@@ -859,22 +859,28 @@ void gui_run (void) {
     char **autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     
     int i;
-    for(i=0; autoscan_plugins[i] != NULL; ++i) {
-      if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
-	int num_mrls;
-	char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
-						       gGui->autoscan_plugin,
-						       &num_mrls);
-	int j;
-	
-	for (j=0; j<num_mrls; j++) {
-	  gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
-	}
-	gGui->playlist_num += j;
-	gGui->playlist_cur = 0;
-	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+
+    if(autoscan_plugins) {
+
+      for(i=0; autoscan_plugins[i] != NULL; ++i) {
+
+	if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
+	  int num_mrls;
+	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
+							 gGui->autoscan_plugin,
+							 &num_mrls);
+	  int j;
 	  
-      }    
+	  if(autoplay_mrls) {
+	    for (j=0; j<num_mrls; j++) {
+	      gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
+	    }
+	    gGui->playlist_num += j;
+	    gGui->playlist_cur = 0;
+	    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	  }
+	}    
+      }
     }
   }  
 
