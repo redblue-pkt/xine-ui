@@ -74,7 +74,8 @@ int is_entry_exist(const char *entry) {
     fclose(fd_read);
   } 
   else {
-    fprintf(stderr, "Unable to find '%s' entry. Exiting.\n", skincfgfile);
+    fprintf(stderr, "SKIN: Unable to find entry '%s' in '%s' skin file."
+	    " Exiting.\n", entry, skincfgfile);
     exit(-1);
   }
 
@@ -144,7 +145,7 @@ int gui_get_skinX(const char *str) {
     value = strtol(v, &v, 10);
     }
   else {
-    fprintf(stderr, "Unable to get '%s' value. Exiting.\n", str);
+    fprintf(stderr, "SKIN: Unable to get '%s' value. Exiting.\n", str);
     exit(-1);
   }
   
@@ -162,7 +163,7 @@ int gui_get_skinY(const char *str) {
     value = strtol(v, &v, 10);
   }
   else {
-    fprintf(stderr, "Unable to get '%s' value. Exiting.\n", str);
+    fprintf(stderr, "SKIN: Unable to get '%s' value. Exiting.\n", str);
     exit(-1);
   }
   
@@ -219,7 +220,7 @@ char *gui_get_skinfile(const char *str) {
     sprintf(ret, "%s/%s/%s", XINE_SKINDIR, skin, v);
   }
   else {
-    fprintf(stderr, "Unable to find '%s:' entry(%s). Exiting.\n", str,v);
+    fprintf(stderr, "SKIN: Unable to find '%s:' entry(%s). Exiting.\n", str,v);
     exit(-1);
   }
   
@@ -279,7 +280,7 @@ void gui_place_extra_images(widget_list_t *gui_widget_list) {
     fclose(fd_read);
   }
   else {
-    fprintf(stderr, "Unable to open '%s'. Exiting.\n", skincfgfile);
+    fprintf(stderr, "SKIN: Unable to open '%s'. Exiting.\n", skincfgfile);
     exit(-1);
   }
 }
