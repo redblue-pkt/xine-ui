@@ -26,6 +26,14 @@
 
 #include <stdarg.h>
 
+typedef struct {
+  xine_osd_t   *osd[2];
+  int           visible;
+  int           have_text;
+  int           x, y;
+  int           w, h;
+} osd_object_t;
+
 #define OSD_BAR_PROGRESS 1
 #define OSD_BAR_POS      2
 #define OSD_BAR_POS2     3
@@ -40,6 +48,11 @@ void osd_stream_infos(void);
 void osd_update_status(void);
 void osd_stream_position(int pos);
 void osd_display_info(char *info, ...);
-  /* see OSD_BAR_* */
+
+/* see OSD_BAR_* */
 void osd_draw_bar(char *title, int min, int max, int val, int type);
+
+int osd_is_visible(void);
+void osd_update_osd(void);
+
 #endif

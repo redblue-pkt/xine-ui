@@ -1188,6 +1188,9 @@ void video_window_set_fullscreen_mode (int req_fullscreen) {
 
   video_window_adapt_size();
   try_to_set_input_focus(gGui->video_window);
+  if(osd_is_visible())
+    osd_update_osd();
+
 }
 
 /*
@@ -2057,8 +2060,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
   case ConfigureNotify:
     if(event->xany.window == gGui->video_window) {
       XConfigureEvent *cev = (XConfigureEvent *) event;
-      Window tmp_win;
+      Window           tmp_win;
+      int              h, w;
 
+      h = gVw->output_height;
+      w = gVw->output_width;
       gVw->output_width  = cev->width;
       gVw->output_height = cev->height;
 
@@ -2072,6 +2078,10 @@ static void video_window_handle_event (XEvent *event, void *data) {
         gVw->xwin = cev->x;
         gVw->ywin = cev->y;
       }
+
+      if(osd_is_visible() && ((h != gVw->output_height) || (w != gVw->output_width)))
+	osd_update_osd();
+
     }
     break;
     

@@ -156,93 +156,94 @@ static char *_osd_get_status_sym(int status) {
 void osd_init(void) {
   int fonth = FONT_SIZE;
 
-  gGui->osd.sinfo = xine_osd_new(gGui->stream, 0, 0, 900, (fonth * 6) + (5 * 3));
-  xine_osd_set_font(gGui->osd.sinfo, "sans", fonth);
-  xine_osd_set_text_palette(gGui->osd.sinfo, 
+  gGui->osd.sinfo.osd[0] = xine_osd_new(gGui->stream, 0, 0, 900, (fonth * 6) + (5 * 3));
+  xine_osd_set_font(gGui->osd.sinfo.osd[0], "sans", fonth);
+  xine_osd_set_text_palette(gGui->osd.sinfo.osd[0], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
   memcpy(color, textpalettes_color, sizeof(textpalettes_color));
   memcpy(trans, textpalettes_trans, sizeof(textpalettes_trans));
 
-  gGui->osd.bar[0] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
-  xine_osd_set_palette(gGui->osd.bar[0], color, trans);
+  gGui->osd.bar.osd[0] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
+  
+  xine_osd_set_palette(gGui->osd.bar.osd[0], color, trans);
 
-  gGui->osd.bar[1] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
-  xine_osd_set_font(gGui->osd.bar[1], "sans", fonth);
-  xine_osd_set_text_palette(gGui->osd.bar[1], 
+  gGui->osd.bar.osd[1] = xine_osd_new(gGui->stream, 0, 0, BAR_WIDTH + 1, BAR_HEIGHT + 1);
+  xine_osd_set_font(gGui->osd.bar.osd[1], "sans", fonth);
+  xine_osd_set_text_palette(gGui->osd.bar.osd[1], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
   
-  gGui->osd.status = xine_osd_new(gGui->stream, 0, 0, 300, 2 * fonth);
-  xine_osd_set_text_palette(gGui->osd.status, 
+  gGui->osd.status.osd[0] = xine_osd_new(gGui->stream, 0, 0, 300, 2 * fonth);
+  xine_osd_set_text_palette(gGui->osd.status.osd[0], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
-  gGui->osd.info = xine_osd_new(gGui->stream, 0, 0, 2048, fonth + (fonth >> 1));
-  xine_osd_set_font(gGui->osd.info, "sans", fonth);
-  xine_osd_set_text_palette(gGui->osd.info, 
+  gGui->osd.info.osd[0] = xine_osd_new(gGui->stream, 0, 0, 2048, fonth + (fonth >> 1));
+  xine_osd_set_font(gGui->osd.info.osd[0], "sans", fonth);
+  xine_osd_set_text_palette(gGui->osd.info.osd[0], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
   gGui->osd.unscaled_available =
-    (xine_osd_get_capabilities(gGui->osd.status) & XINE_OSD_CAP_UNSCALED );
+    (xine_osd_get_capabilities(gGui->osd.status.osd[0]) & XINE_OSD_CAP_UNSCALED );
 }
 
 void osd_deinit(void) {
 
-  if(gGui->osd.sinfo_visible) {
-    gGui->osd.sinfo_visible = 0;
-    xine_osd_hide(gGui->osd.sinfo, 0);
+  if(gGui->osd.sinfo.visible) {
+    gGui->osd.sinfo.visible = 0;
+    xine_osd_hide(gGui->osd.sinfo.osd[0], 0);
   }
 
-  if(gGui->osd.bar_visible) {
-    gGui->osd.bar_visible = 0;
-    xine_osd_hide(gGui->osd.bar[0], 0);
-    xine_osd_hide(gGui->osd.bar[1], 0);
+  if(gGui->osd.bar.visible) {
+    gGui->osd.bar.visible = 0;
+    xine_osd_hide(gGui->osd.bar.osd[0], 0);
+    xine_osd_hide(gGui->osd.bar.osd[1], 0);
   } 
 
-  if(gGui->osd.status_visible) {
-    gGui->osd.status_visible = 0;
-    xine_osd_hide(gGui->osd.status, 0);
+  if(gGui->osd.status.visible) {
+    gGui->osd.status.visible = 0;
+    xine_osd_hide(gGui->osd.status.osd[0], 0);
   } 
 
-  if(gGui->osd.info_visible) {
-    gGui->osd.info_visible = 0;
-    xine_osd_hide(gGui->osd.info, 0);
+  if(gGui->osd.info.visible) {
+    gGui->osd.info.visible = 0;
+    xine_osd_hide(gGui->osd.info.osd[0], 0);
   } 
 
-  xine_osd_free(gGui->osd.sinfo);
-  xine_osd_free(gGui->osd.bar[0]);
-  xine_osd_free(gGui->osd.bar[1]);
-  xine_osd_free(gGui->osd.status);
-  xine_osd_free(gGui->osd.info);
+  xine_osd_free(gGui->osd.sinfo.osd[0]);
+  xine_osd_free(gGui->osd.bar.osd[0]);
+  xine_osd_free(gGui->osd.bar.osd[1]);
+  xine_osd_free(gGui->osd.status.osd[0]);
+  xine_osd_free(gGui->osd.info.osd[0]);
 }
 
 void osd_update(void) {
 
-  if(gGui->osd.sinfo_visible) {
-    gGui->osd.sinfo_visible--;
-    if(!gGui->osd.sinfo_visible) {
-      xine_osd_hide(gGui->osd.sinfo, 0);
+  if(gGui->osd.sinfo.visible) {
+    gGui->osd.sinfo.visible--;
+    if(!gGui->osd.sinfo.visible) {
+      xine_osd_hide(gGui->osd.sinfo.osd[0], 0);
     }
   }
 
-  if(gGui->osd.bar_visible) {
-    gGui->osd.bar_visible--;
-    if(!gGui->osd.bar_visible) {
-      xine_osd_hide(gGui->osd.bar[0], 0);
-      xine_osd_hide(gGui->osd.bar[1], 0);
+  if(gGui->osd.bar.visible) {
+    gGui->osd.bar.visible--;
+    if(!gGui->osd.bar.visible) {
+      xine_osd_hide(gGui->osd.bar.osd[0], 0);
+      xine_osd_hide(gGui->osd.bar.osd[1], 0);
     }
   }
 
-  if(gGui->osd.status_visible) {
-    gGui->osd.status_visible--;
-    if(!gGui->osd.status_visible) {
-      xine_osd_hide(gGui->osd.status, 0);
+  if(gGui->osd.status.visible) {
+    gGui->osd.status.visible--;
+    if(!gGui->osd.status.visible) {
+      xine_osd_hide(gGui->osd.status.osd[0], 0);
     }
   }
 
-  if(gGui->osd.info_visible) {
-    gGui->osd.info_visible--;
-    if(!gGui->osd.info_visible) {
-      xine_osd_hide(gGui->osd.info, 0);
+  if(gGui->osd.info.visible) {
+    gGui->osd.info.visible--;
+    if(!gGui->osd.info.visible) {
+      xine_osd_hide(gGui->osd.info.osd[0], 0);
     }
   }
 
@@ -274,7 +275,7 @@ void osd_stream_infos(void) {
     playedtime /= 1000;
     totaltime  /= 1000;
 
-    xine_osd_clear(gGui->osd.sinfo);
+    xine_osd_clear(gGui->osd.sinfo.osd[0]);
 
     /* We're in visual animation mode */
     if((vwidth == 0) && (vheight == 0)) {
@@ -300,23 +301,23 @@ void osd_stream_infos(void) {
     y = x = 0;
 
     snprintf(buffer, sizeof(buffer), "%s", (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident);
-    xine_osd_get_text_size(gGui->osd.sinfo, buffer, &osdw, &h);
+    xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &osdw, &h);
     p = buffer;
     while(osdw > (wwidth - 40)) {
       *(p++) = '\0';
       *(p)   = '.';
       *(p+1) = '.';
       *(p+2) = '.';
-      xine_osd_get_text_size(gGui->osd.sinfo, p, &osdw, &h);
+      xine_osd_get_text_size(gGui->osd.sinfo.osd[0], p, &osdw, &h);
     }
-    xine_osd_draw_text(gGui->osd.sinfo, x, y, p, XINE_OSD_TEXT1);
+    xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, p, XINE_OSD_TEXT1);
     
     y += h;
     
     if(vcodec && vwidth && vheight) {
       snprintf(buffer, sizeof(buffer), "%s: %dX%d", vcodec, vwidth, vheight);
-      xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
-      xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
+      xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
       if(w > osdw)
 	osdw = w;
       y += h;
@@ -324,8 +325,8 @@ void osd_stream_infos(void) {
 
     if(acodec && asrate) {
       snprintf(buffer, sizeof(buffer), "%s: %d%s", acodec, asrate, "Hz");
-      xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
-      xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
+      xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
       if(w > osdw)
 	osdw = w;
       y += h;
@@ -365,8 +366,8 @@ void osd_stream_infos(void) {
       break;
     }
     sprintf(buffer, "%s.", buffer);
-    xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
-    xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
+    xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
+    xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
     if(w > osdw)
       osdw = w;
     
@@ -391,18 +392,21 @@ void osd_stream_infos(void) {
 	sprintf(buffer, "%s%d:%02d:%02d", buffer, totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
     }
     
-    xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
-    xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
+    xine_osd_draw_text(gGui->osd.sinfo.osd[0], x, y, buffer, XINE_OSD_TEXT1);
+    xine_osd_get_text_size(gGui->osd.sinfo.osd[0], buffer, &w, &h);
     if(w > osdw)
       osdw = w;
     
     osd_stream_position(pos);
     
     x = (wwidth - osdw) - 40;
-    xine_osd_set_position(gGui->osd.sinfo, (x >= 0) ? x : 0, 15);
+    xine_osd_set_position(gGui->osd.sinfo.osd[0], (x >= 0) ? x : 0, 15);
+    gGui->osd.sinfo.x = (x >= 0) ? x : 0;
+    gGui->osd.sinfo.y = 15;
+    gGui->osd.sinfo.w = osdw;
 
-    _xine_osd_show(gGui->osd.sinfo, 0);
-    gGui->osd.sinfo_visible = gGui->osd.timeout;
+    _xine_osd_show(gGui->osd.sinfo.osd[0], 0);
+    gGui->osd.sinfo.visible = gGui->osd.timeout;
   }
 }
 
@@ -430,8 +434,8 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     
     _osd_get_output_size(&wwidth, &wheight);
 
-    xine_osd_clear(gGui->osd.bar[0]);
-    xine_osd_clear(gGui->osd.bar[1]);
+    xine_osd_clear(gGui->osd.bar.osd[0]);
+    xine_osd_clear(gGui->osd.bar.osd[1]);
     
     memset(&bar_color, (XINE_OSD_TEXT1 + 7), sizeof(int) * 40);
     
@@ -450,32 +454,32 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     
     if((type == OSD_BAR_PROGRESS) || (type == OSD_BAR_POS)) {
       x = 3;
-      xine_osd_draw_rect(gGui->osd.bar[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
+      xine_osd_draw_rect(gGui->osd.bar.osd[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
       x += 8;
       
       for(i = 0; i < 40; i++, x += 8) {
-	xine_osd_draw_rect(gGui->osd.bar[0],
+	xine_osd_draw_rect(gGui->osd.bar.osd[0],
 			   x, 6, x + 3, BAR_HEIGHT - 2, bar_color[i], 1);
       }
       
-      xine_osd_draw_rect(gGui->osd.bar[0],
+      xine_osd_draw_rect(gGui->osd.bar.osd[0],
 			 x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
     }
     else if(type == OSD_BAR_POS2) {
       x = 3;
-      xine_osd_draw_rect(gGui->osd.bar[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
+      xine_osd_draw_rect(gGui->osd.bar.osd[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
       x += 8;
       
       for(i = 0; i < 40; i++, x += 8) {
 	if(i == (pos - 1))
-	  xine_osd_draw_rect(gGui->osd.bar[0],
+	  xine_osd_draw_rect(gGui->osd.bar.osd[0],
 			     x, 2, x + 3, BAR_HEIGHT - 2, bar_color[i], 1);
 	else
-	  xine_osd_draw_rect(gGui->osd.bar[0],
+	  xine_osd_draw_rect(gGui->osd.bar.osd[0],
 			     x, 6, x + 3, BAR_HEIGHT - 6, bar_color[i], 1);
       }
       
-      xine_osd_draw_rect(gGui->osd.bar[0],
+      xine_osd_draw_rect(gGui->osd.bar.osd[0],
 			 x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
     }
     else if(type == OSD_BAR_STEPPER) {
@@ -485,7 +489,7 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
       x = 11;
       
       for(i = 0; i < 40; i++, x += 8) {
-	xine_osd_draw_rect(gGui->osd.bar[0],
+	xine_osd_draw_rect(gGui->osd.bar.osd[0],
 			   x, y, x + 3, BAR_HEIGHT - 2, bar_color[i], 1);
 	
 	if(!(i % 2))
@@ -497,23 +501,27 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     if(title) {
       int  tw, th;
       
-      xine_osd_get_text_size(gGui->osd.bar[1], title, &tw, &th);
-      xine_osd_draw_text(gGui->osd.bar[1], (BAR_WIDTH - tw) >> 1, 0, title, XINE_OSD_TEXT1);
+      gGui->osd.bar.have_text = 1;
+      
+      xine_osd_get_text_size(gGui->osd.bar.osd[1], title, &tw, &th);
+      xine_osd_draw_text(gGui->osd.bar.osd[1], (BAR_WIDTH - tw) >> 1, 0, title, XINE_OSD_TEXT1);
     }
+    else
+      gGui->osd.bar.have_text = 0;
     
     x = (wwidth - BAR_WIDTH) >> 1;
-    xine_osd_set_position(gGui->osd.bar[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
-    xine_osd_set_position(gGui->osd.bar[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
+    xine_osd_set_position(gGui->osd.bar.osd[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
+    xine_osd_set_position(gGui->osd.bar.osd[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
     
     /* don't even bother drawing osd over those small streams.
      * it would look pretty bad.
      */
     if( wwidth > MINIMUM_WIN_WIDTH ) {
-      _xine_osd_show(gGui->osd.bar[0], 0);
+      _xine_osd_show(gGui->osd.bar.osd[0], 0);
       if(title)
-        _xine_osd_show(gGui->osd.bar[1], 0);
+        _xine_osd_show(gGui->osd.bar.osd[1], 0);
    
-      gGui->osd.bar_visible = gGui->osd.timeout;
+      gGui->osd.bar.visible = gGui->osd.timeout;
     }
   }
 }
@@ -550,12 +558,12 @@ void osd_display_info(char *info, ...) {
 	return;
     }
 
-    xine_osd_clear(gGui->osd.info);
+    xine_osd_clear(gGui->osd.info.osd[0]);
 
-    xine_osd_draw_text(gGui->osd.info, 0, 0, buf, XINE_OSD_TEXT1);
-    xine_osd_set_position(gGui->osd.info, 20, 10 + 30);
-    _xine_osd_show(gGui->osd.info, 0);
-    gGui->osd.info_visible = gGui->osd.timeout;
+    xine_osd_draw_text(gGui->osd.info.osd[0], 0, 0, buf, XINE_OSD_TEXT1);
+    xine_osd_set_position(gGui->osd.info.osd[0], 20, 10 + 30);
+    _xine_osd_show(gGui->osd.info.osd[0], 0);
+    gGui->osd.info.visible = gGui->osd.timeout;
     SAFE_FREE(buf);
   }
 }
@@ -569,7 +577,7 @@ void osd_update_status(void) {
 
     status = xine_get_status(gGui->stream);
     
-    xine_osd_clear(gGui->osd.status);
+    xine_osd_clear(gGui->osd.status.osd[0]);
     
     /*
       { : eject
@@ -614,17 +622,17 @@ void osd_update_status(void) {
     }
 
     if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
-      xine_osd_set_font(gGui->osd.status, "cetus", UNSCALED_FONT_SIZE);
+      xine_osd_set_font(gGui->osd.status.osd[0], "cetus", UNSCALED_FONT_SIZE);
     else
-      xine_osd_set_font(gGui->osd.status, "cetus", FONT_SIZE);
+      xine_osd_set_font(gGui->osd.status.osd[0], "cetus", FONT_SIZE);
 
     /* set latin1 encoding (NULL) for status text with special characters,
      * then switch back to locale encoding ("") 
      */
-    xine_osd_set_encoding(gGui->osd.status, NULL);
-    xine_osd_draw_text(gGui->osd.status, 0, 0, buffer, XINE_OSD_TEXT1);
-    xine_osd_set_encoding(gGui->osd.status, "");
-    xine_osd_set_position(gGui->osd.status, 20, 10);
+    xine_osd_set_encoding(gGui->osd.status.osd[0], NULL);
+    xine_osd_draw_text(gGui->osd.status.osd[0], 0, 0, buffer, XINE_OSD_TEXT1);
+    xine_osd_set_encoding(gGui->osd.status.osd[0], "");
+    xine_osd_set_position(gGui->osd.status.osd[0], 20, 10);
 
     _osd_get_output_size(&wwidth, &wheight);
 
@@ -632,8 +640,8 @@ void osd_update_status(void) {
      * it would look pretty bad.
      */
     if( wwidth > MINIMUM_WIN_WIDTH ) {
-      _xine_osd_show(gGui->osd.status, 0);
-      gGui->osd.status_visible = gGui->osd.timeout;
+      _xine_osd_show(gGui->osd.status.osd[0], 0);
+      gGui->osd.status.visible = gGui->osd.timeout;
     }
   }
 }
@@ -694,4 +702,60 @@ void osd_display_audio_lang(void) {
 
   snprintf(buffer, sizeof(buffer), "%s%s", _("Audio Channel: "), get_language_from_iso639_1(lang));
   osd_display_info(buffer);
+}
+
+int osd_is_visible(void) {
+  return (gGui->osd.sinfo.visible || gGui->osd.bar.visible);
+}
+
+void osd_update_osd(void) {
+  int vwidth, vheight, wwidth, wheight;
+  int x;
+  
+  vwidth  = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+  vheight = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+  
+  if((vwidth == 0) && (vheight == 0)) {
+    if(gGui->visual_anim.running) {
+      if(gGui->visual_anim.enabled == 1)
+	video_window_get_frame_size(&vwidth, &vheight);
+      else if(gGui->visual_anim.enabled == 2)
+	vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+    }
+    else
+      video_window_get_frame_size(&vwidth, &vheight);
+    
+  }
+  
+  _osd_get_output_size(&wwidth, &wheight);
+  
+  if(gGui->osd.sinfo.visible) {
+    xine_osd_hide(gGui->osd.sinfo.osd[0], 0);
+    
+    x = (wwidth - gGui->osd.sinfo.w) - 40;
+    xine_osd_set_position(gGui->osd.sinfo.osd[0], (x >= 0) ? x : 0,  gGui->osd.sinfo.y);
+    _xine_osd_show(gGui->osd.sinfo.osd[0], 0);
+  }
+
+  if(gGui->osd.bar.visible) {
+    xine_osd_hide(gGui->osd.bar.osd[0], 0);
+    xine_osd_hide(gGui->osd.bar.osd[1], 0);
+    
+    x = (wwidth - BAR_WIDTH) >> 1;
+    xine_osd_set_position(gGui->osd.bar.osd[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
+    xine_osd_set_position(gGui->osd.bar.osd[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
+    
+    /* don't even bother drawing osd over those small streams.
+     * it would look pretty bad.
+     */
+    if(wwidth > MINIMUM_WIN_WIDTH) {
+      _xine_osd_show(gGui->osd.bar.osd[0], 0);
+
+      if(gGui->osd.bar.have_text)
+	_xine_osd_show(gGui->osd.bar.osd[1], 0);
+    }
+
+  }
+
+
 }
