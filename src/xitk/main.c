@@ -129,7 +129,7 @@ static struct option long_options[] = {
  */
 void show_version(void) {
 
-  printf("This is xine (X11 gui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
+  printf("This is xine (X11 gui) - a free video player v%s\n(c) 2000-2002 by G. Bartsch and the xine project team.\n", VERSION);
 }
 
 /*
