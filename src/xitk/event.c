@@ -179,8 +179,17 @@ static void gui_signal_handler (int sig, void *data) {
  */
 void gui_execute_action_id(action_id_t action) {
   xine_event_t   xine_event;
+  static long int numeric_arg = 0;  /* Saves accumulated numeric value */
 
   if(action & ACTID_IS_INPUT_EVENT) {
+
+    if (action >= ACTID_EVENT_NUMBER_0 && action <= ACTID_EVENT_NUMBER_9) {
+      numeric_arg *= 10;
+      numeric_arg += (action - ACTID_EVENT_NUMBER_0);
+    } else if (action == ACTID_EVENT_NUMBER_10_ADD) {
+      numeric_arg += 10;
+    } else numeric_arg = 0;
+    
     /* events for advanced input plugins. */
     xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
     xine_send_event(gGui->xine, &xine_event);
@@ -210,12 +219,20 @@ void gui_execute_action_id(action_id_t action) {
     video_window_set_mag (0.5);
     break;
 
-  case ACTID_SPU_NEXT:
-    gui_change_spu_channel(NULL, (void*)GUI_NEXT);
+  case ACTID_SPU_NEXT: {
+      int i;
+      if (numeric_arg == 0) numeric_arg = 1;
+      for (i=1; i<=numeric_arg; i++)       
+	gui_change_spu_channel(NULL, (void*)GUI_NEXT);
+    }
     break;
     
-  case ACTID_SPU_PRIOR:
-    gui_change_spu_channel(NULL, (void*)GUI_PREV);
+  case ACTID_SPU_PRIOR: {
+      int i;
+      if (numeric_arg == 0) numeric_arg = 1;
+      for (i=1; i<=numeric_arg; i++)       
+	gui_change_spu_channel(NULL, (void*)GUI_PREV);
+    }
     break;
     
   case ACTID_CONTROLSHOW:
@@ -226,12 +243,20 @@ void gui_execute_action_id(action_id_t action) {
     gui_toggle_visibility (NULL, NULL);
     break;
       
-  case ACTID_AUDIOCHAN_NEXT:
-    gui_change_audio_channel(NULL, (void*)GUI_NEXT);
-    break;
-    
-  case ACTID_AUDIOCHAN_PRIOR:
-    gui_change_audio_channel(NULL, (void*)GUI_PREV);
+  case ACTID_AUDIOCHAN_NEXT: {
+      int i;
+      if (numeric_arg == 0) numeric_arg = 1;
+      for (i=1; i<=numeric_arg; i++)       
+	gui_change_audio_channel(NULL, (void*)GUI_NEXT);
+    }
+      break;
+      
+  case ACTID_AUDIOCHAN_PRIOR: {
+      int i;
+      if (numeric_arg == 0) numeric_arg = 1;
+      for (i=1; i<=numeric_arg; i++)       
+	gui_change_audio_channel(NULL, (void*)GUI_PREV);
+  }
     break;
     
   case ACTID_PAUSE:
@@ -274,16 +299,29 @@ void gui_execute_action_id(action_id_t action) {
     gui_setup_show(NULL, NULL);
     break;
 
-  case ACTID_MRL_NEXT:
-    gui_nextprev(NULL, (void*)GUI_NEXT);
+  case ACTID_MRL_NEXT: {
+    int i;
+    if (numeric_arg == 0) numeric_arg = 1;
+    for (i=1; i<=numeric_arg; i++)       
+      gui_nextprev(NULL, (void*)GUI_NEXT);
+  }
     break;
 
-  case ACTID_MRL_PRIOR:
-    gui_nextprev(NULL, (void*)GUI_PREV);
+  case ACTID_MRL_PRIOR: {
+    int i;
+    if (numeric_arg == 0) numeric_arg = 1;
+    for (i=1; i<=numeric_arg; i++)       
+      gui_nextprev(NULL, (void*)GUI_PREV);
+  }
     break;
       
   case ACTID_EJECT:
     gui_eject(NULL, NULL);
+    break;
+
+  case ACTID_SET_CURPOS:
+    /* Number is a percentage */
+    gui_set_current_position((65534 * numeric_arg)/100);
     break;
 
   case ACTID_SET_CURPOS_10:
@@ -324,6 +362,12 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_SET_CURPOS_0:
     gui_set_current_position (0);
+    break;
+
+  case ACTID_SEEK_REL_m:
+    numeric_arg = -numeric_arg;
+  case ACTID_SEEK_REL_p:
+    if (numeric_arg != 0) gui_seek_relative (numeric_arg);
     break;
 
   case ACTID_SEEK_REL_m60:
@@ -443,6 +487,10 @@ void gui_execute_action_id(action_id_t action) {
   default:
     break;
   }
+
+  /* Some sort of function was done given. Clear numeric argument. */
+  numeric_arg = 0;
+
 }	    
 
 /*
