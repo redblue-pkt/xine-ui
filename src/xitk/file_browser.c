@@ -1044,6 +1044,22 @@ static void fb_lbl_hidden_files(xitk_widget_t *w, void *data) {
   xitk_checkbox_callback_exec(fb->show_hidden);
 }
 
+static void fb_handle_events(XEvent *event, void *data) {
+  filebrowser_t *fb = (filebrowser_t *) data;
+  
+  switch(event->type) {
+
+  case KeyPress:
+    {
+      int sel = xitk_browser_get_current_selected(fb->files_browser);
+      
+      if(sel >= 0)
+	fb_select(fb->files_browser, (void *) fb, sel);
+    }
+    break;
+  }
+}
+
 void filebrowser_raise_window(filebrowser_t *fb) {
   if(fb != NULL) {
     if(fb->xwin) {
@@ -1569,7 +1585,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
     sprintf(buffer, "filebrowser%d", (unsigned int) time(NULL));
     fb->widget_key = xitk_register_event_handler(buffer, 
 						 (xitk_window_get_window(fb->xwin)),
-						 NULL,
+						 fb_handle_events,
 						 NULL,
 						 NULL,
 						 fb->widget_list,
