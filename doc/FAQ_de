@@ -6,7 +6,7 @@
                          FAQ (Häufig gestellte Fragen)
 
 
-______________________________________________________________2002/05/02 (1.10)
+______________________________________________________________2002/05/13 (1.11)
 INDEX
 
 
@@ -240,55 +240,18 @@ _____________________________________________________________________________
 
 3.2.3      Eigene RPM-Packete erzeugen (xine-lib, xine-ui)
 
-	Einige Personen beschweren sich über die spec-Dateien, die mit xine
-	geliefert werden und behaupten, daß diese defekt seien und daß sie
-	damit keine Packate bauen können. Daß stimmt natürlich nicht, denn
-	immerhin haben es zwei Personen geschafft, was als Gegenbeweis reichen
-	sollte.
+	Es könnte nicht einfacher sein - führen Sie einfach foldendes
+	Kommando aus:
 
-	Zu allererst - Benutzen Sie *nicht* die bereits existierenden
-	spec-Dateien, weil diese aller Voraussicht nach nicht auf Ihrem System
-	funktionieren werden, da diese vom configure-Skript erzeugt werden und
-	evtl. dynamische/optionale Features enthalten, die auf Ihrem System
-	nicht vorhanden sind.
+	   rpm -ta DER_NAME_DES_TAR_ARCHIVES
+	
+	Die RPMs sollten damit automatisch generiert werden. Die die
+	fertigen Binär-RPMs sollten Sie in ihrem RPM-Binärverzeichnis
+	(i.E.  /usr/src/RPM/RPMS/i686) und die Quellen-RPMs im
+	entsprechenden Verzeichnis (i.E. /usr/src/RPM/SRPMS/) haben.
 
-	Die folgenden Anweisungen gelten sowohl für xine-lib alsauch xine-ui.
-
-	Besorgen Sie sich die Quellen - emtwerder als tar-Archiv von unserer
-	Webseite oder eine aktuellere Entwicklungsversion aus unserem CVS. Im
-	Verzeichnis mit den Quellen rufen Sie "./configure" (bzw.
-	".cvscompile.sh", falls Sie eine CVS-Version haben) auf, was Ihr System
-	testen wird und die entsprechenden xine-Features entsprechend
-	aktivieren/deaktivieren wird. Nachdem dies beendet ist, sind in den
-	Unterverzeichnissen "misc/" der Quellverzeichnisse die spec-Dateien
-	(xine-lib.spec bzw. xine-ui.spec) zu finden, die speziell an Ihr System
-	angepasst sind. Kopieren Sie diese spec-Dateien in ihr
-	RPM-spec-Verzeichnis (i.E. /usr/src/RPM/SPECS/) und die tar-Archive in
-	das RPM-Quellenverzeichnis (i.E. /usr/src/RPM/SOURCES/). Im Falle, daß
-	Sie eine CVS-Version benutzen, haben Sie natuerlich noch keine
-	tar-Archive, die sich aber durch folgende einfache Zwischenschritte
-	erzeichen lassen:
-
-	* Schauen Sie sich xine-lib.spec/xine-ui.spec an - Eine der ersten
-	  Zeilen sollte mit "SOURCE" anfangen. Benutzen Sie den dahinter
-	  angegebenen Dateinamen für Ihr tar-Archiv im nächsten Schritt
-	* Wechseln Sie in das übergeordnete Verzeichnis, daß Ihre
-	  xine-lib/xine-ui Unterverzeichnisse enthält und rufen Sie
-	  "tar cf DATEINAME_VON_OBEN xine-lib/" auf.
-	* Verschieben Sie diese tar-Archibe in das RPM Quellenverzeichnis.
-
-	Rufen Sie nun "rpm -ba xine-lib.spec" (bzw. xine-ui.spec) in Ihrem
-	RPM-spec-Verzeichnis auf. Danach sollten Sie die fertigen Binär-RPMs in
-	ihrem RPM-Binärverzeichnis (i.E. /usr/src/RPM/RPMS/i686) und
-	Quellen-RPMs im entsprechenden Verzeichnis (i.E. /usr/src/RPM/SRPMS/)
-	haben.
-
-	Das ist alles. Achten Sie jedoch darauf, die xine-lib RPMs zu
-	installieren, *bevor* die mit der Übersetzung von xine-ui fortfahren.
-	Anderenfalls wird die Übersetzung bereits beim Aufruf von "configure"
-	abbrechen oder die falsche Version verwendet.
-
-	Ist doch alles ganz einfach, oder ?
+	Vergessen Sie bitte nicht, daß Sie xine-lib übersetzen und
+	installieren müssen, *bevor* Sie mit xine-ui fortfahren.
 
 
 3.3     Wie kann ich den Build-Prozess mit CFLAGS steuern?
