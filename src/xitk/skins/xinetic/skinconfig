@@ -222,7 +222,7 @@ skin.Snapshot {
 
 skin.AutoPlayGUI {
 	coords {
-	  x = 174
+	  x = 258
 	  y = 43
 	}
 	pixmap = MainAutoButton.png
@@ -236,16 +236,16 @@ skin.AutoPlayGUI {
 
 skin.PlBtn {
 	coords {
-	  x = 216
-	  y = 55
+	  x = 5
+	  y = 18
 	}
 	pixmap = PlBtn.png
 }
 
 skin.CtlBtn {
 	coords {
-	  x = 258
-	  y = 55
+	  x = 5
+	  y = 38
 	}
 	pixmap = CtlBtn.png
 }
