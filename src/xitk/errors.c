@@ -181,13 +181,18 @@ void gui_handle_xine_error(void) {
     
   case XINE_ERROR_NO_INPUT_PLUGIN:
     xine_error_with_more(_("- xine engine error -\n\n"
-			   "There is no available input plugin available to handle '%s'.\n"),
+			   "There is no input plugin available to handle '%s'.\nMaybe MRL syntax is wrong or file/stream source doesn not exist."),
 			 gGui->filename);
     break;
     
   case XINE_ERROR_NO_DEMUXER_PLUGIN:
-    xine_error_with_more(_("- xine engine error -\n\nThere is no available demuxer plugin "
-			   "to handle '%s'.\n"), gGui->filename);
+    xine_error_with_more(_("- xine engine error -\n\nThere is no demuxer plugin available "
+			   "to handle '%s'.\nUsually this means that the file format was not recognized."), gGui->filename);
+    break;
+
+  case XINE_ERROR_DEMUXER_FAILED:
+    xine_error_with_more(_("- xine engine error -\n\ndemuxer failed. Maybe '%s' is a broken file?\n"), 
+			 gGui->filename);
     break;
     
   default:
