@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.23\n"
 "POT-Creation-Date: 2004-04-15 16:57+0000\n"
-"PO-Revision-Date: 2004-01-05 09:22+0100\n"
+"PO-Revision-Date: 2004-04-18 08:14+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -141,6 +141,9 @@ msgid ""
 "This is not allowed unless you enable the 'misc.implicit_config' setting "
 "after reading and understanding its help text."
 msgstr ""
+"Sie haben Versucht, die Konfiguration über eine cfg:-MRL zu ändern.\n"
+"Das ist nicht erlaubt, außer Sie aktivieren 'misc.implicit_config', nachdem "
+"Sie den Hilfetext gelesen und verstanden haben."
 
 #: src/xitk/config_wrapper.c:173
 #, c-format
@@ -346,23 +349,22 @@ msgid "Zoom: 50%%"
 msgstr "Zoom: 50%%"
 
 #: src/xitk/event.c:598 src/xitk/event.c:610
-#, fuzzy, c-format
+#, c-format
 msgid "A/V offset: %s"
-msgstr "A/V Versatz: %d"
+msgstr "A/V Versatz: %s"
 
 #: src/xitk/event.c:616
 msgid "A/V Offset: reset."
 msgstr "A/V Versatz: Zurücksetzen"
 
 #: src/xitk/event.c:625 src/xitk/event.c:635
-#, fuzzy, c-format
+#, c-format
 msgid "SPU Offset: %s"
-msgstr "SPU Versatz: %d"
+msgstr "SPU Versatz: %s"
 
 #: src/xitk/event.c:641
-#, fuzzy
 msgid "SPU Offset: reset."
-msgstr "A/V Versatz: Zurücksetzen"
+msgstr "SPU Versatz: Zurücksetzen"
 
 #: src/xitk/event.c:772 src/xitk/menus.c:187
 msgid "Playlist: no loop."
@@ -620,20 +622,19 @@ msgstr "Methode, die zum steuern der Lautstärke benutzt wird."
 
 #: src/xitk/event.c:1402
 msgid "Menu shortcut style"
-msgstr ""
+msgstr "Menu Tastenkürzelstil"
 
 #: src/xitk/event.c:1403
 msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
-msgstr ""
+msgstr "Tastenkürzeldarstellung im Menu, 'Strg Alt' oder 'C,M'."
 
 #: src/xitk/event.c:1487
 msgid "Unable to initialize Imlib\n"
 msgstr "Kann Imlib nicht initialisieren\n"
 
 #: src/xitk/event_sender.c:416
-#, fuzzy
 msgid "xine Event Sender"
-msgstr "Ereignissender"
+msgstr "xine Ereignissender"
 
 #: src/xitk/event_sender.c:433
 msgid "Up"
@@ -810,16 +811,15 @@ msgstr "Keine Hilfe für Abschnitt verfügbar"
 
 #: src/xitk/kbindings.c:497
 msgid "and"
-msgstr ""
+msgstr "und"
 
 #: src/xitk/kbindings.c:510
-#, fuzzy
 msgid ""
 "The following key bindings pairs are identical:\n"
 "\n"
 msgstr ""
-"Diese Tastenbelegung wird bereits für folgende Aktion benutzt:\n"
-"\"%s\".\n"
+"Die folgenden Paare von Tastenbelegung sind identisch::\n"
+"\n"
 
 #: src/xitk/kbindings.c:527
 msgid ""
@@ -827,6 +827,9 @@ msgid ""
 "\n"
 "What do you want to do ?\n"
 msgstr ""
+".\n"
+"\n"
+"Was wollen Sie tun?\n"
 
 #: src/xitk/kbindings.c:533 src/xitk/kbindings_man.c:476
 msgid "Keybindings error!"
@@ -1573,6 +1576,8 @@ msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "use it."
 msgstr ""
+"Das Audiogerät ist nicht verfügbar. Überprüfen Sie, ob es von einem anderen "
+"Programm bereits benutzt wird."
 
 #: src/xitk/main.c:1191
 msgid "*sight*, unkown error."
@@ -1580,7 +1585,7 @@ msgstr "*Stöhn*, unbekannter Fehler."
 
 #: src/xitk/main.c:1301
 msgid "Your system seems too slow, the amoung of dropped frames is too high."
-msgstr ""
+msgstr "Ihr System ist zu langsam, die Anzahl verworfener Bilder ist zu hoch."
 
 #: src/xitk/main.c:1351
 #, c-format
@@ -2066,9 +2071,8 @@ msgid "Auto"
 msgstr "Automatisch"
 
 #: src/xitk/menus.c:1116 src/xitk/menus.c:1125
-#, fuzzy
 msgid "Scan"
-msgstr "Suche nach:"
+msgstr "Suche"
 
 #: src/xitk/menus.c:1117 src/xitk/menus.c:1126 src/xitk/mrl_browser.c:276
 #: src/xitk/playlist.c:1184
@@ -2160,9 +2164,9 @@ msgid "Total time: --:--:--"
 msgstr "Gesamtzeit: --:--:--"
 
 #: src/xitk/panel.c:773
-#, fuzzy, c-format
+#, c-format
 msgid "Amp: %s"
-msgstr "Audio: %s"
+msgstr "Verst.: %s"
 
 #: src/xitk/panel.c:773 src/xitk/panel.c:778
 msgid "Muted"
@@ -2604,9 +2608,8 @@ msgid "File '%s' written.\n"
 msgstr "Datei '%s' gespeichert.\n"
 
 #: src/xitk/splash.c:65
-#, fuzzy
 msgid "xine Splash"
-msgstr "xine %s"
+msgstr "xine Startbild"
 
 #. Create window
 #: src/xitk/stream_infos.c:463
