@@ -32,6 +32,7 @@
 #endif
 #include <X11/Xlib.h>
 #include <xine/video_out_x11.h>
+#include <pthread.h>
 
 #include "event.h"
 #include "control.h"
@@ -50,6 +51,8 @@
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
+
+static pthread_t        seek_thread;
 
 /*
  * Callback-functions for widget-button click
@@ -324,30 +327,28 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   
 }
 
-void gui_set_current_position (int pos) {
+void *gui_set_current_position_thread(void *data) {
+  int pos = (int)data;
 
-  if((xine_is_stream_seekable (gGui->xine)) == 0)
-     return;
-
-  gGui->ignore_status = 1;
+  pthread_detach(pthread_self());
+  
   if(!xine_play (gGui->xine, gGui->filename, pos, 0))
     gui_handle_xine_error();
   
   gGui->ignore_status = 0;
   panel_check_pause();
+
+  pthread_exit(NULL);
 }
 
-void gui_seek_relative (int off_sec) {
-
+void *gui_seek_relative_thread(void *data) {
+  int off_sec = (int)data;
   int sec;
-
-  if (!xine_is_stream_seekable (gGui->xine)) 
-    return;
-
-  gGui->ignore_status = 1;
-
+  
+  pthread_detach(pthread_self());
+  
   sec = xine_get_current_time (gGui->xine);
-  if ((sec + off_sec) < 0) 
+  if((sec + off_sec) < 0)
     sec = 0;
   else
     sec += off_sec;
@@ -357,6 +358,38 @@ void gui_seek_relative (int off_sec) {
 
   gGui->ignore_status = 0;
   panel_check_pause();
+
+  pthread_exit(NULL);
+}
+
+void gui_set_current_position (int pos) {
+  int err;
+  
+  if(((xine_is_stream_seekable (gGui->xine)) == 0) || (gGui->ignore_status == 1))
+    return;
+  
+  gGui->ignore_status = 1;
+  
+  if ((err = pthread_create(&seek_thread,
+			    NULL, gui_set_current_position_thread, (void *)pos)) != 0) {
+    printf(_("gui_set_current_position: can't create new thread (%s)\n"), strerror(err));
+    abort();
+  }
+}
+
+void gui_seek_relative (int off_sec) {
+  int err;
+  
+  if((!xine_is_stream_seekable (gGui->xine)) || (gGui->ignore_status == 1))
+    return;
+  
+  gGui->ignore_status = 1;
+  
+  if ((err = pthread_create(&seek_thread,
+			    NULL, gui_seek_relative_thread, (void *)off_sec)) != 0) {
+    printf(_("gui_set_current_position: can't create new thread (%s)\n"), strerror(err));
+    abort();
+  }
 }
 
 void gui_dndcallback (char *filename) {
