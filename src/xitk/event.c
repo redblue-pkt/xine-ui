@@ -550,8 +550,12 @@ void gui_handle_event (XEvent *event, void *data) {
       break;
 
     case XK_Up:
-      if (xine_get_speed (gGui->xine) < SPEED_FAST_4)
-	xine_set_speed (gGui->xine, xine_get_speed (gGui->xine)*2);
+      if (xine_get_speed (gGui->xine) < SPEED_FAST_4) {
+	if (xine_get_speed (gGui->xine) > SPEED_PAUSE)
+	  xine_set_speed (gGui->xine, xine_get_speed (gGui->xine)*2);
+	else
+	  xine_set_speed (gGui->xine, SPEED_SLOW_4);
+      }
       break;
     case XK_Down:
       if (xine_get_speed (gGui->xine) > SPEED_PAUSE)
