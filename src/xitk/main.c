@@ -691,7 +691,7 @@ static void show_usage (void) {
   printf(_("                    audio_out, video_out, demux, input, sub, post,\n"));
   printf(_("                    audio_decoder, video_decoder.\n"));
   printf(_("      --bug-report [=mrl]      Enable bug report mode:\n"));
-  printf(_("                                 This will turn on verbosity, gather all output\n"));
+  printf(_("                                 Turn on verbosity, gather all output\n"));
   printf(_("                                 messages and write them into a file named\n"));
   printf(_("                                 BUG-REPORT.TXT.\n"));
   printf(_("                                 If <mrl> is given, xine will play the mrl\n"));
@@ -1703,17 +1703,18 @@ int main(int argc, char *argv[]) {
       {
 	FILE   *f;
 
-#ifdef HAVE_SETLOCALE
-	if((xitk_set_locale()) != NULL)
-	  setlocale(LC_ALL, "C");
-#endif
 	if(!(f = fopen("BUG-REPORT.TXT", "w+")))
 	  fprintf(stderr, "fopen(%s) failed: %s.\n", "BUG-REPORT.TXT", strerror(errno));
 	else {
 	  
 	  printf(_("*** NOTE ***\n"));
 	  printf(_(" Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"));
-	  
+
+#ifdef HAVE_SETLOCALE
+	if((xitk_set_locale()) != NULL)
+	  setlocale(LC_ALL, "C");
+#endif
+
 	  if (dup2((fileno(f)), STDOUT_FILENO) < 0)
 	    fprintf(stderr, "dup2() failed: %s.\n", strerror(errno));
 	  else {
