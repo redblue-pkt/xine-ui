@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-12-28 03:17+0100\n"
+"POT-Creation-Date: 2002-01-16 22:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,40 +14,40 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/control.c:316
+#: src/xitk/control.c:317
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr ""
 
-#: src/xitk/control.c:387
+#: src/xitk/control.c:388
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr ""
 
-#: src/xitk/control.c:511
+#: src/xitk/control.c:512
 msgid "Hue"
 msgstr ""
 
-#: src/xitk/control.c:534
+#: src/xitk/control.c:535
 msgid "Sat"
 msgstr ""
 
-#: src/xitk/control.c:557
+#: src/xitk/control.c:558
 msgid "Brt"
 msgstr ""
 
-#: src/xitk/control.c:580
+#: src/xitk/control.c:581
 msgid "Ctr"
 msgstr ""
 
-#: src/xitk/control.c:616
+#: src/xitk/control.c:617
 msgid "Choose a Skin"
 msgstr ""
 
-#: src/xitk/control.c:653 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:829
+#: src/xitk/control.c:654 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:828
 msgid "Dismiss"
 msgstr ""
 
-#: src/xitk/event.c:649
+#: src/xitk/event.c:663
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -55,7 +55,7 @@ msgid ""
 "There is no available input plugin available to handle '%s'.\n"
 msgstr ""
 
-#: src/xitk/event.c:655
+#: src/xitk/event.c:669
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -63,28 +63,28 @@ msgid ""
 "There is no available demuxer plugin to handle '%s'.\n"
 msgstr ""
 
-#: src/xitk/event.c:661
+#: src/xitk/event.c:675
 msgid ""
 "- xine engine error -\n"
 "\n"
 "!! Unhandled error !!\n"
 msgstr ""
 
-#: src/xitk/event.c:889
+#: src/xitk/event.c:903
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
 
-#: src/xitk/event.c:899
+#: src/xitk/event.c:913
 msgid "Cannot open display\n"
 msgstr ""
 
-#: src/xitk/event.c:933
+#: src/xitk/event.c:952
 msgid "Unable to initialize Imlib\n"
 msgstr ""
 
-#: src/xitk/event.c:943
+#: src/xitk/event.c:962
 #, c-format
 msgid "Unable to load %s logo\n"
 msgstr ""
@@ -157,156 +157,160 @@ msgid "                    'h': hide GUI (panel, etc.).\n"
 msgstr ""
 
 #: src/xitk/main.c:184
-msgid "                    'q': quit when play is done.\n"
+msgid "                    'w': hide video window.\n"
 msgstr ""
 
 #: src/xitk/main.c:185
+msgid "                    'q': quit when play is done.\n"
+msgstr ""
+
+#: src/xitk/main.c:186
 msgid ""
 "                    'd': retrieve playlist from DVD. (deprecated. use -s "
 "DVD)\n"
 msgstr ""
 
-#: src/xitk/main.c:186
+#: src/xitk/main.c:187
 msgid ""
 "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
 msgstr ""
 
-#: src/xitk/main.c:187
+#: src/xitk/main.c:188
 msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
 msgstr ""
 
-#: src/xitk/main.c:188
+#: src/xitk/main.c:189
 msgid "  -f, --fullscreen             start in fullscreen mode,\n"
 msgstr ""
 
-#: src/xitk/main.c:189
+#: src/xitk/main.c:190
 msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
 msgstr ""
 
-#: src/xitk/main.c:190
+#: src/xitk/main.c:191
 msgid "  -H, --hide-video             hide video window\n"
 msgstr ""
 
-#: src/xitk/main.c:192
+#: src/xitk/main.c:193
 msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr ""
 
-#: src/xitk/main.c:194
+#: src/xitk/main.c:195
 msgid ""
 "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
 msgstr ""
 
-#: src/xitk/main.c:195
+#: src/xitk/main.c:196
 msgid ""
 "                               is either an X11 visual class, or a visual "
 "id.\n"
 msgstr ""
 
-#: src/xitk/main.c:196
+#: src/xitk/main.c:197
 msgid "      --install                Install a private colormap.\n"
 msgstr ""
 
-#: src/xitk/main.c:197
+#: src/xitk/main.c:198
 msgid "      --keymap [option]        Display keymap. Option are:\n"
 msgstr ""
 
-#: src/xitk/main.c:198
+#: src/xitk/main.c:199
 msgid ""
 "                                 'default': display default keymap table,\n"
 msgstr ""
 
-#: src/xitk/main.c:199
+#: src/xitk/main.c:200
 msgid ""
 "                                 'lirc': display draft of a .lircrc config "
 "file.\n"
 msgstr ""
 
-#: src/xitk/main.c:200
+#: src/xitk/main.c:201
 msgid ""
 "                                 'remapped': user remapped keymap table.\n"
 msgstr ""
 
-#: src/xitk/main.c:201
+#: src/xitk/main.c:202
 msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
 msgstr ""
 
-#: src/xitk/main.c:203
+#: src/xitk/main.c:204
 msgid "examples for valid MRLs (media resource locator):\n"
 msgstr ""
 
-#: src/xitk/main.c:204
+#: src/xitk/main.c:205
 msgid "  File:  'path/foo.vob'\n"
 msgstr ""
 
-#: src/xitk/main.c:205
+#: src/xitk/main.c:206
 msgid "         '/path/foo.vob'\n"
 msgstr ""
 
-#: src/xitk/main.c:206
+#: src/xitk/main.c:207
 msgid "         'file://path/foo.vob'\n"
 msgstr ""
 
-#: src/xitk/main.c:207
+#: src/xitk/main.c:208
 msgid "         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
 msgstr ""
 
-#: src/xitk/main.c:208
+#: src/xitk/main.c:209
 msgid "         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
 msgstr ""
 
-#: src/xitk/main.c:209
+#: src/xitk/main.c:210
 msgid "  DVD:   'dvd://VTS_01_2.VOB'\n"
 msgstr ""
 
-#: src/xitk/main.c:210
+#: src/xitk/main.c:211
 msgid "  VCD:   'vcd://<track number>'\n"
 msgstr ""
 
-#: src/xitk/main.c:283
+#: src/xitk/main.c:284
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr ""
 
-#: src/xitk/main.c:300
+#: src/xitk/main.c:301
 msgid "main: all available video drivers failed.\n"
 msgstr ""
 
-#: src/xitk/main.c:312
+#: src/xitk/main.c:313
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr ""
 
-#: src/xitk/main.c:353
+#: src/xitk/main.c:354
 #, c-format
 msgid "main: trying to autoload '%s' audio driver: "
 msgstr ""
 
-#: src/xitk/main.c:370
+#: src/xitk/main.c:371
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr ""
 
-#: src/xitk/main.c:389
+#: src/xitk/main.c:390
 #, c-format
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr ""
 
-#: src/xitk/main.c:460
+#: src/xitk/main.c:461
 #, c-format
 msgid "Require xine library version 0.9.4, found %d.%d.%d.\n"
 msgstr ""
 
-#: src/xitk/main.c:530
+#: src/xitk/main.c:531
 msgid "video driver id required for -V option\n"
 msgstr ""
 
-#: src/xitk/main.c:540
+#: src/xitk/main.c:541
 msgid "audio driver id required for -A option\n"
 msgstr ""
 
-#: src/xitk/main.c:637
+#: src/xitk/main.c:641
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr ""
@@ -319,104 +323,104 @@ msgstr ""
 msgid "Source:"
 msgstr ""
 
-#: src/xitk/panel.c:487
+#: src/xitk/panel.c:486
 msgid "Volume control"
 msgstr ""
 
-#: src/xitk/panel.c:489
+#: src/xitk/panel.c:488
 msgid "Mute toggle"
 msgstr ""
 
-#: src/xitk/panel.c:656
+#: src/xitk/panel.c:655
 msgid "Play previous entry from playlist"
 msgstr ""
 
-#: src/xitk/panel.c:663
+#: src/xitk/panel.c:662
 msgid "Stop playback"
 msgstr ""
 
-#: src/xitk/panel.c:670
+#: src/xitk/panel.c:669
 msgid "Play selected entry"
 msgstr ""
 
-#: src/xitk/panel.c:678
+#: src/xitk/panel.c:677
 msgid "Pause/Resume playback"
 msgstr ""
 
-#: src/xitk/panel.c:685
+#: src/xitk/panel.c:684
 msgid "Play next entry from playlist"
 msgstr ""
 
-#: src/xitk/panel.c:692
+#: src/xitk/panel.c:691
 msgid "Eject current medium"
 msgstr ""
 
-#: src/xitk/panel.c:699
+#: src/xitk/panel.c:698
 msgid "Quit"
 msgstr ""
 
-#: src/xitk/panel.c:706
+#: src/xitk/panel.c:705
 msgid "Setup window"
 msgstr ""
 
-#: src/xitk/panel.c:713
+#: src/xitk/panel.c:712
 msgid "Hide GUI"
 msgstr ""
 
-#: src/xitk/panel.c:720
+#: src/xitk/panel.c:719
 msgid "Fullscreen/Window mode"
 msgstr ""
 
-#: src/xitk/panel.c:727
+#: src/xitk/panel.c:726
 msgid "Next audio channel"
 msgstr ""
 
-#: src/xitk/panel.c:734
+#: src/xitk/panel.c:733
 msgid "Previous audio channel"
 msgstr ""
 
-#: src/xitk/panel.c:741
+#: src/xitk/panel.c:740
 msgid "Next SPU channel"
 msgstr ""
 
-#: src/xitk/panel.c:748
+#: src/xitk/panel.c:747
 msgid "Previous SPU channel"
 msgstr ""
 
-#: src/xitk/panel.c:812
+#: src/xitk/panel.c:811
 msgid "Take a snapshot"
 msgstr ""
 
-#: src/xitk/panel.c:819
+#: src/xitk/panel.c:818
 msgid "Slow motion"
 msgstr ""
 
-#: src/xitk/panel.c:826
+#: src/xitk/panel.c:825
 msgid "Fast motion"
 msgstr ""
 
-#: src/xitk/panel.c:833
+#: src/xitk/panel.c:832
 msgid "Playlist"
 msgstr ""
 
-#: src/xitk/panel.c:840
+#: src/xitk/panel.c:839
 msgid "Control"
 msgstr ""
 
-#: src/xitk/panel.c:847
+#: src/xitk/panel.c:846
 msgid "MRL Browser"
 msgstr ""
 
-#: src/xitk/playlist.c:333 src/xitk/playlist.c:390
+#: src/xitk/playlist.c:335 src/xitk/playlist.c:392
 #, c-format
 msgid "Can't read %s: %s\n"
 msgstr ""
 
-#: src/xitk/playlist.c:799
+#: src/xitk/playlist.c:801
 msgid "Add"
 msgstr ""
 
-#: src/xitk/playlist.c:809
+#: src/xitk/playlist.c:810
 msgid "Load"
 msgstr ""
 
@@ -424,7 +428,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: src/xitk/playlist.c:853
+#: src/xitk/playlist.c:851
 msgid "Scan for:"
 msgstr ""
 
@@ -448,35 +452,35 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: src/xitk/skins.c:225
+#: src/xitk/skins.c:228
 #, c-format
 msgid "Failed to load %s/%s. Reload old skin '%s'.\n"
 msgstr ""
 
-#: src/xitk/skins.c:240
+#: src/xitk/skins.c:244
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
 
-#: src/xitk/skins.c:267 src/xitk/skins.c:306
+#: src/xitk/skins.c:271 src/xitk/skins.c:310
 #, c-format
 msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
 msgstr ""
 
-#: src/xitk/skins.c:294
+#: src/xitk/skins.c:298
 msgid "No available skin found. Say goodbye.\n"
 msgstr ""
 
-#: src/xitk/skins.c:310
+#: src/xitk/skins.c:314
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
 msgstr ""
 
-#: src/xitk/skins.c:319
+#: src/xitk/skins.c:323
 #, c-format
 msgid "Failed to load %s/%s. Exiting.\n"
 msgstr ""
 
-#: src/xitk/skins.c:328
+#: src/xitk/skins.c:332
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""

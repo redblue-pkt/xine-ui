@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-12-26 00:47+0100\n"
+"POT-Creation-Date: 2002-01-16 22:05+0100\n"
 "PO-Revision-Date: 2001-12-13 20:07GMT\n"
 "Last-Translator: Miguel Freitas <miguel@cetuc.puc-rio.br>\n"
 "Language-Team: \n"
@@ -14,40 +14,40 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/xine-toolkit/test.c:99
+#: src/xitk/xine-toolkit/test.c:103
 msgid "XInitThreads() failed.\n"
 msgstr "erro em XInitThreads().\n"
 
-#: src/xitk/xine-toolkit/test.c:109
+#: src/xitk/xine-toolkit/test.c:113
 msgid "Cannot open display\n"
 msgstr "Não é possível inicializar a tela\n"
 
-#: src/xitk/xine-toolkit/test.c:123
+#: src/xitk/xine-toolkit/test.c:127
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_params() failed.\n"
 
-#: src/xitk/xine-toolkit/test.c:337
+#: src/xitk/xine-toolkit/test.c:341
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:411
+#: src/xitk/xine-toolkit/test.c:415
 msgid "My Frame"
 msgstr "Meu Frame"
 
-#: src/xitk/xine-toolkit/test.c:450
+#: src/xitk/xine-toolkit/test.c:454
 msgid "A Label"
 msgstr "A Label"
 
-#: src/xitk/xine-toolkit/test.c:506
+#: src/xitk/xine-toolkit/test.c:510
 msgid "Fire !!"
 msgstr "Fire !!"
 
-#: src/xitk/xine-toolkit/test.c:537
+#: src/xitk/xine-toolkit/test.c:541
 msgid "!BOOM!"
 msgstr "!BOOM!"
 
-#: src/xitk/xine-toolkit/test.c:609
+#: src/xitk/xine-toolkit/test.c:613
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -56,15 +56,15 @@ msgstr ""
 "Novas entradas selecionadas no combo box são:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:724
+#: src/xitk/xine-toolkit/test.c:728
 msgid "init_test() failed\n"
 msgstr "init_test() failed\n"
 
-#: src/xitk/xine-toolkit/test.c:741
+#: src/xitk/xine-toolkit/test.c:744
 msgid "My Fucking Window"
 msgstr "My Fucking Window"
 
-#: src/xitk/xine-toolkit/test.c:759
+#: src/xitk/xine-toolkit/test.c:762
 msgid "Quit"
 msgstr "Sair"
 
