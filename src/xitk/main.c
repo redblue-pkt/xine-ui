@@ -429,35 +429,6 @@ static void show_banner(void) {
 
 }
 
-static void print_formatted(const char *const *plugins) {
-  const char  *plugin;
-  char         buffer[81];
-  int          len;
-  char        *blanks = "     ";
-  
-  sprintf(buffer, "%s", blanks);
-  plugin = *plugins++;
-
-  while(plugin) {
-
-    len = strlen(buffer);
-
-    if((len + (strlen(plugin) + 3)) < 80)
-      sprintf(buffer, "%s%s%s", buffer, (strlen(buffer) == strlen(blanks)) ? "" : ", ", plugin);
-    else {
-      printf(buffer);
-      printf(",\n");
-      sprintf(buffer, "%s%s", blanks, plugin);
-    }
-    
-    plugin  = *plugins++;
-  }
-  
-  if(strlen(buffer))
-    printf(buffer);
-
-  printf(".\n");
-}
 static void list_plugins(void) {
   typedef struct {
     const char *const *(*func)(xine_t *);
@@ -500,10 +471,39 @@ static void list_plugins(void) {
   
   while(list_functions[i].name) {
     if((plugins = list_functions[i].func(xine))) {
+      const char  *plugin;
+      char         buffer[81];
+      int          len;
+      char        *blanks = "     ";
+      
       printf(list_functions[i].name);
-      print_formatted(plugins);
-      printf("\n");
+      
+      sprintf(buffer, "%s", blanks);
+      plugin = *plugins++;
+      
+      while(plugin) {
+	
+	len = strlen(buffer);
+	
+	if((len + (strlen(plugin) + 3)) < 80) {
+	  sprintf(buffer, "%s%s%s", buffer, 
+		  (strlen(buffer) == strlen(blanks)) ? "" : ", ", plugin);
+	}
+	else {
+	  printf(buffer);
+	  printf(",\n");
+	  sprintf(buffer, "%s%s", blanks, plugin);
+	}
+	
+	plugin = *plugins++;
+      }
+      
+      if(strlen(buffer))
+	printf(buffer);
+      
+      printf(".\n\n");
     }
+    
     i++;
   }
 
