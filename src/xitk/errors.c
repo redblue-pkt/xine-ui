@@ -64,11 +64,15 @@ static void errors_create_window(char *title, char *message) {
 						 NULL, _errors_display_log, 
 						 NULL, 400, ALIGN_CENTER,
 						 message);
+
+  xitk_window_set_parent_window(xw, gGui->video_window);
+
   if(!gGui->use_root_window && gGui->video_display == gGui->display) {
     XLockDisplay(gGui->display);
     XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
     XUnlockDisplay(gGui->display);
   }
+
   layer_above_video(xitk_window_get_window(xw));
 }
 

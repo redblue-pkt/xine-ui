@@ -374,6 +374,7 @@ typedef struct xitk_dialog_s xitk_dialog_t;
 
 struct xitk_window_s {
   Window                    window;
+  Window                    win_parent;
   xitk_pixmap_t            *background;
   int                       width;
   int                       height;

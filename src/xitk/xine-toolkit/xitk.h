@@ -2237,6 +2237,8 @@ xitk_window_t *xitk_window_dialog_yesno(ImlibData *im, char *title,
   xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, __VA_ARGS__)
 #endif
 
+void xitk_window_set_parent_window(xitk_window_t *xwin, Window parent);
+
 void xitk_window_set_modal(xitk_window_t *w);
 void xitk_window_dialog_set_modal(xitk_window_t *w);
 

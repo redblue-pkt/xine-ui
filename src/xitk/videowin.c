@@ -336,7 +336,6 @@ static void video_window_adapt_size (void) {
   Atom                  prop;
   Atom                  wm_delete_window;
   MWMHints              mwmhints;
-  XEvent                xev;
   XGCValues             xgcv;
   Window                old_video_window = None;
   int                   border_width;
@@ -951,13 +950,9 @@ static void video_window_adapt_size (void) {
     XRaiseWindow(gGui->video_display, gGui->video_window);
     XMapWindow(gGui->video_display, gGui->video_window);
     
-    /* Wait for map. */
-    do  {
-      XMaskEvent(gGui->video_display, 
-		 StructureNotifyMask, 
-		 &xev) ;
-    } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
-        
+    while(!xitk_is_window_visible(gGui->display, gGui->video_window))
+      xine_usec_sleep(5000);
+
     if((gGui->always_layer_above || 
 	((!(gVw->fullscreen_mode & WINDOWED_MODE)) && is_layer_above())) && 
        wm_not_ewmh_only()) {
@@ -1191,7 +1186,8 @@ void video_window_set_fullscreen_mode (int req_fullscreen) {
 
   }
 
-  video_window_adapt_size ();
+  video_window_adapt_size();
+  try_to_set_input_focus(gGui->video_window);
 }
 
 /*

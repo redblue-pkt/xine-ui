@@ -41,6 +41,19 @@ static void _xitk_window_destroy_window(xitk_widget_t *, void *);
 
 #define TITLE_BAR_HEIGHT 20
 
+static void _xitk_window_set_focus(Display *display, Window window) {
+  int t = 0;
+
+  while((!xitk_is_window_visible(display, window)) && (++t < 3))
+    xitk_usec_sleep(5000);
+  
+  if(xitk_is_window_visible(display, window)) {
+    XLockDisplay(display);
+    XSetInputFocus(display, window, RevertToParent, CurrentTime);
+    XUnlockDisplay(display);
+  }
+}
+
 /*
  * Is window is size match with given args
  */
@@ -214,6 +227,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
     return NULL;
 
   xwin             = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
+  xwin->win_parent = None;
   xwin->background = NULL;
   xwin->width      = width;
   xwin->height     = height;
@@ -616,6 +630,10 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
 
   XLOCK(im->x.disp);
   XDestroyWindow(im->x.disp, w->window);
+
+  if((w->win_parent != None) && xitk_is_window_visible(im->x.disp, w->win_parent))
+    XSetInputFocus(im->x.disp, w->win_parent, RevertToParent, CurrentTime);
+
   XUNLOCK(im->x.disp);
 
   XITK_FREE(w);
@@ -797,6 +815,8 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
 					NULL,
 					(void *)wd);
   
+  _xitk_window_set_focus(im->x.disp, (xitk_window_get_window(wd->xwin)));
+
   return wd->xwin;
 }
 /*
@@ -932,6 +952,8 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
 					(void *)wd);
 
   xitk_enable_and_show_widget(wd->wyes);
+  
+  _xitk_window_set_focus(im->x.disp, (xitk_window_get_window(wd->xwin)));
 
   return wd->xwin;
 }
@@ -1175,6 +1197,8 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
     xitk_enable_and_show_widget(wd->checkbox_label);
   }
   
+  _xitk_window_set_focus(im->x.disp, (xitk_window_get_window(wd->xwin)));
+
   return wd->xwin;
 }
 
@@ -1397,6 +1421,8 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   xitk_enable_and_show_widget(wd->wno);
   xitk_enable_and_show_widget(wd->wcancel);
 
+  _xitk_window_set_focus(im->x.disp, (xitk_window_get_window(wd->xwin)));
+
   return wd->xwin;
 }
 
@@ -1441,4 +1467,9 @@ xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *ti
   }
   XITK_FREE(buf);
   return xw;
+}
+
+void xitk_window_set_parent_window(xitk_window_t *xwin, Window parent) {
+  if(xwin)
+    xwin->win_parent = parent;
 }

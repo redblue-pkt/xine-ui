@@ -46,6 +46,10 @@
 
 #include <locale.h>
 
+#ifdef __linux__
+#include <execinfo.h>
+#endif
+
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
@@ -294,12 +298,34 @@ static void xitk_signal_handler(int sig) {
     }
     break;
 
-#ifndef DEBUG
   case SIGSEGV:
-    fprintf(stderr, "xiTK received SIGSEGV signal, RIP.\n");
-    abort();
-    break;
+    {
+      fprintf(stderr, "xiTK received SIGSEGV signal, RIP.\n");
+#ifndef DEBUG
+      abort();
+#else
+#ifdef __linux__
+      void    *backtrace_array[255];
+      char   **backtrace_strings;
+      int      entries, i;
+      
+      if((entries = backtrace(backtrace_array, 255))) {
+	if((backtrace_strings = backtrace_symbols(backtrace_array, entries))) {
+	  printf("Backtrace:\n");
+	  
+	  for(i = 0; i < entries; i++) {
+	    printf("  [%d] %s\n", i, backtrace_strings[i]);
+	  }
+	  
+	  free(backtrace_strings);
+	  printf("--\n");
+	}
+      }
 #endif
+#endif
+    }
+    break;
+
 
   }
 }
@@ -734,6 +760,11 @@ void xitk_set_layer_above(Window window) {
   }
   
   switch(gXitk->wm_type & WM_TYPE_COMP_MASK) {
+  case WM_TYPE_MOTIF:
+  case WM_TYPE_LARSWM:
+    return;
+    break;
+    
   case WM_TYPE_KWIN:
     XLockDisplay(gXitk->display);
     XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
@@ -741,19 +772,26 @@ void xitk_set_layer_above(Window window) {
     XUnlockDisplay(gXitk->display);
     break;
     
+  case WM_TYPE_UNKNOWN:
+  case WM_TYPE_WINDOWMAKER:
+  case WM_TYPE_ICE:
+  case WM_TYPE_E:
+  case WM_TYPE_XFCE:
+  case WM_TYPE_SAWFISH:
+  case WM_TYPE_METACITY: /* Untested */
+  case WM_TYPE_AFTERSTEP:
+  case WM_TYPE_BLACKBOX:
   default:
     {
-      if (XA_WIN_LAYER != None) {
-        long propvalue[1];
-
-        propvalue[0] = xitk_get_layer_level();
-
-        XLockDisplay(gXitk->display);
-        XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
-		        XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
-		        1);
-        XUnlockDisplay(gXitk->display);
-      }
+      long propvalue[1];
+      
+      propvalue[0] = xitk_get_layer_level();
+      
+      XLockDisplay(gXitk->display);
+      XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
+		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
+		      1);
+      XUnlockDisplay(gXitk->display);
     }
     break;
   }

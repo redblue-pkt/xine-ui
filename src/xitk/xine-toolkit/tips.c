@@ -49,6 +49,10 @@ typedef struct {
   
   pthread_mutex_t      timer_mutex;
   pthread_cond_t       timer_cond;
+
+  int                  prewait;
+  pthread_mutex_t      prewait_mutex;
+  pthread_cond_t       prewait_cond;
 } _tips_t;
 
 static _tips_t tips;
@@ -64,14 +68,38 @@ static void _tips_handle_event(XEvent *event, void *data) {
 }
 
 static void *_tips_loop_thread(void *data) {
+
   tips.running = 1;
   
   while(tips.running) {
+    struct timeval       tv;
+    struct timespec      ts;
+    int                  result = 1;
+
     pthread_mutex_lock(&tips.new_mutex);
     pthread_cond_wait(&tips.new_cond, &tips.new_mutex);
     pthread_mutex_unlock(&tips.new_mutex);
     
-    if(tips.widget && (tips.widget->tips_timeout > 0) && tips.widget->tips_string) {
+    pthread_mutex_lock(&tips.prewait_mutex);
+    
+    tips.prewait = 1;
+    
+    gettimeofday(&tv, NULL);
+    ts.tv_sec  = tv.tv_sec;
+    ts.tv_nsec = (tv.tv_usec + 300000) * 1000;      
+    
+    result = pthread_cond_timedwait(&tips.prewait_cond, &tips.prewait_mutex, &ts);
+    tips.prewait = 0;
+    
+    if(!result) {
+      tips.widget = NULL;
+      pthread_mutex_unlock(&tips.prewait_mutex);
+      continue;
+    }
+    
+    pthread_mutex_unlock(&tips.prewait_mutex);
+
+    if(tips.widget && (tips.widget->tips_timeout > 0) && tips.widget->tips_string && strlen(tips.widget->tips_string)) {
       int                  x, y, string_length;
       xitk_window_t       *xwin;
       xitk_register_key_t  key;
@@ -196,7 +224,7 @@ static void *_tips_loop_thread(void *data) {
 
       pthread_mutex_unlock(&tips.timer_mutex);
     }
-    
+
   }
 
   pthread_exit(NULL);
@@ -216,13 +244,16 @@ void xitk_tips_init(Display *disp) {
     tips.visible = 0;
     tips.display = disp;
     tips.widget  = NULL;
+    tips.prewait = 0;
 
     pthread_mutex_init(&tips.mutex, NULL);
     pthread_mutex_init(&tips.new_mutex, NULL);
     pthread_mutex_init(&tips.timer_mutex, NULL);
+    pthread_mutex_init(&tips.prewait_mutex, NULL);
 
     pthread_cond_init(&tips.new_cond, NULL);
     pthread_cond_init(&tips.timer_cond, NULL);
+    pthread_cond_init(&tips.prewait_cond, NULL);
     
     pthread_attr_init(&pth_attrs);
 #if ! defined (__OpenBSD__)
@@ -242,7 +273,9 @@ void xitk_tips_deinit(void) {
   tips.running = 0;
   
   pthread_mutex_lock(&tips.mutex);
-  if(tips.visible)
+  if(tips.prewait)
+    pthread_cond_signal(&tips.prewait_cond);
+  else if(tips.visible)
     pthread_cond_signal(&tips.timer_cond);
   else
     pthread_cond_signal(&tips.new_cond);
@@ -257,9 +290,11 @@ void xitk_tips_deinit(void) {
   pthread_mutex_destroy(&tips.mutex);
   pthread_mutex_destroy(&tips.new_mutex);
   pthread_mutex_destroy(&tips.timer_mutex);
+  pthread_mutex_destroy(&tips.prewait_mutex);
   
   pthread_cond_destroy(&tips.new_cond);
   pthread_cond_destroy(&tips.timer_cond);
+  pthread_cond_destroy(&tips.prewait_cond);
 }
 
 /*
@@ -280,10 +315,13 @@ void xitk_tips_hide_tips(void) {
 void xitk_tips_show_widget_tips(xitk_widget_t *w) {
   pthread_mutex_lock(&tips.mutex);
   if(tips.running) {
-    if(tips.widget && tips.visible)
+    
+    if(tips.prewait)
+      pthread_cond_signal(&tips.prewait_cond);
+    else if(tips.widget && tips.visible)
       pthread_cond_signal(&tips.timer_cond);
-
-    if((tips.widget = w))
+    
+    if((tips.widget != w) && (tips.widget = w))
       pthread_cond_signal(&tips.new_cond);
   }
   pthread_mutex_unlock(&tips.mutex);
