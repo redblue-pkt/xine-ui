@@ -86,6 +86,9 @@ static const char *short_options = "?h"
 #ifdef HAVE_LIRC
  "L"
 #endif
+#ifdef HAVE_XF86VIDMODE
+ "F"
+#endif
 #ifdef DEBUG
  "d:"
 #endif
@@ -94,6 +97,9 @@ static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
 #ifdef HAVE_LIRC
   {"no-lirc"        , no_argument      , 0, 'L' },
+#endif
+#ifdef HAVE_XF86VIDMODE
+  {"use-xvidext"    , no_argument      , 0, 'F'},
 #endif
 #ifdef debug
   {"debug"          , required_argument, 0, 'd' },
@@ -176,6 +182,9 @@ void show_usage (void) {
   printf("                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n");
   printf("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n");
   printf("  -f, --fullscreen             start in fullscreen mode,\n");
+#ifdef HAVE_XF86VIDMODE
+  printf("  -F, --use-xvidext            Enable XF86VidMode Extension support\n");
+#endif
   printf("  -g, --hide-gui               hide GUI (panel, etc.),\n");
 #ifdef HAVE_LIRC
   printf("  -L, --no-lirc                Turn off LIRC support.\n");
@@ -491,6 +500,9 @@ int main(int argc, char *argv[]) {
   int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
   int              audio_channel = 0;
   int              spu_channel = -1;
+#ifdef HAVE_XF86VIDMODE
+  int              use_xvidext = 0;
+#endif
   /*  int              audio_options = 0; FIXME */
   int		   visual = 0;
   char            *audio_driver_id = NULL;
@@ -521,6 +533,9 @@ int main(int argc, char *argv[]) {
   gGui->prefered_visual_id = None;
   gGui->install_colormap = 0;
   gGui->cursor_grabbed = 0;
+#ifdef HAVE_XF86VIDMODE
+  gGui->XF86VidMode_fullscreen = 0;
+#endif
 
 #ifdef DEBUG
   /* If XINE_DEBUG envvar is set, parse it */
@@ -631,6 +646,12 @@ int main(int argc, char *argv[]) {
     case 'f': /* full screen mode on start */
       gGui->autoplay_options |= FULL_ON_START;
       break;
+       
+#ifdef HAVE_XF86VIDMODE
+    case 'F': /* Enable XF86VidMode Extension support */
+      use_xvidext = 1;
+      break;
+#endif
 
     case OPTION_VISUAL:
       if (sscanf(optarg, "%x", &visual) == 1)
@@ -694,7 +715,11 @@ int main(int argc, char *argv[]) {
   gGui->config = config_file_init (gGui->configfile);
 
   config_set_int("demux_strategy", demux_strategy);
-
+   
+#ifdef HAVE_XF86VIDMODE
+  if(use_xvidext) config_set_int("use_xvidext", 1);
+#endif
+   
   /*
    * init gui
    */

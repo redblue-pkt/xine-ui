@@ -32,6 +32,9 @@
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
+#ifdef HAVE_XF86VIDMODE
+#include <X11/extensions/xf86vmode.h>
+#endif
 
 #include <xine.h>
 #include <xine/video_out_x11.h>
@@ -74,6 +77,11 @@ typedef struct {
 
   int            completion_event;
 
+#ifdef HAVE_XF86VIDMODE
+  // XF86VidMode Extension stuff
+  XF86VidModeModeInfo** XF86_modelines;
+  int                   XF86_modelines_count;
+#endif
 } gVw_t;
 
 static gVw_t    *gVw;
@@ -258,6 +266,32 @@ void video_window_adapt_size (int video_width, int video_height,
   *dest_x = 0;
   *dest_y = 0;
 
+#ifdef HAVE_XF86VIDMODE
+  // XF86VidMode Extension
+  // In case a fullscreen request is received or if already in fullscreen, the
+  // appropriate modeline will be looked up and used.
+  if(gVw->fullscreen_req || gVw->fullscreen_mode) {
+    int search = 0;
+    
+    // skipping first entry because it is the current modeline
+    for(search = 1; search < gVw->XF86_modelines_count; search++) {
+       if(gVw->XF86_modelines[search]->hdisplay >= gVw->video_width)
+	 break;
+    }
+
+    // just switching to a different modeline if necessary
+    if(!(gVw->XF86_modelines_count <= 1) && !(search > gVw->XF86_modelines_count)) {
+       XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[search]);
+       XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
+       
+       gGui->XF86VidMode_fullscreen = 1;
+       
+       gVw->fullscreen_width  = gVw->XF86_modelines[search]->hdisplay;
+       gVw->fullscreen_height = gVw->XF86_modelines[search]->vdisplay;
+    }
+  }
+#endif
+
   if (gVw->fullscreen_req) {
 
     *dest_width  = gVw->fullscreen_width;
@@ -266,6 +300,12 @@ void video_window_adapt_size (int video_width, int video_height,
     if (gGui->video_window) {
 
       if (gVw->fullscreen_mode) {
+#ifdef HAVE_XF86VIDMODE
+	// resizing the video window may be necessary if the modeline has
+	// just been switched
+	XResizeWindow (gGui->display, gGui->video_window,
+		       gVw->fullscreen_width, gVw->fullscreen_height);
+#endif
 	XUnlockDisplay (gGui->display);
 	return;
       }
@@ -358,6 +398,20 @@ void video_window_adapt_size (int video_width, int video_height,
     if (gGui->video_window) {
 
       if (gVw->fullscreen_mode) {
+#ifdef HAVE_XF86VIDMODE
+	// toggling from fullscreen to window mode - time to switch back to
+	// the original modeline
+	if(gVw->XF86_modelines_count > 1) {
+	   XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[0]);
+	   XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
+
+	   gGui->XF86VidMode_fullscreen = 0;
+       
+	   gVw->fullscreen_width  = gVw->XF86_modelines[0]->hdisplay;
+	   gVw->fullscreen_height = gVw->XF86_modelines[0]->vdisplay;
+	}
+#endif
+
 	widget_unregister_event_handler(&gVw->old_widget_key);
 	old_video_window = gGui->video_window;
       }
@@ -550,7 +604,9 @@ void video_window_init (void) {
   int                   dummy_a, dummy_b;
   XineramaScreenInfo   *screeninfo = NULL;
 #endif
-
+#ifdef HAVE_XF86VIDMODE
+  int                 dummy_query_event, dummy_query_error;
+#endif
 
   gVw = (gVw_t *) xmalloc(sizeof(gVw_t));
 
@@ -642,6 +698,40 @@ void video_window_init (void) {
   } else {
     gVw->completion_event = -1;
   }
+
+#ifdef HAVE_XF86VIDMODE
+  if(config_lookup_int("use_xvidext", 0)) {
+     if(XF86VidModeQueryExtension(gGui->display, &dummy_query_event, &dummy_query_error)) {
+	XF86VidModeModeInfo* XF86_modelines_swap;
+	int                  major, minor, sort_x, sort_y;
+     
+	XF86VidModeQueryVersion(gGui->display, &major, &minor);
+	printf("XF86VidMode Extension (%d.%d) detected, trying to use it.\n", major, minor);
+       
+	if(XF86VidModeGetAllModeLines(gGui->display, XDefaultScreen(gGui->display), &(gVw->XF86_modelines_count), &(gVw->XF86_modelines))) {
+	   printf("XF86VidMode Extension: %d modelines found.\n", gVw->XF86_modelines_count);
+	
+	   // sorting modelines, skipping first entry because it is the current
+	   // modeline in use - this is important so we know to which modeline
+	   // we have to switch to when toggling fullscreen mode.
+	   for(sort_x = 1; sort_x < gVw->XF86_modelines_count; sort_x++) {
+	      for(sort_y = sort_x+1; sort_y < gVw->XF86_modelines_count; sort_y++) {
+		 if(gVw->XF86_modelines[sort_x]->hdisplay > gVw->XF86_modelines[sort_y]->hdisplay) {
+		    XF86_modelines_swap = gVw->XF86_modelines[sort_y];
+		    gVw->XF86_modelines[sort_y] = gVw->XF86_modelines[sort_x];
+		    gVw->XF86_modelines[sort_x] = XF86_modelines_swap;
+		 }
+	      }
+	   }
+	} else {
+	   gVw->XF86_modelines_count = 0;
+	   printf("XF86VidMode Extension: could not get list of available modelines. Failed.\n");
+	}
+     } else {
+	printf("XF86VidMode Extension: initialization failed, not using it.\n");
+     }
+  }
+#endif
 
   XUnlockDisplay (gGui->display);
 

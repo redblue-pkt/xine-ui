@@ -52,6 +52,14 @@ extern _panel_t        *panel;
  */
 void gui_exit (widget_t *w, void *data) {
 
+#ifdef HAVE_XF86VIDMODE
+  // just in case a different modeline than the original one is running,
+  // toggle back to window mode which automatically causes a switch back to
+  // the original modeline
+  if(gGui->XF86VidMode_fullscreen)
+     gui_toggle_fullscreen(NULL,NULL);
+#endif
+   
   printf("xine-panel: EXIT\n");
   
   config_save();

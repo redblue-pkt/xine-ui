@@ -94,6 +94,10 @@ typedef struct {
   int                  lirc_enable;
 #endif
 
+#ifdef HAVE_XF86VIDMODE
+  int                 XF86VidMode_fullscreen;
+#endif
+
   struct {
     int                caps;
     int                volume_mixer;

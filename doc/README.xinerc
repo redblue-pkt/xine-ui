@@ -154,6 +154,12 @@ xine-ui specific values:
 
 layer_above             Boolean value of WM layer property using.
 
+use_xvidext             XINE can switch to a different screen resolution which
+                        fits your video material best when toggling fullscreen
+			mode by using the XF86VidMode Extension.
+			(0) off [default]
+			(1) on
+
 *** NOTE: following values shouldn't be changed by user:
 panel_x                 X coords of panel window in root window.
 

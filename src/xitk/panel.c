@@ -189,6 +189,13 @@ void panel_toggle_visibility (widget_t *w, void *data) {
      
     if(gGui->cursor_grabbed)
        XUngrabPointer(gGui->display, CurrentTime);
+     
+#ifdef HAVE_XF86VIDMODE
+    // necessary to place the panel in a visible area (otherwise it might
+    // appear off the video window while switched to a different modline)
+    if(gGui->XF86VidMode_fullscreen)
+       XMoveWindow(gGui->display, gGui->panel_window, 0, 0);
+#endif
   }
 
   config_set_int("panel_visible", panel->visible);

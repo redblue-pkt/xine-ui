@@ -39,6 +39,9 @@
 /* Define this if you have libXinerama installed */
 #undef HAVE_XINERAMA
 
+/* Define this if you have libXxf86vm installed */
+#undef HAVE_XF86VIDMODE
+
 /* Define this if you have DPMS */
 #undef HAVE_DPMS
 
