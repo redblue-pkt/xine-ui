@@ -193,8 +193,10 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
   }
 
   /* workaround for Enlightenment: need to re-map for reparenting */
-  panel_toggle_visibility(NULL, NULL);
-  panel_toggle_visibility(NULL, NULL);
+  if (panel_is_visible()) {
+    panel_toggle_visibility(NULL, NULL);
+    panel_toggle_visibility(NULL, NULL);
+  }
   
   if(mrl_browser_is_visible()) {
     show_mrl_browser();
