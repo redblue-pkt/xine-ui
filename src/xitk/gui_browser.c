@@ -25,10 +25,8 @@
 #endif
 
 #include <stdio.h>
-#include <setjmp.h>
-#include <pthread.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 #include "gui_widget_types.h"
 #include "gui_browser.h"
@@ -42,7 +40,7 @@
 #define WBDN    2  /*  Position of button down in item_tree  */
 #define WBSTART 3  /*  Position of first item button in item_tree */
 
-/*
+/**
  * Return the real number of first displayed in list
  */
 int browser_get_current_start(widget_t *w) {
@@ -55,7 +53,8 @@ int browser_get_current_start(widget_t *w) {
 
   return -1;
 }
-/*
+
+/**
  * Return the current selected button (if not, return -1)
  */
 int browser_get_current_selected(widget_t *w) {
@@ -72,7 +71,8 @@ int browser_get_current_selected(widget_t *w) {
 
   return -1;    
 }
-/*
+
+/**
  * Release all enabled buttons
  */
 void browser_release_all_buttons(widget_t *w) {
@@ -88,7 +88,8 @@ void browser_release_all_buttons(widget_t *w) {
     }
   }
 }
-/*
+
+/**
  * Select the item 'select' in list
  */
 void browser_set_select(widget_t *w, int select) {
@@ -102,7 +103,8 @@ void browser_set_select(widget_t *w, int select) {
 			  private_data->win, private_data->gc);
   }
 }
-/*
+
+/**
  * Redraw buttons/slider
  */
 void browser_rebuild_browser(widget_t *w, int start) {
@@ -147,7 +149,8 @@ void browser_rebuild_browser(widget_t *w, int start) {
     free(wl);
   }
 }
-/*
+
+/**
  * Update the list, and rebuild button list
  */
 void browser_update_list(widget_t *w, char **list, int len, int start) {
@@ -163,7 +166,8 @@ void browser_update_list(widget_t *w, char **list, int len, int start) {
     }
   }
 }  
-/*
+
+/**
  * Handle slider movments
  */
 static void browser_slidmove(widget_t *w, void *data, int pos) {
@@ -187,7 +191,8 @@ static void browser_slidmove(widget_t *w, void *data, int pos) {
       browser_rebuild_browser(((widget_t*)data), -1);
   }
 }
-/*
+
+/**
  * slide up
  */
 static void browser_up(widget_t *w, void *data) {
@@ -206,7 +211,8 @@ static void browser_up(widget_t *w, void *data) {
     free(wl);
   }
 }
-/*
+
+/**
  * slide down
  */
 static void browser_down(widget_t *w, void *data) {
@@ -225,7 +231,8 @@ static void browser_down(widget_t *w, void *data) {
     free(wl);
   }
 }
-/*
+
+/**
  * Handle list selections
  */
 static void browser_select(widget_t *w, void *data, int state) {
@@ -259,7 +266,8 @@ static void browser_select(widget_t *w, void *data, int state) {
   }
   
 }
-/*
+
+/**
  * Create the list browser
  */
 widget_t *create_browser(Display *display, ImlibData *idata,

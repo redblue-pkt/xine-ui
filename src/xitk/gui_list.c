@@ -47,6 +47,7 @@ gui_list_t *gui_list_new (void) {
 
   return list;
 }
+
 /*
  *
  */
@@ -61,6 +62,7 @@ void gui_list_free(gui_list_t *l) {
 
   l->first = l->cur = l->last = NULL;
 }
+
 /*
  *
  */
@@ -73,6 +75,7 @@ void *gui_list_first_content (gui_list_t *l) {
   else
     return NULL;
 }
+
 /*
  *
  */
@@ -92,12 +95,15 @@ void *gui_list_next_content (gui_list_t *l) {
     return NULL;
   }    
 }
+
 /*
  *
  */
 int gui_list_is_empty (gui_list_t *l) {
+
   return (l->first != NULL);
 }
+
 /*
  *
  */
@@ -115,6 +121,7 @@ void *gui_list_last_content (gui_list_t *l) {
     return NULL;
   }    
 }
+
 /*
  *
  */
@@ -135,6 +142,7 @@ void *gui_list_prev_content (gui_list_t *l){
     return NULL;
   }    
 }
+
 /*
  *
  */
@@ -159,6 +167,7 @@ void gui_list_append_content (gui_list_t *l, void *content) {
     node->prev = node->next = NULL;
   }
 }
+
 /*
  *
  */
@@ -166,6 +175,7 @@ void gui_list_insert_content (gui_list_t *l, void *content) {
   fprintf (stderr, "gui_list_insert_content : NOT IMPLEMENTED");
   exit(1);
 }
+
 /*
  *
  */

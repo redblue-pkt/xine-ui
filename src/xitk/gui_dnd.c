@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <X11/Xatom.h>
-#include <pthread.h>
 #include <string.h>
 #include <signal.h>
 

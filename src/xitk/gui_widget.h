@@ -27,6 +27,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include "gui_list.h"
 #include "gui_widget_types.h"
 
 #define FOCUS_RECEIVED 1
@@ -45,13 +46,13 @@ typedef struct {
   char *colorname;
 } gui_color_names_t;
 
-typedef struct gui_image_s {
+typedef struct {
   Pixmap image;
   int width;
   int height;
 } gui_image_t;
 
-typedef struct gui_color_s {
+typedef struct {
     XColor red;
     XColor blue;
     XColor green;
@@ -81,7 +82,7 @@ typedef struct widget_s {
 
 typedef struct widget_list_s {
 
-  struct gui_list_s *l;
+  gui_list_t        *l;
 
   widget_t          *focusedWidget;
   widget_t          *pressedWidget;
@@ -90,26 +91,66 @@ typedef struct widget_list_s {
   GC                 gc;
 } widget_list_t;
 
+/* ****************************************************************** */
 
+/**
+ * Allocate an clean memory of "size" bytes.
+ */
 void *gui_xmalloc(size_t size);
+
+/**
+ * return pointer to the gui_color_names struct.
+ */
 gui_color_names_t *gui_get_color_names(void);
 
+/**
+ * (re)Paint a widget list.
+ */
 int paint_widget_list (widget_list_t *wl) ;
 
+/**
+ * Boolean function, if x and y coords is in widget.
+ */
 int is_inside_widget (widget_t *widget, int x, int y) ;
 
+/**
+ * Return widget from widget list 'wl' localted at x,y coords.
+ */
 widget_t *get_widget_at (widget_list_t *wl, int x, int y) ;
 
+/**
+ * Notify widget (if enabled) if motion happend at x, y coords.
+ */
 void motion_notify_widget_list (widget_list_t *wl, int x, int y) ;
 
+/**
+ * Notify widget (if enabled) if click event happend at x, y coords.
+ */
 int click_notify_widget_list (widget_list_t *wl, int x, int y, int bUp) ;
 
+/**
+ * Return width (in pixel) of widget.
+ */
 int widget_get_width(widget_t *);
 
+/**
+ * Return height (in pixel) of widget.
+ */
 int widget_get_height(widget_t *);
 
+/**
+ * Boolean, enable state of widget.
+ */
 int widget_enabled(widget_t *);
+
+/**
+ * Enable widget.
+ */
 void widget_enable(widget_t *);
+
+/**
+ * Disable widget.
+ */
 void widget_disable(widget_t *);
 
 #endif

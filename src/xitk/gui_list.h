@@ -33,31 +33,62 @@ typedef struct gui_node_s {
 } gui_node_t;
 
 
-typedef struct gui_list_s {
+typedef struct {
 
   gui_node_t    *first, *last, *cur;
 
 } gui_list_t;
 
+/* ***************************************************************** */
 
+/**
+ * Create a new list.
+ */
 gui_list_t *gui_list_new (void);
 
+/**
+ * Freeing list.
+ */
 void gui_list_free(gui_list_t *l);
 
+/**
+ * Boolean, status of list.
+ */
 int gui_list_is_empty (gui_list_t *l);
 
+/**
+ * return content of first entry in list.
+ */
 void *gui_list_first_content (gui_list_t *l);
 
+/**
+ * return next content in list.
+ */
 void *gui_list_next_content (gui_list_t *l);
 
+/**
+ * Return last content of list.
+ */
 void *gui_list_last_content (gui_list_t *l);
 
+/**
+ * Return previous content of list.
+ */
 void *gui_list_prev_content (gui_list_t *l);
 
+/**
+ * Append content to list.
+ */
 void gui_list_append_content (gui_list_t *l, void *content);
 
+/**
+ * Insert content in list. NOT IMPLEMENTED
+ */
 void gui_list_insert_content (gui_list_t *l, void *content);
 
+/**
+ * Remove current content in list. NOT IMPLEMENTED
+ */
 void gui_list_delete_current (gui_list_t *l);
 
 #endif

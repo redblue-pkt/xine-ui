@@ -26,20 +26,22 @@
 #endif
 
 #include <stdio.h>
-#include <pthread.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 #include "gui_image.h"
 #include "gui_widget_types.h"
 
+/*
+ *
+ */
 gui_image_t *gui_load_image(ImlibData *idata, const char *image) {
   ImlibImage *img = NULL;
   gui_image_t *i;
 
   i = (gui_image_t *) gui_xmalloc(sizeof(gui_image_t));
   
-  if( !( img = Imlib_load_image(idata, (char *)image) ) ) {
+  if(!(img = Imlib_load_image(idata, (char *)image))) {
     fprintf(stderr, "xine-panel: couldn't find image %s\n", image);
     exit(-1);
   }
@@ -53,7 +55,10 @@ gui_image_t *gui_load_image(ImlibData *idata, const char *image) {
   return i;
 } 
 
-void paint_image (widget_t *i,  Window win, GC gc) {
+/*
+ *
+ */
+static void paint_image (widget_t *i,  Window win, GC gc) {
   gui_image_t *skin;
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
@@ -68,13 +73,19 @@ void paint_image (widget_t *i,  Window win, GC gc) {
     
     XFlush (private_data->display);
 
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf (stderr, "paint image on something (%d) "
 	     "that is not an image\n", i->widget_type);
-  
+#endif
+
   XUnlockDisplay (private_data->display);
 }
 
+/*
+ *
+ */
 widget_t *create_image (Display *display, ImlibData *idata,
 			int x, int y, const char *skin) {
   widget_t              *mywidget;
@@ -104,4 +115,3 @@ widget_t *create_image (Display *display, ImlibData *idata,
 
   return mywidget;
 }
-

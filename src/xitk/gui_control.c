@@ -31,9 +31,9 @@
 #include <X11/Xutil.h>
 #include <X11/extensions/shape.h>
 #include <X11/keysym.h>
-#include <Imlib.h>
 #include <pthread.h>
 
+#include "Imlib-light/Imlib.h"
 #include "gui_main.h"
 #include "gui_list.h"
 #include "gui_button.h"

@@ -32,9 +32,10 @@
 #include <X11/extensions/shape.h>
 #include <X11/keysym.h>
 #include <errno.h>
-#include "Imlib.h"
 #include <pthread.h>
 #include <signal.h>
+
+#include "Imlib-light/Imlib.h"
 #include "gui_main.h"
 #include "gui_list.h"
 #include "gui_button.h"

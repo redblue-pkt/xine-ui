@@ -28,9 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 #include "gui_image.h"
 #include "gui_label.h"
@@ -39,7 +38,7 @@
 /*
  *
  */
-void paint_label (widget_t *l,  Window win, GC gc) {
+static void paint_label (widget_t *l,  Window win, GC gc) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;
   gui_image_t *font = (gui_image_t *) private_data->font;
@@ -76,12 +75,16 @@ void paint_label (widget_t *l,  Window win, GC gc) {
       x_dest += nCWidth;
     }
     
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf (stderr, "paint labal on something (%d) that "
 	     "is not a label\n", l->widget_type);
+#endif
 
   XUnlockDisplay (private_data->display);
 }
+
 /*
  *
  */
@@ -98,11 +101,16 @@ int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
     }
     paint_label(l, wl->win, wl->gc);
     return 1;
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf (stderr, "notify focus label button on something (%d) "
 	     "that is not a label button\n", l->widget_type);
+#endif
+
   return 0;
 }
+
 /*
  *
  */

@@ -24,12 +24,14 @@
 #ifndef GUI_MAIN_H
 #define GUI_MAIN_H
 
-#include <Imlib.h>
 #include <pthread.h>
 #include <X11/Xlib.h>
+
 #ifdef HAVE_LIRC
 #include "lirc/lirc_client.h"
 #endif
+
+#include "Imlib-light/Imlib.h"
 #include "xine.h"
 #include "gui_widget.h"
 #include "gui_dnd.h"

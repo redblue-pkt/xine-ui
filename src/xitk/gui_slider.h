@@ -25,7 +25,7 @@
 #define HAVE_GUI_SLIDER_H
 
 #include <X11/Xlib.h>
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 
 /*  To handle a vertical slider */
@@ -33,24 +33,7 @@
 /*  To handle an horizontal slider */
 #define HSLIDER 2
 
-widget_t *create_slider(Display *display, ImlibData *idata,
-			int type, int x, int y, int min, int max, 
-			int step, const char *bg, const char *paddle, 
-/* cb for motion      */void *fm, void *udm,
-/* cb for btn release */void *f, void *ud) ;
-
-int slider_get_pos(widget_t *);
-void slider_set_pos(widget_list_t *, widget_t *, int);
-void slider_set_min(widget_t *, int);
-void slider_set_max(widget_t *, int);
-int slider_get_min(widget_t *);
-int slider_get_max(widget_t *);
-void slider_reset(widget_list_t *, widget_t *);
-void slider_set_to_max(widget_list_t *, widget_t *);
-void slider_make_step(widget_list_t *, widget_t *);
-void slider_make_backstep(widget_list_t *, widget_t *);
-
-typedef struct slider_private_data_s {
+typedef struct {
   Display    *display;
 
   widget_t   *sWidget;
@@ -78,5 +61,66 @@ typedef struct slider_private_data_s {
   float ratio;
 
 } slider_private_data_t;
+
+/* *************************************************************** */
+
+/**
+ * Create a slider
+ */
+widget_t *create_slider(Display *display, ImlibData *idata,
+			int type, int x, int y, int min, int max, 
+			int step, const char *bg, const char *paddle, 
+/* cb for motion      */void *fm, void *udm,
+/* cb for btn release */void *f, void *ud) ;
+
+/**
+ * Get current position of paddle.
+ */
+int slider_get_pos(widget_t *);
+
+/**
+ * Set position of paddle.
+ */
+void slider_set_pos(widget_list_t *, widget_t *, int);
+
+/**
+ * Set min value of slider.
+ */
+void slider_set_min(widget_t *, int);
+
+/**
+ * Set max value of slider.
+ */
+void slider_set_max(widget_t *, int);
+
+/**
+ * Get min value of slider.
+ */
+int slider_get_min(widget_t *);
+
+/**
+ * Get max value of slider.
+ */
+int slider_get_max(widget_t *);
+
+/**
+ * Set position to 0 and redraw the widget.
+ */
+void slider_reset(widget_list_t *, widget_t *);
+
+/**
+ * Set position to max and redraw the widget.
+ */
+void slider_set_to_max(widget_list_t *, widget_t *);
+
+/**
+ * Increment by step the paddle position
+ */
+void slider_make_step(widget_list_t *, widget_t *);
+
+/**
+ * Decrement by step the paddle position.
+ */
+void slider_make_backstep(widget_list_t *, widget_t *);
 
 #endif

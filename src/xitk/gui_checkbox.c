@@ -26,9 +26,8 @@
 #endif
 
 #include <stdio.h>
-#include <pthread.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 #include "gui_image.h"
 #include "gui_checkbox.h"
@@ -37,11 +36,11 @@
 /*
  *
  */
-void paint_checkbox (widget_t *c, Window win, GC gc) {
-  int          checkbox_width;
-  gui_image_t *skin;
+static void paint_checkbox (widget_t *c, Window win, GC gc) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
+  int          checkbox_width;
+  gui_image_t *skin;
   
   XLockDisplay (private_data->display);
   
@@ -52,17 +51,20 @@ void paint_checkbox (widget_t *c, Window win, GC gc) {
     
     if (private_data->cArmed) {
       if (private_data->cClicked) { //click
-	XCopyArea (private_data->display, skin->image,  win, gc, 2*checkbox_width, 0,
+	XCopyArea (private_data->display, skin->image, 
+		   win, gc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       }
       else {
 	if(!private_data->cState) //focus
-	  XCopyArea (private_data->display, skin->image,  win, gc, checkbox_width, 0,
+	  XCopyArea (private_data->display, skin->image, 
+		     win, gc, checkbox_width, 0,
 		     checkbox_width, skin->height, c->x, c->y);
       }
     } else {
       if(private_data->cState) //click
-	XCopyArea (private_data->display, skin->image,  win, gc, 2*checkbox_width, 0,
+	XCopyArea (private_data->display, skin->image, 
+		   win, gc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       else  //normal
 	XCopyArea (private_data->display, skin->image,  win, gc, 0, 0,
@@ -71,21 +73,24 @@ void paint_checkbox (widget_t *c, Window win, GC gc) {
 
     XFlush (private_data->display);
   } 
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "paint checkbox something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
   
+#endif
+
   XUnlockDisplay (private_data->display);
 }
 
 /*
  *
  */
-int notify_click_checkbox (widget_list_t *wl, widget_t *c, 
-			   int cUp, int x, int y) {
-  int bRepaint = 0;
+static int notify_click_checkbox (widget_list_t *wl, widget_t *c, 
+				  int cUp, int x, int y) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
+  int bRepaint = 0;
   
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
 
@@ -101,24 +106,32 @@ int notify_click_checkbox (widget_list_t *wl, widget_t *c,
     }
     if(!bRepaint) 
       paint_widget_list (wl);
-  } else
+  }
+#ifdef DEBUG_GUI
+  else
     fprintf (stderr, "notify click checkbox on something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
+#endif
+
   return 1;
 }
 
 /*
  *
  */
-int notify_focus_checkbox (widget_list_t *wl, widget_t *c, int cEntered) {
+static int notify_focus_checkbox (widget_list_t *wl, 
+				  widget_t *c, int cEntered) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
   if (c->widget_type & WIDGET_TYPE_CHECKBOX)
     private_data->cArmed = cEntered;
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "notify focus checkbox on something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
+#endif
+
   return 1;
 }
 
@@ -130,8 +143,10 @@ int checkbox_get_state(widget_t *c) {
     (checkbox_private_data_t *) c->private_data;
   
   if (c->widget_type & ~WIDGET_TYPE_CHECKBOX) {
+#ifdef DEBUG_GUI
     fprintf (stderr, "notify click checkbox on something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
+#endif
   }
 
   return private_data->cState;
@@ -141,9 +156,9 @@ int checkbox_get_state(widget_t *c) {
  *
  */
 void checkbox_set_state(widget_t *c, int state, Window win, GC gc) {
-  int clk, arm;
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
+  int clk, arm;
 
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
     if(checkbox_get_state(c) != state) {
@@ -162,9 +177,11 @@ void checkbox_set_state(widget_t *c, int state, Window win, GC gc) {
       paint_checkbox(c, win, gc);
     }
   }
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "notify click checkbox on something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
+#endif
 }
 
 /*
@@ -204,4 +221,3 @@ widget_t *create_checkbox (Display *display, ImlibData *idata,
 
   return mywidget;
 }
-/* * */

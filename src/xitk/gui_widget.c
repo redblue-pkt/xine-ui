@@ -716,6 +716,9 @@ void *gui_xmalloc(size_t size) {
   return ptrmemset;
 }
 
+/*
+ *
+ */
 int paint_widget_list (widget_list_t *wl) {
   widget_t *mywidget;
 
@@ -730,11 +733,17 @@ int paint_widget_list (widget_list_t *wl) {
   return 1;
 }
 
+/*
+ *
+ */
 int is_inside_widget (widget_t *widget, int x, int y) {
   return ((x >= widget->x) && (x <= (widget->x + widget->width))
 	  && (y >= widget->y) && (y <= (widget->y + widget->height)));
 }
 
+/*
+ *
+ */
 widget_t *get_widget_at (widget_list_t *wl, int x, int y) {
   widget_t *mywidget;
 
@@ -748,9 +757,11 @@ widget_t *get_widget_at (widget_list_t *wl, int x, int y) {
   return NULL;
 }
 
+/*
+ *
+ */
 void motion_notify_widget_list (widget_list_t *wl,
 				int x, int y) {
-
   int bRepaint = 0;
   widget_t *mywidget = get_widget_at (wl, x, y);
 
@@ -773,9 +784,11 @@ void motion_notify_widget_list (widget_list_t *wl,
     paint_widget_list (wl);
 }
 
+/*
+ *
+ */
 int click_notify_widget_list (widget_list_t *wl, 
 			       int x, int y, int bUp) {
-
   int bRepaint = 0;
   widget_t *mywidget = get_widget_at (wl, x, y);
 
@@ -807,31 +820,50 @@ int click_notify_widget_list (widget_list_t *wl,
   */
 }
 
+/*
+ *
+ */
 int widget_get_width(widget_t *lb) {
-  
+ 
   return lb->width;  
 }
 
+/*
+ *
+ */
 int widget_get_height(widget_t *lb) {
   
   return lb->height;  
 }
 
+/*
+ *
+ */
 int widget_enabled(widget_t *w) {
 
   return (w->enable == WIDGET_ENABLE);
 }
 
+/*
+ *
+ */
 void widget_enable(widget_t *w) {
 
   w->enable = WIDGET_ENABLE;
 }
 
+/*
+ *
+ */
 void widget_disable(widget_t *w) {
 
   w->enable = ~WIDGET_ENABLE;
 }
 
+/*
+ *
+ */
 gui_color_names_t *gui_get_color_names(void) {
+
   return gui_color_names;
 }

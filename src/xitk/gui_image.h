@@ -26,18 +26,26 @@
 
 #include <X11/Xlib.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 
-gui_image_t *gui_load_image(ImlibData *idata, const char *image);
-
-widget_t *create_image (Display *display, ImlibData *idata,
-			int x, int y, const char *skin) ;
-
-typedef struct image_private_data_s {
+typedef struct {
   Display     *display;
   widget_t    *bWidget;
   gui_image_t *skin;
 } image_private_data_t;
+
+/* *************************************************************** */
+
+/**
+ * Load image and return a gui_image_t data type.
+ */
+gui_image_t *gui_load_image(ImlibData *idata, const char *image);
+
+/**
+ * Create an image widget type.
+ */
+widget_t *create_image (Display *display, ImlibData *idata,
+			int x, int y, const char *skin) ;
 
 #endif

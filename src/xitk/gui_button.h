@@ -25,13 +25,10 @@
 #define HAVE_GUI_BUTTON_H
 
 #include <X11/Xlib.h>
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 
-widget_t *create_button (Display *display, ImlibData *idata,
-			 int x, int y, void* f, void* ud, const char *skin) ;
-
-typedef struct button_private_data_s {
+typedef struct {
   Display     *display;
   widget_t    *bWidget;
   int          bClicked;
@@ -43,5 +40,14 @@ typedef struct button_private_data_s {
   void         *user_data;
 
 } button_private_data_t;
+
+/* ********************************************************** */
+
+/**
+ * Create a button
+ */
+widget_t *create_button (Display *display, ImlibData *idata,
+			 int x, int y, void* f, void* ud, const char *skin) ;
+
 
 #endif

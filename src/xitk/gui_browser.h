@@ -26,41 +26,15 @@
 
 #include <X11/Xlib.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 
-                         
-widget_t *create_browser(Display *display, ImlibData *idata,
-			 /* The receiver list */
-			 widget_list_t *thelist, 
-			 /* X, Y, skin for slider up button */
-			 int upX, int upY, char *upSK,
-			 /* X, Y, backgrnd, foregrnd skin for slider */
-			 int slX, int slY, char *slSKB, char *slSKF,
-			 /* X, Y, skin for slider up button */
-			 int dnX, int dnY, char *dnSK,
-			 /* X, Y for item buttons */
-			 int btnX, int btnY, 
-			 /* normal/focus/click colors, skin for item buttons */
-			 char *btnN, char *btnF, char *btnC, char *btnSK,
-			 /* max item displayed, length of content, content */
-			 int maxlength, int listlength, char **content,
-			 /* callback and data to pass to callback */
-			 void *selCB, void *data);
-
-void browser_rebuild_browser(widget_t *w, int start);
-void browser_update_list(widget_t *w, char **list, int len, int start);
-int browser_get_current_selected(widget_t *w);
-void browser_set_select(widget_t *w, int select);
-void browser_release_all_buttons(widget_t *w);
-int browser_get_current_start(widget_t *w);
-
-typedef struct btnlist_s {
+typedef struct {
   widget_t    *itemlist;
   int          sel;
 } btnlist_t;
 
-typedef struct browser_private_data_s {
+typedef struct {
 
   Display       *display;
 
@@ -79,5 +53,53 @@ typedef struct browser_private_data_s {
   void          *user_data;
 
 } browser_private_data_t;
+
+/* ****************************************************************** */
+
+/**
+ * Create the list browser
+ */
+widget_t *create_browser(Display *display, ImlibData *idata,
+			 /* The receiver list */
+			 widget_list_t *thelist, 
+			 /* X, Y, skin for slider up button */
+			 int upX, int upY, char *upSK,
+			 /* X, Y, backgrnd, foregrnd skin for slider */
+			 int slX, int slY, char *slSKB, char *slSKF,
+			 /* X, Y, skin for slider up button */
+			 int dnX, int dnY, char *dnSK,
+			 /* X, Y for item buttons */
+			 int btnX, int btnY, 
+			 /* normal/focus/click colors, skin for item buttons */
+			 char *btnN, char *btnF, char *btnC, char *btnSK,
+			 /* max item displayed, length of content, content */
+			 int maxlength, int listlength, char **content,
+			 /* callback and data to pass to callback */
+			 void *selCB, void *data);
+
+/**
+ * Redraw buttons/slider
+ */
+void browser_rebuild_browser(widget_t *w, int start);
+/**
+ * Update the list, and rebuild button list
+ */
+void browser_update_list(widget_t *w, char **list, int len, int start);
+/**
+ * Return the current selected button (if not, return -1)
+ */
+int browser_get_current_selected(widget_t *w);
+/**
+ * Select the item 'select' in list
+ */
+void browser_set_select(widget_t *w, int select);
+/**
+ * Release all enabled buttons
+ */
+void browser_release_all_buttons(widget_t *w);
+/**
+ * Return the real number of first displayed in list
+ */
+int browser_get_current_start(widget_t *w);
 
 #endif

@@ -25,24 +25,13 @@
 #define HAVE_GUI_LBUTTON_H
 
 #include <X11/Xlib.h>
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 
 #define CLICK_BUTTON 1
 #define RADIO_BUTTON 2
 
-widget_t *create_label_button (Display *display, ImlibData *idata,
-			       int x, int y, int btype, const char *label, 
-			       void* f, void* ud, const char *skin,
- 			       const char *normcolor, const char *focuscolor, 
-			       const char *clickcolor);
-int labelbutton_change_label(widget_list_t *wl, widget_t *, const char *);
-const char *labelbutton_get_label(widget_t *);
-int labelbutton_get_state(widget_t *);
-void labelbutton_set_state(widget_t *, int, Window, GC);
-
-
-typedef struct lbutton_private_data_s {
+typedef struct {
 
   Display     *display;
   widget_t    *bWidget;
@@ -64,5 +53,36 @@ typedef struct lbutton_private_data_s {
   const char   *clickcolor;
 
 } lbutton_private_data_t;
+
+/* ***************************************************************** */
+
+/**
+ * Create a labeled button.
+ */
+widget_t *create_label_button (Display *display, ImlibData *idata,
+			       int x, int y, int btype, const char *label, 
+			       void* f, void* ud, const char *skin,
+ 			       const char *normcolor, const char *focuscolor, 
+			       const char *clickcolor);
+
+/**
+ * Change label of button 'widget'.
+ */
+int labelbutton_change_label(widget_list_t *wl, widget_t *, const char *);
+
+/**
+ * Return label of button 'widget'.
+ */
+const char *labelbutton_get_label(widget_t *);
+
+/**
+ * Get state of button 'widget'.
+ */
+int labelbutton_get_state(widget_t *);
+
+/**
+ * Set state of button "widget'.
+ */
+void labelbutton_set_state(widget_t *, int, Window, GC);
 
 #endif

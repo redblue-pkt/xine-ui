@@ -26,14 +26,14 @@
 #endif
 
 #include <stdio.h>
-#include <pthread.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_image.h"
 #include "gui_widget.h"
 #include "gui_slider.h"
 #include "gui_widget_types.h"
 
+#ifdef DEBUG_GUI
 #define COMPUTE_COORDS(X,Y)                                                \
      {                                                                     \
        if(private_data->sType == HSLIDER) {                                \
@@ -44,10 +44,10 @@
 				- (Y - sl->y))                             \
                                 * private_data->ratio);                    \
        }                                                                   \
-       else                                                                \
+       else {                                                              \
          fprintf(stderr, "Unknown slider type (%d)\n",                     \
                  private_data->sType);                                     \
-                                                                           \
+       }                                                                   \
        if(private_data->pos > private_data->max) {                         \
          fprintf(stderr, "slider POS > MAX!.\n");                          \
          private_data->pos = private_data->max;                            \
@@ -57,12 +57,30 @@
          private_data->pos = private_data->min;                            \
        }                                                                   \
      }
+#else
+#define COMPUTE_COORDS(X,Y)                                                \
+     {                                                                     \
+       if(private_data->sType == HSLIDER) {                                \
+         private_data->pos = (int) ((X - sl->x) * private_data->ratio);    \
+       }                                                                   \
+       else if(private_data->sType == VSLIDER) {                           \
+         private_data->pos = (int) ((private_data->bg_skin->height         \
+				- (Y - sl->y))                             \
+                                * private_data->ratio);                    \
+       }                                                                   \
+       if(private_data->pos > private_data->max) {                         \
+         private_data->pos = private_data->max;                            \
+       }                                                                   \
+       if(private_data->pos < private_data->min) {                         \
+         private_data->pos = private_data->min;                            \
+       }                                                                   \
+     }
+#endif
 
-/* ------------------------------------------------------------------------- */
 /*
  * Draw widget
  */
-void paint_slider (widget_t *sl, Window win, GC gc) {
+static void paint_slider (widget_t *sl, Window win, GC gc) {
   float                  tmp = 0L;
   int                    button_width, button_height;	
   slider_private_data_t *private_data = 
@@ -103,11 +121,13 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
     }
     if (private_data->bArmed) {
       if (private_data->bClicked) {
-	XCopyArea (private_data->display, paddle->image, win, gc, 2*button_width, 0,
+	XCopyArea (private_data->display, paddle->image, 
+		   win, gc, 2*button_width, 0,
 		   button_width, paddle->height, x, y);
 	
       } else {
-	XCopyArea (private_data->display, paddle->image, win, gc, button_width, 0,
+	XCopyArea (private_data->display, paddle->image, 
+		   win, gc, button_width, 0,
 		   button_width, paddle->height, x, y);
       }
     } else {
@@ -119,19 +139,21 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
     XFlush (private_data->display);
     
   } 
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "paint slider on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
-  
+#endif
+
   XUnlockDisplay (private_data->display);
 
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Got click
  */
-int notify_click_slider (widget_list_t *wl, 
-			 widget_t *sl, int bUp, int x, int y) {
+static int notify_click_slider (widget_list_t *wl, 
+				widget_t *sl, int bUp, int x, int y) {
   slider_private_data_t *private_data = 
     (slider_private_data_t *) sl->private_data;
   int original_pos = private_data->pos;
@@ -228,27 +250,34 @@ int notify_click_slider (widget_list_t *wl,
     }
     paint_widget_list (wl);
   }
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "notify click slider on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
+#endif
+
   return 1;
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Got focus
  */
-int notify_focus_slider (widget_list_t *wl, widget_t *sl, int bEntered) {
+static int notify_focus_slider (widget_list_t *wl,
+			 widget_t *sl, int bEntered) {
   slider_private_data_t *private_data = 
     (slider_private_data_t *) sl->private_data;
 
   if (sl->widget_type & WIDGET_TYPE_SLIDER)
     private_data->bArmed = bEntered;    
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "notify slider button on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
+#endif
+
   return 1;
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Increment position
  */
@@ -261,11 +290,13 @@ void slider_make_step(widget_list_t *wl, widget_t *sl) {
     if((slider_get_pos(sl) + private_data->step) <= private_data->max)
       slider_set_pos(wl, sl, slider_get_pos(sl) + private_data->step);
   } 
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "slider_make_step on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
+#endif
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Decrement position
  */
@@ -278,11 +309,13 @@ void slider_make_backstep(widget_list_t *wl, widget_t *sl) {
     if((slider_get_pos(sl) - private_data->step) >= private_data->min)
       slider_set_pos(wl, sl, slider_get_pos(sl) - private_data->step);
   } 
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "slider_make_step on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
+#endif
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Set value MIN.
  */
@@ -303,11 +336,14 @@ void slider_set_min(widget_t *sl, int min) {
 	fprintf(stderr, "Unknown slider type (%d)\n", 
 		private_data->sType);
     }
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf(stderr, "slider_set_min on something (%d) "
 	    "that is not a slider\n", sl->widget_type);
+#endif
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Return the MIN value
  */
@@ -318,12 +354,14 @@ int slider_get_min(widget_t *sl) {
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {
     return private_data->realmin;
   } 
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "slider_get_pos on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
+#endif
   return -1;
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Return the MAX value
  */
@@ -334,12 +372,14 @@ int slider_get_max(widget_t *sl) {
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {
     return private_data->max;
   } 
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "slider_get_pos on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
+#endif
   return -1;
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Set value MAX
  */
@@ -356,16 +396,20 @@ void slider_set_max(widget_t *sl, int max) {
       else if(private_data->sType == VSLIDER)
 	private_data->ratio = (float)
 	  (private_data->max-private_data->min)/private_data->bg_skin->height;
+#ifdef DEBUG_GUI
       else
 	fprintf(stderr, "Unknown slider type (%d)\n", 
 		private_data->sType);
+#endif
     }
   } 
+#ifdef DEBUG_GUI
   else
     fprintf(stderr, "slider_set_min on something (%d) "
 	    "that is not a slider\n", sl->widget_type);
+#endif
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Set pos to 0 and redraw the widget.
  */
@@ -382,11 +426,13 @@ void slider_reset(widget_list_t *wl, widget_t *sl) {
 
     paint_slider(sl, wl->win, wl->gc);
   }
+#ifdef DEBUG_GUI
   else
     fprintf(stderr, "slider_set_min on something (%d) "
 	    "that is not a slider\n", sl->widget_type);
+#endif
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Set pos to max and redraw the widget.
  */
@@ -403,11 +449,13 @@ void slider_set_to_max(widget_list_t *wl, widget_t *sl) {
 
     paint_slider(sl, wl->win, wl->gc);
   }
+#ifdef DEBUG_GUI
   else
     fprintf(stderr, "slider_set_min on something (%d) "
 	    "that is not a slider\n", sl->widget_type);
+#endif
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Return current position.
  */
@@ -421,12 +469,14 @@ int slider_get_pos(widget_t *sl) {
     else
       return private_data->pos;
   } 
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "slider_get_pos on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
+#endif
   return -1;
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Set position.
  */
@@ -448,11 +498,15 @@ void slider_set_pos(widget_list_t *wl, widget_t *sl, int pos) {
     else
       slider_reset(wl, sl);    
   } 
-  else
-    fprintf (stderr, "slider_set_pos on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
+#ifdef DEBUG_GUI
+  else {
+    if(!(sl->widget_type & WIDGET_TYPE_SLIDER))
+      fprintf (stderr, "slider_set_pos on something (%d) "
+	       "that is not a slider\n", sl->widget_type);
+  }
+#endif
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  * Create the widget
  */
@@ -524,4 +578,3 @@ widget_t *create_slider (Display *display, ImlibData *idata,
 
   return mywidget;
 }
-/* ------------------------------------------------------------------------- */

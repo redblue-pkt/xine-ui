@@ -28,9 +28,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 #include "gui_image.h"
 #include "gui_labelbutton.h"
@@ -43,9 +42,10 @@
 /*
  * Draw the string in pixmap pix, then return it
  */
-Pixmap create_labelofbutton(widget_t *lb, Window win, GC gc, Pixmap pix, 
-			    int xsize, int ysize, 
-			    const char *label, int state) {
+static Pixmap create_labelofbutton(widget_t *lb, 
+				   Window win, GC gc, Pixmap pix, 
+				   int xsize, int ysize, 
+				   const char *label, int state) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   XFontStruct *fs;
@@ -137,7 +137,7 @@ Pixmap create_labelofbutton(widget_t *lb, Window win, GC gc, Pixmap pix,
 /*
  * Paint the button with correct background pixmap
  */
-void paint_labelbutton (widget_t *lb, Window win, GC gc) {
+static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   int          button_width, state = 0;
@@ -149,27 +149,32 @@ void paint_labelbutton (widget_t *lb, Window win, GC gc) {
   skin = private_data->skin;
 
   button_width = skin->width / 3;
-  bgtmp = XCreatePixmap(private_data->display, skin->image, button_width, skin->height, 
-			DefaultDepth(private_data->display, DefaultScreen(private_data->display)));
+  bgtmp = XCreatePixmap(private_data->display, skin->image,
+			button_width, skin->height, 
+			DefaultDepth(private_data->display,
+				     DefaultScreen(private_data->display)));
 
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
     
     if (private_data->bArmed) {
       if (private_data->bClicked) {
 	state = CLICK;
-	XCopyArea (private_data->display, skin->image, bgtmp, gc, 2*button_width, 0,
+	XCopyArea (private_data->display, skin->image, 
+		   bgtmp, gc, 2*button_width, 0,
 		   button_width, skin->height, 0, 0);
       }
       else {
 	if(!private_data->bState || private_data->bType == CLICK_BUTTON) {
 	  state = FOCUS;
-	  XCopyArea (private_data->display, skin->image, bgtmp, gc, button_width, 0,
+	  XCopyArea (private_data->display, skin->image,
+		     bgtmp, gc, button_width, 0,
 		     button_width, skin->height, 0, 0);
 	}
 	else {
 	  if(private_data->bType == RADIO_BUTTON) {
 	    state = CLICK;
-	    XCopyArea (private_data->display, skin->image, bgtmp, gc, 2*button_width, 0,
+	    XCopyArea (private_data->display, skin->image,
+		       bgtmp, gc, 2*button_width, 0,
 		       button_width, skin->height, 0, 0);
 	  }
 	}
@@ -184,7 +189,8 @@ void paint_labelbutton (widget_t *lb, Window win, GC gc) {
 	}
 	else {
 	  state = CLICK;
-	  XCopyArea (private_data->display, skin->image, bgtmp, gc, 2*button_width, 0,
+	  XCopyArea (private_data->display, skin->image, 
+		     bgtmp, gc, 2*button_width, 0,
 		     button_width, skin->height, 0, 0);
 	}
       }
@@ -204,18 +210,21 @@ void paint_labelbutton (widget_t *lb, Window win, GC gc) {
     XFlush (private_data->display);
     XFreePixmap(private_data->display, bgtmp);
 
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf (stderr, "paint label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
-  
+#endif
+ 
   XUnlockDisplay (private_data->display);
 }
 
 /*
  * Handle click events
  */
-int notify_click_labelbutton (widget_list_t *wl, widget_t *lb, 
-			      int bUp, int x, int y) {
+static int notify_click_labelbutton (widget_list_t *wl, widget_t *lb, 
+				     int bUp, int x, int y) {
   int bRepaint = 0;
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
@@ -245,9 +254,13 @@ int notify_click_labelbutton (widget_list_t *wl, widget_t *lb,
     if(!bRepaint) 
       paint_widget_list (wl);
     
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf (stderr, "notify click label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
+#endif
+
   return 1;
 }
 
@@ -267,9 +280,13 @@ int labelbutton_change_label(widget_list_t *wl,
     }
     paint_labelbutton(lb, wl->win, wl->gc);
     return 1;
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf (stderr, "notify focus label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
+#endif
+
   return 0;
 }
 
@@ -282,24 +299,33 @@ const char *labelbutton_get_label(widget_t *lb) {
 
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
     return private_data->label;
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf (stderr, "notify focus label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
+#endif
+
   return NULL;
 }
 
 /*
  * Handle motion on button
  */
-int notify_focus_labelbutton (widget_list_t *wl, widget_t *lb, int bEntered) {
+static int notify_focus_labelbutton (widget_list_t *wl, 
+				     widget_t *lb, int bEntered) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
     private_data->bArmed = bEntered;
-  } else
+  }
+#ifdef DEBUG_GUI
+ else
     fprintf (stderr, "notify focus label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
+#endif
+
   return 1;
 }
 
@@ -311,8 +337,10 @@ int labelbutton_get_state(widget_t *lb) {
     (lbutton_private_data_t *) lb->private_data;
   
   if (lb->widget_type & ~WIDGET_TYPE_LABELBUTTON) {
+#ifdef DEBUG_GUI
     fprintf (stderr, "notify click label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
+#endif
   }
 
   if(private_data->bType == RADIO_BUTTON)
@@ -349,9 +377,11 @@ void labelbutton_set_state(widget_t *lb, int state, Window win, GC gc) {
       }
     }
   }
+#ifdef DEBUG_GUI
   else
     fprintf (stderr, "notify click label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
+#endif
 }
 
 /*

@@ -26,20 +26,21 @@
 #endif
 
 #include <stdio.h>
-#include <pthread.h>
 
-#include "Imlib.h"
+#include "Imlib-light/Imlib.h"
 #include "gui_widget.h"
 #include "gui_image.h"
 #include "gui_button.h"
 #include "gui_widget_types.h"
 
-void paint_button (widget_t *b,  Window win, GC gc) {
-
+/**
+ *
+ */
+static void paint_button (widget_t *b,  Window win, GC gc) {
+  button_private_data_t *private_data = 
+    (button_private_data_t *) b->private_data;
   int          button_width;
   gui_image_t *skin;
-  
-  button_private_data_t *private_data = (button_private_data_t *) b->private_data;
 
   XLockDisplay (private_data->display);
 
@@ -51,11 +52,13 @@ void paint_button (widget_t *b,  Window win, GC gc) {
     
     if (private_data->bArmed) {
       if (private_data->bClicked) {
-	XCopyArea (private_data->display, skin->image,  win, gc, 2*button_width, 0,
+	XCopyArea (private_data->display, skin->image,  
+		   win, gc, 2*button_width, 0,
 		   button_width, skin->height, b->x, b->y);
 	
       } else {
-	XCopyArea (private_data->display, skin->image,  win, gc, button_width, 0,
+	XCopyArea (private_data->display, skin->image,  
+		   win, gc, button_width, 0,
 		   button_width, skin->height, b->x, b->y);
       }
     } else {
@@ -66,16 +69,24 @@ void paint_button (widget_t *b,  Window win, GC gc) {
     
     XFlush (private_data->display);
     
-  } else
+  } 
+#ifdef DEBUG_GUI
+  else
     fprintf (stderr, "paint button on something (%d) that is not a button\n",
 	     b->widget_type);
+#endif
   
   XUnlockDisplay (private_data->display);
 }
 
-int notify_click_button (widget_list_t *wl, widget_t *b,int bUp, int x, int y){
+/*
+ *
+ */
+static int notify_click_button (widget_list_t *wl, 
+				widget_t *b,int bUp, int x, int y){
+  button_private_data_t *private_data = 
+    (button_private_data_t *) b->private_data;
   int bRepaint = 0;
-  button_private_data_t *private_data = (button_private_data_t *) b->private_data;
   
   if (b->widget_type & WIDGET_TYPE_BUTTON) {
     private_data->bClicked = !bUp;
@@ -83,32 +94,48 @@ int notify_click_button (widget_list_t *wl, widget_t *b,int bUp, int x, int y){
     if (bUp && private_data->bArmed) {
       bRepaint = paint_widget_list (wl);
       if(private_data->function) {
-	private_data->function (private_data->bWidget, private_data->user_data);
+	private_data->function (private_data->bWidget, 
+				private_data->user_data);
       }
     }
 
     if(!bRepaint) 
       paint_widget_list (wl);
     
-  } else
+  }
+#ifdef DEBUG_GUI
+  else
     fprintf (stderr, "notify click button on something (%d) that is not"
 	     " a button\n", b->widget_type);
+#endif
+
   return 1;
 }
 
-int notify_focus_button (widget_list_t *wl, widget_t *b, int bEntered) {
-  button_private_data_t *private_data = (button_private_data_t *) b->private_data;
+/*
+ *
+ */
+static int notify_focus_button (widget_list_t *wl, widget_t *b, int bEntered) {
+  button_private_data_t *private_data = 
+    (button_private_data_t *) b->private_data;
   
   if (b->widget_type & WIDGET_TYPE_BUTTON) {
 
     private_data->bArmed = bEntered;
     
-  } else
+  } 
+#ifdef DEBUG_GUI
+  else
     fprintf (stderr, "notify focus button on something (%d) that is not"
 	     " a button\n", b->widget_type);
+#endif
+  
   return 1;
 }
 
+/*
+ *
+ */
 widget_t *create_button (Display *display, ImlibData *idata,
 			 int x, int y, void* f, void* ud, const char *skin) {
   widget_t              *mywidget;
@@ -116,7 +143,7 @@ widget_t *create_button (Display *display, ImlibData *idata,
 
   mywidget = (widget_t *) gui_xmalloc (sizeof(widget_t));
 
-  private_data = (button_private_data_t *) gui_xmalloc (sizeof (button_private_data_t));
+  private_data = (button_private_data_t *) gui_xmalloc(sizeof(button_private_data_t));
 
   private_data->display   = display;
 
@@ -143,4 +170,3 @@ widget_t *create_button (Display *display, ImlibData *idata,
 
   return mywidget;
 }
-
