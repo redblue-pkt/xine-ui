@@ -63,8 +63,6 @@ static widget_list_t  *pl_widget_list;
 static int             pl_running;
 static int             pl_panel_visible;
 
-extern Window          gVideoWin;
-
 #define MOVEUP 1
 #define MOVEDN 2
 
@@ -393,7 +391,7 @@ void pl_raise_window(void) {
     if(pl_panel_visible && pl_running) {
       if(pl_running) {
 	XMapRaised(gGlob->gDisplay, pl_win); 
-/*  	XSetTransientForHint (gGlob->gDisplay, pl_win, gVideoWin); FIXME  */
+  	XSetTransientForHint (gGlob->gDisplay, pl_win, gGlob->gVideoWin);
       }
     } else {
       XUnmapWindow (gGlob->gDisplay, pl_win);
@@ -412,7 +410,7 @@ void pl_toggle_panel_visibility (widget_t *w, void *data) {
     if(pl_running) {
       pl_panel_visible = 1;
       XMapRaised(gGlob->gDisplay, pl_win); 
-/*        XSetTransientForHint (gGlob->gDisplay, pl_win, gVideoWin); FIXME  */
+      XSetTransientForHint (gGlob->gDisplay, pl_win, gGlob->gVideoWin);
     }
   }
 }
@@ -422,8 +420,7 @@ void pl_toggle_panel_visibility (widget_t *w, void *data) {
 void playlist_handle_event(XEvent *event) {
   XExposeEvent  *myexposeevent;
   static XEvent *old_event;
-  /* FIXME
-  if(event->xany.window == pl_win || event->xany.window == gVideoWin) {
+  if(event->xany.window == pl_win || event->xany.window == gGlob->gVideoWin) {
     
     switch(event->type) {
     case Expose: {
@@ -436,13 +433,12 @@ void playlist_handle_event(XEvent *event) {
     }
     break;
     
-    case MotionNotify:
-  */      
+    case MotionNotify:      
       /* printf ("MotionNotify\n"); */
-/*        motion_notify_widget_list (pl_widget_list,  */
-/*  				 event->xbutton.x, event->xbutton.y); */
+      motion_notify_widget_list (pl_widget_list,
+				 event->xbutton.x, event->xbutton.y);
       /* if window-moving is enabled move the window */
-  /*      old_event = event;
+      old_event = event;
       if (pl_move.enabled) {
 	int x,y;
 	x = (event->xmotion.x_root) 
@@ -453,28 +449,28 @@ void playlist_handle_event(XEvent *event) {
 	  - pl_move.offset_y;
 	
 	if(event->xany.window == pl_win) {
-	  XLOCK ();
+	  /* FIXME XLOCK (); */
 	  XMoveWindow(gGlob->gDisplay, pl_win, x, y);
-	  XUNLOCK ();
-	  config_file_set_int ("x_playlist",x);
-	  config_file_set_int ("y_playlist",y);
+	  /* FIXME XUNLOCK (); */
+	  config_set_int ("x_playlist",x);
+	  config_set_int ("y_playlist",y);
 	}
       }
       break;
       
     case MappingNotify:
       // printf ("MappingNotify\n");
-      XLOCK ();
+      /* FIXME XLOCK (); */
       XRefreshKeyboardMapping((XMappingEvent *) event);
-      XUNLOCK ();
+      /* FIXME XUNLOCK (); */
       break;
       
       
     case ButtonPress: {
       XButtonEvent *bevent = (XButtonEvent *) event;
-  */
+      
       /* if no widget is hit enable moving the window */
-  /*  if(bevent->window == pl_win)
+      if(bevent->window == pl_win)
 	pl_move.enabled = !click_notify_widget_list (pl_widget_list, 
 						     event->xbutton.x, 
 						     event->xbutton.y, 0);
@@ -488,8 +484,8 @@ void playlist_handle_event(XEvent *event) {
     case ButtonRelease:
       click_notify_widget_list (pl_widget_list, event->xbutton.x, 
 				event->xbutton.y, 1);
-				pl_move.enabled = 0; *//* disable moving the window       */  
-  /*      break;
+      pl_move.enabled = 0; /* disable moving the window       */
+      break;
       
     case ClientMessage:
       if(event->xany.window == pl_win)
@@ -498,7 +494,6 @@ void playlist_handle_event(XEvent *event) {
       
     }
   }
-*/
 }
 /*
  * Create playlist editor window
@@ -516,9 +511,9 @@ void playlist_editor(void) {
 
   /* This shouldn't be happend */
   if(pl_win) {
-    /*  XLOCK (); FIXME  */
+    /* FIXME XLOCK(); */
     XMapRaised(gGlob->gDisplay, pl_win); 
-    /*  XUNLOCK(); FIXME  */
+    /* FIXME  XUNLOCK(); */
     pl_panel_visible = 1;
     pl_running = 1;
     return;
@@ -526,7 +521,7 @@ void playlist_editor(void) {
 
   pl_running = 1;
   
-  /*  XLOCK (); FIXME  */
+  /* FIXME XLOCK(); */
 
   if (!(pl_bg_image = Imlib_load_image(gGlob->gImlib_data,
 				       gui_get_skinfile("PlBG")))) {
@@ -535,8 +530,8 @@ void playlist_editor(void) {
   }
 
   screen = DefaultScreen(gGlob->gDisplay);
-  /*  hint.x = config_file_lookup_int ("x_playlist", 200); FIXME  */
-  /*  hint.y = config_file_lookup_int ("y_playlist", 100); FIXME  */
+  hint.x = config_lookup_int ("x_playlist", 200);
+  hint.y = config_lookup_int ("y_playlist", 100);
   hint.width = pl_bg_image->rgb_width;
   hint.height = pl_bg_image->rgb_height;
   hint.flags = PPosition | PSize;
@@ -562,7 +557,7 @@ void playlist_editor(void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-/*    XSetTransientForHint (gGlob->gDisplay, pl_win, gVideoWin); FIXME  */
+  XSetTransientForHint (gGlob->gDisplay, pl_win, gGlob->gVideoWin);
 
   /* set xclass */
 
@@ -590,7 +585,7 @@ void playlist_editor(void) {
   Imlib_apply_image(gGlob->gImlib_data, pl_bg_image, pl_win);
   XSync(gGlob->gDisplay, False); 
 
-  /*  XUNLOCK (); FIXME  */
+  /* FIXME XUNLOCK (); */
   
   if((xdnd_pl_win = (DND_struct_t *) xmalloc(sizeof(DND_struct_t))) != NULL) {
     gui_init_dnd(xdnd_pl_win);

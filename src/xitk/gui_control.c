@@ -46,8 +46,8 @@
 #include "gui_browser.h"
 #include "utils.h"
 #include "xine.h"
-/*  #include "configfile.h" FIXME  */
 
+extern gGlob_t        *gGlob;
 
 static widget_t       *w_hue = NULL, *w_sat = NULL, *w_bright = NULL;
 static widget_t       *w_cont = NULL;
@@ -60,34 +60,35 @@ static widget_list_t  *ctl_widget_list;
 static int             ctl_running;
 static int             ctl_panel_visible;
 
-extern Window          gVideoWin;
-extern vo_driver_t    *gVideoDriver;
 
-extern gGlob_t        *gGlob;
-
+static int get_current_prop(int prop) {
+  return (xine_get_window_property(gGlob->gXine, prop));
+}
+static int set_current_prop(int prop, int value) {
+  return (xine_set_window_property(gGlob->gXine, prop, value));
+}
 
 /*
  * Update silders positions
  */
 static void update_sliders_video_settings(void) {
-  /* FIXME
+
   if(widget_enabled(w_hue)) {
     slider_set_pos(ctl_widget_list, w_hue, 
-		   gVideoDriver->get_current_hue());
+		   get_current_prop(VO_PROP_HUE));
   }
   if(widget_enabled(w_sat)) {
     slider_set_pos(ctl_widget_list, w_sat, 
-		   gVideoDriver->get_current_saturation());
+		   get_current_prop(VO_PROP_SATURATION));
   }
   if(widget_enabled(w_bright)) {
     slider_set_pos(ctl_widget_list, w_bright, 
-		   gVideoDriver->get_current_brightness());
+		   get_current_prop(VO_PROP_BRIGHTNESS));
   }
   if(widget_enabled(w_cont)) {
     slider_set_pos(ctl_widget_list, w_cont, 
-		   gVideoDriver->get_current_contrast());
+		   get_current_prop(VO_PROP_CONTRAST));
   }
-  */
 }
 
 /*
@@ -96,14 +97,10 @@ static void update_sliders_video_settings(void) {
 static void set_hue(widget_t *w, void *data, int value) {
   int ret = 0;
 
-  /* FIXME
-  if(gVideoDriver->set_hue) {
-    (ret = gVideoDriver->set_hue(value));
+  ret = set_current_prop(VO_PROP_HUE, value);
     
-    if(ret != value)
-      update_sliders_video_settings();
-  }
-  */
+  if(ret != value)
+    update_sliders_video_settings();
 }
 
 /*
@@ -112,14 +109,10 @@ static void set_hue(widget_t *w, void *data, int value) {
 static void set_saturation(widget_t *w, void *data, int value) {
   int ret = 0;
 
-  /* FIXME
-  if(gVideoDriver->set_saturation) {
-    (ret = gVideoDriver->set_saturation(value));
-    
-    if(ret != value)
-      update_sliders_video_settings();
-  }
-  */
+  ret = set_current_prop(VO_PROP_SATURATION, value);
+   
+  if(ret != value)
+    update_sliders_video_settings();
 }
 
 /*
@@ -127,14 +120,11 @@ static void set_saturation(widget_t *w, void *data, int value) {
  */
 static void set_brightness(widget_t *w, void *data, int value) {
   int ret = 0;
-  /* FIXME
-  if(gVideoDriver->set_brightness) {
-    (ret = gVideoDriver->set_brightness(value));
+
+  ret = set_current_prop(VO_PROP_BRIGHTNESS, value);
     
-    if(ret != value)
-      update_sliders_video_settings();
-  }
-  */
+  if(ret != value)
+    update_sliders_video_settings();
 }
 
 /*
@@ -143,34 +133,10 @@ static void set_brightness(widget_t *w, void *data, int value) {
 static void set_contrast(widget_t *w, void *data, int value) {
   int ret = 0;
 
-  /* FIXME
-  if(gVideoDriver->set_contrast) {
-    (ret = gVideoDriver->set_contrast(value));
-
-    if(ret != value)
-      update_sliders_video_settings();
-  }
-  */
-}
-
-/*
- * Save/reset values
- */
-static void ctl_save(widget_t *w, void *data) {
-
-  /* FIXME
-  if(gVideoDriver->save_settings)
-    gVideoDriver->save_settings();
-  */
-}
-static void ctl_reset(widget_t *w, void *data) {
-
-  /* FIXME
-  if(gVideoDriver->reset_settings)
-    gVideoDriver->reset_settings();
-
-  */
-  update_sliders_video_settings();  
+  ret = set_current_prop(VO_PROP_CONTRAST, value);
+    
+  if(ret != value)
+    update_sliders_video_settings();
 }
 
 /*
@@ -221,7 +187,7 @@ void control_raise_window(void) {
       if(ctl_running) {
 	XMapRaised(gGlob->gDisplay, ctl_win);
 	ctl_panel_visible = 1;
-/*  	XSetTransientForHint (gGlob->gDisplay, ctl_win, gVideoWin); FIXME  */
+  	XSetTransientForHint (gGlob->gDisplay, ctl_win, gGlob->gVideoWin);
       }
     } else {
       XUnmapWindow (gGlob->gDisplay, ctl_win);
@@ -241,7 +207,7 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
     if(ctl_running) {
       ctl_panel_visible = 1;
       XMapRaised(gGlob->gDisplay, ctl_win); 
-/*        XSetTransientForHint (gGlob->gDisplay, ctl_win, gVideoWin); FIXME  */
+      XSetTransientForHint (gGlob->gDisplay, ctl_win, gGlob->gVideoWin);
     }
   }
 }
@@ -252,8 +218,8 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
 void control_handle_event(XEvent *event) {
   XExposeEvent  *myexposeevent;
   static XEvent *old_event;
-  /* FIXME
-  if(event->xany.window == ctl_win || event->xany.window == gVideoWin) {
+
+  if(event->xany.window == ctl_win || event->xany.window == gGlob->gVideoWin) {
     
     switch(event->type) {
     case Expose: {
@@ -267,12 +233,11 @@ void control_handle_event(XEvent *event) {
     break;
     
     case MotionNotify:
-  */
       /* printf ("MotionNotify\n"); */
-  /*  motion_notify_widget_list (ctl_widget_list, 
+      motion_notify_widget_list (ctl_widget_list, 
 				 event->xbutton.x, event->xbutton.y);
-  */  /* if window-moving is enabled move the window */
-  /*      old_event = event;
+      /* if window-moving is enabled move the window */
+      old_event = event;
       if (ctl_move.enabled) {
 	int x,y;
 	x = (event->xmotion.x_root) 
@@ -283,28 +248,28 @@ void control_handle_event(XEvent *event) {
 	  - ctl_move.offset_y;
 	
 	if(event->xany.window == ctl_win) {
-	  XLOCK ();
+	  /* FIXME XLOCK (); */
 	  XMoveWindow(gGlob->gDisplay, ctl_win, x, y);
-	  XUNLOCK ();
-	  config_file_set_int ("x_control",x);
-	  config_file_set_int ("y_control",y);
+	  /* FIXME XUNLOCK (); */
+	  config_set_int ("x_control",x);
+	  config_set_int ("y_control",y);
 	}
       }
       break;
       
     case MappingNotify:
-  */  /* printf ("MappingNotify\n");*/
-      /*  XLOCK ();
+      /* printf ("MappingNotify\n");*/
+      /* FIXME  XLOCK (); */
       XRefreshKeyboardMapping((XMappingEvent *) event);
-      XUNLOCK (); 
+      /* FIXME XUNLOCK (); */
       break;
       
       
     case ButtonPress: {
       XButtonEvent *bevent = (XButtonEvent *) event;
-      */
+      
       /* if no widget is hit enable moving the window */
-  /*      if(bevent->window == ctl_win)
+      if(bevent->window == ctl_win)
 	ctl_move.enabled = !click_notify_widget_list (ctl_widget_list, 
 						     event->xbutton.x, 
 						     event->xbutton.y, 0);
@@ -318,8 +283,8 @@ void control_handle_event(XEvent *event) {
     case ButtonRelease:
       click_notify_widget_list (ctl_widget_list, event->xbutton.x, 
 				event->xbutton.y, 1);
-	ctl_move.enabled = 0; */ /* disable moving the window       */  
-  /*      break;
+	ctl_move.enabled = 0; /* disable moving the window       */  
+        break;
       
     case ClientMessage:
       if(event->xany.window == ctl_win)
@@ -327,7 +292,7 @@ void control_handle_event(XEvent *event) {
       break;
       
     }
-    }*/
+    }
 }
 
 /*
@@ -365,16 +330,14 @@ void control_panel(void) {
   }
 
   screen = DefaultScreen(gGlob->gDisplay);
-  /* FIXME
-  hint.x = config_file_lookup_int ("x_control", 200);
-  hint.y = config_file_lookup_int ("y_control", 100);
-  */
+  hint.x = config_lookup_int ("x_control", 200);
+  hint.y = config_lookup_int ("y_control", 100);
   hint.width = ctl_bg_image->rgb_width;
   hint.height = ctl_bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
-  ctl_win = XCreateWindow (gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay), 
+  ctl_win = XCreateWindow (gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay),
 			   hint.x, hint.y, hint.width, hint.height, 0, 
 			   CopyFromParent, CopyFromParent, 
 			   CopyFromParent,
@@ -394,7 +357,7 @@ void control_panel(void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-/*    XSetTransientForHint (gGlob->gDisplay, ctl_win, gVideoWin); FIXME  */
+  XSetTransientForHint (gGlob->gDisplay, ctl_win, gGlob->gVideoWin);
 
   /* set xclass */
 
@@ -441,23 +404,24 @@ void control_panel(void) {
   ctl_widget_list->gc            = gc;
 
   { /* All of sliders are disabled by default*/
-  /* FIXME
     widget_t *w;
     int vidcap = 0;
+    int min, max, cur;
 
+    /* HUE */
+    xine_get_window_property_min_max(gGlob->gXine, VO_PROP_HUE, &min, &max);
+    cur = get_current_prop(VO_PROP_HUE);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_hue = create_slider(VSLIDER,
 				     gui_get_skinX("CtlHueBG"), 
 				     gui_get_skinY("CtlHueBG"), 
-				     gVideoDriver->get_hue_min(),
-				     gVideoDriver->get_hue_max(), 
+				     min,max, 
 				     1, 
 				     gui_get_skinfile("CtlHueBG"),
 				     gui_get_skinfile("CtlHueFG"),
 				     set_hue, NULL,
 				     set_hue, NULL)));
-    slider_set_pos(ctl_widget_list, w_hue, 
-		   gVideoDriver->get_current_hue());
+    slider_set_pos(ctl_widget_list, w_hue, cur);
     gui_list_append_content(ctl_widget_list->l,
 	      (w = create_label(gui_get_skinX("CtlHueLbl"), 
 				gui_get_skinY("CtlHueLbl"), 
@@ -465,19 +429,21 @@ void control_panel(void) {
 				gui_get_skinfile("CtlHueLbl"))));
     widget_disable(w_hue);
 
+    /* SATURATION */
+    xine_get_window_property_min_max(gGlob->gXine, 
+				     VO_PROP_SATURATION, &min, &max);
+    cur = get_current_prop(VO_PROP_SATURATION);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_sat = create_slider(VSLIDER,
 				     gui_get_skinX("CtlSatBG"), 
 				     gui_get_skinY("CtlSatBG"), 
-				     gVideoDriver->get_saturation_min(),
-				     gVideoDriver->get_saturation_max(), 
+				     min, max,
 				     1, 
 				     gui_get_skinfile("CtlSatBG"),
 				     gui_get_skinfile("CtlSatFG"),
 				     set_saturation, NULL,
 				     set_saturation, NULL)));
-    slider_set_pos(ctl_widget_list, w_sat, 
-		   gVideoDriver->get_current_saturation());
+    slider_set_pos(ctl_widget_list, w_sat, cur);
     gui_list_append_content(ctl_widget_list->l,
 	      (w = create_label(gui_get_skinX("CtlSatLbl"), 
 				gui_get_skinY("CtlSatLbl"), 
@@ -485,19 +451,21 @@ void control_panel(void) {
 				gui_get_skinfile("CtlSatLbl"))));
     widget_disable(w_sat);
       
+    /* BRIGHTNESS */
+    xine_get_window_property_min_max(gGlob->gXine, 
+				     VO_PROP_BRIGHTNESS, &min, &max);
+    cur = get_current_prop(VO_PROP_BRIGHTNESS);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_bright = create_slider(VSLIDER,
 					gui_get_skinX("CtlBrightBG"), 
 					gui_get_skinY("CtlBrightBG"), 
-					gVideoDriver->get_brightness_min(),
-					gVideoDriver->get_brightness_max(), 
+					min, max,
 					1, 
 					gui_get_skinfile("CtlBrightBG"),
 					gui_get_skinfile("CtlBrightFG"),
-					  set_brightness, NULL,
+					set_brightness, NULL,
 					set_brightness, NULL)));
-    slider_set_pos(ctl_widget_list, w_bright, 
-		   gVideoDriver->get_current_brightness());
+    slider_set_pos(ctl_widget_list, w_bright, cur);
     gui_list_append_content(ctl_widget_list->l,
 	      (w = create_label(gui_get_skinX("CtlBrightLbl"), 
 				gui_get_skinY("CtlBrightLbl"), 
@@ -505,32 +473,33 @@ void control_panel(void) {
 				gui_get_skinfile("CtlBrightLbl"))));
     widget_disable(w_bright);
       
+    /* CONTRAST */
+    xine_get_window_property_min_max(gGlob->gXine, 
+				     VO_PROP_CONTRAST, &min, &max);
+    cur = get_current_prop(VO_PROP_CONTRAST);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_cont = create_slider(VSLIDER,
 				      gui_get_skinX("CtlContBG"), 
-				      gui_get_skinY("CtlContBG"), 
-				      gVideoDriver->get_contrast_min(),
-				      gVideoDriver->get_contrast_max(), 
+				      gui_get_skinY("CtlContBG"),
+				      min, max,
 				      1, 
 				      gui_get_skinfile("CtlContBG"),
 				      gui_get_skinfile("CtlContFG"),
 				      set_contrast, NULL,
 				      set_contrast, NULL)));
-    slider_set_pos(ctl_widget_list, w_cont, 
-		   gVideoDriver->get_current_contrast());
+    slider_set_pos(ctl_widget_list, w_cont, cur);
     gui_list_append_content(ctl_widget_list->l,
 	      (w = create_label(gui_get_skinX("CtlContLbl"), 
 				gui_get_skinY("CtlContLbl"), 
 				3, "Ctr", 
 				gui_get_skinfile("CtlContLbl"))));
     widget_disable(w_cont);
-  */
+
     /*
      * Enable only supported settings.
      */
-    /* FIXME
-    if((vidcap = gVideoDriver->get_capabilities()) > 0) {
-      
+    if((vidcap = xine_get_window_capabilities(gGlob->gXine)) > 0) {
+
       if(vidcap & VO_CAP_BRIGHTNESS)
 	widget_enable(w_bright);
       
@@ -543,30 +512,33 @@ void control_panel(void) {
       if(vidcap & VO_CAP_CONTRAST)
 	widget_enable(w_cont);
     }
-*/
   }
-  gui_list_append_content (ctl_widget_list->l, 
-			   create_label_button (gui_get_skinX("CtlSave"),
-						gui_get_skinY("CtlSave"),
-						CLICK_BUTTON, "Save",
-						ctl_save, NULL, 
-						gui_get_skinfile("CtlSave"),
-						gui_get_ncolor("CtlSave"),
-						gui_get_fcolor("CtlSave"),
-						gui_get_ccolor("CtlSave")));
-
-  gui_list_append_content (ctl_widget_list->l, 
-			   create_label_button (gui_get_skinX("CtlReset"),
-						gui_get_skinY("CtlReset"),
-						CLICK_BUTTON, "Reset",
-						ctl_reset, NULL, 
-						gui_get_skinfile("CtlReset"),
-						gui_get_ncolor("CtlReset"),
-						gui_get_fcolor("CtlReset"),
-						gui_get_ccolor("CtlReset")));
-
+ 
   { /*  stopgap button ;-), will gone */
     widget_t *w;
+
+    gui_list_append_content (ctl_widget_list->l, 
+	     (w = create_label_button (gui_get_skinX("CtlSave"),
+				       gui_get_skinY("CtlSave"),
+				       CLICK_BUTTON, NULL,
+				       NULL, NULL, 
+				       gui_get_skinfile("CtlDummy"),
+				       gui_get_ncolor("CtlDummy"),
+				       gui_get_fcolor("CtlDummy"),
+				       gui_get_ccolor("CtlDummy"))));
+    widget_disable(w);
+	
+    gui_list_append_content (ctl_widget_list->l, 
+	     (w = create_label_button (gui_get_skinX("CtlReset"),
+				       gui_get_skinY("CtlReset"),
+				       CLICK_BUTTON, NULL,
+				       NULL, NULL, 
+				       gui_get_skinfile("CtlDummy"),
+				       gui_get_ncolor("CtlDummy"),
+				       gui_get_fcolor("CtlDummy"),
+				       gui_get_ccolor("CtlDummy"))));
+    widget_disable(w);
+
     gui_list_append_content (ctl_widget_list->l, 
 	     (w = create_label_button (gui_get_skinX("CtlDummy"),
 				      gui_get_skinY("CtlDummy"),
