@@ -103,6 +103,7 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
 #define WM_TYPE_METACITY        0x00000008
 #define WM_TYPE_AFTERSTEP       0x00000009
 #define WM_TYPE_BLACKBOX        0x0000000A
+#define WM_TYPE_LARSWM          0x0000000B
 
 #ifdef	__GNUC__
 #define XITK_DIE(FMT, ARGS...) do { fprintf(stderr, "xiTK DIE: "FMT, ##ARGS); exit(-1); } while(0)

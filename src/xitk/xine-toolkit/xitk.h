@@ -78,6 +78,7 @@
 #define WM_TYPE_METACITY        0x00000008
 #define WM_TYPE_AFTERSTEP       0x00000009
 #define WM_TYPE_BLACKBOX        0x0000000A
+#define WM_TYPE_LARSWM          0x0000000B
 
 #define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
                       KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \

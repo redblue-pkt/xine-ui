@@ -393,7 +393,12 @@ static uint32_t xitk_check_wm(Display *display) {
   else if((atom = XInternAtom(display, "_BLACKBOX_HINTS", True)) != None) {
     type |= WM_TYPE_BLACKBOX;
   }
-  else if((atom = XInternAtom(display, "KWIN_RUNNING", True)) != None) {
+  else if((atom = XInternAtom(display, "LARSWM_EXIT", True)) != None) {
+    type |= WM_TYPE_LARSWM;
+  }
+  else if(((atom = XInternAtom(display, "KWIN_RUNNING", True)) != None) &&
+	  ((atom = XInternAtom(display, "_KDE_NET_USER_TIME", True)) != None) &&
+	  ((atom = XInternAtom(display, "_DT_SM_WINDOW_INFO", True)) != None)) {
     type |= WM_TYPE_KWIN;
   }
 
@@ -512,6 +517,7 @@ static uint32_t xitk_check_wm(Display *display) {
     break;
 
   case WM_TYPE_MOTIF:
+  case WM_TYPE_LARSWM:
     break;
 
   case WM_TYPE_UNKNOWN:
@@ -570,6 +576,9 @@ static uint32_t xitk_check_wm(Display *display) {
   case WM_TYPE_BLACKBOX:
     printf("Blackbox");
     break;
+  case WM_TYPE_LARSWM:
+    printf("LarsWM");
+    break;
   }
 
   if(wm_name) {
@@ -613,6 +622,7 @@ int xitk_get_layer_level(void) {
     level = 6;
     break;
   case WM_TYPE_MOTIF:
+  case WM_TYPE_LARSWM:
     level = 0;
     break;
   }
@@ -645,6 +655,7 @@ void xitk_set_layer_above(Window window) {
   
   switch(gXitk->wm_type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_MOTIF:
+  case WM_TYPE_LARSWM:
     return;
     break;
     
