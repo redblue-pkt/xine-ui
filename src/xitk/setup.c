@@ -919,7 +919,7 @@ static void setup_sections (void) {
     
     point = strchr(entry->key, '.');
     
-    if (point) {
+    if (entry->type != XINE_CONFIG_TYPE_UNKNOWN && point) {
       int found ;
       int i;
       int len;
@@ -934,32 +934,11 @@ static void setup_sections (void) {
 	}
       }
 
-      /* 
-       * Only add a tab for non-empty sections (we don't need to handle
-       * sinek/gnome-xine/etc... specific entries)
-       */
       if (!found) {
-	xine_cfg_entry_t *check_entry = xine_config_get_first_entry(gGui->xine);
-	int          num_entries = 0;
-	
-	while (check_entry) {
-	  
-	  if(!strncmp(check_entry->key, entry->key, len) && check_entry->description) {
-	    switch(check_entry->type) {
-	    default:
-	      num_entries++;
-	      break;
-	    }
-	  }
-	  check_entry = xine_config_get_next_entry(gGui->xine);
-	}
-	
-	if(num_entries) {
-	  setup->sections[setup->num_sections] = xine_xmalloc (len + 1);
-	  strncpy (setup->sections[setup->num_sections], entry->key, len);
-	  setup->sections[setup->num_sections][len] = 0;
-	  setup->num_sections++;
-	}
+        setup->sections[setup->num_sections] = xine_xmalloc (len + 1);
+	strncpy (setup->sections[setup->num_sections], entry->key, len);
+	setup->sections[setup->num_sections][len] = 0;
+	setup->num_sections++;
       }
     }      
     
