@@ -49,10 +49,6 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#ifdef XINE_ORT
-#define xine_cfg_entry_t xine_config_entry_t
-#endif
-
 #define FONT FONTDIR "/cetus.ttf"
 #define POINTER FONTDIR "/pointer2.png"
 

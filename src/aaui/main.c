@@ -63,10 +63,6 @@
 #define MIXER_CAP_VOL       0x00000001
 #define MIXER_CAP_MUTE      0x00000002
 
-#ifdef XINE_ORT
-#define xine_cfg_entry_t xine_config_entry_t
-#endif
-
 /*
  * global variables
  */
