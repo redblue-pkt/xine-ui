@@ -4,8 +4,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-toolkit 0.9.9\n"
-"POT-Creation-Date: 2002-05-31 13:07+0200\n"
+"Project-Id-Version: xine-toolkit 0.9.10\n"
+"POT-Creation-Date: 2002-06-01 16:26+0200\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -101,8 +101,8 @@ msgstr "Abbrechen"
 
 #: src/xitk/xine-toolkit/xitk.h:1857 src/xitk/xine-toolkit/xitk.h:1873
 msgid "Error"
-msgstr ""
+msgstr "Fehler"
 
 #: src/xitk/xine-toolkit/xitk.h:1862 src/xitk/xine-toolkit/xitk.h:1878
 msgid "Information"
-msgstr ""
+msgstr "Information"
