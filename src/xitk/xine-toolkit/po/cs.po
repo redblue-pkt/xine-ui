@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-0.9.9\n"
 "POT-Creation-Date: 2002-06-17 21:59+0200\n"
-"PO-Revision-Date: 2002-05-11 00:32+0200\n"
+"PO-Revision-Date: 2002-06-20 16:55+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -85,7 +85,7 @@ msgstr "OK"
 
 #: src/xitk/xine-toolkit/window.c:875 src/xitk/xine-toolkit/window.c:1073
 msgid "Question?"
-msgstr "Otázky?"
+msgstr "Otázka?"
 
 #: src/xitk/xine-toolkit/window.c:1004 src/xitk/xine-toolkit/window.c:1215
 msgid "Yes"
@@ -101,8 +101,8 @@ msgstr "Zru¹it"
 
 #: src/xitk/xine-toolkit/xitk.h:1875 src/xitk/xine-toolkit/xitk.h:1891
 msgid "Error"
-msgstr ""
+msgstr "Chyba"
 
 #: src/xitk/xine-toolkit/xitk.h:1880 src/xitk/xine-toolkit/xitk.h:1896
 msgid "Information"
-msgstr ""
+msgstr "Informace"
