@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
   /*  int              audio_options = 0; FIXME */
   char            *audio_driver_id = NULL;
   char            *video_driver_id = NULL;
-  ao_driver_t  *audio_driver = NULL ;
+  ao_driver_t     *audio_driver = NULL ;
   sigset_t         vo_mask;
 
   /* Check xine library version */

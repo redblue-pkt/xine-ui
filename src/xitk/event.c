@@ -515,17 +515,24 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_KP_0:
       gui_set_current_position (0);
       break;
-      /* FIXME
+
     case XK_Left:
-      metronom_set_av_offset (metronom_get_av_offset () - 3600);
+      xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) - 3600);
       break;
     case XK_Right:
-      metronom_set_av_offset (metronom_get_av_offset () + 3600);
+      xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) + 3600);
       break;
     case XK_Home:
-      metronom_set_av_offset (0);
+      xine_set_av_offset (gGui->xine, 0);
       break;
-      */
+
+    case XK_Up:
+      xine_set_speed (gGui->xine, SPEED_FAST_2);
+      break;
+    case XK_Down:
+      xine_set_speed (gGui->xine, SPEED_SLOW_2);
+      break;
+
     }
 
     break;
