@@ -182,6 +182,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
     id->x.root_cmap = 0;
   id->num_colors = 0;
   homedir = getenv("HOME");
+  if (homedir == NULL) homedir = ".";
   snprintf(s, sizeof(s), "%s/.imrc", homedir);
   old_locale = strdup(setlocale(LC_NUMERIC, NULL));
   setlocale(LC_NUMERIC, "C");
