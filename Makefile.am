@@ -4,6 +4,8 @@
 
 AUTOMAKE_OPTIONS = 1.3
 
+ACLOCAL_AMFLAGS = @XINE_ACFLAGS@ -I m4/
+
 SUBDIRS = readline intl src m4 doc misc po
 
 EXTRA_DIST = automake.diff \
