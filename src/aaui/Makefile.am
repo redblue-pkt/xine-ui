@@ -10,7 +10,7 @@ aaxine_SOURCES = main.c
 aaxine_LDADD = @XINE_LIBS@  -laa -lm $(THREAD_LIBS) $(DYNAMIC_LD_LIBS) 
 
 debug:
-	$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
+	$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
 
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
