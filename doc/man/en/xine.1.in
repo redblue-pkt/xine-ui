@@ -296,6 +296,8 @@ Toggle TV modes on the DXR3
 Show/hide the playlist window.
 .IP "\fBQ\fP"
 Exit.
+.IP "\fBd\fP"
+Switch Monitor to DPMS standby mode
 .IP "\fBs\fP"
 Zoom 1:1.
 .IP "\fBS\fP"

@@ -191,27 +191,26 @@ Retire les bordures de la fenêtre de sortie, en mode fenêtré.
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles
 définissent le média à utiliser comme source de lecture.
 Les MRLs valides peuvent être des noms de fichiers ou un de ceux qui suit:
-.BR file://<chemin>
 .br
-.BR fifo://<chemin>
+.BI file: <chemin>
 .br
-.BR stdin://mpeg1
-ou
-.BR stdin://mpeg2
+.BI fifo: <chemin>
 .br
-.BR dvd://VTS_xx_y.VOB
+.B stdin:/
 .br
-.BR vcd://<numéropiste>
+.BI dvd:/ <titre> . <part>
 .br
-.BR tcp://<hôte>:<port>
+.BI vcd:/ <numéro piste>
 .br
-.BR rtp://<hôte>:<port>
+.BI tcp:// <hôte> : <port>
 .br
-.BR udp://<hôte>:<port>
+.BI rtp:// <hôte> : <port>
 .br
-.BR mms://<hôte>...
+.BI udp:// <hôte> : <port>
 .br
-.BR http://<hôte>...
+.BI mms:// <hôte>...
+.br
+.BI http:// <hôte>...
 .LP
 Plusieures MRLs peuvent être spécifiées pour lire un nombre consécutif
 de flux.
@@ -220,38 +219,67 @@ Si vous ne spécifiez aucune MRL, vous pourrez sélectionner un fichier
 par glisser-lacher.
 Glisser des fichiers depuis \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP 
 ou \fBKonqueror\fP est connu pour fonctionner.
-////
 .TP
 .B sous-titre pour les fichiers avi
 .br
-Les fichiers de sous-titre peuvent êre ajoutés (séparé par \`%\') a une MRL de fichier:
+Les fichiers de sous-titre peuvent êre ajoutés (séparé par \`?\') a une MRL de fichier:
 .br 
-.BR file://<path>%<fichiersoustitre>
+.BR file:/<chemin>?<fichiersoustitre>
+.TP
+.B options de flux
+.br
+Aprés un délimiteur
+.B #
+vous pouvez ajouter plusieurs paramètres pour le flux:
+.TP
+.B novideo
+la vidéo sera ignorée
+.TP
+.B noaudio
+l\'audio sera ignoré
+.TP
+.B nospu
+le sous-titre sera ignoré
+.TP
+.BI demux: <nom\ de\ demultiplexeur>
+spécifie le démultiplexeur à utiliser
+.TP
+.BI volume: <niveau>
+spécifie le volume sonore
+.TP
+.BI compression: <niveau>
+définie le niveau de compression dynamique
+.TP
+.IB <section\ de\ configuration> : <valeur\ de\ configuration>
+assigne une nouvelle valeur a n\'importe quelle section de configuration
 .SH TOUCHES DE CONTRÔLE
 Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches. '\fBM\-\fP' est la touche Meta ('Alt' sur les claviers de PC), '\fBC\-\fP' est la touche Control 'Ctrl', les autres touches spéciales sont délimitées par les caractères '\fB<\fP' et '\fB>\fP', par exemple: la touche FIN est affichèe \fB<fin>\fP. La liste de ces touches est:
 .LP
 .BR 0..9 :
 Saute à 0%..90% du flux courant.
 .br
-.BR A :
+.BR a :
 Bascule du ratio d'aspect (AUTO/16:9/4:3/DVB).
 .br
 .BR M\-c :
 Affiche/masque la fenêtre des réglages vidéo.
 .br
-.BR E :
+.BR d :
+Passe le moniteur en attente DPMS
+.br
+.BR e :
 Ejecte le média courant.
 .br
-.BR F :
+.BR f :
 Bascule plein écran/fenêtré.
 .br
-.BR G :
+.BR g :
 Affiche/masque le panneau de contrôle.
 .br
-.BR H :
+.BR h :
 Affiche/masque la fenêtre de sortie.
 .br
-.BR i | I :
+.BR i :
 Bascule des méthodes de dé-entrelacement.
 .br
 .BR M\-l :
@@ -269,7 +297,7 @@ Bascule du mode TV pour les carte DXR3.
 .BR M\-p :
 Affiche/masque le fenêtre de liste de lecture.
 .br
-.BR Q :
+.BR q :
 Quitte.
 .br
 .BR s :
@@ -395,10 +423,10 @@ Il existe des flux ayant de mauvaises informations de temporisation, de ce
 fait la synchronisation échoue. Il est possible de corriger ceci en utilisant
 les touches directionnelle:
 .br
-.BR n | N :
+.BR n :
 Pressez cette touche si la vidéo est en avance par rapport à l'audio.
 .br
-.BR m | M :
+.BR m :
 Pressez cette touche si le vidéo est en retard par rapport à l'audio.
 .br
 .BR <début> :
