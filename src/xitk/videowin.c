@@ -65,6 +65,10 @@ typedef struct {
 
   int            video_width;     /* size of currently displayed video     */
   int            video_height;
+
+  int            frame_width;     /* frame size, from xine-lib */
+  int            frame_height;
+
   double         video_duration;  /* frame duratrion in seconds */
   double         video_average;   /* average frame duration in seconds */
   double         use_duration;    /* duration used for tv mode selection */
@@ -915,6 +919,9 @@ void video_window_dest_size_cb (void *data,
 				int *dest_width, int *dest_height,
 				double *dest_pixel_aspect)  {
   
+  gVw->frame_width = video_width;
+  gVw->frame_height = video_height;
+
   /* correct size with video_pixel_aspect */
   if (video_pixel_aspect >= gGui->pixel_aspect)
     video_width  = video_width * video_pixel_aspect / gGui->pixel_aspect + .5;
@@ -962,6 +969,9 @@ void video_window_frame_output_cb (void *data,
 				   int *dest_width, int *dest_height,
 				   double *dest_pixel_aspect,
 				   int *win_x, int *win_y) {
+
+  gVw->frame_width = video_width;
+  gVw->frame_height = video_height;
 
   /* correct size with video_pixel_aspect */
   if (video_pixel_aspect >= gGui->pixel_aspect)
@@ -1793,4 +1803,11 @@ void video_window_reset_ssaver(void) {
       XResetScreenSaver(gGui->display);
       XUnlockDisplay(gGui->display);
     }
+}
+
+void video_window_get_frame_size(int *w, int *h) {
+  if(w)
+    *w = gVw->frame_width;
+  if(h)
+    *h = gVw->frame_height;
 }

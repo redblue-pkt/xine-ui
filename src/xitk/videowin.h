@@ -78,4 +78,5 @@ void video_window_change_skins(void);
 
 void video_window_reset_ssaver(void);
 
+void video_window_get_frame_size(int *w, int *h);
 #endif
