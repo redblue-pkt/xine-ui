@@ -579,8 +579,10 @@ void gui_status_callback (int nStatus) {
     }
   }
 
-  if(is_playback_widgets_enabled() && (!gGui->playlist_num))
+  if(is_playback_widgets_enabled() && (!gGui->playlist_num) && (!gGui->filename)) {
+    gui_set_current_mrl(NULL);
     enable_playback_controls(0);
+  }
 
 }
 

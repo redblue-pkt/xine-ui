@@ -650,19 +650,16 @@ void xitk_xevent_notify(XEvent *event) {
 	break;
 
 	case Expose:
-	  if (fx->widget_list && (event->xexpose.count == 0)) {
-	    xitk_paint_widget_list (fx->widget_list);
-	  }
-	  /*
-	  else {
-	    
-	    if(event->xexpose.count > 0) {
-	      while(XCheckWindowEvent(gXitk->display, fx->window, 
-				      ExposureMask, event) == True);
-	    }
+	  if (fx->widget_list) {
+	    XEvent xev;
 
+	    xitk_paint_widget_list (fx->widget_list);
+
+	    XLOCK(gXitk->display);
+	    while(XCheckTypedWindowEvent(gXitk->display, fx->window, 
+					 Expose, &xev) == True);
+	    XUNLOCK(gXitk->display);
 	  }
-	  */
 	  break;
 	  
 	case MotionNotify: {
