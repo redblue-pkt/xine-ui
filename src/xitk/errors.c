@@ -291,6 +291,7 @@ static void _learn_more_about_too_slow(xitk_widget_t *w, void *data, int state) 
    * fixme: how to properly open the system browser? 
    * should we just make it configurable? 
    */
+  xine_info(_("Opening mozilla web browser, this might take a while..."));
   system ("mozilla http://xinehq.de/index.php/faq#SPEEDUP");
 }
 
@@ -301,7 +302,7 @@ void too_slow_window(void) {
   xitk_window_t *xw;
   char *title, *message;
   int display_warning;
-  int checked = 1;
+  int checked = 0;
     
   title = _("Warning");
   message = _("The amount of dropped frame is too high, your system might be slow, not properly optimized or just too loaded.\n\nhttp://xinehq.de/index.php/faq#SPEEDUP");
@@ -324,7 +325,7 @@ void too_slow_window(void) {
   xw = xitk_window_dialog_checkbox_two_buttons_with_width(gGui->imlib_data, title, 
 						 _("Done"), _("Learn More..."),
 						 NULL, _learn_more_about_too_slow, 
-                                                 _("Don't ever show this message again."),
+                                                 _("Disable this warning."),
                                                  checked, _dont_show_too_slow_again,
 						 NULL, 500, ALIGN_CENTER,
 						 message);

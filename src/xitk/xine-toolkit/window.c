@@ -976,6 +976,14 @@ xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
   return xw;
 }
 
+static void _checkbox_label_click(xitk_widget_t *w, void *data) {
+  xitk_dialog_t *wd = (xitk_dialog_t *) data;
+  
+  xitk_checkbox_set_state(wd->checkbox, 
+    (!xitk_checkbox_get_state(wd->checkbox)));
+  xitk_checkbox_callback_exec(wd->checkbox);
+}
+
 /*
  * Create an interactive window, containing 'yes', 'no', 'cancel' buttons.
  */
@@ -1074,11 +1082,11 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
     lbl.gc                = (XITK_WIDGET_LIST_GC(wd->widget_list));
     lbl.skin_element_name = NULL;
     lbl.label             = checkbox_label;
-    lbl.callback          = NULL;
-    lbl.userdata          = userdata;
+    lbl.callback          = _checkbox_label_click;
+    lbl.userdata          = wd;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(wd->widget_list)), 
             (wd->checkbox_label = 
-              xitk_noskin_label_create(wd->widget_list, &lbl, x + 15, y, windoww - x - 40, 20, DEFAULT_BOLD_FONT_12)));
+              xitk_noskin_label_create(wd->widget_list, &lbl, x + 15, y, windoww - x - 40, 20, DEFAULT_FONT_12)));
   }
   
   /* Buttons */
