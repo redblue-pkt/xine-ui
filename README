@@ -7,4 +7,8 @@
 
 
 
-please refer to the documentation in the directory "doc/"
+for general information about xine and help on usage please refer to
+the documentation in the package xine-ui, directory "doc/".
+
+for technical documentation and stuff of interest for developers
+please see the directory "doc/" in the package xine-lib.
