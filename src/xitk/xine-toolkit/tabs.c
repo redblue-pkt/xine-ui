@@ -140,8 +140,9 @@ static void tabs_arrange(xitk_widget_t *w) {
       if(p) {
 	draw_tab(private_data->imlibdata, p);
 	
-	XLOCK(private_data->imlibdata->x.disp);
 	gcv.graphics_exposures = False;
+
+	XLOCK(private_data->imlibdata->x.disp);
 	gc = XCreateGC(private_data->imlibdata->x.disp, 
 		       p->image->pixmap, GCGraphicsExposures, &gcv);
 	XCopyArea(private_data->imlibdata->x.disp, 

@@ -52,10 +52,11 @@ unsigned int mods_used = (ShiftMask | ControlMask | Mod1Mask |
  *
  */
 static void _cursor_focus(inputtext_private_data_t *private_data, Window win, int focus) {
-  XLOCK(private_data->imlibdata->x.disp);
 
   private_data->cursor_focus = focus;
   
+  XLOCK(private_data->imlibdata->x.disp);
+
   if(focus)
     XDefineCursor(private_data->imlibdata->x.disp, win, private_data->cursor[1]);
   else
@@ -326,24 +327,28 @@ static void create_labelofinputtext(xitk_widget_t *w,
     plabel += private_data->disp_offset;
 
   /*  Put text in the right place */
-  XLOCK(private_data->imlibdata->x.disp);
   if(private_data->skin_element_name) {
+    XLOCK(private_data->imlibdata->x.disp);
     XDrawString(private_data->imlibdata->x.disp, pix, gc, 
 		2, ((ysize+asc+des+yoff)>>1)-des, 
 		plabel, strlen(plabel));
+    XUNLOCK(private_data->imlibdata->x.disp);
   }
   else {
     XWindowAttributes  attr;
     xitk_pixmap_t     *tpix;
     GC                 lgc;
     
+    XLOCK(private_data->imlibdata->x.disp);
     XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
     
     lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+    XUNLOCK(private_data->imlibdata->x.disp);
     
     tpix = xitk_image_create_xitk_pixmap(private_data->imlibdata, xsize, ysize);
     
+    XLOCK(private_data->imlibdata->x.disp);
     XCopyArea (private_data->imlibdata->x.disp, pix, tpix->pixmap, lgc, 0, 0,
 	       xsize, ysize, 0, 0);
     
@@ -353,11 +358,14 @@ static void create_labelofinputtext(xitk_widget_t *w,
     
     XCopyArea (private_data->imlibdata->x.disp, tpix->pixmap, pix, lgc, 0, 0,
 	       xsize - 1, ysize, 0, 0);
+    XUNLOCK(private_data->imlibdata->x.disp);
 
     xitk_image_destroy_xitk_pixmap(tpix);
+
+    XLOCK(private_data->imlibdata->x.disp);
     XFreeGC(private_data->imlibdata->x.disp, lgc);
+    XUNLOCK(private_data->imlibdata->x.disp);
   }
-  XUNLOCK(private_data->imlibdata->x.disp);
 
   width = xitk_font_get_text_width(fs, plabel,
 				   (private_data->cursor_pos - private_data->disp_offset));
@@ -406,21 +414,27 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
 
       XLOCK(private_data->imlibdata->x.disp);
       XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
-      
+      XUNLOCK(private_data->imlibdata->x.disp);
+
       skin = private_data->skin;
       
+      XLOCK(private_data->imlibdata->x.disp);
       lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
       XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+      XUNLOCK(private_data->imlibdata->x.disp);
       
       if (skin->mask) {
+	XLOCK(private_data->imlibdata->x.disp);
 	XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
 	XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
+	XUNLOCK(private_data->imlibdata->x.disp);
       }
       
       button_width = skin->width / 2;
       
       btn = xitk_image_create_xitk_pixmap(private_data->imlibdata, button_width, skin->height);
       
+      XLOCK(private_data->imlibdata->x.disp);
       if((w->have_focus == FOCUS_RECEIVED) || (private_data->have_focus == FOCUS_MOUSE_IN)) {
 	state = FOCUS;
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
@@ -433,7 +447,6 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
 		   btn->pixmap, gc, 0, 0,
 		   button_width, skin->height, 0, 0);
       }
-      
       XUNLOCK(private_data->imlibdata->x.disp);
       
       create_labelofinputtext(w, win, gc, btn->pixmap, 
@@ -442,7 +455,11 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
       XLOCK(private_data->imlibdata->x.disp);
       XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, win, lgc, 0, 0,
 		 button_width, skin->height, w->x, w->y);
+      XUNLOCK(private_data->imlibdata->x.disp);
+
       xitk_image_destroy_xitk_pixmap(btn);
+
+      XLOCK(private_data->imlibdata->x.disp);
       XFreeGC(private_data->imlibdata->x.disp, lgc);
       XUNLOCK(private_data->imlibdata->x.disp);
     }

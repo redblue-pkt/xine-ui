@@ -104,34 +104,39 @@ static void paint_button (xitk_widget_t *w, Window win, GC gc) {
     button_width = skin->width / 3;
 
     XLOCK (private_data->imlibdata->x.disp);
-        
     lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+    XUNLOCK (private_data->imlibdata->x.disp);
 
     if (skin->mask) {
+      XLOCK (private_data->imlibdata->x.disp);
       XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
       XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
+      XUNLOCK (private_data->imlibdata->x.disp);
     }
 
+    XLOCK (private_data->imlibdata->x.disp);
     if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
       if(private_data->bClicked) {
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
 		   win, lgc, 2*button_width, 0,
 		   button_width, skin->height, w->x, w->y);
-	
-      } else {
+      } 
+      else {
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
 		   win, lgc, button_width, 0,
 		   button_width, skin->height, w->x, w->y);
       }
-    } else {
+    } 
+    else {
       XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
 		 win, lgc, 0, 0,
 		 button_width, skin->height, w->x, w->y);
     }
+    XUNLOCK (private_data->imlibdata->x.disp);
 
+    XLOCK (private_data->imlibdata->x.disp);
     XFreeGC(private_data->imlibdata->x.disp, lgc);
-
     XUNLOCK (private_data->imlibdata->x.disp);
   } 
 

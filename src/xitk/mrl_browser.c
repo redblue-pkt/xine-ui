@@ -368,6 +368,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
        (!xine_play(gGui->stream, 0, 0))) {
       gui_handle_xine_error(gGui->stream);
       enable_playback_controls(0);
+      gui_display_logo();
     }
     else {
       mediamark_t mmk;

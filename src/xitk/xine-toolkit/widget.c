@@ -824,11 +824,9 @@ int xitk_is_cursor_out_mask(Display *display, xitk_widget_t *w, Pixmap mask, int
     if((yy = (y - w->y)) == w->height) yy--;
     
     XLOCK(display);
-    
     xi = XGetImage(display, mask, xx, yy, 1, 1, AllPlanes, ZPixmap);
     p = XGetPixel(xi, 0, 0);
     XDestroyImage(xi);
-    
     XUNLOCK(display);
 
     return (int) p;

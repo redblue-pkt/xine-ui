@@ -197,21 +197,25 @@ static void *_tips_thread(void *data) {
     gc = XCreateGC(tp->w->imlibdata->x.disp, tp->w->imlibdata->x.base_window, None, None);
     XCopyArea(tp->w->imlibdata->x.disp, (xitk_window_get_background(tp->xwin)), bg->pixmap,
 	      gc, 0, 0, width, height, 0, 0);
+    XUNLOCK(tp->w->imlibdata->x.disp);
 
+    XLOCK(tp->w->imlibdata->x.disp);
     XSetForeground(tp->w->imlibdata->x.disp, gc, cwarnfore);
     XDrawRectangle(tp->w->imlibdata->x.disp, bg->pixmap, gc, 0, 0, width - 1, height - 1);
+    XUNLOCK(tp->w->imlibdata->x.disp);
     
+    XLOCK(tp->w->imlibdata->x.disp);
     XSetForeground(tp->w->imlibdata->x.disp, gc, cwarnback);
     XFillRectangle(tp->w->imlibdata->x.disp, bg->pixmap, gc, 1, 1, width - 2, height - 2);
-
     XCopyArea(tp->w->imlibdata->x.disp, i->image->pixmap, bg->pixmap,
 	      gc, 0, 0, i->width, i->height, (width - i->width)>>1, ((height - i->height)>>1) + 1);
     XUNLOCK(tp->w->imlibdata->x.disp);
     
     xitk_window_change_background(tp->w->imlibdata, tp->xwin, bg->pixmap, width, height);
     
-    XLOCK(tp->w->imlibdata->x.disp);
     xitk_image_destroy_xitk_pixmap(bg);
+
+    XLOCK(tp->w->imlibdata->x.disp);
     XFreeGC(tp->w->imlibdata->x.disp, gc);
     XUNLOCK(tp->w->imlibdata->x.disp);
     
@@ -220,15 +224,15 @@ static void *_tips_thread(void *data) {
   }
   
   XLOCK(tp->w->imlibdata->x.disp);
-
   status = XGetWindowAttributes(tp->w->imlibdata->x.disp, tp->wl->win, &wattr);
-
   XMapRaised(tp->w->imlibdata->x.disp, (xitk_window_get_window(tp->xwin)));
-
-  if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable))
-    XSetInputFocus(tp->w->imlibdata->x.disp, tp->wl->win, RevertToParent, CurrentTime);
-  
   XUNLOCK(tp->w->imlibdata->x.disp);
+
+  if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable)) {
+    XLOCK(tp->w->imlibdata->x.disp);
+    XSetInputFocus(tp->w->imlibdata->x.disp, tp->wl->win, RevertToParent, CurrentTime);
+    XUNLOCK(tp->w->imlibdata->x.disp);
+  }
   
   /* TODO: forward key event to parent window */
   tp->key = xitk_register_event_handler("xitk tips", 

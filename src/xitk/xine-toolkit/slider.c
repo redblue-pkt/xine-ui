@@ -294,18 +294,21 @@ static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
 
     x = y = srcx1 = srcx2 = destx1 = srcy1 = srcy2 = desty1 = 0;
         
-    XLOCK (private_data->imlibdata->x.disp);
-
+    XLOCK(private_data->imlibdata->x.disp);
     bgc = XCreateGC(private_data->imlibdata->x.disp, bg->image->pixmap, None, None);
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, bgc);
     pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image->pixmap, None, None);
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, pgc);
+    XUNLOCK(private_data->imlibdata->x.disp);
       
     if(bg->mask) {
+      XLOCK(private_data->imlibdata->x.disp);
       XSetClipOrigin(private_data->imlibdata->x.disp, bgc, w->x, w->y);
       XSetClipMask(private_data->imlibdata->x.disp, bgc, bg->mask->pixmap);
+      XUNLOCK(private_data->imlibdata->x.disp);
     }
     
+    XLOCK(private_data->imlibdata->x.disp);
     XCopyArea(private_data->imlibdata->x.disp, bg->image->pixmap, win, bgc, 0, 0,
 	      bg->width, bg->height, w->x, w->y);
       
@@ -412,15 +415,16 @@ static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
 
     }
     
-    XLOCK(private_data->imlibdata->x.disp);
     if(paddle->mask) {
+      XLOCK(private_data->imlibdata->x.disp);
       XSetClipOrigin(private_data->imlibdata->x.disp, pgc, x, y);
       XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask->pixmap);
+      XUNLOCK(private_data->imlibdata->x.disp);
     }
     
+    XLOCK(private_data->imlibdata->x.disp);
     XCopyArea(private_data->imlibdata->x.disp, paddle->image->pixmap, win, pgc,
 	      srcx1, srcy1, srcx2, srcy2, destx1, desty1);
-    
     XFreeGC(private_data->imlibdata->x.disp, pgc);
     XFreeGC(private_data->imlibdata->x.disp, bgc);
     XUNLOCK(private_data->imlibdata->x.disp);

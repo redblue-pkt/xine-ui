@@ -475,6 +475,9 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 		    1);
   }
   
+  XUNLOCK(c->imlibdata->x.disp);
+
+  XLOCK(c->imlibdata->x.disp);
   XSetTransientForHint (c->imlibdata->x.disp,
 			(xitk_window_get_window(private_data->xwin)), private_data->parent_wlist->win);
   

@@ -81,6 +81,7 @@ int xitk_is_window_size(Display *display, Window window, int width, int height) 
   XLOCK(display);
   if(!XGetWindowAttributes(display, window, &wattr)) {
     XITK_WARNING("XGetWindowAttributes() failed.n");
+    XUNLOCK(display);
     return -1;
   }
   XUNLOCK(display);
@@ -226,8 +227,6 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   xwin->height     = height;
   xwin->parent     = NULL;
   
-  XLOCK(im->x.disp);
-
   memset(&hint, 0, sizeof(hint));
   hint.x               = x;
   hint.y               = y;
@@ -240,7 +239,9 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   hint.win_gravity     = NorthWestGravity;
   hint.flags           = PWinGravity | PBaseSize | PMinSize | USSize | USPosition;
   
+  XLOCK(im->x.disp);
   XAllocNamedColor(im->x.disp, Imlib_get_colormap(im), "black", &black, &dummy);
+  XUNLOCK(im->x.disp);
 
   attr.override_redirect = False;
   attr.background_pixel  = black.pixel;
@@ -248,6 +249,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   attr.colormap          = Imlib_get_colormap(im);
   attr.win_gravity       = NorthWestGravity;
 
+  XLOCK(im->x.disp);
   xwin->window = XCreateWindow(im->x.disp, im->x.root, hint.x, hint.y, hint.width, hint.height,
 			       0, im->x.depth,  InputOutput, im->x.visual,
 			       CWBackPixel | CWBorderPixel | CWColormap
@@ -343,9 +345,9 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
   xitk_font_string_extent(fs, title, &lbear, &rbear, &wid, &asc, &des);
 
   XLOCK(im->x.disp);
-
   XCopyArea(im->x.disp, xwin->background->pixmap, pix_bg->pixmap, xwin->background->gc,
 	    0, 0, width, height, 0, 0);
+  XUNLOCK(im->x.disp);
 
   colorblack = xitk_get_pixel_color_black(im);
   colorwhite = xitk_get_pixel_color_white(im);
@@ -358,11 +360,13 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
     unsigned int colorblue;
 
     colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
+    XLOCK(im->x.disp);
     for(s = 0; s <= TITLE_BAR_HEIGHT; s++, bl -= 8) {
       XSetForeground(im->x.disp, bar->gc, colorblue);
       XDrawLine(im->x.disp, bar->pixmap, bar->gc, 0, s, width, s);
       colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
     }
+    XUNLOCK(im->x.disp);
   }
   else {
     int s;
@@ -374,6 +378,7 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
     draw_flat_with_color(im, bar, width, TITLE_BAR_HEIGHT, colorgray);
     draw_rectangular_inner_box(im, bar, 2, 2, width - 6, (TITLE_BAR_HEIGHT - 1 - 4));
     
+    XLOCK(im->x.disp);
     for(s = 6; s <= (TITLE_BAR_HEIGHT - 6); s += 3) {
       XSetForeground(im->x.disp, bar->gc, c);
       XDrawLine(im->x.disp, bar->pixmap, bar->gc, 5, s, (width - 8), s);
@@ -385,27 +390,40 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
     XFillRectangle(im->x.disp, bar->pixmap, bar->gc, 
 		   ((width - wid) - TITLE_BAR_HEIGHT) - 10, 6, 
 		   wid + 20, TITLE_BAR_HEIGHT - 1 - 8);
+    XUNLOCK(im->x.disp);
   }
-
+  
+  XLOCK(im->x.disp);
   XSetForeground(im->x.disp, bar->gc, colorwhite);
   XDrawLine(im->x.disp, bar->pixmap, bar->gc, 0, 0, width, 0);
   XDrawLine(im->x.disp, bar->pixmap, bar->gc, 0, 0, 0, TITLE_BAR_HEIGHT - 1);
+  XUNLOCK(im->x.disp);
 
+  XLOCK(im->x.disp);
   XSetForeground(im->x.disp, bar->gc, colorblack);
   XDrawLine(im->x.disp, bar->pixmap, bar->gc, width - 1, 0, width - 1, TITLE_BAR_HEIGHT - 1);
 
   XDrawLine(im->x.disp, bar->pixmap, bar->gc, 2, TITLE_BAR_HEIGHT - 1, width - 2, TITLE_BAR_HEIGHT - 1);
+  XUNLOCK(im->x.disp);
 
+  XLOCK(im->x.disp);
   XSetForeground(im->x.disp, bar->gc, colordgray);
   XDrawLine(im->x.disp, bar->pixmap, bar->gc, width - 2, 2, width - 2, TITLE_BAR_HEIGHT - 1);
+  XUNLOCK(im->x.disp);
 
+  XLOCK(im->x.disp);
   XSetForeground(im->x.disp, bar->gc, colorblack);
   XDrawLine(im->x.disp, pix_bg->pixmap, bar->gc, width - 1, 0, width - 1, height - 1);
   XDrawLine(im->x.disp, pix_bg->pixmap, bar->gc, 0, height - 1, width - 1, height - 1);
+  XUNLOCK(im->x.disp);
+
+  XLOCK(im->x.disp);
   XSetForeground(im->x.disp, bar->gc, colordgray);
   XDrawLine(im->x.disp, pix_bg->pixmap, bar->gc, width - 2, 0, width - 2, height - 2);
   XDrawLine(im->x.disp, pix_bg->pixmap, bar->gc, 2, height - 2, width - 2, height - 2);
+  XUNLOCK(im->x.disp);
 
+  XLOCK(im->x.disp);
   if(bar_style)
     XSetForeground(im->x.disp, bar->gc, colorwhite);
   else
@@ -414,7 +432,6 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
   XDrawString(im->x.disp, bar->pixmap, bar->gc, 
 	      (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT+asc+des) >> 1) - des, 
 	      title, strlen(title));
-
   XUNLOCK(im->x.disp);
 
   xitk_font_unload_font(fs);
@@ -582,12 +599,14 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
 
   XLOCK(im->x.disp);
   XUnmapWindow(im->x.disp, w->window);
+  XUNLOCK(im->x.disp);
 
   if(w->background)
     xitk_image_destroy_xitk_pixmap(w->background);
 
   w->width = -1;
   w->height = -1;
+  XLOCK(im->x.disp);
   XDestroyWindow(im->x.disp, w->window);
   XUNLOCK(im->x.disp);
 
@@ -747,8 +766,9 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
 
     xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
 
-    XLOCK(im->x.disp);
     xitk_image_destroy_xitk_pixmap(bg);
+
+    XLOCK(im->x.disp);
     XFreeGC(im->x.disp, gc);
     XUNLOCK(im->x.disp);
 
@@ -880,8 +900,9 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
 
     xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
 
-    XLOCK(im->x.disp);
     xitk_image_destroy_xitk_pixmap(bg);
+
+    XLOCK(im->x.disp);
     XFreeGC(im->x.disp, gc);
     XUNLOCK(im->x.disp);
 
@@ -1072,8 +1093,9 @@ xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *ti
 
     xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
 
-    XLOCK(im->x.disp);
     xitk_image_destroy_xitk_pixmap(bg);
+
+    XLOCK(im->x.disp);
     XFreeGC(im->x.disp, gc);
     XUNLOCK(im->x.disp);
 
@@ -1290,8 +1312,8 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
 
     xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
 
-    XLOCK(im->x.disp);
     xitk_image_destroy_xitk_pixmap(bg);
+    XLOCK(im->x.disp);
     XFreeGC(im->x.disp, gc);
     XUNLOCK(im->x.disp);
 

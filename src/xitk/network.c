@@ -1824,8 +1824,10 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	}
 	gui_set_current_mrl(gGui->playlist.mmk[gGui->playlist.num - 1]);
 	if(!(xine_open(gGui->stream, gGui->mmk.mrl) 
-	     && xine_play (gGui->stream, 0, gGui->mmk.start)))
+	     && xine_play (gGui->stream, 0, gGui->mmk.start))) {
 	  handle_xine_error(client_info);
+	  gui_display_logo();
+	}
 	else
 	  gGui->logo_mode = 0;
       }
@@ -1931,8 +1933,10 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 static void do_play(commands_t *cmd, client_info_t *client_info) {
 
   if (xine_get_status (gGui->stream) != XINE_STATUS_PLAY) {
-    if(!(xine_open(gGui->stream, gGui->mmk.mrl) && xine_play (gGui->stream, 0, gGui->mmk.start)))
+    if(!(xine_open(gGui->stream, gGui->mmk.mrl) && xine_play (gGui->stream, 0, gGui->mmk.start))) {
       handle_xine_error(client_info);
+      gui_display_logo();
+    }
     else
       gGui->logo_mode = 0;
   } 
@@ -2342,8 +2346,10 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 	if(pos < 0) pos = 0;
 	
 	gGui->ignore_next = 1;
-	if(!xine_play(gGui->stream, ((int) (655.35 * pos)), 0))
+	if(!xine_play(gGui->stream, ((int) (655.35 * pos)), 0)) {
 	  gui_handle_xine_error(gGui->stream);
+	  gui_display_logo();
+	}
 	else
 	  gGui->logo_mode = 0;
 
@@ -2373,8 +2379,10 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 	msec *= 1000;
 	
 	gGui->ignore_next = 1;
-	if(!xine_play(gGui->stream, 0, msec))
+	if(!xine_play(gGui->stream, 0, msec)) {
 	  gui_handle_xine_error(gGui->stream);
+	  gui_display_logo();
+	}
 	else
 	  gGui->logo_mode = 0;
 

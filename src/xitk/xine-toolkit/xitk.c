@@ -1202,7 +1202,7 @@ void xitk_run(void) {
   gXitk->running = 1;
   
   XLOCK(gXitk->display);
-  XSync(gXitk->display, True);
+  XSync(gXitk->display, True); /* Flushing the toilets */
   XUNLOCK(gXitk->display);
 
   /*

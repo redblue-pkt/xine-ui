@@ -687,10 +687,12 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
 							private_data->skin_element_name)))) {
       XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
     }
-    
+    XUNLOCK(private_data->imlibdata->x.disp);
+
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
     hint.flags  = PPosition | PSize;
+    XLOCK(private_data->imlibdata->x.disp);
     XSetWMNormalHints(private_data->imlibdata->x.disp, private_data->window, &hint);
 
     XResizeWindow (private_data->imlibdata->x.disp, private_data->window,
@@ -708,10 +710,8 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     private_data->bg_image = new_img;
 
     XLOCK(private_data->imlibdata->x.disp);
-
     Imlib_destroy_image(private_data->imlibdata, old_img);
     Imlib_apply_image(private_data->imlibdata, new_img, private_data->window);
-
     XUNLOCK(private_data->imlibdata->x.disp);
 
     xitk_skin_unlock(skonfig);
@@ -1038,6 +1038,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
     XUNLOCK(mb->imlibdata->x.disp);
     return NULL;
   }
+  XUNLOCK(mb->imlibdata->x.disp);
 
   private_data->mc              = (mrl_contents_t *) xitk_xmalloc(sizeof(mrl_contents_t));
   private_data->mrls_num        = 0;
@@ -1049,11 +1050,13 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   hint.height = private_data->bg_image->rgb_height;
   hint.flags  = PPosition | PSize;
 
+  XLOCK(mb->imlibdata->x.disp);
   screen = DefaultScreen(mb->imlibdata->x.disp);
 
   XAllocNamedColor(mb->imlibdata->x.disp, 
 		   Imlib_get_colormap(mb->imlibdata),
 		   "black", &black, &dummy);
+  XUNLOCK(mb->imlibdata->x.disp);
 
   attr.override_redirect = False;
   attr.background_pixel  = black.pixel;
@@ -1068,6 +1071,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   attr.border_pixel      = 1;
   attr.colormap		 = Imlib_get_colormap(mb->imlibdata);
 
+  XLOCK(mb->imlibdata->x.disp);
   private_data->window   = XCreateWindow (mb->imlibdata->x.disp,
 					  mb->imlibdata->x.root, 
 					  hint.x, hint.y, hint.width, hint.height, 0, 
@@ -1080,12 +1084,14 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 			 None, NULL, 0, &hint);
 
   XSelectInput(mb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
+  XUNLOCK(mb->imlibdata->x.disp);
   
   /*
    * layer above most other things, like gnome panel
    * WIN_LAYER_ABOVE_DOCK  = 10
    *
    */
+  XLOCK(mb->imlibdata->x.disp);
   if(mb->layer_above) {
     XA_WIN_LAYER = XInternAtom(mb->imlibdata->x.disp, "_WIN_LAYER", False);
     
@@ -1099,9 +1105,12 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
    * wm, no border please
    */
   prop                 = XInternAtom(mb->imlibdata->x.disp, "_MOTIF_WM_HINTS", True);
+  XUNLOCK(mb->imlibdata->x.disp);
+
   mwmhints.flags       = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
   
+  XLOCK(mb->imlibdata->x.disp);
   XChangeProperty(mb->imlibdata->x.disp, private_data->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);						
@@ -1116,7 +1125,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
     xclasshint->res_class = mb->resource_class ? mb->resource_class : "xitk";
     XSetClassHint(mb->imlibdata->x.disp, private_data->window, xclasshint);
   }
+  XUNLOCK(mb->imlibdata->x.disp);
   
+  XLOCK(mb->imlibdata->x.disp);
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
     wm_hint->input         = True;
@@ -1125,7 +1136,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
     XSetWMHints(mb->imlibdata->x.disp, private_data->window, wm_hint);
     XFree(wm_hint);
   }
+  XUNLOCK(mb->imlibdata->x.disp);
   
+  XLOCK(mb->imlibdata->x.disp);
   gc = XCreateGC(mb->imlibdata->x.disp, private_data->window, 0, 0);
   
   Imlib_apply_image(mb->imlibdata, 
@@ -1301,7 +1314,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   xitk_browser_update_list(private_data->mrlb_list, 
 			   private_data->mc->mrls_disp, 
 			   private_data->mrls_num, 0);
-  
+
   XLOCK (mb->imlibdata->x.disp);
   XRaiseWindow(mb->imlibdata->x.disp, private_data->window); 
   XMapWindow(mb->imlibdata->x.disp, private_data->window); 
@@ -1315,6 +1328,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 				mb->dndcallback,
 				private_data->widget_list,(void *) private_data);
 
+  while(!xitk_is_window_visible(mb->imlibdata->x.disp, private_data->window))
+    xitk_usec_sleep(5000);
   
   xitk_mrlbrowser_change_skins(mywidget, skonfig);
   
