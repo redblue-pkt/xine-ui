@@ -1770,6 +1770,11 @@ void xitk_combo_rollunroll(xitk_widget_t *w);
 /**
  *
  */
+int xitk_combo_is_same_parent(xitk_widget_t *w1, xitk_widget_t *w2);
+
+/**
+ *
+ */
 unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b);
 
 /**

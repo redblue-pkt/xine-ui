@@ -273,7 +273,7 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
     state = !xitk_checkbox_get_state(private_data->button_widget);
     
     xitk_checkbox_set_state(private_data->button_widget, state);
-    
+
     if(state && private_data->visible == 0) {
       w->wl->widget_focused = private_data->button_widget;
       private_data->visible = 1;
@@ -286,13 +286,58 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
       XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
       XUNLOCK(private_data->imlibdata->x.disp);
     }
-
+    
   }      
 }
 
 /*
  * ************************* END OF PRIVATES *******************************
  */
+
+int xitk_combo_is_same_parent(xitk_widget_t *w1, xitk_widget_t *w2) {
+
+  if((w1 && w2) && ((w1->type & WIDGET_GROUP_COMBO) && (w1->type & WIDGET_GROUP_COMBO))) {
+    
+    if(w1 == w2)
+      return 1;
+    
+    if(w1->wl == w2->wl) {
+      xitk_widget_list_t  *wl = w1->wl;
+      xitk_widget_t       *w, *wt;
+      
+      w = (xitk_widget_t *) xitk_list_first_content(wl->l);
+      while(w && ((w != w1) && (w != w2))) {
+	w = (xitk_widget_t *) xitk_list_next_content(wl->l);
+      }
+
+      if(w) {
+
+	wt = (w == w1) ? w2 : w1;
+	
+	if((w->type & WIDGET_GROUP_COMBO) && 
+	   ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
+	  w = (xitk_widget_t *) xitk_list_next_content(wl->l);
+	  w = (xitk_widget_t *) xitk_list_next_content(wl->l);
+	}
+	else if((w->type & WIDGET_GROUP_COMBO) && 
+		((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
+	  w = (xitk_widget_t *) xitk_list_next_content(wl->l);
+	}
+	
+	if(((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET)) {
+	  combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
+	
+	  if((wt == private_data->label_widget) || (wt == private_data->button_widget))
+	    return 1;
+	  
+	}
+
+      }
+    }
+  }
+  return 0;  
+}
 
 /*
  *
