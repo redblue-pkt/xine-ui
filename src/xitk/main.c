@@ -155,8 +155,8 @@ void show_usage (void) {
   printf("\n");
   printf(_("Usage: xine [OPTIONS]... [MRL]\n"));
   printf("\n");
-  printf(_("  -v, --version                Display version.\n"));
   printf("OPTIONS are:\n");
+  printf(_("  -v, --version                Display version.\n"));
   printf(_("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n"));
   printf("                               ");
   driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);

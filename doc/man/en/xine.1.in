@@ -16,11 +16,11 @@ audio/video player.
 .PP
 .B xine
 plays MPEG system (audio and video) streams, mpeg elementary streams
-(e.g. .mp3 or .mpv files), avi files (using win32 codecs), (S)VCDs
-and DVDs.
+(e.g. .mp3 or .mpv files), mpeg transport streams, avi files, asf files, 
+quicktime files, (S)VCDs and DVDs.
 .SH OPTIONS
 The programs follow the usual GNU command line syntax, with long
-options starting with two dashes (`-').
+ioptions starting with two dashes (`-').
 A summary of options are included below.
 For a complete description, see README and FAQ in @prefix@/share/doc/xine-ui
 or on the xine home page.
@@ -139,7 +139,7 @@ The programs are documented fully on the xine home page:
 .IR "http://xine.sourceforge.net/"
 .SH CONTROL KEYS
 Many features can be controlled by pressing control keys. '\fBM\-\fP' is the Meta key ('Alt' key on PC keyboard), '\fBC\-\fP' is the Control 'CTRL' key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the HOME key is displayed \fB<home>\fP.
-The Key bindings are:
+The default key bindings are:
 .LP
 .BR 0 :
 Jump to start of current stream
@@ -184,7 +184,7 @@ Show/hide the playlist window.
 Exit.
 .br
 .BR s | S :
-Zoom x1.
+Zoom in/out.
 .br
 .BR v :
 Decrease audio volume.
@@ -256,6 +256,15 @@ press if video lags behind audio
 .br
 .BR <home> :
 press to reset audio/video offset to 0, so stream timestamps are unchanged.
+
+.SH FILES
+All config files are now to be found in ~/.xine:
+.br
+.BR ~/.xine/config :
+main config file
+.br
+.BR ~/.xine/keymap :
+key bindings for xine-ui
 
 .SH AUTHOR
 This manual page was written by Siggi Langauf <siggi@debian.org>,

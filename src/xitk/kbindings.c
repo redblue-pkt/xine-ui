@@ -810,7 +810,7 @@ void kbindings_save_kbinding(kbinding_t *kbt) {
     return;
   }
   else {
-    _kbindings_display_kbindings_to_stream(kbt, LIRC_DISPLAY_MODE, f);  
+    _kbindings_display_kbindings_to_stream(kbt, DEFAULT_DISPLAY_MODE, f);  
     fclose(f);
   }
 }
