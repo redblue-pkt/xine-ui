@@ -164,60 +164,59 @@ msgstr "Autsch! Tastenbelegungstabelle ist leer.\n"
 
 #: src/xitk/kbindings.c:1193
 msgid "Nothing selected"
-msgstr ""
+msgstr "Nichts ausgewählt"
 
 #: src/xitk/kbindings.c:1194
-#, fuzzy
 msgid "None"
-msgstr "Fertig"
+msgstr "Nichts"
 
 #: src/xitk/kbindings.c:1355
 msgid "You can only delete alias entries."
-msgstr ""
+msgstr "Nur Alias-Einträge können entfernt werden."
 
 #: src/xitk/kbindings.c:1419
 msgid "Press Keyboard Keys..."
-msgstr ""
+msgstr "Drücke Taste auf Tastatur..."
 
 #: src/xitk/kbindings.c:1437
 msgid "Event receiver window"
-msgstr ""
+msgstr "Ereignisempfangsfenster"
 
 #: src/xitk/kbindings.c:1534
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
 "\"%s\".\n"
-msgstr ""
+msgstr "Diese Tastaturbelegung ist redundant mit Aktion:\n"
+"\"%s\".\n"
 
 #: src/xitk/kbindings.c:1618
 msgid "key binding editor"
-msgstr ""
+msgstr "Tastaturbelegungseditor"
 
 #: src/xitk/kbindings.c:1644
 msgid "Binding action"
-msgstr ""
+msgstr "Aktion zuordnen"
 
 #: src/xitk/kbindings.c:1650
 msgid "Key"
-msgstr ""
+msgstr "Taste"
 
 #: src/xitk/kbindings.c:1655
 msgid "Modifiers"
-msgstr ""
+msgstr "Schalter"
 
 #: src/xitk/kbindings.c:1696
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: src/xitk/kbindings.c:1710
 msgid "Edit"
-msgstr ""
+msgstr "Ändern"
 
 #: src/xitk/kbindings.c:1724
-#, fuzzy
 msgid "Delete"
-msgstr "Auswählen"
+msgstr "Löschen"
 
 #: src/xitk/kbindings.c:1738 src/xitk/playlist.c:863
 msgid "Save"
@@ -225,31 +224,31 @@ msgstr "Speichern"
 
 #: src/xitk/kbindings.c:1752
 msgid "Reset"
-msgstr ""
+msgstr "Reset"
 
 #: src/xitk/kbindings.c:1829
 msgid "ctrl"
-msgstr ""
+msgstr "Strg"
 
 #: src/xitk/kbindings.c:1850
 msgid "meta"
-msgstr ""
+msgstr "Meta"
 
 #: src/xitk/kbindings.c:1872
 msgid "mod3"
-msgstr ""
+msgstr "Mod3"
 
 #: src/xitk/kbindings.c:1894
 msgid "mod4"
-msgstr ""
+msgstr "Mod4"
 
 #: src/xitk/kbindings.c:1915
 msgid "mod5"
-msgstr ""
+msgstr "Mod5"
 
 #: src/xitk/kbindings.c:1924
 msgid "Grab"
-msgstr ""
+msgstr "Aufzeichnen"
 
 #: src/xitk/main.c:250
 #, c-format
@@ -482,9 +481,9 @@ msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main: Der ausgewählte Audio Treiber '%s' ist unbrauchbar\n"
 
 #: src/xitk/main.c:589
-#, fuzzy, c-format
+#, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
-msgstr "Benötigte xine Bibliothek Version 0.9.9, gefunden %d.%d.%d.\n"
+msgstr "Benötigte xine Bibliothek Version 0.9.10, gefunden %d.%d.%d.\n"
 
 #: src/xitk/main.c:670
 msgid "video driver id required for -V option\n"
