@@ -87,6 +87,8 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
     if(gGui->logo_mode == 0) {
       int has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
       
+      osd_update_status();
+      
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
       
@@ -160,6 +162,10 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
 	  
 	}
       }
+      
+      xine_usec_sleep(100);
+      osd_update_status();
+      
     }
   }
   
@@ -279,6 +285,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
   control_exit(NULL, NULL);
   playlist_exit(NULL, NULL);
 
+  osd_deinit();
+
   config_save();
 
   xine_close(gGui->stream);
@@ -337,8 +345,10 @@ void gui_play (xitk_widget_t *w, void *data) {
       gui_display_logo();
     
   } 
-  else
+  else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    osd_update_status();
+  }
   
   panel_check_pause();
 }
@@ -356,6 +366,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
     gGui->visual_anim.running = 0;
   }
 
+  osd_update_status();
   panel_reset_slider ();
   panel_check_pause();
   panel_update_runtime_display();
@@ -373,8 +384,9 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
   else
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
-
+  
   panel_check_pause();
+  osd_update_status();
 }
 
 void gui_eject(xitk_widget_t *w, void *data) {
@@ -629,7 +641,8 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   else if(((int)data) == GUI_RESET) {
     xine_set_param (gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   }
-  
+
+  osd_update_status();
 }
 
 void *gui_set_current_position_thread(void *data) {
@@ -1071,6 +1084,7 @@ void gui_increase_audio_volume(void) {
       gGui->mixer.volume_level++;
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
       xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+      osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
     }
   }
 }
@@ -1082,6 +1096,7 @@ void gui_decrease_audio_volume(void) {
       gGui->mixer.volume_level--;
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
       xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+      osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
     }
   }
 }

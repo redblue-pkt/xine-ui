@@ -1012,7 +1012,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->osd.timeout = 
     xine_config_register_num(gGui->xine, "gui.osd_timeout", 
-			      5,
+			      3,
 			      _("Dismiss OSD time (s)"),
 			      _("Persistence time of OSD visual, in seconds."),
 			      CONFIG_LEVEL_EXP,

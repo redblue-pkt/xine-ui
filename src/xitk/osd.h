@@ -24,10 +24,16 @@
 #ifndef __OSD_H__
 #define __OSD_H__
 
+#define OSD_BAR_PROGRESS 1
+#define OSD_BAR_POS      2
+#define OSD_BAR_STEPPER  3
+
+
 void osd_init(void);
-
-void osd_update(int tick);
-
+void osd_deinit(void);
+void osd_update(void);
 void osd_stream_infos(void);
-
+void osd_update_status(void);
+  /* see OSD_BAR_* */
+void osd_draw_bar(char *title, int min, int max, int val, int type);
 #endif

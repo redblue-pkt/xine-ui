@@ -255,7 +255,8 @@ static void *slider_loop(void *dummy) {
       else
 	pos = secs = 0;
       
-      osd_update(i);
+      if(!(i % 2))
+	osd_update();
 
       if((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) {
 	

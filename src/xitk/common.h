@@ -135,13 +135,15 @@ typedef struct {
     int                     num_mrls;
   } visual_anim;
   
-#define OSD
   struct {
     int                     enabled;
     int                     timeout;
 
     xine_osd_t             *info;
     int                     info_visible;
+
+    xine_osd_t             *bar[2];
+    int                     bar_visible;
 
     xine_osd_t             *status;
     int                     status_visible;

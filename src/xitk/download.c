@@ -43,9 +43,11 @@ static int progress_callback(void *userdata,
 			     double dltotal, double dlnow, double ultotal, double ulnow) {
   download_t  *download = (download_t *) userdata;
   char         buffer[1024];
+  int          percent = (dltotal > 0.0) ? (int) (dlnow * 100.0 / dltotal) : 0;
 
+  osd_draw_bar(_("Download in progress"), 0, 100, percent, OSD_BAR_POS);
   memset(&buffer, 0, sizeof(buffer));
-  sprintf(buffer, "Download progress: %d%%.\n", (int) (dlnow * 100.0 / dltotal));
+  sprintf(buffer, _("Download progress: %d%%."), percent);
   gGui->mrl_overrided = 5;
   panel_set_title(buffer);
   
