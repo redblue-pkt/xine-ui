@@ -538,56 +538,64 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   
   switch(event->type) { 
     
+    /* frontend can e.g. move on to next playlist entry */
+  case XINE_EVENT_UI_PLAYBACK_FINISHED:
+    gui_playlist_start_next();
+    break;
+    
+    /* inform ui that new channel info is available */
   case XINE_EVENT_UI_CHANNELS_CHANGED:
     panel_update_channel_display ();
     break;
     
-  case XINE_EVENT_UI_SET_TITLE: {
-    xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
-    
-    panel_set_title(uevent->str);
-  }
-    break;
-    
-  case XINE_EVENT_UI_PLAYBACK_FINISHED:
-      gui_playlist_start_next();
-    break;
-    
-#warning REWRITE ME
-#if 0
-  case XINE_EVENT_OUTPUT_VIDEO: {
-    xine_ui_event_t   *uevent = (xine_ui_event_t *)event;
-    xine_cfg_entry_t  cfg_entry;
-    int cfg_err_result;
-    
-    cfg_err_result = xine_config_lookup_entry(gGui->xine, "gui.logo_mrl", &cfg_entry);
-    
-    if(strcmp(cfg_entry.str_value, uevent->data)) {
-      if(gGui->auto_vo_visibility) {
-	
-	if(!video_window_is_visible())
-	  video_window_set_visibility(1);
-	
-	if(gGui->auto_panel_visibility && (panel_is_visible()))
-	  panel_toggle_visibility(NULL, NULL);
-      }
-    }
-  }
-    break;
-    
-  case XINE_EVENT_OUTPUT_NO_VIDEO: {
-    /*  xine_ui_event_t *uevent = (xine_ui_event_t *)event; */
-    
-    if(gGui->auto_vo_visibility && (video_window_is_visible())) {
+    /* request title display change in ui */
+  case XINE_EVENT_UI_SET_TITLE:
+    {
+      xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
-      if(!panel_is_visible())
-	panel_toggle_visibility(NULL, NULL);
-      
-      video_window_set_visibility(0);
+      panel_set_title(uevent->str);
     }
-  }
     break;
-#endif  
+    
+    /* message (dialog) for the ui to display */
+  case XINE_EVENT_UI_MESSAGE: 
+    {
+      xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
+      
+      xine_info((char *)uevent->str);
+    }
+    break;
+    
+    /* e.g. aspect ratio change during dvd playback */
+  case XINE_EVENT_FRAME_FORMAT_CHANGE:
+    break;
+
+    /* report current audio level (l/r) */
+  case XINE_EVENT_AUDIO_LEVEL:
+    {
+      xine_audio_level_data_t *aevent = (xine_audio_level_data_t *) event->data;
+
+      printf("XINE_EVENT_AUDIO_LEVEL: left 0>%d<255, right 0>%d<255\n", 
+	     aevent->left, aevent->right);
+    }
+    break;
+
+    /* last event sent when stream is disposed */
+  case XINE_EVENT_QUIT:
+    break;
+    
+    /* index creation/network connections */
+  case XINE_EVENT_PROGRESS:
+    {
+      xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
+      char                  buffer[1024];
+
+      memset(&buffer, 0, sizeof(buffer));
+      printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
+      sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
+      panel_set_title(buffer);
+    }
+    break;
   }
 }
   
@@ -689,10 +697,6 @@ int main(int argc, char *argv[]) {
   int                     _argc;
     
 #ifdef HAVE_SETLOCALE
-#warning FIXME NEWAPI MISSING
-#if 0
-  xine_set_locale();
-#endif
   xitk_set_locale();
   setlocale (LC_ALL, "");
 #endif

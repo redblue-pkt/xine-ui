@@ -65,7 +65,7 @@ static pthread_t        seek_thread;
  */
 void gui_display_logo(void) {
 
-  gGui->logo_mode = 1;
+  gGui->logo_mode = 2;
   (void) gui_xine_open_and_play((char *)gGui->logo_mrl, 0, 0);
   gGui->logo_mode = 1;
   panel_reset_slider();
@@ -77,8 +77,61 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
   if((ret = xine_play(stream, start_pos, start_time)) == 0) {
     gui_handle_xine_error();
   }
-  else
-    gGui->logo_mode = 0;
+  else {
+
+    if(gGui->logo_mode != 2)
+      gGui->logo_mode = 0;
+
+    if(gGui->logo_mode == 0) {
+      int has_video = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_HAS_VIDEO);
+      
+      if(has_video) {
+	
+	if(gGui->auto_vo_visibility) {
+	  
+	  if(!video_window_is_visible())
+	    video_window_set_visibility(1);
+	  
+	  if(gGui->auto_panel_visibility && (panel_is_visible()))
+	    panel_toggle_visibility(NULL, NULL);
+
+	}
+	else {
+	  
+	  if(gGui->auto_panel_visibility && (panel_is_visible()))
+	    panel_toggle_visibility(NULL, NULL);
+	  
+	}
+	
+      }
+      else {
+	
+	if(gGui->auto_vo_visibility) {
+	  
+	  if(gGui->auto_panel_visibility) {
+	    
+	    if(video_window_is_visible())
+	      video_window_set_visibility(0);
+	    
+	    if(!panel_is_visible())
+	      panel_toggle_visibility(NULL, NULL);
+	  }
+	  else {
+
+	    if((panel_is_visible()) && (video_window_is_visible()))
+	      video_window_set_visibility(0);
+
+	  }
+	}
+	else {
+
+	  if(gGui->auto_panel_visibility && (video_window_is_visible()) && (!panel_is_visible()))
+	    panel_toggle_visibility(NULL, NULL);
+	  
+	}
+      }
+    }
+  }
   
   return ret;
 }
