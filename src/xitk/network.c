@@ -580,8 +580,8 @@ static int __sock_write(int socket, int cr, char *msg, ...) {
 #define sock_write(socket, msg, args...) __sock_write(socket, 1, msg, ##args)
 #define sock_write_nocr(socket, msg, args...) __sock_write(socket, 0, msg, ##args)
 #else
-#define sock_write(socket, msg, ...) __sock_write(socket, 1, msg, __VA_ARGS__)
-#define sock_write_nocr(socket, msg, ...) __sock_write(socket, 0, msg, __VA_ARGS__)
+#define sock_write(socket, ...) __sock_write(socket, 1, __VA_ARGS__)
+#define sock_write_nocr(socket, ...) __sock_write(socket, 0, __VA_ARGS__)
 #endif
 
 static char *_atoa(char *str) {
