@@ -100,6 +100,37 @@ extern int XShmGetEventBase(Display *);
 static void video_window_handle_event (XEvent *event, void *data);
 
 /*
+ * Let the video driver override the selected visual
+ */
+void video_window_select_visual (void) {
+  XVisualInfo *vinfo = (XVisualInfo *) -1;
+
+  XLockDisplay (gGui->display);
+  if (gGui->vo_driver)
+  {
+    gGui->vo_driver->gui_data_exchange (gGui->vo_driver, GUI_SELECT_VISUAL,
+                                        &vinfo);
+    if (vinfo != (XVisualInfo *) -1)
+    {
+      if (! vinfo)
+      {
+        fprintf (stderr, "videowin: output driver cannot select a working visual\n");
+        exit (1);
+      }
+      gGui->visual = vinfo->visual;
+      gGui->depth  = vinfo->depth;
+    }
+    if (gGui->visual != gVw->visual)
+    {
+      printf ("videowin: output driver overrides selected visual to visual id 0x%x\n", gGui->visual->visualid);
+      gui_init_imlib (gGui->visual);
+    }
+  }
+  XUnlockDisplay (gGui->display);
+}
+
+
+/*
  * Will called by toolkit on every move/resize event.
  */
 void video_window_change_sizepos(int x, int y, int w, int h) {
@@ -436,7 +467,7 @@ void video_window_adapt_size (void *this,
 
     if (gGui->video_window) {
 
-      if (gVw->fullscreen_mode) {
+      if (gVw->fullscreen_mode && gGui->visual == gVw->visual) {
 #ifdef HAVE_XF86VIDMODE
 	/*
 	 * resizing the video window may be necessary if the modeline has
@@ -454,6 +485,9 @@ void video_window_adapt_size (void *this,
     }
 
     gVw->fullscreen_mode = 1;
+    gVw->visual   = gGui->visual;
+    gVw->depth    = gGui->depth;
+    gVw->colormap = gGui->colormap;
 
     /*
      * open fullscreen window
@@ -540,7 +574,7 @@ void video_window_adapt_size (void *this,
 
     if (gGui->video_window) {
 
-      if (gVw->fullscreen_mode) {
+      if (gVw->fullscreen_mode || gVw->visual != gGui->visual) {
 #ifdef HAVE_XF86VIDMODE
 	/*
 	 * toggling from fullscreen to window mode - time to switch back to
@@ -576,16 +610,21 @@ void video_window_adapt_size (void *this,
     }
 
     gVw->fullscreen_mode = 0;
+    gVw->visual   = gGui->visual;
+    gVw->depth    = gGui->depth;
+    gVw->colormap = gGui->colormap;
 
     attr.background_pixel  = gGui->black.pixel;
     attr.border_pixel      = gGui->black.pixel;
     attr.colormap	   = gVw->colormap;
     
-    gGui->video_window = 
+/* fprintf (stderr, "***** XCreateWindow visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
+    gGui->video_window =
       XCreateWindow(gGui->display, gGui->imlib_data->x.root,
 		    hint.x, hint.y, hint.width, hint.height, 4, 
 		    gVw->depth, CopyFromParent, gVw->visual,
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
+/*fprintf (stderr, "***** XCreateWindow done\n"); */
     
     if(gGui->vo_driver)
       gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
@@ -775,12 +814,14 @@ void video_window_init (void) {
 
   gVw->depth				= gGui->depth;
   gVw->visual				= gGui->visual;
-  gVw->colormap				= Imlib_get_colormap(gGui->imlib_data);
+  gVw->colormap				= gGui->colormap;
+  /* Currently, there no plugin loaded so far, but that might change */
+  video_window_select_visual ();
   gVw->xwin                             = -8192;
   gVw->ywin                             = -8192;
   gVw->desktopWidth                     = DisplayWidth(gGui->display, gGui->screen);
   gVw->desktopHeight                    = DisplayHeight(gGui->display, gGui->screen);
-  
+
 #ifdef HAVE_XINERAMA
   gVw->xinerama				= NULL;
   gVw->xinerama_cnt			= 0;

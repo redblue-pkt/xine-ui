@@ -843,7 +843,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
       visual = vinfo[0].visual;
       XFree(vinfo);
     }
-  }	 
+  }
 
   if (depth == 0) {
     XVisualInfo vinfo;
@@ -875,10 +875,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 void gui_init (int nfiles, char *filenames[]) {
 
   int                   i;
-  XColor                dummy;
   char                 *display_name = ":0.0";
-  char                  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1]; /* Enought ?? ;-) */
-  ImlibInitParams	imlib_init;
 
   /*
    * init playlist
@@ -929,65 +926,7 @@ void gui_init (int nfiles, char *filenames[]) {
 
   gui_find_visual(&gGui->visual, &gGui->depth);
 
-  imlib_init.flags = PARAMS_VISUALID;
-  imlib_init.visualid = gGui->visual->visualid;
-  if (gGui->install_colormap && (gGui->visual->class & 1)) {
-      /*
-       * We're using a visual with changable colors / colormaps
-       * (According to the comment in X11/X.h, an odd display class
-       * has changable colors), and the user requested to install a
-       * private colormap for xine.  Allocate a fresh colormap for
-       * Imlib and Xine.
-       */
-      Colormap cm;
-      cm = XCreateColormap(gGui->display, 
-			   RootWindow(gGui->display, gGui->screen),
-			   gGui->visual, AllocNone);
-
-      imlib_init.cmap = cm;
-      imlib_init.flags |= PARAMS_COLORMAP;
-  }
-  gGui->imlib_data = Imlib_init_with_params (gGui->display, &imlib_init);
-  if (gGui->imlib_data == NULL) {
-    fprintf(stderr, _("Unable to initialize Imlib\n"));
-    exit(1);
-  }
-
-  /* 
-   * Create logo image displayed into video window from
-   * the official Xine logo.
-   */
-  sprintf(buffer, "%s/xine_logo.png", XINE_SKINDIR);
-  if((gGui->video_window_logo_image = Imlib_load_image(gGui->imlib_data, buffer)) == NULL) {
-    xine_error(_("Unable to load %s logo\n"), buffer);
-    exit(1);
-  }
-
-  Imlib_render(gGui->imlib_data, gGui->video_window_logo_image,
-	       gGui->video_window_logo_image->rgb_width,
-	       gGui->video_window_logo_image->rgb_height);
-
-  gGui->video_window_logo_pixmap.image = 
-    Imlib_move_image(gGui->imlib_data, gGui->video_window_logo_image);
-
-  gGui->video_window_logo_pixmap.width = 
-    gGui->video_window_logo_image->rgb_width;
-
-  gGui->video_window_logo_pixmap.height = 
-    gGui->video_window_logo_image->rgb_height;
-
-  XAllocNamedColor(gGui->display, 
-		   Imlib_get_colormap(gGui->imlib_data),
-		   "black", &gGui->black, &dummy);
-
-  /*
-   * create an icon pixmap
-   */
-  
-  gGui->icon = XCreateBitmapFromData (gGui->display, 
-				      gGui->imlib_data->x.root,
-				      xine_bits, 40, 40);
-
+  gui_init_imlib (gGui->visual);
 
   XUnlockDisplay (gGui->display);
 
@@ -1005,11 +944,87 @@ void gui_init (int nfiles, char *filenames[]) {
   gGui->running = 1;
 
   video_window_init ();
-  
+
   panel_init ();
 
   disable_screensavers();
 }
+
+
+void gui_init_imlib (Visual *vis) {
+  XColor                dummy;
+  char                  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1]; /* Enought ?? ;-) */
+  ImlibInitParams	imlib_init;
+
+  /*
+   * This routine isn't re-entrant. I cannot find a Imlib_cleanup either.
+   * However, we have to reinitialize Imlib if we have to change the visual.
+   * This will be a (small) memory leak.
+   */
+  imlib_init.flags = PARAMS_VISUALID;
+  imlib_init.visualid = vis->visualid;
+  if (gGui->install_colormap && (vis->class & 1)) {
+      /*
+       * We're using a visual with changable colors / colormaps
+       * (According to the comment in X11/X.h, an odd display class
+       * has changable colors), and the user requested to install a
+       * private colormap for xine.  Allocate a fresh colormap for
+       * Imlib and Xine.
+       */
+      Colormap cm;
+      cm = XCreateColormap(gGui->display, 
+			   RootWindow(gGui->display, gGui->screen),
+			   vis, AllocNone);
+
+      imlib_init.cmap = cm;
+      imlib_init.flags |= PARAMS_COLORMAP;
+  }
+  gGui->imlib_data = Imlib_init_with_params (gGui->display, &imlib_init);
+  if (gGui->imlib_data == NULL) {
+    fprintf(stderr, _("Unable to initialize Imlib\n"));
+    exit(1);
+  }
+  gGui->colormap = Imlib_get_colormap (gGui->imlib_data);
+
+  /* 
+   * Create logo image displayed into video window from
+   * the official Xine logo.
+   */
+  if (gGui->video_window_logo_image)
+    Imlib_destroy_image (gGui->imlib_data, gGui->video_window_logo_image);
+  sprintf(buffer, "%s/xine_logo.png", XINE_SKINDIR);
+  if((gGui->video_window_logo_image = Imlib_load_image(gGui->imlib_data, buffer)) == NULL) {
+    xine_error(_("Unable to load %s logo\n"), buffer);
+    exit(1);
+  }
+
+  Imlib_render(gGui->imlib_data, gGui->video_window_logo_image,
+	       gGui->video_window_logo_image->rgb_width,
+	       gGui->video_window_logo_image->rgb_height);
+
+  if (gGui->video_window_logo_pixmap.image)
+    Imlib_free_pixmap (gGui->imlib_data, gGui->video_window_logo_pixmap.image);
+  gGui->video_window_logo_pixmap.image = 
+    Imlib_move_image(gGui->imlib_data, gGui->video_window_logo_image);
+
+  gGui->video_window_logo_pixmap.width = 
+    gGui->video_window_logo_image->rgb_width;
+
+  gGui->video_window_logo_pixmap.height = 
+    gGui->video_window_logo_image->rgb_height;
+
+  XAllocNamedColor(gGui->display, gGui->colormap,
+		   "black", &gGui->black, &dummy);
+
+  /*
+   * create an icon pixmap
+   */
+  
+  gGui->icon = XCreateBitmapFromData (gGui->display, 
+				      gGui->imlib_data->x.root,
+				      xine_bits, 40, 40);
+}
+
 
 /*
  *

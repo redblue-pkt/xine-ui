@@ -257,7 +257,7 @@ static void load_video_out_driver(char *video_driver_id) {
 						  NULL, NULL, NULL);
   if (!video_driver_id) {
     /* video output driver auto-probing */
-    char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
+    char **driver_ids;
     int    i;
     
     /* Try to init video with stored information */
@@ -270,14 +270,14 @@ static void load_video_out_driver(char *video_driver_id) {
 						      VISUAL_TYPE_X11,
 						      (void *) &vis);
       if (gGui->vo_driver) {
-	if(driver_ids)
-	  free(driver_ids);
 	gGui->config->update_string (gGui->config, "video.driver", video_driver_id);
 	return;
       } 
     }
     
     i = 0;
+    driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
+
     while (driver_ids[i]) {
       video_driver_id = driver_ids[i];
       
@@ -674,6 +674,7 @@ int main(int argc, char *argv[]) {
 
   /* Video out plugin */
   load_video_out_driver(video_driver_id);
+  video_window_select_visual ();
 
   /* Audio out plugin */
   audio_driver = load_audio_out_driver(audio_driver_id);

@@ -27,6 +27,8 @@
 
 void video_window_init (void);
 
+void video_window_select_visual (void);
+
 void video_window_adapt_size (void *this,
 			      int video_width, int video_height, 
 			      int *dest_x, int *dest_y,

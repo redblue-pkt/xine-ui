@@ -73,6 +73,7 @@ typedef struct {
   Visual	      *visual;
   XColor               black;
   Pixmap               icon;
+  Colormap             colormap;
 
   int		       prefered_visual_class;
   VisualID	       prefered_visual_id;
@@ -152,6 +153,8 @@ char *gui_get_skindir(void);
 char *gui_get_configfile(void);
 
 void gui_init (int nfiles, char *filenames[]);
+
+void gui_init_imlib (Visual *vis);
 
 void gui_run (void);
 
