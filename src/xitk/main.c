@@ -226,7 +226,7 @@ static int _rc_file_get_next_line(file_info_t *rcfile) {
  * This allow user to always specify a command line argument.
  */
 static char **build_command_line_args(int argc, char *argv[], int *_argc) {
-  int            i;
+  int            i = 1, j;
   char          *cfgdir = CONFIGDIR;
   char          *xinerc = "xinerc";
   file_info_t   *rcfile;
@@ -234,9 +234,9 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   
   _argv  = (char **) xine_xmalloc(sizeof(char **) * (argc + 1));
   (*_argc) = argc;
-  for(i = 0; i < argc; i++)
-    _argv[i] = strdup(argv[i]);
 
+  _argv[0] = strdup(argv[0]);
+  
   rcfile           = (file_info_t *) xine_xmalloc(sizeof(file_info_t));
   rcfile->filename = (char *) xine_xmalloc((strlen((xine_get_homedir())) + 
 					    strlen(cfgdir) + strlen(xinerc)) + 3);
@@ -246,12 +246,16 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
     
     while(_rc_file_get_next_line(rcfile)) {
       _argv = (char **) realloc(_argv, sizeof(char **) * ((*_argc) + 2));
-      _argv[(*_argc)] = strdup(rcfile->ln);
+      _argv[i] = strdup(rcfile->ln);
+      i++;
       (*_argc)++;
     }
     
     fclose(rcfile->fd);
   }
+  
+  for(j = 1; i < (*_argc); i++, j++)
+    _argv[i] = strdup(argv[j]);
 
   _argv[(*_argc)] = NULL;
   
