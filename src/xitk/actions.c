@@ -64,8 +64,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
    * the original modeline
    */
   if(gGui->XF86VidMode_fullscreen)
-     video_window_set_fullscreen_mode (0);
-//     gui_set_fullscreen_mode(NULL,NULL);
+    video_window_set_fullscreen_mode (0);
+  //     gui_set_fullscreen_mode(NULL,NULL);
 #endif
    
   destroy_mrl_browser();

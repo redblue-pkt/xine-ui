@@ -300,18 +300,23 @@ static void video_window_adapt_size (void) {
     return;
   }
 
-  switch (gVw->fullscreen_req && gGui->xine) {
+  switch (gVw->fullscreen_req) {
   case 0:
   case 1:
-    xine_tvmode_switch (gGui->xine, 0, gVw->video_width, gVw->video_height, gVw->video_duration);
+    if(gGui->xine)
+      xine_tvmode_switch (gGui->xine, 
+			  0, gVw->video_width, gVw->video_height, gVw->video_duration);
     break;
   case 2:
-    if (xine_tvmode_switch (gGui->xine, 1, 
-			    gVw->video_width, gVw->video_height, gVw->video_duration) != 1)
-      gVw->fullscreen_req = 0;
+    if(gGui->xine)
+      if (xine_tvmode_switch (gGui->xine,
+			      1, gVw->video_width, gVw->video_height, gVw->video_duration) != 1)
+	gVw->fullscreen_req = 0;
     break;
   default:
-    xine_tvmode_switch (gGui->xine, 0, gVw->video_width, gVw->video_height, gVw->video_duration);
+    if(gGui->xine)
+      xine_tvmode_switch (gGui->xine, 
+			  0, gVw->video_width, gVw->video_height, gVw->video_duration);
     gVw->fullscreen_req = 0;
   }
 
