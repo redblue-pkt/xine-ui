@@ -42,6 +42,7 @@ typedef struct {
   int                     bState;
   int                     bOldState;
   gui_image_t            *skin;
+  ImlibData		 *imlibdata;
 
   xitk_simple_callback_t  callback;
   xitk_state_callback_t   state_callback;

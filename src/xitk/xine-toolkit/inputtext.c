@@ -179,7 +179,7 @@ static Pixmap create_labelofinputtext(widget_t *it,
   XLOCK(private_data->display);
 
   XAllocColor(private_data->display,
-	      DefaultColormap(private_data->display, 0), &color);
+	      Imlib_get_colormap(private_data->imlibdata), &color);
   fg = color.pixel;
   
   XSetForeground(private_data->display, gc, fg);
@@ -810,6 +810,7 @@ widget_t *inputtext_create (xitk_inputtext_t *it) {
   private_data->max_length    = it->max_length;
   private_data->cursor_pos    = -1;
 
+  private_data->imlibdata     = it->imlibdata;
   private_data->skin          = gui_load_image(it->imlibdata, it->skin_filename);
 
   private_data->max_visible   = (private_data->skin->width/2) / 6;

@@ -47,6 +47,7 @@ typedef struct {
   widget_t               *iWidget;
 
   gui_image_t            *skin;
+  ImlibData		 *imlibdata;
 
   xitk_string_callback_t callback;
   void                   *userdata;

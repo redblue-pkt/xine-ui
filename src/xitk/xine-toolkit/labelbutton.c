@@ -124,7 +124,8 @@ static Pixmap create_labelofbutton(widget_t *lb,
 
   XLOCK(private_data->display);
 
-  XAllocColor(private_data->display, DefaultColormap(private_data->display, 0), &color);
+  XAllocColor(private_data->display,
+	      Imlib_get_colormap(private_data->imlibdata), &color);
   fg = color.pixel;
   
   XSetForeground(private_data->display, gc, fg);
@@ -415,6 +416,7 @@ widget_t *label_button_create (xitk_labelbutton_t *b) {
   private_data->bArmed         = 0;
   private_data->bState         = 0;
   private_data->bOldState      = 0;
+  private_data->imlibdata      = b->imlibdata;
   private_data->skin           = gui_load_image(b->imlibdata, b->skin);
   private_data->callback       = b->callback;
   private_data->state_callback = b->state_callback;
