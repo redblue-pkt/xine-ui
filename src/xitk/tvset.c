@@ -166,10 +166,10 @@ static void tvset_update(xitk_widget_t *w, void *data) {
 
 static void tvset_exit(xitk_widget_t *w, void *data) {
 
-#warning CHECK FOR MEMLEAK  
   if(tvset) {
     window_info_t wi;
-    
+    int           i;
+
     tvset->running = 0;
     tvset->visible = 0;
     
@@ -190,7 +190,21 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     XLockDisplay(gGui->display);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(tvset->widget_list)));
     XUnlockDisplay(gGui->display);
+
+    for(i = 0; tvset->system_entries[i]; i++)
+      free(tvset->system_entries[i]);
+    free(tvset->system_entries);
     
+    if(tvset->chann_entries) {
+      for(i = 0; tvset->chann_entries[i]; i++)
+	free(tvset->chann_entries[i]);
+      free(tvset->chann_entries);
+    }
+    
+    for(i = 0; tvset->vidstd_entries[i]; i++)
+      free(tvset->vidstd_entries[i]);
+    free(tvset->vidstd_entries);
+
     free(tvset->widget_list);
     
     free(tvset);
