@@ -237,7 +237,7 @@ void *xitk_label_animation_loop(void *data) {
     if(w && (w->visible == 1)) {
       
       private_data->anim_offset++;
-      
+
       if (private_data->anim_offset > 
 	  (private_data->char_length * (strlen(private_data->label) + 5)))
 	private_data->anim_offset = 1;
@@ -270,18 +270,17 @@ static void label_setup_label(xitk_widget_t *w, char *label_) {
   /* Inform animation thread to not paint the label */
   private_data->on_change = 1;
   
-  if (private_data->anim_running) {
+  if(private_data->anim_running) {
     void *dummy;
     
     private_data->anim_running = 0;
     pthread_join (private_data->thread, &dummy);
   }
 
-  if (private_data->label) {
+  if(private_data->label)
     XITK_FREE(private_data->label);
-  }
   
-  if (private_data->labelpix) {
+  if(private_data->labelpix) {
     xitk_image_destroy_xitk_pixmap(private_data->labelpix);
     private_data->labelpix = NULL;
   }
@@ -295,9 +294,9 @@ static void label_setup_label(xitk_widget_t *w, char *label_) {
   else
     private_data->anim_offset = 0;
 
-  if (private_data->animation) {
+  if(private_data->animation) {
     
-    if (label_len > private_data->length) {
+    if(label_len > private_data->length) {
       pthread_attr_t       pth_attrs;
       struct sched_param   pth_params;
       

@@ -751,7 +751,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gGui->playlist.cur = 0;
   gGui->is_display_mrl = 0;
-  
+  gGui->mrl_overrided = 0;
+
   gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 
   /*

@@ -395,7 +395,7 @@ void playlist_scan_for_infos(void) {
       gui_stop(NULL, NULL);
       rerun = 1;
     }
-    if((!mute) && gGui->mixer.caps & XINE_PARAM_AO_MUTE) {
+    if((!mute) && gGui->mixer.caps & MIXER_CAP_MUTE) {
       mute = 1;
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, 1);
     }

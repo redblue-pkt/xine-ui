@@ -930,7 +930,7 @@ void layer_above_video(Window w) {
 
 void gui_increase_audio_volume(void) {
 
-  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+  if(gGui->mixer.caps & MIXER_CAP_VOL) { 
     if(gGui->mixer.volume_level < 100) {
       gGui->mixer.volume_level++;
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
@@ -941,7 +941,7 @@ void gui_increase_audio_volume(void) {
 
 void gui_decrease_audio_volume(void) {
 
-  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+  if(gGui->mixer.caps & MIXER_CAP_VOL) { 
     if(gGui->mixer.volume_level > 0) {
       gGui->mixer.volume_level--;
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);

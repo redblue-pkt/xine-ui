@@ -584,16 +584,19 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     if(event->stream == gGui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
-      if(gGui->mmk.ident)
-	free(gGui->mmk.ident);
-      if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
-	free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
-      
-      gGui->mmk.ident = strdup(uevent->str);
-      gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
-      
-      playlist_mrlident_toggle();
-      panel_update_mrl_display();
+      if(strcmp(gGui->mmk.ident, uevent->str)) {
+
+	if(gGui->mmk.ident)
+	  free(gGui->mmk.ident);
+	if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
+	  free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	
+	gGui->mmk.ident = strdup(uevent->str);
+	gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
+	
+	playlist_mrlident_toggle();
+	panel_update_mrl_display();
+      }
     }
     break;
     
@@ -633,92 +636,13 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       memset(&buffer, 0, sizeof(buffer));
       printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
       sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
+      gGui->mrl_overrided += 20;
       panel_set_title(buffer);
     }
     break;
   }
 }
   
-#warning ADAPT ME
-#if 0
-/*
- * Callback of config value change about reporting mode.
- */
-static void unhandled_codec_mode_cb(void *dummy, xine_cfg_entry_t *entry) {
-  unhandled_codec_mode = entry->num_value;
-}
-
-/*
- * Callback called on codec reporting.
- */
-static void codec_reporting(void *user_data, int codec_type,
-			    uint32_t fourcc, const char *description, int handled) {
-  char fourcc_txt[10];
-  
-  /* store fourcc as text */
-  *(uint32_t *)fourcc_txt = fourcc;
-  fourcc_txt[4] = '\0';
-  
-  /* report error for unknown/unhandled codecs */
-  if( !handled ) {
-    if( codec_type == XINE_CODEC_VIDEO &&
-        (unhandled_codec_mode == 1 || unhandled_codec_mode == 3) ) {
-      
-      /* display fourcc if no description available */
-      if( !description[0] )
-        description = fourcc_txt;
-        
-      xine_error_with_more(_("No video plugin available to decode '%s'."), description);
-    }
-            
-    if( codec_type == XINE_CODEC_AUDIO &&
-        (unhandled_codec_mode == 2 || unhandled_codec_mode == 3) ) {
-      
-      /* display fourcc if no description available */
-      if( !description[0] ) {
-        description = fourcc_txt;
-        
-        /* show waveformattag in hexa */
-        if( fourcc < 0x10000 ) {
-          sprintf(fourcc_txt, "0x%x", fourcc );
-        }  
-      }
-      xine_error_with_more(_("No audio plugin available to decode '%s'."), description);
-    }
-  }
-}
-#endif
-
-/*
- * initialize codec reporting stuff.
- */
-static void init_report_codec(void) {
-#warning ADAPT ME
-#if 0
-  static char *warn_unhandled_codec[] = 
-    { "never", "video only", "audio only", "always", NULL };
-  
-  /*
-   * Register codec reporting
-   */
-  if(!xine_register_report_codec_cb(gGui->xine, codec_reporting, (void *) gGui)){
-    fprintf(stderr, "xine_register_report_codec_cb() failed: exit\n");
-    exit(1);
-  }
-  
-  unhandled_codec_mode =
-    xine_config_register_enum (gGui->xine,
-			       "gui.warn_unhandled_codec", 
-			       3, 
-			       warn_unhandled_codec,
-			       _("Display popup window on unhandled codecs"),
-			       CONFIG_NO_HELP, 
-			       CONFIG_LEVEL_EXP,
-			       unhandled_codec_mode_cb, 
-			       CONFIG_NO_DATA);
-#endif
-}
-
 /*
  *
  */
@@ -1054,7 +978,7 @@ int main(int argc, char *argv[]) {
   gGui->event_queue = xine_event_new_queue(gGui->stream);
   xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
 
-#warning FIXME NEWAPI
+#warning TVMODE NEWAPI
 #if 0
   xine_tvmode_init2(gGui->xine);
 #endif
@@ -1077,8 +1001,6 @@ int main(int argc, char *argv[]) {
   /* init the video window */
   video_window_select_visual ();
   
-  init_report_codec();
-
   /*
    * start CORBA server threadq
    */

@@ -241,11 +241,9 @@ void panel_update_runtime_display(void) {
   xine_get_pos_length(gGui->stream, NULL, &seconds, NULL);
   seconds /= 1000;
   
-  sprintf (timestr, "%02d:%02d:%02d",
-	   seconds / (60*60),
-	   (seconds / 60) % 60, seconds % 60);
+  sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
   
-  xitk_label_change_label (panel->widget_list, panel->runtime_label, timestr); 
+  xitk_label_change_label(panel->widget_list, panel->runtime_label, timestr); 
 }
 
 /*
@@ -253,52 +251,71 @@ void panel_update_runtime_display(void) {
  */
 static void *slider_loop(void *dummy) {
   int screensaver_timer = 0;
+  int status, speed;
+  int pos, secs;
   int i = 0;
   
   pthread_detach(pthread_self());
 
   while(gGui->running) {
-    int status;
     
     if(gGui->stream) {
-      status = xine_get_status(gGui->stream);
       
-      if(((status == XINE_STATUS_PLAY) 
-	  && ((xine_get_param(gGui->stream, XINE_PARAM_SPEED)) != XINE_SPEED_PAUSE))
-	 && gGui->ssaver_timeout) {
+      status = xine_get_status(gGui->stream);
+      speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
+      
+      if(status == XINE_STATUS_PLAY) {
+	xine_get_pos_length(gGui->stream, &pos, &secs, NULL);
+	secs /= 1000;
 	
-	screensaver_timer++;
-	
-	if(screensaver_timer >= gGui->ssaver_timeout) {
-	  screensaver_timer = 0;
-	  video_window_reset_ssaver();
-	}
-
-	if(!(i % 10)) {
-	  panel_update_channel_display();
-	  panel_update_mrl_display();
-	  i = 0;
+	if(gGui->playlist.num && gGui->mmk.end != -1) {
+	  if(secs >= gGui->playlist.mmk[gGui->playlist.cur]->end) {
+	    gGui->ignore_next = 0;
+	    gui_playlist_start_next();
+	    goto __next_iteration;
+	  }
 	}
       }
+      else
+	pos = secs = 0;
       
-      if(panel_is_visible()) {
-	if(gGui->xine) {
+      if((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) {
+	
+	if(gGui->ssaver_timeout) {
 	  
-	  if((status == XINE_STATUS_PLAY) && (gGui->logo_mode == 0)) {
-	    int pos;
+	  if(!(i % 2))
+	    screensaver_timer++;
+	  
+	  if(screensaver_timer >= gGui->ssaver_timeout) {
+	    screensaver_timer = 0;
+	    video_window_reset_ssaver();
+	  }
+	}  
+
+	if(gGui->logo_mode == 0) {
+	  
+	  if(panel_is_visible()) {
 	    
-	    xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
 	    xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
-	    
-	  }
-	  
-	  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
-	    gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-	    xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
-	    panel_check_mute();
-	  }
-	  if(status != XINE_STATUS_STOP)
 	    panel_update_runtime_display();
+	    
+	    if(gGui->mrl_overrided) {
+	      gGui->mrl_overrided--;
+	      if(gGui->mrl_overrided == 0)
+		panel_update_mrl_display();
+	    }
+	    
+	    if(!(i % 20)) {
+	      panel_update_channel_display();
+	      i = 0;
+	    }
+	    
+	    if(gGui->mixer.caps & MIXER_CAP_VOL) { 
+	      gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
+	      xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+	      panel_check_mute();
+	    }
+	  }
 	}
       }
     }
@@ -307,11 +324,12 @@ static void *slider_loop(void *dummy) {
       gGui->cursor_visible = !gGui->cursor_visible;
       video_window_set_cursor_visibility(gGui->cursor_visible);
     }
-
+    
     if(gGui->logo_has_changed)
       video_window_update_logo();
     
-    sleep(1);
+  __next_iteration:
+    xine_usec_sleep(500000.0);
     i++;
   }
 
@@ -397,17 +415,16 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
      
   } 
   else {
-
+    
     panel->visible = 1;
     xitk_show_widgets(panel->widget_list);
-
+    
     XLockDisplay(gGui->display);
-
+    
     XMapRaised(gGui->display, gGui->panel_window); 
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
-
-
+    
     layer_above_video(gGui->panel_window);
      
     if(gGui->cursor_grabbed)
@@ -416,7 +433,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     /* TODO: Currently this is a quick hack
      * We should rather test whether screen size has changed
      * and move the panel on screen if it doesn't fit any longer */
-    if (video_window_get_fullscreen_mode () > 1 
+    if (video_window_get_fullscreen_mode() > 1 
 #ifdef HAVE_XF86VIDMODE
         || gGui->XF86VidMode_fullscreen
 #endif
@@ -430,6 +447,16 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     }
 
     XUnlockDisplay(gGui->display);
+
+    if(gGui->logo_mode == 0) {
+      int pos;
+
+      xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
+      xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
+      panel_update_runtime_display();
+      panel_update_mrl_display();
+    }
+    
   }
 
   config_update_num ("gui.panel_visible", panel->visible);
@@ -534,7 +561,7 @@ void panel_update_mrl_display (void) {
  */
 void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
 
-  if(gGui->mixer.caps & XINE_PARAM_AO_MUTE) {
+  if(gGui->mixer.caps & MIXER_CAP_MUTE) {
     gGui->mixer.mute = state;
     xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, gGui->mixer.mute);
   }
@@ -658,18 +685,22 @@ void panel_add_autoplay_buttons(void) {
  */
 void panel_add_mixer_control(void) {
   
-  gGui->mixer.caps = 0;
+  gGui->mixer.caps = MIXER_CAP_NOTHING;
 
-  if(gGui->ao_driver)
-    gGui->mixer.caps = XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL | XINE_PARAM_AO_MUTE;
+  if(gGui->ao_driver) {
+    if((xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME)) != -1)
+      gGui->mixer.caps |= MIXER_CAP_VOL;
+    if((xine_get_param(gGui->stream, XINE_PARAM_AUDIO_MUTE)) != -1)
+      gGui->mixer.caps |= MIXER_CAP_MUTE;
+  }
 
-  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+  if(gGui->mixer.caps & MIXER_CAP_VOL) { 
     xitk_enable_widget(panel->mixer.slider);
     gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
     xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
   }
 
-  if(gGui->mixer.caps & XINE_PARAM_AO_MUTE) {
+  if(gGui->mixer.caps & MIXER_CAP_MUTE) {
     xitk_enable_widget(panel->mixer.mute);
     gGui->mixer.mute = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_MUTE);
     xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute,
@@ -677,9 +708,9 @@ void panel_add_mixer_control(void) {
   }
 
   /* Tips should be available only if widgets are enabled */
-  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL))
+  if(gGui->mixer.caps & MIXER_CAP_VOL)
     xitk_set_widget_tips(panel->mixer.slider, _("Volume control"));
-  if(gGui->mixer.caps & XINE_PARAM_AO_MUTE)
+  if(gGui->mixer.caps & MIXER_CAP_MUTE)
     xitk_set_widget_tips(panel->mixer.mute, _("Mute toggle"));
 
   if(!panel->tips.enable) {

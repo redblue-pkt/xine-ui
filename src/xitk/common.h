@@ -86,6 +86,11 @@
 #define PLAY_FROM_DVD      0x00000020
 #define PLAY_FROM_VCD      0x00000040
 
+/* Sound mixer capabilities */
+#define MIXER_CAP_NOTHING   0x00000000
+#define MIXER_CAP_VOL       0x00000001
+#define MIXER_CAP_MUTE      0x00000002
+
 
 #define SAFE_FREE(x)     do {                                             \
                            if((x)) {                                      \
@@ -156,6 +161,8 @@ typedef struct {
 
   int                       is_display_mrl;
 
+  int                       mrl_overrided;
+
   /* Current mediamark */
   mediamark_t               mmk;
   
@@ -183,7 +190,7 @@ typedef struct {
 #endif
 
   struct {
-    int                     caps;
+    int                     caps; /* MIXER_CAP_x */
     int                     volume_level;
     int                     mute;
   } mixer;

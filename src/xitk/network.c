@@ -2070,14 +2070,14 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	  sock_write(client_info->socket, "Current audio language: %s\n", buf);
 	}
 	else if(is_arg_contain(client_info, 2, "volume")) {
-	  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+	  if(gGui->mixer.caps & MIXER_CAP_VOL) { 
 	    sock_write(client_info->socket, "Current audio volume: %d\n", gGui->mixer.volume_level);
 	  }
 	  else
 	    sock_write(client_info->socket, "Audio is disabled.\n");
 	}
 	else if(is_arg_contain(client_info, 2, "mute")) {
-	  if(gGui->mixer.caps & XINE_PARAM_AO_MUTE) {
+	  if(gGui->mixer.caps & MIXER_CAP_MUTE) {
 	    sock_write(client_info->socket, "Current audio mute: %d\n", gGui->mixer.mute);
 	  }
 	  else
@@ -2141,7 +2141,7 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
 	  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, (atoi(get_arg(client_info, 3))));
 	}
 	else if(is_arg_contain(client_info, 2, "volume")) {
-	  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+	  if(gGui->mixer.caps & MIXER_CAP_VOL) { 
 	    int vol = atoi(get_arg(client_info, 3));
 	    
 	    if(vol < 0) vol = 0;
@@ -2154,7 +2154,7 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
 	    sock_write(client_info->socket, "Audio is disabled.\n");
 	}
 	else if(is_arg_contain(client_info, 2, "mute")) {
-	  if(gGui->mixer.caps & XINE_PARAM_AO_MUTE) {
+	  if(gGui->mixer.caps & MIXER_CAP_MUTE) {
 	    gGui->mixer.mute = get_bool_value((get_arg(client_info, 3)));
 	    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, gGui->mixer.mute);
 	  }
