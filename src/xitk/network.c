@@ -1895,7 +1895,8 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	int i;
 	if(gGui->playlist.num) {
 	  for(i = 0; i < gGui->playlist.num; i++) {
-	    sock_write(client_info->socket, "%5d %s\n", i, gGui->playlist.mmk[i]->mrl);
+	    sock_write(client_info->socket, "%2s %5d %s\n", 
+		       (i == gGui->playlist.cur) ? "*>" : "", i, gGui->playlist.mmk[i]->mrl);
 	  }
 	}
 	else
@@ -1920,7 +1921,16 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	j = atoi(get_arg(client_info, 2));
 	
 	if((j >= 0) && (j <= gGui->playlist.num)) {
-	  gui_set_current_mrl(gGui->playlist.mmk[j]);
+	  gGui->playlist.cur = j;
+	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+
+	  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
+	    gGui->ignore_next = 1;
+	    xine_stop(gGui->stream);
+	    gGui->ignore_next = 0;
+
+	    do_play(cmd, client_info);
+	  }
 	}
       }
       else if(is_arg_contain(client_info, 1, "delete")) {
