@@ -119,6 +119,7 @@ typedef struct {
   /* help window stuff */
   xitk_window_t              *helpwin;
   xitk_widget_list_t         *help_widget_list;
+  char                      **help_text;
   xitk_register_key_t         help_widget_key;
   int                         help_running;
   xitk_widget_t              *help_browser;
@@ -947,12 +948,12 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
 static void _pplugin_close_help(xitk_widget_t *w, void *data) {
 
   pplugin->help_running = 0;
-
+  
   xitk_unregister_event_handler(&pplugin->help_widget_key);
-
+  
   xitk_destroy_widgets(pplugin->help_widget_list);
   xitk_window_destroy_window(gGui->imlib_data, pplugin->helpwin);
-
+  
   pplugin->helpwin = NULL;
   xitk_list_free((XITK_WIDGET_LIST_LIST(pplugin->help_widget_list)));
     
@@ -1073,8 +1074,18 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
     } while( *p );
     
     if(lines) {
-      xitk_browser_update_list(pplugin->help_browser, (const char **)hbuf, 
+      char **ohbuf = pplugin->help_text;
+      int    i = 0;
+
+      pplugin->help_text = hbuf;
+      xitk_browser_update_list(pplugin->help_browser, (const char **)pplugin->help_text, 
 			       lines, 0);
+      
+      if(ohbuf) {
+	while(ohbuf[i++])
+	  free(ohbuf[i]);
+	free(ohbuf);
+      }
     }
   }
 
@@ -1204,6 +1215,9 @@ static void _pplugin_select_filter(xitk_widget_t *w, void *data, int select) {
       xitk_enable_widget(pplugin->new_filter);
 
   }
+  
+  if(pplugin->help_running)
+    _pplugin_show_help(NULL, pobj);
 
   _pplugin_rewire();
   _pplugin_paint_widgets();
@@ -1487,6 +1501,13 @@ static void pplugin_exit(xitk_widget_t *w, void *data) {
     if( pplugin->help_running )
      _pplugin_close_help(NULL,NULL);
 
+    if(pplugin->help_text) {
+      i = 0;
+      while(pplugin->help_text[i++])
+	free(pplugin->help_text[i]);
+      free(pplugin->help_text);
+    }
+    
     _pplugin_save_chain();
 
     pplugin->running = 0;
@@ -1735,6 +1756,7 @@ void pplugin_panel(void) {
 
   pplugin = (_pplugin_t *) xine_xmalloc(sizeof(_pplugin_t));
   pplugin->first_displayed = 0;
+  pplugin->help_text       = NULL;
   
   x = xine_config_register_num (gGui->xine, "gui.pplugin_x", 
 				100,

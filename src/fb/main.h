@@ -40,6 +40,10 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
+#ifdef XINE_ORT
+#define xine_cfg_entry_t xine_config_entry_t
+#endif
+
 #include "callback.h"
 
 typedef struct {

@@ -1498,13 +1498,10 @@ void xitk_xevent_notify(XEvent *event) {
  * Initiatization of widget internals.
  */
 void xitk_init(Display *display) {
+  char buffer[256];
   
-  printf("-[ xiTK version %d.%d.%d "
-#ifdef WITH_XMB
-	 "[XMB]"
-#endif
-	 "]-\n",
-	 XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
+  sprintf(buffer, "-[ xiTK version %d.%d.%d ", 
+	  XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
 
   xitk_pid = getppid();
 
@@ -1561,15 +1558,13 @@ void xitk_init(Display *display) {
 	  
 	  XShmAttach(display, &shminfo);
 	  XSync(display, False);
-	  if(xitk_x_error) {
+	  if(xitk_x_error)
 	    gXitk->use_xshm = 0;
-	    XITK_WARNING("-[ xiTK can't use XShm ]-\n");
-	  }
 	  else {
 	    XShmDetach(display, &shminfo);
-	    printf("-[ xiTK will use XShm ]-\n");
+	    sprintf(buffer, "%s%s", buffer, "[XShm]");
 	  }
-
+	  
 	  XDestroyImage(xim);
 	  shmdt(shminfo.shmaddr);
 	  shmctl(shminfo.shmid, IPC_RMID, 0);
@@ -1581,6 +1576,13 @@ void xitk_init(Display *display) {
     }
   }
 #endif
+
+#ifdef WITH_XMB
+  sprintf(buffer, "%s%s", buffer, "[XMB]");
+#endif
+  
+  sprintf(buffer, "%s%s", buffer, "]-\n");
+  printf(buffer);
 
   gXitk->wm_type = xitk_check_wm(display);
   

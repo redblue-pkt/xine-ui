@@ -539,34 +539,6 @@ dnl
 AC_CHECK_LIRC
 
 
-
-dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-dnl  CORBA:
-dnl  Temporary disabled, port to new API needed
-dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-dnl
-dnl CORBA support
-dnl
-dnl AC_ARG_ENABLE(orbit,[  --enable-orbit          build orbit dependant parts of xine [default=no]], , enable_orbit=no)
-dnl 
-dnl if test "x$enable_orbit" = "xyes"; then
-dnl   AM_PATH_ORBIT(0.4.0, [
-dnl     AC_DEFINE(HAVE_ORBIT,,[Define this if you have ORBit (libORBit) installed])
-dnl     ORBIT_LIBS="$ORBIT_LIBS -lORBitCosNaming"
-dnl   ], [
-dnl     AC_MSG_RESULT(*** All of ORBit dependent parts will be disabled ***)
-dnl     enable_orbit=no])
-dnl fi
-
-dnl AM_CONDITIONAL(HAVE_ORBIT, test x"$enable_orbit" = "xyes")
-dnl if test x"$enable_orbit" = "xyes"; then
-dnl    CORBA_DEP=""
-dnl else 
-dnl    CORBA_DEP="#"
-dnl fi
-dnl AC_SUBST(CORBA_DEP)
-
-
 dnl
 dnl Check for nvtvsimple library
 dnl
@@ -790,7 +762,7 @@ case "$host_or_hostalias" in
     ;;
 esac
 
-CFLAGS="$COMMON_CFLAGS $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
+CFLAGS="-DNDEBUG $COMMON_CFLAGS $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
 DEBUG_CFLAGS="$COMMON_CFLAGS $DEBUG_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"
 AC_SUBST(CFLAGS)
 AC_SUBST(DEBUG_CFLAGS)
