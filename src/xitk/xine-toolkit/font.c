@@ -421,12 +421,12 @@ xitk_font_t *xitk_font_load_font(Display *display, char *font) {
     xtfs = (xitk_font_t *) xitk_xmalloc(sizeof(xitk_font_t));
 
     if(!xitk_font_load_one(display, font, xtfs)) {
-      char *fname = xitk_get_default_font();
+      char *fdname = xitk_get_default_font();
 
-      if(!fname || !xitk_font_load_one(display, fname, xtfs)) {
-        fname = xitk_get_system_font();
- 	if(!xitk_font_load_one(display, fname, xtfs)) {
-           XITK_WARNING("%s(): XLoadQueryFont() failed\n", __FUNCTION__);
+      if(!fdname || !xitk_font_load_one(display, fdname, xtfs)) {
+        char *fsname = xitk_get_system_font();
+ 	if(!xitk_font_load_one(display, fsname, xtfs)) {
+           XITK_WARNING("loading font \"%s\" failed, default and system fonts \"%s\" and \"%s\" failed too\n", font, fdname, fsname);
            free(xtfs);
            pthread_mutex_unlock(&cache.mutex);
            return NULL;
