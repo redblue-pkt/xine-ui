@@ -370,13 +370,22 @@ static void *slider_loop(void *dummy) {
 	    }
 	    
 	    if(!(i % 20)) {
+	      int level = 0;
+	      
 	      panel_update_channel_display();
 	      
-	      if(gGui->mixer.caps & MIXER_CAP_VOL) {
-		gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-		xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
-		panel_check_mute();
+	      if((gGui->mixer.method == SOUND_CARD_MIXER) &&
+		 (gGui->mixer.caps & MIXER_CAP_VOL)) {
+		level = gGui->mixer.volume_level = 
+		  xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
 	      }
+	      else if(gGui->mixer.method == SOFTWARE_MIXER) {
+		level = gGui->mixer.amp_level = 
+		  xine_get_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL);
+	      }
+	      
+	      xitk_slider_set_pos(panel->mixer.slider, level);
+	      panel_check_mute();
 	      
 	      i = 0;
 	    }
@@ -789,9 +798,12 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
       }
   }
   else if(w == panel->mixer.slider) {
-    gGui->mixer.volume_level = pos;
-    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
-    osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
+
+    if(gGui->mixer.method == SOUND_CARD_MIXER)
+      change_audio_vol(pos);
+    else if(gGui->mixer.method == SOFTWARE_MIXER)
+      change_amp_vol(pos);
+    
   }
   
   panel_check_pause();
@@ -908,11 +920,19 @@ void panel_add_mixer_control(void) {
     if((xine_get_param(gGui->stream, XINE_PARAM_AUDIO_MUTE)) != -1)
       gGui->mixer.caps |= MIXER_CAP_MUTE;
   }
+  
+  if(((gGui->mixer.method == SOUND_CARD_MIXER) && gGui->mixer.caps & MIXER_CAP_VOL) ||
+     (gGui->mixer.method == SOFTWARE_MIXER)) {
+    int level = 0;
 
-  if(gGui->mixer.caps & MIXER_CAP_VOL) { 
     xitk_enable_widget(panel->mixer.slider);
-    gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-    xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
+    
+    if(gGui->mixer.method == SOUND_CARD_MIXER)
+      level = gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
+    else if(gGui->mixer.method == SOFTWARE_MIXER)
+      level = gGui->mixer.amp_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL);
+    
+    xitk_slider_set_pos(panel->mixer.slider, level);
   }
 
   if(gGui->mixer.caps & MIXER_CAP_MUTE) {
@@ -1280,7 +1300,7 @@ void panel_init (void) {
   /* Mixer volume slider */
   sl.skin_element_name = "SliderVol";
   sl.min               = 0;
-  sl.max               = 100;
+  sl.max               = (gGui->mixer.method == SOUND_CARD_MIXER) ? 100 : 200;
   sl.step              = 1;
   sl.callback          = NULL;
   sl.userdata          = NULL;

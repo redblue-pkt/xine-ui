@@ -50,6 +50,7 @@
  * global variables
  */
 extern gGui_t          *gGui;
+extern _panel_t        *panel;
 
 static pid_t            xine_pid;
 
@@ -91,6 +92,12 @@ static char *visual_anim_style[] = {
   "None",
   "Post Plugin",
   "Stream Animation",
+  NULL
+};
+
+static char *mixer_control_method[] = {
+  "Sound card",
+  "Software",
   NULL
 };
 
@@ -169,10 +176,25 @@ static void play_anyway_cb(void *data, xine_cfg_entry_t *cfg) {
 static void exp_level_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->experience_level = (cfg->num_value * 10);
 }
-static void amp_level_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->mixer.amp = cfg->num_value;
-  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gGui->mixer.amp);
-  osd_draw_bar(_("Amplification Level"), 0, 200, gGui->mixer.amp, OSD_BAR_STEPPER);
+
+static void audio_mixer_method_cb(void *data, xine_cfg_entry_t *cfg) {
+  int max = 100, vol = 0;
+  
+  gGui->mixer.method = cfg->num_value;
+
+  switch(gGui->mixer.method) {
+  case SOUND_CARD_MIXER:
+    max = 100;
+    vol = gGui->mixer.volume_level;
+    break;
+  case SOFTWARE_MIXER:
+    max = 200;
+    vol = gGui->mixer.amp_level;
+    break;
+  }
+
+  xitk_slider_set_max(panel->mixer.slider, max);
+  xitk_slider_set_pos(panel->mixer.slider, vol);
 }
 
 int wm_not_ewmh_only(void) {
@@ -1266,13 +1288,13 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       exp_level_cb, 
 			       CONFIG_NO_DATA)) * 10;
 
-  gGui->mixer.amp = xine_config_register_range(gGui->xine, "gui.amp_level", 
-					       100, 0, 200,
-					       _("Amplification level"),
-					       NULL,
-					       CONFIG_LEVEL_ADV,
-					       amp_level_cb, 
-					       CONFIG_NO_DATA);
+  gGui->mixer.amp_level = xine_config_register_range(gGui->xine, "gui.amp_level", 
+						     100, 0, 200,
+						     _("Amplification level"),
+						     NULL,
+						     CONFIG_LEVEL_ADV,
+						     CONFIG_NO_CB, 
+						     CONFIG_NO_DATA);
 
   gGui->splash = 
     gGui->splash ? (xine_config_register_bool(gGui->xine, "gui.splash", 
@@ -1283,6 +1305,15 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 					      dummy_config_cb,
 					      CONFIG_NO_DATA)) : 0;
   
+  gGui->mixer.method = 
+    xine_config_register_enum(gGui->xine, "gui.audio_mixer_method", 
+			      SOUND_CARD_MIXER, mixer_control_method,
+			      _("Audio mixer control method"),
+			      _("Which method used to control audio volume."), 
+			      CONFIG_LEVEL_ADV,
+			      audio_mixer_method_cb,
+			      CONFIG_NO_DATA);
+
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
   

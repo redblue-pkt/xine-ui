@@ -41,11 +41,11 @@
 
 #include "common.h"
 
-#define WINDOW_WIDTH        505
-#define WINDOW_HEIGHT       250 /* 210*/
+#define WINDOW_WIDTH            505
+#define WINDOW_HEIGHT           250
 
-static char            *btnfontname  = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
-static char            *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+static char                    *btnfontname  = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+static char                    *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 
 typedef struct {
   apply_callback_t              callback;
@@ -70,17 +70,17 @@ typedef struct {
   xitk_register_key_t           widget_key;
 } _mmk_editor_t;
 
-static _mmk_editor_t  *mmkeditor = NULL;
+static _mmk_editor_t           *mmkeditor = NULL;
 
-extern gGui_t   *gGui;
+extern gGui_t                  *gGui;
 
 typedef struct {
-  char                *data;
-  char               **lines;
-  int                  numl;
+  char                         *data;
+  char                        **lines;
+  int                           numl;
   
-  int                  entries;
-  char                *type;
+  int                           entries;
+  char                         *type;
 } playlist_t;
 
 typedef mediamark_t **(*playlist_guess_func_t)(playlist_t *, const char *);

@@ -101,6 +101,10 @@
 #define MIXER_CAP_VOL           0x00000001
 #define MIXER_CAP_MUTE          0x00000002
 
+/* mixer control method */
+#define SOUND_CARD_MIXER        0
+#define SOFTWARE_MIXER          1
+
 /* Playlist loop modes */
 #define PLAYLIST_LOOP_NO_LOOP   0 /* no loop (default) */
 #define PLAYLIST_LOOP_LOOP      1 /* loop the whole playlist */
@@ -297,7 +301,8 @@ typedef struct {
     int                     caps; /* MIXER_CAP_x */
     int                     volume_level;
     int                     mute;
-    int                     amp;
+    int                     amp_level;
+    int                     method;
   } mixer;
 
   xitk_register_key_t       widget_key;

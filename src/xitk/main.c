@@ -1193,7 +1193,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       
       gGui->mixer.volume_level = (aevent->left + aevent->right) / 2;
       gGui->mixer.mute = aevent->mute;
-      xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
+
+      if(gGui->mixer.method == SOUND_CARD_MIXER)
+	xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
+      
       xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
     }
     break;
@@ -1921,7 +1924,7 @@ int main(int argc, char *argv[]) {
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
-  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gGui->mixer.amp);
+  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gGui->mixer.amp_level);
 #ifdef XINE_PARAM_BROADCASTER_PORT
   xine_set_param(gGui->stream, XINE_PARAM_BROADCASTER_PORT, gGui->broadcast_port);
 #endif
