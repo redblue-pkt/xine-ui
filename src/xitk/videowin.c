@@ -358,7 +358,7 @@ void video_window_adapt_size (int video_width, int video_height,
   
   XSelectInput(gGui->display, gGui->video_window, 
 	       StructureNotifyMask | ExposureMask | 
-	       KeyPressMask | ButtonPressMask);
+	       KeyPressMask | ButtonPressMask | PointerMotionMask);
 
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
@@ -593,12 +593,52 @@ static void video_window_handle_event (XEvent *event, void *data) {
     gui_handle_event(event, data);
     break;
 
+  case MotionNotify: {
+    XMotionEvent *mevent = (XMotionEvent *) event;
+    mouse_event_t xine_event;
+    int xwin, ywin;
+    unsigned int wwin, hwin, bwin, dwin;
+    float xf,yf;
+    Window rootwin;
+
+    if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
+		    &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+      xine_event.event.type = XINE_MOUSE_EVENT;
+      xine_event.button = 0; // No buttons, just motion.
+      /* Scale co-ordinate to image dimensions. */
+      xf = (float)mevent->x / (float)wwin;
+      yf = (float)mevent->y / (float)hwin;
+      xine_event.x = (uint16_t)( xf * gVw->video_width ); 
+      xine_event.y = (uint16_t)( yf * gVw->video_height );
+      xine_send_event(gGui->xine, (event_t*)(&xine_event), NULL);
+    }
+  }
+  break;
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
-    
+    mouse_event_t xine_event;
+    int xwin, ywin;
+    unsigned int wwin, hwin, bwin, dwin;
+    float xf,yf;
+    Window rootwin;
+
     if (bevent->button == Button3)
       panel_toggle_visibility(NULL, NULL);
+
+    if (bevent->button == Button1) {
+      if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
+		      &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+	xine_event.event.type = XINE_MOUSE_EVENT;
+	xine_event.button = 1;
+	/* Scale co-ordinate to image dimensions. */
+	xf = (float)bevent->x / (float)wwin;
+	yf = (float)bevent->y / (float)hwin;
+	xine_event.x = (uint16_t)( xf * gVw->video_width ); 
+	xine_event.y = (uint16_t)( yf * gVw->video_height );
+	xine_send_event(gGui->xine, (event_t*)(&xine_event), NULL);
+      }
+    }
   }
   break;
 
