@@ -1,7 +1,7 @@
 #!/bin/sh
 # run this to generate all the initial makefiles, etc.
 
-PROG=xine-ui
+PROG=xine-lib
 
 # Check how echo works in this /bin/sh
 case `echo -n` in
@@ -70,10 +70,24 @@ run_libtoolize() {
 # AUTOMAKE
 #--------------------
 detect_automake() {
-  if [ -f `which automake-1.6` ]; then
+  #
+  # expected output from 'type' is
+  #   automake is /usr/local/bin/automake
+  #
+  set -- `type automake-1.6 2>/dev/null`
+  RETVAL=$?
+  NUM_RESULT=$#
+  RESULT_FILE=$3
+  if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
     automake_1_6x=yes
+    automake=automake-1.6
   else
-    if [ -f `which automake` ]; then
+    set -- `type automake 2>/dev/null`
+    RETVAL=$?
+    NUM_RESULT=$#
+    RESULT_FILE=$3
+    if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
+      automake=automake
       AM="`automake --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
       if test $AM -lt 100 ; then
         AM=`expr $AM \* 10`
@@ -92,18 +106,14 @@ detect_automake() {
 }
 
 run_automake () {
-  if test x"$automake_1_6x" = x"no"; then
+  if test x"$automake_1_6x" != x"yes"; then
     echo "Warning: automake < 1.6. Some warning message might occur from automake"
     echo
   fi
 
   echo $_echo_n " + Running automake: $_echo_c";
 
-  if test x"$automake_1_6x" = "xyes"; then
-    automake-1.6 --gnu --add-missing --copy;
-  else
-    automake --gnu --add-missing --copy;
-  fi
+  $automake --gnu --add-missing --copy;
   echo "done."
 }
 
@@ -113,10 +123,20 @@ run_automake () {
 detect_aclocal() {
 
   # if no automake, don't bother testing for aclocal
-  if [ -f `which aclocal-1.6` ]; then
+  set -- `type aclocal-1.6 2>/dev/null`
+  RETVAL=$?
+  NUM_RESULT=$#
+  RESULT_FILE=$3
+  if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
     aclocal_1_6x=yes
+    aclocal=aclocal-1.6
   else
-    if [ -f `which aclocal` ]; then
+    set -- `type aclocal 2>/dev/null`
+    RETVAL=$?
+    NUM_RESULT=$#
+    RESULT_FILE=$3
+    if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
+      aclocal=aclocal
       AC="`aclocal --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
       if test $AC -lt 100 ; then
         AC=`expr $AC \* 10`
@@ -147,6 +167,7 @@ run_aclocal () {
   else
     aclocal $aclocalinclude -I m4
   fi
+
   echo "done." 
 }
 
