@@ -1359,11 +1359,8 @@ void video_window_change_skins(void) {
      * Back to default logo only on a skin 
      * change, not at the first skin loading.
      **/
-#warning FIXME NEWAPI MISSING
-#if 0
     if(cfg_entry && sk_changed)
-      config_update_string("misc.logo_mrl", XINE_LOGO_FILE);
-#endif
+      config_update_string("misc.logo_mrl", XINE_LOGO_MRL);
   }
 
   sk_changed++;

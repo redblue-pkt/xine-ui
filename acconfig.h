@@ -61,6 +61,9 @@
 /* Where skins are */
 #undef XINE_SKINDIR
 
+/* official logo mrl */
+#undef XINE_LOGO_MRL
+
 /* Where scripts are */
 #undef XINE_SCRIPTDIR
 
