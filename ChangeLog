@@ -5,6 +5,7 @@ xine-ui (0.99.1) unstable; urgency=low
   * fix alpha artefact on when changing skins,
   * show windows in taskbar when output window is hidden,
   * fix root window and windows states,
+  * Xft support in xitk (thanks to Drew 'dantealiegri' Ogle <dantealiegri@umbc.edu>),
 
 xine-ui (0.9.23) unstable; urgency=low
 
