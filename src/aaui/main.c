@@ -66,19 +66,21 @@
  * global variables
  */
 typedef struct {
-  xine_t            *xine;
-  xine_video_port_t *vo_port;
-  xine_audio_port_t *ao_port;
-  xine_stream_t     *stream;
+  xine_t              *xine;
+  xine_video_port_t   *vo_port;
+  xine_audio_port_t   *ao_port;
+  xine_stream_t       *stream;
+  xine_event_queue_t  *event_queue;
 
-  int                ignore_status;
-  char              *configfile;
-  aa_context        *context;
-  char              *mrl[1024];
-  int                num_mrls;
-  int                current_mrl;
-  int                running;
-  int                auto_quit;
+  int                  logo_mode;
+  int                  ignore_next;
+  char                *configfile;
+  aa_context          *context;
+  char                *mrl[1024];
+  int                  num_mrls;
+  int                  current_mrl;
+  int                  running;
+  int                  auto_quit;
   
   struct {
     int                enable;
@@ -87,7 +89,7 @@ typedef struct {
     int                mute;
   } mixer;
 
-  int               debug_messages;
+  int                  debug_messages;
 } aaxine_t;
 
 static aaxine_t aaxine;
@@ -287,53 +289,154 @@ static void print_usage (void) {
   xine_exit(xine);
 }
 
-/*
- * Handling xine engine status changes.
- */
-static void gui_status_callback (int nStatus) {
-
-  if (aaxine.ignore_status)
-    return;
+static void aaxine_handle_xine_error(xine_stream_t *stream) {
+  int err;
   
-  if(nStatus == XINE_STATUS_STOP) {
-    aaxine.current_mrl++;
-   
-    if (aaxine.current_mrl < aaxine.num_mrls) {
-      if(xine_open(aaxine.stream, aaxine.mrl[aaxine.current_mrl])) {
-	if(!xine_play (aaxine.stream, 0, 0))
-	  fprintf(stderr, "xine_play() failed.\n");
-      }
-      else
-	fprintf(stderr, "xine_open() failed\n");
-    }
-    else {
-      if (aaxine.auto_quit == 1) {
-        aaxine.running = 0;
-      }
-      aaxine.current_mrl--;
-    }
+  err = xine_get_error(stream);
+
+  switch(err) {
+
+  case XINE_ERROR_NONE:
+    /* noop */
+    break;
+    
+  case XINE_ERROR_NO_INPUT_PLUGIN:
+    fprintf(stderr, "- xine engine error -\n"
+	    "There is no input plugin available to handle '%s'.\n"
+	    "Maybe MRL syntax is wrong or file/stream source doesn't exist.\n",
+	    aaxine.logo_mode ? XINE_LOGO_MRL : aaxine.mrl[aaxine.current_mrl]);
+    break;
+    
+  case XINE_ERROR_NO_DEMUX_PLUGIN:
+    fprintf(stderr, "- xine engine error -\n"
+	    "There is no demuxer plugin available to handle '%s'.\n"
+	    "Usually this means that the file format was not recognized.\n", 
+	    aaxine.logo_mode ? XINE_LOGO_MRL : aaxine.mrl[aaxine.current_mrl]);
+    break;
+    
+  case XINE_ERROR_DEMUX_FAILED:
+    fprintf(stderr, "- xine engine error -\n"
+	    "Demuxer failed. Maybe '%s' is a broken file?\n", 
+	    aaxine.logo_mode ? XINE_LOGO_MRL : aaxine.mrl[aaxine.current_mrl]);
+    break;
+    
+  case XINE_ERROR_MALFORMED_MRL:
+    fprintf(stderr, "- xine engine error -\n"
+	    "Malformed mrl. Mrl '%s' seems malformed/invalid.\n", 
+	    aaxine.logo_mode ? XINE_LOGO_MRL : aaxine.mrl[aaxine.current_mrl]);
+    break;
+    
+  default:
+    fprintf(stderr, "- xine engine error -\n!! Unhandled error !!\n");
+    break;
   }
 
 }
 
-/*
- * Return next available mrl to xine engine.
- */
-static char *gui_next_mrl_callback (void ) {
-
-  if(aaxine.current_mrl >= (aaxine.num_mrls - 1)) 
-    return NULL;
+static int aaxine_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) {
+  int ret;
   
-  return aaxine.mrl[aaxine.current_mrl + 1];
+  if(start_time_in_secs)
+    start_time_in_secs *= 1000;
+  
+  if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0)
+    aaxine_handle_xine_error(stream);
+  else {
+    if(aaxine.logo_mode != 2)
+      aaxine.logo_mode = 0;
+  }
+ 
+  return ret;
+}
+
+int aaxine_xine_open_and_play(char *mrl, int start_pos, int start_time) {
+  
+
+  if(!xine_open(aaxine.stream, (const char *)mrl)) {
+    aaxine_handle_xine_error(aaxine.stream);
+    return 0;
+  }
+
+  if(!aaxine_xine_play(aaxine.stream, start_pos, start_time))
+    return 0;
+
+  return 1;
 }
 
 /*
- * Xine engine branch success.
+ * playback logo mrl
  */
-static void gui_branched_callback (void ) {
+static void aaxine_play_logo(void) {
 
-  if(aaxine.current_mrl < (aaxine.num_mrls - 1)) {
-    aaxine.current_mrl++;
+  if(xine_get_status(aaxine.stream) == XINE_STATUS_PLAY)
+    return;
+
+  aaxine.logo_mode = 2;
+
+  if(xine_get_status(aaxine.stream) == XINE_STATUS_PLAY) {
+    aaxine.ignore_next = 1;
+    xine_stop(aaxine.stream);
+    aaxine.ignore_next = 0; 
+  }
+  
+  aaxine_xine_open_and_play(XINE_LOGO_MRL, 0, 0);
+  aaxine.logo_mode = 1;
+}
+
+/*
+ * Handling xine engine status changes.
+ */
+static void aaxine_start_next(void) {
+
+  if(aaxine.ignore_next)
+    return;
+  
+  aaxine.current_mrl++;
+  
+  if (aaxine.current_mrl < aaxine.num_mrls) {
+    if(!aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0))
+      aaxine_play_logo();
+  }
+  else {
+    aaxine.current_mrl--;
+    aaxine_play_logo();
+
+    if ((aaxine.auto_quit == 1) && (aaxine.logo_mode))
+      aaxine.running = 0;
+  }
+
+}
+
+static void aaxine_event_listener(void *user_data, const xine_event_t *event) {
+  struct timeval tv;
+  
+  if(aaxine.logo_mode)
+    return;
+  
+  gettimeofday (&tv, NULL);
+  
+  if((tv.tv_sec - event->tv.tv_sec) > 3) {
+    printf("Event too old, discarding\n");
+    return;
+  }
+  
+  switch(event->type) { 
+    
+    /* frontend can e.g. move on to next playlist entry */
+  case XINE_EVENT_UI_PLAYBACK_FINISHED:
+    aaxine_start_next();
+    break;
+    
+  case XINE_EVENT_QUIT:
+    break;
+    
+  case XINE_EVENT_PROGRESS:
+    {
+      xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
+      
+      fprintf(stderr, "XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
+    }
+    break;
   }
 }
 
@@ -341,10 +444,7 @@ static void gui_branched_callback (void ) {
  * Seek in current stream.
  */
 static void set_position (int pos) {
-
-  aaxine.ignore_status = 1;
-  xine_play(aaxine.stream, pos, 0);
-  aaxine.ignore_status = 0;
+  aaxine_xine_play(aaxine.stream, pos, 0);
 }
 
 /*
@@ -389,6 +489,7 @@ int main(int argc, char *argv[]) {
 
   aaxine.auto_quit = 0; /* default: loop forever */
   aaxine.debug_messages = 0;
+  aaxine.ignore_next = 0; 
 
   /* 
    * AALib help and option-parsing
@@ -595,21 +696,17 @@ int main(int argc, char *argv[]) {
     else {
       if (dup2(error_fd, STDOUT_FILENO) < 0)
 	printf("cannot dup2 stdout");
-      if (dup2(error_fd, STDERR_FILENO) < 0)
-	printf("cannot dup2 stderr");
     }
   }
   
+  aaxine.event_queue = xine_event_new_queue(aaxine.stream);
+  xine_event_create_listener_thread(aaxine.event_queue, aaxine_event_listener, NULL);
+
+  aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0);
+
   /*
    * ui loop
    */
-
-  if(xine_open(aaxine.stream, aaxine.mrl[aaxine.current_mrl])) {
-    if(!xine_play (aaxine.stream, 0, 0))
-      fprintf(stderr, "xine_play() failed.\n");
-  }
-  else
-    fprintf(stderr, "xine_open() failed.\n");
 
   aaxine.running = 1;
 
@@ -624,28 +721,23 @@ int main(int argc, char *argv[]) {
     switch (key) {
 
     case AA_UP:
-      aaxine.ignore_status = 1;
+      aaxine.ignore_next = 1;
       xine_stop(aaxine.stream);
       aaxine.current_mrl--;
-      if((aaxine.current_mrl >= 0) && (aaxine.current_mrl < aaxine.num_mrls)) {
-	if(xine_open(aaxine.stream, aaxine.mrl[aaxine.current_mrl])) {
-	  if(!xine_play(aaxine.stream, 0, 0))
-	    fprintf(stderr, "xine_play() failed.\n");
-	}
-	else
-	  fprintf(stderr, "xine_open() failed.\n");
-      } 
+      if((aaxine.current_mrl >= 0) && (aaxine.current_mrl < aaxine.num_mrls))
+	(void) aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0);
       else {
 	aaxine.current_mrl = 0;
+	aaxine_play_logo();
       }
-      aaxine.ignore_status = 0;
+      aaxine.ignore_next = 0;
       break;
 
     case AA_DOWN:
-      aaxine.ignore_status = 1;
+      aaxine.ignore_next = 1;
       xine_stop(aaxine.stream);
-      aaxine.ignore_status = 0;
-      gui_status_callback(XINE_STATUS_STOP);
+      aaxine.ignore_next = 0;
+      aaxine_start_next();
       break;
 
     case AA_LEFT:
@@ -683,12 +775,7 @@ int main(int argc, char *argv[]) {
     case 13:
     case 'r':
     case 'R':
-      if(xine_open(aaxine.stream, aaxine.mrl[aaxine.current_mrl])) {
-	if(!xine_play (aaxine.stream, 0, 0))
-	  fprintf(stderr, "xine_play() failed.\n");
-      }
-      else
-	fprintf(stderr, "xine_open() failed.\n");
+      (void) aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0);
       break;
 
     case ' ':
@@ -702,7 +789,8 @@ int main(int argc, char *argv[]) {
 
     case 's':
     case 'S':
-      xine_stop (aaxine.stream);
+      xine_stop(aaxine.stream);
+      aaxine_play_logo();
       break;
 
     case 'V':
@@ -776,6 +864,10 @@ int main(int argc, char *argv[]) {
   if(aaxine.xine) 
     xine_config_save(aaxine.xine, aaxine.configfile);
   
+  xine_close(aaxine.stream);
+  xine_event_dispose_queue(aaxine.event_queue);
+  xine_dispose(aaxine.stream);
+
   if(aaxine.xine)
     xine_exit(aaxine.xine); 
 
