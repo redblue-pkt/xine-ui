@@ -119,6 +119,8 @@ void gui_add_mediamark(void);
 
 void gui_file_selector(void);
 
+void gui_select_sub(void);
+
 void visual_anim_init(void);
 void visual_anim_add_animation(char *mrl);
 void visual_anim_play(void);

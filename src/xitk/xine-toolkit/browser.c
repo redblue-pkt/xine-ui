@@ -805,10 +805,11 @@ void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier) {
       end = ((start - 1) > 0) ? (start - 1) : 0;
       mark = private_data->list_length;
       
+
       for(; start < mark; start++) {
 	
 	if(!strncasecmp(private_data->content[start], key, strlen(key))) {
-	  
+
 	  private_data->jumped = start;
 
 	  focus = 0;
@@ -844,8 +845,8 @@ void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier) {
 
 	  }
 	  
-	  xitk_browser_set_select(w, focus);
-	  
+	  xitk_browser_set_select(w, focus + start);
+
 	  private_data->parent_wlist->widget_focused = private_data->item_tree[WBSTART + focus];
 	  
 	  if((private_data->parent_wlist->widget_focused->type & WIDGET_FOCUSABLE) && 

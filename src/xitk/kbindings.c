@@ -229,7 +229,7 @@ static kbinding_entry_t default_binding_table[] = {
     "PriorMrl",               ACTID_MRL_PRIOR               , "Prior",    KEYMOD_NOMOD   , 0 },
   { "Visibility toggle of the event sender window.",
     "EventSenderShow",        ACTID_EVENT_SENDER            , "e",        KEYMOD_META    , 0 },
-  { "Edit selected mediamark..",
+  { "Edit selected mediamark.",
     "MediamarkEditor",        ACTID_MMKEDITOR               , "e",        KEYMOD_CONTROL , 0 },
   { "Eject the current medium.",
     "Eject",                  ACTID_EJECT                   , "e",        KEYMOD_NOMOD   , 0 },
@@ -389,6 +389,8 @@ static kbinding_entry_t default_binding_table[] = {
     "SkinDownload",           ACTID_SKINDOWNLOAD            , "d",        KEYMOD_CONTROL , 0 },
   { "Open file selector.",
     "FileSelector",           ACTID_FILESELECTOR            , "o",        KEYMOD_CONTROL , 0 },
+  { "Select a subtitle file",
+    "SubSelector",            ACTID_SUBSELECT               , "S",        KEYMOD_CONTROL,  0 },
   { 0,
     0,                        0,                            0,            0              , 0 }
 };

@@ -37,7 +37,9 @@ typedef struct {
   int                       played; /* used with shuffle loop mode */
 } mediamark_t;
 
+int mediamark_free_mmk(mediamark_t **mmk);
 int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end);
+mediamark_t *mediamark_clone_mmk(mediamark_t *mmk);
 void mediamark_add_entry(const char *mrl, const char *ident, const char *sub, int start, int end);
 void mediamark_free_mediamarks(void);
 void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end);

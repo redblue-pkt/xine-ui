@@ -119,6 +119,8 @@ typedef enum {
   ACTID_SKINDOWNLOAD,
   ACTID_OSD_SINFOS,
   ACTID_FILESELECTOR,
+  ACTID_SUBSELECT,
+
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 
    */

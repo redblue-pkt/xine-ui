@@ -629,6 +629,10 @@ void gui_execute_action_id(action_id_t action) {
     playlist_mmk_editor();
     break;
 
+  case ACTID_SUBSELECT:
+    gui_select_sub();
+    break;
+
   case ACTID_LOOPMODE:
     gGui->playlist.loop++;
     if(gGui->playlist.loop == PLAYLIST_LOOP_MODES_NUM)

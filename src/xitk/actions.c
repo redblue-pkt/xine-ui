@@ -53,7 +53,7 @@ int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *len
     while(((ret = xine_get_pos_length(stream, pos, time, length)) == 0) && (++t < 10))
       xine_usec_sleep(100000); /* wait before trying again */
   }
-
+  
   return ret;
 }
 
@@ -61,7 +61,7 @@ int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *len
  *
  */
 void gui_display_logo(void) {
-
+  
   gGui->logo_mode = 2;
   
   if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
@@ -1447,7 +1447,61 @@ void gui_file_selector(void) {
   (void *) create_filebrowser(_("Stream(s) loading"), gGui->curdir, &cbb[0], &cbb[1], &cbb[2]);
 }
 
+static void subselector_callback(filebrowser_t *fb) {
+  char *file;
 
+  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
+
+  if((file = filebrowser_get_full_filename(fb)) != NULL) {
+    if(file) {
+      mediamark_t *mmk = mediamark_clone_mmk((mediamark_t *) mediamark_get_current_mmk());
+      
+      if(mmk) {
+	mediamark_replace_entry(&gGui->playlist.mmk[gGui->playlist.cur],
+				mmk->mrl, mmk->ident, file, mmk->start, mmk->end);
+
+	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	
+	playlist_mrlident_toggle();
+	
+	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
+	  int curpos;
+	  xine_close (gGui->spu_stream);
+	  
+	  if(xine_open(gGui->spu_stream, mmk->sub))
+	    xine_stream_master_slave(gGui->stream, 
+				     gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
+	  
+	  if(gui_xine_get_pos_length(gGui->stream, &curpos, NULL, NULL)) {
+	    xine_stop(gGui->stream);
+	    gui_set_current_position(curpos);
+	  }
+	}
+	mediamark_free_mmk(&mmk);
+      }
+    }
+    free(file);
+  }
+}
+void gui_select_sub(void) {
+  
+  if(gGui->playlist.num) {
+    filebrowser_callback_button_t  cbb[2];
+    const mediamark_t *mmk;
+    
+    mmk = mediamark_get_current_mmk();
+
+    if(mmk) {
+      
+      cbb[0].label = _("Select");
+      cbb[0].callback = subselector_callback;
+      cbb[0].need_a_file = 1;
+      cbb[1].callback = fileselector_cancel_callback;
+      cbb[1].need_a_file = 0;
+      (void *) create_filebrowser(_("Pick a subtitle file"), mmk->sub, &cbb[0], NULL, &cbb[1]);
+    }
+  }
+}
 /*
  *
  */

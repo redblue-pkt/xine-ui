@@ -193,7 +193,23 @@ int mediamark_store_mmk(mediamark_t **mmk,
   return 0;
 }
 
-static int _mediamark_free_mmk(mediamark_t **mmk) {
+mediamark_t *mediamark_clone_mmk(mediamark_t *mmk) {
+  mediamark_t *cmmk = NULL;
+
+  if(mmk && mmk->mrl) {
+    cmmk = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
+    cmmk->mrl    = strdup(mmk->mrl);
+    cmmk->ident  = (mmk->ident) ? strdup(mmk->ident) : NULL;
+    cmmk->sub    = (mmk->sub) ? strdup(mmk->sub) : NULL;
+    cmmk->start  = mmk->start;
+    cmmk->end    = mmk->end;
+    cmmk->played = mmk->played;
+  }
+
+  return cmmk;
+}
+
+int mediamark_free_mmk(mediamark_t **mmk) {
   if((*mmk) != NULL) {
     SAFE_FREE((*mmk)->ident);
     SAFE_FREE((*mmk)->mrl);
@@ -1116,7 +1132,7 @@ const char *mediamark_get_current_sub(void) {
 void mediamark_free_entry(int offset) {
 
   if(gGui->playlist.num && (offset < gGui->playlist.num)) {
-    if(_mediamark_free_mmk(&gGui->playlist.mmk[offset]))
+    if(mediamark_free_mmk(&gGui->playlist.mmk[offset]))
       gGui->playlist.num--;
   }
 }
@@ -1156,7 +1172,7 @@ int mediamark_concat_mediamarks(const char *filename) {
     mediamark_add_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->sub, mmk[i]->start, mmk[i]->end);
   
   for(i = 0; i < playlist->entries; i++)
-    (void) _mediamark_free_mmk(&mmk[i]);
+    (void) mediamark_free_mmk(&mmk[i]);
   
   SAFE_FREE(mmk);
   SAFE_FREE(playlist->type);
@@ -1207,7 +1223,7 @@ void mediamark_load_mediamarks(const char *filename) {
     gGui->playlist.cur = 0;
 
   for(i = 0; i < onum; i++)
-    (void) _mediamark_free_mmk(&ommk[i]);
+    (void) mediamark_free_mmk(&ommk[i]);
 
   SAFE_FREE(ommk);
 
