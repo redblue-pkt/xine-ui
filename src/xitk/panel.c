@@ -532,7 +532,7 @@ void panel_reset_runtime_label(void) {
   if(panel->runtime_mode == 0)
     xitk_label_change_label (panel->runtime_label, "00:00:00"); 
   else
-    xitk_label_change_label (panel->runtime_label, "--:--:--"); 
+    xitk_label_change_label (panel->runtime_label, "..:..:.."); 
 }
 
 static void _panel_change_display_mode(xitk_widget_t *w, void *data) {

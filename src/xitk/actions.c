@@ -379,7 +379,7 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
 	(!strncasecmp(extension, ".m3u", 4)) ||
     	(!strncasecmp(extension, ".sfv", 4)) ||
     	(!strncasecmp(extension, ".tox", 4)))) {
-      
+
       if(mediamark_concat_mediamarks(mrl)) {
 	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	mrl = gGui->mmk.mrl;
