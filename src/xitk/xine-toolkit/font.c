@@ -853,6 +853,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   foo_text = strdup(c);
   foo_text[nbytes] = '\0';
   encoded_text = xitk_recode(cache.xr, foo_text);
+  free(foo_text);
   
   XLOCK(xtfs->display);
   XftTextExtentsUtf8( xtfs->display, xtfs->font, encoded_text, nbytes, &xft_extents );
