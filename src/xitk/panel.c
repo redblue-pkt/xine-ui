@@ -171,6 +171,12 @@ static void *slider_loop(void *dummy) {
 	  xitk_slider_set_pos(panel->widget_list, panel->slider_play, 
 			      xine_get_current_position(gGui->xine));
 	}
+
+        if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+          gGui->mixer.volume_level = xine_get_audio_property(gGui->xine, 
+                                                             gGui->mixer.volume_mixer);
+          xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+        }
 	
 	if(status != XINE_STOP)
 	  panel_update_runtime_display();
