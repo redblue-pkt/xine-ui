@@ -713,7 +713,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       "Menu 1", "Menu 2", "Menu 3", "Menu 4", "Menu 5", "Menu 6", "Menu 7", NULL
     };
     char               *dvd_menu[8] = {
-      "Root", "Title", "Root", "Subpicture", "Audio", "Angle", "Part", NULL
+      "Menu toggle", "Title", "Root", "Subpicture", "Audio", "Angle", "Part", NULL
     };
     char              **menu = default_menu;
     int                 i;

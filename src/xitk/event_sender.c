@@ -641,7 +641,7 @@ void event_sender_panel(void) {
   menu_items_default[5] = _("Menu 6");
   menu_items_default[6] = _("Menu 7");
  
-  menu_items_dvd[0]     = _("Root");
+  menu_items_dvd[0]     = _("Menu toggle");
   menu_items_dvd[1]     = _("Title");
   menu_items_dvd[2]     = _("Root");
   menu_items_dvd[3]     = _("Subpicture");
