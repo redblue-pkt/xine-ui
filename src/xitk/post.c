@@ -35,6 +35,8 @@ extern gGui_t    *gGui;
 
 #undef TRACE_REWIRE
 
+#define DEINTERLACE_METHOD  "Linear"
+
 #define WINDOW_WIDTH        500
 #define WINDOW_HEIGHT       500
 
@@ -1858,20 +1860,71 @@ void pplugin_parse_and_store_post(const char *post_chain) {
   
 }
 
+static char *_pplugin_get_default_deinterlacer(void) {
+  xine_post_t  *post;
+  static char   default_interlacer[1024];
+  
+  sprintf(default_interlacer, "%s", "tvtime");
+
+  post = xine_post_init(gGui->xine, "tvtime", 0, &gGui->ao_port, &gGui->vo_port);
+  
+  if(post) {
+    xine_post_in_t  *input_api;
+    
+    if((input_api = (xine_post_in_t *) xine_post_input(post, "parameters"))) {
+      xine_post_api_t            *post_api;
+      xine_post_api_descr_t      *api_descr;
+      xine_post_api_parameter_t  *parm;
+      
+      post_api  = (xine_post_api_t *) input_api->data;
+      api_descr = post_api->get_param_descr();
+      parm      = api_descr->parameter;
+      
+      while(parm->type != POST_PARAM_TYPE_LAST) {
+	
+	if((parm->type == POST_PARAM_TYPE_INT) && parm->enum_values 
+	   && (!strncasecmp(parm->name, "method", strlen(parm->name)))) {
+	  char **values = parm->enum_values;
+	  int    i = 0;
+	  
+	  while(values[i]) {
+	    if(!strncasecmp(values[i], DEINTERLACE_METHOD, strlen(values[i]))) {
+	      sprintf(default_interlacer, "%s:%s=%d,%s=%d,%s=%d,%s=%d", 
+		      default_interlacer, "method", i, "cheap_mode", 1,
+		      "pulldown", 0, "use_progressive_frame_flag", 1);
+	      goto __found;
+	    }
+	    i++;
+	  }
+	}
+
+	parm++;
+      }          
+
+    __found:
+      xine_post_dispose(gGui->xine, post);
+    }
+  }
+  
+  return default_interlacer;
+}
+
 void post_deinterlace_init(const char *deinterlace_post) {
   post_element_t **posts = NULL;
   int              num;
+  char            *deinterlace_default;
+
+  deinterlace_default = _pplugin_get_default_deinterlacer();
   
   gGui->deinterlace_plugin = 
     (char *) xine_config_register_string (gGui->xine, "gui.deinterlace_plugin", 
-					  "tvtime:method=8",
+					  deinterlace_default,
 					  _("Deinterlace plugin."),
 					  _("Plugin (with optional parameters) to use "
 					    "when deinterlace is used (plugin separator is ';')."),
 					  CONFIG_LEVEL_ADV,
 					  post_deinterlace_plugin_cb,
 					  CONFIG_NO_DATA);
-  
   if((posts = pplugin_parse_and_load((deinterlace_post && strlen(deinterlace_post)) ? 
 				     deinterlace_post : gGui->deinterlace_plugin, &num))) {
     gGui->deinterlace_elements     = posts;
