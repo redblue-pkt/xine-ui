@@ -82,9 +82,12 @@ Xine has an experimental video out driver for displaying non-mpeg
 streams using a dxr3 card called dxr3enc. Non-mpeg video may be AVI,
 quicktime, windows media files or whatever else xine can decode. 
 
-This driver requires libfame from fame.sourceforge.net to build, and
-will compile and install automatically if configure finds it.
-The driver itself is in video_out_dxr3enc.c in the dxr3 directory. 
+This driver requires a supported mpeg encoder to build. At the moment
+there are two:
+- libfame from fame.sourceforge.net (very fast, good quality)
+- librte (version 0.4) from zapping.sourceforge.net (fast, very good quality)
+If configure finds one or both it will compile and install the dxr3enc
+driver.  The driver itself is in video_out_dxr3enc.c in the dxr3 directory. 
 Please read the source comments at the top of this file for more 
 developer related information.
 
@@ -200,12 +203,6 @@ reconfigure.
 
 The following settings only concern the dxr3enc video out driver:
 
-dxr3enc.quality: 
-	0-100	The quality setting of the mpeg1 encoding. Lower
-		is faster but gives noticeable artefacts. Higher is
-		better but slower. Values between 0 and 100, 90
-		is a good initial value.
-
 dxr3enc.outputfile:
 	<none>  If the value is anything other than "<none>", xine
 		tries to open a file with that name to write the
@@ -213,6 +210,31 @@ dxr3enc.outputfile:
 		This is for debugging the driver and not meant for 
 		users.
 	
+dxr3enc.alt_play_mode: 
+	bool	See dxr3.alt_play_mode. The difference is that it's
+		enabled by default for dxr3enc.
+
+dxr3enc.encoder:
+	string	Mpeg encoder backend to use.
+		Depending on what's compiled in, can be "fame" or "rte"
+		If both are available, the default is "rte". As a rule
+		of thumb, you should try rte first because it gives the
+		best output quality. If you get much dropped frames, 
+		switch to "fame" and find the optimum fame_quality setting
+		(see below) for your system.
+
+dxr3enc.fame_quality: (libfame encoder only)
+	0-100	The quality setting of the fame mpeg1 encoding. Lower
+		is faster but gives noticeable artefacts. Higher is
+		better but slower. Values between 0 and 100, 90
+		is a good initial value.
+
+dxr3enc.rte_bitrate: (librte encoder only)
+	1000-20000 The bitrate in kbit/s of the librte mpeg1 encoder
+		output. Lower is faster, but it the difference is not as
+		big as with libfame's quality setting. If you get dropped
+		frames, it's better to use the libfame encoder.
+
 It is recommented to run XINE one time before editing the config,
 since all options get written in .xinerc and have their default
 values. The dxr3 video driver can be forced using the "-V dxr3"
