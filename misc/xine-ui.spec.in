@@ -22,6 +22,7 @@ Group:       Applications/Multimedia
 Source:      http://xine.sourceforge.net/files/%{name}-%{version}.tar.gz
 URL:         http://xine.sourceforge.net/
 Packager:    Manfred Tremmel <Manfred.Tremmel@iiv.de>
+Obsoletes:   xine
 Requires:    %{libname} >= %{libvers}
 BuildPreReq: %{libname}-devel >= %{libvers}
 BuildRoot:   %{_tmppath}/%{name}-buildroot
