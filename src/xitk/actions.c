@@ -689,10 +689,12 @@ void gui_decrease_audio_volume(void) {
   }
 }
 
-void gui_change_zoom(int zoom_d) {
+void gui_change_zoom(int zoom_dx, int zoom_dy) {
 
-  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_FACTOR,
-				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ZOOM_FACTOR) + zoom_d);
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_X,
+				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ZOOM_X) + zoom_dx);
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_Y,
+				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ZOOM_Y) + zoom_dy);
   
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
@@ -706,7 +708,8 @@ void gui_change_zoom(int zoom_d) {
  */
 void gui_reset_zoom(void) {
   
-  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_FACTOR, 100);
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_X, 100);
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_Y, 100);
   
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
