@@ -977,7 +977,7 @@ static void fb_delete_file_cb(xitk_widget_t *w, void *data, int button) {
       memset(&buf, 0, sizeof(buf));
       snprintf(buf, sizeof(buf), "%s", fb->current_dir);
       if(strlen(fb->current_dir) > 1)
-	snprintf(buf, sizeof(buf), "%s/", buf);
+	strcat(buf, "/");
       sprintf(buf, "%s%s", buf, fb->norm_files[sel].name);
       
       if((unlink(buf)) == -1)
