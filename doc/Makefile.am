@@ -3,7 +3,7 @@ SUBDIRS = man
 
 EXTRA_DIST = $(docs_DOCS)
 
-docdir = $(prefix)/share/doc/xine
+docdir = $(prefix)/share/doc/xine-ui
 docs_DOCS = FAQ FAQ_es FAQ_it FAQ_fr \
 	README.freebsd README.irix README.solaris README.syncfb bug_report_form
 
