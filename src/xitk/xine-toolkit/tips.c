@@ -53,7 +53,33 @@ static tips_private_t *disptips;
 /*
  *
  */
-static void *xitk_tips_destroy_thread(void *data) {
+static _tips_kill_running(void) {
+  
+  if(disptips != NULL) {
+    
+    pthread_mutex_lock(&disptips->mutex);
+
+    pthread_cancel(disptips->thread);
+    
+    xitk_window_destroy_window(disptips->w->imlibdata, disptips->xwin);
+    xitk_unregister_event_handler(&disptips->key);
+    
+    XLOCK(disptips->w->imlibdata->x.disp);
+    XFlush(disptips->w->imlibdata->x.disp);
+    XUNLOCK(disptips->w->imlibdata->x.disp);
+    
+    pthread_mutex_unlock(&disptips->mutex);
+    pthread_mutex_destroy(&disptips->mutex);
+
+    XITK_FREE(disptips);
+    disptips = NULL;
+  }
+}
+
+/*
+ *
+ */
+static void *_tips_destroy_thread(void *data) {
   tips_private_t *tp = (tips_private_t *)data;
   
   disptips = tp;
@@ -87,7 +113,7 @@ static void *xitk_tips_destroy_thread(void *data) {
 /*
  *
  */
-static void *xitk_tips_thread(void *data) {
+static void *_tips_thread(void *data) {
   tips_private_t     *tp = (tips_private_t *)data;
   int                 x, y, string_length;
   xitk_image_t       *i;
@@ -118,8 +144,11 @@ static void *xitk_tips_thread(void *data) {
   i = xitk_image_create_image_with_colors_from_string(tp->w->imlibdata, DEFAULT_FONT_10,
 						      string_length + 1, ALIGN_LEFT, 
 						      tp->w->tips_string, cblack, cyellow);
+
   
-  tp->xwin = xitk_window_create_simple_window(tp->w->imlibdata, x, y, 
+  /* Create the tips window, horizontaly centered from parent widget */
+  tp->xwin = xitk_window_create_simple_window(tp->w->imlibdata, x - (((i->width + 10) >> 1) 
+								     - (tp->w->width >> 1)), y, 
 					      i->width + 10, i->height + 10);
 
   /* WM should ignore tips windows */
@@ -201,7 +230,7 @@ static void *xitk_tips_thread(void *data) {
     
     pthread_mutex_init(&tp->mutex, NULL); 
  
-    pthread_create(&tp->thread, &pth_attrs, xitk_tips_destroy_thread, (void *)tp);
+    pthread_create(&tp->thread, &pth_attrs, _tips_destroy_thread, (void *)tp);
   }
   
   pthread_exit(NULL);
@@ -219,26 +248,7 @@ void xitk_tips_create(xitk_widget_t *w, xitk_widget_list_t *wl) {
     return;
   
   /* If there a current tips displayed, hide it */
-
-  if(disptips != NULL) {
-
-    pthread_mutex_lock(&disptips->mutex);
-
-    pthread_cancel(disptips->thread);
-    
-    xitk_window_destroy_window(disptips->w->imlibdata, disptips->xwin);
-    xitk_unregister_event_handler(&disptips->key);
-    
-    XLOCK(disptips->w->imlibdata->x.disp);
-    XFlush(disptips->w->imlibdata->x.disp);
-    XUNLOCK(disptips->w->imlibdata->x.disp);
-    
-    pthread_mutex_unlock(&disptips->mutex);
-    pthread_mutex_destroy(&disptips->mutex);
-
-    XITK_FREE(disptips);
-    disptips = NULL;
-  }
+  _tips_kill_running();
 
   if((w->tips_string != NULL) && w->tips_timeout) {
 
@@ -251,7 +261,7 @@ void xitk_tips_create(xitk_widget_t *w, xitk_widget_list_t *wl) {
     pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
     
-    pthread_create(&w->tips_thread, &pth_attrs, xitk_tips_thread, (void *)tp);
+    pthread_create(&w->tips_thread, &pth_attrs, _tips_thread, (void *)tp);
   }
 
 }
@@ -264,9 +274,12 @@ void xitk_tips_tips_kill(xitk_widget_t *w) {
   if(!w)
     return;
 
-  if(w->tips_thread) {
+  if(w->tips_thread)
     pthread_cancel(w->tips_thread);
-  }
+  
+  /* If there a current tips displayed, kill it */
+  _tips_kill_running();
+
 }    
 
 /*

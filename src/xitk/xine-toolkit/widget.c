@@ -862,7 +862,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
       
       /* Kill (hide) tips */
       xitk_tips_tips_kill(wl->focusedWidget);
-
+      
       if (wl->focusedWidget->notify_focus && wl->focusedWidget->enable == WIDGET_ENABLE) {
 	bRepaint |= (wl->focusedWidget->notify_focus) (wl, wl->focusedWidget, FOCUS_LOST);
 	wl->focusedWidget->have_focus = FOCUS_LOST;
