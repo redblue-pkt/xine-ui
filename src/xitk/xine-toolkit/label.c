@@ -407,7 +407,15 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   
   switch(event->type) {
   case WIDGET_EVENT_PAINT:
-    paint_label(w);
+    {
+      if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
+	label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
+
+	pthread_mutex_lock(&private_data->paint_mutex);
+	paint_label(w);
+	pthread_mutex_unlock(&private_data->paint_mutex);
+      }
+    }
     break;
   case WIDGET_EVENT_CLICK:
     result->value = notify_click_label(w, event->button, 
