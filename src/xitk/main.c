@@ -252,12 +252,11 @@ void show_banner(void) {
   int major, minor, sub;
 
   show_version();
-  printf(_("Built with xine library %d.%d.%d\n"),
-	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION);
+  printf(_("Built with xine library %d.%d.%d (%s)\n"),
+	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_VERSION);
   
   xine_get_version (&major, &minor, &sub);
 
-#warning xine_get_str_version() WAS FINE TO CHECK IF RUNNING IS A CVS CHILD
   printf(_("Found xine library version: %d.%d.%d.\n"), major, minor, sub);
 
 }
