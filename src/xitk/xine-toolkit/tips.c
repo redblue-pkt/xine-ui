@@ -143,8 +143,13 @@ static void *xitk_tips_thread(void *data) {
     gc = XCreateGC(tp->w->imlibdata->x.disp, tp->w->imlibdata->x.base_window, None, None);
     XCopyArea(tp->w->imlibdata->x.disp, (xitk_window_get_background(tp->xwin)), bg,
 	      gc, 0, 0, width, height, 0, 0);
+
+    XSetForeground(tp->w->imlibdata->x.disp, gc, cblack);
+    XDrawRectangle(tp->w->imlibdata->x.disp, bg, gc, 0, 0, width - 1, height - 1);
+    
     XSetForeground(tp->w->imlibdata->x.disp, gc, cyellow);
     XFillRectangle(tp->w->imlibdata->x.disp, bg, gc, 1, 1, width - 2, height - 2);
+
     XCopyArea(tp->w->imlibdata->x.disp, i->image, bg,
 	      gc, 0, 0, i->width, i->height, (width - i->width)>>1, ((height - i->height)>>1) + 1);
     XUNLOCK(tp->w->imlibdata->x.disp);

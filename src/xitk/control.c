@@ -666,7 +666,6 @@ void control_panel(void) {
 			  xitk_labelbutton_create (gGui->skin_config, &lb));
 
   XMapRaised(gGui->display, control->window); 
-  XSetInputFocus(gGui->display, control->window, RevertToParent, CurrentTime);
 
   control->widget_key = 
     xitk_register_event_handler("control", 
