@@ -271,15 +271,13 @@ static void mrl_add(xitk_widget_t *w, void *data, mrl_t *mrl) {
 static void mrl_add_and_play(xitk_widget_t *w, void *data, mrl_t *mrl) {
 
   if(mrl) {
-    gui_dndcallback((char *)mrl->mrl);
-
     if((xine_get_status(gGui->xine) != XINE_STOP)) {
       gGui->ignore_status = 1;
       xine_stop (gGui->xine);
       gGui->ignore_status = 0;
     }
 
-    gui_set_current_mrl(gGui->playlist[gGui->playlist_num - 1]);
+    gui_set_current_mrl(mrl->mrl);
     if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
       gui_handle_xine_error();
 

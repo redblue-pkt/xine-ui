@@ -102,6 +102,36 @@ static int set_current_prop(int prop, int value) {
 }
 
 /*
+ * Enable or disable video settings sliders.
+ */
+static void active_sliders_video_settings(void) {
+  int vidcap;
+  
+  if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) {
+    
+    if(vidcap & VO_CAP_BRIGHTNESS)
+      xitk_enable_widget(control->bright);
+    else
+      xitk_disable_widget(control->bright);
+    
+    if(vidcap & VO_CAP_SATURATION)
+      xitk_enable_widget(control->sat);
+    else
+      xitk_disable_widget(control->sat);
+    
+    if(vidcap & VO_CAP_HUE)
+      xitk_enable_widget(control->hue);
+    else
+      xitk_disable_widget(control->hue);
+    
+    if(vidcap & VO_CAP_CONTRAST)
+      xitk_enable_widget(control->contr);
+    else
+      xitk_disable_widget(control->contr);
+  }
+}
+
+/*
  * Update silders positions
  */
 static void update_sliders_video_settings(void) {
@@ -326,7 +356,6 @@ void control_handle_event(XEvent *event, void *data) {
 void control_change_skins(void) {
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
-  int           vidcap = 0;
 
   if(control_is_running()) {
     
@@ -374,28 +403,7 @@ void control_change_skins(void) {
     xitk_change_skins_widget_list(control->widget_list, gGui->skin_config);
     xitk_paint_widget_list(control->widget_list);
 
-    if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) {
-      
-      if(vidcap & VO_CAP_BRIGHTNESS)
-	xitk_enable_widget(control->bright);
-      else
-	xitk_disable_widget(control->bright);
-      
-      if(vidcap & VO_CAP_SATURATION)
-      	xitk_enable_widget(control->sat);
-      else
-	xitk_disable_widget(control->sat);
-      
-      if(vidcap & VO_CAP_HUE)
-	xitk_enable_widget(control->hue);
-      else
-	xitk_disable_widget(control->hue);
-      
-      if(vidcap & VO_CAP_CONTRAST)
-	xitk_enable_widget(control->contr);
-      else
-	xitk_disable_widget(control->contr);
-    }
+    active_sliders_video_settings();
   }
 }
 
@@ -546,7 +554,6 @@ void control_panel(void) {
   control->widget_list->gc            = gc;
   
   { /* All of sliders are disabled by default*/
-    int vidcap = 0;
     int min, max, cur;
 
     lbl.window = control->widget_list->win;
@@ -648,23 +655,7 @@ void control_panel(void) {
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->contr);
 
-    /*
-     * Enable only supported settings.
-     */
-    if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) {
-
-      if(vidcap & VO_CAP_BRIGHTNESS)
-	xitk_enable_widget(control->bright);
-      
-      if(vidcap & VO_CAP_SATURATION)
-      	xitk_enable_widget(control->sat);
-      
-      if(vidcap & VO_CAP_HUE)
-	xitk_enable_widget(control->hue);
-      
-      if(vidcap & VO_CAP_CONTRAST)
-	xitk_enable_widget(control->contr);
-    }
+    active_sliders_video_settings();
   }
 
   {

@@ -50,6 +50,8 @@
 #include "widget.h"
 #include "widget_types.h"
 
+#undef DEBUG_MRLB
+
 /*
  *
  */
@@ -218,6 +220,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
   }
 }
 
+#ifdef DEBUG_MRLB
 /*
  * Dump informations, on terminal, about selected mrl.
  */
@@ -286,6 +289,7 @@ static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
       printf("] (%Ld byte%c)\n", ms->size, (ms->size > 0) ?'s':'\0');
   }
 }
+#endif
 /*
  *                                 END OF PRIVATES
  *****************************************************************************/
@@ -564,7 +568,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
  * 
  */
 static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
-				  int j, int do_callback) {
+				  int j, int add_callback, int play_callback) {
   mrl_t *ms = private_data->mc->mrls[j];
   char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
@@ -628,10 +632,14 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
   else {
     
     xitk_browser_release_all_buttons(private_data->mrlb_list);
-    if(do_callback && private_data->add_callback)
+
+    if(add_callback && private_data->add_callback)
       private_data->add_callback(NULL, (void *) j, 
 				 private_data->mc->mrls[j]);
-
+    
+    if(play_callback && private_data->play_callback)
+      private_data->play_callback(NULL, (void *) j,
+				  private_data->mc->mrls[j]);
   }
 }
 
@@ -643,7 +651,7 @@ static void mrlbrowser_select(xitk_widget_t *w, void *data) {
   int j = -1;
 
   if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
-    mrlbrowser_select_mrl(private_data, j, 1);
+    mrlbrowser_select_mrl(private_data, j, 1, 0);
   }
 }
 
@@ -651,21 +659,13 @@ static void mrlbrowser_select(xitk_widget_t *w, void *data) {
  * Handle selection in mrlbrowser, then 
  */
 static void mrlbrowser_play(xitk_widget_t *w, void *data) {
-
+  
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
   int j = -1;
   
-  if(private_data->play_callback && 
-     ((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0)) {
-    
-    mrlbrowser_select_mrl(private_data, j, 0);
-    private_data->play_callback(NULL, (void *) j, private_data->mc->mrls[j]);
+  if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
+    mrlbrowser_select_mrl(private_data, j, 0, 1);
   }
-
-  if(private_data->kill_callback)
-    private_data->kill_callback(private_data->fbWidget, NULL);
-
-  xitk_mrlbrowser_destroy(private_data->fbWidget);
 }
 
 /*
@@ -674,7 +674,7 @@ static void mrlbrowser_play(xitk_widget_t *w, void *data) {
 static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
 
-  mrlbrowser_select_mrl(private_data, selected, 1);
+  mrlbrowser_select_mrl(private_data, selected, 0, 1);
 }
 
 /*
@@ -725,15 +725,21 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
       mrlbrowser_select(NULL, (void *)private_data);
       break;
 
-    case XK_Return:
-      mrlbrowser_play(NULL, (void *)private_data);
-      break;
+    case XK_Return: {
+      int selected;
+      
+      if((selected = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0)
+	mrlbrowser_select_mrl(private_data, selected, 0, 1);
+    }
+    break;
       
       /* This is for debugging purpose */
+#ifdef DEBUG_MRLB
     case XK_d:
     case XK_D:
       mrlbrowser_dumpmrl(NULL, (void *)private_data);
       break;
+#endif
       
     case XK_Down:
     case XK_Next:
@@ -747,7 +753,6 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     }
     
     break;
-    
   }
 }
 
