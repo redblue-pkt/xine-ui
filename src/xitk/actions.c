@@ -1222,7 +1222,7 @@ void gui_seek_relative (int off_sec) {
 }
 
 void gui_dndcallback(char *filename) {
-  int more_than_one = -1;
+  int more_than_one = -2;
 
   if(filename) {
     char  buffer[strlen(filename) + 10];
@@ -1296,8 +1296,11 @@ void gui_dndcallback(char *filename) {
     }
     else {
       if(mrl_look_like_playlist(buffer)) {
+	int cur = gGui->playlist.cur;
+	
+	more_than_one = (gGui->playlist.cur - 1);
 	if(mediamark_concat_mediamarks(buffer))
-	  gui_set_current_mmk(mediamark_get_current_mmk());
+	  gGui->playlist.cur = cur;
 	else
 	  mediamark_append_entry(buffer, buffer, NULL, 0, -1, 0, 0);
       }
@@ -1311,7 +1314,7 @@ void gui_dndcallback(char *filename) {
 
     if(!(gGui->playlist.control & PLAYLIST_CONTROL_IGNORE)) {
       if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
-	if((more_than_one > -1) && ((more_than_one + 1) < gGui->playlist.num))
+	if((more_than_one > -2) && ((more_than_one + 1) < gGui->playlist.num))
 	  gGui->playlist.cur = more_than_one + 1;
 	else
 	  gGui->playlist.cur = gGui->playlist.num - 1;
