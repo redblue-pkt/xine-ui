@@ -590,10 +590,12 @@ int main(int argc, char *argv[]) {
   {
     char *homedir;
 
-    homedir = strdup(get_homedir());
-    gGui->configfile = (char *) xmalloc(strlen(homedir) + 8 + 1);
+    if (!(gGui->configfile = getenv ("XINERC"))) {
+      homedir = strdup(get_homedir());
+      gGui->configfile = (char *) xmalloc(strlen(homedir) + 8 + 1);
 
-    sprintf (gGui->configfile, "%s/.xinerc", homedir);
+      sprintf (gGui->configfile, "%s/.xinerc", homedir);
+    }
   }
 
   gGui->config = config_file_init (gGui->configfile);
