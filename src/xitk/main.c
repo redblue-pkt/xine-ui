@@ -1239,7 +1239,7 @@ int main(int argc, char *argv[]) {
       i++;
     }
     
-    audio_driver_ids[i + 1] = NULL;
+    audio_driver_ids[i + 2] = NULL;
     
     if(audio_driver_id) {
       for(i = 0; audio_driver_ids[i] != NULL; i++) {
@@ -1254,7 +1254,7 @@ int main(int argc, char *argv[]) {
   SAFE_FREE(audio_driver_id);
 
   {
-    const char *const *pol = xine_list_post_plugins(gGui->xine);
+    const char *const *pol = xine_list_post_plugins_typed(gGui->xine, XINE_POST_TYPE_AUDIO_VISUALIZATION);
     
     if(pol) {
       int  i = 0;
@@ -1265,17 +1265,15 @@ int main(int argc, char *argv[]) {
 	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
 	
 	if(post) {
-	  if(post->type == XINE_POST_TYPE_AUDIO_VISUALIZATION) {
-	    if(num_plug == 0)
-	      post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
-	    else
-	      post_output_plugins = (char **) realloc(post_output_plugins, 
-						      sizeof(char *) * (num_plug + 1));
-	    
-	    post_output_plugins[num_plug]     = strdup(pol[i]);
-	    post_output_plugins[num_plug + 1] = NULL;
-	    num_plug++;
-	  }
+	  if(num_plug == 0)
+	    post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+	  else
+	    post_output_plugins = (char **) realloc(post_output_plugins, 
+						    sizeof(char *) * (num_plug + 1));
+	  
+	  post_output_plugins[num_plug]     = strdup(pol[i]);
+	  post_output_plugins[num_plug + 1] = NULL;
+	  num_plug++;
 
 	  xine_post_dispose(gGui->xine, post);
 	}
