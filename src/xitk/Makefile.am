@@ -4,22 +4,11 @@ AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ -I$(top_srcdir)/src/xitk
 
 EXTRA_DIST = file_browser.c file_browser.h
 
-#if HAVE_TERMCAP
-#remote = xine-remote
-#endif
-remote=
+if HAVE_TERMCAP
+remote = xine-remote
+endif
 
 bin_PROGRAMS = xine $(remote)
-
-
-#COMMON_DIR = $(top_srcdir)/src/common
-
-#if HAVE_GETOPT_LONG
-#else
-#GETOPT_C = $(COMMON_DIR)/getopt.c \
-#	   $(COMMON_DIR)/getopt1.c
-#GETOPT_H = $(COMMON_DIR)/getopt.h
-#endif
 
 ## xscreensaver-remote.c
 xine_SOURCES = \
@@ -52,10 +41,12 @@ xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
 	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) -lX11 -lm
 
-# DISABLED CORBA SUPPORT: Must port to new API
-#xine_remote_SOURCES = $(GETOPT_C)
-#xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la
-#xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) $(top_builddir)/readline/libreadline.la $(TERMCAP_LIB)
+xine_remote_SOURCES = xine-remote.c
+xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la \
+			   $(top_builddir)/src/common/libcommon.la \
+			   xine-remote.c
+xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) \
+  		    $(top_builddir)/readline/libreadline.la $(TERMCAP_LIB) \			    $(top_builddir)/src/common/libcommon.la
 
 noinst_HEADERS = \
 	common.h \
@@ -81,12 +72,11 @@ noinst_HEADERS = \
 	videowin.h \
 	viewlog.h
 
-# Use this instead of the rule below
-#xine_remote_CFLAGS = -DNETWORK_CLIENT
+xine-remote.c: $(srcdir)/network.c
+	$(LN_S) $(srcdir)/network.c ./xine-remote.c
 
-# Old rule
-#xine-remote.o: xine-remote.c
-#	$(COMPILE) -DNETWORK_CLIENT -c `test -f $< || echo '$(srcdir)/'`$<
+xine-remote.o: xine-remote.c
+	$(COMPILE) -DNETWORK_CLIENT -c `test -f $< || echo '$(srcdir)/'`$<
 
 ##xscreensaver-remote.c:
 ##	$(LN_S) $(top_srcdir)/src/common/xscreensaver-remote.c \
