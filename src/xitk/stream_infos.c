@@ -66,7 +66,7 @@ typedef struct {
   struct {
     xitk_widget_t      *bitrate;
     xitk_widget_t      *seekable;
-    xitk_widget_t      *video_sizes;
+    xitk_widget_t      *video_resolution;
     xitk_widget_t      *video_ratio;
     xitk_widget_t      *video_channels;
     xitk_widget_t      *video_streams;
@@ -299,7 +299,7 @@ static void stream_info_update_undefined(void) {
   /* */
   xitk_label_change_label(sinfos->widget_list, sinfos->infos.bitrate, "---");
   xitk_label_change_label(sinfos->widget_list, sinfos->infos.seekable, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_sizes, "--- X ---");
+  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_resolution, "--- X ---");
   xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_ratio, "---");
   xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_channels, "---");
   xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_streams, "---");
@@ -370,7 +370,7 @@ void stream_infos_update_infos(void) {
       iinfo2 = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
       memset(&buffer, 0, sizeof(buffer));
       sprintf(buffer, "%d X %d", iinfo, iinfo2);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_sizes, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_resolution, buffer);
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_RATIO);
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_ratio, (get_num_string(iinfo)));
@@ -785,7 +785,7 @@ void stream_infos_panel(void) {
 
   x += w + 15;
   w += 4;
-  draw_inner_frame(gGui->imlib_data, bg, _("Sizes: "), lfontname, 
+  draw_inner_frame(gGui->imlib_data, bg, _("Resolution: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
@@ -793,7 +793,7 @@ void stream_infos_panel(void) {
   lbl.label             = "";
   lbl.callback          = NULL;
   xitk_list_append_content(sinfos->widget_list->l, 
-			   (sinfos->infos.video_sizes = 
+			   (sinfos->infos.video_resolution = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
   x += w + 15;

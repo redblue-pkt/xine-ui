@@ -411,6 +411,8 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     if(gGui->cursor_grabbed)
        XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
     
+    /* Give focus to video output window */
+    XSetInputFocus(gGui->display, gGui->video_window, RevertToParent, CurrentTime);
     XUnlockDisplay(gGui->display);
      
   } 
