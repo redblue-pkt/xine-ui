@@ -2,9 +2,21 @@ xine-ui (0.9.2-1) unstable; urgency=medium
 
   * added mailcap (MIME) support (closes: #113071)
   * new upstream release
+    * adds ia64 support to configure.in (closes: #115039)
 
- -- Siggi Langauf <siggi@debian.org>  Thu,  4 Oct 2001 00:12:51 +0200
+ -- Siggi Langauf <siggi@debian.org>  Mon, 15 Oct 2001 21:01:22 +0200
 
+
+xine-ui (0.9.1-1.1) unstable; urgency=low
+
+  * NMU.
+  * Updated autotools info to reflect fixed xine-lib autoconf test.
+  * Removed xine test from acinclude.m4 (why is it there, anyway?).
+    Closes: #115035.
+  * Added ia64 support.  Closes: #115039.
+
+ -- Jeff Licquia <jlicquia@progeny.com>  Tue,  9 Oct 2001 10:25:26 -0600
+    
 xine-ui (0.9.1-1) unstable; urgency=low
 
   * added README and fixed doc dir (closes: #112283)
