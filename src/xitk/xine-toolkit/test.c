@@ -103,7 +103,6 @@ static void create_menu(void);
  *
  */
 static int init_test(void) {
-  char              *display_name = NULL;
   ImlibInitParams    imlib_init;
   int                screen;
   int		     depth = 0;
@@ -116,10 +115,7 @@ static int init_test(void) {
 
   test = (test_t *) xitk_xmalloc(sizeof(test_t));
   
-  if(getenv("DISPLAY"))
-    display_name = getenv("DISPLAY");
-  
-  if((test->display = XOpenDisplay(display_name)) == NULL) {
+  if((test->display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
     fprintf(stderr, _("Cannot open display\n"));
     return 0;
   }

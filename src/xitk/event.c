@@ -953,7 +953,6 @@ void gui_deinit(void) {
  */
 void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute) {
   int    i;
-  char  *display_name = NULL;
   char  *server;
 
   /*
@@ -989,10 +988,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     exit (1);
   } 
   
-  if(getenv("DISPLAY"))
-    display_name = getenv("DISPLAY");
-  
-  if((gGui->display = XOpenDisplay(display_name)) == NULL) {
+  if((gGui->display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
     fprintf(stderr, _("Cannot open display\n"));
     exit(1);
   }

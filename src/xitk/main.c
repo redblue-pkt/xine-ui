@@ -298,7 +298,6 @@ static int parse_visual(VisualID *vid, int *vclass, char *visual_str) {
 }
 
 static void xrm_parse(void) {
-  char         *display_name = NULL;
   Display      *display;
   char          user_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
@@ -313,10 +312,7 @@ static void xrm_parse(void) {
   
   sprintf(wide_dbname, "%s%s", "/usr/lib/X11/app-defaults/", classname);
   
-  if(getenv("DISPLAY"))
-    display_name = getenv("DISPLAY");
-  
-  if((display = XOpenDisplay(display_name)) == NULL) {
+  if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
     fprintf(stderr, _("Cannot open display\n"));
     exit(1);
   }
