@@ -452,7 +452,6 @@ void gui_handle_event (XEvent *event, void *data) {
       break;
 
     case XK_Return:
-    case XK_KP_Enter:
       gui_play(NULL, NULL);
       break;
 
@@ -583,27 +582,37 @@ void gui_handle_event (XEvent *event, void *data) {
       xine_send_event(gGui->xine, &xine_event);
       break;
     case XK_KP_8:
+    case XK_KP_Up:
       xine_event.type = XINE_EVENT_INPUT_UP;
       xine_send_event(gGui->xine, &xine_event);
       break;
     case XK_KP_2:
+    case XK_KP_Down:
       xine_event.type = XINE_EVENT_INPUT_DOWN;
       xine_send_event(gGui->xine, &xine_event);
       break;
     case XK_KP_4:
+    case XK_KP_Left:
       xine_event.type = XINE_EVENT_INPUT_LEFT;
       xine_send_event(gGui->xine, &xine_event);
       break;
     case XK_KP_6:
+    case XK_KP_Right:
       xine_event.type = XINE_EVENT_INPUT_RIGHT;
       xine_send_event(gGui->xine, &xine_event);
       break;
     case XK_KP_9:
+    case XK_KP_Prior:
       xine_event.type = XINE_EVENT_INPUT_NEXT;
       xine_send_event(gGui->xine, &xine_event);
       break;
     case XK_KP_3:
+    case XK_KP_Next:
       xine_event.type = XINE_EVENT_INPUT_PREVIOUS;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
+    case XK_KP_Enter:
+      xine_event.type = XINE_EVENT_INPUT_SELECT;
       xine_send_event(gGui->xine, &xine_event);
       break;
     
