@@ -43,6 +43,7 @@
 #include "mrl_browser.h"
 #include "setup.h"
 #include "event_sender.h"
+#include "stream_infos.h"
 #include "viewlog.h"
 #include "snapshot.h"
 #include "errors.h"

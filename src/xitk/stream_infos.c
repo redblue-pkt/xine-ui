@@ -51,7 +51,7 @@
 extern gGui_t          *gGui;
 
 static char            *sinfosfontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-static char            *lfontname          = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+static char            *lfontname          = "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*";
 
 typedef struct {
   xitk_window_t        *xwin;
@@ -341,10 +341,10 @@ void stream_infos_panel(void) {
 	    bg->gc, 0, 0, width, height, 0, 0);
   
   x = 15;
-  y = 32;
+  y = 35;
   w = WINDOW_WIDTH - 30;
   draw_outter_frame(gGui->imlib_data, bg, _("Title: "), lfontname, 
-		    x - 5, y, w + 10, 20 + 15);
+		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -358,7 +358,7 @@ void stream_infos_panel(void) {
   y += 35;
   w = WINDOW_WIDTH - 30;
   draw_outter_frame(gGui->imlib_data, bg, _("Comment: "), lfontname, 
-		    x - 5, y, w + 10, 20 + 15);
+		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -372,7 +372,7 @@ void stream_infos_panel(void) {
   y += 35;
   w = (WINDOW_WIDTH - 45) >> 1;
   draw_outter_frame(gGui->imlib_data, bg, _("Artist: "), lfontname, 
-		    x - 5, y, w + 10, 20 + 15);
+		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -384,7 +384,7 @@ void stream_infos_panel(void) {
 						     x, y, w, 20, sinfosfontname)));
 
   draw_outter_frame(gGui->imlib_data, bg, _("Genre: "), lfontname, 
-		    (x + w + 15 + 1) - 5, y, w + 10, 20 + 15);
+		    (x + w + 15 + 1) - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -398,7 +398,7 @@ void stream_infos_panel(void) {
   y += 35;
   w = (WINDOW_WIDTH - 60) / 3;
   draw_outter_frame(gGui->imlib_data, bg, _("Album: "), lfontname, 
-		    x - 5, y, w + 10, 20 + 15);
+		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -410,7 +410,7 @@ void stream_infos_panel(void) {
 						     x, y, w, 20, sinfosfontname)));
 
   draw_outter_frame(gGui->imlib_data, bg, _("Year: "), lfontname, 
-		    (x + w + 15 + 1) - 5, y, w + 10, 20 + 15);
+		    (x + w + 15 + 1) - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -421,8 +421,8 @@ void stream_infos_panel(void) {
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x + w + 15, y, w, 20, sinfosfontname)));
 
-  draw_outter_frame(gGui->imlib_data, bg, _("Input: "), lfontname, 
-		    (x + (w * 2) + 30 + 2) - 5, y, w + 10, 20 + 15);
+  draw_outter_frame(gGui->imlib_data, bg, _("Input Plugin: "), lfontname, 
+		    (x + (w * 2) + 30 + 2) - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -436,7 +436,7 @@ void stream_infos_panel(void) {
   y += 35;
   w = (WINDOW_WIDTH - 60) / 3;
   draw_outter_frame(gGui->imlib_data, bg, _("Video Codec: "), lfontname, 
-		    x - 5, y, w + 10, 20 + 15);
+		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -447,8 +447,8 @@ void stream_infos_panel(void) {
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
 
-  draw_outter_frame(gGui->imlib_data, bg, _("Audio: "), lfontname, 
-		    (x + w + 15 + 1) - 5, y, w + 10, 20 + 15);
+  draw_outter_frame(gGui->imlib_data, bg, _("Audio Codec: "), lfontname, 
+		    (x + w + 15 + 1) - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;
@@ -460,7 +460,7 @@ void stream_infos_panel(void) {
 						     x + w + 15, y, w, 20, sinfosfontname)));
   
   draw_outter_frame(gGui->imlib_data, bg, _("System Layer: "), lfontname, 
-		    (x + (w * 2) + 30 + 2) - 5, y, w + 10, 20 + 15);
+		    (x + (w * 2) + 30 + 2) - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
   lbl.gc                = sinfos->widget_list->gc;
   lbl.skin_element_name = NULL;

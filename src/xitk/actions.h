@@ -95,6 +95,8 @@ void gui_viewlog_show(xitk_widget_t *w, void *data);
 
 void gui_kbedit_show(xitk_widget_t *w, void *data);
 
+void gui_stream_infos_show(xitk_widget_t *w, void *data);
+
 void layer_above_video(Window w);
 
 void gui_increase_audio_volume(void);
