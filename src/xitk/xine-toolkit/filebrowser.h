@@ -24,6 +24,7 @@
 #ifndef HAVE_FILEBROWSER_H
 #define HAVE_FILEBROWSER_H
 
+#include <limits.h>
 #include <X11/Xlib.h>
 
 #include "Imlib-light/Imlib.h"

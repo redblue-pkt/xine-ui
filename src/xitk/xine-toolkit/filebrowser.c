@@ -83,6 +83,10 @@ extern int errno;
 #define S_ISDIR(mode) 0
 #endif
 
+#ifndef	NAME_MAX
+#define	NAME_MAX      255
+#endif
+
 #define MAXFILES      4096
 
 #define DEFAULT_SORT 0
