@@ -346,15 +346,25 @@ xscreensaver_command_response (Display *dpy, Window window,
   int status;
   fd_set fds;
   struct timeval tv;
+  time_t starttime, currenttime;
   char err[2048];
 
+  starttime = time(NULL);
   while (1)
     {
       FD_ZERO(&fds);
       FD_SET(fd, &fds);
       memset(&tv, 0, sizeof(tv));
-      tv.tv_sec = timeout;
-      status = select (fd+1, &fds, 0, &fds, &tv);
+      currenttime = time(NULL);
+      if (currenttime - starttime < timeout)
+	{
+          tv.tv_sec = timeout - (currenttime - starttime);
+          status = select (fd+1, &fds, 0, &fds, &tv);
+	}
+      else
+	{
+	  status = 0;
+	}
 
       if (status < 0)
 	{
