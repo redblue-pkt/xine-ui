@@ -64,6 +64,10 @@
 #include "readline.h"
 #include "history.h"
 
+#ifndef	MSG_NOSIGNAL
+#define	MSG_NOSIGNAL	     0
+#endif
+
 #define DEFAULT_XINECTL_PORT "6789"
 #define DEFAULT_SERVER       "localhost"
 
