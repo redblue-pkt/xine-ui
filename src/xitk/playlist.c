@@ -346,27 +346,31 @@ void pl_scan_input(widget_t *w, void *ip) {
     char **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     int i = 0;
     
-    while(autoplay_plugins[i] != NULL) {
-
-      if(!strcasecmp(autoplay_plugins[i], labelbutton_get_label(w))) {
-	char **autoplay_mrls = 
-	  xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i]);
-	int j = 0;
+    if(autoplay_plugins) {
+      while(autoplay_plugins[i] != NULL) {
 	
-	while(autoplay_mrls[j]) {
-	  gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
-	  j++;
+	if(!strcasecmp(autoplay_plugins[i], labelbutton_get_label(w))) {
+	  char **autoplay_mrls = 
+	    xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i]);
+	  int j = 0;
+	  
+	  if(autoplay_mrls) {
+	    while(autoplay_mrls[j]) {
+	      gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
+	      j++;
+	    }
+	    
+	    gGui->playlist_num += j;
+	    gGui->playlist_cur = 0;
+	    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	  }
 	}
-
-	gGui->playlist_num += j;
-	gGui->playlist_cur = 0;
-	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	
+	i++;
       }
-
-      i++;
+      
+      browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
     }
-
-    browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
   }
 }
 
