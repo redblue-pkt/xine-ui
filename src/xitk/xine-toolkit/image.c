@@ -239,9 +239,13 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
   else
 #endif
     {
+#if HAVE_SHM /* Just to make GCC happy */
     __noxshm_pixmap:
+#endif
       xpix->shm     = 0;
+#if HAVE_SHM
       xpix->shminfo = NULL;
+#endif
       xpix->pixmap  = XCreatePixmap(im->x.disp, im->x.base_window, width, height, depth);
     }
   
