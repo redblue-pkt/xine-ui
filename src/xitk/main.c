@@ -107,7 +107,8 @@ static const char *short_options = "?hHgfvn"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::";
+ "u:a:V:A:p::s:RG:BN:P:l::S:";
+
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
@@ -140,6 +141,7 @@ static struct option long_options[] = {
   {"loop"           , optional_argument, 0, 'l'                      },
   {"skin-server-url", required_argument, 0, OPTION_SK_SERVER         },
   {"enqueue"        , required_argument, 0, OPTION_ENQUEUE           },
+  {"session"        , required_argument, 0, 'S'                      },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -858,9 +860,7 @@ int main(int argc, char *argv[]) {
   char                  **_argv;
   int                     _argc;
   int                     driver_num;
-  int                     session;
-  int                     enqueue = 0;
-  char                   *enq_mrls[4096];
+  int                     session = -1;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1103,7 +1103,19 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_ENQUEUE:
-      enq_mrls[enqueue++] = strdup(optarg);
+      {
+	char eqmrl[strlen(optarg) + 256];
+	
+	if(session >= 0) 
+	  sprintf(eqmrl, "session=%d,mrl=%s", session, optarg);
+	else
+	  sprintf(eqmrl, "mrl=%s", optarg);
+	session_handle_subopt(eqmrl, &session);
+      }
+      break;
+
+    case 'S':
+      session_handle_subopt(optarg, &session);
       break;
 
     case 'v': /* Display version and exit*/
@@ -1124,20 +1136,9 @@ int main(int argc, char *argv[]) {
     }
   }
   
-  if(enqueue) {
-    int p;
-    
-    if(is_remote_running(session)) {
-      for(p = 0; p < enqueue; p++) {
-	printf(_("Enqueue '%s'\n"), enq_mrls[p]);
-	send_string(session, CMD_PLAYLIST_ADD, enq_mrls[p]);
-	       }
-    }
-    else
-      printf(_("Session %d isn't running. Aborted.\n"), session);
-
+  /* Session feature was used, say good bye */
+  if(session >= 0)
     return 0;
-  }
 
   /* 
    * Using root window mode don't allow

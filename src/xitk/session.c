@@ -22,12 +22,19 @@
  */
 /* Largely inspired of xmms control socket stuff */
 
+/* required for getsubopt(); the __sun test gives us strncasecmp() on solaris */
+#ifndef __sun
+#define _XOPEN_SOURCE 500
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <strings.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/socket.h>
@@ -35,6 +42,8 @@
 #include <errno.h>
 
 #include "common.h"
+
+extern gGui_t          *gGui;
 
 #define CTRL_PROTO_VERSION    0x1
 
@@ -56,25 +65,6 @@ static pthread_t     thread_server;
 static char         *socket_name;
 
 static void send_packet(int fd, ctrl_commands_t command, void *data, uint32_t data_length);
-
-/*
-  single session (store session id in gGui struct)
-
-  commands: add enqueue
-  ------------------------
-  ------------------------
-
-  server thread;
-
-  read/write: pass struct pointer;
-
-
-  packet_send
-  packet_read
-  ack_send
-  ack_read
-
-*/
 
 static int connect_to_session(int session) {
   int fd;
@@ -100,7 +90,6 @@ static int connect_to_session(int session) {
   return -1;
 }
 
-/* READ */
 static void *read_packet(int fd, ctrl_header_packet_t *hdr) {
   void *data = NULL;
   
@@ -122,8 +111,6 @@ static void read_ack(int fd) {
   SAFE_FREE(data);
 }
 
-
-/* SEND */
 static void _send_packet(int fd, void *data, ctrl_header_packet_t *hdr) {
 
   write(fd, hdr, sizeof(ctrl_header_packet_t));
@@ -131,6 +118,7 @@ static void _send_packet(int fd, void *data, ctrl_header_packet_t *hdr) {
   if(hdr->data_length && data)
     write(fd, data, hdr->data_length);
 }
+
 static void send_packet(int fd, ctrl_commands_t command, void *data, uint32_t data_length) {
   ctrl_header_packet_t  hdr;
   
@@ -165,6 +153,7 @@ void send_uint32(int session, ctrl_commands_t command, uint32_t value) {
   read_ack(fd);
   close(fd);
 }
+
 uint32_t get_uint32(int session, ctrl_commands_t command) {
   ctrl_header_packet_t  hdr;
   void                 *data;
@@ -195,6 +184,7 @@ void send_boolean(int session, ctrl_commands_t command, uint8_t value) {
   read_ack(fd);
   close(fd);
 }
+
 uint8_t get_boolean(int session, ctrl_commands_t command) {
   ctrl_header_packet_t  hdr;
   uint8_t               ret = 0;
@@ -225,6 +215,7 @@ void send_string(int session, ctrl_commands_t command, char *string) {
   read_ack(fd);
   close(fd);
 }
+
 char *get_string(int session, ctrl_commands_t command) {
   ctrl_header_packet_t  hdr;
   char                 *data = NULL;
@@ -260,7 +251,6 @@ int is_remote_running(int session) {
 
 
 #ifndef CTRL_TEST
-/* SERVER */
 void *ctrlsocket_func(void *data) {
   fd_set                set;
   struct timeval        tv;
@@ -297,8 +287,79 @@ void *ctrlsocket_func(void *data) {
     shdr->fd = fd;
 
     switch(shdr->hdr.command) {
+
+    case CMD_PLAY:
+      gui_play(NULL, NULL);
+      send_ack(shdr);
+      break;
       
+    case CMD_SLOW_2:
+      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_2);
+      send_ack(shdr);
+      break;
+
+    case CMD_SLOW_4:
+      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
+      send_ack(shdr);
+      break;
+
+    case CMD_PAUSE:
+      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+      send_ack(shdr);
+      break;
+
+    case CMD_FAST_2:
+      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_FAST_2);
+      send_ack(shdr);
+      break;
+
+    case CMD_FAST_4:
+      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_FAST_4);
+      send_ack(shdr);
+      break;
+
+    case CMD_STOP:
+      gui_stop(NULL, NULL);
+      send_ack(shdr);
+      break;
+
+    case CMD_QUIT:
+      gui_exit(NULL, NULL);
+      send_ack(shdr);
+      break;
+
+    case CMD_FULLSCREEN:
+      gui_set_fullscreen_mode(NULL, NULL);
+      send_ack(shdr);
+      break;
+
+    case CMD_EJECT:
+      gui_eject(NULL, NULL);
+      send_ack(shdr);
+      break;
+
+    case CMD_AUDIO_NEXT:
+      gui_change_audio_channel(NULL, (void *) GUI_NEXT);
+      send_ack(shdr);
+      break;
+
+    case CMD_AUDIO_PREV:
+      gui_change_audio_channel(NULL, (void *) GUI_PREV);
+      send_ack(shdr);
+      break;
+
+    case CMD_SPU_NEXT:
+      gui_change_spu_channel(NULL, (void *) GUI_NEXT);
+      send_ack(shdr);
+      break;
+
+    case CMD_SPU_PREV:
+      gui_change_spu_channel(NULL, (void *) GUI_PREV);
+      send_ack(shdr);
+      break;
+	
     case CMD_PLAYLIST_FLUSH:
+      playlist_delete_all(NULL, NULL);
       send_ack(shdr);
       break;
       
@@ -308,12 +369,25 @@ void *ctrlsocket_func(void *data) {
       break;
       
     case CMD_PLAYLIST_NEXT:
+      gui_direct_nextprev(NULL, (void *) GUI_NEXT, 1);
+      send_ack(shdr);
+      break;
+
     case CMD_PLAYLIST_PREV:
+      gui_direct_nextprev(NULL, (void *) GUI_PREV, 1);
+      send_ack(shdr);
+      break;
+
+    case CMD_PLAYLIST_LOAD:
+      printf("load: '%s'\n", (char *)shdr->data);
+      mediamark_load_mediamarks((const char *)shdr->data);
+      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      if((!is_playback_widgets_enabled()) && gGui->playlist.num)
+	enable_playback_controls(1);
       send_ack(shdr);
       break;
 
     case CMD_GET_VERSION:
-      printf("GET VERSION\n");
       send_packet(shdr->fd, CMD_GET_VERSION, VERSION,  strlen(VERSION));
       send_ack(shdr);
       break;
@@ -346,11 +420,7 @@ int setup_ctrlsocket(void) {
 	  printf("setup_ctrlsocket(): Failed to unlink %s (Error: %s)", 
 		 saddr.sun_path, strerror(errno));
 	}
-	else
-	  printf("Unlink OK\n");
       }
-      else
-	printf("remote_is_running()\n");
       
       if((bind(ctrl_fd, (struct sockaddr *) &saddr, sizeof (saddr))) != -1) {
 
@@ -359,7 +429,6 @@ int setup_ctrlsocket(void) {
 	going = 1;
 	
 	pthread_create(&thread_server, NULL, ctrlsocket_func, NULL);
-#warning CHECK RETURN CODE
 	socket_name = strdup(saddr.sun_path);
 	retval = 1;
 	break;
@@ -383,6 +452,166 @@ int setup_ctrlsocket(void) {
   return retval;
 }
 
+void session_handle_subopt(char *suboptarg, int *session) {
+  char        *sopts = suboptarg;
+  int          optsess = -1;
+  int          playlist_clear, playlist_next, playlist_prev = 0;
+  int          audio_next, audio_prev, spu_next, spu_prev;
+  char        *playlist_load = NULL;
+  int          fullscreen, s, c;
+  uint32_t     state;
+  char        *optstr;
+  char       **mrls = NULL;
+  int          num_mrls = 0;
+  const char  *tokens[] = {
+    /* Don't change order */
+    "play", "slow2", "slow4", "pause", "fast2", "fast4", "stop", "quit", "fullscreen", "eject",
+    "audio", "spu", "session", "mrl", "playlist", "pl", NULL
+  };
+  
+  playlist_clear = playlist_next = playlist_prev = fullscreen = 0;
+  audio_next = audio_prev = spu_next = spu_prev = 0;
+  state = 0;
+
+  while((c = getsubopt(&sopts, (char *const *)tokens, &optstr)) != -1) {
+    switch(c) {
+
+      /* play -> eject */
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+      state |= 0x80000000 >> c;
+      break;
+
+      /* audio */
+    case 10:
+      if(!strcasecmp(optstr, "next"))
+	audio_next++;
+      else if(!strcasecmp(optstr, "prev"))
+	audio_prev++;
+      break;
+
+      /* spu */
+    case 11:
+      if(!strcasecmp(optstr, "next"))
+	spu_next++;
+      else if(!strcasecmp(optstr, "prev"))
+	spu_prev++;
+      break;
+
+      /* session */
+    case 12:
+      if((atoi(optstr)) >= 0)
+	optsess = atoi(optstr);
+      break;
+
+      /* mrl */
+    case 13:
+      if(num_mrls == 0)
+	mrls = (char **) xine_xmalloc(sizeof(char *) * 2);
+      else
+	mrls = (char **) realloc(mrls, sizeof(char *) * (num_mrls + 2));
+	
+	mrls[num_mrls++] = strdup(optstr);
+	mrls[num_mrls]   = NULL;
+      break;
+
+      /* playlist */
+    case 14:
+    case 15:
+      if(!strcasecmp(optstr, "clear"))
+	playlist_clear = 1;
+      else if(!strcasecmp(optstr, "next"))
+	playlist_next++;
+      else if(!strcasecmp(optstr, "prev"))
+	playlist_prev++;
+      else if(!strncasecmp(optstr, "load:", 5))
+	playlist_load = strdup(optstr + 5);
+      break;
+
+    }
+  }
+  
+  *session = (optsess >= 0) ? optsess : 0;
+  
+  if(is_remote_running(*session)) {
+    
+    if((state << (CMD_QUIT - 1)) & 0x80000000)
+      remote_cmd(*session, CMD_QUIT);
+
+    if(playlist_clear)
+      remote_cmd(*session, CMD_PLAYLIST_FLUSH);
+
+    if(playlist_load) {
+      send_string(*session, CMD_PLAYLIST_LOAD, playlist_load);
+      free(playlist_load);
+    }
+
+    while(playlist_next) {
+      remote_cmd(*session, CMD_PLAYLIST_NEXT);
+      playlist_next--;
+    }
+
+    while(playlist_prev) {
+      remote_cmd(*session, CMD_PLAYLIST_PREV);
+      playlist_prev--;
+    }
+    
+    if(num_mrls) {
+      int i;
+
+      for(i = 0; i < num_mrls; i++)
+	send_string(*session, CMD_PLAYLIST_ADD, mrls[i]);
+
+      for(i = 0; i < num_mrls; i++)
+	free(mrls[i]);
+      
+      free(mrls);
+    }
+    
+    /* 
+     * CMD_PLAY, CMD_SLOW_4, CMD_SLOW_2, CMD_PAUSE, CMD_FAST_2, 
+     * CMD_FAST_4, CMD_STOP, CMD_FULLSCREEN, CMD_EJECT
+     */
+    if(state) {
+      for(s = 0; s < 9; s++) {
+	if(((state << s) & 0x80000000) && ((s + 1) != CMD_QUIT))
+	  remote_cmd(*session, (s + 1));
+      }
+    }
+
+    while(audio_next) {
+      remote_cmd(*session, CMD_AUDIO_NEXT);
+      playlist_next--;
+    }
+
+    while(audio_prev) {
+      remote_cmd(*session, CMD_AUDIO_PREV);
+      playlist_next--;
+    }
+
+    while(spu_next) {
+      remote_cmd(*session, CMD_SPU_NEXT);
+      spu_next--;
+    }
+
+    while(spu_prev) {
+      remote_cmd(*session, CMD_SPU_PREV);
+      spu_prev--;
+    }
+
+  }
+  else
+    printf(_("Session %d isn't running.\n"), *session);
+}
+
 #else /* CTRL_TEST */
 
 int main(int argc, char **argv) {
@@ -403,3 +632,4 @@ int main(int argc, char **argv) {
   return 1;
 }
 #endif
+

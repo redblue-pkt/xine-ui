@@ -24,10 +24,26 @@
 #define CTRLSOCKS_H
 
 typedef enum {
-  CMD_PLAYLIST_FLUSH = 1,
+  /* Don't change order */
+  CMD_PLAY = 1,
+  CMD_SLOW_4,
+  CMD_SLOW_2,
+  CMD_PAUSE,
+  CMD_FAST_2,
+  CMD_FAST_4,
+  CMD_STOP,
+  CMD_QUIT,
+  CMD_FULLSCREEN,
+  CMD_EJECT,
+  CMD_AUDIO_NEXT,
+  CMD_AUDIO_PREV,
+  CMD_SPU_NEXT,
+  CMD_SPU_PREV,
+  CMD_PLAYLIST_FLUSH,
   CMD_PLAYLIST_ADD,
   CMD_PLAYLIST_NEXT,
   CMD_PLAYLIST_PREV,
+  CMD_PLAYLIST_LOAD,
   CMD_GET_VERSION,
   CMD_PING
 } ctrl_commands_t;
@@ -41,5 +57,7 @@ char *get_string(int session, ctrl_commands_t command);
 int is_remote_running(int session);
 
 int setup_ctrlsocket(void);
+
+void session_handle_subopt(char *optarg, int *session);
 
 #endif

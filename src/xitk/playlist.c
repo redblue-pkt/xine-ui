@@ -281,7 +281,7 @@ static void _playlist_delete(xitk_widget_t *w, void *data) {
 /*
  * Delete all MRLs
  */
-static void _playlist_delete_all(xitk_widget_t *w, void *data) {
+void playlist_delete_all(xitk_widget_t *w, void *data) {
 
   mmk_editor_end();
 
@@ -290,8 +290,10 @@ static void _playlist_delete_all(xitk_widget_t *w, void *data) {
   
   if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
     gui_stop(NULL, NULL);
-
-  xitk_inputtext_change_text(playlist->winput, NULL);
+  
+  if(playlist && playlist->winput)
+    xitk_inputtext_change_text(playlist->winput, NULL);
+  
   gui_set_current_mrl(NULL);
   enable_playback_controls(0);
 }
@@ -1125,7 +1127,7 @@ void playlist_editor(void) {
   xitk_set_widget_tips(playlist->delete, _("Delete selected MRL from playlist"));
 
   b.skin_element_name = "PlDeleteAll";
-  b.callback          = _playlist_delete_all;
+  b.callback          = playlist_delete_all;
   b.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->delete_all = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
