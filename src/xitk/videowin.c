@@ -1930,6 +1930,11 @@ void video_window_get_frame_size(int *w, int *h) {
     *w = gVw->frame_width;
   if(h)
     *h = gVw->frame_height;
+  if (!gVw->frame_width && !gVw->frame_height) {
+    /* fall back to meta info */
+    *w = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+    *h = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+  }
 }
 
 void video_window_get_visible_size(int *w, int *h) {
