@@ -26,8 +26,23 @@
 
 typedef struct filebrowser_s filebrowser_t;
 
-filebrowser_t *open_filebrowser(void);
-void fb_raise_window(filebrowser_t *fb);
+typedef void (*filebrowser_callback_t)(filebrowser_t *);
+
+typedef struct {
+  char                     *label;
+  filebrowser_callback_t    callback;
+} filebrowser_callback_button_t;
+		
+
+filebrowser_t *create_filebrowser(char *, char *,
+				  filebrowser_callback_button_t *, filebrowser_callback_button_t *);
+
+void filebrowser_raise_window(filebrowser_t *);
+void filebrowser_end(filebrowser_t *);
+char *filebrowser_get_current_dir(filebrowser_t *);
+char *filebrowser_get_current_filename(filebrowser_t *);
+char *filebrowser_get_full_filename(filebrowser_t *);
+char **filebrowser_get_all_files(filebrowser_t *);
 
 
 #endif
