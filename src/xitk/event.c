@@ -1009,8 +1009,12 @@ void gui_playlist_start_next(void) {
       
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset))
-	gui_display_logo();
+				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
+	if(!mediamark_all_played())
+	  goto __shuffle_restart;
+	else
+	  gui_display_logo();
+      }
     }
     else {
       mediamark_reset_played_state();
