@@ -83,7 +83,7 @@ int       no_lirc;
 #define DISPLAY_KEYMAP          1002
 
 /* options args */
-static const char *short_options = "?h"
+static const char *short_options = "?hgH"
 #ifdef HAVE_LIRC
  "L"
 #endif
@@ -93,7 +93,7 @@ static const char *short_options = "?h"
 #ifdef DEBUG
  "d:"
 #endif
- "R::u:a:V:A:D:p::s:g:f:v";
+ "R::u:a:V:A:D:p::s:f:v";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
@@ -113,6 +113,7 @@ static struct option long_options[] = {
   {"auto-play"      , optional_argument, 0, 'p'                      },
   {"auto-scan"      , required_argument, 0, 's'                      },
   {"hide-gui"       , no_argument,       0, 'g'                      },
+  {"hide-video"     , no_argument,       0, 'H'                      },
   {"fullscreen"     , no_argument,       0, 'f'                      },
   {"visual"	    , required_argument, 0,  OPTION_VISUAL           },
   {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
@@ -183,13 +184,14 @@ void show_usage (void) {
   printf("                    'h': hide GUI (panel, etc.).\n");
   printf("                    'q': quit when play is done.\n");
   printf("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n");
-  printf("                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n");
+  printf("                    'v': retrieve plqaylist from VCD. (deprecated. use -s VCD)\n");
   printf("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n");
   printf("  -f, --fullscreen             start in fullscreen mode,\n");
 #ifdef HAVE_XF86VIDMODE
   printf("  -F, --use-xvidext            Enable XF86VidMode Extension support\n");
 #endif
-  printf("  -g, --hide-gui               hide GUI (panel, etc.),\n");
+  printf("  -g, --hide-gui               hide GUI (panel, etc.)\n");
+  printf("  -H, --hide-video             hide video window\n");
 #ifdef HAVE_LIRC
   printf("  -L, --no-lirc                Turn off LIRC support.\n");
 #endif
@@ -660,6 +662,10 @@ int main(int argc, char *argv[]) {
 
     case 'g': /* hide panel on start */
       gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
+      break;
+
+    case 'H': /* hide video on start */
+      gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
       break;
 
     case 'f': /* full screen mode on start */
