@@ -469,9 +469,17 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->print = skin_get_bool_value(p);
 	}
+	else if(!strncasecmp(skonfig->ln, "timer", 5)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->animation_timer = strtol(p, &p, 10);
+	}
 	else if(!strncasecmp(skonfig->ln, "font", 4)) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->font = strdup(p);
+	}
+	else if(!strncasecmp(skonfig->ln, "step", 4)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->animation_step = strtol(p, &p, 10);
 	}
 
       }
@@ -654,6 +662,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
 	printf("  browser entries = %d\n", s->browset_entries);
 
       printf("  animation   = %d\n", s->animation);
+      printf("  step        = %d\n", s->animation_step);
       printf("  print       = %d\n", s->print);
       printf("  static      = %d\n", s->staticity);
       printf("  length      = %d\n", s->length);
@@ -676,6 +685,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  direction   = %d\n", s->direction);
       printf("  pixmap      = '%s'\n", s->pixmap);
       printf("  animation   = %d\n", s->animation);
+      printf("  step        = %d\n", s->animation_step);
       printf("  print       = %d\n", s->print);
       printf("  static      = %d\n", s->staticity);
       printf("  length      = %d\n", s->length);
@@ -1003,6 +1013,31 @@ int xitk_skin_get_label_animation(xitk_skin_config_t *skonfig, const char *str) 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->animation;
 
+  return 0;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_label_animation_step(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+
+  assert(skonfig);
+
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->animation_step;
+
+  return 1;
+}
+
+unsigned long xitk_skin_get_label_animation_timer(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->animation_timer;
+  
   return 0;
 }
 

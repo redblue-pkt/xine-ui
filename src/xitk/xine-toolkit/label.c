@@ -223,13 +223,16 @@ static void paint_label(xitk_widget_t *w) {
 void *xitk_label_animation_loop(void *data) {
   label_private_data_t *private_data = (label_private_data_t *)data;
   xitk_widget_t        *w            = private_data->lWidget;
-  unsigned long         t_anim       = xitk_get_timer_label_animation();
+  unsigned long         t_anim       = private_data->anim_timer;
+  
+  if(t_anim == 0)
+    t_anim = xitk_get_timer_label_animation();
   
   do {
     
     if(w && (w->visible == 1)) {
       
-      private_data->anim_offset++;
+      private_data->anim_offset += private_data->anim_step;
 
       if (private_data->anim_offset > 
 	  (private_data->char_length * (strlen(private_data->label) + 5)))
@@ -330,6 +333,8 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       
       private_data->length      = xitk_skin_get_label_length(skonfig, private_data->skin_element_name);
       private_data->animation   = xitk_skin_get_label_animation(skonfig, private_data->skin_element_name);
+      private_data->anim_step   = xitk_skin_get_label_animation_step(skonfig, private_data->skin_element_name);
+      private_data->anim_timer  = xitk_skin_get_label_animation_timer(skonfig, private_data->skin_element_name);
       w->x                      = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
       w->y                      = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       w->width                  = private_data->char_length * private_data->length;
@@ -488,7 +493,8 @@ static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
   private_data->label          = NULL;
   private_data->animation      = (skin_element_name == NULL) ? 0 : xitk_skin_get_label_animation(skonfig, private_data->skin_element_name);
   private_data->anim_running   = 0;
-
+  private_data->anim_step      = (skin_element_name == NULL) ? 1 : xitk_skin_get_label_animation_step(skonfig, private_data->skin_element_name);
+  private_data->anim_timer     = xitk_skin_get_label_animation_timer(skonfig, private_data->skin_element_name);
   private_data->labelpix       = NULL;
 
   pthread_mutex_init(&private_data->paint_mutex, NULL);

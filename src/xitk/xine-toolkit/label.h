@@ -47,6 +47,8 @@ typedef struct {
   void                   *userdata;
 
   int                     animation;
+  int                     anim_step;
+  int                     anim_timer;
   int                     anim_running;
   int                     anim_offset;
 

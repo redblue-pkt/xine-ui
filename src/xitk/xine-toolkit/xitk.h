@@ -1603,6 +1603,16 @@ int xitk_skin_get_label_animation(xitk_skin_config_t *, const char *);
 /*
  *
  */
+int xitk_skin_get_label_animation_step(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
+unsigned long xitk_skin_get_label_animation_timer(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
 int xitk_skin_get_label_alignment(xitk_skin_config_t *, const char *);
 
 /*

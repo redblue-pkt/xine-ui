@@ -52,6 +52,8 @@ typedef struct xitk_skin_element_s {
   int                           print;
   int                           align;
   int                           animation;
+  int                           animation_step;
+  unsigned long                 animation_timer;
   int                           length;
   char                         *pixmap_font;
   char                         *color;
