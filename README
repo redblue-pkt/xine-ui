@@ -5,5 +5,5 @@ LIBTOOL version:
 can grab the source tarball from an official GNU ftp server if there is no 
 binary package available for your distro.
 
-Also, You should probably apply the patch (automake.diff) to automake (will
+Also, you should probably apply the patch (automake.diff) to automake (will
 be unnecessary in futur automake release).
