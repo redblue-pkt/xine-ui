@@ -228,7 +228,7 @@ void gui_toggle_aspect(void) {
 void gui_toggle_interlaced(void) {
 
   gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_INTERLACED,
-                                 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_INTERLACED) + 1);
+                                 1-gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_INTERLACED));
 
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);

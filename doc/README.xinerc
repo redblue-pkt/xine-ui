@@ -42,6 +42,13 @@ audio_resample_mode	Adjust whether resampling is done or not.
 colorkey                colorkey to use, may be usefull to change
                         if parts of your desktop become transparent
 
+deinterlace_method	method to use for software-deinterlacing:
+			0 none
+			1 bob
+			2 weave
+			3 greedy
+			4 onefield (default)
+
 dvd_device              path to your local dvd device file
 			(e.g. /dev/hdc, /dev/cdrom, /dev/dvd)
 

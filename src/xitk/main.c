@@ -103,7 +103,6 @@ static struct option long_options[] = {
   {"audio-channel"  , required_argument, 0, 'a' },
   {"video-driver"   , required_argument, 0, 'V' },
   {"audio-driver"   , required_argument, 0, 'A' },
-  {"deinterlace"    , required_argument, 0, 'D' },
   {"auto-play"      , optional_argument, 0, 'p' },
   {"auto-scan"      , required_argument, 0, 's' },
   {"hide-gui"       , no_argument,       0, 'g' },
@@ -171,7 +170,6 @@ void show_usage (void) {
 
   printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
-  printf("  -D, --deinterlace <method>   Enable soft deinterlacing ('help' for list).\n");
   printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
   printf("                    'q': quit when play is done.\n");
   printf("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n");
@@ -249,46 +247,6 @@ int handle_debug_subopt(char *sopt) {
   return 1;
 }
 #endif
-
-/*
- * Handle soft deinterlace method selection
- * FIXME: should we have a function for obtaining available methods?
- */
-
-int handle_deinterlace_subopt(char *sopt) {
-  int i, subopt;
-  char *str = sopt;
-  char *val = NULL;
-  char *method[] = {
-    "none","bob","weave","greedy","onefield",
-    NULL
-  };
-
-  if( sscanf(sopt," %d",&subopt) )
-    return subopt;
-
-  while(*str) {
-    subopt = getsubopt(&str, method, &val);
-    switch(subopt) {
-    case -1:
-      i = 0;
-      fprintf(stderr, "Valid methods are:\n\t");
-      while(method[i] != NULL) {
-	fprintf(stderr,"%s, ", method[i]);
-	i++;
-      }
-      fprintf(stderr, "\b\b.\n");
-      fprintf(stderr, "\nwarning: some methods may require MMX.\n");
-      fprintf(stderr, "         currently only implemented for Xv driver.\n");
-      return -1;
-    default:
-      return subopt;
-      break;
-    }
-  }
-
-  return -1;
-}
 
 /*
  * Handle sub-option of 'recognize-by' command line argument
@@ -533,7 +491,6 @@ int main(int argc, char *argv[]) {
   int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
   int              audio_channel = 0;
   int              spu_channel = -1;
-  int		   deinterlace_method = 0;
   /*  int              audio_options = 0; FIXME */
   int		   visual = 0;
   char            *audio_driver_id = NULL;
@@ -636,14 +593,6 @@ int main(int argc, char *argv[]) {
       } else {
 	fprintf (stderr, "audio driver id required for -A option\n");
 	exit (1);
-      }
-      break;
-
-    case 'D': /* Select soft deinterlace */
-      if(optarg != NULL) {
-	deinterlace_method=handle_deinterlace_subopt(chomp(optarg));
-        if( deinterlace_method == -1 )
-	  exit(1);
       }
       break;
 
@@ -774,8 +723,6 @@ int main(int argc, char *argv[]) {
 
   xine_select_audio_channel (gGui->xine, audio_channel);
   xine_select_spu_channel (gGui->xine, spu_channel);
-  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_SOFT_DEINTERLACE,
-                                 deinterlace_method);
 
   /*
    * Register an event listener
