@@ -50,11 +50,31 @@ in your .xinerc so you'll have to specify the audio driver only once.
 Select subpicture (subtitle) channel. <num> is the subpicture channel
 id, default is no subtitle (-1).
 .TP
-.B \-p[f][h][q][d][v]
-Start playing immediately after start. Can be followed by "f" to turn
-on fullscreen mode and/or "h" to hide GUI, and/or by "q" for quitting 
-at the end. It is also possible to request the playlist from DVD 'd',
-or VCD 'v'.
+.B \-p[q][d][v], \-\-auto\-play=[q][d][v]
+Start playing immediately after start. Can be followed by "q" for quitting 
+at the end. As in earlier versions of xine, it is also possible to request
+the playlist from DVD 'd', or VCD 'v'. There is now a more generic option,
+\-\-auto\-scan, for that (see below). So the "d" and "v" suboptions may be
+removed some day.
+.TP
+.B \-s <plugin>, \-\-auto\-scan <plugin>
+Auto-scan playlist from named input plugin. Many plugins allow to read a
+default playlist, in order to play "everything". This works fine for DVDs
+or VCDs, for example. Giving this option has the same effect as pressing
+the according button on xine's main panel.
+
+This option is especially useful in combination with auto-play. You could
+start "xine --auto-play --auto-scan dvd" in order to play a whole DVD without
+having to press any additional buttons. This also works for plugins that are
+not supplied with xine, just give the name of the button that the desired
+plugin adds to the xine panel!
+.TP
+.B \-f, \-\-fullscreen
+Switch xine to fullscreen mode on start (just like pressing "F")
+.TP
+.B \-g, \-\-hide\-gui
+Hide all GUI windows (except the video window) on start. This is the same as
+pressing "G" within xine.
 .TP
 .B \-R, \-\-recognize\-by <option>
 Change the way xine will try to recognize stream types. 
