@@ -844,11 +844,15 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     /* message (dialog) for the ui to display */
   case XINE_EVENT_UI_MESSAGE: 
     if(event->stream == gGui->stream) {
-      xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
-      
-      if(uevent->str) {
-	xine_info((char *)uevent->str);
-	osd_display_info((char *)uevent->str);
+      xine_ui_message_data_t *data = (xine_ui_message_data_t *) event->data;
+
+      /* TODO: check num_parameters, provide customized messages, hints... */
+      if(data->explanation) {
+	xine_info("%s %s",data->explanation, data->parameters);
+	osd_display_info("%s %s",data->explanation, data->parameters);
+      } else {
+	xine_info(data->parameters);
+	osd_display_info(data->parameters);
       }
     }
     break;

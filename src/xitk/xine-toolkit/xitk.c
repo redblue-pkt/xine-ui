@@ -1679,7 +1679,7 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   while(gXitk->running) {
 
 #define XEVENT_NEW_METHOD 1
-#undef  FORWARD_COMPLETION
+#define FORWARD_COMPLETION
     
 #if XEVENT_NEW_METHOD
     
