@@ -40,6 +40,8 @@ CURL_VERSION=-version-info 2:2:0
 # set age to 0.
 #
 
+AM_CFLAGS = -I$(srcdir) -I.
+
 if NO_UNDEFINED
 # The -no-undefined flag is CRUCIAL for this to build fine on Cygwin. If we
 # find a case in which we need to remove this flag, we should most likely
