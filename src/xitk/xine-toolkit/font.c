@@ -78,7 +78,6 @@ void xitk_font_cache_done(void) {
   size_t       i;
   xitk_font_t *xtfs;
 
-  pthread_mutex_destroy(&cache.mutex);
   for (i = 0; i < cache.n; i++) {
     xtfs = cache.items[i].font;
 
@@ -354,11 +353,9 @@ xitk_font_t *xitk_font_load_font(Display *display, char *font) {
         pthread_mutex_unlock(&cache.mutex);
         return NULL;
       }
-      xtfs->name = strdup(fname);
-    } 
-    else
-      xtfs->name = strdup(font);
-  
+    }
+
+    xtfs->name = strdup(font);
     xtfs->display = display;
 
 #ifdef LOG
