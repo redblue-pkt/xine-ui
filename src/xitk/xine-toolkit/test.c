@@ -741,7 +741,7 @@ static void create_browser(void) {
   browser.browser.skin_element_name     = NULL;
   browser.browser.max_displayed_entries = 8;
   browser.browser.num_entries           = test->num_entries;
-  browser.browser.entries               = test->entries;
+  browser.browser.entries               = (const char *const *)test->entries;
   browser.callback                      = change_inputtext;
   browser.dbl_click_callback            = change_inputtext_dbl_click;
   browser.parent_wlist                  = test->widget_list;
@@ -752,7 +752,8 @@ static void create_browser(void) {
 						test->widget_list->gc, 20, 30, 
 						100, 20, 12, fontname)));
   
-  xitk_browser_update_list(test->browser, test->entries, test->num_entries, 0);
+  xitk_browser_update_list(test->browser, 
+			   (const char *const *)test->entries, test->num_entries, 0);
 
 }
 

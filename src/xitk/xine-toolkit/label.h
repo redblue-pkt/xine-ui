@@ -61,6 +61,7 @@ typedef struct {
   int                     on_change;
 
   pthread_t               thread;
+  pthread_mutex_t         paint_mutex;
 
 } label_private_data_t;
 
