@@ -6,7 +6,7 @@
                          FAQ (Häufig gestellte Fragen)
 
 
-______________________________________________________________2002/05/27 (1.16)
+______________________________________________________________2002/09/10 (1.18)
 INDEX
 
 
@@ -86,6 +86,9 @@ INDEX
 5.4.8      "No video plugin available to decode 'xxxxxx'."
 5.4.9      "w32codec: decoder failed to start. Is 'xxxxxx' installed?"
 5.4.10     "xine-lib xxx expected. Version xxx found"
+
+5.5     Abstürze: Wenn man keine hilfreichen Fehlermeldungen bekommt
+5.5.1      Warum bringt xine den Rechner zum (Total-)Absturz?
 
 
 6       BUGS - RAUS MIT DEN KÄFERN!
@@ -1055,6 +1058,33 @@ _____________________________________________________________________________
            ("rm $prefix/lib/libxine*", und wo Sie schon dabei sind auch alle
            alten Plugins in $prefix/lib/xine/plugins/). Installieren Sie danach
            xine-lib und xine-ui erneut, womit das Problem behoben sein sollte.
+
+
+5.5     Abstürze: Wenn man keine hilfreichen Fehlermeldungen bekommt
+
+5.5.1      Warum bringt xine den Rechner zum (Total-)Absturz?
+
+	   xine bringt den Rechner nicht zum Absturz; als ein Benutzerprogramm
+	   ohne root-Rechte kann es das nicht.
+	   Was den Rechner abstürzen läßt ist der X-Server. Wahrscheinlich hat
+	   die Grafikkarte einen Savage-Chipsatz, der eine defekte
+	   Xv-Implementierung hat. Um Abstürze zu Vermeiden, sollten Sie auf Xv
+	   verzichten und als Zwischenlösung xine folgendermaßen starten:
+
+              xine -V xshm
+
+	   Leider ist das sehr viel langsamer, da solche Dinge wie Skalieren
+	   und Farbraumtransformationen jetzt in Software ausgeführt werden.
+
+	   Evtl. gibt es in der Zwischenzeit bereits eine neuere Version von
+	   XFree, welche dieses Problem beseitigt. In diesem Fall können Sie
+	   mit folgendem Aufruf zurückschalten:
+
+              xine -V xv
+
+	   Falls das Problem behoben sein sollte, informieren Sie bitte uns
+	   xine Programmierer unter <xine-user.de@lists.sf.net>, damit wir
+	   diese FAQ aktualisieren können.
 
 
 _____________________________________________________________________________
