@@ -107,7 +107,6 @@ typedef struct {
   gui_list_t         *gfx;
   pthread_t           thread;
   pthread_mutex_t     mutex;
-  pthread_mutex_t     run_mutex;
   int                 running;
   widgetkey_t         key;
 } __widget_t;
@@ -132,7 +131,8 @@ static void xitk_signal_handler(int sig) {
       fprintf(stderr, "XITK killed with signal %d\n", sig);
 
       MUTLOCK();
-      pthread_mutex_unlock(&widl->run_mutex);
+      
+      widl->running = 0;
 
       /* 
        * Tada.... and now Ladies and Gentlemen, the dirty hack
@@ -506,28 +506,6 @@ static void widget_xevent_notify(XEvent *event) {
 }
 
 /*
- * Thread that wait for an xevent
- */
-static void *widget_event_loop(void *dummy) {
-  XEvent  myevent;
-  
-  while(widl->running) {
-    /*      if(XPending (widl->display)) { */
-    //  XLockDisplay(widl->display);
-    XNextEvent (widl->display, &myevent) ;
-    //    XUnlockDisplay(widl->display);
-    widget_xevent_notify(&myevent);
-    /*      } */
-    /*      else {  */
-    /*        XUnlockDisplay(widl->display); */
-    /*        usleep(60); */
-    /*      } */
-  }
-
-  pthread_exit(NULL);
-}
-
-/*
  * Initiatization of widget internals.
  */
 void widget_init(Display *display) {
@@ -543,7 +521,6 @@ void widget_init(Display *display) {
   widl->key     = 0;
 
   pthread_mutex_init (&widl->mutex, NULL);
-  pthread_mutex_init (&widl->run_mutex, NULL);
 
 }
 
@@ -552,8 +529,8 @@ void widget_init(Display *display) {
  * It will block till widget_stop() call
  */
 void widget_run(void) {
-  struct sigaction      action;
-  void *ret;
+  XEvent            myevent;
+  struct sigaction  action;
 
   action.sa_handler = xitk_signal_handler;
   sigemptyset(&(action.sa_mask));
@@ -576,16 +553,19 @@ void widget_run(void) {
 
   widl->running = 1;
 
-  pthread_mutex_lock(&widl->run_mutex);
+  while(widl->running) {
+    /*      if(XPending (widl->display)) { */
+    //  XLockDisplay(widl->display);
+    XNextEvent (widl->display, &myevent) ;
+    //    XUnlockDisplay(widl->display);
+    widget_xevent_notify(&myevent);
+    /*      } */
+    /*      else {  */
+    /*        XUnlockDisplay(widl->display); */
+    /*        usleep(60); */
+    /*      } */
+  }
 
-  pthread_create (&widl->thread, NULL, 
-		  widget_event_loop, NULL) ;
-
-  pthread_join(widl->thread, &ret);
-
-  /* pthread_mutex_lock(&widl->run_mutex); */
-
-  /* Release memory */
   gui_list_free(widl->list);
   gui_list_free(widl->gfx);
   free(widl);
@@ -595,10 +575,5 @@ void widget_run(void) {
  * Stop the wait xevent loop
  */
 void widget_stop(void) {
-/*   void     *p; */
-  
   widl->running = 0;
-
-  /* pthread_join(widl->thread, &p); */
-  pthread_mutex_unlock(&widl->run_mutex);
 }
