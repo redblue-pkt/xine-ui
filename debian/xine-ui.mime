@@ -1,0 +1,7 @@
+video/mpeg; xine %s; description="MPEG Video"; test=test -n "$DISPLAY"; priority=7
+video/mpeg; aaxine %s; needsterminal; description="MPEG Video"; priority=4
+
+video/x-msvideo; xine %s; description="MS Video (AVI)"; test=test -n "$DISPLAY"; priority=4
+video/x-msvideo; aaxine %s; needsterminal; description="MS Video (AVI)"; priority=3
+video/quicktime; xine %s; description="Apple Quicktime Video"; test=test -n "$DISPLAY"; priority=4
+video/quicktime; aaxine %s; needsterminal; description="Apple Quicktime Video"; priority=3
