@@ -30,6 +30,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#include <X11/extensions/dpms.h>
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
@@ -87,7 +88,9 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
-/* Screensavers parameters */
+/*
+ * Screensavers parameters
+ */
 typedef struct {
 
   /* XFree86 one */
@@ -103,9 +106,124 @@ typedef struct {
     int           was_running;
   } xscreensaver;
 
+  /* XFree DPMS */
+  struct {
+    int           was_running;
+    CARD16        standby;
+    CARD16        suspend;
+    CARD16        off;
+    CARD16        level;
+  } xdpms;
+
 } screen_savers_t;
 
 static screen_savers_t    ssavers;
+
+
+/**
+ * Disable all screensavers.
+ */
+static void disable_screensavers(void) {
+  int dummy;
+  
+  /* 
+   * XFree DPMS
+   */
+  ssavers.xdpms.was_running = 0;
+  
+  if(DPMSQueryExtension(gGui->display, &dummy, &dummy)) {
+    BOOL   enabled;
+    
+    DPMSInfo(gGui->display, &ssavers.xdpms.level, &enabled);
+    
+    if(enabled) {
+      
+      if(DPMSGetTimeouts(gGui->display, 
+			 &ssavers.xdpms.standby,
+			 &ssavers.xdpms.suspend, &ssavers.xdpms.off) != True) {
+	fprintf(stderr, "DPMSGetTimeouts() failed\n");
+      }
+
+      /* monitor powersave off */
+      (void) DPMSDisable(gGui->display);
+      ssavers.xdpms.was_running = 1;
+    }
+  }
+  
+  /*
+   * XFree screensaver
+   */
+  XGetScreenSaver(gGui->display ,&ssavers.screensaver.timeout, 
+		  &ssavers.screensaver.interval,
+		  &ssavers.screensaver.prefer_blanking, 
+		  &ssavers.screensaver.allow_exposures);
+  
+  if((XSetScreenSaver(gGui->display, 0, 0, 
+		      DontPreferBlanking, DontAllowExposures)) == BadValue) {
+    fprintf(stderr, "XSetScreenSaver() failed: %s\n", strerror(errno));
+  }
+  
+  /*
+   * XScreenSaver specific.
+   */
+  xscreensaver_remote_init(gGui->display);
+  ssavers.xscreensaver.was_running = is_xscreensaver_running(gGui->display);
+  
+  if(ssavers.xscreensaver.was_running == 1) {
+    if(xscreensaver_kill_server(gGui->display) < 0)
+      ssavers.xscreensaver.was_running = 0;
+  }
+}
+
+/**
+ * Re-enabling previously disabled screensavers.
+ */
+static void reenable_screensavers(void) {
+  int dummy;
+  
+  /*
+   * XFree DPMS
+   */
+  if(ssavers.xdpms.was_running) {
+
+    if(DPMSQueryExtension(gGui->display, &dummy, &dummy)) {
+      
+      /* restoring power saving settings */
+      if((DPMSEnable(gGui->display)) == True) {
+	CARD16 state;
+	BOOL   enabled;
+	
+	(void) DPMSSetTimeouts(gGui->display, ssavers.xdpms.standby, 
+			       ssavers.xdpms.suspend, ssavers.xdpms.off);
+
+	(void) DPMSForceLevel(gGui->display, ssavers.xdpms.level);
+	
+	/* DPMS does not seem to be enabled unless we call DPMSInfo */
+	DPMSInfo(gGui->display, &state, &enabled);
+	
+	if(enabled)
+	  ssavers.xdpms.was_running = 0;
+	
+      }
+    }
+  }
+  
+  /*
+   * XFree screensaver
+   */
+  if((XSetScreenSaver(gGui->display, ssavers.screensaver.timeout, 
+		      ssavers.screensaver.interval, 
+		      ssavers.screensaver.prefer_blanking, 
+		      ssavers.screensaver.allow_exposures)) == BadValue) {
+    fprintf(stderr, "XSetScreenSaver() failed: %s\n", strerror(errno));
+  }
+
+  /*
+   * Restart XScreenSaver.
+   */
+  if(ssavers.xscreensaver.was_running == 1)
+    xscreensaver_start_server();
+}
 
 /**
  * Configuration file lookup/set functions
@@ -600,30 +718,7 @@ void gui_init (int nfiles, char *filenames[]) {
   
   panel_init ();
 
-  /*
-   * Store original screensaver parameters and sets new ones
-   */
-  XGetScreenSaver(gGui->display ,&ssavers.screensaver.timeout, 
-		  &ssavers.screensaver.interval,
-		  &ssavers.screensaver.prefer_blanking, 
-		  &ssavers.screensaver.allow_exposures);
-  
-  if((XSetScreenSaver(gGui->display, 0, 0, 
-		      DontPreferBlanking, DontAllowExposures)) == BadValue) {
-    fprintf(stderr, "XSetScreenSaver() failed: %s\n", strerror(errno));
-  }
-  
-  /*
-   * XScreenSaver specific.
-   */
-  xscreensaver_remote_init(gGui->display);
-  ssavers.xscreensaver.was_running = is_xscreensaver_running(gGui->display);
-
-  if(ssavers.xscreensaver.was_running == 1) {
-    if(xscreensaver_kill_server(gGui->display) < 0)
-      ssavers.xscreensaver.was_running = 0;
-  }
-  
+  disable_screensavers();
 }
 
 /*
@@ -734,19 +829,5 @@ void gui_run (void) {
 
   gGui->running = 0;
   
-  /*
-   * Restore screensaver parameters
-   */
-  if((XSetScreenSaver(gGui->display, ssavers.screensaver.timeout, 
-		      ssavers.screensaver.interval, 
-		      ssavers.screensaver.prefer_blanking, 
-		      ssavers.screensaver.allow_exposures)) == BadValue) {
-    fprintf(stderr, "XSetScreenSaver() failed: %s\n", strerror(errno));
-  }
-
-  /*
-   * Restart XScreenSaver.
-   */
-  if(ssavers.xscreensaver.was_running == 1)
-    xscreensaver_start_server();
+  reenable_screensavers();
 }
