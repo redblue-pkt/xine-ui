@@ -562,8 +562,18 @@ void event_listener (void *user_data, xine_event_t *event) {
     }
     break;
   }      
+ 
+}
 
-  
+void codec_reporting( void *user_data, int codec_type,
+                      uint32_t fourcc, char *description, int handled )
+{
+  if( !handled ) {
+    if( codec_type == XINE_CODEC_VIDEO )
+      xine_error("No video plugin found to decode '%s'", description );
+    else 
+      xine_error("No audio plugin found to decode '%s'", description );
+  }
 }
 
 /*
@@ -885,6 +895,11 @@ int main(int argc, char *argv[]) {
    */
   xine_register_event_listener(gGui->xine, event_listener, (void *) gGui);
 
+  /*
+   * Register codec reporting
+   */
+  xine_register_report_codec_cb(gGui->xine, codec_reporting, (void *) gGui );
+  
   /*
    * start CORBA server thread
    */
