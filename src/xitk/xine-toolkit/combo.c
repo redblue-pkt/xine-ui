@@ -341,7 +341,8 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
   combo_private_data_t  *private_data;
   int                    xx = 0, yy = 0;
   window_info_t          wi;
-  
+  XSizeHints             hint;
+
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     
@@ -360,7 +361,14 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       private_data->win_x += xx;
       private_data->win_y += yy;
       
+      hint.x = private_data->win_x;
+      hint.y = private_data->win_y;
+      hint.flags = PPosition;
+
       XLOCK(private_data->imlibdata->x.disp);
+      XSetWMNormalHints (private_data->imlibdata->x.disp,
+			 xitk_window_get_window(private_data->xwin),
+			 &hint);
       XMoveWindow(private_data->imlibdata->x.disp, 
 		  (xitk_window_get_window(private_data->xwin)), 
 		  private_data->win_x, private_data->win_y);
