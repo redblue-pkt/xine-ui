@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
-"POT-Creation-Date: 2003-04-27 01:05+0200\n"
+"POT-Creation-Date: 2003-05-02 19:48+0200\n"
 "PO-Revision-Date: 2003-04-05 00:45+0200\n"
 "Last-Translator: Giovanni Venturi <jumpyj@libero.it>\n"
 "Language-Team: italiano <kde-i18n-it@mail.kde.org>\n"
@@ -1624,8 +1624,9 @@ msgid "Control"
 msgstr ""
 
 #: src/xitk/panel.c:1295
-msgid "MRL Browser"
-msgstr ""
+#, fuzzy
+msgid "Open Location"
+msgstr "Posizione per la foto"
 
 #: src/xitk/panel.c:1300
 msgid "gui tips visibility"

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.18\n"
-"POT-Creation-Date: 2003-04-27 01:05+0200\n"
+"POT-Creation-Date: 2003-05-02 19:48+0200\n"
 "PO-Revision-Date: 2003-02-08 14:10+0100\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -1741,8 +1741,9 @@ msgid "Control"
 msgstr "Ovládání"
 
 #: src/xitk/panel.c:1295
-msgid "MRL Browser"
-msgstr "Prohlí¾eè MRL"
+#, fuzzy
+msgid "Open Location"
+msgstr "Umístìní snímkù"
 
 #: src/xitk/panel.c:1300
 msgid "gui tips visibility"
@@ -2243,6 +2244,9 @@ msgstr "Prohlí¾eè zpráv xine"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Obnovit"
+
+#~ msgid "MRL Browser"
+#~ msgstr "Prohlí¾eè MRL"
 
 #~ msgid "Key Bindings"
 #~ msgstr "Kláv. zkratky"

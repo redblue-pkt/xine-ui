@@ -1292,7 +1292,7 @@ void panel_init (void) {
   b.userdata          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(panel->widget_list)), 
 			   (w = xitk_button_create(panel->widget_list, gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("MRL Browser"));
+  xitk_set_widget_tips(w, _("Open Location"));
   
 
   panel->tips.enable = xine_config_register_bool(gGui->xine, "gui.tips_visible", 

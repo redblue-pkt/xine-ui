@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2003-04-27 01:05+0200\n"
+"POT-Creation-Date: 2003-05-02 19:48+0200\n"
 "PO-Revision-Date: 2002-01-22 16:34GMT-3\n"
 "Last-Translator: Marcelo Roberto Jimenez <mroberto@cetuc.puc-rio.br>\n"
 "Language-Team: Portuguese (Brazilian) <pt_BR@li.org>\n"
@@ -1697,8 +1697,9 @@ msgid "Control"
 msgstr "Control"
 
 #: src/xitk/panel.c:1295
-msgid "MRL Browser"
-msgstr "Selecionador de MRL Xine"
+#, fuzzy
+msgid "Open Location"
+msgstr "Movimento rápido"
 
 #: src/xitk/panel.c:1300
 msgid "gui tips visibility"
@@ -2192,6 +2193,9 @@ msgstr "visualizador de log xine"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Redesenha"
+
+#~ msgid "MRL Browser"
+#~ msgstr "Selecionador de MRL Xine"
 
 #~ msgid "Can't read %s: %s\n"
 #~ msgstr "Não é possível ler %s: %s\n"

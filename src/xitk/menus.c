@@ -368,7 +368,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Open/File...",
       NULL,
       menu_file_selector,        NULL                                                        },
-    { "Open/MRL...",
+    { "Open/Location...",
       NULL,
       menu_mrl_browser, NULL                                                                 },
     { "Playback",

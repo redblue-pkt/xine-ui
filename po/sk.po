@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
-"POT-Creation-Date: 2003-04-27 01:05+0200\n"
+"POT-Creation-Date: 2003-05-02 19:48+0200\n"
 "PO-Revision-Date: 2003-02-18 12:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -1685,8 +1685,9 @@ msgid "Control"
 msgstr "Ovládanie"
 
 #: src/xitk/panel.c:1295
-msgid "MRL Browser"
-msgstr "MRL prehliadaè"
+#, fuzzy
+msgid "Open Location"
+msgstr "Umiestnenie obrázku - obsahu obrazovky"
 
 #: src/xitk/panel.c:1300
 msgid "gui tips visibility"
@@ -2170,6 +2171,9 @@ msgstr "Xine prehliadaè logov"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Obnovi»"
+
+#~ msgid "MRL Browser"
+#~ msgstr "MRL prehliadaè"
 
 #~ msgid "Key Bindings"
 #~ msgstr "Mapovanie kláves"

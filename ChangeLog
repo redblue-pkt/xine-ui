@@ -1,3 +1,32 @@
+xine-ui (0.9.21) unstable; urgency=low
+
+  * closing an xitk window don't crash xine anymore,
+  * clicking on audio/spu language in main panel popup a language selection menu,
+  * use ISO639-1 to display DVD audio/spu language ('en' -> 'english'),
+  * support 32 audio/spu channels,
+  * --enqueue can enqueue more than one mrl,
+  * get rid of completion event,
+  * new error message, according to xine-lib message events,
+  * fix reparent bug with KDE 3.1,
+  * (re)add cfg:/ style mrls, you can change any config entry BEFORE playing any
+      kind of mrl,
+  * fix snapshot size bug, xine-lib don't fill meta data, so we have to
+      workaround,
+  * change behavior of number key, they aren't binded for seeking, you
+      have to press 3 key for any % seek (use option below if you think that
+      suck, like me),
+  * new --keymap=<keymap file> option,
+  * add lirc commands for hue/saturation/brightness/contrast controls,
+  * improve seeking,
+  * support "resume" feature with DVD playback (<ESC> key),
+  * new translation: italian,
+  * fix metacity layer bug,
+  * new --config option,
+  * fix warp jump and double click bug in widget browser,
+  * fix deadlock with panel hide/show cycle,
+  * playback slider don't handle keyboard events (fix seek weirdness),
+  * .po updates.
+	
 xine-ui (0.9.20) unstable; urgency=low
 
   * hpux compilation fix.
@@ -9,7 +38,7 @@ xine-ui (0.9.20) unstable; urgency=low
   *   add get position/length in network control, 
   *     (patch from Henrik (Mauritz) Johnson <henrik@spinbox.se>),
   *   support fb output,
-  *   many skins updates (don't forget to update you local copies),
+  *   many skins updates (don't forget to update your local copies),
   *   add menu events in main menu,
   *   fix segfault with wrong DISPLAY envvar,
   *   try to handle versionless asx playlists,

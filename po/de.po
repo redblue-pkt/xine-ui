@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
-"POT-Creation-Date: 2003-04-27 01:05+0200\n"
+"POT-Creation-Date: 2003-05-02 19:48+0200\n"
 "PO-Revision-Date: 2003-03-14 08:46+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -1708,8 +1708,9 @@ msgid "Control"
 msgstr "Steuerung"
 
 #: src/xitk/panel.c:1295
-msgid "MRL Browser"
-msgstr "MRL Browser"
+#, fuzzy
+msgid "Open Location"
+msgstr "Schnappschuﬂverzeichnis"
 
 #: src/xitk/panel.c:1300
 msgid "gui tips visibility"
@@ -2203,6 +2204,9 @@ msgstr "xine Log Betrachter"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "MRL Browser"
+#~ msgstr "MRL Browser"
 
 #~ msgid "Key Bindings"
 #~ msgstr "Tastenbelegungen"

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
-"POT-Creation-Date: 2003-04-27 01:05+0200\n"
+"POT-Creation-Date: 2003-05-02 19:48+0200\n"
 "PO-Revision-Date: 2002-02-24 17:35GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -1850,10 +1850,11 @@ msgstr "Список композиц╕й"
 msgid "Control"
 msgstr "Управл╕ння"
 
-# src/xitk/panel.c:846
+# src/xitk/panel.c:825
 #: src/xitk/panel.c:1295
-msgid "MRL Browser"
-msgstr "MRL нав╕гатор"
+#, fuzzy
+msgid "Open Location"
+msgstr "Швидке програвання"
 
 #: src/xitk/panel.c:1300
 msgid "gui tips visibility"
@@ -2376,6 +2377,10 @@ msgstr "переглядач логу xine"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Оновити"
+
+# src/xitk/panel.c:846
+#~ msgid "MRL Browser"
+#~ msgstr "MRL нав╕гатор"
 
 # src/xitk/playlist.c:335 src/xitk/playlist.c:392
 #~ msgid "Can't read %s: %s\n"
