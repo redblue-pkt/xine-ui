@@ -2433,9 +2433,6 @@ static void *server_thread(void *data) {
     pthread_create(&thread_client, NULL, client_thread, (void *)client_info);
   }
 
- __failed:
-  free(service);
-
   { /* Freeing passwords */
     int i;
     
@@ -2447,6 +2444,9 @@ static void *server_thread(void *data) {
     free(passwds);
    
   }
+
+ __failed:
+  free(service);
  
   pthread_exit(NULL);
 }
