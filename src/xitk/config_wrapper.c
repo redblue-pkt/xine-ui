@@ -45,7 +45,7 @@ static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, i
 
   case XINE_CONFIG_TYPE_STRING: 
     {
-      char *newv = strdup(string);
+      char *newv = string;
       char *oldv = entry->str_value;
       
       oldv = entry->str_value;
@@ -81,16 +81,18 @@ void config_update_range(char *key, int min, int max) {
 }
 
 void config_update_string(char *key, char *string) {
+  char *update_string = strdup(string);
   xine_cfg_entry_t *entry = xine_config_lookup_entry(gGui->xine, key);
   
   if(entry && string)
-    config_update(entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
+    config_update(entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, update_string);
   else {
     if(string == NULL)
       fprintf(stderr, "string is NULL\n");
     else
       fprintf(stderr, "WOW, key %s isn't registered\n", key);
   }
+  free(update_string);
 }
 
 void config_update_enum(char *key, int value) {
