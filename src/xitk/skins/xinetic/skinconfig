@@ -608,20 +608,6 @@ skin.CtlContLbl {
 	}
 }
 
-skin.CtlSave {
-	coords {
-	  x = 13
-	  y = 214
-	}
-	pixmap = CtlSave.png
-	label {
-	  color = #9fa4ad
-	  color_focus = #081e2f
-	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
-	}
-}
-
 skin.CtlSkLbl {
 	coords {
 	  x = 218
