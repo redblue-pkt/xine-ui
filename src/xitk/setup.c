@@ -53,9 +53,6 @@ static char                *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*
 static char                *boldfontname = "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*";
 static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
-#define WGPREV              1
-#define WGNEXT              2
-
 #define WINDOW_WIDTH        500
 #define WINDOW_HEIGHT       480
 
@@ -174,7 +171,7 @@ typedef struct {
   xitk_widget_t        *tmp_widgets[200];
   int                   num_tmp_widgets;
 
-  xitk_widget_t        *btnup, *btndn;
+  xitk_widget_t        *slider_wg;
   widget_triplet_t     *wg[100];
   int                   num_wg;
   int                   first_displayed;
@@ -414,21 +411,6 @@ static void setup_paint_widgets(void) {
     y += (FRAME_HEIGHT>>1) + 2;
   }
 
-  /* Hide Up/Down button only i first displayed triplet is 0 and there no extra widgets */
-  if((setup->first_displayed == 0) && (i >= setup->num_wg)) {
-    xitk_disable_widget(setup->btnup);
-    xitk_hide_widget(setup->widget_list, setup->btnup);
-    xitk_disable_widget(setup->btndn);
-    xitk_hide_widget(setup->widget_list, setup->btndn);
-  }
-
-  if(i < setup->num_wg) {
-    xitk_enable_widget(setup->btnup);
-    xitk_show_widget(setup->widget_list, setup->btnup);
-    xitk_enable_widget(setup->btndn);
-    xitk_show_widget(setup->widget_list, setup->btndn);
-  }
-
   /* Repaint them now */
   xitk_paint_widget_list (setup->widget_list); 
 }
@@ -437,11 +419,48 @@ static void setup_paint_widgets(void) {
  * Handle X events here.
  */
 static void setup_handle_event(XEvent *event, void *data) {
-
-  /*
+  
   switch(event->type) {
+    
+  case KeyPress: {
+    XKeyEvent      mykeyevent;
+    KeySym         mykey;
+    char           kbuf[256];
+    int            len;
+    int            modifier;
+    
+    if(xitk_is_widget_enabled(setup->slider_wg)) {
+      
+      mykeyevent = event->xkey;
+      
+      xitk_get_key_modifier(event, &modifier);
+      
+      XLockDisplay(gGui->display);
+      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+      XUnlockDisplay(gGui->display);
+      
+      switch(mykey) {
+	
+      case XK_Up:
+	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
+	  xitk_slider_make_step(setup->widget_list, setup->slider_wg);
+	  xitk_slider_callback_exec(setup->slider_wg);
+	}
+	break;
+	
+      case XK_Down:
+	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) { 
+	  xitk_slider_make_backstep(setup->widget_list, setup->slider_wg);
+	  xitk_slider_callback_exec(setup->slider_wg);
+	}
+	break;
+
+      }
+    }
   }
-  */
+  break;
+  
+  }
 }
 
 /*
@@ -751,7 +770,10 @@ static void setup_section_widgets(int s) {
   int                  len;
   char                *section;
   char                *labelkey;
+  int                  slidmax = 1;
 
+  xitk_disable_widget(setup->slider_wg);
+  
   /* Selected tab is one of help sections */
   if(s >= (setup->num_sections - 3)) {
     if(s == (setup->num_sections - 3)) {
@@ -821,6 +843,15 @@ static void setup_section_widgets(int s) {
       entry = entry->next;
     }
 
+    xitk_enable_widget(setup->slider_wg);
+
+    if(setup->num_wg > MAX_DISPLAY_WIDGETS)
+      slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;
+    else
+      slidmax = setup->num_wg;
+
+    xitk_slider_set_max(setup->slider_wg, slidmax);
+    xitk_slider_set_pos(setup->widget_list, setup->slider_wg, slidmax);
   }
 }
 
@@ -978,21 +1009,8 @@ static void setup_end(xitk_widget_t *w, void *data) {
 /*
  *
  */
-static void setup_nextprev_wg(xitk_widget_t *w, void *data) {
-
-  switch((int)data) {
-
-  case WGPREV:
-    if(setup->first_displayed)
-      setup->first_displayed--;
-    break;
-
-  case WGNEXT:
-    if((setup->first_displayed + MAX_DISPLAY_WIDGETS) < setup->num_wg)
-      setup->first_displayed++;
-    break;
-  }
-
+static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
+  setup->first_displayed = (xitk_slider_get_max(setup->slider_wg)) - pos;
   setup_clear_tab();
   setup_paint_widgets();
 }
@@ -1066,6 +1084,7 @@ void setup_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_button_widget_t       b;
+  xitk_slider_widget_t       sl;
   int                        x, y;
 
   /* this shouldn't happen */
@@ -1101,37 +1120,23 @@ void setup_panel(void) {
 
 
   XITK_WIDGET_INIT(&b, gGui->imlib_data);
+  XITK_WIDGET_INIT(&sl, gGui->imlib_data);
 
   {
-    xitk_image_t  *wimage;
-    
-    b.skin_element_name = NULL;
-    b.callback          = setup_nextprev_wg;
-    b.userdata          = (void *)WGPREV;
+
+    sl.min                      = 0;
+    sl.max                      = 1;
+    sl.step                     = 1;
+    sl.skin_element_name        = NULL;
+    sl.callback                 = NULL;
+    sl.userdata                 = NULL;
+    sl.motion_callback          = setup_nextprev_wg;
+    sl.motion_userdata          = NULL;
     xitk_list_append_content(setup->widget_list->l,
-     (setup->btnup = 
-      xitk_noskin_button_create(setup->widget_list, &b, (WINDOW_WIDTH - 40) + 2, 53, 16, 16)));
-    
-    wimage = xitk_get_widget_foreground_skin(setup->btnup);
-    if(wimage)
-      draw_arrow_up(gGui->imlib_data, wimage);
-    
-    
-    b.skin_element_name = NULL;
-    b.callback          = setup_nextprev_wg;
-    b.userdata          = (void *)WGNEXT;
-    xitk_list_append_content(setup->widget_list->l,
-     (setup->btndn =
-      xitk_noskin_button_create(setup->widget_list, &b, (WINDOW_WIDTH - 40) + 2, 69, 16, 16)));
-    
-    wimage = xitk_get_widget_foreground_skin(setup->btndn);
-    if(wimage)
-      draw_arrow_down(gGui->imlib_data, wimage);
-    
-    xitk_disable_widget(setup->btnup);
-    xitk_hide_widget(setup->widget_list, setup->btnup);
-    xitk_disable_widget(setup->btndn);
-    xitk_hide_widget(setup->widget_list, setup->btndn);
+     (setup->slider_wg = xitk_noskin_slider_create(setup->widget_list, &sl,
+						   (WINDOW_WIDTH - 41), 70, 
+						   16, (WINDOW_HEIGHT - 140), XITK_VSLIDER)));
+    xitk_slider_set_pos(setup->widget_list, setup->slider_wg, 1);
   }
 
   setup_sections();
