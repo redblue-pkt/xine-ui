@@ -607,7 +607,8 @@ int main(int argc, char *argv[]) {
   printf ("main: starting xine engine\n");
 
   gGui->xine = xine_init (gGui->vo_driver, audio_driver, 
-			  gui_status_callback, gGui->config);
+			  gGui->config,
+			  gui_status_callback, NULL, NULL);
 
   printf ("main: (pre-)selection audio/spu channels\n");
 

@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
 					    ao_drv);
 
   if (!ao_driver) {
-    printf ("main: audio driver oss failed\n");
+    printf ("main: audio driver %s failed\n", ao_drv);
   }
 
   /*
@@ -219,7 +219,8 @@ int main(int argc, char *argv[]) {
   printf ("main: starting xine engine\n");
 
   xine = xine_init (vo_driver, ao_driver, 
-		    gui_status_callback, config);
+		    config, gui_status_callback,
+		    NULL, NULL);
 
   xine_select_audio_channel (xine, 0);
 
