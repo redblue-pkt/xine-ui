@@ -528,7 +528,7 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_skin_config_t *skonfig,
 						int x, int y, 
 						char *skin_element_name, xitk_image_t *skin,
 						char *ncolor, char *fcolor, char *ccolor,
-						char *fontname) {
+						char *fontname, char *label) {
   xitk_widget_t               *mywidget;
   lbutton_private_data_t *private_data;
   
@@ -549,7 +549,7 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_skin_config_t *skonfig,
   private_data->callback          = b->callback;
   private_data->state_callback    = b->state_callback;
   private_data->userdata          = b->userdata;
-  private_data->label             = (b->label ? strdup(b->label) : "");
+  private_data->label             = strdup((label)?label:"");
 
   private_data->skin              = skin;
   private_data->normcolor         = strdup(ncolor);
@@ -590,18 +590,20 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_skin_config_t *skonfig,
  *
  */
 xitk_widget_t *xitk_labelbutton_create (xitk_skin_config_t *skonfig, xitk_labelbutton_widget_t *b) {
-  
+
   XITK_CHECK_CONSTITENCY(b);
 
   return _xitk_labelbutton_create(skonfig, b, 
-				  (xitk_skin_get_coord_x(skonfig, b->skin_element_name)),
-				  (xitk_skin_get_coord_y(skonfig, b->skin_element_name)),
-				  b->skin_element_name,
-				  (xitk_image_load_image(b->imlibdata, xitk_skin_get_skin_filename(skonfig, b->skin_element_name))),
-				  (xitk_skin_get_label_color(skonfig, b->skin_element_name)),
-				  (xitk_skin_get_label_color_focus(skonfig, b->skin_element_name)),
-				  (xitk_skin_get_label_color_click(skonfig, b->skin_element_name)),
-				  (xitk_skin_get_label_fontname(skonfig, b->skin_element_name)));
+		  (xitk_skin_get_coord_x(skonfig, b->skin_element_name)),
+		  (xitk_skin_get_coord_y(skonfig, b->skin_element_name)),
+		   b->skin_element_name,
+		  (xitk_image_load_image(b->imlibdata, xitk_skin_get_skin_filename(skonfig, b->skin_element_name))),
+		  (xitk_skin_get_label_color(skonfig, b->skin_element_name)),
+		  (xitk_skin_get_label_color_focus(skonfig, b->skin_element_name)),
+		  (xitk_skin_get_label_color_click(skonfig, b->skin_element_name)),
+		  (xitk_skin_get_label_fontname(skonfig, b->skin_element_name)),
+		  (((xitk_skin_get_label_printable(skonfig, b->skin_element_name) == 1)
+		   ? b->label : NULL)));
 }
 
 /*
@@ -618,5 +620,5 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_labelbutton_widget_t *b,
   i = xitk_image_create_image(b->imlibdata, width * 3, height);
   draw_bevel_three_state(b->imlibdata, i);
 
-  return _xitk_labelbutton_create(NULL, b, x, y, NULL, i, ncolor, fcolor, ccolor, fname);
+  return _xitk_labelbutton_create(NULL, b, x, y, NULL, i, ncolor, fcolor, ccolor, fname, b->label);
 }

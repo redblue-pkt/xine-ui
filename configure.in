@@ -567,6 +567,7 @@ src/xitk/skins/Makefile
 src/xitk/skins/lcd/Makefile
 src/xitk/skins/pitt/Makefile
 src/xitk/skins/xinetic/Makefile
+src/xitk/skins/cloudy/Makefile
 src/aaui/Makefile
 doc/Makefile
 doc/man/Makefile

@@ -53,7 +53,7 @@ static tips_private_t *disptips;
 /*
  *
  */
-static _tips_kill_running(void) {
+static void _tips_kill_running(void) {
   
   if(disptips != NULL) {
     

@@ -1,4 +1,4 @@
-SUBDIRS = lcd pitt xinetic
+SUBDIRS = lcd pitt xinetic cloudy
 
 install-exec-am:
 	if test -d @XINE_SKINDIR@/metal; then \

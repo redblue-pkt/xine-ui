@@ -1327,6 +1327,11 @@ char *xitk_skin_get_label_fontname(xitk_skin_config_t *, const char *);
 /*
  *
  */
+int xitk_skin_get_label_printable(xitk_skin_config_t *skonfig, const char *str);
+
+/*
+ *
+ */
 char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
 
 /*

@@ -42,6 +42,100 @@ extern int errno;
  ************************************************************************************/
 
 /*
+ *
+ */
+static char *_get_expanded_command(xitk_skin_config_t *skonfig, char *cmd) {
+  char *p;
+  char *ret = NULL;
+  char  buf[BUFSIZ], buf2[BUFSIZ], var[BUFSIZ];
+  
+  assert(skonfig != NULL);
+
+  if(cmd) {
+
+    if(strchr(cmd, '$')) {
+
+      memset(&buf, 0, sizeof(buf));
+      snprintf(buf, (BUFSIZ - 1), "%s", cmd);
+
+      memset(&buf2, 0, sizeof(buf2));
+      
+      p = buf;
+
+      while(*p != '\0') {
+	switch(*p) {
+
+	  /*
+	   * Prefix of variable names.
+	   */
+	case '$':
+	  memset(&var, 0, sizeof(var));
+	  if(sscanf(p, "$\(%[A-Z-_])", &var[0])) {
+
+	    p += (strlen(var) + 2);
+
+	    /*
+	     * Now check variable validity
+	     */
+	    if(!strncmp("SKIN_PARENT_PATH", var, strlen(var))) {
+	      if(skonfig->path) {
+		char ppath[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+		char *z;
+		
+		sprintf(ppath, "%s", skonfig->path);
+		if((z = strrchr(ppath, '/')) != NULL) {
+		  *z = '\0';
+		  sprintf(buf2, "%s%s", buf2, ppath);
+		}
+	      }
+	    }
+	    else if(!strncmp("SKIN_VERSION", var, strlen(var))) {
+	      if(skonfig->version >= 0)
+		sprintf(buf2, "%s%d", buf2, skonfig->version);
+	    }
+	    else if(!strncmp("SKIN_AUTHOR", var, strlen(var))) {
+	      if(skonfig->author)
+		sprintf(buf2, "%s%s", buf2, skonfig->author);
+	    }
+	    else if(!strncmp("SKIN_PATH", var, strlen(var))) {
+	      if(skonfig->path)
+		sprintf(buf2, "%s%s", buf2, skonfig->path);
+	    }
+	    else if(!strncmp("SKIN_NAME", var, strlen(var))) {
+	      if(skonfig->name)
+		sprintf(buf2, "%s%s", buf2, skonfig->name);
+	    }
+	    else if(!strncmp("SKIN_DATE", var, strlen(var))) {
+	      if(skonfig->date)
+		sprintf(buf2, "%s%s", buf2, skonfig->date);
+	    }
+	    else if(!strncmp("SKIN_URL", var, strlen(var))) {
+	      if(skonfig->url)
+		sprintf(buf2, "%s%s", buf2, skonfig->url);
+	    }
+	    else if(!strncmp("HOME", var, strlen(var))) {
+	      if(skonfig->url)
+		sprintf(buf2, "%s%s", buf2, xitk_get_homedir());
+	    }
+	    /* else ignore */
+	  }
+	  break;
+	  
+	default:
+	  sprintf(buf2, "%s%c", buf2, *p);
+	  break;
+	}
+	p++;
+      }
+
+      ret = strdup(buf2);
+    }
+  }
+
+  return ret;
+}
+
+/*
  * Return position in str of char 'c'. -1 if not found
  */
 static int _is_there_char(const char *str, int c) {
@@ -224,7 +318,8 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
       skin_get_next_line(skonfig);
     }
     else if(!strncasecmp(skonfig->ln, "label", 5)) {
-
+      skonfig->celement->print = 1;
+      
       while(skin_end_section(skonfig) < 0) {
 	skin_get_next_line(skonfig);
 	p = skonfig->ln;
@@ -254,6 +349,10 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->color = strdup(p);
 	}
+	else if(!strncasecmp(skonfig->ln, "print", 5)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->print = skin_get_bool_value(p);
+	}
 	else if(!strncasecmp(skonfig->ln, "font", 4)) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->font = strdup(p);
@@ -277,7 +376,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
   assert(skonfig != NULL);
 
   while(skonfig->ln != NULL) {
-    
+
     p = skonfig->ln;
     
     if(sscanf(skonfig->ln, "skin.%s", &section[0]) == 1) {
@@ -332,7 +431,16 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	}
 	else {
 	  skin_set_pos_to_value(&p);
-	  if(!strncasecmp(section, "version", 7)) {
+
+	  if(!strncasecmp(section, "unload_command", 14)) {
+	    skonfig->unload_command = _get_expanded_command(skonfig, p);
+	    return;
+	  }
+	  else if(!strncasecmp(section, "load_command", 12)) {
+	    skonfig->load_command = _get_expanded_command(skonfig, p);
+	    return;
+	  }
+	  else if(!strncasecmp(section, "version", 7)) {
 	    skonfig->version = strtol(p, &p, 10);
 	    return;
 	  }
@@ -350,6 +458,10 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	  }
 	  else if(!strncasecmp(section, "url", 3)) {
 	    skonfig->url = strdup(p);
+	    return;
+	  }
+	  else {
+	    XITK_WARNING("%s(): wrong section entry found: '%s'\n", __FUNCTION__, section);
 	    return;
 	  }
 	}
@@ -373,10 +485,12 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
   if(s) {
 
     printf("Skin name '%s'\n", skonfig->name);
-    printf("     version '%d'\n", skonfig->version);
-    printf("     author  '%s'\n", skonfig->author);
-    printf("     date    '%s'\n", skonfig->date);
-    printf("     URL     '%s'\n", skonfig->url);
+    printf("     version   '%d'\n", skonfig->version);
+    printf("     author    '%s'\n", skonfig->author);
+    printf("     date      '%s'\n", skonfig->date);
+    printf("     load cmd  '%s'\n", skonfig->load_command);
+    printf("     uload cmd '%s'\n", skonfig->unload_command);
+    printf("     URL       '%s'\n", skonfig->url);
 
     while(s) {
       printf("Section '%s'\n", s->section);
@@ -390,6 +504,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       }
 
       printf("  animation   = %d\n", s->animation);
+      printf("  print       = %d\n", s->print);
       printf("  length      = %d\n", s->length);
       printf("  color       = '%s'\n", s->color);
       printf("  color focus = '%s'\n", s->color_focus);
@@ -407,6 +522,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  Y           = %d\n", s->y);
       printf("  pixmap      = '%s'\n", s->pixmap);
       printf("  animation   = %d\n", s->animation);
+      printf("  print       = %d\n", s->print);
       printf("  length      = %d\n", s->length);
       printf("  color       = '%s'\n", s->color);
       printf("  color focus = '%s'\n", s->color_focus);
@@ -449,7 +565,8 @@ xitk_skin_config_t *xitk_skin_init_config(void) {
   }
   skonfig->version = -1;
   skonfig->first = skonfig->last = skonfig->celement = NULL;
-  skonfig->name = skonfig->author = skonfig->date = skonfig->url = NULL;
+  skonfig->name = skonfig->author = skonfig->date = skonfig->url = 
+    skonfig->load_command = skonfig->unload_command = NULL;
   skonfig->skinfile = skonfig->path = NULL;
 
   skonfig->ln = skonfig->buf;
@@ -492,6 +609,8 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   XITK_FREE(skonfig->date);
   XITK_FREE(skonfig->url);
   XITK_FREE(skonfig->path);
+  XITK_FREE(skonfig->load_command);
+  XITK_FREE(skonfig->unload_command);
   XITK_FREE(skonfig->skinfile);
   XITK_FREE(skonfig);
 }
@@ -506,6 +625,7 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, char *path, char *filenam
 
   skonfig->path     = strdup(path);
   skonfig->skinfile = strdup(filename);
+
   snprintf(buf, 2048, "%s/%s", skonfig->path, skonfig->skinfile);
 
   if((skonfig->fd = fopen(buf, "r")) != NULL) {
@@ -538,6 +658,12 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, char *path, char *filenam
   check_skonfig(skonfig);
 #endif
 
+  /*
+   * Execute load command
+   */
+  if(skonfig->load_command)
+    xitk_system(0, skonfig->load_command);
+
   return 1;
 }
 
@@ -545,8 +671,13 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, char *path, char *filenam
  * Unload (free) xitk_skin_config_t object.
  */
 void xitk_skin_unload_config(xitk_skin_config_t *skonfig) {
-  if(skonfig)
+  if(skonfig) {
+
+    if(skonfig->unload_command)
+      xitk_system(0, skonfig->unload_command);
+
     xitk_skin_free_config(skonfig);
+  }
 }
 
 /*
@@ -682,6 +813,20 @@ char *xitk_skin_get_label_fontname(xitk_skin_config_t *skonfig, const char *str)
     return s->font;
   
   return NULL;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_label_printable(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->print;
+  
+  return 1;
 }
 
 /*

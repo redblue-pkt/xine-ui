@@ -38,6 +38,7 @@ typedef struct xitk_skin_element_s {
   int                           slider_type;
   
   /* label */
+  int                           print;
   int                           animation;
   int                           length;
   char                         *pixmap_font;
@@ -59,6 +60,10 @@ typedef struct {
   char                         *author;
   char                         *date;
   char                         *url;
+
+  char                         *load_command;
+  char                         *unload_command;
+
   xitk_skin_element_t          *first, *last;
   xitk_skin_element_t          *celement;
 } xitk_skin_config_t;

@@ -113,7 +113,7 @@ void panel_change_skins(void) {
   XLockDisplay(gGui->display);
 
   Imlib_destroy_image(gGui->imlib_data, panel->bg_image);
-  
+    
   if(!(panel->bg_image = 
        Imlib_load_image(gGui->imlib_data,
 			xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {

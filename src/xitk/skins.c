@@ -37,6 +37,9 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
+/*
+#define SKIN_DEBUG 1
+*/
 
 #define DEFAULT_SKIN        "xinetic"
 #define SKIN_IFACE_VERSION  1
@@ -95,7 +98,7 @@ static void looking_for_available_skins(void) {
   
   memset(&buf, 0, sizeof(buf));
   sprintf(buf, "%s/.xine/skins", xine_get_homedir());
-
+  
   get_available_skins_from(buf);
   get_available_skins_from(XINE_SKINDIR);
   
@@ -229,8 +232,9 @@ void change_skin(skins_locations_t *sk) {
       twice++;
       goto __reload_skin;
     }
-    else
+    else {
       exit(-1);
+    }
   }
   
   /* Check skin version */
@@ -334,8 +338,9 @@ void init_skins_support(void) {
       twice++;
       goto __reload_skin;
     }
-    else
+    else {
       exit(-1);
+    }
   }
   
   change_config_entry = 1;
