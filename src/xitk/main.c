@@ -538,9 +538,9 @@ void show_usage (void) {
   printf(_("                    play, slow2, slow4, pause, fast2,\n"));
   printf(_("                    fast4, stop, quit, fullscreen, eject.\n"));
   printf(_("  -Z                           Don't automatically start playback (smart mode).\n"));
-  printf(_("  -D, --deinterlace [post]...  Deinterlace video output. One or more post plugin\n"));
-  printf(_("                                 can be specified, with optional parameters. Syntax"));
-  printf(_("                                 is the same as --post option.\n"));
+  printf(_("  -D, --deinterlace [post]...  Deinterlace video output. One or more post plugin\n"
+	   "                                 can be specified, with optional parameters.\n"
+	   "                                 Syntax is the same as --post option.\n"));
   printf(_("  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"));
   printf(_("                                 'auto', 'square', '4:3', 'anamorphic', 'dvb'.\n"));
 #ifdef XINE_PARAM_BROADCASTER_PORT
@@ -550,7 +550,7 @@ void show_usage (void) {
   printf(_("      --no-logo                Don't display the logo.\n"));
   printf(_("  -E, --no-reload              Don't reload old playlist.\n"));
   printf(_("      --post <plugin>[:parameter=value][,...][;...]\n"));
-  printf(_("                               Load on or many post plugin(s).\n"));
+  printf(_("                               Load one or many post plugin(s).\n"));
   printf(_("                               Parameters are comma separated.\n"));
   printf(_("                               This option can be used more than one time.\n"));
   printf(_("      --disable-post           Don't enable post plugin(s).\n"));
