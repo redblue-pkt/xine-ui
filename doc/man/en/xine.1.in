@@ -1,6 +1,6 @@
 .\" -*-Nroff-*-
 .\""
-.TH XINE 1x 2001-10-13 "The xine project"
+.TH XINE 1x 2002-04-16 "The xine project"
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\""
@@ -20,92 +20,150 @@ plays MPEG system (audio and video) streams, mpeg elementary streams
 quicktime files, (S)VCDs and DVDs.
 .SH OPTIONS
 The programs follow the usual GNU command line syntax, with long
-ioptions starting with two dashes (`-').
+ioptions starting with two dashes (\`\-\').
 A summary of options are included below.
-For a complete description, see README and FAQ in @prefix@/share/doc/xine-ui
+For a complete description, see README and FAQ in \fI@prefix@/share/doc/xine-ui\fP
 or on the xine home page.
 .TP
 .B \-h, \-\-help
 Show summary of options and available output drivers (plugins).
 .TP
 .B \-a, \-\-audio\-channel <num>
-Select the given audio channel. <num> is the audio channel number, default
-is "0".
+Select the given audio channel. \fB<num>\fP is the audio channel number, default
+is \fB0\fP.
 .br
 xine 0.5 and newer tries its best to collect all valid audio channels
 (ac3, mpeg audio, avi audio, ...) from the stream and maps them
-to "virtual channels" with channel numbers starting at 0.
+to "virtual channels" with channel numbers starting at \fB0\fP.
 .TP
 .B \-V, \-\-video\-driver <drv>
-Select video driver. Check out "xine --help" for a list of available
+Select video driver. Check out \fIxine\ \-\-help\fP for a list of available
 video output plugins on your system. This selection is stored automatically
-in your .xinerc so you'll have to specify the video driver only once.
+in your \fI.xinerc\fP so you'll have to specify the video driver only once.
 .TP
 .B \-A, \-\-audio\-driver <drv>
-Select audio driver. Check out "xine --help" for a list of available
+Select audio driver. Check out \fIxine \-\-help\fP for a list of available
 audio output plugins on your system. This selection is stored automatically
-in your .xinerc so you'll have to specify the audio driver only once.
+in your \fI.xinerc\fP so you'll have to specify the audio driver only once.
 .TP
 .B \-u, \-\-spu\-channel <num>
-Select subpicture (subtitle) channel. <num> is the subpicture channel
-id, default is no subtitle (-1).
+Select subpicture (subtitle) channel. \fB<num>\fP is the subpicture channel
+id, default is no subtitle (\fB\-1\fP).
 .TP
-.B \-p[q][d][v], \-\-auto\-play=[q][d][v]
-Start playing immediately after start. Can be followed by "q" for quitting 
-at the end. As in earlier versions of xine, it is also possible to request
-the playlist from DVD 'd', or VCD 'v'. There is now a more generic option,
-\-\-auto\-scan, for that (see below). So the "d" and "v" suboptions may be
-removed some day.
+.B \-p[f][h][w][q][d][v], \-\-auto\-play=[f][h][w][q][d][v]
+Start playing immediately after start. Can be followed by:
+.br
+\'\fBf\fP\' in fullscreen mode,
+.br
+\'\fBh\fP\' hide GUI (main panel, etc...),
+.br
+\'\fBw\fP\' hide video output window,
+.br
+\'\fBq\fP\' for quitting after playback,
+.br
+It is also possible to request the playlist from DVD \'\fBd\fP\', or VCD \'\fBv\fP\'. 
+There is now a more generic option, \fI\-\-auto\-scan\fP, for that (see below).
 .TP
 .B \-s <plugin>, \-\-auto\-scan <plugin>
 Auto-scan playlist from named input plugin. Many plugins allow to read a
-default playlist, in order to play "everything". This works fine for DVDs
+default playlist, in order to play \fBeverything\fP. This works fine for DVDs
 or VCDs, for example. Giving this option has the same effect as pressing
 the according button on xine's main panel.
 
 This option is especially useful in combination with auto-play. You could
-start "xine --auto-play --auto-scan dvd" in order to play a whole DVD without
+start \fIxine\~\-\-auto\-play\~\-\-auto\-scan\~dvd\fP in order to play a whole DVD without
 having to press any additional buttons. This also works for plugins that are
 not supplied with xine, just give the name of the button that the desired
 plugin adds to the xine panel!
 .TP
 .B \-f, \-\-fullscreen
-Switch xine to fullscreen mode on start (just like pressing "F")
+Switch xine to fullscreen mode on start (just like pressing \'\fBF\fP\')
 .TP
 .B \-g, \-\-hide\-gui
 Hide all GUI windows (except the video window) on start. This is the same as
-pressing "G" within xine.
+pressing \'\fBG\fP\' within xine.
 .TP
-.B \-R, \-\-recognize\-by <option>
-Change the way xine will try to recognize stream types. 
-Valid options are: 
-.br
-"default" (first by content, then by extension),
-.br
-"revert" (first by extension, then by content),
-.br
-"content" (only by content),
-.br
-"extension" (only by extension). If no option is given, 
-"revert" is selected
+.B \-H, \-\-hide\-video
+Hide video output window.
 .TP
-.B \-\-visual <visual-class-or-id>
+.B \-L, \-\-no\-lirc
+Turn off LIRC support. This option is \fIonly\~available\fP if xine has been compiled
+with LIRC support.
+.TP
+.B \-\-visual <visual\-class\-or\-id>
 Try to use a specific X11 server visual for xine windows.  The
-<visual-class-or-id> parameter is either the name of an X11 visual
-class (StaticGray, GrayScale, StaticColor, PseudoColor, TrueColor or
-DirectColor) or the hexadecimal value for a specific X11 visual.
+\fB<visual\-class\-or\-id>\fP parameter is either the name of an X11 visual
+class (\fBStaticGray\fP, \fBGrayScale\fP, \fBStaticColor\fP, \fBPseudoColor\fP, \fBTrueColor\fP or
+\fBDirectColor\fP) or the \fBhexadecimal\fP value for a specific X11 visual.
 
 When used with a visual class name, xine tries to find such a visual
-with depth 15 or 16, 24 or 32, 8 (in that order).  The default visual
-class used by xine in absence of a --visual option is TrueColor.
+with depth \fB15\fP or \fB16\fP, \fB24\fP, \fB32\fP or \fB8\fP (in that order).
+The default visual class used by xine in absence of a \fI\-\-visual\fP option is \fBTrueColor\fP.
 
-If no usable visual is found, xine falls back to
-the default visual used on the X11 server's root window.
+If no usable visual is found, xine falls back to the default visual used 
+on the X11 server's root window.
 .TP
 .B \-\-install
-When using an X11 visual with changable colors (colormaps), install a
-private colormap for xine.  With a private colormap, xine can allocate
+When using an X11 visual with changeable colors (colormaps), install a
+private colormap for xine. With a private colormap, xine can allocate
 more colors so that video output may look better.
+.TP
+.B \-\-keymap [option]
+Display keymap. Option are:
+.br
+\'\fBdefault\fP\' display default keymap table,
+.br
+\'\fBlirc\fP\' display draft of a .lircrc config file,
+.br
+\'\fBremapped\fP\' user remapped keymap table,
+.br
+If no option is given, \'\fBdefault\fP\' is selected.
+.TP
+.B \-n, \-\-network
+Enable network remote control server.
+To use network remote control server, a password file is required. If xine don't found it, the server is stopped. The syntax of the password file is familliar, it looks like <\fBidentification\fP>:<\fBpassword\fP>. Due to cryptographic problems in few country, the password is not crypted, so take care with remote connection, the password is clearly transported (perhaps you can tunneling it, i never tried). Two (optional) generic rules are available (one per time):
+.nf
+\fBALL:ALLOW\fP or \fBALL:DENY\fP
+.fi
+In the first case, all client are allowed to execute all available commands, without restriction. In the second case, no\-one are allowed to execute those commands, except identified users (using 'identify' command).
+
+If a password entry begin with an asterisk \'\fB*\fP\', the user is locked, he couldn't 
+be identified. If a password is empty, the full entry is ignored. Here is a small example
+of a small \fI~/.xine/passwd\fP file:
+.nf
+
+ALL:DENY
+daniel:mypasswd
+foo:*
+
+.fi
+This allow only 'daniel' to execute commands, after a successfully identifying stage.
+
+The default port of the server is \fB6789\fP, this number is totally arbitrary. You can connect the server using a simple \fItelnet\fP, like this:
+.nf
+\fBtelnet\~localhost\~6789\fP
+.fi
+To change the default port, you can (as root) edit your \fI/etc/services\fP, and add an entry like this:
+.nf
+
+xinectl    7890/tcp        # xine control
+
+.fi
+This will change the default port from 6789 to 7890, and create a "human" service 
+called \fIxinectl\fP.
+
+The server itself have commands help/syntax:
+.br
+.BR help [command]
+.br
+Without \fIcommand\fP specified, it display all available commands. If a command is specified, it display a short text about the command functionnality.
+.br
+.BR syntaxe <command>
+.br
+Display the \fIcommand\fP syntax.
+.TP
+.B \-R, \-\-root
+Use root window as video window.
 .TP
 .B MRL (media resource locator)
 .br
@@ -117,37 +175,39 @@ to read from. valid MRLs may be plain file names or one of the following:
 .br
 .BR stdin://mpeg1
 or
-.BR "stdin://mpeg2"
+.BR stdin://mpeg2
 .br
-.BR "dvd://VTS_xx_y.VOB"
+.BR dvd://VTS_xx_y.VOB
 .br
-.BR "vcd://<track number>"
+.BR vcd://<track number>
 .br
-.BR "tcp://<host>:<port>"
+.BR tcp://<host>:<port>
 .br
-.BR "rtp://<host>:<port>"
+.BR rtp://<host>:<port>
 .br
-.BR "udp://<host>:<port>"
+.BR udp://<host>:<port>
 .LP
 Several MRLs may be specified in order to play a number of consecutive
 streams.
 .LP
-If you don't specify any MRL, you'll have to select  a file by drag'n-drop.
-Dragging files from the GNOME Midnight Commander (gmc) is known to work.
+If you don't specify any MRL, you'll have to select a file by drag'n\-drop.
+Dragging files from the \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP or \fBKonqueror\fP
+is known to work.
 .SH "SEE ALSO"
+\fBxine-remote\fP(1).
+.br
 The programs are documented fully on the xine home page:
 .UR http://xine.sourceforge.net/
 .IR "http://xine.sourceforge.net/"
 .UE
 .SH CONTROL KEYS
-Many features can be controlled by pressing control keys. '\fBM\-\fP' is the Meta key ('Alt' key on PC keyboard), '\fBC\-\fP' is the Control 'CTRL' key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the HOME key is displayed \fB<home>\fP.
+Many features can be controlled by pressing control keys. '\fBM\-\fP' is 
+the Meta key (\'\fBAlt\fP\' key on PC keyboard), '\fBC\-\fP' is the Control \'\fBCTRL\fP\' 
+key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the \'\fBHOME\fP\' key is displayed \fB<home>\fP.
 The default key bindings are:
 .LP
-.BR 0 :
-Jump to start of current stream
-.br
-.BR 1..9 :
-Jump to 10%..90% of current stream
+.BR 0..9 :
+Jump to 0%..90% of current stream
 .br
 .BR A :
 Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
@@ -170,11 +230,17 @@ Hide/show the video output window.
 .BR i | I :
 Toggle deinterlaced methods.
 .br
+.BR M\-l :
+Show/hide log window.
+.br
 .BR M\-m | M\-M :
 Hide/show the MRL browser.
 .br
 .BR C\-m | C\-M :
 Audio mute toggle.
+.br
+.BR C\-o :
+Toggle TV modes on the DXR3
 .br
 .BR M\-p | M\-P:
 Show/hide the playlist window.
@@ -182,8 +248,20 @@ Show/hide the playlist window.
 .BR Q :
 Exit.
 .br
+.BR s :
+Zoom 1:1.
+.br
+.BR S :
+Stop playback.
+.br
+.BR M\-s :
+Show/hide setup window.
+.br
 .BR z | Z :
 Zoom in/out.
+.br
+.BR M\-C\-z :
+Reset zoom.
 .br
 .BR v :
 Decrease audio volume.
@@ -221,6 +299,15 @@ Reduce the output window.
 .BR > :
 Enlarge the ouput window.
 .br
+.BR M\-1 :
+Set video output window to 50%
+.br
+.BR M\-2 :
+Set video output window to 100%
+.br
+.BR M\-3 :
+Set video output window to 200%
+.br
 .BR . :
 Select next sub-title channel.
 .br
@@ -245,7 +332,39 @@ Menu 3
 .BR M\-L :
 show log viewer window
 .br
+.BR <Insert> :
+Grab pointer toggle.
+.br
 
+Following shortcuts are used by third party plugins, generally for DVD navigation:
+.LP
+.BR <KeyPad\ Up> :
+Up event.
+.br
+.BR <KeyPad\ Down> :
+Down event.
+.br
+.BR <KeyPad\ Left> :
+Left event.
+.br
+.BR <KeyPad\ Right> :
+Right event.
+.br
+.BR <KeyPad\ Prior> :
+Prior event.
+.br
+.BR <KeyPad\ Next> :
+Next event.
+.br
+.BR <KeyPad\ End> :
+Previous angle event.
+.br
+.BR <KeyPad\ Home> :
+Next angle event.
+.br
+.BR <KeyPad\ Enter> :
+Select event
+.br
 .SH Synchronization fine tuning
 Some streams have bad timestamps, so synchronization fails. This can be
 tweaked using arrow keys:
@@ -257,8 +376,7 @@ press if video runs ahead of audio
 press if video lags behind audio
 .br
 .BR <home> :
-press to reset audio/video offset to 0, so stream timestamps are unchanged.
-
+press to reset audio/video offset to \fB0\fP, so stream timestamps are unchanged.
 .SH FILES
 All config files are now to be found in ~/.xine:
 .br
@@ -267,7 +385,9 @@ main config file
 .br
 .BR ~/.xine/keymap :
 key bindings for xine-ui
-
+.br
+.BR ~/.xine/passwd :
+passwords file xine-ui
 .SH AUTHOR
 This manual page was written by Siggi Langauf <siggi@debian.org>,
 for the xine project. Lots of additions by
