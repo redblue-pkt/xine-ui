@@ -365,17 +365,18 @@ static void setup_paint_widgets(void) {
       xitk_set_widget_pos(setup->wg[i]->label, wx, y);
     }
 
-    xitk_get_widget_pos(setup->wg[i]->widget, &wx, &wy);
-    /* Inputtext/intbox/combo widgets have special treatments */
-    if(((xitk_get_widget_type(setup->wg[i]->widget)) & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) {
-      xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 4);
+    if(setup->wg[i]->widget) {
+      xitk_get_widget_pos(setup->wg[i]->widget, &wx, &wy);
+      /* Inputtext/intbox/combo widgets have special treatments */
+      if(((xitk_get_widget_type(setup->wg[i]->widget)) & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) {
+	xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 4);
+      }
+      else if((((xitk_get_widget_type(setup->wg[i]->widget)) & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) ||
+	      (((xitk_get_widget_type(setup->wg[i]->widget)) & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX))
+	xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
+      else
+	xitk_set_widget_pos(setup->wg[i]->widget, wx, y);
     }
-    else if((((xitk_get_widget_type(setup->wg[i]->widget)) & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) ||
-    	    (((xitk_get_widget_type(setup->wg[i]->widget)) & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX))
-      xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
-    else
-      xitk_set_widget_pos(setup->wg[i]->widget, wx, y);
-    
     ENABLE_ME(setup->wg[i]);
 
     y += (FRAME_HEIGHT>>1) + 2;
@@ -489,6 +490,32 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
     if(((xitk_get_widget_type(w)) & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
       xitk_inputtext_change_text(w, check_entry.str_value);
   }
+}
+
+static widget_triplet_t *setup_add_nothing_available(const char *title, int x, int y) {
+  static widget_triplet_t *wt; 
+  xitk_widget_t       *frame = NULL;
+  xitk_image_t        *image;
+  xitk_image_widget_t  im;
+  
+  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+  
+  image = xitk_image_create_image_from_string(gGui->imlib_data, tabsfontname,
+					       FRAME_WIDTH + 1, ALIGN_CENTER, (char *)title);
+  
+  XITK_WIDGET_INIT(&im, gGui->imlib_data);
+  im.skin_element_name = NULL;
+  
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)),
+			    (frame = xitk_noskin_image_create(setup->widget_list, &im, image, x, y)));
+  
+  add_widget_to_list(frame);
+
+  wt->frame = frame;
+  wt->label = NULL;
+  wt->widget = NULL;
+  
+  return wt;
 }
 
 /*
@@ -825,6 +852,13 @@ static void setup_section_widgets(int s) {
     }
     free(entry);
 
+    
+    if(setup->num_wg == 0) {
+      setup->wg[setup->num_wg++] = 
+	setup_add_nothing_available(_("There is no configuration option available in "
+				      "this user experience level."), x, y);
+    }
+
 
     if(setup->num_wg > MAX_DISPLAY_WIDGETS) {
       slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;
@@ -833,7 +867,7 @@ static void setup_section_widgets(int s) {
     }
     else
       slidmax = 1;
-    
+      
     xitk_slider_set_max(setup->slider_wg, slidmax);
     xitk_slider_set_pos(setup->slider_wg, slidmax);
   }
