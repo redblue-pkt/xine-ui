@@ -1903,7 +1903,7 @@ void xitk_set_widget_tips_default(xitk_widget_t *w, char *str) {
   }
 
   xitk_tips_set_tips(w, str);
-  xitk_tips_set_timeout(w, TIPS_TIMEOUT);
+  xitk_tips_set_timeout(w, xitk_get_tips_timeout());
 }
 
 /*
@@ -1956,7 +1956,7 @@ void xitk_enable_widget_tips(xitk_widget_t *w) {
     return;
   }
   
-  xitk_tips_set_timeout(w, TIPS_TIMEOUT);
+  xitk_tips_set_timeout(w, xitk_get_tips_timeout());
 }
 
 /*
@@ -2007,11 +2007,13 @@ void xitk_enable_widgets_tips(xitk_widget_list_t *wl) {
  */
 void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout) {
   xitk_widget_t *mywidget;
-  
+
   if(!wl) {
     XITK_WARNING("widget list was NULL.\n");
     return;
   }
+
+  xitk_set_tips_timeout(timeout);
 
   mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
 

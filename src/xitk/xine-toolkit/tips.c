@@ -385,6 +385,6 @@ void xitk_tips_set_tips(xitk_widget_t *w, char *str) {
   
   /* No timeout, set it to default */
   if(!w->tips_timeout)
-    xitk_tips_set_timeout(w, TIPS_TIMEOUT);
+    xitk_tips_set_timeout(w, xitk_get_tips_timeout());
 
 }

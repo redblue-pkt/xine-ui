@@ -328,6 +328,8 @@ void xitk_unset_current_menu(void);
 int xitk_get_display_width(void);
 int xitk_get_display_height(void);
 XColor xitk_get_black_pixel_color(void);
+unsigned long xitk_get_tips_timeout(void);
+void xitk_set_tips_timeout(unsigned long timeout);
 
 int xitk_is_running(void);
 int xitk_skin_get_direction(xitk_skin_config_t *, const char *);

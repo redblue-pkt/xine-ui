@@ -141,6 +141,7 @@ typedef struct {
   struct timeval              keypress;
 
   pthread_t                  *tips_thread;
+  unsigned long               tips_timeout;
 } __xitk_t;
 
 static __xitk_t    *gXitk;
@@ -1660,6 +1661,7 @@ void xitk_init(Display *display, XColor black, int verbosity) {
   xitk_x_error           = 0;
   gXitk->x_error_handler = NULL;
   gXitk->modalw          = None;
+  gXitk->tips_timeout    = TIPS_TIMEOUT;
 
   memset(&gXitk->keypress, 0, sizeof(gXitk->keypress));
 
@@ -1953,6 +1955,13 @@ int xitk_get_display_height(void) {
 }
 XColor xitk_get_black_pixel_color(void) {
   return gXitk->black;
+}
+
+unsigned long xitk_get_tips_timeout(void) {
+  return gXitk->tips_timeout;
+}
+void xitk_set_tips_timeout(unsigned long timeout) {
+  gXitk->tips_timeout = timeout;
 }
 
 /*
