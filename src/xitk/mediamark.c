@@ -559,22 +559,47 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 	playlist->data = raw_content;
 	
 	if(playlist_split_data(playlist)) {
-	  int entries_raw = 0;
+	  char *path;
+	  char *origin = NULL;
+	  int   entries_raw = 0;
 	  int   linen = 0;
 	  char *ln;
 	  
 	  while((ln = playlist->lines[linen++]) != NULL) {
 	    if(ln) {
 	      
-	      if((strncmp(ln, ";", 1)) &&
-	       (strncmp(ln, "#", 1))) {
+	      if((strncmp(ln, ";", 1)) && (strncmp(ln, "#", 1))) {
+		char  buffer[_PATH_MAX + _NAME_MAX + 1];
+		char *entry;
 		
+		path = strrchr(filename, '/');
+		if(path && (path > filename)) {
+		  origin = (char *) xine_xmalloc((path - filename) + 2);
+		  strncat(origin, filename, (path - filename));
+		  strcat(origin, "/");
+		}
+
 		if(entries_raw == 0)
 		  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
 		else
 		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_raw + 2));
 		
-		mediamark_store_mmk(&mmk[entries_raw], ln, NULL, 0, -1);
+		entry = ln;
+
+		if(origin) {
+		  memset(&buffer, 0, sizeof(buffer));
+		  sprintf(buffer, "%s", origin);
+		  
+		  if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
+		    buffer[strlen(buffer) - 1] = '\0';
+		  
+		  sprintf(buffer, "%s%s", buffer, ln);
+		  
+		  if(_file_exist(buffer))
+		    entry = buffer;
+		}
+		
+		mediamark_store_mmk(&mmk[entries_raw], entry, NULL, 0, -1);
 		playlist->entries = ++entries_raw;
 	      }
 	    }
@@ -584,6 +609,9 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 	    mmk[entries_raw] = NULL;
 	    playlist->type = strdup("RAW");
 	  }
+
+	  if(origin)
+	    free(origin);
 
 	  while(playlist->numl) {
 	    free(playlist->lines[playlist->numl - 1]);
