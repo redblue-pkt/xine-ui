@@ -27,6 +27,10 @@
 #include "config.h"
 #endif
 
+#include <stdio.h>
+#include <string.h>
+#include <pthread.h>
+
 #include "xitk.h"
 
 #include "utils.h"
@@ -53,6 +57,30 @@ static void panel_store_new_position(int x, int y, int w, int h) {
   config_set_int("panel_y", y);
 }
 
+/*
+ * Update slider thread.
+ */
+static void *slider_loop(void *dummy) {
+
+  pthread_detach(pthread_self());
+
+  while(gGui->running) {
+    if(panel_is_visible()) {
+      if(gGui->xine) {
+	if(xine_get_status(gGui->xine) != XINE_STOP) {
+	  slider_set_pos(panel->widget_list, panel->slider_play, 
+			 xine_get_current_position(gGui->xine));
+	}
+      }
+    }
+    sleep(3);
+  }
+  pthread_exit(NULL);
+}
+
+/*
+ * Boolean about panel visibility.
+ */
 int panel_is_visible(void) {
 
   if(panel)
@@ -61,6 +89,9 @@ int panel_is_visible(void) {
   return 0;
 }
 
+/*
+ * Show/Hide panel window.
+ */
 void panel_toggle_visibility (widget_t *w, void *data) {
 
   pl_toggle_visibility(NULL, NULL);
@@ -90,6 +121,9 @@ void panel_toggle_visibility (widget_t *w, void *data) {
   
 }
 
+/*
+ * Check and set the correct state of pause button.
+ */
 void panel_check_pause(void) {
   
   checkbox_set_state(panel->checkbox_pause, 
@@ -98,10 +132,16 @@ void panel_check_pause(void) {
 
 }
 
+/*
+ * Reset the slider of panel window (set to 0).
+ */
 void panel_reset_slider (void) {
   slider_reset(panel->widget_list, panel->slider_play);
 }
 
+/*
+ * Update audio/spu channel displayed informations.
+ */
 void panel_update_channel_display (void) {
 
   sprintf (panel->audiochan, "%3d", xine_get_audio_channel(gGui->xine));
@@ -116,23 +156,16 @@ void panel_update_channel_display (void) {
   label_change_label (panel->widget_list, panel->spuid_label, panel->spuid);
 }
 
+/*
+ * Update displayed MRL according to the current one.
+ */
 void panel_update_mrl_display (void) {
   label_change_label (panel->widget_list, panel->title_label, gGui->filename);
 }
 
-void panel_update_slider (void) {
-
-  if (panel_is_visible()) {
-    if(panel->slider_timer > MAX_UPDSLD) {
-      slider_set_pos(panel->widget_list, panel->slider_play, 
-		     xine_get_current_position(gGui->xine));
-    
-      panel->slider_timer = 0;
-    }
-    panel->slider_timer++;
-  }
-}
-
+/*
+ * Handle paddle moving of slider.
+ */
 static void panel_slider_cb(widget_t *w, void *data, int pos) {
 
   if(w == panel->slider_play) {
@@ -457,7 +490,6 @@ void panel_init (void) {
 					  gui_get_skinfile("SpuLabel"))));
 
   /* SLIDERS */
-  panel->slider_timer = MAX_UPDSLD;
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->slider_play = 
 			    create_slider(gGui->display, gGui->imlib_data, 
@@ -534,5 +566,6 @@ void panel_init (void) {
 
   XUnlockDisplay (gGui->display);
   XSync(gGui->display, False); 
-}
 
+  pthread_create(&panel->slider_thread, NULL, slider_loop, NULL);
+}

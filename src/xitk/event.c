@@ -438,8 +438,6 @@ void gui_status_callback (int nStatus) {
 
   /* printf ("gui status callback : %d\n", nStatus); */
   
-  panel_update_slider ();
-
   if (nStatus == XINE_STOP) {
     gGui->playlist_cur++;
     panel_reset_slider ();
@@ -564,6 +562,8 @@ void gui_init (int nfiles, char *filenames[]) {
 
   widget_init(gGui->display);
 
+  gGui->running = 1;
+
   video_window_init ();
   
   panel_init ();
@@ -685,8 +685,6 @@ void gui_run (void) {
    * event loop
    */
 
-  gGui->running = 1;
-
 #ifdef HAVE_LIRC
   if(!no_lirc) {
     init_lirc();
@@ -700,6 +698,8 @@ void gui_run (void) {
 						   gui_dndcallback, NULL);
   
   widget_run();
+
+  gGui->running = 0;
   
   /*
    * Restore screensaver parameters

@@ -26,6 +26,7 @@
 #ifndef PANEL_H
 #define PANEL_H
 
+#include <pthread.h>
 #include "xitk.h"
 
 typedef struct {
@@ -43,12 +44,11 @@ typedef struct {
   char             spuid[20];
   widget_t        *spuid_label;
   ImlibImage      *bg_image;
-#define MAX_UPDSLD 25
-  int              slider_timer; /* repaint slider if slider_timer<=0 */
   widgetkey_t      widget_key;
+  pthread_t        slider_thread;
 } _panel_t;
 
-void panel_init (void) ;
+void panel_init (void);
 
 void panel_add_autoplay_buttons(void);
 
@@ -65,7 +65,5 @@ void panel_reset_slider ();
 void panel_update_channel_display () ;
 
 void panel_update_mrl_display ();
-
-void panel_update_slider () ;
 
 #endif
