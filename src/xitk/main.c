@@ -1265,35 +1265,20 @@ int main(int argc, char *argv[]) {
 	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
 	
 	if(post) {
-	  const char *const *pinputs = xine_post_list_inputs(post);
-	  
-	  if(pinputs) {
-	    int p = 0;
+	  if(post->type == XINE_POST_TYPE_AUDIO_VISUALIZATION) {
+	    if(num_plug == 0)
+	      post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+	    else
+	      post_output_plugins = (char **) realloc(post_output_plugins, 
+						      sizeof(char *) * (num_plug + 1));
 	    
-	    while(pinputs[p]) {
-	      const xine_post_in_t *pin = xine_post_input(post, (char *)pinputs[p]);
-	      
-	      if(pin) {
-		if(pin->type == XINE_POST_DATA_AUDIO) {
-		  
-		  if(num_plug == 0)
-		    post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
-		  else
-		    post_output_plugins = (char **) realloc(post_output_plugins, 
-							    sizeof(char *) * (num_plug + 1));
-		  
-		  post_output_plugins[num_plug]     = strdup(pol[i]);
-		  post_output_plugins[num_plug + 1] = NULL;
-		  num_plug++;
-		  
-		}
-	      }
-	      
-	      p++;
-	    }
+	    post_output_plugins[num_plug]     = strdup(pol[i]);
+	    post_output_plugins[num_plug + 1] = NULL;
+	    num_plug++;
 	  }
+
+	  xine_post_dispose(gGui->xine, post);
 	}
-	
 	i++;
       }
       
