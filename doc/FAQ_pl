@@ -21,8 +21,6 @@
    3   PROCES KOMPILACJI
    3.1 Czego potrzebujê aby wszystko poprawnie skompilowaæ?
    3.2 Jak skompilowaæ xine?
-   3.2.1 Proste instrukcje kompilacji dla pocz±tkuj±cych
-   3.2.2 Pe³na instrukcja kompilacji.
    
    3.3 Czy mogê dodaæ dodatkowe CFLAGS dla kompilacji?
    3.4 Czy s± dostêpne binaria dla mojego K7? Mogê je skompilowaæ?
@@ -130,7 +128,7 @@
 
     cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine login
 
-    <puste has³o>
+    [puste has³o]
 
     cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-lib
     cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-ui
@@ -153,31 +151,6 @@
 
 3.2 Jak skompilowaæ xine?
 
-3.2.1 Proste instrukcje kompilacji dla pocz±tkuj±cych
-
-    ¦ci±gnij najnowsze zbiory  xine-lib and xine-ui, i zastosuj siê
-    do poni¿szych wskazówek. Aby rozpakowaæ zbiory u¿yj
-  
-    tar xfvz nazwa_zbioru.tar.gz
-
-    Poni¿sze instrukcje zainstaluj± xine w katalogu /usr/local
-    dla wszystkich u¿ytkowników. Potrzebujesz do tego konta root
-    na wiêkszo¶ci systemów.
-
-    najpierw rozpakuj xine-lib, wtedy:
-    # ./configure
-    # make install
-
-    upewnij siê ¿e /etc/ld.so.conf zawiera /usr/local/lib, wtedy
-
-    # ldconfig
-
-    teraz rozpakuj xine-ui, i wykonaj:
-    # ./configure
-    # make install
-
-3.2.2 Pe³na instrukcja kompilacji.
-
     Proces kompilacji jest taki sam dla wszystkich modu³ów xine (zobacz
     2.1 - wyt³umaczenie na temat modu³ów)
 
@@ -196,7 +169,7 @@
 
     aby siê upewniæ ¿e libxine zostanie znalezione przez xine-ui/xine-plugin/...
 
-    I ostatnie ale nie ostateczne. Oto instrukcje kompilacji. Tak jak opisane
+    I ostatnie lecz nie mniej wa¿ne. Oto instrukcje kompilacji. Tak jak opisane
     wcze¶niej, s± takie same dla ka¿dego modu³u.
     
      ./cvscompile.sh [-> niezbêdne tylko gdy pobra³e¶ ¼ród³a z repozytorium CVS]
@@ -462,7 +435,7 @@
       zupe³nie niepotrzebnie, ale CHCESZ: u¿ytkownik - królem ;-)):
 
       Pamiêtaj ¿e je¶li wybie¿esz tê drogê, nie bêdziesz mia³ ci±g³o¶ci w
-      odtwarzaniu filmu DVD. Bêdziesz musia³ odtwarzaæ ka¿d± czê¶æ manualnie.
+      odtwarzaniu filmu DVD. Bêdziesz musia³ odtwarzaæ ka¿d± czê¶æ rêcznie.
       A wiêc jeszcze raz: dlaczego nie nacisn±æ po prostu przyciku DVD
       na panelu xine!? ;-)
 
@@ -498,7 +471,7 @@
      
       Tak, u¿yj nastêpuj±cego MRL:
 
-       xine VCD://<numer ¶cie¿ki>
+       xine VCD://[numer ¶cie¿ki]
 
 
 5.2 PYTANIA DOTYCZ¡CE D¬WIÊKU
@@ -728,7 +701,7 @@
       na odpowiedni kod regionu. (zobacz równie¿ 5.1.8)
 
       Ostatnie wesje xine prawdopodobnie sprawdz± czy DVD, które próbujesz
-      odtworzyæ, jest zaszyfrowane i poinformuj± Ciê o tym. (zobacz 5.4.5)
+      odtworzyæ, jest zaszyfrowane i poinformuj± Ciê o tym. (zobacz 5.4.5)      
 
 5.4.5 "input_dvd: Sorry, xine doesn't play encrypted DVDs. The legal status
        of CSS decryption is unclear and we will not provide such code."
@@ -786,7 +759,8 @@
     Dziêkujemy za po¶wiêcenie czasu na pomoc w ulepszaniu xine!
 
 
-    ###############################
-    # T³umaczenie: _4ever_@irc.pl #
-    ###############################
+    #################################
+    # T³umaczenie: Bart³omiej Muryn #
+    #    mailto: _4ever_@irc.pl     #
+    #################################
 

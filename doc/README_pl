@@ -21,7 +21,8 @@
    2.4.1 Skróty klawiaturowe
    2.4.2 Wybieranie ¶cie¿ki d¼wiêkowej
    2.4.3 Wybieranie napisów
-   
+   2.4.4 LIRC
+ 
    3   CO NIE ZOSTA£O JESZCZE POWIEDZIANE
    3.1 Wolno¶æ, DVD i te sprawy...
    
@@ -47,8 +48,8 @@
 2   O XINE
 
     xine to wolny, na licncji GPL, odtwarzacz wideo dla systemów
-    unixowych. Obs³uguje strumienie mpeg-2 i mpeg-1 (zawieraj±ce audio
-    + obraz), elementarne strumienie mpeg (tylko audio/wideo, np.
+    unixowych. Obs³uguje strumienie mpeg-2 i mpeg-1 (zawieraj±ce d¼wiêk
+    + obraz), elementarne strumienie mpeg (tylko d¼wiêk/obraz, np.
     pliki mp3) jak i pliki typu AVI (u¿ywaj±c kodeków dll win32) oraz
     strumienie typu Vorbis OGG. Jest pewne wsparcie dla sekwencji
     quicktime (ale wiêkszo¶æ kodeków audio i wideo jest chronionych
@@ -62,7 +63,7 @@
 
     xine mo¿e odtwarzaæ VideoCD, CD, SVCD i bezpo¶rednio DVD. Niestety
     status prawny zaszyfrowanych/zablokowanych dysków DVD nie jest
-    w niektórych pañstwach jasny, wiêc nie mo¿emy dodaæ do xine ¿adnego
+    jasny w niektórych pañstwach, wiêc nie mo¿emy dodaæ do xine ¿adnego
     kodu odszyfrowuj±cego DVD. Aby odtwarzaæ takie DVD bêdziesz
     potrzebowaæ zewnêtrznych programów lub czego¶ na kszta³t wtyczki do
     xine 'xine_dvd_plugin', który mo¿e obs³u¿yæ uwierzytelnianie/
@@ -78,7 +79,7 @@
 
 2.1 Wymagania i wspierane platformy
 
-    - xine wymaga serwera X11 dla wyj¶cia wideo (z 8, 15, 16, 24 lub 32
+    - xine wymaga serwera X11 dla wyj¶cia obrazu (z 8, 15, 16, 24 lub 32
       - bitow± g³êbi± kolorów).
     - xine wykrywa i u¿ywa rozszerzeñ MIT X video i X shared memory dla
       lepszej wydajno¶ci.
@@ -97,9 +98,9 @@
     z architektur± i386 (pentium i lepsze) u¿ywaj±c GNU/Linux lub FreeBSD.
     Zale¿nie od typu odtwarzanej sekwencji wideo, bêdziesz potrzebowaæ
     wiêcej lub mniej mocy procesora, dla p³ynnago odtwarzania. Odtwarzanie
-    DVD zacznie dobrze dzia³aæ na systemach opartych o Pentium II 400Mhz
-    (lub równowa¿nych). Zbyt du¿o niewiadomych jest w tym równaniu wiêc
-    ta granica mo¿e siê wahaæ.
+    DVD mo¿e dobrze dzia³aæ ju¿ na systemach opartych o Pentium II 400Mhz
+    (lub równowa¿nych). W tym równaniu jest jednak zbyt wiele niewiadomych
+    wiêc ta granica mo¿e siê wahaæ.
 
     Pomy¶lnie przetestowane karty graficzne (u¿ywaj±ce Xv) dla PC to:
     nVidia Riva TNT (oryginalne sterowniki NVidii "closed-source"),
@@ -111,7 +112,7 @@
     dyskusyjn± u¿ytkowników xine):
     Trident 9660, ATI AIW M64-8Mb PCI, ATI RageII 8MB.
 
-    xine powinien daæ sobiê radê z odtwarzaniem wideo na ka¿dym
+    xine powinien daæ sobiê radê z odtwarzaniem obrazu na ka¿dym
     dzia³aj±cym x-serwerze z ka¿d± kart± graficzn±, ale z du¿o gorsz±
     wydajno¶ci± ni¿ z rozszerzeniem Xv.
 
@@ -146,17 +147,24 @@
 2.3 Programi¶ci xine
 
     g³ówny programista
-      Guenter Bartsch
+      Guenter Bartsch <guenter@users.sourceforge.net>
 
     ró¿ne sugestie, poprawki b³êdów i kompilacji, alsa plugin,
     interfejs u¿ytkownika
-      Daniel Caujolle-Bert 
+      Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 
-    oprogramowanie audio
-      Siegfried Langauf 
+    wiele poprawek, wykrywanie prêdko¶ci transferu, programowa eliminacja
+    przeplotu, masa uaktualnieñ libwin32
+      Miguel Freitas <miguel@cetuc.puc-rio.br>
 
-    Dostarczenie ¶wietnych "hacków" libmpeg2 i libac3:
-      Michael Lespinasse
+    modu³ wy¶wietlania obrazu teletux/syncfb, ró¿ne poprawki, sterowniki alsa
+      Joachim Koenig <Joachim.Koenig@gmx.net>
+
+    programowanie liba52/libmpeg2
+      Michael Lespinasse <walken@zoy.org>
+
+    pakiety dla Debiana, wsparcie dla u¿ytkowników
+      Siegfried Langauf <siggi@users.sourceforge.net>
   
     ...i wielu innych, zobacz plik xine-lib/AUTHORS
 
@@ -202,37 +210,37 @@
 
 2.4.1 Skróty klawiaturowe
 
-      Klawisz           Akcja
+      Klawisz            Akcja
 
-      <RETURN>          odtwórz
-      <SPACJA>, P       stop klatka
-      <Góra>/<Dó³>      szybki podgl±d / zwolnienie
+      [RETURN]           odtwórz
+      [SPACJA], P        stop klatka
+      [Góra]/[Dó³]       szybki podgl±d / zwolnienie
 
-      0                 znajd¼ pocz±tek aktualnej sekwencji
-      1-9               przejd¼ do 10-90% aktualnej sekwencji
-      <Lewo>/<Prawo>    przeskocz -+ 15 sec (+CTRL: 60 sec)
-      <PgUp>/<Wstecz>   przeskocz do poprzedniej pozycji na li¶cie
-      <PgDown>/<Naprzód>przeskocz do nastêpnej pozycji na li¶cie
+      0                  znajd¼ pocz±tek aktualnej sekwencji
+      1-9                przejd¼ do 10-90% aktualnej sekwencji
+      [Lewo]/[Prawo]     przeskocz -+ 15 sec (+CTRL: 60 sec)
+      [PgUp]/[Wstecz]    przeskocz do poprzedniej pozycji na li¶cie
+      [PgDown]/[Naprzód] przeskocz do nastêpnej pozycji na li¶cie
 
-      f                 Prze³±cz do trybu pe³noekranowego/okna
-      a                 prze³±cz proporcje ekranu (AUTO/16:9/4:3/DVB)
-      i                 w³±cz tryb przeplotu
+      f                  Prze³±cz do trybu pe³noekranowego/okna
+      a                  prze³±cz proporcje ekranu (AUTO/16:9/4:3/DVB)
+      i                  w³±cz tryb przeplotu
 
-      z / Shift-Z       ZOOM powiêkszanie / pomiejszanie obrazu.
-                        dodaj Ctrl aby powiêkszyæ w pionie lub Meta aby
-                        powiêkszyæ w poziomie
+      z / Shift-Z        ZOOM powiêkszanie / pomiejszanie obrazu.
+                         dodaj Ctrl aby powiêkszyæ w pionie lub Meta aby
+                         powiêkszyæ w poziomie
 
-      "<",">"           zmodyfikuj rozmiar okna wyj¶wietlania
-      + -               zmieñ kana³ audio
-      , .               zmieñ kana³ napisów
-      n m               wyreguluj synchronizacjê a/v
-      <HOME>            zresetuj synchronizacjê a/v
+      "<",">"            zmodyfikuj rozmiar okna wyj¶wietlania
+      + -                zmieñ kana³ audio
+      , .                zmieñ kana³ napisów
+      n m                wyreguluj synchronizacjê a/v
+      [HOME]             zresetuj synchronizacjê a/v
 
-      <INSERT>          prze³±cz widzialno¶æ kursora myszki w oknie obrazu
+      [INSERT]           prze³±cz widzialno¶æ kursora myszki w oknie obrazu
 
-      q                 zakoñcz
+      q                  zakoñcz
 
-      h                 ukryj okno obrazu (u¿yteczne przy odtwarzaniu mp3)
+      h                  ukryj okno obrazu (u¿yteczne przy odtwarzaniu mp3)
 
       wiêcej wkrótce ;-)
 
@@ -374,11 +382,11 @@
     znaczenie "wolnego oprogramowania" idzie du¿o dalej: jest
     ono zwi±zane z wolno¶ci± jego u¿ytkowników.
     Je¶li masz czas, proszê przeczytaj, co "Free Software Foundation"
-    pisze na temat wolno¶ci i oprogramownia:
+    pisze na ten temat:
     http://www.gnu.org/philosophy/free-sw.pl.html
 
-    Bardzo specificznym zagro¿eniem jest, kiedy dotyczy to DVD: przemys³
-    filmowy dope³nia wszelkich mo¿liwych wysi³ków aby ograniczyæ
+    Bardzo specyficznym problemem jest wolno¶æ oprogramowania DVD:
+    przemys³ filmowy dope³nia wszelkich mo¿liwych wysi³ków aby ograniczyæ
     odtwarzanie p³yt DVD do kontrolowanych urz±dzeñ. Wiêkszo¶æ obecnie
     sprzedawanych p³yt DVD jest zaszyfrowana (zablokowana) i w niektórych
     krajach (zw³aszcza w USA), nielegalnym jest odszyfrowywanie
@@ -392,7 +400,7 @@
     czy gdziekolwiek na ¶wiecie jest legalne  pisanie, posiadanie i u¿ywanie
     oprogramowania do OGL¡DANIA zaszyfrowanych p³yt DVD. Dopóki ten temat
     pozostaje niejasny (i wydaje siê potencjalnie bardzo niebezpieczny),
-    xine nie zawiera ¿adnego specyficznego kodu do odblokowywania DVD.
+    xine nie bêdzie zawieraæ ¿adnego specyficznego kodu do odblokowywania DVD.
     Wydaje siê jednak, ¿e osoby trzecie pracuj± nad takimi rozszerzeniami.
     Mo¿liwe ¿e s± miejsca gdzie jest to legalne. Którekolwiek z powy¿szych
     dotyczy Ciebie - nie bêdziesz w stanie odtwarzaæ zaszyfrowanych DVD
@@ -412,9 +420,10 @@
 
     Informacja zwrotna, lub chêæ pomocy mile widziana, kontakt:
 
-       lista dyskusyjna u¿ytkowników xine <xine-user@lists.sourceforge.net>
+       lista dyskusyjna u¿ytkowników xine: xine-user@lists.sourceforge.net
 
 
-    ###############################
-    # T³umaczenie: _4ever_@irc.pl #
-    ###############################
+    ################################
+    # T³umaczenie: Bar³omiej Muryn #
+    #    mailto: _4ever_@irc.pl    #
+    ################################
