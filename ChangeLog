@@ -1,5 +1,19 @@
 xine-ui (0.99.1) unstable; urgency=low
 
+  * playlist meta info scanning no more disturn playback,
+  * auto buttons can be limited in skinconfig (update your already downloaded skins),
+  * change and add checkbox styles (user selectable, see xitk README),
+  * fix chain-reaction crashes with help and stuff,
+  * shortcuts displayed in menus,
+  * fix xinerama fullscreen (again),
+  * fix layering (one more time),
+  * "ESC" key dismiss windows,
+  * fix enqueuing and new streamtuner,
+  * MooSFV an Noatun playlist formats added,
+  * display offsets on OSD in mm:ss.ss format,
+  * add skin caching (speedup)
+  * remove all skins but xinetic,
+  * implement AMP muting,
   * fix xinerama-fullscreen problems with new kwin versions,
   * fix XMB failure (fallback to standart XFont usage),
   * fix skin downloader preview blanking,
@@ -7,9 +21,10 @@ xine-ui (0.99.1) unstable; urgency=low
   * show windows in taskbar when output window is hidden,
   * fix root window and windows states,
   * Xft support in xitk (thanks to Drew 'dantealiegri' Ogle <dantealiegri@umbc.edu>),
-  * fix a problem with special characters in OSD for some locales
-  * display offsets on OSD in mm:ss format too, SPU offset reset
-  * enhanced ASCII art frontend for using CACA (Colored ASCII art)
+  * fix a problem with special characters in OSD for some locales,
+  * display offsets on OSD in mm:ss format too, SPU offset reset,
+  * enhanced ASCII art frontend for using CACA (Colored AsCii Art),
+  * lot of fix, as usual.
 
 xine-ui (0.9.23) unstable; urgency=low
 
