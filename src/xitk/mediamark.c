@@ -794,15 +794,15 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
       else
 	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
       
+      xml_parser_free_tree(xml_tree);
+    __failure:
+      free(asx_content);
+      
       if(entries_asx) {
 	mmk[entries_asx] = NULL;
 	playlist->type = strdup("ASX3");
 	return mmk;
       }
-      
-      xml_parser_free_tree(xml_tree);
- __failure:
-      free(asx_content);
     }
   }
   
