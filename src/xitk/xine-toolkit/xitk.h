@@ -32,6 +32,7 @@
 
 #include <stdlib.h>
 #include <limits.h>
+#include <pthread.h>
 #include <X11/Xlib.h>
 #include "xitkintl.h"
 #include "Imlib-light/Imlib.h"
