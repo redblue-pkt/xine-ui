@@ -590,7 +590,7 @@ static void codec_reporting( void *user_data, int codec_type,
       if( !description[0] )
         description = fourcc_txt;
         
-      xine_error(_("No video plugin found to decode '%s'."), description);
+      xine_error_with_more(_("No video plugin available to decode '%s'."), description);
     }
             
     if( codec_type == XINE_CODEC_AUDIO &&
@@ -605,7 +605,7 @@ static void codec_reporting( void *user_data, int codec_type,
           sprintf(fourcc_txt, "0x%x", fourcc );
         }  
       }
-      xine_error(_("No audio plugin found to decode '%s'."), description);
+      xine_error_with_more(_("No audio plugin available to decode '%s'."), description);
     }
   }
 }

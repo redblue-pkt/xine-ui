@@ -36,7 +36,9 @@
    3.7 Can I install xine in my home directory (without being root) ?
 
    4   INSTALLATION
-   4.1 Where should I put the windows codec dlls for xine?
+   4.1 Is it possible to use windows codecs with xine?
+   4.2 Where should I put the win32 codec dlls for xine?
+   4.3 This is great! Could you provide these dlls?
 
    5   THE PLEASURE OF RUNNING XINE :)   
    
@@ -76,7 +78,10 @@
    5.4.5 "input_dvd: Sorry, xine doesn't play encrypted DVDs. The legal status
           of CSS decryption is unclear and we will not provide such code."
    5.4.6 "audio driver 'oss' failed, using null driver instead"
-   
+   5.4.7 "video_out: throwing away image with pts xxx because it's too old"
+   5.4.8 "No video plugin available to decode 'xxxxxx'."
+   5.4.9 "w32codec: decoder failed to start. Is 'xxxxxx' installed?"
+      
    6   BUGS - GET THAT DAMN VERMIN EXTERMINATOR NOW! ;-)
    6.1 I did the impossible - I really found a bug! Who can I inform about it?
 
@@ -340,8 +345,30 @@
 
 
 4   INSTALLATION
+   
+4.1 Is it possible to use windows codecs with xine?
 
-4.1 Where should I put the windows codec dlls for xine?
+    Yes, xine is able to use some win32 dlls from your windows system
+    to decode a few obscure formats. We do not generally endorse the use
+    of binary codecs, the user is solely responsible for any license
+    conflict or malfunctioning.
+    
+    Some codecs that are known to work (not an exaustive list):
+      
+      mpg4c32.dll - Microsoft MPEG-4 v1/v2
+      ir50_32.dll - Indeo Video 5 format
+      ir41_32.dll - Indeo Video 4.1 format
+      ir32_32.dll - Indeo Video 3.2 format
+      iccvid.dll - Cinepak video
+      wmvds32.ax - Windows Media Video 7
+      wmv8ds32.ax - Windows Media Video 8
+      vp31vfw.dll - VP32 Video format
+      divxa32.acm - DivX audio (WMA)
+      voxmsdec.ax - Voxware Metasound
+      
+    These win32 dlls do only work in x86 systems.
+
+4.2 Where should I put the win32 codec dlls for xine?
 
     xine uses 
       
@@ -351,7 +378,16 @@
     file (located in ~/.xine) by editing:
 
      codec.win32_path:/usr/lib/win32
+   
+4.3 This is great! Could you provide these dlls?
 
+    Unfortunately not. These files are generally freely available on the
+    web but we can't provide them due legal reasons (read license 
+    restrictions, both from xine and codec sides).
+    
+    Besides you may already have these codecs in your computer if you have
+    a windows partition.
+    
 
 5   THE PLEASURE OF RUNNING XINE :)
 
@@ -362,6 +398,38 @@
       Your hardware is too slow for xine. Make sure you turn on all
       speed optimizing options. A few things you should check:
 
+       - first of all, run the xine-check script included in xine-ui
+         package (probably already installed in your system).
+         xine-check will report several of the most common problems
+         listed here. Sample output from xine-check:
+ 
+           $ xine-check
+           Please be patient, this script may take a while to run...
+           [ good ] you're using Linux, doing specific tests
+           [ good ] looks like you have a /proc filesystem mounted.
+           [ good ] You seem to have a reasonable kernel version (2.4.18)
+           [ good ] intel compatible processor, checking MTRR support
+           [ good ] you have MTRR support and there are some ranges set.
+           [ good ] found the player at /usr/local/bin/xine
+           [ good ] /usr/local/bin/xine is in your PATH
+           [ good ] found /usr/local/bin/xine-config in your PATH
+           [ good ] plugin directory /usr/local/lib/xine/plugins exists.
+           [ good ] found input plugins
+           [ good ] found demux plugins
+           [ good ] found decoder plugins
+           [ good ] found video_out plugins
+           [ good ] found audio_out plugins
+           [ good ] skin directory /usr/local/share/xine/skins exists.
+           [ good ] found logo in /usr/local/share/xine/skins
+           [ good ] I even found some skins.
+           [ good ] /dev/cdrom points to /dev/hdc
+           [ good ] /dev/dvd points to /dev/hdc
+           [ good ] DMA is enabled for your DVD drive
+           [ good ] found xvinfo: X-Video Extension version 2.2
+           [ good ] your Xv extension supports YUV overlays (improves MPEG performance)
+           [ good ] your Xv extension supports packed YUV overlays
+           [ good ] Xv ports:  YUY2 YV12 I420 UYVY      
+       
        - use a recent kernel optimized for your hardware
 
        - use the latest gas/gcc
@@ -386,8 +454,8 @@
 
          You can enable DMA mode with the following command:
          
-	  hdparm -d1 device_of_your_drive_that_supplies_video_data
-	
+         hdparm -d1 device_of_your_drive_that_supplies_video_data
+
          More information about this may be found here:
           => http://oreilly.linux.com/pub/a/linux/2000/06/29/hdparm.html
 
@@ -395,12 +463,12 @@
          Make sure you enable all speed-improving options. 
 
          Especially the via apollo pro chipset is known to be quite weird,
-	 (most of all on my gigabyte board). If you can't configure the ram
-	 access thoroughly using the bios you might want to try some really
-	 nasty tricks, as explained on (for example):
+         (most of all on my gigabyte board). If you can't configure the ram
+         access thoroughly using the bios you might want to try some really
+         nasty tricks, as explained on (for example):
        
           => http://www.overclockers.com/tips105/index03.asp
-	
+
          This website centers around a windows-tool to tweak the chipset, you
          can do the same on FreeBSD with pciconf. On some linux distributions
          there are similar tools.
@@ -431,7 +499,7 @@
           => ftp://ftp.kernel.org/pub/linux/kernel/people/sct/raw-io/
 
          To use raw devices, first connect a free raw device to your dvd
-	 device, use something like:
+         device, use something like:
 
           raw /dev/raw1 /dev/hdc
 
@@ -496,6 +564,13 @@
       directly. Of course you could play back the decrypted mpeg2 stream
       (technically speaking) that is the movie on the dvd with xine with the
       help of additional programs.
+      
+      xine standard dvd plugin also can't handle menus. For more information
+      about menu support please check http://dvd.sf.net
+      
+      If you install a different or "improved" dvd plugin in xine it will be
+      accessible from another button. Hitting "DVD" button will _always_ give
+      you the standard, no menu support and unencrypted dvd plugin.
     
       Due to the uncertain legal situation regarding css encryption we do not
       include anything of that nature in the xine distribution, nor do we
@@ -628,7 +703,7 @@
       Some xine drivers do not support volume changing although the GUI
       will show the volume bar. Usually this is not a xine fault: aRts C
       API, for example, doesn't offer any volume property to applications.
-
+      
 
 5.3 VIDEO RELATED QUESTIONS
 
@@ -654,11 +729,11 @@
 
        CARDS WITH OUT-OF-THE-BOX XV SUPPORT IN XFREE86 4.x:
        
-	 3dfx (voodoo)     (URL: ?)
+         3dfx (voodoo)     (URL: ?)
          i815              (URL: ?)
          Matrox G200/G400  (URL: www.matrox.com)
-	 NVidia            (URL: www.nvidia.com)
-	 Permedia 2/3      (URL: ?)
+         NVidia            (URL: www.nvidia.com)
+         Permedia 2/3      (URL: ?)
        
        CARDS WITH YET UNKNOWN STATUS:
        
@@ -753,7 +828,7 @@
 
 5.4.3 "Unable to open dvd drive (/dev/dvd)"
 
-      You probalby don't have /dev/dvd (check that). If so, simply create a
+      You probably don't have /dev/dvd (check that). If so, simply create a
       link /dev/dvd that points to your DVD device. Something like...
 
        cd /dev
@@ -815,7 +890,29 @@
       Or you suspend the aRts daemon by checking the appropriate option in
       your aRts control. (recommended)
 
+5.4.7 "video_out: throwing away image with pts xxx because it's too old"
 
+      See section 5.1.1, this is a performance related problem.
+      
+      If you have a fast computer and this message shows from time to
+      time playing dvd/cdrom, it's very likely that your drive is not
+      DMA enabled. 
+
+5.4.8 "No video plugin available to decode 'xxxxxx'."
+      
+      You have tried to play a stream using a unknown or unhandled codec.
+      Most likely, the file uses some obscure proprietary format and no
+      information is available to decode it.
+      
+      This popup window can be disabled from xine setup for audio, video
+      codecs or both. see gui.warn_unhandled_codec setting.
+      
+5.4.9 "w32codec: decoder failed to start. Is 'xxxxxx' installed?"
+
+      You probably don't have the win32 dll needed to decode this file.
+      See section 4.1 and 4.2.
+              
+            
 6   BUGS - GET THAT DAMN VERMIN EXTERMINATOR NOW! ;-)
 
 6.1 I did the impossible - I really found a bug! Who can I inform about it?
