@@ -82,6 +82,7 @@ struct prvt_image_s {
   int ratio_code;
   int format;
   uint8_t *y, *u, *v, *yuy2;
+  uint8_t *img;
 
   int u_width, v_width;
   int u_height, v_height;
@@ -101,8 +102,6 @@ static snapshot_messenger_t error_msg_cb;
 static snapshot_messenger_t info_msg_cb;
 static void *msg_cb_data;
 
-#warning FIXME NEWAPI
-#if 0
 /*
  *  This function was pinched from filter_yuy2tov12.c, part of
  *  transcode, a linux video stream processing tool
@@ -632,8 +631,6 @@ int scale_image( struct prvt_image_s *image )
 
 static int yuy2_fudge( struct prvt_image_s *image )
 {
-  image->yuy2 = image->y;
-
   image->y = png_malloc( image->struct_ptr, image->height*image->width );
   if ( image->y == NULL ) return( 0 );
   memset( image->y, 0, image->height*image->width );
@@ -694,7 +691,7 @@ static void rgb_free( struct prvt_image_s *image )
  *  Handler functions for image structure
  */
 
-static int prvt_image_alloc( struct prvt_image_s **image )
+static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
 {
   char *filename;
   
@@ -702,6 +699,12 @@ static int prvt_image_alloc( struct prvt_image_s **image )
   
   if (*image == NULL) 
     return 0;
+    
+  (*image)->img = malloc( imgsize );
+  if ((*image)->img == NULL) {
+    free(*image);
+    return 0;
+  }
   
   filename = (char *) alloca(strlen(gGui->snapshot_location) + 10);
   sprintf(filename, "%s/%s", gGui->snapshot_location, "xinesnap");
@@ -719,12 +722,15 @@ static void prvt_image_free( struct prvt_image_s **image )
    * Do not free image_p->file_name
    *   It looks after itself
    */
-
+  if (image_p->img)
+    free(image_p->img);
+   
   rgb_free ( image_p );
 
   if (image_p->info_ptr)   png_destroy_info_struct (  image_p->struct_ptr, &image_p->info_ptr );
   if (image_p->struct_ptr) png_destroy_write_struct( &image_p->struct_ptr, (png_infopp)NULL );
   if (image_p->fp)         fclose( image_p->fp );
+  free(image_p);
 }
 
 static int clip_8_bit( int val )
@@ -848,7 +854,8 @@ void create_snapshot (snapshot_messenger_t error_mcb,
 {
   int err = 0;
   struct prvt_image_s *image;
-
+  int width, height;
+  
 #ifdef DEBUG
   static int	   prof_scale_image = -1;
   static int	   prof_yuv2rgb     = -1;
@@ -866,15 +873,20 @@ void create_snapshot (snapshot_messenger_t error_mcb,
   info_msg_cb = info_mcb;
   msg_cb_data = mcb_data;
 
-  if ( ! prvt_image_alloc( &image ) )
+  width = xine_get_stream_info(gGui->stream,XINE_STREAM_INFO_VIDEO_WIDTH);
+  height = xine_get_stream_info(gGui->stream,XINE_STREAM_INFO_VIDEO_HEIGHT);
+  
+  printf("snapshot.c: allocating space for a %d x %d image\n", width, height );
+  
+  if ( ! prvt_image_alloc( &image, width*height*2 ) )
   {
     printf("  prvt_image_alloc failed\n");
     return;
   }
 
-  err = xine_get_current_frame(gGui->xine,
+  err = xine_get_current_frame(gGui->stream,
 			       &image->width, &image->height, &image->ratio_code,
-			       &image->format, &image->y, &image->u, &image->v); */
+			       &image->format, image->img);
   
   if (err == 0) {
     printf("   Framegrabber failed\n");
@@ -883,7 +895,7 @@ void create_snapshot (snapshot_messenger_t error_mcb,
   }
 
   /* the dxr3 driver does not allocate yuv buffers */
-  if (! image->y) { /* image->u and image->v are always 0 for YUY2 */
+  if (! image->img) { /* image->u and image->v are always 0 for YUY2 */
     printf(_("snapshot.c: not supported for this video out driver\n"));
     prvt_image_free( &image );
     return;
@@ -936,6 +948,9 @@ void create_snapshot (snapshot_messenger_t error_mcb,
   switch ( image->format ) {
     case XINE_IMGFMT_YV12:
       printf( "XINE_IMGFMT_YV12\n" ); 
+      image->y        = image->img;
+      image->u        = image->img + (image->width*image->height);
+      image->v        = image->img + (image->width*image->height)+(image->width*image->height)/4;
       image->u_width  = ((image->width+1)/2);
       image->v_width  = ((image->width+1)/2);
       image->u_height = ((image->height+1)/2);
@@ -944,6 +959,7 @@ void create_snapshot (snapshot_messenger_t error_mcb,
 
     case XINE_IMGFMT_YUY2: 
       printf( "XINE_IMGFMT_YUY2\n" );
+      image->yuy2     = image->img;
       image->u_width  = ((image->width+1)/2);
       image->v_width  = ((image->width+1)/2);
       image->u_height = ((image->height+1)/2);
@@ -1131,8 +1147,3 @@ void create_snapshot (snapshot_messenger_t error_mcb,
 
   return;
 }
-#else
-void create_snapshot (snapshot_messenger_t error_mcb,
-		      snapshot_messenger_t info_mcb, void *mcb_data) {
-}
-#endif
