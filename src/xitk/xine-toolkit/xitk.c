@@ -1614,24 +1614,19 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
    */
   while(gXitk->running) {
     
-
-
-    /* XLOCK(gXitk->display); 
+    XLOCK(gXitk->display); 
        
-       if(XPending (gXitk->display)) { 
-    */
-    XNextEvent (gXitk->display, &myevent) ;
-      /* XUNLOCK(gXitk->display);  */
-    xitk_xevent_notify(&myevent);
-    /*
-      } else {  
+    if(XPending (gXitk->display)) { 
+    
+      XNextEvent (gXitk->display, &myevent) ;
       XUNLOCK(gXitk->display); 
-      xitk_usec_sleep(16666); // 1/60 sec
-      } 
-      
-    */
+      xitk_xevent_notify(&myevent);
+    
+    } else {  
+      XUNLOCK(gXitk->display); 
+      xitk_usec_sleep(50000);
+    } 
   }
-  /*XUNLOCK(gXitk->display); */
 
   xitk_list_free(gXitk->list);
   xitk_list_free(gXitk->gfx);
