@@ -869,16 +869,14 @@ static void _cursors_create_cursor(Display *display, struct cursors_s *cursor) {
 
 void xitk_cursors_init(Display *display) {
   int   i;
-  int   x_only = xitk_get_cursors_feature();
+  int   xitk_cursors = xitk_get_cursors_feature();
+
+  /* Transparent cursor isn't a valid X cursor */
+  _cursors_create_cursor(display, &cursors[0]);
   
-  for(i = 0; i < MAX_CURSORS; i++) {
+  for(i = 1; i < MAX_CURSORS; i++) {
     
-    if(!x_only) {
-      XLOCK(display);
-      cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
-      XUNLOCK(display);
-    }
-    else {
+    if(xitk_cursors) {
       if(cursors[i].embedded == X_CURSOR) {
 	XLOCK(display);
 	cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
@@ -886,7 +884,11 @@ void xitk_cursors_init(Display *display) {
       }
       else
 	_cursors_create_cursor(display, &cursors[i]);
-      
+    }
+    else {
+      XLOCK(display);
+      cursors[i].cursor = XCreateFontCursor(display, cursors[i].x_shape);
+      XUNLOCK(display);
     }
   }
 }
