@@ -64,7 +64,7 @@
 
 #include "xine.h"
 #ifdef DEBUG
-#include <xine/monitor.h>
+#include <xine/xineutils.h>
 #endif
 
 #include "png.h"
@@ -841,11 +841,11 @@ void create_snapshot ( gGui_t *gGui )
   static int	   prof_png         = -1;
 
   if (prof_scale_image == -1)
-    prof_scale_image = profiler_allocate_slot ("snapshot scale image");
+    prof_scale_image = xine_profiler_allocate_slot ("snapshot scale image");
   if (prof_yuv2rgb == -1)
-    prof_yuv2rgb = profiler_allocate_slot ("snapshot yuv to rgb");
+    prof_yuv2rgb = xine_profiler_allocate_slot ("snapshot yuv to rgb");
   if (prof_png == -1)
-    prof_png = profiler_allocate_slot ("snapshot convert to png");
+    prof_png = xine_profiler_allocate_slot ("snapshot convert to png");
 #endif /* DEBUG */
 
   if ( ! prvt_image_alloc( &image ) )
@@ -1002,13 +1002,13 @@ void create_snapshot ( gGui_t *gGui )
   printf("  Scale YUV Image data\n" );
 
 #ifdef DEBUG
-  profiler_start_count (prof_scale_image);
+  xine_profiler_start_count (prof_scale_image);
 #endif /* DEBUG */
 
   scale_image ( image );
 
 #ifdef DEBUG
-  profiler_stop_count (prof_scale_image);
+  xine_profiler_stop_count (prof_scale_image);
 #endif /* DEBUG */
 
   /*
@@ -1029,13 +1029,13 @@ void create_snapshot ( gGui_t *gGui )
   printf("  Reformat YUV Image data to RGB\n" );
 
 #ifdef DEBUG
-  profiler_start_count (prof_yuv2rgb);
+  xine_profiler_start_count (prof_yuv2rgb);
 #endif /* DEBUG */
 
   yv12_2_rgb( image );
 
 #ifdef DEBUG
-  profiler_stop_count (prof_yuv2rgb);
+  xine_profiler_stop_count (prof_yuv2rgb);
 #endif /* DEBUG */
 
   /**/
@@ -1043,7 +1043,7 @@ void create_snapshot ( gGui_t *gGui )
   printf("  png_set_filter\n" );
 
 #ifdef DEBUG
-  profiler_start_count (prof_png);
+  xine_profiler_start_count (prof_png);
 #endif /* DEBUG */
 
   png_set_filter( image->struct_ptr, 0, PNG_FILTER_NONE  | PNG_FILTER_VALUE_NONE );
@@ -1088,7 +1088,7 @@ void create_snapshot ( gGui_t *gGui )
   prvt_image_free( &image );
 
 #ifdef DEBUG
-  profiler_stop_count (prof_png);
+  xine_profiler_stop_count (prof_png);
 #endif /* DEBUG */
 
   return;
