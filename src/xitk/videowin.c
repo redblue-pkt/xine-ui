@@ -500,8 +500,15 @@ void video_window_init (void) {
 
   if (!XMatchVisualInfo(gGui->display, 
 			gGui->screen, gVw->depth, TrueColor, &gVw->vinfo)) {
-    printf ("gui_main: couldn't find truecolor visual for video window.\n");
-    exit (1);
+    printf ("gui_main: couldn't find true color visual for video window.\n");
+
+    gVw->depth = 8;
+    if (!XMatchVisualInfo(gGui->display, 
+			  gGui->screen, gVw->depth, StaticColor, 
+			  &gVw->vinfo)) {
+      printf ("gui_main: couldn't find static color visual for video window.\n");
+      exit (1);
+    }
   }
   
   

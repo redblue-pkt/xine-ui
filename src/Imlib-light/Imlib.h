@@ -19,6 +19,7 @@ extern              "C"
   void                Imlib_destroy_image(ImlibData * id, ImlibImage * im);
   void                Imlib_kill_image(ImlibData * id, ImlibImage * im);
   void                Imlib_free_pixmap(ImlibData * id, Pixmap pmap);
+  int                 Imlib_load_colors(ImlibData * id, char *file);
 
 #ifdef __cplusplus
 }

@@ -1,40 +1,92 @@
 #define _GNU_SOURCE
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include <config.h>
 #include "Imlib.h"
 #include "Imlib_private.h"
+#include <locale.h>
+
+#ifdef __EMX__
+extern const char *__XOS2RedirRoot(const char *);
+#endif
 
 #ifndef HAVE_SNPRINTF
 #define snprintf my_snprintf
 #ifdef HAVE_STDARGS
 int                 my_snprintf(char *str, size_t count, const char *fmt,...);
+
 #else
 int                 my_snprintf(va_alist);
+
 #endif
 #endif
 
-ImlibData *Imlib_init(Display * disp) {
+char                x_error;
+
+int
+Imlib_get_render_type(ImlibData * id)
+{
+  if (id)
+    return id->render_type;
+  else
+    {
+      fprintf(stderr, "IMLIB ERROR: Imlib not initialised\n");
+      return -1;
+    }
+}
+
+void
+Imlib_set_render_type(ImlibData * id, int rend_type)
+{
+  if (id)
+    {
+      if (id->x.depth > 8)
+	id->render_type = rend_type;
+      else
+	{
+	  if ((rend_type == RT_PLAIN_TRUECOL) ||
+	      (rend_type == RT_DITHER_TRUECOL))
+	    id->render_type = RT_DITHER_PALETTE_FAST;
+	  else
+	    id->render_type = rend_type;
+	}
+      return;
+    }
+  else
+    {
+      fprintf(stderr, "IMLIB ERROR: Imlib not initialised\n");
+      return;
+    }
+}
+
+ImlibData          *
+Imlib_init(Display * disp)
+{
   ImlibData          *id;
   XWindowAttributes   xwa;
   XVisualInfo         xvi, *xvir;
+  char               *homedir;
+  char                s[4096], *s1, *s2;
+  FILE               *f;
   int                 override = 0;
   int                 dither = 0;
   int                 remap = 1;
   int                 num;
   int                 i, max, maxn;
   int                 clas;
+  char               *palfile;
   int                 loadpal;
   int                 vis;
   int                 newcm;
+  char               *old_locale;
 
-  if (!disp) {
-    fprintf(stderr, "IMLIB ERROR: no display\n");
-    return NULL;
-  }
+  /* fprintf(stderr, "Imlib Init\n");
+  fflush(stderr); */
 
+  palfile = NULL;
+  if (!disp)
+    {
+      fprintf(stderr, "IMLIB ERROR: no display\n");
+      return NULL;
+    }
   vis = -1;
   loadpal = 0;
   id = (ImlibData *) malloc(sizeof(ImlibData));
@@ -55,6 +107,9 @@ ImlibData *Imlib_init(Display * disp) {
   id->x.visual = DefaultVisual(disp, id->x.screen);	/* the visual type */
   id->x.depth = DefaultDepth(disp, id->x.screen);	/* the depth of the screen in bpp */
 
+  id->x.shm = 0;
+  id->x.shmp = 0;
+  id->max_shm = 0;
   id->cache.on_image = 0;
   id->cache.size_image = 0;
   id->cache.num_image = 0;
@@ -83,16 +138,195 @@ ImlibData *Imlib_init(Display * disp) {
   id->bmod.contrast = 256;
   id->ordered_dither = 1;
 
-  if (XGetWindowAttributes(disp, id->x.root, &xwa)) {
-    if (xwa.colormap)
-      id->x.root_cmap = xwa.colormap;
-    else
-      id->x.root_cmap = 0;
+  if (XGetWindowAttributes(disp, id->x.root, &xwa))
+    {
+      if (xwa.colormap)
+	id->x.root_cmap = xwa.colormap;
+      else
+	id->x.root_cmap = 0;
     }
   else
     id->x.root_cmap = 0;
   id->num_colors = 0;
+  homedir = getenv("HOME");
+  snprintf(s, sizeof(s), "%s/.imrc", homedir);
 
+  old_locale = strdup(setlocale(LC_NUMERIC, NULL));
+  setlocale(LC_NUMERIC, "C");
+#ifndef __EMX__
+  f = fopen(s, "r");
+#else
+  f = fopen(s, "rt");
+#endif
+  if (!f)
+#ifndef __EMX__
+    f = fopen(SYSTEM_IMRC, "r");
+#else
+    f = fopen(__XOS2RedirRoot(SYSTEM_IMRC), "rt");
+#endif
+  if (f)
+    {
+      while (fgets(s, 4096, f))
+	{
+	  if (s[0] == '#')
+	    continue;
+
+	  s1 = strtok(s, " \t\n");
+
+	  /* Blank line ? */
+
+	  if (s1 == NULL)
+	    continue;
+
+	  s2 = strtok(NULL, " \t\n");
+	  if (s2 == NULL)
+	    s2 = "";		/* NULL argument */
+
+	  if (!strcasecmp("PaletteFile", s1))
+	    {
+	      palfile = strdup(s2);
+	    }
+	  else if (!strcasecmp("PaletteOverride", s1))
+	    {
+	      if (!strcasecmp("yes", s2))
+		override = 1;
+	      else
+		override = 0;
+	    }
+	  else if (!strcasecmp("Dither", s1))
+	    {
+	      if (!strcasecmp("yes", s2))
+		dither = 1;
+	      else
+		dither = 0;
+	    }
+	  else if (!strcasecmp("Remap", s1))
+	    {
+	      if (!strcasecmp("fast", s2))
+		remap = 1;
+	      else
+		remap = 0;
+	    }
+	  else if (!strcasecmp("Mit-Shm", s1))
+	    {
+		{
+		  id->x.shm = 0;
+		  id->x.shmp = 0;
+		}
+	    }
+	  else if (!strcasecmp("SharedPixmaps", s1))
+	    {
+		id->x.shmp = 0;
+	    }
+	  else if (!strcasecmp("FastRender", s1))
+	    {
+	      if (!strcasecmp("on", s2))
+		id->fastrend = 1;
+	    }
+	  else if (!strcasecmp("HighQuality", s1))
+	    {
+	      if (!strcasecmp("on", s2))
+		id->hiq = 1;
+	    }
+	  else if (!strcasecmp("Shm_Max_Size", s1))
+	    {
+	      num = atoi(s2);
+	      id->max_shm = num;
+	    }
+	  else if (!strcasecmp("Image_Cache_Size", s1))
+	    {
+	      num = atoi(s2);
+	      id->cache.size_image = num;
+	    }
+	  else if (!strcasecmp("Pixmap_Cache_Size", s1))
+	    {
+	      num = atoi(s2);
+	      id->cache.size_pixmap = num;
+	    }
+	  else if (!strcasecmp("Image_Cache", s1))
+	    {
+	      if (!strcasecmp("on", s2))
+		id->cache.on_image = 1;
+	    }
+	  else if (!strcasecmp("Pixmap_Cache", s1))
+	    {
+	      if (!strcasecmp("on", s2))
+		id->cache.on_pixmap = 1;
+	    }
+	  else if (!strcasecmp("ForceVisualID", s1))
+	    {
+	      sscanf(s, "%1024s %x", s1, &num);
+	      vis = num;
+	    }
+	  else if (!strcasecmp("Fallback", s1))
+	    {
+	      if (!strcasecmp("off", s2))
+		id->fallback = 0;
+	      else
+		id->fallback = 1;
+	    }
+	  else if (!strcasecmp("Gamma", s1))
+	    {
+	      id->mod.gamma = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Brightness", s1))
+	    {
+	      id->mod.brightness = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Contrast", s1))
+	    {
+	      id->mod.contrast = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Red_Gamma", s1))
+	    {
+	      id->rmod.gamma = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Red_Brightness", s1))
+	    {
+	      id->rmod.brightness = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Red_Contrast", s1))
+	    {
+	      id->rmod.contrast = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Green_Gamma", s1))
+	    {
+	      id->gmod.gamma = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Green_Brightness", s1))
+	    {
+	      id->gmod.brightness = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Green_Contrast", s1))
+	    {
+	      id->gmod.contrast = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Blue_Gamma", s1))
+	    {
+	      id->bmod.gamma = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Blue_Brightness", s1))
+	    {
+	      id->bmod.brightness = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Blue_Contrast", s1))
+	    {
+	      id->bmod.contrast = (int)(256.0 * atof(s2));
+	    }
+	  else if (!strcasecmp("Ordered_Dither", s1))
+	    {
+	      if (!strcasecmp("off", s2))
+		id->ordered_dither = 0;
+	      else
+		id->ordered_dither = 1;
+	    }
+	}
+      fclose(f);
+    }
+  setlocale(LC_NUMERIC, old_locale);
+  if (old_locale)
+    free(old_locale);
+  
   /* list all visuals for the default screen */
   xvi.screen = id->x.screen;
   xvir = XGetVisualInfo(disp, VisualScreenMask, &xvi, &num);
@@ -201,6 +435,8 @@ ImlibData *Imlib_init(Display * disp) {
 	  XFree(xvir);
 	}
     }
+  if (id->x.depth < 8)
+    id->x.shmp = 0;
   if ((id->x.depth <= 8) || (override == 1))
     loadpal = 1;
   if (loadpal)
@@ -218,6 +454,16 @@ ImlibData *Imlib_init(Display * disp) {
 	    id->render_type = RT_PLAIN_PALETTE_FAST;
 	  else
 	    id->render_type = RT_PLAIN_PALETTE;
+	}
+      if (palfile != NULL)
+	Imlib_load_colors(id, palfile);
+      if (id->num_colors == 0)
+	{
+	  fprintf(stderr, "IMLIB ERROR: Cannot Find Palette. A Palette is required for this mode\n");
+	  free(id);
+	  if (palfile)
+	    free(palfile);
+	  return NULL;
 	}
     }
   else
@@ -239,6 +485,7 @@ ImlibData *Imlib_init(Display * disp) {
     mask = CWOverrideRedirect | CWBackPixel | CWBorderPixel |
       CWBackingStore | CWSaveUnder;
     newcm = 0;
+    /*
     if (id->x.visual != DefaultVisual(disp, id->x.screen))
       {
 	Colormap            cm;
@@ -253,6 +500,7 @@ ImlibData *Imlib_init(Display * disp) {
 	    newcm = 1;
 	  }
       }
+*/
     id->x.base_window = XCreateWindow(id->x.disp, id->x.root,
 				      -100, -100, 10, 10, 0,
 				      id->x.depth, InputOutput,
@@ -274,11 +522,13 @@ ImlibData *Imlib_init(Display * disp) {
     if ((htonl(1) == 1) && (byt == LSBFirst))
       id->fastrend = 0;
   }
+  if (palfile)
+    free(palfile);
 
-  /* printf ("Imlib init, d : %d visual : %d\n", id, id->x.visual); */
 
   return id;
 }
+
 
 Pixmap
 Imlib_copy_image(ImlibData * id, ImlibImage * im)
@@ -377,4 +627,103 @@ Imlib_free_pixmap(ImlibData * id, Pixmap pmap)
       free_pixmappmap(id, pmap);
       clean_caches(id);
     }
+}
+
+void
+Imlib_set_image_border(ImlibData * id, ImlibImage * im, ImlibBorder * border)
+{
+  if ((im) && (border))
+    {
+      if ((im->border.left != border->left) ||
+	  (im->border.right != border->right) ||
+	  (im->border.top != border->top) ||
+	  (im->border.bottom != border->bottom))
+	{
+	  dirty_pixmaps(id, im);
+
+	  im->border.left = border->left;
+	  im->border.right = border->right;
+	  im->border.top = border->top;
+	  im->border.bottom = border->bottom;
+	}
+    }
+}
+
+void
+Imlib_get_image_border(ImlibData * id, ImlibImage * im, ImlibBorder * border)
+{
+  if ((im) && (border))
+    {
+      border->left = im->border.left;
+      border->right = im->border.right;
+      border->top = im->border.top;
+      border->bottom = im->border.bottom;
+    }
+}
+
+void
+Imlib_get_image_shape(ImlibData * id, ImlibImage * im, ImlibColor * color)
+{
+  if ((!im) || (!color))
+    return;
+
+  color->r = im->shape_color.r;
+  color->g = im->shape_color.g;
+  color->b = im->shape_color.b;
+}
+
+void
+Imlib_set_image_shape(ImlibData * id, ImlibImage * im, ImlibColor * color)
+{
+  if ((!im) || (!color))
+    return;
+  if ((im->shape_color.r != color->r) || (im->shape_color.g != color->g) || (im->shape_color.b != color->b))
+    {
+      im->shape_color.r = color->r;
+      im->shape_color.g = color->g;
+      im->shape_color.b = color->b;
+      dirty_pixmaps(id, im);
+    }
+}
+
+int
+Imlib_get_fallback(ImlibData * id)
+{
+  if (!id)
+    return 0;
+  return id->fallback;
+}
+
+void
+Imlib_set_fallback(ImlibData * id, int fallback)
+{
+  if (!id)
+    return;
+  id->fallback = fallback;
+}
+
+Visual             *
+Imlib_get_visual(ImlibData * id)
+{
+  if (!id)
+    return NULL;
+  return id->x.visual;
+}
+
+Colormap
+Imlib_get_colormap(ImlibData * id)
+{
+  if (!id)
+    return 0;
+  return id->x.root_cmap;
+}
+
+char               *
+Imlib_get_sysconfig(ImlibData * id)
+{
+#ifndef __EMX__
+  return strdup(SYSTEM_IMRC);
+#else
+  return strdup(__XOS2RedirRoot(SYSTEM_IMRC));
+#endif
 }
