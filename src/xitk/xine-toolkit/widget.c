@@ -859,8 +859,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
   
   if (mywidget != wl->focusedWidget) {
     if (wl->focusedWidget) {
-      if (wl->focusedWidget->notify_focus 
-	  && wl->focusedWidget->enable == WIDGET_ENABLE) {
+      if (wl->focusedWidget->notify_focus && wl->focusedWidget->enable == WIDGET_ENABLE) {
 	bRepaint |= (wl->focusedWidget->notify_focus) (wl, wl->focusedWidget, FOCUS_LOST);
 	wl->focusedWidget->have_focus = FOCUS_LOST;
       }
@@ -930,6 +929,31 @@ void xitk_send_key_event(xitk_widget_list_t *wl, xitk_widget_t *w, XEvent *xev) 
   }
   if(w->notify_keyevent)
     w->notify_keyevent(wl, w, xev);
+}
+
+/*
+ * Return the focused widget.
+ */
+xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *wl) {
+
+  if(wl) {
+    return wl->focusedWidget;
+  }
+  
+  XITK_WARNING("widget list is NULL\n");
+  return NULL;
+}
+
+/*
+ * Return the pressed widget.
+ */
+xitk_widget_t *xitk_get_pressed_widget(xitk_widget_list_t *wl) {
+
+  if(wl)
+    return wl->pressedWidget;
+  
+  XITK_WARNING("widget list is NULL\n");
+  return NULL;
 }
 
 /*

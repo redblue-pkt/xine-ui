@@ -122,31 +122,57 @@ typedef void (*widget_keyevent_callback_t)(struct xitk_widget_list_s *, struct x
 
 typedef int (*widget_inside_callback_t)(struct xitk_widget_s *, int, int);
 
+typedef void (*widget_change_skin_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, xitk_skin_config_t *);
+
+typedef xitk_image_t *(*widget_get_skin_t)(struct xitk_widget_s *, int);
+
+typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
+#define WIDGET_TYPE_GROUP         0xFFFF8000
+
+#define WIDGET_TYPE_BUTTON        0x00000001
+#define WIDGET_TYPE_LABELBUTTON   0x00000002
+#define WIDGET_TYPE_SLIDER        0x00000004
+#define WIDGET_TYPE_LABEL         0x00000008
+#define WIDGET_TYPE_CHECKBOX      0x00000010
+#define WIDGET_TYPE_IMAGE         0x00000020
+#define WIDGET_TYPE_BROWSER       0x00000040
+#define WIDGET_TYPE_FILEBROWSER   0x00000080
+#define WIDGET_TYPE_MRLBROWSER    0x00000100
+#define WIDGET_TYPE_INPUTTEXT     0x00000200
+#define WIDGET_TYPE_COMBO         0x00000400
+#define WIDGET_TYPE_TABS          0x00000800
+
 typedef struct xitk_widget_s {
-  int                        x;
-  int                        y;
-  int                        width;
-  int                        height;
+  int                             x;
+  int                             y;
+  int                             width;
+  int                             height;
 
-  int                        enable;
-  int                        have_focus;
-  int                        running;
-  int                        visible;
+  int                             enable;
+  int                             have_focus;
+  int                             running;
+  int                             visible;
 
-  widget_paint_callback_t    paint;
+  widget_paint_callback_t         paint;
 
   /* notify callback return value : 1 => repaint necessary 0=> do nothing */
                                        /*   parameter: up (1) or down (0) */
-  widget_click_callback_t    notify_click;
+  widget_click_callback_t         notify_click;
                                        /*            entered (1) left (0) */
-  widget_focus_callback_t    notify_focus;
+  widget_focus_callback_t         notify_focus;
 
-  widget_keyevent_callback_t notify_keyevent;
+  widget_keyevent_callback_t      notify_keyevent;
 
-  widget_inside_callback_t   notify_inside;
+  widget_inside_callback_t        notify_inside;
 
-  void                      *private_data;
-  uint32_t                   widget_type;
+  widget_change_skin_callback_t   notify_change_skin;
+
+  widget_destroy_t                notify_destroy;
+
+  widget_get_skin_t               get_skin;
+
+  void                           *private_data;
+  uint32_t                        widget_type;
 } xitk_widget_t;
 
 typedef struct witk_widget_list_s {
@@ -321,6 +347,16 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
  *
  */
 void xitk_send_key_event(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
+
+/**
+ * Return the focused widget.
+ */
+xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *);
+
+/**
+ * Return the pressed widget.
+ */
+xitk_widget_t *xitk_get_pressed_widget(xitk_widget_list_t *);
 
 /**
  * Return width (in pixel) of widget.

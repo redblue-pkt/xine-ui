@@ -218,9 +218,16 @@ void setup_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyPress:
-    gui_handle_event(event, data);
-    break;
+  case KeyPress: {
+    xitk_widget_t *w = xitk_get_focused_widget(setup->widget_list);
+
+    if(w && (w->widget_type & WIDGET_TYPE_INPUTTEXT)) {
+      xitk_send_key_event(setup->widget_list, w, event);
+    }
+    else
+      gui_handle_event(event, data);
+  }
+  break;
     
   case MappingNotify:
     XLockDisplay(gGui->display);

@@ -219,6 +219,16 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
 void xitk_send_key_event(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
 
 /**
+ * Return the focused widget.
+ */
+xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *);
+
+/**
+ * Return the pressed widget.
+ */
+xitk_widget_t *xitk_get_pressed_widget(xitk_widget_list_t *);
+
+/**
  * Return width (in pixel) of widget.
  */
 int xitk_get_widget_width(xitk_widget_t *);

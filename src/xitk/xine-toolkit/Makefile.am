@@ -3,7 +3,7 @@ SUBDIRS = po
 
 CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
 
-noinst_PROGRAMS = test
+EXTRA_PROGRAMS = test
 noinst_LTLIBRARIES = libxitk.la
 libxitk_la_SOURCES = browser.c button.c checkbox.c combo.c dnd.c filebrowser.c font.c \
 		image.c inputtext.c label.c labelbutton.c list.c mrlbrowser.c skin.c \
