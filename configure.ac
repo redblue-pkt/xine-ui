@@ -803,6 +803,10 @@ XINE_LOGO_MRL="file:$XINE_SKINDIR/xine_logo.mpv"
 AC_SUBST(XINE_LOGO_MRL)
 AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL",[official logo mrl])
 
+XINE_VISDIR="${datadir}/xine/visuals"
+eval XINE_VISDIR=`eval echo "$XINE_VISDIR"`
+AC_SUBST(XINE_VISDIR)
+AC_DEFINE_UNQUOTED(XINE_VISDIR, "$XINE_VISDIR",[Location of xine visual animation streams])
 
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
@@ -864,6 +868,7 @@ misc/SlackBuild
 misc/xine-ui.spec
 misc/relchk.sh
 misc/desktops/Makefile
+misc/visuals/Makefile
 po/Makefile.in
 ])
 AC_CONFIG_COMMANDS([default],[[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh ./misc/relchk.sh]],[[]])

@@ -1,5 +1,5 @@
 
-SUBDIRS = desktops
+SUBDIRS = desktops visuals
 
 datadir = @XINE_SKINDIR@
 data_DATA = xine_logo.mpv
