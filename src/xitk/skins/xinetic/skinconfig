@@ -1,9 +1,11 @@
 #Xine skin data file
 # revision 0.8
+#  Licence : GNU GENERAL PUBLIC LICENSE Version 2, June 1991: http://www.gnu.org/copyleft/gpl.html
+
 skin.name    = Xinetic
 skin.version = 5
 skin.date    = 25.05.2002
-skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
+skin.author  = Jérôme Villette <garogoril@wanadoo.fr>
 skin.url     = none
 #skin.logo = file://$(SKIN_PARENT_PATH)/xine-ui_logo.mpv
 
@@ -241,7 +243,7 @@ skin.AutoPlayGUI {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 	max_buttons = 7
 }
@@ -301,7 +303,7 @@ skin.PlAdd {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -315,7 +317,7 @@ skin.PlLoad {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -329,7 +331,7 @@ skin.PlSave {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -347,7 +349,7 @@ skin.PlItemBtn {
 	  color = #a4abb0
 	  color_focus = #a4abb0
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -401,7 +403,7 @@ skin.PlDismiss {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -485,7 +487,7 @@ skin.AutoPlayBG {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 	max_buttons = 6
 }
@@ -500,7 +502,7 @@ skin.PlInputText {
 	  color = #9fa4ad
 	  color_focus = #9fa4ad
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -691,7 +693,7 @@ skin.CtlSkItemBtn {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -705,7 +707,7 @@ skin.CtlDismiss {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -732,7 +734,7 @@ skin.MrlItemBtn {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -746,7 +748,7 @@ skin.MrlSelect {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -768,7 +770,7 @@ skin.MrlDismiss {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 }
 
@@ -852,7 +854,7 @@ skin.MrlPlugNameBG {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = *-helvetica-*-i-*-*-10-*-*-*-*-*-*-*
 	}
 	max_buttons = 8
 }
