@@ -1,0 +1,25 @@
+<OXINEMM VERSION="1">
+<WINDOW x="50" y="130" width="700" height="420">
+
+  <ENTRY x="360" y="45" width="290" height="60">
+    <TITLE>Mediamarks</TITLE>
+    <ACTION type="mediamarks"/>
+  </ENTRY>
+
+  <ENTRY x="50" y="150" width="290" height="60">
+    <TITLE>DVD</TITLE>
+    <ACTION type="autoplay" parameter="dvd"/>
+  </ENTRY>
+
+  <ENTRY x="360" y="150" width="290" height="60">
+    <TITLE>Playlist</TITLE>
+    <ACTION type="playlist"/>
+  </ENTRY>
+
+  <ENTRY x="205" y="320" width="290" height="60">
+    <TITLE>Shutdown</TITLE>
+    <ACTION type="shutdown"/>
+  </ENTRY>
+
+</WINDOW>
+</OXINEMM>
