@@ -91,7 +91,7 @@
 #define XITK_WARNING(FMT, ARGS...) do { fprintf(stderr, "xiTK WARNING(%s:%d): ", __FUNCTION__, __LINE__); fprintf(stderr, FMT, ##ARGS); } while(0)
 #else	/* C99 version: */
 #define XITK_DIE(...) do { fprintf(stderr, "xiTK DIE: "__VA_ARGS__); exit(-1); } while(0)
-#define XITK_WARNING(...) do { fprintf(stderr, "xiTK WARNING(%s:%d): ", __FUNCTION__, __LINE__); fflush(stderr, __VA_ARGS__); } while(0)
+#define XITK_WARNING(...) do { fprintf(stderr, "xiTK WARNING(%s:%d): ", __FUNCTION__, __LINE__); fprintf(stderr, __VA_ARGS__); } while(0)
 #endif
 
 #define XITK_FREE(X) do { if((X)) { free((X)); (X) = NULL; } } while(0)
