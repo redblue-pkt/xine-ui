@@ -1763,6 +1763,13 @@ void gui_run(char **session_opts) {
     mediamark_save_mediamarks(buffer);
   }
 
+  { /* Give focus to the ROOT window, to get C-Tab working */
+    Window rootwindow, wparent;
+    
+    if((rootwindow = xitk_get_desktop_root_window(gGui->video_display, gGui->video_screen, &wparent)) != None)
+      try_to_set_input_focus(rootwindow);
+  }
+
   gGui->running = 0;
   deinit_session();
 
