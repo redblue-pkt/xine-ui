@@ -15,7 +15,7 @@ data_DATA = ComBox.png		MainBg.png	    MainPower.png	    MrlPlay.png		\
 	CtlSliderBg.png		MainPlay.png	    MainVolumePad.png	    PlPlay.png		\
 	CtlSliderPad.png	MainPlayFast.png    MrlBg.png					\
 	MainAutoButton.png	MainPlaySlow.png    MrlItem.png					\
-	fat.pcf.gz smooth.pcf.gz fonts.dir \
+	fatsolid.pcf.gz 	smooth.pcf.gz 	    fonts.dir \
 	skinconfig
 
 
