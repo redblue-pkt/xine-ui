@@ -264,15 +264,15 @@ to read from. valid MRLs may be plain file names or one of the following:
 .br
 .BI vcd:/ <tracknumber>
 .br
-.BI tcp:// <host> : <port>
+.BI tcp:/ <host> : <port>
 .br
-.BI rtp:// <host> : <port>
+.BI rtp:/ <host> : <port>
 .br
-.BI udp:// <host> : <port>
+.BI udp:/ <host> : <port>
 .br
-.BI mms:// <host>...
+.BI mms:/ <host>...
 .br
-.BI http:// <host>...
+.BI http:/ <host>...
 .LP
 Several MRLs may be specified in order to play a number of consecutive
 streams. Additional input plugins will provide additional MRL types.
@@ -282,12 +282,20 @@ If you don't specify any MRL, you'll have to select a file by drag'n\-drop.
 Dragging files from the \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP or \fBKonqueror\fP
 is known to work.
 .TP
-.B avi subtitle files
+.B external subtitle files (any mrl)
 .br
-Text subtitle files may be appended (seperated by `?')
-to a file MRL:
+Text subtitle files may be appended to the MRL:
 .br 
-.BI file:// <path> ? <subtitlefile>
+.BI <mrl>::<subtitlefile>
+.br 
+This is the xine-ui specific way to define the subtitle file to use. The filename will be
+extracted by the frontend, that permit to change it, save it in a playlist, etc...
+.br
+.BI <mrl>#subtitle:<subtitlefile>
+.br
+This is the xine-lib specific way to define the subtitle file to use. The frontend will 
+not take attention about the subtitle file.
+.br Note: 
 .TP
 .B stream options
 .br

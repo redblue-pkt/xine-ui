@@ -261,15 +261,15 @@ Les MRLs valides peuvent être des noms de fichiers ou un de ceux qui suit:
 .br
 .BI vcd:/ <numéro piste>
 .br
-.BI tcp:// <hôte> : <port>
+.BI tcp:/ <hôte> : <port>
 .br
-.BI rtp:// <hôte> : <port>
+.BI rtp:/ <hôte> : <port>
 .br
-.BI udp:// <hôte> : <port>
+.BI udp:/ <hôte> : <port>
 .br
-.BI mms:// <hôte>...
+.BI mms:/ <hôte>...
 .br
-.BI http:// <hôte>...
+.BI http:/ <hôte>...
 .LP
 Plusieures MRLs peuvent être spécifiées pour lire un nombre consécutif
 de flux.
@@ -279,11 +279,21 @@ par glisser-lacher.
 Glisser des fichiers depuis \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP 
 ou \fBKonqueror\fP est connu pour fonctionner.
 .TP
-.B sous-titre pour les fichiers avi
-.br
-Les fichiers de sous-titre peuvent êre ajoutés (séparé par \`?\') a une MRL de fichier:
+.B utilisation des sous-titres (toute mrl)
+.LP
+Les fichiers de sous-titre peuvent êre ajoutés a une MRL:
+.TP
+.BR <mrl>::<fichiersoustitre>
 .br 
-.BR file:/<chemin>?<fichiersoustitre>
+Ceci est spécifique a xine-ui pour définir le fichier de sous-titre à utiliser. Le nom
+de fichier sera extrait par le programme, ce qui permet de le changer, le sauver dans
+un liste de lecture, etc...
+.LP
+.TP
+.BR <mrl>#subtitle:<fichiersoustitre>
+.br
+Ceci est spécifique a xine-lib pour définir le fichier de sous-titre à utiliser. Le 
+programme ne portera aucune attention au fichier de sous-titre utilisé.
 .TP
 .B options de flux
 .br
