@@ -48,11 +48,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <alloca.h>
 #include <pthread.h>
 
 #include "xitk.h"
-
 #include "event.h"
+#include "utils.h"
 
 #include "xine.h"
 
@@ -122,7 +123,8 @@ char* snap_filename(char *base, char *ext)
     
     if (filename != NULL)
 	free(filename);	
-    filename = malloc(strlen(base)+strlen(ext)+32);
+
+    filename = (char *) xmalloc(strlen(base) + strlen(ext) + 32);
     
     strftime(timestamp,31,"%Y%m%d-%H%M%S",tm);
     sprintf(filename,"%s-%s-%d.%s",
@@ -599,13 +601,18 @@ static void rgb_free( struct prvt_image_s *image )
 
 static int prvt_image_alloc( struct prvt_image_s **image )
 {
+  char *filename;
+
   *image = (struct prvt_image_s*)malloc( sizeof( struct prvt_image_s ) );
 
   if (*image == NULL) return( 0 );
     
   memset( *image, 0, sizeof( struct prvt_image_s ) );
 
-  (*image)->file_name = snap_filename( "xinesnap", "png" );
+  filename = (char *) alloca(strlen(get_homedir()) + 10);
+  sprintf(filename, "%s/%s", get_homedir(), "xinesnap");
+
+  (*image)->file_name = snap_filename( filename, "png" );
 
   return( 1 );
 }
@@ -732,8 +739,6 @@ static void write_row_callback( png_structp png_ptr, png_uint_32 row, int pass)
 void create_snapshot ( gGui_t *gGui )
 {
   int err = 0;
-
-
   struct prvt_image_s *image;
 
   if ( ! prvt_image_alloc( &image ) )
@@ -859,8 +864,11 @@ void create_snapshot ( gGui_t *gGui )
    */
 
   printf("  Setup long jump\n" );
-
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
   if (setjmp(png_jmpbuf(image->struct_ptr)))
+#else
+  if (setjmp(image->struct_ptr->jmpbuf))
+#endif
   {
     printf( "  PNG Parsing failed\n" );
     prvt_image_free( &image );
@@ -921,13 +929,19 @@ void create_snapshot ( gGui_t *gGui )
 
   /**/
 
+#if defined(PNG_INFO_IMAGE_SUPPORTED)
   printf("  png_set_rows\n" );
   png_set_rows ( image->struct_ptr, image->info_ptr, image->rgb );
-
   printf("  png_write_png\n" );
   png_write_png( image->struct_ptr, image->info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
+#else
+  png_write_info(image->struct_ptr, image->info_ptr);
+  png_write_image(image->struct_ptr, image->rgb);
+  png_write_end(image->struct_ptr, NULL);
+#endif
 
   /**/
+  printf("file '%s' wrote\n", image->file_name);
 
   printf("  prvt_image_free\n" );
   prvt_image_free( &image );
