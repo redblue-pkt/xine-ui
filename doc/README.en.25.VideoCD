@@ -1,1 +1,60 @@
-TODO: include the end-user relevant part of Rocky's VCD documentation 
+VCD stands for "Video Compact Disc" and basically it is a CD that contains
+moving pictures and sound. xine can handle these and the higher quality
+SVCDs, XVCDs and XSVCDs. Playback is possible both from a physical disk or
+from an image on your harddisk.
+
+Some terminology needs to be clarified first:
+
+"Tracks" correspond to contiguous non-overlapping regions of the CD disk, and
+the sum of the tracks forms the entire CD. The CD specifications standarads say
+that between tracks there is to be a 150-sector gap.
+
+We generally don't use the first track which we would call call "Track 0", but
+other tools like VCDimager, cdinfo, and the CD-reading world in the general call
+this "Track 1". This first track usually contains an ISO 9660-format filesystem
+with metadata describing what's on the CD. It may also contain "segments" or
+small MPEGs that generally make up still frames and menus. Aside from the
+segments which are merely only parts of track 0, it doesn't make sense to try to
+"play" track 0 (or track 1 depending on how you want to count).
+It seems natural to call the first thing you would want to play "track
+1" (which in fact is track 2 to everyone else).
+
+There are two other units that this plugin uses. One we call an "entry". This is
+a starting point of a track which can include the beginning of the track, and
+when an entry points to the beginning of a track, it is equivalent to listing
+the track. However Video CD's often have multiple entry points into a track.
+Logically this corresponds to a "Chapter" or "Scene" of a larger uninterruptable
+unit. One might think a CD "track" could serve this purpose with a collection of
+tracks making up a work or movie. Alas, there is "track pregap" space between
+tracks which appear as a time gaps when hardware players go between tracks -
+something that doesn't have to happen switching between entries because there in
+fact is no gap.
+
+Another unit we use is a called a "segment." These are used in menus and still
+frames. A menu doesn't have to have a still-frame associated with it; A menu
+might be implimented as a short looped movie clip. However Video CD
+specifications allow still frames to have higher resolution than motion clips.
+And several segments can reside in track 0.
+
+A "playback list item" (also called a "list id or LID) combines "entries" and
+"segments" and "tracks" together with some navigation logic. "Playback Control"
+is simply starting playback at a particular playback list item, and unless
+otherwise specified you'd start with the first playback item which we call P1.
+
+When playing a VideoCD, xine understands numeric input and this can be used to
+select entries, tracks, segments or play list selections. You can change to such
+a logical item by typing the number you want and hitting the numeric pad "Enter"
+key. (This is with the default keymapping.)
+
+To go to the next or previous item, the keypad PgUp (keypad 9) and PgDn
+(keypad 3) keys can be used. You can prefix these by a number and it will have
+the same effect as hitting the function that many times. For example, entering
+"2 PgDn" (that's the keyboard 2 key followed by the keypad PgDn key) will go
+forward 2 items.
+
+Two keys that Video CD players use for navigation and selection that don't
+appear in xine are "return" and "default selection".  Since the keys Menu1 and
+Menu2 don't mean any thing in a Video CD player, Menu1 is bound to mean "return"
+and "Menu2" to mean "default selection".
+
+Menu3 with a numeric entry can be used for setting a debug value.
