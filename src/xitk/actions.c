@@ -1238,20 +1238,20 @@ void gui_seek_relative (int off_sec) {
 
 static void *_gui_dndcallback(void *data) {
   int   more_than_one = -2;
-  char *filename = (char *) data;
+  char *mrl           = (char *) data;
 
-  if(filename) {
-    char  buffer[strlen(filename) + 10];
-    char  buffer2[strlen(filename) + 10];
+  if(mrl) {
+    char  buffer[strlen(mrl) + 10];
+    char  buffer2[strlen(mrl) + 10];
     char *p;
 
     memset(&buffer, 0, sizeof(buffer));
     memset(&buffer2, 0, sizeof(buffer2));
 
-    if((strlen(filename) > 6) && 
-       (!strncmp(filename, "file:", 5))) {
+    if((strlen(mrl) > 6) && 
+       (!strncmp(mrl, "file:", 5))) {
       
-      if((p = strstr(filename, ":/")) != NULL) {
+      if((p = strstr(mrl, ":/")) != NULL) {
 	struct stat pstat;
 	
 	p += 2;
@@ -1278,7 +1278,7 @@ static void *_gui_dndcallback(void *data) {
 	  
 	  /* file don't exist, add it anyway */
 	  if((stat(buffer2, &pstat)) == -1)
-	    snprintf(buffer, sizeof(buffer), "%s", filename);
+	    snprintf(buffer, sizeof(buffer), "%s", mrl);
 	  else {
 	    if(is_a_dir(buffer2)) {
 	      
@@ -1296,12 +1296,12 @@ static void *_gui_dndcallback(void *data) {
 	}
       }
       else {
-	p = filename + 5;
+	p = mrl + 5;
 	goto __second_stat;
       }
     }
     else
-      snprintf(buffer, sizeof(buffer), "%s", filename);
+      snprintf(buffer, sizeof(buffer), "%s", mrl);
     
     if(is_a_dir(buffer)) {
       if(buffer[strlen(buffer) - 1] == '/')
@@ -1349,17 +1349,21 @@ static void *_gui_dndcallback(void *data) {
       enable_playback_controls(1);
   }
 
+  free(mrl);
+
   pthread_exit(NULL);
 }
 
-void gui_dndcallback(char *filename) {
-  int        err;
-  pthread_t  pth;
+void gui_dndcallback(char *mrl) {
+  int         err;
+  pthread_t   pth;
+  char       *_mrl = (mrl ? strdup(mrl) : NULL);
 
-  if((err = pthread_create(&pth, NULL, _gui_dndcallback, (void *)filename)) != 0) {
+  if((err = pthread_create(&pth, NULL, _gui_dndcallback, (void *)_mrl)) != 0) {
     printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     abort();
   }
+
 }
 
 void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
