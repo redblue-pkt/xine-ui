@@ -322,6 +322,7 @@ int xitk_check_wm(Display *display) {
     xitk_usec_sleep(5000);
   
   atoms = XListProperties(display, window, &natoms);
+  XUnmapWindow(display, window);
   
   if(natoms) {
     for(i = 0; i < natoms; i++) {
@@ -338,7 +339,6 @@ int xitk_check_wm(Display *display) {
     }
   }
   
-  XUnmapWindow(display, window);
   XDestroyWindow(display, window);
   
   switch(type) {

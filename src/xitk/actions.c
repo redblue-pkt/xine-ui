@@ -262,12 +262,8 @@ void gui_play (xitk_widget_t *w, void *data) {
       gui_display_logo();
 
   } 
-  else {
+  else
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
-    /* not needed right now, since starting the master stream already starts
-     * the visual_anim stream as well */
-    /* visual_anim_pause(); */
-  }
   
   panel_check_pause();
 }
@@ -304,9 +300,6 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
 
   panel_check_pause();
-  /* not needed now, because pausing the master stream already pauses
-   * the visual_anim stream as well */
-  /* visual_anim_pause(); */
 }
 
 void gui_eject(xitk_widget_t *w, void *data) {
@@ -1146,14 +1139,6 @@ void visual_anim_play_next(void) {
     if(gGui->visual_anim.mrls[gGui->visual_anim.current] == NULL)
       gGui->visual_anim.current = 0;
     visual_anim_play();
-  }
-}
-void visual_anim_pause(void) {
-  if(gGui->visual_anim.enabled) {
-    if(xine_get_param(gGui->visual_anim.stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
-      xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-    else
-      xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   }
 }
 void visual_anim_stop(void) {
