@@ -2,7 +2,7 @@ Source: xine-ui
 Section: graphics
 Priority: optional
 Maintainer: Siggi Langauf <siggi@debian.org>
-Build-Depends: debhelper (>> 4.0.0), libxine-dev (>= 1-rc3a-2), libpng-dev, xlibs-dev (>=4.1), aalib1-dev (>> 1.4), libgpmg1-dev (>> 1.19.6), liblircclient-dev, libcurl2-dev, libfreetype6-dev
+Build-Depends: debhelper (>> 4.0.0), libxine-dev (>= 1-rc3a-2), libpng-dev, xlibs-dev (>=4.1), aalib1-dev (>> 1.4), libgpmg1-dev (>> 1.19.6), liblircclient-dev, libcurl2-dev, libfreetype6-dev, libreadline-dev
 Standards-Version: 3.2.1
 
 Package: xine-ui
