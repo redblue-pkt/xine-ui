@@ -439,7 +439,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       (sh[shc++] = menu_get_shortcut("ToggleVisiblity")),
       panel_is_visible() ? "<checked>" : "<check>",  
       menu_panel_visibility, NULL                                                            },
-    { _("Fullscreen"),
+    { _("Fullscreen\\/Windowed View"),
       (sh[shc++] = menu_get_shortcut("ToggleFullscreen")),
       (video_window_get_fullscreen_mode() & fullscr_mode) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_FULLSCR                                                },
