@@ -1205,7 +1205,7 @@ static void kbedit_create_browser_entries(void) {
     memset(&shortcut, 0, sizeof(shortcut));
     
     if(kbedit->kbt->entry[i]->is_alias)
-      sprintf(buf, "@{%s} ", kbedit->kbt->entry[i]->comment);
+      sprintf(buf, "@{%s}", kbedit->kbt->entry[i]->comment);
     else
       sprintf(buf, "%s", kbedit->kbt->entry[i]->comment);
     
