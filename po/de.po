@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.20\n"
+"Project-Id-Version: xine-ui 0.9.22\n"
 "POT-Creation-Date: 2003-10-09 17:52+0200\n"
-"PO-Revision-Date: 2003-05-04 23:40+0200\n"
+"PO-Revision-Date: 2003-10-10 22:35+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -73,18 +73,17 @@ msgid "Aspect ratio: %s"
 msgstr "Seitenverhältnis: %s"
 
 #: src/xitk/actions.c:865
-#, fuzzy, c-format
+#, c-format
 msgid "Deinterlace: %s"
-msgstr "Deinterlace: %d"
+msgstr "Deinterlace: %s"
 
 #: src/xitk/actions.c:865 src/xitk/actions.c:1499
-#, fuzzy
 msgid "enabled"
-msgstr "Umbenennen"
+msgstr "aktiviert"
 
 #: src/xitk/actions.c:865 src/xitk/actions.c:1499
 msgid "disabled"
-msgstr ""
+msgstr "deaktiviert"
 
 #: src/xitk/actions.c:1084 src/xitk/actions.c:1101 src/xitk/post.c:165
 #, c-format
@@ -96,9 +95,9 @@ msgid "There is no mrl."
 msgstr "Das ist keine MRL."
 
 #: src/xitk/actions.c:1499
-#, fuzzy, c-format
+#, c-format
 msgid "Post plugins: %s."
-msgstr "Plugin für Audio-Nachverarbeitung"
+msgstr "Nach-Plugin: %s."
 
 #: src/xitk/actions.c:1579 src/xitk/actions.c:1591 src/xitk/menus.c:268
 #: src/xitk/menus.c:282 src/xitk/panel.c:787 src/xitk/session.c:403
@@ -399,7 +398,6 @@ msgid "Cannot open display\n"
 msgstr "Kann Display nicht öffnen\n"
 
 #: src/xitk/event.c:1100
-#, fuzzy
 msgid "Synchronized X protocol (debug)"
 msgstr "Synchrones X-Protokoll (Fehlersuche)"
 
@@ -523,7 +521,6 @@ msgid "Persistence time of OSD visual, in seconds."
 msgstr "Anzeigezeit von OSD Informationen in Sekunden."
 
 #: src/xitk/event.c:1235
-#, fuzzy
 msgid "Change xine's behavior for unexperienced user"
 msgstr "xine-Verhalten für unerfahrene Benutzer anpassen"
 
@@ -547,9 +544,8 @@ msgstr ""
 "werden soll oder nicht"
 
 #: src/xitk/event.c:1254
-#, fuzzy
 msgid "Configuration experience level"
-msgstr "Erfahrenheut einstellen"
+msgstr "Erfahrenheit einstellen"
 
 #: src/xitk/event.c:1255
 msgid ""
@@ -560,17 +556,16 @@ msgstr ""
 "anzeigt."
 
 #: src/xitk/event.c:1263
-#, fuzzy
 msgid "Amplification level"
 msgstr "Verstärkungslevel"
 
 #: src/xitk/event.c:1272
 msgid "Display splash screen"
-msgstr ""
+msgstr "Startbildschirm anzeigen"
 
 #: src/xitk/event.c:1273
 msgid "If enabled, xine will display its splash screen"
-msgstr ""
+msgstr "Falls aktiviert zeigt xine seinen Startbildschirm an"
 
 #. Some infos
 #: src/xitk/event.c:1286
@@ -739,9 +734,8 @@ msgid "All files"
 msgstr "Alle Dateien"
 
 #: src/xitk/file_browser.c:1199
-#, fuzzy
 msgid "All known subtitles"
-msgstr "Alle bekannten Playlisten"
+msgstr "Alle bekannten Untertitel"
 
 #: src/xitk/file_browser.c:1200
 msgid "All known playlists"
@@ -901,17 +895,17 @@ msgid "Bad visual '%s'\n"
 msgstr "Fehlerhavte visual '%s'\n"
 
 #: src/xitk/main.c:403
-#, fuzzy, c-format
+#, c-format
 msgid "This is xine (X11 gui) - a free video player v%s"
-msgstr ""
-"Dies ist xine (X11 gui) - Ein freier Video-Player v%s\n"
-"(c) 2000-2003 G. Bartsch und das xine Projektteam.\n"
+msgstr "Dies ist xine (X11 gui) - Ein freier Video-Player v%s"
 
 #: src/xitk/main.c:407
 msgid ""
 ".\n"
 "(c) 2000-2003 The xine Team.\n"
 msgstr ""
+".\n"
+"(c) 2000-2003 Das xine Projektteam.\n"
 
 #: src/xitk/main.c:417
 #, c-format
@@ -1269,6 +1263,12 @@ msgid ""
 "parameters.\n"
 "                                 Syntax is the same as --post option.\n"
 msgstr ""
+"  -D, --deinterlace [post]...  Deinterlace Video-Ausgabe. Ein oder mehrere "
+"Nach-Plugins\n"
+"                                 können mit optionalen Parametern angegeben "
+"werden.\n"
+"                                 Syntax ist die Selbe wie bei der --post-"
+"Option.\n"
 
 #: src/xitk/main.c:544
 msgid ""
@@ -1289,65 +1289,64 @@ msgstr ""
 msgid ""
 "      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
 msgstr ""
+"      --broadcast-port <Port>  Setze Port für xine-Broadcaster (Master-"
+"Seite)\n"
 
 #: src/xitk/main.c:548
-#, fuzzy
 msgid ""
 "                               Slave is started with 'xine slave://address:"
 "port'\n"
-msgstr "                                   'clear'  Playliste löschen,\n"
+msgstr ""
+"                               Betrachter wird gestartet mit 'xine slave://"
+"address:port'\n"
 
 #: src/xitk/main.c:550
-#, fuzzy
 msgid "      --no-logo                Don't display the logo.\n"
-msgstr "      --install                Installiert eine eigene Farbtabelle.\n"
+msgstr "      --no-logo                Kein Logo beim Start anzeigen.\n"
 
 #: src/xitk/main.c:551
-#, fuzzy
 msgid "  -E, --no-reload              Don't reload old playlist.\n"
-msgstr "                    (playlist|pl)=p\n"
+msgstr ""
+"  -E, --no-reload              Alte Playliste nicht wiederherstellen.\n"
 
 #: src/xitk/main.c:552
 msgid "      --post <plugin>[:parameter=value][,...][;...]\n"
-msgstr ""
+msgstr "      --post <Plugin>[:Parameter=Wert][,...][;...]\n"
 
 #: src/xitk/main.c:553
-#, fuzzy
 msgid "                               Load one or many post plugin(s).\n"
-msgstr ""
-"                                 'loop': Gesamte Playlist wiederholen.\n"
+msgstr "                               Lade ein oder mehrere Nach-Plugin(s).\n"
 
 #: src/xitk/main.c:554
-#, fuzzy
 msgid "                               Parameters are comma separated.\n"
-msgstr ""
-"                                 'remapped': Zeige aktuelle Tastentabelle.\n"
+msgstr "                               Parameter sine Komma-separiert.\n"
 
 #: src/xitk/main.c:555
-#, fuzzy
 msgid ""
 "                               This option can be used more than one time.\n"
-msgstr "                                 -Kann mehrfach angegeben werden.\n"
+msgstr ""
+"                               Diese Option kann mehrfach angegeben werden.\n"
 
 #: src/xitk/main.c:556
 msgid "      --disable-post           Don't enable post plugin(s).\n"
-msgstr ""
+msgstr "      --disable-post           Nach-Plugin(s) nicht aktivieren.\n"
 
 #: src/xitk/main.c:557
-#, fuzzy
 msgid "      --no-splash              Don't display the splash screen.\n"
-msgstr "                    'q': Nach dem abspielen beenden.\n"
+msgstr "      --no-splash              Keinen Startbildschirm anzeigen.\n"
 
 #: src/xitk/main.c:558
-#, fuzzy
 msgid ""
 "      --stdctl                 Control xine by the console, using lirc "
 "commands.\n"
-msgstr "      --install                Installiert eine eigene Farbtabelle.\n"
+msgstr ""
+"      --stdctl                 Steuere xine über Konsole, benutze lirc "
+"Kommandos.\n"
 
 #: src/xitk/main.c:559
 msgid "  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"
 msgstr ""
+"  -T, --tvout <Backend>        Aktivierte TV-Ausgabe. Backend kann sein:\n"
 
 #: src/xitk/main.c:569
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -1427,13 +1426,13 @@ msgid "main: probing <%s> audio output plugin\n"
 msgstr "main: Teste <%s> Audio Ausgabe Plugin\n"
 
 #: src/xitk/main.c:785
-#, fuzzy, c-format
+#, c-format
 msgid "main: skipping <%s> audio output plugin from auto-probe\n"
-msgstr "main: Teste <%s> Audio Ausgabe Plugin\n"
+msgstr "main: Überspringe <%s> Audio Ausgabe Plugin bei Erkennung\n"
 
 #: src/xitk/main.c:800
 msgid "main: audio driver probing failed => no audio output\n"
-msgstr "main: Audio Treiber Test schlug fehl => keine Audio Ausgabe\n"
+msgstr "main: Audio Treiber Test fehlgeschlagen => keine Audio Ausgabe\n"
 
 #: src/xitk/main.c:820
 #, c-format
@@ -1561,13 +1560,15 @@ msgstr "Sie sollten wenigstens eine MRL zum Anhängen angeben!.\n"
 
 #: src/xitk/main.c:1616
 msgid "Automatically reload old playlist"
-msgstr ""
+msgstr "Automatische alte Playliste wiederherstellen"
 
 #: src/xitk/main.c:1617
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
+"Wenn diese Option aktiviert ist und keine MRL über die Kommandozeile "
+"angegeben werden, lädt xine automatisch die vorherige Playliste."
 
 #: src/xitk/main.c:1760
 msgid "Logo mrl"
@@ -1575,7 +1576,7 @@ msgstr "Logo MRL"
 
 #: src/xitk/mediamark.c:360
 msgid "!!Invalid entry!!"
-msgstr ""
+msgstr "!!Illegaler Eintrag!!"
 
 #: src/xitk/mediamark.c:2390 src/xitk/mediamark.c:2447
 #, c-format
@@ -1643,32 +1644,28 @@ msgid "Mediamark end time (secs)."
 msgstr "Mediamark Endzeit (sek)."
 
 #: src/xitk/mediamark.c:2961
-#, fuzzy
 msgid "A/V offset"
-msgstr "A/V Versatz: %d"
+msgstr "A/V Versatz"
 
 #: src/xitk/mediamark.c:2976
 msgid "Offset of Audio and Video."
-msgstr ""
+msgstr "Versatz von Audio und Video."
 
 #: src/xitk/mediamark.c:2981
-#, fuzzy
 msgid "SPU offset"
-msgstr "SPU Versatz: %d"
+msgstr "SPU Versatz"
 
 #: src/xitk/mediamark.c:2996
-#, fuzzy
 msgid "Subpicture offset."
-msgstr "Untertitel"
+msgstr "Untertitelversatz."
 
 #: src/xitk/mediamark.c:3002 src/xitk/post.c:1648
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: src/xitk/mediamark.c:3012
-#, fuzzy
 msgid "Apply the changes and close the window."
-msgstr "Wende Änderungen auf Playlist an."
+msgstr "Änderungen übernehmen und Fenster schließen."
 
 #: src/xitk/mediamark.c:3027
 msgid "Apply the changes to the playlist."
@@ -1679,268 +1676,239 @@ msgid "Discard changes and dismiss the window."
 msgstr "Änderungen verwerfen und Fenster schließen."
 
 #: src/xitk/menus.c:403
-#, fuzzy
 msgid "GUI visiblity"
-msgstr "gui Hinweise sichtbar"
+msgstr "Bedienfeld sichtbar"
 
 #: src/xitk/menus.c:409
 msgid "Open"
-msgstr ""
+msgstr "Öffnen"
 
 #: src/xitk/menus.c:412
 msgid "Open/File..."
-msgstr ""
+msgstr "Öffnen/Datei..."
 
 #: src/xitk/menus.c:415
-#, fuzzy
 msgid "Open/Playlist..."
-msgstr "Playliste"
+msgstr "Öffnen/Playliste..."
 
 #: src/xitk/menus.c:418
-#, fuzzy
 msgid "Open/Location..."
-msgstr "Objekt öffnen"
+msgstr "Öffnen/Adresse..."
 
 #: src/xitk/menus.c:421
-#, fuzzy
 msgid "Playback"
-msgstr "Stopp (Abspielen Beenden)"
+msgstr "Wiedergabe"
 
 #: src/xitk/menus.c:424
 msgid "Playback/Play"
-msgstr ""
+msgstr "Wiedergabe/Wiedergabe"
 
 #: src/xitk/menus.c:427
 msgid "Playback/Stop"
-msgstr ""
+msgstr "Wiedergabe/Stopp"
 
 #: src/xitk/menus.c:430
 msgid "Playback/Pause"
-msgstr ""
+msgstr "Wiedergabe/Pause"
 
 #: src/xitk/menus.c:433
 msgid "Playback/Next MRL"
-msgstr ""
+msgstr "Wiedergabe/Nächste MRL"
 
 #: src/xitk/menus.c:436
 msgid "Playback/Previous MRL"
-msgstr ""
+msgstr "Wiedergabe/Vorherige MRL"
 
 #: src/xitk/menus.c:439
 msgid "Playback/Increase Speed"
-msgstr ""
+msgstr "Wiedergabe/Geschwindikgeit erhöhen"
 
 #: src/xitk/menus.c:442
 msgid "Playback/Decrease Speed"
-msgstr ""
+msgstr "Wiedergabe/Geschwindigkeit verlangsamen"
 
 #: src/xitk/menus.c:445 src/xitk/menus.c:1017 src/xitk/panel.c:1317
 msgid "Playlist"
 msgstr "Playliste"
 
 #: src/xitk/menus.c:448
-#, fuzzy
 msgid "Playlist/Loop modes"
-msgstr "Playliste: Wiederholen."
+msgstr "Playliste/Wiederholen."
 
 #: src/xitk/menus.c:451
 msgid "Playlist/Loop modes/Disabled"
-msgstr ""
+msgstr "Playliste/Wiederholen/Deaktiviert"
 
 #: src/xitk/menus.c:454
-#, fuzzy
 msgid "Playlist/Loop modes/Loop"
-msgstr "Playliste: Keine Wiederholung."
+msgstr "Playliste/Wiederholen/Wiederholen"
 
 #: src/xitk/menus.c:457
 msgid "Playlist/Loop modes/Repeat Selection"
-msgstr ""
+msgstr "Playliste/Wiederholen/Auswahl wiederholen"
 
 #: src/xitk/menus.c:460
-#, fuzzy
 msgid "Playlist/Loop modes/Shuffle"
-msgstr "Playliste: Mischen"
+msgstr "Playliste/Wiederholen/Mischen"
 
 #: src/xitk/menus.c:463
 msgid "Playlist/Loop modes/Non-stop Shuffle"
-msgstr ""
+msgstr "Playliste/Wiederholmodus/Ununterbrochen mischen"
 
 #: src/xitk/menus.c:466
-#, fuzzy
 msgid "Playlist/SEP"
-msgstr "Playliste"
+msgstr "Playliste/SEP"
 
 #: src/xitk/menus.c:469 src/xitk/menus.c:663
-#, fuzzy
 msgid "Playlist/Get from..."
-msgstr "Playliste: Wiederholen."
+msgstr "Playliste/Holen von..."
 
 #.
 #. autoplay input plugin idents
 #.
 #: src/xitk/menus.c:475
-#, fuzzy
 msgid "Playlist/Load..."
-msgstr "Playliste"
+msgstr "Playliste/Laden..."
 
 #: src/xitk/menus.c:478
-#, fuzzy
 msgid "Playlist/Editor..."
-msgstr "xine Playlisten Editor"
+msgstr "Playliste/Editor..."
 
 #: src/xitk/menus.c:484 src/xitk/menus.c:816
-#, fuzzy
 msgid "Menus"
-msgstr "Menü 1"
+msgstr "Menüs"
 
 #: src/xitk/menus.c:493
-#, fuzzy
 msgid "Audio/Volume"
-msgstr "Lautstärke"
+msgstr "Audio/Lautstärke"
 
 #: src/xitk/menus.c:496
-#, fuzzy
 msgid "Audio/Volume/Mute"
-msgstr "Lautstärke"
+msgstr "Audio/Lautstärke/Stumm"
 
 #: src/xitk/menus.c:499
 msgid "Audio/Volume/Increase 10%"
-msgstr ""
+msgstr "Audio/Lautstärke/10% lauter"
 
 #: src/xitk/menus.c:502
 msgid "Audio/Volume/Decrease 10%"
-msgstr ""
+msgstr "Audio/Lautstärke/10% leiser"
 
 #: src/xitk/menus.c:505 src/xitk/menus.c:716
-#, fuzzy
 msgid "Audio/Channel"
-msgstr "Tonspur: %s"
+msgstr "Audio/Tonspur"
 
 #: src/xitk/menus.c:508 src/xitk/menus.c:689
-#, fuzzy
 msgid "Audio/Visualization"
-msgstr "Audio-Visualisierung"
+msgstr "Audio/Visualisierung"
 
 #: src/xitk/menus.c:517
-#, fuzzy
 msgid "Fullscreen\\/Window"
-msgstr "Vollbild/Fenster-Modus"
+msgstr "Vollbild\\/Fenster-Modus"
 
 #: src/xitk/menus.c:520 src/xitk/stream_infos.c:740
 msgid "Video"
 msgstr "Video"
 
 #: src/xitk/menus.c:523
-#, fuzzy
 msgid "Video/Deinterlace"
-msgstr "Deinterlace: %d"
+msgstr "Video/Deinterlace"
 
 #: src/xitk/menus.c:526 src/xitk/menus.c:538
-#, fuzzy
 msgid "Video/SEP"
-msgstr "Video"
+msgstr "Video/SEP"
 
 #: src/xitk/menus.c:529
 msgid "Video/Postprocess"
-msgstr ""
+msgstr "Video/Nachbearbeitung"
 
 #: src/xitk/menus.c:532
 msgid "Video/Postprocess/Chain Reaction..."
-msgstr ""
+msgstr "Video/Nachbearbeitung/Kettenreaktion..."
 
 #: src/xitk/menus.c:535
 msgid "Video/Postprocess/Enable"
-msgstr ""
+msgstr "Video/Nachbearbeitung/Aktivieren"
 
 #: src/xitk/menus.c:541
-#, fuzzy
 msgid "Video/Aspect ratio"
-msgstr "Seitenverhältnis: %s"
+msgstr "Video/Seitenverhältnis"
 
 #: src/xitk/menus.c:544
 msgid "Video/Aspect ratio/Automatic"
-msgstr ""
+msgstr "Video/Seitenverhältnis/Automatisch"
 
 #: src/xitk/menus.c:547
 msgid "Video/Aspect ratio/Square"
-msgstr ""
+msgstr "Video/Seitenverhältnis/Quadratisch"
 
 #: src/xitk/menus.c:550
-#, fuzzy
 msgid "Video/Aspect ratio/4:3"
-msgstr "Seitenverhältnis: %s"
+msgstr "Video/Seitenverhältnis/4:3"
 
 #: src/xitk/menus.c:553
 msgid "Video/Aspect ratio/Anamorphic"
-msgstr ""
+msgstr "Video/Seitenverhältnis/Anamorph"
 
 #: src/xitk/menus.c:556
-#, fuzzy
 msgid "Video/Aspect ratio/DVB"
-msgstr "Seitenverhältnis: %s"
+msgstr "Video/Seitenverhältnis/DVB"
 
 #: src/xitk/menus.c:559
-#, fuzzy
 msgid "Video/200%"
-msgstr "Video"
+msgstr "Video/200%"
 
 #: src/xitk/menus.c:562
-#, fuzzy
 msgid "Video/100%"
-msgstr "Video"
+msgstr "Video/100%"
 
 #: src/xitk/menus.c:565
-#, fuzzy
 msgid "Video/50%"
-msgstr "Video"
+msgstr "Video/50%"
 
 #: src/xitk/menus.c:574 src/xitk/menus.c:766
-#, fuzzy
 msgid "Subtitle/Channel"
-msgstr "Untertitel"
+msgstr "Untertitel/Kanal"
 
 #: src/xitk/menus.c:583
-#, fuzzy
 msgid "Stream"
-msgstr "Ströme: "
+msgstr "Strom"
 
 #: src/xitk/menus.c:586
-#, fuzzy
 msgid "Stream/OSD Information"
-msgstr "Datenstrominformationen"
+msgstr "Strom/Bildschirminformation"
 
 #: src/xitk/menus.c:589
-#, fuzzy
 msgid "Stream/Window Information..."
-msgstr "Datenstrominformationen"
+msgstr "Strom/Fensterinformation..."
 
 #: src/xitk/menus.c:595
 msgid "Settings"
-msgstr ""
+msgstr "Einstellungen"
 
 #: src/xitk/menus.c:598
 msgid "Settings/Setup..."
-msgstr ""
+msgstr "Einstellungen/Einstellungen..."
 
 #: src/xitk/menus.c:602
 msgid "Settings/Skin Downloader..."
-msgstr ""
+msgstr "Einstellungen/Skin Downloader..."
 
 #: src/xitk/menus.c:606
 msgid "Settings/Keymap Editor..."
-msgstr ""
+msgstr "Einstellungen/Tastenbelegung..."
 
 #: src/xitk/menus.c:609
 msgid "Settings/Video..."
-msgstr ""
+msgstr "Einstellungen/Video..."
 
 #: src/xitk/menus.c:612
 msgid "Settings/TV Analog..."
-msgstr ""
+msgstr "Einstellungen/Analog TV..."
 
 #: src/xitk/menus.c:615
 msgid "Settings/Logs..."
-msgstr ""
+msgstr "Einstellungen/Logs..."
 
 #: src/xitk/menus.c:621 src/xitk/panel.c:1144
 msgid "Quit"
@@ -1952,47 +1920,41 @@ msgid "xine %s"
 msgstr "xine %s"
 
 #: src/xitk/menus.c:646
-#, fuzzy
 msgid "Open/Subtitle..."
-msgstr "Untertitel"
+msgstr "Öffnen/Untertitel..."
 
 #. Save Playlist
 #: src/xitk/menus.c:653
-#, fuzzy
 msgid "Playlist/Save..."
-msgstr "Playliste"
+msgstr "Playliste/Sichern..."
 
 #: src/xitk/menus.c:704
-#, fuzzy
 msgid "Audio/Visualization/None"
-msgstr "Audio-Visualisierung"
+msgstr "Audio/Visualisierung/Keine"
 
 #: src/xitk/menus.c:720
-#, fuzzy
 msgid "Audio/Channel/Off"
-msgstr "Tonspur: %s"
+msgstr "Audio/Tonspur/Aus"
 
 #: src/xitk/menus.c:726
-#, fuzzy
 msgid "Audio/Channel/Auto"
-msgstr "Tonspur: %s"
+msgstr "Audio/Tonspur/Automatisch"
 
 #: src/xitk/menus.c:770
 msgid "Subtitle/Channel/Off"
-msgstr ""
+msgstr "Untertitel/Kanal/Aus"
 
 #: src/xitk/menus.c:776
 msgid "Subtitle/Channel/Auto"
-msgstr ""
+msgstr "Untertitel/Kanal/Automatisch"
 
 #: src/xitk/menus.c:872 src/xitk/menus.c:944
 msgid "Off"
-msgstr ""
+msgstr "Aus"
 
 #: src/xitk/menus.c:878 src/xitk/menus.c:950
-#, fuzzy
 msgid "Auto"
-msgstr "Audio"
+msgstr "Automatisch"
 
 #: src/xitk/menus.c:996 src/xitk/menus.c:1004 src/xitk/mrl_browser.c:272
 #: src/xitk/playlist.c:1175
@@ -2000,23 +1962,20 @@ msgid "Add"
 msgstr "Hinzufügen"
 
 #: src/xitk/menus.c:1002
-#, fuzzy
 msgid "Play"
-msgstr "Playliste"
+msgstr "Wiedergabe"
 
 #: src/xitk/menus.c:1007 src/xitk/menus.c:1035
-#, fuzzy
 msgid "Delete All"
-msgstr "Löschen"
+msgstr "Alle löschen"
 
 #: src/xitk/menus.c:1009
 msgid "Move Up"
-msgstr ""
+msgstr "Nach oben"
 
 #: src/xitk/menus.c:1010
-#, fuzzy
 msgid "Move Down"
-msgstr "Runter"
+msgstr "Nach unten"
 
 #: src/xitk/mrl_browser.c:193
 msgid "All extensions"
@@ -2269,64 +2228,62 @@ msgid "Audio visualization plugin"
 msgstr "Audio-Visualisierung"
 
 #: src/xitk/post.c:206
-#, fuzzy
 msgid "Post audio plugin to used when playing streams without video"
-msgstr "Plugin zur Visualisierung reiner Audio-Ströme"
+msgstr "Audio-Nach-Plugin zur Visualisierung reiner Audio-Ströme"
 
 #: src/xitk/post.c:505
 #, c-format
 msgid "Entered value is out of bounds (%d>%d<%d)."
-msgstr ""
+msgstr "Eingegebener Wert ist außerhalb der Grenzen (%d>%d<%d)."
 
 #: src/xitk/post.c:528
 #, c-format
 msgid "Entered value is out of bounds (%e>%e<%e)."
-msgstr ""
+msgstr "Eingegebener Wert ist außerhalb der Grenzen (%e>%e<%e)."
 
 #: src/xitk/post.c:555
 msgid "parameter type POST_PARAM_TYPE_STRING) not supported yet.\n"
-msgstr ""
+msgstr "Parametertyp POST_PARAM_TYPE_STRING wird noch nicht unterstützt.\n"
 
 #: src/xitk/post.c:565
 msgid "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"
-msgstr ""
+msgstr "Parametertyp POST_PARAM_TYPE_STRINGLIST wird noch nicht unterstützt.\n"
 
 #: src/xitk/post.c:590
-#, fuzzy
 msgid "No description available"
-msgstr "Keine Hilfe verfügbar"
+msgstr "Keine Beschreibung verfügbar"
 
 #: src/xitk/post.c:760
 msgid "No Filter"
-msgstr ""
+msgstr "Kein Filter"
 
 #: src/xitk/post.c:944
 msgid "There is no parameter available for this plugin."
-msgstr ""
+msgstr "Kein Parameter vorhanden für dieses Plugin."
 
 #: src/xitk/post.c:1554
-#, fuzzy
 msgid "Chain Reaction"
-msgstr "Aktion zuordnen"
+msgstr "Kettenreaktion"
 
 #: src/xitk/post.c:1599
 msgid "New Filter"
-msgstr ""
+msgstr "Neuer Filter"
 
 #: src/xitk/post.c:1614
 msgid "Enable"
-msgstr ""
+msgstr "Aktivieren"
 
 #: src/xitk/post.c:1874
-#, fuzzy
 msgid "Deinterlace plugin."
-msgstr "Deinterlace: %d"
+msgstr "Deinterlace-Plugin."
 
 #: src/xitk/post.c:1875
 msgid ""
 "Plugin (with optional parameters) to use when deinterlace is used (plugin "
 "separator is ';')."
 msgstr ""
+"Zu benutzendes Plugin (mit optionalen Parametern), wenn Deinterlace genutzt "
+"wird. (Trennzeichen für Plugins ist ';')."
 
 #: src/xitk/session.c:676
 #, c-format
@@ -2461,7 +2418,7 @@ msgstr "Fehler: %s\n"
 
 #: src/xitk/snapshot.c:881
 msgid "xine_get_current_frame() failed\n"
-msgstr ""
+msgstr "xine_get_current_frame() fehlgeschlagen\n"
 
 #: src/xitk/snapshot.c:890
 #, c-format
@@ -2470,18 +2427,17 @@ msgstr "Falsche Bildgröße: %dx%d. Schnappschuß abgebrochen.\n"
 
 #: src/xitk/snapshot.c:902
 msgid "prvt_image_alloc failed\n"
-msgstr ""
+msgstr "prvt_image_alloc fehlgeschlagen\n"
 
 #: src/xitk/snapshot.c:911
 msgid "Framegrabber failed\n"
-msgstr ""
+msgstr "Framegrabber fehlgeschlagen\n"
 
 #. the dxr3 driver does not allocate yuv buffers
 #. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:918
-#, fuzzy
 msgid "Not supported for this video out driver\n"
-msgstr "snapshot.c: Nicht unterstützt für diesen Video-Ausgabetreiber\n"
+msgstr "Nicht unterstützt für diesen Video-Ausgabetreiber\n"
 
 #: src/xitk/snapshot.c:1027
 #, c-format
@@ -2490,22 +2446,21 @@ msgstr "Kann Datei (%s) nicht öffnen\n"
 
 #: src/xitk/snapshot.c:1047
 msgid "png_create_write_struct() failed\n"
-msgstr ""
+msgstr "png_create_write_struct() fehlgeschlagen\n"
 
 #: src/xitk/snapshot.c:1061
 msgid "png_create_info_struct() failed\n"
-msgstr ""
+msgstr "png_create_info_struct() fehlgeschlagen\n"
 
 #: src/xitk/snapshot.c:1081
 msgid "PNG Parsing failed\n"
-msgstr ""
+msgstr "PNG Lesen fehlgeschlagen\n"
 
 #: src/xitk/snapshot.c:1095
 msgid "Error: yuy2_fudge failed\n"
-msgstr ""
+msgstr "Fehler: yuv2_fudge fehlgeschlagen\n"
 
 #: src/xitk/snapshot.c:1126
-#, fuzzy
 msgid "rgb_alloc() failed\n"
 msgstr "XAllocWMHints() fehlgeschlagen\n"
 

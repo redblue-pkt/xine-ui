@@ -3,7 +3,7 @@
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\" 
-.\" Zuletzt synchronisiert mit en/xine.1.in 1.52 2003-07-28
+.\" Zuletzt synchronisiert mit en/xine.1.in 1.54 2003-10-10
 
 .de Vb \" Begin verbatim text
 .ft CW
@@ -155,8 +155,10 @@ Weiterhin sind folgende Optionen benutzbar:
 .B \-Z
 Wiedergabe nicht automatisch starten (Beeinflusst nur den Autostart im Smart-Modus).
 .TP
-.B \-D,\ \-\-deinterlace
+.BI \-D,\ \-\-deinterlace\  [Nach[:..][;]]
 Deinterlace Video-Fenster.
+Konfigurationsoptionen der Nach-Plugins können überschrieben werden, die zum Deinterlacing des Ausgabebilds verwendet werden.
+Siehe \fI\-\-post\fP für die Syntax.
 .TP
 .BI \-r,\ \-\-aspect\-ratio\  <Modus>
 Setze das Seitenverhältnis für die Video-Ausgabe. Mögliche Modi sind:
@@ -173,10 +175,11 @@ Alte Playlist nicht laden.
 Die Playlist wird beim Beenden von xine gesichert und erneut geladen, wenn xine das nächste mal gestartet wird.
 Diese Funktion kann über das Setup deaktiviert werden.
 .TP
-.BI \-\-post\  <Plugin>[:Parameter=Wert[,...]]
-Lädt ein Post-Plugin.
+.BI \-\-post\  <Plugin>[:Parameter=Wert][,...][;...]
+Lädt ein oder mehrere Post-Plugin(s).
 Parameter sind Komma-separiert.
 Diese Option kann mehrfach angegeben werden, um zwei oder mehr Video-Nachbearbeitungs-Plugins in Reihe zu schalten.
+Zwei oder mehr Plugins können mit Semikolon ';' getrennt angegeben werden.
 .TP
 .B \-\-disable\-post
 Post-Plugins nicht aktivieren.
