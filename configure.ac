@@ -312,7 +312,9 @@ dnl readline
 dnl
 AC_CHECK_READLINE
 AM_CONDITIONAL(HAVE_READLINE, test x"$have_readline" = "xyes")
-
+if test x"$have_readline" != "xyes"; then
+  AC_MSG_RESULT([*** no readline found, xine network interface will be disabled ***])
+fi
 
 dnl
 dnl ncurses
@@ -384,7 +386,7 @@ if test x"$XFT" = "xtrue" ; then
   AC_TRY_LINK([
 #include <X11/Xft/Xft.h>], [ XftFontClose(0, 0); return 1; ], 
     [
-      AC_DEFINE(WITH_XFT, 1, "antialias support")
+      AC_DEFINE(WITH_XFT, 1, [font antialiasing support])
       AC_MSG_CHECKING([Xft UTF-8 support])
       AC_TRY_LINK([
 #include <X11/Xft/Xft.h>
@@ -398,11 +400,13 @@ XftDrawStringUtf8(0, 0, 0, 0, 0, 0, 0); return 0;
     [
       AC_MSG_RESULT([***Could not link with Xft. Install Xft if you want support for it***])
       XFT=false
+      XFT_CFLAGS=
+      XFT_LIBS=
     ])
   CFLAGS=$saved_CFLAGS
   LIBS=$saved_LIBS
 fi
-AM_CONDITIONAL(WITH_XFT, test x"$XFT" != "xtrue")
+AM_CONDITIONAL(WITH_XFT, test x"$XFT" = "xtrue")
 
 dnl
 dnl Check for DirectFB
