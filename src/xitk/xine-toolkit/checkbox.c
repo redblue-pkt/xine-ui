@@ -187,7 +187,7 @@ void checkbox_set_state(widget_t *c, int state, Window win, GC gc) {
 /*
  *
  */
-widget_t *create_checkbox (Display *display, ImlibData *idata,
+widget_t *checkbox_create (Display *display, ImlibData *idata,
 			   int x, int y, void* f, void* ud, const char *skin) {
   widget_t *mywidget;
   checkbox_private_data_t *private_data;

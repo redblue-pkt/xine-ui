@@ -67,7 +67,7 @@ typedef struct {
 /**
  * Create a slider
  */
-widget_t *create_slider(Display *display, ImlibData *idata,
+widget_t *slider_create(Display *display, ImlibData *idata,
 			int type, int x, int y, int min, int max, 
 			int step, const char *bg, const char *paddle, 
 /* cb for motion      */void *fm, void *udm,

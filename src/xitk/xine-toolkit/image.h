@@ -45,7 +45,7 @@ gui_image_t *gui_load_image(ImlibData *idata, const char *image);
 /**
  * Create an image widget type.
  */
-widget_t *create_image (Display *display, ImlibData *idata,
+widget_t *image_create (Display *display, ImlibData *idata,
 			int x, int y, const char *skin) ;
 
 #endif

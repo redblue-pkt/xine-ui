@@ -277,7 +277,7 @@ void widget_disable(widget_t *);
 /**
  * Create a slider
  */
-widget_t *create_slider(Display *display, ImlibData *idata,
+widget_t *slider_create(Display *display, ImlibData *idata,
 			int type, int x, int y, int min, int max, 
 			int step, const char *bg, const char *paddle, 
 /* cb for motion      */void *fm, void *udm,
@@ -397,11 +397,11 @@ void gui_list_delete_current (gui_list_t *l);
 /**
  * Create a labeled button.
  */
-widget_t *create_label_button (Display *display, ImlibData *idata,
-			       int x, int y, int btype, const char *label, 
-			       void* f, void* ud, const char *skin,
- 			       const char *normcolor, const char *focuscolor, 
-			       const char *clickcolor);
+widget_t *label_button_create(Display *display, ImlibData *idata,
+			      int x, int y, int btype, const char *label, 
+			      void* f, void* ud, const char *skin,
+			      const char *normcolor, const char *focuscolor, 
+			      const char *clickcolor);
 
 /**
  * Change label of button 'widget'.
@@ -430,8 +430,8 @@ void labelbutton_set_state(widget_t *, int, Window, GC);
 /**
  * Create a label widget.
  */
-widget_t *create_label (Display *display, ImlibData *idata,
-			int x, int y, int length, const char *label, char *bg);
+widget_t *label_create(Display *display, ImlibData *idata,
+		       int x, int y, int length, const char *label, char *bg);
 
 /**
  * Change label of wodget 'widget'.
@@ -451,8 +451,8 @@ gui_image_t *gui_load_image(ImlibData *idata, const char *image);
 /**
  * Create an image widget type.
  */
-widget_t *create_image (Display *display, ImlibData *idata,
-			int x, int y, const char *skin) ;
+widget_t *image_create(Display *display, ImlibData *idata,
+		       int x, int y, const char *skin) ;
 
 
 /*
@@ -473,7 +473,7 @@ void dnd_set_callback (DND_struct_t *, void *);
 /**
  * Create a checkbox.
  */
-widget_t *create_checkbox (Display *display, ImlibData *idata,
+widget_t *checkbox_create (Display *display, ImlibData *idata,
 			   int x, int y, void* f, void* ud, const char *skin) ;
 /**
  * get state of checkbox "widget".
@@ -490,7 +490,7 @@ void checkbox_set_state(widget_t *, int, Window, GC);
 /**
  * Create a button
  */
-widget_t *create_button (Display *display, ImlibData *idata,
+widget_t *button_create (Display *display, ImlibData *idata,
 			 int x, int y, void* f, void* ud, const char *skin) ;
 
 
@@ -544,7 +544,7 @@ typedef struct {
   void             *user_data;
 } browser_placements_t;
 
-widget_t *create_browser(Display *display, ImlibData *idata,
+widget_t *browser_create(Display *display, ImlibData *idata,
 			 /* The receiver list */
 			 widget_list_t *thelist, 
 			 browser_placements_t *bp);
@@ -654,5 +654,6 @@ void filebrowser_hide(widget_t *w);
 void filebrowser_show(widget_t *w);
 void filebrowser_set_transient(widget_t *w, Window window);
 void filebrowser_destroy(widget_t *w);
+char *filebrowser_get_current_dir(widget_t *w);
 
 #endif

@@ -371,7 +371,7 @@ void control_panel(void) {
 					  VO_PROP_HUE, &min, &max);
     cur = get_current_prop(VO_PROP_HUE);
     gui_list_append_content(control->widget_list->l,
-	    (control->hue = create_slider(gGui->display, gGui->imlib_data, 
+	    (control->hue = slider_create(gGui->display, gGui->imlib_data, 
 				     VSLIDER,
 				     gui_get_skinX("CtlHueBG"), 
 				     gui_get_skinY("CtlHueBG"), 
@@ -383,7 +383,7 @@ void control_panel(void) {
 				     set_hue, NULL)));
     slider_set_pos(control->widget_list, control->hue, cur);
     gui_list_append_content(control->widget_list->l,
-			    create_label(gGui->display, gGui->imlib_data, 
+			    label_create(gGui->display, gGui->imlib_data, 
 					 gui_get_skinX("CtlHueLbl"), 
 					 gui_get_skinY("CtlHueLbl"), 
 					 3, "Hue", 
@@ -396,7 +396,7 @@ void control_panel(void) {
 					  VO_PROP_SATURATION, &min, &max);
     cur = get_current_prop(VO_PROP_SATURATION);
     gui_list_append_content(control->widget_list->l,
-	      (control->sat = create_slider(gGui->display, gGui->imlib_data, 
+	      (control->sat = slider_create(gGui->display, gGui->imlib_data, 
 				     VSLIDER,
 				     gui_get_skinX("CtlSatBG"), 
 				     gui_get_skinY("CtlSatBG"), 
@@ -408,7 +408,7 @@ void control_panel(void) {
 				     set_saturation, NULL)));
     slider_set_pos(control->widget_list, control->sat, cur);
     gui_list_append_content(control->widget_list->l,
-			    create_label(gGui->display, gGui->imlib_data, 
+			    label_create(gGui->display, gGui->imlib_data, 
 					 gui_get_skinX("CtlSatLbl"), 
 					 gui_get_skinY("CtlSatLbl"), 
 					 3, "Sat", 
@@ -420,7 +420,7 @@ void control_panel(void) {
 					  VO_PROP_BRIGHTNESS, &min, &max);
     cur = get_current_prop(VO_PROP_BRIGHTNESS);
     gui_list_append_content(control->widget_list->l,
-	    (control->bright = create_slider(gGui->display, gGui->imlib_data, 
+	    (control->bright = slider_create(gGui->display, gGui->imlib_data, 
 				      VSLIDER,
 				      gui_get_skinX("CtlBrightBG"), 
 				      gui_get_skinY("CtlBrightBG"), 
@@ -432,7 +432,7 @@ void control_panel(void) {
 				      set_brightness, NULL)));
     slider_set_pos(control->widget_list, control->bright, cur);
     gui_list_append_content(control->widget_list->l,
-			    create_label(gGui->display, gGui->imlib_data, 
+			    label_create(gGui->display, gGui->imlib_data, 
 					 gui_get_skinX("CtlBrightLbl"), 
 					 gui_get_skinY("CtlBrightLbl"), 
 					 3, "Brt", 
@@ -444,7 +444,7 @@ void control_panel(void) {
 					  VO_PROP_CONTRAST, &min, &max);
     cur = get_current_prop(VO_PROP_CONTRAST);
     gui_list_append_content(control->widget_list->l,
-	      (control->contr = create_slider(gGui->display, gGui->imlib_data, 
+	      (control->contr = slider_create(gGui->display, gGui->imlib_data, 
 				      VSLIDER,
 				      gui_get_skinX("CtlContBG"), 
 				      gui_get_skinY("CtlContBG"),
@@ -456,7 +456,7 @@ void control_panel(void) {
 				      set_contrast, NULL)));
     slider_set_pos(control->widget_list, control->contr, cur);
     gui_list_append_content(control->widget_list->l,
-			    create_label(gGui->display, gGui->imlib_data, 
+			    label_create(gGui->display, gGui->imlib_data, 
 					 gui_get_skinX("CtlContLbl"), 
 					 gui_get_skinY("CtlContLbl"), 
 					 3, "Ctr", 
@@ -487,7 +487,7 @@ void control_panel(void) {
     widget_t *w;
 
     gui_list_append_content (control->widget_list->l, 
-	     (w = create_label_button (gGui->display, gGui->imlib_data, 
+	     (w = label_button_create (gGui->display, gGui->imlib_data, 
 				       gui_get_skinX("CtlSave"),
 				       gui_get_skinY("CtlSave"),
 				       CLICK_BUTTON, NULL,
@@ -499,7 +499,7 @@ void control_panel(void) {
     widget_disable(w);
 	
     gui_list_append_content (control->widget_list->l, 
-	     (w = create_label_button (gGui->display, gGui->imlib_data, 
+	     (w = label_button_create (gGui->display, gGui->imlib_data, 
 				       gui_get_skinX("CtlReset"),
 				       gui_get_skinY("CtlReset"),
 				       CLICK_BUTTON, NULL,
@@ -511,7 +511,7 @@ void control_panel(void) {
     widget_disable(w);
 
     gui_list_append_content (control->widget_list->l, 
-	     (w = create_label_button (gGui->display, gGui->imlib_data, 
+	     (w = label_button_create (gGui->display, gGui->imlib_data, 
 				       gui_get_skinX("CtlDummy"),
 				      gui_get_skinY("CtlDummy"),
 				      CLICK_BUTTON, NULL,
@@ -524,7 +524,7 @@ void control_panel(void) {
   }
 
   gui_list_append_content (control->widget_list->l, 
-			  create_label_button (gGui->display, 
+			  label_button_create (gGui->display, 
 					       gGui->imlib_data, 
 					       gui_get_skinX("CtlDismiss"),
 					       gui_get_skinY("CtlDismiss"),

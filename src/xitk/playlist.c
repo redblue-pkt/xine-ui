@@ -584,7 +584,7 @@ void playlist_editor(void) {
   playlist->widget_list->gc            = gc;
 
   gui_list_append_content (playlist->widget_list->l, 
-			    create_label_button (gGui->display, 
+			    label_button_create (gGui->display, 
 						gGui->imlib_data, 
 						gui_get_skinX("PlMoveUp"),
 						gui_get_skinY("PlMoveUp"),
@@ -596,7 +596,7 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlMoveUp")));
 
   gui_list_append_content (playlist->widget_list->l, 
-			   create_label_button (gGui->display,
+			   label_button_create (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlMoveDn"),
 						gui_get_skinY("PlMoveDn"),
@@ -608,7 +608,7 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlMoveDn")));
 
   gui_list_append_content (playlist->widget_list->l, 
-			   create_label_button (gGui->display,
+			   label_button_create (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlPlay"),
 						gui_get_skinY("PlPlay"),
@@ -620,7 +620,7 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlPlay")));
 
   gui_list_append_content (playlist->widget_list->l, 
-			   create_label_button (gGui->display,
+			   label_button_create (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlDelete"),
 						gui_get_skinY("PlDelete"),
@@ -632,7 +632,7 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlDelete")));
 
   gui_list_append_content (playlist->widget_list->l, 
-			   create_label_button (gGui->display,
+			   label_button_create (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlDeleteAll"),
 						gui_get_skinY("PlDeleteAll"),
@@ -644,7 +644,7 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlDeleteAll")));
 
   gui_list_append_content (playlist->widget_list->l, 
-                           create_label_button (gGui->display,
+                           label_button_create (gGui->display,
 						gGui->imlib_data,
 						gui_get_skinX("PlAdd"), 
                                                 gui_get_skinY("PlAdd"), 
@@ -656,7 +656,7 @@ void playlist_editor(void) {
                                                 gui_get_ccolor("PlAdd")));
 
   gui_list_append_content (playlist->widget_list->l, 
-			   create_label_button (gGui->display,
+			   label_button_create (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlLoad"),
 						gui_get_skinY("PlLoad"),
@@ -668,7 +668,7 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlLoad")));
 
   gui_list_append_content (playlist->widget_list->l, 
-			   create_label_button (gGui->display,
+			   label_button_create (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlSave"),
 						gui_get_skinY("PlSave"),
@@ -680,7 +680,7 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlSave")));
 
   gui_list_append_content (playlist->widget_list->l, 
-			   create_label_button (gGui->display,
+			   label_button_create (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlDismiss"),
 						gui_get_skinY("PlDismiss"),
@@ -716,13 +716,13 @@ void playlist_editor(void) {
 
   gui_list_append_content (playlist->widget_list->l, 
 			   (playlist->playlist = 
-			    create_browser(gGui->display,
+			    browser_create(gGui->display,
 					   gGui->imlib_data,
 					   playlist->widget_list,
 					   bp)));
 
   gui_list_append_content (playlist->widget_list->l,
-			   create_label (gGui->display, gGui->imlib_data, 
+			   label_create (gGui->display, gGui->imlib_data, 
 					 gui_get_skinX("AutoPlayLbl"),
 					 gui_get_skinY("AutoPlayLbl"),
 					 9, "Scan for:",
@@ -740,7 +740,7 @@ void playlist_editor(void) {
     while(autoplay_plugins[i] != NULL) {
       gui_list_append_content (playlist->widget_list->l,
 	       (tmp =
-		create_label_button (gGui->display, gGui->imlib_data, 
+		label_button_create (gGui->display, gGui->imlib_data, 
 				     x, y,
 				     CLICK_BUTTON,
 				     autoplay_plugins[i],

@@ -510,7 +510,7 @@ void slider_set_pos(widget_list_t *wl, widget_t *sl, int pos) {
 /*
  * Create the widget
  */
-widget_t *create_slider (Display *display, ImlibData *idata,
+widget_t *slider_create (Display *display, ImlibData *idata,
 			 int type, int x, int y, int min, int max, 
 			 int step, const char *bg, const char *paddle,
 			 void *fm, void *udm, void *f, void *ud) {

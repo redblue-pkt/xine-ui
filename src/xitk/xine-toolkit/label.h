@@ -47,7 +47,7 @@ typedef struct {
 /**
  * Create a label widget.
  */
-widget_t *create_label (Display *display, ImlibData *idata,
+widget_t *label_create (Display *display, ImlibData *idata,
 			int x, int y, int length, const char *label, char *bg);
 
 /**

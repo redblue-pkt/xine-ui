@@ -153,7 +153,7 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
 			  gGui->panel_window, gGui->video_window);
   }
   
-  if(is_file_browser_visible()) {
+  if(file_browser_is_visible()) {
     show_file_browser();
     set_file_browser_transient();
   }

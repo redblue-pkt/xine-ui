@@ -134,7 +134,7 @@ static int notify_focus_button (widget_list_t *wl, widget_t *b, int bEntered) {
 /*
  *
  */
-widget_t *create_button (Display *display, ImlibData *idata,
+widget_t *button_create (Display *display, ImlibData *idata,
 			 int x, int y, void* f, void* ud, const char *skin) {
   widget_t              *mywidget;
   button_private_data_t *private_data;

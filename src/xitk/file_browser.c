@@ -46,7 +46,7 @@ static widget_t     *fb = NULL;
 /*
  *
  */
-int is_file_browser_visible(void) {
+int file_browser_is_visible(void) {
 
   if(fb)
     return(filebrowser_is_visible(fb));
@@ -57,7 +57,7 @@ int is_file_browser_visible(void) {
 /*
  *
  */
-int is_file_browser_running(void) {
+int file_browser_is_running(void) {
 
   if(fb)
     return(filebrowser_is_running(fb));
@@ -103,7 +103,7 @@ void file_browser_toggle_visibility(void) {
 
   if(fb) {
 
-    if(is_file_browser_visible())
+    if(file_browser_is_visible())
       hide_file_browser();
     else
       show_file_browser();
@@ -125,7 +125,11 @@ void destroy_file_browser(void) {
  *
  */
 static void file_browser_kill(widget_t *w, void *data) {
+  char *curdir = filebrowser_get_current_dir(fb);
 
+  if(curdir)
+    config_set_str("filebrowser_dir", curdir);
+  
   fb = NULL;
 }
 

@@ -103,7 +103,7 @@ typedef struct {
 /**
  * Create the list browser
  */
-widget_t *create_browser(Display *display, ImlibData *idata,
+widget_t *browser_create(Display *display, ImlibData *idata,
 			 /* The receiver list */
 			 widget_list_t *thelist, browser_placements_t *bp);
 

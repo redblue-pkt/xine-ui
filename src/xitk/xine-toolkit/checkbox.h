@@ -46,7 +46,7 @@ typedef struct {
 /**
  * Create a checkbox.
  */
-widget_t *create_checkbox (Display *display, ImlibData *idata,
+widget_t *checkbox_create (Display *display, ImlibData *idata,
 			   int x, int y, void* f, void* ud, const char *skin) ;
 /**
  * get state of checkbox "widget".

@@ -86,7 +86,7 @@ static void paint_image (widget_t *i,  Window win, GC gc) {
 /*
  *
  */
-widget_t *create_image (Display *display, ImlibData *idata,
+widget_t *image_create (Display *display, ImlibData *idata,
 			int x, int y, const char *skin) {
   widget_t              *mywidget;
   image_private_data_t *private_data;

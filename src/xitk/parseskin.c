@@ -264,7 +264,7 @@ void gui_place_extra_images(widget_list_t *gui_widget_list) {
 	  tmp2[strlen(ln) - 1] = '\0';
 	  sprintf(skinfile, "%s/%s/%s", XINE_SKINDIR, skin, tmp2);
 	  gui_list_append_content (gui_widget_list->l, 
-				   create_image (gGui->display, 
+				   image_create (gGui->display, 
 						 gGui->imlib_data, 
 						 x, y, skinfile));
 	  

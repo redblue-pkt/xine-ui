@@ -270,7 +270,7 @@ static void browser_select(widget_t *w, void *data, int state) {
 /**
  * Create the list browser
  */
-widget_t *create_browser(Display *display, ImlibData *idata,
+widget_t *browser_create(Display *display, ImlibData *idata,
 			 widget_list_t *thelist,
 			 browser_placements_t *bp) {
   widget_t *mywidget;
@@ -288,14 +288,14 @@ widget_t *create_browser(Display *display, ImlibData *idata,
 
   gui_list_append_content(thelist->l, 
 	  (private_data->item_tree[WBUP] = 
-	   create_button(display, idata, 
+	   button_create(display, idata, 
 			 bp->arrow_up.x, bp->arrow_up.y, 
 			 browser_up, (void*)mywidget, 
 			 bp->arrow_up.skinfile)));
   
   gui_list_append_content(thelist->l,
 	  (private_data->item_tree[WSLID] = 
-	   create_slider(display, idata, VSLIDER,
+	   slider_create(display, idata, VSLIDER,
 			 bp->slider.x, bp->slider.y, 0,
 			 (bp->browser.num_entries > (bp->browser.max_displayed_entries-1)
 			  ? bp->browser.num_entries-1 : 0), 
@@ -307,7 +307,7 @@ widget_t *create_browser(Display *display, ImlibData *idata,
   
   gui_list_append_content(thelist->l, 
 	  (private_data->item_tree[WBDN] = 
-	   create_button (display, idata, 
+	   button_create (display, idata, 
 			  bp->arrow_dn.x, bp->arrow_dn.y, 
 			  browser_down, 
 			  (void*)mywidget, bp->arrow_dn.skinfile)));
@@ -328,7 +328,7 @@ widget_t *create_browser(Display *display, ImlibData *idata,
       
       gui_list_append_content(thelist->l, 
 		      (private_data->item_tree[i] =
-		       create_label_button (display, idata, 
+		       label_button_create (display, idata, 
 					    x, y,
 					    RADIO_BUTTON, 
 					    "",

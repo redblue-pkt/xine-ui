@@ -59,7 +59,7 @@ typedef struct {
 /**
  * Create a labeled button.
  */
-widget_t *create_label_button (Display *display, ImlibData *idata,
+widget_t *label_button_create (Display *display, ImlibData *idata,
 			       int x, int y, int btype, const char *label, 
 			       void* f, void* ud, const char *skin,
  			       const char *normcolor, const char *focuscolor, 

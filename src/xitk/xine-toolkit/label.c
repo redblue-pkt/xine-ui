@@ -114,7 +114,7 @@ int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
 /*
  *
  */
-widget_t *create_label (Display *display, ImlibData *idata,
+widget_t *label_create (Display *display, ImlibData *idata,
 			int x, int y, int length, 
 			const char *label, char *font) {
   widget_t              *mywidget;

@@ -46,7 +46,7 @@ typedef struct {
 /**
  * Create a button
  */
-widget_t *create_button (Display *display, ImlibData *idata,
+widget_t *button_create (Display *display, ImlibData *idata,
 			 int x, int y, void* f, void* ud, const char *skin) ;
 
 

@@ -212,6 +212,21 @@ void filebrowser_destroy(widget_t *w) {
 }
 
 /*
+ * Return the current directory location.
+ */
+char *filebrowser_get_current_dir(widget_t *w) {
+  filebrowser_private_data_t *private_data;
+
+  if(w) {
+    private_data = w->private_data;
+
+    return private_data->current_dir;
+  }
+
+  return NULL;
+}
+
+/*
  * Redisplay the displayed current directory.
  */
 static void update_current_dir(filebrowser_private_data_t *private_data) {
@@ -697,6 +712,9 @@ static void load_files(widget_t *w, void *data) {
 void filebrowser_exit(widget_t *w, void *data) {
   filebrowser_private_data_t *private_data = ((widget_t *)data)->private_data;
   
+  if(private_data->kill_callback)
+    private_data->kill_callback(private_data->fbWidget, NULL);
+
   private_data->running = 0;
   private_data->visible = 0;
   
@@ -714,9 +732,6 @@ void filebrowser_exit(widget_t *w, void *data) {
   }
   free(private_data->fc);
   XDestroyWindow(private_data->display, private_data->window);
-
-  if(private_data->kill_callback)
-    private_data->kill_callback(private_data->fbWidget, NULL);
 
   widget_unregister_event_handler(&private_data->widget_key);
   free(private_data->fbWidget);
@@ -792,7 +807,6 @@ static void filebrowser_select(widget_t *w, void *data) {
 	if((strlen(buf) > 1) && *p == '/') 
 	  *p = '\0';
 	
-	printf("new current_dir = '%s'\n", buf);
 	sprintf(private_data->current_dir, "%s", buf);
       }
     }
@@ -810,12 +824,9 @@ static void filebrowser_select(widget_t *w, void *data) {
       }
       
       if(is_a_dir(buf)) {
-	printf("select %s, and it's a directory, so dive in\n", buf);
 	sprintf(private_data->current_dir, "%s", buf);
       }
       else {
-	printf("select %s, and it isn't a directory, so add it to playlist\n",
-	       buf);
 	if(private_data->add_callback)
 	  private_data->add_callback(NULL, (void *) j, buf);
       }
@@ -983,7 +994,7 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
   private_data->widget_list->gc            = gc;
   
   gui_list_append_content (private_data->widget_list->l,
-	   create_label_button (display, 
+	   label_button_create (display, 
 				idata, 
 				fbp->homedir.x,
 				fbp->homedir.y,
@@ -996,7 +1007,7 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
 				fbp->homedir.clicked_color));
 
   gui_list_append_content (private_data->widget_list->l,
-	   create_label_button (display, 
+	   label_button_create (display, 
 				idata,
 				fbp->select.x,
 				fbp->select.y,
@@ -1009,7 +1020,7 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
 				fbp->select.clicked_color));
 
   gui_list_append_content (private_data->widget_list->l,
-	   create_label_button (display,
+	   label_button_create (display,
 				idata,
 				fbp->dismiss.x,
 				fbp->dismiss.y,
@@ -1027,14 +1038,14 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
 
   gui_list_append_content (private_data->widget_list->l,
 			   (private_data->fb_list = 
-			    create_browser(display, idata, 
+			    browser_create(display, idata, 
 					   private_data->widget_list,
 					   fbp->br_placement)));
 
   private_data->sort_default.sort = DEFAULT_SORT;
   private_data->sort_default.w = mywidget;
   gui_list_append_content (private_data->widget_list->l, 
-			   create_button (display, idata,
+			   button_create (display, idata,
 					  fbp->sort_default.x,
 					  fbp->sort_default.y,
 					  filebrowser_sortfiles,
@@ -1044,7 +1055,7 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
   private_data->sort_reverse.sort = REVERSE_SORT;
   private_data->sort_reverse.w = mywidget;
   gui_list_append_content (private_data->widget_list->l, 
-			   create_button (display, idata,
+			   button_create (display, idata,
 					  fbp->sort_reverse.x,
 					  fbp->sort_reverse.y,
 					  filebrowser_sortfiles,
@@ -1053,15 +1064,22 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
 
   gui_list_append_content (private_data->widget_list->l,
 			   (private_data->widget_current_dir = 
-			    create_label (display, idata,
+			    label_create (display, idata,
 					  fbp->current_dir.x,
 					  fbp->current_dir.y,
 					  fbp->current_dir.max_length,
 					  fbp->current_dir.cur_directory, 
 					  fbp->current_dir.skin_filename)));
   
-  sprintf(private_data->current_dir, "%s", fbp->current_dir.cur_directory);
-  if(strlen(private_data->current_dir) == 0)
+
+  if(fbp->current_dir.cur_directory) {
+    sprintf(private_data->current_dir, "%s", fbp->current_dir.cur_directory);
+    
+    if((is_a_dir(private_data->current_dir) != 1)
+       || (strlen(private_data->current_dir) == 0))
+      sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
+  }
+  else
     sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
   
   private_data->visible = 1;
