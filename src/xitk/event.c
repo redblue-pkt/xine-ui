@@ -967,6 +967,12 @@ void gui_run (void) {
   panel_update_mrl_display ();
   panel_update_runtime_display();
 
+  printf("gGui->playlist_num %d\n", gGui->playlist_num);
+  printf("gGui->playlist[%s]\n", gGui->playlist[gGui->playlist_cur]);
+
+  if(!(xine_open(gGui->stream, gGui->logo_mrl) && xine_play(gGui->stream, 0, 0)))
+    printf("That shouldn't happen.\n");
+
   /* autoscan playlist  */
   if(gGui->autoscan_plugin != NULL) {
     const char *const *autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);

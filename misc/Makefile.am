@@ -1,6 +1,9 @@
 
 SUBDIRS = desktops
 
+datadir = @XINE_SKINDIR@
+data_DATA = xine_logo.mpv
+
 EXTRA_DIST = \
 	$(bin_SCRIPTS) \
 	SlackBuild.in \
@@ -12,10 +15,8 @@ EXTRA_DIST = \
 	xine-ui.spec \
 	xine-check.sh.in \
 	xine-check.en \
-	xine_bash_completion
-
-# should use real bindir...
-#bindir = @XINE_SCRIPTDIR@
+	xine_bash_completion \
+	xine_logo.mpv
 
 bin_SCRIPTS = xine-check xine-bugreport
 

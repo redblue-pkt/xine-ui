@@ -780,10 +780,10 @@ dnl skins dir location, xine-config told us about this.
 dnl
 XINE_SKINDIR="${datadir}/xine/skins"
 eval XINE_SKINDIR=`eval echo "$XINE_SKINDIR"`
-dnl AC_SUBST(XINE_SKINDIR)
+AC_SUBST(XINE_SKINDIR)
 AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of xine skin directory])
 
-XINE_LOGO_MRL="$xine_logo_mrl"
+XINE_LOGO_MRL="file://$XINE_SKINDIR/xine_logo.mpv"
 AC_SUBST(XINE_LOGO_MRL)
 AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL",[official logo mrl])
 

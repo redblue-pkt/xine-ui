@@ -337,7 +337,7 @@ skin.PlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 5
+	  entries = 6
 	}
 	label {
 	  align = left
@@ -694,7 +694,7 @@ skin.CtlSkItemBtn {
 	}
 	pixmap = CtlItemBtn.png
 	browser {
-	  entries = 5
+	  entries = 6
 	}
 	label {
 	  color = #adc9ff
@@ -734,7 +734,7 @@ skin.MrlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 5
+	  entries = 6
 	}
 	label {
 	  align = left

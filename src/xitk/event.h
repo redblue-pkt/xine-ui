@@ -60,6 +60,8 @@ typedef struct {
   /* xine lib/gui configuration filename */
   char                *configfile;
 
+  const char          *logo_mrl;
+
   /* stuff like FULL_ON_START, QUIT_ON_STOP */
   action_id_t          actions_on_start[16];
   char                *autoscan_plugin;

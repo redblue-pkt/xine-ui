@@ -236,6 +236,9 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   return _argv;
 }
 
+static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->logo_mrl = cfg->str_value;
+}
 /*
  *
  */
@@ -558,7 +561,7 @@ void event_listener (void *user_data, xine_event_t *event) {
     xine_cfg_entry_t  cfg_entry;
     int cfg_err_result;
 
-    cfg_err_result = xine_config_lookup_entry(gGui->xine, "misc.logo_mrl", &cfg_entry);
+    cfg_err_result = xine_config_lookup_entry(gGui->xine, "gui.logo_mrl", &cfg_entry);
 
     if(strcmp(cfg_entry.str_value, uevent->data)) {
       if(gGui->auto_vo_visibility) {
@@ -986,14 +989,13 @@ int main(int argc, char *argv[]) {
    * Setup logo.
    */
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_driver, gGui->vo_driver);
-#warning USE REAL LOGO
-#if 0
-    if(!xine_open(gGui->stream, XINE_LOGO_MRL)) {
-    printf("Can't open the logo\n");
-    exit(1);
-  }
-#endif
 
+  gGui->logo_mrl = xine_config_register_string (gGui->xine, "gui.gui.logo_mrl", XINE_LOGO_MRL,
+						_("Logo mrl"),
+						CONFIG_NO_HELP, 
+						CONFIG_LEVEL_EXP,
+						main_change_logo_cb, 
+						CONFIG_NO_DATA);
 #warning FIXME NEWAPI
 #if 0
   xine_tvmode_init2(gGui->xine);
