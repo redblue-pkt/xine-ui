@@ -65,6 +65,14 @@ typedef struct {
 				   * switch to fullscreen mode             */
   int            fullscreen_width;
   int            fullscreen_height;
+#ifdef HAVE_XINERAMA
+  XineramaScreenInfo *xinerama;   /* pointer to xinerama struct, or NULL */
+  int            xinerama_cnt;    /* number of screens in Xinerama */
+#endif
+  int            xwin;            /* current X location */
+  int            ywin;            /* current Y location */
+  int            desktopWidth;    /* desktop width */
+  int            desktopHeight;   /* desktop height */
   int            completion_type;
   int            depth;
   int            show;
@@ -94,8 +102,9 @@ static void video_window_handle_event (XEvent *event, void *data);
  * Will called by toolkit on every move/resize event.
  */
 void video_window_change_sizepos(int x, int y, int w, int h) {
-  
-  //  printf("video window change: %d %d %d %d\n", x, y, w, h);
+  gVw->xwin = x;
+  gVw->ywin = y;
+  /*  printf("video window change: %d %d %d %d\n", x, y, w, h); */
 }
 
 /*
@@ -222,8 +231,24 @@ void video_window_calc_dest_size (void *this,
 
   if (gVw->fullscreen_mode) {
 
+#ifdef HAVE_XINERAMA
+    if (gVw->xinerama) {
+        int i;
+        for (i = 0; i < gVw->xinerama_cnt; i++) {
+            if (gVw->xinerama[i].screen_number == XScreenNumberOfScreen(XDefaultScreenOfDisplay(gGui->display))) {
+                *dest_width = gVw->xinerama[i].width;
+                *dest_height = gVw->xinerama[i].height;
+                break;
+            }
+        }
+    } else {
+        *dest_width  = gVw->fullscreen_width;
+        *dest_height = gVw->fullscreen_height;
+    }
+#else
     *dest_width  = gVw->fullscreen_width;
     *dest_height = gVw->fullscreen_height;
+#endif
     
   } else {
 
@@ -313,10 +338,71 @@ void video_window_adapt_size (void *this,
   }
 #endif
 
+#ifdef HAVE_XINERAMA
+    if (gVw->xinerama) {
+        int i;
+        int knowLocation = 0;
+
+        /* someday this could also use the centre of the window as the
+         * test point I guess.  Right now it's the upper-left.
+         */
+        if (gGui->video_window != None) {
+            if (gVw->xwin >= 0 && gVw->ywin >= 0 &&
+              gVw->xwin < gVw->desktopWidth && gVw->ywin < gVw->desktopHeight) {
+                knowLocation = 1;
+            }
+        }
+
+        for (i = 0; i < gVw->xinerama_cnt; i++) {
+            if (
+                (knowLocation == 1 &&
+                 gVw->xwin >= gVw->xinerama[i].x_org &&
+                 gVw->ywin >= gVw->xinerama[i].y_org &&
+                 gVw->xwin <= gVw->xinerama[i].x_org+gVw->xinerama[i].width &&
+                 gVw->ywin <= gVw->xinerama[i].y_org+gVw->xinerama[i].height) ||
+                (knowLocation == 0 &&
+                 gVw->xinerama[i].screen_number == 
+                   XScreenNumberOfScreen(XDefaultScreenOfDisplay(gGui->display)))) {
+                hint.x = gVw->xinerama[i].x_org;
+                hint.y = gVw->xinerama[i].y_org;
+                if (gVw->fullscreen_req) {
+                    hint.width  = gVw->xinerama[i].width;
+                    hint.height = gVw->xinerama[i].height;
+                    gVw->fullscreen_width = hint.width;
+                    gVw->fullscreen_height = hint.height;
+                } else {
+                    hint.width  = gVw->video_width;
+                    hint.height = gVw->video_height;
+                }
+                *dest_width = hint.width;
+                *dest_height = hint.height;
+                break;
+            }
+        }
+    } else {
+        hint.x = 0;
+        hint.y = 0;
+        if (gVw->fullscreen_req) {
+            hint.width  = gVw->fullscreen_width;
+            hint.height = gVw->fullscreen_height;
+        } else {
+            hint.width  = gVw->video_width;
+            hint.height = gVw->video_height;
+        }
+        *dest_width  = hint.width;
+        *dest_height = hint.height;
+    }
+#else
+    hint.x = 0;
+    hint.y = 0;   /* for now -- could change later */
+#endif
+
   if (gVw->fullscreen_req) {
 
+#ifndef HAVE_XINERAMA
     *dest_width  = gVw->fullscreen_width;
     *dest_height = gVw->fullscreen_height;
+#endif
 
     if (gGui->video_window) {
 
@@ -347,7 +433,7 @@ void video_window_adapt_size (void *this,
 
     gGui->video_window = 
       XCreateWindow (gGui->display, gGui->imlib_data->x.root, 
-		     0, 0, gVw->fullscreen_width, 
+		     hint.x, hint.y, gVw->fullscreen_width, 
 		     gVw->fullscreen_height, 
 		     0, gVw->depth, CopyFromParent, 
 		     gVw->visual,
@@ -361,10 +447,12 @@ void video_window_adapt_size (void *this,
     if (gVw->xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint);
 
+#ifndef HAVE_XINERAMA
     hint.x = 0;
     hint.y = 0;
     hint.width  = gVw->fullscreen_width;
     hint.height = gVw->fullscreen_height;
+#endif
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
     
@@ -407,6 +495,7 @@ void video_window_adapt_size (void *this,
 
   } else {
 
+#ifndef HAVE_XINERAMA
     *dest_width  = gVw->video_width;
     *dest_height = gVw->video_height;
 
@@ -414,6 +503,7 @@ void video_window_adapt_size (void *this,
     hint.y = 0;
     hint.width  = gVw->video_width;
     hint.height = gVw->video_height;
+#endif
     hint.flags  = PPosition | PSize;
 
     if (gGui->video_window) {
@@ -517,7 +607,11 @@ void video_window_adapt_size (void *this,
   if (gVw->fullscreen_mode) {
     XSetInputFocus (gGui->display, 
 		    gGui->video_window, RevertToNone, CurrentTime);
+#ifdef HAVE_XINERAMA
+    XMoveWindow (gGui->display, gGui->video_window, hint.x, hint.y);
+#else
     XMoveWindow (gGui->display, gGui->video_window, 0, 0);
+#endif
   }
 
   /* Update WM_TRANSIENT_FOR hints on other windows for the new video_window */
@@ -648,8 +742,14 @@ void video_window_init (void) {
   gVw->depth				= gGui->depth;
   gVw->visual				= gGui->visual;
   gVw->colormap				= Imlib_get_colormap(gGui->imlib_data);
+  gVw->xwin                             = -8192;
+  gVw->ywin                             = -8192;
+  gVw->desktopWidth                     = DisplayWidth(gGui->display, gGui->screen);
+  gVw->desktopHeight                    = DisplayHeight(gGui->display, gGui->screen);
   
 #ifdef HAVE_XINERAMA
+  gVw->xinerama				= NULL;
+  gVw->xinerama_cnt			= 0;
   /* Spark
    * some Xinerama stuff
    * I want to figure out what fullscreen means for this setup
@@ -667,6 +767,8 @@ void video_window_init (void) {
     if (XineramaIsActive(gGui->display)) {
       gVw->fullscreen_width  = screeninfo[0].width;
       gVw->fullscreen_height = screeninfo[0].height;
+      gVw->xinerama = screeninfo;
+      gVw->xinerama_cnt = screens;
     } else {
       gVw->fullscreen_width  = DisplayWidth  (gGui->display, gGui->screen);
       gVw->fullscreen_height = DisplayHeight (gGui->display, gGui->screen);
