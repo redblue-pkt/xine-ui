@@ -67,9 +67,8 @@ static void _tips_handle_event(XEvent *event, void *data) {
 static void *_tips_loop_thread(void *data) {
 
   tips.running = 1;
-  
   pthread_mutex_lock(&tips.mutex);
-
+  
   while(tips.running) {
     struct timeval       tv;
     struct timespec      ts;
@@ -281,6 +280,7 @@ void xitk_tips_deinit(void) {
     pthread_cond_signal(&tips.timer_cond);
   else
     pthread_cond_signal(&tips.new_cond);
+
   pthread_mutex_unlock(&tips.mutex);
 
   pthread_join(tips.thread, NULL);
@@ -296,8 +296,11 @@ void xitk_tips_deinit(void) {
  *
  */
 void xitk_tips_hide_tips(void) {
-  pthread_mutex_lock(&tips.mutex);
-  if(tips.running) {
+
+  if(pthread_mutex_trylock(&tips.mutex))
+    return;
+ 
+ if(tips.running) {
     tips.new_widget = NULL;
     if(tips.prewait) {
       tips.prewait = 0;
