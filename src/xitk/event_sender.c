@@ -347,7 +347,7 @@ int event_sender_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, xitk_window_get_window(eventer->xwin));
     else
-      return eventer->visible;
+      return eventer->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(eventer->xwin));
   }  
 
   return 0;

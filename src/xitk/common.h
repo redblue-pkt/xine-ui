@@ -376,7 +376,10 @@ void reparent_window(Window window);
   do {                                                                                   \
     if((!(video_window_get_fullscreen_mode() & WINDOWED_MODE)) && !wm_not_ewmh_only()) { \
       XLockDisplay(gGui->display);                                                       \
-      XUnmapWindow(gGui->display, (window));                                             \
+      /* Don't unmap this window, because on re-mapping, it will not be visible until    \
+	 its ancestor, the video window, is visible. That's not what's intended.         \
+         XUnmapWindow(gGui->display, (window));                                          \
+      */								                 \
       if(!video_window_is_visible())                                                     \
         xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);                           \
       else                                                                               \

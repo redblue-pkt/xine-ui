@@ -113,25 +113,24 @@ static void paint_checkbox (xitk_widget_t *w) {
 
     XLOCK (private_data->imlibdata->x.disp);
     if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
-      if (private_data->cClicked) { //click
+      if (private_data->cClicked || private_data->cState) { // focused, clicked or checked
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
 		   w->wl->win, lgc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, w->x, w->y);
       }
-      else {
-	if(!private_data->cState) //focus
-	  XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
-		     w->wl->win, lgc, checkbox_width, 0,
-		     checkbox_width, skin->height, w->x, w->y);
+      else { // focused, unchecked
+	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
+		   w->wl->win, lgc, checkbox_width, 0,
+		   checkbox_width, skin->height, w->x, w->y);
       }
     } 
     else {
-      if(private_data->cState) { //click
+      if(private_data->cState) { // unfocused, checked
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
 		   w->wl->win, lgc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, w->x, w->y);
       }
-      else { //normal
+      else { // unfocused, unchecked
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, w->wl->win, lgc, 0, 0,
 		   checkbox_width, skin->height, w->x, w->y);
       }

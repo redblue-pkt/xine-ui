@@ -75,6 +75,7 @@
 #define INPUT_MOTION                (ExposureMask | ButtonPressMask | ButtonReleaseMask | \
                                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |   \
                                      StructureNotifyMask | PropertyChangeMask |           \
+                                     FocusChangeMask |			                  \
                                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
 
 #define WINDOW_INFO_ZERO(w)         do {                  \

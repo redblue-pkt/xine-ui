@@ -308,7 +308,7 @@ int help_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, xitk_window_get_window(help->xwin));
     else
-      return help->visible;
+      return help->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(help->xwin));
   }
 
   return 0;

@@ -328,7 +328,7 @@ int stream_infos_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, xitk_window_get_window(sinfos->xwin));
     else
-      return sinfos->visible;
+      return sinfos->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(sinfos->xwin));
   }
   
   return 0;

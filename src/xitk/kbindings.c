@@ -1479,7 +1479,7 @@ int kbedit_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, xitk_window_get_window(kbedit->xwin));
     else
-      return kbedit->visible;
+      return kbedit->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(kbedit->xwin));
   }
 
   return 0;

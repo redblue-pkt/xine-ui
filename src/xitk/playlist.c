@@ -724,7 +724,7 @@ int playlist_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, playlist->window);
     else
-      return playlist->visible;
+      return playlist->visible && xitk_is_window_visible(gGui->display, playlist->window);
   }
 
   return 0;

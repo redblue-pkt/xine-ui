@@ -169,7 +169,17 @@ static void enability(xitk_widget_t *w) {
     max += (private_data->skin_element_name) ? EXTRA_BTNS : private_data->max_length;
    
     if(w->enable == WIDGET_ENABLE) {
-      for(i = WBUP; i < max; i++)
+      if(private_data->list_length >= private_data->max_length) {
+	xitk_enable_widget(private_data->item_tree[WBUP]);
+	xitk_enable_widget(private_data->item_tree[WSLID]);
+	xitk_enable_widget(private_data->item_tree[WBDN]);
+      }
+      if(private_data->need_h_slider) {
+	xitk_enable_widget(private_data->item_tree[WBLF]);
+	xitk_enable_widget(private_data->item_tree[WSLIDH]);
+	xitk_enable_widget(private_data->item_tree[WBRT]);
+      }
+      for(i = WBSTART; i < max; i++)
 	xitk_enable_widget(private_data->item_tree[i]);
     }
     else {
@@ -342,13 +352,6 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
       private_data->current_start = start;
     
     private_data->need_h_slider = 0;
-    xitk_disable_widget(private_data->item_tree[WBLF]);
-    xitk_disable_widget(private_data->item_tree[WSLIDH]);
-    xitk_disable_widget(private_data->item_tree[WBRT]);
-    xitk_disable_widget(private_data->item_tree[WBUP]);
-    xitk_disable_widget(private_data->item_tree[WSLID]);
-    xitk_disable_widget(private_data->item_tree[WBDN]);
-     
     private_data->labels_offset = 0;
 
     if(label_font) {
@@ -470,6 +473,10 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
       xitk_slider_set_pos(private_data->item_tree[WSLIDH], pos);
     }
     else {
+      xitk_disable_widget(private_data->item_tree[WBLF]);
+      xitk_disable_widget(private_data->item_tree[WSLIDH]);
+      xitk_disable_widget(private_data->item_tree[WBRT]);
+
       xitk_slider_set_max(private_data->item_tree[WSLIDH], 1);
       xitk_slider_set_min(private_data->item_tree[WSLIDH], 0);
       xitk_slider_reset(private_data->item_tree[WSLIDH]);
@@ -482,6 +489,11 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
       xitk_enable_widget(private_data->item_tree[WBUP]);
       xitk_enable_widget(private_data->item_tree[WSLID]);
       xitk_enable_widget(private_data->item_tree[WBDN]);
+    }
+    else {
+      xitk_disable_widget(private_data->item_tree[WBUP]);
+      xitk_disable_widget(private_data->item_tree[WSLID]);
+      xitk_disable_widget(private_data->item_tree[WBDN]);
     }
     
     if(start == 0)

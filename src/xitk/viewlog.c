@@ -127,7 +127,7 @@ int viewlog_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, xitk_window_get_window(viewlog->xwin));
     else
-      return viewlog->visible;
+      return viewlog->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(viewlog->xwin));
   }
 
   return 0;

@@ -401,7 +401,7 @@ int control_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, control->window);
     else
-      return control->visible;
+      return control->visible && xitk_is_window_visible(gGui->display, control->window);
   }
 
   return 0;
@@ -670,7 +670,7 @@ void control_panel(void) {
   xitk_widget_list_set(control->widget_list, WIDGET_LIST_GC, gc);
   
   { /* All of sliders are disabled by default*/
-    int min = 0, max = 65535, cur;
+    int min = 0, max = 65535, step = 565, cur;
 
     lbl.window = XITK_WIDGET_LIST_WINDOW(control->widget_list);
     lbl.gc     = XITK_WIDGET_LIST_GC(control->widget_list);
@@ -681,7 +681,7 @@ void control_panel(void) {
     sl.skin_element_name = "SliderCtlHue";
     sl.min               = min;
     sl.max               = max;
-    sl.step              = 1;
+    sl.step              = step;
     sl.callback          = set_hue;
     sl.userdata          = NULL;
     sl.motion_callback   = set_hue;
@@ -704,7 +704,7 @@ void control_panel(void) {
     sl.skin_element_name = "SliderCtlSat";
     sl.min               = min;
     sl.max               = max;
-    sl.step              = 1;
+    sl.step              = step;
     sl.callback          = set_saturation;
     sl.userdata          = NULL;
     sl.motion_callback   = set_saturation;
@@ -727,7 +727,7 @@ void control_panel(void) {
     sl.skin_element_name = "SliderCtlBright";
     sl.min               = min;
     sl.max               = max;
-    sl.step              = 1;
+    sl.step              = step;
     sl.callback          = set_brightness;
     sl.userdata          = NULL;
     sl.motion_callback   = set_brightness;
@@ -750,7 +750,7 @@ void control_panel(void) {
     sl.skin_element_name = "SliderCtlCont";
     sl.min               = min;
     sl.max               = max;
-    sl.step              = 1;
+    sl.step              = step;
     sl.callback          = set_contrast;
     sl.userdata          = NULL;
     sl.motion_callback   = set_contrast;

@@ -278,7 +278,7 @@ static int fbxine_init(int argc, char **argv)
 	    pplugin_parse_and_store_post((const char *) *plugin);
 	    printf("1\n");
 	    
-	    *plugin++;
+	    plugin++;
 	  }
     
 	  pplugin_rewire_posts();

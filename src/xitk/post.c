@@ -360,7 +360,7 @@ static int _pplugin_is_last_filter(post_object_t *pobj) {
     post_object_t **po = pplugin->post_objects;
     
     while(*po && (*po != pobj))
-      *po++;
+      po++;
     
     if(*(po + 1) == NULL)
       return 1;
@@ -1219,7 +1219,7 @@ static void _pplugin_move_up(xitk_widget_t *w, void *data) {
   _pplugin_unwire();
 
   while(*ppobj != pobj)
-    *ppobj++;
+    ppobj++;
   
   pobj_tmp = *--ppobj;
   *ppobj   = pobj;
@@ -1237,7 +1237,7 @@ static void _pplugin_move_down(xitk_widget_t *w, void *data) {
   _pplugin_unwire();
 
   while(*ppobj != pobj)
-    *ppobj++;
+    ppobj++;
   
   pobj_tmp = *(ppobj + 1);
   *ppobj   = pobj_tmp;
@@ -1374,7 +1374,7 @@ static void _pplugin_rebuild_filters(void) {
       _pplugin_retrieve_parameters(pplugin->post_objects[pplugin->object_num - 1]);
     }
     
-    *pelem++;
+    pelem++;
   }
   
   xitk_enable_widget(pplugin->new_filter);
@@ -1686,7 +1686,7 @@ int pplugin_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, xitk_window_get_window(pplugin->xwin));
     else
-      return pplugin->visible;
+      return pplugin->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(pplugin->xwin));
   }
   
   return 0;

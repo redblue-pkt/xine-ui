@@ -792,6 +792,7 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
       event.type = WIDGET_EVENT_PAINT;
       (void) mywidget->event(mywidget, &event, NULL);
       
+      mywidget->have_focus = FOCUS_LOST;
     }
     else {
       event.type = WIDGET_EVENT_PAINT;
@@ -927,7 +928,11 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
       /* Kill (hide) tips */
       xitk_tips_hide_tips();
       
-      if((wl->widget_under_mouse->type & WIDGET_FOCUSABLE) && 
+      if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
+	   (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
+	    ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER &&
+	     (wl->widget_focused->type & WIDGET_KEYABLE)))) &&
+	 (wl->widget_under_mouse->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_under_mouse->enable == WIDGET_ENABLE) {
 	
 	event.type  = WIDGET_EVENT_FOCUS;
@@ -949,7 +954,11 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
       
       xitk_tips_show_widget_tips(mywidget);
       
-      if((mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
+      if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
+	   (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
+	    ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER &&
+	     (wl->widget_focused->type & WIDGET_KEYABLE)))) &&
+	 (mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
 	event.type  = WIDGET_EVENT_FOCUS;
 	event.focus = FOCUS_MOUSE_IN;
 	(void) mywidget->event(mywidget, &event, NULL);
@@ -960,7 +969,8 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
     }
   }
   else {
-    if(mywidget && (mywidget->type & WIDGET_TYPE_SLIDER)) {
+    /* Can the following happen here at all ? */
+    if(mywidget && (mywidget->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) {
       widget_event_result_t   result;
       
       if(state & Button1Mask) {
@@ -992,7 +1002,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
   
   mywidget = xitk_get_widget_at (wl, x, y);
 
-  if(mywidget != wl->widget_focused) {
+  if(mywidget != wl->widget_focused && !bUp) {
     if (wl->widget_focused) {
       
       /* Kill (hide) tips */
@@ -1051,9 +1061,10 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     }
     
   }
-  else {
+  
+  if (!bUp) {
+
     if(wl->widget_under_mouse && mywidget && (wl->widget_under_mouse == mywidget)) {
-      
       if ((mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
 	event.type  = WIDGET_EVENT_FOCUS;
 	event.focus = FOCUS_RECEIVED;
@@ -1062,10 +1073,6 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       }
     }
     
-  }
-  
-  if (!bUp) {
-
     wl->widget_pressed = mywidget;
     
     if (mywidget) {
@@ -1100,6 +1107,8 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	if(wl->widget_pressed->event(wl->widget_pressed, &event, &result))
 	  bRepaint |= result.value;
       }
+
+      wl->widget_pressed = NULL;
     }
   }
   

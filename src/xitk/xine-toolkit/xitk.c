@@ -1414,7 +1414,7 @@ void xitk_xevent_notify(XEvent *event) {
 	    }
 	    else if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) 
 			  && (w->type & WIDGET_KEYABLE))) {
-	      if((mykey == XK_Left) || (mykey == XK_Down)) {
+	      if((mykey == XK_Left) || (mykey == XK_Down) || (mykey == XK_Next)) {
 		handled = 1;
 		xitk_slider_make_backstep(w);
 		xitk_slider_callback_exec(w);
@@ -1555,8 +1555,20 @@ void xitk_xevent_notify(XEvent *event) {
 	    }
 	  }
 	}
-	break;
-	
+	  break;
+	  
+	case LeaveNotify:
+	  if(fx->widget_list)
+	    xitk_motion_notify_widget_list (fx->widget_list,
+					    event->xmotion.x,
+					    event->xmotion.y, event->xmotion.state);
+	  break;
+	  
+	case FocusOut:
+	  if(fx->widget_list)
+	    xitk_motion_notify_widget_list (fx->widget_list, -1, -1, 0);
+	  break;
+	  
 	case ButtonPress: {
 	  XWindowAttributes   wattr;
 	  Status              status;

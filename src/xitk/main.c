@@ -2122,7 +2122,7 @@ int main(int argc, char *argv[]) {
     
     while(*plugin) {
       pplugin_parse_and_store_post((const char *) *plugin);
-      *plugin++;
+      plugin++;
     }
     
     pplugin_rewire_posts();

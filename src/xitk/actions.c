@@ -94,6 +94,9 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
       else
 	XMapWindow(gGui->display, window);
     }
+    else if(!xitk_is_window_visible(gGui->display, window)) {
+      /* Obviously user has iconified the window, let it be */
+    }
     else {
       *visible = 0;
       xitk_hide_widgets(widget_list);

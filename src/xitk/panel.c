@@ -93,11 +93,12 @@ void panel_show_tips(void) {
   setup_show_tips(panel->tips.enable, panel->tips.timeout);
 }
 
+/* Somewhat paranoia conditionals (Hans, YOU're paranoid ;-) )*/
 int panel_get_tips_enable(void) {
-  return panel->tips.enable;
+  return (panel) ? panel->tips.enable : 0;
 }
 unsigned long panel_get_tips_timeout(void) {
-  return (unsigned long) panel->tips.timeout;
+  return (panel) ? panel->tips.timeout : 0;
 }
 
 /*
@@ -534,7 +535,7 @@ int panel_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, gGui->panel_window);
     else
-      return panel->visible;
+      return panel->visible && xitk_is_window_visible(gGui->display, gGui->panel_window);
   }
 
   return 0;
@@ -546,82 +547,38 @@ int panel_is_visible(void) {
 static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   int visible = xitk_is_window_visible(gGui->display, gGui->panel_window);
 
-  if(!panel->visible && playlist_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && playlist_is_visible()))
-      playlist_toggle_visibility(NULL, NULL);
-  }
-    
-  if(!panel->visible && control_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && control_is_visible()))
-      control_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !playlist_is_visible()) || (visible && playlist_is_visible()))
+    playlist_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && mrl_browser_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && mrl_browser_is_visible()))
-      mrl_browser_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !control_is_visible()) || (visible && control_is_visible()))
+    control_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && setup_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && setup_is_visible()))
-      setup_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !mrl_browser_is_visible()) || (visible && mrl_browser_is_visible()))
+    mrl_browser_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && viewlog_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && viewlog_is_visible()))
-      viewlog_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !setup_is_visible()) || (visible && setup_is_visible()))
+    setup_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && kbedit_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && kbedit_is_visible()))
-      kbedit_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !viewlog_is_visible()) || (visible && viewlog_is_visible()))
+    viewlog_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && event_sender_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && event_sender_is_visible()))
-      event_sender_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !kbedit_is_visible()) || (visible && kbedit_is_visible()))
+    kbedit_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && stream_infos_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && stream_infos_is_visible()))
-      stream_infos_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !event_sender_is_visible()) || (visible && event_sender_is_visible()))
+    event_sender_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && tvset_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && tvset_is_visible()))
-      tvset_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !stream_infos_is_visible()) || (visible && stream_infos_is_visible()))
+    stream_infos_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && pplugin_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && pplugin_is_visible()))
-      pplugin_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !tvset_is_visible()) || (visible && tvset_is_visible()))
+    tvset_toggle_visibility(NULL, NULL);
 
-  if(!panel->visible && help_is_visible()) {
-  }
-  else {
-    if(!gGui->use_root_window || (gGui->use_root_window && visible && help_is_visible()))
-      help_toggle_visibility(NULL, NULL);
-  }
+  if(((!panel->visible || !visible) && !pplugin_is_visible()) || (visible && pplugin_is_visible()))
+    pplugin_toggle_visibility(NULL, NULL);
+
+  if(((!panel->visible || !visible) && !help_is_visible()) || (visible && help_is_visible()))
+    help_toggle_visibility(NULL, NULL);
 
   if (panel->visible && gGui->video_display == gGui->display) {
     
@@ -629,7 +586,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     if (video_window_is_visible ()) {
       if(gGui->use_root_window) { /* Using root window */
-	if(xitk_is_window_visible(gGui->display, gGui->panel_window))
+	if(visible)
 	  XIconifyWindow(gGui->display, gGui->panel_window, gGui->screen);
 	else
 	  XMapWindow(gGui->display, gGui->panel_window);
@@ -641,9 +598,13 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 	xitk_hide_widgets(panel->widget_list);
       }
     }
-    else
-      XIconifyWindow(gGui->display, gGui->panel_window, (XDefaultScreen(gGui->display)));
-
+    else {
+      if(visible)
+	XIconifyWindow(gGui->display, gGui->panel_window, (XDefaultScreen(gGui->display)));
+      else
+	XMapWindow(gGui->display, gGui->panel_window);
+    }
+    
     if(gGui->cursor_grabbed)
       XGrabPointer(gGui->video_display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
     
@@ -979,8 +940,9 @@ void panel_add_autoplay_buttons(void) {
 				(panel->autoplay_plugins[i] =
 				 xitk_labelbutton_create (panel->widget_list, 
 							  gGui->skin_config, &lb)));
-      xitk_set_widget_tips(panel->autoplay_plugins[i], 
-			   (char *) xine_get_input_plugin_description(gGui->xine, autoplay_label));
+      xitk_set_widget_tips_and_timeout(panel->autoplay_plugins[i],
+				       (char *) xine_get_input_plugin_description(gGui->xine, autoplay_label),
+				       panel->tips.timeout);
       
       if(!panel->tips.enable)
 	xitk_disable_widget_tips(panel->autoplay_plugins[i]);
@@ -1054,9 +1016,9 @@ void panel_add_mixer_control(void) {
 
   /* Tips should be available only if widgets are enabled */
   if(gGui->mixer.caps & MIXER_CAP_VOL)
-    xitk_set_widget_tips(panel->mixer.slider, _("Volume control"));
+    xitk_set_widget_tips_and_timeout(panel->mixer.slider, _("Volume control"), panel->tips.timeout);
   if(gGui->mixer.caps & MIXER_CAP_MUTE)
-    xitk_set_widget_tips(panel->mixer.mute, _("Mute toggle"));
+    xitk_set_widget_tips_and_timeout(panel->mixer.mute, _("Mute toggle"), panel->tips.timeout);
 
   if(!panel->tips.enable) {
     xitk_disable_widget_tips(panel->mixer.slider);

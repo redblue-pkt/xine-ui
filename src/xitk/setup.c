@@ -132,14 +132,14 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
     if((wtriplet)->label) {                                                                     \
       xitk_enable_and_show_widget((wtriplet)->label);                                           \
       if(panel_get_tips_enable())					                        \
-	xitk_enable_widget_tips((wtriplet)->label);			                        \
+	xitk_set_widget_tips_timeout((wtriplet)->label, panel_get_tips_timeout());              \
       else								                        \
 	xitk_disable_widget_tips((wtriplet)->label);			                        \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
       xitk_enable_and_show_widget((wtriplet)->widget);                                          \
       if(panel_get_tips_enable())					                        \
-	xitk_enable_widget_tips((wtriplet)->widget);			                        \
+	xitk_set_widget_tips_timeout((wtriplet)->widget, panel_get_tips_timeout());             \
       else								                        \
 	xitk_disable_widget_tips((wtriplet)->widget);			                        \
     }                                                                                           \
@@ -261,7 +261,7 @@ int setup_is_visible(void) {
     if(gGui->use_root_window)
       return xitk_is_window_visible(gGui->display, xitk_window_get_window(setup->xwin));
     else
-      return setup->visible;
+      return setup->visible && xitk_is_window_visible(gGui->display, xitk_window_get_window(setup->xwin));
   }
 
   return 0;
@@ -832,53 +832,46 @@ static void setup_section_widgets(int s) {
       labelkey = &entry->key[len+1];
 	
       switch (entry->type) {
-	  
+
+#define _SET_HELP do {						                                           \
+	  xitk_set_widget_tips_and_timeout(setup->wg[setup->num_wg]->widget,                               \
+					   (entry->help) ?  (char *) entry->help : _("No help available"), \
+					   panel_get_tips_timeout());	                                   \
+	  xitk_set_widget_tips_and_timeout(setup->wg[setup->num_wg]->label,                                \
+					   (entry->help) ?  (char *) entry->help : _("No help available"), \
+					   panel_get_tips_timeout());	                                   \
+	} while(0)
       case XINE_CONFIG_TYPE_RANGE: /* slider */
 	setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	_SET_HELP;
 	DISABLE_ME(setup->wg[setup->num_wg]);
 	setup->num_wg++;
 	break;
-	  
+	
       case XINE_CONFIG_TYPE_STRING:
 	setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	_SET_HELP;
 	DISABLE_ME(setup->wg[setup->num_wg]);
 	setup->num_wg++;
 	break;
-	  
+	
       case XINE_CONFIG_TYPE_ENUM:
 	setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	_SET_HELP;
 	DISABLE_ME(setup->wg[setup->num_wg]);
 	setup->num_wg++;
 	break;
-	  
+	
       case XINE_CONFIG_TYPE_NUM:
 	setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	_SET_HELP;
 	DISABLE_ME(setup->wg[setup->num_wg]);
 	setup->num_wg++;
 	break;
-	  
+	
       case XINE_CONFIG_TYPE_BOOL:
 	setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
-	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	_SET_HELP;
 	DISABLE_ME(setup->wg[setup->num_wg]);
 	setup->num_wg++;
 	break;
