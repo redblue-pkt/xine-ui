@@ -5,26 +5,12 @@ if HAVE_AA
 aa_programs = aaxine
 endif
 
-if HAVE_GETOPT_LONG
-else
-GETOPT_C = getopt.c getopt1.c
-GETOPT_H = getopt.h
-endif
-
 bin_PROGRAMS = ${aa_programs} 
 
 aaxine_SOURCES = $(GETOPT_C) main.c
-aaxine_LDADD = @XINE_LIBS@ $(AALIB_LIBS) $(DYNAMIC_LD_LIBS) -lm
-
-getopt.c:
-	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c
-
-getopt1.c:
-
-	$(LN_S) $(top_srcdir)/src/common/getopt1.c ./getopt1.c
-
-getopt.h:
-	$(LN_S) $(top_srcdir)/src/common/getopt.h ./getopt.h
+aaxine_LDADD = @XINE_LIBS@ $(AALIB_LIBS) $(DYNAMIC_LD_LIBS) -lm \
+	       $(top_builddir)/src/common/libcommon.la
+aaxine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la
 
 debug:
 	@$(MAKE) CFLAGS="$(AALIB_CFLAGS) $(DEBUG_CFLAGS)"
