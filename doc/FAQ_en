@@ -43,7 +43,7 @@
    5.1.3 How do I play streams from STDIN?
    5.1.4 How do I change the skin of the xine gui?
    5.1.5 What is aalib? How do I use it in xine?
-   5.1.6 What do all these .xinerc entries mean?
+   5.1.6 What do all these ~/xine/config entries mean?
    5.1.7 How do I use the dvd plugin?
    5.1.8 I have problems setting up my RPC-2 drive for the right region!
    5.1.9 Can xine play (S)VCDs?
@@ -226,13 +226,13 @@
 
 3.5 Build problems: xine-lib.
 
-3.4.1 The package doesn't compile at all!
+3.5.1 The package doesn't compile at all!
 
       In order to be able to compile xine-lib, you need (amongst other things)
       the zlib compression library plus the appropriate headers, which are
       often found in a package called zlib-devel or similar.
 
-3.4.2 The Xv video-out plugin fails to compile!
+3.5.2 The Xv video-out plugin fails to compile!
 
       If you want to have Xv support compiled in, make sure you either have
       a shared Xv library on your system, e.g. ls /usr/X11R6/lib/libXv*
@@ -252,9 +252,9 @@
       Now you should be ready to build the Xv video-out plugin on your system.
 
 
-3.5 Build problems: xine-ui.
+3.6 Build problems: xine-ui.
 
-3.5.1 I have installed xine-lib but xine-ui complains about not finding it!
+3.6.1 I have installed xine-lib but xine-ui complains about not finding it!
 
       First of all take a closer look at 3.2 again. You will probably find your
       answer there right away.
@@ -278,10 +278,10 @@
       
      /usr/lib/win32
 
-    by default to search for dlls, but you can change this in your .xinerc
-    by editing:
+    by default to search for dlls, but you can change this in your config
+    file (located in ~/.xine) by editing:
 
-     win32_path:/usr/lib/win32
+     codec.win32_path:/usr/lib/win32
 
 
 5   THE PLEASURE OF RUNNING XINE :)
@@ -388,15 +388,15 @@
 
 5.1.4 How do I change the skin of the xine gui?
 
-      Run xine at least once - it should write it's config file .xinerc to
-      your home directory. Now edit that file and change the line:
+      The easiest way to do this is by selecting your favorite theme with
+      the gui itself. In order to do this, start xine and push the control
+      button on the panel which opens a menu window (that also contains the
+      contrast controller for example). There you will find xine's skin
+      chooser. Click your desired skin and your new theme will come into
+      affect immediately.
       
-       skin:default
-     
-      to mach the skin you would like to use.
-     
-      You can also use a button on the gui to interactively change the skin
-      while xine is running. (same button as in 5.3.6)
+      And if you wanna do it the complicated way :), you can also edit the
+      appropriate entry in your ~/.xine/config file (gui.skin).
 
 5.1.5 What is aalib? How do I use it in xine?
 
@@ -413,9 +413,9 @@
 
       to use aalib video output.
 
-5.1.6 What do all these .xinerc entries mean?
+5.1.6 What do all these ~/.xine/config entries mean?
      
-      You'll find more info about them in xine-ui/doc/README.xinerc.
+      You'll find more info about them in xine-ui/doc/README.config_en.
 
 5.1.7 How do I use the dvd plugin?
 
@@ -507,21 +507,36 @@
       supports it. On startup xine tells you what modes are supported by your
       audio driver, e.g:
 
-       audio_oss_out : supported modes are mono stereo (4-channel not enabled
-       in .xinerc) (ac3-pass-through not enabled in .xinerc)
+       audio_alsa_out : supported modes are mono stereo (4-channel not enabled
+       in xine config) (5-channel not enabled in xine config) (5.1-channel not
+       enabled in xine config) (a/52 and DTS pass-through not enabled in xine
+       config)
 
       On this machine 4-channel surround would be possible. However, since xine
       cannot detect if there are actually speakers connected to the additional
-      channels, you'll have to manually enable this mode in your ~/.xinerc:
+      channels, you'll have to manually activate that feature.
+      
+      You can do this either in the config dialog while xine is running (press
+      the config button on the xine panel and go to the AUDIO tab) or have it
+      the complicated way by editing the config file yourself which is located
+      in your home directory in .xine:
 
-       four_channel:1
+      # 4-channel:
+        audio.four_channel:1
+ 
+      # 5-channel:
+        audio.five_channel:1
+
+      # 5.1-channel
+        audio.five_lfe_channel:0
 
 5.2.5 What about ac3 output via spdif to an external ac3 decoder?
 
       xine can do that too. Pretty much the same story as for 4-/5-channel
-      surround (see 5.2.4). You'll have to enable it in your ~/.xinerc:
+      surround (see 5.2.4). You can either use the config dialog or edit
+      the config file (~/.xine/config) yourself:
 
-       ac3_pass_through:1
+        audio.a52_pass_through:1
        
 5.2.6 Changing the volume with the GUI control has not affect! What's up!?
 
@@ -540,8 +555,8 @@
 5.3.2 How can I make xine use the Xv extension and what drivers do I need?
     
       xine will normally use Xv by default if it is available. In some cases
-      you might need to choose Xv playback manually (when the .xinerc for
-      some reason says that you want to use XShm):
+      you might need to choose Xv playback manually (when the ~/.xine/config
+      file for some reason says that you want to use XShm):
 
        xine -V Xv foo.mpg
 
@@ -578,10 +593,10 @@
       Looks like some colors on your GUI match the colorkey Xv uses. You can
       change the colorkey value to avoid this. There should be a line like:
 
-       colorkey:2110
+       video.XV_COLORKEY:2110
 
-      in your ~/.xinerc where you can change the color that's used by xine
-      for the video overlay.
+      in your ~/.xine/config file where you can change the color that's used
+      by xine for the video overlay.
 
 5.3.5 The aspect ratio of the video is wrong!
 
@@ -590,19 +605,19 @@
 5.3.6 How can I change color/brightness/contrast?
 
       At the moment this is only supported on some Xv drivers and with XShm.
-      You'll find three entries like these in our ~/.xinerc for Xv:
+      You'll find three entries like these in our ~/.xine/config file for Xv:
+       
+       video.XV_BRIGHTNESS:0
+       video.XV_SATURATION:0
+       video.XV_CONTRAST:128
 
-       XV_BRIGHTNESS:0
-       XV_SATURATION:0
-       XV_CONTRAST:128
- 
       The values and possible ranges depend on your Xv driver so you'll have
       to experiment a bit to get a good picture.
       
       For XShm, you can change the brightness (gamma correction) by editing
-      the following xinerc element:
-       
-       xshm_gamma
+      the following xine config element:
+
+       video.xshm_gamma:0
        
       It has has a range from -100 to +100. Just experiment a bit with it
       until you have your desired brightness.
@@ -613,8 +628,8 @@
       supporting brightness, saturation and/or contrast - otherwise you won't
       be able to change the specific setting. (logical, isn't it? *grin*)
       
-      (Please also refer to README.xinerc for more details about xinerc
-       elements you can alter.)
+      (Please also refer to README.config_en for more details about xine's
+       config file or use the config dialog accessible through the xine panel)
 
 
 5.4 ERROR MESSAGES: WHAT THEY MEAN AND WHAT YOU CAN DO.
