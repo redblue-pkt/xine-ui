@@ -12,6 +12,7 @@
 
 Name:        %{name}
 Summary:     A Free Audio/Video Player.
+Summary(cs): Volnì ¹iøitelný audio/video pøehrávaè
 Version:     %{version}
 Release:     %{release}
 Copyright:   GPL
@@ -27,6 +28,12 @@ BuildRoot:   %{_tmppath}/%{name}-buildroot
 xine is a fully-featured free audio/video player for unix-like systems which
 uses libxine for audio/video decoding and playback. For more informations on
 what formats are supported, please refer to the libxine documentation.
+
+%description -l cs
+xine je velmi atraktivní volnì ¹iøitelný audio/video pøehrávaè pro unixovské 
+systémy, který pou¾ívá libxine pro dekódování zvuku a videa a pøehrávání. 
+Více informací o tom, jaké formáty jsou podporovány získáte v dokumentaci 
+od libxine.
 
 %prep
 %setup -n %{name}-%{version}
@@ -177,6 +184,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sat May 18 2002 Matthias Dahl <matthew2k@web.de>
+- adding czech translations by valtri@atlas.cz
 * Thu May 16 2002 Matthias Dahl <matthew2k@web.de>
 - replaced %configure because it was causing trouble on some configurations
 * Sat May 11 2002 Matthias Dahl <matthew2k@web.de>
