@@ -315,6 +315,7 @@ static void xrm_parse(void) {
   XrmDatabase   rmdb, home_rmdb, server_rmdb, application_rmdb;
   XrmValue      value;
   
+  rmdb = NULL;
   XrmInitialize();
   
   sprintf(wide_dbname, "%s%s", "/usr/lib/X11/app-defaults/", classname);
