@@ -38,7 +38,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#if defined(__hpux)
+#include <strings.h>
+#else
 #include <string.h>
+#endif
+
 #include <stdarg.h>
 #include <ctype.h>
 #include <dirent.h>
