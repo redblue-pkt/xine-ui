@@ -37,6 +37,8 @@
 
 #include "_xitk.h"
 
+#warning IMPLEMENT xitk_draw_widget_list()
+
 static xitk_color_names_t xitk_color_names[] = {
   { 255,  250,  250,  "snow" },
   { 248,  248,  255,  "GhostWhite" },
@@ -1564,7 +1566,7 @@ void xitk_destroy_widget(xitk_widget_t *w) {
 }
 
 /*
- * Show widgets from widget list.
+ * Destroy widgets from widget list.
  */
 void xitk_destroy_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
@@ -1698,7 +1700,7 @@ void xitk_start_widget(xitk_widget_t *w) {
 }
 
 /*
- * Stop a widgets from widget list.
+ * Stop widgets from widget list.
  */
 void xitk_stop_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
@@ -1762,6 +1764,17 @@ void xitk_show_widgets(xitk_widget_list_t *wl) {
   }
 }
 
+void xitk_enable_and_show_widget(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  xitk_enable_widget(w);
+  xitk_show_widget(w);
+}
+
 /*
  * Hide a widget.
  */
@@ -1806,6 +1819,17 @@ void xitk_hide_widgets(xitk_widget_list_t *wl) {
     
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
+}
+
+void xitk_disable_and_hide_widget(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  xitk_disable_widget(w);
+  xitk_hide_widget(w);
 }
 
 /*

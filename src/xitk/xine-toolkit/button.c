@@ -92,7 +92,7 @@ static void paint_button (xitk_widget_t *w) {
   xitk_image_t          *skin;
 
   if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) && (w->visible == 1))) {
-
+    
     private_data = (button_private_data_t *) w->private_data;
     skin         = private_data->skin;
     button_width = skin->width / 3;
@@ -320,5 +320,5 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
   i = xitk_image_create_image(b->imlibdata, width * 3, height);
   draw_bevel_three_state(b->imlibdata, i);
 
-  return _xitk_button_create(wl, NULL, b, x, y, NULL, i, 1, 1);
+  return _xitk_button_create(wl, NULL, b, x, y, NULL, i, 0, 0);
 }

@@ -30,25 +30,29 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#include <X11/cursorfont.h>
 #include <pthread.h>
 #include <assert.h>
 
 #include "common.h"
 
-extern gGui_t              *gGui;
+extern gGui_t                   *gGui;
 
-static char                *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-static char                *boldfontname = "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*";
-static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+static char                     *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+static char                     *boldfontname = "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*";
+static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
-#define WINDOW_WIDTH        500
-#define WINDOW_HEIGHT       480
+#define WINDOW_WIDTH             500
+#define WINDOW_HEIGHT            480
 
-#define FRAME_WIDTH         350
-#define FRAME_HEIGHT        40
+#define FRAME_WIDTH              350
+#define FRAME_HEIGHT             40
 
-#define MAX_DISPLAY_WIDGETS 8
+#define MAX_DISPLAY_WIDGETS      8
 #define BROWSER_MAX_DISP_ENTRIES 17
+
+#define NORMAL_CURS              0
+#define WAIT_CURS                1
 
 #define ADD_FRAME(title) {                                                                      \
     xitk_widget_t       *frame = NULL;                                                          \
@@ -109,35 +113,29 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
   }
 
 #define DISABLE_ME(wtriplet) {                                                                  \
-    if((wtriplet)->frame) {                                                                     \
-      xitk_disable_widget((wtriplet)->frame);                                                   \
-      xitk_hide_widget((wtriplet)->frame);                                                      \
-    }                                                                                           \
+    if((wtriplet)->frame)                                                                       \
+      xitk_disable_and_hide_widget((wtriplet)->frame);                                          \
+                                                                                                \
     if((wtriplet)->label) {                                                                     \
-      xitk_disable_widget((wtriplet)->label);                                                   \
-      xitk_hide_widget((wtriplet)->label);                                                      \
+      xitk_disable_and_hide_widget((wtriplet)->label);                                          \
       xitk_disable_widget_tips((wtriplet)->label);                                              \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
-      xitk_disable_widget((wtriplet)->widget);                                                  \
-      xitk_hide_widget((wtriplet)->widget);                                                     \
+      xitk_disable_and_hide_widget((wtriplet)->widget);                                         \
       xitk_disable_widget_tips((wtriplet)->widget);                                             \
     }                                                                                           \
 }
 
 #define ENABLE_ME(wtriplet) {                                                                   \
-    if((wtriplet)->frame) {                                                                     \
-      xitk_enable_widget((wtriplet)->frame);                                                    \
-      xitk_show_widget((wtriplet)->frame);                                                      \
-    }                                                                                           \
+    if((wtriplet)->frame)                                                                       \
+      xitk_enable_and_show_widget((wtriplet)->frame);                                           \
+                                                                                                \
     if((wtriplet)->label) {                                                                     \
-      xitk_enable_widget((wtriplet)->label);                                                    \
-      xitk_show_widget((wtriplet)->label);                                                      \
+      xitk_enable_and_show_widget((wtriplet)->label);                                           \
       xitk_enable_widget_tips((wtriplet)->label);                                               \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
-      xitk_enable_widget((wtriplet)->widget);                                                   \
-      xitk_show_widget((wtriplet)->widget);                                                     \
+      xitk_enable_and_show_widget((wtriplet)->widget);                                          \
       xitk_enable_widget_tips((wtriplet)->widget);                                              \
     }                                                                                           \
 }
@@ -148,7 +146,7 @@ typedef struct {
   xitk_widget_t        *label;
   xitk_widget_t        *widget;
   int                   changed;
-  xine_cfg_entry_t     *cfg;
+  xine_cfg_entry_t  *cfg;
 } widget_triplet_t;
 
 typedef struct {
@@ -159,6 +157,7 @@ typedef struct {
   int                   visible;
 
   xitk_widget_t        *tabs;
+  xitk_widget_t        *ok;
 
   char                 *sections[20];
   int                   num_sections;
@@ -178,6 +177,8 @@ typedef struct {
   const char          **faq_content;
   int                   faq_lines;
 
+  Cursor                cursor[2];
+
   xitk_register_key_t   kreg;
 
 } _setup_t;
@@ -185,6 +186,7 @@ typedef struct {
 static _setup_t    *setup = NULL;
 
 static void setup_end(xitk_widget_t *, void *);
+static void setup_change_section(xitk_widget_t *, void *, int);
 
 static void add_widget_to_list(xitk_widget_t *w) {
   xitk_list_append_content(setup->widgets, (void *) w);  
@@ -194,58 +196,61 @@ static void add_widget_to_list(xitk_widget_t *w) {
  * Leaving setup panel, release memory.
  */
 void setup_exit(xitk_widget_t *w, void *data) {
-  window_info_t wi;
-  int           i;
-  
-  setup->running = 0;
-  setup->visible = 0;
 
-  if((xitk_get_window_info(setup->kreg, &wi))) {
-    config_update_num ("gui.setup_x", wi.x);
-    config_update_num ("gui.setup_y", wi.y);
-    WINDOW_INFO_ZERO(&wi);
-  }
-
-  xitk_unregister_event_handler(&setup->kreg);
-
-  xitk_destroy_widgets(setup->widget_list);
-  xitk_window_destroy_window(gGui->imlib_data, setup->xwin);
-
-  setup->xwin = None;
-  xitk_list_free((XITK_WIDGET_LIST_LIST(setup->widget_list)));
-  xitk_list_free(setup->widgets);
-  free(setup->widgets);
-  
-  XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(setup->widget_list)));
-  XUnlockDisplay(gGui->display);
-
-  free(setup->widget_list);
-  
-  if(setup->config_content) {
-    for(i = 0; i < setup->config_lines; i++) {
-      free((char *)setup->config_content[i]);
+  if(setup) {
+    window_info_t wi;
+    int           i;
+    
+    setup->running = 0;
+    setup->visible = 0;
+    
+    if((xitk_get_window_info(setup->kreg, &wi))) {
+      config_update_num ("gui.setup_x", wi.x);
+      config_update_num ("gui.setup_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
     }
-    free(setup->config_content);
-  }
-
-  if(setup->faq_content) {
-    for(i = 0; i < setup->faq_lines; i++) {
-      free((char *)setup->faq_content[i]);
+    
+    xitk_unregister_event_handler(&setup->kreg);
+    
+    xitk_destroy_widgets(setup->widget_list);
+    xitk_window_destroy_window(gGui->imlib_data, setup->xwin);
+    
+    setup->xwin = None;
+    xitk_list_free((XITK_WIDGET_LIST_LIST(setup->widget_list)));
+    xitk_list_free(setup->widgets);
+    
+    XLockDisplay(gGui->display);
+    XFreeCursor(gGui->display, setup->cursor[NORMAL_CURS]);
+    XFreeCursor(gGui->display, setup->cursor[WAIT_CURS]);
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(setup->widget_list)));
+    XUnlockDisplay(gGui->display);
+    
+    free(setup->widget_list);
+    
+    if(setup->config_content) {
+      for(i = 0; i < setup->config_lines; i++) {
+	free((char *)setup->config_content[i]);
+      }
+      free(setup->config_content);
     }
-    free(setup->faq_content);
-  }
-
-  if(setup->readme_content) {
-    for(i = 0; i < setup->readme_lines; i++) {
-      free((char **)setup->readme_content[i]);
+    
+    if(setup->faq_content) {
+      for(i = 0; i < setup->faq_lines; i++) {
+	free((char *)setup->faq_content[i]);
+      }
+      free(setup->faq_content);
     }
-    free(setup->readme_content);
+    
+    if(setup->readme_content) {
+      for(i = 0; i < setup->readme_lines; i++) {
+	free((char **)setup->readme_content[i]);
+      }
+      free(setup->readme_content);
+    }
+    
+    free(setup);
+    setup = NULL;
   }
-
-  free(setup);
-  setup = NULL;
-
 }
 
 /*
@@ -396,6 +401,19 @@ static void setup_apply(xitk_widget_t *w, void *data) {
       }
     }
     config_save();
+
+    if(w != setup->ok)
+      setup_change_section(setup->tabs, NULL, xitk_tabs_get_current_selected(setup->tabs));
+  }
+}
+
+static void setup_set_cursor(int state) {
+  if(setup) {
+    XLockDisplay(gGui->display);
+    XDefineCursor(gGui->display, (xitk_window_get_window(setup->xwin)), 
+		  setup->cursor[state]);
+    XSync(gGui->display, False);
+    XUnlockDisplay(gGui->display);
   }
 }
 
@@ -472,6 +490,7 @@ static void setup_paint_widgets(void) {
 
   /* Repaint them now */
   xitk_paint_widget_list (setup->widget_list); 
+  setup_set_cursor(NORMAL_CURS);
 }
 
 /*
@@ -871,7 +890,7 @@ static widget_triplet_t *setup_list_browser(int x, int y, const char **content, 
 static void setup_section_widgets(int s) {
   int                  x = ((WINDOW_WIDTH>>1) - (FRAME_WIDTH>>1) - 10);
   int                  y = 70;
-  xine_cfg_entry_t    *entry;
+  xine_cfg_entry_t *entry;
   int                  cfg_err_result;
   int                  len;
   char                *section;
@@ -1003,9 +1022,10 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   int i;
   xitk_widget_t *sw;
 
-  for (i = 0; i < setup->num_wg; i++ ) {
+  setup_set_cursor(WAIT_CURS);
+
+  for (i = 0; i < setup->num_wg; i++ )
     free(setup->wg[i]);
-  }
 
   /* remove old widgets */
   sw = (xitk_widget_t *) xitk_list_first_content(setup->widgets);
@@ -1031,7 +1051,7 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   }
 
   
-  xitk_list_free(setup->widgets);
+  xitk_list_clear(setup->widgets);
   setup->num_wg = 0;
   setup->first_displayed = 0;
 
@@ -1046,8 +1066,8 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
  */
 static void setup_sections (void) {
   xitk_pixmap_t       *bg;
-  xine_cfg_entry_t    entry;
-  int                 cfg_err_result;
+  xine_cfg_entry_t  entry;
+  int                  cfg_err_result;
   xitk_tabs_widget_t   tab;
 
   setup->num_sections = 0;
@@ -1103,6 +1123,8 @@ static void setup_sections (void) {
     (setup->tabs = 
      xitk_noskin_tabs_create(setup->widget_list, &tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
   
+  xitk_enable_and_show_widget(setup->tabs);
+
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay(gGui->display);
@@ -1213,9 +1235,9 @@ static void setup_read_faq(void) {
 void setup_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
-  xitk_button_widget_t       b;
   xitk_slider_widget_t       sl;
   int                        x, y;
+  xitk_widget_t             *w;
 
   setup = (_setup_t *) xine_xmalloc(sizeof(_setup_t));
 
@@ -1247,6 +1269,9 @@ void setup_panel(void) {
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(setup->xwin)), None, None);
+  setup->cursor[NORMAL_CURS] = XCreateFontCursor(gGui->display, XC_left_ptr);
+  setup->cursor[WAIT_CURS] = XCreateFontCursor(gGui->display, XC_watch);
+  XUnlockDisplay(gGui->display);
   XUnlockDisplay (gGui->display);
 
   setup->widget_list                = xitk_widget_list_new();
@@ -1255,27 +1280,22 @@ void setup_panel(void) {
 		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(setup->xwin)));
   xitk_widget_list_set(setup->widget_list, WIDGET_LIST_GC, gc);
 
-  XITK_WIDGET_INIT(&b, gGui->imlib_data);
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
 
-  {
-
-    sl.min                      = 0;
-    sl.max                      = 1;
-    sl.step                     = 1;
-    sl.skin_element_name        = NULL;
-    sl.callback                 = NULL;
-    sl.userdata                 = NULL;
-    sl.motion_callback          = setup_nextprev_wg;
-    sl.motion_userdata          = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)),
-     (setup->slider_wg = xitk_noskin_slider_create(setup->widget_list, &sl,
-						   (WINDOW_WIDTH - 41), 70, 
-						   16, (WINDOW_HEIGHT - 140), XITK_VSLIDER)));
-    xitk_slider_set_pos(setup->slider_wg, 1);
-    xitk_disable_widget(setup->slider_wg);
-    xitk_hide_widget(setup->slider_wg);
-  }
+  sl.min                      = 0;
+  sl.max                      = 1;
+  sl.step                     = 1;
+  sl.skin_element_name        = NULL;
+  sl.callback                 = NULL;
+  sl.userdata                 = NULL;
+  sl.motion_callback          = setup_nextprev_wg;
+  sl.motion_userdata          = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)),
+   (setup->slider_wg = xitk_noskin_slider_create(setup->widget_list, &sl,
+						 (WINDOW_WIDTH - 41), 70, 
+						 16, (WINDOW_HEIGHT - 140), XITK_VSLIDER)));
+  xitk_slider_set_pos(setup->slider_wg, 1);
+  xitk_disable_and_hide_widget(setup->slider_wg);
 
   setup_sections();
   setup_paint_widgets();
@@ -1292,9 +1312,11 @@ void setup_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
-   xitk_noskin_labelbutton_create(setup->widget_list, &lb, x, WINDOW_HEIGHT - 40, 100, 23,
-				  "Black", "Black", "White", tabsfontname));
-  
+   (setup->ok = xitk_noskin_labelbutton_create(setup->widget_list, &lb, 
+					       x, WINDOW_HEIGHT - 40, 100, 23,
+					       "Black", "Black", "White", tabsfontname)));
+  xitk_enable_and_show_widget(setup->ok);
+
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Apply");
   lb.align             = ALIGN_CENTER;
@@ -1303,9 +1325,11 @@ void setup_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
-   xitk_noskin_labelbutton_create(setup->widget_list, &lb, (x * 2) + 100, WINDOW_HEIGHT - 40, 100, 23,
-				  "Black", "Black", "White", tabsfontname));
-
+   (w = xitk_noskin_labelbutton_create(setup->widget_list, &lb, 
+				       (x * 2) + 100, WINDOW_HEIGHT - 40, 100, 23, 
+				       "Black", "Black", "White", tabsfontname)));
+  xitk_enable_and_show_widget(w);
+  
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
@@ -1314,9 +1338,11 @@ void setup_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
-   xitk_noskin_labelbutton_create(setup->widget_list, &lb, (x * 3) + (100 * 2), WINDOW_HEIGHT - 40, 100, 23,
-				  "Black", "Black", "White", tabsfontname));
-
+   (w = xitk_noskin_labelbutton_create(setup->widget_list, &lb, 
+				       (x * 3) + (100 * 2), WINDOW_HEIGHT - 40, 100, 23,
+				       "Black", "Black", "White", tabsfontname)));
+  xitk_enable_and_show_widget(w);
+  
   setup->kreg = xitk_register_event_handler("setup", 
 					    (xitk_window_get_window(setup->xwin)),
 					    setup_handle_event,

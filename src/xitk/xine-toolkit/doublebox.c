@@ -31,9 +31,9 @@
 
 static void enability(xitk_widget_t *w) {
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    intbox_private_data_t *private_data = (intbox_private_data_t *) w->private_data;
+    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
     
     if(w->enable == WIDGET_ENABLE) {
       xitk_enable_widget(private_data->input_widget);
@@ -53,9 +53,9 @@ static void enability(xitk_widget_t *w) {
  */
 static void notify_destroy(xitk_widget_t *w) {
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    intbox_private_data_t *private_data = (intbox_private_data_t *) w->private_data;
+    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
     
     XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data);
@@ -66,12 +66,12 @@ static void notify_destroy(xitk_widget_t *w) {
  *
  */
 static void paint(xitk_widget_t *w) {
-  intbox_private_data_t *private_data;
+  doublebox_private_data_t *private_data;
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     
-    private_data = (intbox_private_data_t *) w->private_data;
+    private_data = (doublebox_private_data_t *) w->private_data;
     
     if((w->visible == 1)) {
       int bx, ih, iw;
@@ -99,11 +99,11 @@ static void paint(xitk_widget_t *w) {
  *
  */
 static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  intbox_private_data_t *private_data;
+  doublebox_private_data_t *private_data;
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    private_data = (intbox_private_data_t *) w->private_data;
+    private_data = (doublebox_private_data_t *) w->private_data;
 
     if(private_data->skin_element_name) {
       /*      
@@ -149,19 +149,19 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 /*
  *
  */
-static void intbox_change_value(xitk_widget_t *x, void *data, char *string) {
+static void doublebox_change_value(xitk_widget_t *x, void *data, char *string) {
   xitk_widget_t         *w = (xitk_widget_t *)data;
-  intbox_private_data_t *private_data;
+  doublebox_private_data_t *private_data;
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     char  buf[256];
     
-    private_data = (intbox_private_data_t *)w->private_data;
-    private_data->value = strtol(string, &string, 10);
+    private_data = (doublebox_private_data_t *)w->private_data;
+    private_data->value = strtod(string, &string);
     
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%d", private_data->value);
+    snprintf(buf, 256, "%e", private_data->value);
     xitk_inputtext_change_text(private_data->input_widget, buf);
     if(private_data->force_value == 0)
       if(private_data->callback)
@@ -172,19 +172,19 @@ static void intbox_change_value(xitk_widget_t *x, void *data, char *string) {
 /*
  *
  */
-void xitk_intbox_set_value(xitk_widget_t *w, int value) {
-  intbox_private_data_t *private_data;
+void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
+  doublebox_private_data_t *private_data;
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     char buf[256];
     
-    private_data = (intbox_private_data_t *) w->private_data;
+    private_data = (doublebox_private_data_t *) w->private_data;
 
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%d", value);
+    snprintf(buf, 256, "%e", value);
     private_data->force_value = 1;
-    intbox_change_value(NULL, (void*)w, buf);
+    doublebox_change_value(NULL, (void*)w, buf);
     private_data->force_value = 0;
   }
 }
@@ -192,16 +192,16 @@ void xitk_intbox_set_value(xitk_widget_t *w, int value) {
 /*
  *
  */
-int xitk_intbox_get_value(xitk_widget_t *w) {
-  intbox_private_data_t *private_data;
+double xitk_doublebox_get_value(xitk_widget_t *w) {
+  doublebox_private_data_t *private_data;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     char *strval;
 
-    private_data = (intbox_private_data_t *)w->private_data;
+    private_data = (doublebox_private_data_t *)w->private_data;
     strval = xitk_inputtext_get_text(private_data->input_widget);
-    private_data->value = strtol(strval, &strval, 10);
+    private_data->value = strtod(strval, &strval);
     
     return private_data->value;
   }
@@ -211,16 +211,16 @@ int xitk_intbox_get_value(xitk_widget_t *w) {
 /*
  *
  */
-static void intbox_stepdown(xitk_widget_t *x, void *data) {
+static void doublebox_stepdown(xitk_widget_t *x, void *data) {
   xitk_widget_t *w = (xitk_widget_t *) data;
-  intbox_private_data_t *private_data;
+  doublebox_private_data_t *private_data;
 
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     
-    private_data = (intbox_private_data_t *)w->private_data;
+    private_data = (doublebox_private_data_t *)w->private_data;
     private_data->value -= private_data->step;
-    xitk_intbox_set_value(w, private_data->value);
+    xitk_doublebox_set_value(w, private_data->value);
     if(private_data->callback)
       private_data->callback(w, private_data->userdata, private_data->value);
   }
@@ -229,16 +229,16 @@ static void intbox_stepdown(xitk_widget_t *x, void *data) {
 /*
  *
  */
-static void intbox_stepup(xitk_widget_t *x, void *data) {
+static void doublebox_stepup(xitk_widget_t *x, void *data) {
   xitk_widget_t *w = (xitk_widget_t *) data;
-  intbox_private_data_t *private_data;
+  doublebox_private_data_t *private_data;
   
-  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     
-    private_data = (intbox_private_data_t *)w->private_data;
+    private_data = (doublebox_private_data_t *)w->private_data;
     private_data->value += private_data->step;
-    xitk_intbox_set_value(w, private_data->value);
+    xitk_doublebox_set_value(w, private_data->value);
     if(private_data->callback)
       private_data->callback(w, private_data->userdata, private_data->value);
   }
@@ -247,11 +247,11 @@ static void intbox_stepup(xitk_widget_t *x, void *data) {
 /*
  *
  */
-static xitk_widget_t *_xitk_intbox_create(xitk_widget_list_t *wl,
+static xitk_widget_t *_xitk_doublebox_create(xitk_widget_list_t *wl,
 					  xitk_skin_config_t *skonfig,
-					  xitk_intbox_widget_t *ib, char *skin_element_name,
+					  xitk_doublebox_widget_t *ib, char *skin_element_name,
 					  xitk_widget_t *mywidget, 
-					  intbox_private_data_t *private_data,
+					  doublebox_private_data_t *private_data,
 					  int visible, int enable) {
   
   private_data->imlibdata                = ib->imlibdata;
@@ -274,7 +274,7 @@ static xitk_widget_t *_xitk_intbox_create(xitk_widget_list_t *wl,
   
   mywidget->imlibdata                    = private_data->imlibdata;
 
-  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_INTBOX;
+  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_DOUBLEBOX;
   mywidget->event                        = notify_event;
   mywidget->tips_timeout                 = 0;
   mywidget->tips_string                  = NULL;
@@ -285,12 +285,12 @@ static xitk_widget_t *_xitk_intbox_create(xitk_widget_list_t *wl,
 /*
  *
  */
-xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
-					 xitk_intbox_widget_t *ib,
+xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
+					 xitk_doublebox_widget_t *ib,
 					 int x, int y, int width, int height, 
 					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw) {
   xitk_widget_t              *mywidget;
-  intbox_private_data_t      *private_data;
+  doublebox_private_data_t      *private_data;
   xitk_button_widget_t        b;
   xitk_inputtext_widget_t     inp;
 
@@ -301,7 +301,7 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
   XITK_WIDGET_INIT(&b, ib->imlibdata);
   XITK_WIDGET_INIT(&inp, ib->imlibdata);
 
-  private_data = (intbox_private_data_t *) xitk_xmalloc(sizeof(intbox_private_data_t));
+  private_data = (doublebox_private_data_t *) xitk_xmalloc(sizeof(doublebox_private_data_t));
   
   /* Create inputtext and buttons (not skinable) */
   {
@@ -309,39 +309,39 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage;
 
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%d", ib->value);
+    snprintf(buf, 256, "%e", ib->value);
 
     inp.skin_element_name = NULL;
     inp.text              = buf; 
     inp.max_length        = 16;
-    inp.callback          = intbox_change_value;
+    inp.callback          = doublebox_change_value;
     inp.userdata          = (void *)mywidget;
     xitk_list_append_content(ib->parent_wlist->l, 
 	     (private_data->input_widget = 
 	      xitk_noskin_inputtext_create(ib->parent_wlist, &inp,
 					   x, y, (width - 10), height,
 					   "Black", "Black", DEFAULT_FONT_10)));
-    private_data->input_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
+    private_data->input_widget->type |= WIDGET_GROUP | WIDGET_GROUP_DOUBLEBOX;
     
     b.skin_element_name = NULL;
-    b.callback          = intbox_stepup;
+    b.callback          = doublebox_stepup;
     b.userdata          = (void *)mywidget;
     xitk_list_append_content(ib->parent_wlist->l, 
 	     (private_data->more_widget = 
 	      xitk_noskin_button_create(ib->parent_wlist, &b,
 					(x + width) - (height>>1), y, 
 					(height>>1), (height>>1))));
-    private_data->more_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
+    private_data->more_widget->type |= WIDGET_GROUP | WIDGET_GROUP_DOUBLEBOX;
 
     b.skin_element_name = NULL;
-    b.callback          = intbox_stepdown;
+    b.callback          = doublebox_stepdown;
     b.userdata          = (void *)mywidget;
     xitk_list_append_content(ib->parent_wlist->l, 
 	     (private_data->less_widget = 
 	      xitk_noskin_button_create(ib->parent_wlist, &b,
 					(x + width) - (height>>1), (y + (height>>1)),
 					(height>>1), (height>>1))));
-    private_data->less_widget->type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
+    private_data->less_widget->type |= WIDGET_GROUP | WIDGET_GROUP_DOUBLEBOX;
 
     /* Draw '+' and '-' in buttons */
     wimage = xitk_get_widget_foreground_skin(private_data->more_widget);
@@ -368,5 +368,5 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
   mywidget->width = width;
   mywidget->height = height;
   
-  return _xitk_intbox_create(wl, NULL, ib, NULL, mywidget, private_data, 0, 0);
+  return _xitk_doublebox_create(wl, NULL, ib, NULL, mywidget, private_data, 0, 0);
 }

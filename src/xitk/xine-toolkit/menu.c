@@ -863,6 +863,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       }
       
       xitk_labelbutton_set_label_offset(btn, 20);
+      xitk_enable_and_show_widget(btn);
 
       yy += 20;
     }

@@ -75,34 +75,36 @@ static void viewlog_end(xitk_widget_t *, void *);
  * Leaving setup panel, release memory.
  */
 void viewlog_exit(xitk_widget_t *w, void *data) {
-  window_info_t wi;
-  
-  viewlog->running = 0;
-  viewlog->visible = 0;
 
-  if((xitk_get_window_info(viewlog->kreg, &wi))) {
-    config_update_num ("gui.viewlog_x", wi.x);
-    config_update_num ("gui.viewlog_y", wi.y);
-    WINDOW_INFO_ZERO(&wi);
+  if(viewlog) {
+    window_info_t wi;
+    
+    viewlog->running = 0;
+    viewlog->visible = 0;
+    
+    if((xitk_get_window_info(viewlog->kreg, &wi))) {
+      config_update_num ("gui.viewlog_x", wi.x);
+      config_update_num ("gui.viewlog_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
+    
+    xitk_unregister_event_handler(&viewlog->kreg);
+    
+    xitk_destroy_widgets(viewlog->widget_list);
+    xitk_window_destroy_window(gGui->imlib_data, viewlog->xwin);
+    
+    viewlog->xwin = None;
+    xitk_list_free(XITK_WIDGET_LIST_LIST(viewlog->widget_list));
+    
+    XLockDisplay(gGui->display);
+    XFreeGC(gGui->display, XITK_WIDGET_LIST_GC(viewlog->widget_list));
+    XUnlockDisplay(gGui->display);
+    
+    free(viewlog->widget_list);
+    
+    free(viewlog);
+    viewlog = NULL;
   }
-
-  xitk_unregister_event_handler(&viewlog->kreg);
-
-  xitk_destroy_widgets(viewlog->widget_list);
-  xitk_window_destroy_window(gGui->imlib_data, viewlog->xwin);
-
-  viewlog->xwin = None;
-  xitk_list_free(XITK_WIDGET_LIST_LIST(viewlog->widget_list));
-  
-  XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, XITK_WIDGET_LIST_GC(viewlog->widget_list));
-  XUnlockDisplay(gGui->display);
-
-  free(viewlog->widget_list);
-  
-  free(viewlog);
-  viewlog = NULL;
-
 }
 
 /*
@@ -368,6 +370,7 @@ static void viewlog_create_tabs(void) {
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(viewlog->widget_list)),
     (viewlog->tabs = 
      xitk_noskin_tabs_create(viewlog->widget_list, &tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
+  xitk_enable_and_show_widget(viewlog->tabs);
 
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -402,6 +405,7 @@ void viewlog_window(void) {
   xitk_labelbutton_widget_t  lb;
   xitk_browser_widget_t      br;
   int                        x, y;
+  xitk_widget_t             *w;
   
   viewlog = (_viewlog_t *) xine_xmalloc(sizeof(_viewlog_t));
   viewlog->log = (const char **) xine_xmalloc(sizeof(char **));
@@ -453,11 +457,12 @@ void viewlog_window(void) {
   br.parent_wlist                  = viewlog->widget_list;
   br.userdata                      = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
-			   (viewlog->browser_widget = 
-			    xitk_noskin_browser_create(viewlog->widget_list, &br,
-						       (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 25, 58, 
-						       WINDOW_WIDTH - (50 + 16), 20,
-						       16, br_fontname)));
+   (viewlog->browser_widget = 
+    xitk_noskin_browser_create(viewlog->widget_list, &br,
+			       (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 25, 58, 
+			       WINDOW_WIDTH - (50 + 16), 20,
+			       16, br_fontname)));
+  xitk_enable_and_show_widget(viewlog->browser_widget);
 
   xitk_browser_set_alignment(viewlog->browser_widget, ALIGN_LEFT);
   xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->real_num_entries, 0);
@@ -477,9 +482,10 @@ void viewlog_window(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
-	   xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
-					  x, y, 100, 23,
-					  "Black", "Black", "White", tabsfontname));
+   (w = xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
+				       x, y, 100, 23,
+				       "Black", "Black", "White", tabsfontname)));
+  xitk_enable_and_show_widget(w);
 
   x += (WINDOW_WIDTH / 2);
 
@@ -491,9 +497,10 @@ void viewlog_window(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
-	   xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
-					  x, y, 100, 23,
-					  "Black", "Black", "White", tabsfontname));
+   (w = xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
+				       x, y, 100, 23,
+				       "Black", "Black", "White", tabsfontname)));
+  xitk_enable_and_show_widget(w);
 
   viewlog->kreg = xitk_register_event_handler("viewlog", 
 					      (xitk_window_get_window(viewlog->xwin)),

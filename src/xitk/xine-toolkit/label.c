@@ -111,6 +111,7 @@ static void notify_destroy(xitk_widget_t *w) {
       private_data->labelpix = NULL;
     }
     
+    XITK_FREE(private_data->label);
     XITK_FREE(private_data->fontname);
     XITK_FREE(private_data->skin_element_name);
 
@@ -557,5 +558,5 @@ xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
 					int x, int y, int width, int height, char *fontname) {
   XITK_CHECK_CONSTITENCY(l);
 
-  return _xitk_label_create(wl, NULL, l, x, y, width, height, NULL, fontname, 1, 1);
+  return _xitk_label_create(wl, NULL, l, x, y, width, height, NULL, fontname, 0, 0);
 }

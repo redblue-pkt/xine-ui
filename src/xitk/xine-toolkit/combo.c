@@ -124,15 +124,29 @@ static void paint(xitk_widget_t *w) {
 }
 
 /*
+ *
+ */
+void xitk_combo_callback_exec(xitk_widget_t *w) {
+  
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
+    combo_private_data_t *private_data = (combo_private_data_t *)w->private_data;
+    
+    if(private_data->callback)
+      private_data->callback(private_data->combo_widget, 
+			     private_data->userdata, private_data->selected);
+
+  }
+}
+
+/*
  * Called on select action.
  */
 static void combo_select(xitk_widget_t *w, void *data, int selected) {
-  combo_private_data_t *private_data;
-  xitk_widget_t        *c;
 
   if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
-    c = (xitk_widget_t *) ((browser_private_data_t *)w->private_data)->userdata;
-    private_data = (combo_private_data_t *)c->private_data;
+    xitk_widget_t        *c = (xitk_widget_t *) ((browser_private_data_t *)w->private_data)->userdata;
+    combo_private_data_t *private_data = (combo_private_data_t *)c->private_data;
     
     private_data->selected = selected;
     
@@ -170,7 +184,7 @@ static void _combo_handle_event(XEvent *event, void *data) {
      * If we try to move the combo window,
      * move it back to right position (under label*
      */
-    if(private_data->visible) { 
+    if(private_data && private_data->visible) { 
       int  x, y;
       xitk_window_get_window_position(private_data->combo_widget->imlibdata, 
 				      private_data->xwin, &x, &y, NULL, NULL);
@@ -594,6 +608,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 							private_data->gc, 1, 1, 
 							(itemw - slidw), itemh, slidw,
 							DEFAULT_FONT_10)));
+  xitk_enable_and_show_widget(private_data->browser_widget);
   private_data->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
   
   xitk_browser_update_list(private_data->browser_widget, 
@@ -774,5 +789,5 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
 
   }
 
-  return _xitk_combo_create(wl, NULL, c, NULL, mywidget, private_data, 1, 1);
+  return _xitk_combo_create(wl, NULL, c, NULL, mywidget, private_data, 0, 0);
 }

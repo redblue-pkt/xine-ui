@@ -389,5 +389,5 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
   i = xitk_image_create_image(cb->imlibdata, width * 3, height);
   draw_bevel_three_state(cb->imlibdata, i);
   
-  return _xitk_checkbox_create(wl, NULL, cb, x, y, NULL, i, 1, 1);
+  return _xitk_checkbox_create(wl, NULL, cb, x, y, NULL, i, 0, 0);
 }

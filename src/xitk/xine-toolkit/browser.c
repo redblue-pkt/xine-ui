@@ -134,8 +134,7 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       for(i = WBSTART; i < private_data->max_length + WBSTART; i++) {
 	(void) xitk_set_widget_pos(private_data->item_tree[i], x, y);
 	y += xitk_get_widget_height(private_data->item_tree[i]) + 1;
-	xitk_enable_widget(private_data->item_tree[i]);
-	xitk_show_widget(private_data->item_tree[i]);
+	xitk_enable_and_show_widget(private_data->item_tree[i]);
       }
 
       xitk_browser_rebuild_browser(w, 0);
@@ -696,12 +695,10 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
       }
       
       if((btn_selected = xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
+	int cb2 = 0;
 	/*  Callback call */
 	private_data->jumped = btn_selected;
 	
-	if(private_data->callback)
-	  private_data->callback(((btnlist_t*)data)->itemlist, private_data->userdata, btn_selected);
-      
 	/* A button is currently selected */
 	private_data->current_button_clicked = btn_selected;
 	
@@ -719,9 +716,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	  /* Ok, double click occur, call cb */
 	  if(click_diff < private_data->dbl_click_time) {
 	    if(private_data->dbl_click_callback)
-	      private_data->dbl_click_callback(((btnlist_t*)data)->itemlist/*w*/, 
-					       private_data->userdata, 
-					       private_data->current_button_clicked);
+	      cb2 = 1;
 	  }
 	  
 	}
@@ -731,6 +726,13 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	
 	gettimeofday(&private_data->click_time, 0);
 	
+	if(private_data->callback)
+	  private_data->callback(((btnlist_t*)data)->itemlist, private_data->userdata, btn_selected);
+	if(cb2) {
+	  private_data->dbl_click_callback(((btnlist_t*)data)->itemlist/*w*/, 
+					   private_data->userdata, 
+					   private_data->current_button_clicked);
+	}
 	/*
 	  if(private_data->last_button_clicked == -1)
 	  private_data->last_button_clicked = private_data->current_button_clicked;
@@ -1002,7 +1004,6 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
     for(i = WBSTART; i < (EXTRA_BTNS + WBSTART); i++) {
       
       bt = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
-      bt->itemlist = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
       bt->itemlist = mywidget;
       bt->sel = i;
       
@@ -1025,10 +1026,8 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
       y += xitk_get_widget_height(private_data->item_tree[i]) + 1;
     }
     
-    for(i = WBSTART; i < (br->browser.max_displayed_entries + WBSTART); i++) {
-      xitk_enable_widget(private_data->item_tree[i]);
-      xitk_show_widget(private_data->item_tree[i]);
-    }
+    for(i = WBSTART; i < (br->browser.max_displayed_entries + WBSTART); i++)
+      xitk_enable_and_show_widget(private_data->item_tree[i]);
 
   }
   
@@ -1145,7 +1144,6 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
 								itemw, itemh,
 								"Black", "Black", "White", 
 								fontname)));
-      
       private_data->item_tree[i]->type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
 
       wimage = xitk_get_widget_foreground_skin(private_data->item_tree[i]);
@@ -1273,5 +1271,5 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
 
   return _xitk_browser_create(wl, NULL, br, x, y, 
 			      (itemw + slidw), (itemh * br->browser.max_displayed_entries) + slidw, 
-			      NULL, mywidget, private_data, 1, 1);
+			      NULL, mywidget, private_data, 0, 0);
 }

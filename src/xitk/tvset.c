@@ -41,13 +41,13 @@
 #include "frequencies.h"
 	
 #define WINDOW_WIDTH        500
-#define WINDOW_HEIGHT       500
+#define WINDOW_HEIGHT       310
 
 extern gGui_t          *gGui;
 
 static char            *tvsetfontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
-static char            *lfontname          = "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*";
-static char            *btnfontname        = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+static char            *lfontname         = "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*";
+static char            *btnfontname       = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
 typedef struct {
   xitk_window_t        *xwin;
@@ -77,8 +77,8 @@ static _tvset_t    *tvset = NULL;
 
 
 struct _std_list {
-    const char *name;
-    uint64_t std;
+    const char     *name;
+    uint64_t        std;
 };
 
 typedef uint64_t v4l2_std_id;
@@ -115,60 +115,60 @@ typedef uint64_t v4l2_std_id;
 
 
 static struct _std_list std_list[] = {
-  { "PAL-B", V4L2_STD_PAL_B },
-  { "PAL-B1", V4L2_STD_PAL_B1 },
-  { "PAL-G", V4L2_STD_PAL_G },
-  { "PAL-H", V4L2_STD_PAL_H },
-  { "PAL-I", V4L2_STD_PAL_I },
-  { "PAL-D", V4L2_STD_PAL_D },
-  { "PAL-D1", V4L2_STD_PAL_D1 },
-  { "PAL-K", V4L2_STD_PAL_K },
-  { "PAL-M", V4L2_STD_PAL_M },
-  { "PAL-N", V4L2_STD_PAL_N },
-  { "PAL-Nc", V4L2_STD_PAL_Nc },
-  { "PAL-60", V4L2_STD_PAL_60 },
-  { "NTSC-M", V4L2_STD_NTSC_M },
-  { "NTSC-M-JP", V4L2_STD_NTSC_M_JP },
-  { "SECAM-B", V4L2_STD_SECAM_B },
-  { "SECAM-D", V4L2_STD_SECAM_D },
-  { "SECAM-G", V4L2_STD_SECAM_G },
-  { "SECAM-H", V4L2_STD_SECAM_H },
-  { "SECAM-K", V4L2_STD_SECAM_K },
-  { "SECAM-K1", V4L2_STD_SECAM_K1 },
-  { "SECAM-L", V4L2_STD_SECAM_L },
-  { "ATSC-8-VSB", V4L2_STD_ATSC_8_VSB },
+  { "PAL-B",       V4L2_STD_PAL_B       },
+  { "PAL-B1",      V4L2_STD_PAL_B1      },
+  { "PAL-G",       V4L2_STD_PAL_G       },
+  { "PAL-H",       V4L2_STD_PAL_H       },
+  { "PAL-I",       V4L2_STD_PAL_I       },
+  { "PAL-D",       V4L2_STD_PAL_D       },
+  { "PAL-D1",      V4L2_STD_PAL_D1      },
+  { "PAL-K",       V4L2_STD_PAL_K       },
+  { "PAL-M",       V4L2_STD_PAL_M       },
+  { "PAL-N",       V4L2_STD_PAL_N       },
+  { "PAL-Nc",      V4L2_STD_PAL_Nc      },
+  { "PAL-60",      V4L2_STD_PAL_60      },
+  { "NTSC-M",      V4L2_STD_NTSC_M      },
+  { "NTSC-M-JP",   V4L2_STD_NTSC_M_JP   },
+  { "SECAM-B",     V4L2_STD_SECAM_B     },
+  { "SECAM-D",     V4L2_STD_SECAM_D     },
+  { "SECAM-G",     V4L2_STD_SECAM_G     },
+  { "SECAM-H",     V4L2_STD_SECAM_H     },
+  { "SECAM-K",     V4L2_STD_SECAM_K     },
+  { "SECAM-K1",    V4L2_STD_SECAM_K1    },
+  { "SECAM-L",     V4L2_STD_SECAM_L     },
+  { "ATSC-8-VSB",  V4L2_STD_ATSC_8_VSB  },
   { "ATSC-16-VSB", V4L2_STD_ATSC_16_VSB }
 };
 
 
 
 static void tvset_update(xitk_widget_t *w, void *data) {
-
-  xine_event_t   xine_event;
+  xine_event_t          xine_event;
   xine_set_v4l2_data_t *ev_data;
-
+  
   ev_data = (xine_set_v4l2_data_t *)xine_xmalloc(sizeof(xine_set_v4l2_data_t));
-
-  ev_data->input = xitk_intbox_get_value(tvset->input);
+  
+  ev_data->input     = xitk_intbox_get_value(tvset->input);
   ev_data->frequency = (chanlists[xitk_combo_get_current_selected(tvset->system)].
-                    list[xitk_combo_get_current_selected(tvset->chann)].freq * 16) / 1000;
-
+			list[xitk_combo_get_current_selected(tvset->chann)].freq * 16) / 1000;
+  
   ev_data->standard_id = std_list[xitk_combo_get_current_selected(tvset->vidstd)].std;
-
-  xine_event.type = XINE_EVENT_SET_V4L2;
+  
+  xine_event.type        = XINE_EVENT_SET_V4L2;
   xine_event.data_length = sizeof(xine_set_v4l2_data_t);
-  xine_event.data = ev_data;
-  xine_event.stream = gGui->stream;
+  xine_event.data        = ev_data;
+  xine_event.stream      = gGui->stream;
   gettimeofday(&xine_event.tv, NULL);
-    
+  
   xine_event_send(gGui->stream, &xine_event);
 }
 
 
 static void tvset_exit(xitk_widget_t *w, void *data) {
-  window_info_t wi;
 
+#warning CHECK FOR MEMLEAK  
   if(tvset) {
+    window_info_t wi;
     
     tvset->running = 0;
     tvset->visible = 0;
@@ -277,11 +277,10 @@ void tvset_end(void) {
 
 
 static int update_chann_entries(int system_entry) {
-
-  int i;
+  int               i;
   struct CHANLIST  *list = chanlists[system_entry].list;
-  int len = chanlists[system_entry].count;
-
+  int               len  = chanlists[system_entry].count;
+  
   if( tvset->chann_entries ) {
     for(i = 0; tvset->chann_entries[i]; i++)
       free(tvset->chann_entries[i]);
@@ -290,19 +289,17 @@ static int update_chann_entries(int system_entry) {
 
   tvset->chann_entries = (char **) xine_xmalloc(sizeof(char *) * (len+1) );
   
-  for(i = 0; i < len; i++) {
+  for(i = 0; i < len; i++)
     tvset->chann_entries[i] = strdup(list[i].name);
-  }
 
   tvset->chann_entries[i] = NULL;
   return len;
 }
 
 static void system_combo_select(xitk_widget_t *w, void *data, int select) {
-
   int len;
-
-  len =  update_chann_entries(select);
+  
+  len = update_chann_entries(select);
 
   if( tvset->chann ) {
     xitk_combo_update_list(tvset->chann, tvset->chann_entries, len);
@@ -322,6 +319,7 @@ void tvset_panel(void) {
   xitk_pixmap_t              *bg;
   int                         i;
   int                         x, y, w, width, height;
+  xitk_widget_t              *widget;
 
   tvset = (_tvset_t *) xine_xmalloc(sizeof(_tvset_t));
   
@@ -341,8 +339,9 @@ void tvset_panel(void) {
 				CONFIG_NO_DATA);
   
   /* Create window */
-  tvset->xwin = xitk_window_create_dialog_window(gGui->imlib_data, _("TV/Analog Video parameters"), x, y,
-						  WINDOW_WIDTH, WINDOW_HEIGHT);
+  tvset->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+						 _("TV/Analog Video parameters"), x, y,
+						 WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
@@ -390,7 +389,7 @@ void tvset_panel(void) {
 			   (tvset->input = 
 			    xitk_noskin_intbox_create(tvset->widget_list, &ib,
 						     x, y, w, 20, NULL, NULL, NULL)));
-
+  xitk_enable_and_show_widget(tvset->input);
 
   for(i = 0; chanlists[i].name; i++) ;
   tvset->system_entries = (char **) xine_xmalloc(sizeof(char *) * (i+1));
@@ -415,6 +414,7 @@ void tvset_panel(void) {
 		   (tvset->system = 
 		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
 					     x, y, w, NULL, NULL)));
+  xitk_enable_and_show_widget(tvset->system);
 
   xitk_combo_set_select(tvset->system, 0);
   update_chann_entries(0);
@@ -435,7 +435,7 @@ void tvset_panel(void) {
 		   (tvset->chann = 
 		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
 					     x, y, w, NULL, NULL)));
-
+  xitk_enable_and_show_widget(tvset->chann);
 
   x = 5;
   y += 45;
@@ -460,6 +460,7 @@ void tvset_panel(void) {
 	    xitk_noskin_inputtext_create(tvset->widget_list, &inp,
 					 x, y, w, 20,
 					 "Black", "Black", tvsetfontname)));
+  xitk_enable_and_show_widget(tvset->framerate);
 
   tvset->vidstd_entries = (char **) xine_xmalloc(sizeof(char *) * 
                           (sizeof(std_list)/sizeof(std_list[0])+1));
@@ -484,7 +485,7 @@ void tvset_panel(void) {
 		   (tvset->vidstd = 
 		    xitk_noskin_combo_create(tvset->widget_list, &cmb,
 					     x, y, w, NULL, NULL)));
-
+  xitk_enable_and_show_widget(tvset->vidstd);
 
   x = 5;
   y += 45;
@@ -523,7 +524,7 @@ void tvset_panel(void) {
 	    xitk_noskin_labelbutton_create(tvset->widget_list, 
 					   &lb, x, y, 100, 23,
 					   "Black", "Black", "White", btnfontname)));
-
+  xitk_enable_and_show_widget(tvset->update);
  
   x = WINDOW_WIDTH - 115;
   
@@ -535,9 +536,10 @@ void tvset_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(tvset->widget_list)), 
-	   xitk_noskin_labelbutton_create(tvset->widget_list, 
-					  &lb, x, y, 100, 23,
-					  "Black", "Black", "White", btnfontname));
+   (widget = xitk_noskin_labelbutton_create(tvset->widget_list, 
+					    &lb, x, y, 100, 23,
+					    "Black", "Black", "White", btnfontname)));
+  xitk_enable_and_show_widget(widget);
   
   xitk_window_change_background(gGui->imlib_data, tvset->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);

@@ -151,6 +151,7 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 
   if(xpix->shm) {
     shmdt(xpix->shminfo->shmaddr);
+    shmctl(xpix->shminfo->shmid, IPC_RMID, 0);
     free(xpix->shminfo);
   }
 #endif
@@ -1557,9 +1558,9 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
 
   mywidget->wl                    = wl;
 
-  mywidget->enable                = 1;
+  mywidget->enable                = 0;
   mywidget->running               = 1;
-  mywidget->visible               = 1;
+  mywidget->visible               = 0;
   mywidget->have_focus            = FOCUS_LOST;
   mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;

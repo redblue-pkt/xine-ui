@@ -82,7 +82,7 @@ static skin_downloader_t  *skdloader = NULL;
 #define SKIN_DEBUG 1
 */
 
-#define DEFAULT_SKIN        "xinetic"
+#define DEFAULT_SKIN        "Centori"
 #define SKIN_IFACE_VERSION  4
 
 extern gGui_t             *gGui;
@@ -172,9 +172,9 @@ static void looking_for_available_skins(void) {
  * Return default skindir.
  */
 char *skin_get_skindir(void) {
-  static char         tmp[2048];
-  xine_cfg_entry_t   entry;
-  char               *skin;
+  static char          tmp[2048];
+  xine_cfg_entry_t  entry;
+  char                *skin;
   
   memset(&tmp, 0, 2048);
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
@@ -192,9 +192,9 @@ char *skin_get_skindir(void) {
  * Return the full pathname the skin (default) configfile.
  */
 char *skin_get_configfile(void) {
-  static char        tmp[2048];
+  static char          tmp[2048];
   xine_cfg_entry_t  entry;
-  char              *skin;
+  char                *skin;
   
   memset(&tmp, 0, 2048);
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 

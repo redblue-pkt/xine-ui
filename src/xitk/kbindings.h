@@ -110,6 +110,7 @@ typedef enum {
   ACTID_ZOOM_Y_OUT,
   ACTID_ZOOM_RESET,
   ACTID_TOGGLE_TVMODE,
+  ACTID_TVANALOG,
   ACTID_SETUP,
   ACTID_VIEWLOG,
   ACTID_KBEDIT,
@@ -125,7 +126,6 @@ typedef enum {
   ACTID_SUBSELECT,
   ACTID_SV_SYNC_p,
   ACTID_SV_SYNC_m,
-
   ACTID_HUECONTROLp,
   ACTID_HUECONTROLm,
   ACTID_SATURATIONCONTROLp,
@@ -134,7 +134,8 @@ typedef enum {
   ACTID_BRIGHTNESSCONTROLm,
   ACTID_CONTRASTCONTROLp,
   ACTID_CONTRASTCONTROLm,
-  
+  ACTID_VPP,
+
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 
    */

@@ -2475,9 +2475,9 @@ int mrl_looks_playlist(char *mrl) {
  *  EDITOR
  */
 static void mmkeditor_exit(xitk_widget_t *w, void *data) {
-  window_info_t wi;
-  
+
   if(mmkeditor) {
+    window_info_t wi;
 
     mmkeditor->running = 0;
     mmkeditor->visible = 0;
@@ -2734,6 +2734,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 					 x, y, w, 20,
 					 "Black", "Black", fontname)));
   xitk_set_widget_tips_default(mmkeditor->ident, _("Mediamark Identifier"));
+  xitk_enable_and_show_widget(mmkeditor->ident);
 
   x = 5;
   y += 40;
@@ -2753,6 +2754,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 					  x, y, w, 20,
 					  "Black", "Black", fontname)));
   xitk_set_widget_tips_default(mmkeditor->mrl, _("Mediamark Mrl"));
+  xitk_enable_and_show_widget(mmkeditor->mrl);
 
   x = 5;
   y += 40;
@@ -2772,7 +2774,8 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 					  x, y, w - 115, 20,
 					  "Black", "Black", fontname)));
   xitk_set_widget_tips_default(mmkeditor->mrl, _("Subtitle File"));
-  
+  xitk_enable_and_show_widget(mmkeditor->sub);
+
   x = WINDOW_WIDTH - 115;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Sub File");
@@ -2786,7 +2789,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 					       &lb, x, y - 2, 100, 23,
 					       "Black", "Black", "White", btnfontname)));
   xitk_set_widget_tips_default(b, _("Select a subtitle file to use together with the mrl."));
-
+  xitk_enable_and_show_widget(b);
 
   x = 5;
   y += 40;
@@ -2808,6 +2811,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
 				       x, y, w, 20, NULL, NULL, NULL)));
   xitk_set_widget_tips_default(mmkeditor->start, _("Mediamark start time (secs)."));
+  xitk_enable_and_show_widget(mmkeditor->start);
 
   x += w + 20 + 15;
   y -= 5;
@@ -2827,6 +2831,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
 				       x, y, w, 20, NULL, NULL, NULL)));
   xitk_set_widget_tips_default(mmkeditor->end, _("Mediamark end time (secs)."));
+  xitk_enable_and_show_widget(mmkeditor->end);
 
   x += w + 20 + 15;
   y -= 5;
@@ -2846,8 +2851,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
 				       x, y, w, 20, NULL, NULL, NULL)));
   xitk_set_widget_tips_default(mmkeditor->end, _("Mediamark end time (secs)."));
-
-
+  xitk_enable_and_show_widget(mmkeditor->offset);
 
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
@@ -2863,6 +2867,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 					       &lb, x, y, 100, 23,
 					       "Black", "Black", "White", btnfontname)));
   xitk_set_widget_tips_default(b, _("Apply the changes to the playlist."));
+  xitk_enable_and_show_widget(b);
 
   x = WINDOW_WIDTH - 115;
   
@@ -2878,7 +2883,8 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 					       &lb, x, y, 100, 23,
 					       "Black", "Black", "White", btnfontname)));
   xitk_set_widget_tips_default(b, _("Discard changes and dismiss the window."));
-  
+  xitk_enable_and_show_widget(b);
+
   xitk_window_change_background(gGui->imlib_data, mmkeditor->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
 

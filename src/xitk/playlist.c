@@ -641,9 +641,9 @@ void playlist_update_playlist(void) {
  * Leaving playlist editor
  */
 void playlist_exit(xitk_widget_t *w, void *data) {
-  window_info_t wi;
 
   if(playlist) {
+    window_info_t wi;
     
     mmk_editor_end();
 
@@ -724,7 +724,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
     while(autoplay_plugins[i] != NULL) {
       
       if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
-	int                num_mrls;
+	int                num_mrls = 0;
 	char             **autoplay_mrls = 
 	  xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i], &num_mrls);
 	

@@ -504,6 +504,7 @@ static uint32_t xitk_check_wm(Display *display) {
 	   (format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0)) {
 	  
 	  if(win_id == *(long *)prop_return) {
+	    if (wm_name) free(wm_name);
 	    wm_name = get_wm_name(display, win_id, "_NET_WM_NAME");
 	    type |= WM_TYPE_EWMH_COMP;
 	  }
@@ -768,9 +769,10 @@ void xitk_set_window_layer(Window window, int layer) {
 
 void xitk_set_ewmh_fullscreen(Window window) {
   XEvent xev;
+  
   if(!(gXitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
-
+  
   XLockDisplay(gXitk->display);
   
   xev.xclient.type         = ClientMessage;
@@ -978,6 +980,7 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 	free(fx->xdnd);
       }
 
+      fx->xevent_callback = NULL;
       xitk_list_delete_current(gXitk->gfx); 
       free(fx);
       
@@ -1576,6 +1579,9 @@ void xitk_init(Display *display) {
 #endif
 
   gXitk->wm_type = xitk_check_wm(display);
+  
+  /* init font caching */
+  xitk_font_cache_init();
 }
 
 /* Return True is event type isn't completion */
@@ -1717,6 +1723,9 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   xitk_config_deinit(gXitk->config);
   
   XITK_FREE(gXitk);
+
+  /* destroy font caching */
+  xitk_font_cache_done();
 }
 
 /*
@@ -1836,35 +1845,31 @@ char *xitk_set_locale(void) {
  * Return home directory.
  */
 const char *xitk_get_homedir(void) {
-  struct passwd *pw = NULL;
-  char *homedir = NULL;
-#ifdef HAVE_GETPWUID_R
-  int ret;
-  struct passwd pwd;
-  char *buffer = NULL;
-  int bufsize = 256;
+  struct passwd  pwd, *pw = NULL;
+  static char    homedir[BUFSIZ] = {0,};
 
-  buffer = (char *) xitk_xmalloc(bufsize);
-  
-  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) != 0) {
+  if(homedir[0])
+    return homedir;
+
+#ifdef HAVE_GETPWUID_R
+  if(getpwuid_r(getuid(), &pwd, homedir, sizeof(homedir), &pw) != 0 || pw == NULL) {
 #else
   if((pw = getpwuid(getuid())) == NULL) {
 #endif
-    if((homedir = getenv("HOME")) == NULL) {
-      XITK_WARNING("Unable to get home directory, set it to /tmp.\n");
-      homedir = strdup("/tmp");
+    char *tmp = getenv("HOME");
+    if(tmp) {
+      strncpy(homedir, tmp, sizeof(homedir));
+      homedir[sizeof(homedir) - 1] = '\0';
     }
+  } else {
+    strncpy(homedir, pw->pw_dir, sizeof(homedir));
+    homedir[sizeof(homedir) - 1] = '\0';
   }
-  else {
-    if(pw) 
-      homedir = strdup(pw->pw_dir);
+
+  if(!homedir[0]) {
+    XITK_WARNING("Unable to get home directory, set it to /tmp.\n");
+    strcpy(homedir, "/tmp");
   }
-  
-  
-#ifdef HAVE_GETPWUID_R
-  if(buffer) 
-    XITK_FREE(buffer);
-#endif
-  
+
   return homedir;
 }

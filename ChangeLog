@@ -1,7 +1,14 @@
 xine-ui (0.9.22) unstable; urgency=low
 
-  * don't show up mouse cursor on keyboard action.
-  * network control can manage loop modes.
+  * new widget, double box,
+  * font caching (+fix) and cleanups from Frantisek Dvorak,
+  * change policy of created widget, all non skinned are disabled and hidden,
+  * new window: post plugin chain, aka "chain reaction",
+  * support gxine playlist format,
+  * support new audio event from the lib,
+  * fix window stacking bug while switching output modes (windowed/fullscreen),
+  * don't show up mouse cursor on keyboard action,
+  * network control can manage loop modes,
   * fix crash when pressing 'm' or 'n' with empty playlist
 	
 xine-ui (0.9.21) unstable; urgency=low

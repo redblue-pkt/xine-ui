@@ -1,5 +1,5 @@
 
-SUBDIRS = common Imlib-light xitk aaui dfb fb
+SUBDIRS = common xitk aaui dfb fb
 
 debug:
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -13,7 +13,6 @@ install-debug: debug
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#* 
-
 
 maintainer-clean-generic:
 	-@echo "This command is intended for maintainers to use;"

@@ -750,28 +750,36 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int kbedit       = kbedit_is_visible();
   int event_sender = event_sender_is_visible();
   int stream_infos = stream_infos_is_visible();
+  int tvset        = tvset_is_visible();
+  int pplugin      = pplugin_is_visible();
+
+  if(!(video_window_is_visible()))
+    return;
 
   if(panel)
     panel_toggle_visibility(NULL, NULL);
-  if(mrl_browser)
-    mrl_browser_toggle_visibility(NULL, NULL);
-  if(playlist)
-    playlist_toggle_visibility(NULL, NULL);
-  if(control)
-    control_toggle_visibility(NULL, NULL);
-  if(setup)
-    setup_toggle_visibility(NULL, NULL);
-  if(viewlog)
-    viewlog_toggle_visibility(NULL, NULL);
-  if(kbedit)
-    kbedit_toggle_visibility(NULL, NULL);
-  if(event_sender)
-    event_sender_toggle_visibility(NULL, NULL);
-  if(stream_infos)
-    stream_infos_toggle_visibility(NULL, NULL);
-  
-  if(!(video_window_is_visible()))
-    video_window_set_visibility(1);
+  else {
+    if(mrl_browser)
+      mrl_browser_toggle_visibility(NULL, NULL);
+    if(playlist)
+      playlist_toggle_visibility(NULL, NULL);
+    if(control)
+      control_toggle_visibility(NULL, NULL);
+    if(setup)
+      setup_toggle_visibility(NULL, NULL);
+    if(viewlog)
+      viewlog_toggle_visibility(NULL, NULL);
+    if(kbedit)
+      kbedit_toggle_visibility(NULL, NULL);
+    if(event_sender)
+      event_sender_toggle_visibility(NULL, NULL);
+    if(stream_infos)
+      stream_infos_toggle_visibility(NULL, NULL);
+    if(tvset)
+      tvset_toggle_visibility(NULL, NULL);
+    if(pplugin)
+      pplugin_toggle_visibility(NULL, NULL);
+  }
   
   video_window_set_fullscreen_mode(fullscreen_mode);
   
@@ -781,22 +789,30 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   
   if(panel)
     panel_toggle_visibility(NULL, NULL);
-  if(mrl_browser)
-    mrl_browser_toggle_visibility(NULL, NULL);
-  if(playlist)
-    playlist_toggle_visibility(NULL, NULL);
-  if(control)
-    control_toggle_visibility(NULL, NULL);
-  if(setup)
-    setup_toggle_visibility(NULL, NULL);
-  if(viewlog)
-    viewlog_toggle_visibility(NULL, NULL);
-  if(kbedit)
-    kbedit_toggle_visibility(NULL, NULL);
-  if(event_sender)
-    event_sender_toggle_visibility(NULL, NULL);
-  if(stream_infos)
-    stream_infos_toggle_visibility(NULL, NULL);
+  else {
+    if(mrl_browser)
+      mrl_browser_toggle_visibility(NULL, NULL);
+    if(playlist)
+      playlist_toggle_visibility(NULL, NULL);
+    if(control)
+      control_toggle_visibility(NULL, NULL);
+    if(setup)
+      setup_toggle_visibility(NULL, NULL);
+    if(viewlog)
+      viewlog_toggle_visibility(NULL, NULL);
+    if(kbedit)
+      kbedit_toggle_visibility(NULL, NULL);
+    if(event_sender)
+      event_sender_toggle_visibility(NULL, NULL);
+    if(stream_infos)
+      stream_infos_toggle_visibility(NULL, NULL);
+    if(tvset)
+      tvset_toggle_visibility(NULL, NULL);
+    if(pplugin) {
+      pplugin_toggle_visibility(NULL, NULL);
+    }
+  }
+
 }
 
 void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
@@ -1429,6 +1445,20 @@ void gui_tvset_show(xitk_widget_t *w, void *data) {
   }
 }
 
+void gui_vpp_show(xitk_widget_t *w, void *data) {
+  
+  if (pplugin_is_running() && !pplugin_is_visible())
+    pplugin_toggle_visibility(NULL, NULL);
+  else if(!pplugin_is_running())
+    pplugin_panel();
+  else {
+    if(gGui->use_root_window)
+      pplugin_toggle_visibility(NULL, NULL);
+    else
+      pplugin_end();
+  }
+}
+
 
 void gui_viewlog_show(xitk_widget_t *w, void *data) {
 
@@ -1609,7 +1639,9 @@ void gui_add_mediamark(void) {
     if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
       secs /= 1000;
       
-      mediamark_add_entry(gGui->mmk.mrl, gGui->mmk.ident, gGui->mmk.sub, secs, -1, gGui->mmk.offset);
+      mediamark_add_entry(gGui->mmk.mrl, gGui->mmk.ident, 
+			  gGui->mmk.sub, secs, -1, gGui->mmk.offset);
+      playlist_update_playlist();
     }
   }
 }

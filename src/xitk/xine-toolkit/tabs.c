@@ -40,17 +40,15 @@ static void tabs_arrange(xitk_widget_t *);
  *
  */
 static void enability(xitk_widget_t *w) {
-  tabs_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    int i;
-    
-    private_data = (tabs_private_data_t *) w->private_data;
+    tabs_private_data_t *private_data = (tabs_private_data_t *) w->private_data;
+    int                  i;
 
     if(w->enable == WIDGET_ENABLE) {
-      xitk_enable_widget(private_data->left);
-      xitk_enable_widget(private_data->right);
+      xitk_enable_and_show_widget(private_data->left);
+      xitk_enable_and_show_widget(private_data->right);
       for(i = 0; i < private_data->num_entries; i++)
 	xitk_enable_widget(private_data->tabs[i]);
     }
@@ -451,8 +449,8 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   mywidget->wl                    = wl;
 
   mywidget->enable                = 1;
-  mywidget->running               = 1;
-  mywidget->visible               = 1;
+  mywidget->running               = 0;
+  mywidget->visible               = 0;
 
   mywidget->have_focus            = FOCUS_LOST; 
   mywidget->imlibdata             = private_data->imlibdata;

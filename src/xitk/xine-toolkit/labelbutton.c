@@ -746,5 +746,5 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
   i = xitk_image_create_image(b->imlibdata, width * 3, height);
   draw_bevel_three_state(b->imlibdata, i);
 
-  return _xitk_labelbutton_create(wl, NULL, b, x, y, NULL, i, ncolor, fcolor, ccolor, fname, 1, 0, 1, 1);
+  return _xitk_labelbutton_create(wl, NULL, b, x, y, NULL, i, ncolor, fcolor, ccolor, fname, 1, 0, 0, 0);
 }

@@ -49,7 +49,7 @@ xitk_list_t *xitk_list_new (void) {
 /*
  *
  */
-void xitk_list_free(xitk_list_t *l) {
+void xitk_list_clear(xitk_list_t *l) {
   xitk_node_t *node;
 
   if (!l) {
@@ -71,6 +71,19 @@ void xitk_list_free(xitk_list_t *l) {
   }
   
   l->first = l->cur = l->last = NULL;
+}
+
+/*
+ *
+ */
+void xitk_list_free(xitk_list_t *l) {
+  if (!l) {
+    XITK_WARNING("No list.\n");
+    return;
+  }
+
+  xitk_list_clear(l);
+  XITK_FREE(l);
 }
 
 /*

@@ -34,6 +34,16 @@
 #define FONT_HEIGHT_MODEL    "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN&й(-и_за)=№~#{[|`\\^@]}%"
 
 /*
+ * init font cache subsystem
+ */
+void xitk_font_cache_init(void);
+
+/*
+ * destroy font cache subsystem
+ */
+void xitk_font_cache_done(void);
+
+/*
  * load font from font name. Return NULL on failure.
  */
 xitk_font_t *xitk_font_load_font(Display *display, char *font);

@@ -20,29 +20,28 @@
  * $Id$
  *
  */
+#ifndef HAVE_XITK_DOUBLEBOX_H
+#define HAVE_XITK_DOUBLEBOX_H
 
-#ifndef POST_H
-#define POST_H
-
-#include <xine.h>
+#include "_xitk.h"
 
 typedef struct {
-  xine_post_t    *post;
-  char           *name;
-} post_element_t;
+  ImlibData                      *imlibdata;
+  char                           *skin_element_name;
 
-void post_init(void);
-void post_rewire_visual_anim(void);
-void post_rewire_video_post(void);
-int post_rewire_audio_port_to_stream(xine_stream_t *stream);
-int post_rewire_audio_post_to_stream(xine_stream_t *stream);
-int post_rewire_video_post_to_stream(xine_stream_t *stream);
+  xitk_widget_t                  *input_widget;
+  xitk_widget_t                  *more_widget;
+  xitk_widget_t                  *less_widget;
 
-void pplugin_end(void);
-int pplugin_is_visible(void);
-int pplugin_is_running(void);
-void pplugin_toggle_visibility(xitk_widget_t *w, void *data);
-void pplugin_raise_window(void);
-void pplugin_panel(void);
+  double                          step;
+  double                          value;
+  int                             force_value;
+
+  xitk_widget_list_t             *parent_wlist;
+
+  xitk_state_double_callback_t    callback;
+  void                           *userdata;
+
+} doublebox_private_data_t;
 
 #endif

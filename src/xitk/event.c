@@ -666,6 +666,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_toggle_tvmode();
     break;
 
+  case ACTID_TVANALOG:
+    gui_tvset_show(NULL, NULL);
+    break;
+
   case ACTID_VIEWLOG:
     gui_viewlog_show(NULL, NULL);
     break;
@@ -795,6 +799,10 @@ void gui_execute_action_id(action_id_t action) {
       control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
       osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
+    break;
+
+  case ACTID_VPP:
+    gui_vpp_show(NULL, NULL);
     break;
 
   default:
@@ -1301,8 +1309,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->kbindings = kbindings_init_kbinding();
 
   panel_init ();
-  
-  (void *) getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
 }
 
 void gui_init_imlib (Visual *vis) {
@@ -1352,18 +1358,22 @@ void gui_init_imlib (Visual *vis) {
 				      xine_bits, 40, 40);
 }
 
-
 /*
  *
  */
 static void on_start(void *data) {
   int start = (int) data;
 
-  gui_display_logo();
-  
-  do {
-    xine_usec_sleep(5000);
-  } while(gGui->logo_mode != 1);
+#warning **** FIXME no OSD on first (audio only) playback
+  if((!start && !gGui->playlist.num) || (!start && gGui->playlist.num)) {
+
+    gui_display_logo();
+    
+    do {
+      xine_usec_sleep(5000);
+    } while(gGui->logo_mode != 1);
+
+  }
 
   if(start)
     gui_execute_action_id(ACTID_PLAY);
@@ -1392,7 +1402,7 @@ void gui_run(void) {
       for(i=0; autoscan_plugins[i] != NULL; ++i) {
 
 	if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
-	  int                num_mrls, j;
+	  int    num_mrls, j;
 	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
 							 gGui->autoscan_plugin,
 							 &num_mrls);
@@ -1503,4 +1513,6 @@ void gui_run(void) {
 
   kbindings_save_kbinding(gGui->kbindings);
   kbindings_free_kbinding(&gGui->kbindings);
+
+  XCloseDisplay(gGui->display);
 }

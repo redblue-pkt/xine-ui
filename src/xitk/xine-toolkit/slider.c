@@ -908,5 +908,5 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   
   radius = (b->height >> 1) - (p->height);
 
-  return _xitk_slider_create(wl,NULL, s, x, y, NULL, b, p, type, radius, 1, 1);
+  return _xitk_slider_create(wl,NULL, s, x, y, NULL, b, p, type, radius, 0, 0);
 }

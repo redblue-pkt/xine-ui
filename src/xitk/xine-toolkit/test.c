@@ -82,6 +82,10 @@ typedef struct {
   xitk_widget_t        *intbox;
   int                   oldintvalue;
 
+  /* Doublebox */
+  xitk_widget_t        *doublebox;
+  double                olddoublevalue;
+
   /* checkbox */
   xitk_widget_t        *checkbox;
 
@@ -145,6 +149,12 @@ static int init_test(void) {
  *
  */
 static void deinit_test(void) {
+  int i = 0;
+
+  while(test->entries[i]) {
+    free(test->entries[i]);
+    i++;
+  }
 }
 
 /*
@@ -153,6 +163,7 @@ static void deinit_test(void) {
 static void test_end(xitk_widget_t *w, void *data) {
   XUnmapWindow(test->display, (xitk_window_get_window(test->xwin)));
   xitk_destroy_widgets(test->widget_list);
+  free(test->widget_list);
   xitk_stop();
 }
 
@@ -373,8 +384,60 @@ static void create_intbox(void) {
   xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
 	    (test->intbox = 
 	     xitk_noskin_intbox_create(test->widget_list, &ib, x, y, 60, 20, NULL, NULL, NULL)));
-
+  xitk_enable_and_show_widget(test->intbox);
   xitk_set_widget_tips_default(test->intbox, "This is a intbox");
+}
+
+/*
+ *
+ */
+static void doublechange_cb(xitk_widget_t *w, void *data, int btn) {
+
+  switch(btn) {
+  case XITK_WINDOW_ANSWER_YES:
+    test->olddoublevalue = xitk_doublebox_get_value(test->doublebox);
+    break;
+    
+  case XITK_WINDOW_ANSWER_NO:
+  case XITK_WINDOW_ANSWER_CANCEL:
+    xitk_doublebox_set_value(test->doublebox, test->olddoublevalue);
+    break;
+  }
+}
+
+/*
+ *
+ */
+static void notify_doublebox_change(xitk_widget_t *w, void *data, double value) {
+
+  xitk_window_dialog_yesnocancel(test->imlibdata, NULL,
+				 doublechange_cb, 
+				 doublechange_cb, 
+				 doublechange_cb, 
+				 NULL, ALIGN_DEFAULT, 
+				 _("New double value is: %e. Confirm ?"), value);
+}
+
+/*
+ *
+ */
+static void create_doublebox(void) {
+  int x = 150, y = 330;
+  xitk_doublebox_widget_t ib;
+
+  XITK_WIDGET_INIT(&ib, test->imlibdata);
+
+  ib.skin_element_name = NULL;
+  ib.value             = test->olddoublevalue = 1.500;
+  ib.step              = .5;
+  ib.parent_wlist      = test->widget_list;
+  ib.callback          = notify_doublebox_change;
+  ib.userdata          = NULL;
+  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
+	    (test->doublebox = 
+	     xitk_noskin_doublebox_create(test->widget_list, &ib, x, y, 60, 20, NULL, NULL, NULL)));
+  xitk_enable_and_show_widget(test->doublebox);
+  xitk_set_widget_tips_default(test->doublebox, "This is a doublebox");
 }
 
 /*
@@ -392,6 +455,7 @@ static void create_checkbox(void) {
   xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
 		    (test->checkbox = 
 		     xitk_noskin_checkbox_create(test->widget_list, &cb, x, y, 20, 20)));
+  xitk_enable_and_show_widget(test->checkbox);
 
   xitk_set_widget_tips_default(test->checkbox, "This is a checkbox");
 }
@@ -429,6 +493,7 @@ static void create_tabs(void) {
   xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
 		    (test->tabs = 
 		     xitk_noskin_tabs_create(test->widget_list, &t, x, y, w, fontname)));
+  xitk_enable_and_show_widget(test->tabs);
 
 }
 
@@ -472,6 +537,7 @@ static void create_inputtext(void) {
 	    xitk_noskin_inputtext_create(test->widget_list, &inp,
 					 150, 150, 150, 20,
 					 "Black", "Black", fontname)));
+  xitk_enable_and_show_widget(test->input);
 
   xitk_set_widget_tips_default(test->input, "This is an inputtext");
 }
@@ -503,6 +569,7 @@ static void create_label(void) {
 	   (test->label = 
 	    xitk_noskin_label_create(test->widget_list, &lbl,
 				     x, y, len, (asc+des)*2, fontname)));
+  xitk_enable_and_show_widget(test->label);
 
   xitk_set_widget_tips_default(test->label, "This is a label");
 
@@ -532,7 +599,8 @@ static void create_button(void) {
 	   (test->button = 
 	    xitk_noskin_button_create(test->widget_list, &b,
 				      x, y, width, height)));
-  
+  xitk_enable_and_show_widget(test->button);
+
   xitk_set_widget_tips_default(test->button, "This is a button");
 
   { /* Draw red spot. */
@@ -610,6 +678,7 @@ static void create_sliders(void) {
 		   (test->hslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      17, 208, 117, 20,
 							      XITK_HSLIDER)));
+  xitk_enable_and_show_widget(test->hslider);
   xitk_slider_set_pos(test->hslider, 0);
 
   xitk_set_widget_tips_default(test->hslider, "This is an horizontal slider");
@@ -626,6 +695,7 @@ static void create_sliders(void) {
 		   (test->vslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      17, 230, 20, 117,
 							      XITK_VSLIDER)));
+  xitk_enable_and_show_widget(test->vslider);
   xitk_slider_set_pos(test->vslider, 0);
 
   xitk_set_widget_tips_default(test->vslider, "This is a vertical slider");
@@ -642,6 +712,7 @@ static void create_sliders(void) {
 		   (test->rslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      50, 240, 80, 80,
 							      XITK_RSLIDER)));
+  xitk_enable_and_show_widget(test->rslider);
   xitk_slider_set_pos(test->rslider, 0);
   
   xitk_set_widget_tips_default(test->rslider, "This is a rotate button");
@@ -698,6 +769,7 @@ static void create_combo(void) {
   cmb.skin_element_name = NULL;
   cmb.parent_wlist      = test->widget_list;
   cmb.entries           = test->entries;
+  cmb.layer_above       = 0;
   cmb.parent_wkey       = &test->kreg;
   cmb.callback          = combo_select;
   cmb.userdata          = NULL;
@@ -705,6 +777,7 @@ static void create_combo(void) {
 		   (test->combo = 
 		    xitk_noskin_combo_create(test->widget_list, &cmb,
 					     x, y, width, NULL, NULL)));
+  xitk_enable_and_show_widget(test->combo);
 }
 
 /*
@@ -741,6 +814,7 @@ static void create_browser(void) {
       test->entries[i] = strdup(buf);
     }
     
+    test->entries[i] = NULL;
     test->num_entries = i;
   }
 
@@ -760,6 +834,7 @@ static void create_browser(void) {
 		     xitk_noskin_browser_create(test->widget_list, &browser,
 						XITK_WIDGET_LIST_GC(test->widget_list), 20, 30, 
 						100, 20, 12, fontname)));
+  xitk_enable_and_show_widget(test->browser);
   
   xitk_browser_update_list(test->browser, 
 			   (const char *const *)test->entries, test->num_entries, 0);
@@ -889,6 +964,7 @@ int main(int argc, char **argv) {
 					       (windoww / 2) - 50, windowh - 50,
 					       100, 30,
 					       "Black", "Black", "White", fontname)));
+  xitk_enable_and_show_widget(w);
   xitk_set_widget_tips_default(w, "Do you really want to leave me ?");
 
   create_browser();
@@ -900,6 +976,7 @@ int main(int argc, char **argv) {
   create_frame();
   create_tabs();
   create_intbox();
+  create_doublebox();
   create_checkbox();
   
   test->kreg = xitk_register_event_handler("test", 
@@ -922,5 +999,9 @@ int main(int argc, char **argv) {
   XFreeGC(test->display, gc);
   XUnlockDisplay (test->display);
 
+  XCloseDisplay(test->display);
+
+  free(test);
+  
   return 1;
 }

@@ -399,8 +399,7 @@ static void paint_inputtext(xitk_widget_t *w) {
     private_data = (inputtext_private_data_t *) w->private_data;
 
     if(w->visible == 1) {
-    
-      
+
       if(w->enable && (!private_data->cursor_focus) 
 	 && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, w->wl->win, w)))
 	_cursor_focus(private_data, w->wl->win, 1);
@@ -1183,5 +1182,5 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   draw_bevel_two_state(it->imlibdata, i);
   
 
-  return _xitk_inputtext_create(wl, NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 1, 1);
+  return _xitk_inputtext_create(wl, NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 0, 0);
 }

@@ -1,4 +1,4 @@
-SUBDIRS = xine-toolkit skins
+SUBDIRS = Imlib-light xine-toolkit skins
 
 AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
@@ -28,18 +28,18 @@ xine_SOURCES = \
 	lang.c \
 	lirc.c \
 	main.c \
+	mediamark.c \
 	menus.c \
 	mrl_browser.c \
 	network.c \
 	osd.c \
+	panel.c \
+	playlist.c \
+	post.c \
 	session.c \
 	setup.c \
 	skins.c \
 	snapshot.c \
-	panel.c \
-	playlist.c \
-	post.c \
-	mediamark.c \
 	stream_infos.c \
 	tvset.c \
 	videowin.c \
@@ -64,8 +64,8 @@ xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) \
 session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
 
 noinst_HEADERS = \
-	common.h \
 	actions.h \
+	common.h \
 	config_wrapper.h \
 	control.h \
 	download.h \
@@ -78,6 +78,7 @@ noinst_HEADERS = \
 	kbindings.h \
 	lang.h \
 	lirc.h \
+	mediamark.h \
 	menus.h \
 	mrl_browser.h \
 	network.h \
@@ -85,12 +86,11 @@ noinst_HEADERS = \
 	panel.h \
 	playlist.h \
 	post.h \
-	mediamark.h \
 	session.h \
 	setup.h \
 	skins.h \
-	stream_infos.h \
 	snapshot.h \
+	stream_infos.h \
 	tvset.h \
 	videowin.h \
 	viewlog.h

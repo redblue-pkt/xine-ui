@@ -47,7 +47,7 @@
 #include <X11/extensions/XShm.h>
 #endif
 
-#include "Imlib-light/Imlib.h"
+#include "xitk/Imlib-light/Imlib.h"
 
 #include "xitk.h"
 
@@ -58,6 +58,7 @@
 #include "checkbox.h"
 #include "combo.h"
 #include "dnd.h"
+#include "doublebox.h"
 #include "filebrowser.h"
 #include "font.h"
 #include "image.h"
@@ -308,6 +309,7 @@ void menu_auto_pop(xitk_widget_t *w);
 struct xitk_font_s {
   Display       *display;
   XFontStruct   *font;
+  char          *name;
 };
 
 typedef struct xitk_dialog_s xitk_dialog_t;

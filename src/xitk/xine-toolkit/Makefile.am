@@ -23,6 +23,7 @@ libxitk_la_SOURCES = \
 	combo.c \
 	config.c \
 	dnd.c \
+	doublebox.c \
 	filebrowser.c \
 	font.c \
 	getdeskroot.c \
@@ -44,7 +45,7 @@ libxitk_la_SOURCES = \
 
 libxitk_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 \
 	-lXext $(X_EXTRA_LIBS)  $(THREAD_LIBS) $(INTLLIBS) \
-	$(top_builddir)/src/Imlib-light/libImlib-light.la
+	$(top_builddir)/src/xitk/Imlib-light/libImlib-light.la
 
 noinst_HEADERS = \
 	_config.h \
@@ -55,6 +56,7 @@ noinst_HEADERS = \
 	checkbox.h \
 	combo.h \
 	dnd.h \
+	doublebox.h \
 	filebrowser.h \
 	font.h \
 	image.h \
@@ -77,8 +79,8 @@ test_SOURCES = test.c
 test_DEPENDENCIES = libxitk.la
 test_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
 
-$(top_builddir)/src/Imlib-light/libImlib-light.la:
-	@cd $(top_builddir)/src/Imlib-light && $(MAKE) libImlib-light.la
+$(top_builddir)/src/xitk/Imlib-light/libImlib-light.la:
+	@cd $(top_builddir)/src/xitk/Imlib-light && $(MAKE) libImlib-light.la
 
 
 $(top_builddir)/src/xitk/xine-toolkit/libxitk.la:

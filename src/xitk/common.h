@@ -116,6 +116,9 @@ typedef struct {
   int                       post_video_num;
   xine_post_t              *post_video;
 
+  post_element_t          **post_elements;
+  int                       post_elements_num;
+
   struct {
     int                     hue;
     int                     brightness;

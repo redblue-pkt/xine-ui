@@ -1698,8 +1698,8 @@ float video_window_get_mag (void) {
  */
 void video_window_update_logo(void) {
   xine_cfg_entry_t  cfg_entry;
-  char             *skin_logo;
-  int               cfg_err_result;
+  char                *skin_logo;
+  int                  cfg_err_result;
   
   cfg_err_result = xine_config_lookup_entry(gGui->xine, "gui.logo_mrl", &cfg_entry);
   skin_logo = xitk_skin_get_logo(gGui->skin_config);

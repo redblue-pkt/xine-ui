@@ -932,6 +932,8 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
 					wd->widget_list,
 					(void *)wd);
 
+  xitk_enable_and_show_widget(wd->wyes);
+
   return wd->xwin;
 }
 
@@ -1124,6 +1126,9 @@ xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *ti
 					NULL,
 					wd->widget_list,
 					(void *)wd);
+  xitk_enable_and_show_widget(wd->wyes);
+  xitk_enable_and_show_widget(wd->wno);
+
   return wd->xwin;
 }
 
@@ -1342,6 +1347,9 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
 					NULL,
 					wd->widget_list,
 					(void *)wd);
+  xitk_enable_and_show_widget(wd->wyes);
+  xitk_enable_and_show_widget(wd->wno);
+  xitk_enable_and_show_widget(wd->wcancel);
 
   return wd->xwin;
 }

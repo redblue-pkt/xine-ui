@@ -331,7 +331,7 @@ static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
     break;
 
   case SETS_TVANALOG:
-    gui_tvset_show(NULL, NULL);
+    gui_execute_action_id(ACTID_TVANALOG);
     break;
 
   case SETS_LOGS:
@@ -373,6 +373,9 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Open/File...",
       NULL,
       menu_file_selector,        NULL                                                        },
+    { "Open/Playlist...",
+      NULL,
+      menu_playlist_ctrl, (void *) PLAYL_LOAD                                                },
     { "Open/Location...",
       NULL,
       menu_mrl_browser, NULL                                                                 },

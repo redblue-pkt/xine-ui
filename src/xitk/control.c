@@ -309,10 +309,11 @@ void control_config_register(void) {
  * Leaving control panel, release memory.
  */
 void control_exit(xitk_widget_t *w, void *data) {
-  window_info_t wi;
-  int           i;
 
   if(control) {
+    window_info_t wi;
+    int           i;
+    
     control->running = 0;
     control->visible = 0;
 

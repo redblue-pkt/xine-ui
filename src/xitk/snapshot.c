@@ -587,9 +587,11 @@ int scale_image( struct prvt_image_s *image )
   image->u_width = nu_width;
   image->v_width = nv_width;
 
+#ifdef DEBUG
   printf("  Post scaled\n    Width %d %d %d\n    Height %d %d %d\n",
     image->width, image->u_width, image->v_width,
     image->height, image->u_height, image->v_height );
+#endif
 
   return( 1 );
 }
@@ -876,7 +878,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   err = xine_get_current_frame(gGui->stream, &width, &height, &ratio_code, &format, NULL);
   
   if (err == 0) {
-    printf("   xine_get_current_frame() failed\n");
+    error_msg_cb(msg_cb_data, _("xine_get_current_frame() failed\n"));
     return;
   }
 
@@ -891,11 +893,13 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     return;
   }
   
-  printf("snapshot.c: allocating space for a %d x %d image\n", width, height );
+#ifdef DEBUG
+  printf("%s:allocating space for a %d x %d image\n", __FILE__, width, height);
+#endif
   
   if ( ! prvt_image_alloc( &image, width*height*2 ) )
   {
-    printf("  prvt_image_alloc failed\n");
+    error_msg_cb(msg_cb_data, _("prvt_image_alloc failed\n"));
     return;
   }
 
@@ -904,65 +908,83 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 			       &image->format, image->img);
   
   if (err == 0) {
-    printf("   Framegrabber failed\n");
+    error_msg_cb(msg_cb_data, _("Framegrabber failed\n"));
     prvt_image_free( &image );
     return;
   }
 
   /* the dxr3 driver does not allocate yuv buffers */
   if (! image->img) { /* image->u and image->v are always 0 for YUY2 */
-    printf(_("snapshot.c: not supported for this video out driver\n"));
+    error_msg_cb(msg_cb_data, _("Not supported for this video out driver\n"));
     prvt_image_free( &image );
     return;
   }
 
+#ifdef DEBUG
   printf("  width:  %d\n", image->width );
   printf("  height: %d\n", image->height );
   printf("  ratio:  " );
+#endif
 
   switch ( image->ratio_code ) {
     case XINE_VO_ASPECT_SQUARE:
+#ifdef DEBUG
       printf( "XINE_ASPECT_RATIO_SQUARE\n" ); 
+#endif
       image->scale_line = scale_line_1_1;
       image->scale_factor = ( 32768 * 1 ) / 1;
       break;
 
     case XINE_VO_ASPECT_4_3:
+#ifdef DEBUG
       printf( "XINE_ASPECT_RATIO_4_3\n" ); 
+#endif
       image->scale_line = scale_line_15_16;
       image->scale_factor = ( 32768 * 16 ) / 15;
       break;
 
     case XINE_VO_ASPECT_ANAMORPHIC: 
+#ifdef DEBUG
       printf( "XINE_ASPECT_RATIO_ANAMORPHIC\n" ); 
+#endif
       image->scale_line = scale_line_45_64;
       image->scale_factor = ( 32768 * 64 ) / 45;
       break;
 
     case XINE_VO_ASPECT_DVB:      
+#ifdef DEBUG
       printf( "XINE_ASPECT_RATIO_211_1\n" ); 
+#endif
       image->scale_line = scale_line_45_64;
       image->scale_factor = ( 32768 * 64 ) / 45;
       break;
 
     case XINE_VO_ASPECT_DONT_TOUCH: 
+#ifdef DEBUG
       printf( "XINE_ASPECT_RATIO_DONT_TOUCH\n" ); 
+#endif
       image->scale_line = scale_line_1_1;
       image->scale_factor = ( 32768 * 1 ) / 1;
       break;
     default:                
       /* the mpeg standard has a few that we don't know about */
-      printf( "snapshot.c: warning: unknown aspect ratio. will assume 1:1\n" ); 
+#ifdef DEBUG
+      printf( "Warning: unknown aspect ratio. will assume 1:1\n" ); 
+#endif
       image->scale_line = scale_line_1_1;
       image->scale_factor = ( 32768 * 1 ) / 1;
       break;
   }
 
+#ifdef DEBUG
   printf("  format: " );
-  
+#endif
+ 
   switch ( image->format ) {
     case XINE_IMGFMT_YV12:
+#ifdef DEBUG
       printf( "XINE_IMGFMT_YV12\n" ); 
+#endif
       image->y        = image->img;
       image->u        = image->img + (image->width*image->height);
       image->v        = image->img + (image->width*image->height)+(image->width*image->height)/4;
@@ -973,7 +995,9 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
       break;
 
     case XINE_IMGFMT_YUY2: 
+#ifdef DEBUG
       printf( "XINE_IMGFMT_YUY2\n" );
+#endif
       image->yuy2     = image->img;
       image->u_width  = ((image->width+1)/2);
       image->v_width  = ((image->width+1)/2);
@@ -982,8 +1006,10 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
       break;
 
     default:                
+#ifdef DEBUG
       printf( "Unknown\nError: Format Code %d Unknown\n", image->format ); 
       printf( "  ** Please report this error to andrew@anvil.org **\n" );
+#endif
       prvt_image_free( &image );
       return;
   }
@@ -1007,7 +1033,9 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   /**/
 
+#ifdef DEBUG
   printf("  Setup png_write_struct\n" );
+#endif
 
   image->struct_ptr = png_create_write_struct (
     PNG_LIBPNG_VER_STRING,
@@ -1016,19 +1044,21 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     user_warning_fn);
 
   if (image->struct_ptr == NULL) {
-    printf( "  png_create_write_struct() failed\n" );
+    error_msg_cb(msg_cb_data, _("png_create_write_struct() failed\n"));
     prvt_image_free( &image );
     return;
   }
 
   /**/
 
+#ifdef DEBUG
   printf("  Setup png_info_struct\n" );
+#endif
 
   image->info_ptr = png_create_info_struct(image->struct_ptr);
 
   if (image->info_ptr == NULL) {
-    printf( "  png_create_info_struct() failed\n" );
+    error_msg_cb(msg_cb_data, _("png_create_info_struct() failed\n"));
     prvt_image_free( &image );
     return;
   }
@@ -1038,14 +1068,17 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
    *  Set up long jump callback for PNG parser
    */
 
+#ifdef DEBUG
   printf("  Setup long jump\n" );
+#endif
+
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
   if (setjmp(png_jmpbuf(image->struct_ptr)))
 #else
   if (setjmp(image->struct_ptr->jmpbuf))
 #endif
   {
-    printf( "  PNG Parsing failed\n" );
+    error_msg_cb(msg_cb_data, _("PNG Parsing failed\n"));
     prvt_image_free( &image );
     return;
   }
@@ -1055,9 +1088,11 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
    *  If YUY2 convert to YV12
    */
   if ( image->format == XINE_IMGFMT_YUY2 ) {
+#ifdef DEBUG
     printf("  Convert YUY2 to YV12\n" );
+#endif
     if ( yuy2_fudge( image ) == 0 ) {
-      printf("  Error: yuy2_fudge failed\n");
+      error_msg_cb(msg_cb_data, _("Error: yuy2_fudge failed\n"));
       return;
     }
   }
@@ -1065,7 +1100,9 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   /*
    *  Scale YUV data
    */
+#ifdef DEBUG
   printf("  Scale YUV Image data\n" );
+#endif
 
 #ifdef DEBUG
   xine_profiler_start_count (prof_scale_image);
@@ -1080,11 +1117,13 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   /*
    *  Allocate RGB data structures within image
    */
+#ifdef DEBUG
   printf("  Allocate RGB data space\n" );
+#endif
 
   if ( !rgb_alloc( image ) )
   {
-    printf( "  rgb_alloc() failed\n" );
+    error_msg_cb(msg_cb_data, _("rgb_alloc() failed\n"));
     prvt_image_free( &image );
     return;
   }
@@ -1092,7 +1131,9 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   /*
    *  Move data from yuv to rgb
    */
+#ifdef DEBUG
   printf("  Reformat YUV Image data to RGB\n" );
+#endif
 
 #ifdef DEBUG
   xine_profiler_start_count (prof_yuv2rgb);
@@ -1106,7 +1147,9 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   /**/
 
+#ifdef DEBUG
   printf("  png_set_filter\n" );
+#endif
 
 #ifdef DEBUG
   xine_profiler_start_count (prof_png);
@@ -1114,15 +1157,21 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 
   png_set_filter( image->struct_ptr, 0, PNG_FILTER_NONE  | PNG_FILTER_VALUE_NONE );
 
+#ifdef DEBUG
   printf("  png_init_io\n" );
+#endif
   png_init_io(image->struct_ptr, image->fp);
   
+#ifdef DEBUG
   printf("  png_set_write_status_fn\n" );
+#endif
   png_set_write_status_fn(image->struct_ptr, write_row_callback);
 
   /**/
 
+#ifdef DEBUG
   printf("  png_set_IHDR\n" );
+#endif
   png_set_IHDR( 
     image->struct_ptr, 
     image->info_ptr, 
@@ -1137,9 +1186,13 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   /**/
 
 #if defined(PNG_INFO_IMAGE_SUPPORTED)
+#ifdef DEBUG
   printf("  png_set_rows\n" );
+#endif
   png_set_rows ( image->struct_ptr, image->info_ptr, image->rgb );
+#ifdef DEBUG
   printf("  png_write_png\n" );
+#endif
   png_write_png( image->struct_ptr, image->info_ptr, PNG_TRANSFORM_IDENTITY, NULL);
 #else
   png_write_info(image->struct_ptr, image->info_ptr);
@@ -1155,7 +1208,9 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
     info_msg_cb(msg_cb_data, umessage);
   }
 
+#ifdef DEBUG
   printf("  prvt_image_free\n" );
+#endif
   prvt_image_free( &image );
 
 #ifdef DEBUG

@@ -292,33 +292,36 @@ void event_sender_update_menu_buttons(void) {
 }
 
 void event_sender_exit(xitk_widget_t *w, void *data) {
-  window_info_t wi;
 
-  eventer->running = 0;
-  eventer->visible = 0;
-
-  if((xitk_get_window_info(eventer->widget_key, &wi))) {
-    config_update_num ("gui.eventer_x", wi.x);
-    config_update_num ("gui.eventer_y", wi.y);
-    WINDOW_INFO_ZERO(&wi);
+  if(eventer) {
+    window_info_t wi;
+    
+    eventer->running = 0;
+    eventer->visible = 0;
+    
+    if((xitk_get_window_info(eventer->widget_key, &wi))) {
+      config_update_num ("gui.eventer_x", wi.x);
+      config_update_num ("gui.eventer_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
+    
+    xitk_unregister_event_handler(&eventer->widget_key);
+    
+    xitk_destroy_widgets(eventer->widget_list);
+    xitk_window_destroy_window(gGui->imlib_data, eventer->xwin);
+    
+    eventer->xwin = None;
+    xitk_list_free((XITK_WIDGET_LIST_LIST(eventer->widget_list)));
+    
+    XLockDisplay(gGui->display);
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(eventer->widget_list)));
+    XUnlockDisplay(gGui->display);
+    
+    free(eventer->widget_list);
+    
+    free(eventer);
+    eventer = NULL;
   }
-
-  xitk_unregister_event_handler(&eventer->widget_key);
-
-  xitk_destroy_widgets(eventer->widget_list);
-  xitk_window_destroy_window(gGui->imlib_data, eventer->xwin);
-
-  eventer->xwin = None;
-  xitk_list_free((XITK_WIDGET_LIST_LIST(eventer->widget_list)));
-  
-  XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(eventer->widget_list)));
-  XUnlockDisplay(gGui->display);
-
-  free(eventer->widget_list);
-
-  free(eventer);
-  eventer = NULL;
 }
 
 int event_sender_is_visible(void) {
@@ -414,6 +417,7 @@ void event_sender_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   int                        x, y, i;
+  xitk_widget_t             *w;
 
   eventer = (_eventer_t *) xine_xmalloc(sizeof(_eventer_t));
   
@@ -472,7 +476,8 @@ void event_sender_panel(void) {
 					   &lb, x, y, 70, 40,
 					   "Black", "Black", "White", 
 					   eventerfontname)));
-  
+  xitk_enable_and_show_widget(eventer->navigator.up);
+
   x -= 70;
   y += 40;
 
@@ -489,6 +494,7 @@ void event_sender_panel(void) {
 					   &lb, x, y, 70, 40,
 					   "Black", "Black", "White", 
 					   eventerfontname)));
+  xitk_enable_and_show_widget(eventer->navigator.left);
 
   x += 75;
   y += 5;
@@ -506,6 +512,7 @@ void event_sender_panel(void) {
 					   &lb, x, y, 60, 30,
 					   "Black", "Black", "White", 
 					   eventerfontname)));
+  xitk_enable_and_show_widget(eventer->navigator.select);
 
   x += 65;
   y -= 5;
@@ -523,6 +530,7 @@ void event_sender_panel(void) {
 					   &lb, x, y, 70, 40,
 					   "Black", "Black", "White", 
 					   eventerfontname)));
+  xitk_enable_and_show_widget(eventer->navigator.right);
 
   x -= 70;
   y += 40;
@@ -540,6 +548,7 @@ void event_sender_panel(void) {
 					   &lb, x, y, 70, 40,
 					   "Black", "Black", "White", 
 					   eventerfontname)));
+  xitk_enable_and_show_widget(eventer->navigator.down);
 
   x = 23 * 2 + 5 + 8;
   y = 5 + 23 * 3 + 5 + 40 + 5;
@@ -566,7 +575,8 @@ void event_sender_panel(void) {
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 23, 23,
 					     "Black", "Black", "White", eventerfontname)));
-
+    xitk_enable_and_show_widget(eventer->numbers.number[i]);
+  
     if(!((i - 1) % 3)) {
       y += 23;
       x += 46;
@@ -599,6 +609,7 @@ void event_sender_panel(void) {
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 46, 23,
 					     "Black", "Black", "White", eventerfontname)));
+    xitk_enable_and_show_widget(eventer->numbers.number[i]);
   }
 
   x = WINDOW_WIDTH - 80 - 5;
@@ -616,6 +627,8 @@ void event_sender_panel(void) {
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 80, 23,
 					   "Black", "Black", "White", eventerfontname)));
+  xitk_enable_and_show_widget(eventer->angles.next);
+
   y += 23;
 
   lb.button_type       = CLICK_BUTTON;
@@ -630,6 +643,7 @@ void event_sender_panel(void) {
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 80, 23,
 					   "Black", "Black", "White", eventerfontname)));
+  xitk_enable_and_show_widget(eventer->angles.prev);
 
 
   /* Initialize menu labels */
@@ -665,6 +679,7 @@ void event_sender_panel(void) {
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 80, 23,
 					     "Black", "Black", "White", eventerfontname)));
+    xitk_enable_and_show_widget(eventer->menus.menu[i]);
 
     if(i == 2) {
       x += 80;
@@ -690,9 +705,10 @@ void event_sender_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
-   xitk_noskin_labelbutton_create(eventer->widget_list, 
-				  &lb, x, y, 70, 23,
-				  "Black", "Black", "White", eventerfontname));
+   (w = xitk_noskin_labelbutton_create(eventer->widget_list, 
+				       &lb, x, y, 70, 23,
+				       "Black", "Black", "White", eventerfontname)));
+  xitk_enable_and_show_widget(w);
 
   eventer->widget_key = xitk_register_event_handler("eventer", 
 						    (xitk_window_get_window(eventer->xwin)),

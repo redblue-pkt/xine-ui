@@ -35,7 +35,7 @@
 #include <X11/Xlib.h>
 #include <pthread.h>
 #include <stdarg.h>
-#include "Imlib-light/Imlib.h"
+#include "xitk/Imlib-light/Imlib.h"
 
 #ifdef NEED_MRLBROWSER
 #include <xine.h>
@@ -43,8 +43,8 @@
 
 #define XITK_MAJOR_VERSION          (0)
 #define XITK_MINOR_VERSION          (10)
-#define XITK_SUB_VERSION            (3)
-#define XITK_VERSION                "0.10.3"
+#define XITK_SUB_VERSION            (4)
+#define XITK_VERSION                "0.10.4"
 
 #define XITK_CHECK_VERSION(major, minor, sub)                          \
                                     (XITK_MAJOR_VERSION > (major) ||   \
@@ -96,6 +96,7 @@ typedef void (*xitk_startup_callback_t)(void *);
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
 typedef void (*xitk_menu_callback_t)(xitk_widget_t *, xitk_menu_entry_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
+typedef void (*xitk_state_double_callback_t)(xitk_widget_t *, void *, double);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
 typedef void (*xitk_dnd_callback_t) (char *filename);
 typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
@@ -232,7 +233,8 @@ typedef struct {
 #define WIDGET_GROUP_COMBO          0x00010000
 #define WIDGET_GROUP_TABS           0x00020000
 #define WIDGET_GROUP_INTBOX         0x00040000
-#define WIDGET_GROUP_MENU           0x00080000
+#define WIDGET_GROUP_DOUBLEBOX      0x00080000
+#define WIDGET_GROUP_MENU           0x00100000
 
 /* Real widgets. */
 #define WIDGET_TYPE_MASK            0x00001FFF
@@ -609,6 +611,21 @@ typedef struct {
   void                             *userdata;
 } xitk_intbox_widget_t;
 
+typedef struct {
+  int                              magic;
+  ImlibData                       *imlibdata;
+  
+  char                            *skin_element_name;
+  
+  double                           value;
+  double                           step;
+
+  xitk_widget_list_t              *parent_wlist;
+
+  xitk_state_double_callback_t      callback;
+  void                             *userdata;
+} xitk_doublebox_widget_t;
+
 struct xitk_menu_entry_s {
   char                             *menu;
   char                             *type; /* NULL, <separator>, <branch>, <check>, <checked> */
@@ -905,6 +922,11 @@ void xitk_show_widgets(xitk_widget_list_t *);
 void xitk_show_widget(xitk_widget_t *);
 
 /**
+ *
+ */
+void xitk_enable_and_show_widget(xitk_widget_t *w);
+
+/**
  * Set widgets of widget list not visible.
  */
 void xitk_hide_widgets(xitk_widget_list_t *);
@@ -913,6 +935,11 @@ void xitk_hide_widgets(xitk_widget_list_t *);
  * Hide a widget.
  */
 void xitk_hide_widget(xitk_widget_t *);
+
+/**
+ *
+ */
+void xitk_disable_and_hide_widget(xitk_widget_t *w);
 
 /**
  *
@@ -1063,6 +1090,11 @@ void xitk_slider_callback_exec(xitk_widget_t *);
  * Create a new list.
  */
 xitk_list_t *xitk_list_new (void);
+
+/**
+ * Clear list.
+ */
+void xitk_list_clear(xitk_list_t *l);
 
 /**
  * Freeing list.
@@ -1822,6 +1854,11 @@ int xitk_combo_is_same_parent(xitk_widget_t *w1, xitk_widget_t *w2);
 /**
  *
  */
+void xitk_combo_callback_exec(xitk_widget_t *w);
+
+/**
+ *
+ */
 unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b);
 
 /**
@@ -2230,6 +2267,12 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
 void xitk_intbox_set_value(xitk_widget_t *, int);
 int xitk_intbox_get_value(xitk_widget_t *);
 
+xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
+					    xitk_doublebox_widget_t *ib,
+					    int x, int y, int width, int height, 
+					    xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
+void xitk_doublebox_set_value(xitk_widget_t *, double);
+double xitk_doublebox_get_value(xitk_widget_t *);
 
 int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
 void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);

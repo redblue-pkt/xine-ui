@@ -73,6 +73,8 @@ gGui_t                       *gGui;
 int                           no_lirc;
 #endif
 
+extern _panel_t              *panel;
+
 static char                 **video_driver_ids;
 static char                 **audio_driver_ids;
 static window_attributes_t    window_attribute;
@@ -317,7 +319,6 @@ static void xrm_parse(void) {
   XrmDatabase   rmdb, home_rmdb, server_rmdb, application_rmdb;
   XrmValue      value;
   
-  rmdb = NULL;
   XrmInitialize();
 
   rmdb = home_rmdb = server_rmdb = application_rmdb = NULL;
@@ -387,9 +388,12 @@ static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
  *
  */
 void show_version(void) {
-
-  printf(_("This is xine (X11 gui) - a free video player v%s\n"
-	   "(c) 2000-2003 by G. Bartsch and the xine project team.\n"), VERSION);
+  
+  printf(_("This is xine (X11 gui) - a free video player v%s"), VERSION);
+#ifdef DEBUG
+  printf("-[DEBUG]");
+#endif
+  printf(_(".\n(c) 2000-2003 The xine Team.\n"));
 }
 
 /*
@@ -1028,8 +1032,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     if(event->stream == gGui->stream) {
       xine_audio_level_data_t *aevent = (xine_audio_level_data_t *) event->data;
       
-      printf("XINE_EVENT_AUDIO_LEVEL: left 0>%d<255, right 0>%d<255\n", 
-	     aevent->left, aevent->right);
+      gGui->mixer.volume_level = (aevent->left + aevent->right) / 2;
+      gGui->mixer.mute = aevent->mute;
+      xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
+      xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
     }
     break;
 
@@ -1150,6 +1156,8 @@ int main(int argc, char *argv[]) {
   gGui->verbosity              = 0;
   gGui->broadcast_port         = 0;
   gGui->display_logo           = 1;
+  gGui->post_elements          = NULL;
+  gGui->post_elements_num      = 0;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1178,6 +1186,8 @@ int main(int argc, char *argv[]) {
   /*
    * parse command line
    */
+#warning command line: -post <name>:option1=value1,option2=value2....
+
   opterr = 0;
   while((c = getopt_long(_argc, _argv, short_options,
 			 long_options, &option_index)) != EOF) {
@@ -1542,6 +1552,17 @@ int main(int argc, char *argv[]) {
    * xine init
    */
   xine_init(gGui->xine);
+
+  /* Get old working path from input plugin */
+  {
+    xine_cfg_entry_t  cfg_entry;
+    
+    if(xine_config_lookup_entry(gGui->xine, "input.file_origin_path", &cfg_entry))
+      sprintf(gGui->curdir, "%s", cfg_entry.str_value);
+    else
+      (void *) getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
+
+  }
 
   /*
    * load and init output drivers
