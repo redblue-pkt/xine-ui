@@ -108,6 +108,9 @@ audio.oss_latency               For softsync you can manually adjust the default
                                 so if the sound seems delayed 1 second from the video
                                 set it to 1000. (default value = 0)
 
+audio.passthrough_offset        the audio offset for passthrough output.
+                                The unit is PTS (1/90000s), defaults to 10000.
+
 audio.sun_static_delay          sun driver static delay (latency)
 
 
