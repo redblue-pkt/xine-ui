@@ -47,6 +47,7 @@
 #include <X11/extensions/XShm.h>
 #endif
 #ifdef WITH_XFT
+#include <ft2build.h>
 #include <X11/Xft/Xft.h>
 #endif
 
@@ -271,7 +272,7 @@ void xitk_strdupa(char *dest, char *src);
 #define CHECK_STYLE_CHECK 2
 #define CHECK_STYLE_ROUND 3
 
-int xitk_x_error;
+extern int xitk_x_error;
 
 #ifndef _XITK_C_
 

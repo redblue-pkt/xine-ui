@@ -30,6 +30,8 @@
 
 #include "_xitk.h"
 
+int xitk_x_error = 0;
+
 /*
  * Get a pixel color from rgb values.
  */
