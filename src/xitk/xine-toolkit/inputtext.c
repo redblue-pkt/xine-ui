@@ -322,7 +322,7 @@ static void create_labelofinputtext(xitk_widget_t *w,
   /*  Put text in the right place */
   if(private_data->skin_element_name) {
     XLOCK(private_data->imlibdata->x.disp);
-    XDrawString(private_data->imlibdata->x.disp, pix, gc, 
+    xitk_font_draw_string(fs, pix, gc, 
 		2, ((ysize+asc+des+yoff)>>1)-des, 
 		plabel, strlen(plabel));
     XUNLOCK(private_data->imlibdata->x.disp);
@@ -345,7 +345,7 @@ static void create_labelofinputtext(xitk_widget_t *w,
     XCopyArea (private_data->imlibdata->x.disp, pix, tpix->pixmap, lgc, 0, 0,
 	       xsize, ysize, 0, 0);
     
-    XDrawString(private_data->imlibdata->x.disp, tpix->pixmap, lgc, 
+    xitk_font_draw_string(fs, tpix->pixmap, lgc, 
 		2, ((ysize+asc+des+yoff)>>1)-des, 
 		plabel, strlen(plabel));
     

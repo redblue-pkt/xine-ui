@@ -188,7 +188,7 @@ static void paint_label(xitk_widget_t *w) {
 		 0, 0, private_data->font->width, private_data->font->height, 0, 0);
       XSetForeground(private_data->imlibdata->x.disp, font->image->gc, 
 		     xitk_get_pixel_color_black(private_data->imlibdata));
-      XDrawString(private_data->imlibdata->x.disp, bg->image->pixmap, font->image->gc,
+      xitk_font_draw_string(fs, bg->image->pixmap, font->image->gc,
 		  2, ((private_data->font->height + asc + des)>>1) - des,
 		  private_data->label, strlen(private_data->label));
       XCopyArea (private_data->imlibdata->x.disp, bg->image->pixmap, w->wl->win, 

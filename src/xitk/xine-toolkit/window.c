@@ -424,7 +424,7 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
   else
     XSetForeground(im->x.disp, bar->gc, (xitk_get_pixel_color_from_rgb(im, 85, 12, 135)));
   
-  XDrawString(im->x.disp, bar->pixmap, bar->gc, 
+  xitk_font_draw_string(fs, bar->pixmap, bar->gc, 
 	      (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT+asc+des) >> 1) - des, 
 	      title, strlen(title));
   XUNLOCK(im->x.disp);

@@ -184,19 +184,19 @@ static void create_labelofbutton(xitk_widget_t *lb,
   
   /*  Put text in the right place */
   if(private_data->align == ALIGN_CENTER) {
-    XDrawString(private_data->imlibdata->x.disp, pix, gc, 
+    xitk_font_draw_string(fs, pix, gc, 
 		((xsize-(width+xoff))>>1) + private_data->label_offset, 
 		((ysize+asc+des+yoff)>>1)-des, 
 		label, strlen(label));
   }
   else if(private_data->align == ALIGN_LEFT) {
-    XDrawString(private_data->imlibdata->x.disp, pix, gc, 
+    xitk_font_draw_string(fs, pix, gc, 
 		(((state != CLICK) ? 1 : 5)) + private_data->label_offset, 
 		((ysize+asc+des+yoff)>>1)-des, 
 		label, strlen(label));
   }
   else if(private_data->align == ALIGN_RIGHT) {
-    XDrawString(private_data->imlibdata->x.disp, pix, gc, 
+    xitk_font_draw_string(fs, pix, gc, 
     		(xsize - (width + ((state != CLICK) ? 5 : 1))) + private_data->label_offset,
     		((ysize+asc+des+yoff)>>1)-des, 
     		label, strlen(label));

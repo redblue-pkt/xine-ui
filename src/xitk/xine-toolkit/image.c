@@ -494,7 +494,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
 	x = (width - length);
       
       XLOCK(im->x.disp);
-      XDrawString(im->x.disp, image->image->pixmap, gc, 
+      xitk_font_draw_string(fs, image->image->pixmap, gc, 
 		  x, (j - descent), lines[i], strlen(lines[i]));
       XUNLOCK(im->x.disp);
 	
@@ -1158,7 +1158,7 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
   if(title) {
     XLOCK(im->x.disp);
     XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_black(im));
-    XDrawString(im->x.disp, p->pixmap, p->gc, (x + 6), y, buf, strlen(buf));
+    xitk_font_draw_string(fs, p->pixmap, p->gc, (x + 6), y, buf, strlen(buf));
     XUNLOCK(im->x.disp);
     
     xitk_font_unload_font(fs);

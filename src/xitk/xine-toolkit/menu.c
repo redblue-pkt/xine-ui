@@ -815,8 +815,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 	XFillRectangle(private_data->imlibdata->x.disp, bg->pixmap, private_data->widget->wl->gc, 
 		       1, 1, wwidth , 20);
 	XSetForeground(private_data->imlibdata->x.disp, private_data->widget->wl->gc, cfg);
-	XDrawString(private_data->imlibdata->x.disp, 
-		    bg->pixmap, private_data->widget->wl->gc, 5, 1+ ((20+asc+des)>>1)-des, 
+	xitk_font_draw_string(fs, bg->pixmap, 
+		    private_data->widget->wl->gc, 
+		    5, 1+ ((20+asc+des)>>1)-des, 
 		    me->menu_entry->menu, strlen(me->menu_entry->menu));
 	XUNLOCK(private_data->imlibdata->x.disp);
 	

@@ -308,7 +308,11 @@ void menu_auto_pop(xitk_widget_t *w);
 
 struct xitk_font_s {
   Display       *display;
+#ifdef WITH_XMB
+  XFontSet       fontset;
+#else
   XFontStruct   *font;
+#endif
   char          *name;
 };
 

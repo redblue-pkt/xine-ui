@@ -411,6 +411,14 @@ dnl
 dnl Check for DirectFB
 dnl
 
+dnl option for font sets and multibyte string support
+AC_ARG_ENABLE(mbs, [  --disable-mbs           Disable multibyte string support], echo $enable_mbs, enable_mbs="yes")
+if test "x$enable_mbs" = "xyes"; then
+  AC_DEFINE(WITH_XMB,,[Define this if you want support multibyte strings in gui])
+fi
+
+
+
 dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
 dnl  DFB:
 dnl  Temporary disabled, port to new API needed

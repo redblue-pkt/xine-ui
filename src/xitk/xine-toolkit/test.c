@@ -636,16 +636,16 @@ static void create_button(void) {
       col = xitk_get_pixel_color_black(test->imlibdata);
 
       XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), col);
-      XDrawString(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
+      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
 		  50, ((height+asc+des) >> 1) - des, label, strlen(label));
-      XDrawString(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
+      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
 		  (width) + 50, ((height+asc+des) >> 1) - des, label, strlen(label));
       
       {
 	char *nlabel = _("!BOOM!");
 
       xitk_font_string_extent(fs, nlabel, &lbear, &rbear, &wid, &asc, &des);
-      XDrawString(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
+      xitk_font_draw_string(fs, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
 		  ((width * 2) + 50) + 1, (((height+asc+des) >> 1) - des) + 1, 
 		  nlabel, strlen(nlabel));
       }

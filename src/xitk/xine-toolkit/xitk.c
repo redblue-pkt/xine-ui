@@ -1499,7 +1499,11 @@ void xitk_xevent_notify(XEvent *event) {
  */
 void xitk_init(Display *display) {
   
-  printf("-[ xiTK version %d.%d.%d ]-\n",
+  printf("-[ xiTK version %d.%d.%d "
+#ifdef WITH_XMB
+	 "[XMB]"
+#endif
+	 "]-\n",
 	 XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
 
   xitk_pid = getppid();

@@ -43,8 +43,8 @@
 
 #define XITK_MAJOR_VERSION          (0)
 #define XITK_MINOR_VERSION          (10)
-#define XITK_SUB_VERSION            (4)
-#define XITK_VERSION                "0.10.4"
+#define XITK_SUB_VERSION            (5)
+#define XITK_VERSION                "0.10.5"
 
 #define XITK_CHECK_VERSION(major, minor, sub)                          \
                                     (XITK_MAJOR_VERSION > (major) ||   \
@@ -1732,22 +1732,14 @@ void xitk_font_unload_font(xitk_font_t *xtfs);
 /*
  *
  */
-Font xitk_font_get_font_id(xitk_font_t *xtfs);
+void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc, 
+			   int x, int y, const char *text, 
+			   size_t nbytes);
 
 /*
  *
  */
-int xitk_font_is_font_8(xitk_font_t *xtfs);
-
-/*
- *
- */
-int xitk_font_is_font_16(xitk_font_t *xtfs);
-
-/*
- *
- */
-int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int length);
+int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int nbytes);
 
 /*
  *
@@ -1757,12 +1749,12 @@ int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c);
 /*
  *
  */
-int xitk_font_get_char_width(xitk_font_t *xtfs, unsigned char *c);
+int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nbytes);
 
 /*
  *
  */
-int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int length);
+int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes);
 
 /*
  *
@@ -1772,12 +1764,12 @@ int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c);
 /*
  *
  */
-int xitk_font_get_char_height(xitk_font_t *xtfs, unsigned char *c);
+int xitk_font_get_char_height(xitk_font_t *xtfs, char *c, int maxnbytes, int *nbytes);
 
 /*
  *
  */
-void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int length,
+void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
 
 /*

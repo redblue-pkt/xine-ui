@@ -37,8 +37,6 @@
 
 #include "_xitk.h"
 
-#warning IMPLEMENT xitk_draw_widget_list()
-
 static xitk_color_names_t xitk_color_names[] = {
   { 255,  250,  250,  "snow" },
   { 248,  248,  255,  "GhostWhite" },
