@@ -3042,12 +3042,12 @@ void start_remote_server(void) {
 }
 
 const char *get_homedir(void) {
-  struct passwd  pwd, *pw = NULL;
-  static char    homedir[_BUFSIZ] = {0,};
-  
+  struct passwd pwd, *pw = NULL;
+  static char homedir[BUFSIZ] = {0,};
+
   if(homedir[0])
     return homedir;
-  
+
 #ifdef HAVE_GETPWUID_R
   if(getpwuid_r(getuid(), &pwd, homedir, sizeof(homedir), &pw) != 0 || pw == NULL) {
 #else
@@ -3059,15 +3059,17 @@ const char *get_homedir(void) {
       homedir[sizeof(homedir) - 1] = '\0';
     }
   } else {
-    strncpy(homedir, pw->pw_dir, sizeof(homedir));
+    char *s = strdup(pw->pw_dir);
+    strncpy(homedir, s, sizeof(homedir));
     homedir[sizeof(homedir) - 1] = '\0';
+    free(s);
   }
-  
+
   if(!homedir[0]) {
-    fprintf(stderr, "Unable to get home directory, set it to /tmp.\n");
+    printf("Unable to get home directory, set it to /tmp.\n");
     strcpy(homedir, "/tmp");
   }
-  
+
   return homedir;
 }
 

@@ -1800,17 +1800,24 @@ void gui_add_mediamark(void) {
 }
 
 static void fileselector_cancel_callback(filebrowser_t *fb) {
-  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
-  config_update_string("input.file_origin_path", gGui->curdir);
+  char *cur_dir = filebrowser_get_current_dir(fb);
+
+  if(cur_dir && strlen(cur_dir)) {
+    sprintf(gGui->curdir, "%s", cur_dir);
+    config_update_string("input.file_origin_path", gGui->curdir);
+  }
 }
 
 static void fileselector_callback(filebrowser_t *fb) {
   char *file;
+  char *cur_dir = filebrowser_get_current_dir(fb);
   
-  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
-  config_update_string("input.file_origin_path", gGui->curdir);
+  if(cur_dir && strlen(cur_dir)) {
+    sprintf(gGui->curdir, "%s", cur_dir);
+    config_update_string("input.file_origin_path", gGui->curdir);
+  }
   
-  if((file = filebrowser_get_full_filename(fb)) != NULL) {
+  if(((file = filebrowser_get_full_filename(fb)) != NULL) && strlen(file)) {
     int first  = gGui->playlist.num;
 
     if(file)  {
@@ -1836,15 +1843,17 @@ static void fileselector_callback(filebrowser_t *fb) {
 
 static void fileselector_all_callback(filebrowser_t *fb) {
   char **files;
-  char  *path;
-
-  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
-  config_update_string("input.file_origin_path", gGui->curdir);
+  char  *path = filebrowser_get_current_dir(fb);
+  
+  if(path && strlen(path)) {
+    sprintf(gGui->curdir, "%s", path);
+    config_update_string("input.file_origin_path", gGui->curdir);
+  }
   
   if((files = filebrowser_get_all_files(fb)) != NULL) {
     int i = 0;
 
-    if((path = filebrowser_get_current_dir(fb)) != NULL) {
+    if(path && strlen(path)) {
       char pathname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
       char fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
       int  first = gGui->playlist.num;

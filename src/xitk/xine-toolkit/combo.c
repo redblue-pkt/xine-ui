@@ -61,7 +61,7 @@ static void enability(xitk_widget_t *w) {
 }
 
 static void notify_destroy(xitk_widget_t *w) {
-  
+
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
@@ -79,10 +79,10 @@ static void notify_destroy(xitk_widget_t *w) {
     XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
     XUNLOCK(private_data->imlibdata->x.disp);
 
-    XITK_FREE(private_data->widget_list);
+    free(private_data->widget_list);
 
     XITK_FREE(private_data->skin_element_name);
-    XITK_FREE(private_data);
+    free(private_data);
   }
 }
 

@@ -30,12 +30,6 @@
 
 #include "_xitk.h"
 
-typedef struct {
-  xitk_widget_t    *itemlist;
-  int               sel;
-} btnlist_t;
-
-
 #define WBUP    0  /*  Position of button up in item_tree  */
 #define WSLID   1  /*  Position of slider in item_tree  */
 #define WBDN    2  /*  Position of button down in item_tree  */
@@ -149,7 +143,12 @@ static void notify_destroy(xitk_widget_t *w) {
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
            (w->type & WIDGET_GROUP_WIDGET))) {
+    int  i;
+
     private_data = (browser_private_data_t *) w->private_data;
+    
+    for(i = WBSTART; i < private_data->max_length + WBSTART; i++)
+      XITK_FREE(private_data->bt[i]);
     
     XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data);
@@ -1001,22 +1000,21 @@ xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
   {
 
     int x, y, i;
-    btnlist_t *bt;
     
     x = xitk_skin_get_coord_x(skonfig, br->browser.skin_element_name);
     y = xitk_skin_get_coord_y(skonfig, br->browser.skin_element_name);
     
     for(i = WBSTART; i < (EXTRA_BTNS + WBSTART); i++) {
       
-      bt = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
-      bt->itemlist = mywidget;
-      bt->sel = i;
+      private_data->bt[i]           = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
+      private_data->bt[i]->itemlist = mywidget;
+      private_data->bt[i]->sel      = i;
       
       lb.button_type       = RADIO_BUTTON;
       lb.label             = "";
       lb.callback          = NULL;
       lb.state_callback    = browser_select;
-      lb.userdata          = (void *)(bt);
+      lb.userdata          = (void *)(private_data->bt[i]);
       lb.skin_element_name = br->browser.skin_element_name;
       xitk_list_append_content(br->parent_wlist->l, 
 			       (private_data->item_tree[i] = 
@@ -1126,21 +1124,20 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
 
   {
     int            ix = x, iy = y, i;
-    btnlist_t     *bt;
     xitk_image_t  *wimage;
 
     for(i = WBSTART; i < (br->browser.max_displayed_entries+WBSTART); i++) {
 
-      bt = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
-      bt->itemlist = mywidget;
-      bt->sel = i;
-      
+      private_data->bt[i]           = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
+      private_data->bt[i]->itemlist = mywidget;
+      private_data->bt[i]->sel      = i;
+
       lb.button_type       = RADIO_BUTTON;
       lb.label             = "";
       lb.align             = ALIGN_LEFT;
       lb.callback          = NULL;
       lb.state_callback    = browser_select;
-      lb.userdata          = (void *)(bt);
+      lb.userdata          = (void *)(private_data->bt[i]);
       lb.skin_element_name = NULL;
       xitk_list_append_content(br->parent_wlist->l, 
 			       (private_data->item_tree[i] = 

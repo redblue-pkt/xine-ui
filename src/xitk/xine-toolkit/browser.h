@@ -35,6 +35,9 @@ typedef struct {
 
   xitk_widget_t          *bWidget;
   xitk_widget_t          *item_tree[BROWSER_MAX_ENTRIES];
+
+  btnlist_t              *bt[BROWSER_MAX_ENTRIES];
+
   xitk_widget_list_t     *parent_wlist;
 
   xitk_skin_config_t     *skonfig;

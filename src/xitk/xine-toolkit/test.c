@@ -161,9 +161,16 @@ static void deinit_test(void) {
  *
  */
 static void test_end(xitk_widget_t *w, void *data) {
-  XUnmapWindow(test->display, (xitk_window_get_window(test->xwin)));
+  xitk_unregister_event_handler(&test->kreg);
+
   xitk_destroy_widgets(test->widget_list);
+  xitk_window_destroy_window(test->imlibdata, test->xwin);
+
+  xitk_list_free((XITK_WIDGET_LIST_LIST(test->widget_list)));
+  XFreeGC(test->display, (XITK_WIDGET_LIST_GC(test->widget_list)));
+
   free(test->widget_list);
+
   xitk_stop();
 }
 
@@ -1010,13 +1017,10 @@ int main(int argc, char **argv) {
 
   deinit_test();
 
-  XLockDisplay (test->display);
-  XFreeGC(test->display, gc);
-  XUnlockDisplay (test->display);
-
   XCloseDisplay(test->display);
 
   free(test);
-  
+  test = NULL;
+
   return 1;
 }

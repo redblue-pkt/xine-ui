@@ -67,7 +67,7 @@ void xitk_list_clear(xitk_list_t *l) {
     
     /* XITK_FREE(n->content);  Content should (IS) be fried elswhere */
     node = n->next;
-    XITK_FREE(n);
+    free(n);
   }
   
   l->first = l->cur = l->last = NULL;
@@ -83,7 +83,7 @@ void xitk_list_free(xitk_list_t *l) {
   }
 
   xitk_list_clear(l);
-  XITK_FREE(l);
+  free(l);
 }
 
 /*
@@ -135,9 +135,8 @@ void *xitk_list_last_content (xitk_list_t *l) {
     l->cur = l->last;
     return l->last->content;
   } 
-  else {
-    return NULL;
-  }    
+
+  return NULL;
 }
 
 /*
@@ -150,12 +149,9 @@ void *xitk_list_prev_content (xitk_list_t *l) {
       l->cur = l->cur->prev;
       return l->cur->content;
     } 
-    else
-      return NULL;
   } 
-  else
-    return NULL;
 
+  return NULL;
 }
 
 /*
@@ -228,5 +224,5 @@ void xitk_list_delete_current (xitk_list_t *l) {
   }
 
   //  XITK_FREE(node_cur->content);
-  XITK_FREE(node_cur);
+  free(node_cur);
 }

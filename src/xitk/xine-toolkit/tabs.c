@@ -29,11 +29,6 @@
 #include "_xitk.h"
 
 
-typedef struct {
-  xitk_widget_t    *itemlist;
-  int               sel;
-} btnlist_t;
-
 static void tabs_arrange(xitk_widget_t *);
 
 /*
@@ -62,7 +57,6 @@ static void enability(xitk_widget_t *w) {
   }
 }
   
-/*
 static void notify_destroy(xitk_widget_t *w) {
   tabs_private_data_t *private_data;
   
@@ -72,14 +66,14 @@ static void notify_destroy(xitk_widget_t *w) {
     
     private_data = (tabs_private_data_t *) w->private_data;
 
+    for(i = 0; i <= private_data->num_entries; i++)
+      XITK_FREE(private_data->bt[i]);
+
     XITK_FREE(private_data->skin_element_name);
-    for(i = 0; i <= private_data->num_entries; i++) {
-      xitk_destroy_widget(private_data->tabs[i]);
-    }
     XITK_FREE(private_data);
   }
 }
-*/
+
 /*
  *
  */
@@ -195,6 +189,9 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   switch(event->type) {
   case WIDGET_EVENT_PAINT:
     paint(w);
+    break;
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
     break;
   case WIDGET_EVENT_ENABLE:
     enability(w);
@@ -375,9 +372,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
     for(i = 0; i < t->num_entries; i++) {
 
-      bt = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
-      bt->itemlist = mywidget;
-      bt->sel = i;
+      private_data->bt[i]           = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
+      private_data->bt[i]->itemlist = mywidget;
+      private_data->bt[i]->sel      = i;
 
       fwidth = xitk_font_get_string_length(fs, t->entries[i]);
 
@@ -387,7 +384,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
       lb.label             = t->entries[i];
       lb.callback          = NULL;
       lb.state_callback    = tabs_select;
-      lb.userdata          = (void *)bt;
+      lb.userdata          = (void *) (private_data->bt[i]);
       xitk_list_append_content (t->parent_wlist->l, 
 			(private_data->tabs[i] = 
 			 xitk_noskin_labelbutton_create (t->parent_wlist, &lb, xx, y, fwidth + 20, 

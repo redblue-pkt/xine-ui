@@ -685,7 +685,7 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
   }
 
   xitk_unregister_event_handler(&wd->key);
-
+  
   if(wd->widget_list) {
     xitk_destroy_widgets(wd->widget_list);
     
@@ -694,8 +694,8 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
     XUNLOCK(wd->imlibdata->x.disp);
     
     xitk_list_free(wd->widget_list->l);
-    
-    XITK_FREE(wd->widget_list);
+
+    free(wd->widget_list);
   }
   
   XITK_FREE(wd);

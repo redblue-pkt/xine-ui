@@ -51,8 +51,12 @@
 
 #include "xitk.h"
 
-#include "_config.h"
+typedef struct {
+  xitk_widget_t    *itemlist;
+  int               sel;
+} btnlist_t;
 
+#include "_config.h"
 #include "browser.h"
 #include "button.h"
 #include "checkbox.h"

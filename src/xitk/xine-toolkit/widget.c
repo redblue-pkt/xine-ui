@@ -1103,7 +1103,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     }
   }
   
-  if((wl->widget_focused == NULL) && menu)
+  if(!(wl->widget_focused) && menu)
     wl->widget_focused = menu;
 
   return((bRepaint == 1));

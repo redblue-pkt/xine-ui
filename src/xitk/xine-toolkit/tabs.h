@@ -37,6 +37,7 @@ typedef struct {
   int                     x, y, width;
 
   xitk_widget_t          *tabs[MAX_TABS];
+  btnlist_t              *bt[MAX_TABS];
 
   char                  **entries;
   int                     num_entries;

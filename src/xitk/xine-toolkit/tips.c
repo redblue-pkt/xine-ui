@@ -55,8 +55,8 @@ static void _tips_kill_running(void) {
 
     pthread_cancel(disptips->thread);
     
-    xitk_window_destroy_window(disptips->w->imlibdata, disptips->xwin);
     xitk_unregister_event_handler(&disptips->key);
+    xitk_window_destroy_window(disptips->w->imlibdata, disptips->xwin);
     
     XLOCK(disptips->w->imlibdata->x.disp);
     XSync(disptips->w->imlibdata->x.disp, False);
@@ -105,8 +105,8 @@ static void *_tips_destroy_thread(void *data) {
   pthread_mutex_lock(&tp->mutex);
 
   /* Kill tips window */
-  xitk_window_destroy_window(tp->w->imlibdata, tp->xwin);
   xitk_unregister_event_handler(&tp->key);
+  xitk_window_destroy_window(tp->w->imlibdata, tp->xwin);
 
   /* We are flushing here, otherwise tips window will stay displayed */
   XLOCK(tp->w->imlibdata->x.disp);

@@ -179,9 +179,9 @@ static char *_read_file(const char *filename, int *size) {
 int mediamark_store_mmk(mediamark_t **mmk, 
 			const char *mrl, const char *ident, const char *sub, 
 			int start, int end, int av_offset, int spu_offset) {
-
+  
   if((mmk != NULL) && (mrl != NULL)) {
-    
+
     (*mmk) = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
     (*mmk)->mrl        = strdup(mrl);
     (*mmk)->ident      = strdup((ident != NULL) ? ident : mrl);
@@ -191,6 +191,7 @@ int mediamark_store_mmk(mediamark_t **mmk,
     (*mmk)->av_offset  = av_offset;
     (*mmk)->spu_offset = spu_offset;
     (*mmk)->played     = 0;
+
     return 1;
   }
 
@@ -234,9 +235,8 @@ static int playlist_split_data(playlist_t *playlist) {
   if(playlist->data) {
     char *buf, *p;
 
-    /* strsep modify oriinal string, avoid its corruption */
-    buf = (char *) xine_xmalloc(strlen(playlist->data));
-    memcpy(buf, playlist->data, strlen(playlist->data));
+    /* strsep modify original string, avoid its corruption */
+    buf = strdup(playlist->data);
     playlist->numl = 0;
 
     while((p = xine_strsep(&buf, "\n")) != NULL) {
@@ -748,6 +748,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			char         *line;
 			char         *m;
 			
+			mmkf.ident      = NULL;
 			mmkf.sub        = NULL;
 			mmkf.start      = 0;
 			mmkf.end        = -1;
@@ -779,9 +780,12 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			    }
 			    else if(!strncasecmp(key, "subtitle", 8)) {
 			      if(mmkf_members[6] == 0) {
-				mmkf_members[6] = 1;
 				set_pos_to_value(&key);
-				mmkf.sub = strdup(key);
+				/* Workaround old toxine playlist version bug */
+				if(strcmp(key, "(null)")) {
+				  mmkf_members[6] = 1;
+				  mmkf.sub = strdup(key);
+				}
 			      }
 			    }
 			    else if(!strncasecmp(key, "spu_offset", 10)) {
@@ -848,18 +852,17 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
 			else
 			  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_tox + 2));
-
+			
 			mediamark_store_mmk(&mmk[entries_tox], 
 					    mmkf.mrl, mmkf.ident, mmkf.sub, 
 					    mmkf.start, mmkf.end, mmkf.av_offset, mmkf.spu_offset);
-			
 			playlist->entries = ++entries_tox;
 
 			free(line);
 			
 			if(mmkf_members[0])
 			  free(mmkf.ident);
-			
+
 			SAFE_FREE(mmkf.sub);
 
 			free(mmkf.mrl);
@@ -889,12 +892,13 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	    mmk[entries_tox] = NULL;
 	    playlist->type = strdup("TOX");
 	  }
-	  
+
 	  while(playlist->numl) {
 	    free(playlist->lines[playlist->numl - 1]);
 	    playlist->numl--;
 	  }
 	  SAFE_FREE(playlist->lines);
+
 	}
 	free(tox_content);
       }
@@ -2485,10 +2489,10 @@ void mediamark_load_mediamarks(const char *_filename) {
     gGui->playlist.cur = mediamark_get_shuffle_next();
   else
     gGui->playlist.cur = 0;
-
+  
   for(i = 0; i < onum; i++)
     (void) mediamark_free_mmk(&ommk[i]);
-
+  
   SAFE_FREE(ommk);
 
   SAFE_FREE(playlist->type);
@@ -2703,7 +2707,7 @@ void mmk_editor_end(void) {
 }
 
 void mmkeditor_set_mmk(mediamark_t **mmk) {
-
+  
   if(mmkeditor) {
     mmkeditor->mmk = mmk;
     
@@ -2750,7 +2754,7 @@ static void mmkeditor_apply(xitk_widget_t *w, void *data) {
 
     if(mmkeditor->callback)
       mmkeditor->callback(mmkeditor->user_data);
-      
+    
   }  
 }
 
@@ -3083,6 +3087,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   
   mmkeditor->visible = 1;
   mmkeditor->running = 1;
+
   mmkeditor_set_mmk(mmk);
   mmk_editor_raise_window();
 

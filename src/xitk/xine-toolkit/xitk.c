@@ -603,14 +603,15 @@ static uint32_t xitk_check_wm(Display *display) {
       break;
     }
     
-    if(wm_name) {
+    if(wm_name)
       printf(" {%s}", wm_name);
-      free(wm_name);
-    }
     
     printf(" ]-\n");
   }
-
+  
+  if(wm_name)
+    free(wm_name);
+  
   return type;
 }
 uint32_t xitk_get_wm_type(void) {
@@ -873,7 +874,7 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
 
   fx = (__gfx_t *) xitk_xmalloc(sizeof(__gfx_t));
 
-  fx->name = (name != NULL) ? name : "NO_SET";
+  fx->name = name ? strdup(name) : strdup("NO_SET");
 
   fx->window    = window;
   fx->new_pos.x = 0;
@@ -982,15 +983,16 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 	free(fx->xdnd);
       }
 
-      fx->xevent_callback = NULL;
       xitk_list_delete_current(gXitk->gfx); 
+
+      free(fx->name);
       free(fx);
       
       MUTUNLOCK();
       return;
     }
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
 
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
 
   MUTUNLOCK();
