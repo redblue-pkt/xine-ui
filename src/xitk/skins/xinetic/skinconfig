@@ -76,16 +76,16 @@ PlInputText:	26	193	PlInputTxt.png	Gray	Gray	Black	*-lucida-*-r-*-*-10-*-*-*-*-*
 CtlBG:		0	0	CtlBg.png
 CtlHueBG:	35	39	SliderVBg.png
 CtlHueFG:	0	0	SliderVPad.png
-CtlHueLbl:	23	191	Letters.png
+CtlHueLbl:	23	191	Letters.png	3	False
 CtlSatBG:	79	39	SliderVBg.png
 CtlSatFG:	0	0	SliderVPad.png
-CtlSatLbl:	66	191	Letters.png
+CtlSatLbl:	66	191	Letters.png	3	False
 CtlBrightBG:	124	39	SliderVBg.png
 CtlBrightFG:	0	0	SliderVPad.png
-CtlBrightLbl:	111	191	Letters.png
+CtlBrightLbl:	111	191	Letters.png	3	False
 CtlContBG:	170	39	SliderVBg.png
 CtlContFG:	0	0	SliderVPad.png
-CtlContLbl:	157	192	Letters.png
+CtlContLbl:	157	192	Letters.png	3	False
 CtlSave:        13	214	CtlSave.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
 CtlDismiss:	135	206	CtlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
 
