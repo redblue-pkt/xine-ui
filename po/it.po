@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "POT-Creation-Date: 2003-04-06 16:22+0200\n"
-"PO-Revision-Date: 2003-03-13 15:19+0100\n"
+"PO-Revision-Date: 2003-04-05 00:45+0200\n"
 "Last-Translator: Giovanni Venturi <jumpyj@libero.it>\n"
 "Language-Team: italiano <kde-i18n-it@mail.kde.org>\n"
 "MIME-Version: 1.0\n"
@@ -59,11 +59,11 @@ msgid ""
 "Start playback anyway ?\n"
 msgstr ""
 "%s\n"
-"Avvio palyback comunque?\n"
+"Avvio riproduzione comunque?\n"
 
 #: src/xitk/actions.c:310
 msgid "Start Playback ?"
-msgstr "Avvio Playback?"
+msgstr "Avvio riproduzione?"
 
 #: src/xitk/actions.c:542
 msgid "No MRL (input stream) specified"
@@ -164,7 +164,7 @@ msgstr "Finestra controlli di Xine"
 
 #: src/xitk/control.c:540
 msgid "control: couldn't find image for background\n"
-msgstr "Il controllo: non riesce a trovare l'immagine di sfondo\n"
+msgstr "controllo: non si trova l'immagine di sfondo\n"
 
 #: src/xitk/control.c:661
 msgid "Control HUE value"
@@ -241,7 +241,7 @@ msgid ""
 msgstr ""
 "- errore del motore xine -\n"
 "\n"
-"Non c'è alcun plugin di input disponibile da trattare '%s'.\n"
+"Non c'è alcun plugin di input disponibile per trattare '%s'.\n"
 "Forse la sintassi di MRL è errata o il file o lasorgente di stream non "
 "esiste."
 
@@ -255,7 +255,7 @@ msgid ""
 msgstr ""
 "- errore del motore xine -\n"
 "\n"
-"Non c'è alcun plugin demuxer disponibile da trattare '%s'.\n"
+"Non c'è alcun plugin demuxer disponibile per trattare '%s'.\n"
 "Di solito ciò significa che il formato del file non è stato riconosciuto."
 
 #: src/xitk/errors.c:235
@@ -278,7 +278,7 @@ msgid ""
 msgstr ""
 "- errore del motore xine -\n"
 "\n"
-"Mrl malformato. Mrl '%s' sembra malformanto/non valido.\n"
+"MRL malformato. L'MRL '%s' sembra malformanto/non valido.\n"
 
 #: src/xitk/errors.c:245
 msgid ""
@@ -288,7 +288,7 @@ msgid ""
 msgstr ""
 "- errore del motore xine -\n"
 "\n"
-"!! Errore non trattato !!\n"
+"!! Errore non gestito !!\n"
 
 #: src/xitk/event.c:174
 msgid "Amplification Level"
@@ -324,7 +324,7 @@ msgstr "Inizio SPU: %d"
 
 #: src/xitk/event.c:703 src/xitk/menus.c:149
 msgid "Playlist: no loop."
-msgstr "Playlsit: nessun loop."
+msgstr "Playlist: nessun loop."
 
 #: src/xitk/event.c:706 src/xitk/menus.c:154
 msgid "Playlist: loop."
@@ -332,7 +332,7 @@ msgstr "Playlist: loop."
 
 #: src/xitk/event.c:709 src/xitk/menus.c:159
 msgid "Playlist: entry repeat."
-msgstr "Playlist: ripeti entrata."
+msgstr "Playlist: ripeti elemento."
 
 #: src/xitk/event.c:712 src/xitk/menus.c:164
 msgid "Playlist: shuffle."
@@ -357,18 +357,20 @@ msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
+"\n"
+"XInitThreads fallito - sembra che non abbia un thread-sicuro in xlib.\n"
 
 #: src/xitk/event.c:1005 src/xitk/main.c:317
 msgid "Cannot open display\n"
-msgstr ""
+msgstr "Non posso aprire la visualizzazione\n"
 
 #: src/xitk/event.c:1011
 msgid "synchronized X protocol (debug)"
-msgstr ""
+msgstr "protocollo di sincronizzazione di X (debug)"
 
 #: src/xitk/event.c:1018
 msgid "Warning! Synchronized X activated - this is way slow...\n"
-msgstr ""
+msgstr "Attenzione| Sicronizzazione attivata - modalità lenta...\n"
 
 #: src/xitk/event.c:1023
 msgid "Windows stacking"
@@ -376,7 +378,7 @@ msgstr ""
 
 #: src/xitk/event.c:1024
 msgid "Use wm layer property to place window on top."
-msgstr ""
+msgstr "Usa le proprietà dello strato wm per sistemare la finestra in alto."
 
 #: src/xitk/event.c:1031
 msgid "Windows stacking (more)"
@@ -384,15 +386,15 @@ msgstr ""
 
 #: src/xitk/event.c:1032
 msgid "Use WM layer property to place windows on top."
-msgstr ""
+msgstr "Usa le proprietà dello strato WM per sistemare le finestre in alto."
 
 #: src/xitk/event.c:1043
 msgid "Snapshot location"
-msgstr ""
+msgstr "Posizione per la foto"
 
 #: src/xitk/event.c:1044
 msgid "Where snapshots will be saved."
-msgstr ""
+msgstr "Dove si salvano le foto."
 
 #: src/xitk/event.c:1051
 msgid "Screensaver wakeup"
@@ -408,11 +410,11 @@ msgstr ""
 
 #: src/xitk/event.c:1060
 msgid "Play next|previous chapter instead of mrl (dvdnav)"
-msgstr ""
+msgstr "Riprocuci prossimo|precedente capitolo invece di MRL (dvdnav)"
 
 #: src/xitk/event.c:1067
 msgid "Visibility behavior of output window"
-msgstr ""
+msgstr "Comportamento della visibilità della finestra di output"
 
 #: src/xitk/event.c:1068
 msgid "Hide video output window if there is no video in the stream"
@@ -447,7 +449,7 @@ msgstr ""
 
 #: src/xitk/event.c:1104
 msgid "Stream information"
-msgstr ""
+msgstr "Informazioni stream"
 
 #: src/xitk/event.c:1105
 msgid "Update stream information (in stream info window) each half seconds."
@@ -459,11 +461,11 @@ msgstr ""
 
 #: src/xitk/event.c:1116
 msgid "From where we can get skins."
-msgstr ""
+msgstr "Da dove può ottenere le skin."
 
 #: src/xitk/event.c:1127
 msgid "Enable OSD support"
-msgstr ""
+msgstr "Abilita supporto OSD"
 
 #: src/xitk/event.c:1128
 msgid ""
@@ -508,13 +510,13 @@ msgstr ""
 
 #: src/xitk/event.c:1174
 msgid "amplification level"
-msgstr ""
+msgstr "livello di amplificazione"
 
 #. Some infos
 #: src/xitk/event.c:1188
 #, c-format
 msgid "XServer Vendor: %s. Release: %d,\n"
-msgstr ""
+msgstr "Produttore XServer: %s. Versione: %d,\n"
 
 #: src/xitk/event.c:1190
 #, c-format
@@ -529,7 +531,7 @@ msgstr ""
 #: src/xitk/event.c:1194
 #, c-format
 msgid "        Depth: %d.\n"
-msgstr ""
+msgstr "        Profondità: %d.\n"
 
 #: src/xitk/event.c:1203
 #, c-format
@@ -542,56 +544,56 @@ msgstr ""
 
 #: src/xitk/event_sender.c:463
 msgid "Up"
-msgstr ""
+msgstr "Su"
 
 #: src/xitk/event_sender.c:480
 msgid "Left"
-msgstr ""
+msgstr "Sinistra"
 
 #: src/xitk/event_sender.c:514
 msgid "Right"
-msgstr ""
+msgstr "Destra"
 
 #: src/xitk/event_sender.c:531
 msgid "Down"
-msgstr ""
+msgstr "Giù"
 
 #: src/xitk/event_sender.c:608
 msgid "Angle +"
-msgstr ""
+msgstr "Angolo +"
 
 #: src/xitk/event_sender.c:622
 msgid "Angle -"
-msgstr ""
+msgstr "Angolo -"
 
 #. Initialize menu labels
 #: src/xitk/event_sender.c:636
 msgid "Menu 1"
-msgstr ""
+msgstr "Menu 1"
 
 #: src/xitk/event_sender.c:637
 msgid "Menu 2"
-msgstr ""
+msgstr "Menu 2"
 
 #: src/xitk/event_sender.c:638
 msgid "Menu 3"
-msgstr ""
+msgstr "Menu 3"
 
 #: src/xitk/event_sender.c:639
 msgid "Menu 4"
-msgstr ""
+msgstr "Menu 4"
 
 #: src/xitk/event_sender.c:640
 msgid "Menu 5"
-msgstr ""
+msgstr "Menu 5"
 
 #: src/xitk/event_sender.c:641
 msgid "Menu 6"
-msgstr ""
+msgstr "Menu 6"
 
 #: src/xitk/event_sender.c:642
 msgid "Menu 7"
-msgstr ""
+msgstr "Menu 7"
 
 #: src/xitk/event_sender.c:644 src/xitk/event_sender.c:646
 msgid "Root"
@@ -599,7 +601,7 @@ msgstr ""
 
 #: src/xitk/event_sender.c:645
 msgid "Title"
-msgstr ""
+msgstr "Titolo"
 
 #: src/xitk/event_sender.c:647
 msgid "Subpicture"
@@ -607,89 +609,89 @@ msgstr ""
 
 #: src/xitk/event_sender.c:648 src/xitk/stream_infos.c:868
 msgid "Audio"
-msgstr ""
+msgstr "Audio"
 
 #: src/xitk/event_sender.c:649
 msgid "Angle"
-msgstr ""
+msgstr "Angolo"
 
 #: src/xitk/event_sender.c:650
 msgid "Part"
-msgstr ""
+msgstr "Parte"
 
 #: src/xitk/event_sender.c:686 src/xitk/file_browser.c:1572
 #: src/xitk/mediamark.c:2650 src/xitk/setup.c:1310
 #: src/xitk/stream_infos.c:1021 src/xitk/viewlog.c:487
 msgid "Close"
-msgstr ""
+msgstr "Chiudi"
 
 #: src/xitk/file_browser.c:317 src/xitk/mediamark.c:2635 src/xitk/setup.c:1299
 msgid "Apply"
-msgstr ""
+msgstr "Applica"
 
 #: src/xitk/file_browser.c:332 src/xitk/skins.c:1162
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
 #: src/xitk/file_browser.c:634
 #, c-format
 msgid "Unable to open directory '%s': %s."
-msgstr ""
+msgstr "Impossibile aprire directory '%s': %s."
 
 #: src/xitk/file_browser.c:948
 #, c-format
 msgid "Unable to delete file '%s': %s."
-msgstr ""
+msgstr "Impossibile cancellare file '%s': %s."
 
 #: src/xitk/file_browser.c:971
 msgid "Confirm deletion ?"
-msgstr ""
+msgstr "Confermi cancellazione?"
 
 #: src/xitk/file_browser.c:990
 #, c-format
 msgid "Unable to rename file '%s' to '%s': %s."
-msgstr ""
+msgstr "Impossibile rinominare il file '%s' in '%s': %s."
 
 #: src/xitk/file_browser.c:1009
 msgid "Rename file"
-msgstr ""
+msgstr "Rinomina file"
 
 #: src/xitk/file_browser.c:1017
 #, c-format
 msgid "Unable to create the directory '%s': %s."
-msgstr ""
+msgstr "Impossibile creare la directory '%s': %s."
 
 #: src/xitk/file_browser.c:1031
 msgid "Create a new directory"
-msgstr ""
+msgstr "Crea una nuova directory"
 
 #: src/xitk/file_browser.c:1185
 msgid "File Browser"
-msgstr ""
+msgstr "Sfoglia file"
 
 #: src/xitk/file_browser.c:1206
 msgid "All files"
-msgstr ""
+msgstr "Tutti i file"
 
 #: src/xitk/file_browser.c:1207
 msgid "All known playlists"
-msgstr ""
+msgstr "Tutte le playlist note"
 
 #: src/xitk/file_browser.c:1476
 msgid "Show hidden file"
-msgstr ""
+msgstr "Mostra file nascosti"
 
 #: src/xitk/file_browser.c:1487
 msgid "Rename"
-msgstr ""
+msgstr "Rinomina"
 
 #: src/xitk/file_browser.c:1502 src/xitk/kbindings.c:2008
 msgid "Delete"
-msgstr ""
+msgstr "Cancella"
 
 #: src/xitk/file_browser.c:1517
 msgid "Create a directory"
-msgstr ""
+msgstr "Crea una directory"
 
 #: src/xitk/kbindings.c:441
 #, c-format
@@ -705,11 +707,11 @@ msgstr ""
 
 #: src/xitk/kbindings.c:447 src/xitk/kbindings.c:2036
 msgid "Reset"
-msgstr ""
+msgstr "Ripristina"
 
 #: src/xitk/kbindings.c:448
 msgid "Editor"
-msgstr ""
+msgstr "Editor"
 
 #: src/xitk/kbindings.c:818
 msgid "OOCH: key binding table is NULL.\n"
@@ -717,11 +719,11 @@ msgstr ""
 
 #: src/xitk/kbindings.c:1415
 msgid "Nothing selected"
-msgstr ""
+msgstr "Selezione vuotao"
 
 #: src/xitk/kbindings.c:1416 src/xitk/post.c:135
 msgid "None"
-msgstr ""
+msgstr "Nulla"
 
 #: src/xitk/kbindings.c:1570
 msgid "You can only delete alias entries."
@@ -729,16 +731,16 @@ msgstr ""
 
 #: src/xitk/kbindings.c:1698
 msgid "Press Keyboard Keys..."
-msgstr ""
+msgstr "Premi un tasto..."
 
 #: src/xitk/kbindings.c:1711
 msgid "Event receiver window"
-msgstr ""
+msgstr "Finestra di ricezione eventi"
 
 #. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1799
 msgid "Accept?"
-msgstr ""
+msgstr "Accetti?"
 
 #: src/xitk/kbindings.c:1803
 #, c-format
@@ -764,43 +766,43 @@ msgstr ""
 
 #: src/xitk/kbindings.c:1931
 msgid "Key"
-msgstr ""
+msgstr "Tasto"
 
 #: src/xitk/kbindings.c:1936
 msgid "Modifiers"
-msgstr ""
+msgstr "Modificatori"
 
 #: src/xitk/kbindings.c:1980
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: src/xitk/kbindings.c:1994
 msgid "Edit"
-msgstr ""
+msgstr "Modifica"
 
 #: src/xitk/kbindings.c:2022 src/xitk/playlist.c:408 src/xitk/playlist.c:1192
 msgid "Save"
-msgstr ""
+msgstr "Salva"
 
 #: src/xitk/kbindings.c:2113
 msgid "ctrl"
-msgstr ""
+msgstr "CTRL"
 
 #: src/xitk/kbindings.c:2134
 msgid "meta"
-msgstr ""
+msgstr "meta"
 
 #: src/xitk/kbindings.c:2156
 msgid "mod3"
-msgstr ""
+msgstr "mod3"
 
 #: src/xitk/kbindings.c:2178
 msgid "mod4"
-msgstr ""
+msgstr "mod4"
 
 #: src/xitk/kbindings.c:2199
 msgid "mod5"
-msgstr ""
+msgstr "mod5"
 
 #: src/xitk/kbindings.c:2208
 msgid "Grab"
@@ -809,12 +811,12 @@ msgstr ""
 #: src/xitk/main.c:347
 #, c-format
 msgid "Bad geometry '%s'\n"
-msgstr ""
+msgstr "Geometria errata '%s'\n"
 
 #: src/xitk/main.c:355
 #, c-format
 msgid "Bad visual '%s'\n"
-msgstr ""
+msgstr "Cattiva visuale '%s'\n"
 
 #: src/xitk/main.c:378
 #, c-format
@@ -822,6 +824,8 @@ msgid ""
 "This is xine (X11 gui) - a free video player v%s\n"
 "(c) 2000-2003 by G. Bartsch and the xine project team.\n"
 msgstr ""
+"Questo è xine (X11 gui) - un riproduttore video libero v%s\n"
+"(c) 2000-2003 da G. Bartsch e dal team di progetto di xine.\n"
 
 #: src/xitk/main.c:389
 #, c-format
@@ -884,15 +888,15 @@ msgstr ""
 
 #: src/xitk/main.c:458
 msgid "                    'h': hide GUI (panel, etc.).\n"
-msgstr ""
+msgstr "                    'h': nascondi GUI (pannello, etc.).\n"
 
 #: src/xitk/main.c:459
 msgid "                    'w': hide video window.\n"
-msgstr ""
+msgstr "                    'w': nascondi finestra video.\n"
 
 #: src/xitk/main.c:460
 msgid "                    'q': quit when play is done.\n"
-msgstr ""
+msgstr "                    'q': esci quando la riproduzione è completa.\n"
 
 #: src/xitk/main.c:461
 msgid ""
@@ -912,7 +916,7 @@ msgstr ""
 
 #: src/xitk/main.c:464
 msgid "  -f, --fullscreen             start in fullscreen mode,\n"
-msgstr ""
+msgstr "  -f, --fullscreen             avvia in modalità a schermo pieno,\n"
 
 #: src/xitk/main.c:466
 msgid ""
@@ -1162,7 +1166,7 @@ msgstr ""
 
 #: src/xitk/main.c:562 src/xitk/main.c:684
 msgid "video driver to use"
-msgstr ""
+msgstr "driver video da usare"
 
 #: src/xitk/main.c:563 src/xitk/main.c:685
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
