@@ -351,8 +351,17 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
     XUNLOCK(gXitk->display);
     
     if(err != BadDrawable && err != BadWindow) {
+      Window c;
+      
+      XLOCK(gXitk->display);
+      XTranslateCoordinates(gXitk->display, fx->window, wattr.root, 
+			    0,0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
+      XUNLOCK(gXitk->display);
+      
+      /*
       fx->new_pos.x = wattr.x;
       fx->new_pos.y = wattr.y;
+      */
       fx->width     = wattr.width;
       fx->height    = wattr.height;
     }
