@@ -128,8 +128,8 @@ void gui_stop (xitk_widget_t *w, void *data) {
   panel_reset_slider ();
   panel_check_pause();
   panel_update_runtime_display();
-  
-  if(is_playback_widgets_enabled() && (!gGui->playlist_num)) {
+
+  if(is_playback_widgets_enabled() && (!gGui->playlist_num) && (!gGui->filename)) {
     gui_set_current_mrl(NULL);
     enable_playback_controls(0);
   }
