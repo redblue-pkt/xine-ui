@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2000-2001 the xine project
  * 
  * This file is part of xine, a unix video player.
@@ -143,7 +143,7 @@ void panel_toggle_visibility (widget_t *w, void *data) {
 
 
   if (panel->visible) {
-    
+
     if (video_window_is_visible ()) {
       panel->visible = 0;
       XUnmapWindow (gGui->display, gGui->panel_window);
@@ -211,6 +211,7 @@ void panel_update_channel_display (void) {
 		      panel->audiochan);
 
   if(xine_get_spu_channel(gGui->xine) >= 0) {
+    uevent.event.type = XINE_SPU_EVENT;
     uevent.handled = 0;
     uevent.sub_type = XINE_UI_GET_SPU_LANG;
     uevent.data = panel->spuid;
