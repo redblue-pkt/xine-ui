@@ -441,7 +441,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       "<title>",      
       NULL, NULL                                                                             },
     { _("Show controls"),
-      (sh[shc++] = menu_get_shortcut("ToggleVisiblity")),
+      (sh[shc++] = menu_get_shortcut("ToggleVisibility")),
       panel_is_visible() ? "<checked>" : "<check>",  
       menu_panel_visibility, NULL                                                            },
     { _("Show video window"),
