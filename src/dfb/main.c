@@ -265,6 +265,10 @@ void extract_mrls(int num_mrls, char **mrls) {
 
 }
 
+void vm_cb(int w, int h, int bpp, void* cb_data) {
+  printf("Mode %ix%i @ %i bpp supported\n", w,h,bpp);
+}
+
 typedef struct {
   IDirectFB *dfb;
   IDirectFBSurface *primary;
@@ -283,6 +287,7 @@ int main(int argc, char *argv[]) {
   IDirectFBInputBuffer *input_buf;
   IDirectFBInputDevice *keyboard = NULL;
   int window_grabbed = 0;
+  int window_size = 0;
   int startx = 0;
   int starty = 0;
   int endx = 0;
@@ -396,12 +401,14 @@ int main(int argc, char *argv[]) {
    * Initialise primary surface
    */
   DFBCHECK(DirectFBCreate(&(dfbxine.dfb)));
-  /* DFBCHECK(dfbxine.dfb->SetCooperativeLevel(dfbxine.dfb, 
-					    DFSCL_FULLSCREEN));*/
+  DFBCHECK(dfbxine.dfb->SetCooperativeLevel(dfbxine.dfb, 
+					    DFSCL_NORMAL));
+  DFBCHECK(dfbxine.dfb->EnumVideoModes(dfbxine.dfb, vm_cb, NULL));
+   
+  dfbxine.dfb->GetCardCapabilities( dfbxine.dfb, &caps );
+  dfbxine.dfb->GetDisplayLayer( dfbxine.dfb, DLID_PRIMARY, &(dfbxine.layer) );
+  dfbxine.layer->SetCooperativeLevel(dfbxine.layer, DLSCL_EXCLUSIVE);
 
- dfbxine.dfb->GetCardCapabilities( dfbxine.dfb, &caps );
- dfbxine.dfb->GetDisplayLayer( dfbxine.dfb, DLID_PRIMARY, &(dfbxine.layer) );
- 
  if (!((caps.blitting_flags & DSBLIT_BLEND_ALPHACHANNEL) &&
        (caps.blitting_flags & DSBLIT_BLEND_COLORALPHA  )))
   {
@@ -410,8 +417,9 @@ int main(int argc, char *argv[]) {
    
    dfbxine.layer->SetConfiguration( dfbxine.layer, &(dfbxine.layer_config) );
   }
- 
+
  dfbxine.layer->GetConfiguration( dfbxine.layer, &(dfbxine.layer_config) );
+ /* dfbxine.layer->EnableCursor ( dfbxine.layer, 0 ); */
  dfbxine.layer->EnableCursor ( dfbxine.layer, 1 );
 
   {
@@ -475,10 +483,10 @@ int main(int argc, char *argv[]) {
    desc.flags = ( DWDESC_POSX | DWDESC_POSY |
 		  DWDESC_WIDTH | DWDESC_HEIGHT );
 
-   desc.posx = 20;
-   desc.posy = 120;
-   desc.width = (768*2)/3;
-   desc.height = (576*2)/3;
+   desc.posx = 5;
+   desc.posy = 5;
+   desc.width = dfbxine.layer_config.width/2;
+   desc.height = dfbxine.layer_config.height/2;
 
    DFBCHECK( dfbxine.layer->CreateWindow( dfbxine.layer, &desc, 
 					  &(dfbxine.main_window) ) );
@@ -592,18 +600,33 @@ int main(int argc, char *argv[]) {
     while (dfbxine.main_window->GetEvent( dfbxine.main_window,
 					  &evt ) == DFB_OK) {
       switch (evt.type) {
-       case DWET_BUTTONDOWN:
+       case DWET_BUTTONDOWN: 
 	if(!window_grabbed && evt.button == DIBI_LEFT) {
 	  window_grabbed = 1;
 	  dfbxine.layer->GetCursorPosition(dfbxine.layer, &startx,
 					   &starty);
 	  dfbxine.main_window->GrabPointer(dfbxine.main_window);
 	}
+	if(!window_size && evt.button == DIBI_MIDDLE) {
+	  int w,h;
+	  
+	  window_size = 1;
+	  dfbxine.layer->GetCursorPosition(dfbxine.layer, &startx,
+					   &starty);
+	  dfbxine.main_window->GrabPointer(dfbxine.main_window);
+	  dfbxine.main_window->GetSize(dfbxine.main_window, &w, &h);
+	  startx -= w;
+	  starty -= h;
+	}
 	break;
        case DWET_BUTTONUP:
 	if(evt.button == DIBI_LEFT) {
 	  dfbxine.main_window->UngrabPointer(dfbxine.main_window);
 	  window_grabbed = 0;
+	}
+	if(evt.button == DIBI_MIDDLE) {
+	  dfbxine.main_window->UngrabPointer(dfbxine.main_window);
+	  window_size = 0;
 	}
 	break;
        case DWET_MOTION:
@@ -616,9 +639,14 @@ int main(int argc, char *argv[]) {
 
     if(window_grabbed) {
       dfbxine.main_window->Move(dfbxine.main_window,
-				endx-startx, endy-starty);
+			    	endx-startx, endy-starty);
       startx = endx;
-      starty = endy;
+      starty = endy; 
+    }
+
+    if(window_size) {
+      dfbxine.main_window->Resize(dfbxine.main_window,
+				endx-startx, endy-starty);
     }
     
     while(input_buf->GetEvent(input_buf, &event) == DFB_OK) {
