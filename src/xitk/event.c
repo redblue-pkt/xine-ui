@@ -470,52 +470,42 @@ void gui_handle_event (XEvent *event, void *data) {
       break;
 
     case XK_1:
-    case XK_KP_1:
       gui_set_current_position (6553);
       break;
 
     case XK_2:
-    case XK_KP_2:
       gui_set_current_position (13107);
       break;
 
     case XK_3:
-    case XK_KP_3:
       gui_set_current_position (19660);
       break;
 
     case XK_4:
-    case XK_KP_4:
       gui_set_current_position (26214);
       break;
 
     case XK_5:
-    case XK_KP_5:
       gui_set_current_position (32767);
       break;
 
     case XK_6:
-    case XK_KP_6:
       gui_set_current_position (39321);
       break;
 
     case XK_7:
-    case XK_KP_7:
       gui_set_current_position (45874);
       break;
 
     case XK_8:
-    case XK_KP_8:
       gui_set_current_position (52428);
       break;
 
     case XK_9:
-    case XK_KP_9:
       gui_set_current_position (58981);
       break;
 
     case XK_0:
-    case XK_KP_0:
       gui_set_current_position (0);
       break;
 
@@ -578,6 +568,8 @@ void gui_handle_event (XEvent *event, void *data) {
       panel_execute_xineshot(NULL, NULL);
       break;
 
+      /* events for advanced input plugins: */
+
     case XK_Escape:
       xine_event.type = XINE_EVENT_INPUT_MENU1;
       xine_send_event(gGui->xine, &xine_event);
@@ -590,7 +582,30 @@ void gui_handle_event (XEvent *event, void *data) {
       xine_event.type = XINE_EVENT_INPUT_MENU3;
       xine_send_event(gGui->xine, &xine_event);
       break;
-    
+    case XK_KP_8:
+      xine_event.type = XINE_EVENT_INPUT_UP;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
+    case XK_KP_2:
+      xine_event.type = XINE_EVENT_INPUT_DOWN;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
+    case XK_KP_4:
+      xine_event.type = XINE_EVENT_INPUT_LEFT;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
+    case XK_KP_6:
+      xine_event.type = XINE_EVENT_INPUT_RIGHT;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
+    case XK_KP_9:
+      xine_event.type = XINE_EVENT_INPUT_NEXT;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
+    case XK_KP_3:
+      xine_event.type = XINE_EVENT_INPUT_PREVIOUS;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
     
     case XK_s:
     case XK_S:
