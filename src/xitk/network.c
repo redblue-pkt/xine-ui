@@ -61,13 +61,6 @@
 #include "readline.h"
 #include "history.h"
 
-#define _FREE(x) {               \
-                   if(x) {       \
-                     free(x);    \
-                     x = NULL;   \
-                   }             \
-                 }
-
 #define DEFAULT_XINECTL_PORT "6789"
 #define DEFAULT_SERVER       "localhost"
 
@@ -79,6 +72,12 @@
 #define COMMANDS_PREFIX      "/\377\200COMMANDS"
 extern int errno;
 
+#define _FREE(x) {               \
+                   if(x) {       \
+                     free(x);    \
+                     x = NULL;   \
+                   }             \
+                 }
 
 #ifdef NETWORK_CLIENT
 
@@ -109,6 +108,7 @@ static void client_noop(session_t *, session_commands_t *, const char *);
 static void client_help(session_t *, session_commands_t *, const char *);
 static void client_version(session_t *, session_commands_t *, const char *);
 static void client_open(session_t *, session_commands_t *, const char *);
+static void client_close(session_t *, session_commands_t *, const char *);
 static void client_quit(session_t *, session_commands_t *, const char *);
 
 struct session_s {
@@ -136,6 +136,7 @@ static session_commands_t    client_commands[] = {
   { "?",           ORIGIN_CLIENT,   client_help    },
   { "version",     ORIGIN_CLIENT,   client_version },
   { "open",        ORIGIN_CLIENT,   client_open    },
+  { "close",       ORIGIN_CLIENT,   client_close   },
   { "quit",        ORIGIN_CLIENT,   client_quit    },
   { NULL,          ORIGIN_CLIENT,   NULL           }
 };
@@ -144,19 +145,24 @@ static session_commands_t  **session_commands = NULL;
 
 #else  /* NETWORK_CLIENT */
 
+#include <pwd.h>
+
 # include "event.h"
 # include <xine.h>
 # include <xine/xineutils.h>
 
-static pthread_t   thread_server;
-
 typedef struct commands_s commands_t;
 typedef struct client_info_s client_info_t;
+typedef struct passwds_s passwds_t;
 typedef void (*cmd_func_t)(commands_t *, client_info_t *, void *);
+
+static pthread_t     thread_server;
+static passwds_t   **passwds = NULL;
 
 static void do_commands(commands_t *, client_info_t *, void *);
 static void do_help(commands_t *, client_info_t *, void *);
 static void do_syntax(commands_t *, client_info_t *, void *);
+static void do_auth(commands_t *, client_info_t *, void *);
 static void do_mrl(commands_t *, client_info_t *, void *);
 static void do_playlist(commands_t *, client_info_t *, void *);
 static void do_play(commands_t *, client_info_t *, void *);
@@ -166,22 +172,39 @@ static void do_exit(commands_t *, client_info_t *, void *);
 static void do_fullscreen(commands_t *, client_info_t *, void *);
 static void do_get(commands_t *, client_info_t *, void *);
 static void do_set(commands_t *, client_info_t *, void *);
+/*  static void do_gui(commands_t *, client_info_t *, void *); */
 
 static void handle_client_command(client_info_t *);
+static const char *get_homedir(void);
 
-#define NOT_PUBLIC  0
-#define PUBLIC      1
+#define MAX_NAME_LEN     16
+#define MAX_PASSWD_LEN   16
+
+#define NO_ARGS          1
+#define REQUIRE_ARGS     2
+#define OPTIONAL_ARGS    3
+
+#define NOT_PUBLIC       0
+#define PUBLIC           1
+
+#define AUTH_UNNEEDED    0
+#define NEED_AUTH        1
 
 struct commands_s {
   char         *command;
   int           argtype;
   int           public;
+  int           need_auth;
   cmd_func_t    function;
   char         *help;
   char         *syntax;
 };
 
 struct client_info_s {
+  int                   authentified;
+  char                  name[MAX_NAME_LEN + 1];
+  char                  passwd[MAX_PASSWD_LEN + 1];
+
   int                   finished;
 
   int                   socket;
@@ -199,62 +222,72 @@ struct client_info_s {
 
 };
 
-#define NO_ARGS        1
-#define REQUIRE_ARGS   2
-#define OPTIONAL_ARGS  3
+struct passwds_s {
+  char     *ident;
+  char     *passwd;
+};
+
+typedef struct {
+  FILE             *fd;
+  char             *ln;
+  char              buf[256];
+} fileobj_t;
 
 static commands_t commands[] = {
-  { "commands",    NO_ARGS,         NOT_PUBLIC,      do_commands,
+  { "commands",    NO_ARGS,         NOT_PUBLIC,      AUTH_UNNEEDED, do_commands,
     "Display all available commands, tab separated, dot terminated.", 
     "commands"
   },
-  { "help",        OPTIONAL_ARGS,   PUBLIC,          do_help,
+  { "help",        OPTIONAL_ARGS,   PUBLIC,          AUTH_UNNEEDED, do_help,
     "Display the help text if a command name is specified, otherwise display "
     "all available commands.",
     "  help [command]"
   },
-  { "syntax",      REQUIRE_ARGS,    PUBLIC,          do_syntax,
+  { "syntax",      REQUIRE_ARGS,    PUBLIC,          AUTH_UNNEEDED, do_syntax,
     "Display a command syntax.",
     "  syntax [command]"
   },
-
-  { "mrl",         REQUIRE_ARGS,    PUBLIC,          do_mrl,
+  { "identify",    REQUIRE_ARGS,    PUBLIC,          AUTH_UNNEEDED, do_auth,
+    "Identify client.",
+    "identify <ident> <password>."
+  },
+  { "mrl",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_mrl,
     "manage mrls", 
     "  mrl add <mrl> <mrl> ...\n"
     "  mrl play <mrl>\n"
     "  mrl next\n"
     "  mrl prev"
   },
-  { "play",        NO_ARGS,         PUBLIC,          do_play,
+  { "play",        NO_ARGS,         PUBLIC,          NEED_AUTH,     do_play,
     "start playback", 
     "  play"
   },
-  { "playlist",    REQUIRE_ARGS,    PUBLIC,          do_playlist,
+  { "playlist",    REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_playlist,
     "manage playlist", 
     "  playlist show\n"
     "  playlist select <num>\n"
     "  playlist delete all|*\n"
-    "  playlist delete <num>"
+    "  playlist delete <num>\n"
     "  playlist next\n"
     "  playlist prev"
   },
-  { "stop",        NO_ARGS,         PUBLIC,          do_stop,
+  { "stop",        NO_ARGS,         PUBLIC,          NEED_AUTH,     do_stop,
     "stop playback", 
     "  stop"
   },
-  { "pause",       NO_ARGS,         PUBLIC,          do_pause,
+  { "pause",       NO_ARGS,         PUBLIC,          NEED_AUTH,     do_pause,
     "pause/resume playback", 
     "  pause"
   },
-  { "exit",        NO_ARGS,         PUBLIC,          do_exit,
+  { "exit",        NO_ARGS,         PUBLIC,          AUTH_UNNEEDED, do_exit,
     "close connection", 
     "  exit"
   },
-  { "fullscreen",  NO_ARGS,         PUBLIC,          do_fullscreen,
+  { "fullscreen",  NO_ARGS,         PUBLIC,          NEED_AUTH,     do_fullscreen,
     "fullscreen toggle", 
     "  fullscreen"
   },
-  { "get",         REQUIRE_ARGS,    PUBLIC,          do_get,
+  { "get",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_get,
     "get values", 
     "  get status\n"
     "  get audio channel\n"
@@ -265,16 +298,26 @@ static commands_t commands[] = {
     "  get spu lang\n"
     "  get speed"
   },
-  { "set",         REQUIRE_ARGS,    PUBLIC,          do_set,
+  { "set",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_set,
     "set values", 
     "  set audio channel <num>\n"
     "  set audio volume <%>\n"
     "  set audio mute <state>\n"
     "  set spu channel <num>\n"
     "  set speed <SPEED_PAUSE|SPEED_SLOW_4|SPEED_SLOW_2|SPEED_NORMAL|SPEED_FAST_2|SPEED_FAST_4>\n"
-    "            <     |     |     /4     |     /2     |     =      |     *2     |     *2     >"
+    "            <     |     |     /4     |     /2     |     =      |     *2     |     *4     >"
   },
-  { NULL,          -1,              NOT_PUBLIC,      NULL, 
+  /*
+  { "gui",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_gui,
+    "manage gui windows",
+    "  gui hide·\n"
+    "  gui output\n"
+    "  gui panel\n"
+    "  gui control\n"
+    "  gui mrl"
+  },
+  */
+  { NULL,          -1,              NOT_PUBLIC,      AUTH_UNNEEDED, NULL, 
     NULL, 
     NULL
   } 
@@ -326,7 +369,7 @@ int sock_create(const char *service, const char *transport, struct sockaddr_in *
   else
     type = SOCK_STREAM;
 
-  sock = socket(PF_INET, type, proto);
+  sock = socket(AF_INET, type, proto);
   
   if(sock < 0) {
     sock_err("Cannot create socket: %s\n", strerror(errno));
@@ -368,6 +411,10 @@ int sock_client(const char *host, const char *service, const char *transport) {
   }
   
   if(connect(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
+    int err = errno;
+
+    close(sock);
+    errno = err;
     sock_err("Unable to connect %s[%s]: %s\n", host, service, strerror(errno));
     return -1;
   }
@@ -389,6 +436,127 @@ int sock_serv(const char *service, const char *transport, int queue_length) {
   
   return sock;
 }
+
+/*
+ * Check for socket validity.
+ */
+int sock_check_opened(int socket) {
+  fd_set   readfds, writefds, exceptfds;
+  int      retval;
+  struct   timeval timeout;
+  
+  for(;;) {
+    FD_ZERO(&readfds); 
+    FD_ZERO(&writefds); 
+    FD_ZERO(&exceptfds);
+    FD_SET(socket, &exceptfds);
+    
+    timeout.tv_sec  = 0; 
+    timeout.tv_usec = 0;
+    
+    retval = select(socket + 1, &readfds, &writefds, &exceptfds, &timeout);
+    
+    if(retval == -1 && (errno != EAGAIN && errno != EINTR))
+      return 0;
+    
+    if (retval != -1)
+      return 1;
+  }
+
+  return 0;
+}
+
+/*
+ * Read from socket.
+ */
+int sock_read(int socket, char *buf, int len) {
+  char    *pbuf;
+  int      r, rr;
+  void    *nl;
+  
+  if((socket < 0) || (buf == NULL))
+    return -1;
+
+  if(!sock_check_opened(socket))
+    return -1;
+  
+  if (--len < 1)
+    return(-1);
+  
+  pbuf = buf;
+  
+  do {
+    
+    if((r = recv(socket, pbuf, len, MSG_PEEK)) <= 0)
+      return -1;
+
+    if((nl = memchr(pbuf, '\n', r)) != NULL)
+      r = ((char *) nl) - pbuf + 1;
+
+    if((rr = read(socket, pbuf, r)) < 0)
+      return -1;
+    
+    pbuf += rr;
+    len -= rr;
+
+  } while((nl == NULL) && len);
+  
+  *pbuf = '\0';
+  
+  return (pbuf - buf);
+}
+
+/*
+ * Write to socket.
+ */
+static int _sock_write(int socket, char *buf, int len) {
+  ssize_t  size;
+  int      wlen = 0;
+  
+  if((socket < 0) || (buf == NULL))
+    return -1;
+  
+  if(!sock_check_opened(socket))
+    return -1;
+  
+  while(len) {
+    size = write(socket, buf, len);
+    
+    if(size <= 0)
+      return -1;
+    
+    len -= size;
+    wlen += size;
+    buf += size;
+  }
+
+  return wlen;
+}
+
+static int __sock_write(int socket, int cr, char *msg, ...) {
+  char     buf[_BUFSIZ];
+  va_list  args;
+  
+  va_start(args, msg);
+  vsnprintf(buf, _BUFSIZ, msg, args);
+  va_end(args);
+  
+  /* Each line sent is '\n' terminated */
+  if(cr) {
+    if((buf[strlen(buf)] == '\0') && (buf[strlen(buf) - 1] != '\n'))
+      sprintf(buf, "%s%c", buf, '\n');
+  }
+  
+  return _sock_write(socket, buf, strlen(buf));
+}
+
+#ifdef __GNUC__
+#define sock_write(socket, msg, args...) __sock_write(socket, 1, msg, ##args)
+#define sock_write_nocr(socket, msg, args...) __sock_write(socket, 0, msg, ##args)
+#else
+#define sock_write(socket, msg, args...) __sock_write(socket, 1, msg, __VA_ARGS__)
+#define sock_write_nocr(socket, msg, args...) __sock_write(socket, 0, msg, __VA_ARGS__)
+#endif
 
 static char *_atoa(char *str) {
   char *pbuf;
@@ -416,7 +584,7 @@ static char *_atoa(char *str) {
   return pbuf;
 }
 
-int get_bool_value(const char *val) {
+static int get_bool_value(const char *val) {
   static struct {
     const char *str;
     int value;
@@ -439,52 +607,47 @@ int get_bool_value(const char *val) {
 
 #ifdef NETWORK_CLIENT
 
-static void send_to_server(session_t *session, char *msg, ...) {
+#ifdef __GNUC__
+#define write_to_console_unlocked(session, msg, args...)  __sock_write(session->console, 1, msg, ##args)
+#define write_to_console_unlocked_nocr(session, msg, args...) __sock_write(session->console, 0, msg, ##args)
+#else
+#define write_to_console_unlocked(session, msg, args...)  __sock_write(session->console, 1, msg, __VA_ARGS__)
+#define write_to_console_unlocked_nocr(session, msg, args...) __sock_write(session->console, 0, msg, __VA_ARGS__)
+#endif
+
+static int write_to_console(session_t *session, const char *msg, ...) {
   char     buf[_BUFSIZ];
   va_list  args;
   int      err;
-
-  if(session->socket < 0)
-    return;
-  
-  va_start(args, msg);
-  vsnprintf(buf, _BUFSIZ, msg, args);
-  va_end(args);
-  
-  sprintf(buf, "%s\n", buf);
-  
-  err = send(session->socket, buf, strlen(buf)+1, MSG_NOSIGNAL);
-  if(err < 0) {
-    fprintf(stderr, "send() failed: %s\n", strerror(errno));
-    session->socket = -1;
-  }
-}
-
-static void write_to_console_unlocked(session_t *session, const char *msg, ...) {
-  char     buf[_BUFSIZ];
-  va_list  args;
-  
-  if(session->console != -1) {
-    va_start(args, msg);
-    vsnprintf(buf, _BUFSIZ, msg, args);
-    va_end(args);
-    
-    write(session->console, buf, strlen(buf));
-  }
-}
-
-static void write_to_console(session_t *session, const char *msg, ...) {
-  char     buf[_BUFSIZ];
-  va_list  args;
   
   va_start(args, msg);
   vsnprintf(buf, _BUFSIZ, msg, args);
   va_end(args);
   
   pthread_mutex_lock(&session->console_mutex);
-  write_to_console_unlocked(session, buf);
+  err = write_to_console_unlocked(session, buf);
   pthread_mutex_unlock(&session->console_mutex);
+
+  return err;
 }
+
+#if 0
+static int write_to_console_nocr(session_t *session, const char *msg, ...) {
+  char     buf[_BUFSIZ];
+  va_list  args;
+  int      err;
+  
+  va_start(args, msg);
+  vsnprintf(buf, _BUFSIZ, msg, args);
+  va_end(args);
+  
+  pthread_mutex_lock(&session->console_mutex);
+  err = write_to_console_unlocked_nocr(session, buf);
+  pthread_mutex_unlock(&session->console_mutex);
+
+  return err;
+}
+#endif
 
 static void session_update_prompt(session_t *session) {
   char buf[514];
@@ -588,6 +751,17 @@ static void client_version(session_t *session, session_commands_t *command, cons
 
   write_to_console(session, "%s version %s\n\n", PROGNAME, PROGVERSION);
 }
+static void client_close(session_t *session, session_commands_t *command, const char *cmd) {
+  if((session == NULL) || (command == NULL))
+    return;
+
+  if(session->socket >= 0) {
+    sock_write(session->socket, "exit");
+    close(session->socket);
+    session->socket = -1;
+    session_update_prompt(session);
+  }
+}
 static void client_open(session_t *session, session_commands_t *command, const char *cmd) {
   char  buf[_BUFSIZ];
   char  *pbuf, *p;
@@ -595,18 +769,26 @@ static void client_open(session_t *session, session_commands_t *command, const c
   
   if((session == NULL) || (command == NULL))
     return;
-
+  
+  if(session->socket >= 0) {
+    write_to_console(session, "Already connected to '%s:%s'.", session->host, session->port);
+    return;
+  }
+  
   if(cmd) {
     sprintf(buf, "%s", cmd);
     pbuf = buf;
     if((p = strchr(pbuf, ' ')) != NULL) {
       host = _atoa(p);
       if((port = strrchr(p, ':')) != NULL) {
-	*port = '\0';
-	if(strlen(port) > 1)
+	if(strlen(port) > 1) {
+	  *port = '\0';
 	  port++;
-	else
+	}
+	else {
+	  *port = '\0';
 	  port = NULL;
+	}
       }
     }
     
@@ -617,9 +799,7 @@ static void client_open(session_t *session, session_commands_t *command, const c
       if(port != NULL) 
 	snprintf(session->port, sizeof(session->port), "%s", port);
       
-      if(session->socket >= 0)
-	send_to_server(session, "exit");
-      
+      session_create_commands(session);
       session->socket = sock_client(session->host, session->port, "tcp");
       if(session->socket < 0) {
 	write_to_console(session, "opening server '%s' failed: %s.\nExiting.\n", 
@@ -627,8 +807,7 @@ static void client_open(session_t *session, session_commands_t *command, const c
 	
 	session->running = 0;
       }
-      session_create_commands(session);
-      send_to_server(session, "commands");
+      sock_write(session->socket, "commands");
       session_update_prompt(session);
     }
     else {
@@ -639,12 +818,7 @@ static void client_open(session_t *session, session_commands_t *command, const c
 }
 static void client_quit(session_t *session, session_commands_t *command, const char *cmd) {
   
-  if((session == NULL) || (command == NULL))
-    return;
-  
-  if(session->socket >= 0)
-    send_to_server(session, "exit");
-  
+  client_close(session, command, cmd);
   session->running = 0;
 }
 /*
@@ -696,7 +870,7 @@ static void signals_handler (int sig) {
     }
     else {
       if(session.socket >= 0) {
-	send_to_server(&session, "exit");
+	sock_write(session.socket, "exit");
 	close(session.socket);
       }
       exit(1);
@@ -736,9 +910,10 @@ static void *select_thread(void *data) {
       }
       
       if(FD_ISSET(session->socket, &session_sets)) {
-	
 	size = read(session->socket, buffer, sizeof(buffer));
-	if(size) {
+
+	if(size > 0) {
+
 	  for(i = 0; i < size; i++) {
 	    c = buffer[i];
 	    
@@ -786,7 +961,7 @@ static void *select_thread(void *data) {
 		/* Erase chars til's col0 */
 		while(pos) { 
 		  
-		  write_to_console_unlocked(session, "\b \b");
+		  write_to_console_unlocked_nocr(session, "\b \b");
 		  pos--;
 		}
 		write_to_console_unlocked(session, obuffer);
@@ -834,14 +1009,17 @@ static void client_handle_command(session_t *session, const char *command) {
   /* looking for command matching */
   while((session_commands[i]->command != NULL) && (found == 0)) {
     if(!strncasecmp(cmd, session_commands[i]->command, strlen(cmd))) {
-      found ++;
+      found++;
       
       if(session_commands[i]->origin == ORIGIN_CLIENT) {
 	if(session_commands[i]->function)
 	  session_commands[i]->function(session, session_commands[i], command);
       }
       else {
-	send_to_server(session, (char *)command);
+	//	send_to_server(session, (char *)command);
+	if((sock_write(session->socket, (char *)command)) == -1) {
+	  session->running = 0;
+	}
       }
       
     }
@@ -850,13 +1028,16 @@ static void client_handle_command(session_t *session, const char *command) {
 
   /* Perhaps a ';' separated commands, so send anyway to server */
   if(found == 0) {
-    send_to_server(session, (char *)command);
+    //    send_to_server(session, (char *)command);
+    if((sock_write(session->socket, (char *)command)) == -1) 
+      session->running = 0;
   }
   
   if(!strncasecmp(cmd, "exit", strlen(cmd))) {
     session_create_commands(session);
     session->socket = -1;
   }
+
 }
 
 static void session_single_shot(session_t *session, int num_commands, char *commands[]) {
@@ -873,8 +1054,8 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
   }
 
   client_handle_command(session, buf);
-  send_to_server(session, "exit");
-
+  sock_write(session->socket, "exit");
+  
   /* Wait til' socket is closed. */
   while(session->socket <= 0)
     usleep(10000);
@@ -1032,7 +1213,7 @@ int main(int argc, char **argv) {
       exit(1);
     }
     /* Ask server for available commands */
-    send_to_server(&session, "commands");
+    sock_write(session.socket, "commands");
   }
 
   write_to_console(&session, "? for help.\n");
@@ -1084,57 +1265,151 @@ int main(int argc, char **argv) {
 #else
 
 /*
- * Receive msg from socket.
+ * Password related
  */
-static int msg_from_client(client_info_t *client_info, char *buf, int buflen) {
-  int i = 0, r;
-  char c;
-
-  if(client_info->socket < 0)
-    return 0;
- 
-  while((r = recv(client_info->socket, &c, 1, 0)) != 0) {
-    if(c == '\r' || c == '\n')
-      break;
-
-    if(i > buflen)
-      break;
-
-    buf[i] = c;
-    i++;
-  }
-  buf[i] = '\n';
-  buf[i+1] = 0;
-
-  recv(client_info->socket, &c, 1, 0);
+static void _passwdfile_get_next_line(fileobj_t *fobj) {
+  char *p;
   
-  buf[i] = 0;
+ __get_next_line:
+  
+  fobj->ln = fgets(fobj->buf, sizeof(fobj->buf), fobj->fd);
+  
+  while(fobj->ln && (*fobj->ln == ' ' || *fobj->ln == '\t')) ++fobj->ln;
+  
+  if(fobj->ln) {
+    if((strncmp(fobj->ln, ";", 1) == 0) ||
+       (strncmp(fobj->ln, "#", 1) == 0) ||
+       (*fobj->ln == '\0')) {
+      goto __get_next_line;
+    }
+    
+  }
 
-  return r;
+  p = fobj->ln;
+  
+  if(p) {
+    while(*p != '\0') {
+      if(*p == '\n' || *p == '\r') {
+	*p = '\0';
+	break;
+      }
+      p++;
+    }
+
+    while(p > fobj->ln) {
+      --p;
+      
+      if(*p == ' ' || *p == '\t') 
+	*p = '\0';
+      else
+	break;
+    }
+  }
+
+}
+static int _passwdfile_is_entry_valid(char *entry, char *name, char *passwd) {
+  char buf[_BUFSIZ];
+  char *n, *p;
+  
+  sprintf(buf, "%s", entry);
+  n = buf;
+  if((p = strrchr(buf, ':')) != NULL) {
+    if(strlen(p) > 1) {
+      *p = '\0';
+      p++;
+    }
+    else {
+      *p = '\0';
+      p = NULL;
+    }
+  }
+  
+  if((n != NULL) && (p != NULL)) {
+    snprintf(name, MAX_NAME_LEN, "%s", n);
+    snprintf(passwd, MAX_PASSWD_LEN, "%s", p);
+    return 1;
+  }
+
+  return 0;
+}
+static int server_load_passwd(const char *passwdfilename) {
+  fileobj_t   fobj;
+  int         entries = 0;
+  char        name[MAX_NAME_LEN];
+  char        passwd[MAX_PASSWD_LEN];
+
+  
+  if((fobj.fd = fopen(passwdfilename, "r")) != NULL) {
+    passwds = (passwds_t **) malloc(sizeof(passwds_t *));
+    
+    _passwdfile_get_next_line(&fobj);
+
+    while(fobj.ln != NULL) {
+      
+      if(_passwdfile_is_entry_valid(fobj.buf, name, passwd)) {
+	passwds = (passwds_t **) realloc(passwds, sizeof(passwds_t *) * (entries + 2));
+	passwds[entries]         = (passwds_t *) malloc(sizeof(passwds_t));
+	passwds[entries]->ident  = strdup(name);
+	passwds[entries]->passwd = strdup(passwd);
+	entries++;
+      }
+      
+      _passwdfile_get_next_line(&fobj);
+    }
+
+    passwds[entries]         = (passwds_t *) malloc(sizeof(passwds_t));
+    passwds[entries]->ident  = NULL;
+    passwds[entries]->passwd = NULL;
+
+    fclose(fobj.fd);
+  }
+  else {
+    fprintf(stderr, "fopen() failed: %s\n", strerror(errno));
+    return 0;
+  }
+
+  if(!entries)
+    return 0;
+
+  return 1;
+}
+static int server_is_all_authorized(void) {
+  int i;
+  
+  for(i = 0; passwds[i]->ident != NULL; i++) {
+    if((!strcmp(passwds[i]->ident, "ALL")) && (!strcmp(passwds[i]->passwd, "ALL")))
+      return 1;
+  }
+  
+  return 0;
 }
 
 /*
- * Send msg to socket.
+ * Check access rights.
  */
-static void send_to_client(client_info_t *client_info, char *msg, ...) {
-  char     buf[_BUFSIZ];
-  va_list  args;
-  int      err;
+static void check_client_auth(client_info_t *client_info) {
+  int i;
 
-  if(client_info->socket < 0)
+  /* ALL:ALL passwd rule enabled */
+  if(server_is_all_authorized())
     return;
-  
-  va_start(args, msg);
-  vsnprintf(buf, _BUFSIZ, msg, args);
-  va_end(args);
 
-  err = send(client_info->socket, buf, strlen(buf), MSG_NOSIGNAL);
-  if(err < 0) {
-    fprintf(stderr, "send() failed: %s\n", strerror(errno));
-    close(client_info->socket);
-    client_info->socket = -1;
-    client_info->finished = 1;
+  client_info->authentified = 0;
+  
+  for(i = 0; passwds[i]->ident != NULL; i++) {
+    if(!strcasecmp(passwds[i]->ident, client_info->name)) {
+      if(!strcasecmp(passwds[i]->passwd, client_info->passwd)) {
+	client_info->authentified = 1;
+	sock_write(client_info->socket, "user '%s' has been authentified.\n", client_info->name);
+      }
+      else
+	sock_write(client_info->socket, "bad passwd.\n");
+      
+      return;
+    }
   }
+  
+  sock_write(client_info->socket, "unknown user '%s'\n", client_info->name);
 }
 
 static void handle_xine_error(client_info_t *client_info) {
@@ -1149,19 +1424,21 @@ static void handle_xine_error(client_info_t *client_info) {
     break;
     
   case XINE_ERROR_NO_INPUT_PLUGIN:
-    send_to_client(client_info, "xine engine error:\n"
-		   "There is no available input plugin available to handle '%s'.\n",
-		   gGui->filename);
+    sock_write(client_info->socket,
+	       "xine engine error:\n"
+	       "There is no available input plugin available to handle '%s'.\n",
+	       gGui->filename);
     break;
     
   case XINE_ERROR_NO_DEMUXER_PLUGIN:
-    send_to_client(client_info, "xine engine error:\n"
-		   "There is no available demuxer plugin to handle '%s'.\n", 
-		   gGui->filename);
+    sock_write(client_info->socket, 
+	       "xine engine error:\n"
+	       "There is no available demuxer plugin to handle '%s'.\n", 
+	       gGui->filename);
     break;
     
   default:
-    send_to_client(client_info, "xine engine error:\n!! Unhandled error !!\n");
+    sock_write(client_info->socket, "xine engine error:\n!! Unhandled error !!\n");
     break;
   }
 }
@@ -1229,10 +1506,12 @@ static void command_help(commands_t *command, client_info_t *client_info) {
 
   if(command) {
     if(command->help) {
-      send_to_client(client_info, "Help of '%s' command:\n       %s\n", command->command, command->help);
+      sock_write(client_info->socket,
+		 "Help of '%s' command:\n       %s\n", command->command, command->help);
     }
     else
-      send_to_client(client_info, "There is no help text for command '%s'\n", command->command);
+      sock_write(client_info->socket,
+		 "There is no help text for command '%s'\n", command->command);
   }
 }
 
@@ -1243,10 +1522,12 @@ static void command_syntax(commands_t *command, client_info_t *client_info) {
   
   if(command) {
     if(command->syntax) {
-      send_to_client(client_info, "Syntax of '%s' command:\n%s\n", command->command, command->syntax);
+      sock_write_nocr(client_info->socket, 
+		 "Syntax of '%s' command:\n%s\n", command->command, command->syntax);
     }
     else
-      send_to_client(client_info, "There is no syntax definition for command '%s'\n", command->command);
+      sock_write(client_info->socket,
+		 "There is no syntax definition for command '%s'\n", command->command);
   }
 }
 
@@ -1264,10 +1545,11 @@ static void do_commands(commands_t *cmd, client_info_t *client_info, void *data)
     i++;
   }
   sprintf(buf, "%s.\n", buf);
-  send_to_client(client_info, buf);
+  sock_write(client_info->socket, buf);
 }
 
 static void do_help(commands_t *cmd, client_info_t *client_info, void *data) {
+  char buf[_BUFSIZ];
 
   if(!client_info->command.num_args) {
     int i = 0, j;
@@ -1286,29 +1568,30 @@ static void do_help(commands_t *cmd, client_info_t *client_info, void *data) {
     
     maxlen++; 
     i = 0;  
-    
-    send_to_client(client_info, "Available commands are:\n       ");
+
+    sprintf(buf, "Available commands are:\n       ");
     curpos += 7;
     
     while(commands[i].command != NULL) {
       if(commands[i].public) {
 	if((curpos + maxlen) >= 80) {
-	  send_to_client(client_info, "\n       ");
+	  sprintf(buf, "%s\n       ", buf);
 	  curpos = 7;
 	}
 	
-	send_to_client(client_info, "%s", commands[i].command);
+	sprintf(buf, "%s%s", buf, commands[i].command);
 	curpos += strlen(commands[i].command);
 	
 	for(j = 0; j < (maxlen - strlen(commands[i].command)); j++) {
-	  send_to_client(client_info, " ");
+	  sprintf(buf, "%s ", buf);
 	  curpos++;
 	}
       }
       i++;
     }
     
-    send_to_client(client_info, "\n");
+    sprintf(buf, "%s\n", buf);
+    sock_write(client_info->socket, buf);
   }
   else {
     int i;
@@ -1319,8 +1602,8 @@ static void do_help(commands_t *cmd, client_info_t *client_info, void *data) {
 	return;
       }
     }
-
-    send_to_client(client_info, "Unknown command '%s'.\n", (get_arg(client_info, 1)));
+    
+    sock_write(client_info->socket, "Unknown command '%s'.\n", (get_arg(client_info, 1)));
   }
 }
 
@@ -1334,7 +1617,44 @@ static void do_syntax(commands_t *command, client_info_t *client_info, void *dat
     }
   }
 
-  send_to_client(client_info, "Unknown command '%s'.\n", (get_arg(client_info, 1)));
+  sock_write(client_info->socket, "Unknown command '%s'.\n", (get_arg(client_info, 1)));
+}
+
+static void do_auth(commands_t *cmd, client_info_t *client_info, void *data) {
+  int nargs;
+  
+  nargs = is_args(client_info);
+  if(nargs) {
+    if(nargs >= 1) {
+      char buf[_BUFSIZ];
+      char *name;
+      char *passwd;
+      
+      sprintf(buf, "%s", get_arg(client_info, 1));
+      name = buf;
+      if((passwd = strrchr(buf, ':')) != NULL) {
+	if(strlen(passwd) > 1) {
+	  *passwd = '\0';
+	  passwd++;
+	}
+      	else {
+	  *passwd = '\0';
+	  passwd = NULL;
+	}
+      }
+      if((name != NULL) && (passwd != NULL)) {
+	memset(&client_info->name, 0, sizeof(client_info->name));
+	memset(&client_info->passwd, 0, sizeof(client_info->passwd));
+
+	snprintf(client_info->name, sizeof(client_info->name), "%s", name);
+	snprintf(client_info->passwd, sizeof(client_info->passwd), "%s", passwd);
+
+	check_client_auth(client_info);
+      }
+      else
+	sock_write(client_info->socket, "use identity:password syntax.\n");
+    }
+  }
 }
 
 static void do_mrl(commands_t *cmd, client_info_t *client_info, void *data) {
@@ -1400,13 +1720,13 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info, void *data)
 	int i;
 	if(gGui->playlist_num) {
 	  for(i = 0; gGui->playlist[i] != NULL; i++) {
-	    send_to_client(client_info, "%5d %s\n", i, gGui->playlist[i]);
+	    sock_write(client_info->socket, "%5d %s\n", i, gGui->playlist[i]);
 	  }
 	}
 	else
-	  send_to_client(client_info, "empty playlist.");
+	  sock_write(client_info->socket, "empty playlist.");
 
-	send_to_client(client_info, "\n");
+	sock_write(client_info->socket, "\n");
       }
       else if(is_arg_contain(client_info, 1, "next")) { /* Alias of mrl next */
 	set_command_line(client_info, "mrl next");
@@ -1529,7 +1849,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info, void *data) {
 	  break;
 	}
 	sprintf(buf, "%s%c", buf, '\n');
-	send_to_client(client_info, buf);
+	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "speed")) {
 	char buf[64];
@@ -1563,46 +1883,46 @@ static void do_get(commands_t *cmd, client_info_t *client_info, void *data) {
 	}
 
 	sprintf(buf, "%s%c", buf, '\n');
-	send_to_client(client_info, buf);
+	sock_write(client_info->socket, buf);
       }
     }
     else if(nargs >= 2) {
       if(is_arg_contain(client_info, 1, "audio")) {
 	if(is_arg_contain(client_info, 2, "channel")) {
-	  send_to_client(client_info, "Current audio channel: %d\n", 
-			 (xine_get_audio_selection(gGui->xine)));
+	  sock_write(client_info->socket, "Current audio channel: %d\n", 
+		     (xine_get_audio_selection(gGui->xine)));
 	}
 	else if(is_arg_contain(client_info, 2, "lang")) {
 	  char buf[20];
 
 	  xine_get_audio_lang(gGui->xine, buf);
-	  send_to_client(client_info, "Current audio language: %s\n", buf);
+	  sock_write(client_info->socket, "Current audio language: %s\n", buf);
 	}
 	else if(is_arg_contain(client_info, 2, "volume")) {
 	  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
-	    send_to_client(client_info, "Current audio volume: %d\n", gGui->mixer.volume_level);
+	    sock_write(client_info->socket, "Current audio volume: %d\n", gGui->mixer.volume_level);
 	  }
 	  else
-	    send_to_client(client_info, "Audio is disabled.\n");
+	    sock_write(client_info->socket, "Audio is disabled.\n");
 	}
 	else if(is_arg_contain(client_info, 2, "mute")) {
 	  if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
-	    send_to_client(client_info, "Current audio mute: %d\n", gGui->mixer.mute);
+	    sock_write(client_info->socket, "Current audio mute: %d\n", gGui->mixer.mute);
 	  }
 	  else
-	    send_to_client(client_info, "Audio is disabled.\n");
+	    sock_write(client_info->socket, "Audio is disabled.\n");
 	}
       }
       else if(is_arg_contain(client_info, 1, "spu")) {
 	if(is_arg_contain(client_info, 2, "channel")) {
-	  send_to_client(client_info, "Current spu channel: %d\n", 
-			 (xine_get_spu_channel(gGui->xine)));
+	  sock_write(client_info->socket, "Current spu channel: %d\n", 
+		     (xine_get_spu_channel(gGui->xine)));
 	}
 	else if(is_arg_contain(client_info, 2, "lang")) {
 	  char buf[20];
 
 	  xine_get_audio_lang (gGui->xine, buf);
-	  send_to_client(client_info, "Current spu language: %s\n", buf);
+	  sock_write(client_info->socket, "Current spu language: %s\n", buf);
 	}
       }
     }
@@ -1659,7 +1979,7 @@ static void do_set(commands_t *cmd, client_info_t *client_info, void *data) {
 				    gGui->mixer.volume_mixer, gGui->mixer.volume_level);
 	  }
 	  else
-	    send_to_client(client_info, "Audio is disabled.\n");
+	    sock_write(client_info->socket, "Audio is disabled.\n");
 	}
 	else if(is_arg_contain(client_info, 2, "mute")) {
 	  if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
@@ -1667,7 +1987,7 @@ static void do_set(commands_t *cmd, client_info_t *client_info, void *data) {
 	    xine_set_audio_property(gGui->xine, AO_PROP_MUTE_VOL, gGui->mixer.mute);
 	  }
 	  else
-	    send_to_client(client_info, "Audio is disabled.\n");
+	    sock_write(client_info->socket, "Audio is disabled.\n");
 	}
       }
       else if(is_arg_contain(client_info, 1, "spu")) {
@@ -1678,6 +1998,9 @@ static void do_set(commands_t *cmd, client_info_t *client_info, void *data) {
     }
   }
 }
+
+/*  static void do_gui(commands_t *cmd, client_info_t *client_info, void *data) { */
+/*  } */
 /*
  * *********** COMMANDS ENDS **********
  */
@@ -1695,7 +2018,7 @@ static void say_hello(client_info_t *client_info) {
   else {
     sprintf(buf, "%s %s remote server. Nice to meet you.\n", PACKAGE, VERSION);
   }
-  send_to_client(client_info, buf);
+  sock_write(client_info->socket, buf);
   
 }
 
@@ -1962,23 +2285,33 @@ static void handle_client_command(client_info_t *client_info) {
 	if(!strncasecmp(client_info->command.command, commands[i].command, strlen(client_info->command.command))) {
 	  if((commands[i].argtype == REQUIRE_ARGS) 
 	     && (client_info->command.num_args <= 0)) {
-	    send_to_client(client_info, "Command '%s' require argument(s).\n", commands[i].command);
+	    sock_write(client_info->socket,
+		       "Command '%s' require argument(s).\n", commands[i].command);
 	    found++;
 	  }
 	  else if((commands[i].argtype == NO_ARGS) && (client_info->command.num_args > 0)) {
-	    send_to_client(client_info, "Command '%s' doesn't require argument.\n", commands[i].command);
+	    sock_write(client_info->socket, 
+		       "Command '%s' doesn't require argument.\n", commands[i].command);
 	    found++;
 	  }
 	  else {
-	    commands[i].function(&commands[i], client_info, NULL);
-	    found++;
+	    if((commands[i].need_auth == NEED_AUTH) && (client_info->authentified == 0)) {
+	      sock_write(client_info->socket, 
+			 "You need to be authentified to use '%s' command, "
+			 "use 'identify'.\n", commands[i].command);
+	      found++;
+	    }
+	    else {
+	      commands[i].function(&commands[i], client_info, NULL);
+	      found++;
+	    }
 	  }
 	}
 	i++;
       }
       
       if(!found)
-	send_to_client(client_info, "unhandled command '%s'.\n", client_info->command.command);
+	sock_write(client_info->socket, "unhandled command '%s'.\n", client_info->command.command);
       
     }
     
@@ -1992,35 +2325,40 @@ static void handle_client_command(client_info_t *client_info) {
  */
 static void *client_thread(void *data) {
   client_info_t     *client_info = (client_info_t *) data;
-  char               buf[_BUFSIZ];
+  char               buffer[_BUFSIZ];
   int                i;
+  int                len;
 
   client_info->finished = 0;
-
+  memset(&client_info->name, 0, sizeof(client_info->name));
+  memset(&client_info->passwd, 0, sizeof(client_info->passwd));
+  
   for(i = 0; i < 256; i++)
     client_info->command.args[i] = (char *) xine_xmalloc(sizeof(char *) * 2048);
-  
+
   say_hello(client_info);
   
-  while(!client_info->finished) {
-    
-    if(msg_from_client(client_info, buf, _BUFSIZ)) {
-      
-      if(strlen(buf)) {
-	set_command_line(client_info, buf);
+  do {
+    len = sock_read(client_info->socket, buffer, sizeof(buffer));
+
+    if(len < 0)
+      client_info->finished = 1;
+    else {
+      if(len > 0) {
+	
+	set_command_line(client_info, _atoa(buffer));
 	handle_client_command(client_info);
       }
     }
-    memset(&buf, 0, sizeof(buf));
-  }
+    
+  } while(client_info->finished == 0);
   
   close(client_info->socket);
   
-#warning FIXME, free commands
   for(i = 0; i < 256; i++)
     _FREE(client_info->command.args[i]);
   
-  free(client_info);
+  _FREE(client_info);
 
   pthread_exit(NULL);
 }
@@ -2032,15 +2370,43 @@ static void *server_thread(void *data) {
   char            *service;
   struct servent  *serv_ent;
   int              msock;
- 
+  int              authentified;
+
   /*  Search in /etc/services if a xinectl entry exist */
   if((serv_ent = getservbyname("xinectl", "tcp")) != NULL) {
     service = (char *) xine_xmalloc(ntohs(serv_ent->s_port));
     sprintf(service, "%u", ntohs(serv_ent->s_port));
   }
   else
-    service = DEFAULT_XINECTL_PORT;
+    service = strdup(DEFAULT_XINECTL_PORT);
   
+  /* Load passwd file */
+  /* password file syntax is:
+   *  - one entry per line
+   *  - syntax: 'identifier:password' length limit is 16 chars each
+   *  - if a line contain 'ALL:ALL' (case sensitive),
+        all client are allowed execute all commands.
+  */
+  {
+    char        *passwdfile = ".xine/passwd";
+    char         passwdfilename[(strlen((get_homedir())) + strlen(passwdfile)) + 2];
+    struct stat  st;
+    
+    sprintf(passwdfilename, "%s/%s", (get_homedir()), passwdfile);
+    
+    if(stat(passwdfilename, &st) < 0) {
+      fprintf(stderr, "ERROR: there is no password file for network access.!\n");
+      goto __failed;
+    }
+
+    if(!server_load_passwd(passwdfilename)) {
+      fprintf(stderr, "ERROR: unable to load network server password file.!\n");
+      goto __failed;
+    }
+
+    authentified = server_is_all_authorized();
+  }
+
   while(gGui->running) {
     client_info_t       *client_info;
     int                  lsin;
@@ -2052,6 +2418,7 @@ static void *server_thread(void *data) {
     lsin = sizeof(client_info->sin);
     
     client_info->socket = accept(msock, (struct sockaddr *)&(client_info->sin), &lsin);
+    client_info->authentified = authentified;
     
     if(client_info->socket < 0) {
       
@@ -2065,7 +2432,21 @@ static void *server_thread(void *data) {
 
     pthread_create(&thread_client, NULL, client_thread, (void *)client_info);
   }
+
+ __failed:
   free(service);
+
+  { /* Freeing passwords */
+    int i;
+    
+    for(i = 0; passwds[i]->ident != NULL; i++) {
+      free(passwds[i]->ident);
+      free(passwds[i]->passwd);
+      free(passwds[i]);
+    }
+    free(passwds);
+   
+  }
  
   pthread_exit(NULL);
 }
@@ -2080,4 +2461,39 @@ void start_remote_server(void) {
   }
   
 }
+
+static const char *get_homedir(void) {
+  struct passwd *pw = NULL;
+  char *homedir = NULL;
+#ifdef HAVE_GETPWUID_R
+  int ret;
+  struct passwd pwd;
+  char *buffer = NULL;
+  int bufsize = 128;
+  
+  buffer = (char *) malloc(bufsize);
+  memset(buffer, 0, sizeof(buffer));
+  
+  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) < 0) {
+#else
+  if((pw = getpwuid(getuid())) == NULL) {
+#endif
+    if((homedir = getenv("HOME")) == NULL) {
+      fprintf(stderr, "Unable to get home directory, set it to /tmp.\n");
+      homedir = strdup("/tmp");
+    }
+  }
+  else {
+    if(pw) 
+      homedir = strdup(pw->pw_dir);
+  }
+  
+  
+#ifdef HAVE_GETPWUID_R
+  _FREE(buffer);
+#endif
+  
+  return homedir;
+}
+
 #endif

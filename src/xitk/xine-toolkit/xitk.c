@@ -858,7 +858,7 @@ const char *xitk_get_homedir(void) {
   char *buffer = NULL;
   int bufsize = 128;
 
-  buffer = (char *) xmalloc(bufsize);
+  buffer = (char *) xitk_xmalloc(bufsize);
   
   if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) < 0) {
 #else

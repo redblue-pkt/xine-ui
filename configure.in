@@ -214,7 +214,7 @@ AC_RETSIGTYPE
 AC_HEADER_STAT
 AC_HEADER_DIRENT
 AC_CHECK_FUNCS(lstat memmove putenv select setenv setlocale \
-	strcasecmp strpbrk tcgetattr vsnprintf isascii isxdigit)
+	strcasecmp strpbrk tcgetattr vsnprintf isascii isxdigit getpwuid_r)
 
 AC_FUNC_STRCOLL
 
