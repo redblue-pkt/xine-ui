@@ -394,6 +394,9 @@ static void xrm_parse(void) {
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->logo_mrl = cfg->str_value;
 }
+static void sub_autoload_cb(void *data, xine_config_entry_t *cfg) {
+  gGui->subtitle_autoload = cfg->num_value;
+}
 
 /*
  *
@@ -1626,6 +1629,14 @@ int main(int argc, char *argv[]) {
     sprintf(buffer, "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
     mediamark_load_mediamarks(buffer);
   }
+
+  gGui->subtitle_autoload = 
+    xine_config_register_bool(gGui->xine, "gui.subtitle_autoload", 1,
+			      _("Subtitle autologin"),
+			      _("Automatically load subtitles if they exist."), 
+			      CONFIG_LEVEL_BEG,
+			      sub_autoload_cb,
+			      CONFIG_NO_DATA);
 
   /*
    * init gui

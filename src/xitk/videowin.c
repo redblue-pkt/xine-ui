@@ -849,9 +849,13 @@ static void video_window_adapt_size (void) {
       
   if ((!(gVw->fullscreen_mode & WINDOWED_MODE))) {
     /* Waiting for visibility, avoid X error on some cases */
+
+    XUnlockDisplay (gGui->display);
+
     while(!xitk_is_window_visible(gGui->display, gGui->video_window))
       xine_usec_sleep(5000);
-
+    
+    XLockDisplay (gGui->display);
     XSetInputFocus (gGui->display, 
 		    gGui->video_window, RevertToNone, CurrentTime);
 #ifdef HAVE_XINERAMA

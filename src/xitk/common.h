@@ -145,6 +145,7 @@ typedef struct {
     int                     length;
   } stream_length;
 
+  int                       subtitle_autoload;
   xine_stream_t            *spu_stream;
 
   xine_t                   *xine;

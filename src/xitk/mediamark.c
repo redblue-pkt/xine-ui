@@ -2203,6 +2203,8 @@ int mediamark_get_entry_from_id(const char *ident) {
 
 void mediamark_add_entry(const char *mrl, const char *ident, 
 			 const char *sub, int start, int end, int av_offset, int spu_offset) {
+  char  autosub[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  
   if(!gGui->playlist.num)
     gGui->playlist.mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
   else { 
@@ -2211,7 +2213,48 @@ void mediamark_add_entry(const char *mrl, const char *ident,
 	realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 1));
     }
   }
-  
+
+  /*
+   * If subtitle_autoload is enabled and subtitle is NULL
+   * then try to see if a matching subtitle exist 
+   */
+  if(mrl && (!sub) && gGui->subtitle_autoload) {
+
+    if((strncasecmp(mrl, "file:", 5)) && 
+       strstr (mrl, ":/") && (strstr (mrl, ":/") < strchr(mrl, '/')))
+      ;
+    else {
+      char        *know_subs = "sub,srt,asc,smi,ssa";
+      char        *vsubs;
+      char        *_mrl, *ending, *ext;
+      struct stat  pstat;
+      
+      _mrl = (char *) mrl;
+      if(!strncasecmp(_mrl, "file:", 5))
+	_mrl += 5;
+      
+      memset(&autosub, 0, sizeof(autosub));
+      snprintf(autosub, XITK_PATH_MAX + XITK_NAME_MAX, "%s", _mrl);
+      
+      if((ending = strrchr(autosub, '.')))
+	ending++;
+      else {
+	ending = autosub + strlen(autosub);
+	*ending++ = '.';
+      }
+      
+      xine_strdupa(vsubs, know_subs);
+      
+      while((ext = xine_strsep(&vsubs, ",")) && !sub) {
+	sprintf(ending, "%s", ext);
+	*(ending + strlen(ext) + 1) = '\0';
+	
+	if(((stat(autosub, &pstat)) > -1) && (S_ISREG(pstat.st_mode)) && strcmp(autosub, _mrl))
+	  sub = autosub;
+      }
+    }
+  }
+
   if(mediamark_store_mmk(&gGui->playlist.mmk[gGui->playlist.num], 
 			 mrl, ident, sub, start, end, av_offset, spu_offset))
     gGui->playlist.num++;
