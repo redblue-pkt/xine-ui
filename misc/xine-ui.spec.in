@@ -37,11 +37,10 @@ Více informací o tom, jaké formáty jsou podporovány získáte v dokumentaci
 od libxine.
 
 %description -l de
-xine ist ein funktionsreiches, freies Audio- und Video-Abspielprogramm für
-Unix-basierende Systeme, welches die xine-Bibliothek libxine für Audio- und
-Videodekodierung, sowie -wiedergabe verwendet. Um mehr Informationen über die
-unterstützten Formate zu erhalten, lesen Sie bitte in der Dokumentation der
-xine-Bibliothek libxine nach.
+xine ist ein freies Audio- und Video-Abspielprogramm für unixartige Systeme
+mit umfassenden Funktionen. Zur Audio- und Videodekodierung und Wiedergabe
+werden die xine-Bibliotheken aus libxine verwendet. Weitere Informationen
+über die unterstützten Formate entnehmen Sie in der Dokumentation zu libxine.
 
 %prep
 %setup -n %{name}-%{version}
@@ -132,7 +131,9 @@ if test -d /opt/kde3/; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde3/share/applnk/Multimedia
   fi
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop
-  cat /opt/kde3/share/applnk/Multimedia/xine.desktop | sed -e "s/xine.xpm/\xine/g" > /opt/kde3/share/applnk/Multimedia/xine.desktop
+  cat %{deskdir}/xine.desktop | sed -e "s/xine.xpm/\xine/g" > %{deskdir}/xine.desktop.kde
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde3/share/applnk/Multimedia/xine.desktop
+  rm %{deskdir}/xine.desktop.kde
 fi
 # End Kde3
 # Kde2
@@ -152,8 +153,9 @@ if test -d /opt/kde2/; then
   if test ! -d /opt/kde2/share/applnk/Multimedia; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
   fi
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop
-  cat /opt/kde2/share/applnk/Multimedia/xine.desktop | sed -e "s/xine.xpm/\xine/g" > /opt/kde2/share/applnk/Multimedia/xine.desktop
+  cat %{deskdir}/xine.desktop | sed -e "s/xine.xpm/\xine/g" > %{deskdir}/xine.desktop.kde
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde2/share/applnk/Multimedia/xine.desktop
+  rm %{deskdir}/xine.desktop.kde
 else
   if test -d %{_datadir}/applnk/Multimedia; then
     if test ! -d %{_datadir}/applnk/Multimedia; then
@@ -227,6 +229,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sun Oct 27 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- Update of the german descriptions.
+- fixed some problems with creating kde2 and kde3 menu-entry
 * Mon May 27 2002 Matthias Dahl <matthew2k@web.de>
 - added passing of build parameter to configure
 * Sun May 26 2002 Matthias Dahl <matthew2k@web.de>
