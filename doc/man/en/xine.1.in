@@ -112,9 +112,6 @@ Hide video output window.
 Turn off LIRC support. This option is \fIonly\~available\fP if xine has been compiled
 with LIRC support.
 .TP
-.B \-\-stdctrl
-Turn on controlling xine over STDIN.
-.TP
 .BI \-\-visual\  <visual\-class\-or\-id>
 Try to use a specific X11 server visual for xine windows.  The
 \fI<visual\-class\-or\-id>\fP parameter is either the name of an X11 visual
@@ -231,7 +228,7 @@ Set playlist loop mode. If mode isn't specified, mode \fBloop\fP is used. Possib
 .BI \-\-skin\-server\-url\  <url>
 Define the skin server url.
 .TP
-.BI \-\-enqueue\  <mrl>
+.BI \-\-enqueue\  <mrl> ...
 .br
 Enqueue one or more mrl in a running session (session 0). 
 .br
@@ -255,14 +252,20 @@ Options are:
 .br
 \fBamp=\fP\fIv\fP     set audio amplification of instance (\<\fIv\fP\>: 0 to 200),
 .br
+\fBloop=\fP\fIm\fP    set loop mode (\<\fIm\fP\>: \fBnone\fP \fBloop\fP \fBrepeat\fP \fBshuffle\fP or \fBshuffle+\fP),
+.br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
   \<\fIp\fP\> can be:
 .br
     \fBclear\fP:     clear the playlist,
-    \fBnext\fP:      play next playlist entry,
+    \fBfirst\fP:     play first entry in the playlist,
     \fBprev\fP:      play previous playlist entry,
-    \fBload:\fP\fIs\fP:    load playlist file <\fIs\fP>.
+    \fBnext\fP:      play next playlist entry,
+    \fBlast\fP:      play last entry in the playlist,
+    \fBload:\fP\fIs\fP:    load playlist file <\fIs\fP>,
+    \fBstop\fP:      stop playback at the end of the current playback,
+    \fBcont\fP:      continue playback at the end of current playback.
 .br
 There are also some self explanatory options.
     \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
@@ -274,7 +277,7 @@ Don't automatically start playback, affect only auto-start when smart mode is us
 Deinterlace video output. You can override configuration option of post(s) used to deinterlace the output picture. See \fI\-\-post\fP for syntax.
 .TP
 .BI \-r,\ \-\-aspect\-ratio\  <mode>
-Set aspect ratio of video output. Modes are:
+Set aspect ratio of video output. \<\fImode\fP\> can be:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
 .TP
 .BI \-\-broadcast\-port\  <port>
@@ -291,6 +294,22 @@ Load one or more post plugin(s). Parameters are comma separated. This option can
 .TP
 .BI \-\-disable\-post
 Don't enable post plugin(s). This way, you can specify one more plugin to use, using the --post command line option, but don't enable those effects.
+.TP
+.BI \-\-no\-splash
+Don't display the splash screen.
+.TP
+.B \-\-stdctrl
+Turn on controlling xine over STDIN.
+.TP
+.BI \-T,\ \-\-tvout <backend>
+Turn on TVout support. \<\fIbackend\fP\> can be: nvtv, ati.
+.TP
+.BI \-\-list\-plugins [=type]
+Display the list of available plugins. Optional \<\fItype\fP\> can be: 
+audio_out, video_out, demux, input, sub, post, audio_decoder, video_decoder
+.TP
+.BI \-\-bug\-report [=mrl]
+Enable bug report mode. It turn verbosity on, gather all output messages and write them to a file names BUG-REPORT.TXT. If \<\fImrl\fP\> is given, xine will play that mrl then quit (like -pq does).
 .TP
 .B MRL (media resource locator)
 .br
@@ -382,120 +401,244 @@ Many features can be controlled by pressing control keys. '\fBM\-\fP' is
 the Meta key (`\fBAlt\fP' key on PC keyboard), '\fBC\-\fP' is the Control `\fBCTRL\fP' 
 key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the `\fBHOME\fP' key is displayed \fB<home>\fP.
 The default key bindings are:
-.IP "\fBC\fP\-\fB0\fP .. \fBC\fP\-\fB9\fP"
-Jump to 0%..90% of current stream
-.IP "\fB/\fP"
-Seek to the percentage specified by the numeric argument. This is more
-general than the above 0..9 commands. See the section on "Numeric Input" below.
-.IP "\fBA\fP"
-Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
-.IP "\fBC\fP\-\fBa\fP"
-Add a mediamark to the playlist from the current position stream playback.
-.IP "\fBM\fP\-\fBC\fP"
-Show/hide the video settings window.
-.IP "\fBe\fP"
-Eject the current media.
-.IP "\fBf\fP"
-Toggle fullscreen mode.
-.IP "\fBF\fP"
-Toggle xinerama fullscreen mode.
-.IP "\fBG\fP"
-Hide/show the gui.
-.IP "\fBH\fP"
-Hide/show the video output window.
-.IP "\fBi\fP | \fBI\fP"
-Toggle deinterlace methods.
-.IP "\fBl\fP"
-Toggle between loop modes.
-.IP "\fBM\fP\-\fBl\fP"
-Show/hide log window.
-.IP "\fBM\fP\-\fBm\fP"
-Hide/show the MRL browser.
-.IP "\fBC\fP\-\fBm\fP"
-Audio mute toggle.
-.IP "\fBCM\fP\-\fBo\fP"
-Toggle TV modes on the DXR3
-.IP "\fBC\fP\-\fBo\fP"
-Open file browser.
-.IP "\fBM\fP\-\fBp\fP"
-Show/hide the playlist window.
-.IP "\fBQ\fP"
-Exit.
-.IP "\fBd\fP"
-Switch Monitor to DPMS standby mode
-.IP "\fBs\fP"
-Zoom 1:1.
+.IP "\fB\<Return\>\fP"
+Start playback
+.IP "\fB\<space\>\fP"
+Playback pause toggle
 .IP "\fBS\fP"
-Stop playback.
-.IP "\fBM\fP\-\fBs\fP"
-Show/hide setup window.
-.IP "\fBz\fP | \fBZ\fP"
-Zoom in/out.
-.IP "\fBM\fP\-\fBC\fP\-\fBz\fP"
-Reset zoom.
-.IP "\fBv\fP"
-Decrease audio volume.
-.IP "\fBV\fP"
-Increase audio volume.
-.IP "\fBC\fP\-\fBv\fP"
-Reduce amplication level of instance.
-.IP "\fBC\fP\-\fBV\fP"
-Increase amplication level of instance.
-.IP "\fBC\fP\-\fBA\fP"
-Reset amplication level.
+Stop playback
 .IP "\fBt\fP"
-Take a snapshot.
-.IP "\fB<return>\fP"
-Play
-.IP "\fB<space>\fP"
-Pause
-.IP "\fB<up>\fP | \fB<down>\fP"
-fast forward / slow motion
-.IP "\fBC\fP\-\fB<left>\fP | \fBC\fP\-\fB<right>\fP"
-seek -+ 15 sec.
-.IP "\fB<left>\fP | \fB<right>\fP"
-seek +- 60 sec.
-.IP "\fB<page\ up>\fP"
-Jump to previous stream in playlist
-.IP "\fB<page\ down>\fP"
-Jump to next stream in playlist
-.IP "\fB<\fP"
-Reduce the output window.
-.IP "\fB>\fP"
-Enlarge the ouput window.
+Take a snapshot
+.IP "\fBe\fP"
+Eject the current medium
+.IP "\fB\<Next\>\fP"
+Select and play next MRL in the playlist
+.IP "\fB\<Prior\>\fP"
+Select and play previous MRL in the playlist
+.IP "\fBl\fP"
+Loop mode toggle
+.IP "\fBC\fP\-\fBs\fP"
+Scan playlist to grab stream infos
+.IP "\fBC\fP\-\fBa\fP"
+Add a mediamark from current playback
+.IP "\fBC\fP\-\fBe\fP"
+Edit selected mediamark
+.IP "\fB\<Left\>\fP"
+Set position to -60 seconds in current stream
+.IP "\fB\<Right\>\fP"
+Set position to +60 seconds in current stream
+.IP "\fBM\fP\-\fB\<Left\>\fP"
+Set position to -30 seconds in current stream
+.IP "\fBM\fP\-\fB\<Right\>\fP"
+Set position to +30 seconds in current stream
+.IP "\fBC\fP\-\fB\<Left\>\fP"
+Set position to -15 seconds in current stream
+.IP "\fBC\fP\-\fB\<Right\>\fP"
+Set position to +15 seconds in current stream
+.IP "\fBM3\fP\-\fB\<Left\>\fP"
+Set position to -7 seconds in current stream
+.IP "\fBM3\fP\-\fB\<Right\>\fP"
+Set position to +7 seconds in current stream
+.IP "\fBC\fP\-\fB0\fP"
+Set position to beginning of current stream
+.IP "\fBC\fP\-\fB1\fP"
+Set position to 10% of current stream
+.IP "\fBC\fP\-\fB2\fP"
+Set position to 20% of current stream
+.IP "\fBC\fP\-\fB3\fP"
+Set position to 30% of current stream
+.IP "\fBC\fP\-\fB4\fP"
+Set position to 40% of current stream
+.IP "\fBC\fP\-\fB5\fP"
+Set position to 50% of current stream
+.IP "\fBC\fP\-\fB6\fP"
+Set position to 60% of current stream
+.IP "\fBC\fP\-\fB7\fP"
+Set position to 70% of current stream
+.IP "\fBC\fP\-\fB8\fP"
+Set position to 80% of current stream
+.IP "\fBC\fP\-\fB9\fP"
+Set position to 90% of current stream
+.IP "\fB\<Up\>\fP"
+Increment playback speed
+.IP "\fB\<Down\>\fP"
+Decrement playback speed
+.IP "\fBM\fP\-\fB\<Down\>\fP"
+Reset playback speed
+.IP "\fBV\fP"
+Increment audio volume
+.IP "\fBv\fP"
+Decrement audio volume
+.IP "\fBC\fP\-\fBV\fP"
+Increment amplification level
+.IP "\fBC\fP\-\fBv\fP"
+Decrement amplification level
+.IP "\fBC\fP\-\fBA\fP"
+Reset amplification to default value
+.IP "\fBC\fP\-\fBm\fP"
+Audio muting toggle
+.IP "\fB\<plus\>\fP"
+Select next audio channel
+.IP "\fB\<minus\>\fP"
+Select previous audio channel
+.IP "\fB\<period\>\fP"
+Select next sub picture (subtitle) channel
+.IP "\fB\<comma\>\fP"
+Select previous sub picture (subtitle) channel
+.IP "\fBi\fP"
+Interlaced mode toggle
+.IP "\fBa\fP"
+Cycle aspect ratio values
+.IP "\fB\<less\>\fP"
+Reduce the output window size by factor 1.2
+.IP "\fB\<greater\>\fP"
+Enlarge the output window size by factor 1.2
 .IP "\fBM\fP\-\fB1\fP"
 Set video output window to 50%
 .IP "\fBM\fP\-\fB2\fP"
 Set video output window to 100%
 .IP "\fBM\fP\-\fB3\fP"
 Set video output window to 200%
-.IP "\fB.\fP"
-Select next sub-title channel.
-.IP "\fB,\fP"
-Select previous sub-title channel.
-.IP "\fB+\fP"
-Select next audio channel (may take up to a few seconds to take effect)
-.IP "\fB-\fP"
-Select prev audio channel
-.IP "\fB<Esc>\fP"
-Menu 1 (e.g. root menu)
-.IP "\fB<F1>\fP"
-Menu 2 (e.g. title menu)
-.IP "\fB<F2>\fP"
-Menu 3
-.IP "\fB<Insert>\fP"
-Grab pointer toggle.
+.IP "\fBz\fP"
+Zoom in
+.IP "\fBZ\fP"
+Zoom out
+.IP "\fBC\fP\-\fBz\fP"
+Zoom in horizontally
+.IP "\fBC\fP\-\fBZ\fP"
+Zoom out horizontally
+.IP "\fBM\fP\-\fBz\fP"
+Zoom in vertically
+.IP "\fBM\fP\-\fBZ\fP"
+Zoom out vertically
+.IP "\fBC\fP\-\fBM\fP\-\fBz\fP"
+Reset zooming
+.IP "\fBs\fP"
+Resize output window to stream size
+.IP "\fBf\fP"
+Fullscreen toggle
+.IP "\fBF\fP"
+Xinerama fullscreen toggle
+.IP "\fB\<Escape\>\fP"
+Jump to media Menu
+.IP "\fB\<F1\>\fP"
+Jump to Title Menu
+.IP "\fB\<F2\>\fP"
+Jump to Root Menu
+.IP "\fB\<F3\>\fP"
+Jump to Subpicture Menu
+.IP "\fB\<F4\>\fP"
+Jump to Audio Menu
+.IP "\fB\<F5\>\fP"
+Jump to Angle Menu
+.IP "\fB\<F6\>\fP"
+Jump to Part Menu
+.IP "\fB\<Keypad Up\>\fP"
+Menu navigate up
+.IP "\fB\<Keypad Down\>\fP"
+Menu navigate down
+.IP "\fB\<Keypad Left\>\fP"
+Menu navigate left
+.IP "\fB\<Keypad Right\>\fP"
+Menu navigate right
+.IP "\fB\<Keypad Enter\>\fP"
+Menu select
+.IP "\fB\<Keypad Next\>\fP"
+Jump to next chapter
+.IP "\fB\<Keypad Prior\>\fP"
+Jump to previous chapter
+.IP "\fB\<Keypad Home\>\fP"
+Select next angle
+.IP "\fB\<Keypad End\>\fP"
+Select previous angle
+.IP "\fBM\fP\-\fBh\fP"
+Visibility toggle of help window
+.IP "\fBM\fP\-\fBP\fP"
+Visibility toggle of video post effect window
+.IP "\fBC\fP\-\fBM\fP\-\fBP\fP"
+Toggle post effect usage
+.IP "\fBh\fP"
+Visibility toggle of output window
+.IP "\fBg\fP"
+Visibility toggle of UI windows
+.IP "\fBM\fP\-\fBc\fP"
+Visibility toggle of control window
+.IP "\fBM\fP\-\fBm\fP"
+Visibility toggle of mrl browser window
+.IP "\fBM\fP\-\fBp\fP"
+Visibility toggle of playlist editor window
+.IP "\fBM\fP\-\fBs\fP"
+Visibility toggle of the setup window
 .IP "\fBM\fP\-\fBe\fP"
-Hide/show the event sender window.
+Visibility toggle of the event sender window
+.IP "\fBM\fP\-\fBt\fP"
+Visibility toggle of analog TV window
+.IP "\fBM\fP\-\fBl\fP"
+Visibility toggle of log viewer
 .IP "\fBM\fP\-\fBi\fP"
-Hide/show the stream informations window.
+Visibility toggle of stream info window
+.IP "\fBC\fP\-\fBi\fP"
+Display stream information using OSD
+.IP "\fBM\fP\-\fBk\fP"
+Enter key binding editor
+.IP "\fBC\fP\-\fBo\fP"
+Open file selector
+.IP "\fBC\fP\-\fBS\fP"
+Select a subtitle file
+.IP "\fBC\fP\-\fBd\fP"
+Download a skin from the skin server
 .IP "\fBC\fP\-\fBt\fP"
-Toggle display mode between mrl and identifier.
-.IP "\fBC\fP\-\fBs\fP"
-Update playlist's stream informations (if available).
-.IP "\fBC\fP\-\fBe\fP"
-In playlist window, using this shortcut permit you to change the selected mediamark contents (like identifier, mrl, start and stop time).
-
+Display MRL/Ident toggle
+.IP "\fB\<Insert\>\fP"
+Grab pointer toggle
+.IP "\fB0\fP"
+Enter the number 0
+.IP "\fB1\fP"
+Enter the number 1
+.IP "\fB2\fP"
+Enter the number 2
+.IP "\fB3\fP"
+Enter the number 3
+.IP "\fB4\fP"
+Enter the number 4
+.IP "\fB5\fP"
+Enter the number 5
+.IP "\fB6\fP"
+Enter the number 6
+.IP "\fB7\fP"
+Enter the number 7
+.IP "\fB8\fP"
+Enter the number 8
+.IP "\fB9\fP"
+Enter the number 9
+.IP "\fBM3\fP\-\fB\<plus\>\fP"
+Add 10 to the next entered number
+.IP "\fB\<slash\>\fP"
+Set position in current stream to numeric percentage
+See the section on "Numeric Input" below.
+.IP "\fBM\fP\-\fB\<Up\>\fP"
+Set position forward by numeric argument in current stream
+.IP "\fBM3\fP\-\fB\<Up\>\fP"
+Set position back by numeric argument in current stream
+.IP "\fBm\fP"
+Change audio video syncing (delay video)
+.IP "\fBn\fP"
+Change audio video syncing (delay audio)
+.IP "\fB\<Home\>\fP"
+Reset audio video syncing offset
+.IP "\fBM\fP"
+Change subtitle syncing (delay video)
+.IP "\fBN\fP"
+Change subtitle syncing (delay subtitles)
+.IP "\fBC\fP\-\fBM\fP\-\fBo\fP"
+Toggle TV modes (on the DXR3)
+.IP "\fBd\fP"
+Switch Monitor to DPMS standby mode
+.IP "\fBC\fP\-\fBl\fP"
+Stop playback after played stream
+.IP "\fBq\fP"
+Quit the program
+.br
 .SS Third party plugins
 Following shortcuts are used by third party plugins, generally for DVD navigation:
 .IP "\fB<KeyPad\ Up>\fP"
