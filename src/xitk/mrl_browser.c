@@ -205,6 +205,8 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
       filters[num_endings]->name   = strdup(patterns);
       filters[num_endings]->ending = strdup(e);
     }
+
+    free(mrl_exts);
   }
 
   filters[num_endings + 1]         = (xitk_mrlbrowser_filter_t *)
