@@ -966,7 +966,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   gettimeofday (&tv, NULL);
   
   if(abs(tv.tv_sec - event->tv.tv_sec) > 3) {
-    printf("Event too old, discarding\n");
+    fprintf(stderr, "Event too old, discarding\n");
     return;
   }
   
@@ -985,13 +985,12 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
   /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
-    /*    printf("xitk/main.c: playback finished\n"
-     *	   "             event->stream=%d,\n"
-     *	   "gGui->stream=%d, gGui->visual_anim.stream=%d\n",
-     *	   event->stream, gGui->stream, gGui->visual_anim.stream);
-     */
     if(event->stream == gGui->stream) {
-      /* printf("xitk/main.c: playing next stream...\n"); */
+
+      /* There a reference stream waiting to be played, just wait for */
+      if(gGui->got_reference_stream)
+	return;
+
       gui_playlist_start_next();
     }
     else if(event->stream == gGui->visual_anim.stream) {
@@ -1225,10 +1224,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   case XINE_EVENT_MRL_REFERENCE:
     if((event->stream == gGui->stream) && gGui->playlist.num) {
       xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
-      
+
       if(ref->alternative == 0) {
 	mediamark_t *mmk = mediamark_clone_mmk((mediamark_t *) mediamark_get_current_mmk());
-	
+
 	if(mmk) {
 	  mediamark_replace_entry(&gGui->playlist.mmk[gGui->playlist.cur],
 				  ref->mrl, 
@@ -1239,17 +1238,17 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	  
 	  mmk = (mediamark_t *) mediamark_get_current_mmk();
 	  gui_set_current_mrl(mmk);
+	  
+	  playlist_update_playlist();
+	  panel_update_mrl_display();
+	  
+	  /* We can't do anything more here, otherwise deadlock occur */
+	  gGui->got_reference_stream++;
 	}
       }
-      else {
+      else
 	mediamark_add_entry(ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
-      }
-      
-      playlist_update_playlist();
-      panel_update_mrl_display();
 
-      /* We can't do anything more here, otherwise deadlock occur */
-      gGui->got_reference_stream++;
     }
     break;
   }
@@ -1760,6 +1759,7 @@ int main(int argc, char *argv[]) {
   }
   
   pthread_mutex_init(&gGui->xe_mutex, NULL);
+
   gGui->xine = xine_new();
   xine_config_load(gGui->xine, gGui->configfile);
   xine_engine_set_param(gGui->xine, XINE_ENGINE_PARAM_VERBOSITY, gGui->verbosity);
@@ -1993,6 +1993,9 @@ int main(int argc, char *argv[]) {
     
     free(session_argv);
   }
+
+  pthread_mutex_destroy(&gGui->xe_mutex);
+  pthread_mutex_destroy(&gGui->download_mutex);
 
   return 0;
 }
