@@ -345,7 +345,7 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 	playlist_toggle_visibility(NULL, NULL);
     }
     
-    mediamark_add_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1);
+    mediamark_add_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0);
     
     if((!num) && ((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode)) {
       gGui->playlist.cur = (gGui->playlist.num - 1);

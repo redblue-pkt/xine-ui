@@ -521,20 +521,6 @@ static void _playlist_handle_event(XEvent *event, void *data) {
   }
 }
 
-/* End of privates */
-void mediamark_editor_change_cb(const char *mrl, const char *ident, const char *sub, 
-				int start, int end) {
-  if(playlist) {
-    int sel = xitk_browser_get_current_selected(playlist->playlist);
-
-    if(sel >= 0) {
-      mediamark_replace_entry(&gGui->playlist.mmk[sel], mrl, ident, sub, start, end);
-    }
-
-  }
-}
-
-
 static void _playlist_apply_cb(void *data) {
   playlist_mrlident_toggle();
   gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
@@ -609,7 +595,7 @@ void playlist_scan_for_infos(void) {
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, !mute);
     
     if(rerun)
-      gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, old_pos, 0);
+      gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, old_pos, 0, gGui->mmk.offset);
     
     playlist_mrlident_toggle();
   }
@@ -758,7 +744,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	    gGui->playlist.cur = 0;
 	  
 	  for (j = 0; j < num_mrls; j++)
-	    mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1);
+	    mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0);
 	  
 	  if(gGui->playlist.cur == 0)
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());

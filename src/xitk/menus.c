@@ -195,7 +195,7 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
       gGui->playlist.cur = 0;
     
     for (j = 0; j < num_mrls; j++)
-      mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1);
+      mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0);
     
     if(gGui->playlist.cur == 0)
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());

@@ -35,7 +35,7 @@
 int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length);
 void gui_display_logo(void);
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time, int update_mmk);
-int gui_xine_open_and_play(char *mrl, char *sub, int start_pos, int start_time);
+int gui_xine_open_and_play(char *mrl, char *sub, int start_pos, int start_time, int offset);
 void gui_exit (xitk_widget_t *w, void *data);
 void gui_play (xitk_widget_t *w, void *data);
 void gui_stop (xitk_widget_t *w, void *data);
