@@ -412,6 +412,7 @@ void slider_reset(widget_list_t *wl, widget_t *sl) {
     else
       private_data->pos = 0;
 
+    private_data->bClicked = 0;
     paint_slider(sl, wl->win, wl->gc);
   }
 #ifdef DEBUG_GUI
