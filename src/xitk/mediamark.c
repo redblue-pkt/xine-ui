@@ -76,8 +76,8 @@ typedef struct {
   char               **lines;
   int                  numl;
   
-  int                 entries;
-  char               *type;
+  int                  entries;
+  char                *type;
 } playlist_t;
 
 typedef mediamark_t **(*playlist_guess_func_t)(playlist_t *, const char *);
@@ -555,7 +555,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
   
   if(filename) {
     if(playlist_check_for_file(filename)) {
-      int entries_tox = 0;
+      int   entries_tox = 0;
       char *tox_content;
       int   size;
       
@@ -564,23 +564,30 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	playlist->data = tox_content;
 	
 	if(playlist_split_data(playlist)) {
-	  char    buffer[32768];
-	  char   *p, *pp;
+	  char    buffer[23768];
+	  char    *p, *pp;
 	  int     start = 0;
-	  int   linen = 0;
-	  char *ln;
+	  int     linen = 0;
+	  char   *ln;
 	  
 	  memset(&buffer, 0, sizeof(buffer));
 	  p = buffer;
-	  
+
 	  while((ln = playlist->lines[linen++]) != NULL) {
 	    
+	    if(!start) {
+	      memset(&buffer, 0, sizeof(buffer));
+	      p = buffer;
+	    }
+
 	    if((ln) && (strlen(ln))) {
 	      
 	      if(strncmp(ln, "#", 1)) {
+
 		pp = ln;
 		
 		while(*pp != '\0') {
+
 		  if(!strncasecmp(pp, "entry {", 7)) {
 		    if(!start) {
 		      start = 1;
@@ -701,11 +708,13 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	  __discard:
 	  }
 	  
+	  printf("entries_tox %d\n", entries_tox);
 	  if(entries_tox) {
+	    printf("ENTRY\n");
 	    mmk[entries_tox] = NULL;
 	    playlist->type = strdup("TOX");
 	  }
-
+	  
 	  while(playlist->numl) {
 	    free(playlist->lines[playlist->numl - 1]);
 	    playlist->numl--;
