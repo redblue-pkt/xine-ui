@@ -19,18 +19,33 @@
  *
  * $Id$
  *
+ * lirc specific stuff
+ *
  */
 
-#ifndef HAVE_GUI_PLAYLIST_H
-#define HAVE_GUI_PLAYLIST_H
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-void playlist_editor(void);
-void playlist_handle_event(XEvent *);
-void pl_exit(widget_t *, void *);
-int pl_is_running(void);
-void pl_toggle_visibility(widget_t *, void *);
-void pl_raise_window(void);
-void pl_scan_input(widget_t *, void *);
-void pl_update_playlist(void);
+#ifdef HAVE_LIRC
+#include "lirc/lirc_client.h"
+
+/*
+ * Initialize lirc support
+ */
+
+void init_lirc(void);
+
+/*
+ * De-init lirc support
+ */
+
+void deinit_lirc(void);
+
+/*
+ * Lirc thread loop
+ */
+
+void *xine_lirc_loop(void *dummy);
 
 #endif

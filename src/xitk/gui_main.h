@@ -24,18 +24,9 @@
 #ifndef GUI_MAIN_H
 #define GUI_MAIN_H
 
-#include <pthread.h>
 #include <X11/Xlib.h>
-#ifdef HAVE_XINERAMA
-#include <X11/extensions/Xinerama.h>
-#endif
-#ifdef HAVE_LIRC
-#include "lirc/lirc_client.h"
-#endif
-
 #include "Imlib-light/Imlib.h"
 #include "xine.h"
-#include "gui_widget.h"
 #include "gui_dnd.h"
 
 #define perr(FMT,ARGS...) fprintf(stderr, FMT, ##ARGS);fflush(stderr)
@@ -58,45 +49,31 @@ typedef struct {
   /* stuff like FULL_ON_START, QUIT_ON_STOP */
   int                  autoplay_options;
 
+  /* basic X11 stuff */
   Display             *display;
   int                  screen;
   XColor               black;
+  Pixmap               icon;
+  DND_struct_t         xdnd;
 
-  Window               video_win; /* video output window */
-  XVisualInfo          vinfo;
-  Cursor               cursor[2]; /* Cursor pointers     */
-  XClassHint          *xclasshint;
-  GC                   gc;
-  int                  completion_type;
-  int                  depth;
-  int                  video_width, video_height; /* size of currently displayed video */
-  int                  fullscreen_mode; /* are we currently in fullscreen mode?  */
-  int                  fullscreen_req;  /* ==1 => gui_setup_video_window will switch to fullscreen mode */
-  int                  fullscreen_width, fullscreen_height;
-  Window               video_window; /* video output window */
+  ImlibData           *imlib_data;
+  ImlibImage          *bg_image;     /* background image */
 
-  Window               gui_panel_win;
-  DND_struct_t        *xdnd_panel_win;
+  Window               video_window; 
+
+  Window               panel_window;
 
   uint32_t             debug_level;
 
-  ImlibData           *imlib_data;
-  ImlibImage          *gui_bg_image;     /* background image */
-
-#ifdef HAVE_LIRC
-  struct lirc_config  *xlirc_config;
-  int                  lirc_fd;
-  int                  lirc_enable;
-  pthread_t            lirc_thread;
-#endif
-
-  char                 gui_filename[1024];
+  char                 filename[1024];
 
   /* gui playlist */
-  char                *gui_playlist[MAX_PLAYLIST_LENGTH];
-  int                  gui_playlist_num;
-  int                  gui_playlist_cur;
+  char                *playlist[MAX_PLAYLIST_LENGTH];
+  int                  playlist_num;
+  int                  playlist_cur;
 
+  int                  running;
+  int                  ignore_status;
 } gGui_t;
 
 
@@ -149,21 +126,6 @@ void gui_status_callback (int nStatus) ;
 void gui_dndcallback (char *filename) ;
 
 void gui_set_current_mrl(const char *mrl);
-
-void gui_play(widget_t *, void *);
-
-void gui_stop (widget_t *, void *);
-
-int  is_gui_panel_visible(void);
-
-void gui_setup_video_window (int video_width, int video_height, int *dest_x, int *dest_y,
-			     int *dest_width, int *dest_height) ;
-
-/* hide/show cursor in video window*/
-void gui_set_cursor_visibility(int show_cursor) ;
-
-/* hide/show video window */
-void gui_set_video_window_visibility(int show_window) ;
 
 #endif
 

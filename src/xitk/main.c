@@ -66,8 +66,6 @@
  */
 gGui_t   *gGui;
 
-int       no_lirc = 0;
-
 /* options args */
 static const char *short_options = "?hS4"
 #ifdef HAVE_LIRC

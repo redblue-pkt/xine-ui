@@ -24,6 +24,8 @@
 #ifndef GUI_PARSESKIN_H
 #define GUI_PARSESKIN_H
 
+#include "gui_widget.h"
+
 char *gui_get_skindir(const char *);
 int gui_get_skinX(const char *);
 int gui_get_skinY(const char *);

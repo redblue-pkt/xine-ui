@@ -30,9 +30,6 @@
 #include <errno.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/extensions/shape.h>
-#include <X11/keysym.h>
-#include <pthread.h>
 #include "Imlib-light/Imlib.h"
 #include "gui_main.h"
 #include "gui_list.h"
@@ -45,6 +42,7 @@
 #include "gui_parseskin.h"
 #include "gui_image.h"
 #include "gui_browser.h"
+#include "gui_actions.h"
 #include "utils.h"
 #include "xine.h"
 
@@ -73,7 +71,7 @@ static int             pl_panel_visible;
  */
 void pl_update_playlist(void) {
 
-  browser_update_list(pl_list, gGui->gui_playlist, gGui->gui_playlist_num, 0);
+  browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
 }
 /*
  *
@@ -112,13 +110,13 @@ static void pl_play(widget_t *w, void *data) {
   
   j = browser_get_current_selected(pl_list);
 
-  if(j>=0 && gGui->gui_playlist[j] != NULL) {
+  if(j>=0 && gGui->playlist[j] != NULL) {
     
-    gui_set_current_mrl(gGui->gui_playlist[j]);
+    gui_set_current_mrl(gGui->playlist[j]);
     if(xine_get_status(gGui->xine) != XINE_STOP)
       gui_stop(NULL, NULL);
     
-    gGui->gui_playlist_cur = j;
+    gGui->playlist_cur = j;
     
     gui_play(NULL, NULL);
     browser_release_all_buttons(pl_list);
@@ -133,17 +131,17 @@ static void pl_delete(widget_t *w, void *data) {
   j = browser_get_current_selected(pl_list);
   
   if(j >= 0) {
-    for(i = j; i < gGui->gui_playlist_num; i++) {
-      gGui->gui_playlist[i] = gGui->gui_playlist[i+1];
+    for(i = j; i < gGui->playlist_num; i++) {
+      gGui->playlist[i] = gGui->playlist[i+1];
     }
-    gGui->gui_playlist_num--;
-    if(gGui->gui_playlist_cur) gGui->gui_playlist_cur--;
+    gGui->playlist_num--;
+    if(gGui->playlist_cur) gGui->playlist_cur--;
   }
 
   browser_rebuild_browser(pl_list, 0);
   
-  if(gGui->gui_playlist_num)
-    gui_set_current_mrl(gGui->gui_playlist[gGui->gui_playlist_cur]);
+  if(gGui->playlist_num)
+    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
   else
     gui_set_current_mrl(NULL);
 
@@ -154,14 +152,14 @@ static void pl_delete(widget_t *w, void *data) {
 static void pl_delete_all(widget_t *w, void *data) {
   int i;
 
-  for(i = 0; i < gGui->gui_playlist_num; i++) {
-    gGui->gui_playlist[i] = NULL;
+  for(i = 0; i < gGui->playlist_num; i++) {
+    gGui->playlist[i] = NULL;
   }
 
-  gGui->gui_playlist_num = 0;
-  gGui->gui_playlist_cur = 0;
+  gGui->playlist_num = 0;
+  gGui->playlist_cur = 0;
 
-  browser_update_list(pl_list, gGui->gui_playlist, gGui->gui_playlist_num, 0);
+  browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
   gui_set_current_mrl(NULL);
 
 }
@@ -173,25 +171,25 @@ static void pl_move_updown(widget_t *w, void *data) {
   
   j = browser_get_current_selected(pl_list);
   
-  if((j >= 0) && gGui->gui_playlist[gGui->gui_playlist_cur] != NULL) {
+  if((j >= 0) && gGui->playlist[gGui->playlist_cur] != NULL) {
     
     if(((int)data) == MOVEUP && (j > 0)) {
       char *tmplist[MAX_PLAYLIST_LENGTH];
       char *tmp;
       int i, k;
 
-      tmp = gGui->gui_playlist[j-1];
+      tmp = gGui->playlist[j-1];
       for(i=0; i<j-1; i++) {
-	tmplist[i] = gGui->gui_playlist[i];
+	tmplist[i] = gGui->playlist[i];
       }
-      tmplist[i] = gGui->gui_playlist[j];
+      tmplist[i] = gGui->playlist[j];
       tmplist[i+1] = tmp;
       i += 2;
-      for(k=i++; k<gGui->gui_playlist_num; k++) {
-	tmplist[k] = gGui->gui_playlist[k];
+      for(k=i++; k<gGui->playlist_num; k++) {
+	tmplist[k] = gGui->playlist[k];
       }
-      for(i=0; i<gGui->gui_playlist_num; i++)
-	gGui->gui_playlist[i] = tmplist[i];
+      for(i=0; i<gGui->playlist_num; i++)
+	gGui->playlist[i] = tmplist[i];
 
       if(j > MAX_LIST || (browser_get_current_start(pl_list) != 0)) {
 	j -= ((MAX_LIST-1)/2);
@@ -204,23 +202,23 @@ static void pl_move_updown(widget_t *w, void *data) {
 	browser_set_select(pl_list, j-1);
       }
     }
-    else if(((int)data) == MOVEDN && (j < (gGui->gui_playlist_num-1))) {
+    else if(((int)data) == MOVEDN && (j < (gGui->playlist_num-1))) {
       char *tmplist[MAX_PLAYLIST_LENGTH];
       char *tmp;
       int i, k;
 
-      tmp = gGui->gui_playlist[j];
+      tmp = gGui->playlist[j];
       for(i=0; i<j; i++) {
-	tmplist[i] = gGui->gui_playlist[i];
+	tmplist[i] = gGui->playlist[i];
       }
-      tmplist[i] = gGui->gui_playlist[j+1];
+      tmplist[i] = gGui->playlist[j+1];
       tmplist[i+1] = tmp;
       i += 2;
-      for(k=i++; k<gGui->gui_playlist_num; k++) {
-	tmplist[k] = gGui->gui_playlist[k];
+      for(k=i++; k<gGui->playlist_num; k++) {
+	tmplist[k] = gGui->playlist[k];
       }
-      for(i=0; i<gGui->gui_playlist_num; i++)
-	gGui->gui_playlist[i] = tmplist[i];
+      for(i=0; i<gGui->playlist_num; i++)
+	gGui->playlist[i] = tmplist[i];
 
       if(j >= (MAX_LIST-1)) {
 	browser_rebuild_browser(pl_list, j);
@@ -292,12 +290,12 @@ static void pl_load_pl(widget_t *w, void *data) {
   fclose(plfile);
   
   if(tmp_playlist_num >= 0) {
-    gGui->gui_playlist_num = tmp_playlist_num;
+    gGui->playlist_num = tmp_playlist_num;
     
     for(i = 0; i < tmp_playlist_num; i++)
-      gGui->gui_playlist[i] = tmp_playlist[i];
+      gGui->playlist[i] = tmp_playlist[i];
     
-    browser_update_list(pl_list, gGui->gui_playlist, gGui->gui_playlist_num, 0);
+    browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
     //    browser_rebuild_browser(pl_list, 0);
   }
   
@@ -310,7 +308,7 @@ static void pl_save_pl(widget_t *w, void *data) {
   char buf[1024], tmpbuf[256];
   int i;
 
-  if(!gGui->gui_playlist_num) return;
+  if(!gGui->playlist_num) return;
 
   memset(&buf, 0, sizeof(buf));
   memset(&tmpbuf, 0, sizeof(tmpbuf));
@@ -324,9 +322,9 @@ static void pl_save_pl(widget_t *w, void *data) {
     sprintf(buf, "%s", "[PLAYLIST]\n");
     fputs(buf, plfile);
     
-    for(i = 0; i < gGui->gui_playlist_num; i++) {
+    for(i = 0; i < gGui->playlist_num; i++) {
       memset(&buf, 0, sizeof(buf));
-      sprintf(buf, "%s\n", gGui->gui_playlist[i]);
+      sprintf(buf, "%s\n", gGui->playlist[i]);
       fputs(buf, plfile);
     }
     
@@ -352,14 +350,14 @@ void pl_scan_input(widget_t *w, void *ip) {
       if ((list = ((input_plugin_t*)ip)->get_autoplay_list (&nfiles))) {
 	
 	for (i=0; i<nfiles; i++) {
-	  gGui->gui_playlist[gGui->gui_playlist_num + i] = list[i]; 
+	  gGui->playlist[gGui->playlist_num + i] = list[i]; 
 	}
 	
-	gGui->gui_playlist_num += nfiles; 
-	for (i=0; i<gGui->gui_playlist_num; i++) {
+	gGui->playlist_num += nfiles; 
+	for (i=0; i<gGui->playlist_num; i++) {
 	}
-	gGui->gui_playlist_cur = 0;
-	gui_set_current_mrl(gGui->gui_playlist[gGui->gui_playlist_cur]);	
+	gGui->playlist_cur = 0;
+	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);	
       }
     }
     else if(!strcasecmp(((input_plugin_t*)ip)->get_identifier(), "VCD")) {
@@ -369,16 +367,16 @@ void pl_scan_input(widget_t *w, void *ip) {
       if ((list = ((input_plugin_t*)ip)->get_autoplay_list (&nfiles))) {
 	
 	for (i=0; i<nfiles; i++) {
-	  gGui->gui_playlist[gGui->gui_playlist_num + i]     = list[i]; 
+	  gGui->playlist[gGui->playlist_num + i]     = list[i]; 
 	}
 	
-	gGui->gui_playlist_num += nfiles; 
-	gGui->gui_playlist_cur = 0;
-	gui_set_current_mrl(gGui->gui_playlist[gGui->gui_playlist_cur]);
+	gGui->playlist_num += nfiles; 
+	gGui->playlist_cur = 0;
+	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
       }
     }
     //    pl_rebuild_buttons(0);
-    browser_update_list(pl_list, gGui->gui_playlist, gGui->gui_playlist_num, 0);
+    browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
   }
   */
 }
@@ -401,7 +399,7 @@ void pl_raise_window(void) {
 /*
  * Hide/show the pl panel
  */
-void pl_toggle_panel_visibility (widget_t *w, void *data) {
+void pl_toggle_visibility (widget_t *w, void *data) {
   
   if (pl_panel_visible && pl_running) {
     pl_panel_visible = 0;
@@ -434,65 +432,59 @@ void playlist_handle_event(XEvent *event) {
     break;
     
     case MotionNotify:      
-      /* printf ("MotionNotify\n"); */
-      motion_notify_widget_list (pl_widget_list,
-				 event->xbutton.x, event->xbutton.y);
-      /* if window-moving is enabled move the window */
-      old_event = event;
-      if (pl_move.enabled) {
-	int x,y;
-	x = (event->xmotion.x_root) 
-	  + (event->xmotion.x_root - old_event->xmotion.x_root) 
-	  - pl_move.offset_x;
-	y = (event->xmotion.y_root) 
-	  + (event->xmotion.y_root - old_event->xmotion.y_root) 
-	  - pl_move.offset_y;
-	
-	if(event->xany.window == pl_win) {
-	  /* FIXME XLOCK (); */
-	  XMoveWindow(gGui->display, pl_win, x, y);
-	  /* FIXME XUNLOCK (); */
-	  config_set_int ("x_playlist",x);
-	  config_set_int ("y_playlist",y);
+      if (event->xany.window == pl_win) {
+	/* printf ("MotionNotify\n"); */
+	motion_notify_widget_list (pl_widget_list,
+				   event->xbutton.x, event->xbutton.y);
+	/* if window-moving is enabled move the window */
+	old_event = event;
+	if (pl_move.enabled) {
+	  int x,y;
+	  x = (event->xmotion.x_root) 
+	    + (event->xmotion.x_root - old_event->xmotion.x_root) 
+	    - pl_move.offset_x;
+	  y = (event->xmotion.y_root) 
+	    + (event->xmotion.y_root - old_event->xmotion.y_root) 
+	    - pl_move.offset_y;
+	  
+	  if(event->xany.window == pl_win) {
+	    /* FIXME XLOCK (); */
+	    XMoveWindow(gGui->display, pl_win, x, y);
+	    /* FIXME XUNLOCK (); */
+	    config_set_int ("x_playlist",x);
+	    config_set_int ("y_playlist",y);
+	  }
 	}
       }
       break;
-      
-    case MappingNotify:
-      // printf ("MappingNotify\n");
-      /* FIXME XLOCK (); */
-      XRefreshKeyboardMapping((XMappingEvent *) event);
-      /* FIXME XUNLOCK (); */
-      break;
-      
       
     case ButtonPress: {
       XButtonEvent *bevent = (XButtonEvent *) event;
       
       /* if no widget is hit enable moving the window */
-      if(bevent->window == pl_win)
+      if(bevent->window == pl_win) {
 	pl_move.enabled = !click_notify_widget_list (pl_widget_list, 
 						     event->xbutton.x, 
 						     event->xbutton.y, 0);
-      if (pl_move.enabled) {
-	pl_move.offset_x = event->xbutton.x;
-	pl_move.offset_y = event->xbutton.y;
+	if (pl_move.enabled) {
+	  pl_move.offset_x = event->xbutton.x;
+	  pl_move.offset_y = event->xbutton.y;
+	}
       }
     }
     break;
     
-    case ButtonRelease:
-      click_notify_widget_list (pl_widget_list, event->xbutton.x, 
-				event->xbutton.y, 1);
-      pl_move.enabled = 0; /* disable moving the window       */
-      break;
+    case ButtonRelease: {
+      XButtonEvent *bevent = (XButtonEvent *) event;
       
-    case ClientMessage:
-      if(event->xany.window == pl_win)
-	gui_dnd_process_client_message (xdnd_pl_win, event);
+      if(bevent->window == pl_win) {
+	click_notify_widget_list (pl_widget_list, event->xbutton.x, 
+				  event->xbutton.y, 1);
+	pl_move.enabled = 0; /* disable moving the window       */
+      }
       break;
-      
     }
+    }      
   }
 }
 /*
@@ -720,7 +712,7 @@ void playlist_editor(void) {
 						     gui_get_fcolor("PlItemBtn"),
 						     gui_get_ccolor("PlItemBtn"),
 						     gui_get_skinfile("PlItemBtn"),
-						     9, gGui->gui_playlist_num, gGui->gui_playlist,
+						     9, gGui->playlist_num, gGui->playlist,
 						     handle_selection, NULL)));
   
   gui_list_append_content (pl_widget_list->l,
@@ -760,7 +752,7 @@ void playlist_editor(void) {
     }
   }
   */
-  browser_update_list(pl_list, gGui->gui_playlist, gGui->gui_playlist_num, 0);
+  browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
 
   XMapRaised(gGui->display, pl_win); 
 

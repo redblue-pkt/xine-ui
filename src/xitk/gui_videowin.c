@@ -23,29 +23,63 @@
  */
 
 #include <X11/Xlib.h>
+#include <X11/cursorfont.h>
 
 #include <xine.h>
 #include <xine/video_out_x11.h>
 
 #include "gui_main.h"
+#include "gui_videowin.h"
 
 extern gGui_t *gGui;
 
-/*
-typedef struct
-{
-  int          flags;
-  int          functions;
-  int          decorations;
-  int          input_mode;
-  int          status;
-} MWMHints;
+XVisualInfo    gvw_vinfo;
+Cursor         gvw_cursor[2]; /* Cursor pointers     */
+XClassHint    *gvw_xclasshint;
+GC             gvw_gc;
+int            gvw_video_width, gvw_video_height; /* size of currently displayed video */
+int            gvw_fullscreen_mode; /* are we currently in fullscreen mode?  */
+int            gvw_fullscreen_req;  /* ==1 => gui_setup_video_window will switch to fullscreen mode */
+int            gvw_fullscreen_width, gvw_fullscreen_height;
+int            gvw_completion_type;
+int            gvw_depth;
+int            gvw_show;
 
-#define MWM_HINTS_DECORATIONS   (1L << 1)
-#define PROP_MWM_HINTS_ELEMENTS 5
-*/
 
-void gui_setup_video_window (int video_width, int video_height, int *dest_x, int *dest_y,
+void video_window_set_fullscreen (int req_fullscreen) {
+
+  x11_rectangle_t area;
+
+  gvw_fullscreen_req = req_fullscreen;
+
+  video_window_adapt_size (gvw_video_width, gvw_video_height, 
+			   &area.x, &area.y, &area.w, &area.h);
+
+  gGui->vo_driver->gui_data_exchange (gGui->vo_driver, GUI_DATA_EX_DEST_POS_SIZE_CHANGED, &area);
+
+}
+
+int video_window_is_fullscreen () {
+  return gvw_fullscreen_mode;
+}
+
+void video_window_calc_dest_size (int video_width, int video_height,
+				  int *dest_width, int *dest_height)  {
+
+  if (gvw_fullscreen_mode) {
+
+    *dest_width  = gvw_fullscreen_width;
+    *dest_height = gvw_fullscreen_height;
+    
+  } else {
+
+    *dest_width  = video_width;
+    *dest_height = video_height;
+
+  }
+}
+
+void video_window_adapt_size (int video_width, int video_height, int *dest_x, int *dest_y,
 			     int *dest_width, int *dest_height) {
 
   static char          *window_title = "xine video output";
@@ -60,29 +94,29 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
 
   XLockDisplay (gGui->display);
 
-  gGui->video_width = video_width;
-  gGui->video_height = video_height;
+  gvw_video_width = video_width;
+  gvw_video_height = video_height;
   *dest_x = 0;
   *dest_y = 0;
 
-  if (gGui->fullscreen_req) {
+  if (gvw_fullscreen_req) {
 
-    *dest_width  = gGui->fullscreen_width;
-    *dest_height = gGui->fullscreen_height;
+    *dest_width  = gvw_fullscreen_width;
+    *dest_height = gvw_fullscreen_height;
 
-    if (gGui->video_win) {
+    if (gGui->video_window) {
 
-      if (gGui->fullscreen_mode) {
+      if (gvw_fullscreen_mode) {
 	XUnlockDisplay (gGui->display);
 	return;
       }
 
-      XDestroyWindow(gGui->display, gGui->video_win);
-      gGui->video_win = 0;
+      XDestroyWindow(gGui->display, gGui->video_window);
+      gGui->video_window = 0;
 
     }
 
-    gGui->fullscreen_mode = 1;
+    gvw_fullscreen_mode = 1;
 
     /*
      * open fullscreen window
@@ -90,14 +124,15 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
 
     attr.background_pixel  = gGui->black.pixel;
 
-    gGui->video_win = XCreateWindow (gGui->display, 
+    gGui->video_window = XCreateWindow (gGui->display, 
 				     RootWindow (gGui->display, DefaultScreen(gGui->display)), 
-				     0, 0, gGui->fullscreen_width, gGui->fullscreen_height, 
-				     0, gGui->depth, CopyFromParent, gGui->vinfo.visual,
+				     0, 0, gvw_fullscreen_width, gvw_fullscreen_height, 
+				     0, gvw_depth, CopyFromParent, gvw_vinfo.visual,
 				     CWBackPixel, &attr);
 
-    if (gGui->xclasshint != NULL)
-      XSetClassHint(gGui->display, gGui->video_win, gGui->xclasshint);
+    if (gvw_xclasshint != NULL)
+      XSetClassHint(gGui->display, gGui->video_window, gvw_xclasshint);
+
 
     /*
      * wm, no borders please
@@ -106,26 +141,32 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
     prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
     mwmhints.flags = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = 0;
-    XChangeProperty(gGui->display, gGui->video_win, prop, prop, 32,
+    XChangeProperty(gGui->display, gGui->video_window, prop, prop, 32,
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
-    XSetTransientForHint(gGui->display, gGui->video_win, None);
-    XRaiseWindow(gGui->display, gGui->video_win);
+    XSetTransientForHint(gGui->display, gGui->video_window, None);
+    XRaiseWindow(gGui->display, gGui->video_window);
+
+    /*
+     * drag and drop
+     */
+    
+    gui_make_window_dnd_aware (&gGui->xdnd, gGui->video_window);
 
   } else {
 
-    *dest_width  = gGui->video_width;
-    *dest_height = gGui->video_height;
+    *dest_width  = gvw_video_width;
+    *dest_height = gvw_video_height;
 
-    if (gGui->video_win) {
+    if (gGui->video_window) {
 
-      if (gGui->fullscreen_mode) {
-	XDestroyWindow(gGui->display, gGui->video_win);
-	gGui->video_win = 0;
+      if (gvw_fullscreen_mode) {
+	XDestroyWindow(gGui->display, gGui->video_window);
+	gGui->video_window = 0;
       } else {
 	
-	XResizeWindow (gGui->display, gGui->video_win, 
-		       gGui->video_width, gGui->video_height);
+	XResizeWindow (gGui->display, gGui->video_window, 
+		       gvw_video_width, gvw_video_height);
 
 	XUnlockDisplay (gGui->display);
 	
@@ -134,12 +175,12 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
       }
     }
 
-    gGui->fullscreen_mode = 0;
+    gvw_fullscreen_mode = 0;
 
     hint.x = 0;
     hint.y = 0;
-    hint.width  = gGui->video_width;
-    hint.height = gGui->video_height;
+    hint.width  = gvw_video_width;
+    hint.height = gvw_video_height;
     hint.flags  = PPosition | PSize;
 
     /*
@@ -151,41 +192,44 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
     /* attr.colormap          = theCmap; */
     
 
-    gGui->video_win = XCreateWindow(gGui->display, RootWindow(gGui->display, gGui->screen),
+    gGui->video_window = XCreateWindow(gGui->display, RootWindow(gGui->display, gGui->screen),
 				 hint.x, hint.y, hint.width, hint.height, 4, 
-				 gGui->depth, CopyFromParent, gGui->vinfo.visual,
+				 gvw_depth, CopyFromParent, gvw_vinfo.visual,
 				 CWBackPixel | CWBorderPixel , &attr);
 
-    if (gGui->xclasshint != NULL)
-      XSetClassHint(gGui->display, gGui->video_win, gGui->xclasshint);
+    if (gvw_xclasshint != NULL)
+      XSetClassHint(gGui->display, gGui->video_window, gvw_xclasshint);
 
+    /*
+     * drag and drop
+     */
+    
+    gui_make_window_dnd_aware (&gGui->xdnd, gGui->video_window);
     
     /* Tell other applications about gGui window */
 
-    XSetStandardProperties(gGui->display, gGui->video_win, window_title, window_title, 
+    XSetStandardProperties(gGui->display, gGui->video_window, window_title, window_title, 
 			   None, NULL, 0, &hint);
 
   }
   
-  XSelectInput(gGui->display, gGui->video_win, StructureNotifyMask | ExposureMask | KeyPressMask | ButtonPressMask);
+  XSelectInput(gGui->display, gGui->video_window, StructureNotifyMask | ExposureMask | KeyPressMask | ButtonPressMask);
 
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
     wm_hint->flags = InputHint | StateHint;
-    XSetWMHints(gGui->display, gGui->video_win, wm_hint);
+    XSetWMHints(gGui->display, gGui->video_window, wm_hint);
     XFree(wm_hint);
   }
 
-  /* FIXME
   wm_delete_window = XInternAtom(gGui->display, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols(gGui->display, gGui->video_win, &wm_delete_window, 1);
-  */
+  XSetWMProtocols(gGui->display, gGui->video_window, &wm_delete_window, 1);
 
   /* Map window. */
   
-  XMapRaised(gGui->display, gGui->video_win);
+  XMapRaised(gGui->display, gGui->video_window);
   
   /* Wait for map. */
 
@@ -193,16 +237,16 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
     XMaskEvent(gGui->display, 
 	       StructureNotifyMask, 
 	       &xev) ;
-  } while (xev.type != MapNotify || xev.xmap.event != gGui->video_win);
+  } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
 
   XFlush(gGui->display);
   XSync(gGui->display, False);
   
-  gGui->gc = XCreateGC(gGui->display, gGui->video_win, 0L, &xgcv);
+  gvw_gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
 
-  if (gGui->fullscreen_mode) {
-    XSetInputFocus (gGui->display, gGui->video_win, RevertToNone, CurrentTime);
-    XMoveWindow (gGui->display, gGui->video_win, 0, 0);
+  if (gvw_fullscreen_mode) {
+    XSetInputFocus (gGui->display, gGui->video_window, RevertToNone, CurrentTime);
+    XMoveWindow (gGui->display, gGui->video_window, 0, 0);
   }
 
   XUnlockDisplay (gGui->display);
@@ -233,14 +277,111 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
 }
 
 /* hide/show cursor in video window*/
-void gui_set_cursor_visibility(int show_cursor) {
-  XDefineCursor(gGui->display, gGui->video_win, gGui->cursor[show_cursor]);
+void video_window_set_cursor_visibility(int show_cursor) {
+  XDefineCursor(gGui->display, gGui->video_window, gvw_cursor[show_cursor]);
 }
 
 /* hide/show video window */
-void gui_set_video_window_visibility(int show_window) {
-  if(show_window == 1)
-    XMapRaised (gGui->display, gGui->video_win);
+void video_window_set_visible(int show_window) {
+
+  gvw_show = show_window;
+
+  if (gvw_show == 1)
+    XMapRaised (gGui->display, gGui->video_window);
   else
-    XUnmapWindow (gGui->display, gGui->video_win);
+    XUnmapWindow (gGui->display, gGui->video_window);
 }
+
+int video_window_is_visible () {
+  return gvw_show;
+}
+
+static unsigned char bm_no_data[] = { 0,0,0,0, 0,0,0,0 };
+
+void video_window_init () {
+
+  XWindowAttributes  attribs;
+  Pixmap             bm_no;
+  int                x,y,w,h;
+
+  gvw_fullscreen_req  = 0;
+  gvw_fullscreen_mode = 0;
+  gGui->video_window  = 0;
+  gvw_show            = 1;
+
+  XLockDisplay (gGui->display);
+
+  XGetWindowAttributes(gGui->display, DefaultRootWindow(gGui->display), &attribs);
+
+  gvw_depth = attribs.depth;
+  
+  if (gvw_depth != 15 && gvw_depth != 16 && gvw_depth != 24 && gvw_depth != 32)  {
+    /* The root window may be 8bit but there might still be
+     * visuals with other bit depths. For example this is the 
+     * case on Sun/Solaris machines.
+     */
+    gvw_depth = 24;
+  }
+
+  if (!XMatchVisualInfo(gGui->display, gGui->screen, gvw_depth, TrueColor, &gvw_vinfo)) {
+    printf ("gui_main: couldn't find truecolor visual for video window.\n");
+    exit (1);
+  }
+
+
+#ifdef HAVE_XINERAMA
+  /* Spark
+   * some Xinerama stuff
+   * I want to figure out what fullscreen means for this setup
+   */
+
+  if ((XineramaQueryExtension (gGui->display, &dummy_a, &dummy_b)) 
+      && (screeninfo = XineramaQueryScreens(gGui->display, &screens))) {
+    /* Xinerama Detected */
+#ifdef DEBUG
+    printf ("Display is using Xinerama with %d screens\n", screens);
+    printf (" going to assume we are using the first screen.\n");
+    printf (" size of the first screen is %dx%d.\n", 
+	     screeninfo[0].width, screeninfo[0].height);
+#endif
+    if (XineramaIsActive(gGui->display)) {
+      gvw_fullscreen_width  = screeninfo[0].width;
+      gvw_fullscreen_height = screeninfo[0].height;
+    } else {
+      gvw_fullscreen_width  = DisplayWidth  (gGui->display, gGui->screen);
+      gvw_fullscreen_height = DisplayHeight (gGui->display, gGui->screen);
+    }
+
+  } else 
+#endif
+  {
+    /* no Xinerama */
+    printf ("Display is not using Xinerama.\n");
+    gvw_fullscreen_width  = DisplayWidth (gGui->display, gGui->screen);
+    gvw_fullscreen_height = DisplayHeight (gGui->display, gGui->screen);
+  } 
+
+  /* create xclass hint for video window */
+
+  if ((gvw_xclasshint = XAllocClassHint()) != NULL) {
+    gvw_xclasshint->res_name = "Xine Video Window";
+    gvw_xclasshint->res_class = "Xine";
+  }
+
+  /* 
+   * create cursors
+   */
+
+  XLockDisplay (gGui->display);
+
+  bm_no = XCreateBitmapFromData(gGui->display, DefaultRootWindow(gGui->display), bm_no_data, 8, 8);
+  gvw_cursor[0] = XCreatePixmapCursor(gGui->display, bm_no, bm_no,
+				      &gGui->black, &gGui->black, 0, 0);
+  gvw_cursor[1] = XCreateFontCursor(gGui->display, XC_left_ptr);
+
+  XUnlockDisplay (gGui->display);
+
+  video_window_adapt_size (768, 480, &x, &y, &w, &h);
+
+}
+

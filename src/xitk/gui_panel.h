@@ -19,18 +19,29 @@
  *
  * $Id$
  *
+ * xine panel related stuff
+ *
  */
 
-#ifndef HAVE_GUI_PLAYLIST_H
-#define HAVE_GUI_PLAYLIST_H
+#ifndef HAVE_GUI_PANEL_H
+#define HAVE_GUI_PANEL_H
 
-void playlist_editor(void);
-void playlist_handle_event(XEvent *);
-void pl_exit(widget_t *, void *);
-int pl_is_running(void);
-void pl_toggle_visibility(widget_t *, void *);
-void pl_raise_window(void);
-void pl_scan_input(widget_t *, void *);
-void pl_update_playlist(void);
+void panel_init (void) ;
+
+int panel_is_visible(void) ;
+
+void panel_toggle_visibility (widget_t *w, void *data) ;
+
+void panel_handle_event(XEvent *event) ;
+
+void panel_check_pause(void) ;
+
+void panel_reset_slider ();
+
+void panel_update_channel_display () ;
+
+void panel_update_mrl_display ();
+
+void panel_update_slider () ;
 
 #endif
