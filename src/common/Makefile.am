@@ -10,11 +10,14 @@ GETOPT_SRC = getopt.c getopt1.c
 GETOPT_HDR = getopt.h
 endif
 
-##if HAVE_X11
+if HAVE_X11
 ##xscreensaver_remote = xscreensaver-remote.c
-##endif
+X11_COMMON_LIBS = $(X_LIBS) $(X_PRE_LIBS) -lX11 $(X_EXTRA_LIBS) -lXext
+endif
+
 
 libcommon_la_SOURCES = $(GETOPT_SRC) utils.c
+libcommon_la_LIBADD = $(X11_COMMON_LIBS)
 
 noinst_HEADERS = $(GETOPT_HDR) utils.h libcommon.h
 

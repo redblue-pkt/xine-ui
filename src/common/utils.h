@@ -23,7 +23,15 @@
 #ifndef _COMMON_UTILS_H
 #define _COMMON_UTILS_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <sys/time.h>
+
+#ifdef HAVE_X11
+#include <X11/Xlib.h>
+#endif
 
 /* sys/time.h does not define timersub() on all platforms... */
 #ifndef timersub
@@ -76,5 +84,10 @@ int is_ipv6_last_double_semicolon(const char *str);
 
 inline int is_a_dir(char *filename);
 inline int is_a_file(char *filename);
+
+#ifdef HAVE_X11
+void dump_cpu_infos(void);
+void dump_xfree_info(Display *display, int screen, int complete);
+#endif
 
 #endif
