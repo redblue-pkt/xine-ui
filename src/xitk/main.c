@@ -740,7 +740,13 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
 
     while (driver_ids[i]) {
       
-      printf (_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
+      if( strcmp(driver_ids[i], "none") )
+        printf (_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
+      else {
+        printf (_("main: skipping <%s> audio output plugin from auto-probe\n"), driver_ids[i]);
+        i++;
+        continue;
+      }
       
       audio_port = xine_open_audio_driver(gGui->xine, 
 					  driver_ids[i],
