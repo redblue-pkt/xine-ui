@@ -249,7 +249,7 @@
 
       Zmienianie skrótów:
         Mo¿esz równie¿ zmieniæ jeden/kilka/wszystkie skróty. Do tego musisz
-        mieæ plik .xine_keymap w swoim katalogu $HOME. Sk³adnia wpisów do
+        mieæ plik keymap w swoim katalogu $HOME/.xine/. Sk³adnia wpisów do
         tego pliku wygl±da tak:
 
          WindowReduce {
@@ -304,7 +304,7 @@
       Wy¶wietlanie obecnych/przemapowanych skrótów.
         Mo¿esz u¿yæ 'xine --keymap' lub 'xine --keymap=default' aby wy¶wietliæ
         domy¶lne skróty. Mo¿esz przekierowaæ rezultat do pliku, który mo¿e ju¿
-        zostaæ plikiem .xine_keymap.
+        zostaæ plikiem ~/.xine/keymap.
 
         Aby zobaczyæ rezultaty zmiam w mapowaniu klawiszy, wpisz po prostu:
 

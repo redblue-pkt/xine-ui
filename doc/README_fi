@@ -236,7 +236,7 @@
 
       Pikan‰pp‰inten vaihtaminen:
         Voit myˆs vaihtaa yht‰/useita/kaikkia pik‰n‰pp‰imi‰. Sinulla pit‰isi
-	olla .xine_keymap tiedosto $HOME hakemistossa. Perussyntaksi:
+	olla keymap tiedosto $HOME/.xine/ hakemistossa. Perussyntaksi:
 
          WindowReduce {
             key = less
@@ -288,7 +288,7 @@
       Muutettujen/oletus pikan‰pp‰inten katsominen:
         Voit k‰ytt‰‰ 'xine --keymap' tai 'xine--keymap=default' komentoa
 	katsoaksesi pikan‰pp‰imet. Voit ohjata tuloksen tiedostoon, josta
-	voi tulla .xine_keymap itsess‰‰n.
+	voi tulla ~/.xine/keymap itsess‰‰n.
 	
 	Katsoaksesi muutokset, k‰yt‰ komentoa 'xine --keymap=remapped'
 

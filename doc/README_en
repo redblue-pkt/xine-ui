@@ -246,7 +246,7 @@
 
       Changing shortcuts:
         You can also change one/many/all of the shortcuts. For this, you
-	should have a .xine_keymap in your $HOME directory. The key entry
+	should have a keymap in your $HOME/.xine/ directory. The key entry
 	syntax is:
 
          WindowReduce {
@@ -296,10 +296,24 @@
                                                ^^^^^^^^
 					       This is what you're looking for.
 
+
+        About mouse button, to use your mouse wheel by example, you have
+        to track which button will be assigned to a function, using xev:
+
+         ButtonRelease event, serial 27, synthetic NO, window 0x1200001,
+         root 0x3b, subw 0x0, time 2710360666, (107,87), root:(120,117),
+         state 0x1000, button 5, same_screen YES
+                       ^^^^^^^^
+                       This is the button
+
+         In this case, you have to set a "key = XButton_5". Modifier key
+         is also supported with mouse button handling.
+ 
+
       Displaying current/remapped shortcuts:
         You could use 'xine --keymap' or 'xine --keymap=default' to display
         default shortcuts. You can redirect the result to a file, which can
-        become a .xine_keymap itself.
+        become a ~/.xine/keymap itself.
 	
 	To see the result of a remapping, just use 'xine --keymap=remapped'.
 
