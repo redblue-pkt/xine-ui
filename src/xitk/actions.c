@@ -1411,6 +1411,21 @@ void gui_stream_infos_show(xitk_widget_t *w, void *data) {
   }
 }
 
+void gui_tvset_show(xitk_widget_t *w, void *data) {
+  
+  if (tvset_is_running() && !tvset_is_visible())
+    tvset_toggle_visibility(NULL, NULL);
+  else if(!tvset_is_running())
+    tvset_panel();
+  else {
+    if(gGui->use_root_window)
+      tvset_toggle_visibility(NULL, NULL);
+    else
+      tvset_end();
+  }
+}
+
+
 void gui_viewlog_show(xitk_widget_t *w, void *data) {
 
   if (viewlog_is_running() && !viewlog_is_visible())

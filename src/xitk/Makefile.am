@@ -19,6 +19,7 @@ xine_SOURCES = \
 	event.c \
 	event_sender.c \
 	file_browser.c \
+	frequencies.c \
 	kbindings.c \
 	lang.c \
 	lirc.c \
@@ -36,6 +37,7 @@ xine_SOURCES = \
 	post.c \
 	mediamark.c \
 	stream_infos.c \
+	tvset.c \
 	videowin.c \
 	viewlog.c
 
@@ -67,6 +69,7 @@ noinst_HEADERS = \
 	event.h \
 	event_sender.h \
 	file_browser.h \
+	frequencies.h \
 	i18n.h \
 	kbindings.h \
 	lang.h \
@@ -84,6 +87,7 @@ noinst_HEADERS = \
 	skins.h \
 	stream_infos.h \
 	snapshot.h \
+	tvset.h \
 	videowin.h \
 	viewlog.h
 

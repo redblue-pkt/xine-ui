@@ -57,6 +57,7 @@
 #include "skins.h"
 #include "snapshot.h"
 #include "stream_infos.h"
+#include "tvset.h"
 #include "viewlog.h"
 #include "download.h"
 #include "osd.h"

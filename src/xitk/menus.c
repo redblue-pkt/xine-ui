@@ -63,6 +63,7 @@ extern _panel_t           *panel;
 #define SETS_VIDEO        42
 #define SETS_LOGS         43
 #define SETS_SKINDL       44
+#define SETS_TVANALOG     45
 
 #define STREAM_OSDI       50     
 #define STREAM_WINI       51
@@ -329,6 +330,10 @@ static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
     gui_execute_action_id(ACTID_CONTROLSHOW);
     break;
 
+  case SETS_TVANALOG:
+    gui_tvset_show(NULL, NULL);
+    break;
+
   case SETS_LOGS:
     gui_execute_action_id(ACTID_VIEWLOG);
     break;
@@ -538,6 +543,9 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Settings/Video...",
       NULL,
       menu_settings, (void *) SETS_VIDEO                                                     },
+    { "Settings/TV Analog...",
+      NULL,
+      menu_settings, (void *) SETS_TVANALOG                                                  },
     { "Settings/Logs...",
       NULL,
       menu_settings, (void *) SETS_LOGS                                                      },
