@@ -286,7 +286,7 @@ static void print_usage (void) {
   printf ("\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
   printf("  -P, --post-plugin <name>     Plugin <name> for video less stream animation:\n");
-  printf("                                 (default is goom).\n");
+  printf("                                 (default is oscope).\n");
   printf("                               ");
   post_ids = xine_list_post_plugins_typed(xine, XINE_POST_TYPE_AUDIO_VISUALIZATION);
   post_id  = (char *)*post_ids++;
@@ -748,7 +748,7 @@ int main(int argc, char *argv[]) {
   /* Init post plugin, if desired */
   if(!aaxine.no_post) {
     if(aaxine.post_plugin_name == NULL)
-      aaxine.post_plugin_name = "goom";
+      aaxine.post_plugin_name = "oscope";
     
     if(aaxine.ao_port) {
       const char *const *pol = xine_list_post_plugins_typed(aaxine.xine, 
