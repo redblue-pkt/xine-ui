@@ -11,6 +11,7 @@ src/xitk/file_browser.c
 src/xitk/i18n.h
 src/xitk/kbindings.c
 src/xitk/lang.c
+src/xitk/lirc.c
 src/xitk/main.c
 src/xitk/mediamark.c
 src/xitk/menus.c
@@ -23,6 +24,9 @@ src/xitk/session.c
 src/xitk/setup.c
 src/xitk/skins.c
 src/xitk/snapshot.c
+src/xitk/stdctl.c
 src/xitk/stream_infos.c
+src/xitk/tvout.c
+src/xitk/tvset.c
 src/xitk/videowin.c
 src/xitk/viewlog.c
