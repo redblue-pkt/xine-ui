@@ -1331,20 +1331,23 @@ int main(int argc, char *argv[]) {
 	i++;
       }
       
-      gGui->visual_anim.post_plugin_num = 
-	xine_config_register_enum(gGui->xine, "gui.post_audio_plugin", 
-				  0, post_audio_plugins,
-				  _("Post audio plugin"),
-				  _("Post audio plugin to used with video less stream playback"),
-				  CONFIG_LEVEL_BEG,
-				  post_audio_plugin_cb, 
-				  CONFIG_NO_DATA);
-      
-      gGui->visual_anim.post_output = 
-	xine_post_init(gGui->xine,
-		       post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
-		       &gGui->ao_port, &gGui->vo_port);
-      
+      if(num_plug) {
+	
+	gGui->visual_anim.post_plugin_num = 
+	  xine_config_register_enum(gGui->xine, "gui.post_audio_plugin", 
+				    0, post_audio_plugins,
+				    _("Post audio plugin"),
+				    _("Post audio plugin to used with video less stream playback"),
+				    CONFIG_LEVEL_BEG,
+				    post_audio_plugin_cb, 
+				    CONFIG_NO_DATA);
+	
+	gGui->visual_anim.post_output = 
+	  xine_post_init(gGui->xine,
+			 post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
+			 &gGui->ao_port, &gGui->vo_port);
+	
+      }
     }
   }
 
@@ -1380,20 +1383,22 @@ int main(int argc, char *argv[]) {
 	i++;
       }
       
-      gGui->post_video_num = 
-	xine_config_register_enum(gGui->xine, "gui.post_video_plugin", 
-				  0, post_video_plugins,
-				  _("Post video plugin"),
-				  _("Post video plugin"),
-				  CONFIG_LEVEL_BEG,
-				  post_video_plugin_cb,
-				  CONFIG_NO_DATA);
-      
-      gGui->post_video = 
-      	xine_post_init(gGui->xine,
-      		       post_video_plugins[(gGui->post_video_num == 0) ? 1 : gGui->post_video_num],
-		       0, &gGui->ao_port, &gGui->vo_port);
-      
+      if(num_plug) {
+
+	gGui->post_video_num = 
+	  xine_config_register_enum(gGui->xine, "gui.post_video_plugin", 
+				    0, post_video_plugins,
+				    _("Post video plugin"),
+				    _("Post video plugin"),
+				    CONFIG_LEVEL_BEG,
+				    post_video_plugin_cb,
+				    CONFIG_NO_DATA);
+	
+	gGui->post_video = 
+	  xine_post_init(gGui->xine,
+			 post_video_plugins[(gGui->post_video_num == 0) ? 1 : gGui->post_video_num],
+			 0, &gGui->ao_port, &gGui->vo_port);
+      }
     }
   }
 
