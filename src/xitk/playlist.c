@@ -1205,7 +1205,7 @@ void playlist_editor(void) {
   lb.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->close = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
-  xitk_set_widget_tips(playlist->delete, _("Close playlist window"));
+  xitk_set_widget_tips(playlist->close, _("Close playlist window"));
 
   br.arrow_up.skin_element_name    = "PlUp";
   br.slider.skin_element_name      = "SliderPl";

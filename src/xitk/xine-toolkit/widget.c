@@ -1539,6 +1539,7 @@ void xitk_free_widget(xitk_widget_t *w) {
   event.type = WIDGET_EVENT_DESTROY;
   (void) w->event(w, &event, NULL);
   
+  xitk_tips_tips_kill(w);
   XITK_FREE(w->tips_string);
   XITK_FREE(w);
   w = NULL;

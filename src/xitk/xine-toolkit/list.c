@@ -100,10 +100,9 @@ void *xitk_list_next_content (xitk_list_t *l) {
       return NULL;
     
   } 
-  else {
-    XITK_WARNING("Passed end of list\n");
+  else
     return NULL;
-  }    
+
 }
 
 /*
@@ -141,10 +140,9 @@ void *xitk_list_prev_content (xitk_list_t *l) {
     else
       return NULL;
   } 
-  else {
-    XITK_WARNING("Passed begin of list\n");
+  else
     return NULL;
-  }    
+
 }
 
 /*

@@ -114,7 +114,7 @@ static void xitk_config_fonts(xitk_config_t *xtcf) {
       xtcf->fonts.fallback = strdup(c);
     else if(!strncasecmp(p, "system", 6)) {
       xtcf->fonts.system = (char *) realloc(xtcf->fonts.system, (strlen(c) + 1));
-      xtcf->fonts.system = strdup(c);
+      sprintf(xtcf->fonts.system, "%s", c);
     }
 
   }

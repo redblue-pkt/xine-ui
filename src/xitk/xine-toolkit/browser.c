@@ -145,6 +145,18 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   }
 }
 
+static void notify_destroy(xitk_widget_t *w) {
+  browser_private_data_t *private_data;
+
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+           (w->type & WIDGET_GROUP_WIDGET))) {
+    private_data = (browser_private_data_t *) w->private_data;
+    
+    XITK_FREE(private_data->skin_element_name);
+    XITK_FREE(private_data);
+  }
+}
+
 static void enability(xitk_widget_t *w) {
   browser_private_data_t *private_data;
 
@@ -175,6 +187,9 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   switch(event->type) {
   case WIDGET_EVENT_PAINT:
     paint(w);
+    break;
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
     break;
   case WIDGET_EVENT_CHANGE_SKIN:
     notify_change_skin(w, event->skonfig);

@@ -853,7 +853,7 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
   }
 #endif
 
-  if(pos_cb && window)
+  if(pos_cb && (window != None))
     fx->newpos_callback = pos_cb;
   else
     fx->newpos_callback = NULL;
