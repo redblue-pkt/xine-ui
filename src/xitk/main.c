@@ -471,6 +471,7 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
 					  XINE_VISUAL_TYPE_NONE,
 					  (void *) &vis);
       
+      /* do not save on config, otherwise user would never see images again... */
     }
     else {
       video_port = xine_open_video_driver(gGui->xine,
@@ -478,6 +479,9 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
 					  XINE_VISUAL_TYPE_X11, 
 					  (void *) &vis);
       
+      /* save requested driver (-V) */ 
+      if( video_port )
+        config_update_string("video.driver", video_driver_id);
     }
 
     if (!video_port) {
@@ -555,6 +559,11 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
 
       printf(_("main: not using any audio driver (as requested).\n"));
 
+      /* calling -A null is useful to developers, but we should not save it at
+       * config. if user doesn't have a sound card he may go to setup screen
+       * changing audio.driver to NULL in order to make xine start a bit faster.
+       */
+    
     }
     else {
     
@@ -565,6 +574,8 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
         exit (1);
       }
     
+      /* save requested driver (-A) */ 
+      config_update_string("audio.driver", audio_driver_id);
     }
   
   }
