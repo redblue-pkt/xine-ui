@@ -94,6 +94,8 @@ static int _gui_xine_play(xine_stream_t *stream,
     start_time_in_secs *= 1000;
       
   has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
+  if (has_video)
+    has_video = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_VIDEO);
 
   if((has_video && gGui->visual_anim.enabled == 1) && gGui->visual_anim.running) {
 
@@ -234,6 +236,11 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   video_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_HANDLED);
   has_audio     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_AUDIO);
   audio_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_HANDLED);
+  
+  if (has_video)
+    has_video = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_VIDEO);
+  if (has_audio)
+    has_audio = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_AUDIO);
   
   if((v_unhandled = (has_video && (!video_handled))) 
      || (a_unhandled = (has_audio && (!audio_handled)))) {
