@@ -71,7 +71,7 @@ static void slider_update_minmax(xitk_widget_t *w, float min, float max) {
     return;
   }
   
-  private_data->upper = max;
+  private_data->upper = (min == max) ? max + 1 : max;
   private_data->lower = min;
   slider_update_value(w, private_data->value);
 }
@@ -546,7 +546,8 @@ void xitk_slider_set_min(xitk_widget_t *sl, int min) {
   slider_private_data_t *private_data = (slider_private_data_t *) sl->private_data;
   
   if(sl->widget_type & WIDGET_TYPE_SLIDER) {
-    slider_update_minmax(sl, (float)min, private_data->upper);
+    slider_update_minmax(sl, (float)((min == private_data->upper) 
+				     ? min - 1 : min), private_data->upper);
   }
 }
 
@@ -583,7 +584,9 @@ void xitk_slider_set_max(xitk_widget_t *sl, int max) {
   slider_private_data_t *private_data = (slider_private_data_t *) sl->private_data;
   
   if(sl->widget_type & WIDGET_TYPE_SLIDER) {
-    slider_update_minmax(sl, private_data->lower, (float)max);
+    slider_update_minmax(sl, private_data->lower, (float)((max == private_data->lower) 
+							  ? max + 1 : max));
+
   } 
 }
 
@@ -667,7 +670,7 @@ static xitk_widget_t *_xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slid
 
   private_data->angle                    = 0.0;
 
-  private_data->upper                    = (float)s->max;
+  private_data->upper                    = (float)((s->min == s->max) ? s->max + 1 : s->max);
   private_data->lower                    = (float)s->min;
 
   private_data->value                    = 0.0;
