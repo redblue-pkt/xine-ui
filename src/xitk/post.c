@@ -1705,7 +1705,7 @@ static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_ele
     
     xine_strdupa(post_chain, pchain);
     
-    while((p = strsep(&post_chain, ";"))) {
+    while((p = xine_strsep(&post_chain, ";"))) {
       
       if(p && strlen(p)) {
 	char          *plugin, *args = NULL;
