@@ -220,11 +220,14 @@ typedef struct {
 static play_data_t play_data;
 
 static void start_anyway_yesno(xitk_widget_t *w, void *data, int button) {
+  play_data.running = 0;
+
   if(button == XITK_WINDOW_ANSWER_YES)
     _gui_xine_play(play_data.stream, 
 		   play_data.start_pos, play_data.start_time_in_secs, play_data.update_mmk);
-  
-  play_data.running = 0;
+  else
+    gui_playlist_start_next();
+
 }
 
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, int update_mmk) {
