@@ -796,7 +796,15 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
+  case ButtonPress:
+    {
+      XButtonEvent *bevent = (XButtonEvent *) event;
 
+      if(bevent->button == Button3)
+	video_window_menu(panel->widget_list);
+    }
+    break;
+    
   case KeyPress:
   case ButtonRelease:
     gui_handle_event(event, data);
