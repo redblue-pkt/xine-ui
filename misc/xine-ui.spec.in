@@ -254,7 +254,7 @@ rm -rf $RPM_BUILD_ROOT
 @HAVE_AA_TRUE@%{prefix}/man/pl/man1/aaxine.1*
 
 %changelog
-* Sun Mar 31 2001 Matthias Dahl <matthew2k@web.de>
+* Sun Mar 31 2002 Matthias Dahl <matthew2k@web.de>
 - added xine-bugreport and xine-check, including their man pages.
 - added german man pages and README_fi.
 * Fri Dec 14 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
