@@ -1408,9 +1408,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
 void video_window_reset_ssaver(void) {
 #ifdef HAVE_XTESTEXTENSION
   if(gVw->have_xtest == True) {
+    KeyCode kc_shift_l;
     XLockDisplay(gGui->display);
-    XTestFakeKeyEvent(gGui->display, XK_Shift_L, True, CurrentTime);
-    XTestFakeKeyEvent(gGui->display, XK_Shift_L, False, CurrentTime);
+    kc_shift_l = XKeysymToKeycode(gGui->display, XK_Shift_L);
+    XTestFakeKeyEvent(gGui->display, kc_shift_l, True, CurrentTime);
+    XTestFakeKeyEvent(gGui->display, kc_shift_l, False, CurrentTime);
     XSync(gGui->display, False);
     XUnlockDisplay(gGui->display);
   }
