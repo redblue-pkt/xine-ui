@@ -82,29 +82,21 @@ void *xine_lirc_loop(void *dummy) {
   int               ret;
   kbinding_entry_t *k;
 
-  /* I'm a poor lonesome pthread... */
-  pthread_detach(pthread_self());
-
   while(gGui->running) {
-    
-    pthread_testcancel();
-    
-    while(lirc_nextcode(&code) == 0) {
 
-      pthread_testcancel();
+    while(lirc_nextcode(&code) == 0) {
       
       if(code == NULL) 
 	break;
-      
-      pthread_testcancel();
       
       while((ret = lirc_code2char(lirc.config, code, &c)) == 0 
 	    && c != NULL) {
 #if 0
 	fprintf(stdout, "Command Received = '%s'\n", c);
 #endif
-
+	
 	k = kbindings_lookup_action(gGui->kbindings, c);
+	
 	if(k)
 	  gui_execute_action_id((kbindings_get_action_id(k)));
 	else {
@@ -116,11 +108,14 @@ void *xine_lirc_loop(void *dummy) {
 	      lirc_get_playlist(from);   
 	  }
 	}
-	
       }
-      xitk_paint_widget_list (panel->widget_list);
-      free(code);
-
+      
+      if(panel_is_visible())
+	xitk_paint_widget_list (panel->widget_list);
+      
+      if(code)
+	free(code);
+      
       if(ret == -1) 
 	break;
 
@@ -131,20 +126,18 @@ void *xine_lirc_loop(void *dummy) {
 }
 
 void init_lirc(void) {
-  /*  int flags; */
-
+  int flags;
+  
   if((lirc.fd = lirc_init("xine", LIRC_VERBOSE)) == -1) {
     gGui->lirc_enable = 0;
     return;
   }
-  /*
-  else {
-    flags = fcntl(gGui->lirc.fd, F_GETFL, 0);
-    if(flags != -1)
-      fcntl(gGui->lirc.fd, F_SETFL, flags|FASYNC|O_NONBLOCK);
-  }
-  */
-
+  
+  fcntl(lirc.fd, F_SETOWN, getpid());
+  flags = fcntl(lirc.fd, F_GETFL, 0);
+  if(flags != -1)
+    fcntl(lirc.fd, F_SETFL, flags|O_NONBLOCK);
+  
   if(lirc_readconfig(NULL, &lirc.config, NULL) != 0) {
     gGui->lirc_enable = 0;
     return;
@@ -153,12 +146,12 @@ void init_lirc(void) {
   gGui->lirc_enable = 1;
 
   if(gGui->lirc_enable)
-    pthread_create (&lirc.thread, NULL, xine_lirc_loop, NULL) ;
+    pthread_create(&(lirc.thread), NULL, xine_lirc_loop, NULL) ;
 }
 
 void deinit_lirc(void) {
 
-  pthread_cancel(lirc.thread);
+  pthread_join(lirc.thread, NULL);
 
   if(gGui->lirc_enable) {
     lirc_freeconfig(lirc.config);

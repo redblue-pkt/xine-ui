@@ -92,6 +92,7 @@ typedef struct {
 #define DISPLAY_KEYMAP          1002
 #define OPTION_SK_SERVER        1003
 #define OPTION_ENQUEUE          2000
+#define OPTION_VERBOSE          3000
 
 /* options args */
 static const char *short_options = "?hHgfvn"
@@ -104,18 +105,12 @@ static const char *short_options = "?hHgfvn"
 #ifdef HAVE_XF86VIDMODE
  "F"
 #endif
-#ifdef DEBUG
- "d:"
-#endif
  "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
   {"no-lirc"        , no_argument      , 0, 'L'                      },
-#endif
-#ifdef debug
-  {"debug"          , required_argument, 0, 'd'                      },
 #endif
   {"spu-channel"    , required_argument, 0, 'u'                      },
   {"audio-channel"  , required_argument, 0, 'a'                      },
@@ -145,6 +140,7 @@ static struct option long_options[] = {
   {"version"        , no_argument      , 0, 'v'                      },
   {"deinterlace"    , no_argument      , 0, 'D'                      },
   {"aspect-ratio"   , required_argument, 0, 'r'                      },
+  {"verbose"        , optional_argument, 0, OPTION_VERBOSE           },
   {0                , no_argument      , 0,  0                       }
 };
 
@@ -430,6 +426,7 @@ void show_usage (void) {
   printf("\n");
   printf("OPTIONS are:\n");
   printf(_("  -v, --version                Display version.\n"));
+  printf(_("      --verbose [=level]       Set verbosity level. Default is 1.\n"));
   printf(_("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n"));
   printf("                               ");
   driver_ids = xine_list_video_output_plugins (xine);
@@ -922,6 +919,7 @@ int main(int argc, char *argv[]) {
   char                   *session_mrl     = NULL;
   int                     aspect_ratio    = XINE_VO_ASPECT_AUTO ;
   int                     no_auto_start   = 0;
+  int                     verbosity       = 0;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1207,6 +1205,13 @@ int main(int argc, char *argv[]) {
       }
       break;
 
+    case OPTION_VERBOSE:
+      if(optarg != NULL)
+	verbosity = strtol(optarg, &optarg, 10);
+      else
+	verbosity = 1;
+      break;
+
     case 'S':
       session_handle_subopt(optarg, &session);
       break;
@@ -1287,6 +1292,8 @@ int main(int argc, char *argv[]) {
 
   gGui->xine = xine_new();
   xine_config_load(gGui->xine, gGui->configfile);
+  xine_engine_set_param(gGui->xine, XINE_ENGINE_PARAM_VERBOSITY, verbosity);
+
   /*
    * init gui
    */
