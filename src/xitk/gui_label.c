@@ -27,9 +27,9 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include "xine/xine.h"
-#include "xine/utils.h"
-#include "xine/monitor.h"
+#include "xine.h"
+#include "utils.h"
+#include "monitor.h"
 #include "gui_widget.h"
 #include "gui_label.h"
 #include "gui_widget_types.h"
@@ -49,7 +49,7 @@ void paint_label (widget_t *l,  Window win, GC gc) {
   gui_image_t *font = (gui_image_t *) private_data->font;
   int x_dest, y_dest, nCWidth, nCHeight, nLen, i;
   
-  XLOCK();
+  XLockDisplay (gDisplay);
   
   x_dest = l->x;
   y_dest = l->y;
@@ -84,7 +84,7 @@ void paint_label (widget_t *l,  Window win, GC gc) {
     xprintf (VERBOSE|GUI, "paint labal on something (%d) that "
 	     "is not a label\n", l->widget_type);
 
-  XUNLOCK();
+  XUnlockDisplay (gDisplay);
 }
 /*
  *

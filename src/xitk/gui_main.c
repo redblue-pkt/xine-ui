@@ -48,13 +48,9 @@
 #include "gui_playlist.h"
 #include "gui_control.h"
 
-#include "xine/xine.h"
-#include "xine/utils.h"
-#include "xine/monitor.h"g
-#include "xine/metronom.h"
-#include "xine/video_out.h"
-#include "xine/configfile.h"
-#include "xine/input_plugin.h"
+#include "xine.h"
+#include "utils.h"
+#include "monitor.h"
 
 #ifdef HAVE_LIRC
 #include "lirc/lirc_client.h"
@@ -83,8 +79,7 @@ static widget_list_t  *gui_widget_list;
 static ImlibImage     *gui_bg_image;                 /* background image */
 extern ImlibData      *gImlib_data;
 extern Display        *gDisplay;
-extern pthread_mutex_t gXLock;
-extern vo_driver_t    *gVideoDriver;
+extern vo_instance_t  *gVideoDriver;
 extern Window          gVideoWin;
 
 static widget_t       *gui_slider_play;
