@@ -545,7 +545,7 @@ void playlist_handle_event(XEvent *event, void *data) {
     gui_handle_event(event, data);
     break;
 
-  case KeyRelease:
+  case KeyPress:
     if(!playlist)
       return;
     
@@ -894,6 +894,7 @@ void playlist_editor(void) {
 
   lbl.skin_element_name = "AutoPlayLbl";
   lbl.label             = _("Scan for:");
+  lbl.callback          = NULL;
   xitk_list_append_content (playlist->widget_list->l,
 			    xitk_label_create (gGui->skin_config, &lbl));
   

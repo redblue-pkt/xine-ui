@@ -435,7 +435,7 @@ void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyRelease:
+  case KeyPress:
   case ButtonRelease:
     gui_handle_event(event, data);
     break;
@@ -790,12 +790,14 @@ void panel_init (void) {
   /*  Label title */
   lbl.skin_element_name = "TitleLabel";
   lbl.label             = gGui->filename;
+  lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->title_label = xitk_label_create (gGui->skin_config, &lbl)));
 
   /*  Runtime label */
   lbl.skin_element_name = "TimeLabel";
   lbl.label             = panel->runtime;
+  lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->runtime_label = xitk_label_create (gGui->skin_config, &lbl)));
   /* 
@@ -807,12 +809,14 @@ void panel_init (void) {
   /*  Audio channel label */
   lbl.skin_element_name = "AudioLabel";
   lbl.label             = panel->audiochan;
+  lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->audiochan_label = xitk_label_create (gGui->skin_config, &lbl)));
 
   /*  Spuid label */
   lbl.skin_element_name = "SpuLabel";
   lbl.label             = panel->spuid;
+  lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->spuid_label = xitk_label_create (gGui->skin_config, &lbl)));
 

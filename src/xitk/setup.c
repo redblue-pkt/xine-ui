@@ -396,11 +396,11 @@ static void setup_paint_widgets(void) {
 
     xitk_get_widget_pos(setup->wg[i]->widget, &wx, &wy);
     /* Inputtext/intbox/combo widgets have special treatments */
-    if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_COMBO) {
+    if((setup->wg[i]->widget->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) {
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 4);
     }
-    else if((setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT) ||
-    	    (setup->wg[i]->widget->widget_type & WIDGET_TYPE_INTBOX))
+    else if(((setup->wg[i]->widget->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) ||
+    	    ((setup->wg[i]->widget->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX))
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
     else
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y);
@@ -432,11 +432,11 @@ static void setup_paint_widgets(void) {
 /*
  * Handle X events here.
  */
-void setup_handle_event(XEvent *event, void *data) {
+static void setup_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyRelease:
+  case KeyPress:
     gui_handle_event(event, data);
     break;
     
@@ -450,7 +450,7 @@ void setup_handle_event(XEvent *event, void *data) {
     xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content (setup->widget_list->l);
     
     while (w) {
-      if(w->widget_type & WIDGET_TYPE_COMBO)
+      if((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO)
 	xitk_combo_update_pos(w);
       w = (xitk_widget_t *) xitk_list_next_content (setup->widget_list->l);
     }
@@ -480,6 +480,7 @@ static xitk_widget_t *setup_add_label (int x, int y, int w, char *str) {
   lb.gc                  = setup->widget_list->gc;
   lb.skin_element_name   = NULL;
   lb.label               = str;
+  lb.callback            = NULL;
 
   xitk_list_append_content(setup->widget_list->l, 
 			   (label = xitk_noskin_label_create(&lb,
@@ -514,7 +515,7 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   check_entry = gGui->config->lookup_entry(gGui->config, entry->key);
 
   if(check_entry) {
-    if(w->widget_type & WIDGET_TYPE_INPUTTEXT)
+    if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
       xitk_inputtext_change_text(setup->widget_list, w, check_entry->str_value);
   }
 }

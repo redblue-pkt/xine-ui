@@ -1210,7 +1210,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
       gui_exit(NULL, NULL);
     break;
 
-  case KeyRelease:
+  case KeyPress:
 
     if(!gGui->cursor_visible) {
       gGui->cursor_visible = !gGui->cursor_visible;

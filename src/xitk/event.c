@@ -633,7 +633,11 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_VIEWLOG:
     gui_viewlog_show(NULL, NULL);
     break;
-      
+
+  case ACTID_KBEDIT:
+    kbindings_editor(NULL, NULL);
+    break;
+
   default:
     break;
   }
@@ -673,7 +677,7 @@ void gui_handle_event (XEvent *event, void *data) {
   break;
 
   case ButtonRelease:
-  case KeyRelease:
+  case KeyPress:
     kbindings_handle_kbinding(gGui->kbindings, event);
     break;
     
@@ -722,7 +726,7 @@ void gui_status_callback (int nStatus) {
   }
 }
 
-char *gui_next_mrl_callback () {
+char *gui_next_mrl_callback (void) {
 
   if (gGui->playlist_cur >= (gGui->playlist_num-1)) 
     return NULL;
@@ -730,7 +734,7 @@ char *gui_next_mrl_callback () {
   return gGui->playlist[gGui->playlist_cur+1];
 }
 
-void gui_branched_callback () {
+void gui_branched_callback (void) {
 
   if (gGui->playlist_cur < (gGui->playlist_num-1)) {
   

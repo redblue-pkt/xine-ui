@@ -332,7 +332,7 @@ void control_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyRelease:
+  case KeyPress:
   case ButtonRelease:
     gui_handle_event(event, data);
     break;
@@ -577,6 +577,7 @@ void control_panel(void) {
   
     lbl.skin_element_name = "CtlHueLbl";
     lbl.label             = _("Hue");
+    lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->hue);
@@ -601,6 +602,7 @@ void control_panel(void) {
 
     lbl.skin_element_name = "CtlSatLbl";
     lbl.label             = _("Sat");
+    lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->sat);
@@ -625,6 +627,7 @@ void control_panel(void) {
 
     lbl.skin_element_name = "CtlBrightLbl";
     lbl.label             = _("Brt");
+    lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->bright);
@@ -649,6 +652,7 @@ void control_panel(void) {
 
     lbl.skin_element_name = "CtlContLbl";
     lbl.label             = _("Ctr");
+    lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->contr);
@@ -669,6 +673,7 @@ void control_panel(void) {
   
   lbl.skin_element_name = "CtlSkLbl";
   lbl.label             = _("Choose a Skin");
+  lbl.callback          = NULL;
   xitk_list_append_content(control->widget_list->l,
 			   xitk_label_create(gGui->skin_config, &lbl));
 

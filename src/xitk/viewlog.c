@@ -198,11 +198,11 @@ void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
 /*
  * Handle X events here.
  */
-void viewlog_handle_event(XEvent *event, void *data) {
+static void viewlog_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyRelease:
+  case KeyPress:
     gui_handle_event(event, data);
   break;
   
@@ -473,7 +473,7 @@ void viewlog_window(void) {
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
-  x = (WINDOW_WIDTH - (100 * 2)) / 3;
+  x = ((WINDOW_WIDTH / 2) - 100) / 2;
   y = WINDOW_HEIGHT - 40;
   
   lb.button_type       = CLICK_BUTTON;
@@ -488,7 +488,7 @@ void viewlog_window(void) {
 					  x, y, 100, 23,
 					  "Black", "Black", "White", tabsfontname));
 
-  x += x * 2;
+  x += (WINDOW_WIDTH / 2);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
