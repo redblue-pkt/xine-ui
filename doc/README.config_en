@@ -201,6 +201,9 @@ video.deinterlace_method	method to use for software-deinterlacing (currently
 			  bilinear scaling (interpolation) so this may be
 			  the worst quality method, but it's the only that
 			  don't require MMX.
+			6 linearblend: does a kind of vertical blurring over
+			  the image to remove interlace artifacts. simple but
+			  reported to produce good results.
 
 
 video.syncfb_device             Path to the syncfb device (default: /dev/syncfb)
