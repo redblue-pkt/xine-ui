@@ -261,8 +261,18 @@ static void mrl_handle_selection(xitk_widget_t *w, void *data) {
  */
 static void mrl_add(xitk_widget_t *w, void *data, mrl_t *mrl) {
 
-  if(mrl)
+  if(mrl) {
+    
+    if(!pl_is_running()) {
+      playlist_editor();
+    }
+    else {
+      if(!pl_is_visible())
+	pl_toggle_visibility(NULL, NULL);
+    }
+      
     gui_dndcallback((char *)mrl->mrl);
+  }
 }
 
 /*
