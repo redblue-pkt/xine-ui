@@ -42,6 +42,7 @@
 #include "panel.h"
 #include "mrl_browser.h"
 #include "setup.h"
+#include "event_sender.h"
 #include "viewlog.h"
 #include "snapshot.h"
 #include "errors.h"
@@ -71,25 +72,22 @@ int is_playback_widgets_enabled(void) {
 }
 
 void enable_playback_controls(int enable) {
+  void (*enability)(xitk_widget_t *) = NULL;
   
-  if(enable != panel->playback_widgets.enabled) {
-    void (*enability)(xitk_widget_t *) = NULL;
-    
-    panel->playback_widgets.enabled = enable;
-    
-    if(enable)
-      enability = xitk_enable_widget;
-    else
-      enability = xitk_disable_widget;
-    
-    enability(panel->playback_widgets.prev);
-    enability(panel->playback_widgets.stop);
-    enability(panel->playback_widgets.play);
-    enability(panel->playback_widgets.pause);
-    enability(panel->playback_widgets.next);
-    enability(panel->playback_widgets.eject);
-    enability(panel->playback_widgets.slider_play);
-  }
+  panel->playback_widgets.enabled = enable;
+  
+  if(enable)
+    enability = xitk_enable_widget;
+  else
+    enability = xitk_disable_widget;
+  
+  enability(panel->playback_widgets.prev);
+  enability(panel->playback_widgets.stop);
+  enability(panel->playback_widgets.play);
+  enability(panel->playback_widgets.pause);
+  enability(panel->playback_widgets.next);
+  enability(panel->playback_widgets.eject);
+  enability(panel->playback_widgets.slider_play);
 }
 
 /*
@@ -154,8 +152,22 @@ static int is_wm_is_enlightenment(Display *d, Window w) {
  * coords of panel window.
  */
 static void panel_store_new_position(int x, int y, int w, int h) {
-  config_update_num ("gui.panel_x", x);
-  config_update_num ("gui.panel_y", y);
+
+  if(panel->skin_on_change == 0) {
+    
+    panel->x = x;
+    panel->y = y;
+    
+    config_update_num ("gui.panel_x", x); 
+    config_update_num ("gui.panel_y", y);
+    
+    if(event_sender_is_running())
+      event_sender_move(x+w, y);
+
+  }
+  else
+    panel->skin_on_change--;
+
 }
 
 /*
@@ -165,6 +177,8 @@ void panel_change_skins(void) {
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
   
+  panel->skin_on_change++;
+
   xitk_skin_lock(gGui->skin_config);
   xitk_hide_widgets(panel->widget_list);
 
@@ -226,7 +240,10 @@ void panel_change_skins(void) {
     }
   }
 
+  enable_playback_controls(panel->playback_widgets.enabled);
   xitk_paint_widget_list(panel->widget_list);
+
+  event_sender_move(panel->x + hint.width, panel->y);
 }
 
 /*
@@ -352,6 +369,10 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     kbedit_toggle_visibility(NULL, NULL);
   }
 
+  if(!panel->visible && event_sender_is_visible()) {}
+  else {
+    event_sender_toggle_visibility(NULL, NULL);
+  }
 
   if (panel->visible) {
     
@@ -373,7 +394,8 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     XUnlockDisplay(gGui->display);
      
-  } else {
+  } 
+  else {
 
     panel->visible = 1;
     xitk_show_widgets(panel->widget_list);
@@ -515,8 +537,14 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
  *  Use internal xine-lib framegrabber function
  *  to snapshot current frame.
  */
+static void panel_snapshot_error(void *data, char *message) {
+  xine_error(message);
+}
+static void panel_snapshot_info(void *data, char *message) {
+  xine_info(message);
+}
 void panel_snapshot(xitk_widget_t *w, void *data) {
-  create_snapshot();
+  create_snapshot(panel_snapshot_error, panel_snapshot_info, NULL);
 }
 
 /*
@@ -688,6 +716,8 @@ void panel_init (void) {
 
   panel->playback_widgets.enabled = -1;
 
+  panel->skin_on_change = 0;
+
   XLockDisplay (gGui->display);
   
   /*
@@ -704,20 +734,20 @@ void panel_init (void) {
    * open the panel window
    */
 
-  hint.x = xine_config_register_num (gGui->xine, "gui.panel_x", 
-				     200,
-				     CONFIG_NO_DESC,
-				     CONFIG_NO_HELP,
-				     CONFIG_LEVEL_BEG,
-				     CONFIG_NO_CB,
-				     CONFIG_NO_DATA);
-  hint.y = xine_config_register_num (gGui->xine, "gui.panel_y",
-				     100,
-				     CONFIG_NO_DESC,
-				     CONFIG_NO_HELP,
-				     CONFIG_LEVEL_BEG,
-				     CONFIG_NO_CB,
-				     CONFIG_NO_DATA);
+  panel->x = hint.x = xine_config_register_num (gGui->xine, "gui.panel_x", 
+						200,
+						CONFIG_NO_DESC,
+						CONFIG_NO_HELP,
+						CONFIG_LEVEL_BEG,
+						CONFIG_NO_CB,
+						CONFIG_NO_DATA);
+  panel->y = hint.y = xine_config_register_num (gGui->xine, "gui.panel_y",
+						100,
+						CONFIG_NO_DESC,
+						CONFIG_NO_HELP,
+						CONFIG_LEVEL_BEG,
+						CONFIG_NO_CB,
+						CONFIG_NO_DATA);
 
   hint.width = panel->bg_image->rgb_width;
   hint.height = panel->bg_image->rgb_height;
@@ -886,6 +916,14 @@ void panel_init (void) {
 			   (w = xitk_button_create(panel->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(w, _("Setup window"));
 
+  /*  Event sender button */
+  b.skin_element_name = "Nav";
+  b.callback          = gui_event_sender_show;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, 
+			   (w = xitk_button_create(panel->widget_list, gGui->skin_config, &b)));
+  xitk_set_widget_tips(w, _("Navigator"));
+  
   /*  Close button */
   b.skin_element_name = "Close";
   b.callback          = panel_toggle_visibility;
@@ -1122,6 +1160,9 @@ void panel_init (void) {
     pthread_create(&panel->slider_thread, &pth_attrs, slider_loop, NULL);
   }
 
+  XLockDisplay (gGui->display);
+  XSetInputFocus(gGui->display, gGui->panel_window, RevertToParent, CurrentTime);
+  XUnlockDisplay (gGui->display);
 }
 
 void panel_set_title(char *title) {

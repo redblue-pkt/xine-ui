@@ -69,6 +69,7 @@
 
 #include "event.h"
 #include "errors.h"
+#include "snapshot.h"
 #include "i18n.h"
 
 #include "xitk.h"
@@ -79,8 +80,7 @@
 extern gGui_t  *gGui;
 
 /* internal function use to scale yuv data */
-typedef void (*scale_line_func_t) (uint8_t *source, uint8_t *dest,
-                                   int width, int step);
+typedef void (*scale_line_func_t) (uint8_t *source, uint8_t *dest, int width, int step);
 
 /* Holdall structure */
 
@@ -104,6 +104,10 @@ struct prvt_image_s {
   png_structp struct_ptr;
   png_infop info_ptr;
 };
+
+static snapshot_messenger_t error_msg_cb;
+static snapshot_messenger_t info_msg_cb;
+static void *msg_cb_data;
 
 #warning FIXME NEWAPI
 #if 0
@@ -815,12 +819,25 @@ static void yv12_2_rgb( struct prvt_image_s *image )
 
 static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
 {
-  xine_error(_("Error: %s\n"), error_msg);
+
+  if(error_msg_cb) {
+    char uerror[4096]; 
+
+    memset(&uerror, 0, sizeof(uerror));
+    sprintf(uerror, _("Error: %s\n"), error_msg);
+    error_msg_cb(msg_cb_data, uerror);
+  }
 }
 
 static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
 {
-  xine_error(_("Warning: %s\n"), warning_msg);
+  if(error_msg_cb) {
+    char uerror[4096];
+    
+    memset(&uerror, 0, sizeof(uerror));
+    sprintf(uerror, _("Error: %s\n"), warning_msg);
+    error_msg_cb(msg_cb_data, uerror);
+  }
 }
 
 /*
@@ -834,7 +851,8 @@ static void write_row_callback( png_structp png_ptr, png_uint_32 row, int pass)
  *  External function
  */
 
-void create_snapshot (void)
+void create_snapshot (snapshot_messenger_t error_mcb,
+		      snapshot_messenger_t info_mcb, void *mcb_data)
 {
   int err = 0;
   struct prvt_image_s *image;
@@ -851,6 +869,10 @@ void create_snapshot (void)
   if (prof_png == -1)
     prof_png = xine_profiler_allocate_slot ("snapshot convert to png");
 #endif /* DEBUG */
+
+  error_msg_cb = error_mcb;
+  info_msg_cb = info_mcb;
+  msg_cb_data = mcb_data;
 
   if ( ! prvt_image_alloc( &image ) )
   {
@@ -946,7 +968,14 @@ void create_snapshot (void)
   /**/
 
   if ( (image->fp = fopen(image->file_name, "wb")) == NULL ) {
-    xine_error(_("File open failed (%s)\n"), image->file_name);
+    
+    if(error_msg_cb) {
+      char umessage[4096];
+      
+      memset(&umessage, 0, sizeof(umessage));
+      sprintf(umessage, _("File open failed (%s)\n"), image->file_name);
+      error_msg_cb(msg_cb_data, umessage);
+    }
     prvt_image_free( &image );
     return;
   }
@@ -1094,7 +1123,12 @@ void create_snapshot (void)
 #endif
 
   /**/
-  xine_info(_("File '%s' written.\n"), image->file_name);
+  if(info_msg_cb) {
+    char umessage[4096];
+    memset(&umessage, 0, sizeof(umessage));
+    sprintf(umessage, _("File '%s' written.\n"), image->file_name);
+    info_msg_cb(msg_cb_data, umessage);
+  }
 
   printf("  prvt_image_free\n" );
   prvt_image_free( &image );
@@ -1106,6 +1140,7 @@ void create_snapshot (void)
   return;
 }
 #else
-void create_snapshot(void) {
+void create_snapshot (snapshot_messenger_t error_mcb,
+		      snapshot_messenger_t info_mcb, void *mcb_data) {
 }
 #endif

@@ -25,6 +25,9 @@
 #ifndef SNAPSHOT_H
 #define SNAPSHOT_H
 
-void create_snapshot (void);
+typedef void (*snapshot_messenger_t)(void *data, char *message);
+
+void create_snapshot (snapshot_messenger_t error_mcb, 
+		      snapshot_messenger_t info_mcb, void *mcb_data);
 
 #endif

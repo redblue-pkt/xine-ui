@@ -276,51 +276,56 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
 								CONFIG_NO_CB,
 								CONFIG_NO_DATA);
 
-  mb.window_title                   = _("Xine MRL Browser");
-  mb.skin_element_name              = "MrlBG";
-  mb.resource_name                  = mb.window_title;
-  mb.resource_class                 = "Xine";
+  mb.window_title                          = _("Xine MRL Browser");
+  mb.skin_element_name                     = "MrlBG";
+  mb.resource_name                         = mb.window_title;
+  mb.resource_class                        = "Xine";
   
-  mb.origin.skin_element_name       = "MrlCurOrigin";
-  mb.origin.cur_origin              = NULL;
+  mb.origin.skin_element_name              = "MrlCurOrigin";
+  mb.origin.cur_origin                     = NULL;
 
-  mb.dndcallback                    = dnd_cb;
+  mb.dndcallback                           = dnd_cb;
 
-  mb.select.skin_element_name       = "MrlSelect";
-  mb.select.caption                 = _("Select");
-  mb.select.callback                = add_cb;
+  mb.select.skin_element_name              = "MrlSelect";
+  mb.select.caption                        = _("Select");
+  mb.select.callback                       = add_cb;
 
-  mb.play.skin_element_name         = "MrlPlay";
-  mb.play.callback                  = add_and_play_cb;
+  mb.play.skin_element_name                = "MrlPlay";
+  mb.play.callback                         = add_and_play_cb;
 
-  mb.dismiss.skin_element_name      = "MrlDismiss";
-  mb.dismiss.caption                = _("Dismiss");
+  mb.dismiss.skin_element_name             = "MrlDismiss";
+  mb.dismiss.caption                       = _("Dismiss");
 
-  mb.kill.callback                  = mrl_browser_kill;
+  mb.kill.callback                         = mrl_browser_kill;
 
-  mb.ip_availables                  = ip_availables;
+  mb.ip_availables                         = ip_availables;
 
-  mb.ip_name.button.skin_element_name = "MrlPlugNameBG";
+  mb.ip_name.button.skin_element_name      = "MrlPlugNameBG";
 
-  mb.ip_name.label.skin_element_name = "MrlPlugLabel";
-  mb.ip_name.label.label_str        = _("Source:");
+  mb.ip_name.label.skin_element_name       = "MrlPlugLabel";
+  mb.ip_name.label.label_str               = _("Source:");
 
-  mb.xine                           = (xine_t *)gGui->xine;
+  mb.xine                                  = (xine_t *)gGui->xine;
 
   /* The browser */
 
-  mb.browser.arrow_up.skin_element_name = "MrlUp";
-  mb.browser.slider.skin_element_name   = "SLiderMrl";
-  mb.browser.arrow_dn.skin_element_name = "MrlDn";
-  mb.browser.browser.skin_element_name  = "MrlItemBtn";
-  mb.browser.browser.num_entries        = 0;
-  mb.browser.browser.entries            = NULL;
-  mb.browser.callback                   = sel_cb;
-  mb.browser.userdata                   = NULL;
+  mb.browser.arrow_up.skin_element_name    = "MrlUp";
+  mb.browser.slider.skin_element_name      = "SliderMrl";
+  mb.browser.arrow_dn.skin_element_name    = "MrlDn";
 
-  mb.combo.skin_element_name            = "MrlFilt";
+  mb.browser.arrow_left.skin_element_name  = "MrlLeft";
+  mb.browser.slider_h.skin_element_name    = "SliderHMrl";
+  mb.browser.arrow_right.skin_element_name = "MrlRight";
 
-  mb.mrl_filters                        = mrl_filters;
+  mb.browser.browser.skin_element_name     = "MrlItemBtn";
+  mb.browser.browser.num_entries           = 0;
+  mb.browser.browser.entries               = NULL;
+  mb.browser.callback                      = sel_cb;
+  mb.browser.userdata                      = NULL;
+
+  mb.combo.skin_element_name               = "MrlFilt";
+
+  mb.mrl_filters                           = mrl_filters;
 
   mrlb = xitk_mrlbrowser_create(NULL, gGui->skin_config, &mb);
 

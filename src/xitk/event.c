@@ -328,10 +328,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_stop(NULL, NULL);
     break;
 
-  case ACTID_SETUP:
-    gui_setup_show(NULL, NULL);
+  case ACTID_EVENT_SENDER:
+    gui_event_sender_show(NULL, NULL);
     break;
-
+    
   case ACTID_MRL_NEXT:
     if(!gGui->numeric.set)
       gui_nextprev(NULL, (void*)GUI_NEXT);
@@ -346,6 +346,10 @@ void gui_execute_action_id(action_id_t action) {
       gui_direct_nextprev(NULL, (void*)GUI_PREV, gGui->numeric.arg);
     break;
       
+  case ACTID_SETUP:
+    gui_setup_show(NULL, NULL);
+    break;
+
   case ACTID_EJECT:
     gui_eject(NULL, NULL);
     break;

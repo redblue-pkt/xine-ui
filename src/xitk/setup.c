@@ -346,7 +346,7 @@ static void setup_clear_tab(void) {
   xitk_image_t *im;
 
   im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
-			       (WINDOW_HEIGHT - (51 + 57) + 1));
+  			       (WINDOW_HEIGHT - (51 + 57) + 1 + 4));
 
   draw_outter(gGui->imlib_data, im->image, im->width, im->height);
 
@@ -963,7 +963,7 @@ static void setup_sections (void) {
   XUnlockDisplay(gGui->display);
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
-			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)));
+			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)) + 4);
   xitk_window_change_background(gGui->imlib_data, setup->xwin, bg->pixmap,
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -1191,4 +1191,9 @@ void setup_panel(void) {
   setup->visible = 1;
   setup->running = 1;
 
+  setup_raise_window();
+
+  XLockDisplay (gGui->display);
+  XSetInputFocus(gGui->display, xitk_window_get_window(setup->xwin), RevertToParent, CurrentTime);
+  XUnlockDisplay (gGui->display);
 }

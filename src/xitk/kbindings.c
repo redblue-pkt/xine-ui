@@ -42,6 +42,8 @@
 
 extern gGui_t                 *gGui;
 
+#undef TRACE_KBINDINGS
+
 #define  KBEDIT_NOOP           0
 #define  KBEDIT_ALIASING       1
 #define  KBEDIT_EDITING        2
@@ -89,7 +91,7 @@ static char         *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*
 
 #define WINDOW_WIDTH        520
 #define WINDOW_HEIGHT       440
-#define MAX_DISP_ENTRIES    12
+#define MAX_DISP_ENTRIES    11
 
 /*
  * Handled key modifier.
@@ -227,6 +229,8 @@ static kbinding_entry_t default_binding_table[] = {
     "NextMrl",                ACTID_MRL_NEXT                , "Next",     KEYMOD_NOMOD   , 0 },
   { "Select and play previous mrl in the playlist.",
     "PriorMrl",               ACTID_MRL_PRIOR               , "Prior",    KEYMOD_NOMOD   , 0 },
+  { "Visibility toggle of the event sender window.",
+    "EventSenderShow",        ACTID_EVENT_SENDER            , "e",        KEYMOD_META    , 0 },
   { "Eject the current medium.",
     "Eject",                  ACTID_EJECT                   , "e",        KEYMOD_NOMOD   , 0 },
   { "Set position to numeric-argument%% of current stream.",
@@ -1047,7 +1051,8 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
   if((key == NULL) || (kbt == NULL))
     return NULL;
 
-  /*
+
+#ifdef TRACE_KBINDINGS
   printf("Looking for: '%s' [", key);
   if(modifier == KEYMOD_NOMOD)
     printf("none, ");
@@ -1062,7 +1067,7 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
   if(modifier & KEYMOD_MOD5)
     printf("mod5, ");
   printf("\b\b]\n");
-  */
+#endif
 
   /* Be case sensitive */
   for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
@@ -1108,6 +1113,10 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
     memset(&xbutton, 0, sizeof(xbutton));
     snprintf(xbutton, 255, "XButton_%d", event->xbutton.button);
 
+#ifdef TRACE_KBINDINGS
+    printf("ButtonRelease: %s, modifier: %d\n", xbutton, modifier);
+#endif    
+
     k = kbindings_lookup_binding(kbt, xbutton, modifier);
     
     if(k) {
@@ -1135,6 +1144,9 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
 
     XLockDisplay (gGui->display);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+#ifdef TRACE_KBINDINGS
+    printf("KeyPress: %s, modifier: %d\n", (XKeysymToString(mykey)), modifier);
+#endif    
     k = kbindings_lookup_binding(kbt, XKeysymToString(mykey), modifier);
     XUnlockDisplay (gGui->display);
     
@@ -1847,9 +1859,9 @@ void kbedit_window(void) {
   y = 35;
   
   draw_rectangular_inner_box(gGui->imlib_data, bg, x, y,
-			     (WINDOW_WIDTH - 30), (20 * MAX_DISP_ENTRIES) + 1);
+			     (WINDOW_WIDTH - 30), (20 * (MAX_DISP_ENTRIES + 1)) - 2);
 
-  y = y + (20 * MAX_DISP_ENTRIES) + 45;
+  y = y + (20 * (MAX_DISP_ENTRIES + 1)) + 45;
   draw_outter_frame(gGui->imlib_data, bg, 
 		    _("Binding action"), fontname, 
 		    x, y, 
@@ -2163,4 +2175,7 @@ void kbedit_window(void) {
   kbedit->visible = 1;
   kbedit->running = 1;
 
+  XLockDisplay (gGui->display);
+  XSetInputFocus(gGui->display, xitk_window_get_window(kbedit->xwin), RevertToParent, CurrentTime);
+  XUnlockDisplay (gGui->display);
 }

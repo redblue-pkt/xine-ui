@@ -24,6 +24,7 @@ xine_SOURCES = \
 	control.c \
 	errors.c \
 	event.c \
+	event_sender.c \
 	kbindings.c \
 	lang.c \
 	lirc.c \
@@ -37,7 +38,7 @@ xine_SOURCES = \
 	panel.c \
 	playlist.c \
 	videowin.c \
-	viewlog.c 
+	viewlog.c
 
 xine_DEPENDENTIES = utils.h monitor.h 
 # double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
@@ -56,6 +57,7 @@ noinst_HEADERS = \
 	control.h \
 	errors.h \
 	event.h \
+	event_sender.h \
 	i18n.h \
 	kbindings.h \
 	lang.h \
@@ -68,7 +70,7 @@ noinst_HEADERS = \
 	skins.h \
 	snapshot.h \
 	videowin.h \
-	viewlog.h 
+	viewlog.h
 
 
 $(top_builddir)/readline/libreadline.la:
@@ -117,4 +119,3 @@ maintainer-clean-generic:
 	-@echo "it deletes files that may require special tools to rebuild."
 	-rm -f Makefile.in
 	-rm -f utils.c monitor.c xine-remote.c
-## xscreensaver-remote.c 

@@ -83,6 +83,8 @@ void gui_mrl_browser_show(xitk_widget_t *w, void *data);
 
 void gui_setup_show(xitk_widget_t *w, void *data);
 
+void gui_event_sender_show(xitk_widget_t *w, void *data);
+
 void gui_viewlog_show(xitk_widget_t *w, void *data);
 
 void gui_kbedit_show(xitk_widget_t *w, void *data);

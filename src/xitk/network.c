@@ -59,6 +59,7 @@
 
 #include "actions.h"
 #include "kbindings.h"
+#include "snapshot.h"
 #include "errors.h"
 
 #include "readline.h"
@@ -187,6 +188,7 @@ static void do_gui(commands_t *, client_info_t *);
 static void do_event(commands_t *, client_info_t *);
 static void do_seek(commands_t *, client_info_t *);
 static void do_halt(commands_t *, client_info_t *);
+static void do_snap(commands_t *, client_info_t *);
 
 static void handle_client_command(client_info_t *);
 static const char *get_homedir(void);
@@ -375,6 +377,10 @@ static commands_t commands[] = {
   { "halt",        NO_ARGS,         PUBLIC,          NEED_AUTH,     do_halt,
     "Stop xine program",
     "halt"
+  },
+  { "snapshot",    NO_ARGS,         PUBLIC,          NEED_AUTH,     do_snap,
+    "Take a snapshot",
+    "snapshot"
   },
   { NULL,          -1,              NOT_PUBLIC,      AUTH_UNNEEDED, NULL, 
     NULL, 
@@ -2394,6 +2400,16 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 
 static void do_halt(commands_t *cmd, client_info_t *client_info) {
   gui_exit(NULL, NULL);
+}
+
+static void network_messenger(void *data, char *message) {
+  int socket = (int) data;
+  
+  sock_write(socket, message);
+}
+
+static void do_snap(commands_t *cmd, client_info_t *client_info) {
+  create_snapshot(network_messenger, network_messenger, (void *)client_info->socket);
 }
 
 /*

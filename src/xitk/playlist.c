@@ -606,18 +606,24 @@ void playlist_handle_event(XEvent *event, void *data) {
       
       w = xitk_get_focused_widget(playlist->widget_list);
       if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
-	xitk_browser_step_up(playlist->playlist, NULL);
+	if(mykey == XK_Down)
+	  xitk_browser_step_up(playlist->playlist, NULL);
+	else
+	  xitk_browser_page_up(playlist->playlist, NULL);
       }
     }
     break;
-    
+   
     case XK_Up:
     case XK_Prior: {
       xitk_widget_t *w;
       
       w = xitk_get_focused_widget(playlist->widget_list);
       if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
-	xitk_browser_step_down(playlist->playlist, NULL);
+	if(mykey == XK_Up)
+	  xitk_browser_step_down(playlist->playlist, NULL);
+	else
+	  xitk_browser_page_down(playlist->playlist, NULL);
       }
     }
     break;
@@ -948,6 +954,9 @@ void playlist_editor(void) {
   br.arrow_up.skin_element_name    = "PlUp";
   br.slider.skin_element_name      = "SliderPl";
   br.arrow_dn.skin_element_name    = "PlDn";
+  br.arrow_left.skin_element_name  = "PlLeft";
+  br.slider_h.skin_element_name    = "SliderHPl";
+  br.arrow_right.skin_element_name = "PlRight";
   br.browser.skin_element_name     = "PlItemBtn";
   br.browser.num_entries           = gGui->playlist_num;
   br.browser.entries               = gGui->playlist;
@@ -1023,4 +1032,10 @@ void playlist_editor(void) {
   playlist->visible = 1;
   playlist->running = 1;
   pl_update_focused_entry();
+
+  XLockDisplay(gGui->display);
+  XSetInputFocus(gGui->display, playlist->window, RevertToParent, CurrentTime);
+  XUnlockDisplay(gGui->display);
+
+  xitk_set_focus_to_widget(playlist->widget_list, playlist->winput);
 }

@@ -56,7 +56,7 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
 
 #define WINDOW_WIDTH        580
 #define WINDOW_HEIGHT       480
-#define MAX_DISP_ENTRIES    18
+#define MAX_DISP_ENTRIES    17
         
 typedef struct {
   xitk_window_t        *xwin;
@@ -224,7 +224,7 @@ static void viewlog_clear_tab(void) {
   xitk_image_t *im;
   
   im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
-			       (WINDOW_HEIGHT - (51 + 57) + 1));
+			       (WINDOW_HEIGHT - (51 + 57) + 1) - 5);
   
   draw_outter(gGui->imlib_data, im->image, im->width, im->height);
   
@@ -384,7 +384,7 @@ static void viewlog_create_tabs(void) {
   XUnlockDisplay(gGui->display);
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
-			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)));
+			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)) - 5);
   xitk_window_change_background(gGui->imlib_data, viewlog->xwin, bg->pixmap, 
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -511,10 +511,8 @@ void viewlog_window(void) {
 					  x, y, 100, 23,
 					  "Black", "Black", "White", tabsfontname));
 
-  
-  XUnlockDisplay (gGui->display);
-
   XMapRaised(gGui->display, xitk_window_get_window(viewlog->xwin));
+  XUnlockDisplay (gGui->display);
 
   viewlog->kreg = xitk_register_event_handler("viewlog", 
 					      (xitk_window_get_window(viewlog->xwin)),
@@ -523,9 +521,11 @@ void viewlog_window(void) {
 					      NULL,
 					      viewlog->widget_list,
 					      NULL);
-  
 
   viewlog->visible = 1;
   viewlog->running = 1;
   
+  XLockDisplay (gGui->display);
+  XSetInputFocus(gGui->display, xitk_window_get_window(viewlog->xwin), RevertToParent, CurrentTime);
+  XUnlockDisplay (gGui->display);
 }

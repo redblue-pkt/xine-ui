@@ -32,28 +32,32 @@
 typedef struct {
   xitk_widget_list_t   *widget_list;
   
+  int                   x;
+  int                   y;
+  int                   skin_on_change;
+
   xitk_widget_t        *title_label;
   xitk_widget_t        *runtime_label;
 
   struct {
-    int                enabled;
-    xitk_widget_t     *prev;
-    xitk_widget_t     *stop;
-    xitk_widget_t     *play;
-    xitk_widget_t     *pause;
-    xitk_widget_t     *next;
-    xitk_widget_t     *eject;
-    xitk_widget_t     *slider_play;
+    int                 enabled;
+    xitk_widget_t      *prev;
+    xitk_widget_t      *stop;
+    xitk_widget_t      *play;
+    xitk_widget_t      *pause;
+    xitk_widget_t      *next;
+    xitk_widget_t      *eject;
+    xitk_widget_t      *slider_play;
   } playback_widgets;
   
   struct {
-    xitk_widget_t        *slider;
-    xitk_widget_t        *mute;
+    xitk_widget_t      *slider;
+    xitk_widget_t      *mute;
   } mixer;
   
   struct {
-    int                   enable;
-    unsigned int          timeout;
+    int                 enable;
+    unsigned int        timeout;
   } tips;
   
   int                   visible;
@@ -107,8 +111,6 @@ void panel_update_runtime_display(void);
 void panel_set_no_mrl(void);
 
 void panel_update_mrl_display (void);
-
-void panel_layer_above(int);
 
 void panel_set_title(char*);
 

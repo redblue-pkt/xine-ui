@@ -47,6 +47,7 @@
 #include "videowin.h"
 #include "mrl_browser.h"
 #include "setup.h"
+#include "event_sender.h"
 #include "viewlog.h"
 #include "errors.h"
 #include "i18n.h"
@@ -266,6 +267,9 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
 
   if(kbedit_is_visible())
     kbedit_raise_window();
+
+  if(event_sender_is_visible())
+    event_sender_raise_window();
 }
 
 void gui_toggle_aspect(void) {
@@ -628,6 +632,16 @@ void gui_setup_show(xitk_widget_t *w, void *data) {
     setup_exit(NULL, NULL);
 }
 
+void gui_event_sender_show(xitk_widget_t *w, void *data) {
+  
+  if (event_sender_is_running() && !event_sender_is_visible())
+    event_sender_toggle_visibility(NULL, NULL);
+  else if(!event_sender_is_running())
+    event_sender_panel();
+  else
+    event_sender_exit(NULL, NULL);
+}
+
 void gui_viewlog_show(xitk_widget_t *w, void *data) {
 
   if (viewlog_is_running() && !viewlog_is_visible())
@@ -660,20 +674,25 @@ void layer_above_video(Window w) {
   if(!gGui->layer_above)
     return;
   
-  if( XA_WIN_LAYER == None )
+  if(XA_WIN_LAYER == None)
     XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
 
-  xev.type = ClientMessage;
-  xev.xclient.type = ClientMessage;
-  xev.xclient.window = w;
+  xev.type                 = ClientMessage;
+  xev.xclient.type         = ClientMessage;
+  xev.xclient.window       = w;
   xev.xclient.message_type = XA_WIN_LAYER;
-  xev.xclient.format = 32;
+  xev.xclient.format       = 32;
 
   /* top layer if video is fullscreen, otherwise normal layer */
-  if (video_window_get_fullscreen_mode() && video_window_is_visible()) 
+  if (video_window_get_fullscreen_mode() && video_window_is_visible()) {
     xev.xclient.data.l[0] = (long) 10;
-  else
-    xev.xclient.data.l[0] = (long) 4;
+  }
+  else {
+    if(gGui->layer_above)
+      xev.xclient.data.l[0] = (long) 10;
+    else
+      xev.xclient.data.l[0] = (long) 4;
+  }
 
   xev.xclient.data.l[1] = 0;
 

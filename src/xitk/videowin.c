@@ -546,7 +546,7 @@ static void video_window_adapt_size (void) {
      *
      */
     if(gGui->layer_above) {
-      if( XA_WIN_LAYER == None )
+      if(XA_WIN_LAYER == None)
 	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
       
       propvalue[0] = 10;
@@ -971,7 +971,7 @@ void video_window_set_visibility(int show_window) {
      */
 
     if(gGui->layer_above && (gVw->hide_on_start == 0)) {
-      if( XA_WIN_LAYER == None )
+      if(XA_WIN_LAYER == None)
 	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
       
       data[0] = 10;

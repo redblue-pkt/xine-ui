@@ -684,6 +684,9 @@ void control_panel(void) {
   br.arrow_up.skin_element_name    = "CtlSkUp";
   br.slider.skin_element_name      = "SliderCtlSk";
   br.arrow_dn.skin_element_name    = "CtlSkDn";
+  br.arrow_left.skin_element_name  = "CtlSkLeft";
+  br.slider_h.skin_element_name    = "SliderHCtlSk";
+  br.arrow_right.skin_element_name = "CtlSkRight";
   br.browser.skin_element_name     = "CtlSkItemBtn";
   br.browser.num_entries           = control->skins_num;
   br.browser.entries               = control->skins;
@@ -736,4 +739,8 @@ void control_panel(void) {
   
   control->visible = 1;
   control->running = 1;
+
+  XLockDisplay (gGui->display);
+  XSetInputFocus(gGui->display, control->window, RevertToParent, CurrentTime);
+  XUnlockDisplay (gGui->display);
 }
