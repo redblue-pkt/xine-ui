@@ -1189,7 +1189,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
  * Change label of button 'widget'.
  */
 int xitk_labelbutton_change_label(xitk_widget_t *, char *);
-int xitk_labelbutton_change_shortcut_label(xitk_widget_t *, char *, int);
+int xitk_labelbutton_change_shortcut_label(xitk_widget_t *, char *, int, char *);
 
 /**
  * Return label of button 'widget'.

@@ -62,6 +62,7 @@ typedef struct {
   
   /* Only used if (w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_BROWSER || WIDGET_GROUP_MENU */
   char                   *shortcut_label;
+  char                   *shortcut_font;
   int                     shortcut_pos;
 
 } lbutton_private_data_t;

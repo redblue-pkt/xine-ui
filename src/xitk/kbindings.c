@@ -1110,7 +1110,7 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *kbt) {
   return kbt->action_id;
 }
 
-static char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t  *kbe) {
+static char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
   static char shortcut[32];
 
   if(kbe) {

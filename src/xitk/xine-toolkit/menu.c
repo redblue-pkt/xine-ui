@@ -700,8 +700,11 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   maxlen = xitk_font_get_string_length(fs, maxnode->menu_entry->menu);
 
   if(xitk_get_menu_shortcuts_enability() && _menu_branch_have_shortcut(branch)) {
-    shortcutlen = xitk_font_get_string_length(fs, (_menu_get_wider_shortcut_node(branch))->menu_entry->shortcut);
+    xitk_font_t *short_font;
+    short_font = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_FONT_12);
+    shortcutlen = xitk_font_get_string_length(short_font, (_menu_get_wider_shortcut_node(branch))->menu_entry->shortcut);
     maxlen += shortcutlen + 15;
+    xitk_font_unload_font(short_font);
   }
 
   xitk_font_unload_font(fs);
@@ -823,7 +826,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
       me->button = btn;
       
       if(xitk_get_menu_shortcuts_enability()  && me->menu_entry->shortcut)
-	xitk_labelbutton_change_shortcut_label(btn, me->menu_entry->shortcut, shortcutpos);
+	xitk_labelbutton_change_shortcut_label(btn, me->menu_entry->shortcut, shortcutpos, DEFAULT_FONT_12);
       
       wimage = xitk_get_widget_foreground_skin(btn);
       if(wimage) {

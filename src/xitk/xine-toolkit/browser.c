@@ -386,9 +386,10 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 	  if(private_data->shortcuts_content[private_data->current_start + i])
 	    xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART],
 						   private_data->shortcuts_content[private_data->current_start + i], 
-						   item_width - (xitk_font_get_string_length(fs, private_data->shortcuts_content[private_data->current_start + i]) + 10));
+						   item_width - (xitk_font_get_string_length(fs, private_data->shortcuts_content[private_data->current_start + i]) + 10),
+						   NULL);
 	  else
-	    xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1);
+	    xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1, NULL);
 	}
 	
 	if(fs) {
@@ -411,7 +412,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
       }
       else {
 	xitk_labelbutton_change_label(private_data->item_tree[i+WBSTART], "");
-	xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1);
+	xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1, NULL);
       }
     }
 
@@ -531,12 +532,12 @@ static void browser_hslidmove(xitk_widget_t *w, void *data, int pos) {
 					private_data->content[private_data->current_start + i]);
 	  if(private_data->shortcuts_content)
 	    xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], 
-						   private_data->shortcuts_content[private_data->current_start + i], -1);
+						   private_data->shortcuts_content[private_data->current_start + i], -1, NULL);
 	  
 	}
 	else {
 	  xitk_labelbutton_change_label(private_data->item_tree[i+WBSTART], "");
-	  xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1);
+	  xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1, NULL);
 	}
       }
     }
