@@ -24,7 +24,7 @@
  */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
+#endif
 
 #include <stdio.h>
 #include <X11/Xlib.h>
