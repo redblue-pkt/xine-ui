@@ -537,45 +537,45 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 		
 		skin_ref = skin_ref->next;
 	      }
-	    }
 
-	    if(slx.name && slx.skin.href && 
-	       ((slx.skin.version >= SKIN_IFACE_VERSION) && slx.skin.maintained)) {
-
+	      if(slx.name && slx.skin.href && 
+		 ((slx.skin.version >= SKIN_IFACE_VERSION) && slx.skin.maintained)) {
+		
 #if 0
-	      printf("Skin number %d:\n", entries_slx);
-	      printf("  Name: %s\n", slx.name);
-	      printf("  Author Name: %s\n", slx.author.name);
-	      printf("  Author email: %s\n", slx.author.email);
-	      printf("  Href: %s\n", slx.skin.href);
-	      printf("  Version: %d\n", slx.skin.version);
-	      printf("  Maintained: %d\n", slx.skin.maintained);
-	      printf("--\n");
+		printf("Skin number %d:\n", entries_slx);
+		printf("  Name: %s\n", slx.name);
+		printf("  Author Name: %s\n", slx.author.name);
+		printf("  Author email: %s\n", slx.author.email);
+		printf("  Href: %s\n", slx.skin.href);
+		printf("  Version: %d\n", slx.skin.version);
+		printf("  Maintained: %d\n", slx.skin.maintained);
+		printf("--\n");
 #endif
+		
+		entries_slx++;
+		
+		if(entries_slx == 1)
+		  slxs = (slx_entry_t **) xine_xmalloc(sizeof(slx_entry_t *) * 2);
+		else
+		  slxs = (slx_entry_t **) realloc(slxs, sizeof(slx_entry_t *) * (entries_slx + 1));
+		
+		slxs[(entries_slx - 1)] = (slx_entry_t *) xine_xmalloc(sizeof(slx_entry_t));
+		slxs[(entries_slx - 1)]->name            = strdup(slx.name);
+		slxs[(entries_slx - 1)]->author.name     = slx.author.name ? strdup(slx.author.name) : NULL;
+		slxs[(entries_slx - 1)]->author.email    = slx.author.email ? strdup(slx.author.email) : NULL;
+		slxs[(entries_slx - 1)]->skin.href       = strdup(slx.skin.href);
+		slxs[(entries_slx - 1)]->skin.version    = slx.skin.version;
+		slxs[(entries_slx - 1)]->skin.maintained = slx.skin.maintained;
+		
+	      }
 	      
-	      entries_slx++;
-
-	      if(entries_slx == 1)
-		slxs = (slx_entry_t **) xine_xmalloc(sizeof(slx_entry_t *) * 2);
-	      else
-		slxs = (slx_entry_t **) realloc(slxs, sizeof(slx_entry_t *) * (entries_slx + 1));
-	      
-	      slxs[(entries_slx - 1)] = (slx_entry_t *) xine_xmalloc(sizeof(slx_entry_t));
-	      slxs[(entries_slx - 1)]->name            = strdup(slx.name);
-	      slxs[(entries_slx - 1)]->author.name     = slx.author.name ? strdup(slx.author.name) : NULL;
-	      slxs[(entries_slx - 1)]->author.email    = slx.author.email ? strdup(slx.author.email) : NULL;
-	      slxs[(entries_slx - 1)]->skin.href       = strdup(slx.skin.href);
-	      slxs[(entries_slx - 1)]->skin.version    = slx.skin.version;
-	      slxs[(entries_slx - 1)]->skin.maintained = slx.skin.maintained;
-	      
+	      SAFE_FREE(slx.name);
+	      SAFE_FREE(slx.author.name);
+	      SAFE_FREE(slx.author.email);
+	      SAFE_FREE(slx.skin.href);
+	      slx.skin.version = 0;
+	      slx.skin.maintained = 0;
 	    }
-	    
-	    SAFE_FREE(slx.name);
-	    SAFE_FREE(slx.author.name);
-	    SAFE_FREE(slx.author.email);
-	    SAFE_FREE(slx.skin.href);
-	    slx.skin.version = 0;
-	    slx.skin.maintained = 0;
 
 	    skin_entry = skin_entry->next;
 	  }
@@ -778,6 +778,8 @@ void download_skin(char *url) {
     xitk_labelbutton_widget_t  lb;
     GC                         gc;
     int                        x, y;
+
+    printf("!= NULL\n"); fflush(stdout);
 
     XITK_WIDGET_INIT(&br, gGui->imlib_data);
     XITK_WIDGET_INIT(&lb, gGui->imlib_data);
