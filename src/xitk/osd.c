@@ -114,6 +114,7 @@ static uint8_t trans[OVL_PALETTE_SIZE];
 #define BAR_WIDTH 336
 #define BAR_HEIGHT 25
 
+#define MINIMUM_WIN_WIDTH  300
 #define FONT_SIZE          20
 #define UNSCALED_FONT_SIZE 32
 
@@ -491,11 +492,16 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     xine_osd_set_position(gGui->osd.bar[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
     xine_osd_set_position(gGui->osd.bar[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
     
-    _xine_osd_show(gGui->osd.bar[0], 0);
-    if(title)
-      _xine_osd_show(gGui->osd.bar[1], 0);
-    
-    gGui->osd.bar_visible = gGui->osd.timeout;
+    /* don't even bother drawing osd over those small streams.
+     * it would look pretty bad.
+     */
+    if( wwidth > MINIMUM_WIN_WIDTH ) {
+      _xine_osd_show(gGui->osd.bar[0], 0);
+      if(title)
+        _xine_osd_show(gGui->osd.bar[1], 0);
+   
+      gGui->osd.bar_visible = gGui->osd.timeout;
+    }
   }
 }
 
@@ -546,7 +552,8 @@ void osd_update_status(void) {
   if(gGui->osd.enabled) {
     int  status;
     char buffer[256];
-    
+    int wwidth, wheight;
+
     status = xine_get_status(gGui->stream);
     
     xine_osd_clear(gGui->osd.status);
@@ -600,8 +607,16 @@ void osd_update_status(void) {
     
     xine_osd_draw_text(gGui->osd.status, 0, 0, buffer, XINE_OSD_TEXT1);
     xine_osd_set_position(gGui->osd.status, 20, 10);
-    _xine_osd_show(gGui->osd.status, 0);
-    gGui->osd.status_visible = gGui->osd.timeout;
+
+    _osd_get_output_size(&wwidth, &wheight);
+
+    /* don't even bother drawing osd over those small streams.
+     * it would look pretty bad.
+     */
+    if( wwidth > MINIMUM_WIN_WIDTH ) {
+      _xine_osd_show(gGui->osd.status, 0);
+      gGui->osd.status_visible = gGui->osd.timeout;
+    }
   }
 }
 
