@@ -64,6 +64,10 @@
 
 #include "_xitk.h"
 
+#ifndef XShmGetEventBase
+extern int XShmGetEventBase(Display *);
+#endif
+
 extern char **environ;
 extern int errno;
 #undef TRACE_LOCKS
@@ -899,6 +903,14 @@ void xitk_xevent_notify(XEvent *event) {
 
       if(fx->window == event->xany.window) {
 	
+	/* Forward immediately EventCompletion event */
+	if(event->type == (XShmGetEventBase(gXitk->display) + ShmCompletion)) {
+	  if(fx->xevent_callback)
+	    fx->xevent_callback(event, fx->user_data);
+
+	  return;
+	}
+
 	switch(event->type) {
 
 	case MappingNotify:
