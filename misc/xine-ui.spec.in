@@ -87,12 +87,23 @@ rm -rf $RPM_BUILD_ROOT
 # documentation
 %{prefix}/man/fr/man1/xine.1
 %{prefix}/man/man1/xine.1
-%{prefix}/share/doc/xine/*
+%{prefix}/share/doc/xine/FAQ
+%{prefix}/share/doc/xine/FAQ_es
+%{prefix}/share/doc/xine/FAQ_it
+%{prefix}/share/doc/xine/FAQ_fr
+%{prefix}/share/doc/xine/README.freebsd
+%{prefix}/share/doc/xine/README.irix
+%{prefix}/share/doc/xine/README.solaris
+%{prefix}/share/doc/xine/README.syncfb
+%{prefix}/share/doc/xine/bug_report_form
 
 @HAVE_AA_TRUE@%files aa
+@HAVE_AA_TRUE@%defattr(-,root,root)
 @HAVE_AA_TRUE@%{prefix}/bin/aaxine
 
 %changelog
+* Sun Sep 16 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+- Add missing files.
 * Thu Jul 26 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Made AA as separate package.
 * Thu Jul 26 2001 Matthias Dahl <matthew2k@web.de>

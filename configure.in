@@ -113,7 +113,7 @@ AC_SUBST(THREAD_LIBS)
 dnl
 dnl Check for xine-lib
 dnl
-AM_PATH_XINE(0.5.0,, AC_MSG_ERROR(*** You should install xine-lib first ***))
+AM_PATH_XINE(0.9.0,, AC_MSG_ERROR(*** You should install xine-lib first ***))
 
 dnl
 dnl dynamic linker
@@ -308,7 +308,7 @@ if test "$host_or_hostalias" = ""; then
 fi
 
 case "$host_or_hostalias" in
-i386-*-freebsd*)
+  i386-*-freebsd*)
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -pipe -fomit-frame-pointer -malign-functions=4 -malign-loops=4 -malign-jumps=4 -malign-functions=4 $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions"
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS $CFLAGS -D_REENTRANT"
     DEBUG_CFLAGS="$X_CFLAGS $DEBUG_CFLAGS -D_REENTRANT -DDEBUG"
@@ -316,7 +316,7 @@ i386-*-freebsd*)
     AC_DEFINE([ARCH_X86],,[x86 architecture])
     ;;
 
-i?86*-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-*)
+  i?86*-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-*)
     if test "$GCC" = yes; then
 
 	dnl Check for gcc cpu optimization support
@@ -384,22 +384,22 @@ i?86*-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-*)
     AC_DEFINE([ARCH_X86],,[x86 architecture])
     ;;
 
-alphaev56-*)
+  alphaev56-*)
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -mcpu=ev56 -mieee"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mcpu=ev56 -mieee"
     ;;
 
-alpha*)
+  alpha*)
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -mieee"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mieee"
     ;;
 
-ppc-*-linux-* | powerpc-*) 
+  ppc-*-linux-* | powerpc-*) 
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
     ;;
 
-sparc64-*-linux-* | sparc-*)
+  sparc64-*-linux-* | sparc-*)
     if test "$GCC" = yes; then
 	GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
 	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
@@ -409,17 +409,17 @@ sparc64-*-linux-* | sparc-*)
     fi
     ;;
 
-mips-*)
+  mips-*)
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
     ;;
 
-m68k-*)
+  m68k-*)
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O2"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
     ;;
 
-*)
+  *)
     echo "Host type '$host' ($host_alias) is currently not supported by xine"
     exit 1
     ;;
@@ -508,4 +508,3 @@ misc/build_rpms.sh
 misc/SlackBuild
 misc/xine-ui.spec
 ],[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh])
-

@@ -39,3 +39,4 @@ maintainer-clean-generic:
 	-rm -f Makefile.in configure acinclude.m4 aclocal.m4
 	-rm -f config.h.in stamp-h.in ltconfig ltmain.sh
 	-rm -f config.guess config.sub install-sh missing mkinstalldirs
+	-rm -f depcomp config.log
