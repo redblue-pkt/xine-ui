@@ -1,5 +1,6 @@
 xine-ui (0.9.21) unstable; urgency=low
 
+  * fix playlist handling bug.
   * closing an xitk window don't crash xine anymore,
   * clicking on audio/spu language in main panel popup a language selection menu,
   * use ISO639-1 to display DVD audio/spu language ('en' -> 'english'),
