@@ -37,6 +37,9 @@
   vertical retrace of your monitor and  those tearing artefacts are gone
   forever.
 
+  And last but not least, you can finally  use  hardware  deinterlacing,
+  so your CPU can lean back and let the graphic card do the work. :)
+  
 
 * AND HOW DOES IT WORK?
   
@@ -108,10 +111,10 @@
 
   # 1280x1024
     
-    none yet - will be added soon
+    none yet - might be added in the future
 
-  So before you run XINE please turn to the appropriate refresh rate and
-  the jerking should be gone.   (you may also want to have a look at the
+  So before you run  XINE  just turn to the appropriate refresh rate and
+  the jerking *should* be gone. (you may also want to have a look at the
   XF86VidMode support included in XINE which makes on-the-fly resolution
   switching possible when fullscreen is toggled)
 
@@ -119,10 +122,13 @@
 * WHAT SCREENSIZE SHOULD I PREFER?
   
   Well. It is important that the screensize  you choose for DVD playback
-  is exactly the same screensize  you're starting up your X Server with.
-  So you shouldn't switch down to 1024x768 if you are  running 1280x1024
-  because that  gives  you  a  virtual  screensize  of  1280x1024  in  a
-  resolution of 1024x768 - and the plugin cannot handle that yet.
+  is exactly the same screensize  you're starting up your X Server  with
+  if you are not using the XF86VidMode extension which will properly  do
+  the switching for you  and  take  care  that  the  plugin  is  updated
+  accordingly. So you shouldn't switch down to 1024x768 yourself if  you
+  are running 1280x1024 because that  gives  you  a  virtual  screensize
+  of 1280x1024 in a resolution of 1024x768 - and the plugin can't handle
+  that - and probably never will.
 
   You may want to have a look at the XF86VidMode support in  XINE  which
   will enable on-the-fly resolution switching when activating fullscreen.
@@ -131,6 +137,18 @@
   is always 720x576 for pal and 720x480 for ntsc. If you've an anamorphe
   DVD the image only has to be horizontally scaled to get  back  to  the
   original geometry of 16:9 which is easier to be done.
+
+
+* WHAT ABOUT DEINTERLACING?!
+
+  Pressing 'i' during playback will toggle hardware deinterlacing.     A
+  decrease in picture quality is a known side effect,  yet you won't see
+  any artefacts caused by interlacing anymore. :-)
+  
+  One more note, hardware deinterlacing uses BOB as deinterlacing method
+  and is totally independent from the software deinterlacing in XINE. So
+  specifing a different deinterlacing method in your .xinerc won't  have
+  any effect on this feature.
 
 
 * HEY! THE OVERLAY TURNS OFF WHEN THE WINDOW IS PARTLY OFF THE DESKTOP!?
@@ -153,9 +171,6 @@
   
 * KNOWN BUGs
 
-  + toggling hardware deinterlacing fast will result in decreasing image
-    size constantly - bug is located, a fix is being worked on.
-
   + stopping playback doesn't turn off the syncfb overlay
     
     Currently there is no way to check if playback has stopped from  the
@@ -167,12 +182,14 @@
 
 * WHAT IS ON THE TODO LIST?
 
-  + fixing hardware deinterlacing support
+  + check if the video source is not too big in terms of  dimensions for
+    the video memory left (video memory - X reserved video memory)
   + patching the syncfb kernel module itself for devfs and the  recently
     introduced license tag support
   + updating the documentation
   
   + bug fixes
+  + more sanity checks
   + new features
   + optimizations
   
