@@ -60,6 +60,8 @@ typedef struct {
 } _panel_t;
 
 void panel_show_tips(void);
+int panel_get_tips_enable(void);
+unsigned long panel_get_tips_timeout(void);
 
 void panel_init (void);
 

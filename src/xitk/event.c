@@ -889,12 +889,11 @@ void gui_run (void) {
     if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) {
       if(!panel_is_visible())
 	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
-      
+
       gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 					  GUI_DATA_EX_VIDEOWIN_VISIBLE, 
 					  (int *)0);
       
-
     }
 
     /*  The user wants to see in fullscreen mode  */

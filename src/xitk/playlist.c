@@ -33,6 +33,7 @@
 #include <X11/keysym.h>
 
 #include "Imlib-light/Imlib.h"
+#include "panel.h"
 #include "event.h"
 #include "actions.h"
 #include "mrl_browser.h"
@@ -965,6 +966,8 @@ void playlist_editor(void) {
   }
   xitk_browser_update_list(playlist->playlist, 
 			   gGui->playlist, gGui->playlist_num, 0);
+
+  playlist_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 
   XMapRaised(gGui->display, playlist->window); 
   

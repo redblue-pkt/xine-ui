@@ -73,6 +73,13 @@ void panel_show_tips(void) {
   mrl_browser_show_tips(panel->tips.enable, panel->tips.timeout);
 }
 
+int panel_get_tips_enable(void) {
+  return panel->tips.enable;
+}
+unsigned long panel_get_tips_timeout(void) {
+  return panel->tips.timeout;
+}
+
 /*
  * Config callbacks.
  */

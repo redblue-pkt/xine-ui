@@ -33,6 +33,7 @@
 
 #include <xine/xineutils.h>
 
+#include "panel.h"
 #include "event.h"
 #include "actions.h"
 #include "videowin.h"
@@ -297,4 +298,5 @@ static void mrl_add_and_play(xitk_widget_t *w, void *data, mrl_t *mrl) {
 void open_mrlbrowser(xitk_widget_t *w, void *data) {
   
   mrl_browser(mrl_add, mrl_add_and_play, mrl_handle_selection, gui_dndcallback);
+  mrl_browser_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 }

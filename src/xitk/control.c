@@ -37,6 +37,7 @@
 #include <xine/xineutils.h>
 
 #include "Imlib-light/Imlib.h"
+#include "panel.h"
 #include "event.h"
 #include "actions.h"
 #include "skins.h"
@@ -705,6 +706,8 @@ void control_panel(void) {
   xitk_list_append_content (control->widget_list->l, 
 			    (w = xitk_labelbutton_create (gGui->skin_config, &lb)));
   xitk_set_widget_tips(w, _("Close control window"));
+
+  control_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 
   XMapRaised(gGui->display, control->window); 
 
