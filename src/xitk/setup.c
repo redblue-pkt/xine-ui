@@ -46,7 +46,9 @@
 
 extern gGui_t              *gGui;
 
-static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+static char                *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+static char                *boldfontname = "-*-helvetica-bold-r-*-*-10-*-*-*-*-*-*-*";
+static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
 #define WGPREV              1
 #define WGNEXT              2
@@ -65,12 +67,11 @@ static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
     xitk_image_t        *image;                                                                 \
     xitk_image_widget_t  im;                                                                    \
     int                  lbearing, rbearing, width, ascent, descent;                            \
-    char                *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";                        \
     xitk_font_t         *fs;                                                                    \
                                                                                                 \
     image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);       \
                                                                                                 \
-    fs = xitk_font_load_font(gGui->display, fontname);                                          \
+    fs = xitk_font_load_font(gGui->display, boldfontname);                                      \
     xitk_font_set_font(fs, setup->widget_list->gc);                                             \
     xitk_font_text_extent(fs, title, strlen(title),                                             \
                           &lbearing, &rbearing, &width, &ascent, &descent);                     \
@@ -84,7 +85,7 @@ static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
 		   0, 0, image->width, image->height);                                          \
     XUnlockDisplay(gGui->display);                                                              \
                                                                                                 \
-    draw_inner_frame(gGui->imlib_data, image->image, title, fontname,                           \
+    draw_inner_frame(gGui->imlib_data, image->image, title, boldfontname,                       \
                      0, (ascent+descent), FRAME_WIDTH, FRAME_HEIGHT);                           \
 	                                                                                        \
     XITK_WIDGET_INIT(&im, gGui->imlib_data);                                                    \
@@ -150,9 +151,9 @@ static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
 
 
 typedef struct {
-  xitk_widget_t *frame;
-  xitk_widget_t *label;
-  xitk_widget_t *widget;
+  xitk_widget_t        *frame;
+  xitk_widget_t        *label;
+  xitk_widget_t        *widget;
 } widget_triplet_t;
 
 typedef struct {
@@ -398,8 +399,8 @@ static void setup_paint_widgets(void) {
     if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_COMBO) {
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 4);
     }
-    else if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT ||
-	    setup->wg[i]->widget->widget_type & WIDGET_TYPE_INTBOX)
+    else if((setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT) ||
+    	    (setup->wg[i]->widget->widget_type & WIDGET_TYPE_INTBOX))
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
     else
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y);
@@ -417,17 +418,13 @@ static void setup_paint_widgets(void) {
     xitk_hide_widget(setup->widget_list, setup->btndn);
   }
 
-  if(i<setup->num_wg) {
+  if(i < setup->num_wg) {
     xitk_enable_widget(setup->btnup);
     xitk_show_widget(setup->widget_list, setup->btnup);
     xitk_enable_widget(setup->btndn);
     xitk_show_widget(setup->widget_list, setup->btndn);
   }
-  /* Disable widget out of window */
-  for(; i < setup->num_wg; i++) {
-    DISABLE_ME(setup->wg[i]);
-  }
-    
+
   /* Repaint them now */
   xitk_paint_widget_list (setup->widget_list); 
 }
@@ -443,32 +440,24 @@ void setup_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyPress: {
-    xitk_widget_t *w = xitk_get_focused_widget(setup->widget_list);
-
-    if(w && (w->widget_type & WIDGET_TYPE_INPUTTEXT)) {
-      xitk_send_key_event(setup->widget_list, w, event);
-    }
-    else {
-      mykeyevent = event->xkey;
+  case KeyRelease:
+    mykeyevent = event->xkey;
+    
+    XLockDisplay(gGui->display);
+    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+    XUnlockDisplay(gGui->display);
+    
+    switch (mykey) {
       
-      XLockDisplay(gGui->display);
-      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-      XUnlockDisplay(gGui->display);
+    case XK_Return:
+      setup_end(NULL, NULL);
+      break;
       
-      switch (mykey) {
-	
-      case XK_Return:
-	setup_end(NULL, NULL);
-	break;
-	
-      default:
-	gui_handle_event(event, data);
-	break;
-      }
+    default:
+      gui_handle_event(event, data);
+      break;
     }
-  }
-  break;
+    break;
     
   case MappingNotify:
     XLockDisplay(gGui->display);
@@ -989,8 +978,8 @@ static void setup_sections (void) {
   tab.userdata          = NULL;
   xitk_list_append_content (setup->widget_list->l,
 			    (setup->tabs = 
-			     xitk_noskin_tabs_create(&tab, 20, 25, WINDOW_WIDTH - 40)));
-
+			     xitk_noskin_tabs_create(&tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
+  
   bg = xitk_image_create_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay(gGui->display);
@@ -1111,7 +1100,6 @@ void setup_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_button_widget_t       b;
-  char                      *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
   int                        x, y;
 
   /* this shouldn't happen */
@@ -1142,8 +1130,6 @@ void setup_panel(void) {
 
   setup->widget_list                = xitk_widget_list_new();
   setup->widget_list->l             = xitk_list_new ();
-  setup->widget_list->focusedWidget = NULL;
-  setup->widget_list->pressedWidget = NULL;
   setup->widget_list->win           = (xitk_window_get_window(setup->xwin));
   setup->widget_list->gc            = gc;
 
@@ -1196,7 +1182,7 @@ void setup_panel(void) {
 	   xitk_noskin_labelbutton_create(&lb,
 					  (WINDOW_WIDTH>>1) - 50, WINDOW_HEIGHT - 40,
 					  100, 23,
-					  "Black", "Black", "White", fontname));
+					  "Black", "Black", "White", tabsfontname));
   
   XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
 
@@ -1215,6 +1201,3 @@ void setup_panel(void) {
   setup->running = 1;
 
 }
-
-
-

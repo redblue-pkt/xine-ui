@@ -201,10 +201,18 @@ static kbinding_entry_t default_binding_table[] = {
     "SeekRelative-60",        ACTID_SEEK_REL_m60            , "Left",     KEYMOD_NOMOD   , 0 }, 
   { "Set position to +60 seconds in current stream.",
     "SeekRelative+60",        ACTID_SEEK_REL_p60            , "Right",    KEYMOD_NOMOD   , 0 },
+  { "Set position to -30 seconds in current stream.",
+    "SeekRelative-30",        ACTID_SEEK_REL_m30            , "Left",     KEYMOD_META    , 0 }, 
+  { "Set position to +30 seconds in current stream.",
+    "SeekRelative+30",        ACTID_SEEK_REL_p30            , "Right",    KEYMOD_META    , 0 },
   { "Set position to -15 seconds in current stream.",
     "SeekRelative-15",        ACTID_SEEK_REL_m15            , "Left",     KEYMOD_CONTROL , 0 },
   { "Set position to +15 seconds in current stream.",
     "SeekRelative+15",        ACTID_SEEK_REL_p15            , "Right",    KEYMOD_CONTROL , 0 },
+  { "Set position to -7 seconds in current stream.",
+    "SeekRelative-7",         ACTID_SEEK_REL_m7             , "Left",     KEYMOD_MOD3    , 0 }, 
+  { "Set position to +7 seconds in current stream.",
+    "SeekRelative+7",         ACTID_SEEK_REL_p7             , "Right",    KEYMOD_MOD3    , 0 },
   { "Visibility toggle of mrl browser window.",
     "MrlBrowser",             ACTID_MRLBROWSER              , "m",        KEYMOD_META    , 0 },
   { "Audio muting toggle.",
@@ -219,6 +227,8 @@ static kbinding_entry_t default_binding_table[] = {
     "SpeedFaster",            ACTID_SPEED_FAST              , "Up",       KEYMOD_NOMOD   , 0 },
   { "Decrement playback speed.",
     "SpeedSlower",            ACTID_SPEED_SLOW              , "Down",     KEYMOD_NOMOD   , 0 },
+  { "Reset playback speed.",
+    "SpeedReset",             ACTID_SPEED_RESET             , "Down",     KEYMOD_META    , 0 },
   { "Increment audio volume.",
     "Volume+",                ACTID_pVOLUME                 , "V",        KEYMOD_NOMOD   , 0 },
   { "Decrement audio volume.",
@@ -978,7 +988,7 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
   }
   break;
 
-  case KeyPress: {
+  case KeyRelease: {
     XKeyEvent            mykeyevent;
     KeySym               mykey;
     char                 kbuf[256];

@@ -435,7 +435,7 @@ void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyPress:
+  case KeyRelease:
   case ButtonRelease:
     gui_handle_event(event, data);
     break;
@@ -682,8 +682,6 @@ void panel_init (void) {
 
   panel->widget_list                = xitk_widget_list_new();
   panel->widget_list->l             = xitk_list_new ();
-  panel->widget_list->focusedWidget = NULL;
-  panel->widget_list->pressedWidget = NULL;
   panel->widget_list->win           = gGui->panel_window;
   panel->widget_list->gc            = gc;
  
@@ -830,6 +828,7 @@ void panel_init (void) {
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->slider_play = xitk_slider_create(gGui->skin_config, &sl)));
   xitk_set_widget_tips(panel->slider_play, _("Stream playback position slider"));
+  xitk_slider_reset(panel->widget_list, panel->slider_play);
 
   /* Mixer volume slider */
   sl.skin_element_name = "SliderVol";
@@ -842,6 +841,7 @@ void panel_init (void) {
   sl.motion_userdata   = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->mixer.slider = xitk_slider_create(gGui->skin_config, &sl)));
+  xitk_slider_reset(panel->widget_list, panel->mixer.slider);
   xitk_disable_widget(panel->mixer.slider);
 
   /*  Mute toggle */

@@ -474,6 +474,22 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_SEEK_REL_p15:
     gui_seek_relative (15);
     break;
+    
+  case ACTID_SEEK_REL_m30:
+    gui_seek_relative (-30);
+    break;
+    
+  case ACTID_SEEK_REL_m7:
+    gui_seek_relative (-7);
+    break;
+    
+  case ACTID_SEEK_REL_p30:
+    gui_seek_relative (30);
+    break;
+    
+  case ACTID_SEEK_REL_p7:
+    gui_seek_relative (7);
+    break;
 
   case ACTID_MRLBROWSER:
     gui_mrlbrowser_show(NULL, NULL);
@@ -501,6 +517,10 @@ void gui_execute_action_id(action_id_t action) {
     
   case ACTID_SPEED_SLOW:
     gui_change_speed_playback(NULL, (void*)GUI_NEXT);
+    break;
+
+  case ACTID_SPEED_RESET:
+    gui_change_speed_playback(NULL, (void*)GUI_RESET);
     break;
 
   case ACTID_pVOLUME:
@@ -590,7 +610,7 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_ZOOM_RESET:
     gui_reset_zoom();
     break;
-
+    
   case ACTID_GRAB_POINTER:
     if(!gGui->cursor_grabbed) {
       if(!panel_is_visible())
@@ -652,7 +672,7 @@ void gui_handle_event (XEvent *event, void *data) {
   break;
 
   case ButtonRelease:
-  case KeyPress:
+  case KeyRelease:
     kbindings_handle_kbinding(gGui->kbindings, event);
     break;
     

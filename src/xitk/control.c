@@ -332,7 +332,7 @@ void control_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyPress:
+  case KeyRelease:
   case ButtonRelease:
     gui_handle_event(event, data);
     break;
@@ -548,8 +548,6 @@ void control_panel(void) {
    */
   control->widget_list                = xitk_widget_list_new();
   control->widget_list->l             = xitk_list_new ();
-  control->widget_list->focusedWidget = NULL;
-  control->widget_list->pressedWidget = NULL;
   control->widget_list->win           = control->window;
   control->widget_list->gc            = gc;
   

@@ -30,6 +30,7 @@
 
 #define GUI_NEXT     1
 #define GUI_PREV     2
+#define GUI_RESET    3
 
 void gui_exit (xitk_widget_t *w, void *data);
 

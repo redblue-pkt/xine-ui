@@ -309,6 +309,10 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 	xine_set_speed (gGui->xine, SPEED_SLOW_4);
     }
   }
+  else if(((int)data) == GUI_RESET) {
+    xine_set_speed (gGui->xine, SPEED_NORMAL);
+  }
+  
 }
 
 void gui_set_current_position (int pos) {
@@ -536,7 +540,7 @@ void gui_change_zoom(int zoom_d) {
 
   gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_FACTOR,
 				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ZOOM_FACTOR) + zoom_d);
-
+  
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
@@ -549,8 +553,7 @@ void gui_change_zoom(int zoom_d) {
  */
 void gui_reset_zoom(void) {
   
-  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO,
-				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO));
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_FACTOR, 100);
   
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);

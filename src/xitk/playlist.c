@@ -545,34 +545,31 @@ void playlist_handle_event(XEvent *event, void *data) {
     gui_handle_event(event, data);
     break;
 
-  case KeyPress:
-    if(xitk_is_widget_focused(playlist->winput)) {
-      xitk_send_key_event(playlist->widget_list, playlist->winput, event);
-    }
-    else {
+  case KeyRelease:
+    if(!playlist)
+      return;
+    
+    mykeyevent = event->xkey;
+    
+    XLockDisplay(gGui->display);
+    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+    XUnlockDisplay(gGui->display);
+    
+    switch (mykey) {
       
-      mykeyevent = event->xkey;
+    case XK_Down:
+    case XK_Next:
+      xitk_browser_step_up(playlist->playlist, NULL);
+      break;
       
-      XLockDisplay(gGui->display);
-      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-      XUnlockDisplay(gGui->display);
+    case XK_Up:
+    case XK_Prior:
+      xitk_browser_step_down(playlist->playlist, NULL);
+      break;
       
-      switch (mykey) {
-	
-      case XK_Down:
-      case XK_Next:
-	xitk_browser_step_up(playlist->playlist, NULL);
-	break;
-	
-      case XK_Up:
-      case XK_Prior:
-	xitk_browser_step_down(playlist->playlist, NULL);
-	break;
-	
-      default:
-	gui_handle_event(event, data);
-	break;
-      }
+    default:
+      gui_handle_event(event, data);
+      break;
     }
     break;
 
@@ -798,8 +795,6 @@ void playlist_editor(void) {
    */
   playlist->widget_list                = xitk_widget_list_new();
   playlist->widget_list->l             = xitk_list_new();
-  playlist->widget_list->focusedWidget = NULL;
-  playlist->widget_list->pressedWidget = NULL;
   playlist->widget_list->win           = playlist->window;
   playlist->widget_list->gc            = gc;
 

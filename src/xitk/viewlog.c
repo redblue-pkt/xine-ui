@@ -50,8 +50,8 @@
 
 extern gGui_t              *gGui;
 
-//static char                *br_fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 static char                *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
+static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
 #define WINDOW_WIDTH        580
 #define WINDOW_HEIGHT       480
@@ -202,7 +202,7 @@ void viewlog_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyPress: {
+  case KeyRelease: {
     XKeyEvent      mykeyevent;
     KeySym         mykey;
     char           kbuf[256];
@@ -400,7 +400,7 @@ static void viewlog_create_tabs(void) {
   tab.userdata          = NULL;
   xitk_list_append_content (viewlog->widget_list->l,
 			    (viewlog->tabs = 
-			     xitk_noskin_tabs_create(&tab, 20, 25, WINDOW_WIDTH - 40)));
+			     xitk_noskin_tabs_create(&tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
 
   bg = xitk_image_create_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -435,7 +435,6 @@ void viewlog_window(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_browser_widget_t      br;
-  char                      *fontname = "*-lucida-*-r-*-*-10-*-*-*-*-*-*-*";
   int                        x, y;
   
   /* this shouldn't happen */
@@ -462,8 +461,6 @@ void viewlog_window(void) {
 
   viewlog->widget_list                = xitk_widget_list_new();
   viewlog->widget_list->l             = xitk_list_new ();
-  viewlog->widget_list->focusedWidget = NULL;
-  viewlog->widget_list->pressedWidget = NULL;
   viewlog->widget_list->win           = (xitk_window_get_window(viewlog->xwin));
   viewlog->widget_list->gc            = gc;
 
@@ -510,7 +507,7 @@ void viewlog_window(void) {
   xitk_list_append_content(viewlog->widget_list->l, 
 	   xitk_noskin_labelbutton_create(&lb,
 					  x, y, 100, 23,
-					  "Black", "Black", "White", fontname));
+					  "Black", "Black", "White", tabsfontname));
 
   x += x * 2;
 
@@ -524,7 +521,7 @@ void viewlog_window(void) {
   xitk_list_append_content(viewlog->widget_list->l, 
 	   xitk_noskin_labelbutton_create(&lb,
 					  x, y, 100, 23,
-					  "Black", "Black", "White", fontname));
+					  "Black", "Black", "White", tabsfontname));
 
   
   XUnlockDisplay (gGui->display);
