@@ -128,10 +128,12 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
     if((wtriplet)->label) {                                                                     \
       xitk_disable_widget((wtriplet)->label);                                                   \
       xitk_hide_widget(setup->widget_list, (wtriplet)->label);                                  \
+      xitk_disable_widget_tips((wtriplet)->label);                                              \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
       xitk_disable_widget((wtriplet)->widget);                                                  \
       xitk_hide_widget(setup->widget_list, (wtriplet)->widget);                                 \
+      xitk_disable_widget_tips((wtriplet)->widget);                                             \
     }                                                                                           \
 }
 
@@ -143,10 +145,12 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
     if((wtriplet)->label) {                                                                     \
       xitk_enable_widget((wtriplet)->label);                                                    \
       xitk_show_widget(setup->widget_list, (wtriplet)->label);                                  \
+      xitk_enable_widget_tips((wtriplet)->label);                                               \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
       xitk_enable_widget((wtriplet)->widget);                                                   \
       xitk_show_widget(setup->widget_list, (wtriplet)->widget);                                 \
+      xitk_enable_widget_tips((wtriplet)->widget);                                              \
     }                                                                                           \
 }
 
@@ -794,7 +798,7 @@ static void setup_section_widgets(int s) {
     while (cfg_err_result) {
       
       if (!strncmp (entry->key, section, len) && entry->description) {
-	
+
 	labelkey = &entry->key[len+1];
 	
 	setup->config_entries[setup->num_config_entries++] = entry;
@@ -803,30 +807,50 @@ static void setup_section_widgets(int s) {
 	  
 	case XINE_CONFIG_TYPE_RANGE: /* slider */
 	  setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			       (entry->help) ?  entry->help : _("No help available"));
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			       (entry->help) ?  entry->help : _("No help available"));
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
 	case XINE_CONFIG_TYPE_STRING:
 	  setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			       (entry->help) ?  entry->help : _("No help available"));
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			       (entry->help) ?  entry->help : _("No help available"));
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
 	case XINE_CONFIG_TYPE_ENUM:
 	  setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			       (entry->help) ?  entry->help : _("No help available"));
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			       (entry->help) ?  entry->help : _("No help available"));
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
 	case XINE_CONFIG_TYPE_NUM:
 	  setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			       (entry->help) ?  entry->help : _("No help available"));
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			       (entry->help) ?  entry->help : _("No help available"));
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
 	case XINE_CONFIG_TYPE_BOOL:
 	  setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			       (entry->help) ?  entry->help : _("No help available"));
+	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			       (entry->help) ?  entry->help : _("No help available"));
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
