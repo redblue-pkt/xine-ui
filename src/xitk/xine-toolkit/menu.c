@@ -29,6 +29,7 @@
 #include "_xitk.h"
 
 #undef DEBUG_MENU
+#undef DUMP_MENU
 
 static void _menu_create_menu_from_branch(menu_node_t *, xitk_widget_t *, int, int);
 
@@ -144,41 +145,45 @@ static int _menu_is_title(xitk_menu_entry_t *me) {
   return 0;
 }
 
-#ifdef DEBUG_MENU
+#ifdef DUMP_MENU
+#ifdef	__GNUC__
+#define prints(fmt, args...) do { int j; for(j = 0; j < i; j++) printf(" "); printf(fmt, ##args); } while(0)
+#else
+#define prints(...) do { int j; for(j = 0; j < i; j++) printf(" "); printf(__VA_ARGS__); } while(0)
+#endif
+static int i = 0;
+static void _menu_dump_branch(menu_node_t *branch) {
+  
+  while(branch) {
+    prints("[%s]\n", branch->menu_entry->menu);
+
+    if(branch->branch) {
+      i += 3;
+      _menu_dump_branch(branch->branch);
+    }
+    
+    branch = branch->next;
+  }
+  i -= 3;
+}
 static void _menu_dump(menu_private_data_t *private_data) {
   menu_tree_t *mtree = private_data->mtree;
   menu_node_t *me;
   
+  printf("\n");
   me = mtree->first;
   while(me) {
     xitk_menu_entry_t *entry = me->menu_entry;
     menu_node_t *branch = me->branch;
-
+    
     if(_menu_is_separator(entry))
-      printf("===================\n");
+      prints("===================\n");
     else
-      printf("[%s]\n", entry->menu);
-
-    while(branch) {
-      xitk_menu_entry_t *sentry = branch->menu_entry;
-      menu_node_t *sbranch = branch->branch;
-
-      if(_menu_is_separator(sentry))
-	printf("  ===================\n");
-      else
-	printf("  [%s]\n", sentry->menu);
-
-      while(sbranch) {
-	xitk_menu_entry_t *ssentry = sbranch->menu_entry;
-
-	if(_menu_is_separator(ssentry))
-	  printf("    ===================\n");
-	else
-	  printf("    [%s]\n", ssentry->menu);
-
-	sbranch = sbranch->next;
-      }
-      
+      prints("[%s]\n", entry->menu);
+    
+    if(branch) {
+      i += 3;
+      _menu_dump_branch(branch);
       branch = branch->next;
     }
     
@@ -186,150 +191,6 @@ static void _menu_dump(menu_private_data_t *private_data) {
   }
 }
 #endif
-
-#warning REWRITE ME
-static void _menu_scissor(xitk_widget_t *w,
-			  menu_private_data_t *private_data, xitk_menu_entry_t *me) {
-  char         *c;
-  int           sub, offset;
-  menu_tree_t  *mtree;
-  menu_node_t  *main_trunk = NULL, *branch = NULL, *subbranch = NULL;
-  
-  mtree        = (menu_tree_t *) xitk_xmalloc(sizeof(menu_tree_t));
-  mtree->first = NULL;
-  mtree->cur   = NULL;
-  mtree->last  = NULL;
-  
-  while(me->menu) {
-
-    sub = offset = 0;
-    c = me->menu;
-    
-    if(_menu_is_branch(me)) {
-      int     off = 0, same_branch = 0;
-      char   *cbranch = strchr(c, '/');
-
-      if(cbranch && (*(cbranch - 1) == '\\'))
-	cbranch = NULL;
-      
-      if(cbranch) {
-	cbranch++;
-	off = cbranch - c;
-
-#ifdef DEBUG_MENU
-	printf("  /[%s] << SUBBRANCH (add_in_branch, create_new_branch) \n", cbranch);
-#endif
-
-        if(branch == NULL)
-	  branch = _menu_add_to_node_branch(w, &main_trunk, me, cbranch);
-	else
-	  branch = _menu_append_to_node(w, &branch, me, cbranch);
-	
-	me++;
-	do {
-	  same_branch = 0;
-	  
-	  if(!strncmp(me->menu + off, cbranch, strlen(cbranch))) {
-
-#ifdef DEBUG_MENU
-	    printf("    |\n");
-	    if(_menu_is_separator(me)) {
-	      printf("    +- ========================== << SUBSEP (add_in_branch)\n");
-	    }
-	    else {
-	      printf("    +- [%s] << SUBENTRY (add_in_branch)\n", 
-		     me->menu + off + strlen(cbranch) + 1);
-	    }
-#endif
-
-	    if(subbranch == NULL)
-	      subbranch = _menu_add_to_node_branch(w, &branch, me, (me->menu + off + strlen(cbranch) + 1));
-	    else
-	      subbranch = _menu_append_to_node(w, &subbranch, me, (me->menu + off + strlen(cbranch) + 1));
-	    me++;
-	    same_branch = 1;
-	  }
-	  
-	} while(same_branch);
-
-#ifdef DEBUG_MENU
-	printf("(back_to_parent_branch)\n");
-#endif
-
-	subbranch = NULL;
-	
-	continue;
-      }
-      else {
-
-#ifdef DEBUG_MENU
-	printf("[%s]> << NEWBRANCH (add_in_trunk, create_new_branch)\n", me->menu);
-#endif
-
-	main_trunk = mtree->cur = _menu_append_to_node(w, &main_trunk, me, me->menu);
-	branch = subbranch = NULL;
-	me++;
-	continue;
-      }
-    }
-    
-    while( (c = strchr(c, '/')) && (c && (*(c - 1) != '\\')) ) {
-      offset = c - me->menu + 1;
-      sub++;
-      c++;
-    }
-
-    if(sub) {
-      if(sub > 1) {
-
-#ifdef DEBUG_MENU
-	printf("WHAT ?\n");
-#endif
-
-      }
-      else {
-
-#ifdef DEBUG_MENU
-	printf("  /[%s] SUB (add_in_branch)\n", me->menu + offset);
-#endif
-	if(branch == NULL)
-	  branch = _menu_add_to_node_branch(w, &main_trunk, me, (me->menu + offset));
-	else
-	  branch = _menu_append_to_node(w, &branch, me, (me->menu + offset));
-	
-      }
-    }
-    else {
-
-#ifdef DEBUG_MENU
-      if(_menu_is_separator(me)) {
-	printf("========================= << MAIN (add_in_trunk)\n");
-      }
-      else {
-	printf("(go_to_trunk)\n");
-      }
-#endif
-
-      if(main_trunk)
-	mtree->cur = main_trunk;
-      
-      branch = subbranch = NULL;
-
-#ifdef DEBUG_MENU
-      printf("[%s] << MAIN (add_in_trunk)\n", me->menu);
-#endif
-      
-      main_trunk = mtree->last = mtree->cur = _menu_append_to_node(w, &mtree->cur, me, me->menu);
-      
-      if(mtree->first == NULL)
-      	mtree->first = main_trunk;
-    }
-    
-    me++;
-  }
-  
-  private_data->mtree = mtree;  
-}
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   int retval = 0;
@@ -660,16 +521,24 @@ void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me) {
       
       o = c = new_entry = buffer;
 
-      branch = private_data->mtree->first;
-      while( (c = strchr(c, '/')) && (c && (*(c - 1) != '\\')) && branch) {
+      if(!(branch = private_data->mtree->first)) {
+#ifdef DEBUG_MENU
+	printf("FIRST ENTRY OF MENU\n");
+#endif
+	private_data->mtree->last = private_data->mtree->cur = private_data->mtree->first = 
+	  _menu_append_to_node(w, &(private_data->mtree->first), me, new_entry);
+	return;
+      }
+
+      while( (c = strchr(c, '/')) && (c && (*(c - 1) != '\\'))/*  && branch */) {
 	*c = '\0';
-
+	
 	in_trunk = 0;
-
+	
 #ifdef DEBUG_MENU
 	printf("LOOKING FOR '%s': ", o);
 #endif	
-
+	
 	/* Try to find branch */
 	branch = _menu_find_branch_by_name(branch, o);
 
@@ -722,8 +591,29 @@ void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me) {
 #ifdef DEBUG_MENU
       printf("******* BYE ************\n");
 #endif
-    }      
+#ifdef DUMP_MENU
+      _menu_dump(private_data);
+#endif
+    }
   }
+}
+
+static void _menu_scissor(xitk_widget_t *w,
+			  menu_private_data_t *private_data, xitk_menu_entry_t *me) {
+  menu_tree_t  *mtree;
+  
+  mtree        = (menu_tree_t *) xitk_xmalloc(sizeof(menu_tree_t));
+  mtree->first = NULL;
+  mtree->cur   = NULL;
+  mtree->last  = NULL;
+  
+  private_data->mtree = mtree;  
+  
+  while(me->menu) {
+    xitk_menu_add_entry(w, me);
+    me++;
+  }
+  
 }
 
 static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w, int x, int y) {
@@ -1018,26 +908,24 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
     abort();
   }
 
-  _menu_scissor(mywidget, private_data, m->menu_tree);
+  mywidget->private_data                 = private_data;
+  mywidget->wl                           = wl;
+  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MENU | WIDGET_FOCUSABLE;
   
-#ifdef DEBUG_MENU
+  _menu_scissor(mywidget, private_data, m->menu_tree);
+
+#ifdef DEBUG_DUMP
   _menu_dump(private_data);
 #endif
 
-  mywidget->private_data                 = private_data;
-  
-  mywidget->wl                           = wl;
-  
   mywidget->enable                       = 1;
   mywidget->running                      = 1;
   mywidget->visible                      = 0;
   mywidget->have_focus                   = FOCUS_RECEIVED;
   mywidget->imlibdata                    = private_data->imlibdata;
   mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
-  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MENU | WIDGET_FOCUSABLE;
   mywidget->event                        = notify_event;
   mywidget->tips_timeout                 = 0;
   mywidget->tips_string                  = NULL;
-
   return mywidget;
 }
