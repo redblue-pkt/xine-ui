@@ -1,3 +1,17 @@
+xine-ui (0.9.13) unstable; urgency=low
+
+  * improved TV mode selection (untested)
+  * localization updates (including correct numeric plural forms)
+  * aaxine should work with linux or slang drivers again
+  * improved performance on IA-32 (compiling without -funroll-all-loops)
+  * setup dialog features brand-new xitk scrollbars
+  * prev/next buttons optionally switch chapters (instead of MRLs) on supported media
+  * invalid buttons (eg. "play" without an MRL) are disabled
+  
+  And, of course, lots of other small bugfixes and improvements...
+
+ -- Siggi Langauf <siggi@debian.org>  Sat,  3 Aug 2002 20:38:11 +0200
+
 xine-ui (0.9.12) unstable; urgency=low
 
   * fixed segfault with German localization
