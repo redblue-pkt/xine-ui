@@ -1,9 +1,17 @@
 xine-ui (0.9.16-1) unstable; urgency=low
 
-  * removed obsolete conflicts: libcurl2 entry
-  * updated build-depends (added libcurl-dev)
+  * This one is actually uploaded again...
+  * removed obsolete Conflicts: libcurl2
 
- -- Siggi Langauf <siggi@debian.org>  Sun, 22 Dec 2002 16:16:33 +0100
+  On to the bug check:
+
+  * I'm quite confident that this cannot lock the system (closes: #162048)
+  * links agains libxine1, supporting SVQ1 (closes: #157897)
+  * libxine1 doesn't have any "%" or ":" MRL hacks (closes: #160779)
+    (let's see when the first one complains about "#"...)
+  * This is even newet than 0.9.15 (closes: #171754)
+
+ -- Siggi Langauf <siggi@debian.org>  Thu,  2 Jan 2003 23:39:11 +0100
 
 xine-ui (0.9.16-0) unstable; urgency=low
 
