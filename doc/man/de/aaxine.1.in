@@ -35,65 +35,69 @@ Die folgenden Optionen, die beim Aufruf von "aaxine \-\-help" mit
 .B AAXINE options:
 überschrieben sind, werden im folgenden erläutert.
 .TP 
-.BR \-A,\ \-\-audio\-driver\  <id>
+.BI \-A,\ \-\-audio\-driver\  <Treiber>
 Angegebenen Audiotreiber benutzen. Zur Verfügung stehende Treiber können mit "aaxine \-\-help" aufgelistet werden.
 .TP 
-.BR \-a,\ \-\-audio\-channel\  #
+.BI \-a,\ \-\-audio\-channel\  <Nummer>
 Angegebene Tonspur benutzen. Tonkanäle sind fortlaufend von 0 für die erste Tonspur nummeriert.
 .TP 
 .BR \-R,\ \-\-recognize\-by\  [Option]
 Methode zum identifizieren eines Titels festlegen. Mögliche Optionen sind:
 .RS
-.IP  "default"
+.IP  `\fBdefault\fP'
 Zuerst nach dem Inhalt, dann nach der Erweiterung.
-.IP  "revert"
+.IP  `\fBrevert\fP'
 Zuerst nach der Erweiterung, dann nach dem Inhalt.
-.IP  "content"
+.IP  `\fBcontent\fP'
 Nur nach dem Inhalt,
-.IP  "extension"
+.IP  `\fBextension\fP'
 Nur nach der Erweiterung.
 .PP 
-Wird nur \-R ohne einen weiteren Parameter angegeben, so wird 'revert' ausgewählt.
+Wird nur \fB\-R\fP ohne einen weiteren Parameter angegeben, so wird `\fBrevert\fP' ausgewählt.
 .RE
 .SH "MRLs"
 MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Titel. Gültige MRLs können einfache Dateinamen sein oder folgendermaßen aussehen:
 .TP 
-.B file://<path>
+.BI file:// <path>
 .TP 
-.B fifo://<path>
+.BI fifo:/ /<path>
 .TP 
 .BR stdin://mpeg1\  oder \ stdin://mpeg2
 .TP 
-.B dvd://VTS_xx_y.VOB
+.BI dvd://VTS_ xx _ y .VOB
 .TP 
-.B vcd://<track number>
+.BI vcd:// <Track\ Nummer>
 .TP 
-.B tcp://<host>:<port>
+.BI tcp:// <host> : <port>
 .TP 
-.B rtp://<host>:<port>
+.BI rtp:// <host> : <port>
 .TP 
-.B udp://<host>:<port>
+.BI udp:// <host> : <port>
+.TP 
+.BI mms:// <host>...
+.TP 
+.BI http:// <host>...
 .PP 
 Mehrere MRLs können angegeben werden, um mehrere Titel nacheinander zu spielen. Die oben aufgeführten MRLs werden standardmäßig von libxine unterstützt. Zusätzliche Plugins können diese Liste um weitere MRLs ergänzen.
 .SH "BEDIENTASTEN"
 Viele Funktionen können über Tastatur bedient werden. Die Tastaturzuordnung ist wie folgt:
-.IP  "RETURN oder R"
+.IP  "\fB<RETURN>\fP oder \fBR\fP"
 Wiedergabe.
-.IP  "LEERTASTE oder P"
+.IP  "\fB<LEERTASTE>\fP oder \fBP\fP"
 Pause.
-.IP  "0"
+.IP  "\fB0\fP"
 Zum Anfang des momentanen Titels springen.
-.IP  "1 .. 9"
+.IP  "\fB1\fP .. \fB9\fP"
 Zu 10%..90% des momentanen Titels springen.
-.IP  "PgUp"
+.IP  "\fB<PgUp>\fP"
 Zum vorherigen Titel in der Wiedergabeliste springen.
-.IP  "PgDown"
+.IP  "\fB<PgDown>\fP"
 Zum nächsten Titel in der Wiedergabeliste springen.
-.IP  "+"
+.IP  "\fB+\fP"
 Nächsten Tonkanal auswählen. (Der Wechsel kann sich bis zu einigen Sekunden verzögern)
-.IP  "\-"
+.IP  "\fB\-\fP"
 Vorherigen Tonkanal auswählen.
-.IP  "Q"
+.IP  "\fBQ\fP"
 Beenden.
 .SH "FEHLER"
 Natürlich keine ;\-)
