@@ -33,10 +33,8 @@ typedef struct {
 
 void post_init(void);
 void post_rewire_visual_anim(void);
-void post_rewire_video_post(void);
 int post_rewire_audio_port_to_stream(xine_stream_t *stream);
 int post_rewire_audio_post_to_stream(xine_stream_t *stream);
-int post_rewire_video_post_to_stream(xine_stream_t *stream);
 
 void pplugin_end(void);
 int pplugin_is_visible(void);

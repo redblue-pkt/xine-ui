@@ -113,8 +113,6 @@
 
 typedef struct {
   xine_video_port_t        *vo_port;
-  int                       post_video_num;
-  xine_post_t              *post_video;
 
   post_element_t          **post_elements;
   int                       post_elements_num;

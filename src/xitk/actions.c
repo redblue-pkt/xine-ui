@@ -119,7 +119,7 @@ static int _gui_xine_play(xine_stream_t *stream,
   
   if(start_time_in_secs)
     start_time_in_secs *= 1000;
-      
+  
   has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
   if (has_video)
     has_video = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_VIDEO);
@@ -136,12 +136,7 @@ static int _gui_xine_play(xine_stream_t *stream,
       gGui->visual_anim.running = 1;
 
   }
-  else if(has_video && gGui->post_video && (gGui->post_video_num > 0)) {
 
-    (void) post_rewire_video_post_to_stream(stream);
-
-  }
-  
   if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0) {
     gui_handle_xine_error(stream, NULL);
   }

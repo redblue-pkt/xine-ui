@@ -108,7 +108,6 @@ typedef struct {
 
 static _pplugin_t    *pplugin = NULL;
 static char         **post_audio_plugins;
-static char         **post_video_plugins;
 
 static pthread_t      rewire_thread;
 
@@ -133,18 +132,6 @@ static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   }
 }
 
-static void post_video_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
-  int err;
-  
-  gGui->post_video_num = cfg->num_value;
-  
-  if ((err = pthread_create(&rewire_thread,
-			    NULL, post_rewire_thread, (void *)post_rewire_video_post)) != 0) {
-    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-    abort();
-  }
-}
-
 void post_init(void) {
 
   gGui->visual_anim.post_output = NULL;
@@ -156,34 +143,19 @@ void post_init(void) {
 							  XINE_POST_TYPE_AUDIO_VISUALIZATION);
     
     if(pol) {
-      int  i = 0;
       int  num_plug = 0;
       
-      /* We're only interested by post plugin which handle audio in input */
-      while(pol[i]) {
-
-#ifdef PARANOID
-	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
-
-	if(post) {
-#endif
-
-	  if(num_plug == 0)
-	    post_audio_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
-	  else
-	    post_audio_plugins = (char **) realloc(post_audio_plugins, 
-						   sizeof(char *) * (num_plug + 2));
-	  
-	  post_audio_plugins[num_plug]     = strdup(pol[i]);
-	  post_audio_plugins[num_plug + 1] = NULL;
-	  num_plug++;
-	  
-#ifdef PARANOID
-	  xine_post_dispose(gGui->xine, post);
-	}
-#endif
-
-	i++;
+      while(pol[num_plug]) {
+	
+	if(!num_plug)
+	  post_audio_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+	else
+	  post_audio_plugins = (char **) realloc(post_audio_plugins, 
+						 sizeof(char *) * (num_plug + 2));
+	
+	post_audio_plugins[num_plug]     = strdup(pol[num_plug]);
+	post_audio_plugins[num_plug + 1] = NULL;
+	num_plug++;
       }
       
       if(num_plug) {
@@ -202,130 +174,6 @@ void post_init(void) {
 			 post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
 			 &gGui->ao_port, &gGui->vo_port);
 	
-      }
-    }
-  }
-  gGui->post_video = NULL;
-  gGui->post_video_num = -1;
-
-  {
-    const char *const *pol = xine_list_post_plugins_typed(gGui->xine, XINE_POST_TYPE_VIDEO_FILTER);
-    
-    if(pol) {
-      int  i = 0;
-      int  num_plug = 0;
-      
-      /* We're only interested by post plugin which handle video in input */
-      post_video_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
-      post_video_plugins[num_plug]     = strdup(_("None"));
-      post_video_plugins[num_plug + 1] = NULL;
-      num_plug++;
-      
-      while(pol[i]) {
-#undef PARANOID
-#ifdef PARANOID
-	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
-	printf("pol[i]: %s\n", pol[i]);
-	if(post) {
-#endif
-
-	  post_video_plugins = (char **) realloc(post_video_plugins, 
-						 sizeof(char *) * (num_plug + 2));
-	  
-	  post_video_plugins[num_plug]     = strdup(pol[i]);
-	  post_video_plugins[num_plug + 1] = NULL;
-	  num_plug++;
-
-#undef POST_TEST
-#ifdef POST_TEST	  
-	  {
-	    xine_post_in_t             *input_api;
-	    xine_post_api_t            *post_api;
-	    xine_post_api_descr_t      *api_descr;
-	    xine_post_api_parameter_t  *parm;
-	    
-	    input_api = (xine_post_in_t *) xine_post_input(post, "parameters");
-	    if( input_api ) {  
-	      post_api = (xine_post_api_t *) input_api->data;
-	      
-	      api_descr = post_api->get_param_descr();
-	      
-	      printf("  sizeof(params) = %d\n", api_descr->struct_size);
-	      
-	      parm = api_descr->parameter;
-	      while( parm->type != POST_PARAM_TYPE_LAST ) {
-		printf("  parameter '%s':\n", parm->name);
-
-		printf("  readonly: %s -", parm->readonly ? "YES" : "NO");
-		printf("  type [%d]: ", parm->type);
-
-		switch(parm->type) {
-		case POST_PARAM_TYPE_LAST:
-		  printf("POST_PARAM_TYPE_LAST\n");
-		  break;
-		case POST_PARAM_TYPE_INT:
-		  printf("POST_PARAM_TYPE_INT\n");
-		  break;
-		case POST_PARAM_TYPE_DOUBLE:
-		  printf("POST_PARAM_TYPE_DOUBLE\n");
-		  break;
-		case POST_PARAM_TYPE_CHAR:
-		  printf("POST_PARAM_TYPE_CHAR\n");
-		  break;
-		case POST_PARAM_TYPE_STRING:
-		  printf("POST_PARAM_TYPE_STRING\n");
-		  break;
-		case POST_PARAM_TYPE_STRINGLIST:
-		  printf("POST_PARAM_TYPE_STRINGLIST\n");
-		  break;
-		case POST_PARAM_TYPE_BOOL:
-		  printf("POST_PARAM_TYPE_BOOL\n");
-		  break;
-		}
-
-		printf("    size %d\n", parm->size);
-		printf("    offset %d\n", parm->offset);
-		if( parm->enum_values ) {
-		  char **s = parm->enum_values;
-		  
-		  while( *s )
-		    printf("      enum %s\n", *s++);
-		}
-		printf("    min %lf\n", parm->range_min);
-		printf("    max %lf\n", parm->range_max);
-		printf("    readonly %d\n", parm->readonly);
-		printf("    description '%s'\n", parm->description);
-		
-		parm++;
-	      }
-	    }
-	    
-	  }	  
-#endif
-
-#ifdef PARANOID
-	  xine_post_dispose(gGui->xine, post);
-	}
-#endif
-
-	i++;
-      }
-      
-      if(num_plug) {
-	
-	gGui->post_video_num = 
-	  xine_config_register_enum(gGui->xine, "gui.post_video_plugin", 
-				    0, post_video_plugins,
-				    _("Post video plugin"),
-				    _("Post video plugin"),
-				    CONFIG_LEVEL_BEG,
-				    post_video_plugin_cb,
-				    CONFIG_NO_DATA);
-	
-	gGui->post_video = 
-	  xine_post_init(gGui->xine,
-			 post_video_plugins[(gGui->post_video_num == 0) ? 1 : gGui->post_video_num],
-			 0, &gGui->ao_port, &gGui->vo_port);
       }
     }
   }
@@ -355,28 +203,6 @@ void post_rewire_visual_anim(void) {
   }
 }
 
-void post_rewire_video_post(void) {
-
-  if(gGui->post_video) {
-    xine_post_out_t *video_source;
-    
-    video_source = xine_get_video_source(gGui->stream);
-    (void) xine_post_wire_video_port(video_source, gGui->vo_port);
-    xine_post_dispose(gGui->xine, gGui->post_video);
-  }
-  
-  gGui->post_video = 
-    xine_post_init(gGui->xine,
-		   post_video_plugins[(gGui->post_video_num == 0) ? 1 : gGui->post_video_num],
-		   0, &gGui->ao_port, &gGui->vo_port);
-  
-  if(gGui->post_video && (gGui->post_video_num > 0)) {
-
-    (void) post_rewire_video_post_to_stream(gGui->stream);
-
-  }
-}
-
 int post_rewire_audio_port_to_stream(xine_stream_t *stream) {
   xine_post_out_t * audio_source;
   
@@ -391,13 +217,6 @@ int post_rewire_audio_post_to_stream(xine_stream_t *stream) {
   return xine_post_wire_audio_port(audio_source, gGui->visual_anim.post_output->audio_input[0]);
 }
 
-int post_rewire_video_post_to_stream(xine_stream_t *stream) {
-  xine_post_out_t *video_source;
-  
-  video_source = xine_get_video_source(stream);
-  return xine_post_wire_video_port(video_source, gGui->post_video->video_input[0]);
-}
-
 /* ================================================================ */
 
 static void _pplugin_unwire(void) {
@@ -406,7 +225,7 @@ static void _pplugin_unwire(void) {
   vo_source = xine_get_video_source(gGui->stream);
   (void) xine_post_wire_video_port(vo_source, gGui->vo_port);
   /* Waiting a small chunk of time helps to avoid crashing */
-  xine_usec_sleep(100000);
+  xine_usec_sleep(500000);
 }
 
 static void _pplugin_rewire(void) {
@@ -1121,6 +940,8 @@ static void _pplugin_move_up(xitk_widget_t *w, void *data) {
   post_object_t *pobj_tmp;
   post_object_t **ppobj = pplugin->post_objects;
 
+  _pplugin_unwire();
+
   while(*ppobj != pobj)
     *ppobj++;
   
@@ -1128,6 +949,7 @@ static void _pplugin_move_up(xitk_widget_t *w, void *data) {
   *ppobj   = pobj;
   *++ppobj = pobj_tmp;
   
+  _pplugin_rewire();
   _pplugin_paint_widgets();
 }
 
@@ -1136,6 +958,8 @@ static void _pplugin_move_down(xitk_widget_t *w, void *data) {
   post_object_t *pobj_tmp;
   post_object_t **ppobj = pplugin->post_objects;
 
+  _pplugin_unwire();
+
   while(*ppobj != pobj)
     *ppobj++;
   
@@ -1143,6 +967,7 @@ static void _pplugin_move_down(xitk_widget_t *w, void *data) {
   *ppobj   = pobj_tmp;
   *++ppobj = pobj;
   
+  _pplugin_rewire();
   _pplugin_paint_widgets();
 }
 

@@ -78,11 +78,9 @@ typedef struct {
 
 static skin_downloader_t  *skdloader = NULL;
 
-/*
-#define SKIN_DEBUG 1
-*/
+#undef SKIN_DEBUG
 
-#define DEFAULT_SKIN        "Centori"
+#define DEFAULT_SKIN        "xinetic"
 #define SKIN_IFACE_VERSION  4
 
 extern gGui_t             *gGui;
@@ -406,10 +404,12 @@ void init_skins_support(void) {
   }
   
   skin_names = (char **) xine_xmalloc(sizeof(char *) * (skins_avail_num + 1));
+
   for(i = 0; i < skins_avail_num; i++)
     skin_names[i] = strdup(skins_avail[i]->skin);
+  
   skin_names[skins_avail_num] = NULL;
-
+  
   skin_num = xine_config_register_enum (gGui->xine, "gui.skin", 
 					(get_skin_offset(DEFAULT_SKIN)),
 					skin_names,
@@ -435,7 +435,7 @@ void init_skins_support(void) {
  __reload_skin:
   memset(&buf, 0, XITK_PATH_MAX + XITK_NAME_MAX);
   sprintf(buf, "%s/%s", sk->pathname, sk->skin);
-
+  
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
     if(!twice_load) {
       twice_load++;
