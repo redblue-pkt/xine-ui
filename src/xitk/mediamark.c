@@ -1005,7 +1005,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		  }
 		  
 		  if(atitle && strlen(atitle)) {
-		    real_title = (char *) xine_xmalloc(sizeof(char *) * len);
+		    real_title = (char *) xine_xmalloc(len);
 		    sprintf(real_title, "%s", atitle);
 		    
 		    if(aauthor && strlen(aauthor))
@@ -1227,6 +1227,134 @@ static mediamark_t **guess_gx_playlist(playlist_t *playlist, const char *filenam
       if(entries_gx) {
 	mmk[entries_gx] = NULL;
 	playlist->type = strdup("GXMM");
+	return mmk;
+      }
+    }
+  }
+  
+  return NULL;
+}
+
+static mediamark_t **guess_noatun_playlist(playlist_t *playlist, const char *filename) {
+  mediamark_t **mmk = NULL;
+
+  if(filename) {
+    char            *noa_content;
+    int              size;
+    int              result;
+    xml_node_t      *xml_tree, *noa_entry;
+    xml_property_t  *noa_prop;
+
+    if((noa_content = _read_file(filename, &size)) != NULL) {
+      int entries_noa = 0;
+
+      xml_parser_init(noa_content, size, XML_PARSER_CASE_INSENSITIVE);
+      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
+	goto __failure;
+
+      if(!strcasecmp(xml_tree->name, "PLAYLIST")) {
+	int found = 0;
+	
+	noa_prop = xml_tree->props;
+	
+	while(noa_prop) {
+	  if((!strcasecmp(noa_prop->name, "CLIENT")) && (!strcasecmp(noa_prop->value, "NOATUN")))
+	    found++;
+	  else if(!strcasecmp(noa_prop->name, "VERSION")) {
+	    int  version_major;
+	    
+	    if(((sscanf(noa_prop->value, "%d", &version_major)) == 1) && (version_major == 1))
+	      found++;
+	  }
+
+	  noa_prop = noa_prop->next;
+	}
+
+	if(found >= 2) {
+	  noa_entry = xml_tree->child;
+	  
+	  while(noa_entry) {
+
+	    if(!strcasecmp(noa_entry->name, "ITEM")) {
+	      char *real_title = NULL;
+	      char *title      = NULL;
+	      char *album      = NULL;
+	      char *artist     = NULL;
+	      char *url        = NULL;
+
+	      for(noa_prop = noa_entry->props; noa_prop; noa_prop = noa_prop->next) {
+		if(!strcasecmp(noa_prop->name, "TITLE"))
+		  title = noa_prop->value;
+		else if(!strcasecmp(noa_prop->name, "ALBUM"))
+		  album = noa_prop->value;
+		else if(!strcasecmp(noa_prop->name, "ARTIST"))
+		  artist = noa_prop->value;
+		else if(!strcasecmp(noa_prop->name, "URL"))
+		  url = noa_prop->value;
+	      }
+
+	      if(url) {
+		int   titlen = 0;
+
+		/*
+		  title (artist - album)
+		*/
+		if(title && (titlen = strlen(title))) {
+		  int artlen = 0;
+		  int alblen = 0;
+
+		  if(artist && (artlen = strlen(artist)) && album && (alblen = strlen(album))) {
+		    int len = titlen + artlen + alblen + 7;
+
+		    real_title = (char *) xine_xmalloc(len);
+		    sprintf(real_title, "%s (%s - %s)", title, artist, album);
+		  }
+		  else if(artist && (artlen = strlen(artist))) {
+		    int len = titlen + artlen + 4;
+
+		    real_title = (char *) xine_xmalloc(len);
+		    sprintf(real_title, "%s (%s)", title, artist);
+		  }
+		  else if(album && (alblen = strlen(album))) {
+		    int len = titlen + alblen + 4;
+
+		    real_title = (char *) xine_xmalloc(len);
+		    sprintf(real_title, "%s (%s)", title, album);
+		  }
+		  else
+		    real_title = strdup(title);
+		  
+		}
+		
+		if(entries_noa == 0)
+		  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
+		else
+		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_noa + 2));
+		
+		mediamark_store_mmk(&mmk[entries_noa], url, real_title, NULL, 0, -1, 0, 0);
+		playlist->entries = ++entries_noa;
+
+		if(real_title)
+		  free(real_title);
+
+	      }
+	    }
+	    
+	    noa_entry = noa_entry->next;
+	  }
+	}
+      }
+      else
+	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+      
+      xml_parser_free_tree(xml_tree);
+    __failure:
+      
+      free(noa_content);
+      
+      if(entries_noa) {
+	mmk[entries_noa] = NULL;
+	playlist->type = strdup("NOATUN");
 	return mmk;
       }
     }
@@ -2393,6 +2521,7 @@ int mediamark_concat_mediamarks(const char *_filename) {
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
     guess_gx_playlist,
+    guess_noatun_playlist,
     guess_smil_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
@@ -2450,6 +2579,7 @@ void mediamark_load_mediamarks(const char *_filename) {
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
     guess_gx_playlist,
+    guess_noatun_playlist,
     guess_smil_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
