@@ -31,7 +31,9 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xmd.h>
-#include <X11/extensions/dpms.h>
+#ifdef HAVE_DPMS
+# include <X11/extensions/dpms.h>
+#endif
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
@@ -107,6 +109,7 @@ typedef struct {
     int           was_running;
   } xscreensaver;
 
+#ifdef HAVE_DPMS
   /* XFree DPMS */
   struct {
     int           was_running;
@@ -115,6 +118,7 @@ typedef struct {
     CARD16        off;
     CARD16        level;
   } xdpms;
+#endif
 
 } screen_savers_t;
 
@@ -127,6 +131,7 @@ static screen_savers_t    ssavers;
 static void disable_screensavers(void) {
   int dummy;
   
+#ifdef HAVE_DPMS
   /* 
    * XFree DPMS
    */
@@ -150,6 +155,7 @@ static void disable_screensavers(void) {
       ssavers.xdpms.was_running = 1;
     }
   }
+#endif
   
   /*
    * XFree screensaver
@@ -182,6 +188,7 @@ static void disable_screensavers(void) {
 static void reenable_screensavers(void) {
   int dummy;
   
+#ifdef HAVE_DPMS
   /*
    * XFree DPMS
    */
@@ -208,6 +215,7 @@ static void reenable_screensavers(void) {
       }
     }
   }
+#endif
   
   /*
    * XFree screensaver

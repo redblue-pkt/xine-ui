@@ -39,5 +39,8 @@
 /* Define this if you have libXinerama installed */
 #undef HAVE_XINERAMA
 
+/* Define this if you have DPMS */
+#undef HAVE_DPMS
+
 /* Define this to add mrl browser into xitk lib */
 #undef NEED_MRLBROWSER

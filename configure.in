@@ -150,9 +150,12 @@ AM_CONDITIONAL(HAVE_XINERAMA, test x$ac_have_xinerama = "xyes")
 dnl
 dnl Check for DPMS location
 dnl
-AC_CHECK_LIB(Xext, DPMSQueryExtension, DPMS_LIBS="",
+AC_CHECK_LIB(Xext, DPMSQueryExtension,
+	     DPMS_LIBS=""
+	     AC_DEFINE(HAVE_DPMS),
              AC_CHECK_LIB(Xdpms, DPMSQueryExtension, 
-                          DPMS_LIBS="-lXdpms",, $X_LIBS), 
+                          DPMS_LIBS="-lXdpms"
+			  AC_DEFINE(HAVE_DPMS),, $X_LIBS), 
              $X_LIBS)
 AC_SUBST(DPMS_LIBS)
  
