@@ -106,31 +106,48 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
 /* convert a -*-* .. style font description into something Xft can digest */
 char * xitk_font_core_string_to_xft( char * old_name) {
   static char new_name[255];
-  if( strncmp(old_name , "*-", 2) == 0 || strncmp(old_name, "-*", 2) == 0)
-  {
-    char font[50];
-    char style[15];
-    char size[5];
 
-    if( old_name[0] == '-' ) old_name++;
+  if((strncmp(old_name, "*", 1) == 0))
+    XITK_DIE("font name '%s' is invalid, CU!.\n", old_name);
+  
+  if( strncmp(old_name, "-*", 2) == 0 || strncmp(old_name, "*-", 2) == 0
+      || strncmp(old_name, "-", 1) == 0 || strncmp(old_name, "*", 1) == 0) {
+    char  font[50];
+    char  style[15];
+    char  *psize = "*", size[5], ptsize[5], pxsize[5];
+    
+    if( old_name[0] == '-' )
+      old_name++;
+    
+    sscanf( old_name, "%*[^-]-%[^-]", font );
+    sscanf( old_name, "%*[^-]-%*[^-]-%[^-]", style );
+    sscanf( old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%[^-]", pxsize);
+    sscanf( old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%[^-]", ptsize);
 
-    sscanf( old_name, "%*[^-]-%[^-]",font );
-    sscanf( old_name, "%*[^-]-%*[^-]-%[^-]",style );
-    sscanf( old_name, "%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%*[^-]-%[^-]",size);
     /* Xft doesn't have lucida, which is a small font;
      * thus we make whatever is chosen 2 sizes smaller */
-    if( strcmp( font, "lucida" ) == 0 )
-    {
-      int sz = atoi( size );
+    if(strlen(pxsize) && strcmp(pxsize, "*"))
+      psize = pxsize;
+    else if(strlen(ptsize) && strcmp(ptsize, "*"))
+      psize = ptsize;
+
+    if( strcmp( font, "lucida" ) == 0 ) {
+      int  sz = strtol(psize, &psize, 10);
+
       sz -= 2;
       sprintf( size , "%i", sz );
     }
+    else
+      sprintf(size, "%s", psize);
+    
     if( strcmp( style , "bold" ) != 0 )
       snprintf( new_name, 255, "%s-%s", font, size );
     else
       snprintf( new_name, 255, "%s-%s:%s", font, size, style );
+
     return new_name;
   }
+
   return old_name;
 }
 
@@ -183,8 +200,7 @@ static int xitk_font_load_one(Display *display, char *font, xitk_font_t *xtfs) {
   {
     XLOCK(display);
 #ifdef WITH_XFT
-    xtfs->font = XftFontOpenName( display, DefaultScreen(display), 
-                    xitk_font_core_string_to_xft(font));
+    xtfs->font = XftFontOpenName( display, DefaultScreen(display), xitk_font_core_string_to_xft(font));
 #else
     xtfs->font = XLoadQueryFont(display, font);
 #endif
