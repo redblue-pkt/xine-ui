@@ -876,6 +876,7 @@ int main(int argc, char *argv[]) {
   int                     _argc;
   int                     driver_num;
   int                     session = -1;
+  char                   *session_mrl = NULL;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1120,7 +1121,9 @@ int main(int argc, char *argv[]) {
     case OPTION_ENQUEUE:
       {
 	char eqmrl[strlen(optarg) + 256];
-	
+
+	session_mrl = strdup(optarg);
+
 	if(session >= 0) 
 	  sprintf(eqmrl, "session=%d,mrl=%s", session, optarg);
 	else
@@ -1151,9 +1154,20 @@ int main(int argc, char *argv[]) {
     }
   }
   
-  /* Session feature was used, say good bye */
-  if(session >= 0)
-    return 0;
+  if(session >= 0) {
+    /* Session feature was used, say good bye */
+    if(is_remote_running(session))
+      return 0;
+    else {
+      /* xine isn't running, create instance */
+      if(session_mrl) {
+	_argv[_argc] = session_mrl;
+	_argc++;
+      }
+      else
+	return 0;
+    }
+  }
 
   /* 
    * Using root window mode don't allow
