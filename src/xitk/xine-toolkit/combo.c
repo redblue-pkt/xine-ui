@@ -38,8 +38,8 @@ static void _combo_rollunroll(xitk_widget_t *w, void *data, int state);
 static void enability(xitk_widget_t *w) {
   combo_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (combo_private_data_t *) w->private_data;
 
@@ -50,8 +50,7 @@ static void enability(xitk_widget_t *w) {
     else {
 
       if(private_data->visible) {
-	xitk_checkbox_set_state(private_data->button_widget, 0,
-				private_data->parent_wlist->win, private_data->parent_wlist->gc);
+	xitk_checkbox_set_state(private_data->button_widget, 0);
 	_combo_rollunroll(private_data->button_widget, (void *)w, 0);
       }
 
@@ -63,11 +62,11 @@ static void enability(xitk_widget_t *w) {
   }
 }
 
-static void notify_destroy(xitk_widget_t *w, void *data) {
+static void notify_destroy(xitk_widget_t *w) {
   combo_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (combo_private_data_t *) w->private_data;
     
@@ -94,17 +93,16 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 /*
  *
  */
-static void paint(xitk_widget_t *w, Window win, GC gc) {
+static void paint(xitk_widget_t *w) {
   combo_private_data_t *private_data;
 
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (combo_private_data_t *) w->private_data;
 
     if(private_data->visible == 1 && (w->visible < 1)) {
-      xitk_checkbox_set_state(private_data->button_widget, 0,
-			      private_data->parent_wlist->win, private_data->parent_wlist->gc);
+      xitk_checkbox_set_state(private_data->button_widget, 0);
       _combo_rollunroll(private_data->button_widget, (void *)w, 0);
     }
     if((w->visible == 1)) {
@@ -115,12 +113,12 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
       bx = w->x + lw;
       xitk_set_widget_pos(private_data->button_widget, bx, w->y);
 
-      xitk_show_widget(private_data->parent_wlist, private_data->label_widget);
-      xitk_show_widget(private_data->parent_wlist, private_data->button_widget);
+      xitk_show_widget(private_data->label_widget);
+      xitk_show_widget(private_data->button_widget);
     }
     else {
-      xitk_hide_widget(private_data->parent_wlist, private_data->label_widget);
-      xitk_hide_widget(private_data->parent_wlist, private_data->button_widget);
+      xitk_hide_widget(private_data->label_widget);
+      xitk_hide_widget(private_data->button_widget);
     }
   }
 }
@@ -132,14 +130,13 @@ static void combo_select(xitk_widget_t *w, void *data, int selected) {
   combo_private_data_t *private_data;
   xitk_widget_t        *c;
 
-  if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+  if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
     c = (xitk_widget_t *) ((browser_private_data_t *)w->private_data)->userdata;
     private_data = (combo_private_data_t *)c->private_data;
     
     private_data->selected = selected;
     
-    xitk_label_change_label(private_data->parent_wlist, 
-			    private_data->label_widget, private_data->entries[selected]);
+    xitk_label_change_label(private_data->label_widget, private_data->entries[selected]);
     
     XLOCK(private_data->imlibdata->x.disp);
     XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
@@ -152,8 +149,7 @@ static void combo_select(xitk_widget_t *w, void *data, int selected) {
 			     (const char* const*)private_data->entries, 
 			     private_data->num_entries, 0);
     
-    xitk_checkbox_set_state(private_data->button_widget, 0, 
-			    private_data->widget_list->win, private_data->widget_list->gc);
+    xitk_checkbox_set_state(private_data->button_widget, 0);
 
     if(private_data->callback)
       private_data->callback(private_data->combo_widget, private_data->userdata, selected);
@@ -197,12 +193,11 @@ static void _combo_handle_event(XEvent *event, void *data) {
 /*
  *
  */
-static void notify_change_skin(xitk_widget_list_t *wl, 
-			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   combo_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     private_data = (combo_private_data_t *) w->private_data;
 
     if(private_data->skin_element_name) {
@@ -228,6 +223,27 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   }
 }
 
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int retval = 0;
+  
+  switch(event->type) {
+  case WIDGET_EVENT_PAINT:
+    paint(w);
+    break;
+  case WIDGET_EVENT_CHANGE_SKIN:
+    notify_change_skin(w, event->skonfig);
+    break;
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
+    break;
+  case WIDGET_EVENT_ENABLE:
+    enability(w);
+    break;
+  }
+  
+  return retval;
+}
+
 /*
  *
  */
@@ -235,8 +251,8 @@ static void _combo_rollunroll(xitk_widget_t *w, void *data, int state) {
   xitk_widget_t        *combo = (xitk_widget_t *)data;
   combo_private_data_t *private_data = (combo_private_data_t *)combo->private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
     
     if(state && private_data->visible == 0) {
       private_data->visible = 1;
@@ -259,14 +275,13 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
   xitk_widget_t        *combo = (xitk_widget_t *)data;
   combo_private_data_t *private_data = (combo_private_data_t *)combo->private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
     int state;
     
     state = !xitk_checkbox_get_state(private_data->button_widget);
     
-    xitk_checkbox_set_state(private_data->button_widget, state, 
-			    private_data->parent_wlist->win, private_data->parent_wlist->gc);
+    xitk_checkbox_set_state(private_data->button_widget, state);
     
     if(state && private_data->visible == 0) {
       private_data->visible = 1;
@@ -290,17 +305,17 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
 /*
  *
  */
-void xitk_combo_set_select(xitk_widget_list_t *wl, xitk_widget_t *w, int select) {
+void xitk_combo_set_select(xitk_widget_t *w, int select) {
   combo_private_data_t *private_data;
 
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     
     private_data = (combo_private_data_t *)w->private_data;
     
     if(private_data->entries && private_data->entries[select]) {
       private_data->selected = select;
-      xitk_label_change_label(wl, private_data->label_widget, private_data->entries[select]);
+      xitk_label_change_label(private_data->label_widget, private_data->entries[select]);
     }
 
   }
@@ -314,8 +329,8 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
   int                    x = 0, xx = 0, y = 0, yy = 0;
   window_info_t          wi;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     
     private_data = (combo_private_data_t *)w->private_data;
     
@@ -360,8 +375,8 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
 int xitk_combo_get_current_selected(xitk_widget_t *w) {
   combo_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     private_data = (combo_private_data_t *) w->private_data;
     return private_data->selected;
   }
@@ -375,8 +390,8 @@ int xitk_combo_get_current_selected(xitk_widget_t *w) {
 char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
   combo_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     private_data = (combo_private_data_t *) w->private_data;
 
     if(private_data->entries && private_data->selected >= 0)
@@ -392,8 +407,8 @@ char *xitk_combo_get_current_entry_selected(xitk_widget_t *w) {
 void xitk_combo_update_list(xitk_widget_t *w, char **list, int len) {
   combo_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
  
     private_data              = (combo_private_data_t *) w->private_data;
     private_data->entries     = list;
@@ -450,7 +465,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   }
   
   if(private_data->num_entries) {
-    xitk_label_change_label(c->parent_wlist, private_data->label_widget, entries[0]);
+    xitk_label_change_label(private_data->label_widget, entries[0]);
     private_data->selected = 0;
   }
   
@@ -513,7 +528,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 							private_data->gc, 1, 1, 
 							(itemw - slidw), itemh, slidw,
 							DEFAULT_FONT_10)));
-  private_data->browser_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+  private_data->browser_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
   
   xitk_browser_update_list(private_data->browser_widget, 
 			   (const char* const*)private_data->entries, 
@@ -528,33 +543,21 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 				private_data->widget_list,
 				(void *) private_data);
 
-  private_data->visible                  = 0;
+  private_data->visible  = 0;
 
-  mywidget->private_data                 = private_data;
-  mywidget->widget_list                  = wl;
+  mywidget->private_data = private_data;
+  mywidget->wl           = wl;
+  mywidget->enable       = enable;
+  mywidget->running      = 1;
+  mywidget->visible      = visible;
+  mywidget->have_focus   = FOCUS_LOST;
 
-  mywidget->enable                       = enable;
-  mywidget->running                      = 1;
-  mywidget->visible                      = visible;
-  mywidget->have_focus                   = FOCUS_LOST;
-
-
-  mywidget->imlibdata                    = private_data->imlibdata;
+  mywidget->imlibdata    = private_data->imlibdata;
   //  mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
-  
-  mywidget->widget_type                  = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
-  mywidget->paint                        = paint;
-  mywidget->notify_click                 = NULL;
-  mywidget->notify_focus                 = NULL;
-  mywidget->notify_keyevent              = NULL;
-  mywidget->notify_inside                = NULL;
-  mywidget->notify_change_skin           = (skin_element_name == NULL) ? NULL : notify_change_skin;
-  mywidget->notify_destroy               = notify_destroy;
-  mywidget->get_skin                     = NULL;
-  mywidget->notify_enable                = enability;
-
-  mywidget->tips_timeout                 = 0;
-  mywidget->tips_string                  = NULL;
+  mywidget->type         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_COMBO;
+  mywidget->event        = notify_event;
+  mywidget->tips_timeout = 0;
+  mywidget->tips_string  = NULL;
 
   return mywidget;
 }
@@ -589,7 +592,7 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
   xitk_list_append_content(c->parent_wlist->l,
 			   (private_data->label_widget = 
 			    xitk_label_create(c->parent_wlist, skonfig, &lbl)));
-  private_data->label_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+  private_data->label_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
   cb.skin_element_name = c->skin_element_name;
   cb.callback          = _combo_rollunroll;
@@ -597,7 +600,7 @@ xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
   xitk_list_append_content(c->parent_wlist->l, 
 			   (private_data->button_widget = 
 			    xitk_checkbox_create(c->parent_wlist, skonfig, &cb)));
-  private_data->button_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+  private_data->button_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
   if(lw)
     *lw = private_data->label_widget;
@@ -665,7 +668,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
 			     (private_data->label_widget = 
 			      xitk_noskin_label_create(c->parent_wlist, &lbl,
 						       x, y, (width - height), (height + 4), DEFAULT_FONT_10)));
-    private_data->label_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+    private_data->label_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
     cb.skin_element_name = NULL;
     cb.callback          = _combo_rollunroll;
@@ -676,7 +679,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
 			      xitk_noskin_checkbox_create(c->parent_wlist, &cb,
 							  x + (width - height), y,
 							  (height + 4), (height + 4))));
-    private_data->button_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
+    private_data->button_widget->type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
   
     if(lw)
       *lw = private_data->label_widget;

@@ -1330,10 +1330,10 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w, void *data) {
+static void notify_destroy(xitk_widget_t *w) {
   image_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
     private_data = (image_private_data_t *) w->private_data;
     XITK_FREE(private_data->skin_element_name);
     xitk_image_free_image(private_data->imlibdata, &private_data->skin);
@@ -1354,7 +1354,7 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
   image_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
     private_data = (image_private_data_t *) w->private_data;
     if(sk == BACKGROUND_SKIN && private_data->skin) {
       return private_data->skin;
@@ -1367,19 +1367,19 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 /*
  *
  */
-static void paint_image (xitk_widget_t *w, Window win, GC gc) {
+static void paint_image (xitk_widget_t *w) {
   image_private_data_t *private_data;
   xitk_image_t         *skin;
   GC                    lgc;
   
-  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (w->visible == 1))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (w->visible == 1))) {
     private_data = (image_private_data_t *) w->private_data;
 
     skin = private_data->skin;
     
     XLOCK (private_data->imlibdata->x.disp);
-    lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+    lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
+    XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
     XUNLOCK (private_data->imlibdata->x.disp);
     
     if (skin->mask) {
@@ -1390,7 +1390,7 @@ static void paint_image (xitk_widget_t *w, Window win, GC gc) {
     }
     
     XLOCK (private_data->imlibdata->x.disp);
-    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, win, lgc, 0, 0,
+    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, w->wl->win, lgc, 0, 0,
 	       skin->width, skin->height, w->x, w->y);
     
     XFreeGC(private_data->imlibdata->x.disp, lgc);
@@ -1402,11 +1402,10 @@ static void paint_image (xitk_widget_t *w, Window win, GC gc) {
 /*
  *
  */
-static void notify_change_skin(xitk_widget_list_t *wl,
-			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   image_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (w->visible == 1))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (w->visible == 1))) {
     private_data = (image_private_data_t *) w->private_data;
 
     if(private_data->skin_element_name) {
@@ -1427,6 +1426,34 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       xitk_set_widget_pos(w, w->x, w->y);
     }
   }
+}
+
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int retval = 0;
+
+  switch(event->type) {
+  case WIDGET_EVENT_PAINT:
+    paint_image(w);
+    break;
+  case WIDGET_EVENT_INSIDE:
+    result->value = notify_inside(w, event->x, event->y);
+    retval = 1;
+    break;
+  case WIDGET_EVENT_CHANGE_SKIN:
+    notify_change_skin(w, event->skonfig);
+    break;
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
+    break;
+  case WIDGET_EVENT_GET_SKIN:
+    if(result) {
+      result->image = get_skin(w, event->skin_layer);
+      retval = 1;
+    }
+    break;
+  }
+  
+  return retval;
 }
 
 /*
@@ -1453,7 +1480,7 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
 
   mywidget->private_data          = private_data;
 
-  mywidget->widget_list           = wl;
+  mywidget->wl                    = wl;
 
   mywidget->enable                = 1;
   mywidget->running               = 1;
@@ -1464,16 +1491,8 @@ static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width;
   mywidget->height                = private_data->skin->height;
-  mywidget->widget_type           = WIDGET_TYPE_IMAGE;
-  mywidget->paint                 = paint_image;
-  mywidget->notify_click          = NULL;
-  mywidget->notify_focus          = NULL;
-  mywidget->notify_keyevent       = NULL;
-  mywidget->notify_inside         = notify_inside;
-  mywidget->notify_change_skin    = notify_change_skin;
-  mywidget->notify_destroy        = notify_destroy;
-  mywidget->get_skin              = get_skin;
-
+  mywidget->type                  = WIDGET_TYPE_IMAGE;
+  mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;
 

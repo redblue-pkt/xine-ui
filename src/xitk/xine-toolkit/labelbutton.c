@@ -37,10 +37,10 @@
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w, void *data) {
+static void notify_destroy(xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     XITK_FREE(private_data->label);
     XITK_FREE(private_data->skin_element_name);
@@ -59,7 +59,7 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
   lbutton_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
 
     if(sk == FOREGROUND_SKIN && private_data->skin) {
@@ -76,7 +76,7 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 static int notify_inside(xitk_widget_t *w, int x, int y) {
   lbutton_private_data_t *private_data;
   
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
 
     if(w->visible == 1) {
@@ -213,7 +213,7 @@ static void create_labelofbutton(xitk_widget_t *lb,
 /*
  * Paint the button with correct background pixmap
  */
-static void paint_labelbutton (xitk_widget_t *w, Window win, GC gc) {
+static void paint_labelbutton (xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
   int               button_width, state = 0;
   GC                lgc;
@@ -221,21 +221,21 @@ static void paint_labelbutton (xitk_widget_t *w, Window win, GC gc) {
   XWindowAttributes attr;
   xitk_pixmap_t    *btn;
 
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
 
     private_data = (lbutton_private_data_t *) w->private_data;
 
     if(w->visible == 1) {
       
       XLOCK(private_data->imlibdata->x.disp);
-      XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
+      XGetWindowAttributes(private_data->imlibdata->x.disp, w->wl->win, &attr);
       XUNLOCK(private_data->imlibdata->x.disp);
       
       skin = private_data->skin;
       
       XLOCK(private_data->imlibdata->x.disp);
-      lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
-      XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+      lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
+      XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
       XUNLOCK(private_data->imlibdata->x.disp);
 	    
       if (skin->mask) {
@@ -253,7 +253,7 @@ static void paint_labelbutton (xitk_widget_t *w, Window win, GC gc) {
 	  state = CLICK;
 	  XLOCK(private_data->imlibdata->x.disp);
 	  XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
-		     btn->pixmap, gc, 2*button_width, 0,
+		     btn->pixmap, w->wl->gc, 2*button_width, 0,
 		     button_width, skin->height, 0, 0);
 	  XUNLOCK(private_data->imlibdata->x.disp);
 	}
@@ -262,7 +262,7 @@ static void paint_labelbutton (xitk_widget_t *w, Window win, GC gc) {
 	    state = FOCUS;
 	    XLOCK(private_data->imlibdata->x.disp);
 	    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-		       btn->pixmap, gc, button_width, 0,
+		       btn->pixmap, w->wl->gc, button_width, 0,
 		       button_width, skin->height, 0, 0);
 	    XUNLOCK(private_data->imlibdata->x.disp);
 	  }
@@ -271,7 +271,7 @@ static void paint_labelbutton (xitk_widget_t *w, Window win, GC gc) {
 	      state = CLICK;
 	      XLOCK(private_data->imlibdata->x.disp);
 	      XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-			 btn->pixmap, gc, 2*button_width, 0,
+			 btn->pixmap, w->wl->gc, 2*button_width, 0,
 			 button_width, skin->height, 0, 0);
 	      XUNLOCK(private_data->imlibdata->x.disp);
 	    }
@@ -283,32 +283,32 @@ static void paint_labelbutton (xitk_widget_t *w, Window win, GC gc) {
 	if(private_data->bState && private_data->bType == RADIO_BUTTON) {
 	  if(private_data->bOldState == 1 && private_data->bClicked == 1) {
 	    state = NORMAL;
-	    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, btn->pixmap, gc, 0, 0,
-		       button_width, skin->height, 0, 0);
+	    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, btn->pixmap, 
+		       w->wl->gc, 0, 0, button_width, skin->height, 0, 0);
 	  }
 	  else {
 	    state = CLICK;
 	    XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
-		       btn->pixmap, gc, 2*button_width, 0,
+		       btn->pixmap, w->wl->gc, 2*button_width, 0,
 		       button_width, skin->height, 0, 0);
 	  }
 	}
 	else {
 	  state = NORMAL;
-	  XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, btn->pixmap, gc, 0, 0,
-		     button_width, skin->height, 0, 0);
+	  XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, btn->pixmap, 
+		     w->wl->gc, 0, 0, button_width, skin->height, 0, 0);
 	}
 	XUNLOCK(private_data->imlibdata->x.disp);
       }
       
       if(private_data->label_visible) {
-	create_labelofbutton(w, win, gc, btn->pixmap,
+	create_labelofbutton(w, w->wl->win, w->wl->gc, btn->pixmap,
 			     button_width, skin->height, 
 			     private_data->label, state);
       }
       
       XLOCK(private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, win, lgc, 0, 0,
+      XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, w->wl->win, lgc, 0, 0,
 		 button_width, skin->height, w->x, w->y);
       XUNLOCK(private_data->imlibdata->x.disp);
 
@@ -324,11 +324,10 @@ static void paint_labelbutton (xitk_widget_t *w, Window win, GC gc) {
 /*
  * Handle click events
  */
-static int notify_click_labelbutton (xitk_widget_list_t *wl, 
-				     xitk_widget_t *w, int bUp, int x, int y) {
+static int notify_click_labelbutton (xitk_widget_t *w, int bUp, int x, int y) {
   lbutton_private_data_t *private_data;
   
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     
     private_data->bClicked = !bUp;
@@ -336,7 +335,7 @@ static int notify_click_labelbutton (xitk_widget_list_t *wl,
     
     if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
       private_data->bState = !private_data->bState;
-      paint_labelbutton(w, wl->win, wl->gc);
+      paint_labelbutton(w);
       if(private_data->bType == RADIO_BUTTON) {
 	if(private_data->state_callback) {
 	  private_data->state_callback(private_data->bWidget, 
@@ -352,7 +351,7 @@ static int notify_click_labelbutton (xitk_widget_list_t *wl,
       }
     }
     else
-      paint_labelbutton(w, wl->win, wl->gc);
+      paint_labelbutton(w);
 
   }
 
@@ -362,17 +361,16 @@ static int notify_click_labelbutton (xitk_widget_list_t *wl,
 /*
  * Changing button caption
  */
-int xitk_labelbutton_change_label(xitk_widget_list_t *wl, 
-				  xitk_widget_t *w, char *newlabel) {
+int xitk_labelbutton_change_label(xitk_widget_t *w, char *newlabel) {
   lbutton_private_data_t *private_data;
   
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
 
     if((private_data->label = (char *) realloc(private_data->label, strlen(newlabel)+1)) != NULL)
       strcpy(private_data->label, newlabel);
     
-    paint_labelbutton(w, wl->win, wl->gc);
+    paint_labelbutton(w);
     
     return 1;
   }
@@ -386,7 +384,7 @@ int xitk_labelbutton_change_label(xitk_widget_list_t *wl,
 char *xitk_labelbutton_get_label(xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
 
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     return private_data->label;
   }
@@ -397,10 +395,10 @@ char *xitk_labelbutton_get_label(xitk_widget_t *w) {
 /*
  * Handle motion on button
  */
-static int notify_focus_labelbutton (xitk_widget_list_t *wl, xitk_widget_t *w, int focus) {
+static int notify_focus_labelbutton (xitk_widget_t *w, int focus) {
   lbutton_private_data_t *private_data;
   
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     private_data->focus = focus;
   }
@@ -411,11 +409,10 @@ static int notify_focus_labelbutton (xitk_widget_list_t *wl, xitk_widget_t *w, i
 /*
  *
  */
-static void notify_change_skin(xitk_widget_list_t *wl, 
-			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   lbutton_private_data_t *private_data;
   
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     
     if(private_data->skin_element_name) {
@@ -457,13 +454,50 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   }
 }
 
+
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int retval = 0;
+  
+  switch(event->type) {
+  case WIDGET_EVENT_PAINT:
+    paint_labelbutton(w);
+    break;
+  case WIDGET_EVENT_CLICK:
+    notify_click_labelbutton(w, event->button_pressed, event->x, event->y);
+    result->value = 1;
+    retval = 1;
+    break;
+  case WIDGET_EVENT_FOCUS:
+    notify_focus_labelbutton(w, event->focus);
+    break;
+  case WIDGET_EVENT_INSIDE:
+    result->value = notify_inside(w, event->x, event->y);
+    retval = 1;
+    break;
+  case WIDGET_EVENT_CHANGE_SKIN:
+    notify_change_skin(w, event->skonfig);
+    break;
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
+    break;
+  case WIDGET_EVENT_GET_SKIN:
+    if(result) {
+      result->image = get_skin(w, event->skin_layer);
+      retval = 1;
+    }
+    break;
+  }
+  
+  return retval;
+}
+
 /*
  * Return state (ON/OFF) if button is radio button, otherwise -1
  */
 int xitk_labelbutton_get_state(xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
   
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
 
     if(private_data->bType == RADIO_BUTTON)
@@ -479,7 +513,7 @@ int xitk_labelbutton_get_state(xitk_widget_t *w) {
 void xitk_labelbutton_set_alignment(xitk_widget_t *w, int align) {
   lbutton_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     private_data->align = align;
   }
@@ -491,7 +525,7 @@ void xitk_labelbutton_set_alignment(xitk_widget_t *w, int align) {
 int xitk_labelbutton_get_alignment(xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     return private_data->align;
   }
@@ -505,7 +539,7 @@ int xitk_labelbutton_get_alignment(xitk_widget_t *w) {
 char *xitk_labelbutton_get_fontname(xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     if(private_data->fontname == NULL)
       return NULL;
@@ -521,7 +555,7 @@ char *xitk_labelbutton_get_fontname(xitk_widget_t *w) {
 void xitk_labelbutton_set_label_offset(xitk_widget_t *w, int offset) {
   lbutton_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     private_data->label_offset = offset;
   }
@@ -529,7 +563,7 @@ void xitk_labelbutton_set_label_offset(xitk_widget_t *w, int offset) {
 int xitk_labelbutton_get_label_offset(xitk_widget_t *w) {
   lbutton_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     private_data = (lbutton_private_data_t *) w->private_data;
     return private_data->label_offset;
   }
@@ -539,11 +573,11 @@ int xitk_labelbutton_get_label_offset(xitk_widget_t *w) {
 /*
  * Set radio button to state 'state'
  */
-void xitk_labelbutton_set_state(xitk_widget_t *w, int state, Window win, GC gc) {
+void xitk_labelbutton_set_state(xitk_widget_t *w, int state) {
   lbutton_private_data_t *private_data;
   int                     clk, focus;
   
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
     
     private_data = (lbutton_private_data_t *) w->private_data;
     
@@ -557,12 +591,12 @@ void xitk_labelbutton_set_state(xitk_widget_t *w, int state, Window win, GC gc) 
 	private_data->bOldState = private_data->bState;
 	private_data->bState = state;
 
-	paint_labelbutton(w, win, gc);
+	paint_labelbutton(w);
 	
 	private_data->focus = focus;
 	private_data->bClicked = clk;
 	
-	paint_labelbutton(w, win, gc);
+	paint_labelbutton(w);
       }
     }
   }
@@ -617,7 +651,7 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_widget_list_t *wl,
 
   mywidget->private_data          = private_data;
 
-  mywidget->widget_list           = wl;
+  mywidget->wl                    = wl;
 
   mywidget->enable                = enable;
   mywidget->running               = 1;
@@ -628,17 +662,8 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_widget_list_t *wl,
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width/3;
   mywidget->height                = private_data->skin->height;
-  mywidget->widget_type           = WIDGET_TYPE_LABELBUTTON;
-  mywidget->paint                 = paint_labelbutton;
-  mywidget->notify_click          = notify_click_labelbutton;
-  mywidget->notify_focus          = notify_focus_labelbutton;
-  mywidget->notify_keyevent       = NULL;
-  mywidget->notify_inside         = notify_inside;
-  mywidget->notify_change_skin    = (skin_element_name == NULL) ? NULL : notify_change_skin;
-  mywidget->notify_destroy        = notify_destroy;
-  mywidget->get_skin              = get_skin;
-  mywidget->notify_enable         = NULL;
-
+  mywidget->type                  = WIDGET_TYPE_LABELBUTTON | WIDGET_FOCUSABLE | WIDGET_CLICKABLE;
+  mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;
 

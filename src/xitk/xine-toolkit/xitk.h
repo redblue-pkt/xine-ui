@@ -43,8 +43,8 @@
 
 #define XITK_MAJOR_VERSION          (0)
 #define XITK_MINOR_VERSION          (10)
-#define XITK_SUB_VERSION            (0)
-#define XITK_VERSION                "0.10.0"
+#define XITK_SUB_VERSION            (1)
+#define XITK_VERSION                "0.10.1"
 
 #define XITK_CHECK_VERSION(major, minor, sub)                          \
                                     (XITK_MAJOR_VERSION > (major) ||   \
@@ -200,22 +200,35 @@ typedef struct {
   int                               width;
 } window_info_t;
 
+/*
+ *  1 <widget group >
+ *   1 <The groupped widget>
+ *    1 <focusable>
+ *     1 <clickable>
+ *      00 <reserved, not used yet>
+ *        1111111111111 <group types>         <13 types>
+ *                     1111111111111 <widget> <13 types>
+*/
 /* Group of widgets widget */
 #define WIDGET_GROUP                0x80000000
 /* Grouped widget, itself */
 #define WIDGET_GROUP_WIDGET         0x40000000
+/* Is widget focusable */
+#define WIDGET_FOCUSABLE            0x20000000
+/* Is widget clickable */
+#define WIDGET_CLICKABLE            0x10000000
 
 /* Grouped widgets */
-#define WIDGET_GROUP_MASK           0x3FFF8000 
-#define WIDGET_GROUP_BROWSER        0x00080000
-#define WIDGET_GROUP_FILEBROWSER    0x00100000
-#define WIDGET_GROUP_MRLBROWSER     0x00200000
-#define WIDGET_GROUP_COMBO          0x00400000
-#define WIDGET_GROUP_TABS           0x00800000
-#define WIDGET_GROUP_INTBOX         0x01000000
+#define WIDGET_GROUP_MASK           0x03FFE000
+#define WIDGET_GROUP_BROWSER        0x00002000
+#define WIDGET_GROUP_FILEBROWSER    0x00004000
+#define WIDGET_GROUP_MRLBROWSER     0x00008000
+#define WIDGET_GROUP_COMBO          0x00010000
+#define WIDGET_GROUP_TABS           0x00020000
+#define WIDGET_GROUP_INTBOX         0x00040000
 
 /* Real widgets. */
-#define WIDGET_TYPE_MASK            0x00007FFF
+#define WIDGET_TYPE_MASK            0x00001FFF
 #define WIDGET_TYPE_BUTTON          0x00000001
 #define WIDGET_TYPE_LABELBUTTON     0x00000002
 #define WIDGET_TYPE_LABEL           0x00000003
@@ -757,7 +770,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
 /**
  *
  */
-void xitk_send_key_event(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
+void xitk_send_key_event(xitk_widget_t *, XEvent *);
 
 /**
  * Return the focused widget.
@@ -767,7 +780,7 @@ xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *);
 /**
  * Force the focus to given widget.
  */
-void xitk_set_focus_to_widget(xitk_widget_list_t *, xitk_widget_t *);
+void xitk_set_focus_to_widget(xitk_widget_t *);
 
 /**
  * Return the pressed widget.
@@ -827,7 +840,7 @@ void xitk_free_widget(xitk_widget_t *w);
 /**
  * Destroy and free widget.
  */
-void xitk_destroy_widget(xitk_widget_list_t *wl, xitk_widget_t *w);
+void xitk_destroy_widget(xitk_widget_t *w);
 
 /**
  * Destroy widgets from widget list.
@@ -857,7 +870,7 @@ void xitk_show_widgets(xitk_widget_list_t *);
 /**
  * Set widget visible
  */
-void xitk_show_widget(xitk_widget_list_t *, xitk_widget_t *);
+void xitk_show_widget(xitk_widget_t *);
 
 /**
  * Set widgets of widget list not visible.
@@ -867,7 +880,7 @@ void xitk_hide_widgets(xitk_widget_list_t *);
 /**
  * Hide a widget.
  */
-void xitk_hide_widget(xitk_widget_list_t *, xitk_widget_t *);
+void xitk_hide_widget(xitk_widget_t *);
 
 /**
  *
@@ -959,7 +972,7 @@ int xitk_slider_get_pos(xitk_widget_t *);
 /**
  * Set position of paddle.
  */
-void xitk_slider_set_pos(xitk_widget_list_t *, xitk_widget_t *, int);
+void xitk_slider_set_pos(xitk_widget_t *, int);
 
 /**
  * Set min value of slider.
@@ -984,22 +997,22 @@ int xitk_slider_get_max(xitk_widget_t *);
 /**
  * Set position to 0 and redraw the widget.
  */
-void xitk_slider_reset(xitk_widget_list_t *, xitk_widget_t *);
+void xitk_slider_reset(xitk_widget_t *);
 
 /**
  * Set position to max and redraw the widget.
  */
-void xitk_slider_set_to_max(xitk_widget_list_t *, xitk_widget_t *);
+void xitk_slider_set_to_max(xitk_widget_t *);
 
 /**
  * Increment by step the paddle position
  */
-void xitk_slider_make_step(xitk_widget_list_t *, xitk_widget_t *);
+void xitk_slider_make_step(xitk_widget_t *);
 
 /**
  * Decrement by step the paddle position.
  */
-void xitk_slider_make_backstep(xitk_widget_list_t *, xitk_widget_t *);
+void xitk_slider_make_backstep(xitk_widget_t *);
 
 /**
  * Call callback for current position
@@ -1081,7 +1094,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
 /**
  * Change label of button 'widget'.
  */
-int xitk_labelbutton_change_label(xitk_widget_list_t *wl, xitk_widget_t *, char *);
+int xitk_labelbutton_change_label(xitk_widget_t *, char *);
 
 /**
  * Return label of button 'widget'.
@@ -1096,7 +1109,7 @@ int xitk_labelbutton_get_state(xitk_widget_t *);
 /**
  * Set state of button 'widget'.
  */
-void xitk_labelbutton_set_state(xitk_widget_t *, int, Window, GC);
+void xitk_labelbutton_set_state(xitk_widget_t *, int);
 
 /*
  * Return used font name
@@ -1138,7 +1151,7 @@ xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
 /**
  * Change label of widget 'widget'.
  */
-int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel);
+int xitk_label_change_label(xitk_widget_t *l, char *newlabel);
 
 /**
  * Get label.
@@ -1198,7 +1211,7 @@ int xitk_checkbox_get_state(xitk_widget_t *);
 /**
  * Set state of checkbox .
  */
-void xitk_checkbox_set_state(xitk_widget_t *, int, Window, GC);
+void xitk_checkbox_set_state(xitk_widget_t *, int);
 
 /*
  * ** Buttons
@@ -1315,7 +1328,7 @@ void xitk_browser_set_alignment(xitk_widget_t *w, int align);
  */
 void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier);
 
-xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w);
+xitk_widget_t *xitk_browser_get_browser(xitk_widget_t *w);
 
 /*
  * Filebrowser
@@ -1465,7 +1478,7 @@ char *xitk_inputtext_get_text(xitk_widget_t *it);
 /**
  * Change and redisplay the text of widget.
  */
-void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, char *text);
+void xitk_inputtext_change_text(xitk_widget_t *it, char *text);
 
 
 /*
@@ -1730,7 +1743,7 @@ char *xitk_combo_get_current_entry_selected(xitk_widget_t *w);
 /**
  *
  */
-void xitk_combo_set_select(xitk_widget_list_t *wl, xitk_widget_t *w, int select);
+void xitk_combo_set_select(xitk_widget_t *w, int select);
 
 /**
  *
@@ -1835,6 +1848,9 @@ void draw_bevel_three_state(ImlibData *im, xitk_image_t *p);
  */
 void draw_bevel_two_state(ImlibData *im, xitk_image_t *p);
 
+void draw_paddle_three_state_vertical(ImlibData *im, xitk_image_t *p);
+void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p);
+
 /**
  *
  */
@@ -1847,6 +1863,7 @@ void draw_inner_light(ImlibData *im, xitk_pixmap_t *p, int w, int h);
 void draw_outter(ImlibData *im, xitk_pixmap_t *p, int w, int h);
 void draw_outter_light(ImlibData *im, xitk_pixmap_t *p, int w, int h);
 
+void draw_flat_with_color(ImlibData *im, xitk_pixmap_t *p, int w, int h, unsigned int color);
 /**
  *
  */

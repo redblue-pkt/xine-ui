@@ -78,16 +78,4 @@ typedef struct {
 
 } filebrowser_private_data_t;
 
-xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
-				       xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb);
-
-int xitk_filebrowser_is_running(xitk_widget_t *w);
-int xitk_filebrowser_is_visible(xitk_widget_t *w);
-void xitk_filebrowser_hide(xitk_widget_t *w);
-void xitk_filebrowser_show(xitk_widget_t *w);
-void xitk_filebrowser_set_transient(xitk_widget_t *w, Window window);
-void xitk_filebrowser_destroy(xitk_widget_t *w);
-char *xitk_filebrowser_get_current_dir(xitk_widget_t *w);
-int xitk_filebrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
-
 #endif

@@ -204,10 +204,10 @@ static void slider_update(xitk_widget_t *w, int x, int y) {
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w, void *data) {
+static void notify_destroy(xitk_widget_t *w) {
   slider_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
 
     XITK_FREE(private_data->skin_element_name);
@@ -223,7 +223,7 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     
     private_data = (slider_private_data_t *) w->private_data;
     
@@ -244,7 +244,7 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 static int notify_inside(xitk_widget_t *w, int x, int y) {
   slider_private_data_t *private_data = (slider_private_data_t *) w->private_data;
 
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     
     private_data = (slider_private_data_t *) w->private_data;
     
@@ -269,14 +269,14 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
 /*
  * Draw widget
  */
-static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
+static void paint_slider(xitk_widget_t *w) {
   int                     button_width, button_height;	
   slider_private_data_t  *private_data;
   GC                      bgc, pgc;
   xitk_image_t           *bg;
   xitk_image_t           *paddle;
   
-  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) && (w->visible == 1))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) && (w->visible == 1))) {
     int    x, y, srcx1, srcx2, destx1, srcy1, srcy2, desty1;
     int    xcenter, ycenter;
     int    paddle_width;
@@ -291,9 +291,9 @@ static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
         
     XLOCK(private_data->imlibdata->x.disp);
     bgc = XCreateGC(private_data->imlibdata->x.disp, bg->image->pixmap, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, bgc);
+    XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, bgc);
     pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image->pixmap, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, pgc);
+    XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, pgc);
     XUNLOCK(private_data->imlibdata->x.disp);
       
     if(bg->mask) {
@@ -304,7 +304,7 @@ static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
     }
     
     XLOCK(private_data->imlibdata->x.disp);
-    XCopyArea(private_data->imlibdata->x.disp, bg->image->pixmap, win, bgc, 0, 0,
+    XCopyArea(private_data->imlibdata->x.disp, bg->image->pixmap, w->wl->win, bgc, 0, 0,
 	      bg->width, bg->height, w->x, w->y);
       
     XUNLOCK(private_data->imlibdata->x.disp);
@@ -418,7 +418,7 @@ static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
     }
     
     XLOCK(private_data->imlibdata->x.disp);
-    XCopyArea(private_data->imlibdata->x.disp, paddle->image->pixmap, win, pgc,
+    XCopyArea(private_data->imlibdata->x.disp, paddle->image->pixmap, w->wl->win, pgc,
 	      srcx1, srcy1, srcx2, srcy2, destx1, desty1);
     XFreeGC(private_data->imlibdata->x.disp, pgc);
     XFreeGC(private_data->imlibdata->x.disp, bgc);
@@ -430,11 +430,10 @@ static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
 /*
  *
  */
-static void notify_change_skin(xitk_widget_list_t *wl, 
-			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     
     private_data = (slider_private_data_t *) w->private_data;
     
@@ -478,10 +477,10 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 /*
  * Got click
  */
-static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp, int x, int y) {
+static int notify_click_slider(xitk_widget_t *w, int bUp, int x, int y) {
   slider_private_data_t *private_data;
     
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     
     private_data = (slider_private_data_t *) w->private_data;    
     
@@ -489,7 +488,7 @@ static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp
     
     private_data->bClicked = !bUp;
     
-    paint_slider(w, wl->win, wl->gc);
+    paint_slider(w);
     
     if((bUp == 0) && (private_data->focus == FOCUS_RECEIVED)) {
       XEvent sliderevent;
@@ -525,7 +524,7 @@ static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp
 
 	  if(new_value != old_value) {
 	    old_value = new_value;
-	    paint_slider(w, wl->win, wl->gc);
+	    paint_slider(w);
 	  }
 	  
  	  if(private_data->motion_callback) {
@@ -540,7 +539,7 @@ static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp
 	case ButtonRelease: {
 	  private_data->bClicked = 0;
 	  
-	  xitk_slider_set_pos(wl, w, private_data->value);
+	  xitk_slider_set_pos(w, private_data->value);
 	  
 	  if(private_data->callback) {
 	    private_data->callback(private_data->sWidget,
@@ -566,10 +565,10 @@ static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp
 /*
  * Got focus
  */
-static int notify_focus_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int focus) {
+static int notify_focus_slider(xitk_widget_t *w, int focus) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     private_data->focus = focus;
   }
@@ -577,17 +576,53 @@ static int notify_focus_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int foc
   return 1;
 }
 
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int retval = 0;
+
+  switch(event->type) {
+  case WIDGET_EVENT_PAINT:
+    paint_slider(w);
+    break;
+  case WIDGET_EVENT_CLICK:
+    notify_click_slider(w, event->button_pressed, event->x, event->y);
+    result->value = 1;
+    retval = 1;
+    break;
+  case WIDGET_EVENT_FOCUS:
+    notify_focus_slider(w, event->focus);
+    break;
+  case WIDGET_EVENT_INSIDE:
+    result->value = notify_inside(w, event->x, event->y);
+    retval = 1;
+    break;
+  case WIDGET_EVENT_CHANGE_SKIN:
+    notify_change_skin(w, event->skonfig);
+    break;
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
+    break;
+  case WIDGET_EVENT_GET_SKIN:
+    if(result) {
+      result->image = get_skin(w, event->skin_layer);
+      retval = 1;
+    }
+    break;
+  }
+  
+  return retval;
+}
+
 /*
  * Increment position
  */
-void xitk_slider_make_step(xitk_widget_list_t *wl, xitk_widget_t *w) {
+void xitk_slider_make_step(xitk_widget_t *w) {
   slider_private_data_t *private_data;
 
-  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     if(!private_data->bClicked) {
       if(((xitk_slider_get_pos(w)) + private_data->step) <= (xitk_slider_get_max(w)))
-	xitk_slider_set_pos(wl, w, xitk_slider_get_pos(w) + private_data->step);
+	xitk_slider_set_pos(w, xitk_slider_get_pos(w) + private_data->step);
     }
   } 
 
@@ -596,14 +631,14 @@ void xitk_slider_make_step(xitk_widget_list_t *wl, xitk_widget_t *w) {
 /*
  * Decrement position
  */
-void xitk_slider_make_backstep(xitk_widget_list_t *wl, xitk_widget_t *w) {
+void xitk_slider_make_backstep(xitk_widget_t *w) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     if(!private_data->bClicked) {
       if(((xitk_slider_get_pos(w)) - private_data->step) >= (xitk_slider_get_min(w)))
-	xitk_slider_set_pos(wl, w, xitk_slider_get_pos(w) - private_data->step);
+	xitk_slider_set_pos(w, xitk_slider_get_pos(w) - private_data->step);
     }
     
   } 
@@ -616,7 +651,7 @@ void xitk_slider_make_backstep(xitk_widget_list_t *wl, xitk_widget_t *w) {
 void xitk_slider_set_min(xitk_widget_t *w, int min) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     slider_update_minmax(w, (float)((min == private_data->upper) 
 				    ? min - 1 : min), private_data->upper);
@@ -629,7 +664,7 @@ void xitk_slider_set_min(xitk_widget_t *w, int min) {
 int xitk_slider_get_min(xitk_widget_t *w) {
   slider_private_data_t *private_data;
   
-  if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) {
+  if((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) {
     private_data = (slider_private_data_t *) w->private_data;
     return (int) private_data->lower;
   } 
@@ -643,7 +678,7 @@ int xitk_slider_get_min(xitk_widget_t *w) {
 int xitk_slider_get_max(xitk_widget_t *w) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     return (int) private_data->upper;
   } 
@@ -657,7 +692,7 @@ int xitk_slider_get_max(xitk_widget_t *w) {
 void xitk_slider_set_max(xitk_widget_t *w, int max) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     slider_update_minmax(w, private_data->lower, (float)((max == private_data->lower) 
 							 ? max + 1 : max));
@@ -667,28 +702,28 @@ void xitk_slider_set_max(xitk_widget_t *w, int max) {
 /*
  * Set pos to 0 and redraw the widget.
  */
-void xitk_slider_reset(xitk_widget_list_t *wl, xitk_widget_t *w) {
+void xitk_slider_reset(xitk_widget_t *w) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     slider_update_value(w, 0.0);
     private_data->bClicked = 0;
-    paint_slider(w, wl->win, wl->gc);
+    paint_slider(w);
   }
 }
 
 /*
  * Set pos to max and redraw the widget.
  */
-void xitk_slider_set_to_max(xitk_widget_list_t *wl, xitk_widget_t *w) {
+void xitk_slider_set_to_max(xitk_widget_t *w) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     if(!private_data->bClicked) {
       slider_update_value(w, private_data->upper);
-      paint_slider(w, wl->win, wl->gc);
+      paint_slider(w);
     }
   }
 }
@@ -699,7 +734,7 @@ void xitk_slider_set_to_max(xitk_widget_list_t *wl, xitk_widget_t *w) {
 int xitk_slider_get_pos(xitk_widget_t *w) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
     return (int) private_data->value;
   } 
@@ -710,10 +745,10 @@ int xitk_slider_get_pos(xitk_widget_t *w) {
 /*
  * Set position.
  */
-void xitk_slider_set_pos(xitk_widget_list_t *wl, xitk_widget_t *w, int pos) {
+void xitk_slider_set_pos(xitk_widget_t *w, int pos) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     float value = (float) pos;
     
     private_data = (slider_private_data_t *) w->private_data;
@@ -721,7 +756,7 @@ void xitk_slider_set_pos(xitk_widget_list_t *wl, xitk_widget_t *w, int pos) {
     if(!private_data->bClicked) {
       if(value >= private_data->lower && value <= private_data->upper) {
 	slider_update_value(w, value);
-	paint_slider(w, wl->win, wl->gc);
+	paint_slider(w);
       }
     }
     
@@ -734,7 +769,7 @@ void xitk_slider_set_pos(xitk_widget_list_t *wl, xitk_widget_t *w, int pos) {
 void xitk_slider_callback_exec(xitk_widget_t *w) {
   slider_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
 
     if(private_data->callback) {
@@ -810,7 +845,7 @@ static xitk_widget_t *_xitk_slider_create(xitk_widget_list_t *wl,
 
   mywidget->private_data                 = private_data;
 
-  mywidget->widget_list                  = wl;
+  mywidget->wl                           = wl;
 
   mywidget->enable                       = enable;
   mywidget->running                      = 1;
@@ -821,17 +856,8 @@ static xitk_widget_t *_xitk_slider_create(xitk_widget_list_t *wl,
   mywidget->y                            = y;
   mywidget->width                        = private_data->bg_skin->width;
   mywidget->height                       = private_data->bg_skin->height;
-  mywidget->widget_type                  = WIDGET_TYPE_SLIDER;
-  mywidget->paint                        = paint_slider;
-  mywidget->notify_click                 = notify_click_slider;
-  mywidget->notify_focus                 = notify_focus_slider;
-  mywidget->notify_keyevent              = NULL;
-  mywidget->notify_inside                = notify_inside;
-  mywidget->notify_change_skin           = (skin_element_name == NULL) ? NULL : notify_change_skin;
-  mywidget->notify_destroy               = notify_destroy;
-  mywidget->get_skin                     = get_skin;
-  mywidget->notify_enable                = NULL;
-
+  mywidget->type                         = WIDGET_TYPE_SLIDER | WIDGET_FOCUSABLE | WIDGET_CLICKABLE;
+  mywidget->event                        = notify_event;
   mywidget->tips_timeout                 = 0;
   mywidget->tips_string                  = NULL;
 

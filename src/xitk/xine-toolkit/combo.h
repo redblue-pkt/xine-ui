@@ -54,43 +54,4 @@ typedef struct {
 
 } combo_private_data_t;
 
-/*
- * Create a combo box.
- */
-xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
-				 xitk_skin_config_t *skonfig, xitk_combo_widget_t *s,
-				 xitk_widget_t **lw, xitk_widget_t **bw);
-
-/*
- * Same as above, without skinable feature.
- */
-xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
-					xitk_combo_widget_t *c, int x, int y, int width,
-					xitk_widget_t **lw, xitk_widget_t **bw);
-
-/*
- * Return current selected entry (offset in entries).
- */
-int xitk_combo_get_current_selected(xitk_widget_t *w);
-
-/*
- * Return current selected entry (text).
- */
-char *xitk_combo_get_current_entry_selected(xitk_widget_t *w);
-
-/*
- * Choose a new selected entry in list (also update the label).
- */
-void xitk_combo_set_select(xitk_widget_list_t *wl, xitk_widget_t *w, int select);
-
-/*
- * Update combo list/num entries.
- */
-void xitk_combo_update_list(xitk_widget_t *w, char **list, int len);
-
-/*
- * Update combo window pos to parent label pos
- */
-void xitk_combo_update_pos(xitk_widget_t *w);
-
 #endif

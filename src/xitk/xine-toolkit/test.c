@@ -213,16 +213,16 @@ void test_handle_event(XEvent *event, void *data) {
  */
 static void move_sliders(xitk_widget_t *w, void *data, int pos) {
   if(w == test->vslider) {
-    xitk_slider_set_pos(test->widget_list, test->hslider, pos);
-    xitk_slider_set_pos(test->widget_list, test->rslider, pos);
+    xitk_slider_set_pos(test->hslider, pos);
+    xitk_slider_set_pos(test->rslider, pos);
   }
   else if(w == test->hslider) {
-    xitk_slider_set_pos(test->widget_list, test->vslider, pos);
-    xitk_slider_set_pos(test->widget_list, test->rslider, pos);
+    xitk_slider_set_pos(test->vslider, pos);
+    xitk_slider_set_pos(test->rslider, pos);
   }
   else if(w == test->rslider) {
-    xitk_slider_set_pos(test->widget_list, test->vslider, pos);
-    xitk_slider_set_pos(test->widget_list, test->hslider, pos);
+    xitk_slider_set_pos(test->vslider, pos);
+    xitk_slider_set_pos(test->hslider, pos);
   }
 
 }
@@ -270,7 +270,7 @@ static void change_label(xitk_widget_t *w, void *data) {
 
   nlab = !nlab;
 
-  xitk_label_change_label(test->widget_list, test->label, labels[nlab]);
+  xitk_label_change_label(test->label, labels[nlab]);
 
   xitk_browser_set_alignment(test->browser, align);
   
@@ -289,7 +289,7 @@ static void change_label(xitk_widget_t *w, void *data) {
 static void change_inputtext(xitk_widget_t *w, void *data, int selected) {
 
   if(test->entries[selected] != NULL)
-    xitk_inputtext_change_text(test->widget_list, test->input, test->entries[selected]);
+    xitk_inputtext_change_text(test->input, test->entries[selected]);
 
 }
 
@@ -299,7 +299,7 @@ static void change_inputtext(xitk_widget_t *w, void *data, int selected) {
 static void change_inputtext_dbl_click(xitk_widget_t *w, void *data, int selected) {
 
   if(test->entries[selected] != NULL)
-    xitk_inputtext_change_text(test->widget_list, test->input, test->entries[selected]);
+    xitk_inputtext_change_text(test->input, test->entries[selected]);
 
 }
 
@@ -601,7 +601,7 @@ static void create_sliders(void) {
 		   (test->hslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      17, 208, 117, 20,
 							      XITK_HSLIDER)));
-  xitk_slider_set_pos(test->widget_list, test->hslider, 0);
+  xitk_slider_set_pos(test->hslider, 0);
 
   xitk_set_widget_tips_default(test->hslider, "This is an horizontal slider");
 
@@ -617,7 +617,7 @@ static void create_sliders(void) {
 		   (test->vslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      17, 230, 20, 117,
 							      XITK_VSLIDER)));
-  xitk_slider_set_pos(test->widget_list, test->vslider, 0);
+  xitk_slider_set_pos(test->vslider, 0);
 
   xitk_set_widget_tips_default(test->vslider, "This is a vertical slider");
 
@@ -633,7 +633,7 @@ static void create_sliders(void) {
 		   (test->rslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      50, 240, 80, 80,
 							      XITK_RSLIDER)));
-  xitk_slider_set_pos(test->widget_list, test->rslider, 0);
+  xitk_slider_set_pos(test->rslider, 0);
   
   xitk_set_widget_tips_default(test->rslider, "This is a rotate button");
 

@@ -38,7 +38,6 @@ typedef struct {
   pthread_t             thread;
   pthread_mutex_t       mutex;
   xitk_widget_t        *w;
-  xitk_widget_list_t   *wl;
   xitk_window_t        *xwin;
   xitk_register_key_t   key;
 } tips_private_t;
@@ -144,13 +143,13 @@ static void *_tips_thread(void *data) {
   pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
   
   /* Get parent window position */
-  xitk_get_window_position(tp->w->imlibdata->x.disp, tp->wl->win, &x, &y, NULL, NULL);
+  xitk_get_window_position(tp->w->imlibdata->x.disp, tp->w->wl->win, &x, &y, NULL, NULL);
   
   x += tp->w->x;
   y += (tp->w->y + tp->w->height);
 
   fs = xitk_font_load_font(tp->w->imlibdata->x.disp, DEFAULT_FONT_10);
-  xitk_font_set_font(fs, tp->wl->gc);
+  xitk_font_set_font(fs, tp->w->wl->gc);
   string_length = xitk_font_get_string_length(fs, tp->w->tips_string);
   xitk_font_unload_font(fs);
 
@@ -219,13 +218,13 @@ static void *_tips_thread(void *data) {
   }
   
   XLOCK(tp->w->imlibdata->x.disp);
-  status = XGetWindowAttributes(tp->w->imlibdata->x.disp, tp->wl->win, &wattr);
+  status = XGetWindowAttributes(tp->w->imlibdata->x.disp, tp->w->wl->win, &wattr);
   XMapRaised(tp->w->imlibdata->x.disp, (xitk_window_get_window(tp->xwin)));
   XUNLOCK(tp->w->imlibdata->x.disp);
 
   if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable)) {
     XLOCK(tp->w->imlibdata->x.disp);
-    XSetInputFocus(tp->w->imlibdata->x.disp, tp->wl->win, RevertToParent, CurrentTime);
+    XSetInputFocus(tp->w->imlibdata->x.disp, tp->w->wl->win, RevertToParent, CurrentTime);
     XUNLOCK(tp->w->imlibdata->x.disp);
   }
   
@@ -261,7 +260,7 @@ static void *_tips_thread(void *data) {
 /*
  *
  */
-void xitk_tips_create(xitk_widget_t *w, xitk_widget_list_t *wl) {
+void xitk_tips_create(xitk_widget_t *w) {
   pthread_attr_t       pth_attrs;
   struct sched_param   pth_params;
   tips_private_t      *tp;
@@ -276,7 +275,6 @@ void xitk_tips_create(xitk_widget_t *w, xitk_widget_list_t *wl) {
 
     tp     = (tips_private_t *) xitk_xmalloc(sizeof(tips_private_t));
     tp->w  = w;
-    tp->wl = wl;
     pthread_attr_init(&pth_attrs);
     
     pthread_attr_getschedparam(&pth_attrs, &pth_params);

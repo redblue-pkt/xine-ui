@@ -531,15 +531,19 @@ static void _window_handle_event(XEvent *event, void *data) {
   case Expose:
     if(wd->widget_list) {
       wd->widget_list->widget_focused = wd->default_button;
-      if (wd->widget_list->widget_focused->notify_focus 
-	  && wd->widget_list->widget_focused->enable == WIDGET_ENABLE) {
+      if ((wd->widget_list->widget_focused->type & WIDGET_FOCUSABLE) && 
+	  wd->widget_list->widget_focused->enable == WIDGET_ENABLE) {
 	xitk_widget_t *w = wd->widget_list->widget_focused;
+	widget_event_t event;
+
+	event.type = WIDGET_EVENT_FOCUS;
+	event.focus = FOCUS_RECEIVED;
 	
-	(void) (w->notify_focus) (wd->widget_list, w, FOCUS_RECEIVED);
+	(void) w->event(w, &event, NULL);
 	w->have_focus = FOCUS_RECEIVED;
 	
-	if(w->paint)
-	  (w->paint) (w, wd->widget_list->win, wd->widget_list->gc);
+	event.type = WIDGET_EVENT_PAINT;
+	(void) w->event(w, &event, NULL);
       }
     }
     break;

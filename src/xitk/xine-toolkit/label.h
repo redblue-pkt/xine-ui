@@ -29,11 +29,8 @@
 typedef struct {
   ImlibData              *imlibdata;
   char                   *skin_element_name;
-  GC                      gc;
-  Window                  window;
 
   xitk_widget_t          *lWidget;
-
 
   int                     char_length; /* length of 1 char */
   int                     char_height; /* height of 1 char */
@@ -59,8 +56,6 @@ typedef struct {
   pthread_mutex_t         paint_mutex;
 
 } label_private_data_t;
-
-/* ************************************************************** */
 
 #endif
 

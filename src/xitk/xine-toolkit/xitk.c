@@ -1003,16 +1003,17 @@ void xitk_xevent_notify(XEvent *event) {
 	    w = fx->widget_list->widget_focused;
 	  }
 
-	  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) &&
+	  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) &&
 		   (mykey != XK_Tab) && (mykey != XK_KP_Tab) && (mykey != XK_ISO_Left_Tab))) {
 	    
-	    xitk_send_key_event(fx->widget_list, w, event);
+	    xitk_send_key_event(w, event);
 	    
 	    if((mykey == XK_Return) || 
 	       (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
+	      widget_event_t  event;
 	      
-	      if(w->paint)
-		(w->paint) (w, fx->widget_list->win, fx->widget_list->gc);
+	      event.type = WIDGET_EVENT_PAINT;
+	      (void) w->event(w, &event, NULL);
 	      
 	      xitk_set_focus_to_next_widget(fx->widget_list, 0);
 	    }
@@ -1030,15 +1031,26 @@ void xitk_xevent_notify(XEvent *event) {
 	  /* simulate click event on space/return/enter key event */
 	  else if((mykey == XK_space) || (mykey == XK_Return) || 
 		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
-	    if(w && (w->notify_click && w->visible && w->enable)) {
+	    if(w && ((w->type & WIDGET_CLICKABLE) && w->visible && w->enable)) {
 	      
-	      if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
-		       ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
-		       ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
+	      if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
+		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
+		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
+		widget_event_t         event;
+		widget_event_result_t  result;
+
 		handled = 1;
 
-		w->notify_click(fx->widget_list, w, 0, w->x, w->y);
-		w->notify_click(fx->widget_list, w, 1, w->x, w->y);
+		event.type = WIDGET_EVENT_CLICK;
+		event.button_pressed = LBUTTON_DOWN;
+		event.x = w->x;
+		event.y = w->y;
+
+		(void) w->event(w, &event, &result);
+
+		event.button_pressed = LBUTTON_UP;
+
+		(void) w->event(w, &event, &result);
 
 		//		if(fx->xevent_callback)
 		//		  fx->xevent_callback(event, fx->user_data);
@@ -1051,8 +1063,8 @@ void xitk_xevent_notify(XEvent *event) {
 		   || (mykey == XK_Prior) || (mykey == XK_Next)) 
 		  && ((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD)) {
 	    
-	    if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
-	      xitk_widget_t *b = xitk_browser_get_browser(fx->widget_list, w);
+	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+	      xitk_widget_t *b = xitk_browser_get_browser(w);
 	      
 	      if(b) {
 		if(mykey == XK_Up)
@@ -1070,15 +1082,15 @@ void xitk_xevent_notify(XEvent *event) {
 
 	      }
 	    }
-	    else if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+	    else if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
 	      if((mykey == XK_Left) || (mykey == XK_Down)) {
 		handled = 1;
-		xitk_slider_make_backstep(fx->widget_list, w);
+		xitk_slider_make_backstep(w);
 		xitk_slider_callback_exec(w);
 	      }
 	      else {
 		handled = 1;
-		xitk_slider_make_step(fx->widget_list, w);
+		xitk_slider_make_step(w);
 		xitk_slider_callback_exec(w);
 	      }
 	    }
@@ -1102,8 +1114,8 @@ void xitk_xevent_notify(XEvent *event) {
 		  (mykey == XK_y) || (mykey == XK_Y) || (mykey == XK_z) || (mykey == XK_Z)) {
 
 	    
-	    if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
-	      xitk_widget_t *b = xitk_browser_get_browser(fx->widget_list, w);
+	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+	      xitk_widget_t *b = xitk_browser_get_browser(w);
 	      
 	      if(b)
 		xitk_browser_warp_jump(b, kbuf, modifier);
@@ -1112,18 +1124,19 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 
 	  if(!handled) {
-	    if((w == NULL) || (w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) == 0))) {
+	    if((w == NULL) || (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) == 0))) {
 	      if(fx->xevent_callback) {
 		fx->xevent_callback(event, fx->user_data);
 	      }
 	    }
 	    
-	    if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && 
+	    if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && 
 	       ((mykey == XK_Return) || (mykey == XK_KP_Enter) 
 		|| (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter))) {
+	      widget_event_t  event;
 	      
-	      if(w->paint)
-		(w->paint) (w, fx->widget_list->win, fx->widget_list->gc);
+	      event.type = WIDGET_EVENT_PAINT;
+	      (void) w->event(w, &event, NULL);
 	      
 	      xitk_set_focus_to_next_widget(fx->widget_list, 0);
 	      
@@ -1269,8 +1282,8 @@ void xitk_xevent_notify(XEvent *event) {
 	  if(fx->widget_list && fx->widget_list->l) {
 	    xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content(fx->widget_list->l);
 	    while (w) {
-	      if(((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
-		 (w->widget_type & WIDGET_GROUP_WIDGET)) {
+	      if(((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+		 (w->type & WIDGET_GROUP_WIDGET)) {
 		xitk_combo_update_pos(w);
 	      }
 	      w = (xitk_widget_t *) xitk_list_next_content (fx->widget_list->l);

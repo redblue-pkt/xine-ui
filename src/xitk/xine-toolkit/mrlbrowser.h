@@ -160,17 +160,6 @@ typedef struct {
 
 } mrlbrowser_private_data_t;
 
-xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
-				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
-int xitk_mrlbrowser_is_running(xitk_widget_t *w);
-int xitk_mrlbrowser_is_visible(xitk_widget_t *w);
-void xitk_mrlbrowser_hide(xitk_widget_t *w);
-void xitk_mrlbrowser_show(xitk_widget_t *w);
-void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window);
-void xitk_mrlbrowser_destroy(xitk_widget_t *w);
-int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
-void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned long timeout);
-
 #endif
 
 #endif

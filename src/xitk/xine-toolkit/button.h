@@ -40,18 +40,4 @@ typedef struct {
 
 } button_private_data_t;
 
-/* ********************************************************** */
-
-/**
- * Create a button
- */
-xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
-				   xitk_skin_config_t *skonfig, xitk_button_widget_t *b);
-
-/*
- * Same as above, without skinable feature.
- */
-xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
-					  xitk_button_widget_t *b,
-					  int x, int y, int width, int height);
 #endif

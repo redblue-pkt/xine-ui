@@ -42,8 +42,8 @@ static void tabs_arrange(xitk_widget_t *);
 static void enability(xitk_widget_t *w) {
   tabs_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     int i;
     
     private_data = (tabs_private_data_t *) w->private_data;
@@ -64,18 +64,18 @@ static void enability(xitk_widget_t *w) {
   }
 }
   
-static void notify_destroy(xitk_widget_t *w, void *data) {
+static void notify_destroy(xitk_widget_t *w) {
   tabs_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     int i;
     
     private_data = (tabs_private_data_t *) w->private_data;
 
     XITK_FREE(private_data->skin_element_name);
     for(i = 0; i <= private_data->num_entries; i++) {
-      xitk_destroy_widget(private_data->parent_wlist, private_data->tabs[i]);
+      xitk_destroy_widget(private_data->tabs[i]);
     }
     XITK_FREE(private_data);
   }
@@ -87,8 +87,8 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 static void tabs_arrange(xitk_widget_t *w) {
   tabs_private_data_t  *private_data;
 
-  if(w && ((((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
-	    (w->widget_type & WIDGET_GROUP_WIDGET)) && (w->visible == 1))) {
+  if(w && ((((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
+	    (w->type & WIDGET_GROUP_WIDGET)) && (w->visible == 1))) {
     int i = 0, width, x;
     
     private_data = (tabs_private_data_t*) w->private_data;
@@ -96,7 +96,7 @@ static void tabs_arrange(xitk_widget_t *w) {
     if(private_data->offset != private_data->old_offset) {
       
       for(i = 0; i < private_data->num_entries; i++)
-	xitk_hide_widget(private_data->parent_wlist, private_data->tabs[i]);
+	xitk_hide_widget(private_data->tabs[i]);
       
       i = private_data->offset;
       width = 0;
@@ -107,7 +107,7 @@ static void tabs_arrange(xitk_widget_t *w) {
 	  xitk_set_widget_pos(private_data->tabs[i], x, private_data->y);
 	  width += xitk_get_widget_width(private_data->tabs[i]);
 	  x += xitk_get_widget_width(private_data->tabs[i]);
-	  xitk_show_widget(private_data->parent_wlist, private_data->tabs[i]);
+	  xitk_show_widget(private_data->tabs[i]);
 	}
 	else 
 	  break;
@@ -165,11 +165,11 @@ static void tabs_arrange(xitk_widget_t *w) {
 /*
  *
  */
-static void paint(xitk_widget_t *w, Window win, GC gc) {
+static void paint(xitk_widget_t *w) {
   tabs_private_data_t *private_data;
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (tabs_private_data_t*)w->private_data;
 
@@ -179,6 +179,21 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
 	private_data->old_offset = private_data->offset;
     }
   }
+}
+
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int retval = 0;
+  
+  switch(event->type) {
+  case WIDGET_EVENT_PAINT:
+    paint(w);
+    break;
+  case WIDGET_EVENT_ENABLE:
+    enability(w);
+    break;
+  }
+  
+  return retval;
 }
 
 /*
@@ -191,8 +206,7 @@ static void tabs_select(xitk_widget_t *w, void *data, int select) {
     private_data->old_selected = private_data->selected;
     private_data->selected = (int)((btnlist_t*)data)->sel;
 
-    xitk_labelbutton_set_state(private_data->tabs[private_data->old_selected], 0,
-			       private_data->parent_wlist->win, private_data->parent_wlist->gc);
+    xitk_labelbutton_set_state(private_data->tabs[private_data->old_selected], 0);
 
 
     //    tabs_arrange(private_data->widget);
@@ -200,8 +214,7 @@ static void tabs_select(xitk_widget_t *w, void *data, int select) {
       private_data->callback(private_data->widget, private_data->userdata, private_data->selected);
   }
   else {
-    xitk_labelbutton_set_state(private_data->tabs[private_data->selected], 1,
-			       private_data->parent_wlist->win, private_data->parent_wlist->gc);
+    xitk_labelbutton_set_state(private_data->tabs[private_data->selected], 1);
   }
   
 }
@@ -243,8 +256,8 @@ void xitk_tabs_set_current_selected(xitk_widget_t *w, int select) {
   if(!w)
     XITK_WARNING("%s(): widget is NULL\n", __FUNCTION__);
   
-  if(w && (((w->widget_type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     
     private_data = (tabs_private_data_t*)w->private_data;
     
@@ -268,8 +281,8 @@ int xitk_tabs_get_current_selected(xitk_widget_t *w) {
     return -1;
   }
     
-  if(((w->widget_type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
-     (w->widget_type & WIDGET_GROUP_WIDGET)) {
+  if(((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
+     (w->type & WIDGET_GROUP_WIDGET)) {
 
     private_data = (tabs_private_data_t*)w->private_data;
     return (private_data->selected);
@@ -290,8 +303,8 @@ char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
     return NULL;
   }
 
-  if(((w->widget_type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
-     (w->widget_type & WIDGET_GROUP_WIDGET)) {
+  if(((w->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
+     (w->type & WIDGET_GROUP_WIDGET)) {
 
     private_data = (tabs_private_data_t*)w->private_data;
     return ((xitk_labelbutton_get_label(private_data->tabs[private_data->selected])));
@@ -373,10 +386,10 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 							 private_data->bheight, 
 							 "Black", "Black", "Black",
 							 fontname)));
-      private_data->tabs[i]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
+      private_data->tabs[i]->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
       xx += fwidth + 20;
 
-      xitk_hide_widget(private_data->parent_wlist, private_data->tabs[i]);
+      xitk_hide_widget(private_data->tabs[i]);
       draw_tab(t->imlibdata, (xitk_get_widget_foreground_skin(private_data->tabs[i])));
       
     }
@@ -394,7 +407,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 	       (private_data->left = 
 		xitk_noskin_button_create(t->parent_wlist, &b, (private_data->x + width) - 40, 
 					  (y-1) + (private_data->bheight - 20), 20, 20)));
-      private_data->left->widget_type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
+      private_data->left->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
       
       wimage = xitk_get_widget_foreground_skin(private_data->left);
       if(wimage)
@@ -408,7 +421,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 	       (private_data->right = 
 		xitk_noskin_button_create(t->parent_wlist, &b, (private_data->x + width) - 20,
 					  (y-1) + (private_data->bheight - 20), 20, 20)));
-      private_data->right->widget_type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
+      private_data->right->type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
 
       wimage = xitk_get_widget_foreground_skin(private_data->right);
       if(wimage)
@@ -425,7 +438,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
   mywidget->private_data          = private_data;
 
-  mywidget->widget_list           = wl;
+  mywidget->wl                    = wl;
 
   mywidget->enable                = 1;
   mywidget->running               = 1;
@@ -434,23 +447,12 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   mywidget->have_focus            = FOCUS_LOST; 
   mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
-  mywidget->widget_type           = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_TABS;
-  mywidget->paint                 = paint;
-  mywidget->notify_click          = NULL;
-  mywidget->notify_focus          = NULL;
-  mywidget->notify_keyevent       = NULL;
-  mywidget->notify_inside         = NULL;
-  mywidget->notify_change_skin    = NULL;
-  mywidget->notify_destroy        = NULL;//notify_destroy;
-  mywidget->get_skin              = NULL;
-  mywidget->notify_enable         = enability;
-
+  mywidget->type                  = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_TABS;
+  mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;
 
-  xitk_labelbutton_set_state(private_data->tabs[private_data->selected], 1,
-  			     private_data->parent_wlist->win, private_data->parent_wlist->gc);
-    
+  xitk_labelbutton_set_state(private_data->tabs[private_data->selected], 1);
 
   return mywidget;
 }

@@ -38,7 +38,6 @@
 #define FOREGROUND_SKIN 1
 #define BACKGROUND_SKIN 2
 
-
 typedef struct {
   XColor                      red;
   XColor                      blue;
@@ -48,28 +47,44 @@ typedef struct {
   XColor                      tmp;
 } xitk_color_t;
 
-typedef void (*widget_paint_callback_t)(xitk_widget_t *, Window, GC);
 
-typedef int (*widget_click_callback_t) (xitk_widget_list_t *, struct xitk_widget_s *, int, int, int);
+#define WIDGET_EVENT_PAINT           1
+#define WIDGET_EVENT_CLICK           2
+#define WIDGET_EVENT_FOCUS           3
+#define WIDGET_EVENT_KEY_EVENT       4
+#define WIDGET_EVENT_INSIDE          5
+#define WIDGET_EVENT_CHANGE_SKIN     6
+#define WIDGET_EVENT_ENABLE          7
+#define WIDGET_EVENT_GET_SKIN        8
+#define WIDGET_EVENT_DESTROY         9
 
-typedef int (*widget_focus_callback_t)(xitk_widget_list_t *, xitk_widget_t *, int);
+typedef struct {
+  int                   type; /* See WIDGET_EVENT_x */
+  int                   x;
+  int                   y;
+  
+  int                   button_pressed;
+  
+  int                   focus;
+  
+  XEvent               *xevent;
 
-typedef void (*widget_keyevent_callback_t)(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
+  xitk_skin_config_t   *skonfig;
+  int                   skin_layer;
+} widget_event_t;
 
-typedef int (*widget_inside_callback_t)(xitk_widget_t *, int, int);
+typedef struct {
+  int           value;
+  xitk_image_t *image;
+} widget_event_result_t;
 
-typedef void (*widget_change_skin_callback_t)(xitk_widget_list_t *, xitk_widget_t *, xitk_skin_config_t *);
-
-typedef void (*widget_enable_callback_t)(xitk_widget_t *);
-
-typedef xitk_image_t *(*widget_get_skin_t)(xitk_widget_t *, int);
-
-typedef void (*widget_destroy_t)(xitk_widget_t *, void *);
+/* return 1 if event_result is filled, otherwise 0 */
+typedef int (*widget_event_notify_t)(xitk_widget_t *, widget_event_t *, widget_event_result_t *);
 
 struct xitk_widget_s {
   ImlibData                      *imlibdata;
 
-  xitk_widget_list_t             *widget_list;
+  xitk_widget_list_t             *wl;
 
   int                             x;
   int                             y;
@@ -81,32 +96,14 @@ struct xitk_widget_s {
   int                             running;
   int                             visible;
 
-  widget_paint_callback_t         paint;
-
-  /* notify callback return value : 1 => repaint necessary 0=> do nothing */
-                                       /*   parameter: up (1) or down (0) */
-  widget_click_callback_t         notify_click;
-                                       /*            entered (1) left (0) */
-  widget_focus_callback_t         notify_focus;
-
-  widget_keyevent_callback_t      notify_keyevent;
-
-  widget_inside_callback_t        notify_inside;
-
-  widget_change_skin_callback_t   notify_change_skin;
-
-  widget_destroy_t                notify_destroy;
-
-  widget_get_skin_t               get_skin;
-
-  widget_enable_callback_t        notify_enable;
+  widget_event_notify_t           event;
 
   pthread_t                       tips_thread;
   int                             tips_timeout;
   char                           *tips_string;
 
   void                           *private_data;
-  uint32_t                        widget_type;
+  uint32_t                        type;
 };
 
 struct xitk_widget_list_s {

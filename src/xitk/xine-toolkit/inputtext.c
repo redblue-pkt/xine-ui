@@ -62,10 +62,10 @@ static void _cursor_focus(inputtext_private_data_t *private_data, Window win, in
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w, void *data) {
+static void notify_destroy(xitk_widget_t *w) {
   inputtext_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
   
     XLOCK(private_data->imlibdata->x.disp);
@@ -89,7 +89,7 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
     if(sk == BACKGROUND_SKIN && private_data->skin) {
       return private_data->skin;
@@ -105,7 +105,7 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 static int notify_inside(xitk_widget_t *w, int x, int y) {
   inputtext_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
     if((w->visible == 1)) {
       xitk_image_t *skin = private_data->skin;
@@ -164,8 +164,8 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
 /*
  * Recalculate display offsets.
  */
-static void inputtext_recalc_offsets(xitk_widget_list_t *wl, 
-				     inputtext_private_data_t *private_data) {
+static void inputtext_recalc_offsets(xitk_widget_t *w) {
+  inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   char         *label = private_data->text;
   char         *p = private_data->text;
   xitk_font_t  *fs = NULL;
@@ -183,7 +183,7 @@ static void inputtext_recalc_offsets(xitk_widget_list_t *wl,
     if(fs == NULL)
       XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
 
-    xitk_font_set_font(fs, wl->gc);
+    xitk_font_set_font(fs, w->wl->gc);
 
     private_data->disp_offset = private_data->pos_in_pos = 0;
     
@@ -387,7 +387,7 @@ static void create_labelofinputtext(xitk_widget_t *w,
 /*
  * Paint the input text box.
  */
-static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
+static void paint_inputtext(xitk_widget_t *w) {
   inputtext_private_data_t *private_data;
   int                       button_width, state = 0;
   xitk_image_t             *skin;
@@ -395,25 +395,25 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
   GC                        lgc;
   XWindowAttributes         attr;
 
-  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT))) {
     private_data = (inputtext_private_data_t *) w->private_data;
 
     if(w->visible == 1) {
     
       
       if(w->enable && (!private_data->cursor_focus) 
-	 && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, win, w)))
-	_cursor_focus(private_data, win, 1);
+	 && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, w->wl->win, w)))
+	_cursor_focus(private_data, w->wl->win, 1);
 
       XLOCK(private_data->imlibdata->x.disp);
-      XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
+      XGetWindowAttributes(private_data->imlibdata->x.disp, w->wl->win, &attr);
       XUNLOCK(private_data->imlibdata->x.disp);
 
       skin = private_data->skin;
       
       XLOCK(private_data->imlibdata->x.disp);
-      lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
-      XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+      lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
+      XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
       XUNLOCK(private_data->imlibdata->x.disp);
       
       if (skin->mask) {
@@ -431,22 +431,22 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
       if((w->have_focus == FOCUS_RECEIVED) || (private_data->have_focus == FOCUS_MOUSE_IN)) {
 	state = FOCUS;
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-		   btn->pixmap, gc, button_width, 0,
+		   btn->pixmap, w->wl->gc, button_width, 0,
 		   button_width, skin->height, 0, 0);
       }
       else {
 	state = NORMAL;
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-		   btn->pixmap, gc, 0, 0,
+		   btn->pixmap, w->wl->gc, 0, 0,
 		   button_width, skin->height, 0, 0);
       }
       XUNLOCK(private_data->imlibdata->x.disp);
       
-      create_labelofinputtext(w, win, gc, btn->pixmap, 
+      create_labelofinputtext(w, w->wl->win, w->wl->gc, btn->pixmap, 
 			      button_width, skin->height, private_data->text, state);
       
       XLOCK(private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, win, lgc, 0, 0,
+      XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, w->wl->win, lgc, 0, 0,
 		 button_width, skin->height, w->x, w->y);
       XUNLOCK(private_data->imlibdata->x.disp);
 
@@ -458,7 +458,7 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
     }
     else {
       if(private_data->cursor_focus)
-	_cursor_focus(private_data, win, 0);
+	_cursor_focus(private_data, w->wl->win, 0);
     }
  }
 
@@ -467,20 +467,19 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
 /*
  * Handle click events.
  */
-static int notify_click_inputtext(xitk_widget_list_t *wl, 
-				  xitk_widget_t *w, int bUp, int x, int y) {
+static int notify_click_inputtext(xitk_widget_t *w, int bUp, int x, int y) {
   inputtext_private_data_t *private_data;
   int pos;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
 
     if(w->have_focus == FOCUS_LOST)
       w->have_focus = private_data->have_focus = FOCUS_RECEIVED;
     
     if(w->enable && (!private_data->cursor_focus)
-       && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, wl->win, w)))
-      _cursor_focus(private_data, wl->win, 1);
+       && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, w->wl->win, w)))
+      _cursor_focus(private_data, w->wl->win, 1);
     
     pos = x - w->x;
 
@@ -500,7 +499,7 @@ static int notify_click_inputtext(xitk_widget_list_t *wl,
       if(fs == NULL)
 	XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
       
-      xitk_font_set_font(fs, wl->gc);
+      xitk_font_set_font(fs, w->wl->gc);
       
       while(width < pos) {
 	
@@ -520,7 +519,7 @@ static int notify_click_inputtext(xitk_widget_list_t *wl,
 
     private_data->cursor_pos = (pos < 0) ? 0 : pos;
 
-    paint_inputtext(w, wl->win, wl->gc);
+    paint_inputtext(w);
 
   }
 
@@ -530,19 +529,19 @@ static int notify_click_inputtext(xitk_widget_list_t *wl,
 /*
  * Handle motion on input text box.
  */
-static int notify_focus_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, int focus) {
+static int notify_focus_inputtext(xitk_widget_t *w, int focus) {
   inputtext_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
     
     if((private_data->have_focus = focus) == FOCUS_LOST)
       private_data->cursor_pos = -1;
   
     if((focus == FOCUS_MOUSE_OUT) || (focus == FOCUS_LOST))
-      _cursor_focus(private_data, wl->win, 0);
+      _cursor_focus(private_data, w->wl->win, 0);
     else if(w->enable && (focus == FOCUS_MOUSE_IN))
-      _cursor_focus(private_data, wl->win, 1);
+      _cursor_focus(private_data, w->wl->win, 1);
 
   }
   
@@ -552,11 +551,10 @@ static int notify_focus_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, int 
 /*
  *
  */
-static void notify_change_skin(xitk_widget_list_t *wl, 
-			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   inputtext_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
 
     if(private_data->skin_element_name) {
@@ -594,7 +592,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 /*
  * Erase one char from right of cursor.
  */
-static void inputtext_erase_with_delete(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_erase_with_delete(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   char                      *oldtext, *newtext;
   char                      *p, *pp;
@@ -631,7 +629,7 @@ static void inputtext_erase_with_delete(xitk_widget_list_t *wl, xitk_widget_t *w
       XITK_FREE(private_data->text);
       private_data->text = strdup((newtext != NULL) ? newtext : "");
       
-      paint_inputtext(w, wl->win, wl->gc);
+      paint_inputtext(w);
       
       XITK_FREE(oldtext);
       XITK_FREE(newtext);
@@ -639,14 +637,14 @@ static void inputtext_erase_with_delete(xitk_widget_list_t *wl, xitk_widget_t *w
   }
   else {
     sprintf(private_data->text, "%s", "");
-    paint_inputtext(w, wl->win, wl->gc);
+    paint_inputtext(w);
   }
 }
 
 /*
  * Erase one char from left of cursor.
  */
-static void inputtext_erase_with_backspace(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_erase_with_backspace(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   char                     *oldtext, *newtext;
   char                     *p, *pp;
@@ -683,7 +681,7 @@ static void inputtext_erase_with_backspace(xitk_widget_list_t *wl, xitk_widget_t
       XITK_FREE(private_data->text);
       private_data->text = strdup(newtext);
       
-      paint_inputtext(w, wl->win, wl->gc);
+      paint_inputtext(w);
       
       XITK_FREE(oldtext);
       XITK_FREE(newtext);
@@ -692,14 +690,14 @@ static void inputtext_erase_with_backspace(xitk_widget_list_t *wl, xitk_widget_t
   else {
     sprintf(private_data->text, "%s", "");
     private_data->cursor_pos = 0;
-    paint_inputtext(w, wl->win, wl->gc);
+    paint_inputtext(w);
   }
 }
 
 /*
  * Erase chars from cursor pos to EOL.
  */
-static void inputtext_kill_line(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_kill_line(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   char                      *oldtext, *newtext;
   
@@ -714,7 +712,7 @@ static void inputtext_kill_line(xitk_widget_list_t *wl, xitk_widget_t *w) {
       XITK_FREE(private_data->text);
       private_data->text = strdup(newtext);
       
-      paint_inputtext(w, wl->win, wl->gc);
+      paint_inputtext(w);
       
       XITK_FREE(oldtext);
       XITK_FREE(newtext);
@@ -725,39 +723,39 @@ static void inputtext_kill_line(xitk_widget_list_t *wl, xitk_widget_t *w) {
 /*
  * Move cursor pos to left.
  */
-static void inputtext_move_left(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_move_left(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   
   if(private_data->cursor_pos > 0) {
     private_data->cursor_pos--;
-    paint_inputtext(w, wl->win, wl->gc);
+    paint_inputtext(w);
   }
 }
 
 /*
  * Move cursor pos to right.
  */
-static void inputtext_move_right(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_move_right(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
 
   if(private_data->cursor_pos < strlen(private_data->text)) {
     private_data->cursor_pos++;
-    paint_inputtext(w, wl->win, wl->gc);
+    paint_inputtext(w);
   }
 }
 
 /*
  * Remove focus of widget, then call callback function.
  */
-static void inputtext_exec_return(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_exec_return(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
 
   private_data->cursor_pos   = -1;
   w->have_focus              = 
     private_data->have_focus = FOCUS_LOST;
   //  wl->widget_focused = NULL;
-  _cursor_focus(private_data, wl->win, 0);
-  paint_inputtext(w, wl->win, wl->gc);
+  _cursor_focus(private_data, w->wl->win, 0);
+  paint_inputtext(w);
   
   if(strlen(private_data->text) > 0) {
     if(private_data->callback)
@@ -768,47 +766,47 @@ static void inputtext_exec_return(xitk_widget_list_t *wl, xitk_widget_t *w) {
 /*
  * Remove focus of widget.
  */
-static void inputtext_exec_escape(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_exec_escape(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   
   private_data->cursor_pos = -1;
   w->have_focus = private_data->have_focus = FOCUS_LOST;
-  wl->widget_focused = NULL;
-  _cursor_focus(private_data, wl->win, 0);
-  paint_inputtext(w, wl->win, wl->gc);
+  w->wl->widget_focused = NULL;
+  _cursor_focus(private_data, w->wl->win, 0);
+  paint_inputtext(w);
 }
 
 /*
  *
  */
-static void inputtext_move_bol(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_move_bol(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
 
   if(private_data->text) {
     private_data->cursor_pos = private_data->disp_offset = 0;
-    inputtext_recalc_offsets(wl, private_data);
-    paint_inputtext(w, wl->win, wl->gc);
+    inputtext_recalc_offsets(w);
+    paint_inputtext(w);
   }
 }
 
 /*
  *
  */
-static void inputtext_move_eol(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_move_eol(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
 
   if(private_data->text) {
     private_data->cursor_pos = strlen(private_data->text);
-    inputtext_recalc_offsets(wl, private_data);
+    inputtext_recalc_offsets(w);
     
-    paint_inputtext(w, wl->win, wl->gc);
+    paint_inputtext(w);
   }
 }
 
 /*
  * Transpose two characters.
  */
-static void inputtext_transpose_chars(xitk_widget_list_t *wl, xitk_widget_t *w) {
+static void inputtext_transpose_chars(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   
   if(private_data->text && (strlen(private_data->text) >= 2)) {
@@ -818,7 +816,7 @@ static void inputtext_transpose_chars(xitk_widget_list_t *wl, xitk_widget_t *w) 
       private_data->text[private_data->cursor_pos - 2] = private_data->text[private_data->cursor_pos - 1];
       private_data->text[private_data->cursor_pos - 1] = c;
       
-      paint_inputtext(w, wl->win, wl->gc);
+      paint_inputtext(w);
     }
   }
 }
@@ -826,10 +824,10 @@ static void inputtext_transpose_chars(xitk_widget_list_t *wl, xitk_widget_t *w) 
 /*
  * Handle keyboard event in input text box.
  */
-static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, XEvent *xev) {
+static void notify_keyevent_inputtext(xitk_widget_t *w, XEvent *xev) {
   inputtext_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     XKeyEvent   keyevent = xev->xkey;
     KeySym      key;
     char        buf[256];
@@ -862,7 +860,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_a:
       case XK_A:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_move_bol(wl, w);
+	  inputtext_move_bol(w);
 	}
 	break;
 	
@@ -870,7 +868,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_b:
       case XK_B:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_move_left(wl, w);
+	  inputtext_move_left(w);
 	}
 	break;
 	
@@ -878,7 +876,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_c:
       case XK_C:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_exec_escape(wl, w);
+	  inputtext_exec_escape(w);
 	}
 	break;
 	
@@ -886,7 +884,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_d:
       case XK_D:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_erase_with_delete(wl, w);
+	  inputtext_erase_with_delete(w);
 	}
 	break;
 	
@@ -894,7 +892,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_e:
       case XK_E:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_move_eol(wl, w);
+	  inputtext_move_eol(w);
 	}
 	break;
 
@@ -902,7 +900,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_f:
       case XK_F:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_move_right(wl, w);
+	  inputtext_move_right(w);
 	}
 	break;
 
@@ -910,7 +908,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_k:
       case XK_K:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_kill_line(wl, w);
+	  inputtext_kill_line(w);
 	}
 	break;
 
@@ -918,7 +916,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_m:
       case XK_M:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_exec_return(wl, w);
+	  inputtext_exec_return(w);
 	}
 	break;
 
@@ -926,13 +924,13 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       case XK_t:
       case XK_T:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_transpose_chars(wl, w);
+	  inputtext_transpose_chars(w);
 	}
 	break;
 
       case XK_question:
 	if(modifier & MODIFIER_CTRL) {
-	  inputtext_erase_with_backspace(wl, w);
+	  inputtext_erase_with_backspace(w);
 	}
 	break;
 	
@@ -948,28 +946,28 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       return;
     }
     else if(key == XK_Delete) {
-      inputtext_erase_with_delete(wl, w);
+      inputtext_erase_with_delete(w);
     }
     else if(key == XK_BackSpace) {
-      inputtext_erase_with_backspace(wl, w);
+      inputtext_erase_with_backspace(w);
     }
     else if(key == XK_Left) {
-      inputtext_move_left(wl, w);
+      inputtext_move_left(w);
     }
     else if(key == XK_Right) {
-      inputtext_move_right(wl, w);
+      inputtext_move_right(w);
     }
     else if(key == XK_Home) {
-      inputtext_move_bol(wl, w);
+      inputtext_move_bol(w);
     }
     else if(key == XK_End) {
-      inputtext_move_eol(wl, w);
+      inputtext_move_eol(w);
     }
     else if((key == XK_Return) || (key == XK_KP_Enter)) {
-      inputtext_exec_return(wl, w);
+      inputtext_exec_return(w);
     }
     else if((key == XK_Escape) || (key == XK_Tab)) {
-      inputtext_exec_escape(wl, w);
+      inputtext_exec_escape(w);
     }
     else if((buf[0] != 0) && (buf[1] == 0)) {
     __store_as_is:
@@ -994,7 +992,7 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
 	  sprintf(&private_data->text[pos], "%c%s%c", buf[0], &oldtext[pos], 0);
 	  
 	  private_data->cursor_pos++;
-	  paint_inputtext(w, wl->win, wl->gc);
+	  paint_inputtext(w);
 	  XITK_FREE(oldtext);
 	}
       }
@@ -1008,13 +1006,52 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
 
 }
 
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int retval = 0;
+
+  switch(event->type) {
+  case WIDGET_EVENT_PAINT:
+    paint_inputtext(w);
+    break;
+  case WIDGET_EVENT_CLICK:
+    notify_click_inputtext(w, event->button_pressed, event->x, event->y);
+    result->value = 1;
+    retval = 1;
+    break;
+  case WIDGET_EVENT_FOCUS:
+    notify_focus_inputtext(w, event->focus);
+    break;
+  case WIDGET_EVENT_KEY_EVENT:
+    notify_keyevent_inputtext(w, event->xevent);
+    break;
+  case WIDGET_EVENT_INSIDE:
+    result->value = notify_inside(w, event->x, event->y);
+    retval = 1;
+    break;
+  case WIDGET_EVENT_CHANGE_SKIN:
+    notify_change_skin(w, event->skonfig);
+    break;
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
+    break;
+  case WIDGET_EVENT_GET_SKIN:
+    if(result) {
+      result->image = get_skin(w, event->skin_layer);
+      retval = 1;
+    }
+    break;
+  }
+  
+  return retval;
+}
+
 /*
  * Return the text of widget.
  */
 char *xitk_inputtext_get_text(xitk_widget_t *w) {
   inputtext_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
     return private_data->text;
   }
@@ -1025,16 +1062,16 @@ char *xitk_inputtext_get_text(xitk_widget_t *w) {
 /*
  * Change and redisplay the text of widget.
  */
-void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *w, char *text) {
+void xitk_inputtext_change_text(xitk_widget_t *w, char *text) {
   inputtext_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
     XITK_FREE(private_data->text);
     private_data->text = strdup((text != NULL) ? text : "");
     private_data->disp_offset = 0;
     private_data->cursor_pos = -1;
-    paint_inputtext(w, wl->win, wl->gc);
+    paint_inputtext(w);
   }
 
 }
@@ -1094,7 +1131,7 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
 
   mywidget->private_data          = private_data;
 
-  mywidget->widget_list           = wl;
+  mywidget->wl                    = wl;
 
   mywidget->enable                = enable;
   mywidget->running               = 1;
@@ -1105,18 +1142,8 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width/2;
   mywidget->height                = private_data->skin->height;
-  mywidget->widget_type           = WIDGET_TYPE_INPUTTEXT;
-
-  mywidget->paint                 = paint_inputtext;
-  mywidget->notify_click          = notify_click_inputtext;
-  mywidget->notify_focus          = notify_focus_inputtext;
-  mywidget->notify_keyevent       = notify_keyevent_inputtext;
-  mywidget->notify_inside         = notify_inside;
-  mywidget->notify_change_skin    = (skin_element_name == NULL) ? NULL : notify_change_skin;
-  mywidget->notify_destroy        = notify_destroy;
-  mywidget->get_skin              = get_skin;
-  mywidget->notify_enable         = NULL;
-
+  mywidget->type                  = WIDGET_TYPE_INPUTTEXT | WIDGET_FOCUSABLE | WIDGET_CLICKABLE;
+  mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;
 

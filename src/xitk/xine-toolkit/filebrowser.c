@@ -88,8 +88,8 @@ typedef struct {
 Window xitk_filebrowser_get_window_id(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
     return private_data->window;
@@ -104,8 +104,8 @@ Window xitk_filebrowser_get_window_id(xitk_widget_t *w) {
 int xitk_filebrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
   filebrowser_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
     return((xitk_get_window_info(private_data->widget_key, inf))); 
@@ -120,8 +120,8 @@ int xitk_filebrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
 int xitk_filebrowser_is_running(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
  
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
     return (private_data->running);
@@ -136,8 +136,8 @@ int xitk_filebrowser_is_running(xitk_widget_t *w) {
 int xitk_filebrowser_is_visible(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
     return (private_data->visible);
@@ -152,8 +152,8 @@ int xitk_filebrowser_is_visible(xitk_widget_t *w) {
 void xitk_filebrowser_hide(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
 
@@ -173,8 +173,8 @@ void xitk_filebrowser_hide(xitk_widget_t *w) {
 void xitk_filebrowser_show(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
 
@@ -192,8 +192,8 @@ void xitk_filebrowser_show(xitk_widget_t *w) {
 void xitk_filebrowser_set_transient(xitk_widget_t *w, Window window) {
   filebrowser_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET)) && (window != None)) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET)) && (window != None)) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
 
@@ -213,8 +213,8 @@ void xitk_filebrowser_set_transient(xitk_widget_t *w, Window window) {
 void xitk_filebrowser_destroy(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
 
@@ -262,8 +262,8 @@ void xitk_filebrowser_destroy(xitk_widget_t *w) {
 char *xitk_filebrowser_get_current_dir(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
 
     private_data = (filebrowser_private_data_t *)w->private_data;
 
@@ -278,8 +278,7 @@ char *xitk_filebrowser_get_current_dir(xitk_widget_t *w) {
  */
 static void update_current_dir(filebrowser_private_data_t *private_data) {
 
-  xitk_label_change_label (private_data->widget_list, 
-			   private_data->widget_current_dir, 
+  xitk_label_change_label (private_data->widget_current_dir, 
 			   private_data->current_dir);
   
 }
@@ -932,12 +931,24 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w, void *data) {
+static void notify_destroy(xitk_widget_t *w) {
   
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) && 
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) && 
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     xitk_filebrowser_destroy(w);
   }
+}
+
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int retval = 0;
+
+  switch(event->type) {
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
+    break;
+  }
+  
+  return retval;
 }
 
 /*
@@ -948,8 +959,8 @@ void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig
   ImlibImage                 *new_img, *old_img;
   XSizeHints                  hint;
 
-  if(w && ((w->widget_type & WIDGET_GROUP_FILEBROWSER) &&
-	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+  if(w && ((w->type & WIDGET_GROUP_FILEBROWSER) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
     private_data = (filebrowser_private_data_t *)w->private_data;
     
     xitk_skin_lock(skonfig);
@@ -1162,7 +1173,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   lb.skin_element_name = fb->homedir.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
 		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = fb->select.caption;
@@ -1172,7 +1183,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   lb.skin_element_name = fb->select.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
 		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   lb.button_type    = CLICK_BUTTON;
   lb.label          = fb->dismiss.caption;
@@ -1182,7 +1193,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   lb.skin_element_name = fb->dismiss.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
 		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   private_data->add_callback      = fb->select.callback;
   private_data->kill_callback     = fb->kill.callback;
@@ -1193,7 +1204,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   xitk_list_append_content(private_data->widget_list->l,
 			  (private_data->fb_list = 
 			   xitk_browser_create(private_data->widget_list, skonfig, &fb->browser)));
-  private_data->fb_list->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  private_data->fb_list->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   b.skin_element_name = fb->sort_default.skin_element_name;
   b.callback          = filebrowser_sortfiles;
@@ -1203,7 +1214,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   private_data->sort_default.w    = mywidget;
   xitk_list_append_content (private_data->widget_list->l, 
 			    (w = xitk_button_create (private_data->widget_list, skonfig, &b)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   b.skin_element_name = fb->sort_reverse.skin_element_name;
   b.callback          = filebrowser_sortfiles;
@@ -1213,7 +1224,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   private_data->sort_reverse.w    = mywidget;
   xitk_list_append_content (private_data->widget_list->l, 
 			    (w = xitk_button_create (private_data->widget_list, skonfig, &b)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   lbl.label             = fb->current_dir.cur_directory;
   lbl.skin_element_name = fb->current_dir.skin_element_name;
@@ -1223,7 +1234,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   xitk_list_append_content (private_data->widget_list->l,
 			   (private_data->widget_current_dir = 
 			    xitk_label_create (private_data->widget_list, skonfig, &lbl)));
-  private_data->widget_current_dir->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  private_data->widget_current_dir->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   
 
@@ -1239,7 +1250,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   
   private_data->visible        = 1;
 
-  mywidget->widget_list        = NULL;
+  mywidget->wl                 = NULL;
 
   mywidget->enable             = 1;
   mywidget->running            = 1;
@@ -1250,16 +1261,8 @@ xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
   mywidget->y                  = fb->y;
   mywidget->width              = private_data->bg_image->width;
   mywidget->height             = private_data->bg_image->height;
-  mywidget->widget_type        = WIDGET_GROUP | WIDGET_GROUP_WIDGET |WIDGET_GROUP_FILEBROWSER;
-  mywidget->paint              = NULL;
-  mywidget->notify_click       = NULL;
-  mywidget->notify_focus       = NULL;
-  mywidget->notify_keyevent    = NULL;
-  mywidget->notify_inside      = NULL;
-  mywidget->notify_change_skin = NULL;
-  mywidget->notify_destroy     = notify_destroy;
-  mywidget->get_skin           = NULL;
-
+  mywidget->type               = WIDGET_GROUP | WIDGET_GROUP_WIDGET |WIDGET_GROUP_FILEBROWSER;
+  mywidget->event              = notify_event;
   mywidget->tips_timeout       = 0;
   mywidget->tips_string        = NULL;
 
@@ -1463,7 +1466,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   lb.skin_element_name = fb->homedir.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
 		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = fb->select.caption;
@@ -1473,7 +1476,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   lb.skin_element_name = fb->select.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
 		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   lb.button_type    = CLICK_BUTTON;
   lb.label          = fb->dismiss.caption;
@@ -1483,7 +1486,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   lb.skin_element_name = fb->dismiss.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
 		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   private_data->add_callback      = fb->select.callback;
   private_data->kill_callback     = fb->kill.callback;
@@ -1494,7 +1497,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   xitk_list_append_content(private_data->widget_list->l,
 			  (private_data->fb_list = 
 			   xitk_browser_create(private_data->widget_list, skonfig, &fb->browser)));
-  private_data->fb_list->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  private_data->fb_list->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   b.skin_element_name = fb->sort_default.skin_element_name;
   b.callback          = filebrowser_sortfiles;
@@ -1504,7 +1507,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   private_data->sort_default.w    = mywidget;
   xitk_list_append_content (private_data->widget_list->l, 
 			    (w = xitk_button_create (private_data->widget_list, skonfig, &b)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   b.skin_element_name = fb->sort_reverse.skin_element_name;
   b.callback          = filebrowser_sortfiles;
@@ -1514,7 +1517,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   private_data->sort_reverse.w    = mywidget;
   xitk_list_append_content (private_data->widget_list->l, 
 			    (w = xitk_button_create (private_data->widget_list, skonfig, &b)));
-  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  w->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   lbl.label             = fb->current_dir.cur_directory;
   lbl.skin_element_name = fb->current_dir.skin_element_name;
@@ -1524,7 +1527,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   xitk_list_append_content (private_data->widget_list->l,
 			   (private_data->widget_current_dir = 
 			    xitk_label_create (private_data->widget_list, skonfig, &lbl)));
-  private_data->widget_current_dir->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
+  private_data->widget_current_dir->type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   
 
@@ -1551,17 +1554,8 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   mywidget->y                  = fb->y;
   mywidget->width              = private_data->bg_image->width;
   mywidget->height             = private_data->bg_image->height;
-  mywidget->widget_type        = WIDGET_GROUP | WIDGET_GROUP_WIDGET |WIDGET_GROUP_FILEBROWSER;
-  mywidget->paint              = NULL;
-  mywidget->notify_click       = NULL;
-  mywidget->notify_focus       = NULL;
-  mywidget->notify_keyevent    = NULL;
-  mywidget->notify_inside      = NULL;
-  mywidget->notify_change_skin = NULL;
-  mywidget->notify_destroy     = notify_destroy;
-  mywidget->get_skin           = NULL;
-  mywidget->notify_enable      = NULL;
-
+  mywidget->type               = WIDGET_GROUP | WIDGET_GROUP_WIDGET |WIDGET_GROUP_FILEBROWSER;
+  mywidget->event              = notify_event;
   mywidget->tips_timeout       = 0;
   mywidget->tips_string        = NULL;
 
@@ -1587,4 +1581,3 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
 #endif
   return mywidget;
 }
-

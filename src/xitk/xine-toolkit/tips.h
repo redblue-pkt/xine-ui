@@ -26,7 +26,7 @@
 
 #define TIPS_TIMEOUT 500
 
-void xitk_tips_create(xitk_widget_t *w, xitk_widget_list_t *wl);
+void xitk_tips_create(xitk_widget_t *w);
 void xitk_tips_tips_kill(xitk_widget_t *w);
 void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout);
 void xitk_tips_set_tips(xitk_widget_t *w, char *str);

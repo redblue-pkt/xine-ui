@@ -31,10 +31,10 @@
 /*
  *
  */
-static void notify_destroy(xitk_widget_t *w, void *data) {
+static void notify_destroy(xitk_widget_t *w) {
   button_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
     private_data = (button_private_data_t *) w->private_data;
     
     XITK_FREE(private_data->skin_element_name);
@@ -49,7 +49,7 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
   button_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
     private_data = (button_private_data_t *) w->private_data;
     
     if(sk == FOREGROUND_SKIN && private_data->skin) {
@@ -66,7 +66,7 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 static int notify_inside(xitk_widget_t *w, int x, int y) {
   button_private_data_t *private_data;
 
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
     private_data = (button_private_data_t *) w->private_data;
 
     if((w->visible == 1)) {
@@ -85,21 +85,21 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
 /**
  *
  */
-static void paint_button (xitk_widget_t *w, Window win, GC gc) {
+static void paint_button (xitk_widget_t *w) {
   button_private_data_t *private_data;
   GC                     lgc;
   int                    button_width;
   xitk_image_t          *skin;
 
-  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) && (w->visible == 1))) {
+  if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) && (w->visible == 1))) {
 
     private_data = (button_private_data_t *) w->private_data;
     skin         = private_data->skin;
     button_width = skin->width / 3;
 
     XLOCK (private_data->imlibdata->x.disp);
-    lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+    lgc = XCreateGC(private_data->imlibdata->x.disp, w->wl->win, None, None);
+    XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, lgc);
     XUNLOCK (private_data->imlibdata->x.disp);
 
     if (skin->mask) {
@@ -113,18 +113,18 @@ static void paint_button (xitk_widget_t *w, Window win, GC gc) {
     if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
       if(private_data->bClicked) {
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
-		   win, lgc, 2*button_width, 0,
+		   w->wl->win, lgc, 2*button_width, 0,
 		   button_width, skin->height, w->x, w->y);
       } 
       else {
 	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
-		   win, lgc, button_width, 0,
+		   w->wl->win, lgc, button_width, 0,
 		   button_width, skin->height, w->x, w->y);
       }
     } 
     else {
       XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
-		 win, lgc, 0, 0,
+		 w->wl->win, lgc, 0, 0,
 		 button_width, skin->height, w->x, w->y);
     }
     XUNLOCK (private_data->imlibdata->x.disp);
@@ -139,11 +139,10 @@ static void paint_button (xitk_widget_t *w, Window win, GC gc) {
 /*
  *
  */
-static void notify_change_skin(xitk_widget_list_t *wl, 
-			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   button_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
     private_data = (button_private_data_t *) w->private_data;
     
     if(private_data->skin_element_name) {
@@ -168,15 +167,14 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 /*
  *
  */
-static int notify_click_button (xitk_widget_list_t *wl, 
-				xitk_widget_t *w, int bUp, int x, int y) {
+static int notify_click_button (xitk_widget_t *w, int bUp, int x, int y) {
   button_private_data_t *private_data;
     
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
     private_data = (button_private_data_t *) w->private_data;
     private_data->bClicked = !bUp;
     
-    paint_button(w, wl->win, wl->gc);
+    paint_button(w);
     
     if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
       if(private_data->callback) {
@@ -193,15 +191,51 @@ static int notify_click_button (xitk_widget_list_t *wl,
 /*
  *
  */
-static int notify_focus_button (xitk_widget_list_t *wl, xitk_widget_t *w, int focus) {
+static int notify_focus_button (xitk_widget_t *w, int focus) {
   button_private_data_t *private_data;
   
-  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
     private_data = (button_private_data_t *) w->private_data;
     private_data->focus = focus;
   } 
   
   return 1;
+}
+
+static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
+  int retval = 0;
+
+  switch(event->type) {
+  case WIDGET_EVENT_PAINT:
+    paint_button(w);
+    break;
+  case WIDGET_EVENT_CLICK:
+    notify_click_button(w, event->button_pressed, event->x, event->y);
+    result->value = 1;
+    retval = 1;
+    break;
+  case WIDGET_EVENT_FOCUS:
+    notify_focus_button(w, event->focus);
+    break;
+  case WIDGET_EVENT_INSIDE:
+    result->value = notify_inside(w, event->x, event->y);
+    retval = 1;
+    break;
+  case WIDGET_EVENT_CHANGE_SKIN:
+    notify_change_skin(w, event->skonfig);
+    break;
+  case WIDGET_EVENT_DESTROY:
+    notify_destroy(w);
+    break;
+  case WIDGET_EVENT_GET_SKIN:
+    if(result) {
+      result->image = get_skin(w, event->skin_layer);
+      retval = 1;
+    }
+    break;
+  }
+  
+  return retval;
 }
 
 /*
@@ -233,7 +267,7 @@ static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
   
   mywidget->private_data          = private_data;
 
-  mywidget->widget_list           = wl;
+  mywidget->wl                    = wl;
 
   mywidget->enable                = enable;
   mywidget->running               = 1;
@@ -244,17 +278,8 @@ static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width/3;
   mywidget->height                = private_data->skin->height;
-  mywidget->widget_type           = WIDGET_TYPE_BUTTON;
-  mywidget->paint                 = paint_button;
-  mywidget->notify_click          = notify_click_button;
-  mywidget->notify_focus          = notify_focus_button;
-  mywidget->notify_keyevent       = NULL;
-  mywidget->notify_inside         = notify_inside;
-  mywidget->notify_change_skin    = (skin_element_name == NULL) ? NULL : notify_change_skin;
-  mywidget->notify_destroy        = notify_destroy;
-  mywidget->get_skin              = get_skin;
-  mywidget->notify_enable         = NULL;
-
+  mywidget->type                  = WIDGET_TYPE_BUTTON | WIDGET_CLICKABLE | WIDGET_FOCUSABLE;
+  mywidget->event                 = notify_event;
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;
 
