@@ -92,7 +92,7 @@
   will fall back to the Xv video out plugin as default)
 
 
-* MY IMAGE IS JERKING - WHAT'S THE MATTER?!
+* THE VIDEO IS JERKING - WHAT'S THE MATTER?!
 
   Playing back video material that is mastered for e.g. NTSC  can  cause
   this jerking if your monitor is not running at a refresh rate  that is
@@ -195,13 +195,8 @@
   
 * KNOWN BUGs
 
-  + stopping playback doesn't turn off the syncfb overlay
-    
-    Currently there is no way to check if playback has stopped from  the
-    plugin's point of view - at least none I'm aware of yet.  Working on
-    it... (yeah that's what everyone says *grin*)
-
-  + those you may report will be known soon too. :-)
+  + toggling hardware deinterlacing will reset video out window  to  the
+    original video size. (bug or feature?)
 
 
 * WHAT IS ON THE TODO LIST?
@@ -212,7 +207,7 @@
     the video memory left (video memory - X reserved video memory)
     
   + zooming support (currently only implemented with the Xv video out)
-    [status: implemented, being tested - *may* soon appear on CVS]
+    [status: was implemented, needs updating now - appears soon on CVS]
     
   + patching the syncfb kernel module itself for devfs and the  recently
     introduced license tag support (as well as bug fixing and updating)

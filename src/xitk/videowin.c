@@ -164,6 +164,8 @@ void video_window_hide_logo(void) {
      * Remove the logo by clearing the window.
      */
     XClearWindow (gGui->display, gGui->video_window);
+     
+    gGui->vo_driver->gui_data_exchange(gGui->vo_driver, GUI_DATA_EX_LOGO_VISIBILITY, (int *)0);
 #endif
     XUnlockDisplay (gGui->display);
   }
@@ -178,8 +180,10 @@ void video_window_hide_logo(void) {
  * Show the logo in video output window.
  */
 void video_window_show_logo(void) {
-
+   
   if(video_window_is_visible()) {
+    gGui->vo_driver->gui_data_exchange (gGui->vo_driver, GUI_DATA_EX_LOGO_VISIBILITY, (int *)1);
+     
     XLockDisplay (gGui->display);
     XClearWindow (gGui->display, gGui->video_window); 
     video_window_draw_logo();
@@ -575,7 +579,7 @@ void video_window_set_visibility(int show_window) {
   
   gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 				      GUI_DATA_EX_VIDEOWIN_VISIBLE, 
-				      show_window);
+				      (int *)show_window);
   
   gVw->show = show_window;
 
