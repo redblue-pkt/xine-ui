@@ -291,7 +291,7 @@ static void print_usage (void) {
   printf ("\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
   printf("  -P, --post-plugin <name>     Plugin <name> for video less stream animation:\n");
-  printf("                                 (default is goom).\n");
+  printf("                                 (default is the first).\n");
   printf("                               ");
   post_ids = xine_list_post_plugins_typed(xine, XINE_POST_TYPE_AUDIO_VISUALIZATION);
   post_id  = (char *)*post_ids++;
