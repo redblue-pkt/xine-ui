@@ -581,7 +581,7 @@ void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier) {
 
     private_data = (browser_private_data_t *) w->private_data;
     
-    if((modifier == MODIFIER_NOMOD) || (modifier & MODIFIER_SHIFT)) {
+    if(((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) || (modifier & MODIFIER_SHIFT)) {
       int jumped;
       int start, end, mark;
       int focus;

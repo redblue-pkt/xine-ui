@@ -573,7 +573,8 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 	  /* move sliders */
 	  else if(((mykey == XK_Left) || (mykey == XK_Right) 
-		   || (mykey == XK_Up) || (mykey == XK_Down)) && (modifier == MODIFIER_NOMOD)) {
+		   || (mykey == XK_Up) || (mykey == XK_Down)) 
+		  && ((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD)) {
 	    
 	    if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
 	      xitk_widget_t *b = xitk_browser_get_browser(fx->widget_list, w);
