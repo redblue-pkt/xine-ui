@@ -849,7 +849,7 @@ void video_window_frame_output_cb (void *data,
 				   int *dest_width, int *dest_height,
 				   double *dest_pixel_aspect,
 				   int *win_x, int *win_y) {
-  
+
   /* correct size with video_pixel_aspect */
   if (video_pixel_aspect >= gGui->pixel_aspect)
     video_width  = video_width * video_pixel_aspect / gGui->pixel_aspect + .5;
@@ -1486,13 +1486,21 @@ static void video_window_handle_event (XEvent *event, void *data) {
   case ConfigureNotify:
     if(event->xany.window == gGui->video_window) {
       XConfigureEvent *cev = (XConfigureEvent *) event;
+      Window tmp_win;
 
       gVw->output_width  = cev->width;
       gVw->output_height = cev->height;
 
-      gVw->xwin = cev->x;
-      gVw->ywin = cev->y;
-
+      if ((cev->x == 0) && (cev->y == 0)) {
+        XLockDisplay(cev->display);
+        XTranslateCoordinates(cev->display, cev->window, DefaultRootWindow(cev->display),
+                              0, 0, &gVw->xwin, &gVw->ywin, &tmp_win);
+        XUnlockDisplay(cev->display);
+      }
+      else {
+        gVw->xwin = cev->x;
+        gVw->ywin = cev->y;
+      }
     }
     break;
     
