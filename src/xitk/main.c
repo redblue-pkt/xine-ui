@@ -51,6 +51,9 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xresource.h>
+#ifdef HAVE_XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif
 
 #include <locale.h>
 
@@ -727,6 +730,7 @@ static void show_usage (void) {
   xine_exit(xine);
 }
 
+
 /*
  * Try to load video output plugin, by stored name or probing
  */
@@ -735,6 +739,9 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
   double                  res_h, res_v;
   x11_visual_t            vis;
   int                     driver_num;
+#ifdef HAVE_XINERAMA
+  int                     dummy_event, dummy_error;
+#endif
 
   vis.display           = gGui->video_display;
   vis.screen            = gGui->video_screen;
@@ -747,6 +754,16 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
   XUnlockDisplay(gGui->video_display);
   gGui->pixel_aspect    = res_v / res_h;
   
+#ifdef HAVE_XINERAMA
+  if (XineramaQueryExtension(gGui->video_display, &dummy_event, &dummy_error)) {
+    int count = 1;
+    XineramaQueryScreens(gGui->video_display, &count);
+    if (count > 1)
+      /* multihead -> assuming square pixels */
+      gGui->pixel_aspect = 1.0;
+  }
+#endif
+
 #ifdef DEBUG
   printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif

@@ -465,7 +465,10 @@ static void video_window_adapt_size (void) {
     /* just switching to a different modeline if necessary */
     if(!(search >= gVw->XF86_modelines_count)) {
        if(XF86VidModeSwitchToMode(gGui->video_display, XDefaultScreen(gGui->video_display), gVw->XF86_modelines[search])) {
-          double res_h, res_v;
+	  double res_h, res_v;
+#ifdef HAVE_XINERAMA
+	  int dummy_event, dummy_error;
+#endif
 	  
 	  gGui->XF86VidMode_fullscreen = 1;	  
 	  gVw->fullscreen_width        = gVw->XF86_modelines[search]->hdisplay;
@@ -478,6 +481,15 @@ static void video_window_adapt_size (void) {
 		   / DisplayHeightMM (gGui->video_display, gGui->video_screen));
   
 	  gGui->pixel_aspect    = res_v / res_h;
+#ifdef HAVE_XINERAMA
+	  if (XineramaQueryExtension(gGui->video_display, &dummy_event, &dummy_error)) {
+	    int count = 1;
+	    XineramaQueryScreens(gGui->video_display, &count);
+	    if (count > 1)
+	      /* multihead -> assuming square pixels */
+	      gGui->pixel_aspect = 1.0;
+	  }
+#endif
 #ifdef DEBUG
 	  printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif
@@ -831,6 +843,9 @@ static void video_window_adapt_size (void) {
 	 */
 	if(gVw->XF86_modelines_count > 1) {
 	   double res_h, res_v;
+#ifdef HAVE_XINERAMA
+	   int dummy_event, dummy_error;
+#endif
 	   
 	   XF86VidModeSwitchToMode(gGui->video_display, XDefaultScreen(gGui->video_display), gVw->XF86_modelines[0]);
 	   XF86VidModeSetViewPort(gGui->video_display, XDefaultScreen(gGui->video_display), 0, 0);
@@ -847,6 +862,15 @@ static void video_window_adapt_size (void) {
 		    / DisplayHeightMM (gGui->video_display, gGui->video_screen));
   
 	   gGui->pixel_aspect    = res_v / res_h;
+#ifdef HAVE_XINERAMA
+	   if (XineramaQueryExtension(gGui->video_display, &dummy_event, &dummy_error)) {
+	     int count = 1;
+	     XineramaQueryScreens(gGui->video_display, &count);
+	     if (count > 1)
+	       /* multihead -> assuming square pixels */
+	       gGui->pixel_aspect = 1.0;
+	   }
+#endif
 #ifdef DEBUG
 	   printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif

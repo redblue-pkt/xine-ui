@@ -1,6 +1,8 @@
   * use UTF-8 for Japanese locale if nl_langinfo doesn't work [bug #1096974]
   * expand tabs in post-plugin help
   * merge some osd menus from oxine
+  * aspect ratio fixed for multihead setups (especially TwinView)
+    [bugs #1089328, #1001702 and #989157]
   
 xine-ui (0.99.3) unstable; urgency=low
   * enlarge stream info window (required for Russian translation),
@@ -44,6 +46,7 @@ xine-ui (0.99.2) unstable; urgency=low
   * add --disable-shm-default configure option which sets feature.shm to zero
     but keeps the shm code compiled in
   * optional interaction keys with VDR
+  * command line options -A and -V are not sticky any more
 
 xine-ui (0.99.1) unstable; urgency=low
 
