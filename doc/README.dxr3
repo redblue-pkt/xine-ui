@@ -82,12 +82,11 @@ Xine has an experimental video out driver for displaying non-mpeg
 streams using a dxr3 card called dxr3enc. Non-mpeg video may be AVI,
 quicktime, windows media files or whatever else xine can decode. 
 
-Because this driver is still in development (although it works
-quite well at the moment) it is not yet integrated in the build
-system. You need to manually edit the Makefile.am in xine-lib/src/dxr3
-and (re)compile. The driver itself is in video_out_dxr3enc.c in
-the same directory. Please read the source comments at the top
-of this file for more developer related information.
+This driver requires libfame from fame.sourceforge.net to build, and
+will compile and install automatically if it finds it.
+The driver itself is in video_out_dxr3enc.c in the dxr3 directory. 
+Please read the source comments at the top of this file for more 
+developer related information.
 
 In order to use this driver for output instead of, say, Xv, start
 xine with the command line option "-V dxr3enc", for example
