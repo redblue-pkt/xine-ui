@@ -1155,7 +1155,8 @@ int main(int argc, char *argv[]) {
   gui_init(_argc - optind, &_argv[optind], &window_attribute);
   
   /* Automatically start playback if new_mode is enabled and playlist is filled */
-  if(gGui->newbie_mode && gGui->playlist.num &&
+  if(gGui->newbie_mode && 
+     (gGui->playlist.num || actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) &&
      (!(actions_on_start(gGui->actions_on_start, ACTID_PLAY))))
     gGui->actions_on_start[aos++] = ACTID_PLAY;
   
