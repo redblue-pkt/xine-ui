@@ -365,8 +365,7 @@ After the optional device name or file name, you can name the kind of
 unit which preceded by a colon. An MRL which ends in a colon is like
 not adding it at all: the default entry type and number is used. Items
 come in 4 flavors: \fB"Track"\fP, \fB"Entry"\fP, \fB"Playback"\fP and 
-\fB"Segment"\fP. See the preceding section for an explaination of these 
-terms. These units are indicated with the capital first letter of each 
+\fB"Segment"\fP. These units are indicated with the capital first letter of each 
 type: \fBT\fP, \fBE\fP, \fBP\fP, \fBS\fP, \fBs\fP. An uppercase \fBS\fP 
 in the MRL display indicates a NTS segment while a lowercase \fBS\fP 
 indicates a PAL segment. However when you 
