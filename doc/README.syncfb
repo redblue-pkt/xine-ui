@@ -4,7 +4,14 @@
   =====                                                            =====
 
 
-  PLEASE NOTE: currently the plugin is *not* 100% functional.
+  PLEASE NOTE: The plugin has just been rewritten from scratch.   So you
+               might experience some problems.  We  are  sorry  for  any
+	       inconvenience caused.
+	       
+	       Please help getting the plugin rock  solid  by  reporting
+	       any bugs that are specific to it. We will try to fix them
+	       as soon as possible (hey! who says that?! *grin*). Thanks
+	       in advance for your support.
   
 
 * WHAT IS THIS PLUGIN ABOUT and WHY SHOULD I EVEN CONSIDER TO USE IT? :)
@@ -33,9 +40,9 @@
 
 * AND HOW DOES IT WORK?
   
-  The Teletux driver is a module you will  have  to  load  that  makes a
-  special device (/dev/syncfb) available  which is opened by  the plugin
-  and controlled with certain ioctl calls. Quite easy, isn't it? ;)
+  The Teletux driver is a kernel module you will have to load that makes
+  a special device (e.g. /dev/syncfb) available which  is  opened by the
+  plugin and controlled with certain ioctl calls. Easy, isn't it? ;-)
 
   That module is based on the mga_vid driver from Aaron Holzmann and was
   advanced (and reworked) by Matthias Oelmann.
@@ -44,10 +51,11 @@
 * OK I HEARD ENOUGH - HOW DO I INSTALL and USE IT? :)
 
   First of all you will need to get the Teletux driver itself.      It's
-  available at http://teletux.sourceforge.net.   Once you downloaded it,
-  unpack it to some directory of your choice, please read the README and
-  compile it (a normal "make" should work out-of-the-box). Now there are
-  only a few things left for you to do...
+  available at http://teletux.sourceforge.net.  (please note, that we do
+  recommend a recent CVS checkout) Once you downloaded it, unpack  it to
+  a directory of your choice, please read the README and  compile  it (a
+  normal "make" should work out-of-the-box). Now there are  only  a  few
+  things left for you to do...
   
   1) Become root. Hey now you can take over the world *evil laugh* :-)))
   2) Create a device called /dev/syncfb  ===>  mknod /dev/syncfb c 178 0
@@ -58,7 +66,8 @@
   load it with the command "insmod syncfb.o" - please note that you will
   have to load it every time you reboot if you wanna use the driver.
 
-  XINE autodetects the driver and automaticly uses this plugin.
+  Now just start XINE once with the following parameter: "-V SyncFB" and
+  the SyncFB video out plugin will be used as default plugin.
 
   It  is  possible now  that the image during video playback is jerking.
   This could be caused by the syncronisiation of the  video  image  with
@@ -102,7 +111,9 @@
     none yet - will be added soon
 
   So before you run XINE please turn to the appropriate refresh rate and
-  the jerking should be gone.
+  the jerking should be gone.   (you may also want to have a look at the
+  XF86VidMode support included in XINE which makes on-the-fly resolution
+  switching possible when fullscreen is toggled)
 
 
 * WHAT SCREENSIZE SHOULD I PREFER?
@@ -113,39 +124,52 @@
   because that  gives  you  a  virtual  screensize  of  1280x1024  in  a
   resolution of 1024x768 - and the plugin cannot handle that yet.
 
+  You may want to have a look at the XF86VidMode support in  XINE  which
+  will enable on-the-fly resolution switching when activating fullscreen.
+
   Now back to the question. A screensize of 1024x768 should be it. A DVD
   is always 720x576 for pal and 720x480 for ntsc. If you've an anamorphe
   DVD the image only has to be horizontally scaled to get  back  to  the
   original geometry of 16:9 which is easier to be done.
 
 
-* WHERE IS THE WINDOW A VIDEO IS USUALLY DISPLAYED IN?
-  (this feature is currently broken)
+* HEY! THE OVERLAY TURNS OFF WHEN THE WINDOW IS PARTLY OFF THE DESKTOP!?
+  
+  That's done on purpose.  It  prevents  possible  yet  harmless  screen
+  corruption. And by the way - why would you want to see  a  movie  just
+  partly?! ;-)
+  
+  
+* KNOWN BUGs
 
-  The Teletux driver is writing directly to the video memory of the G400
-  or G200 card and bypasses your X server.   Getting that overlay into a
-  real window isn't as easy as you might think.
-  
-  For now a borderless window is being used which lays under the overlay
-  so you can click on the overlay (for the panel to appear) or issue any
-  command XINE supports by keyboard while you're over the  overlay  with
-  your mouse cursor.
-  
+  + stopping playback doesn't turn off the syncfb overlay
+    
+    Currently there is no way to check if playback has stopped from  the
+    plugin's point of view - at least none I'm aware of yet.  Working on
+    it... (yeah that's what they all say *grin*)
+
+  + those you may report will be known soon too. :-)
+
 
 * WHAT IS ON THE TODO LIST?
-  
-  fixing the plugin to support all features it did before XINE's API change
-  
-  other tasks (out-of-date):  
-  The plugin does not yet activate the hardware deinterlacing.
-  The mouse cursor doesn't disappear yet when it should be disappearing.
-  Prevent the panel from hidding behind the overlay by moving it out of range.
-  Bug fixes, new features and optimizations. :-)
+
+  + hardware deinterlacing support
+  + fixing the yuv_blending which is necessary for subtitles and DVD menus
+   
+  + bug fixes
+  + new features
+  + optimizations
   
 
 * CONTACTS and FEEDBACK
+
+  Your first starting point should be this README followed by the FAQ. :-)
+  If you don't find your answers there or if you found a bug, please leave
+  a message on the XINE User Mailinglist (see the general README).
+
+  You can also reach the maintainers directly by mail (or you may consider
+  sending a message in bottle so we have some more time  to  find  a  good
+  excuse for the bug you may have found *grin*):
   
-  Joachim Koening <joachim.koenig@gmx.net>
     Matthias Dahl <matthew2k@web.de>
-  
-  or use the XINE User Mailinglist. (more infos see the general README)
+  Joachim Koening <joachim.koenig@gmx.net>

@@ -281,8 +281,13 @@ void video_window_adapt_size (void *this,
 	 break;
     }
 
+    // in case we have a request for a resolution higher than any available
+    // ones we take the highest currently available.
+    if(gVw->fullscreen_mode && search >= gVw->XF86_modelines_count)
+       search = 0;
+       
     // just switching to a different modeline if necessary
-    if(!(gVw->XF86_modelines_count <= 1) && !(search > gVw->XF86_modelines_count)) {
+    if(!(gVw->XF86_modelines_count <= 1) && !(search >= gVw->XF86_modelines_count)) {
        if(XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[search])) {
 	  XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
           
@@ -294,9 +299,14 @@ void video_window_adapt_size (void *this,
 	  // just in case the mouse pointer is off the visible area, move it
 	  // to the middle of the video window
 	  XWarpPointer(gGui->display, None, gGui->video_window, 0, 0, 0, 0, gVw->fullscreen_width/2, gVw->fullscreen_height/2);
+	  
+	  // if this is true, we are back at the original resolution, so there
+	  // is no need to further worry about anything.
+	  if(gVw->fullscreen_mode && search == 0)
+	    gGui->XF86VidMode_fullscreen = 0;
        } else {
 	  printf("XF86VidMode Extension: modeline switching failed.\n");
-       }       
+       }
     }
   }
 #endif
