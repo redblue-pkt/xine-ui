@@ -473,7 +473,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       NULL,
       menu_playback_ctrl, (void *) PLAYB_NEXT                                                },
     { _("Playback/Previous MRL"),
-      (sh[shc++] = menu_get_shortcut("PreviousMrl")),
+      (sh[shc++] = menu_get_shortcut("PriorMrl")),
       NULL,
       menu_playback_ctrl, (void *) PLAYB_PREV                                                },
     { _("Playback/SEP"),
