@@ -875,12 +875,14 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
     
     if (mywidget) {
       
-      xitk_tips_create(mywidget, wl);
+      if(mywidget->enable == WIDGET_ENABLE)
+	xitk_tips_create(mywidget, wl);
       
       if (mywidget->notify_focus && mywidget->enable == WIDGET_ENABLE) {
 	bRepaint |= (mywidget->notify_focus) (wl, mywidget, FOCUS_RECEIVED);
 	mywidget->have_focus = FOCUS_RECEIVED;
       }
+
       if(mywidget->paint)
 	(mywidget->paint) (mywidget, wl->win, wl->gc);
     }
@@ -909,6 +911,10 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
     wl->pressedWidget = mywidget;
     
     if (mywidget) {
+
+      /* Kill (hide) tips */
+      xitk_tips_tips_kill(mywidget);
+
       if (mywidget->notify_click && mywidget->enable == WIDGET_ENABLE && mywidget->running)
 	bRepaint |= (mywidget->notify_click) (wl, mywidget, LBUTTON_DOWN, x, y);
 

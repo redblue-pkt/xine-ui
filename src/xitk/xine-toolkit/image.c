@@ -215,9 +215,11 @@ xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
 /*
  *
  */
-xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
-						  char *fontname, 
-						  int width, int align, char *str) {
+xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im, 
+							      char *fontname, 
+							      int width, int align, char *str,
+							      unsigned int foreground,
+							      unsigned int background) {
   xitk_image_t   *image;
   xitk_font_t    *fs;
   GC              gc;
@@ -312,13 +314,13 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
     lines[numlines++] = strdup(buf);
   
   image = xitk_image_create_image(im, width, ((height * numlines) + (3 * numlines)));
-  draw_flat(im, image->image, image->width, image->height);
+  draw_flat_with_color(im, image->image, image->width, image->height, background);
   
   { /* Draw string in image */
     int i, j, x = 0;
 
     XLOCK(im->x.disp);
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+    XSetForeground(im->x.disp, gc, foreground);
     j = height;
     for(i = 0; i < numlines; i++, j += (height + 3)) {
       length = xitk_font_get_string_length(fs, lines[i]);
@@ -344,7 +346,14 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
 
   return image;
 }
-
+xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
+						  char *fontname, 
+						  int width, int align, char *str) {
+  
+  return xitk_image_create_image_with_colors_from_string(im,fontname, width, align, str,
+							 xitk_get_pixel_color_black(im),
+							 xitk_get_pixel_color_gray(im));
+}
 /*
  *
  */

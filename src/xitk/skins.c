@@ -176,6 +176,17 @@ skins_locations_t *get_skin_location(char *skin) {
 }
 
 /*
+ * Select a new skin (used in control skin list).
+ */
+void select_new_skin(skins_locations_t *sk) {
+  
+  if(!sk)
+    return;
+  
+  gGui->config->update_string(gGui->config, "gui.skin", (char *)sk->skin);
+}
+
+/*
  * unload and reload the new config for a given
  * skin file. There is fallback if that fail.
  */
@@ -195,13 +206,16 @@ void change_skin(skins_locations_t *sk) {
   else
     old_skin = DEFAULT_SKIN;
   
+  xitk_skin_unload_config(gGui->skin_config);
+  //  skonfig = gGui->skin_config;
+
+  gGui->skin_config = xitk_skin_init_config();
+  
+    
   if(change_config_entry) {
     gGui->config->update_string(gGui->config, "gui.skin", (char *)sk->skin);
   }
   
-  xitk_skin_unload_config(gGui->skin_config);
-  
-  gGui->skin_config = xitk_skin_init_config();
   
  __reload_skin:
   memset(&buf, 0, sizeof(buf));

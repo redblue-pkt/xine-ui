@@ -349,7 +349,7 @@ static void control_select_new_skin(xitk_widget_t *w, void *data) {
   int                 selected = (int)data;
 
   xitk_browser_release_all_buttons(control->skinlist);
-  change_skin(sks[selected]);
+  select_new_skin(sks[selected]);
 }
 
 /*

@@ -115,6 +115,11 @@ xitk_widget_t *xitk_image_create(xitk_skin_config_t *skonfig, xitk_image_widget_
 /*
  * Create and image object from a string, width is limited.
  */
+xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im, 
+							      char *fontname, 
+							      int width, int align, char *str,
+							      unsigned int foreground,
+							      unsigned int background);
 xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
 						  char *fontname, 
 						  int width, int align, char *str);

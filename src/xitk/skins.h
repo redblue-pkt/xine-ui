@@ -34,6 +34,7 @@ char *gui_get_configfile(void);
 skins_locations_t **get_available_skins(void);
 int get_available_skins_num(void);
 void init_skins_support(void);
+void select_new_skin(skins_locations_t *sk);
 void change_skin(skins_locations_t *sk);
 
 #endif

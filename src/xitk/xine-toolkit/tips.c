@@ -90,11 +90,12 @@ static void *xitk_tips_destroy_thread(void *data) {
  */
 static void *xitk_tips_thread(void *data) {
   tips_private_t     *tp = (tips_private_t *)data;
-  int                 x, y, string_length, string_ascent, string_descent;
+  int                 x, y, string_length;
   xitk_image_t       *i;
   xitk_font_t        *fs;
   XWindowAttributes   wattr;
   Status              status;
+  unsigned int        cyellow, cblack;
 
   pthread_detach(pthread_self());
 
@@ -117,12 +118,14 @@ static void *xitk_tips_thread(void *data) {
   fs = xitk_font_load_font(tp->w->imlibdata->x.disp, DEFAULT_FONT_10);
   xitk_font_set_font(fs, tp->wl->gc);
   string_length = xitk_font_get_string_length(fs, tp->w->tips_string);
-  string_ascent = xitk_font_get_ascent(fs, tp->w->tips_string);
-  string_descent = xitk_font_get_descent(fs, tp->w->tips_string);
   xitk_font_unload_font(fs);
 
-  i = xitk_image_create_image_from_string(tp->w->imlibdata, DEFAULT_FONT_10,
-					  string_length + 1, ALIGN_LEFT, tp->w->tips_string);
+  cblack  = xitk_get_pixel_color_black(tp->w->imlibdata);
+  cyellow = xitk_get_pixel_color_from_rgb(tp->w->imlibdata, 255, 255, 0);
+
+  i =  xitk_image_create_image_with_colors_from_string(tp->w->imlibdata, DEFAULT_FONT_10,
+						       string_length + 1, ALIGN_LEFT, 
+						       tp->w->tips_string, cblack, cyellow);
   
   tp->xwin = xitk_window_create_simple_window(tp->w->imlibdata, x, y, 
 					      i->width + 10, i->height + 10);
@@ -139,8 +142,10 @@ static void *xitk_tips_thread(void *data) {
     XLOCK(tp->w->imlibdata->x.disp);
     gc = XCreateGC(tp->w->imlibdata->x.disp, tp->w->imlibdata->x.base_window, None, None);
     XCopyArea(tp->w->imlibdata->x.disp, (xitk_window_get_background(tp->xwin)), bg,
-    	      gc, 0, 0, width, height, 0, 0);
-    XCopyArea(tp->w->imlibdata->x.disp, i->image, bg, 
+	      gc, 0, 0, width, height, 0, 0);
+    XSetForeground(tp->w->imlibdata->x.disp, gc, cyellow);
+    XFillRectangle(tp->w->imlibdata->x.disp, bg, gc, 1, 1, width - 2, height - 2);
+    XCopyArea(tp->w->imlibdata->x.disp, i->image, bg,
 	      gc, 0, 0, i->width, i->height, (width - i->width)>>1, ((height - i->height)>>1) + 1);
     XUNLOCK(tp->w->imlibdata->x.disp);
     
