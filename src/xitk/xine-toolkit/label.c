@@ -523,7 +523,7 @@ static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
     mywidget->width            = private_data->char_length * private_data->length;
     mywidget->height           = private_data->char_height;
   }
-  mywidget->type               = WIDGET_TYPE_LABEL | WIDGET_CLICKABLE;
+  mywidget->type               = WIDGET_TYPE_LABEL | WIDGET_CLICKABLE | WIDGET_KEYABLE;
   mywidget->event              = notify_event;
   mywidget->tips_timeout       = 0;
   mywidget->tips_string        = NULL;

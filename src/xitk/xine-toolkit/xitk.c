@@ -1083,7 +1083,8 @@ void xitk_xevent_notify(XEvent *event) {
 	  /* simulate click event on space/return/enter key event */
 	  else if((mykey == XK_space) || (mykey == XK_Return) || 
 		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
-	    if(w && ((w->type & WIDGET_CLICKABLE) && w->visible && w->enable)) {
+	    if(w && (((w->type & WIDGET_CLICKABLE) && (w->type & WIDGET_KEYABLE))
+		     && w->visible && w->enable)) {
 
 	      if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
 		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
@@ -1135,7 +1136,8 @@ void xitk_xevent_notify(XEvent *event) {
 
 	      }
 	    }
-	    else if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
+	    else if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER) 
+			  && (w->type & WIDGET_KEYABLE))) {
 	      if((mykey == XK_Left) || (mykey == XK_Down)) {
 		handled = 1;
 		xitk_slider_make_backstep(w);

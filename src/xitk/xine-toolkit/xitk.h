@@ -208,7 +208,8 @@ typedef struct {
  *   1 <The groupped widget>
  *    1 <focusable>
  *     1 <clickable>
- *      00 <reserved, not used yet>
+ *      1 <support key events>
+ *       0 <reserved, not used yet>
  *        1111111111111 <group types>         <13 types>
  *                     1111111111111 <widget> <13 types>
 */
@@ -220,6 +221,8 @@ typedef struct {
 #define WIDGET_FOCUSABLE            0x20000000
 /* Is widget clickable */
 #define WIDGET_CLICKABLE            0x10000000
+/* Widget support key events */
+#define WIDGET_KEYABLE              0x08000000
 
 /* Grouped widgets */
 #define WIDGET_GROUP_MASK           0x03FFE000
@@ -2225,6 +2228,7 @@ int xitk_intbox_get_value(xitk_widget_t *);
 
 int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
 void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);
+void xitk_widget_keyable(xitk_widget_t *w, int keyable);
 
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
 				       xitk_menu_widget_t *m, int x, int y);

@@ -1180,6 +1180,8 @@ void panel_init (void) {
   sl.motion_userdata   = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(panel->widget_list)), 
     (panel->playback_widgets.slider_play = xitk_slider_create(panel->widget_list, gGui->skin_config, &sl)));
+  
+  xitk_widget_keyable(panel->playback_widgets.slider_play, 0);
 
   xitk_set_widget_tips(panel->playback_widgets.slider_play, _("Stream playback position slider"));
   xitk_slider_reset(panel->playback_widgets.slider_play);

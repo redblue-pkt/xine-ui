@@ -2131,3 +2131,15 @@ void *xitk_widget_list_get(xitk_widget_list_t *wl, int param) {
   
   return data;
 }
+
+void xitk_widget_keyable(xitk_widget_t *w, int keyable) {
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+  
+  if(keyable)
+    w->type |= WIDGET_KEYABLE;
+  else
+    w->type &= ~WIDGET_KEYABLE;
+}

@@ -832,7 +832,7 @@ static xitk_widget_t *_xitk_slider_create(xitk_widget_list_t *wl,
   mywidget->y                            = y;
   mywidget->width                        = private_data->bg_skin->width;
   mywidget->height                       = private_data->bg_skin->height;
-  mywidget->type                         = WIDGET_TYPE_SLIDER | WIDGET_FOCUSABLE | WIDGET_CLICKABLE;
+  mywidget->type                         = WIDGET_TYPE_SLIDER | WIDGET_FOCUSABLE | WIDGET_CLICKABLE | WIDGET_KEYABLE;
   mywidget->event                        = notify_event;
   mywidget->tips_timeout                 = 0;
   mywidget->tips_string                  = NULL;
