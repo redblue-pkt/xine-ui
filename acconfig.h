@@ -30,3 +30,5 @@
 
 /* Define this if you have ORBit (libORBit) installed */
 #undef HAVE_ORBIT
+
+#undef HAVE_AA

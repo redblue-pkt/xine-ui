@@ -131,6 +131,16 @@ if test x"$no_x" != x"yes"; then
     AC_DEFINE(HAVE_X11)
 fi
 
+dnl
+dnl check for ascii-art library
+dnl
+
+AC_CHECK_LIB(aa, main,
+             LIBS="$LIBS -laa"
+     AC_DEFINE(HAVE_AA)
+     ac_have_aa="yes",,)
+AM_CONDITIONAL(HAVE_AA, test x$ac_have_aa = "xyes")
+
 
 dnl
 dnl check for libpng
@@ -402,6 +412,7 @@ src/xitk/skins/Makefile
 src/xitk/skins/metal/Makefile
 src/xitk/skins/lcd/Makefile
 src/xitk/skins/pitt/Makefile
+src/aaui/Makefile
 misc/Makefile
 misc/build_rpms.sh
 misc/SlackBuild
