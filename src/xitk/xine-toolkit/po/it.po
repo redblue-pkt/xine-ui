@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xitk\n"
 "POT-Creation-Date: 2003-12-23 23:10+0100\n"
-"PO-Revision-Date: 2003-11-23 00:48+0100\n"
+"PO-Revision-Date: 2003-12-26 12:42+0100\n"
 "Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"
 "MIME-Version: 1.0\n"
@@ -47,9 +47,9 @@ msgid "New integer value is: %d. Confirm ?"
 msgstr "Il nuovo valore intero è: %d. Confermi?"
 
 #: src/xitk/xine-toolkit/test.c:425
-#, fuzzy, c-format
+#, c-format
 msgid "New double value is: %e. Confirm ?"
-msgstr "Il nuovo valore intero è: %d. Confermi?"
+msgstr "Il nuovo valore reale è: %e. Confermi?"
 
 #: src/xitk/xine-toolkit/test.c:521
 msgid "My Frame"
