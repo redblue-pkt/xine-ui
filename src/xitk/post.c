@@ -43,7 +43,13 @@ extern gGui_t    *gGui;
 #define FRAME_WIDTH         (WINDOW_WIDTH - 40)
 #define FRAME_HEIGHT        80
 
+#define HELP_WINDOW_WIDTH   400
+#define HELP_WINDOW_HEIGHT  300
+
 #define MAX_DISPLAY_FILTERS 5
+
+#define MAX_DISP_ENTRIES    11
+#define BROWSER_LINE_WIDTH  55
 
 #define DISABLE_ME(widget)                                                                      \
     do {                                                                                        \
@@ -57,6 +63,7 @@ extern gGui_t    *gGui;
         xitk_enable_and_show_widget(widget);                                                    \
     } while(0)
  
+static char                  *br_fontname      = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
 static char                  *btnfontname      = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 static char                  *fontname         = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 static char                  *boldfontname     = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
@@ -109,6 +116,12 @@ typedef struct {
   int                         visible;
   xitk_register_key_t         widget_key;
 
+  /* help window stuff */
+  xitk_window_t              *helpwin;
+  xitk_widget_list_t         *help_widget_list;
+  xitk_register_key_t         help_widget_key;
+  int                         help_running;
+  xitk_widget_t              *help_browser;
 } _pplugin_t;
 
 static _pplugin_t    *pplugin = NULL;
@@ -931,13 +944,156 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
   return 0;
 }
 
+static void _pplugin_close_help(xitk_widget_t *w, void *data) {
+
+  pplugin->help_running = 0;
+
+  xitk_unregister_event_handler(&pplugin->help_widget_key);
+
+  xitk_destroy_widgets(pplugin->help_widget_list);
+  xitk_window_destroy_window(gGui->imlib_data, pplugin->helpwin);
+
+  pplugin->helpwin = NULL;
+  xitk_list_free((XITK_WIDGET_LIST_LIST(pplugin->help_widget_list)));
+    
+  XLockDisplay(gGui->display);
+  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(pplugin->help_widget_list)));
+  XUnlockDisplay(gGui->display);
+    
+  free(pplugin->help_widget_list);
+}
+
+static int __line_wrap(char *s, int pos, int line_size)
+{
+  int word_size = 0;
+
+  while( *s && *s != ' ' && *s != '\n' ) {
+    s++;
+    word_size++;
+  }
+
+  if( word_size >= line_size )
+    return pos > line_size; 
+
+  return word_size + pos > line_size;
+}
+
 static void _pplugin_show_help(xitk_widget_t *w, void *data) {
   post_object_t *pobj = (post_object_t *) data;
-  printf("(FIXME: create help window)\n"
-         "--------------------------------------------------\n"
-         "%s"
-         "--------------------------------------------------\n",
-         pobj->api->get_help());
+  GC                          gc;
+  xitk_pixmap_t              *bg;
+  int                         x, y, width, height;
+  xitk_labelbutton_widget_t   lb;
+  xitk_browser_widget_t       br;
+
+  x = y = 100;
+  pplugin->helpwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+						 _("Plugin Help"), x, y,
+						 HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
+  XLockDisplay (gGui->display);
+  gc = XCreateGC(gGui->display, 
+		 (xitk_window_get_window(pplugin->helpwin)), None, None);
+  XUnlockDisplay (gGui->display);
+  
+  pplugin->help_widget_list = xitk_widget_list_new();
+  xitk_widget_list_set(pplugin->help_widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(pplugin->help_widget_list, 
+		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(pplugin->helpwin)));
+  xitk_widget_list_set(pplugin->help_widget_list, WIDGET_LIST_GC, gc);
+  
+  xitk_window_get_window_size(pplugin->helpwin, &width, &height);
+  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
+
+  XLockDisplay (gGui->display);
+  XCopyArea(gGui->display, (xitk_window_get_background(pplugin->helpwin)), bg->pixmap,
+	    bg->gc, 0, 0, width, height, 0, 0);
+  XUnlockDisplay (gGui->display);
+
+  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Ok");
+  lb.align             = ALIGN_CENTER;
+  lb.callback          = _pplugin_close_help;
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->help_widget_list)), 
+   (w = xitk_noskin_labelbutton_create(pplugin->help_widget_list, 
+				       &lb, 150, 270, 100, 23,
+				       "Black", "Black", "White", btnfontname)));
+  xitk_enable_and_show_widget(w);
+
+
+  XITK_WIDGET_INIT(&br, gGui->imlib_data);
+  br.arrow_up.skin_element_name    = NULL;
+  br.slider.skin_element_name      = NULL;
+  br.arrow_dn.skin_element_name    = NULL;
+  br.browser.skin_element_name     = NULL;
+  br.browser.max_displayed_entries = MAX_DISP_ENTRIES;
+  br.browser.num_entries           = 0;
+  br.browser.entries               = NULL;
+  br.callback                      = NULL;
+  br.dbl_click_callback            = NULL;
+  br.parent_wlist                  = pplugin->help_widget_list;
+  br.userdata                      = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->help_widget_list)), 
+   (pplugin->help_browser = 
+    xitk_noskin_browser_create(pplugin->help_widget_list, &br,
+			       (XITK_WIDGET_LIST_GC(pplugin->help_widget_list)), 15, 25, 
+			       HELP_WINDOW_WIDTH - (30 + 16), 20,
+			       16, br_fontname)));
+
+  {
+    char  *p, **hbuf = NULL;
+    int    lines = 0, i;
+    
+    p = pobj->api->get_help();
+    
+    do {
+      if(!lines)
+	hbuf = (char **) xine_xmalloc(sizeof(char *) * 2);
+      else
+	hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
+
+      hbuf[lines]    = malloc(BROWSER_LINE_WIDTH+1);
+      hbuf[lines+1]  = NULL;
+
+      for(i = 0; !__line_wrap(p,i,BROWSER_LINE_WIDTH) && *p && *p != '\n'; i++)
+        hbuf[lines][i] = *p++;
+
+      hbuf[lines][i] = '\0';
+      if( *p && (*p == '\n' || *p == ' ') )
+        p++;
+
+      lines++;
+    } while( *p );
+    
+    if(lines) {
+      xitk_browser_update_list(pplugin->help_browser, (const char **)hbuf, 
+			       lines, 0);
+    }
+  }
+
+
+  xitk_enable_and_show_widget(pplugin->help_browser);
+  xitk_browser_set_alignment(pplugin->help_browser, ALIGN_LEFT);
+
+  xitk_window_change_background(gGui->imlib_data, pplugin->helpwin, bg->pixmap, width, height);
+  xitk_image_destroy_xitk_pixmap(bg);
+
+  pplugin->help_widget_key = xitk_register_event_handler("pplugin_help", 
+						    (xitk_window_get_window(pplugin->helpwin)),
+						    NULL,
+						    NULL,
+						    NULL,
+						    pplugin->help_widget_list,
+						    NULL);
+
+  pplugin->help_running = 1;
+  
+  raise_window(xitk_window_get_window(pplugin->helpwin), 1, pplugin->help_running);
+  
+  try_to_set_input_focus(xitk_window_get_window(pplugin->helpwin));
 }
 
 static void _pplugin_retrieve_parameters(post_object_t *pobj) {
@@ -1321,6 +1477,9 @@ static void pplugin_exit(xitk_widget_t *w, void *data) {
     window_info_t wi;
     int           i;
     
+    if( pplugin->help_running )
+     _pplugin_close_help(NULL,NULL);
+
     _pplugin_save_chain();
 
     pplugin->running = 0;
