@@ -281,7 +281,7 @@ Set port of xine broadcaster (master side), slave is started with 'xine slave://
 Don't display the logo.
 .TP
 .BI \-E,\ \-\-no\-reload
-Don't reload old playlist. Playlist are saved when you leave xine, then it will be reloaded and played the next time you lanch xine. This feature can be disabled via setup window.
+Don't reload old playlist. Playlist is saved when you leave xine, then it is reloaded and played the next time you lanch xine. This feature can be disabled via setup window.
 .TP
 .BI \-\-post\  <plugin>[:parameter=value][,...]
 Load a post plugin. Parameters are comma separated. This option can be used more than one time to chain two or more video postprocess plugins.
