@@ -354,6 +354,7 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   if(mrl) {
+    mediamark_t mmk;
 
     if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
       gGui->ignore_next = 1;
@@ -364,21 +365,23 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
     
-    if((!xine_open(gGui->stream, (const char *) mrl->mrl)) ||
-       (!xine_play(gGui->stream, 0, 0))) {
+    if(!xine_open(gGui->stream, (const char *) mrl->mrl)) {
       gui_handle_xine_error(gGui->stream);
       enable_playback_controls(0);
       gui_display_logo();
+      return;
     }
-    else {
-      mediamark_t mmk;
+    if(!gui_xine_play(gGui->stream, 0, 0, 0)) {
+      enable_playback_controls(0);
+      gui_display_logo();
+      return;
+    }
 
-      mmk.mrl = mrl->mrl;
-      mmk.ident = NULL;
-      mmk.start = 0;
-      mmk.end = -1;
-      gui_set_current_mrl(&mmk);
-    }
+    mmk.mrl = mrl->mrl;
+    mmk.ident = NULL;
+    mmk.start = 0;
+    mmk.end = -1;
+    gui_set_current_mrl(&mmk);
   }
 }
 

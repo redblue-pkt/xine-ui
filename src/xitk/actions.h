@@ -36,7 +36,7 @@ int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *len
 
 void gui_display_logo(void);
 
-int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time);
+int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time, int update_mmk);
 
 int gui_xine_open_and_play(char *mrl, int start_pos, int start_time);
 

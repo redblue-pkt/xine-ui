@@ -80,7 +80,7 @@ void gui_display_logo(void) {
     stream_infos_update_infos();
 }
 
-int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) {
+int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, int update_mmk) {
   int ret;
   int has_video;
   
@@ -122,7 +122,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
       
-      if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
+      if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
 	
 	if(gGui->mmk.ident)
 	  free(gGui->mmk.ident);
@@ -282,7 +282,7 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
     gui_handle_xine_error(gGui->stream);
     return 0;
   }
-  if(!gui_xine_play(gGui->stream, start_pos, start_time)) {
+  if(!gui_xine_play(gGui->stream, start_pos, start_time, 1)) {
     return 0;
   }
 
@@ -697,7 +697,7 @@ void *gui_set_current_position_thread(void *data) {
 
   pthread_detach(pthread_self());
   
-  (void) gui_xine_play(gGui->stream, pos, 0);
+  (void) gui_xine_play(gGui->stream, pos, 0, 1);
   
   gGui->ignore_next = 0;
   panel_check_pause();
@@ -724,7 +724,7 @@ void *gui_seek_relative_thread(void *data) {
   else
     sec += off_sec;
 
-  (void) gui_xine_play(gGui->stream, 0, sec);
+  (void) gui_xine_play(gGui->stream, 0, sec, 1);
   
   gGui->ignore_next = 0;
   panel_check_pause();
