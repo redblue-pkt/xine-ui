@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
-"POT-Creation-Date: 2003-01-29 22:48+0100\n"
-"PO-Revision-Date: 2003-01-23 9:20+ZONE\n"
+"POT-Creation-Date: 2003-01-29 22:06+0100\n"
+"PO-Revision-Date: 2003-01-30 9:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -70,12 +70,12 @@ msgstr "MRL (vstupný prúd) nebolo ¹pecifikované"
 #: src/xitk/actions.c:762
 #, c-format
 msgid "Aspect ratio: %s"
-msgstr ""
+msgstr "Pomer strán: %s"
 
 #: src/xitk/actions.c:781
 #, c-format
 msgid "Deinterlace: %d"
-msgstr ""
+msgstr "Deinterlace: %d"
 
 #: src/xitk/actions.c:934 src/xitk/actions.c:953
 #, c-format
@@ -93,7 +93,7 @@ msgstr "Hlasitos»"
 #: src/xitk/actions.c:1382
 #, c-format
 msgid "TV Mode: %d"
-msgstr ""
+msgstr "TV mód: %d"
 
 #: src/xitk/actions.c:1403
 #, c-format
@@ -287,55 +287,51 @@ msgstr ""
 
 #: src/xitk/event.c:301
 msgid "Zoom: 1:1"
-msgstr ""
+msgstr "Zväè¹enie: 1:1"
 
 #: src/xitk/event.c:306
 #, c-format
 msgid "Zoom: 200%%"
-msgstr ""
+msgstr "Zväè¹enie: 200%%"
 
 #: src/xitk/event.c:311
 #, c-format
 msgid "Zoom: 50%%"
-msgstr ""
+msgstr "Zväè¹enie: 200%%"
 
 #: src/xitk/event.c:525 src/xitk/event.c:534
 #, c-format
 msgid "A/V offset: %d"
-msgstr ""
+msgstr "A/V offset: %d"
 
 #: src/xitk/event.c:540
 msgid "SPU Offset: reset."
-msgstr ""
+msgstr "SPU Offset: reset"
 
 #: src/xitk/event.c:548 src/xitk/event.c:557
 #, c-format
 msgid "SPU Offset: %d"
-msgstr ""
+msgstr "SPU Offset: %d"
 
 #: src/xitk/event.c:674
-#, fuzzy
 msgid "Playlist: no loop."
-msgstr "Playlist"
+msgstr "Playlist: neopakova»."
 
 #: src/xitk/event.c:677
-#, fuzzy
 msgid "Playlist: loop."
-msgstr "Playlist"
+msgstr "Playlist: opakova»."
 
 #: src/xitk/event.c:680
-#, fuzzy
 msgid "Playlist: entry repeat."
-msgstr "Ïal¹ia polo¾ka z playlistu"
+msgstr "Playlist: polo¾ku opakova»."
 
 #: src/xitk/event.c:683
-#, fuzzy
 msgid "Playlist: shuffle."
-msgstr "Playlist"
+msgstr "Playlist: náhodne poradie"
 
 #: src/xitk/event.c:686
 msgid "Playlist: shuffle forever."
-msgstr ""
+msgstr "Playlist: náhodné poradie s opakovaním."
 
 #: src/xitk/event.c:898
 #, c-format
@@ -627,9 +623,9 @@ msgid "Cancel"
 msgstr "Zru¹i»"
 
 #: src/xitk/file_browser.c:631
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to open directory '%s': %s."
-msgstr "Nie je mo¾né vytvori» adresár '%s': %s."
+msgstr "Nie je mo¾né otvori» adresár '%s': %s."
 
 #: src/xitk/file_browser.c:945
 #, c-format
@@ -1065,79 +1061,73 @@ msgstr "      --skin-server-url <url>  Definova» adresu skin servera.\n"
 msgid ""
 "      --enqueue <mrl>          Enqueue mrl of a running session (session 0)\n"
 msgstr ""
+"      --enqueue <mrl>          Prida» mrl be¾iacej session (session 0)\n"
 
 #: src/xitk/main.c:495
 msgid "  -S, --session <option1,option2,...>\n"
-msgstr ""
+msgstr "  -S, --session <voµba1,voµba2,...>\n"
 
 #: src/xitk/main.c:496
-#, fuzzy
 msgid "                               Session managements. Options can be:\n"
-msgstr "                                 -mô¾e by» po¾ité viackrát.\n"
+msgstr "                                 Správa session. Voµby mô¾u by»:\n"
 
 #: src/xitk/main.c:497
 msgid "                    session=n   specify session <n> number,\n"
-msgstr ""
+msgstr "                    session=n   ¹pecifikova» èíslo <n>,\n"
 
 #: src/xitk/main.c:498
-#, fuzzy
 msgid "                    mrl=m       add mrl <m> to the playlist,\n"
-msgstr "                                 'loop' : opakova» celý playlist.\n"
+msgstr "                    mrl=m       prida» mrl <m> do playlistu,\n"
 
 #: src/xitk/main.c:499
 msgid ""
 "                    audio=c     select audio channel (<c>: 'next' or "
 "'prev'),\n"
 msgstr ""
+"                    audio=c     vybra» audio kanál (<c>: 'next' alebo "
+"'prev'),\n"
 
 #: src/xitk/main.c:500
 msgid ""
 "                    spu=c       select spu channel (<c>: 'next' or 'prev'),\n"
 msgstr ""
+"                    spu=c       vybra» spu kanál (<c>: 'next' alebo 'prev'),\n"
 
 #: src/xitk/main.c:501
-#, fuzzy
 msgid "                    (playlist|pl)=p\n"
-msgstr "                    'q' : skonèi», keï skonèí prehrávanie.\n"
+msgstr "                    (playlist|pl)=p\n"
 
 #: src/xitk/main.c:502
-#, fuzzy
 msgid "                                 <p> can be:\n"
-msgstr "                                 -mô¾e by» po¾ité viackrát.\n"
+msgstr "                                 <p> mô¾e by»:\n"
 
 #: src/xitk/main.c:503
-#, fuzzy
 msgid "                                   'clear'  clear the playlist,\n"
-msgstr "                                 'loop' : opakova» celý playlist.\n"
+msgstr "                                   'clear'  vyèistí playlist,\n"
 
 #: src/xitk/main.c:504
-#, fuzzy
 msgid "                                   'next'   play next playlist entry,\n"
 msgstr ""
-"                                'repeat' : opakova» aktuálnu polo¾ku "
-"playlistu.\n"
+"                                   'next'   hra» ïal¹iu polo¾ku z playlistu,\n"
+
 
 #: src/xitk/main.c:505
-#, fuzzy
 msgid ""
 "                                   'prev'   play previous playlist entry,\n"
 msgstr ""
-"                                'repeat' : opakova» aktuálnu polo¾ku "
-"playlistu.\n"
+"                                   'next'   hra» predchádzajúcu polo¾ku z playlistu,\n"
 
 #: src/xitk/main.c:506
-#, fuzzy
 msgid "                                   'load:s' load playlist file <s>.\n"
-msgstr "                                 'loop' : opakova» celý playlist.\n"
+msgstr "                                   'load:s' prehra» súbor playlistu <s>.\n"
 
 #: src/xitk/main.c:507
 msgid "                    play, slow2, slow4, pause, fast2,\n"
-msgstr ""
+msgstr "                    prehra», pomaly2, pomaly4, pauza, rýchlo2,\n"
 
 #: src/xitk/main.c:508
-#, fuzzy
 msgid "                    fast4, stop, quit, fullscreen, eject.\n"
-msgstr "                    'f' : v celoobrazovkovom re¾ime.\n"
+msgstr "                    rýchlo4, stop, koniec, pl.obrazovka, eject.\n"
 
 #: src/xitk/main.c:510
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -1393,17 +1383,17 @@ msgid "Total time: %02d:%02d:%02d"
 msgstr "Celkový èas: %02d:%02d:%02d"
 
 #: src/xitk/panel.c:631
-#, fuzzy, c-format
+#, c-format
 msgid "Audio: %s"
-msgstr "Audio: "
+msgstr "Audio: %s"
 
 #: src/xitk/panel.c:631
 msgid "Muted"
-msgstr ""
+msgstr "Bez zvuku"
 
 #: src/xitk/panel.c:631
 msgid "Unmuted"
-msgstr ""
+msgstr "So zvukom"
 
 #: src/xitk/panel.c:797
 msgid "Volume control"
@@ -1597,10 +1587,10 @@ msgstr "Následný audio plugin, ktorý má by» pou¾itý pre prúdy bez videa"
 msgid "Post video plugin"
 msgstr "Následný video plugin"
 
-#: src/xitk/session.c:633
+#: src/xitk/session.c:633 src/xitk/session_ctrl.c:633
 #, c-format
 msgid "Session %d isn't running.\n"
-msgstr ""
+msgstr "Session %d nebe¾í.\n"
 
 #: src/xitk/setup.c:900 src/xitk/setup.c:902 src/xitk/setup.c:910
 #: src/xitk/setup.c:912 src/xitk/setup.c:920 src/xitk/setup.c:922
@@ -1964,7 +1954,7 @@ msgstr "XF86VidMode Extension: %d modeline nájdené.\n"
 #: src/xitk/videowin.c:1447
 #, c-format
 msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
-msgstr ""
+msgstr "XF86VidModeModeLine %dx%d nie je platná: zahodená.\n"
 
 #: src/xitk/videowin.c:1478
 msgid ""
