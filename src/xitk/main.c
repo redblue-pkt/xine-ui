@@ -359,19 +359,6 @@ static const xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
   printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif
 
-  if (fabs(gGui->pixel_aspect - 1.0) < 0.01) {
-    /*
-     * we have a display with *almost* square pixels (<1% error),
-     * to avoid time consuming software scaling in video_out_xshm,
-     * correct this to the exact value of 1.0 and pretend we have
-     * perfect square pixels.
-     */
-    gGui->pixel_aspect  = 1.0;
-#ifdef DEBUG
-    printf("display_ratio: corrected to square pixels!\n");
-#endif
-  }
-
   vis.dest_size_cb      = video_window_dest_size_cb;
   vis.frame_output_cb   = video_window_frame_output_cb;
   vis.user_data         = NULL;
