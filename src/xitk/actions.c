@@ -182,9 +182,9 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
   xine_close(gGui->stream);
 
-  xine_dispose(gGui->stream);
-
   xine_event_dispose_queue(gGui->event_queue);
+
+  xine_dispose(gGui->stream);
 
   if(gGui->vo_driver)
     xine_close_video_driver(gGui->xine, gGui->vo_driver);
