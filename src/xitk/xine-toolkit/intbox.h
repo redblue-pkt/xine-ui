@@ -53,7 +53,8 @@ typedef struct {
 /*
  * Same as above, without skinable feature.
  */
-xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
+xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
+					 xitk_intbox_widget_t *ib,
 					 int x, int y, int width, int height, 
 					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
 

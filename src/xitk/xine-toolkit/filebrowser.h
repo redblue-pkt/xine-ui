@@ -85,7 +85,8 @@ typedef struct {
 
 } filebrowser_private_data_t;
 
-xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb);
+xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
+				       xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb);
 
 int xitk_filebrowser_is_running(xitk_widget_t *w);
 int xitk_filebrowser_is_visible(xitk_widget_t *w);

@@ -362,8 +362,8 @@ static void create_intbox(void) {
   ib.callback          = notify_intbox_change;
   ib.userdata          = NULL;
   xitk_list_append_content (test->widget_list->l,
-			    (test->intbox = 
-			     xitk_noskin_intbox_create(&ib, x, y, 60, 20, NULL, NULL, NULL)));
+	    (test->intbox = 
+	     xitk_noskin_intbox_create(test->widget_list, &ib, x, y, 60, 20, NULL, NULL, NULL)));
 
   xitk_set_widget_tips_default(test->intbox, "This is a intbox");
 }
@@ -381,8 +381,8 @@ static void create_checkbox(void) {
   cb.callback          = NULL;
   cb.userdata          = NULL;
   xitk_list_append_content (test->widget_list->l,
-			    (test->checkbox = 
-			     xitk_noskin_checkbox_create(&cb, x, y, 20, 20)));
+		    (test->checkbox = 
+		     xitk_noskin_checkbox_create(test->widget_list, &cb, x, y, 20, 20)));
 
   xitk_set_widget_tips_default(test->checkbox, "This is a checkbox");
 }
@@ -418,8 +418,8 @@ static void create_tabs(void) {
   t.callback          = NULL;
   t.userdata          = NULL;
   xitk_list_append_content (test->widget_list->l,
-			    (test->tabs = 
-			     xitk_noskin_tabs_create(&t, x, y, w, fontname)));
+		    (test->tabs = 
+		     xitk_noskin_tabs_create(test->widget_list, &t, x, y, w, fontname)));
 
 }
 
@@ -459,10 +459,10 @@ static void create_inputtext(void) {
   inp.callback          = change_browser_entry;
   inp.userdata          = NULL;
   xitk_list_append_content (test->widget_list->l,
-			   (test->input = 
-			    xitk_noskin_inputtext_create(&inp,
-							 150, 150, 150, 20,
-							 "Black", "Black", fontname)));
+	   (test->input = 
+	    xitk_noskin_inputtext_create(test->widget_list, &inp,
+					 150, 150, 150, 20,
+					 "Black", "Black", fontname)));
 
   xitk_set_widget_tips_default(test->input, "This is an inputtext");
 }
@@ -491,9 +491,9 @@ static void create_label(void) {
   lbl.label             = label;
   lbl.callback          = NULL;
   xitk_list_append_content(test->widget_list->l, 
-			   (test->label = 
-			    xitk_noskin_label_create(&lbl,
-						     x, y, len, (asc+des)*2, fontname)));
+	   (test->label = 
+	    xitk_noskin_label_create(test->widget_list, &lbl,
+				     x, y, len, (asc+des)*2, fontname)));
 
   xitk_set_widget_tips_default(test->label, "This is a label");
 
@@ -519,9 +519,9 @@ static void create_button(void) {
   b.callback          = change_label;
   b.userdata          = NULL;
   xitk_list_append_content(test->widget_list->l, 
-			   (test->button = 
-			    xitk_noskin_button_create(&b,
-						      x, y, width, height)));
+	   (test->button = 
+	    xitk_noskin_button_create(test->widget_list, &b,
+				      x, y, width, height)));
   
   xitk_set_widget_tips_default(test->button, "This is a button");
 
@@ -597,9 +597,9 @@ static void create_sliders(void) {
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
   xitk_list_append_content(test->widget_list->l,
-			   (test->hslider = xitk_noskin_slider_create(&sl,
-								      17, 200, 117, 20,
-								      XITK_HSLIDER)));
+		   (test->hslider = xitk_noskin_slider_create(test->widget_list, &sl,
+							      17, 200, 117, 20,
+							      XITK_HSLIDER)));
   xitk_slider_set_pos(test->widget_list, test->hslider, 0);
 
   xitk_set_widget_tips_default(test->hslider, "This is an horizontal slider");
@@ -613,9 +613,9 @@ static void create_sliders(void) {
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
   xitk_list_append_content(test->widget_list->l,
-			   (test->vslider = xitk_noskin_slider_create(&sl,
-								      17, 230, 20, 117,
-								      XITK_VSLIDER)));
+		   (test->vslider = xitk_noskin_slider_create(test->widget_list, &sl,
+							      17, 230, 20, 117,
+							      XITK_VSLIDER)));
   xitk_slider_set_pos(test->widget_list, test->vslider, 0);
 
   xitk_set_widget_tips_default(test->vslider, "This is a vertical slider");
@@ -629,9 +629,9 @@ static void create_sliders(void) {
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
   xitk_list_append_content(test->widget_list->l,
-			   (test->rslider = xitk_noskin_slider_create(&sl,
-								      50, 240, 80, 80,
-								      XITK_RSLIDER)));
+		   (test->rslider = xitk_noskin_slider_create(test->widget_list, &sl,
+							      50, 240, 80, 80,
+							      XITK_RSLIDER)));
   xitk_slider_set_pos(test->widget_list, test->rslider, 0);
   
   xitk_set_widget_tips_default(test->rslider, "This is a rotate button");
@@ -692,9 +692,9 @@ static void create_combo(void) {
   cmb.callback          = combo_select;
   cmb.userdata          = NULL;
   xitk_list_append_content(test->widget_list->l, 
-			   (test->combo = 
-			    xitk_noskin_combo_create(&cmb,
-						     x, y, width, NULL, NULL)));
+		   (test->combo = 
+		    xitk_noskin_combo_create(test->widget_list, &cmb,
+					     x, y, width, NULL, NULL)));
 }
 
 /*
@@ -746,10 +746,10 @@ static void create_browser(void) {
   browser.parent_wlist                  = test->widget_list;
   browser.userdata                      = NULL;
   xitk_list_append_content (test->widget_list->l, 
-			    (test->browser = 
-			     xitk_noskin_browser_create(&browser,
-							test->widget_list->gc, 20, 30, 
-							100, 20, 12, fontname)));
+		    (test->browser = 
+		     xitk_noskin_browser_create(test->widget_list, &browser,
+						test->widget_list->gc, 20, 30, 
+						100, 20, 12, fontname)));
   
   xitk_browser_update_list(test->browser, test->entries, test->num_entries, 0);
 
@@ -805,7 +805,7 @@ int main(int argc, char **argv) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content(test->widget_list->l, 
-	   (w = xitk_noskin_labelbutton_create(&lb,
+	   (w = xitk_noskin_labelbutton_create(test->widget_list, &lb,
 					       (windoww / 2) - 50, windowh - 50,
 					       100, 30,
 					       "Black", "Black", "White", fontname)));

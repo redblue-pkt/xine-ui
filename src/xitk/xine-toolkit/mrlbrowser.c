@@ -908,7 +908,8 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
 /*
  * Create mrlbrowser window.
  */
-xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb) {
+xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
+				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb) {
   GC                          gc;
   XSizeHints                  hint;
   XSetWindowAttributes        attr;
@@ -1075,7 +1076,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   lb.userdata          = (void *)private_data;
   lb.skin_element_name = mb->select.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
-			   (w = xitk_labelbutton_create (skonfig, &lb)));
+		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
   w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
   xitk_set_widget_tips(w, _("Select current entry"));
   
@@ -1083,7 +1084,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   pb.callback          = mrlbrowser_play;
   pb.userdata          = (void *)private_data;
   xitk_list_append_content(private_data->widget_list->l,
-			   (w = xitk_button_create (skonfig, &pb)));
+		   (w = xitk_button_create (private_data->widget_list, skonfig, &pb)));
   w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
   xitk_set_widget_tips(w, _("Play selected entry"));
 
@@ -1094,7 +1095,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   lb.userdata          = (void *)mywidget;
   lb.skin_element_name = mb->dismiss.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
-			   (w = xitk_labelbutton_create (skonfig, &lb)));
+		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
   w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
   xitk_set_widget_tips(w, _("Close MRL browser window"));
   
@@ -1105,8 +1106,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   mb->browser.userdata            = (void *)private_data;
   mb->browser.parent_wlist        = private_data->widget_list;
   xitk_list_append_content (private_data->widget_list->l,
-			   (private_data->mrlb_list = 
-			    xitk_browser_create(skonfig, &mb->browser)));
+		    (private_data->mrlb_list = 
+		     xitk_browser_create(private_data->widget_list, skonfig, &mb->browser)));
   private_data->mrlb_list->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
 
   lbl.label             = "";
@@ -1116,7 +1117,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   lbl.callback          = NULL;
   xitk_list_append_content(private_data->widget_list->l,
 			  (private_data->widget_origin = 
-			   xitk_label_create(skonfig, &lbl)));
+			   xitk_label_create(private_data->widget_list, skonfig, &lbl)));
   private_data->widget_origin->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
   
   memset(&private_data->current_origin, 0, strlen(private_data->current_origin));
@@ -1131,7 +1132,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
     lbl.gc                = private_data->widget_list->gc;
     lbl.callback          = NULL;
     xitk_list_append_content(private_data->widget_list->l, 
-			     (w = xitk_label_create (skonfig, &lbl)));
+			     (w = xitk_label_create (private_data->widget_list, skonfig, &lbl)));
     w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
 
   }
@@ -1156,7 +1157,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
       lb.userdata       = (void *)private_data;
       lb.skin_element_name = mb->ip_name.button.skin_element_name;
       xitk_list_append_content(private_data->widget_list->l,
-			       (private_data->autodir_plugins[i] = xitk_labelbutton_create (skonfig, &lb)));
+		       (private_data->autodir_plugins[i] = 
+			xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
       xitk_set_widget_tips(private_data->autodir_plugins[i], 
 			   xine_get_input_plugin_description(mb->xine, mb->ip_availables[i]));
 
@@ -1191,11 +1193,13 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   cmb.callback          = combo_filter_select;
   cmb.userdata          = (void *)private_data;
   xitk_list_append_content(private_data->widget_list->l, 
-			   (private_data->combo_filter = 
-			    xitk_combo_create(skonfig, &cmb, NULL, NULL)));
+		   (private_data->combo_filter = 
+		    xitk_combo_create(private_data->widget_list, skonfig, &cmb, NULL, NULL)));
 
   private_data->visible        = 1;
   
+  mywidget->widget_list        = NULL;
+
   mywidget->enable             = 1;
   mywidget->running            = 1;
   mywidget->visible            = 1;

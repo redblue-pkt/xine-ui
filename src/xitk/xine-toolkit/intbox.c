@@ -212,7 +212,8 @@ static void intbox_stepup(xitk_widget_t *x, void *data) {
 /*
  *
  */
-static xitk_widget_t *_xitk_intbox_create(xitk_skin_config_t *skonfig,
+static xitk_widget_t *_xitk_intbox_create(xitk_widget_list_t *wl,
+					  xitk_skin_config_t *skonfig,
 					  xitk_intbox_widget_t *ib, char *skin_element_name,
 					  xitk_widget_t *mywidget, 
 					  intbox_private_data_t *private_data,
@@ -228,6 +229,8 @@ static xitk_widget_t *_xitk_intbox_create(xitk_skin_config_t *skonfig,
   private_data->force_value              = 0;
 
   mywidget->private_data                 = private_data;
+
+  mywidget->widget_list                  = wl;
 
   mywidget->enable                       = enable;
   mywidget->running                      = 1;
@@ -255,11 +258,12 @@ static xitk_widget_t *_xitk_intbox_create(xitk_skin_config_t *skonfig,
 /*
  *
  */
-xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
+xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
+					 xitk_intbox_widget_t *ib,
 					 int x, int y, int width, int height, 
 					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw) {
   xitk_widget_t              *mywidget;
-  intbox_private_data_t       *private_data;
+  intbox_private_data_t      *private_data;
   xitk_button_widget_t        b;
   xitk_inputtext_widget_t     inp;
 
@@ -286,30 +290,30 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
     inp.callback          = intbox_change_value;
     inp.userdata          = (void *)mywidget;
     xitk_list_append_content(ib->parent_wlist->l, 
-			     (private_data->input_widget = 
-			      xitk_noskin_inputtext_create(&inp,
-							   x, y, (width - 10), height,
-							   "Black", "Black", DEFAULT_FONT_10)));
+	     (private_data->input_widget = 
+	      xitk_noskin_inputtext_create(ib->parent_wlist, &inp,
+					   x, y, (width - 10), height,
+					   "Black", "Black", DEFAULT_FONT_10)));
     private_data->input_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
     
     b.skin_element_name = NULL;
     b.callback          = intbox_stepup;
     b.userdata          = (void *)mywidget;
     xitk_list_append_content(ib->parent_wlist->l, 
-			     (private_data->more_widget = 
-			      xitk_noskin_button_create(&b,
-							(x + width) - (height>>1), y, 
-							(height>>1), (height>>1))));
+	     (private_data->more_widget = 
+	      xitk_noskin_button_create(ib->parent_wlist, &b,
+					(x + width) - (height>>1), y, 
+					(height>>1), (height>>1))));
     private_data->more_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
 
     b.skin_element_name = NULL;
     b.callback          = intbox_stepdown;
     b.userdata          = (void *)mywidget;
     xitk_list_append_content(ib->parent_wlist->l, 
-			     (private_data->less_widget = 
-			      xitk_noskin_button_create(&b,
-						(x + width) - (height>>1), (y + (height>>1)),
-							(height>>1), (height>>1))));
+	     (private_data->less_widget = 
+	      xitk_noskin_button_create(ib->parent_wlist, &b,
+					(x + width) - (height>>1), (y + (height>>1)),
+					(height>>1), (height>>1))));
     private_data->less_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
 
     /* Draw '+' and '-' in buttons */
@@ -337,5 +341,5 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
   mywidget->width = width;
   mywidget->height = height;
   
-  return _xitk_intbox_create(NULL, ib, NULL, mywidget, private_data, 1, 1);
+  return _xitk_intbox_create(wl, NULL, ib, NULL, mywidget, private_data, 1, 1);
 }

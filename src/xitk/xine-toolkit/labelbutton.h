@@ -66,14 +66,16 @@ typedef struct {
 
 /* ***************************************************************** */
 
-xitk_widget_t *xitk_noskin_labelbutton_create (xitk_labelbutton_widget_t *b,
+xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
+					       xitk_labelbutton_widget_t *b,
 					       int x, int y, int width, int height,
 					       char *ncolor, char *fcolor, char *ccolor, 
 					       char *fname);
 /**
   * Create a labeled button.
   */
-xitk_widget_t *xitk_labelbutton_create (xitk_skin_config_t *skonfig, xitk_labelbutton_widget_t *b);
+xitk_widget_t *xitk_labelbutton_create (xitk_widget_list_t *wl,
+					xitk_skin_config_t *skonfig, xitk_labelbutton_widget_t *b);
 
 /**
  * Change label of button 'widget'.

@@ -65,12 +65,14 @@ typedef struct {
 /**
  * Create the list browser
  */
-xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
+xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl, 
+				   xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
 
 /*
  * Same as above, without skinable feature.
  */
-xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, 
+xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
+					  xitk_browser_widget_t *br, GC gc, 
 					  int x, int y, 
 					  int itemw, int itemh, int slidw, char *fontname);
 /**

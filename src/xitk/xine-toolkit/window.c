@@ -729,7 +729,7 @@ void xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *
   lb.skin_element_name = NULL;
   xitk_list_append_content(wd->widget_list->l, 
 	   (wd->wyes =
-	    xitk_noskin_labelbutton_create(&lb,
+	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
 					   bx, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
@@ -902,7 +902,7 @@ void xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
   lb.skin_element_name = NULL;
   xitk_list_append_content(wd->widget_list->l, 
 	   (wd->wyes =
-	    xitk_noskin_labelbutton_create(&lb,
+	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
 					   bx1, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
@@ -916,7 +916,7 @@ void xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
   lb.skin_element_name = NULL;
   xitk_list_append_content(wd->widget_list->l, 
 	   (wd->wno =
-	    xitk_noskin_labelbutton_create(&lb,
+	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
 					   bx2, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
@@ -1101,7 +1101,7 @@ void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
   lb.skin_element_name = NULL;
   xitk_list_append_content(wd->widget_list->l, 
 	   (wd->wyes =
-	    xitk_noskin_labelbutton_create(&lb,
+	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
 					   bx1, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
@@ -1115,7 +1115,7 @@ void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
   lb.skin_element_name = NULL;
   xitk_list_append_content(wd->widget_list->l, 
 	   (wd->wno =
-	    xitk_noskin_labelbutton_create(&lb,
+	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
 					   bx2, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
@@ -1129,7 +1129,7 @@ void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
   lb.skin_element_name = NULL;
   xitk_list_append_content(wd->widget_list->l, 
 	   (wd->wcancel =
-	    xitk_noskin_labelbutton_create(&lb,
+	    xitk_noskin_labelbutton_create(wd->widget_list, &lb,
 					   bx3, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));

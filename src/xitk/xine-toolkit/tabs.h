@@ -59,7 +59,8 @@ typedef struct {
 
 } tabs_private_data_t;
 
-xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, 
+xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
+				       xitk_tabs_widget_t *t, 
 				       int x, int y, int width, char *fontname);
 int xitk_tabs_get_current_selected(xitk_widget_t *w);
 char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);

@@ -995,7 +995,8 @@ void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *w, char *
 /*
  * Create input text box
  */
-static xitk_widget_t *_xitk_inputtext_create (xitk_skin_config_t *skonfig, 
+static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
+					      xitk_skin_config_t *skonfig, 
 					      xitk_inputtext_widget_t *it,
 					      int x, int y, char *skin_element_name,
 					      xitk_image_t *skin,
@@ -1040,6 +1041,8 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_skin_config_t *skonfig,
 
   mywidget->private_data          = private_data;
 
+  mywidget->widget_list           = wl;
+
   mywidget->enable                = enable;
   mywidget->running               = 1;
   mywidget->visible               = visible;
@@ -1067,11 +1070,12 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_skin_config_t *skonfig,
 }
 
 
-xitk_widget_t *xitk_inputtext_create (xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it) {
+xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
+				      xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it) {
 
   XITK_CHECK_CONSTITENCY(it);
 
-  return _xitk_inputtext_create (skonfig, it,
+  return _xitk_inputtext_create (wl, skonfig, it,
 				 (xitk_skin_get_coord_x(skonfig, it->skin_element_name)),
 				 (xitk_skin_get_coord_y(skonfig, it->skin_element_name)),
 				 it->skin_element_name,
@@ -1087,7 +1091,8 @@ xitk_widget_t *xitk_inputtext_create (xitk_skin_config_t *skonfig, xitk_inputtex
 /*
  *
  */
-xitk_widget_t *xitk_noskin_inputtext_create (xitk_inputtext_widget_t *it,
+xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
+					     xitk_inputtext_widget_t *it,
 					     int x, int y, int width, int height,
 					     char *ncolor, char *fcolor, char *fontname) {
   xitk_image_t *i;
@@ -1097,5 +1102,5 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_inputtext_widget_t *it,
   draw_bevel_two_state(it->imlibdata, i);
   
 
-  return _xitk_inputtext_create(NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 1, 1);
+  return _xitk_inputtext_create(wl, NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 1, 1);
 }

@@ -1298,7 +1298,26 @@ void xitk_disable_widget(xitk_widget_t *w) {
     XITK_WARNING("widget is NULL\n");
     return;
   }
+  
 
+  if(w->widget_list != NULL) {
+    
+    if((w->widget_list->widget_under_mouse != NULL) && (w == w->widget_list->widget_under_mouse)) {
+      /* Kill (hide) tips */
+      xitk_tips_tips_kill(w);
+    }
+    
+    if((w->enable == WIDGET_ENABLE) && (w->have_focus != FOCUS_LOST)) {
+      
+      if(w->notify_focus)
+	(void) (w->notify_focus)(w->widget_list, w, FOCUS_LOST);
+      
+      if(w->paint)
+	(w->paint) (w, w->widget_list->win, w->widget_list->gc);
+      
+    }
+  }
+  
   w->enable = !WIDGET_ENABLE;
 }
 

@@ -76,12 +76,14 @@ typedef struct {
 /**
  * Create a slider
  */
-xitk_widget_t *xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s);
+xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
+				  xitk_skin_config_t *skonfig, xitk_slider_widget_t *s);
 
 /**
  * Same as above, without skinable feature.
  */
-xitk_widget_t *xitk_noskin_slider_create (xitk_slider_widget_t *s,
+xitk_widget_t *xitk_noskin_slider_create (xitk_widget_list_t *wl,
+					  xitk_slider_widget_t *s,
 					  int x, int y, int width, int height, int type);
 /**
  * Get current position of paddle.

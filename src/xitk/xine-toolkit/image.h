@@ -80,7 +80,8 @@ xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
 /*
  *
  */
-xitk_widget_t *xitk_noskin_image_create (xitk_image_widget_t *im, 
+xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
+					 xitk_image_widget_t *im, 
 					 xitk_image_t *image, int x, int y);
 
 /*
@@ -112,7 +113,8 @@ xitk_image_t *xitk_image_load_image(ImlibData *idata, char *image);
 /**
  * Create an image widget type.
  */
-xitk_widget_t *xitk_image_create(xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
+xitk_widget_t *xitk_image_create(xitk_widget_list_t *wl,
+				 xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
 
 /*
  * Create and image object from a string, width is limited.

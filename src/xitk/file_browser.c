@@ -222,7 +222,7 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.browser.callback               = sel_cb;
   fbr.browser.userdata               = NULL;
 
-  fb = xitk_filebrowser_create(gGui->skin_config, &fbr);
+  fb = xitk_filebrowser_create(NULL, gGui->skin_config, &fbr);
 
 }
 

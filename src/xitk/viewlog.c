@@ -372,8 +372,8 @@ static void viewlog_create_tabs(void) {
   tab.callback          = viewlog_change_section;
   tab.userdata          = NULL;
   xitk_list_append_content (viewlog->widget_list->l,
-			    (viewlog->tabs = 
-			     xitk_noskin_tabs_create(&tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
+    (viewlog->tabs = 
+     xitk_noskin_tabs_create(viewlog->widget_list, &tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
 
   bg = xitk_image_create_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -455,7 +455,7 @@ void viewlog_window(void) {
   br.userdata                      = NULL;
   xitk_list_append_content(viewlog->widget_list->l, 
 			   (viewlog->browser_widget = 
-			    xitk_noskin_browser_create(&br,
+			    xitk_noskin_browser_create(viewlog->widget_list, &br,
 						       viewlog->widget_list->gc, 25, 58, 
 						       WINDOW_WIDTH - (50 + 16), 20,
 						       16, br_fontname)));
@@ -478,7 +478,7 @@ void viewlog_window(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content(viewlog->widget_list->l, 
-	   xitk_noskin_labelbutton_create(&lb,
+	   xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
 					  x, y, 100, 23,
 					  "Black", "Black", "White", tabsfontname));
 
@@ -492,7 +492,7 @@ void viewlog_window(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content(viewlog->widget_list->l, 
-	   xitk_noskin_labelbutton_create(&lb,
+	   xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
 					  x, y, 100, 23,
 					  "Black", "Black", "White", tabsfontname));
 

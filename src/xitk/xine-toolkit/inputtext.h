@@ -75,12 +75,14 @@ typedef struct {
 /*
  * Create an input text widget.
  */
-xitk_widget_t *xitk_inputtext_create(xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it);
+xitk_widget_t *xitk_inputtext_create(xitk_widget_list_t *wl,
+				     xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it);
 
 /*
  * Same as above, without skinable feature.
  */
-xitk_widget_t *xitk_noskin_inputtext_create (xitk_inputtext_widget_t *it,
+xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
+					     xitk_inputtext_widget_t *it,
 					     int x, int y, int width, int height,
 					     char *ncolor, char *fcolor, char *fontname);
 

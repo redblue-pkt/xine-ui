@@ -86,7 +86,8 @@ typedef struct {
 
 } mrlbrowser_private_data_t;
 
-xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
+xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
+				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
 int xitk_mrlbrowser_is_running(xitk_widget_t *w);
 int xitk_mrlbrowser_is_visible(xitk_widget_t *w);
 void xitk_mrlbrowser_hide(xitk_widget_t *w);

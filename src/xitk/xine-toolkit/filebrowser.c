@@ -1011,7 +1011,8 @@ void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig
 /*
  * Create file browser window
  */
-xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb) {
+xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
+				       xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb) {
   GC                            gc;
   XSizeHints                    hint;
   XSetWindowAttributes          attr;
@@ -1170,7 +1171,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   lb.userdata          = (void *)private_data;
   lb.skin_element_name = fb->homedir.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
-			   (w = xitk_labelbutton_create (skonfig, &lb)));
+		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
   w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   lb.button_type       = CLICK_BUTTON;
@@ -1180,7 +1181,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   lb.userdata          = (void *)private_data;
   lb.skin_element_name = fb->select.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
-			   (w = xitk_labelbutton_create (skonfig, &lb)));
+		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
   w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   lb.button_type    = CLICK_BUTTON;
@@ -1190,7 +1191,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   lb.userdata       = (void *)private_data;
   lb.skin_element_name = fb->dismiss.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
-			   (w = xitk_labelbutton_create (skonfig, &lb)));
+		   (w = xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
   w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   private_data->add_callback      = fb->select.callback;
@@ -1201,7 +1202,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   fb->browser.parent_wlist       = private_data->widget_list;
   xitk_list_append_content(private_data->widget_list->l,
 			  (private_data->fb_list = 
-			   xitk_browser_create(skonfig, &fb->browser)));
+			   xitk_browser_create(private_data->widget_list, skonfig, &fb->browser)));
   private_data->fb_list->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   b.skin_element_name = fb->sort_default.skin_element_name;
@@ -1211,7 +1212,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   private_data->sort_default.sort = DEFAULT_SORT;
   private_data->sort_default.w    = mywidget;
   xitk_list_append_content (private_data->widget_list->l, 
-			    (w = xitk_button_create (skonfig, &b)));
+			    (w = xitk_button_create (private_data->widget_list, skonfig, &b)));
   w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   b.skin_element_name = fb->sort_reverse.skin_element_name;
@@ -1221,7 +1222,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   private_data->sort_reverse.sort = REVERSE_SORT;
   private_data->sort_reverse.w    = mywidget;
   xitk_list_append_content (private_data->widget_list->l, 
-			    (w = xitk_button_create (skonfig, &b)));
+			    (w = xitk_button_create (private_data->widget_list, skonfig, &b)));
   w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
   
   lbl.label             = fb->current_dir.cur_directory;
@@ -1231,7 +1232,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   lbl.callback          = NULL;
   xitk_list_append_content (private_data->widget_list->l,
 			   (private_data->widget_current_dir = 
-			    xitk_label_create (skonfig, &lbl)));
+			    xitk_label_create (private_data->widget_list, skonfig, &lbl)));
   private_data->widget_current_dir->widget_type |= WIDGET_GROUP | WIDGET_GROUP_FILEBROWSER;
 
   
@@ -1247,6 +1248,8 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
     sprintf(private_data->current_dir, "%s", xitk_get_homedir());
   
   private_data->visible        = 1;
+
+  mywidget->widget_list        = NULL;
 
   mywidget->enable             = 1;
   mywidget->running            = 1;

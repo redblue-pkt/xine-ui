@@ -409,7 +409,8 @@ static int notify_click_label(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp,
 /*
  *
  */
-static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_t *l,
+static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
+					 xitk_skin_config_t *skonfig, xitk_label_widget_t *l,
 					 int x, int y, int width, int height,
 					 char *skin_element_name, char *fontname,
 					 int visible, int enable) {
@@ -457,6 +458,8 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
 
   mywidget->private_data       = private_data;
 
+  mywidget->widget_list        = wl;
+
   mywidget->enable             = enable;
   mywidget->running            = 1;
   mywidget->visible            = visible;
@@ -494,11 +497,12 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
 /*
  *
  */
-xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_t *l) {
+xitk_widget_t *xitk_label_create(xitk_widget_list_t *wl,
+				 xitk_skin_config_t *skonfig, xitk_label_widget_t *l) {
 
   XITK_CHECK_CONSTITENCY(l);
   
-  return _xitk_label_create(skonfig, l, 
+  return _xitk_label_create(wl, skonfig, l, 
 			    (xitk_skin_get_coord_x(skonfig, l->skin_element_name)),
 			    (xitk_skin_get_coord_y(skonfig, l->skin_element_name)),
 			    (xitk_skin_get_label_length(skonfig, l->skin_element_name)),
@@ -512,9 +516,10 @@ xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_
 /*
  *
  */
-xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
+xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
+					xitk_label_widget_t *l,
 					int x, int y, int width, int height, char *fontname) {
   XITK_CHECK_CONSTITENCY(l);
 
-  return _xitk_label_create(NULL, l, x, y, width, height, NULL, fontname, 1, 1);
+  return _xitk_label_create(wl, NULL, l, x, y, width, height, NULL, fontname, 1, 1);
 }

@@ -1388,7 +1388,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 /*
  *
  */
-static xitk_widget_t *_xitk_image_create (xitk_skin_config_t *skonfig, 
+static xitk_widget_t *_xitk_image_create (xitk_widget_list_t *wl,
+					  xitk_skin_config_t *skonfig, 
 					  xitk_image_widget_t *im,
 					  int x, int y,
 					  char *skin_element_name,
@@ -1407,6 +1408,8 @@ static xitk_widget_t *_xitk_image_create (xitk_skin_config_t *skonfig,
   private_data->skin              = skin;
 
   mywidget->private_data          = private_data;
+
+  mywidget->widget_list           = wl;
 
   mywidget->enable                = 1;
   mywidget->running               = 1;
@@ -1433,11 +1436,12 @@ static xitk_widget_t *_xitk_image_create (xitk_skin_config_t *skonfig,
   return mywidget;
 }
 
-xitk_widget_t *xitk_image_create (xitk_skin_config_t *skonfig, xitk_image_widget_t *im) {
+xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
+				  xitk_skin_config_t *skonfig, xitk_image_widget_t *im) {
 
   XITK_CHECK_CONSTITENCY(im);
 
-  return _xitk_image_create(skonfig, im, 
+  return _xitk_image_create(wl, skonfig, im, 
 			    (xitk_skin_get_coord_x(skonfig, im->skin_element_name)),
 			    (xitk_skin_get_coord_y(skonfig, im->skin_element_name)),
 			    im->skin_element_name,
@@ -1449,9 +1453,10 @@ xitk_widget_t *xitk_image_create (xitk_skin_config_t *skonfig, xitk_image_widget
 /*
  *
  */
-xitk_widget_t *xitk_noskin_image_create (xitk_image_widget_t *im, 
+xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
+					 xitk_image_widget_t *im, 
 					 xitk_image_t *image, int x, int y) {
   XITK_CHECK_CONSTITENCY(im);
 
-  return _xitk_image_create(NULL, im, x, y, NULL, image);
+  return _xitk_image_create(wl, NULL, im, x, y, NULL, image);
 }

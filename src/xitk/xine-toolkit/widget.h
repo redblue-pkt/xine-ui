@@ -100,28 +100,30 @@ typedef struct {
   xitk_image_t               *image;
 } xitk_image_and_pos_t;
 
-struct xitk_widget_list_s;
+typedef struct xitk_widget_list_s xitk_widget_list_t;
 
-struct xitk_widget_s;
+typedef struct xitk_widget_s xitk_widget_t;
 
-typedef void (*widget_paint_callback_t)(struct xitk_widget_s *, Window, GC);
+typedef void (*widget_paint_callback_t)(xitk_widget_t *, Window, GC);
 
-typedef int (*widget_click_callback_t) (struct xitk_widget_list_s *, struct xitk_widget_s *, int, int, int);
+typedef int (*widget_click_callback_t) (xitk_widget_list_t *, xitk_widget_t *, int, int, int);
 
-typedef int (*widget_focus_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, int);
+typedef int (*widget_focus_callback_t)(xitk_widget_list_t *, xitk_widget_t *, int);
 
-typedef void (*widget_keyevent_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, XEvent *);
+typedef void (*widget_keyevent_callback_t)(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
 
-typedef int (*widget_inside_callback_t)(struct xitk_widget_s *, int, int);
+typedef int (*widget_inside_callback_t)(xitk_widget_t *, int, int);
 
-typedef void (*widget_change_skin_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, xitk_skin_config_t *);
+typedef void (*widget_change_skin_callback_t)(xitk_widget_list_t *, xitk_widget_t *, xitk_skin_config_t *);
 
-typedef xitk_image_t *(*widget_get_skin_t)(struct xitk_widget_s *, int);
+typedef xitk_image_t *(*widget_get_skin_t)(xitk_widget_t *, int);
 
-typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
+typedef void (*widget_destroy_t)(xitk_widget_t *, void *);
 
-typedef struct xitk_widget_s {
+struct xitk_widget_s {
   ImlibData                      *imlibdata;
+
+  xitk_widget_list_t             *widget_list;
 
   int                             x;
   int                             y;
@@ -157,9 +159,9 @@ typedef struct xitk_widget_s {
 
   void                           *private_data;
   uint32_t                        widget_type;
-} xitk_widget_t;
+};
 
-typedef struct xitk_widget_list_s {
+struct xitk_widget_list_s {
 
   xitk_list_t                *l;
 
@@ -169,7 +171,7 @@ typedef struct xitk_widget_list_s {
 
   Window                      win;
   GC                          gc;
-} xitk_widget_list_t;
+};
 
 /* ****************************************************************** */
 

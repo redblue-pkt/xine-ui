@@ -381,7 +381,8 @@ void xitk_combo_update_list(xitk_widget_t *w, char **list, int len) {
 /*
  *
  */
-static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
+static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
+					 xitk_skin_config_t *skonfig,
 					 xitk_combo_widget_t *c, char *skin_element_name,
 					 xitk_widget_t *mywidget, 
 					 combo_private_data_t *private_data,
@@ -477,7 +478,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
   browser.userdata                      = (void*)mywidget;
   xitk_list_append_content (private_data->widget_list->l, 
 			    (private_data->browser_widget = 
-			     xitk_noskin_browser_create(&browser,
+			     xitk_noskin_browser_create(private_data->widget_list, &browser,
 							private_data->gc, 1, 1, 
 							(itemw - slidw), itemh, slidw,
 							DEFAULT_FONT_10)));
@@ -498,6 +499,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
   private_data->visible                  = 0;
 
   mywidget->private_data                 = private_data;
+  mywidget->widget_list                  = wl;
 
   mywidget->enable                       = enable;
   mywidget->running                      = 1;
@@ -527,7 +529,8 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
 /*
  *
  */
-xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
+xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
+				 xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
 				 xitk_widget_t **lw, xitk_widget_t **bw) {
   xitk_widget_t              *mywidget;
   combo_private_data_t       *private_data;
@@ -551,14 +554,16 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
   lbl.callback          = _combo_rollunroll_from_lbl;
   lbl.userdata          = (void *)mywidget;
   xitk_list_append_content(c->parent_wlist->l,
-			   (private_data->label_widget = xitk_label_create(skonfig, &lbl)));
+			   (private_data->label_widget = 
+			    xitk_label_create(c->parent_wlist, skonfig, &lbl)));
   private_data->label_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
   cb.skin_element_name = c->skin_element_name;
   cb.callback          = _combo_rollunroll;
   cb.userdata          = (void *)mywidget;
   xitk_list_append_content(c->parent_wlist->l, 
-			   (private_data->button_widget = xitk_checkbox_create(skonfig, &cb)));
+			   (private_data->button_widget = 
+			    xitk_checkbox_create(c->parent_wlist, skonfig, &cb)));
   private_data->button_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
   if(lw)
@@ -580,7 +585,7 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
     
     (void) xitk_set_widget_pos(private_data->button_widget, x, y);
   }
-  return _xitk_combo_create(skonfig, c, c->skin_element_name, mywidget, private_data,
+  return _xitk_combo_create(wl, skonfig, c, c->skin_element_name, mywidget, private_data,
 			    (xitk_skin_get_visibility(skonfig, c->skin_element_name)) ? 1 : -1,
 			    xitk_skin_get_enability(skonfig, c->skin_element_name));
 }
@@ -588,7 +593,8 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
 /*
  *  ******************************************************************************
  */
-xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
+xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
+					xitk_combo_widget_t *c,
 					int x, int y, int width, 
 					xitk_widget_t **lw, xitk_widget_t **bw) {
   xitk_widget_t              *mywidget;
@@ -624,7 +630,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     lbl.userdata          = (void *)mywidget;
     xitk_list_append_content(c->parent_wlist->l, 
 			     (private_data->label_widget = 
-			      xitk_noskin_label_create(&lbl,
+			      xitk_noskin_label_create(c->parent_wlist, &lbl,
 						       x, y, (width - height), (height + 4), DEFAULT_FONT_10)));
     private_data->label_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
 
@@ -634,7 +640,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
 
     xitk_list_append_content(c->parent_wlist->l, 
 			     (private_data->button_widget = 
-			      xitk_noskin_checkbox_create(&cb,
+			      xitk_noskin_checkbox_create(c->parent_wlist, &cb,
 							  x + (width - height), y,
 							  (height + 4), (height + 4))));
     private_data->button_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
@@ -666,5 +672,5 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
 
   }
 
-  return _xitk_combo_create(NULL, c, NULL, mywidget, private_data, 1, 1);
+  return _xitk_combo_create(wl, NULL, c, NULL, mywidget, private_data, 1, 1);
 }

@@ -125,27 +125,27 @@ typedef struct {
   xitk_node_t           *first, *last, *cur;
 } xitk_list_t;
 
-struct xitk_widget_list_s;
+typedef struct xitk_widget_list_s xitk_widget_list_t;
 
-struct xitk_widget_s;
+typedef struct xitk_widget_s xitk_widget_t;
 
 typedef void xitk_skin_config_t;
 
-typedef void (*widget_paint_callback_t)(struct xitk_widget_s *, Window, GC);
+typedef void (*widget_paint_callback_t)(xitk_widget_t *, Window, GC);
 
-typedef int (*widget_click_callback_t) (struct xitk_widget_list_s *, struct xitk_widget_s *, int, int, int);
+typedef int (*widget_click_callback_t) (xitk_widget_list_t *, xitk_widget_t *, int, int, int);
 
-typedef int (*widget_focus_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, int);
+typedef int (*widget_focus_callback_t)(xitk_widget_list_t *, xitk_widget_t *, int);
 
-typedef void (*widget_keyevent_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, XEvent *);
+typedef void (*widget_keyevent_callback_t)(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
 
-typedef int (*widget_inside_callback_t)(struct xitk_widget_s *, int, int);
+typedef int (*widget_inside_callback_t)(xitk_widget_t *, int, int);
 
-typedef void (*widget_change_skin_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, xitk_skin_config_t *);
+typedef void (*widget_change_skin_callback_t)(xitk_widget_list_t *, xitk_widget_t *, xitk_skin_config_t *);
 
-typedef xitk_image_t *(*widget_get_skin_t)(struct xitk_widget_s *, int);
+typedef xitk_image_t *(*widget_get_skin_t)(xitk_widget_t *, int);
 
-typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
+typedef void (*widget_destroy_t)(xitk_widget_t *, void *);
 
 /* Group of widgets widget */
 #define WIDGET_GROUP              0x80000000
@@ -171,8 +171,10 @@ typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
 #define WIDGET_TYPE_IMAGE         0x00000006
 #define WIDGET_TYPE_INPUTTEXT     0x00000007
 
-typedef struct xitk_widget_s {
+struct xitk_widget_s {
   ImlibData                      *imlibdata;
+
+  xitk_widget_list_t             *widget_list;
 
   int                             x;
   int                             y;
@@ -208,9 +210,9 @@ typedef struct xitk_widget_s {
 
   void                           *private_data;
   uint32_t                        widget_type;
-} xitk_widget_t;
+};
 
-typedef struct witk_widget_list_s {
+struct xitk_widget_list_s {
   xitk_list_t         *l;
 
   xitk_widget_t       *widget_focused;
@@ -219,7 +221,7 @@ typedef struct witk_widget_list_s {
 
   Window               win;
   GC                   gc;
-} xitk_widget_list_t;
+};
 
 
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
@@ -611,12 +613,14 @@ typedef struct {
 /**
  * Create a slider
  */
-xitk_widget_t *xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widget_t *sl);
+xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
+				  xitk_skin_config_t *skonfig, xitk_slider_widget_t *sl);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_slider_create (xitk_slider_widget_t *s,
+xitk_widget_t *xitk_noskin_slider_create (xitk_widget_list_t *wl,
+					  xitk_slider_widget_t *s,
 					  int x, int y, int width, int height, int type);
 
 /**
@@ -751,12 +755,14 @@ typedef struct {
 /**
  * Create a labeled button.
  */
-xitk_widget_t *xitk_labelbutton_create(xitk_skin_config_t *skonfig, xitk_labelbutton_widget_t *b);
+xitk_widget_t *xitk_labelbutton_create(xitk_widget_list_t *wl,
+				       xitk_skin_config_t *skonfig, xitk_labelbutton_widget_t *b);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_labelbutton_create (xitk_labelbutton_widget_t *b,
+xitk_widget_t *xitk_noskin_labelbutton_create (xitk_widget_list_t *wl,
+					       xitk_labelbutton_widget_t *b,
 					       int x, int y, int width, int height,
 					       char *ncolor, char *fcolor, char *ccolor, 
 					       char *fname);
@@ -809,12 +815,14 @@ typedef struct {
 /**
  * Create a label widget.
  */
-xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_t *l);
+xitk_widget_t *xitk_label_create(xitk_widget_list_t *wl,
+				 xitk_skin_config_t *skonfig, xitk_label_widget_t *l);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
+xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
+					xitk_label_widget_t *l,
 					int x, int y, int width, int height, char *fontname);
 
 /**
@@ -845,12 +853,14 @@ typedef struct {
 /**
  * Create an image widget type.
  */
-xitk_widget_t *xitk_image_create(xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
+xitk_widget_t *xitk_image_create(xitk_widget_list_t *wl,
+				 xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
 
 /**
  * Same as above, without skin.
  */
-xitk_widget_t *xitk_noskin_image_create (xitk_image_widget_t *im, 
+xitk_widget_t *xitk_noskin_image_create (xitk_widget_list_t *wl,
+					 xitk_image_widget_t *im, 
 					 xitk_image_t *image, int x, int y);
 
 /**
@@ -885,12 +895,14 @@ typedef struct {
 /**
  * Create a checkbox.
  */
-xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cp);
+xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
+				     xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cp);
 
 /*
  * Same as above, without skinable feature.
  */
-xitk_widget_t *xitk_noskin_checkbox_create(xitk_checkbox_widget_t *cb,
+xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
+					   xitk_checkbox_widget_t *cb,
 					   int x, int y, int width, int height);
 
 
@@ -921,12 +933,14 @@ typedef struct {
 /**
  *
  */
-xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widget_t *b);
+xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
+				   xitk_skin_config_t *skonfig, xitk_button_widget_t *b);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_button_create (xitk_button_widget_t *b,
+xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
+					  xitk_button_widget_t *b,
 					  int x, int y, int width, int height);
 
 
@@ -972,12 +986,14 @@ typedef struct {
 /**
  *
  */
-xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
+xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl,
+				   xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, 
+xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
+					  xitk_browser_widget_t *br, GC gc, 
 					  int x, int y, 
 					  int itemw, int itemh, int slidw, char *fontname);
 
@@ -1095,7 +1111,8 @@ typedef struct {
 /**
  *
  */
-xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb);
+xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
+				       xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb);
 
 /**
  *
@@ -1217,7 +1234,8 @@ typedef struct {
 /**
  *
  */
-xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
+xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
+				      xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
 
 /**
  *
@@ -1303,12 +1321,14 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier);
 /**
  * Create an input text box.
  */
-xitk_widget_t *xitk_inputtext_create (xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it);
+xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
+				      xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_inputtext_create (xitk_inputtext_widget_t *it,
+xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
+					     xitk_inputtext_widget_t *it,
 					     int x, int y, int width, int height,
 					     char *ncolor, char *fcolor, char *fontname);
 /**
@@ -1563,13 +1583,15 @@ typedef struct {
 /**
  *
  */
-xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
+xitk_widget_t *xitk_combo_create(xitk_widget_list_t *wl,
+				 xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
 				 xitk_widget_t **lw, xitk_widget_t **bw);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c, int x, int y, int width,
+xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
+					xitk_combo_widget_t *c, int x, int y, int width,
 					xitk_widget_t **lw, xitk_widget_t **bw);
 
 /**
@@ -1999,7 +2021,8 @@ typedef struct {
 
 } xitk_tabs_widget_t;
 
-xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, 
+xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
+				       xitk_tabs_widget_t *t, 
 				       int x, int y, int width, char *fontname);
 int xitk_tabs_get_current_selected(xitk_widget_t *w);
 char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
@@ -2020,7 +2043,8 @@ typedef struct {
   void                   *userdata;
 } xitk_intbox_widget_t;
 
-xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
+xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
+					 xitk_intbox_widget_t *ib,
 					 int x, int y, int width, int height, 
 					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
 void xitk_intbox_set_value(xitk_widget_t *, int);

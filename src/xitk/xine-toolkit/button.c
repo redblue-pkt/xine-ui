@@ -207,7 +207,8 @@ static int notify_focus_button (xitk_widget_list_t *wl, xitk_widget_t *w, int fo
 /*
  *
  */
-static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widget_t *b,
+static xitk_widget_t *_xitk_button_create (xitk_widget_list_t *wl,
+					   xitk_skin_config_t *skonfig, xitk_button_widget_t *b,
 					   int x, int y, 
 					   char *skin_element_name, xitk_image_t *skin,
 					   int visible, int enable) {
@@ -231,6 +232,8 @@ static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_but
   private_data->userdata          = b->userdata;
   
   mywidget->private_data          = private_data;
+
+  mywidget->widget_list           = wl;
 
   mywidget->enable                = enable;
   mywidget->running               = 1;
@@ -260,11 +263,12 @@ static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_but
 /*
  *
  */
-xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widget_t *b) {
+xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
+				   xitk_skin_config_t *skonfig, xitk_button_widget_t *b) {
   
   XITK_CHECK_CONSTITENCY(b);
 
-  return _xitk_button_create(skonfig, b, 
+  return _xitk_button_create(wl, skonfig, b, 
 			     (xitk_skin_get_coord_x(skonfig, b->skin_element_name)),
 			     (xitk_skin_get_coord_y(skonfig, b->skin_element_name)),
 			     b->skin_element_name,
@@ -277,7 +281,8 @@ xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widg
 /*
  *
  */
-xitk_widget_t *xitk_noskin_button_create (xitk_button_widget_t *b,
+xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
+					  xitk_button_widget_t *b,
 					  int x, int y, int width, int height) {
   xitk_image_t *i;
 
@@ -286,5 +291,5 @@ xitk_widget_t *xitk_noskin_button_create (xitk_button_widget_t *b,
   i = xitk_image_create_image(b->imlibdata, width * 3, height);
   draw_bevel_three_state(b->imlibdata, i);
 
-  return _xitk_button_create(NULL, b, x, y, NULL, i, 1, 1);
+  return _xitk_button_create(wl, NULL, b, x, y, NULL, i, 1, 1);
 }

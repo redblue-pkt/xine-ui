@@ -257,7 +257,8 @@ void xitk_checkbox_set_state(xitk_widget_t *w, int state, Window win, GC gc) {
 /*
  *
  */
-static xitk_widget_t *_xitk_checkbox_create(xitk_skin_config_t *skonfig, 
+static xitk_widget_t *_xitk_checkbox_create(xitk_widget_list_t *wl,
+					    xitk_skin_config_t *skonfig, 
 					    xitk_checkbox_widget_t *cb, int x, int y, 
 					    char *skin_element_name, xitk_image_t *skin,
 					    int visible, int enable) {
@@ -282,6 +283,8 @@ static xitk_widget_t *_xitk_checkbox_create(xitk_skin_config_t *skonfig,
   private_data->userdata          = cb->userdata;
 
   mywidget->private_data          = private_data;
+
+  mywidget->widget_list           = wl;
 
   mywidget->enable                = enable;
   mywidget->running               = 1;
@@ -311,11 +314,12 @@ static xitk_widget_t *_xitk_checkbox_create(xitk_skin_config_t *skonfig,
 /*
  *
  */
-xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cb) {
-
+xitk_widget_t *xitk_checkbox_create (xitk_widget_list_t *wl,
+				     xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cb) {
+  
   XITK_CHECK_CONSTITENCY(cb);
 
-  return _xitk_checkbox_create(skonfig, cb,
+  return _xitk_checkbox_create(wl, skonfig, cb,
 			       (xitk_skin_get_coord_x(skonfig, cb->skin_element_name)),
 			       (xitk_skin_get_coord_y(skonfig, cb->skin_element_name)),
 			       cb->skin_element_name,
@@ -329,7 +333,8 @@ xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_
 /*
  *
  */
-xitk_widget_t *xitk_noskin_checkbox_create(xitk_checkbox_widget_t *cb,
+xitk_widget_t *xitk_noskin_checkbox_create(xitk_widget_list_t *wl,
+					   xitk_checkbox_widget_t *cb,
 					   int x, int y, int width, int height) {
   xitk_image_t  *i;
   
@@ -338,5 +343,5 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_checkbox_widget_t *cb,
   i = xitk_image_create_image(cb->imlibdata, width * 3, height);
   draw_bevel_three_state(cb->imlibdata, i);
   
-  return _xitk_checkbox_create(NULL, cb, x, y, NULL, i, 1, 1);
+  return _xitk_checkbox_create(wl, NULL, cb, x, y, NULL, i, 1, 1);
 }

@@ -757,7 +757,8 @@ void xitk_slider_callback_exec(xitk_widget_t *w) {
 /*
  * Create the widget
  */
-static xitk_widget_t *_xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s,
+static xitk_widget_t *_xitk_slider_create(xitk_widget_list_t *wl,
+					  xitk_skin_config_t *skonfig, xitk_slider_widget_t *s,
 					  int x, int y, char *skin_element_name,
 					  xitk_image_t *bg_skin, xitk_image_t *pad_skin,
 					  int stype, int radius, int visible, int enable) {
@@ -809,6 +810,8 @@ static xitk_widget_t *_xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slid
 
   mywidget->private_data                 = private_data;
 
+  mywidget->widget_list                  = wl;
+
   mywidget->enable                       = enable;
   mywidget->running                      = 1;
   mywidget->visible                      = visible;
@@ -837,11 +840,12 @@ static xitk_widget_t *_xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slid
 /*
  * Create the widget
  */
-xitk_widget_t *xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s) {
+xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
+				  xitk_skin_config_t *skonfig, xitk_slider_widget_t *s) {
 
   XITK_CHECK_CONSTITENCY(s);
   
-  return _xitk_slider_create(skonfig, s,
+  return _xitk_slider_create(wl, skonfig, s,
 			     (xitk_skin_get_coord_x(skonfig, s->skin_element_name)),
 			     (xitk_skin_get_coord_y(skonfig, s->skin_element_name)),
 			     s->skin_element_name,
@@ -858,7 +862,8 @@ xitk_widget_t *xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widge
 /*
  * Create the widget (not skined).
  */
-xitk_widget_t *xitk_noskin_slider_create(xitk_slider_widget_t *s,
+xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
+					 xitk_slider_widget_t *s,
 					 int x, int y, int width, int height, int type) {
   xitk_image_t   *b, *p;
   int             radius;
@@ -897,5 +902,5 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_slider_widget_t *s,
   
   radius = (b->height >> 1) - (p->height);
 
-  return _xitk_slider_create(NULL, s, x, y, NULL, b, p, type, radius, 1, 1);
+  return _xitk_slider_create(wl,NULL, s, x, y, NULL, b, p, type, radius, 1, 1);
 }
