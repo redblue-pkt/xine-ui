@@ -123,7 +123,7 @@ Display keymap. Option are:
 .br
 `\fBdefault\fP' display default keymap table,
 .br
-`\fBlirc\fP' display draft of a .lircrc config file,
+`\fBlirc\fP' display draft of a \fI~/.lircrc\fP config file,
 .br
 `\fBremapped\fP' user remapped keymap table,
 .br
@@ -174,13 +174,13 @@ called \fIxinectl\fP.
 
 The server itself offers command help/syntax:
 .br
-.BR help\  [command]
+.BI help\  [command]
 .br
 Without \fIcommand\fP specified, all available commands will be displayed. 
 If a command is specified, short text about the command functionnality will
 be given.
 .br
-.BR syntax\  <command>
+.BI syntax\  <command>
 .br
 Display the \fIcommand\fP syntax.
 .TP
@@ -357,132 +357,97 @@ press if video runs ahead of audio
 press if video lags behind audio
 .IP "\fB<home>\fP"
 press to reset audio/video offset to \fB0\fP, so stream timestamps are unchanged.
-.SH Numeric Input
+
+.SS Numeric Input
 It is possible to give numeric input, however for backward
 compatibility the number keys are not bound their corresponding digit
 values. Moreover, the digits 0 to 9 are bound to symbols that can't
 normally be entered on a keyboard. Thus the ability to enter numeric
 input is disabled by default. However you can change this by switching
 the modifier value of "SetPosition\fI<X>\fR%" and "Number\fI<Y>\fR" (where
-\fI<X>\fR is 0, 10, .. 90, and \fI<Y>\fR is 0..9. In particular replace
+\fI<X>\fR is 0, 10, .. 90, and \fI<Y>\fR is 0..9). In particular replace
 these lines in your xine keymap file \fI~/.xine/keymap\fP.
 
 .Vb 119
-# Set position to beginning of current stream.
+# Set position to beginning or 10..90% of current stream.
 SetPosition0% {
 	key = 0
 	modifier = mod3
 }
-
-# Set position to 10% of current stream.
 SetPosition10% {
 	key = 1
 	modifier = mod3
 }
-
-# Set position to 20% of current stream.
 SetPosition20% {
 	key = 2
 	modifier = mod3
 }
-
-# Set position to 30% of current stream.
 SetPosition30% {
 	key = 3
 	modifier = mod3
 }
-
-# Set position to 40% of current stream.
 SetPosition40% {
 	key = 4
 	modifier = mod3
 }
-
-# Set position to 50% of current stream.
 SetPosition50% {
 	key = 5
 	modifier = mod3
 }
-
-# Set position to 60% of current stream.
 SetPosition60% {
 	key = 6
 	modifier = mod3
 }
-
-# Set position to 70% of current stream.
 SetPosition70% {
 	key = 7
 	modifier = mod3
 }
-
-# Set position to 80% of current stream.
 SetPosition80% {
 	key = 8
 	modifier = mod3
 }
-
-# Set position to 90% of current stream.
 SetPosition90% {
 	key = 9
 	modifier = mod3
 }
 
-# Enter the number 0.
+# Enter the numbers 0..9.
 Number0 {
 	key = 0
 	modifier = none
 }
-
-# Enter the number 1.
 Number1 {
 	key = 1
 	modifier = none
 }
-
-# Enter the number 2.
 Number2 {
 	key = 2
 	modifier = none
 }
-
-# Enter the number 3.
 Number3 {
 	key = 3
 	modifier = none
 }
-
-# Enter the number 4.
 Number4 {
 	key = 4
 	modifier = none
 }
-
-# Enter the number 5.
 Number5 {
 	key = 5
 	modifier = none
 }
-
-# Enter the number 6.
 Number6 {
 	key = 6
 	modifier = none
 }
-
-# Enter the number 7.
 Number7 {
 	key = 7
 	modifier = none
 }
-
-# Enter the number 8.
 Number8 {
 	key = 8
 	modifier = none
 }
-
-# Enter the number 9.
 Number9 {
 	key = 9
 	modifier = none
@@ -501,9 +466,9 @@ or selection number. As this is a relatively new feature, perhaps over
 time more plugins will make use of numeric selection.
 .PP
 Other commands that can be numeric prefaced by a numeric argument are
-next/previous MRL (MRL_NEXT, MRL_PRIOR), next/previous subtitle
-(SPU_NEXT, SPU_PRIOR), and next/previous audio channel
-(AUDIOCHAN_NEXT, AUDIOCHAN_PRIOR). With a numeric prefix, it is as
+next/previous MRL (\fBMRL_NEXT\fP, \fBMRL_PRIOR\fP), next/previous subtitle
+(\fBSPU_NEXT\fP, \fBSPU_PRIOR\fP), and next/previous audio channel
+(\fBAUDIOCHAN_NEXT\fP, \fBAUDIOCHAN_PRIOR\fP). With a numeric prefix, it is as
 though one entered that command the number of times.  Here, the
 argument 0, since it would otherwise meaningless, is interpreted here
 to be 1 instead. 
