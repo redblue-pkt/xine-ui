@@ -16,7 +16,7 @@ skins_DATA =                                                                    
 	LettersDigit.png  MainNext.png	      Onglet.png	 OngletSmall.png  SkArrowDown.png \
 	MainPause.png     PlBg.png	      SkArrowUp.png      MainNav.png      		  \
 	ArrowLeft.png	  BigArrowLeft.png    ArrowRight.png	 BigArrowRight.png		  \
-	SkSlidHBg.png	  SliderHPad.png      PlSlidHBg.png      skinconfig
+	SkSlidHBg.png	  SliderHPad.png      SlidHPad.png	 PlSlidHBg.png      skinconfig
 
 
 debug:
