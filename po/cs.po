@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.17\n"
-"POT-Creation-Date: 2003-01-29 22:06+0100\n"
+"POT-Creation-Date: 2003-01-29 22:48+0100\n"
 "PO-Revision-Date: 2003-01-20 10:40+0100\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -1632,7 +1632,7 @@ msgstr ""
 msgid "Post video plugin"
 msgstr "Koncový video modul"
 
-#: src/xitk/session.c:633 src/xitk/session_ctrl.c:633
+#: src/xitk/session.c:633
 #, c-format
 msgid "Session %d isn't running.\n"
 msgstr ""

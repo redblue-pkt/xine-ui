@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2003-01-29 22:06+0100\n"
+"POT-Creation-Date: 2003-01-29 22:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1511,7 +1511,7 @@ msgstr ""
 msgid "Post video plugin"
 msgstr ""
 
-#: src/xitk/session.c:633 src/xitk/session_ctrl.c:633
+#: src/xitk/session.c:633
 #, c-format
 msgid "Session %d isn't running.\n"
 msgstr ""

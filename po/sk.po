@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
-"POT-Creation-Date: 2003-01-29 22:06+0100\n"
+"POT-Creation-Date: 2003-01-29 22:48+0100\n"
 "PO-Revision-Date: 2003-01-23 9:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -1597,7 +1597,7 @@ msgstr "Následný audio plugin, ktorý má by» pou¾itý pre prúdy bez videa"
 msgid "Post video plugin"
 msgstr "Následný video plugin"
 
-#: src/xitk/session.c:633 src/xitk/session_ctrl.c:633
+#: src/xitk/session.c:633
 #, c-format
 msgid "Session %d isn't running.\n"
 msgstr ""

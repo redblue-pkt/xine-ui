@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.9.15\n"
-"POT-Creation-Date: 2003-01-29 22:06+0100\n"
+"POT-Creation-Date: 2003-01-29 22:48+0100\n"
 "PO-Revision-Date: 2003-01-21 16:42+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -1627,7 +1627,7 @@ msgstr "Plugin de audio post para usar con reproducción de flujos sin vídeo"
 msgid "Post video plugin"
 msgstr "Plugin de vídeo post"
 
-#: src/xitk/session.c:633 src/xitk/session_ctrl.c:633
+#: src/xitk/session.c:633
 #, c-format
 msgid "Session %d isn't running.\n"
 msgstr ""
