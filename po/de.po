@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.23\n"
 "POT-Creation-Date: 2004-05-08 21:49+0000\n"
-"PO-Revision-Date: 2004-05-07 23:21+0000\n"
+"PO-Revision-Date: 2004-05-12 08:08+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -855,13 +855,12 @@ msgid "OOCH: key binding table is NULL.\n"
 msgstr "Autsch! Tastenbelegungstabelle ist NULL.\n"
 
 #: src/xitk/kbindings.c:1185 src/xitk/kbindings_man.c:1185
-#, fuzzy
 msgid "Ctrl"
-msgstr "Kon"
+msgstr "Strg"
 
 #: src/xitk/kbindings.c:1187 src/xitk/kbindings_man.c:1187
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: src/xitk/kbindings.c:1508 src/xitk/kbindings_man.c:1508
 msgid "Nothing selected"
@@ -980,13 +979,12 @@ msgid "This is xine (X11 gui) - a free video player v%s"
 msgstr "Dies ist xine (X11 gui) - Ein freier Video-Player v%s"
 
 #: src/xitk/main.c:425
-#, fuzzy
 msgid ""
 ".\n"
 "(c) 2000-2004 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2004 Das xine Projektteam.\n"
+"(c) 2000-2004 Das xine Team.\n"
 
 #: src/xitk/main.c:437
 #, c-format
@@ -1589,7 +1587,6 @@ msgid "*sight*, unkown error."
 msgstr "*Stöhn*, unbekannter Fehler."
 
 #: src/xitk/main.c:1282
-#, fuzzy
 msgid "Your system seems too slow, the amount of dropped frames is too high."
 msgstr "Ihr System ist zu langsam, die Anzahl verworfener Bilder ist zu hoch."
 
@@ -1779,14 +1776,12 @@ msgid "Discard changes and dismiss the window."
 msgstr "Änderungen verwerfen und Fenster schließen."
 
 #: src/xitk/menus.c:438
-#, fuzzy
 msgid "Show controls"
-msgstr "Lautstärke-Regler"
+msgstr "Bedienpult anzeigen"
 
 #: src/xitk/menus.c:442
-#, fuzzy
 msgid "Fullscreen"
-msgstr "Vollbild/Fenster-Modus"
+msgstr "Vollbild"
 
 #: src/xitk/menus.c:450
 msgid "Open"
@@ -1885,9 +1880,8 @@ msgid "Playlist/Loop modes/Non-stop Shuffle"
 msgstr "Playliste/Wiederholmodus/Ununterbrochen mischen"
 
 #: src/xitk/menus.c:550
-#, fuzzy
 msgid "Playlist/Continue Playback"
-msgstr "Playliste/Weiter"
+msgstr "Playliste/Wiedergabe fortsetzen"
 
 #: src/xitk/menus.c:558 src/xitk/menus.c:936
 msgid "Menus"
@@ -2923,7 +2917,6 @@ msgstr "xine Log Betrachter"
 msgid "Refresh"
 msgstr "Aktualisieren"
 
-#, fuzzy
 #~ msgid "Fullscreen\\/Windowed View"
 #~ msgstr "Vollbild\\/Fenster-Modus"
 
