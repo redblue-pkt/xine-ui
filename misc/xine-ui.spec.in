@@ -13,8 +13,7 @@
 
 Name:        %{name}
 Summary:     A Free Audio/Video Player.
-Summary(cs): Volný audio a video pøehrávaè
-Summary(de): Ein freies Audio- und Video-Abspielprogramm
+Summary(cs): Voln audio a video pehrï¿½aï¿½Summary(de): Ein freies Audio- und Video-Abspielprogramm
 Version:     %{version}
 Release:     %{release}
 Copyright:   GPL
@@ -34,16 +33,15 @@ uses libxine for audio/video decoding and playback. For more informations on
 what formats are supported, please refer to the libxine documentation.
 
 %description -l cs
-xine je víceúèelový volnì ¹iøitelný audio a video pøehrávaè pro unixovské
-systémy, který pou¾ívá libxine k dekódování zvuku a videa a k pøehrávání.
-Více informací o tom, jaké formáty jsou podporovány získáte v dokumentaci
+xine je vï¿½eï¿½lov volnï¿½iiteln audio a video pehrï¿½aï¿½pro unixovskï¿½systï¿½y, kter pouï¿½ï¿½libxine k dekï¿½ovï¿½ï¿½zvuku a videa a k pehrï¿½ï¿½ï¿½
+Vï¿½e informacï¿½o tom, jakï¿½formï¿½y jsou podporovï¿½y zï¿½kï¿½e v dokumentaci
 od libxine.
 
 %description -l de
-xine ist ein freies Audio- und Video-Abspielprogramm für unixartige Systeme
+xine ist ein freies Audio- und Video-Abspielprogramm fr unixartige Systeme
 mit umfassenden Funktionen. Zur Audio- und Videodekodierung und Wiedergabe
 werden die xine-Bibliotheken aus libxine verwendet. Weitere Informationen
-über die unterstützten Formate entnehmen Sie in der Dokumentation zu libxine.
+ber die untersttzten Formate entnehmen Sie in der Dokumentation zu libxine.
 
 %prep
 %setup -n %{name}-%{version}
@@ -232,6 +230,7 @@ rm -rf $RPM_BUILD_ROOT
 %{deskdir}/*
 %{_datadir}/pixmaps/*
 %{_datadir}/xine/visuals/*
+%{_datadir}/xine/oxine/*
 %lang(de) %{_mandir}/de/man1/*
 %lang(fr) %{_mandir}/fr/man1/*
 %lang(es) %{_mandir}/es/man1/*
@@ -240,6 +239,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Mon Feb 07 2005 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- added oxine directory to the files
 * Fri Apr 09 2004 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - removed ugly hack to use the right docdir end set XINE_DOCPATH instead
 * Sun Jan 18 2004 Manfred Tremmel <Manfred.Tremmel@iiv.de>
@@ -287,7 +288,7 @@ rm -rf $RPM_BUILD_ROOT
 * Fri Dec 14 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add portuguese brazilian *.mo files: thanks to Miguel Freitas <miguel@cetuc.puc-rio.br> ;-)
 * Tue Nov 27 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-- Add spanish *.mo files: thanks to Juan Manuel García Molina <juanmagm@mail.com>
+- Add spanish *.mo files: thanks to Juan Manuel Garcï¿½ Molina <juanmagm@mail.com>
 * Sun Nov 18 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add *.mo files
 * Wed Oct 3 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
@@ -295,7 +296,7 @@ rm -rf $RPM_BUILD_ROOT
 * Thu Sep 27 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add icons and desktop stuff from patches by Miguel Freitas <miguel@cetuc.puc-rio.br>
 * Sun Sep 16 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-- Merge patch from José Carlos Monteiro <jcm@netcabo.pt>:
+- Merge patch from Josï¿½Carlos Monteiro <jcm@netcabo.pt>:
   - Filelist and other minor updates,
   - Fixed some SuSE compatibility issues,
   - Added Portuguese summary.
