@@ -115,7 +115,6 @@ typedef struct {
 
   int            desktopWidth;    /* desktop width */
   int            desktopHeight;   /* desktop height */
-  int            completion_type;
   int            depth;
   int            show;
   int            borderless;      /* borderless window (for windowed mode)? */
@@ -129,8 +128,6 @@ typedef struct {
 
   xitk_register_key_t    widget_key;
   xitk_register_key_t    old_widget_key;
-
-  int            completion_event;
 
 #ifdef HAVE_XF86VIDMODE
   /* XF86VidMode Extension stuff */
@@ -1385,16 +1382,6 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->wm_hint->icon_pixmap   = gGui->icon;
   gVw->wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
 
-  /*
-   * completion event
-   */
-
-  if (XShmQueryExtension (gGui->display) == True) {
-    gVw->completion_event = XShmGetEventBase (gGui->display) + ShmCompletion;
-  } else {
-    gVw->completion_event = -1;
-  }
-
   XUnlockDisplay (gGui->display);
 
   gVw->stream_resize_window = 
@@ -1851,9 +1838,6 @@ static void video_window_handle_event (XEvent *event, void *data) {
     break;
     
   }
-
-  if (event->type == gVw->completion_event) 
-    xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_COMPLETION_EVENT, (void *)event);
 
 }
 

@@ -846,17 +846,143 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   case XINE_EVENT_UI_MESSAGE: 
     if(event->stream == gGui->stream) {
       xine_ui_message_data_t *data = (xine_ui_message_data_t *) event->data;
+      char                    buffer[8192];
+      void                    (*report)(char *message, ...) = xine_error_with_more;
 
-      /* TODO: check num_parameters, provide customized messages, hints... */
-      if(data->explanation) {
-	xine_info("%s %s",(char *) data + data->explanation,
-                          (char *) data + data->parameters);
-	osd_display_info("%s %s",(char *) data + data->explanation,
-                                 (char *) data + data->parameters);
-      } else {
-	xine_info((char *) data + data->parameters);
-	osd_display_info((char *) data + data->parameters);
+      memset(&buffer, 0, sizeof(buffer));
+      
+      switch(data->type) {
+
+	/* (messages to UI) */
+      case XINE_MSG_NO_ERROR:
+	{ /* copy strings, and replace '\0' separators by '\n' */
+	  char *s, *d;
+	    
+	  report = xine_info;
+
+	  s = data->messages;
+	  d = buffer;
+	  while(s && (*s != '\0') && ((*s + 1) != '\0')) {
+
+	    switch(*s) {
+
+	    case '\0':
+	      *d = '\n';
+	      break;
+	      
+	    default:
+	      *d = *s;
+	      break;
+	    }
+	    
+	    s++;
+	    d++;
+	  }
+
+	  *++d = '\0';
+	}
+	break;
+
+	/* (warning message) */
+      case XINE_MSG_GENERAL_WARNING:
+	report = xine_info;
+	sprintf(buffer, "%s:", _("*drum roll*, xine lib wants to take your attention "
+				 "to deliver an important message to you ;-):"));
+	if(data->explanation)
+	  sprintf(buffer, "%s %s %s", buffer,
+		  (char *) data + data->explanation, (char *) data + data->parameters);
+	else
+	  sprintf(buffer, "%s %s", buffer, _("No Informations available."));
+	  
+	break;
+
+        /* (host name) */
+      case XINE_MSG_UNKNOWN_HOST:
+	sprintf(buffer, "%s", _("The host you're trying to connect is unknown.\n"
+				"Check the validity of the specified hostname."));
+	if(data->explanation)
+	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	break;
+	
+	/* (device name) */
+      case XINE_MSG_UNKNOWN_DEVICE:
+	sprintf(buffer, "%s", _("The device name you specified seems invalid."));
+	if(data->explanation)
+	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	break;
+
+	/* none */
+      case XINE_MSG_NETWORK_UNREACHABLE:
+	sprintf(buffer, "%s", _("The network looks unreachable.\nCheck your network "
+				"setup and/or the server name."));
+	if(data->explanation)
+	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	break;
+
+	/* (host name) */
+      case XINE_MSG_CONNECTION_REFUSED:
+	sprintf(buffer, "%s", _("The connection was refused.\nCheck the host name."));
+	if(data->explanation)
+	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	break;
+
+	/* (file name or mrl) */
+      case XINE_MSG_FILE_NOT_FOUND:
+	sprintf(buffer, "%s", _("The specified file or mrl is not found. Please check it twice."));
+	if(data->explanation)
+	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	break;
+
+	/* (device/file/mrl) */
+      case XINE_MSG_READ_ERROR:
+	sprintf(buffer, "%s", _("The source can't be read.\nMaybe you don't have enough "
+				"rights for this, or source doesn't contain data "
+				"(e.g: not disc in drive)."));
+	if(data->explanation)
+	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	break;
+	
+	/* (library/decoder) */
+      case XINE_MSG_LIBRARY_LOAD_ERROR:
+	sprintf(buffer, "%s", _("A problem occur while loading a library or a decoder"));
+	if(data->explanation)
+	  sprintf(buffer, "%s: %s", buffer, (char *) data + data->parameters);
+	break;
+
+	/* none */
+      case XINE_MSG_ENCRYPTED_SOURCE:
+	sprintf(buffer, "%s", _("The source seems encrypted, and can't be read."));
+	if(!strncasecmp(gGui->mmk.mrl, "dvd:/", 5)) {
+	  sprintf(buffer, "%s", _("\nYou DVD is probably crypted. "
+				  "According to your country laws, you can or can't "
+				  "install/use libdvdcss to be able to read this disc, "
+				  "which you bought."));
+	}
+	if(data->explanation)
+	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	break;
+
+      default:
+	sprintf(buffer, "%s", _("*sight*, unkown error."));
+	if(data->explanation)
+	  sprintf(buffer, "%s (%s %s)", buffer,
+		  (char *) data + data->explanation, (char *) data + data->parameters);
+	break;
       }
+      
+      if(gGui->verbosity >= 2) {
+	sprintf(buffer, "%s\n\n[", buffer);
+	
+	if(data->explanation)
+	  sprintf(buffer, "%s'%s' '%s'", buffer, 
+		  (char *) data + data->explanation, (char *) data + data->parameters);
+	
+	sprintf(buffer, "%s]", buffer);
+      }
+      
+      if(strlen(buffer))
+	report(buffer);
+      
     }
     break;
     
@@ -944,7 +1070,6 @@ int main(int argc, char *argv[]) {
   char                   *session_mrl     = NULL;
   int                     aspect_ratio    = XINE_VO_ASPECT_AUTO ;
   int                     no_auto_start   = 0;
-  int                     verbosity       = 0;
   char                   *cfgdir          = CONFIGDIR;
   char                   *cfgfile         = CONFIGFILE;
 
@@ -990,6 +1115,7 @@ int main(int argc, char *argv[]) {
   gGui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
   gGui->playlist.on_start      = NULL;
   gGui->skin_server_url        = NULL;
+  gGui->verbosity              = 0;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1246,9 +1372,9 @@ int main(int argc, char *argv[]) {
 
     case OPTION_VERBOSE:
       if(optarg != NULL)
-	verbosity = strtol(optarg, &optarg, 10);
+	gGui->verbosity = strtol(optarg, &optarg, 10);
       else
-	verbosity = 1;
+	gGui->verbosity = 1;
       break;
 
     case 'S':
@@ -1353,7 +1479,7 @@ int main(int argc, char *argv[]) {
   pthread_mutex_init(&gGui->xe_mutex, NULL);
   gGui->xine = xine_new();
   xine_config_load(gGui->xine, gGui->configfile);
-  xine_engine_set_param(gGui->xine, XINE_ENGINE_PARAM_VERBOSITY, verbosity);
+  xine_engine_set_param(gGui->xine, XINE_ENGINE_PARAM_VERBOSITY, gGui->verbosity);
 
   /*
    * init gui

@@ -135,6 +135,8 @@ typedef struct {
   xine_stream_t            *spu_stream;
 
   xine_t                   *xine;
+  int                       verbosity;
+
   pthread_mutex_t           xe_mutex;
   int                       new_pos;
 

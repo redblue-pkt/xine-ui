@@ -51,7 +51,7 @@ static void _errors_display_log(xitk_widget_t *w, void *data, int state) {
 /*
  * Create the real window.
  */
-void errors_create_window(char *title, char *message) {
+static void errors_create_window(char *title, char *message) {
   xitk_window_t *xw;
 
   if((title == NULL) || (message == NULL))
@@ -203,7 +203,7 @@ void xine_info(char *message, ...) {
  * Display an error window error from a xine engine error.
  */
 void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
-  int err;
+  int   err;
   char *_mrl = mrl;
 
   if(_mrl == NULL)
@@ -240,11 +240,16 @@ void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
     xine_error_with_more(_("- xine engine error -\n\nMalformed mrl. "
 			   "Mrl '%s' seems malformed/invalid.\n"), _mrl);
     break;
+
+  case XINE_ERROR_INPUT_FAILED:
+    xine_error_with_more(_("- xine engine error -\n\nInput plugin failed to open "
+			   "mrl '%s'\n"), _mrl);
+    break;
     
   default:
     xine_error_with_more(_("- xine engine error -\n\n!! Unhandled error !!\n"));
     break;
   }
-
+  
   gGui->new_pos = -1;
 }

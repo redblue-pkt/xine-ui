@@ -26,8 +26,6 @@
 
 #include <stdarg.h>
 
-void errors_create_window(char *title, char *message);
-
 void xine_error(char *message, ...);
 
 void xine_error_with_more(char *message, ...);
