@@ -1,3 +1,7 @@
+xine-ui (0.9.22) unstable; urgency=low
+
+  * fix crash when pressing 'm' or 'n' with empty playlist
+	
 xine-ui (0.9.21) unstable; urgency=low
 
   * fix playlist handling bug.
