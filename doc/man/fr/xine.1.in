@@ -306,8 +306,13 @@ audio_out, video_out, demux, input, sub, post, audio_decoder, video_decoder
 .TP
 .BI \-\-bug\-report\ [=mrl]
 Met en fonction le mode de rapport de bogue. Il positionne le mode verbeux, collecte tout les messages et les écris dans un fichier nommé BUG-REPORT.TXT. Si \<\fImrl\fP\> est spécifié, xine jouera cette mrl puis quittera (comme le fais -pq).
-.TP
-.B MRL (media resource locator)
+.LP
+Si vous ne spécifiez aucune MRL, vous pourrez sélectionner un fichier
+par glisser-lacher.
+Glisser des fichiers depuis \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP 
+ou \fBKonqueror\fP est connu pour fonctionner.
+.bt
+.SH MRL (media resource locator)
 .br
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles
 définissent le média à utiliser comme source de lecture.
@@ -333,35 +338,27 @@ Les MRLs valides peuvent être des noms de fichiers ou un de ceux qui suit:
 .br
 .BI http:// <hôte>...
 .LP
-Plusieures MRLs peuvent être spécifiées pour lire un nombre consécutif
-de flux.
-.LP
-Si vous ne spécifiez aucune MRL, vous pourrez sélectionner un fichier
-par glisser-lacher.
-Glisser des fichiers depuis \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP 
-ou \fBKonqueror\fP est connu pour fonctionner.
-.TP
-.B utilisation des sous-titres (toute mrl)
+Plusieurs MRLs peuvent être spécifiées pour lire un nombre consécutif de flux. Des plugins supplémentaires permettent l'accés à de nouveaux types de MRL. La liste de MRLs ci-dessus est disponible avec la version "originale" de la bibliothèque xine.
+.br
+.SS Syntaxe des MRL VCD
+	FILLME
+.SH SOUS-TITRE
+.B utilisation des sous-titres externes (toute mrl)
 .LP
 Les fichiers de sous-titre peuvent êre ajoutés a une MRL:
 .TP
-.BR <mrl>::<fichiersoustitre>
-.br 
+.BI <mrl>::<fichier-sous-titre>
 Ceci est spécifique a xine-ui pour définir le fichier de sous-titre à utiliser. Le nom
 de fichier sera extrait par le programme, ce qui permet de le changer, le sauver dans
 un liste de lecture, etc...
-.LP
 .TP
-.BR <mrl>#subtitle:<fichiersoustitre>
-.br
+.BI <mrl>#subtitle:<fichier-sous-titre>
 Ceci est spécifique a xine-lib pour définir le fichier de sous-titre à utiliser. Le 
 programme ne portera aucune attention au fichier de sous-titre utilisé.
-.TP
-.B options de flux
 .br
-Aprés un délimiteur
-.B #
-vous pouvez ajouter plusieurs paramètres pour le flux:
+.SH OPTIONS DE FLUX
+.br
+Aprés un délimiteur \fB#\fP vous pouvez ajouter plusieurs paramètres pour le flux:
 .TP
 .B novideo
 la vidéo sera ignorée
