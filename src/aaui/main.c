@@ -211,11 +211,12 @@ static void show_banner(void) {
   
   show_version();
   
-  printf("Built with xine library %d.%d.%d.\n", 
-	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION);
+  printf("Built with xine library %d.%d.%d (%s).\n", 
+	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_VERSION);
 
   xine_get_version (&major, &minor, &sub);
-  printf("Found xine library version: %d.%d.%d.\n", major, minor, sub);
+  printf("Found xine library version: %d.%d.%d (%s).\n", 
+	 major, minor, sub, xine_get_version_string());
 }
 
 /*

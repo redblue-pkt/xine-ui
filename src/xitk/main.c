@@ -257,7 +257,8 @@ void show_banner(void) {
   
   xine_get_version (&major, &minor, &sub);
 
-  printf(_("Found xine library version: %d.%d.%d.\n"), major, minor, sub);
+  printf(_("Found xine library version: %d.%d.%d (%s).\n"), 
+	 major, minor, sub, xine_get_version_string());
 
 }
 

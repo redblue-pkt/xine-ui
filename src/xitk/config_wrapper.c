@@ -65,7 +65,6 @@ static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, i
 void config_update_range(char *key, int min, int max) {
   xine_cfg_entry_t entry;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t));
   if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
     config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
   else
@@ -75,8 +74,6 @@ void config_update_range(char *key, int min, int max) {
 void config_update_string(char *key, char *string) {
   xine_cfg_entry_t entry;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t));
-  
   if((xine_config_lookup_entry(gGui->xine, key, &entry)) && string)
     config_update(&entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
   else {
@@ -90,7 +87,6 @@ void config_update_string(char *key, char *string) {
 void config_update_enum(char *key, int value) {
   xine_cfg_entry_t entry;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t));
   if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
     config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
   else
@@ -100,7 +96,6 @@ void config_update_enum(char *key, int value) {
 void config_update_bool(char *key, int value) {
   xine_cfg_entry_t entry;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t));
   if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
     config_update(&entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
   else
@@ -110,7 +105,6 @@ void config_update_bool(char *key, int value) {
 void config_update_num(char *key, int value) {
   xine_cfg_entry_t entry;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t));
   if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
     config_update(&entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
   else
