@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# Sample debian/rules that uses debhelper.
+# based on Sample debian/rules that uses debhelper.
 # GNU copyright 1997 to 1999 by Joey Hess.
 
 # Uncomment this to turn on verbose mode.
@@ -27,9 +27,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-
-	# Add here commands to clean up after the build process.
-	-$(MAKE) distclean
+	test -f Makefile && $(MAKE) distclean
 
 	dh_clean
 
@@ -39,12 +37,10 @@ install: build
 	dh_clean -k
 	dh_installdirs
 
-	# Add here commands to install the package into debian/xine-ui.
 	$(MAKE) install prefix=$(CURDIR)/debian/xine-ui/usr \
                   XINE_SKINDIR=$(CURDIR)/debian/xine-ui/usr/share/xine/skins
 	install -m 644 README debian/xine-ui/usr/share/doc/xine-ui
 
-# Build architecture-independent files here.
 binary-indep: build install
 # We have nothing to do by default.
 
@@ -62,7 +58,8 @@ binary-arch: build install
 	dh_compress
 	dh_fixperms
 	dh_installdeb
-	dh_shlibdeps
+#	dh_shlibdeps
+	debian/shlibdeps.sh xine-ui
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb

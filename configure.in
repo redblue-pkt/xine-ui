@@ -476,7 +476,9 @@ AC_SUBST(XINE_SKINDIR)
 dnl
 dnl desktop dir location, xine-config told us about this.
 dnl
-XINE_DESKTOPDIR="$xine_desktop_dir"
+
+escapedprefix="`echo $prefix | sed -e 's/\\//\\\\\//g'`"
+XINE_DESKTOPDIR="`echo $xine_desktop_dir|sed -e s/^$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_DESKTOPDIR)
 
 
