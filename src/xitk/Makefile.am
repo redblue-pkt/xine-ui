@@ -24,7 +24,7 @@ xine_SOURCES = $(GETOPT_C) utils.c  \
 xine_DEPENDENTIES = utils.h monitor.h 
 # double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
 xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
-	@XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
+	$(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	$(X_LIBS) $(XTEST_LIBS) -lX11 -lm
 
 xine_remote_SOURCES = $(GETOPT_C) xine-remote.c
