@@ -196,6 +196,13 @@ void gui_execute_action_id(action_id_t action) {
     return;
   }
 
+  if(action & ACTID_IS_INPUT_EVENT) {
+    /* events for advanced input plugins. */
+    xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
+    xine_send_event(gGui->xine, &xine_event);
+    return;
+  }
+
   switch(action) {
     
   case ACTID_WINDOWREDUCE:
