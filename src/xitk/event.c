@@ -1376,19 +1376,25 @@ static void on_start(void *data) {
     } while(gGui->logo_mode != 1);
 
   }
-  else {
-    /* Crapy Workaround:
-     * The lib seems unable to display OSD until the stream got 
-     * any video data.
-     */
+
+  /* Crapy Workaround:
+   * The lib seems unable to display OSD until the stream got 
+   * any video data.
+   */
+  if(start || (!start && !gGui->display_logo)) {
+    (void) xine_open(gGui->stream, (const char *) XINE_BLACK_STREAM);
+    
+    if(!start && !gGui->display_logo)
+      xine_play(gGui->stream, 0, 0);
+    
     gGui->ignore_next = 1;
-    (void) xine_open(gGui->stream, (const char *) gGui->logo_mrl);
     xine_stop(gGui->stream);
     gGui->ignore_next = 0;
   }
-
+  
   if(start)
     gui_execute_action_id(ACTID_PLAY);
+  
 }
 
 void gui_run(void) {
