@@ -110,7 +110,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef HAVE_XF86VIDMODE
  "F"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:c:ET:";
+ "u:a:V:A:p::s:RG:BN:P:l::S:ZD::r:c:ET:";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
@@ -143,7 +143,7 @@ static struct option long_options[] = {
   {"enqueue"        , no_argument      , 0, OPTION_ENQUEUE           },
   {"session"        , required_argument, 0, 'S'                      },
   {"version"        , no_argument      , 0, 'v'                      },
-  {"deinterlace"    , no_argument      , 0, 'D'                      },
+  {"deinterlace"    , optional_argument, 0, 'D'                      },
   {"aspect-ratio"   , required_argument, 0, 'r'                      },
   {"config"         , required_argument, 0, 'c'                      },
   {"verbose"        , optional_argument, 0, OPTION_VERBOSE           },
@@ -538,7 +538,9 @@ void show_usage (void) {
   printf(_("                    play, slow2, slow4, pause, fast2,\n"));
   printf(_("                    fast4, stop, quit, fullscreen, eject.\n"));
   printf(_("  -Z                           Don't automatically start playback (smart mode).\n"));
-  printf(_("  -D, --deinterlace            Deinterlace video output\n"));
+  printf(_("  -D, --deinterlace [post]...  Deinterlace video output. One or more post plugin\n"));
+  printf(_("                                 can be specified, with optional parameters. Syntax"));
+  printf(_("                                 is the same as --post option.\n"));
   printf(_("  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"));
   printf(_("                                 'auto', 'square', '4:3', 'anamorphic', 'dvb'.\n"));
 #ifdef XINE_PARAM_BROADCASTER_PORT
@@ -547,8 +549,8 @@ void show_usage (void) {
 #endif
   printf(_("      --no-logo                Don't display the logo.\n"));
   printf(_("  -E, --no-reload              Don't reload old playlist.\n"));
-  printf(_("      --post <plugin>[:parameter=value][,...]\n"));
-  printf(_("                               Load a post plugin.\n"));
+  printf(_("      --post <plugin>[:parameter=value][,...][;...]\n"));
+  printf(_("                               Load on or many post plugin(s).\n"));
   printf(_("                               Parameters are comma separated.\n"));
   printf(_("                               This option can be used more than one time.\n"));
   printf(_("      --disable-post           Don't enable post plugin(s).\n"));
@@ -1144,6 +1146,7 @@ int main(int argc, char *argv[]) {
   char                  **pplugins        = NULL;
   int                     pplugins_num    = 0;
   char                   *tvout           = NULL;
+  char                   *pdeinterlace    = NULL;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1198,6 +1201,7 @@ int main(int argc, char *argv[]) {
 #ifdef HAVE_LIRC
   gGui->lirc_enable            = 1;
 #endif
+  gGui->deinterlace_enable     = 0;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1303,7 +1307,14 @@ int main(int argc, char *argv[]) {
 #endif
 
     case 'D':
-      gGui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
+      if(!gGui->deinterlace_enable) {
+	gGui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
+	if(optarg) {
+	  char *p = xine_chomp(optarg);
+	  if(p && strlen(p))
+	    pdeinterlace = strdup(p);
+	}
+      }
       break;
       
     case 'r':
@@ -1730,6 +1741,8 @@ int main(int argc, char *argv[]) {
     gGui->ao_port = load_audio_out_driver(driver_num);
   }
   SAFE_FREE(audio_driver_id);
+
+  post_deinterlace_init(pdeinterlace);
   post_init();
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);

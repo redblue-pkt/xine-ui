@@ -263,8 +263,8 @@ Il y a aussi d'autres options qui s'expliquent d'elles même.
 .B \-Z
 Ne démarre pas automatiquement la lecture. N'affecte que le démarrage automatique de la lecture quand le mode smart est utilisé.
 .TP
-.B \-D, \-\-deinterlace
-Désentrelacement de la vidèo.
+.B \-D, \-\-deinterlace [post]
+Désentrelacement de la vidéo. Vous pouvez spécifier le(s) plugin(s) à utiliser pour le désentrelacement de la sortie vidéo. Voir la syntaxe de \fI\-\-post\fP.
 .TP
 .B \-r, \-\-aspect\-ratio <mode>
 Défini le ratio d'aspect le la sortie vidéo. Les modes sont:
@@ -280,7 +280,7 @@ N'affiche pas le logo.
 Ne recharge pas l'ancienne liste de lecture. La liste de lecture est sauvée quand vous quittez xine, puis elle est rechargée est lue à la prochaine execution de xine. Cette fonctionnalité peut être dévalidée via la fenêtre de réglage.
 .TP
 .BI \-\-post\  <plugin>[:parameter=value][,...]
-Charge un plugin de post-traitement. Les paramètres sont séparés par des virgules. Cette option peut être utilisée plus d'une fois afin de chainer two ou plusieurs plugins de post-traitement vidéo.
+Charge un ou plusieurs plugin(s) de post-traitement. Les paramètres sont séparés par des virgules. Cette option peut être utilisée plus d'une fois afin de chainer deux ou plusieurs plugins de post-traitement vidéo. Vous pouvez specifier deux (et plus) plugins, séparés par un point-virgule ';'.
 .TP
 .BI \-\-disable\-post
 Ne mets pas en fonction le(s) plugin(s). De cette manière, vous pouvre specifier un ou plusieurs plugins à utiliser, à l'aide de l'option de ligne de commande --post, mais en ne validant pas leurs effets.

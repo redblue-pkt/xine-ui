@@ -48,4 +48,8 @@ void pplugin_parse_and_store_post(const char *post);
 void pplugin_rewire_from_posts_window(void);
 void pplugin_rewire_posts(void);
 int pplugin_is_post_selected(void);
+
+void post_deinterlace_init(const char *deinterlace_post);
+void post_deinterlace(void);
+
 #endif

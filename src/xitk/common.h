@@ -123,6 +123,11 @@ typedef struct {
   int                       post_elements_num;
   int                       post_enable;
 
+  char                     *deinterlace_plugin;
+  post_element_t          **deinterlace_elements;
+  int                       deinterlace_elements_num;
+  int                       deinterlace_enable;
+
   struct {
     int                     hue;
     int                     brightness;

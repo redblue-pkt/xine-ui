@@ -112,6 +112,12 @@ static char         **post_audio_plugins;
 
 static pthread_t      rewire_thread;
 
+/* Some functions prototype */
+static void _pplugin_unwire(void);
+static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_elements_num);
+void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num);
+
+
 static void *post_rewire_thread(void *data) {
   void (*rewire)(void) = data;
   
@@ -119,6 +125,34 @@ static void *post_rewire_thread(void *data) {
   rewire();
   pthread_exit(NULL);
   return NULL;
+}
+
+static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
+  post_element_t **posts = NULL;
+  int              num, i;
+  
+  gGui->deinterlace_plugin = cfg->str_value;
+  
+  if(gGui->deinterlace_enable)
+    _pplugin_unwire();
+  
+  for(i = 0; i < gGui->deinterlace_elements_num; i++) {
+    xine_post_dispose(gGui->xine, gGui->deinterlace_elements[i]->post);
+    free(gGui->deinterlace_elements[i]->name);
+    free(gGui->deinterlace_elements[i]);
+  }
+  
+  SAFE_FREE(gGui->deinterlace_elements);
+  gGui->deinterlace_elements_num = 0;
+  
+  if((posts = pplugin_parse_and_load(gGui->deinterlace_plugin, &num))) {
+    gGui->deinterlace_elements     = posts;
+    gGui->deinterlace_elements_num = num;
+  }
+  
+  if(gGui->deinterlace_enable)
+    _pplugin_rewire_from_post_elements(gGui->deinterlace_elements, gGui->deinterlace_elements_num);
+  
 }
 
 static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -246,7 +280,7 @@ static void _pplugin_unwire(void) {
 
 static void _pplugin_rewire(void) {
 
-  if(pplugin && gGui->post_enable) {
+  if(pplugin && (gGui->post_enable && !gGui->deinterlace_enable)) {
     xine_post_out_t  *vo_source;
     int               post_num = pplugin->object_num;
     int               i = 0;
@@ -581,7 +615,7 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	
 	if(pobj->param->enum_values) {
 	  xitk_combo_widget_t         cmb;
-	  
+
 	  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 	  cmb.skin_element_name = NULL;
 	  cmb.layer_above       = (is_layer_above());
@@ -1367,42 +1401,44 @@ void pplugin_rewire_from_posts_window(void) {
   }
 }
 
-void pplugin_rewire_posts(void) {
-
-  _pplugin_unwire();
-
-  if(gGui->post_elements_num) {
-
-    if(gGui->post_enable) {
-      xine_post_out_t   *vo_source;
-      int                i = 0;
-      int                paused = 0;
-      
-      if((paused = (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
-	xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
-      
-      for(i = (gGui->post_elements_num - 1); i >= 0; i--) {
-	const char *const *outs = xine_post_list_outputs(gGui->post_elements[i]->post);
-	const xine_post_out_t *vo_out = xine_post_output(gGui->post_elements[i]->post, (char *) *outs);
-	if(i == (gGui->post_elements_num - 1)) {
-	  xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
-	}
-	else {
-	  const xine_post_in_t *vo_in = xine_post_input(gGui->post_elements[i + 1]->post, "video");
-	  int                   err;
-	  
-	  err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
-	}
+void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
+  
+  if(post_elements_num) {
+    xine_post_out_t   *vo_source;
+    int                i = 0;
+    int                paused = 0;
+    
+    if((paused = (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
+      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
+    
+    for(i = (post_elements_num - 1); i >= 0; i--) {
+      const char *const *outs = xine_post_list_outputs(post_elements[i]->post);
+      const xine_post_out_t *vo_out = xine_post_output(post_elements[i]->post, (char *) *outs);
+      if(i == (post_elements_num - 1)) {
+	xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
       }
-      
-      vo_source = xine_get_video_source(gGui->stream);
-      xine_post_wire_video_port(vo_source, gGui->post_elements[0]->post->video_input[0]);
-
-      if(paused)
- 	xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-
+      else {
+	const xine_post_in_t *vo_in = xine_post_input(post_elements[i + 1]->post, "video");
+	int                   err;
+	
+	err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
+      }
     }
+    
+    vo_source = xine_get_video_source(gGui->stream);
+    xine_post_wire_video_port(vo_source, post_elements[0]->post->video_input[0]);
+    
+    if(paused)
+      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+
   }
+}
+void pplugin_rewire_posts(void) {
+  
+  _pplugin_unwire();
+  
+  if(gGui->post_enable && !gGui->deinterlace_enable)
+    _pplugin_rewire_from_post_elements(gGui->post_elements, gGui->post_elements_num);
 }
 
 void pplugin_end(void) {
@@ -1657,131 +1693,211 @@ void pplugin_panel(void) {
   XUnlockDisplay (gGui->display);
 }
 
-void pplugin_parse_and_store_post(const char *post) {
+/* pchain: "<post1>:option1=value1,option2=value2..;<post2>:...." */
+static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_elements_num) {
+  post_element_t **post_elements = NULL;
+  char            *post_chain;
 
-  /* -post <name>:option1=value1,option2=value2... */
-  if(post && strlen(post)) {
-    char          *p = (char *) post;
-    char          *plugin, *args = NULL;
-    xine_post_t   *post;
+  *post_elements_num = 0;
+  
+  if(pchain && strlen(pchain)) {
+    char *p;
     
-    while(*p == ' ')
-      p++;
+    xine_strdupa(post_chain, pchain);
     
-    xine_strdupa(plugin, p);
-    
-    if((p = strchr(plugin, ':')))
-      *p++ = '\0';
-    
-    if(p && (strlen(p) > 1))
-      args = p;
-
-    post = xine_post_init(gGui->xine, plugin, 0, &gGui->ao_port, &gGui->vo_port);
-
-    if(post) {
-      post_object_t  pobj;
-
-      if(!gGui->post_elements_num)
-	gGui->post_elements = (post_element_t **) xine_xmalloc(sizeof(post_element_t *) * 2);
-      else
-	gGui->post_elements = (post_element_t **) 
-	  realloc(gGui->post_elements, sizeof(post_element_t *) * (gGui->post_elements_num + 2));
+    while((p = strsep(&post_chain, ";"))) {
       
-      gGui->post_elements[gGui->post_elements_num] = (post_element_t *) 
-	xine_xmalloc(sizeof(post_element_t));
-      gGui->post_elements[gGui->post_elements_num]->post = post;
-      gGui->post_elements[gGui->post_elements_num]->name = strdup(plugin);
-      gGui->post_elements_num++;
-      gGui->post_elements[gGui->post_elements_num] = NULL;
-      
-      memset(&pobj, 0, sizeof(post_object_t));
-      pobj.post = post;
-
-      if(__pplugin_retrieve_parameters(&pobj)) {
-	int   i;
-
-	if(pobj.properties_names && args) {
-	  char *param;
+      if(p && strlen(p)) {
+	char          *plugin, *args = NULL;
+	xine_post_t   *post;
+	
+	while(*p == ' ')
+	  p++;
+	
+	plugin = strdup(p);
+	
+	if((p = strchr(plugin, ':')))
+	  *p++ = '\0';
+	
+	if(p && (strlen(p) > 1))
+	  args = p;
+	
+	post = xine_post_init(gGui->xine, plugin, 0, &gGui->ao_port, &gGui->vo_port);
+	
+	if(post) {
+	  post_object_t  pobj;
+	 
+	  if(!(*post_elements_num))
+	    post_elements = (post_element_t **) xine_xmalloc(sizeof(post_element_t *) * 2);
+	  else
+	    post_elements = (post_element_t **) 
+	      realloc(post_elements, sizeof(post_element_t *) * ((*post_elements_num) + 2));
 	  
-	  while((param = xine_strsep(&args, ",")) != NULL) {
+	  post_elements[(*post_elements_num)] = (post_element_t *) 
+	    xine_xmalloc(sizeof(post_element_t));
+	  post_elements[(*post_elements_num)]->post = post;
+	  post_elements[(*post_elements_num)]->name = strdup(plugin);
+	  (*post_elements_num)++;
+	  post_elements[(*post_elements_num)] = NULL;
+	  
+	  memset(&pobj, 0, sizeof(post_object_t));
+	  pobj.post = post;
+	  
+	  if(__pplugin_retrieve_parameters(&pobj)) {
+	    int   i;
 	    
-	    p = param;
-	    
-	    while((*p != '\0') && (*p != '='))
-	      p++;
-	    
-	    if(p && strlen(p)) {
-	      int param_num = 0;
+	    if(pobj.properties_names && args) {
+	      char *param;
 	      
-	      *p++ = '\0';
-	      
-	      while(pobj.properties_names[param_num]
-		    && strcmp(pobj.properties_names[param_num], param))
-		param_num++;
-	      
-	      if(pobj.properties_names[param_num]) {
+	      while((param = xine_strsep(&args, ",")) != NULL) {
 		
-		pobj.param    = pobj.descr->parameter;
-		pobj.param    += param_num;
-		pobj.readonly = pobj.param->readonly;
-
-		switch(pobj.param->type) {
-		case POST_PARAM_TYPE_INT:
-		  if(!pobj.readonly) {
-		    *(int *)(pobj.param_data + pobj.param->offset) = (int) strtol(p, &p, 10);
-		    _pplugin_update_parameter(&pobj);
-		  }
-		  break;
-
-		case POST_PARAM_TYPE_DOUBLE:
-		  if(!pobj.readonly) {
-		    *(double *)(pobj.param_data + pobj.param->offset) = strtod(p, &p);
-		    _pplugin_update_parameter(&pobj);
-		  }
-		  break;
-
-		case POST_PARAM_TYPE_CHAR:
-		case POST_PARAM_TYPE_STRING:
-		  if(!pobj.readonly) {
-		    if(pobj.param->type == POST_PARAM_TYPE_CHAR) {
-		      int maxlen = pobj.param->size / sizeof(char);
+		p = param;
+		
+		while((*p != '\0') && (*p != '='))
+		  p++;
+		
+		if(p && strlen(p)) {
+		  int param_num = 0;
+		  
+		  *p++ = '\0';
+		  
+		  while(pobj.properties_names[param_num]
+			&& strcmp(pobj.properties_names[param_num], param))
+		    param_num++;
+		  
+		  if(pobj.properties_names[param_num]) {
+		    
+		    pobj.param    = pobj.descr->parameter;
+		    pobj.param    += param_num;
+		    pobj.readonly = pobj.param->readonly;
+		    
+		    switch(pobj.param->type) {
+		    case POST_PARAM_TYPE_INT:
+		      if(!pobj.readonly) {
+			*(int *)(pobj.param_data + pobj.param->offset) = (int) strtol(p, &p, 10);
+			_pplugin_update_parameter(&pobj);
+		      }
+		      break;
 		      
-		      snprintf((char *)(pobj.param_data + pobj.param->offset), maxlen, "%s", p);
-		      _pplugin_update_parameter(&pobj);
+		    case POST_PARAM_TYPE_DOUBLE:
+		      if(!pobj.readonly) {
+			*(double *)(pobj.param_data + pobj.param->offset) = strtod(p, &p);
+			_pplugin_update_parameter(&pobj);
+		      }
+		      break;
+		      
+		    case POST_PARAM_TYPE_CHAR:
+		    case POST_PARAM_TYPE_STRING:
+		      if(!pobj.readonly) {
+			if(pobj.param->type == POST_PARAM_TYPE_CHAR) {
+			  int maxlen = pobj.param->size / sizeof(char);
+			  
+			  snprintf((char *)(pobj.param_data + pobj.param->offset), maxlen, "%s", p);
+			  _pplugin_update_parameter(&pobj);
+			}
+			else
+			  fprintf(stderr, "parameter type POST_PARAM_TYPE_STRING) not supported yet.\n");
+		      }
+		      break;
+		      
+		    case POST_PARAM_TYPE_STRINGLIST: /* unsupported */
+		      if(!pobj.readonly)
+			fprintf(stderr, "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n");
+		      break;
+		      
+		    case POST_PARAM_TYPE_BOOL:
+		      if(!pobj.readonly) {
+			*(int *)(pobj.param_data + pobj.param->offset) = ((int) strtol(p, &p, 10)) ? 1 : 0;
+			_pplugin_update_parameter(&pobj);
+		      }
+		      break;
 		    }
-		    else
-		     fprintf(stderr, "parameter type POST_PARAM_TYPE_STRING) not supported yet.\n");
 		  }
-		  break;
-
-		case POST_PARAM_TYPE_STRINGLIST: /* unsupported */
-		  if(!pobj.readonly)
-		    fprintf(stderr, "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n");
-		  break;
-
-		case POST_PARAM_TYPE_BOOL:
-		  if(!pobj.readonly) {
-		    *(int *)(pobj.param_data + pobj.param->offset) = ((int) strtol(p, &p, 10)) ? 1 : 0;
-		    _pplugin_update_parameter(&pobj);
-		  }
-		  break;
 		}
+	      } 
+	      
+	      i = 0;
+	      
+	      while(pobj.properties_names[i]) {
+		free(pobj.properties_names[i]);
+		i++;
 	      }
+	      
+	      free(pobj.properties_names);
 	    }
-	  } 
-
-	  i = 0;
-	  
-	  while(pobj.properties_names[i]) {
-	    free(pobj.properties_names[i]);
-	    i++;
+	    
+	    free(pobj.param_data);
 	  }
-	  
-	  free(pobj.properties_names);
 	}
 	
-	free(pobj.param_data);
+	free(plugin);
       }
     }
+  }
+
+  return post_elements;
+}
+
+void pplugin_parse_and_store_post(const char *post_chain) {
+  post_element_t **posts = NULL;
+  int              num;
+
+  if((posts = pplugin_parse_and_load(post_chain, &num))) {
+    if(gGui->post_elements_num) {
+      int i;
+      int ptot = gGui->post_elements_num + num;
+      
+      gGui->post_elements = (post_element_t **) realloc(gGui->post_elements, 
+							sizeof(post_element_t *) * (ptot + 1));
+      for(i = gGui->post_elements_num; i <  ptot; i++)
+	gGui->post_elements[i] = posts[i - gGui->post_elements_num];
+
+      gGui->post_elements[i] = NULL;
+      gGui->post_elements_num += num;
+
+    }
+    else {
+      gGui->post_elements     = posts;
+      gGui->post_elements_num = num;;
+    }
+  }
+  
+}
+
+void post_deinterlace_init(const char *deinterlace_post) {
+  post_element_t **posts = NULL;
+  int              num;
+  
+  gGui->deinterlace_plugin = 
+    (char *) xine_config_register_string (gGui->xine, "gui.deinterlace_plugin", 
+					  "tvtime:method=8",
+					  _("Deinterlace plugin."),
+					  _("Plugin (with optional parameters) to use "
+					    "when deinterlace is used (plugin separator is ';')."),
+					  CONFIG_LEVEL_ADV,
+					  post_deinterlace_plugin_cb,
+					  CONFIG_NO_DATA);
+  
+  if((posts = pplugin_parse_and_load((deinterlace_post && strlen(deinterlace_post)) ? 
+				     deinterlace_post : gGui->deinterlace_plugin, &num))) {
+    gGui->deinterlace_elements     = posts;
+    gGui->deinterlace_elements_num = num;
+  }
+  
+}
+
+void post_deinterlace(void) {
+
+  if(gGui->deinterlace_enable) {
+    if(gGui->post_enable)
+      _pplugin_unwire();
+    
+    _pplugin_rewire_from_post_elements(gGui->deinterlace_elements, gGui->deinterlace_elements_num);
+  }
+  else {
+    _pplugin_unwire();
+    
+    if(gGui->post_enable)
+      _pplugin_rewire_from_post_elements(gGui->post_elements, gGui->post_elements_num);
   }
 }

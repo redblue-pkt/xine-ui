@@ -270,8 +270,8 @@ There are also some self explanatory options.
 .B \-Z
 Don't automatically start playback, affect only auto-start when smart mode is used.
 .TP
-.B \-D,\ \-\-deinterlace
-Deinterlace video output.
+.B \-D,\ \-\-deinterlace [post[:..][;]]
+Deinterlace video output. You can override configuration option of post(s) used to deinterlace the output picture. See \fI\-\-post\fP for syntax.
 .TP
 .BI \-r,\ \-\-aspect\-ratio\  <mode>
 Set aspect ratio of video output. Modes are:
@@ -286,8 +286,8 @@ Don't display the logo.
 .BI \-E,\ \-\-no\-reload
 Don't reload old playlist. Playlist is saved when you leave xine, then it is reloaded and played the next time you lanch xine. This feature can be disabled via setup window.
 .TP
-.BI \-\-post\  <plugin>[:parameter=value][,...]
-Load a post plugin. Parameters are comma separated. This option can be used more than one time to chain two or more video postprocess plugins.
+.BI \-\-post\  <plugin>[:parameter=value][,...][;...]
+Load one or more post plugin(s). Parameters are comma separated. This option can be used more than one time to chain two or more video postprocess plugins. You can specify two or more plugin, which may be separated by a semi-colon ';'.
 .TP
 .BI \-\-disable\-post
 Don't enable post plugin(s). This way, you can specify one more plugin to use, using the --post command line option, but don't enable those effects.

@@ -861,14 +861,9 @@ void gui_toggle_aspect(int aspect) {
 }
 
 void gui_toggle_interlaced(void) {
-  int deint;
-  
-  xine_set_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE, 
-		 (1 - (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE))));
-
-  deint = xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE);
-
-  osd_display_info(_("Deinterlace: %d"), deint);
+  gGui->deinterlace_enable = !gGui->deinterlace_enable;
+  osd_display_info(_("Deinterlace: %s"), (gGui->deinterlace_enable) ? _("enabled") : _("disabled"));
+  post_deinterlace();
   
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
