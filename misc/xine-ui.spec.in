@@ -192,6 +192,7 @@ rm -rf $RPM_BUILD_ROOT
 @XINE_SKINDIR@/pitt/*
 @XINE_SKINDIR@/xinetic/*
 @XINE_SKINDIR@/cloudy/*
+@XINE_SKINDIR@/mp2k/*
 # misc script
 @XINE_SCRIPTDIR@/xineshot
 # desktop entries/icons
