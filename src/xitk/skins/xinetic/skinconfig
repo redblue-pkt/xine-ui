@@ -1,0 +1,909 @@
+#Xine skin data file
+# revision 0.7
+skin.name    = Xinetic
+skin.version = 2
+skin.date    = 08.05.2002
+skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
+skin.url     = none
+
+## Main GUI ##
+skin.BackGround {
+	coords {
+	  x = 0
+	  y = 0
+        }
+	pixmap = MainBg.png
+}
+
+skin.Close {
+	coords {
+	  x = 500
+	  y = 2
+	}
+	pixmap = MainClose.png
+}
+
+skin.Eject {
+	coords {
+	  x = 434
+	  y = 64
+	}
+	pixmap = MainEject.png
+}
+
+skin.Exit {
+	coords {
+	  x = 8
+	  y = 76
+	}
+	pixmap = MainPower.png
+}
+
+skin.Setup {
+	coords {
+	  x = 20
+	  y = 76
+	}
+	pixmap = MainSetup.png
+}
+
+skin.FullScreen {
+	coords {
+	  x = 486
+	  y = 2
+	}
+	pixmap = MainFullScreen.png
+}
+
+skin.TitleLabel {
+	coords {
+	  x = 42
+	  y = 18
+	}
+	label {
+	  length = 51
+	  animation = True
+	  pixmap = Letters.png
+	}
+}
+
+skin.TimeLabel {
+	coords {
+	  x = 66
+	  y = 37
+	}
+	label {
+	  length = 8
+	  animation = False
+	  pixmap = Letters.png
+	}
+}
+
+skin.AudioNext {
+	coords {
+	  x = 186
+	  y = 37
+	}
+	pixmap = SmallArrowUp.png
+}
+
+skin.AudioPrev {
+	coords {
+	  x = 186
+	  y = 45
+	}
+	pixmap = SmallArrowDown.png
+}
+
+skin.AudioLabel {
+	coords {
+	  x = 222
+	  y = 37
+	}
+	label {
+	  length = 6
+	  animation = False
+	  pixmap = Letters.png
+	}
+}
+
+skin.SpuNext {
+	coords {
+	  x = 268
+	  y = 37
+	}
+	pixmap = SmallArrowUp.png
+}
+
+skin.SpuPrev {
+	coords {
+	  x = 268
+	  y = 45
+	}
+	pixmap = SmallArrowDown.png
+}
+
+skin.SpuLabel {
+	coords {
+	  x = 306
+	  y = 37
+	}
+	label {
+	  length = 6
+	  animation = False
+	pixmap = Letters.png
+	}
+}
+
+skin.PlayFast {
+	coords {
+	  x = 389
+	  y = 16
+	}
+	pixmap = MainUp.png
+}
+
+skin.PlaySlow {
+	coords {
+	  x = 389
+	  y = 45
+	}
+	pixmap = MainDown.png
+}
+
+skin.Next {
+	coords {
+	  x = 459
+	  y = 49
+	}
+	pixmap = MainNext.png
+}
+
+skin.Pause {
+	coords {
+	  x = 413
+	  y = 30
+	}
+	pixmap = MainPause.png
+}
+
+skin.Play {
+	coords {
+	  x = 429
+	  y = 13
+	}
+	pixmap = MainPlay.png
+}
+
+skin.Stop {
+	coords {
+	  x = 459
+	  y = 30
+	}
+	pixmap = MainStop.png
+}
+
+skin.Prev {
+	coords {
+	  x = 413
+	  y = 49
+	}
+	pixmap = MainPrev.png
+}
+
+skin.Mute {
+	coords {
+	  x = 366
+	  y = 45
+	}
+	pixmap = MainMute.png
+}
+
+skin.SliderVol {
+	coords {
+	  x = 347
+	  y = 22
+	}
+	pixmap = MainVolumeBg.png
+	slider {
+	  pixmap = MainVolumePad.png
+	  type = vertical
+	}
+
+}
+
+skin.Snapshot {
+	coords {
+	  x = 346
+	  y = 75
+	}
+	pixmap = MainCam.png
+}
+
+skin.AutoPlayGUI {
+	coords {
+	  x = 300
+	  y = 43
+	}
+	pixmap = MainAutoButton.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlBtn {
+	coords {
+	  x = 4
+	  y = 18
+	}
+	pixmap = PlBtn.png
+}
+
+skin.CtlBtn {
+	coords {
+	  x = 4
+	  y = 37
+	}
+	pixmap = CtlBtn.png
+}
+
+skin.MrlBtn {
+	coords {
+	  x = 4
+	  y = 56
+	}
+	pixmap = MrlBtn.png
+}
+
+skin.SliderPlay {
+	coords {
+	  x = 36
+	  y = 5
+	}
+	pixmap = SliderHBg.png
+	slider {
+	  pixmap = SliderHPad.png
+	  type = horizontal
+	}
+}
+
+## Playlist ##
+skin.PlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = PlBg.png
+}
+
+skin.PlAdd {
+	coords {
+	  x = 333
+	  y = 110
+	}
+	pixmap = Onglet.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlLoad {
+	coords {
+	  x = 333
+	  y = 127
+	}
+	pixmap = Onglet.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlSave {
+	coords {
+	  x = 333
+	  y = 144
+	}
+	pixmap = Onglet.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlItemBtn {
+	coords {
+	  x = 20
+	  y = 20
+	}
+	pixmap = PlItemBtn.png
+	browser {
+	  entries = 9
+	}
+	label {
+	  align = left
+	  color = #a4abb0
+	  color_focus = #a4abb0
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlPlay {
+	coords {
+	  x = 15
+	  y = 218
+	}
+	pixmap = PlPlay.png
+}
+
+skin.PlDelete {
+	coords {
+	  x = 69
+	  y = 218
+	}
+	pixmap = PlDelete.png
+}
+
+skin.PlDeleteAll {
+	coords {
+	  x = 123
+	  y = 218
+	}
+	pixmap = PlDeleteAll.png
+}
+
+skin.PlMoveUp {
+	coords {
+	  x = 177
+	  y = 218
+	}
+	pixmap = PlMoveUp.png
+}
+
+skin.PlMoveDn {
+	coords {
+	  x = 231
+	  y = 218
+	}
+	pixmap = PlMoveDn.png
+}
+
+skin.PlDismiss {
+	coords {
+	  x = 333
+	  y = 207
+	}
+	pixmap = PlDismiss.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlUp {
+	coords {
+	  x = 310
+	  y = 17
+	}
+	pixmap = BigArrowUp.png
+}
+
+skin.SliderPl {
+	coords {
+	  x = 312
+	  y = 38
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+
+skin.PlDn {
+	coords {
+	  x = 310
+	  y = 164
+	}
+	pixmap = BigArrowDown.png
+}
+
+skin.AutoPlayLbl {
+	coords {
+	  x = 337
+	  y = 20
+	}
+
+	label {
+	  length = 9
+	  animation = True
+	  pixmap = Letters.png
+	}
+}
+
+skin.AutoPlayBG {
+	coords {
+	  x = 333
+	  y = 42
+	}
+	pixmap =  Onglet.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlInputText {
+	coords {
+	  x = 26
+	  y = 192
+	}
+	pixmap = PlInputTxt.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #9fa4ad
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+#Control Panel
+skin.CtlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = CtlBg.png
+}
+
+skin.SliderCtlHue {
+	coords {
+	  x = 36
+	  y = 38
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlHueLbl {
+	coords {
+	  x = 23
+	  y = 190
+	}
+	label {
+	  length = 3
+	  animation = False
+	pixmap = Letters.png
+	}
+}
+
+skin.SliderCtlSat {
+	coords {
+	  x = 80
+	  y = 38
+	}
+	pixmap = SliderVBg.png
+	slider {
+	pixmap = SliderVPad.png
+	type = vertical
+	}
+}
+
+skin.CtlSatLbl {
+	coords {
+	  x = 67
+	  y = 190
+	}
+	label {
+	  length = 3
+	  animation = False
+	pixmap = Letters.png
+	}
+}
+
+skin.SliderCtlBright {
+	coords {
+	  x = 124
+	  y = 38
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlBrightLbl {
+	coords {
+	  x = 111
+	  y = 190
+	}
+
+	label {
+	  length = 3
+	  animation = False
+	pixmap = Letters.png
+	}
+}
+
+skin.SliderCtlCont {
+	coords {
+	  x = 168
+	  y = 38
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlContLbl {
+	coords {
+	  x = 155
+	  y = 190
+	}
+	label {
+	  length = 3
+	  animation = False
+	pixmap = Letters.png
+	}
+}
+
+skin.CtlSave {
+	coords {
+	  x = 13
+	  y = 214
+	}
+	pixmap = CtlSave.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.CtlSkLbl {
+	coords {
+	  x = 288
+	  y = 20
+	}
+	label {
+	  length = 13
+	  animation = True
+	pixmap = Letters.png
+	}
+}
+
+skin.CtlSkUp {
+	coords {
+	  x = 378
+	  y = 41
+	}
+	pixmap = SkArrowUp.png
+}
+
+skin.SliderCtlSk {
+	coords {
+	  x = 380
+	  y = 62
+	}
+	pixmap = SkSlidBG.png
+	slider {
+	  pixmap = SkSlidPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlSkDn {
+	coords {
+	  x = 378
+	  y = 116
+	}
+	pixmap = SkArrowDown.png
+}
+
+skin.CtlSkItemBtn {
+	coords {
+	  x = 288
+	  y = 44
+	}
+	pixmap = SkItemBtn.png
+	browser {
+	  entries = 5
+	}
+	label {
+	  color = #a4aab4
+	  color_focus = #a4aab4
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.CtlDismiss {
+	coords {
+	  x = 333
+	  y = 208
+	}
+	pixmap = CtlDismiss.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+### MRL Browser ###
+skin.MrlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = MrlBg.png
+}
+
+skin.MrlItemBtn {
+	coords {
+	  x = 20
+	  y = 20
+	}
+	pixmap = PlItemBtn.png
+	browser {
+	  entries = 9
+	}
+	label {
+	  align = left
+	  color = #a4aab4
+	  color_focus = #a4aab4
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlSelect {
+	coords {
+	  x = 15
+	  y = 224
+	}
+	pixmap = MrlSelect.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlPlay {
+	coords {
+	  x = 69
+	  y = 235
+	}
+	pixmap = PlPlay.png
+}
+
+skin.MrlDismiss {
+	coords {
+	  x = 333
+	  y = 224
+	}
+	pixmap = MrlDismiss.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlUp {
+	coords {
+	  x = 310
+	  y = 17
+	}
+	pixmap = BigArrowUp.png
+}
+
+skin.SliderMrl {
+	coords {
+	  x = 312
+	  y = 38
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+
+skin.MrlDn {
+	coords {
+	  x = 310
+	  y = 164
+	}
+	pixmap = BigArrowDown.png
+}
+
+skin.MrlCurOrigin {
+	coords {
+	  x = 21
+	  y = 189
+	}
+
+	label {
+	  length = 43
+	  animation = True
+	pixmap = Letters.png
+	}
+}
+
+skin.MrlPlugNameBG {
+	coords {
+	  x = 333
+	  y = 42
+	}
+	pixmap = Onglet.png
+	label {
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlPlugLabel {
+	coords {
+	  x = 337
+	  y = 20
+	}
+	label {
+	  length = 7
+	  animation = False
+	pixmap = Letters.png
+	}
+}
+
+skin.MrlFilt {
+	coords {
+	  x = 160
+	  y = 214
+	}
+	pixmap = SkArrowDown.png
+	label {
+	  length = 18
+	  animation = False
+	  pixmap = Letters.png
+	}
+}
+
+### File Browser ##
+skin.FBBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = MrlBg.png
+}
+skin.FBItemBtn {
+	coords {
+	  x = 75
+	  y = 40
+	}
+	pixmap = PlItemBtn.png
+	label {
+	  align = left
+	  color = #a4aab4
+	  color_focus = #a4aab4
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	}
+}
+skin.FBHome {
+	coords {
+	  x = 179
+	  y = 227
+	}
+	pixmap = MrlSelect.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBSelect {
+	coords {
+	  x = 257
+	  y = 227
+	}
+	pixmap = MrlSelect.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBDismiss {
+	coords {
+	  x = 400
+	  y = 227
+	}
+	pixmap = MrlDismiss.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBUp {
+	coords {
+	  x = 375
+	  y = 40
+	}
+	pixmap = SmallArrowUp.png
+}
+skin.SliderFB {
+	coords {
+	  x = 377
+	  y = 55
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+skin.FBDn {
+	coords {
+	  x = 375
+	  y = 178
+	}
+	pixmap = SmallArrowUp.png
+}
+skin.FBCurDirLbl {
+	coords {
+	  x = 75
+	  y = 200
+	}
+	pixmap = Letters.png
+}
+skin.FBCurDir {
+	coords {
+	  x = 140
+	  y = 200
+	}
+	pixmap = Letters.png
+}
+skin.FBSortRev {
+	coords {
+	  x = 362
+	  y = 150
+	}
+	pixmap = SmallArrowUp.png
+}
+skin.FBSortDef {
+	coords {
+	  x = 362
+	  y = 165
+	}
+	pixmap = SmallArrowDown.png
+}

@@ -1,0 +1,922 @@
+#Xine skin data file
+# Revision 0.3 (for Xine 0.9.8)
+# 0.1:
+# 0.2:
+# 0.3: Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+#      add 'print = false' and change font to 'fixed' for hide labels in buttons.
+#      add load/unload command support.
+#
+skin.name           = cloudy
+skin.version        = 2
+skin.date           = 2002.01.09
+skin.author         = Daniel Erat <dan_erat@pobox.com>
+skin.url            = http://www.pobox.com/~dan_erat/
+skin.load_command   = xset +fp $(SKIN_PARENT_PATH)/cloudy
+skin.unload_command = xset -fp $(SKIN_PARENT_PATH)/cloudy
+
+## Main GUI ##
+skin.BackGround {
+	coords {
+	  x = 0
+	  y = 0
+        }
+	pixmap = MainBg.png
+}
+
+skin.Close {
+	coords {
+	  x = 576
+	  y = 8
+	}
+	pixmap = MainClose.png
+}
+
+skin.Eject {
+	coords {
+	  x = 477
+	  y = 33
+	}
+	pixmap = MainEject.png
+}
+
+skin.Exit {
+	coords {
+	  x = 560
+	  y = 62
+	}
+	pixmap = MainPower.png
+}
+
+skin.Setup {
+	coords {
+	  x = 560
+	  y = 24
+	}
+	pixmap = MainSetup.png
+}
+
+skin.FullScreen {
+	coords {
+	  x = 560
+	  y = 8
+	}
+	pixmap = MainFullScreen.png
+}
+
+skin.TitleLabel {
+	coords {
+	  x = 12
+	  y = 20
+	}
+	label {
+	  length = 51
+	  animation = True
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.TimeLabel {
+	coords {
+	  x = 12
+	  y = 36
+	}
+	label {
+	  length = 8
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.AudioNext {
+	coords {
+	  x = 135
+	  y = 36
+	}
+	pixmap = MainSmallArrowUp.png
+}
+
+skin.AudioPrev {
+	coords {
+	  x = 135
+	  y = 42
+	}
+	pixmap = MainSmallArrowDown.png
+}
+
+skin.AudioLabel {
+	coords {
+	  x = 99
+	  y = 36
+	}
+	label {
+	  length = 6
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.SpuNext {
+	coords {
+	  x = 213
+	  y = 36
+	}
+	pixmap = MainSmallArrowUp.png
+}
+
+skin.SpuPrev {
+	coords {
+	  x = 213
+	  y = 42
+	}
+	pixmap = MainSmallArrowDown.png
+}
+
+skin.SpuLabel {
+	coords {
+	  x = 177
+	  y = 36
+	}
+	label {
+	  length = 6
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.PlayFast {
+	coords {
+	  x = 477
+	  y = 8
+	}
+	pixmap = MainPlayFast.png
+}
+
+skin.PlaySlow {
+	coords {
+	  x = 428
+	  y = 8
+	}
+	pixmap = MainPlaySlow.png
+}
+
+skin.Next {
+	coords {
+	  x = 379
+	  y = 8
+	}
+	pixmap = MainNext.png
+}
+
+skin.Pause {
+	coords {
+	  x = 333
+	  y = 33
+	}
+	pixmap = MainPause.png
+}
+
+skin.Play {
+	coords {
+	  x = 428
+	  y = 33
+	}
+	pixmap = MainPlay.png
+}
+
+skin.Stop {
+	coords {
+	  x = 379
+	  y = 33
+	}
+	pixmap = MainStop.png
+}
+
+skin.Prev {
+	coords {
+	  x = 333
+	  y = 8
+	}
+	pixmap = MainPrev.png
+}
+
+skin.Mute {
+	coords {
+	  x = 526
+	  y = 54
+	}
+	pixmap = MainMute.png
+}
+
+skin.SliderVol {
+	coords {
+	  x = 526
+	  y = 11
+	}
+	pixmap = MainVolumeBg.png
+	slider {
+	  pixmap = MainVolumePad.png
+	  type = vertical
+	}
+	
+}
+
+skin.Snapshot {
+	coords {
+	  x = 576
+	  y = 24
+	}
+	pixmap = MainSnapshot.png
+}
+
+skin.AutoPlayGUI {
+	coords {
+	  x = 275
+	  y = 49
+	}
+	pixmap = MainAutoButton.png
+	label {
+	  color = #1f2123
+	  color_focus = #1f2123
+	  color_click = #1f2123
+	  font = -misc-fatsolid-*-*-*-*-*-100-*-*-*-*-*-*
+	}
+}
+
+skin.MrlBtn {
+	coords {
+	  x = 232
+	  y = 30
+	}
+	pixmap = MainMrlBtn.png
+}
+
+skin.PlBtn {
+	coords {
+	  x = 261
+	  y = 30
+	}
+	pixmap = MainPlBtn.png
+}
+
+skin.CtlBtn {
+	coords {
+	  x = 290
+	  y = 30
+	}
+	pixmap = MainCtlBtn.png
+}
+
+skin.SliderPlay {
+	coords {
+	  x = 12
+	  y = 8
+	}
+	pixmap = MainSliderBg.png
+	slider {
+	  pixmap = MainSliderPad.png
+	  type = horizontal
+	}
+}
+
+## Playlist ##
+skin.PlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = PlBg.png
+}
+
+skin.PlAdd {
+	coords {
+	  x = 8
+	  y = 187
+	}
+	pixmap = PlAdd.png
+	label {
+	  print = false
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = fixed
+	}
+}
+
+skin.PlLoad {
+	coords {
+	  x = 282
+	  y = 130
+	}
+	pixmap = ComBox.png
+	label {
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = -misc-smooth-*-*-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlSave {
+	coords {
+	  x = 282
+	  y = 151
+	}
+	pixmap = ComBox.png
+	label {
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = -misc-smooth-*-*-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlItemBtn {
+	coords {
+	  x = 15
+	  y = 15
+	}
+	pixmap = PlItem.png
+	browser {
+	  entries = 9
+	}
+	label {
+	  align = left
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = -misc-smooth-*-*-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlPlay {
+	coords {
+	  x = 142
+	  y = 187
+	}
+	pixmap = PlPlay.png
+}
+
+skin.PlDelete {
+	coords {
+	  x = 32
+	  y = 187
+	}
+	pixmap = PlDelete.png
+}
+
+skin.PlDeleteAll {
+	coords {
+	  x = 56
+	  y = 187
+	}
+	pixmap = PlDeleteAll.png
+}
+
+skin.PlMoveUp {
+	coords {
+	  x = 94
+	  y = 187
+	}
+	pixmap = PlMoveUp.png
+}
+
+skin.PlMoveDn {
+	coords {
+	  x = 118
+	  y = 187
+	}
+	pixmap = PlMoveDown.png
+}
+
+skin.PlDismiss {
+	coords {
+	  x = 316
+	  y = 187
+	}
+	pixmap = ComDismiss.png
+	label {
+	  print = false
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = fixed
+	}
+}
+
+skin.PlUp {
+	coords {
+	  x = 264
+	  y = 12
+	}
+	pixmap = ComScrollArrowUp.png
+}
+
+skin.SliderPl {
+	coords {
+	  x = 264
+	  y = 24
+	}
+	pixmap = ComScrollBg.png
+	slider {
+	  pixmap = ComScrollPad.png
+	  type = vertical
+	}	  
+}
+
+skin.PlDn {
+	coords {
+	  x = 264
+	  y = 142
+	}
+	pixmap = ComScrollArrowDown.png
+}
+
+skin.AutoPlayLbl {
+	coords {
+	  x = 280
+	  y = 13
+	}
+	label {
+	  length = 9
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.AutoPlayBG {
+	coords {
+	  x = 282
+	  y = 26
+	}
+	pixmap = ComBox.png
+	label {
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = -misc-smooth-*-*-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlInputText {
+	coords {
+	  x = 13
+	  y = 156
+	}
+	pixmap = PlInputText.png
+	label {
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = -misc-smooth-*-*-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+#Control Panel
+skin.CtlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = CtlBg.png
+}
+
+skin.SliderCtlHue {
+	coords {
+	  x = 15
+	  y = 29
+	}
+	pixmap = CtlSliderBg.png
+	slider {
+	  pixmap = CtlSliderPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlHueLbl {
+	coords {
+	  x = 13
+	  y = 13
+	}
+	label {
+	  length = 3
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.SliderCtlSat {
+	coords {
+	  x = 37
+	  y = 29
+	}
+	pixmap = CtlSliderBg.png
+	slider {
+	  pixmap = CtlSliderPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlSatLbl {
+	coords {
+	  x = 35
+	  y = 13
+	}
+	label {
+	  length = 3
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.SliderCtlBright {
+	coords {
+	  x = 59
+	  y = 29
+	}
+	pixmap = CtlSliderBg.png
+	slider {
+	  pixmap = CtlSliderPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlBrightLbl {
+	coords {
+	  x = 57
+	  y = 13
+	}
+	label {
+	  length = 3
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.SliderCtlCont {
+	coords {
+	  x = 81
+	  y = 29
+	}
+	pixmap = CtlSliderBg.png
+	slider {
+	  pixmap = CtlSliderPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlContLbl {
+	coords {
+	  x = 79
+	  y = 13
+	}
+	label {
+	  length = 3
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+# FIXME: Deprecated?
+skin.CtlSave {
+	coords {
+	  x = 13
+	  y = 214
+	}
+	pixmap = CtlSave.png
+	label {
+	  color = #344b5d
+	  color_focus = #081e2f
+	  color_click = #a4abb0
+	  font = *-lucida-*-r-*-*-8-*-*-*-*-*-*-*
+	}
+}
+
+skin.CtlSkLbl {
+	coords {
+	  x = 114
+	  y = 13
+	}
+	label {
+	  length = 15
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.CtlSkUp {
+	coords {
+	  x = 208
+	  y = 28
+	}
+	pixmap = ComScrollArrowUp.png
+}
+
+skin.SliderCtlSk {
+	coords {
+	  x = 208
+	  y = 40
+	}
+	pixmap = CtlSkinScrollBg.png
+	slider {
+	  pixmap = ComScrollPad.png
+	  type = vertical
+	}
+}
+
+skin.CtlSkDn {
+	coords {
+	  x = 208
+	  y = 98
+	}
+	pixmap = ComScrollArrowDown.png
+}
+
+skin.CtlSkItemBtn {
+	coords {
+	  x = 103
+	  y = 31
+	}
+	pixmap = CtlSkinItem.png
+	browser {
+	  entries = 5
+	}
+	label {
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = -misc-smooth-*-*-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.CtlDismiss {
+	coords {
+	  x = 204
+	  y = 124
+	}
+	pixmap = ComDismiss.png
+	label {
+	  print = false
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = fixed
+	}
+}
+
+### MRL Browser ###
+skin.MrlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = MrlBg.png
+}
+
+skin.MrlItemBtn {
+	coords {
+	  x = 69
+	  y = 15
+	}
+	pixmap = MrlItem.png
+	browser {
+	  entries = 9
+	}
+	label {
+	  align = left
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = -misc-smooth-*-*-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlSelect {
+	coords {
+	  x = 8
+	  y = 203
+	}
+	pixmap = MrlSelect.png
+	label {
+	  print = false
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = fixed
+	}
+}
+
+skin.MrlPlay {
+	coords {
+	  x = 49
+	  y = 203
+	}
+	pixmap = MrlPlay.png
+}
+
+skin.MrlDismiss {
+	coords {
+	  x = 260
+	  y = 203
+	}
+	pixmap = ComDismiss.png
+	label {
+	  print = false
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = fixed
+	}
+}
+
+skin.MrlUp {
+	coords {
+	  x = 264
+	  y = 12
+	}
+	pixmap = ComScrollArrowUp.png
+}
+
+skin.SliderMrl {
+	coords {
+	  x = 264
+	  y = 24
+	}
+	pixmap = ComScrollBg.png
+	slider {
+	  pixmap = ComScrollPad.png
+	  type = vertical
+	}	  
+}
+
+skin.MrlDn {
+	coords {
+	  x = 264
+	  y = 142
+	}
+	pixmap = ComScrollArrowDown.png
+}
+
+skin.MrlCurOrigin {
+	coords {
+	  x = 15
+	  y = 175
+	}
+	label {
+	  length = 43
+	  animation = True
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.MrlPlugNameBG {
+	coords {
+	  x = 13
+	  y = 27
+	}
+	pixmap = ComBox.png
+	label {
+	  color = #000000
+	  color_focus = #000000
+	  color_click = #000000
+	  font = -misc-smooth-*-*-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlPlugLabel {
+	coords {
+	  x = 18
+	  y = 13
+	}
+	label {
+	  length = 7
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.MrlFilt {
+	coords {
+	  x = 80
+	  y = 157
+	}
+	pixmap = ComScrollArrowDown.png
+	label {
+	  length = 30
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+### File Browser ##
+# FIXME: These files don't exist, but it doesn't seem that the file browser
+# is being created anywhere in the source...  More deprecated stuff?
+skin.FBBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = MrlBg.png
+}
+skin.FBItemBtn {
+	coords {
+	  x = 75
+	  y = 40
+	}
+	pixmap = PlItemBtn.png
+	label {
+	  align = left
+	  color = #a4aab4
+	  color_focus = #a4aab4
+	  color_click = #081e2f
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+skin.FBHome {
+	coords {	
+	  x = 179
+	  y = 227
+	}
+	pixmap = MrlSelect.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBSelect {
+	coords {
+	  x = 257
+	  y = 227
+	}
+	pixmap = MrlSelect.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBDismiss {
+	coords {
+	  x = 400
+	  y = 227
+	}
+	pixmap = MrlDismiss.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBUp {
+	coords {
+	  x = 375
+	  y = 40
+	}
+	pixmap = SmallArrowUp.png
+}
+skin.SliderFB {
+	coords {
+	  x = 377
+	  y = 55
+	}
+	pixmap = SliderVBg.png
+	slider {
+	  pixmap = SliderVPad.png
+	  type = vertical
+	}
+}
+skin.FBDn {
+	coords {
+	  x = 375
+	  y = 178
+	}
+	pixmap = SmallArrowUp.png
+}
+skin.FBCurDirLbl {
+	coords {
+	  x = 75
+	  y = 200
+	}
+	pixmap = ComLetters.png
+}
+skin.FBCurDir {
+	coords {
+	  x = 140
+	  y = 200
+	}
+	pixmap = ComLetters.png
+}
+skin.FBSortRev {
+	coords {
+	  x = 362
+	  y = 150
+	}
+	pixmap = SmallArrowUp.png
+}
+skin.FBSortDef {
+	coords {
+	  x = 362
+	  y = 165
+	}
+	pixmap = SmallArrowDown.png
+}

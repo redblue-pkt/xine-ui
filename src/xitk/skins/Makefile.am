@@ -1,4 +1,4 @@
-SUBDIRS = CelomaChrome
+SUBDIRS = xinetic cloudy CelomaChrome 
 
 debug:
 install-debug: install
