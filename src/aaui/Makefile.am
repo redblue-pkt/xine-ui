@@ -9,7 +9,7 @@ if HAVE_CACA
 caca_programs = cacaxine
 endif
 
-bin_PROGRAMS = ${aa_programs} ${caca_programs}
+bin_PROGRAMS = $(aa_programs) $(caca_programs)
 
 aaxine_SOURCES = $(GETOPT_C) main.c
 aaxine_CFLAGS = $(AALIB_CFLAGS) -DAA
