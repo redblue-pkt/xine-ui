@@ -29,6 +29,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#include <pthread.h>
 #include <errno.h>
 
 #include "skin.h"
@@ -637,6 +638,8 @@ xitk_skin_config_t *xitk_skin_init_config(void) {
 
   skonfig->ln = skonfig->buf;
   
+  pthread_mutex_init(&skonfig->mutex, NULL);
+
   return skonfig;
 }
 
@@ -992,4 +995,22 @@ int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str) {
     return((s->slider_type) ? s->slider_type : XITK_HSLIDER);
 
   return 0;
+}
+
+/*
+ *
+ */
+void xitk_skin_lock(xitk_skin_config_t *skonfig) {
+  assert(skonfig);
+
+  pthread_mutex_lock(&skonfig->mutex);
+}
+
+/*
+ *
+ */
+void xitk_skin_unlock(xitk_skin_config_t *skonfig) {
+  assert(skonfig);
+  
+  pthread_mutex_unlock(&skonfig->mutex);
 }

@@ -108,6 +108,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     (browser_private_data_t *) w->private_data;
 
   if(w->widget_type & WIDGET_TYPE_BROWSER) {
+    xitk_skin_lock(skonfig);
     if(private_data->skin_element_name) {
       int x, y, i = 0;
       
@@ -124,6 +125,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 	
       }
     }
+      xitk_skin_unlock(skonfig);
   }
 }
 

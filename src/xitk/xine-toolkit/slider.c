@@ -263,6 +263,9 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   
   if(sl->widget_type & WIDGET_TYPE_SLIDER) {
     if(private_data->skin_element_name) {
+
+      xitk_skin_lock(skonfig);
+
       XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->paddle_skin);
       private_data->paddle_skin     = xitk_image_load_image(private_data->imlibdata, xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
       private_data->button_width    = private_data->paddle_skin->width / 3;
@@ -287,6 +290,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       sl->visible = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
       sl->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
+      xitk_skin_unlock(skonfig);
+
       xitk_set_widget_pos(sl, sl->x, sl->y);
     }
   }

@@ -1364,6 +1364,16 @@ char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char
  */
 int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str);
 
+/*
+ *
+ */
+void xitk_skin_lock(xitk_skin_config_t *skonfig);
+
+/*
+ *
+ */
+void xitk_skin_unlock(xitk_skin_config_t *skonfig);
+
 
 /**
  * Font manipulations.

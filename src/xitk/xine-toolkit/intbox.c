@@ -88,6 +88,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       /*      
       int x, y;
 
+      xitk_skin_lock(skonfig);
+
       // visibility && enability
 
       xitk_set_widget_pos(c, c->x, c->y);
@@ -95,6 +97,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       x += xitk_get_widget_width(private_data->label_widget);
       
       (void) xitk_set_widget_pos(private_data->button_widget, x, y);
+
+      xitk_skin_unlock(skonfig);
       */
     }
   }

@@ -327,6 +327,8 @@ void control_change_skins(void) {
  
   if(control_is_running()) {
     
+    xitk_skin_lock(gGui->skin_config);
+
     XLockDisplay(gGui->display);
     
     XUnmapWindow(gGui->display, control->window);
@@ -356,6 +358,8 @@ void control_change_skins(void) {
     Imlib_apply_image(gGui->imlib_data, new_img, control->window);
         
     XUnlockDisplay(gGui->display);
+
+    xitk_skin_unlock(gGui->skin_config);
     
     xitk_change_skins_widget_list(control->widget_list, gGui->skin_config);
     xitk_paint_widget_list(control->widget_list);

@@ -598,6 +598,8 @@ void playlist_change_skins(void) {
 
   if(pl_is_running()) {
     
+    xitk_skin_lock(gGui->skin_config);
+
     XLockDisplay(gGui->display);
     
     XUnmapWindow(gGui->display, playlist->window);
@@ -627,6 +629,8 @@ void playlist_change_skins(void) {
     Imlib_apply_image(gGui->imlib_data, new_img, playlist->window);
     
     XUnlockDisplay(gGui->display);
+    
+    xitk_skin_unlock(gGui->skin_config);
     
     xitk_change_skins_widget_list(playlist->widget_list, gGui->skin_config);
     

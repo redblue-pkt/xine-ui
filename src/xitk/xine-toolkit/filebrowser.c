@@ -939,6 +939,8 @@ void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig
   if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
     private_data = (filebrowser_private_data_t *)w->private_data;
     
+    xitk_skin_lock(skonfig);
+
     XLOCK(private_data->imlibdata->x.disp);
     
     Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
@@ -962,6 +964,8 @@ void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig
     
     XUNLOCK(private_data->imlibdata->x.disp);
     
+    xitk_skin_unlock(skonfig);
+
     xitk_change_skins_widget_list(private_data->widget_list, skonfig);
     
     xitk_paint_widget_list(private_data->widget_list);

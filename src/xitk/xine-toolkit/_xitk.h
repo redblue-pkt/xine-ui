@@ -416,8 +416,10 @@ int xitk_skin_get_label_printable(xitk_skin_config_t *skonfig, const char *str);
 int xitk_skin_get_label_alignment(xitk_skin_config_t *skonfig, const char *str);
 char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const char *str);
 char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
-char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str);
-int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str);
+char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *, const char *);
+int xitk_skin_get_slider_type(xitk_skin_config_t *, const char *);
+void xitk_skin_lock(xitk_skin_config_t *);
+void xitk_skin_unlock(xitk_skin_config_t *);
 
 typedef struct {
   Display       *display;

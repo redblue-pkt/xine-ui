@@ -493,6 +493,8 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
   if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
+    xitk_skin_lock(skonfig);
+
     XLOCK(private_data->imlibdata->x.disp);
     
     XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
@@ -521,6 +523,8 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     Imlib_apply_image(private_data->imlibdata, new_img, private_data->window);
 
     XUNLOCK(private_data->imlibdata->x.disp);
+
+    xitk_skin_unlock(skonfig);
     
     xitk_change_skins_widget_list(private_data->widget_list, skonfig);
 

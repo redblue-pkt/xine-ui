@@ -500,6 +500,9 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   
   if (it->widget_type & WIDGET_TYPE_INPUTTEXT) {
     if(private_data->skin_element_name) {
+
+      xitk_skin_lock(skonfig);
+
       XITK_FREE(private_data->fontname);
       private_data->fontname      = strdup(xitk_skin_get_label_fontname(skonfig, private_data->skin_element_name));
       
@@ -521,6 +524,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       it->visible                 = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
       it->enable                  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
      
+      xitk_skin_unlock(skonfig);
+
       xitk_set_widget_pos(it, it->x, it->y);
     }
   }

@@ -23,6 +23,8 @@
 #ifndef HAVE_XITK_SKIN_H
 #define HAVE_XITK_SKIN_H
 
+#include <pthread.h>
+
 typedef struct xitk_skin_element_s {
   struct xitk_skin_element_s   *prev;
   struct xitk_skin_element_s   *next;
@@ -65,6 +67,7 @@ typedef struct {
   char                         *date;
   char                         *url;
 
+  pthread_mutex_t               mutex;
   char                         *load_command;
   char                         *unload_command;
 

@@ -1123,6 +1123,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   if ((i->widget_type & WIDGET_TYPE_IMAGE) && i->visible) {
     if(private_data->skin_element_name) {
       
+      xitk_skin_lock(skonfig);
+
       XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->skin);
       private_data->skin = xitk_image_load_image(private_data->imlibdata,
 						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
@@ -1131,6 +1133,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       i->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       i->width           = private_data->skin->width;
       i->height          = private_data->skin->height;
+
+      xitk_skin_unlock(skonfig);
       
       xitk_set_widget_pos(i, i->x, i->y);
     }
