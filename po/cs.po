@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.9\n"
 "POT-Creation-Date: 2002-07-20 13:07+0200\n"
-"PO-Revision-Date: 2002-07-08 11:10+0200\n"
+"PO-Revision-Date: 2002-07-23 18:00+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr "Nebylo specifikováno ¾ádné MRL (vstupní data)"
 #: src/xitk/actions.c:386 src/xitk/actions.c:401
 #, c-format
 msgid "gui_set_current_position: can't create new thread (%s)\n"
-msgstr ""
+msgstr "gui_set_current_position: nelze vytvoøit nové vlákno (%s)\n"
 
 #: src/xitk/actions.c:711
 #, c-format
@@ -97,7 +97,7 @@ msgid "Error"
 msgstr "Chyba"
 
 #: src/xitk/errors.c:196
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -106,7 +106,7 @@ msgid ""
 msgstr ""
 "- chyba z enginu xine -\n"
 "\n"
-"Pro '%s' není dostupný ¾ádný vstupní modul.\n"
+"Pro práci s '%s' není dostupný ¾ádný vstupní modul.\n"
 "Mo¾ná je ¹patná syntaxe MRL nebo neexistuje soubor nebo data."
 
 #: src/xitk/errors.c:202
@@ -166,7 +166,7 @@ msgstr "Nelze inicializovat display\n"
 
 #: src/xitk/event.c:734
 msgid "synchronized X protocol (debug)"
-msgstr "synchronizovaný X protokol (debug)"
+msgstr "synchronizovaný protokol X (debug)"
 
 #: src/xitk/event.c:736
 msgid "Warning! Synchronized X activated - this is way slow...\n"
@@ -186,7 +186,7 @@ msgstr "èas mezi dvìma pøedstíranými událostmi pro screensaver, 0 zaká¾e"
 
 #: src/xitk/event.c:757
 msgid "play next|previous chapter instead of mrl (dvdnav)"
-msgstr ""
+msgstr "pøehrát dal¹í/pøedchozí kapitolu místo MRL (dvdnav)"
 
 #. Some infos
 #: src/xitk/event.c:765
@@ -236,7 +236,7 @@ msgstr "Nic nevybráno"
 
 #: src/xitk/kbindings.c:1325
 msgid "None"
-msgstr "®ádný"
+msgstr "®ádná"
 
 #: src/xitk/kbindings.c:1486
 msgid "You can only delete alias entries."
@@ -553,12 +553,12 @@ msgstr "main: zkou¹í se výstupní modul videa <%s> \n"
 
 #: src/xitk/main.c:422
 msgid "main: all available video drivers failed.\n"
-msgstr "main: v¹echny videoovladaèe, které jsou k dispozici, selhaly.\n"
+msgstr "main: v¹echny video ovladaèe, které jsou k dispozici, selhaly.\n"
 
 #: src/xitk/main.c:434
 #, c-format
 msgid "main: video driver <%s> failed\n"
-msgstr "main: videoovladaè <%s> selhal\n"
+msgstr "main: video ovladaè <%s> selhal\n"
 
 #: src/xitk/main.c:454
 msgid "audio driver to use"
@@ -603,7 +603,7 @@ msgstr "®ádný dostupný zvukový modul k dekódování '%s'."
 
 #: src/xitk/main.c:626
 msgid "Display popup window on unhandled codecs"
-msgstr ""
+msgstr "Zobrazit varovný dialog pøi neexistujících kodecích"
 
 #: src/xitk/main.c:659
 #, c-format
@@ -641,14 +641,12 @@ msgid "Source:"
 msgstr "Zdroj:"
 
 #: src/xitk/panel.c:64
-#, fuzzy
 msgid "Play previous chapter or mrl"
-msgstr "Pøedchozí polo¾ka playlistu"
+msgstr "Pøedchozí kapitola nebo MRL"
 
 #: src/xitk/panel.c:65
-#, fuzzy
 msgid "Play next chapter or mrl"
-msgstr "Následující polo¾ka playlistu"
+msgstr "Následující kapitola nebo MRL"
 
 #: src/xitk/panel.c:68
 msgid "Play previous entry from playlist"
@@ -661,7 +659,7 @@ msgstr "Následující polo¾ka playlistu"
 #. FIXME: this error message does not make sense!
 #: src/xitk/panel.c:512
 msgid "unknown widget slider caller\n"
-msgstr ""
+msgstr "neznámý volající widgetu posuvníku\n"
 
 #: src/xitk/panel.c:611
 msgid "Volume control"
@@ -702,7 +700,7 @@ msgstr "Konec"
 
 #: src/xitk/panel.c:841
 msgid "Setup window"
-msgstr "Nastavení xine"
+msgstr "Okno s nastavením"
 
 #: src/xitk/panel.c:849
 msgid "Hide GUI"
@@ -920,7 +918,7 @@ msgstr "Varování: %s\n"
 #. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:871
 msgid "snapshot.c: not supported for this video out driver\n"
-msgstr "snapshot.c: není podporováno s tímto výstupním video ovladaèem\n"
+msgstr "snapshot.c: není podporováno s tímto výstupním ovladaèem videa\n"
 
 #: src/xitk/snapshot.c:947
 #, c-format
@@ -952,7 +950,7 @@ msgstr "videowin: výstupní ovladaè vybral obrazovku s ID 0x%lx\n"
 #.
 #: src/xitk/videowin.c:229
 msgid "xine video output"
-msgstr "videovýstup xine"
+msgstr "výstup videa xine"
 
 #: src/xitk/videowin.c:369
 msgid "XF86VidMode Extension: modeline switching failed.\n"
@@ -976,11 +974,11 @@ msgstr "XAllocWMHints() selhalo\n"
 
 #: src/xitk/videowin.c:1096
 msgid "New stream sizes resize output window"
-msgstr "Mìnit velikost výstupního okna podle rozmìrù nového videa"
+msgstr "mìnit velikost výstupního okna podle rozmìrù nového videa"
 
 #: src/xitk/videowin.c:1102
 msgid "Double size for small streams (require stream_resize_window)"
-msgstr "Dvojnásobná velikost pro malá videa (vy¾aduje stream_resize_window)"
+msgstr "dvojnásobná velikost pro malá videa (vy¾aduje stream_resize_window)"
 
 #: src/xitk/videowin.c:1124
 msgid "use XVidModeExtension when switching to fullscreen"
