@@ -84,6 +84,7 @@ gGui_t   *gGui;
 #ifdef HAVE_LIRC
 int       no_lirc;
 #endif
+int       unhandled_codec_mode; /* 0 = never, 1 = video, 2 = audio, 3 = always */
 
 typedef struct {
   FILE    *fd;
@@ -566,6 +567,11 @@ void event_listener (void *user_data, xine_event_t *event) {
  
 }
 
+static void unhandled_codec_mode_cb( void *dummy, cfg_entry_t *entry)
+{
+  unhandled_codec_mode = entry->num_value;
+}
+
 static void codec_reporting( void *user_data, int codec_type,
                              uint32_t fourcc, char *description, int handled )
 {
@@ -577,18 +583,18 @@ static void codec_reporting( void *user_data, int codec_type,
   
   /* report error for unknown/unhandled codecs */
   if( !handled ) {
-    switch(codec_type) {
-
-    case XINE_CODEC_VIDEO:
+    if( codec_type == XINE_CODEC_VIDEO &&
+        (unhandled_codec_mode == 1 || unhandled_codec_mode == 3) ) {
       
       /* display fourcc if no description available */
       if( !description[0] )
         description = fourcc_txt;
         
       xine_error(_("No video plugin found to decode '%s'."), description);
-      break;
+    }
             
-    case XINE_CODEC_AUDIO:
+    if( codec_type == XINE_CODEC_AUDIO &&
+        (unhandled_codec_mode == 2 || unhandled_codec_mode == 3) ) {
       
       /* display fourcc if no description available */
       if( !description[0] ) {
@@ -600,7 +606,6 @@ static void codec_reporting( void *user_data, int codec_type,
         }  
       }
       xine_error(_("No audio plugin found to decode '%s'."), description);
-      break;
     }
   }
 }
@@ -623,6 +628,8 @@ int main(int argc, char *argv[]) {
   sigset_t              vo_mask;
   char                **_argv;
   int                   _argc;
+  static char          *warn_unhandled_codec[] = 
+                       {"never", "video only", "audio only", "always", NULL};
 
   /* Check xine library version */
   if(!xine_check_version(0, 9, 10)) {
@@ -928,6 +935,10 @@ int main(int argc, char *argv[]) {
    * Register codec reporting
    */
   xine_register_report_codec_cb(gGui->xine, codec_reporting, (void *) gGui );
+  unhandled_codec_mode = gGui->config->register_enum (gGui->config,
+                         "gui.warn_unhandled_codec", 3, warn_unhandled_codec,
+                         "Display popup window on unhandled codecs",
+                         NULL, unhandled_codec_mode_cb, NULL);
   
   /*
    * start CORBA server thread
