@@ -304,9 +304,6 @@ void extract_mrls(int num_mrls, char **mrls) {
   aaxine.num_mrls = num_mrls;
   aaxine.current_mrl = 0;
 
-  for(i = 0; i < aaxine.num_mrls; i++)
-    printf("++ '%s'\n", aaxine.mrl[i]);
-  printf("current/num %d/%d\n", aaxine.current_mrl, aaxine.num_mrls);
 }
 
 /*
@@ -408,7 +405,7 @@ int main(int argc, char *argv[]) {
   }
 
   if(!(argc - optind)) {
-    fprintf(stderr, "You should specify an MRL.\n");
+    fprintf(stderr, "You should specify at least one MRL.\n");
     goto failure;
   }
   else
