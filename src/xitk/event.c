@@ -313,6 +313,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_toggle_aspect();
     break;
 
+  case ACTID_STREAM_INFOS:
+    gui_stream_infos_show(NULL, NULL);
+    break;
+
   case ACTID_TOGGLE_INTERLEAVE:
     gui_toggle_interlaced();
     break;

@@ -62,8 +62,6 @@ typedef struct {
 
   xitk_widget_list_t   *widget_list;
 
-  xitk_widget_t        *close;
-
   struct {
     xitk_widget_t      *left;
     xitk_widget_t      *right;
@@ -86,9 +84,9 @@ typedef struct {
   } numbers;
 
 
-  int                  running;
-  int                  visible;
-  xitk_register_key_t  widget_key;
+  int                   running;
+  int                   visible;
+  xitk_register_key_t   widget_key;
 
 } _eventer_t;
 

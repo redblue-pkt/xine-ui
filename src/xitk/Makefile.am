@@ -37,6 +37,7 @@ xine_SOURCES = \
 	utils.c \
 	panel.c \
 	playlist.c \
+	stream_infos.c \
 	videowin.c \
 	viewlog.c
 
@@ -68,6 +69,7 @@ noinst_HEADERS = \
 	playlist.h \
 	setup.h \
 	skins.h \
+	stream_infos.h \
 	snapshot.h \
 	videowin.h \
 	viewlog.h

@@ -239,7 +239,7 @@ static void pl_delete_all(xitk_widget_t *w, void *data) {
   if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
     gui_stop(NULL, NULL);
 
-    xitk_browser_update_list(playlist->playlist, 
+  xitk_browser_update_list(playlist->playlist, 
 			   gGui->playlist, gGui->playlist_num, 0);
 
   gui_set_current_mrl(NULL);

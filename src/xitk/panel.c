@@ -374,6 +374,11 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     event_sender_toggle_visibility(NULL, NULL);
   }
 
+  if(!panel->visible && stream_infos_is_visible()) {}
+  else {
+    stream_infos_toggle_visibility(NULL, NULL);
+  }
+
   if (panel->visible) {
     
     XLockDisplay(gGui->display);

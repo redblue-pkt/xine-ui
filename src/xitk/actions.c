@@ -48,6 +48,7 @@
 #include "mrl_browser.h"
 #include "setup.h"
 #include "event_sender.h"
+#include "stream_infos.h"
 #include "viewlog.h"
 #include "errors.h"
 #include "i18n.h"
@@ -69,6 +70,8 @@ void gui_display_logo(void) {
   (void) gui_xine_open_and_play((char *)gGui->logo_mrl, 0, 0);
   gGui->logo_mode = 1;
   panel_reset_slider();
+  if(stream_infos_is_visible())
+    stream_infos_update_infos();
 }
 
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
@@ -85,6 +88,9 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
     if(gGui->logo_mode == 0) {
       int has_video = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_HAS_VIDEO);
       
+      if(stream_infos_is_visible())
+	stream_infos_update_infos();
+
       if(has_video) {
 	
 	if(gGui->auto_vo_visibility) {
@@ -374,6 +380,9 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
 
   if(event_sender_is_visible())
     event_sender_raise_window();
+
+  if(stream_infos_is_visible())
+    stream_infos_raise_window();
 }
 
 void gui_toggle_aspect(void) {
@@ -741,6 +750,16 @@ void gui_event_sender_show(xitk_widget_t *w, void *data) {
     event_sender_panel();
   else
     event_sender_exit(NULL, NULL);
+}
+
+void gui_stream_infos_show(xitk_widget_t *w, void *data) {
+  
+  if (stream_infos_is_running() && !stream_infos_is_visible())
+    stream_infos_toggle_visibility(NULL, NULL);
+  else if(!stream_infos_is_running())
+    stream_infos_panel();
+  else
+    stream_infos_exit(NULL, NULL);
 }
 
 void gui_viewlog_show(xitk_widget_t *w, void *data) {

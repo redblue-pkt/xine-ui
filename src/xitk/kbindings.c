@@ -145,7 +145,7 @@ struct kbinding_s {
 
   modifier entry is optional.
   modifier key can be multiple:
-  ...
+ ...
   WindowReduce {
       key = less
       modifier = control, meta
@@ -215,6 +215,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ToggleFullscreen",       ACTID_TOGGLE_FULLSCREEN       , "f",        KEYMOD_NOMOD   , 0 },
   { "Aspect ratio values toggle.",
     "ToggleAspectRatio",      ACTID_TOGGLE_ASPECT_RATIO     , "a",        KEYMOD_NOMOD   , 0 },
+  { "Visibility toggle of stream infos window.",
+    "StreamInfosShow",        ACTID_STREAM_INFOS            , "i",        KEYMOD_META    , 0 },
   { "Interlaced mode toggle.",
     "ToggleInterleave",       ACTID_TOGGLE_INTERLEAVE       , "i",        KEYMOD_NOMOD   , 0 },
   { "Quit the program.",
