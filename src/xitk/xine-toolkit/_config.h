@@ -57,6 +57,7 @@ typedef struct {
   struct {
     int             shm;
     int             oldbarstyle;
+    int             checkstyle;
   } features;
 
   struct {
@@ -69,6 +70,7 @@ typedef struct {
 xitk_config_t *xitk_config_init(void);
 void xitk_config_deinit(xitk_config_t *xtcf);
 int xitk_config_get_barstyle_feature(xitk_config_t *xtcf);
+int xitk_config_get_checkstyle_feature(xitk_config_t *xtcf);
 int xitk_config_get_shm_feature(xitk_config_t *xtcf);
 char *xitk_config_get_system_font(xitk_config_t *xtcf);
 char *xitk_config_get_default_font(xitk_config_t *xtcf);

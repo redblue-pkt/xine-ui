@@ -2020,6 +2020,10 @@ void draw_bevel_three_state(ImlibData *im, xitk_image_t *p);
  */
 void draw_bevel_two_state(ImlibData *im, xitk_image_t *p);
 
+void draw_three_state_round_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked);
+void draw_three_state_check_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked);
+
+
 void draw_paddle_three_state_vertical(ImlibData *im, xitk_image_t *p);
 void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p);
 

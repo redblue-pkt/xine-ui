@@ -1893,6 +1893,9 @@ long int xitk_get_timer_dbl_click(void) {
 int xitk_get_barstyle_feature(void) {
   return xitk_config_get_barstyle_feature(gXitk->config);
 }
+int xitk_get_checkstyle_feature(void) {
+  return xitk_config_get_checkstyle_feature(gXitk->config);
+}
 int xitk_get_menu_shortcuts_enability(void) {
   return xitk_config_get_menu_shortcuts_enability(gXitk->config);
 }

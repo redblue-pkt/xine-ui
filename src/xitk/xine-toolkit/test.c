@@ -91,6 +91,7 @@ typedef struct {
 
   /* menu */
   xitk_widget_t        *menu;
+  int                   checked;
 
   xitk_widget_list_t   *widget_list;
   xitk_register_key_t   kreg;
@@ -849,6 +850,9 @@ static void create_browser(void) {
 
 }
 
+static void menu_checked(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  test->checked = !test->checked;
+}
 static void menu_test_end(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   test_end(NULL, NULL);
 }
@@ -859,7 +863,8 @@ static void create_menu(void) {
     { "Popup menu:",                     NULL,     "<title>",       NULL,     NULL },
     { "Load a file",                     NULL,     NULL,            NULL,     NULL },
     { "Reload",                          NULL,     NULL,            NULL,     NULL },
-    { "Auto save",                       NULL,     "<check>",       NULL,     NULL },
+    { "Auto save",                       NULL,
+      test->checked ? "<checked>" : "<check>",                      menu_checked, NULL },
     { "SEP",                             NULL,     "<separator>",   NULL,     NULL },
     { "Empty",                           NULL,     "<branch>",      NULL,     NULL },
     { "Playlist",                        NULL,     "<branch>",      NULL,     NULL },

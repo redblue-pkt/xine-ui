@@ -268,6 +268,10 @@ void xitk_strdupa(char *dest, char *src);
 #define DIRECTION_LEFT   3
 #define DIRECTION_RIGHT  4
 
+#define CHECK_STYLE_OLD   1
+#define CHECK_STYLE_CHECK 2
+#define CHECK_STYLE_ROUND 3
+
 int xitk_x_error;
 
 #ifndef _XITK_C_
@@ -312,6 +316,7 @@ void xitk_subst_special_chars(char *, char *);
 unsigned long xitk_get_timer_label_animation(void);
 long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);
+int xitk_get_checkstyle_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
 void xitk_modal_window(Window w);
@@ -348,6 +353,7 @@ void *labelbutton_get_user_data(xitk_widget_t *w);
 void menu_auto_pop(xitk_widget_t *w);
 
 int xitk_get_bool_value(const char *val);
+
 
 struct xitk_font_s {
   Display       *display;

@@ -735,7 +735,7 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)),
 			   (checkbox = 
 			    xitk_noskin_checkbox_create(setup->widget_list, &cb,
-							x, y, 10, 10)));
+							x, y, 12, 12)));
   xitk_checkbox_set_state (checkbox, entry->num_value);  
   ADD_LABEL(checkbox, label_cb, (void *) checkbox);
 

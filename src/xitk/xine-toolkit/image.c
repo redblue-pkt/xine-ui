@@ -825,20 +825,125 @@ void draw_rectangular_outter_box_light(ImlibData *im, xitk_pixmap_t *p,
   _draw_rectangular_box_light(im, p, x, y, 0, 0, width, height, DRAW_OUTTER);
 }
 
+static void _draw_check_round(ImlibData *im, xitk_image_t *p, int x, int y, int d, int checked) {
+  XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
+  XFillArc(im->x.disp, p->image->pixmap, p->image->gc, x, y, d, d, (30 * 64), (180 * 64));
+  XUNLOCK(im->x.disp);
+  
+  XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray(im));
+  XFillArc(im->x.disp, p->image->pixmap, p->image->gc, x, y, d, d, (210 * 64), (180 * 64));
+  XUNLOCK(im->x.disp);
+  
+  XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
+  XFillArc(im->x.disp, p->image->pixmap, p->image->gc, x + 2, y + 2, d - 4, d - 4, (0 * 64), (360 * 64));
+  XUNLOCK(im->x.disp);
+  
+  if(checked) {
+    XLOCK(im->x.disp);
+    XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
+    XFillArc(im->x.disp, p->image->pixmap, p->image->gc, x + 4, y + 4, d - 8, d - 8, (0 * 64), (360 * 64));
+    XUNLOCK(im->x.disp);
+  }
+}
+static void _draw_check_check(ImlibData *im, xitk_image_t *p, int x, int y, int d, int checked) {
+  /* background */
+  XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, x, y, d, d);
+  XUNLOCK(im->x.disp);
+  /* */
+  XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x, y, x + d, y);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x, y, x, y + d);
+  XUNLOCK(im->x.disp);
+  
+  XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray(im));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x, y + d, x + d, y + d);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x + d, y, x + d, y + d);
+  XUNLOCK(im->x.disp);
+  
+  if(checked) {
+    XLOCK(im->x.disp);
+    XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x + (d / 5), (y + ((d / 3) * 2)) - 2, x + (d / 2), y + d - 2);
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x + (d / 5)+1, (y + ((d / 3) * 2)) - 2, x + (d / 2) + 1, y + d - 2);
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x + (d / 2), y + d - 2, x + d - 2, y+1);
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, x + (d / 2) + 1, y + d - 2, x + d - 1, y+1);
+    XUNLOCK(im->x.disp);
+  }
+  
+}
+
+void draw_check_three_state_round_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked) {
+  int i;
+
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+
+  for(i = 0; i < 3; i++) {
+    if(i == 2) {
+      x++;
+      y++;
+    }
+
+    _draw_check_round(im, p, x, y, d, checked);
+    x += w;
+  }
+}
+
+void draw_check_three_state_check_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked) {
+  int i;
+
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+  
+  for(i = 0; i < 3; i++) {
+    if(i == 2) {
+      x++;
+      y++;
+    }
+
+    _draw_check_check(im, p, x, y, d, checked);
+    x += w;
+  }
+}
+
 void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked) {
-  int      h, w;
-  int      relief = (checked) ? DRAW_INNER : DRAW_OUTTER;
-  int      nrelief = (checked) ? DRAW_OUTTER : DRAW_INNER;
+  int  style = xitk_get_checkstyle_feature();
   
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
   
-  w = p->width / 3;
-  h = p->height - 12;
-  
-  _draw_rectangular_box(im, p->image, 4,               6,     0, 0, 12, h, relief);
-  _draw_rectangular_box(im, p->image, w + 4,           6,     0, 0, 12, h, relief);
-  _draw_rectangular_box(im, p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, nrelief);
+  switch(style) {
+    
+  case CHECK_STYLE_CHECK:
+    draw_check_three_state_check_style(im, p, 4, 4, p->height - 8, p->width / 3, checked);
+    break;
+    
+  case CHECK_STYLE_ROUND:
+    draw_check_three_state_round_style(im, p, 4, 4, p->height - 8, p->width / 3, checked);
+    break;
+    
+  case CHECK_STYLE_OLD:
+  default: 
+    {
+      int      relief = (checked) ? DRAW_INNER : DRAW_OUTTER;
+      int      nrelief = (checked) ? DRAW_OUTTER : DRAW_INNER;
+      int      w, h;
+      
+      w = p->width / 3;
+      h = p->height - 12;
+      _draw_rectangular_box(im, p->image, 4,               6,     0, 0, 12, h, relief);
+      _draw_rectangular_box(im, p->image, w + 4,           6,     0, 0, 12, h, relief);
+      _draw_rectangular_box(im, p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, nrelief);
+    }
+    break;
+  }
 }
 
 /*
@@ -973,6 +1078,45 @@ static void _draw_relief(ImlibData *im, xitk_pixmap_t *p, int w, int h, int reli
 					relief);
   }
 
+}
+
+void draw_checkbox_check(ImlibData *im, xitk_image_t *p) {
+  int  style = xitk_get_checkstyle_feature();
+  
+  XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_gray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, p->width, p->height);
+  XUNLOCK(im->x.disp);
+  
+  switch(style) {
+    
+  case CHECK_STYLE_CHECK:
+    {
+      int w;
+      
+      w = p->width / 3;
+      _draw_check_check(im, p, 0, 0, p->height, 0);
+      _draw_check_check(im, p, w, 0, p->height, 0);
+      _draw_check_check(im, p, w * 2, 0, p->height, 1);
+    }
+    break;
+    
+  case CHECK_STYLE_ROUND:
+    {
+      int w;
+      
+      w = p->width / 3;
+      _draw_check_round(im, p, 0, 0, p->height, 0);
+      _draw_check_round(im, p, w, 0, p->height, 0);
+      _draw_check_round(im, p, w * 2, 0, p->height, 1);
+    }
+    break;
+    
+  case CHECK_STYLE_OLD:
+  default: 
+    _draw_three_state(im, p, STYLE_BEVEL);
+    break;
+  }
 }
 
 /*

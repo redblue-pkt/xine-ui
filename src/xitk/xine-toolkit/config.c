@@ -173,6 +173,14 @@ static void xitk_config_features(xitk_config_t *xtcf) {
     
     if(!strncasecmp(p, "old_title_style", 15))
       xtcf->features.oldbarstyle = strtol(c, &c, 10);
+    if(!strncasecmp(p, "check_style", 11)) {
+      if(!strcasecmp(c, "old"))
+	xtcf->features.checkstyle = CHECK_STYLE_OLD;
+      else if(!strcasecmp(c, "round"))
+	xtcf->features.checkstyle = CHECK_STYLE_ROUND;
+      else if(!strcasecmp(c, "check"))
+	xtcf->features.checkstyle = CHECK_STYLE_CHECK;
+    }
     else if(!strncasecmp(p, "shm", 3))
       xtcf->features.shm = strtol(c, &c, 10);
   }
@@ -326,6 +334,7 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   xtcf->features.shm           = 0;
 #endif
   xtcf->features.oldbarstyle   = 0;
+  xtcf->features.checkstyle    = CHECK_STYLE_CHECK;
   xtcf->menus.shortcuts        = 1;
 }
 
@@ -338,6 +347,13 @@ int xitk_config_get_barstyle_feature(xitk_config_t *xtcf) {
     return -1;
   
   return (xtcf->features.oldbarstyle > 0) ? 1 : 0;
+}
+int xitk_config_get_checkstyle_feature(xitk_config_t *xtcf) {
+
+  if(!xtcf)
+    return -1;
+  
+  return xtcf->features.checkstyle;
 }
 int xitk_config_get_shm_feature(xitk_config_t *xtcf) {
 
