@@ -40,6 +40,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <sys/time.h>
+#include <signal.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -298,6 +299,7 @@ int main(int argc, char *argv[]) {
   ao_functions_t  *audio_driver = NULL ;
   double           res_h, res_v;
   x11_visual_t     vis;
+  sigset_t         vo_mask;
 
   /* Check xine library version */
   if(!xine_check_version(0, 5, 0)) {
@@ -305,6 +307,12 @@ int main(int argc, char *argv[]) {
 	    xine_get_major_version(), xine_get_minor_version(),
 	    xine_get_sub_version());
     exit(1);
+  }
+
+  sigemptyset(&vo_mask);
+  sigaddset(&vo_mask, SIGALRM);
+  if (sigprocmask (SIG_BLOCK,  &vo_mask, NULL)) {
+    printf ("video_out: sigprocmask failed.\n");
   }
 
   show_banner();
