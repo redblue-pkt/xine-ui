@@ -239,50 +239,35 @@ static int _gui_xine_play(xine_stream_t *stream,
 	  if(!video_window_is_visible())
 	    video_window_set_visibility(1);
 	  
-	  if(gGui->auto_panel_visibility && (panel_is_visible()))
-	    panel_toggle_visibility(NULL, NULL);
-	  
 	}
-	else {
-	  
-	  if(gGui->auto_panel_visibility && (panel_is_visible()))
-	    panel_toggle_visibility(NULL, NULL);
-	  
-	}
+
+	if(gGui->auto_panel_visibility && video_window_is_visible() &&
+	   panel_is_visible() )
+	  panel_toggle_visibility(NULL, NULL);
 	
       }
       else {
 	
 	if(gGui->auto_vo_visibility) {
 	  
-	  if(gGui->auto_panel_visibility) {
-	    
-	    if(video_window_is_visible())
-	      video_window_set_visibility(0);
-	    
-	    if(!panel_is_visible())
-	      panel_toggle_visibility(NULL, NULL);
-	  }
-	  else {
-
-	    if((panel_is_visible()) && (video_window_is_visible()))
-	      video_window_set_visibility(0);
-
-	  }
-	}
-	else {
-
-	  if(gGui->auto_panel_visibility && (video_window_is_visible()) && (!panel_is_visible()))
+	  if(!panel_is_visible())
 	    panel_toggle_visibility(NULL, NULL);
-	  
-	  if(video_window_is_visible()) {
-	    if(!gGui->visual_anim.running)
-	      visual_anim_play();
-	  }
-	  else
-	    gGui->visual_anim.running = 2;
-	  
+
+	  if(video_window_is_visible())
+	    video_window_set_visibility(0);
+	    
 	}
+
+	if(gGui->auto_panel_visibility && video_window_is_visible() && 
+	  !panel_is_visible() )
+	  panel_toggle_visibility(NULL, NULL);
+	  
+	if(video_window_is_visible()) {
+	  if(!gGui->visual_anim.running)
+	    visual_anim_play();
+	}
+	else
+	  gGui->visual_anim.running = 2;
       }
       
       xine_usec_sleep(100);
