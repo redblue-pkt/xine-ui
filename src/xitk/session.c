@@ -393,6 +393,33 @@ void *ctrlsocket_func(void *data) {
       send_ack(shdr);
       break;
 
+    case CMD_VOLUME:
+      {
+	uint32_t *vol = (uint32_t *)shdr->data;
+	printf("VOLUME %d\n", *vol);
+
+	if((*vol >= 0) && (*vol <= 100) && (gGui->mixer.caps & MIXER_CAP_VOL)) { 
+	  gGui->mixer.volume_level = *vol;
+	  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
+	  osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
+	}
+
+	send_ack(shdr);
+      }
+      break;
+
+    case CMD_AMP:
+      {
+	uint32_t *amp = (uint32_t *)shdr->data;
+	printf("AMP %d\n", *amp);
+
+	if((*amp >= 0) && (*amp <= 200))
+	  config_update_num("gui.amp_level", (int) *amp);
+
+	send_ack(shdr);
+      }
+      break;
+
     case CMD_GET_VERSION:
       send_packet(shdr->fd, CMD_GET_VERSION, VERSION,  strlen(VERSION));
       send_ack(shdr);
@@ -478,6 +505,7 @@ void session_handle_subopt(char *suboptarg, int *session) {
   int          optsess = -1;
   int          playlist_clear, playlist_next, playlist_prev = 0;
   int          audio_next, audio_prev, spu_next, spu_prev;
+  int          volume, amp;
   char        *playlist_load = NULL;
   int          fullscreen, s, c;
   uint32_t     state;
@@ -487,11 +515,12 @@ void session_handle_subopt(char *suboptarg, int *session) {
   const char  *tokens[] = {
     /* Don't change order */
     "play", "slow2", "slow4", "pause", "fast2", "fast4", "stop", "quit", "fullscreen", "eject",
-    "audio", "spu", "session", "mrl", "playlist", "pl", NULL
+    "audio", "spu", "session", "mrl", "playlist", "pl", "volume", "amp", NULL
   };
   
   playlist_clear = playlist_next = playlist_prev = fullscreen = 0;
   audio_next = audio_prev = spu_next = spu_prev = 0;
+  volume = amp = -1;
   state = 0;
 
   while((c = getsubopt(&sopts, (char *const *)tokens, &optstr)) != -1) {
@@ -557,6 +586,18 @@ void session_handle_subopt(char *suboptarg, int *session) {
 	playlist_load = strdup(optstr + 5);
       break;
 
+      /* volume */
+    case 16:
+      volume = strtol(optstr, &optstr, 10);
+      printf("Volume %d\n", volume);
+      break;
+
+      /* amplification */
+    case 17:
+      amp = strtol(optstr, &optstr, 10);
+      printf("Amp %d\n", amp);
+      break;
+      
     }
   }
   
@@ -579,7 +620,7 @@ void session_handle_subopt(char *suboptarg, int *session) {
       remote_cmd(*session, CMD_PLAYLIST_NEXT);
       playlist_next--;
     }
-
+    
     while(playlist_prev) {
       remote_cmd(*session, CMD_PLAYLIST_PREV);
       playlist_prev--;
@@ -626,6 +667,16 @@ void session_handle_subopt(char *suboptarg, int *session) {
     while(spu_prev) {
       remote_cmd(*session, CMD_SPU_PREV);
       spu_prev--;
+    }
+
+    if(volume >= 0) {
+      printf("SEND Volume: %d\n", volume);
+      send_uint32(*session, CMD_VOLUME, (uint32_t) volume);
+    }
+
+    if(amp >= 0) {
+      printf("SEND Amp: %d\n", amp);
+      send_uint32(*session, CMD_AMP, (uint32_t) amp);
     }
 
   }

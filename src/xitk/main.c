@@ -500,6 +500,8 @@ void show_usage (void) {
   printf(_("                    mrl=m       add mrl <m> to the playlist,\n"));
   printf(_("                    audio=c     select audio channel (<c>: 'next' or 'prev'),\n"));
   printf(_("                    spu=c       select spu channel (<c>: 'next' or 'prev'),\n"));
+  printf(_("                    volume=v    set audio volume,\n"));
+  printf(_("                    amp=v       set amplification level,\n"));
   printf(_("                    (playlist|pl)=p\n"));
   printf(_("                                 <p> can be:\n"));
   printf(_("                                   'clear'  clear the playlist,\n"));
@@ -1389,6 +1391,7 @@ int main(int argc, char *argv[]) {
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
   gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+  xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
   osd_init();
 
@@ -1411,6 +1414,8 @@ int main(int argc, char *argv[]) {
   
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
+  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gGui->mixer.amp);
   
   /* Visual animation stream init */
   gGui->visual_anim.stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
@@ -1419,9 +1424,11 @@ int main(int argc, char *argv[]) {
   xine_event_create_listener_thread(gGui->visual_anim.event_queue, event_listener, NULL);
   xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -2);
   xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
+  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
   /* Playlist scanning feature stream */
   gGui->playlist.scan_stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
+  xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
   xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_SPU_CHANNEL, -2);
   
   /* init the video window */

@@ -168,6 +168,11 @@ static void play_anyway_cb(void *data, xine_cfg_entry_t *cfg) {
 static void exp_level_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->experience_level = (cfg->num_value * 10);
 }
+static void amp_level_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->mixer.amp = cfg->num_value;
+  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gGui->mixer.amp);
+  osd_draw_bar(_("Amplification Level"), 0, 200, gGui->mixer.amp, OSD_BAR_STEPPER);
+}
 
 
 
@@ -576,6 +581,18 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_mVOLUME:
     gui_decrease_audio_volume();
+    break;
+
+  case ACTID_pAMP:
+    gui_increase_amp_level();
+    break;
+
+  case ACTID_mAMP:
+    gui_decrease_amp_level();
+    break;
+
+  case ACTID_AMP_RESET:
+    gui_reset_amp_level();
     break;
 
   case ACTID_SNAPSHOT:
@@ -1141,6 +1158,14 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       CONFIG_LEVEL_BEG,
 			       exp_level_cb, 
 			       CONFIG_NO_DATA)) * 10;
+
+  gGui->mixer.amp =  xine_config_register_range(gGui->xine, "gui.amp_level", 
+						100, 0, 200,
+						_("amplification level"),
+						NULL,
+						CONFIG_LEVEL_ADV,
+						amp_level_cb, 
+						CONFIG_NO_DATA);
 
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;

@@ -44,6 +44,8 @@ typedef enum {
   CMD_PLAYLIST_NEXT,
   CMD_PLAYLIST_PREV,
   CMD_PLAYLIST_LOAD,
+  CMD_VOLUME,
+  CMD_AMP,
   CMD_GET_VERSION,
   CMD_PING
 } ctrl_commands_t;

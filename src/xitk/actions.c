@@ -1398,6 +1398,20 @@ void gui_decrease_audio_volume(void) {
   }
 }
 
+void gui_increase_amp_level(void) {
+  if(gGui->mixer.amp < 200)
+    config_update_num("gui.amp_level", gGui->mixer.amp + 1);
+}
+
+void gui_decrease_amp_level(void) {
+  if(gGui->mixer.amp > 0)
+    config_update_num("gui.amp_level", gGui->mixer.amp - 1);
+}
+
+void gui_reset_amp_level(void) {
+  config_update_num("gui.amp_level", 100);
+}
+
 void gui_change_zoom(int zoom_dx, int zoom_dy) {
 
   xine_set_param(gGui->stream, XINE_PARAM_VO_ZOOM_X,

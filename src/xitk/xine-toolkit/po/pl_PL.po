@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2003-01-15 11:42+0100\n"
+"POT-Creation-Date: 2003-03-09 00:48+0100\n"
 "PO-Revision-Date: 2002-05-31 22:21+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polski <pl@li.org>\n"
@@ -26,40 +26,40 @@ msgstr "Odtwarzanie wybranego wpisu"
 msgid "Close MRL browser window"
 msgstr "Zamkniêcie okna przegl±darki MRL"
 
-#: src/xitk/xine-toolkit/test.c:109
+#: src/xitk/xine-toolkit/test.c:113
 msgid "XInitThreads() failed.\n"
 msgstr "XInitThreads() zawiod³o.\n"
 
-#: src/xitk/xine-toolkit/test.c:119
+#: src/xitk/xine-toolkit/test.c:123
 msgid "Cannot open display\n"
 msgstr "Nie mogê otworzyæ okna wy¶wietlania\n"
 
-#: src/xitk/xine-toolkit/test.c:133
+#: src/xitk/xine-toolkit/test.c:137
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_params() zawiod³o.\n"
 
-#: src/xitk/xine-toolkit/test.c:346
+#: src/xitk/xine-toolkit/test.c:359
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "Nowa warto¶æ integer to: %d. Potwierdzasz ?"
 
-#: src/xitk/xine-toolkit/test.c:440
+#: src/xitk/xine-toolkit/test.c:453
 msgid "My Frame"
 msgstr "Moja Ramka"
 
-#: src/xitk/xine-toolkit/test.c:479
+#: src/xitk/xine-toolkit/test.c:492
 msgid "A Label"
 msgstr "Etykieta"
 
-#: src/xitk/xine-toolkit/test.c:537
+#: src/xitk/xine-toolkit/test.c:550
 msgid "Fire !!"
 msgstr "Ognia !!"
 
-#: src/xitk/xine-toolkit/test.c:568
+#: src/xitk/xine-toolkit/test.c:581
 msgid "!BOOM!"
 msgstr "!BUM!"
 
-#: src/xitk/xine-toolkit/test.c:657
+#: src/xitk/xine-toolkit/test.c:670
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -68,15 +68,15 @@ msgstr ""
 "Nowy wybór w polu wyboru to:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:771
+#: src/xitk/xine-toolkit/test.c:852
 msgid "init_test() failed\n"
 msgstr "init_test() zawiód³\n"
 
-#: src/xitk/xine-toolkit/test.c:787
+#: src/xitk/xine-toolkit/test.c:868
 msgid "My Fucking Window"
 msgstr "Moje Okno"
 
-#: src/xitk/xine-toolkit/test.c:804
+#: src/xitk/xine-toolkit/test.c:885
 msgid "Quit"
 msgstr "Koniec"
 
@@ -100,10 +100,10 @@ msgstr "Nie"
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: src/xitk/xine-toolkit/xitk.h:2062 src/xitk/xine-toolkit/xitk.h:2071
+#: src/xitk/xine-toolkit/xitk.h:2121 src/xitk/xine-toolkit/xitk.h:2130
 msgid "Error"
 msgstr "B³±d"
 
-#: src/xitk/xine-toolkit/xitk.h:2065 src/xitk/xine-toolkit/xitk.h:2074
+#: src/xitk/xine-toolkit/xitk.h:2124 src/xitk/xine-toolkit/xitk.h:2133
 msgid "Information"
 msgstr "Informacja"

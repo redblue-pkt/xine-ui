@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
-"POT-Creation-Date: 2003-01-15 11:42+0100\n"
+"POT-Creation-Date: 2003-03-09 00:48+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -25,40 +25,40 @@ msgstr "Joue l'entrée sélectionnée"
 msgid "Close MRL browser window"
 msgstr "Ferme la fenêtre du brouteur de MRL"
 
-#: src/xitk/xine-toolkit/test.c:109
+#: src/xitk/xine-toolkit/test.c:113
 msgid "XInitThreads() failed.\n"
 msgstr "XInitThreads() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:119
+#: src/xitk/xine-toolkit/test.c:123
 msgid "Cannot open display\n"
 msgstr "Ne peux pas ouvrir l'affichage\n"
 
-#: src/xitk/xine-toolkit/test.c:133
+#: src/xitk/xine-toolkit/test.c:137
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_param() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:346
+#: src/xitk/xine-toolkit/test.c:359
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "La nouvelle valeure entiere est: %d. Confirmer ?"
 
-#: src/xitk/xine-toolkit/test.c:440
+#: src/xitk/xine-toolkit/test.c:453
 msgid "My Frame"
 msgstr "Mon Cadre"
 
-#: src/xitk/xine-toolkit/test.c:479
+#: src/xitk/xine-toolkit/test.c:492
 msgid "A Label"
 msgstr "Un Label"
 
-#: src/xitk/xine-toolkit/test.c:537
+#: src/xitk/xine-toolkit/test.c:550
 msgid "Fire !!"
 msgstr "Feu !!"
 
-#: src/xitk/xine-toolkit/test.c:568
+#: src/xitk/xine-toolkit/test.c:581
 msgid "!BOOM!"
 msgstr "!BOUM!"
 
-#: src/xitk/xine-toolkit/test.c:657
+#: src/xitk/xine-toolkit/test.c:670
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -67,15 +67,15 @@ msgstr ""
 "La nouvelle entrée sélectionnée dans la combo box est:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:771
+#: src/xitk/xine-toolkit/test.c:852
 msgid "init_test() failed\n"
 msgstr "init_test() a échoué\n"
 
-#: src/xitk/xine-toolkit/test.c:787
+#: src/xitk/xine-toolkit/test.c:868
 msgid "My Fucking Window"
 msgstr "Ma Putain de Fenêtre"
 
-#: src/xitk/xine-toolkit/test.c:804
+#: src/xitk/xine-toolkit/test.c:885
 msgid "Quit"
 msgstr "Quitte"
 
@@ -99,10 +99,10 @@ msgstr "Non"
 msgid "Cancel"
 msgstr "Abandon"
 
-#: src/xitk/xine-toolkit/xitk.h:2062 src/xitk/xine-toolkit/xitk.h:2071
+#: src/xitk/xine-toolkit/xitk.h:2121 src/xitk/xine-toolkit/xitk.h:2130
 msgid "Error"
 msgstr "Erreur"
 
-#: src/xitk/xine-toolkit/xitk.h:2065 src/xitk/xine-toolkit/xitk.h:2074
+#: src/xitk/xine-toolkit/xitk.h:2124 src/xitk/xine-toolkit/xitk.h:2133
 msgid "Information"
 msgstr "Information"

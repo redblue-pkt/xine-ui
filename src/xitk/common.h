@@ -244,6 +244,7 @@ typedef struct {
     int                     caps; /* MIXER_CAP_x */
     int                     volume_level;
     int                     mute;
+    int                     amp;
   } mixer;
 
   xitk_register_key_t       widget_key;
