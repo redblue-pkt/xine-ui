@@ -1,7 +1,7 @@
 To specify what you want xine to play, we use a system called MRL, Media
-Ressource Locator. As the name suggests, MRLs are very similar to the URLs you
+Resource Locator. As the name suggests, MRLs are very similar to the URLs you
 know from your webbrowser. In fact, there is a common superset of both, the URIs
-(Uniform Ressource Identifier) as defined in RFC2396.
+(Uniform Resource Identifier) as defined in RFC2396.
 
 xine's MRLs are divided into two major parts, the input source and the stream
 setup. The latter is optional. If it exists, it is separated from the input

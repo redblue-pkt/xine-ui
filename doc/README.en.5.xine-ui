@@ -1,4 +1,4 @@
-What the user sees as "xine" really consists of two major parts:
+What you see as "xine" really consists of two major parts:
 * xine-lib or libxine is the so called engine, it contains all of xine's core
   functionality like retrieving media from the various input sources supported,
   video and audio decoding, synchronized playback and post processing.
