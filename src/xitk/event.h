@@ -39,7 +39,7 @@
 #endif
 
 #ifdef __GNUC__
-#define xine_error(FMT,ARGS...) {xitk_window_dialog_error(gGui->imlib_data, FMT, ##ARGS);sleep(15);}
+#define xine_error(FMT,ARGS...) xitk_window_dialog_error(gGui->imlib_data, FMT, ##ARGS)
 #define xine_info(FMT,ARGS...)  xitk_window_dialog_info(gGui->imlib_data, FMT, ##ARGS)
 #else	/* C99 version: */
 #define xine_error(...)	        xitk_window_dialog_error(gGui->imlib_data, __VA_ARGS__)
