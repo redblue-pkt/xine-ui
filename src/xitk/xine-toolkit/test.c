@@ -501,7 +501,8 @@ static void create_label(void) {
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(test->label);
     
     if(wimage) {
-      draw_rectangular_inner_box(test->imlibdata, wimage->image, 0, 0, wimage->width-1, wimage->height-1);
+      draw_rectangular_inner_box(test->imlibdata, 
+				 wimage->image->pixmap, 0, 0, wimage->width-1, wimage->height-1);
     }
   }
 }
@@ -540,13 +541,13 @@ static void create_button(void) {
 
       XSetForeground(test->display, test->widget_list->gc, col);
       XSetBackground(test->display, test->widget_list->gc, col);
-      XFillArc(test->display, wimage->image, test->widget_list->gc,
+      XFillArc(test->display, wimage->image->pixmap, test->widget_list->gc,
 	       10, (height >> 1) - 13, 26, 26, 
 	       (0 * 64), (360 * 64));
-      XFillArc(test->display, wimage->image, test->widget_list->gc,
+      XFillArc(test->display, wimage->image->pixmap, test->widget_list->gc,
 	       (width) + 10, (height >> 1) - 13, 26, 26, 
 	       (0 * 64), (360 * 64));
-      XFillArc(test->display, wimage->image, test->widget_list->gc,
+      XFillArc(test->display, wimage->image->pixmap, test->widget_list->gc,
 	       ((width*2) + 10) + 1, ((height >> 1) - 13) + 1, 26, 26, 
 	       (0 * 64), (360 * 64));
 
@@ -558,16 +559,16 @@ static void create_button(void) {
       col = xitk_get_pixel_color_black(test->imlibdata);
 
       XSetForeground(test->display, test->widget_list->gc, col);
-      XDrawString(test->display, wimage->image, test->widget_list->gc, 
+      XDrawString(test->display, wimage->image->pixmap, test->widget_list->gc, 
 		  50, ((height+asc+des) >> 1) - des, label, strlen(label));
-      XDrawString(test->display, wimage->image, test->widget_list->gc, 
+      XDrawString(test->display, wimage->image->pixmap, test->widget_list->gc, 
 		  (width) + 50, ((height+asc+des) >> 1) - des, label, strlen(label));
       
       {
 	char *nlabel = _("!BOOM!");
 
       xitk_font_string_extent(fs, nlabel, &lbear, &rbear, &wid, &asc, &des);
-      XDrawString(test->display, wimage->image, test->widget_list->gc, 
+      XDrawString(test->display, wimage->image->pixmap, test->widget_list->gc, 
 		  ((width * 2) + 50) + 1, (((height+asc+des) >> 1) - des) + 1, 
 		  nlabel, strlen(nlabel));
       }

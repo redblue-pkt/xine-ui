@@ -261,7 +261,8 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
       else
 	skin = private_data->bg_skin;
 
-      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask, x, y);
+      if(skin->mask)
+	return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask->pixmap, x, y);
     }
     else
       return 0;
@@ -295,17 +296,17 @@ static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
         
     XLOCK (private_data->imlibdata->x.disp);
 
-    bgc = XCreateGC(private_data->imlibdata->x.disp, bg->image, None, None);
+    bgc = XCreateGC(private_data->imlibdata->x.disp, bg->image->pixmap, None, None);
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, bgc);
-    pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image, None, None);
+    pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image->pixmap, None, None);
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, pgc);
       
     if(bg->mask) {
       XSetClipOrigin(private_data->imlibdata->x.disp, bgc, w->x, w->y);
-      XSetClipMask(private_data->imlibdata->x.disp, bgc, bg->mask);
+      XSetClipMask(private_data->imlibdata->x.disp, bgc, bg->mask->pixmap);
     }
     
-    XCopyArea(private_data->imlibdata->x.disp, bg->image, win, bgc, 0, 0,
+    XCopyArea(private_data->imlibdata->x.disp, bg->image->pixmap, win, bgc, 0, 0,
 	      bg->width, bg->height, w->x, w->y);
       
     XUNLOCK(private_data->imlibdata->x.disp);
@@ -414,10 +415,10 @@ static void paint_slider(xitk_widget_t *w, Window win, GC gc) {
     XLOCK(private_data->imlibdata->x.disp);
     if(paddle->mask) {
       XSetClipOrigin(private_data->imlibdata->x.disp, pgc, x, y);
-      XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask);
+      XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask->pixmap);
     }
     
-    XCopyArea(private_data->imlibdata->x.disp, paddle->image, win, pgc,
+    XCopyArea(private_data->imlibdata->x.disp, paddle->image->pixmap, win, pgc,
 	      srcx1, srcy1, srcx2, srcy2, destx1, desty1);
     
     XFreeGC(private_data->imlibdata->x.disp, pgc);
@@ -442,10 +443,10 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 
       xitk_skin_lock(skonfig);
 
-      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->paddle_skin);
+      xitk_image_free_image(private_data->imlibdata, &private_data->paddle_skin);
       private_data->paddle_skin     = xitk_image_load_image(private_data->imlibdata, xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
       private_data->button_width    = private_data->paddle_skin->width / 3;
-      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->bg_skin);
+      xitk_image_free_image(private_data->imlibdata, &private_data->bg_skin);
       private_data->bg_skin         = xitk_image_load_image(private_data->imlibdata, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
       private_data->sType = xitk_skin_get_slider_type(skonfig, private_data->skin_element_name);
       private_data->paddle_cover_bg = 0;
@@ -895,7 +896,7 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   b = xitk_image_create_image(s->imlibdata, width, height);
   xitk_image_add_mask(s->imlibdata, b);
   if((type == XITK_HSLIDER) || (type == XITK_VSLIDER))
-    draw_inner(s->imlibdata, b->image, width, height);
+    draw_inner(s->imlibdata, b->image->pixmap, width, height);
   else if(type == XITK_RSLIDER) {
     draw_rotate_button(s->imlibdata, b);
   }

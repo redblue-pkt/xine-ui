@@ -70,13 +70,6 @@ typedef struct {
   char                       *colorname;
 } xitk_color_names_t;
 
-typedef struct xitk_image_s {
-  Pixmap                      image;
-  Pixmap                      mask;
-  int                         width;
-  int                         height;
-} xitk_image_t;
-
 typedef struct {
   XColor                      red;
   XColor                      blue;
@@ -92,17 +85,11 @@ typedef struct {
   int                         offset_y;
 } xitk_move_t;
 
-typedef struct {
-  struct {
-    int                       x;
-    int                       y;
-  } pos;
-  xitk_image_t               *image;
-} xitk_image_and_pos_t;
-
 typedef struct xitk_widget_list_s xitk_widget_list_t;
 
 typedef struct xitk_widget_s xitk_widget_t;
+
+typedef struct xitk_image_s xitk_image_t;
 
 typedef void (*widget_paint_callback_t)(xitk_widget_t *, Window, GC);
 

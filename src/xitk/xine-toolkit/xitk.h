@@ -100,12 +100,25 @@ typedef struct {
                                          (X)->magic = XITK_WIDGET_MAGIC;      \
                                          (X)->imlibdata = IMLIBDATA;          \
                                        }
+typedef struct xitk_pixmap_s xitk_pixmap_t;
+typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
+struct xitk_pixmap_s {
+  ImlibData                *imlibdata;
+  Pixmap                    pixmap;
+  int                       width;
+  int                       height;
+  int                       shm;
+#ifdef HAVE_SHM
+  XShmSegmentInfo          *shminfo;
+#endif
+  xitk_pixmap_destroyer_t   destroy;
+};
 
 typedef struct {
-  Pixmap    image;
-  Pixmap    mask;
-  int       width;
-  int       height;
+  xitk_pixmap_t            *image;
+  xitk_pixmap_t            *mask;
+  int                       width;
+  int                       height;
 } xitk_image_t;
 
 typedef struct {
@@ -1672,6 +1685,13 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
 						  char *fontname, 
 						  int width, int align, char *str);
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
+
+xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, 
+							int width, int height, int depth);
+
+xitk_pixmap_t *xitk_image_create_xitk_pixmap(ImlibData *im, int width, int height);
+
+xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int height);
 
 /**
  * Free an image object.

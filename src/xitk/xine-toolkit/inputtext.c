@@ -92,7 +92,8 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
     if((w->visible == 1)) {
       xitk_image_t *skin = private_data->skin;
       
-      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask, x, y);
+      if(skin->mask)
+	return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask->pixmap, x, y);
     }
     else
       return 0;
@@ -303,29 +304,28 @@ static void create_labelofinputtext(xitk_widget_t *w,
 		plabel, strlen(plabel));
   }
   else {
-    XWindowAttributes attr;
-    Pixmap            tpix;
-    GC                lgc;
+    XWindowAttributes  attr;
+    xitk_pixmap_t     *tpix;
+    GC                 lgc;
     
     XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
     
     lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
     
-    tpix = XCreatePixmap(private_data->imlibdata->x.disp, win,
-			 xsize, ysize, attr.depth);
+    tpix = xitk_image_create_xitk_pixmap(private_data->imlibdata, xsize, ysize);
     
-    XCopyArea (private_data->imlibdata->x.disp, pix, tpix, lgc, 0, 0,
+    XCopyArea (private_data->imlibdata->x.disp, pix, tpix->pixmap, lgc, 0, 0,
 	       xsize, ysize, 0, 0);
     
-    XDrawString(private_data->imlibdata->x.disp, tpix, lgc, 
+    XDrawString(private_data->imlibdata->x.disp, tpix->pixmap, lgc, 
 		2, ((ysize+asc+des+yoff)>>1)-des, 
 		plabel, strlen(plabel));
     
-    XCopyArea (private_data->imlibdata->x.disp, tpix, pix, lgc, 0, 0,
+    XCopyArea (private_data->imlibdata->x.disp, tpix->pixmap, pix, lgc, 0, 0,
 	       xsize - 1, ysize, 0, 0);
 
-    XFreePixmap(private_data->imlibdata->x.disp, tpix);
+    tpix->destroy(tpix);
     XFreeGC(private_data->imlibdata->x.disp, lgc);
   }
   XUNLOCK(private_data->imlibdata->x.disp);
@@ -361,7 +361,7 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
   inputtext_private_data_t *private_data;
   int                       button_width, state = 0;
   xitk_image_t             *skin;
-  Pixmap                    btn;
+  xitk_pixmap_t            *btn;
   GC                        lgc;
   XWindowAttributes         attr;
 
@@ -379,36 +379,35 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
 
     if (skin->mask) {
       XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
-      XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
+      XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
     }
 
     button_width = skin->width / 2;
     
-    btn = XCreatePixmap(private_data->imlibdata->x.disp, skin->image,
-			button_width, skin->height, attr.depth);
+    btn = xitk_image_create_xitk_pixmap(private_data->imlibdata, button_width, skin->height);
     
     if((w->have_focus == FOCUS_RECEIVED) || (private_data->have_focus == FOCUS_MOUSE_IN)) {
       state = FOCUS;
-      XCopyArea (private_data->imlibdata->x.disp, skin->image,
-		 btn, gc, button_width, 0,
+      XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
+		 btn->pixmap, gc, button_width, 0,
 		 button_width, skin->height, 0, 0);
     }
     else {
       state = NORMAL;
-      XCopyArea (private_data->imlibdata->x.disp, skin->image,
-		 btn, gc, 0, 0,
+      XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
+		 btn->pixmap, gc, 0, 0,
 		 button_width, skin->height, 0, 0);
     }
     
     XUNLOCK(private_data->imlibdata->x.disp);
     
-    create_labelofinputtext(w, win, gc, btn, 
+    create_labelofinputtext(w, win, gc, btn->pixmap, 
 			    button_width, skin->height, private_data->text, state);
     
     XLOCK(private_data->imlibdata->x.disp);
-    XCopyArea (private_data->imlibdata->x.disp, btn, win, lgc, 0, 0,
+    XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, win, lgc, 0, 0,
 	       button_width, skin->height, w->x, w->y);
-    XFreePixmap(private_data->imlibdata->x.disp, btn);
+    btn->destroy(btn);
     XFreeGC(private_data->imlibdata->x.disp, lgc);
     XUNLOCK(private_data->imlibdata->x.disp);
   }
@@ -509,7 +508,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       XITK_FREE(private_data->fontname);
       private_data->fontname      = strdup(xitk_skin_get_label_fontname(skonfig, private_data->skin_element_name));
       
-      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->skin);
+      xitk_image_free_image(private_data->imlibdata, &private_data->skin);
       private_data->skin          = xitk_image_load_image(private_data->imlibdata, 
 							  xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
       

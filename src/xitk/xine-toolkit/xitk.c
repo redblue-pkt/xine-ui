@@ -130,6 +130,7 @@ typedef struct {
   Display                    *display;
   xitk_list_t                *list;
   xitk_list_t                *gfx;
+  int                         use_xshm;
 
   pthread_mutex_t             mutex;
   int                         running;
@@ -237,6 +238,33 @@ static void xitk_signal_handler(int sig) {
     break;
   }
 
+}
+
+/* 
+ * Desc: query the server for support for the MIT_SHM extension
+ * Return:  0 = not available
+ *          1 = shared XImage support available
+ *          2 = shared Pixmap support available also
+ * Shamelessly stolen from gdk, and slightly tuned for xitk.
+ */
+static int xitk_check_xshm(Display *display) {
+#ifdef HAVE_SHM
+  int major, minor, ignore;
+  Bool pixmaps;
+  
+  if(XQueryExtension(display, "MIT-SHM", &ignore, &ignore, &ignore)) {
+    if(XShmQueryVersion(display, &major, &minor, &pixmaps ) == True) {
+      if((pixmaps == True) && ((XShmPixmapFormat(display)) == ZPixmap))
+	return 2;
+      else if(pixmaps == True)
+	return 1;
+    }
+  }
+#endif
+  return 0;
+}
+int xitk_is_use_xshm(void) {
+  return gXitk->use_xshm;
 }
 
 /*
@@ -840,7 +868,6 @@ void xitk_xevent_notify(XEvent *event) {
  */
 void xitk_init(Display *display) {
 
-
   xitk_pid = getppid();
 
 #ifdef ENABLE_NLS
@@ -856,6 +883,7 @@ void xitk_init(Display *display) {
   gXitk->sig_callback = NULL;
   gXitk->sig_data     = NULL;
   gXitk->config       = xitk_config_init();
+  gXitk->use_xshm     = xitk_check_xshm(display);
   
   pthread_mutex_init (&gXitk->mutex, NULL);
 

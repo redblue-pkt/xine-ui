@@ -186,32 +186,32 @@ static void *_tips_thread(void *data) {
   }
   
   {
-    Pixmap   bg;
-    int      width, height;
-    GC       gc;
+    xitk_pixmap_t *bg;
+    int            width, height;
+    GC             gc;
     
     xitk_window_get_window_size(tp->xwin, &width, &height);
-    bg = xitk_image_create_pixmap(tp->w->imlibdata, width, height);
+    bg = xitk_image_create_xitk_pixmap(tp->w->imlibdata, width, height);
     
     XLOCK(tp->w->imlibdata->x.disp);
     gc = XCreateGC(tp->w->imlibdata->x.disp, tp->w->imlibdata->x.base_window, None, None);
-    XCopyArea(tp->w->imlibdata->x.disp, (xitk_window_get_background(tp->xwin)), bg,
+    XCopyArea(tp->w->imlibdata->x.disp, (xitk_window_get_background(tp->xwin)), bg->pixmap,
 	      gc, 0, 0, width, height, 0, 0);
 
     XSetForeground(tp->w->imlibdata->x.disp, gc, cwarnfore);
-    XDrawRectangle(tp->w->imlibdata->x.disp, bg, gc, 0, 0, width - 1, height - 1);
+    XDrawRectangle(tp->w->imlibdata->x.disp, bg->pixmap, gc, 0, 0, width - 1, height - 1);
     
     XSetForeground(tp->w->imlibdata->x.disp, gc, cwarnback);
-    XFillRectangle(tp->w->imlibdata->x.disp, bg, gc, 1, 1, width - 2, height - 2);
+    XFillRectangle(tp->w->imlibdata->x.disp, bg->pixmap, gc, 1, 1, width - 2, height - 2);
 
-    XCopyArea(tp->w->imlibdata->x.disp, i->image, bg,
+    XCopyArea(tp->w->imlibdata->x.disp, i->image->pixmap, bg->pixmap,
 	      gc, 0, 0, i->width, i->height, (width - i->width)>>1, ((height - i->height)>>1) + 1);
     XUNLOCK(tp->w->imlibdata->x.disp);
     
-    xitk_window_change_background(tp->w->imlibdata, tp->xwin, bg, width, height);
+    xitk_window_change_background(tp->w->imlibdata, tp->xwin, bg->pixmap, width, height);
     
     XLOCK(tp->w->imlibdata->x.disp);
-    XFreePixmap(tp->w->imlibdata->x.disp, bg);
+    bg->destroy(bg);
     XFreeGC(tp->w->imlibdata->x.disp, gc);
     XUNLOCK(tp->w->imlibdata->x.disp);
     

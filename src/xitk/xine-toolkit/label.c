@@ -65,12 +65,9 @@ static void _create_label_pixmap(xitk_widget_t *w) {
   pixwidth = private_data->char_length * 
     ((private_data->length * ((len / private_data->length) + 1)) + 5);
 
-  XLOCK (private_data->imlibdata->x.disp);
-  private_data->labelpix = XCreatePixmap(private_data->imlibdata->x.disp, 
-					 private_data->imlibdata->x.base_window, 
-					 (pixwidth) ? pixwidth : 1, private_data->char_height, 
-					 private_data->imlibdata->x.depth);
-  XUNLOCK (private_data->imlibdata->x.disp);
+  private_data->labelpix = xitk_image_create_xitk_pixmap(private_data->imlibdata,
+							 (pixwidth) ? pixwidth : 1, 
+							 private_data->char_height);
 
   x_dest = 0;
     
@@ -87,8 +84,8 @@ static void _create_label_pixmap(xitk_widget_t *w) {
       py = (c / 32) * private_data->char_height;
       
       XLOCK(private_data->imlibdata->x.disp);
-      XCopyArea(private_data->imlibdata->x.disp, font->image, 
-		private_data->labelpix, private_data->gc, px, py,
+      XCopyArea(private_data->imlibdata->x.disp, font->image->pixmap, 
+		private_data->labelpix->pixmap, private_data->gc, px, py,
 		private_data->char_length, private_data->char_height, x_dest, 0);
       XUNLOCK(private_data->imlibdata->x.disp);
      
@@ -117,11 +114,9 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
       pthread_join(private_data->thread, &dummy);
     }
     
-    if (private_data->labelpix != None) {
-      XLOCK (private_data->imlibdata->x.disp);
-      XFreePixmap(private_data->imlibdata->x.disp, private_data->labelpix);
-      private_data->labelpix = None;
-      XUNLOCK (private_data->imlibdata->x.disp);
+    if (private_data->labelpix) {
+      private_data->labelpix->destroy(private_data->labelpix);
+      private_data->labelpix = NULL;
     }
     
     XITK_FREE(private_data->fontname);
@@ -185,7 +180,7 @@ static void paint_label(xitk_widget_t *w, Window win, GC gc) {
 
       /* Clean old */
       XLOCK (private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, win, 
+      XCopyArea (private_data->imlibdata->x.disp, private_data->font->image->pixmap, win, 
 		 gc, 0, 0, private_data->font->width, private_data->font->height, w->x, w->y);
       XUNLOCK (private_data->imlibdata->x.disp);
 
@@ -196,14 +191,15 @@ static void paint_label(xitk_widget_t *w, Window win, GC gc) {
       bg = xitk_image_create_image(private_data->imlibdata, w->width, w->height);
 
       XLOCK (private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, bg->image, 
+      XCopyArea (private_data->imlibdata->x.disp, 
+		 private_data->font->image->pixmap, bg->image->pixmap, 
 		 gc, 0, 0, private_data->font->width, private_data->font->height, 0, 0);
       XSetForeground(private_data->imlibdata->x.disp, gc, 
 		     xitk_get_pixel_color_black(private_data->imlibdata));
-      XDrawString(private_data->imlibdata->x.disp, bg->image, gc,
+      XDrawString(private_data->imlibdata->x.disp, bg->image->pixmap, gc,
 		  2, ((private_data->font->height + asc + des)>>1) - des,
 		  private_data->label, strlen(private_data->label));
-      XCopyArea (private_data->imlibdata->x.disp, bg->image, win, 
+      XCopyArea (private_data->imlibdata->x.disp, bg->image->pixmap, win, 
 		 gc, 0, 0, private_data->font->width, private_data->font->height, w->x, w->y);
       XUNLOCK (private_data->imlibdata->x.disp);
 
@@ -217,7 +213,7 @@ static void paint_label(xitk_widget_t *w, Window win, GC gc) {
       int width = private_data->char_length * private_data->length;
       
       XLOCK(private_data->imlibdata->x.disp);
-      XCopyArea(private_data->imlibdata->x.disp, private_data->labelpix, win, gc, 
+      XCopyArea(private_data->imlibdata->x.disp, private_data->labelpix->pixmap, win, gc, 
 		private_data->anim_offset, 0, 
 		width, private_data->char_height, 
 		w->x, w->y);
@@ -281,11 +277,9 @@ static void label_setup_label(xitk_widget_t *w, char *label_) {
     XITK_FREE(private_data->label);
   }
   
-  if (private_data->labelpix != None) {
-    XLOCK (private_data->imlibdata->x.disp);
-    XFreePixmap(private_data->imlibdata->x.disp, private_data->labelpix);
-    XUNLOCK (private_data->imlibdata->x.disp);
-    private_data->labelpix = None;
+  if (private_data->labelpix) {
+    private_data->labelpix->destroy(private_data->labelpix);
+    private_data->labelpix = NULL;
   }
 
   label_len = strlen(label_);
@@ -343,7 +337,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       
       xitk_skin_lock(skonfig);
 
-      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->font);
+      xitk_image_free_image(private_data->imlibdata, &private_data->font);
       private_data->font        = xitk_image_load_image(private_data->imlibdata, 
 							xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
       private_data->char_length = (private_data->font->width/32);
@@ -430,7 +424,7 @@ static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
 
   if(skin_element_name == NULL) {
     private_data->font         = xitk_image_create_image(private_data->imlibdata, width, height);
-    draw_flat(private_data->imlibdata, private_data->font->image, 
+    draw_flat(private_data->imlibdata, private_data->font->image->pixmap, 
 	      private_data->font->width, private_data->font->height);
 
     private_data->fontname     = strdup(fontname);
@@ -454,7 +448,7 @@ static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
   private_data->window         = l->window;
   private_data->gc             = l->gc;
 
-  private_data->labelpix       = None;
+  private_data->labelpix       = NULL;
 
   mywidget->private_data       = private_data;
 

@@ -78,7 +78,8 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
     if((w->visible == 1)) {
       xitk_image_t *skin = private_data->skin;
       
-      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask, x, y);
+      if(skin->mask)
+	return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask->pixmap, x, y);
     }
     else 
       return 0;
@@ -109,22 +110,22 @@ static void paint_button (xitk_widget_t *w, Window win, GC gc) {
 
     if (skin->mask) {
       XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
-      XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
+      XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
     }
 
     if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
       if(private_data->bClicked) {
-	XCopyArea (private_data->imlibdata->x.disp, skin->image,  
+	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
 		   win, lgc, 2*button_width, 0,
 		   button_width, skin->height, w->x, w->y);
 	
       } else {
-	XCopyArea (private_data->imlibdata->x.disp, skin->image,  
+	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,  
 		   win, lgc, button_width, 0,
 		   button_width, skin->height, w->x, w->y);
       }
     } else {
-      XCopyArea (private_data->imlibdata->x.disp, skin->image, 
+      XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap, 
 		 win, lgc, 0, 0,
 		 button_width, skin->height, w->x, w->y);
     }
@@ -148,7 +149,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     
     if(private_data->skin_element_name) {
       xitk_skin_lock(skonfig);
-      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->skin);
+      xitk_image_free_image(private_data->imlibdata, &private_data->skin);
       private_data->skin              = xitk_image_load_image(private_data->imlibdata,
 							      (xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)));
       w->x                            = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);

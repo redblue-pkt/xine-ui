@@ -32,7 +32,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+
 #include <X11/Xlib.h>
+#ifdef HAVE_IPC_H
+#include <sys/ipc.h>
+#endif
+#ifdef HAVE_SHM_H
+#include <sys/shm.h>
+#endif
+#ifdef HAVE_XSHM_H
+#include <X11/extensions/XShm.h>
+#endif
+
 #include "Imlib-light/Imlib.h"
 
 #include "dnd.h"
@@ -82,13 +93,13 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 #endif
 
 #define XITK_FREE(X) { if((X)) { free((X)); (X) = NULL; }}
-#define XITK_FREE_XITK_IMAGE(D, X) {                                                     \
-                                     if(((X)) && ((X)->image)) {                         \
-                                       XFreePixmap((D), (X)->image);                     \
-                                         if(((X)->mask))                                 \
-                                           XFreePixmap((D), (X)->mask);                  \
-                                     }                                                   \
-                                   }
+/*  #define XITK_FREE_XITK_IMAGE(X) {                                                        \ */
+/*                                       if(((X)) && ((X)->image)) {                         \ */
+/*                                         (X)->image->destroy((X)->image));                 \ */
+/*                                         if(((X)->mask))                                   \ */
+/*                                          (X)->mask->destroy((X)->mask);                   \ */
+/*                                       }                                                   \ */
+/*                                  } */
 
 
 
@@ -220,6 +231,8 @@ void xitk_strdupa(char *dest, char *src);
                       KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
                       StructureNotifyMask | PropertyChangeMask |              \
                       LeaveWindowMask | EnterWindowMask | PointerMotionMask)
+
+typedef struct xitk_pixmap_s xitk_pixmap_t;
 
 typedef struct {
   Window    window;
@@ -476,6 +489,7 @@ void xitk_xevent_notify(XEvent *event);
 const char *xitk_get_homedir(void);
 void xitk_usec_sleep(unsigned long);
 int xitk_system(int dont_run_as_root, char *command);
+int xitk_is_use_xshm(void);
 
 char *xitk_get_system_font(void);
 char *xitk_get_default_font(void);
@@ -538,12 +552,31 @@ typedef struct {
 
 
 typedef struct {
-  Window   window;
-  Pixmap   background;
-  int      width;
-  int      height;
+  Window                    window;
+  xitk_pixmap_t            *background;
+  int                       width;
+  int                       height;
 } xitk_window_t;
 
+typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
+struct xitk_pixmap_s {
+  ImlibData                *imlibdata;
+  Pixmap                    pixmap;
+  int                       width;
+  int                       height;
+  int                       shm;
+#ifdef HAVE_SHM
+  XShmSegmentInfo          *shminfo;
+#endif
+  xitk_pixmap_destroyer_t   destroy;
+};
+
+struct xitk_image_s {
+  xitk_pixmap_t               *image;
+  xitk_pixmap_t               *mask;
+  int                          width;
+  int                          height;
+};
 
 typedef struct {
   int                     magic;

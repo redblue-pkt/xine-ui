@@ -76,6 +76,10 @@ unsigned int xitk_get_pixel_color_warning_background(ImlibData *im);
  * Create an image object.
  */
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
+xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, 
+							int width, int height, int depth);
+xitk_pixmap_t *xitk_image_create_xitk_pixmap(ImlibData *im, int width, int height);
+xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int height);
 
 /*
  *
