@@ -237,26 +237,32 @@ void panel_change_skins(void) {
  * Update runtime displayed informations.
  */
 void panel_update_runtime_display(void) {
-  int seconds, length, remain;
+  int seconds, pos, length, remain;
   char timestr[10], buffer[256];
 
   if(!panel_is_visible())
     return;
 
-  if(!gui_xine_get_pos_length(gGui->stream, NULL, &seconds, &length))
+  if(!gui_xine_get_pos_length(gGui->stream, &pos, &seconds, &length))
     return;
-
-  remain = (length - seconds) / 1000;
-  seconds /= 1000;
-  length /= 1000;
   
-  if(panel->runtime_mode == 0)
-    sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
-  else
-    sprintf(timestr, "%02d:%02d:%02d", remain / (60*60), (remain / 60) % 60, remain % 60);
-
-  sprintf(buffer, _("Total time: %02d:%02d:%02d"), 
-	  length / (60*60), (length / 60) % 60, length % 60);
+  if((pos || seconds) && length) {
+    remain = (length - seconds) / 1000;
+    seconds /= 1000;
+    length /= 1000;
+    
+    if(panel->runtime_mode == 0)
+      sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
+    else
+      sprintf(timestr, "%02d:%02d:%02d", remain / (60*60), (remain / 60) % 60, remain % 60);
+    
+    sprintf(buffer, _("Total time: %02d:%02d:%02d"), 
+	    length / (60*60), (length / 60) % 60, length % 60);
+  }
+  else {
+    sprintf(timestr, "%s", "--:--:--");
+    sprintf(buffer, "%s", _("Total time: --:--:--"));
+  }
 
   xitk_set_widget_tips(panel->runtime_label, buffer);
 
@@ -286,7 +292,7 @@ static void *slider_loop(void *dummy) {
       if(status == XINE_STATUS_PLAY) {
 	if(gui_xine_get_pos_length(gGui->stream, &pos, &secs, NULL)) {
 	  secs /= 1000;
-	  
+
 	  if(gGui->playlist.num && gGui->mmk.end != -1) {
 	    if(secs >= gGui->playlist.mmk[gGui->playlist.cur]->end) {
 	      gGui->ignore_next = 0;
