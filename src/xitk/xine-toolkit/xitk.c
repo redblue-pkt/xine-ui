@@ -458,7 +458,6 @@ static uint32_t xitk_check_wm(Display *display) {
     type |= WM_TYPE_LARSWM;
   }
   else if(((atom = XInternAtom(display, "KWIN_RUNNING", True)) != None) &&
-	  ((atom = XInternAtom(display, "_KDE_NET_USER_TIME", True)) != None) &&
 	  ((atom = XInternAtom(display, "_DT_SM_WINDOW_INFO", True)) != None)) {
     type |= WM_TYPE_KWIN;
   }
