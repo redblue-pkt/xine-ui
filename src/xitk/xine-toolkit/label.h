@@ -53,6 +53,8 @@ typedef struct {
   int               anim_running;
   int               anim_offset;
 
+  int               on_change;
+
   pthread_t         thread;
   pthread_mutex_t   mutex;
 

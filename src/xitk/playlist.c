@@ -731,9 +731,7 @@ void playlist_editor(void) {
   XSetStandardProperties(gGui->display, playlist->window, title, title,
 			 None, NULL, 0, &hint);
   
-  XSelectInput(gGui->display, playlist->window, 
-	       ButtonPressMask | ButtonReleaseMask | KeymapStateMask | PointerMotionMask
-	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+  XSelectInput(gGui->display, playlist->window, INPUT_MOTION | KeymapStateMask);
   
   /*
    * layer above most other things, like gnome panel

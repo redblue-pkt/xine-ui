@@ -30,6 +30,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
@@ -80,7 +81,7 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 #define XITK_WARNING(...) fprintf(stderr, "XITK WARNING: "__VA_ARGS__)
 #endif
 
-#define XITK_FREE(X) if((X)) free((X))
+#define XITK_FREE(X) { if((X)) { free((X)); (X) = NULL; }}
 #define XITK_FREE_XITK_IMAGE(D, X) {                                                     \
                                      if(((X)) && ((X)->image)) {                         \
                                        XFreePixmap((D), (X)->image);                     \
@@ -132,6 +133,15 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
   } while (0)
 #endif
 
+void xitk_strdupa(char *dest, char *src);
+#define xitk_strdupa(d, s) {                                        \
+  (d) = NULL;                                                       \
+  if((s) != NULL) {                                                 \
+    (d) = (char *) alloca(strlen((s)) + 1);                         \
+    strcpy((d), (s));                                               \
+  }                                                                 \
+}
+
 /* Duplicate s to d timeval values */
 #define timercpy(s, d) {                                                      \
       (d)->tv_sec = (s)->tv_sec;                                              \
@@ -148,6 +158,11 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
       (w)->height = 0;                                                        \
       (w)->width  = 0;                                                        \
     }
+
+#define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
+                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
+                      StructureNotifyMask | PropertyChangeMask |              \
+                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
 
 typedef struct {
   Window    window;

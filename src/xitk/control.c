@@ -453,9 +453,7 @@ void control_panel(void) {
   XSetStandardProperties(gGui->display, control->window, title, title,
  			 None, NULL, 0, &hint);
   
-  XSelectInput(gGui->display, control->window,
-	       ButtonPressMask | ButtonReleaseMask | KeymapStateMask | PointerMotionMask
-	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+  XSelectInput(gGui->display, control->window, INPUT_MOTION | KeymapStateMask);
   
   /*
    * layer above most other things, like gnome panel

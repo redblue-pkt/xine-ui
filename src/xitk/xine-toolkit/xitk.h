@@ -55,6 +55,11 @@
 #define XITK_PATH_MAX           PATH_MAX
 #endif
 
+#define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
+                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
+                      StructureNotifyMask | PropertyChangeMask |              \
+                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
+
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
 typedef struct _mwmhints {
@@ -816,11 +821,12 @@ void xitk_image_change_image(ImlibData *im,
  */
 void xitk_init_dnd(Display *display, xitk_dnd_t *);
 
-void xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
+Bool xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
 
 Bool xitk_process_client_dnd_message(xitk_dnd_t *, XEvent *);
 
 void xitk_set_dnd_callback(xitk_dnd_t *, void *);
+void xitk_unset_dnd_callback(xitk_dnd_t *);
 
 
 /*

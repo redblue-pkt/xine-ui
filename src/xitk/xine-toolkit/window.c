@@ -234,9 +234,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   
   XSetStandardProperties(im->x.disp, xwin->window, title, title, None, NULL, 0, &hint);
 
-  XSelectInput(im->x.disp, xwin->window,
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
-	       | KeyPressMask | KeymapStateMask | ExposureMask | StructureNotifyMask);
+  XSelectInput(im->x.disp, xwin->window, INPUT_MOTION | KeymapStateMask);
   
   XA_WIN_LAYER = XInternAtom(im->x.disp, "_WIN_LAYER", False);
   

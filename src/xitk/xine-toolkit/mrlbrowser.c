@@ -842,9 +842,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   XSetStandardProperties(mb->imlibdata->x.disp, private_data->window, title, title,
 			 None, NULL, 0, &hint);
 
-  XSelectInput(mb->imlibdata->x.disp, private_data->window,
-	       ButtonPressMask | ButtonReleaseMask | KeymapStateMask | PointerMotionMask 
-	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+  XSelectInput(mb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
   
   /*
    * layer above most other things, like gnome panel

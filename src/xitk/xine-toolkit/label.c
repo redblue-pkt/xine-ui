@@ -43,9 +43,10 @@
  *
  */
 static void notify_destroy(xitk_widget_t *w, void *data) {
-  label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+  label_private_data_t *private_data;
 
   if(w->widget_type & WIDGET_TYPE_LABEL) {
+    private_data = (label_private_data_t *) w->private_data;
 
     if(private_data->anim_running) {
       void *dummy;
@@ -67,10 +68,10 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
  *
  */
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
-  label_private_data_t *private_data = 
-    (label_private_data_t *) w->private_data;
+  label_private_data_t *private_data;
   
   if(w->widget_type & WIDGET_TYPE_LABEL) {
+    private_data = (label_private_data_t *) w->private_data;
     if(sk == FOREGROUND_SKIN && private_data->font) {
       return private_data->font;
     }
@@ -97,13 +98,13 @@ char *xitk_label_get_label(xitk_widget_t *w) {
  *
  */
 static void paint_label(xitk_widget_t *l, Window win, GC gc) {
-  label_private_data_t *private_data = 
-    (label_private_data_t *) l->private_data;
-  xitk_image_t          *font = (xitk_image_t *) private_data->font;
-  int                   x_dest, y_dest, nCWidth, nCHeight, len, i;
-  char                 *label_to_display;
-
+  label_private_data_t  *private_data;
+  xitk_image_t          *font;
+  
   if ((l->widget_type & WIDGET_TYPE_LABEL) && (l->visible == 1)) {
+    
+    private_data = (label_private_data_t *) l->private_data;
+    font = (xitk_image_t *) private_data->font;
 
     /* non skinable widget */
     if(private_data->skin_element_name == NULL) {
@@ -138,52 +139,56 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
       xitk_image_free_image(private_data->imlibdata, &bg);
       
       xitk_font_unload_font(fs);
-
+      
       return;
     }
-
-    pthread_mutex_lock(&private_data->mutex);
-
-    if (private_data->anim_running) {
-      label_to_display = 
-	&private_data->animated_label[private_data->anim_offset];
-      len = private_data->length;
-    } 
     else {
-      label_to_display = private_data->label;
-      len = strlen(label_to_display);
-    }
-    pthread_mutex_unlock(&private_data->mutex);
-    
-    x_dest = l->x;
-    y_dest = l->y;
-    
-    nCWidth = font->width / 32;
-    nCHeight = font->height / 3;
-    
-    for (i=0; i<private_data->length; i++) {
-      int c=0;
+      char  *label_to_display;
+      int    x_dest, y_dest, nCWidth, nCHeight, i;
+      int    len;
       
-      if ((i<len) && (label_to_display[i] >= 32))
-	c = label_to_display[i]-32;
+      pthread_mutex_lock(&private_data->mutex);
       
-      if (c>=0) {
-	int px, py;
-	
-	px = (c % 32) * nCWidth;
-	py = (c / 32) * nCHeight;
-	
-	XLOCK (private_data->imlibdata->x.disp);
-	XCopyArea (private_data->imlibdata->x.disp, font->image, win, gc, px, py,
-		   nCWidth, nCHeight, x_dest, y_dest);
-	XUNLOCK (private_data->imlibdata->x.disp);
-	
+      if(private_data->anim_running) {
+	label_to_display = &private_data->animated_label[private_data->anim_offset];
+	len = private_data->length;
+      } 
+      else {
+	label_to_display = private_data->label;
+	len = strlen(label_to_display);
       }
-      
-      x_dest += nCWidth;
-    }
 
-   }
+      pthread_mutex_unlock(&private_data->mutex);
+      
+      x_dest = l->x;
+      y_dest = l->y;
+      
+      nCWidth = font->width / 32;
+      nCHeight = font->height / 3;
+      
+      for (i = 0; i < private_data->length; i++) {
+	int c = 0;
+	
+	if ((i < len) && (label_to_display[i] >= 32))
+	  c = label_to_display[i] - 32;
+	
+	if (c >= 0) {
+	  int px, py;
+	  
+	  px = (c % 32) * nCWidth;
+	  py = (c / 32) * nCHeight;
+	  
+	  XLOCK(private_data->imlibdata->x.disp);
+	  XCopyArea(private_data->imlibdata->x.disp, font->image, win, gc, px, py,
+		    nCWidth, nCHeight, x_dest, y_dest);
+	  XUNLOCK(private_data->imlibdata->x.disp);
+	  
+	}
+	
+	x_dest += nCWidth;
+      }
+    }
+  }
 }
 
 /*
@@ -191,24 +196,29 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
  */
 void *xitk_label_animation_loop(void *data) {
   label_private_data_t *private_data = (label_private_data_t *)data;
-  xitk_widget_t             *w = private_data->lWidget;
+  xitk_widget_t        *w = private_data->lWidget;
 
   do {
     
     if((w->visible == 1)) {
 
       private_data->anim_offset++;
-      if (private_data->anim_offset>(strlen(private_data->label) + 4))
+      if (private_data->anim_offset > (strlen(private_data->label) + 4))
 	private_data->anim_offset = 0;
-      
-      paint_label(private_data->lWidget,
-		  private_data->window, private_data->gc);
-      
-      /* We can't wait here, otherwise the rolling effect is really jerky */
-      XLOCK (private_data->imlibdata->x.disp);
-      XSync(private_data->imlibdata->x.disp, False);
-      XUNLOCK (private_data->imlibdata->x.disp);
-      
+
+      /* 
+       * Label will change sooner, don't try to paint it till the change,
+       * otherwise a deadlock will happened.
+       */
+      if(!private_data->on_change) {
+	paint_label(private_data->lWidget,
+		    private_data->window, private_data->gc);
+	
+	/* We can't wait here, otherwise the rolling effect is really jerky */
+	XLOCK (private_data->imlibdata->x.disp);
+	XSync(private_data->imlibdata->x.disp, False);
+	XUNLOCK (private_data->imlibdata->x.disp);
+      }
     }
 
     xitk_usec_sleep(400000);
@@ -222,76 +232,62 @@ void *xitk_label_animation_loop(void *data) {
  *
  */
 static void label_setup_label(xitk_widget_t *l, char *label_) {
-  label_private_data_t *private_data = 
-    (label_private_data_t *) l->private_data;
+  label_private_data_t *private_data = (label_private_data_t *) l->private_data;
   int label_len;
-
+  
+  /* Inform animation thread to not paint the label */
+  private_data->on_change = 1;
+  
   pthread_mutex_lock(&private_data->mutex);
-
+  
   if (private_data->label) {
     XITK_FREE(private_data->label);
-    private_data->label = NULL;
   }
   
   if (private_data->animated_label) {
     XITK_FREE(private_data->animated_label);
-    private_data->animated_label = NULL;
   }
-
+  
   label_len = strlen(label_);
 
   private_data->label = strdup((label_ != NULL) ? label_ : "");
 
-  /*
-  private_data->label = (char *) xitk_xmalloc(label_len + 1);
-  strncpy (private_data->label, label_, label_len);
-  private_data->label[label_len] = 0;
-  */
-
   if (private_data->animation) {
-
+    
     if (private_data->anim_running) {
       void *dummy;
-
+      
       private_data->anim_running = 0;
-      /*
-       * xitk_label_animation_loop may be already running due to a call
-       * from gui_dndcallback, inside mrl_add_and_play. paint_label will
-       * try to lock this mutex and will block. If we don´t unlock it here,
-       * we will block too waiting for the join... Deadlock!
-       */
-      pthread_mutex_unlock(&private_data->mutex);
       pthread_join (private_data->thread, &dummy);
-      pthread_mutex_lock(&private_data->mutex);
     }
-
+    
     if (label_len > private_data->length) {
       pthread_attr_t       pth_attrs;
       struct sched_param   pth_params;
 
       private_data->anim_running = 1;
 
-      private_data->animated_label = (char *) 
-	xitk_xmalloc(2 * label_len + 11);
-
+      private_data->animated_label = (char *) xitk_xmalloc(2 * label_len + 11);
+      
       sprintf(private_data->animated_label, "%s *** %s *** ", label_, label_) ;
       
       private_data->anim_offset = 0;
-
+      
       pthread_attr_init(&pth_attrs);
-
+      
       /* this won't work on linux, freebsd 5.0 */
       pthread_attr_getschedparam(&pth_attrs, &pth_params);
       pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
       pthread_attr_setschedparam(&pth_attrs, &pth_params);
-
+      
       pthread_create(&private_data->thread, &pth_attrs, 
 		     xitk_label_animation_loop, (void *)private_data);
-
+      
       pthread_attr_destroy(&pth_attrs);
     }
   }
   
+  private_data->on_change = 0;
   pthread_mutex_unlock(&private_data->mutex);
 }
 

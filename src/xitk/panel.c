@@ -606,7 +606,7 @@ void panel_init (void) {
 				      hint.x, hint.y,
 				      hint.width, hint.height, 0, 
 				      gGui->imlib_data->x.depth,
-				      CopyFromParent,
+				      InputOutput/*CopyFromParent*/,
 				      gGui->imlib_data->x.visual,
 				      CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 				      &attr);
@@ -614,9 +614,7 @@ void panel_init (void) {
   XSetStandardProperties(gGui->display, gGui->panel_window, title, title,
 			 None, NULL, 0, &hint);
 
-  XSelectInput(gGui->display, gGui->panel_window,
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask
-	       | KeyPressMask | KeymapStateMask | ExposureMask | StructureNotifyMask);
+  XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | KeymapStateMask);
 
   /*
    * wm, no border please
@@ -945,5 +943,5 @@ void panel_init (void) {
 }
 
 void panel_set_title(char *title) {
-  xitk_label_change_label (panel->widget_list, panel->title_label, title);
+  xitk_label_change_label(panel->widget_list, panel->title_label, title);
 }

@@ -189,7 +189,7 @@ static void video_window_adapt_size (void) {
       attr.background_pixel  = gGui->black.pixel;
       
       gGui->video_window = XCreateWindow(gGui->display, DefaultRootWindow(gGui->display),
-					 0, 0, gVw->fullscreen_width, gVw->fullscreen_width, 
+					 0, 0, gVw->fullscreen_width, gVw->fullscreen_height, 
 					 0, CopyFromParent, CopyFromParent, CopyFromParent, 
 					 CWBackPixel | CWOverrideRedirect, &attr);
 /* fprintf (stderr, "***** XCreateWindow 1 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
@@ -387,9 +387,8 @@ static void video_window_adapt_size (void) {
 
     gGui->video_window = 
       XCreateWindow (gGui->display, gGui->imlib_data->x.root, 
-		     hint.x, hint.y, gVw->fullscreen_width, 
-		     gVw->fullscreen_height, 
-		     0, gVw->depth, CopyFromParent, 
+		     hint.x, hint.y, gVw->fullscreen_width, gVw->fullscreen_height, 
+		     0, gVw->depth, InputOutput/*CopyFromParent*/, 
 		     gVw->visual,
 		     CWBackPixel  | CWBorderPixel | CWColormap, &attr);
 /* fprintf (stderr, "***** XCreateWindow 2 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
@@ -515,7 +514,7 @@ static void video_window_adapt_size (void) {
     gGui->video_window =
       XCreateWindow(gGui->display, gGui->imlib_data->x.root,
 		    hint.x, hint.y, hint.width, hint.height, 4, 
-		    gVw->depth, CopyFromParent, gVw->visual,
+		    gVw->depth, InputOutput/*CopyFromParent*/, gVw->visual,
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
 /*fprintf (stderr, "***** XCreateWindow done\n"); */
     
@@ -537,9 +536,7 @@ static void video_window_adapt_size (void) {
   }
   
   
-  XSelectInput(gGui->display, gGui->video_window, 
-	       StructureNotifyMask | ExposureMask | 
-	       KeyPressMask | ButtonPressMask | PointerMotionMask);
+  XSelectInput(gGui->display, gGui->video_window, INPUT_MOTION | KeymapStateMask);
 
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {

@@ -31,8 +31,17 @@ typedef void (*xitk_dnd_callback_t) (char *filename);
 typedef struct {
   Display             *display;
   Window               win;
-  
+
   xitk_dnd_callback_t  callback;
+
+  int                  x;
+  int                  y;
+  Window               dropper_toplevel;
+  Window               dropper_window;
+  Window               dragger_window;
+  Atom                *dragger_typelist;
+  Atom                 desired;
+  Time                 time;
 
   Atom                 _XA_XdndAware;
   Atom                 _XA_XdndEnter;
@@ -40,12 +49,12 @@ typedef struct {
   Atom                 _XA_XdndDrop;
   Atom                 _XA_XdndPosition;
   Atom                 _XA_XdndStatus;
-  Atom                 _XA_XdndActionCopy;
   Atom                 _XA_XdndSelection;
   Atom                 _XA_XdndFinished;
-  Atom                 _XA_XINE_XDNDEXCHANGE;
+  Atom                 _XA_XdndTypeList;
+  Atom                 _XA_XITK_PROTOCOL_ATOM;
   Atom                 _XA_WM_DELETE_WINDOW;
-  Atom                 atom_support;
+  Atom                 supported;
   Atom                 version;
 
 } xitk_dnd_t;
@@ -95,10 +104,11 @@ typedef struct {
 
 void xitk_init_dnd(Display *display, xitk_dnd_t *);
 
-void xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
+int xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
 
-Bool xitk_process_client_dnd_message(xitk_dnd_t *, XEvent *);
+int xitk_process_client_dnd_message(xitk_dnd_t *, XEvent *);
 
 void xitk_set_dnd_callback(xitk_dnd_t *, xitk_dnd_callback_t);
+void xitk_unset_dnd_callback(xitk_dnd_t *xdnd);
 
 #endif

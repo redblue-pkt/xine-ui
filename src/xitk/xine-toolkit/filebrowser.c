@@ -1062,9 +1062,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   XSetStandardProperties(fb->imlibdata->x.disp, private_data->window, title, title,
 			 None, NULL, 0, &hint);
 
-  XSelectInput(fb->imlibdata->x.disp, private_data->window,
-	       ButtonPressMask | ButtonReleaseMask | KeymapStateMask | PointerMotionMask 
-	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+  XSelectInput(fb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
   
   /*
    * layer above most other things, like gnome panel

@@ -294,8 +294,10 @@ void xitk_change_window_for_event_handler (xitk_register_key_t key, Window windo
 
       fx->window = window;
 
-      if(fx->xdnd && (window != None))
-	xitk_make_window_dnd_aware(fx->xdnd, window);
+      if(fx->xdnd && (window != None)) {
+	if(!xitk_make_window_dnd_aware(fx->xdnd, window))
+	  xitk_unset_dnd_callback(fx->xdnd);
+      }
       
       MUTUNLOCK();
       return;
@@ -347,7 +349,7 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
     XLOCK(gXitk->display);
     err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
     XUNLOCK(gXitk->display);
-
+    
     if(err != BadDrawable && err != BadWindow) {
       fx->new_pos.x = wattr.x;
       fx->new_pos.y = wattr.y;
@@ -378,8 +380,8 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
     fx->xdnd = (xitk_dnd_t *) xitk_xmalloc(sizeof(xitk_dnd_t));
     
     xitk_init_dnd(gXitk->display, fx->xdnd);
-    xitk_set_dnd_callback(fx->xdnd, dnd_cb);
-    xitk_make_window_dnd_aware(fx->xdnd, fx->window);
+    if(xitk_make_window_dnd_aware(fx->xdnd, fx->window))
+      xitk_set_dnd_callback(fx->xdnd, dnd_cb);
   }
   else
   fx->xdnd = NULL;
@@ -638,12 +640,13 @@ void xitk_xevent_notify(XEvent *event) {
 	}
 	break;
 
+	case SelectionNotify:
 	case ClientMessage:
 	  if(fx->xdnd)
 	    xitk_process_client_dnd_message(fx->xdnd, event);
 	  break;
 	}
-
+	
 	if(fx->xevent_callback) {
 	  fx->xevent_callback(event, fx->user_data);
 	}
