@@ -38,6 +38,8 @@
 #include "keys.h"
 #include "actions.h"
 
+int fbxine_init_lirc(void);
+
 static void *lirc_loop(void *dummy)
 {
 	char *code, *c;
