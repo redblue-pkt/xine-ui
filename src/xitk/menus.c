@@ -29,6 +29,7 @@
 #include "common.h"
 
 extern gGui_t             *gGui;
+extern _panel_t           *panel;
 
 #define PLAYB_PLAY         1
 #define PLAYB_STOP         2
@@ -48,6 +49,8 @@ extern gGui_t             *gGui;
 #define PLAYL_SHUF_PLUS   17
 
 #define AUDIO_MUTE        20
+#define AUDIO_INCRE_VOL   21
+#define AUDIO_DECRE_VOL   22
 
 #define VIDEO_FULLSCR     30
 #define VIDEO_2X          31
@@ -216,6 +219,34 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
   switch(ctrl) {
   case AUDIO_MUTE:
     gui_execute_action_id(ACTID_MUTE);
+    break;
+
+  case AUDIO_INCRE_VOL:
+    if((gGui->mixer.caps & MIXER_CAP_VOL) && (gGui->mixer.volume_level < 100)) {
+      
+      gGui->mixer.volume_level += 10;
+      
+      if(gGui->mixer.volume_level > 100)
+	gGui->mixer.volume_level = 100;
+      
+      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
+      xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
+      osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
+    }
+    break;
+
+  case AUDIO_DECRE_VOL:
+    if((gGui->mixer.caps & MIXER_CAP_VOL) && (gGui->mixer.volume_level > 0)) {
+      
+      gGui->mixer.volume_level -= 10;
+      
+      if(gGui->mixer.volume_level < 0)
+	gGui->mixer.volume_level = 0;
+
+      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
+      xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
+      osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
+    }
     break;
 
   default:
@@ -402,9 +433,18 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "SEP",  
       "<separator>",
       NULL, NULL                                                                             },
-    { "Audio Mute",
+    { "Volume",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "Volume/Mute",
       gGui->mixer.mute ? "<checked>" : "<check>",
       menu_audio_ctrl, (void *) AUDIO_MUTE                                                   },
+    { "Volume/Increase 10%",
+      NULL,
+      menu_audio_ctrl, (void *) AUDIO_INCRE_VOL                                              },
+    { "Volume/Decrease 10%",
+      NULL,
+      menu_audio_ctrl, (void *) AUDIO_DECRE_VOL                                              },
     { "Audio Channel",
       "<branch>",
       NULL, NULL                                                                             },
