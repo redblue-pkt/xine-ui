@@ -173,9 +173,10 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
 
 xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   xitk_mrlbrowser_filter_t **filters = NULL;
-  xine_cfg_entry_t          *entry;
+  xine_cfg_entry_t          entry;
+  int                       cfg_err_result;
   int                        num_endings = 0;
-
+  memset(&entry, 0, sizeof(xine_cfg_entry_t)); /* Make sure those pointers are NULL */
   filters                      = (xitk_mrlbrowser_filter_t **) 
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
   filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
@@ -183,19 +184,19 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   filters[num_endings]->name   = strdup("All");
   filters[num_endings]->ending = strdup("*");
 
-  entry = xine_config_get_first_entry(gGui->xine);
-  while(entry) {
+  cfg_err_result = xine_config_get_first_entry(gGui->xine, &entry);
+  while(cfg_err_result==0) {
     char *point;
     
-    point = strchr(entry->key, '.');
+    point = strchr(entry.key, '.');
     
-    if(entry->type == XINE_CONFIG_TYPE_STRING && point) {
+    if(entry.type == XINE_CONFIG_TYPE_STRING && point) {
       int len;
       
-      len = point - entry->key;
+      len = point - entry.key;
       point++;
       
-      if(!strncmp("mrl", entry->key, len)) {
+      if(!strncmp("mrl", entry.key, len)) {
 	
 	if(!strncmp("ends", point, 4)) {
 	  char *ends, *e;
@@ -210,7 +211,7 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
 	  filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
 	    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
 	  
-	  xine_strdupa(ends, entry->str_value);
+	  xine_strdupa(ends, entry.str_value);
 
 	  while((e = xine_strsep(&ends, ",")) != NULL) {
 	    while((*e == ' ') || (*e == '\t')) e++;
@@ -223,12 +224,12 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
 	  }
 	  
 	  filters[num_endings]->name   = strdup(patterns);
-	  filters[num_endings]->ending = strdup(entry->str_value);
+	  filters[num_endings]->ending = strdup(entry.str_value);
 	}
       }
 
     }      
-    entry = xine_config_get_next_entry(gGui->xine);
+    cfg_err_result = xine_config_get_next_entry(gGui->xine, &entry);
   }
   
   filters[num_endings + 1]         = (xitk_mrlbrowser_filter_t *)

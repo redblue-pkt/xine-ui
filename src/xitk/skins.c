@@ -130,15 +130,16 @@ static void looking_for_available_skins(void) {
  */
 char *skin_get_skindir(void) {
   static char         tmp[2048];
-  xine_cfg_entry_t   *entry;
+  xine_cfg_entry_t   entry;
+  int                cfg_err_result;
   char               *skin;
   
   memset(&tmp, 0, 2048);
-  
-  entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
+  memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
+  cfg_err_result = xine_config_lookup_entry(gGui->xine, "gui.skin", &entry);
 
-  if(entry)
-    skin = (char *) skins_avail[entry->num_value]->skin;
+  if(cfg_err_result==0)
+    skin = (char *) skins_avail[entry.num_value]->skin;
   else
     skin = DEFAULT_SKIN;
   
@@ -152,15 +153,13 @@ char *skin_get_skindir(void) {
  */
 char *skin_get_configfile(void) {
   static char        tmp[2048];
-  xine_cfg_entry_t  *entry;
+  xine_cfg_entry_t  entry;
   char              *skin;
   
   memset(&tmp, 0, 2048);
-  
-  entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
-
-  if(entry)
-    skin = (char *) skins_avail[entry->num_value]->skin;
+  memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
+  if (xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)==0) 
+    skin = (char *) skins_avail[entry.num_value]->skin;
   else
     skin = DEFAULT_SKIN;
   
@@ -228,15 +227,15 @@ void change_skin(skins_locations_t *sk) {
   char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char                *old_skin;
   skins_locations_t   *sks = sk;
-  xine_cfg_entry_t    *entry;
+  xine_cfg_entry_t    entry;
   int                  twice = 0, twice_load = 0;
 
   if(!sk)
     return;
-  
-  entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
-  if(entry)
-    old_skin = (char *) skins_avail[entry->num_value]->skin;
+
+  memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
+  if(xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)==0) 
+    old_skin = (char *) skins_avail[entry.num_value]->skin;
   else
     old_skin = DEFAULT_SKIN;
   
@@ -254,8 +253,8 @@ void change_skin(skins_locations_t *sk) {
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
     skins_locations_t   *osks;
     
-    entry->num_value = get_skin_offset(old_skin);
-    xine_config_update_entry(gGui->xine, entry);
+    entry.num_value = get_skin_offset(old_skin);
+    xine_config_update_entry(gGui->xine, &entry);
 
 #warning WHY REMOVED?
     config_update_num("gui.skin", (get_skin_offset(old_skin)));

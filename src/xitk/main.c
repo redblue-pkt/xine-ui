@@ -558,11 +558,12 @@ void event_listener (void *user_data, xine_event_t *event) {
     
   case XINE_EVENT_OUTPUT_VIDEO: {
     xine_ui_event_t   *uevent = (xine_ui_event_t *)event;
-    xine_cfg_entry_t  *cfg_entry;
+    xine_cfg_entry_t  cfg_entry;
+    int cfg_err_result;
 
-    cfg_entry = xine_config_lookup_entry(gGui->xine, "misc.logo_mrl");
+    cfg_err_result = xine_config_lookup_entry(gGui->xine, "misc.logo_mrl", &cfg_entry);
 
-    if(strcmp(cfg_entry->str_value, uevent->data)) {
+    if(strcmp(cfg_entry.str_value, uevent->data)) {
       if(gGui->auto_vo_visibility) {
 
 	if(!video_window_is_visible())

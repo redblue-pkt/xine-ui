@@ -1388,18 +1388,19 @@ float video_window_get_mag (void) {
  * Change displayed logo, if selected skin want to customize it.
  */
 void video_window_change_skins(void) {
-  xine_cfg_entry_t *cfg_entry;
+  xine_cfg_entry_t cfg_entry;
   char             *skin_logo;
   static int        sk_changed = 0;
-
-  cfg_entry = xine_config_lookup_entry(gGui->xine, "misc.logo_mrl");
+  int cfg_err_result;
+  memset(&cfg_entry, 0, sizeof(xine_cfg_entry_t));
+  cfg_err_result = xine_config_lookup_entry(gGui->xine, "misc.logo_mrl", &cfg_entry);
   skin_logo = xitk_skin_get_logo(gGui->skin_config);
   
   if(skin_logo) {
     
-    if(cfg_entry && cfg_entry->str_value) {
+    if((cfg_err_result == 0) && cfg_entry.str_value) {
       /* Old and new logo are same, don't reload */
-      if(!strcmp(cfg_entry->str_value, skin_logo))
+      if(!strcmp(cfg_entry.str_value, skin_logo))
 	return;
     }
     
@@ -1411,7 +1412,7 @@ void video_window_change_skins(void) {
      * Back to default logo only on a skin 
      * change, not at the first skin loading.
      **/
-    if(cfg_entry && sk_changed)
+    if((cfg_err_result == 0) && sk_changed)
       config_update_string("misc.logo_mrl", XINE_LOGO_MRL);
   }
 
