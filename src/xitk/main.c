@@ -818,8 +818,6 @@ int main(int argc, char *argv[]) {
     window_attribute.borderless = 0;
   }
 
-  gGui->actions_on_start[aos] = ACTID_NOKEY;
-
   show_banner();
 
   /*
@@ -839,6 +837,8 @@ int main(int argc, char *argv[]) {
       gGui->actions_on_start[aos++] = ACTID_SETUP;
 
   }
+
+  gGui->actions_on_start[aos] = ACTID_NOKEY;
 
   gGui->config = xine_config_file_init (gGui->configfile);
 
@@ -873,7 +873,7 @@ int main(int argc, char *argv[]) {
   /*
    * Register an event listener
    */
-  xine_register_event_listener(gGui->xine, event_listener, gGui);
+  xine_register_event_listener(gGui->xine, event_listener, (void *) gGui);
 
   /*
    * start CORBA server thread

@@ -800,6 +800,11 @@ void panel_init (void) {
   lbl.label             = panel->runtime;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->runtime_label = xitk_label_create (gGui->skin_config, &lbl)));
+  /* 
+   * Init to default, otherwise if panel is hide
+   * at startup, label is empty 'till it's updated
+   */
+  xitk_label_change_label (panel->widget_list, panel->runtime_label, "00:00:00"); 
 
   /*  Audio channel label */
   lbl.skin_element_name = "AudioLabel";

@@ -325,6 +325,7 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_WINDOWREDUCE:
     video_window_set_mag (0.8 * video_window_get_mag());
     break;
+
   case ACTID_WINDOWENLARGE:
     video_window_set_mag (1.2 * video_window_get_mag());
     break;
@@ -333,9 +334,11 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_WINDOW100:
     video_window_set_mag (1.0);
     break;
+
   case ACTID_WINDOW200:
     video_window_set_mag (2.0);
     break;
+
   case ACTID_WINDOW50:
     video_window_set_mag (0.5);
     break;
@@ -574,6 +577,8 @@ void gui_execute_action_id(action_id_t action) {
     xine_send_event(gGui->xine, &xine_event);
     break;
     
+    /* END OF: events for advanced input plugins: */
+
   case ACTID_ZOOM_IN:
     gui_change_zoom(1);
     break;
@@ -589,10 +594,12 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_GRAB_POINTER:
     if(!gGui->cursor_grabbed) {
       if(!panel_is_visible())
-	XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
+	XGrabPointer(gGui->display, gGui->video_window, 1, None, 
+		     GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
       
       gGui->cursor_grabbed = 1;
-    } else {
+    }
+    else {
       XUngrabPointer(gGui->display, CurrentTime);
       gGui->cursor_grabbed = 0;
     }
@@ -632,22 +639,19 @@ void gui_handle_event (XEvent *event, void *data) {
     }
     break;
     
-  case ButtonRelease:
-    kbindings_handle_kbinding(gGui->kbindings, event);
-    break;
-
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
     /* printf ("ButtonPress\n"); */
 
     /* printf ("button: %d\n",bevent->button); */
 
-    if ((bevent->button==3) && (bevent->window == gGui->video_window))
+    if ((bevent->button == 3) && (bevent->window == gGui->video_window))
       panel_toggle_visibility (NULL, NULL);
     
   }
   break;
 
+  case ButtonRelease:
   case KeyPress:
     kbindings_handle_kbinding(gGui->kbindings, event);
     break;
@@ -715,7 +719,6 @@ void gui_branched_callback () {
     gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
   }
 }
-
 
 static void gui_find_visual (Visual **visual_return, int *depth_return) {
   XWindowAttributes  attribs;
@@ -815,7 +818,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    * init playlist
    */
 
-  for (i=0; i<nfiles; i++)
+  for (i = 0; i < nfiles; i++)
     gGui->playlist[i] = filenames[i];
 
   gGui->playlist_num = nfiles; 
@@ -835,7 +838,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 	    "thread-safe xlib.\n"));
     exit (1);
   } 
-
   
   if(getenv("DISPLAY"))
     display_name = getenv("DISPLAY");
@@ -845,17 +847,18 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     exit(1);
   }
 
-  if (gGui->config->register_bool (gGui->config, "gui.xsynchronize", 0, "synchronized X protocol (debug)", NULL, NULL, NULL)) {
+  if (gGui->config->register_bool (gGui->config, "gui.xsynchronize", 0,
+				   "synchronized X protocol (debug)", NULL, NULL, NULL)) {
     XSynchronize (gGui->display, True);
     fprintf (stderr, "Warning! Synchronized X activated - this is way slow...\n");
   }
 
-  gGui->layer_above = gGui->config->register_bool (gGui->config, "gui.layer_above", 
-						   1, "use wm layer property to place window on top", 
+  gGui->layer_above = gGui->config->register_bool (gGui->config, "gui.layer_above", 1,
+						   "use wm layer property to place window on top", 
 						   NULL, NULL, NULL);
-
+  
   gGui->snapshot_location = gGui->config->register_string (gGui->config, "gui.snapshotdir", 
-							   (char*) (xine_get_homedir()),
+							   (char *) (xine_get_homedir()),
 							   "where snapshots will be saved",
 							   NULL, snapshot_loc_cb, NULL);
   XLockDisplay (gGui->display);
