@@ -485,7 +485,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     private_data->skin          = xitk_load_image(private_data->imlibdata, 
 						  xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
     
-    private_data->max_visible   = (private_data->skin->width/2) / 6;
+    private_data->max_visible   = (private_data->skin->width/2);
     
     
     private_data->normal_color  = xitk_skin_get_label_color(skonfig, private_data->skin_element_name);
