@@ -966,6 +966,10 @@ int main(int argc, char *argv[]) {
    * init gui
    */
   gui_init(_argc - optind, &_argv[optind], &window_attribute);
+  /*
+   * xine init
+   */
+  xine_init (gGui->xine);
 
   /*
    * load and init output drivers
@@ -978,11 +982,6 @@ int main(int argc, char *argv[]) {
   gGui->ao_driver = load_audio_out_driver(audio_driver_id);
   free(audio_driver_id);
   
-  /*
-   * xine init
-   */
-  xine_init (gGui->xine);
-
   /*
    * Setup logo.
    */
