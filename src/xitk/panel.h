@@ -64,6 +64,8 @@ void panel_update_channel_display (void) ;
 
 void panel_update_runtime_display(void);
 
+void panel_set_no_mrl(void);
+
 void panel_update_mrl_display (void);
 
 void panel_layer_above(int);

@@ -772,7 +772,7 @@ void gui_init (int nfiles, char *filenames[]) {
   if (nfiles)
     strcpy(gGui->filename, gGui->playlist [gGui->playlist_cur]);
   else 
-    sprintf(gGui->filename, "DROP A FILE ON XINE");
+    panel_set_no_mrl();
 
   /*
    * X / imlib stuff

@@ -222,6 +222,14 @@ void panel_update_channel_display (void) {
 }
 
 /*
+ * Display an informative message when there is no mrl in playlist.
+ */
+void panel_set_no_mrl(void) {
+
+  sprintf(gGui->filename, "Drop a file on Xine v%s *** Drop a file on Xine v%s *** Drop a file on Xine v%s", VERSION, VERSION, VERSION);
+}
+
+/*
  * Update displayed MRL according to the current one.
  */
 void panel_update_mrl_display (void) {

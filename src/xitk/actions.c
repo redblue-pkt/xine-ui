@@ -398,8 +398,8 @@ void gui_set_current_mrl(char *mrl) {
 
   if(mrl)
     strcpy(gGui->filename, mrl);
-  else 
-    sprintf(gGui->filename, "DROP A FILE ON XINE");  
+  else
+    panel_set_no_mrl();
   
   panel_update_mrl_display ();
 }
