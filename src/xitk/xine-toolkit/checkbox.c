@@ -37,6 +37,22 @@
 /*
  *
  */
+static int notify_inside(widget_t *c, int x, int y) {
+  checkbox_private_data_t *private_data = 
+    (checkbox_private_data_t *) c->private_data;
+  
+  if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && c->visible) {
+    gui_image_t *skin = private_data->skin;
+    
+    return widget_is_cursor_out_mask(private_data->display, c, skin->mask, x, y);
+  }
+
+  return 1;
+}
+
+/*
+ *
+ */
 static void paint_checkbox (widget_t *c, Window win, GC gc) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
@@ -230,6 +246,7 @@ widget_t *checkbox_create (xitk_checkbox_t *cb) {
   mywidget->notify_click    = notify_click_checkbox;
   mywidget->notify_focus    = notify_focus_checkbox;
   mywidget->notify_keyevent = NULL;
-
+  mywidget->notify_inside   = notify_inside;
+  
   return mywidget;
 }

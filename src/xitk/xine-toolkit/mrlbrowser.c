@@ -940,6 +940,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   mywidget->notify_click    = NULL;
   mywidget->notify_focus    = NULL;
   mywidget->notify_keyevent = NULL;
+  mywidget->notify_inside   = NULL;
 
   browser_update_list(private_data->mrlb_list, 
 		      private_data->mc->mrls_disp, 

@@ -44,6 +44,22 @@
 #define FOCUS                   2
 
 /*
+ *
+ */
+static int notify_inside(widget_t *it, int x, int y) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+  
+  if ((it->widget_type & WIDGET_TYPE_INPUTTEXT) && it->visible) {
+    gui_image_t *skin = private_data->skin;
+    
+    return widget_is_cursor_out_mask(private_data->display, it, skin->mask, x, y);
+  }
+
+  return 1;
+}
+
+/*
  * Extract modifier keys.
  */
 int xitk_get_key_modifier(XEvent *xev, int *modifier) {
@@ -850,6 +866,7 @@ widget_t *inputtext_create (xitk_inputtext_t *it) {
   mywidget->notify_click      = notify_click_inputtext;
   mywidget->notify_focus      = notify_focus_inputtext;
   mywidget->notify_keyevent   = notify_keyevent_inputtext;
+  mywidget->notify_inside     = notify_inside;
 
   return mywidget;
 }

@@ -1214,6 +1214,7 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   mywidget->notify_click    = NULL;
   mywidget->notify_focus    = NULL;
   mywidget->notify_keyevent = NULL;
+  mywidget->notify_inside   = NULL;
 
   load_files(NULL, (void *)private_data);
   

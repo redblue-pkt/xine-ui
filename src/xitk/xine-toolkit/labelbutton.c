@@ -42,6 +42,22 @@
 #define NORMAL    3
 
 /*
+ *
+ */
+static int notify_inside(widget_t *lb, int x, int y) {
+  lbutton_private_data_t *private_data = 
+    (lbutton_private_data_t *) lb->private_data;
+  
+  if ((lb->widget_type & WIDGET_TYPE_LABELBUTTON) && lb->visible) {
+    gui_image_t *skin = private_data->skin;
+    
+    return widget_is_cursor_out_mask(private_data->display, lb, skin->mask, x, y);
+  }
+
+  return 1;
+}
+
+/*
  * Draw the string in pixmap pix, then return it
  */
 static Pixmap create_labelofbutton(widget_t *lb, 
@@ -453,6 +469,7 @@ widget_t *label_button_create (xitk_labelbutton_t *b) {
   mywidget->notify_click       = notify_click_labelbutton;
   mywidget->notify_focus       = notify_focus_labelbutton;
   mywidget->notify_keyevent    = NULL;
+  mywidget->notify_inside      = notify_inside;
 
   return mywidget;
 }

@@ -93,6 +93,8 @@ typedef int (*widget_focus_callback_t)(struct widget_list_s *, struct widget_s *
 
 typedef void (*widget_keyevent_callback_t)(struct widget_list_s *, struct widget_s *, XEvent *);
 
+typedef int (*widget_inside_callback_t)(struct widget_s *, int, int);
+
 typedef struct widget_s {
   int                        x;
   int                        y;
@@ -113,6 +115,8 @@ typedef struct widget_s {
   widget_focus_callback_t    notify_focus;
 
   widget_keyevent_callback_t notify_keyevent;
+
+  widget_inside_callback_t   notify_inside;
 
   void                      *private_data;
   uint32_t                   widget_type;
@@ -150,6 +154,13 @@ gui_color_names_t *gui_get_color_name(char *color);
  * (re)Paint a widget list.
  */
 int paint_widget_list (widget_list_t *wl) ;
+
+/**
+ * Check if cursor is in a mask pixmap or not. Return 1 if the cursor
+ * is in visible area (or mask don't exist), and 0 if the pointed
+ * area is not visible.
+ */
+int widget_is_cursor_out_mask(Display *display, widget_t *w, Pixmap mask, int x, int y);
 
 /**
  * Boolean function, if x and y coords is in widget.

@@ -42,7 +42,7 @@
 /*
  *
  */
-static void paint_label(widget_t *l,  Window win, GC gc) {
+static void paint_label(widget_t *l, Window win, GC gc) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;
   gui_image_t          *font = (gui_image_t *) private_data->font;
@@ -264,6 +264,7 @@ widget_t *label_create(xitk_label_t *l) {
   mywidget->notify_click       = NULL;
   mywidget->notify_focus       = NULL;
   mywidget->notify_keyevent    = NULL;
+  mywidget->notify_inside      = NULL;
   
   pthread_mutex_init(&private_data->mutex, NULL);
 

@@ -35,6 +35,7 @@
 #include <unistd.h>
 
 #include <X11/Xlib.h>
+#include <X11/Intrinsic.h>
 
 #include "widget.h"
 #include "list.h"
@@ -741,9 +742,49 @@ int paint_widget_list (widget_list_t *wl) {
 /*
  *
  */
+int widget_is_cursor_out_mask(Display *display, widget_t *w, Pixmap mask, int x, int y) {
+  XImage *xi;
+  Pixel p;
+  
+  if(mask) {
+    int xx, yy;
+    
+    if((xx = (x - w->x)) == w->width) xx--;
+    if((yy = (y - w->y)) == w->height) yy--;
+    
+    XLOCK(display);
+
+    xi = XGetImage(display, mask, xx, yy, 1, 1, AllPlanes, ZPixmap);
+    p = XGetPixel(xi, 0, 0);
+    XDestroyImage(xi);
+
+    XUNLOCK(display);
+
+    return (int) p;
+  }
+  
+  return 1;
+}
+
+/*
+ *
+ */
 int is_inside_widget (widget_t *widget, int x, int y) {
-  return ((x >= widget->x) && (x <= (widget->x + widget->width))
-	  && (y >= widget->y) && (y <= (widget->y + widget->height)));
+  int inside = 0;
+
+  
+  if ((x >= widget->x) && 
+      (x <= (widget->x + widget->width)) && 
+      (y >= widget->y) && (y <= (widget->y + widget->height))) {
+
+    inside = 1;
+
+    if(widget->notify_inside) 
+      inside = widget->notify_inside(widget, x, y);
+    
+  }
+
+  return inside;
 }
 
 /*

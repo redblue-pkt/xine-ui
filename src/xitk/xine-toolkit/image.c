@@ -61,7 +61,7 @@ gui_image_t *gui_load_image(ImlibData *idata, char *image) {
 /*
  *
  */
-static void paint_image (widget_t *i,  Window win, GC gc) {
+static void paint_image (widget_t *i, Window win, GC gc) {
   gui_image_t *skin;
   GC lgc;
   image_private_data_t *private_data = 

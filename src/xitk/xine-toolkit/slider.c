@@ -80,6 +80,28 @@
 #endif
 
 /*
+ *
+ */
+static int notify_inside(widget_t *sl, int x, int y) {
+  slider_private_data_t *private_data = 
+    (slider_private_data_t *) sl->private_data;
+
+  if((sl->widget_type & WIDGET_TYPE_SLIDER) && sl->visible) {
+    gui_image_t *skin;
+
+    if(private_data->paddle_cover_bg == 1)
+      skin = private_data->paddle_skin;
+    else
+      skin = private_data->bg_skin;
+
+
+    return widget_is_cursor_out_mask(private_data->display, sl, skin->mask, x, y);
+  }
+
+  return 1;
+}
+
+/*
  * Draw widget
  */
 static void paint_slider (widget_t *sl, Window win, GC gc) {
@@ -628,6 +650,7 @@ widget_t *slider_create (xitk_slider_t *s) {
   mywidget->notify_click        = notify_click_slider;
   mywidget->notify_focus        = notify_focus_slider;
   mywidget->notify_keyevent     = NULL;
+  mywidget->notify_inside       = notify_inside;
 
   return mywidget;
 }

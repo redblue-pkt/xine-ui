@@ -35,6 +35,22 @@
 
 #include "_xitk.h"
 
+/*
+ *
+ */
+static int notify_inside(widget_t *b, int x, int y) {
+  button_private_data_t *private_data = 
+    (button_private_data_t *) b->private_data;
+
+  if((b->widget_type & WIDGET_TYPE_BUTTON) && b->visible) {
+    gui_image_t *skin = private_data->skin;
+
+    return widget_is_cursor_out_mask(private_data->display, b, skin->mask, x, y);
+  }
+
+  return 1;
+}
+
 /**
  *
  */
@@ -124,7 +140,7 @@ static int notify_click_button (widget_list_t *wl,
 static int notify_focus_button (widget_list_t *wl, widget_t *b, int bEntered) {
   button_private_data_t *private_data = 
     (button_private_data_t *) b->private_data;
-  
+
   if (b->widget_type & WIDGET_TYPE_BUTTON) {
 
     private_data->bArmed = bEntered;
@@ -175,6 +191,7 @@ widget_t *button_create (xitk_button_t *b) {
   mywidget->notify_click    = notify_click_button;
   mywidget->notify_focus    = notify_focus_button;
   mywidget->notify_keyevent = NULL;
+  mywidget->notify_inside   = notify_inside;
 
   return mywidget;
 }
