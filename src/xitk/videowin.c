@@ -283,13 +283,20 @@ void video_window_adapt_size (void *this,
 
     // just switching to a different modeline if necessary
     if(!(gVw->XF86_modelines_count <= 1) && !(search > gVw->XF86_modelines_count)) {
-       XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[search]);
-       XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
-       
-       gGui->XF86VidMode_fullscreen = 1;
-       
-       gVw->fullscreen_width  = gVw->XF86_modelines[search]->hdisplay;
-       gVw->fullscreen_height = gVw->XF86_modelines[search]->vdisplay;
+       if(XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[search])) {
+	  XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
+          
+	  gGui->XF86VidMode_fullscreen = 1;
+	  
+	  gVw->fullscreen_width  = gVw->XF86_modelines[search]->hdisplay;
+	  gVw->fullscreen_height = gVw->XF86_modelines[search]->vdisplay;
+	  
+	  // just in case the mouse pointer is off the visible area, move it
+	  // to the middle of the video window
+	  XWarpPointer(gGui->display, None, gGui->video_window, 0, 0, 0, 0, gVw->fullscreen_width/2, gVw->fullscreen_height/2);
+       } else {
+	  printf("XF86VidMode Extension: modeline switching failed.\n");
+       }       
     }
   }
 #endif
