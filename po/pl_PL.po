@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-03-19 22:38+0100\n"
+"POT-Creation-Date: 2002-03-24 05:17+0100\n"
 "PO-Revision-Date: 2002-03-05 01:00+ZONE\n"
 "Last-Translator: Bart³omiej MURYN <forever@klub.chip.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -111,7 +111,7 @@ msgstr ""
 "\n"
 "!! Nieobs³ugiwany b³±d !!\n"
 
-#: src/xitk/event.c:893
+#: src/xitk/event.c:822
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -119,11 +119,11 @@ msgstr ""
 "\n"
 "XInitThreads failed - wygl±da na to ¿e nie masz thread-safe xlib.\n"
 
-#: src/xitk/event.c:903
+#: src/xitk/event.c:832
 msgid "Cannot open display\n"
 msgstr "Nie mogê otworzyæ okna wy¶wietlania\n"
 
-#: src/xitk/event.c:976
+#: src/xitk/event.c:905
 msgid "Unable to initialize Imlib\n"
 msgstr "Nie mogê zainicjowaæ Imlib\n"
 
@@ -135,12 +135,12 @@ msgstr "Przegladarka plikow xine"
 msgid "Select"
 msgstr "Wybierz"
 
-#: src/xitk/kbindings.c:312
+#: src/xitk/kbindings.c:306
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Skróty klawiaturowe '%s' i '%s' s± identyczne.\n"
 
-#: src/xitk/kbindings.c:668
+#: src/xitk/kbindings.c:662
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Ojej: tablica skrótów klawiaturowych jest PUSTA.\n"
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-03-19 22:38+0100\n"
+"POT-Creation-Date: 2002-03-24 05:17+0100\n"
 "PO-Revision-Date: 2002-02-21 11:42+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -109,7 +109,7 @@ msgstr ""
 "\n"
 "!! Unbekannter Fehler !!\n"
 
-#: src/xitk/event.c:893
+#: src/xitk/event.c:822
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -117,11 +117,11 @@ msgstr ""
 "\n"
 "XInitThreads Fehler - Ihre xlib ist anscheinend nicht Thread-sicher.\n"
 
-#: src/xitk/event.c:903
+#: src/xitk/event.c:832
 msgid "Cannot open display\n"
 msgstr "Kann Display nicht öffnen\n"
 
-#: src/xitk/event.c:976
+#: src/xitk/event.c:905
 msgid "Unable to initialize Imlib\n"
 msgstr "Kann Imlib nicht initialisieren\n"
 
@@ -133,12 +133,12 @@ msgstr "Xine Datei Browser"
 msgid "Select"
 msgstr "Auswählen"
 
-#: src/xitk/kbindings.c:312
+#: src/xitk/kbindings.c:306
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Die Tasten Verknüpfen '%s' und '%s' sind identisch.\n"
 
-#: src/xitk/kbindings.c:668
+#: src/xitk/kbindings.c:662
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Autsch! Tastenbelegungstabelle ist leer.\n"
 

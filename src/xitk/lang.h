@@ -31,7 +31,9 @@ typedef enum {
   FRENCH,
   GERMAN,
   PORTUGUESE,
-  SPANISH
+  SPANISH,
+  POLISH,
+  UKRAINIAN
 } lang_code_t;
 
 typedef struct {

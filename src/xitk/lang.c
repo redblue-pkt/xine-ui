@@ -191,7 +191,7 @@
      no_NO
      norwegian
      nynorsk
-     pl_PL
+ *   pl_PL
      polish
      portuguese
   *  pt_BR
@@ -222,7 +222,7 @@
      thai
      tr_TR
      turkish
-     uk_UA
+  *  uk_UA
      vi_VN
      zh_CN
      zh_CN.gb18030
@@ -260,6 +260,12 @@ static langs_t _langs[] = {
   { "es_ES",           SPANISH,    "_es"    },
   { "es_ES@euro",      SPANISH,    "_es"    },
   { "spanish",         SPANISH,    "_es"    },
+
+  /* Polish */
+  { "pl_PL",           POLISH,     "_pl" },
+
+  /* Ukrainian */
+  { "uk_UA",           UKRAINIAN,  "_uk" },
 
   /* The ultimate solution */
   { NULL,              ENGLISH,    "_en"    }
