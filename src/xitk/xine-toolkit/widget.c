@@ -1398,6 +1398,7 @@ void xitk_free_widget(xitk_widget_t *w) {
   if(w->notify_destroy)
     w->notify_destroy(w, NULL);
   
+  XITK_FREE(w->tips_string);
   XITK_FREE(w);
   w = NULL;
   
