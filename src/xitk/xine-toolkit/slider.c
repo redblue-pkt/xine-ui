@@ -214,34 +214,15 @@ static int notify_click_slider (widget_list_t *wl,
 
 	case ButtonRelease:
 	  private_data->bClicked = 0;
-	  /*
-	   * Perform callback exec if button release is 
-	   * in widget area.
-	   */
-	  if(is_inside_widget(sl, sliderevent.xbutton.x, 
-			      sliderevent.xbutton.y)) {
-	    if(private_data->realmin < 0)
-	      retpos = (private_data->realmin + private_data->pos);
-	    else
-	      retpos = private_data->pos;
-	    if(private_data->callback) {
-	      private_data->callback(private_data->sWidget,
-				     private_data->userdata,
-				     retpos);
-	    }
-	  }
-	  else {
-	    /*
-	     * Restoring original position of paddle.
-	     */
-	    private_data->bArmed = 0;
-	    private_data->pos = original_pos;
-	    paint_slider(sl, wl->win, wl->gc);
-	    if(private_data->callback && private_data->motion_callback) {
-	      private_data->callback(private_data->sWidget,
-				     private_data->userdata,
-				     private_data->pos);
-	    }
+
+	  if(private_data->realmin < 0)
+	    retpos = (private_data->realmin + private_data->pos);
+	  else
+	    retpos = private_data->pos;
+	  if(private_data->callback) {
+	    private_data->callback(private_data->sWidget,
+				   private_data->userdata,
+				   retpos);
 	  }
 	  break;
 	}
