@@ -42,8 +42,10 @@ void splash_create(void) {
   if((xim = xitk_image_load_image(gGui->imlib_data, XINE_SPLASH))) {
     int  x, y;
     
+    XLockDisplay(gGui->display);
     x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (xim->width >> 1);
     y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (xim->height >> 1);
+    XUnlockDisplay(gGui->display);
     
     xwin = xitk_window_create_simple_window(gGui->imlib_data, 
 					    x, y, xim->width, xim->height);
@@ -54,9 +56,9 @@ void splash_create(void) {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, xitk_window_get_window(xwin)); 
     XMapWindow(gGui->display, xitk_window_get_window(xwin));
-    xitk_set_layer_above(xitk_window_get_window(xwin));
     XUnlockDisplay(gGui->display);
-    
+
+    xitk_set_layer_above(xitk_window_get_window(xwin));
     xitk_image_free_image(gGui->imlib_data, &xim);
   }
 }

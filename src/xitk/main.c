@@ -394,7 +394,7 @@ static void xrm_parse(void) {
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->logo_mrl = cfg->str_value;
 }
-static void sub_autoload_cb(void *data, xine_config_entry_t *cfg) {
+static void sub_autoload_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->subtitle_autoload = cfg->num_value;
 }
 
@@ -594,11 +594,12 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
   vis.display           = gGui->display;
   vis.screen            = gGui->screen;
   vis.d                 = gGui->video_window;
+  XLockDisplay(gGui->display);
   res_h                 = (DisplayWidth  (gGui->display, gGui->screen)*1000 
 			   / DisplayWidthMM (gGui->display, gGui->screen));
   res_v                 = (DisplayHeight (gGui->display, gGui->screen)*1000
 			   / DisplayHeightMM (gGui->display, gGui->screen));
-  
+  XUnlockDisplay(gGui->display);
   gGui->pixel_aspect    = res_v / res_h;
   
 #ifdef DEBUG
@@ -782,10 +783,10 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
 
     while (driver_ids[i]) {
       
-      if( strcmp(driver_ids[i], "none") )
-        printf (_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
+      if(strcmp(driver_ids[i], "none"))
+        printf(_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
       else {
-        printf (_("main: skipping <%s> audio output plugin from auto-probe\n"), driver_ids[i]);
+        printf(_("main: skipping <%s> audio output plugin from auto-probe\n"), driver_ids[i]);
         i++;
         continue;
       }
@@ -1805,7 +1806,7 @@ int main(int argc, char *argv[]) {
   xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_SPU_CHANNEL, -2);
   
   /* init the video window */
-  video_window_select_visual ();
+  video_window_select_visual();
 
   xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect_ratio);
   

@@ -304,7 +304,7 @@ static commands_t commands[] = {
     "  fullscreen"
   },
 #ifdef HAVE_XINERAMA
-  { "xineramafull" ,  NO_ARGS,         PUBLIC,          NEED_AUTH,     do_xinerama_fullscreen,
+  { "xineramafull" ,  NO_ARGS,      PUBLIC,          NEED_AUTH,     do_xinerama_fullscreen,
     "xinerama fullscreen toggle",
     "  expand display on further screens"
   },
@@ -395,6 +395,30 @@ static commands_t commands[] = {
     NULL, 
     NULL
   } 
+};
+
+static struct {
+  char        *name;
+  int          status;
+} status_struct[] = {
+  { "XINE_STATUS_IDLE"   , XINE_STATUS_IDLE },
+  { "XINE_STATUS_PLAY"   , XINE_STATUS_PLAY },
+  { "XINE_STATUS_STOP"   , XINE_STATUS_STOP },
+  { "XINE_STATUS_QUIT"   , XINE_STATUS_QUIT },
+  { NULL                 , -1               }
+};
+
+static struct {
+  char        *name;
+  int          speed;
+} speeds_struct[] = {
+  { "XINE_SPEED_PAUSE"   , XINE_SPEED_PAUSE  },
+  { "XINE_SPEED_SLOW_4"  , XINE_SPEED_SLOW_4 },
+  { "XINE_SPEED_SLOW_2"  , XINE_SPEED_SLOW_2 },
+  { "XINE_SPEED_NORMAL"  , XINE_SPEED_NORMAL },
+  { "XINE_SPEED_FAST_2"  , XINE_SPEED_FAST_2 },
+  { "XINE_SPEED_FAST_4"  , XINE_SPEED_FAST_4 },
+  { NULL                 , 0                 }
 };
 
 extern gGui_t *gGui;
@@ -1152,7 +1176,7 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
 
 static void show_version(void) {
   printf("This is %s - xine's remote control v%s.\n"
-	 "(c) 2000-2003 by G. Bartsch and the xine project team.\n", PROGNAME, PROGVERSION);
+	 "(c) 2000-2003 The xine Team.\n", PROGNAME, PROGVERSION);
 }
 
 static void show_usage(void) {
@@ -2018,54 +2042,31 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	sprintf(buf, "%s", "Current status: ");
 	status = xine_get_status(gGui->stream);
 	
-	switch(status) {
-	case XINE_STATUS_STOP:
-	  sprintf(buf, "%s%s", buf, "XINE_STATUS_STOP");
-	  break;
-	case XINE_STATUS_PLAY:
-	  sprintf(buf, "%s%s", buf, "XINE_STATUS_PLAY");
-	  break;
-	case XINE_STATUS_QUIT:
-	  sprintf(buf, "%s%s", buf, "XINE_STATUS_QUIT");
-	  break;
-	default:
+	if(status <= XINE_STATUS_QUIT)
+	  sprintf(buf, "%s%s", buf, status_struct[status].name);
+	else
 	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
-	  break;
-	}
+	
 	sprintf(buf, "%s%c", buf, '\n');
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "speed")) {
 	char buf[64];
-	int  speed;
+	int  speed = -1, i;
 	
 	sprintf(buf, "%s", "Current speed: ");
 	speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
-	
-	switch(speed) {
-	case XINE_SPEED_PAUSE:
-	  sprintf(buf, "%s%s", buf, "XINE_SPEED_PAUSE");
-	  break;
-	case XINE_SPEED_SLOW_4:
-	  sprintf(buf, "%s%s", buf, "XINE_SPEED_SLOW_4");
-	  break;
-	case XINE_SPEED_SLOW_2:
-	  sprintf(buf, "%s%s", buf, "XINE_SPEED_SLOW_2");
-	  break;
-	case XINE_SPEED_NORMAL:
-	  sprintf(buf, "%s%s", buf, "XINE_SPEED_NORMAL");
-	  break;
-	case XINE_SPEED_FAST_2:
-	  sprintf(buf, "%s%s", buf, "XINE_SPEED_FAST_2");
-	  break;
-	case XINE_SPEED_FAST_4:
-	  sprintf(buf, "%s%s", buf, "XINE_SPEED_FAST_4");
-	  break;
-	default:
-	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
-	  break;
-	}
 
+	for(i = 0; speeds_struct[i].name != NULL; i++) {
+	  if(speed == speeds_struct[i].speed)
+	    break;
+	}
+	
+	if(i < ((sizeof(speeds_struct) / sizeof(speeds_struct[0])) - 1))
+	  sprintf(buf, "%s%s", buf, speeds_struct[i].name);
+	else
+	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
+	
 	sprintf(buf, "%s%c", buf, '\n');
 	sock_write(client_info->socket, buf);
       }
@@ -2192,7 +2193,7 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
     if(nargs == 2) {
       if(is_arg_contain(client_info, 1, "speed")) {
 	int speed;
-	
+
 	if((is_arg_contain(client_info, 2, "XINE_SPEED_PAUSE")) || 
 	   (is_arg_contain(client_info, 2, "|")))
 	  speed = XINE_SPEED_PAUSE;
@@ -2346,90 +2347,52 @@ static void do_event(commands_t *cmd, client_info_t *client_info) {
     xine_event.type = 0;
 
     if(nargs == 1) {
-      if(is_arg_contain(client_info, 1, "menu1")) {
-	xine_event.type = XINE_EVENT_INPUT_MENU1;
+      const char *arg = get_arg(client_info, 1);
+      struct {
+	char     *name;
+	int       type;
+      } events_struct[] = {
+	{ "menu1"   , XINE_EVENT_INPUT_MENU1    },
+	{ "menu2"   , XINE_EVENT_INPUT_MENU2    },
+	{ "menu3"   , XINE_EVENT_INPUT_MENU3    },
+	{ "menu4"   , XINE_EVENT_INPUT_MENU4    },
+	{ "menu5"   , XINE_EVENT_INPUT_MENU5    },
+	{ "menu6"   , XINE_EVENT_INPUT_MENU6    },
+	{ "menu7"   , XINE_EVENT_INPUT_MENU7    },
+	{ "up"      , XINE_EVENT_INPUT_UP       },
+	{ "down"    , XINE_EVENT_INPUT_DOWN     },
+	{ "left"    , XINE_EVENT_INPUT_LEFT     },
+	{ "right"   , XINE_EVENT_INPUT_RIGHT    },
+	{ "select"  , XINE_EVENT_INPUT_SELECT   },
+	{ "next"    , XINE_EVENT_INPUT_NEXT     },
+	{ "previous", XINE_EVENT_INPUT_PREVIOUS },
+	{ NULL      , -1                        }
+      };
+      int i = -1;
+
+      if(strlen(arg)) {
+	i = 0;
+	while(events_struct[i].name && strncmp(arg, events_struct[i].name, strlen(arg))) i++;
       }
-      else if(is_arg_contain(client_info, 1, "menu2")) {
-	xine_event.type = XINE_EVENT_INPUT_MENU2;
-      }
-      else if(is_arg_contain(client_info, 1, "menu3")) {
-	xine_event.type = XINE_EVENT_INPUT_MENU3;
-      }
-      else if(is_arg_contain(client_info, 1, "menu4")) {
-	xine_event.type = XINE_EVENT_INPUT_MENU4;
-      }
-      else if(is_arg_contain(client_info, 1, "menu5")) {
-	xine_event.type = XINE_EVENT_INPUT_MENU5;
-      }
-      else if(is_arg_contain(client_info, 1, "menu6")) {
-	xine_event.type = XINE_EVENT_INPUT_MENU6;
-      }
-      else if(is_arg_contain(client_info, 1, "menu7")) {
-	xine_event.type = XINE_EVENT_INPUT_MENU7;
-      }
-      else if(is_arg_contain(client_info, 1, "up")) {
-	xine_event.type = XINE_EVENT_INPUT_UP;
-      }
-      else if(is_arg_contain(client_info, 1, "down")) {
-	xine_event.type = XINE_EVENT_INPUT_DOWN;
-      }
-      else if(is_arg_contain(client_info, 1, "left")) {
-	xine_event.type = XINE_EVENT_INPUT_LEFT;
-      }
-      else if(is_arg_contain(client_info, 1, "right")) {
-	xine_event.type = XINE_EVENT_INPUT_RIGHT;
-      }
-      else if(is_arg_contain(client_info, 1, "next")) {
-	xine_event.type = XINE_EVENT_INPUT_NEXT;
-      }
-      else if(is_arg_contain(client_info, 1, "previous")) {
-	xine_event.type = XINE_EVENT_INPUT_PREVIOUS;
-      }
-      else if(is_arg_contain(client_info, 1, "select")) {
-	xine_event.type = XINE_EVENT_INPUT_SELECT;
+
+      if((i >= 0) && (i < ((sizeof(events_struct) / sizeof(events_struct[0])) - 1))) {
+	xine_event.type = events_struct[i].type;
       }
       else {
-	char *arg = (char *)get_arg(client_info, 1);
 	int   value;
+	int   input_numbers[] = {
+	  XINE_EVENT_INPUT_NUMBER_0, XINE_EVENT_INPUT_NUMBER_1, XINE_EVENT_INPUT_NUMBER_2,
+	  XINE_EVENT_INPUT_NUMBER_3, XINE_EVENT_INPUT_NUMBER_4, XINE_EVENT_INPUT_NUMBER_5,
+	  XINE_EVENT_INPUT_NUMBER_6, XINE_EVENT_INPUT_NUMBER_7, XINE_EVENT_INPUT_NUMBER_8,
+	  XINE_EVENT_INPUT_NUMBER_9, XINE_EVENT_INPUT_NUMBER_10_ADD
+	};
+	  
 
 	if(((sscanf(arg, "%d", &value)) == 1) ||
 	   ((sscanf(arg, "+%d", &value)) == 1)) {
 	  
-	  switch(value) {
-	  case 0:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_0;
-	    break;
-	  case 1:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_1;
-	    break;
-	  case 2:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_2;
-	    break;
-	  case 3:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_3;
-	    break;
-	  case 4:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_4;
-	    break;
-	  case 5:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_5;
-	    break;
-	  case 6:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_6;
-	    break;
-	  case 7:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_7;
-	    break;
-	  case 8:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_8;
-	    break;
-	  case 9:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_9;
-	    break;
-	  case 10:
-	    xine_event.type = XINE_EVENT_INPUT_NUMBER_10_ADD;
-	    break;
-	  }
+	  if((value >= 0) && (value < (sizeof(input_numbers) / sizeof(input_numbers[0]))))
+	    xine_event.type = input_numbers[value];
 	}
       }
     }
@@ -3018,36 +2981,32 @@ void start_remote_server(void) {
   
 }
 
-static const char *get_homedir(void) {
-  struct passwd *pw = NULL;
-  char *homedir = NULL;
+const char *get_homedir(void) {
+  struct passwd  pwd, *pw = NULL;
+  static char    homedir[_BUFSIZ] = {0,};
+  
+  if(homedir[0])
+    return homedir;
+  
 #ifdef HAVE_GETPWUID_R
-  int ret;
-  struct passwd pwd;
-  char *buffer = NULL;
-  int bufsize = 128;
-  
-  buffer = (char *) malloc(bufsize);
-  memset(buffer, 0, sizeof(buffer));
-  
-  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) < 0) {
+  if(getpwuid_r(getuid(), &pwd, homedir, sizeof(homedir), &pw) != 0 || pw == NULL) {
 #else
   if((pw = getpwuid(getuid())) == NULL) {
 #endif
-    if((homedir = getenv("HOME")) == NULL) {
-      fprintf(stderr, "Unable to get home directory, set it to /tmp.\n");
-      homedir = strdup("/tmp");
+    char *tmp = getenv("HOME");
+    if(tmp) {
+      strncpy(homedir, tmp, sizeof(homedir));
+      homedir[sizeof(homedir) - 1] = '\0';
     }
-  }
-  else {
-    if(pw) 
-      homedir = strdup(pw->pw_dir);
+  } else {
+    strncpy(homedir, pw->pw_dir, sizeof(homedir));
+    homedir[sizeof(homedir) - 1] = '\0';
   }
   
-  
-#ifdef HAVE_GETPWUID_R
-  SAFE_FREE(buffer);
-#endif
+  if(!homedir[0]) {
+    fprintf(stderr, "Unable to get home directory, set it to /tmp.\n");
+    strcpy(homedir, "/tmp");
+  }
   
   return homedir;
 }

@@ -724,10 +724,5 @@ void event_sender_panel(void) {
   eventer->move_forced = 0;
   event_sender_raise_window();
 
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(eventer->xwin)))
-    xine_usec_sleep(5000);
-
-  XLockDisplay (gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(eventer->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay (gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(eventer->xwin));
 }

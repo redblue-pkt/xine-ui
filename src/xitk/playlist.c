@@ -1126,7 +1126,7 @@ void playlist_editor(void) {
   /*
    * Widget-list
    */
-  playlist->widget_list                = xitk_widget_list_new();
+  playlist->widget_list = xitk_widget_list_new();
   xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
   xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_WINDOW, (void *) playlist->window);
   xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_GC, gc);
@@ -1140,7 +1140,6 @@ void playlist_editor(void) {
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->move_up = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->move_up, _("Move up selected MRL"));
-
 
   b.skin_element_name = "PlMoveDn";
   b.callback          = playlist_move_current_updown;
@@ -1180,7 +1179,6 @@ void playlist_editor(void) {
     (playlist->add = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
   xitk_set_widget_tips(playlist->add, _("Add one or more entries in playlist"));
     
-
   lb.skin_element_name = "PlLoad";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Load");
@@ -1309,12 +1307,7 @@ void playlist_editor(void) {
 
   playlist_raise_window();
 
-  while(!xitk_is_window_visible(gGui->display, playlist->window))
-    xine_usec_sleep(5000);
-
-  XLockDisplay(gGui->display);
-  XSetInputFocus(gGui->display, playlist->window, RevertToParent, CurrentTime);
-  XUnlockDisplay(gGui->display);
+  try_to_set_input_focus(playlist->window);
 
   xitk_set_focus_to_widget(playlist->winput);
 }

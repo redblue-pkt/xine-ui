@@ -1063,8 +1063,8 @@ static void _pplugin_create_filter_object(void) {
   pplugin->object_num++;
 
   image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH, FRAME_HEIGHT);
+
   XLockDisplay(gGui->display);
-  
   XSetForeground(gGui->display, (XITK_WIDGET_LIST_GC(pplugin->widget_list)),
 		 xitk_get_pixel_color_gray(gGui->imlib_data));
   XFillRectangle(gGui->display, image->image->pixmap,
@@ -1091,7 +1091,6 @@ static void _pplugin_create_filter_object(void) {
 		    20, 24, 1, FRAME_HEIGHT - 48);
   draw_inner_frame(gGui->imlib_data, image->image, NULL, boldfontname,
 		    5, FRAME_HEIGHT - 16 - 5, 16, 16);
-
 
   XITK_WIDGET_INIT(&im, gGui->imlib_data);
   im.skin_element_name = NULL;
@@ -1685,12 +1684,7 @@ void pplugin_panel(void) {
 
   pplugin_raise_window();
   
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(pplugin->xwin)))
-    xine_usec_sleep(5000);
-
-  XLockDisplay (gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(pplugin->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay (gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(pplugin->xwin));
 }
 
 /* pchain: "<post1>:option1=value1,option2=value2..;<post2>:...." */

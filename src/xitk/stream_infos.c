@@ -1084,11 +1084,5 @@ void stream_infos_panel(void) {
   sinfos->running = 1;
   stream_infos_raise_window();
 
-
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(sinfos->xwin)))
-    xine_usec_sleep(5000);
-
-  XLockDisplay (gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(sinfos->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay (gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(sinfos->xwin));
 }

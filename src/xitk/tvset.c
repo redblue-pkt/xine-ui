@@ -514,7 +514,6 @@ void tvset_panel(void) {
   w = 130;
 
 
-
   x = 5;
   y += 45;
   draw_outter_frame(gGui->imlib_data, bg, _("MPEG2"), btnfontname, 
@@ -573,11 +572,5 @@ void tvset_panel(void) {
   tvset->running = 1;
   tvset_raise_window();
 
-
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(tvset->xwin)))
-    xine_usec_sleep(5000);
-
-  XLockDisplay (gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(tvset->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay (gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(tvset->xwin));
 }

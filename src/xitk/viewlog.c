@@ -257,8 +257,6 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 
       memset(&buf, 0, sizeof(buf));
       
-      //      printf("handling line: %d '%s'\n", i, log[i]);
-      
       p = &log[i][0];
       
       if(strlen(log[i]) > 0) {
@@ -280,13 +278,11 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 	      viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
 	      viewlog->log[j++] = strdup(buf);
 	      viewlog->real_num_entries++;
-	      // printf("added line '%s'\n", viewlog->log[j-1]);
 	    }
 	    memset(&buf, 0, sizeof(buf));
 	    break;
 	    
 	  default:
-	    // printf("- %c", *p);
 	    sprintf(buf, "%s%c", buf, *p);
 	    break;
 	  }
@@ -309,14 +305,9 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
     }
     
     /* I like null terminated arrays ;-) */
-    //    printf("viewlog->log[%d] = NULL\n", j);
     viewlog->log[j]      = NULL;
     viewlog->log_entries = j;
     
-    /*
-    for(i = 0; i < j; i++)
-      printf("line %d '%s'\n", i, viewlog->log[i]);
-    */
   }
   
 #if DEBUG_VIEWLOG
@@ -514,11 +505,5 @@ void viewlog_window(void) {
   viewlog->running = 1;
   viewlog_raise_window();
   
-
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(viewlog->xwin)))
-    xine_usec_sleep(5000);
-
-  XLockDisplay (gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(viewlog->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay (gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(viewlog->xwin));
 }

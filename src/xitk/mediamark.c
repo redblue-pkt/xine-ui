@@ -3100,11 +3100,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   mmkeditor->running = 1;
   mmkeditor_set_mmk(mmk);
   mmk_editor_raise_window();
-  
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(mmkeditor->xwin)))
-    xine_usec_sleep(5000);
 
-  XLockDisplay(gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(mmkeditor->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay(gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(mmkeditor->xwin));
 }

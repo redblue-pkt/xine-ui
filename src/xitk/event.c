@@ -263,7 +263,7 @@ void gui_execute_action_id(action_id_t action) {
 	gGui->numeric.arg += (action - ACTID_EVENT_NUMBER_0);
       }
       else
-	printf("WARNING: Input number canceled, avoid overflow\n");
+	fprintf(stderr, "WARNING: Input number canceled, avoid overflow\n");
 
     } 
     else if(action == ACTID_EVENT_NUMBER_10_ADD) {
@@ -276,7 +276,7 @@ void gui_execute_action_id(action_id_t action) {
       if((gGui->numeric.arg + 10) <= INT_MAX)
 	gGui->numeric.arg += 10;
       else
-	printf("WARNING: Input number canceled, avoid overflow\n");
+	fprintf(stderr, "WARNING: Input number canceled, avoid overflow\n");
 
     }
     else {
@@ -285,10 +285,10 @@ void gui_execute_action_id(action_id_t action) {
     }
 
     /* events for advanced input plugins. */
-    xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
+    xine_event.type        = action & ~ACTID_IS_INPUT_EVENT;
     xine_event.data_length = 0;
-    xine_event.data = NULL;
-    xine_event.stream = gGui->stream;
+    xine_event.data        = NULL;
+    xine_event.stream      = gGui->stream;
     gettimeofday(&xine_event.tv, NULL);
     
     xine_event_send(gGui->stream, &xine_event);
@@ -700,7 +700,6 @@ void gui_execute_action_id(action_id_t action) {
     if(gGui->playlist.loop == PLAYLIST_LOOP_MODES_NUM)
       gGui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
     
-    /* Temporary informations */    
     switch(gGui->playlist.loop) {
     case PLAYLIST_LOOP_NO_LOOP:
       osd_display_info(_("Playlist: no loop."));
@@ -1075,8 +1074,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     gGui->playlist.cur = mediamark_get_shuffle_next();
   
   gGui->is_display_mrl = 0;
-  gGui->mrl_overrided = 0;
-  gGui->new_pos = -1;
+  gGui->mrl_overrided  = 0;
+  gGui->new_pos        = -1;
 
   gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 
@@ -1103,7 +1102,9 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				 CONFIG_NO_CB,
 				 CONFIG_NO_DATA)) {
 
+    XLockDisplay(gGui->display);
     XSynchronize (gGui->display, True);
+    XUnlockDisplay(gGui->display);
     fprintf (stderr, _("Warning! Synchronized X activated - this is way slow...\n"));
   }
 
@@ -1441,7 +1442,7 @@ void gui_run(void) {
 
     if(autoscan_plugins) {
 
-      for(i=0; autoscan_plugins[i] != NULL; ++i) {
+      for(i = 0; autoscan_plugins[i] != NULL; ++i) {
 
 	if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
 	  int    num_mrls, j;

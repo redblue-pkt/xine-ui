@@ -82,6 +82,22 @@ int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *len
 /*
  *
  */
+void try_to_set_input_focus(Window window) {
+  int t = 0;
+
+  while((!xitk_is_window_visible(gGui->display, window)) && (++t < 3))
+    xine_usec_sleep(5000);
+  
+  if(xitk_is_window_visible(gGui->display, window)) {
+    XLockDisplay (gGui->display);
+    XSetInputFocus(gGui->display, window, RevertToParent, CurrentTime);
+    XUnlockDisplay (gGui->display);
+  }
+}
+
+/*
+ *
+ */
 void gui_display_logo(void) {
   
   gGui->logo_mode = 2;

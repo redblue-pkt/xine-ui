@@ -33,6 +33,7 @@
 #define GUI_RESET    3
 
 int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length);
+void try_to_set_input_focus(Window window);
 void gui_display_logo(void);
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time, int update_mmk);
 int gui_xine_open_and_play(char *mrl, char *sub, int start_pos, 

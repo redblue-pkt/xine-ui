@@ -70,7 +70,6 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
     xitk_font_unload_font(fs);                                                                  \
                                                                                                 \
     XLockDisplay(gGui->display);                                                                \
-                                                                                                \
     XSetForeground(gGui->display, (XITK_WIDGET_LIST_GC(setup->widget_list)),                    \
 		   xitk_get_pixel_color_gray(gGui->imlib_data));                                \
     XFillRectangle(gGui->display, image->image->pixmap,                                         \
@@ -1272,7 +1271,6 @@ void setup_panel(void) {
 		 (xitk_window_get_window(setup->xwin)), None, None);
   setup->cursor[NORMAL_CURS] = XCreateFontCursor(gGui->display, XC_left_ptr);
   setup->cursor[WAIT_CURS] = XCreateFontCursor(gGui->display, XC_watch);
-  XUnlockDisplay(gGui->display);
   XUnlockDisplay (gGui->display);
 
   setup->widget_list                = xitk_widget_list_new();
@@ -1354,10 +1352,5 @@ void setup_panel(void) {
   setup->running = 1;
   setup_raise_window();
 
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(setup->xwin)))
-    xine_usec_sleep(5000);
-
-  XLockDisplay (gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(setup->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay (gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(setup->xwin));
 }

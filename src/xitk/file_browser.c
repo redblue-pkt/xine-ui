@@ -367,12 +367,7 @@ static void fb_create_input_window(char *title, char *text,
   XUnlockDisplay(gGui->display);
   layer_above_video(xitk_window_get_window(fne->xwin));
   
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(fne->xwin)))
-    xine_usec_sleep(5000);
-  
-  XLockDisplay(gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(fne->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay(gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(fne->xwin));
 }
 /*
  * ************************** END OF filename editor **************************
@@ -1611,12 +1606,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
     
   fb_getdir(fb);
 
-  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(fb->xwin)))
-    xine_usec_sleep(5000);
-
-  XLockDisplay(gGui->display);
-  XSetInputFocus(gGui->display, xitk_window_get_window(fb->xwin), RevertToParent, CurrentTime);
-  XUnlockDisplay(gGui->display);
+  try_to_set_input_focus(xitk_window_get_window(fb->xwin));
 
   return fb;
 }

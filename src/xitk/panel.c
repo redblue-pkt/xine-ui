@@ -531,7 +531,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
        XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
     
     /* Give focus to video output window */
-    XSetInputFocus(gGui->display, gGui->video_window, RevertToParent, CurrentTime);
+    try_to_set_input_focus(gGui->video_window);
     XUnlockDisplay(gGui->display);
      
   }
@@ -1395,14 +1395,14 @@ void panel_init (void) {
   
   {
     pthread_attr_t       pth_attrs;
-#if ! defined (__OpenBSD__)
+#if !defined (__OpenBSD__)
     struct sched_param   pth_params;
 #endif
     
     pthread_attr_init(&pth_attrs);
 
     /* this won't work on linux, freebsd 5.0 */
-#if ! defined (__OpenBSD__)
+#if !defined (__OpenBSD__)
     pthread_attr_getschedparam(&pth_attrs, &pth_params);
     pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
@@ -1411,14 +1411,8 @@ void panel_init (void) {
     pthread_create(&panel->slider_thread, &pth_attrs, slider_loop, NULL);
   }
 
-  if(panel->visible) {
-    while(!xitk_is_window_visible(gGui->display, gGui->panel_window))
-      xine_usec_sleep(5000);
-  
-    XLockDisplay (gGui->display);
-    XSetInputFocus(gGui->display, gGui->panel_window, RevertToParent, CurrentTime);
-    XUnlockDisplay (gGui->display);
-  }
+  if(panel->visible)
+    try_to_set_input_focus(gGui->panel_window);
 }
 
 void panel_set_title(char *title) {

@@ -45,7 +45,7 @@ typedef struct {
 
 static _stdctl_t stdctl;
 
-void *xine_stdctl_loop(void *dummy) {
+static void *xine_stdctl_loop(void *dummy) {
   char              c[255];
   int               len;
   kbinding_entry_t *k;

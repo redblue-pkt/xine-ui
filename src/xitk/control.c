@@ -829,11 +829,5 @@ void control_panel(void) {
   control->running = 1;
   control_raise_window();
 
-  while(!xitk_is_window_visible(gGui->display, control->window))
-    xine_usec_sleep(5000);
-
-  XLockDisplay (gGui->display);
-  XSetInputFocus(gGui->display, control->window, RevertToParent, CurrentTime);
-  XUnlockDisplay (gGui->display);
-
+  try_to_set_input_focus(control->window);
 }
