@@ -7,8 +7,8 @@
 $templ="xine-check.sh.in";
 $out="xine-check";
 
-open TEMPLATE, $templ || die "unable to open input file";
-open OUT, ">$out" || die "unable to open output file";
+(open TEMPLATE, $templ) || die "unable to open input file";
+(open OUT, ">$out") || die "unable to open output file";
 
 $insert='cat <<EOF >/tmp/xck.$$.xine-check.en'."\n";
 while (<>) {

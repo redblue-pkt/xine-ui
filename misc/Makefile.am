@@ -12,7 +12,8 @@ EXTRA_DIST = $(bin_SCRIPTS) autogen.sh SlackBuild.in SlackBuild build_rpms.sh \
 bin_SCRIPTS = xine-check xine-bugreport
 
 xine-check: xine-check.sh.in xine-check.en
-	perl build-xine-check.pl xine-check.en
+	[ `cd $(srcdir); pwd` != `pwd` ] && cp $(srcdir)/xine-check.sh.in .
+	perl $(srcdir)/build-xine-check.pl $(srcdir)/xine-check.en
 	chmod a+x xine-check
 
 xine-bugreport: xine-check

@@ -94,7 +94,7 @@ add() {
 
 resolve_symlink() {
     target="$1"
-    while test -L "$target"; do
+    while test -h "$target"; do
 	local dir=`dirname $target`
 	target=`ls -l $target | sed -e 's/^.*-> //'`
 	if echo $target|grep -v ^/ >/dev/null 2>&1; then 
@@ -352,9 +352,10 @@ fi
 
 ## actual checks start here:
 
-if [ `id -u` -eq 0 ]; then
-  msg root 2
-fi
+case `id` in
+uid=0*) msg root 2;;
+esac
+
 
 # operating system dependant checks
 
