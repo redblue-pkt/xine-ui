@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2002 the xine project
+ * Copyright (C) 2000-2003 the xine project
  *
  * This file is part of xine, a unix video player.
  * 
@@ -374,7 +374,7 @@ static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
 void show_version(void) {
 
   printf(_("This is xine (X11 gui) - a free video player v%s\n"
-	   "(c) 2000-2002 by G. Bartsch and the xine project team.\n"), VERSION);
+	   "(c) 2000-2003 by G. Bartsch and the xine project team.\n"), VERSION);
 }
 
 /*

@@ -681,10 +681,10 @@ msgstr "Mauvais visuel '%s'\n"
 #, c-format
 msgid ""
 "This is xine (X11 gui) - a free video player v%s\n"
-"(c) 2000-2002 by G. Bartsch and the xine project team.\n"
+"(c) 2000-2003 by G. Bartsch and the xine project team.\n"
 msgstr ""
 "Voici xine (X11 gui) - un lecteur vidéo libre v%s\n"
-"(c) 2000-2002 par G. Bartch et l'équipe du projet xine.\n"
+"(c) 2000-2003 par G. Bartch et l'équipe du projet xine.\n"
 
 #: src/xitk/main.c:440
 #, c-format

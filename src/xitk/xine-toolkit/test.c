@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2002 Daniel Caujolle-Bert <segfault@club-internet.fr>
+** Copyright (C) 2001-2003 Daniel Caujolle-Bert <segfault@club-internet.fr>
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by

@@ -669,13 +669,13 @@ msgid "Bad visual '%s'\n"
 msgstr "B³êdna wizualizacja '%s'\n"
 
 #: src/xitk/main.c:429
-#, c-format
+#, c-format, fuzzy
 msgid ""
 "This is xine (X11 gui) - a free video player v%s\n"
-"(c) 2000-2002 by G. Bartsch and the xine project team.\n"
+"(c) 2000-2003 by G. Bartsch and the xine project team.\n"
 msgstr ""
 "To jest XINE (interfejs u¿ytkownika X11) - wolny odtwarzacz wideo v%s\n"
-"(c) 2000-2002 G. Bartsch i grupa projektu xine. \n"
+"(c) 2000-2003 G. Bartsch i grupa projektu xine. \n"
 
 #: src/xitk/main.c:440
 #, c-format

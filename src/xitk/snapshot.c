@@ -1,4 +1,6 @@
 /*
+ * Copyright (C) 2000-2003 the xine project
+ *
  * This file is part of xine, a unix video player.
  * 
  * xine is free software; you can redistribute it and/or modify

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2000-2002 the xine project
+ * Copyright (C) 2000-2003 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -1134,7 +1134,7 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
 
 static void show_version(void) {
   printf("This is %s - xine's remote control v%s.\n"
-	 "(c) 2000-2002 by G. Bartsch and the xine project team.\n", PROGNAME, PROGVERSION);
+	 "(c) 2000-2003 by G. Bartsch and the xine project team.\n", PROGNAME, PROGVERSION);
 }
 
 static void show_usage(void) {

@@ -700,7 +700,7 @@ msgstr ""
 #, c-format
 msgid ""
 "This is xine (X11 gui) - a free video player v%s\n"
-"(c) 2000-2002 by G. Bartsch and the xine project team.\n"
+"(c) 2000-2003 by G. Bartsch and the xine project team.\n"
 msgstr ""
 
 # src/xitk/main.c:138
