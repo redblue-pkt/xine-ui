@@ -792,5 +792,18 @@ void panel_init (void) {
 
   XUnlockDisplay (gGui->display);
 
-  pthread_create(&panel->slider_thread, NULL, slider_loop, NULL);
+
+  {
+    pthread_attr_t       pth_attrs;
+    struct sched_param   pth_params;
+    
+    pthread_attr_init(&pth_attrs);
+
+    /* this won't work on linux, freebsd 5.0 */
+    pthread_attr_getschedparam(&pth_attrs, &pth_params);
+    pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
+    pthread_attr_setschedparam(&pth_attrs, &pth_params);
+    
+    pthread_create(&panel->slider_thread, &pth_attrs, slider_loop, NULL);
+  }
 }
