@@ -497,7 +497,9 @@
        
 5.2.6 Changing the volume with the GUI control has not affect! What's up!?
 
-      [xxx]
+      Some xine drivers do not support volume changing although the GUI
+      will show the volume bar. Usually this is not a xine fault: aRts C
+      API, for example, doesn't offer any volume property to applications.
 
 
 5.3 VIDEO RELATED QUESTIONS
