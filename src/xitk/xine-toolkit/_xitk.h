@@ -64,7 +64,7 @@ typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
 
 #ifdef NEED_MRLBROWSER
 #include <xine.h>
-typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
+typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
 #endif
 
 #ifndef BUFSIZ

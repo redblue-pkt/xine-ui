@@ -37,9 +37,88 @@
 
 #define MAXFILES      65535
 
+/*
+ * Freeing/zeroing all of entries of given mrl.
+ */
+#define MRL_ZERO(m) {                                                         \
+  if((m)) {                                                                   \
+    if((m)->origin)                                                           \
+      free((m)->origin);                                                      \
+    if((m)->mrl)                                                              \
+      free((m)->mrl);                                                         \
+    if((m)->link)                                                             \
+      free((m)->link);                                                        \
+    (m)->origin = NULL;                                                       \
+    (m)->mrl    = NULL;                                                       \
+    (m)->link   = NULL;                                                       \
+    (m)->type   = 0;                                                          \
+    (m)->size   = (off_t) 0;                                                  \
+  }                                                                           \
+}
+
+/*
+ * Duplicate two mrls entries (s = source, d = destination).
+ */
+#define MRL_DUPLICATE(s, d) {                                                 \
+  assert((s) != NULL);                                                        \
+  assert((d) != NULL);                                                        \
+                                                                              \
+  if((s)->origin) {                                                           \
+    if((d)->origin) {                                                         \
+      (d)->origin = (char *) realloc((d)->origin, strlen((s)->origin) + 1);   \
+      sprintf((d)->origin, "%s", (s)->origin);                                \
+    }                                                                         \
+    else                                                                      \
+      (d)->origin = strdup((s)->origin);                                      \
+  }                                                                           \
+  else                                                                        \
+    (d)->origin = NULL;                                                       \
+                                                                              \
+  if((s)->mrl) {                                                              \
+    if((d)->mrl) {                                                            \
+      (d)->mrl = (char *) realloc((d)->mrl, strlen((s)->mrl) + 1);            \
+      sprintf((d)->mrl, "%s", (s)->mrl);                                      \
+    }                                                                         \
+    else                                                                      \
+      (d)->mrl = strdup((s)->mrl);                                            \
+  }                                                                           \
+  else                                                                        \
+    (d)->mrl = NULL;                                                          \
+                                                                              \
+  if((s)->link) {                                                             \
+    if((d)->link) {                                                           \
+      (d)->link = (char *) realloc((d)->link, strlen((s)->link) + 1);         \
+      sprintf((d)->link, "%s", (s)->link);                                    \
+    }                                                                         \
+    else                                                                      \
+      (d)->link = strdup((s)->link);                                          \
+  }                                                                           \
+  else                                                                        \
+    (d)->link = NULL;                                                         \
+                                                                              \
+  (d)->type = (s)->type;                                                      \
+  (d)->size = (s)->size;                                                      \
+}
+
+/**
+ * Duplicate two arrays of mrls (s = source, d = destination).
+ */
+#define MRLS_DUPLICATE(s, d) {                                                \
+  int i = 0;                                                                  \
+                                                                              \
+  assert((s) != NULL);                                                        \
+  assert((d) != NULL);                                                        \
+                                                                              \
+  while((s) != NULL) {                                                        \
+    d[i] = (xine_mrl_t *) malloc(sizeof(xine_mrl_t));                         \
+    MRL_DUPLICATE(s[i], d[i]);                                                \
+    i++;                                                                      \
+  }                                                                           \
+}
+
 typedef struct {
-  mrl_t                     *mrls[MAXFILES];
-  mrl_t                     *filtered_mrls[MAXFILES];
+  xine_mrl_t                *mrls[MAXFILES];
+  xine_mrl_t                *filtered_mrls[MAXFILES];
   char                      *mrls_disp[MAXFILES];
   int                        mrls_to_disp;
 } mrl_contents_t;

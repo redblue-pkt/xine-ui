@@ -160,18 +160,18 @@ static void update_current_origin(mrlbrowser_private_data_t *private_data) {
 /*
  * Return the *marker* of the giver file *fully named*
  */
-static int get_mrl_marker(mrl_t *mrl) {
+static int get_mrl_marker(xine_mrl_t *mrl) {
   
-  if(mrl->type & mrl_file_symlink)
+  if(mrl->type & XINE_MRL_TYPE_file_symlink)
     return '@';
-  else if(mrl->type & mrl_file_directory)
+  else if(mrl->type & XINE_MRL_TYPE_file_directory)
     return '/';
-  else if(mrl->type & mrl_file_fifo)
+  else if(mrl->type & XINE_MRL_TYPE_file_fifo)
     return '|';
-  else if(mrl->type & mrl_file_sock)
+  else if(mrl->type & XINE_MRL_TYPE_file_sock)
     return '=';
-  else if(mrl->type & mrl_file_normal) {
-    if(mrl->type & mrl_file_exec)
+  else if(mrl->type & XINE_MRL_TYPE_file_normal) {
+    if(mrl->type & XINE_MRL_TYPE_file_exec)
       return '*';
   }
 
@@ -198,10 +198,10 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 
     for(i = 0; i < private_data->mrls_num; i++) {
 
-      if(private_data->mc->mrls[i]->type & mrl_file_directory) {
+      if(private_data->mc->mrls[i]->type & XINE_MRL_TYPE_file_directory) {
 
 	if(private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] == NULL)
-	  private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
+	  private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
 
 	MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp]);
 	private_data->mc->mrls_to_disp++;
@@ -217,7 +217,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 	    if(!strcasecmp((ending + 1), m)) {
 
 	      if(private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] == NULL)
-		private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
+		private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
 	      
 	      MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp]);
 	      private_data->mc->mrls_to_disp++;
@@ -234,7 +234,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
     for(i = 0; i < private_data->mrls_num; i++) {
       
       if(private_data->mc->filtered_mrls[i] == NULL)
-	private_data->mc->filtered_mrls[i] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
+	private_data->mc->filtered_mrls[i] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
       
       MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[i]);
     }
@@ -271,7 +271,7 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
 	p++;
     }
     
-    if(private_data->mc->filtered_mrls[i]->type & mrl_file_symlink) {
+    if(private_data->mc->filtered_mrls[i]->type & XINE_MRL_TYPE_file_symlink) {
 
       if(private_data->mc->mrls_disp[i])
 	private_data->mc->mrls_disp[i] = (char *) 
@@ -307,14 +307,14 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
  * directly with these ones.
  */
 static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
-				      mrl_t **mtmp, int num_mrls) {
+				      xine_mrl_t **mtmp, int num_mrls) {
   int i;
   int old_mrls_num = private_data->mrls_num;
 
   for (i = 0; i < num_mrls; i++) {
 
     if(private_data->mc->mrls[i] == NULL)
-      private_data->mc->mrls[i] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
+      private_data->mc->mrls[i] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
 
     MRL_DUPLICATE(mtmp[i], private_data->mc->mrls[i]);
   }
@@ -353,7 +353,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 
     {
       int num_mrls;
-      mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
+      xine_mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
 					  private_data->last_mrl_source, NULL,
 					  &num_mrls);
       
@@ -384,61 +384,61 @@ static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
   int j = -1;
   
   if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
-    mrl_t *ms = private_data->mc->mrls[j];
+    xine_mrl_t *ms = private_data->mc->mrls[j];
     
     printf("mrl '%s'\n\t+", ms->mrl);
 
-    if(ms->type & mrl_file_symlink)
+    if(ms->type & XINE_MRL_TYPE_file_symlink)
       printf(" symlink to '%s' \n\t+ ", ms->link);
 
     printf("[");
 
-    if(ms->type & mrl_unknown)
+    if(ms->type & XINE_MRL_TYPE_unknown)
       printf(" unknown ");
     
-      if(ms->type & mrl_dvd)
+      if(ms->type & XINE_MRL_TYPE_dvd)
 	printf(" dvd ");
       
-      if(ms->type & mrl_vcd)
+      if(ms->type & XINE_MRL_TYPE_vcd)
 	    printf(" vcd ");
       
-      if(ms->type & mrl_net)
+      if(ms->type & XINE_MRL_TYPE_net)
 	printf(" net ");
       
-      if(ms->type & mrl_rtp)
+      if(ms->type & XINE_MRL_TYPE_rtp)
 	printf(" rtp ");
       
-      if(ms->type & mrl_stdin)
+      if(ms->type & XINE_MRL_TYPE_stdin)
 	printf(" stdin ");
       
-      if(ms->type & mrl_file)
+      if(ms->type & XINE_MRL_TYPE_file)
 	printf(" file ");
       
-      if(ms->type & mrl_file_fifo)
+      if(ms->type & XINE_MRL_TYPE_file_fifo)
 	printf(" fifo ");
       
-      if(ms->type & mrl_file_chardev)
+      if(ms->type & XINE_MRL_TYPE_file_chardev)
 	printf(" chardev ");
       
-      if(ms->type & mrl_file_directory)
+      if(ms->type & XINE_MRL_TYPE_file_directory)
 	printf(" directory ");
       
-      if(ms->type & mrl_file_blockdev)
+      if(ms->type & XINE_MRL_TYPE_file_blockdev)
 	printf(" blockdev ");
       
-      if(ms->type & mrl_file_normal)
+      if(ms->type & XINE_MRL_TYPE_file_normal)
 	printf(" normal ");
       
-      if(ms->type & mrl_file_sock)
+      if(ms->type & XINE_MRL_TYPE_file_sock)
 	printf(" sock ");
       
-      if(ms->type & mrl_file_exec)
+      if(ms->type & XINE_MRL_TYPE_file_exec)
 	printf(" exec ");
       
-      if(ms->type & mrl_file_backup)
+      if(ms->type & XINE_MRL_TYPE_file_backup)
 	printf(" backup ");
       
-      if(ms->type & mrl_file_hidden)
+      if(ms->type & XINE_MRL_TYPE_file_hidden)
 	printf(" hidden ");
       
       printf("] (%Ld byte%c)\n", ms->size, (ms->size > 0) ?'s':'\0');
@@ -753,13 +753,13 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
  */
 static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
 				  int j, int add_callback, int play_callback) {
-  mrl_t *ms = private_data->mc->filtered_mrls[j];
+  xine_mrl_t *ms = private_data->mc->filtered_mrls[j];
   char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
   memset(&buf, '\0', sizeof(buf));
   sprintf(buf, "%s", ms->mrl);
   
-  if((ms->type & mrl_file) && (ms->type & mrl_file_directory)) {
+  if((ms->type & XINE_MRL_TYPE_file) && (ms->type & XINE_MRL_TYPE_file_directory)) {
     char *filename = ms->mrl;
     
     if(ms->origin) {
@@ -799,7 +799,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     
     {
       int num_mrls;
-      mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
+      xine_mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
 					  private_data->last_mrl_source, 
 					  buf, &num_mrls);
       
@@ -1215,9 +1215,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
       xitk_list_append_content(private_data->widget_list->l,
 		       (private_data->autodir_plugins[i] = 
 			xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-      xitk_set_widget_tips(private_data->autodir_plugins[i], 
-			   xine_get_input_plugin_description(mb->xine, mb->ip_availables[i]));
-
+#warning FIXME NEWAPI
+      //      xitk_set_widget_tips(private_data->autodir_plugins[i], 
+      //			   xine_get_input_plugin_description(mb->xine, mb->ip_availables[i]));
       private_data->autodir_plugins[i]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
       
       (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
