@@ -1067,13 +1067,15 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   init_skins_support();
 
-  gGui->kbindings = kbindings_init_kbinding();
-
   gGui->running = 1;
 
   video_window_init (window_attribute, 
 		     ((actions_on_start(gGui->actions_on_start, 
 				       ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
+
+  /* kbinding might open an error dialog (double keymapping), which produces a segfault,
+   * when done before the video_window_init(). */
+  gGui->kbindings = kbindings_init_kbinding();
 
   panel_init ();
 }
