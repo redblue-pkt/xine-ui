@@ -1,3 +1,9 @@
+xine-ui (0.9.21-2) unstable; urgency=high
+
+  * actually contains the pointer initialization (closes: #191567)
+
+ -- Siggi Langauf <siggi@debian.org>  Sun, 18 May 2003 18:46:54 +0200
+
 xine-ui (0.9.21-1) unstable; urgency=high
 
   * new upstream version
