@@ -216,6 +216,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/share/doc/xine-ui/README.xinerc
 %{prefix}/share/doc/xine-ui/README_es
 %{prefix}/share/doc/xine-ui/README_pl
+%{prefix}/share/doc/xine-ui/README_it
 %{prefix}/share/doc/xine-ui/bug_report_form
 
 @HAVE_AA_TRUE@%files aa
