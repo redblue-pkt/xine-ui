@@ -313,10 +313,12 @@ void panel_init (void) {
   attr.override_redirect = True;
   attr.background_pixel  = gGui->black.pixel;
   attr.border_pixel      = 1;
+  attr.colormap          = DefaultColormap (gGui->display, gGui->screen);
+  /*
   attr.colormap          = XCreateColormap(gGui->display,
 					   RootWindow(gGui->display, gGui->screen), 
 					   gGui->imlib_data->x.visual, AllocNone);
-
+					   */
   /*  
       printf ("imlib_data: %d visual : %d\n",gGui->imlib_data,gGui->imlib_data->x.visual);
       printf ("w : %d h : %d\n",hint.width, hint.height);
