@@ -94,7 +94,7 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
     xitk_widget_t *lbl;                                                                         \
     char           _labelkey[strlen(labelkey) + 5];                                             \
                                                                                                 \
-    sprintf(_labelkey, "%s%s", labelkey, (!entry->callback) ? " (*)" : "");                     \
+    sprintf(_labelkey, "%s%s", labelkey, (!entry->callback_data) ? " (*)" : "");                \
                                                                                                 \
     fs = xitk_font_load_font(gGui->display, fontname);                                          \
     xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(setup->widget_list)));                          \
@@ -284,7 +284,7 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 	  char          *strval = NULL;
 	  
 	  if(!need_restart) {
-	    if(setup->wg[i]->changed && (!setup->wg[i]->cfg->callback))
+	    if(setup->wg[i]->changed && (!setup->wg[i]->cfg->callback_data))
 	      need_restart = 1;
 	  }
 
