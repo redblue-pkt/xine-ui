@@ -6,7 +6,7 @@ AUTOMAKE_OPTIONS = 1.3
 
 ACLOCAL_AMFLAGS = @XINE_ACFLAGS@ -I m4
 
-SUBDIRS = doc m4 readline intl po misc src  
+SUBDIRS = doc m4 readline intl po misc libcurl src  
 
 EXTRA_DIST = automake.diff \
 	autogen.sh\
@@ -56,6 +56,7 @@ maintainer-clean-generic:
 	-rm -f config.h.in stamp-h.in ltconfig ltmain.sh
 	-rm -f config.guess config.sub install-sh missing mkinstalldirs
 	-rm -f depcomp config.log
+	-rm -rf autom4te.cache
 
 maintainer-clean-generic-hook: 
 	rm -f config.status
