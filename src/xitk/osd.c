@@ -604,8 +604,13 @@ void osd_update_status(void) {
       xine_osd_set_font(gGui->osd.status, "cetus", UNSCALED_FONT_SIZE);
     else
       xine_osd_set_font(gGui->osd.status, "cetus", FONT_SIZE);
-    
+
+    /* set latin1 encoding (NULL) for status text with special characters,
+     * then switch back to locale encoding ("") 
+     */
+    xine_osd_set_encoding(gGui->osd.status, NULL);
     xine_osd_draw_text(gGui->osd.status, 0, 0, buffer, XINE_OSD_TEXT1);
+    xine_osd_set_encoding(gGui->osd.status, "");
     xine_osd_set_position(gGui->osd.status, 20, 10);
 
     _osd_get_output_size(&wwidth, &wheight);

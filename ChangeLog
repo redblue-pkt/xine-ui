@@ -6,6 +6,7 @@ xine-ui (0.99.1) unstable; urgency=low
   * show windows in taskbar when output window is hidden,
   * fix root window and windows states,
   * Xft support in xitk (thanks to Drew 'dantealiegri' Ogle <dantealiegri@umbc.edu>),
+  * fix a problem with special characters in OSD for some locales
 
 xine-ui (0.9.23) unstable; urgency=low
 
