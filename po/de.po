@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
 "POT-Creation-Date: 2002-05-01 22:14+0200\n"
-"PO-Revision-Date: 2002-04-28 08:54+0200\n"
+"PO-Revision-Date: 2002-05-02 11:26+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 
 #: src/xitk/actions.c:96
 msgid "No MRL (input stream) specified"
-msgstr ""
+msgstr "Keine MRL (Eingabedatenstrom) angegeben"
 
 #: src/xitk/control.c:338
 #, c-format
@@ -325,12 +325,11 @@ msgstr ""
 
 #: src/xitk/main.c:210
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
-msgstr ""
+msgstr "  -G, --geometry <BxH[+X+Y]>    Geometrie des Fensters setzen (X-Stil).\n"
 
 #: src/xitk/main.c:211
-#, fuzzy
 msgid "  -B, --borderless             Borderless video output window.\n"
-msgstr "  -H, --hide-video             Video-Fenster verstecken\n"
+msgstr "  -B, --borderless              Rahmenloses Video-Fenster.\n"
 
 #: src/xitk/main.c:213
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -408,7 +407,7 @@ msgstr "Audio Treiber id wird für die Option -A benötigt\n"
 #: src/xitk/main.c:669
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
-msgstr ""
+msgstr "Fehlerhafte Geometrie '%s', siehe xine --help\n"
 
 #: src/xitk/main.c:693
 #, c-format
