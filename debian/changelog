@@ -1,3 +1,10 @@
+xine-ui (0.9.23-0) unstable; urgency=low
+
+  * new upstream release
+    FIXME: closes: a lot
+
+ -- Siggi Langauf <siggi@debian.org>  Tue, 23 Dec 2003 15:07:13 +0100
+
 xine-ui (0.9.22-1) unstable; urgency=high
 
   * new upstream release

@@ -1100,7 +1100,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	  sprintf(buffer, "%s %s %s", buffer,
 		  (char *) data + data->explanation, (char *) data + data->parameters);
 	else
-	  sprintf(buffer, "%s %s", buffer, _("No Informations available."));
+	  sprintf(buffer, "%s %s", buffer, _("No Information available."));
 	  
 	break;
 
