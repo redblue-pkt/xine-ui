@@ -622,8 +622,18 @@ static void fb_getdir(filebrowser_t *fb) {
   }
   
   if((pdir = opendir(fb->current_dir)) == NULL) {
-    fprintf(stderr, "DUDE!\n");
-    abort();
+    char *p = strrchr(fb->current_dir, '/');
+    
+    xine_error(_("Unable to open directory '%s': %s."), 
+	       (p) ? p + 1 : fb->current_dir, strerror(errno));
+    
+    /* One step back */
+    if(p)
+      *p = '\0';
+
+    fb_update_origin(fb);
+    fb_getdir(fb);
+    return;
   }
 
   while((pdirent = readdir(pdir)) != NULL) {
