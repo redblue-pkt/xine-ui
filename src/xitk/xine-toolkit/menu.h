@@ -55,6 +55,7 @@ typedef struct {
   xitk_widget_t          *widget;
   char                   *skin_element_name;
   menu_tree_t            *mtree;
+  menu_node_t            *curbranch;
   xitk_list_t            *menu_windows;
   xitk_widget_list_t     *parent_wlist;
 } menu_private_data_t;

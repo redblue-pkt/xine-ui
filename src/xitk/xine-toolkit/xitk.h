@@ -2217,5 +2217,6 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
 xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w);
 void xitk_menu_destroy_sub_branchs(xitk_widget_t *w);
 void xitk_menu_destroy(xitk_widget_t *w);
+int xitk_menu_show_sub_branchs(xitk_widget_t *w);
 
 #endif

@@ -408,7 +408,7 @@ static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t 
     xitk_list_delete_current(private_data->menu_windows);
     _menu_destroy_menu_window(&mw);
     mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
- } 
+  }
 }
 
 static void _menu_destroy_ntree(menu_node_t **mn) {
@@ -455,6 +455,7 @@ void xitk_menu_destroy(xitk_widget_t *w) {
 
     xitk_unset_current_menu();
     
+    private_data->curbranch = NULL;
     _menu_destroy_subs(private_data, NULL);
     xitk_list_free(private_data->menu_windows);
     _menu_destroy_ntree(&private_data->mtree->first);
@@ -527,6 +528,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   
   private_data = (menu_private_data_t *) w->private_data;
   
+  private_data->curbranch = branch;
+
   XITK_WIDGET_INIT(&lb, private_data->imlibdata);
   
   bentries = _menu_count_entry_from_branch(branch);
@@ -718,8 +721,24 @@ void xitk_menu_destroy_sub_branchs(xitk_widget_t *w) {
       me = me->next;
     
     _menu_destroy_subs(private_data, me->menu_window);
+    private_data->curbranch = private_data->mtree->first;
   }
 }
+
+int xitk_menu_show_sub_branchs(xitk_widget_t *w) {
+  int ret = 0;
+
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
+    menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
+    
+    if(private_data->curbranch && (private_data->curbranch != private_data->mtree->first))
+      ret = 1;
+  }
+
+  return ret;
+}
+
 
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
 				       xitk_menu_widget_t *m, int x, int y) {
@@ -756,7 +775,7 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   mywidget->have_focus                   = FOCUS_RECEIVED;
   mywidget->imlibdata                    = private_data->imlibdata;
   mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
-  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MENU;
+  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MENU | WIDGET_FOCUSABLE;
   mywidget->event                        = notify_event;
   mywidget->tips_timeout                 = 0;
   mywidget->tips_string                  = NULL;

@@ -1225,7 +1225,11 @@ void xitk_xevent_notify(XEvent *event) {
 
 	    if(fx->widget_list->widget_focused && 
 	       (fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)) {
-	      xitk_menu_destroy_sub_branchs(xitk_menu_get_menu(fx->widget_list->widget_focused));
+	      xitk_widget_t *menu = xitk_menu_get_menu(fx->widget_list->widget_focused);
+
+	      if(xitk_menu_show_sub_branchs(menu))
+		xitk_menu_destroy_sub_branchs(menu);
+
 	    }
 
 	    fx->old_pos.x = fx->new_pos.x;
@@ -1278,8 +1282,11 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 	  XUNLOCK(gXitk->display);
 	  
-	  if(gXitk->menu && (!fx->widget_list->widget_focused || 
-			     (!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) {
+	  if(gXitk->menu && 
+	     ((fx->widget_list && 
+	       ((!fx->widget_list->widget_focused) || 
+		(!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) ||
+	      (!fx->widget_list)))  {
 
 	    xitk_set_current_menu(NULL);
 	  }

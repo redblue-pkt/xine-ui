@@ -1001,9 +1001,8 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
 	
-	if(wl->widget_focused && (wl->widget_focused->type & WIDGET_GROUP_MENU)) {
+	if(wl->widget_focused && (wl->widget_focused->type & WIDGET_GROUP_MENU))
 	  menu = xitk_menu_get_menu(wl->widget_focused);
-	}
 
 	if((wl->widget_focused->type & WIDGET_GROUP_COMBO)) {
 	  if(((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)
@@ -1066,7 +1065,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
   }
   
   if (!bUp) {
-    
+
     wl->widget_pressed = mywidget;
     
     if (mywidget) {
