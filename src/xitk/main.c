@@ -93,6 +93,7 @@ typedef struct {
 #define OPTION_SK_SERVER        1003
 #define OPTION_ENQUEUE          2000
 #define OPTION_VERBOSE          3000
+#define OPTION_BROADCAST_PORT   4000
 
 /* options args */
 static const char *short_options = "?hHgfvn"
@@ -142,6 +143,9 @@ static struct option long_options[] = {
   {"aspect-ratio"   , required_argument, 0, 'r'                      },
   {"config"         , required_argument, 0, 'c'                      },
   {"verbose"        , optional_argument, 0, OPTION_VERBOSE           },
+#ifdef XINE_PARAM_BROADCASTER_PORT
+  {"broadcast-port" , required_argument, 0, OPTION_BROADCAST_PORT    },
+#endif
   {0                , no_argument      , 0,  0                       }
 };
 
@@ -511,6 +515,10 @@ void show_usage (void) {
   printf(_("  -D, --deinterlace            Deinterlace video output\n"));
   printf(_("  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"));
   printf(_("                                 'auto', 'square', '4:3', 'anamorphic', 'dvb'.\n"));
+#ifdef XINE_PARAM_BROADCASTER_PORT
+  printf(_("      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"));
+  printf(_("                               Slave is started with 'xine slave://address:port'\n"));
+#endif
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1113,6 +1121,7 @@ int main(int argc, char *argv[]) {
   gGui->playlist.on_start      = NULL;
   gGui->skin_server_url        = NULL;
   gGui->verbosity              = 0;
+  gGui->broadcast_port         = 0;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1366,6 +1375,13 @@ int main(int argc, char *argv[]) {
       else
 	gGui->verbosity = 1;
       break;
+
+#ifdef XINE_PARAM_BROADCASTER_PORT    
+    case OPTION_BROADCAST_PORT:
+      if(optarg != NULL)
+	gGui->broadcast_port = strtol(optarg, &optarg, 10);
+      break;
+#endif
       
     case 'S':
       session_handle_subopt(optarg, &session);
@@ -1609,7 +1625,10 @@ int main(int argc, char *argv[]) {
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL, gGui->mixer.amp);
-  
+#ifdef XINE_PARAM_BROADCASTER_PORT
+  xine_set_param(gGui->stream, XINE_PARAM_BROADCASTER_PORT, gGui->broadcast_port);
+#endif
+
   /* Visual animation stream init */
   gGui->visual_anim.stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
   gGui->visual_anim.event_queue = xine_event_new_queue(gGui->visual_anim.stream);

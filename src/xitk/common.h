@@ -136,6 +136,7 @@ typedef struct {
 
   xine_t                   *xine;
   int                       verbosity;
+  int                       broadcast_port;
 
   pthread_mutex_t           xe_mutex;
   int                       new_pos;
