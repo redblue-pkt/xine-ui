@@ -112,6 +112,9 @@ Hide video output window.
 Turn off LIRC support. This option is \fIonly\~available\fP if xine has been compiled
 with LIRC support.
 .TP
+.B \-\-stdctrl
+Turn on controlling xine over STDIN.
+.TP
 .BI \-\-visual\  <visual\-class\-or\-id>
 Try to use a specific X11 server visual for xine windows.  The
 \fI<visual\-class\-or\-id>\fP parameter is either the name of an X11 visual

@@ -29,6 +29,7 @@
 
 #include "lirc.h"
 #include "main.h"
+#include "post.h"
 #include "keys.h"
 #include "stdctl.h"
 #include "options.h"
@@ -236,8 +237,24 @@ static int fbxine_init(int argc, char **argv)
 	if(!init_stream())
 		return 0;
 #ifdef HAVE_LIRC
-	fbxine_init_lirc();
+	if (!no_lirc)
+	  fbxine_init_lirc();
 #endif
+
+	/* Initialize posts, if required */
+	if(pplugins_num) {
+	  char             **plugin = pplugins;
+	  
+	  while(*plugin) {
+	    pplugin_parse_and_store_post((const char *) *plugin);
+	    printf("1\n");
+	    
+	    *plugin++;
+	  }
+    
+	  pplugin_rewire_posts();
+	}
+
 	return 1;
 }
 

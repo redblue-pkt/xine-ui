@@ -94,7 +94,7 @@ void exit_stdctl(void) {
 void fbxine_init_stdctl(void) {
   static struct fbxine_callback exit_callback;
 
-  stdctl.fd = 2;
+  stdctl.fd = STDIN_FILENO;
   fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_stdctl);
   pthread_create(&(stdctl.thread), NULL, xine_stdctl_loop, NULL) ;
 }

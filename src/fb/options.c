@@ -34,7 +34,12 @@
 #include "main.h"
 
 #define OPTION_STDCTL           5000
+#define OPTION_POST             1008
+
 int stdctl;
+int no_lirc;
+char                  **pplugins        = NULL;
+int                     pplugins_num    = 0;
 
 void extract_mrls(int num_mrls, char **mrls)
 {
@@ -94,7 +99,15 @@ static void print_usage(void)
 	       "                                 'revert': by extension, then by content,\n"
 	       "                                 'content': only by content,\n"
 	       "                                 'extension': only by extension.\n"
-	       "                                 -if no option is given, 'revert' is selected\n"
+	       "                                 -if no option is given, 'revert' is selected\n");
+#ifdef HAVE_LIRC
+	printf("  -L, --no-lirc                  Turn off LIRC support.\n");
+#endif
+	printf("      --stdctl                   Turn on controlling xine over STDIN.\n"
+	       "      --post <plugin>[:parameter=value][,...]\n"
+	       "                                 Load a post plugin.\n"
+	       "                                 Parameters are comma separated.\n"
+	       "                                 This option can be used more than one time.\n"
 	       "  -d, --debug                    Print debug messages.\n"
 	       "\n"
 	       "Examples of valid MRL:s (media resource locators):\n"
@@ -121,6 +134,7 @@ int parse_options(int argc, char **argv)
 			{ "video-driver",  required_argument, 0, 'V' },
 			{ "version",       no_argument,       0, 'v' },
 			{ "stdctl",        optional_argument, 0, OPTION_STDCTL },
+			{"post",           required_argument, 0, OPTION_POST },
 			{ 0,               no_argument,       0,  0  }
 		};
 	const char *short_options = "?hda:qA:V:R::v";
@@ -166,8 +180,24 @@ int parse_options(int argc, char **argv)
 				print_version();
 				return 0;
 				
+		        case 'L':
+			        no_lirc = 1;
+				break;
+
 		        case OPTION_STDCTL:
 			        stdctl  = 1;
+				break;
+
+		        case OPTION_POST:
+			        if(!pplugins_num)
+				     pplugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+				else
+				     pplugins = (char **) realloc(pplugins, sizeof(char *) * 
+								  (pplugins_num + 2));
+			  
+				pplugins[pplugins_num] = optarg;
+				pplugins_num++;
+				pplugins[pplugins_num] = NULL;
 				break;
 
 			case 'h':

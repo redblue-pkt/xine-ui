@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2003 by Fredrik Noring
+ * Copyright (C) 2003 by Dirk Meyer
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -17,17 +17,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  *
- * Initial version by Fredrik Noring, January 2003, based on the xitk
- * and dfb sources.
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+#ifndef POST_HH
+#define POST_HH
 
-int parse_options(int argc, char **argv);
-extern int no_lirc;
-extern int stdctl;
+void pplugin_rewire_posts(void);
+void pplugin_parse_and_store_post(const char *post);
 
-extern char **pplugins;
-extern int pplugins_num;
+#endif 
+
+/* end of post.h */

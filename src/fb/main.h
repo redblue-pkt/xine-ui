@@ -42,6 +42,12 @@
 
 #include "callback.h"
 
+typedef struct {
+  xine_post_t    *post;
+  char           *name;
+} post_element_t;
+
+
 struct fbxine
 {
 	xine_t                   *xine;
@@ -71,7 +77,9 @@ struct fbxine
 	int                      debug;
 
 	int                      ignore_next;
-
+        post_element_t           **post_elements;
+        int                      post_elements_num;
+  
 #ifdef HAVE_LIRC
 	struct
 	{
