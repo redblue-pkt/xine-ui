@@ -651,6 +651,8 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
 	    ukb->key = strdup(p);
 	  }	  
 	}
+	else
+	  break;
       }
 
       if(ukb && ukb->alias && ukb->action && ukb->key) {
