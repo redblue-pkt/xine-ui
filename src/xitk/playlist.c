@@ -701,6 +701,14 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	    gGui->playlist.cur = 0;
 	    
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	    
+	    /* 
+	     * If we're in newbie mode, start playback immediately
+	     * (even ignoring if we're currently playing something
+	     */
+	    if(gGui->newbie_mode)
+	      gui_play(NULL, NULL);
+
 	  }
 	}
 	

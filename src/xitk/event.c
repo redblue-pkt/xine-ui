@@ -138,6 +138,10 @@ static void osd_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->osd.timeout = cfg->num_value;
 }
 
+static void newbie_mode_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->newbie_mode = cfg->num_value;
+}
+
 int actions_on_start(action_id_t actions[], action_id_t a) {
   int i = 0, num = 0;
   while(actions[i] != ACTID_NOKEY) {
@@ -1034,6 +1038,15 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_LEVEL_EXP,
 			      osd_timeout_cb,
 			      CONFIG_NO_DATA);
+
+  gGui->newbie_mode = 
+    xine_config_register_bool (gGui->xine, "gui.newbie_mode", 
+			       1,
+			       _("change xine's behavior for unexperienced user"), 
+			       _("In this mode, xine take some decisions to simplify user's life."),
+			       CONFIG_LEVEL_EXP,
+			       newbie_mode_cb,
+			       CONFIG_NO_DATA);
 
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
