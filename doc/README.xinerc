@@ -111,8 +111,10 @@ oss_device_num		-1, 0-16: Forces the OSS plugin to use the specified
 			the best capabilities will be used.
 			Note: /dev/dsp is usually a symlink to /dev/dsp0
            
-oss_latency             for softsync you can manually adjust the default
-			a/v sync latency here
+oss_latency             For softsync you can manually adjust the default
+			a/v sync latency here. The units are in miliseconds,
+			so if the sound seems delayed 1 second from the video
+			set it to 1000. (default value = 0)
 
 oss_resample            xine can play different sample rates than your
 			soundcard supports.
