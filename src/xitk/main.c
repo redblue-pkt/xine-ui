@@ -643,7 +643,6 @@ static void show_usage (void) {
   printf(_("      --no-splash              Don't display the splash screen.\n"));
   printf(_("      --stdctl                 Control xine by the console, using lirc commands.\n"));
   printf(_("  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"));
-  printf(_("      --list-plugins           Display the list of all available plugins\n"));
   printf("                               ");
   if((backends = tvout_get_backend_names())) {
     backend = *backends++;
@@ -652,6 +651,7 @@ static void show_usage (void) {
       backend = *backends++;
     }
   }
+  printf(_("      --list-plugins           Display the list of all available plugins\n"));
   printf("\n\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
