@@ -31,10 +31,12 @@
 #include <X11/Xatom.h>
 #include <string.h>
 #include <signal.h>
+#include <xine/xineutils.h>
 
 #include "widget.h"
 #include "dnd.h"
 #include "_xitk.h"
+
 
 #define XDND_VERSION 3
 
@@ -129,7 +131,7 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
 	
 	pbuf = buf;
 	/* Extract all data, '\n' separated */
-	while((p = strsep(&pbuf, "\n")) != NULL) {
+	while((p = xine_strsep(&pbuf, "\n")) != NULL) {
 	  
 	  plen = strlen(p) - 1;
 	  

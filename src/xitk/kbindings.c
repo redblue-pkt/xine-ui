@@ -123,29 +123,6 @@ typedef struct {
 } kbinding_file_t;
 
 
-#ifndef	HAVE_STRSEP
-static char *
-strsep(char **stringp, char *delim)
-{
-    char *start = *stringp;
-    char *cp;
-    char ch;
-
-    if (start == NULL)
-	return NULL;
-
-    for (cp = start; ch = *cp; cp++) {
-	if (strchr(delim, ch)) {
-	    *cp++ = 0;
-	    *stringp = cp;
-	    return start;
-	}
-    }
-    *stringp = NULL;
-    return start;
-}
-#endif
-
 /* 
  * Default key mapping table.
  */
@@ -464,7 +441,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
       
       modifier = KEYMOD_NOMOD;
 
-      while((p = strsep(&ukb->modifier, ",")) != NULL) {
+      while((p = xine_strsep(&ukb->modifier, ",")) != NULL) {
 	
 	_kbindings_set_pos_to_next_char(&p);
 	
@@ -532,7 +509,7 @@ static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
 	char *p;
 	int   modifier = KEYMOD_NOMOD;
 	
-	while((p = strsep(&ukb->modifier, ",")) != NULL) {
+	while((p = xine_strsep(&ukb->modifier, ",")) != NULL) {
 
 	  _kbindings_set_pos_to_next_char(&p);
 	  
