@@ -136,7 +136,18 @@ dxr3.videoout_mode:
 	overlay	Overlay Video output on the VGA screen
 		with the option of switching on-the-fly
 		to tvout (see 'VGA Overlay Feature' below).
-	tv	Send video to the tv out connector only
+	letterboxed tv
+		Send video to the tv out connector only.
+		This is the mode used for the standard 4:3
+		television set. Anamorphic aspects will be displayed
+		letterboxed, pan&scan material will have the image
+		cropped.
+	widescreen tv
+		Send video to the tv out connector only.
+		This mode is intended for 16:9 widescreen tv sets.
+		Anamorphic and pan&scan content will fill the
+		entire screen, but you have to set the tv's aspect
+		manually.
 	
 dxr3.keycolor: (overlay only)
 	0x80a040 Hexadecimal RGB value of the key color. Should
