@@ -38,6 +38,12 @@
 #ifdef HAVE_LIRC
 #include "lirc/lirc_client.h"
 
+#ifdef DEBUG
+#define LIRC_VERBOSE 1
+#else
+#define LIRC_VERBOSE 0
+#endif
+
 extern gGui_t          *gGui;
 
 extern _panel_t        *panel;
@@ -95,7 +101,7 @@ void *xine_lirc_loop(void *dummy) {
 void init_lirc(void) {
   /*  int flags; */
 
-  if((lirc.fd = lirc_init("xine", 1)) == -1) {
+  if((lirc.fd = lirc_init("xine", LIRC_VERBOSE)) == -1) {
     gGui->lirc_enable = 0;
     return;
   }

@@ -782,6 +782,17 @@ void kbindings_reset_kbinding(kbinding_t **kbt) {
 }
 
 /*
+ * Freeing key binding table, then NULLify it.
+ */
+void kbindings_free_kbinding(kbinding_t **kbt) {
+
+  assert(*kbt != NULL);
+
+  _kbindings_free_bindings(*kbt);
+  *kbt = NULL;
+}
+
+/*
  * This could be used to create a default key binding file
  * with 'xine --keymap > $HOME/.xine_keymap'
  */
@@ -928,7 +939,6 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
     
     k = kbindings_lookup_binding(kbt, XKeysymToString(mykey), modifier);
     if(k) {
-      printf("%s is on the way\n", k->action);
       gui_execute_action_id(k->action_id);
     }
 #if 0  /* DEBUG */

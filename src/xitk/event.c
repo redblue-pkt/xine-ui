@@ -1068,5 +1068,7 @@ void gui_run (void) {
 
   gGui->running = 0;
   
+  kbindings_free_kbinding(&gGui->kbindings);
+
   reenable_screensavers();
 }
