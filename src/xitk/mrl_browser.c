@@ -326,7 +326,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
 /*
  *
  */
-static void mrl_handle_selection(xitk_widget_t *w, void *data) {
+static void mrl_handle_selection(xitk_widget_t *w, void *data, int selected) {
 }
 
 /*

@@ -30,7 +30,7 @@
 
 #include "xitk.h"
 
-typedef void (*select_cb_t) (xitk_widget_t *, void *);
+typedef void (*select_cb_t) (xitk_widget_t *, void *, int);
 
 void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb,
 		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb);
