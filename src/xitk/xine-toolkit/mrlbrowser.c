@@ -674,11 +674,23 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
 
   attr.override_redirect = True;
   attr.background_pixel  = black.pixel;
+  /*
+   * XXX:multivis
+   * To avoid BadMatch errors on XCreateWindow:
+   * If the parent and the new window have different depths, we must supply either
+   * a BorderPixmap or a BorderPixel.
+   * If the parent and the new window use different visuals, we must supply a
+   * Colormap
+   */
   attr.border_pixel      = 1;
-  attr.colormap          = XCreateColormap(mb->display,
+  if (mb->imlibdata->x.visual != DefaultVisual(mb->display, screen)) {
+    attr.colormap        = XCreateColormap(mb->display,
 					   RootWindow(mb->display, screen),
 					   mb->imlibdata->x.visual, AllocNone);
-  
+  } else {
+    attr.colormap        = DefaultColormap (mb->display, screen);
+  }
+
   private_data->window   = XCreateWindow (mb->display,
 					  DefaultRootWindow(mb->display), 
 					  hint.x, hint.y, hint.width, 

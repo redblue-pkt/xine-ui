@@ -584,10 +584,22 @@ void playlist_editor(void) {
   
   attr.override_redirect = True;
   attr.background_pixel  = gGui->black.pixel;
+  /*
+   * XXX:multivis
+   * To avoid BadMatch errors on XCreateWindow:
+   * If the parent and the new window have different depths, we must supply either
+   * a BorderPixmap or a BorderPixel.
+   * If the parent and the new window use different visuals, we must supply a
+   * Colormap
+   */
   attr.border_pixel      = 1;
-  attr.colormap          = XCreateColormap(gGui->display,
+  if (gGui->imlib_data->x.visual != DefaultVisual(gGui->display, gGui->screen)) {
+    attr.colormap        = XCreateColormap(gGui->display,
                                            RootWindow(gGui->display, gGui->screen),
                                            gGui->imlib_data->x.visual, AllocNone);
+  } else {
+    attr.colormap        = DefaultColormap (gGui->display, gGui->screen);
+  }
 
   playlist->window = XCreateWindow (gGui->display, 
 				    DefaultRootWindow(gGui->display), 

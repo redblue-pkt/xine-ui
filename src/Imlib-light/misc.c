@@ -486,6 +486,13 @@ Imlib_init(Display * disp)
       CWBackingStore | CWSaveUnder;
     newcm = 0;
     /*
+     * XXX:multivis
+     * To avoid BadMatch errors on XCreateWindow:
+     * If the parent and the new window have different depths, we must supply either
+     * a BorderPixmap or a BorderPixel.
+     * If the parent and the new window use different visuals, we must supply a
+     * Colormap
+     */
     if (id->x.visual != DefaultVisual(disp, id->x.screen))
       {
 	Colormap            cm;
@@ -500,7 +507,7 @@ Imlib_init(Display * disp)
 	    newcm = 1;
 	  }
       }
-*/
+  
     id->x.base_window = XCreateWindow(id->x.disp, id->x.root,
 				      -100, -100, 10, 10, 0,
 				      id->x.depth, InputOutput,

@@ -312,13 +312,22 @@ void panel_init (void) {
   
   attr.override_redirect = True;
   attr.background_pixel  = gGui->black.pixel;
-  attr.border_pixel      = 1;
-  attr.colormap          = DefaultColormap (gGui->display, gGui->screen);
   /*
-  attr.colormap          = XCreateColormap(gGui->display,
+   * XXX:multivis
+   * To avoid BadMatch errors on XCreateWindow:
+   * If the parent and the new window have different depths, we must supply either
+   * a BorderPixmap or a BorderPixel.
+   * If the parent and the new window use different visuals, we must supply a
+   * Colormap
+   */
+  attr.border_pixel      = 1;
+  if (gGui->imlib_data->x.visual != DefaultVisual(gGui->display, gGui->screen)) {
+    attr.colormap        = XCreateColormap(gGui->display,
 					   RootWindow(gGui->display, gGui->screen), 
 					   gGui->imlib_data->x.visual, AllocNone);
-					   */
+  } else {
+    attr.colormap        = DefaultColormap (gGui->display, gGui->screen);
+  }
   /*  
       printf ("imlib_data: %d visual : %d\n",gGui->imlib_data,gGui->imlib_data->x.visual);
       printf ("w : %d h : %d\n",hint.width, hint.height);

@@ -983,12 +983,24 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
 
   attr.override_redirect       = True;
   attr.background_pixel        = black.pixel;
+  /*
+   * XXX:multivis
+   * To avoid BadMatch errors on XCreateWindow:
+   * If the parent and the new window have different depths, we must supply either
+   * a BorderPixmap or a BorderPixel.
+   * If the parent and the new window use different visuals, we must supply a
+   * Colormap
+   */
   attr.border_pixel            = 1;
-  attr.colormap                = XCreateColormap(fb->display,
+  if (fb->imlibdata->x.visual != DefaultVisual(fb->display, screen)) {
+    attr.colormap              = XCreateColormap(fb->display,
 						 RootWindow(fb->display,
 							    screen),
 						 fb->imlibdata->x.visual,
 						 AllocNone);
+  } else {
+    attr.colormap              = DefaultColormap (fb->display, screen);
+  }
   
   private_data->window = 
     XCreateWindow (fb->display, DefaultRootWindow(fb->display), 

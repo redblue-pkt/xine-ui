@@ -258,13 +258,23 @@ void video_window_adapt_size (int video_width, int video_height,
      */
 
     attr.background_pixel  = gGui->black.pixel;
+    /*
+     * XXX:multivis
+     * To avoid BadMatch errors on XCreateWindow:
+     * If the parent and the new window have different depths, we must supply either
+     * a BorderPixmap or a BorderPixel.
+     * If the parent and the new window use different visuals, we must supply a
+     * Colormap
+     */
     attr.border_pixel      = 1;
-    attr.colormap          = DefaultColormap (gGui->display, gGui->screen);
-/*
-XCreateColormap(gGui->display,
+    if (gVw->vinfo.visual != DefaultVisual(gGui->display, gGui->screen)) {
+      attr.colormap	   = XCreateColormap(gGui->display,
 					     RootWindow(gGui->display, gGui->screen), 
 					     gVw->vinfo.visual, AllocNone);
-  */  
+    } else {
+      attr.colormap        = DefaultColormap (gGui->display, gGui->screen);
+    }
+
     gGui->video_window = 
       XCreateWindow (gGui->display, 
 		     RootWindow (gGui->display, DefaultScreen(gGui->display)), 
@@ -329,13 +339,22 @@ XCreateColormap(gGui->display,
     hint.flags  = PPosition | PSize;
 
     attr.background_pixel  = gGui->black.pixel;
-    attr.border_pixel      = 1;
-    attr.colormap          = DefaultColormap (gGui->display, gGui->screen);
     /*
-    attr.colormap          = XCreateColormap(gGui->display,
+     * XXX:multivis
+     * To avoid BadMatch errors on XCreateWindow:
+     * If the parent and the new window have different depths, we must supply either
+     * a BorderPixmap or a BorderPixel.
+     * If the parent and the new window use different visuals, we must supply a
+     * Colormap
+     */
+    attr.border_pixel      = 1;
+    if (gVw->vinfo.visual != DefaultVisual(gGui->display, gGui->screen)) {
+      attr.colormap        = XCreateColormap(gGui->display,
 					     RootWindow(gGui->display, gGui->screen), 
 					     gVw->vinfo.visual, AllocNone);
-    */
+    } else {
+      attr.colormap        = DefaultColormap (gGui->display, gGui->screen);
+    }
 
     gGui->video_window = 
       XCreateWindow(gGui->display, RootWindow(gGui->display, gGui->screen),
