@@ -69,6 +69,7 @@
    5.3.4 Some parts of my X Desktop get transparent when xine plays the video!
    5.3.5 The aspect ratio of the video is wrong!
    5.3.6 How can I change color/brightness/contrast?
+   5.3.7 What is the difference between discarded and skipped frames?
 
    5.4 ERROR MESSAGES: WHAT THEY MEAN AND WHAT YOU CAN DO.
    5.4.1 Starting xine fails with complains about audio drivers/devices!   
@@ -781,7 +782,33 @@
       
       (Please also refer to README.config_en for more details about xine's
       config file or use the config dialog accessible through the xine panel)
+   
+5.3.7 What is the difference between discarded and skipped frames?
 
+      Once in a while xine will output a message like that:
+
+        200 frames delivered, XX frames skipped, YY frames discarded
+        
+      The difference between these counters is a little subtle for the non
+      developer. There are two threads running in order to display video:
+      the decoder thread will deliver frames to the video output thread. 
+      The later is responsible for scheduling the frames to be displayed at
+      the right time.
+      
+      If your system can't keep up with decoding requirements, decoder will
+      deliver overdue frames. Imagine if it finished decoding the frame
+      tagged for displaying at 11:30 but xine clock marks 11:31. When this
+      situation is detected, xine will try to skip decoding a few frames
+      to recover. Not every decoder may support this feature.
+      
+      When the frame is decoded to be show somewhere in future but the
+      output thread doesn't get scheduled in time by the operating system
+      to complete the operation, the frame is discarded. One cause might
+      be the disk access operation, which may halt the system for a few
+      miliseconds without DMA. See section 5.1.1.
+      
+      Note that if a decoder can't skip frames for some reason, you would
+      never see frames skipped (they would be all discarded).
 
 5.4 ERROR MESSAGES: WHAT THEY MEAN AND WHAT YOU CAN DO.
 
