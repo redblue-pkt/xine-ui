@@ -6,7 +6,7 @@
                             Ein freier Video-Player
 
 
-______________________________________________________________2002/01/27 (1.7)
+______________________________________________________________2003/04/10 (1.9)
 INHALT
 
 1       DOKUMENTATION
@@ -198,8 +198,8 @@ _____________________________________________________________________________
         LEERTASTE               Pause
         AUF / AB                schnell vorspulen / Zeitlupe
 
-        0                       gehe zum Anfang des Streams
-        1 - 9                   gehe zu 10 - 90% des Streams
+        0 - 9                   zugehörige Ziffer eingeben
+        /                       Zur vorher angegebenen % Position im Strom gehen
         LINKS / RECHTS          +/- 15 Sekunden (mit STRG: +/- 60 Sekunden)
 
         BILD-AUF                gehe zum vorherigen Eintrag in der Liste
