@@ -277,7 +277,7 @@ widget_t *label_create (xitk_label_t *l) {
 
     pthread_attr_getschedparam(&pth_attrs, &pth_params);
 
-    pth_params.__sched_priority = sched_get_priority_min(SCHED_OTHER);
+    pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
 
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
 
