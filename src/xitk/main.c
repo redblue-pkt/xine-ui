@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000 the xine project
+ * Copyright (C) 2000-2001 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -185,7 +185,7 @@ int handle_debug_subopt(char *sopt) {
   int subopt;
   char *str = sopt;
   char *val = NULL;
-  const char *debuglvl[] = {
+  char *debuglvl[] = {
     "verbose", "metronom", "audio", "demux", 
     "input", "video", "pts", "mpeg", "avi", 
     "ac3", "loop", "gui",
@@ -229,7 +229,7 @@ int handle_demux_strategy_subopt(char *sopt) {
   int subopt;
   char *str = sopt;
   char *val = NULL;
-  const char *ds_available[] = {
+  char *ds_available[] = {
     "default",
     "revert",
     "content",

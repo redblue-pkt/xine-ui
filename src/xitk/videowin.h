@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000 the xine project
+ * Copyright (C) 2000-2001 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -27,23 +27,24 @@
 
 void video_window_init (void);
 
-void video_window_adapt_size (int video_width, int video_height, int *dest_x, int *dest_y,
-			      int *dest_width, int *dest_height) ;
+void video_window_adapt_size (int video_width, int video_height, 
+			      int *dest_x, int *dest_y,
+			      int *dest_width, int *dest_height);
 
 void video_window_calc_dest_size (int video_width, int video_height,
-				  int *dest_width, int *dest_height) ;
+				  int *dest_width, int *dest_height);
 
 /* set/get fullscreen mode */
 void video_window_set_fullscreen (int req_fullscreen);
 int video_window_is_fullscreen (void);
 
 /* hide/show cursor in video window*/
-void video_window_set_cursor_visibility(int show_cursor) ;
+void video_window_set_cursor_visibility(int show_cursor);
 /* Get cursor visiblity (boolean) */
 int video_window_is_cursor_visibility(void);
 
 /* hide/show video window */
-void video_window_set_visibility(int show_window) ;
+void video_window_set_visibility(int show_window);
 int video_window_is_visible (void);
 
 void video_window_draw_logo(void);

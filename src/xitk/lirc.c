@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000 the xine project
+ * Copyright (C) 2000-2001 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -125,6 +125,10 @@ void *xine_lirc_loop(void *dummy) {
     lHIDEOUTPUT
   };
   
+
+  /* I'm a poor lonesome pthread... */
+  pthread_detach(pthread_self());
+
 
   while(gGui->running) {
     
@@ -255,7 +259,7 @@ void *xine_lirc_loop(void *dummy) {
     }
   }
   
-  return NULL;
+  pthread_exit(NULL);
 }
 
 void init_lirc(void) {
@@ -289,7 +293,7 @@ void init_lirc(void) {
 void deinit_lirc(void) {
 
   pthread_cancel(lirc_thread);
-
+  
   if(gGui->lirc_enable) {
     lirc_freeconfig(xlirc_config);
     lirc_deinit();

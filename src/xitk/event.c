@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000 the xine project
+ * Copyright (C) 2000-2001 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -33,10 +33,12 @@
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
+#include <setjmp.h>
 
 #include "xitk.h"
 
 #include "Imlib-light/Imlib.h"
+
 #include "event.h"
 #include "parseskin.h"
 #include "playlist.h"
@@ -60,8 +62,10 @@ extern int errno;
  */
 extern gGui_t          *gGui;
 
-static int gui_exiting = 0;
+static sigjmp_buf       jmp_exit;
+static pid_t            xine_pid;
 
+/* Icon data */
 static unsigned char xine_bits[] = {
    0x11, 0x00, 0x00, 0x00, 0x88, 0x11, 0x00, 0x00, 0x00, 0x88, 0xff, 0xff,
    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xf1, 0xff, 0xff, 0xff,
@@ -79,41 +83,104 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0x00, 0xf8, 0xf1, 0xff, 0xff, 0xff, 0x8f, 0xf1, 0xff, 0xff,
    0xff, 0x8f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
    0x11, 0x00, 0x00, 0x00, 0x88, 0x11, 0x00, 0x00, 0x00, 0x88, 0x1f, 0x00,
-   0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8};
+   0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
+};
 
 
-static void gui_handle_SIGINT (int sig) {
-  static XEvent myevent;
-  Status status;
+/**
+ * Configuration file lookup/set functions
+ */
+char *config_lookup_str(char *key, char *def) {
 
-  signal (SIGINT, NULL);
+  return(gGui->config->lookup_str(gGui->config, key, def));
+}
 
-  if (!gui_exiting) {
-    switch (sig) {
-    case SIGINT:
-      gui_exiting = 1;
-      
-      printf ("\nsigint caught => bye\n");
+int config_lookup_int(char *key, int def) {
 
-      myevent.xkey.type        = KeyPress;
-      myevent.xkey.state       = 0;
-      myevent.xkey.keycode     = XK_Q;
-      myevent.xkey.subwindow   = gGui->panel_window;
-      myevent.xkey.time        = 0;
-      myevent.xkey.same_screen = True;
-      
-      status = XSendEvent (gGui->display, gGui->panel_window, True, KeyPressMask, &myevent);
+  return(gGui->config->lookup_int(gGui->config, key, def));
+}
+
+void config_set_str(char *key, char *value) {
+
+  if(key)
+    gGui->config->set_str(gGui->config, key, value);
+}
+
+void config_set_int(char *key, int value) {
+  
+  if(key)
+  gGui->config->set_int(gGui->config, key, value);
+}
+
+void config_save(void) {
+
+  gGui->config->save(gGui->config);
+}
+
+void config_reset(void) {
+
+  gGui->config->read(gGui->config, gGui->configfile);
+}
+
+/*
+ *
+ */
+static void gui_signal_handler (int sig) {
+  XEvent    myevent;
+  Status    status;
+  pid_t     cur_pid = getppid();
+
+  switch (sig) {
+    
+  case SIGINT: /* External killing request */
+  case SIGTERM:
+  case SIGQUIT:
+    
+    if(cur_pid == xine_pid) {
+      gui_exit(NULL, NULL);
+
+      myevent.type                = MotionNotify;
+      myevent.xmotion.type        = MotionNotify;
+      myevent.xmotion.send_event  = True;
+      myevent.xmotion.display     = gGui->display;
+      myevent.xmotion.window      = gGui->panel_window;
+      myevent.xmotion.root        = DefaultRootWindow(gGui->display);
+      myevent.xmotion.time        = CurrentTime;
+      myevent.xmotion.same_screen = True;
+
+      status = XSendEvent (gGui->display, 
+			   gGui->panel_window, True, KeyPressMask, &myevent);
       
       XFlush (gGui->display);
-      break;
+
+      siglongjmp(jmp_exit, 1);
     }
+    break;
+      
+  case SIGHUP:
+    if(cur_pid == xine_pid) {
+      printf("SIGHUP received: re-read config file\n");
+      config_reset();
+    }
+    break;
+
+  case SIGUSR1:
+    if(cur_pid == xine_pid) {
+      printf("SIGUSR1 received\n");
+    }
+    break;
+
+  case SIGUSR2:
+    if(cur_pid == xine_pid) {
+      printf("SIGUSR2 received\n");
+    }
+    break;
   }
 }
 
 /*
  * top-level event handler
  */
-
 void gui_handle_event (XEvent *event) {
   XKeyEvent      mykeyevent;
   KeySym         mykey;
@@ -124,7 +191,6 @@ void gui_handle_event (XEvent *event) {
   panel_handle_event(event);
   playlist_handle_event(event);
   control_handle_event(event);
-  
   
   switch(event->type) {
 
@@ -167,12 +233,6 @@ void gui_handle_event (XEvent *event) {
 
   case KeyPress:
     mykeyevent = event->xkey;
-
-    /* hack: exit on ctrl-c */
-    if (gui_exiting) {
-      gui_exit(NULL, NULL);
-      break;
-    }
 
     /* printf ("KeyPress (state : %d, keycode: %d)\n", mykeyevent.state, mykeyevent.keycode);  */
       
@@ -360,6 +420,9 @@ void gui_handle_event (XEvent *event) {
 
 }
 
+/*
+ * Callback function called by Xine engine.
+ */
 void gui_status_callback (int nStatus) {
 
   if (gGui->ignore_status)
@@ -387,6 +450,9 @@ void gui_status_callback (int nStatus) {
   }
 }
 
+/*
+ * Initialize the GUI
+ */
 #define SEND_KEVENT(key) {                                                    \
      static XEvent startevent;                                                \
      startevent.type = KeyPress;                                              \
@@ -398,7 +464,6 @@ void gui_status_callback (int nStatus) {
      XSendEvent(gGui->display, gGui->panel_window, True, KeyPressMask,        \
                 &startevent);                                                 \
    }
-
 void gui_init (int nfiles, char *filenames[]) {
 
   int                   i;
@@ -425,17 +490,17 @@ void gui_init (int nfiles, char *filenames[]) {
    */
 
   if (!XInitThreads ()) {
-    printf ("\nXInitThreads failed - looks like you don't have a thread-safe xlib.\n");
+    printf ("\nXInitThreads failed - looks like you don't have a "
+	    "thread-safe xlib.\n");
     exit (1);
   } 
 
+  
   if(getenv("DISPLAY"))
     display_name = getenv("DISPLAY");
-
-  gGui->display = XOpenDisplay(display_name);
-
-  if (gGui->display == NULL) {
-    fprintf(stderr,"Can not open display\n");
+  
+  if((gGui->display = XOpenDisplay(display_name)) == NULL) {
+    fprintf(stderr, "Cannot open display\n");
     exit(1);
   }
 
@@ -444,6 +509,10 @@ void gui_init (int nfiles, char *filenames[]) {
   gGui->screen = DefaultScreen(gGui->display);
   gGui->imlib_data = Imlib_init (gGui->display);
 
+  /* 
+   * Create logo image displayed into video window from
+   * the official Xine logo.
+   */
   sprintf(buffer, "%s/xine_logo.png", XINE_SKINDIR);
   if((gGui->video_window_logo_image= 
       Imlib_load_image(gGui->imlib_data, buffer)) == NULL) {
@@ -475,7 +544,8 @@ void gui_init (int nfiles, char *filenames[]) {
    * create an icon pixmap
    */
   
-  gGui->icon = XCreateBitmapFromData (gGui->display, DefaultRootWindow(gGui->display),
+  gGui->icon = XCreateBitmapFromData (gGui->display, 
+				      DefaultRootWindow(gGui->display),
 				      xine_bits, 40, 40);
 
 
@@ -485,9 +555,10 @@ void gui_init (int nfiles, char *filenames[]) {
    * create and map panel and video window
    */
 
+  xine_pid = getppid();
+
   video_window_init ();
   panel_init ();
-
 }
 
 /*
@@ -553,11 +624,41 @@ void gui_run (void) {
   }
 
   /* install sighandler */
-  action.sa_handler = gui_handle_SIGINT;
+  action.sa_handler = gui_signal_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
   if(sigaction(SIGINT, &action, NULL) != 0) {
     fprintf(stderr, "sigaction(SIGINT) failed: %s\n", strerror(errno));
+  }
+  action.sa_handler = gui_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGTERM, &action, NULL) != 0) {
+    fprintf(stderr, "sigaction(SIGTERM) failed: %s\n", strerror(errno));
+  }
+  action.sa_handler = gui_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGQUIT, &action, NULL) != 0) {
+    fprintf(stderr, "sigaction(SIGQUIT) failed: %s\n", strerror(errno));
+  }
+  action.sa_handler = gui_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGHUP, &action, NULL) != 0) {
+    fprintf(stderr, "sigaction(SIGHUP) failed: %s\n", strerror(errno));
+  }
+  action.sa_handler = gui_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGUSR1, &action, NULL) != 0) {
+    fprintf(stderr, "sigaction(SIGUSR1) failed: %s\n", strerror(errno));
+  }
+  action.sa_handler = gui_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGUSR2, &action, NULL) != 0) {
+    fprintf(stderr, "sigaction(SIGUSR2) failed: %s\n", strerror(errno));
   }
 
   /*
@@ -573,45 +674,14 @@ void gui_run (void) {
 #endif
 
   while (gGui->running) {
+    
+    if(sigsetjmp(jmp_exit, 1) != 0)
+      goto loop_end;
 
     XNextEvent (gGui->display, &myevent) ;
-
+    
     gui_handle_event (&myevent) ;
   }
-}
 
-
-/**
- * Configuration file lookup/set functions
- */
-char *config_lookup_str(char *key, char *def) {
-
-  return(gGui->config->lookup_str(gGui->config, key, def));
-}
-
-int config_lookup_int(char *key, int def) {
-
-  return(gGui->config->lookup_int(gGui->config, key, def));
-}
-
-void config_set_str(char *key, char *value) {
-
-  if(key)
-    gGui->config->set_str(gGui->config, key, value);
-}
-
-void config_set_int(char *key, int value) {
-  
-  if(key)
-  gGui->config->set_int(gGui->config, key, value);
-}
-
-void config_save(void) {
-
-  gGui->config->save(gGui->config);
-}
-
-void config_reset(void) {
-
-  gGui->config->read(gGui->config, gGui->configfile);
+ loop_end: /* Killed by signal */
 }
