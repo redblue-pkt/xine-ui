@@ -1102,8 +1102,8 @@ int main(int argc, char *argv[]) {
     xine_cfg_entry_t  cfg_entry;
     
     if(xine_config_lookup_entry(gGui->xine, "dxr3.videoout_mode", &cfg_entry)) {
-      if(((!strcmp(cfg_entry.str_value, "letterboxed tv")) ||
-	  (!strcmp(cfg_entry.str_value, "widescreen tv"))) && 
+      if(((!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "letterboxed tv")) ||
+	  (!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "widescreen tv"))) && 
 	 (!(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)))) {
 	gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
       }
