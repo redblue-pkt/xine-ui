@@ -132,42 +132,42 @@ and dxr3_preferred_tvmode to allow for on-the-fly tv<->overlay
 switching.  Please remove your old .xinerc file and run xine to 
 reconfigure.
 
-*) dxr3_preferred_tvmode:
+*) dxr3.preferred_tvmode:
 	default Keep the current driver setting
 	ntsc    NTSC 60Hz
 	pal     PAL 50Hz
 	pal60   PAL 60Hz
 
-*) dxr3_vomode:
+*) dxr3.videoout_mode:
 	overlay	Overlay Video output on the VGA screen
 		with the option of switching on-the-fly
 		to tvout (see 'VGA Overlay Feature' below).
 	tv	Send video to the tv out connector only
 	
-*) dxr3_keycolor: (overlay only)
+*) dxr3.keycolor: (overlay only)
 	0x80a040 Hexadecimal RGB value of the key color. Should
 		not need to be changed.
 
-*) dxr3_color_interval: (overlay only)
+*) dxr3.color_interval: (overlay only)
 	50.0	Tolerance for keycolor. A higher value allows higher
 		range of keycolors. Intended for compensation of
 		color errors on VGA output. Smaller value is better
 		for not using the "wrong" colors as overlay.
 		Meaningful range: 20.0 - 200.0
 
-*) dxr3_scr_prio:
+*) dxr3.scr_priority:
 	10	Priority of the dxr3 scr plugin. <5 means that the
 		unix system timer will be used. >5 forces to use
 		dxr3 as sync source. If you don't understand this
 		keep the default value.
 
-*) dxr3_contrast:
-*) dxr3_brightness:
-*) dxr3_saturation:
+*) dxr3.contrast:
+*) dxr3.brightness:
+*) dxr3.saturation:
 	500	Should not need to be changed manually.  Use xine
-		to adjust these as necessary.  Range: 1 - 1000	
+		to adjust these as necessary.  Range: 100 - 900
 
-*) dxr3_buffer_mode:
+*) dxr3.alt_play_mode:
 	0	Enables or disables an 'enhanced' buffer mode available
 		on at least some cards.  Noticable improvements have been
 		seen with 'glitchy' streams with intermittant pauses. 
@@ -176,7 +176,7 @@ reconfigure.
 		Use 1 to enable, 0 to disable. This is EXPERIMENTAL!
 			* Only appears to have effect on tvout. 
 
-*) video_driver_name:
+*) video.driver:
 	dxr3    Needed for setting the tv_mode, brightness, contrast,
 		saturation and the aspect ratio. If not, these features
 		will be missing but playback will still work.
@@ -186,13 +186,13 @@ reconfigure.
 		When *not* playing MPEG1/2 content, it must be set
 		to a "real" video driver like "Xv" or "Xshm".
 
-*) audio_driver_name:
+*) audio.driver:
 	oss	The em8300 audio output is available as an usual
 		OSS device. Therefore the audio driver must be
 		set to oss. Can also be specified using "-A oss"
 		on the command line.
 
-*) oss_device_num:
+*) audio.oss_device_num:
 	0-16	Machines with a dxr3 installed often have an usual
 		soundcard too. If audio playback occurs on the
 		wrong device, the demanded device can be set using
@@ -200,13 +200,13 @@ reconfigure.
 
 The following settings only concern the dxr3enc video out driver:
 
-dxr3enc_quality: 
+dxr3enc.quality: 
 	0-100	The quality setting of the mpeg1 encoding. Lower
 		is faster but gives noticeable artefacts. Higher is
 		better but slower. Values between 0 and 100, 90
 		is a good initial value.
 
-dxr3enc_file:
+dxr3enc.outputfile:
 	<none>  If the value is anything other than "<none>", xine
 		tries to open a file with that name to write the
 		encoded mpeg-1 stream to instead of the dxr3 device. 
