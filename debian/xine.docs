@@ -1,8 +1,19 @@
-doc/README
 doc/FAQ
 doc/FAQ_es
+doc/FAQ_fr
+doc/FAQ_it
+doc/FAQ_pl
+doc/README
+doc/README.corba
+doc/README.divx4
 doc/README.dxr3
+doc/README.dxr3_pl
+doc/README.mrl
+doc/README.syncfb
 doc/README.xinerc
+doc/README_es
+doc/README_it
+doc/README_pl
 doc/bug_report_form
 AUTHORS
 

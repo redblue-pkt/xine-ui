@@ -1,3 +1,7 @@
+  * updated list of doc files for rpm and debian package systems
+  * fixed compilation with -DDEBUG (required fixes in snapshot.c)
+ -- Harm van der Heijden <hrm@users.sourceforge.net> 
+
 xine-ui (0.9.4) unstable; urgency=low
 
  -- Guenter Bartsch <guenter@users.sourceforge.net> Sun Nov  4 23:50:02 CET 2001
