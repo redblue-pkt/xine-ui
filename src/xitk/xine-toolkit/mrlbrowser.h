@@ -79,6 +79,7 @@ typedef struct {
   widget_t                 *mrlb_list; /*  Browser list widget */
 
   xitk_mrl_callback_t      add_callback;
+  xitk_mrl_callback_t      play_callback;
   xitk_simple_callback_t   kill_callback;
   xitk_simple_callback_t   ip_callback;
 

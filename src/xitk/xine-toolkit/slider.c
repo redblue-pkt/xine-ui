@@ -406,8 +406,7 @@ void slider_reset(widget_list_t *wl, widget_t *sl) {
   slider_private_data_t *private_data = 
     (slider_private_data_t *) sl->private_data;
   
-  if (sl->widget_type & WIDGET_TYPE_SLIDER
-      && !private_data->bClicked) {
+  if (sl->widget_type & WIDGET_TYPE_SLIDER) {
     if(private_data->realmin < 0)
       private_data->pos = (0 - private_data->realmin);
     else

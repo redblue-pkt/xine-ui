@@ -91,14 +91,23 @@ AC_SUBST(GLOBAL_CFLAGS)
 dnl AC_SUBST(ROOT_CFLAGS)
 dnl AC_SUBST(TOOLS_CFLAGS)
 
-dnl
-dnl threads
-dnl
 
-case $host in
+dnl
+dnl Check for xine-lib
+dnl
+AM_PATH_XINE(0.9.0,, AC_MSG_ERROR(*** You should install xine-lib first ***))
+
+
+dnl
+dnl threads: xine-config tell us what should be used, but
+dnl          xitk need to be linked to thread lib, so the follow AC_SUBST() 
+dnl          are only used in src/xitk/xine-toolkit/Makefile.am
+dnl
+case "$host" in
   *-*-freebsd*)
-    THREAD_LIBS="-pthread"
-    CFLAGS="$CFLAGS -I/usr/local/include -L/usr/local/lib -D_THREAD_SAFE"
+    THREAD_LIBS="-L/usr/local/lib -pthread"
+    THREAD_CFLAGS="-I/usr/local/include -D_THREAD_SAFE"
+    CFLAGS="$CFLAGS -L/usr/local/lib $THREAD_CFLAGS"
     CPPFLAGS="$CPPFLAGS -I/usr/local/include -L/usr/local/lib"
     ;;
   *)
@@ -108,12 +117,8 @@ case $host in
     ;;
 esac
 AC_SUBST(THREAD_LIBS)
+AC_SUBST(THREAD_CFLAGS)
 
-
-dnl
-dnl Check for xine-lib
-dnl
-AM_PATH_XINE(0.9.0,, AC_MSG_ERROR(*** You should install xine-lib first ***))
 
 dnl
 dnl dynamic linker

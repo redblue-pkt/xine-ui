@@ -34,6 +34,7 @@
 #include "xitk.h"
 
 #include "event.h"
+#include "actions.h"
 #include "utils.h"
 #include "parseskin.h"
 #include "mrl_browser.h"
@@ -148,7 +149,7 @@ static void mrl_browser_kill(widget_t *w, void *data) {
 /*
  *
  */
-void mrl_browser(xitk_mrl_callback_t add_cb, 
+void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb,
 		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
   xitk_mrlbrowser_t   mb;
   char              **ip_availables = 
@@ -189,6 +190,11 @@ void mrl_browser(xitk_mrl_callback_t add_cb,
   mb.select.clicked_color           = gui_get_ccolor("MrlSelect");
   mb.select.fontname                = gui_get_fontname("MrlSelect");
   mb.select.callback                = add_cb;
+
+  mb.play.x                         = gui_get_skinX("MrlPlay");
+  mb.play.y                         = gui_get_skinY("MrlPlay");
+  mb.play.skin_filename             = gui_get_skinfile("MrlPlay");
+  mb.play.callback                  = add_and_play_cb;
 
   mb.dismiss.x                      = gui_get_skinX("MrlDismiss");
   mb.dismiss.y                      = gui_get_skinY("MrlDismiss");
@@ -276,9 +282,28 @@ static void mrl_add(widget_t *w, void *data, mrl_t *mrl) {
 }
 
 /*
- *
+ * Callback called by mrlbrowser on play event.
+ */
+static void mrl_add_and_play(widget_t *w, void *data, mrl_t *mrl) {
+
+  if(mrl) {
+    gui_dndcallback((char *)mrl->mrl);
+
+    if((xine_get_status(gGui->xine) != XINE_STOP)) {
+      gGui->ignore_status = 1;
+      xine_stop (gGui->xine);
+      gGui->ignore_status = 0;
+    }
+
+    gui_set_current_mrl(gGui->playlist[gGui->playlist_num - 1]);
+    xine_play (gGui->xine, gGui->filename, 0, 0 );
+  }
+}
+
+/*
+ * Create a new mrl browser.
  */
 void open_mrlbrowser(widget_t *w, void *data) {
   
-  mrl_browser(mrl_add, mrl_handle_selection, gui_dndcallback);
+  mrl_browser(mrl_add, mrl_add_and_play, mrl_handle_selection, gui_dndcallback);
 }

@@ -342,6 +342,13 @@ typedef struct {
   struct {
     int                      x;
     int                      y;
+    char                    *skin_filename;
+    xitk_mrl_callback_t      callback;
+  } play;
+
+  struct {
+    int                      x;
+    int                      y;
     char                    *caption;
     char                    *skin_filename;
     char                    *normal_color;
@@ -419,6 +426,6 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
 					  void *user_data);
 void widget_unregister_event_handler(widgetkey_t *key);
 int widget_get_window_info(widgetkey_t key, window_info_t *winf);
-
+void widget_xevent_notify(XEvent *event);
 #endif
 #endif

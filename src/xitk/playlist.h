@@ -27,6 +27,7 @@
 void playlist_editor(void);
 void pl_exit(widget_t *, void *);
 int pl_is_running(void);
+int pl_is_visible(void);
 void pl_toggle_visibility(widget_t *, void *);
 void pl_raise_window(void);
 void pl_scan_input(widget_t *, void *);

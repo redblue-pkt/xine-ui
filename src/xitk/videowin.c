@@ -302,9 +302,9 @@ void video_window_adapt_size (int video_width, int video_height,
  			   window_title, window_title, None, NULL, 0, 0);
     
     XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
-    
-    
+        
     XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
+
 
     /*
      * wm, no borders please
@@ -316,21 +316,6 @@ void video_window_adapt_size (int video_width, int video_height,
     XChangeProperty(gGui->display, gGui->video_window, prop, prop, 32,
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
-
-    /*
-     * layer above most other things, like gnome panel
-     * WIN_LAYER_ABOVE_DOCK  = 10
-     *
-     */
-
-    if( XA_WIN_LAYER == None )
-      XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-    
-    data[0] = 10;
-    XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
-		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		    1);
-    
 
     XSetTransientForHint(gGui->display, gGui->video_window, None);
     XRaiseWindow(gGui->display, gGui->video_window);
@@ -426,10 +411,23 @@ void video_window_adapt_size (int video_width, int video_height,
   } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
 
   XFlush(gGui->display);
+
+  /*
+   * layer above most other things, like gnome panel
+   * WIN_LAYER_ABOVE_DOCK  = 10
+   *
+   */
+  if( XA_WIN_LAYER == None )
+    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+
+  data[0] = 10;
+  XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
+		  XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		  1);
   
   if (gVw->gc != None) XFreeGC(gGui->display, gVw->gc);
   gVw->gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
-
+  
   if (gVw->fullscreen_mode) {
     XSetInputFocus (gGui->display, 
 		    gGui->video_window, RevertToNone, CurrentTime);
@@ -492,12 +490,12 @@ void video_window_set_visibility(int show_window) {
 
   if (gVw->show == 1) {
     XLockDisplay (gGui->display);
+
     /*
      * layer above most other things, like gnome panel
      * WIN_LAYER_ABOVE_DOCK  = 10
      *
      */
-
     if( XA_WIN_LAYER == None )
       XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
     
@@ -505,6 +503,7 @@ void video_window_set_visibility(int show_window) {
     XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
 		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
 		    1);
+    
     XMapRaised (gGui->display, gGui->video_window);
     XUnlockDisplay (gGui->display);
   }

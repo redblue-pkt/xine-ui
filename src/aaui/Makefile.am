@@ -15,8 +15,7 @@ bin_PROGRAMS = ${aa_programs}
 
 aaxine_SOURCES = $(GETOPT_C) utils.c main.c
 aaxine_DEPENDENTIES = utils.h 
-aaxine_LDADD = @XINE_LIBS@ $(AALIB_LIBS) \
-	$(THREAD_LIBS) $(DYNAMIC_LD_LIBS) -lm
+aaxine_LDADD = @XINE_LIBS@ $(AALIB_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 $(GETOPT_C):
 	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c

@@ -1,5 +1,5 @@
 
-CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@
+CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
 
 noinst_LTLIBRARIES = libxitk.la
 libxitk_la_SOURCES = button.c labelbutton.c label.c \

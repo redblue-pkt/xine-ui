@@ -117,8 +117,11 @@ int panel_is_visible(void) {
  */
 void panel_toggle_visibility (widget_t *w, void *data) {
 
-  pl_toggle_visibility(NULL, NULL);
-
+  if(!panel->visible && pl_is_visible()) {}
+  else {
+    pl_toggle_visibility(NULL, NULL);
+  }
+    
   if(!panel->visible && control_is_visible()) {}
   else {
     control_toggle_panel_visibility(NULL, NULL);
@@ -159,9 +162,10 @@ void panel_toggle_visibility (widget_t *w, void *data) {
 void panel_check_pause(void) {
   
   checkbox_set_state(panel->checkbox_pause, 
-		     ((xine_get_speed(gGui->xine)==SPEED_PAUSE)?1:0), 
+		     (((xine_get_status(gGui->xine) == XINE_PLAY) && 
+		      (xine_get_speed(gGui->xine) == SPEED_PAUSE)) ? 1 : 0 ), 
 		     gGui->panel_window, panel->widget_list->gc);
-
+  
 }
 
 /*
@@ -222,8 +226,9 @@ static void panel_slider_cb(widget_t *w, void *data, int pos) {
 
   if(w == panel->slider_play) {
     gui_set_current_position (pos);
-    if(xine_get_status(gGui->xine) != XINE_PLAY)
-      slider_reset(panel->widget_list, panel->slider_play);
+    if(xine_get_status(gGui->xine) != XINE_PLAY) {
+      panel_reset_slider();
+    }
   }
   else if(w == panel->slider_mixer) {
     // TODO
@@ -446,7 +451,7 @@ void panel_init (void) {
   /* Check and place some extra images on GUI */
   gui_place_extra_images(panel->widget_list);
 
-  //PREV-BUTTON
+  /*  Prev button */
   b.x        = gui_get_skinX("Prev");
   b.y        = gui_get_skinY("Prev");
   b.callback = gui_nextprev;
@@ -454,7 +459,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("Prev");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  //STOP-BUTTON
+  /*  Stop button */
   b.x        = gui_get_skinX("Stop");
   b.y        = gui_get_skinY("Stop");
   b.callback = gui_stop;
@@ -462,7 +467,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("Stop");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
   
-  //PLAY-BUTTON
+  /*  Play button */
   b.x        = gui_get_skinX("Play");
   b.y        = gui_get_skinY("Play");
   b.callback = gui_play;
@@ -470,7 +475,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("Play");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  // PAUSE-BUTTON
+  /*  Pause button */
   cb.x        = gui_get_skinX("Pause");
   cb.y        = gui_get_skinY("Pause");
   cb.callback = gui_pause;
@@ -480,7 +485,7 @@ void panel_init (void) {
 			   (panel->checkbox_pause = 
 			    checkbox_create (&cb)));
   
-  // NEXT-BUTTON
+  /*  Next button */
   b.x        = gui_get_skinX("Next");
   b.y        = gui_get_skinY("Next");
   b.callback = gui_nextprev;
@@ -488,7 +493,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("Next");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  //Eject Button
+  /*  Eject button */
   b.x        = gui_get_skinX("Eject");
   b.y        = gui_get_skinY("Eject");
   b.callback = gui_eject;
@@ -496,7 +501,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("Eject");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  // EXIT-BUTTON
+  /*  Exit button */
   b.x        = gui_get_skinX("Exit");
   b.y        = gui_get_skinY("Exit");
   b.callback = gui_exit;
@@ -504,7 +509,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("Exit");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  // Close-BUTTON
+  /*  Close button */
   b.x        = gui_get_skinX("Close");
   b.y        = gui_get_skinY("Close");
   b.callback = panel_toggle_visibility;
@@ -512,7 +517,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("Close");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  // Fullscreen-BUTTON
+  /*  Fullscreen button */
   b.x        = gui_get_skinX("FullScreen");
   b.y        = gui_get_skinY("FullScreen");
   b.callback = gui_toggle_fullscreen;
@@ -520,7 +525,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("FullScreen");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  // Next audio channel
+  /*  Next audio channel */
   b.x        = gui_get_skinX("AudioNext");
   b.y        = gui_get_skinY("AudioNext");
   b.callback = gui_change_audio_channel;
@@ -528,7 +533,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("AudioNext");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  // Prev audio channel
+  /*  Prev audio channel */
   b.x        = gui_get_skinX("AudioPrev");
   b.y        = gui_get_skinY("AudioPrev");
   b.callback = gui_change_audio_channel;
@@ -536,14 +541,15 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("AudioPrev");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  // Prev spuid
+  /*  Prev spuid */
   b.x        = gui_get_skinX("SpuNext");
   b.y        = gui_get_skinY("SpuNext");
   b.callback = gui_change_spu_channel;
   b.userdata = (void *)GUI_NEXT;
   b.skin     = gui_get_skinfile("SpuNext");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
-  // Next spuid
+
+  /*  Next spuid */
   b.x        = gui_get_skinX("SpuPrev");
   b.y        = gui_get_skinY("SpuPrev");
   b.callback = gui_change_spu_channel;
@@ -551,7 +557,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("SpuPrev");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
-  /* LABEL TITLE */
+  /*  Label title */
   lbl.x         = gui_get_skinX("TitleLabel");
   lbl.y         = gui_get_skinY("TitleLabel");
   lbl.length    = gui_get_label_length("TitleLabel");
@@ -561,7 +567,7 @@ void panel_init (void) {
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->title_label = label_create (&lbl)));
 
-  /* runtime label */
+  /*  Runtime label */
   lbl.x         = gui_get_skinX("TimeLabel");
   lbl.y         = gui_get_skinY("TimeLabel");
   lbl.length    = gui_get_label_length("TimeLabel");
@@ -571,7 +577,7 @@ void panel_init (void) {
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->runtime_label = label_create (&lbl)));
 
-  /* Audio channel label */
+  /*  Audio channel label */
   lbl.x         = gui_get_skinX("AudioLabel");
   lbl.y         = gui_get_skinY("AudioLabel");
   lbl.length    = gui_get_label_length("AudioLabel");
@@ -581,7 +587,7 @@ void panel_init (void) {
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->audiochan_label = label_create (&lbl)));
 
-  /* Spuid label */
+  /*  Spuid label */
   lbl.x         = gui_get_skinX("SpuLabel");
   lbl.y         = gui_get_skinY("SpuLabel");
   lbl.length    = gui_get_label_length("SpuLabel");
@@ -591,7 +597,7 @@ void panel_init (void) {
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->spuid_label = label_create (&lbl)));
 
-  /* SLIDERS */
+  /*  slider seek */
   sl.x               = gui_get_skinX("SliderBGPlay");
   sl.y               = gui_get_skinY("SliderBGPlay");
   sl.slider_type     = HSLIDER;
@@ -624,6 +630,23 @@ void panel_init (void) {
 			   (panel->slider_mixer = slider_create(&sl)));
   */
 
+  /*  Playback speed slow */
+  b.x        = gui_get_skinX("PlaySlow");
+  b.y        = gui_get_skinY("PlaySlow");
+  b.callback = gui_change_speed_playback;
+  b.userdata = (void *)GUI_NEXT;
+  b.skin     = gui_get_skinfile("PlaySlow");
+  gui_list_append_content(panel->widget_list->l, button_create(&b));
+
+  /*  Playback speed fast */
+  b.x        = gui_get_skinX("PlayFast");
+  b.y        = gui_get_skinY("PlayFast");
+  b.callback = gui_change_speed_playback;
+  b.userdata = (void *)GUI_PREV;
+  b.skin     = gui_get_skinfile("PlayFast");
+  gui_list_append_content(panel->widget_list->l, button_create(&b));
+
+  /*  Playlist button */
   b.x        = gui_get_skinX("PlBtn");
   b.y        = gui_get_skinY("PlBtn");
   b.callback = gui_playlist_show;
@@ -631,6 +654,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("PlBtn");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
   
+  /*  Control button */
   b.x        = gui_get_skinX("CtlBtn");
   b.y        = gui_get_skinY("CtlBtn");
   b.callback = gui_control_show;
@@ -638,6 +662,7 @@ void panel_init (void) {
   b.skin     = gui_get_skinfile("CtlBtn");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
+  /*  Mrl button */
   b.x        = gui_get_skinX("MrlBtn");
   b.y        = gui_get_skinY("MrlBtn");
   b.callback = gui_mrlbrowser_show;

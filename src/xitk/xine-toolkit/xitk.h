@@ -846,6 +846,13 @@ typedef struct {
   struct {
     int                      x;
     int                      y;
+    char                    *skin_filename;
+    xitk_mrl_callback_t      callback;
+  } play;
+
+  struct {
+    int                      x;
+    int                      y;
     char                    *caption;
     char                    *skin_filename;
     char                    *normal_color;

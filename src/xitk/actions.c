@@ -160,6 +160,7 @@ void gui_eject(widget_t *w, void *data) {
 }
 
 void gui_toggle_visibility(widget_t *w, void *data) {
+
   if(panel_is_visible()) {
     video_window_set_visibility(!(video_window_is_visible()));
     
@@ -185,23 +186,30 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
   }
   
   if (panel_is_visible())  {
-    pl_raise_window();
-    control_raise_window();
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
   }
 
-  /* workaround for Enlightenment: need to re-map for reparenting */
+  /*
+   * workaround for Enlightenment: need to re-map for reparenting 
+   */
   if (panel_is_visible()) {
     panel_toggle_visibility(NULL, NULL);
     panel_toggle_visibility(NULL, NULL);
   }
-  
+
   if(mrl_browser_is_visible()) {
     show_mrl_browser();
     set_mrl_browser_transient();
   }
+
+  if(pl_is_visible())
+    pl_raise_window();
+  
+  if(control_is_visible())
+    control_raise_window();
+  
 }
 
 void gui_toggle_aspect(void) {
@@ -267,6 +275,22 @@ void gui_change_spu_channel(widget_t *w, void *data) {
 
   panel_update_channel_display ();
   
+}
+
+void gui_change_speed_playback(widget_t *w, void *data) {
+
+  if(((int)data) == GUI_NEXT) {
+    if (xine_get_speed (gGui->xine) > SPEED_PAUSE)
+      xine_set_speed (gGui->xine, xine_get_speed (gGui->xine)/2);
+  }
+  else if(((int)data) == GUI_PREV) {
+    if (xine_get_speed (gGui->xine) < SPEED_FAST_4) {
+      if (xine_get_speed (gGui->xine) > SPEED_PAUSE)
+	xine_set_speed (gGui->xine, xine_get_speed (gGui->xine)*2);
+      else
+	xine_set_speed (gGui->xine, SPEED_SLOW_4);
+    }
+  }
 }
 
 void gui_set_current_position (int pos) {
@@ -343,8 +367,12 @@ void gui_playlist_show(widget_t *w, void *data) {
     playlist_editor();
   }
   else {
-    pl_exit(NULL, NULL);
+    if(pl_is_visible())
+      pl_exit(NULL, NULL);
+    else
+      pl_toggle_visibility(NULL, NULL);
   }
+
 }
 
 void gui_mrlbrowser_show(widget_t *w, void *data) {

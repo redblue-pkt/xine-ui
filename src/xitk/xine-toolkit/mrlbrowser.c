@@ -457,7 +457,7 @@ void mrlbrowser_exit(widget_t *w, void *data) {
  * 
  */
 static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
-				  int j) {
+				  int j, int do_callback) {
   mrl_t *ms = private_data->mc->mrls[j];
   char   buf[PATH_MAX + NAME_MAX + 1];
   
@@ -521,7 +521,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
   else {
     
     browser_release_all_buttons(private_data->mrlb_list);
-    if(private_data->add_callback)
+    if(do_callback && private_data->add_callback)
       private_data->add_callback(NULL, (void *) j, 
 				 private_data->mc->mrls[j]);
 
@@ -536,7 +536,23 @@ static void mrlbrowser_select(widget_t *w, void *data) {
   int j = -1;
 
   if((j = browser_get_current_selected(private_data->mrlb_list)) >= 0) {
-    mrlbrowser_select_mrl(private_data, j);
+    mrlbrowser_select_mrl(private_data, j, 1);
+  }
+}
+
+/*
+ * Handle selection in mrlbrowser, then 
+ */
+static void mrlbrowser_play(widget_t *w, void *data) {
+
+  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+  int j = -1;
+  
+  if(private_data->play_callback && 
+     ((j = browser_get_current_selected(private_data->mrlb_list)) >= 0)) {
+    
+    mrlbrowser_select_mrl(private_data, j, 0);
+    private_data->play_callback(NULL, (void *) j, private_data->mc->mrls[j]);
   }
 }
 
@@ -546,7 +562,7 @@ static void mrlbrowser_select(widget_t *w, void *data) {
 static void handle_dbl_click(widget_t *w, void *data, int selected) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
 
-  mrlbrowser_select_mrl(private_data, selected);
+  mrlbrowser_select_mrl(private_data, selected, 1);
 }
 
 /*
@@ -576,9 +592,14 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     
     switch (mykey) {
       
+    case XK_space:
     case XK_s:
     case XK_S:
       mrlbrowser_select(NULL, (void *)private_data);
+      break;
+
+    case XK_Return:
+      mrlbrowser_play(NULL, (void *)private_data);
       break;
       
       /* This is for debugging purpose */
@@ -620,6 +641,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   widget_t                  *mywidget;
   mrlbrowser_private_data_t *private_data;
   xitk_labelbutton_t         lb;
+  xitk_button_t              pb;
   xitk_label_t               lbl;
   
   if(mb->ip_availables == NULL) {
@@ -761,6 +783,17 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   gui_list_append_content(private_data->widget_list->l,
 			  label_button_create (&lb));
 
+  pb.display        = mb->display;
+  pb.imlibdata      = mb->imlibdata;
+  pb.x              = mb->play.x;
+  pb.y              = mb->play.y;
+  pb.callback       = mrlbrowser_play;
+  pb.userdata       = (void *)private_data;
+  pb.skin           = mb->play.skin_filename;
+
+  gui_list_append_content(private_data->widget_list->l,
+			  button_create (&pb));
+
   lb.display        = mb->display;
   lb.imlibdata      = mb->imlibdata;
   lb.x              = mb->dismiss.x;
@@ -780,6 +813,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
 			  label_button_create (&lb));
   
   private_data->add_callback      = mb->select.callback;
+  private_data->play_callback     = mb->play.callback;
   private_data->kill_callback     = mb->kill.callback;
   mb->browser.dbl_click_callback  = handle_dbl_click;
   mb->browser.dbl_click_time      = DEFAULT_DBL_CLICK_TIME;

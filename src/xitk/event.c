@@ -335,10 +335,8 @@ void gui_handle_event (XEvent *event, void *data) {
 
     /* printf ("button: %d\n",bevent->button); */
 
-    if ((bevent->button==3) && (bevent->window == gGui->video_window)) {
+    if ((bevent->button==3) && (bevent->window == gGui->video_window))
       panel_toggle_visibility (NULL, NULL);
-      break;
-    }
     
   }
   break;
@@ -399,7 +397,8 @@ void gui_handle_event (XEvent *event, void *data) {
 
     case XK_c:
     case XK_C:
-      gui_control_show(NULL, NULL);
+      if(modifier & MODIFIER_META)
+	gui_control_show(NULL, NULL);
       break;
 
     case XK_h:
@@ -418,9 +417,15 @@ void gui_handle_event (XEvent *event, void *data) {
       break;
       
     case XK_space:
+      gui_pause (NULL, (void*)(1), 0); 
+      break;
+
     case XK_P:
     case XK_p:
-      gui_pause (NULL, (void*)(1), 0); 
+      if(modifier & MODIFIER_META)
+	gui_playlist_show(NULL, NULL);
+      else
+	gui_pause (NULL, (void*)(1), 0); 
       break;
       
     case XK_g:
@@ -446,11 +451,6 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_q:
     case XK_Q:
       gui_exit(NULL, NULL);
-      break;
-
-    case XK_b:
-    case XK_B:
-      gui_mrlbrowser_show(NULL, NULL);
       break;
 
     case XK_Return:
@@ -526,39 +526,38 @@ void gui_handle_event (XEvent *event, void *data) {
 	gui_seek_relative (-60);
       else
 	gui_seek_relative (-15);
-
       break;
+
     case XK_Right:
       if(modifier & MODIFIER_CTRL) 
 	gui_seek_relative (60);
       else
 	gui_seek_relative (15);
-
       break;
 
     case XK_n:
     case XK_N:
       xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) - 3600);
       break;
+
     case XK_m:
     case XK_M:
-      xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) + 3600);
+      if(modifier & MODIFIER_META)
+	gui_mrlbrowser_show(NULL, NULL);
+      else
+	xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) + 3600);
       break;
+
     case XK_Home:
       xine_set_av_offset (gGui->xine, 0);
       break;
 
     case XK_Up:
-      if (xine_get_speed (gGui->xine) < SPEED_FAST_4) {
-	if (xine_get_speed (gGui->xine) > SPEED_PAUSE)
-	  xine_set_speed (gGui->xine, xine_get_speed (gGui->xine)*2);
-	else
-	  xine_set_speed (gGui->xine, SPEED_SLOW_4);
-      }
+      gui_change_speed_playback(NULL, (void*)GUI_PREV);
       break;
+
     case XK_Down:
-      if (xine_get_speed (gGui->xine) > SPEED_PAUSE)
-	xine_set_speed (gGui->xine, xine_get_speed (gGui->xine)/2);
+      gui_change_speed_playback(NULL, (void*)GUI_NEXT);
       break;
       
     }
@@ -584,10 +583,9 @@ void gui_handle_event (XEvent *event, void *data) {
     break;
 
   case ClientMessage:
-
     dnd_process_client_message (&gGui->xdnd, event);
-
     break;
+
     /*
       default:
       printf("Got event: %i\n", event->type);

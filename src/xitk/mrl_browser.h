@@ -34,7 +34,7 @@
 
 typedef void (*select_cb_t) (widget_t *, void *);
 
-void mrl_browser(xitk_mrl_callback_t add_cb,
+void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb,
 		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb);
 void open_mrlbrowser(widget_t *w, void *data);
 void destroy_mrl_browser(void);
