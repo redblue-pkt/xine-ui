@@ -47,7 +47,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-       
+#include <dlfcn.h>
+
 #include <xine.h>
 #include <xine/xineutils.h>
 
@@ -92,7 +93,8 @@ typedef struct {
   int                  debug_messages;
 } aaxine_t;
 
-static aaxine_t aaxine;
+static aaxine_t  aaxine;
+void            *xlib_handle = NULL;
 
 #define CONFIGFILE "config2"
 
@@ -440,6 +442,10 @@ static void aaxine_event_listener(void *user_data, const xine_event_t *event) {
   }
 }
 
+static void aaxine_resize_handler(aa_context *context) {
+  aa_resize(context);
+}
+
 /*
  * Seek in current stream.
  */
@@ -450,7 +456,7 @@ static void set_position (int pos) {
 /*
  * Extract mrls from argv[] and store them to playlist.
  */
-void extract_mrls(int num_mrls, char **mrls) {
+static void extract_mrls(int num_mrls, char **mrls) {
   int i;
 
   for(i = 0; i < num_mrls; i++)
@@ -459,6 +465,21 @@ void extract_mrls(int num_mrls, char **mrls) {
   aaxine.num_mrls = num_mrls;
   aaxine.current_mrl = 0;
 
+}
+
+static void xinit_thread(void) {
+   int    (*x_init_threads)(void);
+
+   (void *) dlerror();
+   if((xlib_handle = dlopen("libX11.so", RTLD_LAZY)) != NULL) {
+     
+     if((x_init_threads = dlsym(xlib_handle, "XInitThreads")) != NULL)
+       x_init_threads();
+     else
+       printf("dlsym() failed: %s\n", dlerror());
+   }
+   else
+     printf("dlopen() failed: %s\n", dlerror());
 }
 
 /*
@@ -596,6 +617,12 @@ int main(int argc, char *argv[]) {
   }
 
   /*
+   * If X is running, init X thread support (avoid async errors)
+   */
+  if(getenv("DISPLAY"))
+    xinit_thread();
+  
+  /*
    * Initialize AALib
    */
   aaxine.context = aa_autoinit(&aa_defparams);
@@ -616,7 +643,7 @@ int main(int argc, char *argv[]) {
   }
   
   aa_hidecursor(aaxine.context);
-
+  aa_resizehandler(aaxine.context, aaxine_resize_handler);
   /*
    * init video output driver
    */
@@ -702,7 +729,8 @@ int main(int argc, char *argv[]) {
   aaxine.event_queue = xine_event_new_queue(aaxine.stream);
   xine_event_create_listener_thread(aaxine.event_queue, aaxine_event_listener, NULL);
 
-  aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0);
+  if(!aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0))
+    goto failure;
 
   /*
    * ui loop
@@ -724,8 +752,10 @@ int main(int argc, char *argv[]) {
       aaxine.ignore_next = 1;
       xine_stop(aaxine.stream);
       aaxine.current_mrl--;
-      if((aaxine.current_mrl >= 0) && (aaxine.current_mrl < aaxine.num_mrls))
-	(void) aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0);
+      if((aaxine.current_mrl >= 0) && (aaxine.current_mrl < aaxine.num_mrls)) {
+	if(!aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0))
+	  goto failure;
+      }
       else {
 	aaxine.current_mrl = 0;
 	aaxine_play_logo();
@@ -775,7 +805,8 @@ int main(int argc, char *argv[]) {
     case 13:
     case 'r':
     case 'R':
-      (void) aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0);
+      if(!aaxine_xine_open_and_play(aaxine.mrl[aaxine.current_mrl], 0, 0))
+	goto failure;
       break;
 
     case ' ':
@@ -885,6 +916,9 @@ int main(int argc, char *argv[]) {
     aa_close(aaxine.context);
   }
   
+  if(xlib_handle)
+    dlclose(xlib_handle);
+
   if(aaxine.configfile)
     free(aaxine.configfile);
 
