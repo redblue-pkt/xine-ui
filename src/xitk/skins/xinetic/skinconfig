@@ -667,7 +667,7 @@ skin.MrlItemBtn {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = -*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
