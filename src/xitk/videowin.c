@@ -650,6 +650,68 @@ void video_window_init (void) {
 
 
 /*
+ * Translate screen coordinates to video coordinates
+ */
+static int video_window_translate_point(int gui_x, int gui_y,
+					int *video_x, int *video_y)
+{
+  x11_rectangle_t rect;
+  int xwin, ywin;
+  unsigned int wwin, hwin, bwin, dwin;
+  float xf,yf;
+  float scale, width_scale, height_scale,aspect;
+  Window rootwin;
+
+  rect.x = gui_x;
+  rect.y = gui_y;
+  rect.w = 0;
+  rect.h = 0;
+
+  if (gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
+					  GUI_DATA_EX_TRANSLATE_GUI_TO_VIDEO, 
+					  (void*)&rect) != -1) {
+    /* driver implements gui->video coordinate space translation, use it */
+    *video_x = rect.x;
+    *video_y = rect.y;
+    return 1;
+  }
+
+  /* Driver cannot convert gui->video space, fall back to old code... */
+
+  if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
+		  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) == BadDrawable)
+    return 0;
+
+  /* Scale co-ordinate to image dimensions. */
+  height_scale=(float)gVw->video_height/(float)hwin;
+  width_scale=(float)gVw->video_width/(float)wwin;
+  aspect=(float)gVw->video_width/(float)gVw->video_height;
+  if (((float)wwin/(float)hwin)<aspect) {
+    scale=width_scale;
+    xf=(float)gui_x * scale;
+    yf=(float)gui_y * scale;
+    //wwin=wwin * scale;
+    hwin=hwin * scale;
+    /* FIXME: The 1.25 should really come from the NAV packets. */
+    *video_x=xf * 1.25 / aspect;
+    *video_y=yf-((hwin-gVw->video_height)/2);
+    /* printf("wscale:a=%f, s=%f, x=%d, y=%d\n",aspect, scale,*video_x,*video_y);  */
+  } else {
+    scale=height_scale;
+    xf=(float)gui_x * scale;
+    yf=(float)gui_y * scale;
+    wwin=wwin * scale;
+    /* FIXME: The 1.25 should really come from the NAV packets. */
+    *video_x=(xf-((wwin-gVw->video_width)/2)) * 1.25 / aspect;
+    *video_y=yf;
+    /* printf("hscale:a=%f s=%f x=%d, y=%d\n",aspect,scale,*video_x,*video_y);  */
+  }
+
+  return 1;
+}
+
+
+/*
  *
  */
 static void video_window_handle_event (XEvent *event, void *data) {
@@ -669,11 +731,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
   case MotionNotify: {
     XMotionEvent *mevent = (XMotionEvent *) event;
     mouse_event_t xine_event;
-    int xwin, ywin;
-    unsigned int wwin, hwin, bwin, dwin;
-    float xf,yf;
-    float scale, width_scale, height_scale,aspect;
-    Window rootwin;
+    int x, y;
 
     /* printf("Mouse event:mx=%d my=%d\n",mevent->x, mevent->y); */
     
@@ -682,38 +740,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
       video_window_set_cursor_visibility(gGui->cursor_visible);
     }
 
-    if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
-		    &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+    if (video_window_translate_point(mevent->x, mevent->y, &x, &y)) {
       xine_event.event.type = XINE_MOUSE_EVENT;
       xine_event.button = 0; /*  No buttons, just motion. */
-      /* Scale co-ordinate to image dimensions. */
-      height_scale=(float)gVw->video_height/(float)hwin;
-      width_scale=(float)gVw->video_width/(float)wwin;
-      aspect=(float)gVw->video_width/(float)gVw->video_height;
-      if (((float)wwin/(float)hwin)<((float)gVw->video_width/(float)gVw->video_height)) {
-        scale=width_scale;
-        xf=(float)mevent->x * scale;
-        yf=(float)mevent->y * scale;
-        //wwin=wwin * scale;
-        hwin=hwin * scale;
-        /* FIXME: The 1.25 should really come from the NAV packets. */
-        xine_event.x=xf * 1.25 / aspect;
-        xine_event.y=yf-((hwin-gVw->video_height)/2);
-        /* printf("wscale:a=%f, s=%f, x=%d, y=%d\n",aspect, scale,xine_event.x,xine_event.y);  */
-      } else {
-        scale=height_scale;
-        xf=(float)mevent->x * scale;
-        yf=(float)mevent->y * scale;
-        wwin=wwin * scale;
-        /* FIXME: The 1.25 should really come from the NAV packets. */
-        xine_event.x=(xf-((wwin-gVw->video_width)/2)) * 1.25 / aspect;
-        xine_event.y=yf;
-        /* printf("hscale:a=%f s=%f x=%d, y=%d\n",aspect,scale,xine_event.x,xine_event.y);  */
-      }
-      //xf = (float)mevent->x / (float)wwin;
-      //yf = (float)mevent->y / (float)hwin;
-      //xine_event.x = (uint16_t)( xf * gVw->video_width ); 
-      //xine_event.y = (uint16_t)( yf * gVw->video_height );
+      xine_event.x = x;
+      xine_event.y = y;
       xine_send_event(gGui->xine, (event_t*)(&xine_event), NULL);
     }
   }
@@ -722,11 +753,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
     mouse_event_t xine_event;
-    int xwin, ywin;
-    unsigned int wwin, hwin, bwin, dwin;
-    float xf,yf;
-    float scale, width_scale, height_scale,aspect;
-    Window rootwin;
+    int x, y;
 
     if(!gGui->cursor_visible) {
       gGui->cursor_visible = !gGui->cursor_visible;
@@ -737,33 +764,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
       panel_toggle_visibility(NULL, NULL);
 
     if (bevent->button == Button1) {
-      if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
-		      &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+      if (video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
 	xine_event.event.type = XINE_MOUSE_EVENT;
 	xine_event.button = 1;
-	/* Scale co-ordinate to image dimensions. */
-        height_scale=(float)gVw->video_height/(float)hwin;
-        width_scale=(float)gVw->video_width/(float)wwin;
-        aspect=(float)gVw->video_width/(float)gVw->video_height;
-        if (((float)wwin/(float)hwin)<((float)gVw->video_width/(float)gVw->video_height)) {
-          scale=width_scale;
-          xf=(float)bevent->x * scale;
-          yf=(float)bevent->y * scale;
-          hwin=hwin * scale;
-          /* FIXME: The 1.25 should really come from the NAV packets. */
-          xine_event.x=xf * 1.25 / aspect;
-          xine_event.y=yf-((hwin-gVw->video_height)/2);
-          /* printf("wscale:a=%f, s=%f, x=%d, y=%d\n",aspect, scale,xine_event.x,xine_event.y);  */
-        } else {
-          scale=height_scale;
-          xf=(float)bevent->x * scale ;
-          yf=(float)bevent->y * scale;
-          wwin=wwin * scale;
-          /* FIXME: The 1.25 should really come from the NAV packets. */
-          xine_event.x=(xf-((wwin-gVw->video_width)/2)) * 1.25 / aspect;
-          xine_event.y=yf;
-          /* printf("hscale:a=%f s=%f x=%d, y=%d\n",aspect,scale,xine_event.x,xine_event.y);  */
-        }
+	xine_event.x = x;
+	xine_event.y = y;
 	xine_send_event(gGui->xine, (event_t*)(&xine_event), NULL);
       }
     }
