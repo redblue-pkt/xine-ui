@@ -59,13 +59,13 @@ aclocalinclude="$ACLOCAL_FLAGS"; \
     libtoolize --force --copy >/dev/null 2>&1; \
  echo "done.") && \
 (echo $_echo_n " + Running autoheader: $_echo_c"; \
-    autoheader; \
+    autoheader >/dev/null 2>&1; \
  echo "done.") && \
 (echo $_echo_n " + Running automake: $_echo_c"; \
-    automake --gnu --add-missing --copy; \
+    automake --gnu --add-missing  --copy >/dev/null 2>&1; \
  echo "done.") && \
 (echo $_echo_n " + Running autoconf: $_echo_c"; \
-    autoconf; \
+    autoconf >/dev/null 2>&1; \
  echo "done.")
 
 rm -f config.cache
