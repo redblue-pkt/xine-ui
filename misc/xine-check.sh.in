@@ -139,7 +139,7 @@ confirm() {
 # usage: getmessage <id>
 # where <id> is the message id
 # this function will set
-# $short       = short (<70 char> message>
+# $short       = short (<70 char) message
 # $description = verbose description of the issue, including any instructions
 getmessage(){
     id="$1"
@@ -152,7 +152,7 @@ getmessage(){
     cat $messagefile | while read line; do
 	if $found; then
 	  if test -n "$line"; then
-	    eval "echo \"$indent$line\" >>$tmpfile"
+	    eval "echo \"$line\" |sed -e \"s/^/$indent/\" >>$tmpfile"
 	  else
 	    found=false #end of description
 	fi
@@ -367,7 +367,7 @@ vars UNAME OS ARCH DISTRO
 
 if test -f /etc/debian_version; then
   DISTRO=Debian
-  DEBIAN_VERSION="`cat /etc/version`"
+  DEBIAN_VERSION="`cat /etc/debian_version`"
   vars DEBIAN_VERSION
 fi
 if test -f /etc/redhat-release; then
@@ -508,7 +508,7 @@ else
     if [ "$xine_executable" = "/usr/bin/xine" ]; then
        xine_prefix=/usr
        plugindir=/usr/lib/xine/plugins
-       skindir=/usr/share/xine
+       skindir=/usr/share/xine/skins
        case "$DISTRO" in
 	 Debian)
 	    msg assuming-xine-package-deb 1
@@ -520,8 +520,9 @@ else
 	    msg assuming-xine-package 1
 	    ;;
        esac
+    else
+      msg no-xine-config 2
     fi
-    msg no-xine-config 2
   fi
 fi
 
@@ -598,7 +599,7 @@ if test -n "$skindir"; then
     if test -d "$skindir"; then
       msg skindir-exists
       cd $skindir
-      if test -f xine_logo.png; then
+      if test -f xine_logo.mpg; then
         msg logo-exists
       else
         msg no-xine-logo 2
