@@ -183,11 +183,17 @@
 * WHAT IS ON THE TODO LIST?
 
   + YUY2 and RGB support (currently only YV12)
+    [status: progressing]
+  
   + check if the video source is not too big in terms of  dimensions for
     the video memory left (video memory - X reserved video memory)
+    
   + zooming support (currently only implemented with the Xv video out)
+    [status: implemented, being tested - soon to appear on CVS]
+    
   + patching the syncfb kernel module itself for devfs and the  recently
     introduced license tag support
+    
   + updating the documentation
   
   + bug fixes
