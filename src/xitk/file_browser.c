@@ -81,21 +81,23 @@ typedef struct {
 } filebrowser_filter_t;
 
 static filebrowser_filter_t __fb_filters[] = {
-  { NULL                  , "*"                   },
-  { NULL                  , "pls,m3u,sfv,tox,asx" }, /* playlists */
-  { "*.vob"               , "vob"                 }, /* mpeg block */
-  { "*.mpv"               , "mpv"                 }, /* elementary */
-  { "*.mpg, *.mpeg, *.mpe", "mpg,mpeg,mpe"        }, /* mpeg */
-  { "*.avi"               , "avi"                 }, /* avi */
-  { "*.mp3"               , "mp3"                 }, /* mp3 */
-  { "*.asf, *.wmv"        , "asf,wmv"             }, /* asf */
-  { "*.cpk, *.cak, *.film", "cpk,cak,film"        }, /* film */
-  { "*.ogg"               , "ogg"                 }, /* ogg */
-  { "*.vdr"               , "vdr"                 }, /* pes */
-  { "*.mov, *.mp4, *.qt"  , "mov,mp4,qt"          }, /* QT */
-  { "*.roq"               , "roq"                 }, /* roq */
-  { "*.m2t, *.ts, *.trp"  , "m2t,ts,trp"          }, /* ts */
-  { NULL                  , NULL                  }
+  { NULL                  , "*"                        },
+  { NULL                  , "pls,m3u,sfv,tox,asx,smil" }, /* playlists */
+  { "*.vob"               , "vob"                      }, /* mpeg block */
+  { "*.mpv"               , "mpv"                      }, /* elementary */
+  { "*.mpg, *.mpeg, *.mpe", "mpg,mpeg,mpe"             }, /* mpeg */
+  { "*.avi"               , "avi"                      }, /* avi */
+  { "*.mp3"               , "mp3"                      }, /* mp3 */
+  { "*.asf, *.wma, *.wmv" , "asf,wma,wmv"              }, /* asf */
+  { "*.cpk, *.cak, *.film", "cpk,cak,film"             }, /* film */
+  { "*.ogg"               , "ogg"                      }, /* ogg */
+  { "*.vdr"               , "vdr"                      }, /* pes */
+  { "*.mov, *.mp4, *.qt"  , "mov,mp4,qt"               }, /* QT */
+  { "*.rm"                , "rm"                       }, /* rm */
+  { "*.roq"               , "roq"                      }, /* roq */
+  { "*.m2t, *.ts, *.trp"  , "m2t,ts,trp"               }, /* ts */
+  { "*.dv"                , "dv"                       }, /* dv */
+  { NULL                  , NULL                       }
 };
 
 typedef struct {
