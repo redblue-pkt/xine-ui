@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
       sprintf(configfile, "%s/%s", (xine_get_homedir()), cfgfile);
     }
   }
-  dfbxine.config = config_file_init (configfile);
+  dfbxine.config = xine_config_file_init (configfile);
 
 
   if(!init_dfb()) {
