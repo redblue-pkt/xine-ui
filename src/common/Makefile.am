@@ -1,4 +1,8 @@
-EXTRA_DIST = \
+noinst_LTLIBRARIES = libcommon.la
+
+AM_CFLAGS = @XINE_CFLAGS@
+
+libcommon_la_SOURCES = \
 	getopt.c \
 	getopt1.c \
 	getopt.h \

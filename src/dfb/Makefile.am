@@ -10,15 +10,15 @@ if HAVE_DIRECTFB
 dfb_programs = dfbxine
 endif
 
-if HAVE_GETOPT_LONG
-else
-GETOPT_C = \
-	$(top_srcdir)/src/common/getopt.c \
-	$(top_srcdir)/src/common/getopt1.c
-
-GETOPT_H = \
- 	$(top_srcdir)/src/common/getopt.h
-endif
+#if HAVE_GETOPT_LONG
+#else
+#GETOPT_C = \
+#	$(top_srcdir)/src/common/getopt.c \
+#	$(top_srcdir)/src/common/getopt1.c
+#
+#GETOPT_H = \
+# 	$(top_srcdir)/src/common/getopt.h
+#endif
 
 bin_PROGRAMS = ${dfb_programs} 
 
@@ -27,14 +27,13 @@ fontdir = $(datadir)/xine/fonts/
 font_DATA = $(fontandpointers)
 endif
 
-dfbxine_SOURCES = $(GETOPT_C) \
-	$(top_srcdir)/src/common/utils.c \
-	options.c \
+dfbxine_DEPENDENCIES = $(topbuilddir)/src/common/libcommon.la
+dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm $(topbuilddir)/src/common/libcommon.la
+dfbxine_SOURCES = options.c \
 	dfb.c \
 	main.c
 
-dfbxine_DEPENDENTIES = utils.h
-dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm
+
 
 noinst_HEADERS = dfb.h
 
@@ -51,4 +50,3 @@ maintainer-clean-generic:
 	-@echo "This command is intended for maintainers to use;"
 	-@echo "it deletes files that may require special tools to rebuild."
 	-rm -f Makefile.in
-	-rm -f utils.c

@@ -4,21 +4,25 @@ AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ -I$(top_srcdir)/src/xitk
 
 EXTRA_DIST = file_browser.c file_browser.h
 
-if HAVE_TERMCAP
-remote = xine-remote
-endif
+#if HAVE_TERMCAP
+#remote = xine-remote
+#endif
+remote=
 
 bin_PROGRAMS = xine $(remote)
 
-if HAVE_GETOPT_LONG
-else
-GETOPT_C = getopt.c getopt1.c
-GETOPT_H = getopt.h
-endif
+
+#COMMON_DIR = $(top_srcdir)/src/common
+
+#if HAVE_GETOPT_LONG
+#else
+#GETOPT_C = $(COMMON_DIR)/getopt.c \
+#	   $(COMMON_DIR)/getopt1.c
+#GETOPT_H = $(COMMON_DIR)/getopt.h
+#endif
 
 ## xscreensaver-remote.c
 xine_SOURCES = \
-	$(GETOPT_C) \
 	actions.c \
 	config_wrapper.c \
 	control.c \
@@ -34,7 +38,6 @@ xine_SOURCES = \
 	setup.c \
 	skins.c \
 	snapshot.c \
-	utils.c \
 	panel.c \
 	playlist.c \
 	mediamark.c \
@@ -42,18 +45,19 @@ xine_SOURCES = \
 	videowin.c \
 	viewlog.c
 
-xine_DEPENDENTIES = utils.h monitor.h 
+xine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
 # double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
-xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
-	$(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
-	$(X_LIBS) $(XTEST_LIBS) -lX11 -lm
+xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
+	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
+	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
+	     $(X_LIBS) $(XTEST_LIBS) -lX11 -lm
 
-xine_remote_SOURCES = $(GETOPT_C) xine-remote.c
-xine_remote_DEPENDENTIES = xine-remote.c
-xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) $(top_builddir)/readline/libreadline.la $(TERMCAP_LIB)
+# DISABLED CORBA SUPPORT: Must port to new API
+#xine_remote_SOURCES = $(GETOPT_C)
+#xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la
+#xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) $(top_builddir)/readline/libreadline.la $(TERMCAP_LIB)
 
 noinst_HEADERS = \
-	$(GETOPT_H) \
 	common.h \
 	actions.h \
 	config_wrapper.h \
@@ -77,35 +81,17 @@ noinst_HEADERS = \
 	videowin.h \
 	viewlog.h
 
+# Use this instead of the rule below
+#xine_remote_CFLAGS = -DNETWORK_CLIENT
 
-$(top_builddir)/readline/libreadline.la:
-	@cd $(top_builddir)/readline && $(MAKE) libreadline.la
-
-xine-remote.c:	$(srcdir)/network.c
-	$(LN_S) $(srcdir)/network.c ./xine-remote.c
-
-xine-remote.o: xine-remote.c
-	$(COMPILE) -DNETWORK_CLIENT -c `test -f $< || echo '$(srcdir)/'`$<
-##	@$(MAKE) CFLAGS="$(CFLAGS)  
-
-utils.c:
-	$(LN_S) $(top_srcdir)/src/common/utils.c ./utils.c
-
-monitor.c:
-	$(LN_S) $(top_srcdir)/src/common/monitor.c ./monitor.c
+# Old rule
+#xine-remote.o: xine-remote.c
+#	$(COMPILE) -DNETWORK_CLIENT -c `test -f $< || echo '$(srcdir)/'`$<
 
 ##xscreensaver-remote.c:
 ##	$(LN_S) $(top_srcdir)/src/common/xscreensaver-remote.c \
 ##	./xscreensaver-remote.c
 
-getopt.c:
-	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c
-
-getopt1.c:
-	$(LN_S) $(top_srcdir)/src/common/getopt1.c ./getopt1.c
-
-getopt.h:
-	$(LN_S) $(top_srcdir)/src/common/getopt.h ./getopt.h
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
@@ -123,4 +109,3 @@ maintainer-clean-generic:
 	-@echo "This command is intended for maintainers to use;"
 	-@echo "it deletes files that may require special tools to rebuild."
 	-rm -f Makefile.in
-	-rm -f utils.c monitor.c xine-remote.c
