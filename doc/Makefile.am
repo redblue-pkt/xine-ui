@@ -24,7 +24,11 @@ docs_DATA = \
 	README.en.20.DVD \
 	README.en.25.VideoCD \
 	README.en.30.Advanced \
-	README.en.35.Legal_issues
+	README.en.35.Legal_issues \
+	README.cs.0.Introduction \
+	README.cs.5.xine-ui \
+	README.cs.10.Remote_control \
+	README.cs.15.MRLs
 
 debug:
 install-debug: install

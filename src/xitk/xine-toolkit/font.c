@@ -553,7 +553,7 @@ int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int nbytes) {
   ABORT_IF_NULL(xtfs->fontset);
 
   XLOCK(xtfs->display);
-  width = XmbTextEscapement(xtfs->fontset, c, nbytes);
+  xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, &width, NULL, NULL);
   XUNLOCK(xtfs->display);
 #else 
   ABORT_IF_NULL(xtfs->font);
@@ -638,34 +638,6 @@ int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nby
  *
  */
 int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes) {
-#ifdef WITH_XMB
-  XRectangle logic;
-  int height = 0;
-
-  XLOCK(xtfs->display);  
-
-  XmbTextExtents(xtfs->fontset, c, nbytes, NULL, &logic);
-  if (logic.height) height = logic.height;
-  else {
-  /* if XmbTextExtents had problems, then char-per-char computing height */
-    mbstate_t state;
-    size_t    i = 0, n;
-
-    memset(&state, '\0', sizeof(mbstate_t));
-
-    while (i < nbytes) {
-      n = mbrtowc(NULL, c, nbytes - i, &state);
-      if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;
-      XmbTextExtents(xtfs->fontset, c + i, n, NULL, &logic);
-      if (logic.height > height) height = logic.height;
-      i += n;
-    }
-  }
-
-  XUNLOCK(xtfs->display);  
-
-  return height ? height : 12;
-#else
   int lbearing, rbearing, width, ascent, descent, height;
   
   xitk_font_text_extent(xtfs, c, nbytes, &lbearing, &rbearing, &width, &ascent, &descent);
@@ -673,7 +645,6 @@ int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes) {
   height = ascent + descent;
  
   return height;
-#endif
 }
 
 /*
@@ -719,21 +690,50 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   ABORT_IF_NULL(xtfs->fontset);
   ABORT_IF_NULL(c);
 
+  /* lbearing and rbearing can't find out or compute */
+  if (lbearing) *lbearing = 0;
+  if (rbearing) *rbearing = 0;
+
+  if (nbytes <= 0) {
+    if (width) *width     = 0;
+    if (ascent) *ascent   = 0;
+    if (descent) *descent = 0;
+    return;
+  }
+
   XLOCK(xtfs->display);
   XmbTextExtents(xtfs->fontset, c, nbytes, NULL, &logic);
+  if (!logic.width || !logic.height) {
+  /* XmbTextExtents() has problems, try char-per-char counting */
+    mbstate_t state;
+    size_t    i = 0, n;
+    int       height = 0, width = 0;
+
+    memset(&state, '\0', sizeof(mbstate_t));
+
+    while (i < nbytes) {
+      n = mbrtowc(NULL, c, nbytes - i, &state);
+      if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;
+      XmbTextExtents(xtfs->fontset, c + i, n, NULL, &logic);
+      if (logic.height > height) height = logic.height;
+      width += logic.width;
+      i += n;
+    }
+
+    if (!height || !width) {
+    /* char-per-char counting fails too */
+      XITK_WARNING("extents of the font \"%s\" are %dx%d!\n", xtfs->name, width, height);
+      if (!height) height = 12;
+    } 
+
+    logic.height = height;
+    logic.width = width;
+  }
   XUNLOCK(xtfs->display);
 
-  /* lbearing and rbearing can't find out or compute */
-  if(lbearing)
-    *lbearing = 0;
-  if(rbearing)
-    *rbearing = 0;
-  if(width)
-    *width    = logic.width;
-  if(ascent)
-    *ascent  = -logic.y;
-  if(descent)
-    *descent = logic.height + logic.y;
+  if (width) *width     = logic.width;
+  if (ascent) *ascent   = -logic.y;
+  if (descent) *descent = logic.height + logic.y;
 #else
   XCharStruct ov;
   int         dir;
