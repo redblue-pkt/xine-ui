@@ -46,8 +46,6 @@
 #define SKIN_DEBUG 1
 */
 
-#warning FIXME: DEADLOCK
-
 #define DEFAULT_SKIN        "xinetic"
 #define SKIN_IFACE_VERSION  4
 
@@ -97,6 +95,13 @@ static void get_available_skins_from(char *path) {
 	  
 	  skins_avail[skins_avail_num]->pathname = strdup(path);
 	  skins_avail[skins_avail_num]->skin = strdup(pdirent->d_name);
+	  skins_avail[skins_avail_num]->number = skins_avail_num;
+#ifdef SKIN_DEBUG
+	  printf("add %s/%s at %d\n", 
+		 skins_avail[skins_avail_num]->pathname, 
+		 skins_avail[skins_avail_num]->skin,
+		 skins_avail[skins_avail_num]->number);
+#endif
 	  skins_avail_num++;
 	  
 	}
@@ -215,28 +220,23 @@ skins_locations_t *get_skin_location(char *skin) {
  * unload and reload the new config for a given
  * skin file. There is fallback if that fail.
  */
-void change_skin(skins_locations_t *sk) {
+static int change_skin(skins_locations_t *sk) {
   char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char                *old_skin;
   skins_locations_t   *sks = sk;
-  xine_cfg_entry_t    entry;
   int                  twice = 0, twice_load = 0;
+  int                  ret = 0;
 
   if(!sk)
-    return;
+    return -1;
+  
+  ret = sk->number;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
-  if(xine_config_lookup_entry(gGui->xine, "gui.skin", &entry)) 
-    old_skin = (char *) skins_avail[entry.num_value]->skin;
-  else
-    old_skin = DEFAULT_SKIN;
+  old_skin = DEFAULT_SKIN;
   
   xitk_skin_unload_config(gGui->skin_config);
 
   gGui->skin_config = xitk_skin_init_config();
-
-  if(change_config_entry)
-    config_update_num("gui.skin", (get_skin_offset((char * )sk->skin)));
 
  __reload_skin:
   memset(&buf, 0, sizeof(buf));
@@ -245,17 +245,13 @@ void change_skin(skins_locations_t *sk) {
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
     skins_locations_t   *osks;
     
-    entry.num_value = get_skin_offset(old_skin);
-    xine_config_update_entry(gGui->xine, &entry);
-
-#warning WHY REMOVED?
-    config_update_num("gui.skin", (get_skin_offset(old_skin)));
+    ret = get_skin_offset(old_skin);
 
     osks = get_skin_location(old_skin);
     if((!strcmp(osks->pathname, sks->pathname)) && (!strcmp(osks->skin, sks->skin))) {
       xine_error(_("Failed to load %s/%s. Load fallback skin %s\n"), 
 		 buf, "skinconfig", DEFAULT_SKIN);
-      config_update_num("gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+      ret = get_skin_offset(DEFAULT_SKIN);
       sks = get_skin_location(DEFAULT_SKIN);
     }
     else {
@@ -279,17 +275,17 @@ void change_skin(skins_locations_t *sk) {
     gGui->skin_config = xitk_skin_init_config();
     xine_error(_("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), 
 	       buf, DEFAULT_SKIN);
-    config_update_num("gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+    ret = get_skin_offset(DEFAULT_SKIN);
     sks = get_skin_location(DEFAULT_SKIN);
     twice++;
     goto __reload_skin;
   }
-  
+
   { /* Now, change skins for each window */
     typedef struct {
       void (*change_skins)(void);
     } visible_state_t;
-    int i;
+    int   i;
     visible_state_t visible_state[] = {
       { video_window_change_skins },
       { panel_change_skins        },
@@ -300,11 +296,13 @@ void change_skin(skins_locations_t *sk) {
     };
     
     for(i = 0; visible_state[i].change_skins != NULL; i++) {
-      if(visible_state[i].change_skins)
+      if(visible_state[i].change_skins) {
 	visible_state[i].change_skins();
+      }
     }
-
   }
+
+  return ret;
 }
 
 /*
@@ -312,6 +310,7 @@ void change_skin(skins_locations_t *sk) {
  */
 static void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
   skins_locations_t   *sk;
+  int                  retval;
   
   if(skins_avail == NULL || change_config_entry == 0)
     return;
@@ -321,27 +320,23 @@ static void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
   if(!sk) {
     xine_error(_("Ooch, skin not found, use fallback '%s'.\n"), DEFAULT_SKIN);
     sk = get_skin_location(DEFAULT_SKIN);
-    config_update_num("gui.skin", (get_skin_offset(DEFAULT_SKIN)));
   }
-
-  change_config_entry = 0;
-  change_skin(sk);
-  change_config_entry = 1;
-
+  
+  retval = change_skin(sk);
+  
+  if(retval != sk->number) {
+    if(retval >= 0)
+      cfg->num_value = retval;
+    else
+      cfg->num_value = get_skin_offset(DEFAULT_SKIN);
+  }
 }
 
 /*
  * Select a new skin (used in control skin list).
  */
 void select_new_skin(int selected) {
-  xine_cfg_entry_t cfg;
-
-  change_config_entry = 0;
   config_update_num("gui.skin", selected);
-  change_config_entry = 1;
-  
-  cfg.num_value = selected;
-  skin_change_cb(NULL, &cfg);
 }
 
 /*
@@ -430,5 +425,5 @@ void init_skins_support(void) {
   }
   
   change_config_entry = 1;
-
+  
 }

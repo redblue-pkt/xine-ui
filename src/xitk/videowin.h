@@ -69,6 +69,7 @@ int video_window_is_visible (void);
 void video_window_set_mag (float mag);
 float video_window_get_mag (void);
 
+void video_window_update_logo(void);
 void video_window_change_skins(void);
 
 void video_window_reset_ssaver(void);

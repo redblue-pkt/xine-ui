@@ -317,6 +317,9 @@ static void *slider_loop(void *dummy) {
       video_window_set_cursor_visibility(gGui->cursor_visible);
     }
 
+    if(gGui->logo_has_changed)
+      video_window_update_logo();
+    
     sleep(1);
   }
 

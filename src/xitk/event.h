@@ -64,6 +64,7 @@ typedef struct {
 
   const char          *logo_mrl;
   int                  logo_mode;
+  int                  logo_has_changed;
 
   /* stuff like FULL_ON_START, QUIT_ON_STOP */
   action_id_t          actions_on_start[16];
@@ -169,9 +170,6 @@ void config_save(void);
 void config_reset(void);
 
 int actions_on_start(action_id_t actions[], action_id_t a);
-
-char *gui_get_skindir(void);
-char *gui_get_configfile(void);
 
 void gui_init(int nfiles, char *filenames[], window_attributes_t *window_attribute);
 

@@ -1351,6 +1351,7 @@ void video_window_set_mag(float mag) {
   
   video_window_adapt_size ();
 }
+
 float video_window_get_mag (void) {
   
   /* compute current mag */
@@ -1362,13 +1363,11 @@ float video_window_get_mag (void) {
 /*
  * Change displayed logo, if selected skin want to customize it.
  */
-void video_window_change_skins(void) {
+void video_window_update_logo(void) {
   xine_cfg_entry_t  cfg_entry;
   char             *skin_logo;
-  static int        sk_changed = 0;
   int               cfg_err_result;
-
-  memset(&cfg_entry, 0, sizeof(xine_cfg_entry_t));
+  
   cfg_err_result = xine_config_lookup_entry(gGui->xine, "gui.logo_mrl", &cfg_entry);
   skin_logo = xitk_skin_get_logo(gGui->skin_config);
   
@@ -1377,10 +1376,12 @@ void video_window_change_skins(void) {
     if((cfg_err_result) && cfg_entry.str_value) {
       /* Old and new logo are same, don't reload */
       if(!strcmp(cfg_entry.str_value, skin_logo))
-	return;
+	goto __done;
     }
     
     config_update_string("gui.logo_mrl", skin_logo);
+    goto __play_logo_now;
+    
   }
   else { /* Skin don't use logo feature, set to xine's default */
     
@@ -1388,11 +1389,34 @@ void video_window_change_skins(void) {
      * Back to default logo only on a skin 
      * change, not at the first skin loading.
      **/
-    if((cfg_err_result) && sk_changed)
+    if((cfg_err_result) && (strcmp(cfg_entry.str_value, XINE_LOGO_MRL))) {
       config_update_string("gui.logo_mrl", XINE_LOGO_MRL);
+
+    __play_logo_now:
+      
+      sleep(1);
+      
+      if(gGui->logo_mode) {
+	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
+	  gGui->ignore_next = 1;
+	  xine_stop(gGui->stream);
+	  gGui->ignore_next = 0; 
+	}
+	if((!xine_open(gGui->stream, gGui->logo_mrl)) 
+	   || (!xine_play(gGui->stream, 0, 0))) {
+	  gui_handle_xine_error();
+	  goto __done;
+	}
+	gGui->logo_mode = 1;
+      }
+    }
   }
 
-  sk_changed++;
+ __done:
+  gGui->logo_has_changed--;
+}
+void video_window_change_skins(void) {
+  gGui->logo_has_changed++;
 }
 
 /*

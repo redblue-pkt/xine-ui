@@ -67,6 +67,12 @@ static pthread_t        seek_thread;
 void gui_display_logo(void) {
 
   gGui->logo_mode = 2;
+  
+  if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
+    gGui->ignore_next = 1;
+    xine_stop(gGui->stream);
+    gGui->ignore_next = 0; 
+  }
   (void) gui_xine_open_and_play((char *)gGui->logo_mrl, 0, 0);
   gGui->logo_mode = 1;
   panel_reset_slider();
@@ -515,6 +521,13 @@ void *gui_seek_relative_thread(void *data) {
 void gui_set_current_position (int pos) {
   int err;
   
+  if(gGui->logo_mode && (gGui->playlist[gGui->playlist_cur])) {
+    if(!xine_open(gGui->stream, (const char *)gGui->playlist[gGui->playlist_cur])) {
+      gui_handle_xine_error();
+      return;
+    }
+  }
+
   if(((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
      (gGui->ignore_next == 1))
     return;
@@ -595,7 +608,7 @@ void gui_dndcallback (char *filename) {
     gGui->playlist_cur = gGui->playlist_num++;
     gGui->playlist[gGui->playlist_cur] = strdup(buffer);
 
-    if((xine_get_status(gGui->stream) == XINE_STATUS_STOP))
+    if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode)
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
 
     pl_update_playlist();
