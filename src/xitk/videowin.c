@@ -676,8 +676,6 @@ static void video_window_adapt_size (void) {
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
 
-    XRaiseWindow(gGui->display, gGui->video_window);
-
   } else {
 
 #ifndef HAVE_XINERAMA
@@ -843,6 +841,9 @@ static void video_window_adapt_size (void) {
        wm_not_ewmh_only()) {
       xitk_set_layer_above(gGui->video_window);
     }
+    if(gVw->fullscreen_mode && wm_not_ewmh_only())
+      xitk_set_ewmh_fullscreen(gGui->video_window);
+    
   }
   
   XSync(gGui->display, False);

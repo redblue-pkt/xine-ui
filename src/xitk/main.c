@@ -317,7 +317,13 @@ static void xrm_parse(void) {
   
   rmdb = NULL;
   XrmInitialize();
-  
+
+  rmdb = home_rmdb = server_rmdb = application_rmdb = NULL;
+  memset(&user_dbname, 0, sizeof(user_dbname));
+  memset(&environement_buf, 0, sizeof(environement_buf));
+  memset(&wide_dbname, 0, sizeof(wide_dbname));
+  memset(str_type, 0, sizeof(str_type));
+
   sprintf(wide_dbname, "%s%s", "/usr/lib/X11/app-defaults/", classname);
   
   if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL)

@@ -705,6 +705,11 @@ void xitk_set_layer_above(Window window);
 void xitk_set_window_layer(Window window, int layer);
 
 /*
+ *
+ */
+void xitk_set_ewmh_fullscreen(Window window);
+
+/*
  * This function start the widget live. It's a block function,
  * it will only return after a widget_stop() call.
  */
