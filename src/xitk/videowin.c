@@ -508,7 +508,7 @@ static void video_window_adapt_size (void) {
            * resizing the video window may be necessary if the modeline or tv mode has
            * just been switched
            */
-          XResizeWindow (gGui->display, gGui->video_window,
+          XMoveResizeWindow (gGui->display, gGui->video_window, hint.x, hint.y,
 					  gVw->visible_width, gVw->visible_height);
           gVw->output_width    = gVw->visible_width;
           gVw->output_height   = gVw->visible_height;

@@ -8,6 +8,8 @@ xine-ui (0.9.19) unstable; urgency=low
   * new 'Ok' button in setup window (it save values and dismiss window),
   * don't display engine status (upper left corner) when the engine is already started,
   * fix XVidMode modeline deletion bug,
+  * fix a problem with xinerama fullscreen which caused the fullscreen to
+    occur not always on the right screens
   * do not save unsupported controls (hue, sat, etc) on config,
   * fix image controls for latest SiS driver,
   * fix root window mode (big thanks to XPenguins project, they same me a ton of
