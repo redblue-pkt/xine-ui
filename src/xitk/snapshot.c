@@ -92,6 +92,10 @@ struct prvt_image_s {
   uint8_t *y, *u, *v, *yuy2;
   uint8_t *img;
 
+  /* Pointers to allocated mem that has to be freed at the end */
+  uint8_t *scale_image_y, *scale_image_u, *scale_image_v;
+  uint8_t *yuy2_fudge_y, *yuy2_fudge_u, *yuy2_fudge_v;
+
   int u_width, v_width;
   int u_height, v_height;
 
@@ -549,10 +553,13 @@ static int scale_image( struct prvt_image_s *image )
   /* allocate new buffer space space for post-scaled line buffers */
   n_y = (uint8_t*)png_malloc( image->struct_ptr, ny_width * image->height );
   if (n_y == 0) return( 0 );
+  image->scale_image_y = n_y;
   n_u = (uint8_t*)png_malloc( image->struct_ptr, nu_width * image->u_height );
   if (n_u == 0) return( 0 );
+  image->scale_image_u = n_u;
   n_v = (uint8_t*)png_malloc( image->struct_ptr, nv_width * image->v_height );
   if (n_v == 0) return( 0 );
+  image->scale_image_v = n_v;
 
   /* set post-scaled line buffer progress pointers */
   ny_p = n_y;
@@ -614,14 +621,17 @@ static int yuy2_fudge( struct prvt_image_s *image )
 {
   image->y = png_malloc( image->struct_ptr, image->height*image->width );
   if ( image->y == NULL ) return( 0 );
+  image->yuy2_fudge_y = image->y;
   memset( image->y, 0, image->height*image->width );
 
   image->u = png_malloc( image->struct_ptr, image->u_height*image->u_width );
   if ( image->u == NULL ) return( 0 );
+  image->yuy2_fudge_u = image->u;
   memset( image->u, 0, image->u_height*image->u_width );
 
   image->v = png_malloc( image->struct_ptr, image->v_height*image->v_width );
   if ( image->v == NULL ) return( 0 );
+  image->yuy2_fudge_v = image->v;
   memset( image->v, 0, image->v_height*image->v_width );
 
   yuy2toyv12( image );
@@ -712,6 +722,8 @@ static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
     free(*image);
     return 0;
   }
+  (*image)->scale_image_y = (*image)->scale_image_u = (*image)->scale_image_v = NULL;
+  (*image)->yuy2_fudge_y = (*image)->yuy2_fudge_u = (*image)->yuy2_fudge_v = NULL;
   
   return( 1 );
 }
@@ -729,9 +741,17 @@ static void prvt_image_free( struct prvt_image_s **image )
    
   rgb_free ( image_p );
 
+  if (image_p->scale_image_y) png_free( image_p->struct_ptr, image_p->scale_image_y );
+  if (image_p->scale_image_u) png_free( image_p->struct_ptr, image_p->scale_image_u );
+  if (image_p->scale_image_v) png_free( image_p->struct_ptr, image_p->scale_image_v );
+  if (image_p->yuy2_fudge_y)  png_free( image_p->struct_ptr, image_p->yuy2_fudge_y );
+  if (image_p->yuy2_fudge_u)  png_free( image_p->struct_ptr, image_p->yuy2_fudge_u );
+  if (image_p->yuy2_fudge_v)  png_free( image_p->struct_ptr, image_p->yuy2_fudge_v );
+
   if (image_p->info_ptr)   png_destroy_info_struct (  image_p->struct_ptr, &image_p->info_ptr );
   if (image_p->struct_ptr) png_destroy_write_struct( &image_p->struct_ptr, (png_infopp)NULL );
   if (image_p->fp)         fclose( image_p->fp );
+
   free(image_p);
 }
 
@@ -1093,6 +1113,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 #endif
     if ( yuy2_fudge( image ) == 0 ) {
       error_msg_cb(msg_cb_data, _("Error: yuy2_fudge failed\n"));
+      prvt_image_free( &image );
       return;
     }
   }
