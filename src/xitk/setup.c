@@ -33,19 +33,7 @@
 #include <pthread.h>
 #include <assert.h>
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-#include "Imlib-light/Imlib.h"
-#include "event.h"
-#include "actions.h"
-#include "viewlog.h"
-#include "kbindings.h"
-#include "skins.h"
-#include "lang.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 
 extern gGui_t              *gGui;
 

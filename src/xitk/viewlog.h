@@ -24,6 +24,12 @@
 #ifndef VIEWLOG_H
 #define VIEWLOG_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "xitk.h"
+
 void viewlog_window(void);
 void viewlog_exit(xitk_widget_t *, void *);
 int viewlog_is_visible(void);

@@ -57,10 +57,7 @@
 #include <netdb.h>
 #include <pthread.h>
 
-#include "actions.h"
-#include "kbindings.h"
-#include "snapshot.h"
-#include "errors.h"
+#include "common.h"
 
 #include "readline.h"
 #include "history.h"
@@ -80,13 +77,6 @@
 #define COMMANDS_PREFIX      "/\377\200COMMANDS"
 extern int errno;
 
-#define _FREE(x) do {                          \
-                      if(x) {                  \
-                        free(x);               \
-                        x = NULL;              \
-                      }                        \
-                 } while(0)
-
 #ifdef NETWORK_CLIENT
 
 #ifdef HAVE_GETOPT_LONG
@@ -94,8 +84,6 @@ extern int errno;
 #else
 #  include "getopt.h"
 #endif
-
-# include <xine/xineutils.h>
 
 /* options args */
 static const char *short_options = "?hH:P:ncv";
@@ -160,8 +148,6 @@ static session_commands_t  **session_commands = NULL;
 # include <X11/Xlib.h>
 # include <xine.h>
 # include <xine/xineutils.h>
-# include "event.h"
-# include "panel.h"
 
 typedef struct commands_s commands_t;
 typedef struct client_info_s client_info_t;
@@ -1349,7 +1335,7 @@ int main(int argc, char **argv) {
 	client_handle_command(&session, line);
       }
     }
-    _FREE(grabbed_line);
+    SAFE_FREE(grabbed_line);
   }
 
  __end:
@@ -1581,14 +1567,14 @@ static void handle_xine_error(client_info_t *client_info) {
     sock_write(client_info->socket,
 	       "xine engine error:\n"
 	       "There is no available input plugin available to handle '%s'.\n",
-	       gGui->filename);
+	       gGui->mmk.mrl);
     break;
     
   case XINE_ERROR_NO_DEMUX_PLUGIN:
     sock_write(client_info->socket, 
 	       "xine engine error:\n"
 	       "There is no available demuxer plugin to handle '%s'.\n", 
-	       gGui->filename);
+	       gGui->mmk.mrl);
     break;
     
   default:
@@ -1826,14 +1812,14 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
       else if(is_arg_contain(client_info, 1, "prev")) {
 	gGui->ignore_next = 1;
 	xine_stop (gGui->stream);
-	gGui->playlist_cur--;
-	if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
-	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	  (void) gui_xine_open_and_play(gGui->filename, 0, 0);
+	gGui->playlist.cur--;
+	if ((gGui->playlist.cur >= 0) && (gGui->playlist.cur < gGui->playlist.num)) {
+	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, 0);
 	  
 	} 
 	else {
-	  gGui->playlist_cur = 0;
+	  gGui->playlist.cur = 0;
 	  gui_display_logo();
 	}
 	gGui->ignore_next = 0;
@@ -1857,8 +1843,8 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	  xine_stop(gGui->stream);
 	  gGui->ignore_next = 0;
 	}
-	gui_set_current_mrl(gGui->playlist[gGui->playlist_num - 1]);
-	if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 )))
+	gui_set_current_mrl(gGui->playlist.mmk[gGui->playlist.num - 1]);
+	if(!(xine_open(gGui->stream, gGui->mmk.mrl) && xine_play (gGui->stream, 0, 0 )))
 	  handle_xine_error(client_info);
 	else
 	  gGui->logo_mode = 0;
@@ -1875,9 +1861,9 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
     if(nargs == 1) {
       if(is_arg_contain(client_info, 1, "show")) {
 	int i;
-	if(gGui->playlist_num) {
-	  for(i = 0; gGui->playlist[i] != NULL; i++) {
-	    sock_write(client_info->socket, "%5d %s\n", i, gGui->playlist[i]);
+	if(gGui->playlist.num) {
+	  for(i = 0; i < gGui->playlist.num; i++) {
+	    sock_write(client_info->socket, "%5d %s\n", i, gGui->playlist.mmk[i]->mrl);
 	  }
 	}
 	else
@@ -1901,8 +1887,8 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	
 	j = atoi(get_arg(client_info, 2));
 	
-	if((j >= 0) && (j <= gGui->playlist_num)) {
-	  gui_set_current_mrl(gGui->playlist[j]);
+	if((j >= 0) && (j <= gGui->playlist.num)) {
+	  gui_set_current_mrl(gGui->playlist.mmk[j]);
 	}
       }
       else if(is_arg_contain(client_info, 1, "delete")) {
@@ -1910,16 +1896,12 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	
 	if((is_arg_contain(client_info, 2, "all")) || 
 	   (is_arg_contain(client_info, 2, "*"))) {
-
-	  for(i = 0; i < gGui->playlist_num; i++)
-	    gGui->playlist[i] = NULL;
 	  
-	  gGui->playlist_num = 0;
-	  gGui->playlist_cur = 0;
-
+	  mediamark_free_mediamarks();
+	  
 	  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
 	    gui_stop(NULL, NULL);
-
+	  
 	  enable_playback_controls(0);
 	}
 	else {
@@ -1929,22 +1911,31 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	  
 	  if(j >= 0) {
 
-	    if((gGui->playlist_cur == j) && ((xine_get_status(gGui->stream) != XINE_STATUS_STOP)))
+	    if((gGui->playlist.cur == j) && ((xine_get_status(gGui->stream) != XINE_STATUS_STOP)))
 	      gui_stop(NULL, NULL);
-
-	    for(i = j; i < gGui->playlist_num; i++)
-	      gGui->playlist[i] = gGui->playlist[i+1];
-
-	    gGui->playlist_num--;
-	    if(gGui->playlist_cur) gGui->playlist_cur--;
+	    
+	    mediamark_free_entry(j);
+	    
+	    for(i = j; i < gGui->playlist.num; i++)
+	      gGui->playlist.mmk[i] = gGui->playlist.mmk[i + 1];
+	    
+	    gGui->playlist.mmk = (mediamark_t **) 
+	      realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
+	    
+	    gGui->playlist.mmk[gGui->playlist.num + 1] = NULL;
+	    
+	    gGui->playlist.cur = 0;
 	  }
 	}
 	
-	if(gGui->playlist_num)
-	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	else {
+	if(playlist_is_running())
+	  playlist_update_playlist();
 
-	  if(is_playback_widgets_enabled() && (!gGui->playlist_num))
+	if(gGui->playlist.num)
+	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	else {
+	  
+	  if(is_playback_widgets_enabled())
 	    enable_playback_controls(0);
 	  
 	  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
@@ -1953,7 +1944,6 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	  gui_set_current_mrl(NULL);
 	}
       }
-      
     }
   }
 }
@@ -1961,7 +1951,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 static void do_play(commands_t *cmd, client_info_t *client_info) {
 
   if (xine_get_status (gGui->stream) != XINE_STATUS_PLAY) {
-    if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 )))
+    if(!(xine_open(gGui->stream, gGui->mmk.mrl) && xine_play (gGui->stream, 0, 0 )))
       handle_xine_error(client_info);
     else
       gGui->logo_mode = 0;
@@ -2187,7 +2177,7 @@ static void do_gui(commands_t *cmd, client_info_t *client_info) {
   if(nargs) {
     if(nargs == 1) {
       int flushing = 0;
-
+      
       if(is_arg_contain(client_info, 1, "hide")) {
 	if(panel_is_visible()) {
 	  panel_toggle_visibility(NULL, NULL);
@@ -2461,7 +2451,7 @@ static void parse_destock_remain(client_info_t *client_info) {
   if((client_info->command.remain == NULL) 
      && (client_info->command.line && (strchr(client_info->command.line, ';')))) {
     client_info->command.remain = strdup(client_info->command.line);
-    _FREE(client_info->command.line);
+    SAFE_FREE(client_info->command.line);
   }
 
   if(client_info->command.remain && 
@@ -2523,12 +2513,12 @@ static void parse_destock_remain(client_info_t *client_info) {
 	  sprintf(client_info->command.remain, "%s", remaining);
 	}
 	else {
-	  _FREE(client_info->command.remain);
+	  SAFE_FREE(client_info->command.remain);
 	}
 
       }
       else {
-	_FREE(client_info->command.remain);
+	SAFE_FREE(client_info->command.remain);
       }
       
     }
@@ -2542,7 +2532,7 @@ static void parse_destock_remain(client_info_t *client_info) {
       
       sprintf(client_info->command.line, "%s", client_info->command.remain);
       
-      _FREE(client_info->command.remain);
+      SAFE_FREE(client_info->command.remain);
     }
   }
 }
@@ -2734,7 +2724,7 @@ static void handle_client_command(client_info_t *client_info) {
       
     }
     
-    _FREE(client_info->command.line);
+    SAFE_FREE(client_info->command.line);
 
   } while((client_info->command.remain != NULL));
 }
@@ -2777,9 +2767,9 @@ static void *client_thread(void *data) {
   close(client_info->socket);
   
   for(i = 0; i < 256; i++)
-    _FREE(client_info->command.args[i]);
+    SAFE_FREE(client_info->command.args[i]);
   
-  _FREE(client_info);
+  SAFE_FREE(client_info);
 
   client_info = NULL;
 
@@ -2929,7 +2919,7 @@ static const char *get_homedir(void) {
   
   
 #ifdef HAVE_GETPWUID_R
-  _FREE(buffer);
+  SAFE_FREE(buffer);
 #endif
   
   return homedir;

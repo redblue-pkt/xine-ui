@@ -25,7 +25,7 @@
 #include "config.h"
 #endif
 
-#include "event.h"
+#include "common.h"
 
 extern gGui_t                 *gGui;
 

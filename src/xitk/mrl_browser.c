@@ -31,18 +31,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include <xine/xineutils.h>
-
-#include "panel.h"
-#include "event.h"
-#include "actions.h"
-#include "videowin.h"
-#include "playlist.h"
-#include "mrl_browser.h"
-#include "errors.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 
 extern gGui_t            *gGui;
 static xitk_widget_t     *mrlb = NULL;
@@ -347,12 +336,12 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   if(mrl) {
     
-    if(!pl_is_running()) {
+    if(!playlist_is_running()) {
       playlist_editor();
     }
     else {
-      if(!pl_is_visible())
-	pl_toggle_visibility(NULL, NULL);
+      if(!playlist_is_visible())
+	playlist_toggle_visibility(NULL, NULL);
     }
       
     gui_dndcallback((char *)mrl->mrl);
@@ -365,19 +354,26 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   if(mrl) {
+    mediamark_t mmk;
+
     if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
       gGui->ignore_next = 1;
       xine_stop (gGui->stream);
       gGui->ignore_next = 0;
     }
 
-    gui_set_current_mrl(mrl->mrl);
+    mmk.mrl = mrl->mrl;
+    mmk.ident = mrl->mrl;
+    mmk.start = 0;
+    mmk.end = -1;
+
+    gui_set_current_mrl(&mmk);
     
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
     
-    if(!gui_xine_open_and_play(gGui->filename, 0, 0)) {
-      if((is_playback_widgets_enabled()) && (!gGui->playlist_num))
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, 0)) {
+      if((is_playback_widgets_enabled()) && (!gGui->playlist.num))
 	enable_playback_controls(0);
     }
   }

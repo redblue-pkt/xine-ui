@@ -33,17 +33,7 @@
 #include <X11/keysym.h>
 #include <pthread.h>
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-#include "Imlib-light/Imlib.h"
-#include "event.h"
-#include "actions.h"
-#include "skins.h"
-#include "lang.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 
 /*
 #define DEBUG_VIEWLOG

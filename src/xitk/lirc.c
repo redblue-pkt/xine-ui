@@ -29,15 +29,9 @@
 #include <pthread.h>
 #include <signal.h>
 
-#include "event.h"
-#include "panel.h"
-#include "actions.h"
-#include "playlist.h"
-
-#include "xitk.h"
+#include "common.h"
 
 #ifdef HAVE_LIRC
-#include "lirc/lirc_client.h"
 
 #ifdef DEBUG
 #define LIRC_VERBOSE 1
@@ -69,19 +63,15 @@ static void lirc_get_playlist(char *from) {
       if(autoplay_mrls) {
 
 	/* First, free existing playlist */
-	for(j = 0; j < gGui->playlist_num; j++)
-	  gGui->playlist[j] = NULL;
-	
-	gGui->playlist_num = 0;
-	gGui->playlist_cur = 0;
+	mediamark_free_mediamark();
 	
 	for (j = 0; j < num_mrls; j++)
-	  gGui->playlist[j] = autoplay_mrls[j];
+	  mediamark_add_entry((const char *)autoplay_mrls[j], 
+			      (const char *)autoplay_mrls[j], 0, -1);
 	
-	gGui->playlist_num = j;
-	gGui->playlist_cur = 0;
-	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	pl_update_playlist();
+	gGui->playlist.cur = 0;
+	gui_set_current_mrl(playlist_get_current_mmk());
+	playlist_update_playlist();
       }    
     }
   }

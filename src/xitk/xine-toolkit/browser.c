@@ -391,7 +391,6 @@ void xitk_browser_update_list(xitk_widget_t *w, char **list, int len, int start)
     private_data = (browser_private_data_t *) w->private_data;
     private_data->content = list;
     private_data->list_length = len;
-    private_data->current_start = start;
     xitk_browser_rebuild_browser(w, start);
   }
 }  

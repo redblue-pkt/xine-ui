@@ -24,6 +24,12 @@
 #ifndef SETUP_H
 #define SETUP_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "xitk.h"
+
 void setup_panel(void);
 void setup_exit(xitk_widget_t *, void *);
 int setup_is_visible(void);

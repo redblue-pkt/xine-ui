@@ -39,9 +39,30 @@
   } while (0)
 #endif
 
+#ifndef NAME_MAX
+#define _NAME_MAX          256
+#else
+#define _NAME_MAX          NAME_MAX
+#endif
+
+#ifndef PATH_MAX
+#define _PATH_MAX          768
+#else
+#define _PATH_MAX          PATH_MAX
+#endif
+
 /*
  * Execute a shell command.
  */
 int xine_system(int dont_run_as_root, char *command);
 
+/*
+ * cleanup the str string, take care about '
+ */
+char *atoa(char *str);
+
+/*
+ * Create directories recursively
+ */
+int mkdir_safe(char *path);
 #endif

@@ -25,9 +25,7 @@
 #include "config.h"
 #endif
 
-#include "lang.h"
-#include "i18n.h"
-#include "xitk.h"
+#include "common.h"
 
 /*
  * Our LC_MESSAGES handling.

@@ -27,20 +27,8 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>       
-#include "panel.h"
-#include "control.h"
-#include "mrl_browser.h"
-#include "playlist.h"
-#include "videowin.h"
-#include "event.h"
-#include "skins.h"
-#include "errors.h"
-#include "i18n.h"
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-#include "xitk.h"
+#include "common.h"
 
 /*
 #define SKIN_DEBUG 1

@@ -26,7 +26,12 @@
 #ifndef PANEL_H
 #define PANEL_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <pthread.h>
+
 #include "xitk.h"
 
 typedef struct {
@@ -109,8 +114,6 @@ void panel_reset_slider (void);
 void panel_update_channel_display (void);
 
 void panel_update_runtime_display(void);
-
-void panel_set_no_mrl(void);
 
 void panel_update_mrl_display (void);
 

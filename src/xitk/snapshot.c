@@ -64,15 +64,7 @@
 #include <libpng/png.h>
 #endif
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-#include "event.h"
-#include "errors.h"
-#include "snapshot.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 
 #define PIXSZ 3
 #define BIT_DEPTH 8

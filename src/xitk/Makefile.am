@@ -37,6 +37,7 @@ xine_SOURCES = \
 	utils.c \
 	panel.c \
 	playlist.c \
+	mediamark.c \
 	stream_infos.c \
 	videowin.c \
 	viewlog.c
@@ -53,6 +54,7 @@ xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) $(top_builddir)/readline/libreadl
 
 noinst_HEADERS = \
 	$(GETOPT_H) \
+	common.h \
 	actions.h \
 	config_wrapper.h \
 	control.h \
@@ -67,6 +69,7 @@ noinst_HEADERS = \
 	network.h \
 	panel.h \
 	playlist.h \
+	mediamark.h \
 	setup.h \
 	skins.h \
 	stream_infos.h \

@@ -34,15 +34,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "event.h"
-#include "actions.h"
-#include "file_browser.h"
-#include "i18n.h"
-
-#include "xitk.h"
-
-#include <xine.h>
-#include <xine/xineutils.h>
+#include "common.h"
 
 #define MAX_LIST 9
 

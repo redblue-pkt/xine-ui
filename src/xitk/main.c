@@ -57,18 +57,7 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#include "event.h"
-#include "videowin.h"
-#include "panel.h"
-#include "actions.h"
-#include "i18n.h"
-
-#include "xitk.h"
-#include "errors.h"
-
-#ifdef HAVE_ORBIT 
-#include "../corba/xine-server.h"
-#endif
+#include "common.h"
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
@@ -111,7 +100,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::s:RG:BN:";
+ "u:a:V:A:p::s:RG:BN:P:";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
@@ -137,6 +126,7 @@ static struct option long_options[] = {
   {"geometry"       , required_argument, 0, 'G'                      },
   {"borderless"     , no_argument      , 0, 'B'                      },
   {"animation"      , required_argument, 0, 'N'                      },
+  {"playlist"       , required_argument, 0, 'P'                      },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -347,8 +337,9 @@ void show_usage (void) {
   printf(_("  -R, --root                   Use root window as video window.\n"));
   printf(_("  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"));
   printf(_("  -B, --borderless             Borderless video output window.\n"));
-  printf(_("  -N, --animation              Specify mrl to play when video output isn't used.\n"));
+  printf(_("  -N, --animation <mrl>        Specify mrl to play when video output isn't used.\n"));
   printf(_("                                 -can be used more than one time.\n"));
+  printf(_("  -P, --playlist <filename>    Load a playlist file.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -583,7 +574,16 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
-      panel_set_title(uevent->str);
+      if(gGui->mmk.ident)
+	free(gGui->mmk.ident);
+      if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
+	free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+      
+      gGui->mmk.ident = strdup(uevent->str);
+      gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
+     
+      playlist_mrlident_toggle();
+      panel_update_mrl_display();
     }
     break;
     
@@ -622,7 +622,6 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
       char                  buffer[1024];
 
-#warning FIXME
       if(event->stream == gGui->stream) {
 	memset(&buffer, 0, sizeof(buffer));
 	printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
@@ -740,11 +739,11 @@ int main(int argc, char *argv[]) {
   textdomain(PACKAGE);
   
   /* Check xine library version */
-  if(!xine_check_version(0, 9, 14)) {
+  if(!xine_check_version(1, 0, 0)) {
     int major, minor, sub;
     
     xine_get_version (&major, &minor, &sub);
-    fprintf(stderr, _("Require xine library version 0.9.14, found %d.%d.%d.\n"),
+    fprintf(stderr, _("Require xine library version 1.0.0, found %d.%d.%d.\n"),
 	    major, minor,sub);
     exit(1);
   }
@@ -948,6 +947,10 @@ int main(int argc, char *argv[]) {
 
     case 'N':
       visual_anim_add_animation(optarg);
+      break;
+
+    case 'P':
+      mediamark_load_mediamarks(optarg);
       break;
 
     case 'v': /* Display version and exit*/

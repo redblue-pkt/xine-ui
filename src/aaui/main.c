@@ -371,11 +371,11 @@ int main(int argc, char *argv[]) {
   /*
    * Check xine library version 
    */
-  if(!xine_check_version(0, 9, 14)) {
+  if(!xine_check_version(1, 0, 0)) {
     int major, minor, sub;
     
     xine_get_version (&major, &minor, &sub);
-    fprintf(stderr, "require xine library version 0.9.14, found %d.%d.%d.\n", major, minor, sub);
+    fprintf(stderr, "require xine library version 1.0.0, found %d.%d.%d.\n", major, minor, sub);
     goto failure;
   }
   

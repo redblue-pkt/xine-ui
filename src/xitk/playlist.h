@@ -24,15 +24,23 @@
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
 
-void playlist_editor(void);
-void playlist_change_skins(void);
-void pl_exit(xitk_widget_t *, void *);
-int pl_is_running(void);
-int pl_is_visible(void);
-void pl_toggle_visibility(xitk_widget_t *, void *);
-void pl_raise_window(void);
-void pl_scan_input(xitk_widget_t *, void *);
-void pl_update_playlist(void);
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "xitk.h"
+
 void playlist_show_tips(int enabled, unsigned long timeout);
-void pl_update_focused_entry(void);
+void playlist_mrlident_toggle(void);
+void playlist_update_playlist(void);
+void playlist_exit(xitk_widget_t *, void *);
+int playlist_is_running(void);
+int playlist_is_visible(void);
+void playlist_scan_input(xitk_widget_t *, void *);
+void playlist_raise_window(void);
+void playlist_toggle_visibility(xitk_widget_t *, void *);
+void playlist_update_focused_entry(void);
+void playlist_change_skins(void);
+void playlist_editor(void);
+
 #endif

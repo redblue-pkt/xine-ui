@@ -26,7 +26,7 @@
 #ifndef ACTIONS_H
 #define ACTIONS_H
 
-#include "xitk.h"
+#include "common.h"
 
 #define GUI_NEXT     1
 #define GUI_PREV     2
@@ -79,9 +79,7 @@ void gui_playlist_show(xitk_widget_t *w, void *data);
 
 void gui_mrlbrowser_show(xitk_widget_t *w, void *data);
 
-void gui_set_current_mrl(const char *mrl);
-
-const char *gui_get_next_mrl (void);
+void gui_set_current_mrl(mediamark_t *mmk);
 
 void gui_control_show(xitk_widget_t *w, void *data);
 

@@ -31,26 +31,7 @@
 #include <string.h>
 #include <pthread.h>
 
-#include <xine/xineutils.h>
-#include <zlib.h>
-
-#include "event.h"
-#include "actions.h"
-#include "control.h"
-#include "playlist.h"
-#include "videowin.h"
-#include "panel.h"
-#include "mrl_browser.h"
-#include "setup.h"
-#include "event_sender.h"
-#include "stream_infos.h"
-#include "viewlog.h"
-#include "snapshot.h"
-#include "errors.h"
-#include "utils.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 
 extern gGui_t     *gGui;
 
@@ -295,6 +276,7 @@ static void *slider_loop(void *dummy) {
 
 	if(!(i % 10)) {
 	  panel_update_channel_display();
+	  panel_update_mrl_display();
 	  i = 0;
 	}
       }
@@ -353,9 +335,9 @@ int panel_is_visible(void) {
  */
 void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
-  if(!panel->visible && pl_is_visible()) {}
+  if(!panel->visible && playlist_is_visible()) {}
   else {
-    pl_toggle_visibility(NULL, NULL);
+    playlist_toggle_visibility(NULL, NULL);
   }
     
   if(!panel->visible && control_is_visible()) {}
@@ -475,6 +457,12 @@ void panel_reset_runtime_label(void) {
   xitk_label_change_label (panel->widget_list, panel->runtime_label, "00:00:00"); 
 }
 
+static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
+  gGui->is_display_mrl = !gGui->is_display_mrl;
+  panel_update_mrl_display();
+  playlist_mrlident_toggle();
+}
+
 /*
  * Reset the slider of panel window (set to 0).
  */
@@ -535,19 +523,10 @@ void panel_update_channel_display (void) {
 }
 
 /*
- * Display an informative message when there is no mrl in playlist.
- */
-void panel_set_no_mrl(void) {
-
-  sprintf(gGui->filename, "xine-ui version %s", VERSION);
-}
-
-/*
  * Update displayed MRL according to the current one.
  */
 void panel_update_mrl_display (void) {
-
-  panel_set_title(gGui->filename);
+  panel_set_title((gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident);
 }
 
 /*
@@ -647,7 +626,7 @@ void panel_add_autoplay_buttons(void) {
       lb.skin_element_name = "AutoPlayGUI";
       lb.button_type       = CLICK_BUTTON;
       lb.label             = (char *)autoplay_label;
-      lb.callback          = pl_scan_input;
+      lb.callback          = playlist_scan_input;
       lb.state_callback    = NULL;
       lb.userdata          = NULL;
       xitk_list_append_content (panel->widget_list->l,
@@ -750,7 +729,7 @@ void panel_init (void) {
   if (!(panel->bg_image = 
 	Imlib_load_image(gGui->imlib_data,
 			 xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
-    xine_error(_("xine-panel: couldn't find image for background\n"));
+    xine_error(_("panel: couldn't find image for background\n"));
     exit(-1);
   }
 
@@ -998,8 +977,8 @@ void panel_init (void) {
 
   /*  Label title */
   lbl.skin_element_name = "TitleLabel";
-  lbl.label             = gGui->filename;
-  lbl.callback          = NULL;
+  lbl.label             = "";
+  lbl.callback          = _panel_change_display_mode;
   xitk_list_append_content (panel->widget_list->l, 
 	   (panel->title_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));
 
@@ -1129,6 +1108,7 @@ void panel_init (void) {
 						 panel_timeout_tips_cb, 
 						 CONFIG_NO_DATA);
 
+  panel_update_mrl_display();
   panel_update_nextprev_tips();
   panel_show_tips();
 
@@ -1190,5 +1170,6 @@ void panel_init (void) {
 }
 
 void panel_set_title(char *title) {
-  xitk_label_change_label(panel->widget_list, panel->title_label, title);
+  if(panel && panel->title_label)
+    xitk_label_change_label(panel->widget_list, panel->title_label, title);
 }

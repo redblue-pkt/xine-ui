@@ -40,18 +40,7 @@
 #include <X11/extensions/XTest.h>
 #endif
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-#include "Imlib-light/Imlib.h"
-
-#include "event.h"
-#include "videowin.h"
-#include "panel.h"
-#include "actions.h"
-#include "errors.h"
-#include "i18n.h"
-#include "xitk.h"
+#include "common.h"
 
 #define EST_KEEP_VALID  10	  /* #frames to allow for changing fps */
 #define EST_MAX_JITTER  0.01	  /* maximum jitter to detect valid fps */

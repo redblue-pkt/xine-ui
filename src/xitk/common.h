@@ -1,0 +1,219 @@
+/*
+** Copyright (C) 2002 Daniel Caujolle-Bert <segfault@club-internet.fr>
+**  
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**  
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**  
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+**  
+*/
+
+#ifndef __COMMON_H__
+#define __COMMON_H__
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <xine.h>
+#include <xine/xineutils.h>
+
+#include "Imlib-light/Imlib.h"
+
+#include "xitk.h"
+
+#include "kbindings.h"
+#include "videowin.h"
+#include "mediamark.h"
+#include "actions.h"
+#include "config_wrapper.h"
+#include "control.h"
+#include "errors.h"
+#include "event.h"
+#include "event_sender.h"
+#include "i18n.h"
+#include "lang.h"
+#include "lirc.h"
+#include "mrl_browser.h"
+#include "network.h"
+#include "panel.h"
+#include "playlist.h"
+#include "setup.h"
+#include "skins.h"
+#include "snapshot.h"
+#include "stream_infos.h"
+#include "viewlog.h"
+
+#include "utils.h"
+
+#ifdef HAVE_ORBIT 
+#include "../corba/xine-server.h"
+#endif
+
+#ifdef HAVE_LIRC
+#include "lirc/lirc_client.h"
+#endif
+
+/*
+ * config related constants
+ */
+#define CONFIG_LEVEL_BEG   0 /* => beginner */
+#define CONFIG_LEVEL_ADV  10 /* advanced user */
+#define CONFIG_LEVEL_EXP  20 /* expert */
+
+#define CONFIG_NO_DESC    NULL
+#define CONFIG_NO_HELP    NULL
+#define CONFIG_NO_CB      NULL
+#define CONFIG_NO_DATA    NULL
+
+/*
+ * flags for autoplay options
+ */
+#define PLAY_ON_START      0x00000001
+#define PLAYED_ON_START    0x00000002
+#define QUIT_ON_STOP       0x00000004
+#define FULL_ON_START      0x00000008
+#define HIDEGUI_ON_START   0x00000010
+#define PLAY_FROM_DVD      0x00000020
+#define PLAY_FROM_VCD      0x00000040
+
+
+#define SAFE_FREE(x)     do {                                             \
+                           if((x)) {                                      \
+                             free((x));                                   \
+                             x = NULL;                                    \
+                           }                                              \
+                         } while(0)
+
+typedef struct {
+  xine_vo_driver_t         *vo_driver;
+  xine_ao_driver_t         *ao_driver;
+
+  xine_stream_t            *stream;
+
+  xine_t                   *xine;
+
+  xine_event_queue_t       *event_queue;
+
+  /* Visual stuff (like animation in video window while audio only playback) */
+  struct {
+    xine_stream_t          *stream;
+    xine_event_queue_t     *event_queue;
+    int                     running;
+    int                     current;
+    int                     enabled;
+
+    char                  **mrls;
+    int                     num_mrls;
+  } visual_anim;
+  
+  /* xine lib/gui configuration filename */
+  char                     *configfile;
+
+  const char               *logo_mrl;
+  int                       logo_mode;
+  int                       logo_has_changed;
+
+  /* stuff like FULL_ON_START, QUIT_ON_STOP */
+  action_id_t               actions_on_start[16];
+  char                     *autoscan_plugin;
+
+  /* basic X11 stuff */
+  Display                  *display;
+  int                       screen;
+  int		            depth;
+  Visual	           *visual;
+  XColor                    black;
+  Pixmap                    icon;
+  Colormap                  colormap;
+  double                    pixel_aspect;
+
+  int		            prefered_visual_class;
+  VisualID	            prefered_visual_id;
+  int		            install_colormap;
+
+  xitk_skin_config_t       *skin_config;
+  xitk_dnd_t                xdnd;
+
+  ImlibData                *imlib_data;
+
+  Window                    video_window; 
+  int                       cursor_visible;
+  int                       cursor_grabbed;
+
+  Window                    panel_window;
+
+  uint32_t                  debug_level;
+
+  int                       is_display_mrl;
+
+  /* Current mediamark */
+  mediamark_t               mmk;
+  
+  /* playlist */
+  struct {
+    mediamark_t           **mmk;
+    
+    int                     num;                   /* number of entries in playlist */
+    int                     cur;                   /* current entry in playlist */
+    int                     loop;                  /* not used yet */
+  } playlist;
+
+
+  int                       running;
+  int                       ignore_next;
+
+#ifdef HAVE_LIRC
+  int                       lirc_enable;
+#endif
+
+#ifdef HAVE_XF86VIDMODE
+  int                       XF86VidMode_fullscreen;
+#endif
+
+  struct {
+    int                     caps;
+    int                     volume_level;
+    int                     mute;
+  } mixer;
+
+  xitk_register_key_t       widget_key;
+
+  int                       layer_above;
+  int                       always_layer_above;
+  int                       reparent_hack;
+
+  int                       network;
+  
+  int                       use_root_window;
+
+  const char               *snapshot_location;
+  
+  int                       ssaver_timeout;
+
+  int                       skip_by_chapter;
+
+  int                       auto_vo_visibility;
+  int                       auto_panel_visibility;
+
+  kbinding_t                *kbindings;
+
+  struct {
+    int                      set;
+    int                      arg;
+  } numeric;
+  
+  int                        eventer_sticky;
+
+} gGui_t;
+
+#endif

@@ -39,26 +39,7 @@
 #include <zlib.h>
 #include <sys/wait.h>
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-#include "Imlib-light/Imlib.h"
-
-#include "event.h"
-#include "playlist.h"
-#include "control.h"
-#include "lirc.h"
-#include "videowin.h"
-#include "panel.h"
-#include "actions.h"
-#include "mrl_browser.h"
-#include "skins.h"
-#include "errors.h"
-#include "network.h"
-#include "event_sender.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 
 #ifdef HAVE_LIRC
 extern int no_lirc;
@@ -559,14 +540,15 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_DPMSSTANDBY:
-    {
-      pid_t pid;
-      if ((pid = fork()) == 0)
-	execlp("xset", "xset", "dpms", "force", "standby", NULL);
-      waitpid(pid, NULL, 0);
-    }
+    xine_system(0, "xset dpms force standby");
     break;
 
+  case ACTID_MRLIDENTTOGGLE:
+    gGui->is_display_mrl = !gGui->is_display_mrl;
+    panel_update_mrl_display();
+    playlist_mrlident_toggle();
+    break;
+    
   default:
     break;
   }
@@ -638,13 +620,13 @@ void gui_playlist_start_next(void) {
   if (gGui->ignore_next)
     return;
 
-  gGui->playlist_cur++;
+  gGui->playlist.cur++;
   panel_reset_slider ();
   
-  if(gGui->playlist_cur < gGui->playlist_num) {
-    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+  if(gGui->playlist.cur < gGui->playlist.num) {
+    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
     
-    (void) gui_xine_open_and_play(gGui->filename, 0, 0);
+    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, 0);
     
   }
   else {
@@ -652,11 +634,11 @@ void gui_playlist_start_next(void) {
     if(gGui->actions_on_start[0] == ACTID_QUIT)
       gui_exit(NULL, NULL);
     
-    gGui->playlist_cur--;
+    gGui->playlist.cur--;
     gui_display_logo();
   }
   
-  if(is_playback_widgets_enabled() && (!gGui->playlist_num) && (!gGui->filename)) {
+  if(is_playback_widgets_enabled() && (!gGui->playlist.num) && (!gGui->mmk.mrl)) {
     gui_set_current_mrl(NULL);
     enable_playback_controls(0);
   }
@@ -760,17 +742,13 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   /*
    * init playlist
    */
-
   for (i = 0; i < nfiles; i++)
-    gGui->playlist[i] = filenames[i];
-
-  gGui->playlist_num = nfiles; 
-  gGui->playlist_cur = 0;
-
-  if (nfiles)
-    strcpy(gGui->filename, gGui->playlist [gGui->playlist_cur]);
-  else 
-    panel_set_no_mrl();
+    mediamark_add_entry((const char *)filenames[i], (const char *)filenames[i], 0, -1);
+  
+  gGui->playlist.cur = 0;
+  gGui->is_display_mrl = 0;
+  
+  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 
   /*
    * X / imlib stuff
@@ -1015,18 +993,18 @@ void gui_run (void) {
 	  
 	  if(autoplay_mrls) {
 	    for (j = 0; j < num_mrls; j++)
-	      gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
+	      mediamark_add_entry((const char *)autoplay_mrls[j],
+				  (const char *)autoplay_mrls[j], 0, -1);
 	   
-	    gGui->playlist_num += j;
-	    gGui->playlist_cur = 0;
-	    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	    gGui->playlist.cur = 0;
+	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	  }
 	}    
       }
     }
   }  
 
-  enable_playback_controls((gGui->playlist_num > 0));
+  enable_playback_controls((gGui->playlist.num > 0));
   
   if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
@@ -1055,9 +1033,9 @@ void gui_run (void) {
     /*  The user request "play on start" */
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAY))
       
-      if(gGui->playlist[0] != NULL)
+      if((mediamark_get_current_mrl()) != NULL)
 	gui_execute_action_id(ACTID_PLAY);
-      
+    
     /* Flush actions on start */
     if(actions_on_start(gGui->actions_on_start, ACTID_QUIT)) {
       gGui->actions_on_start[0] = ACTID_QUIT;

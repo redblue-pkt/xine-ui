@@ -38,23 +38,7 @@
 #include <xine/xineutils.h>
 #include <pthread.h>
 
-#include "event.h"
-#include "control.h"
-#include "actions.h"
-#include "lirc.h"
-#include "panel.h"
-#include "playlist.h"
-#include "videowin.h"
-#include "mrl_browser.h"
-#include "setup.h"
-#include "event_sender.h"
-#include "stream_infos.h"
-#include "viewlog.h"
-#include "errors.h"
-#include "i18n.h"
-#include "kbindings.h"
-
-#include "xitk.h"
+#include "common.h"
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
@@ -91,7 +75,10 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
     gui_handle_xine_error(stream);
   }
   else {
-
+    const char *title = NULL;
+    const char *artist = NULL;
+    const char *album = NULL;
+    
     if(gGui->logo_mode != 2)
       gGui->logo_mode = 0;
 
@@ -100,6 +87,46 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
       
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
+
+      title = xine_get_meta_info(gGui->stream, XINE_META_INFO_TITLE);
+      artist = xine_get_meta_info(gGui->stream, XINE_META_INFO_ARTIST);
+      album = xine_get_meta_info(gGui->stream, XINE_META_INFO_ALBUM);
+      
+      if(title) {
+	char *ident;
+	int   len = strlen(title);
+	
+	if(artist && strlen(artist))
+	  len += strlen(artist) + 3;
+	if(album && strlen(album))
+	  len += strlen(album) + 3;
+	
+	ident = (char *) alloca(len + 1);
+	memset(ident, 0, len + 1);
+	sprintf(ident, "%s", title);
+	
+	if((artist && strlen(artist)) || (album && strlen(album))) {
+	  strcat(ident, " (");
+	  if(artist && strlen(artist))
+	    sprintf(ident, "%s%s", ident, artist);
+	  if((artist && strlen(artist)) && (album && strlen(album)))
+	    strcat(ident, " - ");
+	  if(album && strlen(album))
+	    sprintf(ident, "%s%s", ident, album);
+	  strcat(ident, ")");
+	}
+	
+	if(gGui->mmk.ident)
+	  free(gGui->mmk.ident);
+	if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
+	  free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	
+	gGui->mmk.ident = strdup(ident);
+	gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(ident);
+	
+	playlist_mrlident_toggle();
+	panel_update_mrl_display();
+      }
 
       if(has_video) {
 	
@@ -192,7 +219,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
    
   destroy_mrl_browser();
   control_exit(NULL, NULL);
-  pl_exit(NULL, NULL);
+  playlist_exit(NULL, NULL);
 
   config_save();
 
@@ -243,12 +270,12 @@ void gui_play (xitk_widget_t *w, void *data) {
   
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
 
-    if (!strncmp(gGui->filename, "xine-ui version", 15)) {
+    if (!strncmp(gGui->mmk.ident, "xine-ui version", 15)) {
       xine_error (_("No MRL (input stream) specified"));
       return;
     }
     
-    (void) gui_xine_open_and_play(gGui->filename, 0, 0);
+    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, 0);
   } 
   else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -273,7 +300,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
   panel_check_pause();
   panel_update_runtime_display();
 
-  if(is_playback_widgets_enabled() && (!gGui->playlist_num) && (!gGui->filename)) {
+  if(is_playback_widgets_enabled() && (!gGui->playlist.num) && (!gGui->mmk.mrl)) {
     gui_set_current_mrl(NULL);
     enable_playback_controls(0);
   }
@@ -291,66 +318,91 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
 }
 
 void gui_eject(xitk_widget_t *w, void *data) {
-  const char *tmp_playlist[MAX_PLAYLIST_LENGTH];
-  int i, new_num = 0;
+  int i;
   
-  if (xine_eject(gGui->stream)) {
-
-    if(gGui->playlist_num) {
-      char  *tok = NULL;
-      char  *mrl;
-      int    len;
+  if(xine_eject(gGui->stream)) {
+    
+    if(gGui->playlist.num) {
+      mediamark_t **mmk = NULL;
+      char         *tok = NULL;
+      char         *mrl;
+      int           len;
+      int           new_num = 0;
       /*
        * If it's an mrl (____://) remove all of them in playlist
        */
-      mrl = strstr(gGui->playlist[gGui->playlist_cur], "://");
+      mrl = strstr((mediamark_get_current_mrl()), ":/");
       if(mrl) {
-	len = (mrl - gGui->playlist[gGui->playlist_cur]) + 4;
+	char *cur_mrl = (char *)mediamark_get_current_mrl();
+	
+	len = (mrl - cur_mrl) + 3;
 	tok = (char *) alloca(len + 1);
 	memset(tok, 0, len + 1);
-  	snprintf(tok, len, "%s", gGui->playlist[gGui->playlist_cur]);
+  	snprintf(tok, len, "%s", cur_mrl);
       }
 
       if(tok != NULL) {
 	/* 
 	 * Store all of not maching entries
 	 */
-	for(i=0; i < gGui->playlist_num; i++) {
-	  if(strncasecmp(gGui->playlist[i], tok, strlen(tok))) {
-	    tmp_playlist[new_num] = gGui->playlist[i];
+	for(i = 0; i < gGui->playlist.num; i++) {
+	  if(strncasecmp(gGui->playlist.mmk[i]->mrl, tok, strlen(tok))) {
+	    
+	    if(!new_num)
+	      mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
+	    else { 
+	      if(new_num > 1) {
+		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (new_num + 1));
+	      }
+	    }
+	    
+	    (void ) mediamark_store_mmk(&mmk[new_num], 
+					gGui->playlist.mmk[i]->mrl, gGui->playlist.mmk[i]->mrl,
+					gGui->playlist.mmk[i]->start, gGui->playlist.mmk[i]->end);
 	    new_num++;
 	  }
 	}
+
 	/*
-	 * Create new _cleaned_ playlist
+	 * flip playlists.
 	 */
-	memset(&gGui->playlist, 0, sizeof(gGui->playlist));
-	for(i=0; i<new_num; i++)
-	  gGui->playlist[i] = tmp_playlist[i];
+	mediamark_free_mediamarks();
+	if(mmk)
+	  gGui->playlist.mmk = mmk;
+
+	gGui->playlist.num = new_num;
 	
-	gGui->playlist_num = new_num;
 	if(new_num)
-	  gGui->playlist_cur = 0;
-      }
+	  gGui->playlist.cur = 0;
+     }
       else {
 	/*
 	 * Remove only the current MRL
 	 */
-	for(i = gGui->playlist_cur; i < gGui->playlist_num; i++)
-	  gGui->playlist[i] = gGui->playlist[i+1];
+	mediamark_free_entry(gGui->playlist.cur);
+
+	for(i = gGui->playlist.cur; i < gGui->playlist.num; i++)
+	  gGui->playlist.mmk[i] = gGui->playlist.mmk[i + 1];
 	
-	gGui->playlist_num--;
-	if(gGui->playlist_cur) gGui->playlist_cur--;
+	gGui->playlist.mmk = (mediamark_t **) 
+	  realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
+
+	gGui->playlist.mmk[gGui->playlist.num] = NULL;
+
+	if(gGui->playlist.cur)
+	  gGui->playlist.cur--;
+
       }
 
-      if(is_playback_widgets_enabled() && (!gGui->playlist_num)) {
+      if(is_playback_widgets_enabled() && (!gGui->playlist.num)) {
 	enable_playback_controls(0);
 	gui_display_logo();
       }
+
     }
     
-    gui_set_current_mrl(gGui->playlist [gGui->playlist_cur]);
-    pl_update_playlist();
+    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+    playlist_update_playlist();
   }
 }
 
@@ -403,8 +455,8 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
     set_mrl_browser_transient();
   }
 
-  if(pl_is_visible())
-    pl_raise_window();
+  if(playlist_is_visible())
+    playlist_raise_window();
   
   if(control_is_visible())
     control_raise_window();
@@ -553,8 +605,8 @@ void *gui_seek_relative_thread(void *data) {
 void gui_set_current_position (int pos) {
   int err;
   
-  if(gGui->logo_mode && (gGui->playlist[gGui->playlist_cur])) {
-    if(!xine_open(gGui->stream, (const char *)gGui->playlist[gGui->playlist_cur])) {
+  if(gGui->logo_mode && (mediamark_get_current_mrl())) {
+    if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
       gui_handle_xine_error(gGui->stream);
       return;
     }
@@ -565,7 +617,7 @@ void gui_set_current_position (int pos) {
     return;
     
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY)
-    xine_open(gGui->stream, gGui->filename);
+    xine_open(gGui->stream, gGui->mmk.mrl);
   
   gGui->ignore_next = 1;
   
@@ -605,6 +657,7 @@ void gui_dndcallback (char *filename) {
     memset(&buffer, 0, sizeof(buffer));
     memset(&buffer2, 0, sizeof(buffer2));
 
+#warning FIXME
     if((strlen(filename) > 6) && 
        (!strncmp(filename, "file:", 5))) {
       
@@ -636,16 +689,16 @@ void gui_dndcallback (char *filename) {
     }
     else
       sprintf(buffer, "%s", filename);
-      
-    gGui->playlist_cur = gGui->playlist_num++;
-    gGui->playlist[gGui->playlist_cur] = strdup(buffer);
-
+    
+    mediamark_add_entry(buffer, buffer, 0, -1);
+    gGui->playlist.cur = (gGui->playlist.num - 1);
+    
     if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode)
-      gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+    
+    playlist_update_playlist();
 
-    pl_update_playlist();
-
-    if((!is_playback_widgets_enabled()) && gGui->playlist_num)
+    if((!is_playback_widgets_enabled()) && gGui->playlist.num)
       enable_playback_controls(1);
   }
 }
@@ -667,9 +720,9 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
     }
     else {
 
-      if((gGui->playlist_cur + value) < gGui->playlist_num) {
-
-	gGui->playlist_cur += (value - 1);
+      if((gGui->playlist.cur + value) < gGui->playlist.num) {
+	
+	gGui->playlist.cur += (value - 1);
 	
 	gGui->ignore_next = 0;
 	gui_playlist_start_next();
@@ -688,19 +741,19 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
     }
     else {
 
-      if((gGui->playlist_cur - value) >= 0) {
+      if((gGui->playlist.cur - value) >= 0) {
 	
 	gGui->ignore_next = 1;
-	gGui->playlist_cur -= value;
+	gGui->playlist.cur -= value;
 	
-	if((gGui->playlist_cur < gGui->playlist_num)) {
-	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	  
-	  (void) gui_xine_open_and_play(gGui->filename, 0, 0);
+	if((gGui->playlist.cur < gGui->playlist.num)) {
+	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+
+	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, 0);
   
 	}
 	else {
-	  gGui->playlist_cur = 0;
+	  gGui->playlist.cur = 0;
 	}
 	
 	gGui->ignore_next = 0;
@@ -718,14 +771,14 @@ void gui_nextprev(xitk_widget_t *w, void *data) {
 
 void gui_playlist_show(xitk_widget_t *w, void *data) {
 
-  if(!pl_is_running()) {
+  if(!playlist_is_running()) {
     playlist_editor();
   }
   else {
-    if(pl_is_visible())
-      pl_exit(NULL, NULL);
+    if(playlist_is_visible())
+      playlist_exit(NULL, NULL);
     else
-      pl_toggle_visibility(NULL, NULL);
+      playlist_toggle_visibility(NULL, NULL);
   }
 
 }
@@ -749,22 +802,33 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
 }
 
-void gui_set_current_mrl(char const *mrl) {
+void gui_set_current_mrl(mediamark_t *mmk) {
 
-  if(mrl)
-    strcpy(gGui->filename, mrl);
-  else
-    panel_set_no_mrl();
+  if(gGui->mmk.mrl)
+    free(gGui->mmk.mrl);
+  if(gGui->mmk.ident)
+    free(gGui->mmk.ident);
   
-  panel_update_mrl_display ();
-  pl_update_focused_entry();
-}
+  if(mmk) {
+    gGui->mmk.mrl = strdup(mmk->mrl);
+    gGui->mmk.ident = strdup(((mmk->ident) ? mmk->ident : mmk->mrl));
+    gGui->mmk.start = mmk->start;
+    gGui->mmk.end = mmk->end;
+  }
+  else {
+    char buffer[1024];
+    
+    memset(&buffer, 0, sizeof(buffer));
+    sprintf(buffer, "xine-ui version %s", VERSION);
+    
+    gGui->mmk.mrl = strdup(_("There is no mrl."));
+    gGui->mmk.ident = strdup(buffer);
+    gGui->mmk.start = 0;
+    gGui->mmk.end = -1;
+  }
 
-const char *gui_get_next_mrl () {
-  if (gGui->playlist_cur < gGui->playlist_num-1) {
-    return gGui->playlist[gGui->playlist_cur + 1];
-  } else
-    return NULL;
+  panel_update_mrl_display ();
+  playlist_update_focused_entry();
 }
 
 void gui_control_show(xitk_widget_t *w, void *data) {

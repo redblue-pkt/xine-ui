@@ -33,18 +33,7 @@
 #include <X11/keysym.h>
 #include <pthread.h>
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-#include "Imlib-light/Imlib.h"
-#include "panel.h"
-#include "event.h"
-#include "actions.h"
-#include "skins.h"
-#include "errors.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 
 extern gGui_t          *gGui;
 
@@ -397,7 +386,7 @@ void control_panel(void) {
   if (!(control->bg_image = 
 	Imlib_load_image(gGui->imlib_data,
 			 xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
-    xine_error(_("xine-playlist: couldn't find image for background\n"));
+    xine_error(_("control: couldn't find image for background\n"));
     exit(-1);
   }
 

@@ -32,17 +32,7 @@
 #include <X11/keysym.h>
 #include <pthread.h>
 
-#include <xine.h>
-#include <xine/xineutils.h>
-
-#include "event.h"
-#include "actions.h"
-#include "panel.h"
-#include "errors.h"
-#include "utils.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 	
 #define WINDOW_WIDTH        500
 #define WINDOW_HEIGHT       460

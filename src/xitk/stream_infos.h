@@ -24,6 +24,12 @@
 #ifndef STREAM_INFOS_H
 #define STREAM_INFOS_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "xitk.h"
+
 void stream_infos_panel(void);
 void stream_infos_exit(xitk_widget_t *, void *);
 int stream_infos_is_visible(void);

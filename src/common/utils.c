@@ -30,7 +30,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
+
+#include <xine/xineutils.h>
+
+#include "utils.h"
 
 extern char **environ;
 extern int errno;
@@ -78,4 +83,109 @@ int xine_system(int dont_run_as_root, char *command) {
   } while(1);
   
   return -1;
+}
+
+/*
+ * cleanup the str string, take care about '
+ */
+char *atoa(char *str) {
+  char *pbuf;
+  int   quote = 0, dblquote = 0;
+
+  pbuf = str;
+  
+  while(*pbuf == ' ') 
+    pbuf++;
+
+  if(*pbuf == '\'')
+    quote = 1;
+  else if(*pbuf == '"')
+    dblquote = 1;
+  
+  pbuf = str;
+
+  while(*pbuf != '\0')
+    pbuf++;
+  
+  if(pbuf > str)
+    pbuf--;
+
+  while((pbuf > str) && (*pbuf == '\r' || *pbuf == '\n')) {
+    *pbuf = '\0';
+    pbuf--;
+  }
+
+  while((pbuf > str) && (*pbuf == ' ')) {
+    *pbuf = '\0';
+    pbuf--;
+  }
+  
+  if((quote && (*pbuf == '\'')) || (dblquote && (*pbuf == '"'))) {
+    *pbuf = '\0';
+    pbuf--;
+  }
+  
+  pbuf = str;
+
+  while(*pbuf == ' ' || *pbuf == '\t')
+    pbuf++;
+  
+  if((quote && (*pbuf == '\'')) || (dblquote && (*pbuf == '"')))
+    pbuf++;
+  
+  return pbuf;
+}
+
+/*
+ *
+ */
+static int _mkdir_safe(char *path) {
+  struct stat  pstat;
+  
+  if(path == NULL)
+    return 0;
+  
+  if((lstat(path, &pstat)) < 0) {
+    /* file or directory no exist, create it */
+    if(mkdir(path, 0755) < 0) {
+      fprintf(stderr, "mkdir(%s) failed: %s\n", path, strerror(errno));
+      return 0;
+    }
+  }
+  else {
+    /* Check of found file is a directory file */
+    if(!S_ISDIR(pstat.st_mode)) {
+      fprintf(stderr, "%s is not a directory.\n", path);
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
+/*
+ *
+ */
+int mkdir_safe(char *path) {
+  char *p, *pp;
+  char  buf[_PATH_MAX + _NAME_MAX + 1];
+  char  buf2[_PATH_MAX + _NAME_MAX + 1];
+  
+  if(path == NULL)
+    return 0;
+  
+  memset(&buf, 0, sizeof(buf));
+  memset(&buf2, 0, sizeof(buf2));
+  
+  sprintf(buf, "%s", path);
+  pp = buf;
+  while((p = xine_strsep(&pp, "/")) != NULL) {
+    if(p && strlen(p)) {
+      sprintf(buf2, "%s/%s", buf2, p);
+      if(!_mkdir_safe(buf2))
+	return 0;
+    }
+  }
+
+  return 1;
 }

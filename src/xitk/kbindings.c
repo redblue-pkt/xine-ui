@@ -30,15 +30,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include <xine/xineutils.h>
-
-#include "event.h"
-#include "kbindings.h"
-#include "actions.h"
-#include "errors.h"
-#include "i18n.h"
-
-#include "xitk.h"
+#include "common.h"
 
 extern gGui_t                 *gGui;
 
@@ -102,8 +94,6 @@ static char         *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*
 #define KEYMOD_MOD3            0x00000010
 #define KEYMOD_MOD4            0x00000020
 #define KEYMOD_MOD5            0x00000040
-
-#define SAFE_FREE(X)           if(X) free(X)
 
 #define DEFAULT_DISPLAY_MODE   1
 #define LIRC_DISPLAY_MODE      2
@@ -371,14 +361,16 @@ static kbinding_entry_t default_binding_table[] = {
     "ZoomOutY",               ACTID_ZOOM_Y_OUT              , "Z",        KEYMOD_META },
   { "Reset zooming.",
     "ZoomReset",              ACTID_ZOOM_RESET              , "z",        KEYMOD_CONTROL | KEYMOD_META    , 0 },
-  { "Toggle TV modes on the DXR3",
-    "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL , 0 },
-  { "Visibility toggle of log viewer",
+  { "Toggle TV modes on the DXR3.",
+   "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL , 0 },
+  { "Visibility toggle of log viewer.",
     "ViewlogShow",            ACTID_VIEWLOG	            , "l",	  KEYMOD_META    , 0 },
-  { "Key binding editor",
+  { "Key binding editor.",
     "KeyBindingEditor",       ACTID_KBEDIT	            , "k",	  KEYMOD_META    , 0 },
-  { "Switch Monitor to DPMS standby mode",
+  { "Switch Monitor to DPMS standby mode.",
     "DPMSStandby",            ACTID_DPMSSTANDBY             , "d",        KEYMOD_NOMOD   , 0 },
+  { "Display Mrl/Ident toggle.",
+    "MrlIdentToggle",         ACTID_MRLIDENTTOGGLE          , "t",        KEYMOD_CONTROL , 0 },
   { 0,
     0,                        0,                            0,            0              , 0 }
 };
