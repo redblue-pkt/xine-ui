@@ -39,7 +39,7 @@
 
 #include "common.h"
 
-#define TEST_VO_VALUE(val)  ((val >= 0) && (val < 65000)) ? val + 400 : val - 400
+#define TEST_VO_VALUE(val)  (65535 - val)
 
 extern gGui_t          *gGui;
 
@@ -65,6 +65,7 @@ typedef struct {
 } _control_t;
 
 static _control_t    *control = NULL;
+static int hue_ena, sat_ena, bright_ena, contr_ena;
 
 
 static void hue_changes_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -137,7 +138,8 @@ static void set_hue(xitk_widget_t *w, void *data, int value) {
   if((hue = get_current_param(XINE_PARAM_VO_HUE)) != value)
     update_sliders_video_settings();
   
-  config_update_num("gui.vo_hue", hue);
+  if(hue_ena)
+    config_update_num("gui.vo_hue", hue);
 }
 
 /*
@@ -151,7 +153,8 @@ static void set_saturation(xitk_widget_t *w, void *data, int value) {
   if((saturation = get_current_param(XINE_PARAM_VO_SATURATION)) != value)
     update_sliders_video_settings();
 
-  config_update_num("gui.vo_saturation", saturation);
+  if(sat_ena)
+    config_update_num("gui.vo_saturation", saturation);
 }
 
 /*
@@ -165,7 +168,8 @@ static void set_brightness(xitk_widget_t *w, void *data, int value) {
   if((brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS)) != value)
     update_sliders_video_settings();
   
-  config_update_num("gui.vo_brightness", brightness);
+  if(bright_ena)
+    config_update_num("gui.vo_brightness", brightness);
 }
 
 /*
@@ -179,55 +183,56 @@ static void set_contrast(xitk_widget_t *w, void *data, int value) {
   if((contrast = get_current_param(XINE_PARAM_VO_CONTRAST)) != value)
     update_sliders_video_settings();
   
-  config_update_num("gui.vo_contrast", contrast);
+  if(contr_ena)
+    config_update_num("gui.vo_contrast", contrast);
 }
+
+
+static int test_vo_property(int property) {
+  int cur;
+
+  cur = get_current_param(property);
+  set_current_param(property, TEST_VO_VALUE(cur));
+  if((get_current_param(property)) == cur)
+    return 0;
+  else {
+    set_current_param(property, cur);
+    return 1;
+  }
+}
+
 
 /*
  * Enable or disable video settings sliders.
  */
 static void active_sliders_video_settings(void) {
-  int cur;
-
-  cur = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
-  set_current_param(XINE_PARAM_VO_BRIGHTNESS, TEST_VO_VALUE(cur));
-  if((get_current_param(XINE_PARAM_VO_BRIGHTNESS)) == cur)
-    xitk_disable_widget(control->bright);
-  else {
-    xitk_enable_widget(control->bright);
-    set_current_param(XINE_PARAM_VO_BRIGHTNESS, cur);
-  }
   
-  cur = get_current_param(XINE_PARAM_VO_SATURATION);
-  set_current_param(XINE_PARAM_VO_SATURATION, TEST_VO_VALUE(cur));
-  if((get_current_param(XINE_PARAM_VO_SATURATION)) == cur)
+  if(!bright_ena)
+    xitk_disable_widget(control->bright);
+  else
+    xitk_enable_widget(control->bright);
+  
+  if(!sat_ena)
     xitk_disable_widget(control->sat);
-  else {
+  else
     xitk_enable_widget(control->sat);
-    set_current_param(XINE_PARAM_VO_SATURATION, cur);
-  }
 
-  cur = get_current_param(XINE_PARAM_VO_HUE);
-  set_current_param(XINE_PARAM_VO_HUE, TEST_VO_VALUE(cur));
-  if((get_current_param(XINE_PARAM_VO_HUE)) == cur)
+  if(!hue_ena)
     xitk_disable_widget(control->hue);
-  else {
+  else
     xitk_enable_widget(control->hue);
-    set_current_param(XINE_PARAM_VO_HUE, cur);
-  }
 
-  cur = get_current_param(XINE_PARAM_VO_CONTRAST);
-  set_current_param(XINE_PARAM_VO_CONTRAST, TEST_VO_VALUE(cur));
-  if((get_current_param(XINE_PARAM_VO_CONTRAST)) == cur)
+  if(!contr_ena)
     xitk_disable_widget(control->contr);
-  else {
+  else
     xitk_enable_widget(control->contr);
-    set_current_param(XINE_PARAM_VO_CONTRAST, cur);
-  }
-
 }
 
 void control_config_register(void) {
-  set_current_param(XINE_PARAM_VO_HUE,
+
+  hue_ena = test_vo_property(XINE_PARAM_VO_HUE);
+  if(hue_ena)
+    set_current_param(XINE_PARAM_VO_HUE,
 		    (gGui->video_settings.hue = 
 		     xine_config_register_range(gGui->xine, "gui.vo_hue",
 						(get_current_param(XINE_PARAM_VO_HUE)),
@@ -238,7 +243,9 @@ void control_config_register(void) {
 						hue_changes_cb, 
 						CONFIG_NO_DATA)));
   
-  set_current_param(XINE_PARAM_VO_BRIGHTNESS, 
+  bright_ena = test_vo_property(XINE_PARAM_VO_BRIGHTNESS);
+  if(bright_ena)
+    set_current_param(XINE_PARAM_VO_BRIGHTNESS, 
 		    (gGui->video_settings.brightness = 
 		     xine_config_register_range(gGui->xine, "gui.vo_brightness",
 						(get_current_param(XINE_PARAM_VO_BRIGHTNESS)),
@@ -249,7 +256,9 @@ void control_config_register(void) {
 						brightness_changes_cb, 
 						CONFIG_NO_DATA)));
 
-  set_current_param(XINE_PARAM_VO_SATURATION,
+  sat_ena = test_vo_property(XINE_PARAM_VO_SATURATION);
+  if(sat_ena)
+    set_current_param(XINE_PARAM_VO_SATURATION,
 		    (gGui->video_settings.saturation = 
 		     xine_config_register_range(gGui->xine, "gui.vo_saturation",
 						(get_current_param(XINE_PARAM_VO_SATURATION)),
@@ -260,7 +269,9 @@ void control_config_register(void) {
 						saturation_changes_cb, 
 						CONFIG_NO_DATA)));
 
-  set_current_param(XINE_PARAM_VO_CONTRAST,
+  contr_ena = test_vo_property(XINE_PARAM_VO_CONTRAST);
+  if(contr_ena)
+    set_current_param(XINE_PARAM_VO_CONTRAST,
 		    (gGui->video_settings.contrast = 
 		     xine_config_register_range(gGui->xine, "gui.vo_contrast",
 						(get_current_param(XINE_PARAM_VO_CONTRAST)),
