@@ -1465,9 +1465,9 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 	
 	/* first, kick off unsupported modes */
 	for(mode = 1; mode < gVw->XF86_modelines_count; mode++) {
-
-	  if(XF86VidModeValidateModeLine(gGui->display,
-					 gGui->screen, gVw->XF86_modelines[mode]) != Success) {
+	  
+	  if(!XF86VidModeValidateModeLine(gGui->display, gGui->screen, 
+					  gVw->XF86_modelines[mode])) {
 	    int wrong_mode;
 	    
 	    printf(_("XF86VidModeModeLine %dx%d isn't valid: discarded.\n"), 
