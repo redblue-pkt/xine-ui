@@ -628,16 +628,13 @@ int main(int argc, char *argv[]) {
    * generate and init a config "object"
    */
   {
-    char *homedir;
+    char *cfgfile = ".xine/config";
 
     if (!(gGui->configfile = getenv ("XINERC"))) {
-      const char* config_file="/.xine/config";
-      homedir = strdup(xine_get_homedir());
-      
-      gGui->configfile = (char *) xine_xmalloc(strlen(homedir) + strlen(config_file) + 1);
-
-      sprintf (gGui->configfile, "%s%s", homedir,config_file);
+      gGui->configfile = (char *) xine_xmalloc((strlen((xine_get_homedir())) + strlen(cfgfile))+2);
+      sprintf (gGui->configfile, "%s/%s", (xine_get_homedir()), cfgfile);
     }
+      
   }
 
   gGui->config = config_file_init (gGui->configfile);
