@@ -572,7 +572,11 @@ void video_window_set_visibility(int show_window) {
 
   static Atom  XA_WIN_LAYER = None;
   long         data[1];
-
+  
+  gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+				      GUI_DATA_EX_VIDEOWIN_VISIBLE, 
+				      show_window);
+  
   gVw->show = show_window;
 
   if (gVw->show == 1) {
