@@ -92,7 +92,6 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   if((has_video || gGui->visual_anim.enabled == 1) && gGui->visual_anim.running) {
     xine_post_out_t * audio_source;
 
-    printf("CASE 1.\n");
     audio_source = xine_get_audio_source(stream);
     if(xine_post_wire_audio_port(audio_source, gGui->ao_port)) {
       if(gGui->visual_anim.enabled == 1)
@@ -103,7 +102,6 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 	     (gGui->visual_anim.running == 0) && gGui->visual_anim.post_output) {
     xine_post_out_t * audio_source;
 
-    printf("CASE 2.\n");
     audio_source = xine_get_audio_source(stream);
     if(xine_post_wire_audio_port(audio_source, gGui->visual_anim.post_output->audio_input[0]))
       gGui->visual_anim.running = 1;
@@ -112,7 +110,6 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   else if(has_video && gGui->post_video && (gGui->post_video_num > 0)) {
     xine_post_out_t *video_source;
     
-    printf("CASE 3.\n");
     video_source = xine_get_video_source(stream);
     if(xine_post_wire_video_port(video_source, gGui->post_video->video_input[0]))
       printf("xine_post_wire_video_port() succeed\n");
