@@ -102,18 +102,28 @@ static char *get_yesno_string(uint32_t val) {
   return ((val > 0) ? yesno[1] : yesno[0]);
 }
 
-static char *get_fourcc_string(uint32_t fourcc) {
-  static char fourcc_txt[10];
+static char *get_fourcc_string(uint32_t f) {
+  static char fcc[5];
   
-  memset(&fourcc_txt, 0, sizeof(fourcc_txt));
-  if(fourcc <= 0xFFFF)
-    sprintf(fourcc_txt, "0x%x", fourcc);
-  else {
-    *(uint32_t *)fourcc_txt = fourcc;
-    fourcc_txt[4] = '\0';
+  memset(&fcc, 0, sizeof(fcc));
+  
+  /* Should we take care about endianess ? */
+  fcc[0] = f     | 0xFFFFFF00;
+  fcc[1] = f>>8  | 0xFFFFFF00;
+  fcc[2] = f>>16 | 0xFFFFFF00;
+  fcc[3] = f>>24 | 0xFFFFFF00;
+  fcc[4] = 0;
+  
+  if(f <= 0xFFFF)
+    sprintf(fcc, "0x%x", f);
+  
+  if((fcc[0] == 'm') && (fcc[1] == 's')) {
+    if((fcc[2] = 0x0) && (fcc[3] == 0x55)) {
+      *(uint32_t *) fcc = 0x33706d2e; /* Force to '.mp3' */
+    }
   }
   
-  return &fourcc_txt[0];
+  return &fcc[0];
 }
 
 static char *get_num_string(uint32_t num) {
