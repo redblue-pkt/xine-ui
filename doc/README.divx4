@@ -5,6 +5,7 @@ XINE and the divx4 decoder plugin
 
 oct 9 2001: inital version
 oct 27 2001: update - version checking and other things
+nov 21 2001: update - version checking revisited and decoder releasing
 
 1. Overview
 
@@ -13,7 +14,7 @@ mpeg4) and divx3.11 (or divx ;-) or msmpeg4v3) bitstreams, using
 the library "libdivxdecore" from the binary divx4linux package or
 a good (if you can find one) OpenDivx variant.
 
-In version of xine before 0.9.2, the only plugin for decoding these
+In versions of xine before 0.9.2, the only plugin for decoding these
 streams is the ffmpeg plugin. Of course it's still available, but
 you might want to consider switching to the divx4 plugin because
 - it is more optimized than ffmpeg, therefore uses fewer cpu resources
@@ -38,7 +39,8 @@ software tab, then codecs) or http://avifile.sourceforge.net
 in the xine sources), available at http://www.projectmayo.com.
 There is an alternative (but based on opendivx) project at 
 http://www.videocoding.de and mplayer (http://www.mplayerhq.hu) includes 
-another tweaked opendivx version.
+another tweaked opendivx version (but the API differs from what xine's
+divx4 plugin needs).
 
 OpenDivx development seems not very active these days. I couldn't get
 the one from projectmayo to work at all (divxcore nor divx4linux).
@@ -49,9 +51,25 @@ Recent versions of the divx4 package include a method for getting their
 version number (really the date). By default, the xine divx4 plugin
 will only accept packages that
  * support the version number command
- * report that they are newer than august 2001
-But if you're sure your package is OK, you can override this check
-(see below).
+ * report that they are newer than oktober 2001
+   (that used to be august, but some august packages crashed on 
+    the RELEASE command, which is very important now to prevent memory
+    leaks)
+
+The version check is performed when the xine decoder is first asked to
+decode a stream, not at initialization. This has a good and a bad
+side:
+* The good: you'll never be bothered about the version check if you don't
+use the divx4 plugin (it's disabled by default, see below). This is
+especially good considering some crap opendivx versions can trigger
+a segmentation fault when probed for the version.
+* The bad: if you use the divx4 plugin and your package is too old,
+you must manually disable the plugin again in the xine input file; the
+check happens too late for the plugin to disable itself (it's a long
+story...)
+
+If the version check says it's too old, but you're sure your package is OK, 
+you can override the version check (see below).
 
 3. .xinerc 
 
@@ -104,6 +122,9 @@ when probed for the version number. The divx4 plugin attempts to
 catch this signal and prints a message when it happens. The solution
 is to either
 - remove the offending libdivx4decore, or
+- set the divx4 priority back to a low value (like 0) (the check is
+  performed at decode time, not at initalization time), or
 - disable the version check by forcing the version to a too low number, 
 e.g. set "divx4_forceversion:1" in .xinerc
+
 
