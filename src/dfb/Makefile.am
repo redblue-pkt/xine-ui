@@ -10,16 +10,6 @@ if HAVE_DIRECTFB
 dfb_programs = dfbxine
 endif
 
-#if HAVE_GETOPT_LONG
-#else
-#GETOPT_C = \
-#	$(top_srcdir)/src/common/getopt.c \
-#	$(top_srcdir)/src/common/getopt1.c
-#
-#GETOPT_H = \
-# 	$(top_srcdir)/src/common/getopt.h
-#endif
-
 bin_PROGRAMS = ${dfb_programs} 
 
 if HAVE_DIRECTFB
