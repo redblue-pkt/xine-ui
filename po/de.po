@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.22\n"
+"Project-Id-Version: xine-ui 0.9.23\n"
 "POT-Creation-Date: 2003-12-23 17:17+0100\n"
-"PO-Revision-Date: 2003-12-18 09:52+0100\n"
+"PO-Revision-Date: 2004-01-05 09:22+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -203,7 +203,7 @@ msgstr "Sättigung ändern"
 
 #: src/xitk/control.c:675
 msgid "Sat"
-msgstr "Sat"
+msgstr "Sät"
 
 #: src/xitk/control.c:695
 msgid "Control BRIGHTNESS value"
@@ -1043,6 +1043,16 @@ msgid ""
 "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
 msgstr ""
+"  -p, --auto-play [opt]        Beim starten abspielen. Optional gefolgt "
+"von:\n"
+"                    'f': im Vollbildmodus.\n"
+"                    'h': GUI Verstecken (Bedienfeld, usw.).\n"
+"                    'w': Video-Fenster verstecken.\n"
+"                    'q': Nach dem abspielen beenden.\n"
+"                    'd': DVD-Playlist auslesen. (Veraltet. Nutzen Sie -s "
+"DVD)\n"
+"                    'v': VCD-Playliste auslesen. (Veraltet. Nutzen Sie -s "
+"VCD)\n"
 
 #: src/xitk/main.c:605
 msgid "                    'F': in xinerama fullscreen mode.\n"
@@ -1078,12 +1088,12 @@ msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-lirc                LIRC-Unterstützung abschalten.\n"
 
 #: src/xitk/main.c:617
-#, fuzzy
 msgid ""
 "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
 "                               is either an X11 visual class, or a visual "
 "id.\n"
 msgstr ""
+"      --visual <Klasse-oder-id> Angegebenes X11 Visual benutzen\n"
 "                                <Klasse-oder-id> ist entweder eine X11\n"
 "                                visual Klasse oder eine visual id.\n"
 
@@ -1103,6 +1113,14 @@ msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
 msgstr ""
+"      --keymap [=Option]       Zeigt Tastentabelle. Optionen sind:\n"
+"                                 'default': Zeige Standard Tastentabelle,\n"
+"                                 'lirc': Zeigt Beispiel einer .lircrc-"
+"Datei.\n"
+"                                 'remapped': Zeige aktuelle Tastentabelle.\n"
+"                                 'file:<Dateiname>': benutze <Dateiname>\n"
+"                                                     als Tastentabelle.\n"
+"                                  -Ohne Angabe wird 'default' benutzt.\n"
 
 #: src/xitk/main.c:626
 msgid "  -n, --network                Enable network remote control server.\n"
@@ -1125,7 +1143,6 @@ msgid "  -B, --borderless             Borderless video output window.\n"
 msgstr "  -B, --borderless              Rahmenloses Video-Fenster.\n"
 
 #: src/xitk/main.c:630
-#, fuzzy
 msgid ""
 "  -N, --animation <mrl>        Specify mrl to play when video output isn't "
 "used.\n"
@@ -1133,6 +1150,7 @@ msgid ""
 msgstr ""
 "  -N, --animation <mrl>        MRL zum Abspielen, falls keine Videoanteil "
 "vorhanden ist.\n"
+"                                 -Kann mehr als einmal angegeben werden.\n"
 
 #: src/xitk/main.c:632
 msgid "  -P, --playlist <filename>    Load a playlist file.\n"
@@ -1149,6 +1167,17 @@ msgid ""
 "                                 'shuffle+': same as 'shuffle', but "
 "indefinetely replay the playlist.\n"
 msgstr ""
+"  -l, --loop [=Modus]          Setzt Wiederholmodus der Playliste. Modi "
+"sind:\n"
+"                                'loop': Gesamte Playlist wiederholen. "
+"(Standard)\n"
+"                                'repeat': Aktuellen Playlisteintrag "
+"wiederholen.\n"
+"                                'shuffle': Zufälligen ungespielten Eintrag "
+"aus                                           Playlist auswählen.\n"
+"                                'shuffle+': Ähnlich wie 'shuffle', nur wird "
+"die                                            Playliste unendlichoft "
+"wiederholt.\n"
 
 #: src/xitk/main.c:638
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
@@ -1190,6 +1219,32 @@ msgid ""
 "                    play, slow2, slow4, pause, fast2,\n"
 "                    fast4, stop, quit, fullscreen, eject.\n"
 msgstr ""
+"  -S, --session <Option1,Option2,...>\n"
+"                               Sitzungsverwaltung. Option kann sein:\n"
+"                    session=n   Sitzungsnummer <n> angeben,\n"
+"                    mrl=m       MRL <m> der Playliste hinzufügen,\n"
+"                    audio=c     Audiokanal wählen (<c>: 'next' oder "
+"'prev'),\n"
+"                    spu=c       SPU-Kanal wählen (<c>: 'next' oder 'prev'),\n"
+"                    volume=v    Audiolautstärke <v> setzen,\n"
+"                    amp=v       Audioverstärkungslevel <v> setzen,\n"
+"                    loop=m      Wiederholmodus (<m>: 'none', 'loop', "
+"'repeat',                                                'shuffle' oder "
+"'shuffle+'),\n"
+"                    (playlist|pl)=p\n"
+"                      <p> kann sein:\n"
+"                        'clear'  Playliste löschen,\n"
+"                        'first'  Ersten Eintrag in Playliste wiedergeben,\n"
+"                        'prev'   Vorherigen Eintrag in Playliste "
+"wiedergeben,\n"
+"                        'next'   Nächsten Eintrag in Playliste wiedergeben,\n"
+"                        'last'   Letzten Eintrag in Playliste wiedergeben,\n"
+"                        'load:s' Playliste aus Datei <s> laden,\n"
+"                        'stop'   Wiedergabe nach momentanen Titel stoppen.\n"
+"                        'cont'   Wiedergabe nach momentaten Titel "
+"weiterführen.\n"
+"                    play, slow2, slow4, pause, fast2,\n"
+"                    fast4, stop, quit, fullscreen, eject.\n"
 
 #: src/xitk/main.c:661
 msgid ""
@@ -1215,24 +1270,26 @@ msgstr ""
 "Option.\n"
 
 #: src/xitk/main.c:665
-#, fuzzy
 msgid ""
 "  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
 msgstr ""
+"  -r, --aspect-ratio <modus>   Setzt Seitenverhältnis für Video-Ausgabe. "
+"Modi sind:\n"
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
 
 #: src/xitk/main.c:668
-#, fuzzy
 msgid ""
 "      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
 "                               Slave is started with 'xine slave://address:"
 "port'\n"
 msgstr ""
+"      --broadcast-port <Port>  Setze Port für xine-Broadcaster (Master-"
+"Seite)\n"
 "                               Betrachter wird gestartet mit 'xine slave://"
-"address:port'\n"
+"Address:Port'\n"
 
 #: src/xitk/main.c:671
 msgid "      --no-logo                Don't display the logo.\n"
@@ -1250,6 +1307,10 @@ msgid ""
 "                               Parameters are comma separated.\n"
 "                               This option can be used more than one time.\n"
 msgstr ""
+"      --post <Plugin>[:Parameter=Wert][,...][;...]\n"
+"                               Lade ein oder mehrere Nach-Plugin(s).\n"
+"                               Parameter sind Komma-separiert.\n"
+"                               Diese Option kann mehrfach angegeben werden.\n"
 
 #: src/xitk/main.c:677
 msgid "      --disable-post           Don't enable post plugin(s).\n"
@@ -1279,6 +1340,10 @@ msgid ""
 "                    audio_out, video_out, demux, input, sub, post,\n"
 "                    audio_decoder, video_decoder.\n"
 msgstr ""
+"      --list-plugins [=Typ]   Liste aller verfügbaren Plaugins anzeigen,\n"
+"                               Optionaler <Typ> kann sein:\n"
+"                    audio_out, video_out, demux, input, sub, post,\n"
+"                    audio_decoder, video_decoder.\n"
 
 #: src/xitk/main.c:694
 msgid ""
@@ -1289,6 +1354,14 @@ msgid ""
 "                                 If <mrl> is given, xine will play the mrl\n"
 "                                 then quit (like -pq).\n"
 msgstr ""
+"      --bug-report [=mrl]      Fehlerberichtmodus aktivieren:\n"
+"                                   Ausführlichere Meldung, alle\n"
+"                                 Ausgaben sammeln und in Datei BUG-REPORT."
+"TXT\n"
+"                                 schreiben.\n"
+"                                 Falls <mrl> angegeben ist, wird xine diese\n"
+"                                 mrl abspielen und sich danach beenden (wie -"
+"pq).\n"
 
 #: src/xitk/main.c:701
 msgid ""
@@ -1301,6 +1374,15 @@ msgid ""
 "  DVD:   'dvd://VTS_01_2.VOB'\n"
 "  VCD:   'vcd://<track number>'\n"
 msgstr ""
+"Beispiele für MRLs (von \"Media Resource Locator\", "
+"Medienquellenbezeichnung):\n"
+"  Datei:  'Pfad/blah.vob'\n"
+"         '/Pfad/blah.vob'\n"
+"         'file://Pfad/blah.vob'\n"
+"         'fifo://[[mpeg1|mpeg2]:/]Pfad/blah'\n"
+"         'stdin://[mpeg1|mpeg2]' oder '-' (nur mpeg2)\n"
+"  DVD:   'dvd://VTS_01_2.VOB'\n"
+"  VCD:   'vcd://<Spur-Nummer>'\n"
 
 #: src/xitk/main.c:748 src/xitk/main.c:871
 msgid "video driver to use"
@@ -1366,9 +1448,8 @@ msgid ""
 msgstr "Flaschenpost fon der xine Library ;-):"
 
 #: src/xitk/main.c:1103
-#, fuzzy
 msgid "No Information available."
-msgstr "Keine Hilfe verfügbar"
+msgstr "Keine Informationen verfügbar."
 
 #: src/xitk/main.c:1109
 msgid ""
@@ -2755,320 +2836,6 @@ msgstr "xine Log Betrachter"
 #: src/xitk/viewlog.c:428
 msgid "Refresh"
 msgstr "Aktualisieren"
-
-#~ msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
-#~ msgstr ""
-#~ "  -p, --auto-play [opt]        Beim starten abspielen. Kann gefolgt "
-#~ "werden von:\n"
-
-#~ msgid "                    'f': in fullscreen mode.\n"
-#~ msgstr "                    'f': im Vollbildmodus.\n"
-
-#~ msgid "                    'h': hide GUI (panel, etc.).\n"
-#~ msgstr "                    'h': GUI Verstecken (Bedienfeld, usw.).\n"
-
-#~ msgid "                    'w': hide video window.\n"
-#~ msgstr "                    'w': Video-Fenster verstecken.\n"
-
-#~ msgid "                    'q': quit when play is done.\n"
-#~ msgstr "                    'q': Nach dem abspielen beenden.\n"
-
-#~ msgid ""
-#~ "                    'd': retrieve playlist from DVD. (deprecated. use -s "
-#~ "DVD)\n"
-#~ msgstr ""
-#~ "\t\t      'd': Playlist aus DVD auslesen. (Veraltet. Nutzen Sie -s DVD)\n"
-
-#~ msgid ""
-#~ "                    'v': retrieve playlist from VCD. (deprecated. use -s "
-#~ "VCD)\n"
-#~ msgstr ""
-#~ "                     'v': Playliste aus VCD auslesen. (Veraltet. Nutzen "
-#~ "Sie -s VCD)\n"
-
-#~ msgid ""
-#~ "      --visual <class-or-id>   Use the specified X11 visual. <class-or-"
-#~ "id>\n"
-#~ msgstr "      --visual <Klasse-oder-id> Angegebenes X11 Visual benutzen\n"
-
-#~ msgid "      --keymap [=option]       Display keymap. Option are:\n"
-#~ msgstr ""
-#~ "      --keymap [=option]       Zeigt Tastentabelle. Optionen sind:\n"
-
-#~ msgid ""
-#~ "                                 'default': display default keymap "
-#~ "table,\n"
-#~ msgstr ""
-#~ "                                 'default': Zeige Standard "
-#~ "Tastentabelle,\n"
-
-#~ msgid ""
-#~ "                                 'lirc': display draft of a .lircrc "
-#~ "config file.\n"
-#~ msgstr ""
-#~ "                                 'lirc': Zeige Beispiel einer .lircrc "
-#~ "konfigurations Datei.\n"
-
-#~ msgid ""
-#~ "                                 'remapped': user remapped keymap table.\n"
-#~ msgstr ""
-#~ "                                 'remapped': Zeige aktuelle "
-#~ "Tastentabelle.\n"
-
-#~ msgid ""
-#~ "                                 'file:<filename>': use <filename> as "
-#~ "keymap.\n"
-#~ msgstr ""
-#~ "                                 'file:<Dateiname>': benutze <Dateiname>\n"
-#~ "                                                     als Tastentabelle.\n"
-
-#~ msgid ""
-#~ "                                 -if no option is given, 'default' is "
-#~ "selected.\n"
-#~ msgstr ""
-#~ "                                  -wenn keine Option gegeben ist, wird "
-#~ "'default' benutzt.\n"
-
-#~ msgid "                                 -can be used more than one time.\n"
-#~ msgstr "                                 -Kann mehrfach angegeben werden.\n"
-
-#~ msgid ""
-#~ "  -l, --loop [=mode]           Set playlist loop mode (default: loop). "
-#~ "Modes are:\n"
-#~ msgstr ""
-#~ "  -l, --loop [=Modus]          Setzt Playlistwiederholungsmodus "
-#~ "(Standard: loop). Modi sind:\n"
-
-#~ msgid "                                 'loop': loop entire playlist.\n"
-#~ msgstr ""
-#~ "                                 'loop': Gesamte Playlist wiederholen.\n"
-
-#~ msgid ""
-#~ "                                 'repeat': repeat current playlist "
-#~ "entry.\n"
-#~ msgstr ""
-#~ "                                 'repeat': Aktuellen Playlisteintrag "
-#~ "wiederholen.\n"
-
-#~ msgid ""
-#~ "                                 'shuffle': select randomly a yet "
-#~ "unplayed entry from playlist\n"
-#~ msgstr ""
-#~ "                                 'shuffle': Zufällig ungespielten Eintrag "
-#~ "aus Playlist auswählen.\n"
-
-#~ msgid ""
-#~ "                                 'shuffle+': same as 'shuffle', but "
-#~ "indefinetely replay the playlist.\n"
-#~ msgstr ""
-#~ "                                 'shuffle+': Das Selbe wie 'shuffle', nur "
-#~ "wird die Playliste unendlichoft wiederholt.\n"
-
-#~ msgid "  -S, --session <option1,option2,...>\n"
-#~ msgstr "  -S, --session <Option1,Option2,...>\n"
-
-#~ msgid ""
-#~ "                               Session managements. Options can be:\n"
-#~ msgstr ""
-#~ "                               Sitzungsverwaltung. Option kann sein:\n"
-
-#~ msgid "                    session=n   specify session <n> number,\n"
-#~ msgstr "                    session=n   Sitzungsnummer <n> angeben,\n"
-
-#~ msgid "                    mrl=m       add mrl <m> to the playlist,\n"
-#~ msgstr "                    mrl=m       MRL <m> der Playliste hinzufügen,\n"
-
-#~ msgid ""
-#~ "                    audio=c     select audio channel (<c>: 'next' or "
-#~ "'prev'),\n"
-#~ msgstr ""
-#~ "                    audio=c     Audiokanal wählen (<c>: 'next' oder "
-#~ "'prev'),\n"
-
-#~ msgid ""
-#~ "                    spu=c       select spu channel (<c>: 'next' or "
-#~ "'prev'),\n"
-#~ msgstr ""
-#~ "                    spu=c       SPU-Kanal wählen (<c>: 'next' oder "
-#~ "'prev'),\n"
-
-#~ msgid "                    volume=v    set audio volume,\n"
-#~ msgstr "                    volume=v   Audiolautstärke <v> setzen,\n"
-
-#~ msgid "                    amp=v       set amplification level,\n"
-#~ msgstr ""
-#~ "                    amp=v       Audioverstärkungslevel <v> setzen,\n"
-
-#~ msgid ""
-#~ "                    loop=m      set loop mode (<m>: 'none' 'loop' "
-#~ "'repeat' 'shuffle' or 'shuffle+'),\n"
-#~ msgstr ""
-#~ "                    loop=m      Wiederholmodus (<m>: 'none' 'loop' "
-#~ "'repeat' 'shuffle' oder 'shuffle+'),\n"
-
-#~ msgid "                    (playlist|pl)=p\n"
-#~ msgstr "                    (playlist|pl)=p\n"
-
-#~ msgid "                                 <p> can be:\n"
-#~ msgstr "                                 <p> kann sein:\n"
-
-#~ msgid "                                   'clear'  clear the playlist,\n"
-#~ msgstr "                                   'clear'  Playliste löschen,\n"
-
-#~ msgid ""
-#~ "                                   'first'  play first entry in the "
-#~ "playlist,\n"
-#~ msgstr ""
-#~ "                                   'first'  Ersten Eintrag in Playliste "
-#~ "wiedergeben,\n"
-
-#~ msgid ""
-#~ "                                   'prev'   play previous playlist "
-#~ "entry,\n"
-#~ msgstr ""
-#~ "                                   'prev'   Vorherigen Eintrag in "
-#~ "Playliste wiedergeben,\n"
-
-#~ msgid ""
-#~ "                                   'next'   play next playlist entry,\n"
-#~ msgstr ""
-#~ "                                   'next'   Nächsten Eintrag in Playliste "
-#~ "wiedergeben,\n"
-
-#~ msgid ""
-#~ "                                   'last'   play last entry in the "
-#~ "playlist,\n"
-#~ msgstr ""
-#~ "                                   'last'   Letzten Eintrag in Playliste "
-#~ "wiedergeben,\n"
-
-#~ msgid ""
-#~ "                                   'load:s' load playlist file <s>,\n"
-#~ msgstr ""
-#~ "                                   'load:s' Playliste aus Datei <s> "
-#~ "laden,\n"
-
-#~ msgid ""
-#~ "                                   'stop'   stop playback at the end of "
-#~ "current playback.\n"
-#~ msgstr ""
-#~ "                                   'stop'   Wiedergabe nach momentanen "
-#~ "Titel stoppen.\n"
-
-#~ msgid ""
-#~ "                                   'cont'   continue playback at the end "
-#~ "of current playback.\n"
-#~ msgstr ""
-#~ "                                   'cont'   Wiedergabe nach momentaten "
-#~ "Titel weiterführen.\n"
-
-#~ msgid "                    play, slow2, slow4, pause, fast2,\n"
-#~ msgstr "                    play, slow2, slow4, pause, fast2,\n"
-
-#~ msgid "                    fast4, stop, quit, fullscreen, eject.\n"
-#~ msgstr "                    fast4, stop, quit, fullscreen, eject.\n"
-
-#~ msgid ""
-#~ "  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes "
-#~ "are:\n"
-#~ msgstr ""
-#~ "  -r, --aspect-ratio <modus>   Setze Seitenverhältnis für Video-Ausgabe. "
-#~ "Modi sind:\n"
-
-#~ msgid ""
-#~ "      --broadcast-port <port>  Set port of xine broadcaster (master "
-#~ "side)\n"
-#~ msgstr ""
-#~ "      --broadcast-port <Port>  Setze Port für xine-Broadcaster (Master-"
-#~ "Seite)\n"
-
-#~ msgid "      --post <plugin>[:parameter=value][,...][;...]\n"
-#~ msgstr "      --post <Plugin>[:Parameter=Wert][,...][;...]\n"
-
-#~ msgid "                               Load one or many post plugin(s).\n"
-#~ msgstr ""
-#~ "                               Lade ein oder mehrere Nach-Plugin(s).\n"
-
-#~ msgid "                               Parameters are comma separated.\n"
-#~ msgstr "                               Parameter sine Komma-separiert.\n"
-
-#~ msgid ""
-#~ "                               This option can be used more than one "
-#~ "time.\n"
-#~ msgstr ""
-#~ "                               Diese Option kann mehrfach angegeben "
-#~ "werden.\n"
-
-#~ msgid ""
-#~ "      --list-plugins [=type]   Display the list of all available "
-#~ "plugins,\n"
-#~ msgstr ""
-#~ "      --list-plugins [=Typ]   Liste aller verfügbaren Plaugins anzeigen,\n"
-
-#~ msgid "                               Optional <type> can be:\n"
-#~ msgstr "                               Optionaler <Typ> kann sein:\n"
-
-#~ msgid "                    audio_out, video_out, demux, input, sub, post,\n"
-#~ msgstr ""
-#~ "                    audio_out, video_out, demux, input, sub, post,\n"
-
-#~ msgid "                    audio_decoder, video_decoder.\n"
-#~ msgstr "                    audio_decoder, video_decoder.\n"
-
-#~ msgid "      --bug-report [=mrl]      Enable bug report mode:\n"
-#~ msgstr "      --bug-report [=mrl]      Fehlerberichtmodus aktivieren:\n"
-
-#~ msgid ""
-#~ "                                 Turn on verbosity, gather all output\n"
-#~ msgstr "                                   Ausführlichere Meldung, alle\n"
-
-#~ msgid ""
-#~ "                                 messages and write them into a file "
-#~ "named\n"
-#~ msgstr ""
-#~ "                                 Ausgaben sammeln und in Datei BUG-REPORT."
-#~ "TXT\n"
-
-#~ msgid "                                 BUG-REPORT.TXT.\n"
-#~ msgstr "                                 schreiben.\n"
-
-#~ msgid ""
-#~ "                                 If <mrl> is given, xine will play the "
-#~ "mrl\n"
-#~ msgstr ""
-#~ "                                 Falls <mrl> angegeben ist, wird xine "
-#~ "diese\n"
-
-#~ msgid "                                 then quit (like -pq).\n"
-#~ msgstr ""
-#~ "                                 mrl abspielen und sich danach beenden "
-#~ "(wie -pq).\n"
-
-#~ msgid "examples for valid MRLs (media resource locator):\n"
-#~ msgstr ""
-#~ "Beispiele für MRLs (von \"Media Resource Locator\", "
-#~ "Medienquellenbezeichnung):\n"
-
-#~ msgid "  File:  'path/foo.vob'\n"
-#~ msgstr "  Datei:  'Pfad/blah.vob'\n"
-
-#~ msgid "         '/path/foo.vob'\n"
-#~ msgstr "         '/Pfad/blah.vob'\n"
-
-#~ msgid "         'file://path/foo.vob'\n"
-#~ msgstr "         'file://Pfad/blah.vob'\n"
-
-#~ msgid "         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
-#~ msgstr "         'fifo://[[mpeg1|mpeg2]:/]Pfad/blah'\n"
-
-#~ msgid "         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
-#~ msgstr "         'stdin://[mpeg1|mpeg2]' oder '-' (nur mpeg2)\n"
-
-#~ msgid "  DVD:   'dvd://VTS_01_2.VOB'\n"
-#~ msgstr "  DVD:   'dvd://VTS_01_2.VOB'\n"
-
-#~ msgid "  VCD:   'vcd://<track number>'\n"
-#~ msgstr "  VCD:   'vcd://<Spur-Nummer>'\n"
 
 #~ msgid "XServer Vendor: %s. Release: %d,\n"
 #~ msgstr "XServer Hersteller: %s. Version: %d,\n"
