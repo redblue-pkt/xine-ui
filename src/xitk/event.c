@@ -637,27 +637,25 @@ void gui_execute_action_id(action_id_t action) {
     gGui->playlist.loop++;
     if(gGui->playlist.loop == PLAYLIST_LOOP_MODES_NUM)
       gGui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
-#if 1
-    printf("Playlist loop mode:");
+    
+    /* Temporary informations */    
     switch(gGui->playlist.loop) {
     case PLAYLIST_LOOP_NO_LOOP:
-      printf("PLAYLIST_LOOP_NO_LOOP");
+      osd_display_info("playlist: no loop.");
       break;
     case PLAYLIST_LOOP_LOOP:
-      printf("PLAYLIST_LOOP_LOOP");
+      osd_display_info("playlist: loop.");
       break;
     case PLAYLIST_LOOP_REPEAT:
-      printf("PLAYLIST_LOOP_REPEAT");
+      osd_display_info("playlist: entry repeat.");
       break;
     case PLAYLIST_LOOP_SHUFFLE:
-      printf("PLAYLIST_LOOP_SHUFFLE");
+      osd_display_info("playlist: shuffle.");
       break;
     case PLAYLIST_LOOP_SHUF_PLUS:
-      printf("PLAYLIST_LOOP_SHUF_PLUS");
+      osd_display_info("playlist: shuffle forever.");
       break;
     }
-    printf("\n");
-#endif
     break;
     
   case ACTID_ADDMEDIAMARK:
@@ -1226,6 +1224,10 @@ static void on_start(void *data) {
 
   gui_display_logo();
   
+  do {
+    xine_usec_sleep(5000);
+  } while(gGui->logo_mode != 1);
+
   if(start)
     gui_execute_action_id(ACTID_PLAY);
 }

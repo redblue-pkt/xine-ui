@@ -758,7 +758,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
    * Ignoring finished event logo is displayed (or played), that save us
    * from a loop of death
    */
-  if(gGui->logo_mode && (event->type ==XINE_EVENT_UI_PLAYBACK_FINISHED))
+  if(gGui->logo_mode && (event->type == XINE_EVENT_UI_PLAYBACK_FINISHED))
     return;
   
   gettimeofday (&tv, NULL);
@@ -790,7 +790,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     /* inform ui that new channel info is available */
   case XINE_EVENT_UI_CHANNELS_CHANGED:
     if(event->stream == gGui->stream)
-      panel_update_channel_display ();
+      panel_update_channel_display();
     break;
     
     /* request title display change in ui */
@@ -823,7 +823,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     if(event->stream == gGui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
-      xine_info((char *)uevent->str);
+      if(uevent->str) {
+	xine_info((char *)uevent->str);
+	osd_display_info((char *)uevent->str);
+      }
     }
     break;
     
@@ -855,6 +858,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
       gGui->mrl_overrided = 3;
       panel_set_title(buffer);
+      osd_display_info(buffer);
     }
     break;
   }
