@@ -51,6 +51,7 @@ typedef struct {
 #define WBDN    2  /*  Position of button down in item_tree  */
 #define WBSTART 3  /*  Position of first item button in item_tree */
 
+static void notify_change_skin(xitk_widget_list_t *, xitk_widget_t *, xitk_skin_config_t *);
 /*
  *
  */
@@ -68,20 +69,25 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
       int iy    = w->y;
       int bh;
       
-      (void) xitk_set_widget_pos(private_data->item_tree[WBUP], x + itemw, y);
-      bh = xitk_get_widget_height(private_data->item_tree[WBUP]);
-      (void) xitk_set_widget_pos(private_data->item_tree[WSLID], x + itemw, y + bh);
-      bh += xitk_get_widget_height(private_data->item_tree[WSLID]);
-      (void) xitk_set_widget_pos(private_data->item_tree[WBDN], x + itemw, y + bh);
-      
-      xitk_show_widget(private_data->parent_wlist, private_data->item_tree[WBUP]);
-      xitk_show_widget(private_data->parent_wlist, private_data->item_tree[WSLID]);
-      xitk_show_widget(private_data->parent_wlist, private_data->item_tree[WBDN]);
-      
-      for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
-	(void) xitk_set_widget_pos(private_data->item_tree[i], x, iy);
-	xitk_show_widget(private_data->parent_wlist, private_data->item_tree[i]);
-	iy += itemh;
+      if(private_data->skin_element_name) {
+	notify_change_skin(private_data->parent_wlist, w, private_data->skonfig);
+      }
+      else {
+	(void) xitk_set_widget_pos(private_data->item_tree[WBUP], x + itemw, y);
+	bh = xitk_get_widget_height(private_data->item_tree[WBUP]);
+	(void) xitk_set_widget_pos(private_data->item_tree[WSLID], x + itemw, y + bh);
+	bh += xitk_get_widget_height(private_data->item_tree[WSLID]);
+	(void) xitk_set_widget_pos(private_data->item_tree[WBDN], x + itemw, y + bh);
+	
+	xitk_show_widget(private_data->parent_wlist, private_data->item_tree[WBUP]);
+	xitk_show_widget(private_data->parent_wlist, private_data->item_tree[WSLID]);
+	xitk_show_widget(private_data->parent_wlist, private_data->item_tree[WBDN]);
+	
+	for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
+	  (void) xitk_set_widget_pos(private_data->item_tree[i], x, iy);
+	  xitk_show_widget(private_data->parent_wlist, private_data->item_tree[i]);
+	  iy += itemh;
+	}
       }
       
     }
@@ -562,6 +568,7 @@ xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_wid
 
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   private_data = (browser_private_data_t *) xitk_xmalloc(sizeof(browser_private_data_t));
+  private_data->skonfig = skonfig;
 
   b.skin_element_name = br->arrow_up.skin_element_name;
   b.callback          = browser_up;
@@ -643,6 +650,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, int 
 
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   private_data = (browser_private_data_t *) xitk_xmalloc(sizeof(browser_private_data_t));
+  private_data->skonfig = NULL;
 
   b.skin_element_name = NULL;
   b.callback          = browser_up;

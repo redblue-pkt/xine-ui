@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 1.0\n"
-"POT-Creation-Date: 2001-12-12 01:01+0100\n"
+"POT-Creation-Date: 2001-12-14 12:01+0100\n"
 "PO-Revision-Date: 2001-12-12 00:08+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanmagm@mail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -396,27 +396,39 @@ msgstr "Falló la apertura del archivo (%s)\n"
 msgid "File '%s' written.\n"
 msgstr "Archivo '%s' escrito.\n"
 
-#: src/xitk/setup.c:928
+#: src/xitk/setup.c:940
+msgid "Help"
+msgstr ""
+
+#: src/xitk/setup.c:942
+msgid "README"
+msgstr ""
+
+#: src/xitk/setup.c:944
+msgid "FAQ"
+msgstr ""
+
+#: src/xitk/setup.c:1095
 msgid "xine setup"
 msgstr "configuración de xine"
 
-#: src/xitk/setup.c:982 src/xitk/viewlog.c:423
+#: src/xitk/setup.c:1154 src/xitk/viewlog.c:425
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/xitk/viewlog.c:261
+#: src/xitk/viewlog.c:262
 msgid "log info"
 msgstr ""
 
-#: src/xitk/viewlog.c:263
+#: src/xitk/viewlog.c:264
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
 msgstr ""
 
-#: src/xitk/viewlog.c:359
+#: src/xitk/viewlog.c:361
 msgid "xine log viewer"
 msgstr ""
 
-#: src/xitk/viewlog.c:409
+#: src/xitk/viewlog.c:411
 msgid "Refresh"
 msgstr ""

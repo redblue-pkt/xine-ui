@@ -41,6 +41,7 @@ typedef struct {
   xitk_widget_t          *item_tree[BROWSER_MAX_ENTRIES];
   xitk_widget_list_t     *parent_wlist;
 
+  xitk_skin_config_t     *skonfig;
 
   char                  **content;
   int                     max_length;

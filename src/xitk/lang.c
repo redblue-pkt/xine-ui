@@ -193,7 +193,7 @@
      pl_PL
      polish
      portuguese
-     pt_BR
+  *  pt_BR
      pt_PT
      pt_PT@euro
      ro_RO
@@ -235,30 +235,33 @@
 /* Global definition */
 static langs_t _langs[] = {
   /* English section */
-  { "C",               ENGLISH, "_en" }, /* WARNING: This should be the first entry */
-  { "POSIX",           ENGLISH, "_en" },
-  { "en_GB",           ENGLISH, "_en" },
+  { "C",               ENGLISH,    "_en"    }, /* WARNING: This should be the first entry */
+  { "POSIX",           ENGLISH,    "_en"    },
+  { "en_GB",           ENGLISH,    "_en"    },
 
   /* French section */
-  { "fr_FR",           FRENCH,  "_fr" },
-  { "fr_FR@euro",      FRENCH,  "_fr" },
-  { "français",        FRENCH,  "_fr" },
-  { "french",          FRENCH,  "_fr" },
+  { "fr_FR",           FRENCH,     "_fr"    },
+  { "fr_FR@euro",      FRENCH,     "_fr"    },
+  { "français",        FRENCH,     "_fr"    },
+  { "french",          FRENCH,     "_fr"    },
 
   /* German section */
-  { "de_DE",           GERMAN,  "_de" },
-  { "de_DE@euro",      GERMAN,  "_de" },
-  { "deutsch",         GERMAN,  "_de" },
-  { "dutch",           GERMAN,  "_de" },
-  { "german",          GERMAN,  "_de" },
+  { "de_DE",           GERMAN,     "_de"    },
+  { "de_DE@euro",      GERMAN,     "_de"    },
+  { "deutsch",         GERMAN,     "_de"    },
+  { "dutch",           GERMAN,     "_de"    },
+  { "german",          GERMAN,     "_de"    },
+
+  /* Portuguese section */
+  { "pt_BR",           PORTUGUESE, "_pt_BR" },
 
   /* Spanish section */
-  { "es_ES",           SPANISH, "_es" },
-  { "es_ES@euro",      SPANISH, "_es" },
-  { "spanish",         SPANISH, "_es" },
+  { "es_ES",           SPANISH,    "_es"    },
+  { "es_ES@euro",      SPANISH,    "_es"    },
+  { "spanish",         SPANISH,    "_es"    },
 
   /* The ultimate solution */
-  { NULL,              ENGLISH, "_en" }
+  { NULL,              ENGLISH,    "_en"    }
 };
   
 

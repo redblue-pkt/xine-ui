@@ -30,6 +30,7 @@ typedef enum {
   ENGLISH,
   FRENCH,
   GERMAN,
+  PORTUGUESE,
   SPANISH
 } lang_code_t;
 
