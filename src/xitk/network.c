@@ -89,11 +89,12 @@ extern int errno;
 #endif
 
 /* options args */
-static const char *short_options = "?hH:P:nv";
+static const char *short_options = "?hH:P:ncv";
 static struct option long_options[] = {
   { "help"           , no_argument      , 0, 'h' },
   { "host"           , required_argument, 0, 'H' },
   { "port"           , required_argument, 0, 'P' },
+  { "command"        , no_argument      , 0, 'c' },
   { "noconnect"      , no_argument      , 0, 'n' },
   { "version"        , no_argument      , 0, 'v' },
   { 0                , no_argument      , 0,  0  }
@@ -166,6 +167,8 @@ static void do_fullscreen(commands_t *, client_info_t *, void *);
 static void do_get(commands_t *, client_info_t *, void *);
 static void do_set(commands_t *, client_info_t *, void *);
 
+static void handle_client_command(client_info_t *);
+
 #define NOT_PUBLIC  0
 #define PUBLIC      1
 
@@ -217,8 +220,10 @@ static commands_t commands[] = {
 
   { "mrl",         REQUIRE_ARGS,    PUBLIC,          do_mrl,
     "manage mrls", 
-    "  mrl add <mrl>\n"
-    "  mrl play <mrl>"
+    "  mrl add <mrl> <mrl> ...\n"
+    "  mrl play <mrl>\n"
+    "  mrl next\n"
+    "  mrl prev"
   },
   { "play",        NO_ARGS,         PUBLIC,          do_play,
     "start playback", 
@@ -230,6 +235,8 @@ static commands_t commands[] = {
     "  playlist select <num>\n"
     "  playlist delete all|*\n"
     "  playlist delete <num>"
+    "  playlist next\n"
+    "  playlist prev"
   },
   { "stop",        NO_ARGS,         PUBLIC,          do_stop,
     "stop playback", 
@@ -457,11 +464,13 @@ static void write_to_console_unlocked(session_t *session, const char *msg, ...) 
   char     buf[_BUFSIZ];
   va_list  args;
   
-  va_start(args, msg);
-  vsnprintf(buf, _BUFSIZ, msg, args);
-  va_end(args);
-  
-  write(session->console, buf, strlen(buf));
+  if(session->console != -1) {
+    va_start(args, msg);
+    vsnprintf(buf, _BUFSIZ, msg, args);
+    va_end(args);
+    
+    write(session->console, buf, strlen(buf));
+  }
 }
 
 static void write_to_console(session_t *session, const char *msg, ...) {
@@ -484,12 +493,12 @@ static void session_update_prompt(session_t *session) {
     return;
 
   if(session->socket >= 0) {
-    snprintf(buf, sizeof(buf), "%s:%s", session->host, session->port);
+    snprintf(buf, 514, "%s:%s", session->host, session->port);
   }
   else
-    snprintf(buf, sizeof(buf), "%s", "******:****");
+    snprintf(buf, 514, "%s", "******:****");
 
-  snprintf(session->prompt, sizeof(session->prompt), "[%s]%s >", buf, PROGNAME);
+  snprintf(session->prompt, 256, "[%s]%s >", buf, PROGNAME);
 }
 
 static void session_create_commands(session_t *session) {
@@ -841,13 +850,34 @@ static void client_handle_command(session_t *session, const char *command) {
 
   /* Perhaps a ';' separated commands, so send anyway to server */
   if(found == 0) {
-	send_to_server(session, (char *)command);
+    send_to_server(session, (char *)command);
   }
-
+  
   if(!strncasecmp(cmd, "exit", strlen(cmd))) {
     session_create_commands(session);
     session->socket = -1;
   }
+}
+
+static void session_single_shot(session_t *session, int num_commands, char *commands[]) {
+  int i;
+  char buf[_BUFSIZ];
+  
+  memset(&buf, 0, sizeof(buf));
+
+  for(i = 0; i < num_commands; i++) {
+    if(strlen(buf))
+      sprintf(buf, "%s %s", buf, commands[i]);
+    else
+      sprintf(buf, "%s", commands[i]);
+  }
+
+  client_handle_command(session, buf);
+  send_to_server(session, "exit");
+
+  /* Wait til' socket is closed. */
+  while(session->socket <= 0)
+    usleep(10000);
 }
 
 static void show_version(void) {
@@ -859,6 +889,7 @@ static void show_usage(void) {
   printf("usage: %s [options]\n", PROGNAME);
   printf("  -H, --host <hostname>        Connect host <hostname>.\n");
   printf("  -P, --port <port>            Connect using <port>.\n");
+  printf("  -c, --command <command>      Send <command> to server then quit.\n");
   printf("  -n, --noconnect              Do not connect default server.\n");
   printf("  -v, --version                Display version.\n");
   printf("  -h, --help                   Display this help text.\n");
@@ -873,6 +904,7 @@ int main(int argc, char **argv) {
   struct servent    *serv_ent;
   int                port_set = 0;
   int                auto_connect = 1;
+  int                single_shot = 0;
   void              *p;
   
   /*
@@ -928,8 +960,6 @@ int main(int argc, char **argv) {
   snprintf(session.host, sizeof(session.host), "%s", DEFAULT_SERVER);
   snprintf(session.port, sizeof(session.port), "%s", DEFAULT_XINECTL_PORT);
 
-  session.console = STDOUT_FILENO;
-
   opterr = 0;
   while((c = getopt_long(argc, argv, short_options, long_options, &option_index)) != EOF) {
     switch(c) {
@@ -946,6 +976,10 @@ int main(int argc, char **argv) {
       }
       break;
 
+    case 'c':
+      single_shot = 1;
+      break;
+      
     case 'n': /* Disable automatic connection */
       auto_connect = 0;
       break;
@@ -969,6 +1003,11 @@ int main(int argc, char **argv) {
     
   }
 
+  if(single_shot)
+    session.console = -1;
+  else
+    session.console = STDOUT_FILENO;
+  
   /* Few realdline inits */
   rl_readline_name = PROGNAME;
   rl_set_prompt(session.prompt);
@@ -986,8 +1025,6 @@ int main(int argc, char **argv) {
   /* Prepare client commands */
   session_create_commands(&session);
 
-  write_to_console(&session, "? for help.\n");
-
   if(auto_connect) {
     session.socket = sock_client(session.host, session.port, "tcp");
     if(session.socket < 0) {
@@ -997,10 +1034,18 @@ int main(int argc, char **argv) {
     /* Ask server for available commands */
     send_to_server(&session, "commands");
   }
-  
+
+  write_to_console(&session, "? for help.\n");
+
   session.running = 1;
   pthread_create(&session.thread, NULL, select_thread, (void *)&session);
   
+  if(single_shot) {
+    session_single_shot(&session, (argc - optind), &argv[optind]);
+    session.running = 0;
+    goto __end;
+  }
+
   while(session.running) {
     
     session_update_prompt(&session);
@@ -1025,6 +1070,8 @@ int main(int argc, char **argv) {
     _FREE(grabbed_line);
   }
 
+ __end:
+  
   if(session.socket >= 0)
     close(session.socket);
   
@@ -1295,10 +1342,37 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info, void *data) {
 
   nargs = is_args(client_info);
   if(nargs) {
-    if(nargs >= 2) {
+    if(nargs == 1) {
+      if(is_arg_contain(client_info, 1, "next")) {
+	gGui->ignore_status = 1;
+	xine_stop (gGui->xine);
+	gGui->ignore_status = 0;
+	gui_status_callback (XINE_STOP);
+      }
+      else if(is_arg_contain(client_info, 1, "prev")) {
+	gGui->ignore_status = 1;
+	xine_stop (gGui->xine);
+	gGui->playlist_cur--;
+	if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
+	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	  if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
+	    gui_handle_xine_error();
+	  
+	} else {
+	  gGui->playlist_cur = 0;
+	}
+	gGui->ignore_status = 0;
+      }
+    }
+    else if(nargs >= 2) {
       
       if(is_arg_contain(client_info, 1, "add")) {
-	gui_dndcallback((char *)(get_arg(client_info, 2)));
+	int argc = 2;
+	
+	while((get_arg(client_info, argc)) != NULL) {
+	  gui_dndcallback((char *)(get_arg(client_info, argc)));
+	  argc++;
+	}
       }
       else if (is_arg_contain(client_info, 1, "play")) {
 	gui_dndcallback((char *)(get_arg(client_info, 2)));
@@ -1333,6 +1407,14 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info, void *data)
 	  send_to_client(client_info, "empty playlist.");
 
 	send_to_client(client_info, "\n");
+      }
+      else if(is_arg_contain(client_info, 1, "next")) { /* Alias of mrl next */
+	set_command_line(client_info, "mrl next");
+	handle_client_command(client_info);
+      }
+      else if(is_arg_contain(client_info, 1, "prev")) { /* Alias of mrl prev */
+	set_command_line(client_info, "mrl prev");
+	handle_client_command(client_info);
       }
     }
     else if(nargs >= 2) {
