@@ -62,7 +62,7 @@ struct kbinding_entry_s {
   action_id_t       action_id;   /* The numerical action, handled in a case statement */
   char             *key;         /* key binding */
   int               modifier;    /* Modifier key of binding (can be OR'ed) */
-  int               is_alias;
+  int               is_alias;    /* is made from an alias entry ? */
 };
 
 #define MAX_ENTRIES 255
@@ -954,7 +954,6 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
 
   switch(event->type) {
     
-  case ButtonPress:
   case ButtonRelease: {
     kbinding_entry_t    *k;
     char                 xbutton[256];
