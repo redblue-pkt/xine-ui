@@ -82,7 +82,8 @@
    5.4.7 "video_out: throwing away image with pts xxx because it's too old"
    5.4.8 "No video plugin available to decode 'xxxxxx'."
    5.4.9 "w32codec: decoder failed to start. Is 'xxxxxx' installed?"
-      
+   5.4.10 "xine-lib xxx expected. Version xxx found"
+
    6   BUGS - GET THAT DAMN VERMIN EXTERMINATOR NOW! ;-)
    6.1 I did the impossible - I really found a bug! Who can I inform about it?
 
@@ -930,7 +931,24 @@
 
       You probably don't have the win32 dll needed to decode this file.
       See section 4.1 and 4.2.
-              
+     
+5.4.10 "xine-lib xxx expected. Version xxx found"
+
+      Your xine-ui installation doesn't match the xine-lib installation.
+
+      If you haven't just forgotten to install a recent xine-lib (or xine-ui)
+      then you probably have upgraded from an older version and some of the
+      old files are still around, being in the way. Maybe it's even just some
+      bad leftover symlinks.
+
+      This can happen if you install from source or use a packaging
+      system that doesn't clean up previous installations thoroughly enough.
+
+      Remove all older xine libraries manually ("rm $prefix/lib/libxine*".
+      and while you're at it, throw away any old plugins in
+      $prefix/lib/xine/plugins/ as well, just to be safe.) Then install
+      xine-lib and xine-ui again. This should fix the problem.
+
             
 6   BUGS - GET THAT DAMN VERMIN EXTERMINATOR NOW! ;-)
 
