@@ -605,7 +605,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	    return;
 	  }
 	  else {
-	    XITK_WARNING("%s(): wrong section entry found: '%s'\n", __FUNCTION__, section);
+	    XITK_WARNING("wrong section entry found: '%s'\n", section);
 	    return;
 	  }
 	}
@@ -720,7 +720,7 @@ xitk_skin_config_t *xitk_skin_init_config(void) {
   xitk_skin_config_t *skonfig;
   
   if((skonfig = (xitk_skin_config_t *) xitk_xmalloc(sizeof(xitk_skin_config_t))) == NULL) {
-    XITK_DIE("%s(): xitk_xmalloc() failed: %s\n", __FUNCTION__, strerror(errno));
+    XITK_DIE("xitk_xmalloc() failed: %s\n", strerror(errno));
   }
   skonfig->version = -1;
   skonfig->first = skonfig->last = skonfig->celement = NULL;

@@ -335,7 +335,7 @@ int xitk_make_window_dnd_aware(xitk_dnd_t *xdnd, Window window) {
   
   if((status == BadAlloc) || (status == BadAtom) || 
      (status == BadMatch) || (status == BadValue) || (status == BadWindow)) {
-    XITK_WARNING("%s()@%d: XChangeProperty() failed.\n", __FUNCTION__, __LINE__);
+    XITK_WARNING("XChangeProperty() failed.\n");
     return 0;
   }
   
@@ -346,7 +346,7 @@ int xitk_make_window_dnd_aware(xitk_dnd_t *xdnd, Window window) {
   
   if((status == BadAlloc) || (status == BadAtom) || 
      (status == BadMatch) || (status == BadValue) || (status == BadWindow)) {
-    XITK_WARNING("%s()@%d: XChangeProperty() failed.\n", __FUNCTION__, __LINE__);
+    XITK_WARNING("XChangeProperty() failed.\n");
     return 0;
   }
 

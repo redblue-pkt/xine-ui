@@ -246,6 +246,20 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
   return retval;
 }
 
+void xitk_checkbox_callback_exec(xitk_widget_t *w) {
+  checkbox_private_data_t *private_data;
+
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
+    private_data = (checkbox_private_data_t *) w->private_data;
+
+    if(private_data->callback) {
+      private_data->callback(private_data->cWidget, 
+			     private_data->userdata,
+			     private_data->cState);
+    }
+  }
+}
+
 /*
  *
  */

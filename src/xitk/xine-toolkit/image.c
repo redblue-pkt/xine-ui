@@ -597,7 +597,7 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
       y3 = ((h / 4) * 3); 
     }
     else {
-      XITK_WARNING("%s(): direction '%d' is unhandled.\n", __FUNCTION__, direction);
+      XITK_WARNING("direction '%d' is unhandled.\n", direction);
       return;
     }
     
@@ -959,7 +959,7 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
       xx = ((w-1)>>1); yy = 4; ww = 1; hh = (h-1) - 8;
     }
     else {
-      XITK_WARNING("%s(): direction '%d' is unhandled.\n", __FUNCTION__, direction);
+      XITK_WARNING("direction '%d' is unhandled.\n",direction);
       return;
     }
 
@@ -1287,7 +1287,7 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   assert(im);
 
   if(image == NULL) {
-    XITK_WARNING("%s(): image name is NULL\n", __FUNCTION__);
+    XITK_WARNING("image name is NULL\n");
     return NULL;
   }
 

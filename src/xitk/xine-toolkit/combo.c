@@ -164,30 +164,21 @@ static void _combo_handle_event(XEvent *event, void *data) {
   combo_private_data_t *private_data = (combo_private_data_t *)data;
 
   switch(event->type) {
-
+    
   case ButtonRelease:
     /*
      * If we try to move the combo window,
      * move it back to right position (under label*
      */
     if(private_data->visible) { 
-      if(!xitk_is_inside_widget(private_data->browser_widget, 
-				event->xbutton.x, event->xbutton.y)) {
+      int  x, y;
+      xitk_window_get_window_position(private_data->combo_widget->imlibdata, 
+				      private_data->xwin, &x, &y, NULL, NULL);
+      if((x != private_data->win_x) || (y != private_data->win_y))
 	xitk_combo_update_pos(private_data->combo_widget);
-      }
     }
     break;
-
-  case MotionNotify:
-    if(private_data->visible) {
-      if(event->xmotion.state & (Button1MotionMask | Button2MotionMask |
-				 Button3MotionMask | Button4MotionMask | Button5MotionMask)) {
-	xitk_combo_update_pos(private_data->combo_widget);
-      }
-    }
-    break;
-  }
-    
+  }    
 }
 
 /*
@@ -284,6 +275,7 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
     xitk_checkbox_set_state(private_data->button_widget, state);
     
     if(state && private_data->visible == 0) {
+      w->wl->widget_focused = private_data->button_widget;
       private_data->visible = 1;
       xitk_combo_update_pos(combo);
     }
@@ -305,6 +297,27 @@ static void _combo_rollunroll_from_lbl(xitk_widget_t *w, void *data) {
 /*
  *
  */
+void xitk_combo_rollunroll(xitk_widget_t *w) {
+  
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO))) {
+
+    if((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX) {
+      int state = !xitk_checkbox_get_state(w);
+      xitk_checkbox_callback_exec(w);
+      xitk_checkbox_set_state(w, state);
+    }
+  }
+  else if(w->type & WIDGET_GROUP_WIDGET) {
+    combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
+    int state = !xitk_checkbox_get_state(private_data->button_widget);
+      xitk_checkbox_callback_exec(private_data->button_widget);
+      xitk_checkbox_set_state(private_data->button_widget, state);
+  }
+}
+
+  /*
+   *
+   */
 void xitk_combo_set_select(xitk_widget_t *w, int select) {
   combo_private_data_t *private_data;
 
@@ -326,7 +339,7 @@ void xitk_combo_set_select(xitk_widget_t *w, int select) {
  */
 void xitk_combo_update_pos(xitk_widget_t *w) {
   combo_private_data_t  *private_data;
-  int                    x = 0, xx = 0, y = 0, yy = 0;
+  int                    xx = 0, yy = 0;
   window_info_t          wi;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
@@ -336,20 +349,21 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
     
     if(private_data->visible) {
       if((xitk_get_window_info(*(private_data->parent_wkey), &wi))) {
-	x = wi.x;
-	y = wi.y;
+	private_data->win_x = wi.x;
+	private_data->win_y = wi.y;
 	WINDOW_INFO_ZERO(&wi);
       }
       
       xitk_get_widget_pos(private_data->label_widget, &xx, &yy);
       
       yy += xitk_get_widget_height(private_data->label_widget);
-      x += xx;
-      y += yy;
+      private_data->win_x += xx;
+      private_data->win_y += yy;
       
       XLOCK(private_data->imlibdata->x.disp);
       XMoveWindow(private_data->imlibdata->x.disp, 
-		  (xitk_window_get_window(private_data->xwin)), x, y);
+		  (xitk_window_get_window(private_data->xwin)), 
+		  private_data->win_x, private_data->win_y);
       XMapRaised(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
       XSync(private_data->imlibdata->x.disp, False);
       XUNLOCK(private_data->imlibdata->x.disp);
@@ -358,8 +372,10 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
 				    (xitk_window_get_window(private_data->xwin))))
 	xitk_usec_sleep(5000);
       
+      XLOCK(private_data->imlibdata->x.disp);
       XSetInputFocus(private_data->imlibdata->x.disp, 
 		     (xitk_window_get_window(private_data->xwin)), RevertToParent, CurrentTime);
+      XUNLOCK(private_data->imlibdata->x.disp);
       
       /* No widget focused, give focus to the first one */
       if(private_data->widget_list->widget_focused == NULL)
@@ -482,10 +498,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
 		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
 		    1);
   }
-  
-  XUNLOCK(c->imlibdata->x.disp);
 
-  XLOCK(c->imlibdata->x.disp);
   XSetTransientForHint (c->imlibdata->x.disp,
 			(xitk_window_get_window(private_data->xwin)), private_data->parent_wlist->win);
   

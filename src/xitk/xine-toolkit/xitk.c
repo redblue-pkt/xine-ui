@@ -1190,11 +1190,11 @@ void xitk_xevent_notify(XEvent *event) {
 
 	  }
 	  else {
-
-	    if(fx->widget_list)
+	    if(fx->widget_list) {
 	      xitk_motion_notify_widget_list (fx->widget_list,
 					      event->xmotion.x, 
 					      event->xmotion.y, event->xmotion.state);
+	    }
 	  }
 	}
 	break;
@@ -1572,7 +1572,7 @@ void xitk_subst_special_chars(char *src, char *dest) {
   char *s, *d;
   
   if((src == NULL) || (dest == NULL)) {
-    XITK_WARNING("%s(): pass NULL argument(s)\n", __FUNCTION__);
+    XITK_WARNING("pass NULL argument(s)\n");
     return;
   }
   

@@ -1213,6 +1213,11 @@ int xitk_checkbox_get_state(xitk_widget_t *);
  */
 void xitk_checkbox_set_state(xitk_widget_t *, int);
 
+/**
+ * Call callback
+ */
+void xitk_checkbox_callback_exec(xitk_widget_t *w);
+
 /*
  * ** Buttons
  */
@@ -1755,6 +1760,10 @@ void xitk_combo_update_list(xitk_widget_t *w, char **list, int len);
  */
 void xitk_combo_update_pos(xitk_widget_t *w);
 
+/**
+ *
+ */
+void xitk_combo_rollunroll(xitk_widget_t *w);
 
 /**
  *

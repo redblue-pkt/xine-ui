@@ -756,7 +756,7 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
   widget_event_t   event;
 
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return;
   }
 
@@ -811,11 +811,11 @@ int xitk_is_cursor_out_mask(Display *display, xitk_widget_t *w, Pixmap mask, int
   Pixel p;
   
   if(!display) {
-    XITK_WARNING("%s(): display was unset.\n", __FUNCTION__);
+    XITK_WARNING("display was unset.\n");
     return 0;
   }
   if(!w) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return 0;
   }
 
@@ -844,7 +844,7 @@ int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
   int inside = 0;
   
   if(!widget) {
-    XITK_WARNING("%s(): widget was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget was NULL.\n");
     return 0;
   }
 
@@ -872,7 +872,7 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
   xitk_widget_t *mywidget;
 
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return 0;
   }
 
@@ -899,23 +899,25 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
     XITK_WARNING("widget list was NULL.\n");
     return;
   }
-  
+ 
   /* Slider still pressed, mouse pointer outside widget */
-  if(wl->widget_pressed && wl->widget_focused && 
-     (wl->widget_focused->type & WIDGET_TYPE_SLIDER)) {
+  if(wl->widget_pressed && wl->widget_focused && (wl->widget_pressed == wl->widget_focused) &&
+     ((wl->widget_pressed->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     widget_event_result_t   result;
     
+    //    printf("slider already clicked -> send event\n");
+
     if(state & Button1Mask) {
       event.type           = WIDGET_EVENT_CLICK;
       event.x              = x;
       event.y              = y;
       event.button_pressed = LBUTTON_DOWN;
       
-      (void) wl->widget_pressed->event(wl->widget_pressed, &event, &result);
+      (void) wl->widget_focused->event(wl->widget_focused, &event, &result);
     }
     return;
   }
-  
+  //  printf(" no slider\n");
   mywidget = xitk_get_widget_at (wl, x, y);
   
   if (mywidget != wl->widget_under_mouse) {
@@ -989,7 +991,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
   }
 
   mywidget = xitk_get_widget_at (wl, x, y);
-
+  
   if(mywidget != wl->widget_focused) {
     if (wl->widget_focused) {
       
@@ -998,12 +1000,21 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
       
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
-	event.type  = WIDGET_EVENT_FOCUS;
-	event.focus = FOCUS_LOST;
-	(void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
-	wl->widget_focused->have_focus = FOCUS_LOST;
+	
+	if((wl->widget_focused->type & WIDGET_GROUP_COMBO)) {
+	  if((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX) {
+	    if(xitk_checkbox_get_state(wl->widget_focused))
+	      xitk_combo_rollunroll(wl->widget_focused);
+	  }
+	}
+	else {
+	  event.type  = WIDGET_EVENT_FOCUS;
+	  event.focus = FOCUS_LOST;
+	  (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
+	  wl->widget_focused->have_focus = FOCUS_LOST;
+	}
       }
-
+      
       event.type = WIDGET_EVENT_PAINT;
       (void) wl->widget_focused->event(wl->widget_focused, &event, NULL);
     }
@@ -1088,7 +1099,7 @@ static xitk_widget_t *get_next_focusable_widget(xitk_widget_list_t *wl, int back
   int found;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list is NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list is NULL.\n");
     return NULL;
   }
   
@@ -1145,7 +1156,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
   widget_event_t   event;
 
   if(!wl) {
-    XITK_WARNING("%s(): widget list is NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list is NULL.\n");
     return;
   }
 
@@ -1243,7 +1254,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
   xitk_widget_list_t  *wl = w->wl;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list is NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list is NULL.\n");
     return;
   }
 
@@ -1303,7 +1314,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
     }
   }
   else
-    XITK_WARNING("%s(): widget not found in list.\n", __FUNCTION__);
+    XITK_WARNING("widget not found in list.\n");
 }
 
 /*
@@ -1535,7 +1546,7 @@ void xitk_destroy_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return;
   }
   
@@ -1565,7 +1576,7 @@ xitk_color_names_t *xitk_get_color_name(char *color) {
   xitk_color_names_t *pcn = NULL;
 
   if(color == NULL) {
-    XITK_WARNING("%s(): color was NULL.\n", __FUNCTION__);
+    XITK_WARNING("color was NULL.\n");
     return NULL;
   }
 
@@ -1669,7 +1680,7 @@ void xitk_stop_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return;
   }
     
@@ -1710,7 +1721,7 @@ void xitk_show_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return;
   }
     
@@ -1756,7 +1767,7 @@ void xitk_hide_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return;
   }
     
@@ -1891,7 +1902,7 @@ void xitk_disable_widgets_tips(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return;
   }
   
@@ -1912,7 +1923,7 @@ void xitk_enable_widgets_tips(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return;
   }
   
@@ -1934,7 +1945,7 @@ void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout
   xitk_widget_t *mywidget;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return;
   }
 

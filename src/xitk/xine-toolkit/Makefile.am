@@ -67,6 +67,7 @@ noinst_HEADERS = \
 	xitkintl.h
 
 test_SOURCES = test.c
+test_DEPENDENCIES = libxitk.la
 test_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
 
 $(top_builddir)/src/Imlib-light/libImlib-light.la:
