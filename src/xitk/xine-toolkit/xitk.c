@@ -255,7 +255,10 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
     XWindowAttributes wattr;
     Status            err;
     
+    XLOCK(gXitk->display);
     err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
+    XUNLOCK(gXitk->display);
+
     if(err != BadDrawable && err != BadWindow) {
       fx->new_pos.x = wattr.x;
       fx->new_pos.y = wattr.y;
@@ -296,10 +299,12 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
 
   if(fx->window) {
 
+    XLOCK(gXitk->display);
     fx->XA_XITK = XInternAtom(gXitk->display, "_XITK_EVENT", False);
     XChangeProperty (gXitk->display, fx->window, fx->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&VERSION, 1);
-    
+    XUNLOCK(gXitk->display);
+
   }
   else
     fx->XA_XITK = None;
@@ -508,7 +513,10 @@ static void widget_xevent_notify(XEvent *event) {
 	  XWindowAttributes wattr;
 	  Status            err;
 	  
+	  XLOCK(gXitk->display);
 	  err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
+	  XUNLOCK(gXitk->display);
+
 	  if(err != BadDrawable && err != BadWindow) {
 	    fx->width = wattr.width;
 	    fx->height = wattr.height;
