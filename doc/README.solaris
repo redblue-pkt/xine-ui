@@ -1,3 +1,11 @@
+
+   ----------------------
+            xine
+   ----------------------
+
+     a free video player
+
+
 building xine on solaris
 ------------------------
 
@@ -76,3 +84,8 @@ Known Problems
   See the following message for more details about this bug:
 
 	http://groups.yahoo.com/group/solarisonintel/message/22516
+
+
+--- 
+version of this file:
+ $Id$

@@ -1,3 +1,15 @@
+
+   ----------------------
+            xine
+   ----------------------
+
+     a free video player
+
+
+
+This document contains FreeBSD related information about xine
+
+
 xine fails when allocating images
 ---------------------------------
 
@@ -91,3 +103,8 @@ the file you have to patch is /sys/dev/ata/atapi-cd.c:
 
 ------------------------------------------------------------------------
 
+
+
+--- 
+version of this file:
+ $Id$

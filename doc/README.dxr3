@@ -1,3 +1,11 @@
+
+   ----------------------
+            xine
+   ----------------------
+
+     a free video player
+
+
 Introduction
 ============
 
@@ -133,6 +141,7 @@ dxr3 howto too.
 Have a look at the previous explained xinerc options dxr3_keycolor
 and dxr3_color_interval too.
 
-________________________
-docu version information
-$Id$
+
+--- 
+version of this file:
+ $Id$

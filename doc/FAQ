@@ -15,27 +15,13 @@ user interface implementations).
 how do I build this beast?
 --------------------------
 
-first make sure you use a stable, official release of gcc to compile.
+first make sure you use a stable, official release of gcc to compile
+(currently there seem to be occasional problems with gcc-3.x).
 You can try patched gcc versions, but these are not supported and will 
-probably not work (pgcc for example is known to make libmpeg break).
+probably not work (pgcc for example is known to make libmpeg2 break).
 
-You'll have to use gnu make to compile xine, on most GNU/Linux systems
-make is gnu make, on other platforms use "gmake" instead.
-
-If you want to have Xv support compiled in, make sure you either have a shared 
-Xv library on your system, e.g. ls /usr/X11R6/lib/libXv* should give you
-some .so libs, like this:
-
-/usr/X11R6/lib/libXv.a  /usr/X11R6/lib/libXv.so  /usr/X11R6/lib/libXv.so.1
-
-or you have libtool 1.4 or newer installed. If not and you only got 
-libXv.a you can create the shared versions yourself:
-
-# ld --whole-archive -shared -o libXv.so.1 libXv.a
-# ln -s libXv.so.1 libXv.so
-# ldconfig
-
-now you should be ready to build xine on your system:
+You'll have to use GNU make to compile xine, on most GNU/Linux systems
+"make" is gnu make, on other platforms use "gmake" instead.
 
 xine comes in two (official) parts now, xine-lib and xine-ui.
 
@@ -48,12 +34,13 @@ make install
 
 if you have installed xine-lib to a non-standard prefix, make
 sure you have <prefix>/bin in your PATH and your linker will
-find libs in <prefix>/libs, in bash you can use something like
+find libs in <prefix>/lib. Using bash you can do something like
 
 export PATH="<prefix>/bin:$PATH"
 export LD_LIBRARY_PATH="<prefix>/lib:$LD_LIBRARY_PATH"
 
-to make sure this works.
+to make sure libxine can be found by xine-ui.
+
 
 Now you can build and install xine-ui, same procedure as for xine-lib:
 
@@ -67,14 +54,6 @@ check that <prefix>/bin is in your path and your linker will find
 libs installed in </prefix>/lib.
 
 
-xine-lib doesn't compile
-------------------------
-
-in order to be able to compile xine-lib, you need (amongst other things)
-the zlib compression library plus the appropriate headers, which are
-often found in a package called zlib-devel or similar.
-
-
 xine-lib installed nicely but xine-ui complains about not finding xine-lib
 --------------------------------------------------------------------------
 
@@ -85,13 +64,40 @@ can compile xine-ui). See previous question for details about how to
 properly compile and install xine-lib and xine-ui.
 
 
+trouble with getting Xv to compile
+----------------------------------
+
+If you want to have Xv support compiled in, make sure you either have
+a shared Xv library on your system, e.g. ls /usr/X11R6/lib/libXv*
+should give you some .so libs, like this:
+
+/usr/X11R6/lib/libXv.a  /usr/X11R6/lib/libXv.so  /usr/X11R6/lib/libXv.so.1
+
+alternatively you need to have libtool 1.4 or newer installed. If not
+and you only got libXv.a you can create the shared versions yourself:
+
+# ld --whole-archive -shared -o libXv.so.1 libXv.a
+# ln -s libXv.so.1 libXv.so
+# ldconfig
+
+now you should be ready to build xine on your system.
+
+
+xine-lib doesn't compile
+------------------------
+
+in order to be able to compile xine-lib, you need (amongst other things)
+the zlib compression library plus the appropriate headers, which are
+often found in a package called zlib-devel or similar.
+
+
 how can I supply additional CFLAGS for the compilation ?
 --------------------------------------------------------
 
 you can do so by setting the GLOBAL_CFLAGS variable and then run 
 configure again.
 
-This can be usefull to specify additional include paths or library 
+This can be useful to specify additional include paths or library 
 paths to the compiler. Example:
 
 export GLOBAL_CFLAGS="-I/usr/include -L/home/guenter/xine_libs"
@@ -121,16 +127,21 @@ make install
 how can I make xine use the Xv extension?
 -----------------------------------------
 
+xine will normally use Xv by default if it is available. In some cases
+you might need to choose Xv playback manually (when the .xinerc for
+some reason says that you want to use XShm):
+
 xine -V Xv foo.mpg
+
 
 xine fails with "no video port found"
 -------------------------------------
 
-you got the Xv extension, but your video card driver doesn't 
-support it. First try to find a driver that does support Xv on
-your hardware (check your graphics card vendor). If your driver
-has Xv support but you can't get it working, try at a lower
-resultion (1024x768 is still enough even for anamorphic mpeg-2).
+you got the Xv extension, but your video card driver doesn't support
+it. First try to find a driver that does support Xv on your hardware
+(check your graphics card vendor). If your driver has Xv support but
+you can't get it working, try at a lower resolution (1024x768 is
+enough even for anamorphic mpeg-2).
 
 If all that fails, you can still use plain X11/XShm
 
@@ -157,23 +168,21 @@ if you run artsd, try
 xine -A arts
 
 
-xine displays it's logo but I don't see my video?
--------------------------------------------------
+xine displays its logo but I don't see my video?
+------------------------------------------------
 
-use the play button of the gui or press RETURN for PLAY.
+use the play button of the gui or press RETURN for PLAY. Make sure
+that you really told xine what it should play - for example as a
+commandline argument, such as
+
+xine foo-movie.mpg
 
 
 xine plays audio but I don't see a picture
 ------------------------------------------
 
-If you see lot's of "rejected" messages, your hardware isn't
-set up right for xine. It might be your sound card doesn't
-support the "realtime" feature (xine tests that on startup
-so you might want to look at the messages again). Try to
-find better drivers then.
-
-Perhaps your hardware is simply to slow - see "xine drops a
-lot of frames" below for speed tips.
+Probably your hardware is simply to slow - see "xine drops a lot of frames"
+below for speed tips.
 
 
 where should I put the windows codec dlls for xine?
@@ -202,12 +211,15 @@ Another reason could be that your (RPC-2) DVD drive isn't set up
 for the right region.
 
 
-when I play this stream, xine shows some pictures but there's no audio
-----------------------------------------------------------------------
+when I play this stream, xine shows video but there's no audio
+--------------------------------------------------------------
 
+This can happen with mpeg-2 material such as DVDs.
 Try another audio channel:
 
 xine -a channel stream.vob
+
+(or select the channel by using the gui-buttons)
 
 some .vob files have audio on strange channels (e.g. 3, 7, 10)
 
@@ -303,11 +315,12 @@ First you need to install/use XFree 4.x. Once you got that you have to
 make sure the XFree drivers you're using are supporting Xv on your
 hardware. Here are some locations to look for suitable drivers:
 
-g200/g400    : xfree 4.x supports these out-of-the-box
-nvidia cards : www.nvidia.com (the've got binary drivers)
+g200/g400    : XFree 4.x supports these out-of-the-box
+nvidia cards : www.nvidia.com (they've got binary drivers),
+               XFree 4.1.x already contains Xv drivers for nvidia cards
 ATI cards    : GATOS www.linuxvideo.org/gatos/
-i815         : the latest xfree 4.x code supports these
-3dfx (voodoo): the latest xfree 4.x code supports these
+i815         : the latest XFree 4.x code supports these
+3dfx (voodoo): the latest XFree 4.x code supports these
 savage       : http://www.probo.com/timr/savage40.html
 
 
@@ -341,7 +354,7 @@ ac3_pass_through:1
 what do all these .xinerc entries mean?
 ---------------------------------------
 
-you'll find more info about them in doc/README.xinerc
+you'll find more info about them in xine-ui/doc/README.xinerc
 
 
 where and how do I get the latest development version?
@@ -423,7 +436,6 @@ the aspect ratio is wrong!
 Try pressing "A" to toggle the aspect ratio
 
 
-
 how do I play streams from STDIN ?
 ----------------------------------
 
@@ -457,6 +469,9 @@ contrast:128
 the values and possible ranges depend on your Xv driver so you'll have 
 to experiment a bit to get a good picture.
 
+You can also use a button on the gui to interactively changes these
+video settings.
+
 
 some parts of my X Desktop get transparent when xine plays the video!
 ---------------------------------------------------------------------
@@ -480,30 +495,31 @@ The most common reason for this is that some other program is accesing your
 audio device. If you're using linux, the command "fuser /dev/dsp" should give
 you the PID of the process.
 
-If you are using GNOME, chances are, that this is caused by ESD. Now you
-have two possibilities. Either deactivate ESD (temporarily) by right
-clicking on the sound monitor applet and selecting "Place Esound in
-standby". Then xine will use OSS audio output. The other method is to make
-xine use ESD for audio output with
+If you are using GNOME, chances are that this is caused by ESD. Now
+you have two possibilities. Either deactivate ESD (temporarily) by
+right clicking on the sound monitor applet and selecting "Place Esound
+in standby" or just kill it. Then xine will use OSS audio output. The
+other method is to make xine use ESD for audio output with
 
 xine -A esd
 
-This may result in more jerkier playback, so the first method is the
-preferred one.
+This may result in worse playback - exact syncronization is not
+possible with esd, so using oss should be preferred.
 
 
 i have problems when using xine on FreeBSD, Solaris
 ---------------------------------------------------
 
-check out the the corresponding README files in the doc directory
+check out the the corresponding README files in the xine-ui/doc
+directory
 
 
 what is aalib? how do I use it in xine?
 ---------------------------------------
 
 aalib is an ascii art library. xine comes with an aalib video output
-plugin so you can watch movies in your xterm, on the console or
-on your old vt100 - very cool, btw ;>
+plugin so you can watch movies in your xterm, on the console or on
+your old vt100 - very cool ;>
 
 to use it simply make sure you have aalib installed correctly before
 you configure/build xine-lib and xine-ui. Besides the "xine" binary
@@ -530,14 +546,25 @@ alsa_ac3_device:plughw:0,2
 somewhere into your ~/.xinerc and try again.
 
 
+alsa 05
+-------
+
+don't use it.
+
+
 i think I found a bug!
 ----------------------
 
 xine is still under heavy developement. Please be patient.
 If you got time, please contact us and send us a full bug report.
-Please include all xine console output and some details about
-your hardware and operating system.
+Please include all xine console output and some details about your
+hardware and operating system (see xine-ui/doc/bug_report_form).
 
-You can reach us via email:
+You can reach the xine team via email:
 
   Xine Mailing List <xine-user@lists.sourceforge.net>
+
+
+--- 
+version of this file:
+ $Id$
