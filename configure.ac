@@ -15,6 +15,9 @@ dnl Require libtool minimum version 1.4.0
 dnl
 dnl AC_PREREQ_LIBTOOL(1.4.0,,AC_MSG_ERROR(*** You should have libtool >= 1.4 installed ***))
 
+dnl
+dnl Don't forget to update the misc/xine_splash.{xcf,png}
+dnl
 XINE_MAJOR=0
 XINE_MINOR=9
 XINE_SUB=22
