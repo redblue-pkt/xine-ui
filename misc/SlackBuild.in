@@ -11,7 +11,7 @@ CWD=`pwd`
 PACKAGE=@PACKAGE@.tgz
 SLCK=$CWD/slack
 PREFIX=@prefix@
-export PKG=$CWD/slktmp
+PKG=$CWD/slktmp
 TMPBUILD=$CWD/tmpbuild
 
 #
@@ -139,15 +139,14 @@ EOF
 # Building binaries process, then install and move package in right place
 #
 do_build() {
-  cd $CWD
-  rm -rf $TMPBUILD
-  mkdir -p $TMPBUILD
-  cd $TMPBUILD && tar -xzf $CWD/@TAR_NAME@.tar.gz
-  cd @TAR_NAME@
-  DIE=1
-  cp ./configure ./configure.orig
-  sed -e 's/xine_skin_dir=/xine_skin_dir=$PKG/;s/xine_desktop_dir=/xine_desktop_dir=$PKG/' configure.orig > ./configure
-  ./configure --prefix=$PREFIX && make && make install-strip prefix=$PKG/$PREFIX && \
+  echo "cd to $CWD" && cd $CWD && \
+  echo "rm -rf $TMPBUILD" && rm -rf $TMPBUILD && \
+  echo "mkdir -p $TMPBUILD" && mkdir -p $TMPBUILD && \
+  echo "cd $TMPBUILD" && cd $TMPBUILD && \
+  echo "tar -xzf $CWD/@TAR_NAME@.tar.gz" && tar -xzf $CWD/@TAR_NAME@.tar.gz && \
+  echo "cd @TAR_NAME@" && cd @TAR_NAME@ && \
+  DIE=1 && echo "./configure --prefix=$PREFIX && make && mkdir -p $PKG && make install-strip DESTDIR=$PKG" && \
+  ./configure --prefix=$PREFIX && make && mkdir -p $PKG && make install-strip DESTDIR=$PKG && \
   cd $PKG && \
   do_doinst && \
   echo "n" | makepkg $PACKAGE && \

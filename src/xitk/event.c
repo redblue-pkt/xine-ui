@@ -569,6 +569,11 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_v:
       gui_decrease_audio_volume();
       break;
+
+    case XK_x:
+    case XK_X:
+      panel_execute_snapshot(NULL, NULL);
+      break;
     }
   }
   break;
@@ -903,7 +908,6 @@ void gui_run (void) {
 
   /* autoscan playlist  */
   if(gGui->autoscan_plugin != NULL) {
-
     char **autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     
     int i;

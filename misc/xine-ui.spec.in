@@ -66,16 +66,13 @@ ler qualquer vídeo com máximo desempenho.
 %setup -n @TAR_NAME@
 
 %build
-cp ./configure ./configure.orig
-sed -e 's/xine_skin_dir=/xine_skin_dir=$RPM_BUILD_ROOT/;s/xine_desktop_dir=/xine_desktop_dir=$RPM_BUILD_ROOT/' configure.orig > ./configure
-
 ./configure --prefix=%{prefix}
 make
 
 %install
 if [ -d $RPM_BUILD_ROOT ]; then rm -rf $RPM_BUILD_ROOT; fi
 #mkdir -p $RPM_BUILD_ROOT/usr/include/X11/pixmaps
-make install-strip prefix=$RPM_BUILD_ROOT%{prefix}
+make install-strip DESTDIR=$RPM_BUILD_ROOT
 #cp doc/*.xpm $RPM_BUILD_ROOT/usr/include/X11/pixmaps
 
 %post
@@ -194,6 +191,8 @@ rm -rf $RPM_BUILD_ROOT
 @XINE_SKINDIR@/metal/*
 @XINE_SKINDIR@/pitt/*
 @XINE_SKINDIR@/xinetic/*
+# misc script
+@XINE_SCRIPTDIR@/xineshot
 # desktop entries/icons
 @XINE_DESKTOPDIR@/*
 # documentation
@@ -216,6 +215,8 @@ rm -rf $RPM_BUILD_ROOT
 @HAVE_AA_TRUE@%{prefix}/man/man1/aaxine.1*
 
 %changelog
+* Wed Oct 3 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+- use DESTDIR for package building and add xineshot, based on patch from Andrew Meredith <andrew@anvil.org>
 * Thu Sep 27 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add icons and desktop stuff from patches by Miguel Freitas <miguel@cetuc.puc-rio.br>
 * Sun Sep 16 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>

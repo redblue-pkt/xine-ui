@@ -32,6 +32,10 @@
 #include <pwd.h>
 #include <time.h>
 #include <sys/types.h>
+#include <sys/wait.h>
+
+extern char **environ;
+extern int errno;
 
 #ifndef __GNUC__
 #define	__FUNCTION__	__func__
@@ -142,3 +146,47 @@ void xine_usec_sleep(unsigned usec) {
 #endif
 }
 
+/*
+ * Execute a shell command.
+ */
+int xine_system(int dont_run_as_root, char *command) {
+  int pid, status;
+  
+  /* 
+   * Don't permit run as root
+   */
+  if(dont_run_as_root) {
+    if(getuid() == 0)
+      return -1;
+  }
+
+  if(command == 0)
+    return 1;
+
+  pid = fork();
+
+  if(pid == -1)
+    return -1;
+  
+  if(pid == 0) {
+    char *argv[4];
+    argv[0] = "sh";
+    argv[1] = "-c";
+    argv[2] = command;
+    argv[3] = 0;
+    execve("/bin/sh", argv, environ);
+    exit(127);
+  }
+
+  do {
+    if(waitpid(pid, &status, 0) == -1) {
+      if (errno != EINTR)
+	return -1;
+    } 
+    else {
+      return WEXITSTATUS(status);
+    }
+  } while(1);
+  
+  return -1;
+}

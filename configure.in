@@ -478,9 +478,11 @@ dnl desktop dir location, xine-config told us about this.
 dnl
 
 escapedprefix="`echo $prefix | sed -e 's/\\//\\\\\//g'`"
-XINE_DESKTOPDIR="`echo $xine_desktop_dir|sed -e 's/^'$escapedprefix/'\${prefix}'/`"
+XINE_SCRIPTDIR="`echo $xine_script_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
+AC_SUBST(XINE_SCRIPTDIR)
+AC_DEFINE_UNQUOTED(XINE_SCRIPTDIR, "$XINE_SCRIPTDIR")
+XINE_DESKTOPDIR="`echo $xine_desktop_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_DESKTOPDIR)
-
 
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )

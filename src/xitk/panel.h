@@ -66,6 +66,8 @@ void panel_toggle_visibility (widget_t *w, void *data);
 
 void panel_toggle_audio_mute(widget_t *w, void *data, int status);
 
+void panel_execute_snapshot(widget_t *w, void *data);
+
 void panel_check_pause(void);
 
 void panel_check_mute(void);

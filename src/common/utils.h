@@ -57,4 +57,9 @@ char *chomp (char *str);
  */
 void xine_usec_sleep(unsigned usec);
 
+/*
+ * Execute a shell command.
+ */
+int xine_system(int dont_run_as_root, char *command);
+
 #endif

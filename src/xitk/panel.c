@@ -254,6 +254,28 @@ void panel_toggle_audio_mute(widget_t *w, void *data, int state) {
   }
   panel_check_mute();
 }
+
+/*
+ *
+ */
+void panel_execute_snapshot(widget_t *w, void *data) {
+  int err;
+  char cmd[2048];
+  char *vo_name;
+
+  vo_name = config_lookup_str("video_driver_name", NULL);
+
+  if(!strcmp(vo_name, "XShm")) {
+    snprintf(cmd, 2048, "%s/%s", XINE_SCRIPTDIR, "xineshot");
+    if((err = xine_system(0, cmd)) < 0) {
+      printf("xine_system() returned %d\n", err);
+    }
+  }
+  else
+    printf("Grab snapshots only works with XShm video driver.\n");
+  
+}
+
 /*
  * Handle paddle moving of slider.
  */
@@ -772,5 +794,3 @@ void panel_init (void) {
 
   pthread_create(&panel->slider_thread, NULL, slider_loop, NULL);
 }
-
-

@@ -1,8 +1,12 @@
 
 SUBDIRS = desktops
 
-EXTRA_DIST = autogen.sh SlackBuild.in SlackBuild build_rpms.sh \
+EXTRA_DIST = $(bin_SCRIPTS) autogen.sh SlackBuild.in SlackBuild build_rpms.sh \
 	xine-ui.spec.in xine-ui.spec
+
+bindir = @XINE_SCRIPTDIR@
+
+bin_SCRIPTS = xineshot
 
 debug:
 install-debug: debug

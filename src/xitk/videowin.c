@@ -305,7 +305,20 @@ void video_window_adapt_size (int video_width, int video_height,
         
     XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
 
-
+    
+    /*
+     * layer above most other things, like gnome panel
+     * WIN_LAYER_ABOVE_DOCK  = 10
+     *
+     */
+    if( XA_WIN_LAYER == None )
+      XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+    
+    data[0] = 10;
+    XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
+		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		    1);
+    
     /*
      * wm, no borders please
      */
@@ -412,19 +425,6 @@ void video_window_adapt_size (int video_width, int video_height,
 
   XFlush(gGui->display);
 
-  /*
-   * layer above most other things, like gnome panel
-   * WIN_LAYER_ABOVE_DOCK  = 10
-   *
-   */
-  if( XA_WIN_LAYER == None )
-    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-
-  data[0] = 10;
-  XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
-		  XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		  1);
-  
   if (gVw->gc != None) XFreeGC(gGui->display, gVw->gc);
   gVw->gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
   

@@ -36,6 +36,8 @@
 #include <X11/Xutil.h>		/* for XGetClassHint() */
 #include <X11/Xos.h>
 
+#include "utils.h"
+
 #ifdef _VROOT_H_
 #error "ERROR! you must not include vroot.h in this file"
 #endif
@@ -638,6 +640,10 @@ int xscreensaver_kill_server(Display *dpy) {
  * Start xscreensaver daemon.
  */
 void xscreensaver_start_server(void) {
+  int err;
 
-  system("xscreensaver -nosplash&");
+  if((err = xine_system(0, "xscreensaver -nosplash&")) < 0) {
+    fprintf (stderr, "xine_system() returned %d\n", err);
+  }
 }
+
