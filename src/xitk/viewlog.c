@@ -202,29 +202,8 @@ void viewlog_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case KeyRelease: {
-    XKeyEvent      mykeyevent;
-    KeySym         mykey;
-    char           kbuf[256];
-    int            len;
-    
-    mykeyevent = event->xkey;
-    
-    XLockDisplay(gGui->display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay(gGui->display);
-    
-    switch (mykey) {
-      
-    case XK_Return:
-      viewlog_end(NULL, NULL);
-      break;
-      
-    default:
-      gui_handle_event(event, data);
-      break;
-    }
-  }
+  case KeyRelease:
+    gui_handle_event(event, data);
   break;
   
   case MappingNotify:

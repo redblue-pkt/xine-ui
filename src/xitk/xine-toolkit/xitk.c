@@ -41,7 +41,6 @@
 #include <unistd.h>
 #include <signal.h>
 #include <time.h>
-#include <setjmp.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -140,7 +139,6 @@ typedef struct {
 
 static __xitk_t    *gXitk;
 static pid_t        xitk_pid;
-static sigjmp_buf   kill_jmp;
 
 
 void widget_stop(void);
@@ -213,58 +211,32 @@ static void xitk_signal_handler(int sig) {
   pid_t cur_pid = getppid();
 
   /* First, call registered handler */
-  if(gXitk->sig_callback)
-    gXitk->sig_callback(sig, gXitk->sig_data);
+  if(cur_pid == xitk_pid) {
+    if(gXitk->sig_callback)
+      gXitk->sig_callback(sig, gXitk->sig_data);
+  }
+  
+  gXitk->running = 0;
   
   switch (sig) {
-
+    
   case SIGINT:
   case SIGTERM:
   case SIGQUIT:
     if(cur_pid == xitk_pid) {
-      __gfx_t  *fx;
       
-      XITK_WARNING("XITK killed with signal %d\n", sig);
-
-      MUTLOCK();
-      gXitk->running = 0;
+      xitk_list_free(gXitk->list);
+      xitk_list_free(gXitk->gfx);
+      xitk_config_deinit(gXitk->config);
       
-      /* 
-       * Tada.... and now Ladies and Gentlemen, the dirty hack
-       */
-      fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
-
-      while(fx) {
-	if(fx->window) {
-	  XEvent event;
-	  
-	  event.xany.type = ClientMessage;
-	  event.xclient.type = ClientMessage;
-	  event.xclient.send_event = True;
-	  event.xclient.display = gXitk->display;
-	  event.xclient.window = fx->window;
-	  event.xclient.message_type = fx->XA_XITK;
-	  event.xclient.format = 32;
-	  memset(&event.xclient.data, 0, sizeof(event.xclient.data));
-	  snprintf(event.xclient.data.b, 20, "%s", "KILL");
-	  
-	  XLOCK(gXitk->display);
-	  if (!XSendEvent (gXitk->display, fx->window, True, 0L, &event)) {
-	    XITK_WARNING("XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) fx->window);
-	  }
-	  XUNLOCK(gXitk->display);
-
-	  MUTUNLOCK();
-	  siglongjmp(kill_jmp, 1);
-	  return;
-	}
-	fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
-      }
-      MUTUNLOCK();
+      XITK_FREE(gXitk);
+      exit(1);
     }
     break;
   }
+
 }
+
 /*
  * Create a new widget_list, store the pointer in private
  * list of xitk_widget_list_t, then return the widget_list pointer.
@@ -513,10 +485,15 @@ void xitk_xevent_notify(XEvent *event) {
 
 	case KeyPress:
 	  if(fx->widget_list && 
-	     fx->widget_list->widget_focused && 
-	     (fx->widget_list->widget_focused->widget_type & WIDGET_TYPE_INPUTTEXT)) {
-	    xitk_send_key_event(fx->widget_list, fx->widget_list->widget_focused, event);
-	    return;
+	     fx->widget_list->widget_focused) {
+
+	    fx->widget_list->widget_focused->kpressed = 1;
+	    
+	    if(fx->widget_list->widget_focused->widget_type & WIDGET_TYPE_INPUTTEXT) {
+	      xitk_send_key_event(fx->widget_list, fx->widget_list->widget_focused, event);
+	      //	      fx->widget_list->widget_pressed = fx->widget_list->widget_focused;
+	      return;
+	    }
 	  }
 	  break;
 
@@ -528,6 +505,15 @@ void xitk_xevent_notify(XEvent *event) {
 	  int            modifier;
 	  int            handled = 0;
 	  xitk_widget_t *w = NULL;
+
+	  if(fx->widget_list && 
+	     fx->widget_list->widget_focused) {
+
+	    /* Release from not pressed */
+	    if(fx->widget_list->widget_focused->kpressed == 0)
+	      return;
+	    
+	  }
 
 	  mykeyevent = event->xkey;
 
@@ -544,8 +530,10 @@ void xitk_xevent_notify(XEvent *event) {
 	  xitk_tips_tips_kill(fx->widget_list->widget_focused);
 
 
-	  if(fx->widget_list && fx->widget_list->widget_focused)
+	  if(fx->widget_list && fx->widget_list->widget_focused) {
 	    w = fx->widget_list->widget_focused;
+	    w->kpressed = 0;
+	  }
 	  
 	  /* set focus to next widget */
 	  if((mykey == XK_Tab) || (mykey == XK_KP_Tab) || (mykey == XK_ISO_Left_Tab)) {
@@ -554,8 +542,9 @@ void xitk_xevent_notify(XEvent *event) {
 	      xitk_set_focus_to_next_widget(fx->widget_list, (modifier & MODIFIER_SHIFT));
 	    }
 	  }
-	  /* simulate click event on space key event */
-	  else if(mykey == XK_space) {
+	  /* simulate click event on space/return/enter key event */
+	  else if((mykey == XK_space) || (mykey == XK_Return) || 
+		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
 	    if(w && (w->notify_click && w->visible && w->enable)) {
 	      
 	      if(w && ((w->widget_type & WIDGET_TYPE_BUTTON) ||
@@ -590,13 +579,23 @@ void xitk_xevent_notify(XEvent *event) {
 	   * Don't send keyrelease event to an inputtext widget,
 	   * it already got it in KeyPress event.
 	   */
-	  if((!handled) && 
-	     ((w == NULL) || (w && ((w->widget_type & WIDGET_TYPE_INPUTTEXT) == 0)))) {
-	    if(fx->xevent_callback) {
-	      fx->xevent_callback(event, fx->user_data);
+	  if(!handled) {
+	    if((w == NULL) || (w && ((w->widget_type & WIDGET_TYPE_INPUTTEXT) == 0))) {
+	      if(fx->xevent_callback) {
+		fx->xevent_callback(event, fx->user_data);
+	      }
+	    }
+	    if(w && (w->widget_type & WIDGET_TYPE_INPUTTEXT) && 
+	       ((mykey == XK_Return) || (mykey == XK_KP_Enter) 
+		|| (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter))) {
+	      
+	      if(w->paint)
+		(w->paint) (w, fx->widget_list->win, fx->widget_list->gc);
+	      
+	      xitk_set_focus_to_next_widget(fx->widget_list, 0);
+	      
 	    }
 	  }
-	  
 	  return;
 	}
 	break;
@@ -890,27 +889,21 @@ void xitk_run(void) {
    */
   while(gXitk->running) {
     /* XLOCK(gXitk->display); 
-
+       
        if(XPending (gXitk->display)) { 
     */
-
-    if(sigsetjmp(kill_jmp, 1) != 0)
-      goto killing_end;
-    
-      XNextEvent (gXitk->display, &myevent) ;
+    XNextEvent (gXitk->display, &myevent) ;
       /* XUNLOCK(gXitk->display);  */
-      xitk_xevent_notify(&myevent);
-      /*
-    } else {  
+    xitk_xevent_notify(&myevent);
+    /*
+      } else {  
       XUNLOCK(gXitk->display); 
       xitk_usec_sleep(16666); // 1/60 sec
-    } 
-
+      } 
+      
     */
   }
   /*XUNLOCK(gXitk->display); */
-
- killing_end:
 
   xitk_list_free(gXitk->list);
   xitk_list_free(gXitk->gfx);
@@ -985,11 +978,11 @@ const char *xitk_get_homedir(void) {
   int ret;
   struct passwd pwd;
   char *buffer = NULL;
-  int bufsize = 128;
+  int bufsize = 256;
 
   buffer = (char *) xitk_xmalloc(bufsize);
   
-  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) < 0) {
+  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) != 0) {
 #else
   if((pw = getpwuid(getuid())) == NULL) {
 #endif

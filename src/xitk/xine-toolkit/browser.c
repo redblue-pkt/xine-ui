@@ -525,6 +525,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
   
   mywidget->private_data               = private_data;
 
+  mywidget->kpressed                   = 0;
   mywidget->enable                     = enable;
   mywidget->running                    = 1;
   mywidget->visible                    = visible;

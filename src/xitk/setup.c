@@ -433,30 +433,11 @@ static void setup_paint_widgets(void) {
  * Handle X events here.
  */
 void setup_handle_event(XEvent *event, void *data) {
-  XKeyEvent      mykeyevent;
-  KeySym         mykey;
-  char           kbuf[256];
-  int            len;
 
   switch(event->type) {
 
   case KeyRelease:
-    mykeyevent = event->xkey;
-    
-    XLockDisplay(gGui->display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay(gGui->display);
-    
-    switch (mykey) {
-      
-    case XK_Return:
-      setup_end(NULL, NULL);
-      break;
-      
-    default:
-      gui_handle_event(event, data);
-      break;
-    }
+    gui_handle_event(event, data);
     break;
     
   case MappingNotify:

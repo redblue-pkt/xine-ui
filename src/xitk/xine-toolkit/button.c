@@ -229,6 +229,7 @@ static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_but
   
   mywidget->private_data          = private_data;
 
+  mywidget->kpressed              = 0;
   mywidget->enable                = enable;
   mywidget->running               = 1;
   mywidget->visible               = visible;

@@ -312,6 +312,7 @@ static void gui_signal_handler (int sig, void *data) {
     }
     break;
   }
+
 }
 
 /*

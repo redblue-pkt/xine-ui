@@ -1023,6 +1023,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
     
   private_data->visible        = 1;
   
+  mywidget->kpressed           = 0;
   mywidget->enable             = 1;
   mywidget->running            = 1;
   mywidget->visible            = 1;

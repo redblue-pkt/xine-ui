@@ -723,6 +723,7 @@ static void inputtext_exec_return(xitk_widget_list_t *wl, xitk_widget_t *it) {
 
   private_data->cursor_pos = -1;
   it->have_focus = private_data->have_focus = FOCUS_LOST;
+  //  wl->widget_focused = NULL;
   paint_inputtext(it, wl->win, wl->gc);
   
   if(strlen(private_data->text) > 0) {
@@ -1049,6 +1050,7 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_skin_config_t *skonfig,
 
   mywidget->private_data          = private_data;
 
+  mywidget->kpressed              = 0;
   mywidget->enable                = enable;
   mywidget->running               = 1;
   mywidget->visible               = visible;

@@ -702,7 +702,7 @@ static xitk_color_names_t xitk_color_names[] = {
 };
 
 #if 0
-static void dump_widget_type(xitk_widget_t *w) {
+void dump_widget_type(xitk_widget_t *w) {
   if(w->widget_type      & WIDGET_TYPE_GROUP)       printf("WIDGET_TYPE_GROUP | ");
   if(w->widget_type      & WIDGET_TYPE_BUTTON)      printf("WIDGET_TYPE_BUTTON");
   else if(w->widget_type & WIDGET_TYPE_LABELBUTTON) printf("WIDGET_TYPE_LABELBUTTON");
@@ -727,11 +727,10 @@ static void dump_widget_type(xitk_widget_t *w) {
 void *xitk_xmalloc(size_t size) {
   void *ptrmalloc;
   
-  if(size <= 0) {
-    XITK_WARNING("%s(): size was <= 0.\n", __FUNCTION__);
-    return NULL;
-  }
-
+  /* prevent xitk_xmalloc(0) of possibly returning NULL */
+  if(!size)
+    size++;
+  
   if((ptrmalloc = malloc(size)) == NULL) {
     XITK_WARNING("%s: malloc() failed: %s.\n", __FUNCTION__, strerror(errno));
     return NULL;
@@ -897,7 +896,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) {
     
     if (mywidget && (mywidget->enable == WIDGET_ENABLE) && mywidget->visible) {
 
-#if 0      
+#if 0
       dump_widget_type(mywidget);
 #endif
       
