@@ -123,6 +123,15 @@ static char *get_fourcc_string(uint32_t fourcc) {
   return &fourcc_txt[0];
 }
 
+static char *get_num_string(uint32_t num) {
+  static char buffer[1024];
+
+  memset(&buffer, 0, sizeof(buffer));
+  snprintf(buffer, 1023, "%d", num);
+
+  return &buffer[0];
+}
+
 void stream_infos_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
 
@@ -271,8 +280,7 @@ void stream_infos_update_infos(void) {
     if(!gGui->logo_mode) {
       const char *minfo;
       uint32_t    iinfo;
-      char        buffer[1024];
-      
+
       if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_TITLE)) != NULL)
 	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.title, minfo);
       
@@ -304,42 +312,28 @@ void stream_infos_update_infos(void) {
 	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.input_plugin, minfo);
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_BITRATE);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.bitrate, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.bitrate, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE);
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.seekable, (get_yesno_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_width, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_width, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_height, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_height, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_RATIO);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_ratio, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_ratio, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_CHANNELS);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_channels, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_channels, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_STREAMS);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_streams, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_streams, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_BITRATE);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_bitrate, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_bitrate, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_FOURCC);
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_fourcc, (get_fourcc_string(iinfo)));
@@ -348,29 +342,19 @@ void stream_infos_update_infos(void) {
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_handled, (get_yesno_string(iinfo)));;
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_FRAME_DURATION);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.frame_duration, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.frame_duration, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_CHANNELS);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_channels, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_channels, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_BITS);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bits, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bits, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_samplerate, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_samplerate, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_BITRATE);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bitrate, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bitrate, (get_num_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_FOURCC);
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_fourcc, (get_fourcc_string(iinfo)));
