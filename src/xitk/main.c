@@ -39,6 +39,7 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
+#include <math.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/stat.h>
@@ -289,12 +290,29 @@ static void load_video_out_driver(char *video_driver_id) {
   
   vis.display           = gGui->display;
   vis.screen            = gGui->screen;
+  vis.d                 = gGui->video_window;
   res_h                 = (DisplayWidth  (gGui->display, gGui->screen)*1000 
 			   / DisplayWidthMM (gGui->display, gGui->screen));
   res_v                 = (DisplayHeight (gGui->display, gGui->screen)*1000
 			   / DisplayHeightMM (gGui->display, gGui->screen));
   vis.display_ratio     = res_h / res_v;
-  vis.d                 = gGui->video_window;
+#ifdef	DEBUG
+  printf("display_ratio: %f\n", vis.display_ratio);
+#endif
+
+  if (fabs(vis.display_ratio - 1.0) < 0.01) {
+    /*
+     * we have a display with *almost* square pixels (<1% error),
+     * to avoid time consuming software scaling in video_out_xshm,
+     * correct this to the exact value of 1.0 and pretend we have
+     * perfect square pixels.
+     */
+    vis.display_ratio   = 1.0;
+#ifdef	DEBUG
+    printf("display_ratio: corrected to square pixels!\n");
+#endif
+  }
+
   vis.calc_dest_size    = video_window_calc_dest_size;
   vis.request_dest_size = video_window_adapt_size;
   
