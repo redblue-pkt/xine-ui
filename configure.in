@@ -699,13 +699,6 @@ src/xitk/Makefile
 src/xitk/xine-toolkit/Makefile
 src/xitk/xine-toolkit/po/Makefile.in
 src/xitk/skins/Makefile
-src/xitk/skins/lcd/Makefile
-src/xitk/skins/pitt/Makefile
-src/xitk/skins/xinetic/Makefile
-src/xitk/skins/cloudy/Makefile
-src/xitk/skins/mp2k/Makefile
-src/xitk/skins/CelomaGold/Makefile
-src/xitk/skins/CelomaMdk/Makefile
 src/xitk/skins/CelomaChrome/Makefile
 src/aaui/Makefile
 src/dfb/Makefile
