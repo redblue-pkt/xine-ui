@@ -97,7 +97,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::s:R";
+ "u:a:V:A:p::s:RG:B";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
@@ -120,6 +120,8 @@ static struct option long_options[] = {
   {"keymap"         , optional_argument, 0,  DISPLAY_KEYMAP          },
   {"network"        , no_argument      , 0, 'n'                      },
   {"root"           , no_argument      , 0, 'R'                      },
+  {"geometry"       , required_argument, 0, 'G'                      },
+  {"borderless"     , no_argument      , 0, 'B'                      },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -205,6 +207,8 @@ void show_usage (void) {
   printf(_("                                 -if no option is given, 'default' is selected.\n"));
   printf(_("  -n, --network                Enable network remote control server.\n"));
   printf(_("  -R, --root                   Use root window as video window.\n"));
+  printf(_("  -G, --geometry <WxH[+X+Y]>   Set output window size, according to X geometry (see X(7)).\n"));
+  printf(_("  -B, --borderless             Borderless video output window.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -452,16 +456,16 @@ void event_listener (void *user_data, xine_event_t *event) {
 int main(int argc, char *argv[]) {
 
   /* command line options will end up in these variables: */
-  int              c = '?', aos = 0;
-  int              option_index = 0;
-  int              audio_channel = -1;
-  int              spu_channel = -1;
-  /*  int              audio_options = 0; FIXME */
-  int		   visual = 0;
-  char            *audio_driver_id = NULL;
-  char            *video_driver_id = NULL;
-  ao_driver_t     *audio_driver = NULL ;
-  sigset_t         vo_mask;
+  int                   c = '?', aos = 0;
+  int                   option_index = 0;
+  int                   audio_channel = -1;
+  int                   spu_channel = -1;
+  window_attributes_t   window_attribute;
+  int		        visual = 0;
+  char                 *audio_driver_id = NULL;
+  char                 *video_driver_id = NULL;
+  ao_driver_t          *audio_driver = NULL ;
+  sigset_t              vo_mask;
 
   /* Check xine library version */
   if(!xine_check_version(0, 9, 9)) {
@@ -500,6 +504,10 @@ int main(int argc, char *argv[]) {
   gGui->XF86VidMode_fullscreen = 0;
 #endif
   gGui->actions_on_start[aos]  = ACTID_NOKEY;
+
+  window_attribute.x     = window_attribute.y      = -8192;
+  window_attribute.width = window_attribute.height = -1;
+  window_attribute.borderless = 0;
 
   /*
    * initialize CORBA server
@@ -642,6 +650,33 @@ int main(int argc, char *argv[]) {
       gGui->use_root_window = 1;
       break;
 
+    case 'G': /* Set geometry */
+      {
+	int width, height, xoff, yoff;
+	
+	if(optarg != NULL) {
+	  if((sscanf(optarg, "%ix%i+%i+%i", &width, &height, &xoff, &yoff)) == 4) {
+	    window_attribute.width  = width;
+	    window_attribute.height = height;
+	    window_attribute.x      = xoff;
+	    window_attribute.y      = yoff;
+	  }
+	  else if((sscanf(optarg, "%ix%i", &width, &height)) == 2) {
+	    window_attribute.width  = width;
+	    window_attribute.height = height;
+	  }
+	  else {
+	    printf(_("Bad geometry '%s', see xine --help\n"), optarg);
+	    exit(1);
+	  }
+	}
+      }
+      break;
+
+    case 'B':
+      window_attribute.borderless = 1;
+      break;
+
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -688,7 +723,7 @@ int main(int argc, char *argv[]) {
    * init gui
    */
   
-  gui_init(argc-optind, &argv[optind]);
+  gui_init(argc-optind, &argv[optind], &window_attribute);
 
   /*
    * load and init output drivers

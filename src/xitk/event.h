@@ -31,6 +31,7 @@
 #include "kbindings.h"
 #include "xitk.h"
 #include "i18n.h"
+#include "videowin.h"
 
 #define MAX_PLAYLIST_LENGTH  1024
 
@@ -141,7 +142,7 @@ void config_reset(void);
 char *gui_get_skindir(void);
 char *gui_get_configfile(void);
 
-void gui_init (int nfiles, char *filenames[]);
+void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute);
 
 void gui_init_imlib (Visual *vis);
 

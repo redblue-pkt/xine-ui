@@ -25,7 +25,15 @@
 #ifndef VIDEOWIN_H
 #define VIDEOWIN_H
 
-void video_window_init (void);
+typedef struct {
+  int   x;
+  int   y;
+  int   width;
+  int   height;
+  int   borderless;
+} window_attributes_t;
+
+void video_window_init (window_attributes_t *window_attribute);
 
 void video_window_select_visual (void);
 

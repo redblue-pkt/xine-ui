@@ -60,6 +60,7 @@ typedef struct {
   Colormap	 colormap;	  /* Colormap for video window		   */
   XClassHint    *xclasshint;
   XClassHint    *xclasshint_fullscreen;
+  XClassHint    *xclasshint_borderless;
   GC             gc;
 
   int            already_exposed;
@@ -88,6 +89,8 @@ typedef struct {
   int            completion_type;
   int            depth;
   int            show;
+  int            borderless;      /* borderless window (for windowed mode)? */
+
   XWMHints      *wm_hint;
 
   xitk_register_key_t    widget_key;
@@ -162,6 +165,7 @@ static void video_window_adapt_size (void) {
   XGCValues             xgcv;
   Window                old_video_window = None;
   long                  propvalue[1];
+  int                   border_width;
 
 /*  printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
  *           video_width,
@@ -186,14 +190,16 @@ static void video_window_adapt_size (void) {
       gVw->visual          = gGui->visual;
       gVw->depth           = gGui->depth;
       gVw->colormap        = gGui->colormap;
-      
 
       attr.override_redirect = True;
       attr.background_pixel  = gGui->black.pixel;
       
+      border_width = 0;
+
       gGui->video_window = XCreateWindow(gGui->display, DefaultRootWindow(gGui->display),
 					 0, 0, gVw->fullscreen_width, gVw->fullscreen_height, 
-					 0, CopyFromParent, CopyFromParent, CopyFromParent, 
+					 border_width, 
+					 CopyFromParent, CopyFromParent, CopyFromParent, 
 					 CWBackPixel | CWOverrideRedirect, &attr);
 /* fprintf (stderr, "***** XCreateWindow 1 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
       
@@ -388,14 +394,15 @@ static void video_window_adapt_size (void) {
     attr.border_pixel      = gGui->black.pixel;
     attr.colormap	   = gVw->colormap;
 
+    border_width           = 0;
+
     gGui->video_window = 
       XCreateWindow (gGui->display, gGui->imlib_data->x.root, 
 		     hint.x, hint.y, gVw->fullscreen_width, gVw->fullscreen_height, 
-		     0, gVw->depth, InputOutput/*CopyFromParent*/, 
+		     border_width, gVw->depth, InputOutput,
 		     gVw->visual,
-		     CWBackPixel  | CWBorderPixel | CWColormap, &attr);
-/* fprintf (stderr, "***** XCreateWindow 2 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
-    
+		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
+
     if(gGui->vo_driver)
       gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
 					  GUI_DATA_EX_DRAWABLE_CHANGED, 
@@ -460,9 +467,7 @@ static void video_window_adapt_size (void) {
     hint.width       = gVw->win_width;
     hint.height      = gVw->win_height;
 #endif
-
     hint.flags       = PPosition | PSize;
-
 
     gVw->output_width  = hint.width;
     gVw->output_height = hint.height;
@@ -512,32 +517,48 @@ static void video_window_adapt_size (void) {
     attr.background_pixel  = gGui->black.pixel;
     attr.border_pixel      = gGui->black.pixel;
     attr.colormap	   = gVw->colormap;
-    
-/* fprintf (stderr, "***** XCreateWindow 3 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
+
+    if(gVw->borderless)
+      border_width = 0;
+    else
+      border_width = 4;
+
     gGui->video_window =
       XCreateWindow(gGui->display, gGui->imlib_data->x.root,
-		    hint.x, hint.y, hint.width, hint.height, 4, 
-		    gVw->depth, InputOutput/*CopyFromParent*/, gVw->visual,
+		    hint.x, hint.y, hint.width, hint.height, border_width, 
+		    gVw->depth, InputOutput, gVw->visual,
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
-/*fprintf (stderr, "***** XCreateWindow done\n"); */
     
     if(gGui->vo_driver)
       gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
 					  GUI_DATA_EX_DRAWABLE_CHANGED, 
 					  (void*)gGui->video_window);
     
-    if (gVw->xclasshint != NULL)
+    if(gVw->borderless) {
+      if (gVw->xclasshint_borderless != NULL)
+	XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint_borderless);
+    }
+    else {
+      if (gVw->xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint);
-
-    XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
-
-    /* Tell other applications about gGui window */
+    }
 
     XSetStandardProperties(gGui->display, gGui->video_window, 
 			   window_title, window_title, None, NULL, 0, 0);
+
     XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
+
+    XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
+
+    if(gVw->borderless) {
+      prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
+      mwmhints.flags = MWM_HINTS_DECORATIONS;
+      mwmhints.decorations = 0;
+      XChangeProperty(gGui->display, gGui->video_window, prop, prop, 32,
+		      PropModeReplace, (unsigned char *) &mwmhints,
+		      PROP_MWM_HINTS_ELEMENTS);
+    }
   }
-  
   
   XSelectInput(gGui->display, gGui->video_window, INPUT_MOTION | KeymapStateMask);
 
@@ -747,7 +768,7 @@ int video_window_is_visible (void) {
  *
  */
 static unsigned char bm_no_data[] = { 0,0,0,0, 0,0,0,0 };
-void video_window_init (void) {
+void video_window_init (window_attributes_t *window_attribute) {
 
   Pixmap                bm_no;
 #ifdef HAVE_XINERAMA
@@ -769,6 +790,7 @@ void video_window_init (void) {
     gVw->old_widget_key   = 0;
   gVw->gc		  = None;
   gVw->already_exposed    = 0;
+  gVw->borderless         = window_attribute->borderless;
 
   XLockDisplay (gGui->display);
 
@@ -777,8 +799,8 @@ void video_window_init (void) {
   gVw->colormap		  = gGui->colormap;
   /* Currently, there no plugin loaded so far, but that might change */
   video_window_select_visual ();
-  gVw->xwin               = -8192;
-  gVw->ywin               = -8192;
+  gVw->xwin               = window_attribute->x;
+  gVw->ywin               = window_attribute->y;
   gVw->desktopWidth       = DisplayWidth(gGui->display, gGui->screen);
   gVw->desktopHeight      = DisplayHeight(gGui->display, gGui->screen);
 
@@ -827,6 +849,10 @@ void video_window_init (void) {
   if ((gVw->xclasshint_fullscreen = XAllocClassHint()) != NULL) {
     gVw->xclasshint_fullscreen->res_name = "Xine Video Fullscreen Window";
     gVw->xclasshint_fullscreen->res_class = "Xine";
+  }
+  if ((gVw->xclasshint_borderless = XAllocClassHint()) != NULL) {
+    gVw->xclasshint_borderless->res_name = "Xine Video Borderless Window";
+    gVw->xclasshint_borderless->res_class = "Xine";
   }
 
   /* 
@@ -905,8 +931,14 @@ void video_window_init (void) {
 
   XUnlockDisplay (gGui->display);
 
-  gVw->video_width  = 768;
-  gVw->video_height = 480;
+  if((window_attribute->width > 0) && (window_attribute->height > 0)) {
+    gVw->video_width  = window_attribute->width;
+    gVw->video_height = window_attribute->height;
+  }
+  else {
+    gVw->video_width  = 768;
+    gVw->video_height = 480;
+  }
   
   video_window_set_mag(1.0);
 
@@ -918,10 +950,22 @@ void video_window_init (void) {
   if(gGui->video_window) {
     Window tmp_win;
     
+    if((window_attribute->x > -8192) && (window_attribute->y > -8192)) {
+      gVw->xwin = window_attribute->x;
+      gVw->ywin = window_attribute->y;
+      
+      XLockDisplay (gGui->display);
+      XMoveResizeWindow (gGui->display, gGui->video_window, 
+			 gVw->xwin, gVw->ywin, gVw->video_width, gVw->video_height);
+      XUnlockDisplay (gGui->display);
+  
+    }
+
     XLockDisplay (gGui->display);
     XTranslateCoordinates(gGui->display, gGui->video_window, DefaultRootWindow(gGui->display), 
 			  0, 0, &gVw->xwin, &gVw->ywin, &tmp_win);
     XUnlockDisplay (gGui->display);
+    
   }
 }
 
