@@ -133,6 +133,8 @@ static void notify_destroy(xitk_widget_t *w) {
     XITK_FREE(private_data->fontname);
     XITK_FREE(private_data->skin_element_name);
 
+    pthread_mutex_unlock(&private_data->paint_mutex);
+    pthread_mutex_unlock(&private_data->change_mutex);
     pthread_mutex_destroy(&private_data->paint_mutex);
     pthread_mutex_destroy(&private_data->change_mutex);
 
