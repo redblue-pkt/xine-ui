@@ -28,9 +28,9 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#include "xine/xine.h"
-#include "xine/utils.h"
-#include "xine/monitor.h"
+#include "xine.h"
+#include "utils.h"
+#include "monitor.h"
 #include "gui_widget.h"
 #include "gui_button.h"
 #include "gui_widget_types.h"

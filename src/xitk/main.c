@@ -45,13 +45,9 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include "xine/demux.h"
-#include "xine/xine.h"
-#include "xine/monitor.h"
-#include "xine/utils.h"
-#include "xine/configfile.h"
-#include "xine/video_out.h"
-#include "xine/audio_out.h"
+
+#include "xine.h"
+#include "utils.h"
 #include "gui_main.h"
 #include "gui_dnd.h"
 
@@ -123,8 +119,8 @@ void show_usage (void) {
   printf("OPTIONS are:\n");
   printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
-  printf("  -V, --video-driver <drv>     Select video driver (%s).\n", vo_get_available_drivers());
-  printf("  -A, --audio-driver <drv>     Select audio driver (%s).\n", ao_get_available_drivers());
+/*  printf("  -V, --video-driver <drv>     Select video driver (%s).\n", vo_get_available_drivers());
+  printf("  -A, --audio-driver <drv>     Select audio driver (%s).\n", ao_get_available_drivers());*/
   printf("  -S, --spdif                  enable AC3 output via SPDIF Port.\n");
   printf("  -4, --4-channel              enable 4-channel surround audio.\n");
   printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
@@ -262,22 +258,22 @@ int handle_demux_strategy_subopt(char *sopt) {
 int main(int argc, char *argv[]) {
 
   /* command line options will end up in these variables: */
-  int             c = '?';
-  int             option_index = 0;
-  int             demux_strategy = DEMUX_DEFAULT_STRATEGY;
-  int             audio_channel = 0; 
-  int             spu_channel = -1;
-  int             no_lirc = 0;
-  int             audio_options = 0;
-  int             autoplay_options = 0; /* stuff like FULL_ON_START, QUIT_ON_STOP */
-  char           *audio_driver_name = NULL;
-  ao_functions_t *audio_driver;
-  vo_instance_t  *video_driver;
-  char           *video_driver_name = NULL;
-  char           *display_name = ":0.0";
-  char filename[1024];
-  xine_t         *my_xine;
-
+  int              c = '?';
+  int              option_index = 0;
+  int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
+  int              audio_channel = 0; 
+  int              spu_channel = -1;
+  int              no_lirc = 0;
+  int              audio_options = 0;
+  int              autoplay_options = 0; /* stuff like FULL_ON_START, QUIT_ON_STOP */
+  char            *audio_driver_name = NULL;
+  ao_functions_t  *audio_driver = NULL ;
+  vo_instance_t   *video_driver = NULL;
+  char            *video_driver_name = NULL;
+  char            *display_name = ":0.0";
+  char             filename[1024];
+  xine_t          *my_xine;
+  config_values_t *cfg;
 
   show_banner();
 
@@ -307,7 +303,7 @@ int main(int argc, char *argv[]) {
     switch(c) {
 
     case 'S': /* Use SPDIF Port for AC3 Stream */
-      audio_options |= AO_MODE_AC3;
+      /* audio_options |= AO_MODE_AC3; FIXME */
       break;
 
     case 'a': /* Select audio channel */
@@ -394,8 +390,12 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  /*
+   * generate and init a config "object"
+   */
+
   sprintf (filename, "%s/.xinerc", get_homedir());
-  config_file_init (filename);
+  cfg = config_file_init (filename);
 
   /*
    * init X11
@@ -420,16 +420,22 @@ int main(int argc, char *argv[]) {
    * init output drivers
    */
 
+  /* FIXME
   audio_driver = ao_init (audio_driver_name);
 
   video_driver = vo_init (video_driver_name);
+  */
+
+
+  
 
   /*
    * xine init
    */
 
-  my_xine = xine_init (video_driver, audio_driver, gui_status_callback, 
-		       demux_strategy, debug_level);
+  my_xine = xine_init (video_driver, audio_driver, 
+		       gui_status_callback, cfg);
+
   xine_select_audio_channel (my_xine, audio_channel);
   xine_select_spu_channel (my_xine, spu_channel);
 

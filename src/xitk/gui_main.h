@@ -25,7 +25,7 @@
 #define GUI_MAIN_H
 
 #include <Imlib.h>
-#include "xine/xine.h"
+#include "xine.h"
 #include "gui_widget.h"
 
 
