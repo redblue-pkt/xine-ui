@@ -1,5 +1,5 @@
 Source: xine-ui
-Section: unknown
+Section: graphics
 Priority: optional
 Maintainer: Siggi Langauf <siggi@debian.org>
 Build-Depends: debhelper (>> 2.0.0), libxine-dev (>= 0.5.0)
@@ -8,6 +8,8 @@ Standards-Version: 3.2.1
 Package: xine-ui
 Architecture: any
 Depends: ${shlibs:Depends}
+Conflicts: xine (<<0.5.0)
+Replaces: xine
 Description: the xine video player, user interface 
  This is an X11 based GUI for the libxine video player library. It provides
  a skin based media player that can play all the audio/video formats that

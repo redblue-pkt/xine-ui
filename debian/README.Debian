@@ -8,8 +8,8 @@ issues appeared: xine-lib, ie libxine is _not_ compiled with the -fPIC option.
 This is a clear policy violation, but there's a good reason for this:
 First of all, the whole point of -fPIC is allowing several instances of the
 library in memory at the same time, saving memory and gaining performance via
-saved cache space. But it's very unlikely that someone wil watch several movies
-on the same machine at the same time...
+saved cache space. But it's very unlikely that someone will watch several
+movies on the same machine at the same time...
 On the other hand, compiling the library with -fPIC takes an additional
 register which results in some 5% performance loss. So with -fPIC, you'd need
 at least a PIII-600 in order to playback DVDs. Without that, a PII-450 is
