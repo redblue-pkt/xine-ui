@@ -334,10 +334,11 @@ static void *slider_loop(void *dummy) {
 	  
 	  if(panel_is_visible()) {
 	    
+	    panel_update_runtime_display();
+
 	    if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
 	      if(pos >= 0)
 		xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
-	      panel_update_runtime_display();
 	    }
 	    
 	    if(!(i % 20)) {
