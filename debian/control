@@ -7,10 +7,10 @@ Standards-Version: 3.2.1
 
 Package: xine-ui
 Architecture: any
-Depends: libxine0 (>=0.9.8), ${shlibs:Depends}
+Depends: ${shlibs:Depends}
 Recommends: ${shlibs:Recommends}
 Suggests: ${shlibs:Suggests}
-Conflicts: xine (<<0.5.0)
+Conflicts: xine (<<0.5.0), libxine0 (>= 0.9.9)
 Replaces: xine
 Description: the xine video player, user interface 
  This is an X11 based GUI for the libxine video player library.
@@ -20,9 +20,9 @@ Description: the xine video player, user interface
  media (VCD, SVCD, DVD). A more complete list can be found on
  http://xine.sf.net/.
  .
- This package contains an additional frontend, aaxine, which runs even on the
+ This package contains an additional front end, aaxine, which runs even on the
  console. aaxine uses aalib to render ASCII art video, or you can tell it to
- use a framefuffer device. This is more a proof of concept, but you can use it
+ use a framebuffer device. This is more a proof of concept, but you can use it
  to watch DVDs on your old vt100 terminal, of course. ;-)
  .
  Most DVDs on the market today are play-protected by the Content Scrambling

@@ -1,3 +1,11 @@
+xine-ui (0.9.8-3) testing unstable; urgency=high
+
+  * added Conflicts: with future xine-lib (closes: #129942, #128440)
+  * added man page for xine-check (and xine-bugreport) 
+  * "softer" architecture check, so it at least compiles on unknown arch...
+  
+ -- Siggi Langauf <siggi@debian.org>  Sat, 19 Jan 2002 16:57:27 +0100
+
 xine-ui (0.9.8-2) unstable; urgency=high
 
     * added build-dep on libgpmg1-dev (closes: #129801)
