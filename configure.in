@@ -197,6 +197,32 @@ dnl
 AM_PATH_AALIB(1.2,,)
 AM_CONDITIONAL(HAVE_AA, test x$no_aalib != "xyes")
 
+dnl
+dnl Find pkg-config
+dnl
+AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
+if test x$PKG_CONFIG = xno ; then
+  AC_MSG_ERROR([*** pkg-config not found. See http://pkgconfig.sourceforge.net])
+fi
+
+dnl
+dnl Check for DirectFB
+dnl
+DIRECTFB_REQUIRED_VERSION=0.9.7
+
+AC_MSG_CHECKING(for DirectFB)
+if $PKG_CONFIG --atleast-version $DIRECTFB_REQUIRED_VERSION directfb ; then
+      AC_MSG_RESULT(found)
+      DIRECTFB_CFLAGS=`$PKG_CONFIG --cflags directfb`
+      DIRECTFB_LIBS=`$PKG_CONFIG --libs directfb`
+      have_directfb="yes"
+else
+  AC_MSG_RESULT([*** All of DIRECTFB dependent parts will be disabled ***])
+fi
+
+AC_SUBST(DIRECTFB_CFLAGS)
+AC_SUBST(DIRECTFB_LIBS)
+AM_CONDITIONAL(HAVE_DIRECTFB, test x$have_directfb = "xyes" )
 
 dnl
 dnl check for libpng
@@ -570,6 +596,7 @@ src/xitk/skins/xinetic/Makefile
 src/xitk/skins/cloudy/Makefile
 src/xitk/skins/mp2k/Makefile
 src/aaui/Makefile
+src/dfb/Makefile
 doc/Makefile
 doc/man/Makefile
 doc/man/de/Makefile
