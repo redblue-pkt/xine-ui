@@ -712,13 +712,16 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
   }	 
 
   if (depth == 0) {
+    XVisualInfo vinfo;
+
     XGetWindowAttributes(gGui->display, 
 			 RootWindow(gGui->display, gGui->screen), &attribs);
 
     depth = attribs.depth;
   
-    if (!XMatchVisualInfo(gGui->display, 
-			  gGui->screen, depth, TrueColor, NULL)) {
+    if (XMatchVisualInfo(gGui->display, gGui->screen, depth, TrueColor, &vinfo)) {
+      visual = vinfo.visual;
+    } else {
       printf ("gui_main: couldn't find true color visual.\n");
 
       depth = DefaultDepth (gGui->display, gGui->screen);
