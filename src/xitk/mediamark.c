@@ -136,7 +136,8 @@ static char *_read_file(const char *filename, int *size) {
   
   extension = strrchr(filename, '.');
   if(extension && 
-     ((!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".smil", 5))) && 
+     ((!strncasecmp(extension, ".asx", 4)) || 
+      (!strncasecmp(extension, ".smi", 4)) || (!strncasecmp(extension, ".smil", 5))) && 
      ((!strncasecmp(filename, "http://", 7)) || (!strncasecmp(filename, "ftp://", 6))))
     return _download_file(filename, size);
   

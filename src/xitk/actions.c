@@ -414,6 +414,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
     extension = strrchr(mrl, '.');
     if(extension && /* All known playlist ending */
        ((!strncasecmp(extension, ".asx", 4)) ||
+	(!strncasecmp(extension, ".smi", 4)) ||
 	(!strncasecmp(extension, ".smil", 5)) ||
 	(!strncasecmp(extension, ".pls", 4)) ||
 	(!strncasecmp(extension, ".m3u", 4)) ||
