@@ -982,7 +982,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		  }
 		  
 		  if(atitle && strlen(atitle)) {
-		    real_title = (char *) xine_malloc(sizeof(char *) * len);
+		    real_title = (char *) xine_xmalloc(sizeof(char *) * len);
 		    sprintf(real_title, "%s", atitle);
 		    
 		    if(aauthor && strlen(aauthor))
