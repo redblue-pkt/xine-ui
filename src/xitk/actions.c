@@ -27,6 +27,10 @@
 #include "config.h"
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
@@ -395,13 +399,50 @@ void gui_seek_relative (int off_sec) {
 void gui_dndcallback (char *filename) {
 
   if(filename) {
-    gGui->playlist_cur = gGui->playlist_num++;
-    gGui->playlist[gGui->playlist_cur] = strdup(filename);
+    char  buffer[strlen(filename) + 10];
+    char  buffer2[strlen(filename) + 10];
+    char *p;
 
-    if((xine_get_status(gGui->xine) == XINE_STOP)) {
-      gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      /* IS IT REALLY A GOOD IDEA ?? gui_play (NULL, NULL);  */
+    memset(&buffer, 0, sizeof(buffer));
+    memset(&buffer2, 0, sizeof(buffer2));
+
+    if((strlen(filename) > 6) && 
+       (!strncmp(filename, "file:", 5))) {
+      
+      if((p = strstr(filename, "://")) != NULL) {
+	struct stat pstat;
+	
+	p += 3;
+
+      __second_stat:
+
+	if((stat(p, &pstat)) == 0)
+	  sprintf(buffer, "file://%s", p);
+	else {
+	  
+	  sprintf(buffer2, "/%s", p);
+
+	  /* file don't exist, add it anyway */
+	  if((stat(buffer2, &pstat)) == -1)
+	    sprintf(buffer, "%s", filename);
+	  else
+	    sprintf(buffer, "file://%s", buffer2);
+	  
+	}
+      }
+      else {
+	p = filename + 5;
+	goto __second_stat;
+      }
     }
+    else
+      sprintf(buffer, "%s", filename);
+      
+    gGui->playlist_cur = gGui->playlist_num++;
+    gGui->playlist[gGui->playlist_cur] = strdup(buffer);
+
+    if((xine_get_status(gGui->xine) == XINE_STOP))
+      gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
 
     pl_update_playlist();
   }
