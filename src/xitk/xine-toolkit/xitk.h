@@ -68,7 +68,7 @@
 #define WM_TYPE_UNKNOWN         0x00000000
 #define WM_TYPE_GNOME_COMP      0x80000000
 #define WM_TYPE_EWMH_COMP       0x40000000
-#define WM_TYPE_KDE             0x00000001
+#define WM_TYPE_KWIN            0x00000001
 #define WM_TYPE_E               0x00000002
 #define WM_TYPE_ICE             0x00000003
 #define WM_TYPE_WINDOWMAKER     0x00000004
@@ -76,6 +76,8 @@
 #define WM_TYPE_XFCE            0x00000006
 #define WM_TYPE_SAWFISH         0x00000007
 #define WM_TYPE_METACITY        0x00000008
+#define WM_TYPE_AFTERSTEP       0x00000009
+#define WM_TYPE_BLACKBOX        0x0000000A
 
 #define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
                       KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
