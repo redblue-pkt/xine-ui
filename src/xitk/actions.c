@@ -27,7 +27,7 @@
 #include "config.h"
 #endif
 
-#if	HAVE_ALLOCA_H
+#ifdef HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
 #include <X11/Xlib.h>
