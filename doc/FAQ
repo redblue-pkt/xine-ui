@@ -22,13 +22,14 @@ probably not work (pgcc for example is known to make libmpeg break).
 You'll have to use gnu make to compile xine, on most GNU/Linux systems
 make is gnu make, on other platforms use "gmake" instead.
 
-If you want to have Xv support compiled in, make sure you have a shared 
+If you want to have Xv support compiled in, make sure you either have a shared 
 Xv library on your system, e.g. ls /usr/X11R6/lib/libXv* should give you
 some .so libs, like this:
 
 /usr/X11R6/lib/libXv.a  /usr/X11R6/lib/libXv.so  /usr/X11R6/lib/libXv.so.1
 
-if you only got libXv.a you can create the shared versions yourself:
+or you have libtool 1.4 or newer installed. If not and you only got 
+libXv.a you can create the shared versions yourself:
 
 # ld --whole-archive -shared -o libXv.so.1 libXv.a
 # ln -s libXv.so.1 libXv.so
@@ -60,6 +61,10 @@ Now you can build and install xine-ui, same procedure as for xine-lib:
 ./configure
 make
 make install
+
+if ./configure complains about not finding xine-lib, again (see above) 
+check that <prefix>/bin is in your path and your linker will find
+libs installed in </prefix>/lib.
 
 
 how can I supply additional CFLAGS for the compilation ?
@@ -123,7 +128,7 @@ xine -A null
 
 if you have ALSA drivers installed, try
 
-xine -A alsa
+xine -A alsa09
 
 if you run ESD, try
 
@@ -315,6 +320,12 @@ surround here, you'll have to enable it in your ~/.xinerc:
 ac3_pass_through:1
 
 
+what do all these .xinerc entries mean?
+---------------------------------------
+
+you'll find more info about them in doc/README.xinerc
+
+
 where and how do I get the latest development version?
 ------------------------------------------------------
 
@@ -374,6 +385,18 @@ cd /dev
 ln -s hdc dvd
 
 should do the job.
+
+
+I seem to have problems setting up my RPC-2 drive for the right region
+----------------------------------------------------------------------
+
+You can download a tool to set the region code of RPC-Drives here:
+
+http://linuxtv.org/download/dvd/dvd_disc_20000215_css.tar.gz
+
+Warning: Please be aware that the number of region code changes in 
+RPC-2 drives is limited (usually about 5 times), after that your drive 
+will stay locked to the region you last set it up for.
 
 
 the aspect ratio is wrong!
