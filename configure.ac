@@ -110,11 +110,14 @@ dnl   set $ac_sources; ac_source=$1; shift; ac_sources=$*
 dnl   ac_config_links_1="$ac_config_links_1 $ac_dest:$ac_source"
 dnl done
 dnl AC_CONFIG_LINKS([$ac_config_links_1])
+AM_GNU_GETTEXT(use-libtool, need-ngettext)
+AC_PROG_GMSGFMT_PLURAL
 AC_CONFIG_LINKS($nls_cv_header_libgt, $nls_cv_header_intl)
-AM_CONDITIONAL(INCLUDE_INTL, test x$USE_INCLUDED_LIBINTL = "xyes")
+AM_CONDITIONAL(INCLUDED_INTL, test x$USE_INCLUDED_LIBINTL = "xyes")
 if test x"$USE_INCLUDED_LIBINTL" = x"yes"; then
    INTLDIR="-I\$(top_builddir)/intl -I\$(top_srcdir)/intl"
 fi
+dnl AC_SUBST(INTLDIR)
 
 
 dnl
