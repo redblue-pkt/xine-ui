@@ -607,9 +607,9 @@ msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr "Fehler beim Laden von %s, falsche Version. Lade sicheren Skin '%s'.\n"
 
 #: src/xitk/skins.c:298
-#, fuzzy, c-format
+#, c-format
 msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr "Aua, skin '%s' nicht gefunden, benutze sicheren '%s'.\n"
+msgstr "Aua, skin nicht gefunden, benutze sicheren '%s'.\n"
 
 #: src/xitk/skins.c:325
 msgid "No available skin found. Say goodbye.\n"
