@@ -461,7 +461,6 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   int retval = 0;
-  static int shot;
   
   switch(event->type) {
   case WIDGET_EVENT_PAINT:
