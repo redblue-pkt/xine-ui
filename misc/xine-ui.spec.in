@@ -4,6 +4,7 @@
 
 %define major   1
 %define libname libxine%{major}
+%define libvers 1
 
 %define skindir	 %{_datadir}/xine/skins
 %define deskdir	 %{_datadir}/xine/desktop
@@ -20,9 +21,9 @@ Copyright:   GPL
 Group:       Applications/Multimedia
 Source:      http://xine.sourceforge.net/files/%{name}-%{version}.tar.gz
 URL:         http://xine.sourceforge.net/
-Packager:    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-Requires:    %{libname} >= %{version}
-BuildPreReq: %{libname}-devel >= %{version}
+Packager:    Manfred Tremmel <Manfred.Tremmel@iiv.de>
+Requires:    %{libname} >= %{libvers}
+BuildPreReq: %{libname}-devel >= %{libvers}
 BuildRoot:   %{_tmppath}/%{name}-buildroot
 
 %description
@@ -46,6 +47,8 @@ werden die xine-Bibliotheken aus libxine verwendet. Weitere Informationen
 %setup -n %{name}-%{version}
 
 %build
+export CFLAGS="%{optflags}"
+
 if [ ! -f configure ]; then
    NO_CONFIGURE=1 ./cvscompile.sh
 fi
@@ -75,11 +78,10 @@ if test -d %{skindir}/default; then rm -rf %{skindir}/default && ln -s %{skindir
 if test ! -d %{_datadir}/icons; then
   %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/icons
 fi
-%{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm %{_datadir}/icons/xine.xpm
+%{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm %{_datadir}/icons/xine.xpm
 if test ! -d %{_datadir}/pixmaps; then
   %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/pixmaps
 fi
-%{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm %{_datadir}/pixmaps/xine.xpm
 if test -d %{_sysconfdir}/X11/wmconfig; then
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.wmconfig %{_sysconfdir}/X11/wmconfig/xine
 fi
@@ -95,7 +97,7 @@ if test -d /opt/gnome; then
   if test ! -d /opt/gnome/share/pixmaps; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/pixmaps
   fi
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
+  %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
   if test -d /opt/gnome/share/gnome/apps/Multimedia; then
     %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
   else
@@ -121,11 +123,11 @@ if test -d /opt/kde3/; then
   LORES3='32x32 22x22 16x16'
   for hires in $HIRES3; do
     %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI3/$hires/apps
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$hires.png $DIR_HI3/$hires/apps/xine.png
+    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$hires.png $DIR_HI3/$hires/apps/xine.png
   done
   for lores in $LORES3; do
     %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO3/$lores/apps
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$lores.png $DIR_LO3/$lores/apps/xine.png
+    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$lores.png $DIR_LO3/$lores/apps/xine.png
   done
   if test ! -d /opt/kde3/share/applnk/Multimedia; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde3/share/applnk/Multimedia
@@ -144,11 +146,11 @@ if test -d /opt/kde2/; then
   LORES='32x32 22x22 16x16'
   for hires in $HIRES; do
     %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI/$hires/apps
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$hires.png $DIR_HI/$hires/apps/xine.png
+    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$hires.png $DIR_HI/$hires/apps/xine.png
   done
   for lores in $LORES; do
     %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO/$lores/apps
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$lores.png $DIR_LO/$lores/apps/xine.png
+    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$lores.png $DIR_LO/$lores/apps/xine.png
   done
   if test ! -d /opt/kde2/share/applnk/Multimedia; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
@@ -173,7 +175,7 @@ if test -d /opt/kde; then
   if test ! -d /opt/kde/share/applnk/Multimedia; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/applnk/Multimedia
   fi
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm /opt/kde/share/icons/xine.xpm
+  %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm /opt/kde/share/icons/xine.xpm
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
 else
   if test -d %{_datadir}/applnk/Multimedia; then
@@ -219,8 +221,8 @@ rm -rf $RPM_BUILD_ROOT
 %doc doc/FAQ_* doc/README.* doc/README_* doc/bug_report_form
 %{_bindir}/*xine*
 %{skindir}/*
-##%{_datadir}/idl/xine.idl
 %{_datadir}/xine/desktop/*
+%{_datadir}/pixmaps/*
 %lang(de) %{_mandir}/de/man1/*
 %lang(fr) %{_mandir}/fr/man1/*
 %lang(es) %{_mandir}/es/man1/*
@@ -229,6 +231,12 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sat Nov 09 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- Final changes for libxine 1.0alpha1
+* Wed Nov 06 2002 Bill Fink <billfink@mindspring.com>
+- Some more changes for latest xine version
+* Mon Nov 04 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- Changes for next xine version
 * Sun Oct 27 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - Update of the german descriptions.
 - fixed some problems with creating kde2 and kde3 menu-entry
