@@ -23,7 +23,7 @@
 /* Largely inspired of xmms control socket stuff */
 
 /* required for getsubopt(); the __sun test gives us strncasecmp() on solaris */
-#ifndef __sun
+#if ! defined (__sun) && ! defined (__OpenBSD__)
 #define _XOPEN_SOURCE 500
 #endif
 /* required for S_ISSOCK */

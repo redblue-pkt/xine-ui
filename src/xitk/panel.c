@@ -1320,14 +1320,18 @@ void panel_init (void) {
   
   {
     pthread_attr_t       pth_attrs;
+#if ! defined (__OpenBSD__)
     struct sched_param   pth_params;
+#endif
     
     pthread_attr_init(&pth_attrs);
 
     /* this won't work on linux, freebsd 5.0 */
+#if ! defined (__OpenBSD__)
     pthread_attr_getschedparam(&pth_attrs, &pth_params);
     pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
+#endif
     
     pthread_create(&panel->slider_thread, &pth_attrs, slider_loop, NULL);
   }

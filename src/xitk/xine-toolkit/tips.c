@@ -240,12 +240,16 @@ static void *_tips_thread(void *data) {
   /* Create a thread which will destroy the tips window */  
   {
     pthread_attr_t       pth_attrs;
+#if ! defined (__OpenBSD__)
     struct sched_param   pth_params;
+#endif
     
     pthread_attr_init(&pth_attrs);
+#if ! defined (__OpenBSD__)
     pthread_attr_getschedparam(&pth_attrs, &pth_params);
     pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
+#endif
     
     pthread_mutex_init(&tp->mutex, NULL); 
  
@@ -262,7 +266,9 @@ static void *_tips_thread(void *data) {
  */
 void xitk_tips_create(xitk_widget_t *w) {
   pthread_attr_t       pth_attrs;
+#if ! defined (__OpenBSD__)
   struct sched_param   pth_params;
+#endif
   tips_private_t      *tp;
   
   if(!w)
@@ -277,9 +283,11 @@ void xitk_tips_create(xitk_widget_t *w) {
     tp->w  = w;
     pthread_attr_init(&pth_attrs);
     
+#if ! defined (__OpenBSD__)
     pthread_attr_getschedparam(&pth_attrs, &pth_params);
     pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
+#endif
     
     pthread_create(&w->tips_thread, &pth_attrs, _tips_thread, (void *)tp);
   }

@@ -139,7 +139,7 @@ dnl          xitk need to be linked to thread lib, so the follow AC_SUBST()
 dnl          are only used in src/xitk/xine-toolkit/Makefile.am
 dnl
 case "$host" in
-  *-*-freebsd*)
+  *-*-freebsd*|*-*-openbsd*)
     THREAD_LIBS="-L/usr/local/lib -pthread"
     THREAD_CFLAGS="-I/usr/local/include -D_THREAD_SAFE"
     CFLAGS="$CFLAGS -L/usr/local/lib $THREAD_CFLAGS"

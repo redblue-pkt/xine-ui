@@ -24,7 +24,7 @@
  */
 /* required for getsubopt(); the __sun test avoids compilation problems on */
 /* solaris */
-#ifndef __sun
+#if ! defined (__sun__) && ! defined (__OpenBSD__) 
 #define _XOPEN_SOURCE 500
 #endif
 /* required for strncasecmp() */
