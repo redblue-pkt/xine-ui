@@ -332,6 +332,88 @@ typedef enum {
 void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type);
 void xitk_unset_wm_window_type(Window window, xitk_wm_window_type_t type);
 
+typedef enum {
+  xitk_cursor_invisible,
+  xitk_cursor_X_cursor,
+  xitk_cursor_arrow,
+  xitk_cursor_based_arrow_down,
+  xitk_cursor_based_arrow_up,
+  xitk_cursor_boat,
+  xitk_cursor_bogosity,
+  xitk_cursor_bottom_left_corner,
+  xitk_cursor_bottom_right_corner,
+  xitk_cursor_bottom_side,
+  xitk_cursor_bottom_tee,
+  xitk_cursor_box_spiral,
+  xitk_cursor_center_ptr,
+  xitk_cursor_circle,
+  xitk_cursor_clock,
+  xitk_cursor_coffee_mug,
+  xitk_cursor_cross,
+  xitk_cursor_cross_reverse,
+  xitk_cursor_crosshair,
+  xitk_cursor_diamond_cross,
+  xitk_cursor_dot,
+  xitk_cursor_dotbox,
+  xitk_cursor_double_arrow,
+  xitk_cursor_draft_large,
+  xitk_cursor_draft_small,
+  xitk_cursor_draped_box,
+  xitk_cursor_exchange,
+  xitk_cursor_fleur,
+  xitk_cursor_gobbler,
+  xitk_cursor_gumby,
+  xitk_cursor_hand1,
+  xitk_cursor_hand2,
+  xitk_cursor_heart,
+  xitk_cursor_icon,
+  xitk_cursor_iron_cross,
+  xitk_cursor_left_ptr,
+  xitk_cursor_left_side,
+  xitk_cursor_left_tee,
+  xitk_cursor_leftbutton,
+  xitk_cursor_ll_angle,
+  xitk_cursor_lr_angle,
+  xitk_cursor_man,
+  xitk_cursor_middlebutton,
+  xitk_cursor_mouse,
+  xitk_cursor_pencil,
+  xitk_cursor_pirate,
+  xitk_cursor_plus,
+  xitk_cursor_question_arrow,
+  xitk_cursor_right_ptr,
+  xitk_cursor_right_side,
+  xitk_cursor_right_tee,
+  xitk_cursor_rightbutton,
+  xitk_cursor_rtl_logo,
+  xitk_cursor_sailboat,
+  xitk_cursor_sb_down_arrow,
+  xitk_cursor_sb_h_double_arrow,
+  xitk_cursor_sb_left_arrow,
+  xitk_cursor_sb_right_arrow,
+  xitk_cursor_sb_up_arrow,
+  xitk_cursor_sb_v_double_arrow,
+  xitk_cursor_shuttle,
+  xitk_cursor_sizing,
+  xitk_cursor_spider,
+  xitk_cursor_spraycan,
+  xitk_cursor_star,
+  xitk_cursor_target,
+  xitk_cursor_tcross,
+  xitk_cursor_top_left_arrow,
+  xitk_cursor_top_left_corner,
+  xitk_cursor_top_right_corner,
+  xitk_cursor_top_side,
+  xitk_cursor_top_tee,
+  xitk_cursor_trek,
+  xitk_cursor_ul_angle,
+  xitk_cursor_umbrella,
+  xitk_cursor_ur_angle,
+  xitk_cursor_watch,
+  xitk_cursor_xterm,
+  xitk_cursor_num_glyphs
+} xitk_cursors_t;
+
 /* 
  * See xitk_widget_list_[set/get]()
  */
@@ -662,7 +744,7 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf);
 /*
  * Initialization function, should be the first call to widget lib.
  */
-void xitk_init(Display *display, int verbosity);
+void xitk_init(Display *display, XColor black, int verbosity);
 
 /*
  *
@@ -2287,5 +2369,9 @@ xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w);
 void xitk_menu_destroy_sub_branchs(xitk_widget_t *w);
 void xitk_menu_destroy(xitk_widget_t *w);
 int xitk_menu_show_sub_branchs(xitk_widget_t *w);
+
+
+void xitk_cursors_define_window_cursor(Display *display, Window window, xitk_cursors_t cursor);
+void xitk_cursors_restore_window_cursor(Display *display, Window window);
 
 #endif

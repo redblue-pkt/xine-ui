@@ -22,6 +22,7 @@ libxitk_la_SOURCES = \
 	checkbox.c \
 	combo.c \
 	config.c \
+	cursors.c \
 	dnd.c \
 	doublebox.c \
 	font.c \

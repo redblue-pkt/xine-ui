@@ -32,7 +32,6 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/cursorfont.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -62,8 +61,6 @@ typedef struct {
   
   xitk_widget_t        *browser;
   
-  Cursor                cursor[2];
-
   xitk_image_t         *preview_image;
   int                   preview_width;
   int                   preview_height;
@@ -521,11 +518,10 @@ void init_skins_support(void) {
  * Remote skin loader
  */
 static void download_set_cursor_state(int state) {
-  XLockDisplay(gGui->display);
-  XDefineCursor(gGui->display, 
-		(xitk_window_get_window(skdloader->xwin)), skdloader->cursor[state]);
-  XSync(gGui->display, False);
-  XUnlockDisplay(gGui->display);
+  if(state == WAIT_CURS)
+    xitk_cursors_define_window_cursor(gGui->display, (xitk_window_get_window(skdloader->xwin)), xitk_cursor_watch);
+  else
+    xitk_cursors_restore_window_cursor(gGui->display, (xitk_window_get_window(skdloader->xwin)));
 }
 
 static slx_entry_t **skins_get_slx_entries(char *url) {
@@ -692,8 +688,6 @@ static void download_skin_exit(xitk_widget_t *w, void *data) {
     xitk_list_free((XITK_WIDGET_LIST_LIST(skdloader->widget_list)));
     
     XLockDisplay(gGui->display);
-    XFreeCursor(gGui->display, skdloader->cursor[NORMAL_CURS]);
-    XFreeCursor(gGui->display, skdloader->cursor[WAIT_CURS]);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)));
     XUnlockDisplay(gGui->display);
     
@@ -1129,8 +1123,6 @@ void download_skin(char *url) {
     set_window_states_start((xitk_window_get_window(skdloader->xwin)));
 
     XLockDisplay(gGui->display);
-    skdloader->cursor[NORMAL_CURS] = XCreateFontCursor(gGui->display, XC_left_ptr);
-    skdloader->cursor[WAIT_CURS] = XCreateFontCursor(gGui->display, XC_watch);
     gc = XCreateGC(gGui->display, 
     		   (xitk_window_get_window(skdloader->xwin)), None, None);
     XUnlockDisplay(gGui->display);

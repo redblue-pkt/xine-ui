@@ -35,7 +35,6 @@ typedef struct {
 
   xitk_image_t           *skin;
 
-  Cursor                  cursor[2];
   int                     cursor_focus;
 
   xitk_string_callback_t  callback;

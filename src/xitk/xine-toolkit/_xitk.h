@@ -65,6 +65,7 @@ typedef struct {
 #include "button.h"
 #include "checkbox.h"
 #include "combo.h"
+#include "cursors.h"
 #include "dnd.h"
 #include "doublebox.h"
 #include "font.h"
@@ -317,6 +318,7 @@ unsigned long xitk_get_timer_label_animation(void);
 long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);
 int xitk_get_checkstyle_feature(void);
+int xitk_get_cursors_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
 void xitk_modal_window(Window w);
@@ -325,6 +327,7 @@ void xitk_set_current_menu(xitk_widget_t *menu);
 void xitk_unset_current_menu(void);
 int xitk_get_display_width(void);
 int xitk_get_display_height(void);
+XColor xitk_get_black_pixel_color(void);
 
 int xitk_is_running(void);
 int xitk_skin_get_direction(xitk_skin_config_t *, const char *);

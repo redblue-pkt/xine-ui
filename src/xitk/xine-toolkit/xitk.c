@@ -116,6 +116,7 @@ typedef struct {
 
 typedef struct {
   Display                    *display;
+  XColor                      black;
   int                         display_width;
   int                         display_height;
   int                         verbosity;
@@ -1633,7 +1634,7 @@ void xitk_xevent_notify(XEvent *event) {
 /*
  * Initiatization of widget internals.
  */
-void xitk_init(Display *display, int verbosity) {
+void xitk_init(Display *display, XColor black, int verbosity) {
   char buffer[256];
   
   xitk_pid = getppid();
@@ -1644,6 +1645,7 @@ void xitk_init(Display *display, int verbosity) {
 
   gXitk = (__xitk_t *) xitk_xmalloc(sizeof(__xitk_t));
 
+  gXitk->black           = black;
   gXitk->display_width   = DisplayWidth(display, DefaultScreen(display));
   gXitk->display_height  = DisplayHeight(display, DefaultScreen(display));
   gXitk->verbosity       = verbosity;
@@ -1731,7 +1733,8 @@ void xitk_init(Display *display, int verbosity) {
   
   /* init font caching */
   xitk_font_cache_init();
-
+  
+  xitk_cursors_init(display);
   xitk_tips_init(display);
 }
 
@@ -1885,6 +1888,7 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
  */
 void xitk_stop(void) {
   xitk_tips_deinit();
+  xitk_cursors_deinit(gXitk->display);
   gXitk->running = 0;
 }
  
@@ -1933,6 +1937,10 @@ int xitk_get_barstyle_feature(void) {
 int xitk_get_checkstyle_feature(void) {
   return xitk_config_get_checkstyle_feature(gXitk->config);
 }
+int xitk_get_cursors_feature(void) {
+  return xitk_config_get_cursors_feature(gXitk->config);
+}
+
 int xitk_get_menu_shortcuts_enability(void) {
   return xitk_config_get_menu_shortcuts_enability(gXitk->config);
 }
@@ -1942,6 +1950,9 @@ int xitk_get_display_width(void) {
 }
 int xitk_get_display_height(void) {
   return gXitk->display_height;
+}
+XColor xitk_get_black_pixel_color(void) {
+  return gXitk->black;
 }
 
 /*

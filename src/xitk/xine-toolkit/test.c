@@ -112,6 +112,7 @@ static int init_test(void) {
   int                screen;
   int		     depth = 0;
   Visual	    *visual = NULL;
+  XColor             black, dummy;
   
   if(!XInitThreads ()) {
     printf (_("XInitThreads() failed.\n"));
@@ -139,7 +140,9 @@ static int init_test(void) {
     return 0;
   }
 
-  xitk_init(test->display, 1);
+  XAllocNamedColor(test->display, Imlib_get_colormap(test->imlibdata), "black", &black, &dummy);
+
+  xitk_init(test->display, black, 1);
 
   XUnlockDisplay (test->display);
 
@@ -451,6 +454,12 @@ static void create_doublebox(void) {
 /*
  *
  */
+static void checkbox_cb(xitk_widget_t *w, void *data, int state) {
+  if(state)
+    xitk_cursors_restore_window_cursor(test->display, xitk_window_get_window(test->xwin));
+  else
+    xitk_cursors_define_window_cursor(test->display, xitk_window_get_window(test->xwin), xitk_cursor_invisible);
+}
 static void create_checkbox(void) {
   int x = 250, y = 300;
   xitk_checkbox_widget_t cb;
@@ -458,7 +467,7 @@ static void create_checkbox(void) {
   XITK_WIDGET_INIT(&cb, test->imlibdata);
 
   cb.skin_element_name = NULL;
-  cb.callback          = NULL;
+  cb.callback          = checkbox_cb;
   cb.userdata          = NULL;
   xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
 		    (test->checkbox = 
@@ -961,7 +970,6 @@ int main(int argc, char **argv) {
   
   bindtextdomain("xitk", XITK_LOCALE);
   textdomain("xitk");
-
 
   /* Create window */
   test->xwin = xitk_window_create_dialog_window(test->imlibdata,

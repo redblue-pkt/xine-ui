@@ -59,9 +59,6 @@ extern gGui_t           *gGui;
 typedef struct {
   xitk_widget_list_t    *wl;
 
-  Cursor                 cursor[3];       /* Cursor pointers                       */
-  Pixmap                 pm_data[3];
-
   char                   window_title[1024];
   int                    current_cursor;  /* arrow or hand */
   int                    cursor_visible;
@@ -1229,14 +1226,20 @@ void video_window_set_cursor(int cursor) {
     
     if(gVw->cursor_visible) {
       gVw->cursor_timer = 0;
-      XLockDisplay (gGui->video_display);
-      XDefineCursor(gGui->video_display, gGui->video_window, 
-		    gVw->cursor[gVw->current_cursor]);
-      XSync(gGui->video_display, False);
-      XUnlockDisplay (gGui->video_display);
+      switch(gVw->current_cursor) {
+      case 0:
+	xitk_cursors_define_window_cursor(gGui->video_display, gGui->video_window, xitk_cursor_invisible);
+	break;
+      case CURSOR_ARROW:
+	xitk_cursors_restore_window_cursor(gGui->video_display, gGui->video_window);
+	break;
+      case CURSOR_HAND:
+	xitk_cursors_define_window_cursor(gGui->video_display, gGui->video_window, xitk_cursor_hand2);
+	break;
+      }
     }
   }
-
+  
 }
 
 /*
@@ -1251,12 +1254,16 @@ void video_window_set_cursor_visibility(int show_cursor) {
 
   if(show_cursor)
     gVw->cursor_timer = 0;
-
-  XLockDisplay (gGui->video_display);
-  XDefineCursor(gGui->video_display, gGui->video_window, 
-		gVw->cursor[show_cursor ? gVw->current_cursor : show_cursor]);
-  XSync(gGui->video_display, False);
-  XUnlockDisplay (gGui->video_display);
+  
+  if(show_cursor) {
+    if(gVw->current_cursor == CURSOR_ARROW)
+      xitk_cursors_restore_window_cursor(gGui->video_display, gGui->video_window);
+    else
+      xitk_cursors_define_window_cursor(gGui->video_display, gGui->video_window, xitk_cursor_hand1);
+  }
+  else
+    xitk_cursors_define_window_cursor(gGui->video_display, gGui->video_window, xitk_cursor_invisible);
+  
 }
 
 /* 
@@ -1344,40 +1351,7 @@ static int screen_is_in_xinerama_fullscreen_list (const char *list, int screen_n
 /*
  *
  */
-static unsigned char bm_no_data[] = { 
-  0,0,0,0, 0,0,0,0 
-};
-
-static unsigned char hand_bits[] = {
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00,
-  0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00,
-  0x00, 0x48, 0x00, 0x00, 0x00, 0x48, 0x00, 0x00, 0x00, 0xc8, 0x01, 0x00,
-  0x00, 0x48, 0x0e, 0x00, 0x00, 0x48, 0x32, 0x00, 0x00, 0x4e, 0x52, 0x00,
-  0x00, 0x4b, 0x92, 0x00, 0x00, 0x09, 0x90, 0x00, 0x00, 0x09, 0x80, 0x00,
-  0x00, 0x09, 0x80, 0x00, 0x00, 0x01, 0x80, 0x00, 0x00, 0x01, 0x80, 0x00,
-  0x00, 0x01, 0x80, 0x00, 0x00, 0x02, 0x80, 0x00, 0x00, 0x02, 0xc0, 0x00,
-  0x00, 0x04, 0x40, 0x00, 0x00, 0x04, 0x60, 0x00, 0x00, 0xfc, 0x3f, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
-};
-
-static unsigned char hand_mask_bits[] = {
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00,
-  0x00, 0x78, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00,
-  0x00, 0x78, 0x00, 0x00, 0x00, 0x78, 0x00, 0x00, 0x00, 0xf8, 0x01, 0x00,
-  0x00, 0xf8, 0x0f, 0x00, 0x00, 0xf8, 0x3f, 0x00, 0x00, 0xfe, 0x7f, 0x00,
-  0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00,
-  0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00,
-  0x00, 0xff, 0xff, 0x00, 0x00, 0xfe, 0xff, 0x00, 0x00, 0xfe, 0xff, 0x00,
-  0x00, 0xfc, 0x7f, 0x00, 0x00, 0xfc, 0x7f, 0x00, 0x00, 0xfc, 0x3f, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
-};
-
 void video_window_init (window_attributes_t *window_attribute, int hide_on_start) {
-  XColor                bg_curs, fg_curs;
   int                   i;
 #ifdef HAVE_XINERAMA
   int                   screens;
@@ -1601,30 +1575,8 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
     gVw->xclasshint_borderless->res_class = "xine";
   }
 
-  /* 
-   * create cursors
-   */
-  bg_curs.red   = 255 << 8;
-  bg_curs.green = 255 << 8;
-  bg_curs.blue  = 255 << 8;
-  fg_curs.red   = 0;
-  fg_curs.green = 0;
-  fg_curs.blue  = 0;
-  
-  gVw->pm_data[0]           = XCreateBitmapFromData(gGui->video_display,
-						    DefaultRootWindow(gGui->video_display), bm_no_data, 8, 8);
-  gVw->cursor[0]            = XCreatePixmapCursor(gGui->video_display, gVw->pm_data[0], gVw->pm_data[0],
-						  &gGui->black, &gGui->black, 0, 0);
-  gVw->cursor[CURSOR_ARROW] = XCreateFontCursor(gGui->video_display, XC_left_ptr);
-  
-  gVw->pm_data[1]           = XCreateBitmapFromData(gGui->display, 
-						    DefaultRootWindow(gGui->video_display), (char *)hand_bits, 32, 32);
-  gVw->pm_data[2]           = XCreateBitmapFromData(gGui->display, 
-						    DefaultRootWindow(gGui->video_display), (char *)hand_mask_bits, 32, 32);
-  gVw->cursor[CURSOR_HAND]  = XCreatePixmapCursor(gGui->display, gVw->pm_data[1], gVw->pm_data[2], &fg_curs, &bg_curs, 0, 0);
-  
-  gVw->current_cursor       = CURSOR_ARROW;
-  gVw->cursor_timer         = 0;
+  gVw->current_cursor = CURSOR_ARROW;
+  gVw->cursor_timer   = 0;
 
   /*
    * wm hints
@@ -1833,13 +1785,6 @@ void video_window_exit (void) {
   else
     pthread_join(gVw->second_display_thread, NULL);
 
-  XLockDisplay(gGui->display);
-  XFreeCursor(gGui->display, gVw->cursor[0]);
-  XFreeCursor(gGui->display, gVw->cursor[CURSOR_HAND]);
-  XFreePixmap(gGui->display, gVw->pm_data[0]);
-  XFreePixmap(gGui->display, gVw->pm_data[1]);
-  XFreePixmap(gGui->display, gVw->pm_data[2]);
-  XUnlockDisplay(gGui->display);
 }
 
 

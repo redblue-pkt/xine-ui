@@ -29,7 +29,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
-#include <X11/cursorfont.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
@@ -142,8 +141,6 @@ struct filebrowser_s {
 
   xitk_widget_t                  *origin;
 
-  Cursor                          cursor[2];
-
   xitk_widget_t                  *directories_browser;
   xitk_widget_t                  *directories_sort;
   int                             directories_sort_direction;
@@ -237,10 +234,10 @@ static void fb_reactivate(filebrowser_t *fb) {
 
 static void _fb_set_cursor(filebrowser_t *fb, int state) {
   if(fb) {
-    XLockDisplay(gGui->display);
-    XDefineCursor(gGui->display, (xitk_window_get_window(fb->xwin)), fb->cursor[state]);
-    XSync(gGui->display, False);
-    XUnlockDisplay(gGui->display);
+    if(state == WAIT_CURS)
+      xitk_cursors_define_window_cursor(gGui->display, (xitk_window_get_window(fb->xwin)), xitk_cursor_watch);
+    else
+      xitk_cursors_restore_window_cursor(gGui->display, (xitk_window_get_window(fb->xwin)));
   }
 }
 /*
@@ -903,8 +900,6 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     xitk_list_free((XITK_WIDGET_LIST_LIST(fb->widget_list)));
     
     XLockDisplay(gGui->display);
-    XFreeCursor(gGui->display, fb->cursor[NORMAL_CURS]);
-    XFreeCursor(gGui->display, fb->cursor[WAIT_CURS]);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(fb->widget_list)));
     XUnlockDisplay(gGui->display);
     
@@ -1251,8 +1246,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden
   XLockDisplay(gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(fb->xwin)), None, None);
-  fb->cursor[NORMAL_CURS] = XCreateFontCursor(gGui->display, XC_left_ptr);
-  fb->cursor[WAIT_CURS] = XCreateFontCursor(gGui->display, XC_watch);
   XUnlockDisplay(gGui->display);
 
   fb->widget_list                = xitk_widget_list_new();

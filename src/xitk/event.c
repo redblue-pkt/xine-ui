@@ -1500,7 +1500,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    */
   xine_pid = getppid();
   
-  xitk_init(gGui->display, (gGui->verbosity) ? 1 : 0);
+  xitk_init(gGui->display, gGui->black, (gGui->verbosity) ? 1 : 0);
   
   preinit_skins_support();
   

@@ -65,10 +65,13 @@ feature.shm              = 1
 feature.old_title_style  = 1
 
 # Check{box/menu} style (can be: round, check or old) (default = check)
-feature.check_style = round
+feature.check_style      = round
+
+# Use non X cursors (not all ones): 0/1 (default = 0)
+feature.cursors          = 1
 
 # Enable/disable menus shortcuts displaying (default = 1)
-menus.shortcuts = 1
+menus.shortcuts          = 1
 
 --
 

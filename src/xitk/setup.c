@@ -29,7 +29,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
-#include <X11/cursorfont.h>
 
 #include "common.h"
 
@@ -176,8 +175,6 @@ typedef struct {
   int                   num_wg;
   int                   first_displayed;
 
-  Cursor                cursor[2];
-
   xitk_register_key_t   kreg;
 
 } _setup_t;
@@ -217,8 +214,6 @@ static void setup_exit(xitk_widget_t *w, void *data) {
     xitk_list_free(setup->widgets);
     
     XLockDisplay(gGui->display);
-    XFreeCursor(gGui->display, setup->cursor[NORMAL_CURS]);
-    XFreeCursor(gGui->display, setup->cursor[WAIT_CURS]);
     XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(setup->widget_list)));
     XUnlockDisplay(gGui->display);
     
@@ -382,11 +377,10 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 
 static void setup_set_cursor(int state) {
   if(setup) {
-    XLockDisplay(gGui->display);
-    XDefineCursor(gGui->display, (xitk_window_get_window(setup->xwin)), 
-		  setup->cursor[state]);
-    XSync(gGui->display, False);
-    XUnlockDisplay(gGui->display);
+    if(state == WAIT_CURS)
+      xitk_cursors_define_window_cursor(gGui->display, (xitk_window_get_window(setup->xwin)), xitk_cursor_watch);
+    else
+      xitk_cursors_restore_window_cursor(gGui->display, (xitk_window_get_window(setup->xwin)));
   }
 }
 
@@ -1108,8 +1102,6 @@ void setup_panel(void) {
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(setup->xwin)), None, None);
-  setup->cursor[NORMAL_CURS] = XCreateFontCursor(gGui->display, XC_left_ptr);
-  setup->cursor[WAIT_CURS] = XCreateFontCursor(gGui->display, XC_watch);
   XUnlockDisplay (gGui->display);
 
   setup->widget_list                = xitk_widget_list_new();

@@ -181,6 +181,8 @@ static void xitk_config_features(xitk_config_t *xtcf) {
       else if(!strcasecmp(c, "check"))
 	xtcf->features.checkstyle = CHECK_STYLE_CHECK;
     }
+    else if(!strncasecmp(p, "cursors", 7))
+      xtcf->features.cursors = xitk_get_bool_value(c);
     else if(!strncasecmp(p, "shm", 3))
       xtcf->features.shm = strtol(c, &c, 10);
   }
@@ -335,6 +337,7 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
 #endif
   xtcf->features.oldbarstyle   = 0;
   xtcf->features.checkstyle    = CHECK_STYLE_CHECK;
+  xtcf->features.cursors       = 0;
   xtcf->menus.shortcuts        = 1;
 }
 
@@ -361,6 +364,13 @@ int xitk_config_get_shm_feature(xitk_config_t *xtcf) {
     return -1;
   
   return (xtcf->features.shm > 0) ? 1 : 0;
+}
+int xitk_config_get_cursors_feature(xitk_config_t *xtcf) {
+
+  if(!xtcf)
+    return -1;
+  
+  return (xtcf->features.cursors > 0) ? 1 : 0;
 }
 char *xitk_config_get_system_font(xitk_config_t *xtcf) {
 

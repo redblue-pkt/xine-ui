@@ -31,7 +31,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
-#include <X11/cursorfont.h>
 
 #include "_xitk.h"
 
@@ -48,15 +47,10 @@ static void _cursor_focus(inputtext_private_data_t *private_data, Window win, in
 
   private_data->cursor_focus = focus;
   
-  XLOCK(private_data->imlibdata->x.disp);
-
   if(focus)
-    XDefineCursor(private_data->imlibdata->x.disp, win, private_data->cursor[1]);
+    xitk_cursors_define_window_cursor(private_data->imlibdata->x.disp, win, xitk_cursor_xterm);
   else
-    XDefineCursor(private_data->imlibdata->x.disp, win, private_data->cursor[0]);
-  
-  XSync(private_data->imlibdata->x.disp, False);
-  XUNLOCK(private_data->imlibdata->x.disp);
+    xitk_cursors_restore_window_cursor(private_data->imlibdata->x.disp, win);
 }
 
 /*
@@ -68,11 +62,6 @@ static void notify_destroy(xitk_widget_t *w) {
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
   
-    XLOCK(private_data->imlibdata->x.disp);
-    XFreeCursor(private_data->imlibdata->x.disp, private_data->cursor[0]);
-    XFreeCursor(private_data->imlibdata->x.disp, private_data->cursor[1]);
-    XUNLOCK(private_data->imlibdata->x.disp);
-
     if(!private_data->skin_element_name)
       xitk_image_free_image(private_data->imlibdata, &(private_data->skin));
     
@@ -1161,10 +1150,6 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
 
   private_data->disp_offset       = 0;
 
-  XLOCK(private_data->imlibdata->x.disp);
-  private_data->cursor[0] = XCreateFontCursor(private_data->imlibdata->x.disp, XC_left_ptr);
-  private_data->cursor[1] = XCreateFontCursor(private_data->imlibdata->x.disp, XC_xterm);
-  XUNLOCK(private_data->imlibdata->x.disp);
   private_data->cursor_focus      = 0;
 
   private_data->callback          = it->callback;
