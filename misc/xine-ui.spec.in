@@ -14,7 +14,7 @@ Group:       Applications/X11
 Source:      http://xine.sourceforge.net/files/@PACKAGE@_@VERSION@.tar.gz
 URL:         http://xine.sourceforge.net
 Packager:    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-Requires:    xine-lib >= 0.5.0, xine-output >= 0.5.0
+Requires:    xine-lib >= 0.5.0
 BuildRoot:   /tmp/%{name}-root
 
 %description
@@ -57,9 +57,8 @@ make install-strip prefix=$RPM_BUILD_ROOT%{prefix}
 #cp doc/*.xpm $RPM_BUILD_ROOT/usr/include/X11/pixmaps
 
 %post
-/sbin/ldconfig
-if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/metal @XINE_SKINDIR@/default; fi
-
+#/sbin/ldconfig
+#if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/metal @XINE_SKINDIR@/default; fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -67,14 +66,12 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %{prefix}/bin/xine
-%{prefix}/man/man1/xine.*
-%{prefix}/man/fr/man1/xine.*
-%{prefix}/lib/xine/plugins/*.la
-%{prefix}/lib/xine/plugins/*.so
-%{prefix}/share/xine/skins/*
-%{prefix}/share/doc/xine/*
+%{prefix}/share/idl/xine.idl
 
 %changelog
+* Sun Jun 10 2001 Matthias Dahl <matthew2k@web.de>
+- updated filelist and the requirements field
+- removed /sbin/ldconfig as post install script
 * Thu Mar 28 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - add korean summary, patch from Louis JANG <louis@ns.mizi.com>
 * Thu Jan 11 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
