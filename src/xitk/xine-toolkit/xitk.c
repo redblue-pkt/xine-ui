@@ -260,8 +260,13 @@ static void xitk_signal_handler(int sig) {
       exit(1);
     }
     break;
-  }
 
+  case SIGSEGV:
+    fprintf(stderr, "xiTK received SIGSEGV signal, RIP.\n");
+    abort();
+    break;
+
+  }
 }
 
 /* 
@@ -1454,6 +1459,12 @@ void xitk_run(void) {
   action.sa_flags = 0;
   if(sigaction(SIGQUIT, &action, NULL) != 0) {
     XITK_WARNING("sigaction(SIGQUIT) failed: %s\n", strerror(errno));
+  }
+  action.sa_handler = xitk_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGSEGV, &action, NULL) != 0) {
+    XITK_WARNING("sigaction(SIGSEGV) failed: %s\n", strerror(errno));
   }
   
   gXitk->running = 1;
