@@ -309,10 +309,10 @@ Makefile: Makefile.in ../config.status
 	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
 debug:
-	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
+	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
 
 install-debug: debug
-	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec install-data
 
 # Tell versions [3.59,3.63) of GNU make not to export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
