@@ -148,10 +148,11 @@ static void mrl_browser_kill(widget_t *w, void *data) {
 /*
  *
  */
-void mrl_browser(mrl_add_cb_t add_cb, select_cb_t sel_cb, dnd_callback_t dnd_cb) {
-  browser_placements_t     *bp;
-  mrlbrowser_placements_t *mbp;
-  char **ip_availables = xine_get_browsable_input_plugin_ids(gGui->xine);
+void mrl_browser(xitk_mrl_callback_t add_cb, 
+		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
+  xitk_mrlbrowser_t   mb;
+  char              **ip_availables = 
+    xine_get_browsable_input_plugin_ids(gGui->xine);
 
   if(mrlb != NULL) {
     show_mrl_browser();
@@ -159,89 +160,96 @@ void mrl_browser(mrl_add_cb_t add_cb, select_cb_t sel_cb, dnd_callback_t dnd_cb)
     return;
   }
 
-  bp = (browser_placements_t *) xmalloc(sizeof(browser_placements_t));
-  bp->arrow_up.x                    = gui_get_skinX("MrlUp");
-  bp->arrow_up.y                    = gui_get_skinY("MrlUp");
-  bp->arrow_up.skinfile             = gui_get_skinfile("MrlUp");
-  bp->slider.x                      = gui_get_skinX("MrlSlidBG");
-  bp->slider.y                      = gui_get_skinY("MrlSlidBG");
-  bp->slider.skinfile               = gui_get_skinfile("MrlSlidBG");
-  bp->paddle.skinfile               = gui_get_skinfile("MrlSlidFG");
-  bp->arrow_dn.x                    = gui_get_skinX("MrlDn");
-  bp->arrow_dn.y                    = gui_get_skinY("MrlDn");
-  bp->arrow_dn.skinfile             = gui_get_skinfile("MrlDn");
-  bp->browser.x                     = gui_get_skinX("MrlItemBtn");
-  bp->browser.y                     = gui_get_skinY("MrlItemBtn");
-  bp->browser.norm_color            = gui_get_ncolor("MrlItemBtn");
-  bp->browser.focused_color         = gui_get_fcolor("MrlItemBtn");
-  bp->browser.clicked_color         = gui_get_ccolor("MrlItemBtn");
-  bp->browser.skinfile              = gui_get_skinfile("MrlItemBtn");
-  bp->browser.max_displayed_entries = MAX_LIST;
-  bp->browser.num_entries           = 0;
-  bp->browser.entries               = NULL;
-  bp->user_data                     = NULL;
+  mb.display                        = gGui->display;
+  mb.imlibdata                      = gGui->imlib_data;
+  mb.window_trans                   = gGui->video_window;
 
-  mbp                               = (mrlbrowser_placements_t *) 
-    xmalloc(sizeof(filebrowser_placements_t));
-  mbp->x                            = config_lookup_int("x_mrl_browser", 200);
-  mbp->y                            = config_lookup_int("y_mrl_browser", 100);
-  mbp->window_title                 = "Xine MRL Browser";
-  mbp->bg_skinfile                  = gui_get_skinfile("MrlBG");
-  mbp->resource_name                = mbp->window_title;
-  mbp->resource_class               = "Xine";
-
-  mbp->origin.x                     = gui_get_skinX("MrlCurOrigin");
-  mbp->origin.y                     = gui_get_skinY("MrlCurOrigin");
-  mbp->origin.skin_filename         = gui_get_skinfile("MrlCurOrigin");
-  mbp->origin.max_length            = 50;
-  mbp->origin.cur_origin            = NULL;
-
-  mbp->select.x                     = gui_get_skinX("MrlSelect");
-  mbp->select.y                     = gui_get_skinY("MrlSelect");
-  mbp->select.caption               = "Select";
-  mbp->select.skin_filename         = gui_get_skinfile("MrlSelect");
-  mbp->select.normal_color          = gui_get_ncolor("MrlSelect");
-  mbp->select.focused_color         = gui_get_fcolor("MrlSelect");
-  mbp->select.clicked_color         = gui_get_ccolor("MrlSelect");
-
-  mbp->dismiss.x                    = gui_get_skinX("MrlDismiss");
-  mbp->dismiss.y                    = gui_get_skinY("MrlDismiss");
-  mbp->dismiss.caption              = "Dismiss";
-  mbp->dismiss.skin_filename        = gui_get_skinfile("MrlDismiss");
-  mbp->dismiss.normal_color         = gui_get_ncolor("MrlDismiss");
-  mbp->dismiss.focused_color        = gui_get_fcolor("MrlDismiss");
-  mbp->dismiss.clicked_color        = gui_get_ccolor("MrlDismiss");
-
-  mbp->ip_name.label.x              = gui_get_skinX("MrlPlugLabel");
-  mbp->ip_name.label.y              = gui_get_skinY("MrlPlugLabel");
-  mbp->ip_name.label.skin_filename  = gui_get_skinfile("MrlPlugLabel");
-  mbp->ip_name.label.label_str      = "Source:";
-
-  mbp->ip_name.button.x             = gui_get_skinX("MrlPlugNameBG");
-  mbp->ip_name.button.y             = gui_get_skinY("MrlPlugNameBG");
-  mbp->ip_name.button.skin_filename = gui_get_skinfile("MrlPlugNameBG");
-  mbp->ip_name.button.normal_color  = gui_get_ncolor("MrlPlugNameBG");
-  mbp->ip_name.button.focused_color = gui_get_fcolor("MrlPlugNameBG");
-  mbp->ip_name.button.clicked_color = gui_get_ccolor("MrlPlugNameBG");
+  mb.x                              = config_lookup_int("x_mrl_browser", 200);
+  mb.y                              = config_lookup_int("y_mrl_browser", 100);
+  mb.window_title                   = "Xine MRL Browser";
+  mb.background_skin                = gui_get_skinfile("MrlBG");
+  mb.resource_name                  = mb.window_title;
+  mb.resource_class                 = "Xine";
   
-  bp->callback                      = sel_cb;
-  mbp->dndcallback                  = dnd_cb;
-  mbp->select.callback              = add_cb;
-  mbp->kill.callback                = mrl_browser_kill;
+  mb.origin.x                       = gui_get_skinX("MrlCurOrigin");
+  mb.origin.y                       = gui_get_skinY("MrlCurOrigin");
+  mb.origin.skin_filename           = gui_get_skinfile("MrlCurOrigin");
+  mb.origin.max_length              = 50;
+  mb.origin.cur_origin              = NULL;
 
-  mbp->br_placement                 = bp;
+  mb.dndcallback                    = dnd_cb;
 
-  mbp->xine                         = gGui->xine;
-  mbp->ip_availables                = ip_availables;
-  
-  mrlb = mrlbrowser_create(gGui->display, gGui->imlib_data, 
-			   gGui->video_window, mbp);
+  mb.select.x                       = gui_get_skinX("MrlSelect");
+  mb.select.y                       = gui_get_skinY("MrlSelect");
+  mb.select.caption                 = "Select";
+  mb.select.skin_filename           = gui_get_skinfile("MrlSelect");
+  mb.select.normal_color            = gui_get_ncolor("MrlSelect");
+  mb.select.focused_color           = gui_get_fcolor("MrlSelect");
+  mb.select.clicked_color           = gui_get_ccolor("MrlSelect");
+  mb.select.callback                = add_cb;
+
+  mb.dismiss.x                      = gui_get_skinX("MrlDismiss");
+  mb.dismiss.y                      = gui_get_skinY("MrlDismiss");
+  mb.dismiss.caption                = "Dismiss";
+  mb.dismiss.skin_filename          = gui_get_skinfile("MrlDismiss");
+  mb.dismiss.normal_color           = gui_get_ncolor("MrlDismiss");
+  mb.dismiss.focused_color          = gui_get_fcolor("MrlDismiss");
+  mb.dismiss.clicked_color          = gui_get_ccolor("MrlDismiss");
+
+  mb.kill.callback                  = mrl_browser_kill;
+
+  mb.ip_availables                  = ip_availables;
+
+  mb.ip_name.button.x               = gui_get_skinX("MrlPlugNameBG");
+  mb.ip_name.button.y               = gui_get_skinY("MrlPlugNameBG");
+  mb.ip_name.button.skin_filename   = gui_get_skinfile("MrlPlugNameBG");
+  mb.ip_name.button.normal_color    = gui_get_ncolor("MrlPlugNameBG");
+  mb.ip_name.button.focused_color   = gui_get_fcolor("MrlPlugNameBG");
+  mb.ip_name.button.clicked_color   = gui_get_ccolor("MrlPlugNameBG");
+
+  mb.ip_name.label.x                = gui_get_skinX("MrlPlugLabel");
+  mb.ip_name.label.y                = gui_get_skinY("MrlPlugLabel");
+  mb.ip_name.label.skin_filename    = gui_get_skinfile("MrlPlugLabel");
+  mb.ip_name.label.label_str        = "Source:";
+
+  mb.xine                           = gGui->xine;
+
+  /* The browser */
+  mb.browser.display                = gGui->display;
+  mb.browser.imlibdata              = gGui->imlib_data;
+
+  mb.browser.arrow_up.x             = gui_get_skinX("MrlUp");
+  mb.browser.arrow_up.y             = gui_get_skinY("MrlUp");
+  mb.browser.arrow_up.skin_filename = gui_get_skinfile("MrlUp");
+
+  mb.browser.slider.x               = gui_get_skinX("MrlSlidBG");
+  mb.browser.slider.y               = gui_get_skinY("MrlSlidBG");
+  mb.browser.slider.skin_filename   = gui_get_skinfile("MrlSlidBG");
+
+  mb.browser.paddle.skin_filename   = gui_get_skinfile("MrlSlidFG");
+
+  mb.browser.arrow_dn.x             = gui_get_skinX("MrlDn");
+  mb.browser.arrow_dn.y             = gui_get_skinY("MrlDn");
+  mb.browser.arrow_dn.skin_filename = gui_get_skinfile("MrlDn");
+
+  mb.browser.browser.x              = gui_get_skinX("MrlItemBtn");
+  mb.browser.browser.y              = gui_get_skinY("MrlItemBtn");
+  mb.browser.browser.normal_color   = gui_get_ncolor("MrlItemBtn");
+  mb.browser.browser.focused_color  = gui_get_fcolor("MrlItemBtn");
+  mb.browser.browser.clicked_color  = gui_get_ccolor("MrlItemBtn");
+  mb.browser.browser.skin_filename  = gui_get_skinfile("MrlItemBtn");
+  mb.browser.browser.max_displayed_entries = MAX_LIST;
+  mb.browser.browser.num_entries    = 0;
+  mb.browser.browser.entries        = NULL;
+
+  mb.browser.callback               = sel_cb;
+  mb.browser.userdata               = NULL;
+
+  mrlb = mrlbrowser_create(&mb);
 
   if(ip_availables)
     free(ip_availables);
 
-  free(bp);
-  free(mbp);
 }
 
 /*

@@ -24,12 +24,18 @@
 #ifndef FILE_BROWSER_H
 #define FILE_BROWSER_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #ifdef NEED_FILEBROWSER
 
-typedef void (*select_cb_t) (widget_t *, void *);
-typedef void (*add_cb_t) (widget_t *widget, void *data, const char *);
+#include "xitk.h"
 
-void file_browser(add_cb_t add_cb, select_cb_t sel_cb, dnd_callback_t dnd_cb);
+typedef void (*select_cb_t) (widget_t *, void *);
+
+void file_browser(xitk_string_callback_t add_cb,
+		  select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb);
 void destroy_file_browser(void);
 int file_browser_is_running(void);
 int file_browser_is_visible(void);

@@ -101,7 +101,7 @@ typedef struct {
   widget_cb_event_t   xevent_callback;
   widget_cb_newpos_t  newpos_callback;
   widgetkey_t         key;
-  DND_struct_t       *xdnd;
+  xitk_dnd_t         *xdnd;
   void               *user_data;
 } __gfx_t;
 
@@ -233,7 +233,7 @@ void widget_change_window_for_event_handler (widgetkey_t key, Window window) {
 widgetkey_t widget_register_event_handler(char *name, Window window,
 					  widget_cb_event_t cb,
 					  widget_cb_newpos_t pos_cb,
-					  dnd_callback_t dnd_cb,
+					  xitk_dnd_callback_t dnd_cb,
 					  widget_list_t *wl, void *user_data) {
   __gfx_t   *fx;
 
@@ -282,7 +282,7 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
     fx->widget_list = NULL;
 
   if(dnd_cb && (window != None)) {
-    fx->xdnd = (DND_struct_t *) gui_xmalloc(sizeof(DND_struct_t));
+    fx->xdnd = (xitk_dnd_t *) gui_xmalloc(sizeof(xitk_dnd_t));
     
     dnd_init_dnd(gXitk->display, fx->xdnd);
     dnd_set_callback(fx->xdnd, dnd_cb);

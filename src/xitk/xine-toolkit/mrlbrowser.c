@@ -537,7 +537,7 @@ static void mrlbrowser_select(widget_t *w, void *data) {
 /*
  * Handle double click in labelbutton list.
  */
-static void handle_dbl_click(widget_t *w, int selected, void *data) {
+static void handle_dbl_click(widget_t *w, void *data, int selected) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
 
   mrlbrowser_select_mrl(private_data, selected);
@@ -596,13 +596,11 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
 /*
  * Create mrlbrowser window.
  */
-widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
-			    Window window_trans,
-			    mrlbrowser_placements_t *mbp) {
+widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   GC                         gc;
   XSizeHints                 hint;
   XSetWindowAttributes       attr;
-  char                      *title = mbp->window_title;
+  char                      *title = mb->window_title;
   Atom                       prop;
   MWMHints                   mwmhints;
   XWMHints                  *wm_hint;
@@ -611,37 +609,40 @@ widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
   int                        screen;
   widget_t                  *mywidget;
   mrlbrowser_private_data_t *private_data;
+  xitk_labelbutton_t         lb;
+  xitk_label_t               lbl;
   
-  if(mbp->ip_availables == NULL) {
+  if(mb->ip_availables == NULL) {
     fprintf(stderr, "Something's going wrong, there is no input plugin "
 	    "available having INPUT_CAP_GET_DIR capability !!\nExiting.\n");
     exit(1);
   }
 
-  if(mbp->xine == NULL) {
+  if(mb->xine == NULL) {
     fprintf(stderr, "Xine engine should be initialized first !!\nExiting.\n");
     exit(1);
   }
 
-  mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
+  mywidget               = (widget_t *) gui_xmalloc(sizeof(widget_t));
   
-  private_data = (mrlbrowser_private_data_t *) 
+  private_data           = (mrlbrowser_private_data_t *) 
     gui_xmalloc(sizeof(mrlbrowser_private_data_t));
 
   mywidget->private_data = private_data;
 
   private_data->fbWidget = mywidget;
-  private_data->display  = display;
-  private_data->xine     = mbp->xine;
+  private_data->display  = mb->display;
+  private_data->xine     = mb->xine;
   private_data->running  = 1;
 
-  XLOCK(display);
+  XLOCK(mb->display);
 
-  if(!(private_data->bg_image = Imlib_load_image(idata, mbp->bg_skinfile))) {
+  if(!(private_data->bg_image = Imlib_load_image(mb->imlibdata, 
+						 mb->background_skin))) {
     fprintf(stderr, "%s(%d): couldn't find image for background\n",
 	    __FILE__, __LINE__);
-
-    XUNLOCK(display);
+    
+    XUNLOCK(mb->display);
     return NULL;
   }
 
@@ -649,74 +650,75 @@ widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
   private_data->mrls_num        = 0;
   private_data->last_mrl_source = NULL;
 
-  hint.x      = mbp->x;
-  hint.y      = mbp->y;
+  hint.x      = mb->x;
+  hint.y      = mb->y;
   hint.width  = private_data->bg_image->rgb_width;
   hint.height = private_data->bg_image->rgb_height;
   hint.flags  = PPosition | PSize;
 
-  screen = DefaultScreen(display);
+  screen = DefaultScreen(mb->display);
 
-  XAllocNamedColor(display, 
-                   DefaultColormap(display, screen), 
-                   "black", &black, &dummy);
+  XAllocNamedColor(mb->display, 
+                   DefaultColormap(mb->display, screen), 
+		   "black", &black, &dummy);
 
   attr.override_redirect = True;
   attr.background_pixel  = black.pixel;
   attr.border_pixel      = 1;
-  attr.colormap  = XCreateColormap(display,
-				   RootWindow(display, screen),
-				   idata->x.visual, AllocNone);
+  attr.colormap          = XCreateColormap(mb->display,
+					   RootWindow(mb->display, screen),
+					   mb->imlibdata->x.visual, AllocNone);
   
-  private_data->window = 
-    XCreateWindow (display, DefaultRootWindow(display), 
-		   hint.x, hint.y, hint.width, 
-		   hint.height, 0, 
-		   idata->x.depth, 
-		   CopyFromParent, 
-		   idata->x.visual,
-		   CWBackPixel | CWBorderPixel | CWColormap, &attr);
+  private_data->window   = XCreateWindow (mb->display,
+					  DefaultRootWindow(mb->display), 
+					  hint.x, hint.y, hint.width, 
+					  hint.height, 0, 
+					  mb->imlibdata->x.depth, 
+					  CopyFromParent, 
+					  mb->imlibdata->x.visual,
+					  CWBackPixel | CWBorderPixel | CWColormap, &attr);
   
-  XSetStandardProperties(display, private_data->window, title, title,
+  XSetStandardProperties(mb->display, private_data->window, title, title,
 			 None, NULL, 0, &hint);
 
-  XSelectInput(display, private_data->window,
+  XSelectInput(mb->display, private_data->window,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
   /*
    * wm, no border please
    */
-  prop = XInternAtom(display, "_MOTIF_WM_HINTS", True);
-  mwmhints.flags = MWM_HINTS_DECORATIONS;
+  prop                 = XInternAtom(mb->display, "_MOTIF_WM_HINTS", True);
+  mwmhints.flags       = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
   
-  XChangeProperty(display, private_data->window, prop, prop, 32,
+  XChangeProperty(mb->display, private_data->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);						
-  if(window_trans != None)
-    XSetTransientForHint (display, private_data->window, window_trans);
+  if(mb->window_trans != None)
+    XSetTransientForHint (mb->display, private_data->window, mb->window_trans);
 
   /* set xclass */
   
   if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = mbp->resource_name ? mbp->resource_name : "xitk mrl browser";
-    xclasshint->res_class = mbp->resource_class ? mbp->resource_class : "xitk";
-    XSetClassHint(display, private_data->window, xclasshint);
+    xclasshint->res_name  = mb->resource_name ? mb->resource_name : "xitk mrl browser";
+    xclasshint->res_class = mb->resource_class ? mb->resource_class : "xitk";
+    XSetClassHint(mb->display, private_data->window, xclasshint);
   }
   
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
-    wm_hint->input = True;
+    wm_hint->input         = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->flags = InputHint | StateHint;
-    XSetWMHints(display, private_data->window, wm_hint);
+    wm_hint->flags         = InputHint | StateHint;
+    XSetWMHints(mb->display, private_data->window, wm_hint);
     XFree(wm_hint);
   }
   
-  gc = XCreateGC(display, private_data->window, 0, 0);
+  gc = XCreateGC(mb->display, private_data->window, 0, 0);
   
-  Imlib_apply_image(idata, private_data->bg_image, private_data->window);
+  Imlib_apply_image(mb->imlibdata, 
+		    private_data->bg_image, private_data->window);
 
   private_data->widget_list                = widget_list_new() ;
   private_data->widget_list->l             = gui_list_new ();
@@ -725,64 +727,77 @@ widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
   private_data->widget_list->win           = private_data->window;
   private_data->widget_list->gc            = gc;
   
-  gui_list_append_content (private_data->widget_list->l,
-	   label_button_create (display, 
-				idata,
-				mbp->select.x,
-				mbp->select.y,
-				CLICK_BUTTON,
-				mbp->select.caption,
-				mrlbrowser_select, (void*)private_data,
-				mbp->select.skin_filename,
-				mbp->select.normal_color,
-				mbp->select.focused_color,
-				mbp->select.clicked_color));
+  lb.display        = mb->display;
+  lb.imlibdata      = mb->imlibdata;
+  lb.x              = mb->select.x;
+  lb.y              = mb->select.y;
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = mb->select.caption;
+  lb.callback       = mrlbrowser_select;
+  lb.state_callback = NULL;
+  lb.userdata       = (void *)private_data;
+  lb.skin           = mb->select.skin_filename;
+  lb.normcolor      = mb->select.normal_color;
+  lb.focuscolor     = mb->select.focused_color;
+  lb.clickcolor     = mb->select.clicked_color;
 
-  gui_list_append_content (private_data->widget_list->l,
-	   label_button_create (display,
-				idata,
-				mbp->dismiss.x,
-				mbp->dismiss.y,
-				CLICK_BUTTON,
-				mbp->dismiss.caption,
-				mrlbrowser_exit, (void*)mywidget,
-				mbp->dismiss.skin_filename,
-				mbp->dismiss.normal_color,
-				mbp->dismiss.focused_color,
-				mbp->dismiss.clicked_color));
+  gui_list_append_content(private_data->widget_list->l,
+			  label_button_create (&lb));
+
+  lb.display        = mb->display;
+  lb.imlibdata      = mb->imlibdata;
+  lb.x              = mb->dismiss.x;
+  lb.y              = mb->dismiss.y;
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = mb->dismiss.caption;
+  lb.callback       = mrlbrowser_exit;
+  lb.state_callback = NULL;
+  lb.userdata       = (void *)mywidget;
+  lb.skin           = mb->dismiss.skin_filename;
+  lb.normcolor      = mb->dismiss.normal_color;
+  lb.focuscolor     = mb->dismiss.focused_color;
+  lb.clickcolor     = mb->dismiss.clicked_color;
+
+  gui_list_append_content(private_data->widget_list->l,
+			  label_button_create (&lb));
   
-  private_data->add_callback = mbp->select.callback;
-  private_data->kill_callback = mbp->kill.callback;
-
-  mbp->br_placement->dbl_click_cb = handle_dbl_click;
-  mbp->br_placement->user_data = (void *)private_data;
+  private_data->add_callback      = mb->select.callback;
+  private_data->kill_callback     = mb->kill.callback;
+  mb->browser.dbl_click_callback = handle_dbl_click;
+  mb->browser.userdata           = (void *)private_data;
+  mb->browser.parent_wlist       = private_data->widget_list;
   gui_list_append_content (private_data->widget_list->l,
 			   (private_data->mrlb_list = 
-			    browser_create(display, idata, 
-					   private_data->widget_list,
-					   mbp->br_placement)));
+			    browser_create(&mb->browser)));
 
-  gui_list_append_content (private_data->widget_list->l,
-			   (private_data->widget_origin = 
-			    label_create (display, idata,
-					  mbp->origin.x,
-					  mbp->origin.y,
-					  mbp->origin.max_length,
-					  "",
-					  mbp->origin.skin_filename)));
+  lbl.display   = mb->display;
+  lbl.imlibdata = mb->imlibdata;
+  lbl.x         = mb->origin.x;
+  lbl.y         = mb->origin.y;
+  lbl.length    = mb->origin.max_length;
+  lbl.label     = "";
+  lbl.font      = mb->origin.skin_filename;
+
+  gui_list_append_content(private_data->widget_list->l,
+			  (private_data->widget_origin = 
+			   label_create (&lbl)));
   
   memset(&private_data->current_origin, 0, strlen(private_data->current_origin));
-  if(mbp->origin.cur_origin)
-    sprintf(private_data->current_origin, "%s", mbp->origin.cur_origin);
+  if(mb->origin.cur_origin)
+    sprintf(private_data->current_origin, "%s", mb->origin.cur_origin);
 
-  if(mbp->ip_name.label.label_str) {
-    gui_list_append_content (private_data->widget_list->l,
-		     label_create (display, idata, 
-				   mbp->ip_name.label.x,
-				   mbp->ip_name.label.y,
-				   strlen(mbp->ip_name.label.label_str),
-				   mbp->ip_name.label.label_str,
-				   mbp->ip_name.label.skin_filename));
+  if(mb->ip_name.label.label_str) {
+
+    lbl.display   = mb->display;
+    lbl.imlibdata = mb->imlibdata;
+    lbl.x         = mb->ip_name.label.x;
+    lbl.y         = mb->ip_name.label.y;;
+    lbl.length    = strlen(mb->ip_name.label.label_str);
+    lbl.label     = mb->ip_name.label.label_str;
+    lbl.font      = mb->ip_name.label.skin_filename;
+
+    gui_list_append_content(private_data->widget_list->l, 
+			    label_create (&lbl));
   }
 
   /*
@@ -793,32 +808,38 @@ widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
     int i = 0;
     widget_t *tmp;
     
-    x = mbp->ip_name.button.x;
-    y = mbp->ip_name.button.y;
+    x = mb->ip_name.button.x;
+    y = mb->ip_name.button.y;
     
-    while(mbp->ip_availables[i] != NULL) {
-      gui_list_append_content (private_data->widget_list->l,
-	       (tmp =
-		label_button_create (display, idata, 
-				     x, y,
-				     CLICK_BUTTON,
-				     mbp->ip_availables[i],
-				     mrlbrowser_grab_mrls, 
-				     (void*)private_data, 
-				     mbp->ip_name.button.skin_filename,
-				     mbp->ip_name.button.normal_color,
-				     mbp->ip_name.button.focused_color,
-				     mbp->ip_name.button.clicked_color)));
+    while(mb->ip_availables[i] != NULL) {
+
+      lb.display        = mb->display;
+      lb.imlibdata      = mb->imlibdata;
+      lb.x              = x;
+      lb.y              = y;
+      lb.button_type    = CLICK_BUTTON;
+      lb.label          = mb->ip_availables[i];
+      lb.callback       = mrlbrowser_grab_mrls;
+      lb.state_callback = NULL;
+      lb.userdata       = (void *)private_data;
+      lb.skin           = mb->ip_name.button.skin_filename;
+      lb.normcolor      = mb->ip_name.button.normal_color;
+      lb.focuscolor     = mb->ip_name.button.focused_color;
+      lb.clickcolor     = mb->ip_name.button.clicked_color;
+
+      gui_list_append_content(private_data->widget_list->l,
+			      (tmp = label_button_create (&lb)));
+
       y += widget_get_height(tmp) + 1;
       i++;
     }
   }
     
-  private_data->visible = 1;
+  private_data->visible    = 1;
 
   mywidget->enable         = 1;
-  mywidget->x              = mbp->x;
-  mywidget->y              = mbp->y;
+  mywidget->x              = mb->x;
+  mywidget->y              = mb->y;
   mywidget->width          = private_data->bg_image->width;
   mywidget->height         = private_data->bg_image->height;
   mywidget->widget_type    = WIDGET_TYPE_MRLBROWSER | WIDGET_TYPE_GROUP;
@@ -830,18 +851,18 @@ widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
 		      private_data->mc->mrls_disp, 
 		      private_data->mrls_num, 0);
   
-  XMapRaised(display, private_data->window); 
+  XMapRaised(mb->display, private_data->window); 
 
   private_data->widget_key = 
     widget_register_event_handler("mrl browser",
 				  private_data->window, 
 				  mrlbrowser_handle_event,
 				  NULL,
-				  mbp->dndcallback,
+				  mb->dndcallback,
 				  private_data->widget_list,
 				  (void *) private_data);
 
-  XUNLOCK (display);
+  XUNLOCK (mb->display);
 
   return mywidget;
 }

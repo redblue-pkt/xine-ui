@@ -46,121 +46,45 @@
 #endif
 
 typedef struct {
-  mrl_t                  *mrls[MAXFILES];
-  char                   *mrls_disp[MAXFILES];
+  mrl_t                    *mrls[MAXFILES];
+  char                     *mrls_disp[MAXFILES];
 } mrl_contents_t;
 
 typedef struct {
+
+  widget_t                 *fbWidget; /*  My widget */
+
+  Display                  *display; /* Current display */
+
+  widgetkey_t               widget_key;
+
+  Window                    window; /* file browser window */
   
-  int                     x;
-  int                     y;
-  char                   *window_title;
-  char                   *bg_skinfile;
-  char                   *resource_name;
-  char                   *resource_class;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
-    int                   max_length;
-    char                 *cur_origin;
-  } origin;
+  ImlibImage               *bg_image;
+  widget_list_t            *widget_list; /* File browser widget list */
   
-  dnd_callback_t          dndcallback;
+  xine_t                   *xine;
 
-  struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
-    void                (*callback) (widget_t *widget, void *data, mrl_t *);
-  } select;
+  mrl_contents_t           *mc;
+  int                       mrls_num;
 
-  struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
-  } dismiss;
+  char                     *last_mrl_source;
 
-  struct {
-    void                (*callback) (widget_t *widget, void *data);
-  } kill;
+  widget_t                 *widget_origin; /* Current directory widget */
+  char                      current_origin[PATH_MAX + 1]; /* Current directory */
 
-  char                  **ip_availables;
-  
-  struct {
+  int                       running; /* Boolean status */
+  int                       visible; /* Boolean status */
 
-    struct {
-      int                 x;
-      int                 y;
-      char               *skin_filename;
-      char               *normal_color;
-      char               *focused_color;
-      char               *clicked_color;
-    } button;
+  widget_t                 *mrlb_list; /*  Browser list widget */
 
-    struct {
-      int                 x;
-      int                 y;
-      char               *skin_filename;
-      char               *label_str;
-    } label;
-
-  } ip_name;
-  
-  xine_t                 *xine;
-
-  browser_placements_t   *br_placement;
-
-} mrlbrowser_placements_t;
-
-typedef struct {
-
-  widget_t               *fbWidget; /*  My widget */
-
-  Display                *display; /* Current display */
-
-  widgetkey_t             widget_key;
-
-  Window                  window; /* file browser window */
-  
-  ImlibImage             *bg_image;
-  widget_list_t          *widget_list; /* File browser widget list */
-  
-  xine_t                 *xine;
-
-  mrl_contents_t         *mc;
-  int                     mrls_num;
-
-  char                   *last_mrl_source;
-
-  widget_t               *widget_origin; /* Current directory widget */
-  char                    current_origin[PATH_MAX + 1]; /* Current directory */
-
-  int                     running; /* Boolean status */
-  int                     visible; /* Boolean status */
-
-  widget_t               *mrlb_list; /*  Browser list widget */
-
-  void                  (*add_callback) (widget_t *widget, void *data, mrl_t *mrl);
-  void                  (*kill_callback) (widget_t *widget, void *data);
-
-  void                  (*ip_callback) (widget_t *widget, void *data);
+  xitk_mrl_callback_t      add_callback;
+  xitk_simple_callback_t   kill_callback;
+  xitk_simple_callback_t   ip_callback;
 
 } mrlbrowser_private_data_t;
 
-widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
-			    Window window_trans,
-			    mrlbrowser_placements_t *fbp);
-
+widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb);
 int mrlbrowser_is_running(widget_t *w);
 int mrlbrowser_is_visible(widget_t *w);
 void mrlbrowser_hide(widget_t *w);

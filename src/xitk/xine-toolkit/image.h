@@ -28,6 +28,7 @@
 
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
+#include "_xitk.h"
 
 typedef struct {
   Display     *display;
@@ -45,7 +46,6 @@ gui_image_t *gui_load_image(ImlibData *idata, const char *image);
 /**
  * Create an image widget type.
  */
-widget_t *image_create (Display *display, ImlibData *idata,
-			int x, int y, const char *skin) ;
+widget_t *image_create (xitk_image_t *im);
 
 #endif

@@ -34,6 +34,7 @@
 #include "image.h"
 #include "label.h"
 #include "widget_types.h"
+#include "_xitk.h"
 
 /*
  *
@@ -114,31 +115,30 @@ int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
 /*
  *
  */
-widget_t *label_create (Display *display, ImlibData *idata,
-			int x, int y, int length, 
-			const char *label, char *font) {
+widget_t *label_create (xitk_label_t *l) {
   widget_t              *mywidget;
   label_private_data_t *private_data;
-
+  
   mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
-
+  
   private_data = (label_private_data_t *) 
     gui_xmalloc(sizeof(label_private_data_t));
 
-  private_data->display     = display;
+  private_data->display     = l->display;
 
   private_data->lWidget     = mywidget;
-  private_data->font        = gui_load_image(idata, font);
+  private_data->font        = gui_load_image(l->imlibdata, l->font);
   private_data->char_length = (private_data->font->width/32);
   private_data->char_height = (private_data->font->height/3);
-  private_data->length      = length;
-  private_data->label       = strdup(label);
+  private_data->length      = l->length;
+  private_data->label       = (l->label ? strdup(l->label) : "");
 
   mywidget->private_data    = private_data;
   mywidget->enable          = 1;
-  mywidget->x               = x;
-  mywidget->y               = y;
-  mywidget->width           = (private_data->char_length * strlen(label));
+  mywidget->x               = l->x;
+  mywidget->y               = l->y;
+  mywidget->width           = (private_data->char_length 
+			       * strlen(private_data->label));
   mywidget->height          = private_data->char_height;
   mywidget->widget_type     = WIDGET_TYPE_LABEL;
   mywidget->paint           = paint_label;

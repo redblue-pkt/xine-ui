@@ -28,8 +28,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "_xitk.h"
-
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
 #include "widget_types.h"
@@ -38,6 +36,13 @@
 #include "button.h"
 #include "labelbutton.h"
 #include "slider.h"
+
+#include "_xitk.h"
+
+typedef struct {
+  widget_t    *itemlist;
+  int          sel;
+} btnlist_t;
 
 #define WBUP    0  /*  Position of button up in item_tree  */
 #define WSLID   1  /*  Position of slider in item_tree  */
@@ -305,8 +310,8 @@ static void browser_select(widget_t *w, void *data, int state) {
 
     if((i = browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
       // Callback call
-      if(private_data->function)
-	private_data->function(((btnlist_t*)data)->itemlist, (void*)(i));
+      if(private_data->callback)
+	private_data->callback(((btnlist_t*)data)->itemlist, (void*)(i));
     }
 
 
@@ -329,10 +334,10 @@ static void browser_select(widget_t *w, void *data, int state) {
 	
 	/* Ok, double click occur, call cb */
 	if(click_diff < private_data->dbl_click_time) {
-	  if(private_data->dbl_click_cb)
-	    private_data->dbl_click_cb(w, 
-				       private_data->current_button_clicked,
-				       private_data->user_data);
+	  if(private_data->dbl_click_callback)
+	    private_data->dbl_click_callback(w, 
+					     private_data->userdata, 
+					     private_data->current_button_clicked);
 	}
 
       }
@@ -360,10 +365,10 @@ static void browser_select(widget_t *w, void *data, int state) {
 
       /* Ok, double click occur, call cb */
       if(click_diff < private_data->dbl_click_time) {
-	if(private_data->dbl_click_cb)
-	  private_data->dbl_click_cb(w, 
-				     private_data->current_button_clicked,
-				     private_data->user_data);
+	if(private_data->dbl_click_callback)
+	  private_data->dbl_click_callback(w, 
+					   private_data->userdata,
+					   private_data->current_button_clicked);
       }
       private_data->last_button_clicked = private_data->current_button_clicked;
       private_data->current_button_clicked = -1;
@@ -376,110 +381,131 @@ static void browser_select(widget_t *w, void *data, int state) {
 /**
  * Create the list browser
  */
-widget_t *browser_create(Display *display, ImlibData *idata,
-			 widget_list_t *thelist,
-			 browser_placements_t *bp) {
-  widget_t *mywidget;
+widget_t *browser_create(xitk_browser_t *br) {
+  widget_t               *mywidget;
   browser_private_data_t *private_data;
+  xitk_button_t           b;
+  xitk_labelbutton_t      lb;
+  xitk_slider_t           sl;
 
   mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
 
   private_data = 
     (browser_private_data_t *) gui_xmalloc(sizeof(browser_private_data_t));
 
-  private_data->bWidget          = mywidget;
-  private_data->display          = display;
-  private_data->content          = bp->browser.entries;
-  private_data->list_length      = bp->browser.num_entries;
-  private_data->max_length       = bp->browser.max_displayed_entries;
+  private_data->bWidget              = mywidget;
+  private_data->display              = br->display;
+  private_data->content              = br->browser.entries;
+  private_data->list_length          = br->browser.num_entries;
+  private_data->max_length           = br->browser.max_displayed_entries;
 
-  if(bp->dbl_click_time)
-    private_data->dbl_click_time = bp->dbl_click_time;
+  if(br->dbl_click_time)
+    private_data->dbl_click_time     = br->dbl_click_time;
   else
-    private_data->dbl_click_time = DEFAULT_DBL_CLICK_TIME;
+    private_data->dbl_click_time     = DEFAULT_DBL_CLICK_TIME;
 
-  if(bp->dbl_click_cb)
-    private_data->dbl_click_cb   = bp->dbl_click_cb;
+  if(br->dbl_click_callback)
+    private_data->dbl_click_callback = br->dbl_click_callback;
   else
-    private_data->dbl_click_cb   = NULL;
+    private_data->dbl_click_callback = NULL;
     
-    
-  gui_list_append_content(thelist->l, 
-	  (private_data->item_tree[WBUP] = 
-	   button_create(display, idata, 
-			 bp->arrow_up.x, bp->arrow_up.y, 
-			 browser_up, (void*)mywidget, 
-			 bp->arrow_up.skinfile)));
+  b.display   = br->display;
+  b.imlibdata = br->imlibdata;
+  b.x         = br->arrow_up.x;
+  b.y         = br->arrow_up.y;
+  b.callback  = browser_up;
+  b.userdata  = (void *)mywidget;
+  b.skin      = br->arrow_up.skin_filename;
   
-  gui_list_append_content(thelist->l,
-	  (private_data->item_tree[WSLID] = 
-	   slider_create(display, idata, VSLIDER,
-			 bp->slider.x, bp->slider.y, 0,
-			 (bp->browser.num_entries > (bp->browser.max_displayed_entries-1)
-			  ? bp->browser.num_entries-1 : 0), 
-			 1, bp->slider.skinfile, bp->paddle.skinfile,
-			 browser_slidmove, (void*)mywidget,
-			 browser_slidmove, (void*)mywidget)));
+  gui_list_append_content(br->parent_wlist->l, 
+			  (private_data->item_tree[WBUP] = button_create(&b)));
+
+  sl.display         = br->display;
+  sl.imlibdata       = br->imlibdata;
+  sl.x               = br->slider.x;
+  sl.y               = br->slider.y;
+  sl.slider_type     = VSLIDER;
+  sl.min             = 0;
+  sl.max             = (br->browser.num_entries > (br->browser.max_displayed_entries-1) ? br->browser.num_entries-1 : 0);
+  sl.step            = 1;
+  sl.background_skin = br->slider.skin_filename;
+  sl.paddle_skin     = br->paddle.skin_filename;
+  sl.callback        = browser_slidmove;
+  sl.userdata        = (void*)mywidget;
+  sl.motion_callback = browser_slidmove;
+  sl.motion_userdata = (void*)mywidget;
+
+  gui_list_append_content(br->parent_wlist->l,
+	  (private_data->item_tree[WSLID] = slider_create(&sl)));
   
-  slider_set_to_max(thelist, private_data->item_tree[WSLID]);
+  slider_set_to_max(br->parent_wlist, private_data->item_tree[WSLID]);
   
-  gui_list_append_content(thelist->l, 
-	  (private_data->item_tree[WBDN] = 
-	   button_create (display, idata, 
-			  bp->arrow_dn.x, bp->arrow_dn.y, 
-			  browser_down, 
-			  (void*)mywidget, bp->arrow_dn.skinfile)));
+  b.display   = br->display;
+  b.imlibdata = br->imlibdata;
+  b.x         = br->arrow_dn.x;
+  b.y         = br->arrow_dn.y;
+  b.callback  = browser_down;
+  b.userdata  = (void *)mywidget;
+  b.skin      = br->arrow_dn.skin_filename;
+
+  gui_list_append_content(br->parent_wlist->l, 
+			  private_data->item_tree[WBDN] = button_create (&b));
   
   {
     int x, y, i;
     btnlist_t *bt;
     
-    x = bp->browser.x;
-    y = bp->browser.y;
+    x = br->browser.x;
+    y = br->browser.y;
     
-    for(i = WBSTART; i < bp->browser.max_displayed_entries+WBSTART; i++) {
+    for(i = WBSTART; i < br->browser.max_displayed_entries+WBSTART; i++) {
       
       bt = (btnlist_t *) gui_xmalloc(sizeof(btnlist_t));
       bt->itemlist = (widget_t *) gui_xmalloc(sizeof(widget_t));
       bt->itemlist = mywidget;
       bt->sel = i;
       
-      gui_list_append_content(thelist->l, 
-		      (private_data->item_tree[i] =
-		       label_button_create (display, idata, 
-					    x, y,
-					    RADIO_BUTTON, 
-					    "",
-					    browser_select, 
-					    (void*)(bt), 
-					    bp->browser.skinfile,
-					    bp->browser.norm_color,
-					    bp->browser.focused_color, 
-					    bp->browser.clicked_color)));
+      lb.display        = br->display;
+      lb.imlibdata      = br->imlibdata;
+      lb.x              = x;
+      lb.y              = y;
+      lb.button_type    = RADIO_BUTTON;
+      lb.label          = " ";
+      lb.callback       = NULL;
+      lb.state_callback = browser_select;
+      lb.userdata       = (void *)(bt);
+      lb.skin           = br->browser.skin_filename;
+      lb.normcolor      = br->browser.normal_color;
+      lb.focuscolor     = br->browser.focused_color;
+      lb.clickcolor     = br->browser.clicked_color;
+      
+      gui_list_append_content(br->parent_wlist->l, 
+			      (private_data->item_tree[i] = 
+			       label_button_create (&lb)));
       
       y += widget_get_height(private_data->item_tree[i]) + 1;
     }
   }
   
   private_data->current_button_clicked = -1;
-  private_data->last_button_clicked = -1;
+  private_data->last_button_clicked    = -1;
 
-  private_data->win = thelist->win;
-  private_data->gc = thelist->gc;
+  private_data->win                    = br->parent_wlist->win;
+  private_data->gc                     = br->parent_wlist->gc;
   
-  private_data->function = bp->callback;
-  private_data->user_data = bp->user_data;
+  private_data->callback               = br->callback;
+  private_data->userdata               = br->userdata;
   
-  mywidget->private_data = private_data;
+  mywidget->private_data               = private_data;
 
-  mywidget->enable = 1;
+  mywidget->enable                     = 1;
   
   mywidget->x = mywidget->x = mywidget->width = mywidget->height = 0;    
   
-  mywidget->widget_type = WIDGET_TYPE_BROWSER | WIDGET_TYPE_GROUP;
-  mywidget->paint = NULL;
-  mywidget->notify_click = NULL;
-  mywidget->notify_focus = NULL;
+  mywidget->widget_type                = WIDGET_TYPE_BROWSER | WIDGET_TYPE_GROUP;
+  mywidget->paint                      = NULL;
+  mywidget->notify_click               = NULL;
+  mywidget->notify_focus               = NULL;
 
   return mywidget;
 }

@@ -273,7 +273,10 @@ void control_panel(void) {
   Atom                    prop;
   MWMHints                mwmhints;
   XClassHint             *xclasshint;
-
+  xitk_labelbutton_t      lb;
+  xitk_label_t            lbl;
+  xitk_slider_t           sl;
+  
   /* This shouldn't be happend */
   if(control != NULL) {
     if(control->window)
@@ -371,24 +374,36 @@ void control_panel(void) {
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
 					  VO_PROP_HUE, &min, &max);
     cur = get_current_prop(VO_PROP_HUE);
+    
+    sl.display         = gGui->display;
+    sl.imlibdata       = gGui->imlib_data;
+    sl.x               = gui_get_skinX("CtlHueBG");
+    sl.y               = gui_get_skinY("CtlHueBG");
+    sl.slider_type     = VSLIDER;
+    sl.min             = min;
+    sl.max             = max;
+    sl.step            = 1;
+    sl.background_skin = gui_get_skinfile("CtlHueBG");
+    sl.paddle_skin     = gui_get_skinfile("CtlHueFG");
+    sl.callback        = set_hue;
+    sl.userdata        = NULL;
+    sl.motion_callback = set_hue;
+    sl.motion_userdata = NULL;
+    
     gui_list_append_content(control->widget_list->l,
-	    (control->hue = slider_create(gGui->display, gGui->imlib_data, 
-				     VSLIDER,
-				     gui_get_skinX("CtlHueBG"), 
-				     gui_get_skinY("CtlHueBG"), 
-				     min,max, 
-				     1, 
-				     gui_get_skinfile("CtlHueBG"),
-				     gui_get_skinfile("CtlHueFG"),
-				     set_hue, NULL,
-				     set_hue, NULL)));
+			    (control->hue = slider_create(&sl)));
     slider_set_pos(control->widget_list, control->hue, cur);
+
+    lbl.display   = gGui->display;
+    lbl.imlibdata = gGui->imlib_data;
+    lbl.x         = gui_get_skinX("CtlHueLbl");
+    lbl.y         = gui_get_skinY("CtlHueLbl");
+    lbl.length    = 3;
+    lbl.label     = "Hue";
+    lbl.font      = gui_get_skinfile("CtlHueLbl");
+
     gui_list_append_content(control->widget_list->l,
-			    label_create(gGui->display, gGui->imlib_data, 
-					 gui_get_skinX("CtlHueLbl"), 
-					 gui_get_skinY("CtlHueLbl"), 
-					 3, "Hue", 
-					 gui_get_skinfile("CtlHueLbl")));
+			    label_create(&lbl));
     widget_disable(control->hue);
 
 
@@ -396,72 +411,108 @@ void control_panel(void) {
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
 					  VO_PROP_SATURATION, &min, &max);
     cur = get_current_prop(VO_PROP_SATURATION);
+
+    sl.display         = gGui->display;
+    sl.imlibdata       = gGui->imlib_data;
+    sl.x               = gui_get_skinX("CtlSatBG");
+    sl.y               = gui_get_skinY("CtlSatBG");
+    sl.slider_type     = VSLIDER;
+    sl.min             = min;
+    sl.max             = max;
+    sl.step            = 1;
+    sl.background_skin = gui_get_skinfile("CtlSatBG");
+    sl.paddle_skin     = gui_get_skinfile("CtlSatFG");
+    sl.callback        = set_saturation;
+    sl.userdata        = NULL;
+    sl.motion_callback = set_saturation;
+    sl.motion_userdata = NULL;
+    
     gui_list_append_content(control->widget_list->l,
-	      (control->sat = slider_create(gGui->display, gGui->imlib_data, 
-				     VSLIDER,
-				     gui_get_skinX("CtlSatBG"), 
-				     gui_get_skinY("CtlSatBG"), 
-				     min, max,
-				     1, 
-				     gui_get_skinfile("CtlSatBG"),
-				     gui_get_skinfile("CtlSatFG"),
-				     set_saturation, NULL,
-				     set_saturation, NULL)));
+	      (control->sat = slider_create(&sl)));
     slider_set_pos(control->widget_list, control->sat, cur);
+
+    lbl.display   = gGui->display;
+    lbl.imlibdata = gGui->imlib_data;
+    lbl.x         = gui_get_skinX("CtlSatLbl");
+    lbl.y         = gui_get_skinY("CtlSatLbl");
+    lbl.length    = 3;
+    lbl.label     = "Sat";
+    lbl.font      = gui_get_skinfile("CtlSatLbl");
+
     gui_list_append_content(control->widget_list->l,
-			    label_create(gGui->display, gGui->imlib_data, 
-					 gui_get_skinX("CtlSatLbl"), 
-					 gui_get_skinY("CtlSatLbl"), 
-					 3, "Sat", 
-					 gui_get_skinfile("CtlSatLbl")));
+			    label_create(&lbl));
     widget_disable(control->sat);
       
     /* BRIGHTNESS */
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
 					  VO_PROP_BRIGHTNESS, &min, &max);
     cur = get_current_prop(VO_PROP_BRIGHTNESS);
+
+    sl.display         = gGui->display;
+    sl.imlibdata       = gGui->imlib_data;
+    sl.x               = gui_get_skinX("CtlBrightBG");
+    sl.y               = gui_get_skinY("CtlBrightBG");
+    sl.slider_type     = VSLIDER;
+    sl.min             = min;
+    sl.max             = max;
+    sl.step            = 1;
+    sl.background_skin = gui_get_skinfile("CtlBrightBG");
+    sl.paddle_skin     = gui_get_skinfile("CtlBrightFG");
+    sl.callback        = set_brightness;
+    sl.userdata        = NULL;
+    sl.motion_callback = set_brightness;
+    sl.motion_userdata = NULL;
+
     gui_list_append_content(control->widget_list->l,
-	    (control->bright = slider_create(gGui->display, gGui->imlib_data, 
-				      VSLIDER,
-				      gui_get_skinX("CtlBrightBG"), 
-				      gui_get_skinY("CtlBrightBG"), 
-				      min, max,
-				      1, 
-				      gui_get_skinfile("CtlBrightBG"),
-				      gui_get_skinfile("CtlBrightFG"),
-				      set_brightness, NULL,
-				      set_brightness, NULL)));
+	    (control->bright = slider_create(&sl)));
     slider_set_pos(control->widget_list, control->bright, cur);
+
+    lbl.display   = gGui->display;
+    lbl.imlibdata = gGui->imlib_data;
+    lbl.x         = gui_get_skinX("CtlBrightLbl");
+    lbl.y         = gui_get_skinY("CtlBrightLbl");
+    lbl.length    = 3;
+    lbl.label     = "Brt";
+    lbl.font      = gui_get_skinfile("CtlBrightLbl");
+
     gui_list_append_content(control->widget_list->l,
-			    label_create(gGui->display, gGui->imlib_data, 
-					 gui_get_skinX("CtlBrightLbl"), 
-					 gui_get_skinY("CtlBrightLbl"), 
-					 3, "Brt", 
-					 gui_get_skinfile("CtlBrightLbl")));
+			    label_create(&lbl));
     widget_disable(control->bright);
       
     /* CONTRAST */
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
 					  VO_PROP_CONTRAST, &min, &max);
     cur = get_current_prop(VO_PROP_CONTRAST);
+
+    sl.display         = gGui->display;
+    sl.imlibdata       = gGui->imlib_data;
+    sl.x               = gui_get_skinX("CtlContBG");
+    sl.y               = gui_get_skinY("CtlContBG");
+    sl.slider_type     = VSLIDER;
+    sl.min             = min;
+    sl.max             = max;
+    sl.step            = 1;
+    sl.background_skin = gui_get_skinfile("CtlContBG");
+    sl.paddle_skin     = gui_get_skinfile("CtlContFG");
+    sl.callback        = set_contrast;
+    sl.userdata        = NULL;
+    sl.motion_callback = set_contrast;
+    sl.motion_userdata = NULL;
+
     gui_list_append_content(control->widget_list->l,
-	      (control->contr = slider_create(gGui->display, gGui->imlib_data, 
-				      VSLIDER,
-				      gui_get_skinX("CtlContBG"), 
-				      gui_get_skinY("CtlContBG"),
-				      min, max,
-				      1, 
-				      gui_get_skinfile("CtlContBG"),
-				      gui_get_skinfile("CtlContFG"),
-				      set_contrast, NULL,
-				      set_contrast, NULL)));
+	      (control->contr = slider_create(&sl)));
     slider_set_pos(control->widget_list, control->contr, cur);
+
+    lbl.display   = gGui->display;
+    lbl.imlibdata = gGui->imlib_data;
+    lbl.x         = gui_get_skinX("CtlContLbl");
+    lbl.y         = gui_get_skinY("CtlContLbl");
+    lbl.length    = 3;
+    lbl.label     = "Ctr";
+    lbl.font      = gui_get_skinfile("CtlContLbl");
+
     gui_list_append_content(control->widget_list->l,
-			    label_create(gGui->display, gGui->imlib_data, 
-					 gui_get_skinX("CtlContLbl"), 
-					 gui_get_skinY("CtlContLbl"), 
-					 3, "Ctr", 
-					 gui_get_skinfile("CtlContLbl")));
+			    label_create(&lbl));
     widget_disable(control->contr);
 
 
@@ -484,58 +535,78 @@ void control_panel(void) {
     }
   }
  
+  lb.display        = gGui->display;
+  lb.imlibdata      = gGui->imlib_data;
+
   { /*  stopgap button ;-), will gone */
     widget_t *w;
-
+    
+    lb.x              = gui_get_skinX("CtlSave");
+    lb.y              = gui_get_skinY("CtlSave");
+    lb.button_type    = CLICK_BUTTON;
+    lb.label          = NULL;
+    lb.callback       = NULL;
+    lb.state_callback = NULL;
+    lb.userdata       = NULL;
+    lb.skin           = gui_get_skinfile("CtlDummy");
+    lb.normcolor      = gui_get_ncolor("CtlDummy");
+    lb.focuscolor     = gui_get_fcolor("CtlDummy");
+    lb.clickcolor     = gui_get_ccolor("CtlDummy");
+    
     gui_list_append_content (control->widget_list->l, 
-	     (w = label_button_create (gGui->display, gGui->imlib_data, 
-				       gui_get_skinX("CtlSave"),
-				       gui_get_skinY("CtlSave"),
-				       CLICK_BUTTON, NULL,
-				       NULL, NULL, 
-				       gui_get_skinfile("CtlDummy"),
-				       gui_get_ncolor("CtlDummy"),
-				       gui_get_fcolor("CtlDummy"),
-				       gui_get_ccolor("CtlDummy"))));
+	     (w = label_button_create (&lb)));
+
     widget_disable(w);
 	
-    gui_list_append_content (control->widget_list->l, 
-	     (w = label_button_create (gGui->display, gGui->imlib_data, 
-				       gui_get_skinX("CtlReset"),
-				       gui_get_skinY("CtlReset"),
-				       CLICK_BUTTON, NULL,
-				       NULL, NULL, 
-				       gui_get_skinfile("CtlDummy"),
-				       gui_get_ncolor("CtlDummy"),
-				       gui_get_fcolor("CtlDummy"),
-				       gui_get_ccolor("CtlDummy"))));
-    widget_disable(w);
+    lb.x              = gui_get_skinX("CtlReset");
+    lb.y              = gui_get_skinY("CtlReset");
+    lb.button_type    = CLICK_BUTTON;
+    lb.label          = NULL;
+    lb.callback       = NULL;
+    lb.state_callback = NULL;
+    lb.userdata       = NULL;
+    lb.skin           = gui_get_skinfile("CtlDummy");
+    lb.normcolor      = gui_get_ncolor("CtlDummy");
+    lb.focuscolor     = gui_get_fcolor("CtlDummy");
+    lb.clickcolor     = gui_get_ccolor("CtlDummy");
 
     gui_list_append_content (control->widget_list->l, 
-	     (w = label_button_create (gGui->display, gGui->imlib_data, 
-				       gui_get_skinX("CtlDummy"),
-				      gui_get_skinY("CtlDummy"),
-				      CLICK_BUTTON, NULL,
-				      NULL, NULL, 
-				      gui_get_skinfile("CtlDummy"),
-				      gui_get_ncolor("CtlDummy"),
-				      gui_get_fcolor("CtlDummy"),
-				      gui_get_ccolor("CtlDummy"))));
+	     (w = label_button_create (&lb)));
+
+    widget_disable(w);
+
+    lb.x              = gui_get_skinX("CtlDummy");
+    lb.y              = gui_get_skinY("CtlDummy");
+    lb.button_type    = CLICK_BUTTON;
+    lb.label          = NULL;
+    lb.callback       = NULL;
+    lb.state_callback = NULL;
+    lb.userdata       = NULL;
+    lb.skin           = gui_get_skinfile("CtlDummy");
+    lb.normcolor      = gui_get_ncolor("CtlDummy");
+    lb.focuscolor     = gui_get_fcolor("CtlDummy");
+    lb.clickcolor     = gui_get_ccolor("CtlDummy");
+
+    gui_list_append_content (control->widget_list->l, 
+	     (w = label_button_create (&lb)));
+
     widget_disable(w);
   }
+  
+  lb.x              = gui_get_skinX("CtlDismiss");
+  lb.y              = gui_get_skinY("CtlDismiss");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Dismiss";
+  lb.callback       = control_exit;
+  lb.state_callback = NULL;
+  lb.userdata       = NULL;
+  lb.skin           = gui_get_skinfile("CtlDismiss");
+  lb.normcolor      = gui_get_ncolor("CtlDismiss");
+  lb.focuscolor     = gui_get_fcolor("CtlDismiss");
+  lb.clickcolor     = gui_get_ccolor("CtlDismiss");
 
   gui_list_append_content (control->widget_list->l, 
-			  label_button_create (gGui->display, 
-					       gGui->imlib_data, 
-					       gui_get_skinX("CtlDismiss"),
-					       gui_get_skinY("CtlDismiss"),
-					       CLICK_BUTTON, "Dismiss",
-					       control_exit, NULL, 
-					       gui_get_skinfile("CtlDismiss"),
-					       gui_get_ncolor("CtlDismiss"),
-					       gui_get_fcolor("CtlDismiss"),
-					       gui_get_ccolor("CtlDismiss")));
-
+			  label_button_create (&lb));
 
   XMapRaised(gGui->display, control->window); 
 

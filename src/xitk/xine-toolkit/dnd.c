@@ -52,7 +52,7 @@ Atom _XA_XINE_XDNDEXCHANGE;
 
 //static gui_dnd_callback_t gui_dnd_callback;
 
-void dnd_init_dnd(Display *display, DND_struct_t *xdnd) {
+void dnd_init_dnd(Display *display, xitk_dnd_t *xdnd) {
 
   xdnd->display = display;
 
@@ -75,7 +75,7 @@ void dnd_init_dnd(Display *display, DND_struct_t *xdnd) {
   xdnd->callback = NULL;
 }
 
-void dnd_make_window_aware (DND_struct_t *xdnd, Window window) {
+void dnd_make_window_aware (xitk_dnd_t *xdnd, Window window) {
   
   if(!xdnd->display)
     return;
@@ -87,7 +87,7 @@ void dnd_make_window_aware (DND_struct_t *xdnd, Window window) {
   XUNLOCK (xdnd->display);
 }
 
-Bool dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
+Bool dnd_process_selection(xitk_dnd_t *xdnd, XEvent *event) {
   Atom ret_type;
   int ret_format;
   unsigned long ret_item;
@@ -137,11 +137,11 @@ Bool dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
   return False;
 }
 
-void dnd_set_callback (DND_struct_t *xdnd, void *cb) {
+void dnd_set_callback (xitk_dnd_t *xdnd, void *cb) {
   xdnd->callback = cb;
 }
 
-Bool dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
+Bool dnd_process_client_message(xitk_dnd_t *xdnd, XEvent *event) {
 
   if (event->xclient.format == 32 && event->xclient.data.l[0] == xdnd->_XA_WM_DELETE_WINDOW) {
     raise(SIGINT); /* video window closed, quit program */

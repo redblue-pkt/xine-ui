@@ -228,31 +228,32 @@ void gui_handle_event (XEvent *event, void *data) {
     switch (mykey) {
     
     case XK_less:
-    case XK_greater: {
-      int x, y;
-      unsigned int w, h, b, d;
-      Window rootwin;
-      
-      XLockDisplay (gGui->display);
-      
-      if(XGetGeometry(gGui->display, 
-		      gGui->video_window, &rootwin, 
-		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
+    case XK_greater:
+      if(!video_window_is_fullscreen()) {
+	int x, y;
+	unsigned int w, h, b, d;
+	Window rootwin;
+	
+	XLockDisplay (gGui->display);
+	
+	if(XGetGeometry(gGui->display, 
+			gGui->video_window, &rootwin, 
+			&x, &y, &w, &h, &b, &d) != BadDrawable) {
+	}
+	
+	if(mykey == XK_less) {
+	  w /= 1.2;
+	  h /= 1.2;
+	}
+	else {
+	  w *= 1.2;
+	  h *= 1.2;
+	}
+	
+	XResizeWindow (gGui->display, gGui->video_window, w, h);
+	XUnlockDisplay(gGui->display);
+	
       }
-
-      if(mykey == XK_less) {
-	w /= 1.2;
-	h /= 1.2;
-      }
-      else {
-	w *= 1.2;
-	h *= 1.2;
-      }
-      
-      XResizeWindow (gGui->display, gGui->video_window, w, h);
-      XUnlockDisplay(gGui->display);
-
-    }
       break;
 
     case XK_period:

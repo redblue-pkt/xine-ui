@@ -151,95 +151,103 @@ static void file_browser_kill(widget_t *w, void *data) {
 /*
  *
  */
-void file_browser(add_cb_t add_cb, select_cb_t sel_cb, dnd_callback_t dnd_cb) {
-  browser_placements_t     *bp;
-  filebrowser_placements_t *fbp;
-
+void file_browser(xitk_string_callback_t add_cb, 
+		  select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
+  xitk_filebrowser_t fbr;
+  
   if(fb != NULL) {
     show_file_browser();
     set_file_browser_transient();
     return;
   }
 
-  bp  = (browser_placements_t *) xmalloc(sizeof(browser_placements_t));
-  bp->arrow_up.x                    = gui_get_skinX("FBUp");
-  bp->arrow_up.y                    = gui_get_skinY("FBUp");
-  bp->arrow_up.skinfile             = gui_get_skinfile("FBUp");
-  bp->slider.x                      = gui_get_skinX("FBSlidBG");
-  bp->slider.y                      = gui_get_skinY("FBSlidBG");
-  bp->slider.skinfile               = gui_get_skinfile("FBSlidBG");
-  bp->paddle.skinfile               = gui_get_skinfile("FBSlidFG");
-  bp->arrow_dn.x                    = gui_get_skinX("FBDn");
-  bp->arrow_dn.y                    = gui_get_skinY("FBDn");
-  bp->arrow_dn.skinfile             = gui_get_skinfile("FBDn");
-  bp->browser.x                     = gui_get_skinX("FBItemBtn");
-  bp->browser.y                     = gui_get_skinY("FBItemBtn");
-  bp->browser.norm_color            = gui_get_ncolor("FBItemBtn");
-  bp->browser.focused_color         = gui_get_fcolor("FBItemBtn");
-  bp->browser.clicked_color         = gui_get_ccolor("FBItemBtn");
-  bp->browser.skinfile              = gui_get_skinfile("FBItemBtn");
-  bp->browser.max_displayed_entries = MAX_LIST;
-  bp->browser.num_entries           = 0;
-  bp->browser.entries               = NULL;
-  bp->user_data                     = NULL;
+  fbr.display                        = gGui->display;
+  fbr.imlibdata                      = gGui->imlib_data;
+  fbr.window_trans                   = gGui->video_window;
 
-  fbp                               = (filebrowser_placements_t *) 
-    xmalloc(sizeof(filebrowser_placements_t));
-  fbp->x                            = config_lookup_int("x_file_browser", 200);
-  fbp->y                            = config_lookup_int("y_file_browser", 100);
-  fbp->window_title                 = "Xine File Browser";
-  fbp->bg_skinfile                  = gui_get_skinfile("FBBG");
-  fbp->resource_name                = fbp->window_title;
-  fbp->resource_class               = "Xine";
-  fbp->sort_default.x               = gui_get_skinX("FBSortDef");
-  fbp->sort_default.y               = gui_get_skinY("FBSortDef");
-  fbp->sort_default.skin_filename   = gui_get_skinfile("FBSortDef");
-  fbp->sort_reverse.x               = gui_get_skinX("FBSortRev");
-  fbp->sort_reverse.y               = gui_get_skinY("FBSortRev");
-  fbp->sort_reverse.skin_filename   = gui_get_skinfile("FBSortRev");
-  fbp->current_dir.x                = gui_get_skinX("FBCurDir");
-  fbp->current_dir.y                = gui_get_skinY("FBCurDir");
-  fbp->current_dir.skin_filename    = gui_get_skinfile("FBCurDir");
-  fbp->current_dir.max_length       = 50;
-  fbp->current_dir.cur_directory    = config_lookup_str("filebrowser_dir",
-							(char *)get_homedir());
-  fbp->homedir.x                    = gui_get_skinX("FBHome");
-  fbp->homedir.y                    = gui_get_skinY("FBHome");
-  fbp->homedir.caption              = "~/";
-  fbp->homedir.skin_filename        = gui_get_skinfile("FBHome");
-  fbp->homedir.normal_color         = gui_get_ncolor("FBHome");
-  fbp->homedir.focused_color        = gui_get_fcolor("FBHome");
-  fbp->homedir.clicked_color        = gui_get_ccolor("FBHome");
+  fbr.x                              = config_lookup_int("x_file_browser", 200);
+  fbr.y                              = config_lookup_int("y_file_browser", 100);
+  fbr.window_title                   = "Xine File Browser";
+  fbr.background_skin                = gui_get_skinfile("FBBG");
+  fbr.resource_name                  = fbr.window_title;
+  fbr.resource_class                 = "Xine";
 
-  fbp->select.x                     = gui_get_skinX("FBSelect");
-  fbp->select.y                     = gui_get_skinY("FBSelect");
-  fbp->select.caption               = "Select";
-  fbp->select.skin_filename         = gui_get_skinfile("FBSelect");
-  fbp->select.normal_color          = gui_get_ncolor("FBSelect");
-  fbp->select.focused_color         = gui_get_fcolor("FBSelect");
-  fbp->select.clicked_color         = gui_get_ccolor("FBSelect");
+  fbr.sort_default.x                 = gui_get_skinX("FBSortDef");
+  fbr.sort_default.y                 = gui_get_skinY("FBSortDef");
+  fbr.sort_default.skin_filename     = gui_get_skinfile("FBSortDef");
 
-  fbp->dismiss.x                    = gui_get_skinX("FBDismiss");
-  fbp->dismiss.y                    = gui_get_skinY("FBDismiss");
-  fbp->dismiss.caption              = "Dismiss";
-  fbp->dismiss.skin_filename        = gui_get_skinfile("FBDismiss");
-  fbp->dismiss.normal_color         = gui_get_ncolor("FBDismiss");
-  fbp->dismiss.focused_color        = gui_get_fcolor("FBDismiss");
-  fbp->dismiss.clicked_color        = gui_get_ccolor("FBDismiss");
+  fbr.sort_reverse.x                 = gui_get_skinX("FBSortRev");
+  fbr.sort_reverse.y                 = gui_get_skinY("FBSortRev");
+  fbr.sort_reverse.skin_filename     = gui_get_skinfile("FBSortRev");
 
-  bp->callback                      = sel_cb;
-  fbp->dndcallback                  = dnd_cb;
-  fbp->select.callback              = add_cb;
-  fbp->kill.callback                = file_browser_kill;
+  fbr.current_dir.x                  = gui_get_skinX("FBCurDir");
+  fbr.current_dir.y                  = gui_get_skinY("FBCurDir");
+  fbr.current_dir.skin_filename      = gui_get_skinfile("FBCurDir");
+  fbr.current_dir.max_length         = 50;
+  fbr.current_dir.cur_directory      = config_lookup_str("filebrowser_dir",
+							 (char *)get_homedir());
+  fbr.dndcallback                    = dnd_cb;
 
-  fbp->br_placement                 = bp;
+  fbr.homedir.x                      = gui_get_skinX("FBHome");
+  fbr.homedir.y                      = gui_get_skinY("FBHome");
+  fbr.homedir.caption                = "~/";
+  fbr.homedir.skin_filename          = gui_get_skinfile("FBHome");
+  fbr.homedir.normal_color           = gui_get_ncolor("FBHome");
+  fbr.homedir.focused_color          = gui_get_fcolor("FBHome");
+  fbr.homedir.clicked_color          = gui_get_ccolor("FBHome");
 
+  fbr.select.x                       = gui_get_skinX("FBSelect");
+  fbr.select.y                       = gui_get_skinY("FBSelect");
+  fbr.select.caption                 = "Select";
+  fbr.select.skin_filename           = gui_get_skinfile("FBSelect");
+  fbr.select.normal_color            = gui_get_ncolor("FBSelect");
+  fbr.select.focused_color           = gui_get_fcolor("FBSelect");
+  fbr.select.clicked_color           = gui_get_ccolor("FBSelect");
+  fbr.select.callback                = add_cb;
 
-  fb = filebrowser_create(gGui->display, gGui->imlib_data, 
-			  gGui->video_window, fbp);
+  fbr.dismiss.x                      = gui_get_skinX("FBDismiss");
+  fbr.dismiss.y                      = gui_get_skinY("FBDismiss");
+  fbr.dismiss.caption                = "Dismiss";
+  fbr.dismiss.skin_filename          = gui_get_skinfile("FBDismiss");
+  fbr.dismiss.normal_color           = gui_get_ncolor("FBDismiss");
+  fbr.dismiss.focused_color          = gui_get_fcolor("FBDismiss");
+  fbr.dismiss.clicked_color          = gui_get_ccolor("FBDismiss");
 
-  free(bp);
-  free(fbp);
+  fbr.kill.callback                  = file_browser_kill;
+
+  /* The browser */  
+  fbr.browser.display                = gGui->display;
+  fbr.browser.imlibdata              = gGui->imlib_data;
+
+  fbr.browser.arrow_up.x             = gui_get_skinX("FBUp");
+  fbr.browser.arrow_up.y             = gui_get_skinY("FBUp");
+  fbr.browser.arrow_up.skin_filename = gui_get_skinfile("FBUp");
+
+  fbr.browser.slider.x               = gui_get_skinX("FBSlidBG");
+  fbr.browser.slider.y               = gui_get_skinY("FBSlidBG");
+  fbr.browser.slider.skin_filename   = gui_get_skinfile("FBSlidBG");
+
+  fbr.browser.paddle.skin_filename   = gui_get_skinfile("FBSlidFG");
+
+  fbr.browser.arrow_dn.x             = gui_get_skinX("FBDn");
+  fbr.browser.arrow_dn.y             = gui_get_skinY("FBDn");
+  fbr.browser.arrow_dn.skin_filename = gui_get_skinfile("FBDn");
+
+  fbr.browser.browser.x              = gui_get_skinX("FBItemBtn");
+  fbr.browser.browser.y              = gui_get_skinY("FBItemBtn");
+  fbr.browser.browser.normal_color   = gui_get_ncolor("FBItemBtn");
+  fbr.browser.browser.focused_color  = gui_get_fcolor("FBItemBtn");
+  fbr.browser.browser.clicked_color  = gui_get_ccolor("FBItemBtn");
+  fbr.browser.browser.skin_filename  = gui_get_skinfile("FBItemBtn");
+  fbr.browser.browser.max_displayed_entries = MAX_LIST;
+  fbr.browser.browser.num_entries    = 0;
+  fbr.browser.browser.entries        = NULL;
+
+  fbr.browser.callback               = sel_cb;
+  fbr.browser.userdata               = NULL;
+
+  fb = filebrowser_create(&fbr);
+
 }
 
 #endif

@@ -33,6 +33,7 @@
 #include "button.h"
 #include "widget_types.h"
 
+#include "_xitk.h"
 /**
  *
  */
@@ -91,9 +92,9 @@ static int notify_click_button (widget_list_t *wl,
     
     if (bUp && private_data->bArmed) {
       bRepaint = paint_widget_list (wl);
-      if(private_data->function) {
-	private_data->function (private_data->bWidget, 
-				private_data->user_data);
+      if(private_data->callback) {
+	private_data->callback(private_data->bWidget, 
+			       private_data->userdata);
       }
     }
 
@@ -134,31 +135,30 @@ static int notify_focus_button (widget_list_t *wl, widget_t *b, int bEntered) {
 /*
  *
  */
-widget_t *button_create (Display *display, ImlibData *idata,
-			 int x, int y, void* f, void* ud, const char *skin) {
+widget_t *button_create (xitk_button_t *b) {
   widget_t              *mywidget;
   button_private_data_t *private_data;
-
+  
   mywidget = (widget_t *) gui_xmalloc (sizeof(widget_t));
-
+  
   private_data = (button_private_data_t *) gui_xmalloc(sizeof(button_private_data_t));
 
-  private_data->display   = display;
+  private_data->display   = b->display;
 
   private_data->bWidget   = mywidget;
   private_data->bClicked  = 0;
   private_data->bArmed    = 0;
-  private_data->skin      = gui_load_image(idata, skin);
-  private_data->function  = f;
-  private_data->user_data = ud;
+  private_data->skin      = gui_load_image(b->imlibdata, b->skin);
+  private_data->callback  = b->callback;
+  private_data->userdata  = b->userdata;
 
 
   mywidget->private_data = private_data;
 
   mywidget->enable       = 1;
 
-  mywidget->x            = x;
-  mywidget->y            = y;
+  mywidget->x            = b->x;
+  mywidget->y            = b->y;
   mywidget->width        = private_data->skin->width/3;
   mywidget->height       = private_data->skin->height;
   mywidget->widget_type  = WIDGET_TYPE_BUTTON;

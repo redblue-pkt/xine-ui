@@ -230,11 +230,12 @@ char *gui_get_skinfile(const char *str) {
  * Automatic place some image on GUI, if 'AutoPlace:' is found.
  */
 void gui_place_extra_images(widget_list_t *gui_widget_list) {
-  FILE *fd_read;
-  char skincfgfile[1024],
-    *skin, tmp2[256], skinfile[1024],
-    buf[256], *ln = buf, *oln;
-  int x, y;
+  FILE         *fd_read;
+  char          skincfgfile[1024];
+  char         *skin, tmp2[256], skinfile[1024];
+  char          buf[256], *ln = buf, *oln;
+  int           x, y;
+  xitk_image_t  im;
 
   skin = config_lookup_str("skin", "metal");
 
@@ -263,11 +264,14 @@ void gui_place_extra_images(widget_list_t *gui_widget_list) {
 	  strncpy(tmp2, ln, strlen(ln) - 1);
 	  tmp2[strlen(ln) - 1] = '\0';
 	  sprintf(skinfile, "%s/%s/%s", XINE_SKINDIR, skin, tmp2);
-	  gui_list_append_content (gui_widget_list->l, 
-				   image_create (gGui->display, 
-						 gGui->imlib_data, 
-						 x, y, skinfile));
-	  
+
+	  im.display = gGui->display;
+	  im.imlibdata = gGui->imlib_data;
+	  im.x = x;
+	  im.y = y;
+	  im.skin = skinfile;
+
+	  gui_list_append_content (gui_widget_list->l, image_create (&im));	  
 	}
       }
       ln = fgets(buf, 256, fd_read);

@@ -35,6 +35,8 @@
 #include "labelbutton.h"
 #include "widget_types.h"
 
+#include "_xitk.h"
+
 #define CLICK     1
 #define FOCUS     2
 #define NORMAL    3
@@ -238,16 +240,16 @@ static int notify_click_labelbutton (widget_list_t *wl, widget_t *lb,
       private_data->bState = !private_data->bState;
       bRepaint = paint_widget_list (wl);
       if(private_data->bType == RADIO_BUTTON) {
-	if(private_data->rbfunction) {
-	  private_data->rbfunction (private_data->bWidget, 
-				    private_data->user_data,
-				    private_data->bState);
+	if(private_data->state_callback) {
+	  private_data->state_callback(private_data->bWidget, 
+				       private_data->userdata,
+				       private_data->bState);
 	}
       }
       else if(private_data->bType == CLICK_BUTTON) {
-	if(private_data->function) {
-	  private_data->function (private_data->bWidget, 
-				  private_data->user_data);
+	if(private_data->callback) {
+	  private_data->callback(private_data->bWidget, 
+				 private_data->userdata);
 	}
       }
     }
@@ -388,11 +390,7 @@ void labelbutton_set_state(widget_t *lb, int state, Window win, GC gc) {
 /*
  * Create the labeled button
  */
-widget_t *label_button_create (Display *display, ImlibData *idata,
-			       int x, int y, int btype, const char *label, 
-			       void* f, void* ud, const char *skin,
- 			       const char *normcolor, const char *focuscolor, 
-			       const char *clickcolor) {
+widget_t *label_button_create (xitk_labelbutton_t *b) {
   widget_t               *mywidget;
   lbutton_private_data_t *private_data;
   
@@ -401,34 +399,34 @@ widget_t *label_button_create (Display *display, ImlibData *idata,
   private_data = (lbutton_private_data_t *) 
     gui_xmalloc (sizeof (lbutton_private_data_t));
 
-  private_data->display    = display;
+  private_data->display        = b->display;
 
-  private_data->bWidget    = mywidget;
-  private_data->bType      = btype;
-  private_data->bClicked   = 0;
-  private_data->bArmed     = 0;
-  private_data->bState     = 0;
-  private_data->bOldState  = 0;
-  private_data->skin       = gui_load_image(idata, skin);
-  private_data->function   = f;
-  private_data->rbfunction = f;
-  private_data->user_data  = ud;
-  private_data->label      = (label ? strdup(label) : "");
-  private_data->normcolor  = strdup(normcolor);
-  private_data->focuscolor = strdup(focuscolor);
-  private_data->clickcolor = strdup(clickcolor);
+  private_data->bWidget        = mywidget;
+  private_data->bType          = b->button_type;
+  private_data->bClicked       = 0;
+  private_data->bArmed         = 0;
+  private_data->bState         = 0;
+  private_data->bOldState      = 0;
+  private_data->skin           = gui_load_image(b->imlibdata, b->skin);
+  private_data->callback       = b->callback;
+  private_data->state_callback = b->state_callback;
+  private_data->userdata       = b->userdata;
+  private_data->label          = (b->label ? strdup(b->label) : "");
+  private_data->normcolor      = strdup(b->normcolor);
+  private_data->focuscolor     = strdup(b->focuscolor);
+  private_data->clickcolor     = strdup(b->clickcolor);
 
-  mywidget->private_data   = private_data;
+  mywidget->private_data       = private_data;
 
-  mywidget->enable         = 1;
-  mywidget->x              = x;
-  mywidget->y              = y;
-  mywidget->width          = private_data->skin->width/3;
-  mywidget->height         = private_data->skin->height;
-  mywidget->widget_type    = WIDGET_TYPE_LABELBUTTON;
-  mywidget->paint          = paint_labelbutton;
-  mywidget->notify_click   = notify_click_labelbutton;
-  mywidget->notify_focus   = notify_focus_labelbutton;
+  mywidget->enable             = 1;
+  mywidget->x                  = b->x;
+  mywidget->y                  = b->y;
+  mywidget->width              = private_data->skin->width/3;
+  mywidget->height             = private_data->skin->height;
+  mywidget->widget_type        = WIDGET_TYPE_LABELBUTTON;
+  mywidget->paint              = paint_labelbutton;
+  mywidget->notify_click       = notify_click_labelbutton;
+  mywidget->notify_focus       = notify_focus_labelbutton;
 
   return mywidget;
 }

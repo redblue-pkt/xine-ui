@@ -32,6 +32,7 @@
 #include "widget.h"
 #include "slider.h"
 #include "widget_types.h"
+#include "_xitk.h"
 
 #ifdef DEBUG_GUI
 #define COMPUTE_COORDS(X,Y)                                                \
@@ -172,14 +173,14 @@ static int notify_click_slider (widget_list_t *wl,
       /*
        * Exec motion callback function (if available)
        */
-      if(private_data->mfunction) {
+      if(private_data->motion_callback) {
 	if(private_data->realmin < 0)
 	  retpos = (private_data->realmin + private_data->pos);
 	else
 	  retpos = private_data->pos;
-	private_data->mfunction (private_data->sWidget,
-				 private_data->muser_data,
-				 retpos);
+	private_data->motion_callback(private_data->sWidget,
+				      private_data->motion_userdata,
+				      retpos);
       }
 
       /*
@@ -205,10 +206,10 @@ static int notify_click_slider (widget_list_t *wl,
 	  else
 	    retpos = private_data->pos;
 	  
- 	  if(private_data->mfunction) {
-	    private_data->mfunction (private_data->sWidget,
-				     private_data->muser_data,
-				     retpos);
+ 	  if(private_data->motion_callback) {
+	    private_data->motion_callback(private_data->sWidget,
+					  private_data->motion_userdata,
+					  retpos);
 	  }
 	  break;
 
@@ -224,10 +225,10 @@ static int notify_click_slider (widget_list_t *wl,
 	      retpos = (private_data->realmin + private_data->pos);
 	    else
 	      retpos = private_data->pos;
-	    if(private_data->function) {
-	      private_data->function (private_data->sWidget,
-				      private_data->user_data,
-				      retpos);
+	    if(private_data->callback) {
+	      private_data->callback(private_data->sWidget,
+				     private_data->userdata,
+				     retpos);
 	    }
 	  }
 	  else {
@@ -237,10 +238,10 @@ static int notify_click_slider (widget_list_t *wl,
 	    private_data->bArmed = 0;
 	    private_data->pos = original_pos;
 	    paint_slider(sl, wl->win, wl->gc);
-	    if(private_data->function && private_data->mfunction) {
-	      private_data->function (private_data->sWidget,
-				      private_data->user_data,
-				      private_data->pos);
+	    if(private_data->callback && private_data->motion_callback) {
+	      private_data->callback(private_data->sWidget,
+				     private_data->userdata,
+				     private_data->pos);
 	    }
 	  }
 	  break;
@@ -509,10 +510,7 @@ void slider_set_pos(widget_list_t *wl, widget_t *sl, int pos) {
 /*
  * Create the widget
  */
-widget_t *slider_create (Display *display, ImlibData *idata,
-			 int type, int x, int y, int min, int max, 
-			 int step, const char *bg, const char *paddle,
-			 void *fm, void *udm, void *f, void *ud) {
+widget_t *slider_create (xitk_slider_t *s) {
   widget_t                *mywidget;
   slider_private_data_t   *private_data;
 
@@ -520,60 +518,60 @@ widget_t *slider_create (Display *display, ImlibData *idata,
   private_data = (slider_private_data_t *) 
     gui_xmalloc (sizeof (slider_private_data_t));
 
-  private_data->display      = display;
+  private_data->display         = s->display;
   
-  private_data->sWidget      = mywidget;
-  private_data->sType        = type;
-  private_data->bClicked     = 0;
-  private_data->bArmed       = 0;
-  private_data->min          = min;
+  private_data->sWidget         = mywidget;
+  private_data->sType           = s->slider_type;
+  private_data->bClicked        = 0;
+  private_data->bArmed          = 0;
+  private_data->min             = s->min;
 
-  if(max <= min) 
-    private_data->max        = min+1;
+  if(s->max <= s->min) 
+    private_data->max           = s->min + 1;
   else
-    private_data->max        = max;
+    private_data->max           = s->max;
 
-  if(min < 0) {
-    private_data->realmin = min;
-    private_data->min = 0;
-    private_data->realmax = max;
-    private_data->max = max - min;
+  if(s->min < 0) {
+    private_data->realmin       = s->min;
+    private_data->min           = 0;
+    private_data->realmax       = s->max;
+    private_data->max           = s->max - s->min;
   }
   else
-    private_data->realmin = min;
+    private_data->realmin       = s->min;
   
-  private_data->pos          = 0;
-  private_data->step         = step;
-  private_data->paddle_skin  = gui_load_image(idata, paddle);
-  private_data->button_width = private_data->paddle_skin->width / 3;
+  private_data->pos             = 0;
+  private_data->step            = s->step;
+  private_data->paddle_skin     = gui_load_image(s->imlibdata, s->paddle_skin);
+  private_data->button_width    = private_data->paddle_skin->width / 3;
 
-  private_data->bg_skin      = gui_load_image(idata, bg);
+  private_data->bg_skin         = gui_load_image(s->imlibdata, s->background_skin);
 
-  if(type == HSLIDER)
-    private_data->ratio      = (float)(private_data->max - private_data->min)/private_data->bg_skin->width;
-  else if(type == VSLIDER)
-    private_data->ratio      = (float)(private_data->max - private_data->min)/private_data->bg_skin->height;
+  if(s->slider_type == HSLIDER)
+    private_data->ratio         = (float)(private_data->max - private_data->min)/private_data->bg_skin->width;
+  else if(s->slider_type == VSLIDER)
+    private_data->ratio         = (float)(private_data->max - private_data->min)/private_data->bg_skin->height;
   else
-    fprintf(stderr, "Unknown slider type (%d)\n", type);
+    fprintf(stderr, "Unknown slider type (%d)\n", s->slider_type);
 
-  private_data->mfunction    = fm;
-  private_data->muser_data   = udm;
-  private_data->function     = f;
-  private_data->user_data    = ud;
+  private_data->motion_callback = s->motion_callback;
+  private_data->motion_userdata = s->motion_userdata;
+  private_data->callback        = s->callback;
+  private_data->userdata        = s->userdata;
 
-  mywidget->private_data     = private_data;
+  mywidget->private_data        = private_data;
 
-  mywidget->enable           = 1;
+  mywidget->enable              = 1;
 
-  mywidget->x                = x;
-  mywidget->y                = y;
+  mywidget->x                   = s->x;
+  mywidget->y                   = s->y;
 
-  mywidget->width            = private_data->bg_skin->width;
-  mywidget->height           = private_data->bg_skin->height;
-  mywidget->widget_type      = WIDGET_TYPE_SLIDER;
-  mywidget->paint            = paint_slider;
-  mywidget->notify_click     = notify_click_slider;
-  mywidget->notify_focus     = notify_focus_slider;
+  mywidget->width               = private_data->bg_skin->width;
+  mywidget->height              = private_data->bg_skin->height;
+  mywidget->widget_type         = WIDGET_TYPE_SLIDER;
+  mywidget->paint               = paint_slider;
+  mywidget->notify_click        = notify_click_slider;
+  mywidget->notify_focus        = notify_focus_slider;
 
   return mywidget;
 }

@@ -27,6 +27,7 @@
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
+#include "_xitk.h"
 
 typedef struct {
   Display       *display;
@@ -47,8 +48,7 @@ typedef struct {
 /**
  * Create a label widget.
  */
-widget_t *label_create (Display *display, ImlibData *idata,
-			int x, int y, int length, const char *label, char *bg);
+widget_t *label_create (xitk_label_t *l);
 
 /**
  * Change label of wodget 'widget'.

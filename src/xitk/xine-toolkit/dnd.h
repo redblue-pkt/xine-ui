@@ -26,30 +26,29 @@
 
 #include <X11/Xlib.h>
 
+typedef void (*xitk_dnd_callback_t) (char *filename);
 
-typedef void (*dnd_callback_t) (char *filename);
-
-typedef struct DND_struct_s {
-  Display        *display;
-  Window          win;
+typedef struct {
+  Display             *display;
+  Window               win;
   
-  dnd_callback_t  callback;
+  xitk_dnd_callback_t  callback;
 
-  Atom           _XA_XdndAware;
-  Atom           _XA_XdndEnter;
-  Atom           _XA_XdndLeave;
-  Atom           _XA_XdndDrop;
-  Atom           _XA_XdndPosition;
-  Atom           _XA_XdndStatus;
-  Atom           _XA_XdndActionCopy;
-  Atom           _XA_XdndSelection;
-  Atom           _XA_XdndFinished;
-  Atom           _XA_XINE_XDNDEXCHANGE;
-  Atom           _XA_WM_DELETE_WINDOW;
-  Atom           atom_support;
-  Atom           version;
+  Atom                 _XA_XdndAware;
+  Atom                 _XA_XdndEnter;
+  Atom                 _XA_XdndLeave;
+  Atom                 _XA_XdndDrop;
+  Atom                 _XA_XdndPosition;
+  Atom                 _XA_XdndStatus;
+  Atom                 _XA_XdndActionCopy;
+  Atom                 _XA_XdndSelection;
+  Atom                 _XA_XdndFinished;
+  Atom                 _XA_XINE_XDNDEXCHANGE;
+  Atom                 _XA_WM_DELETE_WINDOW;
+  Atom                 atom_support;
+  Atom                 version;
 
-} DND_struct_t;
+} xitk_dnd_t;
 
 /*  void wXDNDInitializeAtoms(); */
 /*  Bool wXDNDProcessSelection(XEvent *event); */
@@ -100,16 +99,16 @@ typedef struct DND_struct_s {
 
 
 
-void dnd_init_dnd(Display *display, DND_struct_t *);
+void dnd_init_dnd(Display *display, xitk_dnd_t *);
 
-void dnd_make_window_aware (DND_struct_t *, Window);
+void dnd_make_window_aware (xitk_dnd_t *, Window);
 
 //Bool gui_accept_dnd(Window window);
 
-Bool dnd_process_client_message(DND_struct_t *, XEvent *);
+Bool dnd_process_client_message(xitk_dnd_t *, XEvent *);
 
 //typedef void (*gui_dnd_callback_t) (char *filename);
 
-void dnd_set_callback (DND_struct_t *, void *);
+void dnd_set_callback (xitk_dnd_t *, void *);
 
 #endif

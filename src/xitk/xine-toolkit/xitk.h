@@ -125,13 +125,20 @@ typedef struct widget_list_s {
   GC                   gc;
 } widget_list_t;
 
-typedef void (*dnd_callback_t) (char *filename);
 
-typedef struct DND_struct_s {
+typedef void (*xitk_simple_callback_t)(widget_t *, void *);
+typedef void (*xitk_state_callback_t)(widget_t *, void *, int);
+typedef void (*xitk_string_callback_t)(widget_t *, void *, const char *);
+typedef void (*xitk_dnd_callback_t) (char *filename);
+#ifdef NEED_MRLBROWSER
+typedef void (*xitk_mrl_callback_t)(widget_t *, void *, mrl_t *);
+#endif
+
+typedef struct {
   Display             *display;
   Window               win;
   
-  dnd_callback_t       callback;
+  xitk_dnd_callback_t  callback;
 
   Atom                 _XA_XdndAware;
   Atom                 _XA_XdndEnter;
@@ -146,7 +153,7 @@ typedef struct DND_struct_s {
   Atom                 _XA_WM_DELETE_WINDOW;
   Atom                 atom_support;
   Atom                 version;
-} DND_struct_t;
+} xitk_dnd_t;
 
 
 /* *******
@@ -201,7 +208,7 @@ void widget_change_window_for_event_handler (widgetkey_t key, Window window);
 widgetkey_t widget_register_event_handler(char *name, Window window,
 					  widget_cb_event_t cb,
 					  widget_cb_newpos_t pos_cb,
-					  dnd_callback_t dnd_cb,
+					  xitk_dnd_callback_t dnd_cb,
 					  widget_list_t *wl, void *user_data);
 
 /*
@@ -306,14 +313,27 @@ void widget_disable(widget_t *);
 /*  To handle an horizontal slider */
 #define HSLIDER 2
 
+typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
+  int                     x;
+  int                     y;
+  int                     slider_type;
+  int                     min;
+  int                     max;
+  int                     step;
+  const char             *background_skin;
+  const char             *paddle_skin;
+  xitk_state_callback_t   callback;
+  void                   *userdata;
+  xitk_state_callback_t   motion_callback;
+  void                   *motion_userdata;
+} xitk_slider_t;
+
 /**
  * Create a slider
  */
-widget_t *slider_create(Display *display, ImlibData *idata,
-			int type, int x, int y, int min, int max, 
-			int step, const char *bg, const char *paddle, 
-/* cb for motion      */void *fm, void *udm,
-/* cb for btn release */void *f, void *ud) ;
+widget_t *slider_create(xitk_slider_t *sl);
 
 /**
  * Get current position of paddle.
@@ -426,14 +446,26 @@ void gui_list_delete_current (gui_list_t *l);
  */
 #define CLICK_BUTTON 1
 #define RADIO_BUTTON 2
+typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
+  int                     x;
+  int                     y;
+  int                     button_type;
+  const char             *label;
+  xitk_simple_callback_t  callback;
+  xitk_state_callback_t   state_callback;
+  void                   *userdata;
+  const char             *skin;
+  const char             *normcolor;
+  const char             *focuscolor;
+  const char             *clickcolor;
+} xitk_labelbutton_t;
+
 /**
  * Create a labeled button.
  */
-widget_t *label_button_create(Display *display, ImlibData *idata,
-			      int x, int y, int btype, const char *label, 
-			      void* f, void* ud, const char *skin,
-			      const char *normcolor, const char *focuscolor, 
-			      const char *clickcolor);
+widget_t *label_button_create(xitk_labelbutton_t *b);
 
 /**
  * Change label of button 'widget'.
@@ -459,11 +491,20 @@ void labelbutton_set_state(widget_t *, int, Window, GC);
 /*
  * *** Labels
  */
+typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
+  int                     x;
+  int                     y;
+  int                     length;
+  const char             *label;
+  const char             *font;
+} xitk_label_t;
+
 /**
  * Create a label widget.
  */
-widget_t *label_create(Display *display, ImlibData *idata,
-		       int x, int y, int length, const char *label, char *bg);
+widget_t *label_create(xitk_label_t *l);
 
 /**
  * Change label of wodget 'widget'.
@@ -480,37 +521,53 @@ int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel);
  */
 gui_image_t *gui_load_image(ImlibData *idata, const char *image);
 
+typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
+  int                     x;
+  int                     y;
+  const char             *skin;
+} xitk_image_t;
+
 /**
  * Create an image widget type.
  */
-widget_t *image_create(Display *display, ImlibData *idata,
-		       int x, int y, const char *skin) ;
-
+widget_t *image_create(xitk_image_t *im);
 
 /*
  * *** DND
  */
-void dnd_init_dnd(Display *display, DND_struct_t *);
+void dnd_init_dnd(Display *display, xitk_dnd_t *);
 
-void dnd_make_window_aware (DND_struct_t *, Window);
+void dnd_make_window_aware (xitk_dnd_t *, Window);
 
-Bool dnd_process_client_message(DND_struct_t *, XEvent *);
+Bool dnd_process_client_message(xitk_dnd_t *, XEvent *);
 
-void dnd_set_callback (DND_struct_t *, void *);
+void dnd_set_callback (xitk_dnd_t *, void *);
 
 
 /*
  * *** Checkbox
  */
+typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
+  int                     x;
+  int                     y;
+  xitk_state_callback_t  callback;
+  void                   *userdata;
+  const char             *skin;
+} xitk_checkbox_t;
 /**
  * Create a checkbox.
  */
-widget_t *checkbox_create (Display *display, ImlibData *idata,
-			   int x, int y, void* f, void* ud, const char *skin) ;
+widget_t *checkbox_create (xitk_checkbox_t *cp);
+
 /**
  * get state of checkbox "widget".
  */
 int checkbox_get_state(widget_t *);
+
 /**
  * Set state of checkbox .
  */
@@ -522,8 +579,17 @@ void checkbox_set_state(widget_t *, int, Window, GC);
 /**
  * Create a button
  */
-widget_t *button_create (Display *display, ImlibData *idata,
-			 int x, int y, void* f, void* ud, const char *skin) ;
+typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
+  int                     x;
+  int                     y;
+  xitk_simple_callback_t  callback;
+  void                   *userdata;
+  const char             *skin;
+} xitk_button_t;
+
+widget_t *button_create (xitk_button_t *b);
 
 
 /*
@@ -535,56 +601,56 @@ widget_t *button_create (Display *display, ImlibData *idata,
 /* Default time (in ms) between mouse click to act as double click */
 #define DEFAULT_DBL_CLICK_TIME 200
 typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
 
   struct {
-    int               x;
-    int               y;
-    char             *skinfile;
+    int                   x;
+    int                   y;
+    char                 *skin_filename;
   } arrow_up;
   
   struct {
-    int               x;
-    int               y;
-    char             *skinfile;
+    int                   x;
+    int                   y;
+    char                 *skin_filename;
   } slider;
 
   struct {
-    char             *skinfile;
+    char                 *skin_filename;
   } paddle;
 
   struct {
-    int               x;
-    int               y;
-    char             *skinfile;
+    int                   x;
+    int                   y;
+    char                 *skin_filename;
   } arrow_dn;
 
   struct {
-    int               x;
-    int               y;
-    char             *norm_color;
-    char             *focused_color;
-    char             *clicked_color;
-    char             *skinfile;
+    int                   x;
+    int                   y;
+    char                 *normal_color;
+    char                 *focused_color;
+    char                 *clicked_color;
+    char                 *skin_filename;
     
-    int               max_displayed_entries;
+    int                   max_displayed_entries;
     
-    int               num_entries;
-    char            **entries;
+    int                   num_entries;
+    char                **entries;
   } browser;
   
+  int                     dbl_click_time;
+  xitk_state_callback_t   dbl_click_callback;
+
   /* Callback on selection function */
-  void            (*callback) (widget_t *, void *);
-  /* user data passed to callback */
-  void             *user_data;
+  xitk_simple_callback_t  callback;
+  void                   *userdata;
 
-  int               dbl_click_time;
-  void            (*dbl_click_cb) (widget_t *, int, void *);
-} browser_placements_t;
+  widget_list_t          *parent_wlist;
+} xitk_browser_t;
 
-widget_t *browser_create(Display *display, ImlibData *idata,
-			 /* The receiver list */
-			 widget_list_t *thelist, 
-			 browser_placements_t *bp);
+widget_t *browser_create(xitk_browser_t *b);
 
 /**
  * Redraw buttons/slider
@@ -611,80 +677,79 @@ void browser_release_all_buttons(widget_t *w);
  */
 int browser_get_current_start(widget_t *w);
 
-
 typedef struct {
-  
-  int                     x;
-  int                     y;
-  char                   *window_title;
-  char                   *bg_skinfile;
-  char                   *resource_name;
-  char                   *resource_class;
+  Display                   *display;
+  ImlibData                 *imlibdata;
+  Window                     window_trans;
+
+  int                        x;
+  int                        y;
+  char                      *window_title;
+  char                      *background_skin;
+  char                      *resource_name;
+  char                      *resource_class;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
+    int                      x;
+    int                      y;
+    char                    *skin_filename;
   } sort_default;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
+    int                      x;
+    int                      y;
+    char                    *skin_filename;
   } sort_reverse;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
-    int                   max_length;
-    char                 *cur_directory;
+    int                      x;
+    int                      y;
+    char                    *skin_filename;
+    int                      max_length;
+    char                    *cur_directory;
   } current_dir;
   
-  dnd_callback_t          dndcallback;
+  xitk_dnd_callback_t        dndcallback;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
+    int                      x;
+    int                      y;
+    char                    *caption;
+    char                    *skin_filename;
+    char                    *normal_color;
+    char                    *focused_color;
+    char                    *clicked_color;
   } homedir;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
-    void                (*callback) (widget_t *widget, void *data, const char *);
+    int                      x;
+    int                      y;
+    char                    *caption;
+    char                    *skin_filename;
+    char                    *normal_color;
+    char                    *focused_color;
+    char                    *clicked_color;
+    xitk_string_callback_t   callback;
   } select;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
+    int                      x;
+    int                      y;
+    char                    *caption;
+    char                    *skin_filename;
+    char                    *normal_color;
+    char                    *focused_color;
+    char                    *clicked_color;
   } dismiss;
 
   struct {
-    void                (*callback) (widget_t *widget, void *data);
+    xitk_simple_callback_t   callback;
   } kill;
  
-  browser_placements_t   *br_placement;
+  xitk_browser_t             browser;
+} xitk_filebrowser_t;
 
-} filebrowser_placements_t;
-
-widget_t *filebrowser_create(Display *display, ImlibData *idata,
-			     Window window_trans,
-			     filebrowser_placements_t *fbp);
+widget_t *filebrowser_create(xitk_filebrowser_t *fb);
 int filebrowser_is_running(widget_t *w);
 int filebrowser_is_visible(widget_t *w);
 void filebrowser_hide(widget_t *w);
@@ -694,85 +759,84 @@ void filebrowser_destroy(widget_t *w);
 char *filebrowser_get_current_dir(widget_t *w);
 int filebrowser_get_window_info(widget_t *w, window_info_t *inf);
 
-
 #ifdef NEED_MRLBROWSER
 
 typedef struct {
-  
-  int                     x;
-  int                     y;
-  char                   *window_title;
-  char                   *bg_skinfile;
-  char                   *resource_name;
-  char                   *resource_class;
+  Display                   *display;
+  ImlibData                 *imlibdata;
+  Window                     window_trans;
+
+  int                        x;
+  int                        y;
+  char                      *window_title;
+  char                      *background_skin;
+  char                      *resource_name;
+  char                      *resource_class;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
-    int                   max_length;
-    char                 *cur_origin;
+    int                      x;
+    int                      y;
+    char                    *skin_filename;
+    int                      max_length;
+    char                    *cur_origin;
   } origin;
   
-  dnd_callback_t          dndcallback;
+  xitk_dnd_callback_t        dndcallback;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
-    void                (*callback) (widget_t *widget, void *data, mrl_t *);
+    int                      x;
+    int                      y;
+    char                    *caption;
+    char                    *skin_filename;
+    char                    *normal_color;
+    char                    *focused_color;
+    char                    *clicked_color;
+    xitk_mrl_callback_t      callback;
   } select;
 
   struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
+    int                      x;
+    int                      y;
+    char                    *caption;
+    char                    *skin_filename;
+    char                    *normal_color;
+    char                    *focused_color;
+    char                    *clicked_color;
   } dismiss;
 
   struct {
-    void                (*callback) (widget_t *widget, void *data);
+    xitk_simple_callback_t   callback;
   } kill;
 
-  char                  **ip_availables;
-
+  char                     **ip_availables;
+  
   struct {
 
     struct {
-      int                 x;
-      int                 y;
-      char               *skin_filename;
-      char               *normal_color;
-      char               *focused_color;
-      char               *clicked_color;
+      int                    x;
+      int                    y;
+      char                  *skin_filename;
+      char                  *normal_color;
+      char                  *focused_color;
+      char                  *clicked_color;
     } button;
 
     struct {
-      int                 x;
-      int                 y;
-      char               *skin_filename;
-      char               *label_str;
+      int                    x;
+      int                    y;
+      char                  *skin_filename;
+      char                  *label_str;
     } label;
 
   } ip_name;
+  
+  xine_t                    *xine;
 
-  xine_t                 *xine;
+  xitk_browser_t             browser;
 
-  browser_placements_t   *br_placement;
+} xitk_mrlbrowser_t;
 
-} mrlbrowser_placements_t;
-
-widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
-			    Window window_trans,
-			    mrlbrowser_placements_t *fbp);
-
+widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb);
 int mrlbrowser_is_running(widget_t *w);
 int mrlbrowser_is_visible(widget_t *w);
 void mrlbrowser_hide(widget_t *w);

@@ -28,84 +28,35 @@
 
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
+#include "_xitk.h"
 
 #define DEFAULT_DBL_CLICK_TIME 200
 
 typedef struct {
-  widget_t    *itemlist;
-  int          sel;
-} btnlist_t;
 
-typedef struct {
+  Display                *display;
 
-  struct {
-    int               x;
-    int               y;
-    char             *skinfile;
-  } arrow_up;
-  
-  struct {
-    int               x;
-    int               y;
-    char             *skinfile;
-  } slider;
+  widget_t               *bWidget;
 
-  struct {
-    char             *skinfile;
-  } paddle;
+  widget_t               *item_tree[BROWSER_MAX_ENTRIES];
+  Window                  win;
+  GC                      gc;
 
-  struct {
-    int               x;
-    int               y;
-    char             *skinfile;
-  } arrow_dn;
+  char                  **content;
+  int                     max_length;
+  int                     list_length;
+  int                     current_start;
 
-  struct {
-    int               x;
-    int               y;
-    char             *norm_color;
-    char             *focused_color;
-    char             *clicked_color;
-    char             *skinfile;
-    
-    int               max_displayed_entries;
-    
-    int               num_entries;
-    char            **entries;
-  } browser;
-  
-  /* Callback on selection function */
-  void            (*callback) (widget_t *, void *);
-  /* user data passed to callback */
-  void             *user_data;
+  xitk_simple_callback_t  callback;
+  void                   *userdata;
 
-  int               dbl_click_time;
-  void            (*dbl_click_cb) (widget_t *, int, void *);
-} browser_placements_t;
+  int                     dbl_click_time;
+  xitk_state_callback_t   dbl_click_callback;
 
-typedef struct {
+  int                     last_button_clicked;
+  int                     current_button_clicked;
+  struct timeval          click_time;
 
-  Display       *display;
-
-  widget_t      *bWidget;
-
-  widget_t      *item_tree[BROWSER_MAX_ENTRIES];
-  Window         win;
-  GC             gc;
-
-  char         **content;
-  int            max_length;
-  int            list_length;
-  int            current_start;
-
-  void           (*function) (widget_t *, void *);
-  void          *user_data;
-
-  int            last_button_clicked;
-  int            current_button_clicked;
-  struct timeval click_time;
-  int            dbl_click_time;
-  void           (*dbl_click_cb) (widget_t *, int, void *);
 
 } browser_private_data_t;
 
@@ -114,9 +65,7 @@ typedef struct {
 /**
  * Create the list browser
  */
-widget_t *browser_create(Display *display, ImlibData *idata,
-			 /* The receiver list */
-			 widget_list_t *thelist, browser_placements_t *bp);
+widget_t *browser_create(xitk_browser_t *b);
 
 /**
  * Redraw buttons/slider

@@ -4,22 +4,22 @@
  * This file is part of xine, a unix video player.
  * 
  * xine is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- * 
- * xine is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
- *
- * $Id$
- *
- */
+  * it under the terms of the GNU General Public License as published by
+  * the Free Software Foundation; either version 2 of the License, or
+  * (at your option) any later version.
+  * 
+  * xine is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  * GNU General Public License for more details.
+  * 
+  * You should have received a copy of the GNU General Public License
+  * along with this program; if not, write to the Free Software
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+  *
+  * $Id$
+  *
+  */
 
 #ifndef HAVE_GUI_LBUTTON_H
 #define HAVE_GUI_LBUTTON_H
@@ -27,43 +27,40 @@
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
+#include "_xitk.h"
 
 #define CLICK_BUTTON 1
 #define RADIO_BUTTON 2
 
 typedef struct {
 
-  Display     *display;
-  widget_t    *bWidget;
-  int          bType;
-  int          bClicked;
-  int          bArmed;
-  int          bState;
-  int          bOldState;
-  gui_image_t *skin;
+  Display                *display;
+  widget_t               *bWidget;
+  int                     bType;
+  int                     bClicked;
+  int                     bArmed;
+  int                     bState;
+  int                     bOldState;
+  gui_image_t            *skin;
 
-  /* callback functions (active_widget, user_data [, state]) */
-  void         (*function) (widget_t *, void *);
-  void         (*rbfunction) (widget_t *, void *, int);
-  void         *user_data;
-
-  const char   *label;
-  const char   *normcolor;
-  const char   *focuscolor;
-  const char   *clickcolor;
+  xitk_simple_callback_t  callback;
+  xitk_state_callback_t   state_callback;
+   
+  void                   *userdata;
+   
+  const char             *label;
+  const char             *normcolor;
+  const char             *focuscolor;
+  const char             *clickcolor;
 
 } lbutton_private_data_t;
 
 /* ***************************************************************** */
 
-/**
- * Create a labeled button.
- */
-widget_t *label_button_create (Display *display, ImlibData *idata,
-			       int x, int y, int btype, const char *label, 
-			       void* f, void* ud, const char *skin,
- 			       const char *normcolor, const char *focuscolor, 
-			       const char *clickcolor);
+ /**
+  * Create a labeled button.
+  */
+widget_t *label_button_create (xitk_labelbutton_t *b);
 
 /**
  * Change label of button 'widget'.

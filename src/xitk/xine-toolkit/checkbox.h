@@ -26,18 +26,18 @@
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
+#include "_xitk.h"
 
 typedef struct {
-  Display     *display;
-  widget_t    *cWidget;
-  int          cClicked;
-  int          cArmed;
-  int          cState;
-  gui_image_t *skin;
+  Display               *display;
+  widget_t              *cWidget;
+  int                    cClicked;
+  int                    cArmed;
+  int                    cState;
+  gui_image_t           *skin;
 
-  /* callback function (active_widget, user_data, check state) */
-  void         (*function) (widget_t *, void *, int);
-  void         *user_data;
+  xitk_state_callback_t  callback;
+  void                  *userdata;
 
 } checkbox_private_data_t;
 
@@ -46,12 +46,13 @@ typedef struct {
 /**
  * Create a checkbox.
  */
-widget_t *checkbox_create (Display *display, ImlibData *idata,
-			   int x, int y, void* f, void* ud, const char *skin) ;
+widget_t *checkbox_create (xitk_checkbox_t *cb);
+
 /**
  * get state of checkbox "widget".
  */
 int checkbox_get_state(widget_t *);
+
 /**
  * Set state of checkbox .
  */

@@ -54,7 +54,8 @@ typedef struct {
   int                  screen;
   XColor               black;
   Pixmap               icon;
-  DND_struct_t         xdnd;
+
+  xitk_dnd_t           xdnd;
 
   ImlibData           *imlib_data;
 

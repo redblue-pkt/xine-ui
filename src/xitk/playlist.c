@@ -140,7 +140,7 @@ static void pl_play(widget_t *w, void *data) {
 /*
  * Start to play the selected stream on double click event in playlist.
  */
-static void pl_on_dbl_click(widget_t *w, int selected, void *data) {
+static void pl_on_dbl_click(widget_t *w, void *data, int selected) {
 
   if(gGui->playlist[selected] != NULL) {
     
@@ -503,7 +503,9 @@ void playlist_editor(void) {
   Atom                    prop;
   MWMHints                mwmhints;
   XClassHint             *xclasshint;
-  browser_placements_t   *bp;
+  xitk_browser_t          br;
+  xitk_labelbutton_t      lb;
+  xitk_label_t            lbl;
 
   /* This shouldn't be happend */
   if(playlist != NULL) {
@@ -593,151 +595,185 @@ void playlist_editor(void) {
   playlist->widget_list->pressedWidget = NULL;
   playlist->widget_list->win           = playlist->window;
   playlist->widget_list->gc            = gc;
+  
+  lb.display        = gGui->display;
+  lb.imlibdata      = gGui->imlib_data;
+
+  lbl.display       = gGui->display;
+  lbl.imlibdata     = gGui->imlib_data;
+
+  lb.x              = gui_get_skinX("PlMoveUp");
+  lb.y              = gui_get_skinY("PlMoveUp");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Move Up";
+  lb.callback       = pl_move_updown;
+  lb.state_callback = NULL;
+  lb.userdata       = (void *)MOVEUP;
+  lb.skin           = gui_get_skinfile("PlMoveUp");
+  lb.normcolor      = gui_get_ncolor("PlMoveUp");
+  lb.focuscolor     = gui_get_fcolor("PlMoveUp");
+  lb.clickcolor     = gui_get_ccolor("PlMoveUp");
 
   gui_list_append_content (playlist->widget_list->l, 
-			    label_button_create (gGui->display, 
-						gGui->imlib_data, 
-						gui_get_skinX("PlMoveUp"),
-						gui_get_skinY("PlMoveUp"),
-						CLICK_BUTTON, "Move Up",
-						pl_move_updown, (void*)MOVEUP, 
-						gui_get_skinfile("PlMoveUp"),
-						gui_get_ncolor("PlMoveUp"),
-						gui_get_fcolor("PlMoveUp"),
-						gui_get_ccolor("PlMoveUp")));
+			   label_button_create (&lb));
+
+  lb.x              = gui_get_skinX("PlMoveDn");
+  lb.y              = gui_get_skinY("PlMoveDn");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Move Dn";
+  lb.callback       = pl_move_updown;
+  lb.state_callback = NULL;
+  lb.userdata       = (void *)MOVEDN;
+  lb.skin           = gui_get_skinfile("PlMoveDn");
+  lb.normcolor      = gui_get_ncolor("PlMoveDn");
+  lb.focuscolor     = gui_get_fcolor("PlMoveDn");
+  lb.clickcolor     = gui_get_ccolor("PlMoveDn");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (gGui->display,
-						gGui->imlib_data, 
-						gui_get_skinX("PlMoveDn"),
-						gui_get_skinY("PlMoveDn"),
-						CLICK_BUTTON, "Move Dn",
-						pl_move_updown, (void*)MOVEDN, 
-						gui_get_skinfile("PlMoveDn"),
-						gui_get_ncolor("PlMoveDn"),
-						gui_get_fcolor("PlMoveDn"),
-						gui_get_ccolor("PlMoveDn")));
+			   label_button_create (&lb));
+
+  lb.x              = gui_get_skinX("PlPlay");
+  lb.y              = gui_get_skinY("PlPlay");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Play";
+  lb.callback       = pl_play;
+  lb.state_callback = NULL;
+  lb.userdata       = NULL;
+  lb.skin           = gui_get_skinfile("PlPlay");
+  lb.normcolor      = gui_get_ncolor("PlPlay");
+  lb.focuscolor     = gui_get_fcolor("PlPlay");
+  lb.clickcolor     = gui_get_ccolor("PlPlay");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (gGui->display,
-						gGui->imlib_data, 
-						gui_get_skinX("PlPlay"),
-						gui_get_skinY("PlPlay"),
-						CLICK_BUTTON, "Play",
-						pl_play, NULL, 
-						gui_get_skinfile("PlPlay"),
-						gui_get_ncolor("PlPlay"),
-						gui_get_fcolor("PlPlay"),
-						gui_get_ccolor("PlPlay")));
+			   label_button_create (&lb));
+
+  lb.x              = gui_get_skinX("PlDelete");
+  lb.y              = gui_get_skinY("PlDelete");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Delete";
+  lb.callback       = pl_delete;
+  lb.state_callback = NULL;
+  lb.userdata       = NULL;
+  lb.skin           = gui_get_skinfile("PlDelete");
+  lb.normcolor      = gui_get_ncolor("PlDelete");
+  lb.focuscolor     = gui_get_fcolor("PlDelete");
+  lb.clickcolor     = gui_get_ccolor("PlDelete");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (gGui->display,
-						gGui->imlib_data, 
-						gui_get_skinX("PlDelete"),
-						gui_get_skinY("PlDelete"),
-						CLICK_BUTTON, "Delete",
-						pl_delete, NULL, 
-						gui_get_skinfile("PlDelete"),
-						gui_get_ncolor("PlDelete"),
-						gui_get_fcolor("PlDelete"),
-						gui_get_ccolor("PlDelete")));
+			   label_button_create (&lb));
+
+  lb.x              = gui_get_skinX("PlDeleteAll");
+  lb.y              = gui_get_skinY("PlDeleteAll");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Delete All";
+  lb.callback       = pl_delete_all;
+  lb.state_callback = NULL;
+  lb.userdata       = NULL;
+  lb.skin           = gui_get_skinfile("PlDeleteAll");
+  lb.normcolor      = gui_get_ncolor("PlDeleteAll");
+  lb.focuscolor     = gui_get_fcolor("PlDeleteAll");
+  lb.clickcolor     = gui_get_ccolor("PlDeleteAll");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (gGui->display,
-						gGui->imlib_data, 
-						gui_get_skinX("PlDeleteAll"),
-						gui_get_skinY("PlDeleteAll"),
-						CLICK_BUTTON, "Delete All",
-						pl_delete_all, NULL, 
-						gui_get_skinfile("PlDeleteAll"),
-						gui_get_ncolor("PlDeleteAll"),
-						gui_get_fcolor("PlDeleteAll"),
-						gui_get_ccolor("PlDeleteAll")));
+			   label_button_create (&lb));
+
+  lb.x              = gui_get_skinX("PlAdd");
+  lb.y              = gui_get_skinY("PlAdd");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Add";
+  lb.callback       = open_mrlbrowser;
+  lb.state_callback = NULL;
+  lb.userdata       = NULL;
+  lb.skin           = gui_get_skinfile("PlAdd");
+  lb.normcolor      = gui_get_ncolor("PlAdd");
+  lb.focuscolor     = gui_get_fcolor("PlAdd");
+  lb.clickcolor     = gui_get_ccolor("PlAdd");
 
   gui_list_append_content (playlist->widget_list->l, 
-                           label_button_create (gGui->display,
-						gGui->imlib_data,
-						gui_get_skinX("PlAdd"), 
-                                                gui_get_skinY("PlAdd"), 
-                                                CLICK_BUTTON, "Add", 
-                                                open_mrlbrowser, NULL,  
-                                                gui_get_skinfile("PlAdd"), 
-                                                gui_get_ncolor("PlAdd"), 
-                                                gui_get_fcolor("PlAdd"), 
-                                                gui_get_ccolor("PlAdd")));
+                           label_button_create (&lb));
+
+  lb.x              = gui_get_skinX("PlLoad");
+  lb.y              = gui_get_skinY("PlLoad");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Load";
+  lb.callback       = pl_load_pl;
+  lb.state_callback = NULL;
+  lb.userdata       = NULL;
+  lb.skin           = gui_get_skinfile("PlLoad");
+  lb.normcolor      = gui_get_ncolor("PlLoad");
+  lb.focuscolor     = gui_get_fcolor("PlLoad");
+  lb.clickcolor     = gui_get_ccolor("PlLoad");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (gGui->display,
-						gGui->imlib_data, 
-						gui_get_skinX("PlLoad"),
-						gui_get_skinY("PlLoad"),
-						CLICK_BUTTON, "Load",
-						pl_load_pl, NULL, 
-						gui_get_skinfile("PlLoad"),
-						gui_get_ncolor("PlLoad"),
-						gui_get_fcolor("PlLoad"),
-						gui_get_ccolor("PlLoad")));
+			   label_button_create (&lb));
+
+  lb.x              = gui_get_skinX("PlSave");
+  lb.y              = gui_get_skinY("PlSave");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Save";
+  lb.callback       = pl_save_pl;
+  lb.state_callback = NULL;
+  lb.userdata       = NULL;
+  lb.skin           = gui_get_skinfile("PlSave");
+  lb.normcolor      = gui_get_ncolor("PlSave");
+  lb.focuscolor     = gui_get_fcolor("PlSave");
+  lb.clickcolor     = gui_get_ccolor("PlSave");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (gGui->display,
-						gGui->imlib_data, 
-						gui_get_skinX("PlSave"),
-						gui_get_skinY("PlSave"),
-						CLICK_BUTTON, "Save",
-						pl_save_pl, NULL, 
-						gui_get_skinfile("PlSave"),
-						gui_get_ncolor("PlSave"),
-						gui_get_fcolor("PlSave"),
-						gui_get_ccolor("PlSave")));
+			   label_button_create (&lb));
 
+  lb.x              = gui_get_skinX("PlDismiss");
+  lb.y              = gui_get_skinY("PlDismiss");
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = "Dismiss";
+  lb.callback       = pl_exit;
+  lb.state_callback = NULL;
+  lb.userdata       = NULL;
+  lb.skin           = gui_get_skinfile("PlDismiss");
+  lb.normcolor      = gui_get_ncolor("PlDismiss");
+  lb.focuscolor     = gui_get_fcolor("PlDismiss");
+  lb.clickcolor     = gui_get_ccolor("PlDismiss");
+  
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (gGui->display,
-						gGui->imlib_data, 
-						gui_get_skinX("PlDismiss"),
-						gui_get_skinY("PlDismiss"),
-						CLICK_BUTTON, "Dismiss",
-						pl_exit, NULL, 
-						gui_get_skinfile("PlDismiss"),
-						gui_get_ncolor("PlDismiss"),
-						gui_get_fcolor("PlDismiss"),
-						gui_get_ccolor("PlDismiss")));
+			   label_button_create (&lb));
 
-  bp = (browser_placements_t *) xmalloc(sizeof(browser_placements_t));
-  bp->arrow_up.x                    = gui_get_skinX("PlUp");
-  bp->arrow_up.y                    = gui_get_skinY("PlUp");
-  bp->arrow_up.skinfile             = gui_get_skinfile("PlUp");
-  bp->slider.x                      = gui_get_skinX("PlSlidBG");
-  bp->slider.y                      = gui_get_skinY("PlSlidBG");
-  bp->slider.skinfile               = gui_get_skinfile("PlSlidBG");
-  bp->paddle.skinfile               = gui_get_skinfile("PlSlidFG");
-  bp->arrow_dn.x                    = gui_get_skinX("PlDn");
-  bp->arrow_dn.y                    = gui_get_skinY("PlDn");
-  bp->arrow_dn.skinfile             = gui_get_skinfile("PlDn");
-  bp->browser.x                     = gui_get_skinX("PlItemBtn");
-  bp->browser.y                     = gui_get_skinY("PlItemBtn");
-  bp->browser.norm_color            = gui_get_ncolor("PlItemBtn");
-  bp->browser.focused_color         = gui_get_fcolor("PlItemBtn");
-  bp->browser.clicked_color         = gui_get_ccolor("PlItemBtn");
-  bp->browser.skinfile              = gui_get_skinfile("PlItemBtn");
-  bp->browser.max_displayed_entries = 9;
-  bp->browser.num_entries           = gGui->playlist_num;
-  bp->browser.entries               = gGui->playlist;
-  bp->callback                      = handle_selection;
-  bp->dbl_click_cb                  = pl_on_dbl_click;
+  br.display                       = gGui->display;
+  br.imlibdata                     = gGui->imlib_data;
+  br.arrow_up.x                    = gui_get_skinX("PlUp");
+  br.arrow_up.y                    = gui_get_skinY("PlUp");
+  br.arrow_up.skin_filename        = gui_get_skinfile("PlUp");
+  br.slider.x                      = gui_get_skinX("PlSlidBG");
+  br.slider.y                      = gui_get_skinY("PlSlidBG");
+  br.slider.skin_filename          = gui_get_skinfile("PlSlidBG");
+  br.paddle.skin_filename          = gui_get_skinfile("PlSlidFG");
+  br.arrow_dn.x                    = gui_get_skinX("PlDn");
+  br.arrow_dn.y                    = gui_get_skinY("PlDn");
+  br.arrow_dn.skin_filename        = gui_get_skinfile("PlDn");
+  br.browser.x                     = gui_get_skinX("PlItemBtn");
+  br.browser.y                     = gui_get_skinY("PlItemBtn");
+  br.browser.normal_color          = gui_get_ncolor("PlItemBtn");
+  br.browser.focused_color         = gui_get_fcolor("PlItemBtn");
+  br.browser.clicked_color         = gui_get_ccolor("PlItemBtn");
+  br.browser.skin_filename         = gui_get_skinfile("PlItemBtn");
+  br.browser.max_displayed_entries = 9;
+  br.browser.num_entries           = gGui->playlist_num;
+  br.browser.entries               = gGui->playlist;
+  br.callback                      = handle_selection;
+  br.dbl_click_callback            = pl_on_dbl_click;
+  br.parent_wlist                  = playlist->widget_list;
 
   gui_list_append_content (playlist->widget_list->l, 
 			   (playlist->playlist = 
-			    browser_create(gGui->display,
-					   gGui->imlib_data,
-					   playlist->widget_list,
-					   bp)));
+			    browser_create(&br)));
 
+  lbl.x      = gui_get_skinX("AutoPlayLbl");
+  lbl.y      = gui_get_skinY("AutoPlayLbl");
+  lbl.length = 9;
+  lbl.label  = "Scan for:";
+  lbl.font   = gui_get_skinfile("AutoPlayLbl");
+  
   gui_list_append_content (playlist->widget_list->l,
-			   label_create (gGui->display, gGui->imlib_data, 
-					 gui_get_skinX("AutoPlayLbl"),
-					 gui_get_skinY("AutoPlayLbl"),
-					 9, "Scan for:",
-					 gui_get_skinfile("AutoPlayLbl")));
+			   label_create (&lbl));
   
   {
     int x, y;
@@ -749,17 +785,22 @@ void playlist_editor(void) {
     y = gui_get_skinY("AutoPlayBG");
     
     while(autoplay_plugins[i] != NULL) {
+
+      lb.x              = x;
+      lb.y              = y;
+      lb.button_type    = CLICK_BUTTON;
+      lb.label          = autoplay_plugins[i];
+      lb.callback       = pl_scan_input;
+      lb.state_callback = NULL;
+      lb.userdata       = NULL;
+      lb.skin           = gui_get_skinfile("AutoPlayBG");
+      lb.normcolor      = gui_get_ncolor("AutoPlayBG");
+      lb.focuscolor     = gui_get_fcolor("AutoPlayBG");
+      lb.clickcolor     = gui_get_ccolor("AutoPlayBG");
+
       gui_list_append_content (playlist->widget_list->l,
-	       (tmp =
-		label_button_create (gGui->display, gGui->imlib_data, 
-				     x, y,
-				     CLICK_BUTTON,
-				     autoplay_plugins[i],
-				     pl_scan_input, NULL, 
-				     gui_get_skinfile("AutoPlayBG"),
-				     gui_get_ncolor("AutoPlayBG"),
-				     gui_get_fcolor("AutoPlayBG"),
-				     gui_get_ccolor("AutoPlayBG"))));
+	       (tmp = label_button_create (&lb)));
+
       y += widget_get_height(tmp) + 1;
       i++;
     }

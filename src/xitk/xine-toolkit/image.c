@@ -31,7 +31,7 @@
 #include "widget.h"
 #include "image.h"
 #include "widget_types.h"
-
+#include "_xitk.h"
 /*
  *
  */
@@ -86,8 +86,7 @@ static void paint_image (widget_t *i,  Window win, GC gc) {
 /*
  *
  */
-widget_t *image_create (Display *display, ImlibData *idata,
-			int x, int y, const char *skin) {
+widget_t *image_create (xitk_image_t *im) {
   widget_t              *mywidget;
   image_private_data_t *private_data;
 
@@ -96,16 +95,16 @@ widget_t *image_create (Display *display, ImlibData *idata,
   private_data = (image_private_data_t *) 
     gui_xmalloc (sizeof (image_private_data_t));
 
-  private_data->display   = display;
+  private_data->display   = im->display;
 
   private_data->bWidget   = mywidget;
-  private_data->skin      = gui_load_image(idata, skin);
+  private_data->skin      = gui_load_image(im->imlibdata, im->skin);
 
   mywidget->private_data  = private_data;
 
   mywidget->enable        = 1;
-  mywidget->x             = x;
-  mywidget->y             = y;
+  mywidget->x             = im->x;
+  mywidget->y             = im->y;
   mywidget->width         = private_data->skin->width;
   mywidget->height        = private_data->skin->height;
   mywidget->widget_type   = WIDGET_TYPE_IMAGE;

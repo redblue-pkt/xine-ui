@@ -31,6 +31,7 @@
 #include "widget.h"
 #include "dnd.h"
 #include "browser.h"
+#include "_xitk.h"
 
 #define MAXFILES      65535
 
@@ -52,76 +53,6 @@ typedef struct {
 
   int                    sort_order;
 } file_contents_t;
-
-typedef struct {
-  
-  int                     x;
-  int                     y;
-  char                   *window_title;
-  char                   *bg_skinfile;
-  char                   *resource_name;
-  char                   *resource_class;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
-  } sort_default;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
-  } sort_reverse;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
-    int                   max_length;
-    char                 *cur_directory;
-  } current_dir;
-  
-  dnd_callback_t          dndcallback;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
-  } homedir;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
-    void                (*callback) (widget_t *widget, void *data, const char *);
-  } select;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
-  } dismiss;
-
-  struct {
-    void                (*callback) (widget_t *widget, void *data);
-  } kill;
- 
-  browser_placements_t   *br_placement;
-
-} filebrowser_placements_t;
 
 typedef struct {
   int                    sort;
@@ -152,17 +83,15 @@ typedef struct {
 
   widget_t               *fb_list; /*  Browser list widget */
 
-  sort_param_t           sort_default;
-  sort_param_t           sort_reverse;
+  sort_param_t            sort_default;
+  sort_param_t            sort_reverse;
 
-  void                  (*add_callback) (widget_t *widget, void *data, const char *filename);
-  void                  (*kill_callback) (widget_t *widget, void *data);
+  xitk_string_callback_t  add_callback;
+  xitk_simple_callback_t  kill_callback;
 
 } filebrowser_private_data_t;
 
-widget_t *filebrowser_create(Display *display, ImlibData *idata,
-			     Window window_trans,
-			     filebrowser_placements_t *fbp);
+widget_t *filebrowser_create(xitk_filebrowser_t *fb);
 
 int filebrowser_is_running(widget_t *w);
 int filebrowser_is_visible(widget_t *w);

@@ -32,6 +32,7 @@
 #include "image.h"
 #include "checkbox.h"
 #include "widget_types.h"
+#include "_xitk.h"
 
 /*
  *
@@ -98,10 +99,10 @@ static int notify_click_checkbox (widget_list_t *wl, widget_t *c,
     if (cUp && private_data->cArmed) {
       private_data->cState = !private_data->cState;
       bRepaint = paint_widget_list (wl);
-      if(private_data->function) {
-	private_data->function (private_data->cWidget, 
-				private_data->user_data,
-				private_data->cState);
+      if(private_data->callback) {
+	private_data->callback(private_data->cWidget, 
+			       private_data->userdata,
+			       private_data->cState);
       }
     }
     if(!bRepaint) 
@@ -187,8 +188,7 @@ void checkbox_set_state(widget_t *c, int state, Window win, GC gc) {
 /*
  *
  */
-widget_t *checkbox_create (Display *display, ImlibData *idata,
-			   int x, int y, void* f, void* ud, const char *skin) {
+widget_t *checkbox_create (xitk_checkbox_t *cb) {
   widget_t *mywidget;
   checkbox_private_data_t *private_data;
 
@@ -197,21 +197,21 @@ widget_t *checkbox_create (Display *display, ImlibData *idata,
   private_data = (checkbox_private_data_t *) 
     gui_xmalloc (sizeof (checkbox_private_data_t));
 
-  private_data->display   = display;
+  private_data->display   = cb->display;
 
   private_data->cWidget   = mywidget;
   private_data->cClicked  = 0;
   private_data->cState    = 0;
   private_data->cArmed    = 0;
-  private_data->skin      = gui_load_image(idata, skin);
-  private_data->function  = f;
-  private_data->user_data = ud;
+  private_data->skin      = gui_load_image(cb->imlibdata, cb->skin);
+  private_data->callback  = cb->callback;
+  private_data->userdata  = cb->userdata;
 
   mywidget->private_data = private_data;
 
   mywidget->enable       = 1;
-  mywidget->x            = x;
-  mywidget->y            = y;
+  mywidget->x            = cb->x;
+  mywidget->y            = cb->y;
   mywidget->width        = private_data->skin->width/3;
   mywidget->height       = private_data->skin->height;
   mywidget->widget_type  = WIDGET_TYPE_CHECKBOX;

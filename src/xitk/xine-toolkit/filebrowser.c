@@ -37,7 +37,6 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include "_xitk.h"
 #include "filebrowser.h"
 #include "browser.h"
 #include "label.h"
@@ -46,6 +45,8 @@
 #include "dnd.h"
 #include "widget.h"
 #include "widget_types.h"
+
+#include "_xitk.h"
 
 extern int errno;
 
@@ -850,7 +851,7 @@ static void filebrowser_select(widget_t *w, void *data) {
 /*
  * Handle double click in labelbutton list.
  */
-static void handle_dbl_click(widget_t *w, int selected, void *data) {
+static void handle_dbl_click(widget_t *w, void *data, int selected) {
   filebrowser_private_data_t *private_data = (filebrowser_private_data_t *)data;
 
   filebrowser_select_entry(private_data, selected);
@@ -905,117 +906,122 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
 /*
  * Create file browser window
  */
-widget_t *filebrowser_create(Display *display, ImlibData *idata,
-			     Window window_trans,
-			     filebrowser_placements_t *fbp) {
-  GC                      gc;
-  XSizeHints              hint;
-  XSetWindowAttributes    attr;
-  char                   *title = fbp->window_title;
-  Atom                    prop;
-  MWMHints                mwmhints;
-  XWMHints               *wm_hint;
-  XClassHint             *xclasshint;
-  XColor                  black, dummy;
-  int                     screen;
-  widget_t               *mywidget;
-  
+widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
+  GC                          gc;
+  XSizeHints                  hint;
+  XSetWindowAttributes        attr;
+  char                       *title = fb->window_title;
+  Atom                        prop;
+  MWMHints                    mwmhints;
+  XWMHints                   *wm_hint;
+  XClassHint                 *xclasshint;
+  XColor                      black, dummy;
+  int                         screen;
+  widget_t                   *mywidget;
+  xitk_button_t               b;
+  xitk_labelbutton_t          lb;
+  xitk_label_t                lbl;
   filebrowser_private_data_t *private_data;
   
   mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
 
-  private_data = (filebrowser_private_data_t *) 
+  private_data                 = (filebrowser_private_data_t *) 
     gui_xmalloc(sizeof(filebrowser_private_data_t));
 
-  mywidget->private_data = private_data;
+  mywidget->private_data       = private_data;
 
-  private_data->fbWidget = mywidget;
+  private_data->fbWidget       = mywidget;
 
-  private_data->display  = display;
+  private_data->display        = fb->display;
 
-  private_data->running  = 1;
+  private_data->running        = 1;
 
-  XLOCK(display);
+  XLOCK(fb->display);
 
-  if(!(private_data->bg_image = Imlib_load_image(idata, fbp->bg_skinfile))) {
+  if(!(private_data->bg_image  = Imlib_load_image(fb->imlibdata, 
+						  fb->background_skin))) {
     fprintf(stderr, "%s(%d): couldn't find image for background\n",
 	    __FILE__, __LINE__);
-
-    XUNLOCK(display);
+    
+    XUNLOCK(fb->display);
     return NULL;
   }
 
-  private_data->fc = (file_contents_t *) gui_xmalloc(sizeof(file_contents_t));
+  private_data->fc             = (file_contents_t *)
+    gui_xmalloc(sizeof(file_contents_t));
   private_data->fc->sort_order = DEFAULT_SORT;
 
-  hint.x      = fbp->x;
-  hint.y      = fbp->y;
-  hint.width  = private_data->bg_image->rgb_width;
-  hint.height = private_data->bg_image->rgb_height;
-  hint.flags  = PPosition | PSize;
+  hint.x                       = fb->x;
+  hint.y                       = fb->y;
+  hint.width                   = private_data->bg_image->rgb_width;
+  hint.height                  = private_data->bg_image->rgb_height;
+  hint.flags                   = PPosition | PSize;
 
-  screen = DefaultScreen(display);
+  screen                       = DefaultScreen(fb->display);
 
-  XAllocNamedColor(display, 
-                   DefaultColormap(display, screen), 
+  XAllocNamedColor(fb->display, 
+                   DefaultColormap(fb->display, screen), 
                    "black", &black, &dummy);
 
-  attr.override_redirect = True;
-  attr.background_pixel  = black.pixel;
-  attr.border_pixel      = 1;
-  attr.colormap  = XCreateColormap(display,
-				   RootWindow(display, screen),
-				   idata->x.visual, AllocNone);
+  attr.override_redirect       = True;
+  attr.background_pixel        = black.pixel;
+  attr.border_pixel            = 1;
+  attr.colormap                = XCreateColormap(fb->display,
+						 RootWindow(fb->display,
+							    screen),
+						 fb->imlibdata->x.visual,
+						 AllocNone);
   
   private_data->window = 
-    XCreateWindow (display, DefaultRootWindow(display), 
+    XCreateWindow (fb->display, DefaultRootWindow(fb->display), 
 		   hint.x, hint.y, hint.width, 
 		   hint.height, 0, 
-		   idata->x.depth, 
+		   fb->imlibdata->x.depth, 
 		   CopyFromParent, 
-		   idata->x.visual,
+		   fb->imlibdata->x.visual,
 		   CWBackPixel | CWBorderPixel | CWColormap, &attr);
   
-  XSetStandardProperties(display, private_data->window, title, title,
+  XSetStandardProperties(fb->display, private_data->window, title, title,
 			 None, NULL, 0, &hint);
 
-  XSelectInput(display, private_data->window,
+  XSelectInput(fb->display, private_data->window,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
   /*
    * wm, no border please
    */
-  prop = XInternAtom(display, "_MOTIF_WM_HINTS", True);
-  mwmhints.flags = MWM_HINTS_DECORATIONS;
+  prop                 = XInternAtom(fb->display, "_MOTIF_WM_HINTS", True);
+  mwmhints.flags       = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
   
-  XChangeProperty(display, private_data->window, prop, prop, 32,
+  XChangeProperty(fb->display, private_data->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);						
-  if(window_trans != None)
-    XSetTransientForHint (display, private_data->window, window_trans);
-
+  if(fb->window_trans != None)
+    XSetTransientForHint (fb->display, private_data->window, fb->window_trans);
+  
   /* set xclass */
   
   if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = fbp->resource_name ? fbp->resource_name : "xitk file browser";
-    xclasshint->res_class = fbp->resource_class ? fbp->resource_class : "xitk";
-    XSetClassHint(display, private_data->window, xclasshint);
+    xclasshint->res_name = fb->resource_name ? fb->resource_name : "xitk file browser";
+    xclasshint->res_class = fb->resource_class ? fb->resource_class : "xitk";
+    XSetClassHint(fb->display, private_data->window, xclasshint);
   }
   
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
-    wm_hint->input = True;
+    wm_hint->input         = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->flags = InputHint | StateHint;
-    XSetWMHints(display, private_data->window, wm_hint);
+    wm_hint->flags         = InputHint | StateHint;
+    XSetWMHints(fb->display, private_data->window, wm_hint);
     XFree(wm_hint);
   }
   
-  gc = XCreateGC(display, private_data->window, 0, 0);
+  gc = XCreateGC(fb->display, private_data->window, 0, 0);
   
-  Imlib_apply_image(idata, private_data->bg_image, private_data->window);
+  Imlib_apply_image(fb->imlibdata, 
+		    private_data->bg_image, private_data->window);
 
   private_data->widget_list                = widget_list_new() ;
   private_data->widget_list->l             = gui_list_new ();
@@ -1024,89 +1030,108 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
   private_data->widget_list->win           = private_data->window;
   private_data->widget_list->gc            = gc;
   
-  gui_list_append_content (private_data->widget_list->l,
-	   label_button_create (display, 
-				idata, 
-				fbp->homedir.x,
-				fbp->homedir.y,
-				CLICK_BUTTON,
-				fbp->homedir.caption,
-				filebrowser_homedir, (void*)private_data,
-				fbp->homedir.skin_filename,
-				fbp->homedir.normal_color,
-				fbp->homedir.focused_color,
-				fbp->homedir.clicked_color));
+  lb.display        = fb->display;
+  lb.imlibdata      = fb->imlibdata;
+  lb.x              = fb->homedir.x;
+  lb.y              = fb->homedir.y;
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = fb->homedir.caption;
+  lb.callback       = filebrowser_homedir;
+  lb.state_callback = NULL;
+  lb.userdata       = (void *)private_data;
+  lb.skin           = fb->homedir.skin_filename;
+  lb.normcolor      = fb->homedir.normal_color;
+  lb.focuscolor     = fb->homedir.focused_color;
+  lb.clickcolor     = fb->homedir.clicked_color;
+      
+  gui_list_append_content(private_data->widget_list->l,
+			  label_button_create (&lb));
 
-  gui_list_append_content (private_data->widget_list->l,
-	   label_button_create (display, 
-				idata,
-				fbp->select.x,
-				fbp->select.y,
-				CLICK_BUTTON,
-				fbp->select.caption,
-				filebrowser_select, (void*)private_data,
-				fbp->select.skin_filename,
-				fbp->select.normal_color,
-				fbp->select.focused_color,
-				fbp->select.clicked_color));
+  lb.display        = fb->display;
+  lb.imlibdata      = fb->imlibdata;
+  lb.x              = fb->select.x;
+  lb.y              = fb->select.y;
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = fb->select.caption;
+  lb.callback       = filebrowser_select;
+  lb.state_callback = NULL;
+  lb.userdata       = (void *)private_data;
+  lb.skin           = fb->select.skin_filename;
+  lb.normcolor      = fb->select.normal_color;
+  lb.focuscolor     = fb->select.focused_color;
+  lb.clickcolor     = fb->select.clicked_color;
 
-  gui_list_append_content (private_data->widget_list->l,
-	   label_button_create (display,
-				idata,
-				fbp->dismiss.x,
-				fbp->dismiss.y,
-				CLICK_BUTTON,
-				fbp->dismiss.caption,
-				filebrowser_exit, (void*)mywidget,
-				fbp->dismiss.skin_filename,
-				fbp->dismiss.normal_color,
-				fbp->dismiss.focused_color,
-				fbp->dismiss.clicked_color));
+  gui_list_append_content(private_data->widget_list->l,
+			  label_button_create (&lb));
+
+  lb.display        = fb->display;
+  lb.imlibdata      = fb->imlibdata;
+  lb.x              = fb->dismiss.x;
+  lb.y              = fb->dismiss.y;
+  lb.button_type    = CLICK_BUTTON;
+  lb.label          = fb->dismiss.caption;
+  lb.callback       = filebrowser_exit;
+  lb.state_callback = (void *)mywidget;
+  lb.userdata       = (void *)private_data;
+  lb.skin           = fb->dismiss.skin_filename;
+  lb.normcolor      = fb->dismiss.normal_color;
+  lb.focuscolor     = fb->dismiss.focused_color;
+  lb.clickcolor     = fb->dismiss.clicked_color;
+
+  gui_list_append_content(private_data->widget_list->l,
+			  label_button_create (&lb));
   
-  private_data->add_callback = fbp->select.callback;
-  private_data->kill_callback = fbp->kill.callback;
+  private_data->add_callback      = fb->select.callback;
+  private_data->kill_callback     = fb->kill.callback;
 
-  fbp->br_placement->dbl_click_cb = handle_dbl_click;
-  fbp->br_placement->user_data = (void *)private_data;
+  fb->browser.dbl_click_callback = handle_dbl_click;
+  fb->browser.userdata           = (void *)private_data;
+  fb->browser.parent_wlist       = private_data->widget_list;
+  gui_list_append_content(private_data->widget_list->l,
+			  (private_data->fb_list = 
+			   browser_create(&fb->browser)));
 
-  gui_list_append_content (private_data->widget_list->l,
-			   (private_data->fb_list = 
-			    browser_create(display, idata, 
-					   private_data->widget_list,
-					   fbp->br_placement)));
-
+  b.display   = fb->display;
+  b.imlibdata = fb->imlibdata;
+  b.x         = fb->sort_default.x;
+  b.y         = fb->sort_default.y;
+  b.callback  = filebrowser_sortfiles;
+  b.userdata  = (void*)&private_data->sort_default;
+  b.skin      = fb->sort_default.skin_filename;
+  
   private_data->sort_default.sort = DEFAULT_SORT;
-  private_data->sort_default.w = mywidget;
+  private_data->sort_default.w    = mywidget;
   gui_list_append_content (private_data->widget_list->l, 
-			   button_create (display, idata,
-					  fbp->sort_default.x,
-					  fbp->sort_default.y,
-					  filebrowser_sortfiles,
-					  (void*)&private_data->sort_default,
-					  fbp->sort_default.skin_filename));
+			   button_create (&b));
+  
+  b.display   = fb->display;
+  b.imlibdata = fb->imlibdata;
+  b.x         = fb->sort_reverse.x;
+  b.y         = fb->sort_reverse.y;
+  b.callback  = filebrowser_sortfiles;
+  b.userdata  = (void*)&private_data->sort_reverse;
+  b.skin      = fb->sort_reverse.skin_filename;
   
   private_data->sort_reverse.sort = REVERSE_SORT;
-  private_data->sort_reverse.w = mywidget;
+  private_data->sort_reverse.w    = mywidget;
   gui_list_append_content (private_data->widget_list->l, 
-			   button_create (display, idata,
-					  fbp->sort_reverse.x,
-					  fbp->sort_reverse.y,
-					  filebrowser_sortfiles,
-					  (void*)&private_data->sort_reverse, 
-					  fbp->sort_reverse.skin_filename));
+			   button_create (&b));
+  
+  lbl.display   = fb->display;
+  lbl.imlibdata = fb->imlibdata;
+  lbl.x         = fb->current_dir.x;
+  lbl.y         = fb->current_dir.y;
+  lbl.length    = fb->current_dir.max_length;
+  lbl.label     = fb->current_dir.cur_directory;
+  lbl.font      = fb->current_dir.skin_filename;
 
   gui_list_append_content (private_data->widget_list->l,
 			   (private_data->widget_current_dir = 
-			    label_create (display, idata,
-					  fbp->current_dir.x,
-					  fbp->current_dir.y,
-					  fbp->current_dir.max_length,
-					  fbp->current_dir.cur_directory, 
-					  fbp->current_dir.skin_filename)));
+			    label_create (&lbl)));
   
 
-  if(fbp->current_dir.cur_directory) {
-    sprintf(private_data->current_dir, "%s", fbp->current_dir.cur_directory);
+  if(fb->current_dir.cur_directory) {
+    sprintf(private_data->current_dir, "%s", fb->current_dir.cur_directory);
     
     if((is_a_dir(private_data->current_dir) != 1)
        || (strlen(private_data->current_dir) == 0))
@@ -1115,11 +1140,11 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
   else
     sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
   
-  private_data->visible = 1;
+  private_data->visible    = 1;
 
   mywidget->enable         = 1;
-  mywidget->x              = fbp->x;
-  mywidget->y              = fbp->y;
+  mywidget->x              = fb->x;
+  mywidget->y              = fb->y;
   mywidget->width          = private_data->bg_image->width;
   mywidget->height         = private_data->bg_image->height;
   mywidget->widget_type    = WIDGET_TYPE_FILEBROWSER | WIDGET_TYPE_GROUP;
@@ -1133,19 +1158,19 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
 		      private_data->fc->dir_disp_contents,
 		      private_data->dir_contents_num, 0);
 
-  XMapRaised(display, private_data->window); 
+  XMapRaised(fb->display, private_data->window); 
 
   private_data->widget_key = 
     widget_register_event_handler("file browser",
 				  private_data->window, 
 				  filebrowser_handle_event,
 				  NULL,
-				  fbp->dndcallback,
+				  fb->dndcallback,
 				  private_data->widget_list,
 				  (void *) private_data);
 
-  XUNLOCK (display);
-  /* XSync(display, False); */
+  XUNLOCK (fb->display);
+  /* XSync(fb->display, False); */
 
   return mywidget;
 }

@@ -24,13 +24,18 @@
 #ifndef MRL_BROWSER_H
 #define MRL_BROWSER_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "xitk.h"
+
 #include "xine.h"
 
 typedef void (*select_cb_t) (widget_t *, void *);
-typedef void (*add_cb_t) (widget_t *widget, void *data, const char *);
-typedef void (*mrl_add_cb_t) (widget_t *widget, void *data, mrl_t *);
 
-void mrl_browser(mrl_add_cb_t add_cb, select_cb_t sel_cb, dnd_callback_t dnd_cb);
+void mrl_browser(xitk_mrl_callback_t add_cb,
+		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb);
 void open_mrlbrowser(widget_t *w, void *data);
 void destroy_mrl_browser(void);
 int mrl_browser_is_running(void);

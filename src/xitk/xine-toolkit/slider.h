@@ -27,6 +27,7 @@
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
+#include "_xitk.h"
 
 /*  To handle a vertical slider */
 #define VSLIDER 1
@@ -34,31 +35,31 @@
 #define HSLIDER 2
 
 typedef struct {
-  Display    *display;
+  Display                *display;
 
-  widget_t   *sWidget;
-  int         sType;
-  int         bClicked;
-  int         bArmed;
-  int 	      pos;
-  int         max;
-  int         step;
-  int         min;
-  int         realmin;
-  int         realmax;
+  widget_t               *sWidget;
+  int                     sType;
+  int                     bClicked;
+  int                     bArmed;
+  int 	                  pos;
+  int                     max;
+  int                     step;
+  int                     min;
+  int                     realmin;
+  int                     realmax;
 
-  gui_image_t *paddle_skin;
-  gui_image_t *bg_skin;
+  gui_image_t            *paddle_skin;
+  gui_image_t            *bg_skin;
 
   /* callback function (active_widget, user_data, current_position) */
-  void        (*mfunction) (widget_t *, void *, int);
-  void       *muser_data;
+  xitk_state_callback_t   motion_callback;
+  void                   *motion_userdata;
 			  
-  void        (*function) (widget_t *, void *, int);
-  void       *user_data;
+  xitk_state_callback_t   callback;
+  void                   *userdata;
 
-  int  button_width;
-  float ratio;
+  int                     button_width;
+  float                   ratio;
 
 } slider_private_data_t;
 
@@ -67,11 +68,7 @@ typedef struct {
 /**
  * Create a slider
  */
-widget_t *slider_create(Display *display, ImlibData *idata,
-			int type, int x, int y, int min, int max, 
-			int step, const char *bg, const char *paddle, 
-/* cb for motion      */void *fm, void *udm,
-/* cb for btn release */void *f, void *ud) ;
+widget_t *slider_create(xitk_slider_t *s);
 
 /**
  * Get current position of paddle.

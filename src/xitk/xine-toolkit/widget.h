@@ -38,7 +38,7 @@
 
 #define WIDGET_ENABLE  1
 
-#define BROWSER_MAX_ENTRIES 4096
+#define BROWSER_MAX_ENTRIES 65535
 
 typedef int widgetkey_t;
 
@@ -87,7 +87,7 @@ typedef struct widget_s {
 
   int      enable;
 
-  void (*paint) (struct widget_s *,  Window, GC) ; 
+  void (*paint) (struct widget_s *, Window, GC) ; 
   
   /* notify callback return value : 1 => repaint necessary 0=> do nothing */
                                        /*   parameter: up (1) or down (0) */
