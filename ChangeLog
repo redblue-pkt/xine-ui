@@ -1,3 +1,5 @@
+  * mrl browser deadlock on long scrolling file names (label.c)
+  * saves windows positions on exit
   * updated list of doc files for rpm and debian package systems
   * fixed compilation with -DDEBUG (required fixes in snapshot.c)
  -- Harm van der Heijden <hrm@users.sourceforge.net> 
