@@ -22,7 +22,21 @@ batch=false
 #batch=true
 runmode=interactive
 do_log=false
-messagefile=/tmp/xck.$$.xine-check.en
+
+# localisation stuff
+available_langs="en"
+locale_lang=`(locale &> /dev/null && locale | grep LC_MESSAGES= | sed -e s/LC_MESSAGES\=//g -e s/\"//g | cut -d _ -f 1) || echo en` # for emacs hilight "
+lang=""
+for lg in $available_langs; do
+  if test $lg = $locale_lang;
+    then lang=$lg
+  fi
+done
+if test x$lang = x -o $lang="POSIX";
+  then lang="en"
+fi
+
+messagefile=/tmp/xck.$$.xine-check.$lang
 #messagefile=/tmp/xine-check.en
 indent="         "
 DUMPVARS="" #this holds the variables to dump into bugreports, use vars()!
