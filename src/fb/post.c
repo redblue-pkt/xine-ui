@@ -279,22 +279,10 @@ void pplugin_parse_and_store_post(const char *post_chain) {
 
 static void _pplugin_unwire(void) {
   xine_post_out_t  *vo_source;
-  int               paused = 0;
   
   vo_source = xine_get_video_source(fbxine.stream);
 
-  if((paused = (xine_get_param(fbxine.stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
-    xine_set_param(fbxine.stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
-  
   (void) xine_post_wire_video_port(vo_source, fbxine.video_port);
-  
-  if(paused)
-    xine_set_param(fbxine.stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-  
-  /* Waiting a small chunk of time helps to avoid crashing */
-  xine_usec_sleep(500000);
-  
-
 }
 
 
@@ -303,10 +291,6 @@ void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post
   if(post_elements_num) {
     xine_post_out_t   *vo_source;
     int                i = 0;
-    int                paused = 0;
-    
-    if((paused = (xine_get_param(fbxine.stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
-      xine_set_param(fbxine.stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
     
     for(i = (post_elements_num - 1); i >= 0; i--) {
       
@@ -325,10 +309,6 @@ void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post
     
     vo_source = xine_get_video_source(fbxine.stream);
     xine_post_wire_video_port(vo_source, post_elements[0]->post->video_input[0]);
-    
-    if(paused)
-      xine_set_param(fbxine.stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-
   }
 }
 

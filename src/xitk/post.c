@@ -132,8 +132,6 @@ typedef struct {
 static _pplugin_t    *pplugin = NULL;
 static char         **post_audio_plugins;
 
-static pthread_t      rewire_thread;
-
 /* Some functions prototype */
 static void _pplugin_unwire(void);
 static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_elements_num);
@@ -141,15 +139,6 @@ static void _pplugin_rewire(void);
 void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num);
 static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_elements_num);
 static void _pplugin_save_chain(void);
-
-static void *post_rewire_thread(void *data) {
-  void (*rewire)(void) = data;
-  
-  pthread_detach(pthread_self());
-  rewire();
-  pthread_exit(NULL);
-  return NULL;
-}
 
 static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   post_element_t **posts = NULL;
@@ -179,15 +168,8 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
 }
 
 static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
-  int err;
-  
-  gGui->visual_anim.post_plugin_num = cfg->num_value;
-  
-  if ((err = pthread_create(&rewire_thread,
-			    NULL, post_rewire_thread, (void *)post_rewire_visual_anim)) != 0) {
-    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-    abort();
-  }
+  gGui->visual_anim.post_plugin_num = cfg->num_value;  
+  post_rewire_visual_anim();
 }
 
 const char **post_get_audio_plugins_names(void) {
@@ -283,22 +265,10 @@ int post_rewire_audio_post_to_stream(xine_stream_t *stream) {
 
 static void _pplugin_unwire(void) {
   xine_post_out_t  *vo_source;
-  int               paused = 0;
   
   vo_source = xine_get_video_source(gGui->stream);
 
-  if((paused = (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
-    xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
-  
   (void) xine_post_wire_video_port(vo_source, gGui->vo_port);
-  
-  if(paused)
-    xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-  
-  /* Waiting a small chunk of time helps to avoid crashing */
-  xine_usec_sleep(500000);
-  
-
 }
 
 static void _pplugin_rewire(void) {
@@ -1672,10 +1642,6 @@ void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post
   if(post_elements_num) {
     xine_post_out_t   *vo_source;
     int                i = 0;
-    int                paused = 0;
-    
-    if((paused = (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
-      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
     
     for(i = (post_elements_num - 1); i >= 0; i--) {
       const char *const *outs = xine_post_list_outputs(post_elements[i]->post);
@@ -1693,12 +1659,9 @@ void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post
     
     vo_source = xine_get_video_source(gGui->stream);
     xine_post_wire_video_port(vo_source, post_elements[0]->post->video_input[0]);
-    
-    if(paused)
-      xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-
   }
 }
+
 void pplugin_rewire_posts(void) {
   
   _pplugin_unwire();
