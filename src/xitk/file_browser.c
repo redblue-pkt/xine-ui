@@ -1003,7 +1003,7 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
   if((sel = xitk_browser_get_current_selected(fb->files_browser)) >= 0) {
     char buf[256 + XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
-    snprintf(buf, sizeof(buf), _("Do you really want to delete the file: '%s"), fb->current_dir);
+    snprintf(buf, sizeof(buf), _("Do you really want to delete the file: '%s'"), fb->current_dir);
     if(strlen(fb->current_dir) > 1)
       strcat(buf, "/");
     sprintf(buf, "%s%s' ?.", buf, fb->norm_files[sel].name);
