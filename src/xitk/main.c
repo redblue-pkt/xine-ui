@@ -453,14 +453,6 @@ int main(int argc, char *argv[]) {
    */
 
   
-  if (!video_driver_id) {
-    char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
-    video_driver_id = driver_ids[0];
-
-    printf ("main: auto-selected <%s> video output plugin\n", video_driver_id);
-
-  }
-
   vis.display           = gGui->display;
   vis.screen            = gGui->screen;
   res_h = (DisplayWidth  (gGui->display, gGui->screen)*1000 / DisplayWidthMM (gGui->display, gGui->screen));
@@ -470,14 +462,44 @@ int main(int argc, char *argv[]) {
   vis.calc_dest_size    = video_window_calc_dest_size;
   vis.request_dest_size = video_window_adapt_size;
 
-  gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
-						  video_driver_id,
-						  VISUAL_TYPE_X11, 
-						  (void *) &vis);
+
+  if (!video_driver_id) {
+    /* video output driver auto-probing */
+    char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
+    int    i;
+
+    i = 0;
+    while (driver_ids[i]) {
+      video_driver_id = driver_ids[i];
+
+      printf ("main: probing <%s> video output plugin\n", video_driver_id);
+
+      gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
+						      video_driver_id,
+						      VISUAL_TYPE_X11, 
+						      (void *) &vis);
+      if (gGui->vo_driver)
+	break;
+      
+      i++;
+    }
+      
+    if (!gGui->vo_driver) {
+      printf ("main: all available video drivers failed.\n");
+      exit (1);
+    }
+
+  } else {
+
+    gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
+						    video_driver_id,
+						    VISUAL_TYPE_X11, 
+						    (void *) &vis);
   
-  if (!gGui->vo_driver) {
-    printf ("main: video driver <%s> failed\n", video_driver_id);
-    exit (1);
+    if (!gGui->vo_driver) {
+      printf ("main: video driver <%s> failed\n", video_driver_id);
+      exit (1);
+    }
   }
   
   if (!audio_driver_id) {
