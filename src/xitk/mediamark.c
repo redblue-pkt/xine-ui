@@ -2347,14 +2347,14 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
     xml_node_t      *fvo_entry;
     xml_property_t  *fvo_prop;
     int              entries_fvo = 0;
-
+    
     if(!strcasecmp(xml_tree->name, "FREEVO")) {
       char *url    = NULL;
       char *sub    = NULL;
       char *title  = NULL;
       char *path;
       char *origin = NULL;
-      
+
       path = strrchr(filename, '/');
       if(path && (path > filename)) {
 	origin = (char *) xine_xmalloc((path - filename) + 2);
@@ -2367,7 +2367,7 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
       while(fvo_entry) {
 	if(!strcasecmp(fvo_entry->name, "MOVIE")) {
 	  xml_node_t *sentry;
-	  
+
 	  for(fvo_prop = fvo_entry->props; fvo_prop; fvo_prop = fvo_prop->next) {
 	    if(!strcasecmp(fvo_prop->name, "TITLE")) {
 	      title = fvo_prop->value;
@@ -2406,6 +2406,18 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
 
 		}
 
+		if(url) {
+		  
+		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_fvo + 2));
+		  
+		  mediamark_store_mmk(&mmk[entries_fvo], url, title, sub, 0, -1, 0, 0);
+		  playlist->entries = ++entries_fvo;
+		  
+		  free(url);
+		  url = NULL;
+		}
+
+		sub     = NULL;
 		ssentry = ssentry->next;
 	      }
 
@@ -2416,20 +2428,7 @@ static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filen
 	  
 	}
 
-	if(url) {
-
-	  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_fvo + 2));
-	  
-	  mediamark_store_mmk(&mmk[entries_fvo], url, title, sub, 0, -1, 0, 0);
-	  playlist->entries = ++entries_fvo;
-
-	  free(url);
-	  url = NULL;
-	}
-
-	title = NULL;
-	sub   = NULL;
-	
+	title     = NULL;
 	fvo_entry = fvo_entry->next;
       }
     }
