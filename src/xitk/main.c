@@ -993,7 +993,7 @@ int main(int argc, char *argv[]) {
    * Setup logo.
    */
   gGui->logo_mode = 0;
-  gGui->logo_mrl = xine_config_register_string (gGui->xine, "gui.gui.logo_mrl", XINE_LOGO_MRL,
+  gGui->logo_mrl = xine_config_register_string (gGui->xine, "gui.logo_mrl", XINE_LOGO_MRL,
 						_("Logo mrl"),
 						CONFIG_NO_HELP, 
 						CONFIG_LEVEL_EXP,
