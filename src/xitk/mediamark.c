@@ -277,7 +277,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
       
       extension = strrchr(filename, '.');
       
-      if((extension) && (!strcmp(extension, ".pls"))) {
+      if((extension) && (!strcasecmp(extension, ".pls"))) {
 	
 	if((playlist->fd = fopen(filename, "r")) != NULL) {
 	  int valid_pls = 0;
@@ -308,7 +308,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 		}
 		
 	      }
-	      else if((!strcmp(playlist->ln, "[playlist]")))
+	      else if((!strcasecmp(playlist->ln, "[playlist]")))
 		valid_pls = 1;
 
 	    }
@@ -368,7 +368,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	      }
 
 	    }
-	    else if((!strcmp(playlist->ln, "#EXTM3U")))
+	    else if((!strcasecmp(playlist->ln, "#EXTM3U")))
 	      valid_pls = 1;
 	  }
 	}
@@ -396,7 +396,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
       
       extension = strrchr(filename, '.');
       
-      if((extension) && (!strcmp(extension, ".sfv"))) {
+      if((extension) && (!strcasecmp(extension, ".sfv"))) {
 	
 	if((playlist->fd = fopen(filename, "r")) != NULL) {
 	  int valid_pls = 0;
@@ -684,11 +684,11 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
       if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
 	goto __failure;
       
-      if(!strcmp(xml_tree->name, "ASX")) {
+      if(!strcasecmp(xml_tree->name, "ASX")) {
 
 	asx_prop = xml_tree->props;
 
-	while((asx_prop) && (strcmp(asx_prop->name, "VERSION")))
+	while((asx_prop) && (strcasecmp(asx_prop->name, "VERSION")))
 	  asx_prop = asx_prop->next;
 	
 	if(asx_prop) {
@@ -700,7 +700,8 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 	    
 	    asx_entry = xml_tree->child;
 	    while(asx_entry) {
-	      if((!strcmp(asx_entry->name, "ENTRY")) || (!strcmp(asx_entry->name, "ENTRYREF"))) {
+	      if((!strcasecmp(asx_entry->name, "ENTRY")) ||
+		 (!strcasecmp(asx_entry->name, "ENTRYREF"))) {
 		char *title  = NULL;
 		char *href   = NULL;
 		char *author = NULL;
@@ -708,23 +709,23 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		asx_ref = asx_entry->child;
 		while(asx_ref) {
 		  
-		  if(!strcmp(asx_ref->name, "TITLE")) {
+		  if(!strcasecmp(asx_ref->name, "TITLE")) {
 
 		    if(!title)
 		      title = asx_ref->data;
 
 		  }
-		  else if(!strcmp(asx_ref->name, "AUTHOR")) {
+		  else if(!strcasecmp(asx_ref->name, "AUTHOR")) {
 
 		    if(!author)
 		      author = asx_ref->data;
 
 		  }
-		  else if(!strcmp(asx_ref->name, "REF")) {
+		  else if(!strcasecmp(asx_ref->name, "REF")) {
 		    
 		    for(asx_prop = asx_ref->props; asx_prop; asx_prop = asx_prop->next) {
 
-		      if(!strcmp(asx_prop->name, "HREF")) {
+		      if(!strcasecmp(asx_prop->name, "HREF")) {
 
 			if(!href)
 			  href = asx_prop->value;
