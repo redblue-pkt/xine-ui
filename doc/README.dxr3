@@ -160,6 +160,8 @@ plugin.
 	0	Enables or disables an 'enhanced' buffer mode available
 		on at least some cards.  Noticable improvements have been
 		seen with 'glitchy' streams with intermittant pauses. 
+		With some dvds the audio starts ahead of the video, pressing
+		0 (zero) once appears to remedy this.  (temporary measure)
 		Use 1 to enable, 0 to disable. This is EXPERIMENTAL!
 			* Only appears to have effect on tvout. 
 
