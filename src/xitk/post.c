@@ -31,20 +31,40 @@ extern gGui_t    *gGui;
 static char     **post_audio_plugins;
 static char     **post_video_plugins;
 
+static pthread_t rewire_thread;
+
+
+static void *post_rewire_thread(void *data) {
+  void (*rewire)(void) = data;
+  
+  pthread_detach(pthread_self());
+  rewire();
+  pthread_exit(NULL);
+  return NULL;
+}
 
 static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
+  int err;
+  
   gGui->visual_anim.post_plugin_num = cfg->num_value;
-
-#if 0 /* xine doesn't support rewiring on the fly */
-  post_rewire_visual_anim();
-#else
-  gGui->visual_anim.post_changed = 1;
-#endif
+  
+  if ((err = pthread_create(&rewire_thread,
+			    NULL, post_rewire_thread, (void *)post_rewire_visual_anim)) != 0) {
+    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
+    abort();
+  }
 }
 
 static void post_video_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
+  int err;
+  
   gGui->post_video_num = cfg->num_value;
-  post_rewire_video_post();
+  
+  if ((err = pthread_create(&rewire_thread,
+			    NULL, post_rewire_thread, (void *)post_rewire_video_post)) != 0) {
+    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
+    abort();
+  }
 }
 
 void post_init(void) {
