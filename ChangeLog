@@ -1,3 +1,32 @@
+xine-ui (0.99.3) unstable; urgency=low
+  * enlarge stream info window (required for Russian translation),
+  * possibility to specify more than one playlist in command line,
+  * unlock mutex before destroying (thanks to Matthias Drochner),
+  * netBSD mutex locking fix,
+  * cursor support implementation into xiTK,
+  * use post plugins for deinterlacing,
+  * fix segfault on enqueuing,
+  * fix segfault on playlist deletion,
+  * add non-official subtitle support into ASX playlists,
+  * add get_speed in session control optarg,
+  * update displayed meta information while playback is running (useful for streaming radio),
+  * restore original sound volume on exit,
+  * fix memory corruption with huge playlists,
+  * remove obsolete "black stream hack",
+  * reset screensaver after playback resume,
+  * various WM layering bugs,
+  * handle new UTF8 meta infos,
+  * huge xiTK fixes (too long for details, check cvs log :-) )(big thanks to Hans-Dieter Kosch <hdkosch@t-online.de>),
+  * Japanese translations (thanks to Tadashi Jokagi),
+  * fix segfault in some case with shortcut handling (thanks to Philipp Matthias Hahn),
+  * visualization switching while playback is running fix,
+  * handle .pls playlist inside URL,
+  * new 'b' shortcut (border visibility toggle),
+  * support alpha channel in splash screen image,
+  * some translations updates, BIG THANKS to the translators,
+  * Merry xmas xiners.
+
+
 xine-ui (0.99.2) unstable; urgency=low
 
   * update screensaver key faking code to avoid false triggering of the
