@@ -49,13 +49,29 @@ xitk_font_t *xitk_font_load_font(Display *display, char *font) {
   XUNLOCK(display);
   
   if(xtfs->font == NULL) {
-    XITK_WARNING("%s(): XLoadQueryFont() failed\n", __FUNCTION__);
-    free(xtfs);
-    return NULL;
+    char *fname = xitk_get_default_font();
+    if(fname) {
+      XLOCK(display);
+      xtfs->font = XLoadQueryFont(display, fname);
+      XUNLOCK(display);
+    }
+
+    if(xtfs->font == NULL) {
+      fname = xitk_get_system_font();
+      XLOCK(display);
+      xtfs->font = XLoadQueryFont(display, fname);
+      XUNLOCK(display);
+    }
+    
+    if(xtfs->font == NULL) {
+      XITK_WARNING("%s(): XLoadQueryFont() failed\n", __FUNCTION__);
+      free(xtfs);
+      return NULL;
+    }
   }
   
   xtfs->display = display;
-    
+  
   return xtfs;
 }
 

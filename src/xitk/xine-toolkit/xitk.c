@@ -31,6 +31,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <pthread.h>
+#include <pwd.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <unistd.h>
@@ -44,6 +45,7 @@
 #include "widget.h"
 #include "list.h"
 #include "dnd.h"
+#include "_config.h"
 
 #include "_xitk.h"
 
@@ -114,6 +116,7 @@ typedef struct {
   pthread_mutex_t             mutex;
   int                         running;
   xitk_register_key_t         key;
+  xitk_config_t              *config;
 } __xitk_t;
 
 static __xitk_t    *gXitk;
@@ -139,6 +142,9 @@ void xitk_usec_sleep(unsigned usec) {
 #endif
 }
 
+/*
+ *
+ */
 static void xitk_signal_handler(int sig) {
   pid_t cur_pid = getppid();
 
@@ -587,6 +593,8 @@ void xitk_init(Display *display) {
   gXitk->display = display;
   gXitk->key     = 0;
 
+  gXitk->config = xitk_config_init();
+  
   pthread_mutex_init (&gXitk->mutex, NULL);
 
 }
@@ -680,6 +688,8 @@ void xitk_run(void) {
 
   xitk_list_free(gXitk->list);
   xitk_list_free(gXitk->gfx);
+  xitk_config_deinit(gXitk->config);
+  
   XITK_FREE(gXitk);
 }
 
@@ -688,4 +698,63 @@ void xitk_run(void) {
  */
 void xitk_stop(void) {
   gXitk->running = 0;
+}
+ 
+char *xitk_get_system_font(void) {
+  return xitk_config_get_system_font(gXitk->config);
+}
+char *xitk_get_default_font(void) {
+  return xitk_config_get_default_font(gXitk->config);
+}
+int xitk_get_black_color(void) {
+  return xitk_config_get_black_color(gXitk->config);
+}
+int xitk_get_white_color(void) {
+  return xitk_config_get_white_color(gXitk->config);
+}
+int xitk_get_background_color(void) {
+  return xitk_config_get_background_color(gXitk->config);
+}
+int xitk_get_focus_color(void) {
+  return xitk_config_get_focus_color(gXitk->config);
+}
+int xitk_get_select_color(void) {
+  return xitk_config_get_select_color(gXitk->config);
+}
+
+/*
+ * Return home directory.
+ */
+const char *xitk_get_homedir(void) {
+  struct passwd *pw = NULL;
+  char *homedir = NULL;
+#ifdef HAVE_GETPWUID_R
+  int ret;
+  struct passwd pwd;
+  char *buffer = NULL;
+  int bufsize = 128;
+
+  buffer = (char *) xmalloc(bufsize);
+  
+  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) < 0) {
+#else
+  if((pw = getpwuid(getuid())) == NULL) {
+#endif
+    if((homedir = getenv("HOME")) == NULL) {
+      XITK_WARNING("Unable to get home directory, set it to /tmp.\n");
+      homedir = strdup("/tmp");
+    }
+  }
+  else {
+    if(pw) 
+      homedir = strdup(pw->pw_dir);
+  }
+  
+  
+#ifdef HAVE_GETPWUID_R
+  if(buffer) 
+    XITK_FREE(buffer);
+#endif
+  
+  return homedir;
 }

@@ -173,12 +173,11 @@ static void inputtext_recalc_offsets(xitk_widget_list_t *wl,
       fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
 
     if(fs == NULL) 
-      fs = xitk_font_load_font(private_data->imlibdata->x.disp, "fixed");
+      fs = xitk_font_load_font(private_data->imlibdata->x.disp, xitk_get_system_font());
 
-    if(fs == NULL) {
+    if(fs == NULL)
       XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-    }
-    
+
     xitk_font_set_font(fs, wl->gc);
 
     private_data->disp_offset = private_data->pos_in_pos = 0;
@@ -232,11 +231,10 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
     fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
 
   if(fs == NULL) 
-    fs = xitk_font_load_font(private_data->imlibdata->x.disp, "fixed");
+    fs = xitk_font_load_font(private_data->imlibdata->x.disp, xitk_get_system_font());
 
-  if(fs == NULL) {
+  if(fs == NULL)
     XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-  }
 
   xitk_font_set_font(fs, gc);
   xitk_font_string_extent(fs, label, &lbear, &rbear, &width, &asc, &des);
@@ -444,11 +442,10 @@ static int notify_click_inputtext(xitk_widget_list_t *wl, xitk_widget_t *it,
 	fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
       
       if(fs == NULL) 
-	fs = xitk_font_load_font(private_data->imlibdata->x.disp, "fixed");
+	fs = xitk_font_load_font(private_data->imlibdata->x.disp, xitk_get_system_font());
       
-      if(fs == NULL) {
+      if(fs == NULL)
 	XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-      }
       
       xitk_font_set_font(fs, wl->gc);
       

@@ -91,8 +91,6 @@ typedef struct {
 } finfo_t;
 
 
-const char *filebrowser_get_homedir(void);
-
 /*
  * Return window id of widget.
  */
@@ -785,7 +783,7 @@ static void filebrowser_sortfiles(xitk_widget_t *w, void *data) {
 static void filebrowser_homedir(xitk_widget_t *w, void *data) {
   filebrowser_private_data_t *private_data = (filebrowser_private_data_t *) data;
   
-  sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
+  sprintf(private_data->current_dir, "%s", xitk_get_homedir());
   load_files(NULL, (void *)private_data);
   xitk_paint_widget_list (private_data->widget_list);
 }
@@ -1191,10 +1189,10 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
     
     if((is_a_dir(private_data->current_dir) != 1)
        || (strlen(private_data->current_dir) == 0))
-      sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
+      sprintf(private_data->current_dir, "%s", xitk_get_homedir());
   }
   else
-    sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
+    sprintf(private_data->current_dir, "%s", xitk_get_homedir());
   
   private_data->visible        = 1;
 
@@ -1238,39 +1236,3 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   return mywidget;
 }
 
-/*
- * Return home directory.
- */
-const char *filebrowser_get_homedir(void) {
-  struct passwd *pw = NULL;
-  char *homedir = NULL;
-#ifdef HAVE_GETPWUID_R
-  int ret;
-  struct passwd pwd;
-  char *buffer = NULL;
-  int bufsize = 128;
-
-  buffer = (char *) xmalloc(bufsize);
-  
-  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) < 0) {
-#else
-  if((pw = getpwuid(getuid())) == NULL) {
-#endif
-    if((homedir = getenv("HOME")) == NULL) {
-      XITK_WARNING("Unable to get home directory, set it to /tmp.\n");
-      homedir = strdup("/tmp");
-    }
-  }
-  else {
-    if(pw) 
-      homedir = strdup(pw->pw_dir);
-  }
-  
-  
-#ifdef HAVE_GETPWUID_R
-  if(buffer) 
-    XITK_FREE(buffer);
-#endif
-  
-  return homedir;
-}

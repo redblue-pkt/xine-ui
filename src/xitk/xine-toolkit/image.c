@@ -64,18 +64,33 @@ unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b) {
  * Some default pixel colors.
  */
 unsigned int xitk_get_pixel_color_black(ImlibData *im) {
+  int user_color = xitk_get_black_color();
+  if(user_color > 0)
+    return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 0, 0, 0);
 }
 unsigned int xitk_get_pixel_color_white(ImlibData *im) {
+  int user_color = xitk_get_white_color();
+  if(user_color > 0)
+    return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 255, 255, 255);
 }
 unsigned int xitk_get_pixel_color_lightgray(ImlibData *im) {
+  int user_color = xitk_get_focus_color();
+  if(user_color > 0)
+    return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 224, 224, 224);
 }
 unsigned int xitk_get_pixel_color_gray(ImlibData *im) {
+  int user_color = xitk_get_background_color();
+  if(user_color > 0)
+    return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 192, 192, 192);
 }
 unsigned int xitk_get_pixel_color_darkgray(ImlibData *im) {
+  int user_color = xitk_get_select_color();
+  if(user_color > 0)
+    return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 160, 160, 160);
 }
 

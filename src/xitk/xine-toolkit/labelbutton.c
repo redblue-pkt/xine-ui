@@ -117,12 +117,11 @@ static Pixmap create_labelofbutton(xitk_widget_t *lb,
   if(private_data->fontname)
     fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
   
+  if(fs == NULL) 
+    fs = xitk_font_load_font(private_data->imlibdata->x.disp, xitk_get_system_font());
+
   if(fs == NULL)
-    fs = xitk_font_load_font(private_data->imlibdata->x.disp, "fixed");
-  
-  if(fs == NULL) {
     XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
-  }
   
   xitk_font_set_font(fs, gc);
   xitk_font_string_extent(fs, label, &lbear, &rbear, &width, &asc, &des);
