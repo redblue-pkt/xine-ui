@@ -494,7 +494,7 @@ static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
   private_data->animation      = (skin_element_name == NULL) ? 0 : xitk_skin_get_label_animation(skonfig, private_data->skin_element_name);
   private_data->anim_running   = 0;
   private_data->anim_step      = (skin_element_name == NULL) ? 1 : xitk_skin_get_label_animation_step(skonfig, private_data->skin_element_name);
-  private_data->anim_timer     = xitk_skin_get_label_animation_timer(skonfig, private_data->skin_element_name);
+  private_data->anim_timer     = (skin_element_name == NULL) ? 0 : xitk_skin_get_label_animation_timer(skonfig, private_data->skin_element_name);
   private_data->labelpix       = NULL;
 
   pthread_mutex_init(&private_data->paint_mutex, NULL);
