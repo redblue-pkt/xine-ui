@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
-"POT-Creation-Date: 2003-12-23 23:10+0100\n"
+"POT-Creation-Date: 2004-04-12 15:06+0000\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -13,57 +13,57 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1161
+#: src/xitk/xine-toolkit/mrlbrowser.c:1180
 msgid "Select current entry"
 msgstr "Sélectionne l'entrée courante"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1169
+#: src/xitk/xine-toolkit/mrlbrowser.c:1188
 msgid "Play selected entry"
 msgstr "Joue l'entrée sélectionnée"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+#: src/xitk/xine-toolkit/mrlbrowser.c:1199
 msgid "Close MRL browser window"
 msgstr "Ferme la fenêtre du brouteur de MRL"
 
-#: src/xitk/xine-toolkit/test.c:116
+#: src/xitk/xine-toolkit/test.c:117
 msgid "XInitThreads() failed.\n"
 msgstr "XInitThreads() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:123
+#: src/xitk/xine-toolkit/test.c:124
 msgid "Cannot open display\n"
 msgstr "Ne peux pas ouvrir l'affichage\n"
 
-#: src/xitk/xine-toolkit/test.c:137
+#: src/xitk/xine-toolkit/test.c:138
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_param() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:373
+#: src/xitk/xine-toolkit/test.c:374
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "La nouvelle valeure entiere est: %d. Confirmer ?"
 
-#: src/xitk/xine-toolkit/test.c:425
+#: src/xitk/xine-toolkit/test.c:426
 #, fuzzy, c-format
 msgid "New double value is: %e. Confirm ?"
 msgstr "La nouvelle valeure entiere est: %d. Confirmer ?"
 
-#: src/xitk/xine-toolkit/test.c:521
+#: src/xitk/xine-toolkit/test.c:522
 msgid "My Frame"
 msgstr "Mon Cadre"
 
-#: src/xitk/xine-toolkit/test.c:561
+#: src/xitk/xine-toolkit/test.c:562
 msgid "A Label"
 msgstr "Un Label"
 
-#: src/xitk/xine-toolkit/test.c:621
+#: src/xitk/xine-toolkit/test.c:622
 msgid "Fire !!"
 msgstr "Feu !!"
 
-#: src/xitk/xine-toolkit/test.c:652
+#: src/xitk/xine-toolkit/test.c:653
 msgid "!BOOM!"
 msgstr "!BOUM!"
 
-#: src/xitk/xine-toolkit/test.c:744
+#: src/xitk/xine-toolkit/test.c:745
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -72,42 +72,42 @@ msgstr ""
 "La nouvelle entrée sélectionnée dans la combo box est:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:945
+#: src/xitk/xine-toolkit/test.c:948
 msgid "init_test() failed\n"
 msgstr "init_test() a échoué\n"
 
-#: src/xitk/xine-toolkit/test.c:961
+#: src/xitk/xine-toolkit/test.c:964
 msgid "My Fucking Window"
 msgstr "Ma Putain de Fenêtre"
 
-#: src/xitk/xine-toolkit/test.c:978
+#: src/xitk/xine-toolkit/test.c:981
 msgid "Quit"
 msgstr "Quitte"
 
-#: src/xitk/xine-toolkit/window.c:973
+#: src/xitk/xine-toolkit/window.c:972
 msgid "OK"
 msgstr "Ok"
 
-#: src/xitk/xine-toolkit/window.c:1037 src/xitk/xine-toolkit/window.c:1243
+#: src/xitk/xine-toolkit/window.c:1036 src/xitk/xine-toolkit/window.c:1242
 msgid "Question?"
 msgstr "Question?"
 
-#: src/xitk/xine-toolkit/window.c:1173 src/xitk/xine-toolkit/window.c:1393
+#: src/xitk/xine-toolkit/window.c:1172 src/xitk/xine-toolkit/window.c:1392
 msgid "Yes"
 msgstr "Oui"
 
-#: src/xitk/xine-toolkit/window.c:1173 src/xitk/xine-toolkit/window.c:1393
+#: src/xitk/xine-toolkit/window.c:1172 src/xitk/xine-toolkit/window.c:1392
 msgid "No"
 msgstr "Non"
 
-#: src/xitk/xine-toolkit/window.c:1393
+#: src/xitk/xine-toolkit/window.c:1392
 msgid "Cancel"
 msgstr "Abandon"
 
-#: src/xitk/xine-toolkit/xitk.h:2163 src/xitk/xine-toolkit/xitk.h:2172
+#: src/xitk/xine-toolkit/xitk.h:2247 src/xitk/xine-toolkit/xitk.h:2256
 msgid "Error"
 msgstr "Erreur"
 
-#: src/xitk/xine-toolkit/xitk.h:2166 src/xitk/xine-toolkit/xitk.h:2175
+#: src/xitk/xine-toolkit/xitk.h:2250 src/xitk/xine-toolkit/xitk.h:2259
 msgid "Information"
 msgstr "Information"

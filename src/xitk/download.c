@@ -52,10 +52,10 @@ static int progress_callback(void *userdata,
   download_t  *download = (download_t *) userdata;
   char         buffer[1024];
   int          percent = (dltotal > 0.0) ? (int) (dlnow * 100.0 / dltotal) : 0;
-
+  
   osd_draw_bar(_("Download in progress"), 0, 100, percent, OSD_BAR_POS);
   memset(&buffer, 0, sizeof(buffer));
-  sprintf(buffer, _("Download progress: %d%%."), percent);
+  snprintf(buffer, sizeof(buffer), _("Download progress: %d%%."), percent);
   gGui->mrl_overrided = 3;
   panel_set_title(buffer);
   
@@ -88,7 +88,7 @@ int network_download(const char *url, download_t *download) {
 #ifdef HAVE_CURL
   CURL        *curl;
   CURLcode     res;
-  
+
   pthread_mutex_lock(&gGui->download_mutex);
 
   curl_global_init(CURL_GLOBAL_DEFAULT);

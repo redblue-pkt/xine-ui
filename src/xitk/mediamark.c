@@ -129,7 +129,7 @@ static char *_read_file(const char *filename, int *size) {
   char        *buf = NULL;
   int          fd, bytes_read;
   char        *extension;
-  
+
   if((!filename) || (!strlen(filename))) {
     fprintf(stderr, "%s(): Empty or NULL filename.\n", __XINE_FUNCTION__);
     return NULL;
@@ -137,9 +137,11 @@ static char *_read_file(const char *filename, int *size) {
   
   extension = strrchr(filename, '.');
   if(extension && 
-     ((!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".xml", 4)) ||
-      (!strncasecmp(extension, ".smi", 4)) || (!strncasecmp(extension, ".smil", 5))) && 
-     ((!strncasecmp(filename, "http://", 7)) || (!strncasecmp(filename, "ftp://", 6))))
+     ((!strncasecmp(extension, ".pls", 4)) || (!strncasecmp(extension, ".m3u", 4)) || 
+      (!strncasecmp(extension, ".sfv", 4)) || (!strncasecmp(extension, ".tox", 4)) ||
+      (!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".smi", 4)) || 
+      (!strncasecmp(extension, ".smil", 5)) || (!strncasecmp(extension, ".xml", 4))) &&
+     is_downloadable((char *) filename)) 
     return _download_file(filename, size);
   
   if(stat(filename, &st) < 0) {
@@ -278,7 +280,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
   char         *extension;
 
   if(filename) {
-    if(is_a_file((char *) filename)) {
+    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
       
       extension = strrchr(filename, '.');
       
@@ -371,7 +373,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
   mediamark_t **mmk = NULL;
   
   if(filename) {
-    if(is_a_file((char *) filename)) {
+    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
       char *m3u_content;
       int   size;
       
@@ -477,7 +479,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
   mediamark_t **mmk = NULL;
 
   if(filename) {
-    if(is_a_file((char *) filename)) {
+    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
       char  *extension;
   
       extension = strrchr(filename, '.');
@@ -612,10 +614,10 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
   mediamark_t **mmk = NULL;
 
   if(filename) {
-    if(is_a_file((char *) filename)) {
+    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
       char *raw_content;
       int   size;
-      
+
       if((raw_content = _read_file(filename, &size)) != NULL) {
 	
 	playlist->data = raw_content;
@@ -693,7 +695,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
   mediamark_t **mmk = NULL;
   
   if(filename) {
-    if(is_a_file((char *) filename)) {
+    if(is_a_file((char *) filename) || is_downloadable((char *) filename)) {
       int   entries_tox = 0;
       char *tox_content;
       int   size;

@@ -327,6 +327,13 @@ int is_ipv6_last_double_semicolon(const char *str) {
   return 0;
 }
 
+int is_downloadable(char *filename) {
+  if(filename && 
+     ((!strncasecmp(filename, "http://", 7)) || (!strncasecmp(filename, "ftp://", 6))))
+    return 1;
+  return 0;
+}
+
 int is_a_dir(char *filename) {
   struct stat  pstat;
   
