@@ -238,7 +238,7 @@ skin.AutoPlayGUI {
 	  color = #1f2123
 	  color_focus = #1f2123
 	  color_click = #1f2123
-	  font = -misc-fatsolid-*-*-*-*-*-120-*-*-*-*-*-*
+	  font = -misc-fatsolid-*-*-*-*-*-100-*-*-*-*-*-*
 	}
 }
 
