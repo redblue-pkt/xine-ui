@@ -128,6 +128,13 @@ dnl
 dnl Check for xine-lib
 dnl
 AM_PATH_XINE(1.0.0,, AC_MSG_ERROR(*** You should install xine-lib first ***))
+dnl the following is an interim solution for the rc series
+dnl checking just the version is not enough, because this is always 1.0.0
+SAVE_CFLAGS="$CFLAGS"
+CFLAGS="$XINE_CFLAGS $CFLAGS"
+AC_CHECK_DECL(XINE_PARAM_AUDIO_AMP_MUTE,,
+  AC_MSG_ERROR(*** Your version of xine-lib is too old ***),[#include "xine.h"])
+CFLAGS="$SAVE_CFLAGS"
 
 
 dnl
