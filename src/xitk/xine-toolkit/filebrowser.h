@@ -140,7 +140,7 @@ typedef struct {
   int                     dir_contents_num; /* number of entries in file browser */
 
   widget_t               *widget_current_dir; /* Current directory widget */
-  char                    current_dir[PATH_MAX + 1]; /* Current directory */
+  char                    current_dir[FPATH_MAX + 1]; /* Current directory */
 
   int                     running; /* Boolean status */
   int                     visible; /* Boolean status */
