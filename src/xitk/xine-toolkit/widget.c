@@ -1232,7 +1232,10 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
     }
     
     /* next widget will be focused */
-    if(widget == wl->widget_focused) {
+    if((widget == wl->widget_focused) ||
+       (widget && wl->widget_focused && 
+	(((wl->widget_focused->type & WIDGET_GROUP_MASK) == WIDGET_GROUP_MENU)
+	 && (wl->widget_focused->type & WIDGET_GROUP_WIDGET)))) {
       xitk_widget_t *next_widget;
       
       if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
