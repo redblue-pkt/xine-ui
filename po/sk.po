@@ -472,8 +472,8 @@ msgid ""
 "                                 'lirc': display draft of a .lircrc config "
 "file.\n"
 msgstr ""
-"                                 'lirc' : zobrazi» vzor .lircrc konfiguraèného"
-"                                          súboru\n"
+"                                 'lirc' : zobrazi» vzor .lircrc "
+"konfiguraèného                                          súboru\n"
 
 #: src/xitk/main.c:318
 msgid ""
@@ -492,7 +492,8 @@ msgstr ""
 
 #: src/xitk/main.c:320
 msgid "  -n, --network                Enable network remote control server.\n"
-msgstr "  -n, --network                Povoli» sie»ový server diaµkového ovládania.\n"
+msgstr ""
+"  -n, --network                Povoli» sie»ový server diaµkového ovládania.\n"
 
 #: src/xitk/main.c:321
 #, fuzzy

@@ -9,7 +9,7 @@ SUBDIRS = readline intl src m4 doc misc po
 EXTRA_DIST = cvscompile.sh automake.diff \
              debian/README.Debian debian/changelog debian/control \
              debian/copyright debian/dirs debian/menu debian/rules \
-             debian/xine.docs debian/shlibdeps.sh @DEPCOMP@
+             debian/xine.docs debian/shlibdeps.sh debian/xine-ui.mime @DEPCOMP@
 
 debug:
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
@@ -25,6 +25,10 @@ install-debug: debug
 prune-cache:
 	-rm -f config.cache
 
+release-check: misc/relchk.sh
+	@mv -f .cvsversion .cvsversion.tmp
+	@./configure && $(SHELL) misc/relchk.sh
+	@mv -f .cvsversion.tmp .cvsversion
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#* 

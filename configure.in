@@ -727,6 +727,7 @@ misc/Makefile
 misc/build_rpms.sh
 misc/SlackBuild
 misc/xine-ui.spec
+misc/relchk.sh
 misc/desktops/Makefile
 po/Makefile.in
-],[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh])
+],[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh ./misc/relchk.sh])

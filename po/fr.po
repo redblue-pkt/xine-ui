@@ -1070,4 +1070,3 @@ msgstr "Rafraîchir"
 #~ msgstr ""
 #~ "Inconnu\n"
 #~ "Erreur : Code de Ratio %d inconnu\n"
-

@@ -38,7 +38,7 @@ uninstall-man1:
 	done
 
 xine-bugreport.1: xine-check.1
-	ln -s xine-check.1 xine-bugreport.1
+	$(LN_S) xine-check.1 xine-bugreport.1
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*

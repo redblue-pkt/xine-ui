@@ -8,7 +8,6 @@ EXTRA_DIST = $(bin_SCRIPTS) autogen.sh SlackBuild.in SlackBuild build_rpms.sh \
 # should use real bindir...
 #bindir = @XINE_SCRIPTDIR@
 
-# removed xineshot. should no longer be needed... -siggi
 bin_SCRIPTS = xine-check xine-bugreport
 
 xine-check: xine-check.sh.in xine-check.en
