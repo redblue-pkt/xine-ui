@@ -292,7 +292,7 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_WINDOWENLARGE:
-    video_window_set_mag (1.2 * video_window_get_mag());
+    video_window_set_mag (1.2 * (video_window_get_mag() + 0.002));
     break;
 
   case ACTID_ZOOM_1_1:
