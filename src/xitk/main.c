@@ -252,6 +252,9 @@ int handle_deinterlace_subopt(char *sopt) {
     NULL
   };
 
+  if( sscanf(sopt," %d",&subopt) )
+    return subopt;
+
   while(*str) {
     subopt = getsubopt(&str, method, &val);
     switch(subopt) {
@@ -265,7 +268,7 @@ int handle_deinterlace_subopt(char *sopt) {
       fprintf(stderr, "\b\b.\n");
       fprintf(stderr, "\nwarning: some methods may require MMX.\n");
       fprintf(stderr, "         currently only implemented for Xv driver.\n");
-      return 0;
+      return -1;
     default:
       return subopt;
       break;
@@ -471,7 +474,7 @@ static void load_audio_out_driver(char *audio_driver_id,
       *audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						    audio_driver_id);
       if (!*audio_driver) {
-	printf ("main: the specified audio driver <%s> failed\n", 
+	printf ("main: the specified audio driver <%s> failed\n",
 		audio_driver_id);
 	exit(1);
       }
