@@ -184,7 +184,7 @@ void xine_info(char *message, ...) {
 void gui_handle_xine_error(void) {
   int err;
 
-  err = xine_get_error(gGui->xine);
+  err = xine_get_error(gGui->stream);
 
   switch(err) {
 

@@ -177,7 +177,7 @@ static void gui_signal_handler (int sig, void *data) {
       }
       alarm(5);
       
-      xine_stop(gGui->xine);
+      xine_stop(gGui->stream);
     }
     break;
   }
@@ -227,7 +227,7 @@ void gui_execute_action_id(action_id_t action) {
 
     /* events for advanced input plugins. */
     xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
-    xine_send_event(gGui->xine, &xine_event);
+    xine_event_send(gGui->stream, &xine_event);
     return;
   }
 
@@ -447,17 +447,17 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_AV_SYNC_m3600:
-    xine_set_param(gGui->xine, XINE_PARAM_AV_OFFSET, 
-		   (xine_get_param(gGui->xine, XINE_PARAM_AV_OFFSET)) - 3600);
+    xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, 
+		   (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET)) - 3600);
     break;
     
   case ACTID_AV_SYNC_p3600:
-    xine_set_param(gGui->xine, XINE_PARAM_AV_OFFSET,
-		   (xine_get_param(gGui->xine, XINE_PARAM_AV_OFFSET)) + 3600);
+    xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET,
+		   (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET)) + 3600);
     break;
 
   case ACTID_AV_SYNC_RESET:
-    xine_set_param(gGui->xine, XINE_PARAM_AV_OFFSET, 0);
+    xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, 0);
     break;
 
   case ACTID_SPEED_FAST:
@@ -618,7 +618,7 @@ void gui_status_callback (int nStatus) {
 
     if (gGui->playlist_cur < gGui->playlist_num) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0 )))
+      if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 )))
 	gui_handle_xine_error();
       
     } else {
@@ -1006,7 +1006,7 @@ void gui_run (void) {
       if(!panel_is_visible())
 	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
 
-      xine_gui_send_vo_data(gGui->xine,
+      xine_gui_send_vo_data(gGui->stream,
 			    XINE_GUI_SEND_VIDEOWIN_VISIBLE,
 			    (int *)0);
     }

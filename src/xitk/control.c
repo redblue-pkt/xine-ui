@@ -88,14 +88,14 @@ void control_show_tips(int enabled, unsigned long timeout) {
  * Get current parameter 'param' value.
  */
 static int get_current_param(int param) {
-  return (xine_get_param(gGui->xine, param));
+  return (xine_get_param(gGui->stream, param));
 }
 
 /*
  * set parameter 'param' to value 'value'.
  */
 static void set_current_param(int param, int value) {
-  xine_set_param(gGui->xine, param, value);
+  xine_set_param(gGui->stream, param, value);
 }
 
 /*

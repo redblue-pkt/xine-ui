@@ -159,7 +159,7 @@ static void pl_play(xitk_widget_t *w, void *data) {
   if(j>=0 && gGui->playlist[j] != NULL) {
     
     gui_set_current_mrl(gGui->playlist[j]);
-    if(xine_get_status(gGui->xine) != XINE_STATUS_STOP)
+    if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
       gui_stop(NULL, NULL);
     
     gGui->playlist_cur = j;
@@ -177,7 +177,7 @@ static void pl_on_dbl_click(xitk_widget_t *w, void *data, int selected) {
   if(gGui->playlist[selected] != NULL) {
     
     gui_set_current_mrl(gGui->playlist[selected]);
-    if(xine_get_status(gGui->xine) != XINE_STATUS_STOP)
+    if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
       gui_stop(NULL, NULL);
     
     gGui->playlist_cur = selected;
@@ -197,7 +197,7 @@ static void pl_delete(xitk_widget_t *w, void *data) {
   
   if(j >= 0) {
 
-    if((gGui->playlist_cur == j) && ((xine_get_status(gGui->xine) != XINE_STATUS_STOP)))
+    if((gGui->playlist_cur == j) && ((xine_get_status(gGui->stream) != XINE_STATUS_STOP)))
       gui_stop(NULL, NULL);
 
     for(i = j; i < gGui->playlist_num; i++)
@@ -216,7 +216,7 @@ static void pl_delete(xitk_widget_t *w, void *data) {
     if(is_playback_widgets_enabled() && (!gGui->playlist_num))
       enable_playback_controls(0);
     
-    if(xine_get_status(gGui->xine) != XINE_STATUS_STOP)
+    if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
       gui_stop(NULL, NULL);
 
     gui_set_current_mrl(NULL);
@@ -236,7 +236,7 @@ static void pl_delete_all(xitk_widget_t *w, void *data) {
   gGui->playlist_num = 0;
   gGui->playlist_cur = 0;
 
-  if(xine_get_status(gGui->xine) != XINE_STATUS_STOP)
+  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
     gui_stop(NULL, NULL);
 
   xitk_browser_update_list(playlist->playlist, 
@@ -451,7 +451,7 @@ static void pl_save_pl(xitk_widget_t *w, void *data) {
  */
 void pl_scan_input(xitk_widget_t *w, void *ip) {
   
-  if(xine_get_status(gGui->xine) == XINE_STATUS_STOP) {
+  if(xine_get_status(gGui->stream) == XINE_STATUS_STOP) {
     const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     int                i = 0;
     

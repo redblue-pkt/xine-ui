@@ -368,9 +368,9 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   if(mrl) {
-    if((xine_get_status(gGui->xine) != XINE_STATUS_STOP)) {
+    if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
       gGui->ignore_status = 1;
-      xine_stop (gGui->xine);
+      xine_stop (gGui->stream);
       gGui->ignore_status = 0;
     }
 
@@ -379,7 +379,7 @@ static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
     
-    if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0 ))) {
+    if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 ))) {
 
       if((is_playback_widgets_enabled()) && (!gGui->playlist_num))
 	enable_playback_controls(0);

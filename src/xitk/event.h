@@ -50,6 +50,9 @@
 typedef struct {
   /* our video out driver */
   xine_vo_driver_t    *vo_driver;
+  xine_ao_driver_t    *ao_driver;
+
+  xine_stream_t       *stream;
 
   /* xine engine instance */
   xine_t              *xine;

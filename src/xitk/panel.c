@@ -239,7 +239,7 @@ void panel_update_runtime_display(void) {
   if(!panel_is_visible())
     return;
 
-  xine_get_pos_length(gGui->xine, NULL, &seconds, NULL);
+  xine_get_pos_length(gGui->stream, NULL, &seconds, NULL);
   seconds /= 1000;
   
   sprintf (timestr, "%02d:%02d:%02d",
@@ -262,7 +262,7 @@ static void *slider_loop(void *dummy) {
     xine_usec_sleep(100000);
   
   while(gGui->running) {
-    int status = xine_get_status(gGui->xine);
+    int status = xine_get_status(gGui->stream);
     
     if(status == XINE_STATUS_PLAY && gGui->ssaver_timeout) {
       
@@ -280,12 +280,12 @@ static void *slider_loop(void *dummy) {
 	if(status == XINE_STATUS_PLAY) {
 	  int pos;
 
-	  xine_get_pos_length(gGui->xine, &pos, NULL, NULL);
+	  xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
 	  xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
 	}
 	
         if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
-          gGui->mixer.volume_level = xine_get_param(gGui->xine, XINE_PARAM_AUDIO_VOLUME);
+          gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
           xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
 	  panel_check_mute();
         }
@@ -424,8 +424,8 @@ void panel_check_mute(void) {
 void panel_check_pause(void) {
   
   xitk_checkbox_set_state(panel->playback_widgets.pause, 
-	  (((xine_get_status(gGui->xine) == XINE_STATUS_PLAY) && 
-	    (xine_get_param(gGui->xine, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)) ? 1 : 0 ), 
+	  (((xine_get_status(gGui->stream) == XINE_STATUS_PLAY) && 
+	    (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)) ? 1 : 0 ), 
 			  gGui->panel_window, panel->widget_list->gc);
   
 }
@@ -441,18 +441,17 @@ void panel_reset_slider (void) {
  * Update audio/spu channel displayed informations.
  */
 void panel_update_channel_display (void) {
-  int channel;
-  const char *lang;
+  int   channel;
+  char *lang = NULL;
 
-  channel = xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+  channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
   switch (channel) {
   case -2:
     lang = "off";
     break;
   case -1:
     /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
-    lang = xine_get_audio_lang (gGui->xine, channel);
-    if (!lang)
+    if(!xine_get_audio_lang (gGui->stream, channel, lang))
       lang = "auto";
     break;
   default:
@@ -464,15 +463,14 @@ void panel_update_channel_display (void) {
   }
   xitk_label_change_label (panel->widget_list, panel->audiochan_label, lang);
   
-  channel = xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL);
+  channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
   switch (channel) {
   case -2:
     lang = "off";
     break;
   case -1:
     /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
-    lang = xine_get_spu_lang (gGui->xine, channel);
-    if (!lang)
+    if(!xine_get_spu_lang (gGui->stream, channel, lang))
       lang = "auto";
     break;
   default:
@@ -508,7 +506,7 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
 
   if(gGui->mixer.caps & XINE_PARAM_AO_MUTE) {
     gGui->mixer.mute = state;
-    xine_set_param(gGui->xine, XINE_PARAM_AUDIO_MUTE, gGui->mixer.mute);
+    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, gGui->mixer.mute);
   }
   panel_check_mute();
 }
@@ -528,13 +526,13 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 
   if(w == panel->playback_widgets.slider_play) {
     gui_set_current_position (pos);
-    if(xine_get_status(gGui->xine) != XINE_STATUS_PLAY) {
+    if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
       panel_reset_slider();
     }
   }
   else if(w == panel->mixer.slider) {
     gGui->mixer.volume_level = pos;
-    xine_set_param(gGui->xine, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
+    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
   }
   else
     /* FIXME: this error message does not make sense! */
@@ -624,22 +622,22 @@ void panel_add_mixer_control(void) {
   
   gGui->mixer.caps = 0;
 
-  if(xine_get_param(gGui->xine, XINE_PARAM_AO_MIXER_VOL))
+  if(xine_get_param(gGui->stream, XINE_PARAM_AO_MIXER_VOL))
     gGui->mixer.caps |= XINE_PARAM_AO_MIXER_VOL;
-  if(xine_get_param(gGui->xine, XINE_PARAM_AO_PCM_VOL))
+  if(xine_get_param(gGui->stream, XINE_PARAM_AO_PCM_VOL))
     gGui->mixer.caps |= XINE_PARAM_AO_PCM_VOL;
-  if(xine_get_param(gGui->xine, XINE_PARAM_AO_MUTE))
+  if(xine_get_param(gGui->stream, XINE_PARAM_AO_MUTE))
     gGui->mixer.caps |= XINE_PARAM_AO_MUTE;
 
   if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     xitk_enable_widget(panel->mixer.slider);
-    gGui->mixer.volume_level = xine_get_param(gGui->xine, XINE_PARAM_AUDIO_VOLUME);
+    gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
     xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
   }
 
   if(gGui->mixer.caps & XINE_PARAM_AO_MUTE) {
     xitk_enable_widget(panel->mixer.mute);
-    gGui->mixer.mute = xine_get_param(gGui->xine, XINE_PARAM_AUDIO_MUTE);
+    gGui->mixer.mute = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_MUTE);
     xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute,
 			    gGui->panel_window, panel->widget_list->gc);
   }

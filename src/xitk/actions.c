@@ -104,18 +104,18 @@ void gui_play (xitk_widget_t *w, void *data) {
 
   video_window_reset_ssaver();
 
-  if (xine_get_status (gGui->xine) != XINE_STATUS_PLAY) {
+  if (xine_get_status (gGui->stream) != XINE_STATUS_PLAY) {
 
     if (!strncmp (gGui->filename, "xine-ui version", 15)) {
       xine_error (_("No MRL (input stream) specified"));
       return;
     }
 
-    if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0)))
+    if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0)))
       gui_handle_xine_error();
   } 
   else
-    xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   
   panel_check_pause();
 }
@@ -123,7 +123,7 @@ void gui_play (xitk_widget_t *w, void *data) {
 void gui_stop (xitk_widget_t *w, void *data) {
 
   gGui->ignore_status = 1;
-  xine_stop (gGui->xine);
+  xine_stop (gGui->stream);
   gGui->ignore_status = 0; 
   panel_reset_slider ();
   panel_check_pause();
@@ -138,10 +138,10 @@ void gui_stop (xitk_widget_t *w, void *data) {
 
 void gui_pause (xitk_widget_t *w, void *data, int state) {
   
-  if (xine_get_param(gGui->xine, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
-    xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+  if (xine_get_param(gGui->stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
+    xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
   else
-    xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   panel_check_pause();
 }
 
@@ -149,7 +149,7 @@ void gui_eject(xitk_widget_t *w, void *data) {
   const char *tmp_playlist[MAX_PLAYLIST_LENGTH];
   int i, new_num = 0;
   
-  if (xine_eject(gGui->xine)) {
+  if (xine_eject(gGui->stream)) {
 
     if(gGui->playlist_num) {
       char  *tok = NULL;
@@ -267,8 +267,8 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
 
 void gui_toggle_aspect(void) {
   
-  xine_set_param(gGui->xine, XINE_PARAM_VO_ASPECT_RATIO, 
-		 (xine_get_param(gGui->xine, XINE_PARAM_VO_ASPECT_RATIO)) + 1);
+  xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, 
+		 (xine_get_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO)) + 1);
 
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
@@ -279,8 +279,8 @@ void gui_toggle_aspect(void) {
 
 void gui_toggle_interlaced(void) {
 
-  xine_set_param(gGui->xine, XINE_PARAM_VO_DEINTERLACE, 
-		 1 - (xine_get_param(gGui->xine, XINE_PARAM_VO_DEINTERLACE)));
+  xine_set_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE, 
+		 1 - (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE)));
 
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
@@ -290,7 +290,7 @@ void gui_toggle_interlaced(void) {
 }
 
 void gui_direct_change_audio_channel(xitk_widget_t *w, void *data, int value) {
-  xine_set_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, value);
+  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, value);
   panel_update_channel_display ();
 }
 
@@ -298,7 +298,7 @@ void gui_change_audio_channel(xitk_widget_t *w, void *data) {
   int dir = (int)data;
   int channel;
   
-  channel = xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+  channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
   
   if(dir == GUI_NEXT)
     channel++;
@@ -309,7 +309,7 @@ void gui_change_audio_channel(xitk_widget_t *w, void *data) {
 }
 
 void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value) {
-  xine_set_param(gGui->xine, XINE_PARAM_SPU_CHANNEL, value);
+  xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, value);
   panel_update_channel_display ();
 }
 
@@ -317,7 +317,7 @@ void gui_change_spu_channel(xitk_widget_t *w, void *data) {
   int dir = (int)data;
   int channel;
   
-  channel = xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL);
+  channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
 
   if(dir == GUI_NEXT)
     channel++;
@@ -330,21 +330,21 @@ void gui_change_spu_channel(xitk_widget_t *w, void *data) {
 void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 
   if(((int)data) == GUI_NEXT) {
-    if (xine_get_param(gGui->xine, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-      xine_set_param (gGui->xine, XINE_PARAM_SPEED, 
-		      (xine_get_param(gGui->xine, XINE_PARAM_SPEED)) / 2);
+    if (xine_get_param(gGui->stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
+      xine_set_param (gGui->stream, XINE_PARAM_SPEED, 
+		      (xine_get_param(gGui->stream, XINE_PARAM_SPEED)) / 2);
   }
   else if(((int)data) == GUI_PREV) {
-    if (xine_get_param (gGui->xine, XINE_PARAM_SPEED) < XINE_SPEED_FAST_4) {
-      if (xine_get_param (gGui->xine, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-	xine_set_param (gGui->xine, XINE_PARAM_SPEED, 
-			(xine_get_param(gGui->xine, XINE_PARAM_SPEED)) * 2);
+    if (xine_get_param (gGui->stream, XINE_PARAM_SPEED) < XINE_SPEED_FAST_4) {
+      if (xine_get_param (gGui->stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
+	xine_set_param (gGui->stream, XINE_PARAM_SPEED, 
+			(xine_get_param(gGui->stream, XINE_PARAM_SPEED)) * 2);
       else
-	xine_set_param (gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
+	xine_set_param (gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
     }
   }
   else if(((int)data) == GUI_RESET) {
-    xine_set_param (gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    xine_set_param (gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   }
   
 }
@@ -354,7 +354,7 @@ void *gui_set_current_position_thread(void *data) {
 
   pthread_detach(pthread_self());
   
-  if(!xine_play (gGui->xine, pos, 0))
+  if(!xine_play (gGui->stream, pos, 0))
     gui_handle_xine_error();
   
   gGui->ignore_status = 0;
@@ -369,7 +369,7 @@ void *gui_seek_relative_thread(void *data) {
   
   pthread_detach(pthread_self());
   
-  xine_get_pos_length(gGui->xine, NULL, &sec, NULL);
+  xine_get_pos_length(gGui->stream, NULL, &sec, NULL);
   sec /= 1000;
 
   if((sec + off_sec) < 0)
@@ -377,7 +377,7 @@ void *gui_seek_relative_thread(void *data) {
   else
     sec += off_sec;
 
-  if(!xine_play (gGui->xine, 0, sec))
+  if(!xine_play (gGui->stream, 0, sec))
     gui_handle_xine_error();
 
   gGui->ignore_status = 0;
@@ -389,12 +389,12 @@ void *gui_seek_relative_thread(void *data) {
 void gui_set_current_position (int pos) {
   int err;
   
-  if(((xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
+  if(((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
      (gGui->ignore_status == 1))
     return;
     
-  if(xine_get_status(gGui->xine) != XINE_STATUS_PLAY)
-    xine_open(gGui->xine, gGui->filename);
+  if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY)
+    xine_open(gGui->stream, gGui->filename);
   
   gGui->ignore_status = 1;
   
@@ -408,11 +408,11 @@ void gui_set_current_position (int pos) {
 void gui_seek_relative (int off_sec) {
   int err;
   
-  if(((xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
+  if(((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
      (gGui->ignore_status == 1))
     return;
   
-  if(xine_get_status(gGui->xine) != XINE_STATUS_PLAY)
+  if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY)
     return;
   
   gGui->ignore_status = 1;
@@ -469,7 +469,7 @@ void gui_dndcallback (char *filename) {
     gGui->playlist_cur = gGui->playlist_num++;
     gGui->playlist[gGui->playlist_cur] = strdup(buffer);
 
-    if((xine_get_status(gGui->xine) == XINE_STATUS_STOP))
+    if((xine_get_status(gGui->stream) == XINE_STATUS_STOP))
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
 
     pl_update_playlist();
@@ -484,7 +484,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
   int by_chapter;
 
   by_chapter = (gGui->skip_by_chapter &&
-		(xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_HAS_CHAPTERS))) ? 1 : 0;
+		(xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_HAS_CHAPTERS))) ? 1 : 0;
   
   if(((int)data) == GUI_NEXT) {
 
@@ -525,7 +525,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	if((gGui->playlist_cur < gGui->playlist_num)) {
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
 	  
-	  if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0)))
+	  if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0)))
 	    gui_handle_xine_error();
 	  
 	}
@@ -683,7 +683,7 @@ void gui_increase_audio_volume(void) {
   if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     if(gGui->mixer.volume_level < 100) {
       gGui->mixer.volume_level++;
-      xine_set_param(gGui->xine, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
+      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
       xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
     }
   }
@@ -694,7 +694,7 @@ void gui_decrease_audio_volume(void) {
   if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     if(gGui->mixer.volume_level > 0) {
       gGui->mixer.volume_level--;
-      xine_set_param(gGui->xine, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
+      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
       xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
     }
   }
@@ -702,10 +702,10 @@ void gui_decrease_audio_volume(void) {
 
 void gui_change_zoom(int zoom_dx, int zoom_dy) {
 
-  xine_set_param(gGui->xine, XINE_PARAM_VO_ZOOM_X,
-		 xine_get_param(gGui->xine, XINE_PARAM_VO_ZOOM_X) + zoom_dx);
-  xine_set_param(gGui->xine, XINE_PARAM_VO_ZOOM_Y,
-		 xine_get_param(gGui->xine, XINE_PARAM_VO_ZOOM_Y) + zoom_dy);
+  xine_set_param(gGui->stream, XINE_PARAM_VO_ZOOM_X,
+		 xine_get_param(gGui->stream, XINE_PARAM_VO_ZOOM_X) + zoom_dx);
+  xine_set_param(gGui->stream, XINE_PARAM_VO_ZOOM_Y,
+		 xine_get_param(gGui->stream, XINE_PARAM_VO_ZOOM_Y) + zoom_dy);
   
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
@@ -719,8 +719,8 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
  */
 void gui_reset_zoom(void) {
 
-  xine_set_param(gGui->xine, XINE_PARAM_VO_ZOOM_X, 100);
-  xine_set_param(gGui->xine, XINE_PARAM_VO_ZOOM_Y, 100);
+  xine_set_param(gGui->stream, XINE_PARAM_VO_ZOOM_X, 100);
+  xine_set_param(gGui->stream, XINE_PARAM_VO_ZOOM_Y, 100);
   
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
@@ -734,8 +734,8 @@ void gui_reset_zoom(void) {
  */
 void gui_toggle_tvmode(void) {
 
-  xine_set_param(gGui->xine, XINE_PARAM_VO_TVMODE,
-		 xine_get_param(gGui->xine, XINE_PARAM_VO_TVMODE) + 1);
+  xine_set_param(gGui->stream, XINE_PARAM_VO_TVMODE,
+		 xine_get_param(gGui->stream, XINE_PARAM_VO_TVMODE) + 1);
   				 
 }
 

@@ -172,7 +172,7 @@ void video_window_select_visual (void) {
   XLockDisplay (gGui->display);
   if (gGui->vo_driver) {
 
-    xine_gui_send_vo_data(gGui->xine, XINE_GUI_SEND_SELECT_VISUAL, &vinfo);
+    xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_SELECT_VISUAL, &vinfo);
 
     if (vinfo != (XVisualInfo *) -1) {
       if (! vinfo) {
@@ -255,7 +255,7 @@ static void video_window_adapt_size (void) {
 					 CWBackPixel | CWOverrideRedirect, &attr);
       
       if(gGui->vo_driver)
-	xine_gui_send_vo_data(gGui->xine, 
+	xine_gui_send_vo_data(gGui->stream, 
 			      XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
 
       XSelectInput(gGui->display, gGui->video_window, ExposureMask);
@@ -515,7 +515,7 @@ static void video_window_adapt_size (void) {
 		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
     if(gGui->vo_driver)
-      xine_gui_send_vo_data(gGui->xine,
+      xine_gui_send_vo_data(gGui->stream,
 			    XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
     
     if (gVw->xclasshint_fullscreen != NULL)
@@ -664,7 +664,7 @@ static void video_window_adapt_size (void) {
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
     
     if(gGui->vo_driver)
-      xine_gui_send_vo_data(gGui->xine, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+      xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
     
     if(gVw->borderless) {
       if (gVw->xclasshint_borderless != NULL)
@@ -957,7 +957,7 @@ void video_window_set_visibility(int show_window) {
   if(gGui->use_root_window)
     return;
 
-  xine_gui_send_vo_data(gGui->xine, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (int *)show_window);
+  xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (int *)show_window);
   
   gVw->show = show_window;
 
@@ -1291,7 +1291,7 @@ static int video_window_translate_point(int gui_x, int gui_y,
   rect.w = 0;
   rect.h = 0;
 
-  if (xine_gui_send_vo_data(gGui->xine, 
+  if (xine_gui_send_vo_data(gGui->stream, 
 			    XINE_GUI_SEND_TRANSLATE_GUI_TO_VIDEO, (void*)&rect) != -1) {
     /* driver implements gui->video coordinate space translation, use it */
     *video_x = rect.x;
@@ -1419,7 +1419,9 @@ static void video_window_handle_event (XEvent *event, void *data) {
     
     gui_handle_event(event, data);
     break;
-    
+
+#warning ADAPT ME
+#if 0
   case MotionNotify: {
     XMotionEvent *mevent = (XMotionEvent *) event;
     xine_input_event_t xine_event;
@@ -1441,10 +1443,14 @@ static void video_window_handle_event (XEvent *event, void *data) {
     }
   }
   break;
+#endif
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
+#warning ADAPT ME
+#if 0
     xine_input_event_t xine_event;
+#endif
     int x, y;
 
     if(!gGui->cursor_visible) {
@@ -1456,6 +1462,8 @@ static void video_window_handle_event (XEvent *event, void *data) {
       panel_toggle_visibility(NULL, NULL);
 
     if (bevent->button == Button1) {
+#warning ADAPT ME
+#if 0
       if (video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
 	xine_event.event.type = XINE_EVENT_MOUSE_BUTTON;
 	xine_event.button = 1;
@@ -1463,6 +1471,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
 	xine_event.y = y;
 	xine_send_event(gGui->xine, (xine_event_t*)(&xine_event));
       }
+#endif
     }
   }
   break;
@@ -1477,7 +1486,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
     if (xev->count == 0) {
 
       if(event->xany.window == gGui->video_window) {
-	xine_gui_send_vo_data(gGui->xine, XINE_GUI_SEND_EXPOSE_EVENT, event);
+	xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_EXPOSE_EVENT, event);
       }
     }
   }
@@ -1507,7 +1516,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
   }
 
   if (event->type == gVw->completion_event) 
-    xine_gui_send_vo_data(gGui->xine, XINE_GUI_SEND_COMPLETION_EVENT, (void *)event);
+    xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_COMPLETION_EVENT, (void *)event);
 
 }
 

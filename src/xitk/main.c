@@ -519,6 +519,8 @@ static xine_ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 /*
  *
  */
+#warning ADAPT ME
+#if 0
 void event_listener (void *user_data, xine_event_t *event) {
 
   /* printf ("main: event listener, got event type %d\n", event->type); */
@@ -587,7 +589,7 @@ void event_listener (void *user_data, xine_event_t *event) {
   }      
  
 }
-
+#endif
 /*
  * Callback of config value change about reporting mode.
  */
@@ -598,6 +600,8 @@ static void unhandled_codec_mode_cb(void *dummy, xine_cfg_entry_t *entry) {
 /*
  * Callback called on codec reporting.
  */
+#warning ADAPT ME
+#if 0
 static void codec_reporting(void *user_data, int codec_type,
 			    uint32_t fourcc, const char *description, int handled) {
   char fourcc_txt[10];
@@ -634,6 +638,7 @@ static void codec_reporting(void *user_data, int codec_type,
     }
   }
 }
+#endif
 
 /*
  * initialize codec reporting stuff.
@@ -645,10 +650,13 @@ static void init_report_codec(void) {
   /*
    * Register codec reporting
    */
+#warning ADAPT ME
+#if 0
   if(!xine_register_report_codec_cb(gGui->xine, codec_reporting, (void *) gGui)){
     fprintf(stderr, "xine_register_report_codec_cb() failed: exit\n");
     exit(1);
   }
+#endif
   
   unhandled_codec_mode =
     xine_config_register_enum (gGui->xine,
@@ -675,7 +683,6 @@ int main(int argc, char *argv[]) {
   int		          visual = 0;
   char                   *audio_driver_id = NULL;
   char                   *video_driver_id = NULL;
-  xine_ao_driver_t       *audio_driver = NULL ;
   sigset_t                vo_mask;
   char                  **_argv;
   int                     _argc;
@@ -971,22 +978,22 @@ int main(int argc, char *argv[]) {
   free(video_driver_id);
 
   /* Audio out plugin */
-  audio_driver = load_audio_out_driver(audio_driver_id);
+  gGui->ao_driver = load_audio_out_driver(audio_driver_id);
   free(audio_driver_id);
   
   
   /*
    * xine init
    */
-  xine_init (gGui->xine, audio_driver, gGui->vo_driver);
+  xine_init (gGui->xine);
 
 #warning FIXME NEWAPI
 #if 0
   xine_tvmode_init2(gGui->xine);
 #endif
 
-  xine_set_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
-  xine_set_param(gGui->xine, XINE_PARAM_SPU_CHANNEL, spu_channel);
+  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
+  xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
 
   /* init the video window */
   video_window_select_visual ();
@@ -994,7 +1001,10 @@ int main(int argc, char *argv[]) {
   /*
    * Register an event listener
    */
+#warning ADAPT ME
+#if 0
   xine_register_event_listener(gGui->xine, event_listener, (void *) gGui);
+#endif
 
   init_report_codec();
 
