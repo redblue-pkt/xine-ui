@@ -954,9 +954,9 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
   char                 buffer[2048];
   xitk_widget_t       *w;
   xitk_menu_entry_t    menu_entries[] = {
-    { NULL , "<title>",      NULL, NULL },
-    { "SEP", "<separator>",  NULL, NULL },
-    { NULL,  NULL,           NULL, NULL }
+    { NULL , NULL, "<title>",      NULL, NULL },
+    { "SEP", NULL, "<separator>",  NULL, NULL },
+    { NULL,  NULL, NULL,           NULL, NULL }
   };
 
   sprintf(buffer, "%s", _("Audio"));
@@ -1030,9 +1030,9 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
   char                 buffer[2048];
   xitk_widget_t       *w;
   xitk_menu_entry_t    menu_entries[] = {
-    { NULL , "<title>",      NULL, NULL },
-    { "SEP", "<separator>",  NULL, NULL },
-    { NULL,  NULL,           NULL, NULL }
+    { NULL , NULL, "<title>",      NULL, NULL },
+    { "SEP", NULL, "<separator>",  NULL, NULL },
+    { NULL,  NULL, NULL,           NULL, NULL }
   };
 
   sprintf(buffer, "%s", _("Subtitle"));
