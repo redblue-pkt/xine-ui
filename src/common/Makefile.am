@@ -19,7 +19,8 @@ libcommon_la_SOURCES = \
 noinst_HEADERS = \
 	$(GETOPT_HDR) \
 	utils.h \
-	xscreensaver-remote.h
+	xscreensaver-remote.h \
+	libcommon.h
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"

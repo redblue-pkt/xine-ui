@@ -38,7 +38,6 @@
 #include "utils.h"
 
 extern char **environ;
-extern int errno;
 
 /*
  * Execute a shell command.

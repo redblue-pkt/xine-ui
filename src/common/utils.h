@@ -20,11 +20,10 @@
  * $Id$
  *
  */
-#ifndef HAVE_UTILS_H
-#define HAVE_UTILS_H
+#ifndef _COMMON_UTILS_H
+#define _COMMON_UTILS_H
 
 #include <sys/time.h>
-
 
 /* sys/time.h does not define timersub() on all platforms... */
 #ifndef timersub

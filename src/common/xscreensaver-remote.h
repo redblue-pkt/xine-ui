@@ -16,6 +16,8 @@
 #ifndef _XSCREENSAVER_REMOTE_H_
 #define _XSCREENSAVER_REMOTE_H_
 
+#include <X11/Xlib.h>
+
 void xscreensaver_remote_init(Display *);
 int is_xscreensaver_running(Display *);
 int xscreensaver_kill_server(Display *);
