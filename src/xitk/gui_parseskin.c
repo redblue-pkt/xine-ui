@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "xine.h"
 #include "gui_main.h"
 #include "gui_list.h"
 #include "gui_image.h"

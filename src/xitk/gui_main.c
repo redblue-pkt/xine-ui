@@ -52,6 +52,8 @@
 #include "utils.h"
 #include "monitor.h"
 
+#warning LIRC is temporary disabled
+#undef HAVE_LIRC
 #ifdef HAVE_LIRC
 #include "lirc/lirc_client.h"
 
@@ -77,7 +79,7 @@ static DND_struct_t   *xdnd_panel_win;
 static gui_move_t      gui_move; 
 static widget_list_t  *gui_widget_list;
 static ImlibImage     *gui_bg_image;                 /* background image */
-extern ImlibData      *gImlib_data;
+ImlibData             *gImlib_data;
 extern Display        *gDisplay;
 extern xine_t         *gXine;
 
@@ -1459,7 +1461,7 @@ static void *xine_lirc_loop(void *dummy) {
 	    break;
 
 	  case lPLAY:
-	    if(xine_get_status() != XINE_PLAY)
+	    if(xine_get_status(gXine) != XINE_PLAY)
 	      gui_play(NULL, NULL);
 	    else
 	      gui_stop(NULL, NULL);

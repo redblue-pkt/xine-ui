@@ -46,8 +46,7 @@
 #include "gui_browser.h"
 #include "utils.h"
 #include "xine.h"
-#include "../video_out/video_out.h"
-#include "configfile.h"
+/*  #include "configfile.h" FIXME  */
 
 
 static widget_t       *w_hue = NULL, *w_sat = NULL, *w_bright = NULL;
@@ -72,6 +71,7 @@ extern pthread_mutex_t gXLock;
  * Update silders positions
  */
 static void update_sliders_video_settings(void) {
+  /* FIXME
   if(widget_enabled(w_hue)) {
     slider_set_pos(ctl_widget_list, w_hue, 
 		   gVideoDriver->get_current_hue());
@@ -88,6 +88,7 @@ static void update_sliders_video_settings(void) {
     slider_set_pos(ctl_widget_list, w_cont, 
 		   gVideoDriver->get_current_contrast());
   }
+  */
 }
 
 /*
@@ -96,12 +97,14 @@ static void update_sliders_video_settings(void) {
 static void set_hue(widget_t *w, void *data, int value) {
   int ret = 0;
 
+  /* FIXME
   if(gVideoDriver->set_hue) {
     (ret = gVideoDriver->set_hue(value));
     
     if(ret != value)
       update_sliders_video_settings();
   }
+  */
 }
 
 /*
@@ -110,12 +113,14 @@ static void set_hue(widget_t *w, void *data, int value) {
 static void set_saturation(widget_t *w, void *data, int value) {
   int ret = 0;
 
+  /* FIXME
   if(gVideoDriver->set_saturation) {
     (ret = gVideoDriver->set_saturation(value));
     
     if(ret != value)
       update_sliders_video_settings();
   }
+  */
 }
 
 /*
@@ -123,13 +128,14 @@ static void set_saturation(widget_t *w, void *data, int value) {
  */
 static void set_brightness(widget_t *w, void *data, int value) {
   int ret = 0;
-
+  /* FIXME
   if(gVideoDriver->set_brightness) {
     (ret = gVideoDriver->set_brightness(value));
     
     if(ret != value)
       update_sliders_video_settings();
   }
+  */
 }
 
 /*
@@ -138,12 +144,14 @@ static void set_brightness(widget_t *w, void *data, int value) {
 static void set_contrast(widget_t *w, void *data, int value) {
   int ret = 0;
 
+  /* FIXME
   if(gVideoDriver->set_contrast) {
     (ret = gVideoDriver->set_contrast(value));
 
     if(ret != value)
       update_sliders_video_settings();
   }
+  */
 }
 
 /*
@@ -151,14 +159,18 @@ static void set_contrast(widget_t *w, void *data, int value) {
  */
 static void ctl_save(widget_t *w, void *data) {
 
+  /* FIXME
   if(gVideoDriver->save_settings)
     gVideoDriver->save_settings();
+  */
 }
 static void ctl_reset(widget_t *w, void *data) {
 
+  /* FIXME
   if(gVideoDriver->reset_settings)
     gVideoDriver->reset_settings();
 
+  */
   update_sliders_video_settings();  
 }
 
@@ -210,7 +222,7 @@ void control_raise_window(void) {
       if(ctl_running) {
 	XMapRaised(gDisplay, ctl_win);
 	ctl_panel_visible = 1;
-	XSetTransientForHint (gDisplay, ctl_win, gVideoWin);
+/*  	XSetTransientForHint (gDisplay, ctl_win, gVideoWin); FIXME  */
       }
     } else {
       XUnmapWindow (gDisplay, ctl_win);
@@ -230,7 +242,7 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
     if(ctl_running) {
       ctl_panel_visible = 1;
       XMapRaised(gDisplay, ctl_win); 
-      XSetTransientForHint (gDisplay, ctl_win, gVideoWin);
+/*        XSetTransientForHint (gDisplay, ctl_win, gVideoWin); FIXME  */
     }
   }
 }
@@ -241,7 +253,7 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
 void control_handle_event(XEvent *event) {
   XExposeEvent  *myexposeevent;
   static XEvent *old_event;
-
+  /* FIXME
   if(event->xany.window == ctl_win || event->xany.window == gVideoWin) {
     
     switch(event->type) {
@@ -256,12 +268,12 @@ void control_handle_event(XEvent *event) {
     break;
     
     case MotionNotify:
-      
+  */
       /* printf ("MotionNotify\n"); */
-      motion_notify_widget_list (ctl_widget_list, 
+  /*  motion_notify_widget_list (ctl_widget_list, 
 				 event->xbutton.x, event->xbutton.y);
-      /* if window-moving is enabled move the window */
-      old_event = event;
+  */  /* if window-moving is enabled move the window */
+  /*      old_event = event;
       if (ctl_move.enabled) {
 	int x,y;
 	x = (event->xmotion.x_root) 
@@ -275,7 +287,6 @@ void control_handle_event(XEvent *event) {
 	  XLOCK ();
 	  XMoveWindow(gDisplay, ctl_win, x, y);
 	  XUNLOCK ();
-	  
 	  config_file_set_int ("x_control",x);
 	  config_file_set_int ("y_control",y);
 	}
@@ -283,18 +294,18 @@ void control_handle_event(XEvent *event) {
       break;
       
     case MappingNotify:
-      /* printf ("MappingNotify\n");*/
-      XLOCK ();
+  */  /* printf ("MappingNotify\n");*/
+      /*  XLOCK ();
       XRefreshKeyboardMapping((XMappingEvent *) event);
-      XUNLOCK ();
+      XUNLOCK (); 
       break;
       
       
     case ButtonPress: {
       XButtonEvent *bevent = (XButtonEvent *) event;
-      
+      */
       /* if no widget is hit enable moving the window */
-      if(bevent->window == ctl_win)
+  /*      if(bevent->window == ctl_win)
 	ctl_move.enabled = !click_notify_widget_list (ctl_widget_list, 
 						     event->xbutton.x, 
 						     event->xbutton.y, 0);
@@ -308,8 +319,8 @@ void control_handle_event(XEvent *event) {
     case ButtonRelease:
       click_notify_widget_list (ctl_widget_list, event->xbutton.x, 
 				event->xbutton.y, 1);
-      ctl_move.enabled = 0; /* disable moving the window       */  
-      break;
+	ctl_move.enabled = 0; */ /* disable moving the window       */  
+  /*      break;
       
     case ClientMessage:
       if(event->xany.window == ctl_win)
@@ -317,7 +328,7 @@ void control_handle_event(XEvent *event) {
       break;
       
     }
-  }
+    }*/
 }
 
 /*
@@ -336,9 +347,9 @@ void control_panel(void) {
 
   /* This shouldn't be happend */
   if(ctl_win) {
-    XLOCK ();
+    /*  XLOCK (); FIXME  */
     XMapRaised(gDisplay, ctl_win); 
-    XUNLOCK();
+    /*  XUNLOCK(); FIXME  */
     ctl_panel_visible = 1;
     ctl_running = 1;
     return;
@@ -346,7 +357,7 @@ void control_panel(void) {
 
   ctl_running = 1;
 
-  XLOCK ();
+  /*  XLOCK (); FIXME  */
 
   if (!(ctl_bg_image = Imlib_load_image(gImlib_data,
 					gui_get_skinfile("CtlBG")))) {
@@ -355,8 +366,10 @@ void control_panel(void) {
   }
 
   screen = DefaultScreen(gDisplay);
+  /* FIXME
   hint.x = config_file_lookup_int ("x_control", 200);
   hint.y = config_file_lookup_int ("y_control", 100);
+  */
   hint.width = ctl_bg_image->rgb_width;
   hint.height = ctl_bg_image->rgb_height;
   hint.flags = PPosition | PSize;
@@ -382,7 +395,7 @@ void control_panel(void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  XSetTransientForHint (gDisplay, ctl_win, gVideoWin);
+/*    XSetTransientForHint (gDisplay, ctl_win, gVideoWin); FIXME  */
 
   /* set xclass */
 
@@ -410,7 +423,7 @@ void control_panel(void) {
   Imlib_apply_image(gImlib_data, ctl_bg_image, ctl_win);
   XSync(gDisplay, False); 
 
-  XUNLOCK ();
+  /*  XUNLOCK (); FIXME  */
   
   if((xdnd_ctl_win = (DND_struct_t *) xmalloc(sizeof(DND_struct_t))) != NULL) {
     gui_init_dnd(xdnd_ctl_win);
@@ -428,8 +441,8 @@ void control_panel(void) {
   ctl_widget_list->win           = ctl_win;
   ctl_widget_list->gc            = gc;
 
-
   { /* All of sliders are disabled by default*/
+  /* FIXME
     widget_t *w;
     int vidcap = 0;
 
@@ -512,10 +525,11 @@ void control_panel(void) {
 				3, "Ctr", 
 				gui_get_skinfile("CtlContLbl"))));
     widget_disable(w_cont);
-
+  */
     /*
      * Enable only supported settings.
      */
+    /* FIXME
     if((vidcap = gVideoDriver->get_capabilities()) > 0) {
       
       if(vidcap & VO_CAP_BRIGHTNESS)
@@ -530,8 +544,8 @@ void control_panel(void) {
       if(vidcap & VO_CAP_CONTRAST)
 	widget_enable(w_cont);
     }
+*/
   }
-
   gui_list_append_content (ctl_widget_list->l, 
 			   create_label_button (gui_get_skinX("CtlSave"),
 						gui_get_skinY("CtlSave"),
