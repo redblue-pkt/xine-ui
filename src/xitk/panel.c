@@ -523,7 +523,6 @@ void panel_update_channel_display (void) {
       {
 	sprintf(buffer, "%3d", channel);
       }
-    sprintf(buffer, "%3d", channel);
     lang = buffer;
     break;
   }
