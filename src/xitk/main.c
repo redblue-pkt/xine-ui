@@ -215,8 +215,9 @@ void show_usage (void) {
  * Try to load video output plugin, by stored name or probing
  */
 static void load_video_out_driver(char *video_driver_id) {
-  double        res_h, res_v;
-  x11_visual_t  vis;
+  double         res_h, res_v;
+  x11_visual_t   vis;
+  char          *default_driver;
 
   vis.display           = gGui->display;
   vis.screen            = gGui->screen;
@@ -247,15 +248,20 @@ static void load_video_out_driver(char *video_driver_id) {
   vis.request_dest_size = video_window_adapt_size;
   vis.user_data         = NULL;
   
+  /*
+   * Setting default (configfile stuff need registering before updating, etc...).
+   */
+  default_driver = gGui->config->register_string (gGui->config, "video.driver", "auto",
+						  "video driver to use",
+						  NULL, NULL, NULL);
   if (!video_driver_id) {
     /* video output driver auto-probing */
     char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
     int    i;
-
+    
     /* Try to init video with stored information */
-    video_driver_id = gGui->config->register_string (gGui->config, "video.driver", "auto",
-						     "video driver to use",
-						     NULL, NULL, NULL);
+    video_driver_id = default_driver;
+    
     if (strcmp (video_driver_id, "auto")) {
 
       gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
@@ -265,6 +271,7 @@ static void load_video_out_driver(char *video_driver_id) {
       if (gGui->vo_driver) {
 	if(driver_ids)
 	  free(driver_ids);
+	gGui->config->update_string (gGui->config, "video.driver", video_driver_id);
 	return;
       } 
     }
@@ -282,6 +289,7 @@ static void load_video_out_driver(char *video_driver_id) {
       if (gGui->vo_driver) {
 	if(driver_ids)
 	  free(driver_ids);
+	gGui->config->update_string (gGui->config, "video.driver", video_driver_id);
 	return;
       }
      
@@ -304,6 +312,9 @@ static void load_video_out_driver(char *video_driver_id) {
       printf (_("main: video driver <%s> failed\n"), video_driver_id);
       exit (1);
     }
+    
+    gGui->config->update_string (gGui->config, "video.driver", video_driver_id);
+    
   }
 }
 
@@ -311,18 +322,22 @@ static void load_video_out_driver(char *video_driver_id) {
  * Try to load audio output plugin, by stored name or probing
  */
 static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
-
+  char        *default_driver;
   ao_driver_t *audio_driver = NULL;
+  
+  /*
+   * Setting default (configfile stuff need registering before updating, etc...).
+   */
+  default_driver = gGui->config->register_string (gGui->config, "audio.driver", "auto",
+						  "audio driver to use",
+						  NULL, NULL, NULL);
   
   /*
    * if no audio driver was specified at the command line, 
    * look up audio driver id in the config file
    */
-
   if (!audio_driver_id) 
-    audio_driver_id = gGui->config->register_string (gGui->config, "audio.driver", "auto",
-						     "audio driver to use",
-						     NULL, NULL, NULL);
+    audio_driver_id = default_driver;
 
   /* probe ? */
 
@@ -363,6 +378,8 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
     if (!strncasecmp (audio_driver_id, "NULL", 4)) {
 
       printf("main: not using any audio driver (as requested).\n");
+      gGui->config->update_string (gGui->config, "audio.driver", 
+				   "null");
 
     } else {
 
@@ -373,6 +390,10 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 		audio_driver_id);
 	exit(1);
       }
+
+      gGui->config->update_string (gGui->config, "audio.driver", 
+				   audio_driver_id);
+      
     }
   }
 
