@@ -1415,6 +1415,8 @@ static void fileselector_callback(filebrowser_t *fb) {
   sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
+    int first = gGui->playlist.num;
+
     if(file)
       gui_dndcallback(file);
     free(file);
@@ -1422,6 +1424,9 @@ static void fileselector_callback(filebrowser_t *fb) {
     if(gGui->smart_mode) {
       if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
 	gui_stop(NULL, NULL);
+
+      gGui->playlist.cur = first;
+      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       gui_play(NULL, NULL);
     }   
   }
@@ -1439,7 +1444,8 @@ static void fileselector_all_callback(filebrowser_t *fb) {
     if((path = filebrowser_get_current_dir(fb)) != NULL) {
       char pathname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
       char fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-      
+      int  first = gGui->playlist.num;
+
       if(strcasecmp(path, "/"))
 	sprintf(pathname, "%s/", path);
       else
@@ -1455,6 +1461,9 @@ static void fileselector_all_callback(filebrowser_t *fb) {
       if(gGui->smart_mode) {
 	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
 	  gui_stop(NULL, NULL);
+
+	gGui->playlist.cur = first;
+	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	gui_play(NULL, NULL);
       }   
     }
