@@ -617,9 +617,9 @@ AC_DEFUN([BASH_CHECK_LIB_TERMCAP],
      _bash_needmsg=
    fi
    AC_CACHE_VAL(bash_cv_termcap_lib,
-                [AC_CHECK_LIB(termcap, tgetents, bash_cv_termcap_lib=libtermcap,
-                              [AC_CHECK_LIB(curses, tgetents, bash_cv_termcap_lib=libcurses,
-	                                    [AC_CHECK_LIB(ncurses, tgetents, bash_cv_termcap_lib=libncurses,
+                [AC_CHECK_LIB(termcap, tgetent, bash_cv_termcap_lib=libtermcap,
+                              [AC_CHECK_LIB(curses, tgetent, bash_cv_termcap_lib=libcurses,
+	                                    [AC_CHECK_LIB(ncurses, tgetent, bash_cv_termcap_lib=libncurses,
 	                                                  [ bash_cv_termcap_lib=unset
                                                             no_termcap=yes])
                                             ])
