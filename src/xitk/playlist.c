@@ -366,15 +366,17 @@ static void _playlist_save_playlist(xitk_widget_t *w, void *data) {
   filebrowser_callback_button_t  cbb[2];
   char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
-  sprintf(buffer, "%s/.xine/playlist.tox", xine_get_homedir());
+  if(gGui->playlist.num) {
+    sprintf(buffer, "%s/.xine/playlist.tox", xine_get_homedir());
+    
+    cbb[0].label = _("Save");
+    cbb[0].callback = _playlist_save_callback;
+    cbb[0].need_a_file = 1;
+    cbb[1].callback = _playlist_cancel_callback;
   
-  cbb[0].label = _("Save");
-  cbb[0].callback = _playlist_save_callback;
-  cbb[0].need_a_file = 1;
-  cbb[1].callback = _playlist_cancel_callback;
-  
-  playlist_deactivate();
-  (void *) create_filebrowser(_("Save a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
+    playlist_deactivate();
+    (void *) create_filebrowser(_("Save a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
+  }
 }
 
 /*
