@@ -214,7 +214,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   hint.min_width       = width;
   hint.height          = height;
   hint.base_height     = height;
-  hint.min_height      = width;
+  hint.min_height      = height;
   hint.win_gravity     = NorthWestGravity;
   hint.flags           = PWinGravity | PBaseSize | PMinSize | USSize | USPosition;
   
