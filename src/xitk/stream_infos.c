@@ -269,7 +269,7 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(sinfos->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, sinfos->xwin);
 
-    sinfos->xwin = None;
+    sinfos->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(sinfos->widget_list)));
     
     XLockDisplay(gGui->display);
@@ -303,40 +303,6 @@ int stream_infos_is_running(void) {
   return 0;
 }
 
-void stream_infos_toggle_visibility(xitk_widget_t *w, void *data) {
-  if(sinfos != NULL) {
-    if (sinfos->visible && sinfos->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(sinfos->xwin)))
-	  XIconifyWindow(gGui->display, xitk_window_get_window(sinfos->xwin), gGui->screen);
-	else
-	  XMapWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
-      }
-      else {
-	sinfos->visible = 0;
-	xitk_hide_widgets(sinfos->widget_list);
-	XUnmapWindow (gGui->display, xitk_window_get_window(sinfos->xwin));
-      }
-      XUnlockDisplay(gGui->display);
-    } 
-    else {
-      if(sinfos->running) {
-	sinfos->visible = 1;
-	xitk_show_widgets(sinfos->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, xitk_window_get_window(sinfos->xwin)); 
-	XMapWindow(gGui->display, xitk_window_get_window(sinfos->xwin)); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(sinfos->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(sinfos->xwin));
-      }
-    }
-  }
-}
-
 void stream_infos_toggle_auto_update(void) {
   if(sinfos != NULL) {
 
@@ -354,21 +320,14 @@ void stream_infos_toggle_auto_update(void) {
 }
 
 void stream_infos_raise_window(void) {
-  if(sinfos != NULL) {
-    if(sinfos->xwin) {
-      if(sinfos->visible && sinfos->running) {
-	  XLockDisplay(gGui->display);
-	  XUnmapWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
-	  XRaiseWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
-	  XMapWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
-	  if(!gGui->use_root_window)
-	    XSetTransientForHint (gGui->display, 
-				  xitk_window_get_window(sinfos->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(sinfos->xwin));
-      }
-    }
-  }
+  if(sinfos != NULL)
+    raise_window(xitk_window_get_window(sinfos->xwin), sinfos->visible, sinfos->running);
+}
+
+void stream_infos_toggle_visibility(xitk_widget_t *w, void *data) {
+  if(sinfos != NULL)
+    toggle_window(xitk_window_get_window(sinfos->xwin), sinfos->widget_list, 
+		  &sinfos->visible, sinfos->running);
 }
 
 void stream_infos_end(void) {

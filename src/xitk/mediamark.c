@@ -2671,7 +2671,7 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(mmkeditor->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, mmkeditor->xwin);
     
-    mmkeditor->xwin = None;
+    mmkeditor->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)));
     
     XLockDisplay(gGui->display);
@@ -2701,55 +2701,15 @@ int mmk_editor_is_running(void) {
   return 0;
 }
 
-void mmk_editor_toggle_visibility(void) {
-  if(mmkeditor != NULL) {
-    if (mmkeditor->visible && mmkeditor->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(mmkeditor->xwin)))
-	  XIconifyWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin), gGui->screen);
-	else
-	  XMapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-      }
-      else {
-	mmkeditor->visible = 0;
-	xitk_hide_widgets(mmkeditor->widget_list);
-	XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-      }
-      XUnlockDisplay(gGui->display);
-    } else {
-      if(mmkeditor->running) {
-	mmkeditor->visible = 1;
-	xitk_show_widgets(mmkeditor->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin)); 
-	XMapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin)); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint(gGui->display, 
-			       xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(mmkeditor->xwin));
-      }
-    }
-  }
+void mmk_editor_raise_window(void) {
+  if(mmkeditor != NULL)
+    raise_window(xitk_window_get_window(mmkeditor->xwin), mmkeditor->visible, mmkeditor->running);
 }
 
-void mmk_editor_raise_window(void) {
-  if(mmkeditor != NULL) {
-    if(mmkeditor->xwin) {
-      if(mmkeditor->visible && mmkeditor->running) {
-	XLockDisplay(gGui->display);
-	XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-	XRaiseWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-	XMapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-	if(!gGui->use_root_window)	
-	  XSetTransientForHint(gGui->display, 
-			       xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(mmkeditor->xwin));
-      }
-    }
-  }
+void mmk_editor_toggle_visibility(void) {
+  if(mmkeditor != NULL)
+    toggle_window(xitk_window_get_window(mmkeditor->xwin), mmkeditor->widget_list,
+		  &mmkeditor->visible, mmkeditor->running);
 }
 
 void mmk_editor_end(void) {

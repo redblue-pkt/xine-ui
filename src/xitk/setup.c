@@ -26,13 +26,10 @@
 #endif
 
 #include <stdio.h>
-#include <errno.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/cursorfont.h>
-#include <pthread.h>
-#include <assert.h>
 
 #include "common.h"
 
@@ -49,7 +46,6 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
 #define FRAME_HEIGHT             40
 
 #define MAX_DISPLAY_WIDGETS      8
-#define BROWSER_MAX_DISP_ENTRIES 17
 
 #define NORMAL_CURS              0
 #define WAIT_CURS                1
@@ -210,7 +206,7 @@ void setup_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(setup->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, setup->xwin);
     
-    setup->xwin = None;
+    setup->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(setup->widget_list)));
     xitk_list_free(setup->widgets);
     
@@ -257,60 +253,17 @@ int setup_is_visible(void) {
  * Raise setup->xwin
  */
 void setup_raise_window(void) {
-  
-  if(setup != NULL) {
-    if(setup->xwin) {
-      if(setup->visible && setup->running) {
-	XLockDisplay(gGui->display);
-	XUnmapWindow(gGui->display, xitk_window_get_window(setup->xwin));
-	XRaiseWindow(gGui->display, xitk_window_get_window(setup->xwin));
-	XMapWindow(gGui->display, xitk_window_get_window(setup->xwin));
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(setup->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(setup->xwin));
-      }
-    }
-  }
+  if(setup != NULL)
+    raise_window(xitk_window_get_window(setup->xwin), setup->visible, setup->running);
 }
 
 /*
  * Hide/show the setup panel
  */
 void setup_toggle_visibility (xitk_widget_t *w, void *data) {
-  
-  if(setup != NULL) {
-    if (setup->visible && setup->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(setup->xwin)))
-	  XIconifyWindow(gGui->display, xitk_window_get_window(setup->xwin), gGui->screen);
-	else
-	  XMapWindow(gGui->display, xitk_window_get_window(setup->xwin));
-      }
-      else {
-	setup->visible = 0;
-	xitk_hide_widgets(setup->widget_list);
-	XUnmapWindow (gGui->display, xitk_window_get_window(setup->xwin));
-      }
-      XUnlockDisplay(gGui->display);
-    } 
-    else {
-      if(setup->running) {
-	setup->visible = 1;
-	xitk_show_widgets(setup->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, xitk_window_get_window(setup->xwin)); 
-	XMapWindow(gGui->display, xitk_window_get_window(setup->xwin)); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(setup->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(setup->xwin));
-      }
-    }
-  }
+  if(setup != NULL)
+    toggle_window(xitk_window_get_window(setup->xwin), setup->widget_list,
+		  &setup->visible, setup->running);
 }
 
 static void setup_apply(xitk_widget_t *w, void *data) {

@@ -648,7 +648,7 @@ static void download_skin_cancel(xitk_widget_t *w, void *data) {
   xitk_destroy_widgets(skdloader->widget_list);
   xitk_window_destroy_window(gGui->imlib_data, skdloader->xwin);
 
-  skdloader->xwin = None;
+  skdloader->xwin = NULL;
 
   xitk_list_free((XITK_WIDGET_LIST_LIST(skdloader->widget_list)));
   

@@ -388,57 +388,17 @@ int control_is_visible(void) {
  * Raise control->window
  */
 void control_raise_window(void) {
-  if(control != NULL) {
-    if(control->window) {
-      if(control->visible && control->running) {
-	XLockDisplay(gGui->display);
-	XUnmapWindow(gGui->display, control->window);
-	XRaiseWindow(gGui->display, control->window);
-	XMapWindow(gGui->display, control->window);
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, control->window, gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(control->window);
-      }
-    }
-  }
+  if(control != NULL)
+    raise_window(control->window, control->visible, control->running);
 }
 
 /*
  * Hide/show the control panel
  */
 void control_toggle_visibility (xitk_widget_t *w, void *data) {
-  
-  if(control != NULL) {
-    if (control->visible && control->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, control->window))
-	  XIconifyWindow(gGui->display, control->window, gGui->screen);
-	else
-	  XMapWindow(gGui->display, control->window);
-      }
-      else {
-	control->visible = 0;
-	xitk_hide_widgets(control->widget_list);
-	XUnmapWindow (gGui->display, control->window);
-      }
-      XUnlockDisplay(gGui->display);
-    }
-    else {
-      if(control->running) {
-	control->visible = 1;
-	xitk_show_widgets(control->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, control->window); 
-	XMapWindow(gGui->display, control->window); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, control->window, gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(control->window);
-      }
-    }
-  }
+  if(control != NULL)
+    toggle_window(control->window, control->widget_list,
+		  &control->visible, control->running);
 }
 
 /*

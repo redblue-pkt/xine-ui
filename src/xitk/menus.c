@@ -382,7 +382,7 @@ static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   }
 }
 static void menu_help(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
-  show_help();
+  gui_execute_action_id(ACTID_HELP_SHOW);
 }
 static void menu_quit(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_execute_action_id(ACTID_QUIT);

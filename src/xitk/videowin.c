@@ -1252,6 +1252,8 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->kc_shift_l         = XKeysymToKeycode(gGui->display, XK_Shift_L);
 #endif
 
+  gettimeofday(&gVw->click_time, 0);
+
   gVw->using_xinerama     = 0;
 #ifdef HAVE_XINERAMA
   gVw->xinerama		  = NULL;
@@ -1865,7 +1867,8 @@ static void video_window_handle_event (XEvent *event, void *data) {
       
       if(click_diff < (xitk_get_timer_dbl_click())) {
 	gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
-	memset(&(gVw->click_time), 0, sizeof(struct timeval));
+	gVw->click_time.tv_sec -= (xitk_get_timer_dbl_click() / 1000.0);
+	gVw->click_time.tv_usec -= (xitk_get_timer_dbl_click() * 1000.0);
       }
       
     }

@@ -715,7 +715,8 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	  
 	  /* Ok, double click occur, call cb */
 	  if(click_diff < private_data->dbl_click_time) {
-	    memset(&(private_data->click_time), 0, sizeof(struct timeval));
+	    private_data->click_time.tv_sec -= (xitk_get_timer_dbl_click() / 1000.0);
+	    private_data->click_time.tv_usec -= (xitk_get_timer_dbl_click() * 1000.0);
 	    if(private_data->dbl_click_callback)
 	      cb2 = 1;
 	  }
@@ -758,7 +759,8 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	
 	/* Ok, double click occur, call cb */
 	if(click_diff < private_data->dbl_click_time) {
-	  memset(&(private_data->click_time), 0, sizeof(struct timeval));
+	  private_data->click_time.tv_sec -= (xitk_get_timer_dbl_click() / 1000.0);
+	  private_data->click_time.tv_usec -= (xitk_get_timer_dbl_click() * 1000.0);
 	  if(private_data->dbl_click_callback)
 	    private_data->dbl_click_callback(((btnlist_t*)data)->itemlist, 
 					     private_data->userdata, cur_clicked);
@@ -931,6 +933,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   private_data->max_length           = br->browser.max_displayed_entries;
 
   private_data->dbl_click_time       = xitk_get_timer_dbl_click();
+  gettimeofday(&private_data->click_time, 0);
 
   if(br->dbl_click_callback)
     private_data->dbl_click_callback = br->dbl_click_callback;

@@ -257,7 +257,7 @@ static void fne_destroy(filename_editor_t *fne) {
     xitk_destroy_widgets(fne->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, fne->xwin);
 
-    fne->xwin = None;
+    fne->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(fne->widget_list)));
     
     XLockDisplay(gGui->display);
@@ -871,7 +871,7 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(fb->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, fb->xwin);
 
-    fb->xwin = None;
+    fb->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(fb->widget_list)));
     
     XLockDisplay(gGui->display);
@@ -1078,21 +1078,8 @@ static void fb_handle_events(XEvent *event, void *data) {
 }
 
 void filebrowser_raise_window(filebrowser_t *fb) {
-  if(fb != NULL) {
-    if(fb->xwin) {
-      if(fb->visible && fb->running) {
-	  XLockDisplay(gGui->display);
-	  XUnmapWindow(gGui->display, xitk_window_get_window(fb->xwin));
-	  XRaiseWindow(gGui->display, xitk_window_get_window(fb->xwin));
-	  XMapWindow(gGui->display, xitk_window_get_window(fb->xwin));
-	  if(!gGui->use_root_window)
-	    XSetTransientForHint (gGui->display, 
-				  xitk_window_get_window(fb->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(fb->xwin));
-      }
-    }
-  }
+  if(fb != NULL)
+    raise_window(xitk_window_get_window(fb->xwin), fb->visible, fb->running);
 }
 
 void filebrowser_end(filebrowser_t *fb) {

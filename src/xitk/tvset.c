@@ -184,7 +184,7 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(tvset->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, tvset->xwin);
 
-    tvset->xwin = None;
+    tvset->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(tvset->widget_list)));
     
     XLockDisplay(gGui->display);
@@ -232,57 +232,15 @@ int tvset_is_running(void) {
   return 0;
 }
 
-void tvset_toggle_visibility(xitk_widget_t *w, void *data) {
-  if(tvset != NULL) {
-    if (tvset->visible && tvset->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(tvset->xwin)))
-	  XIconifyWindow(gGui->display, xitk_window_get_window(tvset->xwin), gGui->screen);
-	else
-	  XMapWindow(gGui->display, xitk_window_get_window(tvset->xwin));
-      }
-      else {
-	tvset->visible = 0;
-	xitk_hide_widgets(tvset->widget_list);
-	XUnmapWindow (gGui->display, xitk_window_get_window(tvset->xwin));
-      }
-      XUnlockDisplay(gGui->display);
-    } 
-    else {
-      if(tvset->running) {
-	tvset->visible = 1;
-	xitk_show_widgets(tvset->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, xitk_window_get_window(tvset->xwin)); 
-	XMapWindow(gGui->display, xitk_window_get_window(tvset->xwin)); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(tvset->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(tvset->xwin));
-      }
-    }
-  }
+void tvset_raise_window(void) {
+  if(tvset != NULL)
+    raise_window(xitk_window_get_window(tvset->xwin), tvset->visible, tvset->running);
 }
 
-
-void tvset_raise_window(void) {
-  if(tvset != NULL) {
-    if(tvset->xwin) {
-      if(tvset->visible && tvset->running) {
-	  XLockDisplay(gGui->display);
-	  XUnmapWindow(gGui->display, xitk_window_get_window(tvset->xwin));
-	  XRaiseWindow(gGui->display, xitk_window_get_window(tvset->xwin));
-	  XMapWindow(gGui->display, xitk_window_get_window(tvset->xwin));
-	  if(!gGui->use_root_window)
-	    XSetTransientForHint (gGui->display, 
-				  xitk_window_get_window(tvset->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(tvset->xwin));
-      }
-    }
-  }
+void tvset_toggle_visibility(xitk_widget_t *w, void *data) {
+  if(tvset != NULL)
+    toggle_window(xitk_window_get_window(tvset->xwin), tvset->widget_list,
+		  &tvset->visible, tvset->running);
 }
 
 void tvset_end(void) {

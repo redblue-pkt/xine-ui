@@ -234,39 +234,39 @@
 /* Global definition */
 static langs_t _langs[] = {
   /* English section */
-  { "C",               ENGLISH,    "_en"    }, /* WARNING: This should be the first entry */
-  { "POSIX",           ENGLISH,    "_en"    },
-  { "en_GB",           ENGLISH,    "_en"    },
+  { "C",               ENGLISH,    "en"    }, /* WARNING: This should be the first entry */
+  { "POSIX",           ENGLISH,    "en"    },
+  { "en_GB",           ENGLISH,    "en"    },
 
   /* French section */
-  { "fr_FR",           FRENCH,     "_fr"    },
-  { "fr_FR@euro",      FRENCH,     "_fr"    },
-  { "français",        FRENCH,     "_fr"    },
-  { "french",          FRENCH,     "_fr"    },
+  { "fr_FR",           FRENCH,     "fr"    },
+  { "fr_FR@euro",      FRENCH,     "fr"    },
+  { "français",        FRENCH,     "fr"    },
+  { "french",          FRENCH,     "fr"    },
 
   /* German section */
-  { "de_DE",           GERMAN,     "_de"    },
-  { "de_DE@euro",      GERMAN,     "_de"    },
-  { "deutsch",         GERMAN,     "_de"    },
-  { "dutch",           GERMAN,     "_de"    },
-  { "german",          GERMAN,     "_de"    },
+  { "de_DE",           GERMAN,     "de"    },
+  { "de_DE@euro",      GERMAN,     "de"    },
+  { "deutsch",         GERMAN,     "de"    },
+  { "dutch",           GERMAN,     "de"    },
+  { "german",          GERMAN,     "de"    },
 
   /* Portuguese section */
-  { "pt_BR",           PORTUGUESE, "_pt_BR" },
+  { "pt_BR",           PORTUGUESE, "pt_BR" },
 
   /* Spanish section */
-  { "es_ES",           SPANISH,    "_es"    },
-  { "es_ES@euro",      SPANISH,    "_es"    },
-  { "spanish",         SPANISH,    "_es"    },
+  { "es_ES",           SPANISH,    "es"    },
+  { "es_ES@euro",      SPANISH,    "es"    },
+  { "spanish",         SPANISH,    "es"    },
 
   /* Polish */
-  { "pl_PL",           POLISH,     "_pl" },
+  { "pl_PL",           POLISH,     "pl" },
 
   /* Ukrainian */
-  { "uk_UA",           UKRAINIAN,  "_uk" },
+  { "uk_UA",           UKRAINIAN,  "uk" },
 
   /* The ultimate solution */
-  { NULL,              ENGLISH,    "_en"    }
+  { NULL,              ENGLISH,    "en"    }
 };
   
 /* ISO 639-1 */

@@ -130,6 +130,7 @@
   } while (0)
 #endif
 
+
 /* Our default location for skin downloads */
 #define SKIN_SERVER_URL         "http://xine.sourceforge.net/skins/skins.slx"
 

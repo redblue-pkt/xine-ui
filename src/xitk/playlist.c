@@ -800,18 +800,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 void playlist_raise_window(void) {
   
   if(playlist != NULL) {
-    if(playlist->window) {
-      if(playlist->visible && playlist->running) {
-	XLockDisplay(gGui->display);
-	XUnmapWindow(gGui->display, playlist->window); 
-	XRaiseWindow(gGui->display, playlist->window); 
-	XMapWindow(gGui->display, playlist->window); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, playlist->window, gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(playlist->window);
-      }
-    }
+    raise_window(playlist->window, playlist->visible, playlist->running);
     mmk_editor_raise_window();
   }
 }
@@ -822,34 +811,8 @@ void playlist_raise_window(void) {
 void playlist_toggle_visibility (xitk_widget_t *w, void *data) {
 
   if(playlist != NULL) {
-    if (playlist->visible && playlist->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, playlist->window))
-	  XIconifyWindow(gGui->display, playlist->window, gGui->screen);
-	else
-	  XMapWindow(gGui->display, playlist->window);
-      }
-      else {
-	playlist->visible = 0;
-	xitk_hide_widgets(playlist->widget_list);
-	XUnmapWindow (gGui->display, playlist->window);
-      }
-      XUnlockDisplay(gGui->display);
-    } 
-    else {
-      if(playlist->running) {
-	playlist->visible = 1;
-	xitk_show_widgets(playlist->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, playlist->window); 
-	XMapWindow(gGui->display, playlist->window); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, playlist->window, gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(playlist->window);
-      }
-    }
+    toggle_window(playlist->window, playlist->widget_list, 
+		  &playlist->visible, playlist->running);
     mmk_editor_toggle_visibility();
   }
 }

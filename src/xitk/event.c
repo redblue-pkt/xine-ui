@@ -807,7 +807,7 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_HELP_SHOW:
-    show_help();
+    gui_help_show(NULL, NULL);
     break;
 
   default:

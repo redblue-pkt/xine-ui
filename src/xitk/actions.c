@@ -46,6 +46,52 @@ extern _panel_t        *panel;
 
 static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
 
+void raise_window(Window window, int visible, int running) {
+  if(window) {
+    if(visible && running) {
+      XLockDisplay(gGui->display);
+      XUnmapWindow(gGui->display, window);
+      XRaiseWindow(gGui->display, window);
+      XMapWindow(gGui->display, window);
+      if(!gGui->use_root_window)
+        XSetTransientForHint (gGui->display, window, gGui->video_window);
+      XUnlockDisplay(gGui->display);
+      layer_above_video(window);
+    }
+  }
+}
+
+void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible, int running) {
+  if(window && (*visible) && running) {
+    XLockDisplay(gGui->display);
+    if(gGui->use_root_window) {
+      if(xitk_is_window_visible(gGui->display, window))
+        XIconifyWindow(gGui->display, window, gGui->screen);
+      else
+	XMapWindow(gGui->display, window);
+    }
+    else {
+      *visible = 0;
+      xitk_hide_widgets(widget_list);
+      XUnmapWindow(gGui->display, window);
+    }
+    XUnlockDisplay(gGui->display);
+  }
+  else {
+    if(running) {
+      *visible = 1;
+      xitk_show_widgets(widget_list);
+      XLockDisplay(gGui->display);
+      XRaiseWindow(gGui->display, window);
+      XMapWindow(gGui->display, window);
+      if(!gGui->use_root_window)
+        XSetTransientForHint (gGui->display, window, gGui->video_window);
+      XUnlockDisplay(gGui->display);
+      layer_above_video(window);
+    }
+  }
+}
+
 int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length) {
   int t = 0, ret = 0;
   int lpos, ltime, llength;
@@ -775,6 +821,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int stream_infos = stream_infos_is_visible();
   int tvset        = tvset_is_visible();
   int pplugin      = pplugin_is_visible();
+  int help         = help_is_visible();
 
   if(!(video_window_is_visible()))
     return;
@@ -802,6 +849,8 @@ static void set_fullscreen_mode(int fullscreen_mode) {
       tvset_toggle_visibility(NULL, NULL);
     if(pplugin)
       pplugin_toggle_visibility(NULL, NULL);
+    if(help)
+      help_toggle_visibility(NULL, NULL);
   }
   
   video_window_set_fullscreen_mode(fullscreen_mode);
@@ -831,9 +880,10 @@ static void set_fullscreen_mode(int fullscreen_mode) {
       stream_infos_toggle_visibility(NULL, NULL);
     if(tvset)
       tvset_toggle_visibility(NULL, NULL);
-    if(pplugin) {
+    if(pplugin)
       pplugin_toggle_visibility(NULL, NULL);
-    }
+    if(help)
+      help_toggle_visibility(NULL, NULL);
   }
 
 }
@@ -1516,6 +1566,7 @@ void gui_vpp_show(xitk_widget_t *w, void *data) {
 }
 
 void gui_vpp_enable(void) {
+
   if(pplugin_is_post_selected()) {
     gGui->post_enable = !gGui->post_enable;
     osd_display_info(_("Post plugins: %s."), (gGui->post_enable) ? _("enabled") : _("disabled"));
@@ -1532,7 +1583,7 @@ void gui_viewlog_show(xitk_widget_t *w, void *data) {
   if (viewlog_is_running() && !viewlog_is_visible())
     viewlog_toggle_visibility(NULL, NULL);
   else if(!viewlog_is_running())
-    viewlog_window();
+    viewlog_panel();
   else {
     if(gGui->use_root_window)
       viewlog_toggle_visibility(NULL, NULL);
@@ -1552,6 +1603,20 @@ void gui_kbedit_show(xitk_widget_t *w, void *data) {
       kbedit_toggle_visibility(NULL, NULL);
     else
       kbedit_exit(NULL, NULL);
+  }
+}
+
+void gui_help_show(xitk_widget_t *w, void *data) {
+
+  if (help_is_running() && !help_is_visible())
+    help_toggle_visibility(NULL, NULL);
+  else if(!help_is_running())
+    help_panel();
+  else {
+    if(gGui->use_root_window)
+      help_toggle_visibility(NULL, NULL);
+    else
+      help_exit(NULL, NULL);
   }
 }
 

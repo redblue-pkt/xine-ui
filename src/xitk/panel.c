@@ -508,6 +508,13 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       pplugin_toggle_visibility(NULL, NULL);
   }
 
+  if(!panel->visible && help_is_visible()) {
+  }
+  else {
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && help_is_visible()))
+      help_toggle_visibility(NULL, NULL);
+  }
+
   if (panel->visible) {
     
     XLockDisplay(gGui->display);

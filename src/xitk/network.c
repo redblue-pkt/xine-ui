@@ -346,6 +346,8 @@ static commands_t commands[] = {
     "  gui control\n"
     "  gui mrl\n"
     "  gui setup\n"
+    "  gui vpost\n"
+    "  gui help\n"
     "  gui log"
   },
   { "event",       REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_event,
@@ -2320,6 +2322,14 @@ static void do_gui(commands_t *cmd, client_info_t *client_info) {
       }
       else if(is_arg_contain(client_info, 1, "setup")) {
 	gui_setup_show(NULL, NULL);
+	flushing++;
+      }
+      else if(is_arg_contain(client_info, 1, "vpost")) {
+	gui_vpp_show(NULL, NULL);
+	flushing++;
+      }
+      else if(is_arg_contain(client_info, 1, "help")) {
+	gui_help_show(NULL, NULL);
 	flushing++;
       }
       else if(is_arg_contain(client_info, 1, "log")) {

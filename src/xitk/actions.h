@@ -32,6 +32,9 @@
 #define GUI_PREV     2
 #define GUI_RESET    3
 
+void raise_window(Window window, int visible, int running);
+void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible, int running);
+
 int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length);
 void try_to_set_input_focus(Window window);
 void gui_display_logo(void);
@@ -70,6 +73,7 @@ void gui_setup_show(xitk_widget_t *w, void *data);
 void gui_event_sender_show(xitk_widget_t *w, void *data);
 void gui_viewlog_show(xitk_widget_t *w, void *data);
 void gui_kbedit_show(xitk_widget_t *w, void *data);
+void gui_help_show(xitk_widget_t *w, void *data);
 void gui_stream_infos_show(xitk_widget_t *w, void *data);
 void gui_tvset_show(xitk_widget_t *w, void *data);
 void gui_vpp_show(xitk_widget_t *w, void *data);

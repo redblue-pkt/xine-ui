@@ -195,6 +195,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ControlShow",            ACTID_CONTROLSHOW             , "c",        KEYMOD_META    , 0 },
   { "Visibility toggle of output window visibility.",
     "ToggleWindowVisibility", ACTID_TOGGLE_WINOUT_VISIBLITY , "h",        KEYMOD_NOMOD   , 0 },
+  { "Visibility toggle of help window.",
+    "HelpShow",               ACTID_HELP_SHOW               , "h",        KEYMOD_META    , 0 },
   { "Select next audio channel.",
     "AudioChannelNext",       ACTID_AUDIOCHAN_NEXT          , "plus",     KEYMOD_NOMOD   , 0 },
   { "Select previous audio channel.",
@@ -1281,59 +1283,17 @@ int kbedit_is_visible(void) {
  */
 void kbedit_raise_window(void) {
   
-  if(kbedit != NULL) {
-    if(kbedit->xwin) {
-      if(kbedit->visible && kbedit->running) {
-	XLockDisplay(gGui->display);
-	XUnmapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
-	XRaiseWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
-	XMapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(kbedit->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(kbedit->xwin));
-      }
-    }
-  }
+  if(kbedit != NULL)
+    raise_window(xitk_window_get_window(kbedit->xwin), kbedit->visible, kbedit->running);
 }
 
 /*
  * Hide/show the kbedit panel
  */
 void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
-  
-  if(kbedit != NULL) {
-    if (kbedit->visible && kbedit->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(kbedit->xwin)))
-	  XIconifyWindow(gGui->display, xitk_window_get_window(kbedit->xwin), gGui->screen);
-	else
-	  XMapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
-      }
-      else {
-	kbedit->visible = 0;
-	xitk_hide_widgets(kbedit->widget_list);
-	XUnmapWindow (gGui->display, xitk_window_get_window(kbedit->xwin));
-      }
-      XUnlockDisplay(gGui->display);
-    } 
-    else {
-      if(kbedit->running) {
-	kbedit->visible = 1;
-	xitk_show_widgets(kbedit->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, xitk_window_get_window(kbedit->xwin)); 
-	XMapWindow(gGui->display, xitk_window_get_window(kbedit->xwin)); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(kbedit->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(kbedit->xwin));
-      }
-    }
-  }
+  if(kbedit != NULL)
+    toggle_window(xitk_window_get_window(kbedit->xwin), kbedit->widget_list,
+		  &kbedit->visible, kbedit->running);
 }
 
 static void kbedit_create_browser_entries(void) {
@@ -1496,7 +1456,7 @@ void kbedit_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(kbedit->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, kbedit->xwin);
     
-    kbedit->xwin = None;
+    kbedit->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(kbedit->widget_list)));
     
     XLockDisplay(gGui->display);

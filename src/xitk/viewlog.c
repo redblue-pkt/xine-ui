@@ -93,7 +93,7 @@ void viewlog_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(viewlog->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, viewlog->xwin);
     
-    viewlog->xwin = None;
+    viewlog->xwin = NULL;
     xitk_list_free(XITK_WIDGET_LIST_LIST(viewlog->widget_list));
     
     XLockDisplay(gGui->display);
@@ -137,70 +137,16 @@ int viewlog_is_visible(void) {
  * Raise viewlog->xwin
  */
 void viewlog_raise_window(void) {
-  
-  if(viewlog != NULL) {
-    if(viewlog->xwin) {
-      if(viewlog->visible && viewlog->running) {
-	XLockDisplay(gGui->display);
-	XUnmapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
-	XRaiseWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
-	XMapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(viewlog->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(viewlog->xwin));
-      }
-    }
-  }
+  if(viewlog != NULL)
+    raise_window(xitk_window_get_window(viewlog->xwin), viewlog->visible, viewlog->running);
 }
 /*
  * Hide/show the viewlog window.
  */
 void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
-  
-  if(viewlog != NULL) {
-    if (viewlog->visible && viewlog->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(viewlog->xwin)))
-	  XIconifyWindow(gGui->display, xitk_window_get_window(viewlog->xwin), gGui->screen);
-	else
-	  XMapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
-      }
-      else {
-	viewlog->visible = 0;
-	xitk_hide_widgets(viewlog->widget_list);
-	XUnmapWindow (gGui->display, xitk_window_get_window(viewlog->xwin));
-      }
-      XUnlockDisplay(gGui->display);
-    } 
-    else {
-      if(viewlog->running) {
-	viewlog->visible = 1;
-	xitk_show_widgets(viewlog->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, xitk_window_get_window(viewlog->xwin)); 
-	XMapWindow(gGui->display, xitk_window_get_window(viewlog->xwin)); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(viewlog->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(viewlog->xwin));
-      }
-    }
-  }
-}
-
-/*
- * Handle X events here.
- */
-static void viewlog_handle_event(XEvent *event, void *data) {
-
-  /*
-  switch(event->type) {
-  }
-  */
+  if(viewlog != NULL)
+    toggle_window(xitk_window_get_window(viewlog->xwin), viewlog->widget_list, 
+		  &viewlog->visible, viewlog->running);
 }
 
 /*
@@ -391,7 +337,7 @@ static void viewlog_end(xitk_widget_t *w, void *data) {
 /*
  * Create viewlog window
  */
-void viewlog_window(void) {
+void viewlog_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_browser_widget_t      br;
@@ -495,7 +441,7 @@ void viewlog_window(void) {
 
   viewlog->kreg = xitk_register_event_handler("viewlog", 
 					      (xitk_window_get_window(viewlog->xwin)),
-					      viewlog_handle_event,
+					      NULL,
 					      NULL,
 					      NULL,
 					      viewlog->widget_list,

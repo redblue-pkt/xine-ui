@@ -1286,7 +1286,7 @@ static void pplugin_exit(xitk_widget_t *w, void *data) {
     xitk_destroy_widgets(pplugin->widget_list);
     xitk_window_destroy_window(gGui->imlib_data, pplugin->xwin);
 
-    pplugin->xwin = None;
+    pplugin->xwin = NULL;
     xitk_list_free((XITK_WIDGET_LIST_LIST(pplugin->widget_list)));
     
     XLockDisplay(gGui->display);
@@ -1466,56 +1466,16 @@ int pplugin_is_running(void) {
   return 0;
 }
 
-void pplugin_toggle_visibility(xitk_widget_t *w, void *data) {
-  if(pplugin != NULL) {
-    if (pplugin->visible && pplugin->running) {
-      XLockDisplay(gGui->display);
-      if(gGui->use_root_window) {
-	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(pplugin->xwin)))
-	  XIconifyWindow(gGui->display, xitk_window_get_window(pplugin->xwin), gGui->screen);
-	else
-	  XMapWindow(gGui->display, xitk_window_get_window(pplugin->xwin));
-      }
-      else {
-	pplugin->visible = 0;
-	xitk_hide_widgets(pplugin->widget_list);
-	XUnmapWindow (gGui->display, xitk_window_get_window(pplugin->xwin));
-      }
-      XUnlockDisplay(gGui->display);
-    } 
-    else {
-      if(pplugin->running) {
-	pplugin->visible = 1;
-	xitk_show_widgets(pplugin->widget_list);
-	XLockDisplay(gGui->display);
-	XRaiseWindow(gGui->display, xitk_window_get_window(pplugin->xwin)); 
-	XMapWindow(gGui->display, xitk_window_get_window(pplugin->xwin)); 
-	if(!gGui->use_root_window)
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(pplugin->xwin), gGui->video_window);
-	XUnlockDisplay(gGui->display);
-	layer_above_video(xitk_window_get_window(pplugin->xwin));
-      }
-    }
-  }
+void pplugin_raise_window(void) {
+  if(pplugin != NULL)
+    raise_window(xitk_window_get_window(pplugin->xwin), pplugin->visible, pplugin->running);
 }
 
-void pplugin_raise_window(void) {
-  if(pplugin != NULL) {
-    if(pplugin->xwin) {
-      if(pplugin->visible && pplugin->running) {
-	  XLockDisplay(gGui->display);
-	  XUnmapWindow(gGui->display, xitk_window_get_window(pplugin->xwin));
-	  XRaiseWindow(gGui->display, xitk_window_get_window(pplugin->xwin));
-	  XMapWindow(gGui->display, xitk_window_get_window(pplugin->xwin));
-	  if(!gGui->use_root_window)
-	    XSetTransientForHint (gGui->display, 
-				  xitk_window_get_window(pplugin->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(pplugin->xwin));
-      }
-    }
-  }
+
+void pplugin_toggle_visibility(xitk_widget_t *w, void *data) {
+  if(pplugin != NULL)
+    toggle_window(xitk_window_get_window(pplugin->xwin), pplugin->widget_list,
+		  &pplugin->visible, pplugin->running);
 }
 
 void pplugin_update_enable_button(void) {

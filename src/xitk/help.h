@@ -24,6 +24,11 @@
 #ifndef HELP_H
 #define HELP_H
 
-void show_help(void);
+void help_panel(void);
+void help_exit(xitk_widget_t *, void *);
+int help_is_visible(void);
+int help_is_running(void);
+void help_toggle_visibility(xitk_widget_t *, void *);
+void help_raise_window(void);
 
 #endif

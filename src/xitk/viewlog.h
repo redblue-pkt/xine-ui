@@ -30,7 +30,7 @@
 
 #include "xitk.h"
 
-void viewlog_window(void);
+void viewlog_panel(void);
 void viewlog_exit(xitk_widget_t *, void *);
 int viewlog_is_visible(void);
 int viewlog_is_running(void);
