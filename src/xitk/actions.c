@@ -507,12 +507,12 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
   }
 }
 
-void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
-
+static void set_fullscreen_mode(int fullscreen_mode) {
+  
   if(!(video_window_is_visible()))
     video_window_set_visibility(1);
   
-  video_window_set_fullscreen_mode(video_window_get_fullscreen_mode() + 1);
+  video_window_set_fullscreen_mode(fullscreen_mode);
   
   /* Drawable has changed, update cursor visiblity */
   if(!gGui->cursor_visible) {
@@ -558,55 +558,12 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
     stream_infos_raise_window();
 }
 
+void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
+  set_fullscreen_mode((video_window_get_fullscreen_mode() + 1));
+}
+
 void gui_set_xinerama_fullscreen_mode(xitk_widget_t *w, void *data) {
-
-  if(!(video_window_is_visible()))
-    video_window_set_visibility(1);
-
-  video_window_set_fullscreen_mode(video_window_get_fullscreen_mode() + 4);
-
-  /* Drawable has changed, update cursor visiblity */
-  if(!gGui->cursor_visible) {
-    video_window_set_cursor_visibility(gGui->cursor_visible);
-  }
-
-  if (panel_is_visible())  {
-    XLockDisplay(gGui->display);
-    XUnmapWindow(gGui->display, gGui->panel_window);
-    XRaiseWindow(gGui->display, gGui->panel_window);
-    XMapWindow(gGui->display, gGui->panel_window);
-    XSetTransientForHint (gGui->display,
-			  gGui->panel_window, gGui->video_window);
-    XUnlockDisplay(gGui->display);
-    layer_above_video(gGui->panel_window);
-  }
-
-  if(mrl_browser_is_visible()) {
-    hide_mrl_browser();
-    show_mrl_browser();
-    set_mrl_browser_transient();
-  }
-
-  if(playlist_is_visible())
-    playlist_raise_window();
-
-  if(control_is_visible())
-    control_raise_window();
-
-  if(setup_is_visible())
-    setup_raise_window();
-
-  if(viewlog_is_visible())
-    viewlog_raise_window();
-
-  if(kbedit_is_visible())
-    kbedit_raise_window();
-
-  if(event_sender_is_visible())
-    event_sender_raise_window();
-
-  if(stream_infos_is_visible())
-    stream_infos_raise_window();
+  set_fullscreen_mode((video_window_get_fullscreen_mode() + 4));
 }
 
 void gui_toggle_aspect(void) {

@@ -305,8 +305,12 @@ static void video_window_adapt_size (void) {
    * if we are in fullscreen mode then go in xinerama fullscreen mode
    * else if we are in xinerama fullscreen, go in fullscreen mode
    */
-  if(gVw->fullscreen_req==5 && gVw->fullscreen_mode==1) gVw->fullscreen_req = 4;
-  else if(gVw->fullscreen_req==5 && gVw->fullscreen_mode==4) gVw->fullscreen_req = 1;
+  if(gVw->xinerama) {
+    if(gVw->fullscreen_req==5 && gVw->fullscreen_mode==1)
+      gVw->fullscreen_req = 4;
+    else if(gVw->fullscreen_req==5 && gVw->fullscreen_mode==4)
+      gVw->fullscreen_req = 1;
+  }
 #endif
 
   switch (gVw->fullscreen_req) {
@@ -485,7 +489,7 @@ static void video_window_adapt_size (void) {
   
 #ifdef HAVE_XINERAMA
   /* ask for xinerama fullscreen mode */
-  if (gVw->fullscreen_req==4) {
+  if (gVw->xinerama && gVw->fullscreen_req==4) {
 
     if (gGui->video_window) {
       int dummy;
@@ -847,7 +851,10 @@ static void video_window_adapt_size (void) {
     XSetInputFocus (gGui->display, 
 		    gGui->video_window, RevertToNone, CurrentTime);
 #ifdef HAVE_XINERAMA
-    XMoveWindow (gGui->display, gGui->video_window, hint.x, hint.y);
+    if(gVw->xinerama)
+      XMoveWindow (gGui->display, gGui->video_window, hint.x, hint.y);
+    else
+      XMoveWindow (gGui->display, gGui->video_window, 0, 0);
 #else
     XMoveWindow (gGui->display, gGui->video_window, 0, 0);
 #endif
