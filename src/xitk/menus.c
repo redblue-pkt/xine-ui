@@ -1111,15 +1111,18 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 
   xitk_menu_show_menu(w);
 }
-#warning ADD SHORTCUTS
+
 void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w = NULL;
   char                 buffer[2048];
+  char                *sh[50];
+  int                  shc = 0;
   xitk_menu_entry_t    menu_entries_nosel[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
-    { _("Scan"),       NULL,          NULL,          menu_scan_infos,              NULL                    },
+    { _("Scan"),       (sh[shc] = menu_get_shortcut("ScanPlaylistInfo")),
+                                      NULL,          menu_scan_infos,              NULL                    },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
     { NULL,            NULL,          NULL,          NULL,                         NULL                    }
   };
@@ -1130,7 +1133,8 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     NULL                    },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
-    { _("Edit"),       NULL,          NULL,          menu_playlist_mmk_editor,     NULL                    },
+    { _("Edit"),       (sh[shc] = menu_get_shortcut("MediamarkEditor")),
+                                      NULL,          menu_playlist_mmk_editor,     NULL                    },
     { _("Delete"),     NULL,          NULL,          menu_playlist_delete_current, NULL                    },
     { _("Delete All"), NULL,          NULL,          menu_playlist_delete_all,     NULL                    },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
@@ -1157,6 +1161,9 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
 
   w = xitk_noskin_menu_create(wl, &menu, x, y);
 
+  while(shc > 0)
+    free(sh[--shc]);
+  
   if(!selected && gGui->playlist.num) {
     xitk_menu_entry_t   menu_entry;
     
