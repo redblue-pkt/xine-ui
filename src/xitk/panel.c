@@ -238,7 +238,9 @@ void panel_update_runtime_display(void) {
   if(!panel_is_visible())
     return;
 
-  xine_get_pos_length(gGui->stream, NULL, &seconds, NULL);
+  if(!xine_get_pos_length(gGui->stream, NULL, &seconds, NULL))
+    return;
+    
   seconds /= 1000;
   
   sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
@@ -264,8 +266,8 @@ static void *slider_loop(void *dummy) {
       status = xine_get_status(gGui->stream);
       speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
       
-      if(status == XINE_STATUS_PLAY) {
-	xine_get_pos_length(gGui->stream, &pos, &secs, NULL);
+      if(status == XINE_STATUS_PLAY && 
+         xine_get_pos_length(gGui->stream, &pos, &secs, NULL)) {
 	secs /= 1000;
 	
 	if(gGui->playlist.num && gGui->mmk.end != -1) {
@@ -480,8 +482,8 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     if(gGui->logo_mode == 0) {
       int pos;
 
-      if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
-	xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
+      if(xitk_is_widget_enabled(panel->playback_widgets.slider_play) &&
+	 xine_get_pos_length(gGui->stream, &pos, NULL, NULL) ) {
 	xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 	panel_update_runtime_display();
       }
@@ -627,9 +629,10 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
       else {
 	int pos;
 	
-	xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
-	xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
-	panel_update_runtime_display();
+	if( xine_get_pos_length(gGui->stream, &pos, NULL, NULL) ) {
+	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+	  panel_update_runtime_display();
+        }
       }
     }
   }

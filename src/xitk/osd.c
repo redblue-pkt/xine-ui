@@ -229,8 +229,13 @@ void osd_stream_infos(void) {
     audiochannel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
     spuchannel   = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
     
-    xine_get_pos_length(gGui->stream, NULL, &playedtime, &totaltime);
-
+    if( !xine_get_pos_length(gGui->stream, NULL, &playedtime, &totaltime) ) {
+      xine_usec_sleep(300000); /* wait before trying again */
+      
+      if( !xine_get_pos_length(gGui->stream, NULL, &playedtime, &totaltime) )
+        return;
+    }
+    
     playedtime /= 1000;
     totaltime  /= 1000;
 
@@ -450,13 +455,18 @@ void osd_update_status(void) {
     case XINE_STATUS_PLAY:
       {
 	int speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
-	int secs;
+	int secs, t = 0;
 	
-	xine_get_pos_length(gGui->stream, NULL, &secs, NULL);
-	secs /= 1000;
+	while ( !xine_get_pos_length(gGui->stream, NULL, &secs, NULL) && ++t < 10 )
+	    xine_usec_sleep(100000); /* wait before trying again */
+	if( xine_get_pos_length(gGui->stream, NULL, &secs, NULL) ) {
+	  secs /= 1000;
 	
-	sprintf(buffer, "%s %02d:%02d:%02d", (_osd_get_speed_sym(speed)), 
-		secs / (60*60), (secs / 60) % 60, secs % 60);
+	  sprintf(buffer, "%s %02d:%02d:%02d", (_osd_get_speed_sym(speed)), 
+		  secs / (60*60), (secs / 60) % 60, secs % 60);
+	} else {
+	  sprintf(buffer, "%s", (_osd_get_speed_sym(speed)) );
+	}
       }
       break;
       

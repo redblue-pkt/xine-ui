@@ -677,7 +677,15 @@ void *gui_seek_relative_thread(void *data) {
   
   pthread_detach(pthread_self());
   
-  xine_get_pos_length(gGui->stream, NULL, &sec, NULL);
+  if( !xine_get_pos_length(gGui->stream, NULL, &sec, NULL) ) {
+    xine_usec_sleep(300000); /* wait before trying again */
+    
+    if( !xine_get_pos_length(gGui->stream, NULL, &sec, NULL) ) {
+      pthread_exit(NULL);
+      return NULL;
+    }
+  }  
+  
   sec /= 1000;
 
   if((sec + off_sec) < 0)
@@ -1189,10 +1197,11 @@ void gui_add_mediamark(void) {
   if((gGui->logo_mode == 0) && (xine_get_status(gGui->stream) == XINE_STATUS_PLAY)) {
     int secs;
 
-    xine_get_pos_length(gGui->stream, NULL, &secs, NULL);
-    secs /= 1000;
+    if( xine_get_pos_length(gGui->stream, NULL, &secs, NULL) ) {
+      secs /= 1000;
 
-    mediamark_add_entry(gGui->mmk.mrl, gGui->mmk.ident, secs, -1);
+      mediamark_add_entry(gGui->mmk.mrl, gGui->mmk.ident, secs, -1);
+    }
   }
 }
 
