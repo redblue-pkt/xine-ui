@@ -31,6 +31,7 @@
    3.5.2 The Xv video-out plugin fails to compile!
    3.6 Build problems: xine-ui.
    3.6.1 I have installed xine-lib but xine-ui complains about not finding it!
+   3.7 Can I install xine in my home directory (without being root) ?
 
    4   INSTALLATION
    4.1 Where should I put the windows codec dlls for xine?
@@ -47,6 +48,7 @@
    5.1.7 How do I use the dvd plugin?
    5.1.8 I have problems setting up my RPC-2 drive for the right region!
    5.1.9 Can xine play (S)VCDs?
+   5.1.10 How can I watch files with external AVI subtitles?
    
    5.2 AUDIO RELATED QUESTIONS
    5.2.1 When I play this stream, xine shows video but there's no audio!
@@ -103,6 +105,14 @@
      
      xine-user@lists.sourceforge.net    
 
+    Please provide some info about your setup so people have a chance to
+    help you, e.g. include information about your audio/video hardware
+    and drivers you use, operating system, cpu type and some console
+    output/any error messages. Also include command line parameters you
+    have specified and information about the type of stream you're
+    trying to play back. Also very important is the version of xine
+    you're using and information about any additional plugins you
+    may have installed on your system.
 
 2   GENERAL QUESTIONS
 
@@ -118,6 +128,11 @@
     
     xine-plugin will be a general browser plugin that will make it possible to
     watch your favorite Internet streams within your browser with xine.
+
+    gnome-xine is a gnome frontend for the xine-engine and can be used
+    as a replacement for xine-ui. It is more focused on the general
+    media-player aspects of xine, as opposed to the full-featured 
+    dvd-player-like gui that xine-ui is.
 
 2.2 Where and how do I get the latest development version?
 
@@ -199,13 +214,13 @@
 
 3.3 Can I provide additional CFLAGS for compilation?
     
-    Yes, you can do so by setting the GLOBAL_CFLAGS variable and then run
+    Yes, you can do so by setting the CFLAGS variable and then run
     configure again.
 
     This can be useful to specify additional include paths or library paths
     to the compiler.
     
-    Example: export GLOBAL_CFLAGS="-I/usr/include -L/home/guenter/xine_libs"
+    Example: export CFLAGS="-I/usr/include -L/home/guenter/xine_libs"
 
 3.4 Are there binaries for my K7 available? Can I build them?
 
@@ -268,6 +283,26 @@
       See question 3.2 for details about how to properly compile and install
       all of the xine modules. But I guess I already mentioned that just a few
       lines before. ;-)
+
+3.7 Can I install xine in my home directory (without being root) ?
+
+    yes. first set up a subdir where you install your private software, eg
+
+    $ mkdir ~/usr
+
+    then, you have to set a few environment variables - perhaps its a good
+    idea to add this to your  ~/.bashrc or somewhere similar:
+
+    export PATH="$HOME/usr/bin:$PATH"
+    export LD_LIBRARY_PATH="$HOME/usr/lib:$LD_LIBRARY_PATH"
+    export CFLAGS="-I$HOME/usr/include -L$HOME/usr/lib -O3"
+    export ACLOCAL_FLAGS="-I $HOME/usr/share/aclocal"
+
+    now you can unpack tarballs e.g. in ~/usr/src (mkdir  ~/usr/src if
+    necessary) and do a
+
+    $ ./configure --prefix=$HOME/usr
+    $ make install
 
 
 4   INSTALLATION
@@ -480,6 +515,11 @@
 
        xine VCD://[track number]
 
+5.1.10 How can I watch files with external AVI subtitles?
+
+      use a MRL like:
+
+       xine foo.avi%bar.sub
 
 5.2 AUDIO RELATED QUESTIONS
 
