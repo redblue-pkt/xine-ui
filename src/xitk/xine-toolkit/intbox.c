@@ -162,6 +162,8 @@ static void intbox_stepdown(xitk_widget_t *x, void *data) {
     private_data = (intbox_private_data_t *)w->private_data;
     private_data->value -= private_data->step;
     xitk_intbox_set_value(w, private_data->value);
+    if(private_data->callback)
+      private_data->callback(w, private_data->userdata, private_data->value);
   }
 }
 
@@ -176,6 +178,8 @@ static void intbox_stepup(xitk_widget_t *x, void *data) {
     private_data = (intbox_private_data_t *)w->private_data;
     private_data->value += private_data->step;
     xitk_intbox_set_value(w, private_data->value);
+    if(private_data->callback)
+      private_data->callback(w, private_data->userdata, private_data->value);
   }
 }
 
