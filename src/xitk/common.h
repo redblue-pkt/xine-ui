@@ -141,7 +141,7 @@ typedef struct {
 
   xine_event_queue_t       *event_queue;
 
-  int                       newbie_mode;
+  int                       smart_mode;
 
   /* Visual stuff (like animation in video window while audio only playback) */
   struct {

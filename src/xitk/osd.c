@@ -405,6 +405,7 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
 	memset(bar_color, (XINE_OSD_TEXT1 + 21), sizeof(int) * pos);
       break;
     case OSD_BAR_POS:
+    case OSD_BAR_POS2:
       if(pos)
 	bar_color[pos - 1] = (XINE_OSD_TEXT1 + 21);
       break;
@@ -418,6 +419,23 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
       for(i = 0; i < 40; i++, x += 8) {
 	xine_osd_draw_rect(gGui->osd.bar[0],
 			   x, 6, x + 3, BAR_HEIGHT - 2, bar_color[i], 1);
+      }
+      
+      xine_osd_draw_rect(gGui->osd.bar[0],
+			 x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
+    }
+    else if(type == OSD_BAR_POS2) {
+      x = 3;
+      xine_osd_draw_rect(gGui->osd.bar[0], x, 2, x + 3, BAR_HEIGHT - 2, XINE_OSD_TEXT1 + 9, 1);
+      x += 8;
+      
+      for(i = 0; i < 40; i++, x += 8) {
+	if(i == (pos - 1))
+	  xine_osd_draw_rect(gGui->osd.bar[0],
+			     x, 2, x + 3, BAR_HEIGHT - 2, bar_color[i], 1);
+	else
+	  xine_osd_draw_rect(gGui->osd.bar[0],
+			     x, 6, x + 3, BAR_HEIGHT - 6, bar_color[i], 1);
       }
       
       xine_osd_draw_rect(gGui->osd.bar[0],
@@ -478,7 +496,7 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
 }
 
 void osd_stream_position(int pos) {
-  osd_draw_bar(_("Position in Stream"), 0, 65535, pos, OSD_BAR_PROGRESS);
+  osd_draw_bar(_("Position in Stream"), 0, 65535, pos, OSD_BAR_POS2);
 }
 
 void osd_display_info(char *info) {

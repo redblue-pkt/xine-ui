@@ -157,8 +157,8 @@ static void osd_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->osd.timeout = cfg->num_value;
 }
 
-static void newbie_mode_cb(void *data, xine_cfg_entry_t *cfg) {
-  gGui->newbie_mode = cfg->num_value;
+static void smart_mode_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->smart_mode = cfg->num_value;
 }
 
 static void play_anyway_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -1080,13 +1080,13 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      osd_timeout_cb,
 			      CONFIG_NO_DATA);
 
-  gGui->newbie_mode = 
-    xine_config_register_bool(gGui->xine, "gui.newbie_mode", 
+  gGui->smart_mode = 
+    xine_config_register_bool(gGui->xine, "gui.smart_mode", 
 			      1,
 			      _("change xine's behavior for unexperienced user"), 
 			      _("In this mode, xine take some decisions to simplify user's life."),
 			      CONFIG_LEVEL_BEG,
-			      newbie_mode_cb,
+			      smart_mode_cb,
 			      CONFIG_NO_DATA);
 
   gGui->play_anyway = 

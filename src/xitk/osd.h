@@ -26,8 +26,8 @@
 
 #define OSD_BAR_PROGRESS 1
 #define OSD_BAR_POS      2
-#define OSD_BAR_STEPPER  3
-
+#define OSD_BAR_POS2     3
+#define OSD_BAR_STEPPER  4
 
 void osd_init(void);
 void osd_deinit(void);

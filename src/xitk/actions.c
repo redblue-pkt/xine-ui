@@ -858,7 +858,7 @@ void *gui_set_current_position_thread(void *data) {
 
 void *gui_seek_relative_thread(void *data) {
   int off_sec = (int)data;
-  int sec;
+  int sec, pos;
   
   pthread_detach(pthread_self());
   
@@ -875,6 +875,9 @@ void *gui_seek_relative_thread(void *data) {
     sec += off_sec;
 
   (void) gui_xine_play(gGui->stream, 0, sec, 1);
+
+  if(gui_xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
+    osd_stream_position(pos);
   
   gGui->ignore_next = 0;
   panel_check_pause();
@@ -989,7 +992,7 @@ void gui_dndcallback(char *filename) {
     if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
       gGui->playlist.cur = (gGui->playlist.num - 1);
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-      if(gGui->newbie_mode)
+      if(gGui->smart_mode)
 	gui_play(NULL, NULL);
     }   
 
@@ -1416,7 +1419,7 @@ static void fileselector_callback(filebrowser_t *fb) {
       gui_dndcallback(file);
     free(file);
 
-    if(gGui->newbie_mode) {
+    if(gGui->smart_mode) {
       if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
 	gui_stop(NULL, NULL);
       gui_play(NULL, NULL);
@@ -1449,7 +1452,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
       
       free(path);
 
-      if(gGui->newbie_mode) {
+      if(gGui->smart_mode) {
 	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
 	  gui_stop(NULL, NULL);
 	gui_play(NULL, NULL);
