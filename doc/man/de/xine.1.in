@@ -1,0 +1,202 @@
+.\" -*-Nroff-*-
+.\" 
+.\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
+.\" other parms are allowed: see man(7), man(1)
+.\" 
+.TH "XINE" "1x" "24. Januar 2002" "Das xine Projekt" ""
+.SH "NAME"
+xine \- Ein freier Video\-Player
+.SH "SYNTAX"
+.B xine
+.I "[Optionen] [MRL] ..."
+.SH "BESCHREIBUNG"
+Diese Handbuchseite beschreibt kurz den
+.BR xine
+Audio/Video\-Player.
+.PP 
+.B xine
+spielt MPEG system streams (Ton und Video), MPEG elementary streams (Z.B. .mp3 oder .mpv Dateien), MPEG transport streams, AVI Dateien, ASF Dateien, Quicktime Dateien, (S)VCDs und DVDs ab.
+.SH "OPTIONEN"
+Dieses Programm folgt dem üblichen Format der GNU Kommandozeilenoptionen, in dem lange Optionen mit 2 Minuszeichen (`\-') beginnen.
+Eine Zusammenfassung der Optionen ist unten aufgeführt.
+Für eine vollständige Beschreibung wird auf die README und FAQ in @prefix@/share/doc/xine\-ui oder auf die xine\-Homepage verwiesen.
+
+.TP 
+.B \-h,\ \-\-help
+Zeigt eine Zusammenfassung der Optionen und die verfügbaren Ausgabe\-Treiber (Plugins) an.
+.TP 
+.BR \-a,\ \-\-audio\-channel\  <Zahl>
+Wählt die angegebene Tonspur. <Zahl> ist die Nummer der Tonspur, normalerweise "0".
+.br 
+Xine 0.5 und neuer versucht, möglichst viele gültige Tonspuren (ac3, mpeg audio, avi audio, ...) des Titels zu sammeln und ordnet diese sogenannten "Virtuelen Kanälen" zu, die von 0 an beginnend durchnummeriert sind.
+.TP 
+.BR \-V,\ \-\-video\-driver\  <Treiber>
+Wählt den Video\-Treiber aus. "xine \-\-help" zeigt eine Liste der Video\-Treiber an, die auf diesem System verfügbar sind. Diese Auswahl wird automatisch in .xinerc gespeichert, so daß der Video\-Treiber nur einmalig gewählt werden braucht.
+.TP 
+.BR \-A,\ \-\-audio\-driver\  <Treiber>
+Wählt den Audio\-Treiber aus. "xine \-\-help" zeigt eine Liste der Audio\-Treiber an, die auf diesem System verfügbar sind. Diese Auswahl wird automatisch in .xinerc gespeichert, so daß der Audio\-Treiber nur einmalig gewählt werden braucht.
+.TP 
+.BR \-u,\ \-\-spu\-channel\  <Zahl>
+Wählt einen Bilduntertitel\-Kanal aus. <Zahl> gibt die Nummer des Kanals an. "\-1" steht für "keinen Untertitel" und ist die Standardauswahl.
+.TP 
+.B \-p[q][d][v],\ \-\-auto\-play=[q][d][v]
+Startet die Wiedergabe sofort nach dem Laden den Programms. Wird "q" angehängt, beendet sich das Programm am Ende der Wiedergabe.
+.br 
+Aus früherer Versionen von xine stammt die Möglichkeit, die Spielliste einer DVD durch das Anhängen von 'd' bzw. die einer VCD durch das Anhängen von 'v' abzufragen. Neuere Versionen bieten dafür eine allgemeinere Option \-\-auto\-scan (siehe unten) an. "d" und "v" können in zukünftigen Versionen entfernt werden.
+.TP 
+.BR \-s\  <plugin>,\  \-\-auto\-scan\  <plugin>
+Titelliste automatisch vom Input\-Plugin erstellen. Viele Plugins erlauben es, eine standard Titelliste zu erstellen, die "alles" enthält. Dies Funktioniert zum Beispiel gut mit DVDs und VCDs. Das Benutzen dieser Option hat die gleiche Wirkung, als wenn der zugehörige Knopf im xine\-Hauptfenster gedrückt wird.
+
+Diese Option ist besonders nützlich im Zusammenhang mit auto\-play. Durch Starten von "xine \-\-auto\-play \-\-auto\-scan dvd" kann eine gesamte DVD abgespielt werden, ohne einen weiteren Knopf zu betätigen. Dies funktioniert auch mit Plugins, die nicht mit xine ausgeliefert werden, indem einfach der Name des Knopfes angegeben wird, wie er im xine\-Fenster dargestellt wird.
+.TP 
+.B \-f, \-\-fullscreen
+Schaltet xine nach dem Start in den Vollbildschirm\-Modus. (Wie das Betätigen von "F")
+.TP 
+.B \-g, \-\-hide\-gui
+Verdeckt nach dem Start nur das Steuerfenster, das Video\-Fenster bleibt sichtbar. (Wie das Betätigen von "G")
+.TP 
+.BR \-R,\ \-\-recognize\-by\  <Option>
+Methode zum identifizieren eines Titels festlegen. Mögliche Optionen sind:
+.RS
+.IP  "default"
+Zuerst nach dem Inhalt, dann nach der Erweiterung.
+.IP  "revert"
+Zuerst nach der Erweiterung, dann nach dem Inhalt.
+.IP  "content"
+Nur nach dem Inhalt,
+.IP  "extension"
+Nur nach der Erweiterung.
+.RE
+.TP 
+.BR \-\-visual\  <Visual\-Klasse\-oder\-id>
+Bestimmtes X11\-Visual für xine\-Fenster verwenden. Der <Visual\-Klasse\-oder\-id> Parameter kann entweder der Name einer X11\-visual\-Klasse (StaticGray, GrayScale, StaticColor, PseudoColor, TrueColor oder DirectColor) oder ein hexadezimaler Wert derselben sein.
+
+Wenn ein symbolischer Name benutz wird, versucht xine ein solches Visual in der Farbtiefe 15 bzw. 16, 24 bzw. 32, oder 8 (in dieser Reihenfolge) zu finden. Die Standardeinstellung der visual\-Klasse, die bei Abwesenheit der \-\-visual\-Option benutzt wird, ist TrueColor.
+
+Wenn kein benutzbares visual gefunden wird, greift xine auf das standard\-visual zurück, daß vom Hauptfenster des X11\-Servers benutzt wird.
+.TP 
+.B \-\-install
+Wenn ein X11\-visual mit veränderlichen Farben (Farbtabellen) benutzt wird, installiert xine eine eigene Farbtabelle. Mit einer eigenen Farbtabelle kann xine mehr Farben anfordern, so daß die Video\-Ausgabe besser aussieht.
+.TP 
+.B MRL (media resource locator)
+MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Titel. Gültige MRLs können einfache Dateinamen sein oder folgendermaßen aussehen:
+.RS
+.TP 
+.B file://<path>
+.TP 
+.B fifo://<path>
+.TP 
+.BR stdin://mpeg1\  oder \ stdin://mpeg2
+.TP 
+.B dvd://VTS_xx_y.VOB
+.TP 
+.B vcd://<track number>
+.TP 
+.B tcp://<host>:<port>
+.TP 
+.B rtp://<host>:<port>
+.TP 
+.B udp://<host>:<port>
+.PP 
+Mehrere MRLs können angegeben werden, um mehrere Titel nacheinander zu spielen. Die oben aufgeführten MRLs werden standardmäßig von libxine unterstützt. Zusätzliche Plugins können diese Liste um weitere MRLs ergänzen.
+.PP 
+Wenn keine MRL angegeben wird, muß eine Datei per drag'n\-drop ausgewählt werden. Das Herüberziehen vom GNOME Midnight Commander (gmc) funktioniert.
+.RE
+.SH "SIEHE AUCH"
+Die vollständige Dokumentation befindet sich auf der xine\-Homepage:
+.UR http://xine.sourceforge.net/
+.I  "http://xine.sourceforge.net/"
+.UE
+.SH "BEDIENTASTEN"
+Viele Funktionen können durch Tastendrücken gesteuert werden. '\fBM\-\fP' ist die Meta Taste ('Alt' Taste auf PC Tastaturen), '\fBC\-\fP' ist die Control/Steuerungs 'CTRL'/'STRG' Taste, andere spzielle Tasten sind mit '\fB<\fP' und '\fB>\fP' Zeichen umklammert, z.B.: die HOME/Pos1 Taste ist dargestellt als \fB<Pos1>\fP.
+Die standard Tastaturbelegung ist:
+.IP  "0"
+Zum Anfang des momentanen Titels springen.
+.IP  "1 .. 9"
+Zu 10%..90% des momentanen Titels springen.
+.IP  "A"
+Seitenverhältnis (AUTO/16:9/4:3/DVB) umschalten.
+.IP  "M\-C | M\-c"
+Fenster mit Video\-Einstellungen anzeigen/verdecken.
+.IP  "E"
+Momentanes Medium/Titel auswerfen.
+.IP  "F"
+Vollbildmodues umschalten.
+.IP  "G"
+Bedienfenster anzeigen/verdecken.
+.IP  "H"
+Video\-Ausgabefenster anzeigen/verdecken.
+.IP  "i | I"
+Deinterlace\-Methode umschalten.
+.IP  "M\-m | M\-M"
+Fenster mit MRL\-Browser anzeigen/verdecken.
+.IP  "C\-m | C\-M"
+Ton\-Stummschaltung umschalten.
+.IP  "M\-p | M\-P"
+Fenster mit Wiedergabeliste anzeigen/verdecken.
+.IP  "Q"
+Beenden.
+.IP  "z | Z"
+Hinein/hinaus zoomen.
+.IP  "v"
+Lautstärke verringern.
+.IP  "V"
+Lautstärke erhöhen.
+.IP  "t"
+Bildschirmschnappschuß machen.
+.IP  "<RETURN>"
+Wiedergabe.
+.IP  "<LEERZEICHEN>"
+Pause.
+.IP  "<Oben>/<Untenn>"
+Schnelle / langsame Wiedergabe.
+.IP  "c\-<Links>/C\-<Rechts>"
+\-+ 15 Sekunden spulen.
+.IP  "<Links> / <Rechts>"
+\-+ 60 Sekunden spulen.
+.IP  "<Bild\ hoch>"
+Zum vorherigen Titel in der Wiedergabeliste springen.
+.IP  "<Bild\ runter>"
+Zum nächsten Titel in der Wiedergabeliste springen.
+.IP  "<"
+Ausgabefenster verkleinern.
+.IP  ">"
+Ausgabefenster vergrößern.
+.IP  "."
+Nächsten Untertitel\-Kanal auswählen.
+.IP  ","
+Vorherigen Untertitel\-Kanal auswählen.
+.IP  "+"
+Nächsten Tonkanal auswählen. (Der Wechsel kann sich bis zu einigen Sekunden verzögern)
+.IP  "\-"
+Vorherigen Tonkanal auswählen.
+.IP  "<Esc>"
+Menü 1 (e.g. root menu)
+.IP  "<F1>"
+Menü 2 (e.g. title menu)
+.IP  "<F2>"
+Menü 3
+.IP  "M\-L"
+Fenster mit Meldungen anzeigen
+.SH "SYNCHONISATIONS FEINHEITEN"
+Einige Titel haben schlechte Zeitmarken, so daß die Synchonisation nicht funktioniert. Dies kann mit folgenden Tasten korrigiert werden:
+.IP  "n | N"
+Falls das Video dem Ton vorauseilt
+.IP  "m | M"
+Falls das Video dem Ton hinterherhinkt.
+.IP  "<Pos1>"
+Video/Ton\-Differenz auf 0 zurücksetzen, so daß die Zeitmarken unverändert bleiben.
+.SH "DATEIEN"
+Alle Konfigurationsdateien befinden sich unter ~/.xine:
+.TP 
+.B ~/.xine/config
+Hauptkonfigurationsdatei.
+.TP 
+.B ~/.xine/keymap
+Tastaturbelegung von xine\-ui.
+
+.SH "AUTOR"
+Diese Hilfe wurde von Philipp Hahn <pmhahn@users.sf.net> für das xine Project übersetzt.
+
+Das englische Original wurde von Siggi Langauf <siggi@debian.org> für das xine Projekt geschrieben.
+Viele Ergänzungen stammen von Guenter Bartsch <guenter@users.sourceforge.net> und Daniel Caujolle\-Bert <f1rmb@users.sourceforge.net>

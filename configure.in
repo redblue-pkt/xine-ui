@@ -572,6 +572,10 @@ src/xitk/skins/mp2k/Makefile
 src/aaui/Makefile
 doc/Makefile
 doc/man/Makefile
+doc/man/de/Makefile
+doc/man/de/xine.1
+doc/man/de/aaxine.1
+doc/man/de/xine-check.1
 doc/man/en/Makefile
 doc/man/en/xine.1
 doc/man/en/aaxine.1

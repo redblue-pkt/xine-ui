@@ -1,0 +1,72 @@
+.\" 
+.TH "xine-check" "1" "24. Januar 2002" "Das xine Projekt" ""
+.SH "NAME"
+xine\-check \- Programm zum Überprüfen des xine Video\-Player
+
+.SH "SYNTAX"
+.B xine\-check 
+.RI [ \-q ] 
+.RI [ \-v ]
+.RI [ \-B ]
+.RI [ \-b ]
+.br 
+.B xine\-bugreport
+.RI [ \-q ] 
+.RI [ \-v ]
+.RI [ \-B ]
+.br 
+
+
+.SH "BESCHREIBUNG"
+Diese Handbuchseite beschreibt das Programm xine\-check.
+.B xine\-check
+ist ein Programm, daß die Installation des xine Video\-Players auf typische Probleme untersucht.
+.PP 
+Wenn es Probleme mit oder bei der Ausführung von \fBxine\fP gibt, kann \fBxine\-check\fP nützliche Hinweise für die Fehlersuche liefern.
+
+\fBxine\-check\fP überprüft Einstellungen des Betriebssystems, die Installation von Plugins, die Konfiguration des CD/DVD\-Laufwerks und die Video\-Unterstützung.
+
+Wenn
+.B xine\-bugreport
+aufgerufen wird, wird eine kurze Systembeschreibung generiert, um die Erstellung eines Fehlerberichts zu unterstützen. Dies ist die bevorzugte Form, um Fehler von xine zu melden, da dies die Erstellung eines Fehlerberichts vereinfacht und den Entwicklern einen vollständigeren Fehlerbericht liefert.
+.SH "OPTIONEN"
+Dieses Programm folgt dem üblichen Format der GNU Kommandozeilenoptionen, in dem lange Optionen mit 2 Minuszeichen (`\-') beginnen.
+Eine Zusammenfassung der Optionen ist unten aufgeführt.
+Für eine vollständige Beschreibung wird auf die README und FAQ in @prefix@/share/doc/xine\-ui oder auf die xine\-Homepage verwiesen.
+
+.TP 
+.B \-h,\ \-\-help
+Zeigt eine kurze Zusammenfassung und die Versionsnummer an.
+.PP 
+Die folgenden Optionen, die beim Aufruf von "xine\-check \-\-help" mit
+.B XINE\-CHECK options:
+überschrieben sind, werden im folgenden erläutert.
+.TP 
+.B \-q,\ \-\-quiet
+Für jeden Test nur eine einzige Nachricht ausgeben, selbst wenn Probleme auftauchen.
+Normalerweise gibt \fBxine\-check\fP zu jedem Problem Hinweise, um das Problem zu beheben.
+.TP 
+.B \-v,\ \-\-verbose
+Erweiterte Ausgabe aktivieren, die jeden Test ausführlich beschreibt. Dies erzeugt eine Art Liste von häufig gestellten Fragen (FAQ).
+.TP 
+.B \-B,\ \-\-batch
+Keine Pause nach langen Beschreibungen. Normalerweise pausiert \fBxine\-check\fP nach jedem gefundenen Problem und wartet auf eine Bestätigung.
+.TP 
+.B \-b,\ \-\-bug
+Produziert einen Fehlerbericht. Dies ist das selbe, als wenn direkt \fBxine\-bugreport\fP aufgerufen wird.
+.SH "FEHLER"
+Natürlich keine ;\-)
+Okay, ein paar könnten schon drin sein. Nach Unterstützung fragen (und Fehler melden) kann man auf der Mailingliste <xine\-user.de@lists.sf.net>.
+
+.SH "SIEHE AUCH"
+.BR xine (1),
+.BR aaxine (1),
+.BR xine\-lib (3),
+.UR http://xine.sourceforge.net/
+.BR http://xine.sf.net
+.UE
+
+.SH "AUTOR"
+Diese Hilfe wurde von Philipp Hahn <pmhahn@users.sf.net> für das xine Project geschrieben.
+.SH "COPYRIGHT"
+Copyright \(co 2002 Siggi Langauf

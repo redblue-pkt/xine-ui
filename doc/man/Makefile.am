@@ -1,4 +1,4 @@
-SUBDIRS = fr es en pl
+SUBDIRS = fr es en pl de
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*

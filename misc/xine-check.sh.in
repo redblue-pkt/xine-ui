@@ -362,12 +362,23 @@ esac
 UNAME=`uname -a`
 OS=`uname -s`
 ARCH=`uname -m||arch`
-
 DISTRO=unknown
-test -f /etc/debian_version && DISTRO=Debian
-test -f /etc/redhat-release && DISTRO=RedHat
-
 vars UNAME OS ARCH DISTRO
+
+if test -f /etc/debian_version; then
+  DISTRO=Debian
+  DEBIAN_VERSION="`cat /etc/version`"
+  vars DEBIAN_VERSION
+fi
+if test -f /etc/redhat-release; then
+  DISTRO=RedHat
+  REDHAT_RELEASE="`cat /etc/redhat-release`"
+  vars REDHAT_RELEASE
+fi
+if test -f /etc/VERSION; then
+  LINUX_VERSION="`cat /etc/VERSION`"
+  vars LINUX_VERSION
+fi
 
 case "$OS" in
   Linux)
@@ -824,7 +835,8 @@ case "$bugclass" in
 	 "NAV (dvdnav from dvd.sourceforge.net)" \
 	 "d4d (by captain_css)" \
 	 "d5d (by captain_css)" \
-	 "dmd"
+	 "dmd" \
+	 "other plugin, add the plugin name to the plugin version below"
     add   "used DVD plugin: $answertext"
     if [ $answer -ne 1 ]; then
       ask "What version of that plugin have you tried?"
@@ -917,7 +929,8 @@ add ""
 add "additional description:"
 add "----------------------"
 add ""
-add "(nothing, this whole message was created by xine-check)"
+add "PUT YOUR DESCRIPTION HERE"
+add "(please replace these two lines by your complete problem description)"
 add ""
 add ""
 add "system info, as found by xine-check:"
