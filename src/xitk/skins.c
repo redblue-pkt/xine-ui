@@ -99,7 +99,7 @@ static void looking_for_available_skins(void) {
   skins_avail = (skins_locations_t **) xine_xmalloc(sizeof(skins_locations_t*));
   
   memset(&buf, 0, sizeof(buf));
-  sprintf(buf, "%s/.xineskins", xine_get_homedir());
+  sprintf(buf, "%s/.xine/skins", xine_get_homedir());
 
   get_available_skins_from(buf);
   get_available_skins_from(XINE_SKINDIR);

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.4\n"
-"POT-Creation-Date: 2001-11-19 03:13+0100\n"
+"POT-Creation-Date: 2001-11-20 23:10+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -23,27 +23,27 @@ msgstr "%s(): ne trouve pas l'image de fond.\n"
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "xine-playlist: ne trouve pas l'image pour le fond.\n"
 
-#: src/xitk/control.c:504
+#: src/xitk/control.c:502
 msgid "Hue"
 msgstr "Tte"
 
-#: src/xitk/control.c:527
+#: src/xitk/control.c:525
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:550
+#: src/xitk/control.c:548
 msgid "Brt"
 msgstr "Bri"
 
-#: src/xitk/control.c:573
+#: src/xitk/control.c:571
 msgid "Ctr"
 msgstr "Ctr"
 
-#: src/xitk/control.c:609
+#: src/xitk/control.c:607
 msgid "Choose a Skin"
 msgstr "Choix de peaux"
 
-#: src/xitk/control.c:646 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:817
+#: src/xitk/control.c:644 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:815
 msgid "Dismiss"
 msgstr "Quitte"
 
@@ -290,25 +290,20 @@ msgstr "main: échec d'auto-détection du pilote audio => pas de sortie son\n"
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main: le pilote audio spécifié '%s' a échoué\n"
 
-#: src/xitk/main.c:380
-#, c-format
-msgid "main: audio driver <%s> failed\n"
-msgstr "main: le pilote audio <%s> a échoué\n"
-
-#: src/xitk/main.c:443
+#: src/xitk/main.c:439
 #, c-format
 msgid "Require xine library version 0.9.4, found %d.%d.%d.\n"
 msgstr "Requière la bibliothèque xine version 0.9.4, a trouvé %d.%d.%d.\n"
 
-#: src/xitk/main.c:511
+#: src/xitk/main.c:507
 msgid "video driver id required for -V option\n"
 msgstr "Nom du pilote video requis pour l'option -V\n"
 
-#: src/xitk/main.c:521
+#: src/xitk/main.c:517
 msgid "audio driver id required for -A option\n"
 msgstr "Nom du pilote audio requis pour l'option -A\n"
 
-#: src/xitk/main.c:618
+#: src/xitk/main.c:614
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Argument invalide %d => quitte\n"
@@ -326,19 +321,19 @@ msgstr "Source:"
 msgid "Can't read %s: %s\n"
 msgstr "Ne peux pas lire %s: %s\n"
 
-#: src/xitk/playlist.c:790
+#: src/xitk/playlist.c:788
 msgid "Add"
 msgstr "Ajoute"
 
-#: src/xitk/playlist.c:799
+#: src/xitk/playlist.c:797
 msgid "Load"
 msgstr "Charge"
 
-#: src/xitk/playlist.c:808
+#: src/xitk/playlist.c:806
 msgid "Save"
 msgstr "Sauve"
 
-#: src/xitk/playlist.c:840
+#: src/xitk/playlist.c:838
 msgid "Scan for:"
 msgstr "Source:"
 
@@ -361,3 +356,6 @@ msgstr "Échec a l'ouverture du fichier (%s)\n"
 #, c-format
 msgid "File '%s' written.\n"
 msgstr "Le fichier '%s' a été crée.\n"
+
+#~ msgid "main: audio driver <%s> failed\n"
+#~ msgstr "main: le pilote audio <%s> a échoué\n"

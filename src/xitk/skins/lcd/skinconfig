@@ -203,6 +203,14 @@ skin.CtlBtn {
 	pixmap = setup.png
 }
 
+skin.Setup {
+	coords {
+	  x = 23
+	  y = 85
+	}
+	pixmap = tool.png
+}
+
 skin.MrlBtn {
 	coords {
 	  x = 81

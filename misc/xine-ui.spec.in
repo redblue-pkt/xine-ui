@@ -188,7 +188,6 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/share/idl/xine.idl
 # skins
 @XINE_SKINDIR@/lcd/*
-@XINE_SKINDIR@/metal/*
 @XINE_SKINDIR@/pitt/*
 @XINE_SKINDIR@/xinetic/*
 # misc script

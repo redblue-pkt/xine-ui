@@ -159,7 +159,7 @@ syncfb_default_repeat   Specifies how many times a frame is repeated.
 
 skin                    skin to use, see <prefix>/share/xine/skins
                         for installed skins
-                        (e.g. default, metal, lcd, pitt, xinetic)
+                        (e.g. default, lcd, pitt, xinetic)
 
 video_driver_name       video driver to use, same as command line 
                         option -V

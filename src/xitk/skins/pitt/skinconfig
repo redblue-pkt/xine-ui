@@ -175,6 +175,14 @@ skin.AutoPlayGUI {
 	}
 }
 
+skin.Setup {
+	coords {
+	  x = 155
+	  y = 39
+	}
+	pixmap = tool.png
+}
+
 skin.MrlBtn {
 	coords {
 	  x = 241
