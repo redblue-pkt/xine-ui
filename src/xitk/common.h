@@ -273,6 +273,8 @@ typedef struct {
   int                        eventer_sticky;
   int                        stream_info_auto_update;
 
+  char                       curdir[XITK_PATH_MAX];
+
 } gGui_t;
 
 #endif

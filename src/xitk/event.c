@@ -1142,6 +1142,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->kbindings = kbindings_init_kbinding();
 
   panel_init ();
+  
+  (void *) getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
 }
 
 void gui_init_imlib (Visual *vis) {

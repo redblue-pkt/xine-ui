@@ -1234,8 +1234,13 @@ void gui_add_mediamark(void) {
   }
 }
 
+static void fileselector_cancel_callback(filebrowser_t *fb) {
+  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
+}
 static void fileselector_callback(filebrowser_t *fb) {
   char *file;
+
+  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     if(file)
@@ -1247,6 +1252,8 @@ static void fileselector_callback(filebrowser_t *fb) {
 static void fileselector_all_callback(filebrowser_t *fb) {
   char **files;
   char  *path;
+
+  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
 
   if((files = filebrowser_get_all_files(fb)) != NULL) {
     int i = 0;
@@ -1276,11 +1283,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
   }
 }
 void gui_file_selector(void) {
-  filebrowser_callback_button_t  cbb[2];
-  char                           current_dir[XITK_PATH_MAX + 1];
-  char                          *curdir;
-
-  curdir = getcwd(&current_dir[0], XITK_PATH_MAX);
+  filebrowser_callback_button_t  cbb[3];
   
   cbb[0].label = _("Select");
   cbb[0].callback = fileselector_callback;
@@ -1288,7 +1291,9 @@ void gui_file_selector(void) {
   cbb[1].label = _("Select all");
   cbb[1].callback = fileselector_all_callback;
   cbb[1].need_a_file = 0;
-  (void *) create_filebrowser(_("Stream(s) loading"), curdir, &cbb[0], &cbb[1], NULL);
+  cbb[2].callback = fileselector_cancel_callback;
+  cbb[2].need_a_file = 0;
+  (void *) create_filebrowser(_("Stream(s) loading"), gGui->curdir, &cbb[0], &cbb[1], &cbb[2]);
 }
 
 
