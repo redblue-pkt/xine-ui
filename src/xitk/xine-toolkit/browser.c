@@ -453,12 +453,10 @@ xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_wid
   xitk_list_append_content(br->parent_wlist->l, 
 			   (private_data->item_tree[WBUP] = xitk_button_create(skonfig, &b)));
   
-  sl.slider_type              = VSLIDER;
   sl.min                      = 0;
   sl.max                      = (br->browser.num_entries > (br->browser.max_displayed_entries-1) ? br->browser.num_entries-1 : 0);
   sl.step                     = 1;
-  sl.skin_element_name_bg     = br->slider.skin_element_name_bg;
-  sl.skin_element_name_paddle = br->slider.skin_element_name_paddle;
+  sl.skin_element_name        = br->slider.skin_element_name;
   sl.callback                 = browser_slidmove;
   sl.userdata                 = (void*)mywidget;
   sl.motion_callback          = browser_slidmove;

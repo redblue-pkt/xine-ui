@@ -808,18 +808,17 @@ void playlist_editor(void) {
   xitk_list_append_content (playlist->widget_list->l, 
 			   xitk_labelbutton_create (gGui->skin_config, &lb));
 
-  br.arrow_up.skin_element_name      = "PlUp";
-  br.slider.skin_element_name_bg     = "PlSlidBG";
-  br.slider.skin_element_name_paddle = "PlSlidFG";
-  br.arrow_dn.skin_element_name      = "PlDn";
-  br.browser.skin_element_name       = "PlItemBtn";
-  br.browser.max_displayed_entries   = 9;
-  br.browser.num_entries             = gGui->playlist_num;
-  br.browser.entries                 = gGui->playlist;
-  br.callback                        = handle_selection;
-  br.dbl_click_callback              = pl_on_dbl_click;
-  br.dbl_click_time                  = DEFAULT_DBL_CLICK_TIME;
-  br.parent_wlist                    = playlist->widget_list;
+  br.arrow_up.skin_element_name    = "PlUp";
+  br.slider.skin_element_name      = "SliderPl";
+  br.arrow_dn.skin_element_name    = "PlDn";
+  br.browser.skin_element_name     = "PlItemBtn";
+  br.browser.max_displayed_entries = 9;
+  br.browser.num_entries           = gGui->playlist_num;
+  br.browser.entries               = gGui->playlist;
+  br.callback                      = handle_selection;
+  br.dbl_click_callback            = pl_on_dbl_click;
+  br.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
+  br.parent_wlist                  = playlist->widget_list;
   xitk_list_append_content (playlist->widget_list->l, 
 			   (playlist->playlist = 
 			    xitk_browser_create(gGui->skin_config, &br)));

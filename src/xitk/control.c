@@ -472,16 +472,14 @@ void control_panel(void) {
 					  VO_PROP_HUE, &min, &max);
     cur = get_current_prop(VO_PROP_HUE);
     
-    sl.skin_element_name_bg     = "CtlHueBG";
-    sl.skin_element_name_paddle = "CtlHueFG";
-    sl.slider_type              = VSLIDER;
-    sl.min                      = min;
-    sl.max                      = max;
-    sl.step                     = 1;
-    sl.callback                 = set_hue;
-    sl.userdata                 = NULL;
-    sl.motion_callback          = set_hue;
-    sl.motion_userdata          = NULL;
+    sl.skin_element_name = "SliderCtlHue";
+    sl.min               = min;
+    sl.max               = max;
+    sl.step              = 1;
+    sl.callback          = set_hue;
+    sl.userdata          = NULL;
+    sl.motion_callback   = set_hue;
+    sl.motion_userdata   = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    (control->hue = xitk_slider_create(gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->hue, cur);
@@ -497,16 +495,14 @@ void control_panel(void) {
 					  VO_PROP_SATURATION, &min, &max);
     cur = get_current_prop(VO_PROP_SATURATION);
 
-    sl.skin_element_name_bg     = "CtlSatBG";
-    sl.skin_element_name_paddle = "CtlSatFG";
-    sl.slider_type              = VSLIDER;
-    sl.min                      = min;
-    sl.max                      = max;
-    sl.step                     = 1;
-    sl.callback                 = set_saturation;
-    sl.userdata                 = NULL;
-    sl.motion_callback          = set_saturation;
-    sl.motion_userdata          = NULL;
+    sl.skin_element_name = "SliderCtlSat";
+    sl.min               = min;
+    sl.max               = max;
+    sl.step              = 1;
+    sl.callback          = set_saturation;
+    sl.userdata          = NULL;
+    sl.motion_callback   = set_saturation;
+    sl.motion_userdata   = NULL;
     xitk_list_append_content(control->widget_list->l,
 	      (control->sat = xitk_slider_create(gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->sat, cur);
@@ -522,16 +518,14 @@ void control_panel(void) {
 					  VO_PROP_BRIGHTNESS, &min, &max);
     cur = get_current_prop(VO_PROP_BRIGHTNESS);
 
-    sl.slider_type              = VSLIDER;
-    sl.min                      = min;
-    sl.max                      = max;
-    sl.step                     = 1;
-    sl.skin_element_name_bg     = "CtlBrightBG";
-    sl.skin_element_name_paddle = "CtlBrightFG";
-    sl.callback                 = set_brightness;
-    sl.userdata                 = NULL;
-    sl.motion_callback          = set_brightness;
-    sl.motion_userdata          = NULL;
+    sl.skin_element_name = "SliderCtlBright";
+    sl.min               = min;
+    sl.max               = max;
+    sl.step              = 1;
+    sl.callback          = set_brightness;
+    sl.userdata          = NULL;
+    sl.motion_callback   = set_brightness;
+    sl.motion_userdata   = NULL;
     xitk_list_append_content(control->widget_list->l,
 	    (control->bright = xitk_slider_create(gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->bright, cur);
@@ -547,16 +541,14 @@ void control_panel(void) {
 					  VO_PROP_CONTRAST, &min, &max);
     cur = get_current_prop(VO_PROP_CONTRAST);
 
-    sl.skin_element_name_bg     = "CtlContBG";
-    sl.skin_element_name_paddle = "CtlContFG";
-    sl.slider_type              = VSLIDER;
-    sl.min                      = min;
-    sl.max                      = max;
-    sl.step                     = 1;
-    sl.callback                 = set_contrast;
-    sl.userdata                 = NULL;
-    sl.motion_callback          = set_contrast;
-    sl.motion_userdata          = NULL;
+    sl.skin_element_name = "SliderCtlCont";
+    sl.min               = min;
+    sl.max               = max;
+    sl.step              = 1;
+    sl.callback          = set_contrast;
+    sl.userdata          = NULL;
+    sl.motion_callback   = set_contrast;
+    sl.motion_userdata   = NULL;
     xitk_list_append_content(control->widget_list->l,
 	      (control->contr = xitk_slider_create(gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->contr, cur);
@@ -602,18 +594,17 @@ void control_panel(void) {
   xitk_list_append_content(control->widget_list->l,
 			   xitk_label_create(gGui->skin_config, &lbl));
 
-  br.arrow_up.skin_element_name      = "CtlSkUp";
-  br.slider.skin_element_name_bg     = "CtlSkSlidBG";
-  br.slider.skin_element_name_paddle = "CtlSkSlidFG";
-  br.arrow_dn.skin_element_name      = "CtlSkDn";
-  br.browser.skin_element_name       = "CtlSkItemBtn";
-  br.browser.max_displayed_entries   = 5;
-  br.browser.num_entries             = control->skins_num;
-  br.browser.entries                 = control->skins;
-  br.callback                        = control_select_new_skin;
-  br.dbl_click_callback              = NULL;
-  br.dbl_click_time                  = DEFAULT_DBL_CLICK_TIME;
-  br.parent_wlist                    = control->widget_list;
+  br.arrow_up.skin_element_name    = "CtlSkUp";
+  br.slider.skin_element_name      = "SliderCtlSk";
+  br.arrow_dn.skin_element_name    = "CtlSkDn";
+  br.browser.skin_element_name     = "CtlSkItemBtn";
+  br.browser.max_displayed_entries = 5;
+  br.browser.num_entries           = control->skins_num;
+  br.browser.entries               = control->skins;
+  br.callback                      = control_select_new_skin;
+  br.dbl_click_callback            = NULL;
+  br.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
+  br.parent_wlist                  = control->widget_list;
   xitk_list_append_content (control->widget_list->l, 
 			   (control->skinlist = 
 			    xitk_browser_create(gGui->skin_config, &br)));

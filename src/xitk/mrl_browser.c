@@ -214,8 +214,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
 
   mb.browser.arrow_up.skin_element_name = "MrlUp";
 
-  mb.browser.slider.skin_element_name_bg = "MrlSlidBG";
-  mb.browser.slider.skin_element_name_paddle = "MrlSlidFG";
+  mb.browser.slider.skin_element_name = "SLiderMrl";
 
   mb.browser.arrow_dn.skin_element_name = "MrlDn";
 

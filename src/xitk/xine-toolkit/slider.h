@@ -30,15 +30,14 @@
 #include "_xitk.h"
 
 /*  To handle a vertical slider */
-#define VSLIDER 1
+#define XITK_VSLIDER 1
 /*  To handle an horizontal slider */
-#define HSLIDER 2
+#define XITK_HSLIDER 2
 
 typedef struct {
   Display                *display;
   ImlibData              *imlibdata;
-  char                   *skin_element_name_bg;
-  char                   *skin_element_name_paddle;
+  char                   *skin_element_name;
 
   xitk_widget_t          *sWidget;
   int                     sType;

@@ -37,10 +37,10 @@
 #ifdef DEBUG_GUI
 #define COMPUTE_COORDS(X,Y)                                                \
      {                                                                     \
-       if(private_data->sType == HSLIDER) {                                \
+       if(private_data->sType == XITK_HSLIDER) {                           \
          private_data->pos = (int) ((X - sl->x) * private_data->ratio);    \
        }                                                                   \
-       else if(private_data->sType == VSLIDER) {                           \
+       else if(private_data->sType == XITK_VSLIDER) {                      \
          private_data->pos = (int) ((private_data->bg_skin->height         \
 				- (Y - sl->y))                             \
                                 * private_data->ratio);                    \
@@ -61,10 +61,10 @@
 #else
 #define COMPUTE_COORDS(X,Y)                                                \
      {                                                                     \
-       if(private_data->sType == HSLIDER) {                                \
+       if(private_data->sType == XITK_HSLIDER) {                           \
          private_data->pos = (int) ((X - sl->x) * private_data->ratio);    \
        }                                                                   \
-       else if(private_data->sType == VSLIDER) {                           \
+       else if(private_data->sType == XITK_VSLIDER) {                      \
          private_data->pos = (int) ((private_data->bg_skin->height         \
 				- (Y - sl->y))                             \
                                 * private_data->ratio);                    \
@@ -136,9 +136,9 @@ static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
       XSetClipMask(private_data->display, bgc, bg->mask);
     }
     
-    if(private_data->sType == HSLIDER)
+    if(private_data->sType == XITK_HSLIDER)
       tmp = sl->width - button_width;
-    if(private_data->sType == VSLIDER)
+    if(private_data->sType == XITK_VSLIDER)
       tmp = sl->height - button_height;
 
     tmp /= private_data->max;
@@ -147,11 +147,11 @@ static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
     XCopyArea (private_data->display, bg->image, win, bgc, 0, 0,
 	       bg->width, bg->height, sl->x, sl->y);
     
-    if(private_data->sType == HSLIDER) {
+    if(private_data->sType == XITK_HSLIDER) {
       x = rint(sl->x + tmp);
       y = sl->y;
     }
-    else if(private_data->sType == VSLIDER) {
+    else if(private_data->sType == XITK_VSLIDER) {
       x = sl->x;
       y = rint(sl->y + private_data->bg_skin->height - button_height - tmp);
     }
@@ -161,7 +161,7 @@ static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
       
       pixpos = (int)(private_data->pos / private_data->ratio);
       
-      if(private_data->sType == VSLIDER) {
+      if(private_data->sType == XITK_VSLIDER) {
 	pixpos = button_height - pixpos;
 	srcx1  = 0;
 	srcy1  = pixpos;
@@ -170,7 +170,7 @@ static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
 	destx1 = sl->x;
 	desty1 = sl->y + pixpos;
       }
-      else if(private_data->sType == HSLIDER) {
+      else if(private_data->sType == XITK_HSLIDER) {
 	srcx1  = 0;
 	srcy1  = 0;
 	srcx2  = pixpos;
@@ -234,24 +234,24 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   if(sl->widget_type & WIDGET_TYPE_SLIDER) {
     
     XITK_FREE_XITK_IMAGE(private_data->display, private_data->paddle_skin);
-    private_data->paddle_skin     = xitk_load_image(private_data->imlibdata, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name_paddle));
+    private_data->paddle_skin     = xitk_load_image(private_data->imlibdata, xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
     private_data->button_width    = private_data->paddle_skin->width / 3;
     XITK_FREE_XITK_IMAGE(private_data->display, private_data->bg_skin);
-    private_data->bg_skin         = xitk_load_image(private_data->imlibdata, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name_bg));
+    private_data->bg_skin         = xitk_load_image(private_data->imlibdata, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
 
     private_data->paddle_cover_bg = 0;
 
-    if(private_data->sType == HSLIDER) {
+    if(private_data->sType == XITK_HSLIDER) {
       if(private_data->button_width == private_data->bg_skin->width)
 	private_data->paddle_cover_bg = 1;
     }
-    else if(private_data->sType == VSLIDER) {
+    else if(private_data->sType == XITK_VSLIDER) {
       if(private_data->paddle_skin->height == private_data->bg_skin->height)
 	private_data->paddle_cover_bg = 1;
     }
     
-    sl->x       = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name_bg);
-    sl->y       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name_bg);
+    sl->x       = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+    sl->y       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
     sl->width   = private_data->bg_skin->width;
     sl->height  = private_data->bg_skin->height;
 
@@ -426,10 +426,10 @@ void xitk_slider_set_min(xitk_widget_t *sl, int min) {
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {
     if(min < private_data->max) {
       private_data->min = min;
-      if(private_data->sType == HSLIDER)
+      if(private_data->sType == XITK_HSLIDER)
 	private_data->ratio = (float) 
 	  (private_data->max-private_data->min)/private_data->bg_skin->width;
-      else if(private_data->sType == VSLIDER)
+      else if(private_data->sType == XITK_VSLIDER)
 	private_data->ratio = (float)
 	  (private_data->max-private_data->min)/private_data->bg_skin->height;
       else
@@ -489,10 +489,10 @@ void xitk_slider_set_max(xitk_widget_t *sl, int max) {
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {
     if(max > private_data->min) {
       private_data->max = max;
-      if(private_data->sType == HSLIDER)
+      if(private_data->sType == XITK_HSLIDER)
 	private_data->ratio = (float) 
 	  (private_data->max-private_data->min)/private_data->bg_skin->width;
-      else if(private_data->sType == VSLIDER)
+      else if(private_data->sType == XITK_VSLIDER)
 	private_data->ratio = (float)
 	  (private_data->max-private_data->min)/private_data->bg_skin->height;
 #ifdef DEBUG_GUI
@@ -621,11 +621,10 @@ xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widg
 
   private_data->display                  = s->display;
   private_data->imlibdata                = s->imlibdata;
-  private_data->skin_element_name_bg     = strdup(s->skin_element_name_bg);
-  private_data->skin_element_name_paddle = strdup(s->skin_element_name_paddle);
+  private_data->skin_element_name        = strdup(s->skin_element_name);
 
   private_data->sWidget                  = mywidget;
-  private_data->sType                    = s->slider_type;
+  private_data->sType                    = xitk_skin_get_slider_type(skonfig, private_data->skin_element_name);
   private_data->bClicked                 = 0;
   private_data->bArmed                   = 0;
   private_data->min                      = s->min;
@@ -647,25 +646,25 @@ xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widg
   private_data->pos                      = 0;
   private_data->step                     = s->step;
   private_data->paddle_skin              = xitk_load_image(private_data->imlibdata, 
-							   xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name_paddle));
+							   xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
   private_data->button_width             = private_data->paddle_skin->width / 3;
   
   private_data->bg_skin                  = xitk_load_image(private_data->imlibdata, 
-							   xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name_bg));
+							   xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
 
-  if(s->slider_type == HSLIDER)
+  if(private_data->sType == XITK_HSLIDER)
     private_data->ratio                  = (float)(private_data->max - private_data->min)/private_data->bg_skin->width;
-  else if(s->slider_type == VSLIDER)
+  else if(private_data->sType == XITK_VSLIDER)
     private_data->ratio                  = (float)(private_data->max - private_data->min)/private_data->bg_skin->height;
   else
-    XITK_WARNING("Unknown slider type (%d)\n", s->slider_type);
+    XITK_WARNING("Unknown slider type (%d)\n", private_data->sType);
   
   private_data->paddle_cover_bg          = 0;
-  if(s->slider_type == HSLIDER) {
+  if(private_data->sType == XITK_HSLIDER) {
     if(private_data->button_width == private_data->bg_skin->width)
       private_data->paddle_cover_bg = 1;
   }
-  else if(s->slider_type == VSLIDER) {
+  else if(private_data->sType == XITK_VSLIDER) {
     if(private_data->paddle_skin->height == private_data->bg_skin->height)
       private_data->paddle_cover_bg = 1;
   }
@@ -681,8 +680,8 @@ xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widg
   mywidget->running                      = 1;
   mywidget->visible                      = 1;
   mywidget->have_focus                   = FOCUS_LOST;
-  mywidget->x                            = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name_bg);
-  mywidget->y                            = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name_bg);
+  mywidget->x                            = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+  mywidget->y                            = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
   mywidget->width                        = private_data->bg_skin->width;
   mywidget->height                       = private_data->bg_skin->height;
   mywidget->widget_type                  = WIDGET_TYPE_SLIDER;

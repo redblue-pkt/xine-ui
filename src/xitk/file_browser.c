@@ -211,8 +211,7 @@ void file_browser(xitk_string_callback_t add_cb,
 
   fbr.browser.arrow_up.skin_element_name = "FBUp";
 
-  fbr.browser.slider.skin_element_name_bg = "FBSlidBG";
-  fbr.browser.slider.skin_element_name_paddle = "FBSlidFG";
+  fbr.browser.slider.skin_element_name = "SliderFB";
 
   fbr.browser.arrow_dn.skin_element_name = "FBDn";
 

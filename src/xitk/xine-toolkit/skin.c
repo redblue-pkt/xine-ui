@@ -198,6 +198,31 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
       }
       skin_get_next_line(skonfig);
     }
+    else if(!strncasecmp(skonfig->ln, "slider", 6)) {
+      
+      while(skin_end_section(skonfig) < 0) {
+	skin_get_next_line(skonfig);
+	p = skonfig->ln;
+	if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->pixmap_pad = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
+	  sprintf(skonfig->celement->pixmap_pad, "%s/%s", skonfig->path, p);
+	}
+	else if(!strncasecmp(skonfig->ln, "type", 1)) {
+	  skin_set_pos_to_value(&p);
+	  if(!strncasecmp("horizontal", p, strlen(p))) {
+	    skonfig->celement->slider_type = XITK_HSLIDER;
+	  }
+	  else if(!strncasecmp("vertical", p, strlen(p))) {
+	    skonfig->celement->slider_type = XITK_VSLIDER;
+	  }
+	  else
+	    skonfig->celement->slider_type = XITK_HSLIDER;
+	}
+	
+      }
+      skin_get_next_line(skonfig);
+    }
     else if(!strncasecmp(skonfig->ln, "label", 5)) {
 
       while(skin_end_section(skonfig) < 0) {
@@ -232,6 +257,7 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
       }
       skin_get_next_line(skonfig);
     }
+
   }
     
 }
@@ -352,6 +378,12 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  X           = %d\n", s->x);
       printf("  Y           = %d\n", s->y);
       printf("  pixmap      = '%s'\n", s->pixmap);
+
+      if(s->slider_type) {
+	printf("  slider type = %d\n", s->slider_type);
+	printf("  pad pixmap  = '%s'\n", s->pixmap_pad);
+      }
+
       printf("  animation   = %d\n", s->animation);
       printf("  length      = %d\n", s->length);
       printf("  color       = '%s'\n", s->color);
@@ -432,6 +464,7 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
       while(s) {
 	XITK_FREE(s->section);
 	XITK_FREE(s->pixmap);
+	XITK_FREE(s->pixmap_pad);
 	XITK_FREE(s->color);
 	XITK_FREE(s->color_focus);
 	XITK_FREE(s->color_click);
@@ -614,4 +647,29 @@ char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char *str) 
     return s->pixmap;
 
   return NULL;
+}
+
+/*
+ *
+ */
+char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    if(s->slider_type)
+      return s->pixmap_pad;
+  
+  return NULL;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return((s->slider_type) ? s->slider_type : XITK_HSLIDER);
+
+  return 0;
 }

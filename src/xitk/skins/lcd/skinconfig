@@ -1,3 +1,5 @@
+skin.name = lcd
+
 ## Main GUI ##
 skin.BackGround {
 	pixmap = bg.png
@@ -209,16 +211,16 @@ skin.MrlBtn {
 	pixmap = mrl.png
 }
 
-skin.SliderBGPlay {
+skin.SliderPlay {
 	coords {
 	  x = 149
 	  y = 70
 	}
 	pixmap = slider_bg.png
-}
-
-skin.SliderFGPlay {
-	pixmap = slider_pad.png
+	slider {
+	  pixmap = slider_pad.png
+	  type = horizontal
+	}
 }
 
 skin.Mute {
@@ -229,16 +231,16 @@ skin.Mute {
 	pixmap = mute.png
 }
 
-skin.SliderBGVol {
+skin.SliderVol {
 	coords {
 	  x = 103
 	  y = 22
 	}
 	pixmap = volumebg.png
-}
-
-skin.SliderFGVol {
-	pixmap = volumepad.png
+	slider {
+	  pixmap = volumepad.png
+	  type = vertical
+	}
 }
 
 skin.Snapshot {
@@ -376,16 +378,16 @@ skin.PlUp {
 	pixmap = arrowup.png
 }
 
-skin.PlSlidBG {
+skin.SliderPl {
 	coords {
 	  x = 377
 	  y = 55
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.PlSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.PlDn {
@@ -445,16 +447,16 @@ skin.CtlBG {
 	pixmap = ctl_bg.png
 }
 
-skin.CtlHueBG {
+skin.SliderCtlHue {
 	coords {
 	  x = 80
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlHueFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlHueLbl {
@@ -469,16 +471,16 @@ skin.CtlHueLbl {
 	}
 }
 
-skin.CtlSatBG {
+skin.SliderCtlSat {
 	coords {
 	  x = 120
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlSatFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlSatLbl {
@@ -493,16 +495,16 @@ skin.CtlSatLbl {
 	}
 }
 
-skin.CtlBrightBG {
+skin.SliderCtlBright {
 	coords {
 	  x = 160
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlBrightFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlBrightLbl {
@@ -517,16 +519,16 @@ skin.CtlBrightLbl {
 	}
 }
 
-skin.CtlContBG {
+skin.SliderCtlCont {
 	coords {
 	  x = 200
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlContFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlContLbl {
@@ -589,16 +591,16 @@ skin.CtlSkUp {
 	pixmap = arrowup.png
 }
 
-skin.CtlSkSlidBG {
+skin.SliderCtlSk {
 	coords {
 	  x = 462
 	  y = 63
 	}
 	pixmap = sk_slidv.png
-}
-
-skin.CtlSkSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlSkDn {
@@ -705,16 +707,16 @@ skin.MrlUp {
 	pixmap = arrowup.png
 }
 
-skin.MrlSlidBG {
+skin.SliderMrl {
 	coords {
 	  x = 377
 	  y = 55
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.MrlSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.MrlDn {
@@ -771,6 +773,7 @@ skin.FBBG {
 	}
 	pixmap = pl_bg.png
 }
+
 skin.FBItemBtn {
 	coords {
 	  x = 75
@@ -783,6 +786,7 @@ skin.FBItemBtn {
 	  color_click = White
 	}
 }
+
 skin.FBHome {
 	coords {	
 	  x = 179
@@ -795,6 +799,7 @@ skin.FBHome {
 	  color_click = White
 	}
 }
+
 skin.FBSelect {
 	coords {
 	  x = 257
@@ -807,6 +812,7 @@ skin.FBSelect {
 	  color_click = White
 	}
 }
+
 skin.FBDismiss {
 	coords {
 	  x = 400
@@ -819,6 +825,7 @@ skin.FBDismiss {
 	  color_click = White
 	}
 }
+
 skin.FBUp {
 	coords {
 	  x = 375
@@ -826,16 +833,19 @@ skin.FBUp {
 	}
 	pixmap = arrowup.png
 }
-skin.FBSlidBG {
+
+skin.SliderFB {
 	coords {
 	  x = 377
 	  y = 55
 	}
 	pixmap = pl_slidv.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
-skin.FBSlidFG {
-	pixmap = pl_slidpad.png
-}
+
 skin.FBDn {
 	coords {
 	  x = 375
@@ -843,6 +853,7 @@ skin.FBDn {
 	}
 	pixmap = arrowdn.png
 }
+
 skin.FBCurDirLbl {
 	coords {
 	  x = 75
@@ -850,6 +861,7 @@ skin.FBCurDirLbl {
 	}
 	pixmap = letters.png
 }
+
 skin.FBCurDir {
 	coords {
 	  x = 140
@@ -857,6 +869,7 @@ skin.FBCurDir {
 	}
 	pixmap = letters.png
 }
+
 skin.FBSortRev {
 	coords {
 	  x = 362
@@ -864,6 +877,7 @@ skin.FBSortRev {
 	}
 	pixmap = arrowup.png
 }
+
 skin.FBSortDef {
 	coords {
 	  x = 362

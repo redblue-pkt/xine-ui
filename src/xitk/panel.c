@@ -730,30 +730,26 @@ void panel_init (void) {
 			   (panel->spuid_label = xitk_label_create (gGui->skin_config, &lbl)));
 
   /*  slider seek */
-  sl.skin_element_name_bg     = "SliderBGPlay";
-  sl.skin_element_name_paddle = "SliderFGPlay";
-  sl.slider_type              = HSLIDER;
-  sl.min                      = 0;
-  sl.max                      = 65535;
-  sl.step                     = 1;
-  sl.callback                 = NULL;
-  sl.userdata                 = NULL;
-  sl.motion_callback          = panel_slider_cb;
-  sl.motion_userdata          = NULL;
+  sl.skin_element_name = "SliderPlay";
+  sl.min               = 0;
+  sl.max               = 65535;
+  sl.step              = 1;
+  sl.callback          = NULL;
+  sl.userdata          = NULL;
+  sl.motion_callback   = panel_slider_cb;
+  sl.motion_userdata   = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->slider_play = xitk_slider_create(gGui->skin_config, &sl)));
 
   /* Mixer volume slider */
-  sl.skin_element_name_bg     = "SliderBGVol";
-  sl.skin_element_name_paddle = "SliderFGVol";
-  sl.slider_type              = VSLIDER;
-  sl.min                      = 0;
-  sl.max                      = 100;
-  sl.step                     = 1;
-  sl.callback                 = NULL;
-  sl.userdata                 = NULL;
-  sl.motion_callback          = panel_slider_cb;
-  sl.motion_userdata          = NULL;
+  sl.skin_element_name = "SliderVol";
+  sl.min               = 0;
+  sl.max               = 100;
+  sl.step              = 1;
+  sl.callback          = NULL;
+  sl.userdata          = NULL;
+  sl.motion_callback   = panel_slider_cb;
+  sl.motion_userdata   = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->mixer.slider = xitk_slider_create(gGui->skin_config, &sl)));
   xitk_disable_widget(panel->mixer.slider);

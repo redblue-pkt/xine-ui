@@ -169,15 +169,16 @@ typedef struct {
   char                   *skin_element_name;
 } xitk_label_widget_t;
 
+#define XITK_VSLIDER 1
+#define XITK_HSLIDER 2
+
 typedef struct {
   Display                *display;
   ImlibData              *imlibdata;
-  int                     slider_type;
   int                     min;
   int                     max;
   int                     step;
-  char                   *skin_element_name_bg;
-  char                   *skin_element_name_paddle;
+  char                   *skin_element_name;
   xitk_state_callback_t   callback;
   void                   *userdata;
   xitk_state_callback_t   motion_callback;
@@ -193,8 +194,7 @@ typedef struct {
   } arrow_up;
   
   struct {
-    char                 *skin_element_name_bg;
-    char                 *skin_element_name_paddle;
+    char                 *skin_element_name;
   } slider;
 
   struct {
@@ -369,5 +369,7 @@ int xitk_skin_get_label_length(xitk_skin_config_t *, const char *);
 int xitk_skin_get_label_animation(xitk_skin_config_t *, const char *);
 char *xitk_skin_get_label_fontname(xitk_skin_config_t *, const char *);
 char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
+char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str);
+int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str);
 
 #endif

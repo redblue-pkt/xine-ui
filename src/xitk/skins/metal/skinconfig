@@ -1,4 +1,6 @@
 ###
+skin.name = metal
+
 skin.BackGround {
 	coords {
 	  x = 0
@@ -184,28 +186,28 @@ skin.Exit {
 	pixmap = exit.png
 }
 
-skin.SliderBGPlay {
+skin.SliderPlay {
 	coords {
 	  x = 17
 	  y = 3
 	}
 	pixmap = slider_bg.png
+	slider {
+	  pixmap = slider_pad.png
+	  type = horizontal
+	}
 }
 
-skin.SliderFGPlay {
-	pixmap = slider_pad.png
-}
-
-skin.SliderBGVol {
+skin.SliderVol {
 	coords {
 	  x = 2
 	  y = 20
 	}
 	pixmap = slider_v.png
-}
-
-skin.SliderFGVol {
-	pixmap = slider_pad.png
+	slider {
+	  pixmap = slider_pad.png
+	  type = vertical
+	}
 }
 
 skin.AutoPlayGUI {
@@ -389,16 +391,16 @@ skin.PlUp {
 	pixmap = arrowup2.png
 }
 
-skin.PlSlidBG {
+skin.SliderPl {
 	coords {
 	  x = 327
 	  y = 45
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.PlSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.PlDn {
@@ -458,16 +460,16 @@ skin.CtlBG {
 	pixmap = pl_bg.png
 }
 
-skin.CtlHueBG {
+skin.SliderCtlHue {
 	coords {
 	  x = 80
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlHueFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlHueLbl {
@@ -482,16 +484,16 @@ skin.CtlHueLbl {
 	}
 }
 
-skin.CtlSatBG {
+skin.SliderCtlSat {
 	coords {
 	  x = 120
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlSatFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlSatLbl {
@@ -506,16 +508,16 @@ skin.CtlSatLbl {
 	}
 }
 
-skin.CtlBrightBG {
+skin.SliderCtlBright {
 	coords {
 	  x = 160
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlBrightFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlBrightLbl {
@@ -530,16 +532,16 @@ skin.CtlBrightLbl {
 	}
 }
 
-skin.CtlContBG {
+skin.SliderCtlCont {
 	coords {
 	  x = 200
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlContFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlContLbl {
@@ -602,16 +604,16 @@ skin.CtlSkUp {
 	pixmap = arrowup2.png
 }
 
-skin.CtlSkSlidBG {
+skin.SliderCtlSk {
 	coords {
 	  x = 410
 	  y = 59
 	}
 	pixmap = sk_slidv.png
-}
-
-skin.CtlSkSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlSkDn {
@@ -717,16 +719,16 @@ skin.MrlUp {
 	pixmap = arrowup2.png
 }
 
-skin.MrlSlidBG {
+skin.SliderMrl {
 	coords {
 	  x = 327
 	  y = 45
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.MrlSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.MrlDn {

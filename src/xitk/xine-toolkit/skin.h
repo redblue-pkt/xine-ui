@@ -33,6 +33,11 @@ typedef struct xitk_skin_element_s {
   int                           x;
   int                           y;
 
+  /* slider */
+  char                         *pixmap_pad;
+  int                           slider_type;
+  
+  /* label */
   int                           animation;
   int                           length;
   char                         *color;

@@ -1,20 +1,4 @@
-## WARNING:  All fields are tab separate, space is no more valid.
-###
-#
-# Text		X       Y       Filename        Length  Animation
-# Label                         of pixfont
-#
-###
-#
-# Labeled						Text
-# Button	X	Y	Filename	Normal  Focus   Click  Fontname
-#				 of bg		Color	Color	Color
-###
-#
-# Other		X	Y	Filename
-#				of skin
-#
-###
+skin.name = pitt
 
 ## Main GUI ##
 skin.BackGround {
@@ -165,16 +149,16 @@ skin.Eject {
 	pixmap = eject.png
 }
 
-skin.SliderBGPlay {
+skin.SliderPlay {
 	coords {
 	  x = 23
 	  y = 78
 	}
 	pixmap = slider_bg.png
-}
-
-skin.SliderFGPlay {
-	pixmap = slider_pad.png
+	slider {
+	  pixmap = slider_pad.png
+	  type = horizontal
+	}
 }
 
 skin.AutoPlayGUI {
@@ -251,16 +235,16 @@ skin.Mute {
 	pixmap = mute.png
 }
 
-skin.SliderBGVol {
+skin.SliderVol {
 	coords {
 	  x = 216
 	  y = 39
 	}
 	pixmap = volumebg.png
-}
-
-skin.SliderFGVol {
-	pixmap = volumepad.png
+	slider {
+	  pixmap = volumepad.png
+	  type = vertical
+	}
 }
 
 skin.Snapshot {
@@ -398,16 +382,16 @@ skin.PlUp {
 	pixmap = arrowup.png
 }
 
-skin.PlSlidBG {
+skin.SliderPl {
 	coords {
 	  x = 326
 	  y = 36
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.PlSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.PlDn {
@@ -467,16 +451,16 @@ skin.CtlBG {
 	pixmap = pl_bg.png
 }
 
-skin.CtlHueBG {
+skin.SliderCtlHue {
 	coords {
 	  x = 80
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlHueFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlHueLbl {
@@ -491,16 +475,16 @@ skin.CtlHueLbl {
 	}
 }
 
-skin.CtlSatBG {
+skin.SliderCtlSat {
 	coords {
 	  x = 120
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlSatFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlSatLbl {
@@ -515,16 +499,16 @@ skin.CtlSatLbl {
 	}
 }
 
-skin.CtlBrightBG {
+skin.SliderCtlBright {
 	coords {
 	  x = 160
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlBrightFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlBrightLbl {
@@ -539,16 +523,16 @@ skin.CtlBrightLbl {
 	}
 }
 
-skin.CtlContBG {
+skin.SliderCtlCont {
 	coords {
 	  x = 200
 	  y = 40
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.CtlContFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlContLbl {
@@ -611,16 +595,16 @@ skin.CtlSkUp {
 	pixmap = arrowup.png
 }
 
-skin.CtlSkSlidBG {
+skin.SliderCtlSk {
 	coords {
 	  x = 415
 	  y = 63
 	}
 	pixmap = sk_slidv.png
-}
-
-skin.CtlSkSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.CtlSkDn {
@@ -710,16 +694,16 @@ skin.MrlMoveDn {
 	}
 }
 
-skin.MrlSlidBG {
+skin.SliderMrl {
 	coords {
 	  x = 326
 	  y = 36
 	}
 	pixmap = pl_slidv.png
-}
-
-skin.MrlSlidFG {
-	pixmap = pl_slidpad.png
+	slider {
+	  pixmap = pl_slidpad.png
+	  type = vertical
+	}
 }
 
 skin.MrlSelect {
