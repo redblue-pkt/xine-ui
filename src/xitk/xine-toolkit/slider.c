@@ -122,25 +122,70 @@ static void slider_update(xitk_widget_t *w, int x, int y) {
   else {
     float width, height;
     float old_value, new_value = 0.0;
-    
+
     old_value = private_data->value;
 
     width = (float)private_data->bg_skin->width;
     height = (float)private_data->bg_skin->height;
-
-    if(x < 0)
-      x = 0;
-    if(x > width)
-      x = width;
-    if(y < 0)
-      y = 0;
-    if(y > height)
-      y = height;
     
-    if(private_data->sType == XITK_HSLIDER)
-      new_value = (x * .01) / (width * .01);
-    else if(private_data->sType == XITK_VSLIDER)
-      new_value = ((height - y) * .01) / (height * .01);
+    if(private_data->paddle_cover_bg == 1) {
+
+      if(x < 0)
+	x = 0;
+      if(x > width)
+	x = width;
+
+      if(y < 0)
+	y = 0;
+      if(y > height)
+	y = height;
+      
+      if(private_data->sType == XITK_HSLIDER)
+	new_value = (x * .01) / (width * .01);
+      else if(private_data->sType == XITK_VSLIDER)
+	new_value = ((height - y) * .01) / (height * .01);
+
+    }
+    else {
+      int pwidth, pheight;
+    
+      pwidth = private_data->button_width;
+      pheight = private_data->paddle_skin->height;
+      
+      if(private_data->sType == XITK_HSLIDER) {
+	x -= pwidth >> 1;
+	
+	if(x < 0)
+	  x = 0;
+	if(x > (width - pwidth))
+	  x = width - pwidth;
+	
+	if(y < 0)
+	  y = 0;
+	if(y > height)
+	  y = height;
+	
+      }
+      else { /* XITK_VSLIDER */
+	
+	if(x < 0)
+	  x = 0;
+	if(x > width)
+	  x = width;
+	
+	y += pheight >> 1;
+	
+	if(y < 0)
+	  y = 0;
+	if(y > (height + pheight))
+	  y = height + pheight ;
+      }
+
+      if(private_data->sType == XITK_HSLIDER)
+	new_value = (x * .01) / ((width - pwidth) * .01);
+      else if(private_data->sType == XITK_VSLIDER)
+	new_value = ((height - y) * .01) / ((height - pheight) * .01);
+    }
     
     private_data->value = private_data->lower + 
       (new_value * (private_data->upper - private_data->lower));
