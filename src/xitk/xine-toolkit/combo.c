@@ -88,12 +88,12 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
       bx = w->x + lw;
       xitk_set_widget_pos(private_data->button_widget, bx, w->y);
 
-      xitk_show_widget(private_data->widget_list, private_data->label_widget);
-      xitk_show_widget(private_data->widget_list, private_data->button_widget);
+      xitk_show_widget(private_data->parent_wlist, private_data->label_widget);
+      xitk_show_widget(private_data->parent_wlist, private_data->button_widget);
     }
     else {
-      xitk_hide_widget(private_data->widget_list, private_data->label_widget);
-      xitk_hide_widget(private_data->widget_list, private_data->button_widget);
+      xitk_hide_widget(private_data->parent_wlist, private_data->label_widget);
+      xitk_hide_widget(private_data->parent_wlist, private_data->button_widget);
     }
   }
 }
@@ -113,7 +113,7 @@ static void combo_select(xitk_widget_t *w, void *data) {
     
     private_data->selected = selected;
     
-    xitk_label_change_label(private_data->widget_list, 
+    xitk_label_change_label(private_data->parent_wlist, 
 			    private_data->label_widget, private_data->entries[selected]);
     
     XLOCK(private_data->imlibdata->x.disp);
