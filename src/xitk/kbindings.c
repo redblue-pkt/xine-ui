@@ -966,8 +966,6 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
     memset(&xbutton, 0, sizeof(xbutton));
     snprintf(xbutton, 255, "XButton_%d", event->xbutton.button);
     
-    printf("button '%s'\n", xbutton);
-    
     k = kbindings_lookup_binding(kbt, xbutton, modifier);
     
     if(k) { 
