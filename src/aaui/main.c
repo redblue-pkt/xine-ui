@@ -125,7 +125,6 @@ int main(int argc, char *argv[]) {
   char           c;
   int            running;
 
-
   /* Check xine library version */
   if(!xine_check_version(0, 5, 0)) {
     fprintf(stderr, "Require xine library version 0.5.0, found %d.%d.%d.\n", 
@@ -135,6 +134,14 @@ int main(int argc, char *argv[]) {
   }
 
   show_banner();
+
+  /* aalib help and option-parsing */
+ if(!aa_parseoptions(NULL, NULL, &argc, argv) || argc != 2) {
+    printf("Usage: %s [options]\n"
+           "Options:\n"
+           "%s", argv[0], aa_help);
+    exit(1);
+  }
 
   /*
    * parse command line
@@ -208,6 +215,8 @@ int main(int argc, char *argv[]) {
   new_settings.c_cc[VMIN] = 1;
   
   tcsetattr(0,TCSANOW,&new_settings);
+
+  xine_play (xine, mrl, 0);
 
   running = 1;
 
