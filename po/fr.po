@@ -102,7 +102,7 @@ msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
 "Il n'y a aucun plugin d'entrée pour gérer '%s'.\n"
-"Ceci est peux être dut à une mauvaise syntaxe de la MRL\n"
+"Ceci est peut être dû à une mauvaise syntaxe de la MRL\n"
 "ou le flux/fichier n'existe pas."
 
 #: src/xitk/errors.c:202
@@ -115,8 +115,8 @@ msgid ""
 msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
-"Il n'y a aucun plugin de démultiplexage disponible pour gérer '%s'.\n"
-"La plupart du temps celà est dut à un format de fichier non reconnu."
+"Il n'y a aucun plugin de démultiplexage disponible pour gérer '%s'\n"
+"La plupart du temps celà est dû à un format de fichier non reconnu."
 
 #: src/xitk/errors.c:207
 #, c-format
@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "- erreur du moteur xine -\n"
 "\n"
-"echec du démultiplexeur. Le fichier '%s' est peux être corrompu?\n"
+"echec du démultiplexeur. Le fichier '%s' est peut être corrompu?\n"
 
 #: src/xitk/errors.c:212
 msgid ""
@@ -143,12 +143,12 @@ msgstr ""
 #, c-format
 msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
 msgstr ""
-"gui_main! visuel sélectionné %#lx inexistant, tente avec le visuel par "
-"defaut\n"
+"gui_main! visuel sélectionné %#lx inexistant, utilisation du visuel par "
+"défaut\n"
 
 #: src/xitk/event.c:681
 msgid "gui_main: couldn't find true color visual.\n"
-msgstr "gui_main: ne trouve pas de visuel en vrai couleur.\n"
+msgstr "gui_main: ne trouve pas de visuel en vraies couleurs.\n"
 
 #: src/xitk/event.c:721
 msgid ""
@@ -156,7 +156,7 @@ msgid ""
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
 "\n"
-"XInitThreads a échoué - il semble que vous ne possédez pas une xlib sûre.\n"
+"XInitThreads a échoué - il semble que vous ne possédiez pas une xlib sûre.\n"
 
 #: src/xitk/event.c:730
 msgid "Cannot open display\n"
@@ -164,22 +164,21 @@ msgstr "Ne peut pas ouvrir l'affichage.\n"
 
 #: src/xitk/event.c:735
 msgid "synchronized X protocol (debug)"
-msgstr "protocol X synchronisé (debug)"
+msgstr "protocole X synchronisé (debug)"
 
 #: src/xitk/event.c:737
 msgid "Warning! Synchronized X activated - this is way slow...\n"
-msgstr "Attention! Synchronisation X activée - cela ralenti l'execution...\n"
+msgstr "Attention! Synchronisation X activée - cela ralenti l'exécution...\n"
 
 #: src/xitk/event.c:742
 msgid "use wm layer property to place window on top"
-msgstr "utilise la propriétée des couches du WM pour placer les fenêtre devant"
+msgstr "utilise la propriété des couches du WM pour placer les fenêtres devant"
 
 #: src/xitk/event.c:748
 msgid "where snapshots will be saved"
 msgstr "où les captures seront sauvées"
 
 #: src/xitk/event.c:753
-#, fuzzy
 msgid "time between two screensaver fake events, 0 to disable"
 msgstr "Temps entre deux évènements trompeur d'economiseur."
 
@@ -192,12 +191,12 @@ msgstr "Vendeur du serveur X: %s. Version: %d,\n"
 #: src/xitk/event.c:763
 #, c-format
 msgid "        Protocol Version: %d, Revision: %d,\n"
-msgstr "        Version du Protocol: %d, Revision: %d,\n"
+msgstr "        Version du Protocole: %d, Revision: %d,\n"
 
 #: src/xitk/event.c:765
 #, c-format
 msgid "        Available Screen(s): %d, using %d\n"
-msgstr "        Ecran(s) Dispoible(s): %d, utilise %d\n"
+msgstr "        Ecran(s) Disponible(s): %d, utilise %d\n"
 
 #: src/xitk/event.c:767
 #, c-format
@@ -243,12 +242,12 @@ msgstr "Appuyez sur les touches du clavier..."
 
 #: src/xitk/kbindings.c:1599
 msgid "Event receiver window"
-msgstr "Fenetre de reception d'evènement"
+msgstr "Fenêtre de reception d'évènements"
 
 #. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1684
 msgid "Accept?"
-msgstr "Accepte ?"
+msgstr "Accepter ?"
 
 #: src/xitk/kbindings.c:1688
 #, c-format
@@ -265,7 +264,7 @@ msgid ""
 "This key bindings is redundant with action:\n"
 "\"%s\".\n"
 msgstr ""
-"Cette séquence de touches est redondante avec l'action:\n"
+"Cette séquence de touches est redondante avec l'action :\n"
 "\"%\".\n"
 
 #: src/xitk/kbindings.c:1774
@@ -290,19 +289,19 @@ msgstr "Alias"
 
 #: src/xitk/kbindings.c:1865
 msgid "Edit"
-msgstr "Edite"
+msgstr "Editer"
 
 #: src/xitk/kbindings.c:1879
 msgid "Delete"
-msgstr "Supprime"
+msgstr "Supprimer"
 
 #: src/xitk/kbindings.c:1893 src/xitk/playlist.c:889
 msgid "Save"
-msgstr "Sauve"
+msgstr "Sauver"
 
 #: src/xitk/kbindings.c:1907
 msgid "Reset"
-msgstr "Ràz"
+msgstr "Raz"
 
 #: src/xitk/kbindings.c:1984
 msgid "ctrl"
@@ -443,7 +442,7 @@ msgstr "  -L, --no-list                Désactivation du support de LIRC.\n"
 #: src/xitk/main.c:312
 msgid ""
 "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
-msgstr "      --visual <classe-ou-nom> Utilise le visuel X11 spécifié.\n"
+msgstr "      --visual <classe-ou-nom> Utilise le visuel X11 spécifié\n"
 
 #: src/xitk/main.c:313
 msgid ""
@@ -550,7 +549,7 @@ msgstr "  VCD:       'vcd://<numero piste>'\n"
 
 #: src/xitk/main.c:377
 msgid "video driver to use"
-msgstr "pilote vidéo a utiliser"
+msgstr "pilote vidéo à utiliser"
 
 #: src/xitk/main.c:405
 #, c-format
@@ -568,7 +567,7 @@ msgstr "main : le pilote vidéo <%s> a échoué\n"
 
 #: src/xitk/main.c:454
 msgid "audio driver to use"
-msgstr "pilote audio a utiliser"
+msgstr "pilote audio à utiliser"
 
 #: src/xitk/main.c:470
 msgid "main: probing audio drivers...\n"
@@ -625,12 +624,12 @@ msgstr "toujours"
 
 #: src/xitk/main.c:638
 msgid "Display popup window on unhandled codecs"
-msgstr "Affiche un fenêtre pour les codecs non supportés"
+msgstr "Affiche une fenêtre pour les codecs non supportés"
 
 #: src/xitk/main.c:671
 #, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
-msgstr "Requière la bibliothèque xine version 0.9.10, a trouvé %d.%d.%d.\n"
+msgstr "Requière la bibliothèque xine version 0.9.10, a trouvé %d%d.%d.\n"
 
 #: src/xitk/main.c:680
 msgid "sigprocmask() failed.\n"
@@ -672,7 +671,7 @@ msgstr "Contrôle du volume"
 
 #: src/xitk/panel.c:567
 msgid "Mute toggle"
-msgstr "Muêt"
+msgstr "Muet"
 
 #. panel already open  - FIXME: bring to foreground
 #: src/xitk/panel.c:598
@@ -681,7 +680,7 @@ msgstr "Panneau de xine"
 
 #: src/xitk/panel.c:615
 msgid "xine-panel: couldn't find image for background\n"
-msgstr "xine-panel: ne trouve pas l'image de fond.\n"
+msgstr "xine-panel : ne trouve pas l'image de fond.\n"
 
 #: src/xitk/panel.c:738
 msgid "Play previous entry from playlist"
@@ -701,7 +700,7 @@ msgstr "Pause/Reprise lecture"
 
 #: src/xitk/panel.c:767
 msgid "Play next entry from playlist"
-msgstr "Joue l'entrée suivante dans le liste de lecture"
+msgstr "Joue l'entrée suivante dans la liste de lecture"
 
 #: src/xitk/panel.c:774
 msgid "Eject current medium"
@@ -826,7 +825,7 @@ msgstr "Charge la liste de lecture sauvée"
 
 #: src/xitk/playlist.c:895
 msgid "Save playlist"
-msgstr "Sauve la list de lecture"
+msgstr "Sauve la liste de lecture"
 
 #: src/xitk/playlist.c:905
 msgid "Close playlist window"
@@ -846,7 +845,7 @@ msgstr "Aide"
 
 #: src/xitk/setup.c:932
 msgid "README"
-msgstr "Lisez Moi"
+msgstr "Lisez-Moi"
 
 #: src/xitk/setup.c:934
 msgid "FAQ"
@@ -931,7 +930,7 @@ msgstr "Attention: %s\n"
 #. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:871
 msgid "snapshot.c: not supported for this video out driver\n"
-msgstr "snapshot.c: non supporté pour de pilote de sortie vidéo\n"
+msgstr "snapshot.c: non supporté pour ce pilote de sortie vidéo\n"
 
 #: src/xitk/snapshot.c:947
 #, c-format
@@ -952,7 +951,7 @@ msgstr ""
 #: src/xitk/videowin.c:181
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
-msgstr "videowin: le pilote de sortie a forcé le visuel selectionné a 0x%lx\n"
+msgstr "videowin: le pilote de sortie a forcé le visuel selectionné à 0x%lx\n"
 
 #. printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
 #. *           video_width,
@@ -988,7 +987,7 @@ msgstr "XAllocWMHints() a échoué\n"
 
 #: src/xitk/videowin.c:1062
 msgid "New stream sizes resize output window"
-msgstr "Nouveau format de flux redimentionne la fenêtre"
+msgstr "Nouvelle taille de flux redimensionne la fenêtre"
 
 #: src/xitk/videowin.c:1068
 msgid "Double size for small streams (require stream_resize_window)"
@@ -1012,7 +1011,7 @@ msgstr "Extension XF86VidMode: %s modeline(s) trouvé(s).\n"
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr ""
-"Extension XF86VidMode: ne peux pas avoir la list des modelines disponibles. "
+"Extension XF86VidMode: ne peux pas avoir la liste des modelines disponibles. "
 "Echec.\n"
 
 #: src/xitk/videowin.c:1130
@@ -1030,7 +1029,7 @@ msgstr "Il n'y a aucune entrée dans le log de la section '%s'.\n"
 
 #: src/xitk/viewlog.c:427
 msgid "xine log viewer"
-msgstr "Visualisateur des logs de xine"
+msgstr "Visualiseur des logs de xine"
 
 #: src/xitk/viewlog.c:474
 msgid "Refresh"
@@ -1043,7 +1042,7 @@ msgstr "Rafraîchir"
 #~ msgstr "XSetScreenSaver() a échoué: %s\n"
 
 #~ msgid "Reduce the output window size by factor 1.2."
-#~ msgstr "Reduit le taille de la fenêtre de sortie par un facteur de 1.2."
+#~ msgstr "Réduit la taille de la fenêtre de sortie par un facteur de 1.2."
 
 #~ msgid ""
 #~ "- xine engine error -\n"
@@ -1071,3 +1070,4 @@ msgstr "Rafraîchir"
 #~ msgstr ""
 #~ "Inconnu\n"
 #~ "Erreur : Code de Ratio %d inconnu\n"
+
