@@ -97,6 +97,7 @@ typedef struct {
 #define OPTION_DISABLE_POST     1009
 #define OPTION_NO_SPLASH        1010
 #define OPTION_STDCTL           1011
+#define OPTION_LIST_PLUGINS     1012
 
 
 /* options args */
@@ -157,6 +158,7 @@ static struct option long_options[] = {
   {"disable-post"   , no_argument      , 0, OPTION_DISABLE_POST      },
   {"no-splash"      , no_argument      , 0, OPTION_NO_SPLASH         },
   {"tvout"          , required_argument, 0, 'T'                      },
+  {"list-plugins"   , no_argument      , 0, OPTION_LIST_PLUGINS      },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -401,7 +403,7 @@ static void sub_autoload_cb(void *data, xine_cfg_entry_t *cfg) {
 /*
  *
  */
-void show_version(void) {
+static void show_version(void) {
   
   printf(_("This is xine (X11 gui) - a free video player v%s"), VERSION);
 #ifdef DEBUG
@@ -413,7 +415,7 @@ void show_version(void) {
 /*
  *
  */
-void show_banner(void) {
+static void show_banner(void) {
   int major, minor, sub;
 
   show_version();
@@ -427,10 +429,91 @@ void show_banner(void) {
 
 }
 
+static void print_formatted(const char *const *plugins) {
+  const char  *plugin;
+  char         buffer[81];
+  int          len;
+  char        *blanks = "     ";
+  
+  sprintf(buffer, "%s", blanks);
+  plugin = *plugins++;
+
+  while(plugin) {
+
+    len = strlen(buffer);
+
+    if((len + (strlen(plugin) + 3)) < 80)
+      sprintf(buffer, "%s%s%s", buffer, (strlen(buffer) == strlen(blanks)) ? "" : ", ", plugin);
+    else {
+      printf(buffer);
+      printf(",\n");
+      sprintf(buffer, "%s%s", blanks, plugin);
+    }
+    
+    plugin  = *plugins++;
+  }
+  
+  if(strlen(buffer))
+    printf(buffer);
+
+  printf(".\n");
+}
+static void list_plugins(void) {
+  typedef struct {
+    const char *const *(*func)(xine_t *);
+    char         *name;
+  } _list_plugin_t;
+  const char   *const *plugins;
+  xine_t       *xine;
+  char         *cfgdir     = CONFIGDIR;
+  char         *cfgfile    = CONFIGFILE;
+  char         *configfile = NULL;
+  int           i;
+  _list_plugin_t list_functions[] = {
+    { xine_list_audio_output_plugins,  _("   -Audio output:\n")    },
+    { xine_list_video_output_plugins,  _("   -Video output:\n")    },
+    { xine_list_demuxer_plugins,       _("   -Demuxer:\n")         },
+    { xine_list_input_plugins,         _("   -Input:\n")           },
+    { xine_list_spu_plugins,           _("   -Subpicture:\n")      },
+    { xine_list_post_plugins,          _("   -Post processing:\n") },
+    { xine_list_audio_decoder_plugins, _("   -Audio decoder:\n")  },
+    { xine_list_video_decoder_plugins, _("   -Video decoder:\n")  },
+    { NULL,                            NULL                     }
+  };
+    
+  configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+				     + strlen(cfgdir) 
+				     + strlen(cfgfile)
+				     + 3);
+  sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
+  mkdir(configfile, 0755);
+  sprintf(configfile + strlen(configfile), "/%s", cfgfile);
+  
+  xine = xine_new();
+  xine_config_load(xine, configfile);
+  xine_init(xine);
+
+  show_version();
+  printf(_("\n Available xine's plugins:\n"));
+
+  i = 0;
+  
+  while(list_functions[i].name) {
+    if((plugins = list_functions[i].func(xine))) {
+      printf(list_functions[i].name);
+      print_formatted(plugins);
+      printf("\n");
+    }
+    i++;
+  }
+
+  xine_exit(xine);
+}
+
 /*
  *
  */
-void show_usage (void) {
+static void show_usage (void) {
   const char   *const *driver_ids;
   const char   *driver_id;
   xine_t       *xine;
@@ -560,6 +643,7 @@ void show_usage (void) {
   printf(_("      --no-splash              Don't display the splash screen.\n"));
   printf(_("      --stdctl                 Control xine by the console, using lirc commands.\n"));
   printf(_("  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"));
+  printf(_("      --list-plugins           Display the list of all available plugins\n"));
   printf("                               ");
   if((backends = tvout_get_backend_names())) {
     backend = *backends++;
@@ -1541,6 +1625,11 @@ int main(int argc, char *argv[]) {
       tvout = optarg;
       break;
       
+    case OPTION_LIST_PLUGINS:
+      list_plugins();
+      exit(1);
+      break;
+
     default:
       show_usage();
       fprintf (stderr, _("invalid argument %d => exit\n"), c);
