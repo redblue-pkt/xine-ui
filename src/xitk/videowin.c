@@ -133,6 +133,8 @@ typedef struct {
   int                   XF86_modelines_count;
 #endif
 
+  int            hide_on_start; /* user use '-H' arg, don't map video window the first time */
+
 } gVw_t;
 
 static gVw_t    *gVw;
@@ -594,10 +596,10 @@ static void video_window_adapt_size (void) {
 	
 	/* Update window size hints with the new size */
 	XSetNormalHints(gGui->display, gGui->video_window, &hint);
-
+	
 	XResizeWindow (gGui->display, gGui->video_window, 
 		       gVw->win_width, gVw->win_height);
-
+	
 	XUnlockDisplay (gGui->display);
 	
 	return;
@@ -671,20 +673,30 @@ static void video_window_adapt_size (void) {
   wm_delete_window = XInternAtom(gGui->display, "WM_DELETE_WINDOW", False);
   XSetWMProtocols(gGui->display, gGui->video_window, &wm_delete_window, 1);
 
-  /* Map window. */
-  XMapRaised(gGui->display, gGui->video_window);
-  
-  /* Wait for map. */
-
-  do  {
-    XMaskEvent(gGui->display, 
-	       StructureNotifyMask, 
-	       &xev) ;
-  } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
+  if(gVw->hide_on_start == 1) {
+    gVw->hide_on_start = -1;
+    gVw->show = 0;
+  }
+  else {
+    /* Map window. */
+    
+    XMapRaised(gGui->display, gGui->video_window);
+    
+    /* Wait for map. */
+    
+    do  {
+      XMaskEvent(gGui->display, 
+		 StructureNotifyMask, 
+		 &xev) ;
+      
+    } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
+  }
 
   XSync(gGui->display, False);
 
-  if (gVw->gc != None) XFreeGC(gGui->display, gVw->gc);
+  if (gVw->gc != None) 
+    XFreeGC(gGui->display, gVw->gc);
+
   gVw->gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
   
   if (gVw->fullscreen_mode) {
@@ -713,7 +725,8 @@ static void video_window_adapt_size (void) {
     XDestroyWindow(gGui->display, old_video_window);
      
     if(gGui->cursor_grabbed)
-       XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
+       XGrabPointer(gGui->display, gGui->video_window, 1, 
+		    None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
   }
 
   gVw->old_widget_key = gVw->widget_key;
@@ -727,9 +740,10 @@ static void video_window_adapt_size (void) {
 						gui_dndcallback,
 						NULL, NULL);
 
-  { /* take care about window decoration/pos */
+  /* take care about window decoration/pos */
+  {
     Window tmp_win;
-
+    
     XLockDisplay (gGui->display);
     XTranslateCoordinates(gGui->display, gGui->video_window, DefaultRootWindow(gGui->display), 
 			  0, 0, &gVw->xwin, &gVw->ywin, &tmp_win);
@@ -738,8 +752,7 @@ static void video_window_adapt_size (void) {
   
 }
 
-static float get_default_mag( int video_width, int video_height )
-{
+static float get_default_mag(int video_width, int video_height) {
   if(gVw->zoom_small_stream && video_width < 300 && video_height < 300 )
     return 2.0;
   else
@@ -906,7 +919,8 @@ void video_window_set_visibility(int show_window) {
      * WIN_LAYER_ABOVE_DOCK  = 10
      *
      */
-    if(gGui->layer_above) {
+
+    if(gGui->layer_above && (gVw->hide_on_start == 0)) {
       if( XA_WIN_LAYER == None )
 	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
       
@@ -924,6 +938,11 @@ void video_window_set_visibility(int show_window) {
     XUnmapWindow (gGui->display, gGui->video_window);
     XUnlockDisplay (gGui->display);
   }
+  
+  /* User used '-H', now he want to show video window */
+  if(gVw->hide_on_start == -1)
+    gVw->hide_on_start = 0;
+
 }
 
 /*
@@ -937,7 +956,7 @@ int video_window_is_visible (void) {
  *
  */
 static unsigned char bm_no_data[] = { 0,0,0,0, 0,0,0,0 };
-void video_window_init (window_attributes_t *window_attribute) {
+void video_window_init (window_attributes_t *window_attribute, int hide_on_start) {
 
   Pixmap                bm_no;
 #ifdef HAVE_XINERAMA
@@ -960,6 +979,7 @@ void video_window_init (window_attributes_t *window_attribute) {
   gVw->gc		  = None;
   gVw->borderless         = window_attribute->borderless;
   gVw->have_xtest         = have_xtestextention();
+  gVw->hide_on_start      = hide_on_start;
 
   XLockDisplay (gGui->display);
 

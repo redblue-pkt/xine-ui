@@ -141,6 +141,8 @@ typedef struct {
 void config_save(void);
 void config_reset(void);
 
+int actions_on_start(action_id_t actions[], action_id_t a);
+
 char *gui_get_skindir(void);
 char *gui_get_configfile(void);
 

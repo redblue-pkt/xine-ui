@@ -33,7 +33,7 @@ typedef struct {
   int   borderless;
 } window_attributes_t;
 
-void video_window_init (window_attributes_t *window_attribute);
+void video_window_init (window_attributes_t *window_attribute, int hide_on_start);
 
 void video_window_exit (void);
 

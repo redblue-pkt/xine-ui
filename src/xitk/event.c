@@ -103,7 +103,7 @@ static void snapshot_loc_cb(void *data, cfg_entry_t *cfg) {
   gGui->snapshot_location = cfg->str_value;
 }
 
-static int actions_on_start(action_id_t actions[], action_id_t a) {
+int actions_on_start(action_id_t actions[], action_id_t a) {
   int i = 0, num = 0;
   while(actions[i] != ACTID_NOKEY) {
     if(actions[i] == a)
@@ -777,7 +777,9 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->running = 1;
 
-  video_window_init (window_attribute);
+  video_window_init (window_attribute, 
+		     ((actions_on_start(gGui->actions_on_start, 
+				       ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
 
   panel_init ();
 }
@@ -887,7 +889,12 @@ void gui_run (void) {
     if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) {
       if(!panel_is_visible())
 	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
-      gui_execute_action_id(ACTID_TOGGLE_WINOUT_VISIBLITY);
+      
+      gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+					  GUI_DATA_EX_VIDEOWIN_VISIBLE, 
+					  (int *)0);
+      
+
     }
 
     /*  The user wants to see in fullscreen mode  */
