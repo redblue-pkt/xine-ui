@@ -1,9 +1,9 @@
 .\" -*-Nroff-*-
 .\""
-.TH xine-remote 1x 2002-04-16 "The xine project"
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\""
+.TH XINE-REMOTE 1x 2002-04-16 "The xine project"
 .SH NAME
 xine-remote \- a small tool to connect xine remote control server.
 .SH SYNOPSIS
@@ -16,20 +16,21 @@ tool.
 .PP
 .B xine-remote
 can replace a \fIraw\fP telnet connection to a xine remote control server. It use the \fBreadline\fP facilities (completion, vi/emacs shortcuts, command history, etc...).
-By default, it try to connect the localhost, using the default port (\fIsee\~xine\fP(1)).
+By default, it try to connect the localhost, using the default port (see \fIxine\fP(1)).
 .SH OPTIONS
 The program follow the usual GNU command line syntax, with long
 ioptions starting with two dashes (\`\-\').
 A summary of options are included below.
 .TP
-.B \-H, \-\-host <hostname>
+.BR \-H,\ \-\-host\  <hostname>
 Try to connect <\fBhostname\fP>.
 .TP
-.B \-P, \-\-port <port>
+.BR \-P,\ \-\-port\  <port>
 Try to connect the host using <\fBport\fP>.
 .TP
-.B \-c, \-\-command <command>
-Send <\fBcommand\fP> to server then quit. The command should be single coted if it contain
+.B \-c,\ \-\-command\  <command>
+Send <\fBcommand\fP> to server then quit.
+The command should be single quoted if it contain
 spaces or special characters. 
 .TP
 .B \-n, \-\-noconnect
@@ -50,7 +51,7 @@ Display available commands (the xine-remote ones + server ones when connection i
 .B version
 Display version.
 .TP
-.B open <server[:port]>
+.BR open\  <server[:port]>
 Open connection to \fBserver\fP. A \fBport\fP can be optionnaly specified, using colon (\fB:\fP) separator.
 .TP
 .B close
@@ -59,8 +60,7 @@ Close connection.
 .B quit
 Leaving xine-remote.
 .SH "SEE ALSO"
-\fBxine\fP(1).
-.br
+.BR xine (1).
+
 .SH AUTHOR
 This manual page was written by Daniel Caujolle-Bert <f1rmb@users.sourceforge.net> for the xine project.
-
