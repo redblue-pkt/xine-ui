@@ -41,18 +41,37 @@
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
 typedef struct _mwmhints {
-  uint32_t flags;
-  uint32_t functions;
-  uint32_t decorations;
-  int32_t  input_mode;
-  uint32_t status;
+  uint32_t  flags;
+  uint32_t  functions;
+  uint32_t  decorations;
+  int32_t   input_mode;
+  uint32_t  status;
 } MWMHints;
 
 typedef struct {
-    int enabled;
-    int offset_x;
-    int offset_y;
+  int       enabled;
+  int       offset_x;
+  int       offset_y;
 } gui_move_t;
+
+typedef struct {
+  Window    window;
+  char     *name;
+  int       x;
+  int       y;
+  int       height;
+  int       width;
+} window_info_t;
+#define WINDOW_INFO_ZERO(w) {                                                 \
+      if((w)->name)                                                           \
+	free((w)->name);                                                      \
+      (w)->window = None;                                                     \
+      (w)->name   = NULL;                                                     \
+      (w)->x      = 0;                                                        \
+      (w)->y      = 0;                                                        \
+      (w)->height = 0;                                                        \
+      (w)->width  = 0;                                                        \
+    }
 
 typedef struct {
   Pixmap    image;
@@ -190,6 +209,11 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
  */
 void widget_unregister_event_handler(widgetkey_t *key);
 
+/*
+ * Copy window information matching with key in passed window_info_t struct.
+ */
+
+int widget_get_window_info(widgetkey_t key, window_info_t *winf);
 /*
  * Initialization function, should be the first call to widget lib.
  */
@@ -668,6 +692,7 @@ void filebrowser_show(widget_t *w);
 void filebrowser_set_transient(widget_t *w, Window window);
 void filebrowser_destroy(widget_t *w);
 char *filebrowser_get_current_dir(widget_t *w);
+int filebrowser_get_window_info(widget_t *w, window_info_t *inf);
 
 
 #ifdef NEED_MRLBROWSER
@@ -754,6 +779,7 @@ void mrlbrowser_hide(widget_t *w);
 void mrlbrowser_show(widget_t *w);
 void mrlbrowser_set_transient(widget_t *w, Window window);
 void mrlbrowser_destroy(widget_t *w);
+int mrlbrowser_get_window_info(widget_t *w, window_info_t *inf);
 
 #endif
 

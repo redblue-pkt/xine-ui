@@ -93,6 +93,16 @@ typedef struct {
 const char *filebrowser_get_homedir(void);
 
 /*
+ * Fill window information struct of given widget.
+ */
+int filebrowser_get_window_info(widget_t *w, window_info_t *inf) {
+  filebrowser_private_data_t *private_data = 
+    (filebrowser_private_data_t *)w->private_data;
+  
+  return((widget_get_window_info(private_data->widget_key, inf))); 
+}
+
+/*
  * Boolean about running state.
  */
 int filebrowser_is_running(widget_t *w) {

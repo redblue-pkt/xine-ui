@@ -21,9 +21,12 @@
  *
  */
 
+#define _XITK_C_ 1
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,6 +44,8 @@
 #include "widget.h"
 #include "list.h"
 #include "dnd.h"
+
+#include "_xitk.h"
 
 extern int              errno;
 #undef TRACE_LOCKS
@@ -67,7 +72,6 @@ static int ml = 0;
 #define MUTLOCK()   { pthread_mutex_lock(&gXitk->mutex); }
 #define MUTUNLOCK() { pthread_mutex_unlock(&gXitk->mutex); }
 #endif
-
 
 typedef void (*widget_cb_event_t)(XEvent *event, void *user_data);
 typedef void (*widget_cb_newpos_t)(int, int, int, int);
@@ -239,9 +243,11 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
 
   fx->name = (name != NULL) ? name : "NO_SET";
 
-  fx->window = window;
-  fx->width  = 0;
-  fx->height = 0;
+  fx->window    = window;
+  fx->new_pos.x = 0;
+  fx->new_pos.y = 0;
+  fx->width     = 0;
+  fx->height    = 0;
   fx->user_data = user_data;
   
   if(window != None) {
@@ -250,8 +256,10 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
     
     err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
     if(err != BadDrawable && err != BadWindow) {
-      fx->width = wattr.width;
-      fx->height = wattr.height;
+      fx->new_pos.x = wattr.x;
+      fx->new_pos.y = wattr.y;
+      fx->width     = wattr.width;
+      fx->height    = wattr.height;
     }
   }
 
@@ -335,6 +343,41 @@ void widget_unregister_event_handler(widgetkey_t *key) {
   MUTUNLOCK();
 }
 
+/*
+ * Copy window information matching with key in passed window_info_t struct.
+ */
+int widget_get_window_info(widgetkey_t key, window_info_t *winf) {
+  __gfx_t  *fx;
+  
+  MUTLOCK();
+
+  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+    
+  while(fx) {
+
+    if((fx->key == key) && (fx->window != None)) {
+      
+      winf->window = fx->window;
+
+      if(fx->name)
+	winf->name = strdup(fx->name);
+      
+      winf->x      = fx->new_pos.x;
+      winf->y      = fx->new_pos.y;
+      winf->height = fx->height;
+      winf->width  = fx->width;
+      
+      MUTUNLOCK();
+      return 1;
+
+    }
+    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
+
+  }
+
+  MUTUNLOCK();
+  return 0;
+}
 /*
  * Here events are handled. All widget are locally
  * handled, then if a event handler callback was passed

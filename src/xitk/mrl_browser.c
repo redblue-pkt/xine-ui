@@ -114,8 +114,14 @@ void mrl_browser_toggle_visibility(void) {
  *
  */
 void destroy_mrl_browser(void) {
+  window_info_t wi;
 
   if(mrlb) {
+    if((mrlbrowser_get_window_info(mrlb, &wi))) {
+      config_set_int("x_mrl_browser", wi.x);
+      config_set_int("y_mrl_browser", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
     mrlbrowser_destroy(mrlb);
     mrlb = NULL;
   }
@@ -125,6 +131,16 @@ void destroy_mrl_browser(void) {
  *
  */
 static void mrl_browser_kill(widget_t *w, void *data) {
+  window_info_t wi;
+
+  if(mrlb) {
+    if((mrlbrowser_get_window_info(mrlb, &wi))) {
+      config_set_int("x_mrl_browser", wi.x);
+      config_set_int("y_mrl_browser", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
+  }
+
   /* FIXME */
   mrlb = NULL;
 }

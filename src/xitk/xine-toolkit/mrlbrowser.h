@@ -167,6 +167,7 @@ void mrlbrowser_hide(widget_t *w);
 void mrlbrowser_show(widget_t *w);
 void mrlbrowser_set_transient(widget_t *w, Window window);
 void mrlbrowser_destroy(widget_t *w);
+int mrlbrowser_get_window_info(widget_t *w, window_info_t *inf);
 
 #endif
 

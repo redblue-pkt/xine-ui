@@ -279,6 +279,16 @@ static void mrlbrowser_dumpmrl(widget_t *w, void *data) {
  *****************************************************************************/
 
 /*
+ * Fill window information struct of given widget.
+ */
+int mrlbrowser_get_window_info(widget_t *w, window_info_t *inf) {
+  mrlbrowser_private_data_t *private_data = 
+    (mrlbrowser_private_data_t *)w->private_data;
+  
+  return((widget_get_window_info(private_data->widget_key, inf))); 
+}
+
+/*
  * Boolean about running state.
  */
 int mrlbrowser_is_running(widget_t *w) {

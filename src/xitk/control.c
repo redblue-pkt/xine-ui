@@ -60,16 +60,6 @@ typedef struct {
 static _control_t    *control = NULL;
 
 /*
- * Toolkit event handler will call this function with new
- * coords of control window.
- */
-static void control_store_new_position(int x, int y, int w, int h) {
-
-  config_set_int("control_x", x);
-  config_set_int("control_y", y);
-}
-
-/*
  * Get current property 'prop' value from vo_driver.
  */
 static int get_current_prop(int prop) {
@@ -159,9 +149,16 @@ static void set_contrast(widget_t *w, void *data, int value) {
  * Leaving control panel, release memory.
  */
 void control_exit(widget_t *w, void *data) {
+  window_info_t wi;
 
   control->running = 0;
   control->visible = 0;
+
+  if((widget_get_window_info(control->widget_key, &wi))) {
+    config_set_int("control_x", wi.x);
+    config_set_int("control_y", wi.y);
+    WINDOW_INFO_ZERO(&wi);
+  }
 
   widget_unregister_event_handler(&control->widget_key);
   XUnmapWindow(gGui->display, control->window);
@@ -546,7 +543,7 @@ void control_panel(void) {
     widget_register_event_handler("control", 
 				  control->window, 
 				  control_handle_event, 
-				  control_store_new_position,
+				  NULL,
 				  gui_dndcallback,
 				  control->widget_list, NULL);
   

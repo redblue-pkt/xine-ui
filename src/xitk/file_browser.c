@@ -116,8 +116,13 @@ void file_browser_toggle_visibility(void) {
  *
  */
 void destroy_file_browser(void) {
+  window_info_t wi;
 
   if(fb) {
+    if((filebrowser_get_window_info(fb, &wi))) {
+      config_set_int("x_file_browser", wi.x);
+      config_set_int("y_file_browser", wi.y);
+    }
     filebrowser_destroy(fb);
     fb = NULL;
   }
@@ -128,9 +133,17 @@ void destroy_file_browser(void) {
  */
 static void file_browser_kill(widget_t *w, void *data) {
   char *curdir = filebrowser_get_current_dir(fb);
-
-  if(curdir)
+  window_info_t wi;
+  
+  if(curdir) {
     config_set_str("filebrowser_dir", curdir);
+    if(fb) {
+      if((filebrowser_get_window_info(fb, &wi))) {
+	config_set_int("x_file_browser", wi.x);
+	config_set_int("y_file_browser", wi.y);
+      }
+    }
+  }
   
   fb = NULL;
 }

@@ -68,16 +68,6 @@ static _playlist_t   *playlist;
 void playlist_handle_event(XEvent *event, void *data);
 
 /*
- * Toolkit event handler will call this function with new
- * coords of playlist window.
- */
-static void playlist_store_new_position(int x, int y, int w, int h) {
-
-  config_set_int("playlist_x", x);
-  config_set_int("playlist_y", y);
-}
-
-/*
  *
  */
 void pl_update_playlist(void) {
@@ -99,9 +89,16 @@ static void handle_selection(widget_t *w, void *data) {
  * Leaving playlist editor
  */
 void pl_exit(widget_t *w, void *data) {
+  window_info_t wi;
 
   playlist->running = 0;
   playlist->visible = 0;
+
+  if((widget_get_window_info(playlist->widget_key, &wi))) {
+    config_set_int("playlist_x", wi.x);
+    config_set_int("playlist_y", wi.y);
+    WINDOW_INFO_ZERO(&wi);
+  }
 
   widget_unregister_event_handler(&playlist->widget_key);
   XUnmapWindow(gGui->display, playlist->window);
@@ -776,7 +773,7 @@ void playlist_editor(void) {
     widget_register_event_handler("playlist", 
 				  playlist->window, 
 				  playlist_handle_event,
-				  playlist_store_new_position,
+				  NULL,
 				  gui_dndcallback,
 				  playlist->widget_list, NULL);
 

@@ -49,7 +49,7 @@ extern gGui_t          *gGui;
 void gui_exit (widget_t *w, void *data) {
 
   printf("xine-panel: EXIT\n");
-
+  
   config_save();
 
   xine_exit(gGui->xine); 
