@@ -406,7 +406,7 @@ void init_skins_support(void) {
 					skin_names,
 					_("gui skin theme"), 
 					CONFIG_NO_HELP, 
-					CONFIG_LEVEL_EXP,
+					CONFIG_LEVEL_BEG,
 					skin_change_cb, 
 					CONFIG_NO_DATA);
 
