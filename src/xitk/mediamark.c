@@ -1029,6 +1029,150 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
   return NULL;
 }
 
+static void gx_get_entries(playlist_t *playlist, 
+			   mediamark_t ***mmk, int *entries, xml_node_t *entry) {
+  xml_property_t  *prop;
+  xml_node_t      *ref;
+  xml_node_t      *node = entry;  
+  
+  while(node) {
+    if(!strcasecmp(node->name, "ENTRY")) {
+      char *title  = NULL;
+      char *href   = NULL;
+      int   start  = 0;
+      
+      ref = node->child;
+      while(ref) {
+	
+	if(!strcasecmp(ref->name, "TITLE")) {
+
+	  if(!title)
+	    title = ref->data;
+	  
+	}
+	else if(!strcasecmp(ref->name, "REF")) {
+
+	  for(prop = ref->props; prop; prop = prop->next) {
+	    if(!strcasecmp(prop->name, "HREF")) {
+	      
+	      if(!href)
+		href = prop->value;
+	    }
+	    
+	    if(href)
+	      break;
+	  }
+	}		    
+	else if(!strcasecmp(ref->name, "TIME")) {
+	  prop = ref->props;
+	  start = strtol(prop->value, &prop->value, 10);
+	}
+	
+	ref = ref->next;
+      }
+      
+      if(href && strlen(href)) {
+	char *real_title = NULL;
+	char *atitle     = NULL;
+	int   len        = 0;
+	
+	if(title && strlen(title)) {
+	  xine_strdupa(atitle, title);
+	  atitle = atoa(atitle);
+	  len = strlen(atitle);
+	  
+	  len++;
+	}
+	
+	if(atitle && strlen(atitle)) {
+	  real_title = (char *) alloca(len);
+	  sprintf(real_title, "%s", atitle);
+	  
+	}
+	
+	if(*entries == 0)
+	  (*mmk) = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
+	else
+	  (*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*entries + 2));
+	
+	mediamark_store_mmk(&(*mmk)[*entries], href, real_title, NULL, start, -1, 0);
+	playlist->entries = ++(*entries);
+      }
+      
+      href = title = NULL;
+    }
+    node = node->next;
+  }
+}
+static mediamark_t **guess_gx_playlist(playlist_t *playlist, const char *filename) {
+  mediamark_t **mmk = NULL;
+
+  if(filename) {
+    char            *gx_content;
+    int              size;
+    int              result;
+    xml_node_t      *xml_tree, *gx_entry;
+    xml_property_t  *gx_prop;
+
+
+    if((gx_content = _read_file(filename, &size)) != NULL) {
+      int entries_gx = 0;
+
+      xml_parser_init(gx_content, size, XML_PARSER_CASE_INSENSITIVE);
+      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
+	goto __failure;
+
+      if(!strcasecmp(xml_tree->name, "GXINEMM")) {
+
+	gx_prop = xml_tree->props;
+
+	while((gx_prop) && (strcasecmp(gx_prop->name, "VERSION")))
+	  gx_prop = gx_prop->next;
+	
+	if(gx_prop) {
+	  int  version_major;
+
+	  if(((sscanf(gx_prop->value, "%d", &version_major)) == 1) && (version_major == 1)) {
+	    
+	    gx_entry = xml_tree->child;
+	    while(gx_entry) {
+	      
+	      if(!strcasecmp(gx_entry->name, "SUB"))
+		gx_get_entries(playlist, &mmk, &entries_gx, gx_entry->child);
+	      
+	      if(!strcasecmp(gx_entry->name, "ENTRY"))
+		gx_get_entries(playlist, &mmk, &entries_gx, gx_entry);
+	      
+	      gx_entry = gx_entry->next;
+	    }
+	  }
+	  else
+	    fprintf(stderr, "%s(): Wrong GXINEMM version: %s\n", __XINE_FUNCTION__, gx_prop->value);
+
+	}
+	else
+	  fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
+	
+      }
+      else
+	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+      
+      xml_parser_free_tree(xml_tree);
+    __failure:
+      
+      free(gx_content);
+      
+      if(entries_gx) {
+	mmk[entries_gx] = NULL;
+	playlist->type = strdup("GXMM");
+	return mmk;
+      }
+    }
+  }
+  
+  return NULL;
+}
+
 /*
  * ********************************** SMIL BEGIN ***********************************
  */
@@ -2152,6 +2296,7 @@ int mediamark_concat_mediamarks(const char *_filename) {
   const char             *filename = _filename;
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
+    guess_gx_playlist,
     guess_smil_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
@@ -2205,6 +2350,7 @@ void mediamark_load_mediamarks(const char *_filename) {
   const char             *filename = _filename;
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
+    guess_gx_playlist,
     guess_smil_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
