@@ -27,7 +27,15 @@
 
 #include "common.h"
 
-extern gGui_t                 *gGui;
+extern gGui_t  *gGui;
+
+/* 
+ * experience level above this level 
+ * can't be changed by cfg:/ mrl type.
+ * This reflect xine-lib policy about security issue
+ */
+#define XINE_CONFIG_SECURITY   30
+
 
 static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, int value, char *string) {
 
@@ -148,6 +156,12 @@ void config_mrl(char *mrl) {
       xine_cfg_entry_t entry;
       
       if(xine_config_lookup_entry(gGui->xine, key, &entry)) {
+
+	if(entry.exp_level >= XINE_CONFIG_SECURITY) {
+	  xine_info(_("For security reason, you're not allowed to change "
+		      "the configuration entry named '%s'."), entry.key);
+	  return;
+	}
 
 	switch(entry.type) {
 
