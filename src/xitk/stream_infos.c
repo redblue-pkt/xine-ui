@@ -38,7 +38,7 @@
 
 #include "common.h"
 	
-#define WINDOW_WIDTH        500
+#define WINDOW_WIDTH        550
 #define WINDOW_HEIGHT       500
 
 extern gGui_t          *gGui;
