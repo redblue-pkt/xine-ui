@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.14\n"
-"POT-Creation-Date: 2002-12-16 14:56+0100\n"
+"POT-Creation-Date: 2003-01-02 22:41+0100\n"
 "PO-Revision-Date: 2002-01-17 00:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -13,98 +13,132 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/actions.c:344
+#: src/xitk/actions.c:384
 msgid "No MRL (input stream) specified"
 msgstr "MRL (vstupný prúd) nebolo ¹pecifikované"
 
-#: src/xitk/actions.c:761 src/xitk/actions.c:780
+#: src/xitk/actions.c:762 src/xitk/actions.c:781
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): nemô¾em vytvori» nový thread (%s)\n"
 
-#: src/xitk/actions.c:1031
+#: src/xitk/actions.c:1032
 msgid "There is no mrl."
 msgstr "Nie je ¾iadne MRL"
 
-#: src/xitk/actions.c:1145 src/xitk/actions.c:1157
+#: src/xitk/actions.c:1146 src/xitk/actions.c:1158
 #, fuzzy
 msgid "Audio Volume"
 msgstr "iba audio"
 
-#: src/xitk/actions.c:1223
+#: src/xitk/actions.c:1224
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) zlyhal.\n"
 
-#: src/xitk/actions.c:1290 src/xitk/event_sender.c:482
+#: src/xitk/actions.c:1295 src/xitk/event_sender.c:482
 #: src/xitk/mrl_browser.c:271
 msgid "Select"
 msgstr "Vybra»"
 
-#: src/xitk/actions.c:1293
+#: src/xitk/actions.c:1298
 #, fuzzy
 msgid "Select all"
 msgstr "Vybra»"
 
-#: src/xitk/actions.c:1296
+#: src/xitk/actions.c:1303
 #, fuzzy
 msgid "Stream(s) loading"
 msgstr "Prúd(y): "
 
-#: src/xitk/control.c:340 src/xitk/panel.c:147 src/xitk/playlist.c:827
+#: src/xitk/control.c:231
+msgid "hue value"
+msgstr ""
+
+#: src/xitk/control.c:232
+msgid "Hue value."
+msgstr ""
+
+#: src/xitk/control.c:242
+msgid "brightness value"
+msgstr ""
+
+#: src/xitk/control.c:243
+msgid "Brightness value."
+msgstr ""
+
+#: src/xitk/control.c:253
+msgid "saturation value"
+msgstr ""
+
+#: src/xitk/control.c:254
+msgid "Saturation value."
+msgstr ""
+
+#: src/xitk/control.c:264
+#, fuzzy
+msgid "contrast value"
+msgstr "Nastavi» odtieò"
+
+#: src/xitk/control.c:265
+#, fuzzy
+msgid "Contrast value."
+msgstr "Nastavi» odtieò"
+
+#: src/xitk/control.c:416 src/xitk/panel.c:147 src/xitk/playlist.c:841
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s() : nemô¾em nájs» obrázok na pozadie.\n"
 
-#: src/xitk/control.c:410
+#: src/xitk/control.c:486
 msgid "Xine Control Panel"
 msgstr "Xine Ovládací panel"
 
-#: src/xitk/control.c:425
+#: src/xitk/control.c:501
 msgid "control: couldn't find image for background\n"
 msgstr "control: nemô¾em nájs» obrázok na pozadie.\n"
 
-#: src/xitk/control.c:546
+#: src/xitk/control.c:622
 msgid "Control HUE value"
 msgstr "Nastavi» odtieò"
 
-#: src/xitk/control.c:549
+#: src/xitk/control.c:625
 msgid "Hue"
 msgstr "Odtieò"
 
-#: src/xitk/control.c:569
+#: src/xitk/control.c:645
 msgid "Control SATURATION value"
 msgstr "Nastavi» nasýtenie"
 
-#: src/xitk/control.c:572
+#: src/xitk/control.c:648
 msgid "Sat"
 msgstr "Nasýtenie"
 
-#: src/xitk/control.c:592
+#: src/xitk/control.c:668
 msgid "Control BRIGHTNESS value"
 msgstr "Nastavi» jas"
 
-#: src/xitk/control.c:595
+#: src/xitk/control.c:671
 msgid "Brt"
 msgstr "Jas"
 
-#: src/xitk/control.c:615
+#: src/xitk/control.c:691
 msgid "Control CONTRAST value"
 msgstr "Nastavi» kontrast"
 
-#: src/xitk/control.c:618
+#: src/xitk/control.c:694
 msgid "Ctr"
 msgstr "Kontrast"
 
-#: src/xitk/control.c:639
+#: src/xitk/control.c:715
 msgid "Choose a Skin"
 msgstr "Vyber skin"
 
-#: src/xitk/control.c:666 src/xitk/mrl_browser.c:278 src/xitk/playlist.c:1119
+#: src/xitk/control.c:742 src/xitk/mrl_browser.c:278 src/xitk/playlist.c:1133
 msgid "Dismiss"
 msgstr "Zavrie»"
 
-#: src/xitk/control.c:672
+#: src/xitk/control.c:748
 msgid "Close control window"
 msgstr "Zavrie» okno nastavenia"
 
@@ -187,16 +221,16 @@ msgstr ""
 "\n"
 "!! Neo¹etrená chyba !!\n"
 
-#: src/xitk/event.c:832
+#: src/xitk/event.c:864
 #, c-format
 msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
 msgstr "gui_main: vybrané zobrazenie %#lx neexistuje, skú¹am default\n"
 
-#: src/xitk/event.c:851
+#: src/xitk/event.c:883
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "gui_main: nemô¾em nájs» true color zobrazenie.\n"
 
-#: src/xitk/event.c:892
+#: src/xitk/event.c:924
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -204,158 +238,177 @@ msgstr ""
 "\n"
 "XInitThreads zlyhali - vyzerá to tak, ¾e nemáte pre thready bezpeènú xlib.\n"
 
-#: src/xitk/event.c:901
+#: src/xitk/event.c:933
 msgid "Cannot open display\n"
 msgstr "Nemô¾em otvori» display.\n"
 
-#: src/xitk/event.c:907
+#: src/xitk/event.c:939
 msgid "synchronized X protocol (debug)"
 msgstr "synchronizovaný X protokol (debug)"
 
-#: src/xitk/event.c:914
+#: src/xitk/event.c:946
 msgid "Warning! Synchronized X activated - this is way slow...\n"
 msgstr "Varovanie! Synchronizovaný X aktivovaný - toto je pomalé\n"
 
-#: src/xitk/event.c:919
+#: src/xitk/event.c:951
 msgid "Windows stacking"
 msgstr ""
 
-#: src/xitk/event.c:920
+#: src/xitk/event.c:952
 msgid "Use wm layer property to place window on top."
 msgstr "Pou¾i» vlastnos» wm layer na umiestnenie okna do popredia"
 
-#: src/xitk/event.c:927
+#: src/xitk/event.c:959
 msgid "Windows stacking (more)"
 msgstr ""
 
-#: src/xitk/event.c:928
+#: src/xitk/event.c:960
 msgid "Use WM layer property to place windows on top."
 msgstr "Pou¾i» vlastnos» wm layer na umiestnenie okna do popredia"
 
-#: src/xitk/event.c:939
+#: src/xitk/event.c:971
 msgid "Snapshot location"
 msgstr "Umiestnenie obrázku - obsahu obrazovky"
 
-#: src/xitk/event.c:940
+#: src/xitk/event.c:972
 msgid "Where snapshots will be saved."
 msgstr "Kam budú ulo¾ené obrázky - obsah obrazovky"
 
-#: src/xitk/event.c:947
+#: src/xitk/event.c:979
 msgid "Screensaver wakeup"
 msgstr "Zobudenie ¹ertrièa obrazovky"
 
-#: src/xitk/event.c:948
+#: src/xitk/event.c:980
 msgid "Time between two screensaver fake events, 0 to disable."
 msgstr "Èas medzi dvoma screensaver fake udalos»ami, 0 na zakázanie"
 
-#: src/xitk/event.c:955
+#: src/xitk/event.c:987
 #, fuzzy
 msgid "Chapter hopping"
 msgstr "Skákanie kapitolami"
 
-#: src/xitk/event.c:956
+#: src/xitk/event.c:988
 msgid "Play next|previous chapter instead of mrl (dvdnav)"
 msgstr "Prehra» ïal¹iu|predchádzajúcu kapitolu namiesto mrl (dvdnav)"
 
-#: src/xitk/event.c:963
+#: src/xitk/event.c:995
 #, fuzzy
 msgid "Visibility behavior of output window"
 msgstr "Správanie sa viditeµnosti okna výstupu"
 
-#: src/xitk/event.c:964
+#: src/xitk/event.c:996
 #, fuzzy
 msgid "Hide video output window if there is no video in the stream"
 msgstr "Ukáza»/skry» výstupne video okno v závislosti od typu prúdu"
 
-#: src/xitk/event.c:971
+#: src/xitk/event.c:1003
 msgid "Visiblility behavior of panel"
 msgstr "Správanie sa viditeµnosti panelu"
 
-#: src/xitk/event.c:972
+#: src/xitk/event.c:1004
 msgid ""
 "Automatically show/hide panel window, according to "
 "auto_video_output_visibility"
 msgstr "Automaticky ukáza»/skry» panel, podµa auto_video_output_visibility"
 
-#: src/xitk/event.c:980
+#: src/xitk/event.c:1012
 msgid "Event sender behavior"
 msgstr "Správanie sa odosielateµa udalostí"
 
-#: src/xitk/event.c:981
+#: src/xitk/event.c:1013
 msgid "Event sender window stick to main panel"
 msgstr "Prilepi» okno odosielateµa udalostí k hlavnému panelu"
 
-#: src/xitk/event.c:989
-msgid "Visual animation"
+#: src/xitk/event.c:1022
+#, fuzzy
+msgid "Visual animation style"
 msgstr "Animácia"
 
-#: src/xitk/event.c:990
+#: src/xitk/event.c:1023
 msgid ""
 "Display some video animations when current stream is audio only (eg: mp3)."
 msgstr "Zobrazi» nejakú video animáciu keï prúd je iba audio (napr.: mp3)."
 
-#: src/xitk/event.c:999
+#: src/xitk/event.c:1032
 #, fuzzy
 msgid "Stream information"
 msgstr "Informácie o prúde"
 
-#: src/xitk/event.c:1000
+#: src/xitk/event.c:1033
 #, fuzzy
 msgid "Update stream information (in stream info window) each half seconds."
 msgstr "Aktualizova» info o prúde (v okne prúd.info.) ka¾dú polovicu sekundy"
 
-#: src/xitk/event.c:1010
+#: src/xitk/event.c:1043
 msgid "Skin Server Url"
 msgstr ""
 
-#: src/xitk/event.c:1011
+#: src/xitk/event.c:1044
 msgid "From where we can get skins."
 msgstr ""
 
-#: src/xitk/event.c:1022
+#: src/xitk/event.c:1055
 msgid "Enable OSD support"
 msgstr ""
 
-#: src/xitk/event.c:1023
+#: src/xitk/event.c:1056
 msgid ""
 "Enabling OSD permit to display some status/informations in output window."
 msgstr ""
 
-#: src/xitk/event.c:1032
+#: src/xitk/event.c:1065
 msgid "Dismiss OSD time (s)"
 msgstr ""
 
-#: src/xitk/event.c:1033
+#: src/xitk/event.c:1066
 msgid "Persistence time of OSD visual, in seconds."
 msgstr ""
 
+#: src/xitk/event.c:1074
+msgid "change xine's behavior for unexperienced user"
+msgstr ""
+
+#: src/xitk/event.c:1075
+msgid "In this mode, xine take some decisions to simplify user's life."
+msgstr ""
+
+#: src/xitk/event.c:1083
+msgid "configuration experience level"
+msgstr ""
+
+#: src/xitk/event.c:1084
+msgid ""
+"Level of user's experience, this will show more or less configuration "
+"options."
+msgstr ""
+
 #. Some infos
-#: src/xitk/event.c:1046
+#: src/xitk/event.c:1098
 #, c-format
 msgid "XServer Vendor: %s. Release: %d,\n"
 msgstr "XServer Vendor: %s. Release: %d,\n"
 
-#: src/xitk/event.c:1048
+#: src/xitk/event.c:1100
 #, c-format
 msgid "        Protocol Version: %d, Revision: %d,\n"
 msgstr "        Protocol Version: %d, Revision: %d,\n"
 
-#: src/xitk/event.c:1050
+#: src/xitk/event.c:1102
 #, c-format
 msgid "        Available Screen(s): %d, using %d\n"
 msgstr "        Dostupné obrazovky: %d, pou¾ívam %d\n"
 
-#: src/xitk/event.c:1052
+#: src/xitk/event.c:1104
 #, c-format
 msgid "        Depth: %d.\n"
 msgstr "        Håbka: %d.\n"
 
-#: src/xitk/event.c:1061
+#: src/xitk/event.c:1113
 #, c-format
 msgid "        XShmQueryVersion: %d.%d.\n"
 msgstr ""
 
-#: src/xitk/event.c:1124
+#: src/xitk/event.c:1178
 msgid "Unable to initialize Imlib\n"
 msgstr "Nemô¾em inicializova» Imlib.\n"
 
@@ -445,13 +498,13 @@ msgstr "Uhol -"
 msgid "Part"
 msgstr ""
 
-#: src/xitk/event_sender.c:671 src/xitk/file_browser.c:1533
-#: src/xitk/mediamark.c:1462 src/xitk/setup.c:1148
+#: src/xitk/event_sender.c:671 src/xitk/file_browser.c:1539
+#: src/xitk/mediamark.c:1547 src/xitk/setup.c:1251
 #: src/xitk/stream_infos.c:1002 src/xitk/viewlog.c:472
 msgid "Close"
 msgstr "Zavrie»"
 
-#: src/xitk/file_browser.c:312 src/xitk/mediamark.c:1447
+#: src/xitk/file_browser.c:312 src/xitk/mediamark.c:1532
 msgid "Apply"
 msgstr "Pou¾i»"
 
@@ -486,32 +539,32 @@ msgstr "Nie je mo¾né ulo¾i» playlist (%s): %s.\n"
 msgid "Create a new directory"
 msgstr ""
 
-#: src/xitk/file_browser.c:1146
+#: src/xitk/file_browser.c:1152
 #, fuzzy
 msgid "File Browser"
 msgstr "Xine súborový prehliadaè"
 
-#: src/xitk/file_browser.c:1167
+#: src/xitk/file_browser.c:1173
 msgid "All files"
 msgstr ""
 
-#: src/xitk/file_browser.c:1168
+#: src/xitk/file_browser.c:1174
 msgid "All known playlists"
 msgstr ""
 
-#: src/xitk/file_browser.c:1437
+#: src/xitk/file_browser.c:1443
 msgid "Show hidden file"
 msgstr ""
 
-#: src/xitk/file_browser.c:1448
+#: src/xitk/file_browser.c:1454
 msgid "Rename"
 msgstr ""
 
-#: src/xitk/file_browser.c:1463 src/xitk/kbindings.c:1948
+#: src/xitk/file_browser.c:1469 src/xitk/kbindings.c:1948
 msgid "Delete"
 msgstr "Vymaza»"
 
-#: src/xitk/file_browser.c:1478
+#: src/xitk/file_browser.c:1484
 msgid "Create a directory"
 msgstr ""
 
@@ -528,7 +581,7 @@ msgstr "Ajajáj: tabuµka klávesových skratiek je PRÁZDNA.\n"
 msgid "Nothing selected"
 msgstr "Nebolo niè vybrané"
 
-#: src/xitk/kbindings.c:1356
+#: src/xitk/kbindings.c:1356 src/xitk/main.c:1363
 msgid "None"
 msgstr "Niè"
 
@@ -591,7 +644,8 @@ msgstr "Alias"
 msgid "Edit"
 msgstr "Editova»"
 
-#: src/xitk/kbindings.c:1962 src/xitk/playlist.c:369 src/xitk/playlist.c:1109
+#: src/xitk/kbindings.c:1962 src/xitk/playlist.c:379 src/xitk/playlist.c:1123
+#: src/xitk/setup.c:1240
 msgid "Save"
 msgstr "Ulo¾i»"
 
@@ -623,7 +677,17 @@ msgstr ""
 msgid "Grab"
 msgstr "Grab"
 
-#: src/xitk/main.c:250
+#: src/xitk/main.c:347
+#, fuzzy, c-format
+msgid "Bad geometry '%s'\n"
+msgstr "Zlá geometria '%s', pozrite xine --help\n"
+
+#: src/xitk/main.c:355
+#, c-format
+msgid "Bad visual '%s'\n"
+msgstr ""
+
+#: src/xitk/main.c:429
 #, c-format
 msgid ""
 "This is xine (X11 gui) - a free video player v%s\n"
@@ -632,25 +696,25 @@ msgstr ""
 "Toto je xine (X11 gui) - slobodný video prehrávaè v%s\n"
 "(c) 2000-2002 by G. Bartsch and the xine project team.\n"
 
-#: src/xitk/main.c:261
+#: src/xitk/main.c:440
 #, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
 msgstr "Prelo¾ené s xine kni¾nicou %d.%d.%d (%s)\n"
 
-#: src/xitk/main.c:266
+#: src/xitk/main.c:445
 #, c-format
 msgid "Found xine library version: %d.%d.%d (%s).\n"
 msgstr "Nájdená xine kni¾nica verzie : %d.%d.%d (%s).\n"
 
-#: src/xitk/main.c:297
+#: src/xitk/main.c:476
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Pou¾itie : xine [VO¥BY]...[MRL]\n"
 
-#: src/xitk/main.c:300
+#: src/xitk/main.c:479
 msgid "  -v, --version                Display version.\n"
 msgstr "  -v, --version                Vypí¹e verziu.\n"
 
-#: src/xitk/main.c:301
+#: src/xitk/main.c:480
 msgid ""
 "  -V, --video-driver <drv>     Select video driver by id. Available "
 "drivers: \n"
@@ -658,7 +722,7 @@ msgstr ""
 "  -V, --video-driver <drv> Výber video ovládaèa pomocou id. Dostupné "
 "ovládaèe : \n"
 
-#: src/xitk/main.c:311
+#: src/xitk/main.c:490
 msgid ""
 "  -A, --audio-driver <drv>     Select audio driver by id. Available "
 "drivers: \n"
@@ -666,42 +730,42 @@ msgstr ""
 "  -A, --audio-driver <dvr> Výber audio ovládaèa pomocou id. Dostupné "
 "ovládaèe : \n"
 
-#: src/xitk/main.c:321
+#: src/xitk/main.c:500
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
 msgstr "  -u, --spu-channel <#> Výber SPU (titulky) kanála '#'.\n"
 
-#: src/xitk/main.c:322
+#: src/xitk/main.c:501
 msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
 msgstr "  -a, --audio-channel <#> Výber audio kanála '#'.\n"
 
-#: src/xitk/main.c:323
+#: src/xitk/main.c:502
 msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
 msgstr ""
 "  -p, --auto-play [opt]        Zaèa» prehráva» pri ¹tarte. Mô¾e "
 "nasledova» :\n"
 
-#: src/xitk/main.c:324
+#: src/xitk/main.c:503
 msgid "                    'f': in fullscreen mode.\n"
 msgstr "                    'f' : v celoobrazovkovom re¾ime.\n"
 
-#: src/xitk/main.c:326
+#: src/xitk/main.c:505
 #, fuzzy
 msgid "                    'F': in xinerama fullscreen mode.\n"
 msgstr "                    'f' : v celoobrazovkovom re¾ime.\n"
 
-#: src/xitk/main.c:328
+#: src/xitk/main.c:507
 msgid "                    'h': hide GUI (panel, etc.).\n"
 msgstr "                    'h' : skry» GUI (panel, atï.).\n"
 
-#: src/xitk/main.c:329
+#: src/xitk/main.c:508
 msgid "                    'w': hide video window.\n"
 msgstr "                    'w': skry» video okno.\n"
 
-#: src/xitk/main.c:330
+#: src/xitk/main.c:509
 msgid "                    'q': quit when play is done.\n"
 msgstr "                    'q' : skonèi», keï skonèí prehrávanie.\n"
 
-#: src/xitk/main.c:331
+#: src/xitk/main.c:510
 msgid ""
 "                    'd': retrieve playlist from DVD. (deprecated. use -s "
 "DVD)\n"
@@ -709,7 +773,7 @@ msgstr ""
 "                    'd' : stiahnu» playlist z DVD. (zastarané, pou¾ite -s "
 "DVD)\n"
 
-#: src/xitk/main.c:332
+#: src/xitk/main.c:511
 msgid ""
 "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
@@ -717,60 +781,60 @@ msgstr ""
 "                     'v': stiahnu» playlist z VCD. (zastarané, pou¾ite -s "
 "VCD)\n"
 
-#: src/xitk/main.c:333
+#: src/xitk/main.c:512
 msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
 msgstr "  -s, --auto-scan <plugin>   stiahnu» playlist z <plugin>\n"
 
-#: src/xitk/main.c:334
+#: src/xitk/main.c:513
 msgid "  -f, --fullscreen             start in fullscreen mode,\n"
 msgstr "  -f, --fullscreen             ¹tart v plnoobrazovkovom re¾ime,\n"
 
-#: src/xitk/main.c:336
+#: src/xitk/main.c:515
 #, fuzzy
 msgid ""
 "  -F, --xineramafull           start in xinerama fullscreen (display on "
 "several screens),\n"
 msgstr "  -f, --fullscreen             ¹tart v plnoobrazovkovom re¾ime,\n"
 
-#: src/xitk/main.c:338
+#: src/xitk/main.c:517
 msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
 msgstr "  -g, --hide-gui               skry» GUI (panel, ...)\n"
 
-#: src/xitk/main.c:339
+#: src/xitk/main.c:518
 msgid "  -H, --hide-video             hide video window\n"
 msgstr "  -H, --hide-video             skry» video okno.\n"
 
-#: src/xitk/main.c:341
+#: src/xitk/main.c:520
 msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-lirc                Vypnú» podporu LIRC.\n"
 
-#: src/xitk/main.c:343
+#: src/xitk/main.c:522
 msgid ""
 "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
 msgstr "      --visual <trieda-alebo-id> Po¾i» ¹pecifické X11 zobrazenie.\n"
 
-#: src/xitk/main.c:344
+#: src/xitk/main.c:523
 msgid ""
 "                               is either an X11 visual class, or a visual "
 "id.\n"
 msgstr ""
 "                              je buï trieda X11 zobr., alebo X11 zobr.\n"
 
-#: src/xitk/main.c:345
+#: src/xitk/main.c:524
 msgid "      --install                Install a private colormap.\n"
 msgstr "      --install                Nain¹talova» osobitnú mapu farieb.\n"
 
-#: src/xitk/main.c:346
+#: src/xitk/main.c:525
 msgid "      --keymap [option]        Display keymap. Option are:\n"
 msgstr "      --keymap [option]        Zobrazi» kláv. mapu. Mo¾nosti sú :\n"
 
-#: src/xitk/main.c:347
+#: src/xitk/main.c:526
 msgid ""
 "                                 'default': display default keymap table,\n"
 msgstr ""
 "                                 'default' : zobrazi» default kl. mapu,\n"
 
-#: src/xitk/main.c:348
+#: src/xitk/main.c:527
 msgid ""
 "                                 'lirc': display draft of a .lircrc config "
 "file.\n"
@@ -778,14 +842,14 @@ msgstr ""
 "                                 'lirc' : zobrazi» vzor .lircrc "
 "konfiguraèného súboru\n"
 
-#: src/xitk/main.c:349
+#: src/xitk/main.c:528
 msgid ""
 "                                 'remapped': user remapped keymap table.\n"
 msgstr ""
 "                                 'remapped' : kl. mapu premapovanú "
 "u¾ívateµom.\n"
 
-#: src/xitk/main.c:350
+#: src/xitk/main.c:529
 msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
@@ -793,25 +857,25 @@ msgstr ""
 "                                 -ak nie je ¾iadna voµba daná, je  \n"
 "                                  zvolená 'default'.\n"
 
-#: src/xitk/main.c:351
+#: src/xitk/main.c:530
 msgid "  -n, --network                Enable network remote control server.\n"
 msgstr ""
 "  -n, --network                Povoli» sie»ový server diaµkového ovládania.\n"
 
-#: src/xitk/main.c:352
+#: src/xitk/main.c:531
 msgid "  -R, --root                   Use root window as video window.\n"
 msgstr ""
 "  -R, --root                   Pou¾i» pracovnú plochu pre zobrazenie videa\n"
 
-#: src/xitk/main.c:353
+#: src/xitk/main.c:532
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
 msgstr "  -G, --geometry <WxH[+X+Y]>   Nastvi» výstupné okno (X style).\n"
 
-#: src/xitk/main.c:354
+#: src/xitk/main.c:533
 msgid "  -B, --borderless             Borderless video output window.\n"
 msgstr "  -B, --borderless             Výstupné okno bez rámu.\n"
 
-#: src/xitk/main.c:355
+#: src/xitk/main.c:534
 msgid ""
 "  -N, --animation <mrl>        Specify mrl to play when video output isn't "
 "used.\n"
@@ -819,15 +883,15 @@ msgstr ""
 "  -N, --animation <mrl>        Zada» mrl ktoré sa prehráva, keï video "
 "výstupnie je pou¾itý.\n"
 
-#: src/xitk/main.c:356
+#: src/xitk/main.c:535
 msgid "                                 -can be used more than one time.\n"
 msgstr "                                 -mô¾e by» po¾ité viackrát.\n"
 
-#: src/xitk/main.c:357
+#: src/xitk/main.c:536
 msgid "  -P, --playlist <filename>    Load a playlist file.\n"
 msgstr "  -P, --playlist <menosúboru>    Nahra» playlist.\n"
 
-#: src/xitk/main.c:358
+#: src/xitk/main.c:537
 msgid ""
 "  -l, --loop [mode]            Set playlist loop mode (default: loop). Modes "
 "are:\n"
@@ -835,18 +899,18 @@ msgstr ""
 "  -l, --loop [mód]          Nastavi» mód opakovania playlist-u (default: "
 "loop). Módy sú:\n"
 
-#: src/xitk/main.c:359
+#: src/xitk/main.c:538
 msgid "                                 'loop': loop entire playlist.\n"
 msgstr "                                 'loop' : opakova» celý playlist.\n"
 
-#: src/xitk/main.c:360
+#: src/xitk/main.c:539
 msgid ""
 "                                 'repeat': repeat current playlist entry.\n"
 msgstr ""
 "                                'repeat' : opakova» aktuálnu polo¾ku "
 "playlistu.\n"
 
-#: src/xitk/main.c:361
+#: src/xitk/main.c:540
 #, fuzzy
 msgid ""
 "                                 'shuffle': select randomly a yet unplayed "
@@ -855,7 +919,7 @@ msgstr ""
 "                                 'shuffle': vybra» náhodne polo¾ku "
 "zplaylistu.\n"
 
-#: src/xitk/main.c:362
+#: src/xitk/main.c:541
 #, fuzzy
 msgid ""
 "                                 'shuffle+': same as 'shuffle', but "
@@ -864,180 +928,200 @@ msgstr ""
 "                                 'shuffle': vybra» náhodne polo¾ku "
 "zplaylistu.\n"
 
-#: src/xitk/main.c:363
+#: src/xitk/main.c:542
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
 msgstr ""
 
-#: src/xitk/main.c:365
+#: src/xitk/main.c:544
 msgid "examples for valid MRLs (media resource locator):\n"
 msgstr "príklady platných MRL (Media Resource Locator) :\n"
 
-#: src/xitk/main.c:366
+#: src/xitk/main.c:545
 msgid "  File:  'path/foo.vob'\n"
 msgstr "  Súbor :   'cesta/súbor.vob'\n"
 
-#: src/xitk/main.c:367
+#: src/xitk/main.c:546
 msgid "         '/path/foo.vob'\n"
 msgstr "             'cesta/súbor.vob'\n"
 
-#: src/xitk/main.c:368
+#: src/xitk/main.c:547
 msgid "         'file://path/foo.vob'\n"
 msgstr "             'file://cesta/súbor.vob'\n"
 
-#: src/xitk/main.c:369
+#: src/xitk/main.c:548
 msgid "         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
 msgstr "             'fifo://[[mpeg1|mpeg2]:/]cesta/súbor'\n"
 
-#: src/xitk/main.c:370
+#: src/xitk/main.c:549
 msgid "         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
 msgstr "             'stdin://[mpeg1|mpeg2]' alebo '-' (iba mpeg2)\n"
 
-#: src/xitk/main.c:371
+#: src/xitk/main.c:550
 msgid "  DVD:   'dvd://VTS_01_2.VOB'\n"
 msgstr "  DVD:   'dvd://VTS_01_2.VOB'\n"
 
-#: src/xitk/main.c:372
+#: src/xitk/main.c:551
 msgid "  VCD:   'vcd://<track number>'\n"
 msgstr "  VCD:   'vcd://<èíslo stopy>'\n"
 
-#: src/xitk/main.c:409
+#: src/xitk/main.c:590 src/xitk/main.c:695
 msgid "video driver to use"
 msgstr "pou¾i» video ovládaè"
 
-#: src/xitk/main.c:443
+#: src/xitk/main.c:591 src/xitk/main.c:696
+msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
+msgstr ""
+
+#: src/xitk/main.c:630
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr "main : skú¹am pou¾i» video výstupný plugin <%s>\n"
 
-#: src/xitk/main.c:460
+#: src/xitk/main.c:644
 msgid "main: all available video drivers failed.\n"
 msgstr "main : v¹etky dostupné video ovládaèe zlyhali.\n"
 
-#: src/xitk/main.c:482
+#: src/xitk/main.c:673
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr "main : video ovládaè <%s> zlyhal\n"
 
-#: src/xitk/main.c:503
+#: src/xitk/main.c:706
 msgid "audio driver to use"
 msgstr "pou¾i» audio ovládaè"
 
-#: src/xitk/main.c:517 src/xitk/main.c:557
+#: src/xitk/main.c:707
+msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
+msgstr ""
+
+#: src/xitk/main.c:721 src/xitk/main.c:759
 msgid "main: not using any audio driver (as requested).\n"
 msgstr "main: nepou¾ívam ¾iaden audio ovládaè (ako po¾adované)\n"
 
-#: src/xitk/main.c:533
+#: src/xitk/main.c:740
 #, c-format
 msgid "main: probing <%s> audio output plugin\n"
 msgstr "main : skú¹am pou¾i» audio výstupný plugin <%s>\n"
 
-#: src/xitk/main.c:548
+#: src/xitk/main.c:752
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr "main : zlyhal test pou¾iteµnosti audio ovládaèa => bez zvuku\n"
 
-#: src/xitk/main.c:566
+#: src/xitk/main.c:772
 #, c-format
 msgid "main: audio driver <%s> failed\n"
 msgstr "main : audio ovládaè <%s> zlyhal\n"
 
-#: src/xitk/main.c:712
+#: src/xitk/main.c:923
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr "Potrebujem xine kni¾nicu verzie 1.0.0, nájdená %d.%d.%d.\n"
 
-#: src/xitk/main.c:720
+#: src/xitk/main.c:931
 msgid "sigprocmask() failed.\n"
 msgstr "sigprocmask() zlyhal.\n"
 
-#: src/xitk/main.c:786
+#: src/xitk/main.c:1003
 msgid "video driver id required for -V option\n"
 msgstr "id video ovládaèa je nutný pre -V voµbu\n"
 
-#: src/xitk/main.c:795
+#: src/xitk/main.c:1012
 msgid "audio driver id required for -A option\n"
 msgstr "id audio ovládaèa je nutný pre -A voµbu\n"
 
-#: src/xitk/main.c:915
+#: src/xitk/main.c:1107
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Zlá geometria '%s', pozrite xine --help\n"
 
-#: src/xitk/main.c:946
+#: src/xitk/main.c:1137
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "Zlý mód opakovania '%s', pozrite xine --help\n"
 
-#: src/xitk/main.c:971
+#: src/xitk/main.c:1162
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Argument %d je neplatný => koniec\n"
 
-#: src/xitk/main.c:1046
+#: src/xitk/main.c:1337
+msgid "Post audio plugin"
+msgstr ""
+
+#: src/xitk/main.c:1338
+msgid "Post audio plugin to used with video less stream playback"
+msgstr ""
+
+#: src/xitk/main.c:1386 src/xitk/main.c:1387
+msgid "Post video plugin"
+msgstr ""
+
+#: src/xitk/main.c:1410
 msgid "Logo mrl"
 msgstr ""
 
-#: src/xitk/mediamark.c:1037 src/xitk/mediamark.c:1082
+#: src/xitk/mediamark.c:1122 src/xitk/mediamark.c:1167
 #, c-format
 msgid "Playlist file (%s) is valid (%s).\n"
 msgstr "Súbor playlistu (%s) je platný (%s).\n"
 
-#: src/xitk/mediamark.c:1039 src/xitk/mediamark.c:1084
+#: src/xitk/mediamark.c:1124 src/xitk/mediamark.c:1169
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
 msgstr "Súbor playlistu (%s) je neplatný.\n"
 
-#: src/xitk/mediamark.c:1152
+#: src/xitk/mediamark.c:1237
 #, c-format
 msgid "Playlist '%s' saved.\n"
 msgstr "Playlist '%s' je ulo¾ený.\n"
 
-#: src/xitk/mediamark.c:1155
+#: src/xitk/mediamark.c:1240
 #, c-format
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr "Nie je mo¾né ulo¾i» playlist (%s): %s.\n"
 
 #. Create window
-#: src/xitk/mediamark.c:1337
+#: src/xitk/mediamark.c:1422
 msgid "Mediamark Editor"
 msgstr ""
 
-#: src/xitk/mediamark.c:1366
+#: src/xitk/mediamark.c:1451
 msgid "Identifier"
 msgstr "Identifikátor"
 
-#: src/xitk/mediamark.c:1382
+#: src/xitk/mediamark.c:1467
 msgid "Mediamark Identifier"
 msgstr "Mediamark Identifikátor"
 
-#: src/xitk/mediamark.c:1386
+#: src/xitk/mediamark.c:1471
 msgid "Mrl"
 msgstr "MRL"
 
-#: src/xitk/mediamark.c:1401
+#: src/xitk/mediamark.c:1486
 msgid "Mediamark Mrl"
 msgstr "Mediamark MRL"
 
-#: src/xitk/mediamark.c:1407
+#: src/xitk/mediamark.c:1492
 msgid "Start at"
 msgstr "Zaèa» na"
 
-#: src/xitk/mediamark.c:1422
+#: src/xitk/mediamark.c:1507
 msgid "Mediamark start time (secs)."
 msgstr "Mediamark poèiatoèný èas (sek)."
 
-#: src/xitk/mediamark.c:1426
+#: src/xitk/mediamark.c:1511
 msgid "End at"
 msgstr "Skonèi» na"
 
-#: src/xitk/mediamark.c:1441
+#: src/xitk/mediamark.c:1526
 msgid "Mediamark end time (secs)."
 msgstr "Mediamark koncový èas (sek)."
 
-#: src/xitk/mediamark.c:1457
+#: src/xitk/mediamark.c:1542
 msgid "Apply the changes to the playlist."
 msgstr "Pou¾i» zmeny v playliste."
 
-#: src/xitk/mediamark.c:1472
+#: src/xitk/mediamark.c:1557
 msgid "Discard changes and dismiss the window."
 msgstr "Zahodi» zmeny a zavrie» okno"
 
@@ -1052,6 +1136,20 @@ msgstr "Xine MRL prehliadaè"
 #: src/xitk/mrl_browser.c:287
 msgid "Source:"
 msgstr "Zdroj:"
+
+#: src/xitk/osd.c:276
+#, fuzzy
+msgid "Audio: "
+msgstr "Audio"
+
+#: src/xitk/osd.c:316
+#, c-format
+msgid "%d:%.2d:%.2d (%.0f%%) of %d:%.2d:%.2d"
+msgstr ""
+
+#: src/xitk/osd.c:325
+msgid "Position in Stream"
+msgstr ""
 
 #: src/xitk/panel.c:43
 msgid "Play previous chapter or mrl"
@@ -1069,212 +1167,213 @@ msgstr "Prehráva» predchádzajúcu polo¾ku z playlistu"
 msgid "Play next entry from playlist"
 msgstr "Ïal¹ia polo¾ka z playlistu"
 
-#: src/xitk/panel.c:743
+#: src/xitk/panel.c:770
 msgid "Volume control"
 msgstr "Ovládanie hlasitosti"
 
-#: src/xitk/panel.c:745
+#: src/xitk/panel.c:772
 msgid "Mute toggle"
 msgstr "Vypnú» zvuk"
 
-#: src/xitk/panel.c:772
+#: src/xitk/panel.c:799
 msgid "Xine Panel"
 msgstr "Xine panel"
 
-#: src/xitk/panel.c:793
+#: src/xitk/panel.c:820
 msgid "panel: couldn't find image for background\n"
 msgstr "panel: nemô¾em nájs» obrázok na pozadie.\n"
 
-#: src/xitk/panel.c:930
+#: src/xitk/panel.c:957
 msgid "Stop playback"
 msgstr "Zastavi» prehrávanie"
 
-#: src/xitk/panel.c:938
+#: src/xitk/panel.c:965
 msgid "Play selected entry"
 msgstr "Prehráva» vybranú polo¾ku"
 
-#: src/xitk/panel.c:946
+#: src/xitk/panel.c:973
 msgid "Pause/Resume playback"
 msgstr "Preru¹i»/Obnovi» prehrávanie"
 
-#: src/xitk/panel.c:961
+#: src/xitk/panel.c:988
 msgid "Eject current medium"
 msgstr "Eject - vysunú» médium"
 
-#: src/xitk/panel.c:969
+#: src/xitk/panel.c:996
 msgid "Quit"
 msgstr "Skonèi»"
 
-#: src/xitk/panel.c:977
+#: src/xitk/panel.c:1004
 msgid "Setup window"
 msgstr "Nastavenia"
 
-#: src/xitk/panel.c:985
+#: src/xitk/panel.c:1012
 msgid "Navigator"
 msgstr "Navigátor"
 
-#: src/xitk/panel.c:993
+#: src/xitk/panel.c:1020
 msgid "Hide GUI"
 msgstr "Skry» GUI"
 
-#: src/xitk/panel.c:1001
+#: src/xitk/panel.c:1028
 msgid "Fullscreen/Window mode"
 msgstr "Plnoobrazovkový/Okenný re¾im"
 
-#: src/xitk/panel.c:1009
+#: src/xitk/panel.c:1036
 msgid "Next audio channel"
 msgstr "Ïal¹í audio kanál"
 
-#: src/xitk/panel.c:1017
+#: src/xitk/panel.c:1044
 msgid "Previous audio channel"
 msgstr "Predchádzajúci audio kanál"
 
-#: src/xitk/panel.c:1025
+#: src/xitk/panel.c:1052
 msgid "Next SPU channel"
 msgstr "Ïal¹í SPU kanál"
 
-#: src/xitk/panel.c:1033
+#: src/xitk/panel.c:1060
 msgid "Previous SPU channel"
 msgstr "Predchádzajúci SPU kanál"
 
-#: src/xitk/panel.c:1079
+#: src/xitk/panel.c:1106
 msgid "Stream playback position slider"
 msgstr "Posuvník pozície prehrávania"
 
-#: src/xitk/panel.c:1110
+#: src/xitk/panel.c:1137
 msgid "Take a snapshot"
 msgstr "Ulo¾i» obsah obrazovky"
 
-#: src/xitk/panel.c:1118
+#: src/xitk/panel.c:1145
 msgid "Slow motion"
 msgstr "Spomali»"
 
-#: src/xitk/panel.c:1126
+#: src/xitk/panel.c:1153
 msgid "Fast motion"
 msgstr "Zrýchli»"
 
-#: src/xitk/panel.c:1134
+#: src/xitk/panel.c:1161
 msgid "Playlist"
 msgstr "Playlist"
 
-#: src/xitk/panel.c:1142
+#: src/xitk/panel.c:1169
 msgid "Control"
 msgstr "Ovládanie"
 
-#: src/xitk/panel.c:1150
+#: src/xitk/panel.c:1177
 msgid "MRL Browser"
 msgstr "MRL prehliadaè"
 
-#: src/xitk/panel.c:1155
+#: src/xitk/panel.c:1182
 msgid "gui tips visibility"
 msgstr "gui viditeµnos» rád"
 
-#: src/xitk/panel.c:1162
+#: src/xitk/panel.c:1189
 msgid "tips timeout (ms)"
 msgstr "tipy timeout (ms)"
 
-#: src/xitk/panel.c:1177
+#: src/xitk/panel.c:1204
 msgid "gui panel visibility"
 msgstr "viditeµnos» gui panelu"
 
-#: src/xitk/playlist.c:341 src/xitk/playlist.c:1099
+#: src/xitk/playlist.c:351 src/xitk/playlist.c:1113
 msgid "Load"
 msgstr "Otvori»"
 
-#: src/xitk/playlist.c:347
+#: src/xitk/playlist.c:357
 #, fuzzy
 msgid "Load a playlist"
 msgstr "Otvori» ulo¾ený playlist"
 
-#: src/xitk/playlist.c:375
+#: src/xitk/playlist.c:385
 #, fuzzy
 msgid "Save a playlist"
 msgstr "Playlist ulo¾i»"
 
-#: src/xitk/playlist.c:933
+#: src/xitk/playlist.c:947
 msgid "Xine Playlist Editor"
 msgstr "Xine Playlist Editor"
 
-#: src/xitk/playlist.c:951
+#: src/xitk/playlist.c:965
 msgid "playlist: couldn't find image for background\n"
 msgstr "playlist : nemô¾em nájs» obrázok na pozadie.\n"
 
-#: src/xitk/playlist.c:1055
+#: src/xitk/playlist.c:1069
 msgid "Move up selected MRL"
 msgstr "Posunú» hore vybrané MRL"
 
-#: src/xitk/playlist.c:1063
+#: src/xitk/playlist.c:1077
 msgid "Move down selected MRL"
 msgstr "Posunú» dole vybrané MRL"
 
-#: src/xitk/playlist.c:1070
+#: src/xitk/playlist.c:1084
 msgid "Start playback of selected MRL"
 msgstr "Zaèa» prehráva» vybrané MRL"
 
-#: src/xitk/playlist.c:1077
+#: src/xitk/playlist.c:1091
 msgid "Delete selected MRL from playlist"
 msgstr "Zmaza» vybrané MRL z playlistu"
 
-#: src/xitk/playlist.c:1084
+#: src/xitk/playlist.c:1098
 msgid "Delete all entries in playlist"
 msgstr "Zmaza» v¹etky polo¾ky v playliste"
 
-#: src/xitk/playlist.c:1088
+#: src/xitk/playlist.c:1102
 msgid "Add"
 msgstr "Prida»"
 
-#: src/xitk/playlist.c:1094
+#: src/xitk/playlist.c:1108
 msgid "Add one or more entries in playlist"
 msgstr "Prida» jednu alebo viaceré polo¾ky do playlistu"
 
-#: src/xitk/playlist.c:1105
+#: src/xitk/playlist.c:1119
 msgid "Load saved playlist"
 msgstr "Otvori» ulo¾ený playlist"
 
-#: src/xitk/playlist.c:1115
+#: src/xitk/playlist.c:1129
 msgid "Save playlist"
 msgstr "Playlist ulo¾i»"
 
-#: src/xitk/playlist.c:1125
+#: src/xitk/playlist.c:1139
 msgid "Close playlist window"
 msgstr "Zavrie» okno playlistu"
 
-#: src/xitk/playlist.c:1143
+#: src/xitk/playlist.c:1157
 msgid "Scan for:"
 msgstr "Hµada»:"
 
-#: src/xitk/playlist.c:1155
+#: src/xitk/playlist.c:1169
 msgid "Direct MRL entry"
 msgstr "Priame zadanie MRL"
 
-#: src/xitk/setup.c:769 src/xitk/setup.c:771 src/xitk/setup.c:779
-#: src/xitk/setup.c:781 src/xitk/setup.c:789 src/xitk/setup.c:791
-#: src/xitk/setup.c:799 src/xitk/setup.c:801 src/xitk/setup.c:809
-#: src/xitk/setup.c:811
+#: src/xitk/setup.c:862 src/xitk/setup.c:864 src/xitk/setup.c:872
+#: src/xitk/setup.c:874 src/xitk/setup.c:882 src/xitk/setup.c:884
+#: src/xitk/setup.c:892 src/xitk/setup.c:894 src/xitk/setup.c:902
+#: src/xitk/setup.c:904
 msgid "No help available"
 msgstr "Nie je dostupná pomoc"
 
-#: src/xitk/setup.c:927
+#: src/xitk/setup.c:922
+msgid ""
+"There is no configuration option available in this user experience level."
+msgstr ""
+
+#: src/xitk/setup.c:1028
 msgid "Help"
 msgstr "Pomoc"
 
-#: src/xitk/setup.c:929
+#: src/xitk/setup.c:1030
 msgid "README"
 msgstr "Èítaj ma"
 
-#: src/xitk/setup.c:931
+#: src/xitk/setup.c:1032
 msgid "FAQ"
 msgstr "FAQ"
 
-#: src/xitk/setup.c:1079
+#: src/xitk/setup.c:1180
 msgid "xine setup"
 msgstr "nastavenie Xine"
 
-#: src/xitk/setup.c:1126
-msgid "Logs"
-msgstr "Záznamy"
-
-#: src/xitk/setup.c:1137
+#: src/xitk/setup.c:1229
 msgid "Key Bindings"
 msgstr "Mapovanie kláves"
 
@@ -1543,81 +1642,81 @@ msgstr "videowin: výstupný driver nasilu vybral vizualizáciu id 0x%lx\n"
 msgid "xine video output"
 msgstr "xine video výstup"
 
-#: src/xitk/videowin.c:404
+#: src/xitk/videowin.c:408
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr "XF86VidMode Extension: prepnutie modeline zlyhalo.\n"
 
-#: src/xitk/videowin.c:1203
+#: src/xitk/videowin.c:1210
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
 msgstr ""
 
-#: src/xitk/videowin.c:1204
+#: src/xitk/videowin.c:1211
 msgid ""
 "Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
 msgstr ""
 
-#: src/xitk/videowin.c:1252
+#: src/xitk/videowin.c:1259
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
 msgstr ""
 
-#: src/xitk/videowin.c:1262
+#: src/xitk/videowin.c:1269
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
 msgstr ""
 
-#: src/xitk/videowin.c:1272
+#: src/xitk/videowin.c:1279
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
 msgstr ""
 
-#: src/xitk/videowin.c:1282
+#: src/xitk/videowin.c:1289
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
 msgstr ""
 
-#: src/xitk/videowin.c:1315
+#: src/xitk/videowin.c:1322
 msgid "Xine Video Window"
 msgstr "Xine Video okno"
 
-#: src/xitk/videowin.c:1319
+#: src/xitk/videowin.c:1326
 msgid "Xine Video Fullscreen Window"
 msgstr "Plnoobrazovkový/Okenný re¾im"
 
-#: src/xitk/videowin.c:1323
+#: src/xitk/videowin.c:1330
 msgid "Xine Video Borderless Window"
 msgstr "Xine Video okno bez rámu"
 
-#: src/xitk/videowin.c:1344
+#: src/xitk/videowin.c:1351
 msgid "XAllocWMHints() failed\n"
 msgstr "XAllocWMHints() zlyhali\n"
 
-#: src/xitk/videowin.c:1369
+#: src/xitk/videowin.c:1376
 msgid "New stream sizes resize output window"
 msgstr "Rozmery nového prúdu zmenili rozmery výstupného okna"
 
-#: src/xitk/videowin.c:1379
+#: src/xitk/videowin.c:1386
 msgid "Double size for small streams (require stream_resize_window)"
 msgstr "Dvojtá veµkos» pre malé prúdy"
 
-#: src/xitk/videowin.c:1403
+#: src/xitk/videowin.c:1410
 msgid "use XVidModeExtension when switching to fullscreen"
 msgstr "pou¾i» XVidModeExtension keï sa prepína do plnoobrazovkového re¾imu"
 
-#: src/xitk/videowin.c:1424
+#: src/xitk/videowin.c:1431
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 msgstr "XF86VidMode Extension (%d.%d) detekovaná, skú¹am ju pou¾i».\n"
 
-#: src/xitk/videowin.c:1427
+#: src/xitk/videowin.c:1434
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
 msgstr "XF86VidMode Extension: %d modeline nájdené.\n"
 
-#: src/xitk/videowin.c:1445
+#: src/xitk/videowin.c:1452
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr "XF86VidMode Extension: nemohol získa» zoznam dost. modeline Zlyhal.\n"
 
-#: src/xitk/videowin.c:1448
+#: src/xitk/videowin.c:1455
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 msgstr "XF86VidMode Extension: initializácia zlyhala, nepou¾ívam to.\n"
 
@@ -1637,6 +1736,9 @@ msgstr "Xine prehliadaè logov"
 #: src/xitk/viewlog.c:458
 msgid "Refresh"
 msgstr "Obnovi»"
+
+#~ msgid "Logs"
+#~ msgstr "Záznamy"
 
 #~ msgid "event sender"
 #~ msgstr "odosielateµ udalostí"
