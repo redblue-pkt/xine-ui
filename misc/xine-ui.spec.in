@@ -72,7 +72,7 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=%{?buildroot:%{buildroot}} install
 
 %post
-if [ "$1" = "1" ]; then # install
+if [ "$1" = "1" ] || [ "$1" = "2" ] ; then # install or update
   if test -d %{skindir}/metal; then rm -rf %{skindir}/metal; fi
   if test -d %{skindir}/default; then rm -rf %{skindir}/default && ln -s %{skindir}/xinetic %{skindir}/default; fi
 
@@ -133,8 +133,7 @@ if [ "$1" = "1" ]; then # install
     if test ! -d /opt/kde3/share/applnk/Multimedia; then
       %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde3/share/applnk/Multimedia
     fi
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop
-    cat %{deskdir}/xine.desktop | sed -e "s/xine.xpm/\xine/g" > %{deskdir}/xine.desktop.kde
+    cat %{deskdir}/xine.desktop | sed -e "s/Icon=xine.xpm/Icon=xine/g" -e "s/Exec=xine/Exec=xine %U/g" > %{deskdir}/xine.desktop.kde
     %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde3/share/applnk/Multimedia/xine.desktop
     rm %{deskdir}/xine.desktop.kde
   fi
@@ -156,7 +155,7 @@ if [ "$1" = "1" ]; then # install
     if test ! -d /opt/kde2/share/applnk/Multimedia; then
       %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
     fi
-    cat %{deskdir}/xine.desktop | sed -e "s/xine.xpm/\xine/g" > %{deskdir}/xine.desktop.kde
+    cat %{deskdir}/xine.desktop | sed -e "s/Icon=xine.xpm/Icon=xine/g" -e "s/Exec=xine/Exec=xine %U/g" > %{deskdir}/xine.desktop.kde
     %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde2/share/applnk/Multimedia/xine.desktop
     rm %{deskdir}/xine.desktop.kde
   else
@@ -196,7 +195,7 @@ if [ "$1" = "0" ]; then # remove
   HIRES='48x48 32x32 22x22'
   LORES='32x32 22x22 16x16'
   # files to remove
-  REMOVALS='%{_datadir}/icons/xine.xpm %{_datadir}/pixmaps/xine.xpm %{_sysconfdir}/X11/wmconfig/xine %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop  %{_datadir}/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop'
+  REMOVALS='%{_datadir}/icons/xine.xpm %{_sysconfdir}/X11/wmconfig/xine %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop  %{_datadir}/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop'
   # remove files in $REMOVALS
   for remove in $REMOVALS; do
     rm -f $remove
@@ -235,6 +234,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sat Jan 11 2003 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- Some cleanups
 * Fri Dec 06 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - do post and pre only when install and remove, saves entries at update
 * Sat Nov 16 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
