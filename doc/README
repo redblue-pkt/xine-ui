@@ -3,16 +3,22 @@
             xine
    ----------------------
 
-     a unix video player
+     a free video player
 
+scope of this document:
+-----------------------
 
+this is the end-user docu for xine-lib and xine-ui. You'll
+find more documentation in the doc/ directory of both
+packages.
 
 about xine:
 -----------
 
 xine is a free gpl-licensed video player for unix-like systems.
 We support mpeg-2 and mpeg-1 system (audio + video multiplexed) streams,
-mpg audio files and AVI files (using win32 codec dlls).
+mpeg elementary streams (audio/video only, e.g. mp3 files) and 
+AVI files (using win32 codec dlls).
 
 xine plays the video and audio data of the stream and synchronizes
 the playback of both. Depending on the properties of the stream,
@@ -25,29 +31,25 @@ so we cannot include any DVD unlock/decrypt code with xine. To play back
 such DVDs you'll need external programs or something like a
 xine_dvd_plugin that can handle DVD authentification/descrambling.
 
-xine tries to be straightforward and effective. ...no bells and
-whistles are being developed at this time ;-) first we want to achieve
-good playback of video.
+As of xine 0.5 we have introduced a new architecture featuring
+flexible plugins for various tasks so we can support various
+other stream types and output devices in the future.
 
 
 supported platforms / requirements:
-----------------------------------
+-----------------------------------
 
-- xine needs a locally attached graphics device and monitor (playback over
-  x is not supported at the moment and will probably never be really useful
-  because of the enormous bandwidth of decoded video streams).
-- xine needs either MIT-SHM (The MIT Shared Memory Extension), which is
-  supported in XFree86 for quite some time (3.3.x will be fine),
-  or X-Video Extension (Xv) which is faster and supports fullscreen
-  operation but is only provided by some XFree86 4.x drivers.
-  nVidia chips and Matrox G200 and G400 are known to work.
+- xine needs a X11 server of 15, 16, 24 or 32 bit depth for video output
+- aaxine uses aalib for output and can run on nearly any terminal
+- xine can detect and use the MIT X video and X shared memory extension
+  for better playback performance
 - if you can't get Xv to run on your platform you should use 16bpp 
   colordepth for speed. Xv seems to work nicely for 16 and 24bpp.
 - if you have a mga 200 / 400 graphics adaptor you can optionally
   use the sybcfb/teletux video ouput driver. See README.syncfb for 
   details.
-- you need a sound driver that is realtime capable (not all
-  OSS/ALSA drivers support that feature) or ESD
+- for audio playback OSS, ALSA, ESD and ARTSD are supported.
+- to build xine fairly recent gmake, gcc and binutils are required
 
 xine has so far been sucessfully used on the following systems:
 
@@ -83,21 +85,22 @@ non-intel platforms:
 - Solaris 8 on SPARC
   using Xsun on a Creator-3D framebuffer
   see README.solaris for more infomation
+- IRIX on MIPS
+  audio support is still missing on this platform yet
 
 usage:
 ------
 
 You can start xine without any command line parameters or you can 
-specify one or more input streams directly. Xine tries to detect wheter 
+specify one or more input streams directly. xine tries to detect wheter 
 it can use the Xv extension and will fall back to XShm, but that 
-detection might fail.
-If you don't see any video, first check your X11 drivers (for example
-only the binary drivers from nVidia have Xv support for their chips).
-If you can't get Xv to work, use the "-s" option and xine will be
-forced to use Xshm.
-If you get very sloppy video ouput your sound driver may not be
-realtime capable. Try to use ALSA instead or, if you're already using
-ALSA you might want to give OSS a try.
+detection might fail. You specify the video output plugin by using the
+"-V" option, e.g.
+
+xine -V XShm
+
+will force xine to use XShm or plain X11. 
+
 If you want to send the sound over a network with ESD, set the ESPEAKER
 environment variable before starting xine.
 
@@ -111,18 +114,6 @@ identifier). Try
 $ xine --help
 
 to get the complete usage.
-
-Unfortunately the gui does not yet support the MRL concept to any
-great extend, so to use any other input source than plain files you'll
-have to use the command line at the moment. That will change soon :-)
-
-Example usage:
-
-$ xine
-
-$ xine /path/foo.vob
-
-$ xine -s /foo/test.mpg
 
 xine supports the xdnd protocol (Version 3) so if you have a file browser 
 application supporting that protocol (e.g. gmc) you can drop video files
@@ -142,15 +133,25 @@ Keyboard shortcuts:
 Key           action
 
 RETURN        play
-F             toggle fullscreen mode
-Q             quit
-0             jump start of current stream
-1-9           jump to 10-90% of current stream
-SPACE         pause
+SPACE, P      pause
+Up/Down       fast forward / slow motion
+
+0             seek start of current stream
+1-9           seek to 10-90% of current stream
+Left/Right    seek -+ 15 sec (+CTRL: 60 sec)
 PgUp/Prior    jump to previous playlist entry
 PgDown/Next   jump to next playlist entry
+
+F             toggle fullscreen mode
 A             toggle aspect ratio (AUTO/16:9/4:3/DVB)
-Ctrl          show/hide mouse cursor
+I             toggle interlaced mode
+< >           modify output window size
++ -           change audio channel
+, .           change subtitle channel
+n m           adjust a/v sync
+home          reset a/v sync
+
+Q             quit
 
 more to come.
 
@@ -163,23 +164,7 @@ Supply the -a option to select the desired audio track:
 
 xine -a 3 test.mpg
 
-plays the third mpg audio track (and the video, of course).
-
-For mpeg-1, only mpeg audio (layer 1, 2 and 3) is supported.
-
-Mpeg-2 streams can have different types of audio streams, though.
-Xine supports ac3 (dolby digital), mpeg and LPCM sound. These
-are mapped to the following tracks:
-
-Track    selected audio stream
-
- 0- 7    ac3 stream 0-7
- 8-15    mpg audio stream 0-7
-16-23    pcm audio stram 0-7
-
-example: to play pcm stream 0 use
-
-xine -a 16 file.vob
+plays the third available audio track (and the video, of course).
 
 selecting subtitles:
 --------------------
@@ -195,7 +180,9 @@ displays the subtitles from stream 0.
 controlling xine via CORBA:
 ---------------------------
 
-Xine implements a CORBA server interface to enable remote control and
+[ FIXME: corba support is not known to work as of xine 0.6 ]
+
+xine implements a CORBA server interface to enable remote control and
 scripting. For this, you need ORBit which should already be installed if
 you are using GNOME. Otherwise you can get it from
 
@@ -229,7 +216,7 @@ Two example client programs are provided:
 using LIRC with xine:
 ---------------------
 
-Xine can be remotly controlled with by IR. For this, you should have
+xine can be remotly controlled with by IR. For this, you should have
 LIRC installed (http://www.lirc.org), you should get latest CVS snapshot
 if you're running latest Linux kernels (2.2 or 2.4 series). 
 
@@ -308,12 +295,12 @@ developers of xine:
     Guenter Bartsch
 
   various suggestions, bug and build fixes, alsa plugin, gui
-    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+    Daniel Caujolle-Bert 
 
   audio programming
-    Siegfried Langauf <siggi@users.sourceforge.net>
+    Siegfried Langauf 
 
-  contributes great libmpeg2 hacks:
+  contributes great libmpeg2 and libac3 hacks:
     Michael Lespinasse
   
   ...plus various other contributors, see the AUTHORS file
@@ -328,14 +315,5 @@ contacting the xine project:
 
   feedback or offers for help are greatly appreciated, please contact
 
+       the xine user mailing list <xine-user@lists.sourceforge.net>
 
-      The Xine User Mailing List <xine-user@lists.sourceforge.net>
-                                 =================================
-
-
-  If, for some reason, you can't post to the list, you may contact the authors
-  directly:
-
-  Guenter Bartsch <guenter@users.sourceforge.net>
-  Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-  Siegfried Langauf <siggi@users.sourceforge.net>

@@ -110,6 +110,10 @@ or
 .BR P :
 Pause
 .br
+.BR UP/DOWN :
+fast forward / slow motion
+.br
+.br
 .BR F :
 Toggle fullscreen mode.
 .br
@@ -136,6 +140,9 @@ Jump to start of current stream
 .br
 .BR 1..9 :
 Jump to 10%..90% of current stream
+.br
+.BR Left/Right :
+seek -+ 15 sec (+CTRL: 60 sec)
 .br
 .BR PgUp :
 Jump to previous stream in playlist
@@ -168,10 +175,10 @@ Exit.
 Some streams have bad timestamps, so synchronization fails. This can be
 tweaked using arrow keys:
 .br
-.BR Left :
+.BR n :
 press if video runs ahead of audio
 .br
-.BR Right :
+.BR m :
 press if video lags behind audio
 .br
 .BR Home :

@@ -185,14 +185,17 @@ static int notify_click_slider (widget_list_t *wl,
        * Loop of death ;-)
        */
       do {
-	XLOCK (private_data->display);
+	/* XLOCK (private_data->display); */
 	XNextEvent (private_data->display, &sliderevent) ;
-	XUNLOCK (private_data->display);
+	/* XUNLOCK (private_data->display); */
 
 	switch(sliderevent.type) {
 	  
 	case MotionNotify:
 	  
+	  while (XCheckMaskEvent (private_data->display, ButtonMotionMask,
+				  &sliderevent));
+
 	  COMPUTE_COORDS(sliderevent.xbutton.x, sliderevent.xbutton.y);
 	  
 	  paint_slider(sl, wl->win, wl->gc);

@@ -53,6 +53,8 @@ void gui_change_spu_channel(widget_t *w, void *data);
 
 void gui_set_current_position (int pos);
 
+void gui_seek_relative (int off_sec) ;
+
 void gui_dndcallback (char *filename);
 
 void gui_nextprev(widget_t *w, void *data);

@@ -449,8 +449,8 @@ void gui_handle_event (XEvent *event, void *data) {
       gui_exit(NULL, NULL);
       break;
 
-    case XK_m:
-    case XK_M:
+    case XK_b:
+    case XK_B:
       gui_mrlbrowser_show(NULL, NULL);
       break;
 
@@ -523,9 +523,26 @@ void gui_handle_event (XEvent *event, void *data) {
       break;
 
     case XK_Left:
-      xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) - 3600);
+      if(modifier & MODIFIER_CTRL) 
+	gui_seek_relative (-60);
+      else
+	gui_seek_relative (-15);
+
       break;
     case XK_Right:
+      if(modifier & MODIFIER_CTRL) 
+	gui_seek_relative (60);
+      else
+	gui_seek_relative (15);
+
+      break;
+
+    case XK_n:
+    case XK_N:
+      xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) - 3600);
+      break;
+    case XK_m:
+    case XK_M:
       xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) + 3600);
       break;
     case XK_Home:
@@ -533,10 +550,12 @@ void gui_handle_event (XEvent *event, void *data) {
       break;
 
     case XK_Up:
-      xine_set_speed (gGui->xine, SPEED_FAST_2);
+      if (xine_get_speed (gGui->xine) < SPEED_FAST_4)
+	xine_set_speed (gGui->xine, xine_get_speed (gGui->xine)*2);
       break;
     case XK_Down:
-      xine_set_speed (gGui->xine, SPEED_SLOW_2);
+      if (xine_get_speed (gGui->xine) > SPEED_PAUSE)
+	xine_set_speed (gGui->xine, xine_get_speed (gGui->xine)/2);
       break;
       
     }
@@ -591,7 +610,7 @@ void gui_status_callback (int nStatus) {
 
     if (gGui->playlist_cur < gGui->playlist_num) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      xine_play (gGui->xine, gGui->filename, 0 );
+      xine_play (gGui->xine, gGui->filename, 0, 0 );
     } else {
       
       if(gGui->autoplay_options & QUIT_ON_STOP)

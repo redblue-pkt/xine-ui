@@ -155,7 +155,7 @@ static void gui_status_callback (int nStatus) {
     aaxine.current_mrl++;
    
     if (aaxine.current_mrl < aaxine.num_mrls)
-      xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0 );
+      xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0, 0 );
     else
       aaxine.current_mrl--;
 
@@ -190,7 +190,7 @@ static void gui_branched_callback (void ) {
 static void set_position (int pos) {
 
   aaxine.ignore_status = 1;
-  xine_seek(aaxine.xine, aaxine.mrl[aaxine.current_mrl], pos);
+  xine_play(aaxine.xine, aaxine.mrl[aaxine.current_mrl], pos, 0);
   aaxine.ignore_status = 0;
 }
 
@@ -501,7 +501,7 @@ int main(int argc, char *argv[]) {
    * ui loop
    */
 
-  xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0);
+  xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0, 0);
 
   running = 1;
 
@@ -519,7 +519,7 @@ int main(int argc, char *argv[]) {
       xine_stop(aaxine.xine);
       aaxine.current_mrl--;
       if((aaxine.current_mrl >= 0) && (aaxine.current_mrl < aaxine.num_mrls)) {
-	xine_play(aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0);
+	xine_play(aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0, 0);
       } 
       else {
 	aaxine.current_mrl = 0;
@@ -560,13 +560,16 @@ int main(int argc, char *argv[]) {
     case 13:
     case 'r':
     case 'R':
-      xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0);
+      xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0, 0);
       break;
 
     case ' ':
     case 'p':
     case 'P':
-      xine_pause (aaxine.xine);
+      if (xine_get_speed (aaxine.xine) != SPEED_PAUSE)
+	xine_set_speed(aaxine.xine, SPEED_PAUSE);
+      else
+	xine_set_speed(aaxine.xine, SPEED_NORMAL);
       break;
 
     case 's':

@@ -67,8 +67,13 @@ void gui_exit (widget_t *w, void *data) {
 void gui_play (widget_t *w, void *data) {
 
   fprintf(stderr, "xine-panel: PLAY\n");
-  video_window_hide_logo();
-  xine_play (gGui->xine, gGui->filename, 0 );
+
+  if (xine_get_status (gGui->xine) != XINE_PLAY) {
+    video_window_hide_logo();
+    xine_play (gGui->xine, gGui->filename, 0, 0 );
+  } else {
+    xine_set_speed(gGui->xine, SPEED_NORMAL);
+  }
 
   panel_check_pause();
 }
@@ -85,7 +90,10 @@ void gui_stop (widget_t *w, void *data) {
 
 void gui_pause (widget_t *w, void *data, int state) {
   
-  xine_pause(gGui->xine);
+  if (xine_get_speed (gGui->xine) != SPEED_PAUSE)
+    xine_set_speed(gGui->xine, SPEED_PAUSE);
+  else
+    xine_set_speed(gGui->xine, SPEED_NORMAL);
   panel_check_pause();
 }
 
@@ -239,7 +247,25 @@ void gui_change_spu_channel(widget_t *w, void *data) {
 void gui_set_current_position (int pos) {
 
   gGui->ignore_status = 1;
-  xine_seek (gGui->xine, gGui->filename, pos);
+  xine_play (gGui->xine, gGui->filename, pos, 0);
+  gGui->ignore_status = 0;
+  panel_check_pause();
+}
+
+void gui_seek_relative (int off_sec) {
+
+  int sec;
+
+  gGui->ignore_status = 1;
+
+  sec = xine_get_current_time (gGui->xine);
+  if ((sec + off_sec) < 0) 
+    sec = 0;
+  else
+    sec += off_sec;
+
+  xine_play (gGui->xine, gGui->filename, 0, sec);
+
   gGui->ignore_status = 0;
   panel_check_pause();
 }
@@ -275,7 +301,7 @@ void gui_nextprev(widget_t *w, void *data) {
     gGui->playlist_cur--;
     if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      xine_play (gGui->xine, gGui->filename, 0 );
+      xine_play (gGui->xine, gGui->filename, 0, 0 );
     } else {
       video_window_show_logo();
       gGui->playlist_cur = 0;

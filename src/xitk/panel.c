@@ -63,6 +63,9 @@ static void panel_store_new_position(int x, int y, int w, int h) {
  */
 static void *slider_loop(void *dummy) {
   
+  int seconds;
+  char timestr[10];
+
   pthread_detach(pthread_self());
 
   while(gGui->running) {
@@ -75,6 +78,14 @@ static void *slider_loop(void *dummy) {
 	  slider_set_pos(panel->widget_list, panel->slider_play, 
 			 xine_get_current_position(gGui->xine));
 	}
+
+	seconds = xine_get_current_time (gGui->xine);
+	
+	sprintf (timestr, "%02d:%02d:%02d",
+		 seconds / (60*60),
+		 (seconds / 60) % 60, seconds % 60);
+	
+	label_change_label (panel->widget_list, panel->runtime_label, timestr); 
       }
     }
     
@@ -83,7 +94,7 @@ static void *slider_loop(void *dummy) {
       video_window_set_cursor_visibility(gGui->cursor_visible);
     }
 
-    sleep(4);
+    sleep(1);
   }
 
   pthread_exit(NULL);
@@ -147,7 +158,7 @@ void panel_toggle_visibility (widget_t *w, void *data) {
 void panel_check_pause(void) {
   
   checkbox_set_state(panel->checkbox_pause, 
-		     ((xine_get_status(gGui->xine)==XINE_PAUSE)?1:0), 
+		     ((xine_get_speed(gGui->xine)==SPEED_PAUSE)?1:0), 
 		     gGui->panel_window, panel->widget_list->gc);
 
 }
@@ -574,9 +585,9 @@ void panel_init (void) {
   sl.step            = 1;
   sl.background_skin = gui_get_skinfile("SliderBGPlay");
   sl.paddle_skin     = gui_get_skinfile("SliderFGPlay");
-  sl.callback        = panel_slider_cb;
+  sl.callback        = NULL; /* panel_slider_cb; */
   sl.userdata        = NULL;
-  sl.motion_callback = NULL;
+  sl.motion_callback = panel_slider_cb;
   sl.motion_userdata = NULL;
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->slider_play = slider_create(&sl)));
