@@ -135,7 +135,7 @@ static struct option long_options[] = {
   {"playlist"       , required_argument, 0, 'P'                      },
   {"loop"           , optional_argument, 0, 'l'                      },
   {"skin-server-url", required_argument, 0, OPTION_SK_SERVER         },
-  {"enqueue"        , required_argument, 0, OPTION_ENQUEUE           },
+  {"enqueue"        , no_argument      , 0, OPTION_ENQUEUE           },
   {"session"        , required_argument, 0, 'S'                      },
   {"version"        , no_argument      , 0, 'v'                      },
   {"deinterlace"    , no_argument      , 0, 'D'                      },
@@ -1067,7 +1067,6 @@ int main(int argc, char *argv[]) {
   int                     _argc;
   int                     driver_num;
   int                     session         = -1;
-  char                   *session_mrl     = NULL;
   int                     aspect_ratio    = XINE_VO_ASPECT_AUTO ;
   int                     no_auto_start   = 0;
   char                   *cfgdir          = CONFIGDIR;
@@ -1357,16 +1356,9 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_ENQUEUE:
-      {
-	char eqmrl[strlen(optarg) + 256];
-
-	session_mrl = strdup(optarg);
-
-	if(session >= 0) 
-	  sprintf(eqmrl, "session=%d,mrl=%s", session, optarg);
-	else
-	  sprintf(eqmrl, "mrl=%s", optarg);
-	session_handle_subopt(eqmrl, &session);
+      if(is_remote_running(((session >= 0) ? session : 0))) {
+	if(session < 0)
+	  session = 0;
       }
       break;
 
@@ -1376,7 +1368,7 @@ int main(int argc, char *argv[]) {
       else
 	gGui->verbosity = 1;
       break;
-
+      
     case 'S':
       session_handle_subopt(optarg, &session);
       break;
@@ -1416,18 +1408,24 @@ int main(int argc, char *argv[]) {
   
   if(session >= 0) {
     /* Session feature was used, say good bye */
-    if(is_remote_running(session))
-      return 0;
-    else {
-      /* xine isn't running, create instance */
-      if(session_mrl) {
-	_argv = (char **) realloc(_argv, sizeof(char **) * ((_argc) + 2));
-	_argv[_argc] = session_mrl;
-	_argc++;
+    if(is_remote_running(session)) {
+      /* send all remaining MRL options to session */
+      int i;
+
+      if(_argv[optind]) {
+	for(i = optind; i < _argc; i++) {
+	  char enqueue_mrl[strlen(_argv[i]) + 256];
+	  
+	  sprintf(enqueue_mrl, "session=%d,mrl=%s", session, _argv[i]);
+	  session_handle_subopt(enqueue_mrl, &session);
+	}
       }
       else
-	return 0;
+	printf(_("You should specify one MRL to enqueue, at least!.\n"));
+
     }
+
+    return 0;
   }
 
   /* 
