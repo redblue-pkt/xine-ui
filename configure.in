@@ -505,7 +505,6 @@ case "$host_or_hostalias" in
 
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
-    AC_DEFINE(FPM_DEFAULT)
     ;;
 esac
 
