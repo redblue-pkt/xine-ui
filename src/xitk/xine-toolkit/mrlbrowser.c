@@ -45,6 +45,7 @@
 #include "label.h"
 #include "button.h"
 #include "labelbutton.h"
+#include "inputtext.h"
 #include "dnd.h"
 #include "window.h"
 #include "widget.h"
@@ -673,8 +674,19 @@ static void mrlbrowser_play(xitk_widget_t *w, void *data) {
  */
 static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+  XEvent                     xev;
+  int                        modifier;
+  
+  XLOCK(private_data->imlibdata->x.disp);
+  XPeekEvent(private_data->imlibdata->x.disp, &xev);
+  XUNLOCK(private_data->imlibdata->x.disp);
 
-  mrlbrowser_select_mrl(private_data, selected, 0, 1);
+  xitk_get_key_modifier(&xev, &modifier);
+
+  if(modifier & MODIFIER_META)
+    mrlbrowser_select_mrl(private_data, selected, 1, 0);
+  else
+    mrlbrowser_select_mrl(private_data, selected, 0, 1);
 }
 
 /*
