@@ -54,9 +54,10 @@ extern _panel_t        *panel;
 void gui_exit (xitk_widget_t *w, void *data) {
 
 #ifdef HAVE_XF86VIDMODE
-  // just in case a different modeline than the original one is running,
-  // toggle back to window mode which automatically causes a switch back to
-  // the original modeline
+  /* just in case a different modeline than the original one is running,
+   * toggle back to window mode which automatically causes a switch back to
+   * the original modeline
+   */
   if(gGui->XF86VidMode_fullscreen)
      gui_toggle_fullscreen(NULL,NULL);
 #endif
@@ -100,6 +101,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
   gGui->ignore_status = 0; 
   panel_reset_slider ();
   panel_check_pause();
+  panel_update_runtime_display();
 }
 
 void gui_pause (xitk_widget_t *w, void *data, int state) {

@@ -69,10 +69,14 @@ static int notify_inside(xitk_widget_t *c, int x, int y) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
-  if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && c->visible) {
-    xitk_image_t *skin = private_data->skin;
-    
-    return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, c, skin->mask, x, y);
+  if(c->widget_type & WIDGET_TYPE_CHECKBOX) {
+    if(c->visible) {
+      xitk_image_t *skin = private_data->skin;
+      
+      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, c, skin->mask, x, y);
+    }
+    else
+      return 0;
   }
 
   return 1;

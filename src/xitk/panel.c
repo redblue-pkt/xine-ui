@@ -171,7 +171,9 @@ static void *slider_loop(void *dummy) {
 	  xitk_slider_set_pos(panel->widget_list, panel->slider_play, 
 			      xine_get_current_position(gGui->xine));
 	}
-	panel_update_runtime_display();
+	
+	if(status != XINE_STOP)
+	  panel_update_runtime_display();
       }
     }
     

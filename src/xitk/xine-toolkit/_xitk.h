@@ -61,7 +61,7 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 #define XITK_WARNING(...) fprintf(stder, "XITK WARNING: "__VA_ARGS__)
 #endif
 
-#define XITK_FREE(X) if((X)) free((X));
+#define XITK_FREE(X) if((X)) free((X))
 #define XITK_FREE_XITK_IMAGE(D, X) {                                                     \
                                      if(((X)) && ((X)->image)) {                         \
                                        XFreePixmap((D), (X)->image);                     \
@@ -412,5 +412,20 @@ typedef struct {
   int      height;
 } xitk_window_t;
 
+
+typedef struct {
+  int                     magic;
+  ImlibData              *imlibdata;
+  
+  char                   *skin_element_name;
+  int                     num_entries;
+  char                  **entries;
+
+  xitk_widget_list_t     *parent_wlist;
+
+  xitk_state_callback_t  callback;
+  void                   *userdata;
+
+} xitk_tabs_widget_t;
 
 #endif

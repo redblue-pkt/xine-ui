@@ -400,6 +400,26 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
       x3 = ((w / 4) * 3) + offset;
       y3 = (h / 4); 
     }
+    else if(direction == DIRECTION_LEFT) {
+      x1 = ((w / 4) * 3) + offset;
+      y1 = (h / 4);
+
+      x2 = ((w / 4) * 3) + offset;
+      y2 = ((h / 4) * 3);
+      
+      x3 = (w / 4) + offset;
+      y3 = (h / 2); 
+    }
+    else if(direction == DIRECTION_RIGHT) {
+      x1 = (w / 4) + offset;
+      y1 = (h / 4);
+
+      x2 = ((w / 4) * 3) + offset;
+      y2 = (h / 2);
+      
+      x3 = (w / 4) + offset;
+      y3 = ((h / 4) * 3); 
+    }
     else {
       XITK_WARNING("%s(): direction '%d' is unhandled.\n", __FUNCTION__, direction);
       return;
@@ -437,12 +457,14 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
 void draw_arrow_up(ImlibData *im, xitk_image_t *p) {
   _draw_arrow(im, p, DIRECTION_UP);
 }
-
-/*
- *
- */
 void draw_arrow_down(ImlibData *im, xitk_image_t *p) {
   _draw_arrow(im, p, DIRECTION_DOWN);
+}
+void draw_arrow_left(ImlibData *im, xitk_image_t *p) {
+  _draw_arrow(im, p, DIRECTION_LEFT);
+}
+void draw_arrow_right(ImlibData *im, xitk_image_t *p) {
+  _draw_arrow(im, p, DIRECTION_RIGHT);
 }
 
 /*
@@ -914,6 +936,49 @@ void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
 /*
  *
  */
+void draw_tab(ImlibData *im, xitk_image_t *p) {
+  GC            gc;
+  XGCValues     gcv;
+  int           w, h;
+
+  assert(im && p);
+
+  XLOCK(im->x.disp);
+  w = p->width / 3;
+  h = p->height;
+
+  gcv.graphics_exposures = False;
+  gc = XCreateGC(im->x.disp, p->image, GCGraphicsExposures, &gcv);
+  
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
+  XFillRectangle(im->x.disp, p->image, gc, 0, 0, (w * 3) , h);
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
+  XFillRectangle(im->x.disp, p->image, gc, 0, 3, w * 2, h);
+
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+  XDrawLine(im->x.disp, p->image, gc, 0, 3, w, 3);
+  XDrawLine(im->x.disp, p->image, gc, 0, 3, 0, h);
+  XDrawLine(im->x.disp, p->image, gc, w, 3, (w * 2) - 1, 3);
+  XDrawLine(im->x.disp, p->image, gc, w, 3, w, h);
+  XDrawLine(im->x.disp, p->image, gc, (w * 2) + 3, 0, (w * 3) - 1, 0);
+  XDrawLine(im->x.disp, p->image, gc, (w * 2), 3, (w * 2), (h - 1));
+  XDrawLine(im->x.disp, p->image, gc, (w * 2), 3, (w * 2) + 3, 0);
+
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
+  XDrawLine(im->x.disp, p->image, gc, (w - 1), 3, (w - 1), h);
+  XDrawLine(im->x.disp, p->image, gc, (w * 2) - 1, 3, (w * 2) - 1, h);
+  XDrawLine(im->x.disp, p->image, gc, (w * 3) - 1, 0, (w * 3) - 1, h);
+
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+  XDrawLine(im->x.disp, p->image, gc, 0, (h - 1), (w * 2) - 1, (h - 1));
+  
+  XFreeGC(im->x.disp, gc);
+  XUNLOCK(im->x.disp);
+}
+
+/*
+ *
+ */
 xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   ImlibImage    *img = NULL;
   xitk_image_t  *i;
@@ -969,6 +1034,28 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 /*
  *
  */
+static int notify_inside(xitk_widget_t *w, int x, int y) {
+  image_private_data_t *private_data = 
+    (image_private_data_t *) w->private_data;
+
+  return 0;
+
+  if(w->widget_type & WIDGET_TYPE_IMAGE) {
+    if(w->visible) {
+      xitk_image_t *skin = private_data->skin;
+      
+      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask, x, y);
+    }
+    else 
+      return 0;
+  }
+
+  return 1;
+}
+
+/*
+ *
+ */
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
   image_private_data_t *private_data = (image_private_data_t *) w->private_data;
   
@@ -1011,11 +1098,7 @@ static void paint_image (xitk_widget_t *i, Window win, GC gc) {
 
     XUNLOCK (private_data->imlibdata->x.disp);
   }
-#ifdef DEBUG_GUI
- else
-    fprintf (stderr, "paint image on something (%d) "
-	     "that is not an image\n", i->widget_type);
-#endif
+
 }
 
 /*
@@ -1027,48 +1110,51 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     (image_private_data_t *) i->private_data;
   
   if ((i->widget_type & WIDGET_TYPE_IMAGE) && i->visible) {
-    
-    XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->skin);
-    private_data->skin = xitk_image_load_image(private_data->imlibdata,
-					       xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
-    
-    i->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-    i->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-    i->width           = private_data->skin->width;
-    i->height          = private_data->skin->height;
-    
-    xitk_set_widget_pos(i, i->x, i->y);
+    if(private_data->skin_element_name) {
+      
+      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->skin);
+      private_data->skin = xitk_image_load_image(private_data->imlibdata,
+						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      
+      i->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+      i->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      i->width           = private_data->skin->width;
+      i->height          = private_data->skin->height;
+      
+      xitk_set_widget_pos(i, i->x, i->y);
+    }
   }
 }
 
 /*
  *
  */
-xitk_widget_t *xitk_image_create (xitk_skin_config_t *skonfig, xitk_image_widget_t *im) {
+static xitk_widget_t *_xitk_image_create (xitk_skin_config_t *skonfig, 
+					  xitk_image_widget_t *im,
+					  int x, int y,
+					  char *skin_element_name,
+					  xitk_image_t *skin) {
   xitk_widget_t              *mywidget;
-  image_private_data_t *private_data;
-
-  XITK_CHECK_CONSTITENCY(im);
+  image_private_data_t       *private_data;
 
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   private_data = (image_private_data_t *) xitk_xmalloc (sizeof (image_private_data_t));
 
   private_data->imlibdata         = im->imlibdata;
-  private_data->skin_element_name = strdup(im->skin_element_name);
-
+  private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(im->skin_element_name);
 
   private_data->bWidget           = mywidget;
-  private_data->skin              = xitk_image_load_image(private_data->imlibdata,
-							  xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+  private_data->skin              = skin;
+
   mywidget->private_data          = private_data;
 
   mywidget->enable                = 1;
   mywidget->running               = 1;
   mywidget->visible               = 1;
   mywidget->have_focus            = FOCUS_LOST;
-  mywidget->x                     = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-  mywidget->y                     = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+  mywidget->x                     = x;
+  mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width;
   mywidget->height                = private_data->skin->height;
   mywidget->widget_type           = WIDGET_TYPE_IMAGE;
@@ -1076,9 +1162,33 @@ xitk_widget_t *xitk_image_create (xitk_skin_config_t *skonfig, xitk_image_widget
   mywidget->notify_click          = NULL;
   mywidget->notify_focus          = NULL;
   mywidget->notify_keyevent       = NULL;
+  mywidget->notify_inside         = notify_inside;
   mywidget->notify_change_skin    = notify_change_skin;
   mywidget->notify_destroy        = notify_destroy;
   mywidget->get_skin              = get_skin;
 
   return mywidget;
+}
+
+xitk_widget_t *xitk_image_create (xitk_skin_config_t *skonfig, xitk_image_widget_t *im) {
+
+  XITK_CHECK_CONSTITENCY(im);
+
+  return _xitk_image_create(skonfig, im, 
+			    (xitk_skin_get_coord_x(skonfig, im->skin_element_name)),
+			    (xitk_skin_get_coord_y(skonfig, im->skin_element_name)),
+			    im->skin_element_name,
+			    (xitk_image_load_image(im->imlibdata,
+						   xitk_skin_get_skin_filename(skonfig, 
+								       im->skin_element_name))));
+}
+
+/*
+ *
+ */
+xitk_widget_t *xitk_noskin_image_create (xitk_image_widget_t *im, 
+					 xitk_image_t *image, int x, int y) {
+  XITK_CHECK_CONSTITENCY(im);
+
+  return _xitk_image_create(NULL, im, x, y, NULL, image);
 }

@@ -71,10 +71,14 @@ static int notify_inside(xitk_widget_t *b, int x, int y) {
   button_private_data_t *private_data = 
     (button_private_data_t *) b->private_data;
 
-  if((b->widget_type & WIDGET_TYPE_BUTTON) && b->visible) {
-    xitk_image_t *skin = private_data->skin;
-
-    return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, b, skin->mask, x, y);
+  if(b->widget_type & WIDGET_TYPE_BUTTON) {
+    if(b->visible) {
+      xitk_image_t *skin = private_data->skin;
+      
+      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, b, skin->mask, x, y);
+    }
+    else 
+      return 0;
   }
 
   return 1;
@@ -88,7 +92,7 @@ static void paint_button (xitk_widget_t *b, Window win, GC gc) {
     (button_private_data_t *) b->private_data;
   GC                  lgc;
   int                 button_width;
-  xitk_image_t        *skin;
+  xitk_image_t       *skin;
 
   if((b->widget_type & WIDGET_TYPE_BUTTON) && b->visible) {
 

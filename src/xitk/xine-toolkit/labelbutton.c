@@ -82,10 +82,14 @@ static int notify_inside(xitk_widget_t *lb, int x, int y) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   
-  if ((lb->widget_type & WIDGET_TYPE_LABELBUTTON) && lb->visible) {
-    xitk_image_t *skin = private_data->skin;
-    
-    return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, lb, skin->mask, x, y);
+  if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
+    if(lb->visible) {
+      xitk_image_t *skin = private_data->skin;
+      
+      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, lb, skin->mask, x, y);
+    }
+    else 
+      return 0;
   }
 
   return 1;

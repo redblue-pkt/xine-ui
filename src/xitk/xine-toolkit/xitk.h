@@ -370,7 +370,7 @@ void xitk_free_widget(xitk_widget_t *w);
 /**
  * Destroy and free widget.
  */
-void xitk_destroy_widget(xitk_widget_t *w);
+void xitk_destroy_widget(xitk_widget_list_t *wl, xitk_widget_t *w);
 
 /**
  * Destroy widgets from widget list.
@@ -383,14 +383,29 @@ void xitk_destroy_widgets(xitk_widget_list_t *wl);
 void xitk_stop_widgets(xitk_widget_list_t *wl);
 
 /**
+ * Start widget.
+ */
+void xitk_start_widget(xitk_widget_t *w);
+
+/**
  * Set widgets of widget list visible.
  */
 void xitk_show_widgets(xitk_widget_list_t *);
 
 /**
+ * Set widget visible
+ */
+void xitk_show_widget(xitk_widget_list_t *, xitk_widget_t *);
+
+/**
  * Set widgets of widget list not visible.
  */
 void xitk_hide_widgets(xitk_widget_list_t *);
+
+/**
+ * Hide a widget.
+ */
+void xitk_hide_widget(xitk_widget_list_t *, xitk_widget_t *);
 
 /**
  *
@@ -643,6 +658,12 @@ typedef struct {
  * Create an image widget type.
  */
 xitk_widget_t *xitk_image_create(xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
+
+/**
+ * Same as above, without skin.
+ */
+xitk_widget_t *xitk_noskin_image_create (xitk_image_widget_t *im, 
+					 xitk_image_t *image, int x, int y);
 
 /**
  *
@@ -1335,6 +1356,16 @@ unsigned int xitk_get_pixel_color_darkgray(ImlibData *im);
 /**
  *
  */
+xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
+
+/**
+ *
+ */
+void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest);
+
+/**
+ *
+ */
 Pixmap xitk_image_create_pixmap(ImlibData *idata, int width, int height);
 
 /**
@@ -1377,6 +1408,16 @@ void draw_arrow_up(ImlibData *im, GC gc, xitk_image_t *p);
  */
 void draw_arrow_down(ImlibData *im, GC gc, xitk_image_t *p);
 
+/*
+ * Draw and arrow (direction is LEFT).
+ */
+void draw_arrow_left(ImlibData *im, xitk_image_t *p);
+
+/*
+ * Draw and arrow (direction is RIGHT).
+ */
+void draw_arrow_right(ImlibData *im, xitk_image_t *p);
+
 /**
  *
  */
@@ -1394,6 +1435,8 @@ void draw_inner_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
 		      int x, int y, int w, int h);
 void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
 		       int x, int y, int w, int h);
+
+void draw_tab(ImlibData *im, xitk_image_t *p);
 
 #define XITK_WINDOW_ANSWER_UNKNOWN 0
 #define XITK_WINDOW_ANSWER_OK      1
@@ -1541,5 +1584,26 @@ void xitk_window_dialog_yesno(ImlibData *im, char *title,
     return;                                                                                       \
   xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, message, ##args);\
 }
+
+
+typedef struct {
+  int                     magic;
+  ImlibData              *imlibdata;
+  
+  char                   *skin_element_name;
+  int                     num_entries;
+  char                  **entries;
+
+  xitk_widget_list_t     *parent_wlist;
+
+  xitk_state_callback_t  callback;
+  void                   *userdata;
+
+} xitk_tabs_widget_t;
+
+xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int width);
+int xitk_tabs_get_current_selected(xitk_widget_t *w);
+char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
+void xitk_tabs_set_current_selected(xitk_widget_t *w, int select);
 
 #endif

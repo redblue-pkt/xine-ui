@@ -118,15 +118,19 @@ static int notify_inside(xitk_widget_t *sl, int x, int y) {
   slider_private_data_t *private_data = 
     (slider_private_data_t *) sl->private_data;
 
-  if((sl->widget_type & WIDGET_TYPE_SLIDER) && sl->visible) {
-    xitk_image_t *skin;
+  if(sl->widget_type & WIDGET_TYPE_SLIDER) {
+    if(sl->visible) {
+      xitk_image_t *skin;
+      
+      if(private_data->paddle_cover_bg == 1)
+	skin = private_data->paddle_skin;
+      else
+	skin = private_data->bg_skin;
 
-    if(private_data->paddle_cover_bg == 1)
-      skin = private_data->paddle_skin;
+      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, sl, skin->mask, x, y);
+    }
     else
-      skin = private_data->bg_skin;
-
-    return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, sl, skin->mask, x, y);
+      return 0;
   }
 
   return 1;

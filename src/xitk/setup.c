@@ -54,10 +54,11 @@ typedef struct {
   int                   running;
   int                   visible;
 
-  xitk_widget_t        *browser;
+  xitk_widget_t        *tabs;
+
   char                 *sections[20];
   int                   num_sections;
-
+  
   xitk_widget_t        *tmp_widgets[200];
   int                   num_tmp_widgets;
 
@@ -208,13 +209,22 @@ void setup_handle_event(XEvent *event, void *data) {
     XUnlockDisplay(gGui->display);
     break;
 
-  case ConfigureNotify:
-    /*  xitk_combo_update_pos(setup->combo); */
-    break;
+  case ConfigureNotify: {
+    xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content (setup->widget_list->l);
+    
+    while (w) {
+      xitk_combo_update_pos(w);
+      w = (xitk_widget_t *) xitk_list_next_content (setup->widget_list->l);
+    }
+  }
+  break;
 
   }
 }
 
+/*
+ *
+ */
 static void setup_add_label (int x, int y, int w, char *str) {
 
   xitk_label_widget_t lb;
@@ -235,6 +245,9 @@ static void setup_add_label (int x, int y, int w, char *str) {
   setup->num_tmp_widgets++;
 }
 
+/*
+ *
+ */
 static void setup_add_slider (int x, int y, int min, int max, int pos) {
 
   xitk_slider_widget_t  sl;
@@ -261,6 +274,9 @@ static void setup_add_slider (int x, int y, int min, int max, int pos) {
   setup->num_tmp_widgets++;
 }
 
+/*
+ *
+ */
 static void setup_add_inputtext(int x, int y, char *str) {
 
   xitk_inputtext_widget_t  inp;
@@ -283,6 +299,9 @@ static void setup_add_inputtext(int x, int y, char *str) {
   setup->num_tmp_widgets++;
 }
 
+/*
+ *
+ */
 static void setup_add_checkbox (int x, int y, int state) {
 
   xitk_checkbox_widget_t   cb;
@@ -306,6 +325,9 @@ static void setup_add_checkbox (int x, int y, int state) {
   setup->num_tmp_widgets++;
 }
 
+/*
+ *
+ */
 static void combo_select(xitk_widget_t *w, void *data, int value) {
   cfg_entry_t *entry;
   
@@ -314,6 +336,9 @@ static void combo_select(xitk_widget_t *w, void *data, int value) {
   entry->config->update_num(entry->config, entry->key, value );
 }
 
+/*
+ *
+ */
 static void setup_add_combo (int x, int y, cfg_entry_t *entry, int state, char **choices) {
 
   xitk_combo_widget_t      cmb;
@@ -336,69 +361,139 @@ static void setup_add_combo (int x, int y, cfg_entry_t *entry, int state, char *
   setup->num_tmp_widgets++;
 }
 
-
+/*
+ *
+ */
 static void setup_section_widgets (int s) {
 
-  int                  y = 40;
+  int                  x = 40;
+  int                  y = 70;
   cfg_entry_t         *entry;
   int                  len;
   char                *section;
+  char                *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
+  int width, height;
 
   section = setup->sections[s];
   len     = strlen (section);
   entry   = gGui->config->first;
-
+  
+  //	setup_add_label (x, y+24, 400, entry->description);
+  
   while (entry) {
 
     if (!strncmp (entry->key, section, len) && entry->description) {
-    
-      printf ("setup: generating labels for %s\n", entry->key);
-      printf ("setup: generating labels for %s\n", entry->description);
+      
+      //      printf ("setup: generating labels for %s\n", entry->key);
+      //      printf ("setup: generating labels for %s\n", entry->description);
+      
+      /* Made frames */
+      {
+	/* Need image widget frame: draw it. */
+	xitk_image_t        *image;
+	xitk_image_widget_t  im;
+	GC            gc;
+	XGCValues     gcv;
+	int lbearing, rbearing, width, ascent, descent;
+	xitk_font_t  *fs;
 
-      setup_add_label (150, y+4, 130, &entry->key[len+1]);
-      setup_add_label (150, y+24, 400, entry->description);
+	image = xitk_image_create_image(gGui->imlib_data, 351, 51);
+	xitk_image_add_mask(gGui->imlib_data, image);
+
+	fs = xitk_font_load_font(gGui->display, fontname);
+	xitk_font_set_font(fs, setup->widget_list->gc);
+	xitk_font_text_extent(fs, entry->description, strlen(entry->description), 
+			      &lbearing, &rbearing, &width, &ascent, &descent);
+	xitk_font_unload_font(fs);
+
+	XLockDisplay(gGui->display);
+
+	gcv.graphics_exposures = False;
+	gc = XCreateGC(gGui->display, image->mask, GCGraphicsExposures, &gcv);
+	XSetForeground(gGui->display, gc, 1);
+	XFillRectangle(gGui->display, image->mask, gc, 0, 0, image->width, image->height);
+
+	XSetForeground(gGui->display, gc, 0);
+	XFillRectangle(gGui->display, image->mask, gc,
+		       5, (ascent+(descent*2)), 
+		       (image->width - 10), (image->height - (ascent+(descent*2))) - descent);
+
+	XFreeGC(gGui->display, gc);
+
+
+	XSetForeground(gGui->display, setup->widget_list->gc, 
+		       xitk_get_pixel_color_gray(gGui->imlib_data));
+	XFillRectangle(gGui->display, image->image, setup->widget_list->gc,
+		       0, 0, image->width, image->height);
+	XUnlockDisplay(gGui->display);
+
+	draw_inner_frame(gGui->imlib_data, image->image, 
+			 entry->description, fontname, 
+			 0, (ascent+descent), 
+			 350, 50);
+	
+	XITK_WIDGET_INIT(&im, gGui->imlib_data);
+	im.skin_element_name = NULL;
+
+	{
+	  xitk_widget_t *frame;
+
+	  xitk_list_append_content (setup->widget_list->l,
+				    (frame = xitk_noskin_image_create(&im, image, x, y)));
+	  
+	  setup->tmp_widgets[setup->num_tmp_widgets] = frame;
+	  setup->num_tmp_widgets++;
+	  
+	}
+      }	
+
+      
+      y += 26;
+
+      setup_add_label (x + 200, y, 130, &entry->key[len+1]);
 
       switch (entry->type) {
 
       case CONFIG_TYPE_RANGE: /* slider */
-	setup_add_slider (280, y, entry->range_min, entry->range_max, entry->num_value);
+	setup_add_slider (x + 10, y, entry->range_min, entry->range_max, entry->num_value);
 	break;
-
+	
       case CONFIG_TYPE_STRING:
-	setup_add_inputtext (280, y, entry->str_value);
+	setup_add_inputtext (x + 10, y, entry->str_value);
 	break;
 	
       case CONFIG_TYPE_ENUM:
-	setup_add_combo (280, y, entry, entry->num_value, entry->enum_values);
+	setup_add_combo (x + 10, y, entry, entry->num_value, entry->enum_values);
 	break;
 	
       case CONFIG_TYPE_NUM:
 	break;
 
       case CONFIG_TYPE_BOOL:
-	setup_add_checkbox (280, y, entry->num_value);
+	setup_add_checkbox (x + 10, y, entry->num_value);
 	break;
 
       }
-
-      y += 50;
-
+      
+      y += 26;
+      
     }
-
+    
     entry = entry->next;
   } 
 
 }
 
-static void setup_change_section(xitk_widget_t *w, void *data) {
-  int section = (int)data;
+/*
+ *
+ */
+static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   int i;
 
   /* remove old widgets */
   /* FIXME: free memory / resources */
 
   for (i=0; i<setup->num_tmp_widgets; i++ ) {
-
     xitk_widget_t *w;
 
     w = (xitk_widget_t *) xitk_list_first_content (setup->widget_list->l);
@@ -406,6 +501,8 @@ static void setup_change_section(xitk_widget_t *w, void *data) {
     while (w) {
       
       if (setup->tmp_widgets[i] == w) {
+	xitk_destroy_widget(setup->widget_list, setup->tmp_widgets[i]);
+
 	xitk_list_delete_current (setup->widget_list->l);
 	
 	w = (xitk_widget_t *) setup->widget_list->l->cur;
@@ -416,23 +513,22 @@ static void setup_change_section(xitk_widget_t *w, void *data) {
   }
 
   setup->num_tmp_widgets = 0;
-
   
   setup_section_widgets (section);
-
+  
   XClearWindow (gGui->display,xitk_window_get_window(setup->xwin) );
   xitk_paint_widget_list (setup->widget_list); 
 }
 
 
 /* 
- * collect config categories, setup browser widget
+ * collect config categories, setup tab widget
  */
-
-static void setup_sections () {
-
-  cfg_entry_t *entry;
-  xitk_browser_widget_t      browser;
+static void setup_sections (void) {
+  Pixmap               bg;
+  cfg_entry_t         *entry;
+  xitk_tabs_widget_t   tab;
+  int                  width, height;
 
   setup->num_sections = 0;
   entry = gGui->config->first;
@@ -471,34 +567,33 @@ static void setup_sections () {
   }
 
 
+  XITK_WIDGET_INIT(&tab, gGui->imlib_data);
 
-  XITK_WIDGET_INIT(&browser, gGui->imlib_data);
+  tab.skin_element_name = NULL;
+  tab.num_entries       = setup->num_sections;
+  tab.entries           = setup->sections;
+  tab.parent_wlist      = setup->widget_list;
+  tab.callback          = setup_change_section;
+  tab.userdata          = NULL;
+  xitk_list_append_content (setup->widget_list->l,
+			    (setup->tabs = 
+			     xitk_noskin_tabs_create(&tab, 20, 25, 600)));
 
-  browser.arrow_up.skin_element_name    = NULL;
-  browser.slider.skin_element_name      = NULL;
-  browser.arrow_dn.skin_element_name    = NULL;
-  browser.browser.skin_element_name     = NULL;
-  browser.browser.max_displayed_entries = 8;
-  browser.browser.num_entries           = setup->num_sections;
-  browser.browser.entries               = setup->sections;
-  /*
-  browser.callback                      = change_inputtext;
-  browser.dbl_click_callback            = change_inputtext_dbl_click;
-  */
-  browser.callback                      = setup_change_section;
-  browser.dbl_click_callback            = NULL;
-  browser.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
-  browser.parent_wlist                  = setup->widget_list;
-  browser.userdata                      = NULL;
-  xitk_list_append_content (setup->widget_list->l, 
-			    (setup->browser = 
-			     xitk_noskin_browser_create(&browser,
-							setup->widget_list->gc, 20, 30, 
-							100, 20, 12, fontname)));
+  xitk_window_get_window_size(setup->xwin, &width, &height);
   
-  xitk_browser_update_list(setup->browser, setup->sections, setup->num_sections, 0);
+  bg = xitk_image_create_pixmap(gGui->imlib_data, width, height);
+  
+  XLockDisplay(gGui->display);
+  XCopyArea(gGui->display, (xitk_window_get_background(setup->xwin)), bg,
+	    setup->widget_list->gc, 0, 0, width, height, 0, 0);
+  XUnlockDisplay(gGui->display);
+  
+  draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 40, 600-1, height - 95);
+  xitk_window_change_background(gGui->imlib_data, setup->xwin, bg, width, height);
 
-  xitk_browser_set_select(setup->browser, 0);
+  XLockDisplay(gGui->display);
+  XFreePixmap(gGui->display, bg);
+  XUnlockDisplay(gGui->display);
 
   setup->num_tmp_widgets = 0;
   setup_section_widgets (0);

@@ -85,10 +85,14 @@ static int notify_inside(xitk_widget_t *it, int x, int y) {
   inputtext_private_data_t *private_data = 
     (inputtext_private_data_t *) it->private_data;
   
-  if ((it->widget_type & WIDGET_TYPE_INPUTTEXT) && it->visible) {
-    xitk_image_t *skin = private_data->skin;
-    
-    return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, it, skin->mask, x, y);
+  if(it->widget_type & WIDGET_TYPE_INPUTTEXT) {
+    if(it->visible) {
+      xitk_image_t *skin = private_data->skin;
+      
+      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, it, skin->mask, x, y);
+    }
+    else
+      return 0;
   }
 
   return 1;

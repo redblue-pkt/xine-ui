@@ -903,14 +903,14 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
     wl->pressedWidget = mywidget;
     
     if (mywidget) {
-      if (mywidget->notify_click && mywidget->enable == WIDGET_ENABLE)
+      if (mywidget->notify_click && mywidget->enable == WIDGET_ENABLE && mywidget->running)
 	bRepaint |= (mywidget->notify_click) (wl, mywidget, LBUTTON_DOWN, x, y);
 
     }
   } else {
     if (wl->pressedWidget) {
       if (wl->pressedWidget->notify_click 
-	  && wl->pressedWidget->enable == WIDGET_ENABLE)
+	  && wl->pressedWidget->enable == WIDGET_ENABLE && mywidget->running)
 	bRepaint |= (wl->pressedWidget->notify_click) (wl, wl->pressedWidget, LBUTTON_UP, x, y);
 
     }
@@ -1029,7 +1029,9 @@ void xitk_disable_widget(xitk_widget_t *w) {
     XITK_WARNING("widget is NULL\n");
     return;
   }
+
   w->enable = ~WIDGET_ENABLE;
+
 }
 
 /*
@@ -1174,6 +1176,20 @@ void xitk_stop_widget(xitk_widget_t *w) {
 }
 
 /*
+ * (Re)Start a widget.
+ */
+void xitk_start_widget(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  w->running = 1;
+  
+}
+
+/*
  * Stop a widgets from widget list.
  */
 void xitk_stop_widgets(xitk_widget_list_t *wl) {
@@ -1197,7 +1213,7 @@ void xitk_stop_widgets(xitk_widget_list_t *wl) {
 /*
  * Show a widget.
  */
-void xitk_show_widget(xitk_widget_t *w) {
+void xitk_show_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
 
   if(!w) {
     XITK_WARNING("widget is NULL\n");
@@ -1206,6 +1222,8 @@ void xitk_show_widget(xitk_widget_t *w) {
 
   w->visible = 1;
   
+  if(w->paint)
+    w->paint(w, wl->win, wl->gc);
 }
 
 /*
@@ -1223,7 +1241,7 @@ void xitk_show_widgets(xitk_widget_list_t *wl) {
 
   while(mywidget) {
     
-    xitk_show_widget(mywidget);
+    xitk_show_widget(wl, mywidget);
     
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }

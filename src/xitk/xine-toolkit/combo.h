@@ -51,6 +51,7 @@ typedef struct {
 
   xitk_register_key_t     widget_key;
   xitk_widget_list_t     *widget_list;
+  xitk_widget_list_t     *parent_wlist;
 
   xitk_state_callback_t   callback;
   void                   *userdata;

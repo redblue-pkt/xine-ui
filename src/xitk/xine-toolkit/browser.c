@@ -633,7 +633,6 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, int 
     for(i = WBSTART; i < br->browser.max_displayed_entries+WBSTART; i++) {
       
       bt = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
-      bt->itemlist = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
       bt->itemlist = mywidget;
       bt->sel = i;
       

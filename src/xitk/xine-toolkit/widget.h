@@ -279,6 +279,11 @@ void xitk_destroy_widgets(xitk_widget_list_t *wl);
 void xitk_stop_widget(xitk_widget_t *w);
 
 /**
+ * Start widget.
+ */
+void xitk_start_widget(xitk_widget_t *w);
+
+/**
  * Stop each (if widget handle it) widgets of widget list.
  */
 void xitk_stop_widgets(xitk_widget_list_t *);
@@ -286,7 +291,7 @@ void xitk_stop_widgets(xitk_widget_list_t *);
 /**
  * Show a widget.
  */
-void xitk_show_widget(xitk_widget_t *);
+void xitk_show_widget(xitk_widget_list_t *, xitk_widget_t *);
 
 /**
  * Set widgets of widget list visible.

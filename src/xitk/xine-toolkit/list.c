@@ -222,6 +222,6 @@ void xitk_list_delete_current (xitk_list_t *l) {
     l->cur = node_cur->prev;
   }
 
-  XITK_FREE(node_cur->content);
+  //  XITK_FREE(node_cur->content);
   XITK_FREE(node_cur);
 }

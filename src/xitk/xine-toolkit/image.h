@@ -76,6 +76,12 @@ unsigned int xitk_get_pixel_color_darkgray(ImlibData *im);
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
 
 /*
+ *
+ */
+xitk_widget_t *xitk_noskin_image_create (xitk_image_widget_t *im, 
+					 xitk_image_t *image, int x, int y);
+
+/*
  * Free an image object.
  */
 void xitk_image_free_image(ImlibData *im, xitk_image_t **src);
@@ -166,6 +172,16 @@ void draw_arrow_up(ImlibData *im, xitk_image_t *p);
 void draw_arrow_down(ImlibData *im, xitk_image_t *p);
 
 /*
+ * Draw and arrow (direction is LEFT).
+ */
+void draw_arrow_left(ImlibData *im, xitk_image_t *p);
+
+/*
+ * Draw and arrow (direction is RIGHT).
+ */
+void draw_arrow_right(ImlibData *im, xitk_image_t *p);
+
+/*
  * Draw a rectangular inner box (only the relief effect).
  */
 void draw_rectangular_inner_box(ImlibData *im, Pixmap p, int x, int y, int width, int height);
@@ -183,4 +199,5 @@ void draw_inner_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
 void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
 		       int x, int y, int w, int h);
 
+void draw_tab(ImlibData *im, xitk_image_t *p);
 #endif

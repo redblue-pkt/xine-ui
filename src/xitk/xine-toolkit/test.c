@@ -49,6 +49,9 @@ typedef struct {
   /* Label */
   xitk_widget_t        *input;
 
+  /* Tabs */
+  xitk_widget_t        *tabs;
+
   xitk_widget_list_t   *widget_list;
   xitk_register_key_t   kreg;
 } test_t;
@@ -266,6 +269,41 @@ static void change_browser_entry(xitk_widget_t *w, void *data, char *currenttext
 /*
  *
  */
+static void create_tabs(void) {
+  Pixmap              bg;
+  xitk_tabs_widget_t  t;
+  int                 x = 150, y = 200, w = 300;
+  int                 width, height;
+  static char        *tabs_labels[] = {
+    "Jumpin'", "Jack", "Flash", "It's", "Gas", "Gas", "Gas", ",", "Tabarnak"
+  };
+
+  XITK_WIDGET_INIT(&t, test->imlibdata);
+
+  xitk_window_get_window_size(test->xwin, &width, &height);
+  bg = xitk_image_create_pixmap(test->imlibdata, width, height);
+  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg,
+	    test->widget_list->gc, 0, 0, width, height, 0, 0);
+  
+  draw_rectangular_outter_box(test->imlibdata, bg, x, y+20, w, 60);
+  xitk_window_change_background(test->imlibdata, test->xwin, bg, width, height);
+  XFreePixmap(test->display, bg);
+  
+  t.skin_element_name = NULL;
+  t.num_entries       = 9;
+  t.entries           = tabs_labels;
+  t.parent_wlist      = test->widget_list;
+  t.callback          = NULL;
+  t.userdata          = NULL;
+  xitk_list_append_content (test->widget_list->l,
+			    (test->tabs = 
+			     xitk_noskin_tabs_create(&t, x, y, w)));
+
+}
+
+/*
+ *
+ */
 static void create_frame(void) {
   Pixmap    bg;
   int       width, height;
@@ -301,7 +339,7 @@ static void create_inputtext(void) {
   xitk_list_append_content (test->widget_list->l,
 			   (test->input = 
 			    xitk_noskin_inputtext_create(&inp,
-							 150, 250, 150, 20,
+							 150, 150, 150, 20,
 							 "Black", "Black", fontname)));
 }
 
@@ -634,6 +672,7 @@ int main(int argc, char **argv) {
   create_label();
   create_inputtext();
   create_frame();
+  create_tabs();
   
   test->kreg = xitk_register_event_handler("test", 
 					   (xitk_window_get_window(test->xwin)),
