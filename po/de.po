@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.17\n"
 "POT-Creation-Date: 2003-01-15 11:42+0100\n"
-"PO-Revision-Date: 2003-01-07 11:45+0100\n"
+"PO-Revision-Date: 2003-01-21 19:45+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -19,6 +19,8 @@ msgid ""
 "The stream '%s' isn't supported by xine:\n"
 "\n"
 msgstr ""
+"Der Datenstrom '%s' wird nicht von xine unterstützt:\n"
+"\n"
 
 #: src/xitk/actions.c:249
 #, c-format
@@ -26,11 +28,13 @@ msgid ""
 "The stream '%s' use an unsupported codec:\n"
 "\n"
 msgstr ""
+"Der Datenstrom '%s' benutzt einen nichtunterstützten codec:\n"
+"\n"
 
 #: src/xitk/actions.c:259
-#, fuzzy, c-format
+#, c-format
 msgid "%sVideo Codec: %s (%s)\n"
-msgstr "Videocodex: "
+msgstr "%s Video-Codec: %s (%s)\n"
 
 #: src/xitk/actions.c:260 src/xitk/actions.c:271 src/xitk/stream_infos.c:152
 #: src/xitk/stream_infos.c:361 src/xitk/stream_infos.c:362
@@ -44,7 +48,7 @@ msgstr "Nicht verfügbar"
 #: src/xitk/actions.c:270
 #, c-format
 msgid "%sAudio Codec: %s (%s)\n"
-msgstr ""
+msgstr "%s Audio-Codec: %s (%s)\n"
 
 #: src/xitk/actions.c:284
 #, c-format
@@ -52,11 +56,12 @@ msgid ""
 "%s\n"
 "Start playback anyway ?\n"
 msgstr ""
+"%s\n"
+"Wiedergabe trotzdem starten ?\n"
 
 #: src/xitk/actions.c:292
-#, fuzzy
 msgid "Start Playback ?"
-msgstr "Stopp (Abspielen Beenden)"
+msgstr "Wiedergabe starten ?"
 
 #: src/xitk/actions.c:499
 msgid "No MRL (input stream) specified"
@@ -95,7 +100,7 @@ msgstr "Ströme laden"
 
 #: src/xitk/actions.c:1501 src/xitk/mediamark.c:1448
 msgid "Pick a subtitle file"
-msgstr ""
+msgstr "Wähle eine Untertiteldatei"
 
 #: src/xitk/control.c:231
 msgid "hue value"
@@ -423,13 +428,16 @@ msgstr ""
 
 #: src/xitk/event.c:1097
 msgid "Ask user for playback with unsupported codec"
-msgstr ""
+msgstr "Benutzer fragen bei Wiedergabe mit nichtunterstütztem coder"
 
 #: src/xitk/event.c:1098
 msgid ""
 "If xine don't support audio or video codec of current stream the user will "
 "be asked if the stream should be played or not"
 msgstr ""
+"Falls der Datenstrom einen Audio- oder Video-Codec benutzt, den xine nicht "
+"unterstützt, wird der Benutzer gefragt, or der Datenstrom wiedergegeben "
+"werden soll oder nicht"
 
 #: src/xitk/event.c:1107
 msgid "configuration experience level"
@@ -620,26 +628,27 @@ msgid "Create a directory"
 msgstr "Verzeichnis anlegen"
 
 #: src/xitk/kbindings.c:425
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Key bindings of '%s' and '%s' are the same.\n"
 "\n"
 "What do you want to do with current key bindings?\n"
-msgstr "Die Tastenbelegungen '%s' und '%s' sind identisch.\n"
+msgstr ""
+"Die Tastenbelegungen '%s' und '%s' sind identisch.\n"
+"\n"
+"Was soll mit den momentanen Belegungen passieren?\n"
 
 #: src/xitk/kbindings.c:430
-#, fuzzy
 msgid "Keybindings error!"
-msgstr "Tastenbelegungseditor"
+msgstr "Tastenbelegungsfehler!"
 
 #: src/xitk/kbindings.c:431 src/xitk/kbindings.c:2005
 msgid "Reset"
 msgstr "Reset"
 
 #: src/xitk/kbindings.c:432
-#, fuzzy
 msgid "Editor"
-msgstr "Ändern"
+msgstr "Editor"
 
 #: src/xitk/kbindings.c:802
 msgid "OOCH: key binding table is NULL.\n"
@@ -1161,21 +1170,22 @@ msgid "Mediamark Mrl"
 msgstr "Mediamark-MRL"
 
 #: src/xitk/mediamark.c:1559
-#, fuzzy
 msgid "Subtitle"
 msgstr "Untertitel"
 
 #: src/xitk/mediamark.c:1574
 msgid "Subtitle File"
-msgstr ""
+msgstr "Untertiteldatei"
 
 #: src/xitk/mediamark.c:1578
 msgid "Sub File"
-msgstr ""
+msgstr "Unterdatei"
 
 #: src/xitk/mediamark.c:1588
 msgid "Select a subtitle file to use together with the mrl."
 msgstr ""
+"Wähle eine Untertiteldatei, welche zusammen mit dieser MRL benutzt werden "
+"soll."
 
 #: src/xitk/mediamark.c:1594
 msgid "Start at"
@@ -1214,13 +1224,12 @@ msgid "Source:"
 msgstr "Quelle:"
 
 #: src/xitk/osd.c:245
-#, fuzzy
 msgid "post animation"
-msgstr "Schneller abspielen"
+msgstr "Nach-Animation"
 
 #: src/xitk/osd.c:255
 msgid "unknown"
-msgstr ""
+msgstr "Unkekannt"
 
 #: src/xitk/osd.c:295
 msgid "Audio: "
@@ -1254,7 +1263,7 @@ msgstr "Spiele nächsten Eintrag in der Playliste"
 #: src/xitk/panel.c:253
 #, c-format
 msgid "Total time: %02d:%02d:%02d"
-msgstr ""
+msgstr "Gesamtzeit: %02d:%02d:%02d"
 
 #: src/xitk/panel.c:790
 msgid "Volume control"
@@ -1326,7 +1335,7 @@ msgstr "Vorherigen Untertitel-Kanal"
 
 #: src/xitk/panel.c:1095
 msgid "Total time: --:--:--"
-msgstr ""
+msgstr "Gesamtzeit: --:--:--"
 
 # *schauder*, aber mir fällt auch nix besseres ein...
 #: src/xitk/panel.c:1128
