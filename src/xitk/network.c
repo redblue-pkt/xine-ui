@@ -137,17 +137,18 @@ struct session_s {
 struct session_commands_s {
   char           *command;
   int             origin;
+  int             enable;
   client_func_t   function;
 };
 
 static session_t             session;
 static session_commands_t    client_commands[] = {
-  { "?",           ORIGIN_CLIENT,   client_help    },
-  { "version",     ORIGIN_CLIENT,   client_version },
-  { "open",        ORIGIN_CLIENT,   client_open    },
-  { "close",       ORIGIN_CLIENT,   client_close   },
-  { "quit",        ORIGIN_CLIENT,   client_quit    },
-  { NULL,          ORIGIN_CLIENT,   NULL           }
+  { "?",           ORIGIN_CLIENT,   1, client_help    },
+  { "version",     ORIGIN_CLIENT,   1, client_version },
+  { "open",        ORIGIN_CLIENT,   1, client_open    },
+  { "close",       ORIGIN_CLIENT,   1, client_close   },
+  { "quit",        ORIGIN_CLIENT,   1, client_quit    },
+  { NULL,          ORIGIN_CLIENT,   1, NULL           }
 };
 
 static session_commands_t  **session_commands = NULL;
@@ -713,11 +714,13 @@ static void session_create_commands(session_t *session) {
     session_commands[i] = (session_commands_t *) malloc(sizeof(session_commands_t));
     session_commands[i]->command   = strdup(client_commands[i].command);
     session_commands[i]->origin    = client_commands[i].origin;
+    session_commands[i]->enable    = client_commands[i].enable;
     session_commands[i]->function  = client_commands[i].function;
   }
   session_commands[i] = (session_commands_t *) malloc(sizeof(session_commands_t));
   session_commands[i]->command   = NULL;
   session_commands[i]->origin    = ORIGIN_CLIENT;
+  session_commands[i]->enable    = 0;
   session_commands[i]->function  = NULL;
 
 }
@@ -740,8 +743,10 @@ static void client_help(session_t *session, session_commands_t *command, const c
 
   while(session_commands[i]->command != NULL) {
     
-    if(strlen(session_commands[i]->command) > maxlen)
-      maxlen = strlen(session_commands[i]->command);
+    if(session_commands[i]->enable) {
+      if(strlen(session_commands[i]->command) > maxlen)
+	maxlen = strlen(session_commands[i]->command);
+    }
     
     i++;
   }
@@ -753,17 +758,19 @@ static void client_help(session_t *session, session_commands_t *command, const c
   curpos += 7;
   
   while(session_commands[i]->command != NULL) {
-    if((curpos + maxlen) >= 80) {
-      sprintf(buf, "%s\n       ", buf);
-      curpos = 7;
-    }
-    
-    sprintf(buf, "%s%s", buf, session_commands[i]->command);
-    curpos += strlen(session_commands[i]->command);
-    
-    for(j = 0; j < (maxlen - strlen(session_commands[i]->command)); j++) {
-      sprintf(buf, "%s ", buf);
-      curpos++;
+    if(session_commands[i]->enable) {
+      if((curpos + maxlen) >= 80) {
+	sprintf(buf, "%s\n       ", buf);
+	curpos = 7;
+      }
+      
+      sprintf(buf, "%s%s", buf, session_commands[i]->command);
+      curpos += strlen(session_commands[i]->command);
+      
+      for(j = 0; j < (maxlen - strlen(session_commands[i]->command)); j++) {
+	sprintf(buf, "%s ", buf);
+	curpos++;
+      }
     }
     i++;
   }
@@ -783,10 +790,18 @@ static void client_close(session_t *session, session_commands_t *command, const 
     return;
 
   if(session->socket >= 0) {
+    int i = 0;
+
     sock_write(session->socket, "exit");
     close(session->socket);
     session->socket = -1;
     session_update_prompt(session);
+
+    while(session_commands[i]->command != NULL) {
+      if(session_commands[i]->origin == ORIGIN_SERVER)
+	session_commands[i]->enable = 0;
+      i++;
+    }
   }
 }
 static void client_open(session_t *session, session_commands_t *command, const char *cmd) {
@@ -867,9 +882,11 @@ static char *command_generator(const char *text, int state) {
   if(len) {
     while((cmd = session_commands[index]->command) != NULL) {
       index++;
-      if(strncasecmp(cmd, text, len) == 0) {
-	retcmd = strdup(cmd);
-	return retcmd;
+      if(session_commands[index - 1]->enable) {
+	if(strncasecmp(cmd, text, len) == 0) {
+	  retcmd = strdup(cmd);
+	  return retcmd;
+	}
       }
     }
   }
@@ -967,8 +984,9 @@ static void *select_thread(void *data) {
 		      while(*p == ' ' || *p == '\t') p++;
 		      session_commands = (session_commands_t **) realloc(session_commands, (i + 2) * (sizeof(session_commands_t *)));
 		      session_commands[i] = (session_commands_t *) malloc(sizeof(session_commands_t));
-		      session_commands[i]->command = strdup(p);
-		      session_commands[i]->origin = ORIGIN_SERVER;
+		      session_commands[i]->command  = strdup(p);
+		      session_commands[i]->origin   = ORIGIN_SERVER;
+		      session_commands[i]->enable   = 1;
 		      session_commands[i]->function = client_noop;
 		      i++;
 		    }
@@ -980,6 +998,7 @@ static void *select_thread(void *data) {
 		  session_commands[i] = (session_commands_t *) malloc(sizeof(session_commands_t));
 		  session_commands[i]->command  = NULL;
 		  session_commands[i]->origin   = ORIGIN_CLIENT;
+		  session_commands[i]->enable   = 1;
 		  session_commands[i]->function = NULL;
 		  
 		  ocount -= special_length;
@@ -1038,57 +1057,58 @@ static void client_handle_command(session_t *session, const char *command) {
 
   /* looking for command matching */
   while((session_commands[i]->command != NULL) && (found == 0)) {
-    if(!strncasecmp(cmd, session_commands[i]->command, strlen(cmd))) {
-      found++;
-      
-      if(session_commands[i]->origin == ORIGIN_CLIENT) {
-	if(session_commands[i]->function)
-	  session_commands[i]->function(session, session_commands[i], command);
-      }
-      else {
-	char *p, *pp;
-	char buf[_BUFSIZ];
+    if(session_commands[i]->enable) {
+      if(!strncasecmp(cmd, session_commands[i]->command, strlen(cmd))) {
+	found++;
 	
-	/*
-	 * Duplicate single '%' char, vsnprintf() seems 
-	 * confused with single one in *format string 
-	 */
-	p = (char *)command;
-	pp = buf;
-	while(*p != '\0') {
+	if(session_commands[i]->origin == ORIGIN_CLIENT) {
+	  if(session_commands[i]->function)
+	    session_commands[i]->function(session, session_commands[i], command);
+	}
+	else {
+	  char *p, *pp;
+	  char buf[_BUFSIZ];
 	  
-	  switch(*p) {
-	  case '%':
-	    if(*(p + 1) != '%') {
-	      *pp++ = '%';
-	      *pp++ = '%';
+	  /*
+	   * Duplicate single '%' char, vsnprintf() seems 
+	   * confused with single one in *format string 
+	   */
+	  p = (char *)command;
+	  pp = buf;
+	  while(*p != '\0') {
+	    
+	    switch(*p) {
+	    case '%':
+	      if(*(p + 1) != '%') {
+		*pp++ = '%';
+		*pp++ = '%';
+	      }
+	      break;
+	      
+	    default:
+	      *pp = *p;
+	      pp++;
+	      break;
 	    }
-	    break;
-
-	  default:
-	    *pp = *p;
-	    pp++;
-	    break;
+	    
+	    p++;
 	  }
-
-	  p++;
+	  
+	  *pp = '\0';
+	  
+	  if((sock_write(session->socket, buf)) == -1) {
+	    session->running = 0;
+	  }
 	}
-
-	*pp = '\0';
-
-	if((sock_write(session->socket, buf)) == -1) {
-	  session->running = 0;
-	}
+	
       }
-      
-    }
+    } 
     i++;
   }
-
+  
   /* Perhaps a ';' separated commands, so send anyway to server */
   if(found == 0) {
-    if((sock_write(session->socket, (char *)command)) == -1) 
-      session->running = 0;
+    sock_write(session->socket, (char *)command);
   }
   
   if(!strncasecmp(cmd, "exit", strlen(cmd))) {
@@ -1118,7 +1138,7 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
 
 static void show_version(void) {
   printf("This is %s - xine's remote control v%s.\n"
-	 "(c) 2000, 2001 by G. Bartsch and the xine project team.\n", PROGNAME, PROGVERSION);
+	 "(c) 2000-2002 by G. Bartsch and the xine project team.\n", PROGNAME, PROGVERSION);
 }
 
 static void show_usage(void) {
