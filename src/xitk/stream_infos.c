@@ -106,8 +106,12 @@ static char *get_fourcc_string(uint32_t fourcc) {
   static char fourcc_txt[10];
   
   memset(&fourcc_txt, 0, sizeof(fourcc_txt));
-  *(uint32_t *)fourcc_txt = fourcc;
-  fourcc_txt[4] = '\0';
+  if(fourcc <= 0xFFFF)
+    sprintf(fourcc_txt, "0x%x", fourcc);
+  else {
+    *(uint32_t *)fourcc_txt = fourcc;
+    fourcc_txt[4] = '\0';
+  }
   
   return &fourcc_txt[0];
 }
