@@ -68,6 +68,7 @@ typedef struct {
   char                         *author;
   char                         *date;
   char                         *url;
+  char                         *logo;
 
   pthread_mutex_t               mutex;
   char                         *load_command;

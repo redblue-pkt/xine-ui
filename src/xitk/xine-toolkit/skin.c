@@ -215,7 +215,7 @@ static void skin_clean_eol(xitk_skin_config_t *skonfig) {
   if(p) {
     while(*p != '\0') {
       if(*p == '\n' || *p == '\r' || (*p == '#' && (istriplet(p) == 0)) || *p == ';' 
-	 || (*p == '/' && (*(p+1) == '/' || *(p+1) == '*'))) {
+	 || (*p == '/' && *(p+1) == '*')) {
 	*p = '\0';
 	break;
       }
@@ -547,6 +547,10 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	    skonfig->date = strdup(p);
 	    return;
 	  }
+	  else if(!strncasecmp(section, "logo", 4)) {
+	    skonfig->logo = strdup(p);
+	    return;
+	  }
 	  else if(!strncasecmp(section, "url", 3)) {
 	    skonfig->url = strdup(p);
 	    return;
@@ -582,6 +586,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
     printf("     load cmd  '%s'\n", skonfig->load_command);
     printf("     uload cmd '%s'\n", skonfig->unload_command);
     printf("     URL       '%s'\n", skonfig->url);
+    printf("     logo      '%s'\n", skonfig->logo);
 
     while(s) {
       printf("Section '%s'\n", s->section);
@@ -665,7 +670,7 @@ xitk_skin_config_t *xitk_skin_init_config(void) {
   skonfig->version = -1;
   skonfig->first = skonfig->last = skonfig->celement = NULL;
   skonfig->name = skonfig->author = skonfig->date = skonfig->url = 
-    skonfig->load_command = skonfig->unload_command = NULL;
+    skonfig->load_command = skonfig->unload_command = skonfig->logo = NULL;
   skonfig->skinfile = skonfig->path = NULL;
 
   skonfig->ln = skonfig->buf;
@@ -707,6 +712,7 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   XITK_FREE(skonfig->author);
   XITK_FREE(skonfig->date);
   XITK_FREE(skonfig->url);
+  XITK_FREE(skonfig->logo);
   XITK_FREE(skonfig->path);
   XITK_FREE(skonfig->load_command);
   XITK_FREE(skonfig->unload_command);
@@ -1056,6 +1062,15 @@ int xitk_skin_get_slider_radius(xitk_skin_config_t *skonfig, const char *str) {
     return s->radius;
 
   return 0;
+}
+
+/*
+ *
+ */
+char *xitk_skin_get_logo(xitk_skin_config_t *skonfig) {
+  assert(skonfig);
+  
+  return skonfig->logo;
 }
 
 /*

@@ -452,7 +452,7 @@ skin.PlInputText {
 	pixmap = PlInputTxt.png
 	label {
 	  color = #9fa4ad
-	  color_focus = #081e2f
+	  color_focus = #9fa4ad
 	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}

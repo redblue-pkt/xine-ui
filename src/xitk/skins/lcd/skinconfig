@@ -1,9 +1,6 @@
 skin.name    = lcd
 skin.version = 1
-
-#skin.VOLogo {
-#	pixmap = logo.zyuy2
-#}
+#skin.logo = file://media/MPEG-I/wong.mpg
 
 ## Main GUI ##
 skin.BackGround {

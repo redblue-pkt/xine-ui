@@ -63,8 +63,6 @@ typedef struct {
   XClassHint    *xclasshint_borderless;
   GC             gc;
 
-  //  int            already_exposed;
-
   int            video_width;     /* size of currently displayed video     */
   int            video_height;
   int            win_width;       /* size of non-fullscreen window         */
@@ -789,7 +787,6 @@ void video_window_init (window_attributes_t *window_attribute) {
   gVw->widget_key         = 
     gVw->old_widget_key   = 0;
   gVw->gc		  = None;
-  //  gVw->already_exposed    = 0;
   gVw->borderless         = window_attribute->borderless;
 
   XLockDisplay (gGui->display);
@@ -1056,22 +1053,22 @@ float video_window_get_mag (void) {
  */
 void video_window_change_skins(void) {
   cfg_entry_t *cfg_entry;
-  char        *new_vo_logo;
+  char        *skin_logo;
 
-  cfg_entry   = gGui->config->lookup_entry(gGui->config, "misc.logo_mrl");
-  new_vo_logo = xitk_skin_get_skin_filename(gGui->skin_config, "VOLogo");
+  cfg_entry = gGui->config->lookup_entry(gGui->config, "misc.logo_mrl");
+  skin_logo = xitk_skin_get_logo(gGui->skin_config);
   
-  if(new_vo_logo) {
+  if(skin_logo) {
     
     if(cfg_entry && cfg_entry->str_value) {
       /* Old and new logo are same, don't reload */
-      if(!strcmp(cfg_entry->str_value, new_vo_logo))
+      if(!strcmp(cfg_entry->str_value, skin_logo))
 	return;
     }
     
-    gGui->config->update_string(gGui->config, "misc.logo_mrl", new_vo_logo);
+    gGui->config->update_string(gGui->config, "misc.logo_mrl", skin_logo);
   }
-  else {
+  else { /* Skin don't use logo feature, set to xine's default */
     char  default_logo[2048];
     
     if(cfg_entry) {
@@ -1153,13 +1150,6 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
   case Expose: {
     XExposeEvent * xev = (XExposeEvent *) event;
-
-    /* Ensure we load the right logo */
-    //    if(!gVw->already_exposed) {
-    //      video_window_change_skins();
-    //      gVw->already_exposed++;
-    //    }
-
 
     if (xev->count == 0) {
 

@@ -946,6 +946,7 @@ void gui_init_imlib (Visual *vis) {
  */
 void gui_run (void) {
 
+  video_window_change_skins();
   panel_add_autoplay_buttons();
   panel_add_mixer_control();
   panel_update_channel_display () ;
