@@ -1,16 +1,24 @@
+xine-ui (0.9.16-0) unstable; urgency=low
+
+  * new upstream release
+    This one should be ready for upload as soon as xine-lib 1-beta1 is out.
+    (xine-lib 1-beta0 has a filename clash with libxine0...)
+
+ -- Siggi Langauf <siggi@debian.org>  Sat, 21 Dec 2002 17:34:28 +0100
+
 xine-ui (0.9.15-0) unstable; urgency=low
 
   * new upstream release
     (not suited for upload: requires xine-lib 1-alpha2)
 
- -- Siggi Langauf <siggi@flake.langauf.de>  Tue, 26 Nov 2002 00:32:16 +0100
+ -- Siggi Langauf <siggi@debian.org>  Tue, 26 Nov 2002 00:32:16 +0100
 
 xine-ui (0.9.14-0) unstable; urgency=low
 
   * new upstream release
     (not suited for upload yet: requires xine-lib 1-alpha0)
 
- -- Siggi Langauf <siggi@flake.langauf.de>  Sun,  3 Nov 2002 20:50:40 +0100
+ -- Siggi Langauf <siggi@debian.org>  Sun,  3 Nov 2002 20:50:40 +0100
 
 xine-ui (0.9.13-1) unstable; urgency=low
 
