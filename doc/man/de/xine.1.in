@@ -3,7 +3,7 @@
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\" 
-.\" Zuletzt synchronisiert mit en/xine.1.in 1.22 2002-12-17
+.\" Zuletzt synchronisiert mit en/xine.1.in 1.49 2003-05-29
 
 .de Vb \" Begin verbatim text
 .ft CW
@@ -36,6 +36,12 @@ Für eine vollständige Beschreibung wird auf die \fIREADME\fP und \fIFAQ\fP in \f
 .TP 
 .B \-h,\ \-\-help
 Zeigt eine Zusammenfassung der Optionen und die verfügbaren Ausgabe\-Treiber (Plugins) an.
+.TP 
+.BI \-\-verbose\  [=Stufe]
+Setze Stufe der `Geschwätzigkeit'.
+.TP 
+.BI \-\-config\  <Datei>
+Benutze \fI<Datei>\fP anstatt anstatt der normalen \fBconfig\fP Datei.
 .TP 
 .BI \-a,\ \-\-audio\-channel\  <Zahl>
 Wählt die angegebene Tonspur. \fI<Zahl>\fP ist die Nummer der Tonspur, normalerweise \fB0\fP.
@@ -94,10 +100,13 @@ Position und Größe des Video\-Fensters als X-Geometrie angeben (siehe \fIX\fP(7)
 .B \-B,\ \-\-borderless
 Rahmen von Video\-Fenster entfernen (Nur im Fenster\-Modus).
 .TP
+.BI \-N,\ \-\-animation\  <mrl>
+Eine oder mehrere MRLs zum Abspielen, falls kein Videoanteil vorhanden ist.
+.TP
 .BI \-P,\ \-\-playlist\  <Dateiname>
 Benutzt die Datei als Wiedergabeliste. Mögliche Formate sind: asx, toxine, m3u, pls, sfv und rohe Textdateien.
 .TP
-.BI \-l,\ \-\-loop\  [Modus]
+.BI \-l,\ \-\-loop\  [=Modus]
 Setzt den Wiedergabeliste-Wiederholmodus. Wenn der Modus nicht angegeben ist, wird `\fBloop\fP' verwendet. MÖgliche Modi sind:
 .br
 `\fIloop\fP': Gesamte Wiedergabeliste wiederholen.
@@ -107,6 +116,51 @@ Setzt den Wiedergabeliste-Wiederholmodus. Wenn der Modus nicht angegeben ist, wi
 `\fIshuffle\fP': Zufälligen Eintrag aus noch nicht gespielter Wiedergabeliste auswählen.
 .br
 `\fIshuffle+\fP': Das Selbe wie shuffle, nur wird die Playliste unendlichoft wiederholt.
+.TP
+.BI \-\-skin\-server\-url\  <url>
+Definiert die URL für den Skin-Server.
+.TP
+.BI \-\-enqueue\  <mrl>
+Eine oder mehrere MRLs an laufenden Sitzung (Sitzung 0) anhängen.
+.br
+Wenn eine andere Sitzung verwendet werden soll, kann diese mit \fB\-S session=\fP\fIx\fP angegeben werden.
+.TP
+.BI \-S,\ \-\-session\  <Option1,Option2,...>
+Sitzungsverwaltung. Alle Optionen bis auf \fBsession\fP können mehr als einmal angegeben werden. Die Optionen sind:
+.br
+\fBsession=\fP\fIn\fP: Spezifiziert die Sitzungsnummer \fIn\fP,
+.br
+\fBmrl=\fP\fIm\fP: Fügt MRL \fIm\fP der Wiedergabeliste hinzu.
+.br
+\fBaudio=\fP\fIc\fP: Wählt Audiokanal (\fIc\fP: \fBnext\fP oder \fBprev\fP),
+.br
+\fBspu=\fP\fIc\fP: Wählt SPU-Kanal (\fIc\fP: \fBnext\fP oder \fBprev\fP),
+.br
+\fBvolume=\fP\fIv\fP: Setzt Lautstärke (\fIv\fP: 0 bis 100),
+.br
+\fBamp=\fP\fIv\fP: Setzt Verstärkungslevel (\fIv\fP: 0 bis 200),
+.br
+\fBplaylist\fP|\fBpl=\fP\fIp\fP
+.br
+ \<\fIp\fP\> kann folgendes sein:
+.br
+    \fBclear\fP: Wiedergabeliste leeren,
+    \fBnext\fP: Nächsten Eintrag wiedergeben,
+    \fBprev\fP: Vorherigen Eintrag wiedergeben,
+    \fBload:\fP\fIs\fP: Wiedergabeliste aus Datei \fIs\fP laden.
+.br
+Weiterhin sind folgende Optionen benutzbar:
+    \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
+.TP
+.B \-Z
+Wiedergabe nicht automatisch starten (Beeinflusst nur den Autostart im Smart-Modus).
+.TP
+.B \-D,\ \-\-deinterlace
+Deinterlace Video-Fenster.
+.TP
+.BI \-r,\ \-\-aspect\-ratio\  <Modus>
+Setze das Seitenverhältnis für die Video-Ausgabe. Mögliche Modi sind:
+\fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP.
 .TP
 .B \-H, \-\-hide\-video
 Verdeckt nach dem Start nur das Video\-Fenster.
@@ -128,7 +182,7 @@ Wenn kein benutzbares Visual gefunden wird, greift xine auf das Standard\-Visual
 .B \-\-install
 Wenn ein X11\-visual mit veränderlichen Farben (Farbtabellen) benutzt wird, installiert xine eine eigene Farbtabelle. Mit einer eigenen Farbtabelle kann xine mehr Farben anfordern, so daß die Video\-Ausgabe besser aussieht.
 .TP 
-.BI \-\-keymap\  [Optionen]
+.BI \-\-keymap\  [=Optionen]
 Zeigt die Tastenbelegung an.
 Optionen sind:
 .br
@@ -137,6 +191,8 @@ Optionen sind:
 `\fBlirc\fP' Zeigt die Tastenbelegung aus der \fI~/.lircrc\fP-Konfigurationsdatei an,
 .br
 `\fBremapped\fP' Zeigt die benutzerspezifische Tastenbelegung an,
+.br
+`\fBfile:<Datei>\fP' Benutze Tastenbelegung aus \fBDatei\fP.
 .br
 Wird keine Option angegeben, wird `\fBdefault\fP' ausgewählt.
 .TP
@@ -215,22 +271,29 @@ MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Tit
 .BI mms:// <host>...
 .TP
 .BI http:// <host>...
+.TP 
+.BI cdda:// <Titelnummer>
 .PP 
 Mehrere MRLs können angegeben werden, um mehrere Titel nacheinander zu spielen. Die oben aufgeführten MRLs werden standardmäßig von libxine unterstützt. Zusätzliche Plugins können diese Liste um weitere MRLs ergänzen.
 .PP 
 Wenn keine MRL angegeben wird, muß eine Datei per drag'n\-drop ausgewählt werden.
 Das Herüberziehen vom \fBGNOME Midnight Commander\fP (gmc), \fBNautilus\fP und \fBKonqueror\fP funktioniert.
 .TP
-.B AVI Untertitel Dateien
+.B Externe Untertiteldateien (Jede MRL)
 .br
-Dateien mit Textuntertiteln können (durch ein `?' getrennt) an die Datei-MRL angehängt werden:
+Dateien mit Textuntertiteln können an die Datei-MRL angehängt werden:
 .br
-.BI file:// <Pfad> ? <Untertiteldatei>
+.BI <mrl>:: <Untertiteldateien>
+.br
+Dies ist eine xine-ui spezifische Option, um Untertitel anzugeben. Der Dateiname wird vom Frontend extrahiert, wodurch der Eintrag editierbar und abspeicherbar ist.
+.br
+.BI <mrl>#subtitle: <Untertiteldatei>
+.br
+Dies ist eine xine-lib spezifische Option, um Untertitel anzugeben. Das Frontend wird diese Option ignorieren.
 .TP
 .B Abspieloptionen
 .br
-Nach einem trennenden
-.B #
+Nach einem trennenden \fB#\fP
 können Parameter für den Abspielvorgang angegeben werden:
 .TP
 .B novideo
@@ -253,6 +316,9 @@ setzt die Dynamikkompression
 .TP
 .IB <Konfigurationseintrag> : <Wert>
 weist einem Konfigurationseintrag einen neuen Wert zu
+.TP
+.BI cfg:/ <Konfigurationseintrag> : <Wert>
+Konfigurationseintrag 'on the fly' ändern. Im Unterschied zu Datenstromoptionen können so alle Optionen \fIvor\fP der Wiedergabe geändert werden.
 .RE
 
 .SH "BEDIENTASTEN"
@@ -269,7 +335,7 @@ Springe zum angegebenen Prozentsatz. Diese Möglichkeit ist allgemeiner als die "
 Seitenverhältnis (AUTO/16:9/4:3/DVB) umschalten.
 .IP  "\fBC\fP-\fBa\fP"
 Mediamark für aktuelle Apspielposition der Wiedergabeliste hinzufügen.
-.IP  "\fBM\fP\-\fBC\fP | \fBM\fP\-\fBc\fP"
+.IP  "\fBM\fP\-\fBC\fP"
 Fenster mit Video\-Einstellungen anzeigen/verdecken.
 .IP  "\fBE\fP"
 Momentanes Medium/Titel auswerfen.
@@ -285,18 +351,22 @@ Video\-Ausgabefenster anzeigen/verdecken.
 Deinterlace\-Methode umschalten.
 .IP  "\fBl\fP"
 Zwischen Wiederholungsmodi umschalten.
-.IP  "\fBM\fP\-\fBl\fP | \fBM\fP\-\fBL\fP"
+.IP  "\fBM\fP\-\fBl\fP
 Fenster mit Meldungen anzeigen/verdecken.
-.IP  "\fBM\fP\-\fBm\fP | \fBM\fP\-\fBM\fP"
+.IP  "\fBM\fP\-\fBm\fP"
 Fenster mit MRL\-Browser anzeigen/verdecken.
-.IP  "\fBC\fP\-\fBm\fP | \fBC\fP\-\fBM\fP"
+.IP  "\fBC\fP\-\fBm\fP"
 Ton\-Stummschaltung umschalten.
 .IP  "\fBCM\fP\-\fBo\fP"
 TV\-Modus der DXR3 umschalten.
-.IP  "\fBM\fP\-\fBp\fP | \fBM\fP\-\fBP\fP"
+.IP "\fBC\fP\-\fBo\fP"
+Dateibrowser öffnen.
+.IP  "\fBM\fP\-\fBp\fP"
 Fenster mit Wiedergabeliste anzeigen/verdecken.
 .IP  "\fBQ\fP"
 Beenden.
+.IP  "\fBd\fP"
+Monitor in DPMS-Bereitschaftsmodus schalten.
 .IP  "\fBs\fP"
 Zoom auf 1:1 zurücksetzen.
 .IP  "\fBS\fP"
@@ -311,6 +381,12 @@ Zoom zurücksetzen.
 Lautstärke verringern.
 .IP  "\fBV\fP"
 Lautstärke erhöhen.
+.IP  "\fBC\fP\-\fBv\fP"
+Verstärkungslevel verringern.
+.IP  "\fBC\fP\-\fBV\fP"
+Verstärkungslevel erhöhen.
+.IP  "\fBC\fP\-\fBA\fP"
+Verstärkungslevel zurücksetzen.
 .IP  "\fBt\fP"
 Bildschirmschnappschuß machen.
 .IP  "\fB<RETURN>\fP"
@@ -353,7 +429,7 @@ Menü 2 (insbesondere Titlemenü)
 Menü 3
 .IP  "\fB<Einfg>\fP"
 Mauszeiger ein\-/ausblenden
-.IP  "\fBM\fP-fBe\fP"
+.IP  "\fBM\fP-\fBe\fP"
 Ereignissendefenster anzeichen/verdecken.
 .IP  "\fBM\fP-\fBi\fP"
 Fenster mit Datenstrominformationen anzeichen/verdecken.
@@ -388,19 +464,23 @@ Ereignis auswählen.
 .SS "Synchonisationsfeinheiten"
 Einige Titel haben schlechte Zeitmarken, so daß die Synchonisation nicht funktioniert.
 Dies kann mit folgenden Tasten korrigiert werden:
-.IP  "\fBn\fP | \fBN\fP"
+.IP  "\fBn\fP"
 Falls das Video dem Ton hinterherhinkt.
-.IP  "\fBm\fP | \fBM\fP"
+.IP  "\fBm\fP"
 Falls das Video dem Ton vorauseilt.
 .IP  "\fB<Pos1>\fP"
 Video/Ton\-Differenz auf \fB0\fP zurücksetzen, so daß die Zeitmarken unverändert bleiben.
+
+.SS "Untertitelsynchronisation"
+Die Synchronisation der Untertitel kann mit folgenden Tasten korrigiert werden:
+.IP  "\fBN\fP | \fBM\fP"
 
 .SS Numerische Eingabe
 Die Zifferntasten können zur Eingabe von Zahlen verwendet werden, aber aus Rückwärtskompatibilitätsgründen sind die Zifferntasten nicht mit den korrespondirenden Zahlen belegt. Vielmehr sind sie mit Symbolen belegt, die normalerweise nicht mit der Tastatur erzeugt werden können. Deshalb ist die numerische Eingabe standardmäßig deaktiviert.
 .PP
 Diese Einstellungen lassen sich aber verändern, indem "SetPosition\fI<X>\fR%" und "Number\fI<Y>\fR" Tasten zugeordnet werden (\fIX\fP ist 0, 10, .. 90 und \fIY\fP ist 0..9). Dazu müssen in der xine keymap-Datei \fI~/.xine/keymap\fP folgende Zeile ersetzt werden:
 
-.Vb 119
+.Vb
 # Setze Position auf den Anfang bzw. 10..90% des Datemstroms.
 SetPosition0% {
 	key = 0
