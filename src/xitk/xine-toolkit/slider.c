@@ -38,7 +38,7 @@
 #define COMPUTE_COORDS(X,Y)                                                \
      {                                                                     \
        if(private_data->sType == XITK_HSLIDER) {                           \
-         private_data->pos = (int) ((X - sl->x) * private_data->ratio);    \
+         private_data->pos = rint ((X - sl->x) * private_data->ratio);    \
        }                                                                   \
        else if(private_data->sType == XITK_VSLIDER) {                      \
          private_data->pos = (int) ((private_data->bg_skin->height         \
@@ -333,15 +333,18 @@ static int notify_click_slider (xitk_widget_list_t *wl,
 
 	switch(sliderevent.type) {
 	  
-	case MotionNotify:
+	case MotionNotify: {
+	  int maxx = (sl->x + sl->width);
+	  int maxy = (sl->y + sl->height);
 	  
 	  while (XCheckMaskEvent (private_data->imlibdata->x.disp, ButtonMotionMask,
 				  &sliderevent));
 
-	  COMPUTE_COORDS(sliderevent.xbutton.x, sliderevent.xbutton.y);
+	  COMPUTE_COORDS(((sliderevent.xbutton.x <= maxx) ? sliderevent.xbutton.x : maxx),
+			 ((sliderevent.xbutton.y <= maxy) ? sliderevent.xbutton.y : maxy));
 	  
 	  paint_slider(sl, wl->win, wl->gc);
-	 
+	  
 	  /*
 	   * Callback exec on all of motion events
 	   */
@@ -356,7 +359,8 @@ static int notify_click_slider (xitk_widget_list_t *wl,
 					  private_data->motion_userdata,
 					  retpos);
 	  }
-	  break;
+	}
+	break;
 
 	case ButtonRelease:
 	  private_data->bClicked = 0;
@@ -573,7 +577,7 @@ void xitk_slider_set_pos(xitk_widget_list_t *wl, xitk_widget_t *sl, int pos) {
       paint_slider(sl, wl->win, wl->gc);
     }
     else
-      xitk_slider_reset(wl, sl);    
+      xitk_slider_reset(wl, sl);
   } 
 }
 
@@ -600,14 +604,7 @@ static xitk_widget_t *_xitk_slider_create (xitk_skin_config_t *skonfig, xitk_sli
   private_data->bArmed                   = 0;
   private_data->min                      = s->min;
 
-  /* 
-   * This is a hack, yes, but some Xv driver (Gatos ATI) report
-   * ~0 as max range value and this confuse our slider.
-   */
-  if(s->max == ~0)
-    s->max = 2147483647;
-
-  if(s->max < s->min) 
+  if(s->max <= s->min) 
     private_data->max                    = s->min + 1;
   else
     private_data->max                    = s->max;
@@ -620,7 +617,7 @@ static xitk_widget_t *_xitk_slider_create (xitk_skin_config_t *skonfig, xitk_sli
   }
   else
     private_data->realmin                = s->min;
-  
+
   private_data->pos                      = 0;
   private_data->step                     = s->step;
   private_data->paddle_skin              = pad_skin;
