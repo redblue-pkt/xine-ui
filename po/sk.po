@@ -1,13 +1,13 @@
 # Slovak xine-ui.po file.
 # Copyright (C) 2002 Free Software Foundation, Inc.
-# Daniel Bena <Daniel.Bena at dm-drogeriemarkt . sk>, 2003.
+# Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>, 2003.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.23\n"
 "POT-Creation-Date: 2003-10-09 17:52+0200\n"
 "PO-Revision-Date: 2003-10-16 12:20+ZONE\n"
-"Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
+"Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
@@ -1002,7 +1002,7 @@ msgid ""
 "  -F, --xineramafull           start in xinerama fullscreen (display on "
 "several screens),\n"
 msgstr ""
-"  -f, --fullscreen             ¹tart v xinerama plnoobrazovkovom re¾ime "
+"  -F, --xineramafull           ¹tart v xinerama plnoobrazovkovom re¾ime "
 "zobrazenie na niekoµko obrazoviek),\n"
 
 #: src/xitk/main.c:496
@@ -1245,6 +1245,11 @@ msgid ""
 "parameters.\n"
 "                                 Syntax is the same as --post option.\n"
 msgstr ""
+"  -D, --deinterlace [post]...  Deinterlace video výstup. Jeden alebo viac "
+"pluginov\n"
+"                                 mô¾e by» zadaných, s voliteµnými "
+"parametrami.\n"
+"                                 Syntax je rovnaká ako pri --post voµbe.\n"
 
 #: src/xitk/main.c:544
 msgid ""
@@ -1263,6 +1268,7 @@ msgstr ""
 msgid ""
 "      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
 msgstr ""
+"      --broadcast-port <port>  Nastavi» port xine vysielaèa (master)\n"
 
 #: src/xitk/main.c:548
 msgid ""
@@ -1412,7 +1418,7 @@ msgid ""
 "*drum roll*, xine lib wants to take your attention to deliver an important "
 "message to you ;-):"
 msgstr ""
-"*tadá*, xine lib chce upúta» Va¹u pozornos», aby doruèil dôle¾itú správu ;-):"
+"*tadá*, xine lib chce upúta» Va¹u pozornos», aby Vám doruèil dôle¾itú správu ;-):"
 
 #: src/xitk/main.c:964
 msgid "No Informations available."
