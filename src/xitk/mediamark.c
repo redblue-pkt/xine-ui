@@ -402,7 +402,6 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	  int   linen = 0;
 	  char *ln;
 	  
-
 	  path = strrchr(filename, '/');
 	  if(path && (path > filename)) {
 	    origin = (char *) xine_xmalloc((path - filename) + 2);
