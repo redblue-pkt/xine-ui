@@ -1279,6 +1279,12 @@ static void kbedit_select(int s) {
  */
 static void kbedit_unset(void) {
 
+  if(xitk_labelbutton_get_state(kbedit->alias))
+    xitk_labelbutton_set_state(kbedit->alias, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
+  
+  if(xitk_labelbutton_get_state(kbedit->edit))
+    xitk_labelbutton_set_state(kbedit->edit, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
+  
   xitk_disable_widget(kbedit->alias);
   xitk_disable_widget(kbedit->edit);
   xitk_disable_widget(kbedit->delete);
