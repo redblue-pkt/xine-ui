@@ -302,14 +302,313 @@ static void gui_signal_handler (int sig) {
 }
 
 /*
+ *
+ */
+void gui_execute_action_id(action_id_t action) {
+  xine_event_t   xine_event;
+
+  switch(action) {
+    
+  case ACTID_WINDOWREDUCE:
+  case ACTID_WINDOWENLARGE:
+    if(!video_window_is_fullscreen()) {
+      int x, y;
+      unsigned int w, h, b, d;
+      Window rootwin;
+      
+      XLockDisplay (gGui->display);
+      
+      if(XGetGeometry(gGui->display, 
+		      gGui->video_window, &rootwin, 
+		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
+      }
+      
+      if(action == ACTID_WINDOWREDUCE) {
+	w /= 1.2;
+	h /= 1.2;
+      }
+      else {
+	w *= 1.2;
+	h *= 1.2;
+      }
+      
+      XResizeWindow (gGui->display, gGui->video_window, w, h);
+      XUnlockDisplay(gGui->display);
+      
+    }
+    break;
+
+  case ACTID_SPU_NEXT:
+    gui_change_spu_channel(NULL, (void*)GUI_NEXT);
+    break;
+    
+  case ACTID_SPU_PRIOR:
+    gui_change_spu_channel(NULL, (void*)GUI_PREV);
+    break;
+    
+  case ACTID_CONTROLSHOW:
+    gui_control_show(NULL, NULL);
+    break;
+    
+  case ACTID_TOGGLE_WINOUT_VISIBLITY:
+    gui_toggle_visibility (NULL, NULL);
+    break;
+      
+  case ACTID_AUDIOCHAN_NEXT:
+    gui_change_audio_channel(NULL, (void*)GUI_NEXT);
+    break;
+    
+  case ACTID_AUDIOCHAN_PRIOR:
+    gui_change_audio_channel(NULL, (void*)GUI_PREV);
+    break;
+    
+  case ACTID_PAUSE:
+    gui_pause (NULL, (void*)(1), 0); 
+    break;
+
+  case ACTID_PLAYLIST:
+    gui_playlist_show(NULL, NULL);
+    break;
+      
+  case ACTID_TOGGLE_VISIBLITY:
+    panel_toggle_visibility (NULL, NULL);
+    break;
+
+  case ACTID_TOGGLE_FULLSCREEN:
+    gui_toggle_fullscreen(NULL, NULL);
+    break;
+
+  case ACTID_TOGGLE_ASPECT_RATIO:
+    gui_toggle_aspect();
+    break;
+
+  case ACTID_TOGGLE_INTERLEAVE:
+    gui_toggle_interlaced();
+    break;
+
+  case ACTID_QUIT:
+    gui_exit(NULL, NULL);
+    break;
+
+  case ACTID_PLAY:
+    gui_play(NULL, NULL);
+    break;
+
+  case ACTID_STOP:
+    gui_stop(NULL, NULL);
+    break;
+
+  case ACTID_MRL_NEXT:
+    gui_nextprev(NULL, (void*)GUI_NEXT);
+    break;
+
+  case ACTID_MRL_PRIOR:
+    gui_nextprev(NULL, (void*)GUI_PREV);
+    break;
+      
+  case ACTID_EJECT:
+    gui_eject(NULL, NULL);
+    break;
+
+  case ACTID_SET_CURPOS_10:
+    gui_set_current_position (6553);
+    break;
+
+  case ACTID_SET_CURPOS_20:
+    gui_set_current_position (13107);
+    break;
+
+  case ACTID_SET_CURPOS_30:
+    gui_set_current_position (19660);
+    break;
+
+  case ACTID_SET_CURPOS_40:
+    gui_set_current_position (26214);
+    break;
+
+  case ACTID_SET_CURPOS_50:
+    gui_set_current_position (32767);
+    break;
+    
+  case ACTID_SET_CURPOS_60:
+    gui_set_current_position (39321);
+    break;
+
+  case ACTID_SET_CURPOS_70:
+    gui_set_current_position (45874);
+    break;
+    
+  case ACTID_SET_CURPOS_80:
+    gui_set_current_position (52428);
+    break;
+    
+  case ACTID_SET_CURPOS_90:
+    gui_set_current_position (58981);
+    break;
+
+  case ACTID_SET_CURPOS_0:
+    gui_set_current_position (0);
+    break;
+
+  case ACTID_SEEK_REL_m60:
+    gui_seek_relative (-60);
+    break;
+
+  case ACTID_SEEK_REL_m15:
+    gui_seek_relative (-15);
+    break;
+
+  case ACTID_SEEK_REL_p60:
+    gui_seek_relative (60);
+    break;
+    
+  case ACTID_SEEK_REL_p15:
+    gui_seek_relative (15);
+    break;
+
+  case ACTID_MRLBROWSER:
+    gui_mrlbrowser_show(NULL, NULL);
+    break;
+    
+  case ACTID_MUTE:
+    panel_toggle_audio_mute(NULL, NULL, !gGui->mixer.mute);
+    break;
+    
+  case ACTID_AV_SYNC_m3600:
+    xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) - 3600);
+    break;
+
+  case ACTID_AV_SYNC_p3600:
+    xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) + 3600);
+    break;
+
+  case ACTID_AV_SYNC_RESET:
+    xine_set_av_offset (gGui->xine, 0);
+    break;
+
+  case ACTID_SPEED_FAST:
+    gui_change_speed_playback(NULL, (void*)GUI_PREV);
+    break;
+    
+  case ACTID_SPEED_SLOW:
+    gui_change_speed_playback(NULL, (void*)GUI_NEXT);
+    break;
+
+  case ACTID_pVOLUME:
+    gui_increase_audio_volume();
+    break;
+
+  case ACTID_mVOLUME:
+    gui_decrease_audio_volume();
+    break;
+
+  case ACTID_SNAPSHOT:
+    panel_snapshot(NULL, NULL);
+    break;
+    
+  case ACTID_XINESHOT:
+    panel_execute_xineshot(NULL, NULL);
+    break;
+    
+    /* events for advanced input plugins: */
+
+  case ACTID_EVENT_MENU1:
+    xine_event.type = XINE_EVENT_INPUT_MENU1;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_MENU2:
+    xine_event.type = XINE_EVENT_INPUT_MENU2;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_MENU3:
+    xine_event.type = XINE_EVENT_INPUT_MENU3;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_UP:
+    xine_event.type = XINE_EVENT_INPUT_UP;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_DOWN:
+    xine_event.type = XINE_EVENT_INPUT_DOWN;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_LEFT:
+    xine_event.type = XINE_EVENT_INPUT_LEFT;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_RIGHT:
+    xine_event.type = XINE_EVENT_INPUT_RIGHT;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_NEXT:
+    xine_event.type = XINE_EVENT_INPUT_NEXT;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_PRIOR:
+    xine_event.type = XINE_EVENT_INPUT_PREVIOUS;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+  
+  case ACTID_EVENT_ANGLE_NEXT:
+    xine_event.type = XINE_EVENT_INPUT_ANGLE_NEXT;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+
+  case ACTID_EVENT_ANGLE_PRIOR:
+    xine_event.type = XINE_EVENT_INPUT_ANGLE_PREVIOUS;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+    
+  case ACTID_EVENT_SELECT:
+    xine_event.type = XINE_EVENT_INPUT_SELECT;
+    xine_send_event(gGui->xine, &xine_event);
+    break;
+    
+  case ACTID_ZOOM_1_1:
+    if(!video_window_is_fullscreen()) {
+      int width, height, ratio_code, format;
+      uint8_t *y, *u, *v;
+      
+      if( xine_get_current_frame (gGui->xine, &width, &height,
+				  &ratio_code, &format,
+				  &y, &u, &v) ) {
+	
+	XLockDisplay (gGui->display);
+	XResizeWindow (gGui->display, gGui->video_window, width, height);
+	XUnlockDisplay(gGui->display);
+      }
+    }
+    break;
+    
+  case ACTID_GRAB_POINTER:
+    if(!gGui->cursor_grabbed) {
+      if(!panel_is_visible())
+	XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
+      
+      gGui->cursor_grabbed = 1;
+    } else {
+      XUngrabPointer(gGui->display, CurrentTime);
+      gGui->cursor_grabbed = 0;
+    }
+    break;
+
+  default:
+    break;
+  }
+}	    
+
+/*
  * top-level event handler
  */
 void gui_handle_event (XEvent *event, void *data) {
-  XKeyEvent      mykeyevent;
-  KeySym         mykey;
-  char           kbuf[256];
-  int            len;
-  xine_event_t   xine_event;
 
   switch(event->type) {
 
@@ -339,324 +638,10 @@ void gui_handle_event (XEvent *event, void *data) {
   }
   break;
 
-  case KeyPress: {
-    int modifier;
-
-    (void) xitk_get_key_modifier(event, &modifier);
-
-    mykeyevent = event->xkey;
+  case KeyPress:
+    kbindings_handle_kbinding(gGui->kbindings, event);
+    break;
     
-    /* printf ("KeyPress (state : %d, keycode: %d)\n", mykeyevent.state, mykeyevent.keycode);  */
-    
-    XLockDisplay (gGui->display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay (gGui->display);
-
-    switch (mykey) {
-	
-    case XK_less:
-    case XK_greater:
-      if(modifier & MODIFIER_CTRL) {
-	if(!video_window_is_fullscreen()) {
-	  int x, y;
-	  unsigned int w, h, b, d;
-	  Window rootwin;
-	  
-	  XLockDisplay (gGui->display);
-	  
-	  if(XGetGeometry(gGui->display, 
-			  gGui->video_window, &rootwin, 
-			  &x, &y, &w, &h, &b, &d) != BadDrawable) {
-	  }
-	
-	  if(mykey == XK_less) {
-	    w /= 1.2;
-	    h /= 1.2;
-	  }
-	  else {
-	    w *= 1.2;
-	    h *= 1.2;
-	  }
-	
-	  XResizeWindow (gGui->display, gGui->video_window, w, h);
-	  XUnlockDisplay(gGui->display);
-	
-	}
-      }
-      break;
-
-    case XK_period:
-      gui_change_spu_channel(NULL, (void*)GUI_NEXT);
-      break;
-      
-    case XK_comma:
-      gui_change_spu_channel(NULL, (void*)GUI_PREV);
-      break;
-
-    case XK_c:
-    case XK_C:
-      if(modifier & MODIFIER_META)
-	gui_control_show(NULL, NULL);
-      break;
-
-    case XK_h:
-    case XK_H:
-      gui_toggle_visibility (NULL, NULL);
-      break;
-      
-    case XK_plus:
-    case XK_KP_Add:
-      gui_change_audio_channel(NULL, (void*)GUI_NEXT);
-      break;
-      
-    case XK_minus:
-    case XK_KP_Subtract:
-      gui_change_audio_channel(NULL, (void*)GUI_PREV);
-      break;
-      
-    case XK_space:
-      gui_pause (NULL, (void*)(1), 0); 
-      break;
-
-    case XK_P:
-    case XK_p:
-      if(modifier & MODIFIER_META)
-	gui_playlist_show(NULL, NULL);
-      else
-	gui_pause (NULL, (void*)(1), 0); 
-      break;
-      
-    case XK_g:
-    case XK_G:
-      panel_toggle_visibility (NULL, NULL);
-      break;
-
-    case XK_f:
-    case XK_F:
-      gui_toggle_fullscreen(NULL, NULL);
-      break;
-
-    case XK_a:
-    case XK_A:
-      gui_toggle_aspect();
-      break;
-
-    case XK_i:
-    case XK_I:
-      gui_toggle_interlaced();
-      break;
-
-    case XK_q:
-    case XK_Q:
-      gui_exit(NULL, NULL);
-      break;
-
-    case XK_Return:
-      gui_play(NULL, NULL);
-      break;
-
-    case XK_Next:
-      gui_nextprev(NULL, (void*)GUI_NEXT);
-      break;
-
-    case XK_Prior:
-      gui_nextprev(NULL, (void*)GUI_PREV);
-      break;
-      
-    case XK_e:
-    case XK_E:
-      gui_eject(NULL, NULL);
-      break;
-
-    case XK_1:
-      gui_set_current_position (6553);
-      break;
-
-    case XK_2:
-      gui_set_current_position (13107);
-      break;
-
-    case XK_3:
-      gui_set_current_position (19660);
-      break;
-
-    case XK_4:
-      gui_set_current_position (26214);
-      break;
-
-    case XK_5:
-      gui_set_current_position (32767);
-      break;
-
-    case XK_6:
-      gui_set_current_position (39321);
-      break;
-
-    case XK_7:
-      gui_set_current_position (45874);
-      break;
-
-    case XK_8:
-      gui_set_current_position (52428);
-      break;
-
-    case XK_9:
-      gui_set_current_position (58981);
-      break;
-
-    case XK_0:
-      gui_set_current_position (0);
-      break;
-
-    case XK_Left:
-      if(modifier & MODIFIER_CTRL) 
-	gui_seek_relative (-60);
-      else
-	gui_seek_relative (-15);
-      break;
-
-    case XK_Right:
-      if(modifier & MODIFIER_CTRL) 
-	gui_seek_relative (60);
-      else
-	gui_seek_relative (15);
-      break;
-
-    case XK_n:
-    case XK_N:
-      xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) - 3600);
-      break;
-
-    case XK_m:
-    case XK_M:
-      if(modifier & MODIFIER_META)
-	gui_mrlbrowser_show(NULL, NULL);
-      else if(modifier & MODIFIER_CTRL)
-	panel_toggle_audio_mute(NULL, NULL, !gGui->mixer.mute);
-      else
-	xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) + 3600);
-      break;
-
-    case XK_Home:
-      xine_set_av_offset (gGui->xine, 0);
-      break;
-
-    case XK_Up:
-      gui_change_speed_playback(NULL, (void*)GUI_PREV);
-      break;
-
-    case XK_Down:
-      gui_change_speed_playback(NULL, (void*)GUI_NEXT);
-      break;
-
-    case XK_V:
-      gui_increase_audio_volume();
-      break;
-
-    case XK_v:
-      gui_decrease_audio_volume();
-      break;
-
-    case XK_t:
-    case XK_T:
-      panel_snapshot(NULL, NULL);
-      break;
-
-    case XK_x:
-    case XK_X:
-      panel_execute_xineshot(NULL, NULL);
-      break;
-
-      /* events for advanced input plugins: */
-
-    case XK_Escape:
-      xine_event.type = XINE_EVENT_INPUT_MENU1;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_F1:
-      xine_event.type = XINE_EVENT_INPUT_MENU2;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_F2:
-      xine_event.type = XINE_EVENT_INPUT_MENU3;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_8:
-    case XK_KP_Up:
-      xine_event.type = XINE_EVENT_INPUT_UP;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_2:
-    case XK_KP_Down:
-      xine_event.type = XINE_EVENT_INPUT_DOWN;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_4:
-    case XK_KP_Left:
-      xine_event.type = XINE_EVENT_INPUT_LEFT;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_6:
-    case XK_KP_Right:
-      xine_event.type = XINE_EVENT_INPUT_RIGHT;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_9:
-    case XK_KP_Prior:
-      xine_event.type = XINE_EVENT_INPUT_NEXT;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_3:
-    case XK_KP_Next:
-      xine_event.type = XINE_EVENT_INPUT_PREVIOUS;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_Enter:
-      xine_event.type = XINE_EVENT_INPUT_SELECT;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_7:
-      xine_event.type = XINE_EVENT_INPUT_ANGLE_NEXT;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    case XK_KP_1:
-      xine_event.type = XINE_EVENT_INPUT_ANGLE_PREVIOUS;
-      xine_send_event(gGui->xine, &xine_event);
-      break;
-    
-    case XK_s:
-    case XK_S:
-      if(!video_window_is_fullscreen()) {
-        int width, height, ratio_code, format;
-        uint8_t *y, *u, *v;
-        
-        if( xine_get_current_frame (gGui->xine, &width, &height,
-				    &ratio_code, &format,
-				    &y, &u, &v) ) {
-          
-          XLockDisplay (gGui->display);
-          XResizeWindow (gGui->display, gGui->video_window, width, height);
-          XUnlockDisplay(gGui->display);
-        }
-      }
-      break;
-    
-    case XK_Insert:
-      if(!gGui->cursor_grabbed) {
-	 if(!panel_is_visible())
-	   XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
-	 
-	 gGui->cursor_grabbed = 1;
-      } else {
-	 XUngrabPointer(gGui->display, CurrentTime);
-	 gGui->cursor_grabbed = 0;
-      }
-      break;
-	    
-    }
-  }
-  break;
-
   case ConfigureNotify:
     break;
 
@@ -944,12 +929,13 @@ void gui_init (int nfiles, char *filenames[]) {
   /*
    * create and map panel and video window
    */
-
   xine_pid = getppid();
 
   xitk_init(gGui->display);
 
   init_skins_support();
+
+  gGui->kbindings = kbindings_init_kbinding();
 
   gGui->running = 1;
 

@@ -14,14 +14,14 @@ endif
 
 xine_SOURCES = $(GETOPT_C) utils.c xscreensaver-remote.c \
 	main.c event.c control.c playlist.c \
-	videowin.c panel.c lirc.c actions.c mrl_browser.c \
+	videowin.c panel.c kbindings.c lirc.c actions.c mrl_browser.c \
 	snapshot.c skins.c #monitor.c
 xine_DEPENDENTIES = utils.h monitor.h 
 xine_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 	@XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	$(X_LIBS) $(DPMS_LIBS) -lX11 -lm
 
-noinst_HEADERS = $(GETOPT_H) event.h playlist.h control.h skins.h \
+noinst_HEADERS = $(GETOPT_H) event.h playlist.h control.h skins.h kbindings.h \
 	panel.h lirc.h actions.h videowin.h mrl_browser.h snapshot.h
 
 utils.c:

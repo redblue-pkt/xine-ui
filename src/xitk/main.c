@@ -80,6 +80,7 @@ int       no_lirc;
 
 #define	OPTION_VISUAL		1000
 #define	OPTION_INSTALL_COLORMAP	1001
+#define DISPLAY_KEYMAP          1002
 
 /* options args */
 static const char *short_options = "?h"
@@ -94,29 +95,30 @@ static const char *short_options = "?h"
 #endif
  "R::u:a:V:A:D:p::s:g:f:v";
 static struct option long_options[] = {
-  {"help"           , no_argument      , 0, 'h' },
+  {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
-  {"no-lirc"        , no_argument      , 0, 'L' },
+  {"no-lirc"        , no_argument      , 0, 'L'                      },
 #endif
 #ifdef HAVE_XF86VIDMODE
-  {"use-xvidext"    , no_argument      , 0, 'F'},
+  {"use-xvidext"    , no_argument      , 0, 'F'                      },
 #endif
 #ifdef debug
-  {"debug"          , required_argument, 0, 'd' },
+  {"debug"          , required_argument, 0, 'd'                      },
 #endif
-  {"recognize-by"   , optional_argument, 0, 'R' },
-  {"spu-channel"    , required_argument, 0, 'u' },
-  {"audio-channel"  , required_argument, 0, 'a' },
-  {"video-driver"   , required_argument, 0, 'V' },
-  {"audio-driver"   , required_argument, 0, 'A' },
-  {"auto-play"      , optional_argument, 0, 'p' },
-  {"auto-scan"      , required_argument, 0, 's' },
-  {"hide-gui"       , no_argument,       0, 'g' },
-  {"fullscreen"     , no_argument,       0, 'f' },
-  {"visual"	    , required_argument, 0,  OPTION_VISUAL },
+  {"recognize-by"   , optional_argument, 0, 'R'                      },
+  {"spu-channel"    , required_argument, 0, 'u'                      },
+  {"audio-channel"  , required_argument, 0, 'a'                      },
+  {"video-driver"   , required_argument, 0, 'V'                      },
+  {"audio-driver"   , required_argument, 0, 'A'                      },
+  {"auto-play"      , optional_argument, 0, 'p'                      },
+  {"auto-scan"      , required_argument, 0, 's'                      },
+  {"hide-gui"       , no_argument,       0, 'g'                      },
+  {"fullscreen"     , no_argument,       0, 'f'                      },
+  {"visual"	    , required_argument, 0,  OPTION_VISUAL           },
   {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
-  {"version"        , no_argument      , 0, 'v' },
-  {0                , no_argument      , 0,  0  }
+  {"keymap"         , optional_argument, 0,  DISPLAY_KEYMAP          },
+  {"version"        , no_argument      , 0, 'v'                      },
+  {0                , no_argument      , 0,  0                       }
 };
 
 /*
@@ -198,6 +200,11 @@ void show_usage (void) {
   printf("      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n");
   printf("                               is either an X11 visual class, or a visual id.\n");
   printf("      --install                Install a private colormap.\n");
+  printf("      --keymap [option]        Display keymap. Option are:\n");
+  printf("                                 'default': display default keymap table,\n");
+  printf("                                 'lirc': display draft of a .lircrc config file.\n");
+  printf("                                 'remapped': user remapped keymap table.\n");
+  printf("                                 -if no option is given, 'default' is selected.\n");
 #ifdef DEBUG
   printf("  -d, --debug <flags>          Debug mode for <flags> ('help' for list).\n");
 #endif
@@ -692,6 +699,23 @@ int main(int argc, char *argv[]) {
 
     case OPTION_INSTALL_COLORMAP:
       gGui->install_colormap = 1;
+      break;
+
+    case DISPLAY_KEYMAP:
+      if(optarg != NULL) {
+	char *p = chomp(optarg);
+	if(!strcasecmp(p, "default"))
+	  kbindings_display_default_bindings();
+	else if(!strcasecmp(p, "lirc"))
+	  kbindings_display_default_lirc_bindings();
+	else if(!strcasecmp(p, "remapped"))
+	  kbindings_display_current_bindings((kbindings_init_kbinding()));
+	else
+	  kbindings_display_default_bindings();
+      }
+      else
+	kbindings_display_default_bindings();
+      exit(1);
       break;
 
     case 'v': /* Display version and exit*/

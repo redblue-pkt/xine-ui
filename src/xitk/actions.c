@@ -69,10 +69,10 @@ void gui_exit (xitk_widget_t *w, void *data) {
   gGui->running = 0;
 
 #ifdef HAVE_LIRC
-  if(gGui->lirc_enable) {
+  if(gGui->lirc_enable)
     deinit_lirc();
-  }
 #endif
+
   xitk_stop();
   xitk_skin_unload_config(gGui->skin_config);
 }

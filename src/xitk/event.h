@@ -26,8 +26,9 @@
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
-#include "xine.h"
+#include "kbindings.h"
 #include "xitk.h"
+#include "xine.h"
 
 #ifdef __GNUC__
 #define perr(FMT,ARGS...) {fprintf(stderr, FMT, ##ARGS);fflush(stderr);}
@@ -96,7 +97,7 @@ typedef struct {
 #endif
 
 #ifdef HAVE_XF86VIDMODE
-  int                 XF86VidMode_fullscreen;
+  int                  XF86VidMode_fullscreen;
 #endif
 
   struct {
@@ -106,11 +107,13 @@ typedef struct {
     int                mute;
   } mixer;
 
-  xitk_register_key_t          widget_key;
+  xitk_register_key_t  widget_key;
 
   int                  layer_above;
   int                  reparent_hack;
-
+  
+  kbinding_t          *kbindings;
+  
 } gGui_t;
 
 
@@ -139,7 +142,6 @@ void config_reset(void);
 char *gui_get_skindir(void);
 char *gui_get_configfile(void);
 
-
 void gui_init (int nfiles, char *filenames[]);
 
 void gui_run ();
@@ -147,6 +149,8 @@ void gui_run ();
 void gui_status_callback (int nStatus) ;
 
 void gui_dndcallback (char *filename) ;
+
+void gui_execute_action_id(action_id_t);
 
 void gui_handle_event (XEvent *event, void *data);
 
