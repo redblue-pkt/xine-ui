@@ -338,7 +338,6 @@ void gui_execute_action_id(action_id_t action) {
       
       XResizeWindow (gGui->display, gGui->video_window, w, h);
       XUnlockDisplay(gGui->display);
-      
     }
     break;
 

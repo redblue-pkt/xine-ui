@@ -168,22 +168,18 @@ void video_window_select_visual (void) {
   XVisualInfo *vinfo = (XVisualInfo *) -1;
 
   XLockDisplay (gGui->display);
-  if (gGui->vo_driver)
-  {
+  if (gGui->vo_driver) {
     gGui->vo_driver->gui_data_exchange (gGui->vo_driver, GUI_SELECT_VISUAL,
                                         &vinfo);
-    if (vinfo != (XVisualInfo *) -1)
-    {
-      if (! vinfo)
-      {
+    if (vinfo != (XVisualInfo *) -1) {
+      if (! vinfo) {
         fprintf (stderr, "videowin: output driver cannot select a working visual\n");
         exit (1);
       }
       gGui->visual = vinfo->visual;
       gGui->depth  = vinfo->depth;
     }
-    if (gGui->visual != gVw->visual)
-    {
+    if (gGui->visual != gVw->visual) {
       printf ("videowin: output driver overrides selected visual to visual id 0x%lx\n", gGui->visual->visualid);
       gui_init_imlib (gGui->visual);
     }
@@ -198,6 +194,12 @@ void video_window_select_visual (void) {
 void video_window_change_sizepos(int x, int y, int w, int h) {
   gVw->xwin = x;
   gVw->ywin = y;
+
+  if(w && h) {
+    gVw->output_width = w;
+    gVw->output_height = h;
+  }
+
   /*  printf("video window change: %d %d %d %d\n", x, y, w, h); */
 }
 
