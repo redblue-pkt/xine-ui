@@ -83,8 +83,7 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
     xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)),                      \
 	      (frame = xitk_noskin_image_create(setup->widget_list, &im, image, x, y)));        \
                                                                                                 \
-    setup->tmp_widgets[setup->num_tmp_widgets] = frame;                                         \
-    setup->num_tmp_widgets++;                                                                   \
+    add_widget_to_list(frame);                                                                  \
     wt->frame = frame;                                                                          \
     x += 10;                                                                                    \
     y += FRAME_HEIGHT >> 1;                                                                     \
@@ -161,11 +160,11 @@ typedef struct {
   char                 *sections[20];
   int                   num_sections;
   
-  xitk_widget_t        *tmp_widgets[200];
-  int                   num_tmp_widgets;
+  /* Store widgets, this is needed to free them on tabs switching */
+  xitk_list_t          *widgets;
   
   xitk_widget_t        *slider_wg;
-  widget_triplet_t     *wg[100];
+  widget_triplet_t     *wg[1024]; /* I hope that will not be reached, never */
   int                   num_wg;
   int                   first_displayed;
 
@@ -184,6 +183,9 @@ static _setup_t    *setup = NULL;
 
 static void setup_end(xitk_widget_t *, void *);
 
+static void add_widget_to_list(xitk_widget_t *w) {
+  xitk_list_append_content(setup->widgets, (void *) w);  
+}
 
 /*
  * Leaving setup panel, release memory.
@@ -192,7 +194,6 @@ void setup_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
   int           i;
   
-
   setup->running = 0;
   setup->visible = 0;
 
@@ -209,6 +210,8 @@ void setup_exit(xitk_widget_t *w, void *data) {
 
   setup->xwin = None;
   xitk_list_free((XITK_WIDGET_LIST_LIST(setup->widget_list)));
+  xitk_list_free(setup->widgets);
+  free(setup->widgets);
   
   XLockDisplay(gGui->display);
   XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(setup->widget_list)));
@@ -456,8 +459,8 @@ static xitk_widget_t *setup_add_label (int x, int y, int w, const char *str) {
 			   (label = xitk_noskin_label_create(setup->widget_list, &lb,
 							     x, y, w, height, fontname)));
 
-  setup->tmp_widgets[setup->num_tmp_widgets] = label;
-  setup->num_tmp_widgets++;
+  
+  add_widget_to_list(label);
 
   return label;
 }
@@ -519,8 +522,7 @@ static widget_triplet_t *setup_add_slider (const char *title, const char *labelk
 
   ADD_LABEL(slider);
 
-  setup->tmp_widgets[setup->num_tmp_widgets] = slider;
-  setup->num_tmp_widgets++;
+  add_widget_to_list(slider);
 
   wt->widget = slider;
 
@@ -554,14 +556,10 @@ static widget_triplet_t *setup_add_inputnum(const char *title, const char *label
 
   ADD_LABEL(intbox);
   
-  setup->tmp_widgets[setup->num_tmp_widgets] = intbox;
-  setup->num_tmp_widgets++;
-  setup->tmp_widgets[setup->num_tmp_widgets] = wi;
-  setup->num_tmp_widgets++;
-  setup->tmp_widgets[setup->num_tmp_widgets] = wbu;
-  setup->num_tmp_widgets++;
-  setup->tmp_widgets[setup->num_tmp_widgets] = wbd;
-  setup->num_tmp_widgets++;
+  add_widget_to_list(intbox);
+  add_widget_to_list(wi);
+  add_widget_to_list(wbu);
+  add_widget_to_list(wbd);
   
   wt->widget = intbox;
 
@@ -596,9 +594,8 @@ static widget_triplet_t *setup_add_inputtext(const char *title, const char *labe
 
   ADD_LABEL(input);
 
-  setup->tmp_widgets[setup->num_tmp_widgets] = input;
-  setup->num_tmp_widgets++;
-  
+  add_widget_to_list(input);
+    
   wt->widget = input;
 
   return wt;
@@ -630,8 +627,7 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
   xitk_checkbox_set_state (checkbox, entry->num_value);  
   ADD_LABEL(checkbox);
 
-  setup->tmp_widgets[setup->num_tmp_widgets] = checkbox;
-  setup->num_tmp_widgets++;
+  add_widget_to_list(checkbox);
 
   wt->widget = checkbox;
 
@@ -667,12 +663,9 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
 
   ADD_LABEL(combo);
 
-  setup->tmp_widgets[setup->num_tmp_widgets] = combo;
-  setup->num_tmp_widgets++;
-  setup->tmp_widgets[setup->num_tmp_widgets] = lw;
-  setup->num_tmp_widgets++;
-  setup->tmp_widgets[setup->num_tmp_widgets] = bw;
-  setup->num_tmp_widgets++;
+  add_widget_to_list(combo);
+  add_widget_to_list(lw);
+  add_widget_to_list(bw);
 
   wt->widget = combo;
 
@@ -713,8 +706,7 @@ static widget_triplet_t *setup_list_browser(int x, int y, const char **content, 
   xitk_browser_set_alignment(browser, ALIGN_LEFT);
   xitk_browser_update_list(browser, content, len, 0);
 
-  setup->tmp_widgets[setup->num_tmp_widgets] = browser;
-  setup->num_tmp_widgets++;
+  add_widget_to_list(browser);
 
   wt->widget = browser;
   wt->frame  = NULL;
@@ -849,32 +841,37 @@ static void setup_section_widgets(int s) {
  */
 static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   int i;
+  xitk_widget_t *sw;
 
   for (i = 0; i < setup->num_wg; i++ ) {
     free(setup->wg[i]);
   }
 
   /* remove old widgets */
-  for (i=0; i<setup->num_tmp_widgets; i++ ) {
+  sw = (xitk_widget_t *) xitk_list_first_content(setup->widgets);
+  while(sw) {
     xitk_widget_t *w;
-
+    
     w = (xitk_widget_t *) xitk_list_first_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)));
-
+    
     while (w) {
       
-      if (setup->tmp_widgets[i] == w) {
-	xitk_destroy_widget(setup->tmp_widgets[i]);
+      if (sw == w) {
+	xitk_destroy_widget(sw);
 
 	xitk_list_delete_current ((XITK_WIDGET_LIST_LIST(setup->widget_list)));
 	
 	w = (xitk_widget_t *) (XITK_WIDGET_LIST_LIST(setup->widget_list))->cur;
-
+	
       } else
 	w = (xitk_widget_t *) xitk_list_next_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)));
-    }
+    } 
+
+    sw = (xitk_widget_t *) xitk_list_next_content(setup->widgets);
   }
 
-  setup->num_tmp_widgets = 0;
+  
+  xitk_list_free(setup->widgets);
   setup->num_wg = 0;
   setup->first_displayed = 0;
 
@@ -960,7 +957,8 @@ static void setup_sections (void) {
   
   xitk_image_destroy_xitk_pixmap(bg);
 
-  setup->num_tmp_widgets = 0;
+  setup->widgets = xitk_list_new();
+
   setup->num_wg = 0;
   setup->first_displayed = 0;
 
