@@ -33,7 +33,7 @@
 #include "options.h"
 
 #define XINE_CONFIG_DIR  ".xine"
-#define XINE_CONFIG_FILE "config2"
+#define XINE_CONFIG_FILE "config"
 
 struct fbxine fbxine =
 {

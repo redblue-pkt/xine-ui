@@ -78,7 +78,7 @@ static char                 **video_driver_ids;
 static char                 **audio_driver_ids;
 static window_attributes_t    window_attribute;
 
-#define CONFIGFILE "config2"
+#define CONFIGFILE "config"
 
 typedef struct {
   FILE    *fd;
