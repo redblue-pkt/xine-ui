@@ -51,6 +51,7 @@ vo_driver_t      *vo_driver;
 config_values_t  *config;
 xine_t           *xine;
 aa_context       *context;
+ao_functions_t   *ao_driver;
 
 void show_banner(void) {
 
@@ -61,22 +62,6 @@ void show_banner(void) {
   printf("Found xine library version: %d.%d.%d (%s).\n", 
 	 xine_get_major_version(), xine_get_minor_version(),
 	 xine_get_sub_version(), xine_get_str_version());
-}
-
-void show_usage (void) {
-  
-  printf("\n");
-  printf("Usage: aaxine MRL\n");
-  printf("\n");
-  printf("examples for valid MRLs (media resource locator):\n");
-  printf("  File:  'path/foo.vob'\n");
-  printf("         '/path/foo.vob'\n");
-  printf("         'file://path/foo.vob'\n");
-  printf("         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n");
-  printf("         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n");
-  printf("  DVD:   'dvd://VTS_01_2.VOB'\n");
-  printf("  VCD:   'vcd://<track number>'\n");
-  printf("\n");
 }
 
 void gui_status_callback (int nStatus) {
@@ -116,6 +101,22 @@ const char *get_homedir(void) {
   return homedir;
 }
 
+void print_usage () {
+  printf("usage: aaxine [aalib-options] [-A audio_driver] mrl\n"
+	 "aalib-options:\n"
+	 "%s", aa_help);
+  printf("\n");
+  printf("examples for valid MRLs (media resource locator):\n");
+  printf("  File:  'path/foo.vob'\n");
+  printf("         '/path/foo.vob'\n");
+  printf("         'file://path/foo.vob'\n");
+  printf("         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n");
+  printf("         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n");
+  printf("  DVD:   'dvd://VTS_01_2.VOB'\n");
+  printf("  VCD:   'vcd://<track number>'\n");
+  printf("\n");
+}
+
 int main(int argc, char *argv[]) {
 
   char          *mrl;
@@ -124,10 +125,11 @@ int main(int argc, char *argv[]) {
   struct termios new_settings;
   char           c;
   int            running;
+  char          *ao_drv = "oss";
 
   /* Check xine library version */
   if(!xine_check_version(0, 5, 0)) {
-    fprintf(stderr, "Require xine library version 0.5.0, found %d.%d.%d.\n", 
+    fprintf(stderr, "require xine library version 0.5.0, found %d.%d.%d.\n", 
 	    xine_get_major_version(), xine_get_minor_version(),
 	    xine_get_sub_version());
     exit(1);
@@ -136,22 +138,33 @@ int main(int argc, char *argv[]) {
   show_banner();
 
   /* aalib help and option-parsing */
- if(!aa_parseoptions(NULL, NULL, &argc, argv) || argc != 2) {
-    printf("Usage: %s [options]\n"
-           "Options:\n"
-           "%s", argv[0], aa_help);
+  if (!aa_parseoptions(NULL, NULL, &argc, argv)) {
+    print_usage();
     exit(1);
   }
 
   /*
    * parse command line
    */
-  if (argc<2) {
-    show_usage();
+  if ((argc!=2) && (argc != 4)) {
+    print_usage();
     exit(1);
   }
 
-  mrl = argv[1];
+  if (argc==4) {
+
+    if (strncmp (argv[1], "-A", 2)) {
+      print_usage();
+      exit(1);
+    } 
+    
+    ao_drv = argv[2];
+
+    mrl = argv[3];
+
+  } else {
+    mrl = argv[1];
+  }
 
 
   /*
@@ -190,12 +203,22 @@ int main(int argc, char *argv[]) {
   }
 
   /*
+   * init audio output driver
+   */
+  ao_driver = xine_load_audio_output_plugin(config,
+					    ao_drv);
+
+  if (!ao_driver) {
+    printf ("main: audio driver oss failed\n");
+  }
+
+  /*
    * xine init
    */
 
   printf ("main: starting xine engine\n");
 
-  xine = xine_init (vo_driver, NULL, 
+  xine = xine_init (vo_driver, ao_driver, 
 		    gui_status_callback, config);
 
   xine_select_audio_channel (xine, 0);
