@@ -601,14 +601,26 @@ void playlist_handle_event(XEvent *event, void *data) {
     switch (mykey) {
       
     case XK_Down:
-    case XK_Next:
-      xitk_browser_step_up(playlist->playlist, NULL);
-      break;
+    case XK_Next: {
+      xitk_widget_t *w;
       
+      w = xitk_get_focused_widget(playlist->widget_list);
+      if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
+	xitk_browser_step_up(playlist->playlist, NULL);
+      }
+    }
+    break;
+    
     case XK_Up:
-    case XK_Prior:
-      xitk_browser_step_down(playlist->playlist, NULL);
-      break;
+    case XK_Prior: {
+      xitk_widget_t *w;
+      
+      w = xitk_get_focused_widget(playlist->widget_list);
+      if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
+	xitk_browser_step_down(playlist->playlist, NULL);
+      }
+    }
+    break;
       
     default:
       gui_handle_event(event, data);
