@@ -925,6 +925,12 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
 	  inputtext_erase_with_backspace(wl, w);
 	}
 	break;
+	
+      default:
+	if((!(modifier & MODIFIER_CTRL)) &&
+	   (!(modifier & MODIFIER_META)))
+	  goto __store_as_is;
+	break;
 
       }
     }
@@ -956,30 +962,32 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, 
       inputtext_exec_escape(wl, w);
     }
     else if((buf[0] != 0) && (buf[1] == 0)) {
-      char *oldtext;
-      int pos;
-      
-      if((private_data->text != NULL) 
-	 && (strlen(private_data->text) < private_data->max_length)) {
-
-	oldtext = strdup(private_data->text);
+    __store_as_is:
+      {
+	char *oldtext;
+	int pos;
 	
-	if(strlen(private_data->text) <= private_data->cursor_pos)
-	  pos = strlen(private_data->text);
-	else
-	  pos = private_data->cursor_pos;
-
-	XITK_FREE(private_data->text);
-	private_data->text = (char *) xitk_xmalloc(strlen(oldtext) + 3);
-
-	sprintf(private_data->text, "%s", oldtext);
-	sprintf(&private_data->text[pos], "%c%s%c", buf[0], &oldtext[pos], 0);
-
-	private_data->cursor_pos++;
-	paint_inputtext(w, wl->win, wl->gc);
-	XITK_FREE(oldtext);
+	if((private_data->text != NULL) 
+	   && (strlen(private_data->text) < private_data->max_length)) {
+	  
+	  oldtext = strdup(private_data->text);
+	  
+	  if(strlen(private_data->text) <= private_data->cursor_pos)
+	    pos = strlen(private_data->text);
+	  else
+	    pos = private_data->cursor_pos;
+	  
+	  XITK_FREE(private_data->text);
+	  private_data->text = (char *) xitk_xmalloc(strlen(oldtext) + 3);
+	  
+	  sprintf(private_data->text, "%s", oldtext);
+	  sprintf(&private_data->text[pos], "%c%s%c", buf[0], &oldtext[pos], 0);
+	  
+	  private_data->cursor_pos++;
+	  paint_inputtext(w, wl->win, wl->gc);
+	  XITK_FREE(oldtext);
+	}
       }
-      
     }
 #if 0
     else {
