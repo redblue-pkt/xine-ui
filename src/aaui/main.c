@@ -61,15 +61,19 @@
  * global variables
  */
 typedef struct {
-  xine_t           *xine;
-  int               ignore_status;
-  char             *configfile;
-  aa_context       *context;
-  char             *mrl[1024];
-  int               num_mrls;
-  int               current_mrl;
-  int               running;
-  int               auto_quit;
+  xine_t            *xine;
+  xine_vo_driver_t  *vo_driver;
+  xine_ao_driver_t  *ao_driver;
+  xine_stream_t     *stream;
+
+  int                ignore_status;
+  char              *configfile;
+  aa_context        *context;
+  char              *mrl[1024];
+  int                num_mrls;
+  int                current_mrl;
+  int                running;
+  int                auto_quit;
   
   struct {
     int                enable;
@@ -282,8 +286,8 @@ static void gui_status_callback (int nStatus) {
     aaxine.current_mrl++;
    
     if (aaxine.current_mrl < aaxine.num_mrls) {
-      if(xine_open(aaxine.xine, aaxine.mrl[aaxine.current_mrl])) {
-	if(!xine_play (aaxine.xine, 0, 0))
+      if(xine_open(aaxine.stream, aaxine.mrl[aaxine.current_mrl])) {
+	if(!xine_play (aaxine.stream, 0, 0))
 	  fprintf(stderr, "xine_play() failed.\n");
       }
       else
@@ -326,7 +330,7 @@ static void gui_branched_callback (void ) {
 static void set_position (int pos) {
 
   aaxine.ignore_status = 1;
-  xine_play(aaxine.xine, pos, 0);
+  xine_play(aaxine.stream, pos, 0);
   aaxine.ignore_status = 0;
 }
 
@@ -355,8 +359,6 @@ int main(int argc, char *argv[]) {
   char                    *video_driver_id = NULL;
   int                      audio_channel   = 0;
   char                    *driver_name;
-  const xine_vo_driver_t  *vo_driver;
-  const xine_ao_driver_t  *ao_driver;
 
   /*
    * Check xine library version 
@@ -452,7 +454,7 @@ int main(int argc, char *argv[]) {
    * generate and init a config "object"
    */
   {
-    char *cfgfile = ".xine/config";
+    char *cfgfile = ".xine/config2";
     
     if (!(aaxine.configfile = getenv("XINERC"))) {
       aaxine.configfile = 
@@ -493,19 +495,19 @@ int main(int argc, char *argv[]) {
   if(!video_driver_id)
     video_driver_id = "aa";
   
-  vo_driver = xine_open_video_driver(aaxine.xine,
-				     video_driver_id,
-				     XINE_VISUAL_TYPE_AA, 
-				     (void *)aaxine.context);
+  aaxine.vo_driver = xine_open_video_driver(aaxine.xine,
+					    video_driver_id,
+					    XINE_VISUAL_TYPE_AA, 
+					    (void *)aaxine.context);
   
-  if (!vo_driver) {
-    vo_driver = xine_open_video_driver(aaxine.xine, 
-				       video_driver_id,
-				       XINE_VISUAL_TYPE_FB, 
-				       NULL);
+  if (!aaxine.vo_driver) {
+    aaxine.vo_driver = xine_open_video_driver(aaxine.xine, 
+					      video_driver_id,
+					      XINE_VISUAL_TYPE_FB, 
+					      NULL);
   }
     
-  if (!vo_driver) {
+  if (!aaxine.vo_driver) {
     printf ("main: video driver %s failed\n", video_driver_id);
     goto failure;
   }
@@ -527,42 +529,44 @@ int main(int argc, char *argv[]) {
   else
     config_update_string ("audio.driver", audio_driver_id);
   
-  ao_driver = xine_open_audio_driver(aaxine.xine, audio_driver_id, NULL);
+  aaxine.ao_driver = xine_open_audio_driver(aaxine.xine, audio_driver_id, NULL);
   
-  if (!ao_driver)
+  if (!aaxine.ao_driver)
     printf ("main: audio driver %s failed\n", audio_driver_id);
   
   /*
    * xine init
    */
-  xine_init (aaxine.xine, ao_driver, vo_driver);
+  xine_init (aaxine.xine);
   
   if(!aaxine.xine) {
     fprintf(stderr, "xine_init() failed.\n");
     goto failure;
   }
+
+  aaxine.stream = xine_stream_new(aaxine.xine, aaxine.ao_driver, aaxine.vo_driver);
   
   /* Init mixer control */
   aaxine.mixer.enable = 0;
   aaxine.mixer.caps = 0;
   
-  if(xine_get_param(aaxine.xine, XINE_PARAM_AO_MIXER_VOL))
+  if(xine_get_param(aaxine.stream, XINE_PARAM_AO_MIXER_VOL))
     aaxine.mixer.caps |= XINE_PARAM_AO_MIXER_VOL;
-  if(xine_get_param(aaxine.xine, XINE_PARAM_AO_PCM_VOL))
+  if(xine_get_param(aaxine.stream, XINE_PARAM_AO_PCM_VOL))
     aaxine.mixer.caps |= XINE_PARAM_AO_PCM_VOL;
-  if(xine_get_param(aaxine.xine, XINE_PARAM_AO_MUTE))
+  if(xine_get_param(aaxine.stream, XINE_PARAM_AO_MUTE))
     aaxine.mixer.caps |= XINE_PARAM_AO_MUTE;
 
   if(aaxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     aaxine.mixer.enable = 1;
-    aaxine.mixer.volume_level = xine_get_param(aaxine.xine, XINE_PARAM_AUDIO_VOLUME);
+    aaxine.mixer.volume_level = xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME);
   }
   
   if(aaxine.mixer.caps & XINE_PARAM_AO_MUTE)
-    aaxine.mixer.mute = xine_get_param(aaxine.xine, XINE_PARAM_AUDIO_MUTE);
+    aaxine.mixer.mute = xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_MUTE);
   
   /* Select audio channel */
-  xine_set_param(aaxine.xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
+  xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
 
   /* Kick off terminal pollution */
   if((!aaxine.debug_messages)
@@ -584,8 +588,8 @@ int main(int argc, char *argv[]) {
    * ui loop
    */
 
-  if(xine_open(aaxine.xine, aaxine.mrl[aaxine.current_mrl])) {
-    if(!xine_play (aaxine.xine, 0, 0))
+  if(xine_open(aaxine.stream, aaxine.mrl[aaxine.current_mrl])) {
+    if(!xine_play (aaxine.stream, 0, 0))
       fprintf(stderr, "xine_play() failed.\n");
   }
   else
@@ -605,11 +609,11 @@ int main(int argc, char *argv[]) {
 
     case AA_UP:
       aaxine.ignore_status = 1;
-      xine_stop(aaxine.xine);
+      xine_stop(aaxine.stream);
       aaxine.current_mrl--;
       if((aaxine.current_mrl >= 0) && (aaxine.current_mrl < aaxine.num_mrls)) {
-	if(xine_open(aaxine.xine, aaxine.mrl[aaxine.current_mrl])) {
-	  if(!xine_play(aaxine.xine, 0, 0))
+	if(xine_open(aaxine.stream, aaxine.mrl[aaxine.current_mrl])) {
+	  if(!xine_play(aaxine.stream, 0, 0))
 	    fprintf(stderr, "xine_play() failed.\n");
 	}
 	else
@@ -623,36 +627,36 @@ int main(int argc, char *argv[]) {
 
     case AA_DOWN:
       aaxine.ignore_status = 1;
-      xine_stop(aaxine.xine);
+      xine_stop(aaxine.stream);
       aaxine.ignore_status = 0;
       gui_status_callback(XINE_STATUS_STOP);
       break;
 
     case AA_LEFT:
-      if(xine_get_param(aaxine.xine, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-        xine_set_param(aaxine.xine, XINE_PARAM_SPEED, 
-		       (xine_get_param(aaxine.xine, XINE_PARAM_SPEED)) / 2);
+      if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
+        xine_set_param(aaxine.stream, XINE_PARAM_SPEED, 
+		       (xine_get_param(aaxine.stream, XINE_PARAM_SPEED)) / 2);
       break;
       
     case AA_RIGHT:
-      if(xine_get_param(aaxine.xine, XINE_PARAM_SPEED) < XINE_SPEED_FAST_4) {
-        if(xine_get_param(aaxine.xine, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-          xine_set_param(aaxine.xine, XINE_PARAM_SPEED, 
-			 (xine_get_param(aaxine.xine, XINE_PARAM_SPEED)) * 2);
+      if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) < XINE_SPEED_FAST_4) {
+        if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
+          xine_set_param(aaxine.stream, XINE_PARAM_SPEED, 
+			 (xine_get_param(aaxine.stream, XINE_PARAM_SPEED)) * 2);
         else
-          xine_set_param(aaxine.xine, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
+          xine_set_param(aaxine.stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
       }
       break;
       
     case '+':
-      xine_set_param(aaxine.xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL,
-		     (xine_get_param(aaxine.xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)) + 1);
+      xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL,
+		     (xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)) + 1);
       break;
       
     case '-':
-      if(xine_get_param(aaxine.xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL))
-	xine_set_param(aaxine.xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, 
-		       (xine_get_param(aaxine.xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)) - 1);
+      if(xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL))
+	xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, 
+		       (xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)) - 1);
       break;
       
     case 'q':
@@ -663,8 +667,8 @@ int main(int argc, char *argv[]) {
     case 13:
     case 'r':
     case 'R':
-      if(xine_open(aaxine.xine, aaxine.mrl[aaxine.current_mrl])) {
-	if(!xine_play (aaxine.xine, 0, 0))
+      if(xine_open(aaxine.stream, aaxine.mrl[aaxine.current_mrl])) {
+	if(!xine_play (aaxine.stream, 0, 0))
 	  fprintf(stderr, "xine_play() failed.\n");
       }
       else
@@ -674,15 +678,15 @@ int main(int argc, char *argv[]) {
     case ' ':
     case 'p':
     case 'P':
-      if (xine_get_param (aaxine.xine, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
-	xine_set_param(aaxine.xine, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+      if (xine_get_param (aaxine.stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
+	xine_set_param(aaxine.stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
       else
-	xine_set_param(aaxine.xine, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+	xine_set_param(aaxine.stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
       break;
 
     case 's':
     case 'S':
-      xine_stop (aaxine.xine);
+      xine_stop (aaxine.stream);
       break;
 
     case 'V':
@@ -690,7 +694,7 @@ int main(int argc, char *argv[]) {
 	if(aaxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
 	  if(aaxine.mixer.volume_level < 100) {
 	    aaxine.mixer.volume_level++;
-	    xine_set_param(aaxine.xine, XINE_PARAM_AUDIO_VOLUME, aaxine.mixer.volume_level);
+	    xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME, aaxine.mixer.volume_level);
 	  }
 	}
       }
@@ -701,7 +705,7 @@ int main(int argc, char *argv[]) {
 	if(aaxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
 	  if(aaxine.mixer.volume_level > 0) {
 	    aaxine.mixer.volume_level--;
-	    xine_set_param(aaxine.xine, XINE_PARAM_AUDIO_VOLUME, aaxine.mixer.volume_level);
+	    xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME, aaxine.mixer.volume_level);
 	  }
 	}
       }
@@ -712,7 +716,7 @@ int main(int argc, char *argv[]) {
       if(aaxine.mixer.enable) {
 	if(aaxine.mixer.caps & XINE_PARAM_AO_MUTE) {
 	  aaxine.mixer.mute = !aaxine.mixer.mute;
-	  xine_set_param(aaxine.xine, XINE_PARAM_AUDIO_MUTE, aaxine.mixer.mute);
+	  xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_MUTE, aaxine.mixer.mute);
 	}
       }
       break;
@@ -758,6 +762,11 @@ int main(int argc, char *argv[]) {
   
   if(aaxine.xine)
     xine_exit(aaxine.xine); 
+
+  xine_close_video_driver(aaxine.xine, aaxine.vo_driver);
+
+  if(aaxine.ao_driver)
+    xine_close_audio_driver(aaxine.xine, aaxine.ao_driver);
   
   if(aaxine.context) {
     aa_showcursor(aaxine.context);
