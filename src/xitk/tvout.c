@@ -47,7 +47,7 @@ struct tvout_s {
 typedef tvout_t *(*backend_init_t)(Display *);
 
 /* Backend init prototypes */
-#ifdef HAVE_NVTV
+#ifdef HAVE_NVTVSIMPLE
 static tvout_t *nvtv_backend(Display *);
 #endif
 static tvout_t *ati_backend(Display *);
@@ -56,7 +56,7 @@ static struct {
   char            *name;
   backend_init_t   init;
 } backends[] = {
-#ifdef HAVE_NVTV
+#ifdef HAVE_NVTVSIMPLE
   { "nvtv", nvtv_backend },
 #endif
   { "ati",  ati_backend  },
@@ -64,7 +64,7 @@ static struct {
 };
 
 
-#ifdef HAVE_NVTV
+#ifdef HAVE_NVTVSIMPLE
 
 #include <nvtv/nvtv_simple.h>
 

@@ -572,7 +572,21 @@ dnl AC_SUBST(CORBA_DEP)
 dnl
 dnl Check for nvtvsimple library
 dnl
-AC_CHECK_NVTV
+if test x"$PKG_CONFIG" != "xno" ; then
+  AC_MSG_CHECKING(for nvtvsimple)
+  if $PKG_CONFIG --atleast-version 0.4.6 nvtvsimple; then
+        AC_MSG_RESULT(found)
+        NVTVSIMPLE_CFLAGS=`$PKG_CONFIG --cflags nvtvsimple`
+        NVTVSIMPLE_LIBS=`$PKG_CONFIG --libs nvtvsimple`
+        have_nvtvsimple="yes"
+        AC_DEFINE([HAVE_NVTVSIMPLE],,
+		  [Define this if you have nvtvsimple installed])
+  else
+    AC_MSG_RESULT([*** nvtvsimple support will be disabled ***])
+  fi
+fi
+AC_SUBST(NVTVSIMPLE_CFLAGS)
+AC_SUBST(NVTVSIMPLE_LIBS)
 
 
 dnl
