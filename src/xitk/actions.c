@@ -397,7 +397,6 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
     return 0;
   }
 
-
   if(!strcmp(mrl, gGui->mmk.mrl))
     gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
   
@@ -1145,7 +1144,7 @@ void gui_set_current_mrl(mediamark_t *mmk) {
   if(mmk) {
     gGui->mmk.mrl   = strdup(mmk->mrl);
     gGui->mmk.ident = strdup(((mmk->ident) ? mmk->ident : mmk->mrl));
-    gGui->mmk.sub   = mmk->ident ? strdup(mmk->ident) : NULL;
+    gGui->mmk.sub   = mmk->sub ? strdup(mmk->sub) : NULL;
     gGui->mmk.start = mmk->start;
     gGui->mmk.end   = mmk->end;
   }
