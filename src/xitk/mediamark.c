@@ -106,10 +106,8 @@ static char *_download_file(const char *filename, int *size) {
   else
     xine_error("Unable to download '%s':\n%s.", filename, download->error);
 
-  if(download->buf)
-    free(download->buf);
-  if(download->error)
-    free(download->error);
+  SAFE_FREE(download->buf);
+  SAFE_FREE(download->error);
   free(download);
   
   return buf;
@@ -415,10 +413,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  if((ptitle = strchr(ln, ',')) != NULL) {
 		    ptitle++;
 
-		    if(title) {
-		      free(title);
-		      title = NULL;
-		    }
+		    SAFE_FREE(title);
 
 		    if(ptitle && strlen(ptitle))
 		      title = strdup(ptitle);
@@ -451,8 +446,8 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, NULL, 0, -1, 0);
 		  playlist->entries = ++entries_m3u;
 
-		  if(title)
-		    free(title);
+
+		  SAFE_FREE(title);
 		  
 		  title = NULL;
 		  ptitle = NULL;
@@ -469,8 +464,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	    playlist->type = strdup("M3U");
 	  }
 
-	  if(origin)
-	    free(origin);
+	  SAFE_FREE(origin);
 
 	  while(playlist->numl) {
 	    free(playlist->lines[playlist->numl - 1]);
@@ -583,8 +577,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 	      playlist->type = strdup("SFV");
 	    }
 	    
-	    if(origin)
-	      free(origin);
+	    SAFE_FREE(origin);
 
 	    while(playlist->numl) {
 	      free(playlist->lines[playlist->numl - 1]);
@@ -665,8 +658,7 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 	    playlist->type = strdup("RAW");
 	  }
 
-	  if(origin)
-	    free(origin);
+	  SAFE_FREE(origin);
 
 	  while(playlist->numl) {
 	    free(playlist->lines[playlist->numl - 1]);
@@ -845,7 +837,8 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			if(mmkf_members[0])
 			  free(mmkf.ident);
 			
-			free(mmkf.sub);
+			SAFE_FREE(mmkf.sub);
+
 			free(mmkf.mrl);
 		      }
 		      
@@ -997,12 +990,9 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		  mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1, 0);
 		  playlist->entries = ++entries_asx;
 
-		  if(real_title)
-		    free(real_title);
-		  if(atitle)
-		    free(atitle);
-		  if(aauthor)
-		    free(aauthor);
+		  SAFE_FREE(real_title);
+		  SAFE_FREE(atitle);
+		  SAFE_FREE(aauthor);
 		}
 		
 		href = title = author = NULL;
@@ -1317,8 +1307,7 @@ static mediamark_t *smil_duplicate_mmk(mediamark_t *ommk) {
 }
 static void smil_free_properties(smil_property_t *smil_props) {
   if(smil_props) {
-    if(smil_props->anchor)
-      free(smil_props->anchor);
+    SAFE_FREE(smil_props->anchor);
   }
 }
 
@@ -1495,8 +1484,7 @@ static void smil_get_properties(smil_property_t *dprop, xml_property_t *props) {
     }
     else if(!strcasecmp(prop->name, "HREF")) {
       
-      if(dprop->anchor)
-	free(dprop->anchor);
+      SAFE_FREE(dprop->anchor);
       
       dprop->anchor = strdup(prop->value);
       
@@ -1993,16 +1981,11 @@ static void smil_free_smil(smil_t *smil) {
   if(smil->first)
     smil_free_node(smil->first);
 
-  if(smil->title)
-    free(smil->title);
-  if(smil->author)
-    free(smil->author);
-  if(smil->copyright)
-    free(smil->copyright);
-  if(smil->year)
-    free(smil->year);
-  if(smil->base)
-    free(smil->base);
+  SAFE_FREE(smil->title);
+  SAFE_FREE(smil->author);
+  SAFE_FREE(smil->copyright);
+  SAFE_FREE(smil->year);
+  SAFE_FREE(smil->base);
 }
 
 static mediamark_t **guess_smil_playlist(playlist_t *playlist, const char *filename) {
