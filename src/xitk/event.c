@@ -685,6 +685,10 @@ void gui_init (int nfiles, char *filenames[]) {
 
   gGui->screen = DefaultScreen(gGui->display);
   gGui->imlib_data = Imlib_init (gGui->display);
+  if (gGui->imlib_data == NULL) {
+    fprintf(stderr, "Unable to initialize Imlib\n");
+    exit(1);
+  }
 
   /* 
    * Create logo image displayed into video window from
