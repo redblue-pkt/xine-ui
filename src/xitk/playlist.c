@@ -166,6 +166,32 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
 
 }
 
+static void _playlist_xine_play(void) {
+  
+  if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
+    gGui->ignore_next = 1;
+    xine_stop(gGui->stream);
+    gGui->ignore_next = 0;
+  }
+  
+  if(!is_playback_widgets_enabled())
+    enable_playback_controls(1);
+    
+  if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
+    gui_handle_xine_error(gGui->stream);
+    enable_playback_controls(0);
+    gui_display_logo();
+    return;
+  }
+  
+  if(!gui_xine_play(gGui->stream, 0, 0, 0)) {
+    enable_playback_controls(0);
+    gui_display_logo();
+    return;
+  }
+
+}
+
 /*
  * Start playing an MRL
  */
@@ -176,17 +202,9 @@ static void _playlist_play(xitk_widget_t *w, void *data) {
 
   if((j >= 0) && (gGui->playlist.mmk[j]->mrl != NULL)) {
     
-    gui_set_current_mrl(gGui->playlist.mmk[j]);
-    
-    if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
-      gui_stop(NULL, NULL);
-    
     gGui->playlist.cur = j;
-    
-    if(!is_playback_widgets_enabled())
-      enable_playback_controls(1);
-
-    gui_play(NULL, NULL);
+    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+    _playlist_xine_play();
     xitk_browser_release_all_buttons(playlist->playlist);
   }
 }
@@ -194,20 +212,12 @@ static void _playlist_play(xitk_widget_t *w, void *data) {
  * Start to play the selected stream on double click event in playlist.
  */
 static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int selected) {
-
+  
   if(gGui->playlist.mmk[selected]->mrl != NULL) {
     
-    gui_set_current_mrl(gGui->playlist.mmk[selected]);
-
-    if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
-      gui_stop(NULL, NULL);
-    
     gGui->playlist.cur = selected;
-    
-    if(!is_playback_widgets_enabled())
-      enable_playback_controls(1);
-
-    gui_play(NULL, NULL);
+    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+    _playlist_xine_play();
     xitk_browser_release_all_buttons(playlist->playlist);
   }
 }
