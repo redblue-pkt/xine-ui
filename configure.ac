@@ -783,7 +783,7 @@ case "$host_or_hostalias" in
 
   ppc-*-linux-* | powerpc-*) 
     AC_DEFINE(__ppc__,1,[Define this if you're running PowerPC architecture])
-    CFLAGS="-O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions $CFLAGS"
+    CFLAGS="-O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions $CFLAGS"
     DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
@@ -796,8 +796,8 @@ case "$host_or_hostalias" in
     ;;
     esac
 
-    CFLAGS="-O3 $cpu_cflags -funroll-loops -funroll-all-loops -finline-functions $CFLAGS"
-    DEBUG_CFLAGS="-O $cpu_cflags -funroll-loops -funroll-all-loops -finline-functions $DEBUG_CFLAGS"
+    CFLAGS="-O3 $cpu_cflags -funroll-loops -finline-functions $CFLAGS"
+    DEBUG_CFLAGS="-O $cpu_cflags -funroll-loops -finline-functions $DEBUG_CFLAGS"
 
     ;;
 
@@ -825,8 +825,8 @@ case "$host_or_hostalias" in
 	*)     cpu_cflags= ;;
 	esac
 
-	cc_optimize_cflags="-O3 $cpu_cflags -funroll-loops -funroll-all-loops -finline-functions"
-	cc_debug_cflags="-O $cpu_cflags -funroll-loops -funroll-all-loops -finline-functions"
+	cc_optimize_cflags="-O3 $cpu_cflags -funroll-loops -finline-functions"
+	cc_debug_cflags="-O $cpu_cflags -funroll-loops -finline-functions"
     else
 	case `uname -m` in
 	sun4c) cpu_cflags="-xarch=v7 -xchip=ultra2" ;;

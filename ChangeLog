@@ -1,6 +1,7 @@
   * fix reporting of dropped frames
   * experimental feature: output video to a different display than control panel.
-    set gui.video_display to the second display name, usually ":0.1" or ":1".
+    set gui.video_display to the second display name, usually ":0.1" or ":1",
+  * removed -funroll-all-loops from SPARC and PPC targets.
 
 xine-ui (0.99.1) unstable; urgency=low
 
