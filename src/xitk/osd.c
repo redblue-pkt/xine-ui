@@ -138,7 +138,7 @@ static char *_osd_get_status_sym(int status) {
 void osd_init(void) {
   int fonth = 20;
 
-  gGui->osd.info = xine_osd_new(gGui->stream, 0, 0, 300, (fonth * 3) + (5 * 3));
+  gGui->osd.info = xine_osd_new(gGui->stream, 0, 0, 900, (fonth * 6) + (5 * 3));
   xine_osd_set_font(gGui->osd.info, "sans", fonth);
   xine_osd_set_text_palette(gGui->osd.info, 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
@@ -217,31 +217,110 @@ void osd_stream_infos(void) {
     const char *vcodec, *acodec;
     char        buffer[256];
     int         x, y;
-    int         w1, w2, h;
+    int         w, h, osdw;
+    int         playedtime, totaltime;
+    int         audiochannel, spuchannel, len;
+
+    vcodec       = xine_get_meta_info(gGui->stream, XINE_META_INFO_VIDEOCODEC);
+    acodec       = xine_get_meta_info(gGui->stream, XINE_META_INFO_AUDIOCODEC);
+    vwidth       = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+    vheight      = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+    asrate       = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
+    audiochannel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+    spuchannel   = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
     
-    vcodec  = xine_get_meta_info(gGui->stream, XINE_META_INFO_VIDEOCODEC);
-    acodec  = xine_get_meta_info(gGui->stream, XINE_META_INFO_AUDIOCODEC);
-    vwidth  = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-    vheight = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
-    asrate  = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
-    
+    xine_get_pos_length(gGui->stream, NULL, &playedtime, &totaltime);
+
+    playedtime /= 1000;
+    totaltime  /= 1000;
+
     xine_osd_clear(gGui->osd.info);
-    
+
     y = x = 0;
-    
-    sprintf(buffer, "%s: %dX%d", vcodec, vwidth, vheight);
+
+    sprintf(buffer, "%s", (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident);
+    xine_osd_get_text_size(gGui->osd.info, buffer, &osdw, &h);
+    while(osdw > (vwidth - 40)) {
+       buffer[strlen(buffer) - 1] = '\0';
+       xine_osd_get_text_size(gGui->osd.info, buffer, &osdw, &h);
+    }
     xine_osd_draw_text(gGui->osd.info, x, y, buffer, XINE_OSD_TEXT1);
-    xine_osd_get_text_size(gGui->osd.info, buffer, &w1, &h);
+    
+    y += h;
+    
+    if(vcodec && vwidth && vheight) {
+      sprintf(buffer, "%s: %dX%d", vcodec, vwidth, vheight);
+      xine_osd_draw_text(gGui->osd.info, x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size(gGui->osd.info, buffer, &w, &h);
+      if(w > osdw)
+	osdw = w;
+      y += h;
+    }
+
+    if(acodec && asrate) {
+      sprintf(buffer, "%s: %dHz", acodec, asrate);
+      xine_osd_draw_text(gGui->osd.info, x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size(gGui->osd.info, buffer, &w, &h);
+      if(w > osdw)
+	osdw = w;
+      y += h;
+    }
+    
+    memset(&buffer, 0, sizeof(buffer));
+
+    sprintf(buffer, _("Audio: "));
+    len = strlen(buffer);
+    switch(audiochannel) {
+    case -2:
+      sprintf(buffer, "%soff", buffer);
+      break;
+    case -1:
+      if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
+	sprintf(buffer, "%sauto", buffer);
+      break;
+    default:
+      if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
+	sprintf(buffer, "%s%3d", buffer, audiochannel);
+      break;
+    }
+
+    sprintf(buffer, "%s, Spu: ", buffer);
+    len = strlen(buffer);
+    switch (spuchannel) {
+    case -2:
+      sprintf(buffer, "%soff", buffer);
+      break;
+    case -1:
+      if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
+	sprintf(buffer, "%sauto", buffer);
+      break;
+    default:
+      if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
+        sprintf(buffer, "%s%3d", buffer, spuchannel);
+      break;
+    }
+    sprintf(buffer, "%s.", buffer);
+    xine_osd_draw_text(gGui->osd.info, x, y, buffer, XINE_OSD_TEXT1);
+    xine_osd_get_text_size(gGui->osd.info, buffer, &w, &h);
+    if(w > osdw)
+      osdw = w;
     
     y += (h);
+
+    if(totaltime) {
+      sprintf(buffer, _("%d:%.2d:%.2d (%.0f%%) of %d:%.2d:%.2d"),
+	      playedtime / 3600, (playedtime % 3600) / 60, playedtime % 60,
+	      ((float)playedtime / (float)totaltime) * 100,
+	      totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
+      xine_osd_draw_text(gGui->osd.info, x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size(gGui->osd.info, buffer, &w, &h);
+      if(w > osdw)
+	osdw = w;
+    }
     
-    sprintf(buffer, "%s @ %dHz", acodec, asrate);
-    xine_osd_draw_text(gGui->osd.info, x, y, buffer, XINE_OSD_TEXT1);
-    xine_osd_get_text_size(gGui->osd.info, buffer, &w2, &h);
-    
-    x = (vwidth - ((w1 + w2) >> 1)) - 40;
-    xine_osd_set_position(gGui->osd.info, x, 10);
-    
+    x = (vwidth - osdw) - 40;
+    xine_osd_set_position(gGui->osd.info, (x >= 0) ? x : 0, 15);
+
     xine_osd_show(gGui->osd.info, 0);
     gGui->osd.info_visible = gGui->osd.timeout;
   }
