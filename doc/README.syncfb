@@ -198,6 +198,9 @@
   + toggling hardware deinterlacing will reset video out window  to  the
     original video size. (bug or feature?)
 
+  + zooming in/out of a video exposes  a  bug  with  the  SyncFB  kernel
+    module and should currently be considered broken. (being worked on)
+
 
 * WHAT IS ON THE TODO LIST?
 
@@ -205,12 +208,10 @@
   
   + check if the video source is not too big in terms of  dimensions for
     the video memory left (video memory - X reserved video memory)
-    
-  + zooming support (currently only implemented with the Xv video out)
-    [status: was implemented, needs updating now - appears soon on CVS]
-    
+
   + patching the syncfb kernel module itself for devfs and the  recently
     introduced license tag support (as well as bug fixing and updating)
+    [status: progressing - check CVS of the Teletux project]
     
   + bug fixes
   + more sanity checks
