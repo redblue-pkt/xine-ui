@@ -52,7 +52,8 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	./configure --prefix=/usr --mandir=\$${prefix}/share/man \
-                    $(HOST_OPTION)
+                    $(HOST_OPTION) || \
+	(echo "=== config.log: ==="; cat config.log; false)
 
 	touch configure-stamp
 

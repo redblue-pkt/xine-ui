@@ -1,3 +1,17 @@
+xine-ui (0.9.20-3) unstable; urgency=low
+
+  * added missing libfreetype6-dev dependancy
+
+ -- Siggi Langauf <siggi@debian.org>  Thu, 17 Apr 2003 14:22:45 +0200
+
+xine-ui (0.9.20-2) unstable; urgency=low
+
+  * more diagnostics on failed configure runs (should help debugging s390
+    build failures)
+  * regenerated autoconf files using autoconf 2.53-2 (closes: #186583)
+
+ -- Siggi Langauf <siggi@debian.org>  Wed, 16 Apr 2003 01:15:31 +0200
+
 xine-ui (0.9.20-1) unstable; urgency=low
 
   * New upstream release(s)
