@@ -961,7 +961,6 @@ int main(int argc, char *argv[]) {
 
   /* Video out plugin */
   load_video_out_driver(video_driver_id);
-  video_window_select_visual ();
 
   /* Audio out plugin */
   audio_driver = load_audio_out_driver(audio_driver_id);
@@ -977,6 +976,9 @@ int main(int argc, char *argv[]) {
   xine_set_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
   xine_set_param(gGui->xine, XINE_PARAM_SPU_CHANNEL, spu_channel);
 
+  /* init the video window */
+  video_window_select_visual ();
+  
   /*
    * Register an event listener
    */
