@@ -480,9 +480,11 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     if(gGui->logo_mode == 0) {
       int pos;
 
-      xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
-      xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
-      panel_update_runtime_display();
+      if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+	xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
+	xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+	panel_update_runtime_display();
+      }
       panel_update_mrl_display();
     }
     
@@ -617,14 +619,14 @@ void panel_snapshot(xitk_widget_t *w, void *data) {
 static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 
   if(w == panel->playback_widgets.slider_play) {
-    gui_set_current_position (pos);
-    if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
-      panel_reset_slider();
-    }
-    else {
-      int pos;
-      
-      if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+    if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+      gui_set_current_position (pos);
+      if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
+	panel_reset_slider();
+      }
+      else {
+	int pos;
+	
 	xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
 	xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 	panel_update_runtime_display();
