@@ -2683,7 +2683,7 @@ mediamark_t *mediamark_get_mmk_by_index(int index) {
 
 const char *mediamark_get_current_mrl(void) {
 
-  if(gGui->playlist.mmk && gGui->playlist.num)
+  if(gGui->playlist.mmk && gGui->playlist.num && (gGui->playlist.cur < gGui->playlist.num))
     return gGui->playlist.mmk[gGui->playlist.cur]->mrl;
 
   return NULL;
