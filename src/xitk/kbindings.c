@@ -346,7 +346,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 	if((!strcmp(kbt->entry[i]->key, kbt->entry[j]->key)) &&
 	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier)) {
 	  found = i;
-	  xine_error(_("Key bindings of '%s' and '%s' are similar.\n"),
+	  xine_error(_("Key bindings of '%s' and '%s' are the same.\n"),
 		     kbt->entry[i]->action, kbt->entry[j]->action);
 	}
       }

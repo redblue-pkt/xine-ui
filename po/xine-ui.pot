@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-17 21:56+0200\n"
+"POT-Creation-Date: 2002-06-22 13:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,60 +23,60 @@ msgstr ""
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr ""
 
-#: src/xitk/control.c:370 src/xitk/panel.c:135 src/xitk/playlist.c:634
+#: src/xitk/control.c:357 src/xitk/panel.c:135 src/xitk/playlist.c:634
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr ""
 
-#: src/xitk/control.c:447
+#: src/xitk/control.c:434
 msgid "Xine Control Panel"
 msgstr ""
 
-#: src/xitk/control.c:462 src/xitk/playlist.c:730
+#: src/xitk/control.c:449 src/xitk/playlist.c:730
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr ""
 
-#: src/xitk/control.c:579
+#: src/xitk/control.c:566
 msgid "Control HUE value"
 msgstr ""
 
-#: src/xitk/control.c:582
+#: src/xitk/control.c:569
 msgid "Hue"
 msgstr ""
 
-#: src/xitk/control.c:604
+#: src/xitk/control.c:591
 msgid "Control SATURATION value"
 msgstr ""
 
-#: src/xitk/control.c:607
+#: src/xitk/control.c:594
 msgid "Sat"
 msgstr ""
 
-#: src/xitk/control.c:629
+#: src/xitk/control.c:616
 msgid "Control BRIGHTNESS value"
 msgstr ""
 
-#: src/xitk/control.c:632
+#: src/xitk/control.c:619
 msgid "Brt"
 msgstr ""
 
-#: src/xitk/control.c:654
+#: src/xitk/control.c:641
 msgid "Control CONTRAST value"
 msgstr ""
 
-#: src/xitk/control.c:657
+#: src/xitk/control.c:644
 msgid "Ctr"
 msgstr ""
 
-#: src/xitk/control.c:678
+#: src/xitk/control.c:665
 msgid "Choose a Skin"
 msgstr ""
 
-#: src/xitk/control.c:714 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:899
+#: src/xitk/control.c:701 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:899
 msgid "Dismiss"
 msgstr ""
 
-#: src/xitk/control.c:720
+#: src/xitk/control.c:707
 msgid "Close control window"
 msgstr ""
 
@@ -199,7 +199,7 @@ msgstr ""
 
 #: src/xitk/kbindings.c:349
 #, c-format
-msgid "Key bindings of '%s' and '%s' are similar.\n"
+msgid "Key bindings of '%s' and '%s' are the same.\n"
 msgstr ""
 
 #: src/xitk/kbindings.c:711
@@ -880,11 +880,11 @@ msgstr ""
 msgid "File '%s' written.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:174
+#: src/xitk/videowin.c:177
 msgid "videowin: output driver cannot select a working visual\n"
 msgstr ""
 
-#: src/xitk/videowin.c:181
+#: src/xitk/videowin.c:184
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
@@ -897,58 +897,58 @@ msgstr ""
 #. *           dest_width,
 #. *           dest_height);
 #.
-#: src/xitk/videowin.c:224
+#: src/xitk/videowin.c:227
 msgid "xine video output"
 msgstr ""
 
-#: src/xitk/videowin.c:358
+#: src/xitk/videowin.c:361
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1009
+#: src/xitk/videowin.c:1015
 msgid "Xine Video Window"
 msgstr ""
 
-#: src/xitk/videowin.c:1013
+#: src/xitk/videowin.c:1019
 msgid "Xine Video Fullscreen Window"
 msgstr ""
 
-#: src/xitk/videowin.c:1017
+#: src/xitk/videowin.c:1023
 msgid "Xine Video Borderless Window"
 msgstr ""
 
-#: src/xitk/videowin.c:1038
+#: src/xitk/videowin.c:1044
 msgid "XAllocWMHints() failed\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1062
+#: src/xitk/videowin.c:1068
 msgid "New stream sizes resize output window"
 msgstr ""
 
-#: src/xitk/videowin.c:1068
+#: src/xitk/videowin.c:1074
 msgid "Double size for small streams (require stream_resize_window)"
 msgstr ""
 
-#: src/xitk/videowin.c:1090
+#: src/xitk/videowin.c:1096
 msgid "use XVidModeExtension when switching to fullscreen"
 msgstr ""
 
-#: src/xitk/videowin.c:1106
+#: src/xitk/videowin.c:1112
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1109
+#: src/xitk/videowin.c:1115
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1127
+#: src/xitk/videowin.c:1133
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1130
+#: src/xitk/videowin.c:1136
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 msgstr ""
 
