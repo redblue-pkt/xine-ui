@@ -226,7 +226,7 @@ run_aclocal () {
   echo $_echo_n " + Running aclocal: $_echo_c"
   aclocalinclude=`xine-config --acflags`
 
-  aclocal $aclocalinclude -I m4
+  aclocal -I m4 $aclocalinclude
   echo "done." 
 }
 

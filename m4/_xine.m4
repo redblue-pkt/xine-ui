@@ -127,3 +127,39 @@ AC_DEFUN([AC_COMPILE_CHECK_SIZEOF],
     AC_TRY_COMPILE([],[switch (0) case 0: case (sizeof ($1) == $2):;],[],
         [AC_MSG_ERROR([can not build a default inttypes.h])])
     AC_MSG_RESULT([yes])])
+
+
+dnl AC_PROG_GMSGFMT_PLURAL
+dnl ----------------------
+dnl Validate the GMSGFMT program found by gettext.m4; reject old versions
+dnl of GNU msgfmt that do not support the "msgid_plural" extension.
+AC_DEFUN([AC_PROG_GMSGFMT_PLURAL],
+ [dnl AC_REQUIRE(AM_GNU_GETTEXT)
+  
+  if test "$GMSGFMT" != ":"; then
+    AC_MSG_CHECKING([for plural forms in GNU msgfmt])
+
+    changequote(,)dnl We use [ and ] in in .po test input
+
+    dnl If the GNU msgfmt does not accept msgid_plural we define it
+    dnl as : so that the Makefiles still can work.
+    cat >conftest.po <<_ACEOF
+msgid "channel"
+msgid_plural "channels"
+msgstr[0] "canal"
+msgstr[1] "canal"
+
+_ACEOF
+    changequote([,])dnl
+
+    if $GMSGFMT -o /dev/null conftest.po >/dev/null 2>&1; then
+      AC_MSG_RESULT(yes)
+    else
+      AC_MSG_RESULT(no)
+      AC_MSG_RESULT(
+	[found GNU msgfmt program is too old, it does not support plural forms; ignore it])
+      GMSGFMT=":"
+    fi
+    rm -f conftest.po
+  fi
+])dnl AC_PROG_GMSGFMT_PLURAL
