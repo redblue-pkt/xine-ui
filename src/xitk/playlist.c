@@ -38,12 +38,23 @@ extern gGui_t          *gGui;
 
 typedef struct {
   Window                window;
-  xitk_widget_t        *playlist;
   ImlibImage           *bg_image;
   xitk_widget_list_t   *widget_list;
 
+  xitk_widget_t        *playlist;
   xitk_widget_t        *winput;
   xitk_widget_t        *autoplay_plugins[64];
+
+  xitk_widget_t        *move_up;
+  xitk_widget_t        *move_down;
+  xitk_widget_t        *play;
+  xitk_widget_t        *delete;
+  xitk_widget_t        *delete_all;
+  xitk_widget_t        *add;
+  xitk_widget_t        *load;
+  xitk_widget_t        *save;
+  xitk_widget_t        *close;
+
   int                   running;
   int                   visible;
   xitk_register_key_t   widget_key;
@@ -60,6 +71,30 @@ static _playlist_t   *playlist;
 
 void playlist_handle_event(XEvent *event, void *data);
 
+static void _playlist_enability(int enable) {
+  void (*enability)(xitk_widget_t *) = (enable == 1) ? xitk_enable_widget : xitk_disable_widget;
+  int    i = 0;
+
+  enability(playlist->playlist);
+  enability(playlist->winput);
+  while(playlist->autoplay_plugins[i])
+    enability(playlist->autoplay_plugins[i++]);
+  enability(playlist->move_up);
+  enability(playlist->move_down);
+  enability(playlist->play);
+  enability(playlist->delete);
+  enability(playlist->delete_all);
+  enability(playlist->add);
+  enability(playlist->load);
+  enability(playlist->save);
+  enability(playlist->close);
+}
+static void playlist_deactivate(void) {
+  _playlist_enability(0);
+}
+static void playlist_reactivate(void) {
+  _playlist_enability(1);
+}
 /*
  *
  */
@@ -284,25 +319,60 @@ static void _playlist_move_updown(xitk_widget_t *w, void *data) {
 /*
  * Load playlist from $HOME/.xine/playlist
  */
-static void _playlist_load_playlist(xitk_widget_t *w, void *data) {
-  char buffer[_PATH_MAX + _NAME_MAX + 1];
+static void _playlist_load_callback(filebrowser_t *fb) {
+  char *file;
 
-  memset(&buffer, 0, sizeof(buffer));
-  sprintf(buffer, "%s/.xine/playlist", xine_get_homedir());
-  mediamark_load_mediamarks(buffer);
-  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-  playlist_update_playlist();
+  if((file = filebrowser_get_full_filename(fb)) != NULL) {
+    mediamark_load_mediamarks(file);
+    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+    playlist_update_playlist();
+    free(file);
+  }
+  playlist_reactivate();
+}
+static void _playlist_cancel_callback(filebrowser_t *fb) {
+  playlist_reactivate();
+}
+static void _playlist_load_playlist(xitk_widget_t *w, void *data) {
+  filebrowser_callback_button_t  cbb[2];
+  char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+
+  sprintf(buffer, "%s/.xine/playlist.tox", xine_get_homedir());
+  
+  cbb[0].label = _("Load");
+  cbb[0].callback = _playlist_load_callback;
+  cbb[0].need_a_file = 1;
+  cbb[1].callback = _playlist_cancel_callback;
+  
+  playlist_deactivate();
+  (void *) create_filebrowser(_("Load a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
 }
 
 /*
  * Save playlist to $HOME/.xine/playlist
  */
-static void _playlist_save_playlist(xitk_widget_t *w, void *data) {
-  char buffer[_PATH_MAX + _NAME_MAX + 1];
+static void _playlist_save_callback(filebrowser_t *fb) {
+  char *file;
 
-  memset(&buffer, 0, sizeof(buffer));
-  sprintf(buffer, "%s/.xine/playlist", xine_get_homedir());
-  mediamark_save_mediamarks(buffer);
+  if((file = filebrowser_get_full_filename(fb)) != NULL) {
+    mediamark_save_mediamarks(file);
+    free(file);
+  }
+  playlist_reactivate();
+}
+static void _playlist_save_playlist(xitk_widget_t *w, void *data) {
+  filebrowser_callback_button_t  cbb[2];
+  char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+
+  sprintf(buffer, "%s/.xine/playlist.tox", xine_get_homedir());
+  
+  cbb[0].label = _("Save");
+  cbb[0].callback = _playlist_save_callback;
+  cbb[0].need_a_file = 1;
+  cbb[1].callback = _playlist_cancel_callback;
+  
+  playlist_deactivate();
+  (void *) create_filebrowser(_("Save a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
 }
 
 /*
@@ -863,7 +933,6 @@ void playlist_editor(void) {
   xitk_label_widget_t        lbl;
   xitk_inputtext_widget_t    inp;
   xitk_button_widget_t       b;
-  xitk_widget_t             *w;
 
   xine_strdupa(title, _("Xine Playlist Editor"));
 
@@ -986,37 +1055,37 @@ void playlist_editor(void) {
   b.callback          = _playlist_move_updown;
   b.userdata          = (void *)MOVEUP;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Move up selected MRL"));
+    (playlist->move_up = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
+  xitk_set_widget_tips(playlist->move_up, _("Move up selected MRL"));
 
 
   b.skin_element_name = "PlMoveDn";
   b.callback          = _playlist_move_updown;
   b.userdata          = (void *)MOVEDN;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Move down selected MRL"));
+    (playlist->move_down = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
+  xitk_set_widget_tips(playlist->move_down, _("Move down selected MRL"));
 
   b.skin_element_name = "PlPlay";
   b.callback          = _playlist_play;
   b.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Start playback of selected MRL"));
+    (playlist->play = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
+  xitk_set_widget_tips(playlist->play, _("Start playback of selected MRL"));
   
   b.skin_element_name = "PlDelete";
   b.callback          = _playlist_delete;
   b.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Delete selected MRL from playlist"));
+    (playlist->delete = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
+  xitk_set_widget_tips(playlist->delete, _("Delete selected MRL from playlist"));
 
   b.skin_element_name = "PlDeleteAll";
   b.callback          = _playlist_delete_all;
   b.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Delete all entries in playlist"));
+    (playlist->delete_all = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
+  xitk_set_widget_tips(playlist->delete_all, _("Delete all entries in playlist"));
 
   lb.skin_element_name = "PlAdd";
   lb.button_type       = CLICK_BUTTON;
@@ -1025,8 +1094,8 @@ void playlist_editor(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
-  xitk_set_widget_tips(w, _("Add one or more entries in playlist"));
+    (playlist->add = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
+  xitk_set_widget_tips(playlist->add, _("Add one or more entries in playlist"));
     
 
   lb.skin_element_name = "PlLoad";
@@ -1036,8 +1105,8 @@ void playlist_editor(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
-  xitk_set_widget_tips(w, _("Load saved playlist"));
+    (playlist->load = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
+  xitk_set_widget_tips(playlist->load, _("Load saved playlist"));
 
   lb.skin_element_name = "PlSave";
   lb.button_type       = CLICK_BUTTON;
@@ -1046,8 +1115,8 @@ void playlist_editor(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
-  xitk_set_widget_tips(w, _("Save playlist"));
+    (playlist->save = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
+  xitk_set_widget_tips(playlist->save, _("Save playlist"));
 
   lb.skin_element_name = "PlDismiss";
   lb.button_type       = CLICK_BUTTON;
@@ -1056,8 +1125,8 @@ void playlist_editor(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-		    (w = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
-  xitk_set_widget_tips(w, _("Close playlist window"));
+    (playlist->close = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
+  xitk_set_widget_tips(playlist->delete, _("Close playlist window"));
 
   br.arrow_up.skin_element_name    = "PlUp";
   br.slider.skin_element_name      = "SliderPl";
@@ -1072,7 +1141,7 @@ void playlist_editor(void) {
   br.dbl_click_callback            = _playlist_play_on_dbl_click;
   br.parent_wlist                  = playlist->widget_list;
   xitk_list_append_content (playlist->widget_list->l, 
-   (playlist->playlist = xitk_browser_create(playlist->widget_list, gGui->skin_config, &br)));
+    (playlist->playlist = xitk_browser_create(playlist->widget_list, gGui->skin_config, &br)));
 
   lbl.skin_element_name = "AutoPlayLbl";
   lbl.label             = _("Scan for:");

@@ -1225,9 +1225,9 @@ static void fileselector_all_callback(filebrowser_t *fb) {
   }
 }
 void gui_file_selector(void) {
-  filebrowser_callback_button_t cbb[2];
-  char current_dir[XITK_PATH_MAX + 1];
-  char *curdir;
+  filebrowser_callback_button_t  cbb[2];
+  char                           current_dir[XITK_PATH_MAX + 1];
+  char                          *curdir;
 
   curdir = getcwd(&current_dir[0], XITK_PATH_MAX);
   
@@ -1237,7 +1237,7 @@ void gui_file_selector(void) {
   cbb[1].label = _("Select all");
   cbb[1].callback = fileselector_all_callback;
   cbb[1].need_a_file = 0;
-  (void *) create_filebrowser(_("Stream(s) loading"), current_dir, &cbb[0], &cbb[1]);
+  (void *) create_filebrowser(_("Stream(s) loading"), curdir, &cbb[0], &cbb[1], NULL);
 }
 
 

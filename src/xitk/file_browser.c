@@ -143,7 +143,7 @@ struct filebrowser_s {
   
   xitk_widget_t                  *close;
 
-  filebrowser_callback_button_t   cbb[2];
+  filebrowser_callback_button_t   cbb[3];
   xitk_widget_t                  *cb_buttons[2];
   
   xitk_register_key_t             widget_key;
@@ -870,6 +870,12 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     fb = NULL;
   }
 }
+static void _fb_exit(xitk_widget_t *w, void *data) {
+  filebrowser_t *fb = (filebrowser_t *) data;
+  if(fb->cbb[2].callback)
+    fb->cbb[2].callback(fb);
+  fb_exit(NULL, (void *)fb);
+}
 
 static void fb_delete_file_cb(xitk_widget_t *w, void *data, int button) {
   filebrowser_t *fb = (filebrowser_t *) data;
@@ -1053,7 +1059,8 @@ char **filebrowser_get_all_files(filebrowser_t *fb) {
 
 filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
 				  filebrowser_callback_button_t *cbb1,
-				  filebrowser_callback_button_t *cbb2) {
+				  filebrowser_callback_button_t *cbb2,
+				  filebrowser_callback_button_t *cbb_close) {
   filebrowser_t              *fb;
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
@@ -1090,6 +1097,9 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
     fb->cbb[1].callback = NULL;
   }
 
+  if(cbb_close)
+    fb->cbb[2].callback = cbb_close->callback;
+  
   XLockDisplay(gGui->display);
   x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (WINDOW_WIDTH >> 1);
   y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (WINDOW_HEIGHT >> 1);
@@ -1363,7 +1373,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = LABEL_ALIGN_CENTER;
-  lb.callback          = fb_exit; 
+  lb.callback          = _fb_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = (void *)fb;
   lb.skin_element_name = NULL;

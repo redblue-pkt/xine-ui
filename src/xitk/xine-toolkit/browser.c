@@ -72,8 +72,8 @@ static void enability(xitk_widget_t *w) {
     
     private_data = (browser_private_data_t *) w->private_data;
 
-    max = private_data->max_length;
-    max += (private_data->skin_element_name) ? EXTRA_BTNS : WBSTART;
+    max = WBSTART;
+    max += (private_data->skin_element_name) ? EXTRA_BTNS : private_data->max_length;
    
     if(w->enable == WIDGET_ENABLE) {
       for(i = WBUP; i < max; i++)

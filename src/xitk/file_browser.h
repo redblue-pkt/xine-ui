@@ -36,7 +36,9 @@ typedef struct {
 		
 
 filebrowser_t *create_filebrowser(char *, char *,
-				  filebrowser_callback_button_t *, filebrowser_callback_button_t *);
+				  filebrowser_callback_button_t *, 
+				  filebrowser_callback_button_t *,
+				  filebrowser_callback_button_t *);
 
 void filebrowser_raise_window(filebrowser_t *);
 void filebrowser_end(filebrowser_t *);
