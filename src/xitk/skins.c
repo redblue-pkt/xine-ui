@@ -503,7 +503,7 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 	  skin_entry = xml_tree->child;
 	  while(skin_entry) {
 
-	    if(!strcasecmp(skin_entry->name, "ENTRY")) {
+	    if(!strcasecmp(skin_entry->name, "SKIN")) {
 	      skin_ref = skin_entry->child;
 
 	      while(skin_ref) {
