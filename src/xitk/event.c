@@ -1289,9 +1289,14 @@ void gui_run (void) {
       if(!panel_is_visible())
 	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
 
-      xine_gui_send_vo_data(gGui->stream,
-			    XINE_GUI_SEND_VIDEOWIN_VISIBLE,
-			    (int *)0);
+      /* DXR3 case */
+      if(video_window_is_visible())
+	video_window_set_visibility(!(video_window_is_visible()));
+      else
+	xine_gui_send_vo_data(gGui->stream,
+			      XINE_GUI_SEND_VIDEOWIN_VISIBLE,
+			      (int *)0);
+
     }
 
     /* The user wants to see in fullscreen mode  */
