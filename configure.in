@@ -277,11 +277,11 @@ case $host in
 
 	if test x"$sarchopt" != "xno"; then
 	    [case "$host_alias" in
-		    i386-*) dnl *BSD return this even on a P III #-))
+		    i386-*) # *BSD return this even on a P III #-))
                       GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=i386"
                       DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=i386"
                       ;;
-		    i486-*) dnl oh dear!
+		    i486-*) # oh dear!
                       GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=i486"
                       DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=i486"
                       ;;
@@ -334,7 +334,7 @@ case $host in
         ;;
     sparc-*)
         GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
-        DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
+        DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
         ;;
     *) echo "$host is not currently supported by xine"; exit 1;;
     esac

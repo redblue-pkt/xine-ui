@@ -23,8 +23,10 @@
  *
  */
 
-/* required for getsubopt() */
+/* required for getsubopt(); the __sun test gives us strncasecmp() on solaris */
+#ifndef __sun
 #define _XOPEN_SOURCE 500
+#endif
 /* required for strncasecmp() */
 #define _BSD_SOURCE 1
 
@@ -223,7 +225,7 @@ int handle_debug_subopt(char *sopt) {
       break;
     }
   }
-  
+
   return 1;
 }
 #endif
@@ -379,9 +381,8 @@ static void load_audio_out_driver(char *audio_driver_id,
       *audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						    audio_driver_id);
       if(*audio_driver) {
-	config_set_str("audio_driver_name", audio_driver_id);
 	if(driver_ids)
-	  free(driver_ids);
+	    free(driver_ids);
 	return;
       }
     }

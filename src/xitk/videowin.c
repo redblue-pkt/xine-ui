@@ -244,6 +244,10 @@ void video_window_adapt_size (int video_width, int video_height,
      */
 
     attr.background_pixel  = gGui->black.pixel;
+    attr.border_pixel      = 1;
+    attr.colormap          = XCreateColormap(gGui->display,
+					     RootWindow(gGui->display, gGui->screen), 
+					     gVw->vinfo.visual, AllocNone);
     
     gGui->video_window = 
       XCreateWindow (gGui->display, 
@@ -252,7 +256,7 @@ void video_window_adapt_size (int video_width, int video_height,
 		     gVw->fullscreen_height, 
 		     0, gVw->depth, CopyFromParent, 
 		     gVw->vinfo.visual,
-		     CWBackPixel, &attr);
+		     CWBackPixel  | CWBorderPixel | CWColormap, &attr);
     
     if(gGui->vo_driver)
       gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
@@ -308,20 +312,18 @@ void video_window_adapt_size (int video_width, int video_height,
     hint.height = gVw->video_height;
     hint.flags  = PPosition | PSize;
 
-    /*
-    theCmap   = XCreateColormap(display, RootWindow(display,gXv.screen), 
-    gXv.vinfo.visual, AllocNone); */
-  
     attr.background_pixel  = gGui->black.pixel;
     attr.border_pixel      = 1;
-    /* attr.colormap          = theCmap; */
+    attr.colormap          = XCreateColormap(gGui->display,
+					     RootWindow(gGui->display, gGui->screen), 
+					     gVw->vinfo.visual, AllocNone);
     
 
     gGui->video_window = 
       XCreateWindow(gGui->display, RootWindow(gGui->display, gGui->screen),
 		    hint.x, hint.y, hint.width, hint.height, 4, 
 		    gVw->depth, CopyFromParent, gVw->vinfo.visual,
-		    CWBackPixel | CWBorderPixel , &attr);
+		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
     
     if(gGui->vo_driver)
       gGui->vo_driver->gui_data_exchange (gGui->vo_driver,

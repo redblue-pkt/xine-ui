@@ -33,6 +33,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
+#include <limits.h>
 
 #include "xitk.h"
 
@@ -470,6 +471,9 @@ void gui_status_callback (int nStatus) {
      XSendEvent(gGui->display, gGui->panel_window, True, KeyPressMask,        \
                 &startevent);                                                 \
    }
+#ifndef	NAME_MAX
+#define	NAME_MAX	20
+#endif
 void gui_init (int nfiles, char *filenames[]) {
 
   int                   i;

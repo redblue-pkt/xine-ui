@@ -143,15 +143,15 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
   int          button_width, state = 0;
   gui_image_t *skin;
   Pixmap       btn, bgtmp;
+  XWindowAttributes attr;
 
+  XGetWindowAttributes(private_data->display, win, &attr);
 
   skin = private_data->skin;
 
   button_width = skin->width / 3;
   bgtmp = XCreatePixmap(private_data->display, skin->image,
-			button_width, skin->height, 
-			DefaultDepth(private_data->display,
-				     DefaultScreen(private_data->display)));
+			button_width, skin->height, attr.depth);
 
   XLockDisplay(private_data->display);
 

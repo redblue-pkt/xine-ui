@@ -271,12 +271,18 @@ void panel_init (void) {
   hint.height = panel->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
+  attr.override_redirect = True;
+  attr.background_pixel  = gGui->black.pixel;
+  attr.border_pixel      = 1;
+  attr.colormap          = XCreateColormap(gGui->display,
+					   RootWindow(gGui->display, gGui->screen), 
+					   gGui->imlib_data->x.visual, AllocNone);
+
   /*  
       printf ("imlib_data: %d visual : %d\n",gGui->imlib_data,gGui->imlib_data->x.visual);
       printf ("w : %d h : %d\n",hint.width, hint.height);
   */
   
-  attr.override_redirect = True;
   gGui->panel_window = XCreateWindow (gGui->display, 
 				      DefaultRootWindow(gGui->display), 
 				      hint.x, hint.y,
@@ -284,7 +290,7 @@ void panel_init (void) {
 				      gGui->imlib_data->x.depth,
 				      CopyFromParent, 
 				      gGui->imlib_data->x.visual,
-				      0, &attr);
+				      CWBackPixel | CWBorderPixel | CWColormap, &attr);
   
   XSetStandardProperties(gGui->display, gGui->panel_window, title, title,
 			 None, NULL, 0, &hint);

@@ -496,13 +496,19 @@ void playlist_editor(void) {
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
+  attr.background_pixel  = gGui->black.pixel;
+  attr.border_pixel      = 1;
+  attr.colormap          = XCreateColormap(gGui->display,
+                                           RootWindow(gGui->display, gGui->screen),
+                                           gGui->imlib_data->x.visual, AllocNone);
+
   playlist->window = XCreateWindow (gGui->display, 
 				    DefaultRootWindow(gGui->display), 
 				    hint.x, hint.y, hint.width, 
 				    hint.height, 0, 
 				    gGui->imlib_data->x.depth, CopyFromParent, 
 				    gGui->imlib_data->x.visual,
-				    0, &attr);
+				    CWBackPixel | CWBorderPixel | CWColormap, &attr);
   
   XSetStandardProperties(gGui->display, playlist->window, title, title,
 			 None, NULL, 0, &hint);
