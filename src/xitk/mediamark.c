@@ -114,6 +114,15 @@ static char *_download_file(const char *filename, int *size) {
   return buf;
 }
 
+static int _file_exist(char *filename) {
+  struct stat  st;
+  
+  if(filename && (stat(filename, &st) == 0))
+    return 1;
+  
+  return 0;
+}
+
 static char *_read_file(const char *filename, int *size) {
   struct stat  st;
   char        *buf = NULL;
@@ -341,8 +350,18 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	  int   entries_m3u = 0;
 	  char *ptitle      = NULL;
 	  char *title       = NULL;
+	  char *path;
+	  char *origin = NULL;
 	  int   linen = 0;
 	  char *ln;
+	  
+
+	  path = strrchr(filename, '/');
+	  if(path && (path > filename)) {
+	    origin = (char *) xine_xmalloc((path - filename) + 2);
+	    strncat(origin, filename, (path - filename));
+	    strcat(origin, "/");
+	  }
 	  
 	  while((ln = playlist->lines[linen++]) != NULL) {
 	    if(ln) {
@@ -356,13 +375,30 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  }
 		}
 		else {
+		  char  buffer[_PATH_MAX + _NAME_MAX + 1];
+		  char *entry;
 		  
 		  if(entries_m3u == 0)
 		    mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
 		  else
 		    mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_m3u + 2));
-		  
-		  mediamark_store_mmk(&mmk[entries_m3u], ln, title, 0, -1);
+
+		  entry = ln;
+
+		  if(origin) {
+		    memset(&buffer, 0, sizeof(buffer));
+		    sprintf(buffer, "%s", origin);
+		    
+		    if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
+		      buffer[strlen(buffer) - 1] = '\0';
+		    
+		    sprintf(buffer, "%s%s", buffer, ln);
+		    
+		    if(_file_exist(buffer))
+		      entry = buffer;
+		  }
+		    
+		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, 0, -1);
 		  playlist->entries = ++entries_m3u;
 		  ptitle = title = NULL;
 		}
@@ -377,6 +413,9 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	    mmk[entries_m3u] = NULL;
 	    playlist->type = strdup("M3U");
 	  }
+
+	  if(origin)
+	    free(origin);
 
 	  while(playlist->numl) {
 	    free(playlist->lines[playlist->numl - 1]);
@@ -415,7 +454,6 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 	    int    entries_sfv = 0;
 	    char  *path;
 	    char  *origin = NULL;
-	    int    origin_end = 0;
 	    int    linen = 0;
 	    char  *ln;
 
@@ -424,7 +462,6 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 	      origin = (char *) xine_xmalloc((path - filename) + 2);
 	      strncat(origin, filename, (path - filename));
 	      strcat(origin, "/");
-	      origin_end = ((path - filename) + 1);
 	    }
 	    
 	    while((ln = playlist->lines[linen++]) != NULL) {
@@ -434,22 +471,35 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 		if(valid_sfv) {
 		  
 		  if(strncmp(ln, ";", 1)) {
-		    char  entry[_PATH_MAX + _NAME_MAX + 1];
+		    char  mentry[_PATH_MAX + _NAME_MAX + 1];
+		    char  buffer[_PATH_MAX + _NAME_MAX + 1];
+		    char *entry;
 		    int   crc;
 		    
-		    if(origin_end)
-		      sprintf(entry, "%s", origin);
-		    
-		    if((sscanf(ln, "%s %x", &entry[origin_end], &crc)) == 2) {
+		    if((sscanf(ln, "%s %x", &mentry[0], &crc)) == 2) {
 		      
 		      if(entries_sfv == 0)
 			mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
 		      else
 			mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_sfv + 2));
+		      
+		      entry = mentry;
+		      
+		      if(origin) {
+			memset(&buffer, 0, sizeof(buffer));
+			sprintf(buffer, "%s", origin);
+			
+			if((buffer[strlen(buffer) - 1] == '/') && (mentry[0] == '/'))
+			  buffer[strlen(buffer) - 1] = '\0';
+			
+			sprintf(buffer, "%s%s", buffer, mentry);
+			
+			if(_file_exist(buffer))
+			  entry = buffer;
+		      }
+
 		      mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, 0, -1);
-		      
 		      playlist->entries = ++entries_sfv;
-		      
 		    }
 		  }
 		}
