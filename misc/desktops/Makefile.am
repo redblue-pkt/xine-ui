@@ -83,6 +83,8 @@ uninstall-local:
 	for remove in $$REMOVALS; do \
 	  rm -f $$remove; \
 	done; \
+	DIR_HI=$(DESTDIR)/opt/kde2/share/icons/hicolor; \
+	DIR_LO=$(DESTDIR)/opt/kde2/share/icons/locolor; \
 	HIRES='48x48 32x32 22x22'; \
 	LORES='32x32 22x22 16x16'; \
 	for hires in $$HIRES; do \
