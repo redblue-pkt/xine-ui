@@ -497,7 +497,7 @@ static int notify_click_inputtext(xitk_widget_t *w, int button, int bUp, int x, 
 
     if((p = private_data->text)) {
       xitk_font_t *fs = NULL;
-      int          width = 0, i = 1;
+      int          width = 0, i = 0;
       int          max_len;
       
       p += private_data->disp_offset;
@@ -515,16 +515,20 @@ static int notify_click_inputtext(xitk_widget_t *w, int button, int bUp, int x, 
       
       max_len = xitk_font_get_text_width(fs, p, strlen(p));
       
-      if(pos > max_len)
-	pos = max_len + 1;
-      
-      while(width < pos) {
-	width = xitk_font_get_text_width(fs, p, i);
-	i++;
+      if(pos > max_len) {
+	/* cursor behind the last character */
+	i = strlen(p) + 1;
+      } else {
+	/* cursor in the text */
+        /* FIXME: implement multibyte string support */
+        while(width < pos) {
+          width = xitk_font_get_text_width(fs, p, i + 1);
+          i++;
+	}
       }
 
       xitk_font_unload_font(fs);
-      pos = (i - 2) + private_data->disp_offset;
+      pos = (i - 1) + private_data->disp_offset;
       
       if(pos > strlen(private_data->text))
 	pos = strlen(private_data->text);

@@ -17,7 +17,7 @@ endif
 
 
 libcommon_la_SOURCES = $(GETOPT_SRC) utils.c
-libcommon_la_LIBADD = $(X11_COMMON_LIBS)
+libcommon_la_LIBADD = $(X11_COMMON_LIBS) $(GICONV_BSD_LIBS)
 
 noinst_HEADERS = $(GETOPT_HDR) utils.h libcommon.h
 

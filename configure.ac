@@ -671,6 +671,22 @@ case "$host_or_hostalias" in
     DEBUG_CFLAGS="$X_CFLAGS -D_REENTRANT -DDEBUG $DEBUG_CFLAGS"
     AC_DEFINE(__i386__,1,[Define this if you're running x86 architecture])
     AC_DEFINE([ARCH_X86],,[Define this if you're running x86 architectur])
+
+    AC_CHECK_HEADER(/usr/local/include/iconv.h,
+			CFLAGS="-I/usr/local/include $CFLAGS"
+			LDFLAGS="-L/usr/local/lib $LDFLAGS"
+	                GICONV_BSD_LIBS="-liconv"
+		        no_BSDiconv="no", 
+                        [ no_BSDiconv="yes"
+	                  echo
+                          echo "****************************************************************"
+		          echo "* You need to install a recent version of the port 'libiconv'  *"
+			  echo "* (in /usr/ports/converters/libiconv).                         *"
+			  echo "* The library in this port is needed to successfully compile   *"
+			  echo "* libsputext plugin.                                           *"
+                          echo "****************************************************************"
+	                  echo 
+                        ],)
     ;;
 
   i?86*-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-*)
@@ -816,6 +832,8 @@ case "$host_or_hostalias" in
     DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 esac
+AC_SUBST(GICONV_BSD_LIBS)
+AM_CONDITIONAL(HAVE_GICONV, test x$no_BSDiconv != "xyes")
 
 CFLAGS="-DNDEBUG $COMMON_CFLAGS $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
 DEBUG_CFLAGS="$COMMON_CFLAGS $DEBUG_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"

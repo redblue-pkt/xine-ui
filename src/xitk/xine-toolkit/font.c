@@ -818,7 +818,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   int         fascent, fdescent;
 #else
   XGlyphInfo xft_extents;
-  char       *encoded_text;
+  char       *foo_text, *encoded_text;
 #endif
 #if defined(WITH_XMB) || defined(WITH_XFT)
   XRectangle  logic;
@@ -848,9 +848,14 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   ABORT_IF_NULL(xtfs->font);
   ABORT_IF_NULL(c);
 
-  encoded_text = xitk_recode(cache.xr, c);
+  /* recode right part of string */
+  if (nbytes > strlen(c)) nbytes = strlen(c);
+  foo_text = strdup(c);
+  foo_text[nbytes] = '\0';
+  encoded_text = xitk_recode(cache.xr, foo_text);
+  
   XLOCK(xtfs->display);
-  XftTextExtentsUtf8( xtfs->display, xtfs->font, encoded_text, strlen(encoded_text), &xft_extents );
+  XftTextExtentsUtf8( xtfs->display, xtfs->font, encoded_text, nbytes, &xft_extents );
   XUNLOCK(xtfs->display);
   free(encoded_text);
   logic.width  = xft_extents.width;
