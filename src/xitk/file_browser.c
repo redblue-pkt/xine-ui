@@ -123,6 +123,7 @@ struct filebrowser_s {
   int                             filter_selected;
   char                          **file_filters;
 
+  xitk_widget_t                  *show_hidden;
   int                             show_hidden_files;
 
   char                            current_dir[XINE_PATH_MAX + 1];
@@ -979,6 +980,13 @@ static void fb_select_file_filter(xitk_widget_t *w, void *data, int selected) {
   fb_getdir(fb);
 }
 
+static void fb_hidden_files(xitk_widget_t *w, void *data, int state) {
+  filebrowser_t *fb = (filebrowser_t *) data;
+  
+  fb->show_hidden_files = state;
+  fb_getdir(fb);
+}
+
 void filebrowser_raise_window(filebrowser_t *fb) {
   if(fb != NULL) {
     if(fb->xwin) {
@@ -1056,6 +1064,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   xitk_inputtext_widget_t     inp;
   xitk_button_widget_t        b;
   xitk_combo_widget_t         cmb;
+  xitk_widget_t              *widget;
   int                         i, x, y, w, width, height;
 
   fb = (filebrowser_t *) xine_xmalloc(sizeof(filebrowser_t));
@@ -1226,7 +1235,6 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
 	   (fb->files_sort =
 	    xitk_noskin_button_create(fb->widget_list, &b, x - 1, y, w + 12 + 2, 15)));
 
-
   x--;
   y += xitk_get_widget_height(fb->files_browser) + 16 + 5;
   w = xitk_get_widget_width(fb->files_browser);
@@ -1243,6 +1251,27 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   xitk_combo_set_select(fb->widget_list, fb->filters, fb->filter_selected);
 
   x = 15;
+
+  cb.skin_element_name = NULL;
+  cb.callback          = fb_hidden_files;
+  cb.userdata          = (void *) fb;
+  xitk_list_append_content (fb->widget_list->l,
+	    (fb->show_hidden = 
+	     xitk_noskin_checkbox_create(fb->widget_list, &cb, x, y+5, 10, 10)));
+
+  xitk_checkbox_set_state(fb->show_hidden, fb->show_hidden_files, 
+			  fb->widget_list->win, fb->widget_list->gc);
+
+  lbl.window            = xitk_window_get_window(fb->xwin);
+  lbl.gc                = fb->widget_list->gc;
+  lbl.skin_element_name = NULL;
+  lbl.label             = _("Show hidden file");
+  lbl.callback          = NULL;
+  lbl.userdata          = NULL;
+  xitk_list_append_content(fb->widget_list->l, 
+	   (widget = 
+	    xitk_noskin_label_create(fb->widget_list, &lbl, x + 15, y, w - 15, 20, fontname)));
+
   y += 30;
   w = (WINDOW_WIDTH - (4 * 15)) / 3;
 
