@@ -473,7 +473,7 @@ void show_usage (void) {
   printf(_("      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"));
   printf(_("                               is either an X11 visual class, or a visual id.\n"));
   printf(_("      --install                Install a private colormap.\n"));
-  printf(_("      --keymap [option]        Display keymap. Option are:\n"));
+  printf(_("      --keymap [=option]       Display keymap. Option are:\n"));
   printf(_("                                 'default': display default keymap table,\n"));
   printf(_("                                 'lirc': display draft of a .lircrc config file.\n"));
   printf(_("                                 'remapped': user remapped keymap table.\n"));
@@ -485,7 +485,7 @@ void show_usage (void) {
   printf(_("  -N, --animation <mrl>        Specify mrl to play when video output isn't used.\n"));
   printf(_("                                 -can be used more than one time.\n"));
   printf(_("  -P, --playlist <filename>    Load a playlist file.\n"));
-  printf(_("  -l, --loop [mode]            Set playlist loop mode (default: loop). Modes are:\n"));
+  printf(_("  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes are:\n"));
   printf(_("                                 'loop': loop entire playlist.\n"));
   printf(_("                                 'repeat': repeat current playlist entry.\n"));
   printf(_("                                 'shuffle': select randomly a yet unplayed entry from playlist\n"));
@@ -1054,6 +1054,7 @@ int main(int argc, char *argv[]) {
     case DISPLAY_KEYMAP:
       if(optarg != NULL) {
 	char *p = xine_chomp(optarg);
+
 	if(!strcasecmp(p, "default"))
 	  kbindings_display_default_bindings();
 	else if(!strcasecmp(p, "lirc"))
@@ -1100,13 +1101,15 @@ int main(int argc, char *argv[]) {
 
     case 'l':
       if(optarg != NULL) {
-	if(!strcasecmp(optarg, "loop"))
+	char *p = xine_chomp(optarg);
+
+	if(!strcasecmp(p, "loop"))
 	  gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
-	else if(!strcasecmp(optarg, "repeat"))
+	else if(!strcasecmp(p, "repeat"))
 	  gGui->playlist.loop = PLAYLIST_LOOP_REPEAT;
-	else if(!strcasecmp(optarg, "shuffle+"))
+	else if(!strcasecmp(p, "shuffle+"))
 	  gGui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
-	else if(!strcasecmp(optarg, "shuffle"))
+	else if(!strcasecmp(p, "shuffle"))
 	  gGui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
 	else {
 	  printf(_("Bad loop mode '%s', see xine --help\n"), optarg);

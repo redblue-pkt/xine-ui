@@ -425,7 +425,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
 void gui_exit (xitk_widget_t *w, void *data) {
   
   gui_stop(NULL, NULL);
-  
+
   video_window_exit ();
 
 #ifdef HAVE_XF86VIDMODE
@@ -526,7 +526,6 @@ void gui_stop (xitk_widget_t *w, void *data) {
   gGui->ignore_next = 0;
 
   mediamark_reset_played_state();
-
   if(gGui->visual_anim.running) {
     xine_stop(gGui->visual_anim.stream);
     if(gGui->visual_anim.enabled == 2)

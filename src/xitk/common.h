@@ -47,6 +47,7 @@
 #include "i18n.h"
 #include "lang.h"
 #include "lirc.h"
+#include "menus.h"
 #include "mrl_browser.h"
 #include "network.h"
 #include "panel.h"

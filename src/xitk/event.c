@@ -542,7 +542,7 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_SV_SYNC_p:
     {
-      int offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) + 1;
+      int offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) + 3600;
       
       xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, offset);
       osd_display_info(_("SPU Offset: %d"), offset);
@@ -551,7 +551,7 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_SV_SYNC_m:
     {
-      int offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) - 1;
+      int offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) - 3600;
       
       xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, offset);
       osd_display_info(_("SPU Offset: %d"), offset);

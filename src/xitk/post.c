@@ -52,7 +52,7 @@ void post_init(void) {
   gGui->visual_anim.post_output = NULL;
   gGui->visual_anim.post_plugin_num = -1;
   gGui->visual_anim.post_changed = 0;
-  
+
   if(gGui->ao_port) {
     const char *const *pol = xine_list_post_plugins_typed(gGui->xine, 
 							  XINE_POST_TYPE_AUDIO_VISUALIZATION);

@@ -58,6 +58,7 @@ extern gGui_t *gGui;
 
 /* Video window private structure */
 typedef struct {
+  xitk_widget_list_t  *wl;
   Cursor         cursor[2];       /* Cursor pointers                       */
   int            cursor_visible;
   Visual	*visual;	  /* Visual for video window               */
@@ -268,6 +269,8 @@ static void video_window_adapt_size (void) {
 					 CopyFromParent, CopyFromParent, CopyFromParent, 
 					 CWBackPixel | CWOverrideRedirect, &attr);
       
+      xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
+
       if(gGui->vo_port)
 	xine_gui_send_vo_data(gGui->stream, 
 			      XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
@@ -283,6 +286,8 @@ static void video_window_adapt_size (void) {
       gcv.graphics_exposures = False;
       gVw->gc = XCreateGC(gGui->display, gGui->video_window, 
 			  GCForeground | GCBackground | GCGraphicsExposures, &gcv);
+
+      xitk_widget_list_set(gVw->wl, WIDGET_LIST_GC, gVw->gc);
 
       hint.flags  = USSize | USPosition | PPosition | PSize;
       hint.x      = 0;
@@ -543,7 +548,9 @@ static void video_window_adapt_size (void) {
 		     gVw->visual,
 		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
-	 if(gGui->vo_port)
+    xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
+
+    if(gGui->vo_port)
       xine_gui_send_vo_data(gGui->stream,
 			    XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
 
@@ -638,6 +645,8 @@ static void video_window_adapt_size (void) {
 		     gVw->visual,
 		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
+    xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
+    
     if(gGui->vo_port)
       xine_gui_send_vo_data(gGui->stream,
 			    XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
@@ -776,6 +785,8 @@ static void video_window_adapt_size (void) {
 		    gVw->depth, InputOutput, gVw->visual,
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
     
+    xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
+
     if(gGui->vo_port)
       xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
     
@@ -849,7 +860,8 @@ static void video_window_adapt_size (void) {
     XFreeGC(gGui->display, gVw->gc);
 
   gVw->gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
-  
+  xitk_widget_list_set(gVw->wl, WIDGET_LIST_GC, gVw->gc);
+      
   if (gVw->fullscreen_mode) {
     /* Waiting for visibility, avoid X error on some cases */
     while(!xitk_is_window_visible(gGui->display, gGui->video_window))
@@ -1165,6 +1177,9 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 #endif
 
   gVw = (gVw_t *) xine_xmalloc(sizeof(gVw_t));
+  
+  gVw->wl                 = xitk_widget_list_new();
+  xitk_widget_list_set(gVw->wl, WIDGET_LIST_LIST, (xitk_list_new()));
 
   gVw->fullscreen_req     = 0;
   gVw->fullscreen_mode    = 0;
@@ -1772,9 +1787,10 @@ static void video_window_handle_event (XEvent *event, void *data) {
     }
 
     if (bevent->button == Button3)
+      video_window_menu(gVw->wl);
+    else if (bevent->button == Button2)
       panel_toggle_visibility(NULL, NULL);
-
-    if (bevent->button == Button1) {
+    else if (bevent->button == Button1) {
       if (video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
 	xine_event_t event;
 	xine_input_data_t input;

@@ -23,6 +23,7 @@ xine_SOURCES = \
 	lang.c \
 	lirc.c \
 	main.c \
+	menus.c \
 	mrl_browser.c \
 	network.c \
 	osd.c \
@@ -70,6 +71,7 @@ noinst_HEADERS = \
 	kbindings.h \
 	lang.h \
 	lirc.h \
+	menus.h \
 	mrl_browser.h \
 	network.h \
 	osd.h \
