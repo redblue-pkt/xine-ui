@@ -396,7 +396,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
       
       extension = strrchr(filename, '.');
       
-      if((extension) && (!strcasecmp(extension, ".pls"))) {
+      if((extension) && (!strncasecmp(extension, ".pls", 4))) {
 	char *pls_content;
 	int   size;
 	
@@ -415,10 +415,10 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 	    char *ln;
 
 	    do {
-
+	      
 	      while((ln = playlist->lines[linen++]) != NULL) {
 		if(ln) {
-		  
+
 		  if(valid_pls) {
 		    
 		    if(entries_pls) {
@@ -614,7 +614,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
   
       extension = strrchr(filename, '.');
       
-      if((extension) && (!strcasecmp(extension, ".sfv"))) {
+      if((extension) && (!strncasecmp(extension, ".sfv", 4))) {
 	char *sfv_content;
 	int   size;
 	
