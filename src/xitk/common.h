@@ -217,6 +217,8 @@ typedef struct {
   
   struct {
     int                     enabled;
+    int                     use_unscaled;
+    int                     unscaled_available;
     int                     timeout;
 
     xine_osd_t             *sinfo;

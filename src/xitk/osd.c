@@ -114,6 +114,12 @@ static uint8_t trans[OVL_PALETTE_SIZE];
 #define BAR_WIDTH 336
 #define BAR_HEIGHT 25
 
+static void  _xine_osd_show(xine_osd_t *osd, int64_t vpts) {
+  if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
+    xine_osd_show_unscaled(osd, vpts);
+  else
+    xine_osd_show(osd, vpts);
+}
 
 static char *_osd_get_speed_sym(int speed) {
   int i;
@@ -165,6 +171,8 @@ void osd_init(void) {
   xine_osd_set_text_palette(gGui->osd.info, 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
+  gGui->osd.unscaled_available =
+    (xine_osd_get_capabilities(gGui->osd.status) & XINE_OSD_CAP_UNSCALED );
 }
 
 void osd_deinit(void) {
@@ -367,7 +375,7 @@ void osd_stream_infos(void) {
     x = (vwidth - osdw) - 40;
     xine_osd_set_position(gGui->osd.sinfo, (x >= 0) ? x : 0, 15);
 
-    xine_osd_show(gGui->osd.sinfo, 0);
+    _xine_osd_show(gGui->osd.sinfo, 0);
     gGui->osd.sinfo_visible = gGui->osd.timeout;
   }
 }
@@ -488,9 +496,9 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     xine_osd_set_position(gGui->osd.bar[0], (x >= 0) ? x : 0, (vheight - BAR_HEIGHT) - 40);
     xine_osd_set_position(gGui->osd.bar[1], (x >= 0) ? x : 0, (vheight - (BAR_HEIGHT * 2)) - 40);
     
-    xine_osd_show(gGui->osd.bar[0], 0);
+    _xine_osd_show(gGui->osd.bar[0], 0);
     if(title)
-      xine_osd_show(gGui->osd.bar[1], 0);
+      _xine_osd_show(gGui->osd.bar[1], 0);
     
     gGui->osd.bar_visible = gGui->osd.timeout;
   }
@@ -532,7 +540,7 @@ void osd_display_info(char *info, ...) {
 
     xine_osd_draw_text(gGui->osd.info, 0, 0, buf, XINE_OSD_TEXT1);
     xine_osd_set_position(gGui->osd.info, 20, 10 + 30);
-    xine_osd_show(gGui->osd.info, 0);
+    _xine_osd_show(gGui->osd.info, 0);
     gGui->osd.info_visible = gGui->osd.timeout;
     SAFE_FREE(buf);
   }
@@ -592,7 +600,7 @@ void osd_update_status(void) {
     
     xine_osd_draw_text(gGui->osd.status, 0, 0, buffer, XINE_OSD_TEXT1);
     xine_osd_set_position(gGui->osd.status, 20, 10);
-    xine_osd_show(gGui->osd.status, 0);
+    _xine_osd_show(gGui->osd.status, 0);
     gGui->osd.status_visible = gGui->osd.timeout;
   }
 }

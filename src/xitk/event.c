@@ -161,6 +161,9 @@ static void skin_server_url_cb(void *data, xine_cfg_entry_t *cfg) {
 static void osd_enabled_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->osd.enabled = cfg->num_value;
 }
+static void osd_use_unscaled_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->osd.use_unscaled = cfg->num_value;
+}
 static void osd_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->osd.timeout = cfg->num_value;
 }
@@ -1274,6 +1277,15 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				"in output window."), 
 			      CONFIG_LEVEL_BEG,
 			      osd_enabled_cb,
+			      CONFIG_NO_DATA);
+
+  gGui->osd.use_unscaled = 
+    xine_config_register_bool(gGui->xine, "gui.osd_use_unscaled", 
+			      1,
+			      _("Use unscaled OSD"),
+			      _("Use unscaled (full screen resolution) OSD if possible"), 
+			      CONFIG_LEVEL_ADV,
+			      osd_use_unscaled_cb,
 			      CONFIG_NO_DATA);
 
   gGui->osd.timeout = 
