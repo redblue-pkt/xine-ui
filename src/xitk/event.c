@@ -93,7 +93,7 @@ static char *exp_levels[] = {
 
 static char *visual_anim_style[] = {
   "None",
-  "Post plugin",
+  "Post Plugin",
   "Stream Animation",
   NULL
 };

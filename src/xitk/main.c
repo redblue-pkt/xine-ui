@@ -1164,7 +1164,7 @@ int main(int argc, char *argv[]) {
       int  i = 0;
       int  num_plug = 0;
       
-      /* We're only insterrested by post plugin which handle audio in input */
+      /* We're only interested by post plugin which handle audio in input */
       while(pol[i]) {
 	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
 	
@@ -1183,7 +1183,8 @@ int main(int argc, char *argv[]) {
 		  if(num_plug == 0)
 		    post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
 		  else
-		    post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * (num_plug + 1));
+		    post_output_plugins = (char **) realloc(post_output_plugins, 
+							    sizeof(char *) * (num_plug + 1));
 		  
 		  post_output_plugins[num_plug]     = strdup(pol[i]);
 		  post_output_plugins[num_plug + 1] = NULL;
