@@ -111,9 +111,9 @@ AC_SUBST(THREAD_LIBS)
 
 
 dnl
-dnl Check for Xine
+dnl Check for xine-lib
 dnl
-AM_PATH_XINE(0.5.0,, AC_MSG_ERROR(*** You should install xine first ***))
+AM_PATH_XINE(0.5.0,, AC_MSG_ERROR(*** You should install xine-lib first ***))
 
 dnl
 dnl dynamic linker
