@@ -48,6 +48,8 @@ typedef struct {
 
   int               animation;
   char             *animated_label;
+  int               anim_running;
+  int               anim_offset;
 
   pthread_t         thread;
   pthread_mutex_t   mutex;

@@ -45,30 +45,31 @@ static void paint_label (widget_t *l,  Window win, GC gc) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;
   gui_image_t *font = (gui_image_t *) private_data->font;
-  int x_dest, y_dest, nCWidth, nCHeight, nLen, i;
+  int x_dest, y_dest, nCWidth, nCHeight, len, i;
   char *label_to_display;
 
   if ((l->widget_type & WIDGET_TYPE_LABEL) && l->visible) {
 
-    if(private_data->animation) {
-      pthread_mutex_lock(&private_data->mutex);
-      label_to_display = private_data->animated_label;
-      pthread_mutex_unlock(&private_data->mutex);
-    }
-    else
+    pthread_mutex_lock(&private_data->mutex);
+    if (private_data->anim_running) {
+      label_to_display = &private_data->animated_label[private_data->anim_offset];
+      len = private_data->length;
+    } else {
       label_to_display = private_data->label;
-      
+      len = strlen(label_to_display);
+    }
+    pthread_mutex_unlock(&private_data->mutex);
+
     x_dest = l->x;
     y_dest = l->y;
   
     nCWidth = font->width / 32;
     nCHeight = font->height / 3;
-    nLen = strlen (label_to_display);
     
     for (i=0; i<private_data->length; i++) {
       int c=0;
       
-      if ((i<nLen) && (label_to_display[i] >= 32))
+      if ((i<len) && (label_to_display[i] >= 32))
 	c = label_to_display[i]-32;
       
       if (c>=0) {
@@ -98,21 +99,112 @@ static void paint_label (widget_t *l,  Window win, GC gc) {
 /*
  *
  */
-int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
+void *label_animation_loop(void *data) {
+  label_private_data_t *private_data = (label_private_data_t *)data;
+  widget_t             *w = private_data->lWidget;
+
+  do {
+    
+    if(w->visible) {
+
+      private_data->anim_offset++;
+      if (private_data->anim_offset>(strlen(private_data->label) + 4))
+	private_data->anim_offset = 0;
+      
+      paint_label(private_data->lWidget, private_data->window, private_data->gc);
+      
+      /* We can't wait here, otherwise the rolling effect is really jerky */
+      XLOCK (private_data->display);
+      XSync(private_data->display, False);
+      XUNLOCK (private_data->display);
+      
+    }
+
+#if HAVE_NANOSLEEP
+    /* nanosleep is prefered on solaris, because it's mt-safe */
+    {
+      struct timespec ts;
+      ts.tv_sec = 0;
+      ts.tv_nsec = 400000000;
+      nanosleep(&ts, NULL);
+    }
+#else
+    usleep(400000);
+#endif
+    
+  } while(w->running && private_data->anim_running);
+  
+  pthread_exit(NULL);
+}
+
+static void label_setup_label (widget_t *l, char *label_) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;
 
-  if(l->widget_type & WIDGET_TYPE_LABEL) {
-    pthread_mutex_lock(&private_data->mutex);
+  int label_len;
 
-    if((private_data->label = (char *) 
-	realloc(private_data->label, strlen(newlabel)+1)) != NULL) {
+  pthread_mutex_lock(&private_data->mutex);
 
-      strcpy((char*)private_data->label, (char*)newlabel);
-      l->width = (private_data->char_length * strlen(newlabel));
+  if (private_data->label) {
+    free(private_data->label);
+    private_data->label = NULL;
+  }
+
+  if (private_data->animated_label) {
+    free(private_data->animated_label);
+    private_data->animated_label = NULL;
+  }
+
+  label_len = strlen(label_);
+  private_data->label = malloc (label_len +1);
+  strncpy (private_data->label, label_, label_len);
+  private_data->label[label_len] = 0;
+
+  if (private_data->animation) {
+
+    if (private_data->anim_running) {
+      void *dummy;
+      private_data->anim_running = 0;
+      pthread_join (private_data->thread, &dummy);
     }
 
-    pthread_mutex_unlock(&private_data->mutex);
+    if (label_len > private_data->length) {
+      pthread_attr_t         pth_attrs;
+      struct sched_param     pth_params;
+
+      private_data->anim_running = 1;
+
+      private_data->animated_label = (char *) malloc(2 * strlen(label_) + 12);
+
+      sprintf(private_data->animated_label, "%s *** %s *** ", label_, label_) ;
+      
+      private_data->anim_offset = 0;
+
+      pthread_attr_init(&pth_attrs);
+
+      /* this won't work on linux, freebsd 5.0 */
+      pthread_attr_getschedparam(&pth_attrs, &pth_params);
+      pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
+      pthread_attr_setschedparam(&pth_attrs, &pth_params);
+
+      pthread_create(&private_data->thread, &pth_attrs, 
+		     label_animation_loop, (void *)private_data);
+
+      pthread_attr_destroy(&pth_attrs);
+    }
+  }
+  
+  pthread_mutex_unlock(&private_data->mutex);
+}
+
+/*
+ *
+ */
+int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
+
+  if(l->widget_type & WIDGET_TYPE_LABEL) {
+
+    label_setup_label (l, newlabel);
     
     paint_label(l, wl->win, wl->gc);
 
@@ -130,124 +222,9 @@ int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
 /*
  *
  */
-void *label_animation_loop(void *data) {
-  label_private_data_t *private_data = (label_private_data_t *)data;
-  widget_t             *w = private_data->lWidget;
-  char                 *label;
-  char                 *disp_label = NULL;
-  char                 *receiver = NULL;
-  char                 *p;
-  char                 *pp;
-  int                  offset = 0;
-  int                  len = 0;
-  int                  length;
-
-  pthread_detach(pthread_self());
-  
-  do {
-    
-    if(w->visible) {
-
-      pthread_mutex_lock(&private_data->mutex);
-      label = strdup(private_data->label);
-      length = private_data->length;
-      pthread_mutex_unlock(&private_data->mutex);
-      
-      if(disp_label == NULL)
-	disp_label = (char *) gui_xmalloc(strlen(label) + 8);
-      else
-	disp_label = (char *) realloc(disp_label, strlen(label) + 8);
-      
-      if(receiver == NULL)
-	receiver = (char *) 
-	  malloc((sizeof(char *) * length) + 1);
-      else
-	receiver = (char *) 
-	  realloc(receiver, (sizeof(char *) * length) + 1);
-      
-      memset(receiver, 0, length + 1);
-      
-      if(strlen(label)) {
-	sprintf(disp_label, "%s  ***  ", label);
-	
-	p = disp_label;
-	p += offset;
-	
-	snprintf(receiver, length, "%s", p);
-	
-	len = strlen(receiver);
-	
-	if(len < length) {
-	  
-	  p = disp_label;
-	  pp = receiver;
-	  pp += len;
-	  
-	  while(len < length) {
-	    
-	    *pp = *p;
-	    
-	    if(*(p + 1) == '\0')
-	      p = disp_label;
-	    else
-	      p++;
-	  
-	    pp++;
-	    len++;
-	  }
-	}
-	
-	offset++;
-	
-	if(offset > (strlen(disp_label)-1))
-	  offset = 0;
-      }
-      
-      pthread_mutex_lock(&private_data->mutex);
-      
-      if(private_data->animated_label)
-	private_data->animated_label = (char *) 
-	  realloc(private_data->animated_label, strlen(receiver) + 1);
-      else
-	private_data->animated_label = (char *) 
-	  gui_xmalloc(strlen(receiver) + 1);
-      
-      sprintf(private_data->animated_label, "%s", receiver);
-      
-      pthread_mutex_unlock(&private_data->mutex);
-      
-      paint_label(private_data->lWidget, private_data->window, private_data->gc);
-      
-      /* We can't wait here, otherwise the rolling effect is really jerky */
-      XSync(private_data->display, False);
-      
-    }
-
-#if HAVE_NANOSLEEP
-    /* nanosleep is prefered on solaris, because it's mt-safe */
-    {
-      struct timespec ts;
-      ts.tv_sec = 0;
-      ts.tv_nsec = 400000000;
-      nanosleep(&ts, NULL);
-    }
-#else
-    usleep(400000);
-#endif
-    
-  } while(w->running);
-  
-  pthread_exit(NULL);
-}
-
-/*
- *
- */
 widget_t *label_create (xitk_label_t *l) {
   widget_t              *mywidget;
   label_private_data_t  *private_data;
-  pthread_attr_t         pth_attrs;
-  struct sched_param     pth_params;
 
   mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
   
@@ -261,15 +238,12 @@ widget_t *label_create (xitk_label_t *l) {
   private_data->char_length    = (private_data->font->width/32);
   private_data->char_height    = (private_data->font->height/3);
   private_data->length         = l->length;
-  private_data->label          = (char *)(l->label ? strdup(l->label) : "");
+  private_data->label          = NULL;
   private_data->animation      = l->animation;
-  private_data->animated_label = strdup(((private_data->animation) 
-					 ? private_data->label : ""));
-
-  if(private_data->animation) {
-    private_data->window       = l->window;
-    private_data->gc           = l->gc;
-  }
+  private_data->animated_label = NULL;
+  private_data->anim_running   = 0;
+  private_data->window         = l->window;
+  private_data->gc             = l->gc;
 
   mywidget->private_data       = private_data;
 
@@ -279,8 +253,7 @@ widget_t *label_create (xitk_label_t *l) {
   mywidget->have_focus         = FOCUS_LOST;
   mywidget->x                  = l->x;
   mywidget->y                  = l->y;
-  mywidget->width              = (private_data->char_length 
-				  * strlen(private_data->label));
+  mywidget->width              = private_data->char_length * private_data->length;
   mywidget->height             = private_data->char_height;
   mywidget->widget_type        = WIDGET_TYPE_LABEL;
   mywidget->paint              = paint_label;
@@ -290,21 +263,10 @@ widget_t *label_create (xitk_label_t *l) {
   
   pthread_mutex_init (&private_data->mutex, NULL);
 
-  if(private_data->animation) {
-
-    pthread_attr_init(&pth_attrs);
-
-    pthread_attr_getschedparam(&pth_attrs, &pth_params);
-
-    pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
-
-    pthread_attr_setschedparam(&pth_attrs, &pth_params);
-
-    pthread_create(&private_data->thread, &pth_attrs, 
-		   label_animation_loop, (void *)private_data);
-
-    pthread_attr_destroy(&pth_attrs);
-  }
+  label_setup_label (mywidget, l->label);
 
   return mywidget;
 }
+
+
+
