@@ -255,6 +255,30 @@ static kbinding_entry_t default_binding_table[] = {
 };
 
 /*
+ * Check if there some redundant entries in key binding table kbt.
+ */
+static void _kbindings_check_redundancy(kbinding_t *kbt) {
+  int i, j, found = -1;
+
+  if(kbt == NULL)
+    return;
+
+  for(i = 0; kbt->entry[i]->action != NULL; i++) {
+    for(j = 0; kbt->entry[j]->action != NULL; j++) {
+      if(i != j && j != found) {
+	if((!strcmp(kbt->entry[i]->key, kbt->entry[j]->key)) &&
+	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier)) {
+	  found = i;
+	  printf("Key bindings of '%s' and '%s' are similar.\n",
+		 kbt->entry[i]->action, kbt->entry[j]->action);
+	}
+      }
+    }
+  }
+  
+}
+
+/*
  * Free a keybindings object.
  */
 static void _kbindings_free_bindings(kbinding_t *kbt) {
@@ -590,8 +614,6 @@ static void _kbinding_load_config(kbinding_t *kbt, char *file) {
     }
     fclose(kbdf->fd);
   }
-  else
-    printf("unable to open %s\n", kbdf->bindingfile);
 
   SAFE_FREE(kbdf->bindingfile);
   SAFE_FREE(kbdf);
@@ -728,6 +750,9 @@ kbinding_t *kbindings_init_kbinding(void) {
   snprintf(buf, sizeof(buf), "%s/.xine_keymap", get_homedir());
   _kbinding_load_config(kbt, buf);
 
+  /* Just to check is there redundant entries, and inform user */
+  _kbindings_check_redundancy(kbt);
+
   return kbt;
 }
 
@@ -822,6 +847,7 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
   if((key == NULL) || (kbt == NULL))
     return NULL;
 
+  /*
   printf("Looking for: '%s' [", key);
   if(modifier == KEYMOD_NOMOD)
     printf("none, ");
@@ -836,6 +862,7 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
   if(modifier & KEYMOD_MOD5)
     printf("mod5, ");
   printf("\b\b]\n");
+  */
 
   /* Be case sensitive */
   for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
