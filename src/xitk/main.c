@@ -179,6 +179,8 @@ void show_usage (void) {
   printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
   printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
+  printf("                    'f': in fullscreen mode.\n");
+  printf("                    'h': hide GUI (panel, etc.).\n");
   printf("                    'q': quit when play is done.\n");
   printf("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n");
   printf("                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n");
@@ -518,7 +520,7 @@ void event_listener (void *user_data, xine_event_t *event) {
 int main(int argc, char *argv[]) {
 
   /* command line options will end up in these variables: */
-  int              c = '?';
+  int              c = '?', aos = 0;
   int              option_index = 0;
   int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
   int              audio_channel = 0;
@@ -550,7 +552,6 @@ int main(int argc, char *argv[]) {
   gGui = (gGui_t *) xmalloc(sizeof(gGui_t));
 
   gGui->debug_level = 0;
-  gGui->autoplay_options = 0;
   gGui->autoscan_plugin = NULL;
   gGui->prefered_visual_class = -1;
   gGui->prefered_visual_id = None;
@@ -559,6 +560,7 @@ int main(int argc, char *argv[]) {
 #ifdef HAVE_XF86VIDMODE
   gGui->XF86VidMode_fullscreen = 0;
 #endif
+  gGui->actions_on_start[aos] = ACTID_NOKEY;
 
 #ifdef DEBUG
   /* If XINE_DEBUG envvar is set, parse it */
@@ -636,18 +638,16 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'p':/* Play [[in fullscreen][then quit]] on start */
-      gGui->autoplay_options |= PLAY_ON_START;
+      gGui->actions_on_start[aos++] = ACTID_PLAY;
       if(optarg != NULL) {
-	/*
 	if(strrchr(optarg, 'f')) {
-	  gGui->autoplay_options |= FULL_ON_START;
+	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
 	}
 	if(strrchr(optarg, 'h')) {
-	  gGui->autoplay_options |= HIDEGUI_ON_START;
+	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
 	}
-	*/
 	if(strrchr(optarg, 'q')) {
-	  gGui->autoplay_options |= QUIT_ON_STOP;
+	  gGui->actions_on_start[aos++] = ACTID_QUIT;
 	}
 	if(strrchr(optarg, 'd')) {
 	  gGui->autoscan_plugin = "DVD";
@@ -658,16 +658,16 @@ int main(int argc, char *argv[]) {
       }
       break;
 
-    case 's': /* autoscan on start */
-      gGui->autoscan_plugin = chomp(optarg);
-      break;
-
     case 'g': /* hide panel on start */
-      gGui->autoplay_options |= HIDEGUI_ON_START;
+      gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
       break;
 
     case 'f': /* full screen mode on start */
-      gGui->autoplay_options |= FULL_ON_START;
+      gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
+      break;
+
+    case 's': /* autoscan on start */
+      gGui->autoscan_plugin = chomp(optarg);
       break;
        
 #ifdef HAVE_XF86VIDMODE
@@ -735,6 +735,8 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
   }
+
+  gGui->actions_on_start[aos] = ACTID_NOKEY;
 
   show_banner();
 

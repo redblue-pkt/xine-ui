@@ -52,7 +52,7 @@ typedef struct {
   char                *configfile;
 
   /* stuff like FULL_ON_START, QUIT_ON_STOP */
-  int                  autoplay_options;
+  action_id_t          actions_on_start[16];
   char                *autoscan_plugin;
 
   /* basic X11 stuff */

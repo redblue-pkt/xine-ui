@@ -73,7 +73,7 @@ void *xine_lirc_loop(void *dummy) {
       
       while((ret = lirc_code2char(lirc.config, code, &c)) == 0 
 	    && c != NULL) {
-	fprintf(stdout, "Command Received = '%s'\n", c);
+	//fprintf(stdout, "Command Received = '%s'\n", c);
 
 	k = kbindings_lookup_action(gGui->kbindings, c);
 	if(k)

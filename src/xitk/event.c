@@ -124,6 +124,16 @@ typedef struct {
 
 static screen_savers_t    ssavers;
 
+static int actions_on_start(action_id_t actions[], action_id_t a) {
+  int i = 0;
+  while(actions[i] != ACTID_NOKEY) {
+    if(actions[i] == a)
+      return 1;
+    i++;
+  }
+  return 0;
+}
+
 /**
  * Disable all screensavers.
  */
@@ -677,7 +687,7 @@ void gui_status_callback (int nStatus) {
       xine_play (gGui->xine, gGui->filename, 0, 0 );
     } else {
       
-      if(gGui->autoplay_options & QUIT_ON_STOP)
+      if(gGui->actions_on_start[0] == ACTID_QUIT)
 	gui_exit(NULL, NULL);
       
       video_window_show_logo();
@@ -799,17 +809,6 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 /*
  * Initialize the GUI
  */
-#define SEND_KEVENT(key) {                                                    \
-     static XEvent startevent;                                                \
-     startevent.type = KeyPress;                                              \
-     startevent.xkey.type = KeyPress;                                         \
-     startevent.xkey.send_event = True;                                       \
-     startevent.xkey.display = gGui->display;                                 \
-     startevent.xkey.window = gGui->panel_window;                             \
-     startevent.xkey.keycode = XKeysymToKeycode(gGui->display, key);          \
-     XSendEvent(gGui->display, gGui->panel_window, True, KeyPressMask,        \
-                &startevent);                                                 \
-   }
 #ifndef	NAME_MAX
 #define	NAME_MAX	20
 #endif
@@ -982,24 +981,28 @@ void gui_run (void) {
     }
   }  
 
-  /*  The user wants to hide control panel  */
-  if(panel_is_visible() && (gGui->autoplay_options & HIDEGUI_ON_START))
-    SEND_KEVENT(XK_G);
-  
-  /*  The user wants to see in fullscreen mode  */
-  if(gGui->autoplay_options & FULL_ON_START)
-    SEND_KEVENT(XK_F);  
+  if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
-  /*  The user request "play on start" */
-  if(gGui->autoplay_options & PLAY_ON_START) {
-      
-    if(gGui->playlist[0] != NULL)
-      SEND_KEVENT(XK_Return);
+    /*  The user wants to hide control panel  */
+    if(panel_is_visible() && (actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_VISIBLITY)))
+      gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
+
+    /*  The user wants to see in fullscreen mode  */
+    if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_FULLSCREEN))
+      gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
     
-    /* this isn't used anywhere ?! */
-    gGui->autoplay_options |= PLAYED_ON_START;    
+    /*  The user request "play on start" */
+    if(actions_on_start(gGui->actions_on_start, ACTID_PLAY))
+      
+      if(gGui->playlist[0] != NULL)
+	gui_execute_action_id(ACTID_PLAY);
+      
+    /* Flush actions on start */
+    if(actions_on_start(gGui->actions_on_start, ACTID_QUIT)) {
+      gGui->actions_on_start[0] = ACTID_QUIT;
+      gGui->actions_on_start[1] = ACTID_NOKEY;
+    }
   }
-  
   /* install sighandler */
   action.sa_handler = gui_signal_handler;
   sigemptyset(&(action.sa_mask));
