@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-02-21 01:32+0100\n"
+"POT-Creation-Date: 2002-02-26 01:38+0100\n"
 "PO-Revision-Date: 2002-02-20 00:00+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -67,7 +67,7 @@ msgstr "Cancel."
 msgid "Close control window"
 msgstr "Cerrar la ventana de control"
 
-#: src/xitk/event.c:664
+#: src/xitk/event.c:648
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -78,7 +78,7 @@ msgstr ""
 "\n"
 "No hay ningún plugin de entrada disponible para manipular '%s'.\n"
 
-#: src/xitk/event.c:670
+#: src/xitk/event.c:654
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -89,7 +89,7 @@ msgstr ""
 "\n"
 "No hay ningún plugin demultiplexador para manipular '%s'.\n"
 
-#: src/xitk/event.c:676
+#: src/xitk/event.c:660
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -99,7 +99,7 @@ msgstr ""
 "\n"
 "¡¡ Error no manipulable !!\n"
 
-#: src/xitk/event.c:898
+#: src/xitk/event.c:882
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -107,11 +107,11 @@ msgstr ""
 "\n"
 "XInitThreads falló - parece que su librería xlib no tiene hilos seguros.\n"
 
-#: src/xitk/event.c:908
+#: src/xitk/event.c:892
 msgid "Cannot open display\n"
 msgstr "No se puede abrir la pantalla\n"
 
-#: src/xitk/event.c:981
+#: src/xitk/event.c:965
 msgid "Unable to initialize Imlib\n"
 msgstr "No se puede iniciar Imlib\n"
 
@@ -123,12 +123,12 @@ msgstr "Navegador de archivos de xine"
 msgid "Select"
 msgstr "Selecc."
 
-#: src/xitk/kbindings.c:307
+#: src/xitk/kbindings.c:299
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Los atajos de teclado '%s' y '%s' son similares.\n"
 
-#: src/xitk/kbindings.c:663
+#: src/xitk/kbindings.c:655
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "OOCH: la tabla de atajos de teclado es NULL.\n"
 

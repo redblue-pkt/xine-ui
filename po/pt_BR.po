@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-02-21 01:32+0100\n"
+"POT-Creation-Date: 2002-02-26 01:38+0100\n"
 "PO-Revision-Date: 2002-01-22 16:34GMT-3\n"
 "Last-Translator: Marcelo Roberto Jimenez <mroberto@cetuc.puc-rio.br>\n"
 "Language-Team: Portuguese (Brazilian) <pt_BR@li.org>\n"
@@ -67,7 +67,7 @@ msgstr "Fechar"
 msgid "Close control window"
 msgstr ""
 
-#: src/xitk/event.c:664
+#: src/xitk/event.c:648
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -78,7 +78,7 @@ msgstr ""
 "\n"
 "Não existe nenhum plugin de entrada disponível para manipular '%s'.\n"
 
-#: src/xitk/event.c:670
+#: src/xitk/event.c:654
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -89,7 +89,7 @@ msgstr ""
 "\n"
 "Não existe nenhum plugin de demuxer para manipular '%s'.\n"
 
-#: src/xitk/event.c:676
+#: src/xitk/event.c:660
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -99,7 +99,7 @@ msgstr ""
 "\n"
 "!! Erro desconhecido !!\n"
 
-#: src/xitk/event.c:898
+#: src/xitk/event.c:882
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -107,11 +107,11 @@ msgstr ""
 "\n"
 "erro em XInitThreads - parece que sua versão da xlib não é 'thread-safe'.\n"
 
-#: src/xitk/event.c:908
+#: src/xitk/event.c:892
 msgid "Cannot open display\n"
 msgstr "Não é possível inicializar a tela \n"
 
-#: src/xitk/event.c:981
+#: src/xitk/event.c:965
 msgid "Unable to initialize Imlib\n"
 msgstr "Não é possível inicializar a Imlib\n"
 
@@ -123,12 +123,12 @@ msgstr "Selecionador de Arquivos Xine"
 msgid "Select"
 msgstr "Selecione"
 
-#: src/xitk/kbindings.c:307
+#: src/xitk/kbindings.c:299
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "As teclas associadas para '%s' e '%s' são semelhantes.\n"
 
-#: src/xitk/kbindings.c:663
+#: src/xitk/kbindings.c:655
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "OOCH: A tabela de associação de teclas é nula.\n"
 
