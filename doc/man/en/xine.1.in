@@ -324,7 +324,7 @@ to read from. valid MRLs may be plain file names or one of the following:
 .br
 .BI dvd:/ <title> . <part>
 .br
-.BI vcd:/ <tracknumber>
+.BI vcd://[<CD-disk-image>|<device-name>][@[letter]<number>]
 .br
 .BI tcp:// <host> : <port>
 .br
