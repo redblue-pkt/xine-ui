@@ -269,7 +269,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
   mb.dndcallback                           = dnd_cb;
 
   mb.select.skin_element_name              = "MrlSelect";
-  mb.select.caption                        = _("Select");
+  mb.select.caption                        = _("Add");
   mb.select.callback                       = add_cb;
 
   mb.play.skin_element_name                = "MrlPlay";
@@ -344,7 +344,7 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       if(!playlist_is_visible())
 	playlist_toggle_visibility(NULL, NULL);
     }
-      
+    
     gui_dndcallback((char *)mrl->mrl);
   }
 }

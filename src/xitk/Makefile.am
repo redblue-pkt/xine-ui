@@ -45,7 +45,7 @@ xine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la $(top_builddir)/src/
 xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
-	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) -lX11 -lm
+	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) -lX11 -lm $(DBG_LIBS)
 
 xine_remote_SOURCES = xine-remote.c
 xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la \
@@ -53,9 +53,9 @@ xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la \
 			   xine-remote.c
 xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) \
 	$(top_builddir)/readline/libreadline.la $(TERMCAP_LIB) \
-	$(top_builddir)/src/common/libcommon.la
+	$(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
 
-session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la
+session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
 
 noinst_HEADERS = \
 	common.h \
