@@ -44,6 +44,7 @@
 #include "panel.h"
 #include "mrl_browser.h"
 #include "snapshot.h"
+#include "errors.h"
 #include "utils.h"
 
 #ifndef __GNUC__

@@ -45,6 +45,7 @@
 #include "mrl_browser.h"
 #include "setup.h"
 #include "viewlog.h"
+#include "errors.h"
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
@@ -63,8 +64,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
      gui_toggle_fullscreen(NULL,NULL);
 #endif
    
-  printf("xine-panel: EXIT\n");
-
   destroy_mrl_browser();
   control_exit(NULL, NULL);
   pl_exit(NULL, NULL);
@@ -81,12 +80,15 @@ void gui_exit (xitk_widget_t *w, void *data) {
 #endif
 
   xitk_stop();
+  /* 
+   * This prevent xine waiting till the end of time for an
+   * XEvent when lirc (and futur other control ways) is used to quit .
+   */
+  gui_send_expose_to_window(gGui->video_window);
   xitk_skin_unload_config(gGui->skin_config);
 }
 
 void gui_play (xitk_widget_t *w, void *data) {
-
-  fprintf(stderr, "xine-panel: PLAY\n");
 
   if (xine_get_status (gGui->xine) != XINE_PLAY) {
     if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
@@ -533,8 +535,6 @@ void gui_decrease_audio_volume(void) {
 
 void gui_change_zoom(int zoom_d) {
 
-  printf ("actions: setting zoom factor\n");
-  
   gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_FACTOR,
 				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ZOOM_FACTOR) + zoom_d);
 
@@ -568,4 +568,29 @@ void gui_toggle_tvmode(void) {
   gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_TVMODE,
   				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO));
   				 
+}
+
+/*
+ * Send an Expose event to given window.
+ */
+void gui_send_expose_to_window(Window window) {
+  XEvent xev;
+
+  if(window == None)
+    return;
+
+  xev.xany.type          = Expose;
+  xev.xexpose.type       = Expose;
+  xev.xexpose.send_event = True;
+  xev.xexpose.display    = gGui->display;
+  xev.xexpose.window     = window;
+  xev.xexpose.count      = 0;
+  
+  XLockDisplay(gGui->display);
+  if(!XSendEvent(gGui->display, window, False, ExposureMask, &xev)) {
+    fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) window);
+  }
+  XFlush(gGui->display);
+  XUnlockDisplay(gGui->display);
+  
 }

@@ -1,9 +1,11 @@
 # For updating this file, look at the result of:
-#  $ grep -l '[^A-Za-z_]_(' src/xitk/*.[chy]
+#  $ head -3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
 
 src/xitk/control.c
+src/xitk/errors.c
 src/xitk/event.c
 src/xitk/file_browser.c
+src/xitk/i18n.h
 src/xitk/kbindings.c
 src/xitk/main.c
 src/xitk/mrl_browser.c

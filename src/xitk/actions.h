@@ -92,4 +92,6 @@ void gui_change_zoom(int zoom_d);
 void gui_reset_zoom(void);
 
 void gui_toggle_tvmode(void);
+
+void gui_send_expose_to_window(Window window);
 #endif

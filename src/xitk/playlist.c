@@ -38,6 +38,7 @@
 #include "event.h"
 #include "actions.h"
 #include "mrl_browser.h"
+#include "errors.h"
 
 #include <xine.h>
 #include <xine/xineutils.h>

@@ -32,21 +32,6 @@
 #include "xitk.h"
 #include "i18n.h"
 
-#ifdef __GNUC__
-#define perr(FMT,ARGS...) {fprintf(stderr, FMT, ##ARGS);fflush(stderr);}
-#else	/* C99 version: */
-#define perr(...)	  {fprintf(stderr, __VA_ARGS__);fflush(stderr);}
-#endif
-
-#ifdef __GNUC__
-#define xine_error(FMT,ARGS...) xitk_window_dialog_error(gGui->imlib_data, FMT, ##ARGS)
-#define xine_info(FMT,ARGS...)  xitk_window_dialog_info(gGui->imlib_data, FMT, ##ARGS)
-#else	/* C99 version: */
-#define xine_error(...)	        xitk_window_dialog_error(gGui->imlib_data, __VA_ARGS__)
-#define xine_info(...)          xitk_window_dialog_info(gGui->imlib_data,  __VA_ARGS__)
-#endif
-
-
 #define MAX_PLAYLIST_LENGTH  1024
 
 typedef struct {
@@ -169,8 +154,6 @@ void gui_handle_event (XEvent *event, void *data);
 char *gui_next_mrl_callback (void) ;
 
 void gui_branched_callback (void) ;
-
-void gui_handle_xine_error(void);
 #endif
 
 

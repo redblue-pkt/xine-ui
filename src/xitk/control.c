@@ -42,6 +42,7 @@
 #include "event.h"
 #include "actions.h"
 #include "skins.h"
+#include "errors.h"
 
 #ifndef __GNUC__
 #define __FUNCTION__    __func__

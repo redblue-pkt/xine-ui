@@ -52,5 +52,6 @@ void video_window_set_visibility(int show_window);
 int video_window_is_visible (void);
 
 void video_window_stream_has_changed(void);
+void video_window_change_size(int width, int height);
 
 #endif

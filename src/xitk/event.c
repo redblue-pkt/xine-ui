@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2001 the xine project
+ * Copyright (C) 2000-2002 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -19,7 +19,7 @@
  *
  * $Id$
  *
- * gui inititalization and top-level event handling stuff
+ * gui initialization and top-level event handling stuff
  *
  */
 #ifdef HAVE_CONFIG_H
@@ -57,6 +57,7 @@
 #include "xscreensaver-remote.h"
 #include "mrl_browser.h"
 #include "skins.h"
+#include "errors.h"
 
 #ifdef HAVE_LIRC
 extern int no_lirc;
@@ -672,41 +673,6 @@ void gui_execute_action_id(action_id_t action) {
     break;
   }
 }	    
-
-/*
- * Display an error window error from a xine engine error.
- */
-void gui_handle_xine_error(void) {
-  int err;
-
-  err = xine_get_error(gGui->xine);
-
-  switch(err) {
-
-  case XINE_ERROR_NONE:
-    /* noop */
-    break;
-    
-  case XINE_ERROR_NO_INPUT_PLUGIN:
-    xitk_window_dialog_error(gGui->imlib_data, 
-			     _("- xine engine error -\n\nThere is no available input plugin "
-			       "available to handle '%s'.\n"), gGui->filename);
-    break;
-    
-  case XINE_ERROR_NO_DEMUXER_PLUGIN:
-    xitk_window_dialog_error(gGui->imlib_data, 
-			     _("- xine engine error -\n\nThere is no available demuxer plugin "
-			       "to handle '%s'.\n"), gGui->filename);
-    break;
-
-  default:
-    xitk_window_dialog_error(gGui->imlib_data, 
-			     _("- xine engine error -\n\n!! Unhandled error !!\n"));
-    break;
-  }
-
-
-}
 
 /*
  * top-level event handler

@@ -34,6 +34,7 @@
 #include <limits.h>
 #include <X11/Xlib.h>
 #include <pthread.h>
+#include <stdarg.h>
 #include "Imlib-light/Imlib.h"
 
 #ifdef NEED_MRLBROWSER
@@ -1735,6 +1736,13 @@ void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, char *title);
 #define ALIGN_RIGHT   3
 #define ALIGN_DEFAULT (ALIGN_LEFT)
 
+/*
+ *
+ */
+void xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *button_label,
+					      xitk_state_callback_t cb, void *userdata, 
+					      int window_width, int align, char *message, ...);
+
 /**
  *
  */
@@ -1782,6 +1790,15 @@ void xitk_window_dialog_ok(ImlibData *im, char *title,
 }
 #endif
 
+/*
+ *
+ */
+void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
+						 xitk_state_callback_t cb1, 
+						 xitk_state_callback_t cb2, 
+						 xitk_state_callback_t cb3, 
+						 void *userdata, 
+						 int window_width, int align, char *message, ...);
 /**
  *
  */
@@ -1814,6 +1831,16 @@ void xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
   xitk_window_dialog_yesnocancel_with_width(im, title, ycb, ncb, ccb, userdata, 400, align, __VA_ARGS__); \
 }
 #endif
+
+/*
+ *
+ */
+void xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
+					       char *button1_label, char *button2_label,
+					       xitk_state_callback_t cb1, 
+					       xitk_state_callback_t cb2, 
+					       void *userdata, 
+					       int window_width, int align, char *message, ...);
 
 /**
  *

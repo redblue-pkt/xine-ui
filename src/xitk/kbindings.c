@@ -34,6 +34,7 @@
 
 #include "event.h"
 #include "kbindings.h"
+#include "errors.h"
 #include "xitk.h"
 
 extern gGui_t                 *gGui;

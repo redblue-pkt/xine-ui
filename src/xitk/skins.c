@@ -33,7 +33,10 @@
 #include "playlist.h"
 #include "event.h"
 #include "skins.h"
+#include "errors.h"
+
 #include "xitk.h"
+
 #include <xine.h>
 #include <xine/xineutils.h>
 

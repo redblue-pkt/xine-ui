@@ -39,6 +39,7 @@
 #include "actions.h"
 #include "videowin.h"
 #include "mrl_browser.h"
+#include "errors.h"
 
 #define MAX_LIST 9
 
@@ -253,9 +254,6 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
  *
  */
 static void mrl_handle_selection(xitk_widget_t *w, void *data) {
-#if 0
-  perr(" +++ Selection called = %d = '%s'\n", 
-#endif
 }
 
 /*

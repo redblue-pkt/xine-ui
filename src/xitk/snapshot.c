@@ -60,10 +60,10 @@
 
 #include "xitk.h"
 #include "event.h"
-#include <xine/xineutils.h>
 
-#include "xine.h"
+#include <xine.h>
 #include <xine/xineutils.h>
+#include "errors.h"
 
 #include "png.h"
 #include "pngconf.h"

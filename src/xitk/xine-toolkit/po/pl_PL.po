@@ -6,13 +6,25 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-03-17 15:08+0100\n"
+"POT-Creation-Date: 2002-03-19 22:38+0100\n"
 "PO-Revision-Date: 2002-02-06 08:00+0100\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:909
+msgid "Select current entry"
+msgstr "Wybierz aktualny wpis"
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:916
+msgid "Play selected entry"
+msgstr "Odtwarzaj wybrany wpis"
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:926
+msgid "Close MRL browser window"
+msgstr "Zamknij okno przegladarki MRL"
 
 #: src/xitk/xine-toolkit/test.c:104
 msgid "XInitThreads() failed.\n"
@@ -68,34 +80,22 @@ msgstr "Moje Okno"
 msgid "Quit"
 msgstr "Zakoñcz"
 
-#: src/xitk/xine-toolkit/window.c:658
+#: src/xitk/xine-toolkit/window.c:743
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:770 src/xitk/xine-toolkit/window.c:922
+#: src/xitk/xine-toolkit/window.c:805 src/xitk/xine-toolkit/window.c:998
 msgid "Question?"
 msgstr "Pytanie?"
 
-#: src/xitk/xine-toolkit/window.c:794 src/xitk/xine-toolkit/window.c:947
+#: src/xitk/xine-toolkit/window.c:932 src/xitk/xine-toolkit/window.c:1138
 msgid "Yes"
 msgstr "Tak"
 
-#: src/xitk/xine-toolkit/window.c:808 src/xitk/xine-toolkit/window.c:961
+#: src/xitk/xine-toolkit/window.c:932 src/xitk/xine-toolkit/window.c:1138
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:975
+#: src/xitk/xine-toolkit/window.c:1138
 msgid "Cancel"
 msgstr "Anuluj"
-
-#: src/xitk/xine-toolkit/mrlbrowser.c:909
-msgid "Select current entry"
-msgstr "Wybierz aktualny wpis"
-
-#: src/xitk/xine-toolkit/mrlbrowser.c:916
-msgid "Play selected entry"
-msgstr "Odtwarzaj wybrany wpis"
-
-#: src/xitk/xine-toolkit/mrlbrowser.c:926
-msgid "Close MRL browser window"
-msgstr "Zamknij okno przegladarki MRL"

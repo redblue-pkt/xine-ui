@@ -581,9 +581,9 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
 /*
  * Create a window error, containing an error message.
  */
-void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
-				      xitk_state_callback_t cb, void *userdata, 
-				      int window_width, int align, char *message, ...) {
+void xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *button_label,
+					      xitk_state_callback_t cb, void *userdata, 
+					      int window_width, int align, char *message, ...) {
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
@@ -655,7 +655,7 @@ void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
 
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("OK");
+  lb.label             = button_label;
   lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
@@ -701,7 +701,7 @@ void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
   XMapRaised(im->x.disp, (xitk_window_get_window(wd->xwin)));
   XUNLOCK(im->x.disp);
 
-  wd->key = xitk_register_event_handler("xitk_ok", 
+  wd->key = xitk_register_event_handler("xitk_1btn", 
 					(xitk_window_get_window(wd->xwin)),
 					_window_handle_event,
 					NULL,
@@ -711,14 +711,49 @@ void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
 
 }
 
+void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
+				      xitk_state_callback_t cb, void *userdata, 
+				      int window_width, int align, char *message, ...) {
+
+  va_list   args;
+  char     *buf;
+  int       n, size = 100;
+  
+  if((buf = xitk_xmalloc(size)) == NULL) 
+    return;
+  
+  while(1) {
+    
+    va_start(args, message);
+    n = vsnprintf(buf, size, message, args);
+    va_end(args);
+    
+    if(n > -1 && n < size)
+      break;
+    
+    if(n > -1)
+      size = n + 1;
+    else
+      size *= 2;
+    
+    if((buf = realloc(buf, size)) == NULL)
+      return;
+  }
+  
+  xitk_window_dialog_one_button_with_width(im, title, _("OK"), cb, userdata, window_width,
+					   align, buf);
+  XITK_FREE(buf);
+}
+
 /*
  * Create an interactive window, containing 'yes', 'no', 'cancel' buttons.
  */
-void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
-					 xitk_state_callback_t ycb, 
-					 xitk_state_callback_t ncb, 
-					 void *userdata, 
-					 int window_width, int align, char *message, ...) {
+void xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
+					       char *button1_label, char *button2_label,
+					       xitk_state_callback_t cb1, 
+					       xitk_state_callback_t cb2, 
+					       void *userdata, 
+					       int window_width, int align, char *message, ...) {
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
@@ -764,8 +799,8 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_YESNO;
-  wd->yescallback = ycb;
-  wd->nocallback = ncb;
+  wd->yescallback = cb1;
+  wd->nocallback = cb2;
   wd->userdata = userdata;
   wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : _("Question?")), 
 					      0, 0, windoww, windowh);  
@@ -791,7 +826,7 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Yes");
+  lb.label             = button1_label;
   lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
@@ -805,7 +840,7 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("No");
+  lb.label             = button2_label;
   lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
@@ -852,7 +887,7 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
   XMapRaised(im->x.disp, (xitk_window_get_window(wd->xwin)));
   XUNLOCK(im->x.disp);
 
-  wd->key = xitk_register_event_handler("xitk_yesno", 
+  wd->key = xitk_register_event_handler("xitk_2btns", 
 					(xitk_window_get_window(wd->xwin)),
 					_window_handle_event,
 					NULL,
@@ -862,14 +897,55 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 }
 
 /*
+ *
+ */
+void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
+					 xitk_state_callback_t ycb, 
+					 xitk_state_callback_t ncb, 
+					 void *userdata, 
+					 int window_width, int align, char *message, ...) {
+  va_list   args;
+  char     *buf;
+  int       n, size = 100;
+  
+  if((buf = xitk_xmalloc(size)) == NULL) 
+    return;
+  
+  while(1) {
+    
+    va_start(args, message);
+    n = vsnprintf(buf, size, message, args);
+    va_end(args);
+    
+    if(n > -1 && n < size)
+      break;
+    
+    if(n > -1)
+      size = n + 1;
+    else
+      size *= 2;
+    
+    if((buf = realloc(buf, size)) == NULL)
+      return;
+  }
+  
+  xitk_window_dialog_two_buttons_with_width(im, title, _("Yes"), _("No"), 
+					    ycb, ncb, userdata, window_width, align, buf);
+  XITK_FREE(buf);
+}
+
+/*
  * Create an interactive window, containing 'yes', 'no', 'cancel' buttons.
  */
-void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
-					       xitk_state_callback_t ycb, 
-					       xitk_state_callback_t ncb, 
-					       xitk_state_callback_t ccb, 
-					       void *userdata, 
-					       int window_width, int align, char *message, ...) {
+void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
+						 char *button1_label,
+						 char *button2_label,
+						 char *button3_label,
+						 xitk_state_callback_t cb1, 
+						 xitk_state_callback_t cb2, 
+						 xitk_state_callback_t cb3, 
+						 void *userdata, 
+						 int window_width, int align, char *message, ...) {
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
@@ -915,9 +991,9 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_YESNOCANCEL;
-  wd->yescallback = ycb;
-  wd->nocallback = ncb;
-  wd->cancelcallback = ccb;
+  wd->yescallback = cb1;
+  wd->nocallback = cb2;
+  wd->cancelcallback = cb3;
   wd->userdata = userdata;
   wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : _("Question?")), 
 					      0, 0, windoww, windowh);  
@@ -944,7 +1020,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Yes");
+  lb.label             = button1_label;
   lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
@@ -958,7 +1034,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("No");
+  lb.label             = button2_label;
   lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
@@ -972,7 +1048,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Cancel");
+  lb.label             = button3_label;
   lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
@@ -1019,11 +1095,47 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
   XMapRaised(im->x.disp, (xitk_window_get_window(wd->xwin)));
   XUNLOCK(im->x.disp);
 
-  wd->key = xitk_register_event_handler("xitk_yesnocancel", 
+  wd->key = xitk_register_event_handler("xitk_3btns", 
 					(xitk_window_get_window(wd->xwin)),
 					_window_handle_event,
 					NULL,
 					NULL,
 					wd->widget_list,
 					(void *)wd);
+}
+
+void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
+					       xitk_state_callback_t ycb, 
+					       xitk_state_callback_t ncb, 
+					       xitk_state_callback_t ccb, 
+					       void *userdata, 
+					       int window_width, int align, char *message, ...) {
+  va_list   args;
+  char     *buf;
+  int       n, size = 100;
+  
+  if((buf = xitk_xmalloc(size)) == NULL) 
+    return;
+  
+  while(1) {
+    
+    va_start(args, message);
+    n = vsnprintf(buf, size, message, args);
+    va_end(args);
+    
+    if(n > -1 && n < size)
+      break;
+    
+    if(n > -1)
+      size = n + 1;
+    else
+      size *= 2;
+    
+    if((buf = realloc(buf, size)) == NULL)
+      return;
+  }
+  
+  xitk_window_dialog_three_buttons_with_width(im, title, _("Yes"), _("No"), _("Cancel"),
+					      ycb, ncb, ccb, userdata, window_width, align, buf);
+  XITK_FREE(buf);
 }

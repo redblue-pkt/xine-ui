@@ -48,6 +48,7 @@
 #include "videowin.h"
 #include "panel.h"
 #include "actions.h"
+#include "errors.h"
 
 extern gGui_t *gGui;
 
@@ -170,7 +171,6 @@ void video_window_set_size_hints(int width, int height) {
 
   XUnlockDisplay(gGui->display);
 }
-
 
 /*
  * Resizes video window and updates size hints for it.
@@ -1107,7 +1107,6 @@ static int video_window_translate_point(int gui_x, int gui_y,
 
   return 1;
 }
-
 
 /*
  *
