@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef GUI_MAIN_H
-#define GUI_MAIN_H
+#ifndef EVENT_H
+#define EVENT_H
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"

@@ -22,8 +22,8 @@
  * video window handling functions
  */
 
-#ifndef HAVE_GUI_VIDEOWIN_H
-#define HAVE_GUI_VIDEOWIN_H
+#ifndef VIDEOWIN_H
+#define VIDEOWIN_H
 
 void video_window_init ();
 

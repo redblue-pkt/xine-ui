@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef HAVE_GUI_ACTIONS_H
-#define HAVE_GUI_ACTIONS_H
+#ifndef ACTIONS_H
+#define ACTIONS_H
 
 #include "xitk.h"
 

@@ -19,7 +19,7 @@ xine_LDADD = @XINE_LIBS@  $(LIRC_LIBS) -lm $(THREAD_LIBS) \
 	$(DYNAMIC_LD_LIBS) xine-toolkit/libxitk.la
 
 noinst_HEADERS = event.h parseskin.h playlist.h control.h \
-	panel.h lirc.h actions.h
+	panel.h lirc.h actions.h videowin.h
 
 utils.c:
 	$(LN_S) $(top_srcdir)/src/common/utils.c ./utils.c

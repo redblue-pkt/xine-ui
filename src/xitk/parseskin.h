@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef GUI_PARSESKIN_H
-#define GUI_PARSESKIN_H
+#ifndef PARSESKIN_H
+#define PARSESKIN_H
 
 #include "xitk.h"
 

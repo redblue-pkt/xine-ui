@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_GUI_PLAYLIST_H
-#define HAVE_GUI_PLAYLIST_H
+#ifndef PLAYLIST_H
+#define PLAYLIST_H
 
 void playlist_editor(void);
 void playlist_handle_event(XEvent *);

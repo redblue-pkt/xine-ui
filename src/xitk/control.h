@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_GUI_CONTROL_H
-#define HAVE_GUI_CONTROL_H
+#ifndef CONTROL_H
+#define CONTROL_H
 
 void control_panel(void);
 void control_handle_event(XEvent *);

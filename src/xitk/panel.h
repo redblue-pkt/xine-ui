@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef HAVE_GUI_PANEL_H
-#define HAVE_GUI_PANEL_H
+#ifndef PANEL_H
+#define PANEL_H
 
 void panel_init (void) ;
 

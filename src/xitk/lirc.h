@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef HAVE_GUI_LIRC_H
-#define HAVE_GUI_LIRC_H
+#ifndef LIRC_H
+#define LIRC_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

@@ -1,5 +1,5 @@
 EXTRA_DIST = autogen.sh SlackBuild.in SlackBuild build_rpms.sh \
-	xine-output.spec.in xine-output.spec
+	xine-ui.spec.in xine-ui.spec
 
 debug:
 

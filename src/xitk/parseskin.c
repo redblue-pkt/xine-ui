@@ -42,7 +42,7 @@ char *gui_get_skindir(const char *file) {
   static char tmp[256];
   char *skin;
 
-  skin = config_lookup_str("skin", "default");
+  skin = config_lookup_str("skin", "metal");
 
   sprintf(tmp, "%s/%s/%s", XINE_SKINDIR, skin, file);
 
@@ -56,7 +56,7 @@ int is_entry_exist(const char *entry) {
   FILE *fd_read;
   char skincfgfile[1024], tok[80], *skin, buf[256], *ln = buf;
 
-  skin = config_lookup_str("skin", "default");
+  skin = config_lookup_str("skin", "metal");
 
   snprintf(skincfgfile, 1024, "%s/%s/skinconfig", XINE_SKINDIR, skin);
   snprintf(tok, 80, "%s:", entry);
@@ -98,7 +98,7 @@ char *extract_value(const char *entry, int pos) {
     *ret = NULL;
   int i;
 
-  skin = config_lookup_str("skin", "default");
+  skin = config_lookup_str("skin", "metal");
 
   snprintf(skincfgfile, 1024, "%s/%s/skinconfig", XINE_SKINDIR, skin);
   snprintf(tok, 80, "%s:", entry);
@@ -212,7 +212,7 @@ char *gui_get_skinfile(const char *str) {
   char *v=NULL;
   char *ret=NULL, *skin;
   
-  skin = config_lookup_str("skin", "default");
+  skin = config_lookup_str("skin", "metal");
   
   if(is_entry_exist(str) && ((v = extract_value(str, 3)) != NULL)) {
     ret = (char *) xmalloc(strlen(XINE_SKINDIR)+strlen(skin)+strlen(v)+3);
@@ -236,7 +236,7 @@ void gui_place_extra_images(widget_list_t *gui_widget_list) {
     buf[256], *ln = buf, *oln;
   int x, y;
 
-  skin = config_lookup_str("skin", "default");
+  skin = config_lookup_str("skin", "metal");
 
   snprintf(skincfgfile, 1024, "%s/%s/skinconfig", XINE_SKINDIR, skin);
 

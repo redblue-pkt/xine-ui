@@ -56,8 +56,10 @@ if [ -d $RPM_BUILD_ROOT ]; then rm -rf $RPM_BUILD_ROOT; fi
 make install-strip prefix=$RPM_BUILD_ROOT%{prefix}
 #cp doc/*.xpm $RPM_BUILD_ROOT/usr/include/X11/pixmaps
 
-#%post
-#/sbin/ldconfig
+%post
+/sbin/ldconfig
+if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/metal @XINE_SKINDIR@/default; fi
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT

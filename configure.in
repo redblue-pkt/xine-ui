@@ -380,7 +380,6 @@ src/Imlib-light/Makefile
 src/xitk/Makefile
 src/xitk/xine-toolkit/Makefile
 src/xitk/skins/Makefile
-src/xitk/skins/default/Makefile
 src/xitk/skins/metal/Makefile
 src/xitk/skins/lcd/Makefile
 src/xitk/skins/pitt/Makefile
