@@ -33,7 +33,7 @@ skin.Eject {
 
 skin.Nav {
         coords {
-          x = 738
+          x = 733
           y = 88
         }
         pixmap = MainNav.png
@@ -65,11 +65,11 @@ skin.FullScreen {
 
 skin.TitleLabel {
 	coords {
-	  x = 264
+	  x = 265
 	  y = 28
 	}
 	label {
-	  length = 37
+	  length = 39
 	  animation = True
 	  pixmap = LettersMiddle.png
 	}
@@ -117,7 +117,7 @@ skin.AudioLabel {
 
 skin.SpuNext {
 	coords {
-	  x = 182
+	  x = 183
 	  y = 84
 	}
 	pixmap = MainButton.png
@@ -445,7 +445,7 @@ skin.SliderHPl {
         }
         pixmap = PlSlidHBg.png
         slider {
-          pixmap = SlidHPad.png
+          pixmap = PlSlidHPad.png
           type = horizontal
         }
 }
@@ -583,7 +583,7 @@ skin.CtlBrightLbl {
 
 skin.SliderCtlCont {
 	coords {
-	  x = 207
+	  x = 206
 	  y = 68
 	}
 	pixmap = SliderVBg.png
@@ -674,7 +674,7 @@ skin.SliderHCtlSk {
         }
         pixmap = SkSlidHBg.png
         slider {
-          pixmap = SlidHPad.png
+          pixmap = PlSlidHPad.png
           type = horizontal
         }
 }
@@ -824,7 +824,7 @@ skin.SliderHMrl {
         }
         pixmap = PlSlidHBg.png
         slider {
-          pixmap = SlidHPad.png
+          pixmap = PlSlidHPad.png
           type = horizontal
         }
 }
