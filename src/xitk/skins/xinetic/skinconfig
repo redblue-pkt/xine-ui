@@ -269,7 +269,7 @@ skin.MrlBtn {
 skin.SliderPlay {
 	coords {
 	  x = 36
-	  y = 2
+	  y = 3
 	}
 	pixmap = SliderHBg.png
 	slider {
