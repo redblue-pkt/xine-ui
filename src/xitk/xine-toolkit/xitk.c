@@ -1163,8 +1163,12 @@ void xitk_xevent_notify(XEvent *event) {
 	  XWindowAttributes wattr;
 	  Status            err;
 	  
+	  XLOCK(gXitk->display);
+	  while(XCheckMaskEvent(gXitk->display, ButtonMotionMask, event) == True);
+	  XUNLOCK(gXitk->display);
+
 	  fx->old_event = event;
-	  if (fx->move.enabled) {
+	  if(fx->move.enabled) {
 
 	    fx->old_pos.x = fx->new_pos.x;
 	    fx->old_pos.y = fx->new_pos.y;
@@ -1184,24 +1188,9 @@ void xitk_xevent_notify(XEvent *event) {
 
 	    XUNLOCK(gXitk->display);
 
-	    if(err != BadDrawable && err != BadWindow) {
-	      if(wattr.your_event_mask & PointerMotionMask) {
-		
-		XLOCK(gXitk->display);
-		while(XCheckWindowEvent(gXitk->display, fx->window, 
-					PointerMotionMask, event) == True);
-		XUNLOCK(gXitk->display);
-	      }
-	    }
-
-	    XLOCK(gXitk->display);
-	    XSync(gXitk->display, False);
-	    XUNLOCK(gXitk->display);
-
 	  }
 	  else {
-	    //	    printf("event->xmotion.x %d event->xmotion.y %d\n", event->xmotion.x, event->xmotion.y);
-	    //	    printf("event->xbutton.x %d event->xbutton.y %d\n", event->xbutton.x, event->xbutton.y);
+
 	    if(fx->widget_list)
 	      xitk_motion_notify_widget_list (fx->widget_list,
 					      event->xmotion.x, 

@@ -485,23 +485,28 @@ static int notify_click_slider(xitk_widget_t *w, int bUp, int x, int y) {
     private_data = (slider_private_data_t *) w->private_data;    
     
     if(private_data->focus == FOCUS_RECEIVED) {
+      int old_value = (int) private_data->value;
+      
       slider_update(w, (x - w->x), (y - w->y));
       
       if(private_data->bClicked == bUp)
 	private_data->bClicked = !bUp;
       
-      paint_slider(w);
-      
       if(bUp == 0) {
+	
+	if(old_value != ((int) private_data->value))
+	  paint_slider(w);
 	
 	/*
 	 * Exec motion callback function (if available)
 	 */
-	if(private_data->motion_callback) {
-	  private_data->motion_callback(private_data->sWidget,
-					private_data->motion_userdata,
-					(int) private_data->value);
+	if(old_value != ((int) private_data->value)) {
+	  if(private_data->motion_callback)
+	    private_data->motion_callback(private_data->sWidget,
+					  private_data->motion_userdata,
+					  (int) private_data->value);
 	}
+
       }
       else if(bUp == 1) {
 	private_data->bClicked = 0;
