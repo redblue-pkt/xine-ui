@@ -2,11 +2,10 @@
 # Copyright (C) 2001 Free Software Foundation, Inc.
 # Daniel Caujolle-Bert <segfault@club-internet.fr>, 2001
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-04-06 11:02+0200\n"
+"POT-Creation-Date: 2002-04-12 21:53+0200\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: Frensh <fr@li.org>\n"
@@ -69,15 +68,15 @@ msgstr "Ferme la fenêtre de contrôle"
 
 #: src/xitk/errors.c:63
 msgid "Done"
-msgstr ""
+msgstr "Terminé"
 
 #: src/xitk/errors.c:63
 msgid "More..."
-msgstr ""
+msgstr "Plus..."
 
 #: src/xitk/errors.c:131
 msgid "Error"
-msgstr ""
+msgstr "Erreur"
 
 #: src/xitk/errors.c:183
 #, c-format
@@ -304,14 +303,11 @@ msgstr ""
 
 #: src/xitk/main.c:206
 msgid "  -n, --network                Enable network remote control server.\n"
-msgstr ""
+msgstr "  -n, --network                Démarrage sur serveur de contrôle distant.\n"
 
 #: src/xitk/main.c:207
-#, fuzzy
 msgid "  -R, --root                   Use root window as video window.\n"
-msgstr ""
-"  -R, --root                   Utilise la fenetre root pour l'affichage "
-"vidéo.\n"
+msgstr "  -R, --root                   Utilise la fenêtre root pour l'affichage vidéo.\n"
 
 #: src/xitk/main.c:209
 msgid "examples for valid MRLs (media resource locator):\n"

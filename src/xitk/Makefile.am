@@ -30,6 +30,9 @@ noinst_HEADERS = $(GETOPT_H) event.h playlist.h control.h skins.h kbindings.h \
 	panel.h lirc.h actions.h videowin.h mrl_browser.h snapshot.h setup.h viewlog.h \
 	lang.h i18n.h errors.h network.h
 
+$(top_builddir)/readline/libreadline.la:
+	@cd $(top_builddir)/readline && $(MAKE) libreadline.la
+
 xine-remote.c:	$(srcdir)/network.c
 	$(LN_S) $(srcdir)/network.c ./xine-remote.c
 

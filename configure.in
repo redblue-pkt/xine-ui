@@ -247,7 +247,7 @@ esac
 
 BASH_CHECK_LIB_TERMCAP
 if test "$TERMCAP_LIB" = "./lib/termcap/libtermcap.a"; then
-	TERMCAP_LIB=-ltermcap	#default
+	TERMCAP_LIB="-ltermcap"	#default
 fi
 
 case "$host_cpu" in

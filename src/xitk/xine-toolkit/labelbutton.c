@@ -283,24 +283,24 @@ static void paint_labelbutton (xitk_widget_t *lb, Window win, GC gc) {
     }
     
     /* Only draw text of label is visible */
+    XUNLOCK(private_data->imlibdata->x.disp);
+
     if(private_data->label_visible) {
       btn = create_labelofbutton(lb, win, gc, bgtmp,
 				 button_width, skin->height, 
 				 private_data->label, state);
+      XLOCK(private_data->imlibdata->x.disp);
       XCopyArea (private_data->imlibdata->x.disp, btn, win, lgc, 0, 0,
 		 button_width, skin->height, lb->x, lb->y);
     }
-    else
+    else {
+      XLOCK(private_data->imlibdata->x.disp);
       XCopyArea (private_data->imlibdata->x.disp, bgtmp, win, lgc, 0, 0,
 		 button_width, skin->height, lb->x, lb->y);
-      
-
-    
+    }
 
     XFreePixmap(private_data->imlibdata->x.disp, bgtmp);
-
     XFreeGC(private_data->imlibdata->x.disp, lgc);
-
     XUNLOCK(private_data->imlibdata->x.disp);
   }
 

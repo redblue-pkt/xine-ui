@@ -129,7 +129,7 @@ static void *_tips_thread(void *data) {
   /* Wait timeout */
   xitk_usec_sleep((tp->w->tips_timeout * 1000));
 
-  pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,NULL);
+  pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
   
   /* Get parent window position */
   xitk_get_window_position(tp->w->imlibdata->x.disp, tp->wl->win, &x, &y, NULL, NULL);

@@ -373,10 +373,12 @@ void xitk_mrlbrowser_hide(xitk_widget_t *w) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
+
       XLOCK(private_data->imlibdata->x.disp);
       XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
-      xitk_hide_widgets(private_data->widget_list);
       XUNLOCK(private_data->imlibdata->x.disp);
+
+      xitk_hide_widgets(private_data->widget_list);
       private_data->visible = 0;
     }
   }
@@ -391,10 +393,12 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
   if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
-    XLOCK(private_data->imlibdata->x.disp);
     xitk_show_widgets(private_data->widget_list);
+
+    XLOCK(private_data->imlibdata->x.disp);
     XMapRaised(private_data->imlibdata->x.disp, private_data->window); 
     XUNLOCK(private_data->imlibdata->x.disp);
+
     private_data->visible = 1;
   }
 }
@@ -891,6 +895,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   Imlib_apply_image(mb->imlibdata, 
 		    private_data->bg_image, private_data->window);
 
+  XUNLOCK (mb->imlibdata->x.disp);
+
   private_data->widget_list                = xitk_widget_list_new() ;
   private_data->widget_list->l             = xitk_list_new ();
   private_data->widget_list->focusedWidget = NULL;
@@ -1019,7 +1025,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 			   private_data->mc->mrls_disp, 
 			   private_data->mrls_num, 0);
   
+  XLOCK (mb->imlibdata->x.disp);
   XMapRaised(mb->imlibdata->x.disp, private_data->window); 
+  XUNLOCK (mb->imlibdata->x.disp);
 
   private_data->widget_key = 
     xitk_register_event_handler("mrl browser",
@@ -1029,8 +1037,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 				mb->dndcallback,
 				private_data->widget_list,
 				(void *) private_data);
-  
-  XUNLOCK (mb->imlibdata->x.disp);
 
   return mywidget;
 }

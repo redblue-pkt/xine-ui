@@ -94,16 +94,16 @@ typedef struct {
   Window                      window;
   Atom                        XA_XITK;
 
-  xitk_move_t                  move;
+  xitk_move_t                 move;
 
   struct {
-    int                         x;
-    int                         y;
+    int                       x;
+    int                       y;
   } old_pos;
 
   struct {
-    int                         x;
-    int                         y;
+    int                       x;
+    int                       y;
   } new_pos;
 
   int                         width;
@@ -292,14 +292,11 @@ void xitk_change_window_for_event_handler (xitk_register_key_t key, Window windo
 
     if(fx->key == key) {
 
-      XLOCK(gXitk->display);
-
       fx->window = window;
 
       if(fx->xdnd && (window != None))
 	xitk_make_window_dnd_aware(fx->xdnd, window);
       
-      XUNLOCK(gXitk->display);
       MUTUNLOCK();
       return;
     }
@@ -436,7 +433,6 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
     fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
 
   }
-  
 
   MUTUNLOCK();
 }
@@ -589,6 +585,8 @@ void xitk_xevent_notify(XEvent *event) {
 
 	      XLOCK(gXitk->display);
 	      err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
+	      XUNLOCK(gXitk->display);
+
 	      if(err != BadDrawable && err != BadWindow) {
 		
 		fx->old_pos.x = event->xmotion.x_root - event->xbutton.x;
@@ -596,8 +594,6 @@ void xitk_xevent_notify(XEvent *event) {
 
 	      }
 	      
-	      XUNLOCK(gXitk->display);
-
 	      fx->move.offset_x = event->xbutton.x;
 	      fx->move.offset_y = event->xbutton.y;
 

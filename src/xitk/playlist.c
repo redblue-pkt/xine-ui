@@ -939,6 +939,8 @@ void playlist_editor(void) {
 
   XMapRaised(gGui->display, playlist->window); 
   
+  XUnlockDisplay (gGui->display);
+
   playlist->widget_key = 
     xitk_register_event_handler("playlist", 
 				playlist->window, 
@@ -949,6 +951,4 @@ void playlist_editor(void) {
 
   playlist->visible = 1;
   playlist->running = 1;
-   
-  XUnlockDisplay (gGui->display);
 }

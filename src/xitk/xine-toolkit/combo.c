@@ -200,8 +200,9 @@ static void _combo_rollunroll(xitk_widget_t *w, void *data, int state) {
       xitk_combo_update_pos(combo);
     }
     else {
-      XLOCK(private_data->imlibdata->x.disp);
       private_data->visible = 0;
+
+      XLOCK(private_data->imlibdata->x.disp);
       XUnmapWindow(private_data->imlibdata->x.disp, (xitk_window_get_window(private_data->xwin)));
       XUNLOCK(private_data->imlibdata->x.disp);
     }
@@ -330,8 +331,6 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
   itemw = xitk_get_widget_width(private_data->label_widget);
   itemw += xitk_get_widget_width(private_data->button_widget);
 
-  XLOCK(c->imlibdata->x.disp);
-
   private_data->imlibdata                = c->imlibdata;
   private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
   private_data->entries                  = c->entries;
@@ -359,6 +358,8 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
   
   private_data->xwin = xitk_window_create_simple_window(c->imlibdata, 0, 0,
 							(itemw + 2), (itemh * 5) + 2);
+  XLOCK(c->imlibdata->x.disp);
+
   if(c->layer_above) {
     XA_WIN_LAYER = XInternAtom(c->imlibdata->x.disp, "_WIN_LAYER", False);
     
@@ -384,6 +385,8 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
 
   private_data->gc = XCreateGC(c->imlibdata->x.disp, 
 			       (xitk_window_get_window(private_data->xwin)), None, None);
+
+  XUNLOCK(c->imlibdata->x.disp);
 
   private_data->widget_list                = xitk_widget_list_new() ;
   private_data->widget_list->l             = xitk_list_new ();
@@ -425,7 +428,6 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
 				private_data->widget_list,
 				(void *) private_data);
 
-  XUNLOCK(c->imlibdata->x.disp);
   private_data->visible                  = 0;
 
   mywidget->private_data                 = private_data;
@@ -474,8 +476,6 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
 
   private_data = (combo_private_data_t *) xitk_xmalloc (sizeof(combo_private_data_t));
 
-  XLOCK(c->imlibdata->x.disp);
-
   /* Create label and button (skinable) */
   lbl.label             = "";
   lbl.skin_element_name = c->skin_element_name;
@@ -504,8 +504,6 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
     (void) xitk_set_widget_pos(private_data->button_widget, x, y);
   }
 
-  XUNLOCK(c->imlibdata->x.disp);
-
   return _xitk_combo_create(skonfig, c, c->skin_element_name, mywidget, private_data,
 			    (xitk_skin_get_visibility(skonfig, c->skin_element_name)) ? 1 : -1,
 			    xitk_skin_get_enability(skonfig, c->skin_element_name));
@@ -530,8 +528,6 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
   XITK_WIDGET_INIT(&lbl, c->imlibdata);
 
   private_data = (combo_private_data_t *) xitk_xmalloc (sizeof(combo_private_data_t));
-
-  XLOCK(c->imlibdata->x.disp);
 
   /* Create label and button (skinable) */
   {
@@ -589,8 +585,6 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     }
 
   }
-
-  XUNLOCK(c->imlibdata->x.disp);
 
   return _xitk_combo_create(NULL, c, NULL, mywidget, private_data, 1, 1);
 }

@@ -911,6 +911,8 @@ void panel_init (void) {
   if (panel->visible)
     XMapRaised(gGui->display, gGui->panel_window); 
   
+  XUnlockDisplay (gGui->display);
+
   panel->widget_key = xitk_register_event_handler("panel", 
 						  gGui->panel_window, 
 						  panel_handle_event,
@@ -922,8 +924,6 @@ void panel_init (void) {
   gGui->cursor_visible = 1;
   video_window_set_cursor_visibility(gGui->cursor_visible);
   
-  XUnlockDisplay (gGui->display);
-
   /*
    * Grag Atoms from a mapped window, panel window could be not already mapped.
    */

@@ -43,22 +43,21 @@ void xitk_init_dnd(Display *display, xitk_dnd_t *xdnd) {
 
   xdnd->display = display;
 
-  xdnd->_XA_XdndAware = XInternAtom(xdnd->display, "XdndAware", False);
-  xdnd->_XA_XdndEnter = XInternAtom(xdnd->display, "XdndEnter", False);
-  xdnd->_XA_XdndLeave = XInternAtom(xdnd->display, "XdndLeave", False);
-  xdnd->_XA_XdndDrop = XInternAtom(xdnd->display, "XdndDrop", False);
-  xdnd->_XA_XdndPosition = XInternAtom(xdnd->display, "XdndPosition", False);
-  xdnd->_XA_XdndStatus = XInternAtom(xdnd->display, "XdndStatus", False);
-  xdnd->_XA_XdndActionCopy = XInternAtom(xdnd->display, "XdndActionCopy", False);
-  xdnd->_XA_XdndSelection = XInternAtom(xdnd->display, "XdndSelection", False);
-  xdnd->_XA_XdndFinished = XInternAtom(xdnd->display, "XdndFinished", False);
+  XLOCK(xdnd->display);
+  xdnd->_XA_XdndAware         = XInternAtom(xdnd->display, "XdndAware", False);
+  xdnd->_XA_XdndEnter         = XInternAtom(xdnd->display, "XdndEnter", False);
+  xdnd->_XA_XdndLeave         = XInternAtom(xdnd->display, "XdndLeave", False);
+  xdnd->_XA_XdndDrop          = XInternAtom(xdnd->display, "XdndDrop", False);
+  xdnd->_XA_XdndPosition      = XInternAtom(xdnd->display, "XdndPosition", False);
+  xdnd->_XA_XdndStatus        = XInternAtom(xdnd->display, "XdndStatus", False);
+  xdnd->_XA_XdndActionCopy    = XInternAtom(xdnd->display, "XdndActionCopy", False);
+  xdnd->_XA_XdndSelection     = XInternAtom(xdnd->display, "XdndSelection", False);
+  xdnd->_XA_XdndFinished      = XInternAtom(xdnd->display, "XdndFinished", False);
+  xdnd->_XA_WM_DELETE_WINDOW  = XInternAtom(xdnd->display, "WM_DELETE_WINDOW", False);
+  xdnd->_XA_XINE_XDNDEXCHANGE = XInternAtom(xdnd->display, "_XINE_XDNDEXCHANGE", False);
+  XUNLOCK(xdnd->display);
 
-  xdnd->_XA_WM_DELETE_WINDOW = XInternAtom(xdnd->display, "WM_DELETE_WINDOW", False);
-
-  xdnd->_XA_XINE_XDNDEXCHANGE = XInternAtom(xdnd->display, "_XINE_XDNDEXCHANGE", 
-					    False);
   xdnd->version = XDND_VERSION;
-
   xdnd->callback = NULL;
 }
 
@@ -145,7 +144,6 @@ Bool xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
   if (event->xclient.format == 32 && event->xclient.data.l[0] == xdnd->_XA_WM_DELETE_WINDOW) {
     XEvent xevent;
 
-    XLOCK(xdnd->display);
     xevent.xany.type = DestroyNotify;
     xevent.xany.display = xdnd->display;
     xevent.xdestroywindow.type = DestroyNotify;
@@ -154,6 +152,7 @@ Bool xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
     xevent.xdestroywindow.event = xdnd->win;
     xevent.xdestroywindow.window = xdnd->win;
     
+    XLOCK(xdnd->display);
     XSendEvent(xdnd->display, xdnd->win, True, 0L, &xevent);
     XUNLOCK(xdnd->display);
       
@@ -167,19 +166,23 @@ Bool xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
   } else if (event->xclient.message_type == xdnd->_XA_XdndLeave) {
     return True;
   } else if (event->xclient.message_type == xdnd->_XA_XdndDrop) {
+    Window win;
 
-    if (event->xclient.data.l[0] == 
-	XGetSelectionOwner(xdnd->display, xdnd->_XA_XdndSelection)) {
-
+    XLOCK (xdnd->display);
+    win = XGetSelectionOwner(xdnd->display, xdnd->_XA_XdndSelection);
+    XUNLOCK (xdnd->display);
+    
+    if (event->xclient.data.l[0] == win) {
+      
       XLOCK (xdnd->display);
-
+      
       XConvertSelection(xdnd->display, xdnd->_XA_XdndSelection, xdnd->atom_support,
 			xdnd->_XA_XINE_XDNDEXCHANGE, event->xclient.window, 
 			CurrentTime);
-
+      
       XUNLOCK (xdnd->display);
 
-
+      
       xitk_process_dnd_selection (xdnd, event);
     }
 
@@ -187,13 +190,14 @@ Bool xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
   } else if (event->xclient.message_type == xdnd->_XA_XdndPosition) {
     XEvent xevent;
     Window srcwin = event->xclient.data.l[0];
+    Atom   atomsup;
     
     XLOCK (xdnd->display);
-  
-    if (xdnd->atom_support != XInternAtom(xdnd->display, "text/uri-list", False)) {
-      XUNLOCK (xdnd->display);
+    atomsup = XInternAtom(xdnd->display, "text/uri-list", False);
+    XUNLOCK (xdnd->display);
+    
+    if (xdnd->atom_support != atomsup)
       return True;
-    }
     
     memset (&xevent, 0, sizeof(xevent));
     xevent.xany.type = ClientMessage;
@@ -208,8 +212,8 @@ Bool xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
     XDND_STATUS_RECT_SET(&xevent, 0, 0, 1024,768);
     XDND_STATUS_ACTION(&xevent) = xdnd->_XA_XdndActionCopy;
     
+    XLOCK (xdnd->display);
     XSendEvent(xdnd->display, srcwin, 0, 0, &xevent);
-
     XUNLOCK (xdnd->display);
 
     return True;

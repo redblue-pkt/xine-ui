@@ -977,9 +977,9 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
 
     XLockDisplay (gGui->display);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay (gGui->display);
-    
     k = kbindings_lookup_binding(kbt, XKeysymToString(mykey), modifier);
+    XUnlockDisplay (gGui->display);
+
     if(k) {
       gui_execute_action_id(k->action_id);
     }

@@ -47,15 +47,16 @@ unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b) {
   
   xcolor.flags = DoRed | DoBlue | DoGreen;
   
-  XLOCK(im->x.disp);
-  
   xcolor.red   = r<<8;
   xcolor.green = g<<8;
   xcolor.blue  = b<<8;
+
+  XLOCK(im->x.disp);
   XAllocColor(im->x.disp, Imlib_get_colormap(im), &xcolor);
+  XUNLOCK(im->x.disp);
+
   pixcol = xcolor.pixel;
   
-  XUNLOCK(im->x.disp);
 
   return pixcol;
 }
@@ -321,6 +322,8 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
 
     XLOCK(im->x.disp);
     XSetForeground(im->x.disp, gc, foreground);
+    XUNLOCK(im->x.disp);
+
     j = height;
     for(i = 0; i < numlines; i++, j += (height + 3)) {
       length = xitk_font_get_string_length(fs, lines[i]);
@@ -332,10 +335,12 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
       else if(align == ALIGN_RIGHT)
 	x = (width - length);
       
+      XLOCK(im->x.disp);
       XDrawString(im->x.disp, image->image, gc, x, (j - descent), lines[i], strlen(lines[i]));
+      XUNLOCK(im->x.disp);
+	
       XITK_FREE(lines[i]);
     }
-    XUNLOCK(im->x.disp);
   }
 
   xitk_font_unload_font(fs);
@@ -1014,11 +1019,11 @@ void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
 
   assert(im && p);
   
-  XLOCK(im->x.disp);
-  
   red    = xitk_get_pixel_color_from_rgb(im, 255, 0, 0);
   yellow = xitk_get_pixel_color_from_rgb(im, 255, 255, 0);
   gray   = xitk_get_pixel_color_darkgray(im);
+  
+  XLOCK(im->x.disp);
   
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image, GCGraphicsExposures, &gcv);
@@ -1067,7 +1072,6 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
   assert(im && p);
   
   XLOCK(im->x.disp);
-  
 
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image, GCGraphicsExposures, &gcv);
@@ -1122,14 +1126,12 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   }
   
   Imlib_render (im, img, img->rgb_width, img->rgb_height);
-  XUNLOCK(im->x.disp);
   
   i->image  = Imlib_copy_image(im, img);
   i->mask   = Imlib_copy_mask(im, img);
   i->width  = img->rgb_width;
   i->height = img->rgb_height;
   
-  XLOCK(im->x.disp);
   Imlib_destroy_image(im, img);
   XUNLOCK(im->x.disp);
   

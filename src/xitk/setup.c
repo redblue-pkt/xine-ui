@@ -1198,8 +1198,11 @@ void setup_panel(void) {
 					  (WINDOW_WIDTH>>1) - 50, WINDOW_HEIGHT - 40,
 					  100, 23,
 					  "Black", "Black", "White", fontname));
-
   
+  XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
+
+  XUnlockDisplay (gGui->display);
+
   setup->kreg = xitk_register_event_handler("setup", 
 					   (xitk_window_get_window(setup->xwin)),
 					   setup_handle_event,
@@ -1208,10 +1211,8 @@ void setup_panel(void) {
 					   setup->widget_list,
 					   NULL);
 
-  XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
 
   setup->visible = 1;
   setup->running = 1;
 
-  XUnlockDisplay (gGui->display);
 }

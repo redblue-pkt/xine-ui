@@ -620,7 +620,7 @@ AC_MSG_CHECKING(which library has the termcap functions)
 fi
 AC_MSG_RESULT(using $bash_cv_termcap_lib)
 if test $bash_cv_termcap_lib = gnutermcap && test -z "$prefer_curses"; then
-LDFLAGS="$LDFLAGS -L./lib/termcap"
+dnl DCB: disable it, it doesn't exist LDFLAGS="$LDFLAGS -L./lib/termcap"
 TERMCAP_LIB="./lib/termcap/libtermcap.a"
 TERMCAP_DEP="./lib/termcap/libtermcap.a"
 elif test $bash_cv_termcap_lib = libtermcap && test -z "$prefer_curses"; then

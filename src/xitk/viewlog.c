@@ -528,6 +528,10 @@ void viewlog_window(void) {
 					  "Black", "Black", "White", fontname));
 
   
+  XUnlockDisplay (gGui->display);
+
+  XMapRaised(gGui->display, xitk_window_get_window(viewlog->xwin));
+
   viewlog->kreg = xitk_register_event_handler("viewlog", 
 					      (xitk_window_get_window(viewlog->xwin)),
 					      viewlog_handle_event,
@@ -536,10 +540,8 @@ void viewlog_window(void) {
 					      viewlog->widget_list,
 					      NULL);
   
-  XMapRaised(gGui->display, xitk_window_get_window(viewlog->xwin));
 
   viewlog->visible = 1;
   viewlog->running = 1;
   
-  XUnlockDisplay (gGui->display);
 }

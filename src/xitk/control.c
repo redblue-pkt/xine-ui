@@ -697,6 +697,8 @@ void control_panel(void) {
 
   XMapRaised(gGui->display, control->window); 
 
+  XUnlockDisplay (gGui->display);
+
   control->widget_key = 
     xitk_register_event_handler("control", 
 				control->window, 
@@ -707,6 +709,4 @@ void control_panel(void) {
   
   control->visible = 1;
   control->running = 1;
-
-  XUnlockDisplay (gGui->display);
 }

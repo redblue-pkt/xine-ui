@@ -159,8 +159,8 @@ void xitk_filebrowser_hide(xitk_widget_t *w) {
     if(private_data->visible) {
       XLOCK(private_data->imlibdata->x.disp);
       XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
-      xitk_hide_widgets(private_data->widget_list);
       XUNLOCK(private_data->imlibdata->x.disp);
+      xitk_hide_widgets(private_data->widget_list);
       private_data->visible = 0;
     }
   }
@@ -175,8 +175,8 @@ void xitk_filebrowser_show(xitk_widget_t *w) {
   if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
     private_data = (filebrowser_private_data_t *)w->private_data;
 
-    XLOCK(private_data->imlibdata->x.disp);
     xitk_show_widgets(private_data->widget_list);
+    XLOCK(private_data->imlibdata->x.disp);
     XMapRaised(private_data->imlibdata->x.disp, private_data->window); 
     XUNLOCK(private_data->imlibdata->x.disp);
     private_data->visible = 1;
@@ -1115,6 +1115,8 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   Imlib_apply_image(fb->imlibdata, 
 		    private_data->bg_image, private_data->window);
 
+  XUNLOCK(fb->imlibdata->x.disp);
+
   private_data->widget_list                = xitk_widget_list_new() ;
   private_data->widget_list->l             = xitk_list_new ();
   private_data->widget_list->focusedWidget = NULL;
@@ -1127,7 +1129,6 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   lb.imlibdata         = fb->imlibdata;
 
   lbl.imlibdata        = fb->imlibdata;
-
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = fb->homedir.caption;
@@ -1234,7 +1235,9 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 			   private_data->fc->dir_disp_contents,
 			   private_data->dir_contents_num, 0);
 
+  XLOCK(fb->imlibdata->x.disp);
   XMapRaised(fb->imlibdata->x.disp, private_data->window); 
+  XUNLOCK(fb->imlibdata->x.disp);
 
   private_data->widget_key = 
     xitk_register_event_handler("file browser",
@@ -1244,8 +1247,6 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 				fb->dndcallback,
 				private_data->widget_list,
 				(void *) private_data);
-
-  XUNLOCK (fb->imlibdata->x.disp);
 
   return mywidget;
 }

@@ -316,6 +316,7 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
   XDrawString(private_data->imlibdata->x.disp, pix, gc, 
 	      2, ((ysize+asc+des+yoff)>>1)-des, 
 	      plabel, strlen(plabel));
+  XUNLOCK(private_data->imlibdata->x.disp);
 
   width = xitk_font_get_text_width(fs, plabel,
 				   (private_data->cursor_pos - private_data->disp_offset));
@@ -323,6 +324,7 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
   /* Draw cursor pointer */
   if(private_data->cursor_pos >= 0) {
     
+    XLOCK(private_data->imlibdata->x.disp);
     XDrawLine(private_data->imlibdata->x.disp, pix, gc,
 	      width + 1, 2, width + 3, 2);
 
@@ -331,10 +333,8 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
 
     XDrawLine(private_data->imlibdata->x.disp, pix, gc, 
 	      width + 1, ysize - 3, width + 3, ysize - 3);
-
+    XUNLOCK(private_data->imlibdata->x.disp);
   }
-  
-  XUNLOCK(private_data->imlibdata->x.disp);
 
   xitk_font_unload_font(fs);
 
@@ -360,6 +360,7 @@ static void paint_inputtext(xitk_widget_t *it, Window win, GC gc) {
 
   if ((it->widget_type & WIDGET_TYPE_INPUTTEXT) && (it->visible == 1)) {
         
+    XLOCK(private_data->imlibdata->x.disp);
     XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
     
     skin = private_data->skin;
@@ -377,8 +378,6 @@ static void paint_inputtext(xitk_widget_t *it, Window win, GC gc) {
     bgtmp = XCreatePixmap(private_data->imlibdata->x.disp, skin->image,
 			  button_width, skin->height, attr.depth);
     
-    XLOCK(private_data->imlibdata->x.disp);
-    
     if(private_data->have_focus) {
       state = FOCUS;
       XCopyArea (private_data->imlibdata->x.disp, skin->image,
@@ -392,19 +391,18 @@ static void paint_inputtext(xitk_widget_t *it, Window win, GC gc) {
 		 button_width, skin->height, 0, 0);
     }
     
-
+    XUNLOCK(private_data->imlibdata->x.disp);
+    
     btn = create_labelofinputtext(it, win, gc, bgtmp,
 				  button_width, skin->height, 
 				  private_data->text, state);
     
+    XLOCK(private_data->imlibdata->x.disp);
     XCopyArea (private_data->imlibdata->x.disp, btn, win, lgc, 0, 0,
 	       button_width, skin->height, it->x, it->y);
 
-
     XFreePixmap(private_data->imlibdata->x.disp, bgtmp);
-
     XFreeGC(private_data->imlibdata->x.disp, lgc);
-
     XUNLOCK(private_data->imlibdata->x.disp);
   }
 
@@ -704,8 +702,7 @@ static void inputtext_exec_return(xitk_widget_list_t *wl, xitk_widget_t *it) {
   
   if(strlen(private_data->text) > 0) {
     if(private_data->callback)
-      private_data->callback(it, 
-			     private_data->userdata, private_data->text);
+      private_data->callback(it, private_data->userdata, private_data->text);
   }
 }
 
@@ -1074,4 +1071,3 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_inputtext_widget_t *it,
 
   return _xitk_inputtext_create(NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 1, 1);
 }
-

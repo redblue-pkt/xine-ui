@@ -234,10 +234,10 @@ static void paint_slider(xitk_widget_t *sl, Window win, GC gc) {
     int    paddle_height;
     double angle;
     
-    XLOCK (private_data->imlibdata->x.disp);
-
     x = y = srcx1 = srcx2 = destx1 = srcy1 = srcy2 = desty1 = 0;
         
+    XLOCK (private_data->imlibdata->x.disp);
+
     bgc = XCreateGC(private_data->imlibdata->x.disp, bg->image, None, None);
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, bgc);
     pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image, None, None);
@@ -251,6 +251,8 @@ static void paint_slider(xitk_widget_t *sl, Window win, GC gc) {
     XCopyArea(private_data->imlibdata->x.disp, bg->image, win, bgc, 0, 0,
 	      bg->width, bg->height, sl->x, sl->y);
       
+    XUNLOCK(private_data->imlibdata->x.disp);
+
     if(private_data->sType == XITK_RSLIDER) {
       
       button_width = private_data->bg_skin->width;
@@ -352,6 +354,7 @@ static void paint_slider(xitk_widget_t *sl, Window win, GC gc) {
 
     }
     
+    XLOCK(private_data->imlibdata->x.disp);
     if(paddle->mask) {
       XSetClipOrigin(private_data->imlibdata->x.disp, pgc, x, y);
       XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask);

@@ -119,6 +119,7 @@ static void tabs_arrange(xitk_widget_t *w) {
 		  private_data->x + private_data->gap_widthstart, private_data->y);
 	XFreeGC(private_data->imlibdata->x.disp, gc);
 	XUNLOCK(private_data->imlibdata->x.disp);
+
 	xitk_image_free_image(private_data->imlibdata, &p);
       }
     }
@@ -411,4 +412,3 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
 
   return mywidget;
 }
-

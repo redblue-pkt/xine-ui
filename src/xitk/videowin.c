@@ -226,12 +226,16 @@ static void video_window_adapt_size (void) {
       XLowerWindow(gGui->display, gGui->video_window);
       
       gVw->old_widget_key = gVw->widget_key;
+
+      XUnlockDisplay (gGui->display);
+
       gVw->widget_key = xitk_register_event_handler("video_window", 
 						    gGui->video_window, 
 						    video_window_handle_event,
 						    NULL,
 						    gui_dndcallback,
 						    NULL, NULL);
+      return;
     }
     
     XUnlockDisplay (gGui->display);
@@ -592,6 +596,9 @@ static void video_window_adapt_size (void) {
   }
 
   gVw->old_widget_key = gVw->widget_key;
+
+  XUnlockDisplay (gGui->display);
+
   gVw->widget_key = xitk_register_event_handler("video_window", 
 						gGui->video_window, 
 						video_window_handle_event,
@@ -599,7 +606,6 @@ static void video_window_adapt_size (void) {
 						gui_dndcallback,
 						NULL, NULL);
   
-  XUnlockDisplay (gGui->display);
 }
 
 /*

@@ -253,8 +253,6 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
 
   private_data = (intbox_private_data_t *) xitk_xmalloc(sizeof(intbox_private_data_t));
   
-  XLOCK(ib->imlibdata->x.disp);
-  
   /* Create inputtext and buttons (not skinable) */
   {
     char buf[256];
@@ -304,7 +302,5 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
   mywidget->width = width;
   mywidget->height = height;
   
-  XUNLOCK(ib->imlibdata->x.disp);
-
   return _xitk_intbox_create(NULL, ib, NULL, mywidget, private_data, 1, 1);
 }
