@@ -1,0 +1,6 @@
+xine name "Xine"
+xine description "Xine video player"
+xine icon "xine.xpm"
+xine mini-icon "xine.xpm"
+xine exec "xine &"
+xine group "Multimedia"

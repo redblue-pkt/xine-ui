@@ -473,6 +473,12 @@ dnl skins dir location, xine-config told us about this.
 dnl
 XINE_SKINDIR="$xine_skin_dir"
 AC_SUBST(XINE_SKINDIR)
+dnl
+dnl desktop dir location, xine-config told us about this.
+dnl
+XINE_DESKTOPDIR="$xine_desktop_dir"
+AC_SUBST(XINE_DESKTOPDIR)
+
 
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
@@ -514,4 +520,5 @@ misc/Makefile
 misc/build_rpms.sh
 misc/SlackBuild
 misc/xine-ui.spec
+misc/desktops/Makefile
 ],[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh])

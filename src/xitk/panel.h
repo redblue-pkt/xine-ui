@@ -58,11 +58,13 @@ void panel_toggle_visibility (widget_t *w, void *data) ;
 
 void panel_check_pause(void) ;
 
-void panel_reset_slider ();
+void panel_reset_slider (void);
 
-void panel_update_channel_display () ;
+void panel_update_channel_display (void) ;
 
-void panel_update_mrl_display ();
+void panel_update_runtime_display(void);
+
+void panel_update_mrl_display (void);
 
 void panel_layer_above(int);
 

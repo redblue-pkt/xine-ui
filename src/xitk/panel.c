@@ -59,13 +59,29 @@ static void panel_store_new_position(int x, int y, int w, int h) {
 }
 
 /*
+ * Update runtime displayed informations.
+ */
+void panel_update_runtime_display(void) {
+  int seconds;
+  char timestr[10];
+
+  if(!panel_is_visible())
+    return;
+
+  seconds = xine_get_current_time (gGui->xine);
+  
+  sprintf (timestr, "%02d:%02d:%02d",
+	   seconds / (60*60),
+	   (seconds / 60) % 60, seconds % 60);
+  
+  label_change_label (panel->widget_list, panel->runtime_label, timestr); 
+}
+
+/*
  * Update slider thread.
  */
 static void *slider_loop(void *dummy) {
   
-  int seconds;
-  char timestr[10];
-
   pthread_detach(pthread_self());
 
   while(gGui->running) {
@@ -73,19 +89,12 @@ static void *slider_loop(void *dummy) {
     if(panel_is_visible()) {
       if(gGui->xine) {
 	int status = xine_get_status(gGui->xine);
-
+	
 	if(status == XINE_PLAY) {
 	  slider_set_pos(panel->widget_list, panel->slider_play, 
 			 xine_get_current_position(gGui->xine));
 	}
-
-	seconds = xine_get_current_time (gGui->xine);
-	
-	sprintf (timestr, "%02d:%02d:%02d",
-		 seconds / (60*60),
-		 (seconds / 60) % 60, seconds % 60);
-	
-	label_change_label (panel->widget_list, panel->runtime_label, timestr); 
+	panel_update_runtime_display();
       }
     }
     

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Xine
+Comment=Video Player
+Exec=xine
+Icon=xine.xpm
+Terminal=0
+Type=Application

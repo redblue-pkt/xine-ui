@@ -890,6 +890,7 @@ void gui_run (void) {
 
   panel_update_channel_display () ;
   panel_update_mrl_display ();
+  panel_update_runtime_display();
 
   /*  The user request "play on start" */
   if(gGui->autoplay_options & PLAY_ON_START) {
