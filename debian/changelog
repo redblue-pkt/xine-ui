@@ -1,3 +1,10 @@
+xine-ui (0.9.4-1) unstable; urgency=medium
+
+  * new upstream release
+  * basically adds zoom support (try "Z" + Shift/Ctrl/Alt keys)
+
+ -- Siggi Langauf <siggi@debian.org>  Sun,  4 Nov 2001 13:04:13 +0100
+
 xine-ui (0.9.3-1) unstable; urgency=medium
 
   * new upstream release
