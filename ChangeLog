@@ -1,6 +1,8 @@
 xine-ui (0.99.1) unstable; urgency=low
 
-  * lots of xine-check updates (including security fixes)
+  * errors are also reported to console if verbose mode is ON (or --bug-report),
+  * fix segfault with too long actions on start (like -HHHHH....),
+  * lots of xine-check updates (including security fixes),
   * fix redundant keybindings reports,
   * fix unplayable streams and loop (of death) mode,
   * all supported playlist can be downloadable,
