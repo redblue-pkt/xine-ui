@@ -1845,7 +1845,7 @@ int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w)
   unsigned int    mask;
   int             retval = 0;
   
-  if(!w ) {
+  if(!w) {
     XITK_WARNING("widget is NULL\n");
     return 0;
   }

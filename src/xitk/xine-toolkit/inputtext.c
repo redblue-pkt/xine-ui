@@ -54,11 +54,13 @@ unsigned int mods_used = (ShiftMask | ControlMask | Mod1Mask |
 static void _cursor_focus(inputtext_private_data_t *private_data, Window win, int focus) {
   XLOCK(private_data->imlibdata->x.disp);
 
+  private_data->cursor_focus = focus;
+  
   if(focus)
     XDefineCursor(private_data->imlibdata->x.disp, win, private_data->cursor[1]);
   else
     XDefineCursor(private_data->imlibdata->x.disp, win, private_data->cursor[0]);
-
+  
   XSync(private_data->imlibdata->x.disp, False);
   XUNLOCK(private_data->imlibdata->x.disp);
 }
@@ -387,52 +389,63 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
   GC                        lgc;
   XWindowAttributes         attr;
 
-  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && (w->visible == 1))) {
-    
+  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT))) {
     private_data = (inputtext_private_data_t *) w->private_data;
-    
-    XLOCK(private_data->imlibdata->x.disp);
-    XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
-    
-    skin = private_data->skin;
-    
-    lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
 
-    if (skin->mask) {
-      XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
-      XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
-    }
+    if(w->visible == 1) {
+    
+      
+      if((!private_data->cursor_focus) 
+	 && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, win, w)))
+	_cursor_focus(private_data, win, 1);
 
-    button_width = skin->width / 2;
-    
-    btn = xitk_image_create_xitk_pixmap(private_data->imlibdata, button_width, skin->height);
-    
-    if((w->have_focus == FOCUS_RECEIVED) || (private_data->have_focus == FOCUS_MOUSE_IN)) {
-      state = FOCUS;
-      XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-		 btn->pixmap, gc, button_width, 0,
-		 button_width, skin->height, 0, 0);
+      XLOCK(private_data->imlibdata->x.disp);
+      XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
+      
+      skin = private_data->skin;
+      
+      lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
+      XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+      
+      if (skin->mask) {
+	XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
+	XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask->pixmap);
+      }
+      
+      button_width = skin->width / 2;
+      
+      btn = xitk_image_create_xitk_pixmap(private_data->imlibdata, button_width, skin->height);
+      
+      if((w->have_focus == FOCUS_RECEIVED) || (private_data->have_focus == FOCUS_MOUSE_IN)) {
+	state = FOCUS;
+	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
+		   btn->pixmap, gc, button_width, 0,
+		   button_width, skin->height, 0, 0);
+      }
+      else {
+	state = NORMAL;
+	XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
+		   btn->pixmap, gc, 0, 0,
+		   button_width, skin->height, 0, 0);
+      }
+      
+      XUNLOCK(private_data->imlibdata->x.disp);
+      
+      create_labelofinputtext(w, win, gc, btn->pixmap, 
+			      button_width, skin->height, private_data->text, state);
+      
+      XLOCK(private_data->imlibdata->x.disp);
+      XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, win, lgc, 0, 0,
+		 button_width, skin->height, w->x, w->y);
+      xitk_image_destroy_xitk_pixmap(btn);
+      XFreeGC(private_data->imlibdata->x.disp, lgc);
+      XUNLOCK(private_data->imlibdata->x.disp);
     }
     else {
-      state = NORMAL;
-      XCopyArea (private_data->imlibdata->x.disp, skin->image->pixmap,
-		 btn->pixmap, gc, 0, 0,
-		 button_width, skin->height, 0, 0);
+      if(private_data->cursor_focus)
+	_cursor_focus(private_data, win, 0);
     }
-    
-    XUNLOCK(private_data->imlibdata->x.disp);
-    
-    create_labelofinputtext(w, win, gc, btn->pixmap, 
-			    button_width, skin->height, private_data->text, state);
-    
-    XLOCK(private_data->imlibdata->x.disp);
-    XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, win, lgc, 0, 0,
-	       button_width, skin->height, w->x, w->y);
-    xitk_image_destroy_xitk_pixmap(btn);
-    XFreeGC(private_data->imlibdata->x.disp, lgc);
-    XUNLOCK(private_data->imlibdata->x.disp);
-  }
+ }
 
 }
 
@@ -450,7 +463,8 @@ static int notify_click_inputtext(xitk_widget_list_t *wl,
     if(w->have_focus == FOCUS_LOST)
       w->have_focus = private_data->have_focus = FOCUS_RECEIVED;
     
-    if(xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, wl->win, w))
+    if((!private_data->cursor_focus)
+       && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, wl->win, w)))
       _cursor_focus(private_data, wl->win, 1);
     
     pos = x - w->x;
@@ -1044,6 +1058,7 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
   private_data->cursor[0] = XCreateFontCursor(private_data->imlibdata->x.disp, XC_left_ptr);
   private_data->cursor[1] = XCreateFontCursor(private_data->imlibdata->x.disp, XC_xterm);
   XUNLOCK(private_data->imlibdata->x.disp);
+  private_data->cursor_focus      = 0;
 
   private_data->callback          = it->callback;
   private_data->userdata          = it->userdata;
