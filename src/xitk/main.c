@@ -635,7 +635,7 @@ static void show_usage (void) {
   printf(_("                                 'shuffle': select randomly a yet unplayed entry from playlist\n"));
   printf(_("                                 'shuffle+': same as 'shuffle', but indefinetely replay the playlist.\n"));
   printf(_("      --skin-server-url <url>  Define the skin server url.\n"));
-  printf(_("      --enqueue <mrl>          Enqueue mrl of a running session (session 0)\n"));
+  printf(_("      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"));
   printf(_("  -S, --session <option1,option2,...>\n"));
   printf(_("                               Session managements. Options can be:\n"));
   printf(_("                    session=n   specify session <n> number,\n"));

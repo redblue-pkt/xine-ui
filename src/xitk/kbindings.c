@@ -2239,3 +2239,98 @@ void kbedit_window(void) {
 
   try_to_set_input_focus(xitk_window_get_window(kbedit->xwin));
 }
+
+#ifdef KBINDINGS_MAN
+
+static gGui_t  *gGui;
+
+static void layer_above_video(Window w) {
+}
+static void raise_window(Window window, int visible, int running) {
+}
+static void xine_error(char *message, ...) {
+}
+static void gui_execute_action_id(action_id_t actid) {
+}
+static void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible, int running) {
+}
+static void config_update_num(char *key, int value) {
+}
+static void try_to_set_input_focus(Window window) {
+}
+
+int main(int argc, char **argv) {
+  int   i;
+
+  gGui              = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
+  gGui->keymap_file = (char *) xine_xmalloc(XITK_PATH_MAX + XITK_NAME_MAX);
+  sprintf(gGui->keymap_file, "%s/%s/%s", xine_get_homedir(), ".xine", "keymap");
+  
+  if((gGui->kbindings = kbindings_init_kbinding())) {
+    kbinding_entry_t **k = gGui->kbindings->entry;
+    
+    for(i = 0; k[i]->action != NULL; i++) {
+      
+      if(k[i]->is_alias && (!strcasecmp(k[i]->key, "VOID")))
+	continue;
+      
+      printf(".IP \"");
+      
+      if(k[i]->modifier != KEYMOD_NOMOD) {
+	char buf[256];
+	
+	memset(&buf, 0, sizeof(buf));
+	
+	if(k[i]->modifier & KEYMOD_CONTROL)
+	  sprintf(buf, "%s", "\\fBC\\fP");
+	if(k[i]->modifier & KEYMOD_META) {
+	  if(strlen(buf))
+	    sprintf(buf, "%s%s", buf, "\\-");
+	  sprintf(buf, "%s%s", buf, "\\fBM\\fP");
+	}
+	if(k[i]->modifier & KEYMOD_MOD3) {
+	  if(strlen(buf))
+	    sprintf(buf, "%s%s", buf, "\\-");
+	  sprintf(buf, "%s%s", buf, "\\fBM3\\fP");
+	}
+	if(k[i]->modifier & KEYMOD_MOD4) {
+	  if(strlen(buf))
+	    sprintf(buf, "%s%s", buf, "\\-");
+	  sprintf(buf, "%s%s", buf, "\\fBM4\\fP");
+	}
+	if(k[i]->modifier & KEYMOD_MOD5) {
+	  if(strlen(buf))
+	    sprintf(buf, "%s%s", buf, "\\-");
+	  sprintf(buf, "%s%s", buf, "\\fBM5\\fP");
+	}
+	printf("%s\\-", buf);
+      }
+      
+      printf("\\fB");
+      if(strlen(k[i]->key) > 1)
+	printf("\\<");
+      
+      if(!strncmp(k[i]->key, "KP_", 3))
+	printf("Keypad %s", (k[i]->key + 3));
+      else
+	printf("%s", k[i]->key);
+      
+      if(strlen(k[i]->key) > 1)
+	printf("\\>");
+      printf("\\fP");
+      
+      printf("\"\n");
+      
+      printf("%c%s\n", (toupper(k[i]->comment[0])), (k[i]->comment + 1));
+    }
+    
+    kbindings_free_kbinding(&gGui->kbindings);
+  }
+
+  free(gGui->keymap_file);
+  free(gGui);
+
+  return 0;
+}
+
+#endif

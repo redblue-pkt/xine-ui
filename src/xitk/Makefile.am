@@ -11,7 +11,13 @@ xine_ui = xine $(remote)
 endif
 
 bin_PROGRAMS = $(xine_ui)
-EXTRA_PROGRAMS = session_ctrl
+EXTRA_PROGRAMS = session_ctrl kbindings_man
+
+kbindings_man_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
+	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
+	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
+	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
+	     -lX11 -lm
 
 xine_SOURCES = \
 	actions.c \
@@ -121,6 +127,13 @@ session_ctrl.c: $(srcdir)/session.c
 session_ctrl.o: session_ctrl.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(DEBUG_CFLAGS) -DCTRL_TEST -c `test -f $< || echo '$(srcdir)/'`$<
+
+kbindings_man.c: $(srcdir)/kbindings.c
+	$(LN_S) $(srcdir)/kbindings.c ./kbindings_man.c
+
+kbindings_man.o: kbindings_man.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(DEBUG_CFLAGS) -DKBINDINGS_MAN -c `test -f $< || echo '$(srcdir)/'`$<
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
