@@ -408,26 +408,12 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
 
   }
 
-  {
-    char *extension;
-    
-    extension = strrchr(mrl, '.');
-    if(extension && /* All known playlist ending */
-       ((!strncasecmp(extension, ".asx", 4)) ||
-	(!strncasecmp(extension, ".smi", 4)) ||
-	(!strncasecmp(extension, ".smil", 5)) ||
-	(!strncasecmp(extension, ".pls", 4)) ||
-	(!strncasecmp(extension, ".m3u", 4)) ||
-    	(!strncasecmp(extension, ".sfv", 4)) ||
-    	(!strncasecmp(extension, ".tox", 4)))) {
-      
-      if(mediamark_concat_mediamarks(mrl)) {
-	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	mrl = gGui->mmk.mrl;
-	playlist_update_playlist();
-      }
+  if(mrl_looks_playlist(mrl)) {
+    if(mediamark_concat_mediamarks(mrl)) {
+      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      mrl = gGui->mmk.mrl;
+      playlist_update_playlist();
     }
-    
   }
   
   if(!xine_open(gGui->stream, (const char *) mrl)) {

@@ -2276,6 +2276,24 @@ void mediamark_save_mediamarks(const char *filename) {
   }
 }
 
+int mrl_looks_playlist(char *mrl) {
+  char *extension;
+  
+  extension = strrchr(mrl, '.');
+  if(extension && /* All known playlist ending */
+     ((!strncasecmp(extension, ".asx", 4))  ||
+      (!strncasecmp(extension, ".smi", 4))  ||
+      (!strncasecmp(extension, ".smil", 5)) ||
+      (!strncasecmp(extension, ".pls", 4))  ||
+      (!strncasecmp(extension, ".m3u", 4))  ||
+      (!strncasecmp(extension, ".sfv", 4))  ||
+      (!strncasecmp(extension, ".tox", 4)))) {
+    return 1;
+  }
+  
+ return 0;
+}
+
 /*
  *  EDITOR
  */

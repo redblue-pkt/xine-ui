@@ -381,7 +381,8 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   if(mrl) {
     mediamark_t mmk;
-
+    char        *_mrl = mrl->mrl;
+    
     if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
       gGui->ignore_next = 1;
       xine_stop(gGui->stream);
@@ -390,20 +391,29 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
-    
-    if(!xine_open(gGui->stream, (const char *) mrl->mrl)) {
-      gui_handle_xine_error(gGui->stream, mrl->mrl);
-      enable_playback_controls(0);
-      gui_display_logo();
-      return;
+
+    if(mrl_looks_playlist(_mrl)) {
+      if(mediamark_concat_mediamarks(_mrl)) {
+	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	_mrl = (char *) mediamark_get_current_mrl();
+	playlist_update_playlist();
+      }
     }
-    if(!gui_xine_play(gGui->stream, 0, 0, 0)) {
+    
+    if(!xine_open(gGui->stream, (const char *) _mrl)) {
+      gui_handle_xine_error(gGui->stream, _mrl);
       enable_playback_controls(0);
       gui_display_logo();
       return;
     }
 
-    mmk.mrl   = mrl->mrl;
+    if(!gui_xine_play(gGui->stream, 0, 0, 0)) {
+      enable_playback_controls(0);
+      gui_display_logo();
+      return;
+    }
+    
+    mmk.mrl   = _mrl;
     mmk.ident = NULL;
     mmk.sub   = NULL;
     mmk.start = 0;
