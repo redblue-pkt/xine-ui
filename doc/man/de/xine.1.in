@@ -86,6 +86,18 @@ Position und Größe des Video\-Fensters als X-Geometrie angeben (siehe \fIX\fP(7)
 .B \-B,\ \-\-borderless
 Rahmen von Video\-Fenster entfernen (Nur im Fenster\-Modus).
 .TP
+.BI \-P,\ \-\-playlist\  <Dateiname>
+Benutzt die Datei als Wiedergabeliste. Mögliche Formate sind: asx, toxine, m3u, pls, sfv und rohe Textdateien.
+.TP
+.BI \-l,\ \-\-loop\  [Modus]
+Setzt den Wiedergabeliste-Wiederholmodus. Wenn der Modus nicht angegeben ist, wird `\fBloop\fP' verwendet. MÖgliche Modi sind:
+.br
+`\fIloop\fP': Gesamte Wiedergabeliste wiederholen.
+.br
+`\fIrepeat\fP': Aktuellen Wiedergabelisteneintrag wiederholen.
+.br
+`\fIshuffle\fP': Zufälligen Eintrag aus noch nicht gespielter Wiedergabeliste auswählen.
+.TP
 .B \-H, \-\-hide\-video
 Verdeckt nach dem Start nur das Video\-Fenster.
 (Wie das Betätigen von `\fBH\fP')
@@ -245,6 +257,8 @@ Zu 0%..90% des momentanen Titels springen.
 Springe zum angegebenen Prozentsatz. Diese Möglichkeit ist allgemeiner als die "\fB0\fP .. \fB9\fP" Kommandos von oben. Siehe dazu auch die Sektion "\fBNumerische Eingabe\fP" weiter unten.
 .IP  "\fBA\fP"
 Seitenverhältnis (AUTO/16:9/4:3/DVB) umschalten.
+.IP  "\fBC\fP-\fBa\fP"
+Mediamark für aktuelle Apspielposition der Wiedergabeliste hinzufügen.
 .IP  "\fBM\fP\-\fBC\fP | \fBM\fP\-\fBc\fP"
 Fenster mit Video\-Einstellungen anzeigen/verdecken.
 .IP  "\fBE\fP"
@@ -257,6 +271,8 @@ Bedienfenster anzeigen/verdecken.
 Video\-Ausgabefenster anzeigen/verdecken.
 .IP  "\fBi\fP | \fBI\fP"
 Deinterlace\-Methode umschalten.
+.IP  "\fBl\fP"
+Zwischen Wiederholungsmodi umschalten.
 .IP  "\fBM\fP\-\fBl\fP | \fBM\fP\-\fBL\fP"
 Fenster mit Meldungen anzeigen/verdecken.
 .IP  "\fBM\fP\-\fBm\fP | \fBM\fP\-\fBM\fP"
@@ -277,7 +293,7 @@ Wiedergabe anhalten.
 Fenster mit Einstellungen anzeigen/verdecken.
 .IP  "\fBz\fP | \fBZ\fP"
 Hinein/hinaus zoomen.
-.IÜ  "\fBM\fP\-\fBC\fP\-\fBz\fP"
+.IP  "\fBM\fP\-\fBC\fP\-\fBz\fP"
 Zoom zurücksetzen.
 .IP  "\fBv\fP"
 Lautstärke verringern.
@@ -325,6 +341,16 @@ Menü 2 (insbesondere Titlemenü)
 Menü 3
 .IP  "\fB<Einfg>\fP"
 Mauszeiger ein\-/ausblenden
+.IP  "\fBM\fP-fBe\fP"
+Ereignissendefenster anzeichen/verdecken.
+.IP  "\fBM\fP-\fBi\fP"
+Fenster mit Datenstrominformationen anzeichen/verdecken.
+.IP  "\fBC\fP-\fBt\fP"
+Anzeigemodus zwischen MRL und Identifikatoren umschalten.
+.IP  "\fBC\fP-\fBs\fP"
+Datenstrominformationen in Wiedergabeliste aktualisieren (falls verfügbar).
+.IP  "\fBC\fP-\fBe\fP"
+Erlaubt das Ändern der Mediamarkinformationen (Identifikator, MRL, Start- und Endzeit) im Wiedergabelistenfenster.
 
 .SS Zusätzliche Plugins
 Die folgenden Belegungen werden von zusätzlichen Plugins verwendet, normalerweise zur DVD\-Navigation:
