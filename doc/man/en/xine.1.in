@@ -270,7 +270,7 @@ There are also some self explanatory options.
 .B \-Z
 Don't automatically start playback, affect only auto-start when smart mode is used.
 .TP
-.B \-D,\ \-\-deinterlace [post[:..][;]]
+.BI \-D,\ \-\-deinterlace\  [post[:..][;]]
 Deinterlace video output. You can override configuration option of post(s) used to deinterlace the output picture. See \fI\-\-post\fP for syntax.
 .TP
 .BI \-r,\ \-\-aspect\-ratio\  <mode>
