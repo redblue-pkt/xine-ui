@@ -972,9 +972,9 @@ void gui_run (void) {
 
 	if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
 	  int                num_mrls, j;
-	  const char *const *autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
-								     gGui->autoscan_plugin,
-								     &num_mrls);
+	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
+							 gGui->autoscan_plugin,
+							 &num_mrls);
 	  
 	  if(autoplay_mrls) {
 	    for (j = 0; j < num_mrls; j++)

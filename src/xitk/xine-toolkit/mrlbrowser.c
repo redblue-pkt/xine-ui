@@ -307,7 +307,7 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
  * directly with these ones.
  */
 static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
-				      const xine_mrl_t *const *mtmp, int num_mrls) {
+				      xine_mrl_t **mtmp, int num_mrls) {
   int i;
   int old_mrls_num = private_data->mrls_num;
 
@@ -353,9 +353,9 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 
     {
       int num_mrls;
-      const xine_mrl_t *const *mtmp = xine_get_browse_mrls(private_data->xine, 
-							   private_data->last_mrl_source, 
-							   NULL, &num_mrls);
+      xine_mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
+					       private_data->last_mrl_source, 
+					       NULL, &num_mrls);
       if(!mtmp) {
 	private_data->last_mrl_source = (char *)
 	  realloc(private_data->last_mrl_source, strlen(old_old_src) + 1);
@@ -798,9 +798,9 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     
     {
       int num_mrls;
-      const xine_mrl_t *const *mtmp = xine_get_browse_mrls(private_data->xine, 
-							   private_data->last_mrl_source, 
-							   buf, &num_mrls);
+      xine_mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
+					       private_data->last_mrl_source, 
+					       buf, &num_mrls);
 
       mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
     }

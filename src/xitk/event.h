@@ -49,10 +49,10 @@
 
 typedef struct {
   /* our video out driver */
-  const xine_vo_driver_t *vo_driver;
+  xine_vo_driver_t    *vo_driver;
 
   /* xine engine instance */
-  const xine_t       *xine;
+  xine_t              *xine;
 
   /* xine lib/gui configuration filename */
   char                *configfile;

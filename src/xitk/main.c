@@ -340,8 +340,8 @@ void show_usage (void) {
 /*
  * Try to load video output plugin, by stored name or probing
  */
-static const xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
-  const xine_vo_driver_t *video_driver = NULL;
+static xine_vo_driver_t *load_video_out_driver(const char *video_driver_id) {
+  xine_vo_driver_t       *video_driver = NULL;
   double                  res_h, res_v;
   x11_visual_t            vis;
   const char             *default_driver;
@@ -378,7 +378,7 @@ static const xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
     int    i;
     
     /* Try to init video with stored information */
-    video_driver_id = (char *)default_driver;
+    video_driver_id = default_driver;
     
     if (strcmp (video_driver_id, "auto")) {
       
@@ -394,7 +394,7 @@ static const xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
     driver_ids = xine_list_video_output_plugins (gGui->xine);
 
     while (driver_ids[i]) {
-      video_driver_id = (char *)driver_ids[i];
+      video_driver_id = driver_ids[i];
       
       printf (_("main: probing <%s> video output plugin\n"), video_driver_id);
       
@@ -436,9 +436,9 @@ static const xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
 /*
  * Try to load audio output plugin, by stored name or probing
  */
-static const xine_ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
+static xine_ao_driver_t *load_audio_out_driver(const char *audio_driver_id) {
   const char             *default_driver;
-  const xine_ao_driver_t *audio_driver = NULL;
+  xine_ao_driver_t       *audio_driver = NULL;
   
   /*
    * Setting default (configfile stuff need registering before updating, etc...).
@@ -665,9 +665,9 @@ int main(int argc, char *argv[]) {
   int                     spu_channel = -1;
   window_attributes_t     window_attribute;
   int		          visual = 0;
-  char                   *audio_driver_id = NULL;
-  char                   *video_driver_id = NULL;
-  const xine_ao_driver_t *audio_driver = NULL ;
+  const char             *audio_driver_id = NULL;
+  const char             *video_driver_id = NULL;
+  xine_ao_driver_t       *audio_driver = NULL ;
   sigset_t                vo_mask;
   char                  **_argv;
   int                     _argc;
@@ -756,8 +756,7 @@ int main(int argc, char *argv[]) {
 
     case 'V': /* select video driver by plugin id */
       if(optarg != NULL) {
-	video_driver_id = xine_xmalloc (strlen (optarg) + 1);
-	strncpy (video_driver_id, optarg, strlen (optarg));
+        video_driver_id = strdup(optarg);
       } else {
 	fprintf (stderr, _("video driver id required for -V option\n"));
 	exit (1);
@@ -766,8 +765,7 @@ int main(int argc, char *argv[]) {
 
     case 'A': /* Select audio driver */
       if(optarg != NULL) {
-	audio_driver_id = xine_xmalloc (strlen (optarg) + 1);
-	strcpy (audio_driver_id, optarg);
+        audio_driver_id = strdup(optarg);
       } else {
 	fprintf (stderr, _("audio driver id required for -A option\n"));
 	exit (1);
