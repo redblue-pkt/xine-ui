@@ -708,9 +708,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	  __discard:
 	  }
 	  
-	  printf("entries_tox %d\n", entries_tox);
 	  if(entries_tox) {
-	    printf("ENTRY\n");
 	    mmk[entries_tox] = NULL;
 	    playlist->type = strdup("TOX");
 	  }
