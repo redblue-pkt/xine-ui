@@ -145,6 +145,13 @@ case "$host" in
     CFLAGS="$CFLAGS -L/usr/local/lib $THREAD_CFLAGS"
     CPPFLAGS="$CPPFLAGS -I/usr/local/include -L/usr/local/lib"
     ;;
+
+  *-*-hpux11*)
+    THREAD_LIBS=" -pthread"
+    THREAD_CFLAGS="-D_REENTRANT"
+    CFLAGS="$CFLAGS $THREAD_CFLAGS"
+    ;;
+
   *)
     AC_CHECK_LIB(pthread, pthread_create,
   	     THREAD_LIBS="-lpthread",
@@ -722,6 +729,11 @@ case "$host_or_hostalias" in
 
   ia64-*)
     CFLAGS="$CFLAGS -O3"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    ;;
+
+  hppa*-hp-*)
+    CFLAGS="$CFLAGS -O2"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
     ;;
 
