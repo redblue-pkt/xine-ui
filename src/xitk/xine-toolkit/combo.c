@@ -572,12 +572,9 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
     int x, y;
     
     xitk_get_widget_pos(private_data->label_widget, &x, &y);
-    printf("X %d, Y %d\n", x, y);
 
     mywidget->x = x;
     mywidget->y = y;
-    // FIXME    mywidget->width = (width - height) + (height + 4);
-    //    mywidget->height = (height + 4);
 
     x += xitk_get_widget_width(private_data->label_widget);
     
