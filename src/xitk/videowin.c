@@ -1863,8 +1863,10 @@ static void video_window_handle_event (XEvent *event, void *data) {
       timersub(&gVw->click_time, &old_click_time, &tm_diff);
       click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
       
-      if(click_diff < (xitk_get_timer_dbl_click()))
+      if(click_diff < (xitk_get_timer_dbl_click())) {
 	gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
+	memset(&(gVw->click_time), 0, sizeof(struct timeval));
+      }
       
     }
   }

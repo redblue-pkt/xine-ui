@@ -715,6 +715,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	  
 	  /* Ok, double click occur, call cb */
 	  if(click_diff < private_data->dbl_click_time) {
+	    memset(&(private_data->click_time), 0, sizeof(struct timeval));
 	    if(private_data->dbl_click_callback)
 	      cb2 = 1;
 	  }
@@ -757,6 +758,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	
 	/* Ok, double click occur, call cb */
 	if(click_diff < private_data->dbl_click_time) {
+	  memset(&(private_data->click_time), 0, sizeof(struct timeval));
 	  if(private_data->dbl_click_callback)
 	    private_data->dbl_click_callback(((btnlist_t*)data)->itemlist, 
 					     private_data->userdata, cur_clicked);
