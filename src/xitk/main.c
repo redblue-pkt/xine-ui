@@ -793,7 +793,8 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
 
     while (driver_ids[i]) {
       
-      printf (_("main: probing <%s> video output plugin\n"), driver_ids[i]);
+      if(gGui->verbosity)
+	printf (_("main: probing <%s> video output plugin\n"), driver_ids[i]);
       
       video_port = xine_open_video_driver(gGui->xine, 
 					  driver_ids[i],
@@ -893,7 +894,8 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
       
       /* don't want to load an audio driver ? */
       if (!strncasecmp(audio_driver_ids[driver_num], "NULL", 4)) {
-        printf(_("main: not using any audio driver (as requested).\n"));
+	if(gGui->verbosity)
+	  printf(_("main: not using any audio driver (as requested).\n"));
         return NULL;
       }
       
@@ -912,11 +914,14 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
 
     while (driver_ids[i]) {
       
-      if(strcmp(driver_ids[i], "none"))
-        printf(_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
+      if(strcmp(driver_ids[i], "none")) {
+	if(gGui->verbosity)
+	  printf(_("main: probing <%s> audio output plugin\n"), driver_ids[i]);
+      }
       else {
-        printf(_("main: skipping <%s> audio output plugin from auto-probe\n"), driver_ids[i]);
-        i++;
+	if(gGui->verbosity)
+	  printf(_("main: skipping <%s> audio output plugin from auto-probe\n"), driver_ids[i]);
+	i++;
         continue;
       }
       
@@ -937,7 +942,8 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
     /* don't want to load an audio driver ? */
     if (!strncasecmp (audio_driver_ids[driver_number], "NULL", 4)) {
 
-      printf(_("main: not using any audio driver (as requested).\n"));
+      if(gGui->verbosity)
+	printf(_("main: not using any audio driver (as requested).\n"));
 
       /* calling -A null is useful to developers, but we should not save it at
        * config. if user doesn't have a sound card he may go to setup screen
