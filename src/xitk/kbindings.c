@@ -899,7 +899,7 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
       buf[strlen(buf) - 2] = '\n';
       buf[strlen(buf) - 1] = '\0';
       sprintf(buf, "%s%s", buf, "}\n\n");
-      fprintf(stream, buf);
+      fprintf(stream, "%s", buf);
       memset(&buf, 0, sizeof(buf));
     }
     fprintf(stream, "##\n# End of xine key bindings.\n##\n");
