@@ -58,6 +58,18 @@ extern gGui_t     *gGui;
 
 _panel_t          *panel;
 
+void panel_update_nextprev_tips(void) {
+
+  if(gGui->skip_by_chapter) { 
+    xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous chapter or mrl")); 
+    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next chapter or mrl")); 
+  }
+  else {
+    xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous entry from playlist"));
+    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next entry from playlist")); 
+  }
+}
+
 int is_playback_widgets_enabled(void) {
   return (panel->playback_widgets.enabled == 1);
 }
@@ -76,9 +88,9 @@ void enable_playback_controls(int enable) {
     
     enability(panel->playback_widgets.prev);
     enability(panel->playback_widgets.stop);
-    enability(panel->playback_widgets.stop);
     enability(panel->playback_widgets.play);
     enability(panel->playback_widgets.pause);
+    enability(panel->playback_widgets.next);
     enability(panel->playback_widgets.eject);
     enability(panel->playback_widgets.slider_play);
   }
@@ -773,11 +785,6 @@ void panel_init (void) {
   xitk_list_append_content(panel->widget_list->l, 
    (panel->playback_widgets.prev = xitk_button_create(panel->widget_list, gGui->skin_config, &b)));
 
-  if (gGui->skip_by_chapter)
-    xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous chapter or mrl")); 
-  else
-    xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous entry from playlist"));
-
   /*  Stop button */
   b.skin_element_name = "Stop";
   b.callback          = gui_stop;
@@ -808,11 +815,6 @@ void panel_init (void) {
   b.userdata          = (void *)GUI_NEXT;
   xitk_list_append_content(panel->widget_list->l, 
    (panel->playback_widgets.next = xitk_button_create(panel->widget_list, gGui->skin_config, &b)));
-
-  if (gGui->skip_by_chapter)
-    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next chapter or mrl")); 
-  else
-    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next entry from playlist")); 
 
   /*  Eject button */
   b.skin_element_name = "Eject";
@@ -1011,6 +1013,7 @@ void panel_init (void) {
 						   _("tips timeout (ms)"), NULL, 
 						   panel_timeout_tips_cb, NULL);
 
+  panel_update_nextprev_tips();
   panel_show_tips();
 
   /* 

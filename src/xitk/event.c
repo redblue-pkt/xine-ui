@@ -92,6 +92,10 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
+static void skip_by_chapter_cb(void *data, cfg_entry_t *cfg) {
+  gGui->skip_by_chapter = cfg->num_value;
+  panel_update_nextprev_tips();
+}
 static void ssaver_timeout_cb(void *data, cfg_entry_t *cfg) {
   gGui->ssaver_timeout = cfg->num_value;
 }
@@ -751,7 +755,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->skip_by_chapter = 
     gGui->config->register_bool (gGui->config, "gui.skip_by_chapter", 1,
 				 _("play next|previous chapter instead of mrl (dvdnav)"), 
-				 NULL, NULL, NULL);
+				 NULL, skip_by_chapter_cb, NULL);
   
   XLockDisplay (gGui->display);
 
@@ -791,7 +795,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				       ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
 
   panel_init ();
-  enable_playback_controls((gGui->playlist_num > 0));
 
 }
 
@@ -886,6 +889,8 @@ void gui_run (void) {
     }
   }  
 
+  enable_playback_controls((gGui->playlist_num > 0));
+  
   if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
     /* Popup setup window if there is no config file */

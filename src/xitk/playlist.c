@@ -480,6 +480,7 @@ void pl_scan_input(xitk_widget_t *w, void *ip) {
 	xitk_browser_update_list(playlist->playlist, 
 				 gGui->playlist, gGui->playlist_num, 0);
     }
+    enable_playback_controls((gGui->playlist_num > 0));
   }
 }
 

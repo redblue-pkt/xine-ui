@@ -70,6 +70,7 @@ typedef struct {
 } _panel_t;
 
 
+void panel_update_nextprev_tips(void);
 int is_playback_widgets_enabled(void);
 void enable_playback_controls(int enable);
 
