@@ -1516,13 +1516,6 @@ void xitk_init(Display *display) {
   gXitk->wm_type = xitk_check_wm(display);
 }
 
-/* Return True is event type isn't completion */
-static Bool is_not_completion(Display *display, XEvent *event, XPointer arg) {
-  if(event->type != (int) arg)
-    return True;
-  return False;
-}
-
 /*
  * Start widget event handling.
  * It will block till widget_stop() call
@@ -1530,8 +1523,6 @@ static Bool is_not_completion(Display *display, XEvent *event, XPointer arg) {
 void xitk_run(xitk_startup_callback_t cb, void *data) {
   XEvent            myevent;
   struct sigaction  action;
-  fd_set            r;
-  int               completion;
   __gfx_t          *fx;
 
   action.sa_handler = xitk_signal_handler;
@@ -1618,61 +1609,23 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   if(cb)
     cb(data);
 
-  XLOCK(gXitk->display);
-  completion = XShmGetEventBase(gXitk->display) + ShmCompletion;
-  XUNLOCK(gXitk->display);
-
   /*
    * Now, wait for a new xevent
    */
   while(gXitk->running) {
-
-#define XEVENT_NEW_METHOD 1
-#undef  FORWARD_COMPLETION
     
-#if XEVENT_NEW_METHOD
-    
-#ifdef FORWARD_COMPLETION
-    FD_ZERO(&r);
-    FD_SET(ConnectionNumber(gXitk->display), &r);
-    select(ConnectionNumber(gXitk->display) + 1, &r, 0, 0, NULL);
-    
-    while(XPending (gXitk->display)) { 
-      XLOCK(gXitk->display);
-      XNextEvent(gXitk->display, &myevent);
-      XUNLOCK(gXitk->display); 
-      
-      xitk_xevent_notify(&myevent);
-      XLOCK(gXitk->display);
-      XSync(gXitk->display, False);
-      XUNLOCK(gXitk->display);
-    }
-#else
-    FD_ZERO(&r);
-    FD_SET(ConnectionNumber(gXitk->display), &r);
-    select(ConnectionNumber(gXitk->display) + 1, &r, 0, 0, NULL);
-    
-    while((XCheckIfEvent(gXitk->display, &myevent, 
-			 is_not_completion, (XPointer)completion)) == True) { 
-      xitk_xevent_notify(&myevent);
-    } 
-    
-#endif
-    
-#else /* Old method */
     XLOCK(gXitk->display); 
-    
+       
     if(XPending (gXitk->display)) { 
+    
       XNextEvent (gXitk->display, &myevent) ;
       XUNLOCK(gXitk->display); 
       xitk_xevent_notify(&myevent);
-    } 
-    else {  
+    
+    } else {  
       XUNLOCK(gXitk->display); 
       xitk_usec_sleep(50000);
     } 
-#endif
-
   }
 
   xitk_list_free(gXitk->list);
