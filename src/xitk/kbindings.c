@@ -128,6 +128,30 @@ typedef struct {
   char              buf[256];
 } kbinding_file_t;
 
+
+#ifndef	HAVE_STRSEP
+static char *
+strsep(char **stringp, char *delim)
+{
+    char *start = *stringp;
+    char *cp;
+    char ch;
+
+    if (start == NULL)
+	return NULL;
+
+    for (cp = start; ch = *cp; cp++) {
+	if (strchr(delim, ch)) {
+	    *cp++ = 0;
+	    *stringp = cp;
+	    return start;
+	}
+    }
+    *stringp = NULL;
+    return start;
+}
+#endif
+
 /* 
  * Default key mapping table.
  */
