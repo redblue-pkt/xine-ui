@@ -20,40 +20,41 @@
  * $Id$
  *
  */
-
-#ifndef HAVE_GUI_LABEL_H
-#define HAVE_GUI_LABEL_H
+#ifndef HAVE_GUI_CHECKBOX_H
+#define HAVE_GUI_CHECKBOX_H
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
+#include "widget.h"
 
 typedef struct {
-  Display       *display;
+  Display     *display;
+  widget_t    *cWidget;
+  int          cClicked;
+  int          cArmed;
+  int          cState;
+  gui_image_t *skin;
 
-  widget_t      *lWidget;
+  /* callback function (active_widget, user_data, check state) */
+  void         (*function) (widget_t *, void *, int);
+  void         *user_data;
 
-  int            char_length; /* length of 1 char */
-  int            char_height; /* height of 1 char */
+} checkbox_private_data_t;
 
-  int            length;      /* length in char */
-  gui_image_t   *font;
-  const char    *label;
-
-} label_private_data_t;
-
-/* ************************************************************** */
-
-/**
- * Create a label widget.
- */
-widget_t *create_label (Display *display, ImlibData *idata,
-			int x, int y, int length, const char *label, char *bg);
+/* ****************************************************************** */
 
 /**
- * Change label of wodget 'widget'.
+ * Create a checkbox.
  */
-int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel);
+widget_t *create_checkbox (Display *display, ImlibData *idata,
+			   int x, int y, void* f, void* ud, const char *skin) ;
+/**
+ * get state of checkbox "widget".
+ */
+int checkbox_get_state(widget_t *);
+/**
+ * Set state of checkbox .
+ */
+void checkbox_set_state(widget_t *, int, Window, GC);
 
 #endif
-

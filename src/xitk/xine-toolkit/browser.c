@@ -27,13 +27,13 @@
 #include <stdio.h>
 
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
-#include "gui_widget_types.h"
-#include "gui_browser.h"
-#include "gui_list.h"
-#include "gui_button.h"
-#include "gui_labelbutton.h"
-#include "gui_slider.h"
+#include "widget.h"
+#include "widget_types.h"
+#include "browser.h"
+#include "list.h"
+#include "button.h"
+#include "labelbutton.h"
+#include "slider.h"
 
 #define WBUP    0  /*  Position of button up in item_tree  */
 #define WSLID   1  /*  Position of slider in item_tree  */
@@ -290,7 +290,7 @@ widget_t *create_browser(Display *display, ImlibData *idata,
   private_data->content = content;
   private_data->list_length = list_length;
   private_data->max_length = max_length;
-  
+
   gui_list_append_content(thelist->l, 
 			  (private_data->item_tree[WBUP] = 
 			   create_button(display, idata, upX, upY, 

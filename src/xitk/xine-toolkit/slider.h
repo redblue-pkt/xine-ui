@@ -26,7 +26,7 @@
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
+#include "widget.h"
 
 /*  To handle a vertical slider */
 #define VSLIDER 1

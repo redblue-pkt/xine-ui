@@ -20,41 +20,34 @@
  * $Id$
  *
  */
-#ifndef HAVE_GUI_CHECKBOX_H
-#define HAVE_GUI_CHECKBOX_H
+
+#ifndef HAVE_GUI_BUTTON_H
+#define HAVE_GUI_BUTTON_H
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
+#include "widget.h"
 
 typedef struct {
   Display     *display;
-  widget_t    *cWidget;
-  int          cClicked;
-  int          cArmed;
-  int          cState;
+  widget_t    *bWidget;
+  int          bClicked;
+  int          bArmed;
   gui_image_t *skin;
 
-  /* callback function (active_widget, user_data, check state) */
-  void         (*function) (widget_t *, void *, int);
+  /* callback function (active_widget, user_data) */
+  void         (*function) (widget_t *, void *);
   void         *user_data;
 
-} checkbox_private_data_t;
+} button_private_data_t;
 
-/* ****************************************************************** */
+/* ********************************************************** */
 
 /**
- * Create a checkbox.
+ * Create a button
  */
-widget_t *create_checkbox (Display *display, ImlibData *idata,
-			   int x, int y, void* f, void* ud, const char *skin) ;
-/**
- * get state of checkbox "widget".
- */
-int checkbox_get_state(widget_t *);
-/**
- * Set state of checkbox .
- */
-void checkbox_set_state(widget_t *, int, Window, GC);
+widget_t *create_button (Display *display, ImlibData *idata,
+			 int x, int y, void* f, void* ud, const char *skin) ;
+
 
 #endif

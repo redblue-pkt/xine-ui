@@ -27,8 +27,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include "gui_list.h"
-#include "gui_widget_types.h"
+#include "list.h"
+#include "widget_types.h"
 
 #define FOCUS_RECEIVED 1
 #define FOCUS_LOST     0
@@ -38,6 +38,8 @@
 #define WIDGET_ENABLE  1
 
 #define BROWSER_MAX_ENTRIES 4096
+
+typedef int widgetkey_t;
 
 typedef struct {
   int red;
@@ -60,6 +62,12 @@ typedef struct {
     XColor black;
     XColor tmp;
 } gui_color_t;
+
+typedef struct {
+    int enabled;
+    int offset_x;
+    int offset_y;
+} gui_move_t;
 
 struct widget_list_s;
 typedef struct widget_s {

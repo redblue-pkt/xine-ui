@@ -31,6 +31,12 @@
 #include "Imlib-light/Imlib.h"
 
 typedef struct {
+    int enabled;
+    int offset_x;
+    int offset_y;
+} gui_move_t;
+
+typedef struct {
   Pixmap    image;
   int       width;
   int       height;
@@ -82,11 +88,13 @@ typedef struct widget_list_s {
   GC                   gc;
 } widget_list_t;
 
+typedef void (*dnd_callback_t) (char *filename);
+
 typedef struct DND_struct_s {
   Display             *display;
   Window               win;
   
-  void               (*callback) (char *fname);
+  dnd_callback_t       callback;
 
   Atom                 _XA_XdndAware;
   Atom                 _XA_XdndEnter;
@@ -102,6 +110,89 @@ typedef struct DND_struct_s {
   Atom                 atom_support;
   Atom                 version;
 } DND_struct_t;
+
+
+/* *******
+ * INIT: widget lib initialization and friends
+ */
+/*
+ * Event callback function type.
+ * This function will be called on every xevent.
+ * If the window match with that one specified at
+ * register time, only event for this window
+ * will be send to this function.
+ */
+typedef void (*widget_cb_event_t)(XEvent *event);
+
+/*
+ * New positioning window callback function.
+ * This callback will be called when the window
+ * moving will be done (at button release time),
+ * and, of course, only if there was a window
+ * specified at register time.
+ */
+typedef void (*widget_cb_newpos_t)(int, int, int, int);
+
+/*
+ * A unique key returned by register function.
+ * It is necessary to store it at program side,
+ * because it will be necessary to pass it for
+ * identification of caller.
+ */
+typedef int widgetkey_t;
+
+/*
+ * Create a lew widget list, store it internaly,
+ * then return the pointer to app.
+ */
+widget_list_t *widget_list_new (void);
+
+/*
+ * Humm, this should be probably removed soon.
+ */
+void widget_change_window_for_event_handler (widgetkey_t key, Window window);
+
+/*
+ * Register function:
+ * name:   temporary name about debug stuff, can be NULL.
+ * window: desired window for event callback calls, can be None.
+ * cb:     callback for xevent, can be NULL.
+ * pos_cb; callback for window moving.
+ * dnd_cb: callback for dnd event.
+ * wl:     widget_list handled internaly for xevent reactions.
+ */
+widgetkey_t widget_register_event_handler(char *name, Window window,
+					  widget_cb_event_t cb,
+					  widget_cb_newpos_t pos_cb,
+					  dnd_callback_t dnd_cb,
+					  widget_list_t *wl);
+
+/*
+ * Remove widgetkey_t entry in internal table.
+ */
+void widget_unregister_event_handler(widgetkey_t *key);
+
+/*
+ * Initialization function, should be the first call to widget lib.
+ */
+void widget_init(Display *display);
+
+/*
+ * This function start the widget live. It's a block function,
+ * it will only return after a widget_stop() call.
+ */
+void widget_run(void);
+
+/*
+ * This function terminate the widget lib loop event. 
+ * Other functions of the lib shouldn't be called after this
+ * one.
+ */
+void widget_stop(void);
+
+/*
+ *
+ ****** */
 
 /**
  * Allocate an clean memory of "size" bytes.

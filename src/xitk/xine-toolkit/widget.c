@@ -28,11 +28,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <unistd.h>
 
-#include "gui_widget.h"
-#include "gui_list.h"
+#include <X11/Xlib.h>
+
+#include "widget.h"
+#include "list.h"
 
 extern int errno;
 

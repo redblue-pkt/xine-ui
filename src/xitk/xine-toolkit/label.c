@@ -30,10 +30,10 @@
 #include <string.h>
 
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
-#include "gui_image.h"
-#include "gui_label.h"
-#include "gui_widget_types.h"
+#include "widget.h"
+#include "image.h"
+#include "label.h"
+#include "widget_types.h"
 
 /*
  *
@@ -43,8 +43,6 @@ static void paint_label (widget_t *l,  Window win, GC gc) {
     (label_private_data_t *) l->private_data;
   gui_image_t *font = (gui_image_t *) private_data->font;
   int x_dest, y_dest, nCWidth, nCHeight, nLen, i;
-  
-  XLockDisplay (private_data->display);
   
   x_dest = l->x;
   y_dest = l->y;
@@ -67,8 +65,10 @@ static void paint_label (widget_t *l,  Window win, GC gc) {
 	px = (c % 32) * nCWidth;
 	py = (c / 32) * nCHeight;
 	
+	XLockDisplay (private_data->display);
 	XCopyArea (private_data->display, font->image, win, gc, px, py,
 		   nCWidth, nCHeight, x_dest, y_dest);
+	XUnlockDisplay (private_data->display);
 	
       }
       
@@ -82,7 +82,7 @@ static void paint_label (widget_t *l,  Window win, GC gc) {
 	     "is not a label\n", l->widget_type);
 #endif
 
-  XUnlockDisplay (private_data->display);
+  XSync(private_data->display, False);
 }
 
 /*

@@ -27,29 +27,27 @@
 #include <X11/Xlib.h>
 
 
-//typedef struct {
-//  void (*function) (char *filename);
-//} dnd_callback_t;
+typedef void (*dnd_callback_t) (char *filename);
 
 typedef struct DND_struct_s {
-  Display *display;
-  Window  win;
+  Display        *display;
+  Window          win;
   
-  void (*callback) (char *fname);
+  dnd_callback_t  callback;
 
-  Atom _XA_XdndAware;
-  Atom _XA_XdndEnter;
-  Atom _XA_XdndLeave;
-  Atom _XA_XdndDrop;
-  Atom _XA_XdndPosition;
-  Atom _XA_XdndStatus;
-  Atom _XA_XdndActionCopy;
-  Atom _XA_XdndSelection;
-  Atom _XA_XdndFinished;
-  Atom _XA_XINE_XDNDEXCHANGE;
-  Atom _XA_WM_DELETE_WINDOW;
-  Atom atom_support;
-  Atom version;
+  Atom           _XA_XdndAware;
+  Atom           _XA_XdndEnter;
+  Atom           _XA_XdndLeave;
+  Atom           _XA_XdndDrop;
+  Atom           _XA_XdndPosition;
+  Atom           _XA_XdndStatus;
+  Atom           _XA_XdndActionCopy;
+  Atom           _XA_XdndSelection;
+  Atom           _XA_XdndFinished;
+  Atom           _XA_XINE_XDNDEXCHANGE;
+  Atom           _XA_WM_DELETE_WINDOW;
+  Atom           atom_support;
+  Atom           version;
 
 } DND_struct_t;
 

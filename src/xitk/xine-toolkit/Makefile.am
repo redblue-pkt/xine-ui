@@ -2,16 +2,16 @@
 CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@
 
 noinst_LTLIBRARIES = libxitk.la
-libxitk_la_SOURCES = gui_button.c gui_labelbutton.c gui_label.c \
-	gui_widget.c gui_dnd.c gui_list.c gui_slider.c gui_checkbox.c \
-	gui_image.c gui_browser.c 
-libxitk_la_LIBADD = $(X_PRE_LIBS) $(X_LIBS) -lXext \
+libxitk_la_SOURCES = button.c labelbutton.c label.c \
+	widget.c dnd.c list.c slider.c checkbox.c \
+	image.c browser.c xitk.c
+libxitk_la_LIBADD = $(X_PRE_LIBS) $(X_LIBS) -lXext $(THREAD_LIBS) \
 	$(top_builddir)/src/Imlib-light/libImlib-light.la
 
-noinst_HEADERS = gui_button.h gui_labelbutton.h gui_label.h \
-	gui_widget.h gui_dnd.h gui_list.h gui_slider.h \
-	gui_checkbox.c gui_image.h gui_widget_types.h gui_checkbox.h \
-	gui_browser.h xitk.h
+noinst_HEADERS = button.h labelbutton.h label.h \
+	widget.h dnd.h list.h slider.h \
+	checkbox.c image.h widget_types.h checkbox.h \
+	browser.h xitk.h
 
 
 $(top_builddir)/src/Imlib-light/libImlib-light.la:

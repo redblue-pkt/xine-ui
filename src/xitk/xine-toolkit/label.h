@@ -21,33 +21,39 @@
  *
  */
 
-#ifndef HAVE_GUI_BUTTON_H
-#define HAVE_GUI_BUTTON_H
+#ifndef HAVE_GUI_LABEL_H
+#define HAVE_GUI_LABEL_H
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
+#include "widget.h"
 
 typedef struct {
-  Display     *display;
-  widget_t    *bWidget;
-  int          bClicked;
-  int          bArmed;
-  gui_image_t *skin;
+  Display       *display;
 
-  /* callback function (active_widget, user_data) */
-  void         (*function) (widget_t *, void *);
-  void         *user_data;
+  widget_t      *lWidget;
 
-} button_private_data_t;
+  int            char_length; /* length of 1 char */
+  int            char_height; /* height of 1 char */
 
-/* ********************************************************** */
+  int            length;      /* length in char */
+  gui_image_t   *font;
+  const char    *label;
+
+} label_private_data_t;
+
+/* ************************************************************** */
 
 /**
- * Create a button
+ * Create a label widget.
  */
-widget_t *create_button (Display *display, ImlibData *idata,
-			 int x, int y, void* f, void* ud, const char *skin) ;
+widget_t *create_label (Display *display, ImlibData *idata,
+			int x, int y, int length, const char *label, char *bg);
 
+/**
+ * Change label of wodget 'widget'.
+ */
+int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel);
 
 #endif
+

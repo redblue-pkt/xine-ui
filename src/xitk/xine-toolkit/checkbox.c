@@ -28,10 +28,10 @@
 #include <stdio.h>
 
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
-#include "gui_image.h"
-#include "gui_checkbox.h"
-#include "gui_widget_types.h"
+#include "widget.h"
+#include "image.h"
+#include "checkbox.h"
+#include "widget_types.h"
 
 /*
  *
@@ -42,9 +42,9 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
   int          checkbox_width;
   gui_image_t *skin;
   
-  XLockDisplay (private_data->display);
-  
   skin = private_data->skin;
+
+  XLockDisplay (private_data->display);
   
   checkbox_width = skin->width / 3;
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
@@ -71,7 +71,6 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
 		   checkbox_width, skin->height, c->x, c->y);
     }
 
-    XFlush (private_data->display);
   } 
 #ifdef DEBUG_GUI
   else
@@ -81,6 +80,7 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
 #endif
 
   XUnlockDisplay (private_data->display);
+  XSync (private_data->display, False);
 }
 
 /*

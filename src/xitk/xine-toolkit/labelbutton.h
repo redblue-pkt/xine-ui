@@ -26,7 +26,7 @@
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
+#include "widget.h"
 
 #define CLICK_BUTTON 1
 #define RADIO_BUTTON 2

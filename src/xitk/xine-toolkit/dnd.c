@@ -31,8 +31,8 @@
 #include <string.h>
 #include <signal.h>
 
-#include "gui_widget.h"
-#include "gui_dnd.h"
+#include "widget.h"
+#include "dnd.h"
 
 /*
 Atom _XA_XdndAware;
@@ -158,7 +158,8 @@ Bool dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
   } else if (event->xclient.message_type == xdnd->_XA_XdndDrop) {
 
     if (event->xclient.data.l[0] == 
-	XGetSelectionOwner(xdnd->display, xdnd->_XA_XdndSelection)){
+	XGetSelectionOwner(xdnd->display, xdnd->_XA_XdndSelection)) {
+
       XLockDisplay (xdnd->display);
 
       XConvertSelection(xdnd->display, xdnd->_XA_XdndSelection, xdnd->atom_support,

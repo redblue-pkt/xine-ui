@@ -28,9 +28,9 @@
 #include <stdio.h>
 
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
-#include "gui_image.h"
-#include "gui_widget_types.h"
+#include "widget.h"
+#include "image.h"
+#include "widget_types.h"
 
 /*
  *
@@ -63,15 +63,14 @@ static void paint_image (widget_t *i,  Window win, GC gc) {
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
 
-  XLockDisplay (private_data->display);
-
   skin = private_data->skin;
+
+  XLockDisplay (private_data->display);
 
   if (i->widget_type & WIDGET_TYPE_IMAGE) {
     XCopyArea (private_data->display, skin->image, win, gc, 0, 0,
 	       skin->width, skin->height, i->x, i->y);
     
-    XFlush (private_data->display);
 
   }
 #ifdef DEBUG_GUI
@@ -81,6 +80,7 @@ static void paint_image (widget_t *i,  Window win, GC gc) {
 #endif
 
   XUnlockDisplay (private_data->display);
+  XSync (private_data->display, False);
 }
 
 /*

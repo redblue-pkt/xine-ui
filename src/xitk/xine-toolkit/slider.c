@@ -28,10 +28,10 @@
 #include <stdio.h>
 
 #include "Imlib-light/Imlib.h"
-#include "gui_image.h"
-#include "gui_widget.h"
-#include "gui_slider.h"
-#include "gui_widget_types.h"
+#include "image.h"
+#include "widget.h"
+#include "slider.h"
+#include "widget_types.h"
 
 #ifdef DEBUG_GUI
 #define COMPUTE_COORDS(X,Y)                                                \
@@ -89,11 +89,11 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
   gui_image_t           *paddle = (gui_image_t *) private_data->paddle_skin;
   gui_color_t            gui_color;
   
-  XLockDisplay (private_data->display);
-
   if(private_data->pos > private_data->max
      || private_data->pos < private_data->min)
     return;
+
+  XLockDisplay (private_data->display);
 
   button_width = private_data->button_width;
   button_height = private_data->paddle_skin->height;
@@ -136,8 +136,6 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
     }
     XSetForeground(private_data->display, gc, gui_color.white.pixel);
     
-    XFlush (private_data->display);
-    
   } 
 #ifdef DEBUG_GUI
   else
@@ -145,7 +143,9 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
 	     "that is not a slider\n", sl->widget_type);
 #endif
 
+    
   XUnlockDisplay (private_data->display);
+  XSync (private_data->display, False);
 
 }
 

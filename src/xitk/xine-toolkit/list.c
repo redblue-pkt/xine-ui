@@ -30,8 +30,8 @@
 #include <sys/types.h>
 #include <inttypes.h>
 
-#include "gui_widget.h"
-#include "gui_list.h"
+#include "widget.h"
+#include "list.h"
 
 /*
  *
@@ -172,14 +172,78 @@ void gui_list_append_content (gui_list_t *l, void *content) {
  *
  */
 void gui_list_insert_content (gui_list_t *l, void *content) {
-  fprintf (stderr, "gui_list_insert_content : NOT IMPLEMENTED");
-  exit(1);
+  gui_node_t *nodecur, *nodenext, *nodenew;
+  
+  if(l->cur->next) {
+    nodenew = (gui_node_t *) gui_xmalloc(sizeof(gui_node_t));
+
+    nodenew->content = content;
+    
+    nodecur = l->cur;
+    nodenext = l->cur->next;
+
+    nodecur->next = nodenew;
+    nodenext->prev = nodenew;
+
+    nodenew->prev = nodecur;
+    nodenew->next = nodenext;
+
+    l->cur = nodenew;
+  }
+  else { /* current is last, append to the list */
+    gui_list_append_content(l, content);
+  }
+
 }
 
 /*
  *
  */
 void gui_list_delete_current (gui_list_t *l) {
-  fprintf (stderr, "gui_list_delete_current : NOT IMPLEMENTED");
-  exit(1);
+  gui_node_t *nodeprev;
+  gui_node_t *nodenext;
+
+  /*    / first   / prev
+   list |      node
+        |         \ next
+        |         / prev
+        +cur  node
+	\ last    \ next
+                  / prev
+              node
+                  \ next
+
+   */
+
+  if(l->cur->prev) {
+    nodeprev = l->cur->prev;
+  }
+  else { /* First entry */
+    nodenext = l->cur->next;
+    l->first = nodenext;
+    free(l->cur->content);
+    free(l->cur);
+    l->cur = nodenext;
+    return;
+  }
+  
+  if(l->cur->next)
+    nodenext = l->cur->next;
+  else { /* last entry in the list */
+    l->last = nodeprev;
+    nodeprev->next = NULL;
+    free(l->cur->content);
+    free(l->cur);
+    l->cur = nodeprev;
+    return;
+  }
+
+  nodeprev->next = nodenext;
+  nodenext->prev = nodeprev;
+
+  free(l->cur->content);
+  free(l->cur);
+
+  l->cur = nodeprev;
 }
+

@@ -30,10 +30,10 @@
 #include <string.h>
 
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
-#include "gui_image.h"
-#include "gui_labelbutton.h"
-#include "gui_widget_types.h"
+#include "widget.h"
+#include "image.h"
+#include "labelbutton.h"
+#include "widget_types.h"
 
 #define CLICK     1
 #define FOCUS     2
@@ -144,7 +144,6 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
   gui_image_t *skin;
   Pixmap       btn, bgtmp;
 
-  XLockDisplay(private_data->display);
 
   skin = private_data->skin;
 
@@ -153,6 +152,8 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
 			button_width, skin->height, 
 			DefaultDepth(private_data->display,
 				     DefaultScreen(private_data->display)));
+
+  XLockDisplay(private_data->display);
 
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
     
@@ -207,17 +208,17 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
     XCopyArea (private_data->display, btn, win, gc, 0, 0,
 	       button_width, skin->height, lb->x, lb->y);
 
-    XFlush (private_data->display);
     XFreePixmap(private_data->display, bgtmp);
 
   }
 #ifdef DEBUG_GUI
- else
+  else
     fprintf (stderr, "paint label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
 #endif
- 
+  
   XUnlockDisplay (private_data->display);
+  XSync (private_data->display, False);
 }
 
 /*

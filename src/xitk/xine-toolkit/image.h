@@ -27,7 +27,7 @@
 #include <X11/Xlib.h>
 
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
+#include "widget.h"
 
 typedef struct {
   Display     *display;

@@ -28,10 +28,10 @@
 #include <stdio.h>
 
 #include "Imlib-light/Imlib.h"
-#include "gui_widget.h"
-#include "gui_image.h"
-#include "gui_button.h"
-#include "gui_widget_types.h"
+#include "widget.h"
+#include "image.h"
+#include "button.h"
+#include "widget_types.h"
 
 /**
  *
@@ -42,12 +42,12 @@ static void paint_button (widget_t *b,  Window win, GC gc) {
   int          button_width;
   gui_image_t *skin;
 
-  XLockDisplay (private_data->display);
-
   skin = private_data->skin;
 
   button_width = skin->width / 3;
   
+  XLockDisplay (private_data->display);
+
   if (b->widget_type & WIDGET_TYPE_BUTTON) {
     
     if (private_data->bArmed) {
@@ -65,10 +65,7 @@ static void paint_button (widget_t *b,  Window win, GC gc) {
       XCopyArea (private_data->display, skin->image,  win, gc, 0, 0,
 		 button_width, skin->height, b->x, b->y);
     }
-    
-    
-    XFlush (private_data->display);
-    
+
   } 
 #ifdef DEBUG_GUI
   else
@@ -77,6 +74,7 @@ static void paint_button (widget_t *b,  Window win, GC gc) {
 #endif
   
   XUnlockDisplay (private_data->display);
+  XSync (private_data->display, False);
 }
 
 /*
