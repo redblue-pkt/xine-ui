@@ -1367,7 +1367,6 @@ void gui_init_imlib (Visual *vis) {
 static void on_start(void *data) {
   int start = (int) data;
 
-#warning **** FIXME no OSD on first (audio only) playback
   if((!start && !gGui->playlist.num) || (!start && gGui->playlist.num)) {
 
     gui_display_logo();
@@ -1376,6 +1375,16 @@ static void on_start(void *data) {
       xine_usec_sleep(5000);
     } while(gGui->logo_mode != 1);
 
+  }
+  else {
+    /* Crapy Workaround:
+     * The lib seems unable to display OSD until the stream got 
+     * any video data.
+     */
+    gGui->ignore_next = 1;
+    (void) xine_open(gGui->stream, (const char *) gGui->logo_mrl);
+    xine_stop(gGui->stream);
+    gGui->ignore_next = 0;
   }
 
   if(start)
