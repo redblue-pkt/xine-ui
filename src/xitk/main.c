@@ -1292,6 +1292,7 @@ int main(int argc, char *argv[]) {
   int                     pplugins_num    = 0;
   char                   *tvout            = NULL;
   char                   *pdeinterlace     = NULL;
+  int                     enable_deinterlace = 0;
   char                  **session_argv     = NULL;
   int                     session_argv_num = 0;
   
@@ -1456,8 +1457,8 @@ int main(int argc, char *argv[]) {
 #endif
 
     case 'D':
-      if(!gGui->deinterlace_enable) {
-	gGui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
+      if(!pdeinterlace) {
+	enable_deinterlace++;
 	if(optarg) {
 	  char *p = xine_chomp(optarg);
 	  if(p && strlen(p))
@@ -1850,6 +1851,20 @@ int main(int argc, char *argv[]) {
 			      CONFIG_LEVEL_BEG,
 			      sub_autoload_cb,
 			      CONFIG_NO_DATA);
+
+
+  enable_deinterlace +=
+    xine_config_register_bool(gGui->xine, "gui.deinterlace_by_default", 0,
+			      _("Enable deinterlacing by default"),
+			      _("Deinterlace plugin will be enabled on "
+			        "startup. Progressive streams are automaticaly "
+			        "detected with no performance penalty."), 
+			        CONFIG_LEVEL_BEG,
+			        NULL,
+			        CONFIG_NO_DATA);
+
+  if( enable_deinterlace )
+    gGui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
 
   /*
    * init gui
