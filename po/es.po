@@ -1,13 +1,13 @@
-# translation of xine-ui-es.po to 
+# translation of xine-ui-es.po to
 # Spanish .po file for xine-ui.
 # Copyright (C) 2001,2003 Free Software Foundation, Inc.
 # Juan Manuel García Molina <juanma_gm@wanadoo.es>, 2001-2003.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.17\n"
+"Project-Id-Version: xine-ui 0.9.18\n"
 "POT-Creation-Date: 2003-02-15 00:05+0100\n"
-"PO-Revision-Date: 2003-02-07 18:12+0100\n"
+"PO-Revision-Date: 2003-02-17 18:08+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -309,9 +309,8 @@ msgid "A/V offset: %d"
 msgstr "Desplazamiento A/V: %d"
 
 #: src/xitk/event.c:540
-#, fuzzy
 msgid "A/V Offset: reset."
-msgstr "Desplazamiento SPU: reiniciar."
+msgstr "Desplazamiento A/V: reiniciar."
 
 #: src/xitk/event.c:548 src/xitk/event.c:557
 #, c-format
@@ -978,9 +977,8 @@ msgid "      --install                Install a private colormap.\n"
 msgstr "      --install                Instala un mapa de color privado.\n"
 
 #: src/xitk/main.c:476
-#, fuzzy
 msgid "      --keymap [=option]       Display keymap. Option are:\n"
-msgstr "      --keymap [option]        Mostrar mapeo de teclado. Opciones:\n"
+msgstr "      --keymap [=option]       Mostrar mapeo de teclado. Opciones:\n"
 
 #: src/xitk/main.c:477
 msgid ""
@@ -1047,12 +1045,11 @@ msgstr ""
 "  -P, --playlist <archivo>     Carga un archivo de lista de reproducción.\n"
 
 #: src/xitk/main.c:488
-#, fuzzy
 msgid ""
 "  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes "
 "are:\n"
 msgstr ""
-"  -l, --loop [modo]            Fija la lista de reproducción (predet: loop). "
+"  -l, --loop [=modo]           Fija la lista de reproducción (predet: loop). "
 "Modos:\n"
 
 #: src/xitk/main.c:489
@@ -1363,9 +1360,9 @@ msgid "Discard changes and dismiss the window."
 msgstr "Descarta los cambios y cierra la ventana."
 
 #: src/xitk/menus.c:491
-#, fuzzy, c-format
+#, c-format
 msgid "xine %s"
-msgstr "configuración de xine"
+msgstr "xine %s"
 
 #: src/xitk/mrl_browser.c:193
 msgid "All extensions"
@@ -1663,7 +1660,7 @@ msgstr "configuración de xine"
 
 #: src/xitk/setup.c:1288
 msgid "OK"
-msgstr ""
+msgstr "Aceptar"
 
 #: src/xitk/skins.c:289 src/xitk/skins.c:442
 #, c-format
