@@ -1,6 +1,8 @@
 xine-ui (0.9.23) unstable; urgency=low
   * xinerama bug fixes (very fullscreen, window position when switching from
     fullscreen to normal mode)
+  * shiny new help dialog
+  * some small usability improvements
 
 xine-ui (0.9.22) unstable; urgency=low
 
