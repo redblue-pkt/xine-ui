@@ -5,65 +5,69 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
-"POT-Creation-Date: 2004-04-21 16:38+0000\n"
-"PO-Revision-Date: 2001-11-18 21:22+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-12-17 00:53+0100\n"
+"PO-Revision-Date: 2004-12-17 00:53+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+#: src/xitk/xine-toolkit/mrlbrowser.c:1161
 msgid "Select current entry"
 msgstr "Sélectionne l'entrée courante"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1188
+#: src/xitk/xine-toolkit/mrlbrowser.c:1169
 msgid "Play selected entry"
 msgstr "Joue l'entrée sélectionnée"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1199
+#: src/xitk/xine-toolkit/mrlbrowser.c:1180
 msgid "Close MRL browser window"
 msgstr "Ferme la fenêtre du brouteur de MRL"
 
-#: src/xitk/xine-toolkit/test.c:117
+#: src/xitk/xine-toolkit/test.c:118
+#, c-format
 msgid "XInitThreads() failed.\n"
 msgstr "XInitThreads() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:124
+#: src/xitk/xine-toolkit/test.c:125
+#, c-format
 msgid "Cannot open display\n"
 msgstr "Ne peux pas ouvrir l'affichage\n"
 
-#: src/xitk/xine-toolkit/test.c:138
+#: src/xitk/xine-toolkit/test.c:139
+#, c-format
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_param() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:374
+#: src/xitk/xine-toolkit/test.c:377
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "La nouvelle valeure entiere est: %d. Confirmer ?"
 
-#: src/xitk/xine-toolkit/test.c:426
-#, fuzzy, c-format
+#: src/xitk/xine-toolkit/test.c:429
+#, c-format
 msgid "New double value is: %e. Confirm ?"
-msgstr "La nouvelle valeure entiere est: %d. Confirmer ?"
+msgstr "La nouvelle valeure double est: %e. Confirmer ?"
 
-#: src/xitk/xine-toolkit/test.c:522
+#: src/xitk/xine-toolkit/test.c:531
 msgid "My Frame"
 msgstr "Mon Cadre"
 
-#: src/xitk/xine-toolkit/test.c:562
+#: src/xitk/xine-toolkit/test.c:571
 msgid "A Label"
 msgstr "Un Label"
 
-#: src/xitk/xine-toolkit/test.c:622
+#: src/xitk/xine-toolkit/test.c:631
 msgid "Fire !!"
 msgstr "Feu !!"
 
-#: src/xitk/xine-toolkit/test.c:653
+#: src/xitk/xine-toolkit/test.c:662
 msgid "!BOOM!"
 msgstr "!BOUM!"
 
-#: src/xitk/xine-toolkit/test.c:745
+#: src/xitk/xine-toolkit/test.c:754
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -72,42 +76,43 @@ msgstr ""
 "La nouvelle entrée sélectionnée dans la combo box est:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:948
+#: src/xitk/xine-toolkit/test.c:961
+#, c-format
 msgid "init_test() failed\n"
 msgstr "init_test() a échoué\n"
 
-#: src/xitk/xine-toolkit/test.c:964
+#: src/xitk/xine-toolkit/test.c:976
 msgid "My Fucking Window"
 msgstr "Ma Putain de Fenêtre"
 
-#: src/xitk/xine-toolkit/test.c:981
+#: src/xitk/xine-toolkit/test.c:993
 msgid "Quit"
 msgstr "Quitte"
 
-#: src/xitk/xine-toolkit/window.c:972
+#: src/xitk/xine-toolkit/window.c:1086
 msgid "OK"
 msgstr "Ok"
 
-#: src/xitk/xine-toolkit/window.c:1036 src/xitk/xine-toolkit/window.c:1242
+#: src/xitk/xine-toolkit/window.c:1164 src/xitk/xine-toolkit/window.c:1405
 msgid "Question?"
 msgstr "Question?"
 
-#: src/xitk/xine-toolkit/window.c:1172 src/xitk/xine-toolkit/window.c:1392
+#: src/xitk/xine-toolkit/window.c:1335 src/xitk/xine-toolkit/window.c:1557
 msgid "Yes"
 msgstr "Oui"
 
-#: src/xitk/xine-toolkit/window.c:1172 src/xitk/xine-toolkit/window.c:1392
+#: src/xitk/xine-toolkit/window.c:1335 src/xitk/xine-toolkit/window.c:1557
 msgid "No"
 msgstr "Non"
 
-#: src/xitk/xine-toolkit/window.c:1392
+#: src/xitk/xine-toolkit/window.c:1557
 msgid "Cancel"
 msgstr "Abandon"
 
-#: src/xitk/xine-toolkit/xitk.h:2247 src/xitk/xine-toolkit/xitk.h:2256
+#: src/xitk/xine-toolkit/xitk.h:2250 src/xitk/xine-toolkit/xitk.h:2259
 msgid "Error"
 msgstr "Erreur"
 
-#: src/xitk/xine-toolkit/xitk.h:2250 src/xitk/xine-toolkit/xitk.h:2259
+#: src/xitk/xine-toolkit/xitk.h:2253 src/xitk/xine-toolkit/xitk.h:2262
 msgid "Information"
 msgstr "Information"
