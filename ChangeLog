@@ -20,6 +20,8 @@ xine-ui (0.9.20) unstable; urgency=low
   *   fix quit while playing crash bug, faster quit,
   *   support XINE_ENGINE_PARAM_VERBOSITY,
   *   support XINE_PARAM_AUDIO_AMP_LEVEL (shortcut/session).
+  *   enabled on-the-fly changing of post plugins
+       (needs at least xine-lib 1-beta10 to be safe to use)
 
 xine-ui (0.9.19) unstable; urgency=low
 
