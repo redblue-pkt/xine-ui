@@ -241,10 +241,8 @@ if test "x$enable_shm" = "xyes"; then
   fi
 
   dnl Check for the X shared memory extension header file
-  AC_MSG_CHECKING(X11/extensions/XShm.h)
   if test "x$no_xext_lib" = "xyes"; then
     dnl If we couldn't find XShmAttach earlier, don't use the header
-    AC_MSG_RESULT(no)
     no_xshm=yes
   else
     saved_CPPFLAGS=$CPPFLAGS
