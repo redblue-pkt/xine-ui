@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <limits.h>	/*PATH_MAX*/
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/shape.h>
@@ -43,6 +44,14 @@
 #include "actions.h"
 #include "skins.h"
 #include "lang.h"
+
+#ifndef NAME_MAX
+#define NAME_MAX 256
+#endif
+#ifndef PATH_MAX
+#define PATH_MAX 768
+#endif
+
 
 extern gGui_t              *gGui;
 
