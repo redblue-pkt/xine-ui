@@ -25,6 +25,7 @@ xine_SOURCES = \
 	main.c \
 	mrl_browser.c \
 	network.c \
+	osd.c \
 	setup.c \
 	skins.c \
 	snapshot.c \
@@ -66,6 +67,7 @@ noinst_HEADERS = \
 	lirc.h \
 	mrl_browser.h \
 	network.h \
+	osd.h \
 	panel.h \
 	playlist.h \
 	mediamark.h \

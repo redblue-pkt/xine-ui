@@ -255,6 +255,8 @@ static void *slider_loop(void *dummy) {
       else
 	pos = secs = 0;
       
+      osd_update(i);
+
       if((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) {
 	
 	if(gGui->ssaver_timeout) {
@@ -266,21 +268,6 @@ static void *slider_loop(void *dummy) {
 	    screensaver_timer = 0;
 	    video_window_reset_ssaver();
 	    
-#if OSD
-	    printf("draw OSD\n"); fflush(stdout);
-	    xine_osd_set_palette(gGui->osd.info, 
-				 XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
-	    printf("palette sets\n"); fflush(stdout);
-	    xine_osd_set_position(gGui->osd.info, 0, 0);
-	    printf("position done\n"); fflush(stdout);
-	    xine_osd_draw_text(gGui->osd.info, 0, 0, 
-			       "Coucou", XINE_OSD_TEXT1);
-	    printf("text drawn\n"); fflush(stdout);
-	    xine_osd_show(gGui->osd.info, 0);
-	    printf("show done\n"); fflush(stdout);
-	    xine_osd_hide(gGui->osd.info, 300000);
-	    printf("hide done\n"); fflush(stdout);
-#endif
 	  }
 	}  
 

@@ -671,12 +671,12 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	xine_error(_("Unable to create '%s' directory: %s."), skindir, strerror(errno));
       }
       else {
-	char   tmpskin[XITK_PATH_MAX];
+	char   tmpskin[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 	FILE  *fd;
 	
 	memset(&tmpskin, 0, sizeof(tmpskin));
-	sprintf(tmpskin, "/tmp/%s", filename);
-
+	sprintf(tmpskin, "/tmp/%d%s", (unsigned int)time(NULL), filename);
+	
 	if((fd = fopen(tmpskin, "w+b")) != NULL) {
 	  char   buffer[2048];
 	  int    i, skin_found = -1;
@@ -689,6 +689,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  
 	  sprintf(buffer, "`which tar`||tar -C %s -xzf %s", skindir, tmpskin);
 	  xine_system(0, buffer);
+	  unlink(tmpskin);
 	  
 	  memset(&buffer, 0, sizeof(buffer));
 	  snprintf(buffer, ((strlen(filename) + 1) - 7), "%s", filename);

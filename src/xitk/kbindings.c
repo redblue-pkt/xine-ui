@@ -207,6 +207,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ToggleAspectRatio",      ACTID_TOGGLE_ASPECT_RATIO     , "a",        KEYMOD_NOMOD   , 0 },
   { "Visibility toggle of stream infos window.",
     "StreamInfosShow",        ACTID_STREAM_INFOS            , "i",        KEYMOD_META    , 0 },
+  { "Display stream information using OSD.",
+    "OSDStreamInfos",         ACTID_OSD_SINFOS              , "i",        KEYMOD_CONTROL , 0 },
   { "Interlaced mode toggle.",
     "ToggleInterleave",       ACTID_TOGGLE_INTERLEAVE       , "i",        KEYMOD_NOMOD   , 0 },
   { "Quit the program.",

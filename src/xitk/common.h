@@ -57,6 +57,7 @@
 #include "stream_infos.h"
 #include "viewlog.h"
 #include "download.h"
+#include "osd.h"
 
 #include "utils.h"
 
@@ -134,10 +135,16 @@ typedef struct {
     int                     num_mrls;
   } visual_anim;
   
-#undef OSD
+#define OSD
   struct {
+    int                     enabled;
+    int                     timeout;
+
     xine_osd_t             *info;
+    int                     info_visible;
+
     xine_osd_t             *status;
+    int                     status_visible;
   } osd;
 
   /* xine lib/gui configuration filename */

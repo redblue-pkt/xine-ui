@@ -187,15 +187,18 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
       
       filename = strrchr(url, '/');
       if(strlen(filename) >= 2) {
+	char  fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 	FILE *fd;
 	
 	filename++;
+	memset(&fullfilename, 0, sizeof(fullfilename));
+	sprintf(fullfilename, "%s/%s", xine_get_homedir(), filename);
 	
-	if((fd = fopen(filename, "w+b")) != NULL) {
+	if((fd = fopen(fullfilename, "w+b")) != NULL) {
 	  char  *newmrl, *ident;
 	  int    start, end;
 	  
-	  xine_strdupa(newmrl, filename);
+	  xine_strdupa(newmrl, fullfilename);
 	  xine_strdupa(ident, gGui->playlist.mmk[gGui->playlist.cur]->ident);
 	  start = gGui->playlist.mmk[gGui->playlist.cur]->start;
 	  end = gGui->playlist.mmk[gGui->playlist.cur]->end;

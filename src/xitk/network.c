@@ -623,28 +623,6 @@ static char *_atoa(char *str) {
   return pbuf;
 }
 
-#warning MOVE ME OUT
-int get_bool_value(const char *val) {
-  static struct {
-    const char *str;
-    int value;
-  } bools[] = {
-    { "1",     1 }, { "true",  1 }, { "yes",   1 }, { "on",    1 },
-    { "0",     0 }, { "false", 0 }, { "no",    0 }, { "off",   0 },
-    { NULL,    0 }
-  };
-  int i;
-  
-  if(val) {
-    for(i = 0; bools[i].str != NULL; i++) {
-      if(!(strcasecmp(bools[i].str, val)))
-	return bools[i].value;
-    }
-  }
-  
-  return 0;
-}
-
 #ifdef NETWORK_CLIENT
 
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 91)

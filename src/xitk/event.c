@@ -128,6 +128,16 @@ static void skin_server_url_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->skin_server_url = cfg->str_value;
 }
 
+/*
+ * OSD cbs
+ */
+static void osd_enabled_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->osd.enabled = cfg->num_value;
+}
+static void osd_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->osd.timeout = cfg->num_value;
+}
+
 int actions_on_start(action_id_t actions[], action_id_t a) {
   int i = 0, num = 0;
   while(actions[i] != ACTID_NOKEY) {
@@ -611,6 +621,10 @@ void gui_execute_action_id(action_id_t action) {
     download_skin(gGui->skin_server_url);
     break;
 
+  case ACTID_OSD_SINFOS:
+    osd_stream_infos();
+    break;
+
   default:
     break;
   }
@@ -986,6 +1000,25 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   config_update_string("gui.skin_server_url", 
 		       gGui->skin_server_url ? gGui->skin_server_url : server);
   
+  gGui->osd.enabled = 
+    xine_config_register_bool(gGui->xine, "gui.osd_enabled", 
+			      1,
+			      _("Enable OSD support"),
+			      _("Enabling OSD permit to display view information "
+				"status in output window."), 
+			      CONFIG_LEVEL_EXP,
+			      osd_enabled_cb,
+			      CONFIG_NO_DATA);
+
+  gGui->osd.timeout = 
+    xine_config_register_num(gGui->xine, "gui.osd_timeout", 
+			      5,
+			      _("Dismiss OSD time (s)"),
+			      _("Persistence time of OSD visual, in seconds."),
+			      CONFIG_LEVEL_EXP,
+			      osd_timeout_cb,
+			      CONFIG_NO_DATA);
+
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
 
