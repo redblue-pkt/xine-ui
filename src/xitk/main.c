@@ -1280,7 +1280,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     break;
 
   case XINE_EVENT_DROPPED_FRAMES:
-    {
+    if (xine_get_param(gGui->stream, XINE_PARAM_SPEED) <= XINE_SPEED_NORMAL) {
       char buffer[2048];
       
       memset(&buffer, 0, sizeof(buffer));
