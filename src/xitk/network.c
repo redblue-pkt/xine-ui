@@ -2070,17 +2070,14 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	  sock_write(client_info->socket, "Current audio channel: %d\n", 
 		     (xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)));
 	}
-#warning FIXME NEWAPI MISSING
-#if 0
 	else if(is_arg_contain(client_info, 2, "lang")) {
 	  char buf[20];
 
 	  xine_get_audio_lang(gGui->stream,
 	                      xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL),
-			      buf);
+			      &buf[0]);
 	  sock_write(client_info->socket, "Current audio language: %s\n", buf);
 	}
-#endif
 	else if(is_arg_contain(client_info, 2, "volume")) {
 	  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
 	    sock_write(client_info->socket, "Current audio volume: %d\n", gGui->mixer.volume_level);
@@ -2101,17 +2098,14 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	  sock_write(client_info->socket, "Current spu channel: %d\n", 
 		     (xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL)));
 	}
-#warning FIXME NEWAPI MISSING
-#if 0
 	else if(is_arg_contain(client_info, 2, "lang")) {
 	  char buf[20];
 
 	  xine_get_spu_lang (gGui->stream,
 	                     xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL),
-	                     buf);
+			     &buf[0]);
 	  sock_write(client_info->socket, "Current spu language: %s\n", buf);
 	}
-#endif
       }
     }
   }
