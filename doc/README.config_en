@@ -252,16 +252,13 @@ video.XV_DOUBLE_BUFFER          Enable double buffering to sync video on
                                 monitor retrace. At least nvidia drivers
                                 should support this.
 
-video.zoom_mpeg1                1/0 : enable automatic zoom of small
-                                (e.g. mpeg1) videos to double size
-
 
 xine-ui specific values:
 -----------------------
 
 gui.tips_visible            gui tips visibility
 
-tips_timeout                tips timeout (ms), default: 500
+gui.tips_timeout            tips timeout (ms), default: 500
 
 gui.skin                    skin to use, see <prefix>/share/xine/skins
                             for installed skins
@@ -269,11 +266,28 @@ gui.skin                    skin to use, see <prefix>/share/xine/skins
 
 gui.layer_above             Boolean value of WM layer property using.
 
-gui.use_xvidext             XINE can switch to a different screen resolution which
+gui.use_xvidext             xine can switch to a different screen resolution which
                             fits your video material best when toggling fullscreen
 			    mode by using the XF86VidMode Extension.
 			    (0) off [default]
 			    (1) on
+
+gui.stream_resize_window    this setting control xine-ui resizing behaviour.
+                            there are two possible policies:
+                            (0) off: never resize window to match stream size.
+                                user should manually change the video window
+                                to the desired size. all streams will be fitted
+                                inside the window.
+                            (1) on: always resize window when stream size changes.
+                                user may still manually resize a playing video
+                                but if the stream size changes (eg. next MRL,
+                                dvd menus, etc) the window will be automatically
+                                resized.
+                           
+gui.zoom_small_stream       automatically double window size when playing small
+                            videos. 
+                            (this setting requires stream_resize_window enabled)
+
 
 *** NOTE: following values shouldn't be changed by user:
 gui.panel_x                 X coords of panel window in root window.
