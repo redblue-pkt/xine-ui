@@ -434,10 +434,20 @@ static xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
   }
   else {
     
-    video_driver = xine_open_video_driver(gGui->xine,
-					  video_driver_id,
-					  XINE_VISUAL_TYPE_X11, 
-					  (void *) &vis);
+    /* 'none' plugin is a special case, just change the visual type */
+    if((!strcasecmp(video_driver_id, "none")) || (!strcasecmp(video_driver_id, "null"))) {
+      video_driver = xine_open_video_driver(gGui->xine,
+					    video_driver_id,
+					    XINE_VISUAL_TYPE_NONE,
+					    (void *) &vis);
+    }
+    else {
+      video_driver = xine_open_video_driver(gGui->xine,
+					    video_driver_id,
+					    XINE_VISUAL_TYPE_X11, 
+					    (void *) &vis);
+    }
+
     if (!video_driver) {
       printf (_("main: video driver <%s> failed\n"), video_driver_id);
       exit (1);
