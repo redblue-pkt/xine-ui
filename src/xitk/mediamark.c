@@ -40,13 +40,55 @@ typedef struct {
   FILE               *fd;
   char                buf[256];
   char               *ln;
-
+  
   int                 entries;
   char               *type;
-
 } playlist_t;
 
 typedef mediamark_t **(*playlist_guess_func_t)(playlist_t *, const char *);
+
+static char *_read_file(const char *filename, int *size) {
+  struct stat  st;
+  char        *buf = NULL;
+  int          fd, bytes_read;
+  
+  if((!filename) || (!strlen(filename))) {
+    fprintf(stderr, "%s(): Empty or NULL filename.\n", __XINE_FUNCTION__);
+    return NULL;
+  }
+  
+  if(stat(filename, &st) < 0) {
+    fprintf(stderr, "%s(): Unable to stat() '%s' file: %s.\n",
+	    __XINE_FUNCTION__, filename, strerror(errno));
+    return NULL;
+  }
+
+  if((*size = st.st_size) == 0) {
+    fprintf(stderr, "%s(): File '%s' is empty.\n", __XINE_FUNCTION__, filename);
+    return NULL;
+  }
+
+  if((fd = open(filename, O_RDONLY)) == -1) {
+    fprintf(stderr, "%s(): open(%s) failed: %s.\n", __XINE_FUNCTION__, filename, strerror(errno));
+    return NULL;
+  }
+  
+  if((buf = (char *) xine_xmalloc(*size)) == NULL) {
+    fprintf(stderr, "%s(): xine_xmalloc() failed.\n", __XINE_FUNCTION__);
+    close(fd);
+    return NULL;
+  }
+  
+  if((bytes_read = read(fd, buf, *size)) != *size) {
+    fprintf(stderr, "%s(): read() return wrong size (%d / %d): %s.\n",
+	    __XINE_FUNCTION__, bytes_read, *size, strerror(errno));
+    *size = bytes_read;
+  }
+
+  close(fd);
+
+  return buf;
+}
 
 int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, int start, int end) {
 
@@ -123,12 +165,13 @@ static void playlist_clean_eol(playlist_t *playlist) {
 static int playlist_get_next_line(playlist_t *playlist) {
 
  __get_next_line:
-  playlist->ln = fgets(playlist->buf, 255, playlist->fd);
+
+  playlist->ln = fgets(playlist->buf, 256, playlist->fd);
   
   while(playlist->ln && (*playlist->ln == ' ' || *playlist->ln == '\t')) ++playlist->ln;
   
   playlist_clean_eol(playlist);
-
+  
   if(playlist->ln && !strlen(playlist->ln))
     goto __get_next_line;
 
@@ -595,6 +638,119 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
   return NULL;
 }
 
+static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filename) {
+  mediamark_t **mmk = NULL;
+
+  if(filename) {
+    char            *asx_content;
+    int              size;
+    int              result;
+    xml_node_t      *xml_tree, *asx_entry, *asx_ref;
+    xml_property_t  *asx_prop;
+
+    if((asx_content = _read_file(filename, &size)) != NULL) {
+      int entries_asx = 0;
+
+      xml_parser_init(asx_content, size, XML_PARSER_CASE_INSENSITIVE);
+      if((result = xml_parser_build_tree(&xml_tree)) > 0)
+	goto __failure;
+      
+      if(!strcmp(xml_tree->name, "ASX")) {
+
+	asx_prop = xml_tree->props;
+
+	while((asx_prop) && (strcmp(asx_prop->name, "VERSION")))
+	  asx_prop = asx_prop->next;
+	
+	if(asx_prop) {
+	  int  version_major, version_minor = 0;
+
+	  if((((sscanf(asx_prop->value, "%d.%d", &version_major, &version_minor)) == 2) ||
+	      ((sscanf(asx_prop->value, "%d", &version_major)) == 1)) && 
+	     ((version_major == 3) && (version_minor == 0))) {
+	    
+	    asx_entry = xml_tree->child;
+	    while(asx_entry) {
+	      if((!strcmp(asx_entry->name, "ENTRY")) || (!strcmp(asx_entry->name, "ENTRYREF"))) {
+		char *title = NULL;
+		char *href  = NULL;
+
+		asx_ref = asx_entry->child;
+		while(asx_ref) {
+		  
+		  if(!strcmp(asx_ref->name, "TITLE")) {
+
+		    if(!title)
+		      title = asx_ref->data;
+		    
+		  }
+		  else if(!strcmp(asx_ref->name, "REF")) {
+		    
+		    for(asx_prop = asx_ref->props; asx_prop; asx_prop = asx_prop->next) {
+
+		      if(!strcmp(asx_prop->name, "HREF")) {
+			if(!href)
+			  href = asx_prop->value;
+		      }
+		      
+		      if(href)
+			break;
+		    }
+
+		  }		    
+
+		  if(href && strlen(href)) {
+		    char *atitle = NULL;
+		    
+		    if(title && strlen(title)) {
+		      xine_strdupa(atitle, title);
+		      atitle = atoa(atitle);
+		    }
+		    
+		    entries_asx++;
+		    
+		    if(entries_asx == 1)
+		      mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
+		    else
+		      mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 1));
+		    
+		    mediamark_store_mmk(&mmk[(entries_asx - 1)], href, atitle, 0, -1);
+		    playlist->entries = entries_asx;
+		    href = title = NULL;
+		  }
+		  
+		  asx_ref = asx_ref->next;
+		}
+	      }
+	      asx_entry = asx_entry->next;
+	    }
+	  }
+	  else
+	    fprintf(stderr, "%s(): Wrong ASX version: %s\n", __XINE_FUNCTION__, asx_prop->value);
+
+	}
+	else
+	  fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
+	
+      }
+      else
+	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+      
+      if(entries_asx) {
+	mmk[entries_asx] = NULL;
+	playlist->type = strdup("ASX3");
+	return mmk;
+      }
+      
+      xml_parser_free_tree(xml_tree);
+      free(asx_content);
+    }
+  }
+ __failure:
+  
+  return NULL;
+}
+
 /*
  * Public
  */
@@ -686,6 +842,7 @@ void mediamark_load_mediamarks(const char *filename) {
   mediamark_t           **mmk = NULL;
   mediamark_t           **ommk;
   playlist_guess_func_t   guess_functions[] = {
+    guess_asx_playlist,
     guess_toxine_playlist,
     guess_xmms_playlist_pls,
     guess_xmms_playlist_m3u,
