@@ -903,6 +903,7 @@ void xitk_xevent_notify(XEvent *event) {
 
       if(fx->window == event->xany.window) {
 	
+#ifdef HAVE_SHM
 	/* Forward immediately EventCompletion event */
 	if(event->type == (XShmGetEventBase(gXitk->display) + ShmCompletion)) {
 	  if(fx->xevent_callback)
@@ -910,6 +911,7 @@ void xitk_xevent_notify(XEvent *event) {
 
 	  return;
 	}
+#endif
 
 	switch(event->type) {
 
