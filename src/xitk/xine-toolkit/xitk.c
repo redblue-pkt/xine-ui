@@ -552,7 +552,8 @@ void widget_init(Display *display) {
  */
 void widget_run(void) {
   struct sigaction      action;
-  
+  void *ret;
+
   action.sa_handler = xitk_signal_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
@@ -579,7 +580,9 @@ void widget_run(void) {
   pthread_create (&widl->thread, NULL, 
 		  widget_event_loop, NULL) ;
 
-  pthread_mutex_lock(&widl->run_mutex);
+  pthread_join(widl->thread, &ret);
+
+  /* pthread_mutex_lock(&widl->run_mutex); */
 
   /* Release memory */
   gui_list_free(widl->list);
@@ -591,10 +594,10 @@ void widget_run(void) {
  * Stop the wait xevent loop
  */
 void widget_stop(void) {
-  void     *p;
+/*   void     *p; */
   
   widl->running = 0;
 
-  pthread_join(widl->thread, &p);
+  /* pthread_join(widl->thread, &p); */
   pthread_mutex_unlock(&widl->run_mutex);
 }
