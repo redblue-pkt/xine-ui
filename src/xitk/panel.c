@@ -1180,11 +1180,11 @@ void panel_init (void) {
   if (panel->visible) {
     while(!xitk_is_window_visible(gGui->display, gGui->panel_window))
       xine_usec_sleep(5000);
-  }
   
-  XLockDisplay (gGui->display);
-  XSetInputFocus(gGui->display, gGui->panel_window, RevertToParent, CurrentTime);
-  XUnlockDisplay (gGui->display);
+    XLockDisplay (gGui->display);
+    XSetInputFocus(gGui->display, gGui->panel_window, RevertToParent, CurrentTime);
+    XUnlockDisplay (gGui->display);
+  }
 }
 
 void panel_set_title(char *title) {
