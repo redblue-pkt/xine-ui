@@ -15,7 +15,7 @@ bin_PROGRAMS = ${aa_programs}
 
 aaxine_SOURCES = $(GETOPT_C) utils.c main.c
 aaxine_DEPENDENTIES = utils.h 
-aaxine_LDADD = @XINE_LIBS@ $(AALIB_STATIC_LIBS) \
+aaxine_LDADD = @XINE_LIBS@ $(AALIB_LIBS) \
 	$(THREAD_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 $(GETOPT_C):
