@@ -1648,11 +1648,13 @@ void gui_add_mediamark(void) {
 
 static void fileselector_cancel_callback(filebrowser_t *fb) {
   sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
+  config_update_string("input.file_origin_path", gGui->curdir);
 }
 static void fileselector_callback(filebrowser_t *fb) {
   char *file;
 
   sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
+  config_update_string("input.file_origin_path", gGui->curdir);
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     int first = gGui->playlist.num;
@@ -1677,6 +1679,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
   char  *path;
 
   sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
+  config_update_string("input.file_origin_path", gGui->curdir);
 
   if((files = filebrowser_get_all_files(fb)) != NULL) {
     int i = 0;
