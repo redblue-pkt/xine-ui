@@ -309,6 +309,18 @@ static void numtype_update(xitk_widget_t *w, void *data, int value) {
 /*
  *
  */
+static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
+  cfg_entry_t *entry;
+  
+  entry = (cfg_entry_t *)data;
+ 
+  entry->config->update_string(entry->config, entry->key, str );
+}
+
+
+/*
+ *
+ */
 static void setup_add_slider (char *labelkey, int x, int y, cfg_entry_t *entry ) {
 
   xitk_slider_widget_t  sl;
@@ -349,9 +361,8 @@ static void setup_add_inputtext(char *labelkey, int x, int y, cfg_entry_t *entry
   inp.skin_element_name = NULL;
   inp.text              = entry->str_value;
   inp.max_length        = 256;
-  /* inp.callback          = change_browser_entry; */
-  inp.callback          = NULL;
-  inp.userdata          = NULL;
+  inp.callback          = stringtype_update;
+  inp.userdata          = entry;
   xitk_list_append_content (setup->widget_list->l,
 			   (input = 
 			    xitk_noskin_inputtext_create(&inp,
@@ -411,6 +422,7 @@ static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry ) 
 			   (combo = 
 			    xitk_noskin_combo_create(&cmb,
 						     x, y, 150, &lw, &bw)));
+  xitk_combo_set_select(setup->widget_list, combo, entry->num_value );
 
   PLACE_LABEL(combo);
 
