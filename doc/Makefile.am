@@ -36,7 +36,7 @@ docs_DATA = FAQ_de \
 	README.tvmode
 
 debug:
-install-debug:
+install-debug: install
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*
