@@ -806,6 +806,6 @@ void control_panel(void) {
   control->visible = 1;
   control->running = 1;
   control_raise_window();
-
+  
   try_to_set_input_focus(control->window);
 }

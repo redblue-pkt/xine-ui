@@ -373,20 +373,31 @@ void set_window_states_start(Window window);
   } while(0)
 
 void reparent_window(Window window);
-#define reparent_window(window)                                           \
-  do {                                                                    \
-    XLockDisplay(gGui->display);                                          \
-    XUnmapWindow(gGui->display, (window));                                \
-    if(!video_window_is_visible())                                        \
-      xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);              \
-    else                                                                  \
-      xitk_unset_wm_window_type((window), WINDOW_TYPE_NORMAL);            \
-    XRaiseWindow(gGui->display, (window));                                \
-    XMapWindow(gGui->display, (window));                                  \
-    try_to_set_input_focus((window));                                     \
-    if(!gGui->use_root_window)                                            \
-      XSetTransientForHint (gGui->display, (window), gGui->video_window); \
-    XUnlockDisplay(gGui->display);                                        \
+#define reparent_window(window)                                                          \
+  do {                                                                                   \
+    if((!(video_window_get_fullscreen_mode() & WINDOWED_MODE)) && !wm_not_ewmh_only()) { \
+      XLockDisplay(gGui->display);                                                       \
+      XUnmapWindow(gGui->display, (window));                                             \
+      if(!video_window_is_visible())                                                     \
+        xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);                           \
+      else                                                                               \
+        xitk_unset_wm_window_type((window), WINDOW_TYPE_NORMAL);                         \
+      XRaiseWindow(gGui->display, (window));                                             \
+      XMapWindow(gGui->display, (window));                                               \
+      try_to_set_input_focus((window));                                                  \
+      if(!gGui->use_root_window)                                                         \
+        XSetTransientForHint (gGui->display, (window), gGui->video_window);              \
+      XUnlockDisplay(gGui->display);                                                     \
+    }                                                                                    \
+    else {                                                                               \
+      XLockDisplay(gGui->display);                                                       \
+      XRaiseWindow(gGui->display, window);                                               \
+      XMapWindow(gGui->display, window);                                                 \
+      if(!gGui->use_root_window)                                                         \
+        XSetTransientForHint (gGui->display, window, gGui->video_window);                \
+      XUnlockDisplay(gGui->display);                                                     \
+      layer_above_video(window);                                                         \
+    }                                                                                    \
   } while(0)
 
 void change_class_name(Window window);

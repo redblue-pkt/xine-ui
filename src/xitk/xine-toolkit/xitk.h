@@ -745,6 +745,7 @@ void xitk_set_window_layer(Window window, int layer);
  *
  */
 void xitk_set_ewmh_fullscreen(Window window);
+void xitk_unset_ewmh_fullscreen(Window window);
 
 /*
  * This function start the widget live. It's a block function,

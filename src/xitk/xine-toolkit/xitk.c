@@ -689,18 +689,18 @@ void xitk_set_layer_above(Window window) {
       XEvent xev;
       
       XLockDisplay(gXitk->display);
-      
-      xev.type                 = ClientMessage;
+      xev.xclient.type         = ClientMessage;
+      xev.xclient.display      = gXitk->display;
       xev.xclient.window       = window;
       xev.xclient.message_type = XA_NET_WM_STATE;
       xev.xclient.format       = 32;
       xev.xclient.data.l[0]    = 1;
       xev.xclient.data.l[1]    = XA_STAYS_ON_TOP;
-      xev.xclient.data.l[2]    = None;
+      xev.xclient.data.l[2]    = 0l;
+      xev.xclient.data.l[3]    = 0l;
+      xev.xclient.data.l[4]    = 0l;
       
-      XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), 
-		 False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
-
+      XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), True, SubstructureRedirectMask, &xev);
       XUnlockDisplay(gXitk->display);
     }
     else {
@@ -789,29 +789,44 @@ void xitk_set_window_layer(Window window, int layer) {
   XUnlockDisplay(gXitk->display);
 }
 
-void xitk_set_ewmh_fullscreen(Window window) {
+static void _set_ewmh_state(Window window, Atom atom, int enable) {
   XEvent xev;
+  
+  if((window == None) || (atom == None))
+    return;
+
+  xev.xclient.type         = ClientMessage;
+  xev.xclient.message_type = XA_NET_WM_STATE;
+  xev.xclient.display      = gXitk->display;
+  xev.xclient.window       = window;
+  xev.xclient.format       = 32;
+  xev.xclient.data.l[0]    = (enable == 1) ? 1 : 0;
+  xev.xclient.data.l[1]    = atom;
+  xev.xclient.data.l[2]    = 0l;
+  xev.xclient.data.l[3]    = 0l;
+  xev.xclient.data.l[4]    = 0l;
+
+  XLockDisplay(gXitk->display);
+  XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), True, SubstructureRedirectMask, &xev);
+  XUnlockDisplay(gXitk->display);
+}
+
+void xitk_set_ewmh_fullscreen(Window window) {
   
   if(!(gXitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
     return;
   
-  XLockDisplay(gXitk->display);
-  
-  xev.xclient.type         = ClientMessage;
-  xev.xclient.send_event   = True;
-  xev.xclient.display      = gXitk->display;
-  xev.xclient.window       = window;
-  xev.xclient.message_type = XA_NET_WM_STATE;
-  xev.xclient.format       = 32;
-  xev.xclient.data.l[0]    = (long) 1;
-  xev.xclient.data.l[1]    = (long) XA_NET_WM_STATE_FULLSCREEN;
-  xev.xclient.data.l[2]    = (long) None;
-  
-  XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), 
-	     False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
-  
-  XUnlockDisplay(gXitk->display);
+  _set_ewmh_state(window, XA_NET_WM_STATE_FULLSCREEN, 1);
+  _set_ewmh_state(window, XA_STAYS_ON_TOP, 1);
+}
 
+void xitk_unset_ewmh_fullscreen(Window window) {
+  
+  if(!(gXitk->wm_type & WM_TYPE_EWMH_COMP) || (window == None))
+    return;
+  
+  _set_ewmh_state(window, XA_NET_WM_STATE_FULLSCREEN, 0);
+  _set_ewmh_state(window, XA_STAYS_ON_TOP, 0);
 }
 
 static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int value) {
@@ -846,9 +861,23 @@ static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int v
     }
     
     if(atom) {
+      XEvent xev;
+
+      xev.xclient.type         = ClientMessage;
+      xev.xclient.display      = gXitk->display;
+      xev.xclient.window       = window;
+      xev.xclient.message_type = XA_WIN_LAYER;
+      xev.xclient.format       = 32;
+      xev.xclient.data.l[0]    = *atom;
+      xev.xclient.data.l[1]    = 0l;
+      xev.xclient.data.l[2]    = 0l;
+      xev.xclient.data.l[3]    = 0l;
+      xev.xclient.data.l[4]    = 0l;
+  
       XLOCK(gXitk->display);
-      XChangeProperty(gXitk->display, window, XA_WM_WINDOW_TYPE, XA_ATOM, 32, 
-		      PropModeReplace, (unsigned char *)atom, value);
+      XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), False, SubstructureNotifyMask, &xev);
+
+      XRaiseWindow(gXitk->display, window);
       XUNLOCK(gXitk->display);
     }
   }
