@@ -1292,7 +1292,8 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 static void kbedit_create_browser_entries(void) {
-  int i, wlen;
+  xitk_font_t  *fs;
+  int           i, wlen;
   
   if(kbedit->num_entries) {
     for(i = 0; i < kbedit->num_entries; i++)
@@ -1305,6 +1306,9 @@ static void kbedit_create_browser_entries(void) {
   kbedit->num_entries = (kbedit->kbt->num_entries - 1);
   
   wlen = WINDOW_WIDTH - 30 - 2 - 16;
+
+  fs   = xitk_font_load_font(gGui->display, br_fontname);
+  xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
   
   for(i = 0; i < kbedit->num_entries; i++) {
     char buf[2048], buf2[2048];
@@ -1340,12 +1344,8 @@ static void kbedit_create_browser_entries(void) {
     sprintf(shortcut, "%s%s ]", shortcut, kbedit->kbt->entry[i]->key);
 
     { /* Right align shortcut */
-      xitk_font_t  *fs;
       int           slen, spaces;
       
-      fs = xitk_font_load_font(gGui->display, br_fontname);
-      xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
-
       sprintf(buf2, "%s %s", buf, shortcut);
       spaces = strlen(buf) + 1;
       
@@ -1359,12 +1359,12 @@ static void kbedit_create_browser_entries(void) {
 	slen = xitk_font_get_string_length(fs, buf2);
       }
 
-      xitk_font_unload_font(fs);
     }
 
     kbedit->entries[i] = strdup(buf2);
   }
   kbedit->entries[i] = NULL;
+  xitk_font_unload_font(fs);
 }
 
 static void kbedit_display_kbinding(char *action, kbinding_entry_t *kbe) {
