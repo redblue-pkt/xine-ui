@@ -415,9 +415,10 @@ static void *slider_loop(void *dummy) {
 	    panel_update_mrl_display();
 	}
       }
+      
+      if(((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) && 
+	 (!xitk_is_window_iconified(gGui->display, gGui->video_window))) {
 
-      if((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) {
-	
 	if(gGui->ssaver_timeout) {
 	  
 	  if(!(i % 2))

@@ -55,6 +55,32 @@ static void _xitk_window_set_focus(Display *display, Window window) {
 }
 
 /*
+ *
+ */
+int xitk_is_window_iconified(Display *display, Window window) {
+  unsigned char *prop_return = NULL;
+  unsigned long  nitems_return;
+  unsigned long  bytes_after_return;
+  int            format_return;
+  Atom           type_return, atom;
+  int            retval = 0;
+  
+  XLockDisplay(display);
+  atom = XInternAtom(display, "WM_STATE", False);
+  XGetWindowProperty (display, window, atom, 0, 0x7fffffff, False,
+		      atom, &type_return, &format_return, &nitems_return, &bytes_after_return, &prop_return);
+  
+  if(prop_return) {
+    if (prop_return[0] == IconicState)
+      retval = 1;
+    XFree(prop_return);
+  }
+  XUnlockDisplay(display);
+ 
+  return retval;
+}
+
+/*
  * Is window is size match with given args
  */
 int xitk_is_window_visible(Display *display, Window window) {

@@ -2099,6 +2099,11 @@ void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, char *title);
 /*
  *
  */
+int xitk_is_window_iconified(Display *display, Window window);
+
+/*
+ *
+ */
 int xitk_is_window_visible(Display *display, Window window);
 
 /*
