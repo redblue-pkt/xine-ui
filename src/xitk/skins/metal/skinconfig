@@ -28,15 +28,17 @@ AudioLabel:	353	41	letters.png	3	False
 SpuPrev:	315	50	arrowdn.png
 SpuNext:	315	38	arrowup.png
 SpuLabel:	293	41	letters.png	3	False
-Next:		180	71	next.png
-Pause:		140	71	pause.png
-Play:		100	71	play.png
-Stop:		60	71	stop.png
-Prev:		20	71	prev.png
-AutoPlace:	224	71	left.png
-Eject:		234	71	eject.png
-Exit:		253	71	exit.png
-AutoPlace:	272	71	right.png
+Prev:		20	72	prev.png
+Stop:		60	72	stop.png
+Play:		100	72	play.png
+PlayFast:	139	72	playfast.png
+PlaySlow:	139	81	playslow.png
+Pause:		152	72	pause.png
+Next:		192	72	next.png
+##AutoPlace:	224	72	left.png
+Eject:		234	72	eject.png
+Exit:		253	72	exit.png
+AutoPlace:	272	72	right.png
 SliderBGPlay:	17	3	slider_bg.png
 SliderFGPlay:	0	0	slider_pad.png
 SliderBGVol:	2	20	slider_v.png
@@ -89,6 +91,7 @@ CtlDismiss:	350	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*
 MrlBG:		0	0	pl_bg.png
 MrlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 MrlSelect:	61	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+MrlPlay:	150	210	mrl_play.png
 MrlDismiss:	350	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 MrlUp:		328	30	arrowup2.png
 MrlSlidBG:	327	45	pl_slidv.png

@@ -26,11 +26,17 @@ TimeLabel:	23	35	letters.png	8	False
 AudioPrev:	242	36	ptdn.png
 AudioNext:	253	35	ptup.png
 AudioLabel:	246	15	letters.png	3	False
-Next:		270	89	next.png
+
+Prev:		163	88	prev.png
+Stop:		187 	88	stop.png
+Play:		212	89	play.png
+
+PlayFast:	232	88	playfast.png
+PlaySlow:	232	93	playslow.png
+
 Pause:		244	88	pause.png
-Play:		222	89	play.png
-Stop:		197 	88	stop.png
-Prev:		173	88	prev.png
+Next:		270	89	next.png
+
 Eject:		23	88	eject.png
 SliderBGPlay:	23	78	slider_bg.png
 SliderFGPlay:	0	0	slider_pad.png

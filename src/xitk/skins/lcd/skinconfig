@@ -29,6 +29,8 @@ AudioLabel:	170	52	letters.png	3	False
 SpuPrev:	250	60	ptdn.png
 SpuNext:	250	51	ptup.png
 SpuLabel:	230	52	letters.png	3	False
+PlaySlow:	6	10	playslow.png
+PlayFast:	35	10	playfast.png
 Next:		324	77	next.png
 Pause:		199	77	pause.png
 Play:		149	77	play.png
@@ -85,6 +87,7 @@ CtlDismiss:	400	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-
 MrlBG:		0	0	mrl_bg.png
 MrlItemBtn:	75	40	pl_itembtn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 MrlSelect:	101	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+MrlPlay:	179	227	mrl_play.png
 MrlDismiss:	400	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 MrlUp:		375	40	arrowup.png
 MrlSlidBG:	377	55	pl_slidv.png
