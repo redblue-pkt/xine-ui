@@ -450,6 +450,7 @@ void panel_update_channel_display (void) {
     lang = "off";
     break;
   case -1:
+    /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
     lang = xine_get_audio_lang (gGui->xine, channel);
     if (!lang)
       lang = "auto";
@@ -469,6 +470,7 @@ void panel_update_channel_display (void) {
     lang = "off";
     break;
   case -1:
+    /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
     lang = xine_get_spu_lang (gGui->xine, channel);
     if (!lang)
       lang = "auto";
