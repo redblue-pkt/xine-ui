@@ -470,6 +470,10 @@ void playlist_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
+  case KeyPress:
+    gui_handle_event(event, data);
+    break;
+
   case MappingNotify:
     XLockDisplay(gGui->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);

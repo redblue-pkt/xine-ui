@@ -563,8 +563,12 @@ void video_window_init (void) {
  *
  */
 static void video_window_handle_event (XEvent *event, void *data) {
-  
+
   switch(event->type) {
+
+  case KeyPress:
+    gui_handle_event(event, data);
+    break;
 
   case Expose: {
     XExposeEvent * xev = (XExposeEvent *) event;

@@ -251,6 +251,11 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
 void control_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
+
+  case KeyPress:
+    gui_handle_event(event, data);
+    break;
+    
   case MappingNotify:
     XLockDisplay(gGui->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);

@@ -491,7 +491,7 @@ static void widget_xevent_notify(XEvent *event) {
 	    dnd_process_client_message(fx->xdnd, event);
 	  break;
 	}
-	
+
 	if(fx->xevent_callback) {
 	  fx->xevent_callback(event, fx->user_data);
 	}
@@ -499,7 +499,9 @@ static void widget_xevent_notify(XEvent *event) {
     }
     else {
       
-      if(fx->xevent_callback) {
+      /* Don't forward event to all of windows */
+      if(fx->xevent_callback 
+	 && (fx->window != None && event->type != KeyPress)) {
 	fx->xevent_callback(event, fx->user_data);
       }
       

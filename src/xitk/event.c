@@ -50,7 +50,6 @@
 #include <xine/video_out_x11.h>
 #include "xine.h"
 #include "utils.h"
-
 #include "xscreensaver-remote.h"
 
 #ifdef HAVE_LIRC

@@ -121,6 +121,8 @@ void gui_dndcallback (char *filename) ;
 
 void gui_set_current_mrl(const char *mrl);
 
+void gui_handle_event (XEvent *event, void *data);
+
 #endif
 
 
