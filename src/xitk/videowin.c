@@ -157,7 +157,7 @@ static void _video_window_zoom_small_cb(void *data, xine_cfg_entry_t *cfg) {
 static Bool have_xtestextention(void) {  
   Bool xtestext = False;
 #ifdef HAVE_XTESTEXTENSION
-  int dummy1, dummy2, dummy3, dummy4;
+  int dummy1 = 0, dummy2 = 0, dummy3 = 0, dummy4 = 0;
   
   XLockDisplay(gGui->display);
   xtestext = XTestQueryExtension(gGui->display, &dummy1, &dummy2, &dummy3, &dummy4);
