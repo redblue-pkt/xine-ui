@@ -13,7 +13,7 @@ data_DATA =                                                                     
 	FsBtn.png	  MainFastB.png       MrlBtn.png	 PlMoveUp.png	  SnapBtn.png     \
 	HideBtn.png	  MainFastF.png       MrlDismiss.png	 PlPlay.png	                  \
 	LettersBig.png	  MainMute.png	      MrlSelect.png	 SetupBtn.png                     \
-	LettersDigit.png  MainNext.png	      Onglet.png	 SkArrowDown.png                  \
+	LettersDigit.png  MainNext.png	      Onglet.png	 OngletSmall.png  SkArrowDown.png \
 	LettersGrey.png   MainPause.png       PlBg.png		 SkArrowUp.png    skinconfig
 
 
