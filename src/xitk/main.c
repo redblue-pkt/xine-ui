@@ -1504,7 +1504,7 @@ int main(int argc, char *argv[]) {
   
   if(session >= 0) {
     /* Session feature was used, say good bye */
-    if(is_remote_running(session)) {
+    if(is_remote_running(session) && (_argc - optind)) {
       /* send all remaining MRL options to session */
       int i;
 
