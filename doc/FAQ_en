@@ -84,6 +84,9 @@
    5.4.9 "w32codec: decoder failed to start. Is 'xxxxxx' installed?"
    5.4.10 "xine-lib xxx expected. Version xxx found"
 
+   5.5 CRASHES: WHEN YOU DON'T GET A USEFUL ERROR MESSAGE
+   5.5.1 Why does xine crash my machine - hard?
+
    6   BUGS - GET THAT DAMN VERMIN EXTERMINATOR NOW! ;-)
    6.1 I did the impossible - I really found a bug! Who can I inform about it?
 
@@ -948,6 +951,30 @@
       and while you're at it, throw away any old plugins in
       $prefix/lib/xine/plugins/ as well, just to be safe.) Then install
       xine-lib and xine-ui again. This should fix the problem.
+
+
+5.5   CRASHES: WHEN YOU DON'T GET A USEFUL ERROR MESSAGE
+
+5.5.1 Why does xine crash my machine - hard?
+      xine doesn't crash your machine. As a user space program without root
+      permissions, it can't.
+      What actually crashes your Machine is your X server. You're probably
+      using a Savage chipset, which seems to have a broken Xv implementation.
+      If you avoid using Xv, your System won't crash, so as a workaround, run
+
+        xine -V xshm
+
+      This will unfortunately be much slower, as lots of things are now done
+      in software instead of hardware scaling/colour space conversion.
+
+      Maybe at the time you read this, there's an XFree upgrade which fixes
+      this for the Savage driver. In that case, you can switch back using
+
+       xine -V xv
+
+      If that works for you, please notify the xine crew at
+      <xine-user@lists.sf.net>, so they can update this FAQ!
+
 
             
 6   BUGS - GET THAT DAMN VERMIN EXTERMINATOR NOW! ;-)
