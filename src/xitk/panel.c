@@ -71,7 +71,7 @@ static void *slider_loop(void *dummy) {
       if(gGui->xine) {
 	int status = xine_get_status(gGui->xine);
 
-	if(status == XINE_PLAY || status == XINE_SEEK) {
+	if(status == XINE_PLAY) {
 	  slider_set_pos(panel->widget_list, panel->slider_play, 
 			 xine_get_current_position(gGui->xine));
 	}
