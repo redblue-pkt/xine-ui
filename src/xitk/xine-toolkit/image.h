@@ -213,4 +213,6 @@ void draw_tab(ImlibData *im, xitk_image_t *p);
 void draw_paddle_rotate(ImlibData *im, xitk_image_t *p);
 void draw_rotate_button(ImlibData *im, xitk_image_t *p);
 
+void draw_button_plus(ImlibData *im, xitk_image_t *p);
+void draw_button_minus(ImlibData *im, xitk_image_t *p);
 #endif

@@ -273,7 +273,8 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
   
   /* Create inputtext and buttons (not skinable) */
   {
-    char buf[256];
+    char          buf[256];
+    xitk_image_t *wimage;
 
     memset(&buf, 0, sizeof(buf));
     snprintf(buf, 256, "%d", ib->value);
@@ -309,6 +310,17 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
 						(x + width) - (height>>1), (y + (height>>1)),
 							(height>>1), (height>>1))));
     private_data->less_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_INTBOX;
+
+    /* Draw '+' and '-' in buttons */
+    wimage = xitk_get_widget_foreground_skin(private_data->more_widget);
+    
+    if(wimage)
+      draw_button_plus(ib->imlibdata, wimage);
+
+    wimage = xitk_get_widget_foreground_skin(private_data->less_widget);
+    
+    if(wimage)
+      draw_button_minus(ib->imlibdata, wimage);
 
   }
 

@@ -1731,6 +1731,9 @@ void draw_tab(ImlibData *im, xitk_image_t *p);
 void draw_paddle_rotate(ImlibData *im, xitk_image_t *p);
 void draw_rotate_button(ImlibData *im, xitk_image_t *p);
 
+void draw_button_plus(ImlibData *im, xitk_image_t *p);
+void draw_button_minus(ImlibData *im, xitk_image_t *p);
+
 #define XITK_WINDOW_ANSWER_UNKNOWN 0
 #define XITK_WINDOW_ANSWER_OK      1
 #define XITK_WINDOW_ANSWER_YES     2
