@@ -57,7 +57,7 @@ static xitk_image_t *skin_load_to_cache(xitk_skin_config_t *skonfig, char *pixma
 	while(cache) {
 	  if(!strcmp(cache->filename, pixmap)) {
 	    xitk_image_free_image(skonfig->im, &image);
-	    return image;
+	    return cache->image;
 	  }
 	  cache = cache->next;
 	}
