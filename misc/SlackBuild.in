@@ -5,14 +5,13 @@
 #
 # Some variables.
 #
-OLDCWD=`pwd`
-
-CWD=`pwd`
-PACKAGE=@PACKAGE@.tgz
+CWD=`pwd` 
+PACKAGE=@PACKAGE@.tgz 
 SLCK=$CWD/slack
-PREFIX=@prefix@
-PKG=$CWD/slktmp
+PREFIX=${PREFIX:-"@prefix@"} 
+PKG=$CWD/slktmp 
 TMPBUILD=$CWD/tmpbuild
+#DOINSTDIR=/install
 
 #
 # Create post-install shell script.
@@ -21,98 +20,152 @@ do_doinst() {
   (mkdir install 
    cd install
   cat > doinst.sh <<EOF
-if [ -d @XINE_SKINDIR@/default ]; then
-  echo "Removing old <default> skin, <xinetic> is the new default skin."
-  rm -rf @XINE_SKINDIR@/default && \
-  ln -s @XINE_SKINDIR@/xinetic @XINE_SKINDIR@/default;
-fi
 
-# Icons
-if test ! -d /usr/share/icons; then 
-  @INSTALL@ -m 755 -o 0 -g 0 -d /usr/share/icons
+SKINDIR=@DATA_DIR@/xine/skins
+DESKDIR=@DATA_DIR@/xine/desktop
+DATADIR=@DATA_DIR@
+SYSCONFDIR=@SYSCONF_DIR@
+
+## Clear old
+DIR_HI=/opt/kde2/share/icons/hicolor
+DIR_LO=/opt/kde2/share/icons/locolor
+DIR_HI3=/opt/kde3/share/icons/hicolor
+DIR_LO3=/opt/kde3/share/icons/locolor
+# icon dimensions
+HIRES='48x48 32x32 22x22'
+LORES='32x32 22x22 16x16'
+# files to remove
+REMOVALS='\$DATADIR/icons/xine.xpm \$SYSCONFDIR/X11/wmconfig/xine \$SYSCONFDIR/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop \$DATADIR/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop  \$DATADIR/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop \$DATADIR/applnk/Multimedia/xine.desktop'
+# remove files in \$REMOVALS
+for remove in \$REMOVALS; do
+  rm -f \$remove
+done
+# KDE2 icons
+for hires in \$HIRES; do
+  rm -f \$DIR_HI/\$hires/apps/xine.png
+done
+for lores in \$LORES; do
+  rm -f \$DIR_LO/\$lores/apps/xine.png
+done
+# KDE3 icons
+for hires in \$HIRES; do
+  rm -f \$DIR_HI3/\$hires/apps/xine.png
+done
+for lores in \$LORES; do
+  rm -f \$DIR_LO3/\$lores/apps/xine.png
+done
+
+
+#install new ones
+if test -d \$SKINDIR/metal; then rm -rf \$SKINDIR/metal; fi
+if test -d \$SKINDIR/default; then rm -rf \$SKINDIR/default && ln -s \$SKINDIR/xinetic \$SKINDIR/default; fi
+if test ! -d \$DATADIR/icons; then
+  @INSTALL@ -m 755 -o 0 -g 0 -d \$DATADIR/icons
 fi
-@INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.xpm /usr/share/icons/xine.xpm
-if test ! -d /usr/share/pixmaps; then 
-  @INSTALL@ -m 755 -o 0 -g 0 -d /usr/share/pixmaps
+@INSTALL@ -m 644 -o 0 -g 0 \$DATADIR/pixmaps/xine.xpm \$DATADIR/icons/xine.xpm
+if test ! -d \$DATADIR/pixmaps; then
+  @INSTALL@ -m 755 -o 0 -g 0 -d \$DATADIR/pixmaps
 fi
-@INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.xpm /usr/share/pixmaps/xine.xpm
-if test -d /etc/X11/wmconfig; then 
-  @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.wmconfig /etc/X11/wmconfig/xine
+if test -d \$SYSCONFDIR/X11/wmconfig; then
+  @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.wmconfig \$SYSCONFDIR/X11/wmconfig/xine
 fi
-if test -d /etc/X11/applnk; then
-  if test ! -d /etc/X11/applnk/Multimedia; then 
-    @INSTALL@ -m 755 -o 0 -g 0 -d /etc/X11/applnk/Multimedia
+if test -d \$SYSCONFDIR/X11/applnk; then
+  if test ! -d \$SYSCONFDIR/X11/applnk/Multimedia; then
+    @INSTALL@ -m 755 -o 0 -g 0 -d \$SYSCONFDIR/X11/applnk/Multimedia
   fi
-  @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /etc/X11/applnk/Multimedia/xine.desktop
+  @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop \$SYSCONFDIR/X11/applnk/Multimedia/xine.desktop
 fi
 # End Icons
 # Gnome
 if test -d /opt/gnome; then
-  if test ! -d /opt/gnome/share/pixmaps; then 
+  if test ! -d /opt/gnome/share/pixmaps; then
     @INSTALL@ -m 755 -o 0 -g 0 -d /opt/gnome/share/pixmaps
   fi
-  @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
+  @INSTALL@ -m 644 -o 0 -g 0 \$DATADIR/pixmaps/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
   if test -d /opt/gnome/share/gnome/apps/Multimedia; then
-    @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
+    @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
   else
     @INSTALL@ -m 755 -o 0 -g 0 -d /opt/gnome/share/gnome/apps/Multimedia
-    @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
+     @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
   fi
 else
-  if test -d /usr/share/gnome/apps; then
-    if test -d /usr/share/gnome/apps/Multimedia; then
-      @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /usr/share/gnome/apps/Multimedia/xine.desktop
+  if test -d \$DATADIR/gnome/apps; then
+    if test -d \$DATADIR/gnome/apps/Multimedia; then
+      @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop \$DATADIR/gnome/apps/Multimedia/xine.desktop
     else
-      @INSTALL@ -m 755 -o 0 -g 0 -d /usr/share/gnome/apps/Multimedia
-      @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /usr/share/gnome/apps/Multimedia/xine.desktop
+      @INSTALL@ -m 755 -o 0 -g 0 -d \$DATADIR/gnome/apps/Multimedia
+      @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop \$DATADIR/gnome/apps/Multimedia/xine.desktop
     fi
   fi
 fi
 # End Gnome
+# Kde3
+if test -d /opt/kde3/; then
+  DIR_HI3=/opt/kde3/share/icons/hicolor
+  DIR_LO3=/opt/kde3/share/icons/locolor
+  HIRES3='48x48 32x32 22x22'
+  LORES3='32x32 22x22 16x16'
+  for hires in \$HIRES3; do
+    @INSTALL@ -m 755 -o 0 -g 0 -d \$DIR_HI3/\$hires/apps
+    @INSTALL@ -m 644 -o 0 -g 0 \$DATADIR/pixmaps/xine_\$hires.png \$DIR_HI3/\$hires/apps/xine.png
+  done
+  for lores in \$LORES3; do
+    @INSTALL@ -m 755 -o 0 -g 0 -d \$DIR_LO3/\$lores/apps
+    @INSTALL@ -m 644 -o 0 -g 0 \$DATADIR/pixmaps/xine_\$lores.png \$DIR_LO3/\$lores/apps/xine.png
+  done
+  if test ! -d /opt/kde3/share/applnk/Multimedia; then
+    @INSTALL@ -m 755 -o 0 -g 0 -d /opt/kde3/share/applnk/Multimedia
+  fi
+  cat \$DESKDIR/xine.desktop | sed -e "s/Icon=xine.xpm/Icon=xine/g" -e "s/Exec=xine/Exec=xine %U/g" > \$DESKDIR/xine.desktop.kde
+  @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop.kde /opt/kde3/share/applnk/Multimedia/xine.desktop
+  rm \$DESKDIR/xine.desktop.kde
+fi
+# End Kde3
 # Kde2
-if test -d /opt/kde2; then
+if test -d /opt/kde2/; then
   DIR_HI=/opt/kde2/share/icons/hicolor
   DIR_LO=/opt/kde2/share/icons/locolor
   HIRES='48x48 32x32 22x22'
   LORES='32x32 22x22 16x16'
-  for hires in $$HIRES; do
-    @INSTALL@ -m 755 -o 0 -g 0 -d $DIR_HI/$hires/apps
-    @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine_$hires.png $DIR_HI/$hires/apps/xine.png
+  for hires in \$HIRES; do
+    @INSTALL@ -m 755 -o 0 -g 0 -d \$DIR_HI/\$hires/apps
+    @INSTALL@ -m 644 -o 0 -g 0 \$DATADIR/pixmaps/xine_\$hires.png \$DIR_HI/\$hires/apps/xine.png
   done
-  for lores in $$LORES; do
-    @INSTALL@ -m 755 -o 0 -g 0 -d $DIR_LO/$lores/apps
-    @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine_$lores.png $DIR_LO/$lores/apps/xine.png
+  for lores in \$LORES; do
+    @INSTALL@ -m 755 -o 0 -g 0 -d \$DIR_LO/\$lores/apps
+    @INSTALL@ -m 644 -o 0 -g 0 \$DATADIR/pixmaps/xine_\$lores.png \$DIR_LO/\$lores/apps/xine.png
   done
-  if test ! -d /opt/kde2/share/applnk/Multimedia; then 
+  if test ! -d /opt/kde2/share/applnk/Multimedia; then
     @INSTALL@ -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
   fi
-  @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop
+  cat \$DESKDIR/xine.desktop | sed -e "s/Icon=xine.xpm/Icon=xine/g" -e "s/Exec=xine/Exec=xine %U/g" > \$DESKDIR/xine.desktop.kde
+  @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop.kde /opt/kde2/share/applnk/Multimedia/xine.desktop
+  rm \$DESKDIR/xine.desktop.kde
 else
-  if test -d /usr/share/applnk/Multimedia; then
-    if test ! -d /usr/share/applnk/Multimedia; then 
-      @INSTALL@ -m 755 -o 0 -g 0 -d /usr/share/applnk/Multimedia
+  if test -d \$DATADIR/applnk/Multimedia; then
+    if test ! -d \$DATADIR/applnk/Multimedia; then
+      @INSTALL@ -m 755 -o 0 -g 0 -d \$DATADIR/applnk/Multimedia
     fi
-    @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /usr/share/applnk/Multimedia/xine.desktop
+    @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop \$DATADIR/applnk/Multimedia/xine.desktop
   fi
 fi
 # End Kde2
 # Kde
 if test -d /opt/kde; then
-  if test ! -d /opt/kde/share/icons; then 
+  if test ! -d /opt/kde/share/icons; then
     @INSTALL@ -m 755 -o 0 -g 0 -d /opt/kde/share/icons
   fi
-  if test ! -d /opt/kde/share/applnk/Multimedia; then 
+  if test ! -d /opt/kde/share/applnk/Multimedia; then
     @INSTALL@ -m 755 -o 0 -g 0 -d /opt/kde/share/applnk/Multimedia
   fi
-  @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.xpm /opt/kde/share/icons/xine.xpm
-  @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
+  @INSTALL@ -m 644 -o 0 -g 0 \$DATADIR/pixmaps/xine.xpm /opt/kde/share/icons/xine.xpm
+  @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
 else
-  if test -d /usr/share/applnk/Multimedia; then 
-    @INSTALL@ -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /usr/share/applnk/Multimedia/xine.desktop
+  if test -d \$DATADIR/applnk/Multimedia; then
+    @INSTALL@ -m 644 -o 0 -g 0 \$DESKDIR/xine.desktop \$DATADIR/applnk/Multimedia/xine.desktop
   fi
 fi
-
-/sbin/ldconfig
+# End Kde
 EOF
 )
 }
@@ -124,14 +177,12 @@ do_descr() {
 cat > package_descriptions << EOF
 @PACKAGE@: @PACKAGE@ @SPEC_VERSION@.
 @PACKAGE@:
-@PACKAGE@: xine is a free gpl-licensed video player for unix-like systems.
-@PACKAGE@: We support mpeg-2 and mpeg-1 system (audio + video multiplexed) streams,
-@PACKAGE@: eventually mpeg-4 and other formats might be added.
-
-@PACKAGE@: xine plays the video and audio data of mpeg-2 videos and synchronizes
-@PACKAGE@: the playback of both. Depending on the properties of the mpeg stream,
-@PACKAGE@: playback will need more or less processor power, 100% frame rate
-@PACKAGE@: has been seen on a 400 MHz P II system.
+@PACKAGE@: xine is a fully-featured free audio/video player for unix-like 
+@PACKAGE@: systems which uses libxine for audio/video decoding and playback.
+@PACKAGE@: For more informations on what formats are supported, please 
+@PACKAGE@: refer to the libxine documentation.
+@PACKAGE@:
+@PACKAGE@:
 EOF
 }
 
@@ -139,17 +190,18 @@ EOF
 # Building binaries process, then install and move package in right place
 #
 do_build() {
-  echo "cd to $CWD" && cd $CWD && \
-  echo "rm -rf $TMPBUILD" && rm -rf $TMPBUILD && \
-  echo "mkdir -p $TMPBUILD" && mkdir -p $TMPBUILD && \
-  echo "cd $TMPBUILD" && cd $TMPBUILD && \
-  echo "tar -xzf $CWD/@TAR_NAME@.tar.gz" && tar -xzf $CWD/@TAR_NAME@.tar.gz && \
-  echo "cd @TAR_NAME@" && cd @TAR_NAME@ && \
-  DIE=1 && echo "./configure --prefix=$PREFIX && make && mkdir -p $PKG && make install-strip DESTDIR=$PKG" && \
-  ./configure --prefix=$PREFIX && make && mkdir -p $PKG && make install-strip DESTDIR=$PKG && \
+  cd $CWD && \
+  rm -rf $TMPBUILD && \
+  mkdir -p $TMPBUILD && \
+  cd $TMPBUILD && \
+  tar -xzf $CWD/@TAR_NAME@.tar.gz && \
+  cd @TAR_NAME@ && \
+  DIE=1 && \
+  echo "./configure --prefix=$PREFIX $CONFIG_OPT && make && DESTDIR=$PKG make install-strip "  && \
+  ./configure --prefix=$PREFIX $CONFIG_OPT && make && DESTDIR=$PKG make install-strip && \
   cd $PKG && \
   do_doinst && \
-  echo "n" | makepkg $PACKAGE && \
+  echo "n" | /sbin/makepkg $PACKAGE && \
   mv $PACKAGE $SLCK && \
   cd $SLCK && DIE=0
   do_descr
@@ -255,7 +307,7 @@ build_k7() {
 main() {
   rm -rf $SLCK
   mkdir -p $SLCK
-  rm -f config.cache && ./cvscompile.sh && make dist
+  rm -f config.cache && ./autogen.sh && make dist
   build_pentiumpro
   build_pentium
   build_k6
@@ -270,10 +322,11 @@ main() {
 build_arch() {
       rm -rf $SLCK
       mkdir -p $SLCK
-      rm -f config.cache && ./cvscompile.sh && make dist
+      rm -f config.cache && ./autogen.sh && make dist
       $barch
       mv -f $CWD/@TAR_NAME@.tar.gz $SLCK
 }
+
 case "$1" in
     pentiumpro | ppro | i686 | 686)
       barch=build_pentiumpro
@@ -295,5 +348,3 @@ case "$1" in
       main
     ;;
 esac
-
-cd $OLDCWD

@@ -9,7 +9,7 @@ ACLOCAL_AMFLAGS = @XINE_ACFLAGS@ -I m4
 SUBDIRS = doc m4 readline intl po misc src  
 
 DEBFILES = debian/README.Debian debian/changelog debian/control \
-	debian/copyright debian/dirs debian/files debian/links debian/menu \
+	debian/copyright debian/dirs debian/links debian/menu \
 	debian/rules debian/shlibdeps.sh debian/xine-ui.mime 
 
 EXTRA_DIST = autogen.sh\
@@ -35,6 +35,10 @@ release-check: misc/relchk.sh
 	@mv -f .cvsversion .cvsversion.tmp
 	@./autogen.sh && $(SHELL) misc/relchk.sh
 	@mv -f .cvsversion.tmp .cvsversion
+
+slackbuild:
+	@(cd misc && $(MAKE) SlackBuild) && \
+	 export PREFIX="/usr"; ./configure --prefix=$$PREFIX && misc/SlackBuild
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#* 
