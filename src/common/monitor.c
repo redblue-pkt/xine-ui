@@ -34,16 +34,16 @@
 
 #ifdef DEBUG
 
-long long int profiler_times[MAX_ID+1] ;
-long long int profiler_start[MAX_ID+1] ;
-char * profiler_label[MAX_ID+1] ;
+long long int profiler_times[MAX_ID] ;
+long long int profiler_start[MAX_ID] ;
+char * profiler_label[MAX_ID] ;
 
 void profiler_init () {
   int i;
   for (i=0; i<MAX_ID; i++) {
     profiler_times[i] = 0;
     profiler_start[i] = 0;
-    profiler_label[i] = "??";
+    profiler_label[i] = NULL;
   }
 }
 
@@ -77,7 +77,8 @@ void profiler_print_results () {
 
   printf ("\n\nPerformance analysis (cpu cycles):\n\n");
   for (i=0; i<MAX_ID; i++) {
-    printf ("%d:\t%s\t%12lld\n", i, profiler_label[i], profiler_times[i]);
+    if (profiler_label[i])
+      printf ("%d:\t%s\t%12lld\n", i, profiler_label[i], profiler_times[i]);
   }
 }
 
