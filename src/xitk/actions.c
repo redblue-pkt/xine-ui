@@ -126,9 +126,6 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
       
-      /*
-	si la playlist->mrl == gGui->mmk.mrl alors update
-      */
       if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
 	
 	if(gGui->mmk.ident)
