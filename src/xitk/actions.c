@@ -126,6 +126,9 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
       
+      /*
+	si la playlist->mrl == gGui->mmk.mrl alors update
+      */
       if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
 	
 	if(gGui->mmk.ident)
@@ -415,9 +418,14 @@ void gui_stop (xitk_widget_t *w, void *data) {
   panel_check_pause();
   panel_update_runtime_display();
 
-  if(is_playback_widgets_enabled() && (!gGui->playlist.num)) {
-    gui_set_current_mrl(NULL);
-    enable_playback_controls(0);
+  if(is_playback_widgets_enabled()) {
+    if(!gGui->playlist.num) {
+      gui_set_current_mrl(NULL);
+      enable_playback_controls(0);
+    }
+    else if(gGui->playlist.num && (strcmp((mediamark_get_current_mrl()), gGui->mmk.mrl))) {
+      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+    }
   }
   gui_display_logo();
 }
@@ -699,10 +707,15 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 
 void *gui_set_current_position_thread(void *data) {
   int pos = (int)data;
+  int update_mmk = 0;
 
   pthread_detach(pthread_self());
   
-  (void) gui_xine_play(gGui->stream, pos, 0, 1);
+  if(gGui->playlist.num && 
+     (!strcmp(gGui->playlist.mmk[gGui->playlist.cur]->mrl, gGui->mmk.mrl)))
+    update_mmk = 1;
+  
+  (void) gui_xine_play(gGui->stream, pos, 0, update_mmk);
   
   gGui->ignore_next = 0;
   panel_check_pause();
