@@ -57,6 +57,7 @@ extern _panel_t           *panel;
 #define VIDEO_1X          32
 #define VIDEO__5X         33
 #define VIDEO_INTERLEAVE  34
+#define VIDEO_PPROCESS    35
 
 #define SETS_SETUP        40
 #define SETS_KEYMAP       41
@@ -308,6 +309,10 @@ static void menu_video_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
     gui_execute_action_id(ACTID_TOGGLE_INTERLEAVE);
     break;
 
+  case VIDEO_PPROCESS:
+    gui_execute_action_id(ACTID_VPP);
+    break;
+
   default:
     printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
     break;
@@ -496,6 +501,12 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Video/Deinterlace",
       (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE)) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_INTERLEAVE                                             },
+    { "Video/SEP",
+      "<separator>",
+      NULL, NULL                                                                             },
+    { "Video/Postprocess...",
+      NULL,
+      menu_video_ctrl, (void *) VIDEO_PPROCESS                                               },
     { "Video/SEP",
       "<separator>",
       NULL, NULL                                                                             },
