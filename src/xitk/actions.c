@@ -881,7 +881,7 @@ void gui_set_current_position (int pos) {
 
   if(gGui->logo_mode && (mediamark_get_current_mrl())) {
     if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
-      gui_handle_xine_error(gGui->stream, (mediamark_get_current_mrl()));
+      gui_handle_xine_error(gGui->stream, (char *)(mediamark_get_current_mrl()));
       return;
     }
   }

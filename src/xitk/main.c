@@ -735,13 +735,16 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
 static void event_listener(void *user_data, const xine_event_t *event) {
   struct timeval tv;
 
-  /* Ignoring all events when logo is displayed (or played) */
-  if(gGui->logo_mode)
+  /*
+   * Ignoring finished event logo is displayed (or played), that save us
+   * from a loop of death
+   */
+  if(gGui->logo_mode && (event->type ==XINE_EVENT_UI_PLAYBACK_FINISHED))
     return;
   
   gettimeofday (&tv, NULL);
   
-  if((tv.tv_sec - event->tv.tv_sec) > 3) {
+  if(abs(tv.tv_sec - event->tv.tv_sec) > 3) {
     printf("Event too old, discarding\n");
     return;
   }
