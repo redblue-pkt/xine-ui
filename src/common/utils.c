@@ -37,10 +37,14 @@
 
 #ifdef HAVE_X11
 #include <X11/Xlib.h>
+#ifdef HAVE_XSHM_H
 #include <X11/extensions/XShm.h>
+#endif /* !HAVE_XSHM_H */
+#ifdef HAVE_XV
 #include <X11/extensions/Xvlib.h>
+#endif /* !HAVE_XV */
 #include <X11/Xutil.h>
-#endif
+#endif /* !HAVE_X11 */
 
 #include <xine/xineutils.h>
 
@@ -587,6 +591,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
       /* XFreeExtensionList (extlist); */
     }
 
+#ifdef HAVE_XV
     if((Success != XvQueryExtension(display, &ver, &rev, &reqB, &eventB, &errorB))) {
       printf("   No X-Video Extension on %s\n", XDisplayName(NULL));
     } 
@@ -594,7 +599,8 @@ void dump_xfree_info(Display *display, int screen, int complete) {
       printf("   X-Video Extension version: %i.%i\n", ver, rev);
       have_xv = 1;
     }
-    
+#endif /* !HAVE_XV */
+
     for (scr = 0; scr < nscreens; scr++) {
       Screen      *s = ScreenOfDisplay (display, scr);  /* opaque structure */
       double       xres, yres;
@@ -646,6 +652,7 @@ void dump_xfree_info(Display *display, int screen, int complete) {
       else
 	printf("%dx%d\n", width, height);
 
+#ifdef HAVE_XV
       if(have_xv) {
 	int                   n, k, adaptor; 
 	unsigned int          nencode, nadaptors;
@@ -787,7 +794,8 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 	  
 	  XvFreeAdaptorInfo(ainfo);
       }
+#endif /* !HAVE_XV */
     }
   }
 }
-#endif
+#endif /* !HAVE_X11 */
