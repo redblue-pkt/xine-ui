@@ -304,6 +304,7 @@ typedef struct {
 #define WM_TYPE_AFTERSTEP           0x00000009
 #define WM_TYPE_BLACKBOX            0x0000000A
 #define WM_TYPE_LARSWM              0x0000000B
+#define WM_TYPE_DTWM                0x0000000C
 
 /* 
  * See xitk_widget_list_[set/get]()

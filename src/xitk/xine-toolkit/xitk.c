@@ -395,6 +395,9 @@ static uint32_t xitk_check_wm(Display *display) {
 	  ((atom = XInternAtom(display, "_DT_SM_WINDOW_INFO", True)) != None)) {
     type |= WM_TYPE_KWIN;
   }
+  else if((atom = XInternAtom(display, "DTWM_IS_RUNNING", True)) != None) {
+    type |= WM_TYPE_DTWM;
+  }
 
   if((atom = XInternAtom(display, "_WIN_SUPPORTING_WM_CHECK", True)) != None) {
     unsigned char   *prop_return = NULL;
@@ -572,6 +575,9 @@ static uint32_t xitk_check_wm(Display *display) {
     break;
   case WM_TYPE_LARSWM:
     printf("LarsWM");
+    break;
+  case WM_TYPE_DTWM:
+    printf("dtwm");
     break;
   }
 
