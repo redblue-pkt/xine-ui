@@ -481,10 +481,14 @@ void event_listener (xine_t *xine, event_t *event, void *data) {
       ui_event_t *uevent = (ui_event_t*)event;
 
       switch(uevent->sub_type) {
-      case XINE_UI_UPDATE_CHANNEL:
+       case XINE_UI_UPDATE_CHANNEL:
 	/* Update the panel */
 	panel_update_channel_display ();
-      }
+  	break;
+       case XINE_UI_SET_TITLE:
+	panel_set_title((char*)(uevent->data));
+	break;
+      }      
     }
   }
 }

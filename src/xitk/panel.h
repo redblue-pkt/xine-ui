@@ -86,4 +86,6 @@ void panel_update_mrl_display (void);
 
 void panel_layer_above(int);
 
+void panel_set_title(char*);
+
 #endif

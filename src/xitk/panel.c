@@ -276,7 +276,7 @@ void panel_set_no_mrl(void) {
  * Update displayed MRL according to the current one.
  */
 void panel_update_mrl_display (void) {
-  label_change_label (panel->widget_list, panel->title_label, gGui->filename);
+  panel_set_title(gGui->filename);
 }
 
 /*
@@ -875,4 +875,8 @@ void panel_init (void) {
     
     pthread_create(&panel->slider_thread, &pth_attrs, slider_loop, NULL);
   }
+}
+
+void panel_set_title(char *title) {
+  label_change_label (panel->widget_list, panel->title_label, title);
 }
