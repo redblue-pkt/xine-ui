@@ -38,26 +38,31 @@ extern gGui_t             *gGui;
 #define PLAYB_SPEEDM       6
 #define PLAYB_SPEEDL       7
 
-#define PLAYL_LOAD         8
-#define PLAYL_SAVE         9
-#define PLAYL_EDIT        10
-#define PLAYL_NO_LOOP     11
-#define PLAYL_LOOP        12
-#define PLAYL_REPEAT      13
-#define PLAYL_SHUFFLE     14
-#define PLAYL_SHUF_PLUS   15
+#define PLAYL_LOAD        10
+#define PLAYL_SAVE        11
+#define PLAYL_EDIT        12
+#define PLAYL_NO_LOOP     13
+#define PLAYL_LOOP        14
+#define PLAYL_REPEAT      15
+#define PLAYL_SHUFFLE     16
+#define PLAYL_SHUF_PLUS   17
 
-#define AUDIO_MUTE        16
+#define AUDIO_MUTE        20
 
-#define VIDEO_FULLSCR     17
-#define VIDEO_2X          18
-#define VIDEO_1X          19
-#define VIDEO__5X         20
+#define VIDEO_FULLSCR     30
+#define VIDEO_2X          31
+#define VIDEO_1X          32
+#define VIDEO__5X         33
+#define VIDEO_INTERLEAVE  34
 
-#define SETS_SETUP        21
-#define SETS_KEYMAP       22
-#define SETS_VIDEO        23
-#define SETS_LOGS         24
+#define SETS_SETUP        40
+#define SETS_KEYMAP       41
+#define SETS_VIDEO        42
+#define SETS_LOGS         43
+#define SETS_SKINDL       44
+
+#define STREAM_OSDI       50     
+#define STREAM_WINI       51
 
 static void menu_panel_visibility(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
@@ -184,6 +189,19 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
     }
   }
 }
+static void menu_stream(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  int info = (int) data;
+
+  switch(info) {
+  case STREAM_OSDI:
+    gui_execute_action_id(ACTID_OSD_SINFOS);
+    break;
+    
+  case STREAM_WINI:
+    gui_execute_action_id(ACTID_STREAM_INFOS);
+    break;
+  }
+}
 static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int ctrl = (int) data;
 
@@ -233,6 +251,10 @@ static void menu_video_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
     gui_execute_action_id(ACTID_WINDOW50);
     break;
     
+  case VIDEO_INTERLEAVE:
+    gui_execute_action_id(ACTID_TOGGLE_INTERLEAVE);
+    break;
+
   default:
     printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
     break;
@@ -259,6 +281,10 @@ static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
     gui_execute_action_id(ACTID_VIEWLOG);
     break;
 
+  case SETS_SKINDL:
+    gui_execute_action_id(ACTID_SKINDOWNLOAD);
+    break;
+    
   default:
     printf("%s(): unknown setting %d\n", __XINE_FUNCTION__, sets);
     break;
@@ -359,6 +385,18 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "SEP",  
       "<separator>",
       NULL, NULL                                                                             },
+    { "Stream",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "Stream/OSD Information",
+      NULL,
+      menu_stream, (void *) STREAM_OSDI                                                      },
+    { "Stream/Window Information",
+      NULL,
+      menu_stream, (void *) STREAM_WINI                                                      },
+    { "SEP",  
+      "<separator>",
+      NULL, NULL                                                                             },
     { "Audio Mute",
       gGui->mixer.mute ? "<checked>" : "<check>",
       menu_audio_ctrl, (void *) AUDIO_MUTE                                                   },
@@ -377,34 +415,43 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "SEP",
       "<separator>",
       NULL, NULL                                                                             },
-    { "Aspect ratio",
-      "<branch>",
-      NULL, NULL                                                                             },
-    { "Aspect ratio/Automatic",
-      (aspect == XINE_VO_ASPECT_AUTO) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_AUTO                                              },
-    { "Aspect ratio/Square",
-      (aspect == XINE_VO_ASPECT_SQUARE) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_SQUARE                                            },
-    { "Aspect ratio/4:3",
-      (aspect == XINE_VO_ASPECT_4_3) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_4_3                                               },
-    { "Aspect ratio/Anamorphic",
-      (aspect == XINE_VO_ASPECT_ANAMORPHIC) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_ANAMORPHIC                                        },
-    { "Aspect ratio/DVB",
-      (aspect == XINE_VO_ASPECT_DVB) ? "<checked>" : "<check>",
-      menu_aspect, (void *) XINE_VO_ASPECT_DVB                                               },
     { "Fullscreen\\/Window",
       video_window_get_fullscreen_mode() ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_FULLSCR                                                },
-    { "200%",
+    { "Video",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "Video/Interlaced",
+      (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE)) ? "<checked>" : "<check>",
+      menu_video_ctrl, (void *) VIDEO_INTERLEAVE                                             },
+    { "Video/SEP",
+      "<separator>",
+      NULL, NULL                                                                             },
+    { "Video/Aspect ratio",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "Video/Aspect ratio/Automatic",
+      (aspect == XINE_VO_ASPECT_AUTO) ? "<checked>" : "<check>",
+      menu_aspect, (void *) XINE_VO_ASPECT_AUTO                                              },
+    { "Video/Aspect ratio/Square",
+      (aspect == XINE_VO_ASPECT_SQUARE) ? "<checked>" : "<check>",
+      menu_aspect, (void *) XINE_VO_ASPECT_SQUARE                                            },
+    { "Video/Aspect ratio/4:3",
+      (aspect == XINE_VO_ASPECT_4_3) ? "<checked>" : "<check>",
+      menu_aspect, (void *) XINE_VO_ASPECT_4_3                                               },
+    { "Video/Aspect ratio/Anamorphic",
+      (aspect == XINE_VO_ASPECT_ANAMORPHIC) ? "<checked>" : "<check>",
+      menu_aspect, (void *) XINE_VO_ASPECT_ANAMORPHIC                                        },
+    { "Video/Aspect ratio/DVB",
+      (aspect == XINE_VO_ASPECT_DVB) ? "<checked>" : "<check>",
+      menu_aspect, (void *) XINE_VO_ASPECT_DVB                                               },
+    { "Video/200%",
       (video_window_get_mag() == 2.0) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_2X                                                     },
-    { "100%",
+    { "Video/100%",
       (video_window_get_mag() == 1.0) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_1X                                                     },
-    { "50%",
+    { "Video/50%",
       (video_window_get_mag() ==  .5) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO__5X                                                    },
     { "SEP", 
@@ -416,6 +463,11 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Settings/Setup",
       NULL,
       menu_settings, (void *) SETS_SETUP                                                     },
+#ifdef HAVE_CURL
+    { "Settings/Skin Downloader",
+      NULL,
+      menu_settings, (void *) SETS_SKINDL                                                    },
+#endif
     { "Settings/Keymap Editor",
       NULL,
       menu_settings, (void *) SETS_KEYMAP                                                    },

@@ -393,8 +393,10 @@ static kbinding_entry_t default_binding_table[] = {
     "ScanPlaylistInfo",       ACTID_SCANPLAYLIST            , "s",        KEYMOD_CONTROL , 0 },
   { "Add a mediamark from current playback.",
     "AddMediamark",           ACTID_ADDMEDIAMARK            , "a",        KEYMOD_CONTROL , 0 },
+#ifdef HAVE_CURL
   { "Download a skin from the skin server.",
     "SkinDownload",           ACTID_SKINDOWNLOAD            , "d",        KEYMOD_CONTROL , 0 },
+#endif
   { "Open file selector.",
     "FileSelector",           ACTID_FILESELECTOR            , "o",        KEYMOD_CONTROL , 0 },
   { "Select a subtitle file",
