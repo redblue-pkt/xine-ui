@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.9\n"
+"Project-Id-Version: xine-ui 0.9.10\n"
 "POT-Creation-Date: 2002-06-17 21:56+0200\n"
-"PO-Revision-Date: 2002-06-05 07:52+0200\n"
+"PO-Revision-Date: 2002-06-18 08:16+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr "Keine MRL (Eingabedatenstrom) angegeben"
 #: src/xitk/actions.c:619
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
-msgstr ""
+msgstr "XSendEvent(display, 0x%x ...) fehlgeschlagen.\n"
 
 #: src/xitk/control.c:370 src/xitk/panel.c:135 src/xitk/playlist.c:634
 #, c-format
@@ -29,7 +29,7 @@ msgstr "%s(): Kann Hintergrund-Bild nicht finden\n"
 
 #: src/xitk/control.c:447
 msgid "Xine Control Panel"
-msgstr ""
+msgstr "Xine Einstellungen"
 
 #: src/xitk/control.c:462 src/xitk/playlist.c:730
 msgid "xine-playlist: couldn't find image for background\n"
@@ -142,10 +142,12 @@ msgstr ""
 #, c-format
 msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
 msgstr ""
+"gui_main: Ausgewähltes Visual %#lx existiert nicht, versuche Standard-"
+"Visual\n"
 
 #: src/xitk/event.c:681
 msgid "gui_main: couldn't find true color visual.\n"
-msgstr ""
+msgstr "gui_main: Konne True-Color-Visual nicht finden.\n"
 
 #: src/xitk/event.c:721
 msgid ""
@@ -161,44 +163,45 @@ msgstr "Kann Display nicht öffnen\n"
 
 #: src/xitk/event.c:735
 msgid "synchronized X protocol (debug)"
-msgstr ""
+msgstr "Synchrones X-Protokoll (Fehlersuche)"
 
 #: src/xitk/event.c:737
 msgid "Warning! Synchronized X activated - this is way slow...\n"
-msgstr ""
+msgstr "Warnung! Synchrones X aktiviert - viel zu langsam...\n"
 
 #: src/xitk/event.c:742
 msgid "use wm layer property to place window on top"
-msgstr ""
+msgstr "Benutze Fenstermanager-Ebenen um Fenster oben zu plazieren"
 
 #: src/xitk/event.c:748
 msgid "where snapshots will be saved"
-msgstr ""
+msgstr "Verzeichnis für Schnappschüsse"
 
 #: src/xitk/event.c:753
 msgid "time between two screensaver fake events, 0 to disable"
 msgstr ""
+"Zeit zwischen zwei Ereignissen für Bildschirmschoner, 0 für deaktiviert"
 
 #. Some infos
 #: src/xitk/event.c:761
 #, c-format
 msgid "XServer Vendor: %s. Release: %d,\n"
-msgstr ""
+msgstr "XServer Hersteller: %s. Version: %s,\n"
 
 #: src/xitk/event.c:763
 #, c-format
 msgid "        Protocol Version: %d, Revision: %d,\n"
-msgstr ""
+msgstr "        Protokolversion: %d, Revision: %d,\n"
 
 #: src/xitk/event.c:765
 #, c-format
 msgid "        Available Screen(s): %d, using %d\n"
-msgstr ""
+msgstr "        Verfügbare Screen(s): %d, benutze %d\n"
 
 #: src/xitk/event.c:767
 #, c-format
 msgid "        Depth: %d.\n"
-msgstr ""
+msgstr "        Farbtiefe: %d.\n"
 
 #: src/xitk/event.c:824
 msgid "Unable to initialize Imlib\n"
@@ -244,7 +247,7 @@ msgstr "Ereignisempfangsfenster"
 #. Ask if uses want/wont store new shorcut
 #: src/xitk/kbindings.c:1684
 msgid "Accept?"
-msgstr ""
+msgstr "Akzeptieren?"
 
 #: src/xitk/kbindings.c:1688
 #, c-format
@@ -252,6 +255,8 @@ msgid ""
 "Store %s as\n"
 "'%s' key binding ?."
 msgstr ""
+"Sichere %s als\n"
+"'%s' Tastenbelegung ?"
 
 #: src/xitk/kbindings.c:1695
 #, c-format
@@ -328,6 +333,8 @@ msgid ""
 "This is xine (X11 gui) - a free video player v%s\n"
 "(c) 2000-2002 by G. Bartsch and the xine project team.\n"
 msgstr ""
+"Dies ist xine (X11 gui) - Ein freier Video-Player v%s\n"
+"(c) 2000-2002 bei G. Bartsch und dem xine Projektteam.\n"
 
 #: src/xitk/main.c:255
 #, c-format
@@ -532,9 +539,8 @@ msgid "  VCD:   'vcd://<track number>'\n"
 msgstr "  VCD:   'vcd://<Track Nummer>'\n"
 
 #: src/xitk/main.c:377
-#, fuzzy
 msgid "video driver to use"
-msgstr "main: Video Treiber <%s> unbrauchbar\n"
+msgstr "Zu benutzender Video-Treiber\n"
 
 #: src/xitk/main.c:405
 #, c-format
@@ -552,12 +558,11 @@ msgstr "main: Video Treiber <%s> unbrauchbar\n"
 
 #: src/xitk/main.c:454
 msgid "audio driver to use"
-msgstr ""
+msgstr "Zu benutzender Audio-Treiber\n"
 
 #: src/xitk/main.c:470
-#, fuzzy
 msgid "main: probing audio drivers...\n"
-msgstr "main: Versuche '%s' Audio Treiber automatisch zu laden: "
+msgstr "main: Audio-Treiber Erkennung...\n"
 
 #: src/xitk/main.c:475
 #, c-format
@@ -565,18 +570,17 @@ msgid "main: trying to autoload '%s' audio driver: "
 msgstr "main: Versuche '%s' Audio Treiber automatisch zu laden: "
 
 #: src/xitk/main.c:481
-#, fuzzy, c-format
+#, c-format
 msgid "main: ...worked, using '%s' audio driver.\n"
-msgstr "main: Versuche '%s' Audio Treiber automatisch zu laden: "
+msgstr "main: ...funktioniert, benutze '%s' Audio-Treiber.\n"
 
 #: src/xitk/main.c:491
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr "main: Audio Treiber Test schlug fehl => keine Audio Ausgabe\n"
 
 #: src/xitk/main.c:501
-#, fuzzy
 msgid "main: not using any audio driver (as requested).\n"
-msgstr "main: Der ausgewählte Audio Treiber '%s' ist unbrauchbar\n"
+msgstr "main: Kein Audio-Treiber wird benutzt (wie gewünscht).\n"
 
 #: src/xitk/main.c:510
 #, c-format
@@ -586,32 +590,32 @@ msgstr "main: Der ausgewählte Audio Treiber '%s' ist unbrauchbar\n"
 #: src/xitk/main.c:598
 #, c-format
 msgid "No video plugin available to decode '%s'."
-msgstr ""
+msgstr "Kein Video-Plugin verfügbar zum dekodieren von '%s'."
 
 #: src/xitk/main.c:613
 #, c-format
 msgid "No audio plugin available to decode '%s'."
-msgstr ""
+msgstr "Kein Audio-Plugin verfügbar zum dekodieren von '%s'."
 
 #: src/xitk/main.c:624
 msgid "never"
-msgstr ""
+msgstr "Niemals"
 
 #: src/xitk/main.c:625
 msgid "video only"
-msgstr ""
+msgstr "Nur Video"
 
 #: src/xitk/main.c:626
 msgid "audio only"
-msgstr ""
+msgstr "Nur Audio"
 
 #: src/xitk/main.c:627
 msgid "always"
-msgstr ""
+msgstr "Immer"
 
 #: src/xitk/main.c:638
 msgid "Display popup window on unhandled codecs"
-msgstr ""
+msgstr "Zeige Nachrichtenfenster bei nichtunterstützten Codecs"
 
 #: src/xitk/main.c:671
 #, c-format
@@ -620,7 +624,7 @@ msgstr "Benötigte xine Bibliothek Version 0.9.10, gefunden %d.%d.%d.\n"
 
 #: src/xitk/main.c:680
 msgid "sigprocmask() failed.\n"
-msgstr ""
+msgstr "sigprocmask() fehlgeschlagen.\n"
 
 #: src/xitk/main.c:742
 msgid "video driver id required for -V option\n"
@@ -650,7 +654,7 @@ msgstr "Quelle:"
 
 #: src/xitk/panel.c:466
 msgid "unknown widget slider caller\n"
-msgstr ""
+msgstr "Unbekannter 'widget slider' Aufrufer\n"
 
 #: src/xitk/panel.c:565
 msgid "Volume control"
@@ -663,12 +667,11 @@ msgstr "Lautlos"
 #. panel already open  - FIXME: bring to foreground
 #: src/xitk/panel.c:598
 msgid "Xine Panel"
-msgstr ""
+msgstr "Xine Fenster"
 
 #: src/xitk/panel.c:615
-#, fuzzy
 msgid "xine-panel: couldn't find image for background\n"
-msgstr "xine-playlist: Kann Hintergrund-Bild nicht finden\n"
+msgstr "xine-Fenster: Kann Hintergrundbild nicht finden\n"
 
 #: src/xitk/panel.c:738
 msgid "Play previous entry from playlist"
@@ -756,15 +759,15 @@ msgstr "MRL Browser"
 
 #: src/xitk/panel.c:945
 msgid "gui tips visibility"
-msgstr ""
+msgstr "gui Hinweise sichtbar"
 
 #: src/xitk/panel.c:948
 msgid "tips timeout (ms)"
-msgstr ""
+msgstr "Hinweiszeit (ms)"
 
 #: src/xitk/panel.c:957
 msgid "gui panel visibility"
-msgstr ""
+msgstr "gui Fenster sichtbar"
 
 #: src/xitk/playlist.c:353 src/xitk/playlist.c:410
 #, c-format
@@ -773,7 +776,7 @@ msgstr "Kann %s: %s nicht lesen\n"
 
 #: src/xitk/playlist.c:716
 msgid "Xine Playlist Editor"
-msgstr ""
+msgstr "Xine Playlist Editor"
 
 #: src/xitk/playlist.c:835
 msgid "Move up selected MRL"
@@ -876,7 +879,7 @@ msgstr "Keinen verfügbaren Skin gefunden. Tschüss.\n"
 
 #: src/xitk/skins.c:337
 msgid "gui skin theme"
-msgstr ""
+msgstr "gui skin Thema"
 
 #: src/xitk/skins.c:342
 #, c-format
@@ -899,20 +902,20 @@ msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr "Kann %s Skin nicht Laden, falsche Version. Lade sicheren Skin '%s'.\n"
 
 #: src/xitk/snapshot.c:816
-#, fuzzy, c-format
+#, c-format
 msgid "Error: %s\n"
-msgstr "Fehler"
+msgstr "Fehler: %s\n"
 
 #: src/xitk/snapshot.c:821
 #, c-format
 msgid "Warning: %s\n"
-msgstr ""
+msgstr "Warnung: %s\n"
 
 #. the dxr3 driver does not allocate yuv buffers
 #. image->u and image->v are always 0 for YUY2
 #: src/xitk/snapshot.c:871
 msgid "snapshot.c: not supported for this video out driver\n"
-msgstr ""
+msgstr "snapshot.c: Nicht unterstützt für diesen Video-Ausgabetreiber\n"
 
 #: src/xitk/snapshot.c:947
 #, c-format
@@ -927,12 +930,14 @@ msgstr "Datei '%s' wurde geschrieben.\n"
 
 #: src/xitk/videowin.c:174
 msgid "videowin: output driver cannot select a working visual\n"
-msgstr ""
+msgstr "videowin: Ausgabetreiber kann keine funktionierende visual auswählen\n"
 
 #: src/xitk/videowin.c:181
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
+"videowin: Ausgabetreiber überschreibt ausgewählte visual mit visual id 0x%"
+"lx\n"
 
 #. printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
 #. *           video_width,
@@ -944,59 +949,62 @@ msgstr ""
 #.
 #: src/xitk/videowin.c:224
 msgid "xine video output"
-msgstr ""
+msgstr "xine Video Ausgabe"
 
 #: src/xitk/videowin.c:358
 msgid "XF86VidMode Extension: modeline switching failed.\n"
-msgstr ""
+msgstr "XF86VidMode Erweiterung: Auflösungsumschaltung fehlgeschlagen.\n"
 
 #: src/xitk/videowin.c:1009
 msgid "Xine Video Window"
-msgstr ""
+msgstr "Xine Video Fenster"
 
 #: src/xitk/videowin.c:1013
-#, fuzzy
 msgid "Xine Video Fullscreen Window"
-msgstr "Vollbild/Fenster-Modus"
+msgstr "Xine Video Vollbildfenster"
 
 #: src/xitk/videowin.c:1017
 msgid "Xine Video Borderless Window"
-msgstr ""
+msgstr "Xine Video rahmenloses Fenster"
 
 #: src/xitk/videowin.c:1038
 msgid "XAllocWMHints() failed\n"
-msgstr ""
+msgstr "XAllocWMHints() fehlgeschlagen\n"
 
 #: src/xitk/videowin.c:1062
 msgid "New stream sizes resize output window"
-msgstr ""
+msgstr "Neue Datemstromgröße verändert Ausgabefenstergröße "
 
 #: src/xitk/videowin.c:1068
 msgid "Double size for small streams (require stream_resize_window)"
-msgstr ""
+msgstr "Doppelte Größe für kleine Datemströme (Erfordert stream_resize_window)"
 
 #: src/xitk/videowin.c:1090
 msgid "use XVidModeExtension when switching to fullscreen"
-msgstr ""
+msgstr "Benutze XVidModeExtension zum Umschalten auf Vollbild"
 
 #: src/xitk/videowin.c:1106
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
-msgstr ""
+msgstr "XF86VidMode Erweiterung (%d.%d) erkannt, versuche diese zu nutzen.\n"
 
 #: src/xitk/videowin.c:1109
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr ""
+msgstr "XF86VidMode Erweiterung: %d Auflösungen gefunden.\n"
 
 #: src/xitk/videowin.c:1127
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr ""
+"XF86VidMode Erweiterung: Konnte Liste der verfügbaren Auflösungen bestimmen. "
+"Fehlschlag.\n"
 
 #: src/xitk/videowin.c:1130
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 msgstr ""
+"XF86VidMode Erweiterung: Initialisierung fehlgeschlagen, wird nicht "
+"benutzt.\n"
 
 #: src/xitk/viewlog.c:328
 msgid "log info"
