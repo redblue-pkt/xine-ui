@@ -36,14 +36,11 @@
 #define MAX_PLAYLIST_LENGTH  1024
 
 typedef struct {
-  /* xine engine configuration */
-  config_values_t     *config;
-  
   /* our video out driver */
-  vo_driver_t         *vo_driver;
+  const xine_vo_driver_t *vo_driver;
 
   /* xine engine instance */
-  xine_t              *xine;
+  const xine_t        *xine;
 
   /* xine lib/gui configuration filename */
   char                *configfile;
@@ -60,6 +57,7 @@ typedef struct {
   XColor               black;
   Pixmap               icon;
   Colormap             colormap;
+  double               display_ratio;
 
   int		       prefered_visual_class;
   VisualID	       prefered_visual_id;
@@ -81,7 +79,7 @@ typedef struct {
   char                 filename[1024];
 
   /* gui playlist */
-  char                *playlist[MAX_PLAYLIST_LENGTH];
+  const char          *playlist[MAX_PLAYLIST_LENGTH];
   int                  playlist_num;
   int                  playlist_cur;
 
@@ -112,7 +110,7 @@ typedef struct {
   
   int                  use_root_window;
 
-  char                *snapshot_location;
+  const char          *snapshot_location;
   
   int                  ssaver_timeout;
 
@@ -170,7 +168,7 @@ void gui_execute_action_id(action_id_t);
 
 void gui_handle_event (XEvent *event, void *data);
 
-char *gui_next_mrl_callback (void) ;
+const char *gui_next_mrl_callback (void) ;
 
 void gui_branched_callback (void) ;
 

@@ -41,7 +41,6 @@
 #endif
 
 #include <xine.h>
-#include <xine/video_out_x11.h>
 #include <xine/xineutils.h>
 
 #include "Imlib-light/Imlib.h"
@@ -146,11 +145,11 @@ extern int XShmGetEventBase(Display *);
 static void video_window_handle_event (XEvent *event, void *data);
 static void video_window_adapt_size (void);
 
-static void _video_window_resize_cb(void *data, cfg_entry_t *cfg) {
+static void _video_window_resize_cb(void *data, xine_cfg_entry_t *cfg) {
   gVw->stream_resize_window = cfg->num_value;
 }
 
-static void _video_window_zoom_small_cb(void *data, cfg_entry_t *cfg) {
+static void _video_window_zoom_small_cb(void *data, xine_cfg_entry_t *cfg) {
   gVw->zoom_small_stream = cfg->num_value;
 }
 
@@ -172,8 +171,7 @@ void video_window_select_visual (void) {
 
   XLockDisplay (gGui->display);
   if (gGui->vo_driver) {
-    gGui->vo_driver->gui_data_exchange (gGui->vo_driver, GUI_SELECT_VISUAL,
-                                        &vinfo);
+    xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_SELECT_VISUAL, &vinfo);
     if (vinfo != (XVisualInfo *) -1) {
       if (! vinfo) {
         fprintf (stderr, _("videowin: output driver cannot select a working visual\n"));
@@ -255,9 +253,7 @@ static void video_window_adapt_size (void) {
 					 CWBackPixel | CWOverrideRedirect, &attr);
       
       if(gGui->vo_driver)
-	gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
-					    GUI_DATA_EX_DRAWABLE_CHANGED, 
-					    (void*)gGui->video_window);
+	xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
 
       XSelectInput(gGui->display, gGui->video_window, ExposureMask);
       
@@ -306,19 +302,22 @@ static void video_window_adapt_size (void) {
   case 0:
   case 1:
     if(gGui->xine)
+      /* FIXME_API: needed?
       xine_tvmode_switch2 (gGui->xine, 
-			  0, gVw->video_width, gVw->video_height, gVw->video_duration);
+			  0, gVw->video_width, gVw->video_height, gVw->video_duration) */;
     break;
   case 2:
     if(gGui->xine)
+      /* FIXME_API: needed?
       if (xine_tvmode_switch2 (gGui->xine,
 			      1, gVw->video_width, gVw->video_height, gVw->video_duration) != 1)
-	gVw->fullscreen_req = 0;
+	gVw->fullscreen_req = 0 */;
     break;
   default:
     if(gGui->xine)
+      /* FIXME_API: needed?
       xine_tvmode_switch2 (gGui->xine, 
-			  0, gVw->video_width, gVw->video_height, gVw->video_duration);
+			  0, gVw->video_width, gVw->video_height, gVw->video_duration) */;
     gVw->fullscreen_req = 0;
   }
 
@@ -432,8 +431,9 @@ static void video_window_adapt_size (void) {
   gVw->visible_ratio  = 1.0;   // TODO
 
   if(gGui->xine) {
+    /* FIXME_API: needed?
     xine_tvmode_size2 (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_ratio, NULL);
-    xine_tvmode_size2 (gGui->xine, &hint.width, &hint.height, NULL, NULL);
+    xine_tvmode_size2 (gGui->xine, &hint.width, &hint.height, NULL, NULL); */
   }
   
   if (gVw->fullscreen_req) {
@@ -491,9 +491,7 @@ static void video_window_adapt_size (void) {
 		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
     if(gGui->vo_driver)
-      gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
-					  GUI_DATA_EX_DRAWABLE_CHANGED, 
-					  (void*)gGui->video_window);
+      xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
     
     if (gVw->xclasshint_fullscreen != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint_fullscreen);
@@ -628,9 +626,7 @@ static void video_window_adapt_size (void) {
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
     
     if(gGui->vo_driver)
-      gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
-					  GUI_DATA_EX_DRAWABLE_CHANGED, 
-					  (void*)gGui->video_window);
+      xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
     
     if(gVw->borderless) {
       if (gVw->xclasshint_borderless != NULL)
@@ -764,9 +760,12 @@ static float get_default_mag(int video_width, int video_height) {
  */
 void video_window_dest_size_cb (void *data,
 				int video_width, int video_height,
-				int *dest_width, int *dest_height)  {
+				double video_pixel_aspect,
+				int *dest_width, int *dest_height,
+				double *dest_pixel_aspect)  {
   
   /* TODO: Interface change:  *dest_ratio */
+  *dest_pixel_aspect = gGui->display_ratio;
 
   if(gVw->stream_resize_window && !gVw->fullscreen_mode) {
 
@@ -801,11 +800,15 @@ void video_window_dest_size_cb (void *data,
  */
 void video_window_frame_output_cb (void *data,
 				   int video_width, int video_height,
+				   double video_pixel_aspect,
 				   int *dest_x, int *dest_y, 
 				   int *dest_width, int *dest_height,
+				   double *dest_pixel_aspect,
 				   int *win_x, int *win_y) {
   
   /* TODO: Interface change: video_duration, *dest_ratio */
+  *dest_pixel_aspect = gGui->display_ratio;
+  
   /* Please do NOT remove, support will be added soon! */
 #if 0
   double jitter;
@@ -905,9 +908,7 @@ void video_window_set_visibility(int show_window) {
   if(gGui->use_root_window)
     return;
 
-  gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
-				      GUI_DATA_EX_VIDEOWIN_VISIBLE, 
-				      (int *)show_window);
+  xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (int *)show_window);
   
   gVw->show = show_window;
 
@@ -1091,16 +1092,16 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   XUnlockDisplay (gGui->display);
 
   gVw->stream_resize_window = 
-    gGui->config->register_bool(gGui->config, 
-				"gui.stream_resize_window", 0,
-				_("New stream sizes resize output window"),
-				NULL, _video_window_resize_cb, NULL);
+    xine_config_register_bool(gGui->xine, 
+			      "gui.stream_resize_window", 0,
+			      _("New stream sizes resize output window"),
+			      NULL, 0, _video_window_resize_cb, NULL);
   
   gVw->zoom_small_stream = 
-    gGui->config->register_bool(gGui->config, 
-				"gui.zoom_small_stream", 0,
-				_("Double size for small streams (require stream_resize_window)"),
-				NULL, _video_window_zoom_small_cb, NULL);
+    xine_config_register_bool(gGui->xine, 
+			      "gui.zoom_small_stream", 0,
+			      _("Double size for small streams (require stream_resize_window)"),
+			      NULL, 0, _video_window_zoom_small_cb, NULL);
   
   if((window_attribute->width > 0) && (window_attribute->height > 0)) {
     gVw->video_width  = window_attribute->width;
@@ -1120,9 +1121,9 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 #ifdef HAVE_XF86VIDMODE
   XLockDisplay (gGui->display);
   
-  if(gGui->config->register_bool(gGui->config, "gui.use_xvidext", 0,
-				 _("use XVidModeExtension when switching to fullscreen"),
-				 NULL, NULL, NULL)) {
+  if(xine_config_register_bool(gGui->xine, "gui.use_xvidext", 0,
+			       _("use XVidModeExtension when switching to fullscreen"),
+			       NULL, 0, NULL, NULL)) {
     /* 
      * without the "stream resizes window" behavior, the XVidMode support
      * won't work correctly, so we force it for each session the user wants
@@ -1204,7 +1205,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
  * Necessary cleanup
  */
 void video_window_exit (void) {
-  xine_tvmode_exit2 (gGui->xine);
+  /* FIXME_API: xine_tvmode_exit2 (gGui->xine); */
 }
 
 
@@ -1226,9 +1227,8 @@ static int video_window_translate_point(int gui_x, int gui_y,
   rect.w = 0;
   rect.h = 0;
 
-  if (gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
-					  GUI_DATA_EX_TRANSLATE_GUI_TO_VIDEO, 
-					  (void*)&rect) != -1) {
+  if (xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_TRANSLATE_GUI_TO_VIDEO, 
+			     (void*)&rect) != -1) {
     /* driver implements gui->video coordinate space translation, use it */
     *video_x = rect.x;
     *video_y = rect.y;
@@ -1299,11 +1299,11 @@ float video_window_get_mag (void) {
  * Change displayed logo, if selected skin want to customize it.
  */
 void video_window_change_skins(void) {
-  cfg_entry_t *cfg_entry;
-  char        *skin_logo;
-  static int   sk_changed = 0;
+  xine_cfg_entry_t *cfg_entry;
+  char             *skin_logo;
+  static int        sk_changed = 0;
 
-  cfg_entry = gGui->config->lookup_entry(gGui->config, "misc.logo_mrl");
+  cfg_entry = xine_config_lookup_entry(gGui->xine, "misc.logo_mrl");
   skin_logo = xitk_skin_get_logo(gGui->skin_config);
   
   if(skin_logo) {
@@ -1314,7 +1314,8 @@ void video_window_change_skins(void) {
 	return;
     }
     
-    gGui->config->update_string(gGui->config, "misc.logo_mrl", skin_logo);
+    cfg_entry->str_value = strdup(skin_logo);
+    xine_config_update_entry(gGui->xine, cfg_entry);
   }
   else { /* Skin don't use logo feature, set to xine's default */
     
@@ -1322,9 +1323,10 @@ void video_window_change_skins(void) {
      * Back to default logo only on a skin 
      * change, not at the first skin loading.
      **/
-    if(cfg_entry && sk_changed)
-      gGui->config->update_string(gGui->config, "misc.logo_mrl", XINE_LOGO_FILE);
-
+    if(cfg_entry && sk_changed) {
+      cfg_entry->str_value = strdup(cfg_entry->str_default);
+      xine_config_update_entry(gGui->xine, cfg_entry);
+    }
   }
 
   sk_changed++;
@@ -1413,9 +1415,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
     if (xev->count == 0) {
 
       if(event->xany.window == gGui->video_window) {
-	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
-					    GUI_DATA_EX_EXPOSE_EVENT, 
-					    event);
+	xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_EXPOSE_EVENT, event);
       }
     }
   }
@@ -1437,9 +1437,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
   }
 
   if (event->type == gVw->completion_event) 
-    gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
-					GUI_DATA_EX_COMPLETION_EVENT, 
-					event);
+    xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_COMPLETION_EVENT, event);
 
 }
 

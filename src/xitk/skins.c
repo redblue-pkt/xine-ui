@@ -121,7 +121,7 @@ static void looking_for_available_skins(void) {
   sprintf(buf, "%s/.xine/skins", xine_get_homedir());
   
   get_available_skins_from(buf);
-  get_available_skins_from(XINE_SKINDIR);
+  /* FIXME_API: XINE_SKINDIR? get_available_skins_from(XINE_SKINDIR); */
   
 }
 
@@ -130,20 +130,21 @@ static void looking_for_available_skins(void) {
  */
 char *skin_get_skindir(void) {
   static char    tmp[2048];
-  cfg_entry_t   *entry;
+  xine_cfg_entry_t *entry;
   char          *skin;
   
   memset(&tmp, 0, 2048);
   
-  entry = gGui->config->lookup_entry(gGui->config, "gui.skin");
+  entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
 
   if(entry)
     skin = (char *) skins_avail[entry->num_value]->skin;
   else
     skin = DEFAULT_SKIN;
   
-  snprintf(tmp, 2048, "%s/%s", XINE_SKINDIR, skin);
-
+  /* FIXME_API: XINE_SKINDIR? snprintf(tmp, 2048, "%s/%s", XINE_SKINDIR, skin); */
+  snprintf(tmp, 2048, "%s/%s", "/usr/share/xine/skins/", skin);
+  
   return tmp;
 }
 
@@ -152,19 +153,20 @@ char *skin_get_skindir(void) {
  */
 char *skin_get_configfile(void) {
   static char   tmp[2048];
-  cfg_entry_t  *entry;
+  xine_cfg_entry_t *entry;
   char         *skin;
   
   memset(&tmp, 0, 2048);
   
-  entry = gGui->config->lookup_entry(gGui->config, "gui.skin");
+  entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
 
   if(entry)
     skin = (char *) skins_avail[entry->num_value]->skin;
   else
     skin = DEFAULT_SKIN;
   
-  snprintf(tmp, 2048, "%s/%s/skinconfig", XINE_SKINDIR, skin);
+  /* FIXME_API: XINE_SKINDIR? snprintf(tmp, 2048, "%s/%s/skinconfig", XINE_SKINDIR, skin); */
+  snprintf(tmp, 2048, "%s/%s/skinconfig", "/usr/share/xine/skins/", skin);
 
   return tmp;
 }
@@ -217,8 +219,11 @@ skins_locations_t *get_skin_location(char *skin) {
  * Select a new skin (used in control skin list).
  */
 void select_new_skin(int selected) {
+  xine_cfg_entry_t *entry;
   
-  gGui->config->update_num(gGui->config, "gui.skin", selected);
+  entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
+  entry->num_value = selected;
+  xine_config_update_entry(gGui->xine, entry);
 }
 
 /*
@@ -229,13 +234,13 @@ void change_skin(skins_locations_t *sk) {
   char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char                *old_skin;
   skins_locations_t   *sks = sk;
-  cfg_entry_t         *entry;
+  xine_cfg_entry_t    *entry;
   int                  twice = 0, twice_load = 0;
 
   if(!sk)
     return;
   
-  entry = gGui->config->lookup_entry(gGui->config, "gui.skin");
+  entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
   if(entry)
     old_skin = (char *) skins_avail[entry->num_value]->skin;
   else
@@ -245,8 +250,10 @@ void change_skin(skins_locations_t *sk) {
 
   gGui->skin_config = xitk_skin_init_config();
 
-  if(change_config_entry)
-    gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset((char * )sk->skin)));
+  if(change_config_entry) {
+    entry->num_value = get_skin_offset((char * )sk->skin);
+    xine_config_update_entry(gGui->xine, entry);
+  }
 
  __reload_skin:
   memset(&buf, 0, sizeof(buf));
@@ -254,13 +261,16 @@ void change_skin(skins_locations_t *sk) {
 
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
     skins_locations_t   *osks;
+    
+    entry->num_value = get_skin_offset(old_skin);
+    xine_config_update_entry(gGui->xine, entry);
 
-    gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(old_skin)));
     osks = get_skin_location(old_skin);
     if((!strcmp(osks->pathname, sks->pathname)) && (!strcmp(osks->skin, sks->skin))) {
       xine_error(_("Failed to load %s/%s. Load fallback skin %s\n"), 
 		 buf, "skinconfig", DEFAULT_SKIN);
-      gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+      entry->num_value = get_skin_offset(DEFAULT_SKIN);
+      xine_config_update_entry(gGui->xine, entry);
       sks = get_skin_location(DEFAULT_SKIN);
     }
     else {
@@ -284,7 +294,8 @@ void change_skin(skins_locations_t *sk) {
     gGui->skin_config = xitk_skin_init_config();
     xine_error(_("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), 
 	       buf, DEFAULT_SKIN);
-    gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+    entry->num_value = get_skin_offset(old_skin);
+    xine_config_update_entry(gGui->xine, entry);
     sks = get_skin_location(DEFAULT_SKIN);
     twice++;
     goto __reload_skin;
@@ -315,7 +326,7 @@ void change_skin(skins_locations_t *sk) {
 /*
  *
  */
-static void skin_change_cb(void *data, cfg_entry_t *cfg) {
+static void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
   skins_locations_t   *sk;
   
   if(skins_avail == NULL || change_config_entry == 0)
@@ -326,7 +337,8 @@ static void skin_change_cb(void *data, cfg_entry_t *cfg) {
   if(!sk) {
     xine_error(_("Ooch, skin not found, use fallback '%s'.\n"), DEFAULT_SKIN);
     sk = get_skin_location(DEFAULT_SKIN);
-    gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+    cfg->num_value = get_skin_offset(DEFAULT_SKIN);
+    xine_config_update_entry(gGui->xine, cfg);
   }
 
   change_config_entry = 0;
@@ -360,16 +372,18 @@ void init_skins_support(void) {
     skin_names[i] = strdup(skins_avail[i]->skin);
   skin_names[skins_avail_num] = NULL;
 
-  skin_num = gGui->config->register_enum (gGui->config, "gui.skin", 
-					  (get_skin_offset(DEFAULT_SKIN)), skin_names,
-					  _("gui skin theme"), NULL, skin_change_cb, NULL);
+  skin_num = xine_config_register_enum (gGui->xine, "gui.skin", 
+					(get_skin_offset(DEFAULT_SKIN)), skin_names,
+					_("gui skin theme"), NULL, 0, skin_change_cb, NULL);
   
   sk = (skin_num < skins_avail_num) ? skins_avail[skin_num] : NULL;
   
   if(!sk) {
+    xine_cfg_entry_t *entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
     xine_error(_("Ooch, skin '%s' not found, use fallback '%s'.\n"), skins_avail[skin_num], 
 	       (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
-    gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+    entry->num_value = get_skin_offset(DEFAULT_SKIN);
+    xine_config_update_entry(gGui->xine, entry);
     sk = get_skin_location(DEFAULT_SKIN);
     if(!sk) {
       fprintf(stderr, _("Failed to load fallback skin. Check your installed skins. Exiting.\n"));
@@ -383,10 +397,12 @@ void init_skins_support(void) {
 
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
     if(!twice_load) {
+      xine_cfg_entry_t *entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
       twice_load++;
       fprintf(stderr, _("Failed to load %s/%s. Load fallback skin %s\n"), 
 	      buf, "skinconfig", DEFAULT_SKIN);
-      gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+      entry->num_value = get_skin_offset(DEFAULT_SKIN);
+      xine_config_update_entry(gGui->xine, entry);
       sk = get_skin_location(DEFAULT_SKIN);
       goto __reload_skin;
     }
@@ -400,10 +416,12 @@ void init_skins_support(void) {
   /* Check skin version */
   if(xitk_skin_check_version(gGui->skin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config(gGui->skin_config);
+    xine_cfg_entry_t *entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
     gGui->skin_config = xitk_skin_init_config();
     fprintf(stderr, _("Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"), 
 	    buf, (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
-    gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+    entry->num_value = get_skin_offset(DEFAULT_SKIN);
+    xine_config_update_entry(gGui->xine, entry);
     sk = get_skin_location(DEFAULT_SKIN);
     sprintf(buf, "%s/%s", sk->pathname, sk->skin);
     if(!twice) {

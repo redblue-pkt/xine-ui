@@ -856,9 +856,11 @@ void create_snapshot (void)
     return;
   }
 
+  /* FIXME_API: separate yuv pointers?
   err = xine_get_current_frame( gGui->xine,
           &image->width, &image->height, &image->ratio_code,
-          &image->format, &image->y, &image->u, &image->v);
+          &image->format, &image->y, &image->u, &image->v); */
+  err = 0;
 
   if (err == 0) {
     printf("   Framegrabber failed\n");
@@ -878,31 +880,31 @@ void create_snapshot (void)
   printf("  ratio:  " );
 
   switch ( image->ratio_code ) {
-    case XINE_ASPECT_RATIO_SQUARE:
+    case XINE_VO_ASPECT_SQUARE:
       printf( "XINE_ASPECT_RATIO_SQUARE\n" ); 
       image->scale_line = scale_line_1_1;
       image->scale_factor = ( 32768 * 1 ) / 1;
       break;
 
-    case XINE_ASPECT_RATIO_4_3:
+    case XINE_VO_ASPECT_4_3:
       printf( "XINE_ASPECT_RATIO_4_3\n" ); 
       image->scale_line = scale_line_15_16;
       image->scale_factor = ( 32768 * 16 ) / 15;
       break;
 
-    case XINE_ASPECT_RATIO_ANAMORPHIC: 
+    case XINE_VO_ASPECT_ANAMORPHIC: 
       printf( "XINE_ASPECT_RATIO_ANAMORPHIC\n" ); 
       image->scale_line = scale_line_45_64;
       image->scale_factor = ( 32768 * 64 ) / 45;
       break;
 
-    case XINE_ASPECT_RATIO_211_1:      
+    case XINE_VO_ASPECT_DVB:      
       printf( "XINE_ASPECT_RATIO_211_1\n" ); 
       image->scale_line = scale_line_45_64;
       image->scale_factor = ( 32768 * 64 ) / 45;
       break;
 
-    case XINE_ASPECT_RATIO_DONT_TOUCH: 
+    case XINE_VO_ASPECT_DONT_TOUCH: 
       printf( "XINE_ASPECT_RATIO_DONT_TOUCH\n" ); 
       image->scale_line = scale_line_1_1;
       image->scale_factor = ( 32768 * 1 ) / 1;

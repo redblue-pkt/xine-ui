@@ -176,11 +176,11 @@ typedef struct {
   int                   num_wg;
   int                   first_displayed;
 
-  char                **config_content;
+  const char          **config_content;
   int                   config_lines;
-  char                **readme_content;
+  const char          **readme_content;
   int                   readme_lines;
-  char                **faq_content;
+  const char          **faq_content;
   int                   faq_lines;
 
   xitk_register_key_t   kreg;
@@ -192,18 +192,17 @@ static _setup_t    *setup = NULL;
 static void setup_end(xitk_widget_t *, void *);
 
 /*
- * Get current property 'prop' value from vo_driver.
+ * Get current parameter 'param' value from xine.
  */
-static int get_current_prop(int prop) {
-  return (gGui->vo_driver->get_property(gGui->vo_driver, prop));
+static int get_current_param(int param) {
+  return xine_get_param(gGui->xine, param);
 }
 
 /*
- * set property 'prop' to  value 'value'.
- * vo_driver return value on success, ~value on failure.
+ * set parameter 'param' to  value 'value'.
  */
-static int set_current_prop(int prop, int value) {
-  return (gGui->vo_driver->set_property(gGui->vo_driver, prop, value));
+static void set_current_param(int param, int value) {
+  xine_set_param(gGui->xine, param, value);
 }
 
 
@@ -218,8 +217,16 @@ void setup_exit(xitk_widget_t *w, void *data) {
   setup->visible = 0;
 
   if((xitk_get_window_info(setup->kreg, &wi))) {
-    gGui->config->update_num (gGui->config, "gui.setup_x", wi.x);
-    gGui->config->update_num (gGui->config, "gui.setup_y", wi.y);
+    xine_cfg_entry_t *entry;
+    
+    entry = xine_config_lookup_entry(gGui->xine, "gui.setup_x");
+    entry->num_value = wi.x;
+    xine_config_update_entry(gGui->xine, entry);
+    
+    entry = xine_config_lookup_entry(gGui->xine, "gui.setup_y");
+    entry->num_value = wi.y;
+    xine_config_update_entry(gGui->xine, entry);
+    
     WINDOW_INFO_ZERO(&wi);
   }
 
@@ -246,21 +253,21 @@ void setup_exit(xitk_widget_t *w, void *data) {
 
   if(setup->config_content) {
     for(i = 0; i < setup->config_lines; i++) {
-      free(setup->config_content[i]);
+      free((char *)setup->config_content[i]);
     }
     free(setup->config_content);
   }
 
   if(setup->faq_content) {
     for(i = 0; i < setup->faq_lines; i++) {
-      free(setup->faq_content[i]);
+      free((char *)setup->faq_content[i]);
     }
     free(setup->faq_content);
   }
 
   if(setup->readme_content) {
     for(i = 0; i < setup->readme_lines; i++) {
-      free(setup->readme_content[i]);
+      free((char **)setup->readme_content[i]);
     }
     free(setup->readme_content);
   }
@@ -499,23 +506,24 @@ static xitk_widget_t *setup_add_label (int x, int y, int w, char *str) {
  *
  */
 static void numtype_update(xitk_widget_t *w, void *data, int value) {
-  cfg_entry_t *entry;
+  xine_cfg_entry_t *entry = (xine_cfg_entry_t *)data;
   
-  entry = (cfg_entry_t *)data;
-
-  entry->config->update_num(entry->config, entry->key, value );
+  entry->num_value = value;
+  xine_config_update_entry(gGui->xine, entry);
 }
 
 /*
  *
  */
 static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
-  cfg_entry_t *entry, *check_entry;
+  xine_cfg_entry_t *entry, *check_entry;
   
-  entry = (cfg_entry_t *)data;
+  entry = (xine_cfg_entry_t *)data;
   
-  entry->config->update_string(entry->config, entry->key, str );
-  check_entry = gGui->config->lookup_entry(gGui->config, entry->key);
+  entry->str_value = str;
+  xine_config_update_entry(gGui->xine, entry);
+  
+  check_entry = xine_config_lookup_entry(gGui->xine, entry->key);
 
   if(check_entry) {
     if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
@@ -527,7 +535,7 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
  *
  */
 static widget_triplet_t *setup_add_slider (char *title, char *labelkey, 
-					   int x, int y, cfg_entry_t *entry ) {
+					   int x, int y, xine_cfg_entry_t *entry ) {
   xitk_slider_widget_t     sl;
   xitk_widget_t           *slider;
   static widget_triplet_t *wt; 
@@ -566,7 +574,7 @@ static widget_triplet_t *setup_add_slider (char *title, char *labelkey,
  *
  */
 static widget_triplet_t *setup_add_inputnum(char *title, char *labelkey, 
-					    int x, int y, cfg_entry_t *entry) {
+					    int x, int y, xine_cfg_entry_t *entry) {
   xitk_intbox_widget_t      ib;
   xitk_widget_t            *intbox, *wi, *wbu, *wbd;
   static widget_triplet_t  *wt;
@@ -607,7 +615,7 @@ static widget_triplet_t *setup_add_inputnum(char *title, char *labelkey,
  *
  */
 static widget_triplet_t *setup_add_inputtext(char *title, char *labelkey, 
-					     int x, int y, cfg_entry_t *entry) {
+					     int x, int y, xine_cfg_entry_t *entry) {
   xitk_inputtext_widget_t   inp;
   xitk_widget_t            *input;
   static widget_triplet_t  *wt;
@@ -643,7 +651,7 @@ static widget_triplet_t *setup_add_inputtext(char *title, char *labelkey,
  *
  */
 static widget_triplet_t *setup_add_checkbox (char *title, char *labelkey, 
-					     int x, int y, cfg_entry_t *entry) {
+					     int x, int y, xine_cfg_entry_t *entry) {
   xitk_checkbox_widget_t    cb;
   xitk_widget_t            *checkbox;
   static widget_triplet_t  *wt;
@@ -679,7 +687,7 @@ static widget_triplet_t *setup_add_checkbox (char *title, char *labelkey,
  *
  */
 static widget_triplet_t *setup_add_combo (char *title, char *labelkey, 
-					  int x, int y, cfg_entry_t *entry ) {
+					  int x, int y, xine_cfg_entry_t *entry ) {
   xitk_combo_widget_t       cmb;
   xitk_widget_t            *combo, *lw, *bw;
   static widget_triplet_t  *wt;
@@ -719,7 +727,7 @@ static widget_triplet_t *setup_add_combo (char *title, char *labelkey,
 /*
  * Add a browser (needed for help files display).
  */
-static widget_triplet_t *setup_list_browser(int x, int y, char **content, int len) {
+static widget_triplet_t *setup_list_browser(int x, int y, const char **content, int len) {
   xitk_browser_widget_t     br;
   xitk_widget_t            *browser;
   static widget_triplet_t  *wt;
@@ -766,7 +774,7 @@ static widget_triplet_t *setup_list_browser(int x, int y, char **content, int le
 static void setup_section_widgets(int s) {
   int                  x = ((WINDOW_WIDTH>>1) - (FRAME_WIDTH>>1) - 10);
   int                  y = 70;
-  cfg_entry_t         *entry;
+  xine_cfg_entry_t    *entry;
   int                  len;
   char                *section;
   char                *labelkey;
@@ -796,7 +804,7 @@ static void setup_section_widgets(int s) {
     
     section = setup->sections[s];
     len     = strlen (section);
-    entry   = gGui->config->first;
+    entry   = xine_config_get_first_entry(gGui->xine);
     
     while (entry) {
       
@@ -806,31 +814,31 @@ static void setup_section_widgets(int s) {
 	
 	switch (entry->type) {
 	  
-	case CONFIG_TYPE_RANGE: /* slider */
+	case XINE_CONFIG_TYPE_RANGE: /* slider */
 	  setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
-	case CONFIG_TYPE_STRING:
+	case XINE_CONFIG_TYPE_STRING:
 	  setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
-	case CONFIG_TYPE_ENUM:
+	case XINE_CONFIG_TYPE_ENUM:
 	  setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
-	case CONFIG_TYPE_NUM:
+	case XINE_CONFIG_TYPE_NUM:
 	  setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
-	case CONFIG_TYPE_BOOL:
+	case XINE_CONFIG_TYPE_BOOL:
 	  setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
@@ -840,7 +848,7 @@ static void setup_section_widgets(int s) {
 	
       }
       
-      entry = entry->next;
+      entry = xine_config_get_next_entry(gGui->xine);
     }
 
     xitk_enable_widget(setup->slider_wg);
@@ -900,11 +908,11 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
  */
 static void setup_sections (void) {
   xitk_pixmap_t       *bg;
-  cfg_entry_t         *entry;
+  xine_cfg_entry_t    *entry;
   xitk_tabs_widget_t   tab;
 
   setup->num_sections = 0;
-  entry = gGui->config->first;
+  entry = xine_config_get_first_entry(gGui->xine);
   while (entry) {
 
     char *point;
@@ -931,7 +939,7 @@ static void setup_sections (void) {
        * sinek/gnome-xine/etc... specific entries)
        */
       if (!found) {
-	cfg_entry_t *check_entry = gGui->config->first;
+	xine_cfg_entry_t *check_entry = xine_config_get_first_entry(gGui->xine);
 	int          num_entries = 0;
 	
 	while (check_entry) {
@@ -943,7 +951,7 @@ static void setup_sections (void) {
 	      break;
 	    }
 	  }
-	  check_entry = check_entry->next;
+	  check_entry = xine_config_get_next_entry(gGui->xine);
 	}
 	
 	if(num_entries) {
@@ -955,7 +963,7 @@ static void setup_sections (void) {
       }
     }      
     
-    entry = entry->next;
+    entry = xine_config_get_next_entry(gGui->xine);
   }
 
   setup->sections[setup->num_sections] = strdup(_("Help"));
@@ -1024,7 +1032,7 @@ static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
 /*
  * Read adn store some files.
  */
-static char **_setup_read_given(char *given, int *ndest) {
+static const char **_setup_read_given(char *given, int *ndest) {
   char            buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char            buffer[256], *ln;
   const langs_t  *l;
@@ -1071,7 +1079,7 @@ static char **_setup_read_given(char *given, int *ndest) {
     goto __redo;
   }
 
-  return dest;  
+  return (const char **)dest;  
 }
 static void setup_read_config(void) {
   setup->config_content = _setup_read_given("README.config", &setup->config_lines);
@@ -1101,8 +1109,8 @@ void setup_panel(void) {
   
   setup = (_setup_t *) xine_xmalloc(sizeof(_setup_t));
 
-  x = gGui->config->register_num (gGui->config, "gui.setup_x", 100, NULL, NULL, NULL, NULL);
-  y = gGui->config->register_num (gGui->config, "gui.setup_y", 100, NULL, NULL, NULL, NULL);
+  x = xine_config_register_num (gGui->xine, "gui.setup_x", 100, NULL, NULL, 20, NULL, NULL);
+  y = xine_config_register_num (gGui->xine, "gui.setup_y", 100, NULL, NULL, 20, NULL, NULL);
 
   /* Create window */
   setup->xwin = xitk_window_create_dialog_window(gGui->imlib_data,

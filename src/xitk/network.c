@@ -1795,7 +1795,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	gGui->ignore_status = 1;
 	xine_stop (gGui->xine);
 	gGui->ignore_status = 0;
-	gui_status_callback (XINE_STOP);
+	gui_status_callback (XINE_STATUS_STOP);
       }
       else if(is_arg_contain(client_info, 1, "prev")) {
 	gGui->ignore_status = 1;
@@ -1803,7 +1803,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	gGui->playlist_cur--;
 	if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	  if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
+	  if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0 )))
 	    gui_handle_xine_error();
 	  
 	} else {
@@ -1825,13 +1825,13 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
       else if (is_arg_contain(client_info, 1, "play")) {
 	gui_dndcallback((char *)(get_arg(client_info, 2)));
 	
-	if((xine_get_status(gGui->xine) != XINE_STOP)) {
+	if((xine_get_status(gGui->xine) != XINE_STATUS_STOP)) {
 	  gGui->ignore_status = 1;
 	  xine_stop (gGui->xine);
 	  gGui->ignore_status = 0;
 	}
 	gui_set_current_mrl(gGui->playlist[gGui->playlist_num - 1]);
-	if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
+	if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0 )))
 	  handle_xine_error(client_info);
       }
     }
@@ -1888,7 +1888,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	  gGui->playlist_num = 0;
 	  gGui->playlist_cur = 0;
 
-	  if(xine_get_status(gGui->xine) != XINE_STOP)
+	  if(xine_get_status(gGui->xine) != XINE_STATUS_STOP)
 	    gui_stop(NULL, NULL);
 
 	  enable_playback_controls(0);
@@ -1900,7 +1900,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	  
 	  if(j >= 0) {
 
-	    if((gGui->playlist_cur == j) && ((xine_get_status(gGui->xine) != XINE_STOP)))
+	    if((gGui->playlist_cur == j) && ((xine_get_status(gGui->xine) != XINE_STATUS_STOP)))
 	      gui_stop(NULL, NULL);
 
 	    for(i = j; i < gGui->playlist_num; i++)
@@ -1918,7 +1918,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	  if(is_playback_widgets_enabled() && (!gGui->playlist_num))
 	    enable_playback_controls(0);
 	  
-	  if(xine_get_status(gGui->xine) != XINE_STOP)
+	  if(xine_get_status(gGui->xine) != XINE_STATUS_STOP)
 	    gui_stop(NULL, NULL);
 	  
 	  gui_set_current_mrl(NULL);
@@ -1931,11 +1931,11 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 
 static void do_play(commands_t *cmd, client_info_t *client_info) {
 
-  if (xine_get_status (gGui->xine) != XINE_PLAY) {
-    if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
+  if (xine_get_status (gGui->xine) != XINE_STATUS_PLAY) {
+    if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0 )))
       handle_xine_error(client_info);
   } else {
-    xine_set_speed(gGui->xine, SPEED_NORMAL);
+    xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   }
 
 }
@@ -1947,10 +1947,10 @@ static void do_stop(commands_t *cmd, client_info_t *client_info) {
 }
 
 static void do_pause(commands_t *cmd, client_info_t *client_info) {
-  if (xine_get_speed (gGui->xine) != SPEED_PAUSE)
-    xine_set_speed(gGui->xine, SPEED_PAUSE);
+  if (xine_get_param (gGui->xine, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
+    xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
   else
-    xine_set_speed(gGui->xine, SPEED_NORMAL);
+    xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
 }
 
 static void do_exit(commands_t *cmd, client_info_t *client_info) {
@@ -1979,13 +1979,13 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	status = xine_get_status(gGui->xine);
 	
 	switch(status) {
-	case XINE_STOP:
+	case XINE_STATUS_STOP:
 	  sprintf(buf, "%s%s", buf, "XINE_STOP");
 	  break;
-	case XINE_PLAY:
+	case XINE_STATUS_PLAY:
 	  sprintf(buf, "%s%s", buf, "XINE_PLAY");
 	  break;
-	case XINE_QUIT:
+	case XINE_STATUS_QUIT:
 	  sprintf(buf, "%s%s", buf, "XINE_QUIT");
 	  break;
 	default:
@@ -2000,25 +2000,25 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	int  speed;
 	
 	sprintf(buf, "%s", "Current speed: ");
-	speed = xine_get_speed(gGui->xine);
+	speed = xine_get_param(gGui->xine, XINE_PARAM_SPEED);
 	
 	switch(speed) {
-	case SPEED_PAUSE:
+	case XINE_SPEED_PAUSE:
 	  sprintf(buf, "%s%s", buf, "SPEED_PAUSE");
 	  break;
-	case SPEED_SLOW_4:
+	case XINE_SPEED_SLOW_4:
 	  sprintf(buf, "%s%s", buf, "SPEED_SLOW_4");
 	  break;
-	case SPEED_SLOW_2:
+	case XINE_SPEED_SLOW_2:
 	  sprintf(buf, "%s%s", buf, "SPEED_SLOW_2");
 	  break;
-	case SPEED_NORMAL:
+	case XINE_SPEED_NORMAL:
 	  sprintf(buf, "%s%s", buf, "SPEED_NORMAL");
 	  break;
-	case SPEED_FAST_2:
+	case XINE_SPEED_FAST_2:
 	  sprintf(buf, "%s%s", buf, "SPEED_FAST_2");
 	  break;
-	case SPEED_FAST_4:
+	case XINE_SPEED_FAST_4:
 	  sprintf(buf, "%s%s", buf, "SPEED_FAST_4");
 	  break;
 	default:
@@ -2034,23 +2034,25 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
       if(is_arg_contain(client_info, 1, "audio")) {
 	if(is_arg_contain(client_info, 2, "channel")) {
 	  sock_write(client_info->socket, "Current audio channel: %d\n", 
-		     (xine_get_audio_selection(gGui->xine)));
+		     (xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)));
 	}
 	else if(is_arg_contain(client_info, 2, "lang")) {
 	  char buf[20];
 
-	  xine_get_audio_lang(gGui->xine, buf);
+	  xine_get_audio_lang(gGui->xine,
+	                      xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL),
+			      buf);
 	  sock_write(client_info->socket, "Current audio language: %s\n", buf);
 	}
 	else if(is_arg_contain(client_info, 2, "volume")) {
-	  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+	  if(gGui->mixer.caps & 0 /* FIXME_API: (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL) */) { 
 	    sock_write(client_info->socket, "Current audio volume: %d\n", gGui->mixer.volume_level);
 	  }
 	  else
 	    sock_write(client_info->socket, "Audio is disabled.\n");
 	}
 	else if(is_arg_contain(client_info, 2, "mute")) {
-	  if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
+	  if(gGui->mixer.caps & 0 /* FIXME_API: AO_CAP_MUTE_VOL */) {
 	    sock_write(client_info->socket, "Current audio mute: %d\n", gGui->mixer.mute);
 	  }
 	  else
@@ -2060,12 +2062,14 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
       else if(is_arg_contain(client_info, 1, "spu")) {
 	if(is_arg_contain(client_info, 2, "channel")) {
 	  sock_write(client_info->socket, "Current spu channel: %d\n", 
-		     (xine_get_spu_channel(gGui->xine)));
+		     (xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL)));
 	}
 	else if(is_arg_contain(client_info, 2, "lang")) {
 	  char buf[20];
 
-	  xine_get_audio_lang (gGui->xine, buf);
+	  xine_get_spu_lang (gGui->xine,
+	                     xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL),
+	                     buf);
 	  sock_write(client_info->socket, "Current spu language: %s\n", buf);
 	}
       }
@@ -2084,51 +2088,51 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
 	
 	if((is_arg_contain(client_info, 2, "SPEED_PAUSE")) || 
 	   (is_arg_contain(client_info, 2, "|")))
-	  speed = SPEED_PAUSE;
+	  speed = XINE_SPEED_PAUSE;
 	else if((is_arg_contain(client_info, 2, "SPEED_SLOW_4")) ||
 		(is_arg_contain(client_info, 2, "/4")))
-	  speed = SPEED_SLOW_4;
+	  speed = XINE_SPEED_SLOW_4;
 	else if((is_arg_contain(client_info, 2, "SPEED_SLOW_2")) ||
 		(is_arg_contain(client_info, 2, "/2")))
-	  speed = SPEED_SLOW_2;
+	  speed = XINE_SPEED_SLOW_2;
 	else if((is_arg_contain(client_info, 2, "SPEED_NORMAL")) ||
 		(is_arg_contain(client_info, 2, "=")))
-	  speed = SPEED_NORMAL;
+	  speed = XINE_SPEED_NORMAL;
 	else if((is_arg_contain(client_info, 2, "SPEED_FAST_2")) ||
 		(is_arg_contain(client_info, 2, "*2")))
-	  speed = SPEED_FAST_2;
+	  speed = XINE_SPEED_FAST_2;
 	else if((is_arg_contain(client_info, 2, "SPEED_FAST_4")) ||
 		(is_arg_contain(client_info, 2, "*4")))
-	  speed = SPEED_FAST_4;
+	  speed = XINE_SPEED_FAST_4;
 	else
 	  speed = atoi((get_arg(client_info, 2)));
 	
-	xine_set_speed(gGui->xine, speed);
+	xine_set_param(gGui->xine, XINE_PARAM_SPEED, speed);
       }
     }
     else if(nargs >= 3) {
       if(is_arg_contain(client_info, 1, "audio")) {
 	if(is_arg_contain(client_info, 2, "channel")) {
-	  xine_select_audio_channel(gGui->xine, (atoi(get_arg(client_info, 3))));
+	  xine_set_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL,
+	                 (atoi(get_arg(client_info, 3))));
 	}
 	else if(is_arg_contain(client_info, 2, "volume")) {
-	  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+	  if(gGui->mixer.caps & 0 /* FIXME_API: (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL) */) { 
 	    int vol = atoi(get_arg(client_info, 3));
 
 	    if(vol < 0) vol = 0;
 	    if(vol > 100) vol = 100;
 
 	    gGui->mixer.volume_level = vol;
-	    xine_set_audio_property(gGui->xine, 
-				    gGui->mixer.volume_mixer, gGui->mixer.volume_level);
+	    xine_set_param(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
 	  }
 	  else
 	    sock_write(client_info->socket, "Audio is disabled.\n");
 	}
 	else if(is_arg_contain(client_info, 2, "mute")) {
-	  if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
+	  if(gGui->mixer.caps & 0 /* FIXME_API: AO_CAP_MUTE_VOL */) {
 	    gGui->mixer.mute = get_bool_value((get_arg(client_info, 3)));
-	    xine_set_audio_property(gGui->xine, AO_PROP_MUTE_VOL, gGui->mixer.mute);
+	    xine_set_param(gGui->xine, XINE_PARAM_AO_MUTE, gGui->mixer.mute);
 	  }
 	  else
 	    sock_write(client_info->socket, "Audio is disabled.\n");
@@ -2136,7 +2140,7 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
       }
       else if(is_arg_contain(client_info, 1, "spu")) {
 	if(is_arg_contain(client_info, 2, "channel")) {
-	  xine_select_spu_channel(gGui->xine, (atoi(get_arg(client_info, 3))));
+	  xine_set_param(gGui->xine, XINE_PARAM_SPU_CHANNEL, (atoi(get_arg(client_info, 3))));
 	}
       }
     }
@@ -2187,7 +2191,7 @@ static void do_gui(commands_t *cmd, client_info_t *client_info) {
       }
 
       /* Flush event when xine !play */
-      if(flushing && ((xine_get_status(gGui->xine) != XINE_PLAY))) {
+      if(flushing && ((xine_get_status(gGui->xine) != XINE_STATUS_PLAY))) {
 	XSync(gGui->display, False);
       }
     }
@@ -2255,7 +2259,7 @@ static void do_event(commands_t *cmd, client_info_t *client_info) {
 static void do_seek(commands_t *cmd, client_info_t *client_info) {
   int            nargs;
   
-  if((xine_is_stream_seekable(gGui->xine)) == 0)
+  if((xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE)) == 0)
     return;
   
   nargs = is_args(client_info);
@@ -2271,7 +2275,7 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 	if(pos < 0) pos = 0;
 	
 	gGui->ignore_status = 1;
-	if(!xine_play(gGui->xine, gGui->filename, ((int) (655.35 * pos)), 0))
+	if(!xine_play(gGui->xine, ((int) (655.35 * pos)), 0))
 	  gui_handle_xine_error();
 	gGui->ignore_status = 0;
 	
@@ -2284,7 +2288,9 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 	pos = atoi(arg);
 	
 	if(((arg[0] == '+') || (arg[0] == '-')) && (isdigit(arg[1]))) {
-	  sec = xine_get_current_time(gGui->xine);
+	  int dummy;
+	  xine_get_pos_length(gGui->xine, &dummy, &sec, &dummy);
+	  sec /= 1000;
 	  if((sec + pos) < 0) 
 	    sec = 0;
 	  else
@@ -2294,7 +2300,7 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 	  sec = pos;
 	
 	gGui->ignore_status = 1;
-	if(!xine_play(gGui->xine, gGui->filename, 0, sec))
+	if(!xine_play(gGui->xine, 0, sec))
 	  gui_handle_xine_error();
 	gGui->ignore_status = 0;
       }

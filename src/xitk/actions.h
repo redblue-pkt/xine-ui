@@ -73,9 +73,9 @@ void gui_playlist_show(xitk_widget_t *w, void *data);
 
 void gui_mrlbrowser_show(xitk_widget_t *w, void *data);
 
-void gui_set_current_mrl(char *mrl);
+void gui_set_current_mrl(const char *mrl);
 
-char *gui_get_next_mrl (void);
+const char *gui_get_next_mrl (void);
 
 void gui_control_show(xitk_widget_t *w, void *data);
 

@@ -74,7 +74,7 @@ typedef struct {
   xitk_widget_t        *mod5;
 
   int                   num_entries;
-  char                **entries;
+  const char          **entries;
 
   int                   grabbing;
   int                   action_wanted; /* See KBEDIT_ defines */
@@ -1234,12 +1234,12 @@ static void kbedit_create_browser_entries(void) {
   
   if(kbedit->num_entries) {
     for(i = 0; i < kbedit->num_entries; i++)
-      free(kbedit->entries[i]);
-    free(kbedit->entries);
+      free((char *)kbedit->entries[i]);
+    free((char **)kbedit->entries);
 
   }
 
-  kbedit->entries = (char **) xine_xmalloc(sizeof(char *) * (kbedit->kbt->num_entries + 1));
+  kbedit->entries = (const char **) xine_xmalloc(sizeof(char *) * (kbedit->kbt->num_entries + 1));
   kbedit->num_entries = (kbedit->kbt->num_entries - 1);
   
   for(i = 0; i < kbedit->num_entries; i++) {
@@ -1286,7 +1286,7 @@ static void kbedit_create_browser_entries(void) {
   kbedit->entries[i] = NULL;
 }
 
-static void kbedit_display_kbinding(char *action, kbinding_entry_t *kbe) {
+static void kbedit_display_kbinding(const char *action, kbinding_entry_t *kbe) {
 
   if(action && kbe) {
 
@@ -1381,8 +1381,16 @@ void kbedit_exit(xitk_widget_t *w, void *data) {
   kbedit->visible = 0;
 
   if((xitk_get_window_info(kbedit->kreg, &wi))) {
-    gGui->config->update_num (gGui->config, "gui.kbedit_x", wi.x);
-    gGui->config->update_num (gGui->config, "gui.kbedit_y", wi.y);
+    xine_cfg_entry_t *entry;
+    
+    entry = xine_config_lookup_entry(gGui->xine, "gui.kbedit_x");
+    entry->num_value = wi.x;
+    xine_config_update_entry(gGui->xine, entry);
+    
+    entry = xine_config_lookup_entry(gGui->xine, "gui.kbedit_y");
+    entry->num_value = wi.y;
+    xine_config_update_entry(gGui->xine, entry);
+    
     WINDOW_INFO_ZERO(&wi);
   }
   
@@ -1411,9 +1419,9 @@ void kbedit_exit(xitk_widget_t *w, void *data) {
     int i;
 
     for(i = 0; i < kbedit->num_entries; i++)
-      free(kbedit->entries[i]);
+      free((char *)kbedit->entries[i]);
 
-    free(kbedit->entries);
+    free((char **)kbedit->entries);
   }
 
   kbindings_free_kbinding(&kbedit->kbt);
@@ -1806,8 +1814,8 @@ void kbedit_window(void) {
       return;
   }
   
-  x = gGui->config->register_num (gGui->config, "gui.kbedit_x", 100, NULL, NULL, NULL, NULL);
-  y = gGui->config->register_num (gGui->config, "gui.kbedit_y", 100, NULL, NULL, NULL, NULL);
+  x = xine_config_register_num (gGui->xine, "gui.kbedit_x", 100, NULL, NULL, 20, NULL, NULL);
+  y = xine_config_register_num (gGui->xine, "gui.kbedit_y", 100, NULL, NULL, 20, NULL, NULL);
   
   kbedit = (_kbedit_t *) xine_xmalloc(sizeof(_kbedit_t));
 

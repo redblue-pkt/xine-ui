@@ -117,11 +117,11 @@ unsigned long panel_get_tips_timeout(void) {
 /*
  * Config callbacks.
  */
-static void panel_enable_tips_cb(void *data, cfg_entry_t *cfg) {
+static void panel_enable_tips_cb(void *data, xine_cfg_entry_t *cfg) {
   panel->tips.enable = cfg->num_value;
   panel_show_tips();
 }
-static void panel_timeout_tips_cb(void *data, cfg_entry_t *cfg) {
+static void panel_timeout_tips_cb(void *data, xine_cfg_entry_t *cfg) {
   panel->tips.timeout = cfg->num_value;
   xitk_set_widgets_tips_timeout(panel->widget_list, panel->tips.timeout);
 }
@@ -154,9 +154,15 @@ static int is_wm_is_enlightenment(Display *d, Window w) {
  * coords of panel window.
  */
 static void panel_store_new_position(int x, int y, int w, int h) {
- 
-  gGui->config->update_num (gGui->config, "gui.panel_x", x);
-  gGui->config->update_num (gGui->config, "gui.panel_y", y);
+  xine_cfg_entry_t *entry;
+  
+  entry = xine_config_lookup_entry(gGui->xine, "gui.panel_x");
+  entry->num_value = x;
+  xine_config_update_entry(gGui->xine, entry);
+  
+  entry = xine_config_lookup_entry(gGui->xine, "gui.panel_y");
+  entry->num_value = y;
+  xine_config_update_entry(gGui->xine, entry);
 }
 
 /*
@@ -234,13 +240,14 @@ void panel_change_skins(void) {
  * Update runtime displayed informations.
  */
 void panel_update_runtime_display(void) {
-  int seconds;
+  int seconds, dummy;
   char timestr[10];
 
   if(!panel_is_visible())
     return;
 
-  seconds = xine_get_current_time (gGui->xine);
+  xine_get_pos_length(gGui->xine, &dummy, &seconds, &dummy);
+  seconds /= 1000;
   
   sprintf (timestr, "%02d:%02d:%02d",
 	   seconds / (60*60),
@@ -264,7 +271,7 @@ static void *slider_loop(void *dummy) {
   while(gGui->running) {
     int status = xine_get_status(gGui->xine);
     
-    if(status == XINE_PLAY && gGui->ssaver_timeout) {
+    if(status == XINE_STATUS_PLAY && gGui->ssaver_timeout) {
       
       screensaver_timer++;
       
@@ -277,19 +284,19 @@ static void *slider_loop(void *dummy) {
     if(panel_is_visible()) {
       if(gGui->xine) {
 	
-	if(status == XINE_PLAY) {
-	  xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, 
-			      xine_get_current_position(gGui->xine));
+	if(status == XINE_STATUS_PLAY) {
+	  int pos, dummy;
+	  xine_get_pos_length(gGui->xine, &pos, &dummy, &dummy);
+	  xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
 	}
 
-        if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
-          gGui->mixer.volume_level = xine_get_audio_property(gGui->xine, 
-                                                             gGui->mixer.volume_mixer);
+        if(gGui->mixer.caps & 0 /* FIXME_API: (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL) */) { 
+          gGui->mixer.volume_level = xine_get_param(gGui->xine, XINE_PARAM_AO_MIXER_VOL);
           xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
 	  panel_check_mute();
         }
 	
-	if(status != XINE_STOP)
+	if(status != XINE_STATUS_STOP)
 	  panel_update_runtime_display();
       }
     }
@@ -321,6 +328,7 @@ int panel_is_visible(void) {
  * Show/Hide panel window.
  */
 void panel_toggle_visibility (xitk_widget_t *w, void *data) {
+  xine_cfg_entry_t *entry;
 
   if(!panel->visible && pl_is_visible()) {}
   else {
@@ -409,7 +417,9 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     XUnlockDisplay(gGui->display);
   }
 
-  gGui->config->update_num (gGui->config, "gui.panel_visible", panel->visible);
+  entry = xine_config_lookup_entry(gGui->xine, "gui.panel_visible");
+  entry->num_value = panel->visible;
+  xine_config_update_entry(gGui->xine, entry);
 }
 
 void panel_check_mute(void) {
@@ -424,8 +434,8 @@ void panel_check_mute(void) {
 void panel_check_pause(void) {
   
   xitk_checkbox_set_state(panel->playback_widgets.pause, 
-			  (((xine_get_status(gGui->xine) == XINE_PLAY) && 
-			    (xine_get_speed(gGui->xine) == SPEED_PAUSE)) ? 1 : 0 ), 
+			  (((xine_get_status(gGui->xine) == XINE_STATUS_PLAY) && 
+			    (xine_get_param(gGui->xine, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)) ? 1 : 0 ), 
 			  gGui->panel_window, panel->widget_list->gc);
   
 }
@@ -442,11 +452,15 @@ void panel_reset_slider (void) {
  */
 void panel_update_channel_display (void) {
 
-  xine_get_audio_lang (gGui->xine, panel->audiochan);
+  xine_get_audio_lang (gGui->xine,
+                       xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL),
+                       panel->audiochan);
   xitk_label_change_label (panel->widget_list, panel->audiochan_label, 
 			   panel->audiochan);
   
-  xine_get_spu_lang (gGui->xine, panel->spuid);
+  xine_get_spu_lang (gGui->xine,
+                     xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL),
+                     panel->spuid);
 
   xitk_label_change_label (panel->widget_list, panel->spuid_label, 
 			   panel->spuid);
@@ -473,9 +487,9 @@ void panel_update_mrl_display (void) {
  */
 void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
 
-  if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
+  if(gGui->mixer.caps & 0 /* FIXME_API: AO_CAP_MUTE_VOL*/ ) {
     gGui->mixer.mute = state;
-    xine_set_audio_property(gGui->xine, AO_PROP_MUTE_VOL, gGui->mixer.mute);
+    xine_set_param(gGui->xine, XINE_PARAM_AO_MUTE, gGui->mixer.mute);
   }
   panel_check_mute();
 }
@@ -495,13 +509,13 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 
   if(w == panel->playback_widgets.slider_play) {
     gui_set_current_position (pos);
-    if(xine_get_status(gGui->xine) != XINE_PLAY) {
+    if(xine_get_status(gGui->xine) != XINE_STATUS_PLAY) {
       panel_reset_slider();
     }
   }
   else if(w == panel->mixer.slider) {
     gGui->mixer.volume_level = pos;
-    xine_set_audio_property(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
+    xine_set_param(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
   }
   else
     /* FIXME: this error message does not make sense! */
@@ -540,7 +554,7 @@ void panel_add_autoplay_buttons(void) {
   int                        x, y;
   int                        i = 0;
   xitk_labelbutton_widget_t  lb;
-  char                     **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+  const char         *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
@@ -582,30 +596,30 @@ void panel_add_autoplay_buttons(void) {
  */
 void panel_add_mixer_control(void) {
   
-  gGui->mixer.caps = xine_get_audio_capabilities(gGui->xine);
+  gGui->mixer.caps = 0 /* FIXME_API: xine_get_audio_capabilities(gGui->xine) */;
 
-  if(gGui->mixer.caps & AO_CAP_PCM_VOL)
-    gGui->mixer.volume_mixer = AO_PROP_PCM_VOL;
-  else if(gGui->mixer.caps & AO_CAP_MIXER_VOL)
-    gGui->mixer.volume_mixer = AO_PROP_MIXER_VOL;
+  if(gGui->mixer.caps & 0 /* FIXME_API: AO_CAP_PCM_VOL */)
+    gGui->mixer.volume_mixer = XINE_PARAM_AO_PCM_VOL;
+  else if(gGui->mixer.caps & 0 /* FIXME_API: AO_CAP_MIXER_VOL */)
+    gGui->mixer.volume_mixer = XINE_PARAM_AO_MIXER_VOL;
   
-  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+  if(gGui->mixer.caps & 0 /* FIXME_API: (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL) */) { 
     xitk_enable_widget(panel->mixer.slider);
-    gGui->mixer.volume_level = xine_get_audio_property(gGui->xine, gGui->mixer.volume_mixer);
+    gGui->mixer.volume_level = xine_get_param(gGui->xine, gGui->mixer.volume_mixer);
     xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
   }
 
-  if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
+  if(gGui->mixer.caps & 0 /* FIXME_API: AO_CAP_MUTE_VOL */) {
     xitk_enable_widget(panel->mixer.mute);
-    gGui->mixer.mute = xine_get_audio_property(gGui->xine, AO_PROP_MUTE_VOL);
+    gGui->mixer.mute = xine_get_param(gGui->xine, XINE_PARAM_AO_MUTE);
     xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute,
 			    gGui->panel_window, panel->widget_list->gc);
   }
 
   /* Tips should be available only if widgets are enabled */
-  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL))
+  if(gGui->mixer.caps & 0 /* FIXME_API: (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL) */)
     xitk_set_widget_tips(panel->mixer.slider, _("Volume control"));
-  if(gGui->mixer.caps & AO_CAP_MUTE_VOL)
+  if(gGui->mixer.caps & 0 /* FIXME_API: AO_CAP_MUTE_VOL */)
     xitk_set_widget_tips(panel->mixer.mute, _("Mute toggle"));
 
   if(!panel->tips.enable) {
@@ -664,10 +678,10 @@ void panel_init (void) {
    * open the panel window
    */
 
-  hint.x = gGui->config->register_num (gGui->config, "gui.panel_x", 200,
-				       NULL, NULL, NULL, NULL);
-  hint.y = gGui->config->register_num (gGui->config, "gui.panel_y", 100,
-				       NULL, NULL, NULL, NULL);
+  hint.x = xine_config_register_num (gGui->xine, "gui.panel_x", 200,
+				     NULL, NULL, 20, NULL, NULL);
+  hint.y = xine_config_register_num (gGui->xine, "gui.panel_y", 100,
+				     NULL, NULL, 20, NULL, NULL);
   hint.width = panel->bg_image->rgb_width;
   hint.height = panel->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
@@ -1002,12 +1016,12 @@ void panel_init (void) {
   xitk_set_widget_tips(w, _("MRL Browser"));
   
 
-  panel->tips.enable = gGui->config->register_bool(gGui->config, "gui.tips_visible", 1,
-						   _("gui tips visibility"), NULL,
-						   panel_enable_tips_cb, NULL);
-  panel->tips.timeout = gGui->config->register_num(gGui->config, "gui.tips_timeout", 500,
-						   _("tips timeout (ms)"), NULL, 
-						   panel_timeout_tips_cb, NULL);
+  panel->tips.enable = xine_config_register_bool(gGui->xine, "gui.tips_visible", 1,
+						 _("gui tips visibility"), NULL, 0,
+						 panel_enable_tips_cb, NULL);
+  panel->tips.timeout = xine_config_register_num(gGui->xine, "gui.tips_timeout", 500,
+						 _("tips timeout (ms)"), NULL, 10,
+						 panel_timeout_tips_cb, NULL);
 
   panel_update_nextprev_tips();
   panel_show_tips();
@@ -1015,9 +1029,9 @@ void panel_init (void) {
   /* 
    * show panel 
    */
-  panel->visible = gGui->config->register_bool (gGui->config, "gui.panel_visible", 1,
-						_("gui panel visibility"),
-						NULL, NULL, NULL);
+  panel->visible = xine_config_register_bool (gGui->xine, "gui.panel_visible", 1,
+					      _("gui panel visibility"),
+					      NULL, 0, NULL, NULL);
   
   if(gGui->use_root_window && (!panel->visible))
     panel->visible = 1;

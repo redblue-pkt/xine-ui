@@ -67,7 +67,7 @@ typedef struct {
 
   xitk_widget_t        *tabs;
 
-  char                **log;
+  const char          **log;
   int                   log_entries;
   int                   real_num_entries;
   
@@ -91,8 +91,16 @@ void viewlog_exit(xitk_widget_t *w, void *data) {
   viewlog->visible = 0;
 
   if((xitk_get_window_info(viewlog->kreg, &wi))) {
-    gGui->config->update_num (gGui->config, "gui.viewlog_x", wi.x);
-    gGui->config->update_num (gGui->config, "gui.viewlog_y", wi.y);
+    xine_cfg_entry_t *entry;
+    
+    entry = xine_config_lookup_entry(gGui->xine, "gui.viewlog_x");
+    entry->num_value = wi.x;
+    xine_config_update_entry(gGui->xine, entry);
+    
+    entry = xine_config_lookup_entry(gGui->xine, "gui.viewlog_y");
+    entry->num_value = wi.y;
+    xine_config_update_entry(gGui->xine, entry);
+    
     WINDOW_INFO_ZERO(&wi);
   }
 
@@ -241,12 +249,13 @@ static void viewlog_clear_tab(void) {
  */
 static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   int    i, j, k;
-  char **log = xine_get_log(gGui->xine, section);
-  char   buf[2048], *p;
+  const char *const *log = xine_get_log(gGui->xine, section);
+  char   buf[2048];
+  const char *p;
   
   /* Freeing entries */
   for(i = 0; i <= viewlog->log_entries; i++) {
-    free(viewlog->log[i]);
+    free((char *)viewlog->log[i]);
   }
   
   /* Compute log entries */
@@ -281,7 +290,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 	    
 	  case '\n':
 	    if(strlen(buf)) {
-	      viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	      viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
 	      viewlog->log[j++] = strdup(buf);
 	      viewlog->real_num_entries++;
 	      // printf("added line '%s'\n", viewlog->log[j-1]);
@@ -300,14 +309,14 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 
 	/* Remaining chars */
 	if(strlen(buf)) {
-	  viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	  viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
 	  viewlog->log[j++] = strdup(buf);
 	}
 	
       }
       else {
 	/* Empty log entry line */
-	viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	viewlog->log = (const char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
 	viewlog->log[j++] = strdup(" ");
       }
     }
@@ -350,7 +359,7 @@ static void viewlog_refresh(xitk_widget_t *w, void *data) {
 static void viewlog_create_tabs(void) {
   xitk_pixmap_t       *bg;
   xitk_tabs_widget_t   tab;
-  char               **log_sections = xine_get_log_names(gGui->xine);
+  const char   *const *log_sections = xine_get_log_names(gGui->xine);
   unsigned int         log_section_count = xine_get_log_section_count(gGui->xine);
   char                *tab_sections[log_section_count + 1];
   int                  i;
@@ -419,10 +428,10 @@ void viewlog_window(void) {
   }
   
   viewlog = (_viewlog_t *) xine_xmalloc(sizeof(_viewlog_t));
-  viewlog->log = (char **) xine_xmalloc(sizeof(char **));
+  viewlog->log = (const char **) xine_xmalloc(sizeof(char **));
 
-  x = gGui->config->register_num (gGui->config, "gui.viewlog_x", 100, NULL, NULL, NULL, NULL);
-  y = gGui->config->register_num (gGui->config, "gui.viewlog_y", 100, NULL, NULL, NULL, NULL);
+  x = xine_config_register_num (gGui->xine, "gui.viewlog_x", 100, NULL, NULL, 20, NULL, NULL);
+  y = xine_config_register_num (gGui->xine, "gui.viewlog_y", 100, NULL, NULL, 20, NULL, NULL);
 
   /* Create window */
   viewlog->xwin = xitk_window_create_dialog_window(gGui->imlib_data,

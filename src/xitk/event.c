@@ -47,7 +47,6 @@
 #include "videowin.h"
 #include "panel.h"
 #include "actions.h"
-#include <xine/video_out_x11.h>
 #include <xine.h>
 #include <xine/xineutils.h>
 #include "mrl_browser.h"
@@ -92,24 +91,24 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
-static void auto_vo_visibility_cb(void *data, cfg_entry_t *cfg) {
+static void auto_vo_visibility_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->auto_vo_visibility = cfg->num_value;
 }
-static void auto_panel_visibility_cb(void *data, cfg_entry_t *cfg) {
+static void auto_panel_visibility_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->auto_panel_visibility = cfg->num_value;
 }
-static void skip_by_chapter_cb(void *data, cfg_entry_t *cfg) {
+static void skip_by_chapter_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->skip_by_chapter = cfg->num_value;
   panel_update_nextprev_tips();
 }
-static void ssaver_timeout_cb(void *data, cfg_entry_t *cfg) {
+static void ssaver_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->ssaver_timeout = cfg->num_value;
 }
 
 /*
  * Callback for snapshots saving location.
  */
-static void snapshot_loc_cb(void *data, cfg_entry_t *cfg) {
+static void snapshot_loc_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->snapshot_location = cfg->str_value;
 }
 
@@ -125,12 +124,12 @@ int actions_on_start(action_id_t actions[], action_id_t a) {
 
 void config_save(void) {
 
-  gGui->config->save(gGui->config);
+  xine_save_config(gGui->xine, gGui->configfile);
 }
 
 void config_reset(void) {
 
-  gGui->config->read(gGui->config, gGui->configfile);
+  xine_reset_config(gGui->xine);
 }
 
 /*
@@ -447,15 +446,17 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_AV_SYNC_m3600:
-    xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) - 3600);
+    xine_set_param (gGui->xine, XINE_PARAM_AV_OFFSET,
+      xine_get_param (gGui->xine, XINE_PARAM_AV_OFFSET) - 3600);
     break;
 
   case ACTID_AV_SYNC_p3600:
-    xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) + 3600);
+    xine_set_param (gGui->xine, XINE_PARAM_AV_OFFSET,
+      xine_get_param (gGui->xine, XINE_PARAM_AV_OFFSET) + 3600);
     break;
 
   case ACTID_AV_SYNC_RESET:
-    xine_set_av_offset (gGui->xine, 0);
+    xine_set_param (gGui->xine, XINE_PARAM_AV_OFFSET, 0);
     break;
 
   case ACTID_SPEED_FAST:
@@ -610,13 +611,13 @@ void gui_status_callback (int nStatus) {
 
   /* printf ("gui status callback : %d\n", nStatus); */
   
-  if (nStatus == XINE_STOP) {
+  if (nStatus == XINE_STATUS_STOP) {
     gGui->playlist_cur++;
     panel_reset_slider ();
 
     if (gGui->playlist_cur < gGui->playlist_num) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
+      if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0 )))
 	gui_handle_xine_error();
 
     } else {
@@ -635,7 +636,7 @@ void gui_status_callback (int nStatus) {
 
 }
 
-char *gui_next_mrl_callback (void) {
+const char *gui_next_mrl_callback (void) {
 
   if (gGui->playlist_cur >= (gGui->playlist_num-1)) 
     return NULL;
@@ -781,41 +782,41 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     exit(1);
   }
 
-  if (gGui->config->register_bool (gGui->config, "gui.xsynchronize", 0,
-				   _("synchronized X protocol (debug)"), NULL, NULL, NULL)) {
+  if (xine_config_register_bool (gGui->xine, "gui.xsynchronize", 0,
+				 _("synchronized X protocol (debug)"), NULL, 20, NULL, NULL)) {
     XSynchronize (gGui->display, True);
     fprintf (stderr, _("Warning! Synchronized X activated - this is way slow...\n"));
   }
 
   gGui->layer_above = 
-    gGui->config->register_bool (gGui->config, "gui.layer_above", 1,
-				 _("use wm layer property to place window on top"), 
-				 NULL, NULL, NULL);
+    xine_config_register_bool (gGui->xine, "gui.layer_above", 1,
+			       _("use wm layer property to place window on top"), 
+			       NULL, 0, NULL, NULL);
   
   gGui->snapshot_location = 
-    gGui->config->register_string (gGui->config, "gui.snapshotdir", 
+    xine_config_register_string (gGui->xine, "gui.snapshotdir", 
 				   (char *) (xine_get_homedir()),
 				   _("where snapshots will be saved"),
-				   NULL, snapshot_loc_cb, NULL);
+				   NULL, 0, snapshot_loc_cb, NULL);
   
   gGui->ssaver_timeout =
-    gGui->config->register_num (gGui->config, "gui.screensaver_timeout", 10,
-				_("time between two screensaver fake events, 0 to disable"),
-				NULL, ssaver_timeout_cb, NULL);
+    xine_config_register_num (gGui->xine, "gui.screensaver_timeout", 10,
+			      _("time between two screensaver fake events, 0 to disable"),
+			      NULL, 10, ssaver_timeout_cb, NULL);
   
   gGui->skip_by_chapter = 
-    gGui->config->register_bool (gGui->config, "gui.skip_by_chapter", 1,
-				 _("play next|previous chapter instead of mrl (dvdnav)"), 
-				 NULL, skip_by_chapter_cb, NULL);
+    xine_config_register_bool (gGui->xine, "gui.skip_by_chapter", 1,
+			       _("play next|previous chapter instead of mrl (dvdnav)"), 
+			       NULL, 10, skip_by_chapter_cb, NULL);
 
   gGui->auto_vo_visibility = 
-    gGui->config->register_bool (gGui->config, "gui.auto_video_output_visibility", 0,
-				 _("show/hide video output window regarding to the stream type"), 
-				 NULL, auto_vo_visibility_cb, NULL);
+    xine_config_register_bool (gGui->xine, "gui.auto_video_output_visibility", 0,
+			       _("show/hide video output window regarding to the stream type"), 
+			       NULL, 0, auto_vo_visibility_cb, NULL);
   gGui->auto_panel_visibility = 
-    gGui->config->register_bool (gGui->config, "gui.auto_panel_visibility", 0,
-				 _("automatically show/hide panel window, according to auto_video_output_visibility"), 
-				 NULL, auto_panel_visibility_cb, NULL); 
+    xine_config_register_bool (gGui->xine, "gui.auto_panel_visibility", 0,
+			       _("automatically show/hide panel window, according to auto_video_output_visibility"), 
+			       NULL, 0, auto_panel_visibility_cb, NULL); 
  
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
@@ -936,7 +937,7 @@ void gui_run (void) {
 
   /* autoscan playlist  */
   if(gGui->autoscan_plugin != NULL) {
-    char **autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+    const char *const *autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     
     int i;
 
@@ -946,9 +947,9 @@ void gui_run (void) {
 
 	if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
 	  int num_mrls;
-	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
-							 gGui->autoscan_plugin,
-							 &num_mrls);
+	  const char *const *autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
+								     gGui->autoscan_plugin,
+								     &num_mrls);
 	  int j;
 	  
 	  if(autoplay_mrls) {
@@ -981,9 +982,7 @@ void gui_run (void) {
       if(!panel_is_visible())
 	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
 
-      gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
-					  GUI_DATA_EX_VIDEOWIN_VISIBLE, 
-					  (int *)0);
+      xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (int *)0);
       
     }
 

@@ -58,7 +58,7 @@ typedef struct {
   xitk_widget_list_t   *widget_list;
 
   xitk_widget_t        *skinlist;
-  char                 *skins[64];
+  const char           *skins[64];
   int                   skins_num;
 
   int                   running;
@@ -85,18 +85,17 @@ void control_show_tips(int enabled, unsigned long timeout) {
 }
 
 /*
- * Get current property 'prop' value from vo_driver.
+ * Get current parameter 'param' value from xine.
  */
-static int get_current_prop(int prop) {
-  return (gGui->vo_driver->get_property(gGui->vo_driver, prop));
+static int get_current_param(int param) {
+  return xine_get_param(gGui->xine, param);
 }
 
 /*
- * set property 'prop' to  value 'value'.
- * vo_driver return value on success, ~value on failure.
+ * set parameter 'param' to  value 'value'.
  */
-static int set_current_prop(int prop, int value) {
-  return (gGui->vo_driver->set_property(gGui->vo_driver, prop, value));
+static void set_current_param(int param, int value) {
+  xine_set_param(gGui->xine, param, value);
 }
 
 /*
@@ -105,24 +104,25 @@ static int set_current_prop(int prop, int value) {
 static void active_sliders_video_settings(void) {
   int vidcap;
   
-  if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) {
+  /* FIXME_API: if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) { */
+  if ((vidcap = 0)) {
     
-    if(vidcap & VO_CAP_BRIGHTNESS)
+    if(vidcap /* FIXME_API: & VO_CAP_BRIGHTNESS */)
       xitk_enable_widget(control->bright);
     else
       xitk_disable_widget(control->bright);
     
-    if(vidcap & VO_CAP_SATURATION)
+    if(vidcap /* FIXME_API: & VO_CAP_SATURATION */)
       xitk_enable_widget(control->sat);
     else
       xitk_disable_widget(control->sat);
     
-    if(vidcap & VO_CAP_HUE)
+    if(vidcap /* FIXME_API: & VO_CAP_HUE */)
       xitk_enable_widget(control->hue);
     else
       xitk_disable_widget(control->hue);
     
-    if(vidcap & VO_CAP_CONTRAST)
+    if(vidcap /* FIXME_API: & VO_CAP_CONTRAST */)
       xitk_enable_widget(control->contr);
     else
       xitk_disable_widget(control->contr);
@@ -136,19 +136,19 @@ static void update_sliders_video_settings(void) {
 
   if(xitk_is_widget_enabled(control->hue)) {
     xitk_slider_set_pos(control->widget_list, control->hue, 
-			get_current_prop(VO_PROP_HUE));
+			get_current_param(XINE_PARAM_VO_HUE));
   }
   if(xitk_is_widget_enabled(control->sat)) {
     xitk_slider_set_pos(control->widget_list, control->sat, 
-			get_current_prop(VO_PROP_SATURATION));
+			get_current_param(XINE_PARAM_VO_SATURATION));
   }
   if(xitk_is_widget_enabled(control->bright)) {
     xitk_slider_set_pos(control->widget_list, control->bright, 
-			get_current_prop(VO_PROP_BRIGHTNESS));
+			get_current_param(XINE_PARAM_VO_BRIGHTNESS));
   }
   if(xitk_is_widget_enabled(control->contr)) {
     xitk_slider_set_pos(control->widget_list, control->contr, 
-			get_current_prop(VO_PROP_CONTRAST));
+			get_current_param(XINE_PARAM_VO_CONTRAST));
   }
 }
 
@@ -156,11 +156,10 @@ static void update_sliders_video_settings(void) {
  * Set hue
  */
 static void set_hue(xitk_widget_t *w, void *data, int value) {
-  int ret = 0;
 
-  ret = set_current_prop(VO_PROP_HUE, value);
+  set_current_param(XINE_PARAM_VO_HUE, value);
     
-  if(ret != value)
+  if(get_current_param(XINE_PARAM_VO_HUE) != value)
     update_sliders_video_settings();
 }
 
@@ -168,11 +167,10 @@ static void set_hue(xitk_widget_t *w, void *data, int value) {
  * Set saturation
  */
 static void set_saturation(xitk_widget_t *w, void *data, int value) {
-  int ret = 0;
 
-  ret = set_current_prop(VO_PROP_SATURATION, value);
+  set_current_param(XINE_PARAM_VO_SATURATION, value);
    
-  if(ret != value)
+  if(get_current_param(XINE_PARAM_VO_SATURATION) != value)
     update_sliders_video_settings();
 }
 
@@ -180,11 +178,10 @@ static void set_saturation(xitk_widget_t *w, void *data, int value) {
  * Set brightness
  */
 static void set_brightness(xitk_widget_t *w, void *data, int value) {
-  int ret = 0;
 
-  ret = set_current_prop(VO_PROP_BRIGHTNESS, value);
+  set_current_param(XINE_PARAM_VO_BRIGHTNESS, value);
     
-  if(ret != value)
+  if(get_current_param(XINE_PARAM_VO_BRIGHTNESS) != value)
     update_sliders_video_settings();
 }
 
@@ -192,11 +189,10 @@ static void set_brightness(xitk_widget_t *w, void *data, int value) {
  * Set contrast
  */
 static void set_contrast(xitk_widget_t *w, void *data, int value) {
-  int ret = 0;
 
-  ret = set_current_prop(VO_PROP_CONTRAST, value);
+  set_current_param(XINE_PARAM_VO_CONTRAST, value);
     
-  if(ret != value)
+  if(get_current_param(XINE_PARAM_VO_CONTRAST) != value)
     update_sliders_video_settings();
 }
 
@@ -212,8 +208,16 @@ void control_exit(xitk_widget_t *w, void *data) {
     control->visible = 0;
 
     if((xitk_get_window_info(control->widget_key, &wi))) {
-      gGui->config->update_num (gGui->config, "gui.control_x", wi.x);
-      gGui->config->update_num (gGui->config, "gui.control_y", wi.y);
+      xine_cfg_entry_t *entry;
+      
+      entry = xine_config_lookup_entry(gGui->xine, "gui.control_x");
+      entry->num_value = wi.x;
+      xine_config_update_entry(gGui->xine, entry);
+      
+      entry = xine_config_lookup_entry(gGui->xine, "gui.control_y");
+      entry->num_value = wi.y;
+      xine_config_update_entry(gGui->xine, entry);
+      
       WINDOW_INFO_ZERO(&wi);
     }
 
@@ -240,7 +244,7 @@ void control_exit(xitk_widget_t *w, void *data) {
     free(control->widget_list);
 
     for(i = 0; i < control->skins_num; i++)
-      free(control->skins[i]);
+      free((char *)control->skins[i]);
 
     free(control);
     control = NULL;
@@ -447,10 +451,10 @@ void control_panel(void) {
     exit(-1);
   }
 
-  hint.x = gGui->config->register_num (gGui->config, "gui.control_x", 200,
-				       NULL, NULL, NULL, NULL);
-  hint.y = gGui->config->register_num (gGui->config, "gui.control_y", 100,
-				       NULL, NULL, NULL, NULL);
+  hint.x = xine_config_register_num (gGui->xine, "gui.control_x", 200,
+				     NULL, NULL, 20, NULL, NULL);
+  hint.y = xine_config_register_num (gGui->xine, "gui.control_y", 100,
+				     NULL, NULL, 20, NULL, NULL);
   hint.width = control->bg_image->rgb_width;
   hint.height = control->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
@@ -545,9 +549,10 @@ void control_panel(void) {
     lbl.gc     = control->widget_list->gc;
 
     /* HUE */
+    /* FIXME_API:
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_HUE, &min, &max);
-    cur = get_current_prop(VO_PROP_HUE);
+					  VO_PROP_HUE, &min, &max); */
+    cur = get_current_param(XINE_PARAM_VO_HUE);
     
     sl.skin_element_name = "SliderCtlHue";
     sl.min               = min;
@@ -570,9 +575,10 @@ void control_panel(void) {
     xitk_disable_widget(control->hue);
 
     /* SATURATION */
+    /* FIXME_API:
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_SATURATION, &min, &max);
-    cur = get_current_prop(VO_PROP_SATURATION);
+					  VO_PROP_SATURATION, &min, &max); */
+    cur = get_current_param(XINE_PARAM_VO_SATURATION);
 
     sl.skin_element_name = "SliderCtlSat";
     sl.min               = min;
@@ -595,9 +601,10 @@ void control_panel(void) {
     xitk_disable_widget(control->sat);
       
     /* BRIGHTNESS */
+    /* FIXME_API:
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_BRIGHTNESS, &min, &max);
-    cur = get_current_prop(VO_PROP_BRIGHTNESS);
+					  VO_PROP_BRIGHTNESS, &min, &max); */
+    cur = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
 
     sl.skin_element_name = "SliderCtlBright";
     sl.min               = min;
@@ -620,9 +627,10 @@ void control_panel(void) {
     xitk_disable_widget(control->bright);
       
     /* CONTRAST */
+    /* FIXME_API:
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_CONTRAST, &min, &max);
-    cur = get_current_prop(VO_PROP_CONTRAST);
+					  VO_PROP_CONTRAST, &min, &max); */
+    cur = get_current_param(XINE_PARAM_VO_CONTRAST);
 
     sl.skin_element_name = "SliderCtlCont";
     sl.min               = min;

@@ -255,7 +255,7 @@ typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
 typedef void (*xitk_dnd_callback_t) (char *filename);
 #ifdef NEED_MRLBROWSER
-typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
+typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
 #endif
 
 typedef struct {
@@ -565,7 +565,7 @@ xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
 /**
  *
  */
-void xitk_set_widget_tips(xitk_widget_t *w, char *str);
+void xitk_set_widget_tips(xitk_widget_t *w, const char *str);
 
 /**
  *
@@ -771,7 +771,7 @@ typedef struct {
   ImlibData                *imlibdata;
   int                       button_type;
   int                       align;
-  char                     *label;
+  const char               *label;
   xitk_simple_callback_t    callback;
   xitk_state_callback_t     state_callback;
   void                     *userdata;
@@ -854,7 +854,7 @@ xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
 /**
  * Change label of widget 'widget'.
  */
-int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel);
+int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *l, const char *newlabel);
 
 /**
  * Get label.
@@ -997,7 +997,7 @@ typedef struct {
     char                 *skin_element_name;
     int                   max_displayed_entries;
     int                   num_entries;
-    char                **entries;
+    const char    *const *entries;
   } browser;
   
   xitk_state_callback_t   dbl_click_callback;
@@ -1031,7 +1031,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start);
 /**
  * Update the list, and rebuild button list
  */
-void xitk_browser_update_list(xitk_widget_t *w, char **list, int len, int start);
+void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, int len, int start);
 
 /**
  * slide up.
@@ -1237,7 +1237,7 @@ typedef struct {
     xitk_simple_callback_t   callback;
   } kill;
 
-  char                     **ip_availables;
+  const char         *const *ip_availables;
   
   struct {
 
@@ -1252,7 +1252,7 @@ typedef struct {
 
   } ip_name;
   
-  xine_t                    *xine;
+  const xine_t              *xine;
 
   xitk_browser_widget_t      browser;
   
@@ -1372,7 +1372,7 @@ char *xitk_inputttext_get_text(xitk_widget_t *it);
 /**
  * Change and redisplay the text of widget.
  */
-void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, char *text);
+void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, const char *text);
 
 
 /*
