@@ -768,8 +768,6 @@ escapedprefix="`echo $prefix | sed -e 's/\\//\\\\\//g'`"
 XINE_SCRIPTDIR="`echo $xine_script_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_SCRIPTDIR)
 AC_DEFINE_UNQUOTED(XINE_SCRIPTDIR, "$XINE_SCRIPTDIR", [Location of the scripts])
-XINE_DESKTOPDIR="`echo $xine_desktop_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
-AC_SUBST(XINE_DESKTOPDIR)
 
 XINE_LOCALE="`echo $xine_locale_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_LOCALE)
@@ -801,6 +799,7 @@ AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of xine skin director
 XINE_LOGO_MRL="file:$XINE_SKINDIR/xine_logo.mpv"
 AC_SUBST(XINE_LOGO_MRL)
 AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL",[official logo mrl])
+
 
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )

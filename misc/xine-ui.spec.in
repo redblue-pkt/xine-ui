@@ -2,11 +2,11 @@
 %define version	@SPEC_VERSION@
 %define release	1
 
-%define major   0
+%define major   1
 %define libname libxine%{major}
 
-%define skindir	 %(xine-config --skindir)
-%define deskdir	 %(xine-config --desktopdir)
+%define skindir	 %(_datadir}/xine/skins
+%define deskdir	 %(_datadir}/xine/desktop
 
 %define	ginstall install -c
 
@@ -219,7 +219,7 @@ rm -rf $RPM_BUILD_ROOT
 %doc doc/FAQ_* doc/README.* doc/README_* doc/bug_report_form
 %{_bindir}/*xine*
 %{skindir}/*
-%{_datadir}/idl/xine.idl
+##%{_datadir}/idl/xine.idl
 %{_datadir}/xine/desktop/*
 %lang(de) %{_mandir}/de/man1/*
 %lang(fr) %{_mandir}/fr/man1/*
