@@ -1,112 +1,69 @@
+                                ------------------
+                                xine configuration
+                                ------------------
 
-			--------------------------
-			 some .xine/config options
-			--------------------------
+These settings may be found on ~/.xine/config.
 
-option                  meaning
---------------------------------------------------------------------
+Since xine 0.9.6 they may also be changed using the xine setup dialog.
 
-a52_dynrng              1/0: enable a/52 dynamic range compensation
+Some settings on setup dialog will require xine to be restarted to take effect.
 
-a52_level               0..~200% : a/52 volume control
 
-a52_pass_through        1/0 : enable a/52 output via spdif port
 
-a52_surround_downmix    Enable audio downmixing to 2.0 surround stereo.
-                        (0) off [default]
-			(1) on
+Audio driver specific values:
+-----------------------------
 
-alsa_default_device	Device name used for mono.
-			(e.g. default)
+audio.alsa_default_device       Device name used for mono.
+                                (e.g. default)
 
-alsa_front_device	Device name used for stereo.
-			(e.g. front)
+audio.alsa_front_device         Device name used for stereo.
+				(e.g. front)
 
-alsa_surround40_device	Device name used for 4-channel.
-			(e.g. surround40)
+audio.alsa_surround40_device	Device name used for 4-channel.
+				(e.g. surround40)
 
-alsa_surround50_device	Device name used for 5-channel.
-			(e.g. surround50)
+audio.alsa_surround50_device	Device name used for 5-channel.
+				(e.g. surround50)
 
-alsa_surround51_device	Device name used for 6-channel.
-			(e.g. surround51)
+audio.alsa_surround51_device	Device name used for 6-channel.
+				(e.g. surround51)
 
-alsa_a52_device		Device name used for a/52 passthrough.
-			(e.g. iec958:AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2)
+audio.alsa_a52_device		Device name used for a/52 passthrough.
+				(e.g. iec958:AES0=0x6,AES1=0x82,AES2=0x0,AES3=0x2)
 
-audio_driver_name       audio driver to use, same as command line 
-                        option -A
-                        (e.g. alsa05, alsa09, arts, esd, sun)
+audio.driver                    audio driver to use, same as command line
+                                option -A
+                                (e.g. alsa05, alsa09, arts, esd, sun)
 
-audio_force_rate	If non-zero, force audio output rate to specified
-			value for systems with braindead audio drivers that
-			don't properly communicate back what audio rates they
-			do support.  The default value of 0 attempts to
-			automatically detect the optimum audio output rate
-			(e.g. use 44100 to force 44.1 KHz audio)
+audio.force_rate		If non-zero, force audio output rate to specified
+				value for systems with braindead audio drivers that
+				don't properly communicate back what audio rates they
+				do support.  The default value of 0 attempts to
+				automatically detect the optimum audio output rate
+				(e.g. use 44100 to force 44.1 KHz audio)
 
-audio_resample_mode	Adjust whether resampling is done or not.
-			1 force off
-			2 force on
-			Anything else sets it to auto.
+audio.resample_mode		Adjust whether resampling is done or not.
+				1 force off
+				2 force on
+				Anything else sets it to auto.
 
-colorkey                colorkey to use, may be usefull to change
-                        if parts of your desktop become transparent
+audio.esd_latency               latency between time of audio sample
+				output to esd and actual playback 
+				in audio samples (default 30000)
+				use this to manually adjust a/v sync
+				for esd output
 
-deinterlace_method	method to use for software-deinterlacing (currently
-			only supported on Xv driver):
-			0 none
-			1 bob: if movement is detected on interlaced lines
-			    interpolate the pixels. lose resolution only on
-			    moving pixels but should avoid zig-zag effects.
-			2 weave: similar to bob with a tendency to preserve
-			    original image (less interpolation). must be
-			    good for high detail on low-movement scenes,
-			    but usually has bad output.
-			3 greedy: take either the older or newer weave pixel
-			    depending upon which give the smaller comb factor,
-			    and then clip to avoid large damage when wrong.
-			    very good results for low or intermediate motion.
-			4 onefield: always interpolate lines, not matter they
-			    are static or moving. always lose resolution.
-			5 onefieldxv: the same as onefield except we deliver
-			    half of the lines to Xvideo driver and let it scale
-			    for us. very low cpu usage. not all cards implement
-			    bilinear scaling (interpolation) so this may be
-			    the worst quality method, but it's the only that
-			    don't require MMX.
+audio.five_lfe_channel          1/0 : enable 5.1-channel playback
 
-demux_strategy          0..3: Demuxer detection strategy. 
-			(see xine.h for details about values).
+audio.five_channel              1/0 : enable 5-channel playback
 
-divx4_XXX               see README.divx4
+audio.four_channel              1/0 : enable 4-channel playback
 
-dvd_device              path to your local dvd device file
-			(e.g. /dev/hdc, /dev/cdrom, /dev/dvd)
+audio.mixer_name                Name of mixer device.
 
-dvd_raw_device          path to a raw device set up for dvd access
-			(option, e.g. /dev/rdvd)
+audio.mixer_volume              0..100%: Mixer volume.
 
-dxr3_XXX	and	
-dxr3enc_XXX		see README.dxr3
-
-esd_latency             latency between time of audio sample
-			output to esd and actual playback 
-			in audio samples (default 30000)
-			use this to manually adjust a/v sync
-			for esd output
-
-five_lfe_channel        1/0 : enable 5.1-channel playback
-
-five_channel            1/0 : enable 5-channel playback
-
-four_channel            1/0 : enable 4-channel playback
-
-mixer_name              Name of mixer device.
-
-mixer_volume            0..100%: Mixer volume.
-
-oss_audio_sync          Type of audio/video synchronization desired
+audio.oss_sync_method           Type of audio/video synchronization desired
                         0 = AUTO_DETECT:      System attempts to automatically
                                               detect thhe optimal type of audio/
                                               video synchronization, with the
@@ -132,97 +89,202 @@ oss_audio_sync          Type of audio/video synchronization desired
                                               video synchronization issues
                                               with use of this setting
 
-oss_device_num		-1, 0-16: Forces the OSS plugin to use the specified
-			dspX device, regardless of its capabilities.
-			If -1 (default) is specified, the audio device with
-			the best capabilities will be used.
-			Note: /dev/dsp is usually a symlink to /dev/dsp0
+audio.oss_device_num		-1, 0-16: Forces the OSS plugin to use the specified
+				dspX device, regardless of its capabilities.
+				If -1 (default) is specified, the audio device with
+				the best capabilities will be used.
+				Note: /dev/dsp is usually a symlink to /dev/dsp0
            
-oss_latency             For softsync you can manually adjust the default
-			a/v sync latency here. The units are in miliseconds,
-			so if the sound seems delayed 1 second from the video
-			set it to 1000. (default value = 0)
+audio.oss_latency               For softsync you can manually adjust the default
+				a/v sync latency here. The units are in miliseconds,
+				so if the sound seems delayed 1 second from the video
+				set it to 1000. (default value = 0)
 
-syncfb_device           Path to the syncfb device (default: /dev/syncfb)
+audio.sun_static_delay          sun driver static delay (latency)
+
+
+
+codec specific values:
+----------------------
+
+codec.a52_dynrng                1/0: enable a/52 dynamic range compensation
+
+codec.a52_level                 0..~200% : a/52 volume control
+
+codec.a52_pass_through          1/0 : enable a/52 output via spdif port
+
+codec.a52_surround_downmix      Enable audio downmixing to 2.0 surround stereo.
+                                (0) off [default]
+                                (1) on
+
+codec.divx4_XXX                 see README.divx4
+
+codec.win32_path                path to where you have installed win32
+                                codec dlls for avi playback, e.g. 
+                                /usr/lib/win32
+
+dxr3.XXX			see README.dxr3
+
+
+
+input plugins specific values:
+------------------------------
+
+input.dvd_device                path to your local dvd device file
+				(e.g. /dev/hdc, /dev/cdrom, /dev/dvd)
+
+input.dvd_raw_device            path to a raw device set up for dvd access
+				(option, e.g. /dev/rdvd)
+
+input.vcd_device                path to your local vcd device file
+                                (option, e.g. /dev/cdrom)
+
+input.cda_device                path to your local cd audio device file
+				(option, e.g. /dev/cdaudio)
+
+input.cda_cddb_server           cddbp server name (for quering audio cd track
+                                names). (default: freedb.freedb.org)
+
+input.cda_cddb_port:8880        cddbp server port (default: 8880)
+
+input.cda_cddb_cachedir         cddbp cache directory
+
+input.file_origin_path          origin path to grab file mrls
+
+input.file_hidden_files         hidden files displaying (filenames starting
+                                with dot)
+
+                                
+miscelaneus values:
+-------------------
+
+misc.demux_strategy             0..3: Demuxer detection strategy. 
+                                (see xine.h for details about values).
+
+misc.memcpy_method              Memcopy method to use in xine for large data chunks.
+                                Will be probed on first xine run. possible values:
+                                { probe  glibc  kernel  mmx  mmxext  sse }
+
+misc.osd_text_palette           Palette (foreground-border-background) to use
+                                on subtitles (not DVD!) available options:
+                                  white-black-transparent
+                                  white-none-transparent
+                                  white-none-translucid
+                                  yellow-black-transparent
+
+misc.osd_display               Show status on play, pause, ff, ...
+
+
+                                                            
+video driver specific values:
+-----------------------------
+
+video.deinterlace_method	method to use for software-deinterlacing (currently
+				only supported on Xv driver):
+			0 none
+			1 bob: if movement is detected on interlaced lines
+			  interpolate the pixels. lose resolution only on
+			  moving pixels but should avoid zig-zag effects.
+			2 weave: similar to bob with a tendency to preserve
+			  original image (less interpolation). must be
+			  good for high detail on low-movement scenes,
+			  but usually has bad output.
+			3 greedy: take either the older or newer weave pixel
+			  depending upon which give the smaller comb factor,
+			  and then clip to avoid large damage when wrong.
+			  very good results for low or intermediate motion.
+			4 onefield: always interpolate lines, not matter they
+			  are static or moving. always lose resolution.
+			5 onefieldxv: the same as onefield except we deliver
+			  half of the lines to Xvideo driver and let it scale
+			  for us. very low cpu usage. not all cards implement
+			  bilinear scaling (interpolation) so this may be
+			  the worst quality method, but it's the only that
+			  don't require MMX.
+
+
+video.syncfb_device             Path to the syncfb device (default: /dev/syncfb)
 			
-syncfb_default_repeat   Specifies how many times a frame is repeated.
-			Defaults to 3.
-			(note: hardware deinterlacing will always use 1)
+video.syncfb_default_repeat     Specifies how many times a frame is repeated.
+				Defaults to 3.
+				(note: hardware deinterlacing will always use 1)
 
-skin                    skin to use, see <prefix>/share/xine/skins
-                        for installed skins
-                        (e.g. default, lcd, pitt, xinetic)
+video.driver                    video driver to use, same as command line 
+                                option -V
+                                (e.g. aa, Syncfb, XShm, Xv)
 
-video_driver_name       video driver to use, same as command line 
-                        option -V
-                        (e.g. aa, Syncfb, XShm, Xv)
+video.xshm_gamma		gamma correction for XShm driver (-100..100)
+				note: in fact, it may be referred as brightness
 
-win32_path              path to where you have installed win32
-                        codec dlls for avi playback, e.g. 
-                        /usr/lib/win32
+*** NOTE: not all XV attributes are available for every video card/driver
+      
+video.XV_COLORKEY               -1000..1000: X11 XVideo COLORKEY property value.
+                                colorkey to use, may be usefull to change
+                                if parts of your desktop become transparent
 
-xine_debug		Various decimal values.
-			See ./xine-lib/xine-engine/monitor.h
-			for a list.
+video.XV_BRIGHTNESS             -1000..1000: X11 XVideo BRIGHTNESS property value.
 
-xshm_gamma		gamma correction for XShm driver (-100..100)
-                        
-XV_COLORKEY             -1000..1000: X11 XVideo COLORKEY property value.
+video.XV_CONTRAST               -1000..1000: X11 XVideo CONTRAST property value.
 
-XV_BRIGHTNESS           -1000..1000: X11 XVideo BRIGHTNESS property value.
+video.XV_SATURATION             -1000..1000: X11 XVideo SATURATION property value.
 
-XV_CONTRAST             -1000..1000: X11 XVideo CONTRAST property value.
+video.XV_HUE                    -1000..1000: X11 XVideo HUE property value.
 
-XV_SATURATION           -1000..1000: X11 XVideo SATURATION property value.
+video.XV_FILTER                 Enable bilinear scaling mode on Permedia cards
+                                (may impact on performance)
+                                            0 = no filter
+                                Permedia 2: 1 = enabled
+                                Permedia 3: 1 = partial (x direction); 2 = full
+                                No other cards seem to support this. 
 
-XV_HUE                  -1000..1000: X11 XVideo HUE property value.
+video.XV_DOUBLE_BUFFER          Enable double buffering to sync video on
+                                monitor retrace. At least nvidia drivers
+                                should support this.
 
-XV_FILTER               Enable bilinear scaling mode on Permedia cards
-                        (may impact on performance)
-                                    0 = no filter
-                        Permedia 2: 1 = enabled
-                        Permedia 3: 1 = partial (x direction only); 2 = full
-                        No other cards seem to support this. 
-
-zoom_mpeg1              1/0 : enable automatic zoom of small
-                        (e.g. mpeg1) videos to double size
-
+video.zoom_mpeg1                1/0 : enable automatic zoom of small
+                                (e.g. mpeg1) videos to double size
 
 
 xine-ui specific values:
 -----------------------
 
-layer_above             Boolean value of WM layer property using.
+gui.tips_visible            gui tips visibility
 
-use_xvidext             XINE can switch to a different screen resolution which
-                        fits your video material best when toggling fullscreen
-			mode by using the XF86VidMode Extension.
-			(0) off [default]
-			(1) on
+tips_timeout                tips timeout (ms), default: 500
+
+gui.skin                    skin to use, see <prefix>/share/xine/skins
+                            for installed skins
+                            (e.g. default, lcd, pitt, xinetic)
+
+gui.layer_above             Boolean value of WM layer property using.
+
+gui.use_xvidext             XINE can switch to a different screen resolution which
+                            fits your video material best when toggling fullscreen
+			    mode by using the XF86VidMode Extension.
+			    (0) off [default]
+			    (1) on
 
 *** NOTE: following values shouldn't be changed by user:
-panel_x                 X coords of panel window in root window.
+gui.panel_x                 X coords of panel window in root window.
 
-panel_y                 Y coords of panel window in root window.
+gui.panel_y                 Y coords of panel window in root window.
 
-panel_visible           Visibility boolean value of panel window.
+gui.panel_visible           Visibility boolean value of panel window.
 
-control_x               X coords of control window in root window.
+gui.control_x               X coords of control window in root window.
 
-control_y               Y coords of control window in root window.
+gui.control_y               Y coords of control window in root window.
 
-playlist_x              X coords of playlist window in root window.
+gui.playlist_x              X coords of playlist window in root window.
 
-playlist_y              Y coords of playlist window in root window.
+gui.playlist_y              Y coords of playlist window in root window.
 
-x_mrl_browser           X coords of mrl browser window in root window.
+gui.x_mrl_browser           X coords of mrl browser window in root window.
 
-y_mrl_browser           Y coords of mrl browser window in root window.
+gui.y_mrl_browser           Y coords of mrl browser window in root window.
 ***
 
 
-The following exist, but details are not yet available.
-sun_static_delay        Unknown
 
 --- 
 version of this file:
