@@ -169,9 +169,6 @@ static void get_stream_yesno_info(xitk_widget_t *w, int info) {
   uint32_t   iinfo;
   
   iinfo = xine_get_stream_info(gGui->stream, info);
-  if(w == sinfos->infos.seekable) {
-    printf("iinfo is %d, answer is %s\n", iinfo, (get_yesno_string(iinfo)));
-  }
   set_label(w, (get_yesno_string(iinfo)));
 }
 
