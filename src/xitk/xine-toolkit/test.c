@@ -266,6 +266,27 @@ static void change_browser_entry(xitk_widget_t *w, void *data, char *currenttext
 /*
  *
  */
+static void create_frame(void) {
+  Pixmap    bg;
+  int       width, height;
+  char     *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
+  int       x = 350, y = 50, w = 200, h = 150;
+  
+  xitk_window_get_window_size(test->xwin, &width, &height);
+  bg = xitk_image_create_pixmap(test->imlibdata, width, height);
+  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg,
+	    test->widget_list->gc, 0, 0, width, height, 0, 0);
+  
+  draw_outter_frame(test->imlibdata, bg, "My Frame", fontname, x, y, w, h);
+  draw_inner_frame(test->imlibdata, bg, NULL, NULL, x+(w>>2), y+(h>>2), w>>1, h>>1);
+  
+  xitk_window_change_background(test->imlibdata, test->xwin, bg, width, height);
+  XFreePixmap(test->display, bg);
+}
+
+/*
+ *
+ */
 static void create_inputtext(void) {
   xitk_inputtext_widget_t  inp;
   char                    *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
@@ -603,6 +624,7 @@ int main(int argc, char **argv) {
   create_combo();
   create_label();
   create_inputtext();
+  create_frame();
   
   test->kreg = xitk_register_event_handler("test", 
 					   (xitk_window_get_window(test->xwin)),

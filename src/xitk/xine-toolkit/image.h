@@ -175,4 +175,12 @@ void draw_rectangular_inner_box(ImlibData *im, Pixmap p, int x, int y, int width
  */
 void draw_rectangular_outter_box(ImlibData *im, Pixmap p, int x, int y, int width, int height);
 
+/*
+ *
+ */
+void draw_inner_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
+		      int x, int y, int w, int h);
+void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
+		       int x, int y, int w, int h);
+
 #endif

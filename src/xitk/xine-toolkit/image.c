@@ -449,7 +449,8 @@ void draw_arrow_down(ImlibData *im, xitk_image_t *p) {
  *
  */
 static void _draw_rectangular_box(ImlibData *im, Pixmap p, 
-				  int x, int y, int width, int height, int relief) {
+				  int x, int y, int excstart, int excstop,
+				  int width, int height, int relief) {
   GC            gc;
   XGCValues     gcv;
 
@@ -465,7 +466,8 @@ static void _draw_rectangular_box(ImlibData *im, Pixmap p,
   else if(relief == DRAW_INNER)
     XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
 
-  XDrawLine(im->x.disp, p, gc, x, y, (x + width), y);
+  XDrawLine(im->x.disp, p, gc, x, y, (x + excstart), y);
+  XDrawLine(im->x.disp, p, gc, (x + excstop), y, (x + width), y);
   XDrawLine(im->x.disp, p, gc, x, y, x, (y + height));
   if(relief == DRAW_OUTTER)
     XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
@@ -522,10 +524,10 @@ static void _draw_rectangular_box_with_colors(ImlibData *im, Pixmap p,
  *
  */
 void draw_rectangular_inner_box(ImlibData *im, Pixmap p, int x, int y, int width, int height) {
-  _draw_rectangular_box(im, p, x, y, width, height, DRAW_INNER);
+  _draw_rectangular_box(im, p, x, y, 0, 0, width, height, DRAW_INNER);
 }
 void draw_rectangular_outter_box(ImlibData *im, Pixmap p, int x, int y, int width, int height) {
-  _draw_rectangular_box(im, p, x, y, width, height, DRAW_OUTTER);
+  _draw_rectangular_box(im, p, x, y, 0, 0, width, height, DRAW_OUTTER);
 }
 
 /*
@@ -638,6 +640,8 @@ static void _draw_relief(ImlibData *im, Pixmap p, int w, int h, int relief) {
   
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
   XFillRectangle(im->x.disp, p, gc, 0, 0, w , h);
+
+  XUNLOCK(im->x.disp);
   
   if(relief != DRAW_FLATTER) {
 
@@ -653,6 +657,7 @@ static void _draw_relief(ImlibData *im, Pixmap p, int w, int h, int relief) {
 					relief);
   }
 
+  XLOCK(im->x.disp);
   XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 }
@@ -720,6 +725,8 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
 
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
   XFillRectangle(im->x.disp, p->image, gc, (w * 2) + 2, 2, ((w * 3) - 1) - 4, (h - 1) - 2);
+
+  XUNLOCK(im->x.disp);
   
   _draw_rectangular_box_with_colors(im, p->image, 2, 2, (w-1)-4, (h-1)-4, 
 				    xitk_get_pixel_color_white(im),
@@ -755,9 +762,9 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
     }
   }
   
+  XLOCK(im->x.disp);
   XFreeGC(im->x.disp, gc);
   XFreeGC(im->x.disp, mgc);
-
   XUNLOCK(im->x.disp);
 }
 /*
@@ -815,6 +822,98 @@ void draw_flat_with_color(ImlibData *im, Pixmap p, int w, int h, unsigned int co
 /*
  *
  */
+static void _draw_frame(ImlibData *im, Pixmap p, 
+			char *title, char *fontname, int style, int x, int y, int w, int h) {
+  GC             gc = None;
+  XGCValues      gcv;
+  xitk_font_t   *fs = NULL;
+  int            sty[2];
+  int            yoff = 0, xstart = 0, xstop = 0, fheight = 0, fwidth = 0;
+  char           buf[BUFSIZ];
+
+  assert(im && (p != None));
+  
+  if(title) {
+
+    XLOCK(im->x.disp);
+    gcv.graphics_exposures = False;
+    gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
+    XUNLOCK(im->x.disp);
+    
+    fs = xitk_font_load_font(im->x.disp, (fontname ? fontname : DEFAULT_FONT_12));
+    xitk_font_set_font(fs, gc);
+    fheight = xitk_font_get_string_height(fs, title);
+    fwidth = xitk_font_get_string_length(fs, title);
+    
+    if(fwidth > w) {
+      int nchar = 0;
+      
+      memset(&buf, 0, sizeof(buf));
+      /* Limit the title to width of frame */
+      do {
+	nchar++;
+	snprintf(buf, nchar, "%s", title);
+      } while(xitk_font_get_string_length(fs, buf) < (w - 6));
+      /* Cut title, add three dots a the end */
+      nchar -= 4;
+      snprintf(buf, nchar, "%s", title);
+      sprintf(buf, "%s%s", buf, "...");
+    }
+    else
+      sprintf(buf, "%s", title);
+
+    fwidth = xitk_font_get_string_length(fs, buf);
+  }
+
+  sty[0] = (style == DRAW_INNER) ? DRAW_INNER : DRAW_OUTTER;
+  sty[1] = (style == DRAW_INNER) ? DRAW_OUTTER : DRAW_INNER;
+
+  /* Dont draw frame box under frame title */
+  if(title) {
+    yoff = (fheight>>1);
+    xstart = 3;
+    xstop = fwidth + 12;
+  }
+  _draw_rectangular_box(im, p, x, (y - yoff), 
+			xstart, xstop,
+			w, (h - yoff), sty[0]);
+  
+  if(title)
+    xstart--;
+  
+  _draw_rectangular_box(im, p, (x + 1), ((y - yoff) + 1), 
+			xstart, xstop,
+			(w - 2), ((h - yoff) - 2), sty[1]);
+  
+  if(title) {
+    XLOCK(im->x.disp);
+    XDrawString(im->x.disp, p, gc, (x + 6), y, buf, strlen(buf));
+    XUNLOCK(im->x.disp);
+    
+    xitk_font_unload_font(fs);
+    
+    XLOCK(im->x.disp);
+    XFreeGC(im->x.disp, gc);
+    XUNLOCK(im->x.disp);
+  }
+
+}
+
+/*
+ *
+ */
+void draw_inner_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
+		      int x, int y, int w, int h) {
+  _draw_frame(im, p, title, fontname, DRAW_INNER, x, y, w, h);
+}
+void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
+		       int x, int y, int w, int h) {
+  _draw_frame(im, p, title, fontname, DRAW_OUTTER, x, y, w, h);
+}
+
+/*
+ *
+ */
 xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   ImlibImage    *img = NULL;
   xitk_image_t  *i;
@@ -825,7 +924,6 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
     XITK_WARNING("%s(): image name is NULL\n", __FUNCTION__);
     return NULL;
   }
-
 
   i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
   
