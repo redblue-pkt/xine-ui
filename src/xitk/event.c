@@ -495,7 +495,7 @@ void gui_status_callback (int nStatus) {
       if(gGui->autoplay_options & QUIT_ON_STOP)
 	gui_exit(NULL, NULL);
       
-      video_window_draw_logo();
+      video_window_show_logo();
       gGui->playlist_cur--;
     }
   }
