@@ -352,7 +352,7 @@ AM_CONDITIONAL(HAVE_GETOPT_LONG, test x"$ac_getopt_long" = "xyes")
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
 dnl
-INCLUDES='-I$(top_srcdir) -I$(top_builddir)'
+INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/src/common -I$(top_builddir)/src/common'
 AC_SUBST(INCLUDES)
 
 

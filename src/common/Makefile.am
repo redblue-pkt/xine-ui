@@ -1,5 +1,6 @@
 
-EXTRA_DIST = getopt.c getopt1.c getopt.h
+EXTRA_DIST = getopt.c getopt1.c getopt.h utils.c
+noinst_HEADERS = utils.h
 
 
 mostlyclean-generic:
