@@ -446,14 +446,27 @@ static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
   if(filepathname) {
     char *filename = NULL;
     char *_filepathname;
+    char *tilde;
     
-    xine_strdupa(_filepathname, filepathname);
-    
+    if((tilde = strchr(filepathname, '~')) && (*(tilde - 1) != '\\')) {
+      const char *homedir = xine_get_homedir();
+      int         len = strlen(homedir) + (tilde - filepathname);
+      
+      tilde++;
+      
+      if(*tilde == '/')
+	len += strlen(tilde);
+      
+      _filepathname = (char *) alloca(len + 1);
+      sprintf(_filepathname, "%s%s", homedir, (tilde) ? tilde : "");
+    }
+    else 
+      xine_strdupa(_filepathname, filepathname);
+
     if(!is_a_dir((char *)_filepathname))
       filename = strrchr(_filepathname, '/');
     
     if(filename && (strlen(filename) > 1)) {
-      
       *filename++ = '\0';
       sprintf(fb->filename, "%s", filename);
       
