@@ -64,6 +64,8 @@ struct oxine_s {
   int                mm_sort_type;
 
   void (*main_menu_cb) (void *data);
+  list_t            *main_menu_items;
+  int                win_x, win_y, win_w, win_h;
 
   void (*reentry) (void *data);
   void               *reentry_data;

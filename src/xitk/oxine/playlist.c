@@ -83,6 +83,7 @@ static void changelist (otk_widget_t *list) {
 
   char tmp[512];
   int i;
+  char *pretty_name;
 
   otk_remove_listentries(list);
 
@@ -102,12 +103,16 @@ static void changelist (otk_widget_t *list) {
       else
         snprintf(tmp, 511, "[*] %s", item->title);
     */
-    snprintf(tmp, 511, "%s %s",  ( i == gGui->playlist.cur ) ? "->" : "  ",
-                                 (gGui->playlist.mmk[i]->ident &&
-                                  strcmp(gGui->playlist.mmk[i]->ident,gGui->playlist.mmk[i]->mrl)) ?
-                                    gGui->playlist.mmk[i]->ident :
-                                    get_basename(gGui->playlist.mmk[i]->mrl));
+    if( gGui->playlist.mmk[i]->ident &&
+        strlen(gGui->playlist.mmk[i]->ident) &&
+        strcmp(gGui->playlist.mmk[i]->ident,gGui->playlist.mmk[i]->mrl) )
+      pretty_name = gGui->playlist.mmk[i]->ident;
+    else if( !strchr(gGui->playlist.mmk[i]->mrl, ':') )
+      pretty_name = get_basename(gGui->playlist.mmk[i]->mrl);
+    else
+      pretty_name = gGui->playlist.mmk[i]->ident;
     
+    snprintf(tmp, 511, "%s %s",  ( i == gGui->playlist.cur ) ? "->" : "  ", pretty_name);
     otk_add_listentry(list, tmp, NULL, -1);
   }
   otk_list_set_pos(list,0);

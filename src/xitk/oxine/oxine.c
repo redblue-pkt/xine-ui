@@ -38,6 +38,7 @@
 #include "odk.h"
 #include "otk.h"
 #include "event.h"
+#include "xine/xmlparser.h"
 #include "utils.h"
 
 #include "mediamarks.h"
@@ -46,12 +47,21 @@
 extern gGui_t          *gGui;
 static oxine_t         *oxine_instance = NULL;
 
+
+typedef struct menuitem_s menuitem_t;
+
+struct menuitem_s {
+  char *title;
+  void *data;
+  int  x, y, w, h;
+  void (*func)(void *data);
+};
+
+
 static void main_menu_cb(void *data);
 static void playing_menu_cb(void *data);
 static void media_stop_cb(void *data);
 static void media_info_cb(void *data);
-//static void media_returnto_cb(void *data);
-//static void media_freeandreturnto_cb(void *data);
 static void media_pause_cb(void *data, int i);
 
 //static void event_delay(void *data);
@@ -79,9 +89,6 @@ static void media_stop_cb(void *data) {
   oxine_t *oxine = (oxine_t*) data;
 
   odk_stop(oxine->odk);
-  /*
-  odk_open_and_play(oxine->odk, oxine->menu_bg);
-  */
   oxine->main_menu_cb(oxine);
 }
 
@@ -258,42 +265,48 @@ static void media_info_cb(void *data) {
   schedule_job(5000, media_info_close_cb, oxine);
 }
 
-/*
-static void media_returnto_cb(void *data) {
-  oxine_t *oxine = (oxine_t*) data;
-
-  oxine->need_draw = 0;
-  printf("%d\n", oxine->mode);
-  oxine->mode = OXINE_MODE_NORMAL;
-  printf("%d\n", oxine->mode);
-  oxine->pauseplay = NULL;
-  otk_clear(oxine->otk); 
-}
-*/
-
 static void shutdown_cb (void *data) {
   gui_execute_action_id(ACTID_QUIT);
 }
 
-static void dvb_cb (void *data) {
-  oxine_t *oxine = (oxine_t*) data;
+static void mrl_cb (void *data) {
+  char *parameter = (char *) data;
+  oxine_t *oxine = oxine_instance;
 
   oxine->pauseplay = NULL;
   oxine->main_window = NULL;
   otk_clear(oxine->otk);
   oxine->mode = OXINE_MODE_NORMAL;
-  odk_open_and_play(oxine->odk, "dvb://");
+  odk_open_and_play(oxine->odk, parameter);
 }
 
-static void tv_cb (void *data) {
-  oxine_t *oxine = (oxine_t*) data;
+static void autoplay_cb (void *data) {
+  char *parameter = (char *) data;
+  oxine_t *oxine = oxine_instance;
+  int    num_mrls, j;
+  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
+                         parameter,
+                         &num_mrls);
 
-  oxine->pauseplay = NULL;
-  oxine->main_window = NULL;
-  otk_clear(oxine->otk);
-  oxine->mode = OXINE_MODE_NORMAL;
-  odk_open_and_play(oxine->odk, "v4l://");
-}
+  if(autoplay_mrls) {
+    playlist_delete_all(NULL, NULL);
+
+    for (j = 0; j < num_mrls; j++)
+      mediamark_append_entry((const char *)autoplay_mrls[j],
+                             (const char *)autoplay_mrls[j], NULL, 0, -1, 0, 0);
+
+    oxine->pauseplay = NULL;
+    oxine->main_window = NULL;
+    otk_clear(oxine->otk);
+    oxine->mode = OXINE_MODE_NORMAL;
+
+    gGui->playlist.cur = 0;
+    gui_set_current_mmk(mediamark_get_current_mmk());
+
+    gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
+                           gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 0);
+  }
+}  
 
 
 static void playing_menu_update(void *data) {
@@ -379,9 +392,181 @@ static void playing_menu_cb(void *data) {
    otk_draw_all(oxine->otk);
 }
 
+static char *read_entire_file (const char *mrl, int *file_size) {
+
+  char        *buf;
+  struct stat  statb;
+  int          fd;
+
+  if (stat (mrl, &statb) < 0) {
+    lprintf ("cannot stat '%s'\n", mrl);
+    return NULL;
+  }
+
+  *file_size = statb.st_size;
+
+  fd = open (mrl, O_RDONLY);
+  if (fd<0)
+    return NULL;
+
+  buf = ho_newstring((*file_size)+1);
+
+  if (!buf)
+    return NULL;
+
+  buf[*file_size]=0;
+
+  *file_size = read (fd, buf, *file_size);
+
+  close (fd);
+
+  return buf;
+}
+
+static menuitem_t *menuitem_load(xml_node_t *node) {
+  
+  menuitem_t *item = ho_new(menuitem_t);
+  char *type;
+  
+  item->x = atoi(xml_parser_get_property(node, "x"));
+  item->y = atoi(xml_parser_get_property(node, "y"));
+  item->w = atoi(xml_parser_get_property(node, "width"));
+  item->h = atoi(xml_parser_get_property(node, "height"));
+  item->func = NULL;
+  item->title = NULL;
+  item->data = NULL;
+
+  node = node->child;
+  while( node ) {
+
+    if (!strcasecmp (node->name, "title")) {
+      item->title = ho_strdup (node->data);
+    } else if (!strcasecmp (node->name, "action")) {
+
+      type = xml_parser_get_property(node, "type");
+      if(type) {
+        if(!strcasecmp(type, "autoplay")) {
+          item->data = ho_strdup(xml_parser_get_property (node, "parameter"));
+          item->func = autoplay_cb;
+        }
+        if(!strcasecmp(type, "mrl")) {
+          item->data = ho_strdup(xml_parser_get_property (node, "parameter"));
+          item->func = mrl_cb;
+        }
+        if(!strcasecmp(type, "mediamarks")) {
+          item->func = mediamarks_cb;
+        }
+        if(!strcasecmp(type, "playlist")) {
+          item->func = playlist_cb;
+        }
+        if(!strcasecmp(type, "shutdown")) {
+          item->func = shutdown_cb;
+        }
+        if(!strcasecmp(type, "shell")) {
+        }
+      }
+    }
+    node=node->next;
+  }
+
+  return item;
+}
+
+static int read_main_menu(oxine_t *oxine, list_t *list, const char *mrl) {
+
+  int size;
+  char *file = read_entire_file(mrl, &size);
+  xml_node_t *node;
+
+  if (!file) return 0;
+
+  xml_parser_init (file, strlen (file), XML_PARSER_CASE_INSENSITIVE);
+
+  if (xml_parser_build_tree (&node)<0) {
+    lprintf("xml parsing of %s failed\n", mrl);
+    return 0;
+  }
+
+  if (strcasecmp (node->name, "oxinemm")) {
+    lprintf ("error, root node must be OXINEMM\n");
+    return 0;
+  }
+
+  node = node->child;
+
+  if (!node || strcasecmp (node->name, "window")) {
+    lprintf ("error, node WINDOW expected (%s found)\n", (!node) ? "(null)" : node->name );
+    return 0;
+  }
+
+  oxine->win_x = atoi(xml_parser_get_property(node, "x"));
+  oxine->win_y = atoi(xml_parser_get_property(node, "y"));
+  oxine->win_w = atoi(xml_parser_get_property(node, "width"));
+  oxine->win_h = atoi(xml_parser_get_property(node, "height"));
+
+  node = node->child;
+
+  while (node) {
+
+    if (!strcasecmp (node->name, "entry")) {
+      menuitem_t *item = menuitem_load(node);
+      if( item )
+        list_append_content(list, item);
+    }
+
+    node=node->next;
+  }
+  
+  xml_parser_free_tree(node);
+  ho_free(file);
+
+  return 1;
+}
+
+static void main_menu_init(oxine_t *oxine)
+{
+  char         mmpath[XITK_NAME_MAX];
+
+  oxine->main_menu_items = list_new();
+  
+  memset(mmpath,0,sizeof(mmpath));
+  snprintf(mmpath,sizeof(mmpath),"%s/.xine/oxine/mainmenu", xine_get_homedir());
+  if (!read_main_menu(oxine, oxine->main_menu_items, mmpath)) {
+    lprintf("trying to load system wide mainmenu\n");
+    snprintf(mmpath,1024,"%s/mainmenu", XINE_OXINEDIR);
+    if (read_main_menu(oxine, oxine->main_menu_items, mmpath)) {
+      /**/
+    } else {
+      list_free(oxine->main_menu_items);
+      oxine->main_menu_items = NULL;
+    }
+  } else {
+    /**/
+  }
+}
+
+static void main_menu_free(list_t *list) {
+
+  menuitem_t *item;
+
+  if (!list) return;
+
+  item = list_first_content(list);
+  while (item) {
+    if (item->title) ho_free(item->title);
+    if (item->data) ho_free(item->data);
+    list_delete_current(list);
+    ho_free(item);
+    item = list_first_content(list);
+  }
+
+  list_free(list);
+}
+
 static void main_menu_cb(void *data) {
   
   oxine_t *oxine = (oxine_t*) data;
+  menuitem_t *item;
   otk_widget_t *b;
 
   lock_job_mutex();
@@ -395,6 +580,7 @@ static void main_menu_cb(void *data) {
 
   otk_clear(oxine->otk);
 
+#if 0
   oxine->main_window = otk_window_new (oxine->otk, NULL, 50, 130, 700, 420);
 
   /*
@@ -405,13 +591,16 @@ static void main_menu_cb(void *data) {
   b = otk_button_new (oxine->main_window, 360, 45, 290, 60, "Mediamarks", mediamarks_cb, oxine);
   otk_set_focus(b);
     
+  /*
   b = otk_button_new (oxine->main_window, 50, 150, 290, 60, "Analogue TV", tv_cb, oxine);
   otk_set_focus(b);
+  */
   
   otk_button_new (oxine->main_window, 360, 150, 290, 60, "Playlist", playlist_cb, oxine);
-  
-  otk_button_new (oxine->main_window, 50, 255, 290, 60, "Digital TV", dvb_cb, oxine);
+
   /*
+  otk_button_new (oxine->main_window, 50, 255, 290, 60, "Digital TV", dvb_cb, oxine);
+
   otk_button_new (oxine->main_window, 360, 255, 290, 60, "Control", control_cb, oxine);
   */
 
@@ -419,6 +608,22 @@ static void main_menu_cb(void *data) {
 
 /*  otk_button_new (oxine->main_window, 50, 180, 290, 60, "File", file_cb, oxine);
   otk_button_new (oxine->main_window, 50, 260, 290, 60, "Streaming", streaming_cb, oxine);*/
+#endif
+
+  oxine->main_window = otk_window_new (oxine->otk, NULL, oxine->win_x, oxine->win_y,
+                                                         oxine->win_w, oxine->win_h);
+
+  item = list_first_content(oxine->main_menu_items);
+
+  while (item) {
+
+    b = otk_button_new (oxine->main_window, item->x, item->y, item->w, item->h,
+                        item->title, item->func, (item->data) ? item->data : oxine);
+    otk_set_focus(b);
+
+    item = list_next_content(oxine->main_menu_items);
+  }
+
 
   otk_draw_all(oxine->otk);
 }
@@ -460,6 +665,7 @@ static void oxine_error_msg(char *text)
   
   b = otk_button_new(oxine->main_window, 260, 240, 80, 50, "OK", return_cb, oxine);
   otk_set_focus(b);
+  oxine->mode = OXINE_MODE_MAINMENU;
   otk_draw_all(oxine->otk);
 
   free(text2);
@@ -475,6 +681,7 @@ oxine_t *create_oxine(void) {
   xine_cfg_entry_t centry;
   
   oxine = ho_new(oxine_t);
+    
   oxine->main_menu_cb = main_menu_cb;
 
   oxine->xine = gGui->xine;
@@ -508,6 +715,8 @@ void destroy_oxine(oxine_t *oxine) {
   if (oxine->otk) otk_free(oxine->otk);
   if (oxine->odk) odk_free(oxine->odk);
 
+  main_menu_free(oxine->main_menu_items);
+  
   ho_free(oxine);
   
   stop_scheduler();
@@ -535,9 +744,18 @@ void oxine_menu(void)
   if( !oxine )
     return;
 
+  if( !oxine->main_menu_items )
+    main_menu_init(oxine);
+
+  if( !oxine->main_menu_items ) {
+    printf("oxine: main menu items missing, check ~/.xine/oxine/mainmenu\n");
+    return;
+  }
+
   oxine_adapt();
       
   if( oxine->mode != OXINE_MODE_MAINMENU ) {
+    video_window_reset_ssaver();
     gGui->nongui_error_msg = oxine_error_msg;
 
     if( oxine->reentry )
@@ -566,22 +784,27 @@ int oxine_action_event(int xine_event_type)
   
   switch( xine_event_type ) {
   case XINE_EVENT_INPUT_UP:
+    video_window_reset_ssaver();
     ev.key = OXINE_KEY_UP;
     otk_send_event(oxine->otk, &ev);
     return 1;
   case XINE_EVENT_INPUT_DOWN:
+    video_window_reset_ssaver();
     ev.key = OXINE_KEY_DOWN;
     otk_send_event(oxine->otk, &ev);
     return 1;
   case XINE_EVENT_INPUT_LEFT:
+    video_window_reset_ssaver();
     ev.key = OXINE_KEY_LEFT;
     otk_send_event(oxine->otk, &ev);
     return 1;
   case XINE_EVENT_INPUT_RIGHT:
+    video_window_reset_ssaver();
     ev.key = OXINE_KEY_RIGHT;
     otk_send_event(oxine->otk, &ev);
     return 1;
   case XINE_EVENT_INPUT_SELECT:
+    video_window_reset_ssaver();
     gGui->nongui_error_msg = oxine_error_msg;
     ev.key = OXINE_KEY_SELECT;
     otk_send_event(oxine->otk, &ev);
@@ -606,9 +829,11 @@ int oxine_mouse_event(int xine_event_type, int x, int y) {
     
   switch( xine_event_type ) {
   case XINE_EVENT_INPUT_MOUSE_MOVE:
+    video_window_reset_ssaver();
     ev.type = OXINE_EVENT_MOTION;
     return otk_send_event(oxine->otk, &ev);
   case XINE_EVENT_INPUT_MOUSE_BUTTON:
+    video_window_reset_ssaver();
     gGui->nongui_error_msg = oxine_error_msg;
     ev.type = OXINE_EVENT_BUTTON;
     ev.key = OXINE_BUTTON1;
