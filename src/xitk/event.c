@@ -453,12 +453,6 @@ void gui_handle_event (XEvent *event, void *data) {
       gui_play(NULL, NULL);
       break;
 
-    case XK_Control_L:
-    case XK_Control_R:
-      if(!panel_is_visible())
-	video_window_set_cursor_visibility(!video_window_is_cursor_visible());
-      break;
-
     case XK_Next:
       gui_nextprev(NULL, (void*)GUI_NEXT);
       break;

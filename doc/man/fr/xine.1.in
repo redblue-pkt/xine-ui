@@ -149,10 +149,6 @@ Sélectionne le canal audio suivant.
 .BR - :
 Sélectionne le canal audio précédent.
 .br
-.BR Ctrl
-Affiche/masque le pointeur de souris (uniquement quand le panneau de
-contrôle est masqué).
-.br
 .BR > :
 Agrandi la fenêtre de sortie.
 .br

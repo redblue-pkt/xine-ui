@@ -20,7 +20,7 @@
  * $Id$
  *
  * video window handling functions
- */
+*/
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -413,9 +413,14 @@ void video_window_adapt_size (int video_width, int video_height,
  * hide/show cursor in video window
  */
 void video_window_set_cursor_visibility(int show_cursor) {
+
   gVw->cursor_visible = show_cursor;
+
+  XLockDisplay (gGui->display);
   XDefineCursor(gGui->display, gGui->video_window, 
-		gVw->cursor[gVw->cursor_visible]);
+		gVw->cursor[show_cursor]);
+  XFlush(gGui->display);
+  XUnlockDisplay (gGui->display);
 }
 
 /* 
@@ -590,6 +595,12 @@ static void video_window_handle_event (XEvent *event, void *data) {
   switch(event->type) {
 
   case KeyPress:
+
+    if(!gGui->cursor_visible) {
+      gGui->cursor_visible = !gGui->cursor_visible;
+      video_window_set_cursor_visibility(gGui->cursor_visible);
+    }
+
     gui_handle_event(event, data);
     break;
 
@@ -600,6 +611,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
     unsigned int wwin, hwin, bwin, dwin;
     float xf,yf;
     Window rootwin;
+    
+    if(!gGui->cursor_visible) {
+      gGui->cursor_visible = !gGui->cursor_visible;
+      video_window_set_cursor_visibility(gGui->cursor_visible);
+    }
 
     if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
 		    &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
@@ -622,6 +638,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
     unsigned int wwin, hwin, bwin, dwin;
     float xf,yf;
     Window rootwin;
+
+    if(!gGui->cursor_visible) {
+      gGui->cursor_visible = !gGui->cursor_visible;
+      video_window_set_cursor_visibility(gGui->cursor_visible);
+    }
 
     if (bevent->button == Button3)
       panel_toggle_visibility(NULL, NULL);

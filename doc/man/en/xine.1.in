@@ -145,9 +145,6 @@ Select next audio channel (may take up to a few seconds to take effect)
 .BR - :
 Select prev audio channel
 .br
-.BR Ctrl :
-Show/hide mouse cursor (only when the GUI is hide)
-.br
 .BR > :
 Enlarge the ouput window.
 .br

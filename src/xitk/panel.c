@@ -66,6 +66,7 @@ static void *slider_loop(void *dummy) {
   pthread_detach(pthread_self());
 
   while(gGui->running) {
+
     if(panel_is_visible()) {
       if(gGui->xine) {
 	if(xine_get_status(gGui->xine) != XINE_STOP) {
@@ -74,7 +75,13 @@ static void *slider_loop(void *dummy) {
 	}
       }
     }
-    sleep(3);
+    
+    if(gGui->cursor_visible) {
+      gGui->cursor_visible = !gGui->cursor_visible;
+      video_window_set_cursor_visibility(gGui->cursor_visible);
+    }
+
+    sleep(4);
   }
 
   pthread_exit(NULL);
@@ -128,8 +135,6 @@ void panel_toggle_visibility (widget_t *w, void *data) {
 
   }
 
-  video_window_set_cursor_visibility (panel->visible);
-  
   config_set_int("open_panel", panel->visible);
   
 }
@@ -621,7 +626,8 @@ void panel_init (void) {
 						    panel->widget_list,
 						    NULL);
 
-  video_window_set_cursor_visibility (panel->visible);
+  gGui->cursor_visible = 1;
+  video_window_set_cursor_visibility(gGui->cursor_visible);
 
   XUnlockDisplay (gGui->display);
 

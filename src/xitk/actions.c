@@ -143,7 +143,10 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
 
   video_window_set_fullscreen (!video_window_is_fullscreen ());
 
-  video_window_set_cursor_visibility (panel_is_visible());
+  /* Drawable has changed, update cursor visiblity */
+  if(!gGui->cursor_visible) {
+    video_window_set_cursor_visibility(gGui->cursor_visible);
+  }
   
   if (panel_is_visible())  {
     pl_raise_window();
