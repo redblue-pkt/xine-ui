@@ -38,6 +38,7 @@
 #define WIDGET_TYPE_INPUTTEXT     0x00000200
 #define WIDGET_TYPE_COMBO         0x00000400
 #define WIDGET_TYPE_TABS          0x00000800
+#define WIDGET_TYPE_INTBOX        0x00001000
 
 #endif
 

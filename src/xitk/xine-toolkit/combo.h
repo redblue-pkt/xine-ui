@@ -36,8 +36,6 @@ typedef struct {
   xitk_window_t          *xwin;
   GC                      gc;
 
-  Window                  parent_win;
-  GC                      parent_gc;
   xitk_register_key_t    *parent_wkey;
 
   xitk_widget_t          *combo_widget;

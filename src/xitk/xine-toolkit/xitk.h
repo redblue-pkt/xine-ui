@@ -127,6 +127,7 @@ typedef void (*widget_change_skin_callback_t)(struct xitk_widget_list_s *, struc
 typedef xitk_image_t *(*widget_get_skin_t)(struct xitk_widget_s *, int);
 
 typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
+
 #define WIDGET_TYPE_GROUP         0xFFFF8000
 
 #define WIDGET_TYPE_BUTTON        0x00000001
@@ -141,6 +142,7 @@ typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
 #define WIDGET_TYPE_INPUTTEXT     0x00000200
 #define WIDGET_TYPE_COMBO         0x00000400
 #define WIDGET_TYPE_TABS          0x00000800
+#define WIDGET_TYPE_INTBOX        0x00001000
 
 typedef struct xitk_widget_s {
   int                             x;
@@ -1653,5 +1655,26 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
 int xitk_tabs_get_current_selected(xitk_widget_t *w);
 char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
 void xitk_tabs_set_current_selected(xitk_widget_t *w, int select);
+
+typedef struct {
+  int                     magic;
+  ImlibData              *imlibdata;
+  
+  char                   *skin_element_name;
+  
+  int                     value;
+  int                     step;
+
+  xitk_widget_list_t     *parent_wlist;
+
+  xitk_state_callback_t   callback;
+  void                   *userdata;
+} xitk_intbox_widget_t;
+
+xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
+					 int x, int y, int width, int height, 
+					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
+void xitk_intbox_set_value(xitk_widget_t *, int);
+int xitk_intbox_get_value(xitk_widget_t *);
 
 #endif

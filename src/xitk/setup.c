@@ -179,6 +179,8 @@ typedef struct {
 
 static _setup_t    *setup = NULL;
 
+static void setup_end(xitk_widget_t *, void *);
+
 /*
  * Get current property 'prop' value from vo_driver.
  */
@@ -349,11 +351,12 @@ static void setup_paint_widgets(void) {
     xitk_set_widget_pos(setup->wg[i]->label, wx, y);
 
     xitk_get_widget_pos(setup->wg[i]->widget, &wx, &wy);
-    /* Inputtext/combo widgets have special treatments */
+    /* Inputtext/intbox/combo widgets have special treatments */
     if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_COMBO) {
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 4);
     }
-    else if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT)
+    else if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT ||
+	    setup->wg[i]->widget->widget_type & WIDGET_TYPE_INTBOX)
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
     else
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y);
@@ -390,6 +393,10 @@ static void setup_paint_widgets(void) {
  * Handle X events here.
  */
 void setup_handle_event(XEvent *event, void *data) {
+  XKeyEvent      mykeyevent;
+  KeySym         mykey;
+  char           kbuf[256];
+  int            len;
 
   switch(event->type) {
 
@@ -399,8 +406,24 @@ void setup_handle_event(XEvent *event, void *data) {
     if(w && (w->widget_type & WIDGET_TYPE_INPUTTEXT)) {
       xitk_send_key_event(setup->widget_list, w, event);
     }
-    else
-      gui_handle_event(event, data);
+    else {
+      mykeyevent = event->xkey;
+      
+      XLockDisplay(gGui->display);
+      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+      XUnlockDisplay(gGui->display);
+      
+      switch (mykey) {
+	
+      case XK_Return:
+	setup_end(NULL, NULL);
+	break;
+	
+      default:
+	gui_handle_event(event, data);
+	break;
+      }
+    }
   }
   break;
     
@@ -461,7 +484,7 @@ static void numtype_update(xitk_widget_t *w, void *data, int value) {
   cfg_entry_t *entry;
   
   entry = (cfg_entry_t *)data;
- 
+
   entry->config->update_num(entry->config, entry->key, value );
 }
 
@@ -518,58 +541,40 @@ static widget_triplet_t *setup_add_slider (char *title, char *labelkey,
 /*
  *
  */
-static void inttype_update(xitk_widget_t *w, void *data, char *str) {
-  cfg_entry_t *entry;
-  int          value;
-  char         buf[256];
-  
-  entry = (cfg_entry_t *)data;
-  
-  value = strtol(str, &str, 10);
-
-  memset(&buf, 0, sizeof(buf));
-  snprintf(buf, 256, "%d", value);
-  xitk_inputtext_change_text(setup->widget_list, w, buf);
-
-  entry->config->update_num(entry->config, entry->key, value);
-}
-
-/*
- *
- */
 static widget_triplet_t *setup_add_inputnum(char *title, char *labelkey, 
 					    int x, int y, cfg_entry_t *entry) {
-  xitk_inputtext_widget_t   inp;
-  xitk_widget_t            *input;
+  xitk_intbox_widget_t      ib;
+  xitk_widget_t            *intbox, *wi, *wbu, *wbd;
   static widget_triplet_t  *wt;
-  char                      buf[256];
 
   wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
 
-  XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+  XITK_WIDGET_INIT(&ib, gGui->imlib_data);
 
   ADD_FRAME(title);
 
-  memset(&buf, 0, sizeof(buf));
-  snprintf(buf, 256, "%d", entry->num_value);
-
-  inp.skin_element_name = NULL;
-  inp.text              = buf;
-  inp.max_length        = 256;
-  inp.callback          = inttype_update;
-  inp.userdata          = entry;
+  ib.skin_element_name = NULL;
+  ib.value             = entry->num_value;
+  ib.step              = 1;
+  ib.parent_wlist      = setup->widget_list;
+  ib.callback          = numtype_update;
+  ib.userdata          = (void *)entry;
   xitk_list_append_content (setup->widget_list->l,
-			    (input = 
-			     xitk_noskin_inputtext_create(&inp,
-							  x, y - 5, 60, 20,
-							  "Black", "Black", fontname)));
+			    (intbox = 
+			     xitk_noskin_intbox_create(&ib, x, y - 5, 60, 20, &wi, &wbu, &wbd)));
+
+  ADD_LABEL(intbox);
   
-  ADD_LABEL(input);
-  
-  setup->tmp_widgets[setup->num_tmp_widgets] = input;
+  setup->tmp_widgets[setup->num_tmp_widgets] = intbox;
+  setup->num_tmp_widgets++;
+  setup->tmp_widgets[setup->num_tmp_widgets] = wi;
+  setup->num_tmp_widgets++;
+  setup->tmp_widgets[setup->num_tmp_widgets] = wbu;
+  setup->num_tmp_widgets++;
+  setup->tmp_widgets[setup->num_tmp_widgets] = wbd;
   setup->num_tmp_widgets++;
   
-  wt->widget = input;
+  wt->widget = intbox;
 
   return wt;
 }

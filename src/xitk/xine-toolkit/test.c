@@ -52,6 +52,9 @@ typedef struct {
   /* Tabs */
   xitk_widget_t        *tabs;
 
+  /* Intbox */
+  xitk_widget_t        *intbox;
+
   xitk_widget_list_t   *widget_list;
   xitk_register_key_t   kreg;
 } test_t;
@@ -132,8 +135,10 @@ void test_handle_event(XEvent *event, void *data) {
   switch(event->type) {
     
   case KeyPress: {
-    if(xitk_is_widget_focused(test->input)) {
-      xitk_send_key_event(test->widget_list, test->input, event);
+    xitk_widget_t *w = xitk_get_focused_widget(test->widget_list);
+    
+    if(w && (w->widget_type & WIDGET_TYPE_INPUTTEXT)) {
+      xitk_send_key_event(test->widget_list, w, event);
     }
     else {
       int modifier;
@@ -264,6 +269,27 @@ static void change_browser_entry(xitk_widget_t *w, void *data, char *currenttext
     test->entries[j] = strdup(currenttext);
     xitk_browser_rebuild_browser(test->browser, j);
   }
+}
+
+/*
+ *
+ */
+static void create_intbox(void) {
+  int x = 150, y = 300;
+  xitk_intbox_widget_t ib;
+
+  XITK_WIDGET_INIT(&ib, test->imlibdata);
+
+  ib.skin_element_name = NULL;
+  ib.value             = 10;
+  ib.step              = 1;
+  ib.parent_wlist      = test->widget_list;
+  ib.callback          = NULL;
+  ib.userdata          = NULL;
+  xitk_list_append_content (test->widget_list->l,
+			    (test->intbox = 
+			     xitk_noskin_intbox_create(&ib, x, y, 60, 20, NULL, NULL, NULL)));
+
 }
 
 /*
@@ -668,6 +694,7 @@ int main(int argc, char **argv) {
   create_inputtext();
   create_frame();
   create_tabs();
+  create_intbox();
   
   test->kreg = xitk_register_event_handler("test", 
 					   (xitk_window_get_window(test->xwin)),
