@@ -390,6 +390,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
   mywidget->visible               = 1;
 
   mywidget->have_focus            = FOCUS_LOST; 
+  mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
   mywidget->widget_type           = WIDGET_TYPE_TABS | WIDGET_TYPE_GROUP;
   mywidget->paint                 = paint;
@@ -400,6 +401,9 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
   mywidget->notify_change_skin    = NULL;
   mywidget->notify_destroy        = NULL;//notify_destroy;
   mywidget->get_skin              = NULL;
+
+  mywidget->tips_timeout          = 0;
+  mywidget->tips_string           = NULL;
 
   xitk_labelbutton_set_state(private_data->tabs[private_data->selected], 1,
   			     private_data->parent_wlist->win, private_data->parent_wlist->gc);

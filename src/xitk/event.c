@@ -311,7 +311,7 @@ void gui_execute_action_id(action_id_t action) {
 		      gGui->video_window, &rootwin, 
 		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
       }
-      
+
       if(action == ACTID_WINDOWREDUCE) {
 	w /= 1.2;
 	h /= 1.2;

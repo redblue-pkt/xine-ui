@@ -435,6 +435,12 @@ void setup_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
+  case EnterNotify:
+    XLockDisplay(gGui->display);
+    XRaiseWindow(gGui->display, xitk_window_get_window(setup->xwin));
+    XUnlockDisplay(gGui->display);
+    break;
+
   case KeyPress: {
     xitk_widget_t *w = xitk_get_focused_widget(setup->widget_list);
 

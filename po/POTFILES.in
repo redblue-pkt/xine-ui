@@ -7,7 +7,9 @@ src/xitk/file_browser.c
 src/xitk/kbindings.c
 src/xitk/main.c
 src/xitk/mrl_browser.c
+src/xitk/panel.c
 src/xitk/playlist.c
-src/xitk/snapshot.c
 src/xitk/setup.c
+src/xitk/skins.c
+src/xitk/snapshot.c
 src/xitk/viewlog.c

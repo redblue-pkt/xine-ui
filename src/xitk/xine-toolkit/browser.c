@@ -532,6 +532,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
   mywidget->visible                    = 1;
   mywidget->have_focus                 = FOCUS_LOST;
   
+  mywidget->imlibdata                  = private_data->imlibdata;
   mywidget->x                          = x;
   mywidget->y                          = y;
   mywidget->width                      = width;
@@ -546,6 +547,9 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
   mywidget->notify_inside              = NULL;
   mywidget->notify_destroy             = NULL;
   mywidget->get_skin                   = NULL;
+
+  mywidget->tips_timeout               = 0;
+  mywidget->tips_string                = NULL;
 
   return mywidget;
 }

@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
-#include <pthread.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <unistd.h>
@@ -39,6 +38,7 @@
 #include "widget.h"
 #include "list.h"
 #include "_xitk.h"
+#include "tips.h"
 
 extern int errno;
 
@@ -859,6 +859,10 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
   
   if (mywidget != wl->focusedWidget) {
     if (wl->focusedWidget) {
+      
+      /* Kill (hide) tips */
+      xitk_tips_tips_kill(wl->focusedWidget);
+
       if (wl->focusedWidget->notify_focus && wl->focusedWidget->enable == WIDGET_ENABLE) {
 	bRepaint |= (wl->focusedWidget->notify_focus) (wl, wl->focusedWidget, FOCUS_LOST);
 	wl->focusedWidget->have_focus = FOCUS_LOST;
@@ -870,6 +874,9 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
     wl->focusedWidget = mywidget;
     
     if (mywidget) {
+      
+      xitk_tips_create(mywidget, wl);
+      
       if (mywidget->notify_focus && mywidget->enable == WIDGET_ENABLE) {
 	bRepaint |= (mywidget->notify_focus) (wl, mywidget, FOCUS_RECEIVED);
 	mywidget->have_focus = FOCUS_RECEIVED;
@@ -1341,4 +1348,149 @@ xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w) {
     return w->get_skin(w, BACKGROUND_SKIN);
 
   return NULL;
+}
+
+/*
+ *
+ */
+void xitk_set_widget_tips(xitk_widget_t *w, char *str) {
+
+  if(!w || !str) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  xitk_tips_set_tips(w, str);
+}
+
+/*
+ *
+ */
+void xitk_set_widget_tips_default(xitk_widget_t *w, char *str) {
+
+  if(!w || !str) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  xitk_tips_set_tips(w, str);
+  xitk_tips_set_timeout(w, TIPS_TIMEOUT);
+}
+
+/*
+ *
+ */
+void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, char *str, unsigned int timeout) {
+
+  if(!w || !str) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  xitk_tips_set_tips(w, str);
+  xitk_tips_set_timeout(w, timeout);
+}
+
+/*
+ *
+ */
+void xitk_disable_widget_tips(xitk_widget_t *w) {
+  
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+  
+  xitk_tips_set_timeout(w, 0);
+}
+
+/*
+ *
+ */
+void xitk_enable_widget_tips(xitk_widget_t *w) {
+  
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+  
+  xitk_tips_set_timeout(w, TIPS_TIMEOUT);
+}
+
+/*
+ *
+ */
+void xitk_disable_widgets_tips(xitk_widget_list_t *wl) {
+  xitk_widget_t *mywidget;
+  
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+  
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
+
+  while(mywidget) {
+    
+    xitk_disable_widget_tips(mywidget);
+    
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
+  }
+}
+
+/*
+ *
+ */
+void xitk_enable_widgets_tips(xitk_widget_list_t *wl) {
+  xitk_widget_t *mywidget;
+  
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+  
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
+
+  while(mywidget) {
+    
+    if(mywidget->tips_string)
+      xitk_enable_widget_tips(mywidget);
+    
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
+  }
+}
+
+/*
+ *
+ */
+void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout) {
+  xitk_widget_t *mywidget;
+  
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
+
+  while(mywidget) {
+    
+    if(mywidget->tips_string)
+      xitk_tips_set_timeout(mywidget, timeout);
+    
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
+  }
+}
+
+/*
+ *
+ */
+void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  xitk_tips_set_timeout(w, timeout);
 }

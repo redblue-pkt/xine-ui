@@ -136,6 +136,12 @@ void test_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
     
+  case EnterNotify:
+    XLockDisplay(test->display);
+    XRaiseWindow(test->display, xitk_window_get_window(test->xwin));
+    XUnlockDisplay(test->display);
+    break;
+
   case KeyPress: {
     xitk_widget_t *w = xitk_get_focused_widget(test->widget_list);
     
@@ -329,6 +335,7 @@ static void create_intbox(void) {
 			    (test->intbox = 
 			     xitk_noskin_intbox_create(&ib, x, y, 60, 20, NULL, NULL, NULL)));
 
+  xitk_set_widget_tips_default(test->intbox, "This is a intbox");
 }
 
 /*
@@ -406,6 +413,8 @@ static void create_inputtext(void) {
 			    xitk_noskin_inputtext_create(&inp,
 							 150, 150, 150, 20,
 							 "Black", "Black", fontname)));
+
+  xitk_set_widget_tips_default(test->input, "This is an inputtext");
 }
 
 /*
@@ -435,6 +444,8 @@ static void create_label(void) {
 			    xitk_noskin_label_create(&lbl,
 						     x, y, len, (asc+des)*2, fontname)));
 
+  xitk_set_widget_tips_default(test->label, "This is a label");
+
   {
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(test->label);
     
@@ -461,6 +472,8 @@ static void create_button(void) {
 			    xitk_noskin_button_create(&b,
 						      x, y, width, height)));
   
+  xitk_set_widget_tips_default(test->button, "This is a button");
+
   { /* Draw red spot. */
     xitk_image_t *wimage = xitk_get_widget_foreground_skin(test->button);
 
@@ -538,6 +551,8 @@ static void create_sliders(void) {
 								      XITK_HSLIDER)));
   xitk_slider_set_pos(test->widget_list, test->hslider, 50);
 
+  xitk_set_widget_tips_default(test->hslider, "This is an horizontal slider");
+
   sl.min                      = 0;
   sl.max                      = 100;
   sl.step                     = 1;
@@ -552,6 +567,7 @@ static void create_sliders(void) {
 								      XITK_VSLIDER)));
   xitk_slider_set_pos(test->widget_list, test->vslider, 50);
 
+  xitk_set_widget_tips_default(test->vslider, "This is a vertical slider");
 }
 
 static void combo_select(xitk_widget_t *w, void *data, int select) {
@@ -611,6 +627,7 @@ static void create_combo(void) {
 			   (test->combo = 
 			    xitk_noskin_combo_create(&cmb,
 						     x, y, width, NULL, NULL)));
+
 }
 
 /*
@@ -680,6 +697,7 @@ int main(int argc, char **argv) {
   xitk_labelbutton_widget_t   lb;
   char                       *fontname = "*-lucida-*-r-*-*-14-*-*-*-*-*-*-*";
   int                         windoww = 600, windowh = 400;
+  xitk_widget_t              *w;
   
   if(!init_test()) {
     printf(_("init_test() failed\n"));
@@ -722,10 +740,12 @@ int main(int argc, char **argv) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content(test->widget_list->l, 
-	   xitk_noskin_labelbutton_create(&lb,
-					  (windoww / 2) - 50, windowh - 50,
-					  100, 30,
-					  "Black", "Black", "White", fontname));
+	   (w = xitk_noskin_labelbutton_create(&lb,
+					       (windoww / 2) - 50, windowh - 50,
+					       100, 30,
+					       "Black", "Black", "White", fontname)));
+  xitk_set_widget_tips_default(w, "Do you really want to leave me ?");
+
   create_browser();
   create_sliders();
   create_button();
@@ -758,4 +778,3 @@ int main(int argc, char **argv) {
 
   return 1;
 }
-

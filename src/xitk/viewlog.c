@@ -193,6 +193,12 @@ void viewlog_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
     
+  case EnterNotify:
+    XLockDisplay(gGui->display);
+    XRaiseWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
+    XUnlockDisplay(gGui->display);
+    break;
+
   case KeyPress: {
     XKeyEvent      mykeyevent;
     KeySym         mykey;

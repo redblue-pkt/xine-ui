@@ -244,6 +244,7 @@ static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_but
   mywidget->running               = 1;
   mywidget->visible               = 1;
   mywidget->have_focus            = FOCUS_LOST; 
+  mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width/3;
@@ -257,6 +258,9 @@ static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_but
   mywidget->notify_change_skin    = (skin_element_name == NULL) ? NULL : notify_change_skin;
   mywidget->notify_destroy        = notify_destroy;
   mywidget->get_skin              = get_skin;
+
+  mywidget->tips_timeout          = 0;
+  mywidget->tips_string           = NULL;
 
   return mywidget;
 }

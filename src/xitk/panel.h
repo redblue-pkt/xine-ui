@@ -41,6 +41,10 @@ typedef struct {
     xitk_widget_t        *mute;
   } mixer;
 
+  struct {
+    int                   enable;
+    unsigned int          timeout;
+  } tips;
 
   xitk_widget_t        *checkbox_pause;
   int                   visible;
@@ -54,6 +58,8 @@ typedef struct {
   xitk_register_key_t   widget_key;
   pthread_t             slider_thread;
 } _panel_t;
+
+void panel_show_tips(void);
 
 void panel_init (void);
 

@@ -109,8 +109,8 @@ void pl_exit(xitk_widget_t *w, void *data) {
   xitk_unregister_event_handler(&playlist->widget_key);
 
   XLockDisplay(gGui->display);
-  XUnlockDisplay(gGui->display);
   XUnmapWindow(gGui->display, playlist->window);
+  XUnlockDisplay(gGui->display);
 
   xitk_destroy_widgets(playlist->widget_list);
 
@@ -456,9 +456,13 @@ void pl_raise_window(void) {
     if(playlist->window) {
       if(playlist->visible && playlist->running) {
 	if(playlist->running) {
+
+	  XLockDisplay(gGui->display);
 	  XMapRaised(gGui->display, playlist->window); 
 	  XSetTransientForHint (gGui->display, 
 				playlist->window, gGui->video_window);
+	  XUnlockDisplay(gGui->display);
+
 	  layer_above_video(playlist->window);
 	}
       } else {
@@ -477,14 +481,18 @@ void pl_toggle_visibility (xitk_widget_t *w, void *data) {
     if (playlist->visible && playlist->running) {
       playlist->visible = 0;
       xitk_hide_widgets(playlist->widget_list);
+      XLockDisplay(gGui->display);
       XUnmapWindow (gGui->display, playlist->window);
+      XUnlockDisplay(gGui->display);
     } else {
       if(playlist->running) {
 	playlist->visible = 1;
 	xitk_show_widgets(playlist->widget_list);
+	XLockDisplay(gGui->display);
 	XMapRaised(gGui->display, playlist->window); 
 	XSetTransientForHint (gGui->display, 
 			      playlist->window, gGui->video_window);
+	XUnlockDisplay(gGui->display);
 	layer_above_video(playlist->window);
       }
     }
@@ -501,6 +509,12 @@ void playlist_handle_event(XEvent *event, void *data) {
   int            len;
 
   switch(event->type) {
+
+  case EnterNotify:
+    XLockDisplay(gGui->display);
+    XRaiseWindow(gGui->display, playlist->window);
+    XUnlockDisplay(gGui->display);
+    break;
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
@@ -682,13 +696,15 @@ void playlist_editor(void) {
 				    hint.height, 0, 
 				    gGui->imlib_data->x.depth, CopyFromParent, 
 				    gGui->imlib_data->x.visual,
-				    CWBackPixel | CWBorderPixel | CWColormap, &attr);
+				    CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
+				    &attr);
   
   XSetStandardProperties(gGui->display, playlist->window, title, title,
 			 None, NULL, 0, &hint);
   
-  XSelectInput(gGui->display, playlist->window,
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
+  XSelectInput(gGui->display, playlist->window, 
+	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
+	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
   /*
@@ -885,7 +901,7 @@ void playlist_editor(void) {
 			   gGui->playlist, gGui->playlist_num, 0);
 
   XMapRaised(gGui->display, playlist->window); 
-
+  
   playlist->widget_key = 
     xitk_register_event_handler("playlist", 
 				playlist->window, 

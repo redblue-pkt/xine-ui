@@ -1155,6 +1155,7 @@ static xitk_widget_t *_xitk_image_create (xitk_skin_config_t *skonfig,
   mywidget->running               = 1;
   mywidget->visible               = 1;
   mywidget->have_focus            = FOCUS_LOST;
+  mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
   mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width;
@@ -1168,6 +1169,9 @@ static xitk_widget_t *_xitk_image_create (xitk_skin_config_t *skonfig,
   mywidget->notify_change_skin    = notify_change_skin;
   mywidget->notify_destroy        = notify_destroy;
   mywidget->get_skin              = get_skin;
+
+  mywidget->tips_timeout          = 0;
+  mywidget->tips_string           = NULL;
 
   return mywidget;
 }

@@ -158,6 +158,8 @@ typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
 #define WIDGET_TYPE_INTBOX        0x00001000
 
 typedef struct xitk_widget_s {
+  ImlibData                      *imlibdata;
+
   int                             x;
   int                             y;
   int                             width;
@@ -185,6 +187,10 @@ typedef struct xitk_widget_s {
   widget_destroy_t                notify_destroy;
 
   widget_get_skin_t               get_skin;
+
+  pthread_t                       tips_thread;
+  int                             tips_timeout;
+  char                           *tips_string;
 
   void                           *private_data;
   uint32_t                        widget_type;
@@ -478,6 +484,51 @@ xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w);
  *
  */
 xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
+
+/**
+ *
+ */
+void xitk_set_widget_tips(xitk_widget_t *w, char *str);
+
+/**
+ *
+ */
+void xitk_set_widget_tips_default(xitk_widget_t *w, char *str);
+
+/**
+ *
+ */
+void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, char *str, unsigned int timeout);
+
+/**
+ *
+ */
+void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout);
+
+/**
+ *
+ */
+void xitk_enable_widget_tips(xitk_widget_t *w);
+
+/**
+ *
+ */
+void xitk_disable_widget_tips(xitk_widget_t *w);
+
+/**
+ *
+ */
+void xitk_disable_widgets_tips(xitk_widget_list_t *wl);
+
+/**
+ *
+ */
+void xitk_enable_widgets_tips(xitk_widget_list_t *wl);
+
+/**
+ *
+ */
+void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout);
 
 /**
  * Pass events to UI

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.4\n"
-"POT-Creation-Date: 2001-12-14 12:01+0100\n"
+"POT-Creation-Date: 2001-12-17 02:52+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -14,40 +14,40 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/control.c:308
+#: src/xitk/control.c:314
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s() : ne trouve pas l'image de fond.\n"
 
-#: src/xitk/control.c:379
+#: src/xitk/control.c:385
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "xine-playlist : ne trouve pas l'image de fond.\n"
 
-#: src/xitk/control.c:502
+#: src/xitk/control.c:510
 msgid "Hue"
 msgstr "Tte"
 
-#: src/xitk/control.c:525
+#: src/xitk/control.c:533
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:548
+#: src/xitk/control.c:556
 msgid "Brt"
 msgstr "Bri"
 
-#: src/xitk/control.c:571
+#: src/xitk/control.c:579
 msgid "Ctr"
 msgstr "Ctr"
 
-#: src/xitk/control.c:607
+#: src/xitk/control.c:615
 msgid "Choose a Skin"
 msgstr "Choisir une apparence"
 
-#: src/xitk/control.c:644 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:818
+#: src/xitk/control.c:652 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:834
 msgid "Dismiss"
 msgstr "Annuler"
 
-#: src/xitk/event.c:642
+#: src/xitk/event.c:649
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -58,7 +58,7 @@ msgstr ""
 "\n"
 "Il n'y a aucun plugin d'entrée pour gérer '%s'.\n"
 
-#: src/xitk/event.c:648
+#: src/xitk/event.c:655
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -69,7 +69,7 @@ msgstr ""
 "\n"
 "Il n'y a aucun plugin démultiplexeur pour gérer '%s'.\n"
 
-#: src/xitk/event.c:654
+#: src/xitk/event.c:661
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -79,7 +79,7 @@ msgstr ""
 "\n"
 "!! Erreur non gérée !!\n"
 
-#: src/xitk/event.c:885
+#: src/xitk/event.c:889
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -87,15 +87,15 @@ msgstr ""
 "\n"
 "XInitThreads a échoué - il semble que vous ne possédez pas une xlib sûre.\n"
 
-#: src/xitk/event.c:895
+#: src/xitk/event.c:899
 msgid "Cannot open display\n"
 msgstr "Ne peut pas ouvrir l'affichage.\n"
 
-#: src/xitk/event.c:929
+#: src/xitk/event.c:933
 msgid "Unable to initialize Imlib\n"
 msgstr "Impossible d'initialiser Imlib.\n"
 
-#: src/xitk/event.c:939
+#: src/xitk/event.c:943
 #, c-format
 msgid "Unable to load %s logo\n"
 msgstr "Impossible de charger le logo %s.\n"
@@ -108,12 +108,12 @@ msgstr "Brouteur de fichier de Xine"
 msgid "Select"
 msgstr "Choisir"
 
-#: src/xitk/kbindings.c:315
+#: src/xitk/kbindings.c:307
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Les sequences de touches '%s' et '%s' sont similaires.\n"
 
-#: src/xitk/kbindings.c:671
+#: src/xitk/kbindings.c:663
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Aïe : la table des séquences de touches est NULLE.\n"
 
@@ -348,26 +348,165 @@ msgstr "Brouteur de MRL de Xine"
 msgid "Source:"
 msgstr "Source :"
 
+#: src/xitk/panel.c:646
+msgid "Play previous entry from playlist"
+msgstr ""
+
+#: src/xitk/panel.c:653
+msgid "Stop playback"
+msgstr ""
+
+#: src/xitk/panel.c:660
+msgid "Play selected entry"
+msgstr ""
+
+#: src/xitk/panel.c:668
+msgid "Pause/Resume playback"
+msgstr ""
+
+#: src/xitk/panel.c:675
+msgid "Play next entry from playlist"
+msgstr ""
+
+#: src/xitk/panel.c:682
+msgid "Eject current medium"
+msgstr ""
+
+#: src/xitk/panel.c:689
+msgid "Quit"
+msgstr ""
+
+#: src/xitk/panel.c:696
+msgid "Setup window"
+msgstr ""
+
+#: src/xitk/panel.c:703
+msgid "Hide GUI"
+msgstr ""
+
+#: src/xitk/panel.c:710
+msgid "Fullscreen/Window mode"
+msgstr ""
+
+#: src/xitk/panel.c:717
+msgid "Next audio channel"
+msgstr ""
+
+#: src/xitk/panel.c:724
+msgid "Previous audio channel"
+msgstr ""
+
+#: src/xitk/panel.c:731
+msgid "Next SPU channel"
+msgstr ""
+
+#: src/xitk/panel.c:738
+msgid "Previous SPU channel"
+msgstr ""
+
+#: src/xitk/panel.c:796
+msgid "Mute toggle"
+msgstr ""
+
+#: src/xitk/panel.c:803
+msgid "Take a snapshot"
+msgstr ""
+
+#: src/xitk/panel.c:810
+msgid "Slow motion"
+msgstr ""
+
+#: src/xitk/panel.c:817
+msgid "Fast motion"
+msgstr ""
+
+#: src/xitk/panel.c:824
+msgid "Playlist"
+msgstr ""
+
+#: src/xitk/panel.c:831
+#, fuzzy
+msgid "Control"
+msgstr "Ctr"
+
+#: src/xitk/panel.c:838
+#, fuzzy
+msgid "MRL Browser"
+msgstr "Brouteur de MRL de Xine"
+
 #: src/xitk/playlist.c:333 src/xitk/playlist.c:390
 #, c-format
 msgid "Can't read %s: %s\n"
 msgstr "Ne peut pas lire %s : %s\n"
 
-#: src/xitk/playlist.c:788
+#: src/xitk/playlist.c:804
 msgid "Add"
 msgstr "Ajoute"
 
-#: src/xitk/playlist.c:798
+#: src/xitk/playlist.c:814
 msgid "Load"
 msgstr "Charge"
 
-#: src/xitk/playlist.c:808
+#: src/xitk/playlist.c:824
 msgid "Save"
 msgstr "Sauve"
 
-#: src/xitk/playlist.c:842
+#: src/xitk/playlist.c:858
 msgid "Scan for:"
 msgstr "Source :"
+
+#: src/xitk/setup.c:952
+msgid "Help"
+msgstr "Aide"
+
+#: src/xitk/setup.c:954
+msgid "README"
+msgstr "Lisez Moi"
+
+#: src/xitk/setup.c:956
+msgid "FAQ"
+msgstr "FAQ"
+
+#: src/xitk/setup.c:1107
+msgid "xine setup"
+msgstr "Reglage de Xine"
+
+#: src/xitk/setup.c:1166 src/xitk/viewlog.c:467
+msgid "Close"
+msgstr "Fermer"
+
+#: src/xitk/skins.c:211
+#, c-format
+msgid "Failed to load %s/%s. Reload old skin '%s'.\n"
+msgstr ""
+
+#: src/xitk/skins.c:226
+#, c-format
+msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
+msgstr ""
+
+#: src/xitk/skins.c:253 src/xitk/skins.c:292
+#, c-format
+msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
+msgstr ""
+
+#: src/xitk/skins.c:280
+msgid "No available skin found. Say goodbye.\n"
+msgstr ""
+
+#: src/xitk/skins.c:296
+msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
+msgstr ""
+
+#: src/xitk/skins.c:305
+#, fuzzy, c-format
+msgid "Failed to load %s/%s. Exiting.\n"
+msgstr "Impossible de charger le logo %s.\n"
+
+#: src/xitk/skins.c:314
+#, c-format
+msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
+msgstr ""
 
 #: src/xitk/snapshot.c:901
 #, c-format
@@ -389,39 +528,19 @@ msgstr "Echec à l'ouverture du fichier (%s)\n"
 msgid "File '%s' written.\n"
 msgstr "Le fichier '%s' a été crée.\n"
 
-#: src/xitk/setup.c:940
-msgid "Help"
-msgstr "Aide"
-
-#: src/xitk/setup.c:942
-msgid "README"
-msgstr "Lisez Moi"
-
-#: src/xitk/setup.c:944
-msgid "FAQ"
-msgstr "FAQ"
-
-#: src/xitk/setup.c:1095
-msgid "xine setup"
-msgstr "Reglage de Xine"
-
-#: src/xitk/setup.c:1154 src/xitk/viewlog.c:425
-msgid "Close"
-msgstr "Fermer"
-
-#: src/xitk/viewlog.c:262
+#: src/xitk/viewlog.c:304
 msgid "log info"
 msgstr "log info"
 
-#: src/xitk/viewlog.c:264
+#: src/xitk/viewlog.c:306
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
 msgstr "Il n'y a aucune entrée dans le log de la section '%s'.\n"
 
-#: src/xitk/viewlog.c:361
+#: src/xitk/viewlog.c:403
 msgid "xine log viewer"
 msgstr "Visualisateur des logs de xine"
 
-#: src/xitk/viewlog.c:411
+#: src/xitk/viewlog.c:453
 msgid "Refresh"
 msgstr "Rafraîchir"

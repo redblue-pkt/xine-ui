@@ -637,7 +637,7 @@ void video_window_adapt_size (void *this,
   
   if (gVw->fullscreen_mode) {
     XSetInputFocus (gGui->display, 
-		    gGui->video_window, RevertToNone, CurrentTime);
+		    gGui->video_window, RevertToParent, CurrentTime);
 #ifdef HAVE_XINERAMA
     XMoveWindow (gGui->display, gGui->video_window, hint.x, hint.y);
 #else

@@ -233,8 +233,10 @@ void control_raise_window(void) {
 	if(control->running) {
 	  XMapRaised(gGui->display, control->window);
 	  control->visible = 1;
+	  XLockDisplay(gGui->display);
 	  XSetTransientForHint (gGui->display, 
 				control->window, gGui->video_window);
+	  XUnlockDisplay(gGui->display);
 	  layer_above_video(control->window);
 	}
       } else {
@@ -253,14 +255,18 @@ void control_toggle_panel_visibility (xitk_widget_t *w, void *data) {
     if (control->visible && control->running) {
       control->visible = 0;
       xitk_hide_widgets(control->widget_list);
+      XLockDisplay(gGui->display);
       XUnmapWindow (gGui->display, control->window);
+      XUnlockDisplay(gGui->display);
     } else {
       if(control->running) {
 	control->visible = 1;
 	xitk_show_widgets(control->widget_list);
+	XLockDisplay(gGui->display);
 	XMapRaised(gGui->display, control->window); 
 	XSetTransientForHint (gGui->display, 
 			      control->window, gGui->video_window);
+	XUnlockDisplay(gGui->display);
 	layer_above_video(control->window);
       }
     }
@@ -273,6 +279,12 @@ void control_toggle_panel_visibility (xitk_widget_t *w, void *data) {
 void control_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
+
+  case EnterNotify:
+    XLockDisplay(gGui->display);
+    XRaiseWindow(gGui->display, control->window);
+    XUnlockDisplay(gGui->display);
+    break;
 
   case KeyPress:
     gui_handle_event(event, data);
@@ -406,13 +418,15 @@ void control_panel(void) {
 				   hint.x, hint.y, hint.width, hint.height, 0, 
 				   gGui->imlib_data->x.depth, CopyFromParent, 
 				   gGui->imlib_data->x.visual,
-				   CWBackPixel | CWBorderPixel | CWColormap, &attr);
+				   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
+				   &attr);
   
   XSetStandardProperties(gGui->display, control->window, title, title,
  			 None, NULL, 0, &hint);
   
   XSelectInput(gGui->display, control->window,
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
+	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
+	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
   /*
@@ -650,6 +664,7 @@ void control_panel(void) {
 			  xitk_labelbutton_create (gGui->skin_config, &lb));
 
   XMapRaised(gGui->display, control->window); 
+  XSetInputFocus(gGui->display, control->window, RevertToParent, CurrentTime);
 
   control->widget_key = 
     xitk_register_event_handler("control", 

@@ -85,8 +85,9 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   
   if(c->widget_type & WIDGET_TYPE_INTBOX) {
     if(private_data->skin_element_name) {
-      int x, y;
       /*      
+      int x, y;
+
       xitk_set_widget_pos(c, c->x, c->y);
       xitk_get_widget_pos(private_data->label_widget, &x, &y);
       x += xitk_get_widget_width(private_data->label_widget);
@@ -207,6 +208,8 @@ static xitk_widget_t *_xitk_intbox_create(xitk_skin_config_t *skonfig,
   mywidget->visible                      = 1;
   mywidget->have_focus                   = FOCUS_LOST;
   
+  mywidget->imlibdata                    = private_data->imlibdata;
+
   mywidget->widget_type                  = WIDGET_TYPE_INTBOX | WIDGET_TYPE_GROUP;
   mywidget->paint                        = paint;
   mywidget->notify_click                 = NULL;
@@ -216,6 +219,9 @@ static xitk_widget_t *_xitk_intbox_create(xitk_skin_config_t *skonfig,
   mywidget->notify_change_skin           = (skin_element_name == NULL) ? NULL : notify_change_skin;
   mywidget->notify_destroy               = notify_destroy;
   mywidget->get_skin                     = NULL;
+
+  mywidget->tips_timeout                 = 0;
+  mywidget->tips_string                  = NULL;
 
   return mywidget;
 }

@@ -877,6 +877,12 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
+  case EnterNotify:
+    XLOCK(private_data->imlibdata->x.disp);
+    XRaiseWindow(private_data->imlibdata->x.disp, private_data->window);
+    XUNLOCK(private_data->imlibdata->x.disp);
+    break;
+
   case MappingNotify:
     XLOCK(private_data->imlibdata->x.disp);
     XRefreshKeyboardMapping((XMappingEvent *) event);
@@ -1047,12 +1053,13 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 		   fb->imlibdata->x.depth, 
 		   CopyFromParent, 
 		   fb->imlibdata->x.visual,
-		   CWBackPixel | CWBorderPixel | CWColormap, &attr);
+		   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect, &attr);
   
   XSetStandardProperties(fb->imlibdata->x.disp, private_data->window, title, title,
 			 None, NULL, 0, &hint);
 
   XSelectInput(fb->imlibdata->x.disp, private_data->window,
+	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
@@ -1203,6 +1210,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   mywidget->running            = 1;
   mywidget->visible            = 1;
   mywidget->have_focus         = FOCUS_LOST;
+  mywidget->imlibdata          = private_data->imlibdata;
   mywidget->x                  = fb->x;
   mywidget->y                  = fb->y;
   mywidget->width              = private_data->bg_image->width;
@@ -1216,6 +1224,9 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   mywidget->notify_change_skin = NULL;
   mywidget->notify_destroy     = notify_destroy;
   mywidget->get_skin           = NULL;
+
+  mywidget->tips_timeout       = 0;
+  mywidget->tips_string        = NULL;
 
   load_files(NULL, (void *)private_data);
   

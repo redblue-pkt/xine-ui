@@ -394,6 +394,7 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
   mywidget->running            = 1;
   mywidget->visible            = 1;
   mywidget->have_focus         = FOCUS_LOST;
+  mywidget->imlibdata          = private_data->imlibdata;
   mywidget->x                  = x;
   mywidget->y                  = y;
 
@@ -415,6 +416,9 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
   mywidget->notify_destroy     = notify_destroy;
   mywidget->get_skin           = get_skin;
   
+  mywidget->tips_timeout       = 0;
+  mywidget->tips_string        = NULL;
+
   pthread_mutex_init(&private_data->mutex, NULL);
 
   label_setup_label(mywidget, l->label);

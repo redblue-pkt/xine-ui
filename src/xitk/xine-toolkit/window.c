@@ -146,15 +146,17 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   attr.colormap          = Imlib_get_colormap(im);
 
   xwin->window = XCreateWindow(im->x.disp, im->x.root, hint.x, hint.y, hint.width, hint.height,
-			       0, im->x.depth, CopyFromParent, im->x.visual,
-			       CWBackPixel | CWBorderPixel | CWColormap, &attr);
+			       0, im->x.depth,  CopyFromParent, im->x.visual,
+			       CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
+			       &attr);
   
   XSetStandardProperties(im->x.disp, xwin->window, title, title, None, NULL, 0, &hint);
 
   XSelectInput(im->x.disp, xwin->window,
+	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
-	       | KeyPressMask | ExposureMask | StructureNotifyMask);
-
+	       | KeyPressMask | KeymapStateMask | ExposureMask | StructureNotifyMask);
+  
   XA_WIN_LAYER = XInternAtom(im->x.disp, "_WIN_LAYER", False);
   
   data[0] = 10;
@@ -165,7 +167,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   prop = XInternAtom(im->x.disp, "_MOTIF_WM_HINTS", False);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
-
+  
   XChangeProperty(im->x.disp, xwin->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
@@ -184,6 +186,9 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
     XSetWMHints(im->x.disp, xwin->window, wm_hint);
     XFree(wm_hint);
   }
+
+  
+  //  XSetInputFocus(im->x.disp, PointerRoot, RevertToNone, CurrentTime);
 
   XUNLOCK(im->x.disp);
 
@@ -389,6 +394,12 @@ static void _window_handle_event(XEvent *event, void *data) {
   xitk_dialog_t *wd = (xitk_dialog_t *)data;
   
   switch(event->type) {
+
+  case Expose:
+    XLOCK(wd->imlibdata->x.disp);
+    XSetInputFocus(wd->imlibdata->x.disp, wd->xwin->window, RevertToParent, CurrentTime);
+    XLOCK(wd->imlibdata->x.disp);
+    break;
 
   case MappingNotify:
     XLOCK(wd->imlibdata->x.disp);

@@ -646,6 +646,12 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
+  case EnterNotify:
+    XLOCK(private_data->imlibdata->x.disp);
+    XRaiseWindow(private_data->imlibdata->x.disp, private_data->window);
+    XUNLOCK(private_data->imlibdata->x.disp);
+    break;
+
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
     if (bevent->button == Button4)
@@ -798,12 +804,14 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 					  mb->imlibdata->x.depth, 
 					  CopyFromParent, 
 					  mb->imlibdata->x.visual,
-					  CWBackPixel | CWBorderPixel | CWColormap, &attr);
+					  CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
+					  &attr);
   
   XSetStandardProperties(mb->imlibdata->x.disp, private_data->window, title, title,
 			 None, NULL, 0, &hint);
 
   XSelectInput(mb->imlibdata->x.disp, private_data->window,
+	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
@@ -960,6 +968,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   mywidget->running            = 1;
   mywidget->visible            = 1;
   mywidget->have_focus         = FOCUS_LOST;
+  mywidget->imlibdata          = private_data->imlibdata;
   mywidget->x                  = mb->x;
   mywidget->y                  = mb->y;
   mywidget->width              = private_data->bg_image->width;
@@ -973,6 +982,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   mywidget->notify_change_skin = NULL;
   mywidget->notify_destroy     = notify_destroy;
   mywidget->get_skin           = NULL;
+
+  mywidget->tips_timeout       = 0;
+  mywidget->tips_string        = NULL;
 
   xitk_browser_update_list(private_data->mrlb_list, 
 			   private_data->mc->mrls_disp, 
