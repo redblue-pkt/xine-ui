@@ -1,1444 +1,2724 @@
-# Polish xine-ui translation file.
+# Polish xine-lib translation file.
 # Copyright (C) 2002 Free Software Foundation, Inc.
 # Bart³omiej Muryn <_4ever_@irc.pl>, 2002.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.13\n"
-"POT-Creation-Date: 2002-11-02 06:37+0100\n"
-"PO-Revision-Date: 2002-10-29 17:44+0100\n"
+"Project-Id-Version: xine-lib 0.9.13\n"
+"POT-Creation-Date: 2002-08-30 16:24+0200\n"
+"PO-Revision-Date: 2002-09-01 21:52+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
-"Language-Team: Polish <pl@li.org>\n"
+"Language-Team: Polski <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.6\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2;\n"
 
-# src/xitk/actions.c:102
-#: src/xitk/actions.c:228
-msgid "No MRL (input stream) specified"
-msgstr "Brak podanego MRL (strumienia wej¶cia)"
+# src/audio_out/audio_alsa_out.c:181 src/audio_out/audio_alsa_out.c:728
+# src/audio_out/audio_alsa_out.c:913 src/audio_out/audio_alsa_out.c:957
+#: src/audio_out/audio_alsa_out.c:181 src/audio_out/audio_alsa_out.c:734
+#: src/audio_out/audio_alsa_out.c:919 src/audio_out/audio_alsa_out.c:963
+msgid "device used for mono output"
+msgstr "urz±dzenie u¿yte w trybie mono"
 
-#: src/xitk/actions.c:529 src/xitk/actions.c:548
-#, c-format
-msgid "%s(): can't create new thread (%s)\n"
-msgstr "%s(): nie mogê utworzyæ nowego w±tku (%s)\n"
+# src/audio_out/audio_alsa_out.c:191 src/audio_out/audio_alsa_out.c:920
+#: src/audio_out/audio_alsa_out.c:191 src/audio_out/audio_alsa_out.c:926
+msgid "device used for stereo output"
+msgstr "urz±dzenie u¿yte w trybie stereo"
 
-# src/xitk/actions.c:619
-#: src/xitk/actions.c:910
-#, c-format
-msgid "XSendEvent(display, 0x%x ...) failed.\n"
-msgstr "XSendEvent(display, 0x%x ...) zawiód³.\n"
+# src/audio_out/audio_alsa_out.c:201 src/audio_out/audio_alsa_out.c:927
+#: src/audio_out/audio_alsa_out.c:201 src/audio_out/audio_alsa_out.c:933
+msgid "device used for 4-channel output"
+msgstr "urz±dzenie u¿yte do wyj¶cia 4-kana³owego"
 
-# src/xitk/control.c:357 src/xitk/panel.c:135 src/xitk/playlist.c:634
-#: src/xitk/control.c:315 src/xitk/panel.c:190 src/xitk/playlist.c:671
-#, c-format
-msgid "%s(): couldn't find image for background\n"
-msgstr "%s(): nie mogê znale¼æ obrazu t³a\n"
+# src/audio_out/audio_alsa_out.c:211 src/audio_out/audio_alsa_out.c:934
+#: src/audio_out/audio_alsa_out.c:211 src/audio_out/audio_alsa_out.c:940
+msgid "device used for 5-channel output"
+msgstr "urz±dzenie u¿yte do wyj¶cia 5-kana³owego"
 
-# src/xitk/control.c:434
-#: src/xitk/control.c:391
-msgid "Xine Control Panel"
-msgstr "Panel Sterowania XINE"
+# src/audio_out/audio_alsa_out.c:221 src/audio_out/audio_alsa_out.c:232
+# src/audio_out/audio_alsa_out.c:941 src/audio_out/audio_alsa_out.c:948
+#: src/audio_out/audio_alsa_out.c:221 src/audio_out/audio_alsa_out.c:232
+#: src/audio_out/audio_alsa_out.c:947 src/audio_out/audio_alsa_out.c:954
+msgid "device used for 5.1-channel output"
+msgstr "urz±dzenie u¿yte do wyj¶cia 5.1-kana³owego"
 
-# src/xitk/control.c:449 src/xitk/playlist.c:730
-#: src/xitk/control.c:406 src/xitk/playlist.c:767
-msgid "xine-playlist: couldn't find image for background\n"
-msgstr "xine-playlist: nie mogê znale¼æ obrazu t³a\n"
+# src/audio_out/audio_alsa_out.c:862 src/audio_out/audio_alsa_out.c:1072
+#: src/audio_out/audio_alsa_out.c:868 src/audio_out/audio_alsa_out.c:1078
+msgid "alsa mixer device"
+msgstr "urz±dzenie miksera alsa"
 
-# src/xitk/control.c:566
-#: src/xitk/control.c:532
-msgid "Control HUE value"
-msgstr "Ustawianie ODCIENIA"
+# src/audio_out/audio_alsa_out.c:1009 src/audio_out/audio_alsa_out.c:1022
+# src/audio_out/audio_alsa_out.c:1035 src/audio_out/audio_alsa_out.c:1053
+#: src/audio_out/audio_alsa_out.c:1015 src/audio_out/audio_alsa_out.c:1028
+#: src/audio_out/audio_alsa_out.c:1041 src/audio_out/audio_alsa_out.c:1059
+msgid "used to inform xine about what the sound card can do"
+msgstr "u¿ywane do informowania xine o mo¿liwo¶ciach karty d¼wiêkowej"
 
-# src/xitk/control.c:569
-#: src/xitk/control.c:535
-msgid "Hue"
-msgstr "Odc"
-
-# src/xitk/control.c:591
-#: src/xitk/control.c:554
-msgid "Control SATURATION value"
-msgstr "Ustawianie NASYCENIA"
-
-# src/xitk/control.c:594
-#: src/xitk/control.c:557
-msgid "Sat"
-msgstr "Nas"
-
-# src/xitk/control.c:616
-#: src/xitk/control.c:576
-msgid "Control BRIGHTNESS value"
-msgstr "Ustawianie JASNO¦CI"
-
-# src/xitk/control.c:619
-#: src/xitk/control.c:579
-msgid "Brt"
-msgstr "Jas"
-
-# src/xitk/control.c:641
-#: src/xitk/control.c:598
-msgid "Control CONTRAST value"
-msgstr "Ustawianie KONTRASTU"
-
-# src/xitk/control.c:644
-#: src/xitk/control.c:601
-msgid "Ctr"
-msgstr "Kon"
-
-# src/xitk/control.c:665
-#: src/xitk/control.c:619
-msgid "Choose a Skin"
-msgstr "Wybór Skóry"
-
-# src/xitk/control.c:701 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:899
-#: src/xitk/control.c:646 src/xitk/mrl_browser.c:274 src/xitk/playlist.c:946
-msgid "Dismiss"
-msgstr "Koniec"
-
-# src/xitk/control.c:707
-#: src/xitk/control.c:652
-msgid "Close control window"
-msgstr "Zamykanie panela kontrolnego"
-
-# src/xitk/errors.c:64 src/xitk/kbindings.c:1920
-#: src/xitk/errors.c:64 src/xitk/kbindings.c:1992
-msgid "Done"
-msgstr "Zrobione"
-
-# src/xitk/errors.c:64
-#: src/xitk/errors.c:64
-msgid "More..."
-msgstr "Wiêcej..."
-
-# src/xitk/errors.c:139
-#: src/xitk/errors.c:139
-msgid "Error"
-msgstr "B³±d"
-
-# src/xitk/errors.c:196
-#: src/xitk/errors.c:196
-#, c-format
-msgid ""
-"- xine engine error -\n"
-"\n"
-"There is no input plugin available to handle '%s'.\n"
-"Maybe MRL syntax is wrong or file/stream source doesn't exist."
+# src/audio_out/audio_alsa_out.c:1105
+#: src/audio_out/audio_alsa_out.c:1111
+msgid "xine audio output plugin using alsa-compliant audio devices/drivers"
 msgstr ""
-"- b³±d silnika xine -\n"
-"\n"
-"Brak odpowiedniej wtyczki wej¶cia do obs³ugi '%s'.\n"
-"Mo¿liwe ¿e sk³adnia MRL jest b³êdna albo ¼ród³o pliku/strumienia nie "
-"istnieje."
+"wtyczka wyj¶cia d¼wiêku xine u¿ywaj±ca sprzêtu/sterowników kompatybilnych z "
+"systemem alsa"
 
-# src/xitk/errors.c:202
-#: src/xitk/errors.c:203
-#, c-format
-msgid ""
-"- xine engine error -\n"
-"\n"
-"There is no demuxer plugin available to handle '%s'.\n"
-"Usually this means that the file format was not recognized."
+# src/audio_out/audio_esd_out.c:414
+#: src/audio_out/audio_esd_out.c:414
+msgid "esd audio output latency (adjust a/v sync)"
+msgstr "opó¼nienie wyj¶cia d¼wieku esd (regulacja synchronizacji a/v)"
+
+# src/audio_out/audio_esd_out.c:441
+#: src/audio_out/audio_esd_out.c:441
+msgid "xine audio output plugin using esd"
+msgstr "wtyczka wyj¶cia d¼wiêku u¿ywaj±ca esd"
+
+# src/audio_out/audio_oss_out.c:640
+#: src/audio_out/audio_oss_out.c:640
+msgid "/dev/dsp# device to use for oss output, -1 => auto_detect"
+msgstr "/dev/dsp# urz±dzenie u¿ywane dla wyj¶cia oss, - 1 => auto_detect"
+
+# src/audio_out/audio_oss_out.c:708
+#: src/audio_out/audio_oss_out.c:708
+msgid "A/V sync method to use by OSS, depends on driver/hardware"
+msgstr "metoda synchronizacji A/V u¿ywana przez OSS, zale¿y od sterownika/sprzêtu"
+
+# src/audio_out/audio_oss_out.c:775
+#: src/audio_out/audio_oss_out.c:775
+msgid "Adjust a/v sync for OSS softsync"
+msgstr "regulacja synchronizacji a/v dla softsync OSS"
+
+# src/audio_out/audio_oss_out.c:776
+#: src/audio_out/audio_oss_out.c:776
+msgid "Use this to manually adjust a/v sync if you're using softsync"
+msgstr "manualna regulacja sychronizacji a/v z wyko¿ystaniem softsync"
+
+# src/audio_out/audio_oss_out.c:802
+#: src/audio_out/audio_oss_out.c:802
+msgid "Enable 4.0 channel analog surround output"
+msgstr "w³±cz 4-kana³owe, analogowe wyj¶cie d¼wiêku surround"
+
+# src/audio_out/audio_oss_out.c:813
+#: src/audio_out/audio_oss_out.c:813
+msgid "Enable 5.0 channel analog surround output"
+msgstr "w³±cz 5-kana³owe, analogowe wyj¶cie d¼wiêku surround"
+
+# src/audio_out/audio_oss_out.c:824
+#: src/audio_out/audio_oss_out.c:824
+msgid "Enable 5.1 channel analog surround output"
+msgstr "w³±cz 5.1-kana³owe, analogowe wyj¶cie d¼wiêku surround"
+
+# src/audio_out/audio_oss_out.c:835
+#: src/audio_out/audio_oss_out.c:835
+msgid "Enable A52 / AC5 digital audio output via spdif"
+msgstr "w³±cz cyfrowe wyj¶cie d¼wiêku a52/ac5 przez spdif"
+
+# src/audio_out/audio_oss_out.c:851
+#: src/audio_out/audio_oss_out.c:851
+msgid "oss mixer device"
+msgstr "urz±dzenie miksera oss"
+
+# src/audio_out/audio_oss_out.c:923
+#: src/audio_out/audio_oss_out.c:923
+msgid "xine audio output plugin using oss-compliant audio devices/drivers"
 msgstr ""
-"- b³±d silnika xine -\n"
-"\n"
-"Brak odpowiedniej wtyczki wej¶cia do obs³ugi '%s'.\n"
-"Zazwyczaj oznacza to ¿e format pliku nie zosta³ rozpoznany."
+"wtyczka wyj¶cia d¼wiêku xine, u¿ywaj±ca urz±dzeñ/sterowników kompatybilnych "
+"z oss"
 
-# src/xitk/errors.c:207
-#: src/xitk/errors.c:210
+# src/audio_out/audio_sun_out.c:664
+#: src/audio_out/audio_sun_out.c:664
+msgid "device used for audio output with the 'Sun' audio plugin"
+msgstr "urz±dzenie u¿ywane do wyj¶cia d¼wiêku z wtyczk± d¼wiêku 'Sun'"
+
+# src/audio_out/audio_sun_out.c:748
+#: src/audio_out/audio_sun_out.c:748
+msgid "xine audio output plugin using sun-compliant audio devices/drivers"
+msgstr "wtyczka wyj¶cia d¼wiêku xine kompatybilna z urz±dzeniami/sterownikami sun"
+
+# src/audio_out/audio_arts_out.c:359
+#: src/audio_out/audio_arts_out.c:359
+msgid "xine audio output plugin using arts-compliant audio devices/drivers"
+msgstr "wtyczka wyj¶cia d¼wiêku xine kompatybilna z urz±dzeniami/sterownikami arts"
+
+# src/audio_out/audio_irixal_out.c:382
+#: src/audio_out/audio_irixal_out.c:382
+msgid "irixal audio output maximum gap length in 1/90000s"
+msgstr "maksymalna d³ugo¶æ przerwy wyj¶cia d¼wiêku irixal w 1/90000s"
+
+# src/audio_out/audio_irixal_out.c:411
+#: src/audio_out/audio_irixal_out.c:411
+msgid "xine audio output plugin using IRIX libaudio"
+msgstr "wtyczka wyj¶cia d¼wiêku xine u¿ywaj±ca IRIX libaudio"
+
+# src/demuxers/demux_ts.c:337
+#: src/demuxers/demux_ts.c:337
+msgid "demux_ts: FIXME: (unsupported )PAT spans multiple TS packets\n"
+msgstr "demux_ts: POPRAW MNIE: (nie wspierane)PAT zrzuca wiele pakietów TS\n"
+
+# src/demuxers/demux_ts.c:343
+#: src/demuxers/demux_ts.c:343
 #, c-format
-msgid ""
-"- xine engine error -\n"
-"\n"
-"demuxer failed. Maybe '%s' is a broken file?\n"
-msgstr ""
-"- b³±d silnika xine -\n"
-"\n"
-"demultiplexer zawiód³. Mo¿liwe ¿e '%s' to uszkodzony plik?\n"
+msgid "demux_ts: FIXME: (unsupported) PAT consists of multiple (%d) sections\n"
+msgstr "demux_ts: POPRAW MNIE: (nie wspierane)PAT sk³ada siê z wielu sekcji (%d)\n"
 
-# src/xitk/errors.c:212
-#: src/xitk/errors.c:216
-msgid ""
-"- xine engine error -\n"
-"\n"
-"!! Unhandled error !!\n"
-msgstr ""
-"- B³±d silnika xine -\n"
-"\n"
-"!! Nieobs³ugiwany b³±d !!\n"
-
-# src/xitk/event.c:662
-#: src/xitk/event.c:713
-#, c-format
-msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
-msgstr "gui_main: selected visual %#lx does not exist, trying default visual\n"
-
-# src/xitk/event.c:681
-#: src/xitk/event.c:732
-msgid "gui_main: couldn't find true color visual.\n"
-msgstr "gui_main: nie mogê znale¼æ ekranu w trybie true-color.\n"
-
-# src/xitk/event.c:721
-#: src/xitk/event.c:772
-msgid ""
-"\n"
-"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
-msgstr ""
-"\n"
-"XInitThreads zawiód³ - wygl±da na to ¿e nie masz thread-safe xlib.\n"
-
-# src/xitk/event.c:730
-#: src/xitk/event.c:781
-msgid "Cannot open display\n"
-msgstr "Nie mogê otworzyæ okna wy¶wietlania\n"
-
-# src/xitk/event.c:735
-#: src/xitk/event.c:787 src/xitk/event.c:800
-msgid "synchronized X protocol (debug)"
-msgstr "synchronizowany protokó³ X (odpluskwianie)"
-
-# src/xitk/event.c:737
-#: src/xitk/event.c:794
-msgid "Warning! Synchronized X activated - this is way slow...\n"
-msgstr ""
-"Uwaga! Synchronizowany protokó³ X aktywowany - to jest powolna metoda...\n"
-
-# src/xitk/event.c:742
-#: src/xitk/event.c:799
-msgid "use wm layer property to place window on top"
-msgstr "U¿ywaæ w³asno¶ci warstwy wm aby umie¶ciæ okno na wierzchu"
-
-# src/xitk/event.c:748
-#: src/xitk/event.c:808
-msgid "where snapshots will be saved"
-msgstr "gdzie zrzuty ekranów bêd± zachowywane"
-
-# src/xitk/event.c:753
-#: src/xitk/event.c:816
-msgid "time between two screensaver fake events, 0 to disable"
-msgstr "czas miêdzy dwoma symulacjami wydarzeñ wygaszacza, 0 wy³±cza"
-
-#: src/xitk/event.c:824
-msgid "play next|previous chapter instead of mrl (dvdnav)"
-msgstr "odtwarzaj nastêpny/poprzedni rozdzia³ zamiast mrl (dvdnav)"
-
-#: src/xitk/event.c:832
-msgid "show/hide video output window regarding to the stream type"
-msgstr "poka¿/ukryj okno wy¶witlania obrazu zale¿nie od typu strumienia"
-
-#: src/xitk/event.c:840
-msgid ""
-"automatically show/hide panel window, according to "
-"auto_video_output_visibility"
-msgstr ""
-"automatycznie poka¿/ukryj panel, zgodnie z auto_video_output_visibility"
-
-# src/xitk/event.c:761
-#. Some infos
-#: src/xitk/event.c:854
-#, c-format
-msgid "XServer Vendor: %s. Release: %d,\n"
-msgstr "Dostawca XSerwera: %s Wersja %d,\n"
-
-# src/xitk/event.c:763
-#: src/xitk/event.c:856
-#, c-format
-msgid "        Protocol Version: %d, Revision: %d,\n"
-msgstr "         Protokó³ w wersji: %d, Rewizja %d,\n"
-
-# src/xitk/event.c:765
-#: src/xitk/event.c:858
-#, c-format
-msgid "        Available Screen(s): %d, using %d\n"
-msgstr "         Dostêpny ekran(y): %d, u¿ywany %d\n"
-
-# src/xitk/event.c:767
-#: src/xitk/event.c:860
-#, c-format
-msgid "        Depth: %d.\n"
-msgstr "         G³êbia: %d.\n"
-
-#: src/xitk/event.c:869
-#, c-format
-msgid "        XShmQueryVersion: %d.%d.\n"
-msgstr "        XShmQureyVersion: %d.%d.\n"
-
-# src/xitk/event.c:824
-#: src/xitk/event.c:931
-msgid "Unable to initialize Imlib\n"
-msgstr "Nie mogê zainicjowaæ Imlib\n"
-
-#: src/xitk/event_sender.c:340
-msgid "Event sender window stick to main panel"
-msgstr "Przyklejenie okna wysy³acza wydarzeñ do g³ównego panelu"
-
-#: src/xitk/event_sender.c:354
-msgid "event sender"
-msgstr "wysy³acz wydarzeñ"
-
-#: src/xitk/event_sender.c:373
-msgid "Up"
-msgstr "Góra"
-
-#: src/xitk/event_sender.c:390
-msgid "Left"
-msgstr "Lewo"
-
-# src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:210
-#: src/xitk/event_sender.c:407 src/xitk/file_browser.c:223
-#: src/xitk/mrl_browser.c:267
-msgid "Select"
-msgstr "Wybór"
-
-#: src/xitk/event_sender.c:424
-msgid "Right"
-msgstr "Prawo"
-
-# src/xitk/errors.c:64 src/xitk/kbindings.c:1920
-#: src/xitk/event_sender.c:441
-msgid "Down"
-msgstr "Dó³"
-
-#: src/xitk/event_sender.c:461
-#, c-format
-msgid "Menu %d"
-msgstr "Menu %d"
-
-#: src/xitk/event_sender.c:481
-msgid "Angle -"
-msgstr "K±t -"
-
-#: src/xitk/event_sender.c:495
-msgid "Angle +"
-msgstr "K±t +"
-
-# src/xitk/setup.c:1165 src/xitk/viewlog.c:488
-#: src/xitk/event_sender.c:573 src/xitk/setup.c:1191
-#: src/xitk/stream_infos.c:881 src/xitk/viewlog.c:503
-msgid "Close"
-msgstr "Koniec"
-
-# src/xitk/file_browser.c:182
-#: src/xitk/file_browser.c:198
-msgid "Xine File Browser"
-msgstr "Przegl±darka plików xine"
-
-# src/xitk/kbindings.c:349
-#: src/xitk/kbindings.c:401
-#, c-format
-msgid "Key bindings of '%s' and '%s' are the same.\n"
-msgstr "Mapowania klawiszy '%s' i '%s' s± identyczne.\n"
-
-# src/xitk/kbindings.c:711
-#: src/xitk/kbindings.c:763
-msgid "OOCH: key binding table is NULL.\n"
-msgstr "Ojej: tablica mapowania klawiszy jest PUSTA.\n"
-
-# src/xitk/kbindings.c:1296
-#: src/xitk/kbindings.c:1355
-msgid "Nothing selected"
-msgstr "Nie wybrano"
-
-# src/xitk/kbindings.c:1297
-#: src/xitk/kbindings.c:1356
-msgid "None"
-msgstr "Brak"
-
-# src/xitk/kbindings.c:1458
-#: src/xitk/kbindings.c:1517
-msgid "You can only delete alias entries."
-msgstr "Mo¿na usuwaæ tylko aliasy wpisów"
-
-# src/xitk/kbindings.c:1582
-#: src/xitk/kbindings.c:1641
-msgid "Press Keyboard Keys..."
-msgstr "Naci¶nij kawisz..."
-
-# src/xitk/kbindings.c:1599
-#: src/xitk/kbindings.c:1658
-msgid "Event receiver window"
-msgstr "Okno odbiornika wydarzeñ"
-
-# src/xitk/kbindings.c:1684
-#. Ask if uses want/wont store new shorcut
-#: src/xitk/kbindings.c:1743
-msgid "Accept?"
-msgstr "Zaakceptowaæ?"
-
-# src/xitk/kbindings.c:1688
-#: src/xitk/kbindings.c:1747
+# src/demuxers/demux_ts.c:353
+#: src/demuxers/demux_ts.c:353
 #, c-format
 msgid ""
-"Store %s as\n"
-"'%s' key binding ?."
+"demux_ts: demux error! PAT with invalid CRC32: packet_crc32: %.8x "
+"calc_crc32: %.8x\n"
 msgstr ""
-"Zapis %s jako\n"
-"mapowanie klawisza '%s'?."
+"demux_ts: b³±d demultiplexera! PAT z b³êdnym CRC32: crc32 pakietu: %.8x "
+"wyliczone crc32: %.8x\n"
 
-# src/xitk/kbindings.c:1695
-#: src/xitk/kbindings.c:1754
+# src/demuxers/demux_ts.c:430
+#: src/demuxers/demux_ts.c:430
+#, c-format
+msgid "demux_ts: error %02x %02x %02x (should be 0x000001)\n"
+msgstr "demux_ts: b³±d %02x %02x %02x (powinno byæ 0x000001)\n"
+
+# src/demuxers/demux_ts.c:571
+#: src/demuxers/demux_ts.c:571
+#, c-format
+msgid "fifo unavailable (%d)\n"
+msgstr "nie dostêpne fifo (%d)\n"
+
+# src/demuxers/demux_ts.c:580
+#: src/demuxers/demux_ts.c:580
+#, c-format
+msgid "demux_ts: unexpected cc %d (expected %d)\n"
+msgstr "demux_ts: nieoczekiwany cc: %d (oczekiwany %d)\n"
+
+# src/demuxers/demux_ts.c:603
+#: src/demuxers/demux_ts.c:603
+msgid "demux_ts: corrupted pes encountered\n"
+msgstr "demux_ts: napotkano uszkodzony PES\n"
+
+# src/demuxers/demux_ts.c:707
+#: src/demuxers/demux_ts.c:707
+msgid "demux error! PMT with invalid pointer\n"
+msgstr "b³±d demultiplexera! PMT z b³êdnym kursorem\n"
+
+# src/demuxers/demux_ts.c:811
+#: src/demuxers/demux_ts.c:811
 #, c-format
 msgid ""
-"This key bindings is redundant with action:\n"
-"\"%s\".\n"
+"demux_ts: demux error! PMT with invalid CRC32: packet_crc32: %#.8x "
+"calc_crc32: %#.8x\n"
 msgstr ""
-"To mapowanie klawisza jest redundantne z akcj±\n"
-"\"%s\".\n"
+"demux_ts: b³±d demultipleksera! PMT z b³êdnym CRC32: crc32 pakietu %#.8x "
+"wyliczone crc32: %#.8x\n"
 
-# src/xitk/kbindings.c:1774
-#: src/xitk/kbindings.c:1845
-msgid "key binding editor"
-msgstr "Edytor mapowania klawiszy"
+# src/demuxers/demux_ts.c:826
+#: src/demuxers/demux_ts.c:826
+msgid "demux error! PMT with inconsistent progInfo length\n"
+msgstr "b³±d demultiplexera! PMT z niespójn± d³ugo¶ci± progInfo\n"
 
-# src/xitk/kbindings.c:1799
-#: src/xitk/kbindings.c:1870
-msgid "Binding action"
-msgstr "Akcja skrótu"
+# src/demuxers/demux_ts.c:843
+#: src/demuxers/demux_ts.c:843
+msgid "demux error! PMT with inconsistent streamInfo length\n"
+msgstr "b³±d demultiplexera! PMT z niespójn± d³ugo¶ci± streamInfo\n"
 
-# src/xitk/kbindings.c:1805
-#: src/xitk/kbindings.c:1876
-msgid "Key"
-msgstr "Klawisz"
+# src/demuxers/demux_ts.c:1200
+#: src/demuxers/demux_ts.c:1200
+#, c-format
+msgid "demux error! invalid ts sync byte %.2x\n"
+msgstr "b³±d demultiplexera! b³êdny bajt synchronizacji ts %.2x\n"
 
-# src/xitk/kbindings.c:1810
-#: src/xitk/kbindings.c:1881
-msgid "Modifiers"
-msgstr "Modyfikator"
+# src/demuxers/demux_ts.c:1205
+#: src/demuxers/demux_ts.c:1205
+msgid "demux error! transport error\n"
+msgstr "b³±d demultiplexera! b³±d transportu\n"
 
-# src/xitk/kbindings.c:1851
-#: src/xitk/kbindings.c:1923
-msgid "Alias"
-msgstr "Alias"
+# src/demuxers/demux_ts.c:1268
+#: src/demuxers/demux_ts.c:1268
+#, c-format
+msgid "demux_ts: demux error! invalid payload size %d\n"
+msgstr "demux_ts: b³±d demultiplexera! B³êdny rozmiar payload %d\n"
 
-# src/xitk/kbindings.c:1865
-#: src/xitk/kbindings.c:1937
-msgid "Edit"
-msgstr "Edycja"
+# src/demuxers/demux_ts.c:1465 src/demuxers/demux_ts.c:1679
+#: src/demuxers/demux_ts.c:1465 src/demuxers/demux_ts.c:1679
+msgid "valid mrls for ts demuxer"
+msgstr "prawid³owe mrl'e dla demultiplexera ts"
 
-# src/xitk/kbindings.c:1879
-#: src/xitk/kbindings.c:1951
-msgid "Delete"
-msgstr "Usuwanie"
+# src/demuxers/demux_ts.c:1472
+#: src/demuxers/demux_ts.c:1472
+#, c-format
+msgid "demux %u ts_open!\n"
+msgstr "demux %u ts_open!\n"
 
-# src/xitk/kbindings.c:1893 src/xitk/playlist.c:889
-#: src/xitk/kbindings.c:1965 src/xitk/playlist.c:936
-msgid "Save"
-msgstr "Zapis"
+# src/demuxers/demux_ts.c:1500 src/demuxers/demux_ts.c:1683
+#: src/demuxers/demux_ts.c:1500 src/demuxers/demux_ts.c:1683
+msgid "valid mrls ending for ts demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultiplexera ts"
 
-# src/xitk/kbindings.c:1907
-#: src/xitk/kbindings.c:1979
-msgid "Reset"
-msgstr "Reset"
+# src/demuxers/demux_ts.c:1573
+#: src/demuxers/demux_ts.c:1573
+#, c-format
+msgid "demux_ts: can't create new thread (%s)\n"
+msgstr "demux_ts: nie moge utworzyæ nowego w±tku (%s)\n"
 
-# src/xitk/kbindings.c:1984
-#: src/xitk/kbindings.c:2056
-msgid "ctrl"
-msgstr "ctrl"
-
-# src/xitk/kbindings.c:2005
-#: src/xitk/kbindings.c:2077
-msgid "meta"
-msgstr "meta"
-
-# src/xitk/kbindings.c:2027
-#: src/xitk/kbindings.c:2099
-msgid "mod3"
-msgstr "mod3"
-
-# src/xitk/kbindings.c:2049
-#: src/xitk/kbindings.c:2121
-msgid "mod4"
-msgstr "mod4"
-
-# src/xitk/kbindings.c:2070
-#: src/xitk/kbindings.c:2142
-msgid "mod5"
-msgstr "mod5"
-
-# src/xitk/kbindings.c:2079
-#: src/xitk/kbindings.c:2151
-msgid "Grab"
-msgstr "Przechwytuj"
-
-# src/xitk/main.c:245
-#: src/xitk/main.c:249
+# src/demuxers/demux_ts.c:1662
+#: src/demuxers/demux_ts.c:1662
 #, c-format
 msgid ""
-"This is xine (X11 gui) - a free video player v%s\n"
-"(c) 2000-2002 by G. Bartsch and the xine project team.\n"
+"demux_ts: plugin doesn't support plugin API version %d.\n"
+"          This means there's a version mismatch between xine and this "
+"demuxer plugin.\n"
+"          Installing current demux plugins should help.\n"
 msgstr ""
-"To jest XINE (interfejs u¿ytkownika X11) - wolny odtwarzacz wideo v%s\n"
-"(c) 2000-2002 G. Bartsch i grupa projektu xine. \n"
+"demux_ts: wtyczka nie wspiera API w wersji %d.\n"
+"\t   to oznacza ¿e jest niezgodno¶æ wersji miêdzy xine i           wtyczk± "
+"demultiplexera.\n"
+"Instalacja aktualnej wtyczki wej¶cia powinna pomóc.\n"
 
-# src/xitk/main.c:255
-#: src/xitk/main.c:260
+# src/demuxers/demux_avi.c:659
+#: src/demuxers/demux_avi.c:652
+msgid "demux_avi: avi index is broken\n"
+msgstr "demux_avi: index pliku avi uszkodzony\n"
+
+# src/demuxers/demux_avi.c:1244
+#: src/demuxers/demux_avi.c:1232
 #, c-format
-msgid "Built with xine library %d.%d.%d (%s)\n"
-msgstr "Skompilowane z bibliotek± xine %d.%d.%d (%s)\n"
+msgid "demux_avi: video format = %s\n"
+msgstr "demux_avi: format obrazu = %s\n"
 
-# src/xitk/main.c:258
-#: src/xitk/main.c:265
+# src/demuxers/demux_avi.c:1246
+#: src/demuxers/demux_avi.c:1234
 #, c-format
-msgid "Found xine library version: %d.%d.%d (%s).\n"
-msgstr "Znaleziono bibliotekê xine w wersji: %d.%d.%d (%s).\n"
+msgid "demux_avi: video frame size %ld x %ld\n"
+msgstr "demux_avi: rozmiar ramki wideo %ld x %ld\n"
 
-# src/xitk/main.c:273
-#: src/xitk/main.c:296
-msgid "Usage: xine [OPTIONS]... [MRL]\n"
-msgstr "U¿ytkowanie: xine [OPCJE]... [MRL]\n"
+# src/demuxers/demux_avi.c:1249
+#: src/demuxers/demux_avi.c:1237
+#, c-format
+msgid "demux_avi: audio format[%d] = 0x%lx\n"
+msgstr "demux_avi: format d¼wiêku [%d] = 0x%lx\n"
 
-# src/xitk/main.c:276
-#: src/xitk/main.c:299
-msgid "  -v, --version                Display version.\n"
-msgstr "  -v, --version                Wy¶wietlenie numeru wersji.\n"
+# src/demuxers/demux_avi.c:1257
+#: src/demuxers/demux_avi.c:1245
+#, c-format
+msgid "demux_avi: unknown audio type 0x%lx\n"
+msgstr "demux_avi: nieznany typ d¼wiêku 0x%lx\n"
 
-# src/xitk/main.c:277
-#: src/xitk/main.c:300
+# src/demuxers/demux_avi.c:1264
+#: src/demuxers/demux_avi.c:1252
+#, c-format
+msgid "demux_avi: audio type %s (wFormatTag 0x%x)\n"
+msgstr "demux_avi: typ dzwiêku %s (wFormatTag 0x%x)\n"
+
+# src/demuxers/demux_avi.c:1384
+#: src/demuxers/demux_avi.c:1388
+#, c-format
+msgid "demux_avi: unknown video codec '%.4s'\n"
+msgstr "demux_avi: nieznany kodek wideo '%.4s'\n"
+
+# src/demuxers/demux_avi.c:1393
+#: src/demuxers/demux_avi.c:1397
+#, c-format
+msgid "demux_avi: video codec is '%s'\n"
+msgstr "demux_avi: kodek wideo to '%s'\n"
+
+# src/demuxers/demux_avi.c:1535 src/demuxers/demux_avi.c:1612
+#: src/demuxers/demux_avi.c:1536 src/demuxers/demux_avi.c:1613
+msgid "valid mrls ending for avi demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultiplexera avi"
+
+# src/demuxers/demux_avi.c:1599
+#: src/demuxers/demux_avi.c:1600
+#, c-format
 msgid ""
-"  -V, --video-driver <drv>     Select video driver by id. Available "
-"drivers: \n"
+"demux_avi: this plugin doesn't support plugin API version %d.\n"
+"demux_avi: this means there's a version mismatch between xine and this "
+"demux_avi: demuxer plugin.\n"
+"Installing current demuxer plugins should help.\n"
 msgstr ""
-"  -V, --video-driver <drv>     Wybór sterownika wideo. Dostêpne "
-"sterowniki: \n"
+"demux_avi: ta wtyczka nie wspiera API w wersji %d.\n"
+"demux_avi: oznacza to niezgodno¶æ miêdzy xine demux_avi: a t± wtyczka "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
 
-# src/xitk/main.c:286
-#: src/xitk/main.c:310
+# src/demuxers/demux_elem.c:319 src/demuxers/demux_elem.c:383
+#: src/demuxers/demux_elem.c:317 src/demuxers/demux_elem.c:381
+msgid "valid mrls ending for elementary demuxer"
+msgstr "prawid³owe rozszerzenia plików dla elementarnego demultiplexera"
+
+# src/demuxers/demux_elem.c:370
+#: src/demuxers/demux_elem.c:368
+#, c-format
 msgid ""
-"  -A, --audio-driver <drv>     Select audio driver by id. Available "
-"drivers: \n"
+"demux_elem: plugin doesn't support plugin API version %d.\n"
+"            this means there's a version mismatch between xine and "
+"this             demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
 msgstr ""
-"  -A, --audio-driver <drv>     Wybór sterownika d¼wiêku. Dostêpne "
-"sterowniki: \n"
+"demux_elem: ta wtyczka nie wspiera API w wersji %d.\n"
+"              oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±               "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
 
-# src/xitk/main.c:296
-#: src/xitk/main.c:320
-msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
-msgstr "  -u, --spu-channel <#>        Wybór kana³u SPU (napisy) '#'.\n"
+# src/demuxers/demux_mpeg.c:893 src/demuxers/demux_mpeg.c:990
+#: src/demuxers/demux_mpeg.c:1064 src/demuxers/demux_mpeg.c:1161
+msgid "valid mrls for mpeg demuxer"
+msgstr "prawid³owe mrls dla demultipleksera mpeg"
 
-# src/xitk/main.c:297
-#: src/xitk/main.c:321
-msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
-msgstr "  -a, --audio-channel <#>      Wybór kana³u d¼wiêku '#'.\n"
+# src/demuxers/demux_mpeg.c:912
+#: src/demuxers/demux_mpeg.c:1083
+msgid "demux_mpeg: please specify mpeg(mpeg1/mpeg2) stream type.\n"
+msgstr "demux_mpeg: proszê podaæ typ strumienia mpeg(mpeg1/mpeg2)\n"
 
-# src/xitk/main.c:298
-#: src/xitk/main.c:322
-msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
-msgstr ""
-"  -p, --auto-play [opt]        Odtwarzanie po starcie. Mo¿na u¿ywaæ z:\n"
+# src/demuxers/demux_mpeg.c:926 src/demuxers/demux_mpeg.c:994
+#: src/demuxers/demux_mpeg.c:1097 src/demuxers/demux_mpeg.c:1165
+msgid "valid mrls ending for mpeg demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera mpeg"
 
-# src/xitk/main.c:299
-#: src/xitk/main.c:323
-msgid "                    'f': in fullscreen mode.\n"
-msgstr "                    'f': tryb pe³noekranowy\n"
-
-# src/xitk/main.c:300
-#: src/xitk/main.c:324
-msgid "                    'h': hide GUI (panel, etc.).\n"
-msgstr "                    'h': ukrycie GUI (panel, etc.).\n"
-
-# src/xitk/main.c:301
-#: src/xitk/main.c:325
-msgid "                    'w': hide video window.\n"
-msgstr "                    'w': ukrycie okna wideo.\n"
-
-# src/xitk/main.c:302
-#: src/xitk/main.c:326
-msgid "                    'q': quit when play is done.\n"
-msgstr "                    'q': koniec po zakoñczeniu odtwarzania.\n"
-
-# src/xitk/main.c:303
-#: src/xitk/main.c:327
+# src/demuxers/demux_mpeg.c:977 src/demuxers/demux_mpgaudio.c:525
+#: src/demuxers/demux_mpeg.c:1148 src/demuxers/demux_mpgaudio.c:661
+#, c-format
 msgid ""
-"                    'd': retrieve playlist from DVD. (deprecated. use -s "
-"DVD)\n"
+"demux_mpeg: plugin doesn't support plugin API version %d.\n"
+"            this means there's a version mismatch between xine and "
+"this             demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
 msgstr ""
-"                    'd': lista odtwarzania z DVD. (stare. u¿yj -s DVD)\n"
+"demux_mpeg: ta wtyczka nie wspiera API w wersji %d.\n"
+"              oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±               "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
 
-# src/xitk/main.c:304
-#: src/xitk/main.c:328
+#: src/demuxers/demux_mpgaudio.c:181
+#, c-format
+msgid "mp3: song title '%s'\n"
+msgstr "mp3: tytu³ utworu '%s'\n"
+
+#: src/demuxers/demux_mpgaudio.c:183
+#, c-format
+msgid "mp3: artist     '%s'\n"
+msgstr "mp3: autor     '%s'\n"
+
+#: src/demuxers/demux_mpgaudio.c:185
+#, c-format
+msgid "mp3: album      '%s'\n"
+msgstr "mp3: album      '%s'\n"
+
+# src/demuxers/demux_mpgaudio.c:184
+#: src/demuxers/demux_mpgaudio.c:233
+#, c-format
+msgid "demux_mpgaudio: MPEG %s  Layer %d  %ldkbps\n"
+msgstr "demux_mpgaudio: MPEG %s Warstwa %d  %ldkbps\n"
+
+# src/demuxers/demux_mpgaudio.c:371
+#: src/demuxers/demux_mpgaudio.c:453
+msgid "demux_mpgaudio: no audio driver!\n"
+msgstr "demux_mpegaudio: brak sterownika d¼wiêku!\n"
+
+# src/demuxers/demux_mpgaudio.c:469 src/demuxers/demux_mpgaudio.c:538
+#: src/demuxers/demux_mpgaudio.c:607 src/demuxers/demux_mpgaudio.c:674
+msgid "valid mrls ending for mpeg audio demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera d¼wiêku mpeg"
+
+# src/demuxers/demux_pes.c:532 src/demuxers/demux_pes.c:620
+#: src/demuxers/demux_pes.c:526 src/demuxers/demux_pes.c:614
+msgid "valid mrls for pes demuxer"
+msgstr "prawid³owe mrls dla demultipleksera pes"
+
+# src/demuxers/demux_pes.c:562 src/demuxers/demux_pes.c:624
+#: src/demuxers/demux_pes.c:556 src/demuxers/demux_pes.c:618
+msgid "valid mrls ending for pes demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera pes"
+
+# src/demuxers/demux_pes.c:608
+#: src/demuxers/demux_pes.c:602
+#, c-format
 msgid ""
-"                    'v': retrieve playlist from VCD. (deprecated. use -s "
-"VCD)\n"
+"demux_pes: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
 msgstr ""
-"                    'v': lista odtwarzania z VCD. (stare. u¿yj -s VCD)\n"
+"demux_pes: ta wtyczka nie wspiera API w wersji %d.\n"
+"              oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±               "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
 
-# src/xitk/main.c:305
-#: src/xitk/main.c:329
-msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
-msgstr "  -s, --auto-scan <wtyczka>    auto-skanowanie listy z <wtyczki>\n"
+# src/demuxers/demux_qt.c:1270 src/demuxers/demux_qt.c:1561
+#: src/demuxers/demux_qt.c:1447 src/demuxers/demux_qt.c:1771
+msgid "valid mrls ending for qt demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera qt"
 
-# src/xitk/main.c:306
-#: src/xitk/main.c:330
-msgid "  -f, --fullscreen             start in fullscreen mode,\n"
-msgstr "  -f, --fullscreen             rozpoczêcie w trybie pe³noekranowym,\n"
+# src/demuxers/demux_qt.c:1344
+#: src/demuxers/demux_qt.c:1521
+#, c-format
+msgid "demux_qt: Apple Quicktime file, %srunning time: %d min, %d sec\n"
+msgstr "demux_qt: plik Apple Quicktime, %s czas odtwarzania: %d min, %d sec\n"
 
-# src/xitk/main.c:307
-#: src/xitk/main.c:331
-msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
-msgstr "  -g, --hide-gui               ukrycie GUI (panel, etc.)\n"
+# src/demuxers/demux_qt.c:1350
+#: src/demuxers/demux_qt.c:1527
+#, c-format
+msgid "demux_qt: '%c%c%c%c' video @ %dx%d\n"
+msgstr "demux_qt: '%c%c%c%c' obraz @ %dx%d\n"
 
-# src/xitk/main.c:308
-#: src/xitk/main.c:332
-msgid "  -H, --hide-video             hide video window\n"
-msgstr "  -H, --hide-video             ukrycie okna wideo\n"
+# src/demuxers/demux_qt.c:1359
+#: src/demuxers/demux_qt.c:1536
+#, c-format
+msgid "demux_qt: '%c%c%c%c' audio @ %d Hz, %d bits, %d %s\n"
+msgstr "demux_qt: '%c%c%c%c', d¼wiêk %d Hz, %d bits, %d %s\n"
 
-# src/xitk/main.c:310
-#: src/xitk/main.c:334
-msgid "  -L, --no-lirc                Turn off LIRC support.\n"
-msgstr "  -L, --no-lirc                wy³±czenie wsparcia dla LIRC'a\n"
+# src/demuxers/demux_qt.c:1367 src/demuxers/demux_smjpeg.c:420
+# src/demuxers/demux_wav.c:322
+#: src/demuxers/demux_qt.c:1544 src/demuxers/demux_smjpeg.c:435
+#: src/demuxers/demux_wav.c:322
+msgid "channel"
+msgid_plural "channels"
+msgstr[0] "kana³"
+msgstr[1] "kana³y"
+msgstr[2] "kana³ów"
 
-# src/xitk/main.c:312
-#: src/xitk/main.c:336
+# src/demuxers/demux_qt.c:1548
+#: src/demuxers/demux_qt.c:1758
+#, c-format
 msgid ""
-"      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+"demux_qt: plugin doesn't support plugin API version %d.\n"
+"          this means there's a version mismatch between xine and "
+"this           demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
 msgstr ""
-"      --visual <klasa-lub-id>  U¿ycie wybranego ekranu X11. <klasa-lub-id>\n"
+"demux_qt: ta wtyczka nie wspiera API w wersji %d.\n"
+"            oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±             "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
 
-# src/xitk/main.c:313
-#: src/xitk/main.c:337
+# src/demuxers/demux_ogg.c:220
+#: src/demuxers/demux_ogg.c:397
+msgid "ogg: vorbis audio stream detected\n"
+msgstr "ogg: znaleziono strumieñ d¼wiêku typu vorbis\n"
+
+# src/demuxers/demux_ogg.c:220
+#: src/demuxers/demux_ogg.c:404
+#, c-format
+msgid "ogg: vorbis avg. bitrate %d, samplerate %d\n"
+msgstr "ogg: vorbis przeciêtne bitrate %d, samplerate %d\n"
+
+#: src/demuxers/demux_ogg.c:417
+msgid "ogg: vorbis audio track indicated but no vorbis stream header found.\n"
+msgstr "ogg: ¶cie¿ka oznaczona jako vorbis ale nie znaleziono nag³ówka strumienia vorbis.\n"
+
+# src/demuxers/demux_avi.c:1246
+#: src/demuxers/demux_ogg.c:471 src/demuxers/demux_ogg.c:604
+#, c-format
+msgid "ogg: video format %.4s, frame size %d x %d, %d fps\n"
+msgstr "ogg: format obrazu %.4s, rozmiar ramki %d x %d, %d fps\n"
+
+#: src/demuxers/demux_ogg.c:641
+msgid "ogg: old header detected but stream type is unknown\n"
+msgstr "ogg: wykryty stary nag³ówek ale typ strumienia nieznany\n"
+
+# src/demuxers/demux_ogg.c:276
+#: src/demuxers/demux_ogg.c:647
+#, c-format
 msgid ""
-"                               is either an X11 visual class, or a visual "
-"id.\n"
-msgstr ""
-"                               jest albo klas± ekranu X11, albo id ekranu.\n"
+"ogg: unknown stream type (signature >%.8s<). hex dump of bos packet "
+"follows:\n"
+msgstr "ogg: nieznany typ strumienia (sygnatura >%.8s<). nastepne linie to hex zrzut pakietów bos\n"
 
-# src/xitk/main.c:314
-#: src/xitk/main.c:338
-msgid "      --install                Install a private colormap.\n"
-msgstr "      --install                Instalowanie prywatnej mapy kolorów.\n"
+# src/demuxers/demux_ogg.c:611 src/demuxers/demux_ogg.c:662
+#: src/demuxers/demux_ogg.c:1002 src/demuxers/demux_ogg.c:1056
+msgid "valid mrls ending for ogg demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera ogg"
 
-# src/xitk/main.c:315
-#: src/xitk/main.c:339
-msgid "      --keymap [option]        Display keymap. Option are:\n"
-msgstr ""
-"      --keymap [option]        Wy¶wietlanie mapowania klawiszy. Opcje:\n"
-
-# src/xitk/main.c:316
-#: src/xitk/main.c:340
+# src/demuxers/demux_ogg.c:649
+#: src/demuxers/demux_ogg.c:1043
+#, c-format
 msgid ""
-"                                 'default': display default keymap table,\n"
+"demux_ogg: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
 msgstr ""
-"                                 'default': wy¶wietl domy¶lne mapowanie,\n"
+"demux_ogg: ta wtyczka nie wspiera API w wersji %d.\n"
+"demux_ogg: oznacza to niezgodno¶æ miêdzy xine demux_ogg: a t± wtyczk± "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
 
-# src/xitk/main.c:317
-#: src/xitk/main.c:341
+# src/demuxers/demux_asf.c:335
+#: src/demuxers/demux_asf.c:354
+#, c-format
+msgid "demux_asf: audio format : %s (wFormatTag 0x%x)\n"
+msgstr "demux_asf: format d¼wiêku : %s (wFormatTag 0x%x)\n"
+
+# src/demuxers/demux_asf.c:400
+#: src/demuxers/demux_asf.c:381
+#, c-format
+msgid "demux_asf: video format : %s\n"
+msgstr "demux_asf: format obrazu : %s\n"
+
+# src/demuxers/demux_asf.c:458
+#: src/demuxers/demux_asf.c:441
+#, c-format
+msgid "demux_asf: stream length is %d sec, rate is %d bytes/sec\n"
+msgstr "demux_asf: d³ugo¶æ strumienia jest %d sec, rate jest %d bajtow/sek\n"
+
+# src/demuxers/demux_asf.c:1254
+#: src/demuxers/demux_asf.c:1257
+#, c-format
+msgid "demux_asf: title        : %s\n"
+msgstr "demux_asf: tytul        : %s\n"
+
+# src/demuxers/demux_asf.c:1256
+#: src/demuxers/demux_asf.c:1259
+#, c-format
+msgid "demux_asf: author       : %s\n"
+msgstr "demux_asf: autor       : %s\n"
+
+# src/demuxers/demux_asf.c:1258
+#: src/demuxers/demux_asf.c:1261
+#, c-format
+msgid "demux_asf: copyright    : %s\n"
+msgstr "demux_asf: copyright    : %s\n"
+
+# src/demuxers/demux_asf.c:1260
+#: src/demuxers/demux_asf.c:1263
+#, c-format
+msgid "demux_asf: comment      : %s\n"
+msgstr "demux_asf: komentarz      : %s\n"
+
+# src/demuxers/demux_asf.c:1370 src/demuxers/demux_asf.c:1422
+#: src/demuxers/demux_asf.c:1408 src/demuxers/demux_asf.c:1460
+msgid "valid mrls ending for asf demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera asf"
+
+# src/demuxers/demux_asf.c:1409
+#: src/demuxers/demux_asf.c:1447
+#, c-format
 msgid ""
-"                                 'lirc': display draft of a .lircrc config "
-"file.\n"
+"demux_asf: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
 msgstr ""
-"                                 'lirc': wy¶wietl wzór pliku .lircrc \n"
+"demux_asf: ta wtyczka nie wspiera API w wersji %d.\n"
+"              oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±               "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
 
-# src/xitk/main.c:318
-#: src/xitk/main.c:342
+# src/demuxers/demux_cda.c:297
+#: src/demuxers/demux_cda.c:297
+#, c-format
 msgid ""
-"                                 'remapped': user remapped keymap table.\n"
-msgstr "                                 'remapped': mapowanie u¿ytkownika.\n"
+"demux_cda: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_cda: ta wtyczka nie wspiera API w wersji %d.\n"
+"             oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±              "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
 
-# src/xitk/main.c:319
-#: src/xitk/main.c:343
+# src/demuxers/demux_film.c:147
+#: src/demuxers/demux_film.c:147
+msgid "demux_film: This is not a FILM file (why was it sent to this demuxer?\n"
+msgstr ""
+"demux_film: To nie jest plik filmowy (dlaczego zosta³ on wys³any do tego "
+"demultipleksera?)\n"
+
+# src/demuxers/demux_film.c:176
+#: src/demuxers/demux_film.c:176
+msgid "invalid FILM chunk size\n"
+msgstr "nieprawid³owy rozmiar fragmentu filmu\n"
+
+# src/demuxers/demux_film.c:254
+#: src/demuxers/demux_film.c:254
+msgid "unrecognized FILM chunk\n"
+msgstr "nie rozpoznany fragment filmu\n"
+
+# src/demuxers/demux_film.c:538 src/demuxers/demux_film.c:815
+# src/demuxers/demux_smjpeg.c:544
+#: src/demuxers/demux_film.c:529 src/demuxers/demux_film.c:804
+#: src/demuxers/demux_smjpeg.c:555
+msgid "valid mrls ending for film demuxer"
+msgstr "prawid³owe rozszerzenia dla demultiplexera filmu"
+
+# src/demuxers/demux_film.c:587
+#: src/demuxers/demux_film.c:577
+#, c-format
+msgid "demux_film: FILM version %c%c%c%c, running time: %d min, %d sec\n"
+msgstr "demux_film: versja FILMU %c%c%c%c, czas odtwarzania %d min, %d sec\n"
+
+# src/demuxers/demux_film.c:596
+#: src/demuxers/demux_film.c:586
+#, c-format
+msgid "demux_film: %c%c%c%c video @ %dx%d, %d Hz playback clock\n"
+msgstr "demux_film: %c%c%c%c obraz @ %dx%d, %d Hz zegar odtwarzania\n"
+
+# src/demuxers/demux_film.c:606
+#: src/demuxers/demux_film.c:596
+#, c-format
+msgid "demux_film: unknown video codec %c%c%c%c\n"
+msgstr "demux_film: nieznany kodek wideo %c%c%c%c\n"
+
+# src/demuxers/demux_film.c:616
+#: src/demuxers/demux_film.c:606
+#, c-format
+msgid "demux_film: %d Hz, %d-bit %s%s PCM audio\n"
+msgstr "demux_film: %d Hz, %d-bit %s%s d¼wiêk PCM\n"
+
+# src/demuxers/demux_film.c:802
+#: src/demuxers/demux_film.c:791
+#, c-format
 msgid ""
-"                                 -if no option is given, 'default' is "
-"selected.\n"
+"demux_film: plugin doesn't support plugin API version %d.\n"
+"            this means there's a version mismatch between xine and "
+"this             demuxer plugin. Installing current demux plugins should "
+"help.\n"
 msgstr ""
-"                                 -je¶li brak opcji, wybrane jest 'default'.\n"
-
-# src/xitk/main.c:320
-#: src/xitk/main.c:344
-msgid "  -n, --network                Enable network remote control server.\n"
-msgstr ""
-"  -n, --network                W³±cz sieciowy serwer zdalnej kontroli.\n"
-
-# src/xitk/main.c:321
-#: src/xitk/main.c:345
-msgid "  -R, --root                   Use root window as video window.\n"
-msgstr "  -R, --root                   U¿yj okna g³ównego jako okna wideo\n"
-
-# src/xitk/main.c:322
-#: src/xitk/main.c:346
-msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
-msgstr "  -G, --geometry <WxH[+X+Y]>   Ustawianie geometrii okna (X style).\n"
-
-# src/xitk/main.c:323
-#: src/xitk/main.c:347
-msgid "  -B, --borderless             Borderless video output window.\n"
-msgstr "  -H, --hide-video             ukrywanie okna wideo\n"
-
-# src/xitk/main.c:325
-#: src/xitk/main.c:349
-msgid "examples for valid MRLs (media resource locator):\n"
-msgstr "przyk³ady MRL'ów (Media Resource Locator):\n"
-
-# src/xitk/main.c:326
-#: src/xitk/main.c:350
-msgid "  File:  'path/foo.vob'\n"
-msgstr "  File:  'path/foo.vob'\n"
-
-# src/xitk/main.c:327
-#: src/xitk/main.c:351
-msgid "         '/path/foo.vob'\n"
-msgstr "         '/path/foo.vob'\n"
-
-# src/xitk/main.c:328
-#: src/xitk/main.c:352
-msgid "         'file://path/foo.vob'\n"
-msgstr "         'file://¶cie¿ka/foo.vob'\n"
-
-# src/xitk/main.c:329
-#: src/xitk/main.c:353
-msgid "         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
-msgstr "         'fifo://[[mpeg1|mpeg2]:/]¶cie¿ka/foo'\n"
-
-# src/xitk/main.c:330
-#: src/xitk/main.c:354
-msgid "         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
-msgstr "         'stdin://[mpeg1|mpeg2]' lub '-' (tylko mpeg2)\n"
-
-# src/xitk/main.c:331
-#: src/xitk/main.c:355
-msgid "  DVD:   'dvd://VTS_01_2.VOB'\n"
-msgstr "  DVD:   'dvd://VTS_01_2.VOB'\n"
-
-# src/xitk/main.c:332
-#: src/xitk/main.c:356
-msgid "  VCD:   'vcd://<track number>'\n"
-msgstr "  VCD:   'vcd://<numer ¶cie¿ki>'\n"
-
-# src/xitk/main.c:377
-#: src/xitk/main.c:392
-msgid "video driver to use"
-msgstr "wybór sterownika wideo"
-
-# src/xitk/main.c:405
-#: src/xitk/main.c:417
-#, c-format
-msgid "main: probing <%s> video output plugin\n"
-msgstr "main: próbkowanie <%s> wtyczki wyj¶cia wideo\n"
-
-# src/xitk/main.c:422
-#: src/xitk/main.c:434
-msgid "main: all available video drivers failed.\n"
-msgstr "main: ¿aden z dostêpnych sterowników wyj¶cia wideo nie zadzia³a³.\n"
-
-# src/xitk/main.c:434
-#: src/xitk/main.c:446
-#, c-format
-msgid "main: video driver <%s> failed\n"
-msgstr "main: sterownik wideo <%s> nie zadzia³a³\n"
-
-# src/xitk/main.c:454
-#: src/xitk/main.c:467
-msgid "audio driver to use"
-msgstr "wybór sterownika d¼wiêku"
-
-# src/xitk/main.c:501
-#: src/xitk/main.c:481 src/xitk/main.c:521
-msgid "main: not using any audio driver (as requested).\n"
-msgstr "main: nie u¿ywam ¿adnego sterownika d¼wiêku (tak jak rz±dano)\n"
-
-# src/xitk/main.c:405
-#: src/xitk/main.c:497
-#, c-format
-msgid "main: probing <%s> audio output plugin\n"
-msgstr "main: próbkowanie wtyczki wyj¶cia d¼wiêku <%s>\n"
-
-# src/xitk/main.c:491
-#: src/xitk/main.c:512
-msgid "main: audio driver probing failed => no audio output\n"
-msgstr ""
-"main: próbkowanie sterownika d¼wiêku zawiod³o => brak wyj¶cia d¼wiêku\n"
-
-# src/xitk/main.c:434
-#: src/xitk/main.c:530
-#, c-format
-msgid "main: audio driver <%s> failed\n"
-msgstr "main: sterownik d¼wiêku <%s> zawiód³\n"
-
-# src/xitk/main.c:598
-#: src/xitk/main.c:650
-#, c-format
-msgid "No video plugin available to decode '%s'."
-msgstr "Brak dostêpnej wtyczki wideo do zdekodowania '%s'."
-
-# src/xitk/main.c:613
-#: src/xitk/main.c:665
-#, c-format
-msgid "No audio plugin available to decode '%s'."
-msgstr "Brak dostêpnej wtyczki d¼wiêku do zdekodowania '%s'."
-
-# src/xitk/main.c:638
-#: src/xitk/main.c:694
-msgid "Display popup window on unhandled codecs"
-msgstr "Wyskakuj±ce okno wy¶wietlania na nie obs³ugiwanym kodeku"
-
-# src/xitk/main.c:671
-#: src/xitk/main.c:731
-#, c-format
-msgid "Require xine library version 0.9.14, found %d.%d.%d.\n"
-msgstr "Wymaga biblioteki xine 0.9.14, znaleziono %d.%d.%d.\n"
-
-# src/xitk/main.c:680
-#: src/xitk/main.c:739
-msgid "sigprocmask() failed.\n"
-msgstr "sigprocmask() zawiód³.\n"
-
-# src/xitk/main.c:742
-#: src/xitk/main.c:800
-msgid "video driver id required for -V option\n"
-msgstr "id serownika wideo wymagane dla opcji -V\n"
-
-# src/xitk/main.c:752
-#: src/xitk/main.c:809
-msgid "audio driver id required for -A option\n"
-msgstr "ID serownika d¼wiêku wymagane dla opcji -A\n"
-
-# src/xitk/main.c:863
-#: src/xitk/main.c:920
-#, c-format
-msgid "Bad geometry '%s', see xine --help\n"
-msgstr "B³êdna geometria '%s', Zobacz xine --help\n"
-
-# src/xitk/main.c:887
-#: src/xitk/main.c:944
-#, c-format
-msgid "invalid argument %d => exit\n"
-msgstr "B³êdny argument %d => exit\n"
-
-#: src/xitk/main.c:1016
-msgid "Logo mrl"
-msgstr ""
-
-# src/xitk/mrl_browser.c:199
-#: src/xitk/mrl_browser.c:256
-msgid "Xine MRL Browser"
-msgstr "Przegl±darka MRL xine"
-
-# src/xitk/mrl_browser.c:226
-#: src/xitk/mrl_browser.c:283
-msgid "Source:"
-msgstr "¬ród³o:"
-
-# src/xitk/panel.c:739
-#: src/xitk/panel.c:62
-msgid "Play previous chapter or mrl"
-msgstr "Odtwarzanie poprzedniego wpisu z listy"
-
-# src/xitk/panel.c:768
-#: src/xitk/panel.c:63
-msgid "Play next chapter or mrl"
-msgstr "Odtwarzanie nastepnego wpisu z listy"
-
-# src/xitk/panel.c:739
-#: src/xitk/panel.c:66
-msgid "Play previous entry from playlist"
-msgstr "Odtwarzanie poprzedniego wpisu z listy"
-
-# src/xitk/panel.c:768
-#: src/xitk/panel.c:67
-msgid "Play next entry from playlist"
-msgstr "Odtwarzanie nastepnego wpisu z listy"
-
-# src/xitk/panel.c:467
-#. FIXME: this error message does not make sense!
-#: src/xitk/panel.c:585
-msgid "unknown widget slider caller\n"
-msgstr "Nieznane wywo³anie suwaka widget\n"
-
-# src/xitk/panel.c:566
-#: src/xitk/panel.c:687
-msgid "Volume control"
-msgstr "Kontrola g³o¶no¶ci"
-
-# src/xitk/panel.c:568
-#: src/xitk/panel.c:689
-msgid "Mute toggle"
-msgstr "Wyciszenie"
-
-# src/xitk/panel.c:599
-#. panel already open  - FIXME: bring to foreground
-#: src/xitk/panel.c:720
-msgid "Xine Panel"
-msgstr "Panel XINE"
-
-# src/xitk/panel.c:616
-#: src/xitk/panel.c:741
-msgid "xine-panel: couldn't find image for background\n"
-msgstr "xine-panel: nie mogê znale¼æ obrazu t³a\n"
-
-# src/xitk/panel.c:746
-#: src/xitk/panel.c:882
-msgid "Stop playback"
-msgstr "Zatrzymanie"
-
-# src/xitk/panel.c:753
-#: src/xitk/panel.c:890
-msgid "Play selected entry"
-msgstr "Odtwarzanie"
-
-# src/xitk/panel.c:761
-#: src/xitk/panel.c:898
-msgid "Pause/Resume playback"
-msgstr "Pauza"
-
-# src/xitk/panel.c:775
-#: src/xitk/panel.c:913
-msgid "Eject current medium"
-msgstr "Wyrzut no¶nika"
-
-# src/xitk/panel.c:782
-#: src/xitk/panel.c:921
-msgid "Quit"
-msgstr "Koniec"
-
-# src/xitk/panel.c:789
-#: src/xitk/panel.c:929
-msgid "Setup window"
-msgstr "Okno ustawieñ"
-
-#: src/xitk/panel.c:937
-msgid "Navigator"
-msgstr "Nawigator"
-
-# src/xitk/panel.c:796
-#: src/xitk/panel.c:945
-msgid "Hide GUI"
-msgstr "Ukrycie GUI"
-
-# src/xitk/panel.c:803
-#: src/xitk/panel.c:953
-msgid "Fullscreen/Window mode"
-msgstr "Tryb pe³noekranowy/okienkowy"
-
-# src/xitk/panel.c:810
-#: src/xitk/panel.c:961
-msgid "Next audio channel"
-msgstr "Nastêpny kana³ d¼wiêku"
-
-# src/xitk/panel.c:817
-#: src/xitk/panel.c:969
-msgid "Previous audio channel"
-msgstr "Poprzedni kana³ d¼wiêku"
-
-# src/xitk/panel.c:824
-#: src/xitk/panel.c:977
-msgid "Next SPU channel"
-msgstr "Nastêpny kana³ napisów"
-
-# src/xitk/panel.c:831
-#: src/xitk/panel.c:985
-msgid "Previous SPU channel"
-msgstr "Poprzedni kana³ napisów"
-
-# src/xitk/panel.c:877
-#: src/xitk/panel.c:1031
-msgid "Stream playback position slider"
-msgstr "Suwak pozycji odtwarzania strumienia"
-
-# src/xitk/panel.c:907
-#: src/xitk/panel.c:1062
-msgid "Take a snapshot"
-msgstr "Zrzut obrazu"
-
-# src/xitk/panel.c:914
-#: src/xitk/panel.c:1070
-msgid "Slow motion"
-msgstr "Zwolnienie"
-
-# src/xitk/panel.c:921
-#: src/xitk/panel.c:1078
-msgid "Fast motion"
-msgstr "Przyspieszenie"
-
-# src/xitk/panel.c:928
-#: src/xitk/panel.c:1086
-msgid "Playlist"
-msgstr "Lista odtwarzania"
-
-# src/xitk/panel.c:935
-#: src/xitk/panel.c:1094
-msgid "Control"
-msgstr "Kontrola wy¶wietlania"
-
-# src/xitk/panel.c:942
-#: src/xitk/panel.c:1102
-msgid "MRL Browser"
-msgstr "Przegl±darka MRL"
-
-# src/xitk/panel.c:946
-#: src/xitk/panel.c:1107
-msgid "gui tips visibility"
-msgstr "wy¶wietlanie podpowiedzi gui"
-
-# src/xitk/panel.c:949
-#: src/xitk/panel.c:1114
-msgid "tips timeout (ms)"
-msgstr "czas wy¶wietlania podpowiedzi (ms)"
-
-# src/xitk/panel.c:958
-#: src/xitk/panel.c:1128
-msgid "gui panel visibility"
-msgstr "wy¶wietlanie panela gui"
-
-# src/xitk/playlist.c:353 src/xitk/playlist.c:410
-#: src/xitk/playlist.c:365 src/xitk/playlist.c:428
-#, c-format
-msgid "Can't read %s: %s\n"
-msgstr "Nie mogê odczytaæ %s: %s\n"
-
-# src/xitk/playlist.c:716
-#: src/xitk/playlist.c:753
-msgid "Xine Playlist Editor"
-msgstr "Xine Playlist Editor"
-
-# src/xitk/playlist.c:835
-#: src/xitk/playlist.c:882
-msgid "Move up selected MRL"
-msgstr "Przesuñ do góry wybrany MRL"
-
-# src/xitk/playlist.c:843
-#: src/xitk/playlist.c:890
-msgid "Move down selected MRL"
-msgstr "Przesuñ w dól wybrany MRL"
-
-# src/xitk/playlist.c:850
-#: src/xitk/playlist.c:897
-msgid "Start playback of selected MRL"
-msgstr "Rozpocznij odtwarzanie wybranego MRL"
-
-# src/xitk/playlist.c:857
-#: src/xitk/playlist.c:904
-msgid "Delete selected MRL from playlist"
-msgstr "Skasuj wybrany MRL z listy odtwarzania"
-
-# src/xitk/playlist.c:864
-#: src/xitk/playlist.c:911
-msgid "Delete all entries in playlist"
-msgstr "Skasuj wszystkie wpisy z listy odtwarzania"
-
-# src/xitk/playlist.c:868
-#: src/xitk/playlist.c:915
-msgid "Add"
-msgstr "Dodanie"
-
-# src/xitk/playlist.c:874
-#: src/xitk/playlist.c:921
-msgid "Add one or more entries in playlist"
-msgstr "Dodanie jednego lub wiecej wpisów do listy"
-
-# src/xitk/playlist.c:879
-#: src/xitk/playlist.c:926
-msgid "Load"
-msgstr "£aduj"
-
-# src/xitk/playlist.c:885
-#: src/xitk/playlist.c:932
-msgid "Load saved playlist"
-msgstr "£adowanie zapisanej listy"
-
-# src/xitk/playlist.c:895
-#: src/xitk/playlist.c:942
-msgid "Save playlist"
-msgstr "Zapis listy"
-
-# src/xitk/playlist.c:905
-#: src/xitk/playlist.c:952
-msgid "Close playlist window"
-msgstr "Zamykanie okna listy odtwarzania"
-
-# src/xitk/playlist.c:921
-#: src/xitk/playlist.c:970
-msgid "Scan for:"
-msgstr "Skanuj:"
-
-# src/xitk/playlist.c:933
-#: src/xitk/playlist.c:982
-msgid "Direct MRL entry"
-msgstr "Bezpo¶redni wpis MRL"
-
-#: src/xitk/setup.c:810 src/xitk/setup.c:812 src/xitk/setup.c:820
-#: src/xitk/setup.c:822 src/xitk/setup.c:830 src/xitk/setup.c:832
-#: src/xitk/setup.c:840 src/xitk/setup.c:842 src/xitk/setup.c:850
-#: src/xitk/setup.c:852
-msgid "No help available"
-msgstr ""
-
-# src/xitk/setup.c:930
-#: src/xitk/setup.c:962
-msgid "Help"
-msgstr "Pomoc"
-
-# src/xitk/setup.c:932
-#: src/xitk/setup.c:964
-msgid "README"
-msgstr "CZYTAJ MNIE"
-
-# src/xitk/setup.c:934
-#: src/xitk/setup.c:966
-msgid "FAQ"
-msgstr "FAQ"
-
-# src/xitk/setup.c:1084
-#: src/xitk/setup.c:1122
-msgid "xine setup"
-msgstr "Ustawienia xine"
-
-# src/xitk/setup.c:1143
-#: src/xitk/setup.c:1169
-msgid "Logs"
-msgstr "Logi"
-
-# src/xitk/setup.c:1154
-#: src/xitk/setup.c:1180
-msgid "Key Bindings"
-msgstr "Mapowanie"
-
-# src/xitk/skins.c:241
-#: src/xitk/skins.c:256 src/xitk/skins.c:401
-#, c-format
-msgid "Failed to load %s/%s. Load fallback skin %s\n"
-msgstr "Nie uda³o siê za³adowaæ %s/%s. Prze³aduj star± skórê '%s'\n"
-
-# src/xitk/skins.c:241
-#: src/xitk/skins.c:262
-#, c-format
-msgid "Failed to load %s/%s. Reload old skin '%s'.\n"
-msgstr "Nie uda³o siê za³adowaæ %s/%s. Prze³aduj star± skórê '%s'.\n"
-
-# src/xitk/skins.c:257
-#: src/xitk/skins.c:280
-#, c-format
-msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
-msgstr "Nie uda³o siê za³adowaæ %s, b³edna wersja. Powrót do skóry '%s'.\n"
-
-# src/xitk/skins.c:299
-#: src/xitk/skins.c:322
-#, c-format
-msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr "Ojej, skóra nie znaleziona, powrót do '%s'.\n"
-
-# src/xitk/skins.c:326
-#: src/xitk/skins.c:363
-msgid "No available skin found. Say goodbye.\n"
-msgstr "Nie znalaz³em ¿adnej dostêpnej skóry. Powiedz do widzenia\n"
-
-# src/xitk/skins.c:337
-#: src/xitk/skins.c:375
-msgid "gui skin theme"
-msgstr "Wybór skóry gui"
-
-# src/xitk/skins.c:342
-#: src/xitk/skins.c:384
-#, c-format
-msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
-msgstr "Ojej, skóra '%s' nie znaleziona, powrót do '%s'.\n"
-
-# src/xitk/skins.c:347
-#: src/xitk/skins.c:389
-msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
-msgstr ""
-"Nie uda³o siê za³adowaæ poprzedniej skóry. Sprawd¼ zainstalowane skóry. "
-"Koniec\n"
-
-# src/xitk/skins.c:357
-#: src/xitk/skins.c:408
-#, c-format
-msgid "Failed to load %s/%s. Exiting.\n"
-msgstr "Nie uda³o siê za³adowaæ %s/%s. Koniec.\n"
-
-# src/xitk/skins.c:366
-#: src/xitk/skins.c:418
-#, c-format
-msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
-msgstr ""
-"Nie uda³o siê za³adowaæ skóry %s, B³êdna wersja. Powrót do skóry '%s'.\n"
-
-# src/xitk/snapshot.c:816
-#: src/xitk/snapshot.c:827 src/xitk/snapshot.c:838
-#, c-format
-msgid "Error: %s\n"
-msgstr "B³±d: %s\n"
-
-# src/xitk/snapshot.c:871
-#. the dxr3 driver does not allocate yuv buffers
-#. image->u and image->v are always 0 for YUY2
-#: src/xitk/snapshot.c:895
-msgid "snapshot.c: not supported for this video out driver\n"
-msgstr "snapshot.c: nie wspierane dla tego sterownika wyj¶cia obrazu\n"
-
-# src/xitk/snapshot.c:947
-#: src/xitk/snapshot.c:976
-#, c-format
-msgid "File open failed (%s)\n"
-msgstr "Nie udane otwarcie pliku (%s)\n"
-
-# src/xitk/snapshot.c:1095
-#: src/xitk/snapshot.c:1129
-#, c-format
-msgid "File '%s' written.\n"
-msgstr "Plik '%s' zapisany.\n"
-
-#: src/xitk/stream_infos.c:240 src/xitk/stream_infos.c:241
-#: src/xitk/stream_infos.c:242 src/xitk/stream_infos.c:243
-#: src/xitk/stream_infos.c:244 src/xitk/stream_infos.c:246
-#: src/xitk/stream_infos.c:247 src/xitk/stream_infos.c:248
-#: src/xitk/stream_infos.c:249
-msgid "Unavailable"
-msgstr ""
-
-#. Create window
-#: src/xitk/stream_infos.c:422
-msgid "stream informations"
-msgstr ""
-
-#: src/xitk/stream_infos.c:447
-msgid "Title: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:461
-msgid "Comment: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:475
-msgid "Artist: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:487
-msgid "Genre: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:501
-msgid "Album: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:513
-msgid "Year: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:525
-msgid "Input Plugin: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:539
-msgid "Video Codec: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:551
-msgid "Audio Codec: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:563
-msgid "System Layer: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:577
-msgid "Bitrate (bps): "
-msgstr ""
-
-#: src/xitk/stream_infos.c:589
-msgid "Is Seekable: "
-msgstr ""
-
-# src/xitk/videowin.c:1015
-#: src/xitk/stream_infos.c:601
-#, fuzzy
-msgid "Video Width: "
-msgstr "Okno wy¶wietlania obrazu xine"
-
-#: src/xitk/stream_infos.c:613
-msgid "Video Height: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:627
-msgid "Video Ratio: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:639
-msgid "Video Channel(s): "
-msgstr ""
-
-#: src/xitk/stream_infos.c:651
-msgid "Video Stream(s): "
-msgstr ""
-
-#: src/xitk/stream_infos.c:663
-msgid "Video Bitrate (bps): "
-msgstr ""
-
-#: src/xitk/stream_infos.c:677
-msgid "Video FourCC: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:689
-msgid "Video handled: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:701
-msgid "Frame Duration: "
-msgstr ""
-
-# src/xitk/panel.c:810
-#: src/xitk/stream_infos.c:713
-#, fuzzy
-msgid "Audio Channel(s): "
-msgstr "Nastêpny kana³ d¼wiêku"
-
-#: src/xitk/stream_infos.c:726
-msgid "Audio Bits: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:738
-msgid "Audio Samplerate: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:750
-msgid "Audio Bitrate: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:762
-msgid "Audio FourCC: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:776
-msgid "Audio Handled: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:788
-msgid "Has Chapters: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:800
-msgid "Has Video: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:812
-msgid "Has Audio: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:826
-msgid "Ignore Video: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:838
-msgid "Ignore Audio: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:850
-msgid "Ignore Spu: "
-msgstr ""
-
-#: src/xitk/stream_infos.c:868
-msgid "Update"
-msgstr ""
-
-# src/xitk/videowin.c:177
-#: src/xitk/videowin.c:179
-msgid "videowin: output driver cannot select a working visual\n"
-msgstr "videowin: sterownik wyj¶cia nie mo¿e wybraæ dzia³aj±cego ekranu\n"
-
-# src/xitk/videowin.c:184
-#: src/xitk/videowin.c:186
-#, c-format
-msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
-msgstr ""
-"videowin: sterownik wyj¶cia omija wybrany ekran i przechodzi do ekranu o id "
-"0x%lx\n"
-
-# src/xitk/videowin.c:227
-#. printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
-#. *           video_width,
-#. *           video_height,
-#. *           dest_x,
-#. *           dest_y,
-#. *           dest_width,
-#. *           dest_height);
-#.
-#: src/xitk/videowin.c:229
-msgid "xine video output"
-msgstr "wyj¶cie obrazu xine"
-
-# src/xitk/videowin.c:361
-#: src/xitk/videowin.c:390
-msgid "XF86VidMode Extension: modeline switching failed.\n"
-msgstr "XF86VidMode Extension: zawiod³o prze³±czanie modeline.\n"
-
-# src/xitk/videowin.c:1015
-#: src/xitk/videowin.c:1093
-msgid "Xine Video Window"
-msgstr "Okno wy¶wietlania obrazu xine"
-
-# src/xitk/videowin.c:1019
-#: src/xitk/videowin.c:1097
-msgid "Xine Video Fullscreen Window"
-msgstr "Tryb pe³noekranowy okna obrazu xine"
-
-# src/xitk/videowin.c:1023
-#: src/xitk/videowin.c:1101
-msgid "Xine Video Borderless Window"
-msgstr "Nie obramowane okno wyj¶cia obrazu xine"
-
-# src/xitk/videowin.c:1044
-#: src/xitk/videowin.c:1122
-msgid "XAllocWMHints() failed\n"
-msgstr "XAllocWMHints() zawiod³o\n"
-
-# src/xitk/videowin.c:1068
-#: src/xitk/videowin.c:1147
-msgid "New stream sizes resize output window"
-msgstr "Rozmiar nowego strumienia zmienia rozmiar okna wyj¶cia obrazu"
-
-# src/xitk/videowin.c:1074
-#: src/xitk/videowin.c:1157
-msgid "Double size for small streams (require stream_resize_window)"
-msgstr "Podwójny rozmiar dla ma³ych strumieni (wymaga stream_resize_window)"
-
-# src/xitk/videowin.c:1096
-#: src/xitk/videowin.c:1183
-msgid "use XVidModeExtension when switching to fullscreen"
-msgstr "u¿ywaj XVidModeExtension podczas prze³±czania do trybu pe³noekranowego"
-
-# src/xitk/videowin.c:1112
-#: src/xitk/videowin.c:1202
-#, c-format
-msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
-msgstr "Zanleziono rozszerzenie XF86VidMode (%d.%d), próba u¿ycia.\n"
-
-# src/xitk/videowin.c:1115
-#: src/xitk/videowin.c:1205
-#, c-format
-msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr "Rozszerzenie XF86VidMode: znaleziono modelines %d.\n"
-
-# src/xitk/videowin.c:1133
-#: src/xitk/videowin.c:1223
+"demux_film: ta wtyczka nie wspiera API w wersji %d.\n"
+"            oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±             "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_mpeg_block.c:345
+#: src/demuxers/demux_mpeg_block.c:346
 msgid ""
-"XF86VidMode Extension: could not get list of available modelines. Failed.\n"
+"demux_mpeg_block: too many errors, stopping playback. Maybe this stream is "
+"scrambled?\n"
 msgstr ""
-"Rozszerzenie XF86VidMode: Zawiod³a próba znalezienia listy dostêpnych "
-"rozdzielczo¶ci.\n"
+"demux_mpeg_block: zbyt wiele b³êdów, zatrzymanie odtwarzania Mo¿e strumieñ "
+"jest zaszyfrowany?\n"
 
-# src/xitk/videowin.c:1136
-#: src/xitk/videowin.c:1226
-msgid "XF86VidMode Extension: initialization failed, not using it.\n"
-msgstr ""
-"Rozszerzenie XF86VidMode: inicjalizacja zawiod³a, nie bêdzie u¿ywany.\n"
-
-# src/xitk/viewlog.c:328
-#: src/xitk/viewlog.c:329
-msgid "log info"
-msgstr "info o logach"
-
-# src/xitk/viewlog.c:330
-#: src/xitk/viewlog.c:331
+# src/demuxers/demux_mpeg_block.c:456
+#: src/demuxers/demux_mpeg_block.c:457
 #, c-format
-msgid "There is no log entry for logging section '%s'.\n"
-msgstr "Brak w logach wpisu o sekcji '%s'.\n"
+msgid ""
+"demux_mpeg_block: warning: pes header indicates that this stream may be "
+"encrypted (encryption mode %d)\n"
+msgstr ""
+"demux_mpeg_block: uwaga: nag³ówek pes wskazuje na to ze strumieñ mo¿e byæ "
+"zaszyfrowany (tryb szyfrowania %d)\n"
 
-# src/xitk/viewlog.c:427
-#: src/xitk/viewlog.c:442
-msgid "xine log viewer"
-msgstr "podgl±d logów xine"
+# src/demuxers/demux_mpeg_block.c:1012
+#: src/demuxers/demux_mpeg_block.c:1013
+msgid "demux_mpeg_block: unknown block size. try using demux_mpeg.\n"
+msgstr "demux_mpeg_block: nieznany rozmiar bloku, spróbuj u¿yæ demux_mpeg.\n"
 
-# src/xitk/viewlog.c:474
-#: src/xitk/viewlog.c:489
-msgid "Refresh"
-msgstr "Od¶wie¿anie"
+# src/demuxers/demux_mpeg_block.c:1100 src/demuxers/demux_mpeg_block.c:1204
+#: src/demuxers/demux_mpeg_block.c:1101 src/demuxers/demux_mpeg_block.c:1205
+msgid "valid mrls for mpeg block demuxer"
+msgstr "prawid³owe mrl'e dla demultipleksera bloku mpeg"
+
+# src/demuxers/demux_mpeg_block.c:1141 src/demuxers/demux_mpeg_block.c:1208
+#: src/demuxers/demux_mpeg_block.c:1142 src/demuxers/demux_mpeg_block.c:1209
+msgid "valid mrls ending for mpeg block demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera bloku mpeg"
+
+# src/demuxers/demux_mpeg_block.c:1191
+#: src/demuxers/demux_mpeg_block.c:1192
+#, c-format
+msgid ""
+"demux_mpeg_block: plugin doesn't support plugin API version %d.\n"
+"                  this means there's a version mismatch between xine and "
+"this                   demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_mpeg_block: ta wtyczka nie wspiera API w wersji %d.\n"
+"             oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±              "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_roq.c:297 src/demuxers/demux_roq.c:550
+#: src/demuxers/demux_roq.c:293 src/demuxers/demux_roq.c:544
+msgid "valid mrls ending for roq demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera roq"
+
+# src/demuxers/demux_roq.c:420
+#: src/demuxers/demux_roq.c:416
+#, c-format
+msgid "demux_roq: RoQ file, video is %dx%d, %d frames/sec\n"
+msgstr "demux_roq: plik RoQ, obraz jest %dx%d, %d ramek/sek\n"
+
+# src/demuxers/demux_roq.c:424
+#: src/demuxers/demux_roq.c:420
+#, c-format
+msgid "demux_roq: 16-bit, 22050 Hz %s RoQ DPCM audio\n"
+msgstr "demux_roq: 16-bit, 22050 Hz %s RoQ DPCM d¼wiêk\n"
+
+# src/demuxers/demux_roq.c:537
+#: src/demuxers/demux_roq.c:531
+#, c-format
+msgid ""
+"demux_roq: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_roq: ta wtyczka nie wspiera API w wersji %d.\n"
+"            oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±             "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_fli.c:311
+#: src/demuxers/demux_fli.c:305
+#, c-format
+msgid "demux_fli: FLI type: %04X, speed: %d/%d\n"
+msgstr "demux_fli: FLI typ: %04X, prêdko¶æ: %d/%d\n"
+
+# src/demuxers/demux_fli.c:315
+#: src/demuxers/demux_fli.c:309
+#, c-format
+msgid "demux_fli: %d frames, %dx%d\n"
+msgstr "demux_fli: %d ramek, %dx%d\n"
+
+# src/demuxers/demux_wav.c:324
+#: src/demuxers/demux_fli.c:312
+#, c-format
+msgid "demux_fli: running time: %d min, %d sec\n"
+msgstr "demux_fli: czas odtwarzania = %d min, %d sek\n"
+
+# src/demuxers/demux_idcin.c:206 src/demuxers/demux_idcin.c:420
+#: src/demuxers/demux_idcin.c:299 src/demuxers/demux_idcin.c:506
+msgid "valid mrls ending for idcin demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera idcin"
+
+# src/demuxers/demux_idcin.c:269
+#: src/demuxers/demux_idcin.c:363
+#, c-format
+msgid "demux_idcin: Id CIN file, video is %dx%d, 14 frames/sec\n"
+msgstr "demux_idcin: plik Id CIN, obraz jest %dx%d, 14 ramek/sek\n"
+
+# src/demuxers/demux_idcin.c:274
+#: src/demuxers/demux_idcin.c:368
+#, c-format
+msgid "demux_idcin: %d-bit, %d Hz %s PCM audio\n"
+msgstr "demux_idcin: %d-bit, %d Hz %s d¼wiêk PCM\n"
+
+# src/demuxers/demux_idcin.c:407
+#: src/demuxers/demux_idcin.c:493
+#, c-format
+msgid ""
+"demux_idcin: plugin doesn't support plugin API version %d.\n"
+"             this means there's a version mismatch between xine and "
+"this              demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_idcin: ta wtyczka nie wspiera API w wersji %d.\n"
+"             oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±              "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_smjpeg.c:276
+#: src/demuxers/demux_smjpeg.c:280
+msgid "valid mrls ending for smjpeg demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera smjpeg"
+
+# src/demuxers/demux_smjpeg.c:398
+#: src/demuxers/demux_smjpeg.c:413
+#, c-format
+msgid "demux_smjpeg: SMJPEG file, running time: %d min, %d sec\n"
+msgstr "demux_smjpeg: plik SMJPEG, czas odtwarzania: %d min, %d sek\n"
+
+# src/demuxers/demux_smjpeg.c:403
+#: src/demuxers/demux_smjpeg.c:418
+#, c-format
+msgid "demux_smjpeg: '%c%c%c%c' video @ %dx%d\n"
+msgstr "demux_smjpeg: '%c%c%c%c' obraz @ %dx%d\n"
+
+# src/demuxers/demux_smjpeg.c:412
+#: src/demuxers/demux_smjpeg.c:427
+#, c-format
+msgid "demux_smjpeg: '%c%c%c%c' audio @ %d Hz, %d bits, %d %s\n"
+msgstr "demux_smjpeg: '%c%c%c%c' d¼wiêk @ %d Hz, %d bitów, %d %s\n"
+
+# src/demuxers/demux_smjpeg.c:531
+#: src/demuxers/demux_smjpeg.c:542
+#, c-format
+msgid ""
+"demux_smjpeg: plugin doesn't support plugin API version %d.\n"
+"              this means there's a version mismatch between xine and "
+"this               demuxer plugin. Installing current demux plugins should "
+"help.\n"
+msgstr ""
+"demux_smjpeg: ta wtyczka nie wspiera API w wersji %d.\n"
+"              oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±               "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_wav.c:227 src/demuxers/demux_wav.c:482
+#: src/demuxers/demux_wav.c:226 src/demuxers/demux_wav.c:482
+msgid "valid mrls ending for wav demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera wav"
+
+# src/demuxers/demux_wav.c:317
+#: src/demuxers/demux_wav.c:317
+#, c-format
+msgid "demux_wav: format 0x%X audio, %d Hz, %d bits/sample, %d %s\n"
+msgstr "demux_wav: format 0x%X d¼wiêk, %d Hz, %d bitów/sample, %d %s\n"
+
+# src/demuxers/demux_wav.c:324
+#: src/demuxers/demux_wav.c:324
+#, c-format
+msgid "demux_wav: running time = %lld min, %lld sec\n"
+msgstr "demux_wav: czas odtwarzania = %lld min, %lld sek\n"
+
+# src/demuxers/demux_wav.c:328
+#: src/demuxers/demux_wav.c:328
+#, c-format
+msgid "demux_wav: average bytes/sec = %d, block alignment = %d\n"
+msgstr "demux_wav: ¶rednia bajtów/sek = %d, wyrównanie bloku = %d\n"
+
+# src/demuxers/demux_wav.c:469
+#: src/demuxers/demux_wav.c:469
+#, c-format
+msgid ""
+"demux_wav: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_wav: ta wtyczka nie wspiera API w wersji %d.\n"
+"           oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±            "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_asf.c:1370 src/demuxers/demux_asf.c:1422
+#: src/demuxers/demux_aiff.c:233 src/demuxers/demux_aiff.c:496
+msgid "valid mrls ending for aiff demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera aiff"
+
+# src/demuxers/demux_qt.c:1359
+#: src/demuxers/demux_aiff.c:342
+#, c-format
+msgid "demux_aiff: %d Hz, %d channels, %d bits, %d frames\n"
+msgstr "demux_aiff: %d Hz, %d kana³y, %d bits, %d ramek\n"
+
+# src/demuxers/demux_wav.c:324
+#: src/demuxers/demux_aiff.c:348
+#, c-format
+msgid "demux_aiff: running time: %d min, %d sec\n"
+msgstr "demux_aiff: czas odtwarzania = %d min, %d sek\n"
+
+# src/demuxers/demux_asf.c:1409
+#: src/demuxers/demux_aiff.c:483
+#, c-format
+msgid ""
+"demux_aiff: plugin doesn't support plugin API version %d.\n"
+"            this means there's a version mismatch between xine and "
+"this             demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_aiff: ta wtyczka nie wspiera API w wersji %d.\n"
+"              oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±               "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_ts.c:1500 src/demuxers/demux_ts.c:1683
+#: src/demuxers/demux_snd.c:221 src/demuxers/demux_snd.c:462
+msgid "valid mrls ending for snd demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultiplexera snd"
+
+#: src/demuxers/demux_snd.c:278
+msgid "demux_snd: bad header parameters\n"
+msgstr "demux_snd: b³êdne parametry nag³ówka\n"
+
+# src/demuxers/demux_avi.c:1257
+#: src/demuxers/demux_snd.c:295
+#, c-format
+msgid "demux_snd: unsupported audio type: %d\n"
+msgstr "demux_snd: niewspierany typ d¼wiêku %d\n"
+
+# src/demuxers/demux_qt.c:1359
+#: src/demuxers/demux_snd.c:308
+#, c-format
+msgid "demux_snd: %d Hz, %d channels, %d bits, %d frames\n"
+msgstr "demux_snd: %d Hz, %d kana³ów, %d bits, %d ramek\n"
+
+# src/demuxers/demux_wav.c:324
+#: src/demuxers/demux_snd.c:314
+#, c-format
+msgid "demux_snd: running time: %d min, %d sec\n"
+msgstr "demux_snd: czas odtwarzania = %d min, %d sek\n"
+
+# src/demuxers/demux_pes.c:608
+#: src/demuxers/demux_snd.c:449
+#, c-format
+msgid ""
+"demux_snd: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_snd: ta wtyczka nie wspiera API w wersji %d.\n"
+"              oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±               "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_avi.c:1535 src/demuxers/demux_avi.c:1612
+#: src/demuxers/demux_voc.c:220 src/demuxers/demux_voc.c:472
+msgid "valid mrls ending for voc demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultiplexera voc"
+
+#: src/demuxers/demux_voc.c:285
+#, c-format
+msgid "unknown VOC block type (0x%02X); please report to xine developers\n"
+msgstr "nieznany typ bloku VOC (0x%02X); proszê skontaktowaæ siê z programistami xine\n"
+
+#: src/demuxers/demux_voc.c:305
+#, c-format
+msgid "unknown VOC compression type (0x%02X); please report to xine developers\n"
+msgstr "nieznany typ kompresji VOC (0x%02X); proszê skontaktowaæ siê z programistami xine\n"
+
+# src/demuxers/demux_wav.c:317
+#: src/demuxers/demux_voc.c:323
+#, c-format
+msgid "demux_voc: VOC format 0x%X audio, %d Hz, running time: %d min, %d sec\n"
+msgstr "demux_voc: format VOC 0x%X d¼wiêk, %d Hz, czas odtwarzania %d min, %d sec\n"
+
+# src/demuxers/demux_ogg.c:649
+#: src/demuxers/demux_voc.c:459
+#, c-format
+msgid ""
+"demux_voc: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_voc: ta wtyczka nie wspiera API w wersji %d.\n"
+"                 oznacza to niezgodno¶æ miêdzy xine demux_ogg: a t± wtyczk± "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_qt.c:1270 src/demuxers/demux_qt.c:1561
+#: src/demuxers/demux_vqa.c:212 src/demuxers/demux_vqa.c:473
+msgid "valid mrls ending for vqa demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera vqa"
+
+# src/demuxers/demux_wav.c:324
+#: src/demuxers/demux_vqa.c:335
+#, c-format
+msgid "demux_vqa: running time: %d min, %d sec\n"
+msgstr "demux_vqa: czas odtwarzania = %d min, %d sek\n"
+
+# src/demuxers/demux_idcin.c:274
+#: src/demuxers/demux_vqa.c:339
+#, c-format
+msgid "demux_vqa: %dx%d VQA video, %d Hz IMA ADPCM audio\n"
+msgstr "demux_vqa: %dx%d obraz VQA, %d Hz IMA d¼wiêk ADPCM\n"
+
+# src/demuxers/demux_asf.c:1409
+#: src/demuxers/demux_vqa.c:460
+#, c-format
+msgid ""
+"demux_vqa: plugin doesn't support plugin API version %d.\n"
+"           this means there's a version mismatch between xine and "
+"this            demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_vqa: ta wtyczka nie wspiera API w wersji %d.\n"
+"              oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±               "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/demuxers/demux_mpeg.c:926 src/demuxers/demux_mpeg.c:994
+#: src/demuxers/demux_wc3movie.c:254 src/demuxers/demux_wc3movie.c:405
+msgid "valid mrls ending for mve demuxer"
+msgstr "prawid³owe rozszerzenia plików dla demultipleksera mve"
+
+# src/demuxers/demux_idcin.c:407
+#: src/demuxers/demux_wc3movie.c:392
+#, c-format
+msgid ""
+"demux_wc3movie: plugin doesn't support plugin API version %d.\n"
+"                this means there's a version mismatch between xine and "
+"this                 demuxer plugin.\n"
+"Installing current demux plugins should help.\n"
+msgstr ""
+"demux_wc3movie: ta wtyczka nie wspiera API w wersji %d.\n"
+"             oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±              "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_net.c:102
+#: src/input/input_net.c:102
+#, c-format
+msgid "input_net: socket(): %s\n"
+msgstr "input_net: socket(): %s\n"
+
+# src/input/input_net.c:111
+#: src/input/input_net.c:111
+#, c-format
+msgid "input_net: connect(): %s\n"
+msgstr "input_net: connect(): %s\n"
+
+# src/input/input_net.c:126
+#: src/input/input_net.c:126
+#, c-format
+msgid "input_net: unable to resolve '%s'.\n"
+msgstr "input_net: nie mogê znale¼æ IP dla '%s'.\n"
+
+# src/input/input_net.c:138
+#: src/input/input_net.c:138
+#, c-format
+msgid "input_net: unable to connect to '%s'.\n"
+msgstr "input_net: nie mogê pod³±czyæ siê do '%s'.\n"
+
+# src/input/input_net.c:302
+#: src/input/input_net.c:302
+msgid "net input plugin as shipped with xine"
+msgstr "wtyczka wej¶cia net dostarczana z xine"
+
+# src/input/input_net.c:344
+#: src/input/input_net.c:344
+#, c-format
+msgid ""
+"net input plugin doesn't support plugin API version %d.\n"
+"PLUGIN DISABLED.\n"
+"This means there's a version mismatch between xine and this inputplugin.\n"
+"Installing current input plugins should help.\n"
+msgstr ""
+"Wtyczka wej¶cia net nie wspiera API w wersji %d.\n"
+"WTYCZKA WY£¡CZONA.\n"
+"oznacza to niezgodno¶æ miêdzy xine a t± wtyczk± wej¶cia\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_rtp.c:157
+#: src/input/input_rtp.c:157
+#, c-format
+msgid "socket(): %s.\n"
+msgstr "socket(): %s.\n"
+
+# src/input/input_rtp.c:167
+#: src/input/input_rtp.c:167
+#, c-format
+msgid "bind(): %s.\n"
+msgstr "bind(): %s.\n"
+
+# src/input/input_rtp.c:185
+#: src/input/input_rtp.c:185
+#, c-format
+msgid "setsockopt(IP_ADD_MEMBERSHIP) failed (multicast kernel?): %s.\n"
+msgstr "setsockopt(IP_ADD_MEMBERSHIP) zawiod³o (multicast kernel?): %s.\n"
+
+# src/input/input_rtp.c:205
+#: src/input/input_rtp.c:205
+#, c-format
+msgid "unable to resolve '%s'.\n"
+msgstr "nie mogê znale¼æ IP dla '%s'.\n"
+
+# src/input/input_rtp.c:218
+#: src/input/input_rtp.c:218
+#, c-format
+msgid "unable to connect to '%s'.\n"
+msgstr "nie mogê siê pod³±czyæ do '%s'.\n"
+
+# src/input/input_rtp.c:241
+#: src/input/input_rtp.c:241
+msgid "OUCH - ran out of buffers\n"
+msgstr "OCH - bufory przepe³nione\n"
+
+# src/input/input_rtp.c:271
+#: src/input/input_rtp.c:271
+#, c-format
+msgid "OUCH - dropped input packet %d %d\n"
+msgstr "OCH - porzucony pakiet wej¶cia %d %d\n"
+
+# src/input/input_rtp.c:311
+#: src/input/input_rtp.c:311
+#, c-format
+msgid "Opening >%s<\n"
+msgstr "Otwieram >%s<\n"
+
+# src/input/input_rtp.c:339
+#: src/input/input_rtp.c:339
+#, c-format
+msgid "input_rtp: can't create new thread (%s)\n"
+msgstr "input_rtp: nie mogê utworzyæ nowego w±tku (%s)\n"
+
+# src/input/input_rtp.c:450
+#: src/input/input_rtp.c:450
+msgid "rtp input plugin as shipped with xine"
+msgstr "Wtyczka wej¶cia rtp dostarczana z xine"
+
+# src/input/input_rtp.c:514
+#: src/input/input_rtp.c:514
+#, c-format
+msgid ""
+"rtp input plugin doesn't support plugin API version %d.\n"
+"PLUGIN DISABLED.\n"
+"This means there's a version mismatch between xine and this inputplugin.\n"
+"Installing current input plugins should help.\n"
+msgstr ""
+"Wtyczka wej¶cia rtp nie wspiera API w wersji %d.\n"
+"WTYCZKA WY£¡CZONA.\n"
+"oznacza to niezgodno¶æ miêdzy xine a t± wtyczka wej¶cia\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_rtp.c:530 src/input/input_rtp.c:535
+#: src/input/input_rtp.c:530 src/input/input_rtp.c:535
+msgid "unable to allocate input buffer.\n"
+msgstr "nie moge umiejscowic bufora wejscia.\n"
+
+# src/input/input_stdin_fifo.c:322
+#: src/input/input_stdin_fifo.c:322
+msgid "stdin/fifo input plugin as shipped with xine"
+msgstr "Wtyczka wej¶cia stdin/fifo dostarczana z xine"
+
+# src/input/input_stdin_fifo.c:357
+#: src/input/input_stdin_fifo.c:357
+#, c-format
+msgid ""
+"stdin/fifo input plugin doesn't support plugin API version %d.\n"
+"PLUGIN DISABLED.\n"
+"This means there's a version mismatch between xine and this inputplugin.\n"
+"Installing current input plugins should help.\n"
+msgstr ""
+"Wtyczka wej¶cia stdin/fifo nie wspiera API w wersji %d.\n"
+"WTYCZKA WY£¡CZONA.\n"
+"oznacza to niezgodno¶æ miêdzy xine a t± wtyczk± wej¶cia\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_file.c:209
+#: src/input/input_file.c:209
+#, c-format
+msgid "lstat failed for %s{%s}\n"
+msgstr "lstat zawiód³ dla %s{%s}\n"
+
+# src/input/input_file.c:295
+#: src/input/input_file.c:295
+#, c-format
+msgid "input_file: trying to open subtitle file '%s'\n"
+msgstr "input_file: próbuje otworzyæ plik z napisami '%s'\n"
+
+# src/input/input_file.c:353
+#: src/input/input_file.c:353
+#, c-format
+msgid "input_file: read error (%s)\n"
+msgstr "input_file: b³±d odczytu (%s)\n"
+
+# src/input/input_file.c:527 src/input/input_file.c:566
+# src/input/input_file.c:602
+#: src/input/input_file.c:527 src/input/input_file.c:566
+#: src/input/input_file.c:602
+#, c-format
+msgid "%s(%d): readlink() failed: %s\n"
+msgstr "%s(%d): readlink() failed: %s\n"
+
+# src/input/input_file.c:790
+#: src/input/input_file.c:790
+msgid "plain file input plugin as shipped with xine"
+msgstr "wtyczka wej¶cia pliku dostarczane z xine"
+
+# src/input/input_file.c:809
+#: src/input/input_file.c:809
+#, c-format
+msgid "input_file: get optional data, type %08x, sub %p\n"
+msgstr "input_file: pobieranie dodatkowych danych, typ %08x, sub %p\n"
+
+# src/input/input_file.c:860
+#: src/input/input_file.c:860
+#, c-format
+msgid ""
+"file input plugin doesn't support plugin API version %d.\n"
+"PLUGIN DISABLED.\n"
+"This means there's a version mismatch between xine and this inputplugin.\n"
+"Installing current input plugins should help.\n"
+msgstr ""
+"Wtyczka wej¶cia file nie wspiera API w wersji %d.\n"
+"WTYCZKA WY£¡CZONA.\n"
+"oznacza to niezgodno¶æ miêdzy xine a t± wtyczka wej¶cia\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_file.c:908
+#: src/input/input_file.c:908
+msgid "origin path to grab file mrls"
+msgstr "¶cie¿ka dostêpu do pli?ów multimedialnych"
+
+# src/input/input_file.c:913
+#: src/input/input_file.c:913
+msgid "hidden files displaying."
+msgstr "wy¶wietlanie ukrytych plików"
+
+# src/input/input_vcd.c:157 src/input/input_vcd.c:194
+#: src/input/input_vcd.c:157 src/input/input_vcd.c:194
+msgid "input_vcd : error in ioctl CDROMREADTOCHDR\n"
+msgstr "input_vcd : b³±d w ioctl CDROMREADTOCHDR\n"
+
+# src/input/input_vcd.c:167
+#: src/input/input_vcd.c:167
+#, c-format
+msgid "input_vcd: error in ioctl CDROMREADTOCENTRY for track %d\n"
+msgstr "input_vcd: b³±d w kontroli wej¶cie/wyj¶cie CDROMREADTOCENTRY dla ¶cie¿ki %d\n"
+
+# src/input/input_vcd.c:178
+#: src/input/input_vcd.c:178
+msgid "input_vcd: error in ioctl CDROMREADTOCENTRY for lead-out\n"
+msgstr "input_vcd: b³±d w ioctl CDROMREADTOCENTRY dla lead-out\n"
+
+# src/input/input_vcd.c:209
+#: src/input/input_vcd.c:209
+msgid "input_vcd: error in ioctl CDROMREADTOCENTRY\n"
+msgstr "input_vcd: b³±d w ioctl CDROMREADTOCENTRY\n"
+
+# src/input/input_vcd.c:327
+#: src/input/input_vcd.c:327
+#, c-format
+msgid "scsi command failed with status %d\n"
+msgstr "komenda scsi zawiod³a ze statusem %d\n"
+
+# src/input/input_vcd.c:368
+#: src/input/input_vcd.c:368
+msgid "input_vcd: malformed MRL. Use vcd://<track #>\n"
+msgstr "input_vcd: ¼le sformu³owany MRL. U¿yj vcd://<¶cie¿ka #>\n"
+
+# src/input/input_vcd.c:375
+#: src/input/input_vcd.c:375
+#, c-format
+msgid "input_vcd: invalid track %d (valid range: 0 .. %d)\n"
+msgstr "input_vcd: b³êdna ¶cie¿ka %d (poprawny zakres: 0 .. %d)\n"
+
+# src/input/input_vcd.c:390
+#: src/input/input_vcd.c:390
+#, c-format
+msgid "input_vcd: error in CDRIOCSETBLOCKSIZE %d\n"
+msgstr "input_vcd: b³±d w CDRIOCSETBLOCKSIZE %d\n"
+
+# src/input/input_vcd.c:440 src/input/input_vcd.c:577
+#: src/input/input_vcd.c:440 src/input/input_vcd.c:577
+msgid "input_vcd: error in CDROMREADRAW\n"
+msgstr "input_vcd: b³±d w CDROMREADRAW\n"
+
+# src/input/input_vcd.c:475 src/input/input_vcd.c:617
+#: src/input/input_vcd.c:475 src/input/input_vcd.c:617
+#, c-format
+msgid "input_vcd: seek error %d\n"
+msgstr "input_vcd: b³±d wyszukiwania %d\n"
+
+# src/input/input_vcd.c:479 src/input/input_vcd.c:621
+#: src/input/input_vcd.c:479 src/input/input_vcd.c:621
+#, c-format
+msgid "input_vcd: read error %d\n"
+msgstr "input_vcd: b³±d odczytu %d\n"
+
+# src/input/input_vcd.c:516 src/input/input_vcd.c:663
+#: src/input/input_vcd.c:516 src/input/input_vcd.c:663
+msgid "input_vcd: read data failed\n"
+msgstr "input_vcd: odczyt danych zawiód³\n"
+
+# src/input/input_vcd.c:734 src/input/input_vcd.c:785
+#: src/input/input_vcd.c:734 src/input/input_vcd.c:785
+msgid "input_vcd: SEEK_CUR not implemented for offset != 0\n"
+msgstr "input_vcd: SEEK_CUR nie zaimplementowane dla offset != 0\n"
+
+# src/input/input_vcd.c:752 src/input/input_vcd.c:793
+#: src/input/input_vcd.c:752 src/input/input_vcd.c:793
+#, c-format
+msgid "input_vcd: error seek to origin %d not implemented!\n"
+msgstr "input_vcd: b³±d wyszukiwania do pocz±tku %d nie zaimplementowany!\n"
+
+# src/input/input_vcd.c:886
+#: src/input/input_vcd.c:886
+#, c-format
+msgid "input_vcd: CDROMCLOSETRAY failed: %s\n"
+msgstr "input_vcd: CDROMCLOSETRAY zawiód³: %s\n"
+
+# src/input/input_vcd.c:891 src/input/input_vcd.c:933
+#: src/input/input_vcd.c:891 src/input/input_vcd.c:933
+#, c-format
+msgid "input_vcd: CDROMEJECT failed: %s\n"
+msgstr "input_vcd: CDROMEJECT zawiód³ %s\n"
+
+# src/input/input_vcd.c:897
+#: src/input/input_vcd.c:897
+#, c-format
+msgid "input_vcd: CDROM_DRIVE_STATUS failed: %s\n"
+msgstr "input_vcd: CDROM_DRIVE_STATUS zawiód³: %s\n"
+
+# src/input/input_vcd.c:963
+#: src/input/input_vcd.c:963
+msgid "vcd device input plugin as shipped with xine"
+msgstr "wtyczka wej¶cia VCD dostarczana z xine"
+
+# src/input/input_vcd.c:991 src/input/input_vcd.c:1071
+#: src/input/input_vcd.c:991 src/input/input_vcd.c:1071
+#, c-format
+msgid "unable to open %s: %s.\n"
+msgstr "nie mogê otworzyæ %s: %s.\n"
+
+# src/input/input_vcd.c:999 src/input/input_vcd.c:1079
+#: src/input/input_vcd.c:999 src/input/input_vcd.c:1079
+msgid "vcd_read_toc failed\n"
+msgstr "vcd_read_toc zawiod³o\n"
+
+# src/input/input_vcd.c:1146
+#: src/input/input_vcd.c:1146
+#, c-format
+msgid ""
+"vcd input plugin doesn't support plugin API version %d.\n"
+"PLUGIN DISABLED.\n"
+"This means there's a version mismatch between xine and this inputplugin.\n"
+"Installing current input plugins should help.\n"
+msgstr ""
+"Wtyczka wej¶cia VCD nie wspiera API w wersji %d.\n"
+"WTYCZKA WY£¡CZONA.\n"
+"oznacza to niezgodno¶æ miêdzy xine a t± wtyczk± wej¶cia\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_vcd.c:1184
+#: src/input/input_vcd.c:1184
+msgid "path to your local vcd device file"
+msgstr "¶cie¿ka dostêpu do pliku lokalnego urz±dzenia vcd"
+
+# src/input/input_http.c:98
+#: src/input/input_http.c:103
+msgid "input_http: failed to open socket\n"
+msgstr "input_http: otwarcie gniazda zawiod³o\n"
+
+# src/input/input_http.c:107
+#: src/input/input_http.c:112
+msgid "input_http: cannot connect to host\n"
+msgstr "input_http: nie mogê pod³±czyæ siê do hosta\n"
+
+# src/input/input_http.c:122
+#: src/input/input_http.c:127
+#, c-format
+msgid "input_http: unable to resolve >%s<\n"
+msgstr "input_http: nie mogê rozwi±zaæ adresu >%s<\n"
+
+# src/input/input_http.c:134
+#: src/input/input_http.c:139
+#, c-format
+msgid "http: unable to connect to >%s<\n"
+msgstr "http: nie mogê siê pod³±czyæ do >%s<\n"
+
+# src/input/input_http.c:334
+#: src/input/input_http.c:340
+#, c-format
+msgid "input_http: opening >/%s< on host >%s<"
+msgstr "input_http: otwieram >/%s< na ho¶cie >%s<"
+
+# src/input/input_http.c:337
+#: src/input/input_http.c:343
+#, c-format
+msgid "%s via proxy >%s<"
+msgstr "%s via proxy >%s<"
+
+# src/input/input_http.c:413 src/input/input_http.c:534
+#: src/input/input_http.c:419 src/input/input_http.c:548
+msgid "input_http: EAGAIN\n"
+msgstr "input_http: EAGAIN\n"
+
+# src/input/input_http.c:416 src/input/input_http.c:537
+#: src/input/input_http.c:422 src/input/input_http.c:551
+msgid "input_http: read error\n"
+msgstr "input_http: b³±d odczytu\n"
+
+# src/input/input_http.c:445
+#: src/input/input_http.c:453
+msgid "input_http: invalid http answer\n"
+msgstr "input_http: b³êdna odpowied¼ http\n"
+
+# src/input/input_http.c:450
+#: src/input/input_http.c:464
+#, c-format
+msgid "input_http: 3xx redirection not implemented: >%d %s<\n"
+msgstr "input_http: przekierowanie 3xx nie zaimplementowane: >%d %s<\n"
+
+# src/input/input_http.c:455
+#: src/input/input_http.c:469
+#, c-format
+msgid "input_http: http status not 2xx: >%d %s<\n"
+msgstr "input_http: status http nie jest 2xx: >%d %s<\n"
+
+# src/input/input_http.c:464
+#: src/input/input_http.c:478
+#, c-format
+msgid "input_http: content length = %Ld bytes\n"
+msgstr "input_http: d³ugo¶æ zawarto¶ci = %Ld bytes\n"
+
+# src/input/input_http.c:471
+#: src/input/input_http.c:485
+msgid "input_http: Location redirection not implemented\n"
+msgstr "input_http: przekierowanie miejsca nie zaimplementowane\n"
+
+# src/input/input_http.c:640
+#: src/input/input_http.c:654
+msgid "http network stream input plugin"
+msgstr "wtyczka wej¶cia strumienia sieciowego http"
+
+# src/input/input_http.c:681
+#: src/input/input_http.c:695
+#, c-format
+msgid ""
+"http input plugin doesn't support plugin API version %d.\n"
+"PLUGIN DISABLED.\n"
+"This means there's a version mismatch between xine and this inputplugin.\n"
+"Installing current input plugins should help.\n"
+msgstr ""
+"Wtyczka wej¶cia http nie wspiera API w wersji %d.\n"
+"WTYCZKA WY£¡CZONA.\n"
+"oznacza to niezgodno¶æ miêdzy xine a t± wtyczk± wej¶cia\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_cda.c:435 src/input/input_cda.c:493
+#: src/input/input_cda.c:435 src/input/input_cda.c:493
+#, c-format
+msgid "input_cda: fopen(%s) failed: %s\n"
+msgstr "input_cda: fopen(%s) zawiód³: %s\n"
+
+# src/input/input_cda.c:582
+#: src/input/input_cda.c:582
+#, c-format
+msgid "input_cda: server '%s:%d' successfuly connected.\n"
+msgstr "input_cda: serwer '%s:%d' pod³±czony.\n"
+
+# src/input/input_cda.c:587
+#: src/input/input_cda.c:587
+#, c-format
+msgid "input_cda: opening server '%s:%d' failed: %s\n"
+msgstr "input_cda: otwarcie serwera '%s:%d' zawiod³o: %s\n"
+
+# src/input/input_cda.c:755
+#: src/input/input_cda.c:755
+#, c-format
+msgid "input_cda: ioctl(CDROM_MEDIA_CHANGED) failed: %s.\n"
+msgstr "input_cda: ioctl(CDROM_MEDIA_CHANGED) zawiód³: %s.\n"
+
+# src/input/input_cda.c:822
+#: src/input/input_cda.c:822
+#, c-format
+msgid "input_cda: ioctl(CDROMSUBCHNL) failed: %s.\n"
+msgstr "input_cda: ioctl(CDROMSUBCHNL) zawiód³: %s.\n"
+
+# src/input/input_cda.c:957
+#: src/input/input_cda.c:957
+#, c-format
+msgid "input_cda: ioctl(CDIOCSTART) failed: %s.\n"
+msgstr "input_cda: ioctl(CDIOCSTART) zawiód³: %s.\n"
+
+# src/input/input_cda.c:963
+#: src/input/input_cda.c:963
+#, c-format
+msgid "input_cda: ioctl(CDROMSTART) failed: %s.\n"
+msgstr "input_cda: ioctl(CDROMSTART) zawiód³: %s.\n"
+
+# src/input/input_cda.c:969
+#: src/input/input_cda.c:969
+#, c-format
+msgid "input_cda: ioctl(CDIOCPLAYMSF) failed: %s.\n"
+msgstr "input_cda: ioctl(CDIOCPLAYMSF) zawiód³: %s.\n"
+
+# src/input/input_cda.c:975
+#: src/input/input_cda.c:975
+#, c-format
+msgid "input_cda: ioctl(CDROMPLAYMSF) failed: %s.\n"
+msgstr "input_cda: ioctl(CDROMPLAYMSF) zawiód³: %s.\n"
+
+# src/input/input_cda.c:997
+#: src/input/input_cda.c:997
+#, c-format
+msgid "input_cda: No rights to open %s.\n"
+msgstr "input_cda: Brak uprawnieñ do otwarcia %s.\n"
+
+# src/input/input_cda.c:1000
+#: src/input/input_cda.c:1000
+#, c-format
+msgid "input_cda: open(%s) failed: %s.\n"
+msgstr "input_cda: open(%s) zawiód³: %s.\n"
+
+# src/input/input_cda.c:1094
+#: src/input/input_cda.c:1094
+#, c-format
+msgid "input_cda: ioctl(CDROMCLOSETRAY) failed: %s\n"
+msgstr "input_cda: ioctl(CDROMCLOSETRAY) zawiód³: %s\n"
+
+# src/input/input_cda.c:1099 src/input/input_cda.c:1115
+# src/input/input_cda.c:1120
+#: src/input/input_cda.c:1099 src/input/input_cda.c:1115
+#: src/input/input_cda.c:1120
+#, c-format
+msgid "input_cda: ioctl(CDROMEJECT) failed: %s\n"
+msgstr "input_cda: ioctl(CDROMEJECT) zawiód³: %s\n"
+
+# src/input/input_cda.c:1105
+#: src/input/input_cda.c:1105
+#, c-format
+msgid "input_cda: ioctl(CDROM_DRIVE_STATUS) failed: %s\n"
+msgstr "input_cda: ioctl(CDROM_DRIVE_STATUS) zawiód³: %s\n"
+
+# src/input/input_cda.c:1111
+#: src/input/input_cda.c:1111
+#, c-format
+msgid "input_cda: ioctl(CDROMALLOW) failed: %s\n"
+msgstr "input_cda: ioctl(CDROMALLOW) zawiód³: %s\n"
+
+# src/input/input_cda.c:1151
+#: src/input/input_cda.c:1151
+#, c-format
+msgid "input_cda: ioctl(CDIOREADTOCHEADER) failed: %s.\n"
+msgstr "input_cda: ioctl(CDIOREADTOCHEADER) zawiód³: %s.\n"
+
+# src/input/input_cda.c:1159
+#: src/input/input_cda.c:1159
+#, c-format
+msgid "input_cda: ioctl(CDROMREADTOCHDR) failed: %s.\n"
+msgstr "input_cda: ioctl(CDROMREADTOCHDR) zawiód³: %s.\n"
+
+# src/input/input_cda.c:1196
+#: src/input/input_cda.c:1196
+#, c-format
+msgid "input_cda: ioctl(CDIOREADTOCENTRYS) failed: %s.\n"
+msgstr "input_cda: ioctl(CDIOREADTOCENTRYS) zawiód³: %s.\n"
+
+# src/input/input_cda.c:1219
+#: src/input/input_cda.c:1219
+#, c-format
+msgid "input_cda: ioctl(CDROMREADTOCENTRY) failed: %s.\n"
+msgstr "input_cda: ioctl(CDROMREADTOCENTRY) zawiód³: %s.\n"
+
+# src/input/input_cda.c:1401
+#: src/input/input_cda.c:1401
+msgid "input_cda: malformed MRL. Use cda://<track #>\n"
+msgstr "input_cda: ¼le sformu³owane MRL. U¿yj cda://<track #>\n"
+
+# src/input/input_cda.c:1407
+#: src/input/input_cda.c:1407
+#, c-format
+msgid "input_cda: invalid track %d (valid range: 1 .. %d)\n"
+msgstr "input_cda: b³êdna ¶cie¿ka %d (poprawny zakres: 1 .. %d)\n"
+
+# src/input/input_cda.c:1490
+#: src/input/input_cda.c:1490
+#, c-format
+msgid "input_cda: error seek to origin %d not implemented!\n"
+msgstr "input_cda: b³±d wyszukiwania do pocz±tku %d nie zaimplementowany!\n"
+
+# src/input/input_cda.c:1606
+#: src/input/input_cda.c:1606
+msgid "cd audio plugin as shipped with xine"
+msgstr "wtyczka wej¶cia CD audio dostarczana z xine"
+
+# src/input/input_cda.c:1794
+#: src/input/input_cda.c:1794
+#, c-format
+msgid ""
+"cda input plugin doesn't support plugin API version %d.\n"
+"PLUGIN DISABLED.\n"
+"This means there's a version mismatch between xine and this inputplugin.\n"
+"Installing current input plugins should help.\n"
+msgstr ""
+"Wtyczka wejscia cda nie wspiera API w wersji %d.\n"
+"WTYCZKA WYLACZONA.\n"
+"oznacza to niezgodno¶æ miêdzy xine a t± wtyczk± wej¶cia\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_cda.c:1842
+#: src/input/input_cda.c:1842
+msgid "path to your local cd audio device file"
+msgstr "¶cie¿ka do pliku lokalnego urz±dzenia cd"
+
+# src/input/input_cda.c:1847
+#: src/input/input_cda.c:1847
+msgid "cddbp server name"
+msgstr "nazwa serwera cddbp"
+
+# src/input/input_cda.c:1851
+#: src/input/input_cda.c:1851
+msgid "cddbp server port"
+msgstr "port serwera cddbp"
+
+# src/input/input_cda.c:1858
+#: src/input/input_cda.c:1858
+msgid "cddbp cache directory"
+msgstr "historia pamiêci podrêcznej cddbp"
+
+# src/input/net_buf_ctrl.c:67
+#: src/input/net_buf_ctrl.c:67
+msgid "buffering..."
+msgstr "buforowanie..."
+
+# src/libmpeg2/xine_decoder.c:156
+#: src/libmpeg2/xine_decoder.c:170
+#, c-format
+msgid ""
+"libmpeg2: plugin doesn't support plugin API version %d.\n"
+"libmpeg2: this means there's a version mismatch between xine and this "
+"libmpeg2: decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"libmpeg2: ta wtyczka nie wspiera API w wersji %d.\n"
+"libmpeg2: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka libmpeg2: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/libmpg123/xine_decoder.c:109
+#: src/libmpg123/xine_decoder.c:109
+#, c-format
+msgid ""
+"libmpg123: plugin doesn't support plugin API version %d.\n"
+"libmpg123: this means there's a version mismatch between xine and this "
+"libmpg123: decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"libmpg123: ta wtyczka nie wspiera API w wersji %d.\n"
+"libmpg123: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka libmpg123: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/libspudec/xine_decoder.c:306
+#: src/libspudec/xine_decoder.c:306
+#, c-format
+msgid ""
+"libspudec: Doesn't support plugin API version %d.\n"
+"libspudec: This means there is a version mismatch between XINE and\n"
+"libspudec: this plugin.\n"
+msgstr ""
+"libspudec: Wtyczka wej¶cia file nie wspiera API w wersji %d.\n"
+"libspudec: To oznacza ¿e jest niezgodno¶æ wersji miêdzy xine a\n"
+"libspudec: t± wtyczka wej¶cia\n"
+
+# src/libw32dll/w32codec.c:1404 src/libw32dll/w32codec.c:1453
+#: src/libw32dll/w32codec.c:1351 src/libw32dll/w32codec.c:1396
+msgid "path to win32 codec dlls"
+msgstr "¶cie¿ka do kodeków dll win32"
+
+# src/libw32dll/w32codec.c:1443
+#: src/libw32dll/w32codec.c:1386
+#, c-format
+msgid ""
+"w32codec: plugin doesn't support plugin API version %d.\n"
+"w32codec: this means there's a version mismatch between xine and this "
+"w32codec: decoder plugin.\n"
+"Installing current decoder plugins should help.\n"
+msgstr ""
+"w32codec: ta wtyczka nie wspiera API w wersji %d.\n"
+"w32codec: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka w32codec: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/video_out/video_out_aa.c:307
+#: src/video_out/video_out_aa.c:300
+msgid "xine video output plugin using the ascii-art library"
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywaj±ca biblioteki ascii-art"
+
+# src/video_out/video_out_syncfb.c:995
+#: src/video_out/video_out_syncfb.c:818
+msgid "syncfb (teletux) device node"
+msgstr "wêze³ urz±dzenia syncfb (teletux)"
+
+# src/video_out/video_out_syncfb.c:1170
+#: src/video_out/video_out_syncfb.c:986
+msgid "xine video output plugin using the SyncFB module for Matrox G200/G400 cards"
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywaj±ca modu³u SyncFB dla kart Matrox G200/G400"
+
+# src/video_out/video_out_fb.c:705 src/video_out/video_out_xshm.c:1283
+#: src/video_out/video_out_fb.c:644 src/video_out/video_out_xshm.c:1038
+msgid "disable all video scaling (faster!)"
+msgstr "wy³±cz skalowanie obrazu (szybsze!)"
+
+# src/video_out/video_out_xshm.c:1426
+#: src/video_out/video_out_xshm.c:1185
+msgid "gamma correction for XShm driver"
+msgstr "korekta gamma dla sterownika XShm"
+
+# src/video_out/video_out_xshm.c:1445
+#: src/video_out/video_out_xshm.c:1204
+msgid "xine video output plugin using the MIT X shared memory extension"
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywajaca rozszerzenie dzielonej pamiêci MIT X"
+
+# src/video_out/video_out_xv.c:1160 src/video_out/video_out_xv.c:1166
+#: src/video_out/video_out_xv.c:999 src/video_out/video_out_xv.c:1005
+msgid "Xv property"
+msgstr "W³a¶ciwo¶ci Xv"
+
+# src/video_out/video_out_xv.c:1408
+#: src/video_out/video_out_xv.c:1241
+msgid "bilinear scaling mode (permedia 2/3)"
+msgstr "tryb skalowania bilinearnego (permedia 2/3)"
+
+# src/video_out/video_out_xv.c:1414
+#: src/video_out/video_out_xv.c:1247
+msgid "double buffer to sync video to the retrace"
+msgstr "podwójny pufor do synchronizacji obrazu do powrotu plamki"
+
+# src/video_out/video_out_xv.c:1463
+#: src/video_out/video_out_xv.c:1296
+msgid "Software deinterlace method (Key I toggles deinterlacer on/off)"
+msgstr "metoda korekty przeplotu (klawisz I w³±cza/wy³acza korekte przeplotu)"
+
+# src/video_out/video_out_xv.c:1479
+#: src/video_out/video_out_xv.c:1312
+msgid "xine video output plugin using the MIT X video extension"
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywaj±ca rozszerzenia obrazu MIT X"
+
+# src/video_out/video_out_fb.c:721
+#: src/video_out/video_out_fb.c:576
+msgid "framebuffer device"
+msgstr "urz±dzenie buforu ramki"
+
+# src/video_out/video_out_fb.c:885
+#: src/video_out/video_out_fb.c:757
+msgid "xine video output plugin using linux framebuffer device"
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywaj±ca linuxowego urz±dzenia buforu ramki"
+
+# src/video_out/video_out_sdl.c:696
+#: src/video_out/video_out_sdl.c:538
+msgid "xine video output plugin using Simple DirectMedia Layer"
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywaj±ca warstwy Simple DirectMedia"
+
+# src/video_out/video_out_opengl.c:1106
+#: src/video_out/video_out_opengl.c:1094
+msgid "gamma correction for OpenGL driver"
+msgstr "korekta gamma dla sterownika OpenGL"
+
+# src/video_out/video_out_opengl.c:1124
+#: src/video_out/video_out_opengl.c:1112
+msgid "xine video output plugin using OpenGL(tm)"
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywaj±ca OpenGL(tm)"
+
+# src/video_out/video_out_directfb.c:569
+#: src/video_out/video_out_directfb.c:564
+msgid "xine video output plugin using the DirectFB library."
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywaj±ca biblioteki DirectFB"
+
+# src/video_out/video_out_vidix.c:869
+#: src/video_out/video_out_vidix.c:740
+msgid "xine video output plugin using libvidix"
+msgstr "wtyczka wyj¶cia obrazu xine u¿ywaj±ca libvidix"
+
+#: src/xine-engine/tvmode.c:589
+msgid "TV System"
+msgstr "System TV"
+
+#: src/xine-engine/tvmode.c:594
+msgid "Mode Selection Policy"
+msgstr "Polityka wyboru trybu"
+
+#: src/xine-engine/tvmode.c:617
+msgid "Modes"
+msgstr "Tryby"
+
+#: src/xine-engine/tvmode.c:627
+msgid "Prefer PAL"
+msgstr "Preferowany PAL"
+
+#: src/xine-engine/tvmode.c:633
+msgid "Verbose resolution selection"
+msgstr "Przyja¼niejsza selekcja rozdzielczo¶ci"
+
+#: src/xine-engine/tvmode.c:639
+msgid "Screen Aspect Ratio"
+msgstr "Proporcje ekranu"
+
+# src/xine-engine/video_out.c:308
+#: src/xine-engine/video_out.c:307
+#, c-format
+msgid "%d frames delivered, %d frames skipped, %d frames discarded\n"
+msgstr "%d ramek dostarczonych, %d ramek pominiêtych, %d ramek porzuconych\n"
+
+# src/xine-engine/video_out.c:351
+#: src/xine-engine/video_out.c:443
+#, c-format
+msgid ""
+"video_out: throwing away image with pts %lld because it's too old (diff : %"
+"lld).\n"
+msgstr "video_out: odrzucam obraz o pts %lld bo jest za stary (diff : %lld).\n"
+
+# src/xine-engine/video_out.c:890
+#: src/xine-engine/video_out.c:969
+#, c-format
+msgid "video_out: can't create thread (%s)\n"
+msgstr "video_out: nie mogê utworzyæ w±tku (%s)\n"
+
+# src/xine-engine/video_out.c:893
+#. FIXME: how does this happen ?
+#: src/xine-engine/video_out.c:972
+msgid "video_out: sorry, this should not happen. please restart xine.\n"
+msgstr ""
+"video_out: przykro mi, to nie powinno sie zdarzyæ.\n"
+"Proszê ponownie uruchomiæ xine.\n"
+
+# src/xine-engine/xine.c:137
+#: src/xine-engine/xine.c:137
+#, c-format
+msgid "xine_notify_stream_finished: can't create new thread (%s)\n"
+msgstr "xine_notify_stream_finished: nie mogê utworzyæ nowego w±tku (%s)\n"
+
+# src/xine-engine/xine.c:294
+#: src/xine-engine/xine.c:296
+#, c-format
+msgid "%s(%d) wrong first stage = %d !!\n"
+msgstr "%s(%d) b³êdny pierwszy etap = %d !!\n"
+
+# src/xine-engine/xine.c:415
+#: src/xine-engine/xine.c:422
+msgid "xine: cannot find input plugin for this MRL\n"
+msgstr "xine: nie mogê znale¼æ wtyczki wej¶cia dla tego MRL\n"
+
+# src/xine-engine/xine.c:426
+#: src/xine-engine/xine.c:433
+#, c-format
+msgid "using input plugin '%s' for MRL '%s'\n"
+msgstr "u¿ywam wtyczki wej¶cia '%s' dla MRL '%s'\n"
+
+# src/xine-engine/xine.c:436
+#: src/xine-engine/xine.c:443
+#, c-format
+msgid "xine: couldn't find demuxer for >%s<\n"
+msgstr "xine: nie mogê znale¼æ demultiplexera dla >%s<\n"
+
+# src/xine-engine/xine.c:443
+#: src/xine-engine/xine.c:450
+#, c-format
+msgid "system layer format '%s' detected.\n"
+msgstr "format warstwy systemowej '%s' wykryty.\n"
+
+# src/xine-engine/xine.c:471
+#: src/xine-engine/xine.c:477
+msgid "xine_play: demuxer failed to start\n"
+msgstr "xine_play: zawiód³ start demultiplexera\n"
+
+# src/xine-engine/xine.c:600
+#: src/xine-engine/xine.c:606
+msgid "logo mrl, displayed in video output window"
+msgstr "mrl logo, wy¶wietlane w oknie wyj¶cia obrazu"
+
+# src/xine-engine/xine.c:1024
+#: src/xine-engine/xine.c:1033
+msgid "stream format"
+msgstr "format strumienia"
+
+# src/xine-engine/xine.c:1025
+#: src/xine-engine/xine.c:1034
+msgid "messages"
+msgstr "wiadomo¶ci"
+
+# src/xine-engine/xine.c:1026
+#: src/xine-engine/xine.c:1035
+msgid "plugin"
+msgstr "wtyczka"
+
+# src/xine-engine/audio_out.c:825
+#: src/xine-engine/audio_out.c:825
+msgid "adjust whether resampling is done or not"
+msgstr "w³±czeni/wy³±czenie ponownego próbkowania"
+
+# src/xine-engine/audio_out.c:828
+#: src/xine-engine/audio_out.c:828
+msgid "if !=0 always resample to given rate"
+msgstr "je¶li !=0 zawsze ponowne próbkowanie do podanej czêstotliwo¶ci"
+
+#: src/xine-engine/audio_out.c:834
+msgid "adjust if audio is offsync"
+msgstr "Dopasuj je¶li d¼wiêk nie jest zsynchronizowany"
+
+# src/xine-engine/audio_out.c:868
+#: src/xine-engine/audio_out.c:874
+msgid "Audio volume"
+msgstr "g³o¶no¶æ d¼wiêku"
+
+# src/xine-engine/audio_out.c:872
+#: src/xine-engine/audio_out.c:878
+msgid "restore volume level at startup"
+msgstr "przywracanie g³o¶no¶ci przy starcie"
+
+# src/xine-engine/audio_out.c:873
+#: src/xine-engine/audio_out.c:879
+msgid "if this not set, xine will not touch any mixer settings at startup"
+msgstr ""
+"je¶li ustawione - xine nie bêdzie zmieniaæ ¿adnych ustawieñ miksera przy "
+"starcie"
+
+# src/xine-engine/osd.c:863
+#: src/xine-engine/osd.c:864
+msgid "Palette (foreground-border-background) to use on subtitles"
+msgstr "paleta u¿yta przy napisach (t³o-napisy-kontur)"
+
+# src/xine-engine/load_plugins.c:100 src/xine-engine/load_plugins.c:455
+#: src/xine-engine/load_plugins.c:100 src/xine-engine/load_plugins.c:463
+#, c-format
+msgid "%s(%s@%d): parameter should be non null, exiting\n"
+msgstr "%s(%s@%d): parametr nie powinien byæ pusty.\n"
+
+# src/xine-engine/load_plugins.c:138
+#: src/xine-engine/load_plugins.c:138
+#, c-format
+msgid ""
+"load_plugins: cannot open demux plugin %s:\n"
+"%s\n"
+msgstr ""
+"load_plugins: nie mogê otworzyæ wtyczki demultiplexera %s:\n"
+"%s\n"
+
+# src/xine-engine/load_plugins.c:153
+#: src/xine-engine/load_plugins.c:153
+#, c-format
+msgid "load_plugins: demux plugin found : %s\n"
+msgstr "load_plugins: wtyczka demultipleksera znaleziona : %s\n"
+
+# src/xine-engine/load_plugins.c:161
+#: src/xine-engine/load_plugins.c:161
+msgid "load_plugins: too many demux plugins installed, exiting.\n"
+msgstr ""
+"load_plugins: zbyt wiele wtyczek demultipleksera zainstalowanych, "
+"zakañczanie.\n"
+
+# src/xine-engine/load_plugins.c:300
+#: src/xine-engine/load_plugins.c:300
+#, c-format
+msgid ""
+"load_plugins: cannot open input plugin %s:\n"
+"%s\n"
+msgstr ""
+"load_plugins: nie mogê otworzyæ wtyczki wej¶cia %s:\n"
+"%s\n"
+
+# src/xine-engine/load_plugins.c:313
+#: src/xine-engine/load_plugins.c:313
+#, c-format
+msgid "load_plugins: input plugin found : %s\n"
+msgstr "load_plugins: wtyczka wej¶cia znaleziona : %s\n"
+
+# src/xine-engine/load_plugins.c:321
+#: src/xine-engine/load_plugins.c:321
+#, c-format
+msgid ""
+"load_plugins: %s is no valid input plugin (lacks init_input_plugin() "
+"function)\n"
+msgstr ""
+"load_plugins: %s nie jest poprawna wtyczka wej¶cia (brak funkcji "
+"init_input_plugin())\n"
+
+# src/xine-engine/load_plugins.c:325
+#: src/xine-engine/load_plugins.c:325
+#, c-format
+msgid "%s(%d): too many input plugins installed, exiting.\n"
+msgstr "%s(%d): znaleziono zbyt wiele wtyczek wejscia, zakañczanie.\n"
+
+# src/xine-engine/load_plugins.c:338
+#: src/xine-engine/load_plugins.c:338
+#, c-format
+msgid ""
+"load_plugins: no input plugins found in %s! - Did you install xine "
+"correctly??\n"
+msgstr ""
+"load_plugins: nie znaleziono ¿adnych wtyczek wej¶cia w %s! - Zainstalowa³e¶ "
+"xine poprawnie??\n"
+
+# src/xine-engine/load_plugins.c:520
+#: src/xine-engine/load_plugins.c:528
+#, c-format
+msgid ""
+"load_plugins: failed to load plugin %s:\n"
+"%s\n"
+msgstr ""
+"load_plugins: nie uda³o siê za³adowaæ wtyczki %s:\n"
+"%s\n"
+
+# src/xine-engine/load_plugins.c:553
+#: src/xine-engine/load_plugins.c:561
+#, c-format
+msgid "spu decoder plugin found : %s\n"
+msgstr "znaleziono wtyczkê dekodera spu : %s\n"
+
+# src/xine-engine/load_plugins.c:586
+#: src/xine-engine/load_plugins.c:594
+#, c-format
+msgid "video decoder plugin found : %s\n"
+msgstr "znaleziono wtyczkê dekodera obrazu : %s\n"
+
+# src/xine-engine/load_plugins.c:616
+#: src/xine-engine/load_plugins.c:624
+#, c-format
+msgid "audio decoder plugin found : %s\n"
+msgstr "znaleziono wtyczkê dekodera d¼wiêku : %s\n"
+
+# src/liblpcm/xine_decoder.c:187
+#: src/liblpcm/xine_decoder.c:212
+#, c-format
+msgid ""
+"liblpcm: plugin doesn't support plugin API version %d.\n"
+"liblpcm: this means there's a version mismatch between xine and this "
+"liblpcm: decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"liblpcm: ta wtyczka nie wspiera API w wersji %d.\n"
+"liblpcm: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka liblpcm:"
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/libffmpeg/xine_decoder.c:413
+#: src/libffmpeg/xine_decoder.c:636
+#, c-format
+msgid ""
+"ffmpeg: plugin doesn't support plugin API version %d.\n"
+"ffmpeg: this means there's a version mismatch between xine and this ffmpeg: "
+"decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"ffmpeg: ta wtyczka nie wspiera API w wersji %d.\n"
+"ffmpeg: oznacza to niezgodno¶æ miêdzy xine a t± wtyczk±ffmpeg: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/libffmpeg/xine_decoder.c:436
+#: src/libffmpeg/xine_decoder.c:663
+msgid "allow illegal vlc codes in mpeg4 streams"
+msgstr "dopuszczenie b³êdnych kodów vlc w strumieniach mpeg4"
+
+# src/dxr3/video_out_dxr3.c:119
+#: src/dxr3/video_out_dxr3.c:125
+msgid "xine video output plugin for dxr3 cards"
+msgstr "wtyczka wyj¶cia obrazu dla kart dxr3"
+
+# src/dxr3/video_out_dxr3.c:153
+#: src/dxr3/video_out_dxr3.c:165
+msgid "swap odd and even lines"
+msgstr "zamiana lini parzystych i nieparzystych"
+
+# src/dxr3/video_out_dxr3.c:156
+#: src/dxr3/video_out_dxr3.c:168
+msgid "Add black bars to correct aspect ratio"
+msgstr "dodanie czarnch pasków w celu skorygowania proporcji"
+
+# src/dxr3/video_out_dxr3.c:157
+#: src/dxr3/video_out_dxr3.c:169
+msgid "If disabled, will assume source has 4:3 aspect ratio."
+msgstr "je¶li wy³±czone, przyjmie ¿e ¼ród³o ma proporcje 4:3"
+
+# src/dxr3/video_out_dxr3.c:160
+#: src/dxr3/video_out_dxr3.c:172
+msgid "dxr3: use alternate play mode for mpeg encoder playback"
+msgstr "dxr3: u¿yj alternatywnego trybu odtwarzania dla kodera mpeg"
+
+# src/dxr3/dxr3_decode_video.c:181 src/dxr3/video_out_dxr3.c:161
+#: src/dxr3/dxr3_decode_video.c:183 src/dxr3/video_out_dxr3.c:173
+msgid "Enabling this option will utilise a smoother play mode."
+msgstr "w³±czenie tej opcji u¿yje wyg³adzonego trybu odtwarzania"
+
+# src/dxr3/video_out_dxr3.c:221
+#: src/dxr3/video_out_dxr3.c:233
+msgid "the encoder for non mpeg content"
+msgstr "koder do zawarto¶ci nie-mpeg"
+
+# src/dxr3/video_out_dxr3.c:222
+#: src/dxr3/video_out_dxr3.c:234
+msgid ""
+"Content other than mpeg has to pass an additional reencoding stage, because "
+"the dxr3 handles mpeg only."
+msgstr ""
+"zawarto¶æ inna ni¿ mpeg musi przej¶æ etap ponownego kodowania, poniewa¿ "
+"karty dxr3 wspieraj± tylko format mpeg"
+
+# src/dxr3/video_out_dxr3.c:252
+#: src/dxr3/video_out_dxr3.c:264
+msgid "Dxr3: contrast control"
+msgstr "dxr3: kontrola kontrastu"
+
+# src/dxr3/video_out_dxr3.c:254
+#: src/dxr3/video_out_dxr3.c:266
+msgid "Dxr3: saturation control"
+msgstr "dxr3: kontrola nasycenia"
+
+# src/dxr3/video_out_dxr3.c:256
+#: src/dxr3/video_out_dxr3.c:268
+msgid "Dxr3: brightness control"
+msgstr "dxr3: kontrola jasno¶ci"
+
+# src/dxr3/video_out_dxr3.c:260
+#: src/dxr3/video_out_dxr3.c:272
+msgid "Dxr3: videoout mode (tv or overlay)"
+msgstr "dxr3: tryb wyj¶cia tv (tv lub overlay)"
+
+# src/dxr3/video_out_dxr3.c:287
+#: src/dxr3/video_out_dxr3.c:300
+msgid "Dxr3: overlay colorkey value"
+msgstr "dxr3: warto¶æ koloru kluczowego dla overlay"
+
+# src/dxr3/video_out_dxr3.c:290
+#: src/dxr3/video_out_dxr3.c:303
+msgid "Dxr3: overlay colorkey range"
+msgstr "dxr3: zakres koloru kluczowego"
+
+# src/dxr3/video_out_dxr3.c:291
+#: src/dxr3/video_out_dxr3.c:304
+msgid "A greater value widens the tolerance for the overlay keycolor"
+msgstr "wiêksza warto¶æ zwiêksza tolerancjê dla koloru kluczowego overlay"
+
+# src/dxr3/video_out_dxr3.c:303
+#: src/dxr3/video_out_dxr3.c:317
+msgid "dxr3 preferred tv mode"
+msgstr "dxr3: wybór trybu tv"
+
+# src/dxr3/dxr3.h:33
+#. data for the device name config entry
+#: src/dxr3/dxr3.h:33
+msgid "Dxr3: Device Name"
+msgstr "dxr3: nazwa urz±dzenia"
+
+# src/dxr3/dxr3.h:34
+#: src/dxr3/dxr3.h:34
+msgid "The device file of the dxr3 mpeg decoder card control device."
+msgstr "plik urz±dzenia karty dekoduj±cej dxr3"
+
+# src/dxr3/dxr3_decode_spu.c:110
+#: src/dxr3/dxr3_decode_spu.c:112
+#, c-format
+msgid ""
+"dxr3_decode_spu: plugin doesn't support plugin API version %d.\n"
+"dxr3_decode_spu: this means there's a version mismatch between xine and this "
+"dxr3_decode_spu: decoder plugin. Installing current plugins should help.\n"
+msgstr ""
+"dxr3_decode_spu: ta wtyczka nie wspiera API w wersji %d.\n"
+"dxr3_decode_spu: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka "
+"dxr3_decode_spu: demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/dxr3/dxr3_decode_video.c:131
+#: src/dxr3/dxr3_decode_video.c:133
+#, c-format
+msgid ""
+"dxr3_decode_video: plugin doesn't support plugin API version %d.\n"
+"dxr3_decode_video: this means there's a version mismatch between xine and "
+"this\n"
+"dxr3_decode_video: decoder plugin. Installing current plugins should help.\n"
+msgstr ""
+"dxr3_decode_video: ta wtyczka nie wspiera API w wersji %d.\n"
+"dxr3_decode_video: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka "
+"dxr3_decode_video: demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/dxr3/dxr3_decode_video.c:168
+#: src/dxr3/dxr3_decode_video.c:170
+msgid "Dxr3: video decoder priority"
+msgstr "dxr3: priorytet dekodera obrazu"
+
+# src/dxr3/dxr3_decode_video.c:169
+#: src/dxr3/dxr3_decode_video.c:171
+msgid "Decoder priorities greater 5 enable hardware decoding, 0 disables it."
+msgstr "priorytet dekodera wiêkszy ni¿ 5 w³±cza dekodowanie sprzêtowe, 0 wy³±cza go."
+
+# src/dxr3/dxr3_decode_video.c:176
+#: src/dxr3/dxr3_decode_video.c:178
+msgid "Try to sync video every frame"
+msgstr "próbuj synchronizowaæ ka¿d± ramkê"
+
+# src/dxr3/dxr3_decode_video.c:177
+#: src/dxr3/dxr3_decode_video.c:179
+msgid "This is relevant for progressive video only (most PAL films)."
+msgstr "to jest zwi±zane tylko z progresywnym obrazem (wiêkszo¶æ filmów PAL)"
+
+# src/dxr3/dxr3_decode_video.c:180
+#: src/dxr3/dxr3_decode_video.c:182
+msgid "Use alternate Play mode"
+msgstr "u¿yj alternatywnego trybu odtwarzania"
+
+# src/dxr3/dxr3_decode_video.c:184
+#: src/dxr3/dxr3_decode_video.c:186
+msgid "Correct frame durations in broken streams"
+msgstr "korekta czasu trwania ramki w zepsutych strumieniach"
+
+# src/dxr3/dxr3_decode_video.c:185
+#: src/dxr3/dxr3_decode_video.c:187
+msgid "Enable this for streams with wrong frame durations."
+msgstr "w³±cz to dla strumieni z b³êdnymi d³ugo¶ciami ramek"
+
+# src/dxr3/dxr3_scr.c:81
+#: src/dxr3/dxr3_scr.c:81
+msgid "Dxr3: SCR plugin priority"
+msgstr "dxr3: priorytet wtyczki SCR"
+
+# src/dxr3/dxr3_scr.c:82
+#: src/dxr3/dxr3_scr.c:82
+msgid "Scr priorities greater 5 make the dxr3 xine's master clock."
+msgstr "priorytet SCR wiêkszy od 5 robi dxr3 g³ównym zegarem xine"
+
+# src/dxr3/dxr3_mpeg_encoders.c:182
+#: src/dxr3/dxr3_mpeg_encoders.c:182
+msgid "Dxr3enc: rte mpeg output bitrate (kbit/s)"
+msgstr "dxr3enc: czêstotliwo¶æ wyj¶æia rte mpeg (kbit/s)"
+
+# src/dxr3/dxr3_mpeg_encoders.c:183
+#: src/dxr3/dxr3_mpeg_encoders.c:183
+msgid ""
+"The bitrate the mpeg encoder library librte should use for dxr3's encoding "
+"mode"
+msgstr "czêstotliwo¶æ jak± biblioteka librte powinna u¿yæ dla trybu kodowania dxr3"
+
+# src/dxr3/dxr3_mpeg_encoders.c:389
+#: src/dxr3/dxr3_mpeg_encoders.c:389
+msgid "Dxr3enc: fame mpeg encoding quality"
+msgstr "dxr3enc: jako¶æ kodowania fame"
+
+# src/dxr3/dxr3_mpeg_encoders.c:390
+#: src/dxr3/dxr3_mpeg_encoders.c:390
+msgid "The encoding quality of the libfame mpeg encoder library."
+msgstr "jako¶æ kodowania przez bibliotekê kodera libfame"
+
+# src/libmad/xine_decoder.c:283
+#: src/libmad/xine_decoder.c:283
+#, c-format
+msgid ""
+"libmad: plugin doesn't support plugin API version %d.\n"
+"libmad: this means there's a version mismatch between xine and this libmad: "
+"decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"libmad: ta wtyczka nie wspiera API w wersji %d.\n"
+"libmad: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka libmad: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/liba52/xine_decoder.c:550
+#: src/liba52/xine_decoder.c:550
+#, c-format
+msgid ""
+"liba52: plugin doesn't support plugin API version %d.\n"
+"liba52: this means there's a version mismatch between xine and this liba52: "
+"decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"liba52: ta wtyczka nie wspiera API w wersji %d.\n"
+"liba52: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka liba52: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/liba52/xine_decoder.c:574
+#: src/liba52/xine_decoder.c:574
+msgid "a/52 volume control"
+msgstr "kontrola g³o¶no¶ci a/52"
+
+# src/liba52/xine_decoder.c:577
+#: src/liba52/xine_decoder.c:577
+msgid "enable a/52 dynamic range compensation"
+msgstr "w³±czanie dynamicznego zakresu kompensacji a/52"
+
+# src/liba52/xine_decoder.c:580
+#: src/liba52/xine_decoder.c:580
+msgid "enable audio downmixing to 2.0 surround stereo"
+msgstr "w³±cz redukcjê d¼wiêku do 2.0 surround stereo"
+
+# src/libdts/xine_decoder.c:233
+#: src/libdts/xine_decoder.c:233
+#, c-format
+msgid ""
+"libdts: plugin doesn't support plugin API version %d.\n"
+"libdts: this means there's a version mismatch between xine and this libdts: "
+"decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"libdts: ta wtyczka nie wspiera API w wersji %d.\n"
+"libdts: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka libdts: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/libdivx4/xine_decoder.c:556
+#: src/libdivx4/xine_decoder.c:558
+#, c-format
+msgid ""
+"divx4: plugin doesn't support plugin API version %d.\n"
+"divx4: this means there's a version mismatch between xine and this divx4: "
+"decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"divx4: ta wtyczka nie wspiera API w wersji %d.\n"
+"divx4: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka divx4: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/libdivx4/xine_decoder.c:569
+#: src/libdivx4/xine_decoder.c:571
+msgid "Relative path to libdivxdecore.so to open"
+msgstr "wzgêdna ¶cie¿ka do otwarcia libdivxdecore.so"
+
+# src/libdivx4/xine_decoder.c:594
+#: src/libdivx4/xine_decoder.c:596
+msgid "priority of the divx4 plugin (>5 => enable)"
+msgstr "priorytet wtyczki divx4 (>5 => w³±cza)"
+
+# src/libdivx4/xine_decoder.c:599
+#: src/libdivx4/xine_decoder.c:601
+msgid "the postprocessing level, 0 = none and fast, 6 = all and slow"
+msgstr "poziom post-przetwarzania, 0 = brak i szybki, 6 = pe³ny ale powolny"
+
+# src/libdivx4/xine_decoder.c:602
+#: src/libdivx4/xine_decoder.c:604
+msgid "use divx4 plugin for msmpeg4v3 streams"
+msgstr "u¿yj wtyczki divx4 dla strumieni msmpeg4v3"
+
+# src/libdivx4/xine_decoder.c:607
+#: src/libdivx4/xine_decoder.c:609
+msgid "Divx version to check for (set to 0 (default) if unsure)"
+msgstr ""
+"wersja divx której ma szukaæ xine (ustwiæ na 0 (domy¶lnie) je¶li brak "
+"pewno¶ci)"
+
+# src/libvorbis/xine_decoder.c:247
+#: src/libvorbis/xine_decoder.c:249
+#, c-format
+msgid ""
+"libvorbis: plugin doesn't support plugin API version %d.\n"
+"libvorbis: this means there's a version mismatch between xine and this "
+"libvorbis: decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"libvorbis: ta wtyczka nie wspiera API w wersji %d.\n"
+"libvorbis: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka libvorbis: "
+"demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/xine-utils/memcpy.c:439
+#: src/xine-utils/memcpy.c:439
+msgid "Memcopy method to use in xine for large data chunks."
+msgstr "metoda kopiowania pamiêci u¿ywana dla du¿ych porcji danych"
+
+# src/libsputext/xine_decoder.c:1056
+#: src/libsputext/xine_decoder.c:1056
+#, c-format
+msgid ""
+"libsputext: doesn't support plugin api version %d.\n"
+"libsputext: This means there is a version mismatch between xine and\n"
+"libsputext: this plugin.\n"
+msgstr ""
+"libsputext: wtyczka wej¶cia file nie wspiera API w wersji %d.\n"
+"libsputext: oznacza to niezgodno¶æ wersji miedzy xine a t±\n"
+"libsputext: wtyczk± wej¶cia\n"
+
+# src/libsputext/xine_decoder.c:1078
+#: src/libsputext/xine_decoder.c:1078
+msgid "font for avi subtitles"
+msgstr "fonty dla napisów avi"
+
+# src/libsputext/xine_decoder.c:1084
+#: src/libsputext/xine_decoder.c:1084
+msgid "subtitle size (relative window size)"
+msgstr "rozmiar napisów (wzglêdny rozmiar okna)"
+
+# src/libsputext/xine_decoder.c:1089
+#: src/libsputext/xine_decoder.c:1089
+msgid "source encoding of subtitles"
+msgstr "kodowanie napisów (¼ród³o)"
+
+# src/libsputext/xine_decoder.c:1094
+#: src/libsputext/xine_decoder.c:1094
+msgid "target encoding for subtitles (have to match font encoding)"
+msgstr "docelowe kodowanie napisów (musi siê pokrywaæ z kodowaniem fontów)"
+
+# src/libsputext/xine_decoder.c:1099
+#: src/libsputext/xine_decoder.c:1099
+msgid "subtitle time offset in 1/100 sec"
+msgstr "wyrównanie czasu napisów w 1/100 sek."
+
+# src/libspucc/xine_decoder.c:220
+#: src/libspucc/xine_decoder.c:220
+msgid "Enable closed captions in MPEG-2 streams"
+msgstr "w³±cz closed-caption w strumieniach mpeg-2"
+
+# src/libspucc/xine_decoder.c:227
+#: src/libspucc/xine_decoder.c:227
+msgid "Closed-captioning foreground/background scheme"
+msgstr "schemat (t³o/napisy) dla closed-caption"
+
+# src/libspucc/xine_decoder.c:233
+#: src/libspucc/xine_decoder.c:233
+msgid "Standard closed captioning font"
+msgstr "standardowa czcionka dla closed-caption"
+
+# src/libspucc/xine_decoder.c:239
+#: src/libspucc/xine_decoder.c:239
+msgid "Italic closed captioning font"
+msgstr "czcionka italic dla closed-caption"
+
+# src/libspucc/xine_decoder.c:245
+#: src/libspucc/xine_decoder.c:245
+msgid "Closed captioning font size"
+msgstr "rozmiar czcionki closed-caption"
+
+# src/libspucc/xine_decoder.c:250
+#: src/libspucc/xine_decoder.c:250
+msgid "Center-adjust closed captions"
+msgstr "centrowanie closed-caption"
+
+# src/libspucc/xine_decoder.c:389
+#: src/libspucc/xine_decoder.c:389
+#, c-format
+msgid ""
+"libspucc: doesn't support plugin api version %d.\n"
+"libspucc: This means there is a version mismatch between xine and\n"
+"libspucc: this plugin.\n"
+msgstr ""
+"libspucc: wtyczka wej¶cia file nie wspiera API w wersji %d.\n"
+"libspucc: oznacza to niezgodno¶æ wersji miêdzy xine a t±\n"
+"libspucc: wtyczka wej¶cia\n"
+
+# src/libxvid/xine_decoder.c:226
+#: src/libxvid/xine_decoder.c:226
+#, c-format
+msgid ""
+"xvid: plugin doesn't support plugin API version %d.\n"
+"xvid: this means there's a version mismatch between xine and this\n"
+"xvid: decoder plugin. Installing current plugins should help.\n"
+msgstr ""
+"xvid: ta wtyczka nie wspiera API w wersji %d.\n"
+"xvid: oznacza to niezgodno¶æ miêdzy xine demux_avi: a t± wtyczka\n"
+"xvid: dekodera. Instalacja nowszej wersji powinna pomóc.\n"
+
+# src/libxvid/xine_decoder.c:236
+#: src/libxvid/xine_decoder.c:236
+#, c-format
+msgid ""
+"xvid: there is mismatch between API used by currently installed XviD\n"
+"xvid: library (%d.%d) and library used to compile this plugin (%d.%d).\n"
+"xvid: Compiling this plugin against current XviD library should help.\n"
+msgstr ""
+"xvid: wyst±pi³a niezgodno¶æ miêdzy obecnie u¿ywan± bibliotek± XviD\n"
+"xvid:(%d.%d) a bibliotek± u¿yt± do kompilacji tej wtyczki (%d.%d).\n"
+"xvid: rekompilacja tej wtyczki z obecn± bibliotek± XviD powinna pomóc.\n"
+
+# src/libxvid/xine_decoder.c:255
+#: src/libxvid/xine_decoder.c:255
+msgid "priority of the xvid plugin (>5 => enable)"
+msgstr "priorytet wtyczki xvid (>5 => w³±cza)"
+
+# src/libxinevdec/cinepak.c:432
+#: src/libxinevdec/cinepak.c:452
+#, c-format
+msgid ""
+"cinepak: plugin doesn't support plugin API version %d.\n"
+"cinepak: this means there's a version mismatch between xine and this "
+"cinepak: decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"cinepak: ta wtyczka nie wspiera API w wersji %d.\n"
+"cinepak: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka cinepak: dekodera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/libxinevdec/roqvideo.c:496
+#: src/libxinevdec/roqvideo.c:497
+#, c-format
+msgid ""
+"RoQ: plugin doesn't support plugin API version %d.\n"
+"RoQ: this means there's a version mismatch between xine and this RoQ: "
+"decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"RoQ: ta wtyczka nie wspiera API w wersji %d.\n"
+"RoQ: oznacza to niezgodno¶æ miêdzy xine a t± wtyczk± dekodera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+#: src/libxinevdec/fli.c:353
+#, c-format
+msgid ""
+"FLI: in chunk FLI_COPY : source data (%d bytes) bigger than image, skipping "
+"chunk\n"
+msgstr "FLI: in chunk FLI_COPY : ¼ród³o danych (%d bajtów) wiêksze ni¿ obraz, opuszczam fragment\n"
+
+# src/demuxers/demux_film.c:254
+#: src/libxinevdec/fli.c:369
+#, c-format
+msgid "FLI: Unrecognized chunk type: %d\n"
+msgstr "FLI nie rozpoznany typ fragmentu %d\n"
+
+#: src/libxinevdec/fli.c:397
+#, c-format
+msgid ""
+"  warning: processed FLI chunk where chunk size = %d\n"
+"  and final chunk ptr = %d\n"
+msgstr ""
+"  uwaga: obrobiony fragment FLI gdzie rozmiar fragmentu = %d\n"
+"  a koñcowy fragment ptr = %d\n"
+
+#. *************************************************************************
+#. * MS RLE specific decode functions
+#. ************************************************************************
+#: src/libxinevdec/msrle.c:69
+msgid "MS RLE: stream ptr just went out of bounds (1)\n"
+msgstr "MS RLE: strumieñ ptr w³a¶nie wyszed³ poza granice (1)\n"
+
+#: src/libxinevdec/msrle.c:109
+msgid "MS RLE: frame ptr just went out of bounds (1)\n"
+msgstr "MS RLE: ramka ptr w³a¶nie wykroczy³a poza granice (1)\n"
+
+#: src/libxinevdec/msrle.c:116
+msgid "MS RLE: stream ptr just went out of bounds (2)\n"
+msgstr "MS RLE: ramka ptr w³a¶nie wykroczy³a poza granice (2)\n"
+
+#: src/libxinevdec/msrle.c:139
+msgid "MS RLE: frame ptr just went out of bounds (2)\n"
+msgstr "MS RLE: ramka ptr w³a¶nie wykroczy³a poza granice (2)\n"
+
+#: src/libxinevdec/msrle.c:160
+#, c-format
+msgid "MS RLE: ended frame decode with bytes left over (%d < %d)\n"
+msgstr "MS RLE: zakoñczono dekodowanie ramki z pozosta³ymi bajtami (%d < %d)\n"
+
+# src/libxineadec/roqaudio.c:194
+#: src/libxineadec/roqaudio.c:194
+#, c-format
+msgid ""
+"RoQ Audio: plugin doesn't support plugin API version %d.\n"
+"RoQ Audio: this means there's a version mismatch between xine and this\n"
+"RoQ Audio: decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"RoQ Audio: ta wtyczka nie wspiera API w wersji %d.\n"
+"RoQ Audio: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka RoQ Audio: "
+"dekodera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/libmad/xine_decoder.c:283
+#: src/libfaad/xine_decoder.c:362
+#, c-format
+msgid ""
+"libfaad: plugin doesn't support plugin API version %d.\n"
+"libfaad: this means there's a version mismatch between xine and this "
+"libfaad: decoder plugin.\n"
+"Installing current plugins should help.\n"
+msgstr ""
+"libfaad: ta wtyczka nie wspiera API w wersji %d.\n"
+"libfaad: oznacza to niezgodno¶æ miêdzy xine a t± wtyczka libmad: "
+"libfaad: demultiplexera.\n"
+"Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_dvd.c:145 src/input/input_dvd.c:693
+# src/input/input_dvd.c:753
+#~ msgid "input_dvd: unable to open dvd drive (%s): %s\n"
+#~ msgstr "input_dvd: nie mogê otworzyæ napêdu dvd (%s): %s\n"
+
+# src/input/input_dvd.c:242
+#~ msgid "USCSICMD dvd_read_copyright: %s"
+#~ msgstr "USCSICMD dvd_read_copyright: %s"
+
+# src/input/input_dvd.c:246
+#~ msgid "bad status: READ DVD STRUCTURE (copyright)\n"
+#~ msgstr "z³y status: READ DVD STRUCTURE (copyright)\n"
+
+# src/input/input_dvd.c:300
+#~ msgid "input_dvd: cannot open dvd drive >%s<\n"
+#~ msgstr "input_dvd: nie mogê otworzyæ napêdu dvd >%s<\n"
+
+# src/input/input_dvd.c:311 src/input/input_dvd.c:324
+#~ msgid "input_dvd: Could not read Copyright Structure\n"
+#~ msgstr "input_dvd: nie mogê odczytaæ Copyright Structure\n"
+
+# src/input/input_dvd.c:337
+#~ msgid ""
+#~ "input_dvd: Could not read Copyright Structure.\n"
+#~ "           Assuming disk is not encrypted.\n"
+#~ msgstr ""
+#~ "input_dvd: Nie mogê odczytaæ Copyright Structure.\n"
+#~ "           Przyjmujê ¿e dysk nie jest zaszyfrowany.\n"
+
+# src/input/input_dvd.c:346
+#~ msgid ""
+#~ "\n"
+#~ "input_dvd: Sorry, this plugin doesn't play encrypted DVDs. The legal "
+#~ "status\n"
+#~ "           of CSS decryption is unclear and we can't provide such code.\n"
+#~ "           Please check http://dvd.sf.net for more information.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "input_dvd: Przykro mi, ta wtyczka nie odtwarza zaszyfrowanych DVD. Status "
+#~ "prawny szyfrowania CSS\n"
+#~ "           jest niejasny wiêc nie mo¿emy dostarczaæ takiego kodu.\n"
+#~ "           Proszê sprawdziæ http://dvd.sf.net aby dowiedzieæ siê wiêcej.\n"
+
+# src/input/input_dvd.c:355
+#~ msgid "input_dvd: cannot open file >%s<\n"
+#~ msgstr "input_dvd: nie mogê otworzyæ pliku >%s<\n"
+
+# src/input/input_dvd.c:400
+#~ msgid "input_dvd: Unable to find >%s< on dvd.\n"
+#~ msgstr "input_dvd: Nie mogê znale¼æ >%s< na dvd.\n"
+
+# src/input/input_dvd.c:435
+#~ msgid "input_dvd: error read: %Ld bytes is not a sector!\n"
+#~ msgstr "input_dvd: error read: %Ld bajtow to nie sektor!\n"
+
+# src/input/input_dvd.c:452
+#~ msgid "input_dvd: read error in input_dvd plugin (%s)\n"
+#~ msgstr "input_dvd: b³±d odczytu we wtyczce input_dvd (%s)\n"
+
+# src/input/input_dvd.c:456
+#~ msgid "input_dvd: short read in input_dvd (%d != %d)\n"
+#~ msgstr "input_dvd: krótki odczyt we wtyczce input_dvd (%d != %d)\n"
+
+# src/input/input_dvd.c:475
+#~ msgid ""
+#~ "input_dvd: error in input_dvd plugin read: %Ld bytes is not a sector!\n"
+#~ msgstr ""
+#~ "input_dvd: b³±d w odczycie wtyczki input_dvd: %Ld bajtow to nie sektor!\n"
+
+# src/input/input_dvd.c:487
+#~ msgid "input_dvd: read error in input_dvd plugin\n"
+#~ msgstr "input_dvd: b³±d odczytu we wtyczce input_dvd\n"
+
+# src/input/input_dvd.c:520
+#~ msgid "input_dvd: seek: %d is an unknown origin\n"
+#~ msgstr "input_dvd: seek: %d jest nieznanego pochodzenia\n"
+
+# src/input/input_dvd.c:561
+#~ msgid "input_dvd: CDROMCLOSETRAY failed: %s\n"
+#~ msgstr "input_dvd: CDROMCLOSETRAY zawiod³o: %s\n"
+
+# src/input/input_dvd.c:567 src/input/input_dvd.c:584
+#~ msgid "input_dvd: CDROMEJECT failed: %s\n"
+#~ msgstr "input_dvd: CDROMEJECT zawiod³o: %s\n"
+
+# src/input/input_dvd.c:573
+#~ msgid "input_dvd: CDROM_DRIVE_STATUS failed: %s\n"
+#~ msgstr "input_dvd: CDROM_DRIVE_STATUS zawiod³o: %s\n"
+
+# src/input/input_dvd.c:589
+#~ msgid "ioctl(cdromallow): %s"
+#~ msgstr "ioctl(cdromallow): %s"
+
+# src/input/input_dvd.c:592
+#~ msgid "ioctl(cdromeject): %s"
+#~ msgstr "ioctl(cdromeject): %s"
+
+# src/input/input_dvd.c:619
+#~ msgid "dvd device input plugin as shipped with xine"
+#~ msgstr "wtyczka wej¶cia DVD dostarczana z xine"
+
+# src/input/input_dvd.c:814
+#~ msgid ""
+#~ "dvd input plugin doesn't support plugin API version %d.\n"
+#~ "PLUGIN DISABLED.\n"
+#~ "This means there's a version mismatch between xine and this inputplugin.\n"
+#~ "Installing current input plugins should help.\n"
+#~ msgstr ""
+#~ "Wtyczka wej¶cia dvd nie wspiera API w wersji %d.\n"
+#~ "WTYCZKA WY£¡CZONA.\n"
+#~ "oznacza to niezgodno¶æ miedzy xine a t± wtyczk± wej¶cia\n"
+#~ "Instalacja najnowszej wersji wtyczki powinna pomóc.\n"
+
+# src/input/input_dvd.c:857
+#~ msgid "path to your local dvd device file"
+#~ msgstr "¶cie¿ka do twojego lokalnego pliku urz±dzenia dvd"
+
+# src/input/input_dvd.c:860
+#~ msgid "path to a raw device set up for dvd access"
+#~ msgstr "¶cie¿ka to surowego urz±dzenia ustawionego na dostêp do dvd"
+
+# src/demuxers/demux_qt.c:1367 src/demuxers/demux_smjpeg.c:420
+# src/demuxers/demux_wav.c:322
+#~ msgid "channels"
+#~ msgstr "kana³y"
+
+# src/xine-engine/tvmode.c:270
+#~ msgid "Show status on play, pause, ff, ..."
+#~ msgstr "Poka¿ status przy odtwarzaniu, pauzie, ff, ..."
+
+#~ msgid "unable to open %s: %s."
+#~ msgstr "nie mogê otworzyæ %s: %s."
+
+#~ msgid "demux_ts: PUSI set but no PES header (corrupt stream?)\n"
+#~ msgstr ""
+#~ "demux_ts: PUSI ustawione ale brak nag³ówka PES (uszkodzony strumieñ?)\n"
+
+#~ msgid "RE-Sync failed\n"
+#~ msgstr "resynchronizacja zawiod³a\n"
+
+#~ msgid "mpgaudio: bitrate = %.2fkbps\n"
+#~ msgstr "mpgaudio: bitrate = %.2fkbps\n"
+
+
