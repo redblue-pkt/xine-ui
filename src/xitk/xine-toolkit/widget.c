@@ -1315,7 +1315,10 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
     }
     
     if (wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
-      
+
+      if(wl->widget_focused->type & WIDGET_CLICKABLE)
+	wl->widget_under_mouse = wl->widget_focused;
+
       if((wl->widget_focused->type & WIDGET_CLICKABLE) &&
 	 (wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
 	widget_event_result_t  result;

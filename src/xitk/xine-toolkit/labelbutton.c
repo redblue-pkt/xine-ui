@@ -461,6 +461,7 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   int retval = 0;
+  static int shot;
   
   switch(event->type) {
   case WIDGET_EVENT_PAINT:
@@ -473,6 +474,10 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     break;
   case WIDGET_EVENT_FOCUS:
     notify_focus_labelbutton(w, event->focus);
+    if((w->type & WIDGET_GROUP_MENU) && 
+       (event->type == WIDGET_EVENT_FOCUS) && (event->focus == FOCUS_MOUSE_IN)) {
+      menu_auto_pop(w);
+    }
     break;
   case WIDGET_EVENT_INSIDE:
     result->value = notify_inside(w, event->x, event->y);
@@ -605,6 +610,36 @@ void xitk_labelbutton_set_state(xitk_widget_t *w, int state) {
     }
   }
 
+}
+
+void *labelbutton_get_user_data(xitk_widget_t *w) {
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+    lbutton_private_data_t *private_data = (lbutton_private_data_t *) w->private_data;
+    
+    return private_data->userdata;
+  }
+
+  return NULL;
+}
+void xitk_labelbutton_callback_exec(xitk_widget_t *w) {
+
+  if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+    lbutton_private_data_t *private_data = (lbutton_private_data_t *) w->private_data;
+    
+    if(private_data->bType == RADIO_BUTTON) {
+      if(private_data->state_callback) {
+	private_data->state_callback(private_data->bWidget, 
+				     private_data->userdata,
+				     private_data->bState);
+      }
+    }
+    else if(private_data->bType == CLICK_BUTTON) {
+      if(private_data->callback) {
+	private_data->callback(private_data->bWidget, 
+			       private_data->userdata);
+      }
+    }
+  }
 }
 
 /*

@@ -1161,6 +1161,8 @@ int xitk_labelbutton_get_alignment(xitk_widget_t *);
 void xitk_labelbutton_set_label_offset(xitk_widget_t *, int);
 int xitk_labelbutton_get_label_offset(xitk_widget_t *);
 
+void xitk_labelbutton_callback_exec(xitk_widget_t *w);
+
 /*
  * *** Labels
  */

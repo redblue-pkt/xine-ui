@@ -782,6 +782,7 @@ static void create_menu(void) {
     { "Reload",                          NULL,            NULL,     NULL },
     { "Auto save",                       "<check>",       NULL,     NULL },
     { "SEP",                             "<separator>",   NULL,     NULL },
+    { "Empty",                           "<branch>",      NULL,     NULL },
     { "Playlist",                        "<branch>",      NULL,     NULL },
     { "Playlist/Playlist Management",    "<title>",       NULL,     NULL },
     { "Playlist/Load",                   NULL,            NULL,     NULL },

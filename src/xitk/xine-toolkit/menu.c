@@ -39,11 +39,11 @@ static menu_window_t *_menu_new_menu_window(ImlibData *im, xitk_window_t *xwin) 
   menu_window->display = im->x.disp;
   menu_window->im      = im;
   menu_window->xwin    = xwin;
-  menu_window->wl.l   = xitk_list_new();
-  menu_window->wl.win = xitk_window_get_window(xwin);
+  menu_window->wl.l    = xitk_list_new();
+  menu_window->wl.win  = xitk_window_get_window(xwin);
 
   XLOCK(im->x.disp);
-  menu_window->wl.gc  = XCreateGC(im->x.disp, (xitk_window_get_window(xwin)), None, None);
+  menu_window->wl.gc   = XCreateGC(im->x.disp, (xitk_window_get_window(xwin)), None, None);
   XUNLOCK(im->x.disp);
 
   return menu_window;
@@ -492,24 +492,44 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
   menu_node_t          *me = (menu_node_t *) data;
   xitk_widget_t        *widget = me->widget;
   menu_private_data_t  *private_data = (menu_private_data_t *) widget->private_data;
-
+  
   if(_menu_is_branch(me->menu_entry)) {
+
     if(me->branch) {
-      int    wx, wy, x, y;
-      
-      xitk_window_get_window_position(private_data->imlibdata, 
-				      me->menu_window->xwin, &wx, &wy, NULL, NULL);
-      xitk_get_widget_pos(w, &x, &y);
-      
-      x += (xitk_get_widget_width(w)) + wx;
-      x -= 10;
-      y += wy;
-      
-      _menu_destroy_subs(private_data, me->menu_window);
-      _menu_create_menu_from_branch(me->branch, widget, x, y);
+      if(private_data->curbranch && (me->branch != private_data->curbranch)) {
+	int   wx, wy, x, y;
+	
+	xitk_window_get_window_position(private_data->imlibdata, 
+					me->menu_window->xwin, &wx, &wy, NULL, NULL);
+	xitk_get_widget_pos(w, &x, &y);
+	
+	x += (xitk_get_widget_width(w)) + wx;
+	x -= 10;
+	y += wy;
+	
+	_menu_destroy_subs(private_data, me->menu_window);
+	_menu_create_menu_from_branch(me->branch, widget, x, y);
+      }
+      else {
+	
+	if(private_data->curbranch) {
+	  XLOCK(private_data->curbranch->menu_window->display);
+	  XRaiseWindow(private_data->curbranch->menu_window->display, 
+		       xitk_window_get_window(private_data->curbranch->menu_window->xwin));
+	  XSetInputFocus(private_data->curbranch->menu_window->display, 
+			 (xitk_window_get_window(private_data->curbranch->menu_window->xwin)),
+			 RevertToParent, CurrentTime);
+	  XUNLOCK(private_data->curbranch->menu_window->display);
+	}
+      }
     }
-    else
+    else {
+      menu_node_t *mnode = (private_data->curbranch && private_data->curbranch->prev) ? 
+	private_data->curbranch->prev : private_data->mtree->first;
+      
       _menu_destroy_subs(private_data, me->menu_window);
+      private_data->curbranch = mnode;
+    }
 
   }
 #ifdef DEBUG_MENU
@@ -535,12 +555,9 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
 
 static void _menu_handle_xevents(XEvent *event, void *data) {
   /*
-    menu_window_t *me = (menu_window_t *) data;
-    menu_private_data_t  *private_data = (menu_private_data_t *) me->widget->private_data;
-    
-  */
-  
-  /*
+  menu_window_t *me = (menu_window_t *) data;
+  menu_private_data_t  *private_data = (menu_private_data_t *) me->widget->private_data;
+   
   switch(event->type) {
   }
   */
@@ -742,6 +759,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   yy = 1;
   while(me) {
 
+    me->menu_window      = menu_window;
+
     if(_menu_is_title(me->menu_entry)) {
 
       if(bg && (!got_title)) {
@@ -793,8 +812,6 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
     }
     else {
       xitk_image_t  *wimage;
-
-      me->menu_window      = menu_window;
 
       lb.button_type       = CLICK_BUTTON;
       lb.label             = me->menu_entry->menu;
@@ -894,6 +911,34 @@ int xitk_menu_show_sub_branchs(xitk_widget_t *w) {
   }
 
   return ret;
+}
+
+void menu_auto_pop(xitk_widget_t *w) {
+  
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) && 
+	   (w->type & WIDGET_TYPE_LABELBUTTON) && (!(w->type & WIDGET_GROUP_WIDGET)))) {
+    menu_window_t       *mw = (menu_window_t *) w->wl;
+    menu_node_t         *me = labelbutton_get_user_data(w);    
+    xitk_widget_t       *widget;
+    menu_private_data_t *private_data;
+    
+    widget = mw->widget;
+    private_data = (menu_private_data_t *) widget->private_data;
+
+    if(_menu_is_branch(me->menu_entry))
+      xitk_labelbutton_callback_exec(w);
+    else {
+      if(xitk_menu_show_sub_branchs(widget)) {
+	menu_node_t *mnode;
+	
+	mnode = (private_data->curbranch && private_data->curbranch->prev) ? 
+	  private_data->curbranch->prev : private_data->mtree->first;
+	
+	_menu_destroy_subs(private_data, me->menu_window);
+	private_data->curbranch = mnode;
+      }
+    }
+  }
 }
 
 void xitk_menu_show_menu(xitk_widget_t *w) {
