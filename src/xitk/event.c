@@ -538,8 +538,6 @@ void gui_init (int nfiles, char *filenames[]) {
   gGui->video_window_logo_pixmap.height = 
     gGui->video_window_logo_image->rgb_height;
 
-  printf ("imlib visual : %d\n", gGui->imlib_data->x.visual);
-
   //  gGui->black = BlackPixel (gGui->display, gGui->screen);
   XAllocNamedColor(gGui->display, 
 		   DefaultColormap(gGui->display, gGui->screen), 

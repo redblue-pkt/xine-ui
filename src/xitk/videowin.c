@@ -30,7 +30,7 @@
 
 #include "xine.h"
 
-#include "xitk.h"
+#include "xine-toolkit/xitk.h"
 
 #include "utils.h"
 #include "Imlib-light/Imlib.h"
@@ -514,7 +514,25 @@ void video_window_handle_event (XEvent *event) {
     if(event->xany.window == gGui->video_window) {
       if(xine_get_status(gGui->xine) == XINE_STOP)
 	video_window_draw_logo();
+      else {
+
+	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+					    GUI_DATA_EX_EXPOSE_EVENT, 
+					    event);
+      }
     }
     break;
+  case ConfigureNotify:
+  case VisibilityNotify:
+    if(event->xany.window == gGui->video_window) {
+      if(xine_get_status(gGui->xine) != XINE_STOP) {
+
+	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+					    GUI_DATA_EX_EXPOSE_EVENT, 
+					    event);
+      }
+    }
+    break;
+
   }
 }
