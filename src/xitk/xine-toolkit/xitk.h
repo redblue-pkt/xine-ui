@@ -1851,6 +1851,11 @@ void xitk_combo_callback_exec(xitk_widget_t *w);
 /**
  *
  */
+xitk_widget_t *xitk_combo_get_label_widget(xitk_widget_t *w);
+
+/**
+ *
+ */
 unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b);
 
 /**
@@ -2258,6 +2263,7 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
 					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
 void xitk_intbox_set_value(xitk_widget_t *, int);
 int xitk_intbox_get_value(xitk_widget_t *);
+xitk_widget_t *xitk_intbox_get_input_widget(xitk_widget_t *w);
 
 xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
 					    xitk_doublebox_widget_t *ib,
@@ -2265,6 +2271,7 @@ xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
 					    xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
 void xitk_doublebox_set_value(xitk_widget_t *, double);
 double xitk_doublebox_get_value(xitk_widget_t *);
+xitk_widget_t *xitk_doublebox_get_input_widget(xitk_widget_t *w);
 
 int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
 void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);

@@ -66,12 +66,10 @@ static void notify_destroy(xitk_widget_t *w) {
  *
  */
 static void paint(xitk_widget_t *w) {
-  intbox_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    
-    private_data = (intbox_private_data_t *) w->private_data;
+    intbox_private_data_t *private_data = (intbox_private_data_t *) w->private_data;
     
     if((w->visible == 1)) {
       int bx, ih, iw;
@@ -99,11 +97,10 @@ static void paint(xitk_widget_t *w) {
  *
  */
 static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  intbox_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    private_data = (intbox_private_data_t *) w->private_data;
+    intbox_private_data_t *private_data = (intbox_private_data_t *) w->private_data;
 
     if(private_data->skin_element_name) {
       /*      
@@ -151,13 +148,12 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
  */
 static void intbox_change_value(xitk_widget_t *x, void *data, char *string) {
   xitk_widget_t         *w = (xitk_widget_t *)data;
-  intbox_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    char  buf[256];
+    intbox_private_data_t *private_data = (intbox_private_data_t *)w->private_data;
+    char                   buf[256];
     
-    private_data = (intbox_private_data_t *)w->private_data;
     private_data->value = strtol(string, &string, 10);
     
     memset(&buf, 0, sizeof(buf));
@@ -173,13 +169,11 @@ static void intbox_change_value(xitk_widget_t *x, void *data, char *string) {
  *
  */
 void xitk_intbox_set_value(xitk_widget_t *w, int value) {
-  intbox_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    char buf[256];
-    
-    private_data = (intbox_private_data_t *) w->private_data;
+    intbox_private_data_t *private_data = (intbox_private_data_t *) w->private_data;
+    char                   buf[256];
 
     memset(&buf, 0, sizeof(buf));
     snprintf(buf, 256, "%d", value);
@@ -193,13 +187,12 @@ void xitk_intbox_set_value(xitk_widget_t *w, int value) {
  *
  */
 int xitk_intbox_get_value(xitk_widget_t *w) {
-  intbox_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    char *strval;
-
-    private_data = (intbox_private_data_t *)w->private_data;
+    intbox_private_data_t *private_data = (intbox_private_data_t *)w->private_data;
+    char                  *strval;
+    
     strval = xitk_inputtext_get_text(private_data->input_widget);
     private_data->value = strtol(strval, &strval, 10);
     
@@ -213,12 +206,11 @@ int xitk_intbox_get_value(xitk_widget_t *w) {
  */
 static void intbox_stepdown(xitk_widget_t *x, void *data) {
   xitk_widget_t *w = (xitk_widget_t *) data;
-  intbox_private_data_t *private_data;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    
-    private_data = (intbox_private_data_t *)w->private_data;
+    intbox_private_data_t *private_data = (intbox_private_data_t *)w->private_data;
+
     private_data->value -= private_data->step;
     xitk_intbox_set_value(w, private_data->value);
     if(private_data->callback)
@@ -231,17 +223,28 @@ static void intbox_stepdown(xitk_widget_t *x, void *data) {
  */
 static void intbox_stepup(xitk_widget_t *x, void *data) {
   xitk_widget_t *w = (xitk_widget_t *) data;
-  intbox_private_data_t *private_data;
   
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
-    
-    private_data = (intbox_private_data_t *)w->private_data;
+    intbox_private_data_t *private_data = (intbox_private_data_t *)w->private_data;
+
     private_data->value += private_data->step;
     xitk_intbox_set_value(w, private_data->value);
     if(private_data->callback)
       private_data->callback(w, private_data->userdata, private_data->value);
   }
+}
+
+xitk_widget_t *xitk_intbox_get_input_widget(xitk_widget_t *w) {
+
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
+    intbox_private_data_t *private_data = (intbox_private_data_t *)w->private_data;
+    
+    return private_data->input_widget;
+  }
+
+  return NULL;
 }
 
 /*

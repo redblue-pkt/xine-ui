@@ -34,16 +34,17 @@ typedef struct {
   char                     *sub;
   int                       start;  /*  0..x (secs)                     */
   int                       end;    /* -1 == <till the end> else (secs) */
-  int                       offset;
+  int                       av_offset;
+  int                       spu_offset;
   int                       played; /* used with shuffle loop mode */
 } mediamark_t;
 
 int mediamark_free_mmk(mediamark_t **mmk);
-int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int offset);
+int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 mediamark_t *mediamark_clone_mmk(mediamark_t *mmk);
-void mediamark_add_entry(const char *mrl, const char *ident, const char *sub, int start, int end, int offset);
+void mediamark_add_entry(const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_free_mediamarks(void);
-void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int offset);
+void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_free_entry(int offset);
 void mediamark_reset_played_state(void);
 int mediamark_all_played(void);

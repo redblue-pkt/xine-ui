@@ -334,6 +334,25 @@ void xitk_tips_set_tips(xitk_widget_t *w, char *str) {
   XITK_FREE(w->tips_string);
   w->tips_string = strdup(str);
 
+  /* Special GROUP widget case */
+  if(w->type & WIDGET_GROUP) {
+    if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX) {
+      xitk_widget_t *widget = xitk_intbox_get_input_widget(w);
+
+      xitk_tips_set_tips(widget, str);
+    }
+    else if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) {
+      xitk_widget_t *widget = xitk_doublebox_get_input_widget(w);
+      
+      xitk_tips_set_tips(widget, str);
+    }
+    else if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) {
+      xitk_widget_t *widget = xitk_combo_get_label_widget(w);
+      
+      xitk_tips_set_tips(widget, str);
+    }
+  }
+  
   /* No timeout, set it to default */
   if(!w->tips_timeout)
     xitk_tips_set_timeout(w, TIPS_TIMEOUT);

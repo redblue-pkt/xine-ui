@@ -28,5 +28,6 @@
 void video_window_menu(xitk_widget_list_t *wl);
 void audio_lang_menu(xitk_widget_list_t *wl, int x, int y);
 void spu_lang_menu(xitk_widget_list_t *wl, int x, int y);
+void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected);
 
 #endif

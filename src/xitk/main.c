@@ -1083,7 +1083,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 				  ref->mrl, 
 				  ((mmk->ident && (strcmp(mmk->mrl, mmk->ident) == 0)) ?
 				   ref->mrl : mmk->ident), 
-				  mmk->sub, mmk->start, mmk->end, mmk->offset);
+				  mmk->sub, mmk->start, mmk->end, mmk->av_offset, mmk->spu_offset);
 	  mediamark_free_mmk(&mmk);
 	  
 	  mmk = (mediamark_t *) mediamark_get_current_mmk();
@@ -1091,7 +1091,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	}
       }
       else {
-	mediamark_add_entry(ref->mrl, ref->mrl, NULL, 0, -1, 0);
+	mediamark_add_entry(ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
       }
       
       playlist_update_playlist();

@@ -314,6 +314,8 @@ static commands_t commands[] = {
     "  get audio mute\n"
     "  get spu channel\n"
     "  get spu lang\n"
+    "  get spu offset\n"
+    "  get av offset\n"
     "  get speed\n"
     "  get position\n"
     "  get length\n"
@@ -325,6 +327,8 @@ static commands_t commands[] = {
     "  set audio volume <%>\n"
     "  set audio mute <state>\n"
     "  set spu channel <num>\n"
+    "  set spu offset <offset>\n"
+    "  set av offset <offset>\n"
     "  set speed <XINE_SPEED_PAUSE|XINE_SPEED_SLOW_4|XINE_SPEED_SLOW_2|XINE_SPEED_NORMAL|XINE_SPEED_FAST_2|XINE_SPEED_FAST_4>\n"
     "            <        |       |        /4       |        /2       |        =        |        *2       |        *4       >\n"
     "  set loop <no | loop | repeat | shuffle | shuffle+>"
@@ -1810,7 +1814,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	if ((gGui->playlist.cur >= 0) && (gGui->playlist.cur < gGui->playlist.num)) {
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	  (void) gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-					gGui->mmk.start, gGui->mmk.offset);
+					gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset);
 	  
 	} 
 	else {
@@ -2155,6 +2159,20 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 			     &buf[0]);
 	  sock_write(client_info->socket, "Current spu language: %s\n", buf);
 	}
+	else if(is_arg_contain(client_info, 2, "offset")) {
+	  int offset;
+
+	  offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET);
+	  sock_write(client_info->socket, "Current spu offset: %d\n", offset);
+	}
+      }
+      else if(is_arg_contain(client_info, 1, "av")) {
+	if(is_arg_contain(client_info, 2, "offset")) {
+	  int offset;
+	  
+	  offset = xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET);
+	  sock_write(client_info->socket, "Current A/V offset: %d\n", offset);
+	}
       }
     }
   }
@@ -2245,6 +2263,14 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
       else if(is_arg_contain(client_info, 1, "spu")) {
 	if(is_arg_contain(client_info, 2, "channel")) {
 	  xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, (atoi(get_arg(client_info, 3))));
+	}
+	else if(is_arg_contain(client_info, 2, "offset")) {
+	  xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, (atoi(get_arg(client_info, 3))));
+	}
+      }
+      else if(is_arg_contain(client_info, 1, "av")) {
+	if(is_arg_contain(client_info, 2, "offset")) {
+	  xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, (atoi(get_arg(client_info, 3))));
 	}
       }
     }

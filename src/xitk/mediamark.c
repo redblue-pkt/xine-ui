@@ -40,7 +40,7 @@
 
 #include "common.h"
 
-#define WINDOW_WIDTH        500
+#define WINDOW_WIDTH        505
 #define WINDOW_HEIGHT       250 /* 210*/
 
 static char            *btnfontname  = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
@@ -59,7 +59,8 @@ typedef struct {
   xitk_widget_t                *sub;
   xitk_widget_t                *start;
   xitk_widget_t                *end;
-  xitk_widget_t                *offset;
+  xitk_widget_t                *av_offset;
+  xitk_widget_t                *spu_offset;
 
   mediamark_t                 **mmk;
 
@@ -177,18 +178,19 @@ static char *_read_file(const char *filename, int *size) {
 
 int mediamark_store_mmk(mediamark_t **mmk, 
 			const char *mrl, const char *ident, const char *sub, 
-			int start, int end, int offset) {
+			int start, int end, int av_offset, int spu_offset) {
 
   if((mmk != NULL) && (mrl != NULL)) {
     
     (*mmk) = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
-    (*mmk)->mrl    = strdup(mrl);
-    (*mmk)->ident  = strdup((ident != NULL) ? ident : mrl);
-    (*mmk)->sub    = (sub != NULL) ? strdup(sub) : NULL;
-    (*mmk)->start  = start;
-    (*mmk)->end    = end;
-    (*mmk)->offset = offset;
-    (*mmk)->played = 0;
+    (*mmk)->mrl        = strdup(mrl);
+    (*mmk)->ident      = strdup((ident != NULL) ? ident : mrl);
+    (*mmk)->sub        = (sub != NULL) ? strdup(sub) : NULL;
+    (*mmk)->start      = start;
+    (*mmk)->end        = end;
+    (*mmk)->av_offset  = av_offset;
+    (*mmk)->spu_offset = spu_offset;
+    (*mmk)->played     = 0;
     return 1;
   }
 
@@ -200,13 +202,14 @@ mediamark_t *mediamark_clone_mmk(mediamark_t *mmk) {
 
   if(mmk && mmk->mrl) {
     cmmk = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
-    cmmk->mrl    = strdup(mmk->mrl);
-    cmmk->ident  = (mmk->ident) ? strdup(mmk->ident) : NULL;
-    cmmk->sub    = (mmk->sub) ? strdup(mmk->sub) : NULL;
-    cmmk->start  = mmk->start;
-    cmmk->end    = mmk->end;
-    cmmk->offset = mmk->offset;
-    cmmk->played = mmk->played;
+    cmmk->mrl        = strdup(mmk->mrl);
+    cmmk->ident      = (mmk->ident) ? strdup(mmk->ident) : NULL;
+    cmmk->sub        = (mmk->sub) ? strdup(mmk->sub) : NULL;
+    cmmk->start      = mmk->start;
+    cmmk->end        = mmk->end;
+    cmmk->av_offset  = mmk->av_offset;
+    cmmk->spu_offset = mmk->spu_offset;
+    cmmk->played     = mmk->played;
   }
 
   return cmmk;
@@ -322,7 +325,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 		      if((entry) && 
 			 ((entry) <= entries_pls) && 
 			 (mmk && (!mmk[(entry - 1)])))
-			mediamark_store_mmk(&mmk[(entry - 1)], buffer, NULL, NULL, 0, -1, 0);
+			mediamark_store_mmk(&mmk[(entry - 1)], buffer, NULL, NULL, 0, -1, 0, 0);
 		      
 		    }
 		    
@@ -351,7 +354,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 	      /* Fill missing entries */
 	      for(i = 0; i < entries_pls; i++) {
 		if(!mmk[i])
-		  mediamark_store_mmk(&mmk[i], _("!!Invalid entry!!"), NULL, NULL, 0, -1, 0);
+		  mediamark_store_mmk(&mmk[i], _("!!Invalid entry!!"), NULL, NULL, 0, -1, 0, 0);
 	      }
 
 	      playlist->type = strdup("PLS");
@@ -443,7 +446,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		      entry = buffer;
 		  }
 		    
-		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, NULL, 0, -1, 0);
+		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, NULL, 0, -1, 0, 0);
 		  playlist->entries = ++entries_m3u;
 
 
@@ -547,7 +550,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 			  entry = buffer;
 		      }
 
-		      mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, NULL, 0, -1, 0);
+		      mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, NULL, 0, -1, 0, 0);
 		      playlist->entries = ++entries_sfv;
 		    }
 		  }
@@ -647,7 +650,7 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		    entry = buffer;
 		}
 		
-		mediamark_store_mmk(&mmk[entries_raw], entry, NULL, NULL, 0, -1, 0);
+		mediamark_store_mmk(&mmk[entries_raw], entry, NULL, NULL, 0, -1, 0, 0);
 		playlist->entries = ++entries_raw;
 	      }
 	    }
@@ -733,19 +736,23 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 		      
 		      { /* OKAY, check found string */
 			mediamark_t   mmkf;
-			int           mmkf_members[6];
+			int           mmkf_members[7];
 			char         *line;
 			char         *m;
 			
 			mmkf.sub        = NULL;
 			mmkf.start      = 0;
 			mmkf.end        = -1;
+			mmkf.av_offset  = 0;
+			mmkf.spu_offset = 0;
+
 			mmkf_members[0] = 0;  /* ident */
 			mmkf_members[1] = -1; /* mrl */
 			mmkf_members[2] = 0;  /* start */
 			mmkf_members[3] = 0;  /* end */
-			mmkf_members[4] = 0;  /* offset */
-			mmkf_members[5] = 0;  /* sub */
+			mmkf_members[4] = 0;  /* av offset */
+			mmkf_members[5] = 0;  /* spu offset */
+			mmkf_members[6] = 0;  /* sub */
 			
 			line = strdup(atoa(buffer));
 			
@@ -763,17 +770,24 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			      }
 			    }
 			    else if(!strncasecmp(key, "subtitle", 8)) {
-			      if(mmkf_members[5] == 0) {
-				mmkf_members[5] = 1;
+			      if(mmkf_members[6] == 0) {
+				mmkf_members[6] = 1;
 				set_pos_to_value(&key);
 				mmkf.sub = strdup(key);
 			      }
 			    }
-			    else if(!strncasecmp(key, "offset", 6)) {
+			    else if(!strncasecmp(key, "spu_offset", 10)) {
+			      if(mmkf_members[5] == 0) {
+				mmkf_members[5] = 1;
+				set_pos_to_value(&key);
+				mmkf.spu_offset = strtol(key, &key, 10);
+			      }
+			    }
+			    else if(!strncasecmp(key, "av_offset", 9)) {
 			      if(mmkf_members[4] == 0) {
 				mmkf_members[4] = 1;
 				set_pos_to_value(&key);
-				mmkf.offset = strtol(key, &key, 10);
+				mmkf.av_offset = strtol(key, &key, 10);
 			      }
 			    }
 			    else if(!strncasecmp(key, "start", 5)) {
@@ -813,12 +827,13 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			*/
 #if 0
 			printf("DUMP mediamark entry:\n");
-			printf("ident: '%s'\n", mmkf.ident);
-			printf("mrl:   '%s'\n", mmkf.mrl);
-			printf("sub:   '%s'\n", mmkf.sub);
-			printf("start:  %d\n", mmkf.start);
-			printf("end:    %d\n", mmkf.end);
-			printf("offset: %d\n", mmkf.offset);
+			printf("ident:     '%s'\n", mmkf.ident);
+			printf("mrl:       '%s'\n", mmkf.mrl);
+			printf("sub:       '%s'\n", mmkf.sub);
+			printf("start:      %d\n", mmkf.start);
+			printf("end:        %d\n", mmkf.end);
+			printf("av_offset:  %d\n", mmkf.av_offset);
+			printf("spu_offset: %d\n", mmkf.spu_offset);
 #endif
 			
 			if(entries_tox == 0)
@@ -828,7 +843,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 
 			mediamark_store_mmk(&mmk[entries_tox], 
 					    mmkf.mrl, mmkf.ident, mmkf.sub, 
-					    mmkf.start, mmkf.end, mmkf.offset);
+					    mmkf.start, mmkf.end, mmkf.av_offset, mmkf.spu_offset);
 			
 			playlist->entries = ++entries_tox;
 
@@ -987,7 +1002,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		  else
 		    mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
 		  
-		  mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1, 0);
+		  mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1, 0, 0);
 		  playlist->entries = ++entries_asx;
 
 		  SAFE_FREE(real_title);
@@ -1040,7 +1055,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		else
 		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
 		
-		mediamark_store_mmk(&mmk[entries_asx], p, p, NULL, 0, -1, 0);
+		mediamark_store_mmk(&mmk[entries_asx], p, p, NULL, 0, -1, 0, 0);
 		playlist->entries = ++entries_asx;
 	      }
 	    }
@@ -1127,7 +1142,7 @@ static void gx_get_entries(playlist_t *playlist,
 	else
 	  (*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*entries + 2));
 	
-	mediamark_store_mmk(&(*mmk)[*entries], href, real_title, NULL, start, -1, 0);
+	mediamark_store_mmk(&(*mmk)[*entries], href, real_title, NULL, start, -1, 0, 0);
 	playlist->entries = ++(*entries);
       }
       
@@ -2165,7 +2180,7 @@ int mediamark_get_entry_from_id(const char *ident) {
 }
 
 void mediamark_add_entry(const char *mrl, const char *ident, 
-			 const char *sub, int start, int end, int offset) {
+			 const char *sub, int start, int end, int av_offset, int spu_offset) {
   if(!gGui->playlist.num)
     gGui->playlist.mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
   else { 
@@ -2176,7 +2191,7 @@ void mediamark_add_entry(const char *mrl, const char *ident,
   }
   
   if(mediamark_store_mmk(&gGui->playlist.mmk[gGui->playlist.num], 
-			 mrl, ident, sub, start, end, offset))
+			 mrl, ident, sub, start, end, av_offset, spu_offset))
     gGui->playlist.num++;
 }
 
@@ -2263,15 +2278,16 @@ int mediamark_get_shuffle_next(void) {
 
 void mediamark_replace_entry(mediamark_t **mmk, 
 			     const char *mrl, const char *ident, const char *sub,
-			     int start, int end, int offset) {
+			     int start, int end, int av_offset, int spu_offset) {
   SAFE_FREE((*mmk)->mrl);
   SAFE_FREE((*mmk)->ident);
   SAFE_FREE((*mmk)->sub);
-  (*mmk)->start  = 0;
-  (*mmk)->end    = -1;
-  (*mmk)->offset = 0;
+  (*mmk)->start      = 0;
+  (*mmk)->end        = -1;
+  (*mmk)->av_offset  = 0;
+  (*mmk)->spu_offset = 0;
 
-  (void) mediamark_store_mmk(mmk, mrl, ident, sub, start, end, offset);
+  (void) mediamark_store_mmk(mmk, mrl, ident, sub, start, end, av_offset, spu_offset);
 }
 
 const mediamark_t *mediamark_get_current_mmk(void) {
@@ -2358,7 +2374,7 @@ int mediamark_concat_mediamarks(const char *_filename) {
 
   for(i = 0; i < playlist->entries; i++)
     mediamark_add_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->sub, 
-			mmk[i]->start, mmk[i]->end, mmk[i]->offset);
+			mmk[i]->start, mmk[i]->end, mmk[i]->av_offset, mmk[i]->spu_offset);
   
   for(i = 0; i < playlist->entries; i++)
     (void) mediamark_free_mmk(&mmk[i]);
@@ -2468,9 +2484,14 @@ void mediamark_save_mediamarks(const char *filename) {
 	fprintf(fd, "\tmrl = %s;\n", gGui->playlist.mmk[i]->mrl);
 	if(gGui->playlist.mmk[i]->sub)
 	  fprintf(fd, "\tsubtitle = %s;\n", gGui->playlist.mmk[i]->sub);
-	fprintf(fd, "\tstart = %d;\n", gGui->playlist.mmk[i]->start);
-	fprintf(fd, "\tend = %d;\n", gGui->playlist.mmk[i]->end);
-	fprintf(fd, "\toffset = %d;\n", gGui->playlist.mmk[i]->offset);
+	if(gGui->playlist.mmk[i]->start > 0)
+	  fprintf(fd, "\tstart = %d;\n", gGui->playlist.mmk[i]->start);
+	if(gGui->playlist.mmk[i]->end != -1)
+	  fprintf(fd, "\tend = %d;\n", gGui->playlist.mmk[i]->end);
+	if(gGui->playlist.mmk[i]->av_offset != 0)
+	  fprintf(fd, "\tav_offset = %d;\n", gGui->playlist.mmk[i]->av_offset);
+	if(gGui->playlist.mmk[i]->spu_offset != 0)
+	  fprintf(fd, "\tspu_offset = %d;\n", gGui->playlist.mmk[i]->spu_offset);
 	fprintf(fd,"};\n");
       }
 
@@ -2624,36 +2645,52 @@ void mmkeditor_set_mmk(mediamark_t **mmk) {
     xitk_inputtext_change_text(mmkeditor->sub, (*mmk)->sub);
     xitk_intbox_set_value(mmkeditor->start, (*mmk)->start);
     xitk_intbox_set_value(mmkeditor->end, (*mmk)->end);
-    xitk_intbox_set_value(mmkeditor->offset, (*mmk)->offset);
+    xitk_intbox_set_value(mmkeditor->av_offset, (*mmk)->av_offset);
+    xitk_intbox_set_value(mmkeditor->spu_offset, (*mmk)->spu_offset);
   }
 }
 
 static void mmkeditor_apply(xitk_widget_t *w, void *data) {
   const char *ident, *mrl, *sub;
-  int         start, end, offset;
+  int         start, end, av_offset, spu_offset;
 
   if(mmkeditor->mmk) {
     
-    mrl    = xitk_inputtext_get_text(mmkeditor->mrl); 
-    ident  = xitk_inputtext_get_text(mmkeditor->ident);
-    sub    = xitk_inputtext_get_text(mmkeditor->sub);
-    start  = xitk_intbox_get_value(mmkeditor->start);
-    end    = xitk_intbox_get_value(mmkeditor->end);
-    offset = xitk_intbox_get_value(mmkeditor->offset);
+    mrl = atoa(xitk_inputtext_get_text(mmkeditor->mrl));
+    if(mrl && (!strlen(mrl)))
+      xine_strdupa((char *) mrl, (*mmkeditor->mmk)->mrl);
+    
+    ident = atoa(xitk_inputtext_get_text(mmkeditor->ident));
+    if(ident && (!strlen(ident)))
+      xine_strdupa((char *) ident, mrl);
 
-    if(start < 0)
+    sub = xitk_inputtext_get_text(mmkeditor->sub);
+    if(sub && (!strlen(sub)))
+      sub = NULL;
+    
+    if((start = xitk_intbox_get_value(mmkeditor->start)) < 0)
       start = 0;
+
+    if((end = xitk_intbox_get_value(mmkeditor->end)) < start)
+      end = start + 1;
 
     if(end < -1)
       end = -1;
-
-    mediamark_replace_entry(mmkeditor->mmk, mrl, ident, sub, start, end, offset);
+    
+    av_offset  = xitk_intbox_get_value(mmkeditor->av_offset);
+    spu_offset = xitk_intbox_get_value(mmkeditor->spu_offset);
+    
+    mediamark_replace_entry(mmkeditor->mmk, mrl, ident, sub, start, end, av_offset, spu_offset);
 
     if(mmkeditor->callback)
       mmkeditor->callback(mmkeditor->user_data);
       
-  }
-  
+  }  
+}
+
+static void mmkeditor_ok(xitk_widget_t *w, void *data) {
+  mmkeditor_apply(NULL, NULL);
+  mmkeditor_exit(NULL, NULL);
 }
 
 static void mmk_fileselector_cancel_callback(filebrowser_t *fb) {
@@ -2807,7 +2844,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 	     xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
 					  x, y, w - 115, 20,
 					  "Black", "Black", fontname)));
-  xitk_set_widget_tips_default(mmkeditor->mrl, _("Subtitle File"));
+  xitk_set_widget_tips_default(mmkeditor->sub, _("Subtitle File"));
   xitk_enable_and_show_widget(mmkeditor->sub);
 
   x = WINDOW_WIDTH - 115;
@@ -2880,14 +2917,49 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.callback          = NULL;
   ib.userdata          = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
-	    (mmkeditor->offset = 
+	    (mmkeditor->av_offset = 
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
 				       x, y, w, 20, NULL, NULL, NULL)));
-  xitk_set_widget_tips_default(mmkeditor->end, _("Mediamark end time (secs)."));
-  xitk_enable_and_show_widget(mmkeditor->offset);
+  xitk_set_widget_tips_default(mmkeditor->av_offset, _("Offset of Audio and Video."));
+  xitk_enable_and_show_widget(mmkeditor->av_offset);
+
+  x += w + 20 + 15;
+  y -= 5;
+  draw_outter_frame(gGui->imlib_data, bg, _("SPU offset"), btnfontname, 
+		    x, y, w + 60, 20 + 15 + 10);
+
+  x += 30;
+  y += 5;
+  ib.skin_element_name = NULL;
+  ib.value             = 0;
+  ib.step              = 1;
+  ib.parent_wlist      = mmkeditor->widget_list;
+  ib.callback          = NULL;
+  ib.userdata          = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
+	    (mmkeditor->spu_offset = 
+	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
+				       x, y, w, 20, NULL, NULL, NULL)));
+  xitk_set_widget_tips_default(mmkeditor->spu_offset, _("Subpicture offset."));
+  xitk_enable_and_show_widget(mmkeditor->spu_offset);
 
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Ok");
+  lb.align             = ALIGN_CENTER;
+  lb.callback          = mmkeditor_ok; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)), 
+	   (b = xitk_noskin_labelbutton_create(mmkeditor->widget_list, 
+					       &lb, x, y, 100, 23,
+					       "Black", "Black", "White", btnfontname)));
+  xitk_set_widget_tips_default(b, _("Apply the changes and close the window."));
+  xitk_enable_and_show_widget(b);
+
+  x = (WINDOW_WIDTH >>1) - 50;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Apply");
   lb.align             = ALIGN_CENTER;

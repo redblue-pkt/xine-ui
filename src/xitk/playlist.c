@@ -70,9 +70,6 @@ typedef struct {
 
 static _playlist_t   *playlist;
 
-#define MOVEUP 1
-#define MOVEDN 2
-
 void playlist_handle_event(XEvent *event, void *data);
 
 static void _playlist_enability(int enable) {
@@ -221,7 +218,7 @@ static void _playlist_xine_play(void) {
 /*
  * Start playing an MRL
  */
-static void _playlist_play(xitk_widget_t *w, void *data) {
+void playlist_play_current(xitk_widget_t *w, void *data) {
   int j;
   
   j = xitk_browser_get_current_selected(playlist->playlist);
@@ -251,7 +248,7 @@ static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int select
 /*
  * Delete selected MRL
  */
-static void _playlist_delete(xitk_widget_t *w, void *data) {
+void playlist_delete_current(xitk_widget_t *w, void *data) {
   int i, j;
   
   mmk_editor_end();
@@ -308,6 +305,7 @@ void playlist_delete_all(xitk_widget_t *w, void *data) {
   if(playlist && playlist->winput)
     xitk_inputtext_change_text(playlist->winput, NULL);
   
+  xitk_browser_release_all_buttons(playlist->playlist);
   gui_set_current_mrl(NULL);
   enable_playback_controls(0);
 }
@@ -315,7 +313,7 @@ void playlist_delete_all(xitk_widget_t *w, void *data) {
 /*
  * Move entry up/down in playlist
  */
-static void _playlist_move_updown(xitk_widget_t *w, void *data) {
+void playlist_move_current_updown(xitk_widget_t *w, void *data) {
   int j;
 
   mmk_editor_end();
@@ -325,14 +323,14 @@ static void _playlist_move_updown(xitk_widget_t *w, void *data) {
     int          start = xitk_browser_get_current_start(playlist->playlist);
     int          max_vis_len = xitk_browser_get_num_entries(playlist->playlist);
 
-    if(((int)data) == MOVEUP && (j > 0)) {
+    if(((int)data) == DIRECTION_UP && (j > 0)) {
       mmk = gGui->playlist.mmk[j - 1];
 
       gGui->playlist.mmk[j - 1] = gGui->playlist.mmk[j];
       gGui->playlist.mmk[j] = mmk;
       j--;
     }
-    else if(((int)data) == MOVEDN && (j < (gGui->playlist.num - 1))) {
+    else if(((int)data) == DIRECTION_DOWN && (j < (gGui->playlist.num - 1))) {
       mmk = gGui->playlist.mmk[j + 1];
       
       gGui->playlist.mmk[j + 1] = gGui->playlist.mmk[j];
@@ -447,7 +445,21 @@ static void _playlist_handle_event(XEvent *event, void *data) {
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
 
-    if((bevent->button == Button4) ||(bevent->button == Button5))
+    if(bevent->button == Button3) {
+      xitk_widget_t *w = xitk_get_focused_widget(playlist->widget_list);
+      
+      if(w && ((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)) {
+	int wx, wy;
+
+	xitk_get_window_position(gGui->display, playlist->window, &wx, &wy, NULL, NULL);
+
+	playlist_menu(playlist->widget_list, 
+		      bevent->x + wx, bevent->y + wy, 
+		      (xitk_browser_get_current_selected(playlist->playlist) >= 0));
+      }
+
+    }
+    else if((bevent->button == Button4) || (bevent->button == Button5))
       mmk_editor_end();
 
   }
@@ -480,7 +492,6 @@ static void _playlist_handle_event(XEvent *event, void *data) {
       xitk_widget_t *w;
       
       mmk_editor_end();
-      
       w = xitk_get_focused_widget(playlist->widget_list);
       if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
 	if(mykey == XK_Down)
@@ -530,9 +541,8 @@ void playlist_mmk_editor(void) {
   if(playlist) {
     int sel = xitk_browser_get_current_selected(playlist->playlist);
 
-    if(sel >= 0) {
+    if(sel >= 0)
       mmk_edit_mediamark(&gGui->playlist.mmk[sel], _playlist_apply_cb, NULL);
-    }
   
   }
 }
@@ -595,7 +605,8 @@ void playlist_scan_for_infos(void) {
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, !mute);
     
     if(rerun)
-      gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, old_pos, 0, gGui->mmk.offset);
+      gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, old_pos, 
+			     0, gGui->mmk.av_offset, gGui->mmk.spu_offset);
     
     playlist_mrlident_toggle();
   }
@@ -744,7 +755,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	    gGui->playlist.cur = 0;
 	  
 	  for (j = 0; j < num_mrls; j++)
-	    mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0);
+	    mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
 	  
 	  if(gGui->playlist.cur == 0)
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
@@ -1125,29 +1136,29 @@ void playlist_editor(void) {
   lbl.gc              = (XITK_WIDGET_LIST_GC(playlist->widget_list));
 
   b.skin_element_name = "PlMoveUp";
-  b.callback          = _playlist_move_updown;
-  b.userdata          = (void *)MOVEUP;
+  b.callback          = playlist_move_current_updown;
+  b.userdata          = (void *)DIRECTION_UP;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->move_up = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->move_up, _("Move up selected MRL"));
 
 
   b.skin_element_name = "PlMoveDn";
-  b.callback          = _playlist_move_updown;
-  b.userdata          = (void *)MOVEDN;
+  b.callback          = playlist_move_current_updown;
+  b.userdata          = (void *)DIRECTION_DOWN;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->move_down = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->move_down, _("Move down selected MRL"));
 
   b.skin_element_name = "PlPlay";
-  b.callback          = _playlist_play;
+  b.callback          = playlist_play_current;
   b.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->play = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->play, _("Start playback of selected MRL"));
   
   b.skin_element_name = "PlDelete";
-  b.callback          = _playlist_delete;
+  b.callback          = playlist_delete_current;
   b.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->delete = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));

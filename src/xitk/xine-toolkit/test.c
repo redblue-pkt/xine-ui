@@ -777,6 +777,7 @@ static void create_combo(void) {
 		   (test->combo = 
 		    xitk_noskin_combo_create(test->widget_list, &cmb,
 					     x, y, width, NULL, NULL)));
+  xitk_set_widget_tips_default(test->combo, "This is a combo box.");
   xitk_enable_and_show_widget(test->combo);
 }
 

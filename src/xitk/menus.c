@@ -72,6 +72,24 @@ extern _panel_t                *panel;
 
 #define IS_CHANNEL_CHECKED(C, N) (C == N) ? "<checked>" : "<check>"
 
+static void menu_open_mrlbrowser(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  open_mrlbrowser_from_playlist(w, data);
+}
+static void menu_playlist_mmk_editor(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  playlist_mmk_editor();
+}
+static void menu_playlist_delete_all(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  playlist_delete_all(w, data);
+}
+static void menu_playlist_delete_current(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  playlist_delete_current(w, data);
+}
+static void menu_playlist_play_current(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  playlist_play_current(w, data);
+}
+static void menu_playlist_move_updown(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  playlist_move_current_updown(w, data);
+}
 
 static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int event     = (int) data;
@@ -198,7 +216,7 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
       gGui->playlist.cur = 0;
     
     for (j = 0; j < num_mrls; j++)
-      mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0);
+      mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
     
     if(gGui->playlist.cur == 0)
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
@@ -956,6 +974,62 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
       xitk_menu_add_entry(w, &menu_entry);
     }
 
+  }
+
+  xitk_menu_show_menu(w);
+}
+
+void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
+  xitk_menu_widget_t   menu;
+  xitk_widget_t       *w = NULL;
+  char                 buffer[2048];
+  xitk_menu_entry_t    menu_entries_nosel[] = {
+    { NULL ,        "<title>",     NULL,                         NULL                    },
+    { "SEP",        "<separator>", NULL,                         NULL                    },
+    { "Add",        NULL,          menu_open_mrlbrowser,         NULL                    },
+    { NULL,         NULL,          NULL,                         NULL                    }
+  };
+  xitk_menu_entry_t    menu_entries_sel[] = {
+    { NULL ,        "<title>",     NULL,                         NULL                    },
+    { "SEP",        "<separator>", NULL,                         NULL                    },
+    { "Play",        NULL,         menu_playlist_play_current,   NULL                    },
+    { "SEP",        "<separator>", NULL,                         NULL                    },
+    { "Add",        NULL,          menu_open_mrlbrowser,         NULL                    },
+    { "Edit",       NULL,          menu_playlist_mmk_editor,     NULL                    },
+    { "Delete",     NULL,          menu_playlist_delete_current, NULL                    },
+    { "Delete All", NULL,          menu_playlist_delete_all,     NULL                    },
+    { "SEP",        "<separator>", NULL,                         NULL                    },
+    { "Move Up",    NULL,          menu_playlist_move_updown,    (void *) DIRECTION_UP   },
+    { "Move Down",  NULL,          menu_playlist_move_updown,    (void *) DIRECTION_DOWN },
+    { NULL,         NULL,          NULL,                         NULL                    }
+  };
+
+  
+  XITK_WIDGET_INIT(&menu, gGui->imlib_data);
+  
+  sprintf(buffer, "%s", _("Playlist"));
+  if(selected) {
+    menu_entries_sel[0].menu = buffer;
+    menu.menu_tree           = &menu_entries_sel[0];
+  }
+  else {
+    menu_entries_nosel[0].menu = buffer;
+    menu.menu_tree             = &menu_entries_nosel[0];
+  }
+  
+  menu.parent_wlist      = wl;
+  menu.skin_element_name = NULL;
+
+  w = xitk_noskin_menu_create(wl, &menu, x, y);
+
+  if(!selected && gGui->playlist.num) {
+    xitk_menu_entry_t   menu_entry;
+    
+    menu_entry.menu      = "Delete All";
+    menu_entry.type      = NULL;
+    menu_entry.cb        = menu_playlist_delete_all;
+    menu_entry.user_data = NULL;
+    xitk_menu_add_entry(w, &menu_entry);
   }
 
   xitk_menu_show_menu(w);

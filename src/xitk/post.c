@@ -1754,7 +1754,7 @@ void pplugin_parse_and_store_post(const char *post) {
 		  }
 		  break;
 
-		case POST_PARAM_TYPE_STRINGLIST: // unsupported */
+		case POST_PARAM_TYPE_STRINGLIST: /* unsupported */
 		  if(!pobj.readonly)
 		    fprintf(stderr, "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n");
 		  break;
