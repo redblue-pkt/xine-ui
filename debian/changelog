@@ -1,6 +1,14 @@
+xine-ui (0.9.18-1) unstable; urgency=low
+
+  * new upstream release
+    - restores correct video mode on exit (closes: #177740)
+    - brings meaningful error message when hotkeys collide (closes: #177877)
+  
+ -- Siggi Langauf <siggi@debian.org>  Wed, 29 Jan 2003 21:51:14 +0100
+
 xine-ui (0.9.17-2) unstable; urgency=low
 
-  * keeping uncompressed versions of onliine documentation (closes: #158838)
+  * keeping uncompressed versions of online documentation (closes: #158838)
 
  -- Siggi Langauf <siggi@debian.org>  Thu,  9 Jan 2003 00:47:31 +0100
 
