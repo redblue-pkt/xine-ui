@@ -869,6 +869,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 	      ((sscanf(asx_prop->value, "%d", &version_major)) == 1)) && 
 	     ((version_major == 3) && (version_minor == 0))) {
 	    
+	  __parse_anyway:
 	    asx_entry = xml_tree->child;
 	    while(asx_entry) {
 	      if((!strcasecmp(asx_entry->name, "ENTRY")) ||
@@ -956,8 +957,11 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 	    fprintf(stderr, "%s(): Wrong ASX version: %s\n", __XINE_FUNCTION__, asx_prop->value);
 
 	}
-	else
+	else {
 	  fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
+	  fprintf(stderr, "%s(): last chance: try to parse it anyway\n", __XINE_FUNCTION__);
+	  goto __parse_anyway;
+	}
 	
       }
       else
