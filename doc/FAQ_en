@@ -175,10 +175,9 @@
 
 3.1 What do I need to compile everything properly?
 
-    First of all an official and stable release of gcc because there seem
-    to be still problems with gcc-3.x. Also be aware that patched gcc versions
-    may break parts of xine and are therefore not supported by us (libmpeg2
-    is broken when compiled with pgcc).
+    First of all an official and stable release of gcc. Also be aware 
+    that patched gcc versions may break parts of xine and are therefore 
+    not supported by us (libmpeg2 is broken when compiled with pgcc).
 
     Furthermore you'll have to use GNU make to compile xine. On most GNU/Linux
     systems "make" is GNU make - on other platforms use "gmake" instead.

@@ -181,11 +181,10 @@ _____________________________________________________________________________
 
 3.1     Was benötige ich, um xine fehlerfrei zu kompilieren?
 
-        Sie benötigen eine offizielle und stabile Version von GCC. Mit
-        gcc-3.x gibt es immer noch Probleme, also sollten Sie eine 2.95.x
-        Version einsetzen. Verwenden Sie keine gepatchten GCC-Version, sonst
-        werden Sie xine nicht korrekt kompilieren können (libmpeg2 kann mit
-        pgcc nicht fehlerfrei kompiliert werden).
+        Sie benötigen eine offizielle und stabile Version von GCC. 
+        Verwenden Sie keine gepatchten GCC-Version, sonst werden Sie  
+        xine nicht korrekt kompilieren können (libmpeg2 kann mit pgcc 
+        nicht fehlerfrei kompiliert werden).
 
         Ausserdem benötigen Sie GNU make. Auf den meisten Linux-Systemen wird
         GNU make mit dem Befehl "make" aufgerufen, auf allen anderen Systemen
