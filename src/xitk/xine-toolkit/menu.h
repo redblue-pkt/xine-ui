@@ -40,6 +40,7 @@ struct menu_node_s {
   xitk_menu_entry_t      *menu_entry;
   xitk_widget_t          *widget;
   menu_window_t          *menu_window;
+  xitk_widget_t          *button;
   menu_node_t            *branch;
   menu_node_t            *next;
 };

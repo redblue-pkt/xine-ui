@@ -187,6 +187,7 @@ static void _menu_dump(menu_private_data_t *private_data) {
 }
 #endif
 
+#warning REWRITE ME
 static void _menu_scissor(xitk_widget_t *w,
 			  menu_private_data_t *private_data, xitk_menu_entry_t *me) {
   char         *c;
@@ -515,34 +516,48 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
   menu_private_data_t  *private_data = (menu_private_data_t *) widget->private_data;
   
   if(_menu_is_branch(me->menu_entry)) {
-
+    
     if(me->branch) {
-      if(private_data->curbranch && (me->branch != private_data->curbranch)) {
-	int   wx, wy, x, y;
+      menu_node_t   *mebr = me;
+      
+      while(mebr->branch) {
 	
-	xitk_window_get_window_position(private_data->imlibdata, 
-					me->menu_window->xwin, &wx, &wy, NULL, NULL);
-	xitk_get_widget_pos(w, &x, &y);
-	
-	x += (xitk_get_widget_width(w)) + wx;
-	x -= 10;
-	y += wy;
-	
-	_menu_destroy_subs(private_data, me->menu_window);
-	_menu_create_menu_from_branch(me->branch, widget, x, y);
-      }
-      else {
-	
-	if(private_data->curbranch) {
-	  XLOCK(private_data->curbranch->menu_window->display);
-	  XRaiseWindow(private_data->curbranch->menu_window->display, 
-		       xitk_window_get_window(private_data->curbranch->menu_window->xwin));
-	  XSetInputFocus(private_data->curbranch->menu_window->display, 
-			 (xitk_window_get_window(private_data->curbranch->menu_window->xwin)),
-			 RevertToParent, CurrentTime);
-	  XUNLOCK(private_data->curbranch->menu_window->display);
+	if(private_data->curbranch && (mebr->branch != private_data->curbranch)) {
+	  int   wx = 0, wy = 0, x = 0, y = 0;
+	  
+	  xitk_window_get_window_position(private_data->imlibdata, 
+					  mebr->menu_window->xwin, &wx, &wy, NULL, NULL);
+	  xitk_get_widget_pos(mebr->button, &x, &y);
+	  
+	  x += (xitk_get_widget_width(mebr->button)) + wx;
+	  x -= 10;
+	  y += wy;
+	  
+	  
+	  if(me->branch && (me->branch == mebr->branch))
+	    _menu_destroy_subs(private_data, mebr->menu_window);
+	    
+	  _menu_create_menu_from_branch(mebr->branch, mebr->widget, x, y);
 	}
+	else {
+	  
+	  if(private_data->curbranch) {
+	    XLOCK(private_data->curbranch->menu_window->display);
+	    XRaiseWindow(private_data->curbranch->menu_window->display, 
+			 xitk_window_get_window(private_data->curbranch->menu_window->xwin));
+	    XSetInputFocus(private_data->curbranch->menu_window->display, 
+			   (xitk_window_get_window(private_data->curbranch->menu_window->xwin)),
+			   RevertToParent, CurrentTime);
+	    XUNLOCK(private_data->curbranch->menu_window->display);
+	  }
+	}
+
+	mebr = mebr->branch;
       }
+
+      private_data->curbranch = me->branch;
+
+      return;
     }
     else {
       menu_node_t *mnode = (private_data->curbranch && private_data->curbranch->prev) ? 
@@ -784,7 +799,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   while(me) {
 
     me->menu_window      = menu_window;
-
+    me->button           = NULL;
+    
     if(_menu_is_title(me->menu_entry)) {
 
       if(bg && (!got_title)) {
@@ -852,6 +868,7 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 								     "Black", "Black", "White", 
 								     DEFAULT_BOLD_FONT_12)));
       btn->type |= WIDGET_GROUP | WIDGET_GROUP_MENU;
+      me->button = btn;
 
       wimage = xitk_get_widget_foreground_skin(btn);
       if(wimage) {
