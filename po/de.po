@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.15\n"
+"Project-Id-Version: xine-ui 0.9.17\n"
 "POT-Creation-Date: 2003-01-02 22:41+0100\n"
-"PO-Revision-Date: 2002-12-17 11:26+0100\n"
+"PO-Revision-Date: 2003-01-07 11:45+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -50,37 +50,35 @@ msgstr "Ströme laden"
 
 #: src/xitk/control.c:231
 msgid "hue value"
-msgstr ""
+msgstr "Farbwert"
 
 #: src/xitk/control.c:232
 msgid "Hue value."
-msgstr ""
+msgstr "Farbwert."
 
 #: src/xitk/control.c:242
 msgid "brightness value"
-msgstr ""
+msgstr "Helligkeitswert"
 
 #: src/xitk/control.c:243
 msgid "Brightness value."
-msgstr ""
+msgstr "Helligkeitswert."
 
 #: src/xitk/control.c:253
 msgid "saturation value"
-msgstr ""
+msgstr "Sättigungswert"
 
 #: src/xitk/control.c:254
 msgid "Saturation value."
-msgstr ""
+msgstr "Sättigungswert."
 
 #: src/xitk/control.c:264
-#, fuzzy
 msgid "contrast value"
-msgstr "Farbton ändern"
+msgstr "Kontrastwert"
 
 #: src/xitk/control.c:265
-#, fuzzy
 msgid "Contrast value."
-msgstr "Farbton ändern"
+msgstr "Kontrastwert."
 
 #: src/xitk/control.c:416 src/xitk/panel.c:147 src/xitk/playlist.c:841
 #, c-format
@@ -319,9 +317,8 @@ msgid "Event sender window stick to main panel"
 msgstr "Ereignissendefester klebt am Hauptbedienfeld"
 
 #: src/xitk/event.c:1022
-#, fuzzy
 msgid "Visual animation style"
-msgstr "Videoanimation"
+msgstr "Stil der Videoanimation"
 
 #: src/xitk/event.c:1023
 msgid ""
@@ -367,21 +364,25 @@ msgstr "Anzeigezeit von OSD Informationen in Sekunden."
 
 #: src/xitk/event.c:1074
 msgid "change xine's behavior for unexperienced user"
-msgstr ""
+msgstr "xine-Verhalten für unerfahrene Benutzer anpassen"
 
 #: src/xitk/event.c:1075
 msgid "In this mode, xine take some decisions to simplify user's life."
 msgstr ""
+"In diesem Modus wählt xine Entscheidungen, die dem Benutzer das Benutzen "
+"erleichtern."
 
 #: src/xitk/event.c:1083
 msgid "configuration experience level"
-msgstr ""
+msgstr "Erfahrenheut einstellen"
 
 #: src/xitk/event.c:1084
 msgid ""
 "Level of user's experience, this will show more or less configuration "
 "options."
 msgstr ""
+"Erfahrungslevel des Benutzwers, der mehr oder weniger Konfigurationsoptionen "
+"anzeigt."
 
 #. Some infos
 #: src/xitk/event.c:1098
@@ -669,14 +670,14 @@ msgid "Grab"
 msgstr "Aufzeichnen"
 
 #: src/xitk/main.c:347
-#, fuzzy, c-format
+#, c-format
 msgid "Bad geometry '%s'\n"
-msgstr "Fehlerhafte Geometrie '%s', siehe xine --help\n"
+msgstr "Fehlerhafte Geometrie '%s'\n"
 
 #: src/xitk/main.c:355
 #, c-format
 msgid "Bad visual '%s'\n"
-msgstr ""
+msgstr "Fehlerhavte visual '%s'\n"
 
 #: src/xitk/main.c:429
 #, c-format
@@ -966,6 +967,8 @@ msgstr "Zu benutzender Video-Treiber"
 #: src/xitk/main.c:591 src/xitk/main.c:696
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
+"Wähle Videotreiber. HINWEIS: xine muß neugestartet werden, um diesen zu "
+"benutzen"
 
 #: src/xitk/main.c:630
 #, c-format
@@ -988,6 +991,8 @@ msgstr "Zu benutzender Audio-Treiber"
 #: src/xitk/main.c:707
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
+"Wähle Audiotreiber. HINWEIS: xine muß neugestartet werden, um diesen zu "
+"benutzen"
 
 #: src/xitk/main.c:721 src/xitk/main.c:759
 msgid "main: not using any audio driver (as requested).\n"
@@ -1041,15 +1046,16 @@ msgstr "Ungültiger Parameter %d => exit\n"
 
 #: src/xitk/main.c:1337
 msgid "Post audio plugin"
-msgstr ""
+msgstr "Plugin für Audio-Nachverarbeitung"
 
 #: src/xitk/main.c:1338
 msgid "Post audio plugin to used with video less stream playback"
 msgstr ""
+"Plugin für Audio-Nachverarbeitung, falls kein Videodatenstrom vorhandne ist"
 
 #: src/xitk/main.c:1386 src/xitk/main.c:1387
 msgid "Post video plugin"
-msgstr ""
+msgstr "Plugin für Video-Nachverarbeitung"
 
 #: src/xitk/main.c:1410
 msgid "Logo mrl"
@@ -1133,18 +1139,17 @@ msgid "Source:"
 msgstr "Quelle:"
 
 #: src/xitk/osd.c:276
-#, fuzzy
 msgid "Audio: "
-msgstr "Audio"
+msgstr "Audio: "
 
 #: src/xitk/osd.c:316
 #, c-format
 msgid "%d:%.2d:%.2d (%.0f%%) of %d:%.2d:%.2d"
-msgstr ""
+msgstr "%d:%.2d:%.2d (%.0f%%) von %d:%.2d:%.2d"
 
 #: src/xitk/osd.c:325
 msgid "Position in Stream"
-msgstr ""
+msgstr "Position im Datenstrom"
 
 #: src/xitk/panel.c:43
 msgid "Play previous chapter or mrl"
@@ -1350,6 +1355,8 @@ msgstr "Keine Hilfe verfügbar"
 msgid ""
 "There is no configuration option available in this user experience level."
 msgstr ""
+"Für den gewählten Erfahrungslevel des Benutzers ist keine "
+"Konfigurationsoption vorhanden."
 
 #: src/xitk/setup.c:1028
 msgid "Help"
