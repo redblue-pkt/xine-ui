@@ -1,3 +1,7 @@
+xine-ui (0.9.23) unstable; urgency=low
+  * xinerama bug fixes (very fullscreen, window position when switching from
+    fullscreen to normal mode)
+
 xine-ui (0.9.22) unstable; urgency=low
 
   * control xine and fbxine via stdin, patch from Dirk Meyer <dmeyer@tzi.de>,

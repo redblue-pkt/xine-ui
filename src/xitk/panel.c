@@ -580,18 +580,11 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       XUnlockDisplay(gGui->display);
       
       if((coordx <= 0) || (coordy <= 0) || (coordx >= desktopw) || (coordy >= desktoph)) {
-	Window        rootwin;
-	int           xwin, ywin;
-	unsigned int  wwin, hwin, bwin, dwin;
-	int           newx = x, newy = y;
+	
+	newx = (desktopw >> 1) - (w >> 1);
+	newy = (desktoph >> 1) - (h >> 1);
 	
 	XLockDisplay(gGui->display);
-	if(XGetGeometry(gGui->display, 
-			(RootWindow(gGui->display, gGui->screen)), &rootwin, 
-			&xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
-	  newx = (wwin >> 1) - (w >> 1);
-	  newy = (hwin >> 1) - (h >> 1);
-	}
 	XMoveWindow(gGui->display, gGui->panel_window, newx, newy);
 	XUnlockDisplay(gGui->display);
 	

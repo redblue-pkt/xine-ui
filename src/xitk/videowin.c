@@ -387,6 +387,11 @@ static void video_window_adapt_size (void) {
     int i;
     int knowLocation = 0;
     
+    Window root_win, dummy_win;
+    int x_mouse,y_mouse;
+    int dummy_x,dummy_y;
+    unsigned int dummy_opts;
+
     /* someday this could also use the centre of the window as the
      * test point I guess.  Right now it's the upper-left.
      */
@@ -406,18 +411,31 @@ static void video_window_adapt_size (void) {
       gVw->fullscreen_height = hint.height;
     } 
     else {
+      /* Get mouse cursor position */
+      XQueryPointer(gGui->display, RootWindow(gGui->display, gGui->screen), &root_win, &dummy_win, &x_mouse, &y_mouse, &dummy_x, &dummy_y, &dummy_opts);
+
       for (i = 0; i < gVw->xinerama_cnt; i++) {
 	if (
 	    (knowLocation == 1 &&
 	     gVw->xwin >= gVw->xinerama[i].x_org &&
 	     gVw->ywin >= gVw->xinerama[i].y_org &&
-	     gVw->xwin <= gVw->xinerama[i].x_org+gVw->xinerama[i].width &&
-	     gVw->ywin <= gVw->xinerama[i].y_org+gVw->xinerama[i].height) ||
+	     gVw->xwin < gVw->xinerama[i].x_org+gVw->xinerama[i].width &&
+	     gVw->ywin < gVw->xinerama[i].y_org+gVw->xinerama[i].height) ||
 	    (knowLocation == 0 &&
-	     gVw->xinerama[i].screen_number == 
-	     XScreenNumberOfScreen(XDefaultScreenOfDisplay(gGui->display)))) {
+	     x_mouse >= gVw->xinerama[i].x_org &&
+	     y_mouse >= gVw->xinerama[i].y_org &&
+	     x_mouse < gVw->xinerama[i].x_org+gVw->xinerama[i].width &&
+	     y_mouse < gVw->xinerama[i].y_org+gVw->xinerama[i].height)) {
+/*	     gVw->xinerama[i].screen_number ==
+	     XScreenNumberOfScreen(XDefaultScreenOfDisplay(gGui->display)))) {*/
 	  hint.x = gVw->xinerama[i].x_org;
 	  hint.y = gVw->xinerama[i].y_org;
+	  
+	  if(knowLocation == 0) {
+	    gVw->old_xwin = hint.x;
+	    gVw->old_ywin = hint.y;
+	  }
+
 	  if (!(gVw->fullscreen_req & WINDOWED_MODE)) {
 	    hint.width  = gVw->xinerama[i].width;
 	    hint.height = gVw->xinerama[i].height;
@@ -650,8 +668,6 @@ static void video_window_adapt_size (void) {
     
     /*
      * user sets window geom, move back to original location.
-     * This probably break something with Xinerama, but i can't
-     * test it.
      */
     if(gVw->stream_resize_window == 0) {
       hint.x           = gVw->old_xwin;
