@@ -111,20 +111,20 @@ $(top_builddir)/src/common/libcommon.la:
 	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
 
 xine-remote.c:	$(srcdir)/network.c
-	$(LN_S) $(srcdir)/network.c ./xine-remote.c
+	@rm -f xine-remote.c;$(LN_S) $(srcdir)/network.c ./xine-remote.c
 
 xine-remote.o: xine-remote.c
 	$(COMPILE) -DNETWORK_CLIENT -c `test -f $< || echo '$(srcdir)/'`$<
 
 session_ctrl.c: $(srcdir)/session.c
-	$(LN_S) $(srcdir)/session.c ./session_ctrl.c
+	@rm -f ./session_ctrl.c; $(LN_S) $(srcdir)/session.c ./session_ctrl.c
 
 session_ctrl.o: session_ctrl.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(DEBUG_CFLAGS) -DCTRL_TEST -c `test -f $< || echo '$(srcdir)/'`$<
 
 kbindings_man.c: $(srcdir)/kbindings.c
-	$(LN_S) $(srcdir)/kbindings.c ./kbindings_man.c
+	@rm -f kbindings_man.c; $(LN_S) $(srcdir)/kbindings.c ./kbindings_man.c
 
 kbindings_man.o: kbindings_man.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
