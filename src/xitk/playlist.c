@@ -181,7 +181,7 @@ static void _playlist_xine_play(void) {
       enable_playback_controls(1);
     
     if(!xine_open(gGui->stream, mmk->mrl)) {
-      gui_handle_xine_error(gGui->stream);
+      gui_handle_xine_error(gGui->stream, mmk->mrl);
       enable_playback_controls(0);
       gui_display_logo();
       return;

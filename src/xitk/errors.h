@@ -34,7 +34,7 @@ void xine_error_with_more(char *message, ...);
 
 void xine_info(char *message, ...);
 
-void gui_handle_xine_error(xine_stream_t *stream);
+void gui_handle_xine_error(xine_stream_t *stream, char *mrl);
 
 #endif
 

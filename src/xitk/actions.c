@@ -114,7 +114,7 @@ static int _gui_xine_play(xine_stream_t *stream,
   }
   
   if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0) {
-    gui_handle_xine_error(stream);
+    gui_handle_xine_error(stream, NULL);
   }
   else {
     char *ident;
@@ -390,7 +390,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
   }
   
   if(!xine_open(gGui->stream, (const char *) mrl)) {
-    gui_handle_xine_error(gGui->stream);
+    gui_handle_xine_error(gGui->stream, mrl);
     return 0;
   }
   
@@ -874,7 +874,7 @@ void gui_set_current_position (int pos) {
 
   if(gGui->logo_mode && (mediamark_get_current_mrl())) {
     if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
-      gui_handle_xine_error(gGui->stream);
+      gui_handle_xine_error(gGui->stream, (mediamark_get_current_mrl()));
       return;
     }
   }
@@ -1536,7 +1536,8 @@ void visual_anim_play(void) {
   if(gGui->visual_anim.enabled == 2) {
     if(!visual_anim_open_and_play(gGui->visual_anim.stream, 
 				  gGui->visual_anim.mrls[gGui->visual_anim.current]))
-      gui_handle_xine_error(gGui->visual_anim.stream);
+      gui_handle_xine_error(gGui->visual_anim.stream, 
+			    gGui->visual_anim.mrls[gGui->visual_anim.current]);
     gGui->visual_anim.running = 1;
   }
 }

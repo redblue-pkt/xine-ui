@@ -366,7 +366,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       enable_playback_controls(1);
     
     if(!xine_open(gGui->stream, (const char *) mrl->mrl)) {
-      gui_handle_xine_error(gGui->stream);
+      gui_handle_xine_error(gGui->stream, mrl->mrl);
       enable_playback_controls(0);
       gui_display_logo();
       return;
