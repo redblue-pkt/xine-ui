@@ -5,6 +5,10 @@ EXTRA_DIST = _xine.m4 ORBit.m4 xine.m4
 
 debug:
 
+install-debug: debug
+        list='$(SUBDIRS)'; for subdir in $$list; do \
+          (cd $$subdir && $(MAKE) $@) \
+        done;
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*
