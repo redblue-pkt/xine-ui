@@ -4,7 +4,7 @@ ORBIT_IDL = @ORBIT_IDL@
 idldir = $(datadir)/idl
 ##idl_DATA = xine.idl
 
-EXTRA_DIST = $(idl_DATA) xine.idl xine-impl.c example.py corba-utils.c
+EXTRA_DIST = xine.idl xine-impl.c example.py corba-utils.c
 
 #BUILT_SOURCES = xine-common.c xine-skels.c xine-stubs.c xine.h
 
