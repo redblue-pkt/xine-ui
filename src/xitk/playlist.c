@@ -536,9 +536,7 @@ void playlist_scan_for_infos(void) {
     
     for(i = 0; i < gGui->playlist.num; i++) {
       
-      if((xine_open(stream, gGui->playlist.mmk[i]->mrl)) && (xine_play(stream, 0, 0))) {
-	
-	xine_usec_sleep(5000);
+      if(xine_open(stream, gGui->playlist.mmk[i]->mrl)) {
 
 	if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
 	  
@@ -568,8 +566,6 @@ void playlist_scan_for_infos(void) {
     
     if(rerun)
       gui_xine_open_and_play(gGui->mmk.mrl, old_pos, 0);
-    else
-      xine_stop(stream);
     
     playlist_mrlident_toggle();
   }
