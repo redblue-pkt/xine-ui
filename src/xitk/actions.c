@@ -150,9 +150,13 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
 	  if(gGui->auto_panel_visibility && (video_window_is_visible()) && (!panel_is_visible()))
 	    panel_toggle_visibility(NULL, NULL);
 	  
-	  if((video_window_is_visible()) && (!gGui->visual_anim.running))
-	    visual_anim_play();
-
+	  if(video_window_is_visible()) {
+	    if(!gGui->visual_anim.running)
+	      visual_anim_play();
+	  }
+	  else
+	    gGui->visual_anim.running = 2;
+	  
 	}
       }
     }
@@ -332,9 +336,9 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	      }
 	    }
 	    
-	    (void ) mediamark_store_mmk(&mmk[new_num], 
-					gGui->playlist.mmk[i]->mrl, gGui->playlist.mmk[i]->mrl,
-					gGui->playlist.mmk[i]->start, gGui->playlist.mmk[i]->end);
+	    (void) mediamark_store_mmk(&mmk[new_num], 
+				       gGui->playlist.mmk[i]->mrl, gGui->playlist.mmk[i]->mrl,
+				       gGui->playlist.mmk[i]->start, gGui->playlist.mmk[i]->end);
 	    new_num++;
 	  }
 	}
@@ -396,6 +400,19 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
     }
     else
       layer_above_video(gGui->panel_window);
+
+    /* (re)start/stop visual animation */
+    if(video_window_is_visible()) {
+      if(gGui->visual_anim.enabled && (gGui->visual_anim.running == 2))
+	visual_anim_play();
+    }
+    else {
+      if(gGui->visual_anim.running) {
+	visual_anim_stop();
+	gGui->visual_anim.running = 2;
+      }
+    }
+
   }
 }
 

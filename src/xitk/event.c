@@ -91,6 +91,9 @@ static void ssaver_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
 
 static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->visual_anim.enabled = cfg->num_value;
+
+  if((!gGui->visual_anim.enabled) && gGui->visual_anim.running)
+    visual_anim_stop();
 }
 /*
  * Layer above callbacks

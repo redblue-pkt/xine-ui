@@ -31,8 +31,6 @@
 #include <string.h>
 #include <pthread.h>
 
-#warning FIXME FIXME FIXME: logo and hide/show vo window
-
 #include "common.h"
 
 extern gGui_t     *gGui;
