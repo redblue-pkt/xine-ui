@@ -1134,8 +1134,10 @@ void gui_run (void) {
       gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
 
     /* User load a playlist on startup */
-    if(actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST))
+    if(actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) {
       mediamark_load_mediamarks(gGui->playlist.on_start);
+      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+    }
     
     /*  The user request "play on start" */
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAY))
