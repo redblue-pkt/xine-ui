@@ -117,8 +117,10 @@ static pthread_t      rewire_thread;
 /* Some functions prototype */
 static void _pplugin_unwire(void);
 static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_elements_num);
+static void _pplugin_rewire(void);
 void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num);
-
+static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_elements_num);
+static void _pplugin_save_chain(void);
 
 static void *post_rewire_thread(void *data) {
   void (*rewire)(void) = data;
@@ -151,10 +153,9 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
     gGui->deinterlace_elements     = posts;
     gGui->deinterlace_elements_num = num;
   }
-  
+
   if(gGui->deinterlace_enable)
-    _pplugin_rewire_from_post_elements(gGui->deinterlace_elements, gGui->deinterlace_elements_num);
-  
+    _pplugin_rewire();
 }
 
 static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -282,6 +283,20 @@ static void _pplugin_unwire(void) {
 
 static void _pplugin_rewire(void) {
 
+  static post_element_t **post_elements;
+  int post_elements_num;
+
+  _pplugin_save_chain();
+
+  post_elements = _pplugin_join_deinterlace_and_post_elements(&post_elements_num);
+
+  if( post_elements ) {
+    _pplugin_rewire_from_post_elements(post_elements, post_elements_num);
+
+    free(post_elements);
+  }
+
+#if 0
   if(pplugin && (gGui->post_enable && !gGui->deinterlace_enable)) {
     xine_post_out_t  *vo_source;
     int               post_num = pplugin->object_num;
@@ -331,6 +346,7 @@ static void _pplugin_rewire(void) {
 
     }
   }
+#endif
 }
 
 static int _pplugin_get_object_offset(post_object_t *pobj) {
@@ -1178,6 +1194,34 @@ static void _pplugin_rebuild_filters(void) {
   _pplugin_paint_widgets();
 }
 
+static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_elements_num) {
+  post_element_t **post_elements;
+  int i, j;
+
+  *post_elements_num = 0;
+  if( gGui->post_enable )
+    *post_elements_num += gGui->post_elements_num;
+  if( gGui->deinterlace_enable )
+    *post_elements_num += gGui->deinterlace_elements_num;
+
+  if( *post_elements_num == 0 )
+    return NULL;
+
+  post_elements = (post_element_t **) 
+    xine_xmalloc(sizeof(post_element_t *) * (*post_elements_num));
+
+  for( i = 0; gGui->deinterlace_enable && i < gGui->deinterlace_elements_num; i++ ) {
+    post_elements[i] = gGui->deinterlace_elements[i];
+  }
+
+  for( j = 0; gGui->post_enable && j < gGui->post_elements_num; j++ ) {
+    post_elements[i+j] = gGui->post_elements[j];
+  }
+  
+  return post_elements;
+}
+
+
 static void _pplugin_save_chain(void) {
   
   if(pplugin) {
@@ -1436,9 +1480,12 @@ void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post
 void pplugin_rewire_posts(void) {
   
   _pplugin_unwire();
-  
+  _pplugin_rewire();
+
+#if 0
   if(gGui->post_enable && !gGui->deinterlace_enable)
     _pplugin_rewire_from_post_elements(gGui->post_elements, gGui->post_elements_num);
+#endif
 }
 
 void pplugin_end(void) {
@@ -1865,6 +1912,17 @@ void post_deinterlace_init(const char *deinterlace_post) {
 
 void post_deinterlace(void) {
 
+  if( !gGui->deinterlace_elements_num ) {
+    /* fallback to the old method */
+    xine_set_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE,
+                   gGui->deinterlace_enable);
+  }
+  else {
+    _pplugin_unwire();
+    _pplugin_rewire();
+  }
+
+#if 0
   if(gGui->deinterlace_enable) {
     if(gGui->post_enable)
       _pplugin_unwire();
@@ -1881,4 +1939,5 @@ void post_deinterlace(void) {
 	_pplugin_rewire_from_post_elements(gGui->post_elements, gGui->post_elements_num);
     }
   }
+#endif
 }
