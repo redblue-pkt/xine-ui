@@ -1,6 +1,6 @@
 SUBDIRS = xine-toolkit skins
 
-CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
+CFLAGS = @BUILD_LIB_STATIC@ @CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
 EXTRA_DIST = file_browser.c file_browser.h
 
