@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <pthread.h>
 
 #ifdef WITH_XMB
@@ -98,7 +97,7 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
 static char *xitk_font_right_name(char *name) {
   char right_name[XITK_FONT_LENGTH_NAME];
 
-  assert(name != NULL);
+  ABORT_IF_NULL(name);
 
   if(name[0] == '-') 
     return strdup(name);
@@ -210,8 +209,11 @@ static size_t xitk_cache_get_oldest(void) {
   size_t          i, oldest;
   unsigned long   lru;
 
-  assert(cache.n != 0);
-
+  if(cache.n != 0) {
+    fprintf(stderr, "%s(%d): cache.n != 0. Aborting.\n", __FUNCTION__, __LINE__);
+    abort();
+  }
+  
   i      = 0;
   oldest = 0;
   lru    = cache.items[0].lru;
@@ -402,8 +404,9 @@ static xitk_font_list_item_t *cache_get_from_list(Display *display, char *name) 
 xitk_font_t *xitk_font_load_font(Display *display, char *font) {
   xitk_font_t           *xtfs;
   xitk_font_list_item_t *list_item;
-
-  assert((display != NULL) && (font != NULL));
+  
+  ABORT_IF_NULL(display);
+  ABORT_IF_NULL(font);
   pthread_mutex_lock(&cache.mutex);
   
   /* quick search in the cache of unloaded fonts */
@@ -459,18 +462,20 @@ xitk_font_t *xitk_font_load_font(Display *display, char *font) {
  */
 void xitk_font_unload_font(xitk_font_t *xtfs) {
   xitk_font_list_item_t *item;
-
+  
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->display);
 #ifdef WITH_XMB
-  assert((xtfs != NULL) && (xtfs->fontset != NULL) && (xtfs->display != NULL));
+  ABORT_IF_NULL(xtfs->fontset);
 #else
-  assert((xtfs != NULL) && (xtfs->font != NULL) && (xtfs->display != NULL));
+  ABORT_IF_NULL(xtfs->font);
 #endif
 
   pthread_mutex_lock(&cache.mutex);
   /* search the font in the list */
   item = cache_get_from_list(xtfs->display, xtfs->name);
   /* it must be there */
-  assert(item != NULL);
+  ABORT_IF_NULL(item);
 
   if(--item->number == 0) {
     xitk_list_delete_current(cache.loaded);
@@ -503,7 +508,8 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
  */
 static Font xitk_font_get_font_id(xitk_font_t *xtfs) {
   
-  assert((xtfs != NULL) && (xtfs->font != NULL));
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->font);
 
   return xtfs->font->fid;
 }
@@ -513,7 +519,8 @@ static Font xitk_font_get_font_id(xitk_font_t *xtfs) {
  */
 static int xitk_font_is_font_8(xitk_font_t *xtfs) {
 
-  assert((xtfs != NULL) && (xtfs->font != NULL));
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->font);
 
   return ((xtfs->font->min_byte1 == 0) && (xtfs->font->max_byte1 == 0));
 }
@@ -524,7 +531,8 @@ static int xitk_font_is_font_8(xitk_font_t *xtfs) {
 #if 0
 static int xitk_font_is_font_16(xitk_font_t *xtfs) {
 
-  assert((xtfs != NULL) && (xtfs->font != NULL));
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->font);
 
   return ((xtfs->font->min_byte1 != 0) || (xtfs->font->max_byte1 != 0));
 }
@@ -537,14 +545,18 @@ static int xitk_font_is_font_16(xitk_font_t *xtfs) {
 int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int nbytes) {
   int width;
  
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->display);
+  ABORT_IF_NULL(c);
+
 #ifdef WITH_XMB
-  assert((xtfs != NULL) && (xtfs->fontset != NULL) && (xtfs->display != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs->fontset);
 
   XLOCK(xtfs->display);
   width = XmbTextEscapement(xtfs->fontset, c, nbytes);
   XUNLOCK(xtfs->display);
 #else 
-  assert((xtfs != NULL) && (xtfs->font != NULL) && (xtfs->display != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs->font);
 
   XLOCK(xtfs->display);
 
@@ -575,7 +587,9 @@ int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nby
   mbstate_t state;
   size_t    n;
   
-  assert((xtfs != NULL) && (xtfs->fontset != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->fontset);
+  ABORT_IF_NULL(c);
 
   if(maxnbytes <= 0) 
     return 0;
@@ -595,7 +609,9 @@ int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nby
   int           width;
   XCharStruct  *chars;
   
-  assert((xtfs != NULL) && (xtfs->font != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->font);
+  ABORT_IF_NULL(c);
 
   if(maxnbytes <= 0)
     return 0;
@@ -680,7 +696,9 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 #ifdef WITH_XMB
   XRectangle logic;
 
-  assert((xtfs != NULL) && (xtfs->fontset != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->fontset);
+  ABORT_IF_NULL(c);
 
   XLOCK(xtfs->display);
   XmbTextExtents(xtfs->fontset, c, nbytes, NULL, &logic);
@@ -702,7 +720,10 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   int         dir;
   int         fascent, fdescent;
 
-  assert((xtfs != NULL) && (xtfs->font != NULL) && (xtfs->display != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->font);
+  ABORT_IF_NULL(xtfs->display);
+  ABORT_IF_NULL(c);
 
   XLOCK(xtfs->display);
 
@@ -747,10 +768,13 @@ void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
 int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
   int lbearing, rbearing, width, ascent, descent;
   
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->display);
+  ABORT_IF_NULL(c);
 #ifdef WITH_XMB
-  assert((xtfs != NULL) && (xtfs->fontset != NULL) && (xtfs->display != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs->fontset);
 #else 
-  assert((xtfs != NULL) && (xtfs->font != NULL) && (xtfs->display != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs->font);
 #endif
 
   xitk_font_text_extent(xtfs, c, strlen(c), &lbearing, &rbearing, &width, &ascent, &descent);
@@ -764,10 +788,13 @@ int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
 int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
   int lbearing, rbearing, width, ascent, descent;
  
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->display);
+  ABORT_IF_NULL(c);
 #ifdef WITH_XMB
-  assert((xtfs != NULL) && (xtfs->fontset != NULL) && (xtfs->display != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs->fontset);
 #else 
-  assert((xtfs != NULL) && (xtfs->font != NULL) && (xtfs->display != NULL) && (c != NULL));
+  ABORT_IF_NULL(xtfs->font);
 #endif
 
   xitk_font_text_extent(xtfs, c, strlen(c), &lbearing, &rbearing, &width, &ascent, &descent);
@@ -780,7 +807,8 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
  */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
 
-  assert((xtfs != NULL) && (xtfs->display != NULL));
+  ABORT_IF_NULL(xtfs);
+  ABORT_IF_NULL(xtfs->display);
 
 #ifndef WITH_XMB
   XLOCK(xtfs->display);

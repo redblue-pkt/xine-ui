@@ -26,7 +26,6 @@
 #endif
 
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 
 #include "_xitk.h"
@@ -39,7 +38,8 @@ static void xitk_config_colors(xitk_config_t *xtcf) {
   char  *c = NULL;
   int    pixel;
 
-  assert(xtcf != NULL && xtcf->ln != NULL);
+  ABORT_IF_NULL(xtcf);
+  ABORT_IF_NULL(xtcf->ln);
 
   p = xtcf->ln + 6;
   if(p)
@@ -98,7 +98,8 @@ static void xitk_config_fonts(xitk_config_t *xtcf) {
   char  *p = NULL;
   char  *c = NULL;
 
-  assert(xtcf != NULL && xtcf->ln != NULL);
+  ABORT_IF_NULL(xtcf);
+  ABORT_IF_NULL(xtcf->ln);
   
   p = xtcf->ln + 5;
   if(p)
@@ -127,7 +128,8 @@ static void xitk_config_timers(xitk_config_t *xtcf) {
   char  *p = NULL;
   char  *c = NULL;
 
-  assert(xtcf != NULL && xtcf->ln != NULL);
+  ABORT_IF_NULL(xtcf);
+  ABORT_IF_NULL(xtcf->ln);
 
   p = xtcf->ln + 6;
   if(p)
@@ -153,7 +155,8 @@ static void xitk_config_features(xitk_config_t *xtcf) {
   char  *p = NULL;
   char  *c = NULL;
 
-  assert(xtcf != NULL && xtcf->ln != NULL);
+  ABORT_IF_NULL(xtcf);
+  ABORT_IF_NULL(xtcf->ln);
 
   p = xtcf->ln + 8;
   if(p)
@@ -177,7 +180,7 @@ static void xitk_config_features(xitk_config_t *xtcf) {
  */
 static void xitk_config_store_entry(xitk_config_t *xtcf) {
 
-  assert(xtcf != NULL);
+  ABORT_IF_NULL(xtcf);
 
   if(!strncasecmp(xtcf->ln, "feature.", 8))
     xitk_config_features(xtcf);
@@ -196,7 +199,7 @@ static void xitk_config_store_entry(xitk_config_t *xtcf) {
 static void xitk_config_clean_eol(xitk_config_t *xtcf) {
   char *p;
 
-  assert(xtcf != NULL);
+  ABORT_IF_NULL(xtcf);
 
   p = xtcf->ln;
 
@@ -225,7 +228,8 @@ static void xitk_config_clean_eol(xitk_config_t *xtcf) {
  */
 static void xitk_config_get_next_line(xitk_config_t *xtcf) {
 
-  assert(xtcf != NULL && xtcf->fd != NULL);
+  ABORT_IF_NULL(xtcf);
+  ABORT_IF_NULL(xtcf->fd);
   
  __get_next_line:
 
@@ -249,7 +253,7 @@ static void xitk_config_get_next_line(xitk_config_t *xtcf) {
  * load config file.
  */
 static void xitk_config_load_configfile(xitk_config_t *xtcf) {
-  assert(xtcf);
+  ABORT_IF_NULL(xtcf);
   
   xitk_config_get_next_line(xtcf);
   
@@ -268,7 +272,7 @@ static void xitk_config_load_configfile(xitk_config_t *xtcf) {
  * Initialiaze values to default.
  */
 static void xitk_config_init_default_values(xitk_config_t *xtcf) {
-  assert(xtcf != NULL);
+  ABORT_IF_NULL(xtcf);
 
   xtcf->fonts.system           = strdup("fixed");
   xtcf->fonts.fallback         = NULL;

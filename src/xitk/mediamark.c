@@ -28,7 +28,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <sys/types.h>
 #include <dirent.h>
 #include <sys/stat.h>
@@ -278,7 +277,8 @@ static int playlist_split_data(playlist_t *playlist) {
 }
 
 static void set_pos_to_value(char **p) {
-  assert(*p != NULL);
+
+  ABORT_IF_NULL(*p);
 
   while(*(*p) != '\0' && *(*p) != '=' && *(*p) != ':' && *(*p) != '{') ++(*p);
   while(*(*p) == '=' || *(*p) == ':' || *(*p) == ' ' || *(*p) == '\t') ++(*p);
@@ -1443,7 +1443,7 @@ static void smil_header(smil_t *smil, xml_property_t *props) {
   for(prop = props; prop; prop = prop->next) {
 #ifdef DEBUG_SMIL
     palign;
-    printf("%s(): prop_name '%s', value: '%s'\n", __func__,
+    printf("%s(): prop_name '%s', value: '%s'\n", __XINE_FUNCTION__,
     	   prop->name, prop->value ? prop->value : "<NULL>");
 #endif
     
@@ -1549,7 +1549,7 @@ static void smil_properties(smil_t *smil, smil_node_t **snode,
 
 #ifdef DEBUG_SMIL
     palign;
-    printf("%s(): prop_name '%s', value: '%s'\n", __func__,
+    printf("%s(): prop_name '%s', value: '%s'\n", __XINE_FUNCTION__,
 	   prop->name, prop->value ? prop->value : "<NULL>");
 #endif
     
@@ -2164,7 +2164,7 @@ static mediamark_t **guess_smil_playlist(playlist_t *playlist, const char *filen
 	smil_free_smil(&smil);
       }
       else
-	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __func__, xml_tree->name);
+	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
       
       xml_parser_free_tree(xml_tree);
       

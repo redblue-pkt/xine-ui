@@ -96,6 +96,22 @@
 #define XITK_WARNING(...) do { fprintf(stderr, "xiTK WARNING(%s:%d): ", __FUNCTION__, __LINE__); fprintf(stderr, __VA_ARGS__); } while(0)
 #endif
 
+#define ABORT_IF_NULL(p)                                                                 \
+  do {                                                                                   \
+    if((p) == NULL) {                                                                    \
+      fprintf(stderr, "%s(%d): '%s' is NULL. Aborting.\n",  __FUNCTION__, __LINE__, #p); \
+      abort();                                                                           \
+    }                                                                                    \
+  } while(0)
+
+#define ABORT_IF_ZERO(p)                                                                      \
+  do {                                                                                        \
+    if((p) <= 0) {                                                                            \
+      fprintf(stderr, "%s(%d): '%s' <= 0 (%d). Aborting.\n",  __FUNCTION__, __LINE__, #p, p); \
+      abort();                                                                                \
+    }                                                                                         \
+  } while(0)
+
 #define XITK_FREE(X) do { if((X)) { free((X)); (X) = NULL; } } while(0)
 
 #define XITK_CHECK_CONSTITENCY(X) do {                                                    \

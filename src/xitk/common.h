@@ -120,6 +120,14 @@
                                   }            \
                                 } while(0)
 
+#define ABORT_IF_NULL(p)                                                                      \
+  do {                                                                                        \
+    if((p) == NULL) {                                                                         \
+      fprintf(stderr, "%s(%d): '%s' is NULL. Aborting.\n",  __XINE_FUNCTION__, __LINE__, #p); \
+      abort();                                                                                \
+    }                                                                                         \
+  } while(0)
+
 /* Duplicate s to d timeval values */
 #define timercpy(s, d) do {                                                   \
       (d)->tv_sec = (s)->tv_sec;                                              \

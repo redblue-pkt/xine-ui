@@ -25,7 +25,6 @@
 #endif
 
 #include <stdio.h>
-#include <assert.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -527,7 +526,7 @@ static int _is_there_char(const char *str, int c) {
  */
 static int _kbindings_begin_section(kbinding_file_t *kbdf) {
 
-  assert(kbdf != NULL);
+  ABORT_IF_NULL(kbdf);
 
   return _is_there_char(kbdf->ln, '{');
 }
@@ -537,7 +536,7 @@ static int _kbindings_begin_section(kbinding_file_t *kbdf) {
  */
 static int _kbindings_end_section(kbinding_file_t *kbdf) {
 
-  assert(kbdf != NULL);
+  ABORT_IF_NULL(kbdf);
 
   return _is_there_char(kbdf->ln, '}');
 }
@@ -548,7 +547,7 @@ static int _kbindings_end_section(kbinding_file_t *kbdf) {
 static void _kbindings_clean_eol(kbinding_file_t *kbdf) {
   char *p;
 
-  assert(kbdf != NULL);
+  ABORT_IF_NULL(kbdf);
 
   p = kbdf->ln;
 
@@ -577,7 +576,8 @@ static void _kbindings_clean_eol(kbinding_file_t *kbdf) {
  */
 static void _kbindings_get_next_line(kbinding_file_t *kbdf) {
 
-  assert(kbdf != NULL && kbdf->fd != NULL);
+  ABORT_IF_NULL(kbdf);
+  ABORT_IF_NULL(kbdf->fd);
   
  __get_next_line:
 
@@ -604,7 +604,7 @@ static void _kbindings_get_next_line(kbinding_file_t *kbdf) {
  */
 static void _kbindings_set_pos_to_next_char(char **p) {
 
-  assert(*p != NULL);
+  ABORT_IF_NULL(*p);
 
   while(*(*p) != '\0' && (*(*p) == ' ' || *(*p) == '\t')) ++(*p);
 }
@@ -614,7 +614,7 @@ static void _kbindings_set_pos_to_next_char(char **p) {
  */
 static void _kbindings_set_pos_to_value(char **p) {
   
-  assert(*p != NULL);
+  ABORT_IF_NULL(*p);
 
   while(*(*p) != '\0' && *(*p) != '=' && *(*p) != ':' && *(*p) != '{') ++(*p);
   while(*(*p) == '=' || *(*p) == ':' || *(*p) == ' ' || *(*p) == '\t') ++(*p);
@@ -628,7 +628,8 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
   kbinding_entry_t  *k;
   int                modifier;
 
-  assert(kbt != NULL && ukb != NULL);
+  ABORT_IF_NULL(kbt);
+  ABORT_IF_NULL(ukb);
 
   k = kbindings_lookup_action(kbt, ukb->alias);
   if(k) {
@@ -699,7 +700,8 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
 static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
   int i;
 
-  assert(kbt != NULL && ukb != NULL);
+  ABORT_IF_NULL(kbt);
+  ABORT_IF_NULL(ukb);
 
   for(i = 0; kbt->entry[i]->action != NULL; i++) {
 
@@ -750,7 +752,8 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
   user_kbinding_t  *ukb;
   char              *p;
   
-  assert(kbt != NULL && kbdf != NULL);
+  ABORT_IF_NULL(kbt);
+  ABORT_IF_NULL(kbdf);
 
   if((kbdf->ln != NULL) && (*kbdf->ln != '\0')) {
     
@@ -811,7 +814,8 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
 static void _kbinding_load_config(kbinding_t *kbt, char *file) {
   kbinding_file_t *kbdf;
   
-  assert(kbt != NULL && file != NULL);
+  ABORT_IF_NULL(kbt);
+  ABORT_IF_NULL(file);
 
   kbdf = (kbinding_file_t *) xine_xmalloc(sizeof(kbinding_file_t));
   kbdf->bindingfile = strdup(file);
@@ -919,7 +923,7 @@ static void _kbindings_display_kbindings(kbinding_t *kbt, int mode) {
 static void kbindings_convert_modifier(int mod, int *modifier) {
   *modifier = KEYMOD_NOMOD;
   
-  assert(modifier != NULL);
+  ABORT_IF_NULL(modifier);
 
   if(mod & MODIFIER_NOMOD)
     *modifier = KEYMOD_NOMOD;
@@ -1002,7 +1006,7 @@ void kbindings_save_kbinding(kbinding_t *kbt) {
 void kbindings_reset_kbinding(kbinding_t **kbt) {
   kbinding_t *k;
   
-  assert(*kbt != NULL);
+  ABORT_IF_NULL(*kbt);
   
   _kbindings_free_bindings(*kbt);
   k = _kbindings_init_to_default();
@@ -1014,7 +1018,7 @@ void kbindings_reset_kbinding(kbinding_t **kbt) {
  */
 void kbindings_free_kbinding(kbinding_t **kbt) {
 
-  assert(*kbt != NULL);
+  ABORT_IF_NULL(*kbt);
 
   _kbindings_free_bindings(*kbt);
   *kbt = NULL;
@@ -1027,7 +1031,7 @@ kbinding_t *kbindings_duplicate_kbindings(kbinding_t *kbt) {
   int         i;
   kbinding_t *k;
   
-  assert(kbt != NULL);
+  ABORT_IF_NULL(kbt);
   
   k = (kbinding_t *) xine_xmalloc(sizeof(kbinding_t));
   
@@ -1085,7 +1089,7 @@ void kbindings_display_default_lirc_bindings(void) {
  */
 void kbindings_display_current_bindings(kbinding_t *kbt) {
 
-  assert(kbt != NULL);
+  ABORT_IF_NULL(kbt);
 
   _kbindings_display_kbindings(kbt, DEFAULT_DISPLAY_MODE);
 }

@@ -53,8 +53,8 @@
  * Duplicate two mrls entries (s = source, d = destination).
  */
 #define MRL_DUPLICATE(s, d) {                                                 \
-  assert((s) != NULL);                                                        \
-  assert((d) != NULL);                                                        \
+  ABORT_IF_NULL(s);                                                           \
+  ABORT_IF_NULL(d);                                                           \
                                                                               \
   if((s)->origin) {                                                           \
     if((d)->origin) {                                                         \
@@ -99,8 +99,8 @@
 #define MRLS_DUPLICATE(s, d) {                                                \
   int i = 0;                                                                  \
                                                                               \
-  assert((s) != NULL);                                                        \
-  assert((d) != NULL);                                                        \
+  ABORT_IF_NULL(s);                                                           \
+  ABORT_IF_NULL(d);                                                           \
                                                                               \
   while((s) != NULL) {                                                        \
     d[i] = (xine_mrl_t *) malloc(sizeof(xine_mrl_t));                         \

@@ -25,7 +25,6 @@
 #endif
 
 #include <stdio.h>
-#include <assert.h>
 #include <stdarg.h>
 #include <X11/Xlib.h>
 
@@ -38,7 +37,7 @@ unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b) {
   XColor       xcolor;
   unsigned int pixcol;
 
-  assert(im);
+  ABORT_IF_NULL(im);
   
   xcolor.flags = DoRed | DoBlue | DoGreen;
   
@@ -106,7 +105,8 @@ unsigned int xitk_get_pixel_color_warning_background(ImlibData *im) {
  */
 void xitk_image_free_image(ImlibData *im, xitk_image_t **src) {
 
-  assert(im && *src);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(*src);
 
   if((*src)->mask)
     xitk_image_destroy_xitk_pixmap((*src)->mask);
@@ -124,7 +124,9 @@ void xitk_image_free_image(ImlibData *im, xitk_image_t **src) {
 Pixmap xitk_image_create_pixmap(ImlibData *im, int width, int height) {
   Pixmap p;
   
-  assert(im && width && height);
+  ABORT_IF_NULL(im);
+  ABORT_IF_ZERO(width);
+  ABORT_IF_ZERO(height);
   
   XLOCK(im->x.disp);
   p = XCreatePixmap(im->x.disp, im->x.base_window, width, height, im->x.depth);
@@ -138,7 +140,7 @@ Pixmap xitk_image_create_pixmap(ImlibData *im, int width, int height) {
  */
 static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 
-  assert(xpix);
+  ABORT_IF_NULL(xpix);
 
   XLOCK(xpix->imlibdata->x.disp);
 
@@ -176,7 +178,9 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
   XShmSegmentInfo  *shminfo;
 #endif
   
-  assert(im && width && height);
+  ABORT_IF_NULL(im);
+  ABORT_IF_ZERO(width);
+  ABORT_IF_ZERO(height);
   
   xpix = (xitk_pixmap_t *) xitk_xmalloc(sizeof(xitk_pixmap_t));
   xpix->imlibdata = im;
@@ -295,7 +299,7 @@ xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int 
 }
 
 void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p) {
-  assert(p);
+  ABORT_IF_NULL(p);
   p->destroy(p);
 }
 
@@ -305,7 +309,9 @@ void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p) {
 Pixmap xitk_image_create_mask_pixmap(ImlibData *im, int width, int height) {
   Pixmap p;
   
-  assert(im && width && height);
+  ABORT_IF_NULL(im);
+  ABORT_IF_ZERO(width);
+  ABORT_IF_ZERO(height);
   
   XLOCK(im->x.disp);
   p = XCreatePixmap(im->x.disp, im->x.base_window, width, height, 1);
@@ -319,7 +325,11 @@ Pixmap xitk_image_create_mask_pixmap(ImlibData *im, int width, int height) {
  */
 void xitk_image_change_image(ImlibData *im, 
 			     xitk_image_t *src, xitk_image_t *dest, int width, int height) {
-  assert(im && src && dest && width && height);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(src);
+  ABORT_IF_NULL(dest);
+  ABORT_IF_ZERO(width);
+  ABORT_IF_ZERO(height);
   
   if(dest->mask)
     xitk_image_destroy_xitk_pixmap(dest->mask);
@@ -358,7 +368,9 @@ void xitk_image_change_image(ImlibData *im,
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
   xitk_image_t *i;
 
-  assert(im && width && height);
+  ABORT_IF_NULL(im);
+  ABORT_IF_ZERO(width);
+  ABORT_IF_ZERO(height);
 
   i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
   i->mask = NULL;
@@ -387,7 +399,10 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   int             numlines = 0;
   char            bufsubs[BUFSIZ], buf[BUFSIZ];
 
-  assert(im && fontname && str && width);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(fontname);
+  ABORT_IF_NULL(str);
+  ABORT_IF_ZERO(width);
 
   XLOCK(im->x.disp);
   gc = XCreateGC(im->x.disp, im->x.base_window, None, None);
@@ -522,7 +537,8 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
  *
  */
 void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest) {
-  assert(im && dest);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(dest);
   
   if(dest->mask)
     xitk_image_destroy_xitk_pixmap(dest->mask);
@@ -543,7 +559,8 @@ void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p) {
   short          x1, x2, x3;
   short          y1, y2, y3;
   
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
   
   w = p->width / 3;
   h = p->height;
@@ -598,7 +615,8 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
   short          x1, x2, x3;
   short          y1, y2, y3;
 
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
   
   w = p->width / 3;
   h = p->height;
@@ -700,7 +718,10 @@ void draw_arrow_right(ImlibData *im, xitk_image_t *p) {
 static void _draw_rectangular_box(ImlibData *im, xitk_pixmap_t *p, 
 				  int x, int y, int excstart, int excstop,
 				  int width, int height, int relief) {
-  assert(im && p && width && height);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+  ABORT_IF_ZERO(width);
+  ABORT_IF_ZERO(height);
 
   XLOCK(im->x.disp);
   if(relief == DRAW_OUTTER)
@@ -730,7 +751,10 @@ static void _draw_rectangular_box(ImlibData *im, xitk_pixmap_t *p,
 static void _draw_rectangular_box_light(ImlibData *im, xitk_pixmap_t *p, 
 					int x, int y, int excstart, int excstop,
 					int width, int height, int relief) {
-  assert(im && p && width && height);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+  ABORT_IF_ZERO(width);
+  ABORT_IF_ZERO(height);
 
   XLOCK(im->x.disp);
   if(relief == DRAW_OUTTER)
@@ -761,7 +785,10 @@ static void _draw_rectangular_box_with_colors(ImlibData *im, xitk_pixmap_t *p,
 					      int x, int y, int width, int height, 
 					      unsigned int lcolor, unsigned int dcolor,
 					      int relief) {
-  assert(im && p && width && height);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
+  ABORT_IF_ZERO(width);
+  ABORT_IF_ZERO(height);
 
   XLOCK(im->x.disp);
   if(relief == DRAW_OUTTER)
@@ -809,7 +836,8 @@ void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked) {
   int      relief = (checked) ? DRAW_INNER : DRAW_OUTTER;
   int      nrelief = (checked) ? DRAW_OUTTER : DRAW_INNER;
   
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
   
   w = p->width / 3;
   h = p->height - 12;
@@ -826,7 +854,8 @@ static void _draw_three_state(ImlibData *im, xitk_image_t *p, int style) {
   int           w;
   int           h;
 
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
 
   w = p->width / 3;
   h = p->height;
@@ -888,7 +917,8 @@ static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
   int           w;
   int           h;
 
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
 
   w = p->width / 2;
   h = p->height;
@@ -925,7 +955,8 @@ static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
  *
  */
 static void _draw_relief(ImlibData *im, xitk_pixmap_t *p, int w, int h, int relief, int light) {
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
   
   XLOCK(im->x.disp);
   XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_gray(im));
@@ -978,7 +1009,8 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
   int           w;
   int           h;
 
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
 
   w = p->width / 3;
   h = p->height;
@@ -1088,7 +1120,8 @@ void draw_flat(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
  *
  */
 void draw_flat_with_color(ImlibData *im, xitk_pixmap_t *p, int w, int h, unsigned int color) {
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
 
   XLOCK(im->x.disp);
   XSetForeground(im->x.disp, p->gc, color);
@@ -1106,7 +1139,8 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
   int            yoff = 0, xstart = 0, xstop = 0, fheight = 0, fwidth = 0;
   char           buf[BUFSIZ];
 
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
   
   if(title) {
 
@@ -1184,7 +1218,8 @@ void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontn
 void draw_tab(ImlibData *im, xitk_image_t *p) {
   int           w, h;
 
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
 
   w = p->width / 3;
   h = p->height;
@@ -1232,7 +1267,8 @@ void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
   int           h;
   unsigned int  ccolor, fcolor, ncolor;
 
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
   
   w = p->width/3;
   h = p->height;
@@ -1277,7 +1313,8 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
   int           w;
   int           h;
   
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
   
   w = p->width;
   h = p->height;
@@ -1315,7 +1352,8 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
 void draw_button_plus(ImlibData *im, xitk_image_t *p) {
   int           w, h;
   
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
 
   draw_button_minus(im, p);
   
@@ -1338,7 +1376,8 @@ void draw_button_plus(ImlibData *im, xitk_image_t *p) {
 void draw_button_minus(ImlibData *im, xitk_image_t *p) {
   int           w, h;
   
-  assert(im && p);
+  ABORT_IF_NULL(im);
+  ABORT_IF_NULL(p);
   
   w = p->width / 3;
   h = p->height;
@@ -1360,7 +1399,7 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   ImlibImage    *img = NULL;
   xitk_image_t  *i;
 
-  assert(im);
+  ABORT_IF_NULL(im);
 
   if(image == NULL) {
     XITK_WARNING("image name is NULL\n");
