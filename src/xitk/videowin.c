@@ -65,8 +65,6 @@ typedef struct {
 
   int            video_width;     /* size of currently displayed video     */
   int            video_height;
-  int            last_video_width;
-  int            last_video_height;
   int            win_width;       /* size of non-fullscreen window         */
   int            win_height;
   int            output_width;    /* output video window width/height      */
@@ -74,6 +72,7 @@ typedef struct {
   float          mag;
 
   int            stream_resize_window; /* Boolean, 1 if new stream resize output window */
+  int            zoom_small_stream; /* Boolean, 1 to double size small streams */
 
   int            fullscreen_mode; /* are we currently in fullscreen mode?  */
   int            fullscreen_req;  /* ==1 => video_window will 
@@ -125,6 +124,10 @@ static void video_window_adapt_size (void);
 
 static void _video_window_resize_cb(void *data, cfg_entry_t *cfg) {
   gVw->stream_resize_window = cfg->num_value;
+}
+
+static void _video_window_zoom_small_cb(void *data, cfg_entry_t *cfg) {
+  gVw->zoom_small_stream = cfg->num_value;
 }
   
 /*
@@ -659,6 +662,14 @@ static void video_window_adapt_size (void) {
   
 }
 
+static float get_default_mag( int video_width, int video_height )
+{
+  if(gVw->zoom_small_stream && video_width < 300 && video_height < 300 )
+    return 2.0;
+  else
+    return 1.0;
+}
+
 /*
  *
  */
@@ -667,19 +678,22 @@ void video_window_dest_size_cb (void *data,
 				int *dest_width, int *dest_height)  {
   
 
-  if(!gVw->stream_resize_window) {
+  if(gVw->stream_resize_window && !gVw->fullscreen_mode) {
 
     if(gVw->video_width != video_width || gVw->video_height != video_height) {
       
-      gVw->last_video_width = gVw->video_width;
-      gVw->last_video_height = gVw->video_height;
-      
-      gVw->video_width  = video_width;
-      gVw->video_height = video_height;
-      
-      if((video_width > 0) && (video_height > 0))
-	video_window_set_mag(1.0);
+      if((video_width > 0) && (video_height > 0)) {
+        double mag = get_default_mag( video_width, video_height );
 
+        /* FIXME: this is supposed to give the same results as if a 
+         * video_window_set_mag(mag) was called. Since video_window_adapt_size()
+         * check several other details (like border, xinerama, etc) this
+         * may produce wrong values in some cases. (?)
+         */  
+        *dest_width  = (int) ((float) video_width * mag);
+        *dest_height = (int) ((float) video_height * mag);
+        return;
+      }
     }
   }
   
@@ -706,14 +720,13 @@ void video_window_frame_output_cb (void *data,
     gVw->video_height = video_height;
   }
   else {
-    if((gVw->video_width != video_width || gVw->video_height != video_height) &&
-       (gVw->last_video_width != video_width || gVw->last_video_height != video_height)) {
+    if(gVw->video_width != video_width || gVw->video_height != video_height ) {
       
       gVw->video_width  = video_width;
       gVw->video_height = video_height;
       
-      if(video_width && video_height)
-	video_window_set_mag(1.0);
+      if(video_width > 0 && video_height > 0)
+	video_window_set_mag(get_default_mag( video_width, video_height ));
     }
   }
 
@@ -958,6 +971,11 @@ void video_window_init (window_attributes_t *window_attribute) {
 							  "gui.stream_resize_window", 0,
 							  "New stream sizes resize output window",
 							  NULL, _video_window_resize_cb, NULL);
+  
+  gVw->zoom_small_stream = gGui->config->register_bool(gGui->config, 
+							  "gui.zoom_small_stream", 0,
+							  "Double size for small streams (require stream_resize_window)",
+							  NULL, _video_window_zoom_small_cb, NULL);
      
   if((window_attribute->width > 0) && (window_attribute->height > 0)) {
     gVw->video_width  = window_attribute->width;
@@ -972,7 +990,6 @@ void video_window_init (window_attributes_t *window_attribute) {
   else {
     gVw->video_width  = 768;
     gVw->video_height = 480;
-    gVw->last_video_width = gVw->last_video_height = 0;
   }
 
 #ifdef HAVE_XF86VIDMODE
