@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "POT-Creation-Date: 2003-11-11 22:22+0100\n"
-"PO-Revision-Date: 2003-11-09 22:50+0100\n"
+"PO-Revision-Date: 2003-11-15 17:08+0100\n"
 "Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"
 "MIME-Version: 1.0\n"
@@ -583,11 +583,11 @@ msgstr "Se abilitato, Xine mostrerà il suo splash screen"
 
 #: src/xitk/event.c:1311
 msgid "Audio mixer control method"
-msgstr ""
+msgstr "MEtodo di controllo dell'audio del mixer"
 
 #: src/xitk/event.c:1312
 msgid "Which method used to control audio volume."
-msgstr ""
+msgstr "Quale metodo si è usato per controllare il volume audio"
 
 #. Some infos
 #: src/xitk/event.c:1325
@@ -953,49 +953,48 @@ msgstr "Trovata libreria Xine versione: %d.%d.%d (%s).\n"
 
 #: src/xitk/main.c:478
 msgid "   -Audio output:\n"
-msgstr ""
+msgstr "   -Output audio:\n"
 
 #: src/xitk/main.c:479
-#, fuzzy
 msgid "   -Video output:\n"
-msgstr "output video di Xine"
+msgstr "   -Output video:\n"
 
 #: src/xitk/main.c:480
 msgid "   -Demuxer:\n"
-msgstr ""
+msgstr "   -Demuxer:\n"
 
 #: src/xitk/main.c:481
-#, fuzzy
 msgid "   -Input:\n"
-msgstr "Input: "
+msgstr "   -Input:\n"
 
 #: src/xitk/main.c:482
-#, fuzzy
 msgid "   -Subpicture:\n"
-msgstr "Sottoimmagine"
+msgstr "   -Sottoimmagine:\n"
 
 #: src/xitk/main.c:483
 msgid "   -Post processing:\n"
-msgstr ""
+msgstr "   -Post processo:\n"
 
 #: src/xitk/main.c:484
 msgid "   -Audio decoder:\n"
-msgstr ""
+msgstr "   -Decodificatore audio:\n"
 
 #: src/xitk/main.c:485
 msgid "   -Video decoder:\n"
-msgstr ""
+msgstr "   -Decodificatore video:\n"
 
 #: src/xitk/main.c:510 src/xitk/main.c:522
 msgid ""
 "\n"
 " Available xine's plugins:\n"
 msgstr ""
+"\n"
+" Plugin disponibili di xine:\n"
 
 #: src/xitk/main.c:519
-#, fuzzy, c-format
+#, c-format
 msgid "No available plugins found of %s type!.\n"
-msgstr "Nessuna skin disponibile. Dico arrivederci.\n"
+msgstr "Nessun plugin disponibile trovato tra i tipi %s!\n"
 
 #: src/xitk/main.c:563
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
@@ -1448,21 +1447,20 @@ msgstr ""
 msgid ""
 "      --list-plugins [=type]   Display the list of all available plugins,\n"
 msgstr ""
+"      --list-plugins [=tipo]   Motsra l'elenco di plugin disponibili,\n"
 
 #: src/xitk/main.c:681
-#, fuzzy
 msgid "                               Optional <type> can be:\n"
-msgstr "                                 <p> può essere:\n"
+msgstr ""
+"                               Il valore opzionale <tipo> può essere:\n"
 
 #: src/xitk/main.c:682
-#, fuzzy
 msgid "                    audio_out, video_out, demux, input, sub, post,\n"
-msgstr "                    play, slow2, slow4, pause, fast2,\n"
+msgstr "                    audio_out, video_out, demux, input, sub, post,\n"
 
 #: src/xitk/main.c:683
-#, fuzzy
 msgid "                    audio_decoder, video_decoder.\n"
-msgstr "                    'w': nascondi finestra video.\n"
+msgstr "                    audio_decoder, video_decoder.\n"
 
 #: src/xitk/main.c:685
 msgid "examples for valid MRLs (media resource locator):\n"
