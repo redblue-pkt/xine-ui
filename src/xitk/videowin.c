@@ -1423,13 +1423,35 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
     
     if(XF86VidModeQueryExtension(gGui->display, &dummy_query_event, &dummy_query_error)) {
       XF86VidModeModeInfo* XF86_modelines_swap;
-      int                  major, minor, sort_x, sort_y;
+      int                  mode, major, minor, sort_x, sort_y;
       
       XF86VidModeQueryVersion(gGui->display, &major, &minor);
       printf(_("XF86VidMode Extension (%d.%d) detected, trying to use it.\n"), major, minor);
       
-      if(XF86VidModeGetAllModeLines(gGui->display, XDefaultScreen(gGui->display), &(gVw->XF86_modelines_count), &(gVw->XF86_modelines))) {
+      if(XF86VidModeGetAllModeLines(gGui->display, 
+				    XDefaultScreen(gGui->display),
+				    &(gVw->XF86_modelines_count), &(gVw->XF86_modelines))) {
 	printf(_("XF86VidMode Extension: %d modelines found.\n"), gVw->XF86_modelines_count);
+	
+	/* first, kick off unsupported modes */
+	for(mode = 1; mode < gVw->XF86_modelines_count; mode++) {
+
+	  if(XF86VidModeValidateModeLine(gGui->display,
+					 gGui->screen, gVw->XF86_modelines[mode]) != Success) {
+	    int wrong_mode;
+	    
+	    printf(_("XF86VidModeModeLine %dx%d isn't valid: discarded.\n"), 
+		   gVw->XF86_modelines[mode]->hdisplay,
+		   gVw->XF86_modelines[mode]->vdisplay);
+	    
+	    for(wrong_mode = mode; wrong_mode < gVw->XF86_modelines_count; wrong_mode++)
+	      gVw->XF86_modelines[wrong_mode] = gVw->XF86_modelines[wrong_mode + 1];
+	    
+	    gVw->XF86_modelines[wrong_mode] = NULL;
+	    gVw->XF86_modelines_count--;
+	    mode--;
+	  }
+	}
 	
 	/*
 	 * sorting modelines, skipping first entry because it is the current
@@ -1437,7 +1459,9 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 	 * we have to switch to when toggling fullscreen mode.
 	 */
 	for(sort_x = 1; sort_x < gVw->XF86_modelines_count; sort_x++) {
+
 	  for(sort_y = sort_x+1; sort_y < gVw->XF86_modelines_count; sort_y++) {
+
 	    if(gVw->XF86_modelines[sort_x]->hdisplay > gVw->XF86_modelines[sort_y]->hdisplay) {
 	      XF86_modelines_swap = gVw->XF86_modelines[sort_y];
 	      gVw->XF86_modelines[sort_y] = gVw->XF86_modelines[sort_x];
@@ -1494,6 +1518,15 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
  */
 void video_window_exit (void) {
   xine_tvmode_exit (gGui->xine);
+#ifdef HAVE_XF86VIDMODE
+  /* Restore original VidMode */
+  if(gGui->XF86VidMode_fullscreen) {
+    XLockDisplay(gGui->display);
+    XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[0]);
+    XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
+    XUnlockDisplay(gGui->display);
+  }
+#endif
 }
 
 
