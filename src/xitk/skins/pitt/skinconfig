@@ -3,30 +3,23 @@
 #						Color	Color	Color
 ## Main GUI ##
 BackGround:	0	0	bg.png
-
 Close:		0	8	close.png
 FullScreen:	0	22	fullsc.png
 Exit:		0	89	power.png
-
 Letters:	0	0	letters.png
-
 TitleLabel:	23	15	letters.png
 TimeLabel:	23	35	letters.png
-
 AudioPrev:	242	36	ptdn.png
 AudioNext:	253	35	ptup.png
 AudioLabel:	246	15	letters.png
-
 Next:		270	89	next.png
 Pause:		244	88	pause.png
 Play:		222	89	play.png
 Stop:		197 	88	stop.png
 Prev:		173	88	prev.png
 Eject:		23	88	eject.png
-
 AutoPlayGUI:	55	58	smallbtn.png	Black	Black	Black
 PlBtn:		220	55	largebtn.png	Black	Black	Black
-
 SliderBGPlay:	23	78	slider_bg.png
 SliderFGPlay:	0	0	slider_pad.png
 
@@ -37,6 +30,7 @@ SpuLabel:	271	15	letters.png
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png
+PlAdd:		355	202	pl_btn.png	Black   Black	Black
 PlLoad:		251	185	pl_btn.png	Black   Black	Black
 PlSave:		251	202	pl_btn.png	Black   Black	Black
 PlItemBtn:	30	20	pl_itembtn.png	Black   Black	Black
@@ -46,14 +40,29 @@ PlPlay:		30	234	pl_btn.png	Black	Black	Black
 PlDelete:	143 	234	pl_btn.png	Black	Black	Black
 PlDeleteAll:	251	234	pl_btn.png	Black	Black	Black
 PlDismiss:	355	234	pl_btn.png	Black	Black	Black
-
 PlUp:		324	21	arrowup.png
 PlSlidBG:	326	36	pl_slidv.png
 PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		324	160	arrowdn.png
-
 AutoPlayLbl:	4100	40	letters.png
 AutoPlayBG:	30	185	pl_btn.png	Black   Black	Black
+
+#File Browser
+FBBG:		0	0	pl_bg.png
+FBItemBtn:	30	20	pl_itembtn.png	Black   Black	Black
+FBMoveUp:	143	185	pl_btn.png	Black	Black	Black
+FBMoveDn:	143	202	pl_btn.png	Black	Black	Black
+FBSlidBG:	326	36	pl_slidv.png
+FBSlidFG:	0	0	pl_slidpad.png
+FBSelect:	30	234	pl_btn.png	Black	Black	Black
+FBHome:		143 	234	pl_btn.png	Black	Black	Black
+FBDismiss:	355	234	pl_btn.png	Black	Black	Black
+FBUp:		324	21	arrowup.png
+FBDn:		324	160	arrowdn.png
+FBCurDirLbl:	30	190	letters.png
+FBCurDir:	95	190	letters.png
+FBSortRev:	340	145	arrowup.png
+FBSortDef:	340	160	arrowdn.png
 
 ## control panel ##
 CtlBtn:		149	55	largebtn.png	Black	Black	Black

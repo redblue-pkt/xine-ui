@@ -32,6 +32,7 @@ CtlBtn:		210	42	largebtn.png    LightGray	White	Red
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png
+PlAdd:		350	141	pl_btn.png	LightGray	White	Red
 PlLoad:		350	164	pl_btn.png	LightGray	White	Red
 PlSave:		350	187	pl_btn.png	LightGray	White	Red
 PlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red
@@ -47,6 +48,22 @@ PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		328	175	arrowdn2.png
 AutoPlayLbl:	360	40	letters.png
 AutoPlayBG:	350	62	pl_btn.png	LightGray	White	Red
+
+### File Browser ##
+FBBG:		0	0	pl_bg.png
+FBItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red
+FBSelect:	61	210	pl_btn.png	LightGray	White	Red
+FBHome:		139 	210	pl_btn.png	LightGray	White	Red
+FBDismiss:	350	210	pl_btn.png	LightGray	White	Red
+FBUp:		328	30	arrowup2.png
+FBSlidBG:	327	45	pl_slidv.png
+FBSlidFG:	0	0	pl_slidpad.png
+FBDn:		328	175	arrowdn2.png
+FBCurDirLbl:	45	186	letters.png
+FBCurDir:	35	186	letters.png
+FBSortRev:	345	160	arrowup2.png
+FBSortDef:	345	175	arrowdn2.png
+
 
 #Control Panel
 CtlBG:		0	0	pl_bg.png
