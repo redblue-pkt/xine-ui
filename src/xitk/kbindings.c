@@ -1185,7 +1185,7 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 static void kbedit_create_browser_entries(void) {
-  int i;
+  int i, j;
   
   if(kbedit->num_entries) {
     for(i = 0; i < kbedit->num_entries; i++)
@@ -1199,11 +1199,43 @@ static void kbedit_create_browser_entries(void) {
   
   for(i = 0; i < kbedit->num_entries; i++) {
     char buf[256];
-    memset(&buf, 0, 256);
+    char shortcut[256];
+
+    memset(&buf, 0, sizeof(buf));
+    memset(&shortcut, 0, sizeof(shortcut));
+    
     if(kbedit->kbt->entry[i]->is_alias)
-      sprintf(buf, "@{%s}", kbedit->kbt->entry[i]->comment);
+      sprintf(buf, "@{%s} ", kbedit->kbt->entry[i]->comment);
     else
       sprintf(buf, "%s", kbedit->kbt->entry[i]->comment);
+    
+    sprintf(shortcut, "%2s", "[ ");
+    
+    if(kbedit->kbt->entry[i]->modifier != KEYMOD_NOMOD) {
+      
+      if(kbedit->kbt->entry[i]->modifier & KEYMOD_CONTROL)
+	sprintf(shortcut, "%s%c", shortcut, 'C');
+      if(kbedit->kbt->entry[i]->modifier & KEYMOD_META)
+	sprintf(shortcut, "%s%c", shortcut, 'M');
+      if(kbedit->kbt->entry[i]->modifier & KEYMOD_MOD3)
+	sprintf(shortcut, "%s%2s", shortcut, "M3");
+      if(kbedit->kbt->entry[i]->modifier & KEYMOD_MOD4)
+	sprintf(shortcut, "%s%2s", shortcut, "M4");
+      if(kbedit->kbt->entry[i]->modifier & KEYMOD_MOD5)
+	sprintf(shortcut, "%s%2s", shortcut, "M5");
+
+      sprintf(shortcut, "%s%c", shortcut, '-');
+    }
+
+    sprintf(shortcut, "%s%s ]", shortcut, kbedit->kbt->entry[i]->key);
+
+    /* Right align shotcuts */
+    j = 78 - (strlen(buf) + strlen(shortcut));
+    while((j--))
+      sprintf(buf, "%s%c", buf, ' ');
+    
+    sprintf(buf, "%s%s", buf, shortcut);
+    
     kbedit->entries[i] = strdup(buf);
   }
   kbedit->entries[i] = NULL;
@@ -1593,7 +1625,6 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
       kbedit->kbt->num_entries++;
       
       kbedit_create_browser_entries();
-      
       xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
       break;
       
@@ -1601,6 +1632,9 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
       kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char *) * (strlen(kbe.key) + 1));
       sprintf(kbedit->ksel->key, "%s", kbe.key);
       kbedit->ksel->modifier = kbe.modifier;
+
+      kbedit_create_browser_entries();
+      xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
       break;
     }
     
