@@ -41,42 +41,23 @@ extern gGui_t             *gGui;
 #define PLAYL_LOAD         8
 #define PLAYL_SAVE         9
 #define PLAYL_EDIT        10
+#define PLAYL_NO_LOOP     11
+#define PLAYL_LOOP        12
+#define PLAYL_REPEAT      13
+#define PLAYL_SHUFFLE     14
+#define PLAYL_SHUF_PLUS   15
 
-#define AUDIO_MUTE        11
+#define AUDIO_MUTE        16
 
-#define VIDEO_FULLSCR     12
-#define VIDEO_2X          13
-#define VIDEO_1X          14
-#define VIDEO__5X         15
+#define VIDEO_FULLSCR     17
+#define VIDEO_2X          18
+#define VIDEO_1X          19
+#define VIDEO__5X         20
 
-#define SETS_SETUP        16
-#define SETS_KEYMAP       17
-#define SETS_VIDEO        18
-#define SETS_LOGS         19
-
-static void menu_loopmode(xitk_widget_t *w, void *data) {
-  int loop = (int) data;
-
-  gGui->playlist.loop = loop;
-
-  switch(gGui->playlist.loop) {
-  case PLAYLIST_LOOP_NO_LOOP:
-    osd_display_info(_("Playlist: no loop."));
-    break;
-  case PLAYLIST_LOOP_LOOP:
-    osd_display_info(_("Playlist: loop."));
-    break;
-  case PLAYLIST_LOOP_REPEAT:
-    osd_display_info(_("Playlist: entry repeat."));
-    break;
-  case PLAYLIST_LOOP_SHUFFLE:
-    osd_display_info(_("Playlist: shuffle."));
-    break;
-  case PLAYLIST_LOOP_SHUF_PLUS:
-    osd_display_info(_("Playlist: shuffle forever."));
-    break;
-  }
-}
+#define SETS_SETUP        21
+#define SETS_KEYMAP       22
+#define SETS_VIDEO        23
+#define SETS_LOGS         24
 
 static void menu_panel_visibility(xitk_widget_t *w, void *data) {
   gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
@@ -139,6 +120,23 @@ static void menu_playlist_ctrl(xitk_widget_t *w, void *data) {
     gui_execute_action_id(ACTID_PLAYLIST);
     break;
 
+  case PLAYL_NO_LOOP:
+    gGui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
+    osd_display_info(_("Playlist: no loop."));
+  case PLAYL_LOOP:
+    gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
+    osd_display_info(_("Playlist: loop."));
+  case PLAYL_REPEAT:
+    gGui->playlist.loop = PLAYLIST_LOOP_REPEAT;
+    osd_display_info(_("Playlist: entry repeat."));
+  case PLAYL_SHUFFLE:
+    gGui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
+    osd_display_info(_("Playlist: shuffle."));
+  case PLAYL_SHUF_PLUS:
+    gGui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
+    osd_display_info(_("Playlist: shuffle forever."));
+    break;
+
   default:
     printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
     break;
@@ -156,6 +154,11 @@ static void menu_audio_ctrl(xitk_widget_t *w, void *data) {
     printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
     break;
   }
+}
+static void menu_aspect(xitk_widget_t *w, void *data) {
+  int aspect = (int) data;
+  
+  gui_toggle_aspect(aspect);
 }
 static void menu_video_ctrl(xitk_widget_t *w, void *data) {
   int ctrl = (int) data;
@@ -214,6 +217,7 @@ static void menu_quit(xitk_widget_t *w, void *data) {
 }
 
 void video_window_menu(xitk_widget_list_t *wl) {
+  int                  aspect = xine_get_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO);
   int                  x, y;
   xitk_menu_widget_t   menu;
   char                 buffer[2048];
@@ -250,8 +254,17 @@ void video_window_menu(xitk_widget_list_t *wl) {
       NULL,                                                              NULL                   },
     { "Playlist/Loop modes",            "<branch>",
       NULL,                                                              NULL                   },
-    { "Playlist/Loop modes/FILLME",     NULL,
-      NULL,                                                              NULL                   },
+
+    { "Playlist/Loop modes/Disabled",   NULL,
+      menu_playlist_ctrl,                                                (void *) PLAYL_NO_LOOP },
+    { "Playlist/Loop modes/Loop",   NULL,
+      menu_playlist_ctrl,                                                (void *) PLAYL_LOOP },
+    { "Playlist/Loop modes/Repeat Selection",   NULL,
+      menu_playlist_ctrl,                                                (void *) PLAYL_REPEAT },
+    { "Playlist/Loop modes/Shuffle",   NULL,
+      menu_playlist_ctrl,                                                (void *) PLAYL_SHUFFLE },
+    { "Playlist/Loop modes/Non-stop Shuffle",   NULL,
+      menu_playlist_ctrl,                                                (void *) PLAYL_SHUF_PLUS },
     { "Playlist/SEP",                   "<separator>",
       NULL,                                                              NULL                   },
     { "Playlist/Load",                  NULL,
@@ -270,6 +283,18 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu_audio_ctrl,                                                   (void *) AUDIO_MUTE    },
     { "SEP",                            "<separator>",              
       NULL,                                                              NULL                   },
+    { "Aspect ratio",                   "<branch>",
+      NULL,                                                              NULL                   },
+    { "Aspect ratio/Automatic",         (aspect == XINE_VO_ASPECT_AUTO) ? "<checked>" : "<check>",
+      menu_aspect,                                                       (void *) XINE_VO_ASPECT_AUTO    },
+    { "Aspect ratio/Square",            (aspect == XINE_VO_ASPECT_SQUARE) ? "<checked>" : "<check>",
+      menu_aspect,                                                       (void *) XINE_VO_ASPECT_SQUARE  },
+    { "Aspect ratio/4:3",               (aspect == XINE_VO_ASPECT_4_3) ? "<checked>" : "<check>",
+      menu_aspect,                                                       (void *) XINE_VO_ASPECT_4_3     },
+    { "Aspect ratio/Anamorphic",        (aspect == XINE_VO_ASPECT_ANAMORPHIC) ? "<checked>" : "<check>",
+      menu_aspect,                                                       (void *) XINE_VO_ASPECT_ANAMORPHIC },
+    { "Aspect ratio/DVB",               (aspect == XINE_VO_ASPECT_DVB) ? "<checked>" : "<check>",
+      menu_aspect,                                                       (void *) XINE_VO_ASPECT_DVB     },
     { "Fullscreen\\/Window",            video_window_get_fullscreen_mode() ? "<checked>" : "<check>",
       menu_video_ctrl,                                                   (void *) VIDEO_FULLSCR },
     { "200%",                           (video_window_get_mag() == 2.0) ? "<checked>":"<check>",
@@ -312,6 +337,4 @@ void video_window_menu(xitk_widget_list_t *wl) {
   
   (void *) xitk_noskin_menu_create(wl, &menu, x, y);
   
-
-
 }

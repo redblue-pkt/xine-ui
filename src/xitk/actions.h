@@ -56,7 +56,7 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data);
 
 void gui_set_xinerama_fullscreen_mode(xitk_widget_t *w, void *data);
 
-void gui_toggle_aspect(void);
+void gui_toggle_aspect(int aspect);
 
 void gui_toggle_interlaced(void);
 

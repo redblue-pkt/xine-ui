@@ -746,7 +746,7 @@ void gui_set_xinerama_fullscreen_mode(xitk_widget_t *w, void *data) {
   set_fullscreen_mode((video_window_get_fullscreen_mode() + 4));
 }
 
-void gui_toggle_aspect(void) {
+void gui_toggle_aspect(int aspect) {
   static char *ratios[XINE_VO_ASPECT_NUM_RATIOS + 1] = {
     "Auto",
     "Square",
@@ -756,8 +756,10 @@ void gui_toggle_aspect(void) {
     NULL
   };
 
-  xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, 
-		 (xine_get_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO)) + 1);
+  if(aspect == -1)
+    aspect = xine_get_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO) + 1;
+  
+  xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect);
   
   osd_display_info(_("Aspect ratio: %s"), 
 		   ratios[xine_get_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO)]);
