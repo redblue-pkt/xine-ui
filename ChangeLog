@@ -1,5 +1,7 @@
 xine-ui (0.9.22) unstable; urgency=low
 
+  * don't show up mouse cursor on keyboard action.
+  * network control can manage loop modes.
   * fix crash when pressing 'm' or 'n' with empty playlist
 	
 xine-ui (0.9.21) unstable; urgency=low
