@@ -105,6 +105,27 @@ else
   fi
 fi
 # End Gnome
+# Kde3
+if test -d /opt/kde3/; then
+  DIR_HI3=/opt/kde3/share/icons/hicolor
+  DIR_LO3=/opt/kde3/share/icons/locolor
+  HIRES3='48x48 32x32 22x22'
+  LORES3='32x32 22x22 16x16'
+  for hires in $HIRES3; do
+    %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI3/$hires/apps
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$hires.png $DIR_HI3/$hires/apps/xine.png
+  done
+  for lores in $LORES3; do
+    %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO3/$lores/apps
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$lores.png $DIR_LO3/$lores/apps/xine.png
+  done
+  if test ! -d /opt/kde3/share/applnk/Multimedia; then
+    %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde3/share/applnk/Multimedia
+  fi
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop
+  cat /opt/kde3/share/applnk/Multimedia/xine.desktop | sed -e "s/xine.xpm/\xine/g" > /opt/kde3/share/applnk/Multimedia/xine.desktop
+fi
+# End Kde3
 # Kde2
 if test -d /opt/kde2/; then
   DIR_HI=/opt/kde2/share/icons/hicolor
@@ -152,18 +173,30 @@ fi
 %preun
   DIR_HI=/opt/kde2/share/icons/hicolor
   DIR_LO=/opt/kde2/share/icons/locolor
+  
+  HIRES='48x48 32x32 22x22'
+  LORES='32x32 22x22 16x16'
 
-  REMOVALS='%{_datadir}/icons/xine.xpm %{_datadir}/pixmaps/xine.xpm %{_sysconfdir}/X11/wmconfig/xine %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop'
+  HIRES3='48x48 32x32 22x22'
+  LORES3='32x32 22x22 16x16'
+
+  REMOVALS='%{_datadir}/icons/xine.xpm %{_datadir}/pixmaps/xine.xpm %{_sysconfdir}/X11/wmconfig/xine %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop  %{_datadir}/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop'
+  
   for remove in $REMOVALS; do
     rm -f $remove
   done
-  HIRES='48x48 32x32 22x22'
-  LORES='32x32 22x22 16x16'
   for hires in $HIRES; do
     rm -f $DIR_HI/$hires/apps/xine.png
   done
   for lores in $LORES; do
     rm -f $DIR_LO/$lores/apps/xine.png
+  done
+  
+  for hires in $HIRES3; do
+    rm -f $DIR_HI3/$hires/apps/xine.png
+  done
+  for lores in $LORES3; do
+    rm -f $DIR_LO3/$lores/apps/xine.png
   done
 
 %clean
@@ -184,8 +217,10 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sun May 20 2002 Matthias Dahl <matthew2k@web.de>
+- added kde3 support by Manfred Tremmel <Manfred.Tremmel@iiv.de> 
 * Sat May 18 2002 Matthias Dahl <matthew2k@web.de>
-- adding czech translations by valtri@atlas.cz
+- added czech translations by valtri@atlas.cz
 * Thu May 16 2002 Matthias Dahl <matthew2k@web.de>
 - replaced %configure because it was causing trouble on some configurations
 * Sat May 11 2002 Matthias Dahl <matthew2k@web.de>
