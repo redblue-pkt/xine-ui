@@ -203,10 +203,15 @@ static int fbxine_init(int argc, char **argv)
 
 static void install_abort(void)
 {
-	int trapped[] = { SIGINT, SIGQUIT, SIGILL,
-			  SIGFPE, SIGKILL, SIGBUS,
-			  SIGSEGV, SIGSYS, SIGPIPE,
-			  SIGTERM, SIGSTKFLT };
+	static int trapped[] = {
+		SIGINT, SIGQUIT, SIGILL,
+		SIGFPE, SIGKILL, SIGBUS,
+		SIGSEGV, SIGSYS, SIGPIPE,
+		SIGTERM,
+#ifdef SIGSTKFLT
+		SIGSTKFLT,
+#endif
+	};
 	int i;
 	
 	for(i = 0; i < sizeof(trapped)/sizeof(int); i++)
