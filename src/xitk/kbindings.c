@@ -1673,7 +1673,7 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
       
       xitk_browser_update_list(kbedit->browser, 
 			       (const char* const*) kbedit->entries, 
-			       (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
+			       (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
     }
     else
       xine_error(_("You can only delete alias entries."));
@@ -1694,7 +1694,7 @@ static void kbedit_reset(xitk_widget_t *w, void *data) {
   kbedit_create_browser_entries();
   xitk_browser_update_list(kbedit->browser, 
 			   (const char* const*) kbedit->entries, 
-			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
+			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
 }
 
 /*
@@ -1723,7 +1723,6 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
   switch(kbedit->action_wanted) {
     
   case KBEDIT_ALIASING:
-
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment = strdup(kbedit->ksel->comment);
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action = strdup(kbedit->ksel->action);
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
@@ -1744,7 +1743,7 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
     kbedit_create_browser_entries();
     xitk_browser_update_list(kbedit->browser, 
 			     (const char* const*) kbedit->entries, 
-			     (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
+			     (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
     break;
     
   case KBEDIT_EDITING:
@@ -1755,7 +1754,7 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
     kbedit_create_browser_entries();
     xitk_browser_update_list(kbedit->browser, 
 			     (const char* const*) kbedit->entries, 
-			     (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
+			     (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
     break;
   }
 
@@ -1776,7 +1775,7 @@ static void kbedit_accept_no(xitk_widget_t *w, void *data, int state) {
   
   xitk_browser_update_list(kbedit->browser, 
 			   (const char* const*) kbedit->entries, 
-			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
+			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
   SAFE_FREE(kbe->comment);
   SAFE_FREE(kbe->action);
   SAFE_FREE(kbe->key);
@@ -2077,7 +2076,7 @@ void kbedit_window(void) {
   xitk_browser_set_alignment(kbedit->browser, ALIGN_LEFT);
   xitk_browser_update_list(kbedit->browser, 
 			   (const char* const*) kbedit->entries, 
-			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
+			   (const char* const*) kbedit->shortcuts, kbedit->num_entries, xitk_browser_get_current_start(kbedit->browser));
 
   y = (WINDOW_HEIGHT - 160);
 
