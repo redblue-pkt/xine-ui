@@ -427,20 +427,22 @@ static void *slider_loop(void *dummy) {
 	char *ident = stream_infos_get_ident_from_stream(gGui->stream);
 	
 	if(ident) {
-	  if(strcmp(gGui->mmk.ident, ident)) {
-	    if(gGui->mmk.ident)
-	      free(gGui->mmk.ident);
-	    if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
-	      free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
-	    
-	    gGui->mmk.ident = strdup(ident);
-	    gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(ident);
-	    
-	    video_window_set_mrl(gGui->mmk.ident);
-	    playlist_mrlident_toggle();
-	    panel_update_mrl_display();
+	  if(gGui->playlist.num) {
+	    if(strcmp(gGui->mmk.ident, ident)) {
+	      if(gGui->mmk.ident)
+		free(gGui->mmk.ident);
+	      if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
+		free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	      
+	      gGui->mmk.ident = strdup(ident);
+	      gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(ident);
+	      
+	      video_window_set_mrl(gGui->mmk.ident);
+	      playlist_mrlident_toggle();
+	      panel_update_mrl_display();
+	    }
+	    free(ident);
 	  }
-	  free(ident);
 	}
 	else
 	  video_window_set_mrl((char *)gGui->mmk.mrl);
