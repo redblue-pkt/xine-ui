@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
-"POT-Creation-Date: 2003-05-02 19:48+0200\n"
-"PO-Revision-Date: 2003-03-14 08:46+0100\n"
+"POT-Creation-Date: 2003-05-04 23:24+0200\n"
+"PO-Revision-Date: 2003-05-04 23:40+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -63,59 +63,59 @@ msgstr ""
 msgid "Start Playback ?"
 msgstr "Wiedergabe starten ?"
 
-#: src/xitk/actions.c:566
+#: src/xitk/actions.c:552
 msgid "No MRL (input stream) specified"
 msgstr "Keine MRL (Eingabedatenstrom) angegeben"
 
-#: src/xitk/actions.c:832
+#: src/xitk/actions.c:818
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Seitenverhältnis: %s"
 
-#: src/xitk/actions.c:853
+#: src/xitk/actions.c:839
 #, c-format
 msgid "Deinterlace: %d"
 msgstr "Deinterlace: %d"
 
-#: src/xitk/actions.c:1071 src/xitk/actions.c:1088 src/xitk/post.c:53
+#: src/xitk/actions.c:1057 src/xitk/actions.c:1074 src/xitk/post.c:53
 #: src/xitk/post.c:65
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): Kann keinen neuen Thread erzeugen (%s)\n"
 
-#: src/xitk/actions.c:1351
+#: src/xitk/actions.c:1337
 msgid "There is no mrl."
 msgstr "Das ist keine MRL."
 
-#: src/xitk/actions.c:1490 src/xitk/actions.c:1502 src/xitk/menus.c:247
+#: src/xitk/actions.c:1476 src/xitk/actions.c:1488 src/xitk/menus.c:247
 #: src/xitk/menus.c:261 src/xitk/panel.c:749 src/xitk/session.c:403
 msgid "Audio Volume"
 msgstr "Lautstärke"
 
-#: src/xitk/actions.c:1562
+#: src/xitk/actions.c:1548
 #, c-format
 msgid "TV Mode: %d"
 msgstr "TV-Modus: %d"
 
-#: src/xitk/actions.c:1583
+#: src/xitk/actions.c:1569
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) fehlgeschlagen.\n"
 
-#: src/xitk/actions.c:1675 src/xitk/actions.c:1733 src/xitk/event_sender.c:497
-#: src/xitk/mediamark.c:2446
+#: src/xitk/actions.c:1661 src/xitk/actions.c:1719 src/xitk/event_sender.c:497
+#: src/xitk/mediamark.c:2464
 msgid "Select"
 msgstr "Auswählen"
 
-#: src/xitk/actions.c:1678
+#: src/xitk/actions.c:1664
 msgid "Select all"
 msgstr "Alles auswählen"
 
-#: src/xitk/actions.c:1683
+#: src/xitk/actions.c:1669
 msgid "Stream(s) loading"
 msgstr "Ströme laden"
 
-#: src/xitk/actions.c:1738 src/xitk/mediamark.c:2451
+#: src/xitk/actions.c:1724 src/xitk/mediamark.c:2469
 msgid "Pick a subtitle file"
 msgstr "Wähle eine Untertiteldatei"
 
@@ -151,7 +151,7 @@ msgstr "Kontrastwert"
 msgid "Contrast value."
 msgstr "Kontrastwert."
 
-#: src/xitk/control.c:468 src/xitk/panel.c:151 src/xitk/playlist.c:909
+#: src/xitk/control.c:468 src/xitk/panel.c:151 src/xitk/playlist.c:917
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): Konnte Hintergrund-Bild nicht finden\n"
@@ -200,7 +200,7 @@ msgstr "Kon"
 msgid "Choose a Skin"
 msgstr "Skin-Auswahl"
 
-#: src/xitk/control.c:803 src/xitk/mrl_browser.c:279 src/xitk/playlist.c:1202
+#: src/xitk/control.c:803 src/xitk/mrl_browser.c:279 src/xitk/playlist.c:1210
 msgid "Dismiss"
 msgstr "Schließen"
 
@@ -278,7 +278,7 @@ msgstr ""
 "Ungültige MRL: '%s' ist ungültig.\n"
 
 #: src/xitk/errors.c:245
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -286,7 +286,7 @@ msgid ""
 msgstr ""
 "- xine engine: Fehler -\n"
 "\n"
-"!! Unbekannter Fehler !!\n"
+"Input Plugin konnte MRL '%s' nicht öffnen.\n"
 
 #: src/xitk/errors.c:250
 msgid ""
@@ -351,19 +351,16 @@ msgid "Playlist: shuffle forever."
 msgstr "Playliste: Immer mischen."
 
 #: src/xitk/event.c:753 src/xitk/event.c:760
-#, fuzzy
 msgid "Saturation"
-msgstr "Sättigungswert."
+msgstr "Farbsättigung"
 
 #: src/xitk/event.c:768 src/xitk/event.c:775
-#, fuzzy
 msgid "Brightness"
-msgstr "Helligkeitswert."
+msgstr "Helligkeit"
 
 #: src/xitk/event.c:783 src/xitk/event.c:790
-#, fuzzy
 msgid "Contrast"
-msgstr "Kontrastwert."
+msgstr "Kontrast"
 
 #: src/xitk/event.c:985
 #, c-format
@@ -634,9 +631,8 @@ msgid "Menu 7"
 msgstr "Menü 7"
 
 #: src/xitk/event_sender.c:644
-#, fuzzy
 msgid "Menu toggle"
-msgstr "Lautlos"
+msgstr "Menü"
 
 #: src/xitk/event_sender.c:645
 msgid "Title"
@@ -664,12 +660,12 @@ msgid "Part"
 msgstr "Kapitel"
 
 #: src/xitk/event_sender.c:686 src/xitk/file_browser.c:1572
-#: src/xitk/mediamark.c:2651 src/xitk/setup.c:1310
+#: src/xitk/mediamark.c:2669 src/xitk/setup.c:1310
 #: src/xitk/stream_infos.c:1021 src/xitk/viewlog.c:487
 msgid "Close"
 msgstr "Schließen"
 
-#: src/xitk/file_browser.c:317 src/xitk/mediamark.c:2636 src/xitk/setup.c:1299
+#: src/xitk/file_browser.c:317 src/xitk/mediamark.c:2654 src/xitk/setup.c:1299
 msgid "Apply"
 msgstr "Anwenden"
 
@@ -831,7 +827,7 @@ msgstr "Alias"
 msgid "Edit"
 msgstr "Ändern"
 
-#: src/xitk/kbindings.c:2041 src/xitk/playlist.c:408 src/xitk/playlist.c:1192
+#: src/xitk/kbindings.c:2041 src/xitk/playlist.c:416 src/xitk/playlist.c:1200
 msgid "Save"
 msgstr "Speichern"
 
@@ -860,7 +856,6 @@ msgid "Grab"
 msgstr "Aufzeichnen"
 
 #: src/xitk/lang.c:487
-#, fuzzy
 msgid "Unknown"
 msgstr "Unkekannt"
 
@@ -904,11 +899,14 @@ msgstr "  -v, --version                Zeigt die Version an.\n"
 #: src/xitk/main.c:429
 msgid "      --verbose [=level]       Set verbosity level. Default is 1.\n"
 msgstr ""
+"      --verbose [=Stufe]       Geschwätzigkeit. Wenn keine Stufe angegeben: "
+"1.\n"
 
 #: src/xitk/main.c:430
 msgid ""
 "  -c, --config <file>          Use config file instead of default one.\n"
 msgstr ""
+"  -c, --config <Datei>          Angegebene Konfigurationsdatei benutzen.\n"
 
 #: src/xitk/main.c:431
 msgid ""
@@ -1047,12 +1045,12 @@ msgstr ""
 "                                 'remapped': Zeige aktuelle Tastentabelle.\n"
 
 #: src/xitk/main.c:480
-#, fuzzy
 msgid ""
 "                                 'file:<filename>': use <filename> as "
 "keymap.\n"
 msgstr ""
-"                                 'remapped': Zeige aktuelle Tastentabelle.\n"
+"                                 'file:<Dateiname>': benutze <Dateiname>\n"
+"                                                     als Tastentabelle.\n"
 
 #: src/xitk/main.c:481
 msgid ""
@@ -1337,10 +1335,9 @@ msgstr "main: Audio Treiber <%s> konnte nicht geladen werden\n"
 msgid ""
 "*drum roll*, xine lib wants to take your attention to deliver an important "
 "message to you ;-):"
-msgstr ""
+msgstr "Flaschenpost fon der xine Library ;-):"
 
 #: src/xitk/main.c:895
-#, fuzzy
 msgid "No Informations available."
 msgstr "Keine Hilfe verfügbar"
 
@@ -1462,65 +1459,65 @@ msgid "Unable to save playlist (%s): %s.\n"
 msgstr "Playlist kann nicht gespeichert werden (%s): %s.\n"
 
 #. Create window
-#: src/xitk/mediamark.c:2494
+#: src/xitk/mediamark.c:2512
 msgid "Mediamark Editor"
 msgstr "Mediamarkeditor"
 
-#: src/xitk/mediamark.c:2523
+#: src/xitk/mediamark.c:2541
 msgid "Identifier"
 msgstr "Bezeichner"
 
-#: src/xitk/mediamark.c:2539
+#: src/xitk/mediamark.c:2557
 msgid "Mediamark Identifier"
 msgstr "Mediamarkbezeichner"
 
-#: src/xitk/mediamark.c:2543
+#: src/xitk/mediamark.c:2561
 msgid "Mrl"
 msgstr "MRL"
 
-#: src/xitk/mediamark.c:2558
+#: src/xitk/mediamark.c:2576
 msgid "Mediamark Mrl"
 msgstr "Mediamark-MRL"
 
-#: src/xitk/mediamark.c:2562 src/xitk/menus.c:821
+#: src/xitk/mediamark.c:2580 src/xitk/menus.c:821
 msgid "Subtitle"
 msgstr "Untertitel"
 
-#: src/xitk/mediamark.c:2577
+#: src/xitk/mediamark.c:2595
 msgid "Subtitle File"
 msgstr "Untertiteldatei"
 
-#: src/xitk/mediamark.c:2581
+#: src/xitk/mediamark.c:2599
 msgid "Sub File"
 msgstr "Unterdatei"
 
-#: src/xitk/mediamark.c:2591
+#: src/xitk/mediamark.c:2609
 msgid "Select a subtitle file to use together with the mrl."
 msgstr ""
 "Wähle eine Untertiteldatei, welche zusammen mit dieser MRL benutzt werden "
 "soll."
 
-#: src/xitk/mediamark.c:2597
+#: src/xitk/mediamark.c:2615
 msgid "Start at"
 msgstr "Start bei"
 
-#: src/xitk/mediamark.c:2612
+#: src/xitk/mediamark.c:2630
 msgid "Mediamark start time (secs)."
 msgstr "Mediamark Startzeit (sek)."
 
-#: src/xitk/mediamark.c:2616
+#: src/xitk/mediamark.c:2634
 msgid "End at"
 msgstr "Ende bei"
 
-#: src/xitk/mediamark.c:2631
+#: src/xitk/mediamark.c:2649
 msgid "Mediamark end time (secs)."
 msgstr "Mediamark Endzeit (sek)."
 
-#: src/xitk/mediamark.c:2646
+#: src/xitk/mediamark.c:2664
 msgid "Apply the changes to the playlist."
 msgstr "Wende Änderungen auf Playlist an."
 
-#: src/xitk/mediamark.c:2661
+#: src/xitk/mediamark.c:2679
 msgid "Discard changes and dismiss the window."
 msgstr "Änderungen verwerfen und Fenster schließen."
 
@@ -1537,7 +1534,7 @@ msgstr "Alle Dateitypen"
 msgid "xine MRL Browser"
 msgstr "xine MRL Browser"
 
-#: src/xitk/mrl_browser.c:272 src/xitk/playlist.c:1171
+#: src/xitk/mrl_browser.c:272 src/xitk/playlist.c:1179
 msgid "Add"
 msgstr "Hinzufügen"
 
@@ -1567,14 +1564,14 @@ msgid "Position in Stream"
 msgstr "Position im Datenstrom"
 
 #: src/xitk/osd.c:625
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitles: %s"
-msgstr "Untertitel"
+msgstr "Untertitel: %s"
 
 #: src/xitk/osd.c:654
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Channel: %s"
-msgstr "Audiokanäle: "
+msgstr "Tonspur: %s"
 
 #: src/xitk/panel.c:47
 msgid "Play previous chapter or mrl"
@@ -1708,9 +1705,8 @@ msgid "Control"
 msgstr "Steuerung"
 
 #: src/xitk/panel.c:1295
-#, fuzzy
 msgid "Open Location"
-msgstr "Schnappschußverzeichnis"
+msgstr "Objekt öffnen"
 
 #: src/xitk/panel.c:1300
 msgid "gui tips visibility"
@@ -1724,78 +1720,77 @@ msgstr "Hinweiszeit (ms)"
 msgid "gui panel visibility"
 msgstr "gui Fenster sichtbar"
 
-#: src/xitk/playlist.c:380 src/xitk/playlist.c:1182 src/xitk/skins.c:1149
+#: src/xitk/playlist.c:388 src/xitk/playlist.c:1190 src/xitk/skins.c:1149
 msgid "Load"
 msgstr "Laden"
 
-#: src/xitk/playlist.c:386
+#: src/xitk/playlist.c:394
 msgid "Load a playlist"
 msgstr "Playliste laden"
 
-#: src/xitk/playlist.c:414
+#: src/xitk/playlist.c:422
 msgid "Save a playlist"
 msgstr "Playliste speichern"
 
-#: src/xitk/playlist.c:1016
+#: src/xitk/playlist.c:1024
 msgid "xine Playlist Editor"
 msgstr "xine Playlisten Editor"
 
-#: src/xitk/playlist.c:1034
+#: src/xitk/playlist.c:1042
 msgid "playlist: couldn't find image for background\n"
 msgstr "playlist: Kann Hintergrund-Bild nicht finden\n"
 
-#: src/xitk/playlist.c:1138
+#: src/xitk/playlist.c:1146
 msgid "Move up selected MRL"
 msgstr "Gewählte MRL nach oben verschieben"
 
-#: src/xitk/playlist.c:1146
+#: src/xitk/playlist.c:1154
 msgid "Move down selected MRL"
 msgstr "Gewählte MRL nach unten verschieben"
 
-#: src/xitk/playlist.c:1153
+#: src/xitk/playlist.c:1161
 msgid "Start playback of selected MRL"
 msgstr "Wiedergabe der gewählten MRL starten"
 
-#: src/xitk/playlist.c:1160
+#: src/xitk/playlist.c:1168
 msgid "Delete selected MRL from playlist"
 msgstr "Ausgewählten Eintrag aus der Playliste entfernen"
 
-#: src/xitk/playlist.c:1167
+#: src/xitk/playlist.c:1175
 msgid "Delete all entries in playlist"
 msgstr "Alle Einträge aus der Playliste entfernen"
 
-#: src/xitk/playlist.c:1177
+#: src/xitk/playlist.c:1185
 msgid "Add one or more entries in playlist"
 msgstr "Einen oder mehrere Einträge der Playliste hinzufügen"
 
-#: src/xitk/playlist.c:1188
+#: src/xitk/playlist.c:1196
 msgid "Load saved playlist"
 msgstr "Gespeicherte Playliste laden"
 
-#: src/xitk/playlist.c:1198
+#: src/xitk/playlist.c:1206
 msgid "Save playlist"
 msgstr "Playliste speichern"
 
-#: src/xitk/playlist.c:1208
+#: src/xitk/playlist.c:1216
 msgid "Close playlist window"
 msgstr "Playlisten-Fenster schließen"
 
-#: src/xitk/playlist.c:1226
+#: src/xitk/playlist.c:1234
 msgid "Scan for:"
 msgstr "Suche nach:"
 
-#: src/xitk/playlist.c:1238
+#: src/xitk/playlist.c:1246
 msgid "Direct MRL entry"
 msgstr "Direkte MRL-Eingabe"
 
 #: src/xitk/post.c:109
-msgid "Post audio plugin"
-msgstr "Plugin für Audio-Nachverarbeitung"
+msgid "Audio visualization plugin"
+msgstr "Audio-Visualisierung"
 
 #: src/xitk/post.c:110
-msgid "Post audio plugin to used with video less stream playback"
-msgstr ""
-"Plugin für Audio-Nachverarbeitung, falls kein Videodatenstrom vorhandne ist"
+msgid "Post audio plugin to used when playing streams without video"
+msgstr "Plugin zur Visualisierung reiner Audio-Ströme"
 
 #: src/xitk/post.c:160 src/xitk/post.c:161
 msgid "Post video plugin"
@@ -2204,6 +2199,9 @@ msgstr "xine Log Betrachter"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "Post audio plugin"
+#~ msgstr "Plugin für Audio-Nachverarbeitung"
 
 #~ msgid "MRL Browser"
 #~ msgstr "MRL Browser"
