@@ -22,13 +22,13 @@ dans le répertoire \fI@XINE_DOCDIR@\fP ou sur la page du projet.
 Affiche la liste des options ainsi que la liste des pilotes 
 (plugins) disponibles.
 .TP
-.B \-\-verbose [=level]
+.B \-\-verbose\ [=level]
 Défini le niveau de verbiage.
 .TP
-.B \-\-config <fichier>
+.B \-\-config\ <fichier>
 Utilise \fBfichier\fP en tand que fichier de configuration.
 .TP
-.B \-a, \-\-audio\-channel <num>
+.B \-a,\ \-\-audio\-channel\ <num>
 Sélectionne le canal audio spécifié. \fBnum\fP est le numéro du canal, la valeur
 par defaut est \fB0\fP.
 .br
@@ -36,23 +36,23 @@ xine 0.5 et plus tente de collecter tous les canaux audio (ac3, mpeg
 audio, avi audio, ...) du flux et les classe en "canaux virtuels" 
 en partant du canal \fB0\fP.
 .TP
-.B \-V, \-\-video\-driver <drv>
+.B \-V,\ \-\-video\-driver\ <drv>
 Sélectionne le pilote vidéo. Utilisez \fIxine \-\-help\fP pour avoir la
 liste des pilotes disponible sur votre système. Cette sélection est
 automatiquement enregistrée dans votre \fB~/.xine/config\fP, donc vous n'avez à
 spécifier ce paramêtre qu'une seule fois.
 .TP
-.B \-A, \-\-audio\-driver <drv>
+.B \-A,\ \-\-audio\-driver\ <drv>
 Sélectionne le pilote audio. Utilisez \fIxine \-\-help\fP pour avoir la
 liste des pilotes disponible sur votre système. Cette sélection est
 automatiquement enregistrée dans votre \fB~/.xine/config\fP, donc vous n'avez à
 spécifier ce paramêtre qu'une seule fois.
 .TP
-.B \-u, \-\-spu\-channel <num>
+.B \-u,\ \-\-spu\-channel\ <num>
 Sélectionne le canal de sous-titre. \fBnum\fP est le numéro
 du canal de sous-titre. par défaut il n'y a pas de sous-titre (\fB\-1\fP)
 .TP
-.B \-p, \-\-auto\-play=[f][F][h][w][q][d][v]
+.B \-p,\ \-\-auto\-play=[f][F][h][w][q][d][v]
 Démarre la lecture immédiatement apres l'exécution. Peut être suivi par:
 .br
 \'\fBf\fP\' en mode plein écran,
@@ -69,7 +69,7 @@ Il est possible d'obtenir automatiquement les listes de lecture à partir
 d'un DVD \'\fBd\fP\', ou d'un VCD \'\fBv\fP\'.
 Il y a désormais un option générique, \fI\-\-auto\-scan\fP, pour çà (voir plus bas).
 .TP
-.B \-s, \-\-auto\-scan <plugin>
+.B \-s,\ \-\-auto\-scan\ <plugin>
 Recherche automatique de la liste de lecture à partir d'un plugin donné. Beaucoup
 de plugins autorisent une liste de lecture générique, afin de \fBtout\fP lire. Ceci
 fonctionne parfaitement pour les DVDs ou VCDs, par exemple. Specifier cette option
@@ -81,25 +81,25 @@ but de lire un DVD entier, sans avoir a appuyer sur un ou plusieurs boutons. Cec
 fonctionne aussi avec des plugins non fournis avec xine, donnez seulement le nom
 du bouton que le plugin affiche dans le paneau principal de xine!.
 .TP
-.B \-f, \-\-fullscreen
+.B \-f,\ \-\-fullscreen
 Passe en mode plein écran au lancement (comme en pressant \'\fBf\fP\').
 .TP
-.B \-F, \-\-xineramafull
+.B \-F,\ \-\-xineramafull
 Passe en mode plein écran sur plusieurs ecran au lancement (comme en pressant \'\fBF\fP\').
 Les ecrans à utiliser sont définis dans le fichier de configuration.
 .TP
-.B \-g, \-\-hide\-gui
+.B \-g,\ \-\-hide\-gui
 Cache toutes les fenêtre graphique (excepté la fenêtre vidéo) au démarrage.
 Ceci reviens à presser \'\fBG\fP\' dans xine.
 .TP
-.B \-H, \-\-hide\-video
+.B \-H,\ \-\-hide\-video
 Cache la fenêtre de sortie.
 .TP
-.B \-L, \-\-no\-lirc
+.B \-L,\ \-\-no\-lirc
 Arrête le support de LIRC. Cette option est \fIseulement\~disponible\fP si xine 
 a été compilé avec le support LIRC.
 .TP
-.B \-\-visual <visual\-class\-or\-id>
+.B \-\-visual\ <visual\-class\-or\-id>
 Tente d'utiliser le visuel du serveur X11 pour les fenêtres de xine. Le
 paramêtre \fB<visual\-class\-or\-id>\fP est soit le nom d'une classe
 de visuel X11 (\fBStaticGray\fP, \fBGrayScale\fP, \fBStaticColor\fP, \fBPseudoColor\fP, 
@@ -119,7 +119,7 @@ Quand un visuel X11 avec changement de couleurs est utilisé (colormaps),
 un colormap privé est installé pour xine. Avec un colormap privé, xine
 peux allouer plus de couleurs, donc la sortie vidéo sera meilleure.
 .TP
-.B \-\-keymap [=option]
+.B \-\-keymap\ [=option]
 Affiche l'assignement des touches. Option peux être:
 .br
 \'\fBdefault\fP\' affiche la table d'assignements par defaut,
@@ -132,7 +132,7 @@ Affiche l'assignement des touches. Option peux être:
 .br
 Si aucune option n'est spécifié, \'\fBdefault\fP\' sera sélectionné.
 .TP
-.B \-n, \-\-network
+.B \-n,\ \-\-network
 Mise en fonction du serveur de contrôle distant.
 Pour utiliser le serveur de contrôle distant, un fichier de 
 mot de passe est requis.
@@ -191,25 +191,25 @@ la commande sera affiché.
 .br
 Affiche la syntaxe de la \fIcommande\fP.
 .TP
-.B \-R, \-\-root
+.B \-R,\ \-\-root
 Utilise la fenêtre root comme fenêtre de sortie.
 .TP
-.B \-G, \-\-geometry <WxH[+X+Y]>
+.B \-G,\ \-\-geometry\ <WxH[+X+Y]>
 Vous pouvez spécifié la taille et la position de la fenêtre de sortie en utilisant
 la géométrie de style X (\fIvoir X(7)\fP). Les décalages \fBX\fP et \fBY\fP sont optionnels.
 .TP
-.B \-B, \-\-borderless
+.B \-B,\ \-\-borderless
 Retire les bordures de la fenêtre de sortie, en mode fenêtré.
 .TP
 .TP
-.B \-\-animation <mrl>
-Spécifie une ou plusieurs mrls à jouer pour les flux sans video.
+.B \-N,\ \-\-animation\ <mrl>
+Spécifie une ou plusieurs mrls à jouer pour les flux sans vidéo.
 .TP
-.B \-P, \-\-playlist <fichier>
+.B \-P, \-\-playlist\ <fichier>
 Utilise le fichier spécifié comme liste de lecture. Les formats reconnues sont:
 asx, toxine, m3u, pls, sfv et les fichiers texte.
 .TP
-.B \-l, \-\-loop [=mode]
+.B \-l,\ \-\-loop\ [=mode]
 Defini le mode de bouclage de la liste de lecture. Si aucun mode n'est precisé, le 
 mode \fBloop\fP est utilisé. Les modes possibles sont:
 .br
@@ -221,15 +221,15 @@ mode \fBloop\fP est utilisé. Les modes possibles sont:
 .br
 \fBshuffle\+\fP: identique à shuffle, mais rejoue indéfiniement la liste de lecture.
 .TP
-.B \-\-skin\-server\-url <url>
+.B \-\-skin\-server\-url\ <url>
 Defini l'url du serveur d'apparences.
 .TP
-.B \-\-enqueue <mrl>
+.B \-\-enqueue\ <mrl>\ ...
 Ajoute une ou plusieurs \fBmrls\fP à la liste de lecture de la session existante (session 0). 
 .br
 Si vous désirez spécifier une autre session, utilisez l'option \fB\-S session=\fP\fIx\fP.
 .TP
-.B \-S, \-\-session <option1,option2,...>
+.B \-S,\ \-\-session\ <option1,option2,...>
 .br
 Gestion de session. Toutes les options peuvent être utilisées plus d'une fois, 
 excepté \fBsession\fP.
@@ -248,14 +248,20 @@ Les options sont:
 .br
 \fBamp=\fP\fIv\fP     règle le niveau d'amplification de l'instance (\<\fIv\fP\>: 0 à 200),
 .br
+\fBloop=\fP\fIm\fP    défini le mode de bouclage (\<\fIm\fP\>: \fBnone\fP \fBloop\fP \fBrepeat\fP \fBshuffle\fP ou \fBshuffle+\fP),
+.br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
   \<\fIp\fP\> peut être:
 .br
     \fBclear\fP:     efface la liste de lecture,
-    \fBnext\fP:      joue l'entrée suivante de la liste de lecture,
+    \fBfirst\fP:     joue la première entrée dans la liste de lecture,
     \fBprev\fP:      joue l'entrée précédente de la liste de lecture,
+    \fBnext\fP:      joue l'entrée suivante de la liste de lecture,
+    \fBlast\fP:      joue la dernière entrée dans la liste de lecture,
     \fBload:\fP\fIs\fP:    charge le fichier de liste de lecture <\fIs\fP>.
+    \fBstop\fP:      arrête la lecture à la fin de la lecture courante,
+    \fBcont\fP:      continu la lecture à la fin de la lecture courante.
 .br
 Il y a aussi d'autres options qui s'expliquent d'elles même.
     \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
@@ -263,14 +269,14 @@ Il y a aussi d'autres options qui s'expliquent d'elles même.
 .B \-Z
 Ne démarre pas automatiquement la lecture. N'affecte que le démarrage automatique de la lecture quand le mode smart est utilisé.
 .TP
-.B \-D, \-\-deinterlace [post]
+.B \-D,\ \-\-deinterlace\ [post]
 Désentrelacement de la vidéo. Vous pouvez spécifier le(s) plugin(s) à utiliser pour le désentrelacement de la sortie vidéo. Voir la syntaxe de \fI\-\-post\fP.
 .TP
-.B \-r, \-\-aspect\-ratio <mode>
+.B \-r,\ \-\-aspect\-ratio\ <mode>
 Défini le ratio d'aspect le la sortie vidéo. Les modes sont:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
 .TP
-.BI \-\-broadcast\-port\  <port>
+.BI \-\-broadcast\-port\ <port>
 Defini le port du diffuseur de xine (coté maître), l'esclave est démarré par 'xine slave://address:port'
 .TP
 .BI \-\-no\-logo
@@ -279,11 +285,27 @@ N'affiche pas le logo.
 .BI \-E,\ \-\-no\-reload
 Ne recharge pas l'ancienne liste de lecture. La liste de lecture est sauvée quand vous quittez xine, puis elle est rechargée est lue à la prochaine execution de xine. Cette fonctionnalité peut être dévalidée via la fenêtre de réglage.
 .TP
-.BI \-\-post\  <plugin>[:parameter=value][,...]
+.BI \-\-post\ <plugin>[:parameter=value][,...]
 Charge un ou plusieurs plugin(s) de post-traitement. Les paramètres sont séparés par des virgules. Cette option peut être utilisée plus d'une fois afin de chainer deux ou plusieurs plugins de post-traitement vidéo. Vous pouvez specifier deux (et plus) plugins, séparés par un point-virgule ';'.
 .TP
 .BI \-\-disable\-post
 Ne mets pas en fonction le(s) plugin(s). De cette manière, vous pouvre specifier un ou plusieurs plugins à utiliser, à l'aide de l'option de ligne de commande --post, mais en ne validant pas leurs effets.
+.TP
+.BI \-\-no\-splash
+N'affiche las l'écran splash.
+.TP
+.B \-\-stdctrl
+Met en fonction le contrôle de xine via le STDIN.
+.TP
+.BI \-T,\ \-\-tvout\ <controleur>
+Met en fonction le support de la Sortie TV. \<\fIbackend\fP\> peut être: nvtv, ati.
+.TP
+.BI \-\-list\-plugins\ [=type]
+Affiche la liste des plugins disponibles. L'optionel \<\fItype\fP\> peut être:
+audio_out, video_out, demux, input, sub, post, audio_decoder, video_decoder
+.TP
+.BI \-\-bug\-report\ [=mrl]
+Met en fonction le mode de rapport de bogue. Il positionne le mode verbeux, collecte tout les messages et les écris dans un fichier nommé BUG-REPORT.TXT. Si \<\fImrl\fP\> est spécifié, xine jouera cette mrl puis quittera (comme le fais -pq).
 .TP
 .B MRL (media resource locator)
 .br
@@ -371,208 +393,254 @@ Sa syntaxe est:
 .br
 Contrairement à l'option de configuration du flux, vous pouvez changer quelque chose \fIavant\fP de jouer le flux.
 .SH TOUCHES DE CONTRÔLE
-Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches. '\fBM\-\fP' est la touche Meta ('Alt' sur les claviers de PC), '\fBC\-\fP' est la touche Control 'Ctrl', les autres touches spéciales sont délimitées par les caractères '\fB<\fP' et '\fB>\fP', par exemple: la touche FIN est affichèe \fB<fin>\fP. La liste de ces touches est:
-.LP
-.BR 0..9 :
-Saute à 0%..90% du flux courant.
-.br
-.BR a :
-Bascule du ratio d'aspect (AUTO/16:9/4:3/DVB).
-.br
-.BR C\-a
-Ajoute une mediamark à la liste de lecture à partir de la position courante du flux lus.
-.br
-.BR M\-c :
-Affiche/masque la fenêtre des réglages vidéo.
-.br
-.BR d :
-Passe le moniteur en attente DPMS
-.br
-.BR e :
-Ejecte le média courant.
-.br
-.BR C\-e :
-Dans la fenêtre de la liste de lecture, ce raccouçis vous permet d'editer le mediamark sélectionné et d'en modifier les paramêtres (identificateur, mrl, debug et fin)
-.br
-.BR M\-e :
-Affiche/masque la fenêtre d'envoi d'évènement.
-.br
-.BR f :
-Bascule plein écran/fenêtré.
-.br
-.BR F :
-Bascule plein écran xinerama/fenêtré.
-.br
-.BR g :
-Affiche/masque le panneau de contrôle.
-.br
-.BR h :
-Affiche/masque la fenêtre de sortie.
-.br
-.BR i :
-Bascule des méthodes de dé-entrelacement.
-.br
-.BR M\-i :
-Affiche/masque la fenêtre d'informations de flux.
-.br
-.BR l :
-Bascule entre les modes de boucle.
-.br
-.BR M\-l :
-Affiche/masque la fenêtre de log.
-.br
-.BR M\-m :
-Affiche/masque le gestionnaire de MRL.
-.br
-.BR C\-m :
-Bascule du mode muêt.
-.br
-.BR CM\-o :
-Bascule du mode TV pour les carte DXR3.
-.br
-.BR C\-o :
-Ouvre la fenêtre du sélecteur de fichiers.
-.br
-.BR M\-p :
-Affiche/masque le fenêtre de liste de lecture.
-.br
-.BR q :
-Quitte.
-.br
-.BR s :
-Zoom 1:1.
-.br
-.BR S :
-Stoppe la lecture.
-.br
-.BR M\-s :
-Affiche/masque la fenêtre de configuration.
-.br
-.BR z | Z :
-Zoom avant/arrière.
-.br
-.BR M\-C\-z :
-Ràz zoom.
-.br
-.BR v :
-Reduit le volume audio.
-.br
-.BR V :
-Augmente le volume audio.
-.br
-.BR C-v :
-Reduit le niveau d'amplification de l'instance.
-.br
-.BR C-V :
-Augmente le niveau d'amplification de l'instance.
-.br
-.BR C-A :
-Remise à zéro du niveau d'amplification.
-.br
-.BR t :
-Prends une photo.
-.br
-.BR <entrée> :
-Lecture.
-.br
-.BR <espace> :
-Pause.
-.br
-.BR <haut>/<bas> :
-Avance rapide, ralenti.
-.br
-.BR C\-<gauche>/C-\<droite> :
-Saute -+ 15 sec.
-.br
-.BR <gauche> / <droite> :
-Saute +- 60 sec.
-.br
-.BR <page\ précédente> :
-Saute au flux precédent dans la liste de lecture.
-.br
-.BR <page\ suivante> :
-Saute au flux suivant dans la liste de lecture.
-.br
-.BR < :
-Réduit la fenêtre de sortie.
-.br
-.BR > :
-Agrandi la fenêtre de sortie.
-.br
-.BR M\-1 :
-Fenêtre de sortie vidéo à 50%
-.br
-.BR M\-2 :
-Fenêtre de sortie vidéo à 100%
-.br
-.BR M\-3 :
-Fenêtre de sortie vidéo à 200%
-.br
-.BR . :
-Sélectionne le canal de sous-titres suivant.
-.br
-.BR , :
-Sélectionne le canal de sous-titres précédant.
-.br
-.BR + :
+Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches. '\fBM\-\fP' est la touche Meta ('Alt' sur les claviers de PC), '\fBC\-\fP' est la touche Control 'Ctrl', les autres touches spéciales sont délimitées par les caractères '\fB<\fP' et '\fB>\fP', par exemple: la touche FIN est affiché \fB<END>\fP.
+La liste des raccourçis par default est :
+.IP "\fB\<Return\>\fP"
+Lance la lecture.
+.IP "\fB\<space\>\fP"
+Bascule de la pause.
+.IP "\fBS\fP"
+Arrête la lecture.
+.IP "\fBt\fP"
+Prends un photo.
+.IP "\fBe\fP"
+Ejecte le medium courant.
+.IP "\fB\<Next\>\fP"
+Sélectionne et joue la mrl suivante dans la liste de lecture.
+.IP "\fB\<Prior\>\fP"
+Sélectionne et joue la mrl précédante dans la liste de lecture.
+.IP "\fBl\fP"
+Sélecteur de mode de bouclage.
+.IP "\fBC\fP\-\fBs\fP"
+Parcours la liste de lecture pour collecter les informations de flux.
+.IP "\fBC\fP\-\fBa\fP"
+Ajoute un mediamark depuis la lecture courante.
+.IP "\fBC\fP\-\fBe\fP"
+Edite le mediamark sélectionné.
+.IP "\fB\<Left\>\fP"
+Déplace la position courante de -60 secondes dans le flux en cours de lecture.
+.IP "\fB\<Right\>\fP"
+Déplace la position courante de +60 secondes dans le flux en cours de lecture.
+.IP "\fBM\fP\-\fB\<Left\>\fP"
+Déplace la position courante de -30 secondes dans le flux en cours de lecture.
+.IP "\fBM\fP\-\fB\<Right\>\fP"
+Déplace la position courante de +30 secondes dans le flux en cours de lecture.
+.IP "\fBC\fP\-\fB\<Left\>\fP"
+Déplace la position courante de -15 secondes dans le flux en cours de lecture.
+.IP "\fBC\fP\-\fB\<Right\>\fP"
+Déplace la position courante de +15 secondes dans le flux en cours de lecture.
+.IP "\fBM3\fP\-\fB\<Left\>\fP"
+Déplace la position courante de -7 secondes dans le flux en cours de lecture.
+.IP "\fBM3\fP\-\fB\<Right\>\fP"
+Déplace la position courante de +7 secondes dans le flux en cours de lecture.
+.IP "\fBC\fP\-\fB0\fP"
+Déplace la position courante au debut du flux en cours de lecture.
+.IP "\fBC\fP\-\fB1\fP"
+Déplace la position courante à 10% du flux en cours de lecture.
+.IP "\fBC\fP\-\fB2\fP"
+Déplace la position courante à 20% du flux en cours de lecture.
+.IP "\fBC\fP\-\fB3\fP"
+Déplace la position courante à 30% du flux en cours de lecture.
+.IP "\fBC\fP\-\fB4\fP"
+Déplace la position courante à 40% du flux en cours de lecture.
+.IP "\fBC\fP\-\fB5\fP"
+Déplace la position courante à 50% du flux en cours de lecture.
+.IP "\fBC\fP\-\fB6\fP"
+Déplace la position courante à 60% du flux en cours de lecture.
+.IP "\fBC\fP\-\fB7\fP"
+Déplace la position courante à 70% du flux en cours de lecture.
+.IP "\fBC\fP\-\fB8\fP"
+Déplace la position courante à 80% du flux en cours de lecture.
+.IP "\fBC\fP\-\fB9\fP"
+Déplace la position courante à 90% du flux en cours de lecture.
+.IP "\fB\<Up\>\fP"
+Augmente la vitesse de lecture.
+.IP "\fB\<Down\>\fP"
+Diminue la vitesse de lecture.
+.IP "\fBM\fP\-\fB\<Down\>\fP"
+Reviens à la vitesse de lecture par defaut.
+.IP "\fBV\fP"
+Augmente le volume sonore.
+.IP "\fBv\fP"
+Diminue le volume sonore.
+.IP "\fBC\fP\-\fBV\fP"
+Augmente le niveau d'amplification.
+.IP "\fBC\fP\-\fBv\fP"
+Diminue le niveau d'amplification.
+.IP "\fBC\fP\-\fBA\fP"
+Reviens au niveau d'amplification par defaut.
+.IP "\fBC\fP\-\fBm\fP"
+Bascule de la sourdine.
+.IP "\fB\<plus\>\fP"
 Sélectionne le canal audio suivant.
-.br
-.BR - :
-Sélectionne le canal audio précédent.
-.br
-.BR Esc :
-Menu 1 (ex: menu principal)
-.br
-.BR F1 :
-Menu 2 (ex: menu titre)
-.br
-.BR F2 :
-Menu 3
-.br
-.BR <Insert> :
-Bascule capture de pointeur.
-.br
-Les raccourcis suivant sont utilisés dans des plugin tiers, généralement pour la navigation de DVD:
-.LP
-.BR <PavéNum\ Haut> :
-Evènement Haut.
-.br
-.BR <PavéNum\ Bas> :
-Evènement Bas.
-.br
-.BR <PavéNum\ Gauche> :
-Evènement Gauche.
-.br
-.BR <PavéNum\ Droit> :
-Evènement Droit..
-.br
-.BR <PavéNum\ PgPréc> :
-Evènement Précédent.
-.br
-.BR <PavéNum\ PgSuiv> :
-Evènement Suivant.
-.br
-.BR <PavéNum\ Fin> :
-Evènement Angle précédent.
-.br
-.BR <PavéNum\ Début> :
-Evènement Angle suivant.
-.br
-.BR <PavéNum\ Entrée> :
-Evènement Sélection.
+.IP "\fB\<minus\>\fP"
+Sélectionne le canal audio précédant.
+.IP "\fB\<period\>\fP"
+Sélectionne le canal de sous-titre suivant.
+.IP "\fB\<comma\>\fP"
+Sélectionne le canal de sous-titre précédant.
+.IP "\fBi\fP"
+Bascule du mode de désentrelacement.
+.IP "\fBa\fP"
+Sélecteur des ratio d'aspect.
+.IP "\fB\<less\>\fP"
+Reduit la taille de la fenêtre de sortie par un facteur de 1.2
+.IP "\fB\<greater\>\fP"
+Agrandit la taille de la fenêtre de sortie par un facteur de 1.2
+.IP "\fBM\fP\-\fB1\fP"
+Dimensionne la fenêtre a 50% de la taille du flux.
+.IP "\fBM\fP\-\fB2\fP"
+Dimensionne la fenêtre a 100% de la taille du flux.
+.IP "\fBM\fP\-\fB3\fP"
+Dimensionne la fenêtre a 200% de la taille du flux.
+.IP "\fBz\fP"
+Zoom avant.
+.IP "\fBZ\fP"
+Zoom arrière.
+.IP "\fBC\fP\-\fBz\fP"
+Zoom avant horizontal.
+.IP "\fBC\fP\-\fBZ\fP"
+Zoom arrière horizontal.
+.IP "\fBM\fP\-\fBz\fP"
+Zoom avant vertical.
+.IP "\fBM\fP\-\fBZ\fP"
+Zoom arrière vertical.
+.IP "\fBC\fP\-\fBM\fP\-\fBz\fP"
+Remise a zéro du zoom.
+.IP "\fBs\fP"
+Redimensionne la fenêtre de sortie à la taille du flux.
+.IP "\fBf\fP"
+Bascule du mode fenêtré/plein écran.
+.IP "\fBF\fP"
+Bascule du mode plein écran Xinerama.
+.IP "\fB\<Escape\>\fP"
+Va au Menu du media
+.IP "\fB\<F1\>\fP"
+Va au Menu Titre.
+.IP "\fB\<F2\>\fP"
+Va au Menu Principal
+.IP "\fB\<F3\>\fP"
+Va au Menu Sous-Titre.
+.IP "\fB\<F4\>\fP"
+Va au Menu Audio.
+.IP "\fB\<F5\>\fP"
+Va au Menu Angle.
+.IP "\fB\<F6\>\fP"
+Va au Menu Chapitre.
+.IP "\fB\<Keypad Up\>\fP"
+Navigation: Haut.
+.IP "\fB\<Keypad Down\>\fP"
+Navigation: Bas.
+.IP "\fB\<Keypad Left\>\fP"
+Navigation: Gauche.
+.IP "\fB\<Keypad Right\>\fP"
+Navigation: Droit.
+.IP "\fB\<Keypad Enter\>\fP"
+Navigation: Sélection
+.IP "\fB\<Keypad Next\>\fP"
+Va au chapitre suivant.
+.IP "\fB\<Keypad Prior\>\fP"
+Va au chapitre précédant.
+.IP "\fB\<Keypad Home\>\fP"
+Sélectionne l'angle suivant.
+.IP "\fB\<Keypad End\>\fP"
+Sélectionne l'angle précédant.
+.IP "\fBM\fP\-\fBh\fP"
+Bascule de visualisation de la fenêtre d'aide.
+.IP "\fBM\fP\-\fBP\fP"
+Bascule de visualisation de la fenêtre de post-traitement.
+.IP "\fBC\fP\-\fBM\fP\-\fBP\fP"
+Bascule du fonctionnement du post-traitement.
+.IP "\fBh\fP"
+Bascule de visualisation de la fenêtre de sortie.
+.IP "\fBg\fP"
+Bascule de visualisation de l'interface utilisateur.
+.IP "\fBM\fP\-\fBc\fP"
+Bascule de visualisation de la fenêtre de contrôle.
+.IP "\fBM\fP\-\fBm\fP"
+Bascule de visualisation du brouteur de mrl
+.IP "\fBM\fP\-\fBp\fP"
+Bascule de visualisation de l'éditeur de liste de lecture.
+.IP "\fBM\fP\-\fBs\fP"
+Bascule de visualisation de la fenêtre de configuration.
+.IP "\fBM\fP\-\fBe\fP"
+Bascule de visualisation de la fenêtre d'envoi d'évenements.
+.IP "\fBM\fP\-\fBt\fP"
+Bascule de visualisation de la fenêtre de contrôle de TV analogique.
+.IP "\fBM\fP\-\fBl\fP"
+Bascule de visualisation de la fenêtre de traçage.
+.IP "\fBM\fP\-\fBi\fP"
+Bascule de visualisation de la fenêtre d'information de flux.
+.IP "\fBC\fP\-\fBi\fP"
+Affichage OSD des informations du flux.
+.IP "\fBM\fP\-\fBk\fP"
+Ouvre la fenêtre de l'éditeur de raccourçis.
+.IP "\fBC\fP\-\fBo\fP"
+Ouvre le sélecteur de fichier.
+.IP "\fBC\fP\-\fBS\fP"
+Ouvre la fenêtre de sélection de fichier de sous-titre.
+.IP "\fBC\fP\-\fBd\fP"
+Ouvre la fenêtre du recupérateur d'apparence.
+.IP "\fBC\fP\-\fBt\fP"
+Bascule d'affichage MRL/Identifiant.
+.IP "\fB\<Insert\>\fP"
+Bascule de capture du pointeur de souris.
+.IP "\fB0\fP"
+Entre le chiffre 0.
+.IP "\fB1\fP"
+Entre le chiffre 1.
+.IP "\fB2\fP"
+Entre le chiffre 2.
+.IP "\fB3\fP"
+Entre le chiffre 3.
+.IP "\fB4\fP"
+Entre le chiffre 4.
+.IP "\fB5\fP"
+Entre le chiffre 5.
+.IP "\fB6\fP"
+Entre le chiffre 6.
+.IP "\fB7\fP"
+Entre le chiffre 7.
+.IP "\fB8\fP"
+Entre le chiffre 8.
+.IP "\fB9\fP"
+Entre le chiffre 9.
+.IP "\fBM3\fP\-\fB\<plus\>\fP"
+Ajoute 10 au prochain chiffre saisie.
+.IP "\fB\<slash\>\fP"
+Définition en pourcentage de la position courante dans le flux.
+.IP "\fBM\fP\-\fB\<Up\>\fP"
+Déplace en avant la position courante dans le flux par un argument numérique.
+.IP "\fBM3\fP\-\fB\<Up\>\fP"
+Déplace en arrière la position courante dans le flux par un argument numérique.
+.IP "\fBm\fP"
+Change la synchronisation audio/video (retarde la vidéo).
+.IP "\fBn\fP"
+Change la synchronisation audio/video (retarde l'audio).
+.IP "\fB\<Home\>\fP"
+Remise à zéro du décalage audio/video.
+.IP "\fBM\fP"
+Change la synchronisation du sous-titre (retarde la video)?
+.IP "\fBN\fP"
+Change la synchronisation du sous-titre (retarde le sous-titre).
+.IP "\fBC\fP\-\fBM\fP\-\fBo\fP"
+Sélecteur de modes de TV (pour DXR3).
+.IP "\fBd\fP"
+Bascule de mode de veille de moniteur DPMS.
+.IP "\fBC\fP\-\fBl\fP"
+Arrête la lecture à la fin de la lecture courante.
+.IP "\fBq\fP"
+Quitte le programme.
 .br
 .SH Ajustement de la synchronization audio/video
 Il existe des flux ayant de mauvaises informations de temporisation, de ce 
 fait la synchronisation échoue. Il est possible de corriger ceci en utilisant
 les touches directionnelle:
-.br
-.BR n :
+.IP "\fBn\fP"
 Pressez cette touche si la vidéo est en retard par rapport à l'audio.
-.br
-.BR m :
+.IP "\fBm\fB"
 Pressez cette touche si la vidéo est en avance par rapport à l'audio.
-.br
-.BR <début> :
+.IP "\fB\<début\>\fP"
 Pressez cette touche pour remettre à 0.
 .br
 .SH Ajustement de la synchronization des sous-titres
@@ -582,16 +650,17 @@ Il est possible de modifier la synchronisation des sous-titres en utilisant les 
 .br
 .SH FICHIERS
 Tout les fichiers de configurations sont désormais dans ~/.xine:
-.br
-.BR ~/.xine/config :
+.TP \w'~/.xine/passwdXX'u
+~/.xine/config :
 fichier principal de configuration
-.br
-.BR ~/.xine/keymap :
+.TP
+~/.xine/keymap :
 fichier d'assignement des touches de xine-ui
-.br
-.BR ~/.xine/passwd :
+.TP
+~/.xine/passwd :
 fichier de mots de passes de xine-ui
-.BR ~/xine/xinerc :
+.TP
+~/xine/xinerc :
 vous pouvez ajouter des arguments de ligne de commande habituel dans ce 
 fichier (un argument par ligne), comme ci\-dessous:
 .nf
@@ -604,10 +673,11 @@ fichier (un argument par ligne), comme ci\-dessous:
 \fBxine-remote\fP(1).
 .br
 Le programme est complètement documenté sur la page du projet de xine:
-.UR http://xine.sourceforge.net/
-.IR "http://xine.sourceforge.net/"
+.UR http://xinehq.de/
+.IR "http://xinehq.de/"
 .UE
 .SH AUTEURS
-Cette page de manuel a été écrite par Siggi Langauf <siggi@users.sourceforge.net>, de nombreux ajouts de Guenter Bartsch <guenter@users.sourceforge.net> et
+Cette page de manuel a été écrite par Siggi Langauf <siggi@users.sourceforge.net>, 
+de nombreux ajouts de Guenter Bartsch <guenter@users.sourceforge.net> et
 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>, pour le projet xine.
 Traduction par Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>.
