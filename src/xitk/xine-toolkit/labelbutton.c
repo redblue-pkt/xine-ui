@@ -192,17 +192,19 @@ static void create_labelofbutton(xitk_widget_t *lb,
   /*  Put text in the right place */
   if(private_data->align == LABEL_ALIGN_CENTER) {
     XDrawString(private_data->imlibdata->x.disp, pix, gc, 
-		(xsize-(width+xoff))>>1, ((ysize+asc+des+yoff)>>1)-des, 
+		((xsize-(width+xoff))>>1) + private_data->label_offset, 
+		((ysize+asc+des+yoff)>>1)-des, 
 		label, strlen(label));
   }
   else if(private_data->align == LABEL_ALIGN_LEFT) {
     XDrawString(private_data->imlibdata->x.disp, pix, gc, 
-		((state != CLICK) ? 1 : 5), ((ysize+asc+des+yoff)>>1)-des, 
+		(((state != CLICK) ? 1 : 5)) + private_data->label_offset, 
+		((ysize+asc+des+yoff)>>1)-des, 
 		label, strlen(label));
   }
   else if(private_data->align == LABEL_ALIGN_RIGHT) {
     XDrawString(private_data->imlibdata->x.disp, pix, gc, 
-    		xsize - (width + ((state != CLICK) ? 5 : 1)),
+    		(xsize - (width + ((state != CLICK) ? 5 : 1))) + private_data->label_offset,
     		((ysize+asc+des+yoff)>>1)-des, 
     		label, strlen(label));
   }
@@ -492,6 +494,43 @@ int xitk_labelbutton_get_alignment(xitk_widget_t *w) {
 }
 
 /*
+ * Return used font name
+ */
+char *xitk_labelbutton_get_fontname(xitk_widget_t *w) {
+  lbutton_private_data_t *private_data;
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+    private_data = (lbutton_private_data_t *) w->private_data;
+    if(private_data->fontname == NULL)
+      return NULL;
+    return (strdup(private_data->fontname));
+  }
+  
+  return NULL;
+}
+
+/*
+ *
+ */
+void xitk_labelbutton_set_label_offset(xitk_widget_t *w, int offset) {
+  lbutton_private_data_t *private_data;
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+    private_data = (lbutton_private_data_t *) w->private_data;
+    private_data->label_offset = offset;
+  }
+}
+int xitk_labelbutton_get_label_offset(xitk_widget_t *w) {
+  lbutton_private_data_t *private_data;
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
+    private_data = (lbutton_private_data_t *) w->private_data;
+    return private_data->label_offset;
+  }
+  return 0;
+}
+
+/*
  * Set radio button to state 'state'
  */
 void xitk_labelbutton_set_state(xitk_widget_t *w, int state, Window win, GC gc) {
@@ -565,6 +604,8 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_widget_list_t *wl,
   private_data->focuscolor        = strdup(fcolor);
   private_data->clickcolor        = strdup(ccolor);
   private_data->fontname          = strdup(fontname);
+
+  private_data->label_offset      = 0;
 
   private_data->align             = skin_element_name ? (xitk_skin_get_label_alignment(skonfig, skin_element_name)) : b->align;
 

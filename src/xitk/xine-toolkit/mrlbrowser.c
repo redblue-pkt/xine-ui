@@ -1282,6 +1282,11 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 				private_data->widget_list,
 				(void *) private_data);
 
+  
+  XLOCK(mb->imlibdata->x.disp);
+  XSetInputFocus(mb->imlibdata->x.disp, private_data->window, RevertToParent, CurrentTime);
+  XUNLOCK(mb->imlibdata->x.disp);
+
   return mywidget;
 }
 

@@ -1162,6 +1162,70 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
 }
 
 /*
+ *
+ */
+void xitk_set_focus_to_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
+  xitk_widget_t *widget;
+  
+  if(!wl) {
+    XITK_WARNING("%s(): widget list is NULL.\n", __FUNCTION__);
+    return;
+  }
+  
+  widget = (xitk_widget_t *) xitk_list_first_content (wl->l);
+  
+  while (widget && wl && wl->l && wl->win && wl->gc && (widget != w))
+    widget = (xitk_widget_t *) xitk_list_next_content(wl->l);
+  
+  if(widget) {
+    
+    if(wl->widget_focused) {
+      
+      /* Kill (hide) tips */
+      xitk_tips_tips_kill(wl->widget_focused);
+      
+      if (wl->widget_focused->notify_focus && wl->widget_focused->enable == WIDGET_ENABLE) {
+	
+	wl->widget_focused->have_focus = FOCUS_LOST;
+	(void) (wl->widget_focused->notify_focus) (wl, wl->widget_focused, FOCUS_LOST);
+	
+	if(wl->widget_focused->paint)
+	  (wl->widget_focused->paint) (wl->widget_focused, wl->win, wl->gc);
+	
+      }
+    }
+    
+    wl->widget_focused = widget;
+    
+    if (wl->widget_focused->notify_focus && wl->widget_focused->enable == WIDGET_ENABLE) {
+      
+      (void) (wl->widget_focused->notify_focus) (wl, wl->widget_focused, FOCUS_RECEIVED);
+      wl->widget_focused->have_focus = FOCUS_RECEIVED;
+      
+      if(wl->widget_focused->paint)
+	(wl->widget_focused->paint) (wl->widget_focused, wl->win, wl->gc);
+    }
+    
+    if (wl->widget_focused->notify_click
+	&& wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
+      
+      if((wl->widget_focused->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
+	(void) (wl->widget_focused->notify_click) (wl, wl->widget_focused, LBUTTON_DOWN, 
+						   wl->widget_focused->x + 1, 
+						   wl->widget_focused->y + 1);
+	
+	if(wl->widget_focused->paint)
+	  (wl->widget_focused->paint) (wl->widget_focused, wl->win, wl->gc);
+	
+      }
+      
+    }
+  }
+  else
+    XITK_WARNING("%s(): widget not found in list.\n", __FUNCTION__);
+}
+
+/*
  * Call notify_keyevent, if exist, of specified plugin. This pass an X11 XEvent.
  */
 void xitk_send_key_event(xitk_widget_list_t *wl, xitk_widget_t *w, XEvent *xev) {
@@ -1565,6 +1629,8 @@ void xitk_hide_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
 
   if(w->visible == 1) {
     w->visible = 0;
+
+    xitk_tips_tips_kill(w);
     
     if(w->paint)
       w->paint(w, wl->win, wl->gc);

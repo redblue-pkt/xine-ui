@@ -343,9 +343,10 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
 						int x, int y, int width, int height) {
   xitk_window_t *xwin;
   xitk_pixmap_t  *bar, *pix_bg;
-  unsigned int   colorblack, colorwhite, colorgray;
+  unsigned int   colorblack, colorwhite, colorgray, colordgray;
   xitk_font_t   *fs = NULL;
   int            lbear, rbear, wid, asc, des;
+  int            bar_style = xitk_get_barstyle_feature();
   
   if((im == NULL) || (title == NULL) || (width == 0 || height == 0))
     return NULL;
@@ -357,6 +358,10 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
   bar = xitk_image_create_xitk_pixmap(im, width, TITLE_BAR_HEIGHT);
   pix_bg = xitk_image_create_xitk_pixmap(im, width, height);
 
+  fs = xitk_font_load_font(im->x.disp, DEFAULT_BOLD_FONT_12);
+  xitk_font_set_font(fs, bar->gc);
+  xitk_font_string_extent(fs, title, &lbear, &rbear, &wid, &asc, &des);
+
   XLOCK(im->x.disp);
 
   XCopyArea(im->x.disp, xwin->background->pixmap, pix_bg->pixmap, xwin->background->gc,
@@ -365,8 +370,10 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
   colorblack = xitk_get_pixel_color_black(im);
   colorwhite = xitk_get_pixel_color_white(im);
   colorgray = xitk_get_pixel_color_gray(im);
+  colordgray = xitk_get_pixel_color_darkgray(im);
 
-  { /* Draw window title bar background */
+ /* Draw window title bar background */
+  if(bar_style) {
     int s, bl = 255;
     unsigned int colorblue;
 
@@ -377,21 +384,53 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
       colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
     }
   }
+  else {
+    int s;
+    unsigned int c, cd;
+
+    cd = xitk_get_pixel_color_from_rgb(im, 115, 12, 206);
+    c = xitk_get_pixel_color_from_rgb(im, 135, 97, 168);
+
+    draw_flat_with_color(im, bar, width, TITLE_BAR_HEIGHT, colorgray);
+    draw_rectangular_inner_box(im, bar, 2, 2, width - 6, (TITLE_BAR_HEIGHT - 1 - 4));
+    
+    for(s = 6; s <= (TITLE_BAR_HEIGHT - 6); s += 3) {
+      XSetForeground(im->x.disp, bar->gc, c);
+      XDrawLine(im->x.disp, bar->pixmap, bar->gc, 5, s, (width - 8), s);
+      XSetForeground(im->x.disp, bar->gc, cd);
+      XDrawLine(im->x.disp, bar->pixmap, bar->gc, 5, s+1, (width - 8), s+1);
+    }
+    
+    XSetForeground(im->x.disp, bar->gc, colorgray);
+    XFillRectangle(im->x.disp, bar->pixmap, bar->gc, 
+		   ((width - wid) - TITLE_BAR_HEIGHT) - 10, 6, 
+		   wid + 20, TITLE_BAR_HEIGHT - 1 - 8);
+  }
 
   XSetForeground(im->x.disp, bar->gc, colorwhite);
   XDrawLine(im->x.disp, bar->pixmap, bar->gc, 0, 0, width, 0);
   XDrawLine(im->x.disp, bar->pixmap, bar->gc, 0, 0, 0, TITLE_BAR_HEIGHT - 1);
-  XSetForeground(im->x.disp, bar->gc, colorgray);
+
+  XSetForeground(im->x.disp, bar->gc, colorblack);
   XDrawLine(im->x.disp, bar->pixmap, bar->gc, width - 1, 0, width - 1, TITLE_BAR_HEIGHT - 1);
-  XDrawLine(im->x.disp, bar->pixmap, bar->gc, 0, TITLE_BAR_HEIGHT - 1, width - 1, TITLE_BAR_HEIGHT - 1);
-  XUNLOCK(im->x.disp);
 
-  fs = xitk_font_load_font(im->x.disp, DEFAULT_BOLD_FONT_12);
-  xitk_font_set_font(fs, bar->gc);
-  xitk_font_string_extent(fs, title, &lbear, &rbear, &wid, &asc, &des);
+  XDrawLine(im->x.disp, bar->pixmap, bar->gc, 2, TITLE_BAR_HEIGHT - 1, width - 2, TITLE_BAR_HEIGHT - 1);
 
-  XLOCK(im->x.disp);
-  XSetForeground(im->x.disp, bar->gc, colorwhite);
+  XSetForeground(im->x.disp, bar->gc, colordgray);
+  XDrawLine(im->x.disp, bar->pixmap, bar->gc, width - 2, 2, width - 2, TITLE_BAR_HEIGHT - 1);
+
+  XSetForeground(im->x.disp, bar->gc, colorblack);
+  XDrawLine(im->x.disp, pix_bg->pixmap, bar->gc, width - 1, 0, width - 1, height - 1);
+  XDrawLine(im->x.disp, pix_bg->pixmap, bar->gc, 0, height - 1, width - 1, height - 1);
+  XSetForeground(im->x.disp, bar->gc, colordgray);
+  XDrawLine(im->x.disp, pix_bg->pixmap, bar->gc, width - 2, 0, width - 2, height - 2);
+  XDrawLine(im->x.disp, pix_bg->pixmap, bar->gc, 2, height - 2, width - 2, height - 2);
+
+  if(bar_style)
+    XSetForeground(im->x.disp, bar->gc, colorwhite);
+  else
+    XSetForeground(im->x.disp, bar->gc, (xitk_get_pixel_color_from_rgb(im, 85, 12, 135)));
+  
   XDrawString(im->x.disp, bar->pixmap, bar->gc, 
 	      (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT+asc+des) >> 1) - des, 
 	      title, strlen(title));

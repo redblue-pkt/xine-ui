@@ -93,7 +93,7 @@ install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
 mostlyclean-generic:
-	-rm -f *~ \#* .*~ .\#*
+	-rm -f *~ \#* .*~ .\#* test
 
 maintainer-clean-generic:
 	-@echo "This command is intended for maintainers to use;"

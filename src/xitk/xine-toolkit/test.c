@@ -599,7 +599,7 @@ static void create_sliders(void) {
   sl.motion_userdata          = NULL;
   xitk_list_append_content(test->widget_list->l,
 		   (test->hslider = xitk_noskin_slider_create(test->widget_list, &sl,
-							      17, 200, 117, 20,
+							      17, 208, 117, 20,
 							      XITK_HSLIDER)));
   xitk_slider_set_pos(test->widget_list, test->hslider, 0);
 
@@ -716,7 +716,7 @@ static void create_browser(void) {
 
   XSetForeground(test->display, test->widget_list->gc, 
 		 xitk_get_pixel_color_black(test->imlibdata));
-  XDrawRectangle(test->display, bg, test->widget_list->gc, 17, 27, 117, 165);
+  XDrawRectangle(test->display, bg, test->widget_list->gc, 17, 27, 117, 176);
 
   xitk_window_change_background(test->imlibdata, 
 				test->xwin, bg, width, height);

@@ -58,6 +58,9 @@ timer.double_click       = 200
 # Enable/disable xshm support (if available): 0/1 (default = 1)
 feature.shm              = 1
 
+# Use old title bar style (blueish): 0/1 (default = 0)
+feature.old_title_style  = 1
+
 --
 
 		     input text widget shortcurts

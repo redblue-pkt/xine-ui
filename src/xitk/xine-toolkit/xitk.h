@@ -394,6 +394,7 @@ int xitk_get_select_color(void);
 void xitk_subst_special_chars(char *src, char *dest);
 unsigned long xitk_get_timer_label_animation(void);
 long int xitk_get_timer_dbl_click(void);
+int xitk_get_barstyle_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
 
@@ -461,6 +462,11 @@ void xitk_send_key_event(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
  * Return the focused widget.
  */
 xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *);
+
+/**
+ * Force the focus to given widget.
+ */
+void xitk_set_focus_to_widget(xitk_widget_list_t *, xitk_widget_t *);
 
 /**
  * Return the pressed widget.
@@ -813,6 +819,11 @@ int xitk_labelbutton_get_state(xitk_widget_t *);
  */
 void xitk_labelbutton_set_state(xitk_widget_t *, int, Window, GC);
 
+/*
+ * Return used font name
+ */
+char *xitk_labelbutton_get_fontname(xitk_widget_t *);
+
 /**
  * Set label button alignment
  */
@@ -823,6 +834,11 @@ void xitk_labelbutton_set_alignment(xitk_widget_t *, int);
  */
 int xitk_labelbutton_get_alignment(xitk_widget_t *);
 
+/**
+ *
+ */
+void xitk_labelbutton_set_label_offset(xitk_widget_t *, int);
+int xitk_labelbutton_get_label_offset(xitk_widget_t *);
 
 /*
  * *** Labels
@@ -995,6 +1011,18 @@ typedef struct {
 
   struct {
     char                 *skin_element_name;
+  } arrow_left;
+  
+  struct {
+    char                 *skin_element_name;
+  } slider_h;
+
+  struct {
+    char                 *skin_element_name;
+  } arrow_right;
+
+  struct {
+    char                 *skin_element_name;
     int                   max_displayed_entries;
     int                   num_entries;
     const char    *const *entries;
@@ -1042,6 +1070,26 @@ void xitk_browser_step_up(xitk_widget_t *w, void *data);
  * slide Down.
  */
 void xitk_browser_step_down(xitk_widget_t *w, void *data);
+
+/**
+ * slide left.
+ */
+void xitk_browser_step_left(xitk_widget_t *w, void *data);
+
+/**
+ * slide right.
+ */
+void xitk_browser_step_right(xitk_widget_t *w, void *data);
+
+/**
+ * Page Up.
+ */
+void xitk_browser_page_up(xitk_widget_t *w, void *data);
+
+/**
+ * Page Down.
+ */
+void xitk_browser_page_down(xitk_widget_t *w, void *data);
 
 /**
  * Return the current selected button (if not, return -1)

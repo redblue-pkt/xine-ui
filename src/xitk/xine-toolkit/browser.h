@@ -58,6 +58,9 @@ typedef struct {
   int                     current_button_clicked;
   struct timeval          click_time;
 
+  int                     need_h_slider;
+  int                     labels_offset;
+
 } browser_private_data_t;
 
 /* ****************************************************************** */
@@ -106,6 +109,12 @@ int xitk_browser_get_current_start(xitk_widget_t *w);
 
 void xitk_browser_step_up(xitk_widget_t *w, void *data);
 void xitk_browser_step_down(xitk_widget_t *w, void *data);
+
+void xitk_browser_step_left(xitk_widget_t *w, void *data);
+void xitk_browser_step_right(xitk_widget_t *w, void *data);
+
+void xitk_browser_page_up(xitk_widget_t *w, void *data);
+void xitk_browser_page_down(xitk_widget_t *w, void *data);
 
 /**
  * Change browser labels alignment

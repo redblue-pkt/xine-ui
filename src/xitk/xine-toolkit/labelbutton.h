@@ -53,6 +53,7 @@ typedef struct {
   void                   *userdata;
    
   int                     align;
+  int                     label_offset;
   int                     label_visible;
   int                     label_static;
 
@@ -97,6 +98,11 @@ int xitk_labelbutton_get_state(xitk_widget_t *);
  */
 void xitk_labelbutton_set_state(xitk_widget_t *, int, Window, GC);
 
+/*
+ * Return used font name
+ */
+char *xitk_labelbutton_get_fontname(xitk_widget_t *);
+
 /**
  * Set label button alignment
  */
@@ -106,5 +112,11 @@ void xitk_labelbutton_set_alignment(xitk_widget_t *, int);
  * Get label button alignment
  */
 int xitk_labelbutton_get_alignment(xitk_widget_t *);
+
+/**
+ *
+ */
+void xitk_labelbutton_set_label_offset(xitk_widget_t *, int);
+int xitk_labelbutton_get_label_offset(xitk_widget_t *);
 
 #endif

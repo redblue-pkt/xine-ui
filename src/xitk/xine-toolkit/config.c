@@ -166,7 +166,9 @@ static void xitk_config_features(xitk_config_t *xtcf) {
     
     while(*c == ' ' || *c == '\t') c++;
     
-    if(!strncasecmp(p, "shm", 3))
+    if(!strncasecmp(p, "old_title_style", 15))
+      xtcf->features.oldbarstyle = strtol(c, &c, 10);
+    else if(!strncasecmp(p, "shm", 3))
       xtcf->features.shm = strtol(c, &c, 10);
   }
 }
@@ -285,11 +287,19 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
 #else
   xtcf->features.shm           = 0;
 #endif
+  xtcf->features.oldbarstyle   = 0;
 }
 
 /*
  * Get stored values.
  */
+int xitk_config_get_barstyle_feature(xitk_config_t *xtcf) {
+
+  if(!xtcf)
+    return -1;
+  
+  return (xtcf->features.oldbarstyle > 0) ? 1 : 0;
+}
 int xitk_config_get_shm_feature(xitk_config_t *xtcf) {
 
   if(!xtcf)

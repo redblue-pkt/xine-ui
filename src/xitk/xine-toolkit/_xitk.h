@@ -48,8 +48,8 @@
 
 #define XITK_MAJOR_VERSION (0)
 #define XITK_MINOR_VERSION (9)
-#define XITK_SUB_VERSION   (0)
-#define XITK_VERSION       "0.9.0"
+#define XITK_SUB_VERSION   (1)
+#define XITK_VERSION       "0.9.1"
 
 #include "dnd.h"
 #include "widget.h"
@@ -324,6 +324,18 @@ typedef struct {
 
   struct {
     char                   *skin_element_name;
+  } arrow_left;
+  
+  struct {
+    char                   *skin_element_name;
+  } slider_h;
+
+  struct {
+    char                   *skin_element_name;
+  } arrow_right;
+
+  struct {
+    char                   *skin_element_name;
     int                     max_displayed_entries;
     int                     num_entries;
     char                  **entries;
@@ -514,6 +526,7 @@ int xitk_get_select_color(void);
 void xitk_subst_special_chars(char *, char *);
 unsigned long xitk_get_timer_label_animation(void);
 long int xitk_get_timer_dbl_click(void);
+int xitk_get_barstyle_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
 

@@ -427,7 +427,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   }
   
   private_data->xwin = xitk_window_create_simple_window(c->imlibdata, 0, 0,
-							(itemw + 2), (itemh * 5) + 2);
+							(itemw + 2), (itemh * 5) + slidw + 2);
   XLOCK(c->imlibdata->x.disp);
 
   if(c->layer_above) {

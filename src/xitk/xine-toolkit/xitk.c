@@ -636,7 +636,8 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 	  /* move sliders */
 	  else if(((mykey == XK_Left) || (mykey == XK_Right) 
-		   || (mykey == XK_Up) || (mykey == XK_Down)) 
+		   || (mykey == XK_Up) || (mykey == XK_Down)
+		   || (mykey == XK_Prior) || (mykey == XK_Next)) 
 		  && ((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD)) {
 	    
 	    if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
@@ -647,6 +648,15 @@ void xitk_xevent_notify(XEvent *event) {
 		  xitk_browser_step_down(b, NULL);
 		else if(mykey == XK_Down)
 		  xitk_browser_step_up(b, NULL);
+		else if(mykey == XK_Left)
+		  xitk_browser_step_left(b, NULL);
+		else if(mykey == XK_Right)
+		  xitk_browser_step_right(b, NULL);
+		else if(mykey == XK_Prior)
+		  xitk_browser_page_down(b, NULL);
+		else if(mykey == XK_Next)
+		  xitk_browser_page_up(b, NULL);
+
 	      }
 	    }
 	    else if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
@@ -1131,6 +1141,9 @@ unsigned long xitk_get_warning_background(void) {
 }
 long int xitk_get_timer_dbl_click(void) {
   return xitk_config_get_timer_dbl_click(gXitk->config);
+}
+int xitk_get_barstyle_feature(void) {
+  return xitk_config_get_barstyle_feature(gXitk->config);
 }
 
 /*
