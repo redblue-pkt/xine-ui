@@ -37,7 +37,7 @@
 #include "errors.h"
 #include "i18n.h"
 
-#include </usr/local/include/xine.h>
+#include <xine.h>
 #include <xine/xineutils.h>
 
 #include "xitk.h"
