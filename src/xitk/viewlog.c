@@ -501,6 +501,10 @@ void viewlog_window(void) {
   viewlog->running = 1;
   viewlog_raise_window();
   
+
+  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(viewlog->xwin)))
+    xine_usec_sleep(5000);
+
   XLockDisplay (gGui->display);
   XSetInputFocus(gGui->display, xitk_window_get_window(viewlog->xwin), RevertToParent, CurrentTime);
   XUnlockDisplay (gGui->display);

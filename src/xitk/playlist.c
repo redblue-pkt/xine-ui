@@ -1108,6 +1108,9 @@ void playlist_editor(void) {
 
   playlist_raise_window();
 
+  while(!xitk_is_window_visible(gGui->display, playlist->window))
+    xine_usec_sleep(5000);
+
   XLockDisplay(gGui->display);
   XSetInputFocus(gGui->display, playlist->window, RevertToParent, CurrentTime);
   XUnlockDisplay(gGui->display);

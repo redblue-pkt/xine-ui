@@ -1177,6 +1177,9 @@ void panel_init (void) {
     pthread_create(&panel->slider_thread, &pth_attrs, slider_loop, NULL);
   }
 
+  while(!xitk_is_window_visible(gGui->display, gGui->panel_window))
+    xine_usec_sleep(5000);
+
   XLockDisplay (gGui->display);
   XSetInputFocus(gGui->display, gGui->panel_window, RevertToParent, CurrentTime);
   XUnlockDisplay (gGui->display);
