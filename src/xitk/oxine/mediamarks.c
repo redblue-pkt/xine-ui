@@ -91,13 +91,13 @@ static int file_is_m3u(const char *mrl);
 
 /* body of mediamarks functions */
 
-void bpush (list_t *list, list_t *item) {
+static void bpush (list_t *list, list_t *item) {
 
   list_first_content(list);
   list_insert_content(list, item);
 }
 
-list_t *bpop (list_t *list) {
+static list_t *bpop (list_t *list) {
 
   list_t *item;
 

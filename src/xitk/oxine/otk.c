@@ -202,7 +202,7 @@ struct otk_s {
  */
 
 /* truncate the text to a fixed width */
-void check_text_width(odk_t *odk, char *text, int width) {
+static void check_text_width(odk_t *odk, char *text, int width) {
   int textwidth, num;
   odk_get_text_size(odk, text, &textwidth, &num);
 
@@ -1040,14 +1040,14 @@ void otk_remove_listentries(otk_widget_t *this) {
   list->num_entries = 0;
 }
 
-void list_scroll_down (void *this) {
+static void list_scroll_down (void *this) {
   otk_list_t *list = (otk_list_t *)this;
 
   list_pgdown(list);
   otk_draw_all(list->widget.otk);
 }
 
-void list_scroll_up (void *this) {
+static void list_scroll_up (void *this) {
   otk_list_t *list = (otk_list_t *)this;
 
   list_pgup(list);
@@ -1740,7 +1740,7 @@ void otk_set_update(otk_widget_t *this, int update) {
 /* FIXME: is this really thread safe?
  * check if all otk updates need lock_job_mutex()
  */
-void otk_update_job(void *data) {
+static void otk_update_job(void *data) {
   otk_t *otk = (otk_t *) data;
   int changed = 0;
   g_list_t *cur, *cur2;

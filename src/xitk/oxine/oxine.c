@@ -59,7 +59,6 @@ struct menuitem_s {
 
 
 static void main_menu_cb(void *data);
-static void playing_menu_cb(void *data);
 static void media_stop_cb(void *data);
 static void media_info_cb(void *data);
 static void media_pause_cb(void *data, int i);
@@ -320,6 +319,7 @@ static void playing_menu_update(void *data) {
     }
 }
 
+#if 0
 static void playing_menu_cb(void *data) {
    oxine_t *oxine = (oxine_t *) data;
    otk_widget_t *b, *l;
@@ -391,6 +391,7 @@ static void playing_menu_cb(void *data) {
 
    otk_draw_all(oxine->otk);
 }
+#endif
 
 static char *read_entire_file (const char *mrl, int *file_size) {
 
@@ -675,7 +676,7 @@ static void oxine_error_msg(char *text)
  * initialisation
  */
  
-oxine_t *create_oxine(void) {
+static oxine_t *create_oxine(void) {
   
   oxine_t *oxine;
   xine_cfg_entry_t centry;
@@ -710,7 +711,7 @@ oxine_t *create_oxine(void) {
   return oxine;
 }
 
-void destroy_oxine(oxine_t *oxine) {
+static void destroy_oxine(oxine_t *oxine) {
   
   if (oxine->otk) otk_free(oxine->otk);
   if (oxine->odk) odk_free(oxine->odk);

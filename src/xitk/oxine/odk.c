@@ -614,10 +614,12 @@ uint32_t odk_get_speed(odk_t *odk) {
   return -1;
 }
 
+#if 0
 void odk_toggle_pause(odk_t *odk) {
 
   gui_pause (NULL, (void*)(1), 0);
 }
+#endif
 
 void odk_eject(odk_t *odk) {
 
