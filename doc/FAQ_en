@@ -21,6 +21,9 @@
    3   THE BUILD PROCESS
    3.1 What do I need to compile everything properly?
    3.2 How do I compile xine?
+   3.2.1 simple build instructions for beginners
+   3.2.2 complete build instructions
+   
    3.3 Can I provide additional CFLAGS for compilation?
    3.4 Are there binaries for my K7 available? Can I build them?
    3.5 Build problems: xine-lib.
@@ -66,7 +69,7 @@
    5.4.2 "no video port found"
    5.4.3 "Unable to open dvd drive (/dev/dvd)"
    5.4.4 "demux error! 00 00 00 (should be 0x000001)"
-   5.4.5 "input_dvd: Sorry, Xine doesn't play encrypted DVDs. The legal status
+   5.4.5 "input_dvd: Sorry, xine doesn't play encrypted DVDs. The legal status
           of CSS decryption is unclear and we will not provide such code."
    5.4.6 "audio driver 'oss' failed, using null driver instead"
    
@@ -143,6 +146,31 @@
     systems "make" is GNU make - on other platforms use "gmake" instead.
 
 3.2 How do I compile xine?
+
+3.2.1 simple build instructions for beginners
+
+    Download the latest xine-lib and xine-ui tarballs, then follow
+    these instruction. To unpack a tarball, use
+  
+    tar xfvz tarballname.tar.gz
+
+    the following instructions will install xine in /usr/local
+    for all users. You need root privileges to do this on most
+    systems.
+
+    first unpack xine-lib, then:
+    # ./configure
+    # make install
+
+    make sure your /etc/ld.so.conf contains /usr/local/lib, then
+
+    # ldconfig
+
+    now unpack xine-ui, then:
+    # ./configure
+    # make install
+
+3.2.2 complete build instructions
 
     The build process is the same for all of the xine modules (see 2.1 for
     an explanation about the modules).
@@ -647,7 +675,7 @@
       Recent xine versions will properly check if the DVD you are trying to
       play is encrypted and warn you about it. (see 5.4.5)
 
-5.4.5 "input_dvd: Sorry, Xine doesn't play encrypted DVDs. The legal status
+5.4.5 "input_dvd: Sorry, xine doesn't play encrypted DVDs. The legal status
        of CSS decryption is unclear and we will not provide such code."
        
       Your DVD is encrypted and thus cannot be played back with xine. Please
