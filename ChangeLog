@@ -14,18 +14,23 @@ xine-ui (0.9.23) unstable; urgency=low
   * new "stop after this stream" feature,
   * grab streams recusively (with enqueuing and file browser),
   * fix reference mrl handling,
-  * add 'loop' and two new playlist options 'first' and 'last', in session control,
+  * add 'loop' and two new playlist options 'first' and 'last', in 
+    session control,
   * fix shortcut grabber,
-  * sound volume control can be sets with sound card mixer or software amplification,
+  * sound volume control can be sets with sound card mixer or 
+    software amplification,
   * add help in chain reaction window,
   * double clicking in output window is a fullscreen toggle now,
   * subtitle autoload feature added,
-  * new TVout feature, using libnvtvsimple for nVIDIA cards, and atitvout for ATI,
+  * new TVout feature, using libnvtvsimple for nVIDIA cards, and 
+    atitvout for ATI,
   * store spu offset in toxine's playlist,
   * fix skin downloder,
   * fix support of huge playlists,
   * contextual menu popup in playlist window,
   * fix control's window sliders,
+  * ton of fbxine improvments (post plugin, deinterlacing, spu, 
+    stream infos...),
   * bunch of other fix.
 	
 xine-ui (0.9.22) unstable; urgency=low
