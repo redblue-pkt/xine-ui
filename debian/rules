@@ -79,6 +79,7 @@ install: build
 	dh_installdirs
 
 	$(MAKE) $(INSTALL_TARGET) DESTDIR=$(CURDIR)/debian/xine-ui
+	mkdir -p debian/xine-ui/usr/share/doc/xine-ui
 	install -m 644 README debian/xine-ui/usr/share/doc/xine-ui
 	# these must not be compressed, or xine's online help will fail:
 	cd debian/xine-ui/usr/share/doc/xine-ui; \

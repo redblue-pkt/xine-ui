@@ -1,6 +1,5 @@
 usr/share/xine/desktop/xine.desktop usr/share/applnk/Multimedia/xine.desktop
 usr/share/xine/desktop/xine.desktop usr/share/gnome/apps/Multimedia/xine.desktop
-usr/share/xine/desktop/xine.xpm usr/share/pixmaps/xine.xpm
-usr/share/xine/desktop/xine.xpm usr/share/icons/xine.xpm
+usr/share/pixmaps/xine.xpm usr/share/icons/xine.xpm
 usr/share/man/man1/xine-check.1 usr/share/man/man1/xine-bugreport.1
 usr/bin/xine-check usr/bin/xine-bugreport

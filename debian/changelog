@@ -1,3 +1,13 @@
+xine-ui (0.9.20-1) unstable; urgency=low
+
+  * New upstream release(s)
+    * Display defaults to NULL (closes: #185407)
+    * display pointer is checked for NULL after opening (closes: #185408)
+    * sliders should work again (maybe-closes: #186123)
+    * READMEs are installed in debug mode as well (closes: #185416))
+
+ -- Siggi Langauf <siggi@debian.org>  Tue, 25 Mar 2003 15:10:53 +0100
+
 xine-ui (0.9.18-1) unstable; urgency=low
 
   * new upstream release
