@@ -388,6 +388,7 @@ static void load_video_out_driver(const char *video_driver_id) {
 					       (void *) &vis);
       if (gGui->vo_driver) {
         entry = xine_config_lookup_entry(gGui->xine, "video.driver");
+	free(entry->str_value);
 	entry->str_value = strdup(video_driver_id);
 	xine_config_update_entry (gGui->xine, entry);
 	return;
@@ -408,6 +409,7 @@ static void load_video_out_driver(const char *video_driver_id) {
 					       (void *) &vis);
       if (gGui->vo_driver) {
         entry = xine_config_lookup_entry(gGui->xine, "video.driver");
+	free(entry->str_value);
 	entry->str_value = strdup(video_driver_id);
 	xine_config_update_entry (gGui->xine, entry);
 	return;
@@ -434,6 +436,7 @@ static void load_video_out_driver(const char *video_driver_id) {
     }
     
     entry = xine_config_lookup_entry(gGui->xine, "video.driver");
+    free(entry->str_value);
     entry->str_value = strdup(video_driver_id);
     xine_config_update_entry (gGui->xine, entry);
   }
@@ -481,6 +484,7 @@ static const xine_ao_driver_t *load_audio_out_driver(const char *audio_driver_id
 	printf (_("main: ...worked, using '%s' audio driver.\n"), driver_ids[i]);
 
 	entry = xine_config_lookup_entry(gGui->xine, "audio.driver");
+	free(entry->str_value);
 	entry->str_value = strdup(audio_driver_id);
 	xine_config_update_entry (gGui->xine, entry);
 
@@ -492,7 +496,8 @@ static const xine_ao_driver_t *load_audio_out_driver(const char *audio_driver_id
     printf(_("main: audio driver probing failed => no audio output\n"));
 	    
     entry = xine_config_lookup_entry(gGui->xine, "audio.driver");
-    entry->str_value = "null";
+    free(entry->str_value);
+    entry->str_value = strdup("null");
     xine_config_update_entry (gGui->xine, entry);
 
   } else {
@@ -502,7 +507,8 @@ static const xine_ao_driver_t *load_audio_out_driver(const char *audio_driver_id
 
       printf(_("main: not using any audio driver (as requested).\n"));
       entry = xine_config_lookup_entry(gGui->xine, "audio.driver");
-      entry->str_value = "null";
+      free(entry->str_value);
+      entry->str_value = strdup("null");
       xine_config_update_entry (gGui->xine, entry);
 
     } else {
@@ -516,6 +522,7 @@ static const xine_ao_driver_t *load_audio_out_driver(const char *audio_driver_id
       }
 
       entry = xine_config_lookup_entry(gGui->xine, "audio.driver");
+      free(entry->str_value);
       entry->str_value = strdup(audio_driver_id);
       xine_config_update_entry (gGui->xine, entry);
       

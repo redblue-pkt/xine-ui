@@ -1324,6 +1324,7 @@ void video_window_change_skins(void) {
 	return;
     }
     
+    free(cfg_entry->str_value);
     cfg_entry->str_value = strdup(skin_logo);
     xine_config_update_entry(gGui->xine, cfg_entry);
   }
@@ -1334,6 +1335,7 @@ void video_window_change_skins(void) {
      * change, not at the first skin loading.
      **/
     if(cfg_entry && sk_changed) {
+      free(cfg_entry->str_value);
       cfg_entry->str_value = strdup(cfg_entry->str_default);
       xine_config_update_entry(gGui->xine, cfg_entry);
     }

@@ -520,7 +520,8 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   
   entry = (xine_cfg_entry_t *)data;
   
-  entry->str_value = str;
+  free(entry->str_value);
+  entry->str_value = strdup(str);
   xine_config_update_entry(gGui->xine, entry);
   
   check_entry = xine_config_lookup_entry(gGui->xine, entry->key);
