@@ -93,10 +93,11 @@ typedef struct {
 #define	OPTION_INSTALL_COLORMAP	1001
 #define DISPLAY_KEYMAP          1002
 #define OPTION_SK_SERVER        1003
-#define OPTION_ENQUEUE          2000
-#define OPTION_VERBOSE          3000
-#define OPTION_BROADCAST_PORT   4000
-#define OPTION_NO_LOGO          5000
+#define OPTION_ENQUEUE          1004
+#define OPTION_VERBOSE          1005
+#define OPTION_BROADCAST_PORT   1006
+#define OPTION_NO_LOGO          1007
+#define OPTION_POST             1008
 
 /* options args */
 static const char *short_options = "?hHgfvn"
@@ -151,6 +152,7 @@ static struct option long_options[] = {
 #endif
   {"no-logo"        , no_argument      , 0, OPTION_NO_LOGO           },
   {"no-reload"      , no_argument      , 0, 'E'                      },
+  {"post"           , required_argument, 0, OPTION_POST              },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -535,6 +537,10 @@ void show_usage (void) {
 #endif
   printf(_("      --no-logo                Don't display the logo.\n"));
   printf(_("  -E, --no-reload              Don't reload old playlist.\n"));
+  printf(_("      --post <plugin>[:parameter=value][,...]\n"));
+  printf(_("                               Load a post plugin.\n"));
+  printf(_("                               Parameters are comma separated.\n"));
+  printf(_("                               This option can be used more than one time.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1113,6 +1119,8 @@ int main(int argc, char *argv[]) {
   char                   *cfgdir          = CONFIGDIR;
   char                   *cfgfile         = CONFIGFILE;
   int                     old_playlist_cfg, no_old_playlist = 0;
+  char                  **pplugins        = NULL;
+  int                     pplugins_num    = 0;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1190,8 +1198,6 @@ int main(int argc, char *argv[]) {
   /*
    * parse command line
    */
-#warning command line: -post <name>:option1=value1,option2=value2....
-
   opterr = 0;
   while((c = getopt_long(_argc, _argv, short_options,
 			 long_options, &option_index)) != EOF) {
@@ -1452,6 +1458,18 @@ int main(int argc, char *argv[]) {
       no_old_playlist = 1;
       break;
 
+    case OPTION_POST:
+      if(!pplugins_num)
+	pplugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+      else
+	pplugins = (char **) realloc(pplugins, sizeof(char *) * (pplugins_num + 2));
+      
+      pplugins[pplugins_num] = optarg;
+      pplugins_num++;
+      pplugins[pplugins_num] = NULL;
+
+      break;
+
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -1580,7 +1598,7 @@ int main(int argc, char *argv[]) {
    * xine init
    */
   xine_init(gGui->xine);
-
+  
   /* Get old working path from input plugin */
   {
     xine_cfg_entry_t  cfg_entry;
@@ -1742,8 +1760,45 @@ int main(int argc, char *argv[]) {
    */
   gGui->actions_on_start[aos] = ACTID_NOKEY;
   
+  /* Initialize posts, if required */
+  if(pplugins_num) {
+    char             **plugin = pplugins;
+    xine_post_out_t   *vo_source;
+    int                i = 0;
+
+    while(*plugin) {
+      pplugin_parse_and_store_post((const char *) *plugin);
+      *plugin++;
+    }
+
+    /* Rewire */
+    if(gGui->post_elements_num) {
+      
+      for(i = (gGui->post_elements_num - 1); i >= 0; i--) {
+	const char *const *outs = xine_post_list_outputs(gGui->post_elements[i]->post);
+	const xine_post_out_t *vo_out = xine_post_output(gGui->post_elements[i]->post, (char *) *outs);
+	if(i == (gGui->post_elements_num - 1)) {
+	  xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
+	}
+	else {
+	  const xine_post_in_t *vo_in = xine_post_input(gGui->post_elements[i + 1]->post, "video");
+	  int                   err;
+	  
+	  err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
+	}
+      }
+      
+      vo_source = xine_get_video_source(gGui->stream);
+      xine_post_wire_video_port(vo_source, gGui->post_elements[0]->post->video_input[0]);
+    }
+    
+  }
+  
   gui_run();
 
+  if(pplugins)
+    free(pplugins);
+  
 #ifdef HAVE_ORBIT
   if (!no_lirc)
     xine_server_exit(gGui->xine);

@@ -624,21 +624,20 @@ static void _pplugin_set_param_int(xitk_widget_t *w, void *data, int value) {
   //can be int[]:
   //int num_of_int = pobj->param->size / sizeof(char);
 
-  *(int *)(pobj->param_data + pobj->param->offset) = value;
-
-  _pplugin_update_parameter(pobj);
-  
-  if(xitk_get_widget_type(w) & WIDGET_GROUP_COMBO)
-    xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
+  if(value < pobj->param->range_min || value > pobj->param->range_max) {
+    xine_error(_("Entered value is out of bounds (%d>%d<%d)."),
+	       pobj->param->range_min, value, pobj->param->range_max);
+  }
   else {
+    *(int *)(pobj->param_data + pobj->param->offset) = value;
     
-    if(value < pobj->param->range_min || value > pobj->param->range_max)
-      xine_error(_("Entered value is out of bounds (%d>%d<%d)."),
-		 pobj->param->range_min, value, pobj->param->range_max);
+    _pplugin_update_parameter(pobj);
+    
+    if(xitk_get_widget_type(w) & WIDGET_GROUP_COMBO)
+      xitk_combo_set_select(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
     else
       xitk_intbox_set_value(pobj->value, *(int *)(pobj->param_data + pobj->param->offset));
   }
-
 }
 
 static void _pplugin_set_param_double(xitk_widget_t *w, void *data, double value) {
@@ -647,15 +646,17 @@ static void _pplugin_set_param_double(xitk_widget_t *w, void *data, double value
   if(pobj->readonly)
     return;
 
-  *(double *)(pobj->param_data + pobj->param->offset) = value;
-
-  _pplugin_update_parameter(pobj);
-  
-  if(value < pobj->param->range_min || value > pobj->param->range_max)
-      xine_error(_("Entered value is out of bounds (%e>%e<%e)."),
-		 pobj->param->range_min, value, pobj->param->range_max);
-    else
-      xitk_doublebox_set_value(pobj->value, *(double *)(pobj->param_data + pobj->param->offset));
+  if(value < pobj->param->range_min || value > pobj->param->range_max) {
+    xine_error(_("Entered value is out of bounds (%e>%e<%e)."),
+	       pobj->param->range_min, value, pobj->param->range_max);
+  }
+  else {
+    *(double *)(pobj->param_data + pobj->param->offset) = value;
+    
+    _pplugin_update_parameter(pobj);
+    
+    xitk_doublebox_set_value(pobj->value, *(double *)(pobj->param_data + pobj->param->offset));
+  }
 }
 
 static void _pplugin_set_param_char(xitk_widget_t *w, void *data, char *text) {
@@ -989,15 +990,14 @@ static void _pplugin_kill_filters_from(post_object_t *pobj) {
   }
 }
 
-static void _pplugin_retrieve_parameters(post_object_t *pobj) {
+static int __pplugins_retrieve_parameters(post_object_t *pobj) {
   xine_post_in_t             *input_api;
-  xine_post_api_t            *post_api;
-  xine_post_api_descr_t      *api_descr;
-  xine_post_api_parameter_t  *parm;
-  xitk_combo_widget_t         cmb;
   
   if((input_api = (xine_post_in_t *) xine_post_input(pobj->post, "parameters"))) {
-    int pnum = 0;
+    xine_post_api_t            *post_api;
+    xine_post_api_descr_t      *api_descr;
+    xine_post_api_parameter_t  *parm;
+    int                         pnum = 0;
     
     post_api = (xine_post_api_t *) input_api->data;
     
@@ -1025,6 +1025,17 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
     pobj->api      = post_api;
     pobj->descr    = api_descr;
     pobj->param    = api_descr->parameter;
+    
+    return 1;
+  }
+
+  return 0;
+}
+
+static void _pplugin_retrieve_parameters(post_object_t *pobj) {
+  xitk_combo_widget_t         cmb;
+  
+  if(__pplugins_retrieve_parameters(pobj)) {
     
     XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
     cmb.skin_element_name = NULL;
@@ -1250,19 +1261,21 @@ static void _pplugin_add_filter(xitk_widget_t *w, void *data) {
 static void _pplugin_rebuild_filters(void) {
   post_element_t  **pelem = gGui->post_elements;
 
-  while(*pelem) {
+  while(pelem && *pelem) {
     int i = 0;
-
+    
     _pplugin_create_filter_object();
     pplugin->post_objects[pplugin->object_num - 1]->post = (*pelem)->post;
-
-    while(strcasecmp(pplugin->plugin_names[i], (*pelem)->name))
+    
+    while(pplugin->plugin_names[i] && strcasecmp(pplugin->plugin_names[i], (*pelem)->name))
       i++;
-
-    xitk_combo_set_select(pplugin->post_objects[pplugin->object_num - 1]->plugins, i);
-
-    _pplugin_retrieve_parameters(pplugin->post_objects[pplugin->object_num - 1]);
-
+    
+    if(pplugin->plugin_names[i]) {
+      xitk_combo_set_select(pplugin->post_objects[pplugin->object_num - 1]->plugins, i);
+      
+      _pplugin_retrieve_parameters(pplugin->post_objects[pplugin->object_num - 1]);
+    }
+    
     *pelem++;
   }
   
@@ -1295,7 +1308,6 @@ static void _pplugin_save_chain(void) {
 	  free(gGui->post_elements[j]->name);
 	  free(gGui->post_elements[j]);
 	}
-	free(gGui->post_elements[j]);
 	
 	gGui->post_elements = (post_element_t **) 
 	  realloc(gGui->post_elements, sizeof(post_element_t *) * (post_num + 1));
@@ -1308,8 +1320,7 @@ static void _pplugin_save_chain(void) {
 	gGui->post_elements[i]->name = 
 	  strdup(xitk_combo_get_current_entry_selected(pplugin->post_objects[i]->plugins));
       }
-      
-      gGui->post_elements[post_num] = (post_element_t *) xine_xmalloc(sizeof(post_element_t));
+
       gGui->post_elements[post_num] = NULL;
       gGui->post_elements_num       = post_num;
     }
@@ -1324,7 +1335,9 @@ static void _pplugin_save_chain(void) {
 	
 	free(gGui->post_elements[j]);
 	free(gGui->post_elements);
+
 	gGui->post_elements_num = 0;
+	gGui->post_elements     = NULL;
       }
     }
   }
@@ -1407,9 +1420,9 @@ static void _pplugin_apply_filters(xitk_widget_t *w, void *data) {
 	gGui->post_elements[i]->name = 
 	  strdup(xitk_combo_get_current_entry_selected(pplugin->post_objects[i]->plugins));
       }
-
-      gGui->post_elements[gGui->post_elements_num] = (post_element_t *) 
-	xine_xmalloc(sizeof(post_element_t));
+      
+      //gGui->post_elements[gGui->post_elements_num] = (post_element_t *) 
+      //	xine_xmalloc(sizeof(post_element_t));
       gGui->post_elements[gGui->post_elements_num] = NULL;
       
 #ifdef TRACE_REWIRE
@@ -1791,4 +1804,133 @@ void pplugin_panel(void) {
   XLockDisplay (gGui->display);
   XSetInputFocus(gGui->display, xitk_window_get_window(pplugin->xwin), RevertToParent, CurrentTime);
   XUnlockDisplay (gGui->display);
+}
+
+void pplugin_parse_and_store_post(const char *post) {
+
+  /* -post <name>:option1=value1,option2=value2... */
+  if(post && strlen(post)) {
+    char          *p = (char *) post;
+    char          *plugin, *args = NULL;
+    xine_post_t   *post;
+    
+    while(*p == ' ')
+      p++;
+    
+    xine_strdupa(plugin, p);
+    
+    if((p = strchr(plugin, ':')))
+      *p++ = '\0';
+    
+    if(p && (strlen(p) > 1))
+      args = p;
+
+    post = xine_post_init(gGui->xine, plugin, 0, &gGui->ao_port, &gGui->vo_port);
+
+    if(post) {
+      post_object_t  pobj;
+
+      if(!gGui->post_elements_num)
+	gGui->post_elements = (post_element_t **) xine_xmalloc(sizeof(post_element_t *) * 2);
+      else
+	gGui->post_elements = (post_element_t **) 
+	  realloc(gGui->post_elements, sizeof(post_element_t *) * (gGui->post_elements_num + 1));
+      
+      gGui->post_elements[gGui->post_elements_num] = (post_element_t *) 
+	xine_xmalloc(sizeof(post_element_t));
+      gGui->post_elements[gGui->post_elements_num]->post = post;
+      gGui->post_elements[gGui->post_elements_num]->name = strdup(plugin);
+      gGui->post_elements_num++;
+      gGui->post_elements[gGui->post_elements_num] = NULL;
+      
+      memset(&pobj, 0, sizeof(post_object_t));
+      pobj.post = post;
+
+      if(__pplugins_retrieve_parameters(&pobj)) {
+	int   i;
+
+	if(pobj.properties_names && args) {
+	  char *param;
+	  
+	  while((param = xine_strsep(&args, ",")) != NULL) {
+	    
+	    p = param;
+	    
+	    while((*p != '\0') && (*p != '='))
+	      p++;
+	    
+	    if(p && strlen(p)) {
+	      int param_num = 0;
+	      
+	      *p++ = '\0';
+	      
+	      while(pobj.properties_names[param_num]
+		    && strcmp(pobj.properties_names[param_num], param))
+		param_num++;
+	      
+	      if(pobj.properties_names[param_num]) {
+		
+		pobj.param    = pobj.descr->parameter;
+		pobj.param    += param_num;
+		pobj.readonly = pobj.param->readonly;
+
+		switch(pobj.param->type) {
+		case POST_PARAM_TYPE_INT:
+		  if(!pobj.readonly) {
+		    *(int *)(pobj.param_data + pobj.param->offset) = (int) strtol(p, &p, 10);
+		    _pplugin_update_parameter(&pobj);
+		  }
+		  break;
+
+		case POST_PARAM_TYPE_DOUBLE:
+		  if(!pobj.readonly) {
+		    *(double *)(pobj.param_data + pobj.param->offset) = strtod(p, &p);
+		    _pplugin_update_parameter(&pobj);
+		  }
+		  break;
+
+		case POST_PARAM_TYPE_CHAR:
+		case POST_PARAM_TYPE_STRING:
+		  if(!pobj.readonly) {
+		    if(pobj.param->type == POST_PARAM_TYPE_CHAR) {
+		      int maxlen = pobj.param->size / sizeof(char);
+		      
+		      snprintf((char *)(pobj.param_data + pobj.param->offset), maxlen, "%s", p);
+		      _pplugin_update_parameter(&pobj);
+		    }
+		    else
+		     fprintf(stderr, "parameter type POST_PARAM_TYPE_STRING) not supported yet.\n");
+		  }
+		  break;
+
+		case POST_PARAM_TYPE_STRINGLIST: // unsupported */
+		  if(!pobj.readonly)
+		    fprintf(stderr, "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n");
+		  break;
+
+		case POST_PARAM_TYPE_BOOL:
+		  if(!pobj.readonly) {
+		    *(int *)(pobj.param_data + pobj.param->offset) = ((int) strtol(p, &p, 10)) ? 1 : 0;
+		    _pplugin_update_parameter(&pobj);
+		  }
+		  break;
+		}
+	      }
+	    }
+	  } 
+
+	  i = 0;
+	  
+	  while(pobj.properties_names[i]) {
+	    free(pobj.properties_names[i]);
+	    i++;
+	  }
+	  
+	  free(pobj.properties_names);
+	}
+	
+	free(pobj.param_data);
+      }
+    }
+  }
 }

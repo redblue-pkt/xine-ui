@@ -44,5 +44,5 @@ int pplugin_is_running(void);
 void pplugin_toggle_visibility(xitk_widget_t *w, void *data);
 void pplugin_raise_window(void);
 void pplugin_panel(void);
-
+void pplugin_parse_and_store_post(const char *post);
 #endif
