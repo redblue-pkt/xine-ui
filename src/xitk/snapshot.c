@@ -853,6 +853,7 @@ void create_snapshot ( gGui_t *gGui )
     return;
   }
 
+#ifdef PNG_SETJMP_SUPPORTED	/* libpng 1.0.5 has no png_jmpbuf */
   /*
    *  Set up long jump callback for PNG parser
    */
@@ -865,6 +866,7 @@ void create_snapshot ( gGui_t *gGui )
     prvt_image_free( &image );
     return;
   }
+#endif
 
   /*
    *  Scale YUV data
