@@ -1,3 +1,46 @@
+xine-ui (0.9.15) unstable; urgency=low
+
+  * tons of toolkit bugfixes,
+  * snapshot fixed,
+  * update from time to time audio and spu language,
+  * fix root window display,
+  * output window can be on top even in windowed mode,
+  * scan whole playlist about stream info,
+  * playlist support: asx (local), tox, m3u, pls, sfv and raw text,
+  * playlist loop modes,
+  * new mediamark object support (start/end/ident/mrl),
+  * possibility to add a new mediamark from current position playback,
+  * mediamarks are editable from playlist window,
+  * visual animation while audio only stream playback,
+  * kde window mapping bug fixed,
+  * handle 'none' video output plugin,
+  * fix playlist entry moving,
+  * fix relative seeking bug,
+  * fix 'file:/' mrl DnD adding bug,
+  * improved support for moving and resizing video window,
+  * (aaUI) playlist fixes,
+  * man pages and translation files updates.
+
+xine-ui (0.9.14) unstable; urgency=low
+
+  * dfb is disabled now (we need a maintainer),
+  * corba is disabled now (we need a maintainer),
+  * new logo code,
+  * reenable sound control,
+  * dpms standby,
+  * more new api syncing,
+  * fix seeking,
+  * fullscreen bug fixed (twice click),
+  * fix mrl browser mrl filtering bug,
+  * document new mrl syntax,
+  * navigation (dvd/vcd) window,
+  * stream information window,
+  * panel/output_window autohide feature (regarding to stream type),
+  * browser widgets have horizontal slider (useful with larger text strings),
+  * man pages and translation files updates.
+
+  * -- Switch to new xine library API --
+
 xine-ui (0.9.13) unstable; urgency=low
   
   * includes the most popular themes: xinetic(default), cloudy, CelomaChrome
