@@ -53,7 +53,10 @@ AM_CONFIG_HEADER(config.h)
 dnl
 dnl Check for programs.
 dnl
+dnl Save CFLAGS, AC_ISC_POSIX set some unwanted default CFLAGS
+saved_CFLAGS="$CFLAGS"
 AC_ISC_POSIX
+CFLAGS="$saved_CFLAGS"
 AC_PROG_CC
 AC_MINIX dnl readline
 AC_STDC_HEADERS
@@ -138,7 +141,6 @@ case "$host" in
 esac
 AC_SUBST(THREAD_LIBS)
 AC_SUBST(THREAD_CFLAGS)
-
 
 dnl
 dnl dynamic linker
@@ -687,6 +689,8 @@ esac
 
 CFLAGS="$CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
 DEBUG_CFLAGS="$DEBUG_CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"
+AC_SUBST(CFLAGS)
+AC_SUBST(DEBUG_CFLAGS)
 
 dnl gcc __attribute__ ((aligned ()))
 AC_C_ATTRIBUTE_ALIGNED
