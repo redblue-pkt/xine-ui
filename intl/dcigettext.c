@@ -57,6 +57,7 @@ extern int errno;
 #include <stdlib.h>
 
 #include <string.h>
+#include <strings.h>
 #if !HAVE_STRCHR && !defined _LIBC
 # ifndef strchr
 #  define strchr index
@@ -973,18 +974,18 @@ plural_lookup (domain, n, translation, translation_len)
      size_t translation_len;
 {
   struct loaded_domain *domaindata = (struct loaded_domain *) domain->data;
-  unsigned long int index;
+  unsigned long int i;
   const char *p;
 
-  index = plural_eval (domaindata->plural, n);
-  if (index >= domaindata->nplurals)
+  i = plural_eval (domaindata->plural, n);
+  if (i >= domaindata->nplurals)
     /* This should never happen.  It means the plural expression and the
        given maximum value do not match.  */
-    index = 0;
+    i = 0;
 
   /* Skip INDEX strings at TRANSLATION.  */
   p = translation;
-  while (index-- > 0)
+  while (i-- > 0)
     {
 #ifdef _LIBC
       p = __rawmemchr (p, '\0');
