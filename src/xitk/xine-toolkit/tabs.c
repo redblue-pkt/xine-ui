@@ -60,14 +60,15 @@ static void enability(xitk_widget_t *w) {
     if(w->enable == WIDGET_ENABLE) {
       xitk_enable_widget(private_data->left);
       xitk_enable_widget(private_data->right);
-      for(i = 0; i <= private_data->num_entries; i++)
+      for(i = 0; i < private_data->num_entries; i++)
 	xitk_enable_widget(private_data->tabs[i]);
     }
     else {
       xitk_disable_widget(private_data->left);
       xitk_disable_widget(private_data->right);
-      for(i = 0; i <= private_data->num_entries; i++)
+      for(i = 0; i < private_data->num_entries; i++) {
 	xitk_disable_widget(private_data->tabs[i]);
+      }
     }
   }
 }
