@@ -298,7 +298,7 @@ static int parse_visual(VisualID *vid, int *vclass, char *visual_str) {
 }
 
 static void xrm_parse(void) {
-  char         *display_name = ":0.0";
+  char         *display_name = NULL;
   Display      *display;
   char          user_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
@@ -316,7 +316,10 @@ static void xrm_parse(void) {
   if(getenv("DISPLAY"))
     display_name = getenv("DISPLAY");
   
-  display = XOpenDisplay(display_name);
+  if((display = XOpenDisplay(display_name)) == NULL) {
+    fprintf(stderr, _("Cannot open display\n"));
+    exit(1);
+  }
   
   application_rmdb = XrmGetFileDatabase(wide_dbname);
   (void) XrmMergeDatabases(application_rmdb, &rmdb);

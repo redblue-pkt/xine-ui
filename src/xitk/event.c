@@ -953,7 +953,7 @@ void gui_deinit(void) {
  */
 void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute) {
   int    i;
-  char  *display_name = ":0.0";
+  char  *display_name = NULL;
   char  *server;
 
   /*

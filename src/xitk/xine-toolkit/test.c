@@ -103,7 +103,7 @@ static void create_menu(void);
  *
  */
 static int init_test(void) {
-  char              *display_name = ":0.0";
+  char              *display_name = NULL;
   ImlibInitParams    imlib_init;
   int                screen;
   int		     depth = 0;
