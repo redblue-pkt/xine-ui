@@ -3,7 +3,17 @@
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\" 
-.\" Zuletzt synchronisiert mit en/xine.1.in 1.18 2002-04-16
+.\" Zuletzt synchronisiert mit en/xine.1.in 1.22 2002-08-02
+.de Vb \" Begin verbatim text
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve \" End verbatim text
+.ft R
+
+.fi
+..
 .TH "XINE" "1x" "30. April 2002" "Das xine Projekt" ""
 .SH "NAME"
 xine \- Ein freier Video\-Player
@@ -26,36 +36,36 @@ Für eine vollständige Beschreibung wird auf die README und FAQ in \fI@prefix@/sh
 .B \-h,\ \-\-help
 Zeigt eine Zusammenfassung der Optionen und die verfügbaren Ausgabe\-Treiber (Plugins) an.
 .TP 
-.BR \-a,\ \-\-audio\-channel\  <Zahl>
-Wählt die angegebene Tonspur. \fB<Zahl>\fP ist die Nummer der Tonspur, normalerweise \fB0\fP.
+.BI \-a,\ \-\-audio\-channel\  <Zahl>
+Wählt die angegebene Tonspur. \fI<Zahl>\fP ist die Nummer der Tonspur, normalerweise \fB0\fP.
 .br 
 Xine 0.5 und neuer versucht, möglichst viele gültige Tonspuren (ac3, mpeg audio, avi audio, ...) des Titels zu sammeln und ordnet diese sogenannten "Virtuelen Kanälen" zu, die von \fB0\fP an beginnend durchnummeriert sind.
 .TP 
-.BR \-V,\ \-\-video\-driver\  <Treiber>
-Wählt den Video\-Treiber aus. \fIxine \-\-help\fP zeigt eine Liste der Video\-Treiber an, die auf diesem System verfügbar sind. Diese Auswahl wird automatisch in \fI.xinerc\fP gespeichert, so daß der Video\-Treiber nur einmalig gewählt werden braucht.
+.BI \-V,\ \-\-video\-driver\  <Treiber>
+Wählt den Video\-Treiber aus. \fIxine \-\-help\fP zeigt eine Liste der Video\-Treiber an, die auf diesem System verfügbar sind. Diese Auswahl wird automatisch in \fI~/.xine/config\fP gespeichert, so daß der Video\-Treiber nur einmalig gewählt werden braucht.
 .TP 
-.BR \-A,\ \-\-audio\-driver\  <Treiber>
-Wählt den Audio\-Treiber aus. \fIxine \-\-help\fP zeigt eine Liste der Audio\-Treiber an, die auf diesem System verfügbar sind. Diese Auswahl wird automatisch in \fI.xinerc\fP gespeichert, so daß der Audio\-Treiber nur einmalig gewählt werden braucht.
+.BI \-A,\ \-\-audio\-driver\  <Treiber>
+Wählt den Audio\-Treiber aus. \fIxine \-\-help\fP zeigt eine Liste der Audio\-Treiber an, die auf diesem System verfügbar sind. Diese Auswahl wird automatisch in \fI~/.xine/config\fP gespeichert, so daß der Audio\-Treiber nur einmalig gewählt werden braucht.
 .TP 
-.BR \-u,\ \-\-spu\-channel\  <Zahl>
-Wählt einen Bilduntertitel\-Kanal aus. \fB<Zahl>\fP gibt die Nummer des Kanals an. \fB\-1\fP steht für "keinen Untertitel" und ist die Standardeinstellung.
+.BI \-u,\ \-\-spu\-channel\  <Zahl>
+Wählt einen Bilduntertitel\-Kanal aus. \fI<Zahl>\fP gibt die Nummer des Kanals an. \fB\-1\fP steht für "keinen Untertitel" und ist die Standardeinstellung.
 .TP 
-.B \-p[q][d][v],\ \-\-auto\-play=[q][d][v]
+.BI \-p,\ \-\-auto\-play= [f][h][w][q][d][v]
 Startet die Wiedergabe sofort nach dem Laden den Programms.
 Folgende Optionen können angehängt werden:
 .br
-\'\fBf\fP\' Vollbildmodus,
+`\fIf\fP' Vollbildmodus,
 .br
-\'\fBh\fP\' GUI (Steuerfenster, etc...) ausbelnden,
+`\fIh\fP' GUI (Steuerfenster, etc...) ausbelnden,
 .br
-\'\fBw\fP\' Videoausgabefenster ausbelnden,
+`\fIw\fP' Videoausgabefenster ausbelnden,
 .br
-\'\fBq\fP\' Programm nach Abspielen beenden,
+`\fIq\fP' Programm nach Abspielen beenden,
 .br
-Es ist auch möglich, eine Spielliste von DVD \'\fBd\fP\' oder \'\fBv\fP\' anzufordern.
+Es ist auch möglich, eine Spielliste von DVD `\fId\fP' oder `\fIv\fP' anzufordern.
 Dafür gibt es inzwischen die allgemeinere Option \fI\-\-auto\-scan\fP, mehr dazu siehe weiter unten.
 .TP 
-.BR \-s\  <plugin>,\  \-\-auto\-scan\  <plugin>
+.BI \-s,\ \-\-auto\-scan\  <plugin>
 Titelliste automatisch vom Input\-Plugin erstellen. Viele Plugins erlauben es, eine standard Titelliste zu erstellen, die "alles" enthält. Dies Funktioniert zum Beispiel gut mit DVDs und VCDs. Das Benutzen dieser Option hat die gleiche Wirkung, als wenn der zugehörige Knopf im xine\-Hauptfenster gedrückt wird.
 
 Diese Option ist besonders nützlich im Zusammenhang mit auto\-play.
@@ -64,23 +74,29 @@ Dies funktioniert auch mit Plugins, die nicht mit xine ausgeliefert werden, inde
 .TP 
 .B \-f, \-\-fullscreen
 Schaltet xine nach dem Start in den Vollbildschirm\-Modus.
-(Wie das Betätigen von \'\fBF\fP\')
+(Wie das Betätigen von `\fBF\fP')
 .TP 
 .B \-g, \-\-hide\-gui
 Verdeckt nach dem Start nur das Steuerfenster, das Video\-Fenster bleibt sichtbar.
-(Wie das Betätigen von \'\fBG\fP\')
+(Wie das Betätigen von `\fBG\fP')
 .TP 
+.BI \-G,\ \-\-geometry\  <BxH[+X+Y]>
+Position und Größe des Video\-Fensters als X-Geometrie angeben (siehe \fIX\fP(7)). Position \fBX\fP und \fBY\fP sind optional.
+.TP
+.B \-B,\ \-\-borderless
+Rahmen von Video\-Fenster entfernen (Nur im Fenster\-Modus).
+.TP
 .B \-H, \-\-hide\-video
 Verdeckt nach dem Start nur das Video\-Fenster.
-(Wie das Betätigen von \'\fBH\fP\')
+(Wie das Betätigen von `\fBH\fP')
 .TP
 .B \-L, \-\-no\-lirc
 Deaktiviert die LIRC Unterstützung.
 Diese Option steht nur zur Verfügung, wenn xine mit LIRC-Unterstützung übersetzt wurde.
 .TP 
-.BR \-\-visual\  <Visual\-Klasse\-oder\-id>
+.BI \-\-visual\  <Visual\-Klasse\-oder\-id>
 Bestimmtes X11\-Visual für xine\-Fenster verwenden.
-Der \fB<Visual\-Klasse\-oder\-id>\fP Parameter kann entweder der Name einer X11\-visual\-Klasse (\fBStaticGray\fP, \fBGrayScale\fP, \fBStaticColor\fP, \fBPseudoColor\fP, \fBTrueColor\fP oder \fBDirectColor\fP) oder ein \fBhexadezimaler Wert\fP derselben sein.
+Der \fI<Visual\-Klasse\-oder\-id>\fP Parameter kann entweder der Name einer X11\-visual\-Klasse (\fBStaticGray\fP, \fBGrayScale\fP, \fBStaticColor\fP, \fBPseudoColor\fP, \fBTrueColor\fP oder \fBDirectColor\fP) oder ein \fBhexadezimaler Wert\fP derselben sein.
 
 Wenn ein symbolischer Name benutz wird, versucht xine ein solches Visual in der Farbtiefe \fB15\fP bzw. \fB16\fP, \fB24\fP bzw. \fB32\fP, oder \fB8\fP (in dieser Reihenfolge) zu finden.
 Die Standardeinstellung der visual\-Klasse, die bei Abwesenheit der \fI\-\-visual\-Option\fP benutzt wird, ist \fBTrueColor\fP.
@@ -90,23 +106,23 @@ Wenn kein benutzbares Visual gefunden wird, greift xine auf das Standard\-Visual
 .B \-\-install
 Wenn ein X11\-visual mit veränderlichen Farben (Farbtabellen) benutzt wird, installiert xine eine eigene Farbtabelle. Mit einer eigenen Farbtabelle kann xine mehr Farben anfordern, so daß die Video\-Ausgabe besser aussieht.
 .TP 
-.B \-\-keymap [Optionen]
+.BI \-\-keymap\  [Optionen]
 Zeigt die Tastenbelegung an.
 Optionen sind:
 .br
-\'\fBdefault\fP\' Zeigt die standard Tastenbelegung an,
+`\fBdefault\fP' Zeigt die standard Tastenbelegung an,
 .br
-\'\fBlirc\fP\' Zeigt die Tastenbelegung aus der \fI.lircrc\fP-Konfigurationsdatei an,
+`\fBlirc\fP' Zeigt die Tastenbelegung aus der \fI~/.lircrc\fP-Konfigurationsdatei an,
 .br
-\'\fBremapped\fP\' Zeigt die benutzerspezifische Tastenbelegung an,
+`\fBremapped\fP' Zeigt die benutzerspezifische Tastenbelegung an,
 .br
-Wird keine Option angegeben, wird \'\fBdefault\fP\' ausgewählt.
+Wird keine Option angegeben, wird `\fBdefault\fP' ausgewählt.
 .TP
 .B \-n, \-\-network
 Aktiviert netzwerkbasierte Fernsteuerung.
 Für die Benutzung der netzwerkbasierte Fernsteuerung wird eine Passwortdatei benötigt.
 Wenn xine diese nicht finden kann, wird der Server gestoppt.
-Der Syntax der Passwortdatei folgt dem (bekannten) Schema <\fBIdentifikation\fP>:<\fBPasswort\fP>.
+Der Syntax der Passwortdatei folgt dem (bekannten) Schema <\fIIdentifikation\fP>:<\fIPasswort\fP>.
 Weil Kryptographie in einigen Ländern gesetzlichen Beschränkungen unterliegt, wird das Passwort unverschlüsselt gespeichert und übertragen, weshalb Netzwerkverbindungen besonders zu beachten sind.
 Zusätzlichen stehen zwei (optionale) allgemeine Regeln stehen zur Verfügung, die sich gegenseitig ausschließen
 .nf
@@ -115,7 +131,7 @@ Zusätzlichen stehen zwei (optionale) allgemeine Regeln stehen zur Verfügung, die
 Im ersten Fall können alle Klienten alle Kommandos ohne Einschränkungen ausführen.
 Im zweiten Fall können keine Klienten irgendwelche Kommandoa ausführen, außer identifizierten Benutzern (durch das \fBidentify\fP-Kommando).
 
-Wenn ein Passworteintrag mit einem Stern \'\fB*\fP\' beginnt, ider der Benutzer blockiert.
+Wenn ein Passworteintrag mit einem Stern `\fB*\fP' beginnt, ider der Benutzer blockiert.
 Wenn das Passwortfeld leer ist, wird der komplette Eintrag ignoriert.
 Hier ein Beispiel für eine kleine \fI~/.xine/passwd\fP Datei:
 .nf
@@ -142,12 +158,12 @@ Das wird den Standard-Port von \fB6789\fP auf \fB7890\fP ändern und einen Benutz
 
 Der Server selbst bietet folgende Befehle:
 .br
-.BR help [Kommando]
+.BI help\  [Kommando]
 .br
 Ohne die Angabe von \fIKommando\fP werden alle verfügbaren Befehle aufgelistet.
 Wenn ein Kommand angegeben ist, wird ein kurzer Text mit der Bescreibung der Funktionalität des Befehls ausgegeben.
 .br
-.BR syntax <Kommando>
+.BI syntax\  <Kommando>
 .br
 Zeigt die Syntax von \fIKommando\fP an.
 .TP
@@ -158,25 +174,25 @@ Benutzt den Desktophintergrund zur Videoausgabe.
 MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Titel. Gültige MRLs können einfache Dateinamen sein oder folgendermaßen aussehen:
 .RS
 .TP 
-.B file://<Pfad>
+.BI file:// <Pfad>
 .TP 
-.B fifo://<Pfad>
+.BI fifo:// <Pfad>
 .TP 
 .BR stdin://mpeg1\  oder \ stdin://mpeg2
 .TP 
-.B dvd://VTS_xx_y.VOB
+.BI dvd://VTS_ xx _ y .VOB
 .TP 
-.B vcd://<Titelnummer>
+.BI vcd:// <Titelnummer>
 .TP 
-.B tcp://<host>:<port>
+.BI tcp:// <host> : <port>
 .TP 
-.B rtp://<host>:<port>
+.BI rtp:// <host> : <port>
 .TP 
-.B udp://<host>:<port>
+.BI udp:// <host> : <port>
 .TP
-.B mms://<host>...
+.BI mms:// <host>...
 .TP
-.B http://<host>...
+.BI http:// <host>...
 .PP 
 Mehrere MRLs können angegeben werden, um mehrere Titel nacheinander zu spielen. Die oben aufgeführten MRLs werden standardmäßig von libxine unterstützt. Zusätzliche Plugins können diese Liste um weitere MRLs ergänzen.
 .PP 
@@ -185,143 +201,253 @@ Das Herüberziehen vom \fBGNOME Midnight Commander\fP (gmc), \fBNautilus\fP und \
 .TP
 .B AVI Untertitel Dateien
 .br
-Dateien mit Textuntertiteln können (durch ein \'%\' getrennt) an die Datei-MRL angehängt werden:
+Dateien mit Textuntertiteln können (durch ein `%' getrennt) an die Datei-MRL angehängt werden:
 .br
-.BR file://<Pfad>%<Untertiteldatei>
+.BI file:// <Pfad> % <Untertiteldatei>
 .RE
 
 .SH "BEDIENTASTEN"
 Viele Funktionen können durch Tastendrücken gesteuert werden.
-'\fBM-\fP' ist die Meta Taste (\'\fBAlt\fP\' Taste auf PC Tastaturen),
-'\fBC-\fP' ist die Control/Steuerungs \'\fBCTRL\fP\'/\'\fBSTRG\fP\' Taste.
-Andere spzielle Tasten sind mit '\fB<\fP' und '\fB>\fP' Zeichen umklammert, z.B.: die \'\fBHOME\fP/\fBPos1\fP\' Taste ist dargestellt als \fB<Pos1>\fP.
+`\fBM-\fP' ist die Meta Taste (`\fBAlt\fP' Taste auf PC Tastaturen),
+`\fBC-\fP' ist die Control/Steuerungs `\fBCTRL\fP'/`\fBSTRG\fP' Taste.
+Andere spzielle Tasten sind mit '\fB<\fP' und '\fB>\fP' Zeichen umklammert, z.B.: die `\fBHOME\fP/\fBPos1\fP' Taste ist dargestellt als \fB<Pos1>\fP.
 Die standard Tastaturbelegung ist:
-.IP  "0 .. 9"
+.IP  "\fB0\fP .. \fB9\fP"
 Zu 0%..90% des momentanen Titels springen.
-.IP  "A"
+.IP  "\fB/\fP"
+Springe zum angegebenen Prozentsatz. Diese Möglichkeit ist allgemeiner als die "\fB0\fP .. \fB9\fP" Kommandos von oben. Siehe dazu auch die Sektion "\fBNumerische Eingabe\fP" weiter unten.
+.IP  "\fBA\fP"
 Seitenverhältnis (AUTO/16:9/4:3/DVB) umschalten.
-.IP  "M\-C | M\-c"
+.IP  "\fBM\fP\-\fBC\fP | \fBM\fP\-\fBc\fP"
 Fenster mit Video\-Einstellungen anzeigen/verdecken.
-.IP  "E"
+.IP  "\fBE\fP"
 Momentanes Medium/Titel auswerfen.
-.IP  "F"
+.IP  "\fBF\fP"
 Vollbildmodues umschalten.
-.IP  "G"
+.IP  "\fBG\fP"
 Bedienfenster anzeigen/verdecken.
-.IP  "H"
+.IP  "\fBH\fP"
 Video\-Ausgabefenster anzeigen/verdecken.
-.IP  "i | I"
+.IP  "\fBi\fP | \fBI\fP"
 Deinterlace\-Methode umschalten.
-.IP  "M\-l"
+.IP  "\fBM\fP\-\fBl\fP | \fBM\fP\-\fBL\fP"
 Fenster mit Meldungen anzeigen/verdecken.
-.IP  "M\-m | M\-M"
+.IP  "\fBM\fP\-\fBm\fP | \fBM\fP\-\fBM\fP"
 Fenster mit MRL\-Browser anzeigen/verdecken.
-.IP  "C\-m | C\-M"
+.IP  "\fBC\fP\-\fBm\fP | \fBC\fP\-\fBM\fP"
 Ton\-Stummschaltung umschalten.
-.IP  "C\-o"
+.IP  "\fBC\fP\-\fBo\fP"
 TV\-Modus der DXR3 umschalten.
-.IP  "M\-p | M\-P"
+.IP  "\fBM\fP\-\fBp\fP | \fBM\fP\-\fBP\fP"
 Fenster mit Wiedergabeliste anzeigen/verdecken.
-.IP  "Q"
+.IP  "\fBQ\fP"
 Beenden.
-.IP  "s"
+.IP  "\fBs\fP"
 Zoom auf 1:1 zurücksetzen.
-.IP  "S"
+.IP  "\fBS\fP"
 Wiedergabe anhalten.
-.IP  "M\-s"
+.IP  "\fBM\fP\-\fBs\fP"
 Fenster mit Einstellungen anzeigen/verdecken.
-.IP  "z | Z"
+.IP  "\fBz\fP | \fBZ\fP"
 Hinein/hinaus zoomen.
-.IÜ  "M\-C\-z"
+.IÜ  "\fBM\fP\-\fBC\fP\-\fBz\fP"
 Zoom zurücksetzen.
-.IP  "v"
+.IP  "\fBv\fP"
 Lautstärke verringern.
-.IP  "V"
+.IP  "\fBV\fP"
 Lautstärke erhöhen.
-.IP  "t"
+.IP  "\fBt\fP"
 Bildschirmschnappschuß machen.
-.IP  "<RETURN>"
+.IP  "\fB<RETURN>\fP"
 Wiedergabe.
-.IP  "<LEERZEICHEN>"
+.IP  "\fB<LEERZEICHEN>\fP"
 Pause.
-.IP  "<Oben>/<Untenn>"
+.IP  "\fB<Oben>\fP | \fB<Untenn>\fP"
 Schnelle / langsame Wiedergabe.
-.IP  "c\-<Links>/C\-<Rechts>"
+.IP  "\fBc\fP\-\fB<Links>\fP | \fBC\fP\-\fB<Rechts>\fP"
 \-+ 15 Sekunden spulen.
-.IP  "<Links> / <Rechts>"
+.IP  "\fB<Links>\fP | \fB<Rechts>\fP"
 \-+ 60 Sekunden spulen.
-.IP  "<Bild\ hoch>"
+.IP  "\fB<Bild\ hoch>\fP"
 Zum vorherigen Titel in der Wiedergabeliste springen.
-.IP  "<Bild\ runter>"
+.IP  "\fB<Bild\ runter>\fP"
 Zum nächsten Titel in der Wiedergabeliste springen.
-.IP  "<"
+.IP  "\fB<\fP"
 Ausgabefenster verkleinern.
-.IP  ">"
+.IP  "\fB>\fP"
 Ausgabefenster vergrößern.
-.IP  "M\-1"
+.IP  "\fBM\fP\-1"
 Video-Fenstergröße auf 50% setzen.
-.IP  "M\-2"
+.IP  "\fBM\fP\-2"
 Video-Fenstergröße auf 100% setzen.
-.IP  "M\-3"
+.IP  "\fBM\fP\-3"
 Video-Fenstergröße auf 200% setzen.
-.IP  "."
+.IP  "\fB.\fP"
 Nächsten Untertitel\-Kanal auswählen.
-.IP  ","
+.IP  "\fB,\fP"
 Vorherigen Untertitel\-Kanal auswählen.
-.IP  "+"
+.IP  "\fB+\fP"
 Nächsten Tonkanal auswählen. (Der Wechsel kann sich bis zu einigen Sekunden verzögern)
-.IP  "\-"
+.IP  "\fB\-\fP"
 Vorherigen Tonkanal auswählen.
-.IP  "<Esc>"
+.IP  "\fB<Esc>\fP"
 Menü 1 (insbesondere Hauptmenü)
-.IP  "<F1>"
+.IP  "\fB<F1>\fP"
 Menü 2 (insbesondere Titlemenü)
-.IP  "<F2>"
+.IP  "\fB<F2>\fP"
 Menü 3
-.IP  "<Einfg>"
+.IP  "\fB<Einfg>\fP"
 Mauszeiger ein\-/ausblenden
 
-.LP
+.SS Zusätzliche Plugins
 Die folgenden Belegungen werden von zusätzlichen Plugins verwendet, normalerweise zur DVD\-Navigation:
-.IP  "<Tastenfeld\ Hoch>"
+.IP  "\fB<Tastenfeld\ Hoch>\fP"
 Ein Ereignis hoch.
-.IP  "<Tastenfeld\ Runter>"
+.IP  "\fB<Tastenfeld\ Runter>\fP"
 Ein Ereignis runter.
-.IP  "<Tastenfeld\ Links>"
+.IP  "\fB<Tastenfeld\ Links>\fP"
 Ein Ereignis links.
-.IP  "<Tastenfeld\ Rechts>"
+.IP  "\fB<Tastenfeld\ Rechts>\fP"
 Ein Ereignis rechts.
-.IP  "<Tastenfeld\ Bild\ Hoch>"
+.IP  "\fB<Tastenfeld\ Bild\ Hoch>\fP"
 Ein Ereignis vorher.
-.IP  "<Tastenfeld\ Bild\ Runter>"
+.IP  "\fB<Tastenfeld\ Bild\ Runter>\fP"
 Ein Ereignis weiter.
-.IP  "<Tastenfeld\ Ende>"
+.IP  "\fB<Tastenfeld\ Ende>\fP"
 Vorheriges Blickwinkel\-Ereignis.
-.IP  "<Tastenfeld\ Pos1>"
+.IP  "\fB<Tastenfeld\ Pos1>\fP"
 Nächstes Blickwinkel\-Ereignis.
-.IP  "<Tastenfeld Enter>"
+.IP  "\fB<Tastenfeld Enter>\fP"
 Ereignis auswählen.
 
-.SH "SYNCHONISATIONS FEINHEITEN"
+.SS "Synchonisationsfeinheiten"
 Einige Titel haben schlechte Zeitmarken, so daß die Synchonisation nicht funktioniert.
 Dies kann mit folgenden Tasten korrigiert werden:
-.IP  "n | N"
+.IP  "\fBn\fP | \fBN\fP"
 Falls das Video dem Ton vorauseilt
-.IP  "m | M"
+.IP  "\fBm\fP | \fBM\fP"
 Falls das Video dem Ton hinterherhinkt.
-.IP  "<Pos1>"
+.IP  "\fB<Pos1>\fP"
 Video/Ton\-Differenz auf \fB0\fP zurücksetzen, so daß die Zeitmarken unverändert bleiben.
+
+.SS Numerische Eingabe
+Die Zifferntasten können zur Eingabe von Zahlen verwendet werden, aber aus Rückwärtskompatibilitätsgründen sind die Zifferntasten nicht mit den korrespondirenden Zahlen belegt. Vielmehr sind sie mit Symbolen belegt, die normalerweise nicht mit der Tastatur erzeugt werden können. Deshalb ist die numerische Eingabe standardmäßig deaktiviert.
+.PP
+Diese Einstellungen lassen sich aber verändern, indem "SetPosition\fI<X>\fR%" und "Number\fI<Y>\fR" Tasten zugeordnet werden (\fIX\fP ist 0, 10, .. 90 und \fIY\fP ist 0..9). Dazu müssen in der xine keymap-Datei \fI~/.xine/keymap\fP folgende Zeile ersetzt werden:
+
+.Vb 119
+# Setze Position auf den Anfang bzw. 10..90% des Datemstroms.
+SetPosition0% {
+	key = 0
+	modifier = mod3
+}
+SetPosition10% {
+	key = 1
+	modifier = mod3
+}
+SetPosition20% {
+	key = 2
+	modifier = mod3
+}
+SetPosition30% {
+	key = 3
+	modifier = mod3
+}
+SetPosition40% {
+	key = 4
+	modifier = mod3
+}
+SetPosition50% {
+	key = 5
+	modifier = mod3
+}
+SetPosition60% {
+	key = 6
+	modifier = mod3
+}
+SetPosition70% {
+	key = 7
+	modifier = mod3
+}
+SetPosition80% {
+	key = 8
+	modifier = mod3
+}
+SetPosition90% {
+	key = 9
+	modifier = mod3
+}
+
+# Eingabe der Ziffern 0..9.
+Number0 {
+	key = 0
+	modifier = none
+}
+Number1 {
+	key = 1
+	modifier = none
+}
+Number2 {
+	key = 2
+	modifier = none
+}
+Number3 {
+	key = 3
+	modifier = none
+}
+Number4 {
+	key = 4
+	modifier = none
+}
+Number5 {
+	key = 5
+	modifier = none
+}
+Number6 {
+	key = 6
+	modifier = none
+}
+Number7 {
+	key = 7
+	modifier = none
+}
+Number8 {
+	key = 8
+	modifier = none
+}
+Number9 {
+	key = 9
+	modifier = none
+}
+.Ve
+.PP
+Nach den obigen Änderungen können numerische Eingaben genutzt werden, um Zahlen für Kommandos einzugeben. Dazu wird zuerst die Zahl und danach das eigentliche Kommando eingegeben. Die Eingabe "99/" (zweimal die `9'-Taste und danach die `/'-Taste) würde zum Beispiel an die Position 99% des Eingabedatenstroms springen.
+.PP
+Das neue, experimentelle VCD/SVCD-Plugin `VCDX' erlaubt die numerische Eingabe. Die Eingabe einer Zahl gefolgt von "Ereignis-Auswahl" (normalerweise \fBZffernblock Enter\fP) springt in das angegebene "Kapitel" (Track oder Eintrag). Im Laufer der Zeit werden sicherlich weitere Plugins diese neue Funktionalität benutzen.
+.PP
+Die Kommandos "nächste/vorherige MRL" (\fBMRL_NEXT\fP, \fBMRL_PRIOR\fP), "nächster/vorheriger Untertitel" (\fBSPU_NEXT\fP, \fBSPU_PRIOR\fP) und "nächster/vorheriger Tonkanal" (\fBAUDIOCHAN_NEXT\fP, \fBAUDIOCHAN_PRIOR\fP) nutzen bereits die Funktion der numerischen Eingabe. Wird vor diesen Kommandos eine Zahl eingegeben, so wird das Kommando sooft wie angegeben ausgeführt. Eine "0" wird hier als "einmal" interpretiert, da dies ansonsten sinnlos wäre.
+
 .SH "DATEIEN"
-Alle Konfigurationsdateien befinden sich unter ~/.xine:
-.TP 
-.B ~/.xine/config
+.TP \w'~/.xine/passwdXX'u
+~/.xine/config
 Hauptkonfigurationsdatei.
 .TP 
-.B ~/.xine/keymap
+~/.xine/keymap
 Tastaturbelegung von xine\-ui.
 .TP
-.B ~/.xine/passwd
+~/.xine/passwd
 Passwortdatei für xine\-ui.
+.TP
+~/.xine/xinerc
+Zusätzliche Kommandozeilenoptionen
+.br
+Jede Zeile entspricht einer zusätzlichen Kommandozeilenoption (Eine Option pro Zeile):
+.nf
+\-\-geometry 720x576+0+0
+\-\-network
+\-s DVD
+\-p
+.fi
 
 .SH "SIEHE AUCH"
 .BR xine-remote (1),
