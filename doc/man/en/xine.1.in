@@ -274,6 +274,21 @@ Deinterlace video output.
 Set aspect ratio of video output. Modes are:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
 .TP
+.BI \-\-broadcast\-port\  <port>
+Set port of xine broadcaster (master side), slave is started with 'xine slave://address:port'
+.TP
+.BI \-\-no\-logo
+Don't display the logo.
+.TP
+.BI \-E,\ \-\-no\-reload
+Don't reload old playlist. Playlist are saved when you leave xine, then it will be reloaded and played the next time you lanch xine. This feature can be disabled via setup window.
+.TP
+.BI \-\-post\  <plugin>[:parameter=value][,...]
+Load a post plugin. Parameters are comma separated. This option can be used more than one time to chain two or more video postprocess plugins.
+.TP
+.BI \-\-disable\-post
+Don't enable post plugin(s). This way, you can specify one more plugin to use, using the --post command line option, but don't enable those effects.
+.TP
 .B MRL (media resource locator)
 .br
 MRLs are similar to URLs in your web browser. They describe the media

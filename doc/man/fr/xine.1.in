@@ -270,6 +270,21 @@ Désentrelacement de la vidèo.
 Défini le ratio d'aspect le la sortie vidéo. Les modes sont:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
 .TP
+.BI \-\-broadcast\-port\  <port>
+Defini le port du diffuseur de xine (coté maître), l'esclave est démarré par 'xine slave://address:port'
+.TP
+.BI \-\-no\-logo
+N'affiche pas le logo.
+.TP
+.BI \-E,\ \-\-no\-reload
+Ne recharge pas l'ancienne liste de lecture. La liste de lecture est sauvée quand vous quittez xine, puis elle est rechargée est lue à la prochaine execution de xine. Cette fonctionnalité peut être dévalidée via la fenêtre de réglage.
+.TP
+.BI \-\-post\  <plugin>[:parameter=value][,...]
+Charge un plugin de post-traitement. Les paramètres sont séparés par des virgules. Cette option peut être utilisée plus d'une fois afin de chainer two ou plusieurs plugins de post-traitement vidéo.
+.TP
+.BI \-\-disable\-post
+Ne mets pas en fonction le(s) plugin(s). De cette manière, vous pouvre specifier un ou plusieurs plugins à utiliser, à l'aide de l'option de ligne de commande --post, mais en ne validant pas leurs effets.
+.TP
 .B MRL (media resource locator)
 .br
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles
