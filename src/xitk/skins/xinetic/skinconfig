@@ -1,7 +1,7 @@
 #Xine skin data file
 # revision 0.7
 skin.name    = Xinetic
-skin.version = 2
+skin.version = 4
 skin.date    = 08.05.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
@@ -29,6 +29,14 @@ skin.Eject {
 	  y = 64
 	}
 	pixmap = MainEject.png
+}
+
+skin.Nav {
+	coords {
+	  x = 489
+	  y = 75
+	}
+	pixmap = MainNav.png
 }
 
 skin.Exit {
@@ -328,7 +336,7 @@ skin.PlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 9
+	  entries = 8
 	}
 	label {
 	  align = left
@@ -419,6 +427,34 @@ skin.PlDn {
 	  y = 164
 	}
 	pixmap = BigArrowDown.png
+}
+
+skin.PlLeft {
+        coords {
+          x = 16
+          y = 166
+        }
+        pixmap = BigArrowLeft.png
+}
+
+skin.SliderHPl {
+        coords {
+          x = 33
+          y = 166
+        }
+        pixmap = PlSlidHBg.png
+        slider {
+          pixmap = SlidHPad.png
+          type = horizontal
+        }
+}
+
+skin.PlRight {
+        coords {
+          x = 293
+          y = 166
+        }
+        pixmap = BigArrowRight.png
 }
 
 skin.AutoPlayLbl {
@@ -622,6 +658,34 @@ skin.CtlSkDn {
 	pixmap = SkArrowDown.png
 }
 
+skin.CtlSkLeft {
+        coords {
+          x = 283
+          y = 118
+        }
+        pixmap = BigArrowLeft.png
+}
+
+skin.SliderHCtlSk {
+        coords {
+          x = 300
+          y = 118
+        }
+        pixmap = SkSlidHBg.png
+        slider {
+          pixmap = SlidHPad.png
+          type = horizontal
+        }
+}
+
+skin.CtlSkRight {
+        coords {
+          x = 356
+          y = 118
+        }
+        pixmap = BigArrowRight.png
+}
+
 skin.CtlSkItemBtn {
 	coords {
 	  x = 288
@@ -629,7 +693,7 @@ skin.CtlSkItemBtn {
 	}
 	pixmap = SkItemBtn.png
 	browser {
-	  entries = 5
+	  entries = 4
 	}
 	label {
 	  color = #a4aab4
@@ -669,7 +733,7 @@ skin.MrlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 9
+	  entries = 8
 	}
 	label {
 	  align = left
@@ -744,6 +808,34 @@ skin.MrlDn {
 	pixmap = BigArrowDown.png
 }
 
+skin.MrlLeft {
+        coords {
+          x = 16
+          y = 166
+        }
+        pixmap = BigArrowLeft.png
+}
+
+skin.SliderHMrl {
+        coords {
+          x = 33
+          y = 166
+        }
+        pixmap = PlSlidHBg.png
+        slider {
+          pixmap = SlidHPad.png
+          type = horizontal
+        }
+}
+
+skin.MrlRight {
+        coords {
+          x = 293
+          y = 166
+        }
+        pixmap = BigArrowRight.png
+}
+
 skin.MrlCurOrigin {
 	coords {
 	  x = 21
@@ -794,116 +886,4 @@ skin.MrlFilt {
 	  animation = False
 	  pixmap = Letters.png
 	}
-}
-
-### File Browser ##
-skin.FBBG {
-	coords {
-	  x = 0
-	  y = 0
-	}
-	pixmap = MrlBg.png
-}
-skin.FBItemBtn {
-	coords {
-	  x = 75
-	  y = 40
-	}
-	pixmap = PlItemBtn.png
-	label {
-	  align = left
-	  color = #a4aab4
-	  color_focus = #a4aab4
-	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
-	}
-}
-skin.FBHome {
-	coords {
-	  x = 179
-	  y = 227
-	}
-	pixmap = MrlSelect.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBSelect {
-	coords {
-	  x = 257
-	  y = 227
-	}
-	pixmap = MrlSelect.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBDismiss {
-	coords {
-	  x = 400
-	  y = 227
-	}
-	pixmap = MrlDismiss.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBUp {
-	coords {
-	  x = 375
-	  y = 40
-	}
-	pixmap = SmallArrowUp.png
-}
-skin.SliderFB {
-	coords {
-	  x = 377
-	  y = 55
-	}
-	pixmap = SliderVBg.png
-	slider {
-	  pixmap = SliderVPad.png
-	  type = vertical
-	}
-}
-skin.FBDn {
-	coords {
-	  x = 375
-	  y = 178
-	}
-	pixmap = SmallArrowUp.png
-}
-skin.FBCurDirLbl {
-	coords {
-	  x = 75
-	  y = 200
-	}
-	pixmap = Letters.png
-}
-skin.FBCurDir {
-	coords {
-	  x = 140
-	  y = 200
-	}
-	pixmap = Letters.png
-}
-skin.FBSortRev {
-	coords {
-	  x = 362
-	  y = 150
-	}
-	pixmap = SmallArrowUp.png
-}
-skin.FBSortDef {
-	coords {
-	  x = 362
-	  y = 165
-	}
-	pixmap = SmallArrowDown.png
 }

@@ -14,7 +14,10 @@ skins_DATA =                                                                    
 	CtlReset.png	   MainMute.png	      MrlBtn.png	PlMoveUp.png    SmallArrowUp.png  \
 	CtlSave.png	   MainNext.png	      MrlDismiss.png	PlPlay.png	Letters.png       \
 	MainPause.png      MrlSelect.png      SkArrowDown.png	                                  \
-	MainAutoButton.png MainPlay.png	      Onglet.png	SkArrowUp.png   skinconfig
+	MainAutoButton.png MainPlay.png	      Onglet.png	SkArrowUp.png   MainNav.png       \
+	MainAutoButton.png MainPlay.png	      Onglet.png	SkArrowUp.png                     \
+	ArrowLeft.png	   ArrowRight.png     BigArrowLeft.png  BigArrowRight.png                 \
+	PlSlidHBg.png      SliderHPad.png     SkSlidHBg.png     SlidHPad.png	skinconfig
 
 debug:
 install-debug: install
