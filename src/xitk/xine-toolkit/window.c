@@ -641,7 +641,7 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
   wd->yescallback = ycb;
   wd->nocallback = ncb;
   wd->userdata = userdata;
-  wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : "Question?"), 
+  wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : _("Question?")), 
 					      0, 0, windoww, windowh);  
   xitk_window_center_window(im, wd->xwin);
   
@@ -789,7 +789,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
   wd->nocallback = ncb;
   wd->cancelcallback = ccb;
   wd->userdata = userdata;
-  wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : "Question?"), 
+  wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : _("Question?")), 
 					      0, 0, windoww, windowh);  
   xitk_window_center_window(im, wd->xwin);
   

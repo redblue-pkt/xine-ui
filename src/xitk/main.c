@@ -183,7 +183,7 @@ void show_usage (void) {
   printf(_("                    'h': hide GUI (panel, etc.).\n"));
   printf(_("                    'q': quit when play is done.\n"));
   printf(_("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n"));
-  printf(_("                    'v': retrieve plqaylist from VCD. (deprecated. use -s VCD)\n"));
+  printf(_("                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n"));
   printf(_("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"));
   printf(_("  -f, --fullscreen             start in fullscreen mode,\n"));
   printf(_("  -g, --hide-gui               hide GUI (panel, etc.)\n"));

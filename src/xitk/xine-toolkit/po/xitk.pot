@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-11-18 14:59+0100\n"
+"POT-Creation-Date: 2001-11-18 21:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,8 +14,59 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: src/xitk/xine-toolkit/test.c:70
+msgid "XInitThreads() failed.\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:80
+msgid "Cannot open display\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:94
+msgid "Imlib_init_with_params() failed.\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:280
+msgid "My Frame"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:318
+msgid "A Label"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:373
+msgid "Fire !!"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:404
+msgid "!BOOM!"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:473
+#, c-format
+msgid ""
+"New entries selected in combo box is:\n"
+"%s [%d]."
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:587
+msgid "init_test() failed\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:602
+msgid "My Fucking Window"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:620
+msgid "Quit"
+msgstr ""
+
 #: src/xitk/xine-toolkit/window.c:536
 msgid "OK"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:644 src/xitk/xine-toolkit/window.c:792
+msgid "Question?"
 msgstr ""
 
 #: src/xitk/xine-toolkit/window.c:668 src/xitk/xine-toolkit/window.c:817

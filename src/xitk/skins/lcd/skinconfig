@@ -577,7 +577,7 @@ skin.CtlSkLbl {
 	  y = 30
 	}
 	label {
-	  length = 13
+	  length = 15
 	  animation = False
 	  pixmap = letters.png
 	}

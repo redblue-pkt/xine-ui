@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-11-18 16:30+0100\n"
+"POT-Creation-Date: 2001-11-18 18:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,7 +79,7 @@ msgstr ""
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:670
+#: src/xitk/kbindings.c:667
 msgid "OOCH: key binding table is NULL.\n"
 msgstr ""
 
@@ -145,7 +145,7 @@ msgstr ""
 
 #: src/xitk/main.c:186
 msgid ""
-"                    'v': retrieve plqaylist from VCD. (deprecated. use -s "
+"                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
 msgstr ""
 
@@ -256,39 +256,39 @@ msgstr ""
 msgid "main: video driver <%s> failed\n"
 msgstr ""
 
-#: src/xitk/main.c:339
+#: src/xitk/main.c:338
 #, c-format
 msgid "main: trying to autoload '%s' audio driver: "
 msgstr ""
 
-#: src/xitk/main.c:352
-msgid "main: not using any audio driver (as requested).\n"
+#: src/xitk/main.c:355
+msgid "main: audio driver probing failed => no audio output\n"
 msgstr ""
 
-#: src/xitk/main.c:360
+#: src/xitk/main.c:372
 #, c-format
-msgid "main: the specified audio driver <%s> failed\n"
+msgid "main: the specified audio driver '%s' failed\n"
 msgstr ""
 
-#: src/xitk/main.c:368
+#: src/xitk/main.c:380
 #, c-format
 msgid "main: audio driver <%s> failed\n"
 msgstr ""
 
-#: src/xitk/main.c:429
+#: src/xitk/main.c:443
 #, c-format
 msgid "Require xine library version 0.9.4, found %d.%d.%d.\n"
 msgstr ""
 
-#: src/xitk/main.c:497
+#: src/xitk/main.c:511
 msgid "video driver id required for -V option\n"
 msgstr ""
 
-#: src/xitk/main.c:507
+#: src/xitk/main.c:521
 msgid "audio driver id required for -A option\n"
 msgstr ""
 
-#: src/xitk/main.c:604
+#: src/xitk/main.c:618
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr ""

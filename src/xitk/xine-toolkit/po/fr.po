@@ -1,22 +1,75 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Free Software Foundation, Inc.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# xine-ui (xitk) french translation file.
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Daniel Caujolle-Bert <segfault@club-internet.fr>, 2001
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-11-18 14:59+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Project-Id-Version: xine-ui (xitk) 0.9.4\n"
+"POT-Creation-Date: 2001-11-18 21:31+0100\n"
+"PO-Revision-Date: 2001-11-18 21:22+0100\n"
+"Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
+"Language-Team: fr <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: src/xitk/xine-toolkit/test.c:70
+msgid "XInitThreads() failed.\n"
+msgstr "XInitThreads() a échoué.\n"
+
+#: src/xitk/xine-toolkit/test.c:80
+msgid "Cannot open display\n"
+msgstr "Ne peux pas ouvrir l'affichage\n"
+
+#: src/xitk/xine-toolkit/test.c:94
+msgid "Imlib_init_with_params() failed.\n"
+msgstr "Imlib_init_with_param() a échoué.\n"
+
+#: src/xitk/xine-toolkit/test.c:280
+msgid "My Frame"
+msgstr "Mon Cadre"
+
+#: src/xitk/xine-toolkit/test.c:318
+msgid "A Label"
+msgstr "Un Label"
+
+#: src/xitk/xine-toolkit/test.c:373
+msgid "Fire !!"
+msgstr "Feu !!"
+
+#: src/xitk/xine-toolkit/test.c:404
+msgid "!BOOM!"
+msgstr "!BOUM!"
+
+#: src/xitk/xine-toolkit/test.c:473
+#, c-format
+msgid ""
+"New entries selected in combo box is:\n"
+"%s [%d]."
+msgstr ""
+"Na nouvelle entrée sélectionnée dans la combo box est:\n"
+"%s [%d]."
+
+#: src/xitk/xine-toolkit/test.c:587
+msgid "init_test() failed\n"
+msgstr "init_test() a échoué\n"
+
+#: src/xitk/xine-toolkit/test.c:602
+msgid "My Fucking Window"
+msgstr "Ma Putain de Fenêtre"
+
+#: src/xitk/xine-toolkit/test.c:620
+msgid "Quit"
+msgstr "Quitte"
+
 #: src/xitk/xine-toolkit/window.c:536
 msgid "OK"
 msgstr "Ok"
+
+#: src/xitk/xine-toolkit/window.c:644 src/xitk/xine-toolkit/window.c:792
+msgid "Question?"
+msgstr "Question?"
 
 #: src/xitk/xine-toolkit/window.c:668 src/xitk/xine-toolkit/window.c:817
 msgid "Yes"
