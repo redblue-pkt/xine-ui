@@ -50,7 +50,7 @@ int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *len
   int t = 0, ret = 0;
 
   if(stream && (xine_get_status(stream) == XINE_STATUS_PLAY)) {
-    while(((ret = xine_get_pos_length(stream, pos, time, length)) == 0) && (++t < 10))
+    while(((ret = xine_get_pos_length(stream, pos, time, length)) == 0) && (++t < 10) && (!gGui->on_quit))
       xine_usec_sleep(100000); /* wait before trying again */
   }
   

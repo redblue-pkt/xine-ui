@@ -1720,6 +1720,9 @@ void video_window_change_skins(void) {
  */
 static void video_window_handle_event (XEvent *event, void *data) {
 
+  if(gGui->on_quit)
+    return;
+
   switch(event->type) {
 
   case DestroyNotify:
