@@ -124,7 +124,7 @@ When using an X11 visual with changeable colors (colormaps), install a
 private colormap for xine. With a private colormap, xine can allocate
 more colors so that video output may look better.
 .TP
-.BI \-\-keymap\  [option]
+.BI \-\-keymap\  [=option]
 Display keymap. Option are:
 .br
 `\fBdefault\fP' display default keymap table,
@@ -203,7 +203,7 @@ Remove borders of video output window, in windowed mode.
 .B \-P, \-\-playlist <filename>
 Use file as playlist. Known formats are: asx, toxine, m3u, pls, sfv and raw text file.
 .TP
-.B \-l, \-\-loop [mode]
+.B \-l, \-\-loop [=mode]
 Set playlist loop mode. If mode isn't specified, mode \fBloop\fP is used. Possible modes are:
 .br
 \fBloop\fP: loop entire playlist.

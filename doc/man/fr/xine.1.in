@@ -113,7 +113,7 @@ Quand un visuel X11 avec changement de couleurs est utilisé (colormaps),
 un colormap privé est installé pour xine. Avec un colormap privé, xine
 peux allouer plus de couleurs, donc la sortie vidéo sera meilleure.
 .TP
-.B \-\-keymap [option]
+.B \-\-keymap [=option]
 Affiche l'assignement des touches. Option peux être:
 .br
 \'\fBdefault\fP\' affiche la table d'assignements par defaut,
@@ -197,7 +197,7 @@ Retire les bordures de la fenêtre de sortie, en mode fenêtré.
 Utilise le fichier spécifié comme liste de lecture. Les formats reconnues sont:
 asx, toxine, m3u, pls, sfv et les fichiers texte.
 .TP
-.B \-l, \-\-loop [mode]
+.B \-l, \-\-loop [=mode]
 Defini le mode de bouclage de la liste de lecture. Si aucun mode n'est precisé, le 
 mode \fBloop\fP est utilisé. Les modes possibles sont:
 .br
