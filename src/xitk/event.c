@@ -632,6 +632,10 @@ void gui_handle_event (XEvent *event, void *data) {
     }
     break;
     
+  case ButtonRelease:
+    kbindings_handle_kbinding(gGui->kbindings, event);
+    break;
+
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
     /* printf ("ButtonPress\n"); */

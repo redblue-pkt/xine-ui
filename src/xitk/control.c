@@ -303,6 +303,7 @@ void control_handle_event(XEvent *event, void *data) {
   switch(event->type) {
 
   case KeyPress:
+  case ButtonRelease:
     gui_handle_event(event, data);
     break;
     

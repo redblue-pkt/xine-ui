@@ -541,6 +541,10 @@ void playlist_handle_event(XEvent *event, void *data) {
   }
   break;
 
+  case ButtonRelease:
+    gui_handle_event(event, data);
+    break;
+
   case KeyPress:
     if(xitk_is_widget_focused(playlist->winput)) {
       xitk_send_key_event(playlist->widget_list, playlist->winput, event);

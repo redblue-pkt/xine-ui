@@ -1246,6 +1246,10 @@ static void video_window_handle_event (XEvent *event, void *data) {
   }
   break;
 
+  case ButtonRelease:
+    gui_handle_event(event, data);
+    break;
+
   case Expose: {
     XExposeEvent * xev = (XExposeEvent *) event;
 
