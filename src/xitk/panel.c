@@ -520,9 +520,7 @@ void panel_update_channel_display (void) {
 
   default:
     if(!xine_get_audio_lang (gGui->stream, channel, &buffer[0]))
-      {
-	sprintf(buffer, "%3d", channel);
-      }
+      sprintf(buffer, "%3d", channel);
     lang = buffer;
     break;
   }
@@ -544,9 +542,7 @@ void panel_update_channel_display (void) {
 
   default:
     if(!xine_get_spu_lang (gGui->stream, channel, &buffer[0]))
-      {
-	sprintf(buffer, "%3d", channel);
-      }
+      sprintf(buffer, "%3d", channel);
     lang = buffer;
     break;
   }

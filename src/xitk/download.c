@@ -28,14 +28,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "curl/curl.h"
-#include "curl/types.h"
-#include "curl/easy.h"
+#ifdef HAVE_CURL
+#include <curl/curl.h>
+#include <curl/types.h>
+#include <curl/easy.h>
+#endif
 
 #include "common.h"
 
 extern gGui_t   *gGui;
 
+#ifdef HAVE_CURL
 static int progress_callback(void *userdata, 
 			     double dltotal, double dlnow, double ultotal, double ulnow) {
   download_t  *download = (download_t *) userdata;
@@ -69,8 +72,10 @@ static int store_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
   
   return rsize;
 }
+#endif
 
 int network_download(const char *url, download_t *download) {
+#ifdef HAVE_CURL
   CURL        *curl;
   CURLcode     res;
   
@@ -121,4 +126,7 @@ int network_download(const char *url, download_t *download) {
   curl_global_cleanup();
   
   return (download->status == 0);
+#else
+  return 0;
+#endif
 }

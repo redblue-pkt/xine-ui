@@ -1,6 +1,6 @@
 SUBDIRS = xine-toolkit skins
 
-AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
+AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
 EXTRA_DIST = file_browser.c file_browser.h
 
@@ -35,14 +35,13 @@ xine_SOURCES = \
 	videowin.c \
 	viewlog.c
 
-xine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la $(top_builddir)/src/xitk/xine-toolkit/libxitk.la $(top_builddir)/libcurl/libcurl.la
+xine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
 
 # double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
 xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
-	     $(top_builddir)/libcurl/libcurl.la \
 	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
-	     $(X_LIBS) $(XTEST_LIBS) -lX11 -lm
+	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) -lX11 -lm
 
 xine_remote_SOURCES = xine-remote.c
 xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la \
@@ -79,9 +78,6 @@ noinst_HEADERS = \
 
 $(top_builddir)/readline/libreadline.la:
 	@cd $(top_builddir)/readline && $(MAKE) libreadline.la
-
-$(top_builddir)/libcurl/libcurl.la:
-	@cd $(top_builddir)/libcurl && $(MAKE) libcurl.la
 
 $(top_builddir)/src/common/libcommon.la:
 	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la

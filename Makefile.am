@@ -6,7 +6,7 @@ AUTOMAKE_OPTIONS = 1.3
 
 ACLOCAL_AMFLAGS = @XINE_ACFLAGS@ -I m4
 
-SUBDIRS = doc m4 readline intl po misc libcurl src  
+SUBDIRS = doc m4 readline intl po misc src  
 
 EXTRA_DIST = autogen.sh\
         debian/README.Debian \
