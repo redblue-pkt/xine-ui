@@ -1,3 +1,25 @@
+xine-ui (0.9.18) unstable; urgency=low
+
+  * support again text subtitle in mrl (::<sub file>),
+  * ask user when duplicate shortcuts are found,
+  * add subtitle field in mediamark editor, add shortcut to select,
+    a subtitle file at runtime,
+  * implement subtitle support (thanks Miguel) with new xine API,
+  * fix start time and playlist start function,
+  * fix abort case with tab widget (size == 0),
+  * implement skin preview,
+  * fix crash bug with download feature,
+  * more support for mouse wheel,
+  * clicking in time label will show remaining time (and tips show full time length),
+  * re-add unsupported codec reports,
+  * change some default value, made beginners life easier,
+  * some newbie mode enhancements,
+  * fix OSD placements when wrong frame size are reported, more cleanings,
+  * fix definetly auto-hide and DXR3 using,
+  * apply button added in setup window (changes cancelation possible),
+  * some playlist bugs fixed,
+  * few other bug fixed, as usual.
+	
 xine-ui (0.9.17) unstable; urgency=low
 
   * keep in mind origin path for filebrowser (per session),
