@@ -218,7 +218,7 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
 #endif
   
   XUnlockDisplay (private_data->display);
-  XSync (private_data->display, False);
+  /* XSync (private_data->display, False); */
 }
 
 /*

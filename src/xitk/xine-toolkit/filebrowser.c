@@ -135,9 +135,9 @@ void filebrowser_hide(widget_t *w) {
     private_data = w->private_data;
 
     if(private_data->visible) {
-      XLockDisplay(private_data->display);
+      XLOCK(private_data->display);
       XUnmapWindow(private_data->display, private_data->window);
-      XUnlockDisplay(private_data->display);
+      XUNLOCK(private_data->display);
       private_data->visible = 0;
     }
   }
@@ -152,9 +152,9 @@ void filebrowser_show(widget_t *w) {
   if(w) {
     private_data = w->private_data;
 
-    XLockDisplay(private_data->display);
+    XLOCK(private_data->display);
     XMapRaised(private_data->display, private_data->window); 
-    XUnlockDisplay(private_data->display);
+    XUNLOCK(private_data->display);
     private_data->visible = 1;
   }
 }
@@ -169,11 +169,11 @@ void filebrowser_set_transient(widget_t *w, Window window) {
     private_data = w->private_data;
 
     if(private_data->visible) {
-      XLockDisplay(private_data->display);
+      XLOCK(private_data->display);
       XSetTransientForHint (private_data->display,
 			    private_data->window, 
 			    window);
-      XUnlockDisplay(private_data->display);
+      XUNLOCK(private_data->display);
     }
   }
 }
@@ -357,7 +357,7 @@ static void load_files(widget_t *w, void *data) {
   DIR             *pdir;
   struct dirent   *pdirent;
   finfo_t         *hide_files, *dir_files, *norm_files;
-  char             fullfilename[PATH_MAX + NAME_MAX + 1];
+  char             fullfilename[FPATH_MAX + FNAME_MAX + 1];
   int              num_hide_files  = 0;
   int              num_dir_files   = 0;
   int              num_norm_files  = 0;
@@ -391,11 +391,11 @@ static void load_files(widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(dir_files[num_dir_files].marker == '@') {
-	char linkbuf[PATH_MAX + NAME_MAX + 1];
+	char linkbuf[FPATH_MAX + FNAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
+	memset(&linkbuf, 0, FPATH_MAX + FNAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, FPATH_MAX + FNAME_MAX);
 	
 	if(linksize < 0) {
 	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
@@ -420,11 +420,11 @@ static void load_files(widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(hide_files[num_hide_files].marker == '@') {
-	char linkbuf[PATH_MAX + NAME_MAX + 1];
+	char linkbuf[FPATH_MAX + FNAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
+	memset(&linkbuf, 0, FPATH_MAX + FNAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, FPATH_MAX + FNAME_MAX);
 	
 	if(linksize < 0) {
 	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
@@ -448,11 +448,11 @@ static void load_files(widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(norm_files[num_norm_files].marker == '@') {
-	char linkbuf[PATH_MAX + NAME_MAX + 1];
+	char linkbuf[FPATH_MAX + FNAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
+	memset(&linkbuf, 0, FPATH_MAX + FNAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, FPATH_MAX + FNAME_MAX);
 	
 	if(linksize < 0) {
 	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
@@ -782,7 +782,7 @@ static void filebrowser_homedir(widget_t *w, void *data) {
 static void filebrowser_select(widget_t *w, void *data) {
   filebrowser_private_data_t *private_data = (filebrowser_private_data_t *)data;
   int j = -1;
-  char buf[PATH_MAX + NAME_MAX + 1];
+  char buf[FPATH_MAX + FNAME_MAX + 1];
 
   if((j = browser_get_current_selected(private_data->fb_list)) >= 0) {
 
@@ -846,17 +846,17 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
   switch(event->type) {
 
   case MappingNotify:
-    XLockDisplay(private_data->display);
+    XLOCK(private_data->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUnlockDisplay(private_data->display);
+    XUNLOCK(private_data->display);
     break;
 
   case KeyPress:
     mykeyevent = event->xkey;
 
-    XLockDisplay (private_data->display);
+    XLOCK (private_data->display);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay (private_data->display);
+    XUNLOCK (private_data->display);
 
     switch (mykey) {
     
@@ -905,11 +905,13 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
 
   private_data->running  = 1;
 
-  XLockDisplay(display);
+  XLOCK(display);
 
   if(!(private_data->bg_image = Imlib_load_image(idata, fbp->bg_skinfile))) {
     fprintf(stderr, "%s(%d): couldn't find image for background\n",
 	    __FILE__, __LINE__);
+
+    XUNLOCK(display);
     return NULL;
   }
 
@@ -1111,8 +1113,8 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
 				  private_data->widget_list,
 				  (void *) private_data);
 
-  XUnlockDisplay (display);
-  XSync(display, False);
+  XUNLOCK (display);
+  /* XSync(display, False); */
 
   return mywidget;
 }

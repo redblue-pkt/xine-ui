@@ -201,14 +201,14 @@ void widget_change_window_for_event_handler (widgetkey_t key, Window window) {
 
     if(fx->key == key) {
 
-      XLockDisplay(gXitk->display);
+      XLOCK(gXitk->display);
 
       fx->window = window;
 
       if(fx->xdnd && (window != None))
 	dnd_make_window_aware(fx->xdnd, window);
       
-      XUnlockDisplay(gXitk->display);
+      XUNLOCK(gXitk->display);
       MUTUNLOCK();
       return;
     }
@@ -396,7 +396,7 @@ static void widget_xevent_notify(XEvent *event) {
 	      + (event->xmotion.y_root - fx->old_event->xmotion.y_root) 
 	      - fx->move.offset_y;
 	    
-	    XLockDisplay(gXitk->display);
+	    XLOCK(gXitk->display);
 
 	    XMoveWindow(gXitk->display, fx->window,
 			fx->new_pos.x, fx->new_pos.y);
@@ -410,9 +410,10 @@ static void widget_xevent_notify(XEvent *event) {
 	      }
 	    }
 
-	    XUnlockDisplay(gXitk->display);
+	    XFlush(gXitk->display);
 
-	    XSync(gXitk->display, False);
+	    XUNLOCK(gXitk->display);
+
 	  }
 	  else {
 	    if(fx->widget_list)
@@ -433,7 +434,7 @@ static void widget_xevent_notify(XEvent *event) {
 	      XWindowAttributes wattr;
 	      Status            err;
 
-	      XLockDisplay(gXitk->display);
+	      XLOCK(gXitk->display);
 	      err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
 	      if(err != BadDrawable && err != BadWindow) {
 		
@@ -442,7 +443,7 @@ static void widget_xevent_notify(XEvent *event) {
 
 	      }
 	      
-	      XUnlockDisplay(gXitk->display);
+	      XUNLOCK(gXitk->display);
 
 	      fx->move.offset_x = event->xbutton.x;
 	      fx->move.offset_y = event->xbutton.y;
@@ -557,17 +558,18 @@ void widget_run(void) {
   gXitk->running = 1;
 
   while(gXitk->running) {
-    /*      if(XPending (gXitk->display)) { */
-    //  XLockDisplay(gXitk->display);
-    XNextEvent (gXitk->display, &myevent) ;
-    //    XUnlockDisplay(gXitk->display);
-    widget_xevent_notify(&myevent);
-    /*      } */
-    /*      else {  */
-    /*        XUnlockDisplay(gXitk->display); */
-    /*        usleep(60); */
-    /*      } */
+    XLOCK(gXitk->display);
+
+    if(XPending (gXitk->display)) { 
+      XNextEvent (gXitk->display, &myevent) ;
+      XUNLOCK(gXitk->display); 
+      widget_xevent_notify(&myevent);
+    } else {  
+      XUNLOCK(gXitk->display); 
+      usleep(16666); /* 1/60 sec */ 
+    } 
   }
+  XUNLOCK(gXitk->display);
 
   gui_list_free(gXitk->list);
   gui_list_free(gXitk->gfx);

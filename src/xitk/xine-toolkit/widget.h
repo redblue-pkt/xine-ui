@@ -24,7 +24,7 @@
 #ifndef HAVE_WIDGET_H
 #define HAVE_WIDGET_H
 
-/* #include <stdint.h> */
+#include <inttypes.h> 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
@@ -172,4 +172,19 @@ void widget_enable(widget_t *);
  */
 void widget_disable(widget_t *);
 
+/*
+ * small utility function to debug xlock races
+ */
+
+/* #define DEBUG_XLOCK */
+
+#ifdef DEBUG_XLOCK
+#define XLOCK(DISP) {printf ("%s: %s(%d) XLockDisplay (%d)\n",__FILE__,__FUNCTION__,__LINE__,DISP); fflush(stdout); XLockDisplay (DISP); printf ("%s: %s(%d) got the lock (%d)\n",__FILE__,__FUNCTION__,__LINE__,DISP);}
+#define XUNLOCK(DISP) {printf ("%s: %s(%d) XUnlockDisplay (%d)\n",__FILE__,__FUNCTION__,__LINE__,DISP); fflush(stdout); XUnlockDisplay (DISP);}
+#else
+#define XLOCK(DISP) {XLockDisplay (DISP);}
+#define XUNLOCK(DISP) {XUnlockDisplay (DISP);}
 #endif
+
+#endif
+

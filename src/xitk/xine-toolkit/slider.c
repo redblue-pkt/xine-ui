@@ -93,7 +93,7 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
      || private_data->pos < private_data->min)
     return;
 
-  XLockDisplay (private_data->display);
+  XLOCK (private_data->display);
 
   button_width = private_data->button_width;
   button_height = private_data->paddle_skin->height;
@@ -144,9 +144,8 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
 #endif
 
     
-  XUnlockDisplay (private_data->display);
-  XSync (private_data->display, False);
-
+  XUNLOCK (private_data->display);
+  /* XSync (private_data->display, False); */
 }
 
 /*

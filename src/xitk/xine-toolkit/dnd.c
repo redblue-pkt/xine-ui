@@ -80,11 +80,11 @@ void dnd_make_window_aware (DND_struct_t *xdnd, Window window) {
   if(!xdnd->display)
     return;
 
-  XLockDisplay (xdnd->display);
+  XLOCK (xdnd->display);
   xdnd->win = window;
   XChangeProperty (xdnd->display, xdnd->win, xdnd->_XA_XdndAware, XA_ATOM,
 		   32, PropModeAppend, (unsigned char *)&xdnd->version, 1);
-  XUnlockDisplay (xdnd->display);
+  XUNLOCK (xdnd->display);
 }
 
 Bool dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
@@ -96,7 +96,7 @@ Bool dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
   XEvent xevent;
   Window selowner;
 
-  XLockDisplay (xdnd->display);
+  XLOCK (xdnd->display);
 
   selowner = XGetSelectionOwner(xdnd->display, xdnd->_XA_XdndSelection);
 
@@ -117,7 +117,7 @@ Bool dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
   XDND_FINISHED_TARGET_WIN(&xevent) = event->xselection.requestor;
   XSendEvent(xdnd->display, selowner, 0, 0, &xevent);
 
-  XUnlockDisplay (xdnd->display);
+  XUNLOCK (xdnd->display);
   
   if (delme) {
     int x;
@@ -160,13 +160,13 @@ Bool dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
     if (event->xclient.data.l[0] == 
 	XGetSelectionOwner(xdnd->display, xdnd->_XA_XdndSelection)) {
 
-      XLockDisplay (xdnd->display);
+      XLOCK (xdnd->display);
 
       XConvertSelection(xdnd->display, xdnd->_XA_XdndSelection, xdnd->atom_support,
 			xdnd->_XA_XINE_XDNDEXCHANGE, event->xclient.window, 
 			CurrentTime);
 
-      XUnlockDisplay (xdnd->display);
+      XUNLOCK (xdnd->display);
 
 
       dnd_process_selection (xdnd, event);
@@ -177,10 +177,10 @@ Bool dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
     XEvent xevent;
     Window srcwin = event->xclient.data.l[0];
     
-    XLockDisplay (xdnd->display);
+    XLOCK (xdnd->display);
   
     if (xdnd->atom_support != XInternAtom(xdnd->display, "text/uri-list", False)) {
-      XUnlockDisplay (xdnd->display);
+      XUNLOCK (xdnd->display);
       return True;
     }
     
@@ -199,7 +199,7 @@ Bool dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
     
     XSendEvent(xdnd->display, srcwin, 0, 0, &xevent);
 
-    XUnlockDisplay (xdnd->display);
+    XUNLOCK (xdnd->display);
 
     return True;
   }

@@ -65,10 +65,10 @@ static void paint_label (widget_t *l,  Window win, GC gc) {
 	px = (c % 32) * nCWidth;
 	py = (c / 32) * nCHeight;
 	
-	XLockDisplay (private_data->display);
+	XLOCK (private_data->display);
 	XCopyArea (private_data->display, font->image, win, gc, px, py,
 		   nCWidth, nCHeight, x_dest, y_dest);
-	XUnlockDisplay (private_data->display);
+	XUNLOCK (private_data->display);
 	
       }
       
@@ -82,7 +82,7 @@ static void paint_label (widget_t *l,  Window win, GC gc) {
 	     "is not a label\n", l->widget_type);
 #endif
 
-  XSync(private_data->display, False);
+  /* XSync(private_data->display, False); */
 }
 
 /*

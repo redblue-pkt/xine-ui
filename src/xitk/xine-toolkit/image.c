@@ -65,7 +65,7 @@ static void paint_image (widget_t *i,  Window win, GC gc) {
 
   skin = private_data->skin;
 
-  XLockDisplay (private_data->display);
+  XLOCK (private_data->display);
 
   if (i->widget_type & WIDGET_TYPE_IMAGE) {
     XCopyArea (private_data->display, skin->image, win, gc, 0, 0,
@@ -79,8 +79,8 @@ static void paint_image (widget_t *i,  Window win, GC gc) {
 	     "that is not an image\n", i->widget_type);
 #endif
 
-  XUnlockDisplay (private_data->display);
-  XSync (private_data->display, False);
+  XUNLOCK (private_data->display);
+  /* XSync (private_data->display, False); */
 }
 
 /*

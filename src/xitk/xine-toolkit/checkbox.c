@@ -44,7 +44,7 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
   
   skin = private_data->skin;
 
-  XLockDisplay (private_data->display);
+  XLOCK (private_data->display);
   
   checkbox_width = skin->width / 3;
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
@@ -79,8 +79,8 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
   
 #endif
 
-  XUnlockDisplay (private_data->display);
-  XSync (private_data->display, False);
+  XUNLOCK (private_data->display);
+  /* XSync (private_data->display, False); */
 }
 
 /*

@@ -46,7 +46,7 @@ static void paint_button (widget_t *b,  Window win, GC gc) {
 
   button_width = skin->width / 3;
   
-  XLockDisplay (private_data->display);
+  XLOCK (private_data->display);
 
   if (b->widget_type & WIDGET_TYPE_BUTTON) {
     
@@ -73,8 +73,8 @@ static void paint_button (widget_t *b,  Window win, GC gc) {
 	     b->widget_type);
 #endif
   
-  XUnlockDisplay (private_data->display);
-  XSync (private_data->display, False);
+  XUNLOCK (private_data->display);
+  /* XSync (private_data->display, False); */
 }
 
 /*
