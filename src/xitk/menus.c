@@ -61,6 +61,7 @@ extern _panel_t                *panel;
 #define VIDEO_INTERLEAVE        34
 #define VIDEO_PPROCESS          35
 #define VIDEO_PPROCESS_ENABLE   36
+#define VIDEO_TOGGLE            37
 
 #define SETS_SETUP              40
 #define SETS_KEYMAP             41
@@ -371,6 +372,10 @@ static void menu_video_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
     gui_execute_action_id(ACTID_VPP_ENABLE);
     break;
 
+  case VIDEO_TOGGLE:
+    gui_execute_action_id(ACTID_TOGGLE_WINOUT_VISIBLITY);
+    break;
+    
   default:
     printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
     break;
@@ -439,6 +444,10 @@ void video_window_menu(xitk_widget_list_t *wl) {
       (sh[shc++] = menu_get_shortcut("ToggleVisiblity")),
       panel_is_visible() ? "<checked>" : "<check>",  
       menu_panel_visibility, NULL                                                            },
+    { _("Show video window"),
+      (sh[shc++] = menu_get_shortcut("ToggleWindowVisibility")),
+      video_window_is_visible() ? "<checked>" : "<check>",  
+      menu_video_ctrl, (void *) VIDEO_TOGGLE                                                 },
     { _("Fullscreen"),
       (sh[shc++] = menu_get_shortcut("ToggleFullscreen")),
       (video_window_get_fullscreen_mode() & fullscr_mode) ? "<checked>" : "<check>",
