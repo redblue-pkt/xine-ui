@@ -93,13 +93,16 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
   }
 
 #define ADD_LABEL(widget, cb, data) {                                                           \
-    int           wx, wy, wh, fh;                                                               \
-    xitk_font_t  *fs;                                                                           \
+    int            wx, wy, wh, fh;                                                              \
+    xitk_font_t   *fs;                                                                          \
     xitk_widget_t *lbl;                                                                         \
+    char           _labelkey[strlen(labelkey) + 5];                                             \
+                                                                                                \
+    sprintf(_labelkey, "%s%s", labelkey, (!entry->callback) ? " (*)" : "");                     \
                                                                                                 \
     fs = xitk_font_load_font(gGui->display, fontname);                                          \
     xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(setup->widget_list)));                          \
-    fh = xitk_font_get_string_height(fs, labelkey);                                             \
+    fh = xitk_font_get_string_height(fs, _labelkey);                                            \
     xitk_font_unload_font(fs);                                                                  \
                                                                                                 \
     xitk_get_widget_pos(widget, &wx, &wy);                                                      \
@@ -107,7 +110,8 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
     wh = xitk_get_widget_height(widget);                                                        \
                                                                                                 \
     lbl = setup_add_label (wx + 20, (wy + (wh >> 1)) - (fh>>1),                                 \
-                           (FRAME_WIDTH - wx), labelkey, cb, data);                             \
+                           (FRAME_WIDTH - (xitk_get_widget_width(widget) + 35)),                \
+                           _labelkey, cb, data);                                                \
     wt->label = lbl;                                                                            \
   }
 
@@ -310,6 +314,7 @@ void setup_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 static void setup_apply(xitk_widget_t *w, void *data) {
+  int need_restart = 0;
 
   if(setup->num_wg > 0) {
     int i;
@@ -325,6 +330,11 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 	  int            numval = 0;
 	  char          *strval = NULL;
 	  
+	  if(!need_restart) {
+	    if(setup->wg[i]->changed && (!setup->wg[i]->cfg->callback))
+	      need_restart = 1;
+	  }
+
 	  setup->wg[i]->changed = 0;
 	  
 	  switch(type & WIDGET_TYPE_MASK) {
@@ -374,6 +384,23 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 
     if(w != setup->ok)
       setup_change_section(setup->tabs, NULL, xitk_tabs_get_current_selected(setup->tabs));
+
+    if(need_restart) {
+      xitk_window_t *xw;
+      
+      xw = xitk_window_dialog_ok(gGui->imlib_data, _("Important Notice"),
+				 NULL, NULL,
+				 ALIGN_CENTER,
+				 _("You changed some configuration value which require"
+				   " to restart xine to take effect."));
+      if(!gGui->use_root_window) {
+	XLockDisplay(gGui->display);
+	XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
+	XUnlockDisplay(gGui->display);
+      }
+      layer_above_video(xitk_window_get_window(xw));
+    }
+
   }
 }
 
@@ -623,11 +650,11 @@ static widget_triplet_t *setup_add_nothing_available(const char *title, int x, i
  *
  */
 static widget_triplet_t *setup_add_slider (const char *title, const char *labelkey, 
-					   int x, int y, xine_cfg_entry_t *entry ) {
+					   int x, int y, xine_cfg_entry_t *entry) {
   xitk_slider_widget_t     sl;
   xitk_widget_t           *slider;
-  static widget_triplet_t *wt; 
-  
+  static widget_triplet_t *wt;
+
   wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
@@ -666,7 +693,7 @@ static widget_triplet_t *setup_add_inputnum(const char *title, const char *label
   xitk_intbox_widget_t      ib;
   xitk_widget_t            *intbox, *wi, *wbu, *wbd;
   static widget_triplet_t  *wt;
-
+  
   wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&ib, gGui->imlib_data);
@@ -746,7 +773,7 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
   xitk_checkbox_widget_t    cb;
   xitk_widget_t            *checkbox;
   static widget_triplet_t  *wt;
-
+  
   wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
@@ -893,7 +920,7 @@ static void setup_section_widgets(int s) {
 	break;
 	  
       }
-	
+      
     } else
       free(entry);
       

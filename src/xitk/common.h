@@ -112,6 +112,24 @@
                                   }            \
                                 } while(0)
 
+/* Duplicate s to d timeval values */
+#define timercpy(s, d) do {                                                   \
+      (d)->tv_sec = (s)->tv_sec;                                              \
+      (d)->tv_usec = (s)->tv_usec;                                            \
+} while(0)
+
+#ifndef timersub
+#define timersub(a, b, result)                                                \
+  do {                                                                        \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
+    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
+    if ((result)->tv_usec < 0) {                                              \
+      --(result)->tv_sec;                                                     \
+      (result)->tv_usec += 1000000;                                           \
+    }                                                                         \
+  } while (0)
+#endif
+
 /* Our default location for skin downloads */
 #define SKIN_SERVER_URL         "http://xine.sourceforge.net/skins/skins.slx"
 

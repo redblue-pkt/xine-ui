@@ -32,6 +32,7 @@
 
 #include "common.h"
 
+void dummy_config_cb(void *data, xine_cfg_entry_t *cfg);
 int actions_on_start(action_id_t actions[], action_id_t a);
 void gui_deinit(void);
 void gui_init(int nfiles, char *filenames[], window_attributes_t *window_attribute);

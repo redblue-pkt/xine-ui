@@ -94,6 +94,9 @@ static char *visual_anim_style[] = {
   NULL
 };
 
+void dummy_config_cb(void *data, xine_cfg_entry_t *cfg) {
+  /* It exist to avoid "restart" window message in setup window */
+}
 static void auto_vo_visibility_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->auto_vo_visibility = cfg->num_value;
 }
@@ -1277,7 +1280,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 					      _("Display splash screen"),
 					      _("If enabled, xine will display its splash screen"), 
 					      CONFIG_LEVEL_BEG,
-					      CONFIG_NO_CB,
+					      dummy_config_cb,
 					      CONFIG_NO_DATA)) : 0;
   
   gGui->numeric.set = 0;

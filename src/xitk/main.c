@@ -1621,7 +1621,7 @@ int main(int argc, char *argv[]) {
 			      _("If it's enabled and if you don't specify any MRL in command "
 				"line, xine will automatically load previous playlist."), 
 			      CONFIG_LEVEL_BEG,
-			      CONFIG_NO_CB,
+			      dummy_config_cb,
 			      CONFIG_NO_DATA);
 
   if(old_playlist_cfg && (!(_argc - optind)) && (!no_old_playlist)) {

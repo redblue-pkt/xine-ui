@@ -53,94 +53,96 @@
 #define EST_MAX_DIFF    0.01      /* maximum diff to detect valid fps */
 #define ABS(x) ((x)>0?(x):-(x))
 
-extern gGui_t *gGui;
+extern gGui_t           *gGui;
 
 /* Video window private structure */
 typedef struct {
-  xitk_widget_list_t  *wl;
-  Cursor         cursor[3];       /* Cursor pointers                       */
-  int            current_cursor;  /* arrow or hand */
-  int            cursor_visible;
-  int            cursor_timer;
-  Visual	*visual;	  /* Visual for video window               */
-  Colormap	 colormap;	  /* Colormap for video window		   */
-  XClassHint    *xclasshint;
-  XClassHint    *xclasshint_fullscreen;
-  XClassHint    *xclasshint_borderless;
-  GC             gc;
+  xitk_widget_list_t    *wl;
+  Cursor                 cursor[3];       /* Cursor pointers                       */
+  int                    current_cursor;  /* arrow or hand */
+  int                    cursor_visible;
+  int                    cursor_timer;
+  Visual	        *visual;          /* Visual for video window               */
+  Colormap	         colormap;        /* Colormap for video window		   */
+  XClassHint            *xclasshint;
+  XClassHint            *xclasshint_fullscreen;
+  XClassHint            *xclasshint_borderless;
+  GC                     gc;
 
-  int            video_width;     /* size of currently displayed video     */
-  int            video_height;
+  int                    video_width;     /* size of currently displayed video     */
+  int                    video_height;
 
-  int            frame_width;     /* frame size, from xine-lib */
-  int            frame_height;
+  int                    frame_width;     /* frame size, from xine-lib */
+  int                    frame_height;
 
-  double         video_duration;  /* frame duratrion in seconds */
-  double         video_average;   /* average frame duration in seconds */
-  double         use_duration;    /* duration used for tv mode selection */
-  int            video_duration_valid; /* is use_duration trustable? */
-  int            win_width;       /* size of non-fullscreen window         */
-  int            win_height;
-  int            output_width;    /* output video window width/height      */
-  int            output_height;
-  float          mag;
+  double                 video_duration;  /* frame duratrion in seconds */
+  double                 video_average;   /* average frame duration in seconds */
+  double                 use_duration;    /* duration used for tv mode selection */
+  int                    video_duration_valid; /* is use_duration trustable? */
+  int                    win_width;       /* size of non-fullscreen window         */
+  int                    win_height;
+  int                    output_width;    /* output video window width/height      */
+  int                    output_height;
+  float                  mag;
 
-  int            stream_resize_window; /* Boolean, 1 if new stream resize output window */
-  int            zoom_small_stream; /* Boolean, 1 to double size small streams */
+  int                    stream_resize_window; /* Boolean, 1 if new stream resize output window */
+  int                    zoom_small_stream; /* Boolean, 1 to double size small streams */
 
-  int            fullscreen_mode; /* bitfield:                                      */
-  int            fullscreen_req;  /* WINDOWED_MODE, FULLSCR_MODE or FULLSCR_XI_MODE */
-  int            fullscreen_width;
-  int            fullscreen_height;
+  int                    fullscreen_mode; /* bitfield:                                      */
+  int                    fullscreen_req;  /* WINDOWED_MODE, FULLSCR_MODE or FULLSCR_XI_MODE */
+  int                    fullscreen_width;
+  int                    fullscreen_height;
 
-  int            xinerama_fullscreen_x; /* will contain paramaters for very fullscreen in xinerama mode */
-  int            xinerama_fullscreen_y;
-  int            xinerama_fullscreen_width;
-  int            xinerama_fullscreen_height;
+  int                    xinerama_fullscreen_x; /* will contain paramaters for very 
+						   fullscreen in xinerama mode */
+  int                    xinerama_fullscreen_y;
+  int                    xinerama_fullscreen_width;
+  int                    xinerama_fullscreen_height;
 
-  int            visible_width;   /* Size of currently visible portion of screen */
-  int            visible_height;  /* May differ from fullscreen_* e.g. for TV mode */
-  double         visible_aspect;  /* Pixel ratio of currently visible screen */
+  int                    visible_width;   /* Size of currently visible portion of screen */
+  int                    visible_height;  /* May differ from fullscreen_* e.g. for TV mode */
+  double                 visible_aspect;  /* Pixel ratio of currently visible screen */
 
-  int            using_xinerama;
+  int                    using_xinerama;
 #ifdef HAVE_XINERAMA
-  XineramaScreenInfo *xinerama;   /* pointer to xinerama struct, or NULL */
-  int            xinerama_cnt;    /* number of screens in Xinerama */
+  XineramaScreenInfo    *xinerama;   /* pointer to xinerama struct, or NULL */
+  int                    xinerama_cnt;    /* number of screens in Xinerama */
 #endif
 
-  int            xwin;            /* current X location */
-  int            ywin;            /* current Y location */
-  int            old_xwin;
-  int            old_ywin;
+  int                    xwin;            /* current X location */
+  int                    ywin;            /* current Y location */
+  int                    old_xwin;
+  int                    old_ywin;
 
-  int            desktopWidth;    /* desktop width */
-  int            desktopHeight;   /* desktop height */
-  int            depth;
-  int            show;
-  int            borderless;      /* borderless window (for windowed mode)? */
+  int                    desktopWidth;    /* desktop width */
+  int                    desktopHeight;   /* desktop height */
+  int                    depth;
+  int                    show;
+  int                    borderless;      /* borderless window (for windowed mode)? */
 
-  Bool           have_xtest;
+  Bool                   have_xtest;
 #ifdef HAVE_XTESTEXTENSION
-  KeyCode        kc_shift_l;      /* Fake key to send */
+  KeyCode                kc_shift_l;      /* Fake key to send */
 #endif
 
-  XWMHints      *wm_hint;
+  XWMHints              *wm_hint;
 
   xitk_register_key_t    widget_key;
   xitk_register_key_t    old_widget_key;
 
 #ifdef HAVE_XF86VIDMODE
   /* XF86VidMode Extension stuff */
-  XF86VidModeModeInfo** XF86_modelines;
-  int                   XF86_modelines_count;
+  XF86VidModeModeInfo**  XF86_modelines;
+  int                    XF86_modelines_count;
 #endif
 
-  int            hide_on_start; /* user use '-H' arg, don't map video window the first time */
+  int                    hide_on_start; /* user use '-H' arg, don't map 
+					   video window the first time */
 
+  struct timeval         click_time;
 } gVw_t;
 
-static gVw_t    *gVw;
-
+static gVw_t            *gVw;
 static void video_window_handle_event (XEvent *event, void *data);
 static void video_window_adapt_size (void);
 
@@ -1837,20 +1839,33 @@ static void video_window_handle_event (XEvent *event, void *data) {
     else if (bevent->button == Button2)
       panel_toggle_visibility(NULL, NULL);
     else if (bevent->button == Button1) {
+      struct timeval  old_click_time, tm_diff;
+      long int        click_diff;
+      
+      timercpy(&gVw->click_time, &old_click_time);
+      gettimeofday(&gVw->click_time, 0);
+      
       if (video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
-	xine_event_t event;
 	xine_input_data_t input;
-
+	xine_event_t      event;
+	
 	event.type        = XINE_EVENT_INPUT_MOUSE_BUTTON;
 	event.stream      = gGui->stream;
 	event.data        = &input;
 	event.data_length = sizeof(input);
-	gettimeofday(&event.tv, NULL);
+	timercpy(&old_click_time, &event.tv);
 	input.button      = 1;
 	input.x           = x;
 	input.y           = y;
 	xine_event_send(gGui->stream, &event);
       }
+
+      timersub(&gVw->click_time, &old_click_time, &tm_diff);
+      click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
+      
+      if(click_diff < (xitk_get_timer_dbl_click()))
+	gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
+      
     }
   }
   break;
