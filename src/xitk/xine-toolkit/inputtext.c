@@ -343,7 +343,8 @@ static void create_labelofinputtext(xitk_widget_t *it,
 
   xitk_font_unload_font(fs);
 
-  xitk_free_color_name(color);
+  if(color)
+    xitk_free_color_name(color);
 }
 
 /*

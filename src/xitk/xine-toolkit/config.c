@@ -65,7 +65,6 @@ static void xitk_config_colors(xitk_config_t *xtcf) {
 	  ((color->blue & 0xf8) >> 3);
 	
 	xitk_free_color_name(color);
-	
       }
       else {
 	XITK_WARNING("%s@%d: wrong color name: '%s'\n", __FUNCTION__, __LINE__, c);

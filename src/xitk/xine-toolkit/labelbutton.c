@@ -207,7 +207,8 @@ static void create_labelofbutton(xitk_widget_t *lb,
 
   xitk_font_unload_font(fs);
 
-  xitk_free_color_name(color);
+  if(color)
+    xitk_free_color_name(color);
 }
 
 /*
