@@ -586,6 +586,8 @@ if test -n "$plugindir"; then
 	    pfx=xineplug_ao_out_;
 	    ;;
 	  *)
+	    type=unknown;
+	    pfx="";
 	    msg unknown-plugin
 	    ;;
 	esac
