@@ -97,6 +97,7 @@ typedef struct {
   int                         object_num;
 
   xitk_widget_t              *new_filter;
+  xitk_widget_t              *enable;
 
   int                         x, y;
   
@@ -1424,6 +1425,11 @@ void pplugin_raise_window(void) {
   }
 }
 
+void pplugin_update_enable_button(void) {
+  if(pplugin)
+    xitk_labelbutton_set_state(pplugin->enable, gGui->post_enable);
+}
+
 void pplugin_panel(void) {
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
@@ -1520,11 +1526,11 @@ void pplugin_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-   (w = xitk_noskin_labelbutton_create(pplugin->widget_list, 
-							 &lb, x, y, 100, 23,
-							 "Black", "Black", "White", btnfontname)));
-  xitk_labelbutton_set_state(w, gGui->post_enable);
-  xitk_enable_and_show_widget(w);
+   (pplugin->enable = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+						     &lb, x, y, 100, 23,
+						     "Black", "Black", "White", btnfontname)));
+  xitk_labelbutton_set_state(pplugin->enable, gGui->post_enable);
+  xitk_enable_and_show_widget(pplugin->enable);
 
   /* IMPLEMENT ME
   x += 115;

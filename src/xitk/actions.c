@@ -1457,6 +1457,7 @@ void gui_vpp_show(xitk_widget_t *w, void *data) {
 void gui_vpp_enable(void) {
   gGui->post_enable = !gGui->post_enable;
   osd_display_info(_("Post plugins: %s."), (gGui->post_enable) ? _("enabled") : _("disabled"));
+  pplugin_update_enable_button();
   pplugin_rewire_posts();
 }
 
