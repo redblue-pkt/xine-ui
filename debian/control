@@ -2,7 +2,7 @@ Source: xine-ui
 Section: graphics
 Priority: optional
 Maintainer: Siggi Langauf <siggi@debian.org>
-Build-Depends: debhelper (>> 2.0.0), libxine-dev (>= 0.5.2)
+Build-Depends: debhelper (>> 2.0.0), libxine-dev (>= 0.5.2), libpng2-dev (>=1.0.12), xlibs-dev (>=4.1), aalib1-dev (>> 1.4)
 Standards-Version: 3.2.1
 
 Package: xine-ui
