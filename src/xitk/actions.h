@@ -32,6 +32,10 @@
 #define GUI_PREV     2
 #define GUI_RESET    3
 
+void gui_display_logo(void);
+
+int gui_open_and_start(char *mrl, int start_pos, int start_time);
+
 void gui_exit (xitk_widget_t *w, void *data);
 
 void gui_play (xitk_widget_t *w, void *data);

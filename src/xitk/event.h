@@ -57,6 +57,8 @@ typedef struct {
   /* xine engine instance */
   xine_t              *xine;
 
+  xine_event_queue_t  *event_queue;
+
   /* xine lib/gui configuration filename */
   char                *configfile;
 

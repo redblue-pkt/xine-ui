@@ -522,50 +522,64 @@ static xine_ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 /*
  *
  */
-#warning ADAPT ME
-#if 0
-void event_listener (void *user_data, xine_event_t *event) {
+static void event_listener(void *user_data, const xine_event_t *event) {
+  struct timeval tv;
 
-  /* printf ("main: event listener, got event type %d\n", event->type); */
+  gettimeofday (&tv, NULL);
   
+  if((tv.tv_sec - event->tv.tv_sec) > 3) {
+    printf("Event too old, discarding\n");
+    return;
+  }
+
   switch(event->type) { 
+    
   case XINE_EVENT_UI_CHANNELS_CHANGED:
     /* Update the panel */
     panel_update_channel_display ();
     break;
-
+    
   case XINE_EVENT_UI_SET_TITLE: {
-    xine_event_t *uevent = (xine_ui_event_t *)event;
-    panel_set_title((char*)(uevent->data));
+    xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
+    
+    panel_set_title(uevent->str);
   }
-  break;
-  
-  case XINE_EVENT_PLAYBACK_FINISHED:
+    break;
+    
+  case XINE_EVENT_UI_PLAYBACK_FINISHED:
     gui_status_callback (XINE_STATUS_STOP);
     break;
     
+#warning GONE
+#if 0
   case XINE_EVENT_NEED_NEXT_MRL: {
     xine_next_mrl_event_t *uevent = (xine_next_mrl_event_t *)event;
     
     uevent->handled = 1;
     uevent->mrl = gui_next_mrl_callback ();
   }
-  break;
-  
+    break;
+#endif
+    
+#warning GONE
+#if 0
   case XINE_EVENT_BRANCHED:
     gui_branched_callback ();
     break;
+#endif
     
+#warning REWRITE ME
+#if 0
   case XINE_EVENT_OUTPUT_VIDEO: {
     xine_ui_event_t   *uevent = (xine_ui_event_t *)event;
     xine_cfg_entry_t  cfg_entry;
     int cfg_err_result;
-
+    
     cfg_err_result = xine_config_lookup_entry(gGui->xine, "gui.logo_mrl", &cfg_entry);
-
+    
     if(strcmp(cfg_entry.str_value, uevent->data)) {
       if(gGui->auto_vo_visibility) {
-
+	
 	if(!video_window_is_visible())
 	  video_window_set_visibility(1);
 	
@@ -574,25 +588,24 @@ void event_listener (void *user_data, xine_event_t *event) {
       }
     }
   }
-  break;
-  
+    break;
+    
   case XINE_EVENT_OUTPUT_NO_VIDEO: {
     /*  xine_ui_event_t *uevent = (xine_ui_event_t *)event; */
-
+    
     if(gGui->auto_vo_visibility && (video_window_is_visible())) {
-
+      
       if(!panel_is_visible())
 	panel_toggle_visibility(NULL, NULL);
       
       video_window_set_visibility(0);
     }
   }
-  break;
-  
-  }      
- 
+    break;
+#endif  
+  }
 }
-#endif
+  
 /*
  * Callback of config value change about reporting mode.
  */
@@ -985,17 +998,21 @@ int main(int argc, char *argv[]) {
   gGui->ao_driver = load_audio_out_driver(audio_driver_id);
   free(audio_driver_id);
   
+  gGui->stream = xine_stream_new(gGui->xine, gGui->ao_driver, gGui->vo_driver);
+
+  gGui->event_queue = xine_event_new_queue(gGui->stream);
+  xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
+
   /*
    * Setup logo.
    */
-  gGui->stream = xine_stream_new(gGui->xine, gGui->ao_driver, gGui->vo_driver);
-
   gGui->logo_mrl = xine_config_register_string (gGui->xine, "gui.gui.logo_mrl", XINE_LOGO_MRL,
 						_("Logo mrl"),
 						CONFIG_NO_HELP, 
 						CONFIG_LEVEL_EXP,
 						main_change_logo_cb, 
 						CONFIG_NO_DATA);
+
 #warning FIXME NEWAPI
 #if 0
   xine_tvmode_init2(gGui->xine);
@@ -1003,18 +1020,10 @@ int main(int argc, char *argv[]) {
 
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
-
+  
   /* init the video window */
   video_window_select_visual ();
-
-  /*
-   * Register an event listener
-   */
-#warning ADAPT ME
-#if 0
-  xine_register_event_listener(gGui->xine, event_listener, (void *) gGui);
-#endif
-
+  
   init_report_codec();
 
   /*
@@ -1034,6 +1043,8 @@ int main(int argc, char *argv[]) {
   if (!no_lirc)
     xine_server_exit(gGui->xine);
 #endif
+
+  xine_event_dispose_queue(gGui->event_queue);
 
   return 0;
 }

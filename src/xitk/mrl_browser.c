@@ -384,12 +384,9 @@ static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
     
-    if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 ))) {
-
+    if(!gui_open_and_start(gGui->filename, 0, 0)) {
       if((is_playback_widgets_enabled()) && (!gGui->playlist_num))
 	enable_playback_controls(0);
-      
-      gui_handle_xine_error();
     }
   }
 }

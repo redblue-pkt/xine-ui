@@ -61,9 +61,32 @@ extern _panel_t        *panel;
 static pthread_t        seek_thread;
 
 /*
+ *
+ */
+void gui_display_logo(void) {
+  (void) gui_open_and_start((char *)gGui->logo_mrl, 0, 0);
+}
+
+int gui_open_and_start(char *mrl, int start_pos, int start_time) {
+  
+  if(gGui->stream)
+    xine_close(gGui->stream);
+  
+  if(!(xine_open(gGui->stream, (const char *)mrl) 
+       && xine_play(gGui->stream, start_pos, start_time))) {
+    gui_handle_xine_error();
+    return 0;
+  }
+  
+  return 1;
+}
+
+/*
  * Callback-functions for widget-button click
  */
 void gui_exit (xitk_widget_t *w, void *data) {
+  
+  gui_stop(NULL, NULL);
   
   video_window_exit ();
 
@@ -112,8 +135,7 @@ void gui_play (xitk_widget_t *w, void *data) {
       return;
     }
 
-    if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0)))
-      gui_handle_xine_error();
+    (void) gui_open_and_start(gGui->filename, 0, 0);
   } 
   else
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -134,7 +156,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
     gui_set_current_mrl(NULL);
     enable_playback_controls(0);
   }
-     
+  gui_display_logo();
 }
 
 void gui_pause (xitk_widget_t *w, void *data, int state) {
@@ -199,8 +221,10 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	if(gGui->playlist_cur) gGui->playlist_cur--;
       }
 
-      if(is_playback_widgets_enabled() && (!gGui->playlist_num))
+      if(is_playback_widgets_enabled() && (!gGui->playlist_num)) {
 	enable_playback_controls(0);
+	gui_display_logo();
+      }
     }
     
     gui_set_current_mrl(gGui->playlist [gGui->playlist_cur]);
@@ -532,9 +556,8 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	if((gGui->playlist_cur < gGui->playlist_num)) {
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
 	  
-	  if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0)))
-	    gui_handle_xine_error();
-	  
+	  (void) gui_open_and_start(gGui->filename, 0, 0);
+  
 	}
 	else {
 	  gGui->playlist_cur = 0;

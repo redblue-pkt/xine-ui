@@ -624,10 +624,10 @@ void gui_status_callback (int nStatus) {
 
     if (gGui->playlist_cur < gGui->playlist_num) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 )))
-	gui_handle_xine_error();
+      gui_open_and_start(gGui->filename, 0, 0);
       
-    } else {
+    } 
+    else {
       
       if(gGui->actions_on_start[0] == ACTID_QUIT)
 	gui_exit(NULL, NULL);
@@ -639,6 +639,7 @@ void gui_status_callback (int nStatus) {
   if(is_playback_widgets_enabled() && (!gGui->playlist_num) && (!gGui->filename)) {
     gui_set_current_mrl(NULL);
     enable_playback_controls(0);
+    gui_display_logo();
   }
 
 }
@@ -967,8 +968,7 @@ void gui_run (void) {
   panel_update_mrl_display ();
   panel_update_runtime_display();
 
-  if(!(xine_open(gGui->stream, gGui->logo_mrl) && xine_play(gGui->stream, 0, 0)))
-    printf("That shouldn't happen.\n");
+  gui_display_logo();
 
   /* autoscan playlist  */
   if(gGui->autoscan_plugin != NULL) {

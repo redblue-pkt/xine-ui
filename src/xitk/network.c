@@ -1829,8 +1829,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	gGui->playlist_cur--;
 	if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	  if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 )))
-	    gui_handle_xine_error();
+	  (void) gui_open_and_start(gGui->filename, 0, 0);
 	  
 	} else {
 	  gGui->playlist_cur = 0;

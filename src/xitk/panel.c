@@ -464,43 +464,50 @@ void panel_reset_slider (void) {
  */
 void panel_update_channel_display (void) {
   int   channel;
+  char  buffer[4];
   char *lang = NULL;
-
+  
+  memset(&buffer, 0, sizeof(buffer));
   channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
   switch (channel) {
   case -2:
     lang = "off";
     break;
+
   case -1:
     /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
-    if(!xine_get_audio_lang (gGui->stream, channel, lang))
+    if(!xine_get_audio_lang (gGui->stream, channel, buffer))
       lang = "auto";
+    else
+      lang = buffer;
     break;
+
   default:
-    {
-      static char audio[4];
-      sprintf(audio, "%3d", channel);
-      lang = audio;
-    }
+    sprintf(buffer, "%3d", channel);
+    lang = buffer;
+    break;
   }
   xitk_label_change_label (panel->widget_list, panel->audiochan_label, lang);
-  
+
+  memset(&buffer, 0, sizeof(buffer));
   channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
   switch (channel) {
   case -2:
     lang = "off";
     break;
+
   case -1:
     /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
-    if(!xine_get_spu_lang (gGui->stream, channel, lang))
+    if(!xine_get_spu_lang (gGui->stream, channel, buffer))
       lang = "auto";
+    else
+      lang = buffer;
     break;
+
   default:
-    {
-      static char spu[4];
-      sprintf(spu, "%3d", channel);
-      lang = spu;
-    }
+    sprintf(buffer, "%3d", channel);
+    lang = buffer;
+    break;
   }
   xitk_label_change_label (panel->widget_list, panel->spuid_label, lang);
 }
