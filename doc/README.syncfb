@@ -214,6 +214,9 @@
 
   + zooming in/out of a video exposes  a  bug  with  the  SyncFB  kernel
     module and should currently be considered broken. (being worked on)
+  
+  + quitting xine by closing the video window, won't properly deactivate
+    the overlay - this is a problem with the xitk signal handler.
 
 
 * WHAT IS ON THE TODO LIST?
