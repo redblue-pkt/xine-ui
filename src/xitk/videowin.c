@@ -397,7 +397,7 @@ static void video_window_adapt_size (void) {
       }
     }
     
-    if (gVw->fullscreen_req == FULLSCR_XI_MODE) {
+    if (gVw->fullscreen_req & FULLSCR_XI_MODE) {
       hint.x = gVw->xinerama_fullscreen_x;
       hint.y = gVw->xinerama_fullscreen_y;
       hint.width  = gVw->xinerama_fullscreen_width;
