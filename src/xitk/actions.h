@@ -44,7 +44,9 @@ void gui_pause (xitk_widget_t *w, void *data, int state) ;
 void gui_eject(xitk_widget_t *w, void *data);
 void gui_toggle_visibility(xitk_widget_t *w, void *data);
 void gui_set_fullscreen_mode(xitk_widget_t *w, void *data);
-void gui_set_xinerama_fullscreen_mode(xitk_widget_t *w, void *data);
+#ifdef HAVE_XINERAMA
+void gui_set_xinerama_fullscreen_mode(void);
+#endif
 void gui_toggle_aspect(int aspect);
 void gui_toggle_interlaced(void);
 void gui_direct_change_audio_channel(xitk_widget_t *w, void *data, int value);

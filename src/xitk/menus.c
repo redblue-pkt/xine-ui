@@ -391,6 +391,11 @@ void video_window_menu(xitk_widget_list_t *wl) {
   xitk_menu_widget_t   menu;
   char                 buffer[2048];
   xitk_widget_t       *w;
+#ifdef HAVE_XINERAMA
+  int                  fullscr_mode = (FULLSCR_MODE | FULLSCR_XI_MODE);
+#else
+  int                  fullscr_mode = FULLSCR_MODE;
+#endif
   xitk_menu_entry_t    menu_entries[] = {
     { NULL ,
       "<title>",      
@@ -510,7 +515,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       "<separator>",
       NULL, NULL                                                                             },
     { "Fullscreen\\/Window",
-      video_window_get_fullscreen_mode() ? "<checked>" : "<check>",
+      (video_window_get_fullscreen_mode() & fullscr_mode) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_FULLSCR                                                },
     { "Video",
       "<branch>",

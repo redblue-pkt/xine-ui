@@ -483,7 +483,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
    * the original modeline
    */
   if(gGui->XF86VidMode_fullscreen)
-    video_window_set_fullscreen_mode (0);
+    video_window_set_fullscreen_mode(WINDOWED_MODE);
   //     gui_set_fullscreen_mode(NULL,NULL);
 #endif
    
@@ -818,12 +818,14 @@ static void set_fullscreen_mode(int fullscreen_mode) {
 }
 
 void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
-  set_fullscreen_mode((video_window_get_fullscreen_mode() + 1));
+  set_fullscreen_mode(FULLSCR_MODE);
 }
 
-void gui_set_xinerama_fullscreen_mode(xitk_widget_t *w, void *data) {
-  set_fullscreen_mode((video_window_get_fullscreen_mode() + 4));
+#ifdef HAVE_XINERAMA
+void gui_set_xinerama_fullscreen_mode(void) {
+  set_fullscreen_mode(FULLSCR_XI_MODE);
 }
+#endif
 
 void gui_toggle_aspect(int aspect) {
   static char *ratios[XINE_VO_ASPECT_NUM_RATIOS + 1] = {
@@ -1526,7 +1528,7 @@ void layer_above_video(Window w) {
   if(!(is_layer_above()))
     return;
   
-  if (video_window_get_fullscreen_mode() && video_window_is_visible()) {
+  if ((!(video_window_get_fullscreen_mode() & WINDOWED_MODE)) && video_window_is_visible()) {
     layer = xitk_get_layer_level();
   }
   else {

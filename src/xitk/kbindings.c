@@ -209,7 +209,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ToggleFullscreen",       ACTID_TOGGLE_FULLSCREEN       , "f",        KEYMOD_NOMOD   , 0 },
 #ifdef HAVE_XINERAMA
   { "Xinerama fullscreen toggle.",
-    "ToggleXineramaFullscr",  ACTID_TOGGLE_XINERAMA_FULLSCR , "F",        KEYMOD_NOMOD   , 0 },
+    "ToggleXineramaFullscr",  ACTID_TOGGLE_XINERAMA_FULLSCREEN 
+                                                            , "F",        KEYMOD_NOMOD   , 0 },
 #endif
   { "Aspect ratio values toggle.",
     "ToggleAspectRatio",      ACTID_TOGGLE_ASPECT_RATIO     , "a",        KEYMOD_NOMOD   , 0 },

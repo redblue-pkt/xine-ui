@@ -536,7 +536,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
      
   }
   else {
-    
+    int fullscreen;
+
     panel->visible = 1;
     xitk_show_widgets(panel->widget_list);
     
@@ -559,7 +560,12 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     /* TODO: Currently this is a quick hack
      * We should rather test whether screen size has changed
      * and move the panel on screen if it doesn't fit any longer */
-    if (video_window_get_fullscreen_mode() > 1 
+    fullscreen = video_window_get_fullscreen_mode();
+    if (((!(fullscreen & WINDOWED_MODE)) 
+#ifdef HAVE_XINERAMA
+	 && (!(fullscreen & FULLSCR_XI_MODE))
+#endif
+	 )
 #ifdef HAVE_XF86VIDMODE
         || gGui->XF86VidMode_fullscreen
 #endif

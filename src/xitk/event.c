@@ -374,8 +374,8 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
 #ifdef HAVE_XINERAMA
-  case ACTID_TOGGLE_XINERAMA_FULLSCR:
-    gui_set_xinerama_fullscreen_mode(NULL, NULL);
+  case ACTID_TOGGLE_XINERAMA_FULLSCREEN:
+    gui_set_xinerama_fullscreen_mode();
     break;
 #endif
 
@@ -1481,9 +1481,6 @@ void gui_run(void) {
   start_remote_server();
   init_session();
 
-  /* Need for tvmode */
-  video_window_set_fullscreen_mode((video_window_get_fullscreen_mode()));
-
   if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
     /* Popup setup window if there is no config file */
@@ -1511,9 +1508,11 @@ void gui_run(void) {
     for (i = actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_FULLSCREEN); i > 0; i--)
       gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
 
+#ifdef HAVE_XINERAMA
     /* The user wants to see in xinerama fullscreen mode  */
-    for (i = actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_XINERAMA_FULLSCR); i > 0; i--)
-      gui_execute_action_id(ACTID_TOGGLE_XINERAMA_FULLSCR);
+    for (i = actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_XINERAMA_FULLSCREEN); i > 0; i--)
+      gui_execute_action_id(ACTID_TOGGLE_XINERAMA_FULLSCREEN);
+#endif
 
     /* User load a playlist on startup */
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) {

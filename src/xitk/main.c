@@ -1246,7 +1246,7 @@ int main(int argc, char *argv[]) {
 	}
 #ifdef HAVE_XINERAMA
 	if(strrchr(optarg, 'F')) {
-	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCR;
+	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
 	}
 #endif
 	if(strrchr(optarg, 'h')) {
@@ -1281,7 +1281,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef HAVE_XINERAMA
     case 'F': /* xinerama full screen mode on start */
-      gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCR;
+      gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
       break;
 #endif
 
