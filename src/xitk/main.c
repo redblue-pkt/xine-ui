@@ -610,6 +610,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
       char                  buffer[1024];
 
+#warning FIXME
       memset(&buffer, 0, sizeof(buffer));
       printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
       sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
