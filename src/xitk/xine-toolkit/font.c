@@ -477,7 +477,7 @@ void xitk_font_cache_done(void) {
   {
     xitk_font_list_item_t *item;
     
-    if(xitk_list_is_empty(cache.loaded) == 1) {
+    if(!xitk_list_is_empty(cache.loaded)) {
       XITK_WARNING("%s(): list of loaded font isn't empty:\n", __FUNCTION__);
       item = xitk_list_first_content(cache.loaded);
       while(item) {

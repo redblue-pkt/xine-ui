@@ -123,7 +123,7 @@ void *xitk_list_next_content (xitk_list_t *l) {
  */
 int xitk_list_is_empty (xitk_list_t *l) {
 
-  return (l->first != NULL);
+  return (l->first == NULL);
 }
 
 /*
