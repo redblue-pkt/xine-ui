@@ -1371,6 +1371,7 @@ int main(int argc, char *argv[]) {
 #endif
   gGui->deinterlace_enable     = 0;
   gGui->report                 = stdout;
+  gGui->ssaver_enabled         = 1;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;

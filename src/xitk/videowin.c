@@ -123,7 +123,8 @@ typedef struct {
 
   Bool                   have_xtest;
 #ifdef HAVE_XTESTEXTENSION
-  KeyCode                kc_shift_l;      /* Fake key to send */
+  int                    fake_key_cur;
+  KeyCode                fake_keys[3];    /* Fake key to send */
 #endif
 
   XWMHints              *wm_hint;
@@ -1395,7 +1396,10 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->desktopHeight      = DisplayHeight(gGui->video_display, gGui->video_screen);
 
 #ifdef HAVE_XTESTEXTENSION
-  gVw->kc_shift_l         = XKeysymToKeycode(gGui->video_display, XK_Shift_L);
+  gVw->fake_keys[0] = XKeysymToKeycode(gGui->video_display, XK_Shift_L);
+  gVw->fake_keys[1] = XKeysymToKeycode(gGui->video_display, XK_Control_L);
+  gVw->fake_keys[2] = XKeysymToKeycode(gGui->video_display, XK_Meta_L);
+  gVw->fake_key_cur = 0;
 #endif
   
   snprintf(gVw->window_title, sizeof(gVw->window_title), "%s", "xine");
@@ -2076,21 +2080,32 @@ static void video_window_handle_event (XEvent *event, void *data) {
 }
 
 void video_window_reset_ssaver(void) {
-  XLockDisplay(gGui->video_display);
+
+  if(gGui->ssaver_enabled && (xitk_get_last_keypressed_time() >= (long int) gGui->ssaver_timeout)) {
 
 #ifdef HAVE_XTESTEXTENSION
-  if(gVw->have_xtest == True) {
-    XTestFakeKeyEvent(gGui->video_display, gVw->kc_shift_l, True, CurrentTime);
-    XTestFakeKeyEvent(gGui->video_display, gVw->kc_shift_l, False, CurrentTime);
-    XSync(gGui->video_display, False);
-  }
-  else 
-#endif
-    {
-      XResetScreenSaver(gGui->video_display);
-    }
+    if(gVw->have_xtest == True) {
+      
+      gVw->fake_key_cur++;
+      
+      if(gVw->fake_key_cur >= 3)
+	gVw->fake_key_cur = 0;
 
-  XUnlockDisplay(gGui->video_display);
+      XLockDisplay(gGui->video_display);
+      XTestFakeKeyEvent(gGui->video_display, gVw->fake_keys[gVw->fake_key_cur], True, CurrentTime);
+      XTestFakeKeyEvent(gGui->video_display, gVw->fake_keys[gVw->fake_key_cur], False, CurrentTime);
+      XSync(gGui->video_display, False);
+      XUnlockDisplay(gGui->video_display);
+    }
+    else 
+#endif
+      {
+	XLockDisplay(gGui->video_display);
+	XResetScreenSaver(gGui->video_display);
+	XUnlockDisplay(gGui->video_display);
+      }
+  }
+
 }
 
 void video_window_get_frame_size(int *w, int *h) {

@@ -332,6 +332,7 @@ typedef struct {
 
   const char               *snapshot_location;
   
+  int                       ssaver_enabled;
   int                       ssaver_timeout;
 
   int                       skip_by_chapter;

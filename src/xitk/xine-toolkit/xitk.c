@@ -42,6 +42,7 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 
 #include <locale.h>
 
@@ -129,6 +130,8 @@ typedef struct {
 
   Window                      modalw;
   xitk_widget_t              *menu;
+  
+  struct timeval              keypress;
 } __xitk_t;
 
 static __xitk_t    *gXitk;
@@ -1161,6 +1164,9 @@ void xitk_xevent_notify(XEvent *event) {
   }
   
   while(fx) {
+
+    if(event->type == KeyRelease)
+      gettimeofday(&gXitk->keypress, 0);
     
     if(fx->window != None) {
       
@@ -1625,6 +1631,8 @@ void xitk_init(Display *display, int verbosity) {
   gXitk->x_error_handler = NULL;
   gXitk->modalw          = None;
 
+  memset(&gXitk->keypress, 0, sizeof(gXitk->keypress));
+
   pthread_mutex_init (&gXitk->mutex, NULL);
   
   snprintf(buffer, sizeof(buffer), "-[ xiTK version %d.%d.%d ", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
@@ -1966,6 +1974,18 @@ char *xitk_set_locale(void) {
   cur_locale = setlocale(LC_ALL, NULL);
   
   return cur_locale;
+}
+
+
+/*
+ *
+ */
+long int xitk_get_last_keypressed_time(void) {
+  struct timeval tm, tm_diff;
+  
+  gettimeofday(&tm, NULL);
+  timersub(&tm, &gXitk->keypress, &tm_diff);
+  return tm_diff.tv_sec;
 }
 
 /*

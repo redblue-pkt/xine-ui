@@ -1588,6 +1588,7 @@ void kbedit_exit(xitk_widget_t *w, void *data) {
     
     free(kbedit);
     kbedit = NULL;
+    gGui->ssaver_enabled = 1;
   }
 }
 
@@ -2353,8 +2354,9 @@ void kbedit_window(void) {
 					     NULL);
   
 
-  kbedit->visible = 1;
-  kbedit->running = 1;
+  gGui->ssaver_enabled = 0;
+  kbedit->visible      = 1;
+  kbedit->running      = 1;
   kbedit_raise_window();
 
   try_to_set_input_focus(xitk_window_get_window(kbedit->xwin));

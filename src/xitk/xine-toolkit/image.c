@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <X11/Xlib.h>
+#include <errno.h>
 
 #include "_xitk.h"
 
@@ -145,25 +146,31 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
   ABORT_IF_NULL(xpix);
 
   XLOCK(xpix->imlibdata->x.disp);
-
-#ifdef HAVE_SHM
-  if(xpix->shm)
-    XShmDetach(xpix->imlibdata->x.disp, xpix->shminfo);
-
-  if(xpix->xim)
-    XDestroyImage(xpix->xim);
-
-  if(xpix->shm) {
-    shmdt(xpix->shminfo->shmaddr);
-    shmctl(xpix->shminfo->shmid, IPC_RMID, 0);
-    free(xpix->shminfo);
-  }
-#endif
   
   if(xpix->pixmap != None)
     XFreePixmap(xpix->imlibdata->x.disp, xpix->pixmap);
   
   XFreeGC(xpix->imlibdata->x.disp, xpix->gc);
+  XSync(xpix->imlibdata->x.disp, False);
+
+#ifdef HAVE_SHM
+  if(xpix->shm) {
+    XShmSegmentInfo *shminfo = xpix->shminfo;
+    
+    XShmDetach(xpix->imlibdata->x.disp, shminfo);
+    
+    if(xpix->xim)
+      XDestroyImage(xpix->xim);
+
+    if(shmdt(shminfo->shmaddr) < 0)
+      XITK_WARNING("shmdt() failed: '%s'\n", strerror(errno));
+
+    if(shmctl(shminfo->shmid, IPC_RMID, 0) < 0)
+      XITK_WARNING("shmctl() failed: '%s'\n", strerror(errno));
+
+    free(shminfo);
+  }
+#endif
   
   XUNLOCK(xpix->imlibdata->x.disp);
   
@@ -173,8 +180,7 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 /*
  *
  */
-xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, 
-							int width, int height, int depth) {
+xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width, int height, int depth) {
   xitk_pixmap_t    *xpix;
 #ifdef HAVE_SHM
   XShmSegmentInfo  *shminfo;
@@ -184,7 +190,7 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
   ABORT_IF_NOT_COND(width > 0);
   ABORT_IF_NOT_COND(height > 0);
   
-  xpix = (xitk_pixmap_t *) xitk_xmalloc(sizeof(xitk_pixmap_t));
+  xpix            = (xitk_pixmap_t *) xitk_xmalloc(sizeof(xitk_pixmap_t));
   xpix->imlibdata = im;
   xpix->destroy   = xitk_image_xitk_pixmap_destroyer;
   xpix->width     = width;
@@ -244,10 +250,10 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
       goto __noxshm_pixmap;
     }
 
-    xpix->xim = xim;
+    xpix->xim    = xim;
     xpix->pixmap = XShmCreatePixmap(im->x.disp, im->x.base_window, 
 				    shminfo->shmaddr, shminfo, width, height, depth);
-
+    
     if(!xpix->pixmap) {
       XITK_WARNING("XShmCreatePixmap() failed.\n");
       XShmDetach(xpix->imlibdata->x.disp, xpix->shminfo);
@@ -259,17 +265,10 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
       goto __noxshm_pixmap;
     }
     else {
-      xpix->shm = 1;
-      //      XDestroyImage(xim);
-      xpix->shminfo = shminfo;
+      xpix->shm                    = 1;
+      xpix->shminfo                = shminfo;
       xpix->gcv.graphics_exposures = False;
-      xpix->gc = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &xpix->gcv);
-      shmctl(shminfo->shmid, IPC_RMID, 0);
-
-      //      XShmPutImage(im->x.disp, xpix->pixmap, xpix->gc, xpix->xim, 
-      //		   0, 0, 0, 0, width, height, False);
-      //      XSync(im->x.disp, False);
-      
+      xpix->gc                     = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &xpix->gcv);
       xitk_uninstall_x_error_handler();
     }
   }
