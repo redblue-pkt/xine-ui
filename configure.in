@@ -296,127 +296,142 @@ dnl Common cflags for all platforms
 COMMON_CFLAGS="$wall -D_FILE_OFFSET_BITS=64"
 
 
-case $host in
-  i386-*-freebsd*)
+host_or_hostalias="$host"
+if test "$host_or_hostalias" = ""; then
+    dnl user has called ./configure with a host parameter unknown to
+    dnl config.sub
+    dnl
+    dnl Try the following switch with user's original host-alias
+    dnl input instead.
+    dnl
+    host_or_hostalias="$host_alias"
+fi
+
+case "$host_or_hostalias" in
+i386-*-freebsd*)
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -pipe -fomit-frame-pointer -malign-functions=4 -malign-loops=4 -malign-jumps=4 -malign-functions=4 $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions"
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS $CFLAGS -D_REENTRANT"
     DEBUG_CFLAGS="$X_CFLAGS $DEBUG_CFLAGS -D_REENTRANT -DDEBUG"
     AC_DEFINE(__i386__)
     AC_DEFINE([ARCH_X86],,[x86 architecture])
-
     ;;
-  ?86*-*-linux* | i386-*-solaris*)
-    dnl Set the appropriate architecture define
-    case "$host_alias" in
-    i?86-* | k?-* | athlon-*) dnl catch i386,i486,i586,i686,k6,k7
 
-        if test "$GCC" = yes; then
-	    dnl Check for gcc cpu optimization support
-	    AC_TRY_CFLAGS("-mcpu=i386", 
-	       sarchopt="-mcpu",
-	       AC_TRY_CFLAGS("-march=i386", 
-		  sarchopt="-march",
-	          [ AC_MSG_RESULT(** no cpu optimization supports **)
-	            sarchopt=no ]))
-	    dnl special check for k7 cpu CC support
-            AC_TRY_CFLAGS("$sarchopt=athlon", k7cpu="athlon", k7cpu="i686")
+i?86*-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-*)
+    if test "$GCC" = yes; then
+	dnl Check for gcc cpu optimization support
+	AC_TRY_CFLAGS("-mcpu=i386", 
+	    sarchopt="-mcpu",
+	    AC_TRY_CFLAGS("-march=i386", 
+		sarchopt="-march",
+	        [ AC_MSG_RESULT(** no cpu optimization supports **)
+	          sarchopt=no ]))
+	dnl special check for k7 cpu CC support
+        AC_TRY_CFLAGS("$sarchopt=athlon", k7cpu="athlon", k7cpu="i686")
 
-	    dnl add x86 specific CFLAGS
-	    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -pipe -fomit-frame-pointer -malign-functions=4 -malign-loops=4 -malign-jumps=4 -malign-functions=4 $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
-	    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
+	dnl add x86 specific CFLAGS
+	GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -pipe -fomit-frame-pointer -malign-functions=4 -malign-loops=4 -malign-jumps=4 -malign-functions=4 $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
+	DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
 	
-	    dnl enable x86 specific parts of the code
+	dnl enable x86 specific parts of the code
 
-	    if test x"$sarchopt" != "xno"; then
-		[case "$host_alias" in
-			i386-*) # *BSD return this even on a P III #-))
-			  GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=i386"
-			  DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=i386"
-			  ;;
-			i486-*) # oh dear!
-			  GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=i486"
-			  DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=i486"
-			  ;;
-			i586-*)
-			  GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=pentium"
-			  DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=pentium"
-			  ;;
-			i686-*)
-			  if test x"$check_athlon" = "xyes"; then
-			    if test -f /proc/cpuinfo; then
-			      modelname=`cat /proc/cpuinfo | grep "model\ name\	:" | sed -e 's/ //g' | cut -d':' -f2`
-			      case $modelname in
-				*Athlon* | *Duron* | *K7*)
-				  GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=$k7cpu"
-				  DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=$k7cpu"
-				;;
-				*)
-				 GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=pentiumpro"
-				 DEBUG_CFLAGS="$DEBUG_CFLAGS $X_CFLAGS $sarchopt=pentiumpro"
-				;;
-			      esac
-			    fi 
-			  else
+	if test x"$sarchopt" != "xno"; then
+	[
+	    case "$host_alias" in
+	    i386-*) # *BSD return this even on a P III #-))
+		GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=i386"
+		DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=i386"
+		;;
+	    i486-*) # oh dear!
+		GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=i486"
+		DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=i486"
+		;;
+	    i586-*)
+		GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=pentium"
+		DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=pentium"
+		;;
+	    i686-*)
+		if test x"$check_athlon" = "xyes"; then
+		    if test -f /proc/cpuinfo; then
+			modelname=`cat /proc/cpuinfo | grep "model\ name\	:" | sed -e 's/ //g' | cut -d':' -f2`
+			case "$modelname" in
+			*Athlon* | *Duron* | *K7*)
+			    GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=$k7cpu"
+			    DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=$k7cpu"
+			    ;;
+			*)
 			    GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=pentiumpro"
-			    DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=pentiumpro"
-			  fi
-			  ;;
-			k6-*)
-			  GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=k6"
-			  DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=k6"		
-			  ;;
-			k7-*)
-			  GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=k7"
-			  DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=k7"
-			  ;;
-			athlon-*)
-			  GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=athlon"
-			  DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=athlon"
-		esac]
-	    fi
-
-	else
-	    dnl add x86 specific cc CFLAGS
-	    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O"
-	    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+			    DEBUG_CFLAGS="$DEBUG_CFLAGS $X_CFLAGS $sarchopt=pentiumpro"
+			    ;;
+			esac
+		    fi 
+		else
+		    GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=pentiumpro"
+		    DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=pentiumpro"
+		fi
+		;;
+	    k6-*)
+		GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=k6"
+		DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=k6"		
+		;;
+	    k7-*)
+		GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=k7"
+		DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=k7"
+		;;
+	    athlon-*)
+		GLOBAL_CFLAGS="$GLOBAL_CFLAGS $sarchopt=athlon"
+		DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=athlon"
+		;;
+	    esac]
 	fi
 
-        AC_DEFINE(__i386__)
-	AC_DEFINE([ARCH_X86],,[x86 architecture])
-
-        ;;
-
-    alphaev56-*)
-        GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -mcpu=ev56 -mieee"
-        DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mcpu=ev56 -mieee"
-        ;;
-    alpha*)
-        GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -mieee"
-        DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mieee"
-        ;;
-    ppc-*-linux-* | powerpc-*) 
-	GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
-       	DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
-        ;;
-    sparc64-*-linux-* | sparc-*)
-	if test "$GCC" = yes; then
-	    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
-	    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
-	else
-	    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O"
-	    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
-	fi
-        ;;
-    mips-*)
-        GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
-        DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
-        ;;
-    m68k-*)
-	GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O2"
+    else
+	dnl add x86 specific cc CFLAGS
+	GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O"
 	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
-	;;
-    *) echo "$host is not currently supported by xine"; exit 1;;
-    esac
+    fi
+
+    AC_DEFINE(__i386__)
+    AC_DEFINE([ARCH_X86],,[x86 architecture])
+    ;;
+
+alphaev56-*)
+    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -mcpu=ev56 -mieee"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mcpu=ev56 -mieee"
+    ;;
+
+alpha*)
+    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -mieee"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mieee"
+    ;;
+
+ppc-*-linux-* | powerpc-*) 
+    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
+    ;;
+
+sparc64-*-linux-* | sparc-*)
+    if test "$GCC" = yes; then
+	GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
+	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    else
+	GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O"
+	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    fi
+    ;;
+
+mips-*)
+    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    ;;
+
+m68k-*)
+    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O2"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    ;;
+
+*)
+    echo "Host type '$host' ($host_alias) is currently not supported by xine"
+    exit 1
     ;;
 esac
 
