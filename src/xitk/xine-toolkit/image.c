@@ -158,7 +158,6 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 #ifdef HAVE_SHM
   if(xpix->shm) {
     shmdt(xpix->shminfo->shmaddr);
-    shmctl(xpix->shminfo->shmid, IPC_RMID, 0);
     free(xpix->shminfo);
   }
 #endif
@@ -210,7 +209,6 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
     shminfo->readOnly = False;
     
     status = XShmAttach(im->x.disp, shminfo);
-    XSync(im->x.disp, False);
     if(status == 0) {
       XITK_WARNING("XShmAttach() failed (bad status).\n");
       XDestroyImage(xim);
@@ -222,6 +220,7 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
     
     xpix->pixmap = XShmCreatePixmap(im->x.disp, im->x.base_window, 
 				    shminfo->shmaddr, shminfo, width, height, depth);
+    XSync(im->x.disp, False);
     if(!xpix->pixmap) {
       XITK_WARNING("XShmCreatePixmap() failed.\n");
       XDestroyImage(xim);
@@ -234,6 +233,7 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
       xpix->shm = 1;
       XDestroyImage(xim);
       xpix->shminfo = shminfo;
+      shmctl(shminfo->shmid, IPC_RMID, 0);
     }
   }
   else
