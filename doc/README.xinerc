@@ -150,6 +150,13 @@ XV_SATURATION           -1000..1000: X11 XVideo SATURATION property value.
 
 XV_HUE                  -1000..1000: X11 XVideo HUE property value.
 
+XV_FILTER               Enable bilinear scaling mode on Permedia cards
+                        (may impact on performance)
+                                    0 = no filter
+                        Permedia 2: 1 = enabled
+                        Permedia 3: 1 = partial (x direction only); 2 = full
+                        No other cards seem to support this. 
+
 zoom_mpeg1              1/0 : enable automatic zoom of small
                         (e.g. mpeg1) videos to double size
 
