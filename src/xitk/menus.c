@@ -67,6 +67,16 @@ extern _panel_t           *panel;
 #define STREAM_OSDI       50     
 #define STREAM_WINI       51
 
+static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  int event     = (int) data;
+  int events[7] = {
+    XINE_EVENT_INPUT_MENU1, XINE_EVENT_INPUT_MENU2, XINE_EVENT_INPUT_MENU3,
+    XINE_EVENT_INPUT_MENU4, XINE_EVENT_INPUT_MENU5, XINE_EVENT_INPUT_MENU6,
+    XINE_EVENT_INPUT_MENU7
+  };
+  
+  event_sender_send(events[event]);
+}
 static void menu_panel_visibility(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
 }
@@ -433,6 +443,12 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "SEP",  
       "<separator>",
       NULL, NULL                                                                             },
+    { "Menus",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "SEP",  
+      "<separator>",
+      NULL, NULL                                                                             },
     { "Volume",
       "<branch>",
       NULL, NULL                                                                             },
@@ -687,6 +703,33 @@ void video_window_menu(xitk_widget_list_t *wl) {
       xitk_menu_add_entry(w, &menu_entry);
     }
 
+  }
+  
+  { /* Menus access */
+    xitk_menu_entry_t   menu_entry;
+    char                buffer[2048];
+    char               *location = "Menus";
+    char               *default_menu[8] = {
+      "Menu 1", "Menu 2", "Menu 3", "Menu 4", "Menu 5", "Menu 6", "Menu 7", NULL
+    };
+    char               *dvd_menu[8] = {
+      "Root", "Title", "Root", "Subpicture", "Audio", "Angle", "Part", NULL
+    };
+    char              **menu = default_menu;
+    int                 i;
+    
+    if((!strncmp(gGui->mmk.mrl, "dvd:/", 5)) || (!strncmp(gGui->mmk.mrl, "dvdnav:/", 8)))
+      menu = dvd_menu;
+    
+    for(i = 0; i < 7; i++) {
+      sprintf(buffer, "%s/%s", location, menu[i]);
+      
+      menu_entry.menu      = buffer;
+      menu_entry.type      = NULL;
+      menu_entry.cb        = menu_menus_selection;
+      menu_entry.user_data = (void *)i;
+      xitk_menu_add_entry(w, &menu_entry);
+    }
   }
 
   xitk_menu_show_menu(w);

@@ -130,7 +130,7 @@ static void event_sender_store_new_position(int x, int y, int w, int h) {
 }
 
 /* Send given event to xine engine */
-static void event_sender_send(int event) {
+void event_sender_send(int event) {
   xine_event_t   xine_event;
 
   xine_event.type        = event;
