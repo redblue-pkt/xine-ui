@@ -377,10 +377,11 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
       return;
     }
 
-    mmk.mrl = mrl->mrl;
+    mmk.mrl   = mrl->mrl;
     mmk.ident = NULL;
+    mmk.sub   = NULL;
     mmk.start = 0;
-    mmk.end = -1;
+    mmk.end   = -1;
     gui_set_current_mrl(&mmk);
   }
 }

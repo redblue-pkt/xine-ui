@@ -73,7 +73,7 @@ void gui_display_logo(void) {
   if(gGui->visual_anim.running)
     visual_anim_stop();
 
-  (void) gui_xine_open_and_play((char *)gGui->logo_mrl, 0, 0);
+  (void) gui_xine_open_and_play((char *)gGui->logo_mrl, NULL, 0, 0);
   gGui->logo_mode = 1;
   panel_reset_slider();
   if(stream_infos_is_visible())
@@ -312,7 +312,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   return _gui_xine_play(stream, start_pos, start_time_in_secs, update_mmk);
 }
 
-int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
+int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time) {
   char *mrl = _mrl;
   
   if((!strncasecmp(mrl, "ftp://", 6)) || (!strncasecmp(mrl, "dload:/", 7)))  {
@@ -396,6 +396,7 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
   if(!gui_xine_play(gGui->stream, start_pos, start_time, 1)) {
     return 0;
   }
+
 
   if(!strcmp(mrl, gGui->mmk.mrl))
     gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
@@ -491,7 +492,7 @@ void gui_play (xitk_widget_t *w, void *data) {
       return;
     }
     
-    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
       gui_display_logo();
     
   } 
@@ -1010,7 +1011,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  gGui->ignore_next = 1;
 	  gGui->playlist.cur = newcur;
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	  if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	  if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
 	    gui_display_logo();
 
 	  gGui->ignore_next = 0;
@@ -1050,7 +1051,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  
 	  if((gGui->playlist.cur < gGui->playlist.num)) {
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
 	      gui_display_logo();
 
 	  }
@@ -1070,7 +1071,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  
 	  if((gGui->playlist.cur < gGui->playlist.num)) {
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
 	      gui_display_logo();
 	  }
 	  else
@@ -1082,7 +1083,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  
 	  gGui->playlist.cur = newcur;
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	  if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	  if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
 	    gui_display_logo();
 	}
 
@@ -1138,12 +1139,15 @@ void gui_set_current_mrl(mediamark_t *mmk) {
     free(gGui->mmk.mrl);
   if(gGui->mmk.ident)
     free(gGui->mmk.ident);
+  if(gGui->mmk.sub)
+    free(gGui->mmk.sub);
   
   if(mmk) {
-    gGui->mmk.mrl = strdup(mmk->mrl);
+    gGui->mmk.mrl   = strdup(mmk->mrl);
     gGui->mmk.ident = strdup(((mmk->ident) ? mmk->ident : mmk->mrl));
+    gGui->mmk.sub   = mmk->ident ? strdup(mmk->ident) : NULL;
     gGui->mmk.start = mmk->start;
-    gGui->mmk.end = mmk->end;
+    gGui->mmk.end   = mmk->end;
   }
   else {
     char buffer[1024];
@@ -1151,10 +1155,11 @@ void gui_set_current_mrl(mediamark_t *mmk) {
     memset(&buffer, 0, sizeof(buffer));
     sprintf(buffer, "xine-ui version %s", VERSION);
     
-    gGui->mmk.mrl = strdup(_("There is no mrl."));
+    gGui->mmk.mrl   = strdup(_("There is no mrl."));
     gGui->mmk.ident = strdup(buffer);
+    gGui->mmk.sub   = NULL;
     gGui->mmk.start = 0;
-    gGui->mmk.end = -1;
+    gGui->mmk.end   = -1;
   }
 
   event_sender_update_menu_buttons();

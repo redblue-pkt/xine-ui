@@ -572,7 +572,7 @@ void playlist_scan_for_infos(void) {
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, !mute);
     
     if(rerun)
-      gui_xine_open_and_play(gGui->mmk.mrl, old_pos, 0);
+      gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, old_pos, 0);
     
     playlist_mrlident_toggle();
   }

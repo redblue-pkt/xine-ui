@@ -1798,7 +1798,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	gGui->playlist.cur--;
 	if ((gGui->playlist.cur >= 0) && (gGui->playlist.cur < gGui->playlist.num)) {
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+	  (void) gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start);
 	  
 	} 
 	else {

@@ -749,7 +749,7 @@ void gui_playlist_start_next(void) {
     
     if(gGui->playlist.cur < gGui->playlist.num) {
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-      if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+      if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
 	gui_display_logo();
     }
     else {
@@ -765,7 +765,7 @@ void gui_playlist_start_next(void) {
       else if(gGui->playlist.loop == PLAYLIST_LOOP_LOOP) {
 	gGui->playlist.cur = 0;
 	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
 	  gui_display_logo();
       }
 
@@ -774,7 +774,7 @@ void gui_playlist_start_next(void) {
     
   case PLAYLIST_LOOP_REPEAT:
     gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
       gui_display_logo();
     break;
 
@@ -786,7 +786,7 @@ void gui_playlist_start_next(void) {
       gGui->playlist.cur = mediamark_get_shuffle_next();
       
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-      if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+      if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
 	gui_display_logo();
     }
     else {
