@@ -18,9 +18,9 @@ msgid "No MRL (input stream) specified"
 msgstr "MRL (vstupný prúd) nebolo ¹pecifikované"
 
 #: src/xitk/actions.c:396 src/xitk/actions.c:411
-#, fuzzy, c-format
+#, c-format
 msgid "%s(): can't create new thread (%s)\n"
-msgstr "gui_set_current_position: nemô¾em vytvori» nový thread (%s)\n"
+msgstr "%s(): nemô¾em vytvori» nový thread (%s)\n"
 
 #: src/xitk/actions.c:746
 #, c-format
@@ -97,7 +97,7 @@ msgid "Error"
 msgstr "Chyba"
 
 #: src/xitk/errors.c:196
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -123,7 +123,7 @@ msgstr ""
 "Obyèajne to znamená, ¾e formát súboru nebol rozpoznaný."
 
 #: src/xitk/errors.c:207
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -171,7 +171,7 @@ msgstr "synchronizovaný X protokol (debug)"
 
 #: src/xitk/event.c:765
 msgid "Warning! Synchronized X activated - this is way slow...\n"
-msgstr "Varovanie! Synchronizovaný X aktivovaný - toto je pomalé.\n"
+msgstr "Varovanie! Synchronizovaný X aktivovaný - toto je pomalé\n"
 
 #: src/xitk/event.c:770
 msgid "use wm layer property to place window on top"
@@ -223,7 +223,7 @@ msgid "Select"
 msgstr "Vybra»"
 
 #: src/xitk/kbindings.c:377
-#, fuzzy, c-format
+#, c-format
 msgid "Key bindings of '%s' and '%s' are the same.\n"
 msgstr "Klávesové skratky '%s' a '%s' sú rovnaké.\n"
 
@@ -299,7 +299,6 @@ msgid "Edit"
 msgstr "Editova»"
 
 #: src/xitk/kbindings.c:1906
-#, fuzzy
 msgid "Delete"
 msgstr "Vymaza»"
 
@@ -363,7 +362,6 @@ msgid "  -v, --version                Display version.\n"
 msgstr "  -v, --version                Vypí¹e verziu.\n"
 
 #: src/xitk/main.c:277
-#, fuzzy
 msgid ""
 "  -V, --video-driver <drv>     Select video driver by id. Available "
 "drivers: \n"
@@ -372,7 +370,6 @@ msgstr ""
 "ovládaèe : \n"
 
 #: src/xitk/main.c:286
-#, fuzzy
 msgid ""
 "  -A, --audio-driver <drv>     Select audio driver by id. Available "
 "drivers: \n"
@@ -381,12 +378,10 @@ msgstr ""
 "ovládaèe : \n"
 
 #: src/xitk/main.c:296
-#, fuzzy
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
 msgstr "  -u, --spu-channel <#> Výber SPU (titulky) kanála '#'.\n"
 
 #: src/xitk/main.c:297
-#, fuzzy
 msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
 msgstr "  -a, --audio-channel <#> Výber audio kanála '#'.\n"
 
@@ -429,7 +424,6 @@ msgstr ""
 "VCD)\n"
 
 #: src/xitk/main.c:305
-#, fuzzy
 msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
 msgstr "  -s, --auto-scan <plugin>   stiahnu» playlist z <plugin>\n"
 
@@ -450,7 +444,6 @@ msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-lirc                Vypnú» podporu LIRC.\n"
 
 #: src/xitk/main.c:312
-#, fuzzy
 msgid ""
 "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
 msgstr "      --visual <trieda-alebo-id> Po¾i» ¹pecifické X11 zobrazenie.\n"
@@ -505,7 +498,6 @@ msgstr ""
 "  -n, --network                Povoli» sie»ový server diaµkového ovládania.\n"
 
 #: src/xitk/main.c:321
-#, fuzzy
 msgid "  -R, --root                   Use root window as video window.\n"
 msgstr ""
 "  -R, --root                   Pou¾i» pracovnú plochu pre zobrazenie videa\n"
@@ -515,7 +507,6 @@ msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
 msgstr "  -G, --geometry <WxH[+X+Y]>   Nastvi» výstupné okno (X style).\n"
 
 #: src/xitk/main.c:323
-#, fuzzy
 msgid "  -B, --borderless             Borderless video output window.\n"
 msgstr "  -B, --borderless             Výstupné okno bez rámu.\n"
 
@@ -574,7 +565,6 @@ msgid "audio driver to use"
 msgstr "pou¾i» audio ovládaè"
 
 #: src/xitk/main.c:470
-#, fuzzy
 msgid "main: probing audio drivers...\n"
 msgstr "main : skú¹am audio ovládaèe...\n"
 
@@ -584,7 +574,7 @@ msgid "main: trying to autoload '%s' audio driver: "
 msgstr "main : skú¹am automaticky natiahnu» audio ovládaè '%s' : "
 
 #: src/xitk/main.c:481
-#, fuzzy, c-format
+#, c-format
 msgid "main: ...worked, using '%s' audio driver.\n"
 msgstr "main: ... vy¹lo to, pou¾ívam audio ovládaè '%s'\n"
 
@@ -593,7 +583,6 @@ msgid "main: audio driver probing failed => no audio output\n"
 msgstr "main : zlyhal test pou¾iteµnosti audio ovládaèa => bez zvuku\n"
 
 #: src/xitk/main.c:501
-#, fuzzy
 msgid "main: not using any audio driver (as requested).\n"
 msgstr "main: nepou¾ívam ¾iaden audio ovládaè (ako po¾adované)\n"
 
@@ -617,9 +606,9 @@ msgid "Display popup window on unhandled codecs"
 msgstr "Zobrazi» popup okno na nepodporované kódeky"
 
 #: src/xitk/main.c:659
-#, fuzzy, c-format
+#, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
-msgstr "Potrebujem xine kni¾nicu verzie 0.9.11, nájdená %d.%d.%d.\n"
+msgstr "Potrebujem xine kni¾nicu verzie 0.9.10, nájdená %d.%d.%d.\n"
 
 #: src/xitk/main.c:668
 msgid "sigprocmask() failed.\n"
@@ -652,14 +641,12 @@ msgid "Source:"
 msgstr "Zdroj:"
 
 #: src/xitk/panel.c:60
-#, fuzzy
 msgid "Play previous chapter or mrl"
-msgstr "Prehráva» predchádzajúcu polo¾ku z playlistu"
+msgstr "Prehráva» predchádzajúcu kapitolu alebo mrl"
 
 #: src/xitk/panel.c:61
-#, fuzzy
 msgid "Play next chapter or mrl"
-msgstr "Ïal¹ia polo¾ka z playlistu"
+msgstr "Ïal¹ia kapitola alebo mrl"
 
 #: src/xitk/panel.c:64
 msgid "Play previous entry from playlist"
@@ -688,7 +675,6 @@ msgid "Xine Panel"
 msgstr "Xine panel"
 
 #: src/xitk/panel.c:659
-#, fuzzy
 msgid "xine-panel: couldn't find image for background\n"
 msgstr "xine-panel: nemô¾em nájs» obrázok na pozadie.\n"
 
@@ -870,7 +856,7 @@ msgid "Close"
 msgstr "Zavrie»"
 
 #: src/xitk/skins.c:261 src/xitk/skins.c:387
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
 msgstr "Nepodarilo sa natiahnu» %s/%s. Natiahnite znova starý skin '%s'.\n"
 
@@ -885,7 +871,7 @@ msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr "Nepodarilo sa natiahnu» %s, zlá verzia. Natiahnite starý skin '%s'.\n"
 
 #: src/xitk/skins.c:327
-#, fuzzy, c-format
+#, c-format
 msgid "Ooch, skin not found, use fallback '%s'.\n"
 msgstr "Och, skin sa nena¹iel, pou¾ite bezpeèný '%s'.\n"
 
