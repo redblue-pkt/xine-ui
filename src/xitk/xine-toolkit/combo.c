@@ -659,7 +659,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_widget_list_t *wl,
       xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->label_widget);
       
       if(wimage) {
-	draw_rectangular_inner_box(c->imlibdata, wimage->image->pixmap, 0, 0, wimage->width - 1, wimage->height - 1);
+	draw_rectangular_inner_box(c->imlibdata, wimage->image, 0, 0, wimage->width - 1, wimage->height - 1);
       }
       
       wimage = xitk_get_widget_foreground_skin(private_data->button_widget);
