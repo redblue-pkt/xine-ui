@@ -49,6 +49,8 @@ deinterlace_method	method to use for software-deinterlacing:
 			3 greedy
 			4 onefield (default)
 
+demux_strategy          0..3: Demuxer detection strategy. (see xine.h for details about values).
+
 dvd_device              path to your local dvd device file
 			(e.g. /dev/hdc, /dev/cdrom, /dev/dvd)
 
@@ -63,13 +65,15 @@ esd_latency             latency between time of audio sample
 			use this to manually adjust a/v sync
 			for esd output
 
-esd_gap_tolerance       deprecated
-
 five_lfe_channel        1/0 : enable 5.1-channel playback
 
 five_channel            1/0 : enable 5-channel playback
 
 four_channel            1/0 : enable 4-channel playback
+
+mixer_name              Name of mixer device.
+
+mixer_volume            0..100%: Mixer volume.
 
 oss_audio_sync          Type of audio/video synchronization desired
                         0 = AUTO_DETECT:      System attempts to automatically
@@ -97,7 +101,16 @@ oss_audio_sync          Type of audio/video synchronization desired
                                               video synchronization issues
                                               with use of this setting
 
-oss_resample            XINE can play different sample rates than your
+oss_device_num		-1, 0-16: Forces the OSS plugin to use the specified
+			dspX device, regardless of its capabilities.
+			If -1 (default) is specified, the audio device with
+			the best capabilities will be used.
+			Note: /dev/dsp is usually a symlink to /dev/dsp0
+           
+oss_latency             for softsync you can manually adjust the default
+			a/v sync latency here
+
+oss_resample            xine can play different sample rates than your
 			soundcard supports.
 			0 = AUTO: Only do resampling with different
                                   input and output sampling rate
@@ -105,12 +118,6 @@ oss_resample            XINE can play different sample rates than your
 			          Dont use, needs missing timer plugin!
 			2 = ON:   Always resample, mainly for debugging.
 
-oss_device_num		-1, 0-16: Forces the OSS plugin to use the specified
-			dspX device, regardless of its capabilities.
-			If -1 (default) is specified, the audio device with
-			the best capabilities will be used.
-			Note: /dev/dsp is usually a symlink to /dev/dsp0
-           
 skin                    skin to use, see <prefix>/share/xine/skins
                         for installed skins
                         (e.g. default, metal, lcd, pitt, xinetic)
@@ -122,9 +129,6 @@ video_driver_name       video driver to use, same as command line
 win32_path              path to where you have installed win32
                         codec dlls for avi playback, e.g. 
                         /usr/lib/win32
-
-zoom_mpeg1              1/0 : enable automatic zoom of small
-                        (e.g. mpeg1) videos to double size
 
 xine_debug		Various decimal values.
 			See ./xine-lib/xine-engine/monitor.h
@@ -140,11 +144,9 @@ XV_SATURATION           -1000..1000: X11 XVideo SATURATION property value.
 
 XV_HUE                  -1000..1000: X11 XVideo HUE property value.
 
-mixer_name              Name of mixer device.
+zoom_mpeg1              1/0 : enable automatic zoom of small
+                        (e.g. mpeg1) videos to double size
 
-mixer_volume            0..100%: Mixer volume.
-
-demux_strategy          0..3: Demuxer detection strategy. (see xine.h for details about values).
 
 
 xine-ui specific values:
@@ -174,7 +176,6 @@ y_mrl_browser           Y coords of mrl browser window in root window.
 
 
 The following exist, but details are not yet available.
-oss_static_delay        Unknown
 sun_static_delay        Unknown
 
 --- 
