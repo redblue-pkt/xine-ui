@@ -1939,6 +1939,13 @@ void video_window_get_visible_size(int *w, int *h) {
     *h = gVw->visible_height;
 }
 
+void video_window_get_output_size(int *w, int *h) {
+  if(w)
+    *w = gVw->output_width;
+  if(h)
+    *h = gVw->output_height;
+}
+
 void video_window_set_mrl(char *mrl) {
   if(mrl && strlen(mrl)) {
     

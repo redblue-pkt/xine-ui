@@ -114,11 +114,21 @@ static uint8_t trans[OVL_PALETTE_SIZE];
 #define BAR_WIDTH 336
 #define BAR_HEIGHT 25
 
+#define FONT_SIZE          20
+#define UNSCALED_FONT_SIZE 32
+
 static void  _xine_osd_show(xine_osd_t *osd, int64_t vpts) {
   if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
     xine_osd_show_unscaled(osd, vpts);
   else
     xine_osd_show(osd, vpts);
+}
+
+static void _osd_get_output_size(int *w, int *h) {
+  if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
+    video_window_get_output_size(w, h);
+  else
+    video_window_get_frame_size(w, h);
 }
 
 static char *_osd_get_speed_sym(int speed) {
@@ -143,7 +153,7 @@ static char *_osd_get_status_sym(int status) {
 }
 
 void osd_init(void) {
-  int fonth = 20;
+  int fonth = FONT_SIZE;
 
   gGui->osd.sinfo = xine_osd_new(gGui->stream, 0, 0, 900, (fonth * 6) + (5 * 3));
   xine_osd_set_font(gGui->osd.sinfo, "sans", fonth);
@@ -161,8 +171,7 @@ void osd_init(void) {
   xine_osd_set_text_palette(gGui->osd.bar[1], 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
   
-  gGui->osd.status = xine_osd_new(gGui->stream, 0, 0, 300, fonth + (fonth >> 1));
-  xine_osd_set_font(gGui->osd.status, "cetus", fonth);
+  gGui->osd.status = xine_osd_new(gGui->stream, 0, 0, 300, 2 * fonth);
   xine_osd_set_text_palette(gGui->osd.status, 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
@@ -241,7 +250,8 @@ void osd_update(void) {
 void osd_stream_infos(void) {
 
   if(gGui->osd.enabled) {
-    uint32_t    vwidth, vheight, asrate;
+    int         vwidth, vheight, asrate;
+    int         wwidth, wheight;
     const char *vcodec, *acodec;
     char        buffer[256], *p;
     int         x, y;
@@ -284,12 +294,14 @@ void osd_stream_infos(void) {
       }
     }
 
+    _osd_get_output_size(&wwidth, &wheight);
+
     y = x = 0;
 
     sprintf(buffer, "%s", (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident);
     xine_osd_get_text_size(gGui->osd.sinfo, buffer, &osdw, &h);
     p = buffer;
-    while(osdw > (vwidth - 40)) {
+    while(osdw > (wwidth - 40)) {
       *(p++) = '\0';
       *(p)   = '.';
       *(p+1) = '.';
@@ -372,7 +384,7 @@ void osd_stream_infos(void) {
       osd_stream_position(pos);
     }
     
-    x = (vwidth - osdw) - 40;
+    x = (wwidth - osdw) - 40;
     xine_osd_set_position(gGui->osd.sinfo, (x >= 0) ? x : 0, 15);
 
     _xine_osd_show(gGui->osd.sinfo, 0);
@@ -383,7 +395,7 @@ void osd_stream_infos(void) {
 void osd_draw_bar(char *title, int min, int max, int val, int type) {
 
   if(gGui->osd.enabled) {
-    uint32_t vwidth, vheight;
+    int      wwidth, wheight;
     int      bar_color[40];
     int      i, x;
     float    _val = (int) val;
@@ -402,6 +414,8 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     
     pos = (int) (_val + -_min) / ((_max + -_min) / 40);
     
+    _osd_get_output_size(&wwidth, &wheight);
+
     xine_osd_clear(gGui->osd.bar[0]);
     xine_osd_clear(gGui->osd.bar[1]);
     
@@ -473,28 +487,9 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
       xine_osd_draw_text(gGui->osd.bar[1], (BAR_WIDTH - tw) >> 1, 0, title, XINE_OSD_TEXT1);
     }
     
-    vwidth  = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-    vheight = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
-    
-    /* We're in visual animation mode */
-    if((vwidth == 0) && (vheight == 0)) {
-      if(gGui->visual_anim.running) {
-	if(gGui->visual_anim.enabled == 1) {
-	  video_window_get_frame_size(&vwidth, &vheight);
-	}
-	else if(gGui->visual_anim.enabled == 2) {
-	  vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-	  vheight = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
-	}
-      }
-      else
-	video_window_get_frame_size(&vwidth, &vheight);
-
-    }
-
-    x = (vwidth - BAR_WIDTH) >> 1;
-    xine_osd_set_position(gGui->osd.bar[0], (x >= 0) ? x : 0, (vheight - BAR_HEIGHT) - 40);
-    xine_osd_set_position(gGui->osd.bar[1], (x >= 0) ? x : 0, (vheight - (BAR_HEIGHT * 2)) - 40);
+    x = (wwidth - BAR_WIDTH) >> 1;
+    xine_osd_set_position(gGui->osd.bar[0], (x >= 0) ? x : 0, (wheight - BAR_HEIGHT) - 40);
+    xine_osd_set_position(gGui->osd.bar[1], (x >= 0) ? x : 0, (wheight - (BAR_HEIGHT * 2)) - 40);
     
     _xine_osd_show(gGui->osd.bar[0], 0);
     if(title)
@@ -597,6 +592,11 @@ void osd_update_status(void) {
       /* noop */
       break;
     }
+
+    if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
+      xine_osd_set_font(gGui->osd.status, "cetus", UNSCALED_FONT_SIZE);
+    else
+      xine_osd_set_font(gGui->osd.status, "cetus", FONT_SIZE);
     
     xine_osd_draw_text(gGui->osd.status, 0, 0, buffer, XINE_OSD_TEXT1);
     xine_osd_set_position(gGui->osd.status, 20, 10);
