@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.8\n"
-"POT-Creation-Date: 2002-05-31 13:07+0200\n"
+"POT-Creation-Date: 2002-06-17 21:59+0200\n"
 "PO-Revision-Date: 2002-03-23 20:42GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -13,15 +13,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:949
+#: src/xitk/xine-toolkit/mrlbrowser.c:957
 msgid "Select current entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:957
+#: src/xitk/xine-toolkit/mrlbrowser.c:965
 msgid "Play selected entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:968
+#: src/xitk/xine-toolkit/mrlbrowser.c:976
 msgid "Close MRL browser window"
 msgstr ""
 
@@ -37,28 +37,28 @@ msgstr "Не можу вивести на д╕сплей\n"
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_param() зазнав збою\n"
 
-#: src/xitk/xine-toolkit/test.c:348
+#: src/xitk/xine-toolkit/test.c:346
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "Нове ц╕ле значення ╓: %d. Так ?"
 
-#: src/xitk/xine-toolkit/test.c:442
+#: src/xitk/xine-toolkit/test.c:440
 msgid "My Frame"
 msgstr "М╕й кадр"
 
-#: src/xitk/xine-toolkit/test.c:481
+#: src/xitk/xine-toolkit/test.c:479
 msgid "A Label"
 msgstr "М╕тка"
 
-#: src/xitk/xine-toolkit/test.c:538
+#: src/xitk/xine-toolkit/test.c:536
 msgid "Fire !!"
 msgstr "Вогонь !!"
 
-#: src/xitk/xine-toolkit/test.c:569
+#: src/xitk/xine-toolkit/test.c:567
 msgid "!BOOM!"
 msgstr "!БУМ!"
 
-#: src/xitk/xine-toolkit/test.c:657
+#: src/xitk/xine-toolkit/test.c:656
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -67,42 +67,42 @@ msgstr ""
 "Нов╕ елементи що обран╕ в комбо бокс╕:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:770
+#: src/xitk/xine-toolkit/test.c:769
 msgid "init_test() failed\n"
 msgstr "init_test() зазнав збою \n"
 
-#: src/xitk/xine-toolkit/test.c:786
+#: src/xitk/xine-toolkit/test.c:785
 msgid "My Fucking Window"
 msgstr "В╕кно"
 
-#: src/xitk/xine-toolkit/test.c:802
+#: src/xitk/xine-toolkit/test.c:801
 msgid "Quit"
 msgstr "Вих╕д"
 
-#: src/xitk/xine-toolkit/window.c:809
+#: src/xitk/xine-toolkit/window.c:812
 msgid "OK"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:871 src/xitk/xine-toolkit/window.c:1063
+#: src/xitk/xine-toolkit/window.c:875 src/xitk/xine-toolkit/window.c:1073
 msgid "Question?"
 msgstr "Питання?"
 
-#: src/xitk/xine-toolkit/window.c:996 src/xitk/xine-toolkit/window.c:1201
+#: src/xitk/xine-toolkit/window.c:1004 src/xitk/xine-toolkit/window.c:1215
 msgid "Yes"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:996 src/xitk/xine-toolkit/window.c:1201
+#: src/xitk/xine-toolkit/window.c:1004 src/xitk/xine-toolkit/window.c:1215
 msgid "No"
 msgstr "Н╕"
 
-#: src/xitk/xine-toolkit/window.c:1201
+#: src/xitk/xine-toolkit/window.c:1215
 msgid "Cancel"
 msgstr "В╕дмова"
 
-#: src/xitk/xine-toolkit/xitk.h:1857 src/xitk/xine-toolkit/xitk.h:1873
+#: src/xitk/xine-toolkit/xitk.h:1875 src/xitk/xine-toolkit/xitk.h:1891
 msgid "Error"
 msgstr ""
 
-#: src/xitk/xine-toolkit/xitk.h:1862 src/xitk/xine-toolkit/xitk.h:1878
+#: src/xitk/xine-toolkit/xitk.h:1880 src/xitk/xine-toolkit/xitk.h:1896
 msgid "Information"
 msgstr ""

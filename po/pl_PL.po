@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-06-16 13:51+0200\n"
+"POT-Creation-Date: 2002-06-17 21:56+0200\n"
 "PO-Revision-Date: 2002-06-07 12:31+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polski <pl@li.org>\n"
@@ -80,7 +80,7 @@ msgstr "Koniec"
 msgid "Close control window"
 msgstr "Zamykanie panela kontrolnego"
 
-#: src/xitk/errors.c:64 src/xitk/kbindings.c:1918
+#: src/xitk/errors.c:64 src/xitk/kbindings.c:1920
 msgid "Done"
 msgstr "Zrobione"
 
@@ -219,36 +219,36 @@ msgstr "Wybór"
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Mapowania klawiszy '%s' i '%s' s± identyczne.\n"
 
-#: src/xitk/kbindings.c:709
+#: src/xitk/kbindings.c:711
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Ojej: tablica mapowania klawiszy jest PUSTA.\n"
 
-#: src/xitk/kbindings.c:1294
+#: src/xitk/kbindings.c:1296
 msgid "Nothing selected"
 msgstr "Nie wybrano"
 
-#: src/xitk/kbindings.c:1295
+#: src/xitk/kbindings.c:1297
 msgid "None"
 msgstr "Brak"
 
-#: src/xitk/kbindings.c:1456
+#: src/xitk/kbindings.c:1458
 msgid "You can only delete alias entries."
 msgstr "Mo¿na usuwaæ tylko aliasy wpisów"
 
-#: src/xitk/kbindings.c:1580
+#: src/xitk/kbindings.c:1582
 msgid "Press Keyboard Keys..."
 msgstr "Naci¶nij kawisz..."
 
-#: src/xitk/kbindings.c:1597
+#: src/xitk/kbindings.c:1599
 msgid "Event receiver window"
 msgstr "Okno odbiornika wydarzeñ"
 
 #. Ask if uses want/wont store new shorcut
-#: src/xitk/kbindings.c:1682
+#: src/xitk/kbindings.c:1684
 msgid "Accept?"
 msgstr "Zaakceptowaæ?"
 
-#: src/xitk/kbindings.c:1686
+#: src/xitk/kbindings.c:1688
 #, c-format
 msgid ""
 "Store %s as\n"
@@ -257,7 +257,7 @@ msgstr ""
 "Zapis %s jako\n"
 "mapowanie klawisza '%s'?."
 
-#: src/xitk/kbindings.c:1693
+#: src/xitk/kbindings.c:1695
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
@@ -266,63 +266,63 @@ msgstr ""
 "To mapowanie klawisza jest redundantne z akcj±\n"
 "\"%s\".\n"
 
-#: src/xitk/kbindings.c:1772
+#: src/xitk/kbindings.c:1774
 msgid "key binding editor"
 msgstr "Edytor mapowania klawiszy"
 
-#: src/xitk/kbindings.c:1797
+#: src/xitk/kbindings.c:1799
 msgid "Binding action"
 msgstr "Akcja skrótu"
 
-#: src/xitk/kbindings.c:1803
+#: src/xitk/kbindings.c:1805
 msgid "Key"
 msgstr "Klawisz"
 
-#: src/xitk/kbindings.c:1808
+#: src/xitk/kbindings.c:1810
 msgid "Modifiers"
 msgstr "Modyfikator"
 
-#: src/xitk/kbindings.c:1849
+#: src/xitk/kbindings.c:1851
 msgid "Alias"
 msgstr "Alias"
 
-#: src/xitk/kbindings.c:1863
+#: src/xitk/kbindings.c:1865
 msgid "Edit"
 msgstr "Edycja"
 
-#: src/xitk/kbindings.c:1877
+#: src/xitk/kbindings.c:1879
 msgid "Delete"
 msgstr "Usuwanie"
 
-#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:889
+#: src/xitk/kbindings.c:1893 src/xitk/playlist.c:889
 msgid "Save"
 msgstr "Zapis"
 
-#: src/xitk/kbindings.c:1905
+#: src/xitk/kbindings.c:1907
 msgid "Reset"
 msgstr "Reset"
 
-#: src/xitk/kbindings.c:1982
+#: src/xitk/kbindings.c:1984
 msgid "ctrl"
 msgstr "ctrl"
 
-#: src/xitk/kbindings.c:2003
+#: src/xitk/kbindings.c:2005
 msgid "meta"
 msgstr "meta"
 
-#: src/xitk/kbindings.c:2025
+#: src/xitk/kbindings.c:2027
 msgid "mod3"
 msgstr "mod3"
 
-#: src/xitk/kbindings.c:2047
+#: src/xitk/kbindings.c:2049
 msgid "mod4"
 msgstr "mod4"
 
-#: src/xitk/kbindings.c:2068
+#: src/xitk/kbindings.c:2070
 msgid "mod5"
 msgstr "mod5"
 
-#: src/xitk/kbindings.c:2077
+#: src/xitk/kbindings.c:2079
 msgid "Grab"
 msgstr "Przechwytuj"
 
@@ -948,51 +948,51 @@ msgstr ""
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1000
+#: src/xitk/videowin.c:1009
 msgid "Xine Video Window"
 msgstr ""
 
-#: src/xitk/videowin.c:1004
+#: src/xitk/videowin.c:1013
 #, fuzzy
 msgid "Xine Video Fullscreen Window"
 msgstr "Tryb pe³noekranowy/okienkowy"
 
-#: src/xitk/videowin.c:1008
+#: src/xitk/videowin.c:1017
 msgid "Xine Video Borderless Window"
 msgstr ""
 
-#: src/xitk/videowin.c:1029
+#: src/xitk/videowin.c:1038
 msgid "XAllocWMHints() failed\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1053
+#: src/xitk/videowin.c:1062
 msgid "New stream sizes resize output window"
 msgstr ""
 
-#: src/xitk/videowin.c:1059
+#: src/xitk/videowin.c:1068
 msgid "Double size for small streams (require stream_resize_window)"
 msgstr ""
 
-#: src/xitk/videowin.c:1081
+#: src/xitk/videowin.c:1090
 msgid "use XVidModeExtension when switching to fullscreen"
 msgstr ""
 
-#: src/xitk/videowin.c:1097
+#: src/xitk/videowin.c:1106
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1100
+#: src/xitk/videowin.c:1109
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1118
+#: src/xitk/videowin.c:1127
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr ""
 
-#: src/xitk/videowin.c:1121
+#: src/xitk/videowin.c:1130
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 msgstr ""
 
