@@ -568,18 +568,16 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
        (gGui->XF86VidMode_fullscreen)
 #endif
        ) {
-      int x, y, w, h, coordx, coordy, desktopw, desktoph;
+      int x, y, w, h, desktopw, desktoph;
       
       xitk_get_window_position(gGui->display, gGui->panel_window, &x, &y, &w, &h);
-      coordx = x + w;
-      coordy = y + h;
       
       XLockDisplay(gGui->display);
       desktopw = DisplayWidth(gGui->display, gGui->screen);
       desktoph = DisplayHeight(gGui->display, gGui->screen);
       XUnlockDisplay(gGui->display);
       
-      if((coordx <= 0) || (coordy <= 0) || (coordx >= desktopw) || (coordy >= desktoph)) {
+      if(((x + w) <= 0) || (y + h) <= 0) || (x >= desktopw) || (y >= desktoph)) {
 	
 	newx = (desktopw >> 1) - (w >> 1);
 	newy = (desktoph >> 1) - (h >> 1);
