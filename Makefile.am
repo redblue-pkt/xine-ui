@@ -9,16 +9,6 @@ ACLOCAL_AMFLAGS = @XINE_ACFLAGS@ -I m4
 SUBDIRS = doc m4 readline intl po misc src  
 
 EXTRA_DIST = autogen.sh\
-        debian/README.Debian \
-	debian/changelog \
-	debian/control \
-        debian/copyright \
-	debian/dirs \
-	debian/menu \
-	debian/rules \
-        debian/xine.docs \
-	debian/shlibdeps.sh \
-	debian/xine-ui.mime \
 	@DEPCOMP@
 
 debug:
