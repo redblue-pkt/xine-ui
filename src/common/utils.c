@@ -312,7 +312,7 @@ int is_ipv6_double_semicolon(char *ostr) {
     char *bracketl, *bracketr, *d_semic;
     char *str = get_ipv6_addr(ostr);
     
-    if((bracketl = strchr(str, '[')) && (bracketr = strchr(str, ']')) && 
+    if(str && (bracketl = strchr(str, '[')) && (bracketr = strchr(str, ']')) && 
        (d_semic = strstr(str, "::")) && 
        ((bracketl < d_semic) && (d_semic < bracketr))) {
       char   *addr;
