@@ -925,7 +925,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
     if (wl->widget_under_mouse) {
       
       /* Kill (hide) tips */
-      xitk_tips_tips_kill(wl->widget_under_mouse);
+      xitk_tips_hide_tips();
       
       if((wl->widget_under_mouse->type & WIDGET_FOCUSABLE) && 
 	 wl->widget_under_mouse->enable == WIDGET_ENABLE) {
@@ -947,7 +947,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
       dump_widget_type(mywidget);
 #endif
       
-      xitk_tips_create(mywidget);
+      xitk_tips_show_widget_tips(mywidget);
       
       if((mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
 	event.type  = WIDGET_EVENT_FOCUS;
@@ -996,7 +996,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     if (wl->widget_focused) {
       
       /* Kill (hide) tips */
-      xitk_tips_tips_kill(wl->widget_focused);
+      xitk_tips_hide_tips();
       
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
@@ -1072,7 +1072,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       widget_event_result_t result;
 
       /* Kill (hide) tips */
-      xitk_tips_tips_kill(mywidget);
+      xitk_tips_hide_tips();
       
       if((mywidget->type & WIDGET_CLICKABLE) && 
 	 mywidget->enable == WIDGET_ENABLE && mywidget->running) {
@@ -1197,7 +1197,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
     __focus_the_widget:
       
       /* Kill (hide) tips */
-      xitk_tips_tips_kill(wl->widget_focused);
+      xitk_tips_hide_tips();
 
       if ((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	  (wl->widget_focused->enable == WIDGET_ENABLE)) {
@@ -1290,7 +1290,7 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
     if(wl->widget_focused) {
       
       /* Kill (hide) tips */
-      xitk_tips_tips_kill(wl->widget_focused);
+      xitk_tips_hide_tips();
       
       if ((wl->widget_focused->type & WIDGET_FOCUSABLE) && 
 	  (wl->widget_focused->enable == WIDGET_ENABLE)) {
@@ -1507,7 +1507,7 @@ void xitk_disable_widget(xitk_widget_t *w) {
     
     if((w->wl->widget_under_mouse != NULL) && (w == w->wl->widget_under_mouse)) {
       /* Kill (hide) tips */
-      xitk_tips_tips_kill(w);
+      xitk_tips_hide_tips();
     }
     
     if((w->type & WIDGET_FOCUSABLE) && 
@@ -1542,7 +1542,7 @@ void xitk_free_widget(xitk_widget_t *w) {
   event.type = WIDGET_EVENT_DESTROY;
   (void) w->event(w, &event, NULL);
   
-  xitk_tips_tips_kill(w);
+  xitk_tips_hide_tips();
   XITK_FREE(w->tips_string);
   XITK_FREE(w);
   w = NULL;
@@ -1793,7 +1793,7 @@ void xitk_hide_widget(xitk_widget_t *w) {
     
     w->visible = 0;
 
-    xitk_tips_tips_kill(w);
+    xitk_tips_hide_tips();
     
     event.type = WIDGET_EVENT_PAINT;
     (void) w->event(w, &event, NULL);

@@ -1896,7 +1896,6 @@ void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
  * Free an image object.
  */
 void xitk_image_free_image(ImlibData *im, xitk_image_t **src);
-
 /**
  *
  */

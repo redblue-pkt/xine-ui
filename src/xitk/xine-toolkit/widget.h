@@ -75,8 +75,8 @@ typedef struct {
 } widget_event_t;
 
 typedef struct {
-  int           value;
-  xitk_image_t *image;
+  int                   value;
+  xitk_image_t         *image;
 } widget_event_result_t;
 
 /* return 1 if event_result is filled, otherwise 0 */
@@ -99,7 +99,6 @@ struct xitk_widget_s {
 
   widget_event_notify_t           event;
 
-  pthread_t                       tips_thread;
   int                             tips_timeout;
   char                           *tips_string;
 

@@ -324,6 +324,7 @@ void xitk_unmodal_window(Window w);
 void xitk_set_current_menu(xitk_widget_t *menu);
 void xitk_unset_current_menu(void);
 
+int xitk_is_running(void);
 int xitk_skin_get_direction(xitk_skin_config_t *, const char *);
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
 int xitk_skin_get_printability(xitk_skin_config_t *, const char *);

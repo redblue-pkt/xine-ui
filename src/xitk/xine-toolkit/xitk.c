@@ -132,6 +132,8 @@ typedef struct {
   xitk_widget_t              *menu;
   
   struct timeval              keypress;
+
+  pthread_t                  *tips_thread;
 } __xitk_t;
 
 static __xitk_t    *gXitk;
@@ -1199,13 +1201,9 @@ void xitk_xevent_notify(XEvent *event) {
 	  len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
 	  XUNLOCK(gXitk->display);
 
-	  if(fx->widget_list && fx->widget_list->widget_under_mouse)
-	    xitk_tips_tips_kill(fx->widget_list->widget_under_mouse);
+	  if(fx->widget_list && (fx->widget_list->widget_under_mouse || fx->widget_list->widget_focused))
+	    xitk_tips_hide_tips();
 	  
-	  if(fx->widget_list && fx->widget_list->widget_focused)
-	    xitk_tips_tips_kill(fx->widget_list->widget_focused);
-
-
 	  if(fx->widget_list && fx->widget_list->widget_focused) {
 	    w = fx->widget_list->widget_focused;
 	  }
@@ -1703,6 +1701,8 @@ void xitk_init(Display *display, int verbosity) {
   
   /* init font caching */
   xitk_font_cache_init();
+
+  xitk_tips_init(display);
 }
 
 /* Return True is event type isn't completion */
@@ -1854,6 +1854,7 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
  * Stop the wait xevent loop
  */
 void xitk_stop(void) {
+  xitk_tips_deinit();
   gXitk->running = 0;
 }
  
