@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-12-08 14:55+0100\n"
+"POT-Creation-Date: 2001-12-10 14:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,25 +43,48 @@ msgstr ""
 msgid "Choose a Skin"
 msgstr ""
 
-#: src/xitk/control.c:644 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:815
+#: src/xitk/control.c:644 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:818
 msgid "Dismiss"
 msgstr ""
 
-#: src/xitk/event.c:846
+#: src/xitk/event.c:642
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"There is no available input plugin available to handle '%s'.\n"
+msgstr ""
+
+#: src/xitk/event.c:648
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"There is no available demuxer plugin to handle '%s'.\n"
+msgstr ""
+
+#: src/xitk/event.c:654
+msgid ""
+"- xine engine error -\n"
+"\n"
+"!! Unhandled error !!\n"
+msgstr ""
+
+#: src/xitk/event.c:885
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
 
-#: src/xitk/event.c:856
+#: src/xitk/event.c:895
 msgid "Cannot open display\n"
 msgstr ""
 
-#: src/xitk/event.c:890
+#: src/xitk/event.c:929
 msgid "Unable to initialize Imlib\n"
 msgstr ""
 
-#: src/xitk/event.c:900
+#: src/xitk/event.c:939
 #, c-format
 msgid "Unable to load %s logo\n"
 msgstr ""
@@ -74,12 +97,12 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
-#: src/xitk/kbindings.c:313
+#: src/xitk/kbindings.c:315
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:669
+#: src/xitk/kbindings.c:671
 msgid "OOCH: key binding table is NULL.\n"
 msgstr ""
 
@@ -305,15 +328,15 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: src/xitk/playlist.c:797
+#: src/xitk/playlist.c:798
 msgid "Load"
 msgstr ""
 
-#: src/xitk/playlist.c:806
+#: src/xitk/playlist.c:808
 msgid "Save"
 msgstr ""
 
-#: src/xitk/playlist.c:838
+#: src/xitk/playlist.c:842
 msgid "Scan for:"
 msgstr ""
 

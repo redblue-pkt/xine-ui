@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 1.0\n"
-"POT-Creation-Date: 2001-12-08 14:55+0100\n"
+"POT-Creation-Date: 2001-12-10 14:16+0100\n"
 "PO-Revision-Date: 2001-11-24 16:45+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanmagm@mail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -43,11 +43,34 @@ msgstr "Ctr"
 msgid "Choose a Skin"
 msgstr "Seleccione piel"
 
-#: src/xitk/control.c:644 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:815
+#: src/xitk/control.c:644 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:818
 msgid "Dismiss"
 msgstr "Cancel."
 
-#: src/xitk/event.c:846
+#: src/xitk/event.c:642
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"There is no available input plugin available to handle '%s'.\n"
+msgstr ""
+
+#: src/xitk/event.c:648
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"There is no available demuxer plugin to handle '%s'.\n"
+msgstr ""
+
+#: src/xitk/event.c:654
+msgid ""
+"- xine engine error -\n"
+"\n"
+"!! Unhandled error !!\n"
+msgstr ""
+
+#: src/xitk/event.c:885
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -55,15 +78,15 @@ msgstr ""
 "\n"
 "XInitThreads falló - parece que su librería xlib no tiene hilos seguros.\n"
 
-#: src/xitk/event.c:856
+#: src/xitk/event.c:895
 msgid "Cannot open display\n"
 msgstr "No se puede abrir la pantalla\n"
 
-#: src/xitk/event.c:890
+#: src/xitk/event.c:929
 msgid "Unable to initialize Imlib\n"
 msgstr "No se puede iniciar Imlib\n"
 
-#: src/xitk/event.c:900
+#: src/xitk/event.c:939
 #, c-format
 msgid "Unable to load %s logo\n"
 msgstr "No se puede cargar el logo %s\n"
@@ -76,12 +99,12 @@ msgstr "Navegador de archivos de xine"
 msgid "Select"
 msgstr "Selecc."
 
-#: src/xitk/kbindings.c:313
+#: src/xitk/kbindings.c:315
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Los atajos de teclado '%s' y '%s' son similares.\n"
 
-#: src/xitk/kbindings.c:669
+#: src/xitk/kbindings.c:671
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "OOCH: la tabla de atajos de teclado es NULL.\n"
 
@@ -332,15 +355,15 @@ msgstr "No se puede leer %s: %s\n"
 msgid "Add"
 msgstr "Añadir"
 
-#: src/xitk/playlist.c:797
+#: src/xitk/playlist.c:798
 msgid "Load"
 msgstr "Cargar"
 
-#: src/xitk/playlist.c:806
+#: src/xitk/playlist.c:808
 msgid "Save"
 msgstr "Guardar"
 
-#: src/xitk/playlist.c:838
+#: src/xitk/playlist.c:842
 msgid "Scan for:"
 msgstr "Buscar:"
 

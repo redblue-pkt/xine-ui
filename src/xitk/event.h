@@ -152,7 +152,7 @@ char *gui_get_configfile(void);
 
 void gui_init (int nfiles, char *filenames[]);
 
-void gui_run ();
+void gui_run (void);
 
 void gui_status_callback (int nStatus) ;
 
@@ -162,10 +162,11 @@ void gui_execute_action_id(action_id_t);
 
 void gui_handle_event (XEvent *event, void *data);
 
-char *gui_next_mrl_callback () ;
+char *gui_next_mrl_callback (void) ;
 
-void gui_branched_callback () ;
+void gui_branched_callback (void) ;
 
+void gui_handle_xine_error(void);
 #endif
 
 

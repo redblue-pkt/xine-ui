@@ -624,6 +624,41 @@ void gui_execute_action_id(action_id_t action) {
 }	    
 
 /*
+ * Display an error window error from a xine engine error.
+ */
+void gui_handle_xine_error(void) {
+  int err;
+
+  err = xine_get_error(gGui->xine);
+
+  switch(err) {
+
+  case XINE_ERROR_NONE:
+    /* noop */
+    break;
+    
+  case XINE_ERROR_NO_INPUT_PLUGIN:
+    xitk_window_dialog_error(gGui->imlib_data, 
+			     _("- xine engine error -\n\nThere is no available input plugin "
+			       "available to handle '%s'.\n"), gGui->filename);
+    break;
+    
+  case XINE_ERROR_NO_DEMUXER_PLUGIN:
+    xitk_window_dialog_error(gGui->imlib_data, 
+			     _("- xine engine error -\n\nThere is no available demuxer plugin "
+			       "to handle '%s'.\n"), gGui->filename);
+    break;
+
+  default:
+    xitk_window_dialog_error(gGui->imlib_data, 
+			     _("- xine engine error -\n\n!! Unhandled error !!\n"));
+    break;
+  }
+
+
+}
+
+/*
  * top-level event handler
  */
 void gui_handle_event (XEvent *event, void *data) {
@@ -692,7 +727,8 @@ void gui_status_callback (int nStatus) {
 
     if (gGui->playlist_cur < gGui->playlist_num) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      xine_play (gGui->xine, gGui->filename, 0, 0 );
+      if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
+	gui_handle_xine_error();
     } else {
       
       if(gGui->actions_on_start[0] == ACTID_QUIT)
@@ -705,7 +741,6 @@ void gui_status_callback (int nStatus) {
 }
 
 char *gui_next_mrl_callback () {
-
 
   if (gGui->playlist_cur >= (gGui->playlist_num-1)) 
     return NULL;
