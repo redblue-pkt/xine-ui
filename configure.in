@@ -51,6 +51,7 @@ dnl Check for programs.
 dnl
 AC_ISC_POSIX
 AC_PROG_CC
+AC_MINIX dnl readline
 AC_STDC_HEADERS
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
@@ -193,6 +194,75 @@ AC_CHECK_LIB(Xext, DPMSQueryExtension,
              $X_LIBS)
 AC_SUBST(DPMS_LIBS)
  
+
+dnl
+dnl readline
+dnl
+dnl configure defaults
+LIBVERSION=4.2a
+opt_curses=no
+opt_shared=no
+
+dnl arguments to configure
+AC_ARG_WITH(curses, --with-curses               use the curses library instead of the termcap library,opt_curses=$withval)
+
+if test "$opt_curses" = "yes"; then
+	prefer_curses=yes
+fi
+AC_RETSIGTYPE
+
+AC_HEADER_STAT
+AC_HEADER_DIRENT
+AC_CHECK_FUNCS(lstat memmove putenv select setenv setlocale \
+	strcasecmp strpbrk tcgetattr vsnprintf isascii isxdigit)
+
+AC_FUNC_STRCOLL
+
+AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h \
+		limits.h sys/ptem.h sys/pte.h sys/stream.h sys/select.h \
+		termcap.h termios.h termio.h sys/file.h locale.h memory.h )
+
+dnl BASH_SYS_SIGNAL_VINTAGE dnl pure 2.50
+dnl BASH_SYS_REINSTALL_SIGHANDLERS dnl pure 2.50
+BASH_SIGNAL_CHECK
+BASH_REINSTALL_SIGHANDLERS
+
+BASH_FUNC_POSIX_SETJMP
+BASH_FUNC_LSTAT
+BASH_CHECK_GETPW_FUNCS
+BASH_FUNC_STRCOLL
+
+BASH_TYPE_SIGHANDLER
+BASH_HAVE_TIOCGWINSZ
+BASH_HAVE_TIOCSTAT
+BASH_HAVE_FIONREAD
+BASH_MISC_SPEED_T
+BASH_STRUCT_WINSIZE
+BASH_STRUCT_DIRENT_D_INO
+BASH_STRUCT_DIRENT_D_FILENO
+dnl yuck
+case "$host_os" in
+aix*)   prefer_curses=yes ;;
+esac
+
+BASH_CHECK_LIB_TERMCAP
+if test "$TERMCAP_LIB" = "./lib/termcap/libtermcap.a"; then
+	TERMCAP_LIB=-ltermcap	#default
+fi
+
+case "$host_cpu" in
+*cray*)	READLINE_LOCAL_CFLAGS=-DCRAY ;;
+*s390*) READLINE_LOCAL_CFLAGS=-fsigned-char ;;
+esac
+
+case "$host_os" in
+isc*)	READLINE_LOCAL_CFLAGS=-Disc386 ;;
+esac
+
+AC_SUBST(READLINE_LOCAL_CFLAGS)
+AC_SUBST(TERMCAP_LIB)
+AC_SUBST(LIBVERSION)
+
 
 dnl
 dnl check for ascii-art library
@@ -590,7 +660,7 @@ AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR")
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
 dnl
-INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
+INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/readline -I$(top_builddir)/readline -I$(top_srcdir)/srcw -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
 AC_SUBST(INCLUDES)
 
 AC_DEFINE(NEED_MRLBROWSER)
@@ -611,6 +681,7 @@ AC_OUTPUT([
 Makefile
 m4/Makefile
 intl/Makefile
+readline/Makefile
 src/Makefile
 src/common/Makefile
 src/corba/Makefile

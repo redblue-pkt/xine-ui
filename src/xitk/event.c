@@ -58,6 +58,7 @@
 #include "mrl_browser.h"
 #include "skins.h"
 #include "errors.h"
+#include "network.h"
 
 #ifdef HAVE_LIRC
 extern int no_lirc;
@@ -772,7 +773,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
   if (depth == 0) {
     XVisualInfo vinfo;
 
-    XGetWindowAttributes(gGui->display, gGui->imlib_data->x.root, &attribs);
+    XGetWindowAttributes(gGui->display, (DefaultRootWindow(gGui->display)), &attribs);
 
     depth = attribs.depth;
   
@@ -1012,6 +1013,8 @@ void gui_run (void) {
 						 gui_dndcallback, 
 						 NULL, NULL);
   
+  start_remote_server();
+
   xitk_run();
 
   gGui->running = 0;

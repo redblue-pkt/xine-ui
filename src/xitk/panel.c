@@ -226,6 +226,7 @@ static void *slider_loop(void *dummy) {
           gGui->mixer.volume_level = xine_get_audio_property(gGui->xine, 
                                                              gGui->mixer.volume_mixer);
           xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+	  panel_check_mute();
         }
 	
 	if(status != XINE_STOP)

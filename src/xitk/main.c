@@ -87,7 +87,7 @@ int       no_lirc;
 #define DISPLAY_KEYMAP          1002
 
 /* options args */
-static const char *short_options = "?hHgfv"
+static const char *short_options = "?hHgfvn"
 #ifdef HAVE_LIRC
  "L"
 #endif
@@ -112,13 +112,14 @@ static struct option long_options[] = {
   {"audio-driver"   , required_argument, 0, 'A'                      },
   {"auto-play"      , optional_argument, 0, 'p'                      },
   {"auto-scan"      , required_argument, 0, 's'                      },
-  {"hide-gui"       , no_argument,       0, 'g'                      },
-  {"hide-video"     , no_argument,       0, 'H'                      },
-  {"fullscreen"     , no_argument,       0, 'f'                      },
+  {"hide-gui"       , no_argument      , 0, 'g'                      },
+  {"hide-video"     , no_argument      , 0, 'H'                      },
+  {"fullscreen"     , no_argument      , 0, 'f'                      },
   {"visual"	    , required_argument, 0,  OPTION_VISUAL           },
   {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
   {"keymap"         , optional_argument, 0,  DISPLAY_KEYMAP          },
-  {"root"           , no_argument,       0, 'R'                      },
+  {"network"        , no_argument      , 0, 'n'                      },
+  {"root"           , no_argument      , 0, 'R'                      },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -202,7 +203,8 @@ void show_usage (void) {
   printf(_("                                 'lirc': display draft of a .lircrc config file.\n"));
   printf(_("                                 'remapped': user remapped keymap table.\n"));
   printf(_("                                 -if no option is given, 'default' is selected.\n"));
-  printf(_("  -R, --root                   Use root window as video window\n"));
+  printf(_("  -n, --network                Enable network remote control server.\n"));
+  printf(_("  -R, --root                   Use root window as video window.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -492,6 +494,7 @@ int main(int argc, char *argv[]) {
   gGui->prefered_visual_id     = None;
   gGui->install_colormap       = 0;
   gGui->cursor_grabbed         = 0;
+  gGui->network                = 0;
   gGui->use_root_window        = 0;
 #ifdef HAVE_XF86VIDMODE
   gGui->XF86VidMode_fullscreen = 0;
@@ -631,6 +634,10 @@ int main(int argc, char *argv[]) {
       exit(1);
       break;
 
+    case 'n': /* Enable remote control server */
+      gGui->network = 1;
+      break;
+      
     case 'R': /* Use root window for video output */
       gGui->use_root_window = 1;
       break;

@@ -1,4 +1,4 @@
-CFLAGS = $(DIRECTFB_CFLAGS) @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @XINE_CFLAGS@
+CFLAGS = $(DIRECTFB_CFLAGS) @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @XINE_CFLAGS@ -DFONTDIR=\\\"$(XINE_SKINDIR)/../fonts/\\\"
 DEBUG_CFLAGS = @BUILD_LIB_STATIC@ @DEBUG_CFLAGS@ @XINE_CFLAGS@
 
 if HAVE_DIRECTFB
@@ -18,7 +18,6 @@ datadir = $(XINE_SKINDIR)/../fonts/
 data_DATA = cetus.ttf pointer1.png pointer2.png
 endif
 
-CFLAGS ='-DFONTDIR="$(XINE_SKINDIR)/../fonts/"'
 dfbxine_SOURCES = $(GETOPT_C) utils.c options.c dfb.c main.c
 dfbxine_DEPENDENTIES = utils.h dfb.h
 dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm
@@ -32,7 +31,7 @@ utils.c:
 	$(LN_S) $(top_srcdir)/src/common/utils.c ./utils.c
 
 debug:
-	@$(MAKE) CFLAGS="$(AALIB_CFLAGS) $(DEBUG_CFLAGS)"
+	@$(MAKE) CFLAGS="-DFONTDIR=\\\"$(XINE_SKINDIR)/../fonts/\\\" $(DEBUG_CFLAGS)"
 
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
