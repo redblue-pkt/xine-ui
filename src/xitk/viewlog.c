@@ -404,7 +404,7 @@ static void viewlog_end(xitk_widget_t *w, void *data) {
 /*
  * Create viewlog window
  */
-void viewlog_window(void) {
+void viewlog_window(xitk_widget_t *w, void *data) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_browser_widget_t      br;

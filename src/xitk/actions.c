@@ -486,12 +486,20 @@ void gui_viewlog_show(xitk_widget_t *w, void *data) {
   if (viewlog_is_running() && !viewlog_is_visible())
     viewlog_toggle_visibility(NULL, NULL);
   else if(!viewlog_is_running())
-    viewlog_window();
+    viewlog_window(NULL, NULL);
   else
     viewlog_exit(NULL, NULL);
 }
 
+void gui_kbedit_show(xitk_widget_t *w, void *data) {
 
+  if (kbedit_is_running() && !kbedit_is_visible())
+    kbedit_toggle_visibility(NULL, NULL);
+  else if(!kbedit_is_running())
+    kbedit_window();
+  else
+    kbedit_exit(NULL, NULL);
+}
 
 /*
  * set window layer property to something above GNOME (and KDE?) panel

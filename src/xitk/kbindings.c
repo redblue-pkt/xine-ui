@@ -34,6 +34,7 @@
 
 #include "event.h"
 #include "kbindings.h"
+#include "actions.h"
 #include "errors.h"
 #include "i18n.h"
 
@@ -1107,7 +1108,81 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
 /*
  * ***** Key Binding Editor ******
  */
-#warning FIXME, add kbedit and viewlog buttons in GUI (panel)
+/*
+ * return 1 if key binding editor is ON
+ */
+int kbedit_is_running(void) {
+
+  if(kbedit != NULL)
+    return kbedit->running;
+
+  return 0;
+}
+
+/*
+ * Return 1 if setup panel is visible
+ */
+int kbedit_is_visible(void) {
+
+  if(kbedit != NULL)
+    return kbedit->visible;
+
+  return 0;
+}
+
+/*
+ * Raise kbedit->xwin
+ */
+void kbedit_raise_window(void) {
+  
+  if(kbedit != NULL) {
+    if(kbedit->xwin) {
+      if(kbedit->visible && kbedit->running) {
+	if(kbedit->running) {
+	  XLockDisplay(gGui->display);
+	  XMapRaised(gGui->display, xitk_window_get_window(kbedit->xwin));
+	  kbedit->visible = 1;
+	  XSetTransientForHint (gGui->display, 
+				xitk_window_get_window(kbedit->xwin), gGui->video_window);
+	  XUnlockDisplay(gGui->display);
+	  layer_above_video(xitk_window_get_window(kbedit->xwin));
+	}
+      } else {
+	XLockDisplay(gGui->display);
+	XUnmapWindow (gGui->display, xitk_window_get_window(kbedit->xwin));
+	XUnlockDisplay(gGui->display);
+	kbedit->visible = 0;
+      }
+    }
+  }
+}
+
+/*
+ * Hide/show the kbedit panel
+ */
+void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
+  
+  if(kbedit != NULL) {
+    if (kbedit->visible && kbedit->running) {
+      kbedit->visible = 0;
+      xitk_hide_widgets(kbedit->widget_list);
+      XLockDisplay(gGui->display);
+      XUnmapWindow (gGui->display, xitk_window_get_window(kbedit->xwin));
+      XUnlockDisplay(gGui->display);
+    } else {
+      if(kbedit->running) {
+	kbedit->visible = 1;
+	xitk_show_widgets(kbedit->widget_list);
+	XLockDisplay(gGui->display);
+	XMapRaised(gGui->display, xitk_window_get_window(kbedit->xwin)); 
+	XSetTransientForHint (gGui->display, 
+			      xitk_window_get_window(kbedit->xwin), gGui->video_window);
+	XUnlockDisplay(gGui->display);
+	layer_above_video(xitk_window_get_window(kbedit->xwin));
+      }
+    }
+  }
+}
 
 static void kbedit_create_browser_entries(void) {
   int i;
@@ -1592,7 +1667,7 @@ static void kbedit_handle_event(XEvent *event, void *data) {
 /*
  *
  */
-void kbindings_editor(xitk_widget_t *w, void *data) {
+void kbedit_window(void) {
   int                        x, y;
   GC                         gc;
   Pixmap                     bg;

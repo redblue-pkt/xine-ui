@@ -24,7 +24,7 @@
 #ifndef VIEWLOG_H
 #define VIEWLOG_H
 
-void viewlog_window(void);
+void viewlog_window(xitk_widget_t *w, void *data);
 void viewlog_exit(xitk_widget_t *, void *);
 int viewlog_is_visible(void);
 int viewlog_is_running(void);

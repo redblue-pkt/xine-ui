@@ -39,6 +39,8 @@
 #include "Imlib-light/Imlib.h"
 #include "event.h"
 #include "actions.h"
+#include "viewlog.h"
+#include "kbindings.h"
 #include "skins.h"
 #include "lang.h"
 #include "i18n.h"
@@ -319,6 +321,7 @@ void setup_raise_window(void) {
     }
   }
 }
+
 /*
  * Hide/show the setup panel
  */
@@ -1134,6 +1137,30 @@ void setup_panel(void) {
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
+  x = (WINDOW_WIDTH - (3 * 100))>>2;
+
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Logs");
+  lb.align             = LABEL_ALIGN_CENTER;
+  lb.callback          = gui_viewlog_show; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content(setup->widget_list->l, 
+	   xitk_noskin_labelbutton_create(&lb, x, WINDOW_HEIGHT - 40, 100, 23,
+					  "Black", "Black", "White", tabsfontname));
+
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Key Bindings");
+  lb.align             = LABEL_ALIGN_CENTER;
+  lb.callback          = gui_kbedit_show; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content(setup->widget_list->l, 
+	   xitk_noskin_labelbutton_create(&lb, (x * 2) + 100, WINDOW_HEIGHT - 40, 100, 23,
+					  "Black", "Black", "White", tabsfontname));
+
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = LABEL_ALIGN_CENTER;
@@ -1142,9 +1169,7 @@ void setup_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content(setup->widget_list->l, 
-	   xitk_noskin_labelbutton_create(&lb,
-					  (WINDOW_WIDTH>>1) - 50, WINDOW_HEIGHT - 40,
-					  100, 23,
+	   xitk_noskin_labelbutton_create(&lb, (x * 3) + (100 * 2), WINDOW_HEIGHT - 40, 100, 23,
 					  "Black", "Black", "White", tabsfontname));
   
   XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));

@@ -636,7 +636,7 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_KBEDIT:
-    kbindings_editor(NULL, NULL);
+    gui_kbedit_show(NULL, NULL);
     break;
 
   default:

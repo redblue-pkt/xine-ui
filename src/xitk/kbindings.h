@@ -118,6 +118,12 @@ void kbindings_display_default_bindings(void);
 kbinding_entry_t *kbindings_lookup_action(kbinding_t *, const char *);
 void kbindings_handle_kbinding(kbinding_t *, XEvent *);
 action_id_t kbindings_get_action_id(kbinding_entry_t *);
-void kbindings_editor(xitk_widget_t *, void *);
+
+void kbedit_window(void);
+void kbedit_exit(xitk_widget_t *, void *);
+int kbedit_is_visible(void);
+int kbedit_is_running(void);
+void kbedit_toggle_visibility(xitk_widget_t *, void *);
+void kbedit_raise_window(void);
 
 #endif
