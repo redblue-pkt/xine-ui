@@ -227,6 +227,8 @@ void gui_execute_action_id(action_id_t action) {
 
     /* events for advanced input plugins. */
     xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
+    xine_event.data_length = 0;
+    xine_event.data = NULL;
     xine_event_send(gGui->stream, &xine_event);
     return;
   }

@@ -962,7 +962,6 @@ int main(int argc, char *argv[]) {
 
   gGui->xine = xine_new();
   xine_config_load (gGui->xine, gGui->configfile);
-
   /*
    * init gui
    */
