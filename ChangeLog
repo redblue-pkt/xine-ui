@@ -1,7 +1,10 @@
 xine-ui (0.99.1) unstable; urgency=low
 
-  * fix OSD stream info for the DXR3
-  * fix lirc skeleton and '%', and 100% CPU eating when lircd quit (thanks to Christoph Bartelmus <lirc@bartelmus.de>)
+  * fix redundant keybindings reports,
+  * fix unplayable streams and loop (of death) mode,
+  * all supported playlist can be downloadable,
+  * fix OSD stream info for the DXR3,
+  * fix lirc skeleton and '%', and 100% CPU eating when lircd quit (thanks to Christoph Bartelmus <lirc@bartelmus.de>),
   * playlist meta info scanning no more disturn playback,
   * auto buttons can be limited in skinconfig (update your already downloaded skins),
   * change and add checkbox styles (user selectable, see xitk README),
