@@ -256,6 +256,9 @@ static int playlist_split_data(playlist_t *playlist) {
 	else
 	  playlist->lines = (char **) realloc(playlist->lines, sizeof(char *) * (playlist->numl + 2));
 	
+	while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))
+	  *(p + strlen(p) - 1) = '\0';
+
 	playlist->lines[playlist->numl++] = strdup(p);
 	playlist->lines[playlist->numl] = NULL;
       }
@@ -851,7 +854,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
       xml_parser_init(asx_content, size, XML_PARSER_CASE_INSENSITIVE);
       if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
 	goto __failure;
-      
+
       if(!strcasecmp(xml_tree->name, "ASX")) {
 
 	asx_prop = xml_tree->props;
@@ -962,6 +965,38 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
       
       xml_parser_free_tree(xml_tree);
     __failure:
+
+      /* Maybe it's 'ASF <url> */
+      if(entries_asx == 0) {
+	
+	playlist->data = asx_content;
+	
+	if(playlist_split_data(playlist)) {
+	  int    linen = 0;
+	  char  *ln;
+
+	  while((ln = playlist->lines[linen++]) != NULL) {
+	    
+	    if(!strncasecmp("ASF", ln, 3)) {
+	      char *p = ln + 3;
+	      
+	      while(p && ((*p == ' ') || (*p == '\t')))
+		p++;
+
+	      if(p && strlen(p)) {
+		if(entries_asx == 0)
+		  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
+		else
+		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
+		
+		mediamark_store_mmk(&mmk[entries_asx], p, p, NULL, 0, -1);
+		playlist->entries = ++entries_asx;
+	      }
+	    }
+	  }
+	}
+      }
+
       free(asx_content);
       
       if(entries_asx) {
