@@ -363,19 +363,19 @@ if you run me, as you would run xine, from an X terminal emulator...
 have-xv found xvinfo: $XVIDEO
 At least that's what xvinfo said. Let's see...
 
-have-yuv your Xv extension supports YUV overlays (improves MPEG performance)
+have-yv12 your Xv extension supports YV12 overlays (improves MPEG performance)
 Your display claims to be capable of converting YUV colorspace to
 RGB in hardware. This should improve performance when playing MPEG
 video, as xine doesn''t have to do this job in software...
 
-no-yuv Your X server doesn't support YUV overlays.
+no-yv12 Your X server doesn't support YV12 overlays.
 That means xine will have to to color space transformation and scaling
 in software, which is quite CPU intensive. Maybe upgrading your
 X server will help here.
 If you have an ATI card, you'll find accelerated X servers on
    http://www.linuxvideo.org/gatos/
 
-have-yuy2 your Xv extension supports packed YUV overlays
+have-yuy2 your Xv extension supports YUY2 overlays
 Your display claims to be capable of converting packed YUV colorspace
 (aka. YUY2) to RGB in hardware. This should improve performance when
 playing some streams (DivX in particular), as xine doesn''t have to
@@ -386,7 +386,7 @@ I can't check if Xv is broken, so if xine hangs when playing video,
 try 'xine -V XShm'. If that works (but is slow), your X server is broken.
 You should try to upgrade your X server in that case. Good luck... 
 
-no-yuy2 Your X server doesn't support packed YUV overlays.
+no-yuy2 Your X server doesn't support YV12 overlays.
 That means xine will have to to color space transformation and scaling
 in software, which is quite CPU intensive. Maybe upgrading your
 X server will help here.

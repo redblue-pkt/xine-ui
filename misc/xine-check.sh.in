@@ -14,8 +14,21 @@
 VERSION=0.9.12
 
 COMMON_PLACES=/:/usr:/usr/local:/usr/local/xine:/usr/xine:/opt:/opt/xine:/usr/X11:/usr/X11R6
+TMP_BASE=/tmp/xine-check.$$
+
+umask 077
+i=1
+while [ $i -lt 99 ] \
+      && tmpdir=$TMP_BASE.$i; mkdir $tmpdir; rc=$?; [ $rc != 0 ]; do
+  i=`expr $i + 1`
+done
+if [ $rc != 0 ]; then
+  echo "Unable to create temp directory. Something is seriously wrong..."
+  exit 1
+fi
+
 logfile=""
-bugreport=/tmp/xine-bugreport
+bugreport=$tmpdir/xine-bugreport
 verbose=false
 quiet=false
 batch=false
@@ -25,7 +38,8 @@ do_log=false
 
 # localisation stuff
 available_langs="en"
-locale_lang=`(locale >/dev/null && locale | grep LC_MESSAGES= | sed -e s/LC_MESSAGES\=//g -e s/\"//g | cut -d _ -f 1) 2>/dev/null || echo en` # for emacs hilight "
+locale_lang=`(locale >/dev/null && locale | grep LC_MESSAGES= | sed -e s/LC_MESSAGES\=//g -e s/\"//g | cut -d _ -f 1) 2>/dev/null || echo en`
+
 lang=""
 for lg in $available_langs; do
   if test x$lg = x"$locale_lang";
@@ -36,8 +50,7 @@ if test x$lang = x -o $lang="POSIX";
   then lang="en"
 fi
 
-messagefile=/tmp/xck.$$.xine-check.$lang
-#messagefile=/tmp/xine-check.en
+messagefile=$tmpdir/locale.$lang
 indent="         "
 DUMPVARS="" #this holds the variables to dump into bugreports, use vars()!
 
@@ -53,8 +66,8 @@ esac
 
 
 clean_exit() {
-    test -f "$messagefile" && rm "$messagefile"
-    test -f "$tmpfile" && rm "$tmpfile"
+    cd /
+    rm -rf $tmpdir
     exit "$@"
 }
  
@@ -147,7 +160,7 @@ getmessage(){
     found=false
     short=
     description=
-    tmpfile=/tmp/xine-check-dsc.$$
+    tmpfile=$tmpdir/xine-check-dsc
     true >$tmpfile
     cat $messagefile | while read line; do
 	if $found; then
@@ -343,7 +356,7 @@ done
 
 if [ "$runmode" = "bugreport" ]; then
   do_log=true
-  logfile=/tmp/xine-check.log
+  logfile=$tmpdir/xine-check.log
   echo logging to ${logfile}...
   echo >$logfile
 fi
@@ -534,7 +547,8 @@ if test -n "$xine_config"; then
     custom-exec-prefix 1
   else
     plugindir=`$xine_config --plugindir`
-    skindir=`$xine_config --skindir`
+    datadir=`$xine_config --datadir`
+    skindir="$datadir/skins" #FIXME: guesswork...
   fi
 fi
   
@@ -721,9 +735,9 @@ if test -n "$found"; then
     esac
   done
   if $YUV; then
-    msg have-yuv
+    msg have-yv12
   else
-    msg no-yuv
+    msg no-yv12
   fi
   if $YUY2; then
     msg have-yuy2
@@ -754,16 +768,6 @@ else
   clean_exit 0    
 fi
 
-if test -f "$bugreport"; then
-  echo "Hmmm, I already found a bug report in ${bugreport}."
-  if yesno "Do you want me to overwrite that file?"; then
-    rm "$bugreport"
-  else
-    echo "Okay, aborting on your request."
-    clean_exit 0
-  fi
-fi
-  
 echo
 echo
 if yesno "Could you solve your xine problems using the previous hints?"; then
