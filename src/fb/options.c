@@ -103,7 +103,10 @@ static void print_usage(void)
 #ifdef HAVE_LIRC
 	printf("  -L, --no-lirc                  Turn off LIRC support.\n");
 #endif
-	printf("      --stdctl                   Turn on controlling xine over STDIN.\n"
+	printf("  -D, --deinterlace              Deinterlace video output. One or more post plugin\n"
+	       "                                 can be specified, with optional parameters.\n"
+	       "                                 Syntax is the same as --post option.\n"
+	       "      --stdctl                   Turn on controlling xine over STDIN.\n"
 	       "      --post <plugin>[:parameter=value][,...]\n"
 	       "                                 Load a post plugin.\n"
 	       "                                 Parameters are comma separated.\n"
@@ -136,9 +139,10 @@ int parse_options(int argc, char **argv)
 			{ "no-lirc",       no_argument,       0, 'L' },
 			{ "stdctl",        optional_argument, 0, OPTION_STDCTL },
 			{"post",           required_argument, 0, OPTION_POST },
+			{"deinterlace",    no_argument,       0, 'D' },
 			{ 0,               no_argument,       0,  0  }
 		};
-	const char *short_options = "?hda:qA:V:R::v";
+	const char *short_options = "?hda:qA:V:R::vD";
 	int c = '?', option_index = 0;
   
 	opterr = 0;
@@ -146,7 +150,10 @@ int parse_options(int argc, char **argv)
 			       long_options, &option_index)) != EOF)
 	{
 		switch(c) {
-			
+		        case 'D':
+			        fbxine.deinterlace_enable = 1;
+				break;
+		  
 			case 'a':
 				sscanf(optarg, "%i", &fbxine.audio_channel);
 				break;

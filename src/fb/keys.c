@@ -75,6 +75,7 @@ static int default_key_action(int key)
 		case 'L': return ACTID_EVENT_RIGHT;
 		case 'M': return ACTID_EVENT_MENU1;
 		case 'S': return ACTID_EVENT_SELECT;
+		case 'i': return ACTID_TOGGLE_INTERLEAVE;
 	}
 	
 	return 0;

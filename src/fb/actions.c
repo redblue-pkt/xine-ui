@@ -33,7 +33,7 @@
 #include "main.h"
 #include "actions.h"
 #include "osd.h"
-
+#include "post.h"
 
 #define GUI_NEXT     1
 #define GUI_PREV     2
@@ -441,5 +441,11 @@ void do_action(int action)
 		case ACTID_QUIT:
 			fbxine_exit();
 			break;
+	        case ACTID_TOGGLE_INTERLEAVE:
+		        fbxine.deinterlace_enable = !fbxine.deinterlace_enable;
+			osd_display_info("Deinterlace: %s", (fbxine.deinterlace_enable) ? 
+					 "enabled" : "disabled");
+			post_deinterlace();
+		        break;
 	}
 }

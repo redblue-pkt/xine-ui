@@ -109,13 +109,6 @@ static struct xine_speeds_s {
   { NULL , 0                 }
 };
 
-#define SAFE_FREE(x)            do {           \
-                                  if((x)) {    \
-                                    free((x)); \
-                                    x = NULL;  \
-                                  }            \
-                                } while(0)
-
 static uint32_t color[OVL_PALETTE_SIZE];
 static uint8_t trans[OVL_PALETTE_SIZE];
 

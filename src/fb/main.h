@@ -81,8 +81,16 @@ struct fbxine
 	int                      debug;
 
 	int                      ignore_next;
-        post_element_t           **post_elements;
-        int                      post_elements_num;
+
+        post_element_t          **post_elements;
+        int                       post_elements_num;
+        int                       post_enable;
+        
+        char                     *deinterlace_plugin;
+        post_element_t          **deinterlace_elements;
+        int                       deinterlace_elements_num;
+        int                       deinterlace_enable;
+  
   
 #ifdef HAVE_LIRC
 	struct
@@ -123,3 +131,10 @@ struct fbxine
 
 extern struct fbxine fbxine;
 void fbxine_exit(void);
+
+#define SAFE_FREE(x)            do {           \
+                                  if((x)) {    \
+                                    free((x)); \
+                                    x = NULL;  \
+                                  }            \
+                                } while(0)

@@ -44,6 +44,15 @@ struct fbxine fbxine =
 	tty_fd:        -1,
 	video_port_id: "fb",
 
+        post_elements: NULL,
+        post_elements_num: 0,
+        post_enable: 1,
+          
+        deinterlace_plugin: NULL,
+        deinterlace_elements: NULL,
+        deinterlace_elements_num: 0,
+        deinterlace_enable: 0,
+
 	exit_cond: PTHREAD_COND_INITIALIZER
 };
 
@@ -274,6 +283,11 @@ static int fbxine_init(int argc, char **argv)
     
 	  pplugin_rewire_posts();
 	}
+
+	post_deinterlace_init(NULL);
+
+	if (fbxine.deinterlace_enable)
+	  post_deinterlace();
 
 	osd_init();
 	fbxine.osd.enabled = 1;

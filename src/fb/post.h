@@ -24,6 +24,8 @@
 
 void pplugin_rewire_posts(void);
 void pplugin_parse_and_store_post(const char *post);
+void post_deinterlace(void);
+void post_deinterlace_init(const char *deinterlace_post);
 
 #endif 
 
