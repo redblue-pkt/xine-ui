@@ -1023,6 +1023,11 @@ eval XINE_VISDIR=`eval echo "$XINE_VISDIR"`
 AC_SUBST(XINE_VISDIR)
 AC_DEFINE_UNQUOTED(XINE_VISDIR, "$XINE_VISDIR",[Location of xine visual animation streams])
 
+XINE_OXINEDIR="${datadir}/xine/oxine"
+eval XINE_OXINEDIR=`eval echo "$XINE_OXINEDIR"`
+AC_SUBST(XINE_OXINEDIR)
+AC_DEFINE_UNQUOTED(XINE_OXINEDIR, "$XINE_OXINEDIR",[Location of osd menu (oxine) config files])
+
 DATA_DIR=`eval echo "$datadir"`
 AC_SUBST(DATA_DIR)
 SYSCONF_DIR=`eval echo "$sysconfdir"`
@@ -1067,6 +1072,7 @@ src/xitk/xine-toolkit/po/Makefile.in
 src/xitk/skins/Makefile
 src/xitk/skins/xinetic/Makefile
 src/xitk/oxine/Makefile
+src/xitk/oxine/data/Makefile
 src/aaui/Makefile
 src/dfb/Makefile
 src/fb/Makefile

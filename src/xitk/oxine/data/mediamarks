@@ -1,0 +1,66 @@
+<OXINEMM VERSION="1">
+  <SUB NAME="Radio">
+    <SUB NAME="News">
+        <ENTRY>
+          <TITLE>BBC Radio News</TITLE>
+          <REF HREF="rtsp://rmv8.bbc.net.uk/news/olmedia/cta/progs/rn/rn_v7.rm"/>
+          <TIME start="20"/>
+        </ENTRY>
+    </SUB>
+    <SUB NAME="Dance">
+        <ENTRY>
+          <TITLE>sunshine live</TITLE>
+          <REF HREF="rtsp://213.200.75.253/farm/*/encoder/sunshinelive/livestream2.rm"/>
+          <TIME start="0"/>
+        </ENTRY>
+    </SUB>
+    <SUB NAME="Hip Hop">
+        <ENTRY>
+          <TITLE>Kiss 98.8 FM</TITLE>
+          <REF HREF="rtsp://213.200.64.234/farm/*/encoder/kissfm/livestream.rm"/>
+          <TIME start="28"/>
+        </ENTRY>
+    </SUB>
+    <SUB NAME="Pop">
+        <ENTRY>
+          <TITLE>Delta Radio 105.9 FM</TITLE>
+          <REF HREF="rtsp://213.200.64.234/farm/*/encoder/deltaradio/live.rm"/>
+          <TIME start="16"/>
+        </ENTRY>
+    </SUB>
+    <SUB NAME="Rock">
+        <ENTRY>
+          <TITLE>The Coast KOZT FM</TITLE>
+          <REF HREF="rtsp://streamer.kozt.com/encoder/live.rm"/>
+          <TIME start="0"/>
+        </ENTRY>
+    </SUB>
+    <SUB NAME="Alternative">
+        <ENTRY>
+          <TITLE>KQRX 95x</TITLE>
+          <REF HREF="mms://media.apex2000.net/KQRX"/>
+          <TIME start="1079392384"/>
+        </ENTRY>
+    </SUB>
+  </SUB>
+<ENTRY>
+  <TITLE>[Home]</TITLE>
+  <REF HREF="/home"/>
+  <TIME start="0"/>
+</ENTRY>
+<ENTRY>
+  <TITLE>[Root]</TITLE>
+  <REF HREF="/"/>
+  <TIME start="0"/>
+</ENTRY>
+<ENTRY>
+  <TITLE>[Audio CD]</TITLE>
+  <REF HREF="CD" TYPE="multiple"/>
+  <TIME start="0"/>
+</ENTRY>
+<ENTRY>
+  <TITLE>[DVD]</TITLE>
+  <REF HREF="DVD" TYPE="multiple"/>
+  <TIME start="0"/>
+</ENTRY>
+</OXINEMM>

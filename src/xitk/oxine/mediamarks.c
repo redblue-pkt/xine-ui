@@ -37,6 +37,8 @@
 #include "common.h"
 
 #include "oxine.h"
+#include "mediamarks.h"
+#include "playlist.h"
 #include "otk.h"
 #include "xine/xmlparser.h"
 #include "utils.h"
@@ -295,11 +297,12 @@ static int parse_multiple(oxine_t *oxine, const char *mrl, list_t *list) {
   return 1;
 }
 
-static void read_directory(oxine_t *oxine, const char *dir, list_t *list) {
+static int read_directory(oxine_t *oxine, const char *dir, list_t *list) {
   
   DIR *dirp;
   struct dirent *entp;
   playitem_t *item;
+  int ret = 0;
 
   free_subtree(list, 0);
 
@@ -308,45 +311,54 @@ static void read_directory(oxine_t *oxine, const char *dir, list_t *list) {
 #endif
   dirp = opendir (dir);
   if (dirp != NULL)
-    {
-      while ((entp = readdir(dirp))) {
+  {
+    while ((entp = readdir(dirp))) {
 
-        struct stat filestat;
-	char mrl[1024];
-	char title[256];
-	int type = 0;
+      struct stat filestat;
+      char mrl[1024];
+      char title[256];
+      int type = 0;
+      
+      if((!strcmp(entp->d_name, "."))||(!strcmp(entp->d_name, "..")))
+        continue;
 
-	if((!strcmp(entp->d_name, "."))||(!strcmp(entp->d_name, ".."))) continue;
-	
-	snprintf(mrl, 1023, "%s/%s", dir, entp->d_name);
-	stat(mrl, &filestat);
-	if(S_ISDIR(filestat.st_mode)) {
-	  type = TYPE_RDIR;
-	  snprintf(title, 255, "[%s]", entp->d_name);	  
-	}else if (S_ISREG(filestat.st_mode)) {
-	  strncpy(title, entp->d_name, 255);
-	  type = TYPE_RREG;
-	}
-	if(file_is_m3u(mrl)) {
-	  type = TYPE_M3U;
-	  snprintf(title, 255, "[%s]", entp->d_name);
-	}
-
-	item = playitem_new(type, title, mrl, list_new());
-#if 0
-	printf("mrl   : %s\n", item->mrl);
-	printf("title : %s\n", item->title);
-	printf("type  : %d\n", item->type);
+#ifndef SHOW_HIDDEN_FILES
+      if(entp->d_name[0] == '.')
+        continue;
 #endif
-	/* printf("ei %d\n", oxine->mm_sort_type); */
-	/* xine_config_lookup_entry (oxine->xine, "oxine.sort_type", &entry); */
- 
-	playitem_sort_into(item, list, oxine->mm_sort_type);
+      
+      snprintf(mrl, 1023, "%s/%s", dir, entp->d_name);
+      stat(mrl, &filestat);
+      if(S_ISDIR(filestat.st_mode)) {
+      type = TYPE_RDIR;
+      snprintf(title, 255, "[%s]", entp->d_name);	  
+      }else if (S_ISREG(filestat.st_mode)) {
+      strncpy(title, entp->d_name, 255);
+      type = TYPE_RREG;
       }
-      closedir (dirp);
+      if(file_is_m3u(mrl)) {
+      type = TYPE_M3U;
+      snprintf(title, 255, "[%s]", entp->d_name);
+      }
+
+      item = playitem_new(type, title, mrl, list_new());
+#if 0
+      printf("mrl   : %s\n", item->mrl);
+      printf("title : %s\n", item->title);
+      printf("type  : %d\n", item->type);
+#endif
+      /* printf("ei %d\n", oxine->mm_sort_type); */
+      /* xine_config_lookup_entry (oxine->xine, "oxine.sort_type", &entry); */
+
+      playitem_sort_into(item, list, oxine->mm_sort_type);
     }
+    closedir (dirp);
+    ret = 1;
+  }
   else
     printf ("mediamarks: Couldn't open the directory.\n");
+  
+  return ret;
 }
 
 static char *read_entire_file (const char *mrl, int *file_size) {
@@ -564,10 +576,11 @@ static void mediamarks_play_cb(void *data, void *entry) {
     changelist(session->list, session->backpath);
     otk_draw_all(oxine->otk);
   } else if (item->type == TYPE_RDIR) {
-    read_directory(oxine, item->mrl, item->sub);
-    bpush(session->backpath, item->sub);
-    changelist(session->list, session->backpath);
-    otk_draw_all(oxine->otk);
+    if( read_directory(oxine, item->mrl, item->sub) ) {
+      bpush(session->backpath, item->sub);
+      changelist(session->list, session->backpath);
+      otk_draw_all(oxine->otk);
+    }
   } else if (item->type == TYPE_UP) {
     bpop(session->backpath);
     changelist(session->list, session->backpath);
@@ -614,14 +627,14 @@ static void mediamarks_play_cb(void *data, void *entry) {
 }
 
 static void mediamarks_leavetoplaylist_cb (void *data) {
-/*
+
   mm_session_t *session = (mm_session_t*) data;
 
   session->oxine->reentry = NULL;
   session->oxine->reentry_data = NULL;
   
   playlist_cb(session->oxine);
-*/
+
 }
 
 static void mediamarks_freeall(void *data) {
@@ -691,7 +704,7 @@ static void mediamarks_reentry_cb (void *data) {
 void mediamarks_cb (void *data) {
 
   oxine_t      *oxine = (oxine_t*) data;
-  char         mmpath[1025];
+  char         mmpath[XITK_NAME_MAX];
   mm_session_t *session;
   list_t  *items = list_new();
 
@@ -701,10 +714,11 @@ void mediamarks_cb (void *data) {
   session->action = 1;
   session->listpos = 0;
 
-  snprintf(mmpath,1024,"%s/.xine/oxine_mediamarks", getenv("HOME"));
+  memset(mmpath,0,sizeof(mmpath));
+  snprintf(mmpath,sizeof(mmpath),"%s/.xine/oxine/mediamarks", xine_get_homedir());
   if (!read_mediamarks(items, mmpath)) {
     printf("mediamarks: trying to load system wide mediamarks\n");
-    snprintf(mmpath,1024,"%s/oxine_mediamarks", XINE_SCRIPTDIR);
+    snprintf(mmpath,1024,"%s/mediamarks", XINE_OXINEDIR);
     if (read_mediamarks(items, mmpath)) {
       bpush(session->backpath, items);
       oxine->reentry_data = session;

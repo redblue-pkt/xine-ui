@@ -215,49 +215,60 @@ static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int select
 }
 
 /*
- * Delete selected MRL
+ * Delete a given entry from playlist
  */
-void playlist_delete_current(xitk_widget_t *w, void *data) {
-  int i, j;
-  
-  mmk_editor_end();
+void playlist_delete_entry(int j) {
+  int i;
 
-  if((j = xitk_browser_get_current_selected(playlist->playlist)) >= 0) {
-    
+  if(j  >= 0) {
+
     if((gGui->playlist.cur == j) && ((xine_get_status(gGui->stream) != XINE_STATUS_STOP)))
       gui_stop(NULL, NULL);
-    
+
     mediamark_free_entry(j);
-    
+
     for(i = j; i < gGui->playlist.num; i++)
       gGui->playlist.mmk[i] = gGui->playlist.mmk[i + 1];
-    
+
     gGui->playlist.mmk = (mediamark_t **) realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
-    
+
     gGui->playlist.mmk[gGui->playlist.num] = NULL;
-    
-    
+
+
     playlist_update_playlist();
-    
+
     if(gGui->playlist.num) {
       gui_set_current_mmk(mediamark_get_current_mmk());
       gGui->playlist.cur = 0;
     }
     else {
-      
+
       gGui->playlist.cur = -1;
 
       if(is_playback_widgets_enabled())
 	enable_playback_controls(0);
-      
+
       if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
 	gui_stop(NULL, NULL);
-      
+
       gui_set_current_mmk(NULL);
       xitk_inputtext_change_text(playlist->winput, NULL);
     }
   }
 
+}
+
+/*
+ * Delete selected MRL
+ */
+void playlist_delete_current(xitk_widget_t *w, void *data) {
+  int j;
+  
+  mmk_editor_end();
+
+  j = xitk_browser_get_current_selected(playlist->playlist);
+
+  playlist_delete_entry(j);
 }
 
 /*

@@ -46,6 +46,7 @@ void playlist_toggle_visibility(xitk_widget_t *, void *);
 void playlist_update_focused_entry(void);
 void playlist_change_skins(int);
 void playlist_play_current(xitk_widget_t *w, void *data);
+void playlist_delete_entry(int j);
 void playlist_delete_current(xitk_widget_t *w, void *data);
 void playlist_delete_all(xitk_widget_t *w, void *data);
 void playlist_move_current_updown(xitk_widget_t *w, void *data);

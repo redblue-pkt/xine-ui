@@ -1,3 +1,5 @@
+SUBDIRS = data
+
 AM_CFLAGS = -I../
 
 if HAVE_X11
@@ -12,6 +14,7 @@ liboxine_la_SOURCES = \
 	odk.c \
 	otk.c \
 	oxine.c \
+	playlist.c \
 	utils.c
 
 noinst_HEADERS = \
@@ -20,6 +23,7 @@ noinst_HEADERS = \
 	odk.h \
 	otk.h \
 	oxine.h \
+	playlist.h \
 	utils.h 
 
 debug:

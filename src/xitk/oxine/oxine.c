@@ -41,6 +41,7 @@
 #include "utils.h"
 
 #include "mediamarks.h"
+#include "playlist.h"
 
 extern gGui_t          *gGui;
 static oxine_t         *oxine_instance = NULL;
@@ -409,9 +410,7 @@ static void main_menu_cb(void *data) {
   b = otk_button_new (oxine->main_window, 50, 150, 290, 60, "Analogue TV", tv_cb, oxine);
   otk_set_focus(b);
   
-  /*
   otk_button_new (oxine->main_window, 360, 150, 290, 60, "Playlist", playlist_cb, oxine);
-  */
   
   otk_button_new (oxine->main_window, 50, 255, 290, 60, "Digital TV", dvb_cb, oxine);
   /*
