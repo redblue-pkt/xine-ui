@@ -56,10 +56,10 @@ static int             ctl_panel_visible;
 
 
 static int get_current_prop(int prop) {
-  return (gGui->vo_driver->get_property(gGui->xine, prop));
+  return (gGui->vo_driver->get_property(gGui->vo_driver, prop));
 }
 static int set_current_prop(int prop, int value) {
-  return (gGui->vo_driver->set_property(gGui->xine, prop, value));
+  return (gGui->vo_driver->set_property(gGui->vo_driver, prop, value));
 }
 
 /*
@@ -398,9 +398,9 @@ void control_panel(void) {
     int min, max, cur;
 
     /* HUE */
-    gGui->vo_driver->get_property_min_max(gGui->xine, VO_PROP_HUE, &min, &max);
+    gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
+					  VO_PROP_HUE, &min, &max);
     cur = get_current_prop(VO_PROP_HUE);
-    printf("Hue: min=%d, max=%d\n", min, max);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_hue = create_slider(gGui->display, gGui->imlib_data, 
 				     VSLIDER,
@@ -422,10 +422,9 @@ void control_panel(void) {
     widget_disable(w_hue);
 
     /* SATURATION */
-    gGui->vo_driver->get_property_min_max(gGui->xine, 
+    gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
 					  VO_PROP_SATURATION, &min, &max);
     cur = get_current_prop(VO_PROP_SATURATION);
-    printf("Saturation: min=%d, max=%d\n", min, max);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_sat = create_slider(gGui->display, gGui->imlib_data, 
 				     VSLIDER,
@@ -447,9 +446,8 @@ void control_panel(void) {
     widget_disable(w_sat);
       
     /* BRIGHTNESS */
-    gGui->vo_driver->get_property_min_max(gGui->xine, 
+    gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
 					  VO_PROP_BRIGHTNESS, &min, &max);
-    printf("Brigthness: min=%d, max=%d\n", min, max);
     cur = get_current_prop(VO_PROP_BRIGHTNESS);
     gui_list_append_content(ctl_widget_list->l,
 	    (w_bright = create_slider(gGui->display, gGui->imlib_data, 
@@ -472,10 +470,9 @@ void control_panel(void) {
     widget_disable(w_bright);
       
     /* CONTRAST */
-    gGui->vo_driver->get_property_min_max(gGui->xine, 
+    gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
 					  VO_PROP_CONTRAST, &min, &max);
     cur = get_current_prop(VO_PROP_CONTRAST);
-    printf("Contrast: min=%d, max=%d\n", min, max);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_cont = create_slider(gGui->display, gGui->imlib_data, 
 				      VSLIDER,
@@ -499,7 +496,7 @@ void control_panel(void) {
     /*
      * Enable only supported settings.
      */
-    if((vidcap = gGui->vo_driver->get_capabilities(gGui->xine)) > 0) {
+    if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) {
 
       if(vidcap & VO_CAP_BRIGHTNESS)
 	widget_enable(w_bright);
