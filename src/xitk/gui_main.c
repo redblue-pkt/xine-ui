@@ -170,7 +170,7 @@ void gui_exit (widget_t *w, void *data) {
   gui_running = 0;
 
 #ifdef HAVE_LIRC
-  if(lirc_enable) {
+  if(gGlob->lirc_enable) {
     pthread_cancel(gGlob->lirc_thread);
     deinit_lirc();
   }

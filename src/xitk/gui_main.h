@@ -25,6 +25,7 @@
 #define GUI_MAIN_H
 
 #include <Imlib.h>
+#include <pthread.h>
 #include <X11/Xlib.h>
 #ifdef HAVE_LIRC
 #include "lirc/lirc_client.h"
@@ -64,9 +65,9 @@ typedef struct {
 
 #ifdef HAVE_LIRC
   struct lirc_config  *xlirc_config;
-  static int           lirc_fd;
-  static int           lirc_enable = 0;
-  static pthread_t     lirc_thread;
+  int                  lirc_fd;
+  int                  lirc_enable;
+  pthread_t            lirc_thread;
 #endif
 
   char                 gui_filename[1024];

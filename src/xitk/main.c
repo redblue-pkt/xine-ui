@@ -66,6 +66,8 @@
  */
 gGlob_t  *gGlob;
 
+int       no_lirc = 0;
+
 /* options args */
 static const char *short_options = "?hS4"
 #ifdef HAVE_LIRC
@@ -281,7 +283,6 @@ int main(int argc, char *argv[]) {
   int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
   int              audio_channel = 0; 
   int              spu_channel = -1;
-  int              no_lirc = 0;
   int              audio_options = 0;
   char            *audio_driver_id = NULL;
   char            *video_driver_id = NULL;
