@@ -434,9 +434,6 @@ static void _playlist_handle_event(XEvent *event, void *data) {
   char           kbuf[256];
   int            len;
 
-  if(gGui->on_quit)
-    return;
-
   switch(event->type) {
 
   case ButtonPress: {

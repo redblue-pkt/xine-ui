@@ -448,6 +448,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
   playlist_deinit();
   control_deinit();
   mrl_browser_deinit();
+  gui_deinit();
 
   if(video_window_is_visible())
     video_window_set_visibility(0);

@@ -736,9 +736,6 @@ void gui_execute_action_id(action_id_t action) {
  */
 void gui_handle_event (XEvent *event, void *data) {
 
-  if(gGui->on_quit)
-    return;
-  
   switch(event->type) {
 
   case MappingNotify:
@@ -945,6 +942,10 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
     *depth_return = depth;
   if (visual_return != NULL)
     *visual_return = visual;
+}
+
+void gui_deinit(void) {
+  xitk_unregister_event_handler(&gGui->widget_key);
 }
 
 /*
@@ -1291,7 +1292,7 @@ static void on_start(void *data) {
     gui_execute_action_id(ACTID_PLAY);
 }
 
-void gui_run (void) {
+void gui_run(void) {
   int       i, auto_start = 0;
   
   video_window_change_skins();

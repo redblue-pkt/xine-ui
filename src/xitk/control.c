@@ -418,9 +418,6 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
  */
 void control_handle_event(XEvent *event, void *data) {
   
-  if(gGui->on_quit)
-    return;
-
   switch(event->type) {
     
   case KeyPress:

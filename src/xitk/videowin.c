@@ -1539,7 +1539,9 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
  * Necessary cleanup
  */
 void video_window_exit (void) {
+
   xine_tvmode_exit (gGui->xine);
+
 #ifdef HAVE_XF86VIDMODE
   /* Restore original VidMode */
   if(gGui->XF86VidMode_fullscreen) {
@@ -1566,6 +1568,8 @@ void video_window_exit (void) {
     XSendEvent(gGui->display, gGui->video_window, False, Expose, (XEvent *) &event);
     XUnlockDisplay(gGui->display);
   }
+
+  xitk_unregister_event_handler(&gVw->widget_key);
 }
 
 
@@ -1719,9 +1723,6 @@ void video_window_change_skins(void) {
  *
  */
 static void video_window_handle_event (XEvent *event, void *data) {
-
-  if(gGui->on_quit)
-    return;
 
   switch(event->type) {
 
