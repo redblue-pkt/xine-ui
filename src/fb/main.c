@@ -115,7 +115,11 @@ static int init_video(void)
 
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_video);
 	
-	if (!strcmp(fbxine.video_port_id, "none"))
+	if (!strcmp(fbxine.video_port_id, "dxr3"))
+	    fbxine.video_port =
+	        xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
+				       XINE_VISUAL_TYPE_X11, NULL);
+	else if (!strcmp(fbxine.video_port_id, "none"))
 	    fbxine.video_port =
 	        xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
 				       XINE_VISUAL_TYPE_NONE, NULL);
