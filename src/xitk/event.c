@@ -1375,6 +1375,9 @@ void gui_run (void) {
       if((!is_playback_widgets_enabled()) && gGui->playlist.num)
 	enable_playback_controls(1);
     }
+
+    if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_INTERLEAVE))
+      gui_toggle_interlaced();
     
     /*  The user request "play on start" */
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAY)) {

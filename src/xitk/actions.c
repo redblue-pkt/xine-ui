@@ -803,8 +803,10 @@ void gui_toggle_interlaced(void) {
   int deint;
   
   xine_set_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE, 
-		 (deint = (1 - (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE)))));
-  
+		 (1 - (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE))));
+
+  deint = xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE);
+
   osd_display_info(_("Deinterlace: %d"), deint);
   
   if (panel_is_visible())  {

@@ -107,7 +107,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::S:Z";
+ "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
@@ -143,6 +143,8 @@ static struct option long_options[] = {
   {"enqueue"        , required_argument, 0, OPTION_ENQUEUE           },
   {"session"        , required_argument, 0, 'S'                      },
   {"version"        , no_argument      , 0, 'v'                      },
+  {"deinterlace"    , no_argument      , 0, 'D'                      },
+  {"aspect-ratio"   , required_argument, 0, 'r'                      },
   {0                , no_argument      , 0,  0                       }
 };
 
@@ -507,6 +509,9 @@ void show_usage (void) {
   printf(_("                    play, slow2, slow4, pause, fast2,\n"));
   printf(_("                    fast4, stop, quit, fullscreen, eject.\n"));
   printf(_("  -Z                           Don't automatically start playback (smart mode).\n"));
+  printf(_("  -D, --deinterlace            Deinterlace video output\n"));
+  printf(_("  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"));
+  printf(_("                                 'auto', 'square', '4:3', 'anamorphic', 'dvb'.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -901,19 +906,20 @@ static void event_listener(void *user_data, const xine_event_t *event) {
  */
 int main(int argc, char *argv[]) {
   /* command line options will end up in these variables: */
-  int                     c = '?', aos = 0;
-  int                     option_index = 0;
-  int                     audio_channel = -1;
-  int                     spu_channel = -1;
+  int                     c = '?', aos    = 0;
+  int                     option_index    = 0;
+  int                     audio_channel   = -1;
+  int                     spu_channel     = -1;
   char                   *audio_driver_id = NULL;
   char                   *video_driver_id = NULL;
   sigset_t                vo_mask;
   char                  **_argv;
   int                     _argc;
   int                     driver_num;
-  int                     session = -1;
-  char                   *session_mrl = NULL;
-  int                     no_auto_start = 0;
+  int                     session         = -1;
+  char                   *session_mrl     = NULL;
+  int                     aspect_ratio    = XINE_VO_ASPECT_AUTO ;
+  int                     no_auto_start   = 0;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1062,11 +1068,38 @@ int main(int argc, char *argv[]) {
     case 'f': /* full screen mode on start */
       gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
       break;
+
 #ifdef HAVE_XINERAMA
     case 'F': /* xinerama full screen mode on start */
       gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCR;
       break;
 #endif
+
+    case 'D':
+      gGui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
+      break;
+      
+    case 'r':
+      if(optarg != NULL) {
+	char *p = xine_chomp(optarg);
+	
+	if(!strcasecmp(p, "auto"))
+	  aspect_ratio = XINE_VO_ASPECT_AUTO;
+	else if(!strcasecmp(p, "square"))
+	  aspect_ratio = XINE_VO_ASPECT_SQUARE;
+	else if(!strcasecmp(p, "4:3"))
+	  aspect_ratio = XINE_VO_ASPECT_4_3;
+	else if(!strcasecmp(p, "anamorphic"))
+	  aspect_ratio = XINE_VO_ASPECT_ANAMORPHIC;
+	else if(!strcasecmp(p, "dvb"))
+	  aspect_ratio = XINE_VO_ASPECT_DVB;
+	else {
+	  printf(_("Bad aspect ratio mode '%s', see xine --help\n"), optarg);
+	  exit(1);
+	}
+      }
+      break;
+
     case 's': /* autoscan on start */
       gGui->autoscan_plugin = xine_chomp(optarg);
       break;
@@ -1378,7 +1411,7 @@ int main(int argc, char *argv[]) {
   
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
-
+  
   /* Visual animation stream init */
   gGui->visual_anim.stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
   gGui->visual_anim.event_queue = xine_event_new_queue(gGui->visual_anim.stream);
@@ -1393,6 +1426,8 @@ int main(int argc, char *argv[]) {
   
   /* init the video window */
   video_window_select_visual ();
+
+  xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect_ratio);
   
   /*
    * start CORBA server threadq
