@@ -62,8 +62,8 @@
  */
 typedef struct {
   xine_t            *xine;
-  xine_vo_driver_t  *vo_driver;
-  xine_ao_driver_t  *ao_driver;
+  xine_video_port_t *vo_port;
+  xine_audio_port_t *ao_port;
   xine_stream_t     *stream;
 
   int                ignore_status;
@@ -517,19 +517,18 @@ int main(int argc, char *argv[]) {
   if(!video_driver_id)
     video_driver_id = "aa";
   
-  aaxine.vo_driver = xine_open_video_driver(aaxine.xine,
-					    video_driver_id,
-					    XINE_VISUAL_TYPE_AA, 
-					    (void *)aaxine.context);
+  aaxine.vo_port = xine_open_video_driver(aaxine.xine,
+					  video_driver_id,
+					  XINE_VISUAL_TYPE_AA, 
+					  (void *)aaxine.context);
   
-  if (!aaxine.vo_driver) {
-    aaxine.vo_driver = xine_open_video_driver(aaxine.xine, 
-					      video_driver_id,
-					      XINE_VISUAL_TYPE_FB, 
-					      NULL);
-  }
-    
-  if (!aaxine.vo_driver) {
+  if (!aaxine.vo_port) {
+    aaxine.vo_port = xine_open_video_driver(aaxine.xine, 
+					    video_driver_id,
+					    XINE_VISUAL_TYPE_FB, 
+					    NULL);
+  }  
+  if (!aaxine.vo_port) {
     printf ("main: video driver %s failed\n", video_driver_id);
     goto failure;
   }
@@ -551,12 +550,12 @@ int main(int argc, char *argv[]) {
   else
     config_update_string ("audio.driver", audio_driver_id);
   
-  aaxine.ao_driver = xine_open_audio_driver(aaxine.xine, audio_driver_id, NULL);
+  aaxine.ao_port = xine_open_audio_driver(aaxine.xine, audio_driver_id, NULL);
   
-  if (!aaxine.ao_driver)
+  if (!aaxine.ao_port)
     printf ("main: audio driver %s failed\n", audio_driver_id);
   
-  aaxine.stream = xine_stream_new(aaxine.xine, aaxine.ao_driver, aaxine.vo_driver);
+  aaxine.stream = xine_stream_new(aaxine.xine, aaxine.ao_port, aaxine.vo_port);
   
   /* Init mixer control */
   aaxine.mixer.enable = 0;
@@ -775,10 +774,10 @@ int main(int argc, char *argv[]) {
   if(aaxine.xine)
     xine_exit(aaxine.xine); 
 
-  xine_close_video_driver(aaxine.xine, aaxine.vo_driver);
+  xine_close_video_driver(aaxine.xine, aaxine.vo_port);
 
-  if(aaxine.ao_driver)
-    xine_close_audio_driver(aaxine.xine, aaxine.ao_driver);
+  if(aaxine.ao_port)
+    xine_close_audio_driver(aaxine.xine, aaxine.ao_port);
   
   if(aaxine.context) {
     aa_showcursor(aaxine.context);
