@@ -45,12 +45,14 @@
  * PRIVATES
  */
 
-static int _is_atom_match(xitk_dnd_t *xdnd, Atom atom) {
-  int i;
+static int _is_atom_match(xitk_dnd_t *xdnd, Atom **atom) {
+  int i, j;
   
-  for(i = 0; i <= MAX_SUPPORTED_TYPE; i++) {
-    if(atom == xdnd->supported[i])
-      return i;
+  for(i = 0; (*atom)[i] != 0; i++) {
+    for(j = 0; j <= MAX_SUPPORTED_TYPE; j++) {
+      if((*atom)[i] == xdnd->supported[j])
+	return i;
+    }
   }
   
   return -1;
@@ -460,28 +462,25 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
 #endif
 	_dnd_get_type_list(xdnd, xdnd->dragger_window, &xdnd->dragger_typelist);
       }
-      
+
       if(xdnd->dragger_typelist) {
-	int   i;
-	
-	for(i = 0; xdnd->dragger_typelist[i] != 0; i++) {
-
+	int atom_match;
 #ifdef DEBUG_DND
-	  XLOCK(xdnd->display);
-	  printf("%d: '%s' ", i, XGetAtomName(xdnd->display, xdnd->dragger_typelist[i]));
-	  XUNLOCK(xdnd->display);
-#endif
-
-	  if(_is_atom_match(xdnd, xdnd->dragger_typelist[i] >= 0)) {
-#ifdef DEBUG_DND
-	    printf(" << SUPPORTED");
-#endif
-	    xdnd->desired = xdnd->dragger_typelist[i];
+	{
+	  int   i;
+	  for(i = 0; xdnd->dragger_typelist[i] != 0; i++) {
+	    XLOCK(xdnd->display);
+	    printf("%d: '%s' ", i, XGetAtomName(xdnd->display, xdnd->dragger_typelist[i]));
+	    XUNLOCK(xdnd->display);
+	    printf("\n");
 	  }
-#ifdef DEBUG_DND
-	  printf("\n");
-#endif	  
 	}
+#endif
+	
+	if((atom_match = _is_atom_match(xdnd, &xdnd->dragger_typelist)) >= 0) {
+	  xdnd->desired = xdnd->dragger_typelist[atom_match];
+	}
+
       }
       else {
 	XITK_WARNING("%s@%d: xdnd->dragger_typelist is zero length!\n", __FILE__, __LINE__);
