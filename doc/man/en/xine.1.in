@@ -16,11 +16,11 @@ audio/video player.
 .PP
 .B xine
 plays MPEG system (audio and video) streams, mpeg elementary streams
-(e.g. .mp3 or .mpv files), mpeg transport streams, avi files, asf files, 
-quicktime files, (S)VCDs and DVDs.
+(e.g. .mp3 or .mpv files), mpeg transport streams, ogg files,
+avi files, asf files, quicktime files, (S)VCDs and DVDs.
 .SH OPTIONS
 The programs follow the usual GNU command line syntax, with long
-ioptions starting with two dashes (\`\-\').
+options starting with two dashes (\`\-\').
 A summary of options are included below.
 For a complete description, see README and FAQ in \fI@prefix@/share/doc/xine-ui\fP
 or on the xine home page.
@@ -121,14 +121,23 @@ If no option is given, \'\fBdefault\fP\' is selected.
 .TP
 .B \-n, \-\-network
 Enable network remote control server.
-To use network remote control server, a password file is required. If xine don't found it, the server is stopped. The syntax of the password file is familliar, it looks like <\fBidentification\fP>:<\fBpassword\fP>. Due to cryptographic problems in few country, the password is not crypted, so take care with remote connection, the password is clearly transported (perhaps you can tunneling it, i never tried). Two (optional) generic rules are available (one per time):
+To use network remote control server, a password file is required. 
+If xine cannot find it, the server is stopped. 
+The syntax of the password file follows the (familliar) scheme
+<\fBidentification\fP>:<\fBpassword\fP>. Since cryptography is subject to
+legal issues in some countries, the password is not encrypted and also
+transmitted unencrypted, so take care with remote connections.
+Two (optional) generic rules are available as well (one at a time)
 .nf
 \fBALL:ALLOW\fP or \fBALL:DENY\fP
 .fi
-In the first case, all client are allowed to execute all available commands, without restriction. In the second case, no\-one are allowed to execute those commands, except identified users (using 'identify' command).
+In the first case, all clients are allowed to execute all available commands, 
+without restriction. In the second case, no\-one is allowed to execute 
+any commands, except identified users (using 'identify' command).
 
-If a password entry begin with an asterisk \'\fB*\fP\', the user is locked, he couldn't 
-be identified. If a password is empty, the full entry is ignored. Here is a small example
+If a password entry begins with an asterisk \'\fB*\fP\', 
+the user is blocked. If a password entry is empty, 
+the full entry is ignored. Here is an example
 of a small \fI~/.xine/passwd\fP file:
 .nf
 
@@ -137,9 +146,10 @@ daniel:mypasswd
 foo:*
 
 .fi
-This allow only 'daniel' to execute commands, after a successfully identifying stage.
+This will allow only 'daniel' to execute commands, 
+after a successfully identifying stage.
 
-The default port of the server is \fB6789\fP, this number is totally arbitrary. You can connect the server using a simple \fItelnet\fP, like this:
+The default port of the server is \fB6789\fP, this number is totally arbitrary. You can connect the server using a simple \fItelnet\fP command:
 .nf
 \fBtelnet\~localhost\~6789\fP
 .fi
@@ -152,11 +162,13 @@ xinectl    7890/tcp        # xine control
 This will change the default port from 6789 to 7890, and create a "human" service 
 called \fIxinectl\fP.
 
-The server itself have commands help/syntax:
+The server itself offers command help/syntax:
 .br
 .BR help [command]
 .br
-Without \fIcommand\fP specified, it display all available commands. If a command is specified, it display a short text about the command functionnality.
+Without \fIcommand\fP specified, all available commands will be displayed. 
+If a command is specified, short text about the command functionnality will
+be given.
 .br
 .BR syntaxe <command>
 .br
@@ -179,13 +191,17 @@ or
 .br
 .BR dvd://VTS_xx_y.VOB
 .br
-.BR vcd://<track number>
+.BR vcd://<tracknumber>
 .br
 .BR tcp://<host>:<port>
 .br
 .BR rtp://<host>:<port>
 .br
 .BR udp://<host>:<port>
+.br
+.BR mms://<host>...
+.br
+.BR http://<host>...
 .LP
 Several MRLs may be specified in order to play a number of consecutive
 streams.
@@ -193,13 +209,13 @@ streams.
 If you don't specify any MRL, you'll have to select a file by drag'n\-drop.
 Dragging files from the \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP or \fBKonqueror\fP
 is known to work.
-.SH "SEE ALSO"
-\fBxine-remote\fP(1).
+.TP
+.B avi subtitle files
 .br
-The programs are documented fully on the xine home page:
-.UR http://xine.sourceforge.net/
-.IR "http://xine.sourceforge.net/"
-.UE
+Text subtitle files may be appended (seperated by \`%\')
+to a file MRL:
+.br 
+.BR file://<path>%<subtitlefile>
 .SH CONTROL KEYS
 Many features can be controlled by pressing control keys. '\fBM\-\fP' is 
 the Meta key (\'\fBAlt\fP\' key on PC keyboard), '\fBC\-\fP' is the Control \'\fBCTRL\fP\' 
@@ -228,7 +244,7 @@ Hide/show the gui.
 Hide/show the video output window.
 .br
 .BR i | I :
-Toggle deinterlaced methods.
+Toggle deinterlace methods.
 .br
 .BR M\-l :
 Show/hide log window.
@@ -367,7 +383,7 @@ Select event
 .br
 .SH Synchronization fine tuning
 Some streams have bad timestamps, so synchronization fails. This can be
-tweaked using arrow keys:
+tweaked using these keys:
 .br
 .BR n | N :
 press if video runs ahead of audio
@@ -388,6 +404,13 @@ key bindings for xine-ui
 .br
 .BR ~/.xine/passwd :
 passwords file xine-ui
+.SH "SEE ALSO"
+\fBxine-remote\fP(1).
+.br
+The programs are documented fully on the xine home page:
+.UR http://xine.sourceforge.net/
+.IR "http://xine.sourceforge.net/"
+.UE
 .SH AUTHOR
 This manual page was written by Siggi Langauf <siggi@debian.org>,
 for the xine project. Lots of additions by
