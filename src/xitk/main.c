@@ -436,6 +436,26 @@ static void load_audio_out_driver(char *audio_driver_id,
     printf ("main: audio driver <%s> failed\n", audio_driver_id);
 }
 
+void event_listener (xine_t *xine, event_t *event, void *data) {
+  /* Check Xine handle is not NULL */
+  if(xine == NULL) {
+    return;
+  }
+  
+  switch(event->type) { 
+  case XINE_UI_EVENT:
+    {
+      ui_event_t *uevent = (ui_event_t*)event;
+
+      switch(uevent->sub_type) {
+      case XINE_UI_UPDATE_CHANNEL:
+	/* Update the panel */
+	panel_update_channel_display ();
+      }
+    }
+  }
+}
+
 /* ------------------------------------------------------------------------- */
 /*
  *
@@ -631,6 +651,11 @@ int main(int argc, char *argv[]) {
 
   xine_select_audio_channel (gGui->xine, audio_channel);
   xine_select_spu_channel (gGui->xine, spu_channel);
+
+  /*
+   * Register an event listener
+   */
+  xine_register_event_listener(gGui->xine, event_listener);
 
   /*
    * start CORBA server thread
