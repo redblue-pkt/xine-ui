@@ -46,6 +46,8 @@
 #define SKIN_DEBUG 1
 */
 
+#warning FIXME: DEADLOCK
+
 #define DEFAULT_SKIN        "xinetic"
 #define SKIN_IFACE_VERSION  4
 

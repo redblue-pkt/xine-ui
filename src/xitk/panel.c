@@ -437,7 +437,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 void panel_check_mute(void) {
 
   xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute, 
-			  gGui->panel_window, panel->widget_list->gc);
+  			  gGui->panel_window, panel->widget_list->gc);
 }
 
 /*
@@ -464,9 +464,9 @@ void panel_reset_slider (void) {
  */
 void panel_update_channel_display (void) {
   int   channel;
-  char  buffer[4];
+  char  buffer[10];
   char *lang = NULL;
-  
+
   memset(&buffer, 0, sizeof(buffer));
   channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
   switch (channel) {
@@ -476,7 +476,7 @@ void panel_update_channel_display (void) {
 
   case -1:
     /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
-    if(!xine_get_audio_lang (gGui->stream, channel, buffer))
+    if(!xine_get_audio_lang (gGui->stream, channel, &buffer[0]))
       lang = "auto";
     else
       lang = buffer;
@@ -498,7 +498,7 @@ void panel_update_channel_display (void) {
 
   case -1:
     /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
-    if(!xine_get_spu_lang (gGui->stream, channel, buffer))
+    if(!xine_get_spu_lang (gGui->stream, channel, &buffer[0]))
       lang = "auto";
     else
       lang = buffer;
@@ -650,19 +650,13 @@ void panel_add_autoplay_buttons(void) {
 
 /*
  * Check if there a mixer control available,
- * We couldn't do this into panel_init(), this function is
- * called before xine engine initialization.
  */
 void panel_add_mixer_control(void) {
   
   gGui->mixer.caps = 0;
 
-  if(xine_get_param(gGui->stream, XINE_PARAM_AO_MIXER_VOL))
-    gGui->mixer.caps |= XINE_PARAM_AO_MIXER_VOL;
-  if(xine_get_param(gGui->stream, XINE_PARAM_AO_PCM_VOL))
-    gGui->mixer.caps |= XINE_PARAM_AO_PCM_VOL;
-  if(xine_get_param(gGui->stream, XINE_PARAM_AO_MUTE))
-    gGui->mixer.caps |= XINE_PARAM_AO_MUTE;
+  if(gGui->ao_driver)
+    gGui->mixer.caps = XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL | XINE_PARAM_AO_MUTE;
 
   if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     xitk_enable_widget(panel->mixer.slider);

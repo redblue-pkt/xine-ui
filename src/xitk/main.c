@@ -1002,7 +1002,7 @@ int main(int argc, char *argv[]) {
 
   gGui->event_queue = xine_event_new_queue(gGui->stream);
   xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
-
+  
   /*
    * Setup logo.
    */
@@ -1043,8 +1043,6 @@ int main(int argc, char *argv[]) {
   if (!no_lirc)
     xine_server_exit(gGui->xine);
 #endif
-
-  xine_event_dispose_queue(gGui->event_queue);
 
   return 0;
 }

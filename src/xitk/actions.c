@@ -69,9 +69,6 @@ void gui_display_logo(void) {
 
 int gui_open_and_start(char *mrl, int start_pos, int start_time) {
   
-  if(gGui->stream)
-    xine_close(gGui->stream);
-  
   if(!(xine_open(gGui->stream, (const char *)mrl) 
        && xine_play(gGui->stream, start_pos, start_time))) {
     gui_handle_xine_error();
@@ -105,6 +102,18 @@ void gui_exit (xitk_widget_t *w, void *data) {
   pl_exit(NULL, NULL);
 
   config_save();
+
+  xine_close(gGui->stream);
+
+  xine_dispose(gGui->stream);
+
+  xine_event_dispose_queue(gGui->event_queue);
+
+  if(gGui->vo_driver)
+    xine_close_video_driver(gGui->xine, gGui->vo_driver);
+
+  if(gGui->ao_driver)
+    xine_close_audio_driver(gGui->xine, gGui->ao_driver);
 
   xine_exit(gGui->xine); 
 
