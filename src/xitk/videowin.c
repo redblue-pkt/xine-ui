@@ -121,7 +121,7 @@ void video_window_draw_logo(void) {
       
       tmp = (wwin / 100) * 86;
       ratio = (tmp < gGui->video_window_logo_pixmap.width && tmp >= 1) ? 
-	(ratio = (double)tmp / (double)gGui->video_window_logo_pixmap.width):1;
+	((double)tmp / (double)gGui->video_window_logo_pixmap.width):1;
     }
     
     resized_image = Imlib_clone_image(gGui->imlib_data, 

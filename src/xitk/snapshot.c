@@ -48,6 +48,10 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#ifdef HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 #include <pthread.h>
 
 #include "xitk.h"
@@ -394,7 +398,7 @@ static void scale_line_45_64 (uint8_t *source, uint8_t *dest,
   *dest++ = (1*source[42] + 7*source[43]) >> 3;
   if (--width <= 0) goto done;
   *dest++ = (3*source[43] + 5*source[44]) >> 3;
- done:
+ done: ;
 
 }
 
@@ -475,7 +479,7 @@ static void scale_line_15_16 (uint8_t *source, uint8_t *dest,
   *dest++ = (7*source[12] + 1*source[13]) >> 3;
   if (--width <= 0) goto done;
   *dest++ = (7*source[13] + 1*source[14]) >> 3;
- done:
+ done: ;
 }
 
 int scale_image( struct prvt_image_s *image )
