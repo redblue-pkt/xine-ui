@@ -571,7 +571,7 @@ void event_listener (void *user_data, xine_event_t *event) {
 /*
  * Callback of config value change about reporting mode.
  */
-static void unhandled_codec_mode_cb( void *dummy, cfg_entry_t *entry) {
+static void unhandled_codec_mode_cb(void *dummy, cfg_entry_t *entry) {
   unhandled_codec_mode = entry->num_value;
 }
 
@@ -619,13 +619,13 @@ static void codec_reporting(void *user_data, int codec_type,
  * initialize codec reporting stuff.
  */
 static void init_report_codec(void) {
-  char  *warn_unhandled_codec[] = { 
-    _("never"),  
-    _("video only"), 
-    _("audio only"), 
-    _("always"), 
-    NULL
-  };
+  char  *warn_unhandled_codec[5];
+
+  warn_unhandled_codec[0] = _("never");
+  warn_unhandled_codec[1] = _("video only");
+  warn_unhandled_codec[2] = _("audio only");
+  warn_unhandled_codec[3] = _("always");
+  warn_unhandled_codec[4] = NULL;
   
   /*
    * Register codec reporting
