@@ -120,7 +120,7 @@ static void tabs_arrange(xitk_widget_t *w) {
     /*
      * Fill gap
      */
-    {
+    if((((private_data->width - 40) - private_data->gap_widthstart) * 3) > 0) {
       xitk_image_t *p;
       GC            gc;
       XGCValues     gcv;
