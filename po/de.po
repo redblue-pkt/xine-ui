@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.15\n"
 "POT-Creation-Date: 2002-12-16 14:56+0100\n"
-"PO-Revision-Date: 2002-11-22 19:04+0100\n"
+"PO-Revision-Date: 2002-12-17 11:26+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -674,12 +674,11 @@ msgstr ""
 
 #: src/xitk/main.c:324
 msgid "                    'f': in fullscreen mode.\n"
-msgstr "                    'f': im Vollbild-Modus.\n"
+msgstr "                    'f': im Vollbildmodus.\n"
 
 #: src/xitk/main.c:326
-#, fuzzy
 msgid "                    'F': in xinerama fullscreen mode.\n"
-msgstr "                    'f': im Vollbild-Modus.\n"
+msgstr "                    'F': im Xinerama Vollbildmodus.\n"
 
 #: src/xitk/main.c:328
 msgid "                    'h': hide GUI (panel, etc.).\n"
@@ -715,14 +714,15 @@ msgstr ""
 
 #: src/xitk/main.c:334
 msgid "  -f, --fullscreen             start in fullscreen mode,\n"
-msgstr "  -f, --fullscreen             im Vollbild-Modus starten,\n"
+msgstr "  -f, --fullscreen             im Vollbildmodus starten,\n"
 
 #: src/xitk/main.c:336
-#, fuzzy
 msgid ""
 "  -F, --xineramafull           start in xinerama fullscreen (display on "
 "several screens),\n"
-msgstr "  -f, --fullscreen             im Vollbild-Modus starten,\n"
+msgstr ""
+"  -f, --fullscreen             im Xinerama Vollbildmodus starten (Anzeige "
+"über mehrere Bildschirme),\n"
 
 #: src/xitk/main.c:338
 msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
@@ -850,13 +850,12 @@ msgstr ""
 "aus Playlist auswählen.\n"
 
 #: src/xitk/main.c:362
-#, fuzzy
 msgid ""
 "                                 'shuffle+': same as 'shuffle', but "
 "indefinetely replay the playlist.\n"
 msgstr ""
-"                                 'shuffle': Zufällig ungespielten Eintrag "
-"aus Playlist auswählen.\n"
+"                                 'shuffle+': Das Selbe wie 'shuffle', nur "
+"wird die Playliste unendlichoft wiederholt.\n"
 
 #: src/xitk/main.c:363
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
@@ -1547,28 +1546,30 @@ msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
-msgstr ""
+msgstr "Zu nutzende Bildschirme im Xinerama Vollbildmodus (z.B. 0 2 3)"
 
 #: src/xitk/videowin.c:1204
 msgid ""
 "Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
 msgstr ""
+"Zum Beispiel, wenn die Anzeige auf den Schirmen 0, 2 und 3 sein soll, 0 2 3 "
+"eingeben"
 
 #: src/xitk/videowin.c:1252
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
+msgstr "X-Koordinate für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
 #: src/xitk/videowin.c:1262
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
+msgstr "Y-Koordinate für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
 #: src/xitk/videowin.c:1272
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
+msgstr "Breite für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
 #: src/xitk/videowin.c:1282
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
+msgstr "Höhe für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
 #: src/xitk/videowin.c:1315
 msgid "Xine Video Window"
