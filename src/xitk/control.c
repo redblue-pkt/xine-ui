@@ -216,6 +216,7 @@ void control_raise_window(void) {
 	  control->visible = 1;
 	  XSetTransientForHint (gGui->display, 
 				control->window, gGui->video_window);
+	  layer_above_video(control->window);
 	}
       } else {
 	XUnmapWindow (gGui->display, control->window);

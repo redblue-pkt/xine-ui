@@ -451,6 +451,7 @@ void pl_raise_window(void) {
 	  XMapRaised(gGui->display, playlist->window); 
 	  XSetTransientForHint (gGui->display, 
 				playlist->window, gGui->video_window);
+	  layer_above_video(playlist->window);
 	}
       } else {
 	XUnmapWindow (gGui->display, playlist->window);

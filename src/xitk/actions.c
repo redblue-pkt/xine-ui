@@ -170,6 +170,8 @@ void gui_toggle_visibility(widget_t *w, void *data) {
       panel_toggle_visibility(NULL, NULL);
       panel_toggle_visibility(NULL, NULL);
     }
+    else
+      layer_above_video(gGui->panel_window);
   }
 }
 
@@ -189,11 +191,13 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
     XMapRaised (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
-  }
-  
-  if(gGui->reparent_hack) {
-    panel_toggle_visibility(NULL, NULL);
-    panel_toggle_visibility(NULL, NULL);
+    
+    if(gGui->reparent_hack) {
+      panel_toggle_visibility(NULL, NULL);
+      panel_toggle_visibility(NULL, NULL);
+    }
+    else
+      layer_above_video(gGui->panel_window);
   }
 
   if(mrl_browser_is_visible()) {
@@ -427,7 +431,6 @@ void layer_above_video(Window w) {
 
   static Atom XA_WIN_LAYER = None;
   XEvent xev;
-
 
   if(!gGui->layer_above)
     return;

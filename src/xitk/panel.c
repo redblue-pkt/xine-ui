@@ -51,23 +51,23 @@ _panel_t          *panel;
 /*
  * Try to guess if current WM is E.
  */
-static int is_wm_is_enlightenment(Display *display, Window window) {
+static int is_wm_is_enlightenment(Display *d, Window w) {
   Atom  *atoms;
   int    i, natoms;
   
-  XLockDisplay (gGui->display);
-  atoms = XListProperties(display, window, &natoms);
+  XLockDisplay (d);
+  atoms = XListProperties(d, w, &natoms);
   
   if(natoms) {
     for(i = 0; i < natoms; i++) {
-      if(!strncasecmp("_E_FRAME_SIZE", (XGetAtomName(display, atoms[i])), 13)) {
-	XUnlockDisplay (gGui->display);
+      if(!strncasecmp("_E_FRAME_SIZE", (XGetAtomName(d, atoms[i])), 13)) {
+	XUnlockDisplay (d);
 	return 1;
       }
     }
   }
   
-  XUnlockDisplay (gGui->display);
+  XUnlockDisplay (d);
   return 0;
 }
 
@@ -184,8 +184,7 @@ void panel_toggle_visibility (widget_t *w, void *data) {
     layer_above_video(gGui->panel_window);
   }
 
-  config_set_int("open_panel", panel->visible);
-  
+  config_set_int("panel_visible", panel->visible);
 }
 
 void panel_check_mute(void) {
@@ -816,15 +815,11 @@ void panel_init (void) {
   /* 
    * show panel 
    */
-
-  if (config_lookup_int("panel_visible", 1)) {
+  panel->visible = (config_lookup_int("panel_visible", 1)) ? 1 : 0;
+  
+  if (panel->visible)
     XMapRaised(gGui->display, gGui->panel_window); 
-    panel->visible = 1;
-  } 
-  else {
-    panel->visible = 0;
-  }
-
+  
   panel->widget_key = widget_register_event_handler("panel", 
 						    gGui->panel_window, 
 						    panel_handle_event,
@@ -835,11 +830,14 @@ void panel_init (void) {
 
   gGui->cursor_visible = 1;
   video_window_set_cursor_visibility(gGui->cursor_visible);
-
+  
   XUnlockDisplay (gGui->display);
 
-  gGui->reparent_hack = is_wm_is_enlightenment(gGui->display, gGui->panel_window);
-
+  /*
+   * Grag Atoms from a mapped window, panel window could be not already mapped.
+   */
+  gGui->reparent_hack = is_wm_is_enlightenment(gGui->display, gGui->video_window);
+  
   {
     pthread_attr_t       pth_attrs;
     struct sched_param   pth_params;
