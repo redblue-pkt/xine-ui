@@ -203,7 +203,6 @@ static void help_sections(void) {
     char                 default_readme[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     char                 ending[XITK_NAME_MAX];
     char                 section_name[1024];
-    struct stat          pstat;
 
     while ((dir_entry = readdir(dir)) != NULL) {
       int order_num;
