@@ -428,7 +428,16 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
 void gui_exit (xitk_widget_t *w, void *data) {
 
   if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
-    gui_stop(NULL, NULL);
+    /* gui_stop(NULL, NULL); */
+    /* use a stripped down version of gui_stop() for faster exiting;
+     * the original version would play the logo again, which would
+     * make xine wait for one logo cycle on exit, which is intolerable
+     * with a longer, animated logo */
+    gGui->ignore_next = 1;
+    xine_stop (gGui->stream);
+    gGui->ignore_next = 0;
+    if(gGui->visual_anim.running)
+      xine_stop(gGui->visual_anim.stream);
     while(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
       xine_usec_sleep(50000);
   }
