@@ -274,7 +274,7 @@ void panel_update_runtime_display(void) {
 
     if(panel->runtime_mode == 0) {
       if(days > 0)
-	snprintf(timestr, sizeof(timestr), "% 4d::%02d", days, (seconds / 60) % 60);
+	snprintf(timestr, sizeof(timestr), "% 4d::%02d", days, seconds / (60*60));
       else
 	snprintf(timestr, sizeof(timestr), "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
     }
@@ -283,7 +283,7 @@ void panel_update_runtime_display(void) {
 	snprintf(timestr, sizeof(timestr), "%s", "  :  :  ");
       else {
 	if(rdays > 0)
-	  snprintf(timestr, sizeof(timestr), "% 4d::%02d", rdays, (remain / 60) % 60);
+	  snprintf(timestr, sizeof(timestr), "% 4d::%02d", rdays, remain / (60*60));
 	else
 	  snprintf(timestr, sizeof(timestr), "%02d:%02d:%02d", remain / (60*60), (remain / 60) % 60, remain % 60);
       }
@@ -299,7 +299,7 @@ void panel_update_runtime_display(void) {
     days = length / (60*60*24);
     
     if(days > 0)
-      snprintf(buffer, sizeof(buffer), "%s% 4d::%02d", _("Total time: "), days, (length / 60) % 60);
+      snprintf(buffer, sizeof(buffer), "%s% 4d::%02d", _("Total time: "), days, length / (60*60));
     else
       snprintf(buffer, sizeof(buffer), "%s%02d:%02d:%02d", _("Total time: "), length / (60*60), (length / 60) % 60, length % 60);
   }

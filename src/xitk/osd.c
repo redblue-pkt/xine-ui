@@ -257,7 +257,7 @@ void osd_stream_infos(void) {
     char        buffer[256], *p;
     int         x, y;
     int         w, h, osdw;
-    int         playedtime, totaltime, pos;
+    int         playedtime, playeddays, totaltime, pos;
     int         audiochannel, spuchannel, len;
 
     vcodec       = xine_get_meta_info(gGui->stream, XINE_META_INFO_VIDEOCODEC);
@@ -372,19 +372,31 @@ void osd_stream_infos(void) {
     
     y += (h);
 
-    if(totaltime) {
-      snprintf(buffer, sizeof(buffer), "%d:%.2d:%.2d (%.0f%%) %s %d:%.2d:%.2d",
-	       playedtime / 3600, (playedtime % 3600) / 60, playedtime % 60,
-	       ((float)playedtime / (float)totaltime) * 100,
-	       _("of"),
-	       totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
-      xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
-      xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
-      if(w > osdw)
-	osdw = w;
-
-      osd_stream_position(pos);
+    playeddays = playedtime / (3600 * 24);
+    
+    if(playeddays > 0)
+      sprintf(buffer, "%d::%02d ", playeddays, playedtime / 3600);
+    else
+      sprintf(buffer, "%d:%02d:%02d ", playedtime / 3600, (playedtime % 3600) / 60, playedtime % 60);
+    
+    if(totaltime > 0) {
+      int totaldays;
+      
+      totaldays  = totaltime / (3600 * 24);
+      sprintf(buffer, "%s(%.0f%%) %s ", buffer, ((float)playedtime / (float)totaltime) * 100, _("of"));
+      
+      if(totaldays > 0)
+	sprintf(buffer, "%s%d::%02d", buffer, totaldays, totaltime / 3600);
+      else
+	sprintf(buffer, "%s%d:%02d:%02d", buffer, totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
     }
+    
+    xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
+    xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
+    if(w > osdw)
+      osdw = w;
+    
+    osd_stream_position(pos);
     
     x = (wwidth - osdw) - 40;
     xine_osd_set_position(gGui->osd.sinfo, (x >= 0) ? x : 0, 15);
