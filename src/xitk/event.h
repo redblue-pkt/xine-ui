@@ -110,6 +110,8 @@ typedef struct {
   int                  network;
   
   int                  use_root_window;
+
+  char                *snapshot_location;
   
   kbinding_t          *kbindings;
   

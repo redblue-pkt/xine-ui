@@ -1,6 +1,10 @@
 skin.name    = lcd
 skin.version = 1
 
+#skin.VOLogo {
+#	pixmap = logo.zyuy2
+#}
+
 ## Main GUI ##
 skin.BackGround {
 	pixmap = bg.png

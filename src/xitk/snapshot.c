@@ -697,18 +697,17 @@ static void rgb_free( struct prvt_image_s *image )
 static int prvt_image_alloc( struct prvt_image_s **image )
 {
   char *filename;
-
-  *image = (struct prvt_image_s*)malloc( sizeof( struct prvt_image_s ) );
-
-  if (*image == NULL) return( 0 );
-    
-  memset( *image, 0, sizeof( struct prvt_image_s ) );
-
-  filename = (char *) alloca(strlen(xine_get_homedir()) + 10);
-  sprintf(filename, "%s/%s", xine_get_homedir(), "xinesnap");
-
+  
+  *image = (struct prvt_image_s*) xine_xmalloc( sizeof( struct prvt_image_s ) );
+  
+  if (*image == NULL) 
+    return 0;
+  
+  filename = (char *) alloca(strlen(gGui->snapshot_location) + 10);
+  sprintf(filename, "%s/%s", gGui->snapshot_location, "xinesnap");
+  
   (*image)->file_name = snap_filename( filename, "png" );
-
+  
   return( 1 );
 }
 
@@ -831,7 +830,7 @@ static void write_row_callback( png_structp png_ptr, png_uint_32 row, int pass)
  *  External function
  */
 
-void create_snapshot ( gGui_t *gGui )
+void create_snapshot (void)
 {
   int err = 0;
   struct prvt_image_s *image;

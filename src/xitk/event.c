@@ -127,6 +127,13 @@ typedef struct {
 
 static screen_savers_t    ssavers;
 
+/*
+ * Callback for snapshots saving location.
+ */
+static void snapshot_loc_cb(void *data, cfg_entry_t *cfg) {
+  gGui->snapshot_location = cfg->str_value;
+}
+
 static int actions_on_start(action_id_t actions[], action_id_t a) {
   int i = 0;
   while(actions[i] != ACTID_NOKEY) {
@@ -843,6 +850,10 @@ void gui_init (int nfiles, char *filenames[]) {
 						   1, "use wm layer property to place window on top", 
 						   NULL, NULL, NULL);
 
+  gGui->snapshot_location = gGui->config->register_string (gGui->config, "gui.snapshotdir", 
+							   (char*) (xine_get_homedir()),
+							   "where snapshots will be saved",
+							   NULL, snapshot_loc_cb, NULL);
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);

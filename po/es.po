@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-04-16 01:33+0200\n"
+"POT-Creation-Date: 2002-04-26 15:31+0200\n"
 "PO-Revision-Date: 2002-04-22 00:51+0200\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <kde-es@kyb.uni-stuttgart.de>\n"
@@ -14,56 +14,56 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.6\n"
 
-#: src/xitk/control.c:339
+#: src/xitk/control.c:338
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): no se pudo encontrar la imagen de fondo\n"
 
-#: src/xitk/control.c:420
+#: src/xitk/control.c:427
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "xine-playlist: no se pudo encontrar la imagen de fondo\n"
 
-#: src/xitk/control.c:540
+#: src/xitk/control.c:547
 msgid "Control HUE value"
 msgstr "Control del valor de TRANSPARENCIA"
 
-#: src/xitk/control.c:543
+#: src/xitk/control.c:550
 msgid "Hue"
 msgstr "Tte"
 
-#: src/xitk/control.c:564
+#: src/xitk/control.c:571
 msgid "Control SATURATION value"
 msgstr "Control del valor de SATURACIÓN"
 
-#: src/xitk/control.c:567
+#: src/xitk/control.c:574
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:588
+#: src/xitk/control.c:595
 msgid "Control BRIGHTNESS value"
 msgstr "Control del valor de BRILLO"
 
-#: src/xitk/control.c:591
+#: src/xitk/control.c:598
 msgid "Brt"
 msgstr "Brl"
 
-#: src/xitk/control.c:612
+#: src/xitk/control.c:619
 msgid "Control CONTRAST value"
 msgstr "Control del valor de CONTRASTE"
 
-#: src/xitk/control.c:615
+#: src/xitk/control.c:622
 msgid "Ctr"
 msgstr "Ctr"
 
-#: src/xitk/control.c:651
+#: src/xitk/control.c:658
 msgid "Choose a Skin"
 msgstr "Seleccione piel"
 
-#: src/xitk/control.c:688 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:867
+#: src/xitk/control.c:695 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:874
 msgid "Dismiss"
 msgstr "Cancel."
 
-#: src/xitk/control.c:694
+#: src/xitk/control.c:701
 msgid "Close control window"
 msgstr "Cerrar la ventana de control"
 
@@ -80,28 +80,41 @@ msgid "Error"
 msgstr "Error"
 
 #: src/xitk/errors.c:183
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
-"There is no available input plugin available to handle '%s'.\n"
+"There is no input plugin available to handle '%s'.\n"
+"Maybe MRL syntax is wrong or file/stream source doesn not exist."
 msgstr ""
 "- error del motor de xine -\n"
 "\n"
 "No hay ningún plugin de entrada disponible para manipular '%s'.\n"
 
 #: src/xitk/errors.c:189
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
-"There is no available demuxer plugin to handle '%s'.\n"
+"There is no demuxer plugin available to handle '%s'.\n"
+"Usually this means that the file format was not recognized."
 msgstr ""
 "- error del motor de xine -\n"
 "\n"
-"No hay ningún plugin demultiplexador para manipular '%s'.\n"
+"No hay ningún plugin de entrada disponible para manipular '%s'.\n"
 
 #: src/xitk/errors.c:194
+#, fuzzy, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"demuxer failed. Maybe '%s' is a broken file?\n"
+msgstr ""
+"- error del motor de xine -\n"
+"\n"
+"¡¡ Error no manipulable !!\n"
+
+#: src/xitk/errors.c:199
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -111,7 +124,7 @@ msgstr ""
 "\n"
 "¡¡ Error no manipulable !!\n"
 
-#: src/xitk/event.c:823
+#: src/xitk/event.c:830
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -119,11 +132,11 @@ msgstr ""
 "\n"
 "XInitThreads falló - parece que su librería xlib no tiene hilos seguros.\n"
 
-#: src/xitk/event.c:833
+#: src/xitk/event.c:840
 msgid "Cannot open display\n"
 msgstr "No se puede abrir la pantalla\n"
 
-#: src/xitk/event.c:906
+#: src/xitk/event.c:917
 msgid "Unable to initialize Imlib\n"
 msgstr "No se puede iniciar Imlib\n"
 
@@ -180,7 +193,8 @@ msgstr ""
 
 #: src/xitk/main.c:182
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
-msgstr "  -u, --spu-channel <#>        Seleccionar núm. canal SPU (subtítulos).\n"
+msgstr ""
+"  -u, --spu-channel <#>        Seleccionar núm. canal SPU (subtítulos).\n"
 
 #: src/xitk/main.c:183
 msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
@@ -188,7 +202,8 @@ msgstr "  -a, --audio-channel <#>      Seleccionar núm. canal de audio.\n"
 
 #: src/xitk/main.c:184
 msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
-msgstr "  -p, --auto-play [opt]        Reproducir al comenzar. Puede seguirlo:\n"
+msgstr ""
+"  -p, --auto-play [opt]        Reproducir al comenzar. Puede seguirlo:\n"
 
 #: src/xitk/main.c:185
 msgid "                    'f': in fullscreen mode.\n"
@@ -245,7 +260,8 @@ msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-lirc                Desactivar el soporte LIRC.\n"
 
 #: src/xitk/main.c:198
-msgid "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+msgid ""
+"      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
 msgstr ""
 "      --visual <class-or-id>   Usar el visual X11 especificado. <class-or-"
 "id>\n"
@@ -254,7 +270,8 @@ msgstr ""
 msgid ""
 "                               is either an X11 visual class, or a visual "
 "id.\n"
-msgstr "                               es o una clase visual X11 o un id. visual.\n"
+msgstr ""
+"                               es o una clase visual X11 o un id. visual.\n"
 
 #: src/xitk/main.c:200
 msgid "      --install                Install a private colormap.\n"
@@ -265,7 +282,8 @@ msgid "      --keymap [option]        Display keymap. Option are:\n"
 msgstr "      --keymap [option]        Mostrar mapeo de teclado. Opciones:\n"
 
 #: src/xitk/main.c:202
-msgid "                                 'default': display default keymap table,\n"
+msgid ""
+"                                 'default': display default keymap table,\n"
 msgstr ""
 "                                 'default': muestra mapeo teclado por "
 "defecto,\n"
@@ -279,7 +297,8 @@ msgstr ""
 "lircrc.\n"
 
 #: src/xitk/main.c:204
-msgid "                                 'remapped': user remapped keymap table.\n"
+msgid ""
+"                                 'remapped': user remapped keymap table.\n"
 msgstr ""
 "                                 'remapped': mapeo tecl. remapeado por "
 "usuario.\n"
@@ -298,11 +317,13 @@ msgstr "  -n, --network                Activar serv. control remoto por red.\n"
 
 #: src/xitk/main.c:207
 msgid "  -R, --root                   Use root window as video window.\n"
-msgstr "  -R, --root                   Usar ventana raíz como ventana de vídeo.\n"
+msgstr ""
+"  -R, --root                   Usar ventana raíz como ventana de vídeo.\n"
 
 #: src/xitk/main.c:209
 msgid "examples for valid MRLs (media resource locator):\n"
-msgstr "ejemplos de MRLs válidos (media resource locator - localizador de medios):\n"
+msgstr ""
+"ejemplos de MRLs válidos (media resource locator - localizador de medios):\n"
 
 #: src/xitk/main.c:210
 msgid "  File:  'path/foo.vob'\n"
@@ -363,7 +384,8 @@ msgstr "main: falló el manejador de audio especificado '%s'\n"
 #: src/xitk/main.c:468
 #, c-format
 msgid "Require xine library version 0.9.9, found %d.%d.%d.\n"
-msgstr "Se requiere la versión 0.9.9 de la biblioteca de xine, encontrada %d.%d.%d.\n"
+msgstr ""
+"Se requiere la versión 0.9.9 de la biblioteca de xine, encontrada %d.%d.%d.\n"
 
 #: src/xitk/main.c:540
 msgid "video driver id required for -V option\n"
@@ -386,95 +408,95 @@ msgstr "Navegador MRL de xine"
 msgid "Source:"
 msgstr "Fuente:"
 
-#: src/xitk/panel.c:523
+#: src/xitk/panel.c:524
 msgid "Volume control"
 msgstr "Control de volumen"
 
-#: src/xitk/panel.c:525
+#: src/xitk/panel.c:526
 msgid "Mute toggle"
 msgstr "Cambiar el modo silencio"
 
-#: src/xitk/panel.c:695
+#: src/xitk/panel.c:697
 msgid "Play previous entry from playlist"
 msgstr "Reproduce la entrada anterior de la lista de reproducción"
 
-#: src/xitk/panel.c:702
+#: src/xitk/panel.c:704
 msgid "Stop playback"
 msgstr "Detiene la reproducción"
 
-#: src/xitk/panel.c:709
+#: src/xitk/panel.c:711
 msgid "Play selected entry"
 msgstr "Reproduce la entrada seleccionada"
 
-#: src/xitk/panel.c:717
+#: src/xitk/panel.c:719
 msgid "Pause/Resume playback"
 msgstr "Pausa/Reanudación de la reproducción"
 
-#: src/xitk/panel.c:724
+#: src/xitk/panel.c:726
 msgid "Play next entry from playlist"
 msgstr "Reproduce la siguiente entrada de la lista de reproducción"
 
-#: src/xitk/panel.c:731
+#: src/xitk/panel.c:733
 msgid "Eject current medium"
 msgstr "Expulsa el soporte actual"
 
-#: src/xitk/panel.c:738
+#: src/xitk/panel.c:740
 msgid "Quit"
 msgstr "Salir"
 
-#: src/xitk/panel.c:745
+#: src/xitk/panel.c:747
 msgid "Setup window"
 msgstr "Ventana de configuración"
 
-#: src/xitk/panel.c:752
+#: src/xitk/panel.c:754
 msgid "Hide GUI"
 msgstr "Ocultar GUI"
 
-#: src/xitk/panel.c:759
+#: src/xitk/panel.c:761
 msgid "Fullscreen/Window mode"
 msgstr "Modo pantalla completa/ventana"
 
-#: src/xitk/panel.c:766
+#: src/xitk/panel.c:768
 msgid "Next audio channel"
 msgstr "Siguiente canal de audio"
 
-#: src/xitk/panel.c:773
+#: src/xitk/panel.c:775
 msgid "Previous audio channel"
 msgstr "Anterior canal de audio"
 
-#: src/xitk/panel.c:780
+#: src/xitk/panel.c:782
 msgid "Next SPU channel"
 msgstr "Siguiente canal SPU"
 
-#: src/xitk/panel.c:787
+#: src/xitk/panel.c:789
 msgid "Previous SPU channel"
 msgstr "Anterior canal SPU"
 
-#: src/xitk/panel.c:824
+#: src/xitk/panel.c:826
 msgid "Stream playback position slider"
 msgstr "Barra de posición de reproducción del stream"
 
-#: src/xitk/panel.c:852
+#: src/xitk/panel.c:854
 msgid "Take a snapshot"
 msgstr "Captura la pantalla"
 
-#: src/xitk/panel.c:859
+#: src/xitk/panel.c:861
 msgid "Slow motion"
 msgstr "Reproducción más lenta"
 
-#: src/xitk/panel.c:866
+#: src/xitk/panel.c:868
 msgid "Fast motion"
 msgstr "Reproducción más rápida"
 
-#: src/xitk/panel.c:873
+#: src/xitk/panel.c:875
 msgid "Playlist"
 msgstr "Lista de reproducción"
 
-#: src/xitk/panel.c:880
+#: src/xitk/panel.c:882
 msgid "Control"
 msgstr "Control"
 
-#: src/xitk/panel.c:887
+#: src/xitk/panel.c:889
 msgid "MRL Browser"
 msgstr "Navegador MRL"
 
@@ -483,59 +505,59 @@ msgstr "Navegador MRL"
 msgid "Can't read %s: %s\n"
 msgstr "No se puede leer %s: %s\n"
 
-#: src/xitk/playlist.c:803
+#: src/xitk/playlist.c:810
 msgid "Move up selected MRL"
 msgstr "Sube MRL seleccionado"
 
-#: src/xitk/playlist.c:811
+#: src/xitk/playlist.c:818
 msgid "Move down selected MRL"
 msgstr "Baja MRL seleccionado"
 
-#: src/xitk/playlist.c:818
+#: src/xitk/playlist.c:825
 msgid "Start playback of selected MRL"
 msgstr "Inicia reproducción de MRL seleccionado"
 
-#: src/xitk/playlist.c:825
+#: src/xitk/playlist.c:832
 msgid "Delete selected MRL from playlist"
 msgstr "Borra la entrada seleccionada de la lista de reproducción"
 
-#: src/xitk/playlist.c:832
+#: src/xitk/playlist.c:839
 msgid "Delete all entries in playlist"
 msgstr "Borra todas las entradas de la lista de reproducción"
 
-#: src/xitk/playlist.c:836
+#: src/xitk/playlist.c:843
 msgid "Add"
 msgstr "Añadir"
 
-#: src/xitk/playlist.c:842
+#: src/xitk/playlist.c:849
 msgid "Add one or more entries in playlist"
 msgstr "Añade una o más entrada en la lista de reproducción"
 
-#: src/xitk/playlist.c:847
+#: src/xitk/playlist.c:854
 msgid "Load"
 msgstr "Cargar"
 
-#: src/xitk/playlist.c:853
+#: src/xitk/playlist.c:860
 msgid "Load saved playlist"
 msgstr "Carga una lista de reproducción salvada"
 
-#: src/xitk/playlist.c:857
+#: src/xitk/playlist.c:864
 msgid "Save"
 msgstr "Guardar"
 
-#: src/xitk/playlist.c:863
+#: src/xitk/playlist.c:870
 msgid "Save playlist"
 msgstr "Guarda la lista de reproducción"
 
-#: src/xitk/playlist.c:873
+#: src/xitk/playlist.c:880
 msgid "Close playlist window"
 msgstr "Cierra la ventana de lista de reproducción"
 
-#: src/xitk/playlist.c:891
+#: src/xitk/playlist.c:898
 msgid "Scan for:"
 msgstr "Buscar:"
 
-#: src/xitk/playlist.c:902
+#: src/xitk/playlist.c:909
 msgid "Direct MRL entry"
 msgstr "Entrada directa de MRL"
 
@@ -559,46 +581,47 @@ msgstr "configuración de xine"
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/xitk/skins.c:229
+#: src/xitk/skins.c:230
 #, c-format
 msgid "Failed to load %s/%s. Reload old skin '%s'.\n"
 msgstr "Fallo al cargar %s/%s. Se vuelve a cargar la piel antigua '%s'.\n"
 
-#: src/xitk/skins.c:245
+#: src/xitk/skins.c:246
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr "Fallo al cargar %s, versión incorrecta. Se carga la piel '%s'.\n"
 
-#: src/xitk/skins.c:287 src/xitk/skins.c:326
+#: src/xitk/skins.c:289 src/xitk/skins.c:328
 #, c-format
 msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
 msgstr "Vaya, la piel '%s' no se encuentra, se usa '%s'.\n"
 
-#: src/xitk/skins.c:314
+#: src/xitk/skins.c:316
 msgid "No available skin found. Say goodbye.\n"
 msgstr "No hay pieles disponibles. Diga adios.\n"
 
-#: src/xitk/skins.c:330
+#: src/xitk/skins.c:332
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
 msgstr "Fallo al cargar la piel. Verifique sus pieles instaladas. Saliendo.\n"
 
-#: src/xitk/skins.c:339
+#: src/xitk/skins.c:341
 #, c-format
 msgid "Failed to load %s/%s. Exiting.\n"
 msgstr "Fallo al cargar %s/%s. Saliendo.\n"
 
-#: src/xitk/skins.c:348
+#: src/xitk/skins.c:350
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
-msgstr "Fallo al cargar la piel %s, versión incorrecta. Se carga la piel '%s'.\n"
+msgstr ""
+"Fallo al cargar la piel %s, versión incorrecta. Se carga la piel '%s'.\n"
 
-#: src/xitk/snapshot.c:943
+#: src/xitk/snapshot.c:945
 #, c-format
 msgid "File open failed (%s)\n"
 msgstr "Falló la apertura del archivo (%s)\n"
 
 #.
-#: src/xitk/snapshot.c:1091
+#: src/xitk/snapshot.c:1093
 #, c-format
 msgid "File '%s' written.\n"
 msgstr "Archivo '%s' escrito.\n"
@@ -620,6 +643,15 @@ msgstr "visor del registro de xine"
 msgid "Refresh"
 msgstr "Refrescar"
 
+#~ msgid ""
+#~ "- xine engine error -\n"
+#~ "\n"
+#~ "There is no available demuxer plugin to handle '%s'.\n"
+#~ msgstr ""
+#~ "- error del motor de xine -\n"
+#~ "\n"
+#~ "No hay ningún plugin demultiplexador para manipular '%s'.\n"
+
 #, fuzzy
 #~ msgid "Select current entry"
 #~ msgstr "Expulsa el soporte actual"
@@ -627,4 +659,3 @@ msgstr "Refrescar"
 #, fuzzy
 #~ msgid "Close MRL browser window"
 #~ msgstr "Cerrar la ventana de control"
-

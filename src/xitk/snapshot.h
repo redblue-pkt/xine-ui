@@ -25,6 +25,6 @@
 #ifndef SNAPSHOT_H
 #define SNAPSHOT_H
 
-void create_snapshot ( gGui_t *gGui );
+void create_snapshot (void);
 
 #endif

@@ -31,6 +31,7 @@
 #include "control.h"
 #include "mrl_browser.h"
 #include "playlist.h"
+#include "videowin.h"
 #include "event.h"
 #include "skins.h"
 #include "errors.h"
@@ -256,11 +257,12 @@ void change_skin(skins_locations_t *sk) {
     } visible_state_t;
     int i;
     visible_state_t visible_state[] = {
-      { panel_change_skins       },
-      { control_change_skins     },
-      { playlist_change_skins    },
-      { mrl_browser_change_skins },
-      { NULL                     }
+      { video_window_change_skins },
+      { panel_change_skins        },
+      { control_change_skins      },
+      { playlist_change_skins     },
+      { mrl_browser_change_skins  },
+      { NULL                      }
     };
     
     for(i = 0; visible_state[i].change_skins != NULL; i++) {

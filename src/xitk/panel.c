@@ -404,7 +404,7 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
  *  to snapshot current frame.
  */
 void panel_snapshot(xitk_widget_t *w, void *data) {
-  create_snapshot(gGui);
+  create_snapshot();
 }
 
 /*

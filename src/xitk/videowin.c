@@ -906,6 +906,9 @@ void video_window_init (void) {
   gVw->video_height = 480;
   
   video_window_set_mag(1.0);
+
+  /* Ensure we load the right logo */
+  video_window_change_skins();
 }
 
 
@@ -971,6 +974,9 @@ static int video_window_translate_point(int gui_x, int gui_y,
   return 1;
 }
 
+/*
+ * Set/Get magnification.
+ */
 void video_window_set_mag(float mag) {
   
   gVw->mag = mag;
@@ -979,14 +985,41 @@ void video_window_set_mag(float mag) {
   
   video_window_adapt_size ();
 }
-
-float video_window_get_mag () {
-
+float video_window_get_mag (void) {
+  
   /* compute current mag */
-
   gVw->mag = (((float) gVw->output_width / (float) gVw->video_width ) + 
 	      ((float) gVw->output_height / (float) gVw->video_height )) * .5;
   return gVw->mag;
+}
+
+/*
+ * Change displayed logo, if selected skin want to customize it.
+ */
+void video_window_change_skins(void) {
+  cfg_entry_t *cfg_entry;
+  char        *new_vo_logo;
+
+  cfg_entry   = gGui->config->lookup_entry(gGui->config, "video.logo_file");
+  new_vo_logo = xitk_skin_get_skin_filename(gGui->skin_config, "VOLogo");
+  
+  if(new_vo_logo) {
+
+    if(cfg_entry && cfg_entry->str_value) {
+      /* Old and new logo are same, don't reload */
+      if(!strcmp(cfg_entry->str_value, new_vo_logo))
+	return;
+    }
+    
+    gGui->config->update_string(gGui->config, "video.logo_file", new_vo_logo);
+  }
+  else {
+    char  default_logo[2048];
+    
+    memset(&default_logo, 0, sizeof(default_logo));
+    snprintf(default_logo, 2048, "%s/xine_logo.zyuy2", XINE_SKINDIR);
+    gGui->config->update_string(gGui->config, "video.logo_file", default_logo);
+  }
 }
 
 /*
@@ -1093,4 +1126,3 @@ static void video_window_handle_event (XEvent *event, void *data) {
 					event);
 
 }
-
