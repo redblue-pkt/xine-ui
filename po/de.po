@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.12\n"
 "POT-Creation-Date: 2002-08-01 10:44+0200\n"
-"PO-Revision-Date: 2002-07-24 08:53+0200\n"
+"PO-Revision-Date: 2002-08-01 18:25+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -18,9 +18,9 @@ msgid "No MRL (input stream) specified"
 msgstr "Keine MRL (Eingabedatenstrom) angegeben"
 
 #: src/xitk/actions.c:396 src/xitk/actions.c:411
-#, fuzzy, c-format
+#, c-format
 msgid "%s(): can't create new thread (%s)\n"
-msgstr "gui_set_current_position: Kann keinen neuen Thread erzeugen (%s)\n"
+msgstr "%s(): Kann keinen neuen Thread erzeugen (%s)\n"
 
 #: src/xitk/actions.c:746
 #, c-format
