@@ -29,6 +29,8 @@ xine_remote_LDADD = @ORBIT_LIBS@
 
 noinst_HEADERS = xine-server.h corba-utils.h
 
+endif
+
 clean-generic:
 	-rm -f xine-common.c xine-skels.c xine-stubs.c xine.h
 
@@ -48,5 +50,4 @@ maintainer-clean-generic:
 	-@echo "it deletes files that may require special tools to rebuild."
 	-rm -f Makefile.in
 	-rm -f xine-common.c xine-skels.c xine-stubs.c xine.h
-endif
 
