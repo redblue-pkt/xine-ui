@@ -67,7 +67,6 @@ static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
     xitk_font_t         *fs;                                                                    \
                                                                                                 \
     image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);       \
-    xitk_image_add_mask(gGui->imlib_data, image); \
                                                                                                 \
     fs = xitk_font_load_font(gGui->display, fontname);                                          \
     xitk_font_set_font(fs, setup->widget_list->gc);                                             \
@@ -1002,4 +1001,3 @@ void setup_panel(void) {
 
   XUnlockDisplay (gGui->display);
 }
-
