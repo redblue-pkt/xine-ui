@@ -1131,8 +1131,6 @@ void gui_run (void) {
       }
     }
   }  
-
-  enable_playback_controls((gGui->playlist.num > 0));
   
   if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
@@ -1176,6 +1174,8 @@ void gui_run (void) {
       gGui->actions_on_start[1] = ACTID_NOKEY;
     }
   }
+
+  enable_playback_controls((gGui->playlist.num > 0));
 
   /* We can't handle signals here, xitk handle this, so
    * give a function callback for this.

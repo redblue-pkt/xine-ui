@@ -779,14 +779,12 @@ void download_skin(char *url) {
     GC                         gc;
     int                        x, y;
 
-    printf("!= NULL\n"); fflush(stdout);
-
     XITK_WIDGET_INIT(&br, gGui->imlib_data);
     XITK_WIDGET_INIT(&lb, gGui->imlib_data);
     
     xitk_window_dialog_destroy(xwin);
 
-#if 1    
+#if 0
     for(i = 0; slxs[i]; i++) {
       printf("Skin number %d:\n", i);
       printf("  Name: %s\n", slxs[i]->name);
