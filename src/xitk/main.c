@@ -1821,6 +1821,19 @@ int main(int argc, char *argv[]) {
   
   show_banner();
   
+#ifndef DEBUG
+  if(!gGui->verbosity) {
+    int error_fd;
+    
+    if ((error_fd = open("/dev/null", O_WRONLY)) < 0)
+      printf("cannot open /dev/null");
+    else {
+      if (dup2(error_fd, STDOUT_FILENO) < 0)
+	printf("cannot dup2 stdout");
+    }
+  }
+#endif
+
   /*
    * Initialize config
    */
