@@ -588,18 +588,12 @@ void playlist_scan_for_infos_selected(void) {
 
   if(gGui->playlist.num) {
     int                 selected = xitk_browser_get_current_selected(playlist->playlist);
-    xine_video_port_t  *vo_port;
+    xine_stream_t      *stream;
     
+    stream = xine_stream_new(gGui->xine, NULL, NULL);
+    _scan_for_playlist_infos(stream, selected);
     
-    if((vo_port = xine_open_video_driver(gGui->xine, "none", XINE_VISUAL_TYPE_NONE, NULL))) {
-      xine_stream_t  *stream;
-
-      stream = xine_stream_new(gGui->xine, NULL, vo_port);
-      _scan_for_playlist_infos(stream, selected);
-      
-      xine_dispose(stream);
-      xine_close_video_driver(gGui->xine, vo_port);
-    }
+    xine_dispose(stream);
     
     playlist_mrlident_toggle();
   }
@@ -609,22 +603,16 @@ void playlist_scan_for_infos(void) {
   
   if(gGui->playlist.num) {
     int                 i;
-    xine_video_port_t  *vo_port;
-  
+    xine_stream_t      *stream;
     
-    if((vo_port = xine_open_video_driver(gGui->xine, "none", XINE_VISUAL_TYPE_NONE, NULL))) {
-      xine_stream_t *stream;
-      
-      stream = xine_stream_new(gGui->xine, NULL, vo_port);
-      
-      for(i = 0; i < gGui->playlist.num; i++)
-	_scan_for_playlist_infos(stream, i);
-      
-      xine_dispose(stream);
-      xine_close_video_driver(gGui->xine, vo_port);
-      
-      playlist_mrlident_toggle();
-    }
+    stream = xine_stream_new(gGui->xine, NULL, NULL);
+    
+    for(i = 0; i < gGui->playlist.num; i++)
+      _scan_for_playlist_infos(stream, i);
+    
+    xine_dispose(stream);
+    
+    playlist_mrlident_toggle();
   }
 }
 
@@ -753,11 +741,11 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
       if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
 	int                num_mrls = 0;
 	char             **autoplay_mrls = xine_get_autoplay_mrls(gGui->xine, autoplay_plugins[i], &num_mrls);
+	xine_stream_t      *stream;
 	
 	if(autoplay_mrls) {
 	  int                j;
 	  int                cdda_mode = 0;
-	  xine_video_port_t *vo_port;
 
 	  if(!strcasecmp(autoplay_plugins[i], "cd"))
 	    cdda_mode = 1;
@@ -774,27 +762,24 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	  if(!gGui->playlist.num)
 	    gGui->playlist.cur = 0;
 	  
-	  if((vo_port = xine_open_video_driver(gGui->xine, "none", XINE_VISUAL_TYPE_NONE, NULL))) {
-	    xine_stream_t  *stream;
 
-	    stream = xine_stream_new(gGui->xine, NULL, vo_port);
+	  stream = xine_stream_new(gGui->xine, NULL, NULL);
+	  
+	  for (j = 0; j < num_mrls; j++) {
+	    char *ident = NULL;
 	    
-	    for (j = 0; j < num_mrls; j++) {
-	      char *ident = NULL;
-	      
-	      if(cdda_mode && xine_open(stream, autoplay_mrls[j])) {
-		ident = stream_infos_get_ident_from_stream(stream);
-		xine_close(stream);
-	      }
-	      
-	      mediamark_add_entry(autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
-	      
-	      if(ident)
-		free(ident);
+	    if(cdda_mode && xine_open(stream, autoplay_mrls[j])) {
+	      ident = stream_infos_get_ident_from_stream(stream);
+	      xine_close(stream);
 	    }
-	    xine_dispose(stream);
-	    xine_close_video_driver(gGui->xine, vo_port);
+	    
+	    mediamark_add_entry(autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
+	    
+	    if(ident)
+	      free(ident);
 	  }
+
+	  xine_dispose(stream);
 	  
 	  if(gGui->playlist.cur == 0)
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
