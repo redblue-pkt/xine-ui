@@ -85,6 +85,7 @@
                                     } while(0)
 
 typedef struct xitk_widget_s xitk_widget_t;
+typedef struct xitk_menu_entry_s xitk_menu_entry_t;
 typedef struct xitk_widget_list_s xitk_widget_list_t;
 typedef struct xitk_skin_config_s xitk_skin_config_t;
 typedef struct xitk_font_s xitk_font_t;
@@ -93,6 +94,7 @@ typedef struct xitk_window_s xitk_window_t;
 
 typedef void (*xitk_startup_callback_t)(void *);
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
+typedef void (*xitk_menu_callback_t)(xitk_widget_t *, xitk_menu_entry_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
 typedef void (*xitk_dnd_callback_t) (char *filename);
@@ -604,12 +606,12 @@ typedef struct {
   void                             *userdata;
 } xitk_intbox_widget_t;
 
-typedef struct {
+struct xitk_menu_entry_s {
   char                             *menu;
   char                             *type; /* NULL, <separator>, <branch>, <check>, <checked> */
-  xitk_simple_callback_t            cb;
+  xitk_menu_callback_t              cb;
   void                             *user_data;
-} xitk_menu_entry_t;
+};
 
 typedef struct {
   int                              magic;
@@ -2214,6 +2216,8 @@ void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);
 
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
 				       xitk_menu_widget_t *m, int x, int y);
+void xitk_menu_show_menu(xitk_widget_t *w);
+void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me);
 xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w);
 void xitk_menu_destroy_sub_branchs(xitk_widget_t *w);
 void xitk_menu_destroy(xitk_widget_t *w);

@@ -58,6 +58,7 @@ typedef struct {
   menu_node_t            *curbranch;
   xitk_list_t            *menu_windows;
   xitk_widget_list_t     *parent_wlist;
+  int                     x, y;
 } menu_private_data_t;
 
 #endif

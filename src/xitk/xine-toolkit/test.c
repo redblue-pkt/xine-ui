@@ -770,6 +770,9 @@ static void create_browser(void) {
 
 }
 
+static void menu_test_end(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  test_end(NULL, NULL);
+}
 static void create_menu(void) {
   xitk_menu_widget_t   menu;
   int                  x = 10, y = 10;
@@ -804,7 +807,7 @@ static void create_menu(void) {
     { "Video/troisieme",                 NULL,            NULL,     NULL },
     { "Video/quatrieme",                 NULL,            NULL,     NULL },
     { "SEP",                             "<separator>",   NULL,     NULL },
-    { "Quit",                            NULL,            test_end, NULL },
+    { "Quit",                            NULL,            menu_test_end, NULL },
     { NULL,                              NULL,            NULL,     NULL }
   };
   
@@ -820,6 +823,7 @@ static void create_menu(void) {
   xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
   			   (test->menu = 
 			    xitk_noskin_menu_create(test->widget_list, &menu, x, y)));
+  xitk_menu_show_menu(test->menu);
 }
 
 /*
