@@ -399,7 +399,6 @@ case $host in
     m68k-*)
 	GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O2"
 	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
-	AC_DEFINE(FPM_M68K)
 	;;
     *) echo "$host is not currently supported by xine"; exit 1;;
     esac
