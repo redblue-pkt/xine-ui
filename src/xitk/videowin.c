@@ -323,32 +323,23 @@ static void video_window_adapt_size (void) {
 #ifdef HAVE_XINERAMA
   case 4:
 #endif
-#warning TVMODE NEWAPI
-#if 0
     if(gGui->xine)
-      xine_tvmode_switch2 (gGui->xine, 
+      xine_tvmode_switch (gGui->xine, 
 			  0, gVw->video_width, gVw->video_height, gVw->video_duration);
-#endif
     break;
   case 2:
 #ifdef HAVE_XINERAMA
   case 8:
 #endif
-#warning TVMODE NEWAPI
-#if 0
     if(gGui->xine)
-      if (xine_tvmode_switch2 (gGui->xine,
+      if (xine_tvmode_switch (gGui->xine,
 			      1, gVw->video_width, gVw->video_height, gVw->video_duration) != 1)
-#endif
 	gVw->fullscreen_req = 0;
     break;
   default:
-#warning TVMODE NEWAPI
-#if 0
     if(gGui->xine)
-      xine_tvmode_switch2 (gGui->xine, 
+      xine_tvmode_switch (gGui->xine, 
 			  0, gVw->video_width, gVw->video_height, gVw->video_duration);
-#endif
     gVw->fullscreen_req = 0;
   }
 
@@ -484,11 +475,8 @@ static void video_window_adapt_size (void) {
   gVw->visible_aspect = gGui->pixel_aspect;
 
   if(gGui->xine) {
-#warning TVMODE NEWAPI
-#if 0
-    xine_tvmode_size2 (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_aspect, NULL);
-    xine_tvmode_size2 (gGui->xine, &hint.width, &hint.height, NULL, NULL);
-#endif
+    xine_tvmode_size (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_aspect, NULL);
+    xine_tvmode_size (gGui->xine, &hint.width, &hint.height, NULL, NULL);
   }
   
 #ifdef HAVE_XINERAMA
@@ -1505,10 +1493,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
  * Necessary cleanup
  */
 void video_window_exit (void) {
-#warning TVMODE NEWAPI
-#if 0
-  xine_tvmode_exit2 (gGui->xine);
-#endif
+  xine_tvmode_exit (gGui->xine);
 }
 
 
