@@ -33,8 +33,6 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-extern int errno;
-
 #include "common.h"
 
 typedef struct {
@@ -45,9 +43,9 @@ typedef struct {
   } author;
   struct {
     char    *href;
+    char    *preview;
     int      version;
     int      maintained;
-    char    *preview;
   } skin;
 } slx_entry_t;
 
@@ -482,18 +480,17 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
   slx_entry_t    **slxs = NULL, slx;
   xml_node_t      *xml_tree, *skin_entry, *skin_ref;
   xml_property_t  *skin_prop;
-  download_t      *download;
-
-  download = (download_t *) xine_xmalloc(sizeof(download_t));
-  download->buf    = NULL;
-  download->error  = NULL;
-  download->size   = 0;
-  download->status = 0; 
+  download_t       download;
   
-  if((network_download(url, download))) {
+  download.buf    = NULL;
+  download.error  = NULL;
+  download.size   = 0;
+  download.status = 0; 
+  
+  if((network_download(url, &download))) {
     int entries_slx = 0;
     
-    xml_parser_init(download->buf, download->size, XML_PARSER_CASE_INSENSITIVE);
+    xml_parser_init(download.buf, download.size, XML_PARSER_CASE_INSENSITIVE);
     if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
       goto __failure;
     
@@ -512,6 +509,10 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 	   ((version_major >= 2) && (version_minor >= 0))) {
 	  
 	  skin_entry = xml_tree->child;
+	  
+	  slx.name = slx.author.name = slx.author.email = slx.skin.href = slx.skin.preview = NULL;
+	  slx.skin.version = slx.skin.maintained = 0;
+	  
 	  while(skin_entry) {
 
 	    if(!strcasecmp(skin_entry->name, "SKIN")) {
@@ -552,7 +553,7 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 		    }
 		  }
 		}
-		
+
 		skin_ref = skin_ref->next;
 	      }
 
@@ -560,7 +561,7 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 		 ((slx.skin.version >= SKIN_IFACE_VERSION) && slx.skin.maintained)) {
 		
 #if 0
-		printf("Skin number %d:\n", entries_slx);
+		printf("get slx: Skin number %d:\n", entries_slx);
 		printf("  Name: %s\n", slx.name);
 		printf("  Author Name: %s\n", slx.author.name);
 		printf("  Author email: %s\n", slx.author.email);
@@ -571,21 +572,23 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 		printf("--\n");
 #endif
 		
-		entries_slx++;
-		
-		if(entries_slx == 1)
+		if(entries_slx == 0)
 		  slxs = (slx_entry_t **) xine_xmalloc(sizeof(slx_entry_t *) * 2);
 		else
-		  slxs = (slx_entry_t **) realloc(slxs, sizeof(slx_entry_t *) * (entries_slx + 1));
+		  slxs = (slx_entry_t **) realloc(slxs, sizeof(slx_entry_t *) * (entries_slx + 2));
 		
-		slxs[(entries_slx - 1)] = (slx_entry_t *) xine_xmalloc(sizeof(slx_entry_t));
-		slxs[(entries_slx - 1)]->name            = strdup(slx.name);
-		slxs[(entries_slx - 1)]->author.name     = slx.author.name ? strdup(slx.author.name) : NULL;
-		slxs[(entries_slx - 1)]->author.email    = slx.author.email ? strdup(slx.author.email) : NULL;
-		slxs[(entries_slx - 1)]->skin.href       = strdup(slx.skin.href);
-		slxs[(entries_slx - 1)]->skin.preview    = (slx.skin.preview) ? strdup(slx.skin.preview) : NULL;
-		slxs[(entries_slx - 1)]->skin.version    = slx.skin.version;
-		slxs[(entries_slx - 1)]->skin.maintained = slx.skin.maintained;
+		slxs[entries_slx] = (slx_entry_t *) xine_xmalloc(sizeof(slx_entry_t));
+		slxs[entries_slx]->name            = strdup(slx.name);
+		slxs[entries_slx]->author.name     = slx.author.name ? strdup(slx.author.name) : NULL;
+		slxs[entries_slx]->author.email    = slx.author.email ? strdup(slx.author.email) : NULL;
+		slxs[entries_slx]->skin.href       = strdup(slx.skin.href);
+		slxs[entries_slx]->skin.preview    = slx.skin.preview ? strdup(slx.skin.preview) : NULL;
+		slxs[entries_slx]->skin.version    = slx.skin.version;
+		slxs[entries_slx]->skin.maintained = slx.skin.maintained;
+
+		entries_slx++;
+
+		slxs[entries_slx] = NULL;
 		
 	      }
 	      
@@ -611,15 +614,14 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 
   }
   else
-    xine_error(_("Unable to retrieve skin list from %s: %s"), url, download->error);
+    xine_error(_("Unable to retrieve skin list from %s: %s"), url, download.error);
  
  __failure:
   
-  if(download->buf)
-    free(download->buf);
-  if(download->error)
-    free(download->error);
-  free(download);
+  if(download.buf)
+    free(download.buf);
+  if(download.error)
+    free(download.error);
   
   return slxs;
 }
@@ -629,10 +631,10 @@ static void download_skin_cancel(xitk_widget_t *w, void *data) {
   
   xitk_unregister_event_handler(&skdloader->widget_key);
   
+  xitk_image_free_image(gGui->imlib_data, &skdloader->preview_image);
+
   xitk_destroy_widgets(skdloader->widget_list);
   xitk_window_destroy_window(gGui->imlib_data, skdloader->xwin);
-
-  xitk_image_free_image(gGui->imlib_data, &skdloader->preview_image);
 
   skdloader->xwin = None;
 
@@ -645,18 +647,19 @@ static void download_skin_cancel(xitk_widget_t *w, void *data) {
   free(skdloader->widget_list);
   
   for(i = 0; i < skdloader->num; i++) {
-    free(skdloader->entries[i]);
     SAFE_FREE(skdloader->slxs[i]->name);
     SAFE_FREE(skdloader->slxs[i]->author.name);
     SAFE_FREE(skdloader->slxs[i]->author.email);
-    free(skdloader->slxs[i]->skin.href);
+    SAFE_FREE(skdloader->slxs[i]->skin.href);
     SAFE_FREE(skdloader->slxs[i]->skin.preview);
     free(skdloader->slxs[i]);
+    free(skdloader->entries[i]);
   }
   
-  skdloader->num = 0;
-  free(skdloader->entries);
   free(skdloader->slxs);
+  free(skdloader->entries);
+
+  skdloader->num = 0;
 
   free(skdloader);
   skdloader = NULL;
@@ -679,20 +682,20 @@ static void download_update_preview(void) {
 
   download_update_blank_preview();
 
-  if(skdloader->preview_image->image) {
+  if(skdloader->preview_image->image && skdloader->preview_image->image->pixmap) {
     GC   lgc;
     int  x, y;
     
     XLockDisplay (gGui->display);
     lgc = XCreateGC(gGui->display, (XITK_WIDGET_LIST_WINDOW(skdloader->widget_list)), None, None);
-    XCopyGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)), 
-	    (1 << GCLastBit) - 1, lgc);
+    XCopyGC(gGui->display, 
+	    (XITK_WIDGET_LIST_GC(skdloader->widget_list)), (1 << GCLastBit) - 1, lgc);
     XUnlockDisplay (gGui->display);
     
     y = 30 + ((skdloader->preview_image->image->height - skdloader->preview_height) >> 1);
     x = 10 + ((skdloader->preview_image->image->width - skdloader->preview_width) >> 1);
     
-    if (skdloader->preview_image->mask && skdloader->preview_image->mask->pixmap) {
+    if(skdloader->preview_image->mask && skdloader->preview_image->mask->pixmap) {
       XLockDisplay (gGui->display);
       XSetClipOrigin(gGui->display, lgc, x, y);
       XSetClipMask(gGui->display, lgc, skdloader->preview_image->mask->pixmap);
@@ -703,25 +706,24 @@ static void download_update_preview(void) {
     XCopyArea (gGui->display, skdloader->preview_image->image->pixmap, 
 	       (XITK_WIDGET_LIST_WINDOW(skdloader->widget_list)), lgc, 0, 0,
 	       skdloader->preview_width, skdloader->preview_height, x, y);
-    
+    XSync(gGui->display, False);
     XFreeGC(gGui->display, lgc);
     XUnlockDisplay (gGui->display);
   }
 }
 
 static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
-  download_t   *download;
+  download_t   download;
 
   if(skdloader->slxs[selected]->skin.preview == NULL)
     return;
 
-  download = (download_t *) xine_xmalloc(sizeof(download_t));
-  download->buf    = NULL;
-  download->error  = NULL;
-  download->size   = 0;
-  download->status = 0; 
+  download.buf    = NULL;
+  download.error  = NULL;
+  download.size   = 0;
+  download.status = 0; 
 
-  if((network_download(skdloader->slxs[selected]->skin.preview, download))) {
+  if((network_download(skdloader->slxs[selected]->skin.preview, &download))) {
     char          *skpname;
     FILE          *fd;
     char           tmpfile[XITK_PATH_MAX + XITK_NAME_MAX + 1];
@@ -736,9 +738,8 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
     
     if((fd = fopen(tmpfile, "w+b")) != NULL) {
       ImlibImage    *img = NULL;
-      xitk_image_t  *ximg;
       
-      fwrite(download->buf, download->size, 1, fd);
+      fwrite(download.buf, download.size, 1, fd);
       fflush(fd);
       fclose(fd);
 
@@ -747,7 +748,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
       XUnlockDisplay(gGui->display);
 
       if(img) {
-	xitk_image_t *oimg = skdloader->preview_image;
+	xitk_image_t *ximg, *oimg = skdloader->preview_image;
 	int           owidth, oheight;
 	float         ratio;
 	
@@ -769,65 +770,57 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
 	
 	/* Rescale preview */
 	XLockDisplay(gGui->display);
-	Imlib_render (gGui->imlib_data, img, skdloader->preview_width, skdloader->preview_height);
+	Imlib_render(gGui->imlib_data, img, skdloader->preview_width, skdloader->preview_height);
 	XUnlockDisplay(gGui->display);
 	
 	ximg = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
-
-	ximg->image = xitk_image_create_xitk_pixmap(gGui->imlib_data, 
-						    skdloader->preview_image->width, 
-						    skdloader->preview_image->height);
+	ximg->width  = owidth;
+	ximg->height = oheight;
+	
+	ximg->image = xitk_image_create_xitk_pixmap(gGui->imlib_data, owidth, oheight);
+	ximg->mask = xitk_image_create_xitk_mask_pixmap(gGui->imlib_data, owidth, oheight);
 	
 	XLockDisplay(gGui->display);
 	ximg->image->pixmap = Imlib_copy_image(gGui->imlib_data, img);
-	XUnlockDisplay(gGui->display);
-	
-	ximg->mask = xitk_image_create_xitk_mask_pixmap(gGui->imlib_data, 
-							skdloader->preview_image->width, 
-							skdloader->preview_image->height);
-	
-	XLockDisplay(gGui->display);
 	ximg->mask->pixmap = Imlib_copy_mask(gGui->imlib_data, img);
 	Imlib_destroy_image(gGui->imlib_data, img);
 	XUnlockDisplay(gGui->display);
 	
-	ximg->width  = skdloader->preview_image->width;
-	ximg->height = skdloader->preview_image->height;
-
 	skdloader->preview_image = ximg;
-
-	xitk_image_free_image(gGui->imlib_data, &oimg);
 	
+	xitk_image_free_image(gGui->imlib_data, &oimg);
+
 	download_update_preview();
       }
       
       unlink(tmpfile);
     }
   }
-  else
+  else {
+    xine_error(_("Unable to download '%s': %s\n"), 
+	       skdloader->slxs[selected]->skin.preview, download.error);
     download_update_blank_preview();
+  }
 
-  if(download->buf)
-    free(download->buf);
-  if(download->error)
-    free(download->error);
-  free(download);
+  if(download.buf)
+    free(download.buf);
+  if(download.error)
+    free(download.error);
 }
 
 static void download_skin_select(xitk_widget_t *w, void *data) {
   int          selected = xitk_browser_get_current_selected(skdloader->browser);
-  download_t  *download;
+  download_t   download;
   
   if(selected < 0)
     return;
 
-  download = (download_t *) xine_xmalloc(sizeof(download_t));
-  download->buf    = NULL;
-  download->error  = NULL;
-  download->size   = 0;
-  download->status = 0; 
+  download.buf    = NULL;
+  download.error  = NULL;
+  download.size   = 0;
+  download.status = 0; 
 
-  if((network_download(skdloader->slxs[selected]->skin.href, download))) {
+  if((network_download(skdloader->slxs[selected]->skin.href, &download))) {
     char *filename;
     
     filename = strrchr(skdloader->slxs[selected]->skin.href, '/');
@@ -860,7 +853,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  char   buffer[2048];
 	  int    i, skin_found = -1;
 	  
-	  fwrite(download->buf, download->size, 1, fd);
+	  fwrite(download.buf, download.size, 1, fd);
 	  fflush(fd);
 	  fclose(fd);
 
@@ -922,13 +915,12 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
   }
   else
     xine_error(_("Unable to download '%s': %s\n"), 
-	       skdloader->slxs[selected]->skin.href, download->error);
+	       skdloader->slxs[selected]->skin.href, download.error);
   
-  if(download->buf)
-    free(download->buf);
-  if(download->error)
-    free(download->error);
-  free(download);
+  if(download.buf)
+    free(download.buf);
+  if(download.error)
+    free(download.error);
   
   download_skin_cancel(w, NULL);
 }
@@ -1006,15 +998,15 @@ void download_skin(char *url) {
   XUnlockDisplay(gGui->display);
   
   xwin = xitk_window_dialog_button_free_with_width(gGui->imlib_data, _("Be Patient..."), 
-						   w, ALIGN_CENTER, 
-						   _("Retrieve skin list from %s"), url);
+  						   w, ALIGN_CENTER, 
+  						   _("Retrieve skin list from %s"), url);
   
   while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(xwin)))
     xine_usec_sleep(5000);
   
   XLockDisplay(gGui->display);
   XSetTransientForHint (gGui->display, 
-  			xitk_window_get_window(xwin), gGui->video_window);
+    			xitk_window_get_window(xwin), gGui->video_window);
   XUnlockDisplay(gGui->display);
   layer_above_video(xitk_window_get_window(xwin));
   
@@ -1024,19 +1016,17 @@ void download_skin(char *url) {
     int                        i;
     xitk_browser_widget_t      br;
     xitk_labelbutton_widget_t  lb;
-    xitk_image_widget_t        imgw;
     GC                         gc;
     int                        x, y;
 
-    XITK_WIDGET_INIT(&br, gGui->imlib_data);
-    XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-    XITK_WIDGET_INIT(&imgw, gGui->imlib_data);
-    
     xitk_window_dialog_destroy(xwin);
 
+    XITK_WIDGET_INIT(&br, gGui->imlib_data);
+    XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+    
 #if 0
     for(i = 0; slxs[i]; i++) {
-      printf("Skin number %d:\n", i);
+      printf("download skins: Skin number %d:\n", i);
       printf("  Name: %s\n", slxs[i]->name);
       printf("  Author Name: %s\n", slxs[i]->author.name);
       printf("  Author email: %s\n", slxs[i]->author.email);
@@ -1080,6 +1070,7 @@ void download_skin(char *url) {
     
     i = 0;
     while(slxs[i]) {
+
       if(i == 0)
 	skdloader->entries = (char **) xine_xmalloc(sizeof(char *) * 2);
       else
@@ -1087,13 +1078,12 @@ void download_skin(char *url) {
       
       skdloader->entries[i] = strdup(slxs[i]->name);
       i++;
+      skdloader->entries[i] = NULL;
     }
-
-    skdloader->entries[i] = NULL;
+    
     skdloader->num = i;
 
-    skdloader->preview_image = xitk_image_create_image(gGui->imlib_data, 
-						       WINDOW_WIDTH - 20, 180);
+    skdloader->preview_image = xitk_image_create_image(gGui->imlib_data, WINDOW_WIDTH - 20, 180);
     
     y = WINDOW_HEIGHT - (5 * 20) - (23 + 15 + 15 + 12);
 
@@ -1125,7 +1115,6 @@ void download_skin(char *url) {
     xitk_image_destroy_xitk_pixmap(bg);
 
     y = WINDOW_HEIGHT - (23 + 15);
-
     x = 15;
 
     lb.button_type       = CLICK_BUTTON;
@@ -1180,5 +1169,5 @@ void download_skin(char *url) {
   }
   else
     xitk_window_dialog_destroy(xwin);
-
+  
 }

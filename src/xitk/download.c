@@ -58,11 +58,11 @@ static int progress_callback(void *userdata,
 static int store_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
   download_t  *download = (download_t *) userdata;
   int         rsize = size * nmemb;
-  
+
   if(download->size == 0)
-    download->buf = (char *) malloc(rsize);
+    download->buf = (char *) malloc(sizeof(char) * (rsize + 1));
   else
-    download->buf = (char *) realloc(download->buf, download->size + rsize + 1);
+    download->buf = (char *) realloc(download->buf, sizeof(char) * (download->size + rsize + 1));
   
   if(download->buf) {
     memcpy(&(download->buf[download->size]), ptr, rsize);
@@ -71,7 +71,7 @@ static int store_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
   }
   else
     download->status = 1; /* error */
-  
+
   return rsize;
 }
 #endif
@@ -81,6 +81,8 @@ int network_download(const char *url, download_t *download) {
   CURL        *curl;
   CURLcode     res;
   
+  pthread_mutex_lock(&gGui->download_mutex);
+
   curl_global_init(CURL_GLOBAL_DEFAULT);
   
   if((curl = curl_easy_init()) != NULL) {
@@ -127,6 +129,8 @@ int network_download(const char *url, download_t *download) {
   
   curl_global_cleanup();
   
+  pthread_mutex_unlock(&gGui->download_mutex);
+
   return (download->status == 0);
 #else
   return 0;

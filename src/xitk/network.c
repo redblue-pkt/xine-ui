@@ -75,7 +75,6 @@
 #define _BUFSIZ              20480
 
 #define COMMANDS_PREFIX      "/\377\200COMMANDS"
-extern int errno;
 
 #ifdef NETWORK_CLIENT
 

@@ -860,7 +860,7 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
       xitk_set_dnd_callback(fx->xdnd, dnd_cb);
   }
   else
-  fx->xdnd = NULL;
+    fx->xdnd = NULL;
 
   fx->key = ++gXitk->key;
 
@@ -909,8 +909,8 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 	free(fx->xdnd);
       }
 
-      free(fx);
       xitk_list_delete_current(gXitk->gfx); 
+      free(fx);
       
       MUTUNLOCK();
       return;

@@ -281,7 +281,7 @@ typedef struct {
 
   int                        play_anyway;
 
-  pthread_mutex_t            modal_mutex;
+  pthread_mutex_t            download_mutex;
 
 } gGui_t;
 

@@ -48,8 +48,6 @@
 extern int no_lirc;
 #endif
 
-extern int errno;
-
 /*
  * global variables
  */
