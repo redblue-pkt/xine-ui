@@ -259,6 +259,9 @@ Désentrelacement de la vidèo.
 Défini le ratio d'aspect le la sortie vidéo. Les modes sont:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
 .TP
+.B \-Z
+Ne démarre pas automatiquement la lecture. N'affecte que le démarrage automatique de la lecture quand le mode smart est utilisé.
+.TP
 .B MRL (media resource locator)
 .br
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles

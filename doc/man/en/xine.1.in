@@ -263,6 +263,9 @@ Deinterlace video output.
 Set aspect ratio of video output. Modes are:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
 .TP
+.B \-Z
+Don't automatically start playback, affect only auto-start when smart mode is used.
+.TP
 .B MRL (media resource locator)
 .br
 MRLs are similar to URLs in your web browser. They describe the media
