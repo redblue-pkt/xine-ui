@@ -10,13 +10,13 @@
 
 * WHAT IS THIS PLUGIN ABOUT and WHY SHOULD I EVEN CONSIDER TO USE IT? :)
   
-  This XINE video output plugin uses the so called  SyncFB  driver (from
+  This xine video output plugin uses the so called  SyncFB  driver (from
   the Teletux project)  which  provides  special  hardware  features  of
   Matrox G200 and newer cards like hardware  deinterlacing, scaling  and
   synchronization of your video output to the vertical retrace  of  your
   monitor - just to name a few. The  plugin  makes  all  those  features
-  available to XINE and because all this tasks are done by the  graphics
-  card there  is  no need for XINE to do them in software -- so you save
+  available to xine and because all this tasks are done by the  graphics
+  card there  is  no need for xine to do them in software -- so you save
   precious CPU time which you may gonna need for other things. :-)
   
   Ok ok -- why should you want to have your video output synchronized to
@@ -32,10 +32,10 @@
   forever.
 
   Last but not least, you may ask what's so special about deinterlacing?
-  There are already several deinterlacing methods  available in XINE and
+  There are already several deinterlacing methods  available in xine and
   why should you care about another one? Well (again)... ;-))
   
-  All current deinterlacers in XINE are done in software  and  therefore
+  All current deinterlacers in xine are done in software  and  therefore
   will cost you some CPU power. The SyncFB video out plugin will use the
   hardware deinterlacing support of your graphics card, thus saving your
   CPU power because everything is done by your graphic processor...
@@ -87,9 +87,9 @@
   it is necessary to load the module like this  every  time  you  reboot
   your system to use this plugin.
 
-  Now just start XINE once with the following parameter: "-V SyncFB" and
+  Now just start xine once with the following parameter: "-V SyncFB" and
   the SyncFB video out plugin will be used as default plugin.    (please
-  remember to load the SyncFB module before starting XINE, otherwise  it
+  remember to load the SyncFB module before starting xine, otherwise  it
   will fall back to the Xv video out plugin as default)
 
 
@@ -138,9 +138,9 @@
     
     none yet - might be added in the future
 
-  So before you run  XINE  just turn to the appropriate refresh rate and
+  So before you run  xine  just turn to the appropriate refresh rate and
   the jerking *should* be gone. (you may also want to have a look at the
-  XF86VidMode support included in XINE which makes on-the-fly resolution
+  XF86VidMode support included in xine which makes on-the-fly resolution
   switching possible when fullscreen is toggled)
 
 
@@ -155,7 +155,7 @@
   of 1280x1024 in a resolution of 1024x768 - and the plugin can't handle
   that - and probably never will.
 
-  You may want to have a look at the XF86VidMode support in  XINE  which
+  You may want to have a look at the XF86VidMode support in  xine  which
   will enable on-the-fly resolution switching when activating fullscreen.
 
   Now back to the question. A screensize of 1024x768 should be it. A DVD
@@ -171,7 +171,7 @@
   any artefacts caused by interlacing anymore. :-)
   
   One more note, hardware deinterlacing uses BOB as deinterlacing method
-  and is totally independent from the software deinterlacing in XINE. So
+  and is totally independent from the software deinterlacing in xine. So
   specifing a different deinterlacing method in your .xinerc won't  have
   any effect on this feature.
 
@@ -195,31 +195,34 @@
 
   
 * KNOWN BUGs
-  
+
+  + the default_repeat config option is currently hardcoded to 0 because
+    any higher value than 1 will trigger a bug with the SyncFB kernel module
+    that results in a distorted picture (depending on video resolution)
+    [this bug is hard to trace, so don't hold your breath for now]
+
   + SyncFB overlay won't turn off when video window is minimized or
     somehow else hidden.
-    
-    (currently there is no way for the SyncFB plugin to know about the
+    [currently there is no way for the SyncFB plugin to know about the
      state of the video window except if the original xine-ui hide function
-     is used to hide the video window... this will be fixed soon)
-     
-  + zooming in/out of a video exposes  a  bug  with  the  SyncFB  kernel
-    module and should currently be considered broken.
-    (for now, don't expect this to be fixed soon - sorry)
-  
-  + zooming in/out won't show any effect until the video window is moved
-    (zooming feature is broken anyway, so why bother *grin*)
+     is used to hide the video window... this will be fixed soon]
+
+  + zooming feature is currently deactivated because it exposes a bug
+    with the SyncFB kernel module
+    [for now, don't expect this to be fixed soon - sorry]
+
 
 * WHAT IS ON THE TODO LIST?
 
-  + RGB support (maybe)
+  + fix above listed bugs in the SyncFB kernel module
+  
+  + rework this README - at least parts of it
+  
+  + RGB support
+    (unlikely at the moment because there is no need for it)
   
   + check if the video source is not too big in terms of  dimensions for
     the video memory left (video memory - X reserved video memory)
-
-  + patching the syncfb kernel module itself for devfs and the  recently
-    introduced license tag support (as well as bug fixing and updating)
-    [status: progressing - check CVS of the Teletux project]
     
   + bug fixes
   + more sanity checks
@@ -231,7 +234,7 @@
 
   Your first starting point should be this README followed by the FAQ. :-)
   If you don't find your answers there or if you found a bug, please leave
-  a message on the XINE User Mailinglist (see the general README).
+  a message on the xine user mailinglist (see the general README).
 
   You can also reach the maintainers directly by mail (or you may consider
   sending a message in bottle so we have some more time  to  find  a  good
