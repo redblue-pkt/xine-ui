@@ -142,14 +142,14 @@ case "$host" in
   *-*-freebsd*|*-*-openbsd*)
     THREAD_LIBS="-L/usr/local/lib -pthread"
     THREAD_CFLAGS="-I/usr/local/include -D_THREAD_SAFE"
-    CFLAGS="$CFLAGS -L/usr/local/lib $THREAD_CFLAGS"
-    CPPFLAGS="$CPPFLAGS -I/usr/local/include -L/usr/local/lib"
+    CFLAGS="-L/usr/local/lib $THREAD_CFLAGS $CFLAGS"
+    CPPFLAGS="-I/usr/local/include -L/usr/local/lib $CPPFLAGS"
     ;;
 
   *-*-hpux11*)
     THREAD_LIBS=" -pthread"
     THREAD_CFLAGS="-D_REENTRANT"
-    CFLAGS="$CFLAGS $THREAD_CFLAGS"
+    CFLAGS="$THREAD_CFLAGS $CFLAGS"
     ;;
 
   *)
@@ -622,8 +622,8 @@ fi
 
 case "$host_or_hostalias" in
   i386-*-freebsd*)
-    CFLAGS="$CFLAGS -pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions -D_REENTRANT"
-    DEBUG_CFLAGS="$X_CFLAGS $DEBUG_CFLAGS -D_REENTRANT -DDEBUG"
+    CFLAGS="-pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions -D_REENTRANT $CFLAGS"
+    DEBUG_CFLAGS="$X_CFLAGS -D_REENTRANT -DDEBUG $DEBUG_CFLAGS"
     AC_DEFINE(__i386__,1,[Define this if you're running x86 architecture])
     AC_DEFINE([ARCH_X86],,[Define this if you're running x86 architectur])
     ;;
@@ -643,8 +643,8 @@ case "$host_or_hostalias" in
         AC_TRY_CFLAGS("$sarchopt=athlon", k7cpu="athlon", k7cpu="i686")
 
 	dnl add x86 specific CFLAGS
-	CFLAGS="$CFLAGS -O3 -pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions"
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+	CFLAGS="-O3 -pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions $CFLAGS"
+	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
 	
 	dnl enable x86 specific parts of the code
 
@@ -680,16 +680,16 @@ case "$host_or_hostalias" in
 	    esac
 
 	    if test x"$archopt_val" != x; then
-		CFLAGS="$CFLAGS $sarchopt=$archopt_val"
-		DEBUG_CFLAGS="$DEBUG_CFLAGS $sarchopt=$archopt_val"
+		CFLAGS="$sarchopt=$archopt_val $CFLAGS"
+		DEBUG_CFLAGS="$sarchopt=$archopt_val $DEBUG_CFLAGS"
 	    fi
 	]
 	fi
 
     else
 	dnl add x86 specific cc CFLAGS
-	CFLAGS="$CFLAGS -O"
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+	CFLAGS="-O $CFLAGS"
+	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     fi
 
     AC_DEFINE(__i386__,1,[Define this if you're running x86 architecture])
@@ -698,57 +698,57 @@ case "$host_or_hostalias" in
 
   alphaev56-*)
     AC_DEFINE(__alpha__,1,[Define this if you're running Alpha architecture])
-    CFLAGS="$CFLAGS -O3 -mcpu=ev56 -mieee"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O -mcpu=ev56 -mieee"
+    CFLAGS="-O3 -mcpu=ev56 -mieee $CFLAGS"
+    DEBUG_CFLAGS="-O -mcpu=ev56 -mieee $DEBUG_CFLAGS"
     ;;
 
   alpha*)
     AC_DEFINE(__alpha__,1,[Define this if you're running Alpha architecture])
-    CFLAGS="$CFLAGS -O3 -mieee"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O -mieee"
+    CFLAGS="-O3 -mieee $CFLAGS"
+    DEBUG_CFLAGS="-O -mieee $DEBUG_CFLAGS"
     ;;
 
   ppc-*-linux-* | powerpc-*) 
     AC_DEFINE(__ppc__,1,[Define this if you're running PowerPC architecture])
-    CFLAGS="$CFLAGS -O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    CFLAGS="-O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions $CFLAGS"
+    DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
   sparc64-*-linux-* | sparc-*)
     AC_DEFINE(__sparc,1,[Define this if you're running Sparc architecture])
 
     if test "$GCC" = yes; then
-	CFLAGS="$CFLAGS -O3"
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+	CFLAGS="-O3 $CFLAGS"
+	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     else
-	CFLAGS="$CFLAGS -O"
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+	CFLAGS="-O $CFLAGS"
+	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     fi
     ;;
 
   mips-*)
-    CFLAGS="$CFLAGS -O3"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    CFLAGS="-O3 $CFLAGS"
+    DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
   m68k-*)
-    CFLAGS="$CFLAGS -O2"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    CFLAGS="-O2 $CFLAGS"
+    DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
   ia64-*)
-    CFLAGS="$CFLAGS -O3"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    CFLAGS="-O3 $CFLAGS"
+    DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
   hppa*-hp-*)
-    CFLAGS="$CFLAGS -O2"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    CFLAGS="-O2 $CFLAGS"
+    DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
   s390-*)
-    CFLAGS="$CFLAGS -O3"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    CFLAGS="-O3 $CFLAGS"
+    DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
   *)
@@ -767,13 +767,13 @@ case "$host_or_hostalias" in
     echo "(sleeping one minute so you can read this...)"
     sleep 60
 
-    CFLAGS="$CFLAGS -O3"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+    CFLAGS="-O3 $CFLAGS"
+    DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 esac
 
-CFLAGS="$CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
-DEBUG_CFLAGS="$DEBUG_CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"
+CFLAGS="$COMMON_CFLAGS $CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
+DEBUG_CFLAGS="$COMMON_CFLAGS $DEBUG_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"
 AC_SUBST(CFLAGS)
 AC_SUBST(DEBUG_CFLAGS)
 
