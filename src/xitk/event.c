@@ -1188,7 +1188,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   /*
    * init playlist
    */
-  gGui->playlist.cur = -1;
   for (i = 0; i < nfiles; i++) {
     char *file = atoa(filenames[i]);
 
@@ -1220,6 +1219,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
       }
     }
   }
+
+  gGui->playlist.cur = gGui->playlist.num ? 0 : -1;
   
   if((gGui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) || 
      (gGui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS))
