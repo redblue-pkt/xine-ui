@@ -575,8 +575,7 @@ int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int nbytes) {
  *
  */
 int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c) {
-  
-  return (xitk_font_get_text_width(xtfs, c, strlen(c)));
+  return ((c && strlen(c)) ? (xitk_font_get_text_width(xtfs, c, strlen(c))) : 0);
 }
 
 /*
@@ -708,9 +707,9 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
     mbstate_t state;
     size_t    i = 0, n;
     int       height = 0, width = 0;
-
+    
     memset(&state, '\0', sizeof(mbstate_t));
-
+    
     while (i < nbytes) {
       n = mbrtowc(NULL, c, nbytes - i, &state);
       if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;

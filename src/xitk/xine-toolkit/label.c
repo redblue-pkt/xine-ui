@@ -178,7 +178,8 @@ static void paint_label(xitk_widget_t *w) {
 
       fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
       xitk_font_set_font(fs, private_data->font->image->gc);
-      xitk_font_string_extent(fs, private_data->label, &lbear, &rbear, &wid, &asc, &des);
+      xitk_font_string_extent(fs, (private_data->label && strlen(private_data->label)) ? private_data->label : "Label",
+			      &lbear, &rbear, &wid, &asc, &des);
 
       bg = xitk_image_create_image(private_data->imlibdata, w->width, w->height);
 

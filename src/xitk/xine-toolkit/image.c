@@ -1144,8 +1144,8 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
     fwidth = xitk_font_get_string_length(fs, title);
 
     if(fwidth >= (w - 12)) {
-      int nchar = 0;
-
+      int nchar = 1;
+      
       memset(&buf, 0, sizeof(buf));
       /* Limit the title to width of frame */
       do {

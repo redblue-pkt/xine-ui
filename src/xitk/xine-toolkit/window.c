@@ -337,7 +337,7 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
 
   fs = xitk_font_load_font(im->x.disp, DEFAULT_BOLD_FONT_12);
   xitk_font_set_font(fs, bar->gc);
-  xitk_font_string_extent(fs, title, &lbear, &rbear, &wid, &asc, &des);
+  xitk_font_string_extent(fs, (title && strlen(title)) ? title : "Window", &lbear, &rbear, &wid, &asc, &des);
 
   XLOCK(im->x.disp);
   XCopyArea(im->x.disp, xwin->background->pixmap, pix_bg->pixmap, xwin->background->gc,

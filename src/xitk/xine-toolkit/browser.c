@@ -362,7 +362,10 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 	  
 	  fs = xitk_font_load_font(private_data->imlibdata->x.disp, label_font);
 	  xitk_font_set_font(fs, private_data->parent_wlist->gc);
-	  label_width = xitk_font_get_string_length(fs, private_data->content[private_data->current_start + i]);
+	  
+	  label_width = (private_data->content[private_data->current_start + i] && 
+			 strlen(private_data->content[private_data->current_start + i])) ? 
+	    xitk_font_get_string_length(fs, private_data->content[private_data->current_start + i]) : 0;
 	  xitk_font_unload_font(fs);
 	  
 	  if(label_width > (item_width - 2)) {

@@ -121,7 +121,7 @@ static void create_labelofbutton(xitk_widget_t *lb,
     XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
   
   xitk_font_set_font(fs, gc);
-  xitk_font_string_extent(fs, label, &lbear, &rbear, &width, &asc, &des);
+  xitk_font_string_extent(fs, (label && strlen(label)) ? label : "Button", &lbear, &rbear, &width, &asc, &des);
 
   if((state == CLICK) && (private_data->label_static == 0)) {
     xoff = -4;

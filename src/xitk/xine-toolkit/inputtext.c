@@ -237,7 +237,7 @@ static void create_labelofinputtext(xitk_widget_t *w,
 
   /* Try to load font */
 
-  if(label) {
+  if(label && strlen(label)) {
     if(private_data->fontname)
       fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
     
@@ -297,7 +297,7 @@ static void create_labelofinputtext(xitk_widget_t *w,
   XSetForeground(private_data->imlibdata->x.disp, gc, fg);
   XUNLOCK(private_data->imlibdata->x.disp);
   
-  if(label) {
+  if(label && strlen(label)) {
     if(private_data->cursor_pos >= 0) {
       
       if(private_data->disp_offset)
@@ -332,7 +332,7 @@ static void create_labelofinputtext(xitk_widget_t *w,
   
   /*  Put text in the right place */
   if(private_data->skin_element_name) {
-    if(label) {
+    if(label && strlen(label)) {
       XLOCK(private_data->imlibdata->x.disp);
       xitk_font_draw_string(fs, pix, gc, 
 			    2, ((ysize+asc+des+yoff)>>1)-des, 
@@ -357,7 +357,7 @@ static void create_labelofinputtext(xitk_widget_t *w,
     XLOCK(private_data->imlibdata->x.disp);
     XCopyArea (private_data->imlibdata->x.disp, pix, tpix->pixmap, lgc, 0, 0, xsize, ysize, 0, 0);
     
-    if(label)
+    if(label && strlen(label))
       xitk_font_draw_string(fs, tpix->pixmap, lgc, 3 , ((ysize+asc+des+yoff)>>1)-des, plabel, strlen(plabel));
     
     XCopyArea (private_data->imlibdata->x.disp, tpix->pixmap, pix, lgc, 0, 0, xsize - 1, ysize, 0, 0);
@@ -370,11 +370,16 @@ static void create_labelofinputtext(xitk_widget_t *w,
     XUNLOCK(private_data->imlibdata->x.disp);
   }
 
-  width = label ? xitk_font_get_text_width(fs, plabel, (private_data->cursor_pos - private_data->disp_offset)) : 0;
-  
+  printf("private_data->cursor_pos: %d\n", private_data->cursor_pos);
+  printf("private_data->disp_offstet: %d\n", private_data->disp_offset);
+  printf("(private_data->cursor_pos - private_data->disp_offset): %d\n", (private_data->cursor_pos - private_data->disp_offset));
+
   /* Draw cursor pointer */
   if(private_data->cursor_pos >= 0) {
     
+    width = (label && strlen(label)) ? 
+      xitk_font_get_text_width(fs, plabel, (private_data->cursor_pos - private_data->disp_offset)) : 0;
+  
     XLOCK(private_data->imlibdata->x.disp);
     XDrawLine(private_data->imlibdata->x.disp, pix, gc,
 	      width + 1, 2, width + 3, 2);
@@ -387,7 +392,7 @@ static void create_labelofinputtext(xitk_widget_t *w,
     XUNLOCK(private_data->imlibdata->x.disp);
   }
   
-  if(label)  
+  if(label && strlen(label))  
     xitk_font_unload_font(fs);
   
   if(color)
