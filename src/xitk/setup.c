@@ -1112,18 +1112,31 @@ void setup_panel(void) {
   setup_sections();
   setup_paint_widgets();
 
-  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
-
-  lbl.window              = xitk_window_get_window(setup->xwin);
-  lbl.gc                  = (XITK_WIDGET_LIST_GC(setup->widget_list));
-  lbl.skin_element_name   = NULL;
-  lbl.label               = _("(*)  you need to restart xine for this setting to take effect");
-  lbl.callback            = NULL;
-  lbl.userdata            = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)),
-   (w = xitk_noskin_label_create(setup->widget_list, &lbl,
-				 50, WINDOW_HEIGHT - 65, WINDOW_WIDTH - 100, 15, fontname)));
-  xitk_enable_and_show_widget(w);
+  {
+    char         *label = _("(*)  you need to restart xine for this setting to take effect");
+    xitk_font_t  *fs;
+    int           len;
+    
+    fs = xitk_font_load_font(gGui->display, fontname);
+    xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(setup->widget_list)));
+    len = xitk_font_get_string_length(fs, (const char *) label);
+    xitk_font_unload_font(fs);
+    
+    XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
+    
+    lbl.window              = xitk_window_get_window(setup->xwin);
+    lbl.gc                  = (XITK_WIDGET_LIST_GC(setup->widget_list));
+    lbl.skin_element_name   = NULL;
+    lbl.label               = label;
+    lbl.callback            = NULL;
+    lbl.userdata            = NULL;
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)),
+			     (w = xitk_noskin_label_create(setup->widget_list, &lbl,
+							   (WINDOW_WIDTH - len) >> 1,
+							   (WINDOW_HEIGHT - (57 + 20)) + 1 +4,
+							   len + 1, 15, fontname)));
+    xitk_enable_and_show_widget(w);
+  }
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
