@@ -3042,7 +3042,10 @@ void start_remote_server(void) {
 }
 
 const char *get_homedir(void) {
-  struct passwd pwd, *pw = NULL;
+#ifdef HAVE_GETPWUID_R
+  struct passwd pwd;
+#endif
+  struct passwd *pw = NULL;
   static char homedir[BUFSIZ] = {0,};
 
   if(homedir[0])
