@@ -1628,7 +1628,7 @@ void video_window_update_logo(void) {
 	}
 	if((!xine_open(gGui->stream, gGui->logo_mrl)) 
 	   || (!xine_play(gGui->stream, 0, 0))) {
-	  gui_handle_xine_error(gGui->stream, gGui->logo_mrl);
+	  gui_handle_xine_error(gGui->stream, (char *)gGui->logo_mrl);
 	  goto __done;
 	}
 	gGui->logo_mode = 1;
