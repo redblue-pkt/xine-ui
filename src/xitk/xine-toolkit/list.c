@@ -57,10 +57,8 @@ void xitk_list_free(xitk_list_t *l) {
     return;
   }
  
-  if(!l->first) {
-    XITK_WARNING("No node.\n");
+  if(!l->first)
     return;
-  }
 
   node = l->first;
   
@@ -126,7 +124,6 @@ void *xitk_list_last_content (xitk_list_t *l) {
     return l->last->content;
   } 
   else {
-    XITK_WARNING("Wanted last of empty list\n");
     return NULL;
   }    
 }
