@@ -305,15 +305,8 @@ void event_sender_exit(xitk_widget_t *w, void *data) {
 
   xitk_unregister_event_handler(&eventer->widget_key);
 
-  XLockDisplay(gGui->display);
-  XUnmapWindow(gGui->display, xitk_window_get_window(eventer->xwin));
-  XUnlockDisplay(gGui->display);
-
   xitk_destroy_widgets(eventer->widget_list);
-
-  XLockDisplay(gGui->display);
-  XDestroyWindow(gGui->display, xitk_window_get_window(eventer->xwin));
-  XUnlockDisplay(gGui->display);
+  xitk_window_destroy_window(gGui->imlib_data, eventer->xwin);
 
   eventer->xwin = None;
   xitk_list_free(eventer->widget_list->l);

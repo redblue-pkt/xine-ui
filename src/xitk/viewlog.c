@@ -88,15 +88,8 @@ void viewlog_exit(xitk_widget_t *w, void *data) {
 
   xitk_unregister_event_handler(&viewlog->kreg);
 
-  XLockDisplay(gGui->display);
-  XUnmapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
-  XUnlockDisplay(gGui->display);
-
   xitk_destroy_widgets(viewlog->widget_list);
-
-  XLockDisplay(gGui->display);
-  XDestroyWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
-  XUnlockDisplay(gGui->display);
+  xitk_window_destroy_window(gGui->imlib_data, viewlog->xwin);
 
   viewlog->xwin = None;
   xitk_list_free(viewlog->widget_list->l);

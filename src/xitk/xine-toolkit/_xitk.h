@@ -582,13 +582,36 @@ typedef struct {
   xitk_register_key_t      *parent_wkey;
 } xitk_combo_widget_t;
 
+typedef struct xitk_dialog_s xitk_dialog_t;
 
 typedef struct {
   Window                    window;
   xitk_pixmap_t            *background;
   int                       width;
   int                       height;
+  xitk_dialog_t            *parent;
 } xitk_window_t;
+
+struct xitk_dialog_s {
+  ImlibData              *imlibdata;
+  xitk_window_t          *xwin;
+  xitk_register_key_t     key;
+  xitk_widget_list_t     *widget_list;
+
+  int                     type;
+
+  xitk_widget_t          *wyes;
+  xitk_widget_t          *wno;
+  xitk_widget_t          *wcancel;
+
+  xitk_widget_t          *default_button;
+
+  xitk_state_callback_t  yescallback;
+  xitk_state_callback_t  nocallback;
+  xitk_state_callback_t  cancelcallback;
+
+  void                   *userdata;
+};
 
 typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
 struct xitk_pixmap_s {

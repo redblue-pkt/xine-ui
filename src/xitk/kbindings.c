@@ -379,6 +379,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ScanPlaylistInfo",       ACTID_SCANPLAYLIST            , "s",        KEYMOD_CONTROL , 0 },
   { "Add a mediamark from current playback.",
     "AddMediamark",           ACTID_ADDMEDIAMARK            , "a",        KEYMOD_CONTROL , 0 },
+  { "Download a skin from the skin server.",
+    "SkinDownload",           ACTID_SKINDOWNLOAD            , "d",        KEYMOD_CONTROL , 0 },
   { 0,
     0,                        0,                            0,            0              , 0 }
 };
@@ -1399,15 +1401,8 @@ void kbedit_exit(xitk_widget_t *w, void *data) {
   
   xitk_unregister_event_handler(&kbedit->kreg);
 
-  XLockDisplay(gGui->display);
-  XUnmapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
-  XUnlockDisplay(gGui->display);
-  
   xitk_destroy_widgets(kbedit->widget_list);
-
-  XLockDisplay(gGui->display);
-  XDestroyWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
-  XUnlockDisplay(gGui->display);
+  xitk_window_destroy_window(gGui->imlib_data, kbedit->xwin);
   
   kbedit->xwin = None;
   xitk_list_free(kbedit->widget_list->l);
@@ -1695,9 +1690,9 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   
   xitk_labelbutton_change_label(kbedit->widget_list, kbedit->grab, olbl);
 
+  xitk_window_destroy_window(gGui->imlib_data, xwin);
+  
   XLockDisplay(gGui->display);
-  XUnmapWindow(gGui->display, xitk_window_get_window(xwin));
-  XDestroyWindow(gGui->display, xitk_window_get_window(xwin));
   XSync(gGui->display, False);
   XUnlockDisplay(gGui->display);
 

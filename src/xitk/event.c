@@ -121,6 +121,13 @@ static void snapshot_loc_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->snapshot_location = cfg->str_value;
 }
 
+/*
+ * Callback for skin server
+ */
+static void skin_server_url_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->skin_server_url = cfg->str_value;
+}
+
 int actions_on_start(action_id_t actions[], action_id_t a) {
   int i = 0, num = 0;
   while(actions[i] != ACTID_NOKEY) {
@@ -600,6 +607,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_add_mediamark();
     break;
 
+  case ACTID_SKINDOWNLOAD:
+    download_skin(gGui->skin_server_url);
+    break;
+
   default:
     break;
   }
@@ -827,6 +838,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute) {
   int    i;
   char  *display_name = ":0.0";
+  char  *server;
 
   /*
    * init playlist
@@ -960,6 +972,19 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_LEVEL_EXP,
 			      stream_info_auto_update_cb,
 			      CONFIG_NO_DATA);
+  
+
+  server = 
+    (char *)xine_config_register_string (gGui->xine, "gui.skin_server_url", 
+					 SKIN_SERVER_URL,
+					 _("Skin Server Url"),
+					 _("From we can get skins."),
+					 CONFIG_LEVEL_EXP,
+					 skin_server_url_cb,
+					 CONFIG_NO_DATA);
+  
+  config_update_string("gui.skin_server_url", 
+		       gGui->skin_server_url ? gGui->skin_server_url : server);
   
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;

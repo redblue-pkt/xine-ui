@@ -109,6 +109,9 @@
                                   }            \
                                 } while(0)
 
+/* Our default location for skin downloads */
+#define SKIN_SERVER_URL         "http://xine.sourceforge.net/skins/skins.slx"
+
 typedef struct {
   xine_video_port_t        *vo_port;
   xine_audio_port_t        *ao_port;
@@ -163,6 +166,8 @@ typedef struct {
   int		            install_colormap;
 
   xitk_skin_config_t       *skin_config;
+  char                     *skin_server_url;
+
   xitk_dnd_t                xdnd;
 
   ImlibData                *imlib_data;

@@ -88,6 +88,7 @@ typedef struct {
 #define	OPTION_VISUAL		1000
 #define	OPTION_INSTALL_COLORMAP	1001
 #define DISPLAY_KEYMAP          1002
+#define OPTION_SK_SERVER        1003
 
 /* options args */
 static const char *short_options = "?hHgfvn"
@@ -128,6 +129,7 @@ static struct option long_options[] = {
   {"animation"      , required_argument, 0, 'N'                      },
   {"playlist"       , required_argument, 0, 'P'                      },
   {"loop"           , optional_argument, 0, 'l'                      },
+  {"skin-server-url", required_argument, 0, OPTION_SK_SERVER         },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -345,6 +347,7 @@ void show_usage (void) {
   printf(_("                                 'loop': loop entire playlist.\n"));
   printf(_("                                 'repeat': repeat current playlist entry.\n"));
   printf(_("                                 'shuffle': select randomly a yet unplayed entry from playlist\n"));
+  printf(_("      --skin-server-url <url>  Define the skin server url.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -721,6 +724,7 @@ int main(int argc, char *argv[]) {
   gGui->actions_on_start[aos]  = ACTID_NOKEY;
   gGui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
   gGui->playlist.on_start      = NULL;
+  gGui->skin_server_url        = NULL;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -922,6 +926,10 @@ int main(int argc, char *argv[]) {
       }
       else
 	gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
+      break;
+
+    case OPTION_SK_SERVER:
+      gGui->skin_server_url = strdup(optarg);
       break;
 
     case 'v': /* Display version and exit*/

@@ -26,6 +26,8 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
+int get_bool_value(const char *val);
+
 void start_remote_server(void);
 
 #endif

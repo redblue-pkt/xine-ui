@@ -1920,6 +1920,12 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
  */
 xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title, int x, int y, int width, int height);
 
+
+/**
+ *
+ */
+void xitk_window_dialog_destroy(xitk_window_t *w);
+
 /**
  *
  */
@@ -1996,6 +2002,9 @@ int xitk_is_window_size(Display *display, Window window, int width, int height);
 #define ALIGN_CENTER  2
 #define ALIGN_RIGHT   3
 #define ALIGN_DEFAULT (ALIGN_LEFT)
+
+xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *title,
+							 int window_width, int align, char *message, ...);
 
 /*
  *

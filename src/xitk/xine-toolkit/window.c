@@ -43,28 +43,7 @@
 #define DIALOG_TYPE_OK             1
 #define DIALOG_TYPE_YESNO          2
 #define DIALOG_TYPE_YESNOCANCEL    3
-
-typedef struct {
-  ImlibData              *imlibdata;
-  xitk_window_t          *xwin;
-  xitk_register_key_t     key;
-  xitk_widget_list_t     *widget_list;
-
-  int                     type;
-
-  xitk_widget_t          *wyes;
-  xitk_widget_t          *wno;
-  xitk_widget_t          *wcancel;
-
-  xitk_widget_t          *default_button;
-
-  xitk_state_callback_t  yescallback;
-  xitk_state_callback_t  nocallback;
-  xitk_state_callback_t  cancelcallback;
-
-  void                   *userdata;
-
-} xitk_dialog_t;
+#define DIALOG_TYPE_BUTTONLESS     4
 
 static void _xitk_window_destroy_window(xitk_widget_t *, void *);
 
@@ -245,6 +224,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   xwin->background = NULL;
   xwin->width      = width;
   xwin->height     = height;
+  xwin->parent     = NULL;
   
   XLOCK(im->x.disp);
 
@@ -445,10 +425,8 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
   
   xitk_window_change_background(im, xwin, pix_bg->pixmap, width, height);
   
-  XUNLOCK(im->x.disp);
   xitk_image_destroy_xitk_pixmap(bar);
   xitk_image_destroy_xitk_pixmap(pix_bg);
-  XUNLOCK(im->x.disp);
 
   return xwin;
 }
@@ -542,16 +520,18 @@ static void _window_handle_event(XEvent *event, void *data) {
   switch(event->type) {
 
   case Expose:
-    wd->widget_list->widget_focused = wd->default_button;
-    if (wd->widget_list->widget_focused->notify_focus 
-	&& wd->widget_list->widget_focused->enable == WIDGET_ENABLE) {
-      xitk_widget_t *w = wd->widget_list->widget_focused;
-
-      (void) (w->notify_focus) (wd->widget_list, w, FOCUS_RECEIVED);
-      w->have_focus = FOCUS_RECEIVED;
-
-      if(w->paint)
-	(w->paint) (w, wd->widget_list->win, wd->widget_list->gc);
+    if(wd->widget_list) {
+      wd->widget_list->widget_focused = wd->default_button;
+      if (wd->widget_list->widget_focused->notify_focus 
+	  && wd->widget_list->widget_focused->enable == WIDGET_ENABLE) {
+	xitk_widget_t *w = wd->widget_list->widget_focused;
+	
+	(void) (w->notify_focus) (wd->widget_list, w, FOCUS_RECEIVED);
+	w->have_focus = FOCUS_RECEIVED;
+	
+	if(w->paint)
+	  (w->paint) (w, wd->widget_list->win, wd->widget_list->gc);
+      }
     }
     break;
     
@@ -576,14 +556,19 @@ static void _window_handle_event(XEvent *event, void *data) {
     switch (mykey) {
 
     case XK_Return:
-      _xitk_window_destroy_window(wd->default_button, (void *)wd);
-      break;
-
-    case XK_Escape:
-      if((wd->type == DIALOG_TYPE_YESNO) || (wd->type == DIALOG_TYPE_YESNOCANCEL))
+      if(wd->default_button)
 	_xitk_window_destroy_window(wd->default_button, (void *)wd);
-      else
-	_xitk_window_destroy_window(NULL, (void *)wd);
+      break;
+      
+    case XK_Escape:
+      if((wd->type == DIALOG_TYPE_YESNO) || (wd->type == DIALOG_TYPE_YESNOCANCEL)) {
+	if(wd->default_button)
+	  _xitk_window_destroy_window(wd->default_button, (void *)wd);
+      }
+      else {
+	if(wd->type != DIALOG_TYPE_BUTTONLESS)
+	  _xitk_window_destroy_window(NULL, (void *)wd);
+      }
       break;
 
     }
@@ -607,6 +592,27 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
   XUNLOCK(im->x.disp);
 
   XITK_FREE(w);
+}
+
+void xitk_window_dialog_destroy(xitk_window_t *w) {
+  xitk_dialog_t *wd = w->parent;
+
+  if(wd) {
+    xitk_window_destroy_window(wd->imlibdata, wd->xwin);
+    xitk_unregister_event_handler(&wd->key);
+    
+    if(wd->widget_list) {
+      xitk_destroy_widgets(wd->widget_list);
+      XLOCK(wd->imlibdata->x.disp);
+      XFreeGC(wd->imlibdata->x.disp, wd->widget_list->gc);
+      XUNLOCK(wd->imlibdata->x.disp);
+      
+      xitk_list_free(wd->widget_list->l);
+      
+      XITK_FREE(wd->widget_list);
+    }
+    XITK_FREE(wd);
+  }  
 }
 
 /*
@@ -641,25 +647,129 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
     }
     break;
     
+  case DIALOG_TYPE_BUTTONLESS:
+    /* NOOP */
+    break;
+
   default:
     XITK_WARNING("window dialog type unknown: %d\n", wd->type);
     break;
 
   }
 
-  xitk_destroy_widgets(wd->widget_list);
-
-  XLOCK(wd->imlibdata->x.disp);
-  XFreeGC(wd->imlibdata->x.disp, wd->widget_list->gc);
-  XUNLOCK(wd->imlibdata->x.disp);
+  if(wd->widget_list) {
+    xitk_destroy_widgets(wd->widget_list);
+    
+    XLOCK(wd->imlibdata->x.disp);
+    XFreeGC(wd->imlibdata->x.disp, wd->widget_list->gc);
+    XUNLOCK(wd->imlibdata->x.disp);
+    
+    xitk_list_free(wd->widget_list->l);
+    
+    XITK_FREE(wd->widget_list);
+  }
   
-  xitk_list_free(wd->widget_list->l);
-
-  XITK_FREE(wd->widget_list);
   XITK_FREE(wd);
   
 }
 
+xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *title,
+							 int window_width, int align, char *message, ...) {
+  xitk_dialog_t              *wd;
+  int                         windoww = window_width, windowh;
+  xitk_image_t               *i;
+
+  if((im == NULL) || (window_width == 0) || (message == NULL))
+    return NULL;
+
+  wd = (xitk_dialog_t *) xitk_xmalloc(sizeof(xitk_dialog_t));
+
+  {
+    va_list   args;
+    char     *buf;
+    int       n, size = 100;
+    
+    if((buf = xitk_xmalloc(size)) == NULL) 
+      return NULL;
+    
+    while(1) {
+
+      va_start(args, message);
+      n = vsnprintf(buf, size, message, args);
+      va_end(args);
+      
+      if(n > -1 && n < size)
+	break;
+      
+      if(n > -1)
+	size = n + 1;
+      else
+	size *= 2;
+
+      if((buf = realloc(buf, size)) == NULL)
+	return NULL;
+    }
+    
+    i = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
+    XITK_FREE(buf);
+  }
+  
+  windowh = (i->height) + (TITLE_BAR_HEIGHT + 40);
+
+  wd->imlibdata = im;
+  wd->type = DIALOG_TYPE_BUTTONLESS;
+  wd->wyes = wd->wno = wd->wcancel = wd->default_button = NULL;
+  wd->widget_list = NULL;
+  wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : "Notice"),
+					      0, 0, windoww, windowh);
+  wd->xwin->parent = wd;
+  
+  xitk_window_center_window(im, wd->xwin);
+  
+  wd->widget_list = NULL;
+
+  /* Draw text area */
+  {
+    xitk_pixmap_t  *bg;
+    int             width, height;
+    GC              gc;
+    
+    xitk_window_get_window_size(wd->xwin, &width, &height);
+    bg = xitk_image_create_xitk_pixmap(im, width, height);
+    
+    XLOCK(im->x.disp);
+    gc = XCreateGC(im->x.disp, (xitk_window_get_background(wd->xwin)), None, None);
+    XCopyArea(im->x.disp, (xitk_window_get_background(wd->xwin)), bg->pixmap,
+	      gc, 0, 0, width, height, 0, 0);
+    XCopyArea(im->x.disp, i->image->pixmap, bg->pixmap,
+	      i->image->gc, 0, 0, i->width, i->height, 20, (TITLE_BAR_HEIGHT + 20));
+    XUNLOCK(im->x.disp);
+
+    xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
+
+    XLOCK(im->x.disp);
+    xitk_image_destroy_xitk_pixmap(bg);
+    XFreeGC(im->x.disp, gc);
+    XUNLOCK(im->x.disp);
+
+    xitk_image_free_image(im, &i);
+
+  }
+
+  XLOCK(im->x.disp);
+  XMapRaised(im->x.disp, (xitk_window_get_window(wd->xwin)));
+  XUNLOCK(im->x.disp);
+
+  wd->key = xitk_register_event_handler("xitk_nobtn", 
+					(xitk_window_get_window(wd->xwin)),
+					_window_handle_event,
+					NULL,
+					NULL,
+					NULL,
+					(void *)wd);
+  
+  return wd->xwin;
+}
 /*
  * Create a window error, containing an error message.
  */
@@ -714,7 +824,9 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   wd->yescallback = cb;
   wd->userdata = userdata;
   wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : "Notice"),
-					      0, 0, windoww, windowh);  
+					      0, 0, windoww, windowh);
+  wd->xwin->parent = wd;
+
   xitk_window_center_window(im, wd->xwin);
   
   wd->widget_list                = xitk_widget_list_new();
@@ -891,6 +1003,7 @@ xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *ti
   wd->userdata = userdata;
   wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : _("Question?")), 
 					      0, 0, windoww, windowh);  
+  wd->xwin->parent = wd;
   xitk_window_center_window(im, wd->xwin);
   
   wd->widget_list                = xitk_widget_list_new();
@@ -1092,6 +1205,8 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   wd->xwin           = xitk_window_create_dialog_window(im, ((title != NULL) 
 							     ? title : _("Question?")), 
 							0, 0, windoww, windowh);  
+  wd->xwin->parent = wd;
+
   xitk_window_center_window(im, wd->xwin);
   
   wd->widget_list                = xitk_widget_list_new();

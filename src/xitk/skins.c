@@ -27,8 +27,40 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <sys/stat.h>       
+#include <errno.h>
+
+extern int errno;
 
 #include "common.h"
+
+typedef struct {
+  char *name;
+  struct {
+    char *name;
+    char *email;
+  } author;
+  struct {
+    char *href;
+    int   version;
+    int   maintained;
+  } skin;
+} slx_entry_t;
+
+typedef struct {
+  xitk_window_t        *xwin;
+  
+  xitk_widget_t        *browser;
+
+  xitk_widget_list_t   *widget_list;
+  char                **entries;
+  int                   num;
+  
+  slx_entry_t         **slxs;
+
+  xitk_register_key_t   widget_key;
+} skin_downloader_t;
+
+static skin_downloader_t  *skdloader = NULL;
 
 /*
 #define SKIN_DEBUG 1
@@ -428,4 +460,440 @@ void init_skins_support(void) {
     gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++] = strdup(skin_anim);
   }
   
+}
+
+/*
+ * Remote skin loader
+ */
+
+static slx_entry_t **skins_get_slx_entries(char *url) {
+  int              result;
+  slx_entry_t    **slxs = NULL, slx;
+  xml_node_t      *xml_tree, *skin_entry, *skin_ref;
+  xml_property_t  *skin_prop;
+  download_t      *download;
+
+  download = (download_t *) xine_xmalloc(sizeof(download_t));
+  download->buf    = NULL;
+  download->error  = NULL;
+  download->size   = 0;
+  download->status = 0; 
+  
+  if((network_download(url, download))) {
+    int entries_slx = 0;
+    
+    xml_parser_init(download->buf, download->size, XML_PARSER_CASE_INSENSITIVE);
+    if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
+      goto __failure;
+    
+    if(!strcasecmp(xml_tree->name, "SLX")) {
+      
+      skin_prop = xml_tree->props;
+      
+      while((skin_prop) && (strcasecmp(skin_prop->name, "VERSION")))
+	skin_prop = skin_prop->next;
+      
+      if(skin_prop) {
+	int  version_major, version_minor = 0;
+	
+	if((((sscanf(skin_prop->value, "%d.%d", &version_major, &version_minor)) == 2) ||
+	    ((sscanf(skin_prop->value, "%d", &version_major)) == 1)) && 
+	   ((version_major >= 1) && (version_minor >= 0))) {
+	  
+	  skin_entry = xml_tree->child;
+	  while(skin_entry) {
+
+	    if(!strcasecmp(skin_entry->name, "ENTRY")) {
+	      skin_ref = skin_entry->child;
+
+	      while(skin_ref) {
+
+		if(!strcasecmp(skin_ref->name, "NAME")) {
+		  slx.name = strdup(skin_ref->data);
+		}
+		else if(!strcasecmp(skin_ref->name, "AUTHOR")) {
+		  for(skin_prop = skin_ref->props; skin_prop; skin_prop = skin_prop->next) {
+		    if(!strcasecmp(skin_prop->name, "NAME")) {
+		      slx.author.name = strdup(skin_prop->value);
+		    }
+		    else if(!strcasecmp(skin_prop->name, "EMAIL")) {
+		      slx.author.email = strdup(skin_prop->value);
+		    }
+		  }
+		}
+		else if(!strcasecmp(skin_ref->name, "REF")) {
+		  for(skin_prop = skin_ref->props; skin_prop; skin_prop = skin_prop->next) {
+		    if(!strcasecmp(skin_prop->name, "HREF")) {
+		      slx.skin.href = strdup(skin_prop->value);
+		    }
+		    else if(!strcasecmp(skin_prop->name, "VERSION")) {
+		      slx.skin.version = atoi(skin_prop->value);
+		    }
+		    else if(!strcasecmp(skin_prop->name, "MAINTAINED")) {
+		      slx.skin.maintained = get_bool_value(skin_prop->value);
+		    }
+		  }
+		}
+		
+		skin_ref = skin_ref->next;
+	      }
+	    }
+
+	    if(slx.name && slx.skin.href && 
+	       ((slx.skin.version >= SKIN_IFACE_VERSION) && slx.skin.maintained)) {
+
+#if 0
+	      printf("Skin number %d:\n", entries_slx);
+	      printf("  Name: %s\n", slx.name);
+	      printf("  Author Name: %s\n", slx.author.name);
+	      printf("  Author email: %s\n", slx.author.email);
+	      printf("  Href: %s\n", slx.skin.href);
+	      printf("  Version: %d\n", slx.skin.version);
+	      printf("  Maintained: %d\n", slx.skin.maintained);
+	      printf("--\n");
+#endif
+	      
+	      entries_slx++;
+
+	      if(entries_slx == 1)
+		slxs = (slx_entry_t **) xine_xmalloc(sizeof(slx_entry_t *) * 2);
+	      else
+		slxs = (slx_entry_t **) realloc(slxs, sizeof(slx_entry_t *) * (entries_slx + 1));
+	      
+	      slxs[(entries_slx - 1)] = (slx_entry_t *) xine_xmalloc(sizeof(slx_entry_t));
+	      slxs[(entries_slx - 1)]->name            = strdup(slx.name);
+	      slxs[(entries_slx - 1)]->author.name     = slx.author.name ? strdup(slx.author.name) : NULL;
+	      slxs[(entries_slx - 1)]->author.email    = slx.author.email ? strdup(slx.author.email) : NULL;
+	      slxs[(entries_slx - 1)]->skin.href       = strdup(slx.skin.href);
+	      slxs[(entries_slx - 1)]->skin.version    = slx.skin.version;
+	      slxs[(entries_slx - 1)]->skin.maintained = slx.skin.maintained;
+	      
+	    }
+	    
+	    SAFE_FREE(slx.name);
+	    SAFE_FREE(slx.author.name);
+	    SAFE_FREE(slx.author.email);
+	    SAFE_FREE(slx.skin.href);
+	    slx.skin.version = 0;
+	    slx.skin.maintained = 0;
+
+	    skin_entry = skin_entry->next;
+	  }
+	}
+      }
+    }
+    
+    xml_parser_free_tree(xml_tree);
+
+    if(entries_slx)
+      slxs[entries_slx] = NULL;
+
+  }
+  else
+    xine_error(_("Unable to retrieve skin list from %s: %s"), url, download->error);
+ 
+ __failure:
+  
+  if(download->buf)
+    free(download->buf);
+  if(download->error)
+    free(download->error);
+  free(download);
+  
+  return slxs;
+}
+
+static void download_skin_cancel(xitk_widget_t *w, void *data) {
+  int i;
+  
+  xitk_unregister_event_handler(&skdloader->widget_key);
+  
+  xitk_destroy_widgets(skdloader->widget_list);
+  xitk_window_destroy_window(gGui->imlib_data, skdloader->xwin);
+
+  skdloader->xwin = None;
+
+  xitk_list_free(skdloader->widget_list->l);
+  
+  XLockDisplay(gGui->display);
+  XFreeGC(gGui->display, skdloader->widget_list->gc);
+  XUnlockDisplay(gGui->display);
+  
+  free(skdloader->widget_list);
+  
+  for(i = 0; i < skdloader->num; i++) {
+    free(skdloader->entries[i]);
+    SAFE_FREE(skdloader->slxs[i]->name);
+    SAFE_FREE(skdloader->slxs[i]->author.name);
+    SAFE_FREE(skdloader->slxs[i]->author.email);
+    free(skdloader->slxs[i]->skin.href);
+    free(skdloader->slxs[i]);
+  }
+  
+  skdloader->num = 0;
+  free(skdloader->entries);
+  free(skdloader->slxs);
+
+  free(skdloader);
+  skdloader = NULL;
+}
+
+static void download_skin_select(xitk_widget_t *w, void *data) {
+  int          selected = (int)data;
+  download_t  *download;
+  
+  download = (download_t *) xine_xmalloc(sizeof(download_t));
+  download->buf    = NULL;
+  download->error  = NULL;
+  download->size   = 0;
+  download->status = 0; 
+
+  if((network_download(skdloader->slxs[selected]->skin.href, download))) {
+    char *filename;
+    
+    filename = strrchr(skdloader->slxs[selected]->skin.href, '/');
+    if(strlen(filename) >= 2) {
+      struct stat  st;
+      char         skindir[XITK_PATH_MAX];
+      
+      filename++;
+      
+      memset(&skindir, 0, sizeof(skindir));
+      sprintf(skindir, "%s/.xine/skins", xine_get_homedir());
+      
+      /*
+       * Make sure to have the directory
+       */
+      if(stat(skindir, &st) < 0)
+	(void) mkdir_safe(skindir);
+      
+      if(stat(skindir, &st) < 0) {
+	xine_error(_("Unable to create '%s' directory: %s."), skindir, strerror(errno));
+      }
+      else {
+	char   tmpskin[XITK_PATH_MAX];
+	FILE  *fd;
+	
+	memset(&tmpskin, 0, sizeof(tmpskin));
+	sprintf(tmpskin, "/tmp/%s", filename);
+
+	if((fd = fopen(tmpskin, "w+b")) != NULL) {
+	  char   buffer[2048];
+	  
+	  fwrite(download->buf, download->size, 1, fd);
+	  fflush(fd);
+	  fclose(fd);
+
+	  memset(&buffer, 0, sizeof(buffer));
+	  
+	  sprintf(buffer, "`which tar`||tar -C %s -xzf %s", skindir, tmpskin);
+	  xine_system(0, buffer);
+
+	  memset(&buffer, 0, sizeof(buffer));
+	  snprintf(buffer, ((strlen(filename) + 1) - 7), "%s", filename);
+
+	  skins_avail = (skins_locations_t **) realloc(skins_avail, 
+						       (skins_avail_num + 2) * sizeof(skins_locations_t*));
+	  skin_names = (char **) realloc(skin_names, (skins_avail_num + 2) * sizeof(char *));
+	  
+	  skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
+	  skins_avail[skins_avail_num]->pathname = strdup(skindir);
+	  skins_avail[skins_avail_num]->skin = strdup(buffer);
+	  skins_avail[skins_avail_num]->number = skins_avail_num;
+	  
+	  skin_names[skins_avail_num] = strdup(skins_avail[skins_avail_num]->skin);
+	  
+	  skins_avail_num++;
+	  
+	  skins_avail[skins_avail_num] = NULL;
+	  skin_names[skins_avail_num] = NULL;
+	  
+	  /* Re-register skin enum config, a new one has been added */
+	  (void) xine_config_register_enum (gGui->xine, "gui.skin", 
+					    (get_skin_offset(DEFAULT_SKIN)),
+					    skin_names,
+					    _("gui skin theme"), 
+					    CONFIG_NO_HELP, 
+					    CONFIG_LEVEL_EXP,
+					    skin_change_cb, 
+					    CONFIG_NO_DATA);
+
+	  xine_info(_("Skin %s correctly installed"), buffer);
+	  
+	  /* Okay, load this skin */
+	  select_new_skin(skins_avail_num - 1);
+	}
+	else
+	  xine_error(_("Unable to create '%s'."), tmpskin);
+	
+      }
+    }
+  }
+  else
+    xine_error(_("Unable to download '%s': %s\n"), 
+	       skdloader->slxs[selected]->skin.href, download->error);
+  
+  if(download->buf)
+    free(download->buf);
+  if(download->error)
+    free(download->error);
+  free(download);
+  
+  download_skin_cancel(w, NULL);
+}
+
+void download_skin(char *url) {
+  slx_entry_t         **slxs;
+  xitk_window_t        *xwin;
+  int                   x, y, w, h;
+
+  w = 300;
+  h = 50;
+  XLockDisplay(gGui->display);
+  x = (((DisplayWidth(gGui->display, gGui->screen))) >> 1) - (w >> 1);
+  y = (((DisplayHeight(gGui->display, gGui->screen))) >> 1) - (h >> 1);
+  XUnlockDisplay(gGui->display);
+  
+  xwin = xitk_window_dialog_button_free_with_width(gGui->imlib_data, _("Be Patient..."), 
+						   w, ALIGN_CENTER, 
+						   _("Retrieve skin list from %s"), url);
+  
+  while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(xwin)))
+    xine_usec_sleep(5000);
+  
+  XLockDisplay(gGui->display);
+  XSetTransientForHint (gGui->display, 
+  			xitk_window_get_window(xwin), gGui->video_window);
+  XUnlockDisplay(gGui->display);
+  layer_above_video(xitk_window_get_window(xwin));
+  
+#define WINDOW_WIDTH  400
+#define WINDOW_HEIGHT 195
+
+  if((slxs = skins_get_slx_entries(url)) != NULL) {
+    char                      *fontname    = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+    char                      *btnfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+    int                        i;
+    xitk_browser_widget_t      br;
+    xitk_labelbutton_widget_t  lb;
+    GC                         gc;
+    int                        x, y;
+
+    XITK_WIDGET_INIT(&br, gGui->imlib_data);
+    XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+    
+    xitk_window_dialog_destroy(xwin);
+
+#if 1    
+    for(i = 0; slxs[i]; i++) {
+      printf("Skin number %d:\n", i);
+      printf("  Name: %s\n", slxs[i]->name);
+      printf("  Author Name: %s\n", slxs[i]->author.name);
+      printf("  Author email: %s\n", slxs[i]->author.email);
+      printf("  Href: %s\n", slxs[i]->skin.href);
+      printf("  Version: %d\n", slxs[i]->skin.version);
+      printf("  Maintained: %d\n", slxs[i]->skin.maintained);
+      printf("--\n");
+    }
+#endif
+
+    skdloader = (skin_downloader_t *) xine_xmalloc(sizeof(skin_downloader_t));
+
+    XLockDisplay(gGui->display);
+    x = ((DisplayWidth(gGui->display, gGui->screen)) >> 1) - (WINDOW_WIDTH >> 1);
+    y = ((DisplayHeight(gGui->display, gGui->screen)) >> 1) - (WINDOW_HEIGHT >> 1);
+    XUnlockDisplay(gGui->display);
+    
+    skdloader->xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
+						       _("Choose a skin to download..."),
+						       x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
+    
+    XLockDisplay(gGui->display);
+    gc = XCreateGC(gGui->display, 
+		   (xitk_window_get_window(skdloader->xwin)), None, None);
+    XUnlockDisplay(gGui->display);
+
+    skdloader->widget_list                = xitk_widget_list_new();
+    skdloader->widget_list->l             = xitk_list_new();
+    skdloader->widget_list->win           = (xitk_window_get_window(skdloader->xwin));
+    skdloader->widget_list->gc            = gc;
+    
+    skdloader->slxs = slxs;
+    
+    i = 0;
+    while(slxs[i]) {
+      if(i == 0)
+	skdloader->entries = (char **) xine_xmalloc(sizeof(char *) * 2);
+      else
+	skdloader->entries = (char **) realloc(skdloader->entries, sizeof(char *) * (i + 2));
+      
+      skdloader->entries[i] = strdup(slxs[i]->name);
+      i++;
+    }
+
+    skdloader->entries[i] = NULL;
+    skdloader->num = i;
+
+    br.arrow_up.skin_element_name    = NULL;
+    br.slider.skin_element_name      = NULL;
+    br.arrow_dn.skin_element_name    = NULL;
+    br.browser.skin_element_name     = NULL;
+    br.browser.max_displayed_entries = 5;
+    br.browser.num_entries           = skdloader->num;
+    br.browser.entries               = (const char *const *)skdloader->entries;
+    br.callback                      = download_skin_select;
+    br.dbl_click_callback            = NULL;
+    br.parent_wlist                  = skdloader->widget_list;
+    br.userdata                      = NULL;
+    xitk_list_append_content(skdloader->widget_list->l, 
+			     (skdloader->browser = 
+			      xitk_noskin_browser_create(skdloader->widget_list, &br,
+							 skdloader->widget_list->gc, 10, 30, 
+							 WINDOW_WIDTH - (20 + 10) , 20, 12, fontname)));
+    
+    xitk_browser_update_list(skdloader->browser, 
+    			     (const char *const *)skdloader->entries, skdloader->num, 0);
+    
+    
+    x = WINDOW_WIDTH - 115;
+    y = WINDOW_HEIGHT - (23 + 15);
+    
+    lb.button_type       = CLICK_BUTTON;
+    lb.label             = _("Cancel");
+    lb.align             = LABEL_ALIGN_CENTER;
+    lb.callback          = download_skin_cancel; 
+    lb.state_callback    = NULL;
+    lb.userdata          = NULL;
+    lb.skin_element_name = NULL;
+    xitk_list_append_content(skdloader->widget_list->l, 
+			     xitk_noskin_labelbutton_create(skdloader->widget_list, 
+							    &lb, x, y, 100, 23,
+							    "Black", "Black", "White", btnfontname));
+
+    skdloader->widget_key = xitk_register_event_handler("skdloader", 
+							(xitk_window_get_window(skdloader->xwin)),
+							NULL,
+							NULL,
+							NULL,
+							skdloader->widget_list,
+							NULL);
+    
+    XLockDisplay(gGui->display);
+    XRaiseWindow(gGui->display, xitk_window_get_window(skdloader->xwin));
+    XMapWindow(gGui->display, xitk_window_get_window(skdloader->xwin));
+    XSetTransientForHint (gGui->display, 
+			  xitk_window_get_window(skdloader->xwin), gGui->video_window);
+    XUnlockDisplay(gGui->display);
+    layer_above_video(xitk_window_get_window(skdloader->xwin));
+
+    while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(skdloader->xwin)))
+      xine_usec_sleep(5000);
+    
+    XLockDisplay (gGui->display);
+    XSetInputFocus(gGui->display, xitk_window_get_window(skdloader->xwin), RevertToParent, CurrentTime);
+    XUnlockDisplay (gGui->display);
+  }
+  else
+    xitk_window_dialog_destroy(xwin);
+
 }

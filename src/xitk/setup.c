@@ -206,15 +206,8 @@ void setup_exit(xitk_widget_t *w, void *data) {
 
   xitk_unregister_event_handler(&setup->kreg);
 
-  XLockDisplay(gGui->display);
-  XUnmapWindow(gGui->display, xitk_window_get_window(setup->xwin));
-  XUnlockDisplay(gGui->display);
-
   xitk_destroy_widgets(setup->widget_list);
-
-  XLockDisplay(gGui->display);
-  XDestroyWindow(gGui->display, xitk_window_get_window(setup->xwin));
-  XUnlockDisplay(gGui->display);
+  xitk_window_destroy_window(gGui->imlib_data, setup->xwin);
 
   setup->xwin = None;
   xitk_list_free(setup->widget_list->l);

@@ -260,17 +260,10 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     }
     
     xitk_unregister_event_handler(&sinfos->widget_key);
-    
-    XLockDisplay(gGui->display);
-    XUnmapWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
-    XUnlockDisplay(gGui->display);
-    
+
     xitk_destroy_widgets(sinfos->widget_list);
-    
-    XLockDisplay(gGui->display);
-    XDestroyWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
-    XUnlockDisplay(gGui->display);
-    
+    xitk_window_destroy_window(gGui->imlib_data, sinfos->xwin);
+
     sinfos->xwin = None;
     xitk_list_free(sinfos->widget_list->l);
     

@@ -102,7 +102,6 @@ static char *_download_file(const char *filename, int *size) {
   download->status = 0; 
   
   if((network_download(filename, download))) {
-    printf("network_download returned 1\n");
     *size = download->size;
     buf = (char *) xine_xmalloc(*size);
     memcpy(buf, download->buf, *size);
@@ -118,7 +117,6 @@ static char *_download_file(const char *filename, int *size) {
   
   return buf;
 }
-
 
 static char *_read_file(const char *filename, int *size) {
   struct stat  st;
@@ -1127,15 +1125,8 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     
     xitk_unregister_event_handler(&mmkeditor->widget_key);
     
-    XLockDisplay(gGui->display);
-    XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-    XUnlockDisplay(gGui->display);
-    
     xitk_destroy_widgets(mmkeditor->widget_list);
-    
-    XLockDisplay(gGui->display);
-    XDestroyWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-    XUnlockDisplay(gGui->display);
+    xitk_window_destroy_window(gGui->imlib_data, mmkeditor->xwin);
     
     mmkeditor->xwin = None;
     xitk_list_free(mmkeditor->widget_list->l);

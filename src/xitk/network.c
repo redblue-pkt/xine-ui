@@ -623,7 +623,8 @@ static char *_atoa(char *str) {
   return pbuf;
 }
 
-static int get_bool_value(const char *val) {
+#warning MOVE ME OUT
+int get_bool_value(const char *val) {
   static struct {
     const char *str;
     int value;
