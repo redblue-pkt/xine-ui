@@ -536,7 +536,6 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
      
   }
   else {
-    int fullscreen;
 
     panel->visible = 1;
     xitk_show_widgets(panel->widget_list);
@@ -557,31 +556,50 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       XUnlockDisplay (gGui->display);
     }
     
-#if 0
-    /* TODO: Currently this is a quick hack
-     * We should rather test whether screen size has changed
-     * and move the panel on screen if it doesn't fit any longer */
-    fullscreen = video_window_get_fullscreen_mode();
-    if (((!(fullscreen & (WINDOWED_MODE | FULLSCR_MODE)))
+#if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
+    if(
 #ifdef HAVE_XINERAMA
-	 && (fullscreen & FULLSCR_XI_MODE)
-#endif
-	 )
+       ((video_window_get_fullscreen_mode()) & FULLSCR_XI_MODE)
 #ifdef HAVE_XF86VIDMODE
-	|| gGui->XF86VidMode_fullscreen
+       ||
 #endif
-	) {
-      /*
-       * necessary to place the panel in a visible area (otherwise it might
-       * appear off the video window while switched to a different
-       * modeline or tv mode)
-       */
-      XLockDisplay (gGui->display);
-      XMoveWindow(gGui->display, gGui->panel_window, 40, 40);
-      XUnlockDisplay (gGui->display);
+#endif
+#ifdef HAVE_XF86VIDMODE
+       (gGui->XF86VidMode_fullscreen)
+#endif
+       ) {
+      int x, y, w, h, coordx, coordy, desktopw, desktoph;
+      
+      xitk_get_window_position(gGui->display, gGui->panel_window, &x, &y, &w, &h);
+      coordx = x + w;
+      coordy = y + h;
+      
+      XLockDisplay(gGui->display);
+      desktopw = DisplayWidth(gGui->display, gGui->screen);
+      desktoph = DisplayHeight(gGui->display, gGui->screen);
+      XUnlockDisplay(gGui->display);
+      
+      if((coordx <= 0) || (coordy <= 0) || (coordx >= desktopw) || (coordy >= desktoph)) {
+	Window        rootwin;
+	int           xwin, ywin;
+	unsigned int  wwin, hwin, bwin, dwin;
+	int           newx = x, newy = y;
+	
+	XLockDisplay(gGui->display);
+	if(XGetGeometry(gGui->display, 
+			(RootWindow(gGui->display, gGui->screen)), &rootwin, 
+			&xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+	  newx = (wwin >> 1) - (w >> 1);
+	  newy = (hwin >> 1) - (h >> 1);
+	}
+	XMoveWindow(gGui->display, gGui->panel_window, newx, newy);
+	XUnlockDisplay(gGui->display);
+	
+	panel_store_new_position(newx, newy, w, h);
+      }
     }
-#endif    
-
+#endif
+    
     if(gGui->logo_mode == 0) {
       int pos;
       
