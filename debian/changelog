@@ -1,3 +1,9 @@
+xine-ui (0.9.3-1) unstable; urgency=medium
+
+  * new upstream release
+
+ -- Siggi Langauf <siggi@debian.org>  Sat,  3 Nov 2001 11:23:56 +0100
+
 xine-ui (0.9.2-3) unstable; urgency=high
   
   * allow for architectures that won't compile aaxine
