@@ -815,3 +815,16 @@ skin.MrlPlugNameBG {
 	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
+
+skin.MrlFilt {
+	coords {
+	  x = 335
+	  y = 190
+	}
+	pixmap = arrowdn.png
+	label {
+	  length = 14
+	  animation = False
+	  pixmap = letters.png
+	}
+}

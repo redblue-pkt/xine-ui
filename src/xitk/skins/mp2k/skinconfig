@@ -785,3 +785,16 @@ skin.MrlPlugLabel {
 	  pixmap = letters2.png
 	}
 }
+
+skin.MrlFilt {
+	coords {
+	  x = 420
+	  y = 33
+	}
+	pixmap = cmb_dn.png
+	label {
+	  length = 18
+	  animation = False
+	  pixmap = letters3.png
+	}
+}

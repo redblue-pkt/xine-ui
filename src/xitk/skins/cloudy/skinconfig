@@ -693,7 +693,7 @@ skin.MrlItemBtn {
 skin.MrlSelect {
 	coords {
 	  x = 8
-	  y = 187
+	  y = 203
 	}
 	pixmap = MrlSelect.png
 	label {
@@ -708,7 +708,7 @@ skin.MrlSelect {
 skin.MrlPlay {
 	coords {
 	  x = 49
-	  y = 187
+	  y = 203
 	}
 	pixmap = MrlPlay.png
 }
@@ -716,7 +716,7 @@ skin.MrlPlay {
 skin.MrlDismiss {
 	coords {
 	  x = 260
-	  y = 187
+	  y = 203
 	}
 	pixmap = ComDismiss.png
 	label {
@@ -759,7 +759,7 @@ skin.MrlDn {
 skin.MrlCurOrigin {
 	coords {
 	  x = 15
-	  y = 157
+	  y = 175
 	}
 	label {
 	  length = 43
@@ -789,6 +789,19 @@ skin.MrlPlugLabel {
 	}
 	label {
 	  length = 7
+	  animation = False
+	  pixmap = ComLetters.png
+	}
+}
+
+skin.MrlFilt {
+	coords {
+	  x = 80
+	  y = 157
+	}
+	pixmap = ComScrollArrowDown.png
+	label {
+	  length = 30
 	  animation = False
 	  pixmap = ComLetters.png
 	}

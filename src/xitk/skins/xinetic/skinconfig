@@ -683,7 +683,7 @@ skin.MrlItemBtn {
 skin.MrlSelect {
 	coords {
 	  x = 15
-	  y = 207
+	  y = 224
 	}
 	pixmap = MrlSelect.png
 	label {
@@ -697,7 +697,7 @@ skin.MrlSelect {
 skin.MrlPlay {
 	coords {
 	  x = 69
-	  y = 218
+	  y = 235
 	}
 	pixmap = PlPlay.png
 }
@@ -705,7 +705,7 @@ skin.MrlPlay {
 skin.MrlDismiss {
 	coords {
 	  x = 333
-	  y = 206
+	  y = 224
 	}
 	pixmap = MrlDismiss.png
 	label {
@@ -747,7 +747,7 @@ skin.MrlDn {
 skin.MrlCurOrigin {
 	coords {
 	  x = 21
-	  y = 192
+	  y = 189
 	}
 
 	label {
@@ -782,6 +782,20 @@ skin.MrlPlugLabel {
 	pixmap = Letters.png
 	}
 }
+
+skin.MrlFilt {
+	coords {
+	  x = 160
+	  y = 214
+	}
+	pixmap = SkArrowDown.png
+	label {
+	  length = 18
+	  animation = False
+	  pixmap = Letters.png
+	}
+}
+
 ### File Browser ##
 skin.FBBG {
 	coords {

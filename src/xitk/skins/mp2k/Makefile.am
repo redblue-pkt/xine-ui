@@ -10,7 +10,7 @@ data_DATA = autoplay_btn.png   eject_btn.png    mute_btn.png      pl_moveup.png 
 	ctl_sk_item.png    letters3.png     pl_erasemany.png  play_btn.png    stop_btn.png	 \
 	ctl_sk_slidbg.png  letters4.png     pl_eraseone.png   playlist.png    volumebg.png	 \
 	ctl_slidbg.png	   menu_btn.png     pl_input.png      point_btn.png   volumepad.png	 \
-	ctl_slidpad.png    mrl_btn.png	    pl_item_btn.png   prev_btn.png			 \
+	ctl_slidpad.png    mrl_btn.png	    pl_item_btn.png   prev_btn.png    cmb_dn.png	 \
 	ctrl_btn.png	   mrlbrowser.png   pl_movedn.png     reduce_btn.png  skinconfig
 
 

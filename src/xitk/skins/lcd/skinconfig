@@ -754,7 +754,7 @@ skin.MrlCurOrigin {
 	  y = 200
 	}
 	label {
-	  length = 50
+	  length = 48
 	  animation = True
 	  pixmap = letters.png
 	}
@@ -781,6 +781,19 @@ skin.MrlPlugLabel {
 	}
 	label {
 	  length = 7
+	  animation = False
+	  pixmap = letters.png
+	}
+}
+
+skin.MrlFilt {
+	coords {
+	  x = 365
+	  y = 200
+	}
+	pixmap = arrowdn.png
+	label {
+	  length = 18
 	  animation = False
 	  pixmap = letters.png
 	}

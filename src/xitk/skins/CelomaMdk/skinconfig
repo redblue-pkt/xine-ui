@@ -783,6 +783,20 @@ skin.MrlPlugLabel {
 	pixmap = LettersMiddle.png
 	}
 }
+
+skin.MrlFilt {
+	coords {
+	  x = 168
+	  y = 166
+	}
+	pixmap = SkArrowDown.png
+	label {
+	  length = 18
+	  animation = False
+	  pixmap = LettersMiddle.png
+	}
+}
+
 ### File Browser ##
 skin.FBBG {
 	coords {
