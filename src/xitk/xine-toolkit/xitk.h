@@ -2035,7 +2035,7 @@ xitk_window_t *xitk_window_dialog_ok(ImlibData *im, char *title,
   xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__)
 
 #define xitk_window_dialog_info(im, ...) \
-  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__)#endif
+  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__)
 #endif
 /* 
  *
