@@ -14,7 +14,9 @@ skins_DATA =                                                                    
 	HideBtn.png	  MainFastF.png       MrlDismiss.png	 PlPlay.png	  LettersBlue.png \
 	LettersBig.png	  MainMute.png	      MrlSelect.png	 SetupBtn.png     CtlItemBtn.png  \
 	LettersDigit.png  MainNext.png	      Onglet.png	 OngletSmall.png  SkArrowDown.png \
-	MainPause.png     PlBg.png	      SkArrowUp.png      skinconfig
+	MainPause.png     PlBg.png	      SkArrowUp.png      MainNav.png      		  \
+	ArrowLeft.png	  BigArrowLeft.png    ArrowRight.png	 BigArrowRight.png		  \
+	SkSlidHBg.png	  SliderHPad.png      PlSlidHBg.png      skinconfig
 
 
 debug:

@@ -1,7 +1,7 @@
 #Xine skin data file
 # revision 0.6
 skin.name    = CelomaChrome
-skin.version = 2
+skin.version = 4
 skin.date    = 06.18.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
@@ -29,6 +29,14 @@ skin.Eject {
 	  y = 15
 	}
 	pixmap = MainEject.png
+}
+
+skin.Nav {
+	coords {
+	  x = 738
+	  y = 88
+	}
+	pixmap = MainNav.png
 }
 
 skin.Exit {
@@ -329,7 +337,7 @@ skin.PlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 7
+	  entries = 5
 	}
 	label {
 	  align = left
@@ -420,6 +428,34 @@ skin.PlDn {
 	  y = 171
 	}
 	pixmap = BigArrowDown.png
+}
+
+skin.PlLeft {
+	coords {
+	  x = 81
+	  y = 152
+	}
+	pixmap = BigArrowLeft.png
+}
+
+skin.SliderHPl {
+	coords {
+	  x = 97
+	  y = 152
+	}
+	pixmap = PlSlidHBg.png
+	slider {
+	  pixmap = SliderHPad.png
+	  type = horizontal
+	}
+}
+
+skin.PlRight {
+	coords {
+	  x = 316
+	  y = 152
+	}
+	pixmap = BigArrowRight.png
 }
 
 skin.AutoPlayLbl {
@@ -623,6 +659,34 @@ skin.CtlSkDn {
 	pixmap = BigArrowDown.png
 }
 
+skin.CtlSkLeft {
+	coords {
+	  x = 287
+	  y = 153
+	}
+	pixmap = BigArrowLeft.png
+}
+
+skin.SliderHCtlSk {
+	coords {
+	  x = 303
+	  y = 153
+	}
+	pixmap = SkSlidHBg.png
+	slider {
+	  pixmap = SliderHPad.png
+	  type = horizontal
+	}
+}
+
+skin.CtlSkRight {
+	coords {
+	  x = 377
+	  y = 153
+	}
+	pixmap = BigArrowRight.png
+}
+
 skin.CtlSkItemBtn {
 	coords {
 	  x = 288
@@ -630,7 +694,7 @@ skin.CtlSkItemBtn {
 	}
 	pixmap = CtlItemBtn.png
 	browser {
-	  entries = 7
+	  entries = 5
 	}
 	label {
 	  color = #adc9ff
@@ -670,7 +734,7 @@ skin.MrlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 7
+	  entries = 5
 	}
 	label {
 	  align = left
@@ -745,6 +809,34 @@ skin.MrlDn {
 	pixmap = BigArrowDown.png
 }
 
+skin.MrlLeft {
+	coords {
+	  x = 81
+	  y = 152
+	}
+	pixmap = BigArrowLeft.png
+}
+
+skin.SliderHMrl {
+	coords {
+	  x = 97
+	  y = 152
+	}
+	pixmap = PlSlidHBg.png
+	slider {
+	  pixmap = SliderHPad.png
+	  type = horizontal
+	}
+}
+
+skin.MrlRight {
+	coords {
+	  x = 316
+	  y = 152
+	}
+	pixmap = BigArrowRight.png
+}
+
 skin.MrlCurOrigin {
 	coords {
 	  x = 83
@@ -795,116 +887,4 @@ skin.MrlFilt {
 	  animation = False
 	  pixmap = LettersMiddle.png
 	}
-}
-
-### File Browser ##
-skin.FBBG {
-	coords {
-	  x = 0
-	  y = 0
-	}
-	pixmap = MrlBg.png
-}
-skin.FBItemBtn {
-	coords {
-	  x = 200
-	  y = 50
-	}
-	pixmap = PlItemBtn.png
-	label {
-	  align = left
-	  color = #a4aab4
-	  color_focus = #a4aab4
-	  color_click = #081e2f
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
-	}
-}
-skin.FBHome {
-	coords {
-	  x = 74
-	  y = 160
-	}
-	pixmap = MrlSelect.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBSelect {
-	coords {
-	  x = 100
-	  y = 160
-	}
-	pixmap = MrlSelect.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBDismiss {
-	coords {
-	  x = 150
-	  y = 160
-	}
-	pixmap = MrlDismiss.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBUp {
-	coords {
-	  x = 307
-	  y = 50
-	}
-	pixmap = BigArrowUp.png
-}
-skin.SliderFB {
-	coords {
-	  x = 307
-	  y = 70
-	}
-	pixmap = SliderVBg.png
-	slider {
-	  pixmap = SliderVPad.png
-	  type = vertical
-	}
-}
-skin.FBDn {
-	coords {
-	  x = 307
-	  y = 129
-	}
-	pixmap = BigArrowUp.png
-}
-skin.FBCurDirLbl {
-	coords {
-	  x = 78
-	  y = 50
-	}
-	pixmap = LettersMiddle.png
-}
-skin.FBCurDir {
-	coords {
-	  x = 110
-	  y = 150
-	}
-	pixmap = LettersMiddle.png
-}
-skin.FBSortRev {
-	coords {
-	  x = 362
-	  y = 170
-	}
-	pixmap = SmallArrowUp.png
-}
-skin.FBSortDef {
-	coords {
-	  x = 362
-	  y = 170
-	}
-	pixmap = SmallArrowDown.png
 }
