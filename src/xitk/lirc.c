@@ -63,14 +63,14 @@ static void lirc_get_playlist(char *from) {
       if(autoplay_mrls) {
 
 	/* First, free existing playlist */
-	mediamark_free_mediamark();
+	mediamark_free_mediamarks();
 	
 	for (j = 0; j < num_mrls; j++)
 	  mediamark_add_entry((const char *)autoplay_mrls[j], 
 			      (const char *)autoplay_mrls[j], 0, -1);
 	
 	gGui->playlist.cur = 0;
-	gui_set_current_mrl(playlist_get_current_mmk());
+	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	playlist_update_playlist();
       }    
     }
