@@ -1193,6 +1193,11 @@ Window xitk_filebrowser_get_window_id(xitk_widget_t *w);
 #ifdef NEED_MRLBROWSER
 
 typedef struct {
+  char                      *name;
+  char                      *ending;
+} xitk_mrlbrowser_filter_t;
+
+typedef struct {
   int                       magic;
   ImlibData                 *imlibdata;
   char                      *skin_element_name;
@@ -1251,6 +1256,8 @@ typedef struct {
 
   xitk_browser_widget_t      browser;
   
+  xitk_mrlbrowser_filter_t **mrl_filters;
+
   struct {
     char                    *skin_element_name;
   } combo;

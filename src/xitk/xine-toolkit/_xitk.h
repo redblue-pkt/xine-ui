@@ -391,66 +391,73 @@ typedef struct {
 
 #ifdef NEED_MRLBROWSER
 typedef struct {
-  int                       magic;
-  ImlibData                *imlibdata;
-  char                     *skin_element_name;
-  Window                    window_trans;
-  int                       layer_above;
+  char                      *name;
+  char                      *ending;
+} xitk_mrlbrowser_filter_t;
 
-  int                       x;
-  int                       y;
-  char                     *window_title;
-  char                     *resource_name;
-  char                     *resource_class;
+typedef struct {
+  int                        magic;
+  ImlibData                 *imlibdata;
+  char                      *skin_element_name;
+  Window                     window_trans;
+  int                        layer_above;
+
+  int                        x;
+  int                        y;
+  char                      *window_title;
+  char                      *resource_name;
+  char                      *resource_class;
 
   struct {
-    char                   *cur_origin;
-    char                   *skin_element_name;
+    char                    *cur_origin;
+    char                    *skin_element_name;
   } origin;
   
-  xitk_dnd_callback_t       dndcallback;
+  xitk_dnd_callback_t        dndcallback;
 
   struct {
-    char                   *caption;
-    char                   *skin_element_name;
-    xitk_mrl_callback_t     callback;
+    char                    *caption;
+    char                    *skin_element_name;
+    xitk_mrl_callback_t      callback;
   } select;
 
   struct {
-    char                   *skin_element_name;
-    xitk_mrl_callback_t     callback;
+    char                    *skin_element_name;
+    xitk_mrl_callback_t      callback;
   } play;
 
   struct {
-    char                   *caption;
-    char                   *skin_element_name;
+    char                    *caption;
+    char                    *skin_element_name;
   } dismiss;
 
   struct {
-    xitk_simple_callback_t  callback;
+    xitk_simple_callback_t   callback;
   } kill;
 
-  char                    **ip_availables;
+  char                     **ip_availables;
   
   struct {
 
     struct {
-      char                 *skin_element_name;
+      char                  *skin_element_name;
     } button;
 
     struct {
-      char                 *label_str;
-      char                 *skin_element_name;
+      char                  *label_str;
+      char                  *skin_element_name;
     } label;
 
   } ip_name;
   
-  xine_t                   *xine;
+  xine_t                    *xine;
 
-  xitk_browser_widget_t     browser;
+  xitk_browser_widget_t      browser;
   
+  xitk_mrlbrowser_filter_t **mrl_filters;
+
   struct {
-    char                    *skin_element_name;
+    char                     *skin_element_name;
   } combo;
 
 } xitk_mrlbrowser_widget_t;

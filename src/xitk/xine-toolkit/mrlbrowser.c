@@ -54,12 +54,7 @@
 
 #undef DEBUG_MRLB
 
-typedef struct {
-  char *name;
-  char *ending;
-} mrl_filter_t;
-
-static mrl_filter_t mrl_filters[] = {
+static xitk_mrlbrowser_filter_t __mrl_filters[] = {
   { "All"                 , "*"            },
   { "*.vob"               , "vob"          }, /* mpeg block */
   { "*.mpv"               , "mpv"          }, /* elementary */
@@ -76,6 +71,62 @@ static mrl_filter_t mrl_filters[] = {
   { NULL                  , NULL           }
 };
 
+/*
+ *
+ */
+static void _duplicate_mrl_filters(mrlbrowser_private_data_t *private_data, 
+				   xitk_mrlbrowser_filter_t **mrl_f) {
+  xitk_mrlbrowser_filter_t **mrl_filters = mrl_f;
+  int                        i = 0;
+  
+  private_data->filters_num = 0;
+
+  if(mrl_f == NULL) {
+    int len = sizeof(__mrl_filters) / sizeof(xitk_mrlbrowser_filter_t);
+
+    private_data->mrl_filters = (xitk_mrlbrowser_filter_t **) 
+      xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * len);
+
+    for(i = 0; i < (len - 1); i++) {
+      
+      private_data->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
+	xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+      private_data->mrl_filters[i]->name   = strdup(__mrl_filters[i].name);
+      private_data->mrl_filters[i]->ending = strdup(__mrl_filters[i].ending);
+
+    }
+  }
+  else {
+    
+    private_data->mrl_filters = (xitk_mrlbrowser_filter_t **) 
+      xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *));
+    
+    for(i = 0; 
+	mrl_filters[i] && (mrl_filters[i]->name && mrl_filters[i]->ending); i++) {
+
+      private_data->mrl_filters            = (xitk_mrlbrowser_filter_t **)
+	realloc(private_data->mrl_filters, sizeof(xitk_mrlbrowser_filter_t *) * (i + 2));
+      private_data->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
+	xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+      private_data->mrl_filters[i]->name   = strdup(mrl_filters[i]->name);
+      private_data->mrl_filters[i]->ending = strdup(mrl_filters[i]->ending);
+    }
+  }
+  
+  private_data->filters_num            = i;
+  private_data->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
+    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+  private_data->mrl_filters[i]->name   = NULL;
+  private_data->mrl_filters[i]->ending = NULL;
+  
+  private_data->filters = (char **) xitk_xmalloc(sizeof(char *) * (private_data->filters_num + 1));
+  
+  for(i = 0; private_data->mrl_filters[i]->name != NULL; i++)
+    private_data->filters[i] = private_data->mrl_filters[i]->name;
+  
+  private_data->filters[i] = NULL;
+  private_data->filter_selected = 0;
+}
 
 /*
  *
@@ -142,7 +193,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 
     private_data->mc->mrls_to_disp = 0;
 
-    xitk_strdupa(filter_ends, mrl_filters[private_data->filter_selected].ending);
+    xitk_strdupa(filter_ends, private_data->mrl_filters[private_data->filter_selected]->ending);
     p = filter_ends;
 
     for(i = 0; i < private_data->mrls_num; i++) {
@@ -583,7 +634,15 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
     
     {
       int i;
-      for(i = private_data->mrls_num; i > 0; i--) {
+      
+      for(i = 0; i <= private_data->filters_num; i++) {
+	XITK_FREE(private_data->mrl_filters[i]->name);
+	XITK_FREE(private_data->mrl_filters[i]->ending);
+	XITK_FREE(private_data->mrl_filters[i]);
+      }
+      XITK_FREE(private_data->mrl_filters);
+      
+      for(i = 0; i < private_data->mrls_num; i++) {
 	MRL_ZERO(private_data->mc->mrls[i]);
 	XITK_FREE(private_data->mc->mrls[i]);
 	MRL_ZERO(private_data->mc->filtered_mrls[i]);
@@ -591,9 +650,6 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
 	XITK_FREE(private_data->mc->mrls_disp[i]);
       }
       
-      for(i = 0; private_data->filters[i] != NULL; i++)
-	free(private_data->filters[i]);
-
       free(private_data->filters);
     }
     
@@ -1173,19 +1229,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
       private_data->autodir_plugins[i+1] = NULL;
   }
 
+  _duplicate_mrl_filters(private_data, mb->mrl_filters);
 
-  private_data->filters = (char **) xitk_xmalloc(sizeof(char *) * 
-						 (sizeof(mrl_filters) / sizeof(mrl_filter_t)));
-  {
-    int i;
-
-    for(i = 0; mrl_filters[i].name != NULL; i++)
-      private_data->filters[i] = strdup(mrl_filters[i].name);
-
-    private_data->filters[i] = NULL;
-    private_data->filter_selected = 0;
-  }
-  
   cmb.skin_element_name = mb->combo.skin_element_name;
   cmb.parent_wlist      = private_data->widget_list;
   cmb.entries           = private_data->filters;

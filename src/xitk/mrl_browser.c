@@ -171,14 +171,83 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
   mrlb = NULL;
 }
 
+xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
+  xitk_mrlbrowser_filter_t **filters = NULL;
+  cfg_entry_t               *entry;
+  int                        num_endings = 0;
+
+  filters                      = (xitk_mrlbrowser_filter_t **) 
+    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
+  filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
+    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+  filters[num_endings]->name   = strdup("All");
+  filters[num_endings]->ending = strdup("*");
+
+  entry = gGui->config->first;
+  while(entry) {
+    char *point;
+    
+    point = strchr(entry->key, '.');
+    
+    if(point) {
+      int len;
+      
+      len = point - entry->key;
+      point++;
+      
+      if(!strncmp("mrl", entry->key, len)) {
+	
+	if(!strncmp("ends", point, 4)) {
+	  char *ends, *e;
+	  char patterns[2048];
+	  num_endings++;
+	  
+	  memset(&patterns, 0, sizeof(patterns));
+	  
+	  filters                      = (xitk_mrlbrowser_filter_t **) 
+	    realloc(filters, sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
+	  
+	  filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
+	    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+	  
+	  xine_strdupa(ends, entry->str_value);
+
+	  while((e = xine_strsep(&ends, ",")) != NULL) {
+	    while((*e == ' ') || (*e == '\t')) e++;
+	    
+	    if(strlen(patterns))
+	      strcat(patterns, ",");
+	    
+	    strcat(patterns, "*.");
+	    strcat(patterns, e);
+	  }
+	  
+	  filters[num_endings]->name   = strdup(patterns);
+	  filters[num_endings]->ending = strdup(entry->str_value);
+	}
+      }
+
+    }      
+    entry = entry->next;
+  }
+  
+  filters[num_endings + 1]         = (xitk_mrlbrowser_filter_t *)
+    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+  filters[num_endings + 1]->name   = NULL;
+  filters[num_endings + 1]->ending = NULL;
+  
+  return filters;
+}
+
+
 /*
  *
  */
 void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb,
-		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
-  xitk_mrlbrowser_widget_t   mb;
-  char              **ip_availables = 
-    xine_get_browsable_input_plugin_ids(gGui->xine);
+		 select_cb_t   sel_cb, xitk_dnd_callback_t dnd_cb) {
+  xitk_mrlbrowser_widget_t     mb;
+  char                       **ip_availables = xine_get_browsable_input_plugin_ids(gGui->xine);
+  xitk_mrlbrowser_filter_t   **mrl_filters = mrl_browser_get_valid_mrl_ending();
 
   if(mrlb != NULL) {
     show_mrl_browser();
@@ -241,11 +310,30 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
 
   mb.combo.skin_element_name            = "MrlFilt";
 
+  mb.mrl_filters                        = mrl_filters;
+
   mrlb = xitk_mrlbrowser_create(NULL, gGui->skin_config, &mb);
 
-  if(ip_availables)
-    free(ip_availables);
+  if(ip_availables) {
+    int i;
 
+    for(i = 0; ip_availables[i]; i++)
+      free(ip_availables[i]);
+    
+    free(ip_availables);
+  }
+  
+  if(mrl_filters) {
+    int i;
+
+    for(i = 0; mrl_filters[i] && (mrl_filters[i]->name && mrl_filters[i]->ending); i++) {
+      free(mrl_filters[i]->name);
+      free(mrl_filters[i]->ending);
+      free(mrl_filters[i]);
+    }
+    free(mrl_filters[i]);
+    free(mrl_filters);
+  }
 }
 
 /*

@@ -38,51 +38,53 @@
 #define MAXFILES      65535
 
 typedef struct {
-  mrl_t                    *mrls[MAXFILES];
-  mrl_t                    *filtered_mrls[MAXFILES];
-  char                     *mrls_disp[MAXFILES];
-  int                       mrls_to_disp;
+  mrl_t                     *mrls[MAXFILES];
+  mrl_t                     *filtered_mrls[MAXFILES];
+  char                      *mrls_disp[MAXFILES];
+  int                        mrls_to_disp;
 } mrl_contents_t;
 
 typedef struct {
 
-  xitk_widget_t            *fbWidget; /*  My widget */
+  xitk_widget_t             *fbWidget; /*  My widget */
 
-  ImlibData                *imlibdata;
-  char                     *skin_element_name;
-  char                     *skin_element_name_ip;
+  ImlibData                 *imlibdata;
+  char                      *skin_element_name;
+  char                      *skin_element_name_ip;
 
-  xitk_register_key_t       widget_key;
+  xitk_register_key_t        widget_key;
 
-  Window                    window; /* file browser window */
+  Window                     window; /* file browser window */
   
-  ImlibImage               *bg_image;
-  xitk_widget_list_t       *widget_list; /* File browser widget list */
+  ImlibImage                *bg_image;
+  xitk_widget_list_t        *widget_list; /* File browser widget list */
   
-  xine_t                   *xine;
+  xine_t                    *xine;
 
-  mrl_contents_t           *mc;
-  int                       mrls_num;
+  mrl_contents_t            *mc;
+  int                        mrls_num;
 
-  char                     *last_mrl_source;
+  char                      *last_mrl_source;
 
-  xitk_widget_t            *widget_origin; /* Current directory widget */
-  char                      current_origin[XITK_PATH_MAX + 1]; /* Current directory */
+  xitk_widget_t             *widget_origin; /* Current directory widget */
+  char                       current_origin[XITK_PATH_MAX + 1]; /* Current directory */
 
-  int                       running; /* Boolean status */
-  int                       visible; /* Boolean status */
+  int                        running; /* Boolean status */
+  int                        visible; /* Boolean status */
 
-  xitk_widget_t            *mrlb_list; /*  Browser list widget */
-  xitk_widget_t            *autodir_plugins[64];
+  xitk_widget_t             *mrlb_list; /*  Browser list widget */
+  xitk_widget_t             *autodir_plugins[64];
 
-  xitk_widget_t            *combo_filter;
-  char                    **filters;
-  int                       filter_selected;
+  xitk_widget_t             *combo_filter;
+  char                     **filters;
+  int                        filters_num;
+  xitk_mrlbrowser_filter_t **mrl_filters;
+  int                        filter_selected;
 
-  xitk_mrl_callback_t       add_callback;
-  xitk_mrl_callback_t       play_callback;
-  xitk_simple_callback_t    kill_callback;
-  xitk_simple_callback_t    ip_callback;
+  xitk_mrl_callback_t        add_callback;
+  xitk_mrl_callback_t        play_callback;
+  xitk_simple_callback_t     kill_callback;
+  xitk_simple_callback_t     ip_callback;
 
 } mrlbrowser_private_data_t;
 
