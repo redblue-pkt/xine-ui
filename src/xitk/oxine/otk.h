@@ -97,6 +97,18 @@ otk_widget_t *otk_selector_grid_new (const char **items, int num,
 
 otk_widget_t *otk_layout_new(otk_widget_t *win, int x, int y, int w, int h, int rows, int columns);
 
+otk_widget_t *otk_scrollbar_new (otk_widget_t *win, int x, int y,
+			        int w, int h,
+			        otk_button_cb_t cb_up, otk_button_cb_t cb_down,
+			        void *user_data);
+
+
+/*
+ * scrollbar widget functions
+ */
+
+void otk_scrollbar_set(otk_widget_t *this, int pos_start, int pos_end);
+
 /*
  * selector widget functions
  */

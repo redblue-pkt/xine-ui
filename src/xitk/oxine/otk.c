@@ -43,6 +43,7 @@
 #define OTK_WIDGET_SLIDER    (6)
 #define OTK_WIDGET_SELECTOR  (7)
 #define OTK_WIDGET_LAYOUT    (8)
+#define OTK_WIDGET_SCROLLBAR (9)
 
 #define OTK_BUTTON_TEXT   (1)
 #define OTK_BUTTON_PIXMAP (2)
@@ -53,6 +54,7 @@ typedef struct otk_window_s otk_window_t;
 typedef struct otk_list_s otk_list_t;
 typedef struct otk_listentry_s otk_listentry_t;
 typedef struct otk_slider_s otk_slider_t;
+typedef struct otk_scrollbar_s otk_scrollbar_t;
 typedef struct otk_selector_s otk_selector_t;
 typedef struct otk_layout_s otk_layout_t;
 
@@ -89,6 +91,17 @@ struct otk_slider_s {
 
   int  old_pos;
   otk_slider_cb_t get_value;
+};
+
+struct otk_scrollbar_s {
+  otk_widget_t widget;
+
+  int  pos_start;
+  int  pos_end;
+
+  otk_button_cb_t  cb_up;
+  otk_button_cb_t  cb_down;
+  void            *cb_data;
 };
 
 struct otk_button_s {
@@ -146,6 +159,8 @@ struct otk_list_s {
 
   otk_list_cb_t    cb;
   void            *cb_data;
+
+  otk_widget_t    *scrollbar;
 };
 
 struct otk_label_s {
@@ -518,7 +533,15 @@ static void key_handler (otk_t *otk, oxine_event_t *ev) {
           otk_draw_all(otk);
 	}
       }
-      new = find_neighbour(otk, UP);
+      if (otk->focus_ptr->widget_type == OTK_WIDGET_SCROLLBAR) {
+	otk_scrollbar_t *scrollbar = (otk_scrollbar_t*) otk->focus_ptr;
+
+	if(scrollbar->cb_up) {
+	  scrollbar->cb_up(scrollbar->cb_data);
+          otk_draw_all(otk);
+	}
+      } else
+        new = find_neighbour(otk, UP);
       break;
     case OXINE_KEY_DOWN:
       if (otk->focus_ptr->widget_type == OTK_WIDGET_LISTENTRY) {
@@ -530,7 +553,15 @@ static void key_handler (otk_t *otk, oxine_event_t *ev) {
 	} else
           new = find_neighbour(otk, DOWN);
       }
-      new = find_neighbour(otk, DOWN);
+      if (otk->focus_ptr->widget_type == OTK_WIDGET_SCROLLBAR) {
+	otk_scrollbar_t *scrollbar = (otk_scrollbar_t*) otk->focus_ptr;
+
+	if(scrollbar->cb_down) {
+	  scrollbar->cb_down(scrollbar->cb_data);
+          otk_draw_all(otk);
+	}
+      } else
+        new = find_neighbour(otk, DOWN);
       break;
     case OXINE_KEY_LEFT:
       new = find_neighbour(otk, LEFT);
@@ -703,10 +734,52 @@ static void slider_draw_graphic(otk_widget_t *this) {
 static void slider_destroy(otk_widget_t *this) {
   otk_slider_t *slider = (otk_slider_t*) this;
   if (!is_correct_widget(this, OTK_WIDGET_SLIDER)) return;
- 
+
   remove_widget_from_win(this);
   if (this->otk->focus_ptr == this) this->otk->focus_ptr = NULL;
   ho_free(slider);
+}
+
+static void scrollbar_draw(otk_widget_t *this) {
+
+  otk_scrollbar_t *scrollbar = (otk_scrollbar_t*) this;
+  int value1, value2;
+  int color[3];
+
+  if (!is_correct_widget(this, OTK_WIDGET_SCROLLBAR)) return;
+
+  value1 = ( scrollbar->pos_start * (this->h-10) ) / 100;
+  value2 = ( scrollbar->pos_end * (this->h-10) ) / 100;
+
+  if (this->focus) {
+    color[0] = this->otk->textcolor_but+1;
+    color[1] = this->otk->col_sl1f;
+    color[2] = this->otk->col_sl2f;
+  } else {
+    color[0] = this->otk->textcolor_win+1;
+    color[1] = this->otk->col_sl1;
+    color[2] = this->otk->col_sl2;
+  }
+    
+  odk_draw_rect (this->odk, this->x, this->y,
+                 this->x+this->w, this->y+this->h, 1, color[0]);
+
+/*
+  odk_draw_rect (this->odk, this->x, this->y,
+                 this->x+this->w, this->y+this->h, 0, color[1]);
+*/
+
+  odk_draw_rect (this->odk, this->x+5, this->y+5+value1,
+                 this->x+this->w-5, this->y+5+value2, 1, color[2]);
+}
+
+static void scrollbar_destroy(otk_widget_t *this) {
+  otk_scrollbar_t *scrollbar = (otk_scrollbar_t*) this;
+  if (!is_correct_widget(this, OTK_WIDGET_SCROLLBAR)) return;
+
+  remove_widget_from_win(this);
+  if (this->otk->focus_ptr == this) this->otk->focus_ptr = NULL;
+  ho_free(scrollbar);
 }
 
 static void button_destroy(otk_widget_t *this) {
@@ -830,6 +903,58 @@ otk_widget_t *otk_button_new (otk_widget_t *win, int x, int y,
   return (otk_widget_t*) button;
 }
 
+otk_widget_t *otk_scrollbar_new (otk_widget_t *win, int x, int y,
+			        int w, int h,
+			        otk_button_cb_t cb_up, otk_button_cb_t cb_down,
+			        void *user_data) {
+                                
+  otk_scrollbar_t *scrollbar;
+  otk_window_t *window = (otk_window_t*) win;
+
+  if (!is_correct_widget(win, OTK_WIDGET_WINDOW)) return NULL;
+
+  scrollbar = ho_new(otk_scrollbar_t);
+
+  scrollbar->widget.widget_type = OTK_WIDGET_SCROLLBAR;
+  scrollbar->widget.x           = win->x+x;
+  scrollbar->widget.y           = win->y+y;
+  scrollbar->widget.w           = w;
+  scrollbar->widget.h           = h;
+  scrollbar->widget.win         = win;
+  scrollbar->widget.otk         = win->otk;
+  scrollbar->widget.odk         = win->otk->odk;
+  scrollbar->widget.selectable  = 1;
+  scrollbar->widget.select_cb   = NULL;
+  scrollbar->widget.draw        = scrollbar_draw;
+  scrollbar->widget.destroy     = scrollbar_destroy;
+  scrollbar->widget.needupdate  = 0;
+  scrollbar->widget.major       = 0;
+  scrollbar->cb_up              = cb_up;
+  scrollbar->cb_down            = cb_down;
+  scrollbar->cb_data            = user_data;
+  scrollbar->pos_start          = 0;
+  scrollbar->pos_end            = 100;
+  
+  window->subs = g_list_append (window->subs, scrollbar);
+
+  return (otk_widget_t*) scrollbar;
+}
+
+void otk_scrollbar_set(otk_widget_t *this, int pos_start, int pos_end)
+{
+  otk_scrollbar_t *scrollbar = (otk_scrollbar_t*) this;
+
+  if (!is_correct_widget(this, OTK_WIDGET_SCROLLBAR)) return;
+
+  if(pos_start < 0 ) pos_start = 0;
+  if(pos_start > 100 ) pos_start = 100;
+  scrollbar->pos_start = pos_start;
+
+  if(pos_end < pos_start ) pos_end = pos_start;
+  if(pos_end > 100 ) pos_end = 100;
+  scrollbar->pos_end = pos_end;
+}
+
 void otk_button_uc_set(otk_widget_t *this, otk_button_cb_t uc, void *uc_data) {
   otk_button_t *button = (otk_button_t *)this;
   
@@ -949,6 +1074,11 @@ static void list_adapt_entries(otk_list_t *list) {
     cur = g_list_next (cur);
     i++;
   }
+
+  if(list->num_entries)
+    otk_scrollbar_set(list->scrollbar,
+                      (list->position) * 100 / list->num_entries,
+                      (list->position+list->entries_visible) * 100 / list->num_entries);
 }
 
 void otk_add_listentry(otk_widget_t *this, char *text, void *data, int pos) {
@@ -1198,7 +1328,6 @@ otk_widget_t *otk_list_new (otk_widget_t *win, int x, int y, int w, int h,
 
   otk_list_t *list;
   otk_window_t *window = (otk_window_t*) win;
-  otk_widget_t *b1, *b2;
 
   if (!is_correct_widget(win, OTK_WIDGET_WINDOW)) return NULL;
 
@@ -1229,20 +1358,12 @@ otk_widget_t *otk_list_new (otk_widget_t *win, int x, int y, int w, int h,
   list->entries_visible = list->widget.h / list->entry_height;
   list->widget.h = list->entries_visible * list->entry_height;
 
-  b1 = otk_button_new(win, x + list->widget.w - 25, 
-                           y-14, 27, 27, //list->entry_height, 
-			   "", list_scroll_up, list);
 
-  b2 = otk_button_new(win, x + list->widget.w - 25,
-                           y + list->widget.h-5, //-list->entry_height,
-                           27, 27, //list->entry_height,
-                           "", list_scroll_down, list);
+  list->scrollbar = otk_scrollbar_new (win, x + list->widget.w - 25, y,
+			        27, list->widget.h,
+			        list_scroll_up, list_scroll_down,
+			        list);
 
-#if 0
-  otk_button_add_pixmap(b1, odk_get_pixmap(PIXMAP_SIMPLE_ARROW_UP));
-  otk_button_add_pixmap(b2, odk_get_pixmap(PIXMAP_SIMPLE_ARROW_DOWN));
-#endif
-  
   window->subs = g_list_append(window->subs, list);
 
   return (otk_widget_t*) list;
