@@ -2517,20 +2517,19 @@ int mediamark_get_entry_from_id(const char *ident) {
 void mediamark_insert_entry(int index, const char *mrl, const char *ident, 
 			    const char *sub, int start, int end, int av_offset, int spu_offset) {
   char  autosub[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-  
+
   gGui->playlist.mmk = (mediamark_t **) realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
   
-  if( index < gGui->playlist.num )
-    memmove( &gGui->playlist.mmk[index+1], 
-             &gGui->playlist.mmk[index], 
-             (gGui->playlist.num - index) * sizeof(gGui->playlist.mmk[0]) );
-  
+  if(index < gGui->playlist.num)
+    memmove(&gGui->playlist.mmk[index+1], &gGui->playlist.mmk[index], 
+	    (gGui->playlist.num - index) * sizeof(gGui->playlist.mmk[0]) );
+
   /*
    * If subtitle_autoload is enabled and subtitle is NULL
    * then try to see if a matching subtitle exist 
    */
   if(mrl && (!sub) && gGui->subtitle_autoload) {
-    
+
     if(mrl_look_like_file((char *) mrl)) {
       char        *know_subs = "sub,srt,asc,smi,ssa";
       char        *vsubs;
@@ -2561,10 +2560,11 @@ void mediamark_insert_entry(int index, const char *mrl, const char *ident,
 	  sub = autosub;
       }
     }
+
   }
 
   if(mediamark_store_mmk(&gGui->playlist.mmk[index], 
-			 mrl, ident, sub, start, end, av_offset, spu_offset))
+  			 mrl, ident, sub, start, end, av_offset, spu_offset))
     gGui->playlist.num++;
 }
 
@@ -2925,59 +2925,63 @@ int mrl_look_like_file(char *mrl) {
   return 1;
 }
 
-void mediamark_collect_from_directory(char *filepathname) {
+void mediamark_collect_from_directory(char *_filepathname) {
   DIR           *dir;
   struct dirent *dentry;
+  char          *filepathname = strdup(_filepathname);
   
   if((dir = opendir(filepathname))) {
     
     while((dentry = readdir(dir))) {
-      char fullpathname[XITK_PATH_MAX + XITK_NAME_MAX];
+      char fullpathname[XITK_PATH_MAX + XITK_NAME_MAX] = "";
       
-      snprintf(fullpathname, sizeof(fullpathname), "%s/%s", filepathname, dentry->d_name);
+      snprintf(fullpathname, sizeof(fullpathname) - 1, "%s/%s", filepathname, dentry->d_name);
       
-      if(fullpathname[strlen(fullpathname) - 1] == '/')
-	fullpathname[strlen(fullpathname) - 1] = '\0';
-      
-      if(is_a_dir(fullpathname)) {
-	if(!((strlen(dentry->d_name) == 1) && (dentry->d_name[0] == '.'))
-	   && !((strlen(dentry->d_name) == 2) && 
-		((dentry->d_name[0] == '.') && dentry->d_name[1] == '.'))) {
-	  mediamark_collect_from_directory(fullpathname);
-	}
-      }
-      else {
-	char *p, *extension;
-	char  loname[strlen(fullpathname) + 1];
-	
-	p = strcat(loname, fullpathname);
-	while(*p && (*p != '\0')) {
-	  *p = tolower(*p);
-	  p++;
-	}
-	
-	if((extension = strrchr(loname, '.')) && (strlen(extension) > 1)) {
-	  char  ext[strlen(extension) + 2];
-	  char *valid_endings = 
-	    ".pls .m3u .sfv .tox .asx .smi .smil .xml .fxd " /* Playlists */
-	    ".4xm .ac3 .aif .aiff .asf .wmv .wma .wvx .wax .aud .avi .cin .cpk .cak "
-	    ".film .dv .dif .fli .flc .mjpg .mov .qt .mp4 .mp3 .mp2 .mpa .mpega .mpg .mpeg "
-	    ".mpv .mve .mve .mv8 .nsf .nsv .ogg .ogm .spx .pes .png .png .mng .pva .ra .rm "
-	    ".ram .roq .snd .au .str .iki .ik2 .dps .dat .xa .xa1 .xa2 .xas .xap .ts .m2t "
-	    ".trp .vob .voc .vox .vqa .wav .wve .y4m ";
-	  
-	  snprintf(ext, sizeof(ext), "%s ", extension);
+      if(strlen(fullpathname)) {
 
-	  if(strstr(valid_endings, ext)) {
-	    mediamark_append_entry((const char *)fullpathname, 
-				   (const char *)fullpathname, NULL, 0, -1, 0, 0);
-	  }	    
+	if(fullpathname[strlen(fullpathname) - 1] == '/')
+	  fullpathname[strlen(fullpathname) - 1] = '\0';
+	
+	if(is_a_dir(fullpathname)) {
+	  if(!((strlen(dentry->d_name) == 1) && (dentry->d_name[0] == '.'))
+	     && !((strlen(dentry->d_name) == 2) && 
+		  ((dentry->d_name[0] == '.') && dentry->d_name[1] == '.'))) {
+	    mediamark_collect_from_directory(fullpathname);
+	  }
+	}
+	else {
+	  char *p, *extension;
+	  char  loname[XITK_PATH_MAX + XITK_NAME_MAX];
+	  
+	  p = strncat(loname, fullpathname, strlen(fullpathname));
+	  while(*p && (*p != '\0')) {
+	    *p = tolower(*p);
+	    p++;
+	  }
+	  
+	  if((extension = strrchr(loname, '.')) && (strlen(extension) > 1)) {
+	    char  ext[strlen(extension) + 2];
+	    char *valid_endings = 
+	      ".pls .m3u .sfv .tox .asx .smi .smil .xml .fxd " /* Playlists */
+	      ".4xm .ac3 .aif .aiff .asf .wmv .wma .wvx .wax .aud .avi .cin .cpk .cak "
+	      ".film .dv .dif .fli .flc .mjpg .mov .qt .mp4 .mp3 .mp2 .mpa .mpega .mpg .mpeg "
+	      ".mpv .mve .mve .mv8 .nsf .nsv .ogg .ogm .spx .pes .png .png .mng .pva .ra .rm "
+	      ".ram .roq .snd .au .str .iki .ik2 .dps .dat .xa .xa1 .xa2 .xas .xap .ts .m2t "
+	      ".trp .vob .voc .vox .vqa .wav .wve .y4m ";
+	    
+	    snprintf(ext, sizeof(ext), "%s ", extension);
+	    
+	    if(strstr(valid_endings, ext)) {
+	      mediamark_append_entry((const char *)fullpathname, 
+				     (const char *)fullpathname, NULL, 0, -1, 0, 0);
+	    }	    
+	  }
 	}
       }
     }
-    
     closedir(dir);
   }
+  free(filepathname);
 }
 
 /*
