@@ -1104,11 +1104,8 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
 	Imlib_load_colors(id, palfile);
       if (id->num_colors == 0)
 	{
-	  fprintf(stderr, "IMLIB ERROR: Cannot Find Palette. A Palette is required for this mode\n");
-	  free(id);
-	  if (palfile)
-	    free(palfile);
-	  return NULL;
+	  fprintf(stderr, "IMLIB ERROR: Cannot Find Palette. Using built-in palette.\n");
+	  Imlib_load_default_colors (id);
 	}
     }
   else
