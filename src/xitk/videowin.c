@@ -650,9 +650,6 @@ void video_window_frame_output_cb (void *data,
   *win_x = (gVw->xwin < 0) ? 0 : gVw->xwin;
   *win_y = (gVw->ywin < 0) ? 0 : gVw->ywin;
 
-  /* Compute mag all the time */
-  gVw->mag = (((float) gVw->output_width / (float) gVw->video_width ) + 
-	      ((float) gVw->output_height / (float) gVw->video_height )) * .5;
 }
 
 /*
@@ -980,6 +977,11 @@ void video_window_set_mag(float mag) {
 }
 
 float video_window_get_mag () {
+
+  /* compute current mag */
+
+  gVw->mag = (((float) gVw->output_width / (float) gVw->video_width ) + 
+	      ((float) gVw->output_height / (float) gVw->video_height )) * .5;
   return gVw->mag;
 }
 
