@@ -44,16 +44,7 @@ static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, i
     break;
 
   case XINE_CONFIG_TYPE_STRING: 
-    {
-      char *newv = string;
-      char *oldv = entry->str_value;
-      
-      oldv = entry->str_value;
-      entry->str_value = newv;
-      
-      if(oldv)
-	free(oldv);
-    }
+    entry->str_value = string;
     break;
     
   case XINE_CONFIG_TYPE_ENUM:
