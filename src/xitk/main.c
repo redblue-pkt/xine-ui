@@ -459,22 +459,27 @@ int main(int argc, char *argv[]) {
   video_driver = xine_load_video_output_plugin(gGlob->gConfig, video_driver_id,
 					       VISUAL_TYPE_X11, 
 					       (void *) gGlob->gDisplay);
-
+  
   if (!video_driver) {
     printf ("main: video driver <%s> failed\n", video_driver_id);
     exit (1);
   }
-
+  
   if (!audio_driver_id) {
     char **driver_ids = xine_list_audio_output_plugins ();
-    audio_driver_id = driver_ids[0];
-
-    printf ("main: auto-selected <%s> audio output plugin\n", audio_driver_id);
-
+    int i = 0;
+    
+    while(driver_ids[i] != NULL && audio_driver == NULL) {
+      printf("try to autoload '%s' audio driver: ", driver_ids[i]);
+      
+      audio_driver = xine_load_audio_output_plugin(gGlob->gConfig, 
+						   driver_ids[i]);
+      i++;
+    }
   }
-
-  audio_driver = xine_load_audio_output_plugin(gGlob->gConfig, 
-					       audio_driver_id);
+  else
+    audio_driver = xine_load_audio_output_plugin(gGlob->gConfig, 
+						 audio_driver_id);    
 
   if (!audio_driver) {
     printf ("main: audio driver <%s> failed\n", audio_driver_id);

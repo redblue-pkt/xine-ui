@@ -441,6 +441,7 @@ void gui_change_spu_channel(widget_t *w, void *data) {
 			      (xine_get_spu_channel(gGlob->gXine) - 1));
     }
   }
+
   
   if(xine_get_spu_channel(gGlob->gXine) >= 0) 
     sprintf (gui_spuid, "%3d", xine_get_spu_channel (gGlob->gXine));
