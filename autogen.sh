@@ -162,11 +162,7 @@ run_aclocal () {
   else
     aclocalinclude=`${XINE_CONFIG} --acflags`
   fi
-  if test x"$aclocal_1_6x" = x"yes"; then
-    aclocal-1.6 $aclocalinclude -I m4
-  else
-    aclocal $aclocalinclude -I m4
-  fi
+  $aclocal $aclocalinclude -I m4
 
   echo "done." 
 }
