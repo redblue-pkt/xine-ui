@@ -186,7 +186,7 @@ msgstr ""
 #: src/xitk/event.c:761
 #, c-format
 msgid "XServer Vendor: %s. Release: %d,\n"
-msgstr "XServer Hersteller: %s. Version: %s,\n"
+msgstr "XServer Hersteller: %s. Version: %d,\n"
 
 #: src/xitk/event.c:763
 #, c-format
