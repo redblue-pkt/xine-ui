@@ -398,20 +398,47 @@ static kbinding_entry_t default_binding_table[] = {
 /*
  * Check if there some redundant entries in key binding table kbt.
  */
+static void _kbinding_reset_cb(xitk_widget_t *w, void *data, int button) {
+  kbinding_t *kbt = (kbinding_t *) data;
+  kbindings_reset_kbinding(&kbt);
+}
+static void _kbinding_editor_cb(xitk_widget_t *w, void *data, int button) {
+  kbedit_window();
+}
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
-  int i, j, found = -1;
-
+  int            i, j, found = -1;
+  xitk_window_t *xw;
+      
   if(kbt == NULL)
     return;
-
+  
   for(i = 0; kbt->entry[i]->action != NULL; i++) {
     for(j = 0; kbt->entry[j]->action != NULL; j++) {
       if(i != j && j != found) {
 	if((!strcmp(kbt->entry[i]->key, kbt->entry[j]->key)) &&
 	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier)) {
+	  char  buffer[4096];
+	  
 	  found = i;
-	  xine_error(_("Key bindings of '%s' and '%s' are the same.\n"),
-		     kbt->entry[i]->action, kbt->entry[j]->action);
+	  
+	  memset(&buffer, 0, sizeof(buffer));
+	  sprintf(buffer, _("Key bindings of '%s' and '%s' are the same.\n\n"
+			    "What do you want to do with current key bindings?\n"),
+		  kbt->entry[i]->action, kbt->entry[j]->action);
+	  
+	  xw = xitk_window_dialog_two_buttons_with_width(gGui->imlib_data,
+							 _("Keybindings error!"),
+							 _("Reset"),
+							 _("Editor"),
+							 _kbinding_reset_cb, _kbinding_editor_cb, 
+							 (void *) kbt, 400, ALIGN_CENTER,
+							 buffer);
+	  XLockDisplay(gGui->display);
+	  XSetTransientForHint(gGui->display, 
+			       xitk_window_get_window(xw), gGui->video_window);
+	  XSync(gGui->display, False);
+	  XUnlockDisplay(gGui->display);
+	  layer_above_video(xitk_window_get_window(xw));
 	}
       }
     }
