@@ -189,18 +189,23 @@ static void do_seek(commands_t *, client_info_t *);
 static void handle_client_command(client_info_t *);
 static const char *get_homedir(void);
 
-#define MAX_NAME_LEN     16
-#define MAX_PASSWD_LEN   16
+#define MAX_NAME_LEN        16
+#define MAX_PASSWD_LEN      16
 
-#define NO_ARGS          1
-#define REQUIRE_ARGS     2
-#define OPTIONAL_ARGS    3
+#define NO_ARGS             1
+#define REQUIRE_ARGS        2
+#define OPTIONAL_ARGS       3
 
-#define NOT_PUBLIC       0
-#define PUBLIC           1
+#define NOT_PUBLIC          0
+#define PUBLIC              1
 
-#define AUTH_UNNEEDED    0
-#define NEED_AUTH        1
+#define AUTH_UNNEEDED       0
+#define NEED_AUTH           1
+
+#define PASSWD_ALL_ALLOWED  1
+#define PASSWD_ALL_DENIED   2
+#define PASSWD_USER_ALLOWED 3
+#define PASSWD_USER_DENIED  4
 
 struct commands_s {
   char         *command;
@@ -1423,43 +1428,96 @@ static int server_load_passwd(const char *passwdfilename) {
 
   return 1;
 }
-static int server_is_all_authorized(void) {
+static int is_user_in_passwds(client_info_t *client_info) {
   int i;
   
+  if((client_info == NULL) || (client_info->name == NULL))
+    return 0;
+  
   for(i = 0; passwds[i]->ident != NULL; i++) {
-    if((!strcmp(passwds[i]->ident, "ALL")) && (!strcmp(passwds[i]->passwd, "ALL")))
+    if(!strcasecmp(passwds[i]->ident, client_info->name))
       return 1;
   }
-  
   return 0;
+}
+static int is_user_allowed(client_info_t *client_info) {
+  int i;
+  
+  if((client_info == NULL) || (client_info->name == NULL) || (client_info->passwd == NULL))
+    return PASSWD_USER_DENIED;
+  
+  for(i = 0; passwds[i]->ident != NULL; i++) {
+    if(!strcmp(passwds[i]->ident, client_info->name)) {
+      if(!strncmp(passwds[i]->passwd, "*", 1))
+	return PASSWD_USER_DENIED;
+      else if(!strcmp(passwds[i]->passwd, client_info->passwd))
+	return PASSWD_USER_ALLOWED;
+    }
+  }
+  return PASSWD_USER_DENIED;
+}
+static int is_client_authorized(client_info_t *client_info) {
+  int i;
+  int all, allowed;
+
+  all = allowed = 0;
+  
+  /* First, find global permissions (ALL/ALLOW|DENY) */
+  for(i = 0; passwds[i]->ident != NULL; i++) {
+    if(!strcmp(passwds[i]->ident, "ALL")) {
+      
+      all = 1;
+      
+      if(!strcmp(passwds[i]->passwd, "ALLOW"))
+	allowed = PASSWD_ALL_ALLOWED;
+      else if(!strcmp(passwds[i]->passwd, "DENY"))
+	allowed = PASSWD_ALL_DENIED;
+      else
+	all = allowed = 0;
+
+    }
+  }
+  
+  if(all) {
+    if(allowed == PASSWD_ALL_ALLOWED)
+      return 1;
+    /* 
+     * If user in password list, ask him for passwd,
+     * otherwise don't let him enter.
+     */
+    else if(allowed == PASSWD_ALL_DENIED) {
+
+      if(!is_user_in_passwds(client_info))
+	return 0;
+      else
+	return 1;
+      
+    }
+  }
+  
+  /*
+   * No valid ALL rule found, assume everybody are denied and
+   * check if used is in password file.
+   */
+  return (is_user_in_passwds(client_info));
 }
 
 /*
  * Check access rights.
  */
 static void check_client_auth(client_info_t *client_info) {
-  int i;
-
-  /* ALL:ALL passwd rule enabled */
-  if(server_is_all_authorized())
-    return;
-
+  
   client_info->authentified = 0;
   
-  for(i = 0; passwds[i]->ident != NULL; i++) {
-    if(!strcasecmp(passwds[i]->ident, client_info->name)) {
-      if(!strcasecmp(passwds[i]->passwd, client_info->passwd)) {
-	client_info->authentified = 1;
-	sock_write(client_info->socket, "user '%s' has been authentified.\n", client_info->name);
-      }
-      else
-	sock_write(client_info->socket, "bad passwd.\n");
-      
+  if(is_client_authorized(client_info)) {
+    if((is_user_allowed(client_info)) == PASSWD_USER_ALLOWED) {
+      client_info->authentified = 1;
+      sock_write(client_info->socket, "user '%s' has been authentified.\n", client_info->name);
       return;
     }
   }
-  
-  sock_write(client_info->socket, "unknown user '%s'\n", client_info->name);
+    
+  sock_write(client_info->socket, "user '%s' isn't known/authorized.\n", client_info->name);
 }
 
 static void handle_xine_error(client_info_t *client_info) {
@@ -1508,7 +1566,7 @@ static int is_args(client_info_t *client_info) {
 }
 
 /*
- * return argumemnt <num>, NULL if there is not argument.
+ * return argument <num>, NULL if there is not argument.
  */
 static const char *get_arg(client_info_t *client_info, int num) {
 
@@ -2581,7 +2639,6 @@ static void *server_thread(void *data) {
   char            *service;
   struct servent  *serv_ent;
   int              msock;
-  int              authentified;
 
   /*  Search in /etc/services if a xinectl entry exist */
   if((serv_ent = getservbyname("xinectl", "tcp")) != NULL) {
@@ -2595,9 +2652,27 @@ static void *server_thread(void *data) {
   /* password file syntax is:
    *  - one entry per line
    *  - syntax: 'identifier:password' length limit is 16 chars each
-   *  - if a line contain 'ALL:ALL' (case sensitive),
-        all client are allowed execute all commands.
-  */
+   *  - a password beginning by an asterisk '*' lock the user.
+   *  - if a line contain 'ALL:ALLOW' (case sensitive),
+   *    all client are allowed to execute all commands.
+   *  - if a line contain 'ALL:DENY' (case sensitive),
+   *    all client aren't allowed to execute a command, except those
+   *    who are specified. ex:
+   *  - rule 'ALL' is optional.
+   *    
+   *    ALL:DENY
+   *    daniel:f1rmb
+   *    .......
+   *    All users are denied, except 'daniel' (if he give good passwd) 
+   *
+   *
+   *    daniel:f1rmb
+   *    foo:*mypasswd
+   *    .......
+   *    All users are denied, 'daniel' is authorized (with passwd), 'foo'
+   *    is locked.
+   *
+   */
   {
     char        *passwdfile = ".xine/passwd";
     char         passwdfilename[(strlen((get_homedir())) + strlen(passwdfile)) + 2];
@@ -2615,7 +2690,6 @@ static void *server_thread(void *data) {
       goto __failed;
     }
 
-    authentified = server_is_all_authorized();
   }
 
   while(gGui->running) {
@@ -2629,7 +2703,7 @@ static void *server_thread(void *data) {
     lsin = sizeof(client_info->sin);
     
     client_info->socket = accept(msock, (struct sockaddr *)&(client_info->sin), &lsin);
-    client_info->authentified = authentified;
+    client_info->authentified = is_client_authorized(client_info);
     
     if(client_info->socket < 0) {
       
