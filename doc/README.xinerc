@@ -55,6 +55,8 @@ deinterlace_method	method to use for software-deinterlacing:
 
 demux_strategy          0..3: Demuxer detection strategy. (see xine.h for details about values).
 
+divx4_XXX               see README.divx4
+
 dvd_device              path to your local dvd device file
 			(e.g. /dev/hdc, /dev/cdrom, /dev/dvd)
 
