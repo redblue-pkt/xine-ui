@@ -1,0 +1,41 @@
+xine-ui for Debian
+------------------
+
+This package (along with libxine) is the official successor of the xine
+media player.
+Along with the new architecture (with separate libxine), some packaging
+issues appeared: xine-lib, ie libxine is _not_ compiled with the -fPIC option.
+This is a clear policy violation, but there's a good reason for this:
+First of all, the whole point of -fPIC is allowing several instances of the
+library in memory at the same time, saving memory and gaining performance via
+saved cache space. But it's very unlikely that someone wil watch several movies
+on the same machine at the same time...
+On the other hand, compiling the library with -fPIC takes an additional
+register which results in some 5% performance loss. So with -fPIC, you'd need
+at least a PIII-600 in order to playback DVDs. Without that, a PII-450 is
+sufficient... (provided that an Xv capable video adapter is available)
+
+Another minor issue is the lack of a static libxine. This is currently not
+really supported, but I'll try my best to add it to libxine-dev if someone
+needs it...
+
+
+the CSS issue
+=============
+
+Due to possible legal issues, xine doesn't include any code to descramble CSS
+"enhanced" DVDs. CSS is sold by the DVD industry as a "copy protection", though
+it's more of a "view protection" as it makes DVDs unviewable with unlicensed
+players (like xine).
+Some people have hacked CSS decryption routines, and some of those are
+available as xine plugins. So if you have such a DVD, have a look at one of
+the CSS plugin sites! If you are positive that it's allowed where you live,
+you can just install the Plugin and watch all your DVDs...
+
+The sites that I have heared of are:
+
+http://www.geocities.com/captain_css
+http://dvd.sf.net
+
+
+ -- Siggi Langauf <siggi@debian.org>, Sun, 12 Aug 2001 23:59:02 +0200

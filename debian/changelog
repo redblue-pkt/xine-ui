@@ -1,0 +1,9 @@
+xine-ui (0.5.0-1) unstable; urgency=low
+
+  * Initial Release of the new 0.5 architecture with separate libxine
+
+ -- Siggi Langauf <siggi@debian.org>  Sun, 12 Aug 2001 23:59:02 +0200
+
+Local variables:
+mode: debian-changelog
+End:

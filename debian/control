@@ -1,0 +1,21 @@
+Source: xine-ui
+Section: unknown
+Priority: optional
+Maintainer: Siggi Langauf <siggi@debian.org>
+Build-Depends: debhelper (>> 2.0.0), libxine-dev (>= 0.5.0)
+Standards-Version: 3.2.1
+
+Package: xine-ui
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: the xine video player, user interface 
+ This is an X11 based GUI for the libxine video player library. It provides
+ a skin based media player that can play all the audio/video formats that
+ libxine supports. Currently, this includes MPEG1/2, some AVI files and
+ disc based media (VCD, SVCD, DVD).
+ .
+ Most DVDs on the market today are play-protected by the Content Scrambling
+ System (CSS). Xine does not provide any code to descrample those DVDs,
+ because of legal uncertainties. Have a look at /usr/share/doc/README.Debian
+ for more information!
+

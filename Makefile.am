@@ -6,7 +6,10 @@ AUTOMAKE_OPTIONS = 1.3
 
 SUBDIRS = src m4 doc misc
 
-EXTRA_DIST = cvscompile.sh automake.diff
+EXTRA_DIST = cvscompile.sh automake.diff \
+             debian/README.Debian debian/changelog debian/control \
+             debian/copyright debian/dirs debian/menu debian/rules \
+             debian/xine.docs
 
 debug:
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
