@@ -2,8 +2,9 @@ xine-ui (0.9.21-1) unstable; urgency=high
 
   * new upstream version
     * doing paranoid xrdb pointer initialization (closes: #191567)
+    * fixes Metacity layering (closes: #177766)
 
- -- Siggi Langauf <siggi@debian.org>  Sat, 17 May 2003 17:14:17 +0200
+ -- Siggi Langauf <siggi@debian.org>  Sat, 17 May 2003 17:26:48 +0200
 
 xine-ui (0.9.20-3) unstable; urgency=low
 
