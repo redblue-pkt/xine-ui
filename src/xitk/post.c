@@ -1650,7 +1650,7 @@ void pplugin_parse_and_store_post(const char *post) {
 	gGui->post_elements = (post_element_t **) xine_xmalloc(sizeof(post_element_t *) * 2);
       else
 	gGui->post_elements = (post_element_t **) 
-	  realloc(gGui->post_elements, sizeof(post_element_t *) * (gGui->post_elements_num + 1));
+	  realloc(gGui->post_elements, sizeof(post_element_t *) * (gGui->post_elements_num + 2));
       
       gGui->post_elements[gGui->post_elements_num] = (post_element_t *) 
 	xine_xmalloc(sizeof(post_element_t));
