@@ -107,6 +107,7 @@ extern int XShmGetEventBase(Display *);
 #endif
 
 static void video_window_handle_event (XEvent *event, void *data);
+static void video_window_adapt_size (void);
 
 /*
  * Let the video driver override the selected visual
@@ -144,7 +145,7 @@ void video_window_select_visual (void) {
  * will set
  * output_width/output_height
  */
-static void video_window_adapt_size () { 
+static void video_window_adapt_size (void) { 
 
   static char          *window_title = "xine video output";
   XSizeHints            hint;
