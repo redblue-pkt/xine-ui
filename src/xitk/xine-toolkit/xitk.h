@@ -319,6 +319,7 @@ void xitk_unregister_event_handler(xitk_register_key_t *key);
  */
 
 int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf);
+
 /*
  * Initialization function, should be the first call to widget lib.
  */
@@ -344,6 +345,21 @@ void xitk_run(void);
 void xitk_stop(void);
 
 /*
+ * Some user settings values.
+ */
+char *xitk_get_system_font(void);
+char *xitk_get_default_font(void);
+int xitk_get_black_color(void);
+int xitk_get_white_color(void);
+int xitk_get_background_color(void);
+int xitk_get_focus_color(void);
+int xitk_get_select_color(void);
+unsigned long xitk_get_timer_label_animation(void);
+unsigned long xitk_get_warning_foreground(void);
+unsigned long xitk_get_warning_background(void);
+
+
+/*
  *
  ****** */
 
@@ -353,9 +369,19 @@ void xitk_stop(void);
 void *xitk_xmalloc(size_t);
 
 /**
+ *
+ */
+xitk_color_names_t *xitk_get_color_name(char *color);
+
+/**
  * return pointer to the xitk_color_names struct.
  */
 xitk_color_names_t *xitk_get_color_names(void);
+
+/**
+ * Free color object.
+ */
+void xitk_free_color_name(xitk_color_names_t *color);
 
 /**
  * (re)Paint a widget list.
@@ -1560,6 +1586,16 @@ unsigned int xitk_get_pixel_color_gray(ImlibData *im);
  *
  */
 unsigned int xitk_get_pixel_color_darkgray(ImlibData *im);
+
+/**
+ *
+ */
+unsigned int xitk_get_pixel_color_warning_foreground(ImlibData *im);
+
+/**
+ *
+ */
+unsigned int xitk_get_pixel_color_warning_background(ImlibData *im);
 
 /**
  *

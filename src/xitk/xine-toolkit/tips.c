@@ -122,7 +122,7 @@ static void *_tips_thread(void *data) {
   xitk_font_t        *fs;
   XWindowAttributes   wattr;
   Status              status;
-  unsigned int        cyellow, cblack;
+  unsigned int        cwarnfore, cwarnback;
 
   pthread_detach(pthread_self());
 
@@ -142,12 +142,12 @@ static void *_tips_thread(void *data) {
   string_length = xitk_font_get_string_length(fs, tp->w->tips_string);
   xitk_font_unload_font(fs);
 
-  cblack  = xitk_get_pixel_color_black(tp->w->imlibdata);
-  cyellow = xitk_get_pixel_color_from_rgb(tp->w->imlibdata, 255, 255, 0);
-
+  cwarnfore = xitk_get_pixel_color_warning_foreground(tp->w->imlibdata);
+  cwarnback = xitk_get_pixel_color_warning_background(tp->w->imlibdata);
+  
   i = xitk_image_create_image_with_colors_from_string(tp->w->imlibdata, DEFAULT_FONT_10,
 						      string_length + 1, ALIGN_LEFT, 
-						      tp->w->tips_string, cblack, cyellow);
+						      tp->w->tips_string, cwarnfore, cwarnback);
 
   
   /* Create the tips window, horizontaly centered from parent widget */
@@ -181,10 +181,10 @@ static void *_tips_thread(void *data) {
     XCopyArea(tp->w->imlibdata->x.disp, (xitk_window_get_background(tp->xwin)), bg,
 	      gc, 0, 0, width, height, 0, 0);
 
-    XSetForeground(tp->w->imlibdata->x.disp, gc, cblack);
+    XSetForeground(tp->w->imlibdata->x.disp, gc, cwarnfore);
     XDrawRectangle(tp->w->imlibdata->x.disp, bg, gc, 0, 0, width - 1, height - 1);
     
-    XSetForeground(tp->w->imlibdata->x.disp, gc, cyellow);
+    XSetForeground(tp->w->imlibdata->x.disp, gc, cwarnback);
     XFillRectangle(tp->w->imlibdata->x.disp, bg, gc, 1, 1, width - 2, height - 2);
 
     XCopyArea(tp->w->imlibdata->x.disp, i->image, bg,

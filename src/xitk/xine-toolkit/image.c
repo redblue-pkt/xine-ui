@@ -66,33 +66,45 @@ unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b) {
  */
 unsigned int xitk_get_pixel_color_black(ImlibData *im) {
   int user_color = xitk_get_black_color();
-  if(user_color > 0)
+  if(user_color >= 0)
     return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 0, 0, 0);
 }
 unsigned int xitk_get_pixel_color_white(ImlibData *im) {
   int user_color = xitk_get_white_color();
-  if(user_color > 0)
+  if(user_color >= 0)
     return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 255, 255, 255);
 }
 unsigned int xitk_get_pixel_color_lightgray(ImlibData *im) {
   int user_color = xitk_get_focus_color();
-  if(user_color > 0)
+  if(user_color >= 0)
     return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 224, 224, 224);
 }
 unsigned int xitk_get_pixel_color_gray(ImlibData *im) {
   int user_color = xitk_get_background_color();
-  if(user_color > 0)
+  if(user_color >= 0)
     return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 192, 192, 192);
 }
 unsigned int xitk_get_pixel_color_darkgray(ImlibData *im) {
   int user_color = xitk_get_select_color();
-  if(user_color > 0)
+  if(user_color >= 0)
     return (unsigned int) user_color;
   return xitk_get_pixel_color_from_rgb(im, 160, 160, 160);
+}
+unsigned int xitk_get_pixel_color_warning_foreground(ImlibData *im) {
+  int user_color = xitk_get_warning_foreground();
+  if(user_color >= 0)
+    return (unsigned int) user_color;
+  return xitk_get_pixel_color_black(im);
+}
+unsigned int xitk_get_pixel_color_warning_background(ImlibData *im) {
+  int user_color = xitk_get_warning_background();
+  if(user_color >= 0)
+    return (unsigned int) user_color;
+  return xitk_get_pixel_color_from_rgb(im, 255, 255, 0);
 }
 
 /*
@@ -939,6 +951,7 @@ static void _draw_frame(ImlibData *im, Pixmap p,
   
   if(title) {
     XLOCK(im->x.disp);
+    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
     XDrawString(im->x.disp, p, gc, (x + 6), y, buf, strlen(buf));
     XUNLOCK(im->x.disp);
     
@@ -986,6 +999,7 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
   XFillRectangle(im->x.disp, p->image, gc, 0, 3, (w - 1), h);
   XFillRectangle(im->x.disp, p->image, gc, w, 0, (w - 1), h);
 
+
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
   XDrawLine(im->x.disp, p->image, gc, 0, 3, w, 3);
   XDrawLine(im->x.disp, p->image, gc, 0, 3, 0, h);
@@ -1015,13 +1029,13 @@ void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
   XGCValues     gcv;
   int           w = p->width/3;
   int           h = p->height;
-  unsigned int  red, yellow, gray;
+  unsigned int  ccolor, fcolor, ncolor;
 
   assert(im && p);
   
-  red    = xitk_get_pixel_color_from_rgb(im, 255, 0, 0);
-  yellow = xitk_get_pixel_color_from_rgb(im, 255, 255, 0);
-  gray   = xitk_get_pixel_color_darkgray(im);
+  ncolor = xitk_get_pixel_color_darkgray(im);
+  fcolor = xitk_get_pixel_color_warning_background(im);
+  ccolor = xitk_get_pixel_color_lightgray(im);
   
   XLOCK(im->x.disp);
   
@@ -1033,7 +1047,7 @@ void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
   
   {
     int x, i;
-    unsigned int bg_colors[3] = { gray, yellow, red };
+    unsigned int bg_colors[3] = { ncolor, fcolor, ccolor };
     
     XSetForeground(im->x.disp, mgc, 0);
     XFillRectangle(im->x.disp, p->mask, mgc, 0, 0, w * 3 , h);

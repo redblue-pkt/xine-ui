@@ -44,6 +44,8 @@ typedef struct {
     int             background;
     int             focus;
     int             select;
+    int             warn_foreground;
+    int             warn_background;
   } colors;
 
   struct {
@@ -63,5 +65,7 @@ int xitk_config_get_background_color(xitk_config_t *xtcf);
 int xitk_config_get_focus_color(xitk_config_t *xtcf);
 int xitk_config_get_select_color(xitk_config_t *xtcf);
 unsigned long xitk_config_get_timer_label_animation(xitk_config_t *xtcf);
+unsigned long xitk_config_get_warning_foreground(xitk_config_t *xtcf);
+unsigned long xitk_config_get_warning_background(xitk_config_t *xtcf);
 
 #endif

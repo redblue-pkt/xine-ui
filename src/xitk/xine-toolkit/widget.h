@@ -185,6 +185,11 @@ xitk_color_names_t *xitk_get_color_names(void);
 xitk_color_names_t *xitk_get_color_name(char *color);
 
 /**
+ * Free color object.
+ */
+void xitk_free_color_name(xitk_color_names_t *color);
+
+/**
  * (re)Paint a widget list.
  */
 int xitk_paint_widget_list (xitk_widget_list_t *wl);

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XINE 1.0\n"
-"POT-Creation-Date: 2002-04-16 01:33+0200\n"
+"POT-Creation-Date: 2002-04-29 22:55+0200\n"
 "PO-Revision-Date: 2002-02-19 22:56+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:913
+#: src/xitk/xine-toolkit/mrlbrowser.c:920
 msgid "Select current entry"
 msgstr "Selecciona entrada actual"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:920
+#: src/xitk/xine-toolkit/mrlbrowser.c:927
 msgid "Play selected entry"
 msgstr "Reproduce entrada actual"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:930
+#: src/xitk/xine-toolkit/mrlbrowser.c:937
 msgid "Close MRL browser window"
 msgstr "Cierra la ventana del navegador de MRL"
 
@@ -80,22 +80,22 @@ msgstr "Mi jodida ventana"
 msgid "Quit"
 msgstr "Salir"
 
-#: src/xitk/xine-toolkit/window.c:755
+#: src/xitk/xine-toolkit/window.c:777
 msgid "OK"
 msgstr "Aceptar"
 
-#: src/xitk/xine-toolkit/window.c:817 src/xitk/xine-toolkit/window.c:1010
+#: src/xitk/xine-toolkit/window.c:839 src/xitk/xine-toolkit/window.c:1032
 msgid "Question?"
 msgstr "¿Pregunta?"
 
-#: src/xitk/xine-toolkit/window.c:944 src/xitk/xine-toolkit/window.c:1150
+#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
 msgid "Yes"
 msgstr "Sí"
 
-#: src/xitk/xine-toolkit/window.c:944 src/xitk/xine-toolkit/window.c:1150
+#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
 msgid "No"
 msgstr "No"
 
-#: src/xitk/xine-toolkit/window.c:1150
+#: src/xitk/xine-toolkit/window.c:1172
 msgid "Cancel"
 msgstr "Cancelar"

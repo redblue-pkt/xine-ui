@@ -219,11 +219,11 @@ static void create_labelofinputtext(xitk_widget_t *it,
   xitk_font_t        *fs = NULL;
   int                 lbear, rbear, width, asc, des;
   int                 yoff = 0, DefaultColor = -1;
-  unsigned int        fg;
-  XColor              color;
-  xitk_color_names_t  *gColor = NULL;
+  unsigned int        fg = 0;
+  XColor              xcolor;
+  xitk_color_names_t  *color = NULL;
 
-  color.flags = DoRed|DoBlue|DoGreen;
+  xcolor.flags = DoRed|DoBlue|DoGreen;
 
   /* Try to load font */
 
@@ -239,45 +239,51 @@ static void create_labelofinputtext(xitk_widget_t *it,
   xitk_font_set_font(fs, gc);
   xitk_font_string_extent(fs, label, &lbear, &rbear, &width, &asc, &des);
 
-  /*  Some colors configurations */
-  switch(state) {
-  case NORMAL:
-    if(!strcasecmp(private_data->normal_color, "Default")) {
-      DefaultColor = 0;
+  if((private_data->skin_element_name != NULL) ||
+     ((private_data->skin_element_name == NULL) && ((fg = xitk_get_black_color()) == -1))) {
+    
+    /*  Some colors configurations */
+    switch(state) {
+    case NORMAL:
+      if(!strcasecmp(private_data->normal_color, "Default")) {
+	DefaultColor = 0;
+      }
+      else {
+	color = xitk_get_color_name(private_data->normal_color);
+      }
+      break;
+      
+    case FOCUS:
+      if(!strcasecmp(private_data->focused_color, "Default")) {
+	DefaultColor = 0;
+      }
+      else {
+	color = xitk_get_color_name(private_data->focused_color);
+      }
+      break;
+      
+    }
+    
+    if(color == NULL || DefaultColor != -1) {
+      xcolor.red = xcolor.blue = xcolor.green = DefaultColor<<8;
     }
     else {
-      gColor = xitk_get_color_name(private_data->normal_color);
+      xcolor.red = color->red<<8; 
+      xcolor.blue = color->blue<<8;
+      xcolor.green = color->green<<8;
     }
-    break;
+    
+    XLOCK(private_data->imlibdata->x.disp);
+    XAllocColor(private_data->imlibdata->x.disp,
+		Imlib_get_colormap(private_data->imlibdata), &xcolor);
+    XUNLOCK(private_data->imlibdata->x.disp);
 
-  case FOCUS:
-    if(!strcasecmp(private_data->focused_color, "Default")) {
-      DefaultColor = 0;
-    }
-    else {
-      gColor = xitk_get_color_name(private_data->focused_color);
-    }
-    break;
+    fg = xcolor.pixel;
     
   }
   
-  if(gColor == NULL || DefaultColor != -1) {
-    color.red = color.blue = color.green = DefaultColor<<8;
-  }
-  else {
-    color.red = gColor->red<<8; 
-    color.blue = gColor->blue<<8;
-    color.green = gColor->green<<8;
-  }
-
   XLOCK(private_data->imlibdata->x.disp);
-
-  XAllocColor(private_data->imlibdata->x.disp,
-	      Imlib_get_colormap(private_data->imlibdata), &color);
-  fg = color.pixel;
-  
   XSetForeground(private_data->imlibdata->x.disp, gc, fg);
-
   XUNLOCK(private_data->imlibdata->x.disp);
 
   if(private_data->cursor_pos >= 0) {
@@ -312,7 +318,6 @@ static void create_labelofinputtext(xitk_widget_t *it,
 
   /*  Put text in the right place */
   XLOCK(private_data->imlibdata->x.disp);
-
   XDrawString(private_data->imlibdata->x.disp, pix, gc, 
 	      2, ((ysize+asc+des+yoff)>>1)-des, 
 	      plabel, strlen(plabel));
@@ -338,11 +343,7 @@ static void create_labelofinputtext(xitk_widget_t *it,
 
   xitk_font_unload_font(fs);
 
-  if(gColor) {
-    XITK_FREE(gColor->colorname);
-    XITK_FREE(gColor);
-  }
-
+  xitk_free_color_name(color);
 }
 
 /*

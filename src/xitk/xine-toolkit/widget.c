@@ -1201,6 +1201,20 @@ xitk_color_names_t *xitk_get_color_name(char *color) {
 }
 
 /*
+ * Free color object.
+ */
+void xitk_free_color_name(xitk_color_names_t *color) {
+
+  if(!color) {
+    XITK_WARNING("color is NULL\n");
+    return;
+  }
+
+  XITK_FREE(color->colorname);
+  XITK_FREE(color);
+}
+
+/*
  * Stop a widget.
  */
 void xitk_stop_widget(xitk_widget_t *w) {

@@ -1,3 +1,8 @@
+
+fontandpointers = cetus.ttf pointer1.png pointer2.png
+
+EXTRA_DIST = $(fontandpointers)
+
 CFLAGS = $(DIRECTFB_CFLAGS) @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @XINE_CFLAGS@ -DFONTDIR=\"$(XINE_SKINDIR)/../fonts/\"
 DEBUG_CFLAGS = @BUILD_LIB_STATIC@ @DEBUG_CFLAGS@ @XINE_CFLAGS@
 
@@ -15,12 +20,14 @@ bin_PROGRAMS = ${dfb_programs}
 
 if HAVE_DIRECTFB
 datadir = $(XINE_SKINDIR)/../fonts/
-data_DATA = cetus.ttf pointer1.png pointer2.png
+data_DATA = $(fontandpointers)
 endif
 
 dfbxine_SOURCES = $(GETOPT_C) utils.c options.c dfb.c main.c
-dfbxine_DEPENDENTIES = utils.h dfb.h
+dfbxine_DEPENDENTIES = utils.h
 dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm
+
+noinst_HEADERS = dfb.h
 
 $(GETOPT_C):
 	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c

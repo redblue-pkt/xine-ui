@@ -107,11 +107,11 @@ static void create_labelofbutton(xitk_widget_t *lb,
   xitk_font_t             *fs = NULL;
   int                      lbear, rbear, width, asc, des;
   int                      xoff = 0, yoff = 0, DefaultColor = -1;
-  unsigned int             fg;
-  XColor                   color;
-  xitk_color_names_t      *gColor = NULL;
+  unsigned int             fg = 0;
+  XColor                   xcolor;
+  xitk_color_names_t      *color = NULL;
 
-  color.flags = DoRed|DoBlue|DoGreen;
+  xcolor.flags = DoRed|DoBlue|DoGreen;
 
   /* Try to load font */
   if(private_data->fontname)
@@ -126,57 +126,65 @@ static void create_labelofbutton(xitk_widget_t *lb,
   xitk_font_set_font(fs, gc);
   xitk_font_string_extent(fs, label, &lbear, &rbear, &width, &asc, &des);
 
-  /*  Some colors configurations */
-  switch(state) {
-  case CLICK:
-    if(private_data->label_static == 0) {
-      xoff = -4;
-      yoff = 1;
-    }
-    if(!strcasecmp(private_data->clickcolor, "Default")) {
-      DefaultColor = 255;
-    }
-    else {
-      gColor = xitk_get_color_name(private_data->clickcolor);
-    }
-    break;
-    
-  case FOCUS:
-    if(!strcasecmp(private_data->focuscolor, "Default")) {
-      DefaultColor = 0;
-    }
-    else {
-      gColor = xitk_get_color_name(private_data->focuscolor);
-    }
-    break;
-    
-  case NORMAL:
-    if(!strcasecmp(private_data->normcolor, "Default")) {
-      DefaultColor = 0;
-    }
-    else {
-      gColor = xitk_get_color_name(private_data->normcolor);
-    }
-    break;
+  if((state == CLICK) && (private_data->label_static == 0)) {
+    xoff = -4;
+    yoff = 1;
   }
 
-  if(gColor == NULL || DefaultColor != -1) {
-    color.red = color.blue = color.green = DefaultColor<<8;
-  }
-  else {
-    color.red = gColor->red<<8; 
-    color.blue = gColor->blue<<8;
-    color.green = gColor->green<<8;
-  }
+  if((private_data->skin_element_name != NULL) ||
+     ((private_data->skin_element_name == NULL) && ((fg = xitk_get_black_color()) == -1))) {
+    
+    /*  Some colors configurations */
+    switch(state) {
+    case CLICK:
+      if(!strcasecmp(private_data->clickcolor, "Default")) {
+	DefaultColor = 255;
+      }
+      else {
+	color = xitk_get_color_name(private_data->clickcolor);
+      }
+      break;
+      
+    case FOCUS:
+      if(!strcasecmp(private_data->focuscolor, "Default")) {
+	DefaultColor = 0;
+      }
+      else {
+	color = xitk_get_color_name(private_data->focuscolor);
+      }
+      break;
+      
+    case NORMAL:
+      if(!strcasecmp(private_data->normcolor, "Default")) {
+	DefaultColor = 0;
+      }
+      else {
+	color = xitk_get_color_name(private_data->normcolor);
+      }
+      break;
+    }
+    
+    if(color == NULL || DefaultColor != -1) {
+      xcolor.red = xcolor.blue = xcolor.green = DefaultColor<<8;
+    }
+    else {
+      xcolor.red = color->red<<8; 
+      xcolor.blue = color->blue<<8;
+      xcolor.green = color->green<<8;
+    }
+    
+    XLOCK(private_data->imlibdata->x.disp);
+    XAllocColor(private_data->imlibdata->x.disp,
+		Imlib_get_colormap(private_data->imlibdata), &xcolor);
+    XUNLOCK(private_data->imlibdata->x.disp);
 
+    fg = xcolor.pixel;
+  }
+  
   XLOCK(private_data->imlibdata->x.disp);
 
-  XAllocColor(private_data->imlibdata->x.disp,
-	      Imlib_get_colormap(private_data->imlibdata), &color);
-  fg = color.pixel;
-  
   XSetForeground(private_data->imlibdata->x.disp, gc, fg);
-
+  
   /*  Put text in the right place */
   if(private_data->align == LABEL_ALIGN_CENTER) {
     XDrawString(private_data->imlibdata->x.disp, pix, gc, 
@@ -199,12 +207,7 @@ static void create_labelofbutton(xitk_widget_t *lb,
 
   xitk_font_unload_font(fs);
 
-  if(gColor) {
-    XITK_FREE(gColor->colorname);
-    XITK_FREE(gColor);
-  }
-    
-  //  return pix;
+  xitk_free_color_name(color);
 }
 
 /*

@@ -69,6 +69,8 @@ unsigned int xitk_get_pixel_color_white(ImlibData *im);
 unsigned int xitk_get_pixel_color_lightgray(ImlibData *im);
 unsigned int xitk_get_pixel_color_gray(ImlibData *im);
 unsigned int xitk_get_pixel_color_darkgray(ImlibData *im);
+unsigned int xitk_get_pixel_color_warning_foreground(ImlibData *im);
+unsigned int xitk_get_pixel_color_warning_background(ImlibData *im);
 
 /*
  * Create an image object.

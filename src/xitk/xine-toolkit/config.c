@@ -38,7 +38,7 @@
 static void xitk_config_colors(xitk_config_t *xtcf) {
   char  *p = NULL;
   char  *c = NULL;
-  int    i;
+  int    pixel;
 
   assert(xtcf != NULL && xtcf->ln != NULL);
 
@@ -52,18 +52,43 @@ static void xitk_config_colors(xitk_config_t *xtcf) {
 
     while(*c == ' ' || *c == '\t') c++;
 
-    sscanf(c, "%d", &i);
+    if((strchr(c, '#')) || (isalpha(*c))) {
+      xitk_color_names_t *color; 
 
-    if(!strncasecmp(p, "background", 10))
-      xtcf->colors.background = i;
+      if((color = xitk_get_color_name(c)) != NULL) {
+	/* 
+	 * We can't use xitk_get_pixel_from_rgb() here, 
+	 * 'cause we didn't have any ImlibData object.
+	 */
+	pixel = ((color->red & 0xf8) << 8) | 
+	  ((color->green & 0xf8) << 3) | 
+	  ((color->blue & 0xf8) >> 3);
+	
+	xitk_free_color_name(color);
+	
+      }
+      else {
+	XITK_WARNING("%s@%d: wrong color name: '%s'\n", __FUNCTION__, __LINE__, c);
+	pixel = 0;
+      }
+    }
+    else
+      sscanf(c, "%d", &pixel);
+    
+    if(!strncasecmp(p, "warning_foreground", 15))
+      xtcf->colors.warn_foreground = pixel;
+    else if(!strncasecmp(p, "warning_background", 15))
+      xtcf->colors.warn_background = pixel;
+    else if(!strncasecmp(p, "background", 10))
+      xtcf->colors.background = pixel;
     else if(!strncasecmp(p, "select", 6))
-      xtcf->colors.select = i;
+      xtcf->colors.select = pixel;
     else if(!strncasecmp(p, "focus", 5))
-      xtcf->colors.focus = i;
+      xtcf->colors.focus = pixel;
     else if(!strncasecmp(p, "black", 5))
-      xtcf->colors.black = i;
+      xtcf->colors.black = pixel;
     else if(!strncasecmp(p, "white", 5))
-      xtcf->colors.white = i;
+      xtcf->colors.white = pixel;
 
   }
 }
@@ -217,14 +242,16 @@ static void xitk_config_load_configfile(xitk_config_t *xtcf) {
 static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   assert(xtcf != NULL);
 
-  xtcf->fonts.system      = strdup("fixed");
-  xtcf->fonts.fallback    = NULL;
-  xtcf->colors.black      = -1;
-  xtcf->colors.white      = -1;
-  xtcf->colors.background = -1;
-  xtcf->colors.focus      = -1;
-  xtcf->colors.select     = -1;
-  xtcf->timers.label_anim = 50000;
+  xtcf->fonts.system           = strdup("fixed");
+  xtcf->fonts.fallback         = NULL;
+  xtcf->colors.black           = -1;
+  xtcf->colors.white           = -1;
+  xtcf->colors.background      = -1;
+  xtcf->colors.focus           = -1;
+  xtcf->colors.select          = -1;
+  xtcf->colors.warn_foreground = -1;
+  xtcf->colors.warn_background = -1;
+  xtcf->timers.label_anim      = 50000;
 }
 
 /*
@@ -273,7 +300,7 @@ int xitk_config_get_focus_color(xitk_config_t *xtcf) {
   return xtcf->colors.focus;
 }
 int xitk_config_get_select_color(xitk_config_t *xtcf) {
-
+  
   if(!xtcf)
     return -1;
   
@@ -285,6 +312,20 @@ unsigned long xitk_config_get_timer_label_animation(xitk_config_t *xtcf) {
     return 5000;
   
   return xtcf->timers.label_anim;
+}
+unsigned long xitk_config_get_warning_foreground(xitk_config_t *xtcf) {
+
+  if(!xtcf)
+    return -1;
+
+  return xtcf->colors.warn_foreground;
+}
+unsigned long xitk_config_get_warning_background(xitk_config_t *xtcf) {
+  
+  if(!xtcf)
+    return -1;
+
+  return xtcf->colors.warn_background;
 }
 
 #define SYSTEM_RC  "/etc/xitkrc"

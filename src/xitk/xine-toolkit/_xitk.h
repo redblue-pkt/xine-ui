@@ -481,6 +481,8 @@ int xitk_get_background_color(void);
 int xitk_get_focus_color(void);
 int xitk_get_select_color(void);
 unsigned long xitk_get_timer_label_animation(void);
+unsigned long xitk_get_warning_foreground(void);
+unsigned long xitk_get_warning_background(void);
 
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
 int xitk_skin_get_enability(xitk_skin_config_t *, const char *);

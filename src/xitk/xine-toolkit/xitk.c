@@ -839,6 +839,12 @@ int xitk_get_select_color(void) {
 unsigned long xitk_get_timer_label_animation(void) {
   return xitk_config_get_timer_label_animation(gXitk->config);
 }
+unsigned long xitk_get_warning_foreground(void) {
+  return xitk_config_get_warning_foreground(gXitk->config);
+}
+unsigned long xitk_get_warning_background(void) {
+  return xitk_config_get_warning_background(gXitk->config);
+}
 
 /*
  *
