@@ -135,11 +135,18 @@ fi
 dnl
 dnl check for libpng
 dnl
+if test x"$PNG_PREFIX" != "x"; then
+   PNG_LIB="-L$PNG_PREFIX/lib"
+   PNG_CFLAGS="-I$PNG_PREFIX/include"
+fi
+
 AC_CHECK_LIB(png, png_read_info,
   AC_CHECK_HEADER(png.h, png_ok=yes, png_ok=no),
-  AC_MSG_ERROR(*** libpng is needed (PNG library not found) ***), -lz -lm $X_LIBS)
+  AC_MSG_ERROR(*** libpng is needed (PNG library not found) ***), $PNG_LIB $PNG_CFLAGS -lz -lm $X_LIBS)
 
 if test x"$png_ok" = xyes; then
+     saved_CFLAGS="$CFLAGS"
+     CFLAGS="$CFLAGS $PNG_CFLAGS"
   AC_MSG_CHECKING([for png_structp in png.h])
   AC_TRY_COMPILE([#include <png.h>],
     [
@@ -156,8 +163,11 @@ png_set_IHDR;
 else
   AC_MSG_WARN(*** libpng is needed (PNG header file not found) ***)
 fi
+
+CFLAGS="$saved_CFLAGS"
+
 if test x"$png_ok" = xyes; then
-   X_LIBS="$X_LIBS -lpng -lz"
+   X_LIBS="$X_LIBS $PNG_LIB $PNG_CFLAGS -lpng -lz"
 fi
 
 
