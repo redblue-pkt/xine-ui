@@ -600,7 +600,14 @@ static xitk_widget_t *_xitk_slider_create (xitk_skin_config_t *skonfig, xitk_sli
   private_data->bArmed                   = 0;
   private_data->min                      = s->min;
 
-  if(s->max <= s->min) 
+  /* 
+   * This is a hack, yes, but some Xv driver (Gatos ATI) report
+   * ~0 as max range value and this confuse our slider.
+   */
+  if(s->max == ~0)
+    s->max = 2147483647;
+
+  if(s->max < s->min) 
     private_data->max                    = s->min + 1;
   else
     private_data->max                    = s->max;
@@ -627,7 +634,7 @@ static xitk_widget_t *_xitk_slider_create (xitk_skin_config_t *skonfig, xitk_sli
     private_data->ratio                  = (float)(private_data->max - private_data->min)/private_data->bg_skin->height;
   else
     XITK_WARNING("Unknown slider type (%d)\n", private_data->sType);
-  
+
   private_data->paddle_cover_bg          = 0;
   if(private_data->sType == XITK_HSLIDER) {
     if(private_data->button_width == private_data->bg_skin->width)
