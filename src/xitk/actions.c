@@ -94,32 +94,56 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     start_time_in_secs *= 1000;
       
   has_video     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
-#if 0 /* Will be enabled sooner */
+  printf("XINE_STREAM_INFO_HAS_VIDEO %d (%s)\n", has_video, 
+	 xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC));
+  #if 1 /* Will be enabled sooner */
   video_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_HANDLED);
-  audio_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_HANDLED);
+  printf("XINE_STREAM_INFO_VIDEO_HANDLED %d\n", video_handled);
   has_audio     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_AUDIO);
+  printf("XINE_STREAM_INFO_HAS_AUDIO %d (%s)\n", has_audio,
+	 xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC));
+  audio_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_HANDLED);
+  printf("XINE_STREAM_INFO_AUDIO_HANDLED %d\n", audio_handled);
 
   if((has_video && (!video_handled)) || (has_audio && (!audio_handled))) {
     char      buffer[4096];
-    uint32_t  vfcc, afcc;
+    int       errlvl = 0;
     
+    printf("ERROR\n");
     memset(&buffer, 0, sizeof(buffer));
     
     sprintf(buffer, _("The stream you're trying to play (%s) can't be handled by xine:\n\n"),
 	    (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current]);
 
     if(has_video && (!video_handled)) {
+      const char *minfo;
+      uint32_t    vfcc;
+
+      errlvl++;
+      minfo = xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC);
       vfcc = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_FOURCC);
-      sprintf(buffer, "%s%s%s\n", buffer, _("Video FOURCC: "), (get_fourcc_string(vfcc)));
+      sprintf(buffer, _("%sVideo Codec: %s (%s)\n"), buffer,
+	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
+	      (get_fourcc_string(vfcc)));
     }
     
     if(has_audio && (!audio_handled)) {
-      afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
-      sprintf(buffer, "%s%s%s\n", buffer, _("Audio FOURCC: "), (get_fourcc_string(afcc)));
-    }
+      const char *minfo;
+      uint32_t    afcc;
 
+      errlvl++;
+      minfo = xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC);
+      afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
+      sprintf(buffer, _("%sAudio Codec: %s (%s)\n"), buffer,
+	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
+	      (get_fourcc_string(afcc)));
+    }
+    
     xine_error(buffer);
-    return 0;
+    
+    /* We can't playback the stream at all */
+    if(errlvl == 2)
+      return 0;
   }
 #endif
 
