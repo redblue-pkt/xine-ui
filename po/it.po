@@ -1,4 +1,5 @@
 # translation of xine-ui.po to Italiano
+# translation of xine-ui.po to italiano
 # This file is distributed under the same license as the PACKAGE package.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
 # Giovanni Venturi <jumpyj@libero.it>, 2003.
@@ -21,7 +22,7 @@ msgid ""
 "The stream '%s' isn't supported by xine:\n"
 "\n"
 msgstr ""
-"Lo stream '%s' non è supportato da xine:\n"
+"Lo stream '%s' non è supportato da Xine:\n"
 "\n"
 
 #: src/xitk/actions.c:282
@@ -172,7 +173,7 @@ msgstr "%s(): non riesce a trovare l'immagine di sfondo\n"
 
 #: src/xitk/control.c:553
 msgid "xine Control Window"
-msgstr "Finestra di controllo di xine"
+msgstr "Finestra di controllo di Xine"
 
 #: src/xitk/control.c:568
 msgid "control: couldn't find image for background\n"
@@ -251,7 +252,7 @@ msgid ""
 "There is no input plugin available to handle '%s'.\n"
 "Maybe MRL syntax is wrong or file/stream source doesn't exist."
 msgstr ""
-"- errore del motore di xine -\n"
+"- errore del motore di Xine -\n"
 "\n"
 "Non c'è alcun plugin di input disponibile per trattare '%s'.\n"
 "Forse la sintassi di MRL è errata o il file o lasorgente di stream non "
@@ -265,7 +266,7 @@ msgid ""
 "There is no demuxer plugin available to handle '%s'.\n"
 "Usually this means that the file format was not recognized."
 msgstr ""
-"- errore del motore di xine -\n"
+"- errore del motore di Xine -\n"
 "\n"
 "Non c'è alcun plugin demuxer disponibile per trattare '%s'.\n"
 "Di solito ciò significa che il formato del file non è stato riconosciuto."
@@ -277,7 +278,7 @@ msgid ""
 "\n"
 "Demuxer failed. Maybe '%s' is a broken file?\n"
 msgstr ""
-"- errore del motore di xine -\n"
+"- errore del motore di Xine -\n"
 "\n"
 "Demuxer non riuscito. Forse '%s' è un file incompleto?\n"
 
@@ -288,7 +289,7 @@ msgid ""
 "\n"
 "Malformed mrl. Mrl '%s' seems malformed/invalid.\n"
 msgstr ""
-"- errore del motore di xine -\n"
+"- errore del motore di Xine -\n"
 "\n"
 "MRL malformato. L'MRL '%s' sembra malformanto/non valido.\n"
 
@@ -299,7 +300,7 @@ msgid ""
 "\n"
 "Input plugin failed to open mrl '%s'\n"
 msgstr ""
-"- errore del motore di xine -\n"
+"- errore del motore di Xine -\n"
 "\n"
 "Il plugin di input non è riuscito ad aprire l'MRL '%s' !!\n"
 
@@ -309,7 +310,7 @@ msgid ""
 "\n"
 "!! Unhandled error !!\n"
 msgstr ""
-"- errore del motore di xine -\n"
+"- errore del motore di Xine -\n"
 "\n"
 "!! Errore non gestito !!\n"
 
@@ -525,12 +526,12 @@ msgstr "Tempo di permanenza della visuale OSD, in secondi."
 
 #: src/xitk/event.c:1235
 msgid "Change xine's behavior for unexperienced user"
-msgstr "Cambia il comportamento di xine per utenti inesperti"
+msgstr "Cambia il comportamento di Xine per utenti inesperti"
 
 #: src/xitk/event.c:1236
 msgid "In this mode, xine take some decisions to simplify user's life."
 msgstr ""
-"In questa modalità, xine prende alcune decisoni per semplificare la vita "
+"In questa modalità, Xine prende alcune decisoni per semplificare la vita "
 "dell'utente."
 
 #: src/xitk/event.c:1244
@@ -542,7 +543,7 @@ msgid ""
 "If xine don't support audio or video codec of current stream the user will "
 "be asked if the stream should be played or not"
 msgstr ""
-"Se xine non supporta codec audio o video del corrente stream allora chiede "
+"Se Xine non supporta codec audio o video del corrente stream allora chiede "
 "all'utente se riprodurre o meno lo stream"
 
 #: src/xitk/event.c:1254
@@ -567,7 +568,7 @@ msgstr "Mostra splash screen"
 
 #: src/xitk/event.c:1273
 msgid "If enabled, xine will display its splash screen"
-msgstr "Se abilitato, xine mostrerà il suo splash screen"
+msgstr "Se abilitato, Xine mostrerà il suo splash screen"
 
 #. Some infos
 #: src/xitk/event.c:1286
@@ -899,7 +900,7 @@ msgstr "Cattiva visuale '%s'\n"
 #: src/xitk/main.c:403
 #, c-format
 msgid "This is xine (X11 gui) - a free video player v%s"
-msgstr "Questo è xine (X11 gui) - un riproduttore video libero v%s"
+msgstr "Questo è Xine (X11 gui) - un riproduttore video libero v%s"
 
 #: src/xitk/main.c:407
 msgid ""
@@ -907,21 +908,21 @@ msgid ""
 "(c) 2000-2003 The xine Team.\n"
 msgstr ""
 ".\n"
-"(c) 2000-2003 Il team di xine.\n"
+"(c) 2000-2003 Il team di Xine.\n"
 
 #: src/xitk/main.c:417
 #, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
-msgstr "Generato con la libreria xine %d.%d.%d (%s)\n"
+msgstr "Generato con la libreria Xine %d.%d.%d (%s)\n"
 
 #: src/xitk/main.c:422
 #, c-format
 msgid "Found xine library version: %d.%d.%d (%s).\n"
-msgstr "Trovata libreria xine versione: %d.%d.%d (%s).\n"
+msgstr "Trovata libreria Xine versione: %d.%d.%d (%s).\n"
 
 #: src/xitk/main.c:452
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
-msgstr "Usa: xine [OPZIONI]... [MRL]\n"
+msgstr "Usa: Xine [OPZIONI]... [MRL]\n"
 
 #: src/xitk/main.c:455
 msgid "  -v, --version                Display version.\n"
@@ -1306,7 +1307,7 @@ msgstr ""
 msgid ""
 "      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
 msgstr ""
-"      --broadcast-port <port>  Imopsta la porta di broadcast di xine (parte "
+"      --broadcast-port <port>  Imopsta la porta di broadcast di Xine (parte "
 "principale)\n"
 
 #: src/xitk/main.c:548
@@ -1357,7 +1358,7 @@ msgid ""
 "      --stdctl                 Control xine by the console, using lirc "
 "commands.\n"
 msgstr ""
-"      --stdctl                 Controlla xine tramite una console, usando i "
+"      --stdctl                 Controlla Xine tramite una console, usando i "
 "comandi lirc.\n"
 
 #: src/xitk/main.c:559
@@ -1405,7 +1406,7 @@ msgstr "driver video da usare"
 #: src/xitk/main.c:616 src/xitk/main.c:738
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
-"Scegli driver video. NOTA: dovresti riavviare xine per usare il nuovo driver"
+"Scegli driver video. NOTA: dovresti riavviare Xine per usare il nuovo driver"
 
 #: src/xitk/main.c:663
 #, c-format
@@ -1428,7 +1429,7 @@ msgstr "driver audio da usare"
 #: src/xitk/main.c:749
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
-"Scegli driver audio. NOTA: dovresti riavviare xine per usare il nuovo driver"
+"Scegli driver audio. NOTA: dovresti riavviare Xine per usare il nuovo driver"
 
 #: src/xitk/main.c:763 src/xitk/main.c:807
 msgid "main: not using any audio driver (as requested).\n"
@@ -1536,7 +1537,7 @@ msgstr "*sigh*, errore sconosciuto."
 #: src/xitk/main.c:1164
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
-msgstr "Richiesta libreria xine versione 1.0.0, trovata %d.%d.%d.\n"
+msgstr "Richiesta libreria Xine versione 1.0.0, trovata %d.%d.%d.\n"
 
 #: src/xitk/main.c:1172
 msgid "sigprocmask() failed.\n"
@@ -1583,7 +1584,7 @@ msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
-"Se è abilitato e se non specifichi alcuna MRL dalla linea di commando, xine "
+"Se è abilitato e se non specifichi alcuna MRL dalla linea di commando, Xine "
 "caricherà automaticamente la precedente playlist."
 
 #: src/xitk/main.c:1760
@@ -1997,7 +1998,7 @@ msgstr "Tutte le estensioni"
 
 #: src/xitk/mrl_browser.c:261
 msgid "xine MRL Browser"
-msgstr "Navigatore MRL di xine"
+msgstr "Navigatore MRL di Xine"
 
 #: src/xitk/mrl_browser.c:288
 msgid "Source:"
@@ -2082,7 +2083,7 @@ msgstr "Abilita/Disabilita muto"
 
 #: src/xitk/panel.c:946
 msgid "xine Panel"
-msgstr "Pannello di xine"
+msgstr "Pannello di Xine"
 
 #: src/xitk/panel.c:967
 msgid "panel: couldn't find image for background\n"
@@ -2186,7 +2187,7 @@ msgstr "Salva una playlist"
 
 #: src/xitk/playlist.c:1020
 msgid "xine Playlist Editor"
-msgstr "Editor di playlist di xine"
+msgstr "Editor di playlist di Xine"
 
 #: src/xitk/playlist.c:1038
 msgid "playlist: couldn't find image for background\n"
@@ -2331,7 +2332,7 @@ msgstr "FAQ"
 
 #: src/xitk/setup.c:1262
 msgid "xine setup"
-msgstr "impostazioni di xine"
+msgstr "impostazioni di Xine"
 
 #: src/xitk/setup.c:1307
 msgid "OK"
@@ -2625,7 +2626,7 @@ msgstr ""
 #.
 #: src/xitk/videowin.c:231
 msgid "xine video output"
-msgstr "output video di xine"
+msgstr "output video di Xine"
 
 #: src/xitk/videowin.c:379
 msgid "XF86VidMode Extension: modeline switching failed.\n"
@@ -2664,15 +2665,15 @@ msgstr "altezza per xinerama a schermo pieno (-8192 = autorilevamento)"
 
 #: src/xitk/videowin.c:1396
 msgid "xine Video Window"
-msgstr "Finestra video di xine"
+msgstr "Finestra video di Xine"
 
 #: src/xitk/videowin.c:1400
 msgid "xine Video Fullscreen Window"
-msgstr "Finestra video a schermo intero di xine"
+msgstr "Finestra video a schermo intero di Xine"
 
 #: src/xitk/videowin.c:1404
 msgid "xine Video Borderless Window"
-msgstr "Finestra video senza bordi di xine"
+msgstr "Finestra video senza bordi di Xine"
 
 #: src/xitk/videowin.c:1428
 msgid "XAllocWMHints() failed\n"
@@ -2730,7 +2731,7 @@ msgstr "Non c'è alcun elemento di log per il fare il log della sezione '%s'.\n"
 
 #: src/xitk/viewlog.c:430
 msgid "xine log viewer"
-msgstr "visualizzatore log di xine"
+msgstr "visualizzatore log di Xine"
 
 #: src/xitk/viewlog.c:478
 msgid "Refresh"
