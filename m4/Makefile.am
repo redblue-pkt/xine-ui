@@ -1,6 +1,7 @@
 ##
 ## Process this file with automake to produce Makefile.in
 ##
+
 EXTRA_DIST = \
 	ORBit.m4 \
 	aa.m4 \
@@ -16,6 +17,7 @@ EXTRA_DIST = \
 
 
 debug:
+
 install-debug: debug
 
 mostlyclean-generic:

@@ -1,8 +1,8 @@
-EXTRA_DIST = $(data_DATA)
+EXTRA_DIST = $(skins_DATA)
 
-datadir = $(XINE_SKINDIR)/xinetic
+skinsdir = $(datadir)/xine/skins/xinetic
 
-data_DATA =                                                                                       \
+skins_DATA =                                                                                       \
 	ArrowDown.png	   MainBg.png	      MainPower.png	PlBg.png        SkItemBtn.png     \
 	ArrowUp.png	   MainCam.png	      MainPrev.png	PlBtn.png	SkSlidBG.png      \
 	BigArrowDown.png   MainClose.png      MainSetup.png	PlDelete.png    SkSlidPad.png     \

@@ -1,4 +1,3 @@
-
 EXTRA_DIST = \
 	getopt.c \
 	getopt1.c \

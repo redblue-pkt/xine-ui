@@ -1,14 +1,12 @@
+if HAVE_ORBIT
+
 CFLAGS = @BUILD_LIB_STATIC@ @CFLAGS@ @ORBIT_CFLAGS@
 
-ORBIT_IDL = @ORBIT_IDL@
+EXTRA_DIST = xine.idl example.py
+
 idldir = $(datadir)/idl
-##idl_DATA = xine.idl
+idl_DATA = xine.idl
 
-EXTRA_DIST = xine.idl xine-impl.c example.py corba-utils.c
-
-#BUILT_SOURCES = xine-common.c xine-skels.c xine-stubs.c xine.h
-
-if HAVE_ORBIT
 xine.h:
 	$(ORBIT_IDL) $(top_srcdir)/corba/xine.idl
 
@@ -20,34 +18,26 @@ xine-skels.c: xine.h
 
 xine-stubs.c: xine.h
 	$(ORBIT_IDL) $(top_srcdir)/corba/xine.idl
+noinst_LTLIBRARIES = libcorba.la
+libcorba_la_SOURCES = xine-impl.c corba-utils.c xine-server.c
+libcorba_la_CFLAGS = $(AM_FLAGS)
 
-corbalib_libs = libcorba.la
-corbalib_srcs = xine-common.c xine-skels.c xine-stubs.c \
-	corba-utils.c
-corbabin_bins = xine-remote
-corbabin_srcs = xine-common.c xine-skels.c xine-stubs.c \
-	corba-utils.c
-endif
+bin_PROGRAMS = xine-remote
+xine_remote_SOURCES = xine-impl.c corba-utils.c xine-remote.c
 
-noinst_LTLIBRARIES = $(corbalib_libs)
-libcorba_la_SOURCES = $(corbalib_srcs) xine-server.c
-
-bin_PROGRAMS = $(corbabin_bins)
-xine_remote_SOURCES = $(corbabin_srcs) xine-remote.c
 xine_remote_LDADD = @ORBIT_LIBS@
 
 noinst_HEADERS = xine-server.h corba-utils.h
 
-
 clean-generic:
 	-rm -f xine-common.c xine-skels.c xine-stubs.c xine.h
-
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) @ORBIT_CFLAGS@"
 
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*
@@ -58,3 +48,5 @@ maintainer-clean-generic:
 	-@echo "it deletes files that may require special tools to rebuild."
 	-rm -f Makefile.in
 	-rm -f xine-common.c xine-skels.c xine-stubs.c xine.h
+endif
+

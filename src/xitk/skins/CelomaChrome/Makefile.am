@@ -1,8 +1,8 @@
-EXTRA_DIST = $(data_DATA)
+EXTRA_DIST = $(skins_DATA)
 
-datadir = $(XINE_SKINDIR)/CelomaChrome
+skinsdir = $(datadir)/xine/skins/CelomaChrome
 
-data_DATA =                                                                                       \
+skins_DATA =                                                                                       \
 	BigArrowDown.png  LettersMiddle.png   MainPlay.png	 PlBtn.png	  SkItemBtn.png   \
 	BigArrowUp.png	  LettersMini.png     MainPower.png	 PlDelete.png	  SkSlidBG.png    \
 	CtlBg.png	  MainAutoButton.png  MainPrev.png	 PlDeleteAll.png  SkSlidPad.png   \

@@ -750,7 +750,7 @@ dnl
 dnl skins dir location, xine-config told us about this.
 dnl
 XINE_SKINDIR="$xine_data_dir/skins"
-AC_SUBST(XINE_SKINDIR)
+dnl AC_SUBST(XINE_SKINDIR)
 AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of Xine skin directory])
 
 XINE_LOGO_MRL="$xine_logo_mrl"

@@ -12,30 +12,31 @@ endif
 
 if HAVE_GETOPT_LONG
 else
-GETOPT_C = getopt.c getopt1.c
-GETOPT_H = getopt.h
+GETOPT_C = \
+	$(top_srcdir)/src/common/getopt.c \
+	$(top_srcdir)/src/common/getopt1.c
+
+GETOPT_H = \
+ 	$(top_srcdir)/src/common/getopt.h
 endif
 
 bin_PROGRAMS = ${dfb_programs} 
 
 if HAVE_DIRECTFB
-datadir = $(XINE_SKINDIR)/../fonts/
-data_DATA = $(fontandpointers)
+fontdir = $(datadir)/xine/fonts/
+font_DATA = $(fontandpointers)
 endif
 
-dfbxine_SOURCES = $(GETOPT_C) utils.c options.c dfb.c main.c
+dfbxine_SOURCES = $(GETOPT_C) \
+	$(top_srcdir)/src/common/utils.c \
+	options.c \
+	dfb.c \
+	main.c
+
 dfbxine_DEPENDENTIES = utils.h
 dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 noinst_HEADERS = dfb.h
-
-$(GETOPT_C):
-	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c
-	$(LN_S) $(top_srcdir)/src/common/getopt1.c ./getopt1.c
-	$(LN_S) $(top_srcdir)/src/common/getopt.h ./getopt.h
-
-utils.c:
-	$(LN_S) $(top_srcdir)/src/common/utils.c ./utils.c
 
 debug:
 	@$(MAKE) CFLAGS="-DFONTDIR=\\\"$(XINE_SKINDIR)/../fonts/\\\" $(DEBUG_CFLAGS)"

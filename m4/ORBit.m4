@@ -192,9 +192,9 @@ main ()
      ifelse([$3], , :, [$3])
   fi
 
+  AC_ARG_VAR(ORBIT_IDL, [ORBit IDL compiler])
   AC_PATH_PROG(ORBIT_IDL, orbit-idl, ifelse([$3], , :, [$3]))
   AC_SUBST(ORBIT_CFLAGS)
   AC_SUBST(ORBIT_LIBS)
-  AC_SUBST(ORBIT_IDL)
   rm -f conf.orbittest
 ])

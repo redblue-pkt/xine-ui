@@ -1,8 +1,8 @@
-EXTRA_DIST = $(data_DATA)
+EXTRA_DIST = $(skins_DATA)
 
-datadir = $(XINE_SKINDIR)/cloudy
+skinsdir = $(datadir)/xine/skins/cloudy
 
-data_DATA = ComBox.png		MainBg.png	    MainPower.png	    MrlPlay.png		\
+skins_DATA = ComBox.png		MainBg.png	    MainPower.png	    MrlPlay.png		\
 	ComDismiss.png		MainClose.png	    MainPrev.png	    MrlSelect.png	\
 	ComLetters.png		MainCtlBtn.png	    MainSetup.png	    PlAdd.png		\
 	ComScrollArrowDown.png	MainEject.png	    MainSliderBg.png	    PlBg.png		\

@@ -6,7 +6,7 @@ AUTOMAKE_OPTIONS = 1.3
 
 ACLOCAL_AMFLAGS = @XINE_ACFLAGS@ -I m4
 
-SUBDIRS = readline intl src m4 doc misc po
+SUBDIRS = doc m4 readline intl po misc src  
 
 EXTRA_DIST = automake.diff \
 	cvscompile.sh\
