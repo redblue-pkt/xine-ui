@@ -152,10 +152,10 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
 }
 
 void gui_toggle_aspect(void) {
-
+  
   gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO,
 				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO) + 1);
-
+  
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 

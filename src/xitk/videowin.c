@@ -527,7 +527,18 @@ void video_window_handle_event (XEvent *event) {
   case VisibilityNotify:
     if(event->xany.window == gGui->video_window) {
       if(xine_get_status(gGui->xine) != XINE_STOP) {
+	XConfigureEvent *cev = (XConfigureEvent *) event;
+	x11_rectangle_t area;
 
+	area.x = 0;
+	area.y = 0;
+	gVw->video_width = area.w = cev->width;
+	gVw->video_height = area.h = cev->height;
+	
+	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+					    GUI_DATA_EX_DEST_POS_SIZE_CHANGED, 
+					    &area);
+	
 	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 					    GUI_DATA_EX_EXPOSE_EVENT, 
 					    event);
