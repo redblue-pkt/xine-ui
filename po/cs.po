@@ -88,6 +88,7 @@ msgstr ""
 "- chyba z enginu xine -\n"
 "\n"
 "Pro '%s' není dostupný ¾ádný vstupní modul.\n"
+"Mo¾ná je ¹patná syntaxe MRL nebo neexistuje soubor nebo data.\n"
 
 #: src/xitk/errors.c:189
 #, c-format
@@ -99,6 +100,7 @@ msgstr ""
 "- chyba z enginu xine -\n"
 "\n"
 "Pro '%s' není k dispozici ¾ádný demux-modul.\n"
+"Obvykle toto znamená, ¾e nebyl rozpoznán formát souboru.\n"
 
 #: src/xitk/errors.c:194
 msgid ""
@@ -108,7 +110,7 @@ msgid ""
 msgstr ""
 "- chyba z enginu xine -\n"
 "\n"
-"!! Neoèekávaná chyba !!\n"
+"demuxer selhal. Mo¾ná, ¾e je '%s' po¹kozený soubor.\n"
 
 #: src/xitk/event.c:823
 msgid ""
@@ -116,8 +118,8 @@ msgid ""
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
 "\n"
-"selhala funkce XInitThreads - vypadá to, ¾e va¹e xlib není bezpeèná pro "
-"vlákna.\n"
+"selhala funkce XInitThreads - vypadá to, ¾e va¹e xlib není bezpeèná "
+"s vlákny.\n"
 
 #: src/xitk/event.c:833
 msgid "Cannot open display\n"
@@ -235,7 +237,7 @@ msgstr "  -g, --hide-gui               skrýt GUI (panel, atd.)\n"
 
 #: src/xitk/main.c:194
 msgid "  -H, --hide-video             hide video window\n"
-msgstr "  -H, --hide-video             skrýt okno s wideem\n"
+msgstr "  -H, --hide-video             skrýt okno s videem\n"
 
 #: src/xitk/main.c:196
 msgid "  -L, --no-lirc                Turn off LIRC support.\n"
@@ -299,8 +301,7 @@ msgstr ""
 #: src/xitk/main.c:207
 msgid "  -R, --root                   Use root window as video window.\n"
 msgstr ""
-"  -R, --root                   Pro zobrazení videa pou¾ít pracovní plochu "
-"(koøenové okno)\n"
+"  -R, --root                   Pro zobrazení videa pou¾ít pracovní plochu.\n"
 
 #: src/xitk/main.c:209
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -365,7 +366,7 @@ msgstr "main: specifikovaný zvukový ovladaè '%s' selhal\n"
 #: src/xitk/main.c:468
 #, c-format
 msgid "Require xine library version 0.9.9, found %d.%d.%d.\n"
-msgstr "Vy¾adována knihovna xine ve verzi 0.9.9, nalezena %d.%d.%d.\n"
+msgstr "Vy¾adována knihovna xine verze 0.9.9, nalezena %d.%d.%d.\n"
 
 #: src/xitk/main.c:540
 msgid "video driver id required for -V option\n"
@@ -373,7 +374,7 @@ msgstr "u volby -V po¾adováno ID videoovladaèe\n"
 
 #: src/xitk/main.c:550
 msgid "audio driver id required for -A option\n"
-msgstr "u volby -A po¾adováno ID zvukového obladaèe\n"
+msgstr "u volby -A po¾adováno ID zvukového ovladaèe\n"
 
 #: src/xitk/main.c:658
 #, c-format
