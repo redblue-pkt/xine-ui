@@ -1634,7 +1634,8 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   xitk_labelbutton_change_label(kbedit->widget_list, kbedit->grab, _("Press Keyboard Keys..."));
   XLockDisplay(gGui->display);
   XSync(gGui->display, False);
-  
+  XUnlockDisplay(gGui->display);
+
   {
     int x, y, w, h;
 
@@ -1647,14 +1648,16 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     
   }
   
+  XLockDisplay(gGui->display);
   XRaiseWindow(gGui->display, (xitk_window_get_window(xwin)));
   XMapWindow(gGui->display, (xitk_window_get_window(xwin)));
+  XUnlockDisplay(gGui->display);
 
   while(!xitk_is_window_visible(gGui->display, (xitk_window_get_window(xwin))))
     xine_usec_sleep(5000);
   
+  XLockDisplay(gGui->display);
   XSetInputFocus(gGui->display, (xitk_window_get_window(xwin)), RevertToParent, CurrentTime);
-  
   XUnlockDisplay(gGui->display);
 
   do {

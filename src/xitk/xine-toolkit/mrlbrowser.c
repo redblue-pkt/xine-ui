@@ -692,6 +692,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
     hint.flags  = PPosition | PSize;
+
     XLOCK(private_data->imlibdata->x.disp);
     XSetWMNormalHints(private_data->imlibdata->x.disp, private_data->window, &hint);
 

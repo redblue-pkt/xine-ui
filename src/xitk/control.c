@@ -344,10 +344,13 @@ void control_change_skins(void) {
       xine_error(_("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
-    
+    XUnlockDisplay(gGui->display);
+
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
     hint.flags  = PPosition | PSize;
+
+    XLockDisplay(gGui->display);
     XSetWMNormalHints(gGui->display, control->window, &hint);
     
     XResizeWindow (gGui->display, control->window,
@@ -365,7 +368,6 @@ void control_change_skins(void) {
     control->bg_image = new_img;
     
     XLockDisplay(gGui->display);
-    
     XSetTransientForHint(gGui->display, control->window, gGui->video_window);
     
     Imlib_destroy_image(gGui->imlib_data, old_img);
@@ -428,6 +430,8 @@ void control_panel(void) {
     exit(-1);
   }
 
+  XUnlockDisplay(gGui->display);
+
   hint.x = xine_config_register_num (gGui->xine, "gui.control_x", 
 				     200,
 				     CONFIG_NO_DESC,
@@ -458,6 +462,8 @@ void control_panel(void) {
    * Colormap
    */
   attr.border_pixel      = 1;
+
+  XLockDisplay(gGui->display);
   attr.colormap		 = Imlib_get_colormap(gGui->imlib_data);
 
   control->window = XCreateWindow (gGui->display,
@@ -472,6 +478,7 @@ void control_panel(void) {
  			 None, NULL, 0, &hint);
   
   XSelectInput(gGui->display, control->window, INPUT_MOTION | KeymapStateMask);
+  XUnlockDisplay(gGui->display);
   
   if(is_layer_above())
     xitk_set_layer_above(control->window);
@@ -480,6 +487,7 @@ void control_panel(void) {
    * wm, no border please
    */
 
+  XLockDisplay(gGui->display);
   prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", True);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;

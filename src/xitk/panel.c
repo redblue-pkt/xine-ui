@@ -435,12 +435,16 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     XMapWindow(gGui->display, gGui->panel_window); 
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
-    
+    XUnlockDisplay (gGui->display);
+
     layer_above_video(gGui->panel_window);
      
-    if(gGui->cursor_grabbed)
-       XUngrabPointer(gGui->display, CurrentTime);
-     
+    if(gGui->cursor_grabbed) {
+      XLockDisplay (gGui->display);
+      XUngrabPointer(gGui->display, CurrentTime);
+      XUnlockDisplay (gGui->display);
+    }
+    
     /* TODO: Currently this is a quick hack
      * We should rather test whether screen size has changed
      * and move the panel on screen if it doesn't fit any longer */
@@ -448,16 +452,16 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 #ifdef HAVE_XF86VIDMODE
         || gGui->XF86VidMode_fullscreen
 #endif
-       ) {
+	) {
     /*
      * necessary to place the panel in a visible area (otherwise it might
      * appear off the video window while switched to a differenti
      * modeline or tv mode)
      */
-       XMoveWindow(gGui->display, gGui->panel_window, 40, 40);
+      XLockDisplay (gGui->display);
+      XMoveWindow(gGui->display, gGui->panel_window, 40, 40);
+      XUnlockDisplay (gGui->display);
     }
-
-    XUnlockDisplay(gGui->display);
 
     if(gGui->logo_mode == 0) {
       int pos;
@@ -793,6 +797,8 @@ void panel_init (void) {
     exit(-1);
   }
 
+  XUnlockDisplay(gGui->display);
+
   /*
    * open the panel window
    */
@@ -827,6 +833,8 @@ void panel_init (void) {
    * Colormap
    */
   attr.border_pixel      = gGui->black.pixel;
+
+  XLockDisplay(gGui->display);
   attr.colormap          = Imlib_get_colormap(gGui->imlib_data);
   /*  
       printf ("imlib_data: %d visual : %d\n",gGui->imlib_data,gGui->imlib_data->x.visual);
@@ -848,6 +856,8 @@ void panel_init (void) {
 
   XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | KeymapStateMask);
 
+  XUnlockDisplay(gGui->display);
+
   if(is_layer_above())
     xitk_set_layer_above(gGui->panel_window);
   
@@ -855,6 +865,7 @@ void panel_init (void) {
    * wm, no border please
    */
   
+  XLockDisplay(gGui->display);
   prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
@@ -892,6 +903,7 @@ void panel_init (void) {
   gc = XCreateGC(gGui->display, gGui->panel_window, 0, 0);
 
   Imlib_apply_image(gGui->imlib_data, panel->bg_image, gGui->panel_window);
+  XUnlockDisplay(gGui->display);
 
   /*
    * Widget-list
@@ -1175,15 +1187,15 @@ void panel_init (void) {
     panel->visible = 1;
 
   if (panel->visible) {
+    XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window); 
     XMapWindow(gGui->display, gGui->panel_window); 
+    XUnlockDisplay(gGui->display);
   }
   else
     xitk_hide_widgets(panel->widget_list);
   
   
-  XUnlockDisplay (gGui->display);
-
   panel->widget_key = xitk_register_event_handler("panel", 
 						  gGui->panel_window, 
 						  panel_handle_event,

@@ -159,7 +159,6 @@ static Bool have_xtestextention(void) {
 void video_window_select_visual (void) {
   XVisualInfo *vinfo = (XVisualInfo *) -1;
 
-  XLockDisplay (gGui->display);
   if (gGui->vo_port) {
 
     xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_SELECT_VISUAL, &vinfo);
@@ -174,11 +173,12 @@ void video_window_select_visual (void) {
     }
     if (gGui->visual != gVw->visual) {
       printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), gGui->visual->visualid);
+      XLockDisplay (gGui->display);
       gui_init_imlib (gGui->visual);
+      XUnlockDisplay (gGui->display);
       video_window_adapt_size ();
     }
   }
-  XUnlockDisplay (gGui->display);
 }
 
 /*
@@ -746,9 +746,9 @@ static void video_window_adapt_size (void) {
 		    None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
   }
 
-  gVw->old_widget_key = gVw->widget_key;
-
   XUnlockDisplay (gGui->display);
+
+  gVw->old_widget_key = gVw->widget_key;
 
   gVw->widget_key = xitk_register_event_handler("video_window", 
 						gGui->video_window, 
@@ -943,11 +943,11 @@ void video_window_set_visibility(int show_window) {
   gVw->show = show_window;
 
   if (gVw->show == 1) {
-    XLockDisplay (gGui->display);
     
     if((is_layer_above()) && (gVw->hide_on_start == 0))
       xitk_set_layer_above(gGui->video_window);
     
+    XLockDisplay (gGui->display);
     XRaiseWindow(gGui->display, gGui->video_window);
     XMapWindow(gGui->display, gGui->video_window);
     XUnlockDisplay (gGui->display);
@@ -1000,8 +1000,6 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->have_xtest         = have_xtestextention();
   gVw->hide_on_start      = hide_on_start;
 
-  XLockDisplay (gGui->display);
-
   gVw->depth	          = gGui->depth;
   gVw->visual		  = gGui->visual;
   gVw->colormap		  = gGui->colormap;
@@ -1009,6 +1007,8 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   video_window_select_visual ();
   gVw->xwin               = window_attribute->x;
   gVw->ywin               = window_attribute->y;
+
+  XLockDisplay (gGui->display);
   gVw->desktopWidth       = DisplayWidth(gGui->display, gGui->screen);
   gVw->desktopHeight      = DisplayHeight(gGui->display, gGui->screen);
 
@@ -1145,8 +1145,6 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   }
 
 #ifdef HAVE_XF86VIDMODE
-  XLockDisplay (gGui->display);
-  
   if(xine_config_register_bool(gGui->xine, "gui.use_xvidext", 
 			       0,
 			       _("use XVidModeExtension when switching to fullscreen"),
@@ -1162,7 +1160,9 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
      * FIXME: maybe display a warning message or so?!
      */
     gVw->stream_resize_window = 1;
-     
+    
+    XLockDisplay (gGui->display);
+    
     if(XF86VidModeQueryExtension(gGui->display, &dummy_query_event, &dummy_query_error)) {
       XF86VidModeModeInfo* XF86_modelines_swap;
       int                  major, minor, sort_x, sort_y;
@@ -1194,11 +1194,11 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
     } else {
       printf(_("XF86VidMode Extension: initialization failed, not using it.\n"));
     }
+    XUnlockDisplay (gGui->display);
   }
-   else
-     gVw->XF86_modelines_count = 0;
-
-  XUnlockDisplay (gGui->display);
+  else
+    gVw->XF86_modelines_count = 0;
+  
 #endif
 
   video_window_set_mag(1.0);

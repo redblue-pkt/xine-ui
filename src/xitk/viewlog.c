@@ -366,9 +366,6 @@ static void viewlog_create_tabs(void) {
   xitk_window_change_background(gGui->imlib_data, viewlog->xwin, bg->pixmap, 
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XLockDisplay(gGui->display);
-  XUnlockDisplay(gGui->display);
-
   xitk_image_destroy_xitk_pixmap(bg);
   
   viewlog_change_section(NULL, NULL, 0);
