@@ -31,6 +31,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "common.h"
 
@@ -80,7 +81,7 @@ static void lirc_get_playlist(char *from) {
   }
 }
 
-void *xine_lirc_loop(void *dummy) {
+static void *xine_lirc_loop(void *dummy) {
   char             *code, *c;
   int               ret;
   kbinding_entry_t *k;
@@ -138,8 +139,9 @@ void *xine_lirc_loop(void *dummy) {
   pthread_exit(NULL);
 }
 
-void init_lirc(void) {
+void lirc_start(void) {
   int flags;
+  int err;
   
   if((lirc.fd = lirc_init("xine", LIRC_VERBOSE)) == -1) {
     gGui->lirc_enable = 0;
@@ -153,23 +155,22 @@ void init_lirc(void) {
   
   if(lirc_readconfig(NULL, &lirc.config, NULL) != 0) {
     gGui->lirc_enable = 0;
+    lirc_deinit();
     return;
   }
 
-  gGui->lirc_enable = 1;
-
-  if(gGui->lirc_enable)
-    pthread_create(&(lirc.thread), NULL, xine_lirc_loop, NULL) ;
-}
-
-void deinit_lirc(void) {
-
-  pthread_join(lirc.thread, NULL);
-
-  if(gGui->lirc_enable) {
+  if((err = pthread_create(&(lirc.thread), NULL, xine_lirc_loop, NULL)) != 0) {
+    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     lirc_freeconfig(lirc.config);
     lirc_deinit();
+    gGui->lirc_enable = 0;
   }
+}
+
+void lirc_stop(void) {
+  pthread_join(lirc.thread, NULL);
+  lirc_freeconfig(lirc.config);
+  lirc_deinit();
 }
 
 #endif

@@ -30,6 +30,7 @@
 #include "lirc.h"
 #include "main.h"
 #include "keys.h"
+#include "stdctl.h"
 #include "options.h"
 
 #define XINE_CONFIG_DIR  ".xine"
@@ -222,8 +223,12 @@ static int fbxine_init(int argc, char **argv)
 		case -1:
 			return 0;
 	}
-	if(!fbxine_init_keyboard())
-		return 0;;
+
+	if (stdctl)
+	        fbxine_init_stdctl();
+	else 
+	        if(!fbxine_init_keyboard())
+		        return 0;;
 	if(!init_video())
 		return 0;
 	if(!init_audio())

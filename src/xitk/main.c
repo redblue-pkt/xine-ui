@@ -69,10 +69,6 @@
  * global variables
  */
 gGui_t                       *gGui;
-#ifdef HAVE_LIRC
-int                           no_lirc;
-#endif
-
 extern _panel_t              *panel;
 
 static char                 **video_driver_ids;
@@ -100,6 +96,7 @@ typedef struct {
 #define OPTION_POST             1008
 #define OPTION_DISABLE_POST     1009
 #define OPTION_NO_SPLASH        1010
+#define OPTION_STDCTL           1011
 
 
 /* options args */
@@ -150,6 +147,7 @@ static struct option long_options[] = {
   {"aspect-ratio"   , required_argument, 0, 'r'                      },
   {"config"         , required_argument, 0, 'c'                      },
   {"verbose"        , optional_argument, 0, OPTION_VERBOSE           },
+  {"stdctl"         , optional_argument, 0, OPTION_STDCTL            },
 #ifdef XINE_PARAM_BROADCASTER_PORT
   {"broadcast-port" , required_argument, 0, OPTION_BROADCAST_PORT    },
 #endif
@@ -548,6 +546,7 @@ void show_usage (void) {
   printf(_("                               This option can be used more than one time.\n"));
   printf(_("      --disable-post           Don't enable post plugin(s).\n"));
   printf(_("      --no-splash              Don't display the splash screen.\n"));
+  printf(_("      --stdctl                 Control xine by the console, using lirc commands.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1179,6 +1178,9 @@ int main(int argc, char *argv[]) {
   gGui->post_elements_num      = 0;
   gGui->post_enable            = 1;
   gGui->splash                 = 1;
+#ifdef HAVE_LIRC
+  gGui->lirc_enable            = 1;
+#endif
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1187,14 +1189,6 @@ int main(int argc, char *argv[]) {
   _argv = build_command_line_args(argc, argv, &_argc);
 #ifdef TRACE_RC
   _rc_file_check_args(_argc, _argv);
-#endif
-
-  /*
-   * initialize CORBA server
-   */
-#ifdef HAVE_ORBIT
-  if (!no_lirc)
-    xine_server_init (&_argc, _argv);
 #endif
 
   visual_anim_init();
@@ -1214,7 +1208,7 @@ int main(int argc, char *argv[]) {
 
 #ifdef HAVE_LIRC
     case 'L': /* Disable LIRC support */
-      no_lirc = 1;
+      gGui->lirc_enable = 0;
       break;
 #endif
 
@@ -1497,6 +1491,10 @@ int main(int argc, char *argv[]) {
       exit(1);
       break;
 
+    case OPTION_STDCTL:
+      gGui->stdctl_enable = 1;
+      break;
+      
     default:
       show_usage();
       fprintf (stderr, _("invalid argument %d => exit\n"), c);
@@ -1764,14 +1762,6 @@ int main(int argc, char *argv[]) {
   xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect_ratio);
   
   /*
-   * start CORBA server threadq
-   */
-#ifdef HAVE_ORBIT
-  if (!no_lirc)
-    xine_server_start (gGui->xine);
-#endif
-
-  /*
    * hand control over to gui
    */
   gGui->actions_on_start[aos] = ACTID_NOKEY;
@@ -1793,10 +1783,5 @@ int main(int argc, char *argv[]) {
   if(pplugins)
     free(pplugins);
   
-#ifdef HAVE_ORBIT
-  if (!no_lirc)
-    xine_server_exit(gGui->xine);
-#endif
-
   return 0;
 }

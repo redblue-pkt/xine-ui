@@ -47,6 +47,7 @@
 #include "i18n.h"
 #include "lang.h"
 #include "lirc.h"
+#include "stdctl.h"
 #include "menus.h"
 #include "mrl_browser.h"
 #include "network.h"
@@ -252,7 +253,9 @@ typedef struct {
 #ifdef HAVE_LIRC
   int                       lirc_enable;
 #endif
-
+  
+  int                       stdctl_enable;
+  
 #ifdef HAVE_XF86VIDMODE
   int                       XF86VidMode_fullscreen;
 #endif

@@ -19,22 +19,18 @@
  *
  * $Id$
  *
- * lirc specific stuff
+ * stdctl specific stuff
  *
  */
 
-#ifndef LIRC_H
-#define LIRC_H
+#ifndef STDCTL_H
+#define STDCTL_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#ifdef HAVE_LIRC
-
-void lirc_start(void);
-void lirc_stop(void);
-
-#endif
+void stdctl_start(void);
+void stdctl_stop(void);
 
 #endif

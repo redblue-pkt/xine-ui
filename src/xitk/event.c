@@ -44,10 +44,6 @@
 
 #include "common.h"
 
-#ifdef HAVE_LIRC
-extern int no_lirc;
-#endif
-
 #define STEP_SIZE 256
 
 /*
@@ -1379,6 +1375,8 @@ void gui_init_imlib (Visual *vis) {
 static void on_start(void *data) {
   int start = (int) data;
 
+  splash_destroy();
+
   if((!start && !gGui->playlist.num) || (!start && gGui->playlist.num)) {
 
     gui_display_logo();
@@ -1462,10 +1460,12 @@ void gui_run(void) {
    */
 
 #ifdef HAVE_LIRC
-  if(!no_lirc) {
-    init_lirc();
-  }
+  if(gGui->lirc_enable)
+    lirc_start();
 #endif
+  
+  if(gGui->stdctl_enable)
+    stdctl_start();
 
   /*  global event handler */
   gGui->widget_key = xitk_register_event_handler("NO WINDOW", None,
@@ -1535,8 +1535,6 @@ void gui_run(void) {
       gGui->actions_on_start[1] = ACTID_NOKEY;
     }
   }
-
-  splash_destroy();
 
   xitk_run(on_start, (void *)auto_start);
 

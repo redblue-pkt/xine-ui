@@ -33,6 +33,9 @@
 
 #include "main.h"
 
+#define OPTION_STDCTL           5000
+int stdctl;
+
 void extract_mrls(int num_mrls, char **mrls)
 {
 	int i;
@@ -117,6 +120,7 @@ int parse_options(int argc, char **argv)
 			{ "audio-driver",  required_argument, 0, 'A' },
 			{ "video-driver",  required_argument, 0, 'V' },
 			{ "version",       no_argument,       0, 'v' },
+			{ "stdctl",        optional_argument, 0, OPTION_STDCTL },
 			{ 0,               no_argument,       0,  0  }
 		};
 	const char *short_options = "?hda:qA:V:R::v";
@@ -162,6 +166,10 @@ int parse_options(int argc, char **argv)
 				print_version();
 				return 0;
 				
+		        case OPTION_STDCTL:
+			        stdctl  = 1;
+				break;
+
 			case 'h':
 			case '?':
 				print_usage();

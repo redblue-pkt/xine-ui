@@ -26,3 +26,4 @@
 #endif
 
 int parse_options(int argc, char **argv);
+extern int stdctl;

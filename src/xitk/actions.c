@@ -520,9 +520,12 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
 #ifdef HAVE_LIRC
   if(gGui->lirc_enable)
-    deinit_lirc();
+    lirc_stop();
 #endif
-
+  
+  if(gGui->stdctl_enable) 
+    stdctl_stop();
+  
   xitk_stop();
   /* 
    * This prevent xine waiting till the end of time for an

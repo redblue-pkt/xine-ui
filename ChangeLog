@@ -1,7 +1,9 @@
 xine-ui (0.9.22) unstable; urgency=low
 
+  * control xine and fbxine via stdin, patch from Dirk Meyer <dmeyer@tzi.de>,
+  * add splash screen,
   * multibyte string support from Frantisek Dvorak,
-  * reload old playlist if no MRL is given (can be turned off).
+  * reload old playlist if no MRL is given (can be turned off),
   * new widget, double box,
   * font caching and cleanups from Frantisek Dvorak,
   * change policy of created widget, all non skinned are disabled and hidden,
