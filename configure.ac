@@ -547,6 +547,15 @@ AC_CHECK_LIRC
 
 
 dnl
+dnl user selectable support for special VDR interaction keys
+dnl
+AC_ARG_ENABLE(vdr-keys, [  --enable-vdr-keys       Support special keys for VDR interaction.], vdr_keys=$enableval, vdr_keys=no)
+if test x"$vdr_keys" = xyes ; then
+  AC_DEFINE(ENABLE_VDR_KEYS,, [Define this if you want support for VDR keys.])
+fi
+
+
+dnl
 dnl Check for nvtvsimple library
 dnl
 if test x"$PKG_CONFIG" != "xno" ; then

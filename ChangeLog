@@ -10,6 +10,7 @@ xine-ui (0.99.2) unstable; urgency=low
   * fix xitk trying set a window property when its atom may be undefined
   * add --disable-shm-default configure option which sets feature.shm to zero
     but keeps the shm code compiled in
+  * optional interaction keys with VDR
 
 xine-ui (0.99.1) unstable; urgency=low
 
