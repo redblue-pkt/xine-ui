@@ -50,13 +50,13 @@ location with
 
 otherwise a ./configure without parameters will do.
 
-XINE dxr3 plugins
+XINE dxr3 plugin
 =================
 
 There are two different ways in which xine can make use of the dxr3 
 card.
 
-1. [dxr3] mpeg-1/mpeg-2 (DVD, VCD, ...) decoding and displaying. 
+1. mpeg-1/mpeg-2 (DVD, VCD, ...) decoding and displaying. 
 
 This is the normal use.  Instead of doing the mpeg decoding in
 software, xine sets up the display (TV or overlay) and sends the mpeg
@@ -68,36 +68,36 @@ with the dxr3 video out plugin.
 Xine should select the mpeg2-dxr3 decoder plugin automatically when it
 encounters an mpeg stream, but it is possible it does not use the dxr3
 video out plugin by default. In that case, start xine with the 
-"-V dxr3" argument to specify the dxr3 video out plugin. Remember not
-to use this driver for non-mpeg content!
+"-V dxr3" argument to specify the dxr3 video out plugin. If you use
+an other video out driver, such as Xv or XShm, xine won't be able
+to use the mpeg decoding capability of the dxr3 hardware and will
+use libmpeg2 instead. 
 
-Here's a short overview what happens when you play a dvd with xine:
+Here's a short overview what happens when you play a dvd with xine
+using the dxr3 video out driver:
 
 DVD -> split mpeg video and audio and audio streams 
 -> send mpeg video to dxr3 -> image appears on screen
 
-2. [dxr3enc] EXPERIMENTAL: displaying non-mpeg video on dxr3 hardware. 
+2. displaying non-mpeg video on dxr3 hardware. 
 
-Xine has an experimental video out driver for displaying non-mpeg
-streams using a dxr3 card called dxr3enc. Non-mpeg video may be AVI,
-quicktime, windows media files or whatever else xine can decode. 
+Non-mpeg video may be AVI, quicktime, windows media files or whatever 
+else xine can decode. 
 
-This driver requires a supported mpeg encoder to build. At the moment
-there are two:
+This option must be compiled in and requires a supported mpeg encoder. 
+At the moment there are two:
 - libfame from fame.sourceforge.net (very fast, good quality)
 - librte (version 0.4) from zapping.sourceforge.net (fast, very good quality)
-If configure finds one or both it will compile and install the dxr3enc
-driver.  The driver itself is in video_out_dxr3enc.c in the dxr3 directory. 
-Please read the source comments at the top of this file for more 
-developer related information.
+If configure finds one or both it will compile in encoding support into
+the dxr3 driver. 
 
-In order to use this driver for output instead of, say, Xv, start
-xine with the command line option "-V dxr3enc", for example
-% xine -V dxr3enc my_movie.avi
+In order to use this driver for output instead of, say, Xv, just start
+xine with the command line option "-V dxr3", for example
+% xine -V dxr3 my_movie.avi
 
 Unlike in case 1), where the card does the video decoding, in this
 case Xine does the decoding in software, as usual, and sends the
-decompressed image to the video out driver.  The dxr3enc video out
+decompressed image to the video out driver.  The dxr3 video out
 driver encodes, in real time, this image as an mpeg-1 intra frame and
 sends it to the mpeg decoder on the card.
 
@@ -122,11 +122,6 @@ XINE run-time configuration
 
 XINE has several configuration options in $HOME/.xinerc
 (see also doc/README.xinerc)
-
-Some of them are important for dxr3 playback. The variables
-starting with "dxr3_" are general, the ones starting with
-"dxr3enc_" are only of importance for the dxr3enc video out
-plugin. 
 
 ********** PLEASE NOTE ***********
 Some of the options in .xinerc been have changed (as of 0.9.5)!
@@ -201,20 +196,20 @@ reconfigure.
 		wrong device, the demanded device can be set using
 		this option.
 
-The following settings only concern the dxr3enc video out driver:
+The following settings only concern the mpeg encoding part:
 
-dxr3enc.outputfile:
+dxr3.outputfile:
 	<none>  If the value is anything other than "<none>", xine
 		tries to open a file with that name to write the
 		encoded mpeg-1 stream to instead of the dxr3 device. 
 		This is for debugging the driver and not meant for 
 		users.
 	
-dxr3enc.alt_play_mode: 
+dxr3.enc_alt_play_mode: 
 	bool	See dxr3.alt_play_mode. The difference is that it's
 		enabled by default for dxr3enc.
 
-dxr3enc.encoder:
+dxr3.encoder:
 	string	Mpeg encoder backend to use.
 		Depending on what's compiled in, can be "fame" or "rte"
 		If both are available, the default is "rte". As a rule
@@ -223,13 +218,13 @@ dxr3enc.encoder:
 		switch to "fame" and find the optimum fame_quality setting
 		(see below) for your system.
 
-dxr3enc.fame_quality: (libfame encoder only)
+dxr3.fame_quality: (libfame encoder only)
 	0-100	The quality setting of the fame mpeg1 encoding. Lower
 		is faster but gives noticeable artefacts. Higher is
 		better but slower. Values between 0 and 100, 90
 		is a good initial value.
 
-dxr3enc.rte_bitrate: (librte encoder only)
+dxr3.rte_bitrate: (librte encoder only)
 	1000-20000 The bitrate in kbit/s of the librte mpeg1 encoder
 		output. Lower is faster, but it the difference is not as
 		big as with libfame's quality setting. If you get dropped

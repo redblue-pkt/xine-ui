@@ -862,6 +862,13 @@ void create_snapshot ( gGui_t *gGui )
     return;
   }
 
+  /* the dxr3 driver does not allocate yuv buffers */
+  if (! image->y) { /* image->u and image->v are always 0 for YUY2 */
+    printf("snapshot.c: not supported for this video out driver\n");
+    prvt_image_free( &image );
+    return;
+  }
+
   printf("  width:  %d\n", image->width );
   printf("  height: %d\n", image->height );
   printf("  ratio:  " );
@@ -896,11 +903,12 @@ void create_snapshot ( gGui_t *gGui )
       image->scale_line = scale_line_1_1;
       image->scale_factor = ( 32768 * 1 ) / 1;
       break;
-
     default:                
-      xine_error(_("Unknown\nError: Ratio Code %d Unknown\n"), image->ratio_code ); 
-      prvt_image_free( &image );
-      return;
+      /* the mpeg standard has a few that we don't know about */
+      printf( "snapshot.c: warning: unknown aspect ratio. will assume 1:1\n" ); 
+      image->scale_line = scale_line_1_1;
+      image->scale_factor = ( 32768 * 1 ) / 1;
+      break;
   }
 
   printf("  format: " );
