@@ -354,7 +354,7 @@ static void setup_paint_widgets(void) {
     if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT)
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
     else
-      xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
+      xitk_set_widget_pos(setup->wg[i]->widget, wx, y);
       
     ENABLE_ME(setup->wg[i]);
 
@@ -474,7 +474,6 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   entry->config->update_string(entry->config, entry->key, str );
 }
 
-
 /*
  *
  */
@@ -510,6 +509,65 @@ static widget_triplet_t *setup_add_slider (char *title, char *labelkey,
   setup->num_tmp_widgets++;
 
   wt->widget = slider;
+
+  return wt;
+}
+
+/*
+ *
+ */
+static void inttype_update(xitk_widget_t *w, void *data, char *str) {
+  cfg_entry_t *entry;
+  int          value;
+  char         buf[256];
+  
+  entry = (cfg_entry_t *)data;
+  
+  value = strtol(str, &str, 10);
+
+  memset(&buf, 0, sizeof(buf));
+  snprintf(buf, 256, "%d", value);
+  xitk_inputtext_change_text(setup->widget_list, w, buf);
+
+  entry->config->update_num(entry->config, entry->key, value);
+}
+
+/*
+ *
+ */
+static widget_triplet_t *setup_add_inputnum(char *title, char *labelkey, 
+					    int x, int y, cfg_entry_t *entry) {
+  xitk_inputtext_widget_t   inp;
+  xitk_widget_t            *input;
+  static widget_triplet_t  *wt;
+  char                      buf[256];
+
+  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+
+  XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+
+  ADD_FRAME(title);
+
+  memset(&buf, 0, sizeof(buf));
+  snprintf(buf, 256, "%d", entry->num_value);
+
+  inp.skin_element_name = NULL;
+  inp.text              = buf;
+  inp.max_length        = 256;
+  inp.callback          = inttype_update;
+  inp.userdata          = entry;
+  xitk_list_append_content (setup->widget_list->l,
+			    (input = 
+			     xitk_noskin_inputtext_create(&inp,
+							  x, y - 5, 60, 20,
+							  "Black", "Black", fontname)));
+  
+  ADD_LABEL(input);
+  
+  setup->tmp_widgets[setup->num_tmp_widgets] = input;
+  setup->num_tmp_widgets++;
+  
+  wt->widget = input;
 
   return wt;
 }
@@ -669,8 +727,9 @@ static void setup_section_widgets (int s) {
 	break;
 	
       case CONFIG_TYPE_NUM:
-	printf("%s is CONFIG_TYPE_NUM(%s)\n", labelkey, entry->description);
-	//	setup->cur_w_offset++;
+	setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
 	break;
 
       case CONFIG_TYPE_BOOL:
