@@ -30,23 +30,6 @@ echo "*****************************************************"
 echo
 echo "building rpm for @PACKAGE@ @VERSION@"
 echo 
-echo "current architecture:pentiumpro"
-echo "rpms will be copied to ./rpms directory"
-echo
-echo "*****************************************************"
-
-export XINE_BUILD=i686-pc-linux-gnu
-
-eval $RPM_BA
-
-cp /usr/src/redhat/SRPMS/@PACKAGE@-@SPEC_VERSION@-$DATE.src.rpm ./rpms/
-mv /usr/src/redhat/RPMS/i386/@PACKAGE@-@SPEC_VERSION@-$DATE.i386.rpm ./rpms/@PACKAGE@-@SPEC_VERSION@-$DATE.i686.rpm
-@HAVE_AA_TRUE@mv /usr/src/redhat/RPMS/i386/@PACKAGE@-aa-@SPEC_VERSION@-$DATE.i386.rpm ./rpms/@PACKAGE@-aa-@SPEC_VERSION@-$DATE.i686.rpm
-
-echo "*****************************************************"
-echo
-echo "building rpm for @PACKAGE@ @VERSION@"
-echo 
 echo "current architecture:pentium"
 echo "rpms will be copied to ./rpms directory"
 echo
@@ -54,8 +37,9 @@ echo "*****************************************************"
 
 export XINE_BUILD=i586-pc-linux-gnu
 
-eval $RPM_BB
+eval $RPM_BA
 
+cp /usr/src/redhat/SRPMS/@PACKAGE@-@SPEC_VERSION@-$DATE.src.rpm ./rpms/
 mv /usr/src/redhat/RPMS/i386/@PACKAGE@-@SPEC_VERSION@-$DATE.i386.rpm ./rpms/@PACKAGE@-@SPEC_VERSION@-$DATE.i586.rpm
 @HAVE_AA_TRUE@mv /usr/src/redhat/RPMS/i386/@PACKAGE@-aa-@SPEC_VERSION@-$DATE.i386.rpm ./rpms/@PACKAGE@-aa-@SPEC_VERSION@-$DATE.i586.rpm
 
