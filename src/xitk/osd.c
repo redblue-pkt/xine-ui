@@ -238,15 +238,21 @@ void osd_stream_infos(void) {
     xine_osd_clear(gGui->osd.info);
 
     /* We're in visual animation mode */
-    if((vwidth == 0) && (vheight == 0) && gGui->visual_anim.running) {
-      if(gGui->visual_anim.enabled == 1) {
-	video_window_get_frame_size(&vwidth, &vheight);
-	vcodec = _("post animation");
+    if((vwidth == 0) && (vheight == 0)) {
+      if(gGui->visual_anim.running) {
+	if(gGui->visual_anim.enabled == 1) {
+	  video_window_get_frame_size(&vwidth, &vheight);
+	  vcodec = _("post animation");
+	}
+	else if(gGui->visual_anim.enabled == 2) {
+	  vcodec  = xine_get_meta_info(gGui->visual_anim.stream, XINE_META_INFO_VIDEOCODEC);
+	  vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+	  vheight = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+	}
       }
-      else if(gGui->visual_anim.enabled == 2) {
-	vcodec  = xine_get_meta_info(gGui->visual_anim.stream, XINE_META_INFO_VIDEOCODEC);
-	vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-	vheight = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+      else {
+	video_window_get_frame_size(&vwidth, &vheight);
+	vcodec = _("unknown");
       }
     }
 
@@ -425,14 +431,19 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     vheight = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
     
     /* We're in visual animation mode */
-    if((vwidth == 0) && (vheight == 0) && gGui->visual_anim.running) {
-      if(gGui->visual_anim.enabled == 1) {
+    if((vwidth == 0) && (vheight == 0)) {
+      if(gGui->visual_anim.running) {
+	if(gGui->visual_anim.enabled == 1) {
+	  video_window_get_frame_size(&vwidth, &vheight);
+	}
+	else if(gGui->visual_anim.enabled == 2) {
+	  vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+	  vheight = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+	}
+      }
+      else
 	video_window_get_frame_size(&vwidth, &vheight);
-      }
-      else if(gGui->visual_anim.enabled == 2) {
-	vwidth  = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-	vheight = xine_get_stream_info(gGui->visual_anim.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
-      }
+
     }
 
     x = (vwidth - BAR_WIDTH) >> 1;
