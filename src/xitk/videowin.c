@@ -605,9 +605,6 @@ void video_window_dest_size_cb (void *data,
 				int video_width, int video_height,
 				int *dest_width, int *dest_height)  {
 
-  gVw->video_width  = video_width;
-  gVw->video_height = video_height;
-
   if (gVw->fullscreen_mode) {
     *dest_width  = gVw->fullscreen_width;
     *dest_height = gVw->fullscreen_height;
@@ -626,6 +623,9 @@ void video_window_frame_output_cb (void *data,
 				   int *dest_width, int *dest_height,
 				   int *win_x, int *win_y) {
   
+  gVw->video_width  = video_width;
+  gVw->video_height = video_height;
+
   *dest_x = 0;
   *dest_y = 0;
 
