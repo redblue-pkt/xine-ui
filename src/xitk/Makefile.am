@@ -12,9 +12,9 @@ GETOPT_C = getopt.c getopt1.c
 GETOPT_H = getopt.h
 endif
 
-xine_SOURCES = $(GETOPT_C) utils.c monitor.c xscreensaver-remote.c \
+xine_SOURCES = $(GETOPT_C) utils.c xscreensaver-remote.c \
 	main.c event.c control.c playlist.c parseskin.c \
-	videowin.c panel.c lirc.c actions.c mrl_browser.c
+	videowin.c panel.c lirc.c actions.c mrl_browser.c #monitor.c
 xine_DEPENDENTIES = utils.h monitor.h 
 xine_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 	@XINE_LIBS@ $(LIRC_LIBS) $(THREAD_LIBS) \
