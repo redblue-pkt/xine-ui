@@ -531,8 +531,7 @@ Imlib_init_with_params(Display * disp, ImlibInitParams * p)
    * stored on id->x.root_cmap, so that Imlib_load_colors() allocates
    * colors from the correct colormap.
    */
-  if ((id->x.visual != DefaultVisual(disp, id->x.screen) && !newcm) ||
-      getenv("PRIVATE_COLORMAP"))
+  if (id->x.visual != DefaultVisual(disp, id->x.screen) && !newcm)
     {
       Colormap            cm;
 
