@@ -501,7 +501,7 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   entry = (xine_cfg_entry_t *)data;
 
   config_update_string((char *)entry->key, str);
-  if(xine_config_lookup_entry(gGui->xine, entry->key, &check_entry)==0) {
+  if(xine_config_lookup_entry(gGui->xine, entry->key, &check_entry)) {
     if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
       xitk_inputtext_change_text(setup->widget_list, w, check_entry.str_value);
   }
@@ -784,7 +784,7 @@ static void setup_section_widgets(int s) {
     len     = strlen (section);
     cfg_err_result   = xine_config_get_first_entry(gGui->xine, &entry);
     
-    while (cfg_err_result==0) {
+    while (cfg_err_result) {
       
       if (!strncmp (entry.key, section, len) && entry.description) {
 	
@@ -893,7 +893,7 @@ static void setup_sections (void) {
   memset(&entry, 0, sizeof(xine_cfg_entry_t));
   setup->num_sections = 0;
   cfg_err_result = xine_config_get_first_entry(gGui->xine, &entry);
-  while (cfg_err_result==0) {
+  while (cfg_err_result) {
 
     char *point;
     

@@ -185,7 +185,7 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   filters[num_endings]->ending = strdup("*");
 
   cfg_err_result = xine_config_get_first_entry(gGui->xine, &entry);
-  while(cfg_err_result==0) {
+  while(cfg_err_result) {
     char *point;
     
     point = strchr(entry.key, '.');

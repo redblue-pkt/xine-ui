@@ -131,14 +131,11 @@ static void looking_for_available_skins(void) {
 char *skin_get_skindir(void) {
   static char         tmp[2048];
   xine_cfg_entry_t   entry;
-  int                cfg_err_result;
   char               *skin;
   
   memset(&tmp, 0, 2048);
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
-  cfg_err_result = xine_config_lookup_entry(gGui->xine, "gui.skin", &entry);
-
-  if(cfg_err_result==0)
+  if(xine_config_lookup_entry(gGui->xine, "gui.skin", &entry))
     skin = (char *) skins_avail[entry.num_value]->skin;
   else
     skin = DEFAULT_SKIN;
@@ -158,7 +155,7 @@ char *skin_get_configfile(void) {
   
   memset(&tmp, 0, 2048);
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
-  if (xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)==0) 
+  if (xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)) 
     skin = (char *) skins_avail[entry.num_value]->skin;
   else
     skin = DEFAULT_SKIN;
@@ -234,7 +231,7 @@ void change_skin(skins_locations_t *sk) {
     return;
 
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
-  if(xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)==0) 
+  if(xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)) 
     old_skin = (char *) skins_avail[entry.num_value]->skin;
   else
     old_skin = DEFAULT_SKIN;
