@@ -1,5 +1,4 @@
 #Xine skin data file
-skin.name           = cloudy
 # Revision 0.3 (for Xine 0.9.8)
 # 0.1:
 # 0.2:
@@ -7,8 +6,9 @@ skin.name           = cloudy
 #      add 'print = false' and change font to 'fixed' for hide labels in buttons.
 #      add load/unload command support.
 #
+skin.name           = cloudy
 skin.version        = 1
-skin.date           = 2001.12.16
+skin.date           = 2002.01.09
 skin.author         = Daniel Erat <dan_erat@pobox.com>
 skin.url            = http://www.pobox.com/~dan_erat/
 skin.load_command   = xset +fp $(SKIN_PARENT_PATH)/cloudy
@@ -89,7 +89,7 @@ skin.TimeLabel {
 
 skin.AudioNext {
 	coords {
-	  x = 230
+	  x = 135
 	  y = 36
 	}
 	pixmap = MainSmallArrowUp.png
@@ -97,7 +97,7 @@ skin.AudioNext {
 
 skin.AudioPrev {
 	coords {
-	  x = 230
+	  x = 135
 	  y = 42
 	}
 	pixmap = MainSmallArrowDown.png
@@ -105,7 +105,7 @@ skin.AudioPrev {
 
 skin.AudioLabel {
 	coords {
-	  x = 194
+	  x = 99
 	  y = 36
 	}
 	label {
@@ -117,7 +117,7 @@ skin.AudioLabel {
 
 skin.SpuNext {
 	coords {
-	  x = 308
+	  x = 213
 	  y = 36
 	}
 	pixmap = MainSmallArrowUp.png
@@ -125,7 +125,7 @@ skin.SpuNext {
 
 skin.SpuPrev {
 	coords {
-	  x = 308
+	  x = 213
 	  y = 42
 	}
 	pixmap = MainSmallArrowDown.png
@@ -133,7 +133,7 @@ skin.SpuPrev {
 
 skin.SpuLabel {
 	coords {
-	  x = 272
+	  x = 177
 	  y = 36
 	}
 	label {
@@ -230,7 +230,7 @@ skin.Snapshot {
 
 skin.AutoPlayGUI {
 	coords {
-	  x = 145
+	  x = 275
 	  y = 49
 	}
 	pixmap = MainAutoButton.png
@@ -242,10 +242,18 @@ skin.AutoPlayGUI {
 	}
 }
 
+skin.MrlBtn {
+	coords {
+	  x = 232
+	  y = 30
+	}
+	pixmap = MainMrlBtn.png
+}
+
 skin.PlBtn {
 	coords {
 	  x = 261
-	  y = 49
+	  y = 30
 	}
 	pixmap = MainPlBtn.png
 }
@@ -253,17 +261,9 @@ skin.PlBtn {
 skin.CtlBtn {
 	coords {
 	  x = 290
-	  y = 49
+	  y = 30
 	}
 	pixmap = MainCtlBtn.png
-}
-
-skin.MrlBtn {
-	coords {
-	  x = 232
-	  y = 49
-	}
-	pixmap = MainMrlBtn.png
 }
 
 skin.SliderPlay {
