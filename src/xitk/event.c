@@ -917,7 +917,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gGui->skip_by_chapter = 
     xine_config_register_bool (gGui->xine, "gui.skip_by_chapter", 1,
-			       _("Chapter hoping"),
+			       _("Chapter hopping"),
 			       _("Play next|previous chapter instead of mrl (dvdnav)"), 
 			       CONFIG_LEVEL_EXP,
 			       skip_by_chapter_cb, 
@@ -925,7 +925,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gGui->auto_vo_visibility = 
     xine_config_register_bool (gGui->xine, "gui.auto_video_output_visibility", 0,
-			       _("Visiblity behavoir of output window"),
+			       _("Visiblity behavior of output window"),
 			       _("Show/hide video output window regarding to the stream type"), 
 			       CONFIG_LEVEL_EXP,
 			       auto_vo_visibility_cb, 
@@ -961,8 +961,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->stream_info_auto_update = 
     xine_config_register_bool(gGui->xine, "gui.sinfo_auto_update", 
 			      0,
-			      _("Stream informations"),
-			      _("Update stream informations (in stream infos window) "
+			      _("Stream information"),
+			      _("Update stream information (in stream infos window) "
 				"each half seconds."), 
 			      CONFIG_LEVEL_EXP,
 			      stream_info_auto_update_cb,
