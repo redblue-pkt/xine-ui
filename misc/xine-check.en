@@ -26,7 +26,7 @@ I have found this script altough it is not in your PATH.
 Note that this is somewhat suspicious...
 
 assuming-xine-package-deb No xine-config found. Assuming xine from Debian package
-The xine-config script can be used to deternime some file locations
+The xine-config script can be used to determine some file locations
 used by xine-lib, but you don't have such a script on your system.
 However, it looks like you installed xine from the Debian packages.
 So I'll just guess that you are using the standard locations.
@@ -35,7 +35,7 @@ the 'libxine-dev' package, which contains xine-config. However, this
 package is not really needed to run xine...
 
 assuming-xine-package-rpm No xine-config found. Assuming xine from RPMs
-The xine-config script can be used to deternime some file locations
+The xine-config script can be used to determine some file locations
 used by xine-lib, but you don't have such a script on your system.
 However, it looks like you installed xine from the RedHat packages.
 So I'll just guess that you are using the standard locations.
@@ -45,7 +45,7 @@ you're using, which contains xine-config. However, this package is
 not really needed to run xine...
 
 assuming-xine-package No xine-config found. Assuming xine from binary packages
-The xine-config script can be used to deternime some file locations
+The xine-config script can be used to determine some file locations
 used by xine-lib, but you don't have such a script on your system.
 However, it looks like you installed xine via some package manager.
 So I'll just guess that you are using the standard locations.
@@ -373,7 +373,7 @@ RGB in hardware. This should improve performance when playing MPEG
 video, as xine doesn''t have to do this job in software...
 
 no-yv12 Your X server doesn't support YV12 overlays.
-That means xine will have to to color space transformation and scaling
+That means xine will have to do color space transformation and scaling
 in software, which is quite CPU intensive. Maybe upgrading your
 X server will help here.
 If you have an ATI card, you'll find accelerated X servers on
@@ -391,7 +391,7 @@ try 'xine -V XShm'. If that works (but is slow), your X server is broken.
 You should try to upgrade your X server in that case. Good luck... 
 
 no-yuy2 Your X server doesn't support YV12 overlays.
-That means xine will have to to color space transformation and scaling
+That means xine will have to do color space transformation and scaling
 in software, which is quite CPU intensive. Maybe upgrading your
 X server will help here.
 If you have an ATI card, you'll find accelerated X servers on
