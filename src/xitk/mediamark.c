@@ -2441,7 +2441,7 @@ void mediamark_save_mediamarks(const char *filename) {
 	fprintf(fd, "\nentry {\n");
 	fprintf(fd, "\tidentifier = %s;\n", gGui->playlist.mmk[i]->ident);
 	fprintf(fd, "\tmrl = %s;\n", gGui->playlist.mmk[i]->mrl);
-	fprintf(fd, "\tsubtitle = %s;\n", gGui->playlist.mmk[i]->sub);
+	fprintf(fd, "\tsubtitle = %s;\n", (gGui->playlist.mmk[i]->sub) ? gGui->playlist.mmk[i]->sub : "");
 	fprintf(fd, "\tstart = %d;\n", gGui->playlist.mmk[i]->start);
 	fprintf(fd, "\tend = %d;\n", gGui->playlist.mmk[i]->end);
 	fprintf(fd, "\toffset = %d;\n", gGui->playlist.mmk[i]->offset);
