@@ -99,7 +99,7 @@ static void *_tips_loop_thread(void *data) {
     tips.new_widget = NULL;
     
     if(tips.widget && (tips.widget->tips_timeout > 0) && tips.widget->tips_string && strlen(tips.widget->tips_string)) {
-      int                  x, y, string_length;
+      int                  x, y, w, h, string_length;
       xitk_window_t       *xwin;
       xitk_register_key_t  key;
       xitk_image_t        *image;
@@ -110,13 +110,15 @@ static void *_tips_loop_thread(void *data) {
       struct timeval       tv;
       struct timespec      ts;
 
+      int                  margin = 10;
+
       tips.visible = 1;
 
       /* Get parent window position */
       xitk_get_window_position(tips.display, tips.widget->wl->win, &x, &y, NULL, NULL);
       
       x += tips.widget->x;
-      y += (tips.widget->y + tips.widget->height);
+      y += tips.widget->y;
       
       fs = xitk_font_load_font(tips.display, DEFAULT_FONT_10);
       xitk_font_set_font(fs, tips.widget->wl->gc);
@@ -132,10 +134,22 @@ static void *_tips_loop_thread(void *data) {
 							      string_length + 1, ALIGN_LEFT, 
 							      tips.widget->tips_string, cwarnfore, cwarnback);
       
-      /* Create the tips window, horizontaly centered from parent widget */
-      xwin = xitk_window_create_simple_window(tips.widget->imlibdata, x - (((image->width + 10) >> 1) 
-								      - (tips.widget->width >> 1)), y, 
-					      image->width + 10, image->height + 10);
+      /* Create the tips window, horizontally centered from parent widget */
+      /* If necessary, adjust position to display it fully on screen      */
+      /* 1 px dist to widget prevents odd behavior of mouse pointer when  */
+      /* pointer is moved slowly from widget to tips, at least under FVWM */
+      w = image->width + margin;
+      h = image->height + margin;
+      x -= ((w >> 1) - (tips.widget->width >> 1));
+      y += (tips.widget->height + 1);
+      if(x > DisplayWidth(tips.widget->imlibdata->x.disp, tips.widget->imlibdata->x.screen) - w)
+	x = DisplayWidth(tips.widget->imlibdata->x.disp, tips.widget->imlibdata->x.screen) - w;
+      else if(x < 0)
+	x = 0;
+      if(y > DisplayHeight(tips.widget->imlibdata->x.disp, tips.widget->imlibdata->x.screen) - h)
+	y -= (tips.widget->height + h + 2);
+      /* No further alternative to y-position the tips (just either below or above widget) */
+      xwin = xitk_window_create_simple_window(tips.widget->imlibdata, x, y, w, h);
       
       /* WM should ignore tips windows */
       {
