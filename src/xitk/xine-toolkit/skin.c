@@ -198,6 +198,7 @@ static void _nullify_me(xitk_skin_element_t *s) {
   s->font            = NULL;
   s->browser_entries = -2;
   s->direction       = DIRECTION_LEFT; /* Compatibility */
+  s->max_buttons     = 0;
 }
 
 /*
@@ -567,8 +568,11 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	     goto  __next_subsection;
 	  }
 	  else {
-
-	    if(!strncasecmp(skonfig->ln, "direction", 9)) {
+	    if(!strncasecmp(skonfig->ln, "max_buttons", 11)) {
+	      skin_set_pos_to_value(&p);
+	      s->max_buttons = strtol(p, &p, 10);
+	    }
+	    else if(!strncasecmp(skonfig->ln, "direction", 9)) {
 	      skin_set_pos_to_value(&p);
 	      s->direction = skin_get_direction(p);
 	    }
@@ -699,6 +703,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  color click = '%s'\n", s->color_click);
       printf("  pixmap font = '%s'\n", s->pixmap_font);
       printf("  font        = '%s'\n", s->font);
+      printf("  max_buttons = %d\n", s->max_buttons);
       s = s->next;
     }
 
@@ -722,6 +727,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  color click = '%s'\n", s->color_click);
       printf("  pixmap font = '%s'\n", s->pixmap_font);
       printf("  font        = '%s'\n", s->font);
+      printf("  max_buttons = %d\n", s->max_buttons);
       s = s->prev;
     }
   }
@@ -1265,6 +1271,17 @@ xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *skonfig, const char *str) 
   }
 
   return (xitk_image_load_image(skonfig->im, (char *) str));
+}
+
+int xitk_skin_get_max_buttons(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  ABORT_IF_NULL(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->max_buttons;
+  
+  return 0;
 }
 
 /*

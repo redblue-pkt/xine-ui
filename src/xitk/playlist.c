@@ -939,16 +939,17 @@ void playlist_change_skins(void) {
     
     {
       int x, y, dir;
-      int i = 0;
+      int i = 0, max;
       
-      x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayBG");
-      y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayBG");
+      x   = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayBG");
+      y   = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayBG");
       dir = xitk_skin_get_direction(gGui->skin_config, "AutoPlayBG");
-      
+      max = xitk_skin_get_max_buttons(gGui->skin_config, "AutoPlayBG");
+
       switch(dir) {
       case DIRECTION_UP:
       case DIRECTION_DOWN:
-	while(playlist->autoplay_plugins[i] != NULL) {
+	while((max && ((i < max) && (playlist->autoplay_plugins[i] != NULL))) || (!max && playlist->autoplay_plugins[i] != NULL)) {
 	  
 	  (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
 	  
@@ -962,7 +963,7 @@ void playlist_change_skins(void) {
 	break;
       case DIRECTION_LEFT:
       case DIRECTION_RIGHT:
-	while(playlist->autoplay_plugins[i] != NULL) {
+	while((max && ((i < max) && (playlist->autoplay_plugins[i] != NULL))) || (!max && playlist->autoplay_plugins[i] != NULL)) {
 	  
 	  (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
 	  
@@ -974,6 +975,13 @@ void playlist_change_skins(void) {
 	  i++;
 	}
 	break;
+      }
+
+      if(max && (i < max)) {
+	while(playlist->autoplay_plugins[i] != NULL) {
+	  xitk_disable_and_hide_widget(playlist->autoplay_plugins[i]);
+	  i++;
+	}
       }
     }
     
@@ -1245,13 +1253,14 @@ void playlist_editor(void) {
 
   {
     int                x, y, dir;
-    int                i = 0;
+    int                i = 0, max;
     const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     
-    x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayBG");
-    y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayBG");
+    x   = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayBG");
+    y   = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayBG");
     dir = xitk_skin_get_direction(gGui->skin_config, "AutoPlayBG");
-      
+    max = xitk_skin_get_max_buttons(gGui->skin_config, "AutoPlayBG");
+
     while(autoplay_plugins[i] != NULL) {
 
       lb.skin_element_name = "AutoPlayBG";
@@ -1285,6 +1294,9 @@ void playlist_editor(void) {
 	break;
       }
 
+      if(max && (i >= max))
+	xitk_disable_and_hide_widget(playlist->autoplay_plugins[i]);
+      
       i++;
 
     }

@@ -60,6 +60,8 @@ typedef struct xitk_skin_element_s {
   char                         *color_focus;
   char                         *color_click;
   char                         *font;
+
+  int                          max_buttons;
 } xitk_skin_element_t;
 
 typedef struct cache_entry_s cache_entry_t;

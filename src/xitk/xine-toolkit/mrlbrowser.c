@@ -731,17 +731,19 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     {
       int x, y;
       int i = 0;
-      int dir;
+      int dir, max;
       
-      x = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name_ip);
-      y = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name_ip);
+      x   = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name_ip);
+      y   = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name_ip);
       dir = xitk_skin_get_direction(skonfig, private_data->skin_element_name_ip);
-    
+      max = xitk_skin_get_max_buttons(skonfig, private_data->skin_element_name_ip);
+
       switch(dir) {
       case DIRECTION_UP:
       case DIRECTION_DOWN:
-	while(private_data->autodir_plugins[i] != NULL) {
-	  
+	while((max && ((i < max) && (private_data->autodir_plugins[i] != NULL))) || 
+	      (!max && private_data->autodir_plugins[i] != NULL)) {
+
 	  (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
 	  
 	  if(dir == DIRECTION_DOWN)
@@ -754,7 +756,8 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
 	break;
       case DIRECTION_LEFT:
       case DIRECTION_RIGHT:
-	while(private_data->autodir_plugins[i] != NULL) {
+	while((max && ((i < max) && (private_data->autodir_plugins[i] != NULL))) || 
+	      (!max && private_data->autodir_plugins[i] != NULL)) {
 	  
 	  (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
 	  
@@ -768,6 +771,12 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
 	break;
       }
 
+      if(max && (i < max)) {
+	while(private_data->autodir_plugins[i] != NULL) {
+	  xitk_disable_and_hide_widget(private_data->autodir_plugins[i]);
+	  i++;
+	}
+      }
     }
     
     xitk_paint_widget_list(private_data->widget_list);
@@ -1233,13 +1242,14 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   {
     int x, y;
     int i = 0;
-    int dir;
+    int dir, max;
     
     private_data->skin_element_name_ip = strdup(mb->ip_name.button.skin_element_name);
-    x = xitk_skin_get_coord_x(skonfig, mb->ip_name.button.skin_element_name);
-    y = xitk_skin_get_coord_y(skonfig, mb->ip_name.button.skin_element_name);
+    x   = xitk_skin_get_coord_x(skonfig, mb->ip_name.button.skin_element_name);
+    y   = xitk_skin_get_coord_y(skonfig, mb->ip_name.button.skin_element_name);
     dir = xitk_skin_get_direction(skonfig, mb->ip_name.button.skin_element_name);
-    
+    max = xitk_skin_get_max_buttons(skonfig, mb->ip_name.button.skin_element_name);
+
     while(mb->ip_availables[i] != NULL) {
 
       lb.button_type    = CLICK_BUTTON;
@@ -1278,7 +1288,10 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 	  x -= (xitk_get_widget_width(private_data->autodir_plugins[i]) + 1);
 	break;
       }
-
+      
+      if(max && (i >= max))
+	xitk_disable_and_hide_widget(private_data->autodir_plugins[i]);
+      
       i++;
     }
     if(i)

@@ -192,16 +192,17 @@ void panel_change_skins(void) {
    * Update position of dynamic buttons.
    */
   {
-    int i = 0, x, y, dir;
+    int i = 0, x, y, dir, max;
     
-    x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
-    y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
+    x   = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
+    y   = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
     dir = xitk_skin_get_direction(gGui->skin_config, "AutoPlayGUI");
+    max = xitk_skin_get_max_buttons(gGui->skin_config, "AutoPlayGUI");
 
     switch(dir) {
     case DIRECTION_UP:
     case DIRECTION_DOWN:
-      while(panel->autoplay_plugins[i] != NULL) {
+      while((max && ((i < max) && (panel->autoplay_plugins[i] != NULL))) || (!max && panel->autoplay_plugins[i] != NULL)) {
 	
 	(void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
 	
@@ -215,7 +216,7 @@ void panel_change_skins(void) {
       break;
     case DIRECTION_LEFT:
     case DIRECTION_RIGHT:
-      while(panel->autoplay_plugins[i] != NULL) {
+      while((max && ((i < max) && (panel->autoplay_plugins[i] != NULL))) || (!max && panel->autoplay_plugins[i] != NULL)) {
 	
 	(void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
 	
@@ -228,8 +229,15 @@ void panel_change_skins(void) {
       }
       break;
     }
-  }
 
+    if(max && (i < max)) {
+      while(panel->autoplay_plugins[i] != NULL) {
+	xitk_disable_and_hide_widget(panel->autoplay_plugins[i]);
+	i++;
+      }
+    }
+  }
+  
   enable_playback_controls(panel->playback_widgets.enabled);
   xitk_paint_widget_list(panel->widget_list);
 
@@ -856,17 +864,18 @@ void panel_handle_event(XEvent *event, void *data) {
  */
 void panel_add_autoplay_buttons(void) {
   int                        x, y, dir;
-  int                        i = 0;
+  int                        i = 0, max;
   xitk_labelbutton_widget_t  lb;
   const char *const         *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
   const char                *autoplay_label;
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
-  x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
-  y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
+  x   = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
+  y   = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
   dir = xitk_skin_get_direction(gGui->skin_config, "AutoPlayGUI");
-  
+  max = xitk_skin_get_max_buttons(gGui->skin_config, "AutoPlayGUI");
+
   if(autoplay_plugins) {
     autoplay_label = *autoplay_plugins++;
     while(autoplay_label) {
@@ -905,7 +914,10 @@ void panel_add_autoplay_buttons(void) {
 	  x -= (xitk_get_widget_width(panel->autoplay_plugins[i]) + 1);
 	break;
       }
-
+      
+      if(max && (i >= max))
+	xitk_disable_and_hide_widget(panel->autoplay_plugins[i]);
+      
       i++;
       
       autoplay_label = *autoplay_plugins++;

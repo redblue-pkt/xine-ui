@@ -1752,6 +1752,11 @@ xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *, const char *);
 /*
  *
  */
+int xitk_skin_get_max_buttons(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
 void xitk_skin_lock(xitk_skin_config_t *);
 
 /*
