@@ -142,7 +142,6 @@ Pixmap xitk_image_create_pixmap(ImlibData *im, int width, int height) {
  *
  */
 static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
-
   ABORT_IF_NULL(xpix);
 
   XLOCK(xpix->imlibdata->x.disp);
@@ -161,12 +160,13 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
     
     if(xpix->xim)
       XDestroyImage(xpix->xim);
-
+    
     if(shmdt(shminfo->shmaddr) < 0)
       XITK_WARNING("shmdt() failed: '%s'\n", strerror(errno));
 
     if(shmctl(shminfo->shmid, IPC_RMID, 0) < 0)
       XITK_WARNING("shmctl() failed: '%s'\n", strerror(errno));
+    
 
     free(shminfo);
   }
@@ -185,7 +185,7 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width
 #ifdef HAVE_SHM
   XShmSegmentInfo  *shminfo;
 #endif
-  
+
   ABORT_IF_NULL(im);
   ABORT_IF_NOT_COND(width > 0);
   ABORT_IF_NOT_COND(height > 0);
@@ -375,10 +375,10 @@ xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
   ABORT_IF_NOT_COND(width > 0);
   ABORT_IF_NOT_COND(height > 0);
 
-  i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
-  i->mask = NULL;
-  i->image = xitk_image_create_xitk_pixmap(im, width, height);
-  i->width = width;
+  i         = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
+  i->mask   = NULL;
+  i->image  = xitk_image_create_xitk_pixmap(im, width, height);
+  i->width  = width;
   i->height = height;
 
   return i;

@@ -39,7 +39,7 @@
 
 extern gGui_t     *gGui;
 
-_panel_t          *panel;
+_panel_t          *panel = NULL;
 
 void panel_update_nextprev_tips(void) {
 
@@ -130,6 +130,46 @@ static void panel_store_new_position(int x, int y, int w, int h) {
   else
     panel->skin_on_change--;
 
+}
+
+static void panel_exit(xitk_widget_t *w, void *data) {
+
+  if(panel) {
+    window_info_t wi;
+    
+    panel->visible = 0;
+
+    if((xitk_get_window_info(panel->widget_key, &wi))) {
+      config_update_num ("gui.panel_x", wi.x);
+      config_update_num ("gui.panel_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
+
+    xitk_unregister_event_handler(&panel->widget_key);
+
+    XLockDisplay(gGui->display);
+    XUnmapWindow(gGui->display, gGui->panel_window);
+    XUnlockDisplay(gGui->display);
+
+    xitk_destroy_widgets(panel->widget_list);
+
+    XLockDisplay(gGui->display);
+    XDestroyWindow(gGui->display, gGui->panel_window);
+    Imlib_destroy_image(gGui->imlib_data, panel->bg_image);
+    XUnlockDisplay(gGui->display);
+
+    gGui->panel_window = None;
+    xitk_list_free((XITK_WIDGET_LIST_LIST(panel->widget_list)));
+
+    XLockDisplay(gGui->display);
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(panel->widget_list)));
+    XUnlockDisplay(gGui->display);
+
+    free(panel->widget_list);
+    
+    free(panel);
+    panel = NULL;  
+  }
 }
 
 /*
@@ -996,7 +1036,7 @@ void panel_add_mixer_control(void) {
 void panel_deinit(void) {
   if(panel_is_visible())
     _panel_toggle_visibility(NULL, NULL);
-  xitk_unregister_event_handler(&panel->widget_key);
+  panel_exit(NULL, NULL);
 }
 
 void panel_reparent(void) {

@@ -494,7 +494,7 @@ void control_deinit(void) {
   if(control) {
     if(control_is_visible())
       control_toggle_visibility(NULL, NULL);
-    xitk_unregister_event_handler(&control->widget_key);
+    control_exit(NULL, NULL);
   }
 }
 

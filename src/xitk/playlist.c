@@ -66,9 +66,11 @@ typedef struct {
   char                **playlist_mrls;
   char                **playlist_idents;
   int                   playlist_len;
+
 } _playlist_t;
 
-static _playlist_t   *playlist;
+static filebrowser_t   *load_fb = NULL, *save_fb = NULL;
+static _playlist_t     *playlist;
 
 void playlist_handle_event(XEvent *event, void *data);
 
@@ -348,24 +350,34 @@ static void _playlist_load_callback(filebrowser_t *fb) {
 
     free(file);
   }
+  load_fb = NULL;
   playlist_reactivate();
 }
 static void _playlist_cancel_callback(filebrowser_t *fb) {
+  if(fb == load_fb)
+    load_fb = NULL;
+  else if(fb == save_fb)
+    save_fb = NULL;
+
   playlist_reactivate();
 }
 void playlist_load_playlist(xitk_widget_t *w, void *data) {
   filebrowser_callback_button_t  cbb[2];
   char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
-  snprintf(buffer, sizeof(buffer), "%s%s", xine_get_homedir(), "/.xine/playlist.tox");
-  
-  cbb[0].label = _("Load");
-  cbb[0].callback = _playlist_load_callback;
-  cbb[0].need_a_file = 1;
-  cbb[1].callback = _playlist_cancel_callback;
-  
-  playlist_deactivate();
-  (void *) create_filebrowser(_("Load a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
+  if(load_fb)
+    filebrowser_raise_window(load_fb);
+  else {
+    snprintf(buffer, sizeof(buffer), "%s%s", xine_get_homedir(), "/.xine/playlist.tox");
+    
+    cbb[0].label = _("Load");
+    cbb[0].callback = _playlist_load_callback;
+    cbb[0].need_a_file = 1;
+    cbb[1].callback = _playlist_cancel_callback;
+    
+    playlist_deactivate();
+    load_fb = create_filebrowser(_("Load a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
+  }
 }
 
 /*
@@ -378,6 +390,7 @@ static void _playlist_save_callback(filebrowser_t *fb) {
     mediamark_save_mediamarks(file);
     free(file);
   }
+  save_fb = NULL;
   playlist_reactivate();
 }
 void playlist_save_playlist(xitk_widget_t *w, void *data) {
@@ -385,15 +398,19 @@ void playlist_save_playlist(xitk_widget_t *w, void *data) {
   char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
   if(gGui->playlist.num) {
-    snprintf(buffer, sizeof(buffer), "%s%s", xine_get_homedir(), "/.xine/playlist.tox");
-    
-    cbb[0].label = _("Save");
-    cbb[0].callback = _playlist_save_callback;
-    cbb[0].need_a_file = 1;
-    cbb[1].callback = _playlist_cancel_callback;
-  
-    playlist_deactivate();
-    (void *) create_filebrowser(_("Save a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
+    if(save_fb)
+      filebrowser_raise_window(save_fb);
+    else {
+      snprintf(buffer, sizeof(buffer), "%s%s", xine_get_homedir(), "/.xine/playlist.tox");
+      
+      cbb[0].label = _("Save");
+      cbb[0].callback = _playlist_save_callback;
+      cbb[0].need_a_file = 1;
+      cbb[1].callback = _playlist_cancel_callback;
+      
+      playlist_deactivate();
+      save_fb = create_filebrowser(_("Save a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
+    }
   }
 }
 
@@ -623,6 +640,11 @@ void playlist_update_playlist(void) {
  */
 void playlist_exit(xitk_widget_t *w, void *data) {
 
+  if(load_fb)
+    filebrowser_end(load_fb);
+  if(save_fb)
+    filebrowser_end(save_fb);
+
   if(playlist) {
     window_info_t wi;
     
@@ -665,7 +687,6 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     playlist = NULL;  
   }
 }
-
 
 
 /*
@@ -957,7 +978,13 @@ void playlist_deinit(void) {
   if(playlist) {
     if(playlist_is_visible())
       playlist_toggle_visibility(NULL, NULL);
-    xitk_unregister_event_handler(&playlist->widget_key);
+    playlist_exit(NULL, NULL);
+  }
+  else {
+    if(load_fb)
+      filebrowser_end(load_fb);
+    if(save_fb)
+      filebrowser_end(save_fb);
   }
 }
 

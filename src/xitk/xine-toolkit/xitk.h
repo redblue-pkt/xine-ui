@@ -1884,8 +1884,7 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
 						  int width, int align, char *str);
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
 
-xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, 
-							int width, int height, int depth);
+xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, int width, int height, int depth);
 
 xitk_pixmap_t *xitk_image_create_xitk_pixmap(ImlibData *im, int width, int height);
 

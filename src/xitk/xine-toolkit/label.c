@@ -58,12 +58,10 @@ static void _create_label_pixmap(xitk_widget_t *w) {
   else
     _label = strdup(private_data->label);
   
-  len = strlen(_label);
-  pixwidth = private_data->char_length * 
-    ((private_data->length * ((len / private_data->length) + 1)) + 5);
+  len                    = strlen(_label);
+  pixwidth               = private_data->char_length * ((private_data->length * ((len / private_data->length) + 1)) + 5);
   private_data->labelpix = xitk_image_create_xitk_pixmap(private_data->imlibdata,
-							 (pixwidth) ? pixwidth : 1, 
-							 private_data->char_height);
+							 (pixwidth) ? pixwidth : 1, private_data->char_height);
 
   x_dest = 0;
 

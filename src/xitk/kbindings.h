@@ -190,7 +190,7 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *);
 char *kbindings_get_shortcut(kbinding_t *, char *);
 
 void kbedit_window(void);
-void kbedit_exit(xitk_widget_t *, void *);
+void kbedit_end(void);
 int kbedit_is_visible(void);
 int kbedit_is_running(void);
 void kbedit_toggle_visibility(xitk_widget_t *, void *);

@@ -44,21 +44,33 @@ static pthread_mutex_t  skin_mutex = PTHREAD_MUTEX_INITIALIZER;
 /*
  *
  */
-static void skin_load_to_cache(xitk_skin_config_t *skonfig, char *pixmap) {
+static xitk_image_t *skin_load_to_cache(xitk_skin_config_t *skonfig, char *pixmap) {
 
   if(skonfig && pixmap) {
     xitk_image_t  *image  = xitk_image_load_image(skonfig->im, pixmap);
     cache_entry_t *cache  = skonfig->cache;
     cache_entry_t *ncache = NULL;
-    
+
     if(image) {
+
+      if(cache) {
+	while(cache) {
+	  if(!strcmp(cache->filename, pixmap)) {
+	    xitk_image_free_image(skonfig->im, &image);
+	    return image;
+	  }
+	  cache = cache->next;
+	}
+	cache = skonfig->cache;
+      }
+
       ncache           = (cache_entry_t *) xitk_xmalloc(sizeof(cache_entry_t));
       ncache->image    = image;
       ncache->filename = strdup(pixmap);
       ncache->next     = NULL;
     }
     else
-      return;
+      return image;
     
     if(!cache) {
       skonfig->cache = ncache;
@@ -69,7 +81,11 @@ static void skin_load_to_cache(xitk_skin_config_t *skonfig, char *pixmap) {
       
       cache->next  = ncache;
     }
+
+    return image;
   }
+
+  return NULL;
 }
 
 static void skin_free_cache(xitk_skin_config_t *skonfig) {
@@ -1285,7 +1301,8 @@ xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *skonfig, const char *str) 
     }
   }
 
-  return (xitk_image_load_image(skonfig->im, (char *) str));
+  return (skin_load_to_cache(skonfig, (char *) str));
+  //  return (xitk_image_load_image(skonfig->im, (char *) str));
 }
 
 int xitk_skin_get_max_buttons(xitk_skin_config_t *skonfig, const char *str) {

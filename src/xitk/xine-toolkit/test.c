@@ -811,7 +811,7 @@ static void create_browser(void) {
 
   xitk_window_change_background(test->imlibdata, 
 				test->xwin, bg, width, height);
-
+  XFreePixmap(test->display, bg);
 
   {
     int i;

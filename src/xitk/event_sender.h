@@ -26,7 +26,7 @@
 
 void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg);
 void event_sender_panel(void);
-void event_sender_exit(xitk_widget_t *, void *);
+void event_sender_end(void);
 void event_sender_move(int x, int y);
 int event_sender_is_visible(void);
 int event_sender_is_running(void);

@@ -1229,6 +1229,5 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
   i = xitk_image_create_image(it->imlibdata, width * 2, height);
   draw_bevel_two_state(it->imlibdata, i);
   
-
   return _xitk_inputtext_create(wl, NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 0, 0);
 }

@@ -43,6 +43,7 @@
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
+filebrowser_t          *load_stream = NULL, *load_sub = NULL;
 
 static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
 
@@ -569,11 +570,27 @@ void gui_exit (xitk_widget_t *w, void *data) {
   }
   
   gGui->on_quit = 1;
-  
+
   panel_deinit();
   playlist_deinit();
-  control_deinit();
   mrl_browser_deinit();
+  control_deinit();
+  
+  setup_end();
+  viewlog_end();
+  kbedit_end();
+  event_sender_end();
+  stream_infos_end();
+  tvset_end();
+  pplugin_end();
+  help_end();
+  download_skin_end();
+  
+  if(load_stream)
+    filebrowser_end(load_stream);
+  if(load_sub)
+    filebrowser_end(load_sub);
+
   gui_deinit();
 
   if(video_window_is_visible())
@@ -592,10 +609,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
   //     gui_set_fullscreen_mode(NULL,NULL);
 #endif
    
-  destroy_mrl_browser();
-  control_exit(NULL, NULL);
-  playlist_exit(NULL, NULL);
-
   osd_deinit();
 
   config_update_num("gui.amp_level", gGui->mixer.amp_level);
@@ -1596,7 +1609,7 @@ void gui_setup_show(xitk_widget_t *w, void *data) {
     if(gGui->use_root_window)
       setup_toggle_visibility(NULL, NULL);
     else
-      setup_exit(NULL, NULL);
+      setup_end();
   }
 }
 
@@ -1610,7 +1623,7 @@ void gui_event_sender_show(xitk_widget_t *w, void *data) {
     if(gGui->use_root_window)
       event_sender_toggle_visibility(NULL, NULL);
     else
-      event_sender_exit(NULL, NULL);
+      event_sender_end();
   }
 }
 
@@ -1679,7 +1692,7 @@ void gui_viewlog_show(xitk_widget_t *w, void *data) {
     if(gGui->use_root_window)
       viewlog_toggle_visibility(NULL, NULL);
     else
-      viewlog_exit(NULL, NULL);
+      viewlog_end();
   }
 }
 
@@ -1693,7 +1706,7 @@ void gui_kbedit_show(xitk_widget_t *w, void *data) {
     if(gGui->use_root_window)
       kbedit_toggle_visibility(NULL, NULL);
     else
-      kbedit_exit(NULL, NULL);
+      kbedit_end();
   }
 }
 
@@ -1707,7 +1720,7 @@ void gui_help_show(xitk_widget_t *w, void *data) {
     if(gGui->use_root_window)
       help_toggle_visibility(NULL, NULL);
     else
-      help_exit(NULL, NULL);
+      help_end();
   }
 }
 
@@ -1874,10 +1887,15 @@ void gui_add_mediamark(void) {
 static void fileselector_cancel_callback(filebrowser_t *fb) {
   char *cur_dir = filebrowser_get_current_dir(fb);
 
-  if(cur_dir && strlen(cur_dir)) {
-    snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cur_dir);
-    config_update_string("input.file_origin_path", gGui->curdir);
+  if(fb == load_stream) {
+    if(cur_dir && strlen(cur_dir)) {
+      snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cur_dir);
+      config_update_string("input.file_origin_path", gGui->curdir);
+    }
+    load_stream = NULL;
   }
+  else if(fb == load_sub)
+    load_sub = NULL;
 }
 
 static void fileselector_callback(filebrowser_t *fb) {
@@ -1911,6 +1929,8 @@ static void fileselector_callback(filebrowser_t *fb) {
       gui_play(NULL, NULL);
     }
   }
+
+  load_stream = NULL;
 }
 
 static void fileselector_all_callback(filebrowser_t *fb) {
@@ -1962,20 +1982,26 @@ static void fileselector_all_callback(filebrowser_t *fb) {
     
     free(files);
   }
+
+  load_stream = NULL;
 }
 
 void gui_file_selector(void) {
   filebrowser_callback_button_t  cbb[3];
-  
-  cbb[0].label = _("Select");
-  cbb[0].callback = fileselector_callback;
-  cbb[0].need_a_file = 0;
-  cbb[1].label = _("Select all");
-  cbb[1].callback = fileselector_all_callback;
-  cbb[1].need_a_file = 0;
-  cbb[2].callback = fileselector_cancel_callback;
-  cbb[2].need_a_file = 0;
-  (void *) create_filebrowser(_("Stream(s) loading"), gGui->curdir, &cbb[0], &cbb[1], &cbb[2]);
+
+  if(load_stream)
+    filebrowser_raise_window(load_stream);
+  else {
+    cbb[0].label = _("Select");
+    cbb[0].callback = fileselector_callback;
+    cbb[0].need_a_file = 0;
+    cbb[1].label = _("Select all");
+    cbb[1].callback = fileselector_all_callback;
+    cbb[1].need_a_file = 0;
+    cbb[2].callback = fileselector_cancel_callback;
+    cbb[2].need_a_file = 0;
+    load_stream = create_filebrowser(_("Stream(s) loading"), gGui->curdir, &cbb[0], &cbb[1], &cbb[2]);
+  }
 }
 
 static void subselector_callback(filebrowser_t *fb) {
@@ -2012,41 +2038,49 @@ static void subselector_callback(filebrowser_t *fb) {
     }
     free(file);
   }
+
+  load_sub = NULL;
 }
 
 void gui_select_sub(void) {
   
   if(gGui->playlist.num) {
-    filebrowser_callback_button_t  cbb;
-    mediamark_t *mmk;
-    
-    mmk = mediamark_get_current_mmk();
-
-    if(mmk) {
-      char *path, *open_path;
+    if(load_sub)
+      filebrowser_raise_window(load_sub);
+    else {
+      filebrowser_callback_button_t  cbb[2];
+      mediamark_t *mmk;
       
-      cbb.label = _("Select");
-      cbb.callback = subselector_callback;
-      cbb.need_a_file = 1;
+      mmk = mediamark_get_current_mmk();
       
-      path = mmk->sub ? mmk->sub : mmk->mrl;
-      
-      if(mrl_look_like_file(path)) {
-	char *p;
+      if(mmk) {
+	char *path, *open_path;
 	
-	xine_strdupa(open_path, path);
+	cbb[0].label = _("Select");
+	cbb[0].callback = subselector_callback;
+	cbb[0].need_a_file = 1;
+	cbb[1].callback = fileselector_cancel_callback;
+	cbb[1].need_a_file = 0;
+    	
+	path = mmk->sub ? mmk->sub : mmk->mrl;
 	
-	if(!strncasecmp(path, "file:", 5))
-	  path += 5;
-
-	p = strrchr(open_path, '/');
-	if (p && strlen(p))
-	  *p = '\0';
+	if(mrl_look_like_file(path)) {
+	  char *p;
+	  
+	  xine_strdupa(open_path, path);
+	  
+	  if(!strncasecmp(path, "file:", 5))
+	    path += 5;
+	  
+	  p = strrchr(open_path, '/');
+	  if (p && strlen(p))
+	    *p = '\0';
+	}
+	else
+	  open_path = gGui->curdir;
+	
+	load_sub = create_filebrowser(_("Pick a subtitle file"), open_path, &cbb[0], NULL, &cbb[1]);
       }
-      else
-	open_path = gGui->curdir;
-      
-      (void *) create_filebrowser(_("Pick a subtitle file"), open_path, &cbb, NULL, NULL);
     }
   }
 }

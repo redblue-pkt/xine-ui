@@ -200,7 +200,7 @@ void xitk_window_center_window(ImlibData *im, xitk_window_t *w) {
  */
 xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width, int height) {
   xitk_window_t         *xwin;
-  char                   title[] = {"Xitk Window"};
+  char                   title[] = {"XiTK Window"};
   XSizeHints             hint;
   XWMHints              *wm_hint;
   XSetWindowAttributes   attr;
@@ -705,7 +705,7 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
 							 int window_width, int align, char *message, ...) {
   xitk_dialog_t              *wd;
   int                         windoww = window_width, windowh;
-  xitk_image_t               *i;
+  xitk_image_t               *image;
 
   if((im == NULL) || (window_width == 0) || (message == NULL))
     return NULL;
@@ -738,11 +738,11 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
 	return NULL;
     }
     
-    i = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
+    image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
   
-  windowh = (i->height) + (TITLE_BAR_HEIGHT + 40);
+  windowh = (image->height) + (TITLE_BAR_HEIGHT + 40);
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_BUTTONLESS;
@@ -769,8 +769,8 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
     gc = XCreateGC(im->x.disp, (xitk_window_get_background(wd->xwin)), None, None);
     XCopyArea(im->x.disp, (xitk_window_get_background(wd->xwin)), bg->pixmap,
 	      gc, 0, 0, width, height, 0, 0);
-    XCopyArea(im->x.disp, i->image->pixmap, bg->pixmap,
-	      i->image->gc, 0, 0, i->width, i->height, 20, (TITLE_BAR_HEIGHT + 20));
+    XCopyArea(im->x.disp, image->image->pixmap, bg->pixmap,
+	      image->image->gc, 0, 0, image->width, image->height, 20, (TITLE_BAR_HEIGHT + 20));
     XUNLOCK(im->x.disp);
 
     xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
@@ -781,7 +781,7 @@ xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *ti
     XFreeGC(im->x.disp, gc);
     XUNLOCK(im->x.disp);
 
-    xitk_image_free_image(im, &i);
+    xitk_image_free_image(im, &image);
 
   }
 
@@ -808,7 +808,7 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
-  xitk_image_t               *i;
+  xitk_image_t               *image;
   int                         bwidth = 100, bx, by;
 
   if((im == NULL) || (window_width == 0) || (message == NULL))
@@ -842,11 +842,11 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
 	return NULL;
     }
     
-    i = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
+    image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
   
-  windowh = (i->height + 50) + (TITLE_BAR_HEIGHT + 40);
+  windowh = (image->height + 50) + (TITLE_BAR_HEIGHT + 40);
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_OK;
@@ -903,8 +903,8 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
     gc = XCreateGC(im->x.disp, (xitk_window_get_background(wd->xwin)), None, None);
     XCopyArea(im->x.disp, (xitk_window_get_background(wd->xwin)), bg->pixmap,
 	      gc, 0, 0, width, height, 0, 0);
-    XCopyArea(im->x.disp, i->image->pixmap, bg->pixmap,
-	      i->image->gc, 0, 0, i->width, i->height, 20, (TITLE_BAR_HEIGHT + 20));
+    XCopyArea(im->x.disp, image->image->pixmap, bg->pixmap,
+	      image->image->gc, 0, 0, image->width, image->height, 20, (TITLE_BAR_HEIGHT + 20));
     XUNLOCK(im->x.disp);
 
     xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
@@ -915,7 +915,7 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
     XFreeGC(im->x.disp, gc);
     XUNLOCK(im->x.disp);
 
-    xitk_image_free_image(im, &i);
+    xitk_image_free_image(im, &image);
 
   }
 
@@ -998,7 +998,7 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
-  xitk_image_t               *i;
+  xitk_image_t               *image;
   int                         bwidth = 150, bx1, bx2, by;
   int                         checkbox_height = 0;
 
@@ -1033,14 +1033,14 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
 	return NULL;
     }
     
-    i = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
+    image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
   
   if( checkbox_label )
     checkbox_height = 50;
 
-  windowh = (i->height + 50 + checkbox_height) + (TITLE_BAR_HEIGHT + 40);
+  windowh = (image->height + 50 + checkbox_height) + (TITLE_BAR_HEIGHT + 40);
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_YESNO;
@@ -1141,8 +1141,8 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
     gc = XCreateGC(im->x.disp, (xitk_window_get_background(wd->xwin)), None, None);
     XCopyArea(im->x.disp, (xitk_window_get_background(wd->xwin)), bg->pixmap,
 	      gc, 0, 0, width, height, 0, 0);
-    XCopyArea(im->x.disp, i->image->pixmap, bg->pixmap,
-	      i->image->gc, 0, 0, i->width, i->height, 20, (TITLE_BAR_HEIGHT + 20));
+    XCopyArea(im->x.disp, image->image->pixmap, bg->pixmap,
+	      image->image->gc, 0, 0, image->width, image->height, 20, (TITLE_BAR_HEIGHT + 20));
     XUNLOCK(im->x.disp);
 
     xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
@@ -1153,7 +1153,7 @@ xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im,
     XFreeGC(im->x.disp, gc);
     XUNLOCK(im->x.disp);
 
-    xitk_image_free_image(im, &i);
+    xitk_image_free_image(im, &image);
 
   }
 
@@ -1239,7 +1239,7 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
-  xitk_image_t               *i;
+  xitk_image_t               *image;
   int                         bwidth = 100, bx1, bx2, bx3, by;
 
   if((im == NULL) || (window_width == 0) || (message == NULL))
@@ -1273,11 +1273,11 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
 	return NULL;
     }
     
-    i = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
+    image = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
 
-  windowh = (i->height + 50) + (TITLE_BAR_HEIGHT + 40);
+  windowh = (image->height + 50) + (TITLE_BAR_HEIGHT + 40);
 
   wd->imlibdata      = im;
   wd->type           = DIALOG_TYPE_YESNOCANCEL;
@@ -1367,8 +1367,8 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
     gc = XCreateGC(im->x.disp, (xitk_window_get_background(wd->xwin)), None, None);
     XCopyArea(im->x.disp, (xitk_window_get_background(wd->xwin)), bg->pixmap,
 	      gc, 0, 0, width, height, 0, 0);
-    XCopyArea(im->x.disp, i->image->pixmap, bg->pixmap,
-	      i->image->gc, 0, 0, i->width, i->height, 20, (TITLE_BAR_HEIGHT + 20));
+    XCopyArea(im->x.disp, image->image->pixmap, bg->pixmap,
+	      image->image->gc, 0, 0, image->width, image->height, 20, (TITLE_BAR_HEIGHT + 20));
     XUNLOCK(im->x.disp);
 
     xitk_window_change_background(im, wd->xwin, bg->pixmap, width, height);
@@ -1378,7 +1378,7 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
     XFreeGC(im->x.disp, gc);
     XUNLOCK(im->x.disp);
 
-    xitk_image_free_image(im, &i);
+    xitk_image_free_image(im, &image);
 
   }
 

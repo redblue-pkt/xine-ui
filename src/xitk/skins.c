@@ -676,45 +676,47 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
   return slxs;
 }
 
-static void download_skin_cancel(xitk_widget_t *w, void *data) {
+static void download_skin_exit(xitk_widget_t *w, void *data) {
   int i;
   
-  xitk_unregister_event_handler(&skdloader->widget_key);
-  
-  xitk_image_free_image(gGui->imlib_data, &skdloader->preview_image);
-
-  xitk_destroy_widgets(skdloader->widget_list);
-  xitk_window_destroy_window(gGui->imlib_data, skdloader->xwin);
-
-  skdloader->xwin = NULL;
-
-  xitk_list_free((XITK_WIDGET_LIST_LIST(skdloader->widget_list)));
-  
-  XLockDisplay(gGui->display);
-  XFreeCursor(gGui->display, skdloader->cursor[NORMAL_CURS]);
-  XFreeCursor(gGui->display, skdloader->cursor[WAIT_CURS]);
-  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)));
-  XUnlockDisplay(gGui->display);
-  
-  free(skdloader->widget_list);
-  
-  for(i = 0; i < skdloader->num; i++) {
-    SAFE_FREE(skdloader->slxs[i]->name);
-    SAFE_FREE(skdloader->slxs[i]->author.name);
-    SAFE_FREE(skdloader->slxs[i]->author.email);
-    SAFE_FREE(skdloader->slxs[i]->skin.href);
-    SAFE_FREE(skdloader->slxs[i]->skin.preview);
-    free(skdloader->slxs[i]);
-    free(skdloader->entries[i]);
+  if(skdloader) {
+    xitk_unregister_event_handler(&skdloader->widget_key);
+    
+    xitk_image_free_image(gGui->imlib_data, &skdloader->preview_image);
+    
+    xitk_destroy_widgets(skdloader->widget_list);
+    xitk_window_destroy_window(gGui->imlib_data, skdloader->xwin);
+    
+    skdloader->xwin = NULL;
+    
+    xitk_list_free((XITK_WIDGET_LIST_LIST(skdloader->widget_list)));
+    
+    XLockDisplay(gGui->display);
+    XFreeCursor(gGui->display, skdloader->cursor[NORMAL_CURS]);
+    XFreeCursor(gGui->display, skdloader->cursor[WAIT_CURS]);
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)));
+    XUnlockDisplay(gGui->display);
+    
+    free(skdloader->widget_list);
+    
+    for(i = 0; i < skdloader->num; i++) {
+      SAFE_FREE(skdloader->slxs[i]->name);
+      SAFE_FREE(skdloader->slxs[i]->author.name);
+      SAFE_FREE(skdloader->slxs[i]->author.email);
+      SAFE_FREE(skdloader->slxs[i]->skin.href);
+      SAFE_FREE(skdloader->slxs[i]->skin.preview);
+      free(skdloader->slxs[i]);
+      free(skdloader->entries[i]);
+    }
+    
+    free(skdloader->slxs);
+    free(skdloader->entries);
+    
+    skdloader->num = 0;
+    
+    free(skdloader);
+    skdloader = NULL;
   }
-  
-  free(skdloader->slxs);
-  free(skdloader->entries);
-
-  skdloader->num = 0;
-
-  free(skdloader);
-  skdloader = NULL;
 }
 
 static void download_update_blank_preview(void) {
@@ -990,7 +992,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
   if(download.error)
     free(download.error);
   
-  download_skin_cancel(w, NULL);
+  download_skin_exit(w, NULL);
 }
 
 static void download_skin_handle_event(XEvent *event, void *data) {
@@ -1041,13 +1043,17 @@ static void download_skin_handle_event(XEvent *event, void *data) {
       break;
       
     case XK_Escape:
-      download_skin_cancel(NULL, NULL);
+      download_skin_exit(NULL, NULL);
       break;
     }
   }
     break;
 
   }
+}
+
+void download_skin_end(void) {
+  download_skin_exit(NULL, NULL);
 }
     
 void download_skin(char *url) {
@@ -1207,7 +1213,7 @@ void download_skin(char *url) {
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Cancel");
     lb.align             = ALIGN_CENTER;
-    lb.callback          = download_skin_cancel; 
+    lb.callback          = download_skin_exit; 
     lb.state_callback    = NULL;
     lb.userdata          = NULL;
     lb.skin_element_name = NULL;

@@ -69,12 +69,10 @@ typedef struct {
 
 static _viewlog_t    *viewlog = NULL;
 
-static void viewlog_end(xitk_widget_t *, void *);
-
 /*
  * Leaving setup panel, release memory.
  */
-void viewlog_exit(xitk_widget_t *w, void *data) {
+static void viewlog_exit(xitk_widget_t *w, void *data) {
 
   if(viewlog) {
     window_info_t wi;
@@ -342,7 +340,7 @@ static void viewlog_create_tabs(void) {
 /*
  * Leave viewlog window.
  */
-static void viewlog_end(xitk_widget_t *w, void *data) {
+void viewlog_end(void) {
   viewlog_exit(NULL, NULL);
 }
 
@@ -459,7 +457,7 @@ void viewlog_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = viewlog_end; 
+  lb.callback          = viewlog_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;

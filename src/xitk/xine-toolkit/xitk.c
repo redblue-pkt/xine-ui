@@ -1659,7 +1659,6 @@ void xitk_init(Display *display, int verbosity) {
 	shminfo.shmaddr = xim->data =  shmat(shminfo.shmid, 0, 0);
 	if(shminfo.shmaddr == (char *) -1) {
 	  XDestroyImage(xim);
-	  shmctl(shminfo.shmid, IPC_RMID, 0);
 	  gXitk->use_xshm = 0;
 	}
 	else {
@@ -1679,11 +1678,11 @@ void xitk_init(Display *display, int verbosity) {
 	  
 	  XDestroyImage(xim);
 	  shmdt(shminfo.shmaddr);
-	  shmctl(shminfo.shmid, IPC_RMID, 0);
 
 	  xitk_uninstall_x_error_handler();
 	  xitk_x_error = 0;
 	}
+	shmctl(shminfo.shmid, IPC_RMID, 0);
       }
     }
   }

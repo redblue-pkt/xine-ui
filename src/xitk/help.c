@@ -220,18 +220,7 @@ static void help_sections(void) {
   }
 }
 
-static void help_handle_event(XEvent *event, void *data) {
-
-  switch(event->type) {
-    
-  case KeyPress:
-    if(xitk_get_key_pressed(event) == XK_Escape)
-      help_exit(NULL, NULL);
-    break;
-  }
-}
-
-void help_exit(xitk_widget_t *w, void *data) {
+static void help_exit(xitk_widget_t *w, void *data) {
 
   if(help) {
     window_info_t wi;
@@ -283,12 +272,23 @@ void help_exit(xitk_widget_t *w, void *data) {
   }
 }
 
+static void help_handle_event(XEvent *event, void *data) {
+
+  switch(event->type) {
+    
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      help_exit(NULL, NULL);
+    break;
+  }
+}
+
 void help_raise_window(void) {
   if(help != NULL)
     raise_window(xitk_window_get_window(help->xwin), help->visible, help->running);
 }
 
-static void help_end(xitk_widget_t *w, void *data) {
+void help_end(void) {
   help_exit(NULL, NULL);
 }
 
@@ -439,7 +439,7 @@ void help_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = help_end; 
+  lb.callback          = help_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;

@@ -178,7 +178,6 @@ typedef struct {
 
 static _setup_t    *setup = NULL;
 
-static void setup_end(xitk_widget_t *, void *);
 static void setup_change_section(xitk_widget_t *, void *, int);
 
 static void add_widget_to_list(xitk_widget_t *w) {
@@ -188,7 +187,7 @@ static void add_widget_to_list(xitk_widget_t *w) {
 /*
  * Leaving setup panel, release memory.
  */
-void setup_exit(xitk_widget_t *w, void *data) {
+static void setup_exit(xitk_widget_t *w, void *data) {
 
   if(setup) {
     window_info_t wi;
@@ -370,7 +369,7 @@ static void setup_set_cursor(int state) {
 
 static void setup_ok(xitk_widget_t *w, void *data) {
   setup_apply(w, data);
-  setup_end(w, data);
+  setup_exit(w, data);
 }
 
 /*
@@ -1026,7 +1025,7 @@ static void setup_sections (void) {
 /*
  *
  */
-static void setup_end(xitk_widget_t *w, void *data) {
+void setup_end(void) {
   setup_exit(NULL, NULL);
 }
 
@@ -1173,7 +1172,7 @@ void setup_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = setup_end; 
+  lb.callback          = setup_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;

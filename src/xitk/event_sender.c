@@ -291,7 +291,7 @@ void event_sender_update_menu_buttons(void) {
   }
 }
 
-void event_sender_exit(xitk_widget_t *w, void *data) {
+static void event_sender_exit(xitk_widget_t *w, void *data) {
 
   if(eventer) {
     window_info_t wi;
@@ -368,7 +368,7 @@ void event_sender_move(int x, int y) {
   }
 }
 
-static void event_sender_end(xitk_widget_t *w, void *data) {
+void event_sender_end(void) {
   event_sender_exit(NULL, NULL);
 }
 
@@ -666,7 +666,7 @@ void event_sender_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = event_sender_end; 
+  lb.callback          = event_sender_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;

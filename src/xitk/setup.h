@@ -31,11 +31,11 @@
 #include "xitk.h"
 
 void setup_panel(void);
-void setup_exit(xitk_widget_t *, void *);
 int setup_is_visible(void);
 int setup_is_running(void);
 void setup_toggle_visibility(xitk_widget_t *, void *);
 void setup_raise_window(void);
 void setup_reparent(void);
+void setup_end(void);
 
 #endif

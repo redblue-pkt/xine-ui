@@ -1544,7 +1544,7 @@ static int bkedit_check_redundancy(kbinding_t *kbt, kbinding_entry_t *kbe) {
 /*
  *
  */
-void kbedit_exit(xitk_widget_t *w, void *data) {
+static void kbedit_exit(xitk_widget_t *w, void *data) {
   
   if(kbedit) {
     window_info_t wi;
@@ -1714,7 +1714,7 @@ static void kbedit_save(xitk_widget_t *w, void *data) {
 /*
  * Forget and dismiss kbeditor 
  */
-static void kbedit_done(xitk_widget_t *w, void *data) {
+void kbedit_end(void) {
   kbedit_exit(NULL, NULL);
 }
 
@@ -2160,7 +2160,7 @@ void kbedit_window(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Done");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = kbedit_done; 
+  lb.callback          = kbedit_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
