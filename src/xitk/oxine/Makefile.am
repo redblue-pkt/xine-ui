@@ -1,6 +1,6 @@
 SUBDIRS = data
 
-AM_CFLAGS = -I../
+AM_CPPFLAGS = -I$(top_srcdir)/src/xitk
 
 if HAVE_X11
 oxine_lib = liboxine.la
@@ -28,7 +28,7 @@ noinst_HEADERS = \
 	utils.h 
 
 debug:
-	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -I../"
+	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
 
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
