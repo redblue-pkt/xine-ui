@@ -7,7 +7,7 @@ docsdir = $(datadir)/doc/xitk
 
 docs_DATA = README
 
-CFLAGS = @BUILD_LIB_STATIC@ @CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
+AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
 
 EXTRA_PROGRAMS = test
 noinst_LTLIBRARIES = libxitk.la
@@ -78,6 +78,10 @@ $(top_builddir)/src/Imlib-light/libImlib-light.la:
 $(top_builddir)/src/xitk/xine-toolkit/libxitk.la:
 	@cd $(top_builddir)/src/xitk/xine-toolkit && $(MAKE) libxitk.la
 
+if INCLUDE_INTL
+@INTLLIBS@:
+	@cd $(top_builddir)/intl && $(MAKE) @INTLLIBS@
+endif
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"

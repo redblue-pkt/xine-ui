@@ -96,14 +96,16 @@ dnl AM_WITH_NLS(use-libtool,,)
 dnl ALL_LINGUAS="cs da de el en@quot en@boldquot es et fr gl id it ja ko nl nn no pl pt pt_BR ru sl sv tr zh"
 ALL_LINGUAS="fr es pt_BR de sk pl_PL uk cs"
 AM_GNU_GETTEXT(use-libtool)
-ac_sources="$nls_cv_header_libgt"
-ac_dests="$nls_cv_header_intl"
-while test -n "$ac_sources"; do
-  set $ac_dests; ac_dest=$1; shift; ac_dests=$*
-  set $ac_sources; ac_source=$1; shift; ac_sources=$*
-  ac_config_links_1="$ac_config_links_1 $ac_dest:$ac_source"
-done
-AC_CONFIG_LINKS([$ac_config_links_1])
+dnl ac_sources="$nls_cv_header_libgt"
+dnl ac_dests="$nls_cv_header_intl"
+dnl while test -n "$ac_sources"; do
+dnl   set $ac_dests; ac_dest=$1; shift; ac_dests=$*
+dnl   set $ac_sources; ac_source=$1; shift; ac_sources=$*
+dnl   ac_config_links_1="$ac_config_links_1 $ac_dest:$ac_source"
+dnl done
+dnl AC_CONFIG_LINKS([$ac_config_links_1])
+AC_CONFIG_LINKS($nls_cv_header_libgt, $nls_cv_header_intl)
+AM_CONDITIONAL(INCLUDE_INTL, test x$USE_INCLUDED_LIBINTL = "xyes")
 if test x"$USE_INCLUDED_LIBINTL" = x"yes"; then
    INTLDIR="-I\$(top_builddir)/intl -I\$(top_srcdir)/intl"
 fi
@@ -749,7 +751,8 @@ AM_CONDITIONAL(HAVE_GETOPT_LONG, test x"$ac_getopt_long" = "xyes")
 dnl
 dnl skins dir location, xine-config told us about this.
 dnl
-XINE_SKINDIR="$xine_data_dir/skins"
+XINE_SKINDIR="${datadir}/xine/skins"
+eval XINE_SKINDIR=`eval echo "$XINE_SKINDIR"`
 dnl AC_SUBST(XINE_SKINDIR)
 AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of Xine skin directory])
 
