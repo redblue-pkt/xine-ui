@@ -1135,8 +1135,8 @@ void setup_panel(void) {
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)),
 			     (w = xitk_noskin_label_create(setup->widget_list, &lbl,
 							   (WINDOW_WIDTH - len) >> 1,
-							   (WINDOW_HEIGHT - (57 + 20)) + 1 +4,
-							   len + 1, 15, fontname)));
+							   (WINDOW_HEIGHT - (57 + 20)) + 1 + 4,
+							   len + 3, 15, fontname)));
     xitk_enable_and_show_widget(w);
   }
 

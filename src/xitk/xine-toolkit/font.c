@@ -71,8 +71,215 @@ typedef struct {
   xitk_recode_t           *xr;         /* text recoding */
 } xitk_font_cache_t;
 
+typedef struct {
+  char                    *language;
+  char                    *encoding;
+  char                    *modifier;
+} lang_locale_t;
+
+static lang_locale_t lang_locales[] = {
+  { "af_ZA",    "iso88591",   NULL       },
+  { "ar_AE",    "iso88596",   NULL       },
+  { "ar_BH",    "iso88596",   NULL       },
+  { "ar_DZ",    "iso88596",   NULL       },
+  { "ar_EG",    "iso88596",   NULL       },
+  { "ar_IN",    "utf8",       NULL       },
+  { "ar_IQ",    "iso88596",   NULL       },
+  { "ar_JO",    "iso88596",   NULL       },
+  { "ar_KW",    "iso88596",   NULL       },
+  { "ar_LB",    "iso88596",   NULL       },
+  { "ar_LY",    "iso88596",   NULL       },
+  { "ar_MA",    "iso88596",   NULL       },
+  { "ar_OM",    "iso88596",   NULL       },
+  { "ar_QA",    "iso88596",   NULL       },
+  { "ar_SA",    "iso88596",   NULL       },
+  { "ar_SD",    "iso88596",   NULL       },
+  { "ar_SY",    "iso88596",   NULL       },
+  { "ar_TN",    "iso88596",   NULL       },
+  { "ar_YE",    "iso88596",   NULL       },
+  { "be_BY",    "cp1251",     NULL       },
+  { "bg_BG",    "cp1251",     NULL       },
+  { "br_FR",    "iso88591",   NULL       },
+  { "bs_BA",    "iso88592",   NULL       },
+  { "ca_ES",    "iso88591",   NULL       },
+  { "ca_ES",    "iso885915",  "euro"     },
+  { "cs_CZ",    "iso88592",   NULL       },
+  { "cy_GB",    "iso885914",  NULL       },
+  { "da_DK",    "iso88591",   NULL       },
+  { "de_AT",    "iso88591",   NULL       },
+  { "de_AT",    "iso885915",  "euro"     },
+  { "de_BE",    "iso88591",   NULL       },
+  { "de_BE",    "iso885915",  "euro"     },
+  { "de_CH",    "iso88591",   NULL       },
+  { "de_DE",    "iso88591",   NULL       },
+  { "de_DE",    "iso885915",  "euro"     },
+  { "de_LU",    "iso88591",   NULL       },
+  { "de_LU",    "iso885915",  "euro"     },
+  { "el_GR",    "iso88597",   NULL       },
+  { "en_AU",    "iso88591",   NULL       },
+  { "en_BW",    "iso88591",   NULL       },
+  { "en_CA",    "iso88591",   NULL       },
+  { "en_DK",    "iso88591",   NULL       },
+  { "en_GB",    "iso88591",   NULL       },
+  { "en_HK",    "iso88591",   NULL       },
+  { "en_IE",    "iso88591",   NULL       },
+  { "en_IE",    "iso885915",  "euro"     },
+  { "en_IN",    "utf8",       NULL       },
+  { "en_NZ",    "iso88591",   NULL       },
+  { "en_PH",    "iso88591",   NULL       },
+  { "en_SG",    "iso88591",   NULL       },
+  { "en_US",    "iso88591",   NULL       },
+  { "en_ZA",    "iso88591",   NULL       },
+  { "en_ZW",    "iso88591",   NULL       },
+  { "es_AR",    "iso88591",   NULL       },
+  { "es_BO",    "iso88591",   NULL       },
+  { "es_CL",    "iso88591",   NULL       },
+  { "es_CO",    "iso88591",   NULL       },
+  { "es_CR",    "iso88591",   NULL       },
+  { "es_DO",    "iso88591",   NULL       },
+  { "es_EC",    "iso88591",   NULL       },
+  { "es_ES",    "iso88591",   NULL       },
+  { "es_ES",    "iso885915",  "euro"     },
+  { "es_GT",    "iso88591",   NULL       },
+  { "es_HN",    "iso88591",   NULL       },
+  { "es_MX",    "iso88591",   NULL       },
+  { "es_NI",    "iso88591",   NULL       },
+  { "es_PA",    "iso88591",   NULL       },
+  { "es_PE",    "iso88591",   NULL       },
+  { "es_PR",    "iso88591",   NULL       },
+  { "es_PY",    "iso88591",   NULL       },
+  { "es_SV",    "iso88591",   NULL       },
+  { "es_US",    "iso88591",   NULL       },
+  { "es_UY",    "iso88591",   NULL       },
+  { "es_VE",    "iso88591",   NULL       },
+  { "et_EE",    "iso88591",   NULL       },
+  { "eu_ES",    "iso88591",   NULL       },
+  { "eu_ES",    "iso885915",  "euro"     },
+  { "fa_IR",    "utf8",       NULL       },
+  { "fi_FI",    "iso88591",   NULL       },
+  { "fi_FI",    "iso885915",  "euro"     },
+  { "fo_FO",    "iso88591",   NULL       },
+  { "fr_BE",    "iso88591",   NULL       },
+  { "fr_BE",    "iso885915",  "euro"     },
+  { "fr_CA",    "iso88591",   NULL       },
+  { "fr_CH",    "iso88591",   NULL       },
+  { "fr_FR",    "iso88591",   NULL       },
+  { "fr_FR",    "iso885915",  "euro"     },
+  { "fr_LU",    "iso88591",   NULL       },
+  { "fr_LU",    "iso885915",  "euro"     },
+  { "ga_IE",    "iso88591",   NULL       },
+  { "ga_IE",    "iso885915",  "euro"     },
+  { "gl_ES",    "iso88591",   NULL       },
+  { "gl_ES",    "iso885915",  "euro"     },
+  { "gv_GB",    "iso88591",   NULL       },
+  { "he_IL",    "iso88598",   NULL       },
+  { "hi_IN",    "utf8",       NULL       },
+  { "hr_HR",    "iso88592",   NULL       },
+  { "hu_HU",    "iso88592",   NULL       },
+  { "id_ID",    "iso88591",   NULL       },
+  { "is_IS",    "iso88591",   NULL       },
+  { "it_CH",    "iso88591",   NULL       },
+  { "it_IT",    "iso88591",   NULL       },
+  { "it_IT",    "iso885915",  "euro"     },
+  { "iw_IL",    "iso88598",   NULL       },
+  { "ja_JP",    "eucjp",      NULL       },
+  { "ja_JP",    "ujis",       NULL       },
+  { "japanese", "euc",        NULL       },
+  { "ka_GE",    "georgianps", NULL       },
+  { "kl_GL",    "iso88591",   NULL       },
+  { "ko_KR",    "euckr",      NULL       },
+  { "ko_KR",    "utf8",       NULL       },
+  { "korean",   "euc",        NULL       },
+  { "kw_GB",    "iso88591",   NULL       },
+  { "lt_LT",    "iso885913",  NULL       },
+  { "lv_LV",    "iso885913",  NULL       },
+  { "mi_NZ",    "iso885913",  NULL       },
+  { "mk_MK",    "iso88595",   NULL       },
+  { "mr_IN",    "utf8",       NULL       },
+  { "ms_MY",    "iso88591",   NULL       },
+  { "mt_MT",    "iso88593",   NULL       },
+  { "nb_NO",    "ISO-8859-1", NULL       },
+  { "nl_BE",    "iso88591",   NULL       },
+  { "nl_BE",    "iso885915",  "euro"     },
+  { "nl_NL",    "iso88591",   NULL       },
+  { "nl_NL",    "iso885915",  "euro"     },
+  { "nn_NO",    "iso88591",   NULL       },
+  { "no_NO",    "iso88591",   NULL       },
+  { "oc_FR",    "iso88591",   NULL       },
+  { "pl_PL",    "iso88592",   NULL       },
+  { "pt_BR",    "iso88591",   NULL       },
+  { "pt_PT",    "iso88591",   NULL       },
+  { "pt_PT",    "iso885915",  "euro"     },
+  { "ro_RO",    "iso88592",   NULL       },
+  { "ru_RU",    "iso88595",   NULL       },
+  { "ru_RU",    "koi8r",      NULL       },
+  { "ru_UA",    "koi8u",      NULL       },
+  { "se_NO",    "utf8",       NULL       },
+  { "sk_SK",    "iso88592",   NULL       },
+  { "sl_SI",    "iso88592",   NULL       },
+  { "sq_AL",    "iso88591",   NULL       },
+  { "sr_YU",    "iso88592",   NULL       },
+  { "sr_YU",    "iso88595",   "cyrillic" },
+  { "sv_FI",    "iso88591",   NULL       },
+  { "sv_FI",    "iso885915",  "euro"     },
+  { "sv_SE",    "iso88591",   NULL       },
+  { "ta_IN",    "utf8",       NULL       },
+  { "te_IN",    "utf8",       NULL       },
+  { "tg_TJ",    "koi8t",      NULL       },
+  { "th_TH",    "tis620",     NULL       },
+  { "tl_PH",    "iso88591",   NULL       },
+  { "tr_TR",    "iso88599",   NULL       },
+  { "uk_UA",    "koi8u",      NULL       },
+  { "ur_PK",    "utf8",       NULL       },
+  { "uz_UZ",    "iso88591",   NULL       },
+  { "vi_VN",    "tcvn",       NULL       },
+  { "vi_VN",    "utf8",       NULL       },
+  { "wa_BE",    "iso88591",   NULL       },
+  { "wa_BE",    "iso885915",  "euro"     },
+  { "yi_US",    "cp1255",     NULL       },
+  { "zh_CN",    "gb18030",    NULL       },
+  { "zh_CN",    "gb2312",     NULL       },
+  { "zh_CN",    "gbk",        NULL       },
+  { "zh_HK",    "big5hkscs",  NULL       },
+  { "zh_TW",    "big5",       NULL       },
+  { "zh_TW",    "euctw",      NULL       },
+  { NULL,       NULL,         NULL       }
+};
+
 /* global font cache */
 static xitk_font_cache_t cache;
+
+static const lang_locale_t *_get_next_lang_locale(char *lcal, const lang_locale_t *plocale) {
+  if(lcal && strlen(lcal) && plocale) {
+    const lang_locale_t *llocale = plocale;
+
+    llocale++;
+
+    while(llocale && llocale->language) {
+      if(!strncmp(lcal, llocale->language, strlen(lcal)))
+	return llocale;
+      
+      llocale++;
+    }
+  }
+  return NULL;
+}
+
+static const lang_locale_t *_get_first_lang_locale(char *lcal) {
+  const lang_locale_t *llocale;
+
+  if(lcal && strlen(lcal)) {
+    llocale = &*lang_locales;
+    
+    while(llocale->language) {
+      if(!strncmp(lcal, llocale->language, strlen(lcal)))
+	return llocale;
+      
+      llocale++;
+    }
+  }
+  return NULL;
+}
 
 #ifdef WITH_XMB
 # ifndef WITH_XFT
@@ -242,7 +449,42 @@ void xitk_font_cache_init(void) {
   pthread_mutex_init(&cache.mutex, NULL);
   
 #ifdef WITH_XFT
-  cache.xr = xitk_recode_init("", "UTF-8");
+ {
+   char *lang, *codeset = NULL;
+   
+   if(!(lang = getenv("LC_ALL")))
+     if(!(lang = getenv("LC_MESSAGES")))
+       lang = getenv("LANG");
+   
+   if(lang) {
+     char *lg, *enc, *mod;
+     
+     lg = strdup(lang);
+
+     if((enc = strchr(lg, '.')) && (strlen(enc) > 1)) {
+       enc++;
+
+       if((mod = strchr(enc, '@')))
+	 *mod = '\0';
+       
+       codeset = strdup(enc);
+     }
+     else {
+       const lang_locale_t *llocale = _get_first_lang_locale(lg);
+       
+       if(llocale && llocale->encoding)
+	 codeset = strdup(llocale->encoding);
+
+     }
+
+     free(lg);
+   }
+
+   cache.xr = xitk_recode_init(codeset ? codeset : "", "UTF-8");
+
+   if(codeset)
+     free(codeset);
+ }
 #else
   cache.xr = NULL;
 #endif
@@ -841,10 +1083,10 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   int         dir;
   int         fascent, fdescent;
 #else
-  XGlyphInfo xft_extents;
+  XGlyphInfo  xft_extents;
   char       *foo_text, *encoded_text;
 #endif
-#if defined(WITH_XMB) || defined(WITH_XFT)
+#if defined(WITH_XMB) && !defined(WITH_XFT)
   XRectangle  logic;
 #endif
   
@@ -873,23 +1115,23 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   ABORT_IF_NULL(c);
 
   /* recode right part of string */
-  if (nbytes > strlen(c)) nbytes = strlen(c);
+  if (nbytes > strlen(c))
+    nbytes = strlen(c);
+
   foo_text = strdup(c);
   foo_text[nbytes] = '\0';
   encoded_text = xitk_recode(cache.xr, foo_text);
+  nbytes = strlen(encoded_text);
   free(foo_text);
   
   XLOCK(xtfs->display);
-  XftTextExtentsUtf8( xtfs->display, xtfs->font, encoded_text, nbytes, &xft_extents );
+  XftTextExtentsUtf8(xtfs->display, xtfs->font, encoded_text, nbytes, &xft_extents);
   XUNLOCK(xtfs->display);
   free(encoded_text);
-  logic.width  = xft_extents.width;
-  logic.height = xft_extents.height;
-  logic.y = -1 * xft_extents.y;
-    
-  if (width) *width     = logic.width;
-  if (ascent) *ascent   = -logic.y;
-  if (descent) *descent = logic.height + logic.y;
+
+  if (width) *width       = xft_extents.width;
+  if (ascent) *ascent     = xtfs->font->ascent - 1;
+  if (descent) *descent   = xtfs->font->descent;
   if (lbearing) *lbearing = 0;
   if (rbearing) *rbearing = 0;
 #else
