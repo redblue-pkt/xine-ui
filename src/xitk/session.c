@@ -382,6 +382,7 @@ void *ctrlsocket_func(void *data) {
       printf("load: '%s'\n", (char *)shdr->data);
       mediamark_load_mediamarks((const char *)shdr->data);
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      playlist_update_playlist();
       if((!is_playback_widgets_enabled()) && gGui->playlist.num)
 	enable_playback_controls(1);
       send_ack(shdr);
