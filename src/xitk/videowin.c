@@ -756,7 +756,8 @@ void video_window_dest_size_cb (void *data,
 void video_window_frame_output_cb (void *data,
 				   int video_width, int video_height,
 				   int *dest_x, int *dest_y, 
-				   int *dest_width, int *dest_height) {
+				   int *dest_width, int *dest_height,
+				   int *win_x, int *win_y) {
   
   if(gVw->stream_has_changed) {
     
@@ -773,10 +774,13 @@ void video_window_frame_output_cb (void *data,
     video_window_set_size_hints(gVw->output_width, gVw->output_height);
   }
   
-  *dest_x = (gVw->xwin < 0) ? 0 : gVw->xwin;
-  *dest_y = (gVw->ywin < 0) ? 0 : gVw->ywin;
+  
+  *dest_x = 0;
+  *dest_y = 0;
   *dest_width  = gVw->output_width;
   *dest_height = gVw->output_height;
+  *win_x = (gVw->xwin < 0) ? 0 : gVw->xwin;
+  *win_y = (gVw->ywin < 0) ? 0 : gVw->ywin;
 }
 
 /*

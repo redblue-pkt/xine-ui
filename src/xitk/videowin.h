@@ -32,7 +32,8 @@ void video_window_select_visual (void);
 void video_window_frame_output_cb (void *this,
 				   int video_width, int video_height, 
 				   int *dest_x, int *dest_y,
-				   int *dest_width, int *dest_height);
+				   int *dest_width, int *dest_height,
+				   int *win_x, int *win_y);
 
 void video_window_dest_size_cb (void *this,
 				int video_width, int video_height,
