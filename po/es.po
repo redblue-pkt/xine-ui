@@ -4,15 +4,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine 0.9.11\n"
+"Project-Id-Version: xine 1.0.0\n"
 "POT-Creation-Date: 2002-11-22 00:07+0100\n"
-"PO-Revision-Date: 2002-08-04 01:11+0200\n"
+"PO-Revision-Date: 2002-11-15 17:59+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.9.5\n"
+"X-Generator: KBabel 0.9.6\n"
 
 #: src/xitk/actions.c:254
 msgid "No MRL (input stream) specified"
@@ -131,11 +131,11 @@ msgstr ""
 "Normalmente esto significa que el formato de archivo no fue reconocido."
 
 #: src/xitk/errors.c:206
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
-"Demuxer failed. Maybe '%s' is a broken file?\n"
+"demuxer failed. Maybe '%s' is a broken file?\n"
 msgstr ""
 "- error del motor de xine -\n"
 "\n"
@@ -248,8 +248,9 @@ msgid "Visiblity behavoir of output window"
 msgstr ""
 
 #: src/xitk/event.c:933
+#, fuzzy
 msgid "Show/hide video output window regarding to the stream type"
-msgstr ""
+msgstr "muestra/oculta la ventana de salida de vídeo según el tipo de flujo"
 
 #: src/xitk/event.c:940
 msgid "Visiblility behavior of panel"
@@ -257,17 +258,20 @@ msgstr ""
 
 #: src/xitk/event.c:941
 msgid ""
-"Automatically show/hide panel window, according to "
+"automatically show/hide panel window, according to "
 "auto_video_output_visibility"
 msgstr ""
+"muestra/oculta automáticamente la ventana del panel, según "
+"auto_video_output_visibility"
 
 #: src/xitk/event.c:949
+#, fuzzy
 msgid "Event sender behavior"
-msgstr ""
+msgstr "emisor del evento"
 
 #: src/xitk/event.c:950
 msgid "Event sender window stick to main panel"
-msgstr ""
+msgstr "Emisor del evento de pegado de ventana al panel principal"
 
 #: src/xitk/event.c:958
 msgid "Visual animation"
@@ -279,8 +283,9 @@ msgid ""
 msgstr ""
 
 #: src/xitk/event.c:968
+#, fuzzy
 msgid "Stream informations"
-msgstr ""
+msgstr "información sobre los flujos"
 
 #: src/xitk/event.c:969
 msgid "Update stream informations (in stream infos window) each half seconds."
@@ -310,7 +315,7 @@ msgstr "        Profundidad: %d.\n"
 #: src/xitk/event.c:998
 #, c-format
 msgid "        XShmQueryVersion: %d.%d.\n"
-msgstr ""
+msgstr "        XShmQueryVersion: %d.%d.\n"
 
 #: src/xitk/event.c:1060
 msgid "Unable to initialize Imlib\n"
@@ -318,15 +323,15 @@ msgstr "No se puede iniciar Imlib\n"
 
 #: src/xitk/event_sender.c:441
 msgid "event sender"
-msgstr ""
+msgstr "emisor del evento"
 
 #: src/xitk/event_sender.c:460
 msgid "Up"
-msgstr ""
+msgstr "Arriba"
 
 #: src/xitk/event_sender.c:477
 msgid "Left"
-msgstr ""
+msgstr "Izquierda"
 
 #: src/xitk/event_sender.c:494 src/xitk/file_browser.c:215
 #: src/xitk/mrl_browser.c:271
@@ -335,69 +340,71 @@ msgstr "Selecc."
 
 #: src/xitk/event_sender.c:511
 msgid "Right"
-msgstr ""
+msgstr "Derecha"
 
 #: src/xitk/event_sender.c:528
-#, fuzzy
 msgid "Down"
-msgstr "Hecho"
+msgstr "Abajo"
 
 #: src/xitk/event_sender.c:605
 msgid "Angle +"
-msgstr ""
+msgstr "Ángulo +"
 
 #: src/xitk/event_sender.c:619
 msgid "Angle -"
-msgstr ""
+msgstr "Ángulo -"
 
 #. Initialize menu labels
 #: src/xitk/event_sender.c:633
 msgid "Menu 1"
-msgstr ""
+msgstr "Menú 1"
 
 #: src/xitk/event_sender.c:634
 msgid "Menu 2"
-msgstr ""
+msgstr "Menú 2"
 
 #: src/xitk/event_sender.c:635
 msgid "Menu 3"
-msgstr ""
+msgstr "Menú 3"
 
 #: src/xitk/event_sender.c:636
 msgid "Menu 4"
-msgstr ""
+msgstr "Menú 4"
 
 #: src/xitk/event_sender.c:637
 msgid "Menu 5"
-msgstr ""
+msgstr "Menú 5"
 
 #: src/xitk/event_sender.c:638
 msgid "Menu 6"
-msgstr ""
+msgstr "Menú 6"
 
 #: src/xitk/event_sender.c:639
 msgid "Menu 7"
-msgstr ""
+msgstr "Menú 7"
 
 #: src/xitk/event_sender.c:641 src/xitk/event_sender.c:643
 msgid "Root"
 msgstr ""
 
 #: src/xitk/event_sender.c:642
+#, fuzzy
 msgid "Title"
-msgstr ""
+msgstr "Título: "
 
 #: src/xitk/event_sender.c:644
 msgid "Subpicture"
 msgstr ""
 
 #: src/xitk/event_sender.c:645 src/xitk/stream_infos.c:842
+#, fuzzy
 msgid "Audio"
-msgstr ""
+msgstr "Tiene audio: "
 
 #: src/xitk/event_sender.c:646
+#, fuzzy
 msgid "Angle"
-msgstr ""
+msgstr "Ángulo -"
 
 #: src/xitk/event_sender.c:647
 msgid "Part"
@@ -534,9 +541,9 @@ msgstr ""
 "(c) 2000-2002 por G. Bartsch y el equipo del proyecto xine.\n"
 
 #: src/xitk/main.c:253
-#, fuzzy, c-format
+#, c-format
 msgid "Built with xine library %d.%d.%d (%s)\n"
-msgstr "Construído con la biblioteca xine %d.%d.%d [%s]-[%s]-[%s].\n"
+msgstr "Construído con la biblioteca de xine %d.%d.%d (%s)\n"
 
 #: src/xitk/main.c:258
 #, c-format
@@ -812,25 +819,25 @@ msgid "main: not using any audio driver (as requested).\n"
 msgstr "main: no usando ningún manejador de audio (como se pidió).\n"
 
 #: src/xitk/main.c:517
-#, fuzzy, c-format
+#, c-format
 msgid "main: probing <%s> audio output plugin\n"
-msgstr "main: probando plugin de vídeo de salida <%s>\n"
+msgstr "main: probando plugin de salida de audio <%s>\n"
 
 #: src/xitk/main.c:532
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr "main: prueba de manejador de audio falló => no hay salida de audio\n"
 
 #: src/xitk/main.c:550
-#, fuzzy, c-format
+#, c-format
 msgid "main: audio driver <%s> failed\n"
-msgstr "main: falló el manejador de vídeo <%s>\n"
+msgstr "main: falló el manejador de audio <%s>\n"
 
 #: src/xitk/main.c:690
-#, fuzzy, c-format
+#, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr ""
-"Se requiere la versión 0.9.10 de la biblioteca de xine, encontrada la %d.%d.%"
-"d.\n"
+"Se requiere la versión 1.0.0 de la biblioteca de xine, se encontró la %d.%d."
+"%d.\n"
 
 #: src/xitk/main.c:698
 msgid "sigprocmask() failed.\n"
@@ -861,7 +868,7 @@ msgstr "argumento %d no válido => fin\n"
 
 #: src/xitk/main.c:1004
 msgid "Logo mrl"
-msgstr ""
+msgstr "Logo mrl"
 
 #: src/xitk/mediamark.c:894
 #, c-format
@@ -975,9 +982,8 @@ msgid "Xine Panel"
 msgstr "Panel de Xine"
 
 #: src/xitk/panel.c:767
-#, fuzzy
 msgid "panel: couldn't find image for background\n"
-msgstr "xine-panel: no se pudo encontrar imagen para fondo\n"
+msgstr "panel: no se pudo encontrar imagen para fondo\n"
 
 #: src/xitk/panel.c:908
 msgid "Stop playback"
@@ -1005,7 +1011,7 @@ msgstr "Ventana de configuración"
 
 #: src/xitk/panel.c:963
 msgid "Navigator"
-msgstr ""
+msgstr "Navegador"
 
 #: src/xitk/panel.c:971
 msgid "Hide GUI"
@@ -1076,9 +1082,8 @@ msgid "Xine Playlist Editor"
 msgstr "Editor de listas de reproducción de xine"
 
 #: src/xitk/playlist.c:859
-#, fuzzy
 msgid "playlist: couldn't find image for background\n"
-msgstr "xine-playlist: no se pudo encontrar la imagen de fondo\n"
+msgstr "playlist: no se pudo encontrar la imagen de fondo\n"
 
 #: src/xitk/playlist.c:974
 msgid "Move up selected MRL"
@@ -1137,7 +1142,7 @@ msgstr "Entrada directa de MRL"
 #: src/xitk/setup.c:828 src/xitk/setup.c:830 src/xitk/setup.c:838
 #: src/xitk/setup.c:840
 msgid "No help available"
-msgstr ""
+msgstr "No está disponible la ayuda"
 
 #: src/xitk/setup.c:950
 msgid "Help"
@@ -1243,12 +1248,12 @@ msgstr "Archivo '%s' escrito.\n"
 #: src/xitk/stream_infos.c:378 src/xitk/stream_infos.c:379
 #: src/xitk/stream_infos.c:380 src/xitk/stream_infos.c:381
 msgid "Unavailable"
-msgstr ""
+msgstr "No disponible"
 
 #. Create window
 #: src/xitk/stream_infos.c:478
 msgid "Stream Information"
-msgstr ""
+msgstr "Información sobre los flujos"
 
 #: src/xitk/stream_infos.c:503
 msgid "General"
@@ -1256,27 +1261,27 @@ msgstr ""
 
 #: src/xitk/stream_infos.c:510
 msgid "Title: "
-msgstr ""
+msgstr "Título: "
 
 #: src/xitk/stream_infos.c:525
 msgid "Comment: "
-msgstr ""
+msgstr "Comentario: "
 
 #: src/xitk/stream_infos.c:540
 msgid "Artist: "
-msgstr ""
+msgstr "Artista: "
 
 #: src/xitk/stream_infos.c:554
 msgid "Genre: "
-msgstr ""
+msgstr "Género: "
 
 #: src/xitk/stream_infos.c:567
 msgid "Year: "
-msgstr ""
+msgstr "Año: "
 
 #: src/xitk/stream_infos.c:583
 msgid "Album: "
-msgstr ""
+msgstr "Álbum: "
 
 #: src/xitk/stream_infos.c:598
 msgid "Misc"
@@ -1284,85 +1289,96 @@ msgstr ""
 
 #: src/xitk/stream_infos.c:604
 msgid "Input Plugin: "
-msgstr ""
+msgstr "Plugin de entrada: "
 
 #: src/xitk/stream_infos.c:617
 msgid "System Layer: "
-msgstr ""
+msgstr "Capa del sistema: "
 
 #: src/xitk/stream_infos.c:630 src/xitk/stream_infos.c:787
 #: src/xitk/stream_infos.c:932
+#, fuzzy
 msgid "Bitrate: "
-msgstr ""
+msgstr "Tasa de bits (bps): "
 
 #: src/xitk/stream_infos.c:643
 msgid "Frame Duration: "
-msgstr ""
+msgstr "Duración del marco: "
 
 #: src/xitk/stream_infos.c:658
 msgid "Is Seekable: "
-msgstr ""
+msgstr "Es posicionable: "
 
 #: src/xitk/stream_infos.c:671
 msgid "Has Chapters: "
-msgstr ""
+msgstr "Tiene capítulos: "
 
 #: src/xitk/stream_infos.c:684
 msgid "Ignore Spu: "
-msgstr ""
+msgstr "Ignorar spu: "
 
 #: src/xitk/stream_infos.c:699
+#, fuzzy
 msgid "Video"
-msgstr ""
+msgstr "Tiene vídeo: "
 
 #: src/xitk/stream_infos.c:707 src/xitk/stream_infos.c:850
+#, fuzzy
 msgid "Has: "
-msgstr ""
+msgstr "Tiene vídeo: "
 
 #: src/xitk/stream_infos.c:719 src/xitk/stream_infos.c:863
+#, fuzzy
 msgid "Handled: "
-msgstr ""
+msgstr "Audio gestionado: "
 
 #: src/xitk/stream_infos.c:732 src/xitk/stream_infos.c:876
+#, fuzzy
 msgid "Ignore: "
-msgstr ""
+msgstr "Ignorar spu: "
 
 #: src/xitk/stream_infos.c:745 src/xitk/stream_infos.c:890
+#, fuzzy
 msgid "Codec: "
-msgstr ""
+msgstr "Codec de audio: "
 
 #: src/xitk/stream_infos.c:761 src/xitk/stream_infos.c:906
+#, fuzzy
 msgid "FourCC: "
-msgstr ""
+msgstr "Vídeo FourCC: "
 
 #: src/xitk/stream_infos.c:774 src/xitk/stream_infos.c:919
 #, fuzzy
 msgid "Channel(s): "
-msgstr "Siguiente canal de audio"
+msgstr "Canal(es) de vídeo: "
 
 #: src/xitk/stream_infos.c:801
 msgid "Resolution: "
 msgstr ""
 
 #: src/xitk/stream_infos.c:814
+#, fuzzy
 msgid "Ratio: "
-msgstr ""
+msgstr "Proporción de vídeo: "
 
 #: src/xitk/stream_infos.c:827
+#, fuzzy
 msgid "Stream(s): "
-msgstr ""
+msgstr "Flujo(s) de vídeo: "
 
 #: src/xitk/stream_infos.c:945
+#, fuzzy
 msgid "Bits: "
-msgstr ""
+msgstr "Bits de audio: "
 
 #: src/xitk/stream_infos.c:959
+#, fuzzy
 msgid "Samplerate: "
-msgstr ""
+msgstr "Tasa de la muestra de audio: "
 
 #: src/xitk/stream_infos.c:977
 msgid "Update"
-msgstr ""
+msgstr "Actualizar"
 
 #: src/xitk/videowin.c:169
 msgid "videowin: output driver cannot select a working visual\n"
@@ -1474,9 +1490,35 @@ msgstr "Refrescar"
 #~ msgid "Can't read %s: %s\n"
 #~ msgstr "No se puede leer %s: %s\n"
 
-#, fuzzy
+#~ msgid "Video Codec: "
+#~ msgstr "Codec de vídeo: "
+
 #~ msgid "Video Width: "
-#~ msgstr "Ventana de vídeo de xine"
+#~ msgstr "Anchura del vídeo: "
+
+#~ msgid "Video Height: "
+#~ msgstr "Altura del vídeo: "
+
+#~ msgid "Video Bitrate (bps): "
+#~ msgstr "Tasa de bits del vídeo (bps): "
+
+#~ msgid "Video handled: "
+#~ msgstr "Vídeo gestionado: "
+
+#~ msgid "Audio Channel(s): "
+#~ msgstr "Canal(es) de audio: "
+
+#~ msgid "Audio Bitrate: "
+#~ msgstr "Tasa de bits de audio: "
+
+#~ msgid "Audio FourCC: "
+#~ msgstr "Audio FourCC: "
+
+#~ msgid "Ignore Video: "
+#~ msgstr "Ignorar vídeo: "
+
+#~ msgid "Ignore Audio: "
+#~ msgstr "Ignorar audio: "
 
 #~ msgid "main: probing audio drivers...\n"
 #~ msgstr "main: probando manejadores de audio...\n"
