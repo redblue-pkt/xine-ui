@@ -747,7 +747,7 @@ skin.MrlItemBtn {
 
 skin.MrlSelect {
 	coords {
-	  x = 15
+	  x = 69
 	  y = 224
 	}
 	pixmap = MrlSelect.png
@@ -761,7 +761,7 @@ skin.MrlSelect {
 
 skin.MrlPlay {
 	coords {
-	  x = 69
+	  x = 15
 	  y = 235
 	}
 	pixmap = PlPlay.png
