@@ -564,8 +564,7 @@ static void video_window_adapt_size (void) {
      * This probably break something with Xinerama, but i can't
      * test it.
      */
-    if((gVw->using_xinerama == 0) && 
-       (gVw->stream_resize_window == 0)) {
+    if(gVw->stream_resize_window == 0) {
       hint.x           = gVw->old_xwin;
       hint.y           = gVw->old_ywin;
     }
@@ -1221,13 +1220,13 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 			 gVw->xwin, gVw->ywin, gVw->video_width, gVw->video_height);
       XUnlockDisplay (gGui->display);
   
-    }
+    } else {
 
     XLockDisplay (gGui->display);
     XTranslateCoordinates(gGui->display, gGui->video_window, DefaultRootWindow(gGui->display), 
 			  0, 0, &gVw->xwin, &gVw->ywin, &tmp_win);
     XUnlockDisplay (gGui->display);
-    
+    }
   }
 }
 
