@@ -7,7 +7,7 @@ Standards-Version: 3.2.1
 
 Package: xine-ui
 Architecture: any
-Depends: libxine0 (>=0.9.1), ${shlibs:Depends}
+Depends: libxine0 (>=0.9.5), ${shlibs:Depends}
 Recommends: ${shlibs:Recommends}
 Suggests: ${shlibs:Suggests}
 Conflicts: xine (<<0.5.0)
