@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-0.9.9\n"
 "POT-Creation-Date: 2002-05-02 22:21+0200\n"
-"PO-Revision-Date: 2002-04-05 20:33+0200\n"
+"PO-Revision-Date: 2002-05-11 00:32+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -69,7 +69,7 @@ msgstr ""
 
 #: src/xitk/xine-toolkit/test.c:753
 msgid "init_test() failed\n"
-msgstr "Funcke init_test() selhala\n"
+msgstr "Funkce init_test() selhala\n"
 
 #: src/xitk/xine-toolkit/test.c:769
 msgid "My Fucking Window"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.9\n"
 "POT-Creation-Date: 2002-05-02 22:21+0200\n"
-"PO-Revision-Date: 2002-04-05 20:00+0200\n"
+"PO-Revision-Date: 2002-05-11 00:15+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,7 @@ msgstr ""
 
 #: src/xitk/actions.c:96
 msgid "No MRL (input stream) specified"
-msgstr ""
+msgstr "Nebylo specifikováno ¾ádné MRL (vstupní data)"
 
 #: src/xitk/control.c:338
 #, c-format
@@ -83,7 +83,7 @@ msgid "Error"
 msgstr "Chyba"
 
 #: src/xitk/errors.c:183
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -93,10 +93,10 @@ msgstr ""
 "- chyba z enginu xine -\n"
 "\n"
 "Pro '%s' není dostupný ¾ádný vstupní modul.\n"
-"Mo¾ná je ¹patná syntaxe MRL nebo neexistuje soubor nebo data.\n"
+"Mo¾ná je ¹patná syntaxe MRL nebo neexistuje soubor nebo data."
 
 #: src/xitk/errors.c:189
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -106,10 +106,10 @@ msgstr ""
 "- chyba z enginu xine -\n"
 "\n"
 "Pro '%s' není dostupný ¾ádný vstupní modul.\n"
-"Mo¾ná je ¹patná syntaxe MRL nebo neexistuje soubor nebo data.\n"
+"Toto obvykle znamená, ¾e nebyl rozpoznán formát souboru."
 
 #: src/xitk/errors.c:194
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -127,7 +127,7 @@ msgid ""
 msgstr ""
 "- chyba z enginu xine -\n"
 "\n"
-"demuxer selhal. Mo¾ná, ¾e je '%s' po¹kozený soubor.\n"
+"!! Neznámá chyba !!\n"
 
 #: src/xitk/event.c:830
 msgid ""
@@ -285,7 +285,8 @@ msgstr "      --keymap [volba]         Zobrazit mapu klávesnine. Volby jsou:\n"
 msgid ""
 "                                 'default': display default keymap table,\n"
 msgstr ""
-"                                 'default': zobrazit implicitní kláv. mapu,\n"
+"                                 'default': zobrazit implicitní mapu "
+"klávesnice,\n"
 
 #: src/xitk/main.c:205
 msgid ""
@@ -299,8 +300,8 @@ msgstr ""
 msgid ""
 "                                 'remapped': user remapped keymap table.\n"
 msgstr ""
-"                                 'remapped': u¾ivatelem pozmìnìnou kl. "
-"mapu.\n"
+"                                 'remapped': u¾ivatelem pozmìnìnou mapu "
+"klávesnice.\n"
 
 #: src/xitk/main.c:207
 msgid ""
@@ -322,12 +323,12 @@ msgstr ""
 
 #: src/xitk/main.c:210
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
-msgstr ""
+"  -G, --geometry <WxH[+X+Y]>   Nastavení geometrie výstupního okna (ve stylu "
+"X).\n"
 
 #: src/xitk/main.c:211
-#, fuzzy
 msgid "  -B, --borderless             Borderless video output window.\n"
-msgstr "  -H, --hide-video             skrýt okno s videem\n"
+msgstr "  -B, --borderless             Výstupní okno s videem bez okrajù\n"
 
 #: src/xitk/main.c:213
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -405,7 +406,7 @@ msgstr "u volby -A po¾adováno ID zvukového ovladaèe\n"
 #: src/xitk/main.c:669
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
-msgstr ""
+msgstr "©patnì zadaná geometrie '%s', viz. xine --help\n"
 
 #: src/xitk/main.c:693
 #, c-format
@@ -458,7 +459,7 @@ msgstr "Konec"
 
 #: src/xitk/panel.c:747
 msgid "Setup window"
-msgstr "Nasatvení xine"
+msgstr "Nastavení xine"
 
 #: src/xitk/panel.c:754
 msgid "Hide GUI"
@@ -606,7 +607,7 @@ msgstr "Nepodaøilo se naèíst %s, ¹patná verze. Pou¾ije se pùvodní skin '%s'.\n"
 #: src/xitk/skins.c:289 src/xitk/skins.c:328
 #, c-format
 msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
-msgstr "Jejda, skin '%s' nenalezen, pou¾it pùvodní '%s'.\n"
+msgstr "Jejda, skin '%s' nenalezen, pou¾ijte pùvodní '%s'.\n"
 
 #: src/xitk/skins.c:316
 msgid "No available skin found. Say goodbye.\n"
