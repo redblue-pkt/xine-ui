@@ -1324,6 +1324,7 @@ int main(int argc, char *argv[]) {
   gGui->actions_on_start[aos]  = ACTID_NOKEY;
   gGui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
   gGui->playlist.on_start      = NULL;
+  gGui->playlist.control       = 0;
   gGui->skin_server_url        = NULL;
   gGui->verbosity              = 0;
   gGui->broadcast_port         = 0;
