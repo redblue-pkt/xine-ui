@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.23\n"
 "POT-Creation-Date: 2004-05-01 00:55+0000\n"
-"PO-Revision-Date: 2004-04-18 08:14+0200\n"
+"PO-Revision-Date: 2004-05-03 15:38+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -746,7 +746,7 @@ msgstr "Kann Datei '%s' nicht löschen: %s."
 #: src/xitk/file_browser.c:1001
 #, c-format
 msgid "Do you really want to delete the file: '%s"
-msgstr ""
+msgstr "Datei '%s' wirklich löschen?"
 
 #: src/xitk/file_browser.c:1007
 msgid "Confirm deletion ?"
@@ -1552,7 +1552,6 @@ msgstr ""
 "Die Quelle scheint verschlüsselt zu sein und kann nicht gelesen werden."
 
 #: src/xitk/main.c:1159
-#, fuzzy
 msgid ""
 "\n"
 "Your DVD is probably crypted. According to your country laws, you can or "
@@ -2059,9 +2058,8 @@ msgid "Subtitle/Channel/Auto"
 msgstr "Untertitel/Kanal/Automatisch"
 
 #: src/xitk/menus.c:980
-#, fuzzy
 msgid "Add Mediamark"
-msgstr "Mediamark-MRL"
+msgstr "Mediamark hinzufügen"
 
 #: src/xitk/menus.c:1022 src/xitk/menus.c:1098
 msgid "Off"
@@ -2122,21 +2120,19 @@ msgstr "Audio: "
 
 #: src/xitk/osd.c:379
 msgid "of"
-msgstr ""
+msgstr "von"
 
 #: src/xitk/osd.c:510
 msgid "Position in Stream"
 msgstr "Position im Datenstrom"
 
 #: src/xitk/osd.c:654
-#, fuzzy
 msgid "Subtitles: "
-msgstr "Untertitel: %s"
+msgstr "Untertitel: "
 
 #: src/xitk/osd.c:683
-#, fuzzy
 msgid "Audio Channel: "
-msgstr "Tonspur: %s"
+msgstr "Tonspur: "
 
 #: src/xitk/panel.c:47
 msgid "Play previous chapter or mrl"
@@ -2155,9 +2151,8 @@ msgid "Play next entry from playlist"
 msgstr "Spiele nächsten Eintrag in der Playliste"
 
 #: src/xitk/panel.c:282
-#, fuzzy
 msgid "Total time: "
-msgstr "Gesamtzeit: --:--:--"
+msgstr "Gesamtzeit: "
 
 #: src/xitk/panel.c:285 src/xitk/panel.c:1285
 msgid "Total time: --:--:--"
@@ -2550,9 +2545,8 @@ msgid "Choose a skin to download..."
 msgstr "Wähle einen Skin zum Herunterladen..."
 
 #: src/xitk/snapshot.c:827 src/xitk/snapshot.c:838
-#, fuzzy
 msgid "Error: "
-msgstr "Fehler"
+msgstr "Fehler: "
 
 #: src/xitk/snapshot.c:881
 msgid "xine_get_current_frame() failed\n"
@@ -2560,12 +2554,11 @@ msgstr "xine_get_current_frame() fehlgeschlagen\n"
 
 #: src/xitk/snapshot.c:890
 msgid "Wrong image size: "
-msgstr ""
+msgstr "Falsche Bildgröße: "
 
 #: src/xitk/snapshot.c:890
-#, fuzzy
 msgid ". Snapshot aborted."
-msgstr "Falsche Bildgröße: %dx%d. Schnappschuß abgebrochen.\n"
+msgstr ". Schnappschuß abgebrochen."
 
 #: src/xitk/snapshot.c:902
 msgid "prvt_image_alloc failed\n"
@@ -2582,9 +2575,8 @@ msgid "Not supported for this video out driver\n"
 msgstr "Nicht unterstützt für diesen Video-Ausgabetreiber\n"
 
 #: src/xitk/snapshot.c:1027
-#, fuzzy
 msgid "File open failed"
-msgstr "Kann Datei (%s) nicht öffnen\n"
+msgstr "Kann Datei nicht öffnen"
 
 #: src/xitk/snapshot.c:1047
 msgid "png_create_write_struct() failed\n"
@@ -2607,9 +2599,8 @@ msgid "rgb_alloc() failed\n"
 msgstr "XAllocWMHints() fehlgeschlagen\n"
 
 #: src/xitk/snapshot.c:1207
-#, fuzzy
 msgid "File written: "
-msgstr "Datei '%s' gespeichert.\n"
+msgstr "Datei geschrieben: "
 
 #: src/xitk/splash.c:65
 msgid "xine Splash"
