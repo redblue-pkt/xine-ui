@@ -1,15 +1,21 @@
 noinst_LTLIBRARIES = libcommon.la
 
-AM_CFLAGS = @XINE_CFLAGS@
+AM_CFLAGS = @XINE_CFLAGS@ @BUILD_LIB_STATIC@
+
+if HAVE_GETOPT_LONG
+else
+GETOPT_SRC = getopt.c \
+	     getopt1.c
+GETOPT_HDR = getopt.h
+endif
 
 libcommon_la_SOURCES = \
-	getopt.c \
-	getopt1.c \
-	getopt.h \
+	$(GETOPT_SRC) \
 	utils.c \
 	xscreensaver-remote.c
 
 noinst_HEADERS = \
+	$(GETOPT_HDR) \
 	utils.h \
 	xscreensaver-remote.h
 
