@@ -108,7 +108,12 @@ static struct option long_options[] = {
 void show_banner(void) {
 
   printf("This is xine (X11 gui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
-  printf("Used xine library version %d.%d.%d was built the '%s'\nwith '%s' on '%s'.\n", XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
+  printf("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n", 
+XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
+  printf("Found xine library version: %d.%d.%d (%s).\n", 
+	 xine_get_major_version(), xine_get_minor_version(),
+	 xine_get_sub_version(), xine_get_str_version());
+
 }
 /* ------------------------------------------------------------------------- */
 /*
@@ -293,6 +298,14 @@ int main(int argc, char *argv[]) {
   ao_functions_t  *audio_driver = NULL ;
   double           res_h, res_v;
   x11_visual_t     vis;
+
+  /* Check xine library version */
+  if(!xine_check_version(0, 5, 0)) {
+    fprintf(stderr, "Require xine library version 0.5.0, found %d.%d.%d.\n", 
+	    xine_get_major_version(), xine_get_minor_version(),
+	    xine_get_sub_version());
+    exit(1);
+  }
 
   show_banner();
 

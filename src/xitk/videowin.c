@@ -30,7 +30,7 @@
 
 #include "xine.h"
 
-#include "xine-toolkit/xitk.h"
+#include "xitk.h"
 
 #include "utils.h"
 #include "Imlib-light/Imlib.h"
@@ -364,14 +364,14 @@ void video_window_set_cursor_visibility(int show_cursor) {
 /* 
  * Get cursor visiblity (boolean) 
  */
-int video_window_is_cursor_visibility(void) {
+int video_window_is_cursor_visible(void) {
   return gVw->cursor_visible;
 }
 
 /* 
  * hide/show video window 
  */
-void video_window_set_visible(int show_window) {
+void video_window_set_visibility(int show_window) {
 
   gVw->show = show_window;
 
@@ -522,6 +522,7 @@ void video_window_handle_event (XEvent *event) {
       }
     }
     break;
+
   case ConfigureNotify:
   case VisibilityNotify:
     if(event->xany.window == gGui->video_window) {
@@ -533,6 +534,9 @@ void video_window_handle_event (XEvent *event) {
       }
     }
     break;
-
+    
+  case ClientMessage:
+    dnd_process_client_message (&gVw->xdnd, event);
+    break;
   }
 }

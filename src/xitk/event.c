@@ -1,4 +1,3 @@
-
 /* 
  * Copyright (C) 2000-2001 the xine project
  * 
@@ -215,12 +214,14 @@ void gui_handle_event (XEvent *event) {
     }
     break;
     
+    /* FIXED
   case VisibilityNotify:
-    /* FIXME
+     FIXME
     if(event->xany.window == gGui->video_window)
       xine_window_handle_event(gGui->xine, (void *)event);
+    
+    break;
     */
-    break;  
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
@@ -264,10 +265,8 @@ void gui_handle_event (XEvent *event) {
 
     case XK_h:
     case XK_H:
-      /* FIXME 
-      xine_set_window_visible(gGui->xine, 
-			      !(xine_get_window_visible(gGui->xine)));
-      */
+      if(panel_is_visible())
+	video_window_set_visibility(!video_window_is_visible());
       break;
       
     case XK_plus:
@@ -314,7 +313,7 @@ void gui_handle_event (XEvent *event) {
     case XK_Control_L:
     case XK_Control_R:
       if(!panel_is_visible())
-	video_window_set_cursor_visibility(!video_window_is_cursor_visibility());
+	video_window_set_cursor_visibility(!video_window_is_cursor_visible());
       break;
 
     case XK_Next:
@@ -395,7 +394,7 @@ void gui_handle_event (XEvent *event) {
     break;
 
   case ConfigureNotify:
-    /* FIXME
+    /* FIXME: FIXED
     xine_window_handle_event(gGui->xine, (void *)event);
     */
 

@@ -41,7 +41,7 @@ int video_window_is_fullscreen (void);
 /* hide/show cursor in video window*/
 void video_window_set_cursor_visibility(int show_cursor);
 /* Get cursor visiblity (boolean) */
-int video_window_is_cursor_visibility(void);
+int video_window_is_cursor_visible(void);
 
 /* hide/show video window */
 void video_window_set_visibility(int show_window);
