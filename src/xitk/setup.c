@@ -32,6 +32,7 @@
 #include <X11/extensions/shape.h>
 #include <X11/keysym.h>
 #include <pthread.h>
+#include <assert.h>
 
 #include <xine.h>
 #include <xine/xineutils.h>
@@ -485,7 +486,7 @@ static xitk_widget_t *setup_add_label (int x, int y, int w, const char *str) {
  */
 static void numtype_update(xitk_widget_t *w, void *data, int value) {
   xine_cfg_entry_t *entry;
-  
+
   entry = (xine_cfg_entry_t *)data;
   config_update_num((char*)entry->key, value);
 }
@@ -750,14 +751,13 @@ static widget_triplet_t *setup_list_browser(int x, int y, const char **content, 
 static void setup_section_widgets(int s) {
   int                  x = ((WINDOW_WIDTH>>1) - (FRAME_WIDTH>>1) - 10);
   int                  y = 70;
-  xine_cfg_entry_t    entry;
+  xine_cfg_entry_t    *entry;
   int                 cfg_err_result;
   int                  len;
   char                *section;
   const char          *labelkey;
   int                  slidmax = 1;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t));
   xitk_disable_widget(setup->slider_wg);
   
   /* Selected tab is one of help sections */
@@ -782,42 +782,43 @@ static void setup_section_widgets(int s) {
     
     section = setup->sections[s];
     len     = strlen (section);
-    cfg_err_result   = xine_config_get_first_entry(gGui->xine, &entry);
+    entry= xine_xmalloc(sizeof(xine_cfg_entry_t));
+    cfg_err_result   = xine_config_get_first_entry(gGui->xine, entry);
     
     while (cfg_err_result) {
       
-      if (!strncmp (entry.key, section, len) && entry.description) {
+      if (!strncmp (entry->key, section, len) && entry->description) {
 	
-	labelkey = &entry.key[len+1];
+	labelkey = &entry->key[len+1];
 	
-	switch (entry.type) {
+	switch (entry->type) {
 	  
 	case XINE_CONFIG_TYPE_RANGE: /* slider */
-	  setup->wg[setup->num_wg] = setup_add_slider (entry.description, labelkey, x, y, &entry);
+	  setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
 	case XINE_CONFIG_TYPE_STRING:
-	  setup->wg[setup->num_wg] = setup_add_inputtext (entry.description, labelkey, x, y, &entry);
+	  setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
 	case XINE_CONFIG_TYPE_ENUM:
-	  setup->wg[setup->num_wg] = setup_add_combo (entry.description, labelkey, x, y, &entry);
+	  setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
 	case XINE_CONFIG_TYPE_NUM:
-	  setup->wg[setup->num_wg] = setup_add_inputnum (entry.description, labelkey, x, y, &entry);
+	  setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
 	  
 	case XINE_CONFIG_TYPE_BOOL:
-	  setup->wg[setup->num_wg] = setup_add_checkbox (entry.description, labelkey, x, y, &entry);
+	  setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
 	  DISABLE_ME(setup->wg[setup->num_wg]);
 	  setup->num_wg++;
 	  break;
@@ -826,7 +827,8 @@ static void setup_section_widgets(int s) {
 	
       }
       
-      cfg_err_result = xine_config_get_next_entry(gGui->xine, &entry);
+      entry= xine_xmalloc(sizeof(xine_cfg_entry_t));
+      cfg_err_result = xine_config_get_next_entry(gGui->xine, entry);
     }
 
     xitk_enable_widget(setup->slider_wg);

@@ -69,7 +69,7 @@ void config_update_range(char *key, int min, int max) {
   if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
     config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
   else
-    fprintf(stderr, "WOW, key %s isn't registered\n", key);
+    fprintf(stderr, "WOW, range key %s isn't registered\n", key);
 }
 
 void config_update_string(char *key, char *string) {
@@ -83,7 +83,7 @@ void config_update_string(char *key, char *string) {
     if(string == NULL)
       fprintf(stderr, "string is NULL\n");
     else
-      fprintf(stderr, "WOW, key %s isn't registered\n", key);
+      fprintf(stderr, "WOW, string key %s isn't registered\n", key);
   }
 }
 
@@ -94,7 +94,7 @@ void config_update_enum(char *key, int value) {
   if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
     config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
   else
-    fprintf(stderr, "WOW, key %s isn't registered\n", key);
+    fprintf(stderr, "WOW, enum key %s isn't registered\n", key);
 }
 
 void config_update_bool(char *key, int value) {
@@ -104,7 +104,7 @@ void config_update_bool(char *key, int value) {
   if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
     config_update(&entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
   else
-    fprintf(stderr, "WOW, key %s isn't registered\n", key);
+    fprintf(stderr, "WOW, bool key %s isn't registered\n", key);
 }
 
 void config_update_num(char *key, int value) {
@@ -114,5 +114,5 @@ void config_update_num(char *key, int value) {
   if(xine_config_lookup_entry(gGui->xine, key, &entry)) 
     config_update(&entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
   else
-    fprintf(stderr, "WOW, key %s isn't registered\n", key);
+    fprintf(stderr, "WOW, num key %s isn't registered\n", key);
 }

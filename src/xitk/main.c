@@ -561,6 +561,7 @@ void event_listener (void *user_data, xine_event_t *event) {
     xine_cfg_entry_t  cfg_entry;
     int cfg_err_result;
 
+    memset(&cfg_entry, 0, sizeof(xine_cfg_entry_t));
     cfg_err_result = xine_config_lookup_entry(gGui->xine, "misc.logo_mrl", &cfg_entry);
 
     if(strcmp(cfg_entry.str_value, uevent->data)) {
