@@ -143,7 +143,7 @@ static char *_read_file(const char *filename, int *size) {
       (!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".smi", 4))  || 
       (!strncasecmp(extension, ".smil", 5)) || (!strncasecmp(extension, ".xml", 4)) ||
       (!strncasecmp(extension, ".fxd", 4))) &&
-     is_downloadable((char *) filename)) 
+     is_downloadable((char *) filename))
     return _download_file(filename, size);
   
   if(stat(filename, &st) < 0) {
@@ -405,54 +405,75 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 	  playlist->data = pls_content;
 	  
 	  if(playlist_split_data(playlist)) {
-	    int   valid_pls = 0;
-	    int   entries_pls = 0;
-	    int   linen = 0;
+	    int   valid_pls     = 0;
+	    int   entries_pls   = 0;
+	    int   found_nument  = 0;
+	    int   stored_nument = 0;
+	    int   pl_line       = 0;
+	    int   linen         = 0;
+	    int   count         = 0;
 	    char *ln;
-	    
-	    while((ln = playlist->lines[linen++]) != NULL) {
-	      if(ln) {
-		
-		if(valid_pls) {
+
+	    do {
+
+	      while((ln = playlist->lines[linen++]) != NULL) {
+		if(ln) {
 		  
-		  if(entries_pls) {
-		    int   entry;
+		  if(valid_pls) {
 		    
-		    if((!strncasecmp(ln, "file", 4)) && ((sscanf(ln + 4, "%d=", &entry)) == 1)) {
-		      char *mrl = strchr(ln, '=');
+		    if(entries_pls) {
+		      int   entry;
 		      
-		      if(mrl)
-			mrl++;
+		      if((!strncasecmp(ln, "file", 4)) && ((sscanf(ln + 4, "%d=", &entry)) == 1)) {
+			char *mrl = strchr(ln, '=');
+			
+			if(mrl)
+			  mrl++;
+			
+			if((entry && mrl) && 
+			   ((entry) <= entries_pls) && 
+			   (mmk && (!mmk[(entry - 1)]))) {
+			  stored_nument++;
+			  mediamark_store_mmk(&mmk[(entry - 1)], mrl, NULL, NULL, 0, -1, 0, 0);
+			}
+			
+		      }
 		      
-		      if((entry && mrl) && 
-			 ((entry) <= entries_pls) && 
-			 (mmk && (!mmk[(entry - 1)])))
-			mediamark_store_mmk(&mmk[(entry - 1)], mrl, NULL, NULL, 0, -1, 0, 0);
-		      
+		    }
+		    else {
+		      if((!strncasecmp(ln, "numberofentries", 15))
+			 && ((sscanf(ln + 15, "=%d", &entries_pls)) == 1)) {
+			
+			if(!found_nument) {
+			  if(entries_pls) {
+			    playlist->entries = entries_pls;
+			    mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * (entries_pls + 1));
+			    found_nument = 1;
+			  }
+			}
+
+		      }
 		    }
 		    
 		  }
-		  else {
-		    if((!strncasecmp(ln, "numberofentries", 15))
-		       && ((sscanf(ln + 15, "=%d", &entries_pls)) == 1)) {
-
-		      if(entries_pls) {
-			playlist->entries = entries_pls;
-			mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * (entries_pls + 1));
-		      }
+		  else if((!strcasecmp(ln, "[playlist]"))) {
+		    if(!valid_pls) {
+		      valid_pls = 1;
+		      pl_line = linen;
 		    }
 		  }
 		  
 		}
-		else if((!strcasecmp(ln, "[playlist]")))
-		  valid_pls = 1;
-		
 	      }
-	    }
+	      
+	      count++;
+	      linen = pl_line;
+
+	    } while((playlist->entries && !stored_nument) && (count < 2));
 	    
 	    if(valid_pls && entries_pls) {
 	      int i;
-
+	      
 	      mmk[entries_pls] = NULL;
 
 	      /* Fill missing entries */
