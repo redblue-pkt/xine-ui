@@ -60,13 +60,13 @@ typedef struct xitk_skin_element_s {
   char                         *font;
 } xitk_skin_element_t;
 
-typedef struct {
+struct xitk_skin_config_s {
   FILE                         *fd;
   char                         *path;
   char                         *skinfile;
   char                         *ln;
   char                          buf[256];
-
+  
   char                         *name;
   int                           version;
   char                         *author;
@@ -81,6 +81,6 @@ typedef struct {
   
   xitk_skin_element_t          *first, *last;
   xitk_skin_element_t          *celement;
-} xitk_skin_config_t;
+};
 
 #endif

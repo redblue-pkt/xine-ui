@@ -23,9 +23,6 @@
 #ifndef HAVE_XITK_FONT_H
 #define HAVE_XITK_FONT_H
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-
 #include "_xitk.h"
 
 #define DEFAULT_FONT_10      "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*"

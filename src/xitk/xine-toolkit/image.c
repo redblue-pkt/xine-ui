@@ -29,11 +29,6 @@
 #include <stdarg.h>
 #include <X11/Xlib.h>
 
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
-#include "font.h"
-#include "image.h"
-#include "widget_types.h"
 #include "_xitk.h"
 
 /*

@@ -27,13 +27,7 @@
 #include <X11/Xlib.h>
 #include <stdio.h>
 
-#include "inputtext.h"
-#include "button.h"
-#include "intbox.h"
-#include "font.h"
-#include "image.h"
 #include "_xitk.h"
-
 
 /*
  *

@@ -23,9 +23,6 @@
 #ifndef HAVE_XITK_TABS_H
 #define HAVE_XITK_TABS_H
 
-#include <X11/Xlib.h>
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
 #include "_xitk.h"
 
 #define MAX_TABS 256

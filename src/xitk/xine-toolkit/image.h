@@ -24,7 +24,7 @@
 #ifndef HAVE_XITK_IMAGE_H
 #define HAVE_XITK_IMAGE_H
 
-#include <X11/Xlib.h>
+#include "_xitk.h"
 
 #define STYLE_FLAT     1
 #define STYLE_BEVEL    2
@@ -38,9 +38,6 @@
 #define ALIGN_RIGHT   3
 #define ALIGN_DEFAULT (ALIGN_LEFT)
 
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
-#include "_xitk.h"
 
 typedef struct {
   ImlibData            *imlibdata;

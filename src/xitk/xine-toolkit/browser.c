@@ -28,18 +28,6 @@
 #include <sys/time.h>
 #include <unistd.h>
 
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
-#include "widget_types.h"
-#include "image.h"
-#include "browser.h"
-#include "list.h"
-#include "button.h"
-#include "labelbutton.h"
-#include "slider.h"
-#include "inputtext.h"
-#include "font.h"
-
 #include "_xitk.h"
 
 typedef struct {
@@ -369,15 +357,15 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
       int align = xitk_labelbutton_get_alignment(private_data->item_tree[WBSTART]);
 
       switch(align) {
-      case LABEL_ALIGN_CENTER:
+      case ALIGN_CENTER:
 	xitk_slider_set_min(private_data->item_tree[WSLIDH], -(private_data->labels_offset>>1));
 	xitk_slider_set_max(private_data->item_tree[WSLIDH], (private_data->labels_offset>>1));
 	break;
-      case LABEL_ALIGN_LEFT:
+      case ALIGN_LEFT:
 	xitk_slider_set_min(private_data->item_tree[WSLIDH], 0);
 	xitk_slider_set_max(private_data->item_tree[WSLIDH], private_data->labels_offset);
 	break;
-      case LABEL_ALIGN_RIGHT:
+      case ALIGN_RIGHT:
 	xitk_slider_set_min(private_data->item_tree[WSLIDH], (-private_data->labels_offset) - 3);
 	xitk_slider_set_max(private_data->item_tree[WSLIDH], 0);
 	break;
@@ -406,14 +394,14 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 /**
  * Update the list, and rebuild button list
  */
-void xitk_browser_update_list(xitk_widget_t *w, char **list, int len, int start) {
+void xitk_browser_update_list(xitk_widget_t *w, const char *const *list, int len, int start) {
   browser_private_data_t *private_data;
   
   if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
 	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
     
     private_data = (browser_private_data_t *) w->private_data;
-    private_data->content = list;
+    private_data->content = (char **)list;
     private_data->list_length = len;
     xitk_browser_rebuild_browser(w, start);
   }
@@ -963,7 +951,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   private_data->imlibdata            = br->imlibdata;
   private_data->skin_element_name    = (skin_element_name == NULL) ? NULL : strdup(br->browser.skin_element_name);
   private_data->jumped               = -1;
-  private_data->content              = br->browser.entries;
+  private_data->content              = (char **)br->browser.entries;
   private_data->list_length          = br->browser.num_entries;
   private_data->max_length           = br->browser.max_displayed_entries;
 
@@ -1184,7 +1172,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
       
       lb.button_type       = RADIO_BUTTON;
       lb.label             = "";
-      lb.align             = LABEL_ALIGN_LEFT;
+      lb.align             = ALIGN_LEFT;
       lb.callback          = NULL;
       lb.state_callback    = browser_select;
       lb.userdata          = (void *)(bt);

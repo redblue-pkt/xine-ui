@@ -56,7 +56,6 @@ noinst_HEADERS = \
 	intbox.h \
 	label.h \
 	labelbutton.h \
-	list.h \
 	mrlbrowser.h \
 	skin.h \
 	slider.h \
@@ -64,7 +63,6 @@ noinst_HEADERS = \
 	tips.h \
 	window.h \
 	widget.h \
-	widget_types.h \
 	xitk.h \
 	xitkintl.h
 

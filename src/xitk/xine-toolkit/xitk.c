@@ -49,18 +49,6 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 
-#include "widget.h"
-#include "list.h"
-#include "dnd.h"
-#include "inputtext.h"
-#include "checkbox.h"
-#include "browser.h"
-#include "slider.h"
-#include "combo.h"
-#include "tips.h"
-#include "window.h"
-#include "_config.h"
-
 #include "_xitk.h"
 
 #ifndef XShmGetEventBase
@@ -95,10 +83,6 @@ static int ml = 0;
 #define MUTLOCK()   { pthread_mutex_lock(&gXitk->mutex); }
 #define MUTUNLOCK() { pthread_mutex_unlock(&gXitk->mutex); }
 #endif
-
-typedef void (*widget_event_callback_t)(XEvent *event, void *user_data);
-typedef void (*widget_newpos_callback_t)(int, int, int, int);
-typedef void (*xitk_signal_callback_t)(int, void *);
 
 typedef struct {
   Window                      window;
@@ -886,16 +870,23 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
   //  printf("%s()\n", __FUNCTION__);
 
   MUTLOCK();
-
+  
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
   
   
   while(fx) {
-
+    
     if(fx->key == *key) {
-      xitk_list_delete_current(gXitk->gfx); 
-
       *key = 0; 
+      
+      if(fx->xdnd) {
+	xitk_unset_dnd_callback(fx->xdnd);
+	free(fx->xdnd);
+      }
+
+      free(fx);
+      xitk_list_delete_current(gXitk->gfx); 
+      
       MUTUNLOCK();
       return;
     }

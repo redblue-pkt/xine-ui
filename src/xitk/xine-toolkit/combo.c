@@ -28,15 +28,6 @@
 #include <X11/Xutil.h>
 #include <stdio.h>
 
-#include "combo.h"
-#include "browser.h"
-#include "image.h"
-#include "label.h"
-#include "button.h"
-#include "labelbutton.h"
-#include "checkbox.h"
-#include "font.h"
-#include "window.h"
 #include "_xitk.h"
 
 static void _combo_rollunroll(xitk_widget_t *w, void *data, int state);
@@ -158,7 +149,8 @@ static void combo_select(xitk_widget_t *w, void *data, int selected) {
     
     xitk_browser_release_all_buttons(private_data->browser_widget);
     xitk_browser_update_list(private_data->browser_widget, 
-			     private_data->entries, private_data->num_entries, 0);
+			     (const char* const*)private_data->entries, 
+			     private_data->num_entries, 0);
     
     xitk_checkbox_set_state(private_data->button_widget, 0, 
 			    private_data->widget_list->win, private_data->widget_list->gc);
@@ -409,7 +401,8 @@ void xitk_combo_update_list(xitk_widget_t *w, char **list, int len) {
     private_data->selected    = -1;
     
     xitk_browser_update_list(private_data->browser_widget, 
-			     private_data->entries, private_data->num_entries, 0);
+			     (const char* const*)private_data->entries, 
+			     private_data->num_entries, 0);
   }
 }
 
@@ -509,7 +502,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   browser.browser.skin_element_name     = NULL;
   browser.browser.max_displayed_entries = 5;
   browser.browser.num_entries           = private_data->num_entries;
-  browser.browser.entries               = private_data->entries;
+  browser.browser.entries               = (const char* const*)private_data->entries;
   browser.callback                      = combo_select;
   browser.dbl_click_callback            = NULL;
   browser.parent_wlist                  = private_data->widget_list;
@@ -523,7 +516,8 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   private_data->browser_widget->widget_type |= WIDGET_GROUP | WIDGET_GROUP_COMBO;
   
   xitk_browser_update_list(private_data->browser_widget, 
-			   private_data->entries, private_data->num_entries, 0);
+			   (const char* const*)private_data->entries, 
+			   private_data->num_entries, 0);
   
   private_data->widget_key = 
     xitk_register_event_handler("xitk combo",

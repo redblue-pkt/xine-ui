@@ -24,11 +24,6 @@
 #ifndef HAVE_XITK_LABEL_H
 #define HAVE_XITK_LABEL_H
 
-#include <X11/Xlib.h>
-#include <pthread.h>
-
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
 #include "_xitk.h"
 
 typedef struct {
@@ -66,29 +61,6 @@ typedef struct {
 } label_private_data_t;
 
 /* ************************************************************** */
-
-/**
- * Create a label widget.
- */
-xitk_widget_t *xitk_label_create (xitk_widget_list_t *wl,
-				  xitk_skin_config_t *skonfig, xitk_label_widget_t *l);
-
-/*
- * Same as above, without skinable feature.
- */
-xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
-					xitk_label_widget_t *l,
-					int x, int y, int width, int height, char *fontname);
-
-/**
- * Change label of widget 'widget'.
- */
-int xitk_label_change_label (xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel);
-
-/**
- *
- */
-char *xitk_label_get_label(xitk_widget_t *w);
 
 #endif
 

@@ -35,11 +35,7 @@
 #include <X11/Xlib.h>
 #include <X11/Intrinsic.h>
 
-#include "widget.h"
-#include "list.h"
 #include "_xitk.h"
-#include "combo.h"
-#include "tips.h"
 
 extern int errno;
 
@@ -1315,6 +1311,16 @@ int xitk_get_widget_pos(xitk_widget_t *w, int *x, int *y) {
   return 1;
 }
 
+uint32_t xitk_get_widget_type(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return 0;
+  }
+
+  return w->widget_type;
+}
+
 /*
  * Return 1 if widget is enabled.
  */
@@ -1876,4 +1882,64 @@ int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w)
   }
   
   return retval;
+}
+
+int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data) {
+
+  if(!wl) {
+    XITK_WARNING("List is NULL\n");
+    return 0;
+  }
+
+  switch(param) {
+  case WIDGET_LIST_GC:
+    wl->gc = (GC) data;
+    break;
+  case WIDGET_LIST_WINDOW:
+    wl->win = (Window) data;
+    break;
+  case WIDGET_LIST_LIST:
+    wl->l = (xitk_list_t *) data;
+    break;
+  default:
+    XITK_WARNING("Unknown param %d\n", param);
+    return 0;
+    break;
+  }
+  return 1;
+}
+
+void *xitk_widget_list_get(xitk_widget_list_t *wl, int param) {
+  void *data = NULL;
+
+  if(!wl) {
+    XITK_WARNING("List is NULL\n");
+    return NULL;
+  }
+
+  switch(param) {
+  case WIDGET_LIST_GC:
+    if(wl->gc)
+      data = (void *) wl->gc;
+    else
+      XITK_WARNING("widget list GC unset\n");
+    break;
+  case WIDGET_LIST_WINDOW:
+    if(wl->win)
+      data = (void *) wl->win;
+    else
+      XITK_WARNING("widget list window unset\n");
+    break;
+  case WIDGET_LIST_LIST:
+    if(wl->l)
+      data = (void *) wl->l;
+    else
+      XITK_WARNING("widget list list unset\n");
+    break;
+  default:
+    XITK_WARNING("Unknown param %d\n", param);
+    break;
+  }
+  
+  return data;
 }

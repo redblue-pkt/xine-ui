@@ -24,9 +24,6 @@
 #ifndef HAVE_XITK_SLIDER_H
 #define HAVE_XITK_SLIDER_H
 
-#include <X11/Xlib.h>
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
 #include "_xitk.h"
 
 /*  vertical slider type */

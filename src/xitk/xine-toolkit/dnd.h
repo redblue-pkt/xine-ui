@@ -24,9 +24,7 @@
 #ifndef _HAVE_XITK_DND_H
 #define _HAVE_XITK_DND_H
 
-#include <X11/Xlib.h>
-
-typedef void (*xitk_dnd_callback_t) (char *filename);
+#include "_xitk.h"
 
 #define MAX_SUPPORTED_TYPE 2
 
@@ -58,7 +56,6 @@ typedef struct {
   Atom                 _XA_WM_DELETE_WINDOW;
   Atom                 supported[MAX_SUPPORTED_TYPE];
   Atom                 version;
-
 } xitk_dnd_t;
 
 /* header was ripped from xdnd's example on its page */
@@ -102,8 +99,9 @@ typedef struct {
 /* XdndFinished */
 #define XDND_FINISHED_TARGET_WIN(e)	((e)->xclient.data.l[0])
 
-
-
+/*
+ * *** DND
+ */
 void xitk_init_dnd(Display *display, xitk_dnd_t *);
 
 int xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
@@ -111,6 +109,7 @@ int xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
 int xitk_process_client_dnd_message(xitk_dnd_t *, XEvent *);
 
 void xitk_set_dnd_callback(xitk_dnd_t *, xitk_dnd_callback_t);
-void xitk_unset_dnd_callback(xitk_dnd_t *xdnd);
+void xitk_unset_dnd_callback(xitk_dnd_t *);
+
 
 #endif

@@ -92,7 +92,7 @@ typedef struct {
 
 static test_t *test;
 static int nlab = 0;
-static int align = LABEL_ALIGN_LEFT;
+static int align = ALIGN_LEFT;
 #define FONT_HEIGHT_MODEL "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN&й(-и_за)=№~#{[|`\\^@]}%"
 
 /*
@@ -265,8 +265,8 @@ static void change_label(xitk_widget_t *w, void *data) {
     "Boom"
   };
 
-  if((++align) > LABEL_ALIGN_RIGHT)
-    align = LABEL_ALIGN_CENTER;
+  if((++align) > ALIGN_RIGHT)
+    align = ALIGN_CENTER;
 
   nlab = !nlab;
 
@@ -361,7 +361,7 @@ static void create_intbox(void) {
   ib.parent_wlist      = test->widget_list;
   ib.callback          = notify_intbox_change;
   ib.userdata          = NULL;
-  xitk_list_append_content (test->widget_list->l,
+  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
 	    (test->intbox = 
 	     xitk_noskin_intbox_create(test->widget_list, &ib, x, y, 60, 20, NULL, NULL, NULL)));
 
@@ -380,7 +380,7 @@ static void create_checkbox(void) {
   cb.skin_element_name = NULL;
   cb.callback          = NULL;
   cb.userdata          = NULL;
-  xitk_list_append_content (test->widget_list->l,
+  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
 		    (test->checkbox = 
 		     xitk_noskin_checkbox_create(test->widget_list, &cb, x, y, 20, 20)));
 
@@ -417,7 +417,7 @@ static void create_tabs(void) {
   t.parent_wlist      = test->widget_list;
   t.callback          = NULL;
   t.userdata          = NULL;
-  xitk_list_append_content (test->widget_list->l,
+  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
 		    (test->tabs = 
 		     xitk_noskin_tabs_create(test->widget_list, &t, x, y, w, fontname)));
 
@@ -458,7 +458,7 @@ static void create_inputtext(void) {
   inp.max_length        = 256;
   inp.callback          = change_browser_entry;
   inp.userdata          = NULL;
-  xitk_list_append_content (test->widget_list->l,
+  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list),
 	   (test->input = 
 	    xitk_noskin_inputtext_create(test->widget_list, &inp,
 					 150, 150, 150, 20,
@@ -481,16 +481,16 @@ static void create_label(void) {
   XITK_WIDGET_INIT(&lbl, test->imlibdata);
 
   fs = xitk_font_load_font(test->display, fontname);
-  xitk_font_set_font(fs, test->widget_list->gc);
+  xitk_font_set_font(fs, XITK_WIDGET_LIST_GC(test->widget_list));
   xitk_font_string_extent(fs, label, &lbear, &rbear, &wid, &asc, &des);
   xitk_font_unload_font(fs);
 
   lbl.window            = xitk_window_get_window(test->xwin);
-  lbl.gc                = test->widget_list->gc;
+  lbl.gc                = XITK_WIDGET_LIST_GC(test->widget_list);
   lbl.skin_element_name = NULL;
   lbl.label             = label;
   lbl.callback          = NULL;
-  xitk_list_append_content(test->widget_list->l, 
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
 	   (test->label = 
 	    xitk_noskin_label_create(test->widget_list, &lbl,
 				     x, y, len, (asc+des)*2, fontname)));
@@ -519,7 +519,7 @@ static void create_button(void) {
   b.skin_element_name = NULL;
   b.callback          = change_label;
   b.userdata          = NULL;
-  xitk_list_append_content(test->widget_list->l, 
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
 	   (test->button = 
 	    xitk_noskin_button_create(test->widget_list, &b,
 				      x, y, width, height)));
@@ -539,36 +539,36 @@ static void create_button(void) {
 
       col = xitk_get_pixel_color_from_rgb(test->imlibdata, 255, 0, 0);
 
-      XSetForeground(test->display, test->widget_list->gc, col);
-      XSetBackground(test->display, test->widget_list->gc, col);
-      XFillArc(test->display, wimage->image->pixmap, test->widget_list->gc,
+      XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), col);
+      XSetBackground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), col);
+      XFillArc(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
 	       10, (height >> 1) - 13, 26, 26, 
 	       (0 * 64), (360 * 64));
-      XFillArc(test->display, wimage->image->pixmap, test->widget_list->gc,
+      XFillArc(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
 	       (width) + 10, (height >> 1) - 13, 26, 26, 
 	       (0 * 64), (360 * 64));
-      XFillArc(test->display, wimage->image->pixmap, test->widget_list->gc,
+      XFillArc(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list),
 	       ((width*2) + 10) + 1, ((height >> 1) - 13) + 1, 26, 26, 
 	       (0 * 64), (360 * 64));
 
 
       fs = xitk_font_load_font(test->display, fontname);
-      xitk_font_set_font(fs, test->widget_list->gc);
+      xitk_font_set_font(fs, XITK_WIDGET_LIST_GC(test->widget_list));
       xitk_font_string_extent(fs, label, &lbear, &rbear, &wid, &asc, &des);
       
       col = xitk_get_pixel_color_black(test->imlibdata);
 
-      XSetForeground(test->display, test->widget_list->gc, col);
-      XDrawString(test->display, wimage->image->pixmap, test->widget_list->gc, 
+      XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), col);
+      XDrawString(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
 		  50, ((height+asc+des) >> 1) - des, label, strlen(label));
-      XDrawString(test->display, wimage->image->pixmap, test->widget_list->gc, 
+      XDrawString(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
 		  (width) + 50, ((height+asc+des) >> 1) - des, label, strlen(label));
       
       {
 	char *nlabel = _("!BOOM!");
 
       xitk_font_string_extent(fs, nlabel, &lbear, &rbear, &wid, &asc, &des);
-      XDrawString(test->display, wimage->image->pixmap, test->widget_list->gc, 
+      XDrawString(test->display, wimage->image->pixmap, XITK_WIDGET_LIST_GC(test->widget_list), 
 		  ((width * 2) + 50) + 1, (((height+asc+des) >> 1) - des) + 1, 
 		  nlabel, strlen(nlabel));
       }
@@ -597,7 +597,7 @@ static void create_sliders(void) {
   sl.userdata                 = NULL;
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
-  xitk_list_append_content(test->widget_list->l,
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list),
 		   (test->hslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      17, 208, 117, 20,
 							      XITK_HSLIDER)));
@@ -613,7 +613,7 @@ static void create_sliders(void) {
   sl.userdata                 = NULL;
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
-  xitk_list_append_content(test->widget_list->l,
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list),
 		   (test->vslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      17, 230, 20, 117,
 							      XITK_VSLIDER)));
@@ -629,7 +629,7 @@ static void create_sliders(void) {
   sl.userdata                 = NULL;
   sl.motion_callback          = move_sliders;
   sl.motion_userdata          = NULL;
-  xitk_list_append_content(test->widget_list->l,
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list),
 		   (test->rslider = xitk_noskin_slider_create(test->widget_list, &sl,
 							      50, 240, 80, 80,
 							      XITK_RSLIDER)));
@@ -672,11 +672,11 @@ static void create_combo(void) {
   /*
   xitk_window_get_window_size(test->xwin, &wwidth, &wheight);
   bg = xitk_image_create_pixmap(test->imlibdata, wwidth, wheight);
-  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg, test->widget_list->gc,
+  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg, XITK_WIDGET_LIST_GC(test->widget_list),
 	    0, 0, wwidth, wheight, 0, 0);
   */
   fs = xitk_font_load_font(test->display, fontname);
-  xitk_font_set_font(fs, test->widget_list->gc);
+  xitk_font_set_font(fs, XITK_WIDGET_LIST_GC(test->widget_list));
   height = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
   xitk_font_unload_font(fs);
   /*
@@ -692,7 +692,7 @@ static void create_combo(void) {
   cmb.parent_wkey       = &test->kreg;
   cmb.callback          = combo_select;
   cmb.userdata          = NULL;
-  xitk_list_append_content(test->widget_list->l, 
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
 		   (test->combo = 
 		    xitk_noskin_combo_create(test->widget_list, &cmb,
 					     x, y, width, NULL, NULL)));
@@ -711,12 +711,12 @@ static void create_browser(void) {
 
   xitk_window_get_window_size(test->xwin, &width, &height);
   bg = xitk_image_create_pixmap(test->imlibdata, width, height);
-  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg, test->widget_list->gc,
+  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg, XITK_WIDGET_LIST_GC(test->widget_list),
 	    0, 0, width, height, 0, 0);
 
-  XSetForeground(test->display, test->widget_list->gc, 
+  XSetForeground(test->display, XITK_WIDGET_LIST_GC(test->widget_list), 
 		 xitk_get_pixel_color_black(test->imlibdata));
-  XDrawRectangle(test->display, bg, test->widget_list->gc, 17, 27, 117, 176);
+  XDrawRectangle(test->display, bg, XITK_WIDGET_LIST_GC(test->widget_list), 17, 27, 117, 176);
 
   xitk_window_change_background(test->imlibdata, 
 				test->xwin, bg, width, height);
@@ -746,10 +746,10 @@ static void create_browser(void) {
   browser.dbl_click_callback            = change_inputtext_dbl_click;
   browser.parent_wlist                  = test->widget_list;
   browser.userdata                      = NULL;
-  xitk_list_append_content (test->widget_list->l, 
+  xitk_list_append_content (XITK_WIDGET_LIST_LIST(test->widget_list), 
 		    (test->browser = 
 		     xitk_noskin_browser_create(test->widget_list, &browser,
-						test->widget_list->gc, 20, 30, 
+						XITK_WIDGET_LIST_GC(test->widget_list), 20, 30, 
 						100, 20, 12, fontname)));
   
   xitk_browser_update_list(test->browser, 
@@ -792,21 +792,22 @@ int main(int argc, char **argv) {
   gc = XCreateGC(test->display, 
 		 (xitk_window_get_window(test->xwin)), None, None);
 
-  test->widget_list                = xitk_widget_list_new();
-  test->widget_list->l             = xitk_list_new ();
-  test->widget_list->win           = (xitk_window_get_window(test->xwin));
-  test->widget_list->gc            = gc;
-
+  test->widget_list  = xitk_widget_list_new();
+  xitk_widget_list_set(test->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(test->widget_list, 
+		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(test->xwin)));
+  xitk_widget_list_set(test->widget_list, WIDGET_LIST_GC, gc);
+  
   XITK_WIDGET_INIT(&lb, test->imlibdata);
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Quit");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = test_end;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(test->widget_list->l, 
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list),
 	   (w = xitk_noskin_labelbutton_create(test->widget_list, &lb,
 					       (windoww / 2) - 50, windowh - 50,
 					       100, 30,

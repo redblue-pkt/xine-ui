@@ -32,7 +32,6 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include "skin.h"
 #include "_xitk.h"
 
 extern int errno;
@@ -295,9 +294,9 @@ static int skin_get_align_value(const char *val) {
     const char *str;
     int value;
   } aligns[] = {
-    { "left",   LABEL_ALIGN_LEFT   }, 
-    { "center", LABEL_ALIGN_CENTER }, 
-    { "right",  LABEL_ALIGN_RIGHT  },
+    { "left",   ALIGN_LEFT   }, 
+    { "center", ALIGN_CENTER }, 
+    { "right",  ALIGN_RIGHT  },
     { NULL,     0 }
   };
   int i;
@@ -309,7 +308,7 @@ static int skin_get_align_value(const char *val) {
       return aligns[i].value;
   }
 
-  return LABEL_ALIGN_CENTER;
+  return ALIGN_CENTER;
 }
 
 /*
@@ -429,7 +428,7 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
     else if(!strncasecmp(skonfig->ln, "label", 5)) {
       skonfig->celement->print = 1;
       
-      skonfig->celement->align = LABEL_ALIGN_CENTER;
+      skonfig->celement->align = ALIGN_CENTER;
 
       while(skin_end_section(skonfig) < 0) {
 	skin_get_next_line(skonfig);
@@ -1062,7 +1061,7 @@ int xitk_skin_get_label_alignment(xitk_skin_config_t *skonfig, const char *str) 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->align;
   
-  return LABEL_ALIGN_CENTER;
+  return ALIGN_CENTER;
 }
 
 /*

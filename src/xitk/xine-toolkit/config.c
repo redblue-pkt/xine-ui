@@ -29,7 +29,6 @@
 #include <assert.h>
 #include <string.h>
 
-#include "_config.h"
 #include "_xitk.h"
 
 /*

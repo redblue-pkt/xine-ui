@@ -40,17 +40,6 @@
 #include <xine.h>
 
 #include "_xitk.h"
-#include "mrlbrowser.h"
-#include "browser.h"
-#include "label.h"
-#include "button.h"
-#include "labelbutton.h"
-#include "inputtext.h"
-#include "dnd.h"
-#include "window.h"
-#include "combo.h"
-#include "widget.h"
-#include "widget_types.h"
 
 #undef DEBUG_MRLB
 
@@ -365,7 +354,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
     update_current_origin(private_data);
     mrlbrowser_create_enlighted_entries(private_data);
     xitk_browser_update_list(private_data->mrlb_list, 
-			     private_data->mc->mrls_disp, 
+			     (const char* const*)private_data->mc->mrls_disp, 
 			     private_data->mc->mrls_to_disp, 0);
   }
 }
@@ -828,7 +817,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     update_current_origin(private_data);
     mrlbrowser_create_enlighted_entries(private_data);
     xitk_browser_update_list(private_data->mrlb_list, 
-			     private_data->mc->mrls_disp, 
+			     (const char* const*)private_data->mc->mrls_disp, 
 			     private_data->mc->mrls_to_disp, 0);
     
   }
@@ -902,7 +891,7 @@ static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
   private_data->filter_selected = select;
   mrlbrowser_create_enlighted_entries(private_data);
   xitk_browser_update_list(private_data->mrlb_list, 
-  			   private_data->mc->mrls_disp, 
+  			  (const char* const*) private_data->mc->mrls_disp, 
   			   private_data->mc->mrls_to_disp, 0);
 }
 
@@ -1313,7 +1302,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   mywidget->tips_string        = NULL;
 
   xitk_browser_update_list(private_data->mrlb_list, 
-			   private_data->mc->mrls_disp, 
+			   (const char* const*)private_data->mc->mrls_disp, 
 			   private_data->mrls_num, 0);
 
   XLOCK (mb->imlibdata->x.disp);

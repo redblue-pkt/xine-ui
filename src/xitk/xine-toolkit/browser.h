@@ -24,11 +24,9 @@
 #ifndef HAVE_XITK_BROWSER_H
 #define HAVE_XITK_BROWSER_H
 
-#include <X11/Xlib.h>
-
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
 #include "_xitk.h"
+
+#define BROWSER_MAX_ENTRIES 65535
 
 typedef struct {
 
@@ -65,63 +63,4 @@ typedef struct {
 
 /* ****************************************************************** */
 
-/**
- * Create the list browser
- */
-xitk_widget_t *xitk_browser_create(xitk_widget_list_t *wl, 
-				   xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
-
-/*
- * Same as above, without skinable feature.
- */
-xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
-					  xitk_browser_widget_t *br, GC gc, 
-					  int x, int y, 
-					  int itemw, int itemh, int slidw, char *fontname);
-/**
- * Redraw buttons/slider
- */
-void xitk_browser_rebuild_browser(xitk_widget_t *w, int start);
-/**
- * Update the list, and rebuild button list
- */
-void xitk_browser_update_list(xitk_widget_t *w, char **list, int len, int start);
-/**
- * Return the current selected button (if not, return -1)
- */
-int xitk_browser_get_current_selected(xitk_widget_t *w);
-/**
- * Select the item 'select' in list
- */
-void xitk_browser_set_select(xitk_widget_t *w, int select);
-/**
- * Release all enabled buttons
- */
-void xitk_browser_release_all_buttons(xitk_widget_t *w);
-/**
- * Return the number of displayed entries
- */
-int xitk_browser_get_num_entries(xitk_widget_t *w);
-/**
- * Return the real number of first displayed in list
- */
-int xitk_browser_get_current_start(xitk_widget_t *w);
-
-void xitk_browser_step_up(xitk_widget_t *w, void *data);
-void xitk_browser_step_down(xitk_widget_t *w, void *data);
-
-void xitk_browser_step_left(xitk_widget_t *w, void *data);
-void xitk_browser_step_right(xitk_widget_t *w, void *data);
-
-void xitk_browser_page_up(xitk_widget_t *w, void *data);
-void xitk_browser_page_down(xitk_widget_t *w, void *data);
-
-/**
- * Change browser labels alignment
- */
-void xitk_browser_set_alignment(xitk_widget_t *w, int align);
-
-xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w);
-
-void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier);
 #endif

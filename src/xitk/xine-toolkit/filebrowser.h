@@ -24,13 +24,6 @@
 #ifndef HAVE_XITK_FILEBROWSER_H
 #define HAVE_XITK_FILEBROWSER_H
 
-#include <limits.h>
-#include <X11/Xlib.h>
-
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
-#include "dnd.h"
-#include "browser.h"
 #include "_xitk.h"
 
 #define MAXFILES      65535

@@ -41,271 +41,68 @@
 #include <xine.h>
 #endif
 
-#define XITK_MAJOR_VERSION (0)
-#define XITK_MINOR_VERSION (9)
-#define XITK_SUB_VERSION   (0)
+#define XITK_MAJOR_VERSION          (0)
+#define XITK_MINOR_VERSION          (10)
+#define XITK_SUB_VERSION            (0)
+#define XITK_VERSION                "0.10.0"
 
-#define XITK_CHECK_VERSION(major, minor, sub)                                                    \
-   (XITK_MAJOR_VERSION > (major) ||                                                              \
-    (XITK_MAJOR_VERSION == (major) && XITK_MINOR_VERSION > (minor)) ||                           \
-    (XITK_MAJOR_VERSION == (major) && XITK_MINOR_VERSION == (minor) && XITK_SUB_VERSION >= (sub)))
+#define XITK_CHECK_VERSION(major, minor, sub)                          \
+                                    (XITK_MAJOR_VERSION > (major) ||   \
+                                     (XITK_MAJOR_VERSION == (major) && \
+                                      XITK_MINOR_VERSION > (minor)) || \
+                                     (XITK_MAJOR_VERSION == (major) && \
+                                      XITK_MINOR_VERSION == (minor) && \
+                                      XITK_SUB_VERSION >= (sub)))
 
-#define XITK_WIDGET_MAGIC       0x7869746b
+#define XITK_WIDGET_MAGIC           0x7869746b
 
 #ifndef NAME_MAX
-#define XITK_NAME_MAX           256
+#define XITK_NAME_MAX               256
 #else
-#define XITK_NAME_MAX           NAME_MAX
+#define XITK_NAME_MAX               NAME_MAX
 #endif
 
 #ifndef PATH_MAX
-#define XITK_PATH_MAX           768
+#define XITK_PATH_MAX               768
 #else
-#define XITK_PATH_MAX           PATH_MAX
+#define XITK_PATH_MAX               PATH_MAX
 #endif
 
-#define WM_TYPE_COMP_MASK       0x00007FFF
-#define WM_TYPE_UNKNOWN         0x00000000
-#define WM_TYPE_GNOME_COMP      0x80000000
-#define WM_TYPE_EWMH_COMP       0x40000000
-#define WM_TYPE_KWIN            0x00000001
-#define WM_TYPE_E               0x00000002
-#define WM_TYPE_ICE             0x00000003
-#define WM_TYPE_WINDOWMAKER     0x00000004
-#define WM_TYPE_MOTIF           0x00000005
-#define WM_TYPE_XFCE            0x00000006
-#define WM_TYPE_SAWFISH         0x00000007
-#define WM_TYPE_METACITY        0x00000008
-#define WM_TYPE_AFTERSTEP       0x00000009
-#define WM_TYPE_BLACKBOX        0x0000000A
-#define WM_TYPE_LARSWM          0x0000000B
+#define INPUT_MOTION                (ExposureMask | ButtonPressMask | ButtonReleaseMask | \
+                                     KeyPressMask | KeyReleaseMask | ButtonMotionMask |   \
+                                     StructureNotifyMask | PropertyChangeMask |           \
+                                     LeaveWindowMask | EnterWindowMask | PointerMotionMask)
 
-#define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
-                      KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
-                      StructureNotifyMask | PropertyChangeMask |              \
-                      LeaveWindowMask | EnterWindowMask | PointerMotionMask)
-
-#define MWM_HINTS_DECORATIONS   (1L << 1)
-#define PROP_MWM_HINTS_ELEMENTS 5
-typedef struct _mwmhints {
-  uint32_t  flags;
-  uint32_t  functions;
-  uint32_t  decorations;
-  int32_t   input_mode;
-  uint32_t  status;
-} MWMHints;
-
-typedef struct {
-  int       enabled;
-  int       offset_x;
-  int       offset_y;
-} xitk_move_t;
-
-typedef struct {
-  Window    window;
-  char     *name;
-  int       x;
-  int       y;
-  int       height;
-  int       width;
-} window_info_t;
-
-#define WINDOW_INFO_ZERO(w) do {                                              \
-      if((w)->name)                                                           \
-	free((w)->name);                                                      \
-      (w)->window = None;                                                     \
-      (w)->name   = NULL;                                                     \
-      (w)->x      = 0;                                                        \
-      (w)->y      = 0;                                                        \
-      (w)->height = 0;                                                        \
-      (w)->width  = 0;                                                        \
-} while(0)
-
-#define XITK_WIDGET_INIT(X, IMLIBDATA) do {                                   \
-                                         (X)->magic = XITK_WIDGET_MAGIC;      \
-                                         (X)->imlibdata = IMLIBDATA;          \
-                                       } while(0)
-
-typedef struct xitk_pixmap_s xitk_pixmap_t;
-typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
-struct xitk_pixmap_s {
-  ImlibData                *imlibdata;
-  XImage                   *xim;
-  Pixmap                    pixmap;
-  GC                        gc;
-  XGCValues                 gcv;
-  int                       width;
-  int                       height;
-  int                       shm;
-#ifdef HAVE_SHM
-  XShmSegmentInfo          *shminfo;
-#endif
-  xitk_pixmap_destroyer_t   destroy;
-};
-
-typedef struct {
-  xitk_pixmap_t            *image;
-  xitk_pixmap_t            *mask;
-  int                       width;
-  int                       height;
-} xitk_image_t;
-
-typedef struct {
-  int       red;
-  int       green;
-  int       blue;
-  char     *colorname;
-} xitk_color_names_t;
-
-typedef struct xitk_node_s {
-  struct xitk_node_s    *next, *prev;
-  void                  *content;
-} xitk_node_t;
-
-
-typedef struct {
-  xitk_node_t           *first, *last, *cur;
-} xitk_list_t;
-
-typedef struct xitk_widget_list_s xitk_widget_list_t;
+#define WINDOW_INFO_ZERO(w)         do {                  \
+                                      if((w)->name)       \
+	                                free((w)->name);  \
+                                      (w)->window = None; \
+                                      (w)->name   = NULL; \
+                                      (w)->x      = 0;    \
+                                      (w)->y      = 0;    \
+                                      (w)->height = 0;    \
+                                      (w)->width  = 0;    \
+                                    } while(0)
 
 typedef struct xitk_widget_s xitk_widget_t;
-
-typedef void xitk_skin_config_t;
-
-typedef void (*widget_paint_callback_t)(xitk_widget_t *, Window, GC);
-
-typedef int (*widget_click_callback_t) (xitk_widget_list_t *, xitk_widget_t *, int, int, int);
-
-typedef int (*widget_focus_callback_t)(xitk_widget_list_t *, xitk_widget_t *, int);
-
-typedef void (*widget_keyevent_callback_t)(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
-
-typedef int (*widget_inside_callback_t)(xitk_widget_t *, int, int);
-
-typedef void (*widget_change_skin_callback_t)(xitk_widget_list_t *, xitk_widget_t *, xitk_skin_config_t *);
-
-typedef void (*widget_enable_callback_t)(xitk_widget_t *);
-
-typedef xitk_image_t *(*widget_get_skin_t)(xitk_widget_t *, int);
-
-typedef void (*widget_destroy_t)(xitk_widget_t *, void *);
-
-/* Group of widgets widget */
-#define WIDGET_GROUP              0x80000000
-/* Grouped widget, itself */
-#define WIDGET_GROUP_WIDGET       0x40000000
-
-/* Grouped widgets */
-#define WIDGET_GROUP_MASK         0x3FFF8000 
-#define WIDGET_GROUP_BROWSER      0x00080000
-#define WIDGET_GROUP_FILEBROWSER  0x00100000
-#define WIDGET_GROUP_MRLBROWSER   0x00200000
-#define WIDGET_GROUP_COMBO        0x00400000
-#define WIDGET_GROUP_TABS         0x00800000
-#define WIDGET_GROUP_INTBOX       0x01000000
-
-/* Real widgets. */
-#define WIDGET_TYPE_MASK          0x00007FFF
-#define WIDGET_TYPE_BUTTON        0x00000001
-#define WIDGET_TYPE_LABELBUTTON   0x00000002
-#define WIDGET_TYPE_LABEL         0x00000003
-#define WIDGET_TYPE_SLIDER        0x00000004
-#define WIDGET_TYPE_CHECKBOX      0x00000005
-#define WIDGET_TYPE_IMAGE         0x00000006
-#define WIDGET_TYPE_INPUTTEXT     0x00000007
-
-struct xitk_widget_s {
-  ImlibData                      *imlibdata;
-
-  xitk_widget_list_t             *widget_list;
-
-  int                             x;
-  int                             y;
-  int                             width;
-  int                             height;
-
-  int                             enable;
-  int                             have_focus;
-  int                             running;
-  int                             visible;
-
-  widget_paint_callback_t         paint;
-
-  /* notify callback return value : 1 => repaint necessary 0=> do nothing */
-                                       /*   parameter: up (1) or down (0) */
-  widget_click_callback_t         notify_click;
-                                       /*            entered (1) left (0) */
-  widget_focus_callback_t         notify_focus;
-
-  widget_keyevent_callback_t      notify_keyevent;
-
-  widget_inside_callback_t        notify_inside;
-
-  widget_change_skin_callback_t   notify_change_skin;
-
-  widget_destroy_t                notify_destroy;
-
-  widget_get_skin_t               get_skin;
-
-  widget_enable_callback_t        notify_enable;
-
-  pthread_t                       tips_thread;
-  unsigned long                   tips_timeout;
-  char                           *tips_string;
-
-  void                           *private_data;
-  uint32_t                        widget_type;
-};
-
-struct xitk_widget_list_s {
-  xitk_list_t         *l;
-
-  xitk_widget_t       *widget_focused;
-  xitk_widget_t       *widget_under_mouse;
-  xitk_widget_t       *widget_pressed;
-
-  Window               win;
-  GC                   gc;
-};
-
+typedef struct xitk_widget_list_s xitk_widget_list_t;
+typedef struct xitk_skin_config_s xitk_skin_config_t;
+typedef struct xitk_font_s xitk_font_t;
+typedef struct xitk_pixmap_s xitk_pixmap_t;
+typedef struct xitk_window_s xitk_window_t;
 
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
 typedef void (*xitk_dnd_callback_t) (char *filename);
+typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
 #ifdef NEED_MRLBROWSER
 typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
 #endif
 
-typedef struct {
-  Display             *display;
-  Window               win;
-  
-  xitk_dnd_callback_t  callback;
-
-  Atom                 _XA_XdndAware;
-  Atom                 _XA_XdndEnter;
-  Atom                 _XA_XdndLeave;
-  Atom                 _XA_XdndDrop;
-  Atom                 _XA_XdndPosition;
-  Atom                 _XA_XdndStatus;
-  Atom                 _XA_XdndActionCopy;
-  Atom                 _XA_XdndSelection;
-  Atom                 _XA_XdndFinished;
-  Atom                 _XA_XINE_XDNDEXCHANGE;
-  Atom                 _XA_WM_DELETE_WINDOW;
-  Atom                 atom_support;
-  Atom                 version;
-} xitk_dnd_t;
-
-
-/* *******
- * INIT: widget lib initialization and friends
- */
 /*
  * Event callback function type.
- * This function will be called on every xevent.
+ * Thefunction will be called on every xevent.
  * If the window match with that one specified at
  * register time, only event for this window
  * will be send to this function.
@@ -335,6 +132,466 @@ typedef void (*xitk_signal_callback_t)(int, void *);
  */
 typedef int xitk_register_key_t;
 
+
+struct xitk_pixmap_s {
+  ImlibData                        *imlibdata;
+  XImage                           *xim;
+  Pixmap                            pixmap;
+  GC                                gc;
+  XGCValues                         gcv;
+  int                               width;
+  int                               height;
+  int                               shm;
+#ifdef HAVE_SHM
+  XShmSegmentInfo                  *shminfo;
+#endif
+  xitk_pixmap_destroyer_t           destroy;
+};
+
+typedef struct {
+  xitk_pixmap_t                    *image;
+  xitk_pixmap_t                    *mask;
+  int                               width;
+  int                               height;
+} xitk_image_t;
+
+typedef struct {
+  int                               red;
+  int                               green;
+  int                               blue;
+  char                             *colorname;
+} xitk_color_names_t;
+
+typedef struct xitk_node_s {
+  struct xitk_node_s               *next;
+  struct xitk_node_s               *prev;
+  void                             *content;
+} xitk_node_t;
+
+
+typedef struct {
+  xitk_node_t                      *first;
+  xitk_node_t                      *last;
+  xitk_node_t                      *cur;
+} xitk_list_t;
+
+#define MWM_HINTS_DECORATIONS       (1L << 1)
+#define PROP_MWM_HINTS_ELEMENTS     5
+typedef struct _mwmhints {
+  uint32_t                          flags;
+  uint32_t                          functions;
+  uint32_t                          decorations;
+  int32_t                           input_mode;
+  uint32_t                          status;
+} MWMHints;
+
+typedef struct {
+  int                               enabled;
+  int                               offset_x;
+  int                               offset_y;
+} xitk_move_t;
+
+typedef struct {
+  Window                            window;
+  char                             *name;
+  int                               x;
+  int                               y;
+  int                               height;
+  int                               width;
+} window_info_t;
+
+/* Group of widgets widget */
+#define WIDGET_GROUP                0x80000000
+/* Grouped widget, itself */
+#define WIDGET_GROUP_WIDGET         0x40000000
+
+/* Grouped widgets */
+#define WIDGET_GROUP_MASK           0x3FFF8000 
+#define WIDGET_GROUP_BROWSER        0x00080000
+#define WIDGET_GROUP_FILEBROWSER    0x00100000
+#define WIDGET_GROUP_MRLBROWSER     0x00200000
+#define WIDGET_GROUP_COMBO          0x00400000
+#define WIDGET_GROUP_TABS           0x00800000
+#define WIDGET_GROUP_INTBOX         0x01000000
+
+/* Real widgets. */
+#define WIDGET_TYPE_MASK            0x00007FFF
+#define WIDGET_TYPE_BUTTON          0x00000001
+#define WIDGET_TYPE_LABELBUTTON     0x00000002
+#define WIDGET_TYPE_LABEL           0x00000003
+#define WIDGET_TYPE_SLIDER          0x00000004
+#define WIDGET_TYPE_CHECKBOX        0x00000005
+#define WIDGET_TYPE_IMAGE           0x00000006
+#define WIDGET_TYPE_INPUTTEXT       0x00000007
+
+/* See */
+#define ALIGN_LEFT                  1
+#define ALIGN_CENTER                2
+#define ALIGN_RIGHT                 3
+#define ALIGN_DEFAULT               (ALIGN_LEFT)
+
+/* 
+ * Slider type
+ */
+#define XITK_VSLIDER                1
+#define XITK_HSLIDER                2
+#define XITK_RSLIDER                3
+
+/*
+ * Label button type
+ */
+#define CLICK_BUTTON                1
+#define RADIO_BUTTON                2
+
+/*
+ * See xitk_get_modifier_key()
+ */
+#define MODIFIER_NOMOD              0x00000000
+#define MODIFIER_SHIFT              0x00000001
+#define MODIFIER_LOCK               0x00000002
+#define MODIFIER_CTRL               0x00000004
+#define MODIFIER_META               0x00000008
+#define MODIFIER_NUML               0x00000010
+#define MODIFIER_MOD3               0x00000020
+#define MODIFIER_MOD4               0x00000040
+#define MODIFIER_MOD5               0x00000080
+
+/*
+ * See
+ */
+#define DIRECTION_UP                1
+#define DIRECTION_DOWN              2
+#define DIRECTION_LEFT              3
+#define DIRECTION_RIGHT             4
+
+/*
+ * Result of dialog window
+ */
+#define XITK_WINDOW_ANSWER_UNKNOWN  0
+#define XITK_WINDOW_ANSWER_OK       1
+#define XITK_WINDOW_ANSWER_YES      2
+#define XITK_WINDOW_ANSWER_NO       3
+#define XITK_WINDOW_ANSWER_CANCEL   4
+
+/*
+ * See xitk_get_wm_type()
+ */
+#define WM_TYPE_COMP_MASK           0x00007FFF
+#define WM_TYPE_UNKNOWN             0x00000000
+#define WM_TYPE_GNOME_COMP          0x80000000
+#define WM_TYPE_EWMH_COMP           0x40000000
+#define WM_TYPE_KWIN                0x00000001
+#define WM_TYPE_E                   0x00000002
+#define WM_TYPE_ICE                 0x00000003
+#define WM_TYPE_WINDOWMAKER         0x00000004
+#define WM_TYPE_MOTIF               0x00000005
+#define WM_TYPE_XFCE                0x00000006
+#define WM_TYPE_SAWFISH             0x00000007
+#define WM_TYPE_METACITY            0x00000008
+#define WM_TYPE_AFTERSTEP           0x00000009
+#define WM_TYPE_BLACKBOX            0x0000000A
+#define WM_TYPE_LARSWM              0x0000000B
+
+/* 
+ * See xitk_widget_list_[set/get]()
+ */
+#define WIDGET_LIST_GC              1
+#define WIDGET_LIST_WINDOW          2
+#define WIDGET_LIST_LIST            3
+#define XITK_WIDGET_LIST_LIST(wl)   (xitk_list_t *) xitk_widget_list_get(wl, WIDGET_LIST_LIST)
+#define XITK_WIDGET_LIST_WINDOW(wl) (Window) xitk_widget_list_get(wl, WIDGET_LIST_WINDOW)
+#define XITK_WIDGET_LIST_GC(wl)     (GC) xitk_widget_list_get(wl, WIDGET_LIST_GC)
+
+#define XITK_WIDGET_INIT(X, I)      do {                              \
+                                      (X)->magic = XITK_WIDGET_MAGIC; \
+                                      (X)->imlibdata = I;             \
+                                    } while(0)
+
+/**
+ *  Widget struct
+ */
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  int                               min;
+  int                               max;
+  int                               step;
+  char                             *skin_element_name;
+  xitk_state_callback_t             callback;
+  void                             *userdata;
+  xitk_state_callback_t             motion_callback;
+  void                             *motion_userdata;
+} xitk_slider_widget_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  int                               button_type;
+  int                               align;
+  const char                       *label;
+  xitk_simple_callback_t            callback;
+  xitk_state_callback_t             state_callback;
+  void                             *userdata;
+  char                             *skin_element_name;
+} xitk_labelbutton_widget_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  Window                            window;
+  GC                                gc;
+  char                             *label;
+  char                             *skin_element_name;
+  xitk_simple_callback_t            callback;
+  void                             *userdata;
+} xitk_label_widget_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  char                             *skin_element_name;
+} xitk_image_widget_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  xitk_state_callback_t             callback;
+  void                             *userdata;
+  char                             *skin_element_name;
+} xitk_checkbox_widget_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  char                             *skin_element_name;
+  xitk_simple_callback_t            callback;
+  void                             *userdata;
+} xitk_button_widget_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+
+  struct {
+    char                           *skin_element_name;
+  } arrow_up;
+  
+  struct {
+    char                           *skin_element_name;
+  } slider;
+
+  struct {
+    char                           *skin_element_name;
+  } arrow_dn;
+
+  struct {
+    char                           *skin_element_name;
+  } arrow_left;
+  
+  struct {
+    char                           *skin_element_name;
+  } slider_h;
+
+  struct {
+    char                           *skin_element_name;
+  } arrow_right;
+
+  struct {
+    char                           *skin_element_name;
+    int                             max_displayed_entries;
+    int                             num_entries;
+    const char *const              *entries;
+  } browser;
+  
+  xitk_state_callback_t             dbl_click_callback;
+
+  xitk_state_callback_t             callback;
+  void                             *userdata;
+
+  xitk_widget_list_t               *parent_wlist;
+} xitk_browser_widget_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+
+  char                             *skin_element_name;
+  Window                            window_trans;
+  int                               layer_above;
+
+  int                               x;
+  int                               y;
+  char                             *window_title;
+  char                             *resource_name;
+  char                             *resource_class;
+
+  struct {
+    char                           *skin_element_name;
+  } sort_default;
+
+  struct {
+    char                           *skin_element_name;
+  } sort_reverse;
+
+  struct {
+    char                           *cur_directory;
+    char                           *skin_element_name;
+  } current_dir;
+  
+  xitk_dnd_callback_t               dndcallback;
+
+  struct {
+    char                           *caption;
+    char                           *skin_element_name;
+  } homedir;
+
+  struct {
+    char                           *caption;
+    char                           *skin_element_name;
+    xitk_string_callback_t          callback;
+  } select;
+
+  struct {
+    char                           *caption;
+    char                           *skin_element_name;
+  } dismiss;
+
+  struct {
+    xitk_simple_callback_t          callback;
+  } kill;
+ 
+  xitk_browser_widget_t             browser;
+} xitk_filebrowser_widget_t;
+
+#ifdef NEED_MRLBROWSER
+
+typedef struct {
+  char                             *name;
+  char                             *ending;
+} xitk_mrlbrowser_filter_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  char                             *skin_element_name;
+  Window                            window_trans;
+  int                               layer_above;
+
+  int                               x;
+  int                               y;
+  char                             *window_title;
+  char                             *resource_name;
+  char                             *resource_class;
+
+  struct {
+    char                           *cur_origin;
+    char                           *skin_element_name;
+  } origin;
+  
+  xitk_dnd_callback_t               dndcallback;
+
+  struct {
+    char                           *caption;
+    char                           *skin_element_name;
+    xitk_mrl_callback_t             callback;
+  } select;
+
+  struct {
+    char                           *skin_element_name;
+    xitk_mrl_callback_t             callback;
+  } play;
+
+  struct {
+    char                           *caption;
+    char                           *skin_element_name;
+  } dismiss;
+
+  struct {
+    xitk_simple_callback_t          callback;
+  } kill;
+
+  const char *const                *ip_availables;
+  
+  struct {
+
+    struct {
+      char                         *skin_element_name;
+    } button;
+
+    struct {
+      char                         *label_str;
+      char                         *skin_element_name;
+    } label;
+
+  } ip_name;
+  
+  xine_t                           *xine;
+
+  xitk_browser_widget_t             browser;
+  
+  xitk_mrlbrowser_filter_t        **mrl_filters;
+
+  struct {
+    char                           *skin_element_name;
+  } combo;
+
+} xitk_mrlbrowser_widget_t;
+
+#endif
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  char                             *text;
+  int                               max_length;
+  xitk_string_callback_t            callback;
+  void                             *userdata;
+  char                             *skin_element_name;
+} xitk_inputtext_widget_t;
+
+typedef struct {
+  int                               magic;
+  ImlibData                        *imlibdata;
+  char                             *skin_element_name;
+  xitk_widget_list_t               *parent_wlist;
+  char                           **entries;
+  int                              layer_above;
+  xitk_state_callback_t            callback;
+  void                            *userdata;
+  xitk_register_key_t             *parent_wkey;
+} xitk_combo_widget_t;
+
+typedef struct {
+  int                              magic;
+  ImlibData                       *imlibdata;
+  char                            *skin_element_name;
+  int                              num_entries;
+  char                           **entries;
+  xitk_widget_list_t              *parent_wlist;
+  xitk_state_callback_t            callback;
+  void                            *userdata;
+} xitk_tabs_widget_t;
+
+typedef struct {
+  int                              magic;
+  ImlibData                       *imlibdata;
+  
+  char                            *skin_element_name;
+  
+  int                              value;
+  int                              step;
+
+  xitk_widget_list_t              *parent_wlist;
+
+  xitk_state_callback_t            callback;
+  void                             *userdata;
+} xitk_intbox_widget_t;
+
+
+/* *******
+ * INIT: widget lib initialization and friends
+ */
 /*
  * Create a lew widget list, store it internaly,
  * then return the pointer to app.
@@ -450,6 +707,11 @@ void *xitk_xmalloc(size_t);
 /**
  *
  */
+int xitk_is_cursor_out_mask(Display *display, xitk_widget_t *w, Pixmap mask, int x, int y);
+
+/**
+ *
+ */
 xitk_color_names_t *xitk_get_color_name(char *color);
 
 /**
@@ -533,6 +795,11 @@ int xitk_set_widget_pos(xitk_widget_t *w, int x, int y);
 int xitk_get_widget_pos(xitk_widget_t *w, int *x, int *y);
 
 /**
+ *
+ */
+uint32_t xitk_get_widget_type(xitk_widget_t *w);
+
+/**
  * Boolean, return 1 if widget 'w' have focus.
  */
 int xitk_is_widget_focused(xitk_widget_t *);
@@ -566,6 +833,11 @@ void xitk_destroy_widget(xitk_widget_list_t *wl, xitk_widget_t *w);
  * Destroy widgets from widget list.
  */
 void xitk_destroy_widgets(xitk_widget_list_t *wl);
+
+/**
+ *
+ */
+void xitk_stop_widget(xitk_widget_t *w);
 
 /**
  * Stop each (if widget handle it) widgets of widget list.
@@ -610,7 +882,7 @@ xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
 /**
  *
  */
-void xitk_set_widget_tips(xitk_widget_t *w, const char *str);
+void xitk_set_widget_tips(xitk_widget_t *w, char *str);
 
 /**
  *
@@ -665,26 +937,6 @@ void xitk_xevent_notify(XEvent *event);
 /* 
  * *** Sliders ***
  */
-
-/*  vertical slider type */
-#define XITK_VSLIDER 1
-/*  horizontal slider type */
-#define XITK_HSLIDER 2
-/*  rotate button *slider* type */
-#define XITK_RSLIDER 3
-
-typedef struct {
-  int                       magic;
-  ImlibData              *imlibdata;
-  int                     min;
-  int                     max;
-  int                     step;
-  char                   *skin_element_name;
-  xitk_state_callback_t   callback;
-  void                   *userdata;
-  xitk_state_callback_t   motion_callback;
-  void                   *motion_userdata;
-} xitk_slider_widget_t;
 
 /**
  * Create a slider
@@ -811,23 +1063,6 @@ void xitk_list_delete_current (xitk_list_t *l);
 /*
  * *** Label Buttons
  */
-#define CLICK_BUTTON       1
-#define RADIO_BUTTON       2
-#define LABEL_ALIGN_CENTER 1
-#define LABEL_ALIGN_LEFT   2
-#define LABEL_ALIGN_RIGHT  3
-typedef struct {
-  int                       magic;
-  ImlibData                *imlibdata;
-  int                       button_type;
-  int                       align;
-  const char               *label;
-  xitk_simple_callback_t    callback;
-  xitk_state_callback_t     state_callback;
-  void                     *userdata;
-  char                     *skin_element_name;
-} xitk_labelbutton_widget_t;
-
 /**
  * Create a labeled button.
  */
@@ -887,17 +1122,6 @@ int xitk_labelbutton_get_label_offset(xitk_widget_t *);
 /*
  * *** Labels
  */
-typedef struct {
-  int                       magic;
-  ImlibData                *imlibdata;
-  Window                    window;
-  GC                        gc;
-  char                     *label;
-  char                     *skin_element_name;
-  xitk_simple_callback_t    callback;
-  void                     *userdata;
-} xitk_label_widget_t;
-
 /**
  * Create a label widget.
  */
@@ -914,7 +1138,7 @@ xitk_widget_t *xitk_noskin_label_create(xitk_widget_list_t *wl,
 /**
  * Change label of widget 'widget'.
  */
-int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *l, const char *newlabel);
+int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel);
 
 /**
  * Get label.
@@ -929,12 +1153,6 @@ char *xitk_label_get_label(xitk_widget_t *w);
  * Load image and return a xitk_image_t data type.
  */
 xitk_image_t *xitk_image_load_image(ImlibData *idata, char *image);
-
-typedef struct {
-  int                       magic;
-  ImlibData              *imlibdata;
-  char                   *skin_element_name;
-} xitk_image_widget_t;
 
 /**
  * Create an image widget type.
@@ -956,28 +1174,8 @@ void xitk_image_change_image(ImlibData *im,
 			     xitk_image_t *src, xitk_image_t *dest, int width, int height);
 
 /*
- * *** DND
- */
-void xitk_init_dnd(Display *display, xitk_dnd_t *);
-
-int xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
-
-int xitk_process_client_dnd_message(xitk_dnd_t *, XEvent *);
-
-void xitk_set_dnd_callback(xitk_dnd_t *, void *);
-void xitk_unset_dnd_callback(xitk_dnd_t *);
-
-
-/*
  * *** Checkbox
  */
-typedef struct {
-  int                       magic;
-  ImlibData                *imlibdata;
-  xitk_state_callback_t     callback;
-  void                     *userdata;
-  char                     *skin_element_name;
-} xitk_checkbox_widget_t;
 /**
  * Create a checkbox.
  */
@@ -1008,14 +1206,6 @@ void xitk_checkbox_set_state(xitk_widget_t *, int, Window, GC);
 /**
  * Create a button
  */
-typedef struct {
-  int                       magic;
-  ImlibData                *imlibdata;
-  char                     *skin_element_name;
-  xitk_simple_callback_t    callback;
-  void                     *userdata;
-} xitk_button_widget_t;
-
 /**
  *
  */
@@ -1036,51 +1226,6 @@ xitk_widget_t *xitk_noskin_button_create (xitk_widget_list_t *wl,
 /**
  * Create the list browser
  */
-/* Default time (in ms) between mouse click to act as double click */
-typedef struct {
-  int                       magic;
-  ImlibData              *imlibdata;
-
-  struct {
-    char                 *skin_element_name;
-  } arrow_up;
-  
-  struct {
-    char                 *skin_element_name;
-  } slider;
-
-  struct {
-    char                 *skin_element_name;
-  } arrow_dn;
-
-  struct {
-    char                 *skin_element_name;
-  } arrow_left;
-  
-  struct {
-    char                 *skin_element_name;
-  } slider_h;
-
-  struct {
-    char                 *skin_element_name;
-  } arrow_right;
-
-  struct {
-    char                 *skin_element_name;
-    int                   max_displayed_entries;
-    int                   num_entries;
-    const char    *const *entries;
-  } browser;
-  
-  xitk_state_callback_t   dbl_click_callback;
-
-  /* Callback on selection function */
-  xitk_state_callback_t   callback;
-  void                   *userdata;
-
-  xitk_widget_list_t          *parent_wlist;
-} xitk_browser_widget_t;
-
 /**
  *
  */
@@ -1175,57 +1320,6 @@ xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w
 /*
  * Filebrowser
  */
-typedef struct {
-  int                       magic;
-  ImlibData                 *imlibdata;
-  char                      *skin_element_name;
-  Window                     window_trans;
-  int                        layer_above;
-
-  int                        x;
-  int                        y;
-  char                      *window_title;
-  char                      *resource_name;
-  char                      *resource_class;
-
-  struct {
-    char                    *skin_element_name;
-  } sort_default;
-
-  struct {
-    char                    *skin_element_name;
-  } sort_reverse;
-
-  struct {
-    char                    *cur_directory;
-    char                    *skin_element_name;
-  } current_dir;
-  
-  xitk_dnd_callback_t        dndcallback;
-
-  struct {
-    char                    *caption;
-    char                    *skin_element_name;
-  } homedir;
-
-  struct {
-    char                    *caption;
-    char                    *skin_element_name;
-    xitk_string_callback_t   callback;
-  } select;
-
-  struct {
-    char                    *caption;
-    char                    *skin_element_name;
-  } dismiss;
-
-  struct {
-    xitk_simple_callback_t   callback;
-  } kill;
- 
-  xitk_browser_widget_t             browser;
-} xitk_filebrowser_widget_t;
-
 /**
  *
  */
@@ -1283,79 +1377,6 @@ int xitk_filebrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
 Window xitk_filebrowser_get_window_id(xitk_widget_t *w);
 
 #ifdef NEED_MRLBROWSER
-
-typedef struct {
-  char                      *name;
-  char                      *ending;
-} xitk_mrlbrowser_filter_t;
-
-typedef struct {
-  int                       magic;
-  ImlibData                 *imlibdata;
-  char                      *skin_element_name;
-  Window                     window_trans;
-  int                        layer_above;
-
-  int                        x;
-  int                        y;
-  char                      *window_title;
-  char                      *resource_name;
-  char                      *resource_class;
-
-  struct {
-    char                    *cur_origin;
-    char                    *skin_element_name;
-  } origin;
-  
-  xitk_dnd_callback_t        dndcallback;
-
-  struct {
-    char                    *caption;
-    char                    *skin_element_name;
-    xitk_mrl_callback_t      callback;
-  } select;
-
-  struct {
-    char                    *skin_element_name;
-    xitk_mrl_callback_t      callback;
-  } play;
-
-  struct {
-    char                    *caption;
-    char                    *skin_element_name;
-  } dismiss;
-
-  struct {
-    xitk_simple_callback_t   callback;
-  } kill;
-
-  const char         *const *ip_availables;
-  
-  struct {
-
-    struct {
-      char                  *skin_element_name;
-    } button;
-
-    struct {
-      char                  *label_str;
-      char                  *skin_element_name;
-    } label;
-
-  } ip_name;
-  
-  const xine_t              *xine;
-
-  xitk_browser_widget_t      browser;
-  
-  xitk_mrlbrowser_filter_t **mrl_filters;
-
-  struct {
-    char                    *skin_element_name;
-  } combo;
-
-} xitk_mrlbrowser_widget_t;
-
 /**
  *
  */
@@ -1414,29 +1435,9 @@ void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned lo
 
 #endif
 
-typedef struct {
-  int                       magic;
-  ImlibData              *imlibdata;
-  char                   *text;
-  int                     max_length;
-  xitk_string_callback_t  callback;
-  void                   *userdata;
-  char                   *skin_element_name;
-} xitk_inputtext_widget_t;
-
 /**
  * All states of modifiers (see xitk_get_key_modifier() bellow).
  */
-#define MODIFIER_NOMOD 0x00000000
-#define MODIFIER_SHIFT 0x00000001
-#define MODIFIER_LOCK  0x00000002
-#define MODIFIER_CTRL  0x00000004
-#define MODIFIER_META  0x00000008
-#define MODIFIER_NUML  0x00000010
-#define MODIFIER_MOD3  0x00000020
-#define MODIFIER_MOD4  0x00000040
-#define MODIFIER_MOD5  0x00000080
-
 /**
  * return 1 if a modifier key has been pressed (extracted from XEvent *)
  * modifier pointer will contain the modifier(s) bits (MODIFIER_*)
@@ -1464,7 +1465,7 @@ char *xitk_inputtext_get_text(xitk_widget_t *it);
 /**
  * Change and redisplay the text of widget.
  */
-void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, const char *text);
+void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, char *text);
 
 
 /*
@@ -1503,10 +1504,6 @@ void xitk_skin_unload_config(xitk_skin_config_t *);
 /*
  *
  */
-#define DIRECTION_UP     1
-#define DIRECTION_DOWN   2
-#define DIRECTION_LEFT   3
-#define DIRECTION_RIGHT  4
 int xitk_skin_get_direction(xitk_skin_config_t *skonfig, const char *str);
 
 /*
@@ -1623,7 +1620,6 @@ void xitk_skin_unlock(xitk_skin_config_t *);
 /**
  * Font manipulations.
  */
-typedef void xitk_font_t;
 /*
  *
  */
@@ -1706,18 +1702,6 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
  */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
 
-
-typedef struct {
-  int                      magic;
-  ImlibData               *imlibdata;
-  char                    *skin_element_name;
-  xitk_widget_list_t      *parent_wlist;
-  char                   **entries;
-  int                      layer_above;
-  xitk_state_callback_t    callback;
-  void                    *userdata;
-  xitk_register_key_t     *parent_wkey;
-} xitk_combo_widget_t;
 
 /**
  *
@@ -1916,16 +1900,9 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p);
 void draw_button_plus(ImlibData *im, xitk_image_t *p);
 void draw_button_minus(ImlibData *im, xitk_image_t *p);
 
-#define XITK_WINDOW_ANSWER_UNKNOWN 0
-#define XITK_WINDOW_ANSWER_OK      1
-#define XITK_WINDOW_ANSWER_YES     2
-#define XITK_WINDOW_ANSWER_NO      3
-#define XITK_WINDOW_ANSWER_CANCEL  4
-
 /*
  * Windows
  */
-typedef void xitk_window_t;
 
 /**
  *
@@ -2020,11 +1997,6 @@ int xitk_is_window_visible(Display *display, Window window);
  */
 int xitk_is_window_size(Display *display, Window window, int width, int height);
 
-#define ALIGN_LEFT    1
-#define ALIGN_CENTER  2
-#define ALIGN_RIGHT   3
-#define ALIGN_DEFAULT (ALIGN_LEFT)
-
 xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *title,
 							 int window_width, int align, char *message, ...);
 
@@ -2071,7 +2043,11 @@ xitk_window_t *xitk_window_dialog_ok(ImlibData *im, char *title,
 /* 
  *
  */
-xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title, xitk_state_callback_t cb1, 
+xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title, 
+							   char *button1_label,
+							   char *button2_label,
+							   char *button3_label,
+							   xitk_state_callback_t cb1, 
 							   xitk_state_callback_t cb2, 
 							   xitk_state_callback_t cb3, 
 							   void *userdata, 
@@ -2138,21 +2114,6 @@ xitk_window_t *xitk_window_dialog_yesno(ImlibData *im, char *title,
 #endif
 
 
-typedef struct {
-  int                     magic;
-  ImlibData              *imlibdata;
-  
-  char                   *skin_element_name;
-  int                     num_entries;
-  char                  **entries;
-
-  xitk_widget_list_t     *parent_wlist;
-
-  xitk_state_callback_t  callback;
-  void                   *userdata;
-
-} xitk_tabs_widget_t;
-
 xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 				       xitk_tabs_widget_t *t, 
 				       int x, int y, int width, char *fontname);
@@ -2160,26 +2121,15 @@ int xitk_tabs_get_current_selected(xitk_widget_t *w);
 char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
 void xitk_tabs_set_current_selected(xitk_widget_t *w, int select);
 
-typedef struct {
-  int                     magic;
-  ImlibData              *imlibdata;
-  
-  char                   *skin_element_name;
-  
-  int                     value;
-  int                     step;
-
-  xitk_widget_list_t     *parent_wlist;
-
-  xitk_state_callback_t   callback;
-  void                   *userdata;
-} xitk_intbox_widget_t;
-
 xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
 					 xitk_intbox_widget_t *ib,
 					 int x, int y, int width, int height, 
 					 xitk_widget_t **iw, xitk_widget_t **mw, xitk_widget_t **lw);
 void xitk_intbox_set_value(xitk_widget_t *, int);
 int xitk_intbox_get_value(xitk_widget_t *);
+
+
+int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
+void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);
 
 #endif

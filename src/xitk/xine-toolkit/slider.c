@@ -27,11 +27,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "Imlib-light/Imlib.h"
-#include "image.h"
-#include "widget.h"
-#include "slider.h"
-#include "widget_types.h"
 #include "_xitk.h"
 
 #ifndef M_PI

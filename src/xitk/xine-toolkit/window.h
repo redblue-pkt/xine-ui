@@ -23,9 +23,6 @@
 #ifndef HAVE_XITK_WINDOW_H
 #define HAVE_XITK_WINDOW_H
 
-#include <X11/Xlib.h>
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
 #include "_xitk.h"
 
 #define XITK_WINDOW_ANSWER_UNKNOWN 0

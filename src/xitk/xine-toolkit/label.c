@@ -30,13 +30,6 @@
 #include <pthread.h>
 #include <unistd.h>
 
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
-#include "font.h"
-#include "image.h"
-#include "label.h"
-#include "widget_types.h"
-#include "utils.h"
 #include "_xitk.h"
 
 static void _create_label_pixmap(xitk_widget_t *w) {

@@ -29,14 +29,6 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 
-#include "Imlib-light/Imlib.h"
-#include "labelbutton.h"
-#include "image.h"
-#include "font.h"
-#include "window.h"
-#include "widget.h"
-#include "widget_types.h"
-
 #include "_xitk.h"
 
 #define DIALOG_TYPE_UNKNOWN        0
@@ -868,7 +860,7 @@ xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *tit
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button_label;
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -1046,7 +1038,7 @@ xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *ti
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button1_label;
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -1060,7 +1052,7 @@ xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *ti
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button2_label;
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -1251,7 +1243,7 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button1_label;
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -1265,7 +1257,7 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button2_label;
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -1279,7 +1271,7 @@ xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button3_label;
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;

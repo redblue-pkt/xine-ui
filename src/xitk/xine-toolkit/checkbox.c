@@ -26,11 +26,6 @@
 
 #include <stdio.h>
 
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
-#include "image.h"
-#include "checkbox.h"
-#include "widget_types.h"
 #include "_xitk.h"
 
 /*

@@ -29,8 +29,6 @@
 #include <sys/types.h>
 #include <inttypes.h>
 
-#include "widget.h"
-#include "list.h"
 #include "_xitk.h"
 
 /*
@@ -55,12 +53,12 @@ void xitk_list_free(xitk_list_t *l) {
   xitk_node_t *node;
 
   if (!l) {
-    XITK_WARNING("%s(): No list.\n", __FUNCTION__);
+    XITK_WARNING("No list.\n");
     return;
   }
  
   if(!l->first) {
-    XITK_WARNING("%s(): No node.\n", __FUNCTION__);
+    XITK_WARNING("No node.\n");
     return;
   }
 
@@ -105,7 +103,7 @@ void *xitk_list_next_content (xitk_list_t *l) {
     
   } 
   else {
-    XITK_WARNING("%s(): passed end of list", __FUNCTION__);
+    XITK_WARNING("Passed end of list");
     return NULL;
   }    
 }
@@ -128,7 +126,7 @@ void *xitk_list_last_content (xitk_list_t *l) {
     return l->last->content;
   } 
   else {
-    XITK_WARNING("xitk_list : wanted last of empty list");
+    XITK_WARNING("Wanted last of empty list");
     return NULL;
   }    
 }
@@ -147,7 +145,7 @@ void *xitk_list_prev_content (xitk_list_t *l) {
       return NULL;
   } 
   else {
-    XITK_WARNING("xitk_list : passed begin of list");
+    XITK_WARNING("Passed begin of list");
     return NULL;
   }    
 }

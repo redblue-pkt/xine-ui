@@ -32,10 +32,7 @@
 #include <string.h>
 #include <signal.h>
 
-#include "widget.h"
-#include "dnd.h"
 #include "_xitk.h"
-
 
 #define XDND_VERSION 3
 

@@ -26,15 +26,6 @@
 
 #include <stdio.h>
 
-#include "Imlib-light/Imlib.h"
-#include "widget.h"
-#include "image.h"
-#include "labelbutton.h"
-#include "button.h"
-#include "tabs.h"
-#include "font.h"
-#include "widget_types.h"
-
 #include "_xitk.h"
 
 
@@ -371,7 +362,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 
       lb.skin_element_name = NULL;
       lb.button_type       = RADIO_BUTTON;
-      lb.align             = LABEL_ALIGN_CENTER;
+      lb.align             = ALIGN_CENTER;
       lb.label             = t->entries[i];
       lb.callback          = NULL;
       lb.state_callback    = tabs_select;

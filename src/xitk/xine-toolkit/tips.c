@@ -32,11 +32,6 @@
 
 #include <X11/Xlib.h>
 
-#include "widget.h"
-#include "window.h"
-#include "font.h"
-#include "image.h"
-#include "tips.h"
 #include "_xitk.h"
 
 typedef struct {
