@@ -1262,9 +1262,7 @@ char *xitk_get_system_encoding(void) {
   
 #ifdef HAVE_LANGINFO_CODESET
   codeset = nl_langinfo(CODESET);
-  printf("%s\n", codeset);
 #endif
-
   /*
    * guess locale codeset according to shell variables
    * when nl_langinfo(CODESET) isn't available or workig
@@ -1287,20 +1285,21 @@ char *xitk_get_system_encoding(void) {
         if((mod = strchr(enc, '@')))
           *mod = '\0';
 
-        codeset = enc;
+        codeset = strdup(enc);
       }
       else {
         const lang_locale_t *llocale = _get_first_lang_locale(lg);
 
         if(llocale && llocale->encoding)
-          codeset = llocale->encoding;
+          codeset = strdup(llocale->encoding);
       }
 
       free(lg);
     }
-  }
+  } else
+    codeset = strdup(codeset);
 
-  return codeset ? strdup(codeset) : NULL;
+  return codeset;
 }
 
 xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding) {
