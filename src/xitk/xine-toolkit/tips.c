@@ -34,21 +34,6 @@
 
 #include "_xitk.h"
 
-/*
-static xitk_widget_t        *widget = NULL;
-static pthread_t             tips_thread;
-static int                   tips_visible = 0;
-static int                   tips_running = 0;
-static pthread_mutex_t       widget_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_mutex_t       tips_new_tips = PTHREAD_MUTEX_INITIALIZER;
-
-static pthread_mutex_t       newtips_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t        newtips_cond = PTHREAD_COND_INITIALIZER;
-
-static pthread_mutex_t       tips_timer_mutex = PTHREAD_MUTEX_INITIALIZER;
-static pthread_cond_t        tips_timer_cond = PTHREAD_COND_INITIALIZER;
-static Display              *display;
-*/
 typedef struct {
   Display             *display;
   pthread_t            thread;
