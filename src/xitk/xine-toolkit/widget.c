@@ -1850,7 +1850,7 @@ int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w)
     return 0;
   }
   if(window == None) {
-    XITK_WARNING("widget is NULL\n");
+    XITK_WARNING("window is None\n");
     return 0;
   }
   
