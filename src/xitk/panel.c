@@ -211,7 +211,7 @@ void panel_update_channel_display (void) {
 		      panel->audiochan);
 
   if(xine_get_spu_channel(gGui->xine) >= 0) {
-    uevent.event.type = XINE_SPU_EVENT;
+    uevent.event.type = XINE_UI_EVENT;
     uevent.handled = 0;
     uevent.sub_type = XINE_UI_GET_SPU_LANG;
     uevent.data = panel->spuid;
