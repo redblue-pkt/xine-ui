@@ -44,6 +44,7 @@
 #include "errors.h"
 #include "event.h"
 #include "event_sender.h"
+#include "help.h"
 #include "i18n.h"
 #include "lang.h"
 #include "lirc.h"

@@ -23,6 +23,7 @@ xine_SOURCES = \
 	event_sender.c \
 	file_browser.c \
 	frequencies.c \
+	help.c \
 	kbindings.c \
 	lang.c \
 	lirc.c \
@@ -78,6 +79,7 @@ noinst_HEADERS = \
 	file_browser.h \
 	frequencies.h \
 	i18n.h \
+	help.h \
 	kbindings.h \
 	lang.h \
 	lirc.h \

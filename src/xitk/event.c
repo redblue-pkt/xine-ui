@@ -803,6 +803,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_vpp_enable();
     break;
 
+  case ACTID_HELP_SHOW:
+    show_help();
+    break;
+
   default:
     break;
   }

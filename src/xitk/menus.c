@@ -381,6 +381,9 @@ static void menu_settings(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
     break;
   }
 }
+static void menu_help(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  show_help();
+}
 static void menu_quit(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_execute_action_id(ACTID_QUIT);
 }
@@ -615,6 +618,12 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { _("Settings/Logs..."),
       NULL,
       menu_settings, (void *) SETS_LOGS                                                      },
+    { "SEP",
+      "<separator>",
+      NULL, NULL                                                                             },
+    { _("Help"),
+      NULL,
+      menu_help, NULL                                                                        },
     { "SEP",
       "<separator>",
       NULL, NULL                                                                             },
