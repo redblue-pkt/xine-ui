@@ -105,10 +105,10 @@ void            *xlib_handle = NULL;
 
 /* options args */
 static const char *short_options = "?h"
- "da:qA:V:R::NP:v";
+ "d::a:qA:V:R::NP:v";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
-  {"debug"          , no_argument      , 0, 'd' },
+  {"debug"          , optional_argument, 0, 'd' },
   {"audio-channel"  , required_argument, 0, 'a' },
   {"auto-quit"      , no_argument      , 0, 'q' },
   {"audio-driver"   , required_argument, 0, 'A' },
@@ -581,9 +581,17 @@ int main(int argc, char *argv[]) {
     switch(c) {
 
     case 'd': /* Enable debug messages */
-      aaxine.debug_messages = 1;
-      break;
+      if(optarg != NULL) {
+	char *p = xine_chomp(optarg);
+	
+	if(p && strlen(p))
+	  aaxine.debug_messages = strtol(p, &p, 10);
 
+      }
+      else
+	aaxine.debug_messages = 1;
+      break;
+      
     case 'a': /* Select audio channel */
       sscanf(optarg, "%i", &audio_channel);
       break;
@@ -666,7 +674,8 @@ int main(int argc, char *argv[]) {
 
   aaxine.xine = (xine_t *)xine_new();
   xine_config_load (aaxine.xine, aaxine.configfile);
-
+  xine_engine_set_param(aaxine.xine, XINE_ENGINE_PARAM_VERBOSITY, aaxine.debug_messages);
+  
   /*
    * xine init
    */
