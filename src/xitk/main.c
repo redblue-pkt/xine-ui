@@ -51,6 +51,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#include <X11/Xresource.h>
 
 #include <locale.h>
 
@@ -68,14 +69,17 @@
 /*
  * global variables
  */
-gGui_t    *gGui;
+gGui_t                       *gGui;
 #ifdef HAVE_LIRC
-int        no_lirc;
+int                           no_lirc;
 #endif
-int        unhandled_codec_mode; /* 0 = never, 1 = video, 2 = audio, 3 = always */
+
+static char                 **video_driver_ids;
+static char                 **audio_driver_ids;
+static char                 **post_output_plugins;
+static window_attributes_t    window_attribute;
 
 #define CONFIGFILE "config2"
-
 
 typedef struct {
   FILE    *fd;
@@ -83,11 +87,6 @@ typedef struct {
   char    *ln;
   char     buf[256];
 } file_info_t;
-
-static char **video_driver_ids;
-static char **audio_driver_ids;
-static char **post_output_plugins;
-    
 
 #define	OPTION_VISUAL		1000
 #define	OPTION_INSTALL_COLORMAP	1001
@@ -241,6 +240,126 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   free(rcfile);
 
   return _argv;
+}
+
+static int parse_geometry(window_attributes_t *window_attribute, char *geomstr) {
+  int width, height, xoff, yoff, ret;  
+  
+  if((ret = XParseGeometry(geomstr, &xoff, &yoff, &width, &height))) {
+    if(ret & XValue)
+      window_attribute->x      = xoff;
+    if(ret & YValue)
+      window_attribute->y      = yoff;
+    if(ret & WidthValue)
+      window_attribute->width  = width;
+    if(ret & HeightValue)
+      window_attribute->height = height;
+    
+    return 1;
+  }
+  return 0;
+}
+  
+static int parse_visual(VisualID *vid, int *vclass, char *visual_str) {
+  int ret = 0;
+  int visual = 0;
+
+  if(sscanf(visual_str, "%x", &visual) == 1) {
+    *vid = visual;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "StaticGray") == 0) {
+    *vclass = StaticGray;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "GrayScale") == 0) {
+    *vclass = GrayScale;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "StaticColor") == 0) {
+    *vclass = StaticColor;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "PseudoColor") == 0) {
+    *vclass = PseudoColor;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "TrueColor") == 0) {
+    *vclass = TrueColor;
+    ret = 1;
+  }
+  else if (strcasecmp(visual_str, "DirectColor") == 0) {
+    *vclass = DirectColor;
+    ret = 1;
+  }
+
+  return ret;
+}
+
+static void xrm_parse(void) {
+  char         *display_name = ":0.0";
+  Display      *display;
+  char          user_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char          wide_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  char         *environment;
+  char         *classname = "Xine";
+  char         *str_type[20];
+  XrmDatabase   rmdb, home_rmdb, server_rmdb, application_rmdb;
+  XrmValue      value;
+  
+  XrmInitialize();
+  
+  sprintf(wide_dbname, "%s%s", "/usr/lib/X11/app-defaults/", classname);
+  
+  if(getenv("DISPLAY"))
+    display_name = getenv("DISPLAY");
+  
+  display = XOpenDisplay(display_name);
+  
+  application_rmdb = XrmGetFileDatabase(wide_dbname);
+  (void) XrmMergeDatabases(application_rmdb, &rmdb);
+  
+  if(XResourceManagerString(display) != NULL)
+    server_rmdb = XrmGetStringDatabase(XResourceManagerString(display));
+  else {
+    sprintf(user_dbname, "%s%s", (xine_get_homedir()), "/.Xdefaults");
+    server_rmdb = XrmGetFileDatabase(user_dbname);
+  }
+  
+  XrmMergeDatabases(server_rmdb, &rmdb);
+  
+  if((environment = getenv("XENVIRONMENT")) == NULL) {
+    int len;
+    
+    environment = environement_buf;
+    sprintf(environement_buf, "%s%s", (xine_get_homedir()), "/.Xdefaults-");
+    len = strlen(environment);
+    (void) gethostname(environment + len, (XITK_PATH_MAX + XITK_NAME_MAX) - len);
+  }
+
+  home_rmdb = XrmGetFileDatabase(environment);
+  XrmMergeDatabases(home_rmdb, &rmdb);
+
+  if(XrmGetResource(rmdb, "xine.geometry", "Xine.Geometry", str_type, &value) == True) {
+    if(!parse_geometry(&window_attribute, (char *)value.addr))
+      printf(_("Bad geometry '%s'\n"), (char *)value.addr);
+  } 
+  if(XrmGetResource(rmdb, "xine.border", "Xine.Border", str_type, &value) == True) {
+    window_attribute.borderless = !get_bool_value((char *) value.addr);
+  }
+  if(XrmGetResource(rmdb, "xine.visual", "Xine.Visual", str_type, &value) == True) {
+    if(!parse_visual(&gGui->prefered_visual_id, 
+		     &gGui->prefered_visual_class, (char *)value.addr)) {
+      printf(_("Bad visual '%s'\n"), (char *)value.addr);
+    }
+  }
+  if(XrmGetResource(rmdb, "xine.colormap", "Xine.Colormap", str_type, &value) == True) {
+    gGui->install_colormap = !get_bool_value((char *) value.addr);
+  }
+
+  if(display)
+    XCloseDisplay(display);
 }
 
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -738,8 +857,6 @@ int main(int argc, char *argv[]) {
   int                     option_index = 0;
   int                     audio_channel = -1;
   int                     spu_channel = -1;
-  window_attributes_t     window_attribute;
-  int		          visual = 0;
   char                   *audio_driver_id = NULL;
   char                   *video_driver_id = NULL;
   sigset_t                vo_mask;
@@ -808,6 +925,11 @@ int main(int argc, char *argv[]) {
 #endif
 
   visual_anim_init();
+
+  /*
+   * Parse X Ressource database
+   */
+  xrm_parse();
 
   /*
    * parse command line
@@ -899,23 +1021,11 @@ int main(int argc, char *argv[]) {
       break;
        
     case OPTION_VISUAL:
-      if (sscanf(optarg, "%x", &visual) == 1)
-	gGui->prefered_visual_id = visual;
-      else if (strcasecmp(optarg, "StaticGray") == 0)
-	gGui->prefered_visual_class = StaticGray;
-      else if (strcasecmp(optarg, "GrayScale") == 0)
-	gGui->prefered_visual_class = GrayScale;
-      else if (strcasecmp(optarg, "StaticColor") == 0)
-	gGui->prefered_visual_class = StaticColor;
-      else if (strcasecmp(optarg, "PseudoColor") == 0)
-	gGui->prefered_visual_class = PseudoColor;
-      else if (strcasecmp(optarg, "TrueColor") == 0)
-	gGui->prefered_visual_class = TrueColor;
-      else if (strcasecmp(optarg, "DirectColor") == 0)
-	gGui->prefered_visual_class = DirectColor;
-      else {
-	show_usage();
-	exit(1);
+      if(optarg != NULL) {
+	if(!parse_visual(&gGui->prefered_visual_id, &gGui->prefered_visual_class, optarg)) {
+	  show_usage();
+	  exit(1);
+	}
       }
       break;
 
@@ -949,24 +1059,10 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'G': /* Set geometry */
-      {
-	int width, height, xoff, yoff;
-	
-	if(optarg != NULL) {
-	  if((sscanf(optarg, "%ix%i+%i+%i", &width, &height, &xoff, &yoff)) == 4) {
-	    window_attribute.width  = width;
-	    window_attribute.height = height;
-	    window_attribute.x      = xoff;
-	    window_attribute.y      = yoff;
-	  }
-	  else if((sscanf(optarg, "%ix%i", &width, &height)) == 2) {
-	    window_attribute.width  = width;
-	    window_attribute.height = height;
-	  }
-	  else {
-	    printf(_("Bad geometry '%s', see xine --help\n"), optarg);
-	    exit(1);
-	  }
+      if(optarg != NULL) {
+	if(!parse_geometry(&window_attribute, optarg)) {
+	  printf(_("Bad geometry '%s', see xine --help\n"), optarg);
+	  exit(1);
 	}
       }
       break;
