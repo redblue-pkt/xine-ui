@@ -1009,7 +1009,7 @@ static void setup_section_widgets(int s) {
     }
     else
       slidmax = 1;
-      
+
     xitk_slider_set_max(setup->slider_wg, slidmax);
     xitk_slider_set_pos(setup->slider_wg, slidmax);
   }
@@ -1294,8 +1294,6 @@ void setup_panel(void) {
    (setup->slider_wg = xitk_noskin_slider_create(setup->widget_list, &sl,
 						 (WINDOW_WIDTH - 41), 70, 
 						 16, (WINDOW_HEIGHT - 140), XITK_VSLIDER)));
-  xitk_slider_set_pos(setup->slider_wg, 1);
-  xitk_disable_and_hide_widget(setup->slider_wg);
 
   setup_sections();
   setup_paint_widgets();

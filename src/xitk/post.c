@@ -362,12 +362,11 @@ static void _pplugin_show_obj(post_object_t *pobj) {
   }
 }
 
-
 static void _pplugin_paint_widgets(void) {
   if(pplugin) {
     int   i, x, y;
     int   last;
-    int   slidmax = 1;
+    int   slidmax, slidpos;
     
     last = pplugin->object_num <= (pplugin->first_displayed + MAX_DISPLAY_FILTERS)
       ? pplugin->object_num : (pplugin->first_displayed + MAX_DISPLAY_FILTERS);
@@ -387,19 +386,19 @@ static void _pplugin_paint_widgets(void) {
     
     if(pplugin->object_num > MAX_DISPLAY_FILTERS) {
       slidmax = pplugin->object_num - MAX_DISPLAY_FILTERS;
+      slidpos = slidmax - pplugin->first_displayed;
       xitk_enable_and_show_widget(pplugin->slider);
     }
     else {
       slidmax = 1;
+      slidpos = slidmax;
       
       if(!pplugin->first_displayed)
-      	xitk_disable_and_hide_widget(pplugin->slider);
+	xitk_disable_and_hide_widget(pplugin->slider);
     }
     
     xitk_slider_set_max(pplugin->slider, slidmax);
-    xitk_slider_set_pos(pplugin->slider, slidmax);
-
-    xitk_paint_widget_list (pplugin->widget_list); 
+    xitk_slider_set_pos(pplugin->slider, slidpos);
   }
 }
 
@@ -916,6 +915,12 @@ static void _pplugin_select_filter(xitk_widget_t *w, void *data, int select) {
 	xitk_enable_widget(pplugin->new_filter);
       
     }
+
+    if(pplugin->object_num <= MAX_DISPLAY_FILTERS)
+      pplugin->first_displayed = 0;
+    else if((pplugin->object_num - pplugin->first_displayed) < MAX_DISPLAY_FILTERS)
+      pplugin->first_displayed = pplugin->object_num - MAX_DISPLAY_FILTERS;
+
   }
   else {
     _pplugin_destroy_obj(pobj);
@@ -1108,9 +1113,6 @@ static void _pplugin_rebuild_filters(void) {
   
   xitk_enable_widget(pplugin->new_filter);
 
-  if(pplugin->object_num > MAX_DISPLAY_FILTERS)
-    pplugin->first_displayed = (pplugin->object_num - MAX_DISPLAY_FILTERS);
-
   _pplugin_paint_widgets();
 }
 
@@ -1236,7 +1238,7 @@ static void pplugin_exit(xitk_widget_t *w, void *data) {
 }
 
 static void _pplugin_handle_event(XEvent *event, void *data) {
-  
+
   switch(event->type) {
 
   case ButtonPress:
@@ -1491,7 +1493,7 @@ void pplugin_panel(void) {
    (pplugin->slider = xitk_noskin_slider_create(pplugin->widget_list, &sl,
 						(WINDOW_WIDTH - (16 + 10)), 33, 
 						16, (WINDOW_HEIGHT - 88), XITK_VSLIDER)));
-  
+
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
 
