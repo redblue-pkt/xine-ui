@@ -381,11 +381,9 @@ void control_panel(void) {
   }
 
   hint.x = gGui->config->register_num (gGui->config, "gui.control_x", 200,
-				       "gui control panel x coordinate",
-				       NULL, NULL, NULL);
+				       NULL, NULL, NULL, NULL);
   hint.y = gGui->config->register_num (gGui->config, "gui.control_y", 100,
-				       "gui control panel y coordinate",
-				       NULL, NULL, NULL);
+				       NULL, NULL, NULL, NULL);
   hint.width = control->bg_image->rgb_width;
   hint.height = control->bg_image->rgb_height;
   hint.flags = PPosition | PSize;

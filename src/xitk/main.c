@@ -376,11 +376,7 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
     }
   }
 
-  if (!audio_driver)
-    printf (_("main: audio driver <%s> failed\n"), audio_driver_id);
-
   return audio_driver;
-
 }
 
 /*

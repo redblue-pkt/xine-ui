@@ -43,6 +43,7 @@
 #include "playlist.h"
 #include "videowin.h"
 #include "mrl_browser.h"
+#include "setup.h"
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
@@ -431,6 +432,16 @@ void gui_control_show(xitk_widget_t *w, void *data) {
     control_panel();
   else
     control_exit(NULL, NULL);
+}
+
+void gui_setup_show(xitk_widget_t *w, void *data) {
+
+  if (setup_is_running() && !setup_is_visible())
+    setup_toggle_panel_visibility(NULL, NULL);
+  else if(!setup_is_running())
+    setup_panel();
+  else
+    setup_exit(NULL, NULL);
 }
 
 

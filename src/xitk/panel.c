@@ -484,11 +484,9 @@ void panel_init (void) {
    */
 
   hint.x = gGui->config->register_num (gGui->config, "gui.panel_x", 200,
-				       "gui panel x coordinate",
-				       NULL, NULL, NULL);
+				       NULL, NULL, NULL, NULL);
   hint.y = gGui->config->register_num (gGui->config, "gui.panel_y", 100,
-				       "gui panel x coordinate",
-				       NULL, NULL, NULL);
+				       NULL, NULL, NULL, NULL);
   hint.width = panel->bg_image->rgb_width;
   hint.height = panel->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
@@ -637,6 +635,12 @@ void panel_init (void) {
   /*  Exit button */
   b.skin_element_name = "Exit";
   b.callback          = gui_exit;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
+
+  /*  Setup button */
+  b.skin_element_name = "Setup";
+  b.callback          = gui_setup_show;
   b.userdata          = NULL;
   xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 

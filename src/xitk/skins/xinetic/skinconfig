@@ -38,6 +38,14 @@ skin.Exit {
 	pixmap = MainPower.png
 }
 
+skin.Setup {
+	coords {
+	  x = 20
+	  y = 76
+	}
+	pixmap = MainSetup.png
+}
+
 skin.FullScreen {
 	coords {
 	  x = 486

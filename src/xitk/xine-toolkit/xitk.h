@@ -676,6 +676,13 @@ typedef struct {
  */
 xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cp);
 
+/*
+ * Same as above, without skinable feature.
+ */
+xitk_widget_t *xitk_noskin_checkbox_create(xitk_checkbox_widget_t *cb,
+					   int x, int y, int width, int height);
+
+
 /**
  * get state of checkbox "widget".
  */

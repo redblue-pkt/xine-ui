@@ -655,11 +655,9 @@ void playlist_editor(void) {
   }
 
   hint.x = gGui->config->register_num (gGui->config, "gui.playlist_x", 200,
-				       "gui playlist x coordinate",
-				       NULL, NULL, NULL);
+				       NULL, NULL, NULL, NULL);
   hint.y = gGui->config->register_num (gGui->config, "gui.playlist_y", 200,
-				       "gui playlist y coordinate",
-				       NULL, NULL, NULL);
+				       NULL, NULL, NULL, NULL);
 
   hint.width = playlist->bg_image->rgb_width;
   hint.height = playlist->bg_image->rgb_height;
