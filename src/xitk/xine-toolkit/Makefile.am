@@ -5,7 +5,7 @@ noinst_LTLIBRARIES = libxitk.la
 libxitk_la_SOURCES = button.c labelbutton.c label.c \
 	widget.c dnd.c list.c slider.c checkbox.c \
 	image.c browser.c xitk.c filebrowser.c mrlbrowser.c
-libxitk_la_LIBADD = $(X_PRE_LIBS) $(X_LIBS) -lXext $(THREAD_LIBS) \
+libxitk_la_LIBADD = $(X_PRE_LIBS) $(X_LIBS) -lX11 -lXext $(THREAD_LIBS) \
 	$(top_builddir)/src/Imlib-light/libImlib-light.la
 
 noinst_HEADERS = button.h labelbutton.h label.h \
