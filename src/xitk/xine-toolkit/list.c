@@ -198,7 +198,6 @@ void xitk_list_insert_content (xitk_list_t *l, void *content) {
  */
 void xitk_list_delete_current (xitk_list_t *l) {
   xitk_node_t *node_cur;
-  static int          i;
 
   node_cur = l->cur;
 
