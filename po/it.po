@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "POT-Creation-Date: 2003-11-11 22:22+0100\n"
-"PO-Revision-Date: 2003-11-15 17:08+0100\n"
+"PO-Revision-Date: 2003-11-16 16:08+0100\n"
 "Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"
 "MIME-Version: 1.0\n"
@@ -1871,7 +1871,7 @@ msgstr "Playlist/SEP"
 
 #: src/xitk/menus.c:471
 msgid "Playlist/Loop modes"
-msgstr "Playlist/Modaliltà ciclo"
+msgstr "Playlist/Modalità ciclo"
 
 #: src/xitk/menus.c:474
 msgid "Playlist/Loop modes/Disabled"
@@ -2950,3 +2950,4 @@ msgstr "Aggiorna"
 
 #~ msgid "MRL Browser"
 #~ msgstr "Navigatore MRL"
+
