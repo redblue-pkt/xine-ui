@@ -167,27 +167,31 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
 }
 
 static void _playlist_xine_play(void) {
-  
-  if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
-    gGui->ignore_next = 1;
-    xine_stop(gGui->stream);
-    gGui->ignore_next = 0;
-  }
-  
-  if(!is_playback_widgets_enabled())
-    enable_playback_controls(1);
+  const mediamark_t *mmk;
+
+  if((mmk = mediamark_get_current_mmk()) != NULL) {
     
-  if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
-    gui_handle_xine_error(gGui->stream);
-    enable_playback_controls(0);
-    gui_display_logo();
-    return;
-  }
-  
-  if(!gui_xine_play(gGui->stream, 0, 0, 0)) {
-    enable_playback_controls(0);
-    gui_display_logo();
-    return;
+    if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
+      gGui->ignore_next = 1;
+      xine_stop(gGui->stream);
+      gGui->ignore_next = 0;
+    }
+    
+    if(!is_playback_widgets_enabled())
+      enable_playback_controls(1);
+    
+    if(!xine_open(gGui->stream, mmk->mrl)) {
+      gui_handle_xine_error(gGui->stream);
+      enable_playback_controls(0);
+      gui_display_logo();
+      return;
+    }
+    
+    if(!gui_xine_play(gGui->stream, 0, mmk->start, 0)) {
+      enable_playback_controls(0);
+      gui_display_logo();
+      return;
+    }
   }
 
 }
