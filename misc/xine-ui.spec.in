@@ -17,6 +17,11 @@ Packager:    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 Requires:    xine-lib >= 0.5.0
 BuildRoot:   /tmp/%{name}-root
 
+@HAVE_AA_TRUE@%package aa
+@HAVE_AA_TRUE@Summary:     XINE - Ascii Art player.
+@HAVE_AA_TRUE@Group:       Applications/Multimedia
+@HAVE_AA_TRUE@Requires:    xine-lib >= 0.5.0, xine-lib-aa, libaa
+
 %description
 xine is a free gpl-licensed video player for unix-like systems.
 We support mpeg-2 and mpeg-1 system (audio + video multiplexed) streams,
@@ -43,6 +48,9 @@ xine 는 GPL라이선스를 따르는 UNIX용 공개 동영상 플레이어입니다. 이
 플레이어는 mpeg-2 와 mpeg 1 스트림을 지원하며, 현재는 지원하지
 않지만 나중에는 mpeg-4 와 다른 형식의 동영상도 지원할 예정입니다.
 
+@HAVE_AA_TRUE@%description aa
+@HAVE_AA_TRUE@Video player using Ascii Art library.
+
 %prep
 %setup -n @TAR_NAME@
 
@@ -68,28 +76,27 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-
 # binaries
 %{prefix}/bin/xine
-%{prefix}/bin/aaxine
-
 %{prefix}/share/idl/xine.idl
-
 # skins
 @XINE_SKINDIR@/lcd/*
 @XINE_SKINDIR@/metal/*
 @XINE_SKINDIR@/pitt/*
 @XINE_SKINDIR@/xinetic/*
-
 # documentation
 %{prefix}/man/fr/man1/xine.1
 %{prefix}/man/man1/xine.1
 %{prefix}/share/doc/xine/*
 
+@HAVE_AA_TRUE@%files aa
+@HAVE_AA_TRUE@%{prefix}/bin/aaxine
+
 %changelog
+* Thu Jul 26 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+- Made AA as separate package.
 * Thu Jul 26 2001 Matthias Dahl <matthew2k@web.de>
-- updated filelist (in case aaxine is not always built, we have to put a
-  detection before its filelist entry - let me know... Daniel? *grin*)
+- updated filelist.
 * Tue Jul 03 2001 Matthias Dahl <matthew2k@web.de>
 - fixed the "no-skins-in-final-RPM-package" problem (nice explanation *grin*)
 * Sun Jun 10 2001 Matthias Dahl <matthew2k@web.de>

@@ -44,6 +44,7 @@ eval $RPM_BA
 
 cp '/usr/src/redhat/SRPMS/@PACKAGE@-@SPEC_VERSION@-0.src.rpm' ./rpms/
 mv '/usr/src/redhat/RPMS/i386/@PACKAGE@-@SPEC_VERSION@-0.i386.rpm' './rpms/@PACKAGE@-@SPEC_VERSION@-0.i686.rpm'
+@HAVE_AA_TRUE@mv '/usr/src/redhat/RPMS/i386/@PACKAGE@-aa-@SPEC_VERSION@-0.i386.rpm' './rpms/@PACKAGE@-aa-@SPEC_VERSION@-0.i686.rpm'
 
 echo "*****************************************************"
 echo
@@ -59,6 +60,7 @@ export XINE_BUILD=k6-pc-linux-gnu
 eval $RPM_BB
 
 mv '/usr/src/redhat/RPMS/i386/@PACKAGE@-@SPEC_VERSION@-0.i386.rpm' './rpms/@PACKAGE@-@SPEC_VERSION@-0.k6.rpm'
+@HAVE_AA_TRUE@mv '/usr/src/redhat/RPMS/i386/@PACKAGE@-aa-@SPEC_VERSION@-0.i386.rpm' './rpms/@PACKAGE@-aa-@SPEC_VERSION@-0.k6.rpm'
 
 echo "*****************************************************"
 echo
@@ -74,6 +76,7 @@ export XINE_BUILD=i586-pc-linux-gnu
 eval $RPM_BB
 
 mv '/usr/src/redhat/RPMS/i386/@PACKAGE@-@SPEC_VERSION@-0.i386.rpm' './rpms/@PACKAGE@-@SPEC_VERSION@-0.i586.rpm'
+@HAVE_AA_TRUE@mv '/usr/src/redhat/RPMS/i386/@PACKAGE@-aa-@SPEC_VERSION@-0.i386.rpm' './rpms/@PACKAGE@-aa-@SPEC_VERSION@-0.i586.rpm'
 
 echo "*****************************************************"
 echo
@@ -89,5 +92,6 @@ export XINE_BUILD=athlon-pc-linux-gnu
 eval $RPM_BB
 
 mv '/usr/src/redhat/RPMS/i386/@PACKAGE@-@SPEC_VERSION@-0.i386.rpm' './rpms/@PACKAGE@-@SPEC_VERSION@-0.k7.rpm'
+@HAVE_AA_TRUE@mv '/usr/src/redhat/RPMS/i386/@PACKAGE@-aa-@SPEC_VERSION@-0.i386.rpm' './rpms/@PACKAGE@-aa-@SPEC_VERSION@-0.k7.rpm'
 
 echo "Done."
