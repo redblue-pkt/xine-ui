@@ -466,7 +466,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Video",
       "<branch>",
       NULL, NULL                                                                             },
-    { "Video/Interlaced",
+    { "Video/Deinterlace",
       (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE)) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_INTERLEAVE                                             },
     { "Video/SEP",
