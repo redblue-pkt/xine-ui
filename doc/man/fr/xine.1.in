@@ -15,8 +15,8 @@ Il peux lire les flux a partir de fichiers, CD Vidéo, DVD ou d'autres sources.
 Ce programme utilise la syntaxe GNU pour la ligne de commande, avec les 
 longues options commençant par deux tirets ('\-').
 Une liste de ces options est donnée plus bas.
-Pour une description complète, lisez les fichiers README et FAQ présents
-dans le répertoire \fI@prefix@/share/doc/xine\fP ou sur la page du projet.
+Pour une description complète, lisez les fichiers \fIREADME\fP et \fIFAQ\fP présents
+dans le répertoire \fI@XINE_DOCDIR@\fP ou sur la page du projet.
 .TP
 .B \-h, \-\-help
 Affiche la liste des options ainsi que la liste des pilotes 

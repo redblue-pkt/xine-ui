@@ -3,7 +3,7 @@ SUBDIRS = man
 
 EXTRA_DIST = $(docs_DATA)
 
-docsdir = $(datadir)/doc/xine-ui
+docsdir = @XINE_DOCDIR@
 
 docs_DATA = FAQ_de FAQ_en FAQ_es FAQ_fr FAQ_it FAQ_pl FAQ_uk \
 	README_en README.corba README.dxr3 README.dxr3_pl README.freebsd README.irix README.mrl \

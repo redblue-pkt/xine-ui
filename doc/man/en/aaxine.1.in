@@ -29,7 +29,7 @@ or ffmpeg), (S)VCDs and DVDs. In short, anything that's supported by xine-lib.
 The program follows usual GNU command line syntax, with long
 options starting with two dashes (`-').
 A summary of options are included below.
-For a complete description, see README and FAQ in @prefix@/share/doc/xine-ui
+For a complete description, see \fIREADME\fP and \fIFAQ\fP in \fI@XINE_DOCDIR@\fP
 or on the xine home page.
 .TP
 .B \-h,\ \-\-help

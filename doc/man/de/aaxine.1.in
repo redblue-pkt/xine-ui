@@ -23,7 +23,7 @@ Wie auch \fBxine\fR spielt \fBaaxine\fP MPEG system streams (Ton und Video), MPE
 .SH "OPTIONEN"
 Dieses Programm folgt dem üblichen Format der GNU Kommandozeilenoptionen, in dem lange Optionen mit 2 Minuszeichen (`\-') beginnen.
 Eine Zusammenfassung der Optionen ist unten aufgeführt.
-Für eine vollständige Beschreibung wird auf die README und FAQ in @prefix@/share/doc/xine\-ui oder auf die xine\-Homepage verwiesen.
+Für eine vollständige Beschreibung wird auf die \fIREADME\fP und \fIFAQ\fP in \fI@XINE_DOCDIR@\fP oder auf die xine\-Homepage verwiesen.
 
 .TP 
 .B \-h,\ \-\-help

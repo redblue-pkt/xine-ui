@@ -23,7 +23,7 @@ i DVD.
 Program na¶laduje sk³adniê wiersza poleceñ w stylu GNU, z d³ugimi nazwami
 opcji zaczynaj±cymi siê od podwójnego my¶lnika (`-').
 Lista opcji jest zebrana poni¿ej.
-Pe³nego opisu szukaj w dokumentach README i FAQ w katalogu @prefix@/share/doc/xine-ui
+Pe³nego opisu szukaj w dokumentach \fIREADME\fP i \fIFAQ\fP w katalogu \fI@XINE_DOCDIR@\fP
 lub na stronie g³ównej
 .B xine
 .

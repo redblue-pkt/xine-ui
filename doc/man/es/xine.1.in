@@ -22,8 +22,8 @@ y DVDs.
 El programa sigue las sintaxis usuales de líneas de comando GNU, con 
 largas opciones comenzando con dos rayas (`-').
 Debajo están incluidas un conjunto de opciones.
-Para una descripción completa, vea la FAQ_es y el REAME_es en 
-@prefix@/share/doc/xine o en la página inicial de Xine.
+Para una descripción completa, vea la \fIFAQ_es\fP y el \fIREAME_es\fP en 
+\fI@XINE_DOCDIR@\fP o en la página inicial de Xine.
 .TP
 .B \-h, \-\-help (ayuda)
 Muestra el conjunto de opciones y los controladores de salida disponibles 
