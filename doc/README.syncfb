@@ -3,6 +3,10 @@
        XINE video output plugin for MATROX G400 / G200 cards *only*
   =====                                                            =====
 
+
+   VERSION
+    => $Id$
+
   
   IMPORTANT NOTE
     
