@@ -637,7 +637,11 @@ void gui_execute_action_id(action_id_t action) {
       gGui->cursor_grabbed = 0;
     }
     break;
-
+    
+  case ACTID_TOGGLE_TVMODE:
+    gui_toggle_tvmode();
+    break;
+      
   default:
     break;
   }

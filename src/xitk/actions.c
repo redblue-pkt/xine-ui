@@ -520,3 +520,13 @@ void gui_reset_zoom(void) {
 			  gGui->panel_window, gGui->video_window);
   }
 }
+
+/* 
+ * Toggle TV Modes on the dxr3
+ */
+void gui_toggle_tvmode(void) {
+
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_TVMODE,
+  				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO));
+  				 
+}
