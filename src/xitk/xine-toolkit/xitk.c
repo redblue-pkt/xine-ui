@@ -1532,6 +1532,7 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   struct sigaction  action;
   fd_set            r;
   int               completion;
+  Bool              got_event;
   __gfx_t          *fx;
 
   action.sa_handler = xitk_signal_handler;
@@ -1652,10 +1653,19 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
     FD_SET(ConnectionNumber(gXitk->display), &r);
     select(ConnectionNumber(gXitk->display) + 1, &r, 0, 0, NULL);
     
-    while((XCheckIfEvent(gXitk->display, &myevent, 
-			 is_not_completion, (XPointer)completion)) == True) { 
+    XLOCK(gXitk->display);
+    got_event = XCheckIfEvent(gXitk->display, &myevent, is_not_completion, (XPointer)completion);
+    XUNLOCK(gXitk->display);
+    
+    while(got_event == True) {
+      
       xitk_xevent_notify(&myevent);
-    } 
+      
+      XLOCK(gXitk->display);
+      got_event = XCheckIfEvent(gXitk->display, &myevent, is_not_completion, (XPointer)completion);
+      XUNLOCK(gXitk->display);
+    }
+    
     
 #endif
     
