@@ -625,11 +625,15 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
 	if(gGui->mmk.ident)
 	  free(gGui->mmk.ident);
-	if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
-	  free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	if(gGui->playlist.mmk != NULL && 
+	   gGui->playlist.mmk[gGui->playlist.cur] != NULL ) {
+
+	  if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
+	    free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
 	
+	  gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
+	}
 	gGui->mmk.ident = strdup(uevent->str);
-	gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
 	
 	playlist_mrlident_toggle();
 	panel_update_mrl_display();
