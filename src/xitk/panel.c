@@ -332,14 +332,16 @@ static void *slider_loop(void *dummy) {
 	    
 	    if(!(i % 20)) {
 	      panel_update_channel_display();
+	      
+	      if(gGui->mixer.caps & MIXER_CAP_VOL) { 
+		gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
+		xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
+		panel_check_mute();
+	      }
+	      
 	      i = 0;
 	    }
 	    
-	    if(gGui->mixer.caps & MIXER_CAP_VOL) { 
-	      gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-	      xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
-	      panel_check_mute();
-	    }
 	  }
 	  
 	  if(stream_infos_is_visible() && gGui->stream_info_auto_update)
@@ -432,6 +434,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
       else {
 	panel->visible = 0;
 	XUnmapWindow (gGui->display, gGui->panel_window);
+	XSync(gGui->display, False);
 	xitk_hide_widgets(panel->widget_list);
       }
     }
