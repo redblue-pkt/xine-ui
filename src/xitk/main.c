@@ -77,13 +77,14 @@ static const char *short_options = "?hS4"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::";
+ "u:a:V:I:A:p::";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
   {"spdif"          , no_argument      , 0, 'S' },
   {"4-channel"      , no_argument      , 0, '4' },
   {"audio-channel"  , required_argument, 0, 'a' },
   {"video-driver"   , required_argument, 0, 'V' },
+  {"video-id"       , required_argument, 0, 'I' },
   {"audio-driver"   , required_argument, 0, 'A' },
   {"spu-channel"    , required_argument, 0, 'u' },
   {"auto-play"      , optional_argument, 0, 'p' },
@@ -116,10 +117,11 @@ void show_usage (void) {
   printf("Usage: %s [OPTIONS]... [MRL]\n", PACKAGE);
   printf("\n");
   printf("OPTIONS are:\n");
-  printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
+ printf("  -V, --video-driver <drv>     Select video driver by name.\n\t\t\t\teg: xineplug_vo_out_xv.so\n");
+ printf("  -I, --video-id <drv>     Select video driver by ident.\n\t\t\t\teg: X11_XV\n");
+/*    printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
-/*  printf("  -V, --video-driver <drv>     Select video driver (%s).\n", vo_get_available_drivers());
-  printf("  -A, --audio-driver <drv>     Select audio driver (%s).\n", ao_get_available_drivers());*/
+  printf("  -A, --audio-driver <drv>     Select audio driver (%s).\n", ao_get_available_drivers());
   printf("  -S, --spdif                  enable AC3 output via SPDIF Port.\n");
   printf("  -4, --4-channel              enable 4-channel surround audio.\n");
   printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
@@ -140,6 +142,7 @@ void show_usage (void) {
 #ifdef DEBUG
   printf("  -d, --debug <flags>          Debug mode for <flags> ('help' for list).\n");
 #endif
+*/
   printf("\n");
   printf("examples for valid MRLs (media resource locator):\n");
   printf("  File:  'path/foo.vob'\n");
@@ -323,12 +326,24 @@ int main(int argc, char *argv[]) {
       }
       break;
 
-    case 'V': /* select video driver */
+    case 'V': /* select video driver by plugin name */
       if(optarg != NULL) {
 	video_driver_name = malloc (strlen (optarg) + 1);
 	strncpy (video_driver_name, optarg, strlen (optarg));
+	printf("video_driver_name = '%s'\n", video_driver_name);
       } else {
 	fprintf (stderr, "video driver name required for -V option\n");
+	exit (1);
+      }
+      break;
+
+    case 'I': /* select video driver by identifier */
+      if(optarg != NULL) {
+	video_driver_id = malloc (strlen (optarg) + 1);
+	strncpy (video_driver_id, optarg, strlen (optarg));
+	printf("video_driver_id = '%s'\n", video_driver_id);
+      } else {
+	fprintf (stderr, "video driver id required for -I option\n");
 	exit (1);
       }
       break;
