@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XINE 1.0\n"
-"POT-Creation-Date: 2002-03-10 23:44+0100\n"
+"POT-Creation-Date: 2002-03-17 15:08+0100\n"
 "PO-Revision-Date: 2002-02-19 22:56+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"

@@ -1,12 +1,12 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Free Software Foundation, Inc.
+# Polish xitk translation file.
+# Copyright (C) 2002 Free Software Foundation, Inc.
 # Bart³omiej Muryn <_4ever_@irc.pl>, 2002.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-03-10 23:44+0100\n"
+"POT-Creation-Date: 2002-03-17 15:08+0100\n"
 "PO-Revision-Date: 2002-02-06 08:00+0100\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -53,7 +53,7 @@ msgid ""
 "New entries selected in combo box is:\n"
 "%s [%d]."
 msgstr ""
-"Nowy wpis wybrany w combo-box'ie to:\n"
+"Nowy wybór w polu wyboru to:\n"
 "%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:753
@@ -62,7 +62,7 @@ msgstr "init_test() zawiód³\n"
 
 #: src/xitk/xine-toolkit/test.c:769
 msgid "My Fucking Window"
-msgstr "Moje Pieprzone Okno"
+msgstr "Moje Okno"
 
 #: src/xitk/xine-toolkit/test.c:787
 msgid "Quit"
@@ -98,4 +98,4 @@ msgstr "Odtwarzaj wybrany wpis"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:926
 msgid "Close MRL browser window"
-msgstr "Zamknij okno wyszukiwarki MRL"
+msgstr "Zamknij okno przegladarki MRL"

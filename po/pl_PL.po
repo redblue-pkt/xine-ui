@@ -1,12 +1,12 @@
-# xine-ui Polish translation file.
-# Copyright (C) YEAR Free Software Foundation, Inc.
+# Polish xine-ui translation file.
+# Copyright (C) 2002 Free Software Foundation, Inc.
 # Bart³omiej Muryn <_4ever_@irc.pl>, 2002.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-03-10 16:02+0100\n"
+"POT-Creation-Date: 2002-03-17 15:08+0100\n"
 "PO-Revision-Date: 2002-03-05 01:00+ZONE\n"
 "Last-Translator: Bart³omiej MURYN <forever@klub.chip.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -25,15 +25,15 @@ msgstr "xine-playlist: nie mogê znale¼æ obrazu t³a\n"
 
 #: src/xitk/control.c:541
 msgid "Control HUE value"
-msgstr "Kontrolka NATÊ¯ENIA koloru"
+msgstr "Ustawianie ODCIENIA"
 
 #: src/xitk/control.c:544
 msgid "Hue"
-msgstr "Kol"
+msgstr "Odc"
 
 #: src/xitk/control.c:565
 msgid "Control SATURATION value"
-msgstr "Kontrolka NASYCENIA obrazu"
+msgstr "Ustawianie NASYCENIA"
 
 #: src/xitk/control.c:568
 msgid "Sat"
@@ -41,7 +41,7 @@ msgstr "Nas"
 
 #: src/xitk/control.c:589
 msgid "Control BRIGHTNESS value"
-msgstr "Kontrolka JASNO¦CI obrazu"
+msgstr "Ustawianie JASNOSCI"
 
 #: src/xitk/control.c:592
 msgid "Brt"
@@ -49,7 +49,7 @@ msgstr "Jas"
 
 #: src/xitk/control.c:613
 msgid "Control CONTRAST value"
-msgstr "Kontrola KONTRASTU"
+msgstr "Ustawianie KONTRASTU"
 
 #: src/xitk/control.c:616
 msgid "Ctr"
@@ -57,7 +57,7 @@ msgstr "Kon"
 
 #: src/xitk/control.c:652
 msgid "Choose a Skin"
-msgstr "Wybierz Styl GUI"
+msgstr "Wybierz Skore"
 
 #: src/xitk/control.c:689 src/xitk/mrl_browser.c:216 src/xitk/playlist.c:868
 msgid "Dismiss"
@@ -65,7 +65,7 @@ msgstr "Anuluj"
 
 #: src/xitk/control.c:695
 msgid "Close control window"
-msgstr "Zamknij okino kontrolek"
+msgstr "Zamknij panel kontrolny"
 
 #: src/xitk/event.c:692
 #, c-format
@@ -117,7 +117,7 @@ msgstr "Nie mogê zainicjowaæ Imlib\n"
 
 #: src/xitk/file_browser.c:182
 msgid "Xine File Browser"
-msgstr "Mened¿er plików xine"
+msgstr "Przegladarka plikow xine"
 
 #: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:209
 msgid "Select"
@@ -126,7 +126,7 @@ msgstr "Wybierz"
 #: src/xitk/kbindings.c:311
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
-msgstr "Skróty klawiaturowe '%s' i '%s' s± podobne.\n"
+msgstr "Skróty klawiaturowe '%s' i '%s' s± identyczne.\n"
 
 #: src/xitk/kbindings.c:667
 msgid "OOCH: key binding table is NULL.\n"
@@ -360,15 +360,15 @@ msgstr "b³êdny argument %d => exit\n"
 
 #: src/xitk/mrl_browser.c:198
 msgid "Xine MRL Browser"
-msgstr "Wyszukiwarka MRL xine"
+msgstr "Przegladarka MRL xine"
 
 #: src/xitk/mrl_browser.c:225
 msgid "Source:"
-msgstr "¬ród³o:"
+msgstr "Zrodlo:"
 
 #: src/xitk/panel.c:516
 msgid "Volume control"
-msgstr "Kontrola g³o¶no¶ci"
+msgstr "Kontrola glosnosci"
 
 #: src/xitk/panel.c:518
 msgid "Mute toggle"
@@ -392,19 +392,19 @@ msgstr "Pauza"
 
 #: src/xitk/panel.c:719
 msgid "Play next entry from playlist"
-msgstr "Odtwarzaj nastêpny wpis z listy"
+msgstr "Odtwarzaj nastepny wpis z listy"
 
 #: src/xitk/panel.c:726
 msgid "Eject current medium"
-msgstr "Wysuñ no¶nik"
+msgstr "Wysun nosnik"
 
 #: src/xitk/panel.c:733
 msgid "Quit"
-msgstr "Zakoñcz"
+msgstr "Zakoncz"
 
 #: src/xitk/panel.c:740
 msgid "Setup window"
-msgstr "Okno ustawieñ"
+msgstr "Okno ustawien"
 
 #: src/xitk/panel.c:747
 msgid "Hide GUI"
@@ -412,23 +412,23 @@ msgstr "Ukryj GUI"
 
 #: src/xitk/panel.c:754
 msgid "Fullscreen/Window mode"
-msgstr "Tryb pe³noekranowy/okienkowy"
+msgstr "Tryb pelnoekranowy/okienkowy"
 
 #: src/xitk/panel.c:761
 msgid "Next audio channel"
-msgstr "Nastêpny kana³ d¼wiêku"
+msgstr "Nastepny kanal dzwieku"
 
 #: src/xitk/panel.c:768
 msgid "Previous audio channel"
-msgstr "Poprzedni kana³ dzwiêku"
+msgstr "Poprzedni kanal dzwieku"
 
 #: src/xitk/panel.c:775
 msgid "Next SPU channel"
-msgstr "Nastêpny kana³ napisów"
+msgstr "Nastepny kanal napisow"
 
 #: src/xitk/panel.c:782
 msgid "Previous SPU channel"
-msgstr "Poprzedni kana³ napisów"
+msgstr "Poprzedni kanal napisow"
 
 #: src/xitk/panel.c:819
 msgid "Stream playback position slider"
@@ -436,7 +436,7 @@ msgstr "suwak pozycji odtwarzania strumienia"
 
 #: src/xitk/panel.c:847
 msgid "Take a snapshot"
-msgstr "Zdjêcie"
+msgstr "Zdjecie"
 
 #: src/xitk/panel.c:854
 msgid "Slow motion"
@@ -452,24 +452,24 @@ msgstr "Lista odtwarzania"
 
 #: src/xitk/panel.c:875
 msgid "Control"
-msgstr "Kontrola wy¶wietlania"
+msgstr "Kontrola wyswietlania"
 
 #: src/xitk/panel.c:882
 msgid "MRL Browser"
-msgstr "Wyszukiwarka MRL"
+msgstr "Przegladarka MRL"
 
 #: src/xitk/playlist.c:352 src/xitk/playlist.c:409
 #, c-format
 msgid "Can't read %s: %s\n"
-msgstr "Nie mogê odczytaæ %s: %s\n"
+msgstr "Nie moge odczytac %s: %s\n"
 
 #: src/xitk/playlist.c:804
 msgid "Move up selected MRL"
-msgstr "Przesuñ do góry wybrany MRL"
+msgstr "Przesun do gory wybrany MRL"
 
 #: src/xitk/playlist.c:812
 msgid "Move down selected MRL"
-msgstr "Przesuñ w dó³ wybrany MRL"
+msgstr "Przesun w dol wybrany MRL"
 
 #: src/xitk/playlist.c:819
 msgid "Start playback of selected MRL"
@@ -489,15 +489,15 @@ msgstr "Dodaj"
 
 #: src/xitk/playlist.c:843
 msgid "Add one or more entries in playlist"
-msgstr "Dodaj jeden lub wiêcej wpisów do listy"
+msgstr "Dodaj jeden lub wiecej wpisow do listy"
 
 #: src/xitk/playlist.c:848
 msgid "Load"
-msgstr "Za³aduj"
+msgstr "Zaladuj"
 
 #: src/xitk/playlist.c:854
 msgid "Load saved playlist"
-msgstr "Za³aduj zapisan± listê"
+msgstr "Zaladuj zapisan± listê"
 
 #: src/xitk/playlist.c:858
 msgid "Save"
@@ -505,7 +505,7 @@ msgstr "Zapisz"
 
 #: src/xitk/playlist.c:864
 msgid "Save playlist"
-msgstr "Zapisz listê"
+msgstr "Zapisz liste"
 
 #: src/xitk/playlist.c:874
 msgid "Close playlist window"
@@ -517,7 +517,7 @@ msgstr "Szukaj:"
 
 #: src/xitk/playlist.c:903
 msgid "Direct MRL entry"
-msgstr "Bezpo¶redni wpis MRL"
+msgstr "Bezposredni wpis MRL"
 
 #: src/xitk/setup.c:954
 msgid "Help"
@@ -537,7 +537,7 @@ msgstr "ustawienia xine"
 
 #: src/xitk/setup.c:1168 src/xitk/viewlog.c:519
 msgid "Close"
-msgstr "Zakoñcz"
+msgstr "Zakoncz"
 
 #: src/xitk/skins.c:228
 #, c-format
@@ -552,7 +552,7 @@ msgstr "Nie uda³o siê za³adowaæ %s, b³êdna wersja. Wracam do skóry '%s'.\n"
 #: src/xitk/skins.c:286 src/xitk/skins.c:325
 #, c-format
 msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
-msgstr "Och, skóra '%s' nie znaleziona, wracam do '%s'.\n"
+msgstr "Ojej, skóra '%s' nie znaleziona, wracam do '%s'.\n"
 
 #: src/xitk/skins.c:313
 msgid "No available skin found. Say goodbye.\n"
@@ -561,7 +561,8 @@ msgstr "Nie znalaz³em ¿adnej dostêpnej skóry. Powiedz dowidzenia\n"
 #: src/xitk/skins.c:329
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
 msgstr ""
-"Nie uda³o siê wróciæ do skóry. Sprawd¼ zainstalowane skóry. Wychodzê.\n"
+"Nie uda³o siê za³adowaæ poprzedniej skóry. Sprawd¼ zainstalowane skóry. "
+"Wychodzê.\n"
 
 #: src/xitk/skins.c:338
 #, c-format
@@ -571,7 +572,8 @@ msgstr "Nie uda³o siê za³adowaæ %s/%s. Wychodzê.\n"
 #: src/xitk/skins.c:347
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
-msgstr "Nie uda³o siê za³adowaæ skóry %s, z³a wesja. Wracam do skóry '%s'.\n"
+msgstr ""
+"Nie uda³o siê za³adowaæ skóry %s, B³êdna wersja. Wracam do skóry '%s'.\n"
 
 #: src/xitk/snapshot.c:943
 #, c-format
@@ -599,4 +601,4 @@ msgstr "podgl±d logów xine"
 
 #: src/xitk/viewlog.c:505
 msgid "Refresh"
-msgstr "Od¶wie¿"
+msgstr "Odswiez"
