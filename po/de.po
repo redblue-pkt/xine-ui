@@ -5,12 +5,12 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-02-06 00:16+0100\n"
+"POT-Creation-Date: 2002-02-07 01:19+0100\n"
 "PO-Revision-Date: 2002-01-17 00:20+ZONE\n"
 "Last-Translator: Jens Gutzeit <jens.gutzeit@web.de>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/xitk/control.c:336
@@ -152,13 +152,17 @@ msgstr "  -v, --version                Zeigt die Version an.\n"
 msgid ""
 "  -V, --video-driver <drv>     Select video driver by id. Available "
 "drivers: \n"
-msgstr "  -V, --video-driver <drv>     Auswahl des Video Treiber nach id. Verfügbar: \n"
+msgstr ""
+"  -V, --video-driver <drv>     Auswahl des Video Treiber nach id. "
+"Verfügbar: \n"
 
 #: src/xitk/main.c:171
 msgid ""
 "  -A, --audio-driver <drv>     Select audio driver by id. Available "
 "drivers: \n"
-msgstr "  -A, --audio-driver <dvr>     Auswahl des Audio Treibers nach id. Verfügbar: \n"
+msgstr ""
+"  -A, --audio-driver <dvr>     Auswahl des Audio Treibers nach id. "
+"Verfügbar: \n"
 
 #: src/xitk/main.c:181
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
@@ -559,7 +563,8 @@ msgstr "Keinen verfügbaren Skin gefunden. Tschüss.\n"
 
 #: src/xitk/skins.c:329
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
-msgstr "Kann sicheren Skin nicht laden. Bitte prüfen Sie Ihre installierten Skins.\n"
+msgstr ""
+"Kann sicheren Skin nicht laden. Bitte prüfen Sie Ihre installierten Skins.\n"
 
 #: src/xitk/skins.c:338
 #, c-format
@@ -589,7 +594,8 @@ msgstr "Log Information"
 #: src/xitk/viewlog.c:357
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
-msgstr "Es ist kein Log Eintrag für die zu protokolierende Sektion '%s' vorhanden.\n"
+msgstr ""
+"Es ist kein Log Eintrag für die zu protokolierende Sektion '%s' vorhanden.\n"
 
 #: src/xitk/viewlog.c:455
 msgid "xine log viewer"
