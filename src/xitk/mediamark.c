@@ -316,22 +316,24 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 		  
 		  if(entries_pls) {
 		    int   entry;
-		    char  buffer[2048];
 		    
-		    memset(buffer, 0, sizeof(buffer));
-		    
-		    if((sscanf(ln, "File%d=%s", &entry, &buffer[0])) == 2) {
+		    if((sscanf(ln, "File%d=", &entry)) == 1) {
+		      char *mrl = strchr(ln, '=');
+
+		      if(mrl)
+			mrl++;
 		      
-		      if((entry) && 
+		      if((entry && mrl) && 
 			 ((entry) <= entries_pls) && 
 			 (mmk && (!mmk[(entry - 1)])))
-			mediamark_store_mmk(&mmk[(entry - 1)], buffer, NULL, NULL, 0, -1, 0, 0);
+			mediamark_store_mmk(&mmk[(entry - 1)], mrl, NULL, NULL, 0, -1, 0, 0);
 		      
 		    }
 		    
 		  }
 		  else {
 		    if((sscanf(ln, "NumberOfEntries=%d", &entries_pls)) == 1) {
+
 		      if(entries_pls) {
 			playlist->entries = entries_pls;
 			mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * (entries_pls + 1));
@@ -523,35 +525,55 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 		if(valid_sfv) {
 		  
 		  if(strncmp(ln, ";", 1)) {
-		    char  mentry[_PATH_MAX + _NAME_MAX + 1];
-		    char  buffer[_PATH_MAX + _NAME_MAX + 1];
-		    char *entry;
-		    int   crc;
-		    
-		    if((sscanf(ln, "%s %x", &mentry[0], &crc)) == 2) {
+		    char            buffer[_PATH_MAX + _NAME_MAX + 1];
+		    char           *entry;
+		    long long int   crc = 0;
+		    char           *p;
+
+		    p = ln + strlen(ln) - 1;
+		    if(p) {
+
+		      while(p && (p > ln) && (*p != ' '))
+			p--;
 		      
-		      if(entries_sfv == 0)
-			mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-		      else
-			mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_sfv + 2));
-		      
-		      entry = mentry;
-		      
-		      if(origin) {
-			memset(&buffer, 0, sizeof(buffer));
-			sprintf(buffer, "%s", origin);
-			
-			if((buffer[strlen(buffer) - 1] == '/') && (mentry[0] == '/'))
-			  buffer[strlen(buffer) - 1] = '\0';
-			
-			sprintf(buffer, "%s%s", buffer, mentry);
-			
-			if(_file_exist(buffer))
-			  entry = buffer;
+		      if(p > ln) {
+			*p = '\0';
+			p++;
 		      }
 
-		      mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, NULL, 0, -1, 0, 0);
-		      playlist->entries = ++entries_sfv;
+		      if(p && strlen(p)) {
+			crc = strtoll(p, &p, 16);
+
+			if((errno == ERANGE) || (errno == EINVAL))
+			  crc = 0;
+
+		      }
+
+		      if(ln && (crc > 0)) {
+			
+			if(entries_sfv == 0)
+			  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
+			else
+			  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_sfv + 2));
+			
+			entry = ln;
+			
+			if(origin) {
+			  memset(&buffer, 0, sizeof(buffer));
+			  sprintf(buffer, "%s", origin);
+			  
+			  if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
+			    buffer[strlen(buffer) - 1] = '\0';
+			  
+			  sprintf(buffer, "%s%s", buffer, ln);
+			  
+			  if(_file_exist(buffer))
+			    entry = buffer;
+			}
+			
+			mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, NULL, 0, -1, 0, 0);
+			playlist->entries = ++entries_sfv;
+		      }
 		    }
 		  }
 		}
