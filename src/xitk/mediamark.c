@@ -771,10 +771,10 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
       }
       
       xml_parser_free_tree(xml_tree);
+ __failure:
       free(asx_content);
     }
   }
- __failure:
   
   return NULL;
 }
