@@ -140,7 +140,7 @@ dnl Checks for Xinerama extension
 dnl
 
 AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
-             X_LIBS="$X_LIBS -lXinerama"
+             X_PRE_LIBS="$X_PRE_LIBS -lXinerama"
              AC_DEFINE(HAVE_XINERAMA)
              ac_have_xinerama="yes",,
              $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
@@ -167,38 +167,61 @@ if test x"$png_prefix" != "x"; then
     CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
 fi
 
+dnl
+dnl First, add -L and -R options for png and X11 to LDFLAGS.
+dnl LDFLAGS are passed to the compiler before LIBS; this is important for
+dnl some non-gcc compilers, which need a -L{dir} option before a -l{lib}
+dnl to see the library we are looking for in directory "dir"
+dnl
+dnl BTW: Do we really need the X11 library path ($X_LIBS) for a libpng check?
+dnl
+old_LDFLAGS="$LDFLAGS"
+LDFLAGS="$X_LIBS $PNG_LIB $LDFLAGS"
+
+
+dnl
+dnl Look for a -lpng library, that provides a png_read_info routine
+dnl If we find such a library,  check that the png.h header is available, too.
+dnl
 AC_CHECK_LIB(png, png_read_info,
   AC_CHECK_HEADER(png.h, png_ok=yes, png_ok=no),
-  AC_MSG_ERROR(*** libpng is needed (PNG library not found) - try to use --with-png-prefix option ***), $PNG_LIB -lz -lm -L$x_libraries)
+  AC_MSG_ERROR(*** libpng is needed (PNG library not found) - try to use --with-png-prefix option ***), -lz -lm)
 
 if test x"$png_prefix" != "x"; then
     CPPFLAGS="$old_CPPFLAGS"
 fi
+LDFLAGS="$old_LDFLAGS"
 
 if test x"$png_ok" = xyes; then
+
+    dnl OK, -lpng library and <png.h> header found.
+    dnl Check if this png is an old png version.
+
     saved_CFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS $PNG_CFLAGS"
-  AC_MSG_CHECKING([for png_structp in png.h])
-  AC_TRY_COMPILE([#include <png.h>],
-    [
-png_structp pp; 
-png_infop info; 
-png_colorp cmap; 
-png_create_read_struct; 
-png_set_IHDR;
-    ], png_ok=yes, png_ok=no)
-  AC_MSG_RESULT($png_ok)
-  if test x"$png_ok" = xno; then
-    AC_MSG_ERROR(*** libpng is needed (PNG library is too old) ***)
-  fi
+
+    AC_MSG_CHECKING([for png_structp in png.h])
+    AC_TRY_COMPILE([#include <png.h>],
+	[
+	png_structp pp; 
+	png_infop info; 
+	png_colorp cmap; 
+	png_create_read_struct; 
+	png_set_IHDR;
+	], png_ok=yes, png_ok=no)
+
+    AC_MSG_RESULT($png_ok)
+    if test x"$png_ok" = xno; then
+    	AC_MSG_ERROR(*** libpng is needed (PNG library is too old) ***)
+    fi
+    CFLAGS="$saved_CFLAGS"
 else
-  AC_MSG_ERROR(*** libpng is needed (PNG header file not found) - try to use --with-png-prefix option ***)
+    AC_MSG_ERROR(*** libpng is needed (PNG header file not found) - try to use --with-png-prefix option ***)
 fi
 
-CFLAGS="$saved_CFLAGS"
 
 if test x"$png_ok" = xyes; then
-    X_LIBS="$X_LIBS $PNG_LIB -lpng -lz"
+    X_PRE_LIBS="$X_PRE_LIBS $PNG_LIB -lpng -lz -lm"
     X_CFLAGS="$X_CFLAGS $PNG_CFLAGS"
 fi
 
