@@ -123,15 +123,23 @@ static void menu_playlist_ctrl(xitk_widget_t *w, void *data) {
   case PLAYL_NO_LOOP:
     gGui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
     osd_display_info(_("Playlist: no loop."));
+    break;
+
   case PLAYL_LOOP:
     gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
     osd_display_info(_("Playlist: loop."));
+    break;
+
   case PLAYL_REPEAT:
     gGui->playlist.loop = PLAYLIST_LOOP_REPEAT;
     osd_display_info(_("Playlist: entry repeat."));
+    break;
+
   case PLAYL_SHUFFLE:
     gGui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
     osd_display_info(_("Playlist: shuffle."));
+    break;
+
   case PLAYL_SHUF_PLUS:
     gGui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
     osd_display_info(_("Playlist: shuffle forever."));
@@ -255,15 +263,15 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Playlist/Loop modes",            "<branch>",
       NULL,                                                              NULL                   },
 
-    { "Playlist/Loop modes/Disabled",   NULL,
+    { "Playlist/Loop modes/Disabled",   (gGui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) ? "<checked>" : "<check>",
       menu_playlist_ctrl,                                                (void *) PLAYL_NO_LOOP },
-    { "Playlist/Loop modes/Loop",   NULL,
+    { "Playlist/Loop modes/Loop",   (gGui->playlist.loop == PLAYLIST_LOOP_LOOP) ? "<checked>" : "<check>",
       menu_playlist_ctrl,                                                (void *) PLAYL_LOOP },
-    { "Playlist/Loop modes/Repeat Selection",   NULL,
+    { "Playlist/Loop modes/Repeat Selection",   (gGui->playlist.loop == PLAYLIST_LOOP_REPEAT) ? "<checked>" : "<check>",
       menu_playlist_ctrl,                                                (void *) PLAYL_REPEAT },
-    { "Playlist/Loop modes/Shuffle",   NULL,
+    { "Playlist/Loop modes/Shuffle",   (gGui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) ? "<checked>" : "<check>",
       menu_playlist_ctrl,                                                (void *) PLAYL_SHUFFLE },
-    { "Playlist/Loop modes/Non-stop Shuffle",   NULL,
+    { "Playlist/Loop modes/Non-stop Shuffle",   (gGui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS) ? "<checked>" : "<check>",
       menu_playlist_ctrl,                                                (void *) PLAYL_SHUF_PLUS },
     { "Playlist/SEP",                   "<separator>",
       NULL,                                                              NULL                   },
