@@ -84,7 +84,7 @@ typedef struct {
 } playlist_t;
 
 typedef mediamark_t **(*playlist_guess_func_t)(playlist_t *, const char *);
-typedef mediamark_t **(*playlist_xml_guess_func_t)(playlist_t *, char *xml_content, xml_node_t *);
+typedef mediamark_t **(*playlist_xml_guess_func_t)(playlist_t *, const char *, char *xml_content, xml_node_t *);
 
 static char *_download_file(const char *filename, int *size) {
   download_t  *download;
@@ -138,10 +138,11 @@ static char *_read_file(const char *filename, int *size) {
   
   extension = strrchr(filename, '.');
   if(extension && 
-     ((!strncasecmp(extension, ".pls", 4)) || (!strncasecmp(extension, ".m3u", 4)) || 
-      (!strncasecmp(extension, ".sfv", 4)) || (!strncasecmp(extension, ".tox", 4)) ||
-      (!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".smi", 4)) || 
-      (!strncasecmp(extension, ".smil", 5)) || (!strncasecmp(extension, ".xml", 4))) &&
+     ((!strncasecmp(extension, ".pls", 4)) || (!strncasecmp(extension, ".m3u", 4))  || 
+      (!strncasecmp(extension, ".sfv", 4)) || (!strncasecmp(extension, ".tox", 4))  ||
+      (!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".smi", 4))  || 
+      (!strncasecmp(extension, ".smil", 5)) || (!strncasecmp(extension, ".xml", 4)) ||
+      (!strncasecmp(extension, ".fxd", 4))) &&
      is_downloadable((char *) filename)) 
     return _download_file(filename, size);
   
@@ -1007,7 +1008,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 /*
  * XML based playlists
  */
-static mediamark_t **xml_asx_playlist(playlist_t *playlist, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -1242,7 +1243,7 @@ static void __gx_get_entries(playlist_t *playlist, mediamark_t ***mmk, int *entr
     node = node->next;
   }
 }
-static mediamark_t **xml_gx_playlist(playlist_t *playlist, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_gx_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -1295,7 +1296,7 @@ static mediamark_t **xml_gx_playlist(playlist_t *playlist, char *xml_content, xm
   return NULL;
 }
 
-static mediamark_t **xml_noatun_playlist(playlist_t *playlist, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_noatun_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -2191,7 +2192,7 @@ static void smil_free_smil(smil_t *smil) {
   SAFE_FREE(smil->base);
 }
 
-static mediamark_t **xml_smil_playlist(playlist_t *playlist, char *xml_content, xml_node_t *xml_tree) {
+static mediamark_t **xml_smil_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
   if(xml_tree) {
@@ -2339,6 +2340,114 @@ static mediamark_t **xml_smil_playlist(playlist_t *playlist, char *xml_content, 
  * ********************************** SMIL END ***********************************
  */
 
+static mediamark_t **xml_freevo_playlist(playlist_t *playlist, const char *filename, char *xml_content, xml_node_t *xml_tree) {
+  mediamark_t **mmk = NULL;
+
+  if(xml_tree) {
+    xml_node_t      *fvo_entry;
+    xml_property_t  *fvo_prop;
+    int              entries_fvo = 0;
+
+    if(!strcasecmp(xml_tree->name, "FREEVO")) {
+      char *url    = NULL;
+      char *sub    = NULL;
+      char *title  = NULL;
+      char *path;
+      char *origin = NULL;
+      
+      path = strrchr(filename, '/');
+      if(path && (path > filename)) {
+	origin = (char *) xine_xmalloc((path - filename) + 2);
+	strncat(origin, filename, (path - filename));
+	strcat(origin, "/");
+      }
+	  
+      fvo_entry = xml_tree->child;
+      
+      while(fvo_entry) {
+	if(!strcasecmp(fvo_entry->name, "MOVIE")) {
+	  xml_node_t *sentry;
+	  
+	  for(fvo_prop = fvo_entry->props; fvo_prop; fvo_prop = fvo_prop->next) {
+	    if(!strcasecmp(fvo_prop->name, "TITLE")) {
+	      title = fvo_prop->value;
+	    }
+	  }
+	  
+	  sentry = fvo_entry->child;
+	  while(sentry) {
+	    
+	    if((!strcasecmp(sentry->name, "VIDEO")) || (!strcasecmp(sentry->name, "AUDIO"))) {
+	      xml_node_t *ssentry = sentry->child;
+	      
+	      while(ssentry) {
+		
+		if(!strcasecmp(ssentry->name, "SUBTITLE")) {
+		  sub = ssentry->data;
+		}
+		else if((!strcasecmp(ssentry->name, "URL")) || 
+			(!strcasecmp(ssentry->name, "DVD")) || (!strcasecmp(ssentry->name, "VCD"))) {
+		  url = strdup(ssentry->data);
+		}
+		else if(!strcasecmp(ssentry->name, "FILE")) {
+
+		  if(origin) {
+		    url = (char *) xine_xmalloc(strlen(origin) + strlen(ssentry->data) + 2);
+		    strcat(url, origin);
+		    
+		    if((url[strlen(url) - 1] == '/') && (*ssentry->data == '/'))
+		      url[strlen(url) - 1] = '\0';
+		    
+		    strcat(url, ssentry->data);
+		    
+		  }
+		  else
+		    url = strdup(ssentry->data);
+
+		}
+
+		ssentry = ssentry->next;
+	      }
+
+	    }
+	    
+	    sentry = sentry->next;
+	  }
+	  
+	}
+
+	if(url) {
+
+	  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_fvo + 2));
+	  
+	  mediamark_store_mmk(&mmk[entries_fvo], url, title, sub, 0, -1, 0, 0);
+	  playlist->entries = ++entries_fvo;
+
+	  free(url);
+	  url = NULL;
+	}
+
+	title = NULL;
+	sub   = NULL;
+	
+	fvo_entry = fvo_entry->next;
+      }
+    }
+#ifdef DEBUG
+    else
+      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+#endif    
+    
+    if(entries_fvo) {
+      mmk[entries_fvo] = NULL;
+      playlist->type = strdup("FREEVO");
+      return mmk;
+    }
+  }
+
+  return NULL;
+}
+
 static mediamark_t **guess_xml_based_playlist(playlist_t *playlist, const char *filename) {
   mediamark_t **mmk = NULL;
 
@@ -2355,6 +2464,7 @@ static mediamark_t **guess_xml_based_playlist(playlist_t *playlist, const char *
 	xml_gx_playlist,
 	xml_noatun_playlist,
 	xml_smil_playlist,
+	xml_freevo_playlist,
 	NULL
       };
 
@@ -2366,7 +2476,7 @@ static mediamark_t **guess_xml_based_playlist(playlist_t *playlist, const char *
 
       /* Check all playlists */
       for(i = 0; guess_functions[i]; i++) {
-	if((mmk = guess_functions[i](playlist, xml_content, xml_tree)))
+	if((mmk = guess_functions[i](playlist, filename, xml_content, xml_tree)))
 	  break;
       }
       
@@ -2771,7 +2881,8 @@ int mrl_look_like_playlist(char *mrl) {
       (!strncasecmp(extension, ".m3u", 4))  ||
       (!strncasecmp(extension, ".sfv", 4))  ||
       (!strncasecmp(extension, ".xml", 4))  ||
-      (!strncasecmp(extension, ".tox", 4)))) {
+      (!strncasecmp(extension, ".tox", 4))  ||
+      (!strncasecmp(extension, ".fxd", 4)))) {
     return 1;
   }
   
@@ -2816,7 +2927,7 @@ void mediamark_collect_from_directory(char *filepathname) {
 	if((extension = strrchr(fullpathname, '.')) && (strlen(extension) > 1)) {
 	  char ext[strlen(extension) + 2];
 	  char *valid_endings = 
-	    ".pls .m3u .sfv .tox .asx .smi .smil .xml " /* Playlists */
+	    ".pls .m3u .sfv .tox .asx .smi .smil .xml .fxd " /* Playlists */
 	    ".4xm .ac3 .aif .aiff .asf .wmv .wma .wvx .wax .aud .avi .cin .cpk .cak "
 	    ".film .dv .dif .fli .flc .mjpg .mov .qt .mp4 .mp3 .mp2 .mpa .mpega .mpg .mpeg "
 	    ".mpv .mve .mve .mv8 .nsf .nsv .ogg .ogm .spx .pes .png .png .mng .pva .ra .rm "

@@ -85,7 +85,7 @@ static filebrowser_filter_t __fb_filters[] = {
  /* subtitles */
   { NULL, ".sub .srt .asc .smi .ssa "                                              },
   /* playlists */
-  { NULL, ".pls .m3u .sfv .tox .asx .smil .smi .xml "                              },
+  { NULL, ".pls .m3u .sfv .tox .asx .smil .smi .xml .fxd "                         },
   { "*.4xm", ".4xm "                                                               },
   { "*.ac3", ".ac3 "                                                               },
   { "*.aif, *.aiff,", ".aif .aiff "                                                },
