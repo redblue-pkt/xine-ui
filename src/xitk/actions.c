@@ -325,6 +325,9 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
 void gui_play (xitk_widget_t *w, void *data) {
 
+  if(!gGui->playlist.num)
+    return;
+
   video_window_reset_ssaver();
   
   if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
@@ -334,9 +337,9 @@ void gui_play (xitk_widget_t *w, void *data) {
       gGui->ignore_next = 0; 
     }
   }
-  
-  if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
 
+  if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
+    
     if (!strncmp(gGui->mmk.ident, "xine-ui version", 15)) {
       xine_error (_("No MRL (input stream) specified"));
       return;
@@ -372,7 +375,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
   panel_check_pause();
   panel_update_runtime_display();
 
-  if(is_playback_widgets_enabled() && (!gGui->playlist.num) && (!gGui->mmk.mrl)) {
+  if(is_playback_widgets_enabled() && (!gGui->playlist.num)) {
     gui_set_current_mrl(NULL);
     enable_playback_controls(0);
   }

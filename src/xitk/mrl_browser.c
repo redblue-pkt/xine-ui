@@ -225,7 +225,7 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
 /*
  *
  */
-void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb,
+void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
 		 select_cb_t   sel_cb, xitk_dnd_callback_t dnd_cb) {
   xitk_mrlbrowser_widget_t     mb;
   const char *const           *ip_availables = xine_get_browsable_input_plugin_ids(gGui->xine);
@@ -272,7 +272,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.select.callback                       = add_cb;
 
   mb.play.skin_element_name                = "MrlPlay";
-  mb.play.callback                         = add_and_play_cb;
+  mb.play.callback                         = play_cb;
 
   mb.dismiss.skin_element_name             = "MrlDismiss";
   mb.dismiss.caption                       = _("Dismiss");
@@ -351,24 +351,32 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 /*
  * Callback called by mrlbrowser on play event.
  */
-static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
+static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   if(mrl) {
-    
+
     if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
       gGui->ignore_next = 1;
       xine_stop(gGui->stream);
       gGui->ignore_next = 0;
     }
     
-    gui_dndcallback((char *)mrl->mrl);
-    
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
     
-    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start)) {
-      if((is_playback_widgets_enabled()) && (!gGui->playlist.num))
-	enable_playback_controls(0);
+    if((!xine_open(gGui->stream, (const char *) mrl->mrl)) ||
+       (!xine_play(gGui->stream, 0, 0))) {
+      gui_handle_xine_error(gGui->stream);
+      enable_playback_controls(0);
+    }
+    else {
+      mediamark_t mmk;
+
+      mmk.mrl = mrl->mrl;
+      mmk.ident = NULL;
+      mmk.start = 0;
+      mmk.end = -1;
+      gui_set_current_mrl(&mmk);
     }
   }
 }
@@ -378,7 +386,7 @@ static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
  */
 void open_mrlbrowser(xitk_widget_t *w, void *data) {
   
-  mrl_browser(mrl_add, mrl_add_and_play, mrl_handle_selection, gui_dndcallback);
+  mrl_browser(mrl_add, mrl_play, mrl_handle_selection, gui_dndcallback);
   set_mrl_browser_transient();
   mrl_browser_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 }
