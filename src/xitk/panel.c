@@ -418,7 +418,7 @@ static void *slider_loop(void *dummy) {
       
       if(!(i % 2)) {
 	osd_update();
-
+	
 	if(gGui->mrl_overrided) {
 	  gGui->mrl_overrided--;
 	  if(gGui->mrl_overrided == 0)
@@ -426,60 +426,81 @@ static void *slider_loop(void *dummy) {
 	}
       }
       
-      if(((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) && 
-	 (!xitk_is_window_iconified(gGui->video_display, gGui->video_window))) {
-
-	if(gGui->ssaver_timeout) {
-	  
-	  if(!(i % 2))
-	    screensaver_timer++;
-	  
-	  if(screensaver_timer >= gGui->ssaver_timeout) {
-	    screensaver_timer = 0;
-	    video_window_reset_ssaver();
+      if((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) {
+	char *ident = stream_infos_get_ident_from_stream(gGui->stream);
+	
+	if(ident) {
+	  if(strcmp(gGui->mmk.ident, ident)) {
+	    if(gGui->mmk.ident)
+	      free(gGui->mmk.ident);
+	    if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
+	      free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
 	    
+	    gGui->mmk.ident = strdup(ident);
+	    gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(ident);
+	    
+	    video_window_set_mrl(gGui->mmk.ident);
+	    playlist_mrlident_toggle();
+	    panel_update_mrl_display();
 	  }
-	}  
-
-	if(gGui->logo_mode == 0) {
+	  free(ident);
+	}
+	else
+	  video_window_set_mrl((char *)gGui->mmk.mrl);
+	
+	if(!xitk_is_window_iconified(gGui->video_display, gGui->video_window)) {
 	  
-	  if(panel_is_visible()) {
+	  if(gGui->ssaver_timeout) {
 	    
-	    panel_update_runtime_display();
-
-	    if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
-	      if(pos >= 0)
-		xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+	    if(!(i % 2))
+	      screensaver_timer++;
+	    
+	    if(screensaver_timer >= gGui->ssaver_timeout) {
+	      screensaver_timer = 0;
+	      video_window_reset_ssaver();
+	      
+	    }
+	  }  
+	  
+	  if(gGui->logo_mode == 0) {
+	    
+	    if(panel_is_visible()) {
+	      
+	      panel_update_runtime_display();
+	      
+	      if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+		if(pos >= 0)
+		  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+	      }
+	      
+	      if(!(i % 20)) {
+		int level = 0;
+		
+		panel_update_channel_display();
+		
+		if((gGui->mixer.method == SOUND_CARD_MIXER) &&
+		   (gGui->mixer.caps & MIXER_CAP_VOL)) {
+		  level = gGui->mixer.volume_level = 
+		    xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
+		}
+		else if(gGui->mixer.method == SOFTWARE_MIXER) {
+		  level = gGui->mixer.amp_level = 
+		    xine_get_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL);
+		}
+		
+		xitk_slider_set_pos(panel->mixer.slider, level);
+		panel_check_mute();
+		
+		i = 0;
+	      }
+	      
 	    }
 	    
-	    if(!(i % 20)) {
-	      int level = 0;
-	      
-	      panel_update_channel_display();
-	      
-	      if((gGui->mixer.method == SOUND_CARD_MIXER) &&
-		 (gGui->mixer.caps & MIXER_CAP_VOL)) {
-		level = gGui->mixer.volume_level = 
-		  xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-	      }
-	      else if(gGui->mixer.method == SOFTWARE_MIXER) {
-		level = gGui->mixer.amp_level = 
-		  xine_get_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL);
-	      }
-	      
-	      xitk_slider_set_pos(panel->mixer.slider, level);
-	      panel_check_mute();
-	      
-	      i = 0;
-	    }
-	    
+	    if(stream_infos_is_visible() && gGui->stream_info_auto_update)
+	      stream_infos_update_infos();
 	  }
-	  
-	  if(stream_infos_is_visible() && gGui->stream_info_auto_update)
-	    stream_infos_update_infos();
 	}
       }
-      
     }
     
     if(gGui->cursor_visible) {
