@@ -108,6 +108,7 @@ static struct option long_options[] = {
 void show_banner(void) {
 
   printf("This is xine (X11 gui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
+  printf("Used xine library version %d.%d.%d was built the '%s'\nwith '%s' on '%s'.\n", XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
 }
 /* ------------------------------------------------------------------------- */
 /*

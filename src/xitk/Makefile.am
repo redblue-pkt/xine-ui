@@ -35,6 +35,12 @@ $(GETOPT_C):
 debug:
 	$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
 
+install-debug: debug
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) $@) \
+	done;
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*
 

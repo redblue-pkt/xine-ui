@@ -14,6 +14,10 @@ debug:
 	done;
 	$(MAKE) CFLAGS="$(DEBUG_CFLAGS) @ORBIT_CFLAGS@"
 
+install-debug: debug
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) $@) \
+	done;
 
 prune-cache:
 	-rm -f config.cache

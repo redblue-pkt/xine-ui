@@ -8,6 +8,8 @@ data_DATA = arrowdn.png arrowup.png bg.png close.png eject.png fastb.png \
 	play.png power.png prev.png ptdn.png ptup.png skip.png slider_bg.png \
 	slider_pad.png smallbtn.png stop.png skinconfig
 
+install-debug: install
+
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*
 
