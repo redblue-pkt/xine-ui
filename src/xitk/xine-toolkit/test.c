@@ -259,6 +259,7 @@ static void window_message_cb(xitk_widget_t *w, void *data, int btn) {
  *
  */
 static void change_label(xitk_widget_t *w, void *data) {
+  xitk_window_t *xw;
   static char *labels[] = {
     "A Label",
     "Boom"
@@ -278,8 +279,8 @@ static void change_label(xitk_widget_t *w, void *data) {
   //xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, ALIGN_DEFAULT, "** This program is free software; you can redistribute it and/or modify\n** it under the terms of the GNU General Public License as published by\n** the Free Software Foundation; either version 2 of the License, or\n** (at your option) any later version.");
   // xitk_window_dialog_yesno(test->imlibdata, NULL, NULL, NULL, NULL, ALIGN_LEFT, "Le programme <linux kernel> a provoqué une faute de protection dans le module <unknown> à l'adresse 0x00001234.\nCitroën dump:\nAX:0x00\t\tBX:0x00\nCX:0x00\t\tGS:0x00;-)");
   //  xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, ALIGN_DEFAULT, "**Thisprogramisfreesoftware;youcanredistributeitand/ormodify**itunderthetermsoftheGNUGeneralPublicLicenseaspublishedby**TheFreeSoftwareFoundation;eitherversion2oftheLicense,or**(atyouroption)anylaterversion.");
-  xitk_window_dialog_error(test->imlibdata, 
-			   "Stream number %d <%s.mpg> is not valid.\n", nlab, labels[nlab]);
+  xw = xitk_window_dialog_error(test->imlibdata, 
+				"Stream number %d <%s.mpg> is not valid.\n", nlab, labels[nlab]);
 }
 
 /*

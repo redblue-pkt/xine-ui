@@ -70,30 +70,30 @@
 /*
  * config related constants
  */
-#define CONFIG_LEVEL_BEG   0 /* => beginner */
-#define CONFIG_LEVEL_ADV  10 /* advanced user */
-#define CONFIG_LEVEL_EXP  20 /* expert */
+#define CONFIG_LEVEL_BEG        0 /* => beginner */
+#define CONFIG_LEVEL_ADV        10 /* advanced user */
+#define CONFIG_LEVEL_EXP        20 /* expert */
 
-#define CONFIG_NO_DESC    NULL
-#define CONFIG_NO_HELP    NULL
-#define CONFIG_NO_CB      NULL
-#define CONFIG_NO_DATA    NULL
+#define CONFIG_NO_DESC          NULL
+#define CONFIG_NO_HELP          NULL
+#define CONFIG_NO_CB            NULL
+#define CONFIG_NO_DATA          NULL
 
 /*
  * flags for autoplay options
  */
-#define PLAY_ON_START      0x00000001
-#define PLAYED_ON_START    0x00000002
-#define QUIT_ON_STOP       0x00000004
-#define FULL_ON_START      0x00000008
-#define HIDEGUI_ON_START   0x00000010
-#define PLAY_FROM_DVD      0x00000020
-#define PLAY_FROM_VCD      0x00000040
+#define PLAY_ON_START           0x00000001
+#define PLAYED_ON_START         0x00000002
+#define QUIT_ON_STOP            0x00000004
+#define FULL_ON_START           0x00000008
+#define HIDEGUI_ON_START        0x00000010
+#define PLAY_FROM_DVD           0x00000020
+#define PLAY_FROM_VCD           0x00000040
 
 /* Sound mixer capabilities */
-#define MIXER_CAP_NOTHING   0x00000000
-#define MIXER_CAP_VOL       0x00000001
-#define MIXER_CAP_MUTE      0x00000002
+#define MIXER_CAP_NOTHING       0x00000000
+#define MIXER_CAP_VOL           0x00000001
+#define MIXER_CAP_MUTE          0x00000002
 
 /* Playlist loop modes */
 #define PLAYLIST_LOOP_NO_LOOP   0 /* no loop (default) */
@@ -101,12 +101,12 @@
 #define PLAYLIST_LOOP_REPEAT    2 /* loop the current mrl */
 #define PLAYLIST_LOOP_SHUFFLE   3 /* random selection in playlist */
 
-#define SAFE_FREE(x)     do {                                             \
-                           if((x)) {                                      \
-                             free((x));                                   \
-                             x = NULL;                                    \
-                           }                                              \
-                         } while(0)
+#define SAFE_FREE(x)            do {           \
+                                  if((x)) {    \
+                                    free((x)); \
+                                    x = NULL;  \
+                                  }            \
+                                } while(0)
 
 typedef struct {
   xine_video_port_t        *vo_port;
@@ -130,6 +130,12 @@ typedef struct {
     int                     num_mrls;
   } visual_anim;
   
+#undef OSD
+  struct {
+    xine_osd_t             *info;
+    xine_osd_t             *status;
+  } osd;
+
   /* xine lib/gui configuration filename */
   char                     *configfile;
 
@@ -208,7 +214,6 @@ typedef struct {
 
   int                       layer_above;
   int                       always_layer_above;
-  int                       reparent_hack;
 
   int                       network;
   
@@ -232,6 +237,7 @@ typedef struct {
   
   int                        eventer_sticky;
   int                        stream_info_auto_update;
+
 } gGui_t;
 
 #endif

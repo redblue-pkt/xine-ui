@@ -142,20 +142,14 @@ void viewlog_raise_window(void) {
   if(viewlog != NULL) {
     if(viewlog->xwin) {
       if(viewlog->visible && viewlog->running) {
-	if(viewlog->running) {
-	  XLockDisplay(gGui->display);
-	  XMapRaised(gGui->display, xitk_window_get_window(viewlog->xwin));
-	  viewlog->visible = 1;
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(viewlog->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(viewlog->xwin));
-	}
-      } else {
 	XLockDisplay(gGui->display);
-	XUnmapWindow (gGui->display, xitk_window_get_window(viewlog->xwin));
+	XUnmapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
+	XRaiseWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
+	XMapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
+	XSetTransientForHint (gGui->display, 
+			      xitk_window_get_window(viewlog->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
-	viewlog->visible = 0;
+	layer_above_video(xitk_window_get_window(viewlog->xwin));
       }
     }
   }
@@ -177,7 +171,8 @@ void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
 	viewlog->visible = 1;
 	xitk_show_widgets(viewlog->widget_list);
 	XLockDisplay(gGui->display);
-	XMapRaised(gGui->display, xitk_window_get_window(viewlog->xwin)); 
+	XRaiseWindow(gGui->display, xitk_window_get_window(viewlog->xwin)); 
+	XMapWindow(gGui->display, xitk_window_get_window(viewlog->xwin)); 
 	XSetTransientForHint (gGui->display, 
 			      xitk_window_get_window(viewlog->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
@@ -427,15 +422,14 @@ void viewlog_window(void) {
 						   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
-
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(viewlog->xwin)), None, None);
-
+  XUnlockDisplay (gGui->display);
+  
   viewlog->widget_list                = xitk_widget_list_new();
   viewlog->widget_list->l             = xitk_list_new ();
   viewlog->widget_list->win           = (xitk_window_get_window(viewlog->xwin));
   viewlog->widget_list->gc            = gc;
-
 
   viewlog_create_tabs();
 
@@ -495,9 +489,6 @@ void viewlog_window(void) {
 					  x, y, 100, 23,
 					  "Black", "Black", "White", tabsfontname));
 
-  XMapRaised(gGui->display, xitk_window_get_window(viewlog->xwin));
-  XUnlockDisplay (gGui->display);
-
   viewlog->kreg = xitk_register_event_handler("viewlog", 
 					      (xitk_window_get_window(viewlog->xwin)),
 					      viewlog_handle_event,
@@ -508,6 +499,7 @@ void viewlog_window(void) {
 
   viewlog->visible = 1;
   viewlog->running = 1;
+  viewlog_raise_window();
   
   XLockDisplay (gGui->display);
   XSetInputFocus(gGui->display, xitk_window_get_window(viewlog->xwin), RevertToParent, CurrentTime);

@@ -659,19 +659,14 @@ void playlist_raise_window(void) {
   if(playlist != NULL) {
     if(playlist->window) {
       if(playlist->visible && playlist->running) {
-	if(playlist->running) {
-	  XLockDisplay(gGui->display);
-	  XMapRaised(gGui->display, playlist->window); 
-	  playlist->visible = 1;
-	  XSetTransientForHint (gGui->display, 
-				playlist->window, gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(playlist->window);
-	}
-      } else {
 	XLockDisplay(gGui->display);
-	XUnmapWindow (gGui->display, playlist->window);
+	XUnmapWindow(gGui->display, playlist->window); 
+	XRaiseWindow(gGui->display, playlist->window); 
+	XMapWindow(gGui->display, playlist->window); 
+	XSetTransientForHint (gGui->display, 
+			      playlist->window, gGui->video_window);
 	XUnlockDisplay(gGui->display);
+	layer_above_video(playlist->window);
       }
     }
     mmk_editor_raise_window();
@@ -695,7 +690,8 @@ void playlist_toggle_visibility (xitk_widget_t *w, void *data) {
 	playlist->visible = 1;
 	xitk_show_widgets(playlist->widget_list);
 	XLockDisplay(gGui->display);
-	XMapRaised(gGui->display, playlist->window); 
+	XRaiseWindow(gGui->display, playlist->window); 
+	XMapWindow(gGui->display, playlist->window); 
 	XSetTransientForHint (gGui->display, 
 			      playlist->window, gGui->video_window);
 	XUnlockDisplay(gGui->display);
@@ -827,7 +823,7 @@ void playlist_editor(void) {
   XWMHints                  *wm_hint;
   XSetWindowAttributes       attr;
   char                      *title;
-  Atom                       prop, XA_WIN_LAYER;
+  Atom                       prop;
   MWMHints                   mwmhints;
   XClassHint                *xclasshint;
   xitk_browser_widget_t      br;
@@ -836,7 +832,6 @@ void playlist_editor(void) {
   xitk_inputtext_widget_t    inp;
   xitk_button_widget_t       b;
   xitk_widget_t             *w;
-  long data[1];
 
   xine_strdupa(title, _("Xine Playlist Editor"));
 
@@ -906,19 +901,8 @@ void playlist_editor(void) {
   
   XSelectInput(gGui->display, playlist->window, INPUT_MOTION | KeymapStateMask);
   
-  /*
-   * layer above most other things, like gnome panel
-   * WIN_LAYER_ABOVE_DOCK  = 10
-   *
-   */
-  if(is_layer_above()) {
-    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-    
-    data[0] = 10;
-    XChangeProperty(gGui->display, playlist->window, XA_WIN_LAYER,
-		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		    1);
-  }
+  if(is_layer_above())
+    xitk_set_layer_above(playlist->window);
 
   /*
    * wm, no border please
@@ -932,8 +916,6 @@ void playlist_editor(void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  XSetTransientForHint (gGui->display, playlist->window, gGui->video_window);
-
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
@@ -954,6 +936,8 @@ void playlist_editor(void) {
   gc = XCreateGC(gGui->display, playlist->window, 0, 0);
   
   Imlib_apply_image(gGui->imlib_data, playlist->bg_image, playlist->window);
+
+  XUnlockDisplay (gGui->display);
 
   /*
    * Widget-list
@@ -1108,10 +1092,6 @@ void playlist_editor(void) {
 
   playlist_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 
-  XMapRaised(gGui->display, playlist->window); 
-  
-  XUnlockDisplay (gGui->display);
-
   playlist->widget_key = 
     xitk_register_event_handler("playlist", 
 				playlist->window, 
@@ -1124,6 +1104,8 @@ void playlist_editor(void) {
   playlist->running = 1;
 
   playlist_update_focused_entry();
+
+  playlist_raise_window();
 
   XLockDisplay(gGui->display);
   XSetInputFocus(gGui->display, playlist->window, RevertToParent, CurrentTime);

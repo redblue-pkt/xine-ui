@@ -89,6 +89,13 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, xine_mrl_t *);
 #undef  MIN
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 
+#define WM_TYPE_UNKNOWN         0
+#define WM_TYPE_KDE             1
+#define WM_TYPE_E               2
+#define WM_TYPE_ICE             3
+#define WM_TYPE_WMAKER          4
+#define WM_TYPE_GNOMECOMP       5
+
 #ifdef	__GNUC__
 #define XITK_DIE(FMT, ARGS...) do { fprintf(stderr, "xiTK DIE: "FMT, ##ARGS); exit(-1); } while(0)
 #define XITK_WARNING(FMT, ARGS...) do { fprintf(stderr, "xiTK WARNING: "FMT, ##ARGS); } while(0)
@@ -519,6 +526,9 @@ int xitk_get_white_color(void);
 int xitk_get_background_color(void);
 int xitk_get_focus_color(void);
 int xitk_get_select_color(void);
+
+int xitk_get_wm_type(void);
+
 /*
  * copy src to dest and substitute special chars. dest should have 
  * enought space to store chars.

@@ -52,15 +52,21 @@ static void _errors_display_log(xitk_widget_t *w, void *data, int state) {
  * Create the real window.
  */
 void errors_create_window(char *title, char *message) {
-  
+  xitk_window_t *xw;
+
   if((title == NULL) || (message == NULL))
     return;
   
-  xitk_window_dialog_two_buttons_with_width(gGui->imlib_data, title, 
-					    _("Done"), _("More..."),
-					    NULL, _errors_display_log, 
-					    NULL, 400, ALIGN_CENTER,
-					    message);
+  xw = xitk_window_dialog_two_buttons_with_width(gGui->imlib_data, title, 
+						 _("Done"), _("More..."),
+						 NULL, _errors_display_log, 
+						 NULL, 400, ALIGN_CENTER,
+						 message);
+  XLockDisplay(gGui->display);
+  XSetTransientForHint(gGui->display, 
+		       xitk_window_get_window(xw), gGui->video_window);
+  XUnlockDisplay(gGui->display);
+  layer_above_video(xitk_window_get_window(xw));
 }
 
 /*
@@ -93,9 +99,17 @@ void xine_error(char *message, ...) {
   }
   
   {
+    xitk_window_t *xw;
     char buf2[(strlen(buf) * 2) + 1];
+
     xitk_subst_special_chars(buf, buf2);
-    xitk_window_dialog_error(gGui->imlib_data, buf2);
+    xw = xitk_window_dialog_error(gGui->imlib_data, buf2);
+
+    XLockDisplay(gGui->display);
+    XSetTransientForHint(gGui->display, 
+			 xitk_window_get_window(xw), gGui->video_window);
+    XUnlockDisplay(gGui->display);
+    layer_above_video(xitk_window_get_window(xw));
   }
   free(buf);
 }
@@ -167,9 +181,17 @@ void xine_info(char *message, ...) {
   }
   
   {
-    char buf2[(strlen(buf) * 2) + 1];
+    xitk_window_t *xw;
+    char           buf2[(strlen(buf) * 2) + 1];
+
     xitk_subst_special_chars(buf, buf2);
-    xitk_window_dialog_info(gGui->imlib_data, buf2);
+    xw = xitk_window_dialog_info(gGui->imlib_data, buf2);
+
+    XLockDisplay(gGui->display);
+    XSetTransientForHint(gGui->display, 
+			 xitk_window_get_window(xw), gGui->video_window);
+    XUnlockDisplay(gGui->display);
+    layer_above_video(xitk_window_get_window(xw));
   }
   free(buf);
 }

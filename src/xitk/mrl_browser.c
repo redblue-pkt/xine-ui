@@ -385,5 +385,6 @@ static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 void open_mrlbrowser(xitk_widget_t *w, void *data) {
   
   mrl_browser(mrl_add, mrl_add_and_play, mrl_handle_selection, gui_dndcallback);
+  set_mrl_browser_transient();
   mrl_browser_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 }

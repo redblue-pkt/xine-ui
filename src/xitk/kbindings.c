@@ -1199,20 +1199,14 @@ void kbedit_raise_window(void) {
   if(kbedit != NULL) {
     if(kbedit->xwin) {
       if(kbedit->visible && kbedit->running) {
-	if(kbedit->running) {
-	  XLockDisplay(gGui->display);
-	  XMapRaised(gGui->display, xitk_window_get_window(kbedit->xwin));
-	  kbedit->visible = 1;
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(kbedit->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(kbedit->xwin));
-	}
-      } else {
 	XLockDisplay(gGui->display);
-	XUnmapWindow (gGui->display, xitk_window_get_window(kbedit->xwin));
+	XUnmapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
+	XRaiseWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
+	XMapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
+	XSetTransientForHint (gGui->display, 
+			      xitk_window_get_window(kbedit->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
-	kbedit->visible = 0;
+	layer_above_video(xitk_window_get_window(kbedit->xwin));
       }
     }
   }
@@ -1235,7 +1229,8 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
 	kbedit->visible = 1;
 	xitk_show_widgets(kbedit->widget_list);
 	XLockDisplay(gGui->display);
-	XMapRaised(gGui->display, xitk_window_get_window(kbedit->xwin)); 
+	XRaiseWindow(gGui->display, xitk_window_get_window(kbedit->xwin)); 
+	XMapWindow(gGui->display, xitk_window_get_window(kbedit->xwin)); 
 	XSetTransientForHint (gGui->display, 
 			      xitk_window_get_window(kbedit->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
@@ -1654,7 +1649,8 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     
   }
   
-  XMapRaised(gGui->display, (xitk_window_get_window(xwin)));
+  XRaiseWindow(gGui->display, (xitk_window_get_window(xwin)));
+  XMapWindow(gGui->display, (xitk_window_get_window(xwin)));
 
   while(!xitk_is_window_visible(gGui->display, (xitk_window_get_window(xwin))))
     xine_usec_sleep(5000);
@@ -1835,9 +1831,9 @@ void kbedit_window(void) {
 							   _("key binding editor"), 
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   XLockDisplay (gGui->display);
-  
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(kbedit->xwin)), None, None);
+  XUnlockDisplay (gGui->display);
 
   kbedit->widget_list      = xitk_widget_list_new();
   kbedit->widget_list->l   = xitk_list_new();
@@ -1846,8 +1842,10 @@ void kbedit_window(void) {
   
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
+  XLockDisplay (gGui->display);
   XCopyArea(gGui->display, (xitk_window_get_background(kbedit->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
+  XUnlockDisplay (gGui->display);
   
   x = 15;
   y = 35;
@@ -2152,10 +2150,6 @@ void kbedit_window(void) {
 
 
   kbedit_unset();
-
-  XMapRaised(gGui->display, xitk_window_get_window(kbedit->xwin));
-  
-  XUnlockDisplay (gGui->display);
   
   kbedit->kreg = xitk_register_event_handler("kbedit", 
 					     (xitk_window_get_window(kbedit->xwin)),
@@ -2168,6 +2162,7 @@ void kbedit_window(void) {
 
   kbedit->visible = 1;
   kbedit->running = 1;
+  kbedit_raise_window();
 
   XLockDisplay (gGui->display);
   XSetInputFocus(gGui->display, xitk_window_get_window(kbedit->xwin), RevertToParent, CurrentTime);

@@ -119,4 +119,5 @@ void visual_anim_play(void);
 void visual_anim_play_next(void);
 void visual_anim_pause(void);
 void visual_anim_stop(void);
+
 #endif

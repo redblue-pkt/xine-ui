@@ -199,12 +199,10 @@ static void video_window_adapt_size (void) {
   XSetWindowAttributes  attr;
   Atom                  prop;
   Atom                  wm_delete_window;
-  static Atom           XA_WIN_LAYER = None;
   MWMHints              mwmhints;
   XEvent                xev;
   XGCValues             xgcv;
   Window                old_video_window = None;
-  long                  propvalue[1];
   int                   border_width;
 
 /*  printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
@@ -534,20 +532,8 @@ static void video_window_adapt_size (void) {
     gVw->output_width    = hint.width;
     gVw->output_height   = hint.height;
     
-    /*
-     * layer above most other things, like gnome panel
-     * WIN_LAYER_ABOVE_DOCK  = 10
-     *
-     */
-    if(is_layer_above()) {
-      if(XA_WIN_LAYER == None)
-	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-      
-      propvalue[0] = 10;
-      XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
-		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
-		      1);
-    }
+    if(is_layer_above())
+      xitk_set_layer_above(gGui->video_window);
 
     /*
      * wm, no borders please
@@ -676,15 +662,8 @@ static void video_window_adapt_size (void) {
 
     XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
 
-    if(gGui->always_layer_above) {
-      if(XA_WIN_LAYER == None)
-	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-      
-      propvalue[0] = 10;
-      XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
-		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
-		      1);
-    }
+    if(gGui->always_layer_above)
+      xitk_set_layer_above(gGui->video_window);
 
     if(gVw->borderless) {
       prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
@@ -718,7 +697,8 @@ static void video_window_adapt_size (void) {
   else {
     /* Map window. */
     
-    XMapRaised(gGui->display, gGui->video_window);
+    XRaiseWindow(gGui->display, gGui->video_window);
+    XMapWindow(gGui->display, gGui->video_window);
     
     /* Wait for map. */
     
@@ -955,9 +935,7 @@ int video_window_is_cursor_visible(void) {
  * hide/show video window 
  */
 void video_window_set_visibility(int show_window) {
-  static Atom  XA_WIN_LAYER = None;
-  long         data[1];
-  
+
   if(gGui->use_root_window)
     return;
 
@@ -967,24 +945,12 @@ void video_window_set_visibility(int show_window) {
 
   if (gVw->show == 1) {
     XLockDisplay (gGui->display);
-
-    /*
-     * layer above most other things, like gnome panel
-     * WIN_LAYER_ABOVE_DOCK  = 10
-     *
-     */
-
-    if((is_layer_above()) && (gVw->hide_on_start == 0)) {
-      if(XA_WIN_LAYER == None)
-	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-      
-      data[0] = 10;
-      XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
-		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		      1);
-    }
     
-    XMapRaised (gGui->display, gGui->video_window);
+    if((is_layer_above()) && (gVw->hide_on_start == 0))
+      xitk_set_layer_above(gGui->video_window);
+    
+    XRaiseWindow(gGui->display, gGui->video_window);
+    XMapWindow(gGui->display, gGui->video_window);
     XUnlockDisplay (gGui->display);
   }
   else {

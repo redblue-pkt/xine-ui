@@ -357,7 +357,8 @@ void event_sender_toggle_visibility(xitk_widget_t *w, void *data) {
 	eventer->visible = 1;
 	xitk_show_widgets(eventer->widget_list);
 	XLockDisplay(gGui->display);
-	XMapRaised(gGui->display, xitk_window_get_window(eventer->xwin)); 
+	XRaiseWindow(gGui->display, xitk_window_get_window(eventer->xwin)); 
+	XMapWindow(gGui->display, xitk_window_get_window(eventer->xwin)); 
 	XSetTransientForHint (gGui->display, 
 			      xitk_window_get_window(eventer->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
@@ -371,20 +372,14 @@ void event_sender_raise_window(void) {
   if(eventer != NULL) {
     if(eventer->xwin) {
       if(eventer->visible && eventer->running) {
-	if(eventer->running) {
-	  XLockDisplay(gGui->display);
-	  XMapRaised(gGui->display, xitk_window_get_window(eventer->xwin));
-	  eventer->visible = 1;
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(eventer->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(eventer->xwin));
-	}
-      } else {
 	XLockDisplay(gGui->display);
-	XUnmapWindow (gGui->display, xitk_window_get_window(eventer->xwin));
+	XUnmapWindow(gGui->display, xitk_window_get_window(eventer->xwin));
+	XRaiseWindow(gGui->display, xitk_window_get_window(eventer->xwin));
+	XMapWindow(gGui->display, xitk_window_get_window(eventer->xwin));
+	XSetTransientForHint (gGui->display, 
+			      xitk_window_get_window(eventer->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
-	eventer->visible = 0;
+	layer_above_video(xitk_window_get_window(eventer->xwin));
       }
     }
   }
@@ -429,7 +424,7 @@ void event_sender_panel(void) {
 					 CONFIG_NO_CB,
 					 CONFIG_NO_DATA);
   
-    if(gGui->eventer_sticky) {
+    if(gGui->eventer_sticky && panel_is_visible()) {
     int  px, py, pw, ph;
     xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, &ph);
     eventer->x = px + pw;
@@ -442,9 +437,9 @@ void event_sender_panel(void) {
 						   WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
-
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(eventer->xwin)), None, None);
+  XUnlockDisplay (gGui->display);
   
   eventer->widget_list                = xitk_widget_list_new();
   eventer->widget_list->l             = xitk_list_new();
@@ -690,9 +685,6 @@ void event_sender_panel(void) {
    xitk_noskin_labelbutton_create(eventer->widget_list, 
 				  &lb, x, y, 70, 23,
 				  "Black", "Black", "White", eventerfontname));
-  
-  XMapRaised(gGui->display, xitk_window_get_window(eventer->xwin));
-  XUnlockDisplay (gGui->display);
 
   eventer->widget_key = xitk_register_event_handler("eventer", 
 						    (xitk_window_get_window(eventer->xwin)),
@@ -708,9 +700,7 @@ void event_sender_panel(void) {
   eventer->move_forced = 0;
   event_sender_raise_window();
 
-
   XLockDisplay (gGui->display);
   XSetInputFocus(gGui->display, xitk_window_get_window(eventer->xwin), RevertToParent, CurrentTime);
   XUnlockDisplay (gGui->display);
-
 }

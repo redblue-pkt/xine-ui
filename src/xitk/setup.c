@@ -284,20 +284,14 @@ void setup_raise_window(void) {
   if(setup != NULL) {
     if(setup->xwin) {
       if(setup->visible && setup->running) {
-	if(setup->running) {
-	  XLockDisplay(gGui->display);
-	  XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
-	  setup->visible = 1;
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(setup->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(setup->xwin));
-	}
-      } else {
 	XLockDisplay(gGui->display);
-	XUnmapWindow (gGui->display, xitk_window_get_window(setup->xwin));
+	XUnmapWindow(gGui->display, xitk_window_get_window(setup->xwin));
+	XRaiseWindow(gGui->display, xitk_window_get_window(setup->xwin));
+	XMapWindow(gGui->display, xitk_window_get_window(setup->xwin));
+	XSetTransientForHint (gGui->display, 
+			      xitk_window_get_window(setup->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
-	setup->visible = 0;
+	layer_above_video(xitk_window_get_window(setup->xwin));
       }
     }
   }
@@ -320,7 +314,8 @@ void setup_toggle_visibility (xitk_widget_t *w, void *data) {
 	setup->visible = 1;
 	xitk_show_widgets(setup->widget_list);
 	XLockDisplay(gGui->display);
-	XMapRaised(gGui->display, xitk_window_get_window(setup->xwin)); 
+	XRaiseWindow(gGui->display, xitk_window_get_window(setup->xwin)); 
+	XMapWindow(gGui->display, xitk_window_get_window(setup->xwin)); 
 	XSetTransientForHint (gGui->display, 
 			      xitk_window_get_window(setup->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
@@ -1107,9 +1102,9 @@ void setup_panel(void) {
   setup_read_faq();
   
   XLockDisplay (gGui->display);
-
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(setup->xwin)), None, None);
+  XUnlockDisplay (gGui->display);
 
   setup->widget_list                = xitk_widget_list_new();
   setup->widget_list->l             = xitk_list_new ();
@@ -1176,11 +1171,6 @@ void setup_panel(void) {
   xitk_list_append_content(setup->widget_list->l, 
    xitk_noskin_labelbutton_create(setup->widget_list, &lb, (x * 3) + (100 * 2), WINDOW_HEIGHT - 40, 100, 23,
 					  "Black", "Black", "White", tabsfontname));
-  
-  XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
-
-  XUnlockDisplay (gGui->display);
-
   setup->kreg = xitk_register_event_handler("setup", 
 					   (xitk_window_get_window(setup->xwin)),
 					   setup_handle_event,
@@ -1192,7 +1182,6 @@ void setup_panel(void) {
 
   setup->visible = 1;
   setup->running = 1;
-
   setup_raise_window();
 
   XLockDisplay (gGui->display);

@@ -1030,6 +1030,15 @@ int main(int argc, char *argv[]) {
   gGui->playlist.scan_stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
   xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_SPU_CHANNEL, -2);
   
+
+  /*
+   * Osd
+   */
+#if OSD
+  gGui->osd.info = xine_osd_new(gGui->stream, 0, 0, 100, 30);
+  xine_osd_set_font(gGui->osd.info, "sans", 16);
+#endif
+
   /* init the video window */
   video_window_select_visual ();
   

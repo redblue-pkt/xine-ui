@@ -562,7 +562,8 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
     private_data->visible = 1;
     xitk_show_widgets(private_data->widget_list);
     XLOCK(private_data->imlibdata->x.disp);
-    XMapRaised(private_data->imlibdata->x.disp, private_data->window); 
+    XRaiseWindow(private_data->imlibdata->x.disp, private_data->window); 
+    XMapWindow(private_data->imlibdata->x.disp, private_data->window); 
     XUNLOCK(private_data->imlibdata->x.disp);
   }
 }
@@ -1257,7 +1258,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 			   private_data->mrls_num, 0);
   
   XLOCK (mb->imlibdata->x.disp);
-  XMapRaised(mb->imlibdata->x.disp, private_data->window); 
+  XRaiseWindow(mb->imlibdata->x.disp, private_data->window); 
+  XMapWindow(mb->imlibdata->x.disp, private_data->window); 
   XUNLOCK (mb->imlibdata->x.disp);
 
   private_data->widget_key = 

@@ -106,29 +106,6 @@ static void panel_timeout_tips_cb(void *data, xine_cfg_entry_t *cfg) {
 }
 
 /*
- * Try to guess if current WM is E.
- */
-static int is_wm_is_enlightenment(Display *d, Window w) {
-  Atom  *atoms;
-  int    i, natoms;
-  
-  XLockDisplay (d);
-  atoms = XListProperties(d, w, &natoms);
-  
-  if(natoms) {
-    for(i = 0; i < natoms; i++) {
-      if(!strncasecmp("_E_FRAME_SIZE", (XGetAtomName(d, atoms[i])), 13)) {
-	XUnlockDisplay (d);
-	return 1;
-      }
-    }
-  }
-  
-  XUnlockDisplay (d);
-  return 0;
-}
-
-/*
  * Toolkit event handler will call this function with new
  * coords of panel window.
  */
@@ -288,6 +265,22 @@ static void *slider_loop(void *dummy) {
 	  if(screensaver_timer >= gGui->ssaver_timeout) {
 	    screensaver_timer = 0;
 	    video_window_reset_ssaver();
+	    
+#if OSD
+	    printf("draw OSD\n"); fflush(stdout);
+	    xine_osd_set_palette(gGui->osd.info, 
+				 XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
+	    printf("palette sets\n"); fflush(stdout);
+	    xine_osd_set_position(gGui->osd.info, 0, 0);
+	    printf("position done\n"); fflush(stdout);
+	    xine_osd_draw_text(gGui->osd.info, 0, 0, 
+			       "Coucou", XINE_OSD_TEXT1);
+	    printf("text drawn\n"); fflush(stdout);
+	    xine_osd_show(gGui->osd.info, 0);
+	    printf("show done\n"); fflush(stdout);
+	    xine_osd_hide(gGui->osd.info, 300000);
+	    printf("hide done\n"); fflush(stdout);
+#endif
 	  }
 	}  
 
@@ -425,7 +418,8 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     XLockDisplay(gGui->display);
     
-    XMapRaised(gGui->display, gGui->panel_window); 
+    XRaiseWindow(gGui->display, gGui->panel_window); 
+    XMapWindow(gGui->display, gGui->panel_window); 
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
     
@@ -733,7 +727,7 @@ void panel_init (void) {
   XWMHints                 *wm_hint;
   XSetWindowAttributes      attr;
   char                     *title;
-  Atom                      prop, XA_WIN_LAYER;
+  Atom                      prop;
   MWMHints                  mwmhints;
   XClassHint               *xclasshint;
   xitk_button_widget_t      b;
@@ -741,7 +735,6 @@ void panel_init (void) {
   xitk_label_widget_t       lbl;
   xitk_slider_widget_t      sl;
   xitk_widget_t            *w;
-  long                     data[1];
   
   xine_strdupa(title, _("Xine Panel"));
 
@@ -823,19 +816,8 @@ void panel_init (void) {
 
   XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | KeymapStateMask);
 
-  /*
-   * layer above most other things, like gnome panel
-   * WIN_LAYER_ABOVE_DOCK  = 10
-   *
-   */
-  if(is_layer_above()) {
-    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-    
-    data[0] = 10;
-    XChangeProperty(gGui->display, gGui->panel_window, XA_WIN_LAYER,
-		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		    1);
-  }
+  if(is_layer_above())
+    xitk_set_layer_above(gGui->panel_window);
   
   /*
    * wm, no border please
@@ -849,8 +831,7 @@ void panel_init (void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  XSetTransientForHint (gGui->display, 
-			gGui->panel_window, gGui->video_window);
+  XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
 
   /* 
    * set wm properties 
@@ -869,7 +850,7 @@ void panel_init (void) {
     wm_hint->icon_pixmap   = gGui->icon;
     wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
     XSetWMHints(gGui->display, gGui->panel_window, wm_hint);
-    XFree(wm_hint); /* CHECKME */
+    XFree(wm_hint);
   }
 
   /*
@@ -1161,8 +1142,10 @@ void panel_init (void) {
   if(gGui->use_root_window && (!panel->visible))
     panel->visible = 1;
 
-  if (panel->visible)
-    XMapRaised(gGui->display, gGui->panel_window); 
+  if (panel->visible) {
+    XRaiseWindow(gGui->display, gGui->panel_window); 
+    XMapWindow(gGui->display, gGui->panel_window); 
+  }
   else
     xitk_hide_widgets(panel->widget_list);
   
@@ -1179,11 +1162,6 @@ void panel_init (void) {
 
   gGui->cursor_visible = 1;
   video_window_set_cursor_visibility(gGui->cursor_visible);
-  
-  /*
-   * Grag Atoms from a mapped window, panel window could be not already mapped.
-   */
-  gGui->reparent_hack = is_wm_is_enlightenment(gGui->display, gGui->video_window);
   
   {
     pthread_attr_t       pth_attrs;

@@ -269,24 +269,16 @@ int control_is_visible(void) {
  * Raise control->window
  */
 void control_raise_window(void) {
-  
   if(control != NULL) {
     if(control->window) {
       if(control->visible && control->running) {
-	if(control->running) {
-	  XLockDisplay(gGui->display);
-	  XMapRaised(gGui->display, control->window);
-	  control->visible = 1;
-	  XSetTransientForHint (gGui->display, 
-				control->window, gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(control->window);
-	}
-      } else {
 	XLockDisplay(gGui->display);
-	XUnmapWindow (gGui->display, control->window);
+	XUnmapWindow(gGui->display, control->window);
+	XRaiseWindow(gGui->display, control->window);
+	XMapWindow(gGui->display, control->window);
+	XSetTransientForHint (gGui->display, control->window, gGui->video_window);
 	XUnlockDisplay(gGui->display);
-	control->visible = 0;
+	layer_above_video(control->window);
       }
     }
   }
@@ -309,9 +301,9 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
 	control->visible = 1;
 	xitk_show_widgets(control->widget_list);
 	XLockDisplay(gGui->display);
-	XMapRaised(gGui->display, control->window); 
-	XSetTransientForHint (gGui->display, 
-			      control->window, gGui->video_window);
+	XRaiseWindow(gGui->display, control->window); 
+	XMapWindow(gGui->display, control->window); 
+	XSetTransientForHint (gGui->display, control->window, gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(control->window);
       }
@@ -407,7 +399,7 @@ void control_panel(void) {
   XWMHints                  *wm_hint;
   XSetWindowAttributes       attr;
   char                      *title;
-  Atom                       prop, XA_WIN_LAYER;
+  Atom                       prop;
   MWMHints                   mwmhints;
   XClassHint                *xclasshint;
   xitk_browser_widget_t      br;
@@ -416,7 +408,6 @@ void control_panel(void) {
   xitk_slider_widget_t       sl;
   xitk_combo_widget_t        cmb;
   xitk_widget_t             *w;
-  long                       data[1];
 
   xine_strdupa(title, _("Xine Control Panel"));
 
@@ -482,20 +473,9 @@ void control_panel(void) {
   
   XSelectInput(gGui->display, control->window, INPUT_MOTION | KeymapStateMask);
   
-  /*
-   * layer above most other things, like gnome panel
-   * WIN_LAYER_ABOVE_DOCK  = 10
-   *
-   */
-  if(is_layer_above()) {
-    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-    
-    data[0] = 10;
-    XChangeProperty(gGui->display, control->window, XA_WIN_LAYER,
-		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		    1);
-  }
-  
+  if(is_layer_above())
+    xitk_set_layer_above(control->window);
+
   /*
    * wm, no border please
    */
@@ -508,8 +488,6 @@ void control_panel(void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  XSetTransientForHint (gGui->display, control->window, gGui->video_window);
-
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
@@ -530,6 +508,8 @@ void control_panel(void) {
   gc = XCreateGC(gGui->display, control->window, 0, 0);
   
   Imlib_apply_image(gGui->imlib_data, control->bg_image, control->window);
+
+  XUnlockDisplay (gGui->display);
 
   /*
    * Widget-list
@@ -689,10 +669,6 @@ void control_panel(void) {
 
   control_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 
-  XMapRaised(gGui->display, control->window); 
-
-  XUnlockDisplay (gGui->display);
-
   control->widget_key = 
     xitk_register_event_handler("control", 
 				control->window, 
@@ -703,6 +679,7 @@ void control_panel(void) {
   
   control->visible = 1;
   control->running = 1;
+  control_raise_window();
 
   XLockDisplay (gGui->display);
   XSetInputFocus(gGui->display, control->window, RevertToParent, CurrentTime);

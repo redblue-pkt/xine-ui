@@ -1028,7 +1028,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				       ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
 
   panel_init ();
-
 }
 
 void gui_init_imlib (Visual *vis) {

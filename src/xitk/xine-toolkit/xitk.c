@@ -59,6 +59,7 @@
 #include "slider.h"
 #include "combo.h"
 #include "tips.h"
+#include "window.h"
 #include "_config.h"
 
 #include "_xitk.h"
@@ -132,6 +133,8 @@ typedef struct {
   xitk_list_t                *gfx;
   int                         use_xshm;
 
+  int                         wm_type;
+
   int                        (*x_error_handler)(Display *, XErrorEvent *);
 
   pthread_mutex_t             mutex;
@@ -144,6 +147,7 @@ typedef struct {
 
 static __xitk_t    *gXitk;
 static pid_t        xitk_pid;
+static Atom XA_WIN_LAYER = None, XA_STAYS_ON_TOP = None;
 
 
 void widget_stop(void);
@@ -300,6 +304,161 @@ static int xitk_check_xshm(Display *display) {
 }
 int xitk_is_use_xshm(void) {
   return gXitk->use_xshm;
+}
+
+int xitk_check_wm(Display *display) {
+  Atom   *atoms;
+  int     i, natoms;
+  int     type = WM_TYPE_UNKNOWN;
+  Window  window;
+  
+  XLockDisplay(display);
+  window = XCreateSimpleWindow(display, RootWindow(display, (XDefaultScreen(display))), 
+			       0, 0, 1, 1, 0, 0, 0);
+  XSelectInput(display, window, PropertyChangeMask | StructureNotifyMask );
+  XMapWindow(display, window);
+  
+  while(!xitk_is_window_visible(display, window))
+    xitk_usec_sleep(5000);
+  
+  atoms = XListProperties(display, window, &natoms);
+  
+  if(natoms) {
+    for(i = 0; i < natoms; i++) {
+      char *atomname = XGetAtomName(display, atoms[i]);
+      
+      if(!strncasecmp("_E_FRAME_SIZE",atomname, 13))
+	type = WM_TYPE_E;
+      else if(!strncasecmp("_KDE_",atomname, 5))
+	type = WM_TYPE_KDE;
+      else if(!strncasecmp("_ICEWM_",atomname, 7))
+	type = WM_TYPE_ICE;
+      else if(!strncasecmp("KWM_WIN_DESKTOP",atomname, 15))
+	type = WM_TYPE_WMAKER;
+    }
+  }
+  
+  XUnmapWindow(display, window);
+  XDestroyWindow(display, window);
+  
+  switch(type) {
+  case WM_TYPE_KDE:
+    XA_WIN_LAYER    = XInternAtom(display, "_NET_WM_STATE", False);
+    XA_STAYS_ON_TOP = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
+    break;
+  case WM_TYPE_UNKNOWN:
+  case WM_TYPE_E:
+  case WM_TYPE_ICE:
+  case WM_TYPE_WMAKER:
+  case WM_TYPE_GNOMECOMP:
+    XA_WIN_LAYER = XInternAtom(display, "_WIN_LAYER", False);
+    break;
+  }
+
+  XUnlockDisplay(display);
+  
+  printf("-[ WM type: ");
+  switch(type) {
+  case WM_TYPE_UNKNOWN:
+    printf("Unknown");
+    break;
+  case WM_TYPE_KDE:
+    printf("KDE");
+    break;
+  case WM_TYPE_E:
+    printf("Enlightenment");
+    break;
+  case WM_TYPE_ICE:
+    printf("Ice");
+    break;
+  case WM_TYPE_WMAKER:
+    printf("WindowMaker");
+    break;
+  case WM_TYPE_GNOMECOMP:
+    printf("GnomeCompliant");
+    break;
+  }
+  printf(" ]-\n");
+
+  return type;
+}
+int xitk_get_wm_type(void) {
+  return gXitk->wm_type;
+}
+
+int xitk_get_layer_level(void) {
+  int level = 10;
+  
+  switch(gXitk->wm_type) {
+  case WM_TYPE_GNOMECOMP:
+  case WM_TYPE_UNKNOWN:
+  case WM_TYPE_KDE:
+    level = 10; /* Wrong, but we need to provide a default value */
+    break;
+  case WM_TYPE_WMAKER:
+    level = 6;
+    break;
+  case WM_TYPE_ICE:
+    level = 8;
+    break;
+  case WM_TYPE_E:
+    level = 6;
+    break;
+  }
+  return level;     
+}
+
+void xitk_set_layer_above(Window window) {
+
+  switch(gXitk->wm_type) {
+
+  case WM_TYPE_KDE:
+    XLockDisplay(gXitk->display);
+    XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
+		    XA_ATOM, 32, PropModeReplace, (unsigned char *)&XA_STAYS_ON_TOP, 1);
+    XUnlockDisplay(gXitk->display);
+    break;
+
+  case WM_TYPE_GNOMECOMP:
+  case WM_TYPE_UNKNOWN:
+  case WM_TYPE_WMAKER:
+  case WM_TYPE_ICE:
+  case WM_TYPE_E:
+  default:
+    {
+      long propvalue[1];
+      
+      propvalue[0] = xitk_get_layer_level();
+      
+      XLockDisplay(gXitk->display);
+      XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
+		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
+		      1);
+      XUnlockDisplay(gXitk->display);
+    }
+    break;
+  }
+}
+void xitk_set_window_layer(Window window, int layer) {
+  XEvent xev;
+
+  if(gXitk->wm_type == WM_TYPE_KDE)
+    return;
+
+  xev.type                 = ClientMessage;
+  xev.xclient.type         = ClientMessage;
+  xev.xclient.window       = window;
+  xev.xclient.message_type = XA_WIN_LAYER;
+  xev.xclient.format       = 32;
+  xev.xclient.data.l[0]    = (long) layer;
+  xev.xclient.data.l[1]    = (long) 0;
+  xev.xclient.data.l[2]    = (long) 0;
+  xev.xclient.data.l[3]    = (long) 0;
+
+  XLockDisplay(gXitk->display);
+  XSendEvent(gXitk->display, RootWindow(gXitk->display, (XDefaultScreen(gXitk->display))), 
+	     False, SubstructureNotifyMask, (XEvent*) &xev);
+  XUnlockDisplay(gXitk->display);
 }
 
 /*
@@ -990,6 +1149,8 @@ void xitk_init(Display *display) {
     }
   }
 #endif
+
+  gXitk->wm_type = xitk_check_wm(display);
 }
 
 /*

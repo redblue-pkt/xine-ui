@@ -1039,7 +1039,8 @@ void mmk_editor_toggle_visibility(void) {
 	mmkeditor->visible = 1;
 	xitk_show_widgets(mmkeditor->widget_list);
 	XLockDisplay(gGui->display);
-	XMapRaised(gGui->display, xitk_window_get_window(mmkeditor->xwin)); 
+	XRaiseWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin)); 
+	XMapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin)); 
 	XSetTransientForHint(gGui->display, 
 			     xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
@@ -1053,20 +1054,14 @@ void mmk_editor_raise_window(void) {
   if(mmkeditor != NULL) {
     if(mmkeditor->xwin) {
       if(mmkeditor->visible && mmkeditor->running) {
-	if(mmkeditor->running) {
-	  XLockDisplay(gGui->display);
-	  XMapRaised(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-	  mmkeditor->visible = 1;
-	  XSetTransientForHint(gGui->display, 
-			       xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(mmkeditor->xwin));
-	}
-      } else {
 	XLockDisplay(gGui->display);
 	XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+	XRaiseWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+	XMapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+	XSetTransientForHint(gGui->display, 
+			     xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
-	mmkeditor->visible = 0;
+	layer_above_video(xitk_window_get_window(mmkeditor->xwin));
       }
     }
   }
@@ -1158,9 +1153,9 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 						     WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
-  
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(mmkeditor->xwin)), None, None);
+  XUnlockDisplay (gGui->display);
   
   mmkeditor->widget_list                = xitk_widget_list_new();
   mmkeditor->widget_list->l             = xitk_list_new();
@@ -1175,8 +1170,10 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   xitk_window_get_window_size(mmkeditor->xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
+  XLockDisplay (gGui->display);
   XCopyArea(gGui->display, (xitk_window_get_background(mmkeditor->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
+  XUnlockDisplay (gGui->display);
 
   x = 5;
   y = 35;
@@ -1290,9 +1287,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   
   xitk_window_change_background(gGui->imlib_data, mmkeditor->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
-
-  XMapRaised(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-  XUnlockDisplay(gGui->display);
 
   mmkeditor->widget_key = xitk_register_event_handler("mmkeditor", 
 						      (xitk_window_get_window(mmkeditor->xwin)),

@@ -115,54 +115,54 @@ void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height);
 /*
  *
  */
-void xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *button_label,
-					      xitk_state_callback_t cb, void *userdata, 
-					      int window_width, int align, char *message, ...);
+xitk_window_t *xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *button_label,
+							xitk_state_callback_t cb, void *userdata, 
+							int window_width, int align, char *message, ...);
 /*
  * Display an OK window (sized), containing the message.
  */
-void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
-				      xitk_state_callback_t cb, void *userdata, 
-				      int window_width, int align, char *message, ...);
+xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
+						xitk_state_callback_t cb, void *userdata, 
+						int window_width, int align, char *message, ...);
 
 /*
  *
  */
-void xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
-					       char *button1_label, char *button2_label,
-					       xitk_state_callback_t cb1, 
-					       xitk_state_callback_t cb2, 
-					       void *userdata, 
-					       int window_width, int align, char *message, ...);
+xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
+							 char *button1_label, char *button2_label,
+							 xitk_state_callback_t cb1, 
+							 xitk_state_callback_t cb2, 
+							 void *userdata, 
+							 int window_width, int align, char *message, ...);
 /*
  * Display a question window with 'yes' and 'no' buttons.
  */
-void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
-					 xitk_state_callback_t ycb, 
-					 xitk_state_callback_t ncb, 
-					 void *userdata, 
-					 int window_width, int align, char *message, ...);
+xitk_window_t *xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
+						   xitk_state_callback_t ycb, 
+						   xitk_state_callback_t ncb, 
+						   void *userdata, 
+						   int window_width, int align, char *message, ...);
 
 /*
  *
  */
-void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
-						 char *button1_label,
-						 char *button2_label,
-						 char *button3_label,
-						 xitk_state_callback_t cb1, 
-						 xitk_state_callback_t cb2, 
-						 xitk_state_callback_t cb3, 
-						 void *userdata, 
-						 int window_width, int align, char *message, ...);
+xitk_window_t *xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
+							   char *button1_label,
+							   char *button2_label,
+							   char *button3_label,
+							   xitk_state_callback_t cb1, 
+							   xitk_state_callback_t cb2, 
+							   xitk_state_callback_t cb3, 
+							   void *userdata, 
+							   int window_width, int align, char *message, ...);
 /*
  * Display a question window with 'yes', 'no' and 'cancel' buttons.
  */
-void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
-					       xitk_state_callback_t ycb, 
-					       xitk_state_callback_t ncb, 
-					       xitk_state_callback_t ccb, 
-					       void *userdata, 
-					       int window_width, int align, char *message, ...);
+xitk_window_t *xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
+							 xitk_state_callback_t ycb, 
+							 xitk_state_callback_t ncb, 
+							 xitk_state_callback_t ccb, 
+							 void *userdata, 
+							 int window_width, int align, char *message, ...);
 
 #endif

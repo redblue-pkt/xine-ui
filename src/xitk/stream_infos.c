@@ -314,7 +314,8 @@ void stream_infos_toggle_visibility(xitk_widget_t *w, void *data) {
 	sinfos->visible = 1;
 	xitk_show_widgets(sinfos->widget_list);
 	XLockDisplay(gGui->display);
-	XMapRaised(gGui->display, xitk_window_get_window(sinfos->xwin)); 
+	XRaiseWindow(gGui->display, xitk_window_get_window(sinfos->xwin)); 
+	XMapWindow(gGui->display, xitk_window_get_window(sinfos->xwin)); 
 	XSetTransientForHint (gGui->display, 
 			      xitk_window_get_window(sinfos->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
@@ -344,20 +345,14 @@ void stream_infos_raise_window(void) {
   if(sinfos != NULL) {
     if(sinfos->xwin) {
       if(sinfos->visible && sinfos->running) {
-	if(sinfos->running) {
 	  XLockDisplay(gGui->display);
-	  XMapRaised(gGui->display, xitk_window_get_window(sinfos->xwin));
-	  sinfos->visible = 1;
+	  XUnmapWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
+	  XRaiseWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
+	  XMapWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
 	  XSetTransientForHint (gGui->display, 
 				xitk_window_get_window(sinfos->xwin), gGui->video_window);
 	  XUnlockDisplay(gGui->display);
 	  layer_above_video(xitk_window_get_window(sinfos->xwin));
-	}
-      } else {
-	XLockDisplay(gGui->display);
-	XUnmapWindow (gGui->display, xitk_window_get_window(sinfos->xwin));
-	XUnlockDisplay(gGui->display);
-	sinfos->visible = 0;
       }
     }
   }
@@ -479,10 +474,10 @@ void stream_infos_panel(void) {
 						  WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
-  
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(sinfos->xwin)), None, None);
-  
+  XUnlockDisplay (gGui->display);
+
   sinfos->widget_list                = xitk_widget_list_new();
   sinfos->widget_list->l             = xitk_list_new ();
   sinfos->widget_list->win           = (xitk_window_get_window(sinfos->xwin));
@@ -494,9 +489,11 @@ void stream_infos_panel(void) {
 
   xitk_window_get_window_size(sinfos->xwin, &width, &height);
   bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
+  XLockDisplay (gGui->display);
   XCopyArea(gGui->display, (xitk_window_get_background(sinfos->xwin)), bg->pixmap,
 	    bg->gc, 0, 0, width, height, 0, 0);
-
+  XUnlockDisplay (gGui->display);
+  
   x = 5;
   y = 35;
   
@@ -1005,9 +1002,6 @@ void stream_infos_panel(void) {
   
   xitk_window_change_background(gGui->imlib_data, sinfos->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
-
-  XMapRaised(gGui->display, xitk_window_get_window(sinfos->xwin));
-  XUnlockDisplay (gGui->display);
 
   sinfos->widget_key = xitk_register_event_handler("sinfos", 
 						   (xitk_window_get_window(sinfos->xwin)),

@@ -45,6 +45,8 @@ extern _panel_t        *panel;
 
 static pthread_t        seek_thread;
 
+
+
 /*
  *
  */
@@ -401,15 +403,10 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
   if(panel_is_visible()) {
     video_window_set_visibility(!(video_window_is_visible()));
     XLockDisplay(gGui->display);
-    XMapRaised (gGui->display, gGui->panel_window); 
+    XRaiseWindow(gGui->display, gGui->panel_window); 
+    XMapWindow(gGui->display, gGui->panel_window); 
     XUnlockDisplay(gGui->display);
-
-    if(gGui->reparent_hack) {
-      panel_toggle_visibility(NULL, NULL);
-      panel_toggle_visibility(NULL, NULL);
-    }
-    else
-      layer_above_video(gGui->panel_window);
+    layer_above_video(gGui->panel_window);
 
     /* (re)start/stop visual animation */
     if(video_window_is_visible()) {
@@ -431,7 +428,7 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
   if(!(video_window_is_visible()))
     video_window_set_visibility(1);
   
-  video_window_set_fullscreen_mode (video_window_get_fullscreen_mode () + 1);
+  video_window_set_fullscreen_mode(video_window_get_fullscreen_mode() + 1);
   
   /* Drawable has changed, update cursor visiblity */
   if(!gGui->cursor_visible) {
@@ -440,20 +437,17 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
   
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
-    XMapRaised (gGui->display, gGui->panel_window);
+    XUnmapWindow(gGui->display, gGui->panel_window);
+    XRaiseWindow(gGui->display, gGui->panel_window);
+    XMapWindow(gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
-
-    if(gGui->reparent_hack) {
-      panel_toggle_visibility(NULL, NULL);
-      panel_toggle_visibility(NULL, NULL);
-    }
-    else
-      layer_above_video(gGui->panel_window);
+    layer_above_video(gGui->panel_window);
   }
 
   if(mrl_browser_is_visible()) {
+    hide_mrl_browser();
     show_mrl_browser();
     set_mrl_browser_transient();
   }
@@ -487,9 +481,9 @@ void gui_toggle_aspect(void) {
 
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
-    XRaiseWindow (gGui->display, gGui->panel_window);
-    XSetTransientForHint (gGui->display, 
-			  gGui->panel_window, gGui->video_window);
+    XRaiseWindow(gGui->display, gGui->panel_window);
+    XSetTransientForHint(gGui->display, 
+			 gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
     
   }
@@ -502,9 +496,9 @@ void gui_toggle_interlaced(void) {
 
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
-    XRaiseWindow (gGui->display, gGui->panel_window);
-    XSetTransientForHint (gGui->display,
-                          gGui->panel_window, gGui->video_window);
+    XRaiseWindow(gGui->display, gGui->panel_window);
+    XSetTransientForHint(gGui->display,
+			 gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
 
   }
@@ -988,43 +982,22 @@ int is_layer_above(void) {
  * (reset to normal if do_raise == 0)
  */
 void layer_above_video(Window w) {
-
-  static Atom XA_WIN_LAYER = None;
-  XEvent xev;
-
+  int layer = 10;
+  
   if(!(is_layer_above()))
     return;
   
-  if(XA_WIN_LAYER == None) {
-    XLockDisplay(gGui->display);
-    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-    XUnlockDisplay(gGui->display);
-  }
-
-  xev.type                 = ClientMessage;
-  xev.xclient.type         = ClientMessage;
-  xev.xclient.window       = w;
-  xev.xclient.message_type = XA_WIN_LAYER;
-  xev.xclient.format       = 32;
-
-  /* top layer if video is fullscreen, otherwise normal layer */
   if (video_window_get_fullscreen_mode() && video_window_is_visible()) {
-    xev.xclient.data.l[0] = (long) 10;
+    layer = xitk_get_layer_level();
   }
   else {
     if(is_layer_above())
-      xev.xclient.data.l[0] = (long) 10;
+      layer = xitk_get_layer_level();
     else
-      xev.xclient.data.l[0] = (long) 4;
+      layer = 4;
   }
-
-  xev.xclient.data.l[1] = 0;
-
-  XLockDisplay(gGui->display);
-  XSendEvent(gGui->display, gGui->imlib_data->x.root, False,
-	     SubstructureNotifyMask, (XEvent*) &xev);
-  XUnlockDisplay(gGui->display);
-
+  
+  xitk_set_window_layer(w, layer);
 }
 
 void gui_increase_audio_volume(void) {
@@ -1058,9 +1031,9 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
   
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
-    XRaiseWindow (gGui->display, gGui->panel_window);
-    XSetTransientForHint (gGui->display, 
-			  gGui->panel_window, gGui->video_window);
+    XRaiseWindow(gGui->display, gGui->panel_window);
+    XSetTransientForHint(gGui->display, 
+			 gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
   }
 }
@@ -1075,9 +1048,9 @@ void gui_reset_zoom(void) {
   
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
-    XRaiseWindow (gGui->display, gGui->panel_window);
-    XSetTransientForHint (gGui->display, 
-			  gGui->panel_window, gGui->video_window);
+    XRaiseWindow(gGui->display, gGui->panel_window);
+    XSetTransientForHint(gGui->display, 
+			 gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
   }
 }
@@ -1134,7 +1107,7 @@ void gui_add_mediamark(void) {
  */
 void visual_anim_init(void) {
   char buffer[4096];
-  
+
   memset(&buffer, 0, sizeof(buffer));
   sprintf(buffer, "%s/%s", XINE_VISDIR, "default.avi");
   
