@@ -133,6 +133,63 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
   } while (0)
 #endif
 
+#ifdef HAVE_STRPBRK
+#define xitk_strpbrk strpbrk
+#else
+static inline char *_x_strpbrk(const char *s, const char *accept) {
+
+  while(*s != '\0') {
+    const char *a = accept;
+    while(*a != '\0')
+      if(*a++ == *s)
+	return(char *) s;
+    ++s;
+  }
+
+  return NULL;
+}
+#define xitk_strpbrk _x_strpbrk
+#endif
+
+#ifdef HAVE_STRSEP
+#define xitk_strsep strsep
+#else
+static inline char *_x_strsep(char **stringp, const char *delim) {
+  char *begin, *end;
+  
+  begin = *stringp;
+  if(begin == NULL)
+    return NULL;
+  
+  if(delim[0] == '\0' || delim[1] == '\0') {
+    char ch = delim[0];
+    
+    if(ch == '\0')
+      end = NULL;
+    else {
+      if(*begin == ch)
+	end = begin;
+      else if(*begin == '\0')
+	end = NULL;
+      else
+	end = strchr(begin + 1, ch);
+    }
+  }
+  else
+    end = xitk_strpbrk(begin, delim);
+  
+  if(end) {
+    *end++ = '\0';
+    *stringp = end;
+  }
+  else
+    *stringp = NULL;
+  
+  return begin;
+}
+#define xitk_strsep _x_strsep
+#endif
+
 void xitk_strdupa(char *dest, char *src);
 #define xitk_strdupa(d, s) {                                        \
   (d) = NULL;                                                       \
