@@ -35,11 +35,13 @@
 
 extern gGui_t          *gGui; 
 
+#define DEFAULT_SKIN "xinetic"
+
 /* Old "default" skin is unavailable now, change to "metal" */
 #define CHECK_IF_NO_DEFAULT(sk) {                                             \
   if(!strncasecmp(sk, "default", strlen(sk))) {                               \
-    config_set_str("skin", "metal");                                          \
-    sk = config_lookup_str("skin", "metal");                                  \
+    config_set_str("skin", DEFAULT_SKIN);                                     \
+    sk = config_lookup_str("skin", DEFAULT_SKIN);                             \
   }                                                                           \
 }
 
@@ -50,7 +52,7 @@ char *gui_get_skindir(const char *file) {
   static char tmp[256];
   char *skin;
 
-  skin = config_lookup_str("skin", "metal");
+  skin = config_lookup_str("skin", DEFAULT_SKIN);
   
   CHECK_IF_NO_DEFAULT(skin);
   
@@ -66,7 +68,7 @@ int is_entry_exist(const char *entry) {
   FILE *fd_read;
   char skincfgfile[1024], tok[80], *skin, buf[256], *ln = buf;
 
-  skin = config_lookup_str("skin", "metal");
+  skin = config_lookup_str("skin", DEFAULT_SKIN);
 
   CHECK_IF_NO_DEFAULT(skin);
 
@@ -111,7 +113,7 @@ char *extract_value(const char *entry, int pos) {
     *ret = NULL;
   int i;
 
-  skin = config_lookup_str("skin", "metal");
+  skin = config_lookup_str("skin", DEFAULT_SKIN);
 
   CHECK_IF_NO_DEFAULT(skin);
 
@@ -273,7 +275,7 @@ char *gui_get_skinfile(const char *str) {
   char *v=NULL;
   char *ret=NULL, *skin;
   
-  skin = config_lookup_str("skin", "metal");
+  skin = config_lookup_str("skin", DEFAULT_SKIN);
   
   CHECK_IF_NO_DEFAULT(skin);
 
@@ -300,7 +302,7 @@ void gui_place_extra_images(widget_list_t *gui_widget_list) {
   int           x, y;
   xitk_image_t  im;
 
-  skin = config_lookup_str("skin", "metal");
+  skin = config_lookup_str("skin", DEFAULT_SKIN);
 
   CHECK_IF_NO_DEFAULT(skin);
 

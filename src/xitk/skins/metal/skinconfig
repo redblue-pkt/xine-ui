@@ -94,6 +94,6 @@ MrlUp:		328	30	arrowup2.png
 MrlSlidBG:	327	45	pl_slidv.png
 MrlSlidFG:	0	0	pl_slidpad.png
 MrlDn:		328	175	arrowdn2.png
-MrlCurOrigin:	35	186	letters.png	50	False
+MrlCurOrigin:	35	186	letters.png	50	True
 MrlPlugLabel:	360	40	letters.png	7	False
 MrlPlugNameBG:	350	62	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*

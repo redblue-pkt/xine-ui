@@ -68,9 +68,7 @@ static Pixmap create_labelofinputtext(widget_t *it,
   int                 dir, as, des, len, yoff = 0, DefaultColor = -1;
   unsigned int        fg;
   XColor              color;
-  gui_color_names_t  *gColors;
-
-  gColors = gui_get_color_names();
+  gui_color_names_t  *gColor = NULL;
 
   color.flags = DoRed|DoBlue|DoGreen;
 
@@ -101,11 +99,7 @@ static Pixmap create_labelofinputtext(widget_t *it,
       DefaultColor = 0;
     }
     else {
-      for(; gColors->colorname != NULL; gColors++) {
-	if(!strcasecmp(gColors->colorname, private_data->normal_color)) {
-	  break;
-	}
-      } 
+      gColor = gui_get_color_name(private_data->normal_color);
     }
     break;
 
@@ -114,23 +108,19 @@ static Pixmap create_labelofinputtext(widget_t *it,
       DefaultColor = 0;
     }
     else {
-      for(; gColors->colorname != NULL; gColors++) {
-	if(!strcasecmp(gColors->colorname, private_data->focused_color)) {
-	  break;
-	}
-      } 
+      gColor = gui_get_color_name(private_data->focused_color);
     }
     break;
     
   }
   
-  if(gColors->colorname == NULL || DefaultColor != -1) {
+  if(gColor == NULL || DefaultColor != -1) {
     color.red = color.blue = color.green = DefaultColor<<8;
   }
   else {
-    color.red = gColors->red<<8; 
-    color.blue = gColors->blue<<8;
-    color.green = gColors->green<<8;
+    color.red = gColor->red<<8; 
+    color.blue = gColor->blue<<8;
+    color.green = gColor->green<<8;
   }
 
   XAllocColor(private_data->display,
@@ -181,6 +171,11 @@ static Pixmap create_labelofinputtext(widget_t *it,
   }
   
   XFreeFont(private_data->display, fs);
+
+  if(gColor) {
+    free(gColor->colorname);
+    free(gColor);
+  }
 
   return pix;
 }
@@ -768,7 +763,7 @@ char *inputttext_get_text(widget_t *it) {
 /*
  * Change and redisplay the text of widget.
  */
-void inputtext_change_text(widget_list_t *wl, widget_t *it, const char *text) {
+void inputtext_change_text(widget_list_t *wl, widget_t *it, char *text) {
   inputtext_private_data_t *private_data = 
     (inputtext_private_data_t *) it->private_data;
   
@@ -822,7 +817,7 @@ widget_t *inputtext_create (xitk_inputtext_t *it) {
 
   mywidget->enable            = 1;
   mywidget->running           = 1;
-  mywidget->visible         = 1;
+  mywidget->visible           = 1;
   mywidget->have_focus        = FOCUS_LOST;
   mywidget->x                 = it->x;
   mywidget->y                 = it->y;

@@ -59,7 +59,7 @@ void gui_playlist_show(widget_t *w, void *data);
 
 void gui_mrlbrowser_show(widget_t *w, void *data);
 
-void gui_set_current_mrl(const char *mrl);
+void gui_set_current_mrl(char *mrl);
 
 char *gui_get_next_mrl (void);
 

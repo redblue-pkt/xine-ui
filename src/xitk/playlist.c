@@ -536,7 +536,7 @@ void playlist_handle_event(XEvent *event, void *data) {
 /*
  *
  */
-static void pl_add_input(widget_t *w, void *data, const char *filename) {
+static void pl_add_input(widget_t *w, void *data, char *filename) {
 
   if(filename)
     gui_dndcallback((char *)filename);

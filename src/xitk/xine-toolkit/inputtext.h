@@ -42,9 +42,9 @@ typedef struct {
   void                   *userdata;
 
   char                   *text;
-  const char             *fontname;
-  const char             *normal_color;
-  const char             *focused_color;
+  char                   *fontname;
+  char                   *normal_color;
+  char                   *focused_color;
 
   int                     have_focus;
   int                     max_length;
@@ -58,6 +58,6 @@ typedef struct {
 
 widget_t *inputtext_create(xitk_inputtext_t *it);
 char *inputttext_get_text(widget_t *it);
-void inputtext_change_text(widget_list_t *wl, widget_t *it, const char *text);
+void inputtext_change_text(widget_list_t *wl, widget_t *it, char *text);
 
 #endif

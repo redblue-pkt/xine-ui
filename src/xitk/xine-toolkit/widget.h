@@ -141,6 +141,11 @@ void *gui_xmalloc(size_t size);
 gui_color_names_t *gui_get_color_names(void);
 
 /**
+ *
+ */
+gui_color_names_t *gui_get_color_name(char *color);
+
+/**
  * (re)Paint a widget list.
  */
 int paint_widget_list (widget_list_t *wl) ;

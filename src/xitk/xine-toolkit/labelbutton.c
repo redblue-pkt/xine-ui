@@ -47,7 +47,7 @@
 static Pixmap create_labelofbutton(widget_t *lb, 
 				   Window win, GC gc, Pixmap pix, 
 				   int xsize, int ysize, 
-				   const char *label, int state) {
+				   char *label, int state) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   XFontStruct *fs = NULL;
@@ -55,9 +55,7 @@ static Pixmap create_labelofbutton(widget_t *lb,
   int dir, as, des, len, xoff = 0, yoff = 0, DefaultColor = -1;
   unsigned int fg;
   XColor color;
-  gui_color_names_t *gColors;
-
-  gColors = gui_get_color_names();
+  gui_color_names_t *gColor = NULL;
 
   color.flags = DoRed|DoBlue|DoGreen;
 
@@ -89,11 +87,7 @@ static Pixmap create_labelofbutton(widget_t *lb,
       DefaultColor = 255;
     }
     else {
-      for(; gColors->colorname != NULL; gColors++) {
-	if(!strcasecmp(gColors->colorname, private_data->clickcolor)) {
-	  break;
-	}
-      } 
+      gColor = gui_get_color_name(private_data->clickcolor);
     }
     break;
     
@@ -102,11 +96,7 @@ static Pixmap create_labelofbutton(widget_t *lb,
       DefaultColor = 0;
     }
     else {
-      for(; gColors->colorname != NULL; gColors++) {
-	if(!strcasecmp(gColors->colorname, private_data->focuscolor)) {
-	  break;
-	}
-      } 
+      gColor = gui_get_color_name(private_data->focuscolor);
     }
     break;
     
@@ -115,22 +105,18 @@ static Pixmap create_labelofbutton(widget_t *lb,
       DefaultColor = 0;
     }
     else {
-      for(; gColors->colorname != NULL; gColors++) {
-	if(!strcasecmp(gColors->colorname, private_data->normcolor)) {
-	  break;
-	}
-      } 
+      gColor = gui_get_color_name(private_data->normcolor);
     }
     break;
   }
-  
-  if(gColors->colorname == NULL || DefaultColor != -1) {
+
+  if(gColor == NULL || DefaultColor != -1) {
     color.red = color.blue = color.green = DefaultColor<<8;
   }
   else {
-    color.red = gColors->red<<8; 
-    color.blue = gColors->blue<<8;
-    color.green = gColors->green<<8;
+    color.red = gColor->red<<8; 
+    color.blue = gColor->blue<<8;
+    color.green = gColor->green<<8;
   }
 
   XAllocColor(private_data->display, DefaultColormap(private_data->display, 0), &color);
@@ -145,6 +131,11 @@ static Pixmap create_labelofbutton(widget_t *lb,
   
   XFreeFont(private_data->display, fs);
 
+  if(gColor) {
+    free(gColor->colorname);
+    free(gColor);
+  }
+    
   return pix;
 }
 

@@ -128,7 +128,7 @@ typedef struct widget_list_s {
 
 typedef void (*xitk_simple_callback_t)(widget_t *, void *);
 typedef void (*xitk_state_callback_t)(widget_t *, void *, int);
-typedef void (*xitk_string_callback_t)(widget_t *, void *, const char *);
+typedef void (*xitk_string_callback_t)(widget_t *, void *, char *);
 typedef void (*xitk_dnd_callback_t) (char *filename);
 #ifdef NEED_MRLBROWSER
 typedef void (*xitk_mrl_callback_t)(widget_t *, void *, mrl_t *);
@@ -346,8 +346,8 @@ typedef struct {
   int                     min;
   int                     max;
   int                     step;
-  const char             *background_skin;
-  const char             *paddle_skin;
+  char                   *background_skin;
+  char                   *paddle_skin;
   xitk_state_callback_t   callback;
   void                   *userdata;
   xitk_state_callback_t   motion_callback;
@@ -496,7 +496,7 @@ widget_t *label_button_create(xitk_labelbutton_t *b);
 /**
  * Change label of button 'widget'.
  */
-int labelbutton_change_label(widget_list_t *wl, widget_t *, const char *);
+int labelbutton_change_label(widget_list_t *wl, widget_t *, char *);
 
 /**
  * Return label of button 'widget'.
@@ -526,7 +526,7 @@ typedef struct {
   int                     y;
   int                     length;
   char                   *label;
-  const char             *font;
+  char                   *font;
   int                     animation;
 } xitk_label_t;
 
@@ -548,14 +548,14 @@ int label_change_label(widget_list_t *wl, widget_t *l, char *newlabel);
 /**
  * Load image and return a gui_image_t data type.
  */
-gui_image_t *gui_load_image(ImlibData *idata, const char *image);
+gui_image_t *gui_load_image(ImlibData *idata, char *image);
 
 typedef struct {
   Display                *display;
   ImlibData              *imlibdata;
   int                     x;
   int                     y;
-  const char             *skin;
+  char                   *skin;
 } xitk_image_t;
 
 /**
@@ -585,7 +585,7 @@ typedef struct {
   int                     y;
   xitk_state_callback_t  callback;
   void                   *userdata;
-  const char             *skin;
+  char                   *skin;
 } xitk_checkbox_t;
 /**
  * Create a checkbox.
@@ -615,7 +615,7 @@ typedef struct {
   int                     y;
   xitk_simple_callback_t  callback;
   void                   *userdata;
-  const char             *skin;
+  char                   *skin;
 } xitk_button_t;
 
 widget_t *button_create (xitk_button_t *b);
@@ -900,17 +900,17 @@ typedef struct {
   ImlibData              *imlibdata;
   int                     x;
   int                     y;
-  const char             *text;
+  char                   *text;
   int                     max_length;
 
-  const char             *fontname;
+  char                   *fontname;
 
   xitk_string_callback_t  callback;
   void                   *userdata;
 
-  const char             *skin_filename;
-  const char             *normal_color;
-  const char             *focused_color;
+  char                   *skin_filename;
+  char                   *normal_color;
+  char                   *focused_color;
 
 } xitk_inputtext_t;
 
@@ -925,7 +925,7 @@ char *inputttext_get_text(widget_t *it);
 /**
  * Change and redisplay the text of widget.
  */
-void inputtext_change_text(widget_list_t *wl, widget_t *it, const char *text);
+void inputtext_change_text(widget_list_t *wl, widget_t *it, char *text);
 
 
 #endif

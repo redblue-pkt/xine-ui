@@ -453,6 +453,7 @@ src/xitk/skins/Makefile
 src/xitk/skins/metal/Makefile
 src/xitk/skins/lcd/Makefile
 src/xitk/skins/pitt/Makefile
+src/xitk/skins/xinetic/Makefile
 src/aaui/Makefile
 doc/Makefile
 doc/man/Makefile

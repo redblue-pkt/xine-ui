@@ -1,0 +1,105 @@
+## WARNING:  All fields are tab separate, space is no more valid.
+###
+#
+# Text		X       Y       Filename        Length  Animation
+# Label                         of pixfont
+#
+###
+#
+# Labeled						Text
+# Button	X	Y	Filename	Normal  Focus   Click  Fontname
+#				 of bg		Color	Color	Color
+###
+#
+# Other		X	Y	Filename
+#				of skin
+#
+###
+#Xine skin data file
+#Title:     Xinetic for Xine
+#Version:   0.1
+#Released:  22.07.2001
+#Author:    Darjeeling <villette@chem.leidenuniv.nl>
+#URL:       none
+
+## Main GUI ##
+BackGround:	0	0	MainBg.png
+Close:		549	1	MainClose.png
+Eject:		527	62	MainEject.png
+Exit:		7	75	MainPower.png
+FullScreen:	524	3	MainFullScreen.png
+TitleLabel:	48	17	Letters.png	59	True
+TimeLabel:	235	36	Letters.png	8	False
+
+AudioPrev:	288	44	SmallArrowDown.png
+AudioNext:	288	36	SmallArrowUp.png
+AudioLabel:	325	36	Letters.png	3	False
+
+SpuNext:	347	36	SmallArrowUp.png
+SpuPrev:	347	44	SmallArrowDown.png
+SpuLabel:	384	36	Letters.png	3	False
+
+Next:		504	49	MainNext.png
+Pause:		454	29	MainPause.png
+Play:		482	12	MainPlay.png
+Stop:		504 	29	MainStop.png
+Prev:		454	49	MainPrev.png
+
+AutoPlayGUI:	156	43	MainAutoButton.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+PlBtn:		210	55	PlBtn.png
+CtlBtn:		264	55	CtlBtn.png
+MrlBtn:		318	55	MrlBtn.png
+SliderBGPlay:	35	4	SliderHBg.png
+SliderFGPlay:	0	0	SliderHPad.png
+
+## Playlist ##
+PlBG:		0	0	PlBg.png
+PlAdd:		333	110	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+PlLoad:		333	127	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+PlSave:		333	144	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+PlItemBtn:	20	20	PlItemBtn.png	Gray	Gray	Black	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+PlPlay:		15	219	PlPlay.png
+PlDelete:	69 	219	PlDelete.png
+PlDeleteAll:	123	219	PlDeleteAll.png
+PlMoveUp:	177	219	PlMoveUp.png
+PlMoveDn:	231	219	PlMoveDn.png
+PlDismiss:	333	207	PlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+PlUp:		310	17	BigArrowUp.png
+PlSlidBG:	312	38	SliderVBg.png
+PlSlidFG:	0	0	SliderVPad.png
+PlDn:		310	164	BigArrowDown.png
+AutoPlayLbl:	337	20	Letters.png	9	False
+AutoPlayBG:	333	42	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+PlInputText:	26	193	PlInputTxt.png	Gray	Gray	Black	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+
+#Control Panel
+CtlBG:		0	0	CtlBg.png
+CtlHueBG:	35	39	SliderVBg.png
+CtlHueFG:	0	0	SliderVPad.png
+CtlHueLbl:	23	191	Letters.png
+CtlSatBG:	79	39	SliderVBg.png
+CtlSatFG:	0	0	SliderVPad.png
+CtlSatLbl:	66	191	Letters.png
+CtlBrightBG:	124	39	SliderVBg.png
+CtlBrightFG:	0	0	SliderVPad.png
+CtlBrightLbl:	111	191	Letters.png
+CtlContBG:	170	39	SliderVBg.png
+CtlContFG:	0	0	SliderVPad.png
+CtlContLbl:	157	192	Letters.png
+CtlSave:        13	214	CtlSave.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+CtlDismiss:	135	206	CtlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+
+### MRL Browser ###
+MrlBG:		0	0	MrlBg.png
+MrlItemBtn:	20	20	PlItemBtn.png	Gray	Gray	Black	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+MrlSelect:	15	207	MrlSelect.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+MrlDismiss:	333	207	MrlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+MrlUp:		310	17	BigArrowUp.png
+MrlSlidBG:	312	38	SliderVBg.png
+MrlSlidFG:	0	0	SliderVPad.png
+MrlDn:		310	164	BigArrowDown.png
+MrlCurOrigin:	21	193	Letters.png	43	True
+MrlPlugNameBG:	333	42	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+MrlPlugLabel:	337	20	Letters.png	7	False
+
+

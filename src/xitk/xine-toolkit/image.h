@@ -41,7 +41,7 @@ typedef struct {
 /**
  * Load image and return a gui_image_t data type.
  */
-gui_image_t *gui_load_image(ImlibData *idata, const char *image);
+gui_image_t *gui_load_image(ImlibData *idata, char *image);
 
 /**
  * Create an image widget type.

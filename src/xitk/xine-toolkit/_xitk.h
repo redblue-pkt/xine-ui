@@ -37,7 +37,7 @@
 
 typedef void (*xitk_simple_callback_t)(widget_t *, void *);
 typedef void (*xitk_state_callback_t)(widget_t *, void *, int);
-typedef void (*xitk_string_callback_t)(widget_t *, void *, const char *);
+typedef void (*xitk_string_callback_t)(widget_t *, void *, char *);
 
 #ifdef NEED_MRLBROWSER
 #include "xine.h"
@@ -106,7 +106,7 @@ typedef struct {
   int          y;
   xitk_simple_callback_t callback;
   void         *userdata;
-  const char   *skin;
+  char         *skin;
 } xitk_button_t;
 
 typedef struct {
@@ -132,7 +132,7 @@ typedef struct {
   ImlibData              *imlibdata;
   int                     x;
   int                     y;
-  const char             *skin;
+  char                  *skin;
 } xitk_image_t;
 
 typedef struct {
@@ -142,7 +142,7 @@ typedef struct {
   int                     y;
   xitk_state_callback_t  callback;
   void                   *userdata;
-  const char             *skin;
+  char                   *skin;
 } xitk_checkbox_t;
 
 typedef struct {
@@ -154,7 +154,7 @@ typedef struct {
   int                     y;
   int                     length;
   char                   *label;
-  const char             *font;
+  char                   *font;
   int                     animation;
 } xitk_label_t;
 
@@ -167,8 +167,8 @@ typedef struct {
   int                     min;
   int                     max;
   int                     step;
-  const char             *background_skin;
-  const char             *paddle_skin;
+  char                   *background_skin;
+  char                   *paddle_skin;
   xitk_state_callback_t   callback;
   void                   *userdata;
   xitk_state_callback_t   motion_callback;
@@ -390,17 +390,17 @@ typedef struct {
   ImlibData              *imlibdata;
   int                     x;
   int                     y;
-  const char             *text;
+  char                   *text;
   int                     max_length;
 
-  const char             *fontname;
+  char                   *fontname;
 
   xitk_string_callback_t  callback;
   void                   *userdata;
 
-  const char             *skin_filename;
-  const char             *normal_color;
-  const char             *focused_color;
+  char                   *skin_filename;
+  char                   *normal_color;
+  char                   *focused_color;
 
 } xitk_inputtext_t;
 

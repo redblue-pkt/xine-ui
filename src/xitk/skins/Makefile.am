@@ -1,4 +1,4 @@
-SUBDIRS = metal lcd pitt
+SUBDIRS = metal lcd pitt xinetic
 
 install-exec-am:
 	if test -d @XINE_SKINDIR@/default; then \

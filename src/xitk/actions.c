@@ -283,7 +283,7 @@ void gui_mrlbrowser_show(widget_t *w, void *data) {
   }
 }
 
-void gui_set_current_mrl(const char *mrl) {
+void gui_set_current_mrl(char *mrl) {
 
   if(mrl)
     strcpy(gGui->filename, mrl);

@@ -120,8 +120,6 @@ void gui_status_callback (int nStatus) ;
 
 void gui_dndcallback (char *filename) ;
 
-void gui_set_current_mrl(const char *mrl);
-
 void gui_handle_event (XEvent *event, void *data);
 
 char *gui_next_mrl_callback () ;

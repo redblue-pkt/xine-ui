@@ -35,7 +35,7 @@
 /*
  *
  */
-gui_image_t *gui_load_image(ImlibData *idata, const char *image) {
+gui_image_t *gui_load_image(ImlibData *idata, char *image) {
   ImlibImage *img = NULL;
   gui_image_t *i;
 

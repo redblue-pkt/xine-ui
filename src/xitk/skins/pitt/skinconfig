@@ -92,6 +92,6 @@ MrlSelect:	30	234	pl_btn.png	Black	Black	Black	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 MrlDismiss:	355	234	pl_btn.png	Black	Black	Black	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 MrlUp:		324	21	arrowup.png
 MrlDn:		324	160	arrowdn.png
-MrlCurOrigin:	95	190	letters.png	50	False
+MrlCurOrigin:	30	190	letters.png	50	True
 MrlPlugLabel:	355	20	letters.png	7	False
 MrlPlugNameBG:	355	40	pl_btn.png	Black	Black	Black	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*

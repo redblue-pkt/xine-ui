@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
 #include <string.h>
 #include <pthread.h>
 #include <errno.h>
@@ -891,6 +892,67 @@ void widget_disable(widget_t *w) {
 gui_color_names_t *gui_get_color_names(void) {
 
   return gui_color_names;
+}
+
+/*
+ *
+ */
+gui_color_names_t *gui_get_color_name(char *color) {
+  gui_color_names_t *cn = NULL;
+  gui_color_names_t *pcn = NULL;
+
+  if(color == NULL)
+    return NULL;
+
+  /* Hexa X triplet */
+  if((strncasecmp(color, "#", 1) <= 0) && (strlen(color) == 7)) {
+    char  *lowercolorname;
+    char  *p;
+    
+    p = strdup((color + 1));
+
+    /* 
+     * convert copied color to lowercase, this can avoid some problems
+     * with _buggy_ sscanf(), who knows ;-)
+    */
+    lowercolorname = p;
+    while(*lowercolorname != '\0') {
+      *lowercolorname = tolower(*lowercolorname);
+      lowercolorname++;
+    }
+    lowercolorname = p;
+
+    cn = (gui_color_names_t *) gui_xmalloc(sizeof(gui_color_names_t));
+    
+    if((sscanf(lowercolorname, 
+	       "%2x%2x%2x", &cn->red, &cn->green, &cn->blue)) != 3) {
+      fprintf(stderr, "sscanf() failed: %s\n", strerror(errno));
+      cn->red = cn->green = cn->blue = 0;
+    }
+
+    cn->colorname = strdup(color);
+    
+    free(p);
+
+    return cn;
+  } 
+  else {
+    for(pcn = gui_color_names; pcn->colorname != NULL; pcn++) {
+      if(!strncasecmp(pcn->colorname, color, strlen(pcn->colorname))) {
+
+	cn = (gui_color_names_t *) gui_xmalloc(sizeof(gui_color_names_t));
+
+	cn->red       = pcn->red;
+	cn->green     = pcn->green;
+	cn->blue      = pcn->blue;
+	cn->colorname = strdup(pcn->colorname);
+
+	return cn;
+      }
+    }
+  }
+
+  return NULL;
 }
 
 /*
