@@ -39,6 +39,14 @@
 extern gGui_t   *gGui;
 
 #ifdef HAVE_CURL
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE 0
+#endif
+
 static int progress_callback(void *userdata, 
 			     double dltotal, double dlnow, double ultotal, double ulnow) {
   download_t  *download = (download_t *) userdata;
