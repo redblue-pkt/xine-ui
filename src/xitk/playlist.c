@@ -42,6 +42,10 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
+#ifndef __GNUC__
+#define __FUNCTION__    __func__
+#endif
+
 #define MAX_LIST 9
 
 extern gGui_t          *gGui;

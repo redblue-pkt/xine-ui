@@ -70,8 +70,8 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 #define XITK_DIE(FMT, ARGS...) { fprintf(stderr, "XITK DIE: "FMT, ##ARGS); exit(-1); }
 #define XITK_WARNING(FMT, ARGS...) fprintf(stderr, "XITK WARNING: "FMT, ##ARGS)
 #else	/* C99 version: */
-#define XITK_DIE(...) { fprintf(stder, "XITK DIE: "__VA_ARGS__); exit(-1); }
-#define XITK_WARNING(...) fprintf(stder, "XITK WARNING: "__VA_ARGS__)
+#define XITK_DIE(...) { fprintf(stderr, "XITK DIE: "__VA_ARGS__); exit(-1); }
+#define XITK_WARNING(...) fprintf(stderr, "XITK WARNING: "__VA_ARGS__)
 #endif
 
 #define XITK_FREE(X) if((X)) free((X))

@@ -46,6 +46,10 @@
 #include "snapshot.h"
 #include "utils.h"
 
+#ifndef __GNUC__
+#define __FUNCTION__    __func__
+#endif
+
 extern gGui_t     *gGui;
 
 _panel_t          *panel;

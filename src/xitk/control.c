@@ -43,6 +43,10 @@
 #include "actions.h"
 #include "skins.h"
 
+#ifndef __GNUC__
+#define __FUNCTION__    __func__
+#endif
+
 extern gGui_t          *gGui;
 
 typedef struct {

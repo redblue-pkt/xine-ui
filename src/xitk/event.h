@@ -41,8 +41,8 @@
 #define xine_error(FMT,ARGS...) xitk_window_dialog_error(gGui->imlib_data, FMT, ##ARGS)
 #define xine_info(FMT,ARGS...)  xitk_window_dialog_info(gGui->imlib_data, FMT, ##ARGS)
 #else	/* C99 version: */
-#define xine_error(...)	        xitk_window_dialog_error(gGui->imlib_data, __VA_ARGS__)
-#define xine_info(FMT,ARGS...)  xitk_window_dialog_info(gGui->imlib_data,  __VA_ARGS__)
+#define xine_error(...)         xitk_window_dialog_error(gGui->imlib_data, __VA_ARGS__)
+#define xine_info(...)          xitk_window_dialog_info(gGui->imlib_data, __VA_ARGS__)
 #endif
 
 
