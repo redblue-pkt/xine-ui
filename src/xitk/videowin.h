@@ -51,7 +51,4 @@ int video_window_is_cursor_visible(void);
 void video_window_set_visibility(int show_window);
 int video_window_is_visible (void);
 
-void video_window_show_logo(void);
-void video_window_hide_logo(void);
-
 #endif

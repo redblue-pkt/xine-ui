@@ -89,7 +89,6 @@ void gui_play (xitk_widget_t *w, void *data) {
   fprintf(stderr, "xine-panel: PLAY\n");
 
   if (xine_get_status (gGui->xine) != XINE_PLAY) {
-    video_window_hide_logo();
     if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
       gui_handle_xine_error();
   } else {
@@ -103,7 +102,6 @@ void gui_stop (xitk_widget_t *w, void *data) {
 
   gGui->ignore_status = 1;
   xine_stop (gGui->xine);
-  video_window_show_logo();
   gGui->ignore_status = 0; 
   panel_reset_slider ();
   panel_check_pause();
@@ -371,7 +369,6 @@ void gui_nextprev(xitk_widget_t *w, void *data) {
       if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
 	gui_handle_xine_error();
     } else {
-      video_window_show_logo();
       gGui->playlist_cur = 0;
     }
     gGui->ignore_status = 0;

@@ -32,6 +32,7 @@
 #include <pthread.h>
 
 #include <xine/xineutils.h>
+#include <zlib.h>
 
 #include "xitk.h"
 

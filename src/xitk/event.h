@@ -85,8 +85,6 @@ typedef struct {
   ImlibData           *imlib_data;
 
   Window               video_window; 
-  ImlibImage          *video_window_logo_image;
-  xitk_image_t         video_window_logo_pixmap;
   int                  cursor_visible;
   int                  cursor_grabbed;
 

@@ -142,116 +142,6 @@ void video_window_change_sizepos(int x, int y, int w, int h) {
 /*
  *
  */
-void video_window_draw_logo(void) {
-  ImlibImage *resized_image;
-  int xwin, ywin, tmp;
-  unsigned int wwin, hwin, bwin, dwin;
-  double ratio = 1;
-  Window rootwin;
-  
-  if(video_window_is_visible()) {
-    
-    XLockDisplay (gGui->display);
-    
-    /* XClearWindow (gGui->display, gGui->video_window);  */
-    
-    if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
-		    &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
-      
-      tmp = (wwin / 100) * 86;
-      ratio = (tmp < gGui->video_window_logo_pixmap.width && tmp >= 1) ? 
-	((double)tmp / (double)gGui->video_window_logo_pixmap.width):1;
-    }
-    
-    resized_image = Imlib_clone_image(gGui->imlib_data, 
-				      gGui->video_window_logo_image);
-    Imlib_render (gGui->imlib_data, resized_image, 
-		  (int)gGui->video_window_logo_pixmap.width * ratio, 
-		  (int)gGui->video_window_logo_pixmap.height * ratio);
-    
-    XCopyArea (gGui->display, resized_image->pixmap, gGui->video_window, 
-	       gVw->gc, 0, 0,
-	       resized_image->width, resized_image->height, 
-	       (wwin - resized_image->width) / 2, 
-	       (hwin - resized_image->height) / 2);
-    
-    
-    XFlush(gGui->display);
-    
-    Imlib_destroy_image(gGui->imlib_data, resized_image);
-    
-    XUnlockDisplay (gGui->display);
-  }
-}
-
-/*
- * Hide the logo in video output window.
- */
-void video_window_hide_logo(void) {
-
-  if(video_window_is_visible()) {
-    XLockDisplay (gGui->display);
-#if 0
-    XUnmapWindow (gGui->display, gGui->video_window);
-    XMapWindow (gGui->display, gGui->video_window);
-#else
-    /*
-     * The Unmap/Map trick(?) has the undesirable side-effect, that
-     * all of the video_windows's transient windows are unmapped, too
-     * - messing up their "visible" state.
-     *
-     * Remove the logo by clearing the window.
-     */
-    XClearWindow (gGui->display, gGui->video_window);
-
-    /* Force ConfigureNotify event */
-    /* 
-     *   no longer needed, video_out_xv repaints it's colorkey now on
-     * GUI_DATA_EX_LOGO_VISIBILITY 
-     *
-    {
-      Window        rootwin;
-      int           xwin, ywin;
-      unsigned int  wwin, hwin, bwin, dwin;
-      
-      if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
-		      &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
-	
-	XMoveResizeWindow (gGui->display, gGui->video_window, xwin, ywin, wwin-1, hwin-1);
-	XMoveResizeWindow (gGui->display, gGui->video_window, xwin, ywin, wwin, hwin);
-      }
-    }
-    */
-    
-    gGui->vo_driver->gui_data_exchange(gGui->vo_driver, GUI_DATA_EX_LOGO_VISIBILITY, (int *)0);
-#endif
-    XUnlockDisplay (gGui->display);
-  }
-
-/* 2001-10-07 ehasenle: activated this code for dxr3 overlay */
-    gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
-    GUI_DATA_EX_DRAWABLE_CHANGED, 
-    (void*)gGui->video_window);
-}
-
-/*
- * Show the logo in video output window.
- */
-void video_window_show_logo(void) {
-   
-  if(video_window_is_visible()) {
-    gGui->vo_driver->gui_data_exchange (gGui->vo_driver, GUI_DATA_EX_LOGO_VISIBILITY, (int *)1);
-     
-    XLockDisplay (gGui->display);
-    XClearWindow (gGui->display, gGui->video_window); 
-    video_window_draw_logo();
-    XUnlockDisplay (gGui->display);
-  }
-}
-
-/*
- *
- */
 void video_window_set_fullscreen (int req_fullscreen) {
 
   x11_rectangle_t area;
@@ -942,8 +832,6 @@ void video_window_init (void) {
   XUnlockDisplay (gGui->display);
 
   video_window_adapt_size (NULL, 768, 480, &x, &y, &w, &h);
-  video_window_draw_logo();
-
 }
 
 
@@ -1085,14 +973,9 @@ static void video_window_handle_event (XEvent *event, void *data) {
     if (xev->count == 0) {
 
       if(event->xany.window == gGui->video_window) {
-	if(xine_get_status(gGui->xine) == XINE_STOP)
-	  video_window_draw_logo();
-	else {
-
-	  gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
-					      GUI_DATA_EX_EXPOSE_EVENT, 
-					      event);
-	}
+	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+					    GUI_DATA_EX_EXPOSE_EVENT, 
+					    event);
       }
     }
   }
@@ -1100,19 +983,17 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
   case ConfigureNotify:
     if(event->xany.window == gGui->video_window) {
-      if(xine_get_status(gGui->xine) != XINE_STOP) {
-	XConfigureEvent *cev = (XConfigureEvent *) event;
-	x11_rectangle_t area;
-
-	area.x = 0;
-	area.y = 0;
-	area.w = cev->width;
-	area.h = cev->height;
-	
-	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
-					    GUI_DATA_EX_DEST_POS_SIZE_CHANGED, 
-					    &area);
-      }
+      XConfigureEvent *cev = (XConfigureEvent *) event;
+      x11_rectangle_t area;
+      
+      area.x = 0;
+      area.y = 0;
+      area.w = cev->width;
+      area.h = cev->height;
+      
+      gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+					  GUI_DATA_EX_DEST_POS_SIZE_CHANGED, 
+					  &area);
     }
     break;
     

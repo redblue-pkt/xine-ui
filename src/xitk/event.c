@@ -38,6 +38,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <limits.h>
+#include <zlib.h>
 
 #include "xitk.h"
 
@@ -755,7 +756,6 @@ void gui_status_callback (int nStatus) {
       if(gGui->actions_on_start[0] == ACTID_QUIT)
 	gui_exit(NULL, NULL);
       
-      video_window_show_logo();
       gGui->playlist_cur--;
     }
   }
@@ -867,7 +867,6 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
   if (visual_return != NULL)
     *visual_return = visual;
 }
-
 
 /*
  * Initialize the GUI
@@ -984,34 +983,8 @@ void gui_init_imlib (Visual *vis) {
     fprintf(stderr, _("Unable to initialize Imlib\n"));
     exit(1);
   }
+
   gGui->colormap = Imlib_get_colormap (gGui->imlib_data);
-
-  /* 
-   * Create logo image displayed into video window from
-   * the official Xine logo.
-   */
-  if (gGui->video_window_logo_image)
-    Imlib_destroy_image (gGui->imlib_data, gGui->video_window_logo_image);
-  sprintf(buffer, "%s/xine_logo.png", XINE_SKINDIR);
-  if((gGui->video_window_logo_image = Imlib_load_image(gGui->imlib_data, buffer)) == NULL) {
-    xine_error(_("Unable to load %s logo\n"), buffer);
-    exit(1);
-  }
-
-  Imlib_render(gGui->imlib_data, gGui->video_window_logo_image,
-	       gGui->video_window_logo_image->rgb_width,
-	       gGui->video_window_logo_image->rgb_height);
-
-  if (gGui->video_window_logo_pixmap.image)
-    Imlib_free_pixmap (gGui->imlib_data, gGui->video_window_logo_pixmap.image);
-  gGui->video_window_logo_pixmap.image = 
-    Imlib_move_image(gGui->imlib_data, gGui->video_window_logo_image);
-
-  gGui->video_window_logo_pixmap.width = 
-    gGui->video_window_logo_image->rgb_width;
-
-  gGui->video_window_logo_pixmap.height = 
-    gGui->video_window_logo_image->rgb_height;
 
   XAllocNamedColor(gGui->display, gGui->colormap,
 		   "black", &gGui->black, &dummy);
