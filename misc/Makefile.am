@@ -2,7 +2,7 @@
 SUBDIRS = desktops visuals
 
 datadir = @XINE_SKINDIR@
-data_DATA = xine-ui_logo.mpv black.mpv xine_splash.png
+data_DATA = xine-ui_logo.mpv xine_splash.png
 
 EXTRA_DIST = \
 	$(bin_SCRIPTS) \
@@ -16,8 +16,7 @@ EXTRA_DIST = \
 	xine-check.en \
 	xine_bash_completion \
 	xine-ui_logo.mpv \
-	xine_splash.png \
-	black.mpv
+	xine_splash.png
 
 bin_SCRIPTS = xine-check xine-bugreport
 

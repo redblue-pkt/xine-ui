@@ -253,7 +253,7 @@ int post_rewire_audio_port_to_stream(xine_stream_t *stream) {
 
 int post_rewire_audio_post_to_stream(xine_stream_t *stream) {
   xine_post_out_t * audio_source;
-  
+
   audio_source = xine_get_audio_source(stream);
   return xine_post_wire_audio_port(audio_source, gGui->visual_anim.post_output->audio_input[0]);
 }

@@ -1594,7 +1594,7 @@ static void on_start(void *data) {
   splash_destroy();
 
   if((!startup->start && !gGui->playlist.num) || (!startup->start && gGui->playlist.num)) {
-
+    
     gui_display_logo();
     
     do {
@@ -1603,21 +1603,6 @@ static void on_start(void *data) {
 
   }
 
-  /* Crapy Workaround:
-   * The lib seems unable to display OSD until the stream got 
-   * any video data.
-   */
-  if(startup->start || (!startup->start && !gGui->display_logo)) {
-    (void) xine_open(gGui->stream, (const char *) XINE_BLACK_STREAM);
-    
-    if(!startup->start && !gGui->display_logo)
-      xine_play(gGui->stream, 0, 0);
-    
-    gGui->ignore_next = 1;
-    xine_stop(gGui->stream);
-    gGui->ignore_next = 0;
-  }
-  
   if(startup->session_opts) {
     int i = 0;
     int dummy_session;
