@@ -657,6 +657,10 @@ void gui_execute_action_id(action_id_t action) {
     }
     break;
 
+  case ACTID_FILESELECTOR:
+    gui_file_selector();
+    break;
+
   default:
     break;
   }

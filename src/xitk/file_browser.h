@@ -31,6 +31,7 @@ typedef void (*filebrowser_callback_t)(filebrowser_t *);
 typedef struct {
   char                     *label;
   filebrowser_callback_t    callback;
+  int                       need_a_file;
 } filebrowser_callback_button_t;
 		
 

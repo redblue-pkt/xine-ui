@@ -113,6 +113,8 @@ void gui_send_expose_to_window(Window window);
 
 void gui_add_mediamark(void);
 
+void gui_file_selector(void);
+
 void visual_anim_init(void);
 void visual_anim_add_animation(char *mrl);
 void visual_anim_play(void);

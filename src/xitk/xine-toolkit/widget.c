@@ -702,7 +702,7 @@ static xitk_color_names_t xitk_color_names[] = {
   {   0,    0,    0,  NULL }
 };
 
-#if 0
+#if 1
 void dump_widget_type(xitk_widget_t *w) {
   if(w->widget_type & WIDGET_GROUP) {
     printf("WIDGET_TYPE_GROUP: ");
@@ -1361,12 +1361,11 @@ void xitk_enable_widget(xitk_widget_t *w) {
  */
 void xitk_disable_widget(xitk_widget_t *w) {
 
-  if(!w) {
+  if(w == NULL) {
     XITK_WARNING("widget is NULL\n");
     return;
   }
   
-
   if(w->widget_list != NULL) {
     
     if((w->widget_list->widget_under_mouse != NULL) && (w == w->widget_list->widget_under_mouse)) {
@@ -1419,10 +1418,16 @@ void xitk_destroy_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
     return;
   }
 
-  xitk_hide_widget(wl, w);
-  xitk_stop_widget(w);
-  xitk_disable_widget(w);
 
+/*   if(w->widget_type & WIDGET_GROUP) { */
+/*     printf("%s: Gtype:\n", __func__); //(w->widget_type & WIDGET_GROUP_MASK)); */
+/*     dump_widget_type(w); */
+/*   } */
+/*   else */
+/*     printf("%s: type 0x%x\n", __func__, w->widget_type); */
+
+  xitk_hide_widget(wl, w);
+  xitk_disable_widget(w);
   xitk_free_widget(w);
 }
 

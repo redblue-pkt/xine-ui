@@ -194,6 +194,7 @@ static void fb_reactivate(filebrowser_t *fb) {
 /*
  * **************************************************
  */
+static void fb_exit(xitk_widget_t *, void *);
 
 /*
  * ************************* filename editor **************************
@@ -677,6 +678,24 @@ static void fb_select(xitk_widget_t *w, void *data, int selected) {
   }
 }
 
+static void fb_callback_button_cb(xitk_widget_t *w, void *data) {
+  filebrowser_t *fb = (filebrowser_t *) data;
+  
+  if(w == fb->cb_buttons[0]) {
+    if(fb->cbb[0].need_a_file && (!strlen(fb->filename)))
+      return;
+    fb->cbb[0].callback(fb);
+  }
+  else if(w == fb->cb_buttons[1]) {
+    if(fb->cbb[1].need_a_file && (!strlen(fb->filename)))
+      return;
+    fb->cbb[1].callback(fb);
+  }
+  
+  fb_exit(NULL, (void *)fb);
+}
+
+
 static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
   filebrowser_t *fb = (filebrowser_t *) data;
 
@@ -728,8 +747,10 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
     fb_getdir(fb);
   }
   else if(w == fb->files_browser) {
-    printf("DBL FILE SELECTED: '%s\n", fb->norm_files[selected].name);
+    sprintf(fb->filename, "%s", fb->norm_files[selected].name);
+    fb_callback_button_cb(fb->cb_buttons[0], (void *)data);
   }
+
 }
 
 static void fb_change_origin(xitk_widget_t *w, void *data, char *currenttext) {
@@ -852,6 +873,7 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     SAFE_FREE(fb->cbb[1].label);
     
     free(fb);
+    fb = NULL;
   }
 }
 
@@ -964,21 +986,6 @@ static void fb_select_file_filter(xitk_widget_t *w, void *data, int selected) {
   fb_getdir(fb);
 }
 
-static void fb_callback_button_cb(xitk_widget_t *w, void *data) {
-  filebrowser_t *fb = (filebrowser_t *) data;
-  
-  if(strlen(fb->filename)) {
-    
-    if(w == fb->cb_buttons[0])
-      fb->cbb[0].callback(fb);
-    else if(w == fb->cb_buttons[1]) {
-      fb->cbb[1].callback(fb);
-    }
-    
-    fb_exit(NULL, (void *)fb);
-  }
-}
-
 void filebrowser_raise_window(filebrowser_t *fb) {
   if(fb != NULL) {
     if(fb->xwin) {
@@ -1063,9 +1070,11 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   if(cbb1 && (strlen(cbb1->label) && cbb1->callback)) {
     fb->cbb[0].label = strdup(cbb1->label);
     fb->cbb[0].callback = cbb1->callback;
+    fb->cbb[0].need_a_file = cbb1->need_a_file;
     if(cbb2 && (strlen(cbb2->label) && cbb2->callback)) {
       fb->cbb[1].label = strdup(cbb2->label);
       fb->cbb[1].callback = cbb2->callback;
+      fb->cbb[1].need_a_file = cbb2->need_a_file;
   }
     else {
       fb->cbb[1].label = NULL;
