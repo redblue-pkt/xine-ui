@@ -641,8 +641,12 @@ int xscreensaver_kill_server(Display *dpy) {
  */
 void xscreensaver_start_server(void) {
   int err;
-
-  if((err = xine_system(0, "xscreensaver -nosplash&")) < 0) {
+  
+  /*
+   * when playing file from user unmountable device, don't start the
+   * screensaver there, because mount dir stays in use, so first cd to $HOME
+   */
+  if((err = xine_system(0, "cd; xscreensaver -nosplash&")) < 0) {
     fprintf (stderr, "xine_system() returned %d\n", err);
   }
 }
