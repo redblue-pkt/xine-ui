@@ -819,7 +819,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   printf(_("        Depth: %d.\n"),
 	 XDisplayPlanes(gGui->display, gGui->screen));
 #ifdef HAVE_SHM
-  {
+  if(XShmQueryExtension(gGui->display)) {
     int major, minor, ignore;
     Bool pixmaps;
     

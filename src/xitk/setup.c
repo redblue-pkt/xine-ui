@@ -85,7 +85,7 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
 		   0, 0, image->width, image->height);                                          \
     XUnlockDisplay(gGui->display);                                                              \
                                                                                                 \
-    draw_inner_frame(gGui->imlib_data, image->image->pixmap, title, boldfontname,               \
+    draw_inner_frame(gGui->imlib_data, image->image, title, boldfontname,                       \
                      0, (ascent+descent), FRAME_WIDTH, FRAME_HEIGHT);                           \
 	                                                                                        \
     XITK_WIDGET_INIT(&im, gGui->imlib_data);                                                    \
@@ -355,7 +355,7 @@ static void setup_clear_tab(void) {
   im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
 			       (WINDOW_HEIGHT - (51 + 57) + 1));
 
-  draw_outter(gGui->imlib_data, im->image->pixmap, im->width, im->height);
+  draw_outter(gGui->imlib_data, im->image, im->width, im->height);
 
   XLockDisplay(gGui->display);
   XCopyArea(gGui->display, im->image->pixmap, (xitk_window_get_window(setup->xwin)),
@@ -899,7 +899,7 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
  * collect config categories, setup tab widget
  */
 static void setup_sections (void) {
-  Pixmap               bg;
+  xitk_pixmap_t       *bg;
   cfg_entry_t         *entry;
   xitk_tabs_widget_t   tab;
 
@@ -977,21 +977,23 @@ static void setup_sections (void) {
     (setup->tabs = 
      xitk_noskin_tabs_create(setup->widget_list, &tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
   
-  bg = xitk_image_create_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
+  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay(gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(setup->xwin)), bg,
-	    setup->widget_list->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
+  XCopyArea(gGui->display, (xitk_window_get_background(setup->xwin)), bg->pixmap,
+	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
   XUnlockDisplay(gGui->display);
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
 			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)));
-  xitk_window_change_background(gGui->imlib_data, setup->xwin, bg, WINDOW_WIDTH, WINDOW_HEIGHT);
+  xitk_window_change_background(gGui->imlib_data, setup->xwin, bg->pixmap,
+				WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay(gGui->display);
-  XFreePixmap(gGui->display, bg);
   XUnlockDisplay(gGui->display);
-  
+
+  xitk_image_destroy_xitk_pixmap(bg);
+
   setup->num_tmp_widgets = 0;
   setup->num_wg = 0;
   setup->first_displayed = 0;

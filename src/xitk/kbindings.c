@@ -1784,7 +1784,7 @@ static void kbedit_handle_event(XEvent *event, void *data) {
 void kbedit_window(void) {
   int                        x, y;
   GC                         gc;
-  Pixmap                     bg;
+  xitk_pixmap_t             *bg;
   xitk_labelbutton_widget_t  lb;
   xitk_label_widget_t        l;
   xitk_browser_widget_t      br;
@@ -1818,10 +1818,10 @@ void kbedit_window(void) {
   kbedit->widget_list->win = (xitk_window_get_window(kbedit->xwin));
   kbedit->widget_list->gc  = gc;
   
-  bg = xitk_image_create_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
+  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XCopyArea(gGui->display, (xitk_window_get_background(kbedit->xwin)), bg,
-	    kbedit->widget_list->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
+  XCopyArea(gGui->display, (xitk_window_get_background(kbedit->xwin)), bg->pixmap,
+	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
   
   x = 15;
   y = 35;
@@ -1847,9 +1847,10 @@ void kbedit_window(void) {
 		    (WINDOW_WIDTH - (x + 130) - 15), 45);
 
 
-  xitk_window_change_background(gGui->imlib_data, kbedit->xwin, bg, WINDOW_WIDTH, WINDOW_HEIGHT);
+  xitk_window_change_background(gGui->imlib_data, kbedit->xwin, bg->pixmap,
+				WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XFreePixmap(gGui->display, bg);
+  xitk_image_destroy_xitk_pixmap(bg);
 
   kbedit_create_browser_entries();
 

@@ -226,7 +226,7 @@ static void viewlog_clear_tab(void) {
   im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
 			       (WINDOW_HEIGHT - (51 + 57) + 1));
   
-  draw_outter(gGui->imlib_data, im->image->pixmap, im->width, im->height);
+  draw_outter(gGui->imlib_data, im->image, im->width, im->height);
   
   XLockDisplay(gGui->display);
   XCopyArea(gGui->display, im->image->pixmap, (xitk_window_get_window(viewlog->xwin)),
@@ -348,7 +348,7 @@ static void viewlog_refresh(xitk_widget_t *w, void *data) {
  * collect config categories, viewlog tab widget
  */
 static void viewlog_create_tabs(void) {
-  Pixmap               bg;
+  xitk_pixmap_t       *bg;
   xitk_tabs_widget_t   tab;
   char               **log_sections = xine_get_log_names(gGui->xine);
   unsigned int         log_section_count = xine_get_log_section_count(gGui->xine);
@@ -375,20 +375,22 @@ static void viewlog_create_tabs(void) {
     (viewlog->tabs = 
      xitk_noskin_tabs_create(viewlog->widget_list, &tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
 
-  bg = xitk_image_create_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
+  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay(gGui->display);
-  XCopyArea(gGui->display, (xitk_window_get_background(viewlog->xwin)), bg,
-	    viewlog->widget_list->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
+  XCopyArea(gGui->display, (xitk_window_get_background(viewlog->xwin)), bg->pixmap,
+	    bg->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
   XUnlockDisplay(gGui->display);
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
 			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)));
-  xitk_window_change_background(gGui->imlib_data, viewlog->xwin, bg, WINDOW_WIDTH, WINDOW_HEIGHT);
+  xitk_window_change_background(gGui->imlib_data, viewlog->xwin, bg->pixmap, 
+				WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay(gGui->display);
-  XFreePixmap(gGui->display, bg);
   XUnlockDisplay(gGui->display);
+
+  xitk_image_destroy_xitk_pixmap(bg);
   
   viewlog_change_section(NULL, NULL, 0);
 }
