@@ -17,7 +17,8 @@ xine_SOURCES = $(GETOPT_C) utils.c xscreensaver-remote.c \
 	videowin.c panel.c kbindings.c lirc.c actions.c mrl_browser.c \
 	snapshot.c skins.c setup.c viewlog.c lang.c errors.c
 xine_DEPENDENTIES = utils.h monitor.h 
-xine_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
+# double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
+xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 	@XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	$(X_LIBS) $(DPMS_LIBS) -lX11 -lm
 

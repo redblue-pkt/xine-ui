@@ -129,6 +129,7 @@ void video_window_select_visual (void) {
     if (gGui->visual != gVw->visual) {
       printf ("videowin: output driver overrides selected visual to visual id 0x%lx\n", gGui->visual->visualid);
       gui_init_imlib (gGui->visual);
+      video_window_adapt_size ();
     }
   }
   XUnlockDisplay (gGui->display);
@@ -190,6 +191,7 @@ static void video_window_adapt_size () {
 					 0, 0, gVw->fullscreen_width, gVw->fullscreen_width, 
 					 0, CopyFromParent, CopyFromParent, CopyFromParent, 
 					 CWBackPixel | CWOverrideRedirect, &attr);
+/* fprintf (stderr, "***** XCreateWindow 1 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
       
       if(gGui->vo_driver)
 	gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
@@ -385,6 +387,7 @@ static void video_window_adapt_size () {
 		     0, gVw->depth, CopyFromParent, 
 		     gVw->visual,
 		     CWBackPixel  | CWBorderPixel | CWColormap, &attr);
+/* fprintf (stderr, "***** XCreateWindow 2 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
     
     if(gGui->vo_driver)
       gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
@@ -503,7 +506,7 @@ static void video_window_adapt_size () {
     attr.border_pixel      = gGui->black.pixel;
     attr.colormap	   = gVw->colormap;
     
-/* fprintf (stderr, "***** XCreateWindow visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
+/* fprintf (stderr, "***** XCreateWindow 3 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
     gGui->video_window =
       XCreateWindow(gGui->display, gGui->imlib_data->x.root,
 		    hint.x, hint.y, hint.width, hint.height, 4, 
