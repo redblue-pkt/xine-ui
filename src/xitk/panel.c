@@ -1094,7 +1094,7 @@ void panel_init (void) {
   sl.min               = 0;
   sl.max               = 65535;
   sl.step              = 1;
-  sl.callback          = panel_slider_cb;
+  sl.callback          = NULL;
   sl.userdata          = NULL;
   sl.motion_callback   = panel_slider_cb;
   sl.motion_userdata   = NULL;
