@@ -210,6 +210,7 @@ widget_t *checkbox_create (xitk_checkbox_t *cb) {
   mywidget->private_data = private_data;
 
   mywidget->enable          = 1;
+  mywidget->running         = 1;
   mywidget->have_focus      = FOCUS_LOST;
   mywidget->x               = cb->x;
   mywidget->y               = cb->y;

@@ -198,6 +198,7 @@ void filebrowser_destroy(widget_t *w) {
     
     XUnmapWindow(private_data->display, private_data->window);
     
+    widget_stop_widgets(private_data->widget_list);
     gui_list_free(private_data->widget_list->l);
     free(private_data->widget_list);
     
@@ -726,6 +727,7 @@ void filebrowser_exit(widget_t *w, void *data) {
   
   XUnmapWindow(private_data->display, private_data->window);
   
+  widget_stop_widgets(private_data->widget_list);
   gui_list_free(private_data->widget_list->l);
   free(private_data->widget_list);
   
@@ -1127,6 +1129,9 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   lbl.length    = fb->current_dir.max_length;
   lbl.label     = fb->current_dir.cur_directory;
   lbl.font      = fb->current_dir.skin_filename;
+  lbl.animation = fb->current_dir.animation;
+  lbl.window    = private_data->widget_list->win;
+  lbl.gc        = private_data->widget_list->gc;
 
   gui_list_append_content (private_data->widget_list->l,
 			   (private_data->widget_current_dir = 
@@ -1143,9 +1148,10 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   else
     sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
   
-  private_data->visible    = 1;
+  private_data->visible     = 1;
 
   mywidget->enable          = 1;
+  mywidget->running         = 1;
   mywidget->have_focus      = FOCUS_LOST;
   mywidget->x               = fb->x;
   mywidget->y               = fb->y;

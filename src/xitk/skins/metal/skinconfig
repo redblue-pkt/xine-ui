@@ -6,13 +6,12 @@ AudioPrev:	375	50	arrowdn.png
 AudioNext:	375	38	arrowup.png
 Close:		383	4	close.png
 FullScreen:	388	20	fullsc.png
-Letters:	0	0	letters.png
-TitleLabel:	20	18	letters.png
-TimeLabel:	20	41	letters.png
-AudioLabel:	353	41	letters.png
+TitleLabel:	20	18	letters.png	60	True
+TimeLabel:	20	41	letters.png	8	False
+AudioLabel:	353	41	letters.png	3	False
 SpuPrev:	315	50	arrowdn.png
 SpuNext:	315	38	arrowup.png
-SpuLabel:	293	41	letters.png
+SpuLabel:	293	41	letters.png	3	False
 Next:		180	71	next.png
 Pause:		140	71	pause.png
 Play:		100	71	play.png
@@ -47,39 +46,24 @@ PlUp:		328	30	arrowup2.png
 PlSlidBG:	327	45	pl_slidv.png
 PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		328	175	arrowdn2.png
-AutoPlayLbl:	360	40	letters.png
+AutoPlayLbl:	360	40	letters.png	9	False
 AutoPlayBG:	350	62	pl_btn.png	LightGray	White	Red
 PlInputText:	35	186     pl_inputtxt.png	LightGray	White	Red
-
-### File Browser ##
-FBBG:		0	0	pl_bg.png
-FBItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red
-FBSelect:	61	210	pl_btn.png	LightGray	White	Red
-FBHome:		139 	210	pl_btn.png	LightGray	White	Red
-FBDismiss:	350	210	pl_btn.png	LightGray	White	Red
-FBUp:		328	30	arrowup2.png
-FBSlidBG:	327	45	pl_slidv.png
-FBSlidFG:	0	0	pl_slidpad.png
-FBDn:		328	175	arrowdn2.png
-FBCurDirLbl:	45	186	letters.png
-FBCurDir:	35	186	letters.png
-FBSortRev:	345	160	arrowup2.png
-FBSortDef:	345	175	arrowdn2.png
 
 #Control Panel
 CtlBG:		0	0	pl_bg.png
 CtlHueBG:	80	40	pl_slidv.png
 CtlHueFG:	0	0	pl_slidpad.png
-CtlHueLbl:	76	168	letters.png
+CtlHueLbl:	76	168	letters.png	3	False
 CtlSatBG:	120	40	pl_slidv.png
 CtlSatFG:	0	0	pl_slidpad.png
-CtlSatLbl:	116	168	letters.png
+CtlSatLbl:	116	168	letters.png	3	False
 CtlBrightBG:	160	40	pl_slidv.png
 CtlBrightFG:	0	0	pl_slidpad.png
-CtlBrightLbl:	156	168	letters.png
+CtlBrightLbl:	156	168	letters.png	3	False
 CtlContBG:	200	40	pl_slidv.png
 CtlContFG:	0	0	pl_slidpad.png
-CtlContLbl:	196	168	letters.png
+CtlContLbl:	196	168	letters.png	3	False
 CtlSave:	31	210	pl_btn.png	LightGray	White	Red
 CtlReset:	109 	210	pl_btn.png	LightGray	White	Red
 CtlDummy:	187	210	pl_btn.png	LightGray	White	Red
@@ -94,6 +78,6 @@ MrlUp:		328	30	arrowup2.png
 MrlSlidBG:	327	45	pl_slidv.png
 MrlSlidFG:	0	0	pl_slidpad.png
 MrlDn:		328	175	arrowdn2.png
-MrlCurOrigin:	35	186	letters.png
-MrlPlugLabel:	360	40	letters.png
+MrlCurOrigin:	35	186	letters.png	50	False
+MrlPlugLabel:	360	40	letters.png	7	False
 MrlPlugNameBG:	350	62	pl_btn.png	LightGray	White	Red

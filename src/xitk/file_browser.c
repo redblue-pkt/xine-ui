@@ -183,9 +183,11 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.current_dir.x                  = gui_get_skinX("FBCurDir");
   fbr.current_dir.y                  = gui_get_skinY("FBCurDir");
   fbr.current_dir.skin_filename      = gui_get_skinfile("FBCurDir");
-  fbr.current_dir.max_length         = 50;
+  fbr.current_dir.max_length         = gui_get_label_length("FBCurDir");
   fbr.current_dir.cur_directory      = config_lookup_str("filebrowser_dir",
 							 (char *)get_homedir());
+  fbr.current_dir.animation          = gui_get_animation("FBCurDir");
+
   fbr.dndcallback                    = dnd_cb;
 
   fbr.homedir.x                      = gui_get_skinX("FBHome");

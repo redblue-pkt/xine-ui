@@ -34,5 +34,6 @@ void gui_place_extra_images(widget_list_t *);
 char *gui_get_ncolor(const char *str);
 char *gui_get_fcolor(const char *str);
 char *gui_get_ccolor(const char *str);
-
+int gui_get_animation(const char *str);
+int gui_get_label_length(const char *str);
 #endif

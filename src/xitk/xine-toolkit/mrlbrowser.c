@@ -385,6 +385,7 @@ void mrlbrowser_destroy(widget_t *w) {
     XUnmapWindow(private_data->display, private_data->window);
     XUNLOCK(private_data->display);
    
+    widget_stop_widgets(private_data->widget_list);
     gui_list_free(private_data->widget_list->l);
     free(private_data->widget_list);
 
@@ -425,6 +426,7 @@ void mrlbrowser_exit(widget_t *w, void *data) {
   XUnmapWindow(private_data->display, private_data->window);
   XUNLOCK(private_data->display);
 
+  widget_stop_widgets(private_data->widget_list);
   gui_list_free(private_data->widget_list->l);
   free(private_data->widget_list);
 
@@ -782,7 +784,10 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   lbl.length    = mb->origin.max_length;
   lbl.label     = "";
   lbl.font      = mb->origin.skin_filename;
-
+  lbl.animation = mb->origin.animation;
+  lbl.window    = private_data->widget_list->win;
+  lbl.gc        = private_data->widget_list->gc;
+  
   gui_list_append_content(private_data->widget_list->l,
 			  (private_data->widget_origin = 
 			   label_create (&lbl)));
@@ -797,9 +802,12 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
     lbl.imlibdata = mb->imlibdata;
     lbl.x         = mb->ip_name.label.x;
     lbl.y         = mb->ip_name.label.y;;
-    lbl.length    = strlen(mb->ip_name.label.label_str);
-    lbl.label     = mb->ip_name.label.label_str;
     lbl.font      = mb->ip_name.label.skin_filename;
+    lbl.label     = mb->ip_name.label.label_str;
+    lbl.length    = mb->ip_name.label.length;
+    lbl.animation = mb->ip_name.label.animation;
+    lbl.window    = private_data->widget_list->win;
+    lbl.gc        = private_data->widget_list->gc;
 
     gui_list_append_content(private_data->widget_list->l, 
 			    label_create (&lbl));
@@ -843,6 +851,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   private_data->visible     = 1;
 
   mywidget->enable          = 1;
+  mywidget->running         = 1;
   mywidget->have_focus      = FOCUS_LOST;
   mywidget->x               = mb->x;
   mywidget->y               = mb->y;

@@ -111,7 +111,6 @@ typedef struct {
   Display            *display;
   gui_list_t         *list;
   gui_list_t         *gfx;
-  pthread_t           thread;
   pthread_mutex_t     mutex;
   int                 running;
   widgetkey_t         key;

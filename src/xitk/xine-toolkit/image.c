@@ -103,6 +103,7 @@ widget_t *image_create (xitk_image_t *im) {
   mywidget->private_data  = private_data;
 
   mywidget->enable          = 1;
+  mywidget->running         = 1;
   mywidget->have_focus      = FOCUS_LOST;
   mywidget->x               = im->x;
   mywidget->y               = im->y;

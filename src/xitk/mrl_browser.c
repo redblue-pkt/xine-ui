@@ -174,8 +174,9 @@ void mrl_browser(xitk_mrl_callback_t add_cb,
   mb.origin.x                       = gui_get_skinX("MrlCurOrigin");
   mb.origin.y                       = gui_get_skinY("MrlCurOrigin");
   mb.origin.skin_filename           = gui_get_skinfile("MrlCurOrigin");
-  mb.origin.max_length              = 50;
+  mb.origin.max_length              = gui_get_label_length("MrlCurOrigin");;
   mb.origin.cur_origin              = NULL;
+  mb.origin.animation               = gui_get_animation("MrlCurOrigin");
 
   mb.dndcallback                    = dnd_cb;
 
@@ -211,6 +212,8 @@ void mrl_browser(xitk_mrl_callback_t add_cb,
   mb.ip_name.label.y                = gui_get_skinY("MrlPlugLabel");
   mb.ip_name.label.skin_filename    = gui_get_skinfile("MrlPlugLabel");
   mb.ip_name.label.label_str        = "Source:";
+  mb.ip_name.label.length           = gui_get_label_length("MrlPlugLabel");
+  mb.ip_name.label.animation        = gui_get_animation("MrlPlugLabel");
 
   mb.xine                           = gGui->xine;
 

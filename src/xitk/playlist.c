@@ -115,6 +115,7 @@ void pl_exit(widget_t *w, void *data) {
 
   Imlib_destroy_image(gGui->imlib_data, playlist->bg_image);
   playlist->window = None;
+  widget_stop_widgets(playlist->widget_list);
   gui_list_free(playlist->widget_list->l);
   free(playlist->widget_list->gc);
   free(playlist->widget_list);
@@ -651,6 +652,8 @@ void playlist_editor(void) {
 
   lbl.display       = gGui->display;
   lbl.imlibdata     = gGui->imlib_data;
+  lbl.window        = playlist->widget_list->win;
+  lbl.gc            = playlist->widget_list->gc;
 
   b.display         = gGui->display;
   b.imlibdata       = gGui->imlib_data;
@@ -793,11 +796,12 @@ void playlist_editor(void) {
 			   (playlist->playlist = 
 			    browser_create(&br)));
 
-  lbl.x      = gui_get_skinX("AutoPlayLbl");
-  lbl.y      = gui_get_skinY("AutoPlayLbl");
-  lbl.length = 9;
-  lbl.label  = "Scan for:";
-  lbl.font   = gui_get_skinfile("AutoPlayLbl");
+  lbl.x         = gui_get_skinX("AutoPlayLbl");
+  lbl.y         = gui_get_skinY("AutoPlayLbl");
+  lbl.length    = gui_get_label_length("AutoPlayLbl");
+  lbl.label     = "Scan for:";
+  lbl.font      = gui_get_skinfile("AutoPlayLbl");
+  lbl.animation = gui_get_animation("AutoPlayLbl");
   
   gui_list_append_content (playlist->widget_list->l,
 			   label_create (&lbl));

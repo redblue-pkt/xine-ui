@@ -892,3 +892,20 @@ gui_color_names_t *gui_get_color_names(void) {
 
   return gui_color_names;
 }
+
+/*
+ *
+ */
+void widget_stop_widgets(widget_list_t *wl) {
+  widget_t *mywidget;
+  
+  mywidget = (widget_t *) gui_list_first_content (wl->l);
+
+  while(mywidget) {
+    
+    mywidget->running = 0;
+    
+    mywidget = (widget_t *) gui_list_next_content (wl->l);
+  }
+
+}

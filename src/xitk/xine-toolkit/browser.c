@@ -500,6 +500,7 @@ widget_t *browser_create(xitk_browser_t *br) {
   mywidget->private_data               = private_data;
 
   mywidget->enable                     = 1;
+  mywidget->running                    = 1;
   mywidget->have_focus                 = FOCUS_LOST;
   
   mywidget->x = mywidget->x = mywidget->width = mywidget->height = 0;    

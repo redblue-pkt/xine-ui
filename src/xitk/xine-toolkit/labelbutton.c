@@ -418,6 +418,7 @@ widget_t *label_button_create (xitk_labelbutton_t *b) {
   mywidget->private_data       = private_data;
 
   mywidget->enable             = 1;
+  mywidget->running            = 1;
   mywidget->have_focus         = FOCUS_LOST;
   mywidget->x                  = b->x;
   mywidget->y                  = b->y;

@@ -389,6 +389,8 @@ void panel_init (void) {
 
   lbl.display   = gGui->display;
   lbl.imlibdata = gGui->imlib_data;
+  lbl.window    = panel->widget_list->win;
+  lbl.gc        = panel->widget_list->gc;
 
   sl.display    = gGui->display;
   sl.imlibdata  = gGui->imlib_data;
@@ -502,38 +504,42 @@ void panel_init (void) {
   gui_list_append_content(panel->widget_list->l, button_create(&b));
 
   /* LABEL TITLE */
-  lbl.x      = gui_get_skinX("TitleLabel");
-  lbl.y      = gui_get_skinY("TitleLabel");
-  lbl.length = 60;
-  lbl.label  = gGui->filename;
-  lbl.font   = gui_get_skinfile("TitleLabel");
+  lbl.x         = gui_get_skinX("TitleLabel");
+  lbl.y         = gui_get_skinY("TitleLabel");
+  lbl.length    = gui_get_label_length("TitleLabel");
+  lbl.label     = gGui->filename;
+  lbl.font      = gui_get_skinfile("TitleLabel");
+  lbl.animation = gui_get_animation("TitleLabel");
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->title_label = label_create (&lbl)));
 
   /* runtime label */
-  lbl.x      = gui_get_skinX("TimeLabel");
-  lbl.y      = gui_get_skinY("TimeLabel");
-  lbl.length = 8;
-  lbl.label  = panel->runtime;
-  lbl.font   = gui_get_skinfile("TimeLabel");
+  lbl.x         = gui_get_skinX("TimeLabel");
+  lbl.y         = gui_get_skinY("TimeLabel");
+  lbl.length    = gui_get_label_length("TimeLabel");
+  lbl.label     = panel->runtime;
+  lbl.font      = gui_get_skinfile("TimeLabel");
+  lbl.animation = gui_get_animation("TimeLabel");
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->runtime_label = label_create (&lbl)));
 
   /* Audio channel label */
-  lbl.x      = gui_get_skinX("AudioLabel");
-  lbl.y      = gui_get_skinY("AudioLabel");
-  lbl.length = 3;
-  lbl.label  = panel->audiochan;
-  lbl.font   = gui_get_skinfile("AudioLabel");
+  lbl.x         = gui_get_skinX("AudioLabel");
+  lbl.y         = gui_get_skinY("AudioLabel");
+  lbl.length    = gui_get_label_length("AudioLabel");
+  lbl.label     = panel->audiochan;
+  lbl.font      = gui_get_skinfile("AudioLabel");
+  lbl.animation = gui_get_animation("AudioLabel");
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->audiochan_label = label_create (&lbl)));
 
   /* Spuid label */
-  lbl.x      = gui_get_skinX("SpuLabel");
-  lbl.y      = gui_get_skinY("SpuLabel");
-  lbl.length = 3;
-  lbl.label  = panel->spuid;
-  lbl.font   = gui_get_skinfile("SpuLabel");
+  lbl.x         = gui_get_skinX("SpuLabel");
+  lbl.y         = gui_get_skinY("SpuLabel");
+  lbl.length    = gui_get_label_length("SpuLabel");
+  lbl.label     = panel->spuid;
+  lbl.font      = gui_get_skinfile("SpuLabel");
+  lbl.animation = gui_get_animation("SpuLabel");
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->spuid_label = label_create (&lbl)));
 

@@ -7,15 +7,14 @@ Close:		520	6	close.png
 Eject:		0	0	eject.png
 Exit:		61	74	power.png
 FullScreen:	508	6	fullsc.png
-Letters:	0	0	letters.png
-TitleLabel:	170	32	letters.png
-TimeLabel:	480	51	letters.png
+TitleLabel:	170	32	letters.png	60	True
+TimeLabel:	480	51	letters.png	8	False
 AudioPrev:	190	60	ptdn.png
 AudioNext:	190	51	ptup.png
-AudioLabel:	170	52	letters.png
+AudioLabel:	170	52	letters.png	3	False
 SpuPrev:	250	60	ptdn.png
 SpuNext:	250	51	ptup.png
-SpuLabel:	230	52	letters.png
+SpuLabel:	230	52	letters.png	3	False
 Next:		324	77	next.png
 Pause:		199	77	pause.png
 Play:		149	77	play.png
@@ -45,7 +44,7 @@ PlUp:		375	40	arrowup.png
 PlSlidBG:	377	55	pl_slidv.png
 PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		375	178	arrowdn.png
-AutoPlayLbl:	410	40	letters.png
+AutoPlayLbl:	410	40	letters.png	9	False
 AutoPlayBG:	400	62	pl_btn.png	Black   Yellow	White
 PlInputText:	75	200     pl_inputtxt.png	Black	Yellow	Black
 
@@ -53,31 +52,30 @@ PlInputText:	75	200     pl_inputtxt.png	Black	Yellow	Black
 CtlBG:		0	0	pl_bg.png
 CtlHueBG:	80	40	pl_slidv.png
 CtlHueFG:	0	0	pl_slidpad.png
-CtlHueLbl:	77	168	letters.png
+CtlHueLbl:	77	168	letters.png	3	False
 CtlSatBG:	120	40	pl_slidv.png
 CtlSatFG:	0	0	pl_slidpad.png
-CtlSatLbl:	117	168	letters.png
+CtlSatLbl:	117	168	letters.png	3	False
 CtlBrightBG:	160	40	pl_slidv.png
 CtlBrightFG:	0	0	pl_slidpad.png
-CtlBrightLbl:	157	168	letters.png
+CtlBrightLbl:	157	168	letters.png	3	False
 CtlContBG:	200	40	pl_slidv.png
 CtlContFG:	0	0	pl_slidpad.png
-CtlContLbl:	197	168	letters.png
-CtlSave:	101	227	pl_btn.png        Black   Yellow    White
-CtlReset:	179 	227	pl_btn.png        Black   Yellow    White
-CtlDummy:	257	227	pl_btn.png        Black   Yellow    White
-CtlDismiss:	400	227	pl_btn.png        Black   Yellow    White
+CtlContLbl:	197	168	letters.png	3	False
+CtlSave:	101	227	pl_btn.png	Black   Yellow    White
+CtlReset:	179 	227	pl_btn.png	Black   Yellow    White
+CtlDummy:	257	227	pl_btn.png	Black   Yellow    White
+CtlDismiss:	400	227	pl_btn.png	Black   Yellow    White
 
 ### MRL Browser ###
 MrlBG:		0	0	pl_bg.png
 MrlItemBtn:	75	40	pl_itembtn.png	Black   Yellow	White
-MrlSelect:	101	227	pl_btn.png        Black   Yellow    White
-MrlDismiss:	400	227	pl_btn.png        Black   Yellow    White
+MrlSelect:	101	227	pl_btn.png	Black   Yellow    White
+MrlDismiss:	400	227	pl_btn.png	Black   Yellow    White
 MrlUp:		375	40	arrowup.png
 MrlSlidBG:	377	55	pl_slidv.png
 MrlSlidFG:	0	0	pl_slidpad.png
 MrlDn:		375	178	arrowdn.png
-MrlCurOrigin:	75	200	letters.png
+MrlCurOrigin:	75	200	letters.png	50	False
 MrlPlugNameBG:	400	62	pl_btn.png	Black   Yellow	White
-MrlPlugLabel:	410	40	letters.png
-
+MrlPlugLabel:	410	40	letters.png	7	False

@@ -221,6 +221,40 @@ char *gui_get_ccolor(const char *str) {
 }
 
 /*
+ * Return length of given label.
+ */
+int gui_get_label_length(const char *str) {
+  char *v;
+  int len = 0;
+  
+  if(is_entry_exist(str) && ((v = extract_value(str, 4)) != NULL)) {
+      len = atoi(v);
+  }
+  
+  return len;
+}
+
+/*
+ * Boolean, return animation value.
+ */
+int gui_get_animation(const char *str) {
+  char *v;
+  int anim = 0;
+  
+  if(is_entry_exist(str) && ((v = extract_value(str, 5)) != NULL)) {
+    if(!strncasecmp(v, "TRUE", strlen(v)))
+      anim = 1;
+    else if(!strncasecmp(v, "FALSE", strlen(v)))
+      anim = 0;
+    else {
+      anim = atoi(v);
+    }
+  }
+  
+  return anim;
+}
+
+/*
  * Return image filename of *str in skinfile
  */
 char *gui_get_skinfile(const char *str) {

@@ -25,21 +25,32 @@
 #define HAVE_GUI_LABEL_H
 
 #include <X11/Xlib.h>
+#include <pthread.h>
+
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
 #include "_xitk.h"
 
 typedef struct {
-  Display       *display;
+  Display          *display;
+  GC                gc;
+  Window            window;
 
-  widget_t      *lWidget;
+  widget_t         *lWidget;
 
-  int            char_length; /* length of 1 char */
-  int            char_height; /* height of 1 char */
 
-  int            length;      /* length in char */
-  gui_image_t   *font;
-  const char    *label;
+  int               char_length; /* length of 1 char */
+  int               char_height; /* height of 1 char */
+
+  int               length;      /* length in char */
+  gui_image_t      *font;
+  char             *label;
+
+  int               animation;
+  char             *animated_label;
+
+  pthread_t         thread;
+  pthread_mutex_t   mutex;
 
 } label_private_data_t;
 

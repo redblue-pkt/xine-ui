@@ -6,12 +6,11 @@ BackGround:	0	0	bg.png
 Close:		0	8	close.png
 FullScreen:	0	22	fullsc.png
 Exit:		0	89	power.png
-Letters:	0	0	letters.png
-TitleLabel:	23	15	letters.png
-TimeLabel:	23	35	letters.png
+TitleLabel:	23	15	letters.png	35	True
+TimeLabel:	23	35	letters.png	8	False
 AudioPrev:	242	36	ptdn.png
 AudioNext:	253	35	ptup.png
-AudioLabel:	246	15	letters.png
+AudioLabel:	246	15	letters.png	3	False
 Next:		270	89	next.png
 Pause:		244	88	pause.png
 Play:		222	89	play.png
@@ -28,7 +27,7 @@ CtlBtn:		275	58	setup.png
 ## SPU ##
 SpuPrev:	267	36	ptdn.png
 SpuNext:	278	35	ptup.png
-SpuLabel:	271	15	letters.png
+SpuLabel:	271	15	letters.png	3	False
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png
@@ -46,7 +45,7 @@ PlUp:		324	21	arrowup.png
 PlSlidBG:	326	36	pl_slidv.png
 PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		324	160	arrowdn.png
-AutoPlayLbl:	355	20	letters.png
+AutoPlayLbl:	355	20	letters.png	9	False
 AutoPlayBG:	355	40	pl_btn.png	Black   Black	Black
 PlInputText:	30	202	pl_inputtxt.png	Black	Black	Black
 
@@ -54,16 +53,16 @@ PlInputText:	30	202	pl_inputtxt.png	Black	Black	Black
 CtlBG:		0	0	pl_bg.png
 CtlHueBG:	80	40	pl_slidv.png
 CtlHueFG:	0	0	pl_slidpad.png
-CtlHueLbl:	77	168	letters.png
+CtlHueLbl:	77	168	letters.png	3	False
 CtlSatBG:	120	40	pl_slidv.png
 CtlSatFG:	0	0	pl_slidpad.png
-CtlSatLbl:	117	168	letters.png
+CtlSatLbl:	117	168	letters.png	3	False
 CtlBrightBG:	160	40	pl_slidv.png
 CtlBrightFG:	0	0	pl_slidpad.png
-CtlBrightLbl:	157	168	letters.png
+CtlBrightLbl:	157	168	letters.png	3	False
 CtlContBG:	200	40	pl_slidv.png
 CtlContFG:	0	0	pl_slidpad.png
-CtlContLbl:	197	168	letters.png
+CtlContLbl:	197	168	letters.png	3	False
 CtlSave:	30	234	pl_btn.png	Black	Black	Black
 CtlReset:	143 	234	pl_btn.png	Black	Black	Black
 CtlDummy:	251	234	pl_btn.png	Black	Black	Black
@@ -80,6 +79,6 @@ MrlSelect:	30	234	pl_btn.png	Black	Black	Black
 MrlDismiss:	355	234	pl_btn.png	Black	Black	Black
 MrlUp:		324	21	arrowup.png
 MrlDn:		324	160	arrowdn.png
-MrlCurOrigin:	95	190	letters.png
-MrlPlugLabel:	355	20	letters.png
+MrlCurOrigin:	95	190	letters.png	50	False
+MrlPlugLabel:	355	20	letters.png	7	False
 MrlPlugNameBG:	355	40	pl_btn.png	Black   Black	Black

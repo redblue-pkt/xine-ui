@@ -807,6 +807,7 @@ widget_t *inputtext_create (xitk_inputtext_t *it) {
   mywidget->private_data      = private_data;
 
   mywidget->enable            = 1;
+  mywidget->running           = 1;
   mywidget->have_focus        = FOCUS_LOST;
   mywidget->x                 = it->x;
   mywidget->y                 = it->y;

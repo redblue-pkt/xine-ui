@@ -170,6 +170,7 @@ void control_exit(widget_t *w, void *data) {
   Imlib_destroy_image(gGui->imlib_data, control->bg_image);
   control->window = None;
 
+  widget_stop_widgets(control->widget_list);
   gui_list_free(control->widget_list->l);
   free(control->widget_list->gc);
   free(control->widget_list);
@@ -370,6 +371,11 @@ void control_panel(void) {
     int vidcap = 0;
     int min, max, cur;
 
+    lbl.display   = gGui->display;
+    lbl.imlibdata = gGui->imlib_data;
+    lbl.window    = control->widget_list->win;
+    lbl.gc        = control->widget_list->gc;
+
     /* HUE */
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
 					  VO_PROP_HUE, &min, &max);
@@ -394,13 +400,12 @@ void control_panel(void) {
 			    (control->hue = slider_create(&sl)));
     slider_set_pos(control->widget_list, control->hue, cur);
 
-    lbl.display   = gGui->display;
-    lbl.imlibdata = gGui->imlib_data;
     lbl.x         = gui_get_skinX("CtlHueLbl");
     lbl.y         = gui_get_skinY("CtlHueLbl");
-    lbl.length    = 3;
+    lbl.length    = gui_get_label_length("CtlHueLbl");
     lbl.label     = "Hue";
     lbl.font      = gui_get_skinfile("CtlHueLbl");
+    lbl.animation = gui_get_animation("CtlHueLbl");
 
     gui_list_append_content(control->widget_list->l,
 			    label_create(&lbl));
@@ -431,13 +436,12 @@ void control_panel(void) {
 	      (control->sat = slider_create(&sl)));
     slider_set_pos(control->widget_list, control->sat, cur);
 
-    lbl.display   = gGui->display;
-    lbl.imlibdata = gGui->imlib_data;
     lbl.x         = gui_get_skinX("CtlSatLbl");
     lbl.y         = gui_get_skinY("CtlSatLbl");
-    lbl.length    = 3;
+    lbl.length    = gui_get_label_length("CtlSatLbl");
     lbl.label     = "Sat";
     lbl.font      = gui_get_skinfile("CtlSatLbl");
+    lbl.animation = gui_get_animation("CtlSatLbl");
 
     gui_list_append_content(control->widget_list->l,
 			    label_create(&lbl));
@@ -467,13 +471,12 @@ void control_panel(void) {
 	    (control->bright = slider_create(&sl)));
     slider_set_pos(control->widget_list, control->bright, cur);
 
-    lbl.display   = gGui->display;
-    lbl.imlibdata = gGui->imlib_data;
     lbl.x         = gui_get_skinX("CtlBrightLbl");
     lbl.y         = gui_get_skinY("CtlBrightLbl");
-    lbl.length    = 3;
+    lbl.length    = gui_get_label_length("CtlBrightLbl");
     lbl.label     = "Brt";
     lbl.font      = gui_get_skinfile("CtlBrightLbl");
+    lbl.animation = gui_get_animation("CtlBrightLbl");
 
     gui_list_append_content(control->widget_list->l,
 			    label_create(&lbl));
@@ -503,13 +506,12 @@ void control_panel(void) {
 	      (control->contr = slider_create(&sl)));
     slider_set_pos(control->widget_list, control->contr, cur);
 
-    lbl.display   = gGui->display;
-    lbl.imlibdata = gGui->imlib_data;
     lbl.x         = gui_get_skinX("CtlContLbl");
     lbl.y         = gui_get_skinY("CtlContLbl");
-    lbl.length    = 3;
+    lbl.length    = gui_get_label_length("CtlContLbl");
     lbl.label     = "Ctr";
     lbl.font      = gui_get_skinfile("CtlContLbl");
+    lbl.animation = gui_get_animation("CtlContLbl");
 
     gui_list_append_content(control->widget_list->l,
 			    label_create(&lbl));

@@ -563,6 +563,7 @@ widget_t *slider_create (xitk_slider_t *s) {
   mywidget->private_data        = private_data;
 
   mywidget->enable              = 1;
+  mywidget->running             = 1;
   mywidget->have_focus          = FOCUS_LOST;
   mywidget->x                   = s->x;
   mywidget->y                   = s->y;

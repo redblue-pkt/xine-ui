@@ -313,6 +313,10 @@ void widget_enable(widget_t *);
  */
 void widget_disable(widget_t *);
 
+/**
+ * Stop each (if widget handle it) widgets of widget list.
+ */
+void widget_stop_widgets(widget_list_t *wl);
 
 /* 
  * *** Sliders ***
@@ -504,11 +508,14 @@ void labelbutton_set_state(widget_t *, int, Window, GC);
 typedef struct {
   Display                *display;
   ImlibData              *imlibdata;
+  Window                  window;
+  GC                      gc;
   int                     x;
   int                     y;
   int                     length;
   const char             *label;
   const char             *font;
+  int                     animation;
 } xitk_label_t;
 
 /**
@@ -725,6 +732,7 @@ typedef struct {
     char                    *skin_filename;
     int                      max_length;
     char                    *cur_directory;
+    int                      animation;
   } current_dir;
   
   xitk_dnd_callback_t        dndcallback;
@@ -797,6 +805,7 @@ typedef struct {
     char                    *skin_filename;
     int                      max_length;
     char                    *cur_origin;
+    int                      animation;
   } origin;
   
   xitk_dnd_callback_t        dndcallback;
@@ -844,6 +853,8 @@ typedef struct {
       int                    y;
       char                  *skin_filename;
       char                  *label_str;
+      int                    length;
+      int                    animation;
     } label;
 
   } ip_name;
