@@ -579,6 +579,14 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
 	return video_port;
       
     }
+    else if(!strcasecmp(video_driver_ids[driver_num], "fb")) {
+      video_port = xine_open_video_driver(gGui->xine,
+					  video_driver_ids[driver_num],
+					  XINE_VISUAL_TYPE_FB, NULL);
+      if (video_port)
+	return video_port;
+      
+    }
     else if(strcasecmp(video_driver_ids[driver_num], "auto")) {
       
       video_port = xine_open_video_driver(gGui->xine, 
@@ -627,6 +635,15 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
 					  (void *) &vis);
       
       /* do not save on config, otherwise user would never see images again... */
+    }
+    else if(!strcasecmp(video_driver_ids[driver_number], "fb")) {
+      video_port = xine_open_video_driver(gGui->xine,
+					  video_driver_ids[driver_number],
+					  XINE_VISUAL_TYPE_FB, NULL);
+
+      /* save requested driver (-V) */ 
+      if(video_port)
+        config_update_num("video.driver", driver_number);
     }
     else {
       video_port = xine_open_video_driver(gGui->xine,
