@@ -372,8 +372,6 @@ void video_window_init () {
    * create cursors
    */
 
-  XLockDisplay (gGui->display);
-
   bm_no = XCreateBitmapFromData(gGui->display, DefaultRootWindow(gGui->display), bm_no_data, 8, 8);
   gvw_cursor[0] = XCreatePixmapCursor(gGui->display, bm_no, bm_no,
 				      &gGui->black, &gGui->black, 0, 0);
