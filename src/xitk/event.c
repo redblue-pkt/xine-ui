@@ -925,8 +925,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gGui->auto_vo_visibility = 
     xine_config_register_bool (gGui->xine, "gui.auto_video_output_visibility", 0,
-			       _("Visiblity behavior of output window"),
-			       _("Show/hide video output window regarding to the stream type"), 
+			       _("Visibility behavior of output window"),
+			       _("Hide video output window if there is no video in the stream"), 
 			       CONFIG_LEVEL_EXP,
 			       auto_vo_visibility_cb, 
 			       CONFIG_NO_DATA);
@@ -962,7 +962,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     xine_config_register_bool(gGui->xine, "gui.sinfo_auto_update", 
 			      0,
 			      _("Stream information"),
-			      _("Update stream information (in stream infos window) "
+			      _("Update stream information (in stream info window) "
 				"each half seconds."), 
 			      CONFIG_LEVEL_EXP,
 			      stream_info_auto_update_cb,
