@@ -1,3 +1,10 @@
+xine-ui (0.9.16-1) unstable; urgency=low
+
+  * removed obsolete conflicts: libcurl2 entry
+  * updated build-depends (added libcurl-dev)
+
+ -- Siggi Langauf <siggi@debian.org>  Sun, 22 Dec 2002 16:16:33 +0100
+
 xine-ui (0.9.16-0) unstable; urgency=low
 
   * new upstream release
