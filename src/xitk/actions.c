@@ -46,6 +46,17 @@ extern _panel_t        *panel;
 
 static pthread_t        seek_thread;
 
+int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length) {
+  int t = 0, ret = 0;
+
+  if(stream && (xine_get_status(stream) == XINE_STATUS_PLAY)) {
+    while(((ret = xine_get_pos_length(stream, pos, time, length)) == 0) && (++t < 10))
+      xine_usec_sleep(100000); /* wait before trying again */
+  }
+
+  return ret;
+}
+
 /*
  *
  */
@@ -677,16 +688,10 @@ void *gui_seek_relative_thread(void *data) {
   
   pthread_detach(pthread_self());
   
-  if(!xine_get_pos_length(gGui->stream, NULL, &sec, NULL)) {
-    printf("DODO\n");
-    xine_usec_sleep(300000); /* wait before trying again */
-    
-    if(!xine_get_pos_length(gGui->stream, NULL, &sec, NULL)) {
-      printf("DODO2\n");
-      pthread_exit(NULL);
-      return NULL;
-    }
-  }  
+  if(!gui_xine_get_pos_length(gGui->stream, NULL, &sec, NULL)) {
+    pthread_exit(NULL);
+    return NULL;
+  }
   
   sec /= 1000;
 
@@ -1199,7 +1204,7 @@ void gui_add_mediamark(void) {
   if((gGui->logo_mode == 0) && (xine_get_status(gGui->stream) == XINE_STATUS_PLAY)) {
     int secs;
 
-    if(xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
+    if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
       secs /= 1000;
       
       mediamark_add_entry(gGui->mmk.mrl, gGui->mmk.ident, secs, -1);

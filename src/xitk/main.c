@@ -725,7 +725,8 @@ int main(int argc, char *argv[]) {
   }
 
   gGui = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
-
+  
+  gGui->stream                 = NULL;
   gGui->debug_level            = 0;
   gGui->autoscan_plugin        = NULL;
   gGui->prefered_visual_class  = -1;
@@ -1030,7 +1031,7 @@ int main(int argc, char *argv[]) {
   /*
    * xine init
    */
-  xine_init (gGui->xine);
+  xine_init(gGui->xine);
 
   /*
    * load and init output drivers
@@ -1042,7 +1043,7 @@ int main(int argc, char *argv[]) {
   /* Audio out plugin */
   gGui->ao_port = load_audio_out_driver(audio_driver_id);
   free(audio_driver_id);
-  
+
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
 
   osd_init();

@@ -2376,28 +2376,29 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 	
 	if(((arg[0] == '+') || (arg[0] == '-')) && (isdigit(arg[1]))) {
 
-	  xine_get_pos_length(gGui->stream, NULL, &msec, NULL);
-	  msec /= 1000;
-
-	  if((msec + pos) < 0) 
-	    msec = 0;
+	  if(gui_xine_get_pos_length(gGui->stream, NULL, &msec, NULL)) {
+	    msec /= 1000;
+	    
+	    if((msec + pos) < 0) 
+	      msec = 0;
+	    else
+	      msec += pos;
+	  }
+	  else 
+	    msec = pos;
+	  
+	  msec *= 1000;
+	  
+	  gGui->ignore_next = 1;
+	  if(!xine_play(gGui->stream, 0, msec)) {
+	    gui_handle_xine_error(gGui->stream);
+	    gui_display_logo();
+	  }
 	  else
-	    msec += pos;
-	}
-	else 
-	  msec = pos;
-
-	msec *= 1000;
+	    gGui->logo_mode = 0;
 	
-	gGui->ignore_next = 1;
-	if(!xine_play(gGui->stream, 0, msec)) {
-	  gui_handle_xine_error(gGui->stream);
-	  gui_display_logo();
+	  gGui->ignore_next = 0;
 	}
-	else
-	  gGui->logo_mode = 0;
-
-	gGui->ignore_next = 0;
       }
     }
   }

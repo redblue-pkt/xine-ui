@@ -238,7 +238,7 @@ void panel_update_runtime_display(void) {
   if(!panel_is_visible())
     return;
 
-  if(!xine_get_pos_length(gGui->stream, NULL, &seconds, NULL))
+  if(!gui_xine_get_pos_length(gGui->stream, NULL, &seconds, NULL))
     return;
     
   seconds /= 1000;
@@ -260,7 +260,7 @@ static void *slider_loop(void *dummy) {
   pthread_detach(pthread_self());
 
   while(gGui->running) {
-    
+
     if(gGui->stream) {
       
       status = xine_get_status(gGui->stream);
@@ -269,7 +269,7 @@ static void *slider_loop(void *dummy) {
       pos = 0;
 
       if(status == XINE_STATUS_PLAY) {
-	if(xine_get_pos_length(gGui->stream, &pos, &secs, NULL)) {
+	if(gui_xine_get_pos_length(gGui->stream, &pos, &secs, NULL)) {
 	  secs /= 1000;
 	  
 	  if(gGui->playlist.num && gGui->mmk.end != -1) {
@@ -487,7 +487,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
       int pos;
 
       if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
-	if(xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
+	if(gui_xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
 	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 	panel_update_runtime_display();
       }
@@ -633,7 +633,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
       else {
 	int pos;
 	
-	if(xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
+	if(gui_xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
 	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 	panel_update_runtime_display();
         }
@@ -1242,7 +1242,7 @@ void panel_init (void) {
     pthread_create(&panel->slider_thread, &pth_attrs, slider_loop, NULL);
   }
 
-  if (panel->visible) {
+  if(panel->visible) {
     while(!xitk_is_window_visible(gGui->display, gGui->panel_window))
       xine_usec_sleep(5000);
   

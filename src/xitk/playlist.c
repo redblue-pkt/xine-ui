@@ -522,7 +522,8 @@ void playlist_scan_for_infos(void) {
      * avoid some sync/crash problems.
      */
     if(((xine_get_status(gGui->stream)) != XINE_STATUS_STOP) && (gGui->logo_mode == 0)) {
-      xine_get_pos_length(gGui->stream, &old_pos, NULL, NULL);
+      if(!xine_get_pos_length(gGui->stream, &old_pos, NULL, NULL))
+	old_pos = 0;
       gui_stop(NULL, NULL);
       rerun = 1;
     }

@@ -32,6 +32,8 @@
 #define GUI_PREV     2
 #define GUI_RESET    3
 
+int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length);
+
 void gui_display_logo(void);
 
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time);
