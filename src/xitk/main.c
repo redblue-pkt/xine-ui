@@ -45,6 +45,7 @@
 #include <sys/stat.h>
 #include <sys/mman.h>
 #include <sys/time.h>
+#include <sys/types.h>
 #include <signal.h>
 
 #include <X11/Xlib.h>
@@ -652,12 +653,17 @@ int main(int argc, char *argv[]) {
    */
   {
     char *cfgfile = ".xine/config";
+    struct stat st;
 
     if (!(gGui->configfile = getenv ("XINERC"))) {
       gGui->configfile = (char *) xine_xmalloc((strlen((xine_get_homedir())) + strlen(cfgfile))+2);
       sprintf (gGui->configfile, "%s/%s", (xine_get_homedir()), cfgfile);
     }
-      
+
+    /* Popup setup window if there is no config file */
+    if(stat(gGui->configfile, &st) < 0)
+      gGui->actions_on_start[aos++] = ACTID_SETUP;
+
   }
 
   gGui->config = config_file_init (gGui->configfile);

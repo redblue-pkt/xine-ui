@@ -952,7 +952,6 @@ void gui_init (int nfiles, char *filenames[]) {
 
 void gui_init_imlib (Visual *vis) {
   XColor                dummy;
-  char                  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1]; /* Enought ?? ;-) */
   ImlibInitParams	imlib_init;
 
   /*
@@ -1036,6 +1035,10 @@ void gui_run (void) {
 
   if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
+    /* Popup setup window if there is no config file */
+    if(actions_on_start(gGui->actions_on_start, ACTID_SETUP))
+      gui_execute_action_id(ACTID_SETUP);
+    
     /*  The user wants to hide control panel  */
     if(panel_is_visible() && (actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_VISIBLITY)))
       gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
