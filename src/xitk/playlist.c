@@ -304,8 +304,10 @@ void playlist_delete_all(xitk_widget_t *w, void *data) {
   
   if(playlist && playlist->winput)
     xitk_inputtext_change_text(playlist->winput, NULL);
-  
-  xitk_browser_release_all_buttons(playlist->playlist);
+
+  if(playlist)
+    xitk_browser_release_all_buttons(playlist->playlist);
+
   gui_set_current_mrl(NULL);
   enable_playback_controls(0);
 }
