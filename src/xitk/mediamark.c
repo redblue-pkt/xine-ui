@@ -2213,17 +2213,14 @@ void mediamark_add_entry(const char *mrl, const char *ident,
 	realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 1));
     }
   }
-
+  
   /*
    * If subtitle_autoload is enabled and subtitle is NULL
    * then try to see if a matching subtitle exist 
    */
   if(mrl && (!sub) && gGui->subtitle_autoload) {
-
-    if((strncasecmp(mrl, "file:", 5)) && 
-       strstr (mrl, ":/") && (strstr (mrl, ":/") < strchr(mrl, '/')))
-      ;
-    else {
+    
+    if(mrl_looks_like_file((char *) mrl)) {
       char        *know_subs = "sub,srt,asc,smi,ssa";
       char        *vsubs;
       char        *_mrl, *ending, *ext;
@@ -2588,7 +2585,18 @@ int mrl_looks_playlist(char *mrl) {
     return 1;
   }
   
- return 0;
+  return 0;
+}
+ 
+int mrl_looks_like_file(char *mrl) {
+  
+  if(mrl && strlen(mrl)) {
+    if((strncasecmp(mrl, "file:", 5)) && 
+       strstr (mrl, ":/") && (strstr (mrl, ":/") < strchr(mrl, '/')))
+      return 0;
+  }
+  
+  return 1;
 }
 
 void mediamark_collect_from_directory(char *filepathname) {
@@ -2788,9 +2796,6 @@ static void mmkeditor_ok(xitk_widget_t *w, void *data) {
   mmkeditor_exit(NULL, NULL);
 }
 
-static void mmk_fileselector_cancel_callback(filebrowser_t *fb) {
-  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
-}
 static void mmk_fileselector_callback(filebrowser_t *fb) {
   char *file;
 
@@ -2804,14 +2809,31 @@ static void mmk_fileselector_callback(filebrowser_t *fb) {
   
 }
 static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
-  filebrowser_callback_button_t  cbb[2];
+  filebrowser_callback_button_t  cbb;
+  char                           *path, *open_path;
   
-  cbb[0].label = _("Select");
-  cbb[0].callback = mmk_fileselector_callback;
-  cbb[0].need_a_file = 1;
-  cbb[1].callback = mmk_fileselector_cancel_callback;
-  cbb[1].need_a_file = 0;
-  (void *) create_filebrowser(_("Pick a subtitle file"), gGui->curdir, &cbb[0], NULL, &cbb[1]);
+  cbb.label = _("Select");
+  cbb.callback = mmk_fileselector_callback;
+  cbb.need_a_file = 1;
+  
+  path = (*mmkeditor->mmk)->sub ? (*mmkeditor->mmk)->sub : (*mmkeditor->mmk)->mrl;
+  
+  if(mrl_looks_like_file(path)) {
+    char *p;
+    
+    xine_strdupa(open_path, path);
+    
+    if(!strncasecmp(path, "file:", 5))
+      path += 5;
+
+    p = strrchr(open_path, '/');
+    if (p && strlen(p))
+      *p = '\0';
+  }
+  else
+    open_path = gGui->curdir;
+  
+  (void *) create_filebrowser(_("Pick a subtitle file"), open_path, &cbb, NULL, NULL);
 }
 
 void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data) {

@@ -1711,6 +1711,7 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
   sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
   config_update_string("input.file_origin_path", gGui->curdir);
 }
+
 static void fileselector_callback(filebrowser_t *fb) {
   char *file;
 
@@ -1735,6 +1736,7 @@ static void fileselector_callback(filebrowser_t *fb) {
   }
   
 }
+
 static void fileselector_all_callback(filebrowser_t *fb) {
   char **files;
   char  *path;
@@ -1779,6 +1781,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
     free(files);
   }
 }
+
 void gui_file_selector(void) {
   filebrowser_callback_button_t  cbb[3];
   
@@ -1795,8 +1798,6 @@ void gui_file_selector(void) {
 
 static void subselector_callback(filebrowser_t *fb) {
   char *file;
-
-  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     if(file) {
@@ -1830,25 +1831,44 @@ static void subselector_callback(filebrowser_t *fb) {
     free(file);
   }
 }
+
 void gui_select_sub(void) {
   
   if(gGui->playlist.num) {
-    filebrowser_callback_button_t  cbb[2];
+    filebrowser_callback_button_t  cbb;
     const mediamark_t *mmk;
     
     mmk = mediamark_get_current_mmk();
 
     if(mmk) {
+      char *path, *open_path;
       
-      cbb[0].label = _("Select");
-      cbb[0].callback = subselector_callback;
-      cbb[0].need_a_file = 1;
-      cbb[1].callback = fileselector_cancel_callback;
-      cbb[1].need_a_file = 0;
-      (void *) create_filebrowser(_("Pick a subtitle file"), mmk->sub, &cbb[0], NULL, &cbb[1]);
+      cbb.label = _("Select");
+      cbb.callback = subselector_callback;
+      cbb.need_a_file = 1;
+      
+      path = mmk->sub ? mmk->sub : mmk->mrl;
+      
+      if(mrl_looks_like_file(path)) {
+	char *p;
+	
+	xine_strdupa(open_path, path);
+	
+	if(!strncasecmp(path, "file:", 5))
+	  path += 5;
+
+	p = strrchr(open_path, '/');
+	if (p && strlen(p))
+	  *p = '\0';
+      }
+      else
+	open_path = gGui->curdir;
+      
+      (void *) create_filebrowser(_("Pick a subtitle file"), open_path, &cbb, NULL, NULL);
     }
   }
 }
+
 /*
  *
  */
