@@ -27,7 +27,7 @@ audio/video player.
 .B xine
 plays MPEG system (audio and video) streams, mpeg elementary streams
 (e.g. .mp3 or .mpv files), mpeg transport streams, ogg files,
-avi files, asf files, quicktime files, (S)VCDs and DVDs.
+avi files, asf files, quicktime files, (S)VCDs and DVDs and many more.
 .SH OPTIONS
 The programs follow the usual GNU command line syntax, with long
 options starting with two dashes (`--').
@@ -382,7 +382,7 @@ Many features can be controlled by pressing control keys. '\fBM\-\fP' is
 the Meta key (`\fBAlt\fP' key on PC keyboard), '\fBC\-\fP' is the Control `\fBCTRL\fP' 
 key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the `\fBHOME\fP' key is displayed \fB<home>\fP.
 The default key bindings are:
-.IP "\fB0\fP .. \fB9\fP"
+.IP "\fBC\fP\-\fB0\fP .. \fBC\fP\-\fB9\fP"
 Jump to 0%..90% of current stream
 .IP "\fB/\fP"
 Seek to the percentage specified by the numeric argument. This is more
@@ -393,7 +393,7 @@ Toggle aspect ratio (AUTO/16:9/4:3/DVB)
 Add a mediamark to the playlist from the current position stream playback.
 .IP "\fBM\fP\-\fBC\fP"
 Show/hide the video settings window.
-.IP "\fBE\fP"
+.IP "\fBe\fP"
 Eject the current media.
 .IP "\fBf\fP"
 Toggle fullscreen mode.
@@ -532,107 +532,12 @@ You can adjust subtitle synchronization by using these keys:
 .IP "M / N"
 
 .SS Numeric Input
-It is possible to give numeric input, however for backward
-compatibility the number keys are not bound their corresponding digit
-values. Moreover, the digits 0 to 9 are bound to symbols that can't
-normally be entered on a keyboard. Thus the ability to enter numeric
-input is disabled by default. However you can change this by switching
-the modifier value of "SetPosition\fI<X>\fR%" and "Number\fI<Y>\fR" (where
-\fI<X>\fR is 0, 10, .. 90, and \fI<Y>\fR is 0..9). In particular replace
-these lines in your xine keymap file \fI~/.xine/keymap\fP.
-
-.Vb
-# Set position to beginning or 10..90% of current stream.
-SetPosition0% {
-	key = 0
-	modifier = mod3
-}
-SetPosition10% {
-	key = 1
-	modifier = mod3
-}
-SetPosition20% {
-	key = 2
-	modifier = mod3
-}
-SetPosition30% {
-	key = 3
-	modifier = mod3
-}
-SetPosition40% {
-	key = 4
-	modifier = mod3
-}
-SetPosition50% {
-	key = 5
-	modifier = mod3
-}
-SetPosition60% {
-	key = 6
-	modifier = mod3
-}
-SetPosition70% {
-	key = 7
-	modifier = mod3
-}
-SetPosition80% {
-	key = 8
-	modifier = mod3
-}
-SetPosition90% {
-	key = 9
-	modifier = mod3
-}
-
-# Enter the numbers 0..9.
-Number0 {
-	key = 0
-	modifier = none
-}
-Number1 {
-	key = 1
-	modifier = none
-}
-Number2 {
-	key = 2
-	modifier = none
-}
-Number3 {
-	key = 3
-	modifier = none
-}
-Number4 {
-	key = 4
-	modifier = none
-}
-Number5 {
-	key = 5
-	modifier = none
-}
-Number6 {
-	key = 6
-	modifier = none
-}
-Number7 {
-	key = 7
-	modifier = none
-}
-Number8 {
-	key = 8
-	modifier = none
-}
-Number9 {
-	key = 9
-	modifier = none
-}
-.Ve
-.PP
-Having made the above change, you can specify a numeric argument to be
+You can specify a numeric argument to be
 applied to a command typing in a number and then entering a function
 key. For example entering "99/", that is, the number-9 key twice and then
 the slash key, you should seek 99% of the current stream. 
 .PP
-The new experimental VCD/SVCD plugin, VCDX, allows some numeric
+The new VCD/SVCD plugin allows some numeric
 input. Entering a number followed by the "Select event" (by default
 the keypad enter), one can go to a specific "Chapter" (track or entry)
 or selection number. As this is a relatively new feature, perhaps over

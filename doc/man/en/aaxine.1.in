@@ -23,7 +23,7 @@ want to watch DVDs on their good old vt100 ;-)
 
 Like xine, \fBaaxine\fP plays MPEG system (audio and video) streams, mpeg
 elementary streams (e.g. .mp3 or .mpv files), avi files (using win32 codecs
-or ffmpeg), (S)VCDs and DVDs. In short, anything that's supported by xine-lib.
+or ffmpeg), (S)VCDs, DVDs and many more. In short, anything that's supported by xine-lib.
 
 .SH OPTIONS
 The program follows usual GNU command line syntax, with long
