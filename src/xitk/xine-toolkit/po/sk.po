@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.x\n"
-"POT-Creation-Date: 2002-06-17 21:59+0200\n"
+"POT-Creation-Date: 2002-07-20 13:07+0200\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: Daniel Bena  <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Type: text/plain; charset=iso8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:957
+#: src/xitk/xine-toolkit/mrlbrowser.c:1081
 msgid "Select current entry"
 msgstr "Vybra» aktuálnu polo¾ku"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:965
+#: src/xitk/xine-toolkit/mrlbrowser.c:1089
 msgid "Play selected entry"
 msgstr "Prehra» aktuálnu polo¾ku"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:976
+#: src/xitk/xine-toolkit/mrlbrowser.c:1100
 msgid "Close MRL browser window"
 msgstr "Zatvori» okno MRL prehliadaèa"
 
@@ -100,10 +100,10 @@ msgstr "Nie"
 msgid "Cancel"
 msgstr "Zru¹i»"
 
-#: src/xitk/xine-toolkit/xitk.h:1875 src/xitk/xine-toolkit/xitk.h:1891
+#: src/xitk/xine-toolkit/xitk.h:1901 src/xitk/xine-toolkit/xitk.h:1917
 msgid "Error"
 msgstr ""
 
-#: src/xitk/xine-toolkit/xitk.h:1880 src/xitk/xine-toolkit/xitk.h:1896
+#: src/xitk/xine-toolkit/xitk.h:1906 src/xitk/xine-toolkit/xitk.h:1922
 msgid "Information"
 msgstr ""

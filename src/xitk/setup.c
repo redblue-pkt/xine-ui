@@ -1010,9 +1010,13 @@ static void setup_end(xitk_widget_t *w, void *data) {
  *
  */
 static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
-  setup->first_displayed = (xitk_slider_get_max(setup->slider_wg)) - pos;
-  setup_clear_tab();
-  setup_paint_widgets();
+  int rpos = (xitk_slider_get_max(setup->slider_wg)) - pos;
+
+  if(rpos != setup->first_displayed) {
+    setup->first_displayed = rpos;
+    setup_clear_tab();
+    setup_paint_widgets();
+  }
 }
 
 /*

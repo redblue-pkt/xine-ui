@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.9.11\n"
-"POT-Creation-Date: 2002-06-17 21:59+0200\n"
+"POT-Creation-Date: 2002-07-20 13:07+0200\n"
 "PO-Revision-Date: 2002-06-21 11:04+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:957
+#: src/xitk/xine-toolkit/mrlbrowser.c:1081
 msgid "Select current entry"
 msgstr "Selecciona entrada actual"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:965
+#: src/xitk/xine-toolkit/mrlbrowser.c:1089
 msgid "Play selected entry"
 msgstr "Reproduce entrada actual"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:976
+#: src/xitk/xine-toolkit/mrlbrowser.c:1100
 msgid "Close MRL browser window"
 msgstr "Cierra la ventana del navegador de MRL"
 
@@ -100,10 +100,10 @@ msgstr "No"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/xitk/xine-toolkit/xitk.h:1875 src/xitk/xine-toolkit/xitk.h:1891
+#: src/xitk/xine-toolkit/xitk.h:1901 src/xitk/xine-toolkit/xitk.h:1917
 msgid "Error"
 msgstr "Error"
 
-#: src/xitk/xine-toolkit/xitk.h:1880 src/xitk/xine-toolkit/xitk.h:1896
+#: src/xitk/xine-toolkit/xitk.h:1906 src/xitk/xine-toolkit/xitk.h:1922
 msgid "Information"
 msgstr "Información"
