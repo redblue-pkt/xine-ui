@@ -1296,6 +1296,7 @@ void gui_run (void) {
 						 NULL, NULL);
   
   start_remote_server();
+  setup_ctrlsocket();
 
   /* Need for tvmode */
   video_window_set_fullscreen_mode((video_window_get_fullscreen_mode()));

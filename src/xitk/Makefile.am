@@ -7,12 +7,14 @@ remote = xine-remote
 endif
 
 bin_PROGRAMS = xine $(remote)
+EXTRA_PROGRAMS = ctrl
 
 ## xscreensaver-remote.c
 xine_SOURCES = \
 	actions.c \
 	config_wrapper.c \
 	control.c \
+	ctrlsock.c \
 	download.c \
 	errors.c \
 	event.c \
@@ -52,11 +54,14 @@ xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) \
 	$(top_builddir)/readline/libreadline.la $(TERMCAP_LIB) \
 	$(top_builddir)/src/common/libcommon.la
 
+ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la
+
 noinst_HEADERS = \
 	common.h \
 	actions.h \
 	config_wrapper.h \
 	control.h \
+	ctrlsock.h \
 	download.h \
 	errors.h \
 	event.h \
@@ -91,6 +96,14 @@ xine-remote.c:	$(srcdir)/network.c
 
 xine-remote.o: xine-remote.c
 	$(COMPILE) -DNETWORK_CLIENT -c `test -f $< || echo '$(srcdir)/'`$<
+
+ctrl.c: $(srcdir)/ctrlsock.c
+	$(LN_S) $(srcdir)/ctrlsock.c ./ctrl.c
+
+DEBUG_COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(DEBUG_CFLAGS)
+ctrl.o: ctrl.c
+	$(DEBUG_COMPILE) -DCTRL_TEST -c `test -f $< || echo '$(srcdir)/'`$<
 
 ##xscreensaver-remote.c:
 ##	$(LN_S) $(top_srcdir)/src/common/xscreensaver-remote.c \

@@ -41,6 +41,7 @@
 #include "actions.h"
 #include "config_wrapper.h"
 #include "control.h"
+#include "ctrlsock.h"
 #include "errors.h"
 #include "event.h"
 #include "event_sender.h"

@@ -91,6 +91,7 @@ typedef struct {
 #define	OPTION_INSTALL_COLORMAP	1001
 #define DISPLAY_KEYMAP          1002
 #define OPTION_SK_SERVER        1003
+#define OPTION_ENQUEUE          2000
 
 /* options args */
 static const char *short_options = "?hHgfvn"
@@ -138,6 +139,7 @@ static struct option long_options[] = {
   {"playlist"       , required_argument, 0, 'P'                      },
   {"loop"           , optional_argument, 0, 'l'                      },
   {"skin-server-url", required_argument, 0, OPTION_SK_SERVER         },
+  {"enqueue"        , required_argument, 0, OPTION_ENQUEUE           },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -856,6 +858,9 @@ int main(int argc, char *argv[]) {
   char                  **_argv;
   int                     _argc;
   int                     driver_num;
+  int                     session;
+  int                     enqueue = 0;
+  char                   *enq_mrls[4096];
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1092,8 +1097,13 @@ int main(int argc, char *argv[]) {
 	gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
       break;
 
+
     case OPTION_SK_SERVER:
       gGui->skin_server_url = strdup(optarg);
+      break;
+
+    case OPTION_ENQUEUE:
+      enq_mrls[enqueue++] = strdup(optarg);
       break;
 
     case 'v': /* Display version and exit*/
@@ -1114,6 +1124,21 @@ int main(int argc, char *argv[]) {
     }
   }
   
+  if(enqueue) {
+    int p;
+    
+    if(is_remote_running(session)) {
+      for(p = 0; p < enqueue; p++) {
+	printf(_("Enqueue '%s'\n"), enq_mrls[p]);
+	send_string(session, CMD_PLAYLIST_ADD, enq_mrls[p]);
+	       }
+    }
+    else
+      printf(_("Session %d isn't running. Aborted.\n"), session);
+
+    return 0;
+  }
+
   /* 
    * Using root window mode don't allow
    * window geometry, so, reset those params.

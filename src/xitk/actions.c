@@ -980,6 +980,8 @@ void gui_dndcallback(char *filename) {
     if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
       gGui->playlist.cur = (gGui->playlist.num - 1);
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      if(gGui->newbie_mode)
+	gui_play(NULL, NULL);
     }   
 
     playlist_update_playlist();
