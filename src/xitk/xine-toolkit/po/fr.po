@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
-"POT-Creation-Date: 2002-04-29 22:55+0200\n"
+"POT-Creation-Date: 2002-05-02 22:21+0200\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -79,22 +79,22 @@ msgstr "Ma Putain de Fenêtre"
 msgid "Quit"
 msgstr "Quitte"
 
-#: src/xitk/xine-toolkit/window.c:777
+#: src/xitk/xine-toolkit/window.c:797
 msgid "OK"
 msgstr "Ok"
 
-#: src/xitk/xine-toolkit/window.c:839 src/xitk/xine-toolkit/window.c:1032
+#: src/xitk/xine-toolkit/window.c:859 src/xitk/xine-toolkit/window.c:1052
 msgid "Question?"
 msgstr "Question?"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "Yes"
 msgstr "Oui"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "No"
 msgstr "Non"
 
-#: src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:1192
 msgid "Cancel"
 msgstr "Abandon"

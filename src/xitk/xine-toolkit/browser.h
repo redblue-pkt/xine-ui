@@ -30,8 +30,6 @@
 #include "widget.h"
 #include "_xitk.h"
 
-#define DEFAULT_DBL_CLICK_TIME 200
-
 typedef struct {
 
   ImlibData              *imlibdata;

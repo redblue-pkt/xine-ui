@@ -888,7 +888,6 @@ void playlist_editor(void) {
   br.browser.entries               = gGui->playlist;
   br.callback                      = handle_selection;
   br.dbl_click_callback            = pl_on_dbl_click;
-  br.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
   br.parent_wlist                  = playlist->widget_list;
   xitk_list_append_content (playlist->widget_list->l, 
 			   (playlist->playlist = 

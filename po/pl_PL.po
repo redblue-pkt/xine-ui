@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-05-01 22:14+0200\n"
+"POT-Creation-Date: 2002-05-02 22:21+0200\n"
 "PO-Revision-Date: 2002-03-31 01:00+0100\n"
 "Last-Translator: Bart³omiej MURYN <forever@klub.chip.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -140,7 +140,7 @@ msgstr ""
 msgid "Cannot open display\n"
 msgstr "Nie moge otworzyc okna wyswietlania\n"
 
-#: src/xitk/event.c:917
+#: src/xitk/event.c:925
 msgid "Unable to initialize Imlib\n"
 msgstr "Nie moge zainicjowac Imlib\n"
 

@@ -1,0 +1,86 @@
+	 Here is a small summary of xitk hidden features ;-)
+         ---------------------------------------------------
+
+    - xitk can be slightly tuned for user requirements (read: you can
+made small changes). You can change default colors, fonts, and timers.
+
+			       RC file
+			       -------
+User can add a '.xitkrc' in their home directory, and system admins can add 
+a 'xitkrc' file in /etc (system wide rc file). 
+If the user have his own .xitkrc file, the system wide rc file is simply ignored.
+
+NOTE: colors can be: pixel color value, tripled value or named colors (see widget.c)
+
+Each entries are optional.
+
+--
+
+#
+# Small "almost green" example of a xitkrc file.
+#
+
+# background color
+color.background         = 5582
+
+# color for focused widget
+color.focus              = #0e7f4c
+
+# color for selected widget
+color.select             = #16f490
+
+# color for black color
+color.black 	         = #064c35
+
+# color for white color
+color.white              = #00ff8c
+
+# color for warning foregrounds (mainly tips windows)
+color.warning_foreground = Blue
+
+# color for warning backgrounds (mainly tips windows)
+color.warning_background = #ff0000
+
+# default font (the first attempted).
+font.default             = fixed
+
+# fallback font.
+font.system              = -adobe-courier-*-*-*-*-12-*-*-*-*-*-*-*
+
+# speed (in µ-seconds) between two "slide effect" for label marked
+# as animated (depending of skin configuration).
+timer.label_animation    = 5000
+
+# time (in m-seconds) between two mouse click 
+# assimilated as double click
+timer.double_click       = 200
+
+--
+
+		     input text widget shortcurts
+                     ----------------------------
+
+As i use emacs, input text widget handle emacs-like shortcuts (is someone
+want vi-like shortcuts, the patch is welcome ;-) ):
+
+	C-a | C-A: begin of line,
+	C-b | C-B: go backward,
+	C-c | C-C: cancel,
+	C-d | C-D: delete one char from the right cursor position,
+	C-e | C-E: end of line,
+	C-f | C-F: go forward,
+	C-k | C-K: kill line from cursor,
+	C-m | C-M: return,
+	C-t | C-T: transpose chars,
+	C-?      : erase one char from the left cursor position.
+
+	other key actions:
+	Del                :delete one char from the right cursor position,
+	Backspace          : erase one char from the left cursor position,
+	Left/Right arrows  : self explaning ;-),
+	Home               : begin of line,
+	End                : end of line,
+	Return/Keypad enter: return,
+	Esc/Tab            : cancel.
+
+--

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-04-29 22:55+0200\n"
+"POT-Creation-Date: 2002-05-02 22:21+0200\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: Daniel Bena  <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -80,22 +80,22 @@ msgstr "Moje okno"
 msgid "Quit"
 msgstr "Skonèi»"
 
-#: src/xitk/xine-toolkit/window.c:777
+#: src/xitk/xine-toolkit/window.c:797
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:839 src/xitk/xine-toolkit/window.c:1032
+#: src/xitk/xine-toolkit/window.c:859 src/xitk/xine-toolkit/window.c:1052
 msgid "Question?"
 msgstr "Otázka?"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "Yes"
 msgstr "Áno"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:1192
 msgid "Cancel"
 msgstr "Zru¹i»"

@@ -940,7 +940,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   private_data->play_callback     = mb->play.callback;
   private_data->kill_callback     = mb->kill.callback;
   mb->browser.dbl_click_callback  = handle_dbl_click;
-  mb->browser.dbl_click_time      = DEFAULT_DBL_CLICK_TIME;
   mb->browser.userdata            = (void *)private_data;
   mb->browser.parent_wlist        = private_data->widget_list;
   xitk_list_append_content (private_data->widget_list->l,

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XINE 1.0\n"
-"POT-Creation-Date: 2002-04-29 22:55+0200\n"
+"POT-Creation-Date: 2002-05-02 22:21+0200\n"
 "PO-Revision-Date: 2002-02-19 22:56+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -80,22 +80,22 @@ msgstr "Mi jodida ventana"
 msgid "Quit"
 msgstr "Salir"
 
-#: src/xitk/xine-toolkit/window.c:777
+#: src/xitk/xine-toolkit/window.c:797
 msgid "OK"
 msgstr "Aceptar"
 
-#: src/xitk/xine-toolkit/window.c:839 src/xitk/xine-toolkit/window.c:1032
+#: src/xitk/xine-toolkit/window.c:859 src/xitk/xine-toolkit/window.c:1052
 msgid "Question?"
 msgstr "¿Pregunta?"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "Yes"
 msgstr "Sí"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "No"
 msgstr "No"
 
-#: src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:1192
 msgid "Cancel"
 msgstr "Cancelar"

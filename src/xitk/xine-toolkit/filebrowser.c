@@ -1175,7 +1175,6 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   private_data->kill_callback     = fb->kill.callback;
 
   fb->browser.dbl_click_callback = handle_dbl_click;
-  fb->browser.dbl_click_time     = DEFAULT_DBL_CLICK_TIME;
   fb->browser.userdata           = (void *)private_data;
   fb->browser.parent_wlist       = private_data->widget_list;
   xitk_list_append_content(private_data->widget_list->l,

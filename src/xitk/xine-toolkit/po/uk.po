@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.8\n"
-"POT-Creation-Date: 2002-04-29 22:55+0200\n"
+"POT-Creation-Date: 2002-05-02 22:21+0200\n"
 "PO-Revision-Date: 2002-03-23 20:42GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -79,22 +79,22 @@ msgstr "В╕кно"
 msgid "Quit"
 msgstr "Вих╕д"
 
-#: src/xitk/xine-toolkit/window.c:777
+#: src/xitk/xine-toolkit/window.c:797
 msgid "OK"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:839 src/xitk/xine-toolkit/window.c:1032
+#: src/xitk/xine-toolkit/window.c:859 src/xitk/xine-toolkit/window.c:1052
 msgid "Question?"
 msgstr "Питання?"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "Yes"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "No"
 msgstr "Н╕"
 
-#: src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:1192
 msgid "Cancel"
 msgstr "В╕дмова"

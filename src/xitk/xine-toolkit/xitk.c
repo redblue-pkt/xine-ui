@@ -845,7 +845,9 @@ unsigned long xitk_get_warning_foreground(void) {
 unsigned long xitk_get_warning_background(void) {
   return xitk_config_get_warning_background(gXitk->config);
 }
-
+long int xitk_get_timer_dbl_click(void) {
+  return xitk_config_get_timer_dbl_click(gXitk->config);
+}
 /*
  *
  */

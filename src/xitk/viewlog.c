@@ -481,7 +481,6 @@ void viewlog_window(void) {
   br.browser.entries               = viewlog->log;
   br.callback                      = NULL;
   br.dbl_click_callback            = NULL;
-  br.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
   br.parent_wlist                  = viewlog->widget_list;
   br.userdata                      = NULL;
   xitk_list_append_content(viewlog->widget_list->l, 

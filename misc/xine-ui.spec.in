@@ -230,6 +230,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/share/doc/xine-ui/README_it
 %{prefix}/share/doc/xine-ui/README_uk
 %{prefix}/share/doc/xine-ui/bug_report_form
+%{prefix}/share/doc/xitk/README
 ## intl files
 %{prefix}/share/locale/fr/LC_MESSAGES/xine-ui.mo
 %{prefix}/share/locale/fr/LC_MESSAGES/xitk.mo
@@ -255,6 +256,8 @@ rm -rf $RPM_BUILD_ROOT
 @HAVE_AA_TRUE@%{prefix}/man/pl/man1/aaxine.1*
 
 %changelog
+* Fri May 03 2002 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+- add xitk README file.
 * Sun Mar 31 2002 Matthias Dahl <matthew2k@web.de>
 - added xine-bugreport and xine-check, including their man pages.
 - added german man pages and README_fi.

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-04-29 22:55+0200\n"
+"POT-Creation-Date: 2002-05-02 22:21+0200\n"
 "PO-Revision-Date: 2002-03-31 08:00+0100\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -80,22 +80,22 @@ msgstr "Moje Okno"
 msgid "Quit"
 msgstr "Zakoncz"
 
-#: src/xitk/xine-toolkit/window.c:777
+#: src/xitk/xine-toolkit/window.c:797
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:839 src/xitk/xine-toolkit/window.c:1032
+#: src/xitk/xine-toolkit/window.c:859 src/xitk/xine-toolkit/window.c:1052
 msgid "Question?"
 msgstr "Pytanie?"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "Yes"
 msgstr "Tak"
 
-#: src/xitk/xine-toolkit/window.c:966 src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:986 src/xitk/xine-toolkit/window.c:1192
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1172
+#: src/xitk/xine-toolkit/window.c:1192
 msgid "Cancel"
 msgstr "Anuluj"

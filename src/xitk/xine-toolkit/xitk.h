@@ -355,6 +355,7 @@ int xitk_get_background_color(void);
 int xitk_get_focus_color(void);
 int xitk_get_select_color(void);
 unsigned long xitk_get_timer_label_animation(void);
+long int xitk_get_timer_dbl_click(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
 
@@ -920,7 +921,6 @@ xitk_widget_t *xitk_noskin_button_create (xitk_button_widget_t *b,
  * Create the list browser
  */
 /* Default time (in ms) between mouse click to act as double click */
-#define DEFAULT_DBL_CLICK_TIME 200
 typedef struct {
   int                       magic;
   ImlibData              *imlibdata;
@@ -944,7 +944,6 @@ typedef struct {
     char                **entries;
   } browser;
   
-  int                     dbl_click_time;
   xitk_state_callback_t   dbl_click_callback;
 
   /* Callback on selection function */

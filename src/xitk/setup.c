@@ -763,7 +763,6 @@ static widget_triplet_t *setup_list_browser(int x, int y, char **content, int le
   br.browser.entries               = content;
   br.callback                      = NULL;
   br.dbl_click_callback            = NULL;
-  br.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
   br.parent_wlist                  = setup->widget_list;
   br.userdata                      = NULL;
   xitk_list_append_content(setup->widget_list->l, 

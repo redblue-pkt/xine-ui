@@ -1,6 +1,12 @@
 
 SUBDIRS = po
 
+EXTRA_DIST = $(docs_DATA)
+
+docsdir = $(datadir)/doc/xitk
+
+docs_DATA = README
+
 CFLAGS = @BUILD_LIB_STATIC@ @CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
 
 EXTRA_PROGRAMS = test

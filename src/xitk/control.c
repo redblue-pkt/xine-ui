@@ -668,7 +668,6 @@ void control_panel(void) {
   br.browser.entries               = control->skins;
   br.callback                      = control_select_new_skin;
   br.dbl_click_callback            = NULL;
-  br.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
   br.parent_wlist                  = control->widget_list;
   xitk_list_append_content (control->widget_list->l, 
 			   (control->skinlist = 

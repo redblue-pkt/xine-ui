@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-05-01 22:14+0200\n"
+"POT-Creation-Date: 2002-05-02 22:21+0200\n"
 "PO-Revision-Date: 2002-05-02 11:26+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -141,7 +141,7 @@ msgstr ""
 msgid "Cannot open display\n"
 msgstr "Kann Display nicht öffnen\n"
 
-#: src/xitk/event.c:917
+#: src/xitk/event.c:925
 msgid "Unable to initialize Imlib\n"
 msgstr "Kann Imlib nicht initialisieren\n"
 
@@ -325,7 +325,8 @@ msgstr ""
 
 #: src/xitk/main.c:210
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
-msgstr "  -G, --geometry <BxH[+X+Y]>    Geometrie des Fensters setzen (X-Stil).\n"
+msgstr ""
+"  -G, --geometry <BxH[+X+Y]>    Geometrie des Fensters setzen (X-Stil).\n"
 
 #: src/xitk/main.c:211
 msgid "  -B, --borderless             Borderless video output window.\n"

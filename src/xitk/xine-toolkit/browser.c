@@ -508,10 +508,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
   private_data->list_length          = br->browser.num_entries;
   private_data->max_length           = br->browser.max_displayed_entries;
 
-  if(br->dbl_click_time)
-    private_data->dbl_click_time     = br->dbl_click_time;
-  else
-    private_data->dbl_click_time     = DEFAULT_DBL_CLICK_TIME;
+  private_data->dbl_click_time       = xitk_get_timer_dbl_click();
 
   if(br->dbl_click_callback)
     private_data->dbl_click_callback = br->dbl_click_callback;

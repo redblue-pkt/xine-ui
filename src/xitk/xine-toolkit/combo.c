@@ -406,7 +406,6 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
   browser.browser.entries               = private_data->entries;
   browser.callback                      = combo_select;
   browser.dbl_click_callback            = NULL;
-  browser.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
   browser.parent_wlist                  = private_data->widget_list;
   browser.userdata                      = (void*)mywidget;
   xitk_list_append_content (private_data->widget_list->l, 

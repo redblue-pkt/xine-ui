@@ -726,7 +726,6 @@ static void create_browser(void) {
   browser.browser.entries               = test->entries;
   browser.callback                      = change_inputtext;
   browser.dbl_click_callback            = change_inputtext_dbl_click;
-  browser.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
   browser.parent_wlist                  = test->widget_list;
   browser.userdata                      = NULL;
   xitk_list_append_content (test->widget_list->l, 

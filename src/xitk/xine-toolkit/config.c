@@ -143,6 +143,8 @@ static void xitk_config_timers(xitk_config_t *xtcf) {
     
     if(!strncasecmp(p, "label_animation", 15))
       xtcf->timers.label_anim = strtol(c, &c, 10);
+    else if(!strncasecmp(p, "double_click", 12))
+      xtcf->timers.dbl_click = strtol(c, &c, 10);
   }
 }
 
@@ -252,6 +254,7 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   xtcf->colors.warn_foreground = -1;
   xtcf->colors.warn_background = -1;
   xtcf->timers.label_anim      = 50000;
+  xtcf->timers.dbl_click       = 200;
 }
 
 /*
@@ -312,6 +315,13 @@ unsigned long xitk_config_get_timer_label_animation(xitk_config_t *xtcf) {
     return 5000;
   
   return xtcf->timers.label_anim;
+}
+long xitk_config_get_timer_dbl_click(xitk_config_t *xtcf) {
+  
+  if(!xtcf)
+    return 200;
+  
+  return xtcf->timers.dbl_click;
 }
 unsigned long xitk_config_get_warning_foreground(xitk_config_t *xtcf) {
 
