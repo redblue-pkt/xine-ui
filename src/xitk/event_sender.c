@@ -129,6 +129,21 @@ static void event_sender_store_new_position(int x, int y, int w, int h) {
   
 }
 
+void event_sender_show_tips(int enabled, unsigned long timeout) {
+  
+  if(eventer) {
+    if(enabled)
+      xitk_set_widgets_tips_timeout(eventer->widget_list, timeout);
+    else
+      xitk_disable_widgets_tips(eventer->widget_list);
+  }
+}
+
+void event_sender_update_tips_timeout(unsigned long timeout) {
+  if(eventer)
+    xitk_set_widgets_tips_timeout(eventer->widget_list, timeout);
+}
+
 /* Send given event to xine engine */
 void event_sender_send(int event) {
   xine_event_t   xine_event;
@@ -677,6 +692,7 @@ void event_sender_panel(void) {
 				       &lb, x, y, 70, 23,
 				       "Black", "Black", "White", eventerfontname)));
   xitk_enable_and_show_widget(w);
+  event_sender_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 
   eventer->widget_key = xitk_register_event_handler("eventer", 
 						    (xitk_window_get_window(eventer->xwin)),

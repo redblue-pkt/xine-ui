@@ -34,6 +34,7 @@ void playlist_mmk_editor(void);
 void playlist_scan_for_infos_selected(void);
 void playlist_scan_for_infos(void);
 void playlist_show_tips(int enabled, unsigned long timeout);
+void playlist_update_tips_timeout(unsigned long timeout);
 void playlist_mrlident_toggle(void);
 void playlist_update_playlist(void);
 void playlist_exit(xitk_widget_t *, void *);

@@ -29,6 +29,7 @@
 #include <pthread.h>
 #include <inttypes.h>
 #include <unistd.h>
+#include <sys/time.h>
 
 #include <X11/Xlib.h>
 
@@ -204,11 +205,15 @@ static void *_tips_loop_thread(void *data) {
 					NULL,
 					NULL,
 					NULL);
-            
-      gettimeofday(&tv, NULL);
-      ts.tv_sec  = tv.tv_sec;
-      ts.tv_nsec = (tv.tv_usec + (tips.widget->tips_timeout * 10000)) * 1000;      
-
+      {
+	unsigned int     secs = (tips.widget->tips_timeout / 1000);
+	long int         nsecs = (tips.widget->tips_timeout * 1000000) - (secs * 1000000000);
+	
+	gettimeofday(&tv, NULL);
+	ts.tv_sec  = tv.tv_sec + secs;
+	ts.tv_nsec = (tv.tv_usec * 1000) + nsecs;
+      }
+      
       pthread_mutex_lock(&tips.timer_mutex);
       pthread_cond_timedwait(&tips.timer_cond, &tips.timer_mutex, &ts);
 
@@ -338,6 +343,13 @@ void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout) {
     return;
   
   w->tips_timeout = timeout;
+  if(w->type & (WIDGET_GROUP | WIDGET_GROUP_WIDGET)) {
+    widget_event_t  event;
+    
+    event.type         = WIDGET_EVENT_TIPS_TIMEOUT;
+    event.tips_timeout = timeout;
+    (void) w->event(w, &event, NULL);
+  }
 }
 
 /*

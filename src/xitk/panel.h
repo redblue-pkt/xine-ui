@@ -63,7 +63,7 @@ typedef struct {
   
   struct {
     int                 enable;
-    unsigned int        timeout;
+    unsigned long       timeout;
   } tips;
   
   int                   visible;

@@ -50,7 +50,7 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
 #define NORMAL_CURS              0
 #define WAIT_CURS                1
 
-#define ADD_FRAME(title) {                                                                      \
+#define ADD_FRAME(title) do {						                        \
     xitk_widget_t       *frame = NULL;                                                          \
     xitk_image_t        *image;                                                                 \
     xitk_image_widget_t  im;                                                                    \
@@ -86,9 +86,9 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
     wt->frame = frame;                                                                          \
     x += 10;                                                                                    \
     y += FRAME_HEIGHT >> 1;                                                                     \
-  }
+  } while(0)
 
-#define ADD_LABEL(widget, cb, data) {                                                           \
+#define ADD_LABEL(widget, cb, data) do {                                                        \
     int            wx, wy, wh, fh;                                                              \
     xitk_font_t   *fs;                                                                          \
     xitk_widget_t *lbl;                                                                         \
@@ -110,35 +110,41 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
                            (FRAME_WIDTH - (xitk_get_widget_width(widget) + 35)),                \
                            _labelkey, cb, data);                                                \
     wt->label = lbl;                                                                            \
-  }
+  } while(0)
 
-#define DISABLE_ME(wtriplet) {                                                                  \
+#define DISABLE_ME(wtriplet) do {                                                               \
     if((wtriplet)->frame)                                                                       \
       xitk_disable_and_hide_widget((wtriplet)->frame);                                          \
                                                                                                 \
     if((wtriplet)->label) {                                                                     \
       xitk_disable_and_hide_widget((wtriplet)->label);                                          \
-      xitk_disable_widget_tips((wtriplet)->label);                                              \
+      xitk_disable_widget_tips((wtriplet)->label);		 	                        \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
       xitk_disable_and_hide_widget((wtriplet)->widget);                                         \
-      xitk_disable_widget_tips((wtriplet)->widget);                                             \
+      xitk_disable_widget_tips((wtriplet)->widget);			                        \
     }                                                                                           \
-}
+  } while(0)
 
-#define ENABLE_ME(wtriplet) {                                                                   \
+#define ENABLE_ME(wtriplet) do {                                                                \
     if((wtriplet)->frame)                                                                       \
       xitk_enable_and_show_widget((wtriplet)->frame);                                           \
                                                                                                 \
     if((wtriplet)->label) {                                                                     \
       xitk_enable_and_show_widget((wtriplet)->label);                                           \
-      xitk_enable_widget_tips((wtriplet)->label);                                               \
+      if(panel_get_tips_enable())					                        \
+	xitk_enable_widget_tips((wtriplet)->label);			                        \
+      else								                        \
+	xitk_disable_widget_tips((wtriplet)->label);			                        \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
       xitk_enable_and_show_widget((wtriplet)->widget);                                          \
-      xitk_enable_widget_tips((wtriplet)->widget);                                              \
+      if(panel_get_tips_enable())					                        \
+	xitk_enable_widget_tips((wtriplet)->widget);			                        \
+      else								                        \
+	xitk_disable_widget_tips((wtriplet)->widget);			                        \
     }                                                                                           \
-}
+  } while(0)
 
 
 typedef struct {
@@ -223,6 +229,21 @@ static void setup_exit(xitk_widget_t *w, void *data) {
 
     try_to_set_input_focus(gGui->video_window);
   }
+}
+
+void setup_show_tips(int enabled, unsigned long timeout) {
+  
+  if(setup) {
+    if(enabled)
+      xitk_set_widgets_tips_timeout(setup->widget_list, timeout);
+    else
+      xitk_disable_widgets_tips(setup->widget_list);
+  }
+}
+
+void setup_update_tips_timeout(unsigned long timeout) {
+  if(setup)
+    xitk_set_widgets_tips_timeout(setup->widget_list, timeout);
 }
 
 /*
@@ -1183,6 +1204,7 @@ void setup_panel(void) {
 				       (x * 3) + (100 * 2), WINDOW_HEIGHT - 40, 100, 23,
 				       "Black", "Black", "White", tabsfontname)));
   xitk_enable_and_show_widget(w);
+  setup_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
   
   setup->kreg = xitk_register_event_handler("setup", 
 					    (xitk_window_get_window(setup->xwin)),

@@ -46,6 +46,14 @@ void mrl_browser_show_tips(int enabled, unsigned long timeout) {
 
 }
 
+void mrl_browser_update_tips_timeout(unsigned long timeout) {
+  if(mrlb) {
+    if(xitk_get_widget_tips_timeout(mrlb) > 0)
+      xitk_mrlbrowser_set_tips_timeout(mrlb, 1, timeout);
+
+  }
+}
+
 /*
  *
  */

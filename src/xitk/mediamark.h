@@ -87,6 +87,8 @@ int mrl_look_like_playlist(char *mrl);
 int mrl_look_like_file(char *mrl);
 void mediamark_collect_from_directory(char *filepathname);
 
+void mmk_editor_update_tips_timeout(unsigned long timeout);
+void mmk_editor_show_tips(int enabled, unsigned long timeout);
 void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data);
 int mmk_editor_is_visible(void);
 int mmk_editor_is_running(void);

@@ -941,7 +941,12 @@ void xitk_set_widget_tips_default(xitk_widget_t *w, char *str);
 /**
  *
  */
-void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, char *str, unsigned int timeout);
+void xitk_set_widget_tips_and_timeout(xitk_widget_t *w, char *str, unsigned long timeout);
+
+/**
+ *
+ */
+unsigned long xitk_get_widget_tips_timeout(xitk_widget_t *w);
 
 /**
  *

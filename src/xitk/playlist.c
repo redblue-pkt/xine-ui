@@ -614,6 +614,11 @@ void playlist_show_tips(int enabled, unsigned long timeout) {
   }
 }
 
+void playlist_update_tips_timeout(unsigned long timeout) {
+  if(playlist)
+    xitk_set_widgets_tips_timeout(playlist->widget_list, timeout);
+}
+
 void playlist_mrlident_toggle(void) {
 
   if(playlist && playlist->visible) {

@@ -94,6 +94,11 @@ void control_show_tips(int enabled, unsigned long timeout) {
   }
 }
 
+void control_update_tips_timeout(unsigned long timeout) {
+  if(control)
+    xitk_set_widgets_tips_timeout(control->widget_list, timeout);
+}
+
 /*
  * Get current parameter 'param' value.
  */

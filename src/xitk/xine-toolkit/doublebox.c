@@ -122,6 +122,17 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   }
 }
 
+static void tips_timeout(xitk_widget_t *w, unsigned long timeout) {
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_DOUBLEBOX) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
+    doublebox_private_data_t *private_data = (doublebox_private_data_t *) w->private_data;
+    
+    private_data->input_widget->tips_timeout = timeout;
+    private_data->more_widget->tips_timeout = timeout;
+    private_data->less_widget->tips_timeout = timeout;
+  }
+}
+
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
   int retval = 0;
   
@@ -137,6 +148,9 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     break;
   case WIDGET_EVENT_ENABLE:
     enability(w);
+    break;
+  case WIDGET_EVENT_TIPS_TIMEOUT:
+    tips_timeout(w, event->tips_timeout);
     break;
   }
   

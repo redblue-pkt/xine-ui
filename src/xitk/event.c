@@ -1522,7 +1522,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gui_set_current_mmk(mediamark_get_current_mmk());
 
-  panel_init ();
+  panel_init();
 }
 
 void gui_init_imlib (Visual *vis) {
@@ -1630,6 +1630,7 @@ void gui_run(char **session_opts) {
   
   video_window_change_skins();
   panel_add_autoplay_buttons();
+  panel_show_tips();
   panel_add_mixer_control();
   panel_update_channel_display () ;
   panel_update_mrl_display ();

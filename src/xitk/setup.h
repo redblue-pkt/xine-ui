@@ -37,5 +37,7 @@ void setup_toggle_visibility(xitk_widget_t *, void *);
 void setup_raise_window(void);
 void setup_reparent(void);
 void setup_end(void);
+void setup_show_tips(int enabled, unsigned long timeout);
+void setup_update_tips_timeout(unsigned long timeout);
 
 #endif

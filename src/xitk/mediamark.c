@@ -3014,6 +3014,21 @@ static void mmkeditor_handle_event(XEvent *event, void *data) {
   }
 }
 
+void mmk_editor_show_tips(int enabled, unsigned long timeout) {
+  
+  if(mmkeditor) {
+    if(enabled)
+      xitk_set_widgets_tips_timeout(mmkeditor->widget_list, timeout);
+    else
+      xitk_disable_widgets_tips(mmkeditor->widget_list);
+  }
+}
+
+void mmk_editor_update_tips_timeout(unsigned long timeout) {
+  if(mmkeditor)
+    xitk_set_widgets_tips_timeout(mmkeditor->widget_list, timeout);
+}
+
 int mmk_editor_is_visible(void) {
   
   if(mmkeditor != NULL)
@@ -3414,6 +3429,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 					       "Black", "Black", "White", btnfontname)));
   xitk_set_widget_tips_default(b, _("Discard changes and dismiss the window."));
   xitk_enable_and_show_widget(b);
+  mmk_editor_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 
   xitk_window_change_background(gGui->imlib_data, mmkeditor->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);

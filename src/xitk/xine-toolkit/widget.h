@@ -57,6 +57,7 @@ typedef struct {
 #define WIDGET_EVENT_ENABLE          7
 #define WIDGET_EVENT_GET_SKIN        8
 #define WIDGET_EVENT_DESTROY         9
+#define WIDGET_EVENT_TIPS_TIMEOUT   10
 
 typedef struct {
   int                   type; /* See WIDGET_EVENT_x */
@@ -68,6 +69,8 @@ typedef struct {
   
   int                   focus;
   
+  unsigned long         tips_timeout;
+
   XEvent               *xevent;
 
   xitk_skin_config_t   *skonfig;
@@ -99,7 +102,7 @@ struct xitk_widget_s {
 
   widget_event_notify_t           event;
 
-  int                             tips_timeout;
+  unsigned long                   tips_timeout;
   char                           *tips_string;
 
   void                           *private_data;
