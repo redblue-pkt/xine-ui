@@ -215,7 +215,7 @@ static void paint_label(xitk_widget_t *w, Window win, GC gc) {
 		w->x, w->y);
 
       /* We can't wait here, otherwise the rolling effect is really jerky */
-      if(private_data->on_change == 0)
+      if(private_data->animation && (private_data->on_change == 0))
 	XSync(private_data->imlibdata->x.disp, False);
       
       XUNLOCK(private_data->imlibdata->x.disp);
@@ -312,8 +312,6 @@ static void label_setup_label(xitk_widget_t *w, char *label_) {
       
       pthread_create(&private_data->thread, &pth_attrs, 
       		     xitk_label_animation_loop, (void *)private_data);
-      
-      //      pthread_attr_destroy(&pth_attrs);
     }
   }
 

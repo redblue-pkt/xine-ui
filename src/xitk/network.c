@@ -79,12 +79,12 @@
 #define COMMANDS_PREFIX      "/\377\200COMMANDS"
 extern int errno;
 
-#define _FREE(x) do {               \
-                      if(x) {       \
-                        free(x);    \
-                        x = NULL;   \
-                      }             \
-                    } while(0)
+#define _FREE(x) do {                          \
+                      if(x) {                  \
+                        free(x);               \
+                        x = NULL;              \
+                      }                        \
+                 } while(0)
 
 #ifdef NETWORK_CLIENT
 
@@ -186,6 +186,7 @@ static void do_set(commands_t *, client_info_t *);
 static void do_gui(commands_t *, client_info_t *);
 static void do_event(commands_t *, client_info_t *);
 static void do_seek(commands_t *, client_info_t *);
+static void do_halt(commands_t *, client_info_t *);
 
 static void handle_client_command(client_info_t *);
 static const char *get_homedir(void);
@@ -370,6 +371,10 @@ static commands_t commands[] = {
     "Seek in current stream",
     "seek %[0...100]\n"
     "seek [+|-][secs]"
+  },
+  { "halt",        NO_ARGS,         PUBLIC,          NEED_AUTH,     do_halt,
+    "Stop xine program",
+    "halt"
   },
   { NULL,          -1,              NOT_PUBLIC,      AUTH_UNNEEDED, NULL, 
     NULL, 
@@ -1126,7 +1131,7 @@ static void client_handle_command(session_t *session, const char *command) {
     sock_write(session->socket, (char *)command);
   }
   
-  if(!strncasecmp(cmd, "exit", strlen(cmd))) {
+  if((!strncasecmp(cmd, "exit", strlen(cmd))) || (!strncasecmp(cmd, "halt", strlen(cmd)))) {
     session_create_commands(session);
     session->socket = -1;
   }
@@ -2385,6 +2390,10 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
       }
     }
   }
+}
+
+static void do_halt(commands_t *cmd, client_info_t *client_info) {
+  gui_exit(NULL, NULL);
 }
 
 /*

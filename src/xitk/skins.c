@@ -210,13 +210,6 @@ skins_locations_t *get_skin_location(char *skin) {
 }
 
 /*
- * Select a new skin (used in control skin list).
- */
-void select_new_skin(int selected) {
-  config_update_num("gui.skin", selected);
-}
-
-/*
  * unload and reload the new config for a given
  * skin file. There is fallback if that fail.
  */
@@ -231,7 +224,7 @@ void change_skin(skins_locations_t *sk) {
     return;
 
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
-  if(xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)) 
+  if(xine_config_lookup_entry(gGui->xine, "gui.skin", &entry)) 
     old_skin = (char *) skins_avail[entry.num_value]->skin;
   else
     old_skin = DEFAULT_SKIN;
@@ -333,6 +326,20 @@ static void skin_change_cb(void *data, xine_cfg_entry_t *cfg) {
   change_skin(sk);
   change_config_entry = 1;
 
+}
+
+/*
+ * Select a new skin (used in control skin list).
+ */
+void select_new_skin(int selected) {
+  xine_cfg_entry_t cfg;
+
+  change_config_entry = 0;
+  config_update_num("gui.skin", selected);
+  change_config_entry = 1;
+  
+  cfg.num_value = selected;
+  skin_change_cb(NULL, &cfg);
 }
 
 /*

@@ -197,6 +197,9 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	gGui->playlist_num--;
 	if(gGui->playlist_cur) gGui->playlist_cur--;
       }
+
+      if(is_playback_widgets_enabled() && (!gGui->playlist_num))
+	enable_playback_controls(0);
     }
     
     gui_set_current_mrl(gGui->playlist [gGui->playlist_cur]);

@@ -672,7 +672,7 @@ void panel_init (void) {
   xitk_label_widget_t       lbl;
   xitk_slider_widget_t      sl;
   xitk_widget_t            *w;
-  long data[1];
+  long                     data[1];
   
   if (gGui->panel_window)
     return ; /* panel already open  - FIXME: bring to foreground */
@@ -753,23 +753,7 @@ void panel_init (void) {
   XSetStandardProperties(gGui->display, gGui->panel_window, title, title,
 			 None, NULL, 0, &hint);
 
-  XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | 
-	       /*SubstructureRedirectMask | */ KeymapStateMask);
-
-  /*
-   * wm, no border please
-   */
-
-  prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
-  mwmhints.flags = MWM_HINTS_DECORATIONS;
-  mwmhints.decorations = 0;
-
-  XChangeProperty(gGui->display, gGui->panel_window, prop, prop, 32,
-                  PropModeReplace, (unsigned char *) &mwmhints,
-                  PROP_MWM_HINTS_ELEMENTS);
-  
-  XSetTransientForHint (gGui->display, 
-			gGui->panel_window, gGui->video_window);
+  XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | KeymapStateMask);
 
   /*
    * layer above most other things, like gnome panel
@@ -784,6 +768,21 @@ void panel_init (void) {
 		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
 		    1);
   }
+  
+  /*
+   * wm, no border please
+   */
+  
+  prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
+  mwmhints.flags = MWM_HINTS_DECORATIONS;
+  mwmhints.decorations = 0;
+
+  XChangeProperty(gGui->display, gGui->panel_window, prop, prop, 32,
+                  PropModeReplace, (unsigned char *) &mwmhints,
+                  PROP_MWM_HINTS_ELEMENTS);
+  
+  XSetTransientForHint (gGui->display, 
+			gGui->panel_window, gGui->video_window);
 
   /* 
    * set wm properties 
@@ -1087,6 +1086,9 @@ void panel_init (void) {
 
   if (panel->visible)
     XMapRaised(gGui->display, gGui->panel_window); 
+  else
+    xitk_hide_widgets(panel->widget_list);
+  
   
   XUnlockDisplay (gGui->display);
 

@@ -524,9 +524,9 @@ void control_panel(void) {
 
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
-    wm_hint->input = True;
+    wm_hint->input         = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->flags = InputHint | StateHint;
+    wm_hint->flags         = InputHint | StateHint;
     XSetWMHints(gGui->display, control->window, wm_hint);
     XFree(wm_hint); /* CHECKME */
   }
