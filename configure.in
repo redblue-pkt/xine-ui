@@ -91,12 +91,13 @@ dnl AC_SUBST(ROOT_CFLAGS)
 dnl AC_SUBST(TOOLS_CFLAGS)
 
 dnl
-dnl threads
+dnl threads, lib search paths
 dnl
 
 case $host in
   *-*-freebsd*)
     THREAD_LIBS="-pthread"
+    LIBTEST_CFLAGS="-I/usr/local/include -L/usr/local/lib" 
     ;;
   *)
     AC_CHECK_LIB(pthread, pthread_create,
@@ -137,56 +138,49 @@ dnl
 
 AC_CHECK_LIB(aa, main,
 	AC_DEFINE(HAVE_AA)
-	ac_have_aa="yes",,)
+	ac_have_aa="yes",,$LIBTEST_CFLAGS)
 AM_CONDITIONAL(HAVE_AA, test x$ac_have_aa = "xyes")
 
 
 dnl
 dnl check for libpng
 dnl
-AC_ARG_WITH(png-prefix,
-    [  --with-png-prefix=PFX   Prefix where PNG library is installed (optional)], png_prefix="$withval", png_prefix="")
 
-if test x"$png_prefix" != "x"; then
-    PNG_LIB="-L$png_prefix/lib"
-    PNG_CFLAGS="-I$png_prefix/include"
-    old_CPPFLAGS="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
-fi
+AC_CHECK_LIB(png, png_read_info,,
+  AC_MSG_ERROR(*** libpng is needed (PNG library not found) ***), 
+  $LIBTEST_CFLAGS -lz -lm $X_LIBS)
 
-AC_CHECK_LIB(png, png_read_info,
-  AC_CHECK_HEADER(png.h, png_ok=yes, png_ok=no),
-  AC_MSG_ERROR(*** libpng is needed (PNG library not found) - try to use --with-png-prefix option ***), $PNG_LIB $PNG_CFLAGS -lz -lm $X_LIBS)
+#
+# the following is not working on FreeBSD at the moment (guenter)
+#
+#if test x"$png_ok" = xyes; then
+#    saved_CFLAGS="$CFLAGS"
+#    CFLAGS="$CFLAGS $LIBTEST_CFLAGS"
+#  AC_MSG_CHECKING([for png_structp in png.h])
+#  AC_TRY_COMPILE([#include <png.h>],
+#    [
+#png_structp pp; 
+#png_infop info; 
+#png_colorp cmap; 
+#png_create_read_struct; 
+#png_set_IHDR;
+#    ], png_ok=yes, png_ok=no)
+#  AC_MSG_RESULT($png_ok)
+#  if test x"$png_ok" = xno; then
+#    AC_MSG_ERROR(*** libpng is needed (PNG library is too old) ***)
+#  fi
+#else
+#  AC_MSG_ERROR(*** libpng is needed (PNG header file not found) - try to use --with-png-prefix option ***)
+#fi
+#
+#CFLAGS="$saved_CFLAGS"
 
-if test x"$png_prefix" != "x"; then
-    CPPFLAGS="$old_CPPFLAGS"
-fi
+#
+# if we reach this point, we know libpng is there
+# (we cannot do without it anyway)
+#
 
-if test x"$png_ok" = xyes; then
-    saved_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $PNG_CFLAGS"
-  AC_MSG_CHECKING([for png_structp in png.h])
-  AC_TRY_COMPILE([#include <png.h>],
-    [
-png_structp pp; 
-png_infop info; 
-png_colorp cmap; 
-png_create_read_struct; 
-png_set_IHDR;
-    ], png_ok=yes, png_ok=no)
-  AC_MSG_RESULT($png_ok)
-  if test x"$png_ok" = xno; then
-    AC_MSG_ERROR(*** libpng is needed (PNG library is too old) ***)
-  fi
-else
-  AC_MSG_ERROR(*** libpng is needed (PNG header file not found) - try to use --with-png-prefix option ***)
-fi
-
-CFLAGS="$saved_CFLAGS"
-
-if test x"$png_ok" = xyes; then
-    X_LIBS="$X_LIBS $PNG_LIB $PNG_CFLAGS -lpng -lz"
-fi
+X_LIBS="$X_LIBS -lpng -lz"
 
 
 dnl
@@ -245,9 +239,9 @@ COMMON_CFLAGS="-Wall -D_FILE_OFFSET_BITS=64"
 
 case $host in
   i386-*-freebsd*)
-    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -pipe -fomit-frame-pointer -malign-functions=4 -malign-loops=4 -malign-jumps=4 -malign-functions=4 $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions"
+    GLOBAL_CFLAGS="$GLOBAL_CFLAGS -I/usr/local/include -L/usr/local/lib -pipe -fomit-frame-pointer -malign-functions=4 -malign-loops=4 -malign-jumps=4 -malign-functions=4 $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions"
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS $CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -D_REENTRANT"
-    DEBUG_CFLAGS="$X_CFLAGS $DEBUG_CFLAGS $CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -D_REENTRANT -DDEBUG"
+    DEBUG_CFLAGS="-I/usr/local/include -L/usr/local/lib $X_CFLAGS $DEBUG_CFLAGS $CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -D_REENTRANT -DDEBUG"
     AC_DEFINE(__i386__)
     AC_DEFINE([ARCH_X86],,[x86 architecture])
 
