@@ -146,7 +146,7 @@ static char *_read_file(const char *filename, int *size) {
     return NULL;
   }
   
-  if((buf = (char *) xine_xmalloc(*size)) == NULL) {
+  if((buf = (char *) xine_xmalloc(*size + 1)) == NULL) {
     fprintf(stderr, "%s(): xine_xmalloc() failed.\n", __XINE_FUNCTION__);
     close(fd);
     return NULL;
@@ -159,6 +159,8 @@ static char *_read_file(const char *filename, int *size) {
   }
 
   close(fd);
+
+  buf[*size] = '\0';
 
   return buf;
 }
@@ -213,12 +215,12 @@ static int playlist_split_data(playlist_t *playlist) {
     char *buf, *p;
 
     /* strsep modify oriinal string, avoid its corruption */
-    buf = (char *) xine_xmalloc(strlen(playlist->data) + 1);
+    buf = (char *) xine_xmalloc(strlen(playlist->data));
     memcpy(buf, playlist->data, strlen(playlist->data));
     playlist->numl = 0;
 
     while((p = xine_strsep(&buf, "\n")) != NULL) {
-      if(p && strlen(p)) {
+      if(p && (p <= buf) && (strlen(p))) {
 
 	if(playlist->numl == 0)
 	  playlist->lines = (char **) xine_xmalloc(sizeof(char *) * 2);
@@ -305,6 +307,12 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 	      playlist->type = strdup("PLS");
 	      return mmk;
 	    }
+
+	    while(playlist->numl) {
+	      free(playlist->lines[playlist->numl - 1]);
+	      playlist->numl--;
+	    }
+	    SAFE_FREE(playlist->lines);
 	  }
 	  
 	  free(pls_content);
@@ -369,8 +377,14 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 	    mmk[entries_m3u] = NULL;
 	    playlist->type = strdup("M3U");
 	  }
-	}
 
+	  while(playlist->numl) {
+	    free(playlist->lines[playlist->numl - 1]);
+	    playlist->numl--;
+	  }
+	  SAFE_FREE(playlist->lines);
+	}
+	
 	free(m3u_content);
       }
     }
@@ -467,6 +481,11 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 	    if(origin)
 	      free(origin);
 
+	    while(playlist->numl) {
+	      free(playlist->lines[playlist->numl - 1]);
+	      playlist->numl--;
+	    }
+	    SAFE_FREE(playlist->lines);
 	  }
 	  free(sfv_content);
 	}
@@ -507,7 +526,6 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		
 		mediamark_store_mmk(&mmk[entries_raw], ln, NULL, 0, -1);
 		playlist->entries = ++entries_raw;
-		
 	      }
 	    }
 	  }
@@ -516,6 +534,12 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 	    mmk[entries_raw] = NULL;
 	    playlist->type = strdup("RAW");
 	  }
+
+	  while(playlist->numl) {
+	    free(playlist->lines[playlist->numl - 1]);
+	    playlist->numl--;
+	  }
+	  SAFE_FREE(playlist->lines);
 	}
 
 	free(raw_content);
@@ -540,7 +564,6 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	playlist->data = tox_content;
 	
 	if(playlist_split_data(playlist)) {
-	  //      if((playlist->fd = fopen(filename, "r")) != NULL) {
 	  char    buffer[32768];
 	  char   *p, *pp;
 	  int     start = 0;
@@ -682,6 +705,12 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	    mmk[entries_tox] = NULL;
 	    playlist->type = strdup("TOX");
 	  }
+
+	  while(playlist->numl) {
+	    free(playlist->lines[playlist->numl - 1]);
+	    playlist->numl--;
+	  }
+	  SAFE_FREE(playlist->lines);
 	}
 	free(tox_content);
       }
@@ -1021,11 +1050,6 @@ int mediamark_concat_mediamarks(const char *filename) {
     (void) _mediamark_free_mmk(&mmk[i]);
   
   SAFE_FREE(mmk);
-  while(playlist->numl) {
-    free(playlist->lines[playlist->numl - 1]);
-    playlist->numl--;
-  }
-  SAFE_FREE(playlist->lines);
   SAFE_FREE(playlist->type);
   SAFE_FREE(playlist);
 
@@ -1078,11 +1102,6 @@ void mediamark_load_mediamarks(const char *filename) {
 
   SAFE_FREE(ommk);
 
-  while(playlist->numl) {
-    free(playlist->lines[playlist->numl - 1]);
-    playlist->numl--;
-  }
-  SAFE_FREE(playlist->lines);
   SAFE_FREE(playlist->type);
   SAFE_FREE(playlist);
 }
