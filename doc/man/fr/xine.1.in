@@ -261,15 +261,15 @@ Les MRLs valides peuvent être des noms de fichiers ou un de ceux qui suit:
 .br
 .BI vcd:/ <numéro piste>
 .br
-.BI tcp:/ <hôte> : <port>
+.BI tcp:// <hôte> : <port>
 .br
-.BI rtp:/ <hôte> : <port>
+.BI rtp:// <hôte> : <port>
 .br
-.BI udp:/ <hôte> : <port>
+.BI udp:// <hôte> : <port>
 .br
-.BI mms:/ <hôte>...
+.BI mms:// <hôte>...
 .br
-.BI http:/ <hôte>...
+.BI http:// <hôte>...
 .LP
 Plusieures MRLs peuvent être spécifiées pour lire un nombre consécutif
 de flux.

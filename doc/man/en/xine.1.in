@@ -264,15 +264,15 @@ to read from. valid MRLs may be plain file names or one of the following:
 .br
 .BI vcd:/ <tracknumber>
 .br
-.BI tcp:/ <host> : <port>
+.BI tcp:// <host> : <port>
 .br
-.BI rtp:/ <host> : <port>
+.BI rtp:// <host> : <port>
 .br
-.BI udp:/ <host> : <port>
+.BI udp:// <host> : <port>
 .br
-.BI mms:/ <host>...
+.BI mms:// <host>...
 .br
-.BI http:/ <host>...
+.BI http:// <host>...
 .LP
 Several MRLs may be specified in order to play a number of consecutive
 streams. Additional input plugins will provide additional MRL types.
