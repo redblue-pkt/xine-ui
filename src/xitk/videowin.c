@@ -317,8 +317,8 @@ static void video_window_adapt_size (void) {
     if(gGui->xine)
       if (xine_tvmode_switch2 (gGui->xine,
 			      1, gVw->video_width, gVw->video_height, gVw->video_duration) != 1)
-	gVw->fullscreen_req = 0;
 #endif
+	gVw->fullscreen_req = 0;
     break;
   default:
 #warning TVMODE NEWAPI
