@@ -87,7 +87,7 @@ typedef struct {
 
 #define	OPTION_VISUAL		1000
 #define	OPTION_INSTALL_COLORMAP	1001
-#define DISPLAY_KEYMAP          1002
+#define OPTION_DISPLAY_KEYMAP   1002
 #define OPTION_SK_SERVER        1003
 #define OPTION_ENQUEUE          1004
 #define OPTION_VERBOSE          1005
@@ -99,6 +99,7 @@ typedef struct {
 #define OPTION_STDCTL           1011
 #define OPTION_LIST_PLUGINS     1012
 #define OPTION_BUG_REPORT       1013
+#define OPTION_NETWORK_PORT     1014
 
 
 /* options args */
@@ -133,8 +134,9 @@ static struct option long_options[] = {
 #endif
   {"visual"	    , required_argument, 0,  OPTION_VISUAL           },
   {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
-  {"keymap"         , optional_argument, 0,  DISPLAY_KEYMAP          },
+  {"keymap"         , optional_argument, 0,  OPTION_DISPLAY_KEYMAP   },
   {"network"        , no_argument      , 0, 'n'                      },
+  {"network-port"   , required_argument, 0,  OPTION_NETWORK_PORT     },
   {"root"           , no_argument      , 0, 'R'                      },
   {"geometry"       , required_argument, 0, 'G'                      },
   {"borderless"     , no_argument      , 0, 'B'                      },
@@ -636,6 +638,7 @@ static void show_usage (void) {
 	   "                                 'file:<filename>': use <filename> as keymap.\n"
 	   "                                 -if no option is given, 'default' is selected.\n"));
   printf(_("  -n, --network                Enable network remote control server.\n"));
+  printf(_("      --network-port           Specify network server port number.\n"));
   printf(_("  -R, --root                   Use root window as video window.\n"));
   printf(_("  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"));
   printf(_("  -B, --borderless             Borderless video output window.\n"));
@@ -1351,6 +1354,7 @@ int main(int argc, char *argv[]) {
   gGui->install_colormap       = 0;
   gGui->cursor_grabbed         = 0;
   gGui->network                = 0;
+  gGui->network_port           = 0;
   gGui->video_window           = None;
   gGui->use_root_window        = 0;
 #ifdef HAVE_XF86VIDMODE
@@ -1538,7 +1542,7 @@ int main(int argc, char *argv[]) {
       gGui->install_colormap = 1;
       break;
 
-    case DISPLAY_KEYMAP:
+    case OPTION_DISPLAY_KEYMAP:
       if(optarg != NULL) {
 	char *p = xine_chomp(optarg);
 
@@ -1572,6 +1576,18 @@ int main(int argc, char *argv[]) {
       gGui->network = 1;
       break;
       
+    case OPTION_NETWORK_PORT:
+      if(optarg) {
+	int port = strtol(optarg, &optarg, 10);
+
+	if((port >= 1) && (port <= 65535))
+	  gGui->network_port = port;
+	else
+	  printf(_("Bad port number: %d\n"), port);
+
+      }
+      break;
+
     case 'R': /* Use root window for video output */
       gGui->use_root_window = 1;
       break;

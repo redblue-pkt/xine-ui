@@ -325,6 +325,7 @@ typedef struct {
   int                       always_layer_above;
   
   int                       network;
+  int                       network_port;
   
   int                       use_root_window;
 

@@ -2914,14 +2914,22 @@ static void *server_thread(void *data) {
   char            *service;
   struct servent  *serv_ent;
   int              msock;
+  
+  if(gGui->network_port) {
+    int len = (int) log10(gGui->network_port) + 1;
 
-  /*  Search in /etc/services if a xinectl entry exist */
-  if((serv_ent = getservbyname("xinectl", "tcp")) != NULL) {
-    service = (char *) xine_xmalloc(ntohs(serv_ent->s_port));
-    sprintf(service, "%u", ntohs(serv_ent->s_port));
-  }
-  else
-    service = strdup(DEFAULT_XINECTL_PORT);
+    service = (char *) xine_xmalloc(len + 1);
+    sprintf(service, "%u", gGui->network_port);
+  } 
+  else {
+    /*  Search in /etc/services if a xinectl entry exist */
+    if((serv_ent = getservbyname("xinectl", "tcp")) != NULL) {
+      service = (char *) xine_xmalloc(ntohs(serv_ent->s_port));
+      sprintf(service, "%u", ntohs(serv_ent->s_port));
+    }
+    else
+      service = strdup(DEFAULT_XINECTL_PORT);
+  }  
   
   /* Load passwd file */
   /* password file syntax is:
