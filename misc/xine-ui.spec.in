@@ -21,7 +21,7 @@ BuildRoot:   /tmp/%{name}-root
 @HAVE_AA_TRUE@%package aa
 @HAVE_AA_TRUE@Summary:     XINE - Ascii Art player.
 @HAVE_AA_TRUE@Group:       Applications/Multimedia
-@HAVE_AA_TRUE@Requires:    xine-lib >= %{ver}, xine-lib-aa, libaa
+@HAVE_AA_TRUE@Requires:    xine-lib >= %{ver}, xine-lib-aa
 
 %description
 xine is a free gpl-licensed video player for unix-like systems.

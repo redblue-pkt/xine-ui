@@ -33,12 +33,16 @@
  *
  *  Harm van der Heijden <harm@etpmod.phys.tue.nl> for spotting the author's
  *    brain crackingly stupid typo that broke the whole thing for a while.
+ *    He also pointed out the yuy2toyv12() function.
  *
  *  Billy Biggs <vektor@dumbterm.net> for the YV12 colour conversion formula
  *    (see below)
  *
- * James Courtier-Dutton <James@superbug.demon.co.uk> for educating the author
+ *  James Courtier-Dutton <James@superbug.demon.co.uk> for educating the author
  *    in the details of YUV style data formats.
+ *
+ *  Thomas Östreich 
+ *    for the yuy2toyv12() function (see below)
  *
  */
 
@@ -63,6 +67,8 @@
 #include "png.h"
 #include "pngconf.h"
 
+#include "monitor.h"
+
 #define PIXSZ 3
 #define BIT_DEPTH 8
 
@@ -77,7 +83,7 @@ struct prvt_image_s {
   int height;
   int ratio_code;
   int format;
-  uint8_t *y, *u, *v;
+  uint8_t *y, *u, *v, *yuy2;
 
   int u_width, v_width;
   int u_height, v_height;
@@ -92,6 +98,54 @@ struct prvt_image_s {
   png_structp struct_ptr;
   png_infop info_ptr;
 };
+
+/*
+ *  This function was pinched from filter_yuy2tov12.c, part of
+ *  transcode, a linux video stream processing tool
+ *
+ *  Copyright (C) Thomas Östreich - June 2001
+ *
+ *  Thanks Thomas
+ *      
+ */
+static void yuy2toyv12( struct prvt_image_s *image )
+{
+
+    int i,j,w2;
+
+    //I420
+    uint8_t *y = image->y;
+    uint8_t *u = image->u;
+    uint8_t *v = image->v;
+
+    uint8_t *input = image->yuy2;
+    
+    int width  = image->width;
+    int height = image->height;
+
+    w2 = width/2;
+
+    for (i=0; i<height; i+=2) {
+      for (j=0; j<w2; j++) {
+	
+	/* packed YUV 422 is: Y[i] U[i] Y[i+1] V[i] */
+	*(y++) = *(input++);
+	*(u++) = *(input++);
+	*(y++) = *(input++);
+	*(v++) = *(input++);
+      }
+      
+      //down sampling
+      
+      for (j=0; j<w2; j++) {
+	/* skip every second line for U and V */
+	*(y++) = *(input++);
+	input++;
+	*(y++) = *(input++);
+	input++;
+      }
+    }
+}
 
 /*
  *   Function to construct image filename
@@ -559,6 +613,43 @@ int scale_image( struct prvt_image_s *image )
 }
 
 /*
+ *  This function is a fudge .. a hack.
+ *
+ *  It is in place purely to get snapshots going for YUY2 data
+ *  longer term there needs to be a bit of a reshuffle to account
+ *  for the two fundamentally different YUV formats. Things would
+ *  have been different had I known how YUY2 was done before designing
+ *  the flow. Teach me to make assumptions I guess.
+ *
+ *  So .. this function converts the YUY2 image to YV12. The downside
+ *  being that as YV12 has half as many chroma rows as YUY2, there is
+ *  a loss of image quality.
+ */
+
+static int yuy2_fudge( struct prvt_image_s *image )
+{
+  image->yuy2 = image->y;
+
+  image->y = png_malloc( image->struct_ptr, image->height*image->width );
+  if ( image->y == NULL ) return( 0 );
+  memset( image->y, 0, image->height*image->width );
+
+  image->u = png_malloc( image->struct_ptr, image->u_height*image->u_width );
+  if ( image->u == NULL ) return( 0 );
+  memset( image->u, 0, image->u_height*image->u_width );
+
+  image->v = png_malloc( image->struct_ptr, image->v_height*image->v_width );
+  if ( image->v == NULL ) return( 0 );
+  memset( image->v, 0, image->v_height*image->v_width );
+
+  yuy2toyv12( image );
+
+  image->yuy2 = NULL;
+
+  return( 1 );
+}
+
+/*
  *  RGB allocation
  */
 
@@ -741,6 +832,19 @@ void create_snapshot ( gGui_t *gGui )
   int err = 0;
   struct prvt_image_s *image;
 
+#ifdef DEBUG
+  static int	   prof_scale_image = -1;
+  static int	   prof_yuv2rgb     = -1;
+  static int	   prof_png         = -1;
+
+  if (prof_scale_image == -1)
+    prof_scale_image = profiler_allocate_slot ("snapshot scale image");
+  if (prof_yuv2rgb == -1)
+    prof_yuv2rgb = profiler_allocate_slot ("snapshot yuv to rgb");
+  if (prof_png == -1)
+    prof_png = profiler_allocate_slot ("snapshot convert to png");
+#endif /* DEBUG */
+
   if ( ! prvt_image_alloc( &image ) )
   {
     printf("  prvt_image_alloc failed\n");
@@ -810,10 +914,12 @@ void create_snapshot ( gGui_t *gGui )
       break;
 
     case XINE_IMGFMT_YUY2: 
-      printf( "XINE_IMGFMT_YUY2\nError: This format is not supported.\n" );
-      printf( "  ** Please report this error to andrew@anvil.org **\n" );
-      prvt_image_free( &image );
-      return;
+      printf( "XINE_IMGFMT_YUY2\n" );
+      image->u_width  = ((image->width+1)/2);
+      image->v_width  = ((image->width+1)/2);
+      image->u_height = ((image->height+1)/2);
+      image->v_height = ((image->height+1)/2);
+      break;
 
     default:                
       printf( "Unknown\nError: Format Code %d Unknown\n", image->format ); 
@@ -877,11 +983,30 @@ void create_snapshot ( gGui_t *gGui )
 #endif
 
   /*
+   *  If YUY2 convert to YV12
+   */
+  if ( image->format == XINE_IMGFMT_YUY2 ) {
+    printf("  Convert YUY2 to YV12\n" );
+    if ( yuy2_fudge( image ) == 0 ) {
+      printf("  Error: yuy2_fudge failed\n");
+      return;
+    }
+  }
+
+  /*
    *  Scale YUV data
    */
   printf("  Scale YUV Image data\n" );
 
+#ifdef DEBUG
+  profiler_start_count (prof_scale_image);
+#endif /* DEBUG */
+
   scale_image ( image );
+
+#ifdef DEBUG
+  profiler_stop_count (prof_scale_image);
+#endif /* DEBUG */
 
   /*
    *  Allocate RGB data structures within image
@@ -900,11 +1025,24 @@ void create_snapshot ( gGui_t *gGui )
    */
   printf("  Reformat YUV Image data to RGB\n" );
 
+#ifdef DEBUG
+  profiler_start_count (prof_yuv2rgb);
+#endif /* DEBUG */
+
   yv12_2_rgb( image );
+
+#ifdef DEBUG
+  profiler_stop_count (prof_yuv2rgb);
+#endif /* DEBUG */
 
   /**/
 
   printf("  png_set_filter\n" );
+
+#ifdef DEBUG
+  profiler_start_count (prof_png);
+#endif /* DEBUG */
+
   png_set_filter( image->struct_ptr, 0, PNG_FILTER_NONE  | PNG_FILTER_VALUE_NONE );
 
   printf("  png_init_io\n" );
@@ -941,9 +1079,14 @@ void create_snapshot ( gGui_t *gGui )
 #endif
 
   /**/
-  printf("file '%s' wrote\n", image->file_name);
+  printf("file '%s' written\n", image->file_name);
 
   printf("  prvt_image_free\n" );
   prvt_image_free( &image );
+
+#ifdef DEBUG
+  profiler_stop_count (prof_png);
+#endif /* DEBUG */
+
   return;
 }

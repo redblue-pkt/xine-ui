@@ -69,6 +69,8 @@ extern uint32_t xine_debug;
                                        printf(__VA_ARGS__);		      \
                                      }                                        \
                                    }
+#endif /* if __GNUC__ */
+
 /*
  * profiling
  */
