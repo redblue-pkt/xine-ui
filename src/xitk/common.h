@@ -288,6 +288,8 @@ typedef struct {
 
   int                        play_anyway;
 
+  int                        got_reference_stream;
+
   pthread_mutex_t            download_mutex;
 
 } gGui_t;

@@ -861,6 +861,37 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       osd_display_info(buffer);
     }
     break;
+
+  case XINE_EVENT_MRL_REFERENCE:
+    if((event->stream == gGui->stream) && gGui->playlist.num) {
+      xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
+      
+      if(ref->alternative == 0) {
+	mediamark_t *mmk = mediamark_clone_mmk((mediamark_t *) mediamark_get_current_mmk());
+	
+	if(mmk) {
+	  mediamark_replace_entry(&gGui->playlist.mmk[gGui->playlist.cur],
+				  ref->mrl, 
+				  ((mmk->ident && (strcmp(mmk->mrl, mmk->ident) == 0)) ?
+				   ref->mrl : mmk->ident), 
+				  mmk->sub, mmk->start, mmk->end);
+	  mediamark_free_mmk(&mmk);
+	  
+	  mmk = (mediamark_t *) mediamark_get_current_mmk();
+	  gui_set_current_mrl(mmk);
+	}
+      }
+      else {
+	mediamark_add_entry(ref->mrl, ref->mrl, NULL, 0, -1);
+      }
+      
+      playlist_update_playlist();
+      panel_update_mrl_display();
+
+      /* We can't do anything more here, otherwise deadlock occur */
+      gGui->got_reference_stream++;
+    }
+    break;
   }
 }
   

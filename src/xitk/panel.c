@@ -366,6 +366,12 @@ static void *slider_loop(void *dummy) {
 	    stream_infos_update_infos();
 	}
       }
+
+      if(gGui->got_reference_stream) {
+	gGui->got_reference_stream--;
+	gui_play(NULL, NULL);
+      }
+
     }
     
     if(gGui->cursor_visible) {
