@@ -37,6 +37,10 @@
 #include <pthread.h>
 #include <errno.h>
 
+#ifdef HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
+
 #include "common.h"
 
 #define WINDOW_WIDTH        500

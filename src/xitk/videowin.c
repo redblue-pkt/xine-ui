@@ -43,6 +43,10 @@
 #include <X11/extensions/XTest.h>
 #endif
 
+#ifdef HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
+
 #include "common.h"
 
 #define EST_KEEP_VALID  10	  /* #frames to allow for changing fps */

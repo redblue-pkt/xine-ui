@@ -33,6 +33,10 @@
 #include <X11/keysym.h>
 #include <pthread.h>
 
+#ifdef HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
+
 #include "common.h"
 
 #define TEST_VO_VALUE(val)  ((val >= 0) && (val < 65000)) ? val + 400 : val - 400
