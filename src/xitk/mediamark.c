@@ -135,10 +135,11 @@ static char *_read_file(const char *filename, int *size) {
   }
   
   extension = strrchr(filename, '.');
-  if(extension && (!strncasecmp(extension, ".asx", 4)) && 
+  if(extension && 
+     ((!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".smil", 5))) && 
      ((!strncasecmp(filename, "http://", 7)) || (!strncasecmp(filename, "ftp://", 6))))
     return _download_file(filename, size);
-
+  
   if(stat(filename, &st) < 0) {
     fprintf(stderr, "%s(): Unable to stat() '%s' file: %s.\n",
 	    __XINE_FUNCTION__, filename, strerror(errno));
@@ -975,6 +976,952 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 }
 
 /*
+ * ********************************** SMIL BEGIN ***********************************
+ */
+#undef DEBUG_SMIL
+
+#ifdef DEBUG_SMIL
+static int offset = 0;
+#define palign {int i; for(i = 0; i < offset; i++) { printf(" "); } } while(0)
+#endif
+
+typedef struct smil_node_s smil_node_t;
+
+typedef struct {
+  char   *anchor;
+
+  int     repeat;
+  int     begin;
+  int     end;
+
+  int     clip_begin;
+  int     clip_end;
+
+  int     duration;
+
+} smil_property_t;
+
+struct smil_node_s {
+  mediamark_t      *mmk;
+  smil_property_t   prop;
+  smil_node_t      *next;
+};
+
+typedef struct {
+  /* Header */
+  char   *title;
+  char   *author;
+  char   *copyright;
+  char   *year;
+  char   *base;
+  /* End Header */
+  
+  smil_node_t *first;
+  smil_node_t *node;
+  
+} smil_t;
+
+/* protos */
+static void smil_seq(smil_t *, smil_node_t **, xml_node_t *, smil_property_t *);
+static void smil_par(smil_t *, smil_node_t **, xml_node_t *, smil_property_t *);
+static void smil_switch(smil_t *, smil_node_t **, xml_node_t *, smil_property_t *);
+static void smil_repeat(int, smil_node_t *, smil_node_t **, smil_property_t *);
+
+static void smil_init_smil_property(smil_property_t *sprop) {
+  sprop->anchor     = NULL;
+  sprop->repeat     = 1;
+  sprop->begin      = 0;
+  sprop->clip_begin = 0;
+  sprop->end        = -1;
+  sprop->clip_end   = -1;
+  sprop->duration   = 0;
+}
+static smil_node_t *smil_new_node(void) {
+  smil_node_t *node;
+
+  node       = (smil_node_t *) xine_xmalloc(sizeof(smil_node_t));
+  node->mmk  = NULL;
+  node->next = NULL;
+
+  smil_init_smil_property(&(node->prop));
+
+  return node;
+}
+static mediamark_t *smil_new_mediamark(void) {
+  mediamark_t *mmk;
+
+  mmk         = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
+  mmk->mrl    = NULL;
+  mmk->ident  = NULL;
+  mmk->sub    = NULL;
+  mmk->start  = 0;
+  mmk->end    = -1;
+  mmk->played = 0;
+
+  return mmk;
+}
+static mediamark_t *smil_duplicate_mmk(mediamark_t *ommk) {
+  mediamark_t *mmk = NULL;
+  
+  if(ommk) {
+    mmk         = smil_new_mediamark();
+    mmk->mrl    = strdup(ommk->mrl);
+    mmk->ident  = strdup(ommk->ident ? ommk->ident : ommk->mrl);
+    mmk->sub    = ommk->sub ? strdup(ommk->sub) : NULL;
+    mmk->start  = ommk->start;
+    mmk->end    = ommk->end;
+    mmk->played = ommk->played;
+  }
+  
+  return mmk;
+}
+static void smil_free_properties(smil_property_t *smil_props) {
+  if(smil_props) {
+    if(smil_props->anchor)
+      free(smil_props->anchor);
+  }
+}
+
+#ifdef DEBUG_SMIL
+static void smil_dump_header(smil_t *smil) {
+  printf("title: %s\n", smil->title);
+  printf("author: %s\n", smil->author);
+  printf("copyright: %s\n", smil->copyright);
+  printf("year: %s\n", smil->year);
+  printf("base: %s\n", smil->base);
+}
+
+static void smil_dump_tree(smil_node_t *node) {
+  if(node->mmk) {
+    printf("mrl:   %s\n", node->mmk->mrl);
+    printf(" ident: %s\n", node->mmk->ident);
+    printf("  sub:   %s\n", node->mmk->sub);
+    printf("   start: %d\n", node->mmk->start);
+    printf("    end:   %d\n", node->mmk->end);
+  }
+
+  if(node->next)
+    smil_dump_tree(node->next);
+}
+#endif
+
+static char *smil_get_prop_value(xml_property_t *props, const char *propname) {
+  xml_property_t  *prop;
+
+  for(prop = props; prop; prop = prop->next) {
+    if(!strcasecmp(prop->name, propname)) {
+      return prop->value;
+    }
+  }
+  return NULL;
+}
+
+static int smil_get_time_in_seconds(const char *time_str) {
+  int    retval = 0;
+  int    hours, mins, secs, msecs;
+  int    unit = 0; /* 1 = ms, 2 = s, 3 = min, 4 = h */
+
+  if(strstr(time_str, "ms"))
+    unit = 1;
+  else if(strstr(time_str, "s"))
+    unit = 2;
+  else if(strstr(time_str, "min"))
+    unit = 3;
+  else if(strstr(time_str, "h"))
+    unit = 4;
+  
+  if(unit == 0) {
+    if((sscanf(time_str, "%d:%d:%d.%d", &hours, &mins, &secs, &msecs)) == 4)
+      retval = (hours * 60 * 60) + (mins * 60) + secs + ((int) msecs / 1000);
+    else if((sscanf(time_str, "%d:%d:%d", &hours, &mins, &secs)) == 3)
+      retval = (hours * 60 * 60) + (mins * 60) + secs;
+    else if((sscanf(time_str, "%d:%d.%d", &mins, &secs, &msecs)) == 3)
+      retval = (mins * 60) + secs + ((int) msecs / 1000);
+    else if((sscanf(time_str, "%d:%d", &mins, &secs)) == 2) {
+      retval = (mins * 60) + secs;
+    }
+  }
+  else {
+    int val, dec, args;
+
+    if(((args = sscanf(time_str, "%d.%d", &val, &dec)) == 2) ||
+       ((args = sscanf(time_str, "%d", &val)) == 1)) {
+      switch(unit) {
+      case 1: /* ms */
+	retval = (int) val / 1000;
+	break;
+      case 2: /* s */
+	retval = val + ((args == 2) ? ((int)((((float) dec) * 10) / 1000)) : 0);
+	break;
+      case 3: /* min */
+	retval = (val * 60) + ((args == 2) ? (dec * 10 * 60 / 100) : 0);
+	break;
+      case 4: /* h */
+	retval = (val * 60 * 60) + ((args == 2) ? (dec * 10 * 60 / 100) : 0);
+	break;
+      }
+    }
+  }
+
+  return retval;
+}
+static void smil_header(smil_t *smil, xml_property_t *props) {
+  xml_property_t  *prop;
+
+#ifdef DEBUG_SMIL
+  offset += 2;
+#endif
+
+  for(prop = props; prop; prop = prop->next) {
+#ifdef DEBUG_SMIL
+    palign;
+    printf("%s(): prop_name '%s', value: '%s'\n", __func__,
+    	   prop->name, prop->value ? prop->value : "<NULL>");
+#endif
+    
+    if(!strcasecmp(prop->name, "NAME")) {
+      
+      if(!strcasecmp(prop->value, "TITLE"))
+	smil->title = smil_get_prop_value(prop, "CONTENT");
+      else if(!strcasecmp(prop->value, "AUTHOR"))
+	smil->author = smil_get_prop_value(prop, "CONTENT");
+      else if(!strcasecmp(prop->value, "COPYRIGHT"))
+	smil->copyright = smil_get_prop_value(prop, "CONTENT");
+      else if(!strcasecmp(prop->value, "YEAR"))
+	smil->year = smil_get_prop_value(prop, "CONTENT");
+      else if(!strcasecmp(prop->value, "BASE"))
+	smil->base = smil_get_prop_value(prop, "CONTENT");
+
+    }
+  }
+#ifdef DEBUG_SMIL
+  palign;
+  printf("---\n");
+  offset -= 2;
+#endif
+}
+
+static void smil_get_properties(smil_property_t *dprop, xml_property_t *props) {
+  xml_property_t  *prop;
+  
+#ifdef DEBUG_SMIL
+  offset += 2;
+#endif
+  for(prop = props; prop; prop = prop->next) {
+
+    if(!strcasecmp(prop->name, "REPEAT")) {
+      dprop->repeat = strtol(prop->value, &prop->value, 10);
+#ifdef DEBUG_SMIL
+      palign;
+      printf("REPEAT: %d\n", dprop->repeat);
+#endif
+    }
+    else if(!strcasecmp(prop->name, "BEGIN")) {
+      dprop->begin = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+      palign;
+      printf("BEGIN: %d\n", dprop->begin);
+#endif
+    }
+    else if(!strcasecmp(prop->name, "CLIP-BEGIN")) {
+      dprop->clip_begin = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+      palign;
+      printf("CLIP-BEGIN: %d\n", dprop->clip_begin);
+#endif
+    }
+    else if(!strcasecmp(prop->name, "END")) {
+      dprop->end = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+      palign;
+      printf("END: %d\n", dprop->end);
+#endif
+    }
+    else if(!strcasecmp(prop->name, "CLIP-END")) {
+      dprop->clip_end = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+      palign;
+      printf("CLIP-END: %d\n", dprop->clip_end);
+#endif
+    }
+    else if(!strcasecmp(prop->name, "DUR")) {
+      dprop->duration = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+      palign;
+      printf("DURATION: %d\n", dprop->duration);
+#endif
+    }
+    else if(!strcasecmp(prop->name, "HREF")) {
+      
+      if(dprop->anchor)
+	free(dprop->anchor);
+      
+      dprop->anchor = strdup(prop->value);
+      
+#ifdef DEBUG_SMIL
+      palign;
+      printf("HREF: %s\n", dprop->anchor);
+#endif
+      
+    }
+  }
+#ifdef DEBUG_SMIL
+  offset -= 2;
+#endif
+}
+
+static void smil_properties(smil_t *smil, smil_node_t **snode, 
+			    xml_property_t *props, smil_property_t *sprop) {
+  xml_property_t  *prop;
+  int              gotmrl = 0;
+
+#ifdef DEBUG_SMIL
+  offset += 2;
+#endif
+  for(prop = props; prop; prop = prop->next) {
+
+#ifdef DEBUG_SMIL
+    palign;
+    printf("%s(): prop_name '%s', value: '%s'\n", __func__,
+	   prop->name, prop->value ? prop->value : "<NULL>");
+#endif
+    
+    if(prop->name) {
+      if((!strcasecmp(prop->name, "SRC")) || (!strcasecmp(prop->name, "HREF"))) {
+	
+	gotmrl++;
+	
+	if((*snode)->mmk == NULL)
+	  (*snode)->mmk = smil_new_mediamark();
+	
+	/*
+	  handle BASE, ANCHOR
+	*/
+	if(sprop && sprop->anchor)
+	  (*snode)->mmk->mrl = strdup(sprop->anchor);
+	else {
+	  char  buffer[((smil->base) ? (strlen(smil->base) + 1) : 0) + strlen(prop->value) + 1];
+	  char *p;
+
+	  memset(&buffer, 0, sizeof(buffer));
+	  p = buffer;
+
+	  if(smil->base && (!strstr(prop->value, "://"))) {
+	    strcat(p, smil->base);
+	    
+	    if(buffer[strlen(buffer) - 1] != '/')
+	      strcat(p, "/");
+	  }
+	  
+	  strcat(p, prop->value);
+	  
+	  (*snode)->mmk->mrl = strdup(buffer);
+	}
+      }
+      else if(!strcasecmp(prop->name, "TITLE")) {
+	
+	gotmrl++;
+	
+	if((*snode)->mmk == NULL) {
+	  (*snode)->mmk = smil_new_mediamark();
+	}
+	
+	(*snode)->mmk->ident = strdup(prop->value);
+      }
+      else if(!strcasecmp(prop->name, "REPEAT")) {
+	(*snode)->prop.repeat = strtol(prop->value, &prop->value, 10);
+      }
+      else if(!strcasecmp(prop->name, "BEGIN")) {
+	(*snode)->prop.begin = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+	printf("begin: %d\n",(*snode)->prop.begin);
+#endif
+      }
+      else if(!strcasecmp(prop->name, "CLIP-BEGIN")) {
+	(*snode)->prop.clip_begin = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+	printf("clip-begin: %d\n",(*snode)->prop.clip_begin);
+#endif
+      }
+      else if(!strcasecmp(prop->name, "END")) {
+	(*snode)->prop.end = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+	printf("end: %d\n",(*snode)->prop.end);
+#endif
+      }
+      else if(!strcasecmp(prop->name, "CLIP-END")) {
+	(*snode)->prop.clip_end = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+	printf("clip-end: %d\n",(*snode)->prop.clip_end);
+#endif
+      }
+      else if(!strcasecmp(prop->name, "DUR")) {
+	(*snode)->prop.duration = smil_get_time_in_seconds(prop->value);
+#ifdef DEBUG_SMIL
+	palign;
+	printf("DURATION: %d\n", (*snode)->prop.duration);
+#endif
+      }
+    }
+  }
+
+  if(gotmrl) {
+    smil_node_t *node = (*snode);
+    int          repeat = node->prop.repeat;
+
+    if((*snode)->mmk->ident == NULL)
+      (*snode)->mmk->ident = strdup((*snode)->mmk->mrl);
+    
+    if(sprop) {
+      if(sprop->clip_begin && (node->prop.clip_begin == 0))
+	node->mmk->start = sprop->clip_begin;
+      else
+	node->mmk->start = node->prop.clip_begin;
+      
+      if(sprop->clip_end && (node->prop.clip_end == -1))
+	node->mmk->end = sprop->clip_end;
+      else
+	node->mmk->end = node->prop.clip_end;
+      
+      if(sprop->duration && (node->prop.duration == 0))
+      	node->mmk->end = node->mmk->start + sprop->duration;
+      else
+      	node->mmk->end = node->mmk->start + node->prop.duration;
+      
+    }
+    else {
+      node->mmk->start = node->prop.clip_begin;
+      node->mmk->end = node->prop.clip_end;
+      if(node->prop.duration)
+	node->mmk->end = node->mmk->start + node->prop.duration;
+    }
+    
+    smil_repeat((repeat <= 1) ? 1 : repeat, node, snode, sprop);
+  }
+
+#ifdef DEBUG_SMIL
+  palign;
+  printf("---\n");
+  offset -= 2;
+#endif
+}
+
+static void smil_repeat(int times, smil_node_t *from, 
+			smil_node_t **snode, smil_property_t *sprop) {
+  int  i;
+  
+  if(times > 1) {
+    smil_node_t *node, *to;
+    
+    to = (*snode);
+    
+    for(i = 0; i < (times - 1); i++) {
+      int found = 0;
+
+      node = from;
+      
+      while(!found) {
+	smil_node_t *nnode = smil_new_node();
+	
+	nnode->mmk  = smil_duplicate_mmk(node->mmk);
+	
+	(*snode)->next = nnode;
+	(*snode) = nnode;
+	
+	if(node == to)
+	  found = 1;
+	
+	node = node->next;
+      }
+    }
+  }
+  else {
+    smil_node_t *nnode = smil_new_node();
+
+    (*snode)->next = nnode;
+    (*snode) = (*snode)->next;
+  }
+}
+/*
+ * Sequence playback
+ */
+static void smil_seq(smil_t *smil, 
+		     smil_node_t **snode, xml_node_t *node, smil_property_t *sprop) { 
+  xml_node_t      *seq;
+  
+#ifdef DEBUG_SMIL
+  offset += 2;
+#endif
+  
+  for(seq = node; seq; seq = seq->next) {
+    
+    if(!strcasecmp(seq->name, "SEQ")) {
+      smil_property_t  smil_props;
+      smil_node_t     *node = (*snode);
+
+      smil_init_smil_property(&smil_props);
+      
+#ifdef DEBUG_SMIL
+      offset += 2;
+      palign; 
+      printf("seq NEW SEQ\n");
+      offset -= 2;
+#endif
+
+      smil_get_properties(&smil_props, seq->props);
+      smil_seq(smil, snode, seq->child, &smil_props);
+      smil_repeat(smil_props.repeat, node, snode, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+    else if(!strcasecmp(seq->name, "PAR")) {
+      smil_property_t  smil_props;
+      smil_node_t     *node = (*snode);
+
+      smil_init_smil_property(&smil_props);
+      
+#ifdef DEBUG_SMIL
+      offset += 2;
+      palign;
+      printf("seq NEW PAR\n");
+      offset -= 2;
+#endif
+
+      smil_get_properties(&smil_props, seq->props);
+      smil_par(smil, snode, seq->child, &smil_props);
+      smil_repeat(smil_props.repeat, node, snode, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+    else if(!strcasecmp(seq->name, "SWITCH")) {
+      smil_property_t  smil_props;
+      smil_node_t     *node = (*snode);
+
+      smil_init_smil_property(&smil_props);
+      
+#ifdef DEBUG_SMIL
+      offset += 2;
+      palign;
+      printf("seq NEW SWITCH\n");
+      offset -= 2;
+#endif
+
+      smil_get_properties(&smil_props, seq->props);
+      smil_switch(smil, snode, seq->child, &smil_props);
+      smil_repeat(smil_props.repeat, node, snode, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+    else if((!strcasecmp(seq->name, "VIDEO")) || 
+	    (!strcasecmp(seq->name, "AUDIO")) ||
+	    (!strcasecmp(seq->name, "A"))) {
+      smil_property_t  smil_props;
+      
+      smil_init_smil_property(&smil_props);
+      
+      if(seq->child) {
+	xml_node_t *child = seq->child;
+	
+	while(child) {
+
+	  if(!strcasecmp(child->name, "ANCHOR")) {
+#ifdef DEBUG_SMIL
+	    palign;
+	    printf("ANCHOR\n");
+#endif
+	    smil_get_properties(&smil_props, child->props);
+	  }
+
+	  child = child->next;
+	}
+      }
+      
+      smil_properties(smil, snode, seq->props, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+  }
+#ifdef DEBUG_SMIL
+  offset -= 2;
+#endif
+}
+/*
+ * Parallel playback
+ */
+static void smil_par(smil_t *smil, smil_node_t **snode, xml_node_t *node, smil_property_t *sprop) {
+  xml_node_t      *par;
+   
+#ifdef DEBUG_SMIL
+  offset += 2;
+#endif
+  
+  for(par = node; par; par = par->next) {
+    
+    if(!strcasecmp(par->name, "SEQ")) {
+      smil_property_t  smil_props;
+      smil_node_t     *node = (*snode);
+
+      smil_init_smil_property(&smil_props);
+
+#ifdef DEBUG_SMIL
+      offset += 2;
+      palign; 
+      printf("par NEW SEQ\n");
+      offset -= 2;
+#endif
+
+      smil_get_properties(&smil_props, par->props);
+      smil_seq(smil, snode, par->child, &smil_props);
+      smil_repeat(smil_props.repeat, node, snode, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+    else if(!strcasecmp(par->name, "PAR")) {
+      smil_property_t  smil_props;
+      smil_node_t     *node = (*snode);
+
+      smil_init_smil_property(&smil_props);
+
+#ifdef DEBUG_SMIL
+      offset += 2;
+      palign;
+      printf("par NEW PAR\n");
+      offset -= 2;
+#endif
+
+      smil_get_properties(&smil_props, par->props);
+      smil_par(smil, snode, par->child, &smil_props);
+      smil_repeat(smil_props.repeat, node, snode, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+    else if(!strcasecmp(par->name, "SWITCH")) {
+      smil_property_t  smil_props;
+      smil_node_t     *node = (*snode);
+
+      smil_init_smil_property(&smil_props);
+
+#ifdef DEBUG_SMIL
+      offset += 2;
+      palign;
+      printf("par NEW SWITCH\n");
+      offset -= 2;
+#endif
+
+      smil_get_properties(&smil_props, par->props);
+      smil_switch(smil, snode, par->child, &smil_props);
+      smil_repeat(smil_props.repeat, node, snode, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+    else if((!strcasecmp(par->name, "VIDEO")) || 
+	    (!strcasecmp(par->name, "AUDIO")) ||
+	    (!strcasecmp(par->name, "A"))) {
+      smil_property_t  smil_props;
+
+      smil_init_smil_property(&smil_props);
+      
+      if(par->child) {
+	xml_node_t *child = par->child;
+
+	while(child) {
+	  if(!strcasecmp(child->name, "ANCHOR")) {
+#ifdef DEBUG_SMIL
+	    palign;
+	    printf("ANCHOR\n");
+#endif
+	    smil_get_properties(&smil_props, child->props);
+	  }
+	  child = child->next;
+	}
+      }
+
+      smil_properties(smil, snode, par->props, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+  }
+
+#ifdef DEBUG_SMIL
+  offset -= 2;
+#endif
+}
+static void smil_switch(smil_t *smil, smil_node_t **snode, xml_node_t *node, smil_property_t *sprop) { 
+  xml_node_t      *nswitch;
+
+#ifdef DEBUG_SMIL
+  offset += 2;
+#endif
+  
+  for(nswitch = node; nswitch; nswitch = nswitch->next) {
+    
+    if(!strcasecmp(nswitch->name, "SEQ")) {
+      smil_property_t  smil_props;
+      smil_node_t     *node = (*snode);
+
+      smil_init_smil_property(&smil_props);
+      
+#ifdef DEBUG_SMIL
+      offset += 2;
+      palign; 
+      printf("switch NEW SEQ\n");
+      offset -= 2;
+#endif
+
+      smil_get_properties(&smil_props, nswitch->props);
+      smil_seq(smil, snode, nswitch->child, &smil_props);
+      smil_repeat(smil_props.repeat, node, snode, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+    else if(!strcasecmp(nswitch->name, "PAR")) {
+      smil_property_t  smil_props;
+      smil_node_t     *node = (*snode);
+
+      smil_init_smil_property(&smil_props);
+      
+#ifdef DEBUG_SMIL
+      offset += 2;
+      palign;
+      printf("switch NEW PAR\n");
+      offset -= 2;
+#endif
+
+      smil_get_properties(&smil_props, nswitch->props);
+      smil_par(smil, snode, nswitch->child, &smil_props);
+      smil_repeat(smil_props.repeat, node, snode, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+    else if((!strcasecmp(nswitch->name, "VIDEO")) || 
+	    (!strcasecmp(nswitch->name, "AUDIO")) ||
+	    (!strcasecmp(nswitch->name, "A"))) {
+      smil_property_t  smil_props;
+      
+      smil_init_smil_property(&smil_props);
+      
+      if(nswitch->child) {
+	xml_node_t *child = nswitch->child;
+	
+	while(child) {
+
+	  if(!strcasecmp(child->name, "ANCHOR")) {
+#ifdef DEBUG_SMIL
+	    palign;
+	    printf("ANCHOR\n");
+#endif
+	    smil_get_properties(&smil_props, child->props);
+	  }
+
+	  child = child->next;
+	}
+      }
+      
+      smil_properties(smil, snode, nswitch->props, &smil_props);
+      smil_free_properties(&smil_props);
+    }
+  }
+#ifdef DEBUG_SMIL
+  offset -= 2;
+#endif
+}
+
+static void smil_add_mmk(int *num, mediamark_t ***mmk, smil_node_t *node) {
+  if(node->mmk) {
+    if(*num == 0)
+      (*mmk) = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
+    else
+      (*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*num + 2));
+
+    (*mmk)[*num] = node->mmk;
+    *num += 1;
+  }
+  
+  if(node->next)
+    smil_add_mmk(num, mmk, node->next);
+}
+static int smil_fill_mmk(smil_t *smil, mediamark_t ***mmk) {
+  int num = 0;
+  
+  if(smil->first)
+    smil_add_mmk(&num, mmk, smil->first);
+  
+  return num;
+}
+
+static void smil_free_node(smil_node_t *node) {
+  if(node->next)
+    smil_free_node(node->next);
+
+  /* mmk shouldn't be fried */
+  smil_free_properties(&(node->prop));
+  free(node);
+}
+static void smil_free_smil(smil_t *smil) {
+  if(smil->first)
+    smil_free_node(smil->first);
+
+  if(smil->title)
+    free(smil->title);
+  if(smil->author)
+    free(smil->author);
+  if(smil->copyright)
+    free(smil->copyright);
+  if(smil->year)
+    free(smil->year);
+  if(smil->base)
+    free(smil->base);
+}
+
+static mediamark_t **guess_smil_playlist(playlist_t *playlist, const char *filename) {
+  mediamark_t **mmk = NULL;
+
+  if(filename) {
+    char            *smil_content;
+    int              size;
+    int              result;
+    xml_node_t      *xml_tree, *smil_entry, *smil_ref;
+    smil_t           smil;
+    
+    if((smil_content = _read_file(filename, &size)) != NULL) {
+      int entries_smil = 0;
+
+      xml_parser_init(smil_content, size, XML_PARSER_CASE_INSENSITIVE);
+      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
+	goto __failure;
+      
+      memset(&smil, 0, sizeof(smil_t));
+
+      if(!strcasecmp(xml_tree->name, "SMIL")) {
+
+	smil.first = smil.node = smil_new_node();
+	smil_entry = xml_tree->child;
+
+	while(smil_entry) {
+	  
+#ifdef DEBUG_SMIL
+	  printf("smil_entry '%s'\n", smil_entry->name);
+#endif	  
+	  if(!strcasecmp(smil_entry->name, "HEAD")) {
+#ifdef DEBUG_SMIL
+	    printf("+---------+\n");
+	    printf("| IN HEAD |\n");
+	    printf("+---------+\n");
+#endif	    
+	    smil_ref = smil_entry->child;
+	    while(smil_ref) {
+#ifdef DEBUG_SMIL
+	      printf("  smil_ref '%s'\n", smil_ref->name);
+#endif	      
+	      smil_header(&smil, smil_ref->props);
+	      
+	      smil_ref = smil_ref->next;
+	    }
+	  }
+	  else if(!strcasecmp(smil_entry->name, "BODY")) {
+#ifdef DEBUG_SMIL
+	    printf("+---------+\n");
+	    printf("| IN BODY |\n");
+	    printf("+---------+\n");
+#endif
+	    smil_ref = smil_entry->child;
+	    while(smil_ref) {
+#ifdef DEBUG_SMIL
+	      printf("  smil_ref '%s'\n", smil_ref->name);
+#endif
+	      
+	      if(!strcasecmp(smil_ref->name, "SEQ")) {
+		smil_property_t  smil_props;
+		smil_node_t     *node = smil.node;
+		
+#ifdef DEBUG_SMIL
+		palign;
+		printf("SEQ Found\n");
+#endif		
+		smil_init_smil_property(&smil_props);
+
+		smil_get_properties(&smil_props, smil_ref->props);
+		smil_seq(&smil, &(smil.node), smil_ref->child, &smil_props);
+		smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
+		smil_free_properties(&smil_props);
+	      }
+	      else if(!strcasecmp(smil_ref->name, "PAR")) {
+		smil_property_t  smil_props;
+		smil_node_t     *node = smil.node;
+	
+#ifdef DEBUG_SMIL
+		palign;
+		printf("PAR Found\n");
+#endif
+		
+		smil_init_smil_property(&smil_props);
+
+		smil_get_properties(&smil_props, smil_ref->props);
+		smil_par(&smil, &(smil.node), smil_ref->child, &smil_props);
+		smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
+		smil_free_properties(&smil_props);
+	      }
+	      else if(!strcasecmp(smil_ref->name, "A")) {
+#ifdef DEBUG_SMIL
+		palign;
+		printf("  IN A\n");
+#endif
+		smil_properties(&smil, &(smil.node), smil_ref->props, NULL);
+	      }
+	      else if(!strcasecmp(smil_ref->name, "SWITCH")) {
+		smil_property_t  smil_props;
+		smil_node_t     *node = smil.node;
+	
+#ifdef DEBUG_SMIL
+		palign;
+		printf("SWITCH Found\n");
+#endif
+		
+		smil_init_smil_property(&smil_props);
+		
+		smil_get_properties(&smil_props, smil_ref->props);
+		smil_switch(&smil, &(smil.node), smil_ref->child, &smil_props);
+		smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
+		smil_free_properties(&smil_props);
+	      }
+	      else {
+		smil_properties(&smil, &smil.node, smil_ref->props, NULL);
+	      }
+
+	      smil_ref = smil_ref->next;
+	    }
+	  }
+	  
+	  smil_entry = smil_entry->next;
+	}
+	
+#ifdef DEBUG_SMIL
+	printf("DUMPING TREE:\n");
+	printf("-------------\n");
+	smil_dump_tree(smil.first);
+	
+	printf("DUMPING HEADER:\n");
+	printf("---------------\n");
+	smil_dump_header(&smil);
+#endif
+
+	entries_smil = smil_fill_mmk(&smil, &mmk);
+	smil_free_smil(&smil);
+      }
+      else
+	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __func__, xml_tree->name);
+      
+      xml_parser_free_tree(xml_tree);
+      
+    __failure:
+      free(smil_content);
+      
+      if(entries_smil) {
+	mmk[entries_smil] = NULL;
+	playlist->entries = entries_smil;
+	playlist->type    = strdup("SMIL");
+	return mmk;
+      }
+    }
+  }
+  
+  return NULL;
+}
+/*
+ * ********************************** SMIL END ***********************************
+ */
+
+/*
  * Public
  */
 int mediamark_get_entry_from_id(const char *ident) {
@@ -1142,6 +2089,7 @@ int mediamark_concat_mediamarks(const char *filename) {
   mediamark_t           **mmk = NULL;
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
+    guess_smil_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
     guess_m3u_playlist,
@@ -1187,6 +2135,7 @@ void mediamark_load_mediamarks(const char *filename) {
   mediamark_t           **ommk;
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
+    guess_smil_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
     guess_m3u_playlist,
