@@ -661,6 +661,11 @@ static void mrlbrowser_play(xitk_widget_t *w, void *data) {
     mrlbrowser_select_mrl(private_data, j, 0);
     private_data->play_callback(NULL, (void *) j, private_data->mc->mrls[j]);
   }
+
+  if(private_data->kill_callback)
+    private_data->kill_callback(private_data->fbWidget, NULL);
+
+  xitk_mrlbrowser_destroy(private_data->fbWidget);
 }
 
 /*
@@ -945,6 +950,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   xitk_list_append_content (private_data->widget_list->l,
 			   (private_data->mrlb_list = 
 			    xitk_browser_create(skonfig, &mb->browser)));
+
+  xitk_browser_set_alignment(private_data->mrlb_list, LABEL_ALIGN_LEFT);
+
 
   lbl.label             = "";
   lbl.skin_element_name = mb->origin.skin_element_name;

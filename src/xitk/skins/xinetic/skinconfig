@@ -1,8 +1,8 @@
 #Xine skin data file
-# revision 0.6
+# revision 0.7
 skin.name    = Xinetic
 skin.version = 1
-skin.date    = 20.01.2002
+skin.date    = 08.05.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
 
@@ -658,14 +658,14 @@ skin.MrlBG {
 skin.MrlItemBtn {
 	coords {
 	  x = 20
-	  y=  20
+	  y = 20
 	}
 	pixmap = PlItemBtn.png
 	label {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
