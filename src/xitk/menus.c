@@ -598,7 +598,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       NULL, NULL                                                                             },
     { _("Video/Deinterlace"),
       (sh[shc++] = menu_get_shortcut("ToggleInterleave")),
-      (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE)) ? "<checked>" : "<check>",
+      (gGui->deinterlace_enable) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_INTERLEAVE                                             },
     { _("Video/SEP"),
       NULL,
