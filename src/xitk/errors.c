@@ -207,7 +207,7 @@ void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
   char *_mrl = mrl;
 
   if(_mrl == NULL)
-    mrl = (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current];
+    _mrl = (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current];
 
   err = xine_get_error(stream);
 
