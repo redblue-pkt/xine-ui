@@ -29,6 +29,10 @@
 #include <sys/stat.h>       
 #include <errno.h>
 
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/keysym.h>
+
 extern int errno;
 
 #include "common.h"
@@ -45,6 +49,9 @@ typedef struct {
     int   maintained;
   } skin;
 } slx_entry_t;
+
+#define WINDOW_WIDTH  400
+#define WINDOW_HEIGHT 195
 
 typedef struct {
   xitk_window_t        *xwin;
@@ -465,7 +472,6 @@ void init_skins_support(void) {
 /*
  * Remote skin loader
  */
-
 static slx_entry_t **skins_get_slx_entries(char *url) {
   int              result;
   slx_entry_t    **slxs = NULL, slx;
@@ -754,10 +760,70 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
   download_skin_cancel(w, NULL);
 }
 
+static void download_skin_handle_event(XEvent *event, void *data) {
+  
+  switch(event->type) {
+    
+  case KeyPress: {
+    XKeyEvent      mykeyevent;
+    KeySym         mykey;
+    char           kbuf[256];
+    int            len;
+    int            modifier;
+    
+    mykeyevent = event->xkey;
+    
+    xitk_get_key_modifier(event, &modifier);
+    
+    XLockDisplay(gGui->display);
+    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+    XUnlockDisplay(gGui->display);
+    
+    switch(mykey) {
+      
+    case XK_Down:
+    case XK_Next: {
+      xitk_widget_t *w;
+      
+      w = xitk_get_focused_widget(skdloader->widget_list);
+      if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
+	if(mykey == XK_Down)
+	  xitk_browser_step_up(skdloader->browser, NULL);
+	else
+	  xitk_browser_page_up(skdloader->browser, NULL);
+      }
+    }
+      break;
+      
+    case XK_Up:
+    case XK_Prior: {
+      xitk_widget_t *w;
+      
+      w = xitk_get_focused_widget(skdloader->widget_list);
+      if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
+	if(mykey == XK_Up)
+	  xitk_browser_step_down(skdloader->browser, NULL);
+	else
+	  xitk_browser_page_down(skdloader->browser, NULL);
+      }
+    }
+      break;
+     
+    case XK_Escape:
+      download_skin_cancel(NULL, NULL);
+      break;
+    }
+  }
+    break;
+
+  }
+}
+    
 void download_skin(char *url) {
   slx_entry_t         **slxs;
   xitk_window_t        *xwin;
-  int                   x, y, w, h;
+  xitk_pixmap_t        *bg;
+  int                   x, y, w, h, width, height;
 
   w = 300;
   h = 50;
@@ -779,9 +845,6 @@ void download_skin(char *url) {
   XUnlockDisplay(gGui->display);
   layer_above_video(xitk_window_get_window(xwin));
   
-#define WINDOW_WIDTH  400
-#define WINDOW_HEIGHT 195
-
   if((slxs = skins_get_slx_entries(url)) != NULL) {
     char                      *fontname    = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
     char                      *btnfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
@@ -825,6 +888,13 @@ void download_skin(char *url) {
 		   (xitk_window_get_window(skdloader->xwin)), None, None);
     XUnlockDisplay(gGui->display);
 
+    xitk_window_get_window_size(skdloader->xwin, &width, &height);
+    bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
+    XLockDisplay (gGui->display);
+    XCopyArea(gGui->display, (xitk_window_get_background(skdloader->xwin)), bg->pixmap,
+	      bg->gc, 0, 0, width, height, 0, 0);
+    XUnlockDisplay (gGui->display);
+
     skdloader->widget_list                = xitk_widget_list_new();
     skdloader->widget_list->l             = xitk_list_new();
     skdloader->widget_list->win           = (xitk_window_get_window(skdloader->xwin));
@@ -867,6 +937,11 @@ void download_skin(char *url) {
     			     (const char *const *)skdloader->entries, skdloader->num, 0);
     
     
+    draw_rectangular_inner_box(gGui->imlib_data, bg, 8, 28, (WINDOW_WIDTH - 20) + 5, (5 * 20) + 10 + 5);
+    
+    xitk_window_change_background(gGui->imlib_data, skdloader->xwin, bg->pixmap, width, height);
+    xitk_image_destroy_xitk_pixmap(bg);
+
     x = WINDOW_WIDTH - 115;
     y = WINDOW_HEIGHT - (23 + 15);
     
@@ -884,7 +959,7 @@ void download_skin(char *url) {
 
     skdloader->widget_key = xitk_register_event_handler("skdloader", 
 							(xitk_window_get_window(skdloader->xwin)),
-							NULL,
+							download_skin_handle_event,
 							NULL,
 							NULL,
 							skdloader->widget_list,

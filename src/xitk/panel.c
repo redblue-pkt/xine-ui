@@ -279,8 +279,15 @@ static void *slider_loop(void *dummy) {
       else
 	pos = secs = 0;
       
-      if(!(i % 2))
+      if(!(i % 2)) {
 	osd_update();
+
+	if(gGui->mrl_overrided) {
+	  gGui->mrl_overrided--;
+	  if(gGui->mrl_overrided == 0)
+	    panel_update_mrl_display();
+	}
+      }
 
       if((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) {
 	
@@ -302,12 +309,6 @@ static void *slider_loop(void *dummy) {
 	    
 	    xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
 	    panel_update_runtime_display();
-	    
-	    if(gGui->mrl_overrided) {
-	      gGui->mrl_overrided--;
-	      if(gGui->mrl_overrided == 0)
-		panel_update_mrl_display();
-	    }
 	    
 	    if(!(i % 20)) {
 	      panel_update_channel_display();
