@@ -2225,7 +2225,9 @@ static void do_gui(commands_t *cmd, client_info_t *client_info) {
 
       /* Flush event when xine !play */
       if(flushing && ((xine_get_status(gGui->stream) != XINE_STATUS_PLAY))) {
+	XLockDisplay(gGui->display);
 	XSync(gGui->display, False);
+	XUnlockDisplay(gGui->display);
       }
     }
   }

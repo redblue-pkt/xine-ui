@@ -526,14 +526,19 @@ void gui_execute_action_id(action_id_t action) {
     
   case ACTID_GRAB_POINTER:
     if(!gGui->cursor_grabbed) {
-      if(!panel_is_visible())
+      if(!panel_is_visible()) {
+	XLockDisplay(gGui->display);
 	XGrabPointer(gGui->display, gGui->video_window, 1, None, 
 		     GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
+	XUnlockDisplay(gGui->display);
+      }
       
       gGui->cursor_grabbed = 1;
     }
     else {
+      XLockDisplay(gGui->display);
       XUngrabPointer(gGui->display, CurrentTime);
+      XUnlockDisplay(gGui->display);
       gGui->cursor_grabbed = 0;
     }
     break;

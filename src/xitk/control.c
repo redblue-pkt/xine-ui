@@ -239,9 +239,9 @@ void control_raise_window(void) {
     if(control->window) {
       if(control->visible && control->running) {
 	if(control->running) {
+	  XLockDisplay(gGui->display);
 	  XMapRaised(gGui->display, control->window);
 	  control->visible = 1;
-	  XLockDisplay(gGui->display);
 	  XSetTransientForHint (gGui->display, 
 				control->window, gGui->video_window);
 	  XUnlockDisplay(gGui->display);

@@ -990,9 +990,6 @@ static void setup_sections (void) {
   xitk_window_change_background(gGui->imlib_data, setup->xwin, bg->pixmap,
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  XLockDisplay(gGui->display);
-  XUnlockDisplay(gGui->display);
-
   xitk_image_destroy_xitk_pixmap(bg);
 
   setup->num_tmp_widgets = 0;

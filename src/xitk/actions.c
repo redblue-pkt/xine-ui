@@ -336,7 +336,9 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
 
   if(panel_is_visible()) {
     video_window_set_visibility(!(video_window_is_visible()));
+    XLockDisplay(gGui->display);
     XMapRaised (gGui->display, gGui->panel_window); 
+    XUnlockDisplay(gGui->display);
 
     if(gGui->reparent_hack) {
       panel_toggle_visibility(NULL, NULL);
@@ -360,10 +362,12 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
   }
   
   if (panel_is_visible())  {
+    XLockDisplay(gGui->display);
     XMapRaised (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
-    
+    XUnlockDisplay(gGui->display);
+
     if(gGui->reparent_hack) {
       panel_toggle_visibility(NULL, NULL);
       panel_toggle_visibility(NULL, NULL);
@@ -405,9 +409,12 @@ void gui_toggle_aspect(void) {
 		 (xine_get_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO)) + 1);
 
   if (panel_is_visible())  {
+    XLockDisplay(gGui->display);
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
+    XUnlockDisplay(gGui->display);
+    
   }
 }
 
@@ -417,9 +424,12 @@ void gui_toggle_interlaced(void) {
 		 1 - (xine_get_param(gGui->stream, XINE_PARAM_VO_DEINTERLACE)));
 
   if (panel_is_visible())  {
+    XLockDisplay(gGui->display);
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display,
                           gGui->panel_window, gGui->video_window);
+    XUnlockDisplay(gGui->display);
+
   }
 }
 
@@ -735,14 +745,6 @@ const char *gui_get_next_mrl () {
     return NULL;
 }
 
-/*
-void gui_notify_demux_branched () {
-  gGui->gui_playlist_cur ++;
-  strcpy(gGui->gui_filename, gGui->gui_playlist [gGui->gui_playlist_cur]);
-  label_change_label (gui_widget_list, gui_title_label, gGui->gui_filename);
-}
-*/
-
 void gui_control_show(xitk_widget_t *w, void *data) {
 
   if(control_is_running() && !control_is_visible())
@@ -815,8 +817,11 @@ void layer_above_video(Window w) {
   if(!gGui->layer_above)
     return;
   
-  if(XA_WIN_LAYER == None)
+  if(XA_WIN_LAYER == None) {
+    XLockDisplay(gGui->display);
     XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+    XUnlockDisplay(gGui->display);
+  }
 
   xev.type                 = ClientMessage;
   xev.xclient.type         = ClientMessage;
@@ -837,8 +842,11 @@ void layer_above_video(Window w) {
 
   xev.xclient.data.l[1] = 0;
 
+  XLockDisplay(gGui->display);
   XSendEvent(gGui->display, gGui->imlib_data->x.root, False,
 	     SubstructureNotifyMask, (XEvent*) &xev);
+  XUnlockDisplay(gGui->display);
+
 }
 
 void gui_increase_audio_volume(void) {
@@ -871,9 +879,11 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
 		 xine_get_param(gGui->stream, XINE_PARAM_VO_ZOOM_Y) + zoom_dy);
   
   if (panel_is_visible())  {
+    XLockDisplay(gGui->display);
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
+    XUnlockDisplay(gGui->display);
   }
 }
 
@@ -886,9 +896,11 @@ void gui_reset_zoom(void) {
   xine_set_param(gGui->stream, XINE_PARAM_VO_ZOOM_Y, 100);
   
   if (panel_is_visible())  {
+    XLockDisplay(gGui->display);
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
+    XUnlockDisplay(gGui->display);
   }
 }
 

@@ -583,9 +583,6 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
     gGui->mixer.volume_level = pos;
     xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
   }
-  else
-    /* FIXME: this error message does not make sense! */
-    xine_error(_("unknown widget slider caller\n"));
 
   panel_check_pause();
 }

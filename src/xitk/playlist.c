@@ -495,13 +495,12 @@ void pl_raise_window(void) {
     if(playlist->window) {
       if(playlist->visible && playlist->running) {
 	if(playlist->running) {
-
 	  XLockDisplay(gGui->display);
 	  XMapRaised(gGui->display, playlist->window); 
+	  playlist->visible = 1;
 	  XSetTransientForHint (gGui->display, 
 				playlist->window, gGui->video_window);
 	  XUnlockDisplay(gGui->display);
-
 	  layer_above_video(playlist->window);
 	}
       } else {
