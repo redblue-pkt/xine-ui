@@ -28,21 +28,6 @@
 
 #include <inttypes.h>
 
-extern uint32_t xine_debug;
-
-#define VERBOSE        (xine_debug & 0x8000>>1)
-#define METRONOM       (xine_debug & 0x8000>>2)
-#define AUDIO          (xine_debug & 0x8000>>3)
-#define DEMUX          (xine_debug & 0x8000>>4)
-#define INPUT          (xine_debug & 0x8000>>5)
-#define VIDEO          (xine_debug & 0x8000>>6)
-#define VPTS           (xine_debug & 0x8000>>7)
-#define MPEG           (xine_debug & 0x8000>>8)
-#define VAVI           (xine_debug & 0x8000>>9)
-#define AC3            (xine_debug & 0x8000>>10)
-#define LOOP           (xine_debug & 0x8000>>11)
-#define GUI            (xine_debug & 0x8000>>12)
-
 #ifdef  __GNUC__
 #define perr(FMT,ARGS...) {fprintf(stderr, FMT, ##ARGS);fflush(stderr);}
 #else   /* C99 version: */
@@ -89,11 +74,6 @@ void profiler_print_results ();
 
 //#define perr(FMT,ARGS...) 
 
-#ifdef  __GNUC__
-#define xprintf(LVL, FMT, ARGS...) 
-#else   /* C99 version: */
-#define xprintf(LVL, ...) 
-#endif
 
 #define profiler_init()
 #define profiler_set_label(id, label)

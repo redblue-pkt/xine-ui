@@ -727,36 +727,40 @@ void video_window_init (void) {
   }
 
 #ifdef HAVE_XF86VIDMODE
-  if(config_lookup_int("use_xvidext", 0)) {
-     if(XF86VidModeQueryExtension(gGui->display, &dummy_query_event, &dummy_query_error)) {
-	XF86VidModeModeInfo* XF86_modelines_swap;
-	int                  major, minor, sort_x, sort_y;
-     
-	XF86VidModeQueryVersion(gGui->display, &major, &minor);
-	printf("XF86VidMode Extension (%d.%d) detected, trying to use it.\n", major, minor);
-       
-	if(XF86VidModeGetAllModeLines(gGui->display, XDefaultScreen(gGui->display), &(gVw->XF86_modelines_count), &(gVw->XF86_modelines))) {
-	   printf("XF86VidMode Extension: %d modelines found.\n", gVw->XF86_modelines_count);
+  if (gGui->config->register_bool (gGui->config, "gui.use_xvidect", 0,
+				   "use XVidModeExtension when switching to fullscreen",
+				   NULL, NULL, NULL)) {
+    if(XF86VidModeQueryExtension(gGui->display, &dummy_query_event, &dummy_query_error)) {
+      XF86VidModeModeInfo* XF86_modelines_swap;
+      int                  major, minor, sort_x, sort_y;
+      
+      XF86VidModeQueryVersion(gGui->display, &major, &minor);
+      printf("XF86VidMode Extension (%d.%d) detected, trying to use it.\n", major, minor);
+      
+      if(XF86VidModeGetAllModeLines(gGui->display, XDefaultScreen(gGui->display), &(gVw->XF86_modelines_count), &(gVw->XF86_modelines))) {
+	printf("XF86VidMode Extension: %d modelines found.\n", gVw->XF86_modelines_count);
 	
-	   // sorting modelines, skipping first entry because it is the current
-	   // modeline in use - this is important so we know to which modeline
-	   // we have to switch to when toggling fullscreen mode.
-	   for(sort_x = 1; sort_x < gVw->XF86_modelines_count; sort_x++) {
-	      for(sort_y = sort_x+1; sort_y < gVw->XF86_modelines_count; sort_y++) {
-		 if(gVw->XF86_modelines[sort_x]->hdisplay > gVw->XF86_modelines[sort_y]->hdisplay) {
-		    XF86_modelines_swap = gVw->XF86_modelines[sort_y];
-		    gVw->XF86_modelines[sort_y] = gVw->XF86_modelines[sort_x];
-		    gVw->XF86_modelines[sort_x] = XF86_modelines_swap;
-		 }
-	      }
-	   }
-	} else {
-	   gVw->XF86_modelines_count = 0;
-	   printf("XF86VidMode Extension: could not get list of available modelines. Failed.\n");
+	/*
+	 * sorting modelines, skipping first entry because it is the current
+	 * modeline in use - this is important so we know to which modeline
+	 * we have to switch to when toggling fullscreen mode.
+	 */
+	for(sort_x = 1; sort_x < gVw->XF86_modelines_count; sort_x++) {
+	  for(sort_y = sort_x+1; sort_y < gVw->XF86_modelines_count; sort_y++) {
+	    if(gVw->XF86_modelines[sort_x]->hdisplay > gVw->XF86_modelines[sort_y]->hdisplay) {
+	      XF86_modelines_swap = gVw->XF86_modelines[sort_y];
+	      gVw->XF86_modelines[sort_y] = gVw->XF86_modelines[sort_x];
+	      gVw->XF86_modelines[sort_x] = XF86_modelines_swap;
+	    }
+	  }
 	}
-     } else {
-	printf("XF86VidMode Extension: initialization failed, not using it.\n");
-     }
+      } else {
+	gVw->XF86_modelines_count = 0;
+	printf("XF86VidMode Extension: could not get list of available modelines. Failed.\n");
+      }
+    } else {
+      printf("XF86VidMode Extension: initialization failed, not using it.\n");
+    }
   }
 #endif
 

@@ -99,13 +99,9 @@ static struct option long_options[] = {
 #ifdef HAVE_LIRC
   {"no-lirc"        , no_argument      , 0, 'L'                      },
 #endif
-#ifdef HAVE_XF86VIDMODE
-  {"use-xvidext"    , no_argument      , 0, 'F'                      },
-#endif
 #ifdef debug
   {"debug"          , required_argument, 0, 'd'                      },
 #endif
-  {"recognize-by"   , optional_argument, 0, 'R'                      },
   {"spu-channel"    , required_argument, 0, 'u'                      },
   {"audio-channel"  , required_argument, 0, 'a'                      },
   {"video-driver"   , required_argument, 0, 'V'                      },
@@ -187,20 +183,11 @@ void show_usage (void) {
   printf("                    'v': retrieve plqaylist from VCD. (deprecated. use -s VCD)\n");
   printf("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n");
   printf("  -f, --fullscreen             start in fullscreen mode,\n");
-#ifdef HAVE_XF86VIDMODE
-  printf("  -F, --use-xvidext            Enable XF86VidMode Extension support\n");
-#endif
   printf("  -g, --hide-gui               hide GUI (panel, etc.)\n");
   printf("  -H, --hide-video             hide video window\n");
 #ifdef HAVE_LIRC
   printf("  -L, --no-lirc                Turn off LIRC support.\n");
 #endif
-  printf("  -R, --recognize-by [option]  Try to recognize stream type. Option are:\n");
-  printf("                                 'default': by content, then by extension,\n");
-  printf("                                 'revert': by extension, then by content,\n");
-  printf("                                 'content': only by content,\n");
-  printf("                                 'extension': only by extension.\n");
-  printf("                                 -if no option is given, 'revert' is selected\n");
   printf("      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n");
   printf("                               is either an X11 visual class, or a visual id.\n");
   printf("      --install                Install a private colormap.\n");
@@ -209,9 +196,6 @@ void show_usage (void) {
   printf("                                 'lirc': display draft of a .lircrc config file.\n");
   printf("                                 'remapped': user remapped keymap table.\n");
   printf("                                 -if no option is given, 'default' is selected.\n");
-#ifdef DEBUG
-  printf("  -d, --debug <flags>          Debug mode for <flags> ('help' for list).\n");
-#endif
 
   printf("\n");
   printf("examples for valid MRLs (media resource locator):\n");
@@ -223,103 +207,6 @@ void show_usage (void) {
   printf("  DVD:   'dvd://VTS_01_2.VOB'\n");
   printf("  VCD:   'vcd://<track number>'\n");
   printf("\n");
-}
-
-/*
- *
- */
-#ifdef DEBUG
-int handle_debug_subopt(char *sopt) {
-  int i, subopt;
-  char *str = sopt;
-  char *val = NULL;
-  char *debuglvl[] = {
-    "verbose", "metronom", "audio", "demux",
-    "input", "video", "pts", "mpeg", "avi",
-    "ac3", "loop", "gui",
-    NULL
-  };
-
-  while(*str) {
-    subopt = getsubopt(&str, debuglvl, &val);
-    switch(subopt) {
-    case -1:
-      i = 0;
-      fprintf(stderr, "Valid debug flags are:\n\t");
-      while(debuglvl[i] != NULL) {
-	fprintf(stderr,"%s, ", debuglvl[i]);
-	i++;
-      }
-      fprintf(stderr, "\b\b.\n");
-      return 0;
-    default:
-      /* If debug feature is already enabled, with
-       * XINE_DEBUG envvar, turn it off
-       */
-      if((gGui->debug_level & 0x8000>>(subopt + 1)))
-	gGui->debug_level &= ~0x8000>>(subopt + 1);
-      else
-	gGui->debug_level |= 0x8000>>(subopt + 1);
-      break;
-    }
-  }
-
-  return 1;
-}
-#endif
-
-/*
- * Handle sub-option of 'recognize-by' command line argument
- */
-int handle_demux_strategy_subopt(char *sopt) {
-  int subopt;
-  char *str = sopt;
-  char *val = NULL;
-  char *ds_available[] = {
-    "default",
-    "revert",
-    "content",
-    "extension",
-    NULL
-  };
-  enum DEMUX_S {
-    DS_DEFAULT,
-    DS_REVERT,
-    DS_CONTENT,
-    DS_EXT
-  };
-
-  while((subopt = getsubopt(&str, ds_available, &val)) != -1) {
-
-    switch(subopt) {
-
-    case DS_DEFAULT:
-      return DEMUX_DEFAULT_STRATEGY;
-      break;
-    case DS_REVERT:
-      return DEMUX_REVERT_STRATEGY;
-      break;
-    case DS_CONTENT:
-      return DEMUX_CONTENT_STRATEGY;
-      break;
-    case DS_EXT:
-      return DEMUX_EXTENSION_STRATEGY;
-      break;      
-    }
-  }
-
-  if(val) {
-    int i;
-
-    fprintf(stderr, "Error: '%s' is a wrong recognition strategy option.\n", 
-	    val);
-    fprintf(stderr, "Available strategies are:");
-    for(i = 0; ds_available[i] != NULL; i++)
-      fprintf(stderr, " %s,", ds_available[i]);
-    fprintf(stderr, "\b.\nStrategy forced to 'default'.\n");
-  }
-  
-  return DEMUX_DEFAULT_STRATEGY;
 }
 
 /*
@@ -364,8 +251,10 @@ static void load_video_out_driver(char *video_driver_id) {
     int    i;
 
     /* Try to init video with stored information */
-    video_driver_id = config_lookup_str("video_driver_name", NULL);
-    if(video_driver_id) {
+    video_driver_id = gGui->config->register_string (gGui->config, "video.driver", "auto",
+						     "video driver to use",
+						     NULL, NULL, NULL);
+    if (strcmp (video_driver_id, "auto")) {
 
       gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
 						      video_driver_id,
@@ -389,7 +278,6 @@ static void load_video_out_driver(char *video_driver_id) {
 						      VISUAL_TYPE_X11, 
 						      (void *) &vis);
       if (gGui->vo_driver) {
-	config_set_str("video_driver_name", video_driver_id);
 	if(driver_ids)
 	  free(driver_ids);
 	return;
@@ -403,8 +291,7 @@ static void load_video_out_driver(char *video_driver_id) {
       exit (1);
     }
 
-  } 
-  else {
+  } else {
 
     gGui->vo_driver = xine_load_video_output_plugin(gGui->config,
 						    video_driver_id,
@@ -415,8 +302,6 @@ static void load_video_out_driver(char *video_driver_id) {
       printf ("main: video driver <%s> failed\n", video_driver_id);
       exit (1);
     }
-    
-    config_set_str("video_driver_name", video_driver_id);
   }
 }
 
@@ -431,8 +316,12 @@ static void load_audio_out_driver(char *audio_driver_id,
     int i = 0;
     
     /* Try to init audio with stored information */
-    audio_driver_id = config_lookup_str("audio_driver_name", NULL);
-    if(audio_driver_id) {
+
+    audio_driver_id = gGui->config->register_string (gGui->config, "audio.driver", "auto",
+						     "audio driver to use",
+						     NULL, NULL, NULL);
+    *audio_driver = NULL;
+    if (strcmp (audio_driver_id, "auto")) {
       *audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						    audio_driver_id);
       if(*audio_driver) {
@@ -460,8 +349,9 @@ static void load_audio_out_driver(char *audio_driver_id,
       *audio_driver = NULL;
       printf("main: not using any audio driver (as requested).\n");
       return;
-    }
-    else {
+
+    } else {
+
       *audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						    audio_driver_id);
       if (!*audio_driver) {
@@ -472,9 +362,7 @@ static void load_audio_out_driver(char *audio_driver_id,
     }
   }
 
-  if (*audio_driver)
-    config_set_str("audio_driver_name", audio_driver_id);
-  else
+  if (!(*audio_driver))
     printf ("main: audio driver <%s> failed\n", audio_driver_id);
 }
 
@@ -524,12 +412,8 @@ int main(int argc, char *argv[]) {
   /* command line options will end up in these variables: */
   int              c = '?', aos = 0;
   int              option_index = 0;
-  int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
   int              audio_channel = -1;
   int              spu_channel = -1;
-#ifdef HAVE_XF86VIDMODE
-  int              use_xvidext = 0;
-#endif
   /*  int              audio_options = 0; FIXME */
   int		   visual = 0;
   char            *audio_driver_id = NULL;
@@ -564,14 +448,6 @@ int main(int argc, char *argv[]) {
 #endif
   gGui->actions_on_start[aos] = ACTID_NOKEY;
 
-#ifdef DEBUG
-  /* If XINE_DEBUG envvar is set, parse it */
-  if(getenv("XINE_DEBUG") != NULL) {
-    if(!(handle_debug_subopt(chomp((getenv("XINE_DEBUG"))))))
-      exit(1);
-  }
-#endif
-
   /*
    * initialize CORBA server
    */
@@ -593,22 +469,6 @@ int main(int argc, char *argv[]) {
       no_lirc = 1;
       break;
 #endif
-
-#ifdef DEBUG
-    case 'd': /* Select debug levels */
-      if(optarg != NULL) {
-	if(!(handle_debug_subopt(chomp(optarg))))
-	  exit(1);
-      }
-      break;
-#endif
-
-    case 'R': /* Set a strategy to recognizing stream type */
-      if(optarg != NULL)
-	demux_strategy = handle_demux_strategy_subopt(chomp(optarg));
-      else
-	demux_strategy = DEMUX_REVERT_STRATEGY;
-      break;
 
     case 'u': /* Select SPU channel */
       sscanf(optarg, "%i", &spu_channel);
@@ -676,12 +536,6 @@ int main(int argc, char *argv[]) {
       gGui->autoscan_plugin = chomp(optarg);
       break;
        
-#ifdef HAVE_XF86VIDMODE
-    case 'F': /* Enable XF86VidMode Extension support */
-      use_xvidext = 1;
-      break;
-#endif
-
     case OPTION_VISUAL:
       if (sscanf(optarg, "%x", &visual) == 1)
 	gGui->prefered_visual_id = visual;
@@ -756,18 +610,12 @@ int main(int argc, char *argv[]) {
       homedir = strdup(get_homedir());
       gGui->configfile = (char *) xmalloc(strlen(homedir) + 8 + 1);
 
-      sprintf (gGui->configfile, "%s/.xinerc", homedir);
+      sprintf (gGui->configfile, "%s/.xine/config", homedir);
     }
   }
 
   gGui->config = config_file_init (gGui->configfile);
 
-  config_set_int("demux_strategy", demux_strategy);
-   
-#ifdef HAVE_XF86VIDMODE
-  if(use_xvidext) config_set_int("use_xvidext", 1);
-#endif
-   
   /*
    * init gui
    */

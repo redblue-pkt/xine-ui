@@ -243,34 +243,6 @@ static void reenable_screensavers(void) {
     xscreensaver_start_server();
 }
 
-/**
- * Configuration file lookup/set functions
- */
-char *config_lookup_str(char *key, char *def) {
-
-  return(gGui->config->lookup_str(gGui->config, key, def));
-}
-
-int config_lookup_int(char *key, int def) {
-
-  return(gGui->config->lookup_int(gGui->config, key, def));
-}
-
-void config_set_str(char *key, char *value) {
-
-  if(key) {
-    gGui->config->set_str(gGui->config, key, value);
-    config_save();
-  }
-}
-
-void config_set_int(char *key, int value) {
-  
-  if(key) {
-    gGui->config->set_int(gGui->config, key, value);
-    config_save();
-  }
-}
 
 void config_save(void) {
 
@@ -514,10 +486,6 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_SNAPSHOT:
     panel_snapshot(NULL, NULL);
-    break;
-    
-  case ACTID_XINESHOT:
-    panel_execute_xineshot(NULL, NULL);
     break;
     
     /* events for advanced input plugins: */
@@ -885,7 +853,9 @@ void gui_init (int nfiles, char *filenames[]) {
     exit(1);
   }
 
-  gGui->layer_above = config_lookup_int("layer_above", 1);
+  gGui->layer_above = gGui->config->register_bool (gGui->config, "gui.layer_above", 
+						   1, "use wm layer property to place window on top", 
+						   NULL, NULL, NULL);
 
   XLockDisplay (gGui->display);
 

@@ -131,14 +131,12 @@ typedef struct {
 
 
 /*
- * Configuration file lookup/set functions
+ * Configuration file convenience functions
  */
-char *config_lookup_str(char *, char *);
-int config_lookup_int(char *, int);
-void config_set_str(char *, char *);
-void config_set_int(char *, int);
+
 void config_save(void);
 void config_reset(void);
+
 char *gui_get_skindir(void);
 char *gui_get_configfile(void);
 

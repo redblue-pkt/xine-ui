@@ -47,14 +47,6 @@
 
 #define DEFAULT_SKIN "xinetic"
 
-/* Old "default" skin is unavailable now, change to "metal" */
-#define CHECK_IF_NO_DEFAULT(sk) {                                             \
-  if(!strncasecmp(sk, "default", strlen(sk))) {                               \
-    config_set_str("skin", DEFAULT_SKIN);                                     \
-    sk = config_lookup_str("skin", DEFAULT_SKIN);                             \
-  }                                                                           \
-}
-
 extern gGui_t             *gGui;
 
 static skins_locations_t **skins_avail = NULL;
@@ -123,9 +115,9 @@ char *skin_get_skindir(void) {
   
   memset(&tmp, 0, 2048);
   
-  skin = config_lookup_str("skin", DEFAULT_SKIN);
-  
-  CHECK_IF_NO_DEFAULT(skin);
+  skin = gGui->config->register_string (gGui->config, "gui.skin", DEFAULT_SKIN,
+					"gui skin theme", 
+					NULL, NULL, NULL);
   
   snprintf(tmp, 2048, "%s/%s", XINE_SKINDIR, skin);
 
@@ -141,9 +133,9 @@ char *skin_get_configfile(void) {
   
   memset(&tmp, 0, 2048);
   
-  skin = config_lookup_str("skin", DEFAULT_SKIN);
-  
-  CHECK_IF_NO_DEFAULT(skin);
+  skin = gGui->config->register_string (gGui->config, "gui.skin", DEFAULT_SKIN,
+					"gui skin theme", 
+					NULL, NULL, NULL);
   
   snprintf(tmp, 2048, "%s/%s/skinconfig", XINE_SKINDIR, skin);
 
@@ -189,13 +181,15 @@ void change_skin(skins_locations_t *sk) {
   char                *old_skin;
   skins_locations_t   *sks = sk;
   int                  twice = 0;
+
   if(!sk)
     return;
 
-  old_skin = strdup(config_lookup_str("skin", DEFAULT_SKIN));
+  old_skin = strdup(gGui->config->register_string (gGui->config, "gui.skin", DEFAULT_SKIN,
+						   "gui skin theme", 
+						   NULL, NULL, NULL));
 
-  config_set_str("skin", (char *)sk->skin);
-  config_save();
+  gGui->config->update_string (gGui->config, "gui.skin", (char *)sk->skin);
 
   xitk_skin_unload_config(gGui->skin_config);
   
@@ -207,8 +201,9 @@ void change_skin(skins_locations_t *sk) {
   
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
     printf("Failed to load %s/%s. Reload old skin '%s'.\n", buf, "skinconfig", old_skin);
-    config_set_str("skin", old_skin);
-    config_save();
+    
+    gGui->config->update_string (gGui->config, "gui.skin", old_skin);
+
     sks = get_skin_location(old_skin);
     if(!twice) {
       twice++;
@@ -242,19 +237,21 @@ void init_skins_support(void) {
     exit(-1);
   }
   
-  skin = config_lookup_str("skin", DEFAULT_SKIN);
+  skin = gGui->config->register_string (gGui->config, "gui.skin", DEFAULT_SKIN,
+					"gui skin theme", 
+					NULL, NULL, NULL);
 
   sk = get_skin_location(skin);
 
   memset(&buf, 0, sizeof(buf));
 
   if(!sk) {
-    printf("Ooch, skin '%s' not found, use fallback '%s'.\n", skin, DEFAULT_SKIN);
-    config_set_str("skin", DEFAULT_SKIN);
-    config_save();
+    printf("skins: skin '%s' not found, use fallback '%s'.\n", skin, DEFAULT_SKIN);
+
+    gGui->config->update_string (gGui->config, "gui.skin", (char *)sk->skin);
+
     sprintf(buf, "%s/%s", XINE_SKINDIR, DEFAULT_SKIN);
-  }
-  else {
+  } else {
     sprintf(buf, "%s/%s", sk->pathname, sk->skin);
   }
   

@@ -77,8 +77,8 @@ static int is_wm_is_enlightenment(Display *d, Window w) {
  */
 static void panel_store_new_position(int x, int y, int w, int h) {
  
-  config_set_int("panel_x", x);
-  config_set_int("panel_y", y);
+  gGui->config->update_num (gGui->config, "gui.panel_x", x);
+  gGui->config->update_num (gGui->config, "gui.panel_y", y);
 }
 
 /*
@@ -249,7 +249,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 #endif
   }
 
-  config_set_int("panel_visible", panel->visible);
+  gGui->config->update_num (gGui->config, "gui.panel_visible", panel->visible);
 }
 
 void panel_check_mute(void) {
@@ -318,28 +318,6 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
     xine_set_audio_property(gGui->xine, AO_PROP_MUTE_VOL, gGui->mixer.mute);
   }
   panel_check_mute();
-}
-
-/*
- *  Call external "xineshot" program to get a fullscreen
- *  snapshot.
- */
-void panel_execute_xineshot(xitk_widget_t *w, void *data) {
-  int err;
-  char cmd[2048];
-  char *vo_name;
-
-  vo_name = config_lookup_str("video_driver_name", NULL);
-
-  if(!strcmp(vo_name, "XShm")) {
-    snprintf(cmd, 2048, "%s/%s", XINE_SCRIPTDIR, "xineshot");
-    if((err = xine_system(0, cmd)) < 0) {
-      printf("xine_system() returned %d\n", err);
-    }
-  }
-  else
-    printf("Grab snapshots only works with XShm video driver.\n");
-  
 }
 
 /*
@@ -503,8 +481,12 @@ void panel_init (void) {
    * open the panel window
    */
 
-  hint.x = config_lookup_int ("panel_x", 200);
-  hint.y = config_lookup_int ("panel_y", 100);
+  hint.x = gGui->config->register_num (gGui->config, "gui.panel_x", 200,
+				       "gui panel x coordinate",
+				       NULL, NULL, NULL);
+  hint.y = gGui->config->register_num (gGui->config, "gui.panel_y", 100,
+				       "gui panel x coordinate",
+				       NULL, NULL, NULL);
   hint.width = panel->bg_image->rgb_width;
   hint.height = panel->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
@@ -788,8 +770,10 @@ void panel_init (void) {
   /* 
    * show panel 
    */
-  panel->visible = (config_lookup_int("panel_visible", 1)) ? 1 : 0;
-  
+  panel->visible = gGui->config->register_bool (gGui->config, "gui.panel_visible", 1,
+						"gui panel visibility",
+						NULL, NULL, NULL);
+
   if (panel->visible)
     XMapRaised(gGui->display, gGui->panel_window); 
   

@@ -128,8 +128,8 @@ void destroy_mrl_browser(void) {
 
   if(mrlb) {
     if((xitk_mrlbrowser_get_window_info(mrlb, &wi))) {
-      config_set_int("x_mrl_browser", wi.x);
-      config_set_int("y_mrl_browser", wi.y);
+      gGui->config->update_num (gGui->config, "gui.mrl_browser_x", wi.x);
+      gGui->config->update_num (gGui->config, "gui.mrl_browser_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
     xitk_mrlbrowser_destroy(mrlb);
@@ -145,8 +145,8 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
 
   if(mrlb) {
     if((xitk_mrlbrowser_get_window_info(mrlb, &wi))) {
-      config_set_int("x_mrl_browser", wi.x);
-      config_set_int("y_mrl_browser", wi.y);
+      gGui->config->update_num (gGui->config, "gui.mrl_browser_x", wi.x);
+      gGui->config->update_num (gGui->config, "gui.mrl_browser_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
   }
@@ -175,8 +175,12 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.window_trans                   = gGui->video_window;
   mb.layer_above                    = gGui->layer_above;
 
-  mb.x                              = config_lookup_int("x_mrl_browser", 200);
-  mb.y                              = config_lookup_int("y_mrl_browser", 100);
+  mb.x                              = gGui->config->register_num (gGui->config, "gui.mrl_browser_x", 200,
+								  "gui mrl browser x coordinate",
+								  NULL, NULL, NULL);
+  mb.y                              = gGui->config->register_num (gGui->config, "gui.mrl_browser_y", 100,
+								  "gui mrl browser y coordinate",
+								  NULL, NULL, NULL);
   mb.window_title                   = "Xine MRL Browser";
   mb.skin_element_name              = "MrlBG";
   mb.resource_name                  = mb.window_title;

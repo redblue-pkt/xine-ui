@@ -164,8 +164,8 @@ void control_exit(xitk_widget_t *w, void *data) {
   control->visible = 0;
 
   if((xitk_get_window_info(control->widget_key, &wi))) {
-    config_set_int("control_x", wi.x);
-    config_set_int("control_y", wi.y);
+    gGui->config->update_num (gGui->config, "gui.control_x", wi.x);
+    gGui->config->update_num (gGui->config, "gui.control_y", wi.y);
     WINDOW_INFO_ZERO(&wi);
   }
 
@@ -379,8 +379,12 @@ void control_panel(void) {
     exit(-1);
   }
 
-  hint.x = config_lookup_int ("control_x", 200);
-  hint.y = config_lookup_int ("control_y", 100);
+  hint.x = gGui->config->register_num (gGui->config, "gui.control_x", 200,
+				       "gui control panel x coordinate",
+				       NULL, NULL, NULL);
+  hint.y = gGui->config->register_num (gGui->config, "gui.control_y", 100,
+				       "gui control panel y coordinate",
+				       NULL, NULL, NULL);
   hint.width = control->bg_image->rgb_width;
   hint.height = control->bg_image->rgb_height;
   hint.flags = PPosition | PSize;

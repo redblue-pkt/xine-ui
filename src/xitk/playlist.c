@@ -101,8 +101,8 @@ void pl_exit(xitk_widget_t *w, void *data) {
   playlist->visible = 0;
 
   if((xitk_get_window_info(playlist->widget_key, &wi))) {
-    config_set_int("playlist_x", wi.x);
-    config_set_int("playlist_y", wi.y);
+    gGui->config->update_num (gGui->config, "gui.playlist_x", wi.x);
+    gGui->config->update_num (gGui->config, "gui.playlist_y", wi.y);
     WINDOW_INFO_ZERO(&wi);
   }
 
@@ -645,8 +645,13 @@ void playlist_editor(void) {
     exit(-1);
   }
 
-  hint.x = config_lookup_int ("playlist_x", 200);
-  hint.y = config_lookup_int ("playlist_y", 100);
+  hint.x = gGui->config->register_num (gGui->config, "gui.playlist_x", 200,
+				       "gui playlist x coordinate",
+				       NULL, NULL, NULL);
+  hint.y = gGui->config->register_num (gGui->config, "gui.playlist_y", 200,
+				       "gui playlist y coordinate",
+				       NULL, NULL, NULL);
+
   hint.width = playlist->bg_image->rgb_width;
   hint.height = playlist->bg_image->rgb_height;
   hint.flags = PPosition | PSize;

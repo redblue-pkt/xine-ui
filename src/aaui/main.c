@@ -259,60 +259,6 @@ static int handle_debug_subopt(char *sopt) {
 #endif
 
 /*
- * Handle demuxer strategy user choice here.
- */
-static int handle_demux_strategy_subopt(char *sopt) {
-  int subopt;
-  char *str = sopt;
-  char *val = NULL;
-  char *ds_available[] = {
-    "default",
-    "revert",
-    "content",
-    "extension",
-    NULL
-  };
-  enum DEMUX_S {
-    DS_DEFAULT,
-    DS_REVERT,
-    DS_CONTENT,
-    DS_EXT
-  };
-
-  while((subopt = getsubopt(&str, ds_available, &val)) != -1) {
-
-    switch(subopt) {
-
-    case DS_DEFAULT:
-      return DEMUX_DEFAULT_STRATEGY;
-      break;      
-    case DS_REVERT:
-      return DEMUX_REVERT_STRATEGY;
-      break;      
-    case DS_CONTENT:
-      return DEMUX_CONTENT_STRATEGY;
-      break;      
-    case DS_EXT:
-      return DEMUX_EXTENSION_STRATEGY;
-      break;      
-    }
-  }
-
-  if(val) {
-    int i;
-
-    fprintf(stderr, "Error: '%s' is a wrong recognition strategy option.\n", 
-	    val);
-    fprintf(stderr, "Available strategies are:");
-    for(i = 0; ds_available[i] != NULL; i++)
-      fprintf(stderr, " %s,", ds_available[i]);
-    fprintf(stderr, "\b.\nStrategy forced to 'default'.\n");
-  }
-  
-  return DEMUX_DEFAULT_STRATEGY;
-}
-
-/*
  * Extract mrls from argv[] and store them to playlist.
  */
 void extract_mrls(int num_mrls, char **mrls) {
@@ -334,7 +280,6 @@ int main(int argc, char *argv[]) {
   int            option_index    = 0;
   int            key;
   char          *configfile;
-  int            demux_strategy  = DEMUX_DEFAULT_STRATEGY;
   char          *audio_driver_id = NULL;
   int            audio_channel   = 0;
 
@@ -406,13 +351,6 @@ int main(int argc, char *argv[]) {
       }
       break;
 
-    case 'R': /* Set a strategy to recognizing stream type */
-      if(optarg != NULL)
-	demux_strategy = handle_demux_strategy_subopt(chomp(optarg));
-      else
-	demux_strategy = DEMUX_REVERT_STRATEGY;
-      break;
-     
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -453,7 +391,6 @@ int main(int argc, char *argv[]) {
   }
 
   aaxine.config = config_file_init (configfile);
-  aaxine.config->set_int(aaxine.config, "demux_strategy", demux_strategy);
   aaxine.config->save(aaxine.config);
 
   /*
@@ -495,13 +432,10 @@ int main(int argc, char *argv[]) {
    * init audio output driver
    */
   if(!audio_driver_id)
-    audio_driver_id = aaxine.config->lookup_str(aaxine.config, 
-						"audio_driver_name", "oss");
-  else {
-    aaxine.config->set_str(aaxine.config, 
-			   "audio_driver_name", audio_driver_id);
-    aaxine.config->save(aaxine.config);
-  }
+    audio_driver_id = aaxine.config->register_string(aaxine.config, 
+						     "audio.driver", "oss",
+						     "Audio driver id",
+						     NULL, NULL, NULL);
     
   aaxine.ao_driver = xine_load_audio_output_plugin(aaxine.config,
 						   audio_driver_id);
