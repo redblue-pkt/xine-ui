@@ -226,10 +226,10 @@ static void viewlog_clear_tab(void) {
   im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
 			       (WINDOW_HEIGHT - (51 + 57) + 1));
   
-  draw_outter(gGui->imlib_data, im->image, im->width, im->height);
+  draw_outter(gGui->imlib_data, im->image->pixmap, im->width, im->height);
   
   XLockDisplay(gGui->display);
-  XCopyArea(gGui->display, im->image, (xitk_window_get_window(viewlog->xwin)),
+  XCopyArea(gGui->display, im->image->pixmap, (xitk_window_get_window(viewlog->xwin)),
 	    viewlog->widget_list->gc, 0, 0, im->width, im->height, 20, 51);
   XUnlockDisplay(gGui->display);
   

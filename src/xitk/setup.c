@@ -81,11 +81,11 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
                                                                                                 \
     XSetForeground(gGui->display, setup->widget_list->gc,                                       \
 		   xitk_get_pixel_color_gray(gGui->imlib_data));                                \
-    XFillRectangle(gGui->display, image->image, setup->widget_list->gc,                         \
+    XFillRectangle(gGui->display, image->image->pixmap, setup->widget_list->gc,                 \
 		   0, 0, image->width, image->height);                                          \
     XUnlockDisplay(gGui->display);                                                              \
                                                                                                 \
-    draw_inner_frame(gGui->imlib_data, image->image, title, boldfontname,                       \
+    draw_inner_frame(gGui->imlib_data, image->image->pixmap, title, boldfontname,               \
                      0, (ascent+descent), FRAME_WIDTH, FRAME_HEIGHT);                           \
 	                                                                                        \
     XITK_WIDGET_INIT(&im, gGui->imlib_data);                                                    \
@@ -355,10 +355,10 @@ static void setup_clear_tab(void) {
   im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
 			       (WINDOW_HEIGHT - (51 + 57) + 1));
 
-  draw_outter(gGui->imlib_data, im->image, im->width, im->height);
+  draw_outter(gGui->imlib_data, im->image->pixmap, im->width, im->height);
 
   XLockDisplay(gGui->display);
-  XCopyArea(gGui->display, im->image, (xitk_window_get_window(setup->xwin)),
+  XCopyArea(gGui->display, im->image->pixmap, (xitk_window_get_window(setup->xwin)),
 	    setup->widget_list->gc, 0, 0, im->width, im->height, 20, 51);
   XUnlockDisplay(gGui->display);
 
@@ -1042,7 +1042,7 @@ static char **_setup_read_given(char *given, int *ndest) {
  __redo:
 
   sprintf(buf, "%s/%s%s", XINE_DOCDIR, given, l->ext);
-  
+
   if((fd = fopen(buf, "r")) != NULL) {
     
     while((ln = fgets(buffer, 255, fd)) != NULL) {
