@@ -25,7 +25,7 @@ msgstr "xine-playlist: Kann Hintergrund-Bild nicht finden\n"
 
 #: src/xitk/control.c:537
 msgid "Control HUE value"
-msgstr ""
+msgstr "Farbton ändern"
 
 #: src/xitk/control.c:540
 msgid "Hue"
@@ -33,7 +33,7 @@ msgstr "Ton"
 
 #: src/xitk/control.c:561
 msgid "Control SATURATION value"
-msgstr ""
+msgstr "Sättigung ändern"
 
 #: src/xitk/control.c:564
 msgid "Sat"
@@ -41,7 +41,7 @@ msgstr "Far"
 
 #: src/xitk/control.c:585
 msgid "Control BRIGHTNESS value"
-msgstr ""
+msgstr "Helligkeit ändern"
 
 #: src/xitk/control.c:588
 msgid "Brt"
@@ -49,7 +49,7 @@ msgstr "Hel"
 
 #: src/xitk/control.c:609
 msgid "Control CONTRAST value"
-msgstr ""
+msgstr "Kontrast ändern"
 
 #: src/xitk/control.c:612
 msgid "Ctr"
@@ -65,7 +65,7 @@ msgstr "Schließen"
 
 #: src/xitk/control.c:691
 msgid "Close control window"
-msgstr ""
+msgstr "Einstellungen-Fenster schließen"
 
 #: src/xitk/event.c:664
 #, c-format
@@ -337,9 +337,9 @@ msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main: Der ausgewählte Audio Treiber '%s' ist unbrauchbar\n"
 
 #: src/xitk/main.c:462
-#, fuzzy, c-format
+#, c-format
 msgid "Require xine library version 0.9.9, found %d.%d.%d.\n"
-msgstr "Benötigte xine Bibliothek Version 0.9.4, gefunden %d.%d.%d.\n"
+msgstr "Benötigte xine Bibliothek Version 0.9.9, gefunden %d.%d.%d.\n"
 
 #: src/xitk/main.c:532
 msgid "video driver id required for -V option\n"
@@ -472,14 +472,12 @@ msgid "Start playback of selected MRL"
 msgstr ""
 
 #: src/xitk/playlist.c:822
-#, fuzzy
 msgid "Delete selected MRL from playlist"
-msgstr "Spiele nächsten Eintrag in der Playliste"
+msgstr "Ausgewählten Eintrag aus der Playlist entfernen"
 
 #: src/xitk/playlist.c:829
-#, fuzzy
 msgid "Delete all entries in playlist"
-msgstr "Spiele nächsten Eintrag in der Playliste"
+msgid "Alle Einträge aus der Playlist entfernen"
 
 #: src/xitk/playlist.c:833
 msgid "Add"
@@ -487,7 +485,7 @@ msgstr "Hinzufügen"
 
 #: src/xitk/playlist.c:839
 msgid "Add one or more entries in playlist"
-msgstr ""
+msgstr "Einen oder mehrere Einträge der Playlist hinzufügen"
 
 #: src/xitk/playlist.c:844
 msgid "Load"
@@ -495,20 +493,19 @@ msgstr "Laden"
 
 #: src/xitk/playlist.c:850
 msgid "Load saved playlist"
-msgstr ""
+msgstr "Gespeicherte Playlist laden"
 
 #: src/xitk/playlist.c:854
 msgid "Save"
 msgstr "Speichern"
 
 #: src/xitk/playlist.c:860
-#, fuzzy
 msgid "Save playlist"
-msgstr "Playliste"
+msgstr "Playliste speichern"
 
 #: src/xitk/playlist.c:870
 msgid "Close playlist window"
-msgstr ""
+msgstr "Playlist-Fenster schließen"
 
 #: src/xitk/playlist.c:888
 msgid "Scan for:"
@@ -516,7 +513,7 @@ msgstr "Suche nach:"
 
 #: src/xitk/playlist.c:899
 msgid "Direct MRL entry"
-msgstr ""
+msgstr "Direkte MRL Eingabe"
 
 #: src/xitk/setup.c:954
 msgid "Help"
