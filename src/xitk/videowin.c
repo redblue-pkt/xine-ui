@@ -773,8 +773,8 @@ void video_window_frame_output_cb (void *data,
     video_window_set_size_hints(gVw->output_width, gVw->output_height);
   }
   
-  *dest_x = 0;
-  *dest_y = 0;
+  *dest_x = (gVw->xwin < 0) ? 0 : gVw->xwin;
+  *dest_y = (gVw->ywin < 0) ? 0 : gVw->ywin;
   *dest_width  = gVw->output_width;
   *dest_height = gVw->output_height;
 }
