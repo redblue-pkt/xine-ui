@@ -793,6 +793,7 @@ static void create_menu(void) {
     { "Playlist/Loop/SEP",               "<separator>",   NULL,     NULL },
     { "Playlist/Loop/shuffle",           "<check>",       NULL,     NULL },
     { "Playlist/Loop/infinite shuffle",  "<check>",       NULL,     NULL },
+    { "Playlist/Loop/Extra",             "<branch>",      NULL,     NULL },
     { "Playlist/Save",                   NULL,            NULL,     NULL },
     { "Another branch",                  "<branch>",      NULL,     NULL },
     { "Another branch/dummy",            NULL,            NULL,     NULL },
@@ -820,9 +821,19 @@ static void create_menu(void) {
   menu.parent_wlist      = test->widget_list;
   menu.skin_element_name = NULL;
   
-  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
-  			   (test->menu = 
-			    xitk_noskin_menu_create(test->widget_list, &menu, x, y)));
+  test->menu = xitk_noskin_menu_create(test->widget_list, &menu, x, y);
+
+  {
+    xitk_menu_entry_t menu_entry;
+
+    menu_entry.menu      = "Playlist/Loop/Extra/errrr?";
+    menu_entry.type      = NULL;
+    menu_entry.cb        = NULL;
+    menu_entry.user_data = NULL;
+    xitk_menu_add_entry(test->menu, &menu_entry);
+  }
+  
+
   xitk_menu_show_menu(test->menu);
 }
 

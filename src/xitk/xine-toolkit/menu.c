@@ -563,9 +563,6 @@ static void __menu_find_branch_by_name(menu_node_t *mnode, menu_node_t **fnode, 
   if((*fnode))
     return;
   
-  if(_menu_is_branch(m->menu_entry) && m->next)
-    m = m->next;
-  
   if(m->next) {
     if(!strcmp(m->menu_entry->menu, name)) {
       (*fnode) = m;
@@ -574,8 +571,9 @@ static void __menu_find_branch_by_name(menu_node_t *mnode, menu_node_t **fnode, 
     __menu_find_branch_by_name(m->next, fnode, name);
   }
   else {
-    if(!strcmp(m->menu_entry->menu, name))
+    if(!strcmp(m->menu_entry->menu, name)) {
       (*fnode) = m;
+    }
   }
   
 }

@@ -197,6 +197,16 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
     break;
   }
 }
+static void menu_audio_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  int channel = (int) data;
+
+  gui_direct_change_audio_channel(NULL, NULL, channel);
+}
+static void menu_spu_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  int channel = (int) data;
+
+  gui_direct_change_spu_channel(NULL, NULL, channel);
+}
 static void menu_aspect(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int aspect = (int) data;
   
@@ -350,8 +360,20 @@ void video_window_menu(xitk_widget_list_t *wl) {
       "<separator>",
       NULL, NULL                                                                             },
     { "Audio Mute",
-      gGui->mixer.mute ? "<checked>":"<check>",
+      gGui->mixer.mute ? "<checked>" : "<check>",
       menu_audio_ctrl, (void *) AUDIO_MUTE                                                   },
+    { "Audio Channel",
+      "<branch>",
+      NULL, NULL                                                                             },
+    /*
+      audio channels
+    */
+    { "Sub Channel",
+      "<branch>",
+      NULL, NULL                                                                             },
+    /*
+      spu channels
+    */
     { "SEP",
       "<separator>",
       NULL, NULL                                                                             },
@@ -377,13 +399,13 @@ void video_window_menu(xitk_widget_list_t *wl) {
       video_window_get_fullscreen_mode() ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_FULLSCR                                                },
     { "200%",
-      (video_window_get_mag() == 2.0) ? "<checked>":"<check>",
+      (video_window_get_mag() == 2.0) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_2X                                                     },
     { "100%",
-      (video_window_get_mag() == 1.0) ? "<checked>":"<check>",
+      (video_window_get_mag() == 1.0) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO_1X                                                     },
     { "50%",
-      (video_window_get_mag() ==  .5) ? "<checked>":"<check>",
+      (video_window_get_mag() ==  .5) ? "<checked>" : "<check>",
       menu_video_ctrl, (void *) VIDEO__5X                                                    },
     { "SEP", 
       "<separator>",
@@ -427,7 +449,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
   
   w = xitk_noskin_menu_create(wl, &menu, x, y);
 
-  {
+  { /* Autoplay plugins */
     xitk_menu_entry_t   menu_entry;
     char                buffer[2048];
     char               *location = "Playlist/Get from...";
@@ -448,6 +470,114 @@ void video_window_menu(xitk_widget_list_t *wl) {
       
       plug_id = *plug_ids++;
     }
+  }
+
+#define IS_CHANNEL_CHECKED(C, N) (C == N) ? "<checked>" : "<check>"
+#undef BIG_DIRTY_HACK
+  { /* Audio channels */
+    xitk_menu_entry_t   menu_entry;
+    int                 i;
+    char               *location = "Audio Channel";
+    char                buffer[2048];
+    int                 channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+    
+    menu_entry.menu      = "Audio Channel/Off";
+    menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
+    menu_entry.cb        = menu_audio_chan;
+    menu_entry.user_data = (void *) -2;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    menu_entry.menu      = "Audio Channel/Auto";
+    menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
+    menu_entry.cb        = menu_audio_chan;
+    menu_entry.user_data = (void *) -1;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    for(i = 0; i < 15; i++) {
+      char   langbuf[16];
+      
+      memset(&langbuf, 0, sizeof(langbuf));
+      
+#ifdef BIG_DIRTY_HACK
+      /* BIG WARNING: THIS IS A BIG DIRTY HACK (i want to remove is ASAP) */
+      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, i);
+      xine_usec_sleep(20000);
+#endif
+
+      if(!xine_get_audio_lang(gGui->stream, i, &langbuf[0])) {
+	if(i > 0)
+	  goto __audio_chan_done;
+	sprintf(langbuf, "%d", i);
+	
+      }
+      
+      sprintf(buffer, "%s/%s", location, langbuf);
+      menu_entry.menu      = buffer;
+      menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
+      menu_entry.cb        = menu_audio_chan;
+      menu_entry.user_data = (void *) i;
+      xitk_menu_add_entry(w, &menu_entry);
+    }
+
+  __audio_chan_done:
+
+#ifdef BIG_DIRTY_HACK
+    /* THE HACK CONTINUE */
+    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, channel);
+#endif    
+  }
+  { /* SPU channels */
+    xitk_menu_entry_t   menu_entry;
+    int                 i;
+    char               *location = "Sub Channel";
+    char                buffer[2048];
+    int                 channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
+    
+    menu_entry.menu      = "Sub Channel/Off";
+    menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
+    menu_entry.cb        = menu_spu_chan;
+    menu_entry.user_data = (void *) -2;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    menu_entry.menu      = "Sub Channel/Auto";
+    menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
+    menu_entry.cb        = menu_spu_chan;
+    menu_entry.user_data = (void *) -1;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    for(i = 0; i < 15; i++) {
+      char   langbuf[16];
+      
+      memset(&langbuf, 0, sizeof(langbuf));
+      
+#ifdef BIG_DIRTY_HACK
+      /* BIG WARNING: THIS IS A BIG DIRTY HACK (i want to remove is ASAP) */
+      xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, i);
+      xine_usec_sleep(20000);
+#endif
+
+      if(!xine_get_spu_lang(gGui->stream, i, &langbuf[0])) {
+	printf("FAILED\n");
+	if(i > 0)
+	  goto __spu_chan_done;
+	sprintf(langbuf, "%d", i);
+	
+      }
+      
+      sprintf(buffer, "%s/%s", location, langbuf);
+      menu_entry.menu      = buffer;
+      menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
+      menu_entry.cb        = menu_spu_chan;
+      menu_entry.user_data = (void *) i;
+      xitk_menu_add_entry(w, &menu_entry);
+    }
+
+  __spu_chan_done:
+
+#ifdef BIG_DIRTY_HACK
+    /* THE HACK CONTINUE */
+    xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, channel);
+#endif    
   }
 
   xitk_menu_show_menu(w);
