@@ -89,21 +89,21 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
       
   has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
   
-  if( (has_video || gGui->visual_anim.enabled) && gGui->using_vis ) {
+  if((has_video || gGui->visual_anim.enabled == 1) && gGui->visual_anim.running) {
     xine_post_out_t * audio_source;
     
     audio_source = xine_get_audio_source(stream);
-    if( xine_post_wire_audio_port( audio_source, gGui->ao_port ) )
-      gGui->using_vis = 0;
-  
-  } else if ( !has_video && !gGui->visual_anim.enabled && 
-              !gGui->using_vis && gGui->vis ) {
+    if(xine_post_wire_audio_port(audio_source, gGui->ao_port))
+      gGui->visual_anim.running = 0;
+    
+  } else if (!has_video && (gGui->visual_anim.enabled == 1) && 
+	     (gGui->visual_anim.running == 0) && gGui->visual_anim.post_output) {
     xine_post_out_t * audio_source;
-    
+
     audio_source = xine_get_audio_source(stream);
-    if( xine_post_wire_audio_port( audio_source, gGui->vis->audio_input[0] ) )
-      gGui->using_vis = 1;
-    
+    if(xine_post_wire_audio_port(audio_source, gGui->visual_anim.post_output->audio_input[0]))
+      gGui->visual_anim.running = 1;
+
   }
   
   if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0) {
@@ -137,7 +137,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
 
       if(has_video) {
 	
-	if(gGui->visual_anim.running)
+	if((gGui->visual_anim.enabled == 2) && gGui->visual_anim.running)
 	  visual_anim_stop();
 	
 	if(gGui->auto_vo_visibility) {
@@ -327,6 +327,9 @@ void gui_exit (xitk_widget_t *w, void *data) {
    * won't use it anymore (otherwise -> segfault on exit).
    */
   gGui->running = 0;
+
+  if(gGui->visual_anim.post_output)
+    xine_post_dispose(gGui->xine, gGui->visual_anim.post_output);
 
   xine_dispose(gGui->stream);
   /* xine_dispose(gGui->visual_anim.stream); */
@@ -1320,7 +1323,7 @@ static int visual_anim_open_and_play(xine_stream_t *stream, const char *mrl) {
   return 1;
 }
 void visual_anim_play(void) {
-  if(gGui->visual_anim.enabled) {
+  if(gGui->visual_anim.enabled == 2) {
     if(!visual_anim_open_and_play(gGui->visual_anim.stream, 
 				  gGui->visual_anim.mrls[gGui->visual_anim.current]))
       gui_handle_xine_error(gGui->visual_anim.stream);
@@ -1328,7 +1331,7 @@ void visual_anim_play(void) {
   }
 }
 void visual_anim_play_next(void) {
-  if(gGui->visual_anim.enabled) {
+  if(gGui->visual_anim.enabled == 2) {
     gGui->visual_anim.current++;
     if(gGui->visual_anim.mrls[gGui->visual_anim.current] == NULL)
       gGui->visual_anim.current = 0;
@@ -1336,7 +1339,7 @@ void visual_anim_play_next(void) {
   }
 }
 void visual_anim_stop(void) {
-  if(gGui->visual_anim.enabled) {
+  if(gGui->visual_anim.enabled == 2) {
     xine_stop(gGui->visual_anim.stream);
     gGui->visual_anim.running = 0;
   }

@@ -86,6 +86,7 @@ typedef struct {
 
 static char **video_driver_ids;
 static char **audio_driver_ids;
+static char **post_output_plugins;
     
 
 #define	OPTION_VISUAL		1000
@@ -245,6 +246,19 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->logo_mrl = cfg->str_value;
 }
+
+static void post_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->visual_anim.post_plugin_num = cfg->num_value;
+
+  if(gGui->visual_anim.post_output)
+    xine_post_dispose(gGui->xine, gGui->visual_anim.post_output);
+  
+  gGui->visual_anim.post_output = 
+    xine_post_init(gGui->xine,
+		   post_output_plugins[gGui->visual_anim.post_plugin_num], 0,
+		   &gGui->ao_port, &gGui->vo_port);
+}
+
 /*
  *
  */
@@ -627,11 +641,11 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
   /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
-/*    printf("xitk/main.c: playback finished\n"
- *	   "             event->stream=%d,\n"
- *	   "gGui->stream=%d, gGui->visual_anim.stream=%d\n",
- *	   event->stream, gGui->stream, gGui->visual_anim.stream);
- */
+    /*    printf("xitk/main.c: playback finished\n"
+     *	   "             event->stream=%d,\n"
+     *	   "gGui->stream=%d, gGui->visual_anim.stream=%d\n",
+     *	   event->stream, gGui->stream, gGui->visual_anim.stream);
+     */
     if(event->stream == gGui->stream) {
       /* printf("xitk/main.c: playing next stream...\n"); */
       gui_playlist_start_next();
@@ -654,15 +668,15 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
       if(strcmp(gGui->mmk.ident, uevent->str)) {
-
+	
 	if(gGui->mmk.ident)
 	  free(gGui->mmk.ident);
 	if(gGui->playlist.mmk != NULL && 
 	   gGui->playlist.mmk[gGui->playlist.cur] != NULL ) {
-
+	  
 	  if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
 	    free(gGui->playlist.mmk[gGui->playlist.cur]->ident);
-	
+	  
 	  gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
 	}
 	gGui->mmk.ident = strdup(uevent->str);
@@ -1143,14 +1157,71 @@ int main(int argc, char *argv[]) {
   SAFE_FREE(audio_driver_id);
   
 
-  gGui->vis = xine_post_init(gGui->xine, "goom", 0, &gGui->ao_port, &gGui->vo_port);
-  if (gGui->vis) {
+  {
+    const char *const *pol = xine_list_post_plugins(gGui->xine);
     
-    /*gGui->ao_port = gGui->post1->audio_input[0];*/
-    
-    printf("xine: post plugin successfully initialized\n");
+    if(pol) {
+      int  i = 0;
+      int  num_plug = 0;
+      
+      /* We're only insterrested by post plugin which handle audio in input */
+      while(pol[i]) {
+	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
+	
+	if(post) {
+	  const char *const *pinputs = xine_post_list_inputs(post);
+	  
+	  if(pinputs) {
+	    int p = 0;
+	    
+	    while(pinputs[p]) {
+	      const xine_post_in_t *pin = xine_post_input(post, (char *)pinputs[p]);
+	      
+	      if(pin) {
+		if(pin->type == XINE_POST_DATA_AUDIO) {
+		  
+		  if(num_plug == 0)
+		    post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+		  else
+		    post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * (num_plug + 1));
+		  
+		  post_output_plugins[num_plug]     = strdup(pol[i]);
+		  post_output_plugins[num_plug + 1] = NULL;
+		  num_plug++;
+		  
+		}
+	      }
+	      
+	      p++;
+	    }
+	  }
+	}
+	
+	i++;
+      }
+      
+      gGui->visual_anim.post_plugin_num = 
+	xine_config_register_enum(gGui->xine, "gui.post_output_plugin", 
+				  0, post_output_plugins,
+				  _("Post output plugin"),
+				  _("Post output plugin to used with video less stream playback"),
+				  CONFIG_LEVEL_BEG,
+				  post_plugin_cb, 
+				  CONFIG_NO_DATA);
+      
+      gGui->visual_anim.post_output = 
+	xine_post_init(gGui->xine,
+		       post_output_plugins[gGui->visual_anim.post_plugin_num], 0,
+		       &gGui->ao_port, &gGui->vo_port);
+      
+    }
+    else {
+      gGui->visual_anim.post_output = NULL;
+      gGui->visual_anim.post_plugin_num = -1;
+    }
+
   }
-  gGui->using_vis = 0;
+
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
 

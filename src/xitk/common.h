@@ -132,10 +132,6 @@ typedef struct {
 
   xine_stream_t            *stream;
 
-  xine_post_t              *vis;
-  
-  int                       using_vis;
-  
   xine_t                   *xine;
 
   xine_event_queue_t       *event_queue;
@@ -148,10 +144,14 @@ typedef struct {
     xine_event_queue_t     *event_queue;
     int                     running;
     int                     current;
-    int                     enabled;
-
+    int                     enabled; /* 0, 1:vpost, 2:vanim */
+    
     char                  **mrls;
     int                     num_mrls;
+    
+    int                     post_plugin_num;
+    xine_post_t            *post_output;
+    
   } visual_anim;
   
   struct {

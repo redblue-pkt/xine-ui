@@ -78,7 +78,7 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
-static char *exp_levels[6] = {
+static char *exp_levels[] = {
   "Beginner",
   "Advanced",
   "Expert",
@@ -88,6 +88,13 @@ static char *exp_levels[6] = {
 #else  
   NULL,
 #endif
+  NULL
+};
+
+static char *visual_anim_style[] = {
+  "None",
+  "Post plugin",
+  "Stream Animation",
   NULL
 };
 
@@ -106,10 +113,11 @@ static void ssaver_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
 }
 
 static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
+  
+  if(((gGui->visual_anim.enabled == 2) && (cfg->num_value != 2)) && gGui->visual_anim.running)
+     visual_anim_stop();
+     
   gGui->visual_anim.enabled = cfg->num_value;
-
-  if((!gGui->visual_anim.enabled) && gGui->visual_anim.running)
-    visual_anim_stop();
 }
 
 static void stream_info_auto_update_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -1008,9 +1016,10 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->visual_anim.enabled = 
-    xine_config_register_bool(gGui->xine, "gui.visual_anim", 
-			      1,
-			      _("Visual animation"),
+    xine_config_register_enum(gGui->xine, "gui.visual_anim", 
+			      0,
+			      visual_anim_style,
+			      _("Visual animation style"),
 			      _("Display some video animations when "
 				"current stream is audio only (eg: mp3)."), 
 			      CONFIG_LEVEL_BEG,
