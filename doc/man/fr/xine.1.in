@@ -22,6 +22,9 @@ dans le répertoire \fI@XINE_DOCDIR@\fP ou sur la page du projet.
 Affiche la liste des options ainsi que la liste des pilotes 
 (plugins) disponibles.
 .TP
+.B \-\-verbose [=level]
+defini le niveau de verbiage.
+.TP
 .B \-a, \-\-audio\-channel <num>
 Sélectionne le canal audio spécifié. \fBnum\fP est le numéro du canal, la valeur
 par defaut est \fB0\fP.
@@ -233,6 +236,10 @@ Les options sont::
 .br
 \fBspu=\fP\fIc\fP     sélectionne le canal de sous-titre (\<\fIc\fP\>: \fBnext\fP ou \fBprev\fP),
 .br
+\fBvolume=\fP\fIv\fP  règle le volume audio (\<\fIv\fP\>: 0 à 100),
+.br
+\fBamp=\fP\fIv\fP     règle le niveau d'amplification de l'instance (\<\fIv\fP\>: 0 à 200),
+.br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
   \<\fIp\fP\> peut être:
@@ -244,6 +251,13 @@ Les options sont::
 .br
 Il y a aussi d'autres options qui s'expliquent d'elles même.
     \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
+.TP
+.B \-D, \-\-deinterlace
+Désentrelacement de la vidèo.
+.TP
+.B \-r, \-\-aspect\-ratio <mode>
+Défini le ratio d'aspect le la sortie vidéo. Les modes sont:
+\fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
 .TP
 .B MRL (media resource locator)
 .br
@@ -410,6 +424,15 @@ Reduit le volume audio.
 .br
 .BR V :
 Augmente le volume audio.
+.br
+.BR C-v :
+Reduit le niveau d'amplification de l'instance.
+.br
+.BR C-V :
+Augmente le niveau d'amplification de l'instance.
+.br
+.BR C-A :
+Remise à zéro du niveau d'amplification.
 .br
 .BR t :
 Prends une photo.

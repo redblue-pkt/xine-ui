@@ -38,6 +38,9 @@ or on the xine home page.
 .B \-h, \-\-help
 Show summary of options and available output drivers (plugins).
 .TP
+.BI \-\-verbose [=level]
+Set verbose level.
+.TP
 .BI \-a,\ \-\-audio\-channel\  <num>
 Select the given audio channel. \fI<num>\fP is the audio channel number, default
 is \fB0\fP.
@@ -237,6 +240,10 @@ Options are:
 .br
 \fBspu=\fP\fIc\fP     select spu channel (\<\fIc\fP\>: \fBnext\fP or \fBprev\fP),
 .br
+\fBvolume=\fP\fIv\fP  set audio volume (\<\fIv\fP\>: 0 to 100),
+.br
+\fBamp=\fP\fIv\fP     set audio amplification of instance (\<\fIv\fP\>: 0 to 200),
+.br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
   \<\fIp\fP\> can be:
@@ -248,6 +255,13 @@ Options are:
 .br
 There are also some self explanatory options.
     \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
+.TP
+.B \-D, \-\-deinterlace
+Deinterlace video output.
+.TP
+.B \-r, \-\-aspect\-ratio <mode>
+Set aspect ratio of video output. Modes are:
+\fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
 .TP
 .B MRL (media resource locator)
 .br
@@ -383,6 +397,12 @@ Reset zoom.
 Decrease audio volume.
 .IP "\fBV\fP"
 Increase audio volume.
+.IP "\fBC\fP\-v\fB\fP"
+Reduce amplication level of instance.
+.IP "\fBC\fP\-\fBV\fP"
+Increase amplication level of instance.
+.IP "\fBC\fP\-\fBA\fP"
+Reset amplication level.
 .IP "\fBt\fP"
 Take a snapshot.
 .IP "\fB<return>\fP"

@@ -1,3 +1,17 @@
+xine-ui (0.9.20) unstable; urgency=low
+
+  * add menu events in main menu,
+  * fix segfault with wrong DISPLAY envvar,
+  * fb: fix xine's driver initialization,
+  * try to handle versionless asx playlists,
+  * fix lirc exiting freeze bug,
+  * add --verbose[=level] option arg,
+  * various memleaks/bug fixes,
+  * update file browser filters,
+  * fix quit while playing crash bug, faster quit,
+  * support XINE_PARAM_AUDIO_AMP_LEVEL (shortcut/session),
+  * hpux compilation fix.
+
 xine-ui (0.9.19) unstable; urgency=low
 
   * deinterlace and aspect ratio from command line 
