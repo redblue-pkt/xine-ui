@@ -16,7 +16,7 @@ noinst_HEADERS = _xitk.h browser.h button.h checkbox.c checkbox.h combo.h dnd.h 
 		list.h mrlbrowser.h skin.h slider.h window.h widget.h widget_types.h xitk.h
 
 test_SOURCES = test.c
-test_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
+test_LDADD = libxitk.la
 
 $(top_builddir)/src/Imlib-light/libImlib-light.la:
 	@cd $(top_builddir)/src/Imlib-light && $(MAKE) libImlib-light.la
