@@ -7,19 +7,12 @@ endif
 bin_PROGRAMS = ${aa_programs} 
 
 aaxine_SOURCES = main.c
-
-
-aaxine_LDADD = @XINE_LIBS@  -lm $(THREAD_LIBS) \
-		$(DYNAMIC_LD_LIBS) 
-
+aaxine_LDADD = @XINE_LIBS@  -laa -lm $(THREAD_LIBS) $(DYNAMIC_LD_LIBS) 
 
 debug:
 	$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
 
 install-debug: debug
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  (cd $$subdir && $(MAKE) $@) \
-	done;
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
 mostlyclean-generic:
