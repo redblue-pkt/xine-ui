@@ -4,12 +4,57 @@
    ----------------------
 
 
+scope of this FAQ
+-----------------
+
+this FAQ covers xine version 0.5 and newer, it covers both xine-lib 
+(the xine engine and default plugins) and xine-ui (xlib and console
+user interface implementations).
+
+
 how do I build this beast?
 --------------------------
 
 first make sure you use a stable, official release of gcc to compile.
 You can try patched gcc versions, but these are not supported and will 
 probably not work (pgcc for example is known to make libmpeg break).
+
+You'll have to use gnu make to compile xine, on most GNU/Linux systems
+make is gnu make, on other platforms use "gmake" instead.
+
+If you want to have Xv support compiled in, make sure you have a shared 
+Xv library on your system, e.g. ls /usr/X11R6/lib/libXv* should give you
+some .so libs, like this:
+
+/usr/X11R6/lib/libXv.a  /usr/X11R6/lib/libXv.so  /usr/X11R6/lib/libXv.so.1
+
+if you only got libXv.a you can create the shared versions yourself:
+
+# ld --whole-archive -shared -o libXv.so.1 libXv.a
+# ln -s libXv.so.1 libXv.so
+# ldconfig
+
+now you should be ready to build xine on your system:
+
+xine comes in two (official) parts now, xine-lib and xine-ui.
+
+First you have to build and install xine-lib:
+
+./cvscompile.sh  <--- only neccessary if you checked xine out of CVS
+./configure
+make
+make install
+
+if you have installed xine-lib to a non-standard prefix, make
+sure you have <prefix>/bin in your PATH and your linker will
+find libs in <prefix>/libs, in bash you can use something like
+
+export PATH="<prefix>/bin:$PATH"
+export LD_LIBRARY_PATH="<prefix>/lib:$LD_LIBRARY_PATH"
+
+to make sure this works.
+
+Now you can build and install xine-ui, same procedure as for xine-lib:
 
 ./cvscompile.sh  <--- only neccessary if you checked xine out of CVS
 ./configure
@@ -29,7 +74,7 @@ paths to the compiler. Example:
 export GLOBAL_CFLAGS="-I/usr/include -L/home/guenter/xine_libs"
 
 
-Are there binaries for my K7 available? Can I build them?
+are there binaries for my K7 available? Can I build them?
 ---------------------------------------------------------
 
 At the moment we do not provide K7 binaries, since the latest
@@ -45,10 +90,15 @@ your configuration, e.g.
 
 export XINE_BUILD=k7-pc-linux-gnu
 rm -f config.cache
-./autogen.sh
+./cvscompile.sh
 make
 make install
 
+
+how can I make xine use the Xv extension?
+-----------------------------------------
+
+xine -V Xv foo.mpg
 
 xine fails with "no video port found"
 -------------------------------------
@@ -59,26 +109,29 @@ your hardware (check your graphics card vendor). If your driver
 has Xv support but you can't get it working, try at a lower
 resultion (1024x768 is still enough even for anamorphic mpeg-2).
 
-If all that fails, supply the "-s" option so xine will be forced
-to use Xshm output (remember to switch to 16bpp for speed)
+If all that fails, you can still use plain X11/XShm
 
-xine -s foo.vob
+xine -V XShm foo.vob
 
 
 xine fails complaining about audio drivers/devices
 --------------------------------------------------
 
-You can select the audio driver using the -A option. So try
+you can select the audio driver using the -A option. So try
 
 xine -A null
 
-If you have ALSA drivers installed, try
+if you have ALSA drivers installed, try
 
 xine -A alsa
 
-If you run ESD, try
+if you run ESD, try
 
 xine -A esd
+
+if you run artsd, try
+
+xine -A arts
 
 
 xine displays it's logo but I don't see my video?
@@ -99,29 +152,18 @@ find better drivers then.
 Perhaps your hardware is simply to slow - see "xine drops a
 lot of frames" below for speed tips.
 
-If you're using Xv and the video output stays blank, try
-moving the window around or toggling fullscreen ("F" key).
-There is a bug in overlay setup [FIXME].
 
-
-Where should I put the windows codec dlls for xine?
+where should I put the windows codec dlls for xine?
 ---------------------------------------------------
 
-store them in
+xine uses 
 
-@w32_path@
+/usr/lib/win32
 
+by default to search for dlls, but you can change this in your
+.xinerc by editing
 
-xine crashes when I try to play AVI files
------------------------------------------
-
-win32codec support is still experimental. It should work ok if 
-your system meets these requirements:
-
-- Xv driver is working
-- the AVI file contains mpeg audio
-- you've got the right codecs installed correctly in
-  @w32_path@
+win32_path:/usr/lib/win32
 
 
 I get this message: demux error! 00 00 00 (should be 0x000001)
@@ -137,24 +179,6 @@ Another reason could be that your (RPC-2) DVD drive isn't set up
 for the right region.
 
 
-I get messages such as "Ouch! lastPTS : 100657583 current pts : 100652798"
---------------------------------------------------------------------------
-
-Looks like your sond card / driver fails to provide exact timing 
-information. Try to find better drivers (oss <-> alsa). 
-
-If you're using alsa, make sure xine is using the native alsa API and
-_not_ the oss emulation. Use
-
-xine -A alsa
-
-I get lots of "200 frames delivered, 200 frames skipped, 0 frames discarded"
-----------------------------------------------------------------------------
-
-looks like you've selected the wrong audio channel or you're trying to
-play a stream that uses features xine doesn't support (yet).
-
-
 when I play this stream, xine shows some pictures but there's no audio
 ----------------------------------------------------------------------
 
@@ -165,18 +189,12 @@ xine -a channel stream.vob
 some .vob files have audio on strange channels (e.g. 3, 7, 10)
 
 
-can xine play SVCDs ?
+can xine play (S)VCDs ?
 ---------------------
 
-Yes, but you'll have to experiment with the audio channels
+Yes, use a MRL like
 
-xine -a channel VCD://<track number>
-
-Normally, you should find an audio track #8 and, for bilingual SVCDs #9, so
-
-xine -a 8 
-
-shoud allow you to press the "vcd" button and play your SVCDs
+xine VCD://<track number>
 
 
 xine drops a lot of frames
@@ -255,7 +273,7 @@ speed optimizing options. A few point you should check:
   ln -s /dev/raw1 /dev/rdvd
 
 
-Now how do I get this Xv extension to work?
+now how do I get this Xv extension to work?
 -------------------------------------------
 
 First you need to install/use XFree 4.x. Once you got that you have to
@@ -267,23 +285,34 @@ nvidia cards : www.nvidia.com (the've got binary drivers)
 ATI cards    : GATOS www.linuxvideo.org/gatos/
 i815         : the latest xfree 4.x code supports these
 3dfx (voodoo): the latest xfree 4.x code supports these
+savage       : http://www.probo.com/timr/savage40.html
 
 
-The AC3 via S/PDIF does not work with my soundcard
----------------------------------------------------
+can xine produce 4-/5-channel surround audio output?
+----------------------------------------------------
 
-The AC3 via S/PDIF is supported by ALSA only for soundcards
-with Trident 4DWaveNX and YMF chips. So if you have a
-soundcard with one of these chips use
+yep, xine can do that using OSS or ALSA drivers, provided that
+the driver supports it. On startup xine tells you what modes are
+supported by your audio driver, e.g:
 
-xine -S -A alsa 
+audio_oss_out : supported modes are mono stereo (4-channel not enabled in .xiner
+c) (ac3-pass-through not enabled in .xinerc)
 
-The -S switch disables the internal AC3 decoder. For very 
-slow machines you could improve video playback (without
-sound) when you start xine as
+on this machine 4-channel surround would be possible. However,
+since xine cannot detect if there are actually speakers connected
+to the additional channels, you'll have to manually enable this mode
+in your ~/.xinerc:
 
-xine -S -A null
+four_channel:1
 
+
+what about ac3 output via spdif to an external ac3 decoder?
+-----------------------------------------------------------
+
+xine can do that too. Pretty much the same story as for 4-/5-channel
+surround here, you'll have to enable it in your ~/.xinerc:
+
+ac3_pass_through:1
 
 
 where and how do I get the latest development version?
@@ -295,11 +324,12 @@ cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine login
 
 <empty password>
 
+cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-lib
 cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-ui
 
 
 
-How do I use the dvd plugin?
+how do I use the dvd plugin?
 ----------------------------
 
 First of all:
@@ -346,14 +376,14 @@ ln -s hdc dvd
 should do the job.
 
 
-The aspect ratio is wrong!
+the aspect ratio is wrong!
 --------------------------
 
-Try pressing "A" (preferable when xine is stopped, otherwise
-you may experience a segfault).
+Try pressing "A" to toggle the aspect ratio
 
 
-How do I play streams from STDIN ?
+
+how do I play streams from STDIN ?
 ----------------------------------
 
 use something like
@@ -365,7 +395,7 @@ or, if you've got an mpeg-2 stream use
 cat stream.vob | xine stdin://mpeg2
 
 
-How do I change the skin?
+how do I change the skin?
 -------------------------
 
 Run xine at least once - it should write it's config file
@@ -373,7 +403,7 @@ Run xine at least once - it should write it's config file
 the line "skin:default" to mach the skin you would like to use.
 
 
-How can I change color/brightness/contrast?
+how can I change color/brightness/contrast?
 -------------------------------------------
 
 At the moment this is only supported on some Xv drivers. You'll find
@@ -387,7 +417,7 @@ the values and possible ranges depend on your Xv driver so you'll have
 to experiment a bit to get a good picture.
 
 
-Some parts of my X Desktop get transparent when xine plays the video!
+some parts of my X Desktop get transparent when xine plays the video!
 ---------------------------------------------------------------------
 
 Looks like some colors on your GUI match the colorkey Xv uses. You can
@@ -399,7 +429,7 @@ to your ~/.xinerc where you can change the color that's used by xine
 for the video overlay.
 
 
-I get no sound, but "audio driver 'oss' failed, using null driver instead."
+i get no sound, but "audio driver 'oss' failed, using null driver instead."
 ---------------------------------------------------------------------------
 
 First of all, make sure that your OSS Audio drivers are working (ie you can
@@ -421,25 +451,16 @@ This may result in more jerkier playback, so the first method is the
 preferred one.
 
 
-after running xine several times it fail's to allocated shared memory!
-----------------------------------------------------------------------
+i have problems when using xine on FreeBSD, Solaris
+---------------------------------------------------
 
-This should be fixed in xine 0.3.3 or later. However, this can only work if
-you exit xine the "correct" way (e.g. using the panel or pressing "q").
-Do _not_ simply close the video output window using your window manager - 
-xine won't release shared memory in this case (!).
+check out the the corresponding README files in the doc directory
 
 
-i have problems when using xine on FreeBSD
-------------------------------------------
-
-check if you find what you are looking for in the file README.freebsd
-
-
-I think I found a bug!
+i think I found a bug!
 ----------------------
 
-xine is in it's early developement stages. Please be patient.
+xine is still under heavy developement. Please be patient.
 If you got time, please contact us and send us a full bug report.
 Please include all xine console output and some details about
 your hardware and operating system.
@@ -447,4 +468,3 @@ your hardware and operating system.
 You can reach us via email:
 
   Xine Mailing List <xine-user@lists.sourceforge.net>
-

@@ -41,20 +41,22 @@
 /*
  *
  */
-static void paint_label (widget_t *l,  Window win, GC gc) {
+static void paint_label(widget_t *l,  Window win, GC gc) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;
-  gui_image_t *font = (gui_image_t *) private_data->font;
-  int x_dest, y_dest, nCWidth, nCHeight, len, i;
-  char *label_to_display;
+  gui_image_t          *font = (gui_image_t *) private_data->font;
+  int                   x_dest, y_dest, nCWidth, nCHeight, len, i;
+  char                 *label_to_display;
 
   if ((l->widget_type & WIDGET_TYPE_LABEL) && l->visible) {
 
     pthread_mutex_lock(&private_data->mutex);
     if (private_data->anim_running) {
-      label_to_display = &private_data->animated_label[private_data->anim_offset];
+      label_to_display = 
+	&private_data->animated_label[private_data->anim_offset];
       len = private_data->length;
-    } else {
+    } 
+    else {
       label_to_display = private_data->label;
       len = strlen(label_to_display);
     }
@@ -111,7 +113,8 @@ void *label_animation_loop(void *data) {
       if (private_data->anim_offset>(strlen(private_data->label) + 4))
 	private_data->anim_offset = 0;
       
-      paint_label(private_data->lWidget, private_data->window, private_data->gc);
+      paint_label(private_data->lWidget,
+		  private_data->window, private_data->gc);
       
       /* We can't wait here, otherwise the rolling effect is really jerky */
       XLOCK (private_data->display);
@@ -137,7 +140,10 @@ void *label_animation_loop(void *data) {
   pthread_exit(NULL);
 }
 
-static void label_setup_label (widget_t *l, char *label_) {
+/*
+ *
+ */
+static void label_setup_label(widget_t *l, char *label_) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;
 
@@ -156,25 +162,32 @@ static void label_setup_label (widget_t *l, char *label_) {
   }
 
   label_len = strlen(label_);
-  private_data->label = malloc (label_len +1);
+
+  private_data->label = strdup((label_ != NULL) ? label_ : "");
+
+  /*
+  private_data->label = (char *) gui_xmalloc(label_len + 1);
   strncpy (private_data->label, label_, label_len);
   private_data->label[label_len] = 0;
+  */
 
   if (private_data->animation) {
 
     if (private_data->anim_running) {
       void *dummy;
+
       private_data->anim_running = 0;
       pthread_join (private_data->thread, &dummy);
     }
 
     if (label_len > private_data->length) {
-      pthread_attr_t         pth_attrs;
-      struct sched_param     pth_params;
+      pthread_attr_t       pth_attrs;
+      struct sched_param   pth_params;
 
       private_data->anim_running = 1;
 
-      private_data->animated_label = (char *) malloc(2 * strlen(label_) + 12);
+      private_data->animated_label = (char *) 
+	gui_xmalloc(2 * label_len + 11);
 
       sprintf(private_data->animated_label, "%s *** %s *** ", label_, label_) ;
       
@@ -200,11 +213,11 @@ static void label_setup_label (widget_t *l, char *label_) {
 /*
  *
  */
-int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
+int label_change_label (widget_list_t *wl, widget_t *l, char *newlabel) {
 
   if(l->widget_type & WIDGET_TYPE_LABEL) {
 
-    label_setup_label (l, newlabel);
+    label_setup_label(l, newlabel);
     
     paint_label(l, wl->win, wl->gc);
 
@@ -222,10 +235,10 @@ int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
 /*
  *
  */
-widget_t *label_create (xitk_label_t *l) {
+widget_t *label_create(xitk_label_t *l) {
   widget_t              *mywidget;
   label_private_data_t  *private_data;
-
+  
   mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
   
   private_data = (label_private_data_t *) 
@@ -261,9 +274,9 @@ widget_t *label_create (xitk_label_t *l) {
   mywidget->notify_focus       = NULL;
   mywidget->notify_keyevent    = NULL;
   
-  pthread_mutex_init (&private_data->mutex, NULL);
+  pthread_mutex_init(&private_data->mutex, NULL);
 
-  label_setup_label (mywidget, l->label);
+  label_setup_label(mywidget, l->label);
 
   return mywidget;
 }

@@ -153,7 +153,7 @@ typedef struct {
   int                     x;
   int                     y;
   int                     length;
-  const char             *label;
+  char                   *label;
   const char             *font;
   int                     animation;
 } xitk_label_t;

@@ -525,7 +525,7 @@ typedef struct {
   int                     x;
   int                     y;
   int                     length;
-  const char             *label;
+  char                   *label;
   const char             *font;
   int                     animation;
 } xitk_label_t;
@@ -536,9 +536,9 @@ typedef struct {
 widget_t *label_create(xitk_label_t *l);
 
 /**
- * Change label of wodget 'widget'.
+ * Change label of widget 'widget'.
  */
-int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel);
+int label_change_label(widget_list_t *wl, widget_t *l, char *newlabel);
 
 
 /*

@@ -155,7 +155,6 @@ static int notify_click_slider (widget_list_t *wl,
 				widget_t *sl, int bUp, int x, int y) {
   slider_private_data_t *private_data = 
     (slider_private_data_t *) sl->private_data;
-  int original_pos = private_data->pos;
   int retpos;
 
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {

@@ -109,7 +109,7 @@ Hay una bug (falla) en la configuración del revestimiento [Repárame].
 
 guárdelos en:
 
-@w32_path@
+/usr/lib/win32
 
 Xine se cuelga cuando intento reproducir archivos AVI
 -----------------------------------------------------

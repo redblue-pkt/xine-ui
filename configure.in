@@ -455,8 +455,6 @@ src/xitk/skins/lcd/Makefile
 src/xitk/skins/pitt/Makefile
 src/aaui/Makefile
 doc/Makefile
-doc/FAQ
-doc/FAQ_es
 doc/man/Makefile
 doc/man/en/Makefile
 doc/man/en/xine.1

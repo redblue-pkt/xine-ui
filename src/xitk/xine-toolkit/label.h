@@ -66,7 +66,7 @@ widget_t *label_create (xitk_label_t *l);
 /**
  * Change label of wodget 'widget'.
  */
-int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel);
+int label_change_label (widget_list_t *wl, widget_t *l, char *newlabel);
 
 #endif
 
