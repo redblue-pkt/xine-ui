@@ -744,6 +744,8 @@ void xitk_stop(void);
  */
 char *xitk_get_system_font(void);
 char *xitk_get_default_font(void);
+int xitk_get_xmb_enability(void);
+void xitk_set_xmb_enability(int value);
 int xitk_get_black_color(void);
 int xitk_get_white_color(void);
 int xitk_get_background_color(void);

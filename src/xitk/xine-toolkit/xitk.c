@@ -1754,6 +1754,12 @@ char *xitk_get_system_font(void) {
 char *xitk_get_default_font(void) {
   return xitk_config_get_default_font(gXitk->config);
 }
+int xitk_get_xmb_enability(void) {
+  return xitk_config_get_xmb_enability(gXitk->config);
+}
+void xitk_set_xmb_enability(int value) {
+  xitk_config_set_xmb_enability(gXitk->config, value);
+}
 int xitk_get_black_color(void) {
   return xitk_config_get_black_color(gXitk->config);
 }

@@ -117,6 +117,9 @@ static void xitk_config_fonts(xitk_config_t *xtcf) {
       xtcf->fonts.system = (char *) realloc(xtcf->fonts.system, (strlen(c) + 1));
       sprintf(xtcf->fonts.system, "%s", c);
     }
+    else if(!strncasecmp(p, "xmb", 3)) {
+      xtcf->fonts.xmb = ((strtol(c, &c, 10)) >= 1) ? 1 : 0;
+    }
 
   }
 }
@@ -276,6 +279,11 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
 
   xtcf->fonts.system           = strdup("fixed");
   xtcf->fonts.fallback         = NULL;
+#ifdef WITH_XMB
+  xtcf->fonts.xmb              = 1;
+#else
+  xtcf->fonts.xmb              = 0;
+#endif
   xtcf->colors.black           = -1;
   xtcf->colors.white           = -1;
   xtcf->colors.background      = -1;
@@ -323,6 +331,18 @@ char *xitk_config_get_default_font(xitk_config_t *xtcf) {
     return NULL;
   
   return xtcf->fonts.fallback;
+}
+int xitk_config_get_xmb_enability(xitk_config_t *xtcf) {
+
+  if(!xtcf)
+    return -1;
+
+  return xtcf->fonts.xmb;
+}
+void xitk_config_set_xmb_enability(xitk_config_t *xtcf, int value) {
+
+  if(xtcf)
+    xtcf->fonts.xmb = (value >= 1) ? 1 : 0;
 }
 int xitk_config_get_black_color(xitk_config_t *xtcf) {
 

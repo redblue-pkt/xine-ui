@@ -1,4 +1,4 @@
-/*
+/* 
  * Copyright (C) 2000-2003 the xine project
  * 
  * This file is part of xine, a unix video player.
@@ -122,18 +122,22 @@ static int xitk_font_load_one(Display *display, char *font, xitk_font_t *xtfs) {
   char  *right_name;
   int    count;
 
-  right_name = xitk_font_right_name(font);
-  XLOCK(display);
-  xtfs->fontset = XCreateFontSet(display, right_name, &missing, &count, &def);
-  ok = !xitk_font_guess_error(xtfs->fontset, right_name, missing, count);
-  XUNLOCK(display);
-  free(right_name);
-#else
-  XLOCK(display);
-  xtfs->font = XLoadQueryFont(display, font);
-  XUNLOCK(display);
-  ok = (xtfs->font != NULL);
+  if(xitk_get_xmb_enability()) {
+    right_name = xitk_font_right_name(font);
+    XLOCK(display);
+    xtfs->fontset = XCreateFontSet(display, right_name, &missing, &count, &def);
+    ok = !xitk_font_guess_error(xtfs->fontset, right_name, missing, count);
+    XUNLOCK(display);
+    free(right_name);
+  }
+  else
 #endif
+  {
+    XLOCK(display);
+    xtfs->font = XLoadQueryFont(display, font);
+    XUNLOCK(display);
+    ok = (xtfs->font != NULL);
+  }
 
   if(ok)
     xtfs->display = display;
@@ -146,11 +150,14 @@ static int xitk_font_load_one(Display *display, char *font, xitk_font_t *xtfs) {
  */
 static void xitk_font_unload_one(xitk_font_t *xtfs) {
   XLOCK(xtfs->display);
+
 #ifdef WITH_XMB
-  XFreeFontSet(xtfs->display, xtfs->fontset);
-#else
-  XFreeFont(xtfs->display, xtfs->font);
+  if(xitk_get_xmb_enability())
+    XFreeFontSet(xtfs->display, xtfs->fontset);
+  else
 #endif
+    XFreeFont(xtfs->display, xtfs->font);
+
   XUNLOCK(xtfs->display);
   free(xtfs->name);
 }
@@ -429,10 +436,22 @@ xitk_font_t *xitk_font_load_font(Display *display, char *font) {
       if(!fdname || !xitk_font_load_one(display, fdname, xtfs)) {
         char *fsname = xitk_get_system_font();
  	if(!xitk_font_load_one(display, fsname, xtfs)) {
-           XITK_WARNING("loading font \"%s\" failed, default and system fonts \"%s\" and \"%s\" failed too\n", font, fdname, fsname);
-           free(xtfs);
-           pthread_mutex_unlock(&cache.mutex);
-           return NULL;
+	  XITK_WARNING("loading font \"%s\" failed, default and system fonts \"%s\" and \"%s\" failed too\n", font, fdname, fsname);
+	  free(xtfs);
+	  pthread_mutex_unlock(&cache.mutex);
+
+	  /* Maybe broken XMB support */
+	  if(xitk_get_xmb_enability()) {
+	    xitk_font_t *xtfs_fallback;
+
+	    xitk_set_xmb_enability(0);
+	    if((xtfs_fallback = xitk_font_load_font(display, font)))
+	      XITK_WARNING("XMB support seems broken on your system, add \"font.xmb = 0\" in your ~/.xitkrc\n");
+	    
+	    return xtfs_fallback;
+	  }
+	  else
+	    return NULL;
         }
       }
     }
@@ -466,10 +485,11 @@ void xitk_font_unload_font(xitk_font_t *xtfs) {
   ABORT_IF_NULL(xtfs);
   ABORT_IF_NULL(xtfs->display);
 #ifdef WITH_XMB
-  ABORT_IF_NULL(xtfs->fontset);
-#else
-  ABORT_IF_NULL(xtfs->font);
+  if(xitk_get_xmb_enability())
+    ABORT_IF_NULL(xtfs->fontset);
+  else
 #endif
+    ABORT_IF_NULL(xtfs->font);
 
   pthread_mutex_lock(&cache.mutex);
   /* search the font in the list */
@@ -500,14 +520,13 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
   }
 #endif
 #ifdef WITH_XMB
-  XmbDrawString(xtfs->display, pix, xtfs->fontset, gc, x, y, 
-		text, nbytes);
-#else 
-  XDrawString(xtfs->display, pix, gc, x, y, text, nbytes);
+  if(xitk_get_xmb_enability())
+    XmbDrawString(xtfs->display, pix, xtfs->fontset, gc, x, y, text, nbytes);
+  else
 #endif
+    XDrawString(xtfs->display, pix, gc, x, y, text, nbytes);
 }
 
-#ifndef WITH_XMB
 /*
  *
  */
@@ -542,7 +561,6 @@ static int xitk_font_is_font_16(xitk_font_t *xtfs) {
   return ((xtfs->font->min_byte1 != 0) || (xtfs->font->max_byte1 != 0));
 }
 #endif
-#endif
 
 /*
  *
@@ -555,23 +573,27 @@ int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int nbytes) {
   ABORT_IF_NULL(c);
 
 #ifdef WITH_XMB
-  ABORT_IF_NULL(xtfs->fontset);
-
-  XLOCK(xtfs->display);
-  xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, &width, NULL, NULL);
-  XUNLOCK(xtfs->display);
-#else 
-  ABORT_IF_NULL(xtfs->font);
-
-  XLOCK(xtfs->display);
-
-  if(xitk_font_is_font_8(xtfs))
-    width = XTextWidth (xtfs->font, c, nbytes);
+  if(xitk_get_xmb_enability()) {
+    ABORT_IF_NULL(xtfs->fontset);
+    
+    XLOCK(xtfs->display);
+    xitk_font_text_extent(xtfs, c, nbytes, NULL, NULL, &width, NULL, NULL);
+    XUNLOCK(xtfs->display);
+  }
   else
-    width = XTextWidth16 (xtfs->font, (XChar2b *)c, nbytes);
-
-  XUNLOCK(xtfs->display);
 #endif
+    {
+      ABORT_IF_NULL(xtfs->font);
+      
+      XLOCK(xtfs->display);
+      
+      if(xitk_font_is_font_8(xtfs))
+	width = XTextWidth (xtfs->font, c, nbytes);
+      else
+	width = XTextWidth16 (xtfs->font, (XChar2b *)c, nbytes);
+      
+      XUNLOCK(xtfs->display);
+    }
  
   return width;
 }
@@ -587,55 +609,60 @@ int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c) {
  *
  */
 int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nbytes) {
+  unsigned int  ch = (*c & 0xff);
+  int           width;
+  XCharStruct  *chars;
 #ifdef WITH_XMB
   mbstate_t state;
   size_t    n;
   
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->fontset);
-  ABORT_IF_NULL(c);
-
-  if(maxnbytes <= 0) 
-    return 0;
-
-  memset(&state, '\0', sizeof(mbstate_t));
-  n = mbrtowc(NULL, c, maxnbytes, &state);
-
-  if(n == (size_t)-1 || n == (size_t)-2) 
-    return 0;
-
-  if(nbytes)
-    *nbytes = n;
-
-  return xitk_font_get_text_width(xtfs, c, n);
-#else
-  unsigned int  ch = (*c & 0xff);
-  int           width;
-  XCharStruct  *chars;
-  
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->font);
-  ABORT_IF_NULL(c);
-
-  if(maxnbytes <= 0)
-    return 0;
-
-  if(xitk_font_is_font_8(xtfs) && 
-     ((ch >= xtfs->font->min_char_or_byte2) && (ch <= xtfs->font->max_char_or_byte2))) {
-
-    chars = xtfs->font->per_char;
-
-    if(chars)
-      width = chars[ch - xtfs->font->min_char_or_byte2].width;
-    else
-      width = xtfs->font->min_bounds.width;
-
+  if(xitk_get_xmb_enability()) {
+    ABORT_IF_NULL(xtfs);
+    ABORT_IF_NULL(xtfs->fontset);
+    ABORT_IF_NULL(c);
+    
+    if(maxnbytes <= 0) 
+      return 0;
+    
+    memset(&state, '\0', sizeof(mbstate_t));
+    n = mbrtowc(NULL, c, maxnbytes, &state);
+    
+    if(n == (size_t)-1 || n == (size_t)-2) 
+      return 0;
+    
+    if(nbytes)
+      *nbytes = n;
+    
+    return xitk_font_get_text_width(xtfs, c, n);
   }
   else
-    width = xitk_font_get_text_width(xtfs, c, 1);
-  
-  return width;
 #endif
+    {
+      ABORT_IF_NULL(xtfs);
+      ABORT_IF_NULL(xtfs->font);
+      ABORT_IF_NULL(c);
+      
+      if(maxnbytes <= 0)
+	return 0;
+      
+      if(xitk_font_is_font_8(xtfs) && 
+	 ((ch >= xtfs->font->min_char_or_byte2) && (ch <= xtfs->font->max_char_or_byte2))) {
+	
+	chars = xtfs->font->per_char;
+	
+	if(chars)
+	  width = chars[ch - xtfs->font->min_char_or_byte2].width;
+	else
+	  width = xtfs->font->min_bounds.width;
+	
+      }
+      else
+	width = xitk_font_get_text_width(xtfs, c, 1);
+      
+      return width;
+    }
+
+  return 0;
 }
 
 /*
@@ -667,19 +694,21 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, char *c, int maxnbytes, int *nb
   mbstate_t state;
   size_t    n;
 
-  memset(&state, '\0', sizeof(mbstate_t));
-  n = mbrtowc(NULL, c, maxnbytes, &state);
-
-  if(n == (size_t)-1 || n == (size_t)-2) 
-    return 0;
-
-  if(nbytes) 
-    *nbytes = n;
-
-  return xitk_font_get_text_height(xtfs, c, n);
-#else
-  return (xitk_font_get_text_height(xtfs, c, 1));
+  if(xitk_get_xmb_enability()) {
+    memset(&state, '\0', sizeof(mbstate_t));
+    n = mbrtowc(NULL, c, maxnbytes, &state);
+    
+    if(n == (size_t)-1 || n == (size_t)-2) 
+      return 0;
+    
+    if(nbytes) 
+      *nbytes = n;
+    
+    return xitk_font_get_text_height(xtfs, c, n);
+  }
+  else
 #endif
+    return (xitk_font_get_text_height(xtfs, c, 1));
 }
 
 /*
@@ -687,15 +716,14 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, char *c, int maxnbytes, int *nb
  */
 void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent) {
-
-#ifdef WITH_XMB
-  XRectangle logic;
-#else
+  
   XCharStruct ov;
   int         dir;
   int         fascent, fdescent;
+#ifdef WITH_XMB
+  XRectangle  logic;
 #endif
-
+  
 #ifdef DEBUG
   if (nbytes > strlen(c) + 1) {
     XITK_WARNING("extent: %d > %d\n", nbytes, strlen(c));
@@ -703,90 +731,94 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 #endif
 
 #ifdef WITH_XMB
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->fontset);
-  ABORT_IF_NULL(c);
-
-  /* lbearing and rbearing can't find out or compute */
-  if (lbearing) *lbearing = 0;
-  if (rbearing) *rbearing = 0;
-
-  if (nbytes <= 0) {
+  if(xitk_get_xmb_enability()) {
+    ABORT_IF_NULL(xtfs);
+    ABORT_IF_NULL(xtfs->fontset);
+    ABORT_IF_NULL(c);
+    
+    /* lbearing and rbearing can't find out or compute */
+    if (lbearing) *lbearing = 0;
+    if (rbearing) *rbearing = 0;
+    
+    if (nbytes <= 0) {
 #ifdef DEBUG
-    if (nbytes < 0)
-      XITK_WARNING("nbytes < 0\n");
+      if (nbytes < 0)
+	XITK_WARNING("nbytes < 0\n");
 #endif
-    if (width) *width     = 0;
-    if (ascent) *ascent   = 0;
-    if (descent) *descent = 0;
-    return;
-  }
-
-  XLOCK(xtfs->display);
-  XmbTextExtents(xtfs->fontset, c, nbytes, NULL, &logic);
-  if (!logic.width || !logic.height) {
-  /* XmbTextExtents() has problems, try char-per-char counting */
-    mbstate_t state;
-    size_t    i = 0, n;
-    int       height = 0, width = 0;
-    
-    memset(&state, '\0', sizeof(mbstate_t));
-    
-    while (i < nbytes) {
-      n = mbrtowc(NULL, c, nbytes - i, &state);
-      if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;
-      XmbTextExtents(xtfs->fontset, c + i, n, NULL, &logic);
-      if (logic.height > height) height = logic.height;
-      width += logic.width;
-      i += n;
+      if (width) *width     = 0;
+      if (ascent) *ascent   = 0;
+      if (descent) *descent = 0;
+      return;
     }
-
-    if (!height || !width) {
-    /* char-per-char counting fails too */
-      XITK_WARNING("extents of the font \"%s\" are %dx%d!\n", xtfs->name, width, height);
-      if (!height) height = 12;
-    } 
-
-    logic.height = height;
-    logic.width = width;
+    
+    XLOCK(xtfs->display);
+    XmbTextExtents(xtfs->fontset, c, nbytes, NULL, &logic);
+    if (!logic.width || !logic.height) {
+      /* XmbTextExtents() has problems, try char-per-char counting */
+      mbstate_t state;
+      size_t    i = 0, n;
+      int       height = 0, width = 0;
+      
+      memset(&state, '\0', sizeof(mbstate_t));
+      
+      while (i < nbytes) {
+	n = mbrtowc(NULL, c, nbytes - i, &state);
+	if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;
+	XmbTextExtents(xtfs->fontset, c + i, n, NULL, &logic);
+	if (logic.height > height) height = logic.height;
+	width += logic.width;
+	i += n;
+      }
+      
+      if (!height || !width) {
+	/* char-per-char counting fails too */
+	XITK_WARNING("extents of the font \"%s\" are %dx%d!\n", xtfs->name, width, height);
+	if (!height) height = 12;
+      } 
+      
+      logic.height = height;
+      logic.width = width;
+    }
+    XUNLOCK(xtfs->display);
+    
+    if (width) *width     = logic.width;
+    if (ascent) *ascent   = -logic.y;
+    if (descent) *descent = logic.height + logic.y;
   }
-  XUNLOCK(xtfs->display);
-
-  if (width) *width     = logic.width;
-  if (ascent) *ascent   = -logic.y;
-  if (descent) *descent = logic.height + logic.y;
-#else
-  ABORT_IF_NULL(xtfs);
-  ABORT_IF_NULL(xtfs->font);
-  ABORT_IF_NULL(xtfs->display);
-  ABORT_IF_NULL(c);
-
-  XLOCK(xtfs->display);
-
-  if(xitk_font_is_font_8(xtfs))
-    XTextExtents(xtfs->font, c, nbytes, &dir, &fascent, &fdescent, &ov);
   else
-    XTextExtents16(xtfs->font, (XChar2b *)c, (nbytes / 2), &dir, &fascent, &fdescent, &ov);
-
-  XUNLOCK(xtfs->display);
-
-  if(lbearing)
-    *lbearing = ov.lbearing;
-  if(rbearing)
-    *rbearing = ov.rbearing;
-  if(width)
-    *width    = ov.width;
-  if(ascent)
-    *ascent  = xtfs->font->ascent;
-  if(descent)
-    *descent = xtfs->font->descent;
+#endif
+    {
+      ABORT_IF_NULL(xtfs);
+      ABORT_IF_NULL(xtfs->font);
+      ABORT_IF_NULL(xtfs->display);
+      ABORT_IF_NULL(c);
+      
+      XLOCK(xtfs->display);
+      
+      if(xitk_font_is_font_8(xtfs))
+	XTextExtents(xtfs->font, c, nbytes, &dir, &fascent, &fdescent, &ov);
+      else
+	XTextExtents16(xtfs->font, (XChar2b *)c, (nbytes / 2), &dir, &fascent, &fdescent, &ov);
+      
+      XUNLOCK(xtfs->display);
+      
+      if(lbearing)
+	*lbearing = ov.lbearing;
+      if(rbearing)
+	*rbearing = ov.rbearing;
+      if(width)
+	*width    = ov.width;
+      if(ascent)
+	*ascent  = xtfs->font->ascent;
+      if(descent)
+	*descent = xtfs->font->descent;
 #if 0
-  if(ascent)
-    *ascent   = ov.ascent;
-  if(descent)
-    *descent  = ov.descent;
+      if(ascent)
+	*ascent   = ov.ascent;
+      if(descent)
+	*descent  = ov.descent;
 #endif
-#endif
+    }
 }
 
 /*
@@ -794,7 +826,7 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
  */
 void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
 			     int *lbearing, int *rbearing, int *width, int *ascent, int *descent) {
-
+  
   xitk_font_text_extent(xtfs, c, strlen(c), lbearing, rbearing, width, ascent, descent);
 }
 
@@ -808,11 +840,12 @@ int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
   ABORT_IF_NULL(xtfs->display);
   ABORT_IF_NULL(c);
 #ifdef WITH_XMB
-  ABORT_IF_NULL(xtfs->fontset);
-#else 
-  ABORT_IF_NULL(xtfs->font);
+  if(xitk_get_xmb_enability())
+    ABORT_IF_NULL(xtfs->fontset);
+  else
 #endif
-
+    ABORT_IF_NULL(xtfs->font);
+  
   xitk_font_text_extent(xtfs, c, strlen(c), &lbearing, &rbearing, &width, &ascent, &descent);
 
   return ascent;
@@ -828,11 +861,12 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
   ABORT_IF_NULL(xtfs->display);
   ABORT_IF_NULL(c);
 #ifdef WITH_XMB
-  ABORT_IF_NULL(xtfs->fontset);
-#else 
-  ABORT_IF_NULL(xtfs->font);
+  if(xitk_get_xmb_enability())
+    ABORT_IF_NULL(xtfs->fontset);
+  else
 #endif
-
+    ABORT_IF_NULL(xtfs->font);
+  
   xitk_font_text_extent(xtfs, c, strlen(c), &lbearing, &rbearing, &width, &ascent, &descent);
 
   return descent;
@@ -846,9 +880,15 @@ void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
   ABORT_IF_NULL(xtfs);
   ABORT_IF_NULL(xtfs->display);
 
-#ifndef WITH_XMB
-  XLOCK(xtfs->display);
-  XSetFont(xtfs->display, gc, xitk_font_get_font_id(xtfs));
-  XUNLOCK(xtfs->display);
+#ifdef WITH_XMB
+  if(xitk_get_xmb_enability())
+    ;
+  else
 #endif
+    {
+      XLOCK(xtfs->display);
+      XSetFont(xtfs->display, gc, xitk_font_get_font_id(xtfs));
+      XUNLOCK(xtfs->display);
+    }
 }
+

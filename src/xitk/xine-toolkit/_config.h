@@ -36,6 +36,7 @@ typedef struct {
   struct {
     char           *fallback;
     char           *system;
+    int             xmb;
   } fonts;
 
   struct {
@@ -67,6 +68,8 @@ int xitk_config_get_barstyle_feature(xitk_config_t *xtcf);
 int xitk_config_get_shm_feature(xitk_config_t *xtcf);
 char *xitk_config_get_system_font(xitk_config_t *xtcf);
 char *xitk_config_get_default_font(xitk_config_t *xtcf);
+int xitk_config_get_xmb_enability(xitk_config_t *xtcf);
+void xitk_config_set_xmb_enability(xitk_config_t *xtcf, int value);
 int xitk_config_get_black_color(xitk_config_t *xtcf);
 int xitk_config_get_white_color(xitk_config_t *xtcf);
 int xitk_config_get_background_color(xitk_config_t *xtcf);

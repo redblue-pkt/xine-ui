@@ -47,6 +47,9 @@ font.default             = fixed
 # fallback font.
 font.system              = -adobe-courier-*-*-*-*-12-*-*-*-*-*-*-*
 
+# multibyte usage (default is enabled, on supported platforms)
+font.xmb                 = 0;
+
 # speed (in µ-seconds) between two "slide effect" for label marked
 # as animated (depending of skin configuration).
 timer.label_animation    = 5000

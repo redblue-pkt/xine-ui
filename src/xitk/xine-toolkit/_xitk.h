@@ -348,9 +348,8 @@ struct xitk_font_s {
   Display       *display;
 #ifdef WITH_XMB
   XFontSet       fontset;
-#else
-  XFontStruct   *font;
 #endif
+  XFontStruct   *font;
   char          *name;
 };
 
