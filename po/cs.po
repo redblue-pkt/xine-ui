@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.18\n"
-"POT-Creation-Date: 2003-02-15 00:05+0100\n"
+"POT-Creation-Date: 2003-03-01 21:55+0100\n"
 "PO-Revision-Date: 2003-02-08 14:10+0100\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -91,7 +91,7 @@ msgid "There is no mrl."
 msgstr "Neni zde zadne MRL."
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/actions.c:1356 src/xitk/actions.c:1368 src/xitk/panel.c:699
+#: src/xitk/actions.c:1356 src/xitk/actions.c:1368 src/xitk/panel.c:705
 msgid "Audio Volume"
 msgstr "Hlasitost zvuku"
 
@@ -107,7 +107,7 @@ msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) selhalo.\n"
 
 #: src/xitk/actions.c:1527 src/xitk/actions.c:1585 src/xitk/event_sender.c:497
-#: src/xitk/mediamark.c:1452 src/xitk/mrl_browser.c:272
+#: src/xitk/mediamark.c:1452
 msgid "Select"
 msgstr "Vybrat"
 
@@ -156,7 +156,7 @@ msgstr "Kontrast"
 msgid "Contrast value."
 msgstr "Hodnota kontrastu."
 
-#: src/xitk/control.c:446 src/xitk/panel.c:151 src/xitk/playlist.c:907
+#: src/xitk/control.c:446 src/xitk/panel.c:151 src/xitk/playlist.c:909
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): nelze nalézt obrázek na pozadí\n"
@@ -207,7 +207,7 @@ msgstr "Kon"
 msgid "Choose a Skin"
 msgstr "Vyber skinu"
 
-#: src/xitk/control.c:773 src/xitk/mrl_browser.c:279 src/xitk/playlist.c:1192
+#: src/xitk/control.c:773 src/xitk/mrl_browser.c:279 src/xitk/playlist.c:1194
 msgid "Dismiss"
 msgstr "Zpìt"
 
@@ -332,27 +332,27 @@ msgid "SPU Offset: %d"
 msgstr "Odstup titulku: %d"
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/event.c:674 src/xitk/menus.c:130
+#: src/xitk/event.c:674 src/xitk/menus.c:136
 msgid "Playlist: no loop."
 msgstr "Playlist: neopakovat"
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/event.c:677 src/xitk/menus.c:135
+#: src/xitk/event.c:677 src/xitk/menus.c:141
 msgid "Playlist: loop."
 msgstr "Playlist: opakovat"
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/event.c:680 src/xitk/menus.c:140
+#: src/xitk/event.c:680 src/xitk/menus.c:146
 msgid "Playlist: entry repeat."
 msgstr "Playlist: opakovat polozku"
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/event.c:683 src/xitk/menus.c:145
+#: src/xitk/event.c:683 src/xitk/menus.c:151
 msgid "Playlist: shuffle."
 msgstr "Playlist: nahodne poradi"
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/event.c:686 src/xitk/menus.c:150
+#: src/xitk/event.c:686 src/xitk/menus.c:156
 msgid "Playlist: shuffle forever."
 msgstr "Playlist: nahodne poradi bez prestani"
 
@@ -813,7 +813,7 @@ msgstr "Zástupce"
 msgid "Edit"
 msgstr "Editovat"
 
-#: src/xitk/kbindings.c:2016 src/xitk/playlist.c:406 src/xitk/playlist.c:1182
+#: src/xitk/kbindings.c:2016 src/xitk/playlist.c:408 src/xitk/playlist.c:1184
 msgid "Save"
 msgstr "Ulo¾it"
 
@@ -1256,39 +1256,39 @@ msgstr "main: zkou¹ka zvukového ovladaèe selhala => ¾ádný zvukový výstup\n"
 msgid "main: audio driver <%s> failed\n"
 msgstr "main: zvukový ovladaè <%s> selhal\n"
 
-#: src/xitk/main.c:898
+#: src/xitk/main.c:929
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr "Vy¾adována knihovna xine verze 1.0.0, nalezena %d.%d.%d.\n"
 
-#: src/xitk/main.c:906
+#: src/xitk/main.c:937
 msgid "sigprocmask() failed.\n"
 msgstr "sigprocmask() selhalo.\n"
 
-#: src/xitk/main.c:978
+#: src/xitk/main.c:1009
 msgid "video driver id required for -V option\n"
 msgstr "u volby -V vy¾adován video ovladaè\n"
 
-#: src/xitk/main.c:987
+#: src/xitk/main.c:1018
 msgid "audio driver id required for -A option\n"
 msgstr "u volby -A vy¾adován zvukový ovladaè\n"
 
-#: src/xitk/main.c:1083
+#: src/xitk/main.c:1114
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "©patnì zadaná velikost a umístìní '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:1115
+#: src/xitk/main.c:1146
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "©patný re¾im opakování '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:1159
+#: src/xitk/main.c:1190
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "neplatný argument %d ==> konec\n"
 
-#: src/xitk/main.c:1331
+#: src/xitk/main.c:1362
 msgid "Logo mrl"
 msgstr "MRL loga"
 
@@ -1375,7 +1375,7 @@ msgid "Discard changes and dismiss the window."
 msgstr "Zru¹it zmìny a zavøít okno."
 
 # window title
-#: src/xitk/menus.c:491
+#: src/xitk/menus.c:496
 #, fuzzy, c-format
 msgid "xine %s"
 msgstr "Nastavení xine"
@@ -1388,6 +1388,10 @@ msgstr "V¹echny pøípony"
 #: src/xitk/mrl_browser.c:261
 msgid "xine MRL Browser"
 msgstr "Prohlí¾eè MRL xine"
+
+#: src/xitk/mrl_browser.c:272 src/xitk/playlist.c:1163
+msgid "Add"
+msgstr "Pøidat"
 
 #: src/xitk/mrl_browser.c:288
 msgid "Source:"
@@ -1441,203 +1445,199 @@ msgid "Total time: %02d:%02d:%02d"
 msgstr "Celkový èas: %02d:%02d:%02d"
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/panel.c:656
+#: src/xitk/panel.c:662
 #, c-format
 msgid "Audio: %s"
 msgstr "Zvuk: %s"
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/panel.c:656
+#: src/xitk/panel.c:662
 msgid "Muted"
 msgstr "je ztlumen"
 
 # only ISO8859-1 characters (OSD)
-#: src/xitk/panel.c:656
+#: src/xitk/panel.c:662
 msgid "Unmuted"
 msgstr "neni ztlumen"
 
-#: src/xitk/panel.c:823
+#: src/xitk/panel.c:829
 msgid "Volume control"
 msgstr "Ovládání hlasitosti"
 
-#: src/xitk/panel.c:825
+#: src/xitk/panel.c:831
 msgid "Mute toggle"
 msgstr "Ztlumit"
 
 # window title
-#: src/xitk/panel.c:852
+#: src/xitk/panel.c:858
 msgid "xine Panel"
 msgstr "Panel xine"
 
-#: src/xitk/panel.c:873
+#: src/xitk/panel.c:879
 msgid "panel: couldn't find image for background\n"
 msgstr "panel: nelze nalézt obrázek na pozadí\n"
 
-#: src/xitk/panel.c:1011
+#: src/xitk/panel.c:1017
 msgid "Stop playback"
 msgstr "Stop"
 
-#: src/xitk/panel.c:1019
+#: src/xitk/panel.c:1025
 msgid "Play selected entry"
 msgstr "Pøehrání vybrané polo¾ky"
 
-#: src/xitk/panel.c:1027
+#: src/xitk/panel.c:1033
 msgid "Pause/Resume playback"
 msgstr "Pauza/Pøehrávání"
 
-#: src/xitk/panel.c:1042
+#: src/xitk/panel.c:1048
 msgid "Eject current medium"
 msgstr "Vysunout souèasné médium"
 
-#: src/xitk/panel.c:1050
+#: src/xitk/panel.c:1056
 msgid "Quit"
 msgstr "Konec"
 
-#: src/xitk/panel.c:1058
+#: src/xitk/panel.c:1064
 msgid "Setup window"
 msgstr "Okno s nastavením"
 
-#: src/xitk/panel.c:1066
+#: src/xitk/panel.c:1072
 msgid "Navigator"
 msgstr "Navigátor"
 
-#: src/xitk/panel.c:1074
+#: src/xitk/panel.c:1080
 msgid "Hide GUI"
 msgstr "Skrýt GUI"
 
-#: src/xitk/panel.c:1082
+#: src/xitk/panel.c:1088
 msgid "Fullscreen/Window mode"
 msgstr "Celoobrazovkový/okenní re¾im"
 
-#: src/xitk/panel.c:1090
+#: src/xitk/panel.c:1096
 msgid "Next audio channel"
 msgstr "Dal¹í zvukový kanál"
 
-#: src/xitk/panel.c:1098
+#: src/xitk/panel.c:1104
 msgid "Previous audio channel"
 msgstr "Pøedchozí zvukový kanál"
 
-#: src/xitk/panel.c:1106
+#: src/xitk/panel.c:1112
 msgid "Next SPU channel"
 msgstr "Dal¹í kanál s titulky"
 
-#: src/xitk/panel.c:1114
+#: src/xitk/panel.c:1120
 msgid "Previous SPU channel"
 msgstr "Pøedchozí kanál s titulky"
 
-#: src/xitk/panel.c:1129
+#: src/xitk/panel.c:1135
 msgid "Total time: --:--:--"
 msgstr "Celkový èas: --:--:--"
 
-#: src/xitk/panel.c:1163
+#: src/xitk/panel.c:1169
 msgid "Stream playback position slider"
 msgstr "Posuvník pozice"
 
-#: src/xitk/panel.c:1197
+#: src/xitk/panel.c:1203
 msgid "Take a snapshot"
 msgstr "Získat snímek"
 
-#: src/xitk/panel.c:1205
+#: src/xitk/panel.c:1211
 msgid "Slow motion"
 msgstr "Zpomalit pøehrávání"
 
-#: src/xitk/panel.c:1213
+#: src/xitk/panel.c:1219
 msgid "Fast motion"
 msgstr "Zrychlit pøehrávání"
 
-#: src/xitk/panel.c:1221
+#: src/xitk/panel.c:1227
 msgid "Playlist"
 msgstr "Playlist"
 
-#: src/xitk/panel.c:1229
+#: src/xitk/panel.c:1235
 msgid "Control"
 msgstr "Ovládání"
 
-#: src/xitk/panel.c:1237
+#: src/xitk/panel.c:1243
 msgid "MRL Browser"
 msgstr "Prohlí¾eè MRL"
 
-#: src/xitk/panel.c:1242
+#: src/xitk/panel.c:1248
 msgid "gui tips visibility"
 msgstr "Zobrazovat tipy GUI"
 
-#: src/xitk/panel.c:1249
+#: src/xitk/panel.c:1255
 msgid "tips timeout (ms)"
 msgstr "Èas zobrazení tipù (ms)"
 
-#: src/xitk/panel.c:1264
+#: src/xitk/panel.c:1270
 msgid "gui panel visibility"
 msgstr "Viditelnost GUI panelu"
 
-#: src/xitk/playlist.c:378 src/xitk/playlist.c:1172 src/xitk/skins.c:1149
+#: src/xitk/playlist.c:380 src/xitk/playlist.c:1174 src/xitk/skins.c:1149
 msgid "Load"
 msgstr "Naèíst"
 
 # window title
-#: src/xitk/playlist.c:384
+#: src/xitk/playlist.c:386
 msgid "Load a playlist"
 msgstr "Naètení playlistu"
 
 # window title
-#: src/xitk/playlist.c:412
+#: src/xitk/playlist.c:414
 msgid "Save a playlist"
 msgstr "Ulo¾ení playlistu"
 
 # window title
-#: src/xitk/playlist.c:1006
+#: src/xitk/playlist.c:1008
 msgid "xine Playlist Editor"
 msgstr "Editor playlistu xine"
 
-#: src/xitk/playlist.c:1024
+#: src/xitk/playlist.c:1026
 msgid "playlist: couldn't find image for background\n"
 msgstr "playlist: nelze nalézt obrázek na pozadí\n"
 
-#: src/xitk/playlist.c:1128
+#: src/xitk/playlist.c:1130
 msgid "Move up selected MRL"
 msgstr "Posunutí vybraného MRL nahoru"
 
-#: src/xitk/playlist.c:1136
+#: src/xitk/playlist.c:1138
 msgid "Move down selected MRL"
 msgstr "Posunutí vybraného MRL dolù"
 
-#: src/xitk/playlist.c:1143
+#: src/xitk/playlist.c:1145
 msgid "Start playback of selected MRL"
 msgstr "Start pøehrávání vybraného MRL"
 
-#: src/xitk/playlist.c:1150
+#: src/xitk/playlist.c:1152
 msgid "Delete selected MRL from playlist"
 msgstr "Smazání vybraného MRL z playlistu"
 
-#: src/xitk/playlist.c:1157
+#: src/xitk/playlist.c:1159
 msgid "Delete all entries in playlist"
 msgstr "Smazání v¹ech polo¾ek v playlistu"
 
-#: src/xitk/playlist.c:1161
-msgid "Add"
-msgstr "Pøidat"
-
-#: src/xitk/playlist.c:1167
+#: src/xitk/playlist.c:1169
 msgid "Add one or more entries in playlist"
 msgstr "Pøidání jedné nebo více polo¾ek do playlistu"
 
-#: src/xitk/playlist.c:1178
+#: src/xitk/playlist.c:1180
 msgid "Load saved playlist"
 msgstr "Naètení ulo¾eného playlistu"
 
-#: src/xitk/playlist.c:1188
+#: src/xitk/playlist.c:1190
 msgid "Save playlist"
 msgstr "Ulo¾ení playlistu"
 
-#: src/xitk/playlist.c:1198
+#: src/xitk/playlist.c:1200
 msgid "Close playlist window"
 msgstr "Zavøení okna playlistu"
 
 # only ISO8859-1 characters (skin)
-#: src/xitk/playlist.c:1216
+#: src/xitk/playlist.c:1218
 msgid "Scan for:"
 msgstr "Hledani:"
 
-#: src/xitk/playlist.c:1228
+#: src/xitk/playlist.c:1230
 msgid "Direct MRL entry"
 msgstr "Pøímé zadání MRL"
 
@@ -1779,19 +1779,19 @@ msgstr "Získává se seznam skinù z %s"
 msgid "Choose a skin to download..."
 msgstr "Vyberte skin ke stáhnutí..."
 
-#: src/xitk/snapshot.c:827 src/xitk/snapshot.c:838
+#: src/xitk/snapshot.c:825 src/xitk/snapshot.c:836
 #, c-format
 msgid "Error: %s\n"
 msgstr "Chyba: %s\n"
 
-#: src/xitk/snapshot.c:886
+#: src/xitk/snapshot.c:884
 #, c-format
 msgid "Wrong image size: %dx%d. Snapshot aborted.\n"
 msgstr "Chybná velikost obrázku: %dx%d. Získávaní snímku zru¹eno.\n"
 
 #. the dxr3 driver does not allocate yuv buffers
 #. image->u and image->v are always 0 for YUY2
-#: src/xitk/snapshot.c:912
+#: src/xitk/snapshot.c:910
 msgid "snapshot.c: not supported for this video out driver\n"
 msgstr ""
 "snapshot.c: získávání snímkù není podporováno s tímto výstupním ovladaèem "
