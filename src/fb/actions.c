@@ -33,6 +33,11 @@
 #include "main.h"
 #include "actions.h"
 
+
+#define GUI_NEXT     1
+#define GUI_PREV     2
+
+
 static const struct
 {
 	char *description;
@@ -294,6 +299,28 @@ static void action_seek_relative(int off_sec)
 	abort();
 }
 
+
+void direct_change_audio_channel(void *data, int value) 
+{
+        xine_set_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, value);
+}
+
+
+void change_audio_channel(void *data) 
+{
+        int dir = (int)data;
+	int channel;
+  
+	channel = xine_get_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+  
+	if(dir == GUI_NEXT)
+	     channel++;
+	else if(dir == GUI_PREV)
+	     channel--;
+  
+	direct_change_audio_channel(data, channel);
+}
+
 void do_action(int action)
 {
 	if(action & ACTID_IS_INPUT_EVENT)
@@ -352,6 +379,14 @@ void do_action(int action)
 			break;
 		case ACTID_SEEK_REL_p7:
 			action_seek_relative(7);
+			break;
+
+	        case ACTID_AUDIOCHAN_NEXT:
+		        change_audio_channel((void*)GUI_NEXT);
+			break;
+
+	        case ACTID_AUDIOCHAN_PRIOR:
+		        change_audio_channel((void*)GUI_PREV);
 			break;
 
 		case ACTID_PAUSE:

@@ -133,6 +133,7 @@ int parse_options(int argc, char **argv)
 			{ "audio-driver",  required_argument, 0, 'A' },
 			{ "video-driver",  required_argument, 0, 'V' },
 			{ "version",       no_argument,       0, 'v' },
+			{ "no-lirc",       no_argument,       0, 'L' },
 			{ "stdctl",        optional_argument, 0, OPTION_STDCTL },
 			{"post",           required_argument, 0, OPTION_POST },
 			{ 0,               no_argument,       0,  0  }
