@@ -13,7 +13,7 @@ GETOPT_H = getopt.h
 endif
 
 xine_SOURCES = $(GETOPT_C) main.c gui_main.c gui_control.c gui_playlist.c \
-	gui_parseskin.c utils.c monitor.c
+	gui_parseskin.c gui_videowin.c utils.c monitor.c
 xine_DEPENDENTIES = utils.h monitor.h
 xine_LDADD = @XINE_LIBS@  $(LIRC_LIBS) -lm $(THREAD_LIBS) \
 	$(DYNAMIC_LD_LIBS) libxitk.la

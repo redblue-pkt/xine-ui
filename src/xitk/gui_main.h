@@ -26,7 +26,9 @@
 
 #include <pthread.h>
 #include <X11/Xlib.h>
-
+#ifdef HAVE_XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif
 #ifdef HAVE_LIRC
 #include "lirc/lirc_client.h"
 #endif
@@ -41,20 +43,35 @@
 #define MAX_PLAYLIST_LENGTH  1024
 
 typedef struct {
-  /* Xine lib engine configuration */
+  /* xine engine configuration */
   config_values_t     *config;
   
-  /* Xine lib instance */
+  /* our video out driver */
+  vo_driver_t         *vo_driver;
+
+  /* xine engine instance */
   xine_t              *xine;
 
-  /* Xine lib/gui configuration filename */
+  /* xine lib/gui configuration filename */
   char                *configfile;
 
   /* stuff like FULL_ON_START, QUIT_ON_STOP */
   int                  autoplay_options;
 
   Display             *display;
+  int                  screen;
+  XColor               black;
 
+  Window               video_win; /* video output window */
+  XVisualInfo          vinfo;
+  Cursor               cursor[2]; /* Cursor pointers     */
+  XClassHint          *xclasshint;
+  int                  completion_type;
+  int                  depth;
+  int                  video_width, video_height; /* size of currently displayed video */
+  int                  fullscreen_mode; /* are we currently in fullscreen mode?  */
+  int                  fullscreen_req;  /* ==1 => gui_setup_video_window will switch to fullscreen mode */
+  int                  fullscreen_width, fullscreen_height;
   Window               video_window; /* video output window */
 
   Window               gui_panel_win;
@@ -78,8 +95,6 @@ typedef struct {
   char                *gui_playlist[MAX_PLAYLIST_LENGTH];
   int                  gui_playlist_num;
   int                  gui_playlist_cur;
-
-
 
 } gGui_t;
 
@@ -140,13 +155,15 @@ void gui_stop (widget_t *, void *);
 
 int  is_gui_panel_visible(void);
 
-/*
- * seamless branching support:
- */
+void gui_setup_video_window (int video_width, int video_height, int *dest_x, int *dest_y,
+			     int *dest_width, int *dest_height) ;
 
-char *gui_get_next_mrl (void);
+/* hide/show cursor in video window*/
+void gui_set_cursor_visibility(int show_cursor) ;
 
-void gui_notify_demux_branched (void);
+/* hide/show video window */
+void gui_set_video_window_visibility(int show_window) ;
 
 #endif
+
 

@@ -49,6 +49,7 @@
 #include "gui_playlist.h"
 #include "gui_control.h"
 
+#include <xine/video_out_x11.h>
 #include "xine.h"
 #include "utils.h"
 
@@ -343,9 +344,16 @@ void gui_eject(widget_t *w, void *data) {
 
 void gui_toggle_fullscreen(widget_t *w, void *data) {
 
-  xine_set_window_fullscreen(gGui->xine,
-			     !(xine_get_window_fullscreen(gGui->xine)));
-  xine_set_display_cursor(gGui->xine, gui_panel_visible);
+  x11_rectangle_t area;
+
+  gGui->fullscreen_req = !gGui->fullscreen_req;
+
+  gui_setup_video_window (gGui->video_width, gGui->video_height, 
+			  &area.x, &area.y, &area.w, &area.h);
+
+  gGui->vo_driver->gui_data_exchange (gGui->vo_driver, GUI_DATA_EX_DEST_POS_SIZE_CHANGED, &area);
+
+  gui_set_cursor_visibility (gui_panel_visible);
   
   cursor_visible = gui_panel_visible;
   if (gui_panel_visible)  {
@@ -359,12 +367,9 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
 
 void gui_toggle_aspect(void) {
 
-  /*
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO,
+				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO) + 1);
 
-    FIXME
-
-  vo_set_aspect (vo_get_aspect () + 1);
-  */
   if (gui_panel_visible)  {
     XRaiseWindow (gGui->display, gGui->gui_panel_win);
     XSetTransientForHint (gGui->display, 
@@ -512,7 +517,6 @@ void gui_open_panel (void) {
   XSizeHints              hint;
   XWMHints               *wm_hint;
   XSetWindowAttributes    attr;
-  int                     screen;
   char                    title[] = {"Xine Panel"}; /* window-title     */
   Atom                    prop;
   MWMHints                mwmhints;
@@ -547,11 +551,11 @@ void gui_open_panel (void) {
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
-  gGui->gui_panel_win = XCreateWindow (gGui->display, DefaultRootWindow(gGui->display), 
-				 hint.x, hint.y, hint.width, hint.height, 0, 
-				 CopyFromParent, CopyFromParent, 
-				 CopyFromParent,
-				 0, &attr);
+  gGlob->gui_panel_win = XCreateWindow (gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay), 
+					hint.x, hint.y, hint.width, hint.height, 0, 
+					gGlob.gImlib_data->x.depth, CopyFromParent, 
+					gGlob.gImlib_data->x.visual,
+					0, &attr);
   
   XSetStandardProperties(gGui->display, gGui->gui_panel_win, title, title,
 			 None, NULL, 0, &hint);
@@ -1223,10 +1227,15 @@ void gui_status_callback (int nStatus) {
                 &startevent);                                                 \
    }
 
+static unsigned char bm_no_data[] = { 0,0,0,0, 0,0,0,0 };
+
 void gui_start (int nfiles, char *filenames[]) {
-  XEvent  myevent;
-  int     i;
-  struct sigaction action;
+
+  XEvent                myevent;
+  int                   i;
+  struct sigaction      action;
+  XWindowAttributes     attribs;
+  Pixmap                bm_no;
 
   /*
    * moving the window
@@ -1255,14 +1264,95 @@ void gui_start (int nfiles, char *filenames[]) {
   else
     sprintf (gui_spuid, "%3s", "off");
 
-  gGui->imlib_data = Imlib_init (gGui->display);
-
-  gGui->video_window = (Window) xine_get_window_output(gGui->xine);
+  gGlob->gImlib_data = Imlib_init (gGlob->gDisplay);
 
   /*
-   * setup panel
+   * examine this X display 
    */
+
+  XLockDisplay (gGlob->gDisplay);
+
+  gGlob->black = BlackPixel (gGlob->gDisplay, gGlob->screen);
+
+  XGetWindowAttributes(gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay), &attribs);
+
+  gGlob->depth = attribs.depth;
+  
+  if (this->depth != 15 && this->depth != 16 && this->depth != 24 && this->depth != 32)  {
+    /* The root window may be 8bit but there might still be
+     * visuals with other bit depths. For example this is the 
+     * case on Sun/Solaris machines.
+     */
+    this->depth = 24;
+  }
+
+  if (!XMatchVisualInfo(gGlob->gDisplay, gGlob->screen, gGlob->depth, TrueColor, &gGlob->vinfo)) {
+    printf ("gui_main: couldn't find truecolor visual for video window.\n");
+    exit (1);
+  }
+
+#ifdef HAVE_XINERAMA
+  /* Spark
+   * some Xinerama stuff
+   * I want to figure out what fullscreen means for this setup
+   */
+
+  if ((XineramaQueryExtension (gGlob->gDisplay, &dummy_a, &dummy_b)) 
+      && (screeninfo = XineramaQueryScreens(gGlob->gDisplay, &screens))) {
+    /* Xinerama Detected */
+    xprintf (VERBOSE|VIDEO, 
+	     "Display is using Xinerama with %d screens\n", screens);
+    xprintf (VERBOSE|VIDEO, 
+	     " going to assume we are using the first screen.\n");
+    xprintf (VERBOSE|VIDEO, " size of the first screen is %dx%d.\n", 
+	     screeninfo[0].width, screeninfo[0].height);
+    
+    if (XineramaIsActive(gGlob->gDisplay)) {
+      gGlob->fullscreen_width  = screeninfo[0].width;
+      gGlob->fullscreen_height = screeninfo[0].height;
+    } else {
+      gGlob->fullscreen_width  = DisplayWidth  (gGlob->gDisplay, gGlob->screen);
+      gGlob->fullscreen_height = DisplayHeight (gGlob->gDisplay, gGlob->screen);
+    }
+
+  } else {
+    /* no Xinerama */
+    xprintf (VERBOSE|VIDEO, "Display is not using Xinerama.\n");
+    gGlob->fullscreen_width  = DisplayWidth (gGlob->gDisplay, gGlob->screen);
+    gGlob->fullscreen_height = DisplayHeight (gGlob->gDisplay, gGlob->screen);
+  } 
+  gGui->imlib_data = Imlib_init (gGui->display);
+
+  XUnlockDisplay (gGlob->gDisplay);
+
+  /*
+   * setup the panel
+   */
+
   gui_open_panel ();
+
+  /* 
+   * create cursors
+   */
+
+  XLockDisplay (gGlob->gDisplay);
+
+  bm_no = XCreateBitmapFromData(gGlob->gDisplay, gGlob->gui_panel_win, bm_no_data, 8, 8);
+  gGlob->cursor[0] = XCreatePixmapCursor(gGlob->gDisplay, bm_no, bm_no,
+					 gGlob->black, gGlob->black, 0, 0);
+  gGlob->cursor[1] = XCreateFontCursor(gGlob->gDisplay, XC_left_ptr);
+
+
+  /* create xclass hint for video window */
+
+  if ((gGlob->xclasshint = XAllocClassHint()) != NULL) {
+    gGlob->xclasshint->res_name = "Xine Video Window";
+    gGlob->xclasshint->res_class = "Xine";
+  }
+
+  /* 
+   * show panel 
+   */
 
   XLockDisplay (gGui->display);
   
@@ -1274,7 +1364,7 @@ void gui_start (int nfiles, char *filenames[]) {
     gui_panel_visible = 0;
   }
 
-  xine_set_display_cursor(gGui->xine, gui_panel_visible);
+  gui_set_display_cursor(gGlob->gXine, gui_panel_visible);
   cursor_visible = gui_panel_visible;
   XUnlockDisplay (gGui->display);
   

@@ -443,6 +443,8 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
 
+  gGui->screen = DefaultScreen(gGui->display);
+
   /*
    * load and init output drivers
    */
