@@ -661,6 +661,7 @@ static void show_usage (void) {
 	   "                    volume=v    set audio volume,\n"
 	   "                    amp=v       set amplification level,\n"
 	   "                    loop=m      set loop mode (<m>: 'none' 'loop' 'repeat' 'shuffle' or 'shuffle+'),\n"
+           "                    get_speed   get speed value (see man page for returned value).\n"
 	   "                    (playlist|pl)=p\n"
 	   "                                 <p> can be:\n"
 	   "                                   'clear'  clear the playlist,\n"
@@ -1310,6 +1311,7 @@ int main(int argc, char *argv[]) {
   int                     enable_deinterlace = 0;
   char                  **session_argv     = NULL;
   int                     session_argv_num = 0;
+  int                     retval           = 0;
   
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1663,9 +1665,9 @@ int main(int argc, char *argv[]) {
 
     case 'S':
       if(is_remote_running(((session >= 0) ? session : 0)))
-	session_handle_subopt(optarg, &session);
+	retval = session_handle_subopt(optarg, &session);
       else {
-
+	
 	session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
 
 	session_argv[session_argv_num++] = strdup(optarg);
@@ -1804,7 +1806,7 @@ int main(int argc, char *argv[]) {
 	  char enqueue_mrl[strlen(_argv[i]) + 256];
 
 	  sprintf(enqueue_mrl, "session=%d,mrl=%s", session, atoa(_argv[i]));
-	  session_handle_subopt(enqueue_mrl, &session);
+	  (void) session_handle_subopt(enqueue_mrl, &session);
 	}
       }
       else
@@ -1813,7 +1815,8 @@ int main(int argc, char *argv[]) {
     }
 
     free_command_line_args(&_argv, _argc);
-    return 0;
+
+    return retval;
   }
 
   /* 
@@ -2143,5 +2146,5 @@ int main(int argc, char *argv[]) {
 
   free_command_line_args(&_argv, _argc);
 
-  return 0;
+  return retval;
 }

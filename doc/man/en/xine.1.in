@@ -254,6 +254,16 @@ Options are:
 .br
 \fBloop=\fP\fIm\fP    set loop mode (\<\fIm\fP\>: \fBnone\fP \fBloop\fP \fBrepeat\fP \fBshuffle\fP or \fBshuffle+\fP),
 .br
+\fBget_speed\fP       get current speed status. Return values are:
+    - 1: Error
+    - 2: Stop
+    - 3: * 1
+    - 4: Pause
+    - 5: / 4
+    - 6: / 2
+    - 7: * 2
+    - 8: * 4
+.br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
   \<\fIp\fP\> can be:

@@ -250,6 +250,16 @@ Les options sont:
 .br
 \fBloop=\fP\fIm\fP    défini le mode de bouclage (\<\fIm\fP\>: \fBnone\fP \fBloop\fP \fBrepeat\fP \fBshuffle\fP ou \fBshuffle+\fP),
 .br
+\fBget_speed\fP       récupère le status de vitesse courante. Les valeurs retournées sont:
+    - 1: Erreur
+    - 2: Stop
+    - 3: * 1
+    - 4: Pause
+    - 5: / 4
+    - 6: / 2
+    - 7: * 2
+    - 8: * 4
+.br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
   \<\fIp\fP\> peut être:

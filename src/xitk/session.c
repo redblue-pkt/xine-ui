@@ -473,6 +473,44 @@ static void *ctrlsocket_func(void *data) {
       }
       break;
 
+    case CMD_GET_SPEED_STATUS:
+      {
+	uint32_t status = 2;
+
+	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
+	  int speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
+
+	  switch(speed) {
+	  case XINE_SPEED_NORMAL:
+	    status = 3;
+	    break;
+	  case XINE_SPEED_PAUSE:
+	    status = 4;
+	    break;
+	  case XINE_SPEED_SLOW_4:
+	    status = 5;
+	    break;
+	  case XINE_SPEED_SLOW_2:
+	    status = 6;
+	    break;
+	  case XINE_SPEED_FAST_2:
+	    status = 7;
+	    break;
+	  case XINE_SPEED_FAST_4:
+	    status = 8;
+	    break;
+	  default:
+	    /* Dude! */
+	    status = 1;
+	    break;
+	  }
+	}
+	
+	send_packet(shdr->fd, CMD_GET_SPEED_STATUS, &status, sizeof(status));
+	send_ack(shdr);
+      }
+      break;
+    
     case CMD_GET_VERSION:
       send_packet(shdr->fd, CMD_GET_VERSION, VERSION,  strlen(VERSION));
       send_ack(shdr);
@@ -553,30 +591,35 @@ int init_session(void) {
   return retval;
 }
 
-void session_handle_subopt(char *suboptarg, int *session) {
-  char        *sopts = suboptarg;
-  int          optsess = -1;
+int session_handle_subopt(char *suboptarg, int *session) {
   int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev, playlist_stop_cont;
   int          audio_next, audio_prev, spu_next, spu_prev;
-  int          volume, amp, loop;
-  char        *playlist_load = NULL;
+  int          volume, amp, loop, speed_status;
   int          fullscreen, s, c;
   uint32_t     state;
   char        *optstr;
-  char       **mrls = NULL;
-  int          num_mrls = 0;
-  const char  *tokens[] = {
+  char       **mrls          = NULL;
+  int          num_mrls      = 0;
+  int          retval        = 0;
+  char        *sopts         = suboptarg;
+  int          optsess       = -1;
+  char        *playlist_load = NULL;
+  const char  *tokens[]      = {
     /* Don't change order */
-    "play", "slow2", "slow4", "pause", "fast2", "fast4", "stop", "quit", "fullscreen", "eject",
-    "audio", "spu", "session", "mrl", "playlist", "pl", "volume", "amp", "loop", NULL
+    "play",  "slow2",  "slow4",   "pause",      "fast2",
+    "fast4", "stop",   "quit",    "fullscreen", "eject",
+    "audio", "spu",    "session", "mrl",        "playlist", 
+    "pl",    "volume", "amp",     "loop",       "get_speed", 
+    NULL
   };
   
   playlist_first = playlist_last = playlist_clear = playlist_next = playlist_prev = playlist_stop_cont = 0;
-  fullscreen = 0;
-  audio_next = audio_prev = spu_next = spu_prev = 0;
-  volume = amp = -1;
-  state = 0;
-  loop = -1;
+  fullscreen     = 0;
+  audio_next     = audio_prev = spu_next = spu_prev = 0;
+  volume = amp   = -1;
+  state          = 0;
+  loop           = -1;
+  speed_status   = 0;
 
   while((c = getsubopt(&sopts, (char *const *)tokens, &optstr)) != -1) {
     switch(c) {
@@ -668,6 +711,11 @@ void session_handle_subopt(char *suboptarg, int *session) {
 	loop = PLAYLIST_LOOP_SHUFFLE;
       else if(!strcasecmp(optstr, "shuffle+"))
 	loop = PLAYLIST_LOOP_SHUF_PLUS;
+      break;
+
+      /* speed status */
+    case 19:
+      speed_status = 1;
       break;
 
     }
@@ -762,9 +810,14 @@ void session_handle_subopt(char *suboptarg, int *session) {
     if(playlist_last)
       remote_cmd(*session, CMD_PLAYLIST_LAST);
 
+    if(speed_status)
+      retval = get_uint32(*session, CMD_GET_SPEED_STATUS);
+
   }
   else
     fprintf(stderr, _("Session %d isn't running.\n"), *session);
+
+  return retval;
 }
 
 #else /* CTRL_TEST */

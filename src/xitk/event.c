@@ -1615,7 +1615,7 @@ static void on_start(void *data) {
     int dummy_session;
     
     while(startup->session_opts[i])
-      session_handle_subopt(startup->session_opts[i++], &dummy_session);
+      (void) session_handle_subopt(startup->session_opts[i++], &dummy_session);
     
   }
   

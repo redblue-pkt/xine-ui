@@ -51,6 +51,7 @@ typedef enum {
   CMD_VOLUME,
   CMD_AMP,
   CMD_LOOP,
+  CMD_GET_SPEED_STATUS,
   CMD_GET_VERSION,
   CMD_PING
 } ctrl_commands_t;
@@ -66,6 +67,6 @@ int is_remote_running(int session);
 int init_session(void);
 void deinit_session(void);
 
-void session_handle_subopt(char *optarg, int *session);
+int session_handle_subopt(char *optarg, int *session);
 
 #endif
