@@ -232,7 +232,7 @@ static kbinding_entry_t default_binding_table[] = {
   { "Change audio syncing.",
     "AudioVideoDecay+",       ACTID_AV_SYNC_p3600           , "m",        KEYMOD_NOMOD   },
   { "Change audio syncing.",
-    "AudioVideoDecay-",       ACTID_AV_SYNC_p3600           , "n",        KEYMOD_NOMOD   },
+    "AudioVideoDecay-",       ACTID_AV_SYNC_m3600           , "n",        KEYMOD_NOMOD   },
   { "Reset audio video syncing offset.",
     "AudioVideoDecayReset",   ACTID_AV_SYNC_RESET           , "Home",     KEYMOD_NOMOD   },
   { "Increment playback speed.",
