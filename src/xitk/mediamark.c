@@ -652,7 +652,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
       int entries_asx = 0;
 
       xml_parser_init(asx_content, size, XML_PARSER_CASE_INSENSITIVE);
-      if((result = xml_parser_build_tree(&xml_tree)) > 0)
+      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
 	goto __failure;
       
       if(!strcmp(xml_tree->name, "ASX")) {
