@@ -50,22 +50,26 @@
    
    5.2 PYTANIA DOTYCZ¡CE D¬WIÊKU
    5.2.1 Kiedy odtwarzam tê próbkê widzê obraz ale nie ma d¼wiêku!
-   5.2.2 Mam problemy z za³adowaniem bibliotek ALSA 0.9.x! (wtyczka audio alsa09)
+   5.2.2 Mam problemy z za³adowaniem bibliotek ALSA 0.9.x!(wtyczka audio alsa09)
    5.2.3 Co ze sterownikami ALSA 0.5.x?
    5.2.4 Czy xine mo¿e odtwarzaæ d¼wiêk surround 4-/5-kana³owy?
    5.2.5 Co z wyj¶ciem ac3 przez spdif do zewnêtrznego dekodera ac3?
-   5.2.6 Zmiana g³o¶no¶ci przez interfejs u¿ytkonika xine nic nie daje! Co jest!?
+   5.2.6 Zmiana g³o¶no¶ci przez interfejs u¿ytkonika xine nic nie daje!
+         Co jest!?
    
    5.3 PYTANIA DOTYCZ¡CE OBRAZU
    5.3.1 S³yszê d¼wiêk ale nie widzê obrazu!
-   5.3.2 Jak mogê zmusiæ xine do u¿ywania rozszerzenia Xv i jakich sterowników potrzebujê?
+   5.3.2 Jak mogê zmusiæ xine do u¿ywania rozszerzenia Xv i jakich sterowników
+         potrzebujê?
    5.3.3 Wy¶wietlane jest logo xine ale nie widze mojego wideo!
-   5.3.4 Niektóre czê¶ci mojego X Pulpitu robi± siê przezroczyste kiedy xine odtwarza wideo!
+   5.3.4 Niektóre czê¶ci mojego X Pulpitu robi± siê przezroczyste kiedy xine
+         odtwarza wideo!
    5.3.5 Proporcje odtwarzanego obrazu s± b³êdne!
    5.3.6 Jak mo¿na zmieniæ kolor/jasno¶æ/kontrast?
 
    5.4 KOMUNIKATY O B£ÊDACH: CO ONE OZNACZAJ¡ I CO MO¯ESZ ZROBIÆ.
-   5.4.1 B³±d przy uruchomieniu xine z informacj± o sterownikach/urz±dzeniach audio!   
+   5.4.1 B³±d przy uruchomieniu xine z informacj± o sterownikach/urz±dzeniach
+         audio!   
    5.4.2 "no video port found"
    5.4.3 "Unable to open dvd drive (/dev/dvd)"
    5.4.4 "demux error! 00 00 00 (should be 0x000001)"
@@ -74,7 +78,7 @@
    5.4.6 "audio driver 'oss' failed, using null driver instead"
    
    6   PLUSKWA - DAWAÆ TEGO EKSTERMINATORA ROBLI NATYCHMIAST ;-)
-   6.1 Dokona³em niemo¿liwego - Znalaz³em b³±d! Kogo mogê o tym poinformowaæ?
+   6.1 Dokona³em niemo¿liwego - znalaz³em b³±d! Kogo mogê o tym poinformowaæ?
 
 
 
@@ -122,16 +126,16 @@
 
 2.2 Gdzie i jak mogê znale¼æ najnowsz± wersjê rozwojow±?
 
-     ¦ci±gnij je sobie z naszego repozytorium CVS:
+    ¦ci±gnij je sobie z naszego repozytorium CVS:
 
-     cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine login
+    cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine login
 
-     <puste has³o>
+    <puste has³o>
 
-     cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-lib
-     cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-ui
+    cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-lib
+    cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-ui
      
-     Lub pobierz sobie robiony codziennie zbiór tar z naszej strony WWW.
+    Lub pobierz sobie robiony codziennie zbiór tar z naszej strony WWW.
     
 
 3   PROCES KOMPILACJI
@@ -239,7 +243,10 @@
 3.5.2 Wtyczka wyj¶cia wideo Xv nie kompiluje siê!
 
       Je¶li chcesz mieæ wkompilowane wsparcie dla Xv, upewnij siê ¿e masz
-      wspó³dzielon± bibliotekê Xv w swoim systemie, n.p. ls /usr/X11R6/lib/libXv*
+      wspó³dzielon± bibliotekê Xv w swoim systemie, n.p. 
+
+       ls /usr/X11R6/lib/libXv*
+
       powinno zwróciæ ci biblioteki .so takie jak:
 
       /usr/X11R6/lib/libXv.a
@@ -434,29 +441,39 @@
       Wtyczka dvd, dostarczana obecnie z xine, nie wspiera odtwarzania
       zablokowanych i/lub zaszyfrowanych dysków DVD. Bêdziesz potrzebowaæ
       zewnêtrznego programu lub czego¶ na kszta³t "ulepszonej" wtyczki
-      xine_dvd_plugin by ogl±daæ takie dvd bezpo¶rednio w xine. Oczywi¶cie
+      xine_dvd_plugin by ogl±daæ takie DVD bezpo¶rednio w xine. Oczywi¶cie
       mo¿esz odtwarzaæ za pomoc± xine odszyfrowane strumienie mpeg2 (mówi±c
-      technicznie) to jest, odtwarzaæ zaszyfrowane DVD w xine,
-      odszyfrowywuj±c je za pomoc± innych programów.
+      technicznie) to jest, odtwarzaæ zaszyfrowane DVD w xine, uprzednio
+      odszyfrowywuj±c dysk za pomoc± innych programów.
     
       Z powodu niejasnego statusu szyfrowania CSS nie dodajemy nic takiego
-      w dystrybucji xine, jak równie¿ nie zalecamy u¿ywania takich programów.
+      do dystrybucji xine, jak równie¿ nie zalecamy u¿ywania takich programów.
       (Powiniene¶ sprawdziæ czy u¿ywanie takiego oprogramowania jest legalne
       w Twoim kraju).
     
       Mamy nadziejê ¿e ta sytuacja wkrótce ulegnie zmianie.
 
-      Dla nieblokowanego/nieszyfrowanego dvd dobrze jest najpierw sprawdziæ
-      jakie pliki on zawiera, poprzez zamontowanie go. Pliki nazywa siê w/g
-      nastêpuj±cego schematu:
-     
+      Najprostszym sposobem na odtwarzanie niezaszyfrowanego DVD jest po prostu
+      Naci¶niêcie przycisku DVD na panelu xine, po czym przycisku PLAY. Wtedy
+      wszystko powinno dzia³aæ "automatycznie". Zauwa¿ ¿e aby to zadzia³a³o nie
+      musisz montowaæ dysku DVD. Mo¿esz spocz±æ i korzystaæ z uroków filmu. :-)
+
+      Alternatywnym sposobem jest zrobienie wszystkiego manualnie. (nawet je¶li
+      zupe³nie niepotrzebnie, ale CHCESZ: u¿ytkownik - królem ;-)):
+
+      Pamiêtaj ¿e je¶li wybie¿esz tê drogê, nie bêdziesz mia³ ci±g³o¶ci w
+      odtwarzaniu filmu DVD. Bêdziesz musia³ odtwarzaæ ka¿d± czê¶æ manualnie.
+      A wiêc jeszcze raz: dlaczego nie nacisn±æ po prostu przyciku DVD
+      na panelu xine!? ;-)
+
+      Zamontuj dysk DVD i sprawd¼ jakie pliki na nim siê znajduj±. Powinny siê
+      tam znajdowaæ pliki typu:
+
        ../VIDEO_TS/VTS_xx_x.VOB, gdzie x to cyfra.
      
       Je¶li znajdziesz wielkie pliki .VOB na dvd to prawdopodobnie s± w³a¶nie
-      te które zawieraj± film. Obecnie nie wspieramy podobnego odtwarzania
-      ca³ych filmów - bêdziesz musia³ odtwarzaæ ka¿d± indywidualn± czê¶æ osobno.
-
-      Aby odtworzyæ plik .VOB u¿yj nastêpuj±cego polecenia:
+      te które zawieraj± film. Aby odtworzyæ taki plik uruchom xine w
+      nastêpuj±cy sposób:
 
        xine dvd://VTS_xx_x.VOB
 
@@ -567,7 +584,8 @@
       Prawdopodobnie Twój sprzêt jest po prostu zbyt wolny - zobacz odpowiedz
       na pytanie 5.1.1 jak to przy¶pieszyæ.
 
-5.3.2 Jak mogê zmusiæ xine do u¿ywania rozszerzenia Xv i jakich sterowników potrzebujê?
+5.3.2 Jak mogê zmusiæ xine do u¿ywania rozszerzenia Xv i jakich sterowników
+      potrzebujê?
     
       xine powinien sam u¿yæ Xv je¶li jest to mo¿liwe. W niektórych przypadkach
       mo¿esz chcieæ wybraæ odtwarzanie przez Xv manualnie (gdy z jakiego¶
@@ -653,7 +671,8 @@
 
 5.4 KOMUNIKATY O B£ÊDACH: CO ONE OZNACZAJ¡ I CO MO¯ESZ ZROBIÆ.
 
-5.4.1 B³±d przy uruchomieniu xine z informacj± o sterownikach/urz±dzeniach audio!
+5.4.1 B³±d przy uruchomieniu xine z informacj± o sterownikach/urz±dzeniach
+      audio!
 
       Mo¿esz wybraæ sterownik audio poprzez podanie opcji -A. Tak wiêc spróbuj:
      
@@ -709,7 +728,7 @@
       na odpowiedni kod regionu. (zobacz równie¿ 5.1.8)
 
       Ostatnie wesje xine prawdopodobnie sprawdz± czy DVD, które próbujesz
-      odtworzyæ, jest zaszyfrowane i poinformuj± Ciê o tym. (zobacz 5.4.5)      
+      odtworzyæ, jest zaszyfrowane i poinformuj± Ciê o tym. (zobacz 5.4.5)
 
 5.4.5 "input_dvd: Sorry, xine doesn't play encrypted DVDs. The legal status
        of CSS decryption is unclear and we will not provide such code."
@@ -757,8 +776,8 @@
 
 6.1 Dokona³em niemo¿liwego - znalaz³em b³±d! Kogo mogê o tym poinformowaæ?
 
-    Pomimo wysi³ków aby ka¿da nastêpna wersja by³a wolna od b³êdów jak to tylko
-    mo¿liwe, xine jest w ci±g³ym i intensywnym rozwoju. (³adna wymówka, nie?)
+    Pomimo wysi³ków, aby ka¿da nastêpna wersja by³a, jak to tylko mo¿liwe, wolna
+    od b³êdów, xine jest w ci±g³ym i intensywnym rozwoju.(³adna wymówka, nie?)
 
     Proszê rzuæ okiem na formularz zg³aszania b³êdów który znajduje siê w
     pakiecie xine-ui (doc/bug_report_form). Wype³nij go dok³adnie i wy¶lij na
