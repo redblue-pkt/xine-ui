@@ -26,6 +26,8 @@
 #ifndef __sun
 #define _XOPEN_SOURCE 500
 #endif
+/* required for S_ISSOCK */
+#define _BSD_SOURCE 1
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +47,10 @@
 
 extern gGui_t          *gGui;
 
+#ifndef S_ISSOCK
+#define S_ISSOCK(mode) 0
+#endif
+
 #define CTRL_PROTO_VERSION    0x1
 
 typedef struct {
@@ -59,7 +65,7 @@ typedef struct {
   void                 *data;
 } serv_header_packet_t;
 
-static int           ctrl_fd, session_id;
+static int           ctrl_fd, session_id = -1;
 static int           going;
 static pthread_t     thread_server;
 static char         *socket_name;
@@ -379,7 +385,6 @@ void *ctrlsocket_func(void *data) {
       break;
 
     case CMD_PLAYLIST_LOAD:
-      printf("load: '%s'\n", (char *)shdr->data);
       mediamark_load_mediamarks((const char *)shdr->data);
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       playlist_update_playlist();
@@ -406,7 +411,19 @@ void *ctrlsocket_func(void *data) {
   pthread_exit(NULL);
 }
 
-int setup_ctrlsocket(void) {
+void deinit_session(void) {
+  if(session_id >= 0) {
+    char          socketname[XITK_PATH_MAX + XINE_NAME_MAX + 1];
+    struct stat   sstat;
+    
+    sprintf(socketname, "%s/.xine/session.%d", (xine_get_homedir()), session_id);
+    if(((stat(socketname, &sstat)) > -1) && (S_ISSOCK(sstat.st_mode)))
+      unlink(socketname);
+    
+  }
+}
+
+int init_session(void) {
   struct sockaddr_un   saddr;
   int                  retval = 0;
   int                  i;

@@ -68,8 +68,6 @@ typedef struct {
 
 static _mmk_editor_t  *mmkeditor = NULL;
 
-extern int       errno;
-
 extern gGui_t   *gGui;
 
 typedef struct {

@@ -66,7 +66,6 @@
 #define S_IXUGO        (S_IXUSR | S_IXGRP | S_IXOTH)
 #endif
 
-extern int              errno;
 extern gGui_t          *gGui;
 
 static char            *fontname           = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";

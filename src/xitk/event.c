@@ -1296,7 +1296,7 @@ void gui_run (void) {
 						 NULL, NULL);
   
   start_remote_server();
-  setup_ctrlsocket();
+  init_session();
 
   /* Need for tvmode */
   video_window_set_fullscreen_mode((video_window_get_fullscreen_mode()));
@@ -1361,6 +1361,7 @@ void gui_run (void) {
   xitk_run(on_start, (void *)auto_start);
 
   gGui->running = 0;
+  deinit_session();
 
   kbindings_save_kbinding(gGui->kbindings);
   kbindings_free_kbinding(&gGui->kbindings);

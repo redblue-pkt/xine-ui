@@ -56,7 +56,8 @@ void send_string(int session, ctrl_commands_t command, char *string);
 char *get_string(int session, ctrl_commands_t command);
 int is_remote_running(int session);
 
-int setup_ctrlsocket(void);
+int init_session(void);
+void deinit_session(void);
 
 void session_handle_subopt(char *optarg, int *session);
 
