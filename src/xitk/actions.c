@@ -748,8 +748,10 @@ void gui_stop (xitk_widget_t *w, void *data) {
 void gui_pause (xitk_widget_t *w, void *data, int state) {
   if(xine_get_param(gGui->stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
-  else
+  else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    video_window_reset_ssaver();
+  }
   
   panel_check_pause();
   osd_update_status();
