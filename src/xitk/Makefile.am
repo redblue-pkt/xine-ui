@@ -1,6 +1,6 @@
 SUBDIRS = xine-toolkit skins
 
-CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ -Ixine-toolkit/
+CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
 
 bin_PROGRAMS = xine
