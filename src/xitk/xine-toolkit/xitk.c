@@ -132,6 +132,8 @@ typedef struct {
   xitk_config_t              *config;
   xitk_signal_callback_t      sig_callback;
   void                       *sig_data;
+
+  Window                      modalw;
 } __xitk_t;
 
 static __xitk_t    *gXitk;
@@ -140,6 +142,14 @@ static Atom XA_WIN_LAYER = None, XA_STAYS_ON_TOP = None;
 
 
 void widget_stop(void);
+
+void xitk_modal_window(Window w) {
+  gXitk->modalw = w;
+}
+void xitk_unmodal_window(Window w) {
+  if(w == gXitk->modalw)
+    gXitk->modalw = None;
+}
 
 /*
  * Execute a shell command.
@@ -964,8 +974,18 @@ void xitk_xevent_notify(XEvent *event) {
     
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
 
+  if(gXitk->modalw != None) {
+    while(fx && (fx->window != gXitk->modalw)) {
+      
+      if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
+	fx->xevent_callback(event, fx->user_data);
+      
+      fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+    }
+  }
+  
   while(fx) {
-
+    
     if(fx->window != None) {
       
       //printf("event %d\n", event->type);
@@ -1045,12 +1065,14 @@ void xitk_xevent_notify(XEvent *event) {
 	  else if((mykey == XK_space) || (mykey == XK_Return) || 
 		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
 	    if(w && ((w->type & WIDGET_CLICKABLE) && w->visible && w->enable)) {
-	      
+	      printf("RETURN\n");
 	      if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
 		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
 		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
 		widget_event_t         event;
 		widget_event_result_t  result;
+
+		printf("BUTTON\n");
 
 		handled = 1;
 
@@ -1350,11 +1372,22 @@ void xitk_xevent_notify(XEvent *event) {
     else {
       
       /* Don't forward event to all of windows */
-      if(fx->xevent_callback 
-	 && (fx->window != None && event->type != KeyRelease)) {
+      if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
 	fx->xevent_callback(event, fx->user_data);
+
+    }
+
+    if(gXitk->modalw != None) {
+      fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+
+      /* Flush remain fxs */
+      while(fx && (fx->window != gXitk->modalw)) {
+	if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
+	  fx->xevent_callback(event, fx->user_data);
+
+	fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
       }
-      
+      return;
     }
     
     fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
@@ -1377,16 +1410,17 @@ void xitk_init(Display *display) {
 
   gXitk = (__xitk_t *) xitk_xmalloc(sizeof(__xitk_t));
 
-  gXitk->list           = xitk_list_new();
-  gXitk->gfx            = xitk_list_new();
-  gXitk->display        = display;
-  gXitk->key            = 0;
-  gXitk->sig_callback   = NULL;
-  gXitk->sig_data       = NULL;
-  gXitk->config         = xitk_config_init();
-  gXitk->use_xshm       = (xitk_config_get_shm_feature(gXitk->config)) ? (xitk_check_xshm(display)) : 0;
-  xitk_x_error          = 0;
+  gXitk->list            = xitk_list_new();
+  gXitk->gfx             = xitk_list_new();
+  gXitk->display         = display;
+  gXitk->key             = 0;
+  gXitk->sig_callback    = NULL;
+  gXitk->sig_data        = NULL;
+  gXitk->config          = xitk_config_init();
+  gXitk->use_xshm        = (xitk_config_get_shm_feature(gXitk->config)) ? (xitk_check_xshm(display)) : 0;
+  xitk_x_error           = 0;
   gXitk->x_error_handler = NULL;
+  gXitk->modalw          = None;
 
   pthread_mutex_init (&gXitk->mutex, NULL);
 

@@ -2146,6 +2146,8 @@ xitk_window_t *xitk_window_dialog_yesno(ImlibData *im, char *title,
   xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, __VA_ARGS__)
 #endif
 
+void xitk_window_set_modal(xitk_window_t *w);
+void xitk_window_dialog_set_modal(xitk_window_t *w);
 
 xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
 				       xitk_tabs_widget_t *t, 

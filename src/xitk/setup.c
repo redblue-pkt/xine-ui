@@ -492,15 +492,34 @@ static void setup_handle_event(XEvent *event, void *data) {
 	}
 	break;
 
+
+      case XK_Next: {
+	int pos, max = xitk_slider_get_max(setup->slider_wg);
+	
+	pos = max - (setup->first_displayed + MAX_DISPLAY_WIDGETS);
+	xitk_slider_set_pos(setup->slider_wg, (pos >= 0) ? pos : 0);
+	xitk_slider_callback_exec(setup->slider_wg);
+      }
+	break;
+
+      case XK_Prior: {
+	int pos, max = xitk_slider_get_max(setup->slider_wg);
+	
+	pos = max - (setup->first_displayed - MAX_DISPLAY_WIDGETS);
+	xitk_slider_set_pos(setup->slider_wg, (pos <= max) ? pos : max);
+	xitk_slider_callback_exec(setup->slider_wg);
+      }
+	break;
+	
       }
     }
   }
-  break;
-  
+    break;
+    
   }
 }
 
-/*
+/*q
  *
  */
 static xitk_widget_t *setup_add_label (int x, int y, int w, const char *str) {

@@ -163,6 +163,10 @@ static void newbie_mode_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->newbie_mode = cfg->num_value;
 }
 
+static void play_anyway_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->play_anyway = cfg->num_value;
+}
+
 static void exp_level_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->experience_level = (cfg->num_value * 10);
 }
@@ -1075,6 +1079,16 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      _("In this mode, xine take some decisions to simplify user's life."),
 			      CONFIG_LEVEL_BEG,
 			      newbie_mode_cb,
+			      CONFIG_NO_DATA);
+
+  gGui->play_anyway = 
+    xine_config_register_bool(gGui->xine, "gui.play_anyway", 
+			      0,
+			      _("Ask user for playback with unsupported codec"),
+			      _("If xine don't support audio or video codec of current stream "
+				"the user will be asked if the stream should be played or not"), 
+			      CONFIG_LEVEL_BEG,
+			      play_anyway_cb,
 			      CONFIG_NO_DATA);
 
   gGui->experience_level =

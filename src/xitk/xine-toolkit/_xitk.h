@@ -271,6 +271,8 @@ long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
+void xitk_modal_window(Window w);
+void xitk_unmodal_window(Window w);
 
 int xitk_skin_get_direction(xitk_skin_config_t *, const char *);
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);

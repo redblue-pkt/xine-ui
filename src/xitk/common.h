@@ -279,6 +279,10 @@ typedef struct {
 
   char                       curdir[XITK_PATH_MAX];
 
+  int                        play_anyway;
+
+  pthread_mutex_t            modal_mutex;
+
 } gGui_t;
 
 #endif

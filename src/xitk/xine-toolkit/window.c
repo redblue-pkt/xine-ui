@@ -591,6 +591,13 @@ static void _window_handle_event(XEvent *event, void *data) {
   }
 }
 
+void xitk_window_set_modal(xitk_window_t *w) {
+  xitk_modal_window(w->window);  
+}
+void xitk_window_dialog_set_modal(xitk_window_t *w) {
+  xitk_dialog_t *wd = w->parent;
+  xitk_window_set_modal(wd->xwin);
+}
 void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
 
   XLOCK(im->x.disp);
@@ -602,6 +609,9 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
 
   w->width = -1;
   w->height = -1;
+
+  xitk_unmodal_window(w->window);
+
   XLOCK(im->x.disp);
   XDestroyWindow(im->x.disp, w->window);
   XUNLOCK(im->x.disp);

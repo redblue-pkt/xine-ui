@@ -1153,6 +1153,8 @@ int main(int argc, char *argv[]) {
    * init gui
    */
   gui_init(_argc - optind, &_argv[optind], &window_attribute);
+
+  pthread_mutex_init(&gGui->modal_mutex, NULL);
   
   /* Automatically start playback if new_mode is enabled and playlist is filled */
   if(gGui->newbie_mode && 
