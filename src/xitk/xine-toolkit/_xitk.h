@@ -65,7 +65,6 @@
 #include "intbox.h"
 #include "labelbutton.h"
 #include "label.h"
-#include "list.h"
 #include "mrlbrowser.h"
 #include "skin.h"
 #include "slider.h"
