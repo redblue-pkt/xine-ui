@@ -225,8 +225,15 @@ Zooming Feature (TVout Only)
 Pressing the 'z' key enables another tv-only mode which zooms into the 
 centre of a 16:9 video to display much smaller (or none) black bars 
 top & bottom.  It crops the video on the left and right sides to 
-maintain the correct aspect ratio. Please read the xine README for
-further information on usage. 
+maintain the correct aspect ratio. Use SHIFT-z to disable.
+
+
+TVmode Cycling Feature
+======================
+Pressing ALT-z repeatedly will allow you to cycle between tv modes PAL, 
+PAL60, & NTSC.  The format selected will only remain valid for the 
+current xine session, on startup the tv mode will revert to the default
+in .xinerc
 
 
 VGA overlay feature
