@@ -47,7 +47,7 @@ static void _create_label_pixmap(xitk_widget_t *w) {
   private_data->anim_offset = 0;
 
   if(private_data->animation) {
-    _label = (char *) alloca((strlen(private_data->label) * 2) + 5 + 1);
+    _label = (char *) xitk_xmalloc((strlen(private_data->label) * 2) + 5 + 1);
     
     if((strlen(private_data->label)) > private_data->length)
       sprintf(_label, "%s *** %s", private_data->label, private_data->label);
@@ -56,24 +56,22 @@ static void _create_label_pixmap(xitk_widget_t *w) {
     
   }
   else
-    xitk_strdupa(_label, private_data->label);
+    _label = strdup(private_data->label);
   
   len = strlen(_label);
   pixwidth = private_data->char_length * 
     ((private_data->length * ((len / private_data->length) + 1)) + 5);
-
   private_data->labelpix = xitk_image_create_xitk_pixmap(private_data->imlibdata,
 							 (pixwidth) ? pixwidth : 1, 
 							 private_data->char_height);
 
   x_dest = 0;
-    
-  for (i = 0; i < pixwidth; i++) {
+
+  for (i = 0; i < strlen(_label); i++) {
     int c = 0;
     
     if ((i < len) && (_label[i] >= 32))
       c = _label[i] - 32;
-    
     if (c >= 0) {
       int px, py;
       
@@ -91,6 +89,7 @@ static void _create_label_pixmap(xitk_widget_t *w) {
     x_dest += private_data->char_length;
   }
 
+  free(_label);
 }
 
 /*
