@@ -231,6 +231,9 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/share/locale/de/LC_MESSAGES/xitk.mo
 %{prefix}/share/locale/sk/LC_MESSAGES/xine-ui.mo
 %{prefix}/share/locale/sk/LC_MESSAGES/xitk.mo
+%{prefix}/share/locale/pl_PL/LC_MESSAGES/xitk.mo
+%{prefix}/share/locale/pl_PL/LC_MESSAGES/xine-ui.mo
+
 
 @HAVE_AA_TRUE@%files aa
 @HAVE_AA_TRUE@%defattr(-,root,root)
