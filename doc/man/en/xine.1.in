@@ -306,7 +306,7 @@ Show/hide log window.
 Hide/show the MRL browser.
 .IP "\fBC\fP\-\fBm\fP"
 Audio mute toggle.
-.IP "\fBC\fP\-\fBo\fP"
+.IP "\fBCM\fP\-\fBo\fP"
 Toggle TV modes on the DXR3
 .IP "\fBM\fP\-\fBp\fP"
 Show/hide the playlist window.

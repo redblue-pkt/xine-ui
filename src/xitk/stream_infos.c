@@ -87,6 +87,7 @@ typedef struct {
     xitk_widget_t      *ignore_video;
     xitk_widget_t      *ignore_audio;
     xitk_widget_t      *ignore_spu;
+    xitk_widget_t      *has_still;
   } infos;
 
   int                   running;
@@ -390,6 +391,7 @@ static void stream_info_update_undefined(void) {
   set_label(sinfos->infos.ignore_video, "---");
   set_label(sinfos->infos.ignore_audio, "---");
   set_label(sinfos->infos.ignore_spu, "---");
+  set_label(sinfos->infos.has_still, "---");
 }
 
 void stream_infos_update_infos(void) {
@@ -431,6 +433,7 @@ void stream_infos_update_infos(void) {
       get_stream_yesno_info(sinfos->infos.ignore_video, XINE_STREAM_INFO_IGNORE_VIDEO);
       get_stream_yesno_info(sinfos->infos.ignore_audio, XINE_STREAM_INFO_IGNORE_AUDIO);
       get_stream_yesno_info(sinfos->infos.ignore_spu, XINE_STREAM_INFO_IGNORE_SPU);
+      get_stream_yesno_info(sinfos->infos.has_still, XINE_STREAM_INFO_VIDEO_HAS_STILL);
     }
     else
       stream_info_update_undefined();
@@ -680,6 +683,19 @@ void stream_infos_panel(void) {
   lbl.callback          = NULL;
   xitk_list_append_content(sinfos->widget_list->l, 
 			   (sinfos->infos.ignore_spu = 
+			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
+						     x, y, w, 20, sinfosfontname)));
+
+  x += w + 15;
+  draw_inner_frame(gGui->imlib_data, bg, _("Has Still: "), lfontname, 
+		    x - 5, y - 2, w + 10, 20 + 15);
+  lbl.window            = xitk_window_get_window(sinfos->xwin);
+  lbl.gc                = sinfos->widget_list->gc;
+  lbl.skin_element_name = NULL;
+  lbl.label             = "";
+  lbl.callback          = NULL;
+  xitk_list_append_content(sinfos->widget_list->l, 
+			   (sinfos->infos.has_still = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
 

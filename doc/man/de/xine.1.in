@@ -4,6 +4,7 @@
 .\" other parms are allowed: see man(7), man(1)
 .\" 
 .\" Zuletzt synchronisiert mit en/xine.1.in 1.22 2002-08-02
+
 .de Vb \" Begin verbatim text
 .ft CW
 .nf
@@ -279,7 +280,7 @@ Fenster mit Meldungen anzeigen/verdecken.
 Fenster mit MRL\-Browser anzeigen/verdecken.
 .IP  "\fBC\fP\-\fBm\fP | \fBC\fP\-\fBM\fP"
 Ton\-Stummschaltung umschalten.
-.IP  "\fBC\fP\-\fBo\fP"
+.IP  "\fBCM\fP\-\fBo\fP"
 TV\-Modus der DXR3 umschalten.
 .IP  "\fBM\fP\-\fBp\fP | \fBM\fP\-\fBP\fP"
 Fenster mit Wiedergabeliste anzeigen/verdecken.

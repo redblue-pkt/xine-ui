@@ -545,6 +545,16 @@ dnl fi
 dnl AC_SUBST(CORBA_DEP)
 
 
+dnl
+dnl
+dnl
+BUILD_CC="`$CC -v 2>&1 | tail -1`"
+BUILD_OS="`uname -s -r -m`"
+BUILD_DATE="`date \"+%a %d %b %Y %T\"`"
+AC_SUBST(BUILD_CC)
+AC_SUBST(BUILD_OS)
+AC_SUBST(BUILD_DATE)
+
 
 if test "$GCC" = yes; then
     dnl

@@ -321,7 +321,7 @@ Affiche/masque le gestionnaire de MRL.
 .BR C\-m :
 Bascule du mode muêt.
 .br
-.BR C\-o :
+.BR CM\-o :
 Bascule du mode TV pour les carte DXR3.
 .br
 .BR M\-p :
