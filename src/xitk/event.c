@@ -641,19 +641,19 @@ void gui_execute_action_id(action_id_t action) {
     /* Temporary informations */    
     switch(gGui->playlist.loop) {
     case PLAYLIST_LOOP_NO_LOOP:
-      osd_display_info("playlist: no loop.");
+      osd_display_info(_("playlist: no loop."));
       break;
     case PLAYLIST_LOOP_LOOP:
-      osd_display_info("playlist: loop.");
+      osd_display_info(_("playlist: loop."));
       break;
     case PLAYLIST_LOOP_REPEAT:
-      osd_display_info("playlist: entry repeat.");
+      osd_display_info(_("playlist: entry repeat."));
       break;
     case PLAYLIST_LOOP_SHUFFLE:
-      osd_display_info("playlist: shuffle.");
+      osd_display_info(_("playlist: shuffle."));
       break;
     case PLAYLIST_LOOP_SHUF_PLUS:
-      osd_display_info("playlist: shuffle forever.");
+      osd_display_info(_("playlist: shuffle forever."));
       break;
     }
     break;

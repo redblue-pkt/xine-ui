@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <unistd.h>
 
 #include "common.h"
@@ -499,19 +500,41 @@ void osd_stream_position(int pos) {
   osd_draw_bar(_("Position in Stream"), 0, 65535, pos, OSD_BAR_POS2);
 }
 
-void osd_display_info(char *info) {
+void osd_display_info(char *info, ...) {
 
   if(gGui->osd.enabled) {
-    char buffer[256];
+    va_list   args;
+    char     *buf;
+    int       n, size = 100;
+    
+    if((buf = xine_xmalloc(size)) == NULL) 
+      return;
+    
+    while(1) {
+      
+      va_start(args, info);
+      n = vsnprintf(buf, size, info, args);
+      va_end(args);
+      
+      if(n > -1 && n < size)
+	break;
+      
+      if(n > -1)
+	size = n + 1;
+      else
+	size *= 2;
+      
+      if((buf = realloc(buf, size)) == NULL)
+	return;
+    }
     
     xine_osd_clear(gGui->osd.info);
     
-    memset(&buffer, 0, sizeof(buffer));
-    snprintf(buffer, 255, "%s", info);
-    xine_osd_draw_text(gGui->osd.info, 0, 0, buffer, XINE_OSD_TEXT1);
+    xine_osd_draw_text(gGui->osd.info, 0, 0, buf, XINE_OSD_TEXT1);
     xine_osd_set_position(gGui->osd.info, 20, 10 + 30);
     xine_osd_show(gGui->osd.info, 0);
     gGui->osd.info_visible = gGui->osd.timeout;
+    SAFE_FREE(buf);
   }
 }
 

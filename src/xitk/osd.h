@@ -24,6 +24,8 @@
 #ifndef __OSD_H__
 #define __OSD_H__
 
+#include <stdarg.h>
+
 #define OSD_BAR_PROGRESS 1
 #define OSD_BAR_POS      2
 #define OSD_BAR_POS2     3
@@ -35,7 +37,7 @@ void osd_update(void);
 void osd_stream_infos(void);
 void osd_update_status(void);
 void osd_stream_position(int pos);
-void osd_display_info(char *info);
+void osd_display_info(char *info, ...);
   /* see OSD_BAR_* */
 void osd_draw_bar(char *title, int min, int max, int val, int type);
 #endif
