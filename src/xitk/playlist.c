@@ -744,8 +744,11 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	   * If we're in newbie mode, start playback immediately
 	   * (even ignoring if we're currently playing something
 	   */
-	  if(gGui->newbie_mode)
+	  if(gGui->newbie_mode) {
+	    if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
+	      gui_stop(NULL, NULL);
 	    gui_play(NULL, NULL);
+	  }
 	  
 	}
       }

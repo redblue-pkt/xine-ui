@@ -564,8 +564,11 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
 void gui_eject(xitk_widget_t *w, void *data) {
   int i;
   
+  if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
+    gui_stop(NULL, NULL);
+  
   if(xine_eject(gGui->stream)) {
-    
+
     if(gGui->playlist.num) {
       mediamark_t **mmk = NULL;
       char         *tok = NULL;
@@ -621,13 +624,14 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	
 	if(new_num)
 	  gGui->playlist.cur = 0;
-     }
+      }
       else {
+      __remove_current_mrl:
 	/*
 	 * Remove only the current MRL
 	 */
 	mediamark_free_entry(gGui->playlist.cur);
-
+	
 	for(i = gGui->playlist.cur; i < gGui->playlist.num; i++)
 	  gGui->playlist.mmk[i] = gGui->playlist.mmk[i + 1];
 	
@@ -650,6 +654,11 @@ void gui_eject(xitk_widget_t *w, void *data) {
     
     gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
     playlist_update_playlist();
+  }
+  else {
+    /* Remove current mrl */
+    if(gGui->playlist.num)
+      goto __remove_current_mrl;
   }
 }
 
@@ -1406,6 +1415,12 @@ static void fileselector_callback(filebrowser_t *fb) {
     if(file)
       gui_dndcallback(file);
     free(file);
+
+    if(gGui->newbie_mode) {
+      if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
+	gui_stop(NULL, NULL);
+      gui_play(NULL, NULL);
+    }   
   }
   
 }
@@ -1433,6 +1448,12 @@ static void fileselector_all_callback(filebrowser_t *fb) {
       }
       
       free(path);
+
+      if(gGui->newbie_mode) {
+	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
+	  gui_stop(NULL, NULL);
+	gui_play(NULL, NULL);
+      }   
     }
 
     i = 0;
