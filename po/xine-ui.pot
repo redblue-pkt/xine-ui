@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-22 13:38+0200\n"
+"POT-Creation-Date: 2002-06-23 11:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -605,120 +605,121 @@ msgstr ""
 msgid "Source:"
 msgstr ""
 
-#: src/xitk/panel.c:466
+#. FIXME: this error message does not make sense!
+#: src/xitk/panel.c:467
 msgid "unknown widget slider caller\n"
 msgstr ""
 
-#: src/xitk/panel.c:565
+#: src/xitk/panel.c:566
 msgid "Volume control"
 msgstr ""
 
-#: src/xitk/panel.c:567
+#: src/xitk/panel.c:568
 msgid "Mute toggle"
 msgstr ""
 
 #. panel already open  - FIXME: bring to foreground
-#: src/xitk/panel.c:598
+#: src/xitk/panel.c:599
 msgid "Xine Panel"
 msgstr ""
 
-#: src/xitk/panel.c:615
+#: src/xitk/panel.c:616
 msgid "xine-panel: couldn't find image for background\n"
 msgstr ""
 
-#: src/xitk/panel.c:738
+#: src/xitk/panel.c:739
 msgid "Play previous entry from playlist"
 msgstr ""
 
-#: src/xitk/panel.c:745
+#: src/xitk/panel.c:746
 msgid "Stop playback"
 msgstr ""
 
-#: src/xitk/panel.c:752
+#: src/xitk/panel.c:753
 msgid "Play selected entry"
 msgstr ""
 
-#: src/xitk/panel.c:760
+#: src/xitk/panel.c:761
 msgid "Pause/Resume playback"
 msgstr ""
 
-#: src/xitk/panel.c:767
+#: src/xitk/panel.c:768
 msgid "Play next entry from playlist"
 msgstr ""
 
-#: src/xitk/panel.c:774
+#: src/xitk/panel.c:775
 msgid "Eject current medium"
 msgstr ""
 
-#: src/xitk/panel.c:781
+#: src/xitk/panel.c:782
 msgid "Quit"
 msgstr ""
 
-#: src/xitk/panel.c:788
+#: src/xitk/panel.c:789
 msgid "Setup window"
 msgstr ""
 
-#: src/xitk/panel.c:795
+#: src/xitk/panel.c:796
 msgid "Hide GUI"
 msgstr ""
 
-#: src/xitk/panel.c:802
+#: src/xitk/panel.c:803
 msgid "Fullscreen/Window mode"
 msgstr ""
 
-#: src/xitk/panel.c:809
+#: src/xitk/panel.c:810
 msgid "Next audio channel"
 msgstr ""
 
-#: src/xitk/panel.c:816
+#: src/xitk/panel.c:817
 msgid "Previous audio channel"
 msgstr ""
 
-#: src/xitk/panel.c:823
+#: src/xitk/panel.c:824
 msgid "Next SPU channel"
 msgstr ""
 
-#: src/xitk/panel.c:830
+#: src/xitk/panel.c:831
 msgid "Previous SPU channel"
 msgstr ""
 
-#: src/xitk/panel.c:876
+#: src/xitk/panel.c:877
 msgid "Stream playback position slider"
 msgstr ""
 
-#: src/xitk/panel.c:906
+#: src/xitk/panel.c:907
 msgid "Take a snapshot"
 msgstr ""
 
-#: src/xitk/panel.c:913
+#: src/xitk/panel.c:914
 msgid "Slow motion"
 msgstr ""
 
-#: src/xitk/panel.c:920
+#: src/xitk/panel.c:921
 msgid "Fast motion"
 msgstr ""
 
-#: src/xitk/panel.c:927
+#: src/xitk/panel.c:928
 msgid "Playlist"
 msgstr ""
 
-#: src/xitk/panel.c:934
+#: src/xitk/panel.c:935
 msgid "Control"
 msgstr ""
 
-#: src/xitk/panel.c:941
+#: src/xitk/panel.c:942
 msgid "MRL Browser"
 msgstr ""
 
-#: src/xitk/panel.c:945
+#: src/xitk/panel.c:946
 msgid "gui tips visibility"
 msgstr ""
 
-#: src/xitk/panel.c:948
+#: src/xitk/panel.c:949
 msgid "tips timeout (ms)"
 msgstr ""
 
-#: src/xitk/panel.c:957
+#: src/xitk/panel.c:958
 msgid "gui panel visibility"
 msgstr ""
 

@@ -1,3 +1,9 @@
+xine-ui (0.9.12) unstable; urgency=low
+
+  * fixed segfault with German localization
+
+ -- Siggi Langauf <siggi@debian.org>  Sun, 23 Jun 2002 12:20:11 +0200
+
 xine-ui (0.9.11) unstable; urgency=low
 
   * started the xine-ui ChangeLog again
@@ -8,4 +14,6 @@ xine-ui (0.9.11) unstable; urgency=low
   * xine-ui now reports unsupported codec formats
   * probably more things that I don't recall
 
--- Siggi Langauf <siggi@users.sf.net>
+ -- Siggi Langauf <siggi@users.sf.net>  Sun, 21 Jun 2002
+
+
