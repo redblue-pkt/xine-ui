@@ -12,6 +12,7 @@ src/xitk/i18n.h
 src/xitk/kbindings.c
 src/xitk/main.c
 src/xitk/mediamark.c
+src/xitk/menus.c
 src/xitk/mrl_browser.c
 src/xitk/osd.c
 src/xitk/panel.c

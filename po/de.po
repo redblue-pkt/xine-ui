@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
-"POT-Creation-Date: 2003-02-03 01:35+0100\n"
+"POT-Creation-Date: 2003-02-15 00:05+0100\n"
 "PO-Revision-Date: 2003-02-10 10:20+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -117,92 +117,92 @@ msgstr "Ströme laden"
 msgid "Pick a subtitle file"
 msgstr "Wähle eine Untertiteldatei"
 
-#: src/xitk/control.c:235
+#: src/xitk/control.c:240
 msgid "hue value"
 msgstr "Farbwert"
 
-#: src/xitk/control.c:236
+#: src/xitk/control.c:241
 msgid "Hue value."
 msgstr "Farbwert."
 
-#: src/xitk/control.c:246
+#: src/xitk/control.c:253
 msgid "brightness value"
 msgstr "Helligkeitswert"
 
-#: src/xitk/control.c:247
+#: src/xitk/control.c:254
 msgid "Brightness value."
 msgstr "Helligkeitswert."
 
-#: src/xitk/control.c:257
+#: src/xitk/control.c:266
 msgid "saturation value"
 msgstr "Sättigungswert"
 
-#: src/xitk/control.c:258
+#: src/xitk/control.c:267
 msgid "Saturation value."
 msgstr "Sättigungswert."
 
-#: src/xitk/control.c:268
+#: src/xitk/control.c:279
 msgid "contrast value"
 msgstr "Kontrastwert"
 
-#: src/xitk/control.c:269
+#: src/xitk/control.c:280
 msgid "Contrast value."
 msgstr "Kontrastwert."
 
-#: src/xitk/control.c:435 src/xitk/panel.c:151 src/xitk/playlist.c:907
+#: src/xitk/control.c:446 src/xitk/panel.c:151 src/xitk/playlist.c:907
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): Konnte Hintergrund-Bild nicht finden\n"
 
-#: src/xitk/control.c:506
+#: src/xitk/control.c:517
 msgid "xine Control Window"
 msgstr "xine Einstellungensfenster"
 
-#: src/xitk/control.c:521
+#: src/xitk/control.c:532
 msgid "control: couldn't find image for background\n"
 msgstr "control: Konnte Hintergrundbild nicht finden\n"
 
-#: src/xitk/control.c:642
+#: src/xitk/control.c:653
 msgid "Control HUE value"
 msgstr "Farbton ändern"
 
-#: src/xitk/control.c:645
+#: src/xitk/control.c:656
 msgid "Hue"
 msgstr "Ton"
 
-#: src/xitk/control.c:665
+#: src/xitk/control.c:676
 msgid "Control SATURATION value"
 msgstr "Sättigung ändern"
 
-#: src/xitk/control.c:668
+#: src/xitk/control.c:679
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:688
+#: src/xitk/control.c:699
 msgid "Control BRIGHTNESS value"
 msgstr "Helligkeit ändern"
 
-#: src/xitk/control.c:691
+#: src/xitk/control.c:702
 msgid "Brt"
 msgstr "Hel"
 
-#: src/xitk/control.c:711
+#: src/xitk/control.c:722
 msgid "Control CONTRAST value"
 msgstr "Kontrast ändern"
 
-#: src/xitk/control.c:714
+#: src/xitk/control.c:725
 msgid "Ctr"
 msgstr "Kon"
 
-#: src/xitk/control.c:735
+#: src/xitk/control.c:746
 msgid "Choose a Skin"
 msgstr "Skin-Auswahl"
 
-#: src/xitk/control.c:762 src/xitk/mrl_browser.c:279 src/xitk/playlist.c:1192
+#: src/xitk/control.c:773 src/xitk/mrl_browser.c:279 src/xitk/playlist.c:1192
 msgid "Dismiss"
 msgstr "Schließen"
 
-#: src/xitk/control.c:768
+#: src/xitk/control.c:779
 msgid "Close control window"
 msgstr "Einstellungen-Fenster schließen"
 
@@ -215,7 +215,7 @@ msgstr "Download läuft"
 msgid "Download progress: %d%%."
 msgstr "Downloadfortschritt: %d%%."
 
-#: src/xitk/errors.c:61 src/xitk/kbindings.c:2041
+#: src/xitk/errors.c:61 src/xitk/kbindings.c:2043
 msgid "Done"
 msgstr "Fertig"
 
@@ -305,7 +305,8 @@ msgid "A/V offset: %d"
 msgstr "A/V Versatz: %d"
 
 #: src/xitk/event.c:540
-msgid "SPU Offset: reset."
+#, fuzzy
+msgid "A/V Offset: reset."
 msgstr "SPU Versatz: Zurücksetzen"
 
 #: src/xitk/event.c:548 src/xitk/event.c:557
@@ -313,23 +314,23 @@ msgstr "SPU Versatz: Zurücksetzen"
 msgid "SPU Offset: %d"
 msgstr "SPU Versatz: %d"
 
-#: src/xitk/event.c:674
+#: src/xitk/event.c:674 src/xitk/menus.c:130
 msgid "Playlist: no loop."
 msgstr "Playliste: Keine Wiederholung."
 
-#: src/xitk/event.c:677
+#: src/xitk/event.c:677 src/xitk/menus.c:135
 msgid "Playlist: loop."
 msgstr "Playliste: Wiederholen."
 
-#: src/xitk/event.c:680
+#: src/xitk/event.c:680 src/xitk/menus.c:140
 msgid "Playlist: entry repeat."
 msgstr "Playliste: Eintrag wiederholen."
 
-#: src/xitk/event.c:683
+#: src/xitk/event.c:683 src/xitk/menus.c:145
 msgid "Playlist: shuffle."
 msgstr "Playliste: Mischen"
 
-#: src/xitk/event.c:686
+#: src/xitk/event.c:686 src/xitk/menus.c:150
 msgid "Playlist: shuffle forever."
 msgstr "Playliste: Immer mischen."
 
@@ -622,12 +623,12 @@ msgid "Part"
 msgstr "Kapitel"
 
 #: src/xitk/event_sender.c:686 src/xitk/file_browser.c:1570
-#: src/xitk/mediamark.c:1657 src/xitk/setup.c:1304
+#: src/xitk/mediamark.c:1657 src/xitk/setup.c:1310
 #: src/xitk/stream_infos.c:1021 src/xitk/viewlog.c:487
 msgid "Close"
 msgstr "Schließen"
 
-#: src/xitk/file_browser.c:315 src/xitk/mediamark.c:1642 src/xitk/setup.c:1293
+#: src/xitk/file_browser.c:315 src/xitk/mediamark.c:1642 src/xitk/setup.c:1299
 msgid "Apply"
 msgstr "Anwenden"
 
@@ -687,7 +688,7 @@ msgstr "Versteckte Dateien anzeigen"
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: src/xitk/file_browser.c:1500 src/xitk/kbindings.c:2000
+#: src/xitk/file_browser.c:1500 src/xitk/kbindings.c:2002
 msgid "Delete"
 msgstr "Löschen"
 
@@ -695,7 +696,7 @@ msgstr "Löschen"
 msgid "Create a directory"
 msgstr "Verzeichnis anlegen"
 
-#: src/xitk/kbindings.c:433
+#: src/xitk/kbindings.c:435
 #, c-format
 msgid ""
 "Key bindings of '%s' and '%s' are the same.\n"
@@ -706,48 +707,48 @@ msgstr ""
 "\n"
 "Was soll mit den momentanen Belegungen passieren?\n"
 
-#: src/xitk/kbindings.c:438
+#: src/xitk/kbindings.c:440
 msgid "Keybindings error!"
 msgstr "Tastenbelegungsfehler!"
 
-#: src/xitk/kbindings.c:439 src/xitk/kbindings.c:2028
+#: src/xitk/kbindings.c:441 src/xitk/kbindings.c:2030
 msgid "Reset"
 msgstr "Reset"
 
-#: src/xitk/kbindings.c:440
+#: src/xitk/kbindings.c:442
 msgid "Editor"
 msgstr "Editor"
 
-#: src/xitk/kbindings.c:810
+#: src/xitk/kbindings.c:812
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Autsch! Tastenbelegungstabelle ist NULL.\n"
 
-#: src/xitk/kbindings.c:1407
+#: src/xitk/kbindings.c:1409
 msgid "Nothing selected"
 msgstr "Nichts ausgewählt"
 
-#: src/xitk/kbindings.c:1408 src/xitk/post.c:115
+#: src/xitk/kbindings.c:1410 src/xitk/post.c:115
 msgid "None"
 msgstr "Nichts"
 
-#: src/xitk/kbindings.c:1562
+#: src/xitk/kbindings.c:1564
 msgid "You can only delete alias entries."
 msgstr "Nur Alias-Einträge können entfernt werden."
 
-#: src/xitk/kbindings.c:1690
+#: src/xitk/kbindings.c:1692
 msgid "Press Keyboard Keys..."
 msgstr "Drücke Taste auf Tastatur..."
 
-#: src/xitk/kbindings.c:1703
+#: src/xitk/kbindings.c:1705
 msgid "Event receiver window"
 msgstr "Ereignisempfangsfenster"
 
 #. Ask if uses want/wont store new shorcut
-#: src/xitk/kbindings.c:1791
+#: src/xitk/kbindings.c:1793
 msgid "Accept?"
 msgstr "Akzeptieren?"
 
-#: src/xitk/kbindings.c:1795
+#: src/xitk/kbindings.c:1797
 #, c-format
 msgid ""
 "Store %s as\n"
@@ -756,7 +757,7 @@ msgstr ""
 "Sichere %s als\n"
 "'%s' Tastenbelegung ?"
 
-#: src/xitk/kbindings.c:1802
+#: src/xitk/kbindings.c:1804
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
@@ -765,55 +766,55 @@ msgstr ""
 "Diese Tastenbelegung wird bereits für folgende Aktion benutzt:\n"
 "\"%s\".\n"
 
-#: src/xitk/kbindings.c:1888
+#: src/xitk/kbindings.c:1890
 msgid "key binding editor"
 msgstr "Tastenbelegungseditor"
 
-#: src/xitk/kbindings.c:1917
+#: src/xitk/kbindings.c:1919
 msgid "Binding action"
 msgstr "Aktion zuordnen"
 
-#: src/xitk/kbindings.c:1923
+#: src/xitk/kbindings.c:1925
 msgid "Key"
 msgstr "Taste"
 
-#: src/xitk/kbindings.c:1928
+#: src/xitk/kbindings.c:1930
 msgid "Modifiers"
 msgstr "Zusatztasten"
 
-#: src/xitk/kbindings.c:1972
+#: src/xitk/kbindings.c:1974
 msgid "Alias"
 msgstr "Alias"
 
-#: src/xitk/kbindings.c:1986
+#: src/xitk/kbindings.c:1988
 msgid "Edit"
 msgstr "Ändern"
 
-#: src/xitk/kbindings.c:2014 src/xitk/playlist.c:406 src/xitk/playlist.c:1182
+#: src/xitk/kbindings.c:2016 src/xitk/playlist.c:406 src/xitk/playlist.c:1182
 msgid "Save"
 msgstr "Speichern"
 
-#: src/xitk/kbindings.c:2105
+#: src/xitk/kbindings.c:2107
 msgid "ctrl"
 msgstr "Strg"
 
-#: src/xitk/kbindings.c:2126
+#: src/xitk/kbindings.c:2128
 msgid "meta"
 msgstr "Meta"
 
-#: src/xitk/kbindings.c:2148
+#: src/xitk/kbindings.c:2150
 msgid "mod3"
 msgstr "Mod3"
 
-#: src/xitk/kbindings.c:2170
+#: src/xitk/kbindings.c:2172
 msgid "mod4"
 msgstr "Mod4"
 
-#: src/xitk/kbindings.c:2191
+#: src/xitk/kbindings.c:2193
 msgid "mod5"
 msgstr "Mod5"
 
-#: src/xitk/kbindings.c:2200
+#: src/xitk/kbindings.c:2202
 msgid "Grab"
 msgstr "Aufzeichnen"
 
@@ -967,7 +968,8 @@ msgid "      --install                Install a private colormap.\n"
 msgstr "      --install                Installiert eine eigene Farbtabelle.\n"
 
 #: src/xitk/main.c:476
-msgid "      --keymap [option]        Display keymap. Option are:\n"
+#, fuzzy
+msgid "      --keymap [=option]       Display keymap. Option are:\n"
 msgstr "      --keymap [option]        Zeigt Tastentabelle. Optionen sind:\n"
 
 #: src/xitk/main.c:477
@@ -1035,8 +1037,9 @@ msgid "  -P, --playlist <filename>    Load a playlist file.\n"
 msgstr "  -P, --playlist <Dateiname>   Lädt eine Playliste.\n"
 
 #: src/xitk/main.c:488
+#, fuzzy
 msgid ""
-"  -l, --loop [mode]            Set playlist loop mode (default: loop). Modes "
+"  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes "
 "are:\n"
 msgstr ""
 "  -l, --loop [Modus]           Setzt Playlistwiederholungsmodus (Standard: "
@@ -1251,22 +1254,22 @@ msgstr "Video Treiber id wird für die Option -V benötigt\n"
 msgid "audio driver id required for -A option\n"
 msgstr "Audio Treiber id wird für die Option -A benötigt\n"
 
-#: src/xitk/main.c:1082
+#: src/xitk/main.c:1083
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Fehlerhafte Geometrie '%s', siehe xine --help\n"
 
-#: src/xitk/main.c:1112
+#: src/xitk/main.c:1115
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "Fehlerhafter Wiederholmodus '%s', siehe xine --help\n"
 
-#: src/xitk/main.c:1156
+#: src/xitk/main.c:1159
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Ungültiger Parameter %d => exit\n"
 
-#: src/xitk/main.c:1328
+#: src/xitk/main.c:1331
 msgid "Logo mrl"
 msgstr "Logo MRL"
 
@@ -1352,6 +1355,11 @@ msgstr "Wende Änderungen auf Playlist an."
 #: src/xitk/mediamark.c:1667
 msgid "Discard changes and dismiss the window."
 msgstr "Änderungen verwerfen und Fenster schließen."
+
+#: src/xitk/menus.c:491
+#, fuzzy, c-format
+msgid "xine %s"
+msgstr "xine Konfiguration"
 
 #: src/xitk/mrl_browser.c:193
 msgid "All extensions"
@@ -1619,39 +1627,39 @@ msgstr "Plugin für Video-Nachverarbeitung"
 msgid "Session %d isn't running.\n"
 msgstr "Sitzung %d läuft nicht.\n"
 
-#: src/xitk/setup.c:915 src/xitk/setup.c:917 src/xitk/setup.c:925
-#: src/xitk/setup.c:927 src/xitk/setup.c:935 src/xitk/setup.c:937
-#: src/xitk/setup.c:945 src/xitk/setup.c:947 src/xitk/setup.c:955
-#: src/xitk/setup.c:957
+#: src/xitk/setup.c:921 src/xitk/setup.c:923 src/xitk/setup.c:931
+#: src/xitk/setup.c:933 src/xitk/setup.c:941 src/xitk/setup.c:943
+#: src/xitk/setup.c:951 src/xitk/setup.c:953 src/xitk/setup.c:961
+#: src/xitk/setup.c:963
 msgid "No help available"
 msgstr "Keine Hilfe verfügbar"
 
-#: src/xitk/setup.c:975
+#: src/xitk/setup.c:981
 msgid ""
 "There is no configuration option available in this user experience level."
 msgstr ""
 "Für den gewählten Erfahrungslevel des Benutzers ist keine "
 "Konfigurationsoption vorhanden."
 
-#: src/xitk/setup.c:1081
+#: src/xitk/setup.c:1087
 msgid "Help"
 msgstr "Hilfe"
 
-#: src/xitk/setup.c:1083
+#: src/xitk/setup.c:1089
 msgid "README"
 msgstr "Lies mich"
 
-#: src/xitk/setup.c:1085
+#: src/xitk/setup.c:1091
 msgid "FAQ"
 msgstr "FAQ"
 
-#: src/xitk/setup.c:1233
+#: src/xitk/setup.c:1239
 msgid "xine setup"
 msgstr "xine Konfiguration"
 
-#: src/xitk/setup.c:1282
-msgid "Key Bindings"
-msgstr "Tastenbelegungen"
+#: src/xitk/setup.c:1288
+msgid "OK"
+msgstr ""
 
 #: src/xitk/skins.c:289 src/xitk/skins.c:442
 #, c-format
@@ -1888,11 +1896,11 @@ msgstr "Samplerate: "
 msgid "Update"
 msgstr "Aktualisieren"
 
-#: src/xitk/videowin.c:183
+#: src/xitk/videowin.c:184
 msgid "videowin: output driver cannot select a working visual\n"
 msgstr "videowin: Ausgabetreiber kann kein funktionierendes Visual auswählen\n"
 
-#: src/xitk/videowin.c:190
+#: src/xitk/videowin.c:191
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
@@ -1907,94 +1915,94 @@ msgstr ""
 #. *           dest_width,
 #. *           dest_height);
 #.
-#: src/xitk/videowin.c:232
+#: src/xitk/videowin.c:233
 msgid "xine video output"
 msgstr "xine Video Ausgabe"
 
-#: src/xitk/videowin.c:414
+#: src/xitk/videowin.c:419
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr "XF86VidMode Erweiterung: Umschaltung der Modeline fehlgeschlagen.\n"
 
-#: src/xitk/videowin.c:1223
+#: src/xitk/videowin.c:1238
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
 msgstr "Zu nutzende Bildschirme im Xinerama Vollbildmodus (z.B. 0 2 3)"
 
-#: src/xitk/videowin.c:1224
+#: src/xitk/videowin.c:1239
 msgid ""
 "Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
 msgstr ""
 "Zum Beispiel, wenn die Anzeige auf den Schirmen 0, 2 und 3 sein soll, 0 2 3 "
 "eingeben"
 
-#: src/xitk/videowin.c:1272
+#: src/xitk/videowin.c:1287
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
 msgstr "X-Koordinate für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
-#: src/xitk/videowin.c:1282
+#: src/xitk/videowin.c:1297
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Y-Koordinate für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
-#: src/xitk/videowin.c:1292
+#: src/xitk/videowin.c:1307
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Breite für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
-#: src/xitk/videowin.c:1302
+#: src/xitk/videowin.c:1317
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Höhe für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
-#: src/xitk/videowin.c:1335
+#: src/xitk/videowin.c:1350
 msgid "xine Video Window"
 msgstr "xine Video Fenster"
 
-#: src/xitk/videowin.c:1339
+#: src/xitk/videowin.c:1354
 msgid "xine Video Fullscreen Window"
 msgstr "xine Video Vollbildfenster"
 
-#: src/xitk/videowin.c:1343
+#: src/xitk/videowin.c:1358
 msgid "xine Video Borderless Window"
 msgstr "xine Video rahmenloses Fenster"
 
-#: src/xitk/videowin.c:1364
+#: src/xitk/videowin.c:1379
 msgid "XAllocWMHints() failed\n"
 msgstr "XAllocWMHints() fehlgeschlagen\n"
 
-#: src/xitk/videowin.c:1389
+#: src/xitk/videowin.c:1404
 msgid "New stream sizes resize output window"
 msgstr "Neue Datemstromgröße verändert Ausgabefenstergröße "
 
-#: src/xitk/videowin.c:1399
+#: src/xitk/videowin.c:1414
 msgid "Double size for small streams (require stream_resize_window)"
 msgstr "Doppelte Größe für kleine Datemströme (Erfordert stream_resize_window)"
 
-#: src/xitk/videowin.c:1423
+#: src/xitk/videowin.c:1438
 msgid "use XVidModeExtension when switching to fullscreen"
 msgstr "Benutze XVidModeExtension beim Umschalten auf Vollbild"
 
-#: src/xitk/videowin.c:1444
+#: src/xitk/videowin.c:1459
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 msgstr "XF86VidMode Erweiterung (%d.%d) erkannt, versuche sie zu nutzen.\n"
 
-#: src/xitk/videowin.c:1449
+#: src/xitk/videowin.c:1464
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
 msgstr "XF86VidMode Erweiterung: %d Auflösungen gefunden.\n"
 
-#: src/xitk/videowin.c:1458
+#: src/xitk/videowin.c:1473
 #, c-format
 msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
 msgstr "XF86VidModeModeLine %dx%d ist ungültig: Verworfen.\n"
 
-#: src/xitk/videowin.c:1489
+#: src/xitk/videowin.c:1504
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr ""
 "XF86VidMode Erweiterung: Konnte Liste der verfügbaren Auflösungen nicht "
 "bestimmen.\n"
 
-#: src/xitk/videowin.c:1492
+#: src/xitk/videowin.c:1507
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 msgstr ""
 "XF86VidMode Erweiterung: Initialisierung fehlgeschlagen, wird nicht "
@@ -2017,6 +2025,9 @@ msgstr "xine Log Betrachter"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Aktualisieren"
+
+#~ msgid "Key Bindings"
+#~ msgstr "Tastenbelegungen"
 
 #~ msgid "Xine Control Panel"
 #~ msgstr "Xine Einstellungen"
