@@ -412,13 +412,16 @@ case "$OS" in
 	    msg kernel-2.2.new 0
 	  fi
 	  ;;
-	2.4.*|2.5.*)
+	2.4.*)
 	  if [ "$KERNEL_SUBMINOR" -gt 10 -a "$KERNEL_SUBMINOR" -lt 16 ]; then
 	    msg kernel-2.4.bad 1
 	  else
 	    msg kernel-2.4.good 0
 	  fi
 	  ;;
+	2.5.*|2.6.*|2.7.*)
+	   msg kernel-recent 0
+	   ;;
 	2.*)
 	  msg kernel-pre-2.2 1
 	  ;;

@@ -1,5 +1,6 @@
 xine-ui (0.99.1) unstable; urgency=low
 
+  * lots of xine-check updates (including security fixes)
   * fix redundant keybindings reports,
   * fix unplayable streams and loop (of death) mode,
   * all supported playlist can be downloadable,

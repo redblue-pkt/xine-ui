@@ -1,3 +1,17 @@
+xine-ui (0.99.1-1) unstable; urgency=low
+
+  * new upstream release (finally!)
+    - doesn't depend on old libpng for TRUE/FALSE declaration
+      (closes: #243401, #231999)
+    - handles multiple double hotkey assignments gracefully (closes: #206816)
+    - uses fallback fonts correctly (closes: #225618)
+    - xine-check uses safe tempdir (closes: #239974) [DSA-477]
+    - xine-check handles "unknown" plugins better (closes: #243661)
+    - doesn't segfault on -pfq any more (closes: 187321)
+    - fixes segfault on >16 autorun options (closes: #212509)
+  
+ -- Siggi Langauf <siggi@debian.org>  Thu, 15 Apr 2004 21:26:28 +0200
+
 xine-ui (0.9.23-2) unstable; urgency=low
 
   * rebuild against xine-lib 1-rc3a-2 corrects dependancies (closes: 225613)

@@ -193,6 +193,10 @@ I've detected a recent 2.4.x kernel, which should have support for
 DVD devices, as well as anything else that could accelerate
 video playback.
 
+kernel-recent You seem to have a reasonable kernel version ($KERNEL_VERSION)
+I've detected a recent 2.6 (or newer) kernel, which should have support for
+DVD devices, as well as anything else that could accelerate video playback.
+
 kernel-pre-2.2 seems like you're running a pre-2.2 kernel.
 for DVD support you need to upgrade to a recent 2.2 or 2.4 kernel.
 
