@@ -478,9 +478,5 @@ misc/Makefile
 misc/build_rpms.sh
 misc/SlackBuild
 misc/xine-ui.spec
-])
+],[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh])
 
-dnl
-dnl Change attribute.
-dnl
-chmod +x ./misc/SlackBuild ./misc/build_rpms.sh
