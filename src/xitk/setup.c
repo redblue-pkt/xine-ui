@@ -62,9 +62,9 @@ static char            *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
     fh = xitk_font_get_string_height(fs, labelkey);                                      \
     xitk_font_unload_font(fs);                                                           \
                                                                                          \
-    xitk_get_widget_pos(##widget##, &wx, &wy);                                           \
-    wx += xitk_get_widget_width(##widget##);                                             \
-    wh = xitk_get_widget_height(##widget##);                                             \
+    xitk_get_widget_pos(widget, &wx, &wy);                                               \
+    wx += xitk_get_widget_width(widget);                                                 \
+    wh = xitk_get_widget_height(widget);                                                 \
                                                                                          \
     setup_add_label (wx + 20, (wy + (wh >> 1)) - (fh>>1), (FRAME_WIDTH - wx), labelkey); \
   } 
@@ -298,27 +298,37 @@ static void setup_add_label (int x, int y, int w, char *str) {
 /*
  *
  */
-static void setup_add_slider (char *labelkey, int x, int y, int min, int max, int pos) {
+static void numtype_update(xitk_widget_t *w, void *data, int value) {
+  cfg_entry_t *entry;
+  
+  entry = (cfg_entry_t *)data;
+ 
+  entry->config->update_num(entry->config, entry->key, value );
+}
+
+/*
+ *
+ */
+static void setup_add_slider (char *labelkey, int x, int y, cfg_entry_t *entry ) {
 
   xitk_slider_widget_t  sl;
   xitk_widget_t        *slider;
 
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
 
-  sl.min                      = min;
-  sl.max                      = max;
+  sl.min                      = entry->range_min;
+  sl.max                      = entry->range_max;
   sl.step                     = 1;
   sl.skin_element_name        = NULL;
   sl.callback                 = NULL;
   sl.userdata                 = NULL;
-  /* sl.motion_callback          = move_sliders; */
-  sl.motion_callback          = NULL;
-  sl.motion_userdata          = NULL;
+  sl.motion_callback          = numtype_update;
+  sl.motion_userdata          = entry;
   xitk_list_append_content(setup->widget_list->l,
 			   (slider = xitk_noskin_slider_create(&sl,
 							       x, y, 150, 16,
 							       XITK_HSLIDER)));
-  xitk_slider_set_pos(setup->widget_list, slider, pos);
+  xitk_slider_set_pos(setup->widget_list, slider, entry->num_value);
 
   PLACE_LABEL(slider);
 
@@ -329,7 +339,7 @@ static void setup_add_slider (char *labelkey, int x, int y, int min, int max, in
 /*
  *
  */
-static void setup_add_inputtext(char *labelkey, int x, int y, char *str) {
+static void setup_add_inputtext(char *labelkey, int x, int y, cfg_entry_t *entry) {
 
   xitk_inputtext_widget_t  inp;
   xitk_widget_t           *input;
@@ -337,7 +347,7 @@ static void setup_add_inputtext(char *labelkey, int x, int y, char *str) {
   XITK_WIDGET_INIT(&inp, gGui->imlib_data);
 
   inp.skin_element_name = NULL;
-  inp.text              = str;
+  inp.text              = entry->str_value;
   inp.max_length        = 256;
   /* inp.callback          = change_browser_entry; */
   inp.callback          = NULL;
@@ -357,7 +367,7 @@ static void setup_add_inputtext(char *labelkey, int x, int y, char *str) {
 /*
  *
  */
-static void setup_add_checkbox (char *labelkey, int x, int y, int state) {
+static void setup_add_checkbox (char *labelkey, int x, int y, cfg_entry_t *entry) {
 
   xitk_checkbox_widget_t   cb;
   xitk_widget_t           *checkbox;
@@ -365,15 +375,14 @@ static void setup_add_checkbox (char *labelkey, int x, int y, int state) {
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
 
   cb.skin_element_name = NULL;
-  /* cb.callback          = change_browser_entry; */
-  cb.callback          = NULL;
-  cb.userdata          = NULL;
+  cb.callback          = numtype_update;
+  cb.userdata          = entry;
 
   xitk_list_append_content (setup->widget_list->l,
 			   (checkbox = 
 			    xitk_noskin_checkbox_create(&cb,
 							x, y, 10, 10)));
-  xitk_checkbox_set_state (checkbox, state, xitk_window_get_window(setup->xwin),
+  xitk_checkbox_set_state (checkbox, entry->num_value, xitk_window_get_window(setup->xwin),
 			   setup->widget_list->gc);
   
   PLACE_LABEL(checkbox);
@@ -385,18 +394,7 @@ static void setup_add_checkbox (char *labelkey, int x, int y, int state) {
 /*
  *
  */
-static void combo_select(xitk_widget_t *w, void *data, int value) {
-  cfg_entry_t *entry;
-  
-  entry = (cfg_entry_t *)data;
- 
-  entry->config->update_num(entry->config, entry->key, value );
-}
-
-/*
- *
- */
-static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry, int state, char **choices) {
+static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry ) {
 
   xitk_combo_widget_t      cmb;
   xitk_widget_t           *combo, *lw, *bw;
@@ -405,9 +403,9 @@ static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry, i
 
   cmb.skin_element_name = NULL;
   cmb.parent_wlist      = setup->widget_list;
-  cmb.entries           = choices;
+  cmb.entries           = entry->enum_values;
   cmb.parent_wkey       = &setup->kreg;
-  cmb.callback          = combo_select;
+  cmb.callback          = numtype_update;
   cmb.userdata          = entry;
   xitk_list_append_content(setup->widget_list->l, 
 			   (combo = 
@@ -496,15 +494,15 @@ static void setup_section_widgets (int s) {
       switch (entry->type) {
 
       case CONFIG_TYPE_RANGE: /* slider */
-	setup_add_slider (labelkey, x + 10, y, entry->range_min, entry->range_max, entry->num_value);
+	setup_add_slider (labelkey, x + 10, y, entry);
 	break;
 	
       case CONFIG_TYPE_STRING:
-	setup_add_inputtext (labelkey, x + 10, y, entry->str_value);
+	setup_add_inputtext (labelkey, x + 10, y, entry);
 	break;
 	
       case CONFIG_TYPE_ENUM:
-	setup_add_combo (labelkey, x + 10, y, entry, entry->num_value, entry->enum_values);
+	setup_add_combo (labelkey, x + 10, y, entry);
 	break;
 	
       case CONFIG_TYPE_NUM:
@@ -512,7 +510,7 @@ static void setup_section_widgets (int s) {
 	break;
 
       case CONFIG_TYPE_BOOL:
-	setup_add_checkbox (labelkey, x + 10, y, entry->num_value);
+	setup_add_checkbox (labelkey, x + 10, y, entry);
 	break;
 
       }
