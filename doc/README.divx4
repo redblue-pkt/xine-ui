@@ -4,12 +4,35 @@ XINE and the divx4 decoder plugin
 0: History of this readme
 
 oct 9 2001: inital version
+oct 27 2001: update - version checking and other things
 
-1. Requirements and overview
+1. Overview
 
-You'll need the decore library of the divx project. Currently, there are two
-implementations (I'm not talking about projects that provide divx4 decoding
-support like ffmpeg):
+The divx4 plugin can decode divx4 (formerly OpenDivx, a subset of 
+mpeg4) and divx3.11 (or divx ;-) or msmpeg4v3) bitstreams, using
+the library "libdivxdecore" from the binary divx4linux package or
+a good (if you can find one) OpenDivx variant.
+
+In version of xine before 0.9.2, the only plugin for decoding these
+streams is the ffmpeg plugin. Of course it's still available, but
+you might want to consider switching to the divx4 plugin because
+- it is more optimized than ffmpeg, therefore uses fewer cpu resources
+- it has a postprocessing function to remove some encoding artefacts
+from the decoded image.
+
+The default settings are such that this plugin has a lower priority 
+than the ffmpeg plugin. You need to actively enable the divx4 plugin 
+to start using it (see section 3).
+
+2. Requirements 
+
+You'll need the libdivxdecore library of the divx project. Currently, 
+there are two implementations: 
+
+- divx4, commercial version of opendivx, binary package available for x86 
+linux at http://www.divx.com (be careful not to wander onto an OpenDivx
+link! The download link on the main page only has divx for windows. Select the 
+software tab, then codecs) or http://avifile.sourceforge.net
 
 - opendivx, open source (but not GPL, so it probably won't be included
 in the xine sources), available at http://www.projectmayo.com.
@@ -17,26 +40,32 @@ There is an alternative (but based on opendivx) project at
 http://www.videocoding.de and mplayer (http://www.mplayerhq.hu) includes 
 another tweaked opendivx version.
 
-- divx4, commercial version of opendivx, binary package available for x86 
-linux at http://www.divx.com or http://avifile.sourceforge.net
-
 OpenDivx development seems not very active these days. I couldn't get
 the one from projectmayo to work at all (divxcore nor divx4linux).
 The one from videocoding did work but has some issues, most notably
 that it only worked if compiled with the -g flag, not -O2. 
 
-The binary divx4 package is much more solid, but not open. However,
-since it has postprocessing to remove some mpeg4 artefacts and is
-supposedly more optimised, it is, at least for i386 linux users and 
-barring free software principles, preferred over the ffmpeg decoder.  
+Recent versions of the divx4 package include a method for getting their
+version number (really the date). By default, the xine divx4 plugin
+will only accept packages that
+ * support the version number command
+ * report that they are newer than august 2001
+But if you're sure your package is OK, you can override this check
+(see below).
 
-2. .xinerc 
+3. .xinerc 
 
 There are a number of settings that can be configured in .xinerc.
 If you're using the binary divx4 package in a standard library
 location, you'll probably only be interested in the priority and 
 postproc settings. Adventurous souls with OpenDivx should carefully 
 read all descriptions ;-)
+
+- divx4_priority (int, default 4)
+
+The priority of the divx4 plugin. By default, lower than the ffmpeg
+priority, so you'll actively need to set this priority to a value
+higher that that of ffmpeg (5) to enable this plugin. 
 
 - divx4_libdivxdecore (string, default "libdivxdecore.so")
 
@@ -45,26 +74,12 @@ filename, like the default, to search in the library path, or an
 absolute one for a specific file. If the library is not found, the
 divx4 plugin will disable itself, so that ffmpeg can take over.
 
-- divx4_priority (int, default 6)
-
-The priority of the divx4 plugin. By default, higher than the ffmpeg
-priority. 
-
 - divx4_postproc (int, default 3)
 
 The postprocessing level, 0 = none and fast, 6 = all and slow. You
 might want to set this to 0 if you're having problems with opendivx.
 Also, lower this to reduce the cpu load if you're getting dropped
 frames.
-
-- divx4_decoreformat (int, default 1)
-
-If 0, the decore function writes straight into the frame's yuv data
-buffer, if 1 the decore function returns pointers to it's internal
-buffers and we copy it to the frame ourselves. 0 may be faster, 1 is
-certainly safer. You probably need 1 for OpenDivx (this may be due to a 
-API difference between divx4 and OpenDivx regarding the layout of the 
-YV12 buffer). Use 0 if you want to see if it speeds things up.
 
 - divx4_msmpeg4 (int, default 1)
 
@@ -74,4 +89,13 @@ to tell which is which. Set to 1 for divx4, 0 for opendivx. If you're
 getting a lot of DEC_EXIT messages, chances are you're trying to
 decode a msmpeg4v3 avi with OpenDivx.
 
+- divx4_forceversion (int, default 0)
+
+The default 0 enables version checking and is recommended for most
+users. If libdivxdecore is found, but the version is not high
+enough the divx4 plugin will print a warning and disable itself.
+In order to test a new variant of libdivxdecore that does not 
+implement version checking, or to test an old library that you 
+expect to work, set divx4_forceversion to some date that xine 
+accepts, for example 20010901.
 
