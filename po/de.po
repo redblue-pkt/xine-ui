@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.23\n"
-"POT-Creation-Date: 2004-04-15 00:51+0000\n"
+"POT-Creation-Date: 2004-04-15 16:57+0000\n"
 "PO-Revision-Date: 2004-01-05 09:22+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -249,7 +249,7 @@ msgstr "Download läuft"
 msgid "Download progress: %d%%."
 msgstr "Downloadfortschritt: %d%%."
 
-#: src/xitk/errors.c:61 src/xitk/kbindings.c:2112
+#: src/xitk/errors.c:61 src/xitk/kbindings.c:2156
 #: src/xitk/kbindings_man.c:2078
 msgid "Done"
 msgstr "Fertig"
@@ -727,7 +727,7 @@ msgstr "Schließen"
 msgid "Apply"
 msgstr "Anwenden"
 
-#: src/xitk/file_browser.c:372 src/xitk/kbindings.c:512 src/xitk/skins.c:1213
+#: src/xitk/file_browser.c:372 src/xitk/kbindings.c:534 src/xitk/skins.c:1213
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -787,7 +787,7 @@ msgstr "Versteckte Dateien anzeigen"
 msgid "Rename"
 msgstr "Umbenennen"
 
-#: src/xitk/file_browser.c:1542 src/xitk/kbindings.c:2068
+#: src/xitk/file_browser.c:1542 src/xitk/kbindings.c:2112
 #: src/xitk/kbindings_man.c:2034 src/xitk/menus.c:1128
 msgid "Delete"
 msgstr "Löschen"
@@ -808,7 +808,141 @@ msgstr "Hilfe"
 msgid "No Help Section Available"
 msgstr "Keine Hilfe für Abschnitt verfügbar"
 
-#: src/xitk/kbindings.c:507 src/xitk/kbindings_man.c:471
+#: src/xitk/kbindings.c:497
+msgid "and"
+msgstr ""
+
+#: src/xitk/kbindings.c:510
+#, fuzzy
+msgid ""
+"The following key bindings pairs are identical:\n"
+"\n"
+msgstr ""
+"Diese Tastenbelegung wird bereits für folgende Aktion benutzt:\n"
+"\"%s\".\n"
+
+#: src/xitk/kbindings.c:527
+msgid ""
+".\n"
+"\n"
+"What do you want to do ?\n"
+msgstr ""
+
+#: src/xitk/kbindings.c:533 src/xitk/kbindings_man.c:476
+msgid "Keybindings error!"
+msgstr "Tastenbelegungsfehler!"
+
+#: src/xitk/kbindings.c:534 src/xitk/kbindings.c:2142
+#: src/xitk/kbindings_man.c:477 src/xitk/kbindings_man.c:2064
+msgid "Reset"
+msgstr "Reset"
+
+#: src/xitk/kbindings.c:534 src/xitk/kbindings_man.c:478
+msgid "Editor"
+msgstr "Editor"
+
+#: src/xitk/kbindings.c:911 src/xitk/kbindings_man.c:853
+msgid "OOCH: key binding table is NULL.\n"
+msgstr "Autsch! Tastenbelegungstabelle ist NULL.\n"
+
+#: src/xitk/kbindings.c:1503 src/xitk/kbindings_man.c:1435
+msgid "Nothing selected"
+msgstr "Nichts ausgewählt"
+
+#: src/xitk/kbindings.c:1504 src/xitk/kbindings_man.c:1436
+msgid "None"
+msgstr "Nichts"
+
+#: src/xitk/kbindings.c:1674 src/xitk/kbindings_man.c:1598
+msgid "You can only delete alias entries."
+msgstr "Nur Alias-Einträge können entfernt werden."
+
+#: src/xitk/kbindings.c:1808 src/xitk/kbindings_man.c:1730
+msgid "Press Keyboard Keys..."
+msgstr "Drücke Taste auf Tastatur..."
+
+#: src/xitk/kbindings.c:1821 src/xitk/kbindings_man.c:1743
+msgid "Event receiver window"
+msgstr "Ereignisempfangsfenster"
+
+#. Ask if uses want/wont store new shorcut
+#: src/xitk/kbindings.c:1887 src/xitk/kbindings_man.c:1809
+msgid "Accept?"
+msgstr "Akzeptieren?"
+
+#: src/xitk/kbindings.c:1891 src/xitk/kbindings_man.c:1813
+#, c-format
+msgid ""
+"Store %s as\n"
+"'%s' key binding ?."
+msgstr ""
+"Sichere %s als\n"
+"'%s' Tastenbelegung ?"
+
+#: src/xitk/kbindings.c:1897 src/xitk/kbindings_man.c:1819
+#, c-format
+msgid ""
+"This key bindings is redundant with action:\n"
+"\"%s\".\n"
+msgstr ""
+"Diese Tastenbelegung wird bereits für folgende Aktion benutzt:\n"
+"\"%s\".\n"
+
+#: src/xitk/kbindings.c:1994 src/xitk/kbindings_man.c:1916
+msgid "key binding editor"
+msgstr "Tastenbelegungseditor"
+
+#: src/xitk/kbindings.c:2025 src/xitk/kbindings_man.c:1947
+msgid "Binding action"
+msgstr "Aktion zuordnen"
+
+#: src/xitk/kbindings.c:2031 src/xitk/kbindings_man.c:1953
+msgid "Key"
+msgstr "Taste"
+
+#: src/xitk/kbindings.c:2036 src/xitk/kbindings_man.c:1958
+msgid "Modifiers"
+msgstr "Zusatztasten"
+
+#: src/xitk/kbindings.c:2082 src/xitk/kbindings_man.c:2004
+msgid "Alias"
+msgstr "Alias"
+
+#: src/xitk/kbindings.c:2097 src/xitk/kbindings_man.c:2019
+#: src/xitk/menus.c:1127
+msgid "Edit"
+msgstr "Ändern"
+
+#: src/xitk/kbindings.c:2127 src/xitk/kbindings_man.c:2049
+#: src/xitk/playlist.c:424 src/xitk/playlist.c:1204
+msgid "Save"
+msgstr "Speichern"
+
+#: src/xitk/kbindings.c:2222 src/xitk/kbindings_man.c:2144
+msgid "ctrl"
+msgstr "Strg"
+
+#: src/xitk/kbindings.c:2246 src/xitk/kbindings_man.c:2168
+msgid "meta"
+msgstr "Meta"
+
+#: src/xitk/kbindings.c:2270 src/xitk/kbindings_man.c:2192
+msgid "mod3"
+msgstr "Mod3"
+
+#: src/xitk/kbindings.c:2294 src/xitk/kbindings_man.c:2216
+msgid "mod4"
+msgstr "Mod4"
+
+#: src/xitk/kbindings.c:2318 src/xitk/kbindings_man.c:2240
+msgid "mod5"
+msgstr "Mod5"
+
+#: src/xitk/kbindings.c:2329 src/xitk/kbindings_man.c:2251
+msgid "Grab"
+msgstr "Aufzeichnen"
+
+#: src/xitk/kbindings_man.c:471
 #, c-format
 msgid ""
 "Key bindings of '%s' and '%s' are the same.\n"
@@ -818,120 +952,6 @@ msgstr ""
 "Die Tastenbelegungen '%s' und '%s' sind identisch.\n"
 "\n"
 "Was soll mit den momentanen Belegungen passieren?\n"
-
-#: src/xitk/kbindings.c:511 src/xitk/kbindings_man.c:476
-msgid "Keybindings error!"
-msgstr "Tastenbelegungsfehler!"
-
-#: src/xitk/kbindings.c:512 src/xitk/kbindings.c:2098
-#: src/xitk/kbindings_man.c:477 src/xitk/kbindings_man.c:2064
-msgid "Reset"
-msgstr "Reset"
-
-#: src/xitk/kbindings.c:512 src/xitk/kbindings_man.c:478
-msgid "Editor"
-msgstr "Editor"
-
-#: src/xitk/kbindings.c:887 src/xitk/kbindings_man.c:853
-msgid "OOCH: key binding table is NULL.\n"
-msgstr "Autsch! Tastenbelegungstabelle ist NULL.\n"
-
-#: src/xitk/kbindings.c:1469 src/xitk/kbindings_man.c:1435
-msgid "Nothing selected"
-msgstr "Nichts ausgewählt"
-
-#: src/xitk/kbindings.c:1470 src/xitk/kbindings_man.c:1436
-msgid "None"
-msgstr "Nichts"
-
-#: src/xitk/kbindings.c:1632 src/xitk/kbindings_man.c:1598
-msgid "You can only delete alias entries."
-msgstr "Nur Alias-Einträge können entfernt werden."
-
-#: src/xitk/kbindings.c:1764 src/xitk/kbindings_man.c:1730
-msgid "Press Keyboard Keys..."
-msgstr "Drücke Taste auf Tastatur..."
-
-#: src/xitk/kbindings.c:1777 src/xitk/kbindings_man.c:1743
-msgid "Event receiver window"
-msgstr "Ereignisempfangsfenster"
-
-#. Ask if uses want/wont store new shorcut
-#: src/xitk/kbindings.c:1843 src/xitk/kbindings_man.c:1809
-msgid "Accept?"
-msgstr "Akzeptieren?"
-
-#: src/xitk/kbindings.c:1847 src/xitk/kbindings_man.c:1813
-#, c-format
-msgid ""
-"Store %s as\n"
-"'%s' key binding ?."
-msgstr ""
-"Sichere %s als\n"
-"'%s' Tastenbelegung ?"
-
-#: src/xitk/kbindings.c:1853 src/xitk/kbindings_man.c:1819
-#, c-format
-msgid ""
-"This key bindings is redundant with action:\n"
-"\"%s\".\n"
-msgstr ""
-"Diese Tastenbelegung wird bereits für folgende Aktion benutzt:\n"
-"\"%s\".\n"
-
-#: src/xitk/kbindings.c:1950 src/xitk/kbindings_man.c:1916
-msgid "key binding editor"
-msgstr "Tastenbelegungseditor"
-
-#: src/xitk/kbindings.c:1981 src/xitk/kbindings_man.c:1947
-msgid "Binding action"
-msgstr "Aktion zuordnen"
-
-#: src/xitk/kbindings.c:1987 src/xitk/kbindings_man.c:1953
-msgid "Key"
-msgstr "Taste"
-
-#: src/xitk/kbindings.c:1992 src/xitk/kbindings_man.c:1958
-msgid "Modifiers"
-msgstr "Zusatztasten"
-
-#: src/xitk/kbindings.c:2038 src/xitk/kbindings_man.c:2004
-msgid "Alias"
-msgstr "Alias"
-
-#: src/xitk/kbindings.c:2053 src/xitk/kbindings_man.c:2019
-#: src/xitk/menus.c:1127
-msgid "Edit"
-msgstr "Ändern"
-
-#: src/xitk/kbindings.c:2083 src/xitk/kbindings_man.c:2049
-#: src/xitk/playlist.c:424 src/xitk/playlist.c:1204
-msgid "Save"
-msgstr "Speichern"
-
-#: src/xitk/kbindings.c:2178 src/xitk/kbindings_man.c:2144
-msgid "ctrl"
-msgstr "Strg"
-
-#: src/xitk/kbindings.c:2202 src/xitk/kbindings_man.c:2168
-msgid "meta"
-msgstr "Meta"
-
-#: src/xitk/kbindings.c:2226 src/xitk/kbindings_man.c:2192
-msgid "mod3"
-msgstr "Mod3"
-
-#: src/xitk/kbindings.c:2250 src/xitk/kbindings_man.c:2216
-msgid "mod4"
-msgstr "Mod4"
-
-#: src/xitk/kbindings.c:2274 src/xitk/kbindings_man.c:2240
-msgid "mod5"
-msgstr "Mod5"
-
-#: src/xitk/kbindings.c:2285 src/xitk/kbindings_man.c:2251
-msgid "Grab"
-msgstr "Aufzeichnen"
 
 #: src/xitk/lang.c:495
 msgid "Unknown"
