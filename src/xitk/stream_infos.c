@@ -122,10 +122,13 @@ static char *get_num_string(uint32_t num) {
 }
 
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
-  const char *title = NULL;
-  const char *artist = NULL;
-  const char *album = NULL;
-  char       *ident = NULL;
+  const char  *title   = NULL;
+  char        *atitle  = NULL;
+  const char  *album   = NULL;
+  char        *aartist = NULL;
+  const char  *artist  = NULL;
+  char        *aalbum  = NULL; 
+  char        *ident   = NULL;
   
   if(!stream)
     return NULL;
@@ -134,25 +137,43 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
   artist = xine_get_meta_info(stream, XINE_META_INFO_ARTIST);
   album = xine_get_meta_info(stream, XINE_META_INFO_ALBUM);
   
-  if(title) {
-    int len = strlen(title);
+  /*
+   * Since meta info can be corrupted/wrong/ugly
+   * we need to clean and check them before using.
+   * Note: atoa() modify the string, so we work on a copy.
+   */
+  if(title && strlen(title)) {
+    xine_strdupa(atitle, title);
+    atitle = atoa(atitle);
+  }
+  if(artist && strlen(artist)) {
+    xine_strdupa(aartist, artist);
+    atitle = atoa(aartist);
+  }
+  if(album && strlen(album)) {
+    xine_strdupa(aalbum, album);
+    atitle = atoa(aalbum);
+  }
+
+  if(atitle) {
+    int len = strlen(atitle);
     
-    if(artist && strlen(artist))
-      len += strlen(artist) + 3;
-    if(album && strlen(album))
-      len += strlen(album) + 3;
+    if(aartist && strlen(aartist))
+      len += strlen(aartist) + 3;
+    if(aalbum && strlen(aalbum))
+      len += strlen(aalbum) + 3;
     
     ident = (char *) xine_xmalloc(len + 1);
-    sprintf(ident, "%s", title);
+    sprintf(ident, "%s", atitle);
     
-    if((artist && strlen(artist)) || (album && strlen(album))) {
+    if((aartist && strlen(aartist)) || (aalbum && strlen(aalbum))) {
       strcat(ident, " (");
-      if(artist && strlen(artist))
-	sprintf(ident, "%s%s", ident, artist);
-      if((artist && strlen(artist)) && (album && strlen(album)))
+      if(aartist && strlen(aartist))
+	sprintf(ident, "%s%s", ident, aartist);
+      if((aartist && strlen(aartist)) && (aalbum && strlen(aalbum)))
 	strcat(ident, " - ");
-      if(album && strlen(album))
-	sprintf(ident, "%s%s", ident, album);
+      if(aalbum && strlen(aalbum))
+	sprintf(ident, "%s%s", ident, aalbum);
       strcat(ident, ")");
     }
   }
