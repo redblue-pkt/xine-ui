@@ -62,6 +62,8 @@ typedef struct {
   XClassHint    *xclasshint_fullscreen;
   GC             gc;
 
+  int            already_exposed;
+
   int            video_width;     /* size of currently displayed video     */
   int            video_height;
   int            win_width;       /* size of non-fullscreen window         */
@@ -766,6 +768,7 @@ void video_window_init (void) {
   gVw->widget_key         = 
     gVw->old_widget_key   = 0;
   gVw->gc		  = None;
+  gVw->already_exposed    = 0;
 
   XLockDisplay (gGui->display);
 
@@ -907,9 +910,6 @@ void video_window_init (void) {
   
   video_window_set_mag(1.0);
 
-  /* Ensure we load the right logo */
-  video_window_change_skins();
-
   /*
    * for plugins that aren't really bind to the window, it's necessary that the
    * gVw->xwin and gVw->ywin variables are set to right values, otherwise the
@@ -1030,9 +1030,11 @@ void video_window_change_skins(void) {
   else {
     char  default_logo[2048];
     
-    memset(&default_logo, 0, sizeof(default_logo));
-    snprintf(default_logo, 2048, "%s/xine_logo.zyuy2", XINE_SKINDIR);
-    gGui->config->update_string(gGui->config, "video.logo_file", default_logo);
+    if(cfg_entry) {
+      memset(&default_logo, 0, sizeof(default_logo));
+      snprintf(default_logo, 2048, "%s/xine_logo.zyuy2", XINE_SKINDIR);
+      gGui->config->update_string(gGui->config, "video.logo_file", default_logo);
+    }
   }
 }
 
@@ -1107,6 +1109,13 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
   case Expose: {
     XExposeEvent * xev = (XExposeEvent *) event;
+
+    /* Ensure we load the right logo */
+    if(!gVw->already_exposed) {
+      video_window_change_skins();
+      gVw->already_exposed++;
+    }
+
 
     if (xev->count == 0) {
 

@@ -706,7 +706,6 @@ int main(int argc, char *argv[]) {
    * xine init
    */
 
-  //  xine_set_locale();
   gGui->xine = xine_init (gGui->vo_driver, audio_driver,
 			  gGui->config);
 

@@ -73,6 +73,26 @@ static void _xitk_window_destroy_window(xitk_widget_t *, void *);
 /*
  * Is window is size match with given args
  */
+int xitk_is_window_visible(Display *display, Window window) {
+  XWindowAttributes  wattr;
+  Status             status;
+  
+  if((display == NULL) || (window == None))
+    return -1;
+  
+  XLOCK(display);
+  status = XGetWindowAttributes(display, window, &wattr);
+  XUNLOCK(display);
+  
+  if((status != BadDrawable) && (status != BadWindow) && (wattr.map_state == IsViewable))
+    return 1;
+  
+  return 0;
+}
+
+/*
+ * Is window is size match with given args
+ */
 int xitk_is_window_size(Display *display, Window window, int width, int height) {
   XWindowAttributes  wattr;
   
