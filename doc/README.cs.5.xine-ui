@@ -1,0 +1,88 @@
+To, co vidíte jako "xine", se ve skuteènosti skládá ze dvou hlavních èástí:
+* xine-lib nebo libxine je takzvaný engine zahrnující v¹echnu základní
+  funkènost xine jako získávání médií z rùzných podporovaných zdrojù vstupù,
+  dekódování videa a zvuku, synchronizace pøehrávání a dodateèné zpracování.
+  Tato èást xine je jen pouze akumulace funkènosti, programátoøi toto nazývají
+  knihovna. Koncoví u¾ivatelé nemohou xine-lib pou¾ít pøímo, jeliko¾ zde není
+  rozhraní k interakci se xine-lib.
+* Druhá èást je takzvaný "frontend". Obaluje u¾ivatelské rozhraní kolem
+  xine-lib, èiní xine-lib pou¾itelným pro v¹echny.
+
+Výhodou tohoto oddìlení je, ¾e si mù¾ete vybrat mezi rùznými odli¹nými
+"frontendy". Ten, který pou¾íváte teï, je známý jako "xine-ui". Nìkteré
+zajímavé vlastnosti xine-ui jsou v krátkosti uvedeny ní¾e:
+
+
+Menu
+----
+
+V¹echny klíèové funkce xine jsou pøístupné z hlavního menu xine-ui, které
+získáte klepnutím pravým tlaèítkem my¹i buï na okno s videem nebo na panel.
+Vìt¹ina polo¾ek je samovysvìtlující.
+
+
+Prohlí¾eè MRL
+-------------
+
+Zpùsob, jakým xine popisuje média k pøehrání, jsou MRL. Více o tomto zajímavém
+pojetí si mù¾ete pøeèíst v sekci MRL. Z dùvodu schopností MRL není bì¾ný dialog
+pro výbìr souborù dostateèný pro sdìlení xine, jaká data pøehrát. Prohlí¾eè
+MRL tudí¾ dovoluje nejen procházet va¹imi soubory, nechá vás také vybrat jiný
+typ vstupu z média, které nabízí svùj vlastní výbìr mo¾ných dat k pøehrání.
+Mù¾ete otevøít prohlí¾eè MRL pomocí odpovídající ikony va¹eho oblíbeného skinu
+nebo vybráním Otevøít->Umístìní z menu.
+
+Bì¾ný souborový dialog je rovnì¾ k dispozici, mù¾ete ho získat na
+Otevøít->Soubor v menu.
+
+
+Playlisty
+---------
+
+xine-ui také samozøejmì pracuje s playlisty. Editor playlistu umístìný
+na Playlist->Editor nebo reprezentovaný tlaèítkem ve va¹em skinu vám dovoluje
+naèíst, ulo¾it a editovat playlisty. Editor zálo¾ek vám dovoluje detailnì
+editovat aktuální polo¾ku playlistu a pøidìlit dal¹í volby pøehrávání, napø.
+oddìlený soubor s titulky. Editor zálo¾ek standardnì otevøete stiskem Ctrl-e.
+
+
+Autoscan tlaèítka
+-----------------
+
+Autoscan tlaèítka najdete v panelu xine nebo v editoru playlistu. Jsou to
+zástupci pro vytvoøení playlistu z urèitých dobøe známých zdrojových médií. Pøi
+výchozím nastavení se zaène playlist hned pøehrávat. Napø. stisk autoscan
+tlaèítka popsaného "DVD" zaène, jak název napovídá, pøehrávat DVD ve va¹í
+mechanice pomocí vytvoøeného playlistu.
+
+
+Pøídavné efekty
+---------------
+
+xine poskytuje sadu efektù dodateèného zpracování, které mù¾ete pou¾ít na va¹e
+video. V menu vyberte Video->Dodateèné zpracování->Zøetìzená reakce. Otevøe se
+okno "Zøetìzená reakce", kde mù¾ete vytvoøit sadu pøídavných efektù, které se
+pou¾ijí na video. Vyberte si pøídavný filtr, vyberte a pøizpùsobte si volby,
+které jsou k dispozici, abyste si filtr vylep¹ili podle potøeby. Chcete-li
+pøidat je¹tì dal¹í efekt do øetìzce, kliknìte na "Nový filtr".
+
+
+Navigace v menu média
+---------------------
+
+Nìkteré typy médií jsou interaktivní, nejbì¾nìj¹í pøíklad jsou dnes DVD, kde si
+mù¾ete vybrat v¹echny druhy voleb z podrobných menu. xine poskytuje vícero
+zpùsobù, jak se pohybovat v takovém interaktivním obsahu.
+* 1) Mù¾ete klikat va¹í my¹í pøímo na polo¾ky v oknì videa.
+* 2) Mù¾ete pou¾ít panel na posílání událostí, který lze otevøít z menu
+     polo¾kou Volby->Navigace.
+* 3) Mù¾ete pou¾ít polo¾ky v menu, abyste se dostali pøímo na rùzná podmenu
+     va¹eho interaktivního média. Toto bude mít efekt pouze tehdy, poskytuje-li
+     dané menu zdroj, který pøehráváte.
+* 4) Mù¾ete pou¾ít klávesnici. Pøednastaveno je, ¾e ¹ipkami na numerické
+     klávesnici budete pøesunovat zvýraznìní v menu a Enter vybere zvýraznìné
+     tlaèítko.
+     Pøes numerickou klávesnici jsou k dispozici také dal¹í zajímavé funkce:
+     (Uvedené klávesy jsou z pøednastaveného mapování kláves.)
+     S PgUp a PgDown se budete pohybovat zpìt a vpøed mezi kapitolami.
+     Home a End vybere úhel, který pøehrát, je-li k dispozici více úhlù.

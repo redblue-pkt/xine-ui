@@ -1,0 +1,50 @@
+xine mù¾e být dálkovì ovládáno infraèerveným ovladaèem. Abyste mohli tuto
+vlastnost pou¾ívat, musíte mít nainstalováno LIRC. Podrobnosti najdete na
+http://www.lirc.org/.
+
+Do va¹eho souboru ~/.lircrc pøidejte nìkteré polo¾ky, napø.:
+
+       begin
+               remote = SAMSUNG
+               button = Button_Play
+               prog   = xine
+               repeat = 0
+               config = Play
+       end
+       begin
+               remote = SAMSUNG
+               button = Button_1
+               prog   = xine
+               repeat = 0
+               config = SetPosition10%
+       end
+
+xine doká¾e samo vytvoøit návrh lirc polo¾ek pou¾itím 'xine --keymap=lirc'.
+Výstup pøesmìrujte do souboru a dolaïte tam nastavení.
+
+Ka¾dá polo¾ka pak bude vypadat asi takto:
+
+       # Reduce the output window size.
+       begin
+               remote = xxxxx
+               button = xxxxx
+               prog   = xine
+               repeat = 0
+               config = WindowReduce
+       end
+
+Je na vás uvést jméno v remote a pøiøadit button.
+
+
+K získání automaticky naèteného playlistu z daného vstupního modulu mù¾ete
+pou¾ít speciální klíèové slovo 'PlaylistFrom:' následované jménem modulu
+(stejné jako popisek tlaèítka na panelu xine):
+
+       # Retrieve playlist from DVD plugin.
+       begin
+               remote = xxxxx
+               button = xxxxx
+               prog   = xine
+               repeat = 0
+               config = PlaylistFrom:DVD
+       end

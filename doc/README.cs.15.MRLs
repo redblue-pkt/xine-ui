@@ -1,0 +1,99 @@
+Pro výbìr multimédií, které chcete pøehrát, pou¾ívá xine systém zvaný MRL
+(Media Resource Locator). Jak ji¾ napovídá název, MRL jsou si velmi podobné
+URL, které znáte z va¹ich webových prohlí¾eèù. Ve skuteènosti je zde zobecnìní
+pro obojí: URI (Uniform Resource Identifier) definované v RFC2396.
+
+MRL xine se dìlí na dvì hlavní èásti: zdroj vstupu a nastavení dat. Nastavení
+dat je volitelné. Jestli¾e se uvede, musí se oddìlit od zdroje vstupu znakem
+'#'.
+
+
+zdroj vstupu
+------------
+
+Zdroj vstupu øíká xine, kde získat data k pøehrání. Abychom zaèali nìèím dobøe
+známým, vìt¹ina UNIXovských cest a jmen souborù jsou platné. Jsou zde nìkteré
+znaky, které vy¾adují zvlá¹tní zacházení, ale i trochu nesprávné MRL xine zkou¹í
+zpracovávat elegantnì.
+
+U zdrojù dat jiných ne¾ jsou jména souborù musíte zaèít tøídou vstupu
+následovanou dvojteèkou ':'. Co má pøijít za dvojteèkou závisí na pou¾itém
+vstupu. Nìkteré dùle¾ité pøíklady by mìly být vysvìtleny:
+
+     file:/cesta/k/souboru          pøehraje zadaný soubor
+     stdin:/                        získá data ze standardního vstupu
+     fifo:/cesta/k/souboru          získá data z dané fronty (fifo)
+
+     cdda:/                         pøehraje zvukové CD
+     cdda:/5                        pøehraje stopu 5 ze zvukového CD
+
+     dvd:/                          pøehraje DVD
+     dvd:/2                         pøehraje DVD od titulu 2
+     dvd:/2.4                       pøehraje DVD od titulu 2, èást 4
+
+     http://server/umístìní/soubor  pøehraje soubor z webu
+     mms://server/umístìní/soubor   pøehraje soubor pøes protokol MMS
+     pnm://server/umístìní/soubor   pøehraje soubor pøes protokol PNM
+     rtsp://server/umístìní/soubor  pøehraje soubor pøes protokol RTSP
+
+     tcp://hostitel:port            pøijmá data pøes soket TCP
+     slave://hostitel:port          pøijmá data vysílaná pomocí xine
+     udp://hostitel:port            pøijmá vícesmìrová data pøes UDP
+     rtp://hostitel:port            pøijmá vícesmìrová data RTP
+
+     dvb:/                          uká¾e digitální vysílání videa (Digital
+                                    Video Broadcast)
+     dvb:/7                         uká¾e DVB stanici 7
+
+     v4l:/tuner/frekvence           pøijme data ze zaøízení Video4Linux
+
+
+nastavení dat
+-------------
+
+Èást nastavení dat vám dovoluje pøedat speciální volby pro pøehrávání pøímo
+v MRL. Jednotlivé volby se oddìlují støedníkem ';'.
+Mo¾né volby jsou:
+
+     novideo                        ignorovat v datech video
+     noaudio                        ignorovat v datech zvuk
+     nospu                          ignorovat v datech titulky
+
+     volume:hodnota                 nastavit hlasitost na zadanou hodnotu
+     compression:hodnota            nastavit úroveò komprese na zadanou hodnotu
+
+     subtitle:soubor                zobrazit titulky z oddìleného souboru
+
+     save:jméno_souboru             ulo¾it data do urèeného souboru
+
+     config_entry:hodnota           zmìnit polo¾ku konfigurace na zadanou
+                                    hodnotu
+
+     demux:demuxer_plugin           pou¾ít zadaný demultiplexor "demuxer_plugin"
+     lastdemuxprobe:demuxer_plugin  pou¾ito k debugování
+
+
+pøíklady
+--------
+
+Následující pøíklady ukazují mo¾nosti MRL:
+
+     vá¹_film.avi#subtitle:va¹e_titulky.srt
+
+                                    pøehraje uvedené avi se zobrazováním
+                                    titulkù z daného souboru
+
+     http://nìjaký.server.org/stream.mpg#save:savedstream.mpg
+
+                                    bude stahovat soubor pøes HTTP a bude ho
+                                    ukládat na disk bìhem pøehrávání
+
+     dvd:/1.1#novideo
+
+                                    pøehraje první èást prvního titulu DVD,
+                                    ale pouze zvuk
+
+     stdin:/#demux:rawdv
+
+                                    pøehraje DV data ze standardního vstupu,
+                                    mù¾e se pou¾ít pro live DV data
