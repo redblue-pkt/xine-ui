@@ -200,38 +200,36 @@ void gui_list_insert_content (gui_list_t *l, void *content) {
  *
  */
 void gui_list_delete_current (gui_list_t *l) {
-  gui_node_t *nodeprev;
-  gui_node_t *nodenext;
 
-  if(l->cur->prev) {
-    nodeprev = l->cur->prev;
-  }
-  else { /* First entry */
-    nodenext = l->cur->next;
-    l->first = nodenext;
-    free(l->cur->content);
-    free(l->cur);
-    l->cur = nodenext;
-    return;
+  gui_node_t *node_cur;
+
+  node_cur = l->cur;
+
+  if(node_cur->prev) {
+
+    node_cur->prev->next = node_cur->next;
+
+  } else { /* First entry */
+
+    l->first = node_cur->next;
+    
   }
   
-  if(l->cur->next)
-    nodenext = l->cur->next;
-  else { /* last entry in the list */
-    l->last = nodeprev;
-    nodeprev->next = NULL;
-    free(l->cur->content);
-    free(l->cur);
-    l->cur = nodeprev;
-    return;
+  if(node_cur->next) {
+
+    node_cur->next->prev = node_cur->prev;
+    l->cur = node_cur->next;
+
+  }  else { /* last entry in the list */
+
+    l->last = node_cur->prev;
+
+    l->cur = node_cur->prev;
   }
 
-  nodeprev->next = nodenext;
-  nodenext->prev = nodeprev;
+  free(node_cur->content);
+  free(node_cur);
 
-  free(l->cur->content);
-  free(l->cur);
-
-  l->cur = nodeprev;
 }
+
 

@@ -53,7 +53,7 @@ static int ml = 0;
     ml++;                                \
     for(i=0; i<ml; i++) printf(".");     \
     printf("LOCK\n");                    \
-    pthread_mutex_lock(&widl->mutex);    \
+    pthread_mutex_lock(&gXitk->mutex);    \
   }
 #define MUTUNLOCK() \
   {                                      \
@@ -61,11 +61,11 @@ static int ml = 0;
     for(i=0; i<ml; i++) printf(".");     \
     printf("UNLOCK\n");                  \
     ml--;                                \
-    pthread_mutex_unlock(&widl->mutex);  \
+    pthread_mutex_unlock(&gXitk->mutex);  \
   }
 #else
-#define MUTLOCK()   { pthread_mutex_lock(&widl->mutex); }
-#define MUTUNLOCK() { pthread_mutex_unlock(&widl->mutex); }
+#define MUTLOCK()   { pthread_mutex_lock(&gXitk->mutex); }
+#define MUTUNLOCK() { pthread_mutex_unlock(&gXitk->mutex); }
 #endif
 
 
@@ -109,10 +109,10 @@ typedef struct {
   pthread_mutex_t     mutex;
   int                 running;
   widgetkey_t         key;
-} __widget_t;
+} __xitk_t;
 
-static __widget_t  *widl;
-static pid_t        xitk_pid;
+static __xitk_t  *gXitk;
+static pid_t      xitk_pid;
 
 void widget_stop(void);
 
@@ -132,7 +132,7 @@ static void xitk_signal_handler(int sig) {
 
       MUTLOCK();
       
-      widl->running = 0;
+      gXitk->running = 0;
 
       /* 
        * Tada.... and now Ladies and Gentlemen, the dirty hack
@@ -145,14 +145,14 @@ static void xitk_signal_handler(int sig) {
 	  event.xany.type = ClientMessage;
 	  event.xclient.type = ClientMessage;
 	  event.xclient.send_event = True;
-	  event.xclient.display = widl->display;
+	  event.xclient.display = gXitk->display;
 	  event.xclient.window = fx->window;
 	  event.xclient.message_type = fx->XA_XITK;
 	  event.xclient.format = 32;
 	  memset(&event.xclient.data, 0, sizeof(event.xclient.data));
 	  event.xclient.data.b[0] = 'K';
 	  
-	  if (!XSendEvent (widl->display, fx->window, False, 0L, &event)) {
+	  if (!XSendEvent (gXitk->display, fx->window, False, 0L, &event)) {
 	    fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n",
 		    (unsigned int) fx->window);
 	  }
@@ -160,7 +160,7 @@ static void xitk_signal_handler(int sig) {
 	  MUTUNLOCK();
 	  return;
 	}
-	fx = (__gfx_t *) gui_list_next_content(widl->gfx);
+	fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
       }
       MUTUNLOCK();
     }
@@ -178,7 +178,7 @@ widget_list_t *widget_list_new (void) {
 
   l = (widget_list_t *) gui_xmalloc(sizeof(widget_list_t));
 
-  gui_list_append_content(widl->list, l);
+  gui_list_append_content(gXitk->list, l);
 
   MUTUNLOCK();
 
@@ -195,24 +195,24 @@ void widget_change_window_for_event_handler (widgetkey_t key, Window window) {
   
   MUTLOCK();
       
-  fx = (__gfx_t *) gui_list_first_content(widl->gfx);
+  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
   
   while(fx) {
 
     if(fx->key == key) {
 
-      XLockDisplay(widl->display);
+      XLockDisplay(gXitk->display);
 
       fx->window = window;
 
       if(fx->xdnd && (window != None))
 	dnd_make_window_aware(fx->xdnd, window);
       
-      XUnlockDisplay(widl->display);
+      XUnlockDisplay(gXitk->display);
       MUTUNLOCK();
       return;
     }
-    fx = (__gfx_t *) gui_list_next_content(widl->gfx);
+    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
   }
 
   MUTUNLOCK();
@@ -243,7 +243,7 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
     XWindowAttributes wattr;
     Status            err;
     
-    err = XGetWindowAttributes(widl->display, fx->window, &wattr);
+    err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
     if(err != BadDrawable && err != BadWindow) {
       fx->width = wattr.width;
       fx->height = wattr.height;
@@ -271,19 +271,19 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
   if(dnd_cb && (window != None)) {
     fx->xdnd = (DND_struct_t *) gui_xmalloc(sizeof(DND_struct_t));
     
-    dnd_init_dnd(widl->display, fx->xdnd);
+    dnd_init_dnd(gXitk->display, fx->xdnd);
     dnd_set_callback(fx->xdnd, dnd_cb);
     dnd_make_window_aware(fx->xdnd, fx->window);
   }
   else
   fx->xdnd = NULL;
 
-  fx->key = ++widl->key;
+  fx->key = ++gXitk->key;
 
   if(fx->window) {
 
-    fx->XA_XITK = XInternAtom(widl->display, "_XITK_EVENT", False);
-    XChangeProperty (widl->display, fx->window, fx->XA_XITK, XA_ATOM,
+    fx->XA_XITK = XInternAtom(gXitk->display, "_XITK_EVENT", False);
+    XChangeProperty (gXitk->display, fx->window, fx->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&VERSION, 1);
     
     /*  Force to repain the widget list if it exist */
@@ -293,10 +293,10 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
       xexp.xany.type          = Expose;
       xexp.xexpose.type       = Expose;
       xexp.xexpose.send_event = True;
-      xexp.xexpose.display    = widl->display;
+      xexp.xexpose.display    = gXitk->display;
       xexp.xexpose.window     = fx->window;
       xexp.xexpose.count      = 1;
-      if(!XSendEvent(widl->display, fx->window, False, ExposureMask, &xexp)) {
+      if(!XSendEvent(gXitk->display, fx->window, False, ExposureMask, &xexp)) {
 	fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n",
 		(unsigned int) fx->window);
       }
@@ -308,7 +308,7 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
 
   MUTLOCK();
 
-  gui_list_append_content(widl->gfx, fx);
+  gui_list_append_content(gXitk->gfx, fx);
 
   MUTUNLOCK();
 
@@ -326,19 +326,22 @@ void widget_unregister_event_handler(widgetkey_t *key) {
 
   MUTLOCK();
 
-  fx = (__gfx_t *) gui_list_first_content(widl->gfx);
-
+  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+  
+  
   while(fx) {
 
     if(fx->key == *key) {
-      gui_list_delete_current(widl->gfx);
-      *key = 0;
+      gui_list_delete_current(gXitk->gfx); 
+
+      *key = 0; 
       MUTUNLOCK();
       return;
     }
-    fx = (__gfx_t *) gui_list_next_content(widl->gfx);
+    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
 
   }
+  
 
   MUTUNLOCK();
 }
@@ -352,7 +355,7 @@ static void widget_xevent_notify(XEvent *event) {
   __gfx_t  *fx;
 
     
-  fx = (__gfx_t *) gui_list_first_content(widl->gfx);
+  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
 
   while(fx) {
 
@@ -369,7 +372,7 @@ static void widget_xevent_notify(XEvent *event) {
 	  else {
 	    
 	    if(event->xexpose.count > 0) {
-	      while(XCheckWindowEvent(widl->display, fx->window, 
+	      while(XCheckWindowEvent(gXitk->display, fx->window, 
 				      ExposureMask, event) == True);
 	    }
 
@@ -393,23 +396,23 @@ static void widget_xevent_notify(XEvent *event) {
 	      + (event->xmotion.y_root - fx->old_event->xmotion.y_root) 
 	      - fx->move.offset_y;
 	    
-	    XLockDisplay(widl->display);
+	    XLockDisplay(gXitk->display);
 
-	    XMoveWindow(widl->display, fx->window,
+	    XMoveWindow(gXitk->display, fx->window,
 			fx->new_pos.x, fx->new_pos.y);
 
-	    err = XGetWindowAttributes(widl->display, fx->window, &wattr);
+	    err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
 	    if(err != BadDrawable && err != BadWindow) {
 	      if(wattr.your_event_mask & PointerMotionMask) {
 
-		while(XCheckWindowEvent(widl->display, fx->window, 
+		while(XCheckWindowEvent(gXitk->display, fx->window, 
 					PointerMotionMask, event) == True);
 	      }
 	    }
 
-	    XUnlockDisplay(widl->display);
+	    XUnlockDisplay(gXitk->display);
 
-	    XSync(widl->display, False);
+	    XSync(gXitk->display, False);
 	  }
 	  else {
 	    if(fx->widget_list)
@@ -430,8 +433,8 @@ static void widget_xevent_notify(XEvent *event) {
 	      XWindowAttributes wattr;
 	      Status            err;
 
-	      XLockDisplay(widl->display);
-	      err = XGetWindowAttributes(widl->display, fx->window, &wattr);
+	      XLockDisplay(gXitk->display);
+	      err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
 	      if(err != BadDrawable && err != BadWindow) {
 		
 		fx->old_pos.x = event->xmotion.x_root - event->xbutton.x;
@@ -439,7 +442,7 @@ static void widget_xevent_notify(XEvent *event) {
 
 	      }
 	      
-	      XUnlockDisplay(widl->display);
+	      XUnlockDisplay(gXitk->display);
 
 	      fx->move.offset_x = event->xbutton.x;
 	      fx->move.offset_y = event->xbutton.y;
@@ -468,7 +471,7 @@ static void widget_xevent_notify(XEvent *event) {
 	  XWindowAttributes wattr;
 	  Status            err;
 	  
-	  err = XGetWindowAttributes(widl->display, fx->window, &wattr);
+	  err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
 	  if(err != BadDrawable && err != BadWindow) {
 	    fx->width = wattr.width;
 	    fx->height = wattr.height;
@@ -501,7 +504,7 @@ static void widget_xevent_notify(XEvent *event) {
       
     }
     
-    fx = (__gfx_t *) gui_list_next_content(widl->gfx);
+    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
   }
 }
 
@@ -513,14 +516,14 @@ void widget_init(Display *display) {
 
   xitk_pid = getppid();
 
-  widl = (__widget_t *) gui_xmalloc(sizeof(__widget_t));
+  gXitk = (__xitk_t *) gui_xmalloc(sizeof(__xitk_t));
 
-  widl->list    = gui_list_new();
-  widl->gfx     = gui_list_new();
-  widl->display = display;
-  widl->key     = 0;
+  gXitk->list    = gui_list_new();
+  gXitk->gfx     = gui_list_new();
+  gXitk->display = display;
+  gXitk->key     = 0;
 
-  pthread_mutex_init (&widl->mutex, NULL);
+  pthread_mutex_init (&gXitk->mutex, NULL);
 
 }
 
@@ -551,29 +554,29 @@ void widget_run(void) {
     fprintf(stderr, "sigaction(SIGQUIT) failed: %s\n", strerror(errno));
   }
 
-  widl->running = 1;
+  gXitk->running = 1;
 
-  while(widl->running) {
-    /*      if(XPending (widl->display)) { */
-    //  XLockDisplay(widl->display);
-    XNextEvent (widl->display, &myevent) ;
-    //    XUnlockDisplay(widl->display);
+  while(gXitk->running) {
+    /*      if(XPending (gXitk->display)) { */
+    //  XLockDisplay(gXitk->display);
+    XNextEvent (gXitk->display, &myevent) ;
+    //    XUnlockDisplay(gXitk->display);
     widget_xevent_notify(&myevent);
     /*      } */
     /*      else {  */
-    /*        XUnlockDisplay(widl->display); */
+    /*        XUnlockDisplay(gXitk->display); */
     /*        usleep(60); */
     /*      } */
   }
 
-  gui_list_free(widl->list);
-  gui_list_free(widl->gfx);
-  free(widl);
+  gui_list_free(gXitk->list);
+  gui_list_free(gXitk->gfx);
+  free(gXitk);
 }
 
 /*
  * Stop the wait xevent loop
  */
 void widget_stop(void) {
-  widl->running = 0;
+  gXitk->running = 0;
 }
