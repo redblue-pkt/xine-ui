@@ -1073,6 +1073,15 @@ static void *_gui_set_current_position(void *data) {
   
   pthread_detach(pthread_self());
 
+  if(pthread_mutex_trylock(&gGui->xe_mutex)) {
+    pthread_exit(NULL);
+    return NULL;
+  }
+  
+  pthread_mutex_lock(&new_pos_mutex);
+  gGui->new_pos = pos;
+  pthread_mutex_unlock(&new_pos_mutex);
+  
   if(gGui->logo_mode && (mediamark_get_current_mrl())) {
     if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
       gui_handle_xine_error(gGui->stream, (char *)(mediamark_get_current_mrl()));
@@ -1203,12 +1212,6 @@ void gui_set_current_position (int pos) {
   pthread_t  pth;
 
   if(gGui->new_pos == -1) {
-    
-    pthread_mutex_lock(&gGui->xe_mutex);
-
-    pthread_mutex_lock(&new_pos_mutex);
-    gGui->new_pos = pos;
-    pthread_mutex_unlock(&new_pos_mutex);
     
     if((err = pthread_create(&pth, NULL, _gui_set_current_position, (void *)pos)) != 0) {
       printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
