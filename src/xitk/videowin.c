@@ -764,8 +764,13 @@ void video_window_dest_size_cb (void *data,
 				int *dest_width, int *dest_height,
 				double *dest_pixel_aspect)  {
   
-  /* TODO: Interface change:  *dest_ratio */
-  *dest_pixel_aspect = gGui->display_ratio;
+  *dest_pixel_aspect = gGui->pixel_aspect;
+  
+  /* correct size with video_pixel_aspect */
+  if (video_pixel_aspect >= gGui->pixel_aspect)
+    video_width  = video_width * video_pixel_aspect / gGui->pixel_aspect + .5;
+  else
+    video_height = video_height * gGui->pixel_aspect / video_pixel_aspect + .5;
 
   if(gVw->stream_resize_window && !gVw->fullscreen_mode) {
 
@@ -806,9 +811,14 @@ void video_window_frame_output_cb (void *data,
 				   double *dest_pixel_aspect,
 				   int *win_x, int *win_y) {
   
-  /* TODO: Interface change: video_duration, *dest_ratio */
-  *dest_pixel_aspect = gGui->display_ratio;
+  *dest_pixel_aspect = gGui->pixel_aspect;
   
+  /* correct size with video_pixel_aspect */
+  if (video_pixel_aspect >= gGui->pixel_aspect)
+    video_width  = video_width * video_pixel_aspect / gGui->pixel_aspect + .5;
+  else
+    video_height = video_height * gGui->pixel_aspect / video_pixel_aspect + .5;
+
   /* Please do NOT remove, support will be added soon! */
 #if 0
   double jitter;

@@ -344,19 +344,20 @@ static void load_video_out_driver(const char *video_driver_id) {
   res_v                 = (DisplayHeight (gGui->display, gGui->screen)*1000
 			   / DisplayHeightMM (gGui->display, gGui->screen));
   
-  gGui->display_ratio   = res_h / res_v;
+  gGui->pixel_aspect    = res_h / res_v;
+  printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #ifdef DEBUG
-  printf("display_ratio: %f\n", gGui->display_ratio);
+  printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif
 
-  if (fabs(gGui->display_ratio - 1.0) < 0.01) {
+  if (fabs(gGui->pixel_aspect - 1.0) < 0.01) {
     /*
      * we have a display with *almost* square pixels (<1% error),
      * to avoid time consuming software scaling in video_out_xshm,
      * correct this to the exact value of 1.0 and pretend we have
      * perfect square pixels.
      */
-    gGui->display_ratio   = 1.0;
+    gGui->pixel_aspect  = 1.0;
 #ifdef DEBUG
     printf("display_ratio: corrected to square pixels!\n");
 #endif

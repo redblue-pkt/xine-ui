@@ -57,7 +57,7 @@ typedef struct {
   XColor               black;
   Pixmap               icon;
   Colormap             colormap;
-  double               display_ratio;
+  double               pixel_aspect;
 
   int		       prefered_visual_class;
   VisualID	       prefered_visual_id;
