@@ -26,6 +26,7 @@
 #endif
 
 #include <stdio.h>
+#include <math.h>
 
 #include "Imlib-light/Imlib.h"
 #include "image.h"

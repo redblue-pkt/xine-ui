@@ -36,6 +36,7 @@
 #include "button.h"
 #include "labelbutton.h"
 #include "slider.h"
+#include "utils.h"
 
 #include "_xitk.h"
 

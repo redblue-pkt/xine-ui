@@ -23,6 +23,22 @@
 #ifndef HAVE_UTILS_H
 #define HAVE_UTILS_H
 
+#include <sys/time.h>
+
+
+/* sys/time.h does not define timersub() on all platforms... */
+#ifndef timersub
+# define timersub(a, b, result)                                               \
+  do {                                                                        \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
+    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
+    if ((result)->tv_usec < 0) {                                              \
+      --(result)->tv_sec;                                                     \
+      (result)->tv_usec += 1000000;                                           \
+    }                                                                         \
+  } while (0)
+#endif
+
 void *xmalloc(size_t size);
 
 void *xmalloc_aligned(size_t alignment, size_t size);

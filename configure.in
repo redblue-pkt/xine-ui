@@ -72,6 +72,7 @@ dnl
 dnl Build all libs as static
 dnl
 BUILD_LIB_STATIC="-static"
+BUILD_LIB_STATIC=""
 AC_SUBST(BUILD_LIB_STATIC)
 
 
@@ -132,6 +133,7 @@ AC_PATH_XTRA
 if test x"$no_x" != x"yes"; then
     AC_DEFINE(HAVE_X11)
 fi
+
 
 dnl
 dnl Checks for Xinerama extension
@@ -200,7 +202,6 @@ if test x"$png_ok" = xyes; then
     X_CFLAGS="$X_CFLAGS $PNG_CFLAGS"
 fi
 
-
 dnl
 dnl
 dnl
@@ -250,15 +251,18 @@ AC_TRY_CFLAGS("-fno-strict-aliasing", f_nsa="-fno-strict-aliasing", f_nsa="")
 AC_TRY_CFLAGS("-fschedule-insns2", f_si="-fschedule-insns2", f_si="")
 AC_TRY_CFLAGS("-mwide-multiply", m_wm="-mwide-multiply", m_wm="")
 
+dnl Flags not supported by all *cc* variants
+AC_TRY_CFLAGS("-Wall", wall="-Wall", wall="")
+
 dnl Common cflags for all platforms
-COMMON_CFLAGS="-Wall -D_FILE_OFFSET_BITS=64"
+COMMON_CFLAGS="$wall -D_FILE_OFFSET_BITS=64"
 
 
 case $host in
   i386-*-freebsd*)
     GLOBAL_CFLAGS="$GLOBAL_CFLAGS -pipe -fomit-frame-pointer -malign-functions=4 -malign-loops=4 -malign-jumps=4 -malign-functions=4 $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions"
-    GLOBAL_CFLAGS="$GLOBAL_CFLAGS $CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -D_REENTRANT"
-    DEBUG_CFLAGS="$X_CFLAGS $DEBUG_CFLAGS $CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -D_REENTRANT -DDEBUG"
+    GLOBAL_CFLAGS="$GLOBAL_CFLAGS $CFLAGS -D_REENTRANT"
+    DEBUG_CFLAGS="$X_CFLAGS $DEBUG_CFLAGS -D_REENTRANT -DDEBUG"
     AC_DEFINE(__i386__)
     AC_DEFINE([ARCH_X86],,[x86 architecture])
 
@@ -348,14 +352,17 @@ case $host in
         GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
         DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
         ;;
+    mips-*)
+        GLOBAL_CFLAGS="$GLOBAL_CFLAGS -O3"
+        DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
+        ;;
     *) echo "$host is not currently supported by xine"; exit 1;;
     esac
-
-    GLOBAL_CFLAGS="$GLOBAL_CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"
     ;;
 esac
 
+GLOBAL_CFLAGS="$GLOBAL_CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS"
+DEBUG_CFLAGS="$DEBUG_CFLAGS $COMMON_CFLAGS $ALSA_CFLAGS $ESD_CFLAGS -g -DDEBUG"
 
 dnl gcc __attribute__ ((aligned ()))
 AC_C_ATTRIBUTE_ALIGNED
