@@ -1171,7 +1171,7 @@ void xitk_subst_special_chars(char *src, char *dest) {
       /* %20 is ' ' */
       if((*(s) == '%') && (*(s + 1) == '2') && (*(s + 2) == '0')) {
 	*d = ' ';
-	d += 2;
+	s += 2;
       }
       else {
 	*d++ = '%';

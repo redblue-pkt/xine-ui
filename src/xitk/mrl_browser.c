@@ -372,7 +372,7 @@ static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
     
-    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, 0)) {
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start)) {
       if((is_playback_widgets_enabled()) && (!gGui->playlist.num))
 	enable_playback_controls(0);
     }

@@ -630,7 +630,7 @@ void gui_playlist_start_next(void) {
   if(gGui->playlist.cur < gGui->playlist.num) {
     gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
     
-    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, 0);
+    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
     
   }
   else {

@@ -68,10 +68,13 @@ void gui_display_logo(void) {
     stream_infos_update_infos();
 }
 
-int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
+int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) {
   int ret;
   
-  if((ret = xine_play(stream, start_pos, start_time)) == 0) {
+  if(start_time_in_secs)
+    start_time_in_secs *= 1000;
+
+  if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0) {
     gui_handle_xine_error(stream);
   }
   else {
@@ -248,7 +251,7 @@ void gui_play (xitk_widget_t *w, void *data) {
       return;
     }
     
-    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, 0);
+    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
   } 
   else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -551,6 +554,7 @@ void *gui_set_current_position_thread(void *data) {
   panel_check_pause();
 
   pthread_exit(NULL);
+  return NULL;
 }
 
 void *gui_seek_relative_thread(void *data) {
@@ -568,11 +572,12 @@ void *gui_seek_relative_thread(void *data) {
     sec += off_sec;
 
   (void) gui_xine_play(gGui->stream, 0, sec);
-
+  
   gGui->ignore_next = 0;
   panel_check_pause();
 
   pthread_exit(NULL);
+  return NULL;
 }
 
 void gui_set_current_position (int pos) {
@@ -630,19 +635,21 @@ void gui_dndcallback (char *filename) {
     memset(&buffer, 0, sizeof(buffer));
     memset(&buffer2, 0, sizeof(buffer2));
 
-#warning FIXME
     if((strlen(filename) > 6) && 
        (!strncmp(filename, "file:", 5))) {
       
-      if((p = strstr(filename, "://")) != NULL) {
+      if((p = strstr(filename, ":/")) != NULL) {
 	struct stat pstat;
 	
-	p += 3;
+	p += 2;
+
+	if(*(p + 1) == '/')
+	  p++;
 
       __second_stat:
 
 	if((stat(p, &pstat)) == 0)
-	  sprintf(buffer, "file://%s", p);
+	  sprintf(buffer, "file:/%s", p);
 	else {
 	  
 	  sprintf(buffer2, "/%s", p);
@@ -651,7 +658,7 @@ void gui_dndcallback (char *filename) {
 	  if((stat(buffer2, &pstat)) == -1)
 	    sprintf(buffer, "%s", filename);
 	  else
-	    sprintf(buffer, "file://%s", buffer2);
+	    sprintf(buffer, "file:/%s", buffer2);
 	  
 	}
       }
@@ -722,7 +729,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	if((gGui->playlist.cur < gGui->playlist.num)) {
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 
-	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, 0);
+	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
   
 	}
 	else {

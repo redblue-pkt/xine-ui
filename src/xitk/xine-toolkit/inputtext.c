@@ -143,6 +143,9 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
     state = xev->xkey.state;
   else
     state = xev->xkey.state;
+
+  if(state & XK_Multi_key)
+    state = (state | XK_Multi_key) & 0xFF;
   
   if(state & ShiftMask)
     *modifier |= MODIFIER_SHIFT;
@@ -160,31 +163,6 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
     *modifier |= MODIFIER_MOD4;
   if(state & Mod5Mask)
     *modifier |= MODIFIER_MOD5;
-  
-  {
-    XKeyEvent            mykeyevent;
-    KeySym               mykey;
-    char                 kbuf[256];
-    int                  len;
-    char                *key;
-    
-    mykeyevent = xev->xkey;
-    
-    XLOCK(xev->xany.display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    key = XKeysymToString(mykey);
-    XUNLOCK(xev->xany.display);
-    
-    if(key) {
-      if((!strcmp(key, "XK_Control_L")) || (!strcmp(key, "XK_Control_R")))
-	*modifier |= MODIFIER_CTRL;
-      if((!strcmp(key, "XK_Shift_L")) || (!strcmp(key, "XK_Shift_R")))
-	*modifier |= MODIFIER_SHIFT;
-      if((!strcmp(key, "XK_Meta_L")) || (!strcmp(key, "XK_Meta_R")) ||
-	 (!strcmp(key, "XK_Alt_L")) || (!strcmp(key, "XK_Alt_R"))) 
-	*modifier |= MODIFIER_META;
-    }
-  }
   
   return (*modifier != MODIFIER_NOMOD);
 }

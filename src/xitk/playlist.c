@@ -432,7 +432,7 @@ void playlist_scan_for_infos(void) {
     
     /* Restoring previous play status */
     if(mute)
-      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, mute);
+      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, !mute);
     
     if(rerun)
       gui_xine_open_and_play(gGui->mmk.mrl, old_pos, 0);

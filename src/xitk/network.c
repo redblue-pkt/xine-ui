@@ -1815,7 +1815,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	gGui->playlist.cur--;
 	if ((gGui->playlist.cur >= 0) && (gGui->playlist.cur < gGui->playlist.num)) {
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, 0);
+	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
 	  
 	} 
 	else {
@@ -1844,7 +1844,8 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	  gGui->ignore_next = 0;
 	}
 	gui_set_current_mrl(gGui->playlist.mmk[gGui->playlist.num - 1]);
-	if(!(xine_open(gGui->stream, gGui->mmk.mrl) && xine_play (gGui->stream, 0, 0 )))
+	if(!(xine_open(gGui->stream, gGui->mmk.mrl) 
+	     && xine_play (gGui->stream, 0, gGui->mmk.start)))
 	  handle_xine_error(client_info);
 	else
 	  gGui->logo_mode = 0;
@@ -1951,7 +1952,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 static void do_play(commands_t *cmd, client_info_t *client_info) {
 
   if (xine_get_status (gGui->stream) != XINE_STATUS_PLAY) {
-    if(!(xine_open(gGui->stream, gGui->mmk.mrl) && xine_play (gGui->stream, 0, 0 )))
+    if(!(xine_open(gGui->stream, gGui->mmk.mrl) && xine_play (gGui->stream, 0, gGui->mmk.start)))
       handle_xine_error(client_info);
     else
       gGui->logo_mode = 0;
@@ -2367,25 +2368,27 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 
       else if((((arg[0] == '+') || (arg[0] == '-')) && (isdigit(arg[1])))
 	      || (isdigit(arg[0]))) {
-	int sec;
+	int msec;
 	
 	pos = atoi(arg);
 	
 	if(((arg[0] == '+') || (arg[0] == '-')) && (isdigit(arg[1]))) {
 
-	  xine_get_pos_length(gGui->stream, NULL, &sec, NULL);
-	  sec /= 1000;
+	  xine_get_pos_length(gGui->stream, NULL, &msec, NULL);
+	  msec /= 1000;
 
-	  if((sec + pos) < 0) 
-	    sec = 0;
+	  if((msec + pos) < 0) 
+	    msec = 0;
 	  else
-	    sec += pos;
+	    msec += pos;
 	}
 	else 
-	  sec = pos;
+	  msec = pos;
+
+	msec *= 1000;
 	
 	gGui->ignore_next = 1;
-	if(!xine_play(gGui->stream, 0, sec))
+	if(!xine_play(gGui->stream, 0, msec))
 	  gui_handle_xine_error(gGui->stream);
 	else
 	  gGui->logo_mode = 0;
