@@ -9,7 +9,7 @@ ACLOCAL_AMFLAGS = @XINE_ACFLAGS@ -I m4
 SUBDIRS = doc m4 readline intl po misc src  
 
 EXTRA_DIST = automake.diff \
-	cvscompile.sh\
+	autogen.sh\
         debian/README.Debian \
 	debian/changelog \
 	debian/control \
