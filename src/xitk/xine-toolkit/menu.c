@@ -622,7 +622,6 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   XUNLOCK(private_data->imlibdata->x.disp);
   
   xitk_set_focus_to_widget((xitk_widget_t *) (xitk_list_first_content(menu_window->wl.l)));
-  private_data->parent_wlist->widget_focused = menu_window->widget;
 }
 
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
@@ -660,7 +659,7 @@ xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl,
   mywidget->have_focus                   = FOCUS_RECEIVED;
   mywidget->imlibdata                    = private_data->imlibdata;
   mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
-  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MENU | WIDGET_FOCUSABLE | WIDGET_CLICKABLE;
+  mywidget->type                         = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MENU;
   mywidget->event                        = notify_event;
   mywidget->tips_timeout                 = 0;
   mywidget->tips_string                  = NULL;

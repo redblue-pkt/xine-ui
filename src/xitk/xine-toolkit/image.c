@@ -806,6 +806,7 @@ void draw_rectangular_outter_box_light(ImlibData *im, xitk_pixmap_t *p,
 void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked) {
   int      h, w;
   int      relief = (checked) ? DRAW_INNER : DRAW_OUTTER;
+  int      nrelief = (checked) ? DRAW_OUTTER : DRAW_INNER;
   
   assert(im && p);
   
@@ -814,7 +815,7 @@ void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked) {
   
   _draw_rectangular_box(im, p->image, 4,               6,     0, 0, 12, h, relief);
   _draw_rectangular_box(im, p->image, w + 4,           6,     0, 0, 12, h, relief);
-  _draw_rectangular_box(im, p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, relief);
+  _draw_rectangular_box(im, p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, nrelief);
 }
 
 /*
