@@ -1117,6 +1117,18 @@ void gui_send_expose_to_window(Window window) {
   
 }
 
+void gui_add_mediamark(void) {
+  
+  if((gGui->logo_mode == 0) && (xine_get_status(gGui->stream) == XINE_STATUS_PLAY)) {
+    int secs;
+
+    xine_get_pos_length(gGui->stream, NULL, &secs, NULL);
+    secs /= 1000;
+
+    mediamark_add_entry(gGui->mmk.mrl, gGui->mmk.ident, secs, -1);
+  }
+}
+
 /*
  *
  */

@@ -275,6 +275,8 @@ Seek to the percentage specified by the numeric argument. This is more
 general than the above 0..9 commands. See the section on "Numeric Input" below.
 .IP "\fBA\fP"
 Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
+.IP "\fBC\fP\-\fBa\fP"
+Add a mediamark to the playlist from the current position stream playback.
 .IP "\fBM\fP\-\fBC\fP"
 Show/hide the video settings window.
 .IP "\fBE\fP"

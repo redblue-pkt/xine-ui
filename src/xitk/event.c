@@ -596,6 +596,9 @@ void gui_execute_action_id(action_id_t action) {
 #endif
     break;
     
+  case ACTID_ADDMEDIAMARK:
+    gui_add_mediamark();
+    break;
 
   default:
     break;

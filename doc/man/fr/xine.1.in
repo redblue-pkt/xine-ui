@@ -266,6 +266,9 @@ Saute à 0%..90% du flux courant.
 .BR a :
 Bascule du ratio d'aspect (AUTO/16:9/4:3/DVB).
 .br
+.BR C\-a
+Ajoute une mediamark à la liste de lecture à partir de la position courante du flux lus.
+.br
 .BR M\-c :
 Affiche/masque la fenêtre des réglages vidéo.
 .br

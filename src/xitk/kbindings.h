@@ -114,7 +114,7 @@ typedef enum {
   ACTID_SCANPLAYLIST,
   ACTID_MMKEDITOR,
   ACTID_LOOPMODE,
-
+  ACTID_ADDMEDIAMARK,
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 
    */

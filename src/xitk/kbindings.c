@@ -377,6 +377,8 @@ static kbinding_entry_t default_binding_table[] = {
     "MrlIdentToggle",         ACTID_MRLIDENTTOGGLE          , "t",        KEYMOD_CONTROL , 0 },
   { "Scan playlist to grab stream infos.",
     "ScanPlaylistInfo",       ACTID_SCANPLAYLIST            , "s",        KEYMOD_CONTROL , 0 },
+  { "Add a mediamark from current playback.",
+    "AddMediamark",           ACTID_ADDMEDIAMARK            , "a",        KEYMOD_CONTROL , 0 },
   { 0,
     0,                        0,                            0,            0              , 0 }
 };
