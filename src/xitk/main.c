@@ -248,7 +248,7 @@ int handle_deinterlace_subopt(char *sopt) {
   char *str = sopt;
   char *val = NULL;
   char *method[] = {
-    "none","bob","weave","greedy",
+    "none","bob","weave","greedy","onefield",
     NULL
   };
 
