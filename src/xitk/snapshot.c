@@ -48,7 +48,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <alloca.h>
 #include <pthread.h>
 
 #include "xitk.h"
