@@ -2846,6 +2846,8 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   mmkeditor->xwin = xitk_window_create_dialog_window(gGui->imlib_data, _("Mediamark Editor"), x, y,
 						     WINDOW_WIDTH, WINDOW_HEIGHT);
   
+  set_window_states_start((xitk_window_get_window(mmkeditor->xwin)));
+  
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(mmkeditor->xwin)), None, None);

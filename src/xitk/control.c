@@ -466,6 +466,9 @@ void control_change_skins(void) {
     
     XUnlockDisplay(gGui->display);
 
+    if(control_is_visible())
+      control_raise_window();
+
     xitk_skin_unlock(gGui->skin_config);
     
     xitk_change_skins_widget_list(control->widget_list, gGui->skin_config);
@@ -489,6 +492,11 @@ void control_deinit(void) {
       control_toggle_visibility(NULL, NULL);
     xitk_unregister_event_handler(&control->widget_key);
   }
+}
+
+void control_reparent(void) {
+  if(control)
+    reparent_window(control->window);
 }
 
 /*
@@ -578,6 +586,11 @@ void control_panel(void) {
   
   XSelectInput(gGui->display, control->window, INPUT_MOTION | KeymapStateMask);
   XUnlockDisplay(gGui->display);
+
+  if(!video_window_is_visible())
+    xitk_set_wm_window_type(control->window, WINDOW_TYPE_NORMAL);
+  else
+    xitk_unset_wm_window_type(control->window, WINDOW_TYPE_NORMAL);
   
   if(is_layer_above())
     xitk_set_layer_above(control->window);
@@ -607,7 +620,8 @@ void control_panel(void) {
   if (wm_hint != NULL) {
     wm_hint->input         = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->flags         = InputHint | StateHint;
+    wm_hint->icon_pixmap   = gGui->icon;
+    wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
     XSetWMHints(gGui->display, control->window, wm_hint);
     XFree(wm_hint);
   }

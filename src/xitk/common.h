@@ -360,4 +360,63 @@ typedef struct {
 
 } gGui_t;
 
+
+void set_window_states_start(Window window);
+#define set_window_states_start(window)                                   \
+  do {                                                                    \
+    if(!video_window_is_visible())                                        \
+      xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);              \
+    else                                                                  \
+      xitk_unset_wm_window_type((window), WINDOW_TYPE_NORMAL);            \
+    change_class_name((window));                                          \
+    change_icon((window));                                                \
+  } while(0)
+
+void reparent_window(Window window);
+#define reparent_window(window)                                           \
+  do {                                                                    \
+    XLockDisplay(gGui->display);                                          \
+    XUnmapWindow(gGui->display, (window));                                \
+    if(!video_window_is_visible())                                        \
+      xitk_set_wm_window_type((window), WINDOW_TYPE_NORMAL);              \
+    else                                                                  \
+      xitk_unset_wm_window_type((window), WINDOW_TYPE_NORMAL);            \
+    XRaiseWindow(gGui->display, (window));                                \
+    XMapWindow(gGui->display, (window));                                  \
+    try_to_set_input_focus((window));                                     \
+    if(!gGui->use_root_window)                                            \
+      XSetTransientForHint (gGui->display, (window), gGui->video_window); \
+    XUnlockDisplay(gGui->display);                                        \
+  } while(0)
+
+void change_class_name(Window window);
+#define change_class_name(window)                                         \
+  do {                                                                    \
+    XClassHint  xclasshint;                                               \
+    XLockDisplay (gGui->display);                                         \
+    if((XGetClassHint(gGui->display, (window), &xclasshint)) != 0) {      \
+      XClassHint   nxclasshint;                                           \
+      nxclasshint.res_name = xclasshint.res_name;                         \
+      nxclasshint.res_class = "xine";                                     \
+      XSetClassHint(gGui->display, window, &nxclasshint);                 \
+      XFree(xclasshint.res_name);                                         \
+      XFree(xclasshint.res_class);                                        \
+    }                                                                     \
+    XUnlockDisplay (gGui->display);                                       \
+  } while(0)
+
+void change_icon(Window window);
+#define change_icon(window)                                               \
+  do {                                                                    \
+    XWMHints *wmhints;                                                    \
+    XLockDisplay(gGui->display);                                          \
+    if((wmhints = XAllocWMHints())) {                                     \
+      wmhints->icon_pixmap   = gGui->icon;                                \
+      wmhints->flags         = IconPixmapHint;                            \
+      XSetWMHints(gGui->display, (window), wmhints);                      \
+      XFree(wmhints);                                                     \
+    }                                                                     \
+    XUnlockDisplay(gGui->display);                                        \
+  } while(0)
+
 #endif

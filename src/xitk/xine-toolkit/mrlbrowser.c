@@ -1083,7 +1083,12 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 
   XSelectInput(mb->imlibdata->x.disp, private_data->window, INPUT_MOTION | KeymapStateMask);
   XUNLOCK(mb->imlibdata->x.disp);
-  
+
+  if(mb->set_wm_window_normal)
+    xitk_set_wm_window_type(private_data->window, WINDOW_TYPE_NORMAL);
+  else
+    xitk_unset_wm_window_type(private_data->window, WINDOW_TYPE_NORMAL);
+
   /*
    * layer above most other things, like gnome panel
    * WIN_LAYER_ABOVE_DOCK  = 10
@@ -1130,7 +1135,11 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   if (wm_hint != NULL) {
     wm_hint->input         = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->flags         = InputHint | StateHint;
+    if(mb->icon) {
+      wm_hint->icon_pixmap = *mb->icon;
+      wm_hint->flags       = IconPixmapHint;
+    }
+    wm_hint->flags         |= InputHint | StateHint;
     XSetWMHints(mb->imlibdata->x.disp, private_data->window, wm_hint);
     XFree(wm_hint);
   }

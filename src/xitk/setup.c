@@ -1048,6 +1048,11 @@ static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
   }
 }
 
+void setup_reparent(void) {
+  if(setup)
+    reparent_window((xitk_window_get_window(setup->xwin)));
+}
+
 /*
  * Create setup panel window
  */
@@ -1081,6 +1086,8 @@ void setup_panel(void) {
 						 _("xine setup"), 
 						 x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
+  set_window_states_start((xitk_window_get_window(setup->xwin)));
+
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(setup->xwin)), None, None);

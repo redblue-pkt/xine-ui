@@ -121,4 +121,6 @@ void panel_update_mrl_display (void);
 
 void panel_set_title(char*);
 
+void panel_reparent(void);
+
 #endif

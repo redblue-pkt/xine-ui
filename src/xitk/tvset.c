@@ -280,6 +280,11 @@ static void system_combo_select(xitk_widget_t *w, void *data, int select) {
 }
 
 
+void tvset_reparent(void) {
+  if(tvset)
+    reparent_window((xitk_window_get_window(tvset->xwin)));
+}
+
 void tvset_panel(void) {
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
@@ -315,6 +320,8 @@ void tvset_panel(void) {
 						 _("TV/Analog Video parameters"), x, y,
 						 WINDOW_WIDTH, WINDOW_HEIGHT);
   
+  set_window_states_start((xitk_window_get_window(tvset->xwin)));
+
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(tvset->xwin)), None, None);

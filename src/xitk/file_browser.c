@@ -306,6 +306,10 @@ static void fb_create_input_window(char *title, char *text,
 
   fne->xwin = xitk_window_create_dialog_window(gGui->imlib_data, title, x, y, width, height);
 
+  xitk_set_wm_window_type((xitk_window_get_window(fne->xwin)), WINDOW_TYPE_NORMAL);
+  change_class_name((xitk_window_get_window(fne->xwin)));
+  change_icon((xitk_window_get_window(fne->xwin)));
+
   XLockDisplay(gGui->display);
   gc = XCreateGC(gGui->display, (xitk_window_get_window(fne->xwin)), None, None);
   XUnlockDisplay(gGui->display);
@@ -1195,6 +1199,10 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
 					      (window_title) ? window_title : _("File Browser"), 
 					      x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
+  xitk_set_wm_window_type((xitk_window_get_window(fb->xwin)), WINDOW_TYPE_NORMAL);
+  change_class_name((xitk_window_get_window(fb->xwin)));
+  change_icon((xitk_window_get_window(fb->xwin)));
+
   fb->directories                = NULL;
   fb->directories_num            = 0;
   fb->files                      = NULL;
@@ -1629,7 +1637,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
     
   fb_getdir(fb);
 
+  layer_above_video(xitk_window_get_window(fb->xwin));
   try_to_set_input_focus(xitk_window_get_window(fb->xwin));
-
+  
   return fb;
 }

@@ -65,6 +65,8 @@ void mrl_browser_change_skins(void) {
   if(mrlb) {
     xitk_mrlbrowser_change_skins(mrlb, gGui->skin_config);
     set_mrl_browser_transient();
+    if(mrl_browser_is_visible())
+      raise_window((xitk_mrlbrowser_get_window_id(mrlb)), 1, 1);
   }
 }
 
@@ -242,6 +244,8 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
 
   mb.window_trans                   = (gGui->use_root_window) ? None : gGui->video_window;
   mb.layer_above                    = (is_layer_above());
+  mb.icon                           = &gGui->icon;
+  mb.set_wm_window_normal           = !video_window_is_visible();
 
   mb.x                              = xine_config_register_num (gGui->xine, "gui.mrl_browser_x", 
 								200,
@@ -427,6 +431,11 @@ void mrl_browser_deinit(void) {
     if(mrl_browser_is_running())
       destroy_mrl_browser();
   }
+}
+
+void mrl_browser_reparent(void) {
+  if(mrlb)
+    reparent_window((xitk_mrlbrowser_get_window_id(mrlb)));
 }
 
 /*

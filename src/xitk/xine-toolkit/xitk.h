@@ -43,8 +43,8 @@
 
 #define XITK_MAJOR_VERSION          (0)
 #define XITK_MINOR_VERSION          (10)
-#define XITK_SUB_VERSION            (6)
-#define XITK_VERSION                "0.10.6"
+#define XITK_SUB_VERSION            (7)
+#define XITK_VERSION                "0.10.7"
 
 #define XITK_CHECK_VERSION(major, minor, sub)                          \
                                     (XITK_MAJOR_VERSION > (major) ||   \
@@ -315,6 +315,20 @@ typedef struct {
 #define WM_TYPE_LARSWM              0x0000000B
 #define WM_TYPE_DTWM                0x0000000C
 
+typedef enum {
+  WINDOW_TYPE_DESKTOP = 1,
+  WINDOW_TYPE_DOCK,
+  WINDOW_TYPE_TOOLBAR,
+  WINDOW_TYPE_MENU,
+  WINDOW_TYPE_UTILITY,
+  WINDOW_TYPE_SPLASH,
+  WINDOW_TYPE_DIALOG,
+  WINDOW_TYPE_NORMAL
+} xitk_wm_window_type_t;
+
+void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type);
+void xitk_unset_wm_window_type(Window window, xitk_wm_window_type_t type);
+
 /* 
  * See xitk_widget_list_[set/get]()
  */
@@ -500,6 +514,8 @@ typedef struct {
   char                             *skin_element_name;
   Window                            window_trans;
   int                               layer_above;
+  Pixmap                           *icon;
+  int                               set_wm_window_normal;
 
   int                               x;
   int                               y;

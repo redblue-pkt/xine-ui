@@ -346,6 +346,10 @@ static void viewlog_end(xitk_widget_t *w, void *data) {
   viewlog_exit(NULL, NULL);
 }
 
+void viewlog_reparent(void) {
+  if(viewlog)
+    reparent_window((xitk_window_get_window(viewlog->xwin)));
+}
 
 /*
  * Create viewlog window
@@ -380,6 +384,8 @@ void viewlog_panel(void) {
 						   _("xine log viewer"), 
 						   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
+  set_window_states_start((xitk_window_get_window(viewlog->xwin)));
+
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(viewlog->xwin)), None, None);

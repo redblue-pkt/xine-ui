@@ -180,7 +180,10 @@ void panel_change_skins(void) {
   Imlib_apply_image(gGui->imlib_data, new_img, gGui->panel_window);
   
   XUnlockDisplay(gGui->display);
-  
+
+  if(panel_is_visible())
+    raise_window(gGui->panel_window, 1, 1);
+
   xitk_skin_unlock(gGui->skin_config);
   
   xitk_change_skins_widget_list(panel->widget_list, gGui->skin_config);
@@ -542,6 +545,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 	xitk_hide_widgets(panel->widget_list);
       }
     }
+    else
+      XIconifyWindow(gGui->display, gGui->panel_window, (XDefaultScreen(gGui->display)));
 
     if(gGui->cursor_grabbed)
        XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
@@ -965,6 +970,12 @@ void panel_deinit(void) {
   xitk_unregister_event_handler(&panel->widget_key);
 }
 
+void panel_reparent(void) {
+  if(panel) {
+    reparent_window(gGui->panel_window);
+  }
+}
+
 /*
  * Create the panel window, and fit all widgets in.
  */
@@ -1066,9 +1077,13 @@ void panel_init (void) {
 			 None, NULL, 0, &hint);
 
   XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | KeymapStateMask);
-
   XUnlockDisplay(gGui->display);
-
+  
+  if(!video_window_is_visible())
+    xitk_set_wm_window_type(gGui->panel_window, WINDOW_TYPE_NORMAL);
+  else
+    xitk_unset_wm_window_type(gGui->panel_window, WINDOW_TYPE_NORMAL);
+  
   if(is_layer_above())
     xitk_set_layer_above(gGui->panel_window);
   

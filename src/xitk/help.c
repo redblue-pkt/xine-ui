@@ -348,6 +348,11 @@ void help_toggle_visibility (xitk_widget_t *w, void *data) {
 		  &help->visible, help->running);
 }
 
+void help_reparent(void) {
+  if(help)
+    reparent_window((xitk_window_get_window(help->xwin)));
+}
+
 void help_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
@@ -379,6 +384,8 @@ void help_panel(void) {
 						_("Help"), 
 						x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
+  set_window_states_start((xitk_window_get_window(help->xwin)));
+
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(help->xwin)), None, None);

@@ -30,5 +30,6 @@ int help_is_visible(void);
 int help_is_running(void);
 void help_toggle_visibility(xitk_widget_t *, void *);
 void help_raise_window(void);
+void help_reparent(void);
 
 #endif

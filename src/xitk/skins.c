@@ -727,38 +727,36 @@ static void download_update_blank_preview(void) {
 
 }
 
-static void download_update_preview(void) {
-
+static void redraw_preview(void) {
+  int  x, y;
+  
   download_update_blank_preview();
-
-  if(skdloader->preview_image->image && skdloader->preview_image->image->pixmap) {
-    GC   lgc;
-    int  x, y;
-    
+  
+  y = 30 + ((skdloader->preview_image->image->height - skdloader->preview_height) >> 1);
+  x = 10 + ((skdloader->preview_image->image->width - skdloader->preview_width) >> 1);
+  
+  if(skdloader->preview_image->mask && skdloader->preview_image->mask->pixmap) {
     XLockDisplay (gGui->display);
-    lgc = XCreateGC(gGui->display, (XITK_WIDGET_LIST_WINDOW(skdloader->widget_list)), None, None);
-    XCopyGC(gGui->display, 
-	    (XITK_WIDGET_LIST_GC(skdloader->widget_list)), (1 << GCLastBit) - 1, lgc);
-    XUnlockDisplay (gGui->display);
-    
-    y = 30 + ((skdloader->preview_image->image->height - skdloader->preview_height) >> 1);
-    x = 10 + ((skdloader->preview_image->image->width - skdloader->preview_width) >> 1);
-    
-    if(skdloader->preview_image->mask && skdloader->preview_image->mask->pixmap) {
-      XLockDisplay (gGui->display);
-      XSetClipOrigin(gGui->display, lgc, x, y);
-      XSetClipMask(gGui->display, lgc, skdloader->preview_image->mask->pixmap);
-      XUnlockDisplay (gGui->display);
-    }
-    
-    XLockDisplay (gGui->display);
-    XCopyArea (gGui->display, skdloader->preview_image->image->pixmap, 
-	       (XITK_WIDGET_LIST_WINDOW(skdloader->widget_list)), lgc, 0, 0,
-	       skdloader->preview_width, skdloader->preview_height, x, y);
-    XSync(gGui->display, False);
-    XFreeGC(gGui->display, lgc);
+    XSetClipOrigin(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)), x, y);
+    XSetClipMask(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)), skdloader->preview_image->mask->pixmap);
     XUnlockDisplay (gGui->display);
   }
+  
+  XLockDisplay (gGui->display);
+  XCopyArea (gGui->display, skdloader->preview_image->image->pixmap, 
+	     (XITK_WIDGET_LIST_WINDOW(skdloader->widget_list)), (XITK_WIDGET_LIST_GC(skdloader->widget_list)), 0, 0,
+	     skdloader->preview_width, skdloader->preview_height, x, y);
+  XSync(gGui->display, False);
+  XUnlockDisplay (gGui->display);
+}
+
+static void download_update_preview(void) {
+
+  if(skdloader->preview_image->image && skdloader->preview_image->image->pixmap)
+    redraw_preview();
+  else
+    download_update_blank_preview();
+
 }
 
 static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
@@ -985,6 +983,10 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 static void download_skin_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
+
+  case Expose:
+    redraw_preview();
+    break;
     
   case KeyPress: {
     XKeyEvent      mykeyevent;
@@ -1108,11 +1110,13 @@ void download_skin(char *url) {
 						       _("Choose a skin to download..."),
 						       x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
     
+    set_window_states_start((xitk_window_get_window(skdloader->xwin)));
+
     XLockDisplay(gGui->display);
     skdloader->cursor[NORMAL_CURS] = XCreateFontCursor(gGui->display, XC_left_ptr);
     skdloader->cursor[WAIT_CURS] = XCreateFontCursor(gGui->display, XC_watch);
     gc = XCreateGC(gGui->display, 
-		   (xitk_window_get_window(skdloader->xwin)), None, None);
+    		   (xitk_window_get_window(skdloader->xwin)), None, None);
     XUnlockDisplay(gGui->display);
 
     xitk_window_get_window_size(skdloader->xwin, &width, &height);

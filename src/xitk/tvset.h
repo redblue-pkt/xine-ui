@@ -36,5 +36,6 @@ int tvset_is_visible(void);
 int tvset_is_running(void);
 void tvset_toggle_visibility(xitk_widget_t *, void *);
 void tvset_raise_window(void);
+void tvset_reparent(void);
 
 #endif

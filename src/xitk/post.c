@@ -993,6 +993,9 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
     pplugin->helpwin = xitk_window_create_dialog_window(gGui->imlib_data, 
   						 _("Plugin Help"), x, y,
   						 HELP_WINDOW_WIDTH, HELP_WINDOW_HEIGHT);
+
+    set_window_states_start((xitk_window_get_window(pplugin->helpwin)));
+
     XLockDisplay (gGui->display);
     gc = XCreateGC(gGui->display, 
   		 (xitk_window_get_window(pplugin->helpwin)), None, None);
@@ -1744,6 +1747,11 @@ void pplugin_update_enable_button(void) {
     xitk_labelbutton_set_state(pplugin->enable, gGui->post_enable);
 }
 
+void pplugin_reparent(void) {
+  if(pplugin)
+    reparent_window((xitk_window_get_window(pplugin->xwin)));
+}
+
 void pplugin_panel(void) {
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
@@ -1777,6 +1785,8 @@ void pplugin_panel(void) {
 						   _("Chain Reaction"), x, y,
 						   WINDOW_WIDTH, WINDOW_HEIGHT);
   
+  set_window_states_start((xitk_window_get_window(pplugin->xwin)));
+
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(pplugin->xwin)), None, None);

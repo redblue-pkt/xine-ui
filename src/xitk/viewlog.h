@@ -36,5 +36,6 @@ int viewlog_is_visible(void);
 int viewlog_is_running(void);
 void viewlog_toggle_visibility(xitk_widget_t *, void *);
 void viewlog_raise_window(void);
+void viewlog_reparent(void);
 
 #endif

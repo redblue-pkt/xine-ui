@@ -1698,7 +1698,8 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
         
     xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
 					    _("Event receiver window"), x, y, w, h);
-    
+
+    set_window_states_start((xitk_window_get_window(xwin)));
   }
   
   XLockDisplay(gGui->display);
@@ -1842,6 +1843,11 @@ static void kbedit_handle_event(XEvent *event, void *data) {
   }
 }
 
+void kbedit_reparent(void) {
+  if(kbedit)
+    reparent_window((xitk_window_get_window(kbedit->xwin)));
+}
+
 /*
  *
  */
@@ -1880,6 +1886,8 @@ void kbedit_window(void) {
   kbedit->xwin          = xitk_window_create_dialog_window(gGui->imlib_data,
 							   _("key binding editor"), 
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
+  set_window_states_start((xitk_window_get_window(kbedit->xwin)));
+
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
 		 (xitk_window_get_window(kbedit->xwin)), None, None);

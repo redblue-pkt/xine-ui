@@ -929,9 +929,11 @@ void playlist_change_skins(void) {
     
     Imlib_destroy_image(gGui->imlib_data, old_img);
     Imlib_apply_image(gGui->imlib_data, new_img, playlist->window);
-    
     XUnlockDisplay(gGui->display);
-    
+
+    if(playlist_is_visible())
+      playlist_raise_window();
+
     xitk_skin_unlock(gGui->skin_config);
     
     xitk_change_skins_widget_list(playlist->widget_list, gGui->skin_config);
@@ -986,6 +988,11 @@ void playlist_deinit(void) {
       playlist_toggle_visibility(NULL, NULL);
     xitk_unregister_event_handler(&playlist->widget_key);
   }
+}
+
+void playlist_reparent(void) {
+  if(playlist)
+    reparent_window(playlist->window);
 }
 
 /*
@@ -1073,7 +1080,13 @@ void playlist_editor(void) {
 			 None, NULL, 0, &hint);
   
   XSelectInput(gGui->display, playlist->window, INPUT_MOTION | KeymapStateMask);
+  XUnlockDisplay (gGui->display);
   
+  if(!video_window_is_visible())
+    xitk_set_wm_window_type(playlist->window, WINDOW_TYPE_NORMAL);
+  else
+    xitk_unset_wm_window_type(playlist->window, WINDOW_TYPE_NORMAL);
+
   if(is_layer_above())
     xitk_set_layer_above(playlist->window);
 
@@ -1081,6 +1094,7 @@ void playlist_editor(void) {
    * wm, no border please
    */
 
+  XLockDisplay (gGui->display);
   prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", True);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
@@ -1101,7 +1115,8 @@ void playlist_editor(void) {
   if (wm_hint != NULL) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->flags = InputHint | StateHint;
+    wm_hint->icon_pixmap   = gGui->icon;
+    wm_hint->flags = InputHint | StateHint | IconPixmapHint;
     XSetWMHints(gGui->display, playlist->window, wm_hint);
     XFree(wm_hint);
   }

@@ -1,4 +1,13 @@
+xine-ui (0.99.1) unstable; urgency=low
+
+  * fix XMB failure (fallback to standart XFont usage),
+  * fix skin downloader preview blanking,
+  * fix alpha artefact on when changing skins,
+  * show windows in taskbar when output window is hidden,
+  * fix root window and windows states,
+
 xine-ui (0.9.23) unstable; urgency=low
+
   * xinerama bug fixes (very fullscreen, window position when switching from
     fullscreen to normal mode),
   * shiny new help dialog,

@@ -51,5 +51,5 @@ void playlist_deinit(void);
 void playlist_editor(void);
 void playlist_load_playlist(xitk_widget_t *w, void *data);
 void playlist_save_playlist(xitk_widget_t *w, void *data);
-
+void playlist_reparent(void);
 #endif

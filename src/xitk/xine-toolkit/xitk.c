@@ -137,6 +137,15 @@ static Atom XA_WIN_LAYER = None, XA_STAYS_ON_TOP = None;
 static Atom XA_NET_WM_STATE = None, XA_NET_WM_STATE_ABOVE = None;
 static Atom XA_NET_WM_STATE_FULLSCREEN = None;
 
+static Atom XA_WM_WINDOW_TYPE = None;
+static Atom XA_WM_WINDOW_TYPE_DESKTOP = None;
+static Atom XA_WM_WINDOW_TYPE_DOCK = None;
+static Atom XA_WM_WINDOW_TYPE_TOOLBAR = None;
+static Atom XA_WM_WINDOW_TYPE_MENU = None;
+static Atom XA_WM_WINDOW_TYPE_UTILITY = None;
+static Atom XA_WM_WINDOW_TYPE_SPLASH = None;
+static Atom XA_WM_WINDOW_TYPE_DIALOG = None;
+static Atom XA_WM_WINDOW_TYPE_NORMAL = None;
 
 void widget_stop(void);
 
@@ -519,11 +528,21 @@ static uint32_t xitk_check_wm(Display *display) {
   }
 
   if(type & WM_TYPE_EWMH_COMP) {
-    XA_WIN_LAYER          = XInternAtom(display, "_NET_WM_STATE", False);
-    XA_STAYS_ON_TOP       = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
-    XA_NET_WM_STATE       = XInternAtom(display, "_NET_WM_STATE", False);
-    XA_NET_WM_STATE_ABOVE = XInternAtom(display, "_NET_WM_STATE_ABOVE", False);
+    XA_WIN_LAYER               = XInternAtom(display, "_NET_WM_STATE", False);
+    XA_STAYS_ON_TOP            = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
+    XA_NET_WM_STATE            = XInternAtom(display, "_NET_WM_STATE", False);
+    XA_NET_WM_STATE_ABOVE      = XInternAtom(display, "_NET_WM_STATE_ABOVE", False);
     XA_NET_WM_STATE_FULLSCREEN = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
+
+    XA_WM_WINDOW_TYPE          = XInternAtom(display, "_NET_WM_WINDOW_TYPE", False);
+    XA_WM_WINDOW_TYPE_DESKTOP  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DESKTOP", False);
+    XA_WM_WINDOW_TYPE_DOCK     = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DOCK", False);
+    XA_WM_WINDOW_TYPE_TOOLBAR  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_TOOLBAR", False);
+    XA_WM_WINDOW_TYPE_MENU     = XInternAtom(display, "_NET_WM_WINDOW_TYPE_MENU", False);
+    XA_WM_WINDOW_TYPE_UTILITY  = XInternAtom(display, "_NET_WM_WINDOW_TYPE_UTILITY", False);
+    XA_WM_WINDOW_TYPE_SPLASH   = XInternAtom(display, "_NET_WM_WINDOW_TYPE_SPLASH", False);
+    XA_WM_WINDOW_TYPE_DIALOG   = XInternAtom(display, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+    XA_WM_WINDOW_TYPE_NORMAL   = XInternAtom(display, "_NET_WM_WINDOW_TYPE_NORMAL", False);
   }
   
   switch(type & WM_TYPE_COMP_MASK) {
@@ -793,6 +812,54 @@ void xitk_set_ewmh_fullscreen(Window window) {
   
   XUnlockDisplay(gXitk->display);
 
+}
+
+static void _set_wm_window_type(Window window, xitk_wm_window_type_t type, int value) {
+  if(window && (gXitk->wm_type & WM_TYPE_EWMH_COMP)) {
+    Atom *atom = NULL;
+    
+    switch(type) {
+    case WINDOW_TYPE_DESKTOP:
+      atom = &XA_WM_WINDOW_TYPE_DESKTOP;
+      break;
+    case WINDOW_TYPE_DOCK:
+      atom = &XA_WM_WINDOW_TYPE_DOCK;
+      break;
+    case WINDOW_TYPE_TOOLBAR:
+      atom = &XA_WM_WINDOW_TYPE_TOOLBAR;
+      break;
+    case WINDOW_TYPE_MENU:
+      atom = &XA_WM_WINDOW_TYPE_MENU;
+      break;
+    case WINDOW_TYPE_UTILITY:
+      atom = &XA_WM_WINDOW_TYPE_UTILITY;
+      break;
+    case WINDOW_TYPE_SPLASH:
+      atom = &XA_WM_WINDOW_TYPE_SPLASH;
+      break;
+    case WINDOW_TYPE_DIALOG:
+      atom = &XA_WM_WINDOW_TYPE_DIALOG;
+      break;
+    case WINDOW_TYPE_NORMAL:
+      atom = &XA_WM_WINDOW_TYPE_NORMAL;
+      break;
+    }
+    
+    if(atom) {
+      XLOCK(gXitk->display);
+      XChangeProperty(gXitk->display, window, XA_WM_WINDOW_TYPE, XA_ATOM, 32, 
+		      PropModeReplace, (unsigned char *)atom, value);
+      XUNLOCK(gXitk->display);
+    }
+  }
+}
+
+void xitk_unset_wm_window_type(Window window, xitk_wm_window_type_t type) {
+  _set_wm_window_type(window, type, 0);
+}
+
+void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type) {
+  _set_wm_window_type(window, type, 1);
 }
 
 /*

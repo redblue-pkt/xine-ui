@@ -46,16 +46,39 @@ extern _panel_t        *panel;
 
 static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
 
+void reparent_all_windows(void) {
+  int                    i;
+  typedef struct {
+    int                 (*visible)(void);
+    void                (*reparent)(void);
+  } reparent_t;
+  reparent_t _reparent[] = {
+    { panel_is_visible,         panel_reparent },
+    { mrl_browser_is_visible,   mrl_browser_reparent },
+    { playlist_is_visible,      playlist_reparent },
+    { control_is_visible,       control_reparent },
+    { setup_is_visible,         setup_reparent },
+    { viewlog_is_visible,       viewlog_reparent },
+    { kbedit_is_visible,        kbedit_reparent },
+    { event_sender_is_visible,  event_sender_reparent },
+    { stream_infos_is_visible,  stream_infos_reparent },
+    { tvset_is_visible,         tvset_reparent },
+    { pplugin_is_visible,       pplugin_reparent },
+    { help_is_visible,          help_reparent },
+    { NULL,                     NULL}
+  };
+  
+  for(i = 0; _reparent[i].visible; i++) {
+    if(_reparent[i].visible())
+      _reparent[i].reparent();
+  }
+
+}
+
 void raise_window(Window window, int visible, int running) {
   if(window) {
     if(visible && running) {
-      XLockDisplay(gGui->display);
-      XUnmapWindow(gGui->display, window);
-      XRaiseWindow(gGui->display, window);
-      XMapWindow(gGui->display, window);
-      if(!gGui->use_root_window)
-        XSetTransientForHint (gGui->display, window, gGui->video_window);
-      XUnlockDisplay(gGui->display);
+      reparent_window(window);
       layer_above_video(window);
     }
   }
@@ -787,20 +810,22 @@ void gui_eject(xitk_widget_t *w, void *data) {
 
 void gui_toggle_visibility(xitk_widget_t *w, void *data) {
 
-  if(panel_is_visible()) {
+  if(panel_is_visible() && (!gGui->use_root_window)) {
+
     video_window_set_visibility(!(video_window_is_visible()));
-    XLockDisplay(gGui->display);
-    XRaiseWindow(gGui->display, gGui->panel_window); 
-    XMapWindow(gGui->display, gGui->panel_window); 
-    XUnlockDisplay(gGui->display);
-    layer_above_video(gGui->panel_window);
+
+    /* We need to reparent all visible windows because of redirect tweaking */
+    reparent_all_windows();
 
     /* (re)start/stop visual animation */
     if(video_window_is_visible()) {
+      layer_above_video(gGui->panel_window);
+      
       if(gGui->visual_anim.enabled && (gGui->visual_anim.running == 2))
 	visual_anim_play();
     }
     else {
+
       if(gGui->visual_anim.running) {
 	visual_anim_stop();
 	gGui->visual_anim.running = 2;
@@ -824,7 +849,7 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   int pplugin      = pplugin_is_visible();
   int help         = help_is_visible();
 
-  if(!(video_window_is_visible()))
+  if((!(video_window_is_visible())) || gGui->use_root_window)
     return;
 
   if(panel)

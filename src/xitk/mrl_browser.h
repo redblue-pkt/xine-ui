@@ -46,5 +46,6 @@ void hide_mrl_browser(void);
 void show_mrl_browser(void);
 void set_mrl_browser_transient(void);
 void mrl_browser_show_tips(int enabled, unsigned long timeout);
+void mrl_browser_reparent(void);
 
 #endif
