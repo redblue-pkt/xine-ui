@@ -637,8 +637,8 @@ static int get_bool_value(const char *val) {
 #define write_to_console_unlocked(session, msg, args...)  __sock_write(session->console, 1, msg, ##args)
 #define write_to_console_unlocked_nocr(session, msg, args...) __sock_write(session->console, 0, msg, ##args)
 #else
-#define write_to_console_unlocked(session, msg, ...)  __sock_write(session->console, 1, msg, __VA_ARGS__)
-#define write_to_console_unlocked_nocr(session, msg, ...) __sock_write(session->console, 0, msg, __VA_ARGS__)
+#define write_to_console_unlocked(session, ...)  __sock_write(session->console, 1, __VA_ARGS__)
+#define write_to_console_unlocked_nocr(session, ...) __sock_write(session->console, 0, __VA_ARGS__)
 #endif
 
 static int write_to_console(session_t *session, const char *msg, ...) {
@@ -1288,7 +1288,7 @@ int main(int argc, char **argv) {
 
     if((grabbed_line = readline(session.prompt)) == NULL) {
       fprintf(stderr, "%s(%d): readline() failed: %s\n",
-	      __FUNCTION__, __LINE__, strerror(errno));
+	      __XINE_FUNCTION__, __LINE__, strerror(errno));
       exit(1);
     }
     
