@@ -305,7 +305,7 @@ case $host in
     AC_DEFINE([ARCH_X86],,[x86 architecture])
 
     ;;
-  *)
+  ?86*-*-linux* | i386-*-solaris*)
     dnl Set the appropriate architecture define
     case "$host_alias" in
     i?86-* | k?-* | athlon-*) dnl catch i386,i486,i586,i686,k6,k7
