@@ -1253,8 +1253,8 @@ int main(int argc, char *argv[]) {
     xine_cfg_entry_t  cfg_vo_entry;
     
     if(xine_config_lookup_entry(gGui->xine, "video.driver", &cfg_vo_entry)) {
-      
-      if(cfg_vo_entry.str_value && (!strcasecmp(cfg_vo_entry.str_value, "dxr3"))) {
+      printf("xine_config_lookup_entry() succeed: '%s'\n", cfg_vo_entry.str_value);
+      if(!strcasecmp(video_driver_ids[cfg_vo_entry.num_value], "dxr3")) {
 	xine_cfg_entry_t  cfg_entry;
 	
 	if(xine_config_lookup_entry(gGui->xine, "dxr3.videoout_mode", &cfg_entry)) {
