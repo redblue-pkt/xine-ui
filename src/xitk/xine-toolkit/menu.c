@@ -703,7 +703,7 @@ void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me) {
 	if(in_trunk)
 	  private_data->mtree->last = branch;
       }
-    __done:
+    __done: ;
 #ifdef DEBUG_MENU
       printf("******* BYE ************\n");
 #endif

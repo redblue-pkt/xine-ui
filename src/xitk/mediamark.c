@@ -813,7 +813,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 		
 	      }
 	    }
-	  __discard:
+	  __discard: ;
 	  }
 	  
 	  if(entries_tox) {

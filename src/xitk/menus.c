@@ -626,7 +626,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	  }
 	}
 
-	goto __audio_chan_done;
+	break;
       }
       
       sprintf(buffer, "%s/%s", location, langbuf);
@@ -637,7 +637,6 @@ void video_window_menu(xitk_widget_list_t *wl) {
       xitk_menu_add_entry(w, &menu_entry);
     }
 
-  __audio_chan_done:
   }
 
   { /* SPU channels */
@@ -677,7 +676,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	  }
 	}
 
-	goto __spu_chan_done;
+	break;
       }
       
       sprintf(buffer, "%s/%s", location, langbuf);
@@ -688,7 +687,6 @@ void video_window_menu(xitk_widget_list_t *wl) {
       xitk_menu_add_entry(w, &menu_entry);
     }
 
-  __spu_chan_done:
   }
 
   xitk_menu_show_menu(w);
