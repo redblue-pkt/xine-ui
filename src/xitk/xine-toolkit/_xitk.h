@@ -388,6 +388,8 @@ struct xitk_dialog_s {
   xitk_widget_t          *wyes;
   xitk_widget_t          *wno;
   xitk_widget_t          *wcancel;
+  xitk_widget_t          *checkbox;
+  xitk_widget_t          *checkbox_label;
 
   xitk_widget_t          *default_button;
 

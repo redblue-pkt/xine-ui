@@ -979,17 +979,20 @@ xitk_window_t *xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
 /*
  * Create an interactive window, containing 'yes', 'no', 'cancel' buttons.
  */
-xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im, char *title,
 							 char *button1_label, char *button2_label,
 							 xitk_state_callback_t cb1, 
 							 xitk_state_callback_t cb2, 
+                                                         char *checkbox_label, int checkbox_state,
+                                                         xitk_state_callback_t cb3,
 							 void *userdata, 
 							 int window_width, int align, char *message, ...) {
   xitk_dialog_t              *wd;
   xitk_labelbutton_widget_t   lb;
   int                         windoww = window_width, windowh;
   xitk_image_t               *i;
-  int                         bwidth = 100, bx1, bx2, by;
+  int                         bwidth = 150, bx1, bx2, by;
+  int                         checkbox_height = 0;
 
   if((im == NULL) || (window_width == 0) || (message == NULL))
     return NULL;
@@ -1025,8 +1028,11 @@ xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *ti
     i = xitk_image_create_image_from_string(im, DEFAULT_FONT_12, windoww - 40, align, buf);
     XITK_FREE(buf);
   }
+  
+  if( checkbox_label )
+    checkbox_height = 50;
 
-  windowh = (i->height + 50) + (TITLE_BAR_HEIGHT + 40);
+  windowh = (i->height + 50 + checkbox_height) + (TITLE_BAR_HEIGHT + 40);
 
   wd->imlibdata = im;
   wd->type = DIALOG_TYPE_YESNO;
@@ -1045,7 +1051,36 @@ xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *ti
   wd->widget_list->gc            = (XCreateGC(im->x.disp, (xitk_window_get_window(wd->xwin)),
 					      None, None));
   XUNLOCK(wd->imlibdata->x.disp);
-				
+		
+  /* Checkbox */
+  if( checkbox_label ) {
+    int x = 25, y = windowh - 50 - checkbox_height;
+    xitk_checkbox_widget_t cb;
+    xitk_label_widget_t lbl;
+  
+    XITK_WIDGET_INIT(&cb, im);
+    XITK_WIDGET_INIT(&lbl, im);
+  
+    cb.skin_element_name = NULL;
+    cb.callback          = cb3;
+    cb.userdata          = userdata;
+    xitk_list_append_content (XITK_WIDGET_LIST_LIST(wd->widget_list),
+                      (wd->checkbox = 
+                      xitk_noskin_checkbox_create(wd->widget_list, &cb, x, y+5, 10, 10)));
+  
+    xitk_checkbox_set_state(wd->checkbox, checkbox_state);
+  
+    lbl.window            = xitk_window_get_window(wd->xwin);
+    lbl.gc                = (XITK_WIDGET_LIST_GC(wd->widget_list));
+    lbl.skin_element_name = NULL;
+    lbl.label             = checkbox_label;
+    lbl.callback          = NULL;
+    lbl.userdata          = userdata;
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(wd->widget_list)), 
+            (wd->checkbox_label = 
+              xitk_noskin_label_create(wd->widget_list, &lbl, x + 15, y, windoww - x - 40, 20, DEFAULT_BOLD_FONT_12)));
+  }
+  
   /* Buttons */
   if((bwidth * 2) > windoww)
     bwidth = (windoww / 2) - 8;
@@ -1127,7 +1162,11 @@ xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *ti
 					(void *)wd);
   xitk_enable_and_show_widget(wd->wyes);
   xitk_enable_and_show_widget(wd->wno);
-
+  if( checkbox_label ) {
+    xitk_enable_and_show_widget(wd->checkbox);
+    xitk_enable_and_show_widget(wd->checkbox_label);
+  }
+  
   return wd->xwin;
 }
 

@@ -2188,12 +2188,22 @@ xitk_window_t *xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
 /*
  *
  */
-xitk_window_t *xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
+xitk_window_t *xitk_window_dialog_checkbox_two_buttons_with_width(ImlibData *im, char *title,
 							 char *button1_label, char *button2_label,
 							 xitk_state_callback_t cb1, 
 							 xitk_state_callback_t cb2, 
+                                                         char *checkbox_label, int checkbox_state,
+                                                         xitk_state_callback_t cb3,
 							 void *userdata, 
 							 int window_width, int align, char *message, ...);
+
+#ifdef __GNUC__
+#define xitk_window_dialog_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, userdata, window_width, align, message, args...) \
+  xitk_window_dialog_checkbox_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, NULL, 0, NULL, userdata, window_width, align, message, ##args)
+#else
+#define xitk_window_dialog_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, userdata, window_width, align, ...) \
+  xitk_window_dialog_checkbox_two_buttons_with_width(im, title, bl1, bl2, cb1, cb2, NULL, 0, NULL, userdata, window_width, align, __VA_ARGS__)
+#endif
 
 /**
  *

@@ -280,3 +280,58 @@ void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
   
   gGui->new_pos = -1;
 }
+
+
+static void _dont_show_too_slow_again(xitk_widget_t *w, void *data, int state) {
+  config_update_num ("gui.dropped_frames_warning", !state);
+}
+
+static void _learn_more_about_too_slow(xitk_widget_t *w, void *data, int state) {
+  /*
+   * fixme: how to properly open the system browser? 
+   * should we just make it configurable? 
+   */
+  system ("mozilla http://xinehq.de/index.php/faq#SPEEDUP");
+}
+
+/*
+ * Create the real window.
+ */
+void too_slow_window(void) {
+  xitk_window_t *xw;
+  char *title, *message;
+  int display_warning;
+  int checked = 1;
+    
+  title = _("Warning");
+  message = _("The amount of dropped frame is too high, your system might be slow, not properly optimized or just too loaded.\n\nhttp://xinehq.de/index.php/faq#SPEEDUP");
+  
+  dump_error(gGui->verbosity, message);
+
+  display_warning = xine_config_register_bool (gGui->xine, "gui.dropped_frames_warning", 
+		     1,
+		     _("Warn user when too much frames are dropped."),
+		     CONFIG_NO_HELP,
+		     CONFIG_LEVEL_ADV,
+		     CONFIG_NO_CB,
+		     CONFIG_NO_DATA);
+
+  if( !display_warning )
+    return;
+  
+  _dont_show_too_slow_again(NULL, NULL, checked);
+    
+  xw = xitk_window_dialog_checkbox_two_buttons_with_width(gGui->imlib_data, title, 
+						 _("Done"), _("Learn More..."),
+						 NULL, _learn_more_about_too_slow, 
+                                                 _("Don't ever show this message again."),
+                                                 checked, _dont_show_too_slow_again,
+						 NULL, 500, ALIGN_CENTER,
+						 message);
+  if(!gGui->use_root_window && gGui->video_display == gGui->display) {
+    XLockDisplay(gGui->display);
+    XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
+    XUnlockDisplay(gGui->display);
+  }
+  layer_above_video(xitk_window_get_window(xw));
+}

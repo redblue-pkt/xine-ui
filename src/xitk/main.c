@@ -1276,11 +1276,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
   case XINE_EVENT_DROPPED_FRAMES:
     if (xine_get_param(gGui->stream, XINE_PARAM_SPEED) <= XINE_SPEED_NORMAL) {
-      char buffer[2048];
-      
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, sizeof(buffer), "%s", _("Your system seems too slow, the amount of dropped frames is too high."));
-      xine_error_with_more(buffer);
+      too_slow_window();
     }
     break;
 

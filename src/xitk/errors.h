@@ -34,5 +34,7 @@ void xine_info(char *message, ...);
 
 void gui_handle_xine_error(xine_stream_t *stream, char *mrl);
 
+void too_slow_window(void);
+
 #endif
 
