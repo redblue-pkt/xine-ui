@@ -70,7 +70,7 @@ void post_init(void) {
 	    post_audio_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
 	  else
 	    post_audio_plugins = (char **) realloc(post_audio_plugins, 
-						   sizeof(char *) * (num_plug + 1));
+						   sizeof(char *) * (num_plug + 2));
 	  
 	  post_audio_plugins[num_plug]     = strdup(pol[i]);
 	  post_audio_plugins[num_plug + 1] = NULL;
