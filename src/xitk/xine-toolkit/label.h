@@ -76,5 +76,10 @@ xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
  */
 int xitk_label_change_label (xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel);
 
+/**
+ *
+ */
+char *xitk_label_get_label(xitk_widget_t *w);
+
 #endif
 

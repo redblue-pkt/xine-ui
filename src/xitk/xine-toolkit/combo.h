@@ -62,12 +62,14 @@ typedef struct {
 /*
  * Create a combo box.
  */
-xitk_widget_t *xitk_create_combo(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s);
+xitk_widget_t *xitk_create_combo(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s,
+				 xitk_widget_t **lw, xitk_widget_t **bw);
 
 /*
  * Same as above, without skinable feature.
  */
-xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c, int x, int y, int width);
+xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c, int x, int y, int width,
+					xitk_widget_t **lw, xitk_widget_t **bw);
 
 /*
  * Return current selected entry (offset in entries).

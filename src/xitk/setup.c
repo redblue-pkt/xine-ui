@@ -382,7 +382,7 @@ static void combo_select(xitk_widget_t *w, void *data, int value) {
 static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry, int state, char **choices) {
 
   xitk_combo_widget_t      cmb;
-  xitk_widget_t           *combo;
+  xitk_widget_t           *combo, *lw, *bw;
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 
@@ -395,10 +395,14 @@ static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry, i
   xitk_list_append_content(setup->widget_list->l, 
 			   (combo = 
 			    xitk_noskin_combo_create(&cmb,
-						     x, y, 150)));
+						     x, y, 150, &lw, &bw)));
 
   PLACE_LABEL(combo);
 
+  setup->tmp_widgets[setup->num_tmp_widgets] = lw;
+  setup->num_tmp_widgets++;
+  setup->tmp_widgets[setup->num_tmp_widgets] = bw;
+  setup->num_tmp_widgets++;
   setup->tmp_widgets[setup->num_tmp_widgets] = combo;
   setup->num_tmp_widgets++;
 }

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-11-20 23:10+0100\n"
+"POT-Creation-Date: 2001-11-24 01:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,7 +97,7 @@ msgstr ""
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr ""
 
-#: src/xitk/main.c:158
+#: src/xitk/main.c:159
 msgid "  -v, --version                Display version.\n"
 msgstr ""
 
@@ -242,48 +242,48 @@ msgstr ""
 msgid "  VCD:   'vcd://<track number>'\n"
 msgstr ""
 
-#: src/xitk/main.c:276
+#: src/xitk/main.c:283
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr ""
 
-#: src/xitk/main.c:292
+#: src/xitk/main.c:300
 msgid "main: all available video drivers failed.\n"
 msgstr ""
 
-#: src/xitk/main.c:304
+#: src/xitk/main.c:312
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr ""
 
-#: src/xitk/main.c:338
+#: src/xitk/main.c:353
 #, c-format
 msgid "main: trying to autoload '%s' audio driver: "
 msgstr ""
 
-#: src/xitk/main.c:355
+#: src/xitk/main.c:370
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr ""
 
-#: src/xitk/main.c:372
+#: src/xitk/main.c:389
 #, c-format
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr ""
 
-#: src/xitk/main.c:439
+#: src/xitk/main.c:460
 #, c-format
 msgid "Require xine library version 0.9.4, found %d.%d.%d.\n"
 msgstr ""
 
-#: src/xitk/main.c:507
+#: src/xitk/main.c:528
 msgid "video driver id required for -V option\n"
 msgstr ""
 
-#: src/xitk/main.c:517
+#: src/xitk/main.c:538
 msgid "audio driver id required for -A option\n"
 msgstr ""
 
-#: src/xitk/main.c:614
+#: src/xitk/main.c:635
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr ""
@@ -333,4 +333,12 @@ msgstr ""
 #: src/xitk/snapshot.c:1083
 #, c-format
 msgid "File '%s' written.\n"
+msgstr ""
+
+#: src/xitk/setup.c:652
+msgid "xine setup"
+msgstr ""
+
+#: src/xitk/setup.c:674
+msgid "Close"
 msgstr ""

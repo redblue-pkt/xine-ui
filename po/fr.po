@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.4\n"
-"POT-Creation-Date: 2001-11-20 23:10+0100\n"
+"POT-Creation-Date: 2001-11-24 01:38+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -99,7 +99,7 @@ msgstr "Version de la bibliothèque de xine trouvée: %d.%d.%d (%s).\n"
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Usage: xine [OPTIONS]...[MRL]\n"
 
-#: src/xitk/main.c:158
+#: src/xitk/main.c:159
 msgid "  -v, --version                Display version.\n"
 msgstr "  -v, --version                Affiche la version.\n"
 
@@ -262,48 +262,48 @@ msgstr "  DVD:       'dvd://VTS_01_2.VOB'\n"
 msgid "  VCD:   'vcd://<track number>'\n"
 msgstr "  VCD:       'vcd://<numero piste>'\n"
 
-#: src/xitk/main.c:276
+#: src/xitk/main.c:283
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr "main: detection de plugin de sortie vidéo <%s>\n"
 
-#: src/xitk/main.c:292
+#: src/xitk/main.c:300
 msgid "main: all available video drivers failed.\n"
 msgstr "main: tous les pilotes vidéo on échoués.\n"
 
-#: src/xitk/main.c:304
+#: src/xitk/main.c:312
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr "main: le pilote vidéo <%s> a échoué\n"
 
-#: src/xitk/main.c:338
+#: src/xitk/main.c:353
 #, c-format
 msgid "main: trying to autoload '%s' audio driver: "
 msgstr "main: tente de charger automatiquement le pilote audio '%s': "
 
-#: src/xitk/main.c:355
+#: src/xitk/main.c:370
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr "main: échec d'auto-détection du pilote audio => pas de sortie son\n"
 
-#: src/xitk/main.c:372
+#: src/xitk/main.c:389
 #, c-format
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main: le pilote audio spécifié '%s' a échoué\n"
 
-#: src/xitk/main.c:439
+#: src/xitk/main.c:460
 #, c-format
 msgid "Require xine library version 0.9.4, found %d.%d.%d.\n"
 msgstr "Requière la bibliothèque xine version 0.9.4, a trouvé %d.%d.%d.\n"
 
-#: src/xitk/main.c:507
+#: src/xitk/main.c:528
 msgid "video driver id required for -V option\n"
 msgstr "Nom du pilote video requis pour l'option -V\n"
 
-#: src/xitk/main.c:517
+#: src/xitk/main.c:538
 msgid "audio driver id required for -A option\n"
 msgstr "Nom du pilote audio requis pour l'option -A\n"
 
-#: src/xitk/main.c:614
+#: src/xitk/main.c:635
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Argument invalide %d => quitte\n"
@@ -357,5 +357,10 @@ msgstr "Échec a l'ouverture du fichier (%s)\n"
 msgid "File '%s' written.\n"
 msgstr "Le fichier '%s' a été crée.\n"
 
-#~ msgid "main: audio driver <%s> failed\n"
-#~ msgstr "main: le pilote audio <%s> a échoué\n"
+#: src/xitk/setup.c:652
+msgid "xine setup"
+msgstr "Reglage de Xine"
+
+#: src/xitk/setup.c:674
+msgid "Close"
+msgstr "Fermer"

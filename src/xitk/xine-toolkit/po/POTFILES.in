@@ -20,3 +20,5 @@ src/xitk/xine-toolkit/list.c
 src/xitk/xine-toolkit/skin.c
 src/xitk/xine-toolkit/slider.c
 src/xitk/xine-toolkit/widget.c
+src/xitk/xine-toolkit/tabs.c
+

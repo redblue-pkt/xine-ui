@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
-"POT-Creation-Date: 2001-11-20 23:10+0100\n"
+"POT-Creation-Date: 2001-11-24 01:40+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -14,35 +14,35 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/test.c:70
+#: src/xitk/xine-toolkit/test.c:73
 msgid "XInitThreads() failed.\n"
 msgstr "XInitThreads() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:80
+#: src/xitk/xine-toolkit/test.c:83
 msgid "Cannot open display\n"
 msgstr "Ne peux pas ouvrir l'affichage\n"
 
-#: src/xitk/xine-toolkit/test.c:94
+#: src/xitk/xine-toolkit/test.c:97
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_param() a échoué.\n"
 
-#: src/xitk/xine-toolkit/test.c:280
+#: src/xitk/xine-toolkit/test.c:318
 msgid "My Frame"
 msgstr "Mon Cadre"
 
-#: src/xitk/xine-toolkit/test.c:318
+#: src/xitk/xine-toolkit/test.c:355
 msgid "A Label"
 msgstr "Un Label"
 
-#: src/xitk/xine-toolkit/test.c:373
+#: src/xitk/xine-toolkit/test.c:407
 msgid "Fire !!"
 msgstr "Feu !!"
 
-#: src/xitk/xine-toolkit/test.c:404
+#: src/xitk/xine-toolkit/test.c:438
 msgid "!BOOM!"
 msgstr "!BOUM!"
 
-#: src/xitk/xine-toolkit/test.c:473
+#: src/xitk/xine-toolkit/test.c:507
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -51,15 +51,15 @@ msgstr ""
 "Na nouvelle entrée sélectionnée dans la combo box est:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:587
+#: src/xitk/xine-toolkit/test.c:620
 msgid "init_test() failed\n"
 msgstr "init_test() a échoué\n"
 
-#: src/xitk/xine-toolkit/test.c:602
+#: src/xitk/xine-toolkit/test.c:635
 msgid "My Fucking Window"
 msgstr "Ma Putain de Fenêtre"
 
-#: src/xitk/xine-toolkit/test.c:620
+#: src/xitk/xine-toolkit/test.c:653
 msgid "Quit"
 msgstr "Quitte"
 

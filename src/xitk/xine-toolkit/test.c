@@ -515,9 +515,7 @@ static void combo_select(xitk_widget_t *w, void *data, int select) {
 static void create_combo(void) {
   xitk_combo_widget_t    cmb;
   char                  *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
-  Pixmap                 bg;
   int                    x = 150, y = 40, width = 100, height;
-  int                    wwidth, wheight;
   xitk_font_t           *fs;
 
   XITK_WIDGET_INIT(&cmb, test->imlibdata);
@@ -547,7 +545,7 @@ static void create_combo(void) {
   xitk_list_append_content(test->widget_list->l, 
 			   (test->combo = 
 			    xitk_noskin_combo_create(&cmb,
-						     x, y, width)));
+						     x, y, width, NULL, NULL)));
 }
 
 /*

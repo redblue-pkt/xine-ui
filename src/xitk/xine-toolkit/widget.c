@@ -877,8 +877,8 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
       if(mywidget->paint)
 	(mywidget->paint) (mywidget, wl->win, wl->gc);
     }
+    
   }
-
 }
 
 /*

@@ -434,7 +434,8 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
 /*
  *
  */
-xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_t *c) {
+xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
+				 xitk_widget_t **lw, xitk_widget_t **bw) {
   xitk_widget_t              *mywidget;
   combo_private_data_t       *private_data;
   xitk_checkbox_widget_t      cb;
@@ -464,7 +465,12 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
   cb.userdata          = (void *)mywidget;
   xitk_list_append_content(c->parent_wlist->l, 
 			   (private_data->button_widget = xitk_checkbox_create(skonfig, &cb)));
-  
+
+  if(lw)
+    *lw = private_data->label_widget;
+  if(bw)
+    *bw = private_data->button_widget;
+
   {
     int x, y;
     
@@ -483,7 +489,8 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
  *  ******************************************************************************
  */
 xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
-					int x, int y, int width) {
+					int x, int y, int width, 
+					xitk_widget_t **lw, xitk_widget_t **bw) {
   xitk_widget_t              *mywidget;
   combo_private_data_t       *private_data;
   xitk_checkbox_widget_t      cb;
@@ -530,6 +537,11 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
 							  x + (width - height), (y - 4),
 							  (height + 8), (height + 8))));
 
+    if(lw)
+      *lw = private_data->label_widget;
+    if(bw)
+      *bw = private_data->button_widget;
+    
     mywidget->x = x;
     mywidget->y = y-4;
     

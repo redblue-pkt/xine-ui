@@ -82,6 +82,20 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 /*
  *
  */
+char *xitk_label_get_label(xitk_widget_t *w) {
+  label_private_data_t *private_data;
+  
+  if(w->widget_type & WIDGET_TYPE_LABEL) {
+    private_data = (label_private_data_t *) w->private_data;
+    return private_data->label;
+  }
+
+  return NULL;
+}
+
+/*
+ *
+ */
 static void paint_label(xitk_widget_t *l, Window win, GC gc) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;

@@ -674,6 +674,10 @@ xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
  */
 int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel);
 
+/**
+ * Get label.
+ */
+char *xitk_label_get_label(xitk_widget_t *w);
 
 /*
  * *** Image
@@ -1326,12 +1330,14 @@ typedef struct {
 /**
  *
  */
-xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_t *c);
+xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_t *c,
+				 xitk_widget_t **lw, xitk_widget_t **bw);
 
 /**
  *
  */
-xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c, int x, int y, int width);
+xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c, int x, int y, int width,
+					xitk_widget_t **lw, xitk_widget_t **bw);
 
 /**
  *

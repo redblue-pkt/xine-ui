@@ -763,7 +763,7 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
 				    xitk_get_pixel_color_black(im),
 				    DRAW_INNER);
   
-  { /* Enlighting paddle */
+  { /* Enlightening paddle */
     int xx, yy, ww, hh;
     int i, offset = 0;
 
@@ -789,6 +789,7 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
   XFreeGC(im->x.disp, mgc);
   XUNLOCK(im->x.disp);
 }
+
 /*
  *
  */
@@ -1035,22 +1036,7 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
  *
  */
 static int notify_inside(xitk_widget_t *w, int x, int y) {
-  image_private_data_t *private_data = 
-    (image_private_data_t *) w->private_data;
-
   return 0;
-
-  if(w->widget_type & WIDGET_TYPE_IMAGE) {
-    if(w->visible) {
-      xitk_image_t *skin = private_data->skin;
-      
-      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask, x, y);
-    }
-    else 
-      return 0;
-  }
-
-  return 1;
 }
 
 /*
