@@ -1742,6 +1742,11 @@ void xitk_set_window_title(Display *display, Window window, char *title);
  */
 void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, char *title);
 
+/*
+ *
+ */
+int xitk_is_window_size(Display *display, Window window, int width, int height);
+
 #define ALIGN_LEFT    1
 #define ALIGN_CENTER  2
 #define ALIGN_RIGHT   3

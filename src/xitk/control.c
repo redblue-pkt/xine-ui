@@ -323,7 +323,6 @@ void control_handle_event(XEvent *event, void *data) {
  * Change the current skin.
  */
 void control_change_skins(void) {
-  XEvent        xev;
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
 
@@ -332,8 +331,6 @@ void control_change_skins(void) {
     xitk_skin_lock(gGui->skin_config);
 
     XLockDisplay(gGui->display);
-    
-    XUnmapWindow(gGui->display, control->window);
     
     if(!(new_img = Imlib_load_image(gGui->imlib_data,
 				    xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
@@ -350,20 +347,23 @@ void control_change_skins(void) {
 		   (unsigned int)new_img->rgb_width,
 		   (unsigned int)new_img->rgb_height);
     
+    XUnlockDisplay(gGui->display);
+    
+    while(!xitk_is_window_size(gGui->display, control->window, 
+			       new_img->rgb_width, new_img->rgb_height)) {
+      xine_usec_sleep(10000);
+    }
+    
     old_img = control->bg_image;
     control->bg_image = new_img;
     
-    Imlib_destroy_image(gGui->imlib_data, old_img);
+    XLockDisplay(gGui->display);
     
-    XMapRaised(gGui->display, control->window); 
     XSetTransientForHint(gGui->display, control->window, gGui->video_window);
     
-    do  {
-      XMaskEvent(gGui->display, StructureNotifyMask, &xev) ;
-    } while (xev.type != MapNotify || xev.xmap.event != control->window);
-    
+    Imlib_destroy_image(gGui->imlib_data, old_img);
     Imlib_apply_image(gGui->imlib_data, new_img, control->window);
-        
+    
     XUnlockDisplay(gGui->display);
 
     xitk_skin_unlock(gGui->skin_config);
@@ -451,7 +451,7 @@ void control_panel(void) {
   control->window = XCreateWindow (gGui->display,
 				   gGui->imlib_data->x.root,
 				   hint.x, hint.y, hint.width, hint.height, 0, 
-				   gGui->imlib_data->x.depth, CopyFromParent, 
+				   gGui->imlib_data->x.depth, InputOutput, 
 				   gGui->imlib_data->x.visual,
 				   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 				   &attr);

@@ -43,6 +43,7 @@
 #include "button.h"
 #include "labelbutton.h"
 #include "dnd.h"
+#include "window.h"
 #include "widget.h"
 #include "widget_types.h"
 
@@ -934,7 +935,6 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
  *
  */
 void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  XEvent                      xev;
   filebrowser_private_data_t *private_data;
   ImlibImage                 *new_img, *old_img;
   XSizeHints                  hint;
@@ -946,8 +946,6 @@ void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig
 
     XLOCK(private_data->imlibdata->x.disp);
     
-    XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
-    
     if(!(new_img = Imlib_load_image(private_data->imlibdata,
 				    xitk_skin_get_skin_filename(skonfig,
 							private_data->skin_element_name)))) {
@@ -958,22 +956,25 @@ void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig
     hint.height = new_img->rgb_height;
     hint.flags  = PSize;
     XSetWMNormalHints(private_data->imlibdata->x.disp, private_data->window, &hint);
-
+    
     XResizeWindow (private_data->imlibdata->x.disp, private_data->window,
 		   (unsigned int)new_img->rgb_width,
 		   (unsigned int)new_img->rgb_height);
     
+    
+    XUNLOCK(private_data->imlibdata->x.disp);
+    
+    while(!xitk_is_window_size(private_data->imlibdata->x.disp, private_data->window, 
+			       new_img->rgb_width, new_img->rgb_height)) {
+      xitk_usec_sleep(10000);
+    }
+    
     old_img = private_data->bg_image;
     private_data->bg_image = new_img;
     
+    XLOCK(private_data->imlibdata->x.disp);
+    
     Imlib_destroy_image(private_data->imlibdata, old_img);
-    
-    XMapRaised(private_data->imlibdata->x.disp, private_data->window); 
-
-    do  {
-      XMaskEvent(private_data->imlibdata->x.disp, StructureNotifyMask, &xev) ;
-    } while (xev.type != MapNotify || xev.xmap.event != private_data->window);
-    
     Imlib_apply_image(private_data->imlibdata, new_img, private_data->window);
 
     XUNLOCK(private_data->imlibdata->x.disp);
@@ -1069,7 +1070,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 		   hint.x, hint.y, hint.width, 
 		   hint.height, 0, 
 		   fb->imlibdata->x.depth, 
-		   CopyFromParent, 
+		   InputOutput, 
 		   fb->imlibdata->x.visual,
 		   CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect, &attr);
   

@@ -35,6 +35,11 @@
 #define XITK_WINDOW_ANSWER_CANCEL  4
 
 /*
+ * Is window is size match with given args
+ */
+int xitk_is_window_size(Display *display, Window window, int width, int height);
+
+/*
  * Set/Change window title.
  */
 void xitk_set_window_title(Display *display, Window window, char *title);

@@ -119,16 +119,12 @@ static void panel_store_new_position(int x, int y, int w, int h) {
  * Change the current skin.
  */
 void panel_change_skins(void) {
-  XEvent        xev;
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
   
   xitk_skin_lock(gGui->skin_config);
-
-  XLockDisplay(gGui->display);
   
-  if(panel->visible)
-    XUnmapWindow(gGui->display, gGui->panel_window);
+  XLockDisplay(gGui->display);
   
   if(!(new_img = Imlib_load_image(gGui->imlib_data,
 				  xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
@@ -145,24 +141,22 @@ void panel_change_skins(void) {
 		 (unsigned int)new_img->rgb_width,
 		 (unsigned int)new_img->rgb_height);
   
+  XUnlockDisplay(gGui->display);
+
+  while(!xitk_is_window_size(gGui->display, gGui->panel_window, 
+			     new_img->rgb_width, new_img->rgb_height)) {
+    xine_usec_sleep(10000);
+  }
+  
   old_img = panel->bg_image;
   panel->bg_image = new_img;
-  
-  Imlib_destroy_image(gGui->imlib_data, old_img);
-  
-  XMapRaised(gGui->display, gGui->panel_window); 
-  
+
+  XLockDisplay(gGui->display);
+
   XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
-  
-  do  {
-    XMaskEvent(gGui->display, StructureNotifyMask, &xev) ;
-  } while (xev.type != MapNotify || xev.xmap.event != gGui->panel_window);
-  
+
+  Imlib_destroy_image(gGui->imlib_data, old_img);
   Imlib_apply_image(gGui->imlib_data, new_img, gGui->panel_window);
-  
-  /* Video window was hidded, hide it again */
-  if(!panel->visible)
-    XUnmapWindow(gGui->display, gGui->panel_window);
   
   XUnlockDisplay(gGui->display);
   
@@ -612,15 +606,16 @@ void panel_init (void) {
 				      hint.x, hint.y,
 				      hint.width, hint.height, 0, 
 				      gGui->imlib_data->x.depth,
-				      InputOutput/*CopyFromParent*/,
+				      InputOutput,
 				      gGui->imlib_data->x.visual,
 				      CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 				      &attr);
-  
+
   XSetStandardProperties(gGui->display, gGui->panel_window, title, title,
 			 None, NULL, 0, &hint);
 
-  XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | KeymapStateMask);
+  XSelectInput(gGui->display, gGui->panel_window, INPUT_MOTION | 
+	       /*SubstructureRedirectMask | */ KeymapStateMask);
 
   /*
    * wm, no border please

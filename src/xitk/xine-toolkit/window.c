@@ -71,6 +71,28 @@ static void _xitk_window_destroy_window(xitk_widget_t *, void *);
 #define TITLE_BAR_HEIGHT 20
 
 /*
+ * Is window is size match with given args
+ */
+int xitk_is_window_size(Display *display, Window window, int width, int height) {
+  XWindowAttributes  wattr;
+  
+  if((display == NULL) || (window == None))
+    return -1;
+  
+  XLOCK(display);
+  if(!XGetWindowAttributes(display, window, &wattr)) {
+    XITK_WARNING("XGetWindowAttributes() failed.n");
+    return -1;
+  }
+  XUNLOCK(display);
+  
+  if((wattr.width == width) && (wattr.height == height))
+    return 1;
+  
+  return 0;
+}
+
+/*
  * Set/Change window title.
  */
 void xitk_set_window_title(Display *display, Window window, char *title) {
