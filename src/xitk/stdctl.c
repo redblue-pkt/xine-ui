@@ -51,6 +51,9 @@ static void *xine_stdctl_loop(void *dummy) {
   kbinding_entry_t *k;
   fd_set            set;
   struct timeval    tv;
+  int               secs, last_secs;
+
+  last_secs = -1;
 
   while(gGui->running) {
 
@@ -84,6 +87,17 @@ static void *xine_stdctl_loop(void *dummy) {
 	break;
       
     }
+
+    if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
+      secs /= 1000;
+      
+      if (secs != last_secs) {
+	fprintf(stdout, "time: %d\n", secs);
+	fflush(stdout);
+	last_secs = secs;
+      }
+    }
+
   }
   
   pthread_exit(NULL);
