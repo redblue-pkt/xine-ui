@@ -202,9 +202,9 @@ void video_window_select_visual (void) {
 }
 
 /*
- * Set size hints to video window.
+ * Set size hints to video window. (Internal version, without X11 display lock)
  */
-void video_window_set_size_hints(int width, int height) {
+static void video_window_set_size_hints_unlocked(int width, int height) {
   XSizeHints hints;
   
   memset(&hints, 0, sizeof(hints));
@@ -215,8 +215,32 @@ void video_window_set_size_hints(int width, int height) {
   hints.base_height = hints.min_height = hints.max_height = hints.height = height;
   hints.flags       = PPosition | PBaseSize | PMinSize | PMaxSize | PSize;
   
-  XLockDisplay(gGui->display);
   XSetWMNormalHints(gGui->display, gGui->video_window, &hints);
+}
+
+/*
+ * Set size hints to video window.
+ */
+void video_window_set_size_hints(int width, int height) {
+
+  XLockDisplay(gGui->display);
+
+  video_window_set_size_hints_unlocked(width, height);
+
+  XUnlockDisplay(gGui->display);
+}
+
+
+/*
+ * Resizes video window and updates size hints for it.
+ */
+void video_window_change_size(int width, int height) {
+
+  XLockDisplay(gGui->display);
+
+  video_window_set_size_hints_unlocked(width, height);
+  XResizeWindow(gGui->display, gGui->video_window, width, height);
+
   XUnlockDisplay(gGui->display);
 }
 
@@ -240,9 +264,9 @@ void video_window_change_sizepos(int x, int y, int w, int h) {
 /*
  *
  */
-static inline void video_window_adapt_size (int video_width, int video_height, 
-					    int *dest_x, int *dest_y,
-					    int *dest_width, int *dest_height) {
+static void video_window_adapt_size (int video_width, int video_height, 
+				     int *dest_x, int *dest_y,
+				     int *dest_width, int *dest_height) {
 
   static char          *window_title = "xine video output";
   XSizeHints            hint;
@@ -576,11 +600,11 @@ static inline void video_window_adapt_size (int video_width, int video_height,
       }
       else {
 	
-	XResizeWindow (gGui->display, gGui->video_window, 
-		       gVw->video_width, gVw->video_height);
-
 	/* Update window size hints with the new size */
 	XSetNormalHints(gGui->display, gGui->video_window, &hint);
+
+	XResizeWindow (gGui->display, gGui->video_window, 
+		       gVw->video_width, gVw->video_height);
 
 	XUnlockDisplay (gGui->display);
 	

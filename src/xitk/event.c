@@ -327,6 +327,8 @@ void gui_execute_action_id(action_id_t action) {
 		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
       }
 
+      XUnlockDisplay(gGui->display);
+
       if(action == ACTID_WINDOWREDUCE) {
 	w /= 1.2;
 	h /= 1.2;
@@ -336,8 +338,7 @@ void gui_execute_action_id(action_id_t action) {
 	h *= 1.2;
       }
       
-      XResizeWindow (gGui->display, gGui->video_window, w, h);
-      XUnlockDisplay(gGui->display);
+      video_window_change_size (w, h);
     }
     break;
 
@@ -360,6 +361,8 @@ void gui_execute_action_id(action_id_t action) {
 		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
       }
       
+      XUnlockDisplay(gGui->display);
+
       if(action == ACTID_WINDOWREDUCE_H_PIXEL) {
 	w--;
       }
@@ -381,8 +384,7 @@ void gui_execute_action_id(action_id_t action) {
 	h++;
       }
       
-      XResizeWindow (gGui->display, gGui->video_window, w, h);
-      XUnlockDisplay(gGui->display);
+      video_window_change_size (w, h);
     }
     break;
 
@@ -629,9 +631,7 @@ void gui_execute_action_id(action_id_t action) {
 				  &ratio_code, &format,
 				  &y, &u, &v) ) {
 	
-	XLockDisplay (gGui->display);
-	XResizeWindow (gGui->display, gGui->video_window, width, height);
-	XUnlockDisplay(gGui->display);
+	video_window_change_size (width, height);
       }
     }
     break;
