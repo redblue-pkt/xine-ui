@@ -49,6 +49,7 @@ typedef struct {
   xitk_widget_list_t   *widget_list;
 
   xitk_widget_t        *close;
+  xitk_widget_t        *update;
 
   struct {
     xitk_widget_t      *title;
@@ -96,6 +97,14 @@ typedef struct {
 
 static _stream_infos_t    *sinfos = NULL;
 
+static void stream_infos_update(xitk_widget_t *w, void *data) {
+  stream_infos_update_infos();
+}
+
+static void set_label(xitk_widget_t *w, const char *label) {
+  xitk_label_change_label(sinfos->widget_list, w, label);
+}
+
 static char *get_yesno_string(uint32_t val) {
   static char *yesno[] =  { "No", "Yes" };
 
@@ -133,6 +142,47 @@ static char *get_num_string(uint32_t num) {
   snprintf(buffer, 1023, "%d", num);
 
   return &buffer[0];
+}
+
+static void get_meta_info(xitk_widget_t *w, int meta) {
+  const char *minfo;
+  
+  minfo = xine_get_meta_info(gGui->stream, meta);
+  set_label(w, (minfo) ? minfo : _("Unavailable"));
+}
+
+static void get_stream_info(xitk_widget_t *w, int info) {
+  uint32_t   iinfo;
+  
+  iinfo = xine_get_stream_info(gGui->stream, info);
+  set_label(w, (get_num_string(iinfo)));
+}
+      
+static void get_stream_fourcc_info(xitk_widget_t *w, int info) {
+  uint32_t   iinfo;
+  
+  iinfo = xine_get_stream_info(gGui->stream, info);
+  set_label(w, (get_fourcc_string(iinfo)));
+}
+      
+static void get_stream_yesno_info(xitk_widget_t *w, int info) {
+  uint32_t   iinfo;
+  
+  iinfo = xine_get_stream_info(gGui->stream, info);
+  set_label(w, (get_yesno_string(iinfo)));
+}
+
+static void get_stream_video_resolution_info(void) {
+  uint32_t    video_w, video_h;
+  char        buffer[1024];
+  
+  memset(&buffer, 0, sizeof(buffer));
+
+  video_w = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+  video_h = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+
+  sprintf(buffer, "%d X %d", video_w, video_h);
+  set_label(sinfos->infos.video_resolution, buffer);
 }
 
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
@@ -271,6 +321,22 @@ void stream_infos_toggle_visibility(xitk_widget_t *w, void *data) {
   }
 }
 
+void stream_infos_toggle_auto_update(void) {
+  if(sinfos != NULL) {
+
+    if(gGui->stream_info_auto_update) {
+      xitk_hide_widget(sinfos->widget_list, sinfos->update);
+      XLockDisplay(gGui->display);
+      XClearWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
+      XUnlockDisplay(gGui->display);
+      xitk_paint_widget_list(sinfos->widget_list);
+    }
+    else
+      xitk_show_widget(sinfos->widget_list, sinfos->update);
+
+  }
+}
+
 void stream_infos_raise_window(void) {
   if(sinfos != NULL) {
     if(sinfos->xwin) {
@@ -300,154 +366,84 @@ static void stream_infos_end(xitk_widget_t *w, void *data) {
 
 static void stream_info_update_undefined(void) {
 
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.title, _("Unavailable"));
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.comment, _("Unavailable"));
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.artist, _("Unavailable"));
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.genre, _("Unavailable"));
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.album, _("Unavailable"));
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.year, "19--");
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.videocodec, _("Unavailable"));
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.audiocodec, _("Unavailable"));
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.systemlayer, _("Unavailable"));
-  xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.input_plugin, _("Unavailable"));
+  set_label(sinfos->meta_infos.title, _("Unavailable"));
+  set_label(sinfos->meta_infos.comment, _("Unavailable"));
+  set_label(sinfos->meta_infos.artist, _("Unavailable"));
+  set_label(sinfos->meta_infos.genre, _("Unavailable"));
+  set_label(sinfos->meta_infos.album, _("Unavailable"));
+  set_label(sinfos->meta_infos.year, "19__");
+  set_label(sinfos->meta_infos.videocodec, _("Unavailable"));
+  set_label(sinfos->meta_infos.audiocodec, _("Unavailable"));
+  set_label(sinfos->meta_infos.systemlayer, _("Unavailable"));
+  set_label(sinfos->meta_infos.input_plugin, _("Unavailable"));
   /* */
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.bitrate, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.seekable, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_resolution, "--- X ---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_ratio, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_channels, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_streams, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_bitrate, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_fourcc, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_handled, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.frame_duration, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_channels, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bits, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_samplerate, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bitrate, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_fourcc, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_handled, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_chapters, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_video, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_audio, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_video, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_audio, "---");
-  xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_spu, "---");
+  set_label(sinfos->infos.bitrate, "---");
+  set_label(sinfos->infos.seekable, "---");
+  set_label(sinfos->infos.video_resolution, "--- X ---");
+  set_label(sinfos->infos.video_ratio, "---");
+  set_label(sinfos->infos.video_channels, "---");
+  set_label(sinfos->infos.video_streams, "---");
+  set_label(sinfos->infos.video_bitrate, "---");
+  set_label(sinfos->infos.video_fourcc, "---");
+  set_label(sinfos->infos.video_handled, "---");
+  set_label(sinfos->infos.frame_duration, "---");
+  set_label(sinfos->infos.audio_channels, "---");
+  set_label(sinfos->infos.audio_bits, "---");
+  set_label(sinfos->infos.audio_samplerate, "---");
+  set_label(sinfos->infos.audio_bitrate, "---");
+  set_label(sinfos->infos.audio_fourcc, "---");
+  set_label(sinfos->infos.audio_handled, "---");
+  set_label(sinfos->infos.has_chapters, "---");
+  set_label(sinfos->infos.has_video, "---");
+  set_label(sinfos->infos.has_audio, "---");
+  set_label(sinfos->infos.ignore_video, "---");
+  set_label(sinfos->infos.ignore_audio, "---");
+  set_label(sinfos->infos.ignore_spu, "---");
 }
 
 void stream_infos_update_infos(void) {
 
   if(sinfos != NULL) {
-    stream_info_update_undefined();
+
     if(!gGui->logo_mode) {
-      const char *minfo;
-      uint32_t    iinfo, iinfo2;
-      char        buffer[1024];
-
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_TITLE)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.title, minfo);
       
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_COMMENT)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.comment, minfo);
+      get_meta_info(sinfos->meta_infos.title, XINE_META_INFO_TITLE);
+      get_meta_info(sinfos->meta_infos.comment, XINE_META_INFO_COMMENT);
+      get_meta_info(sinfos->meta_infos.artist, XINE_META_INFO_ARTIST);
+      get_meta_info(sinfos->meta_infos.genre, XINE_META_INFO_GENRE);
+      get_meta_info(sinfos->meta_infos.album, XINE_META_INFO_ALBUM);
+      get_meta_info(sinfos->meta_infos.year, XINE_META_INFO_YEAR);
+      get_meta_info(sinfos->meta_infos.videocodec, XINE_META_INFO_VIDEOCODEC);
+      get_meta_info(sinfos->meta_infos.audiocodec, XINE_META_INFO_AUDIOCODEC);
+      get_meta_info(sinfos->meta_infos.systemlayer, XINE_META_INFO_SYSTEMLAYER);
+      get_meta_info(sinfos->meta_infos.input_plugin, XINE_META_INFO_INPUT_PLUGIN);
       
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_ARTIST)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.artist, minfo);
-
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_GENRE)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.genre, minfo);
-      
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_ALBUM)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.album, minfo);
-
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_YEAR)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.year, minfo);
-      
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_VIDEOCODEC)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.videocodec, minfo);
-      
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_AUDIOCODEC)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.audiocodec, minfo);
-      
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_SYSTEMLAYER)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.systemlayer, minfo);
-      
-      if((minfo = xine_get_meta_info(gGui->stream, XINE_META_INFO_INPUT_PLUGIN)) != NULL)
-	xitk_label_change_label(sinfos->widget_list, sinfos->meta_infos.input_plugin, minfo);
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_BITRATE);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.bitrate, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.seekable, (get_yesno_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
-      iinfo2 = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
-      memset(&buffer, 0, sizeof(buffer));
-      sprintf(buffer, "%d X %d", iinfo, iinfo2);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_resolution, buffer);
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_RATIO);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_ratio, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_CHANNELS);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_channels, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_STREAMS);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_streams, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_BITRATE);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_bitrate, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_FOURCC);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_fourcc, (get_fourcc_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HANDLED);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_handled, (get_yesno_string(iinfo)));;
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_FRAME_DURATION);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.frame_duration, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_CHANNELS);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_channels, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_BITS);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bits, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_samplerate, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_BITRATE);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bitrate, (get_num_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_FOURCC);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_fourcc, (get_fourcc_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_HANDLED);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_handled, (get_yesno_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_HAS_CHAPTERS);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_chapters, (get_yesno_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_HAS_VIDEO);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_video, (get_yesno_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_HAS_AUDIO);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_audio, (get_yesno_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_IGNORE_VIDEO);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_video, (get_yesno_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_IGNORE_AUDIO);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_audio, (get_yesno_string(iinfo)));
-
-      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_IGNORE_SPU);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_spu, (get_yesno_string(iinfo)));
+      get_stream_info(sinfos->infos.bitrate, XINE_STREAM_INFO_BITRATE);
+      get_stream_yesno_info(sinfos->infos.seekable, XINE_STREAM_INFO_SEEKABLE);
+      get_stream_video_resolution_info();
+      get_stream_info(sinfos->infos.video_ratio, XINE_STREAM_INFO_VIDEO_RATIO);
+      get_stream_info(sinfos->infos.video_channels, XINE_STREAM_INFO_VIDEO_CHANNELS);
+      get_stream_info(sinfos->infos.video_streams, XINE_STREAM_INFO_VIDEO_STREAMS);
+      get_stream_info(sinfos->infos.video_bitrate, XINE_STREAM_INFO_VIDEO_BITRATE);
+      get_stream_fourcc_info(sinfos->infos.video_fourcc, XINE_STREAM_INFO_VIDEO_FOURCC);
+      get_stream_yesno_info(sinfos->infos.video_handled, XINE_STREAM_INFO_VIDEO_HANDLED);
+      get_stream_info(sinfos->infos.frame_duration, XINE_STREAM_INFO_FRAME_DURATION);
+      get_stream_info(sinfos->infos.audio_channels, XINE_STREAM_INFO_AUDIO_CHANNELS);
+      get_stream_info(sinfos->infos.audio_bits, XINE_STREAM_INFO_AUDIO_BITS);
+      get_stream_info(sinfos->infos.audio_samplerate, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
+      get_stream_info(sinfos->infos.audio_bitrate, XINE_STREAM_INFO_AUDIO_BITRATE);
+      get_stream_fourcc_info(sinfos->infos.audio_fourcc, XINE_STREAM_INFO_AUDIO_FOURCC);
+      get_stream_yesno_info(sinfos->infos.audio_handled, XINE_STREAM_INFO_AUDIO_HANDLED);
+      get_stream_yesno_info(sinfos->infos.has_chapters, XINE_STREAM_INFO_HAS_CHAPTERS);
+      get_stream_yesno_info(sinfos->infos.has_video, XINE_STREAM_INFO_HAS_VIDEO);
+      get_stream_yesno_info(sinfos->infos.has_audio, XINE_STREAM_INFO_HAS_AUDIO);
+      get_stream_yesno_info(sinfos->infos.ignore_video, XINE_STREAM_INFO_IGNORE_VIDEO);
+      get_stream_yesno_info(sinfos->infos.ignore_audio, XINE_STREAM_INFO_IGNORE_AUDIO);
+      get_stream_yesno_info(sinfos->infos.ignore_spu, XINE_STREAM_INFO_IGNORE_SPU);
     }
+    else
+      stream_info_update_undefined();
   }
-}
-
-static void stream_infos_update(xitk_widget_t *w, void *data) {
-  stream_infos_update_infos();
 }
 
 void stream_infos_panel(void) {
@@ -982,11 +978,16 @@ void stream_infos_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content(sinfos->widget_list->l, 
-	   xitk_noskin_labelbutton_create(sinfos->widget_list, 
-					  &lb, x, y, 100, 23,
-					  "Black", "Black", "White", btnfontname));
-  x = WINDOW_WIDTH - 115;
+	   (sinfos->update = 
+	    xitk_noskin_labelbutton_create(sinfos->widget_list, 
+					   &lb, x, y, 100, 23,
+					   "Black", "Black", "White", btnfontname)));
 
+  if(gGui->stream_info_auto_update)
+    xitk_hide_widget(sinfos->widget_list, sinfos->update);
+  
+  x = WINDOW_WIDTH - 115;
+  
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = LABEL_ALIGN_CENTER;

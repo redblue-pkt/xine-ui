@@ -316,6 +316,9 @@ static void *slider_loop(void *dummy) {
 	      panel_check_mute();
 	    }
 	  }
+	  
+	  if(stream_infos_is_visible() && gGui->stream_info_auto_update)
+	    stream_infos_update_infos();
 	}
       }
     }

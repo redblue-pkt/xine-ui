@@ -95,6 +95,12 @@ static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
   if((!gGui->visual_anim.enabled) && gGui->visual_anim.running)
     visual_anim_stop();
 }
+
+static void stream_info_auto_update_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->stream_info_auto_update = cfg->num_value;
+  stream_infos_toggle_auto_update();
+}
+
 /*
  * Layer above callbacks
  */
@@ -790,16 +796,16 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->layer_above = 
     xine_config_register_bool (gGui->xine, "gui.layer_above", 1,
-			       _("use wm layer property to place window on top"), 
-			       CONFIG_NO_HELP,
+			       _("Windows stacking"),
+			       _("Use wm layer property to place window on top."), 
 			       CONFIG_LEVEL_EXP,
 			       layer_above_cb,
 			       CONFIG_NO_DATA);
 
   gGui->always_layer_above = 
     xine_config_register_bool (gGui->xine, "gui.always_layer_above", 0,
-			       _("use wm layer property to place windows on top"), 
-			       CONFIG_NO_HELP,
+			       _("Windows stacking (more)"),
+			       _("Use WM layer property to place windows on top."), 
 			       CONFIG_LEVEL_EXP,
 			       always_layer_above_cb,
 			       CONFIG_NO_DATA);
@@ -810,60 +816,72 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->snapshot_location = 
     (char *)xine_config_register_string (gGui->xine, "gui.snapshotdir", 
 					 (char *) (xine_get_homedir()),
-					 _("where snapshots will be saved"),
-					 CONFIG_NO_HELP,
+					 _("Snapshot location"),
+					 _("Where snapshots will be saved."),
 					 CONFIG_LEVEL_EXP,
 					 snapshot_loc_cb,
 					 CONFIG_NO_DATA);
   
   gGui->ssaver_timeout =
     xine_config_register_num (gGui->xine, "gui.screensaver_timeout", 10,
-			      _("time between two screensaver fake events, 0 to disable"),
-			      CONFIG_NO_HELP,
+			      _("Screensaver wakeup"),
+			      _("Time between two screensaver fake events, 0 to disable."),
 			      CONFIG_LEVEL_EXP,
 			      ssaver_timeout_cb,
 			      CONFIG_NO_DATA);
   
   gGui->skip_by_chapter = 
     xine_config_register_bool (gGui->xine, "gui.skip_by_chapter", 1,
-			       _("play next|previous chapter instead of mrl (dvdnav)"), 
-			       CONFIG_NO_HELP,
+			       _("Chapter hoping"),
+			       _("Play next|previous chapter instead of mrl (dvdnav)"), 
 			       CONFIG_LEVEL_EXP,
 			       skip_by_chapter_cb, 
 			       CONFIG_NO_DATA);
   
   gGui->auto_vo_visibility = 
     xine_config_register_bool (gGui->xine, "gui.auto_video_output_visibility", 0,
-			       _("show/hide video output window regarding to the stream type"), 
-			       CONFIG_NO_HELP,
+			       _("Visiblity behavoir of output window"),
+			       _("Show/hide video output window regarding to the stream type"), 
 			       CONFIG_LEVEL_EXP,
 			       auto_vo_visibility_cb, 
 			       CONFIG_NO_DATA);
 
   gGui->auto_panel_visibility = 
     xine_config_register_bool (gGui->xine, "gui.auto_panel_visibility", 0,
-			       _("automatically show/hide panel window, according to auto_video_output_visibility"), 
-			       CONFIG_NO_HELP,
+			       _("Visiblility behavior of panel"),
+			       _("Automatically show/hide panel window, according to auto_video_output_visibility"), 
 			       CONFIG_LEVEL_EXP,
 			       auto_panel_visibility_cb,
 			       CONFIG_NO_DATA); 
  
-  gGui->eventer_sticky = xine_config_register_bool(gGui->xine, "gui.eventer_sticky", 
-						   1,
-						   _("Event sender window stick to main panel"), 
-						   CONFIG_NO_HELP,
-						   CONFIG_LEVEL_EXP,
-						   event_sender_sticky_cb,
-						   CONFIG_NO_DATA);
+  gGui->eventer_sticky = 
+    xine_config_register_bool(gGui->xine, "gui.eventer_sticky", 
+			      1,
+			      _("Event sender behavior"),
+			      _("Event sender window stick to main panel"), 
+			      CONFIG_LEVEL_EXP,
+			      event_sender_sticky_cb,
+			      CONFIG_NO_DATA);
 
-  gGui->visual_anim.enabled = xine_config_register_bool(gGui->xine, "gui.visual_anim", 
-							1,
-							_("Display some video animations when "
-							  "current stream is audio only (eg: mp3)."), 
-							CONFIG_NO_HELP,
-							CONFIG_LEVEL_EXP,
-							visual_anim_cb,
-							CONFIG_NO_DATA);
+  gGui->visual_anim.enabled = 
+    xine_config_register_bool(gGui->xine, "gui.visual_anim", 
+			      1,
+			      _("Visual animation"),
+			      _("Display some video animations when "
+				"current stream is audio only (eg: mp3)."), 
+			      CONFIG_LEVEL_EXP,
+			      visual_anim_cb,
+			      CONFIG_NO_DATA);
+
+  gGui->stream_info_auto_update = 
+    xine_config_register_bool(gGui->xine, "gui.sinfo_auto_update", 
+			      0,
+			      _("Stream informations"),
+			      _("Update stream informations (in stream infos window) "
+				"each half seconds."), 
+			      CONFIG_LEVEL_EXP,
+			      stream_info_auto_update_cb,
+			      CONFIG_NO_DATA);
   
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;

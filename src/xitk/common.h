@@ -222,7 +222,7 @@ typedef struct {
   } numeric;
   
   int                        eventer_sticky;
-
+  int                        stream_info_auto_update;
 } gGui_t;
 
 #endif
