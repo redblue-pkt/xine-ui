@@ -170,51 +170,23 @@ static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selecte
 }
 
 static void _playlist_xine_play(void) {
-  mediamark_t *mmk;
+  gui_set_current_mmk(mediamark_get_current_mmk());
 
-  if((mmk = mediamark_get_current_mmk()) != NULL) {
-    
-    if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
-      gGui->ignore_next = 1;
-      xine_stop(gGui->stream);
-      gGui->ignore_next = 0;
-    }
-    
-    if(!is_playback_widgets_enabled())
-      enable_playback_controls(1);
-
-    if(mrl_look_like_playlist(mmk->mrl)) {
-      if(mediamark_concat_mediamarks(mmk->mrl)) {
-	gui_set_current_mmk(mediamark_get_current_mmk());
-	mmk = mediamark_get_current_mmk();
-	playlist_update_playlist();
-      }
-    }
-
-    if(!xine_open(gGui->stream, mmk->mrl)) {
-      gui_handle_xine_error(gGui->stream, mmk->mrl);
-      enable_playback_controls(0);
+  if(mediamark_have_alternates(&(gGui->mmk))) {
+    if(!gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub))
       gui_display_logo();
-      return;
-    }
-
-    if(mmk->sub) {
-      if(xine_open(gGui->spu_stream, mmk->sub))
-	xine_stream_master_slave(gGui->stream, 
-				 gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
-    }
-    else
-      xine_close(gGui->spu_stream);
-    
-    if(!gui_xine_play(gGui->stream, 0, mmk->start, 0)) {
-      enable_playback_controls(0);
+  }
+  else {
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
+			       gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 1)) {
+      
+      if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+	gui_exit(NULL, NULL);
+      
       gui_display_logo();
-      return;
     }
   }
-
 }
-
 /*
  * Start playing an MRL
  */
@@ -224,9 +196,7 @@ void playlist_play_current(xitk_widget_t *w, void *data) {
   j = xitk_browser_get_current_selected(playlist->playlist);
 
   if((j >= 0) && (gGui->playlist.mmk[j]->mrl != NULL)) {
-    
     gGui->playlist.cur = j;
-    gui_set_current_mmk(mediamark_get_current_mmk());
     _playlist_xine_play();
     xitk_browser_release_all_buttons(playlist->playlist);
   }
@@ -237,9 +207,7 @@ void playlist_play_current(xitk_widget_t *w, void *data) {
 static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int selected) {
   
   if(gGui->playlist.mmk[selected]->mrl != NULL) {
-    
     gGui->playlist.cur = selected;
-    gui_set_current_mmk(mediamark_get_current_mmk());
     _playlist_xine_play();
     xitk_browser_release_all_buttons(playlist->playlist);
   }
