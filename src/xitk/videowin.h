@@ -57,6 +57,10 @@ void video_window_dest_size_cb (void *this,
 void video_window_set_fullscreen_mode (int req_fullscreen);
 int video_window_get_fullscreen_mode (void);
 
+/* set/check xinerama fullscreen mode */
+void video_window_set_xinerama_fullscreen_mode (int req_fullscreen);
+int video_window_get_xinerama_fullscreen_mode (void);
+
 /* hide/show cursor in video window*/
 void video_window_set_cursor_visibility(int show_cursor);
 /* Get cursor visiblity (boolean) */

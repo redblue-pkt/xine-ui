@@ -326,6 +326,12 @@ void gui_execute_action_id(action_id_t action) {
     gui_set_fullscreen_mode(NULL, NULL);
     break;
 
+#ifdef HAVE_XINERAMA
+  case ACTID_TOGGLE_XINERAMA_FULLSCR:
+    gui_set_xinerama_fullscreen_mode(NULL, NULL);
+    break;
+#endif
+
   case ACTID_TOGGLE_ASPECT_RATIO:
     gui_toggle_aspect();
     break;

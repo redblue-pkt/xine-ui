@@ -168,6 +168,7 @@ static void do_stop(commands_t *, client_info_t *);
 static void do_pause(commands_t *, client_info_t *);
 static void do_exit(commands_t *, client_info_t *);
 static void do_fullscreen(commands_t *, client_info_t *);
+static void do_xinerama_fullscreen(commands_t *, client_info_t *);
 static void do_get(commands_t *, client_info_t *);
 static void do_set(commands_t *, client_info_t *);
 static void do_gui(commands_t *, client_info_t *);
@@ -293,6 +294,10 @@ static commands_t commands[] = {
   { "fullscreen",  NO_ARGS,         PUBLIC,          NEED_AUTH,     do_fullscreen,
     "fullscreen toggle", 
     "  fullscreen"
+  },
+  { "xineramafull" ,  NO_ARGS,         PUBLIC,          NEED_AUTH,     do_xinerama_fullscreen,
+    "xinerama fullscreen toggle",
+    "  expand display on further screens"
   },
   { "get",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_get,
     "get values", 
@@ -1969,6 +1974,12 @@ static void do_exit(commands_t *cmd, client_info_t *client_info) {
 
 static void do_fullscreen(commands_t *cmd, client_info_t *client_info) {
   action_id_t action = ACTID_TOGGLE_FULLSCREEN;
+
+  gui_execute_action_id(action);
+}
+
+static void do_xinerama_fullscreen(commands_t *cmd, client_info_t *client_info) {
+  action_id_t action = ACTID_TOGGLE_XINERAMA_FULLSCR;
 
   gui_execute_action_id(action);
 }

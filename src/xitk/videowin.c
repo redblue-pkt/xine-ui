@@ -26,6 +26,8 @@
 #include "config.h"
 #endif
 
+#include <stdio.h>
+#include <string.h>
 #include <sys/time.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
@@ -81,6 +83,11 @@ typedef struct {
 				   * switch to fullscreen mode             */
   int            fullscreen_width;
   int            fullscreen_height;
+
+  int            xinerama_fullscreen_x; /* will contain paramaters for very fullscreen in xinerama mode */
+  int            xinerama_fullscreen_y;
+  int            xinerama_fullscreen_width;
+  int            xinerama_fullscreen_height;
 
   int            visible_width;   /* Size of currently visible portion of screen */
   int            visible_height;  /* May differ from fullscreen_* e.g. for TV mode */
@@ -293,9 +300,21 @@ static void video_window_adapt_size (void) {
     return;
   }
 
+#ifdef HAVE_XINERAMA
+  /*
+   * if we are in fullscreen mode then go in xinerama fullscreen mode
+   * else if we are in xinerama fullscreen, go in fullscreen mode
+   */
+  if(gVw->fullscreen_req==5 && gVw->fullscreen_mode==1) gVw->fullscreen_req = 4;
+  else if(gVw->fullscreen_req==5 && gVw->fullscreen_mode==4) gVw->fullscreen_req = 1;
+#endif
+
   switch (gVw->fullscreen_req) {
   case 0:
   case 1:
+#ifdef HAVE_XINERAMA
+  case 4:
+#endif
 #warning TVMODE NEWAPI
 #if 0
     if(gGui->xine)
@@ -304,6 +323,9 @@ static void video_window_adapt_size (void) {
 #endif
     break;
   case 2:
+#ifdef HAVE_XINERAMA
+  case 8:
+#endif
 #warning TVMODE NEWAPI
 #if 0
     if(gGui->xine)
@@ -400,6 +422,14 @@ static void video_window_adapt_size (void) {
       }
     }
     
+    if (gVw->fullscreen_req==4) {
+      hint.x = gVw->xinerama_fullscreen_x;
+      hint.y = gVw->xinerama_fullscreen_y;
+      hint.width  = gVw->xinerama_fullscreen_width;
+      hint.height = gVw->xinerama_fullscreen_height;
+      gVw->fullscreen_width = hint.width;
+      gVw->fullscreen_height = hint.height;
+    } else {
     for (i = 0; i < gVw->xinerama_cnt; i++) {
       if (
 	  (knowLocation == 1 &&
@@ -423,6 +453,7 @@ static void video_window_adapt_size (void) {
 	}
 	break;
       }
+    }
     }
   } else {
     hint.x = 0;
@@ -452,6 +483,98 @@ static void video_window_adapt_size (void) {
 #endif
   }
   
+#ifdef HAVE_XINERAMA
+  /* ask for xinerama fullscreen mode */
+  if (gVw->fullscreen_req==4) {
+
+    if (gGui->video_window) {
+      int dummy;
+
+      if (gVw->fullscreen_mode && gGui->visual == gVw->visual) {
+        if (gVw->visible_width != gVw->output_width || gVw->visible_height != gVw->output_height) {
+          /*
+           * resizing the video window may be necessary if the modeline or tv mode has
+           * just been switched
+           */
+          XResizeWindow (gGui->display, gGui->video_window,
+					  gVw->visible_width, gVw->visible_height);
+          gVw->output_width    = gVw->visible_width;
+          gVw->output_height   = gVw->visible_height;
+        }
+        gVw->fullscreen_mode = gVw->fullscreen_req;
+        XUnlockDisplay (gGui->display);
+
+        return;
+      }
+
+      xitk_get_window_position(gGui->display, gGui->video_window,
+      			       &gVw->old_xwin, &gVw->old_ywin, &dummy, &dummy);
+
+      xitk_unregister_event_handler(&gVw->old_widget_key);
+      old_video_window = gGui->video_window;
+    }
+
+    gVw->fullscreen_mode = gVw->fullscreen_req;
+    gVw->visual   = gGui->visual;
+    gVw->depth    = gGui->depth;
+    gVw->colormap = gGui->colormap;
+
+    /*
+     * open fullscreen window
+     */
+
+    attr.background_pixel  = gGui->black.pixel;
+    attr.border_pixel      = gGui->black.pixel;
+    attr.colormap	   = gVw->colormap;
+
+    border_width           = 0;
+
+    gGui->video_window =
+      XCreateWindow (gGui->display, gGui->imlib_data->x.root,
+		     hint.x, hint.y, gVw->visible_width, gVw->visible_height,
+		     border_width, gVw->depth, InputOutput,
+		     gVw->visual,
+		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
+
+	 if(gGui->vo_port)
+      xine_gui_send_vo_data(gGui->stream,
+			    XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+
+    if (gVw->xclasshint_fullscreen != NULL)
+      XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint_fullscreen);
+
+    hint.win_gravity = StaticGravity;
+    hint.flags  = PPosition | PSize | PWinGravity;
+
+    XSetStandardProperties(gGui->display, gGui->video_window,
+ 			   window_title, window_title, None, NULL, 0, 0);
+
+    XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
+
+    XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
+
+    gVw->output_width    = hint.width;
+    gVw->output_height   = hint.height;
+
+    if(is_layer_above())
+      xitk_set_layer_above(gGui->video_window);
+
+    /*
+     * wm, no borders please
+     */
+
+    prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
+    mwmhints.flags = MWM_HINTS_DECORATIONS;
+    mwmhints.decorations = 0;
+    XChangeProperty(gGui->display, gGui->video_window, prop, prop, 32,
+		    PropModeReplace, (unsigned char *) &mwmhints,
+		    PROP_MWM_HINTS_ELEMENTS);
+
+    XSetTransientForHint(gGui->display, gGui->video_window, None);
+    XRaiseWindow(gGui->display, gGui->video_window);
+
+  } else
+#endif
   if (gVw->fullscreen_req) {
 
     if (gGui->video_window) {
@@ -907,6 +1030,23 @@ int video_window_get_fullscreen_mode (void) {
 }
 
 /*
+ * set/reset xine in xinerama fullscreen
+ * ie: try to expend display on further screens
+ */
+void video_window_set_xinerama_fullscreen_mode (int req_fullscreen) {
+  gVw->fullscreen_req = req_fullscreen;
+
+  video_window_adapt_size ();
+}
+
+/*
+ *
+ */
+int video_window_get_xinerama_fullscreen_mode (void) {
+  return gVw->fullscreen_mode;
+}
+
+/*
  * hide/show cursor in video window
  */
 void video_window_set_cursor_visibility(int show_cursor) {
@@ -972,16 +1112,33 @@ int video_window_is_visible (void) {
 }
 
 /*
+ * check if screen_number is in the list
+ */
+int screen_is_in_xinerama_fullscreen_list (const char *list,int screen_number) {
+  const char *buffer;
+  int dummy;
+
+  buffer=list;
+  do {
+    if(sscanf(buffer,"%d",&dummy)==1 && screen_number==dummy) return 1;
+  } while((buffer=strchr(buffer,(int)' '))!=NULL && ++buffer < list + strlen(list));
+
+  return 0;
+}
+
+/*
  *
  */
 static unsigned char bm_no_data[] = { 0,0,0,0, 0,0,0,0 };
 void video_window_init (window_attributes_t *window_attribute, int hide_on_start) {
 
   Pixmap                bm_no;
+  int i;
 #ifdef HAVE_XINERAMA
   int                   screens;
   int                   dummy_a, dummy_b;
   XineramaScreenInfo   *screeninfo = NULL;
+  const char           *screens_list;
 #endif
 #ifdef HAVE_XF86VIDMODE
   int                   dummy_query_event, dummy_query_error;
@@ -1040,9 +1197,105 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
       gVw->fullscreen_height = screeninfo[0].height;
       gVw->xinerama = screeninfo;
       gVw->xinerama_cnt = screens;
+
+      screens_list = xine_config_register_string (gGui->xine, "gui.xinerama_use_screens",
+					"0 1",
+					_("Screens to use in order to do a very fullscreen in xinerama mode. (example 0 2 3)"),
+					_("Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"),
+					CONFIG_LEVEL_EXP,
+					CONFIG_NO_CB,
+					CONFIG_NO_DATA);
+
+      if(sscanf(screens_list,"%d",&dummy_a)==1 && dummy_a>=0 && dummy_a<screens) {
+
+        /* try to calculate the best maximum size for xinerama fullscreen */
+        gVw->xinerama_fullscreen_x = screeninfo[dummy_a].x_org;
+        gVw->xinerama_fullscreen_y = screeninfo[dummy_a].y_org;
+        gVw->xinerama_fullscreen_width = screeninfo[dummy_a].width;
+        gVw->xinerama_fullscreen_height = screeninfo[dummy_a].height;
+
+        i=dummy_a;
+        while(i<screens) {
+
+          if(screen_is_in_xinerama_fullscreen_list(screens_list,i)) {
+            if(screeninfo[i].x_org < gVw->xinerama_fullscreen_x) gVw->xinerama_fullscreen_x = screeninfo[i].x_org;
+            if(screeninfo[i].y_org < gVw->xinerama_fullscreen_y) gVw->xinerama_fullscreen_y = screeninfo[i].y_org;
+          }
+
+          i++;
+        }
+
+        i=dummy_a;
+        while(i<screens) {
+
+          if(screen_is_in_xinerama_fullscreen_list(screens_list,i)) {
+            if(screeninfo[i].width + screeninfo[i].x_org > gVw->xinerama_fullscreen_x + gVw->xinerama_fullscreen_width)
+            		gVw->xinerama_fullscreen_width = screeninfo[i].width + screeninfo[i].x_org - gVw->xinerama_fullscreen_x;
+
+            if(screeninfo[i].height + screeninfo[i].x_org > gVw->xinerama_fullscreen_y + gVw->xinerama_fullscreen_height)
+            		gVw->xinerama_fullscreen_height = screeninfo[i].height + screeninfo[i].y_org - gVw->xinerama_fullscreen_y;
+          }
+
+          i++;
+        }
+      } else {
+        /* we can't find screens to use, so we use screen 0 */
+        gVw->xinerama_fullscreen_x = screeninfo[0].x_org;
+        gVw->xinerama_fullscreen_y = screeninfo[0].y_org;
+        gVw->xinerama_fullscreen_width = screeninfo[0].width;
+        gVw->xinerama_fullscreen_height = screeninfo[0].height;
+      }
+
+      dummy_a = xine_config_register_num(gGui->xine,
+			      "gui.xinerama_fullscreen_x",
+			      -8192,
+			      _("x coordinate for xinerama fullscreen (-8192 = autodetect)"),
+			      CONFIG_NO_HELP,
+			      CONFIG_LEVEL_EXP,
+			      CONFIG_NO_CB,
+			      CONFIG_NO_DATA);
+      if(dummy_a > -8192) gVw->xinerama_fullscreen_x=dummy_a;
+
+      dummy_a = xine_config_register_num(gGui->xine,
+			      "gui.xinerama_fullscreen_y",
+			      -8192,
+			      _("y coordinate for xinerama fullscreen (-8192 = autodetect)"),
+			      CONFIG_NO_HELP,
+			      CONFIG_LEVEL_EXP,
+			      CONFIG_NO_CB,
+			      CONFIG_NO_DATA);
+      if(dummy_a > -8192) gVw->xinerama_fullscreen_y=dummy_a;
+
+      dummy_a = xine_config_register_num(gGui->xine,
+			      "gui.xinerama_fullscreen_width",
+			      -8192,
+			      _("width for xinerama fullscreen (-8192 = autodetect)"),
+			      CONFIG_NO_HELP,
+			      CONFIG_LEVEL_EXP,
+			      CONFIG_NO_CB,
+			      CONFIG_NO_DATA);
+      if(dummy_a > -8192) gVw->xinerama_fullscreen_width=dummy_a;
+
+      dummy_a = xine_config_register_num(gGui->xine,
+			      "gui.xinerama_fullscreen_height",
+			      -8192,
+			      _("height for xinerama fullscreen (-8192 = autodetect)"),
+			      CONFIG_NO_HELP,
+			      CONFIG_LEVEL_EXP,
+			      CONFIG_NO_CB,
+			      CONFIG_NO_DATA);
+      if(dummy_a > -8192) gVw->xinerama_fullscreen_height=dummy_a;
+
+#ifdef DEBUG
+      printf("videowin: Xinerama fullscreen parameters: X_origin=%d Y_origin=%d Width=%d Height=%d\n",gVw->xinerama_fullscreen_x,gVw->xinerama_fullscreen_y,gVw->xinerama_fullscreen_width,gVw->xinerama_fullscreen_height);
+#endif
     } else {
       gVw->fullscreen_width  = DisplayWidth  (gGui->display, gGui->screen);
       gVw->fullscreen_height = DisplayHeight (gGui->display, gGui->screen);
+      gVw->xinerama_fullscreen_x = 0;
+      gVw->xinerama_fullscreen_y = 0;
+      gVw->xinerama_fullscreen_width = gVw->fullscreen_width;
+      gVw->xinerama_fullscreen_height = gVw->fullscreen_height;
     }
 
   } else 
