@@ -63,9 +63,32 @@ static menu_node_t *_menu_new_node(xitk_widget_t *w) {
 }
 static xitk_menu_entry_t *_menu_build_menu_entry(xitk_menu_entry_t *me, char *name) {
   xitk_menu_entry_t  *mentry;
+  char                buffer[name ? (strlen(name) + 3) : 1];
   
+  if(name) {
+    char *s = name;
+    char *d = buffer;
+
+    while(*s) {
+      
+      switch(*s) {
+      case '\\':
+	*d = *(++s);
+	break;
+	
+      default:
+	*d = *s;
+	break;
+      }
+
+      d++;
+      s++;
+    }
+    *d = '\0';
+  }
+
   mentry            = (xitk_menu_entry_t *) xitk_xmalloc(sizeof(xitk_menu_entry_t));
-  mentry->menu      = strdup((name) ? name : me->menu);
+  mentry->menu      = strdup((name) ? buffer : me->menu);
   mentry->type      = (me->type) ? strdup(me->type) : NULL;
   mentry->cb        = me->cb;
   mentry->user_data = me->user_data;
@@ -184,6 +207,9 @@ static void _menu_scissor(xitk_widget_t *w,
     if(_menu_is_branch(me)) {
       int     off = 0, same_branch = 0;
       char   *cbranch = strchr(c, '/');
+
+      if(cbranch && (*(cbranch - 1) == '\\'))
+	cbranch = NULL;
       
       if(cbranch) {
 	cbranch++;
@@ -240,13 +266,13 @@ static void _menu_scissor(xitk_widget_t *w,
 #endif
 
 	main_trunk = mtree->cur = _menu_append_to_node(w, &main_trunk, me, me->menu);
-	subbranch = NULL;
+	branch = subbranch = NULL;
 	me++;
 	continue;
       }
     }
     
-    while((c = strchr(c, '/'))) {
+    while( (c = strchr(c, '/')) && (c && (*(c - 1) != '\\')) ) {
       offset = c - me->menu + 1;
       sub++;
       c++;
