@@ -905,6 +905,7 @@ void gui_set_current_mrl(mediamark_t *mmk) {
     gGui->mmk.end = -1;
   }
 
+  event_sender_update_menu_buttons();
   panel_update_mrl_display ();
   playlist_update_focused_entry();
 }

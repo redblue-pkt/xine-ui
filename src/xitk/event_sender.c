@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <sys/time.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -37,8 +38,8 @@
 
 #include "common.h"
 
-#define WINDOW_WIDTH        240
-#define WINDOW_HEIGHT       296
+#define WINDOW_WIDTH        250
+#define WINDOW_HEIGHT       240
 
 extern gGui_t          *gGui;
 
@@ -82,6 +83,10 @@ typedef struct {
 } _eventer_t;
 
 static _eventer_t    *eventer = NULL;
+
+/* Initialized below */
+static char *menu_items_default[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static char *menu_items_dvd[8] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 
 void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
   
@@ -128,10 +133,16 @@ static void event_sender_store_new_position(int x, int y, int w, int h) {
 static void event_sender_send(int event) {
   xine_event_t   xine_event;
 
-  xine_event.type = event;
+  xine_event.type        = event;
   
-  if(xine_event.type != 0)
+  if(xine_event.type != 0) {
+    xine_event.data_length = 0;
+    xine_event.data        = NULL;
+    xine_event.stream      = gGui->stream;
+    gettimeofday(&xine_event.tv, NULL);
+
     xine_event_send(gGui->stream, &xine_event);
+  }
 }
 
 static void event_sender_up(xitk_widget_t *w, void *data) {
@@ -184,6 +195,100 @@ static void event_sender_angle(xitk_widget_t *w, void *data) {
   };
 
   event_sender_send(events[event]);
+}
+
+static void event_sender_handle_event(XEvent *event, void *data) {
+  
+  switch(event->type) {
+
+  case KeyPress:
+    {
+      XKeyEvent      mykeyevent;
+      KeySym         key;
+      char           kbuf[256];
+      int            len;
+      
+      mykeyevent = event->xkey;
+      
+      XLockDisplay(gGui->display);
+      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &key, NULL);
+      XUnlockDisplay(gGui->display);
+
+      switch(key) {
+      case XK_Up:
+	event_sender_up(NULL, NULL);
+	  break;
+      case XK_Down:
+	event_sender_down(NULL, NULL);
+	break;
+      case XK_Left:
+	event_sender_left(NULL, NULL);
+	break;
+      case XK_Right:
+	event_sender_right(NULL, NULL);
+	  break;
+
+      case XK_Return:
+      case XK_KP_Enter:
+      case XK_ISO_Enter:
+	event_sender_select(NULL, NULL);
+	break;
+	
+      case XK_0:
+	event_sender_num(NULL, (void *)0);
+	break;
+      case XK_1:
+	event_sender_num(NULL, (void *)1);
+	break;
+      case XK_2:
+	event_sender_num(NULL, (void *)2);
+	break;
+      case XK_3:
+	event_sender_num(NULL, (void *)3);
+	break;
+      case XK_4:
+	event_sender_num(NULL, (void *)4);
+	break;
+      case XK_5:
+	event_sender_num(NULL, (void *)5);
+	break;
+      case XK_6:
+	event_sender_num(NULL, (void *)6);
+	break;
+      case XK_7:
+	event_sender_num(NULL, (void *)7);
+	break;
+      case XK_8:
+	event_sender_num(NULL, (void *)8);
+	break;
+      case XK_9:
+	event_sender_num(NULL, (void *)9);
+	break;
+
+      case XK_plus:
+      case XK_KP_Add:
+	event_sender_num(NULL, (void *)10);
+	break;
+
+      }
+    }
+    break;
+  }
+}
+
+void event_sender_update_menu_buttons(void) {
+
+  if(eventer) {
+    int i;
+    char **lbls = menu_items_default;
+    
+    if((!strncmp(gGui->mmk.mrl, "dvd:/", 5)) || (!strncmp(gGui->mmk.mrl, "dvdnav:/", 8)))
+      lbls = menu_items_dvd;
+    
+    for(i = 0; i < 7; i++)
+      xitk_labelbutton_change_label(eventer->widget_list, eventer->menus.menu[i], lbls[i]);
+
+  }
 }
 
 void event_sender_exit(xitk_widget_t *w, void *data) {
@@ -308,7 +413,7 @@ void event_sender_panel(void) {
   int                        x, y, i;
 
   eventer = (_eventer_t *) xine_xmalloc(sizeof(_eventer_t));
-
+  
   eventer->x = xine_config_register_num (gGui->xine, "gui.eventer_x", 
 					 100,
 					 CONFIG_NO_DESC,
@@ -342,14 +447,14 @@ void event_sender_panel(void) {
 		 (xitk_window_get_window(eventer->xwin)), None, None);
   
   eventer->widget_list                = xitk_widget_list_new();
-  eventer->widget_list->l             = xitk_list_new ();
+  eventer->widget_list->l             = xitk_list_new();
   eventer->widget_list->win           = (xitk_window_get_window(eventer->xwin));
   eventer->widget_list->gc            = gc;
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
-  x = 85;
-  y = 30;
+  x = 70 + 15 + 5;
+  y = 23 + 23 + 11;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Up");
@@ -433,64 +538,8 @@ void event_sender_panel(void) {
 					   "Black", "Black", "White", 
 					   eventerfontname)));
 
-  x = 15;
-  y = 120;
-
-  for(i = 0; i < 7; i++) {
-    char number[7];
-
-    memset(&number, 0, sizeof(number));
-    sprintf(number, _("Menu %d"), (i + 1));
-    lb.button_type       = CLICK_BUTTON;
-    lb.label             = number;
-    lb.align             = LABEL_ALIGN_CENTER;
-    lb.callback          = event_sender_menu; 
-    lb.state_callback    = NULL;
-    lb.userdata          = (void *)i;
-    lb.skin_element_name = NULL;
-    xitk_list_append_content(eventer->widget_list->l, 
-	     (eventer->menus.menu[i] = 
-	      xitk_noskin_labelbutton_create(eventer->widget_list, 
-					     &lb, x, y, 60, 23,
-					     "Black", "Black", "White", eventerfontname)));
-    y += 23;
-  }
-
-  x = 165; 
-  y = 189;
-
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Angle -");
-  lb.align             = LABEL_ALIGN_CENTER;
-  lb.callback          = event_sender_angle; 
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)0;
-  lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
-	   (eventer->angles.prev = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 60, 23,
-					   "Black", "Black", "White", eventerfontname)));
-  y += 23;
-
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Angle +");
-  lb.align             = LABEL_ALIGN_CENTER;
-  lb.callback          = event_sender_angle; 
-  lb.state_callback    = NULL;
-  lb.userdata          = (void *)1;
-  lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
-	   (eventer->angles.next = 
-	    xitk_noskin_labelbutton_create(eventer->widget_list, 
-					   &lb, x, y, 60, 23,
-					   "Black", "Black", "White", eventerfontname)));
-
-
-    
-
-  x = 85 + 46;
-  y = 189;
+  x = 23 * 2 + 5 + 8;
+  y = 23 * 4 + 5 + 40 + 5;
 
   for(i = 9; i >= 0; i--) {
     char number[2];
@@ -549,7 +598,86 @@ void event_sender_panel(void) {
 					     "Black", "Black", "White", eventerfontname)));
   }
 
-  x = WINDOW_WIDTH - 75;
+  x = WINDOW_WIDTH - 80 - 5;
+  y = 23 * 4 + 5 + 40 + 5;
+
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Angle +");
+  lb.align             = LABEL_ALIGN_CENTER;
+  lb.callback          = event_sender_angle; 
+  lb.state_callback    = NULL;
+  lb.userdata          = (void *)1;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content(eventer->widget_list->l, 
+	   (eventer->angles.next = 
+	    xitk_noskin_labelbutton_create(eventer->widget_list, 
+					   &lb, x, y, 80, 23,
+					   "Black", "Black", "White", eventerfontname)));
+  y += 23;
+
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Angle -");
+  lb.align             = LABEL_ALIGN_CENTER;
+  lb.callback          = event_sender_angle; 
+  lb.state_callback    = NULL;
+  lb.userdata          = (void *)0;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content(eventer->widget_list->l, 
+	   (eventer->angles.prev = 
+	    xitk_noskin_labelbutton_create(eventer->widget_list, 
+					   &lb, x, y, 80, 23,
+					   "Black", "Black", "White", eventerfontname)));
+
+
+  /* Initialize menu labels */
+  menu_items_default[0] = _("Menu 1");
+  menu_items_default[1] = _("Menu 2");
+  menu_items_default[2] = _("Menu 3");
+  menu_items_default[3] = _("Menu 4");
+  menu_items_default[4] = _("Menu 5");
+  menu_items_default[5] = _("Menu 6");
+  menu_items_default[6] = _("Menu 7");
+ 
+  menu_items_dvd[0]     = _("Root");
+  menu_items_dvd[1]     = _("Title");
+  menu_items_dvd[2]     = _("Root");
+  menu_items_dvd[3]     = _("Subpicture");
+  menu_items_dvd[4]     = _("Audio");
+  menu_items_dvd[5]     = _("Angle");
+  menu_items_dvd[6]     = _("Part");
+
+  x = 5;
+  y = 23;
+
+  for(i = 0; i < 7; i++) {
+    lb.button_type       = CLICK_BUTTON;
+    lb.label             = "";
+    lb.align             = LABEL_ALIGN_CENTER;
+    lb.callback          = event_sender_menu; 
+    lb.state_callback    = NULL;
+    lb.userdata          = (void *)i;
+    lb.skin_element_name = NULL;
+    xitk_list_append_content(eventer->widget_list->l, 
+	     (eventer->menus.menu[i] = 
+	      xitk_noskin_labelbutton_create(eventer->widget_list, 
+					     &lb, x, y, 80, 23,
+					     "Black", "Black", "White", eventerfontname)));
+
+    if(i == 2) {
+      x += 80;
+      y -= (23 * 3);
+    }
+    if(i == 3) {
+      x += 80;
+      y -= 23;
+    }
+
+    y += 23;
+  }
+  event_sender_update_menu_buttons();
+  
+  x = WINDOW_WIDTH - 70 - 5;
+  y = WINDOW_HEIGHT - 23 - 5;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
@@ -560,7 +688,7 @@ void event_sender_panel(void) {
   lb.skin_element_name = NULL;
   xitk_list_append_content(eventer->widget_list->l, 
    xitk_noskin_labelbutton_create(eventer->widget_list, 
-				  &lb, x, WINDOW_HEIGHT - (23 + 15), 60, 23,
+				  &lb, x, y, 70, 23,
 				  "Black", "Black", "White", eventerfontname));
   
   XMapRaised(gGui->display, xitk_window_get_window(eventer->xwin));
@@ -568,7 +696,7 @@ void event_sender_panel(void) {
 
   eventer->widget_key = xitk_register_event_handler("eventer", 
 						    (xitk_window_get_window(eventer->xwin)),
-						    NULL,
+						    event_sender_handle_event,
 						    event_sender_store_new_position,
 						    NULL,
 						    eventer->widget_list,

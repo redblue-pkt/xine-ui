@@ -2332,8 +2332,14 @@ static void do_event(commands_t *cmd, client_info_t *client_info) {
       }
     }
 
-    if(xine_event.type != 0)
+    if(xine_event.type != 0) {
+      xine_event.data_length = 0;
+      xine_event.data        = NULL;
+      xine_event.stream      = gGui->stream;
+      gettimeofday(&xine_event.tv, NULL);
+      
       xine_event_send(gGui->stream, &xine_event);
+    }
 
   }
 }

@@ -27,6 +27,7 @@
 #endif
 
 #include <stdio.h>
+#include <sys/time.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -226,6 +227,9 @@ void gui_execute_action_id(action_id_t action) {
     xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
     xine_event.data_length = 0;
     xine_event.data = NULL;
+    xine_event.stream = gGui->stream;
+    gettimeofday(&xine_event.tv, NULL);
+    
     xine_event_send(gGui->stream, &xine_event);
     return;
   }

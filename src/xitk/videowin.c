@@ -26,6 +26,7 @@
 #include "config.h"
 #endif
 
+#include <sys/time.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
@@ -1462,13 +1463,15 @@ static void video_window_handle_event (XEvent *event, void *data) {
     if (video_window_translate_point(mevent->x, mevent->y, &x, &y)) {
       xine_event_t event;
       xine_input_data_t input;
-      event.type = XINE_EVENT_INPUT_MOUSE_MOVE;
-      event.stream = gGui->stream;
-      event.data = &input;
+
+      event.type        = XINE_EVENT_INPUT_MOUSE_MOVE;
+      event.stream      = gGui->stream;
+      event.data        = &input;
       event.data_length = sizeof(input);
-      input.button = 0; /*  No buttons, just motion. */
-      input.x = x;
-      input.y = y;
+      gettimeofday(&event.tv, NULL);
+      input.button      = 0; /*  No buttons, just motion. */
+      input.x           = x;
+      input.y           = y;
       xine_event_send(gGui->stream, &event);
     }
   }
@@ -1490,13 +1493,15 @@ static void video_window_handle_event (XEvent *event, void *data) {
       if (video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
 	xine_event_t event;
 	xine_input_data_t input;
-	event.type = XINE_EVENT_INPUT_MOUSE_BUTTON;
-	event.stream = gGui->stream;
-	event.data = &input;
+
+	event.type        = XINE_EVENT_INPUT_MOUSE_BUTTON;
+	event.stream      = gGui->stream;
+	event.data        = &input;
 	event.data_length = sizeof(input);
-	input.button = 1;
-	input.x = x;
-	input.y = y;
+	gettimeofday(&event.tv, NULL);
+	input.button      = 1;
+	input.x           = x;
+	input.y           = y;
 	xine_event_send(gGui->stream, &event);
       }
     }
