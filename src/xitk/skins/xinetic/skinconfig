@@ -1,8 +1,8 @@
 #Xine skin data file
 skin.name    = Xinetic
-skin.version = 0.5
-skin.date    = 15.11.2001
-skin.author  = Darjeeling (Jérôme Villette)<villette@chem.leidenuniv.nl>
+skin.version = 0.5.2
+skin.date    = 14.11.2001
+skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
 
 ## Main GUI ##
@@ -130,7 +130,7 @@ skin.SpuLabel {
 	label {
 	  length = 6
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
@@ -208,7 +208,7 @@ skin.SliderVol {
 	  pixmap = MainVolumePad.png
 	  type = vertical
 	}
-	
+
 }
 
 skin.Snapshot {
@@ -226,9 +226,9 @@ skin.AutoPlayGUI {
 	}
 	pixmap = MainAutoButton.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #a4abb0
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -285,9 +285,9 @@ skin.PlAdd {
 	}
 	pixmap = Onglet.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #344b5d
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -299,9 +299,9 @@ skin.PlLoad {
 	}
 	pixmap = Onglet.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #344b5d
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -313,9 +313,9 @@ skin.PlSave {
 	}
 	pixmap = Onglet.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #344b5d
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -327,8 +327,8 @@ skin.PlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	label {
-	  color = #a4aab4
-	  color_focus = #a4aab4
+	  color = #a4abb0
+	  color_focus = #a4abb0
 	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
@@ -381,9 +381,9 @@ skin.PlDismiss {
 	}
 	pixmap = PlDismiss.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #a4abb0
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -421,10 +421,11 @@ skin.AutoPlayLbl {
 	  x = 337
 	  y = 20
 	}
+
 	label {
 	  length = 9
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
@@ -435,9 +436,9 @@ skin.AutoPlayBG {
 	}
 	pixmap =  Onglet.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #344b5d
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -449,10 +450,10 @@ skin.PlInputText {
 	}
 	pixmap = PlInputTxt.png
 	label {
-	  color = #a4aab4
-	  color_focus = #a4aab4
-	  color_click = #081e2f*
-	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	  color = #9fa4ad
+	  color_focus = #081e2f
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -485,7 +486,7 @@ skin.CtlHueLbl {
 	label {
 	  length = 3
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
@@ -496,8 +497,8 @@ skin.SliderCtlSat {
 	}
 	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SliderVPad.png
-	  type = vertical
+	pixmap = SliderVPad.png
+	type = vertical
 	}
 }
 
@@ -509,7 +510,7 @@ skin.CtlSatLbl {
 	label {
 	  length = 3
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
@@ -530,10 +531,11 @@ skin.CtlBrightLbl {
 	  x = 111
 	  y = 190
 	}
+
 	label {
 	  length = 3
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
@@ -557,7 +559,7 @@ skin.CtlContLbl {
 	label {
 	  length = 3
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
@@ -568,37 +570,37 @@ skin.CtlSave {
 	}
 	pixmap = CtlSave.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #a4abb0
-	  font = *-lucida-*-r-*-*-8-*-*-*-*-*-*-*
+	  color_click = #081e2f
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.CtlSkLbl {
 	coords {
-	  x = 268
+	  x = 288
 	  y = 20
 	}
 	label {
-	  length = 15
+	  length = 13
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
 skin.CtlSkUp {
 	coords {
-	  x = 371
-	  y = 42
+	  x = 378
+	  y = 41
 	}
 	pixmap = SkArrowUp.png
 }
 
 skin.SliderCtlSk {
 	coords {
-	  x = 373
-	  y = 55
+	  x = 380
+	  y = 62
 	}
 	pixmap = SkSlidBG.png
 	slider {
@@ -609,16 +611,16 @@ skin.SliderCtlSk {
 
 skin.CtlSkDn {
 	coords {
-	  x = 371
-	  y = 119
+	  x = 378
+	  y = 116
 	}
 	pixmap = SkArrowDown.png
 }
 
 skin.CtlSkItemBtn {
 	coords {
-	  x = 244
-	  y = 42
+	  x = 288
+	  y = 44
 	}
 	pixmap = SkItemBtn.png
 	label {
@@ -636,9 +638,9 @@ skin.CtlDismiss {
 	}
 	pixmap = CtlDismiss.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #a4abb0
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -662,7 +664,7 @@ skin.MrlItemBtn {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -673,9 +675,9 @@ skin.MrlSelect {
 	}
 	pixmap = MrlSelect.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #a4abb0
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -695,9 +697,9 @@ skin.MrlDismiss {
 	}
 	pixmap = MrlDismiss.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #a4abb0
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -719,7 +721,7 @@ skin.SliderMrl {
 	slider {
 	  pixmap = SliderVPad.png
 	  type = vertical
-	}	  
+	}
 }
 
 skin.MrlDn {
@@ -735,10 +737,11 @@ skin.MrlCurOrigin {
 	  x = 21
 	  y = 192
 	}
+
 	label {
 	  length = 43
 	  animation = True
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
@@ -749,9 +752,9 @@ skin.MrlPlugNameBG {
 	}
 	pixmap = Onglet.png
 	label {
-	  color = #344b5d
+	  color = #9fa4ad
 	  color_focus = #081e2f
-	  color_click = #344b5d
+	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -764,7 +767,7 @@ skin.MrlPlugLabel {
 	label {
 	  length = 7
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 ### File Browser ##
@@ -785,11 +788,11 @@ skin.FBItemBtn {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
 }
 skin.FBHome {
-	coords {	
+	coords {
 	  x = 179
 	  y = 227
 	}
