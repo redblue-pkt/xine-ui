@@ -882,7 +882,7 @@ void playlist_update_focused_entry(void) {
 /*
  * Change the current skin.
  */
-void playlist_change_skins(void) {
+void playlist_change_skins(int synthetic) {
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
 

@@ -185,7 +185,7 @@ static void panel_exit(xitk_widget_t *w, void *data) {
 /*
  * Change the current skin.
  */
-void panel_change_skins(void) {
+void panel_change_skins(int synthetic) {
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
   

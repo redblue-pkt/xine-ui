@@ -146,6 +146,7 @@ typedef struct {
   pthread_t              second_display_thread;
   int                    second_display_running;
   
+  int                    logo_synthetic;
 } gVw_t;
 
 static gVw_t            *gVw;
@@ -1917,7 +1918,7 @@ void video_window_update_logo(void) {
      * Back to default logo only on a skin 
      * change, not at the first skin loading.
      **/
-    if((cfg_err_result) && (strcmp(cfg_entry.str_value, XINE_LOGO_MRL))) {
+    if(gVw->logo_synthetic && (cfg_err_result) && (strcmp(cfg_entry.str_value, XINE_LOGO_MRL))) {
       config_update_string("gui.logo_mrl", XINE_LOGO_MRL);
 
     __play_logo_now:
@@ -1945,7 +1946,8 @@ void video_window_update_logo(void) {
  __done:
   gGui->logo_has_changed--;
 }
-void video_window_change_skins(void) {
+void video_window_change_skins(int synthetic) {
+  gVw->logo_synthetic = (synthetic ? 1 : 0);
   gGui->logo_has_changed++;
 }
 

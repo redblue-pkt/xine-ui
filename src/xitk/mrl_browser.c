@@ -68,7 +68,7 @@ void set_mrl_browser_transient(void) {
 /*
  *
  */
-void mrl_browser_change_skins(void) {
+void mrl_browser_change_skins(int synthetic) {
 
   if(mrlb) {
     xitk_mrlbrowser_change_skins(mrlb, gGui->skin_config);

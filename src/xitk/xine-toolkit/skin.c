@@ -108,7 +108,7 @@ static void skin_free_cache(xitk_skin_config_t *skonfig) {
  *
  */
 #warning FIXME
-static char *_get_expanded_command(xitk_skin_config_t *skonfig, char *cmd) {
+static char *_expanded(xitk_skin_config_t *skonfig, char *cmd) {
   char *p;
   char *ret = NULL;
   char  buf[BUFSIZ], buf2[BUFSIZ], var[BUFSIZ];
@@ -620,11 +620,11 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 
 	  if(!strncasecmp(section, "unload_command", 14)) {
-	    skonfig->unload_command = _get_expanded_command(skonfig, p);
+	    skonfig->unload_command = _expanded(skonfig, p);
 	    return;
 	  }
 	  else if(!strncasecmp(section, "load_command", 12)) {
-	    skonfig->load_command = _get_expanded_command(skonfig, p);
+	    skonfig->load_command = _expanded(skonfig, p);
 	    return;
 	  }
 	  else if(!strncasecmp(section, "animation", 9)) {
@@ -648,7 +648,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	    return;
 	  }
 	  else if(!strncasecmp(section, "logo", 4)) {
-	    skonfig->logo = strdup(p);
+	    skonfig->logo = _expanded(skonfig, p);
 	    return;
 	  }
 	  else if(!strncasecmp(section, "url", 3)) {

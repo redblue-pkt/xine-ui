@@ -28,7 +28,7 @@ void control_config_register(void);
 
 void control_deinit(void);
 void control_panel(void);
-void control_change_skins(void);
+void control_change_skins(int);
 void control_exit(xitk_widget_t *, void *);
 int control_is_visible(void);
 int control_is_running(void);

@@ -89,7 +89,7 @@ unsigned long panel_get_tips_timeout(void);
 void panel_deinit(void);
 void panel_init (void);
 
-void panel_change_skins(void);
+void panel_change_skins(int);
 
 void panel_add_autoplay_buttons(void);
 

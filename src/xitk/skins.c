@@ -324,7 +324,7 @@ static int change_skin(skins_locations_t *sk) {
 
   { /* Now, change skins for each window */
     typedef struct {
-      void (*change_skins)(void);
+      void (*change_skins)(int);
     } visible_state_t;
     int   i;
     visible_state_t visible_state[] = {
@@ -338,7 +338,7 @@ static int change_skin(skins_locations_t *sk) {
     
     for(i = 0; visible_state[i].change_skins != NULL; i++) {
       if(visible_state[i].change_skins) {
-	visible_state[i].change_skins();
+	visible_state[i].change_skins(1);
       }
     }
   }

@@ -1621,7 +1621,7 @@ void gui_run(char **session_opts) {
   _startup_t  startup;
   int         i, auto_start = 0;
   
-  video_window_change_skins();
+  video_window_change_skins(0);
   panel_add_autoplay_buttons();
   panel_show_tips();
   panel_add_mixer_control();

@@ -429,7 +429,7 @@ static void control_handle_event(XEvent *event, void *data) {
 /*
  * Change the current skin.
  */
-void control_change_skins(void) {
+void control_change_skins(int synthetic) {
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
 
