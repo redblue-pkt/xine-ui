@@ -392,7 +392,12 @@ static void create_labelofinputtext(xitk_widget_t *w,
     
     width = (label && strlen(label)) ? 
       xitk_font_get_text_width(fs, plabel, (private_data->cursor_pos - private_data->disp_offset)) : 0;
-  
+
+#ifdef WITH_XFT
+    if(width)
+      width += 2;
+#endif
+    
     XLOCK(private_data->imlibdata->x.disp);
     XDrawLine(private_data->imlibdata->x.disp, pix, gc,
 	      width + 1, 2, width + 3, 2);
