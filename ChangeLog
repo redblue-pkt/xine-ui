@@ -1,6 +1,6 @@
 xine-ui (0.9.15) unstable; urgency=low
 
-  * hownload asx playlist. In fact it can download anything, since we
+  * download asx playlist. In fact it can download anything, since we
     use libcurl now. It's experimental and not documented yet (use dload:/
     as an mrl prefix, ftp:// are also handled)
   * handle playlist file/mrl in playlist (cryptic words here)
