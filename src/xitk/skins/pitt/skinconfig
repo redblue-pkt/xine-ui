@@ -95,6 +95,7 @@ MrlMoveDn:	143	202	pl_btn.png	Black	Black	Black	*-lucida-*-r-*-*-12-*-*-*-*-*-*-
 MrlSlidBG:	326	36	pl_slidv.png
 MrlSlidFG:	0	0	pl_slidpad.png
 MrlSelect:	30	234	pl_btn.png	Black	Black	Black	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+MrlPlay:	120	234	mrl_play.png
 MrlDismiss:	355	234	pl_btn.png	Black	Black	Black	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 MrlUp:		324	21	arrowup.png
 MrlDn:		324	160	arrowdn.png
