@@ -11,7 +11,7 @@ VERSION = @VERSION@
 
 # These two variables depend on the location of this directory.
 subdir = po
-top_builddir = @top_srcdir@
+top_builddir = ../../../..
 
 SHELL = /bin/sh
 @SET_MAKE@
