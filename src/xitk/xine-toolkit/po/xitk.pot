@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2003-03-09 00:48+0100\n"
+"POT-Creation-Date: 2003-03-24 21:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,55 +27,55 @@ msgstr ""
 msgid "Close MRL browser window"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:113
+#: src/xitk/xine-toolkit/test.c:112
 msgid "XInitThreads() failed.\n"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:123
+#: src/xitk/xine-toolkit/test.c:119
 msgid "Cannot open display\n"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:137
+#: src/xitk/xine-toolkit/test.c:133
 msgid "Imlib_init_with_params() failed.\n"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:359
+#: src/xitk/xine-toolkit/test.c:355
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:453
+#: src/xitk/xine-toolkit/test.c:449
 msgid "My Frame"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:492
+#: src/xitk/xine-toolkit/test.c:488
 msgid "A Label"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:550
+#: src/xitk/xine-toolkit/test.c:546
 msgid "Fire !!"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:581
+#: src/xitk/xine-toolkit/test.c:577
 msgid "!BOOM!"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:670
+#: src/xitk/xine-toolkit/test.c:666
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
 "%s [%d]."
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:852
+#: src/xitk/xine-toolkit/test.c:848
 msgid "init_test() failed\n"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:868
+#: src/xitk/xine-toolkit/test.c:864
 msgid "My Fucking Window"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:885
+#: src/xitk/xine-toolkit/test.c:881
 msgid "Quit"
 msgstr ""
 
