@@ -1161,6 +1161,7 @@ int main(int argc, char *argv[]) {
     else {
       /* xine isn't running, create instance */
       if(session_mrl) {
+	_argv = (char **) realloc(_argv, sizeof(char **) * ((_argc) + 2));
 	_argv[_argc] = session_mrl;
 	_argc++;
       }
