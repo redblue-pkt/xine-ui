@@ -681,6 +681,9 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   XITK_FREE(skonfig->load_command);
   XITK_FREE(skonfig->unload_command);
   XITK_FREE(skonfig->skinfile);
+
+  pthread_mutex_destroy(&skonfig->mutex);
+
   XITK_FREE(skonfig);
 }
 
