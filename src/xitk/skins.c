@@ -879,7 +879,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 
 	  memset(&buffer, 0, sizeof(buffer));
 	  
-	  sprintf(buffer, "`which tar`||tar -C %s -xzf %s", skindir, tmpskin);
+	  sprintf(buffer, "which tar > /dev/null 2>&1 && tar -C %s -xzf %s", skindir, tmpskin);
 	  xine_system(0, buffer);
 	  unlink(tmpskin);
 	  
