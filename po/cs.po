@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.9\n"
-"POT-Creation-Date: 2002-06-23 11:11+0200\n"
+"POT-Creation-Date: 2002-06-24 22:04+0200\n"
 "PO-Revision-Date: 2002-05-18 09:20+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -592,49 +592,33 @@ msgstr ""
 msgid "No audio plugin available to decode '%s'."
 msgstr ""
 
-#: src/xitk/main.c:624
-msgid "never"
-msgstr ""
-
-#: src/xitk/main.c:625
-msgid "video only"
-msgstr ""
-
-#: src/xitk/main.c:626
-msgid "audio only"
-msgstr ""
-
-#: src/xitk/main.c:627
-msgid "always"
-msgstr ""
-
-#: src/xitk/main.c:638
+#: src/xitk/main.c:633
 msgid "Display popup window on unhandled codecs"
 msgstr ""
 
-#: src/xitk/main.c:671
+#: src/xitk/main.c:666
 #, fuzzy, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
 msgstr "Vy¾adována knihovna xine verze 0.9.9, nalezena %d.%d.%d.\n"
 
-#: src/xitk/main.c:680
+#: src/xitk/main.c:675
 msgid "sigprocmask() failed.\n"
 msgstr ""
 
-#: src/xitk/main.c:742
+#: src/xitk/main.c:737
 msgid "video driver id required for -V option\n"
 msgstr "u volby -V po¾adováno ID videoovladaèe\n"
 
-#: src/xitk/main.c:752
+#: src/xitk/main.c:747
 msgid "audio driver id required for -A option\n"
 msgstr "u volby -A po¾adováno ID zvukového ovladaèe\n"
 
-#: src/xitk/main.c:863
+#: src/xitk/main.c:858
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "©patnì zadaná velikost a umístìní '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:887
+#: src/xitk/main.c:882
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "neplatný argument %d ==> konec\n"

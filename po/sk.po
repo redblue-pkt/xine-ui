@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.11\n"
-"POT-Creation-Date: 2002-06-23 11:11+0200\n"
+"POT-Creation-Date: 2002-06-24 22:04+0200\n"
 "PO-Revision-Date: 2002-01-17 00:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -603,49 +603,33 @@ msgstr "®iaden video plugin nie je dostupný na dekódovanie '%s'."
 msgid "No audio plugin available to decode '%s'."
 msgstr "®iaden audio plugin nie je dostupný na dekódovanie '%s'."
 
-#: src/xitk/main.c:624
-msgid "never"
-msgstr "nikdy"
-
-#: src/xitk/main.c:625
-msgid "video only"
-msgstr "iba video"
-
-#: src/xitk/main.c:626
-msgid "audio only"
-msgstr "iba audio"
-
-#: src/xitk/main.c:627
-msgid "always"
-msgstr "v¾dy"
-
-#: src/xitk/main.c:638
+#: src/xitk/main.c:633
 msgid "Display popup window on unhandled codecs"
 msgstr "Zobrazi» popup okno na nepodporované kódeky"
 
-#: src/xitk/main.c:671
+#: src/xitk/main.c:666
 #, fuzzy, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
 msgstr "Potrebujem xine kni¾nicu verzie 0.9.11, nájdená %d.%d.%d.\n"
 
-#: src/xitk/main.c:680
+#: src/xitk/main.c:675
 msgid "sigprocmask() failed.\n"
 msgstr "sigprocmask() zlyhal.\n"
 
-#: src/xitk/main.c:742
+#: src/xitk/main.c:737
 msgid "video driver id required for -V option\n"
 msgstr "id video ovládaèa je nutný pre -V voµbu\n"
 
-#: src/xitk/main.c:752
+#: src/xitk/main.c:747
 msgid "audio driver id required for -A option\n"
 msgstr "id audio ovládaèa je nutný pre -A voµbu\n"
 
-#: src/xitk/main.c:863
+#: src/xitk/main.c:858
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Zlá geometria '%s', pozrite xine --help\n"
 
-#: src/xitk/main.c:887
+#: src/xitk/main.c:882
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Argument %d je neplatný => koniec\n"
@@ -1025,6 +1009,18 @@ msgstr "Xine prehliadaè logov"
 #: src/xitk/viewlog.c:474
 msgid "Refresh"
 msgstr "Obnovi»"
+
+#~ msgid "never"
+#~ msgstr "nikdy"
+
+#~ msgid "video only"
+#~ msgstr "iba video"
+
+#~ msgid "audio only"
+#~ msgstr "iba audio"
+
+#~ msgid "always"
+#~ msgstr "v¾dy"
 
 #~ msgid ""
 #~ "- xine engine error -\n"

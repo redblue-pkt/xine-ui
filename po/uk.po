@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
-"POT-Creation-Date: 2002-06-23 11:11+0200\n"
+"POT-Creation-Date: 2002-06-24 22:04+0200\n"
 "PO-Revision-Date: 2002-02-24 17:35GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -662,54 +662,38 @@ msgstr ""
 msgid "No audio plugin available to decode '%s'."
 msgstr ""
 
-#: src/xitk/main.c:624
-msgid "never"
-msgstr ""
-
-#: src/xitk/main.c:625
-msgid "video only"
-msgstr ""
-
-#: src/xitk/main.c:626
-msgid "audio only"
-msgstr ""
-
-#: src/xitk/main.c:627
-msgid "always"
-msgstr ""
-
-#: src/xitk/main.c:638
+#: src/xitk/main.c:633
 msgid "Display popup window on unhandled codecs"
 msgstr ""
 
 # src/xitk/main.c:461
-#: src/xitk/main.c:671
+#: src/xitk/main.c:666
 #, fuzzy, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
 msgstr "Потр╕бна б╕бл╕отека xine верс╕╖ 0.9.9, знайдена %d.%d.%d.\n"
 
-#: src/xitk/main.c:680
+#: src/xitk/main.c:675
 #, fuzzy
 msgid "sigprocmask() failed.\n"
 msgstr "XInitThreads()  виявлено зб╕й.\n"
 
 # src/xitk/main.c:531
-#: src/xitk/main.c:742
+#: src/xitk/main.c:737
 msgid "video driver id required for -V option\n"
 msgstr "ID в╕део драйвера потр╕бен для -V опц╕╖\n"
 
 # src/xitk/main.c:541
-#: src/xitk/main.c:752
+#: src/xitk/main.c:747
 msgid "audio driver id required for -A option\n"
 msgstr "ID ауд╕о драйвера потр╕бен для -A опц╕╖\n"
 
-#: src/xitk/main.c:863
+#: src/xitk/main.c:858
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr ""
 
 # src/xitk/main.c:641
-#: src/xitk/main.c:887
+#: src/xitk/main.c:882
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "неправильний параметр %d => вих╕д\n"

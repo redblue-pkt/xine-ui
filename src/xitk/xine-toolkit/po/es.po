@@ -107,4 +107,3 @@ msgstr "Error"
 #: src/xitk/xine-toolkit/xitk.h:1880 src/xitk/xine-toolkit/xitk.h:1896
 msgid "Information"
 msgstr "Información"
-

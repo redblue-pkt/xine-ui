@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-06-23 11:11+0200\n"
+"POT-Creation-Date: 2002-06-24 22:04+0200\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: Frensh <fr@li.org>\n"
@@ -265,7 +265,7 @@ msgid ""
 "\"%s\".\n"
 msgstr ""
 "Cette séquence de touches est redondante avec l'action :\n"
-"\"%\".\n"
+"\"%s\".\n"
 
 #: src/xitk/kbindings.c:1774
 msgid "key binding editor"
@@ -606,49 +606,33 @@ msgstr "Aucun plugin vidéo disponible pour decoder '%s'."
 msgid "No audio plugin available to decode '%s'."
 msgstr "Aucun plugin audio disponible pour decoder '%s'."
 
-#: src/xitk/main.c:624
-msgid "never"
-msgstr "jamais"
-
-#: src/xitk/main.c:625
-msgid "video only"
-msgstr "vidéo seulement"
-
-#: src/xitk/main.c:626
-msgid "audio only"
-msgstr "audio seulement"
-
-#: src/xitk/main.c:627
-msgid "always"
-msgstr "toujours"
-
-#: src/xitk/main.c:638
+#: src/xitk/main.c:633
 msgid "Display popup window on unhandled codecs"
 msgstr "Affiche une fenêtre pour les codecs non supportés"
 
-#: src/xitk/main.c:671
+#: src/xitk/main.c:666
 #, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
 msgstr "Requière la bibliothèque xine version 0.9.10, a trouvé %d%d.%d.\n"
 
-#: src/xitk/main.c:680
+#: src/xitk/main.c:675
 msgid "sigprocmask() failed.\n"
 msgstr "sigprocmask() a échoué.\n"
 
-#: src/xitk/main.c:742
+#: src/xitk/main.c:737
 msgid "video driver id required for -V option\n"
 msgstr "Nom du pilote video requis pour l'option -V\n"
 
-#: src/xitk/main.c:752
+#: src/xitk/main.c:747
 msgid "audio driver id required for -A option\n"
 msgstr "Nom du pilote audio requis pour l'option -A\n"
 
-#: src/xitk/main.c:863
+#: src/xitk/main.c:858
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Mauvaise géométrie '%s', voir xine --help\n"
 
-#: src/xitk/main.c:887
+#: src/xitk/main.c:882
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Argument %d non valide => quitte\n"
@@ -1006,7 +990,7 @@ msgstr "Extension XF86VidMode (%d.%d) detecté, tente de l'utiliser.\n"
 #: src/xitk/videowin.c:1115
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr "Extension XF86VidMode: %s modeline(s) trouvé(s).\n"
+msgstr "Extension XF86VidMode: %d modeline(s) trouvé(s).\n"
 
 #: src/xitk/videowin.c:1133
 msgid ""
@@ -1035,6 +1019,18 @@ msgstr "Visualiseur des logs de xine"
 #: src/xitk/viewlog.c:474
 msgid "Refresh"
 msgstr "Rafraîchir"
+
+#~ msgid "never"
+#~ msgstr "jamais"
+
+#~ msgid "video only"
+#~ msgstr "vidéo seulement"
+
+#~ msgid "audio only"
+#~ msgstr "audio seulement"
+
+#~ msgid "always"
+#~ msgstr "toujours"
 
 #~ msgid "DPMSGetTimeouts() failed\n"
 #~ msgstr "DPMSGetTimeouts() a échoué\n"

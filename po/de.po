@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.12\n"
-"POT-Creation-Date: 2002-06-23 11:11+0200\n"
+"POT-Creation-Date: 2002-06-24 22:04+0200\n"
 "PO-Revision-Date: 2002-06-22 11:13+0200\n"
 "Last-Translator: Siggi Langauf <siggi@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -599,49 +599,33 @@ msgstr "Keines der Video-Plugin kann '%s' dekodieren."
 msgid "No audio plugin available to decode '%s'."
 msgstr "Keines der Audio-Plugins kann '%s' dekodieren."
 
-#: src/xitk/main.c:624
-msgid "never"
-msgstr "Niemals"
-
-#: src/xitk/main.c:625
-msgid "video only"
-msgstr "Nur Video"
-
-#: src/xitk/main.c:626
-msgid "audio only"
-msgstr "Nur Audio"
-
-#: src/xitk/main.c:627
-msgid "always"
-msgstr "Immer"
-
-#: src/xitk/main.c:638
+#: src/xitk/main.c:633
 msgid "Display popup window on unhandled codecs"
 msgstr "Zeige Nachrichtenfenster bei nichtunterstützten Codecs"
 
-#: src/xitk/main.c:671
+#: src/xitk/main.c:666
 #, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
 msgstr "Benötigte xine Bibliothek Version 0.9.10, gefunden: %d.%d.%d.\n"
 
-#: src/xitk/main.c:680
+#: src/xitk/main.c:675
 msgid "sigprocmask() failed.\n"
 msgstr "sigprocmask() fehlgeschlagen.\n"
 
-#: src/xitk/main.c:742
+#: src/xitk/main.c:737
 msgid "video driver id required for -V option\n"
 msgstr "Video Treiber id wird für die Option -V benötigt\n"
 
-#: src/xitk/main.c:752
+#: src/xitk/main.c:747
 msgid "audio driver id required for -A option\n"
 msgstr "Audio Treiber id wird für die Option -A benötigt\n"
 
-#: src/xitk/main.c:863
+#: src/xitk/main.c:858
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Fehlerhafte Geometrie '%s', siehe xine --help\n"
 
-#: src/xitk/main.c:887
+#: src/xitk/main.c:882
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Ungültiger Parameter %d => exit\n"
@@ -1029,3 +1013,14 @@ msgstr "xine Log Betrachter"
 msgid "Refresh"
 msgstr "Aktualisieren"
 
+#~ msgid "never"
+#~ msgstr "Niemals"
+
+#~ msgid "video only"
+#~ msgstr "Nur Video"
+
+#~ msgid "audio only"
+#~ msgstr "Nur Audio"
+
+#~ msgid "always"
+#~ msgstr "Immer"
