@@ -78,27 +78,18 @@ void post_init(void) {
 							  XINE_POST_TYPE_AUDIO_VISUALIZATION);
     
     if(pol) {
-      int  i = 0;
       int  num_plug = 0;
       
-      /* We're only interested by post plugin which handle audio in input */
-      while(pol[i]) {
-	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
-
-	if(post) {
-	  if(num_plug == 0)
-	    post_audio_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
-	  else
-	    post_audio_plugins = (char **) realloc(post_audio_plugins, 
+      while(pol[num_plug]) {
+	if(num_plug == 0)
+	  post_audio_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+	else
+	  post_audio_plugins = (char **) realloc(post_audio_plugins, 
 						   sizeof(char *) * (num_plug + 2));
-	  
-	  post_audio_plugins[num_plug]     = strdup(pol[i]);
-	  post_audio_plugins[num_plug + 1] = NULL;
-	  num_plug++;
-	  
-	  xine_post_dispose(gGui->xine, post);
-	}
-	i++;
+	
+	post_audio_plugins[num_plug]     = strdup(pol[num_plug]);
+	post_audio_plugins[num_plug + 1] = NULL;
+	num_plug++;
       }
       
       if(num_plug) {
@@ -127,29 +118,20 @@ void post_init(void) {
     const char *const *pol = xine_list_post_plugins_typed(gGui->xine, XINE_POST_TYPE_VIDEO_FILTER);
     
     if(pol) {
-      int  i = 0;
       int  num_plug = 0;
       
-      /* We're only interested by post plugin which handle video in input */
       post_video_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
       post_video_plugins[num_plug]     = strdup(_("None"));
       post_video_plugins[num_plug + 1] = NULL;
       num_plug++;
       
-      while(pol[i]) {
-	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
+      while(pol[num_plug - 1]) {
+	post_video_plugins = (char **) realloc(post_video_plugins, 
+					       sizeof(char *) * (num_plug + 2));
 	
-	if(post) {
-	  post_video_plugins = (char **) realloc(post_video_plugins, 
-						 sizeof(char *) * (num_plug + 2));
-	  
-	  post_video_plugins[num_plug]     = strdup(pol[i]);
-	  post_video_plugins[num_plug + 1] = NULL;
-	  num_plug++;
-	  
-	  xine_post_dispose(gGui->xine, post);
-	}
-	i++;
+	post_video_plugins[num_plug]     = strdup(pol[num_plug - 1]);
+	post_video_plugins[num_plug + 1] = NULL;
+	num_plug++;
       }
       
       if(num_plug) {
@@ -163,10 +145,11 @@ void post_init(void) {
 				    post_video_plugin_cb,
 				    CONFIG_NO_DATA);
 	
-	gGui->post_video = 
-	  xine_post_init(gGui->xine,
-			 post_video_plugins[(gGui->post_video_num == 0) ? 1 : gGui->post_video_num],
-			 0, &gGui->ao_port, &gGui->vo_port);
+	if (gGui->post_video_num)
+	  gGui->post_video = 
+	    xine_post_init(gGui->xine,
+			   post_video_plugins[gGui->post_video_num],
+			   0, &gGui->ao_port, &gGui->vo_port);
       }
     }
   }
