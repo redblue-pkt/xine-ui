@@ -1313,6 +1313,8 @@ void gui_run (void) {
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) {
       mediamark_load_mediamarks(gGui->playlist.on_start);
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      if((!is_playback_widgets_enabled()) && gGui->playlist.num)
+	enable_playback_controls(1);
     }
     
     /*  The user request "play on start" */
