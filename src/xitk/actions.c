@@ -95,11 +95,15 @@ void gui_display_logo(void) {
   if(gGui->visual_anim.running)
     visual_anim_stop();
 
-  (void) gui_xine_open_and_play((char *)gGui->logo_mrl, NULL, 0, 0, 0);
+  if(gGui->display_logo)
+    (void) gui_xine_open_and_play((char *)gGui->logo_mrl, NULL, 0, 0, 0);
+
   gGui->logo_mode = 1;
+  
   panel_reset_slider();
   if(stream_infos_is_visible())
     stream_infos_update_infos();
+  
 }
 
 static int _gui_xine_play(xine_stream_t *stream, 

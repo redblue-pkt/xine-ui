@@ -94,6 +94,7 @@ typedef struct {
 #define OPTION_ENQUEUE          2000
 #define OPTION_VERBOSE          3000
 #define OPTION_BROADCAST_PORT   4000
+#define OPTION_NO_LOGO          5000
 
 /* options args */
 static const char *short_options = "?hHgfvn"
@@ -146,7 +147,8 @@ static struct option long_options[] = {
 #ifdef XINE_PARAM_BROADCASTER_PORT
   {"broadcast-port" , required_argument, 0, OPTION_BROADCAST_PORT    },
 #endif
-  {0                , no_argument      , 0,  0                       }
+  {"no-logo"        , no_argument      , 0, OPTION_NO_LOGO           },
+  {0                , no_argument      , 0, 0                        }
 };
 
 #undef TRACE_RC
@@ -526,6 +528,7 @@ void show_usage (void) {
   printf(_("      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"));
   printf(_("                               Slave is started with 'xine slave://address:port'\n"));
 #endif
+  printf(_("      --no-logo                Don't display the logo.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1146,6 +1149,7 @@ int main(int argc, char *argv[]) {
   gGui->skin_server_url        = NULL;
   gGui->verbosity              = 0;
   gGui->broadcast_port         = 0;
+  gGui->display_logo           = 1;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1407,6 +1411,10 @@ int main(int argc, char *argv[]) {
       break;
 #endif
       
+    case OPTION_NO_LOGO:
+      gGui->display_logo = 0;
+      break;
+
     case 'S':
       session_handle_subopt(optarg, &session);
       break;

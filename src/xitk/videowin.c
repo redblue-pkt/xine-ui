@@ -1735,16 +1735,18 @@ void video_window_update_logo(void) {
 	  xine_stop(gGui->stream);
 	  gGui->ignore_next = 0; 
 	}
-	if((!xine_open(gGui->stream, gGui->logo_mrl)) 
-	   || (!xine_play(gGui->stream, 0, 0))) {
-	  gui_handle_xine_error(gGui->stream, (char *)gGui->logo_mrl);
-	  goto __done;
+	if(gGui->display_logo) {
+	  if((!xine_open(gGui->stream, gGui->logo_mrl)) 
+	     || (!xine_play(gGui->stream, 0, 0))) {
+	    gui_handle_xine_error(gGui->stream, (char *)gGui->logo_mrl);
+	    goto __done;
+	  }
 	}
 	gGui->logo_mode = 1;
       }
     }
   }
-
+  
  __done:
   gGui->logo_has_changed--;
 }

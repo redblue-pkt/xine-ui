@@ -188,6 +188,7 @@ typedef struct {
   const char               *logo_mrl;
   int                       logo_mode;
   int                       logo_has_changed;
+  int                       display_logo;
 
   /* stuff like ACTID_x */
   action_id_t               actions_on_start[16];
