@@ -407,6 +407,25 @@ static kbinding_entry_t default_binding_table[] = {
     "FileSelector",           ACTID_FILESELECTOR            , "o",        KEYMOD_CONTROL , 0 },
   { "Select a subtitle file",
     "SubSelector",            ACTID_SUBSELECT               , "S",        KEYMOD_CONTROL,  0 },
+
+  /* Those are just for LIRC control */
+  { "Increase +10 Hue value (LIRC)",
+    "HueControl+",            ACTID_HUECONTROLp             , "VOID",     KEYMOD_NOMOD,    0 },
+  { "Decrease -10 Hue value (LIRC)",
+    "HueControl-",            ACTID_HUECONTROLm             , "VOID",     KEYMOD_NOMOD,    0 },
+  { "Increase +10 Saturation value (LIRC)",
+    "SaturationControl+",      ACTID_SATURATIONCONTROLp     , "VOID",     KEYMOD_NOMOD,    0 },
+  { "Decrease -10 Saturation value (LIRC)",
+    "SaturationControl-",      ACTID_SATURATIONCONTROLm     , "VOID",     KEYMOD_NOMOD,    0 },
+  { "Increase +10 Brightness value (LIRC)",
+    "BrightnessControl+",      ACTID_BRIGHTNESSCONTROLp     , "VOID",     KEYMOD_NOMOD,    0 },
+  { "Decrease -10 Brightness value (LIRC)",
+    "BrightnessControl-",      ACTID_BRIGHTNESSCONTROLm     , "VOID",     KEYMOD_NOMOD,    0 },
+  { "Increase +10 Contrast value (LIRC)",
+    "ContrastControl+",        ACTID_CONTRASTCONTROLp       , "VOID",     KEYMOD_NOMOD,    0 },
+  { "Decrease -10 Contrast value (LIRC)",
+    "ContrastControl-",        ACTID_CONTRASTCONTROLm       , "VOID",     KEYMOD_NOMOD,    0 },
+
   { 0,
     0,                        0,                            0,            0              , 0 }
 };
@@ -432,7 +451,8 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
     for(j = 0; kbt->entry[j]->action != NULL; j++) {
       if(i != j && j != found) {
 	if((!strcmp(kbt->entry[i]->key, kbt->entry[j]->key)) &&
-	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier)) {
+	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier) && 
+	   (strcasecmp(kbt->entry[i]->key, "void"))) {
 	  char  buffer[4096];
 	  
 	  found = i;
@@ -944,14 +964,11 @@ static kbinding_t *_kbindings_init_to_default(void) {
  */
 kbinding_t *kbindings_init_kbinding(void) {
   kbinding_t *kbt = NULL;
-  char        buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
   kbt = _kbindings_init_to_default();
-
-  /* read and parse user file */
-  snprintf(buf, sizeof(buf), "%s/.xine/keymap", xine_get_homedir());
-  _kbinding_load_config(kbt, buf);
-
+  
+  _kbinding_load_config(kbt, gGui->keymap_file);
+  
   /* Just to check is there redundant entries, and inform user */
   _kbindings_check_redundancy(kbt);
 
@@ -963,10 +980,8 @@ kbinding_t *kbindings_init_kbinding(void) {
  */
 void kbindings_save_kbinding(kbinding_t *kbt) {
   FILE   *f;
-  char    buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
-  sprintf(buf, "%s/.xine/%s", xine_get_homedir(), "keymap");
-  if((f = fopen(buf, "w")) == NULL) {
+  if((f = fopen(gGui->keymap_file, "w+")) == NULL) {
     return;
   }
   else {
@@ -1355,7 +1370,7 @@ static void kbedit_create_browser_entries(void) {
 
     sprintf(shortcut, "%s%s ]", shortcut, kbedit->kbt->entry[i]->key);
 
-    /* Right align shotcuts */
+    /* Right align shortcuts */
     j = 78 - (strlen(buf) + strlen(shortcut));
     while((j--))
       sprintf(buf, "%s%c", buf, ' ');
@@ -1436,7 +1451,8 @@ static int bkedit_check_redundancy(kbinding_t *kbt, kbinding_entry_t *kbe) {
     
     for(i = 0; kbt->entry[i]->action != NULL; i++) {
       if((!strcmp(kbt->entry[i]->key, kbe->key)) &&
-	 (kbt->entry[i]->modifier == kbe->modifier)) {
+	 (kbt->entry[i]->modifier == kbe->modifier) &&
+	 (strcasecmp(kbt->entry[i]->key, "void"))) {
 	return i;
       }
     }

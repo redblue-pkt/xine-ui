@@ -274,6 +274,7 @@ typedef struct {
   int                       auto_vo_visibility;
   int                       auto_panel_visibility;
 
+  char                      *keymap_file;
   kbinding_t                *kbindings;
 
   struct {

@@ -113,17 +113,19 @@ static void set_current_param(int param, int value) {
  */
 static void update_sliders_video_settings(void) {
 
-  if(xitk_is_widget_enabled(control->hue)) {
-    xitk_slider_set_pos(control->hue, get_current_param(XINE_PARAM_VO_HUE));
-  }
-  if(xitk_is_widget_enabled(control->sat)) {
-    xitk_slider_set_pos(control->sat, get_current_param(XINE_PARAM_VO_SATURATION));
-  }
-  if(xitk_is_widget_enabled(control->bright)) {
-    xitk_slider_set_pos(control->bright, get_current_param(XINE_PARAM_VO_BRIGHTNESS));
-  }
-  if(xitk_is_widget_enabled(control->contr)) {
-    xitk_slider_set_pos(control->contr, get_current_param(XINE_PARAM_VO_CONTRAST));
+  if(control) {
+    if(xitk_is_widget_enabled(control->hue)) {
+      xitk_slider_set_pos(control->hue, get_current_param(XINE_PARAM_VO_HUE));
+    }
+    if(xitk_is_widget_enabled(control->sat)) {
+      xitk_slider_set_pos(control->sat, get_current_param(XINE_PARAM_VO_SATURATION));
+    }
+    if(xitk_is_widget_enabled(control->bright)) {
+      xitk_slider_set_pos(control->bright, get_current_param(XINE_PARAM_VO_BRIGHTNESS));
+    }
+    if(xitk_is_widget_enabled(control->contr)) {
+      xitk_slider_set_pos(control->contr, get_current_param(XINE_PARAM_VO_CONTRAST));
+    }
   }
 }
 
@@ -187,6 +189,26 @@ static void set_contrast(xitk_widget_t *w, void *data, int value) {
     config_update_num("gui.vo_contrast", contrast);
 }
 
+void control_set_image_prop(int prop, int value) {
+  switch(prop) {
+  case XINE_PARAM_VO_HUE:
+    set_current_param(XINE_PARAM_VO_HUE, value);
+    break;
+  case XINE_PARAM_VO_SATURATION:
+    set_current_param(XINE_PARAM_VO_SATURATION, value);
+    break;
+  case XINE_PARAM_VO_BRIGHTNESS:
+    set_current_param(XINE_PARAM_VO_BRIGHTNESS, value);
+    break;
+  case XINE_PARAM_VO_CONTRAST:
+    set_current_param(XINE_PARAM_VO_CONTRAST, value);
+    break;
+  default:
+    return;
+    break;
+  }
+  update_sliders_video_settings();
+}
 
 static int test_vo_property(int property) {
   int cur;

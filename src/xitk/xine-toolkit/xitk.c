@@ -1823,6 +1823,11 @@ void xitk_subst_special_chars(char *src, char *dest) {
       }
       break;
       
+    case '~':
+      strcat(d, xitk_get_homedir());
+      d += (strlen(xitk_get_homedir()) - 1);
+      break;
+      
     default:
       *d = *s;
       break;

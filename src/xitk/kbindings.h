@@ -126,6 +126,15 @@ typedef enum {
   ACTID_SV_SYNC_p,
   ACTID_SV_SYNC_m,
 
+  ACTID_HUECONTROLp,
+  ACTID_HUECONTROLm,
+  ACTID_SATURATIONCONTROLp,
+  ACTID_SATURATIONCONTROLm,
+  ACTID_BRIGHTNESSCONTROLp,
+  ACTID_BRIGHTNESSCONTROLm,
+  ACTID_CONTRASTCONTROLp,
+  ACTID_CONTRASTCONTROLm,
+  
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 
    */

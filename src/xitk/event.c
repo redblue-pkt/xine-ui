@@ -729,6 +729,58 @@ void gui_execute_action_id(action_id_t action) {
     gui_file_selector();
     break;
 
+  case ACTID_HUECONTROLp:
+    if(gGui->video_settings.hue <= (65535 - 10)) {
+      config_update_num("gui.vo_hue", gGui->video_settings.hue + 10);
+      control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
+    }
+    break;
+  case ACTID_HUECONTROLm:
+    if(gGui->video_settings.hue >= 10) {
+      config_update_num("gui.vo_hue", gGui->video_settings.hue - 10);
+      control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
+    }
+    break;
+
+  case ACTID_SATURATIONCONTROLp:
+    if(gGui->video_settings.saturation <= (65535 - 10)) {
+      config_update_num("gui.vo_saturation", gGui->video_settings.saturation + 10);
+      control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
+    }
+    break;
+  case ACTID_SATURATIONCONTROLm:
+    if(gGui->video_settings.saturation >= 10) {
+      config_update_num("gui.vo_saturation", gGui->video_settings.saturation - 10);
+      control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
+    }
+    break;
+
+  case ACTID_BRIGHTNESSCONTROLp:
+    if(gGui->video_settings.brightness <= (65535 - 10)) {
+      config_update_num("gui.vo_brightness", gGui->video_settings.brightness + 10);
+      control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
+    }
+    break;
+  case ACTID_BRIGHTNESSCONTROLm:
+    if(gGui->video_settings.brightness >= 10) {
+      config_update_num("gui.vo_brightness", gGui->video_settings.brightness - 10);
+      control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
+    }
+    break;
+
+  case ACTID_CONTRASTCONTROLp:
+    if(gGui->video_settings.contrast <= (65535 - 10)) {
+      config_update_num("gui.vo_contrast", gGui->video_settings.contrast + 10);
+      control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
+    }
+    break;
+  case ACTID_CONTRASTCONTROLm:
+    if(gGui->video_settings.contrast >= 10) {
+      config_update_num("gui.vo_contrast", gGui->video_settings.contrast - 10);
+      control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
+    }
+    break;
+
   default:
     break;
   }

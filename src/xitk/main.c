@@ -78,6 +78,7 @@ static char                 **audio_driver_ids;
 static window_attributes_t    window_attribute;
 
 #define CONFIGFILE "config"
+#define CONFIGDIR  ".xine"
 
 typedef struct {
   FILE    *fd;
@@ -211,7 +212,8 @@ static int _rc_file_get_next_line(file_info_t *rcfile) {
  */
 static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   int            i;
-  char          *xinerc = ".xine/xinerc";
+  char          *cfgdir = CONFIGDIR;
+  char          *xinerc = "xinerc";
   file_info_t   *rcfile;
   char        **_argv = NULL;
   
@@ -221,8 +223,9 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
     _argv[i] = strdup(argv[i]);
 
   rcfile           = (file_info_t *) xine_xmalloc(sizeof(file_info_t));
-  rcfile->filename = (char *) xine_xmalloc((strlen((xine_get_homedir())) + strlen(xinerc)) + 2);
-  sprintf(rcfile->filename, "%s/%s", (xine_get_homedir()), xinerc);
+  rcfile->filename = (char *) xine_xmalloc((strlen((xine_get_homedir())) + 
+					    strlen(cfgdir) + strlen(xinerc)) + 3);
+  sprintf(rcfile->filename, "%s/%s/%s", (xine_get_homedir()), cfgdir, xinerc);
   
   if((rcfile->fd = fopen(rcfile->filename, "r")) != NULL) {
     
@@ -402,19 +405,17 @@ void show_usage (void) {
   const char   *const *driver_ids;
   const char   *driver_id;
   xine_t       *xine;
-  char         *cfgdir = ".xine";
-  char         *cfgfile = CONFIGFILE;
-  char         *configfile;
+  char         *cfgdir     = CONFIGDIR;
+  char         *cfgfile    = CONFIGFILE;
+  char         *configfile = NULL;
   
-  if(!(configfile = getenv("XINERC"))) {
-    configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
-				       + strlen(cfgdir) 
-				       + strlen(cfgfile)
-				       + 3);
-    sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
-    mkdir(configfile, 0755);
-    sprintf(configfile + strlen(configfile), "/%s", cfgfile);
-  }
+  configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+				     + strlen(cfgdir) 
+				     + strlen(cfgfile)
+				     + 3);
+  sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
+  mkdir(configfile, 0755);
+  sprintf(configfile + strlen(configfile), "/%s", cfgfile);
   
   xine = xine_new();
   xine_config_load(xine, configfile);
@@ -476,6 +477,7 @@ void show_usage (void) {
   printf(_("                                 'default': display default keymap table,\n"));
   printf(_("                                 'lirc': display draft of a .lircrc config file.\n"));
   printf(_("                                 'remapped': user remapped keymap table.\n"));
+  printf(_("                                 'file:<filename>': use <filename> as keymap.\n"));
   printf(_("                                 -if no option is given, 'default' is selected.\n"));
   printf(_("  -n, --network                Enable network remote control server.\n"));
   printf(_("  -R, --root                   Use root window as video window.\n"));
@@ -943,6 +945,8 @@ int main(int argc, char *argv[]) {
   int                     aspect_ratio    = XINE_VO_ASPECT_AUTO ;
   int                     no_auto_start   = 0;
   int                     verbosity       = 0;
+  char                   *cfgdir          = CONFIGDIR;
+  char                   *cfgfile         = CONFIGFILE;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1150,6 +1154,18 @@ int main(int argc, char *argv[]) {
 	  kbindings_display_default_lirc_bindings();
 	else if(!strcasecmp(p, "remapped"))
 	  kbindings_display_current_bindings((kbindings_init_kbinding()));
+	else if(!strncasecmp(p, "file:", 5)) {
+	  char  *keymap_file = p + 5;
+	  
+	  if((gGui->keymap_file == NULL) && keymap_file && strlen(keymap_file)) {
+	    char  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+
+	    memset(&buffer, 0, sizeof(buffer));
+	    xitk_subst_special_chars(keymap_file, &buffer[0]);
+	    gGui->keymap_file = strdup(buffer);
+	    continue;
+	  }
+	}
 	else
 	  kbindings_display_default_bindings();
       }
@@ -1246,8 +1262,11 @@ int main(int argc, char *argv[]) {
     case 'c':
       {
 	char *cfg = xine_chomp(optarg);
+	char  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 	
-	gGui->configfile = strdup(cfg);
+	memset(&buffer, 0, sizeof(buffer));
+	xitk_subst_special_chars(cfg, &buffer[0]);
+	gGui->configfile = strdup(buffer);
       }
       break;
 
@@ -1294,33 +1313,43 @@ int main(int argc, char *argv[]) {
     window_attribute.width = window_attribute.height = -1;
     window_attribute.borderless = 0;
   }
-
+  
   show_banner();
-
+  
   /*
    * Initialize config
    */
   if(gGui->configfile == NULL) {
-    char *cfgdir = ".xine";
-    char *cfgfile = CONFIGFILE;
     struct stat st;
     
-    if (!(gGui->configfile = getenv ("XINERC"))) {
-      gGui->configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
-					       + strlen(cfgdir) 
-					       + strlen(cfgfile)
-					       + 3);
-      sprintf (gGui->configfile, "%s/%s", xine_get_homedir(), cfgdir);
-      mkdir (gGui->configfile, 0755);
-      sprintf (gGui->configfile + strlen(gGui->configfile), "/%s", cfgfile);
-    }
-
+    gGui->configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+					     + strlen(cfgdir) 
+					     + strlen(cfgfile)
+					     + 3);
+    sprintf (gGui->configfile, "%s/%s", xine_get_homedir(), cfgdir);
+    mkdir (gGui->configfile, 0755);
+    sprintf (gGui->configfile + strlen(gGui->configfile), "/%s", cfgfile);
+    
     /* Popup setup window if there is no config file */
     if(stat(gGui->configfile, &st) < 0)
       gGui->actions_on_start[aos++] = ACTID_SETUP;
-
+    
   }
+  
+  /*
+   * Initialize keymap
+   */
+  if(gGui->keymap_file == NULL) {
+    char *cfgdir = CONFIGDIR;
+    char *keymap = "keymap";
 
+    gGui->keymap_file = (char *) xine_xmalloc(strlen(xine_get_homedir())
+					      + strlen(cfgdir) 
+					      + strlen(cfgfile)
+					      + strlen(keymap) + 3);
+    sprintf(gGui->keymap_file, "%s/%s/%s", xine_get_homedir(), cfgdir, keymap);
+  }
+  
   pthread_mutex_init(&gGui->xe_mutex, NULL);
   gGui->xine = xine_new();
   xine_config_load(gGui->xine, gGui->configfile);
