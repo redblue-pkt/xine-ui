@@ -327,7 +327,7 @@ static void xrm_parse(void) {
     server_rmdb = XrmGetFileDatabase(user_dbname);
   }
   
-  XrmMergeDatabases(server_rmdb, &rmdb);
+  (void) XrmMergeDatabases(server_rmdb, &rmdb);
   
   if((environment = getenv("XENVIRONMENT")) == NULL) {
     int len;
@@ -337,9 +337,9 @@ static void xrm_parse(void) {
     len = strlen(environment);
     (void) gethostname(environment + len, (XITK_PATH_MAX + XITK_NAME_MAX) - len);
   }
-
+  
   home_rmdb = XrmGetFileDatabase(environment);
-  XrmMergeDatabases(home_rmdb, &rmdb);
+  (void) XrmMergeDatabases(home_rmdb, &rmdb);
 
   if(XrmGetResource(rmdb, "xine.geometry", "Xine.Geometry", str_type, &value) == True) {
     if(!parse_geometry(&window_attribute, (char *)value.addr))
@@ -357,9 +357,12 @@ static void xrm_parse(void) {
   if(XrmGetResource(rmdb, "xine.colormap", "Xine.Colormap", str_type, &value) == True) {
     gGui->install_colormap = !get_bool_value((char *) value.addr);
   }
-
+  
+  XrmDestroyDatabase(rmdb);
+  
   if(display)
     XCloseDisplay(display);
+
 }
 
 static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
