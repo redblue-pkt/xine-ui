@@ -340,7 +340,7 @@ static void change_browser_entry(xitk_widget_t *w, void *data, char *currenttext
   if((j = xitk_browser_get_current_selected(test->browser)) >= 0) {
     free(test->entries[j]);
     test->entries[j] = strdup(currenttext);
-    xitk_browser_rebuild_browser(test->browser, j);
+    xitk_browser_rebuild_browser(test->browser, xitk_browser_get_current_start(test->browser));
   }
 }
 

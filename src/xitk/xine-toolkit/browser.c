@@ -321,11 +321,13 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
     int           item_width;
     char         *label_font;
     xitk_font_t  *fs = NULL;
+    int           old_label_offset;
     
-    private_data = (browser_private_data_t *) w->private_data;
-    item_width   = xitk_get_widget_width(private_data->item_tree[WBSTART]);
-    label_font   = xitk_labelbutton_get_fontname(private_data->item_tree[WBSTART]);
-    
+    private_data     = (browser_private_data_t *) w->private_data;
+    item_width       = xitk_get_widget_width(private_data->item_tree[WBSTART]);
+    label_font       = xitk_labelbutton_get_fontname(private_data->item_tree[WBSTART]);
+    old_label_offset = private_data->labels_offset;
+
     xitk_browser_release_all_buttons(w);
 
     j = (private_data->list_length > (private_data->max_length - 1) ? 
@@ -335,10 +337,10 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
       max = 0;
     else if(j > (private_data->max_length - 1))
       max = j - (private_data->max_length - 1);
-    
+
     if(((start >= 0) && max) || ((start == 0) && (max == 0)))
       private_data->current_start = start;
-
+    
     private_data->need_h_slider = 0;
     xitk_disable_widget(private_data->item_tree[WBLF]);
     xitk_disable_widget(private_data->item_tree[WSLIDH]);
@@ -346,7 +348,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
     xitk_disable_widget(private_data->item_tree[WBUP]);
     xitk_disable_widget(private_data->item_tree[WSLID]);
     xitk_disable_widget(private_data->item_tree[WBDN]);
-
+     
     private_data->labels_offset = 0;
 
     if(label_font) {
@@ -356,14 +358,14 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 
     if(private_data->shortcuts_content) {
       int maxlen = 0;
-      
+
       for(i = 0; i < private_data->max_length; i++) {
 	char *nshortcut;
-	
+
 	if((private_data->shortcuts_content[private_data->current_start + i]) && 
 	   (nshortcut = private_data->shortcuts_content[private_data->current_start + i])) {
 	  int nlen = strlen(nshortcut);
-	  
+
 	  if(nlen > maxlen) {
 	    maxlen = nlen;
 	    max_shortcut = nshortcut;
@@ -371,14 +373,44 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 	}
       }
     }
+
+    if(fs) {
+      int  label_width;
+      int  j = 0;
+      int  max = 0, offset = 0, len;
+      
+      while(j < private_data->list_length) {
+	if((len = strlen(private_data->content[j])) > max) {
+	  max    = len;
+	  offset = j;
+	}
+	j++;
+      }
+      
+      label_width = (private_data->content && private_data->content[offset] && strlen(private_data->content[offset])) ? xitk_font_get_string_length(fs, private_data->content[offset]) : 0;
+      
+      if(label_width > (item_width -2)) {
+	int diff_width = (label_width - (item_width - 2));
+	
+	private_data->need_h_slider = 1;
+	
+	if(private_data->labels_offset < diff_width)
+	  private_data->labels_offset = diff_width;
+	 
+      }
+      else
+	private_data->need_h_slider = 0;
+    }
     
-    for(i = 0; i < private_data->max_length; i++)
-      xitk_labelbutton_set_label_offset(private_data->item_tree[i + WBSTART], 0);
+    if(!private_data->need_h_slider) {
+      for(i = 0; i < private_data->max_length; i++)
+	xitk_labelbutton_set_label_offset(private_data->item_tree[i + WBSTART], 0);
+    }
     
     for(i = 0; i < private_data->max_length; i++) {
       if (((private_data->current_start + i) < private_data->list_length) 
 	  && (private_data->content[private_data->current_start + i] != NULL)) {
-	
+
 	xitk_labelbutton_change_label(private_data->item_tree[i + WBSTART],
 				      private_data->content[private_data->current_start + i]);
 
@@ -392,63 +424,58 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
 	    xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1, NULL);
 	}
 	
-	if(fs) {
-	  int  label_width;
-	  
-	  label_width = (private_data->content[private_data->current_start + i] && 
-			 strlen(private_data->content[private_data->current_start + i])) ? 
-	    xitk_font_get_string_length(fs, private_data->content[private_data->current_start + i]) : 0;
-	  
-	  if(label_width > (item_width - 2)) {
-	    int diff_width = (label_width - (item_width - 2));
-	    
-	    private_data->need_h_slider = 1;
-	    
-	    if(private_data->labels_offset < diff_width)
-	      private_data->labels_offset = diff_width;
-	    
-	  }
-	}
       }
       else {
 	xitk_labelbutton_change_label(private_data->item_tree[i+WBSTART], "");
 	xitk_labelbutton_change_shortcut_label(private_data->item_tree[i + WBSTART], "", -1, NULL);
       }
+
     }
-
+    
     XITK_FREE(label_font);
-
+    
     if(fs)
       xitk_font_unload_font(fs);
-
+     
     if(private_data->need_h_slider) {
-      int align = xitk_labelbutton_get_alignment(private_data->item_tree[WBSTART]);
-
-      xitk_enable_widget(private_data->item_tree[WBLF]);
+      int npos, pos = xitk_slider_get_pos(private_data->item_tree[WSLIDH]);
+      
       xitk_enable_widget(private_data->item_tree[WSLIDH]);
+      xitk_enable_widget(private_data->item_tree[WBLF]);
       xitk_enable_widget(private_data->item_tree[WBRT]);
+      
+      if(private_data->labels_offset != old_label_offset) {
+	int align = xitk_labelbutton_get_alignment(private_data->item_tree[WBSTART]);
 
-      switch(align) {
-      case ALIGN_CENTER:
-	xitk_slider_set_min(private_data->item_tree[WSLIDH], -(private_data->labels_offset>>1));
-	xitk_slider_set_max(private_data->item_tree[WSLIDH], (private_data->labels_offset>>1));
-	break;
-      case ALIGN_LEFT:
-	xitk_slider_set_min(private_data->item_tree[WSLIDH], 0);
-	xitk_slider_set_max(private_data->item_tree[WSLIDH], private_data->labels_offset);
-	break;
-      case ALIGN_RIGHT:
-	xitk_slider_set_min(private_data->item_tree[WSLIDH], (-private_data->labels_offset) - 3);
-	xitk_slider_set_max(private_data->item_tree[WSLIDH], 0);
-	break;
+	switch(align) {
+	case ALIGN_CENTER:
+	  xitk_slider_set_min(private_data->item_tree[WSLIDH], -(private_data->labels_offset>>1));
+	  xitk_slider_set_max(private_data->item_tree[WSLIDH], (private_data->labels_offset>>1));
+	  break;
+	case ALIGN_LEFT:
+	  xitk_slider_set_min(private_data->item_tree[WSLIDH], 0);
+	  xitk_slider_set_max(private_data->item_tree[WSLIDH], private_data->labels_offset);
+	  break;
+	case ALIGN_RIGHT:
+	  xitk_slider_set_min(private_data->item_tree[WSLIDH], (-private_data->labels_offset) - 3);
+	  xitk_slider_set_max(private_data->item_tree[WSLIDH], 0);
+	  break;
+	}
       }
+
+      if((pos > (npos = xitk_slider_get_max(private_data->item_tree[WSLIDH]))) || 
+      	 (pos < (npos = xitk_slider_get_min(private_data->item_tree[WSLIDH]))))
+	pos = npos;
+
+      xitk_slider_set_pos(private_data->item_tree[WSLIDH], pos);
     }
     else {
       xitk_slider_set_max(private_data->item_tree[WSLIDH], 1);
       xitk_slider_set_min(private_data->item_tree[WSLIDH], 0);
+      xitk_slider_reset(private_data->item_tree[WSLIDH]);
     }
-    xitk_slider_reset(private_data->item_tree[WSLIDH]);
      
+
     xitk_slider_set_max(private_data->item_tree[WSLID], max);
 
     if(private_data->list_length >= private_data->max_length) {

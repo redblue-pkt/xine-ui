@@ -1735,7 +1735,7 @@ void xitk_show_widget(xitk_widget_t *w) {
 
   if(w->visible == 0) {
     widget_event_t  event;
-    
+
     w->visible = 1;
     
     event.type = WIDGET_EVENT_PAINT;
