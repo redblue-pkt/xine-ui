@@ -181,6 +181,10 @@ void gui_display_logo(void) {
   if(gGui->visual_anim.running)
     visual_anim_stop();
 
+  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -1);
+  xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, -1);
+  panel_update_channel_display();
+
   if(gGui->display_logo)
     (void) gui_xine_open_and_play((char *)gGui->logo_mrl, NULL, 0, 0, 0, 0, 1);
 
