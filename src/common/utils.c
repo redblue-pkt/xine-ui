@@ -158,7 +158,7 @@ static int _mkdir_safe(char *path) {
   if(path == NULL)
     return 0;
   
-  if((lstat(path, &pstat)) < 0) {
+  if((stat(path, &pstat)) < 0) {
     /* file or directory no exist, create it */
     if(mkdir(path, 0755) < 0) {
       fprintf(stderr, "mkdir(%s) failed: %s\n", path, strerror(errno));
