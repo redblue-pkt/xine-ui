@@ -15,7 +15,7 @@ skins_DATA =                                                                    
 	MainMute.png	  MrlSelect.png	      SetupBtn.png       CtlItemBtn.png                   \
 	LettersDigit.png  MainNext.png	      Onglet.png	 OngletSmall.png                  \
 	MainPause.png     PlBg.png	      MainNav.png      		                          \
-	BigArrowLeft.png  BigArrowRight.png		                                          \
+	BigArrowLeft.png  BigArrowRight.png   FlitArrowDown.png                                   \
 	SkSlidHBg.png	  SliderHPad.png      PlSlidHBg.png    PlSlidHPad.png                     \
 	skinconfig
 
