@@ -147,10 +147,14 @@ typedef struct {
   void                     *userdata;
 } xitk_button_widget_t;
 
+#define LABEL_ALIGN_CENTER 1
+#define LABEL_ALIGN_LEFT   2
+#define LABEL_ALIGN_RIGHT  3
 typedef struct {
   int                       magic;
   ImlibData                *imlibdata;
   int                       button_type;
+  int                       align;
   char                     *label;
   xitk_simple_callback_t    callback;
   xitk_state_callback_t     state_callback;

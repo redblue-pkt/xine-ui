@@ -865,6 +865,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   
   lb.button_type       = CLICK_BUTTON;
   lb.label             = mb->select.caption;
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = mrlbrowser_select;
   lb.state_callback    = NULL;
   lb.userdata          = (void *)private_data;
@@ -880,6 +881,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = mb->dismiss.caption;
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = xitk_mrlbrowser_exit;
   lb.state_callback    = NULL;
   lb.userdata          = (void *)mywidget;
@@ -935,6 +937,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 
       lb.button_type    = CLICK_BUTTON;
       lb.label          = mb->ip_availables[i];
+      lb.align          = LABEL_ALIGN_CENTER;
       lb.callback       = mrlbrowser_grab_mrls;
       lb.state_callback = NULL;
       lb.userdata       = (void *)private_data;

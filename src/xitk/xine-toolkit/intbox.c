@@ -113,8 +113,9 @@ static void intbox_change_value(xitk_widget_t *x, void *data, char *string) {
     memset(&buf, 0, sizeof(buf));
     snprintf(buf, 256, "%d", private_data->value);
     xitk_inputtext_change_text(private_data->parent_wlist, private_data->input_widget, buf);
-    if(private_data->callback)
-      private_data->callback(w, private_data->userdata, private_data->value);
+    if(private_data->force_value == 0)
+      if(private_data->callback)
+	private_data->callback(w, private_data->userdata, private_data->value);
   }
 }
 
@@ -127,9 +128,13 @@ void xitk_intbox_set_value(xitk_widget_t *w, int value) {
   if(w->widget_type & WIDGET_TYPE_INTBOX) {
     char buf[256];
 
+    private_data = (intbox_private_data_t *) w->private_data;
+
     memset(&buf, 0, sizeof(buf));
     snprintf(buf, 256, "%d", value);
+    private_data->force_value = 1;
     intbox_change_value(NULL, (void*)w, buf);
+    private_data->force_value = 0;
   }
 }
 
@@ -189,6 +194,7 @@ static xitk_widget_t *_xitk_intbox_create(xitk_skin_config_t *skonfig,
   private_data->userdata                 = ib->userdata;
   private_data->step                     = ib->step;
   private_data->value                    = ib->value;
+  private_data->force_value              = 0;
 
   mywidget->private_data                 = private_data;
 

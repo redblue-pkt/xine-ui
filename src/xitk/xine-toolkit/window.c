@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <X11/Xlib.h>
+#include <X11/keysym.h>
 
 #include "Imlib-light/Imlib.h"
 #include "labelbutton.h"
@@ -55,6 +56,8 @@ typedef struct {
   xitk_widget_t          *wno;
   xitk_widget_t          *wcancel;
 
+  xitk_widget_t          *default_button;
+
   xitk_state_callback_t  yescallback;
   xitk_state_callback_t  nocallback;
   xitk_state_callback_t  cancelcallback;
@@ -63,6 +66,7 @@ typedef struct {
 
 } xitk_dialog_t;
   
+static void _xitk_window_destroy_window(xitk_widget_t *, void *);
 
 #define TITLE_BAR_HEIGHT 20
 
@@ -251,13 +255,13 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
   colorgray = xitk_get_pixel_color_gray(im);
 
   { /* Draw window title bar background */
-    int s, bl = 132;
+    int s, bl = 255;
     unsigned int colorblue;
 
     colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
-    for(s = 0; s <= (TITLE_BAR_HEIGHT/2); s++, bl += 8) {
+    for(s = 0; s <= TITLE_BAR_HEIGHT; s++, bl -= 8) {
       XSetForeground(im->x.disp, gc, colorblue);
-      XFillRectangle(im->x.disp, bar, gc, 0, s, width, ((TITLE_BAR_HEIGHT - (s*2))));
+      XDrawLine(im->x.disp, bar, gc, 0, s, width, s);
       colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
     }
   }
@@ -385,12 +389,42 @@ static void _window_handle_event(XEvent *event, void *data) {
   xitk_dialog_t *wd = (xitk_dialog_t *)data;
   
   switch(event->type) {
-    
+
   case MappingNotify:
     XLOCK(wd->imlibdata->x.disp);
     XRefreshKeyboardMapping((XMappingEvent *) event);
     XUNLOCK(wd->imlibdata->x.disp);
     break;
+
+  case KeyPress: {
+    XKeyEvent  mykeyevent;
+    KeySym     mykey;
+    char       kbuf[256];
+    int        len;
+    
+    mykeyevent = event->xkey;
+    
+    XLOCK(wd->imlibdata->x.disp);
+    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+    XUNLOCK(wd->imlibdata->x.disp);
+    
+    switch (mykey) {
+
+    case XK_Return:
+      _xitk_window_destroy_window(wd->default_button, (void *)wd);
+      break;
+
+    case XK_Escape:
+      if((wd->type == DIALOG_TYPE_YESNO) || (wd->type == DIALOG_TYPE_YESNOCANCEL))
+	_xitk_window_destroy_window(wd->default_button, (void *)wd);
+      else
+	_xitk_window_destroy_window(NULL, (void *)wd);
+      break;
+
+    }
+    
+  }
+  break;    
   }
 }
 
@@ -536,6 +570,7 @@ void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("OK");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -546,6 +581,8 @@ void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
 					   bx, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
+  wd->default_button = wd->wyes;
+
   /* Draw text area */
   {
     Pixmap   bg;
@@ -668,6 +705,7 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Yes");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -681,6 +719,7 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("No");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -691,6 +730,8 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 					   bx2, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
+
+  wd->default_button = wd->wno;
 
   /* Draw text area */
   {
@@ -817,6 +858,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Yes");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -830,6 +872,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("No");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -843,6 +886,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Cancel");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -853,6 +897,8 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 					   bx3, by,
 					   bwidth, 30,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
+
+  wd->default_button = wd->wcancel;
 
   /* Draw text area */
   {

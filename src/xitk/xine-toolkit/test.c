@@ -54,6 +54,7 @@ typedef struct {
 
   /* Intbox */
   xitk_widget_t        *intbox;
+  int                   oldintvalue;
 
   xitk_widget_list_t   *widget_list;
   xitk_register_key_t   kreg;
@@ -62,6 +63,7 @@ typedef struct {
 
 static test_t *test;
 static int nlab = 0;
+static int align = LABEL_ALIGN_CENTER;
 /*
  *
  */
@@ -223,8 +225,15 @@ static void change_label(xitk_widget_t *w, void *data) {
     "A Label",
     "Boom"
   };
+
+  if((++align) > LABEL_ALIGN_RIGHT)
+    align = LABEL_ALIGN_CENTER;
+
   nlab = !nlab;
+
   xitk_label_change_label(test->widget_list, test->label, labels[nlab]);
+
+  xitk_browser_set_alignment(test->browser, align);
   
   //  xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", NULL, NULL, 500, ALIGN_LEFT, "premier \n\n\nnum %d\n", nlab);
   //  xitk_window_dialog_ok_with_width(test->imlibdata, "License information", NULL, NULL, 500, ALIGN_CENTER, "** This program is free software; you can redistribute it and/or modify** it under the terms of the GNU General Public License as published by** the Free Software Foundation; either version 2 of the License, or** (at your option) any later version.");
@@ -274,6 +283,36 @@ static void change_browser_entry(xitk_widget_t *w, void *data, char *currenttext
 /*
  *
  */
+static void intchange_cb(xitk_widget_t *w, void *data, int btn) {
+
+  switch(btn) {
+  case XITK_WINDOW_ANSWER_YES:
+    test->oldintvalue = xitk_intbox_get_value(test->intbox);
+    break;
+    
+  case XITK_WINDOW_ANSWER_NO:
+  case XITK_WINDOW_ANSWER_CANCEL:
+    xitk_intbox_set_value(test->intbox, test->oldintvalue);
+    break;
+  }
+}
+
+/*
+ *
+ */
+static void notify_intbox_change(xitk_widget_t *w, void *data, int value) {
+
+  xitk_window_dialog_yesnocancel(test->imlibdata, NULL,
+				 intchange_cb, 
+				 intchange_cb, 
+				 intchange_cb, 
+				 NULL, ALIGN_DEFAULT, 
+				 _("New integer value is: %d. Confirm ?"), value);
+}
+
+/*
+ *
+ */
 static void create_intbox(void) {
   int x = 150, y = 300;
   xitk_intbox_widget_t ib;
@@ -281,10 +320,10 @@ static void create_intbox(void) {
   XITK_WIDGET_INIT(&ib, test->imlibdata);
 
   ib.skin_element_name = NULL;
-  ib.value             = 10;
+  ib.value             = test->oldintvalue = 10;
   ib.step              = 1;
   ib.parent_wlist      = test->widget_list;
-  ib.callback          = NULL;
+  ib.callback          = notify_intbox_change;
   ib.userdata          = NULL;
   xitk_list_append_content (test->widget_list->l,
 			    (test->intbox = 
@@ -677,6 +716,7 @@ int main(int argc, char **argv) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Quit");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = test_end;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;

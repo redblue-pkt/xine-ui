@@ -176,9 +176,22 @@ static Pixmap create_labelofbutton(xitk_widget_t *lb,
   XSetForeground(private_data->imlibdata->x.disp, gc, fg);
 
   /*  Put text in the right place */
-  XDrawString(private_data->imlibdata->x.disp, pix, gc, 
-	      (xsize-(width+xoff))>>1, ((ysize+asc+des+yoff)>>1)-des, 
-	      label, strlen(label));
+  if(private_data->align == LABEL_ALIGN_CENTER) {
+    XDrawString(private_data->imlibdata->x.disp, pix, gc, 
+		(xsize-(width+xoff))>>1, ((ysize+asc+des+yoff)>>1)-des, 
+		label, strlen(label));
+  }
+  else if(private_data->align == LABEL_ALIGN_LEFT) {
+    XDrawString(private_data->imlibdata->x.disp, pix, gc, 
+		((state != CLICK) ? 1 : 5), ((ysize+asc+des+yoff)>>1)-des, 
+		label, strlen(label));
+  }
+  else if(private_data->align == LABEL_ALIGN_RIGHT) {
+    XDrawString(private_data->imlibdata->x.disp, pix, gc, 
+    		xsize - (width + ((state != CLICK) ? 5 : 1)),
+    		((ysize+asc+des+yoff)>>1)-des, 
+    		label, strlen(label));
+  }
   
   XUNLOCK(private_data->imlibdata->x.disp);
 
@@ -449,6 +462,30 @@ int xitk_labelbutton_get_state(xitk_widget_t *lb) {
 }
 
 /*
+ * Set label button alignment
+ */
+void xitk_labelbutton_set_alignment(xitk_widget_t *lb, int align) {
+  lbutton_private_data_t *private_data = (lbutton_private_data_t *) lb->private_data;
+
+  if(lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
+    private_data->align = align;
+  }
+}
+
+/*
+ * Get label button alignment
+ */
+int xitk_labelbutton_get_alignment(xitk_widget_t *lb) {
+  lbutton_private_data_t *private_data = (lbutton_private_data_t *) lb->private_data;
+
+  if(lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
+    return private_data->align;
+  }
+  
+  return -1;
+}
+
+/*
  * Set radio button to state 'state'
  */
 void xitk_labelbutton_set_state(xitk_widget_t *lb, int state, Window win, GC gc) {
@@ -519,7 +556,9 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_skin_config_t *skonfig,
   private_data->focuscolor        = strdup(fcolor);
   private_data->clickcolor        = strdup(ccolor);
   private_data->fontname          = strdup(fontname);
-  
+
+  private_data->align             = b->align;
+
   mywidget->private_data          = private_data;
 
   mywidget->enable                = 1;
@@ -568,7 +607,7 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_labelbutton_widget_t *b,
 					       int x, int y, int width, int height,
 					       char *ncolor, char *fcolor, char *ccolor, 
 					       char *fname) {
-  xitk_image_t   *i;
+  xitk_image_t  *i;
   
   XITK_CHECK_CONSTITENCY(b);
 

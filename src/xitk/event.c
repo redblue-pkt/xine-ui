@@ -613,6 +613,10 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_TOGGLE_TVMODE:
     gui_toggle_tvmode();
     break;
+
+  case ACTID_VIEWLOG:
+    gui_viewlog_show(NULL, NULL);
+    break;
       
   default:
     break;

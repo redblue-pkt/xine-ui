@@ -92,6 +92,21 @@ int xitk_browser_get_current_start(xitk_widget_t *w) {
 }
 
 /**
+ * Change browser labels alignment
+ */
+void xitk_browser_set_alignment(xitk_widget_t *w, int align) {
+  browser_private_data_t *private_data = 
+    (browser_private_data_t *) w->private_data;
+  int i;
+  
+  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+    for(i = 0; i < private_data->max_length; i++) {
+      xitk_labelbutton_set_alignment(private_data->item_tree[i+WBSTART], align);
+    }
+  }
+}
+
+/**
  * Return the current selected button (if not, return -1)
  */
 int xitk_browser_get_current_selected(xitk_widget_t *w) {
@@ -318,43 +333,75 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
   browser_private_data_t *private_data = 
     (browser_private_data_t*) ((btnlist_t*)data)->itemlist->private_data;
 
-  if(w->widget_type & WIDGET_TYPE_LABELBUTTON) {
-    if(!strcasecmp((xitk_labelbutton_get_label(private_data->
-					       item_tree[(int)((btnlist_t*)data)->
-							sel])), "")) {
-      xitk_labelbutton_set_state((xitk_widget_t*)(private_data->
-						  item_tree[(int)((btnlist_t*)data)->
-							   sel]),
-				 0, private_data->win, private_data->gc);
-    }
-
-    for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
-      if((xitk_labelbutton_get_state(private_data->item_tree[i]))
-	 && (i != ((btnlist_t*)data)->sel)) {
-	xitk_labelbutton_set_state(private_data->item_tree[i], 0, 
-			    private_data->win, private_data->gc);
+  if(w->widget_type & WIDGET_TYPE_LABELBUTTON) { 
+    if(private_data->dbl_click_callback || private_data->callback) {
+      if(!strcasecmp((xitk_labelbutton_get_label(private_data->
+						 item_tree[(int)((btnlist_t*)data)->
+							  sel])), "")) {
+	xitk_labelbutton_set_state((xitk_widget_t*)(private_data->
+						    item_tree[(int)((btnlist_t*)data)->
+							     sel]),
+				   0, private_data->win, private_data->gc);
       }
-    }
-
-    if((i = xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
-      // Callback call
-      if(private_data->callback)
-	private_data->callback(((btnlist_t*)data)->itemlist, (void*)(i));
-    }
-
-
-    /* A button is currently selected */
-    if((btn_selected = 
-	xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
       
-      private_data->current_button_clicked = btn_selected;
-
-      if(private_data->last_button_clicked == private_data->current_button_clicked) {
+      for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
+	if((xitk_labelbutton_get_state(private_data->item_tree[i]))
+	   && (i != ((btnlist_t*)data)->sel)) {
+	  xitk_labelbutton_set_state(private_data->item_tree[i], 0, 
+				     private_data->win, private_data->gc);
+	}
+      }
+      
+      if((i = xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
+	// Callback call
+	if(private_data->callback)
+	  private_data->callback(((btnlist_t*)data)->itemlist, (void*)(i));
+      }
+      
+      
+      /* A button is currently selected */
+      if((btn_selected = 
+	  xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
+	
+	private_data->current_button_clicked = btn_selected;
+	
+	if(private_data->last_button_clicked == private_data->current_button_clicked) {
+	  struct timeval old_click_time, tm_diff;
+	  long int click_diff;
+	  
+	  private_data->last_button_clicked = -1;
+	  
+	  timercpy(&private_data->click_time, &old_click_time);
+	  gettimeofday(&private_data->click_time, 0);
+	  timersub(&private_data->click_time, &old_click_time, &tm_diff);
+	  click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
+	  
+	  /* Ok, double click occur, call cb */
+	  if(click_diff < private_data->dbl_click_time) {
+	    if(private_data->dbl_click_callback)
+	      private_data->dbl_click_callback(w, 
+					       private_data->userdata, 
+					       private_data->current_button_clicked);
+	  }
+	  
+	}
+	else {
+	  private_data->last_button_clicked = private_data->current_button_clicked;
+	}
+	
+	gettimeofday(&private_data->click_time, 0);
+	
+	/*
+	  if(private_data->last_button_clicked == -1)
+	  private_data->last_button_clicked = private_data->current_button_clicked;
+	*/
+	
+      }
+      else if((xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist) < 0)
+	      && (private_data->current_button_clicked > -1)) {
 	struct timeval old_click_time, tm_diff;
 	long int click_diff;
 	
-	private_data->last_button_clicked = -1;
-		
 	timercpy(&private_data->click_time, &old_click_time);
 	gettimeofday(&private_data->click_time, 0);
 	timersub(&private_data->click_time, &old_click_time, &tm_diff);
@@ -364,45 +411,22 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	if(click_diff < private_data->dbl_click_time) {
 	  if(private_data->dbl_click_callback)
 	    private_data->dbl_click_callback(w, 
-					     private_data->userdata, 
+					     private_data->userdata,
 					     private_data->current_button_clicked);
 	}
-
-      }
-      else {
 	private_data->last_button_clicked = private_data->current_button_clicked;
+	private_data->current_button_clicked = -1;
       }
       
       gettimeofday(&private_data->click_time, 0);
-      
-      /*
-      if(private_data->last_button_clicked == -1)
-      	private_data->last_button_clicked = private_data->current_button_clicked;
-      */
-
     }
-    else if((xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist) < 0)
-	    && (private_data->current_button_clicked > -1)) {
-      struct timeval old_click_time, tm_diff;
-      long int click_diff;
-      
-      timercpy(&private_data->click_time, &old_click_time);
-      gettimeofday(&private_data->click_time, 0);
-      timersub(&private_data->click_time, &old_click_time, &tm_diff);
-      click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
-
-      /* Ok, double click occur, call cb */
-      if(click_diff < private_data->dbl_click_time) {
-	if(private_data->dbl_click_callback)
-	  private_data->dbl_click_callback(w, 
-					   private_data->userdata,
-					   private_data->current_button_clicked);
+    else {
+      /* If there no callback, release selected button */
+      if((btn_selected = xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
+	xitk_labelbutton_set_state(private_data->item_tree[btn_selected+WBSTART], 0, 
+				   private_data->win, private_data->gc);
       }
-      private_data->last_button_clicked = private_data->current_button_clicked;
-      private_data->current_button_clicked = -1;
     }
-
-    gettimeofday(&private_data->click_time, 0);
   }
 }
 
@@ -537,6 +561,7 @@ xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_wid
       
       lb.button_type       = RADIO_BUTTON;
       lb.label             = "";
+      lb.align             = LABEL_ALIGN_CENTER;
       lb.callback          = NULL;
       lb.state_callback    = browser_select;
       lb.userdata          = (void *)(bt);
@@ -638,6 +663,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, int 
       
       lb.button_type       = RADIO_BUTTON;
       lb.label             = "";
+      lb.align             = LABEL_ALIGN_CENTER;
       lb.callback          = NULL;
       lb.state_callback    = browser_select;
       lb.userdata          = (void *)(bt);

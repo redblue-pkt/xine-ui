@@ -44,6 +44,7 @@
 #include "videowin.h"
 #include "mrl_browser.h"
 #include "setup.h"
+#include "viewlog.h"
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
@@ -444,6 +445,16 @@ void gui_setup_show(xitk_widget_t *w, void *data) {
     setup_panel();
   else
     setup_exit(NULL, NULL);
+}
+
+void gui_viewlog_show(xitk_widget_t *w, void *data) {
+
+  if (viewlog_is_running() && !viewlog_is_visible())
+    viewlog_toggle_panel_visibility(NULL, NULL);
+  else if(!viewlog_is_running())
+    viewlog_window();
+  else
+    viewlog_exit(NULL, NULL);
 }
 
 

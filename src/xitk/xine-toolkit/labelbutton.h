@@ -50,6 +50,8 @@ typedef struct {
    
   void                   *userdata;
    
+  int                     align;
+
   char                   *label;
   char                   *normcolor;
   char                   *focuscolor;
@@ -88,5 +90,15 @@ int xitk_labelbutton_get_state(xitk_widget_t *);
  * Set state of button "widget'.
  */
 void xitk_labelbutton_set_state(xitk_widget_t *, int, Window, GC);
+
+/**
+ * Set label button alignment
+ */
+void xitk_labelbutton_set_alignment(xitk_widget_t *, int);
+
+/**
+ * Get label button alignment
+ */
+int xitk_labelbutton_get_alignment(xitk_widget_t *);
 
 #endif

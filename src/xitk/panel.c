@@ -394,6 +394,7 @@ void panel_add_autoplay_buttons(void) {
     lb.skin_element_name = "AutoPlayGUI";
     lb.button_type       = CLICK_BUTTON;
     lb.label             = autoplay_plugins[i];
+    lb.align             = LABEL_ALIGN_CENTER;
     lb.callback          = pl_scan_input;
     lb.state_callback    = NULL;
     lb.userdata          = NULL;

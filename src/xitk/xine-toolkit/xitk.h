@@ -601,17 +601,21 @@ void xitk_list_delete_current (xitk_list_t *l);
 /*
  * *** Label Buttons
  */
-#define CLICK_BUTTON 1
-#define RADIO_BUTTON 2
+#define CLICK_BUTTON       1
+#define RADIO_BUTTON       2
+#define LABEL_ALIGN_CENTER 1
+#define LABEL_ALIGN_LEFT   2
+#define LABEL_ALIGN_RIGHT  3
 typedef struct {
   int                       magic;
-  ImlibData              *imlibdata;
-  int                     button_type;
-  char                   *label;
-  xitk_simple_callback_t  callback;
-  xitk_state_callback_t   state_callback;
-  void                   *userdata;
-  char                   *skin_element_name;
+  ImlibData                *imlibdata;
+  int                       button_type;
+  int                       align;
+  char                     *label;
+  xitk_simple_callback_t    callback;
+  xitk_state_callback_t     state_callback;
+  void                     *userdata;
+  char                     *skin_element_name;
 } xitk_labelbutton_widget_t;
 
 /**
@@ -646,6 +650,16 @@ int xitk_labelbutton_get_state(xitk_widget_t *);
  * Set state of button 'widget'.
  */
 void xitk_labelbutton_set_state(xitk_widget_t *, int, Window, GC);
+
+/**
+ * Set label button alignment
+ */
+void xitk_labelbutton_set_alignment(xitk_widget_t *, int);
+
+/**
+ * Get label button alignment
+ */
+int xitk_labelbutton_get_alignment(xitk_widget_t *);
 
 
 /*
@@ -875,6 +889,11 @@ void xitk_browser_release_all_buttons(xitk_widget_t *w);
  * Return the real number of first displayed in list
  */
 int xitk_browser_get_current_start(xitk_widget_t *w);
+
+/**
+ * Change browser labels alignment
+ */
+void xitk_browser_set_alignment(xitk_widget_t *w, int align);
 
 /*
  * Filebrowser
@@ -1610,7 +1629,7 @@ void xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
 #define xitk_window_dialog_yesnocancel(im, title, ycb, ncb, ccb, userdata, align, message, args...) {         \
   if(((im) == NULL) || ((message) == NULL))                                                                   \
     return;                                                                                                   \
-  xitk_window_dialog_yesnocancel_with_width(im, title, ycb, ncd, ccb, userdata, 400, align, message, ##args); \
+  xitk_window_dialog_yesnocancel_with_width(im, title, ycb, ncb, ccb, userdata, 400, align, message, ##args); \
 }
 
 /**

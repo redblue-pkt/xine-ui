@@ -38,6 +38,7 @@ typedef struct {
 
   int                      step;
   int                      value;
+  int                      force_value;
 
   xitk_widget_list_t      *parent_wlist;
 

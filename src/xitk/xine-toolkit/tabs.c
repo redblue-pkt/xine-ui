@@ -326,6 +326,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
 
       lb.skin_element_name = NULL;
       lb.button_type       = RADIO_BUTTON;
+      lb.align             = LABEL_ALIGN_CENTER;
       lb.label             = t->entries[i];
       lb.callback          = NULL;
       lb.state_callback    = tabs_select;

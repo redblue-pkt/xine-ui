@@ -980,6 +980,7 @@ void setup_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = setup_end; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -999,7 +1000,7 @@ void setup_panel(void) {
 					   setup->widget_list,
 					   NULL);
 
-  XUnlockDisplay (gGui->display);
+  //  XUnlockDisplay (gGui->display);
 
   XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
 

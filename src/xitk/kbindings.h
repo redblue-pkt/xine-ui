@@ -97,7 +97,8 @@ typedef enum {
   ACTID_ZOOM_Y_OUT,
   ACTID_ZOOM_RESET,
   ACTID_TOGGLE_TVMODE,
-  ACTID_SETUP
+  ACTID_SETUP,
+  ACTID_VIEWLOG
 } action_id_t;
   
 kbinding_t *kbindings_init_kbinding(void);

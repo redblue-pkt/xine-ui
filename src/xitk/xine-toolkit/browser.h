@@ -99,4 +99,10 @@ int xitk_browser_get_current_start(xitk_widget_t *w);
 
 void xitk_browser_step_up(xitk_widget_t *w, void *data);
 void xitk_browser_step_down(xitk_widget_t *w, void *data);
+
+/**
+ * Change browser labels alignment
+ */
+void xitk_browser_set_alignment(xitk_widget_t *w, int align);
+
 #endif

@@ -15,7 +15,7 @@ endif
 xine_SOURCES = $(GETOPT_C) utils.c xscreensaver-remote.c \
 	main.c event.c control.c playlist.c \
 	videowin.c panel.c kbindings.c lirc.c actions.c mrl_browser.c \
-	snapshot.c skins.c setup.c #monitor.c
+	snapshot.c skins.c setup.c viewlog.c
 xine_DEPENDENTIES = utils.h monitor.h 
 xine_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 	@XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \

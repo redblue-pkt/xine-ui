@@ -290,7 +290,9 @@ static kbinding_entry_t default_binding_table[] = {
   { "Reset zooming.",
     "ZoomReset",              ACTID_ZOOM_RESET              , "z",        KEYMOD_CONTROL | KEYMOD_META    },
   { "Toggle TV modes on the DXR3",
-    "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL    },                             
+    "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL },
+  { "Visibility toggle of log viewer",
+    "ViewlogShow",            ACTID_VIEWLOG	            , "l",	  KEYMOD_META    },
   { 0,
     0,                        0,                            0,            0              }
 };

@@ -21,14 +21,14 @@
  *
  */
 
-#ifndef SETUP_H
-#define SETUP_H
+#ifndef VIEWLOG_H
+#define VIEWLOG_H
 
-void setup_panel(void);
-void setup_exit(xitk_widget_t *, void *);
-int setup_is_visible(void);
-int setup_is_running(void);
-void setup_toggle_panel_visibility(xitk_widget_t *, void *);
-void setup_raise_window(void);
+void viewlog_window(void);
+void viewlog_exit(xitk_widget_t *, void *);
+int viewlog_is_visible(void);
+int viewlog_is_running(void);
+void viewlog_toggle_panel_visibility(xitk_widget_t *, void *);
+void viewlog_raise_window(void);
 
 #endif

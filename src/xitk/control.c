@@ -642,6 +642,7 @@ void control_panel(void) {
   lb.skin_element_name = "CtlDismiss";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Dismiss");
+  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = control_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
