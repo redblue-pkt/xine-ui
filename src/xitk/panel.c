@@ -487,6 +487,12 @@ void panel_add_mixer_control(void) {
 			    gGui->panel_window, panel->widget_list->gc);
   }
 
+  /* Tips should be available only if widgets are enabled */
+  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL))
+    xitk_set_widget_tips(panel->mixer.slider, _("Volume control"));
+  if(gGui->mixer.caps & AO_CAP_MUTE_VOL)
+    xitk_set_widget_tips(panel->mixer.mute, _("Mute toggle"));
+
 }
 
 /*
@@ -803,7 +809,6 @@ void panel_init (void) {
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->mixer.mute = xitk_checkbox_create (gGui->skin_config, &cb)));
   xitk_disable_widget(panel->mixer.mute);
-  xitk_set_widget_tips(panel->mixer.mute, _("Mute toggle"));
 
   /* Snapshot */
   b.skin_element_name = "Snapshot";
