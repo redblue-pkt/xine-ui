@@ -615,6 +615,14 @@ void gui_handle_event (XEvent *event, void *data) {
       xine_event.type = XINE_EVENT_INPUT_SELECT;
       xine_send_event(gGui->xine, &xine_event);
       break;
+    case XK_KP_7:
+      xine_event.type = XINE_EVENT_INPUT_ANGLE_NEXT;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
+    case XK_KP_1:
+      xine_event.type = XINE_EVENT_INPUT_ANGLE_PREVIOUS;
+      xine_send_event(gGui->xine, &xine_event);
+      break;
     
     case XK_s:
     case XK_S:
