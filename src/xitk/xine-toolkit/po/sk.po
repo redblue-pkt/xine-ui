@@ -5,7 +5,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: xine-ui (xitk) 0.9.x\n"
 "POT-Creation-Date: 2002-06-17 21:59+0200\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: Daniel Bena  <Daniel.Bena@dm-drogeriemarkt.sk>\n"
