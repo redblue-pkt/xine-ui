@@ -836,6 +836,11 @@ eval XINE_VISDIR=`eval echo "$XINE_VISDIR"`
 AC_SUBST(XINE_VISDIR)
 AC_DEFINE_UNQUOTED(XINE_VISDIR, "$XINE_VISDIR",[Location of xine visual animation streams])
 
+DATA_DIR=`eval echo "$datadir"`
+AC_SUBST(DATA_DIR)
+SYSCONF_DIR=`eval echo "$sysconfdir"`
+AC_SUBST(SYSCONF_DIR)
+
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
 dnl
