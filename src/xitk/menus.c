@@ -120,8 +120,11 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
   switch(ctrl) {
 
   case PLAYL_LOAD:
+    playlist_load_playlist(NULL, NULL);
+    break;
+    
   case PLAYL_SAVE:
-    printf("TODO\n");
+    playlist_save_playlist(NULL, NULL);
     break;
 
   case PLAYL_EDIT:
@@ -372,21 +375,18 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Playlist/SEP",  
       "<separator>",  
       NULL, NULL                                                                             },
-    { "Playlist/Load...",
-      NULL,
-      menu_playlist_ctrl, (void *) PLAYL_LOAD                                                },
-    { "Playlist/Save...",
-      NULL,
-      menu_playlist_ctrl, (void *) PLAYL_SAVE                                                },
-    { "Playlist/Editor...",
-      NULL,
-      menu_playlist_ctrl, (void *) PLAYL_EDIT                                                },
     { "Playlist/Get from...",
       "<branch>",
       NULL, NULL                                                                             },
     /*
       autoplay input plugin idents      
     */
+    { "Playlist/Load...",
+      NULL,
+      menu_playlist_ctrl, (void *) PLAYL_LOAD                                                },
+    { "Playlist/Editor...",
+      NULL,
+      menu_playlist_ctrl, (void *) PLAYL_EDIT                                                },
     { "SEP",  
       "<separator>",
       NULL, NULL                                                                             },
@@ -509,16 +509,18 @@ void video_window_menu(xitk_widget_list_t *wl) {
   /* Subtitle loader */
   if(gGui->playlist.num) {
     xitk_menu_entry_t   menu_entry;
-    char                buffer[2048];
-    char               *location = "Open";
     
-    memset(&buffer, 0, sizeof(buffer));
-    sprintf(buffer, "%s/%s", location, "Subtitle...");
-    
-    menu_entry.menu      = buffer;
+    menu_entry.menu      = "Open/Subtitle...";
     menu_entry.type      = NULL;
     menu_entry.cb        = menu_subtitle_selector;
     menu_entry.user_data = NULL;
+    xitk_menu_add_entry(w, &menu_entry);
+
+    /* Save Playlist */
+    menu_entry.menu      = "Playlist/Save...";
+    menu_entry.type      = NULL;
+    menu_entry.cb        = menu_playlist_ctrl;
+    menu_entry.user_data = (void *) PLAYL_SAVE;
     xitk_menu_add_entry(w, &menu_entry);
   }
   

@@ -78,20 +78,22 @@ void playlist_handle_event(XEvent *event, void *data);
 static void _playlist_enability(int enable) {
   void (*enability)(xitk_widget_t *) = (enable == 1) ? xitk_enable_widget : xitk_disable_widget;
   int    i = 0;
-
-  enability(playlist->playlist);
-  enability(playlist->winput);
-  while(playlist->autoplay_plugins[i])
-    enability(playlist->autoplay_plugins[i++]);
-  enability(playlist->move_up);
-  enability(playlist->move_down);
-  enability(playlist->play);
-  enability(playlist->delete);
-  enability(playlist->delete_all);
-  enability(playlist->add);
-  enability(playlist->load);
-  enability(playlist->save);
-  enability(playlist->close);
+  
+  if(playlist) {
+    enability(playlist->playlist);
+    enability(playlist->winput);
+    while(playlist->autoplay_plugins[i])
+      enability(playlist->autoplay_plugins[i++]);
+    enability(playlist->move_up);
+    enability(playlist->move_down);
+    enability(playlist->play);
+    enability(playlist->delete);
+    enability(playlist->delete_all);
+    enability(playlist->add);
+    enability(playlist->load);
+    enability(playlist->save);
+    enability(playlist->close);
+  }
 }
 static void playlist_deactivate(void) {
   _playlist_enability(0);
@@ -369,7 +371,7 @@ static void _playlist_load_callback(filebrowser_t *fb) {
 static void _playlist_cancel_callback(filebrowser_t *fb) {
   playlist_reactivate();
 }
-static void _playlist_load_playlist(xitk_widget_t *w, void *data) {
+void playlist_load_playlist(xitk_widget_t *w, void *data) {
   filebrowser_callback_button_t  cbb[2];
   char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
@@ -396,7 +398,7 @@ static void _playlist_save_callback(filebrowser_t *fb) {
   }
   playlist_reactivate();
 }
-static void _playlist_save_playlist(xitk_widget_t *w, void *data) {
+void playlist_save_playlist(xitk_widget_t *w, void *data) {
   filebrowser_callback_button_t  cbb[2];
   char                           buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
@@ -1170,7 +1172,7 @@ void playlist_editor(void) {
   lb.skin_element_name = "PlLoad";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Load");
-  lb.callback          = _playlist_load_playlist;
+  lb.callback          = playlist_load_playlist;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
@@ -1180,7 +1182,7 @@ void playlist_editor(void) {
   lb.skin_element_name = "PlSave";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Save");
-  lb.callback          = _playlist_save_playlist;
+  lb.callback          = playlist_save_playlist;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
