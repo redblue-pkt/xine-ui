@@ -505,7 +505,7 @@ dnl
 AC_CHECK_LIB(posix4, nanosleep)
 AC_CHECK_FUNCS(vsnprintf snprintf strpbrk strsep nanosleep)
 AC_CHECK_HEADER(stdarg.h, AC_DEFINE(HAVE_STDARGS,,[Define this is you have stdarg.h header file installed]))
-AC_CHECK_HEADERS(string.h strings.h alloca.h)
+AC_CHECK_HEADERS(string.h strings.h alloca.h linux/kd.h)
 
 
 dnl
@@ -861,6 +861,7 @@ src/xitk/skins/cloudy/Makefile
 src/xitk/skins/CelomaChrome/Makefile
 src/aaui/Makefile
 src/dfb/Makefile
+src/fb/Makefile
 doc/Makefile
 doc/man/Makefile
 doc/man/de/Makefile
