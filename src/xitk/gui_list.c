@@ -33,7 +33,6 @@
 #include "gui_widget.h"
 #include "gui_list.h"
 #include "utils.h"
-#include "monitor.h"
 
 extern uint32_t xine_debug;
 
@@ -91,7 +90,7 @@ void *gui_list_next_content (gui_list_t *l) {
 
   } else {
 
-    xprintf (VERBOSE|GUI, "gui_list : passed end of list");
+    fprintf (stderr, "gui_list : passed end of list");
 
     return NULL;
   }    
@@ -114,7 +113,7 @@ void *gui_list_last_content (gui_list_t *l) {
   } else {
 
 
-    xprintf (VERBOSE|GUI, "gui_list : wanted last of empty list");
+    fprintf (stderr, "gui_list : wanted last of empty list");
 
     return NULL;
   }    
@@ -134,7 +133,7 @@ void *gui_list_prev_content (gui_list_t *l){
 
   } else {
 
-    xprintf (VERBOSE|GUI, "gui_list : passed begin of list");
+    fprintf (stderr, "gui_list : passed begin of list");
 
     return NULL;
   }    

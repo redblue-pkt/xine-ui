@@ -29,14 +29,12 @@
 #include <pthread.h>
 #include "xine.h"
 #include "utils.h"
-#include "monitor.h"
 #include "gui_widget.h"
 #include "gui_label.h"
 #include "gui_widget_types.h"
 #include "gui_main.h"
 
-extern Display          *gDisplay;
-extern pthread_mutex_t   gXLock;
+extern gGlob_t          *gGlob;
 extern gui_color_t       gui_color;
 extern uint32_t          xine_debug;
 
@@ -49,7 +47,7 @@ void paint_label (widget_t *l,  Window win, GC gc) {
   gui_image_t *font = (gui_image_t *) private_data->font;
   int x_dest, y_dest, nCWidth, nCHeight, nLen, i;
   
-  XLockDisplay (gDisplay);
+  XLockDisplay (gGlob->gDisplay);
   
   x_dest = l->x;
   y_dest = l->y;
@@ -72,7 +70,7 @@ void paint_label (widget_t *l,  Window win, GC gc) {
 	px = (c % 32) * nCWidth;
 	py = (c / 32) * nCHeight;
 	
-	XCopyArea (gDisplay, font->image, win, gc, px, py,
+	XCopyArea (gGlob->gDisplay, font->image, win, gc, px, py,
 		   nCWidth, nCHeight, x_dest, y_dest);
 	
       }
@@ -81,10 +79,10 @@ void paint_label (widget_t *l,  Window win, GC gc) {
     }
     
   } else
-    xprintf (VERBOSE|GUI, "paint labal on something (%d) that "
+    fprintf (stderr, "paint labal on something (%d) that "
 	     "is not a label\n", l->widget_type);
 
-  XUnlockDisplay (gDisplay);
+  XUnlockDisplay (gGlob->gDisplay);
 }
 /*
  *
@@ -103,7 +101,7 @@ int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
     paint_label(l, wl->win, wl->gc);
     return 1;
   } else
-    xprintf (VERBOSE|GUI, "notify focus label button on something (%d) "
+    fprintf (stderr, "notify focus label button on something (%d) "
 	     "that is not a label button\n", l->widget_type);
   return 0;
 }

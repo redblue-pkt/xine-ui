@@ -50,65 +50,48 @@
 
 #include "xine.h"
 #include "utils.h"
-#include "monitor.h"
 
 #warning LIRC is temporary disabled
 #undef HAVE_LIRC
 #ifdef HAVE_LIRC
+
 #include "lirc/lirc_client.h"
 
-static struct lirc_config *xlirc_config;
-static int                 lirc_fd;
-static int                 lirc_enable = 0;
-static pthread_t           lirc_thread;
 extern int                 no_lirc;
 
 /*  Functions prototypes */
 static void init_lirc(void);
 static void deinit_lirc(void);
 static void *xine_lirc_loop(void *dummy);
-
 #endif
 
 
 /*
  * global variables
  */
-static Window          gui_panel_win;
-static DND_struct_t   *xdnd_panel_win;
-static gui_move_t      gui_move; 
-static widget_list_t  *gui_widget_list;
-static ImlibImage     *gui_bg_image;                 /* background image */
-ImlibData             *gImlib_data;
-extern Display        *gDisplay;
-extern xine_t         *gXine;
+extern gGlob_t          *gGlob;
 
-static widget_t       *gui_slider_play;
-static widget_t       *gui_slider_mixer;
-static widget_t       *gui_checkbox_pause;
+static gui_move_t        gui_move; 
+static widget_list_t    *gui_widget_list;
 
-static char            gui_filename[1024];
-static widget_t       *gui_title_label;
-static char            gui_runtime[20];
-static widget_t       *gui_runtime_label;
-static int             gui_panel_visible;
-static int             gui_running;
+static widget_t         *gui_slider_play;
+static widget_t         *gui_slider_mixer;
+static widget_t         *gui_checkbox_pause;
 
-static char            gui_audiochan[20];
-static widget_t       *gui_audiochan_label;
-static char            gui_spuid[20];
-static widget_t       *gui_spuid_label;
+static widget_t         *gui_title_label;
+static char              gui_runtime[20];
+static widget_t         *gui_runtime_label;
+static int               gui_panel_visible;
+static int               gui_running;
 
-/*
- * simple gui playlist
- */
-char                  *gui_playlist[MAX_PLAYLIST_LENGTH];
-int                    gui_playlist_num;
-int                    gui_playlist_cur;
+static char              gui_audiochan[20];
+static widget_t         *gui_audiochan_label;
+static char              gui_spuid[20];
+static widget_t         *gui_spuid_label;
 
-static int             gui_ignore_status=0;
+static int               gui_ignore_status=0;
 
-static int             cursor_visible;
+static int               cursor_visible;
 
 #define NEXT     1
 #define PREV     2
@@ -118,26 +101,63 @@ extern uint32_t xine_debug;
 #define MAX_UPDSLD 25
 static int update_slider;
 
+/**
+ * Configuration file lookup/set functions
+ */
+char *config_lookup_str(char *key, char *def) {
+
+  return(gGlob->gConfig->lookup_str(gGlob->gConfig, key, def));
+}
+
+int config_lookup_int(char *key, int def) {
+
+  return(gGlob->gConfig->lookup_int(gGlob->gConfig, key, def));
+}
+
+void config_set_str(char *key, char *value) {
+
+  if(key)
+    gGlob->gConfig->set_str(gGlob->gConfig, key, value);
+}
+
+void config_set_int(char *key, int value) {
+  
+  if(key)
+  gGlob->gConfig->set_int(gGlob->gConfig, key, value);
+}
+
+void config_save(void) {
+
+  gGlob->gConfig->save(gGlob->gConfig);
+}
+
+void config_reset(void) {
+
+  gGlob->gConfig->read(gGlob->gConfig, gGlob->gConfigFilename);
+}
+/*
+ *
+ *******/
 
 /*
  * Unlock pause when status != XINE_PAUSE
  */
 void check_pause(void) {
   
-  if((xine_get_status(gXine) != XINE_PAUSE)
+  if((xine_get_status(gGlob->gXine) != XINE_PAUSE)
      && (checkbox_get_state(gui_checkbox_pause)))
     checkbox_set_state(gui_checkbox_pause, 0, 
-		       gui_panel_win, gui_widget_list->gc);
+		       gGlob->gui_panel_win, gui_widget_list->gc);
 }
 
 void gui_set_current_mrl(const char *mrl) {
 
   if(mrl)
-    strcpy(gui_filename, mrl);
+    strcpy(gGlob->gui_filename, mrl);
   else 
-    sprintf(gui_filename, "DROP A FILE ON XINE");  
+    sprintf(gGlob->gui_filename, "DROP A FILE ON XINE");  
   
-  label_change_label (gui_widget_list, gui_title_label, gui_filename);
+  label_change_label (gui_widget_list, gui_title_label, gGlob->gui_filename);
 }
 
 /*
@@ -145,19 +165,19 @@ void gui_set_current_mrl(const char *mrl) {
  */
 void gui_exit (widget_t *w, void *data) {
 
-  xprintf(VERBOSE|GUI, "xine-panel: EXIT\n");
+  fprintf(stderr, "xine-panel: EXIT\n");
 
 
-  xine_exit(gXine); 
+  xine_exit(gGlob->gXine); 
 
-  if(xdnd_panel_win)
-    free(xdnd_panel_win);
+  if(gGlob->xdnd_panel_win)
+    free(gGlob->xdnd_panel_win);
 
   gui_running = 0;
 
 #ifdef HAVE_LIRC
   if(lirc_enable) {
-    pthread_cancel(lirc_thread);
+    pthread_cancel(gGlob->lirc_thread);
     deinit_lirc();
   }
 #endif
@@ -182,13 +202,13 @@ static void gui_handleSIG (int sig) {
       myevent.xkey.type        = KeyPress;
       myevent.xkey.state       = 0;
       myevent.xkey.keycode     = XK_Q;
-      myevent.xkey.subwindow   = gui_panel_win;
+      myevent.xkey.subwindow   = gGlob->gui_panel_win;
       myevent.xkey.time        = 0;
       myevent.xkey.same_screen = True;
       
-      status = XSendEvent (gDisplay, gui_panel_win, True, KeyPressMask, &myevent);
+      status = XSendEvent (gGlob->gDisplay, gGlob->gui_panel_win, True, KeyPressMask, &myevent);
       
-      XFlush (gDisplay);
+      XFlush (gGlob->gDisplay);
       break;
     }
   }
@@ -196,8 +216,8 @@ static void gui_handleSIG (int sig) {
 
 void gui_play (widget_t *w, void *data) {
 
-  xprintf(VERBOSE|GUI, "xine-panel: PLAY\n");
-  xine_play ( gXine, gui_filename, 0 );
+  fprintf(stderr, "xine-panel: PLAY\n");
+  xine_play (gGlob->gXine, gGlob->gui_filename, 0 );
 
   check_pause();
 }
@@ -205,7 +225,7 @@ void gui_play (widget_t *w, void *data) {
 void gui_stop (widget_t *w, void *data) {
 
   gui_ignore_status = 1;
-  xine_stop (gXine);
+  xine_stop (gGlob->gXine);
   /* FIXME vo_set_logo_mode (1); */
   gui_ignore_status = 0; 
   slider_reset(gui_widget_list, gui_slider_play);
@@ -215,11 +235,11 @@ void gui_stop (widget_t *w, void *data) {
 void gui_dndcallback (char *filename) {
 
   if(filename) {
-    gui_playlist_cur = gui_playlist_num++;
-    gui_playlist[gui_playlist_cur] = strdup(filename);
+    gGlob->gui_playlist_cur = gGlob->gui_playlist_num++;
+    gGlob->gui_playlist[gGlob->gui_playlist_cur] = strdup(filename);
 
-    if((xine_get_status(gXine) == XINE_STOP)) {
-      gui_set_current_mrl(gui_playlist[gui_playlist_cur]);
+    if((xine_get_status(gGlob->gXine) == XINE_STOP)) {
+      gui_set_current_mrl(gGlob->gui_playlist[gGlob->gui_playlist_cur]);
       gui_play (NULL, NULL); 
       update_slider = MAX_UPDSLD;
     }
@@ -230,45 +250,45 @@ void gui_dndcallback (char *filename) {
 
 void gui_pause (widget_t *w, void *data, int state) {
   
-  xine_pause(gXine);
+  xine_pause(gGlob->gXine);
   check_pause();
   
   if(((int)data) == 1)
-    checkbox_set_state(w, ((xine_get_status(gXine)==XINE_PAUSE)?1:0), 
-		       gui_panel_win, gui_widget_list->gc);
+    checkbox_set_state(w, ((xine_get_status(gGlob->gXine)==XINE_PAUSE)?1:0), 
+		       gGlob->gui_panel_win, gui_widget_list->gc);
 }
 
 char *gui_get_next_mrl () {
-  if (gui_playlist_cur < gui_playlist_num-1) {
-    return gui_playlist[gui_playlist_cur + 1];
+  if (gGlob->gui_playlist_cur < gGlob->gui_playlist_num-1) {
+    return gGlob->gui_playlist[gGlob->gui_playlist_cur + 1];
   } else
     return NULL;
 }
 
 void gui_notify_demux_branched () {
-  gui_playlist_cur ++;
-  strcpy(gui_filename, gui_playlist [gui_playlist_cur]);
-  label_change_label (gui_widget_list, gui_title_label, gui_filename);
+  gGlob->gui_playlist_cur ++;
+  strcpy(gGlob->gui_filename, gGlob->gui_playlist [gGlob->gui_playlist_cur]);
+  label_change_label (gui_widget_list, gui_title_label, gGlob->gui_filename);
 }
 
 void gui_nextprev(widget_t *w, void *data) {
 
   if(((int)data) == NEXT) {
     gui_ignore_status = 1;
-    xine_stop (gXine);
+    xine_stop (gGlob->gXine);
     gui_ignore_status = 0;
     gui_status_callback (XINE_STOP);
   }
   else if(((int)data) == PREV) {
     gui_ignore_status = 1;
-    xine_stop (gXine);
-    gui_playlist_cur--;
-    if ((gui_playlist_cur>=0) && (gui_playlist_cur < gui_playlist_num)) {
-      gui_set_current_mrl(gui_playlist[gui_playlist_cur]);
-      xine_play ( gXine, gui_filename, 0 );
+    xine_stop (gGlob->gXine);
+    gGlob->gui_playlist_cur--;
+    if ((gGlob->gui_playlist_cur>=0) && (gGlob->gui_playlist_cur < gGlob->gui_playlist_num)) {
+      gui_set_current_mrl(gGlob->gui_playlist[gGlob->gui_playlist_cur]);
+      xine_play (gGlob->gXine, gGlob->gui_filename, 0 );
     } else {
       /* vo_set_logo_mode (1); FIXME */
-      gui_playlist_cur = 0;
+      gGlob->gui_playlist_cur = 0;
     }
     gui_ignore_status = 0;
   }
@@ -282,47 +302,47 @@ void gui_eject(widget_t *w, void *data) {
   int i, new_num = 0;
   char *tok = NULL;
   
-  if(gui_playlist_num && xine_eject(gui_filename)) {
+  if(gGlob->gui_playlist_num && xine_eject(gGlob->gui_filename)) {
     /*
      * If MRL is dvd:// or vcd:// remove all of them in playlist
      */
-    if(!strncasecmp(gui_playlist[gui_playlist_cur], "dvd://", 6))
+    if(!strncasecmp(gGlob->gui_playlist[gGlob->gui_playlist_cur], "dvd://", 6))
       tok = "dvd://";
-    else if(!strncasecmp(gui_playlist[gui_playlist_cur], "vcd://", 6))
+    else if(!strncasecmp(gGlob->gui_playlist[gGlob->gui_playlist_cur], "vcd://", 6))
       tok = "vcd://";
     
     if(tok != NULL) {
       /* 
        * Store all of not maching entries
        */
-      for(i=0; i < gui_playlist_num; i++) {
-	if(strncasecmp(gui_playlist[i], tok, strlen(tok))) {
-	  tmp_playlist[new_num] = gui_playlist[i];
+      for(i=0; i < gGlob->gui_playlist_num; i++) {
+	if(strncasecmp(gGlob->gui_playlist[i], tok, strlen(tok))) {
+	  tmp_playlist[new_num] = gGlob->gui_playlist[i];
 	  new_num++;
 	}
       }
       /*
        * Create new _cleaned_ playlist
        */
-      memset(&gui_playlist, 0, sizeof(gui_playlist));
+      memset(&gGlob->gui_playlist, 0, sizeof(gGlob->gui_playlist));
       for(i=0; i<new_num; i++)
-	gui_playlist[i] = tmp_playlist[i];
+	gGlob->gui_playlist[i] = tmp_playlist[i];
 
-      gui_playlist_num = new_num;
+      gGlob->gui_playlist_num = new_num;
 
     }
     else {
       /*
        * Remove only the current MRL
        */
-      for(i = gui_playlist_cur; i < gui_playlist_num; i++)
-	gui_playlist[i] = gui_playlist[i+1];
+      for(i = gGlob->gui_playlist_cur; i < gGlob->gui_playlist_num; i++)
+	gGlob->gui_playlist[i] = gGlob->gui_playlist[i+1];
       
-      gui_playlist_num--;
-      if(gui_playlist_cur) gui_playlist_cur--;
+      gGlob->gui_playlist_num--;
+      if(gGlob->gui_playlist_cur) gGlob->gui_playlist_cur--;
     }
 
-    gui_set_current_mrl(gui_playlist [gui_playlist_cur]);
+    gui_set_current_mrl(gGlob->gui_playlist [gGlob->gui_playlist_cur]);
     pl_update_playlist();
   }
 }
@@ -337,8 +357,8 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
   if (gui_panel_visible)  {
     pl_raise_window();
     control_raise_window();
-    XRaiseWindow (gDisplay, gui_panel_win);
-    XSetTransientForHint (gDisplay, gui_panel_win, gVideoWin);
+    XRaiseWindow (gGlob->gDisplay, gGlob->gui_panel_win);
+    XSetTransientForHint (gGlob->gDisplay, gGlob->gui_panel_win, gVideoWin);
   }
   */
 }
@@ -351,8 +371,8 @@ void gui_toggle_aspect(void) {
 
   vo_set_aspect (vo_get_aspect () + 1);
   if (gui_panel_visible)  {
-    XRaiseWindow (gDisplay, gui_panel_win);
-    XSetTransientForHint (gDisplay, gui_panel_win, gVideoWin);
+    XRaiseWindow (gGlob->gDisplay, gGlob->gui_panel_win);
+    XSetTransientForHint (gGlob->gDisplay, gGlob->gui_panel_win, gVideoWin);
   }
   */
 }
@@ -372,14 +392,14 @@ void gui_toggle_panel_visibility (widget_t *w, void *data) {
 
     /* if (is_display_window_visible()) { FIXME */
     gui_panel_visible = 0;
-    XUnmapWindow (gDisplay, gui_panel_win);
+    XUnmapWindow (gGlob->gDisplay, gGlob->gui_panel_win);
     /* } */
     
   } else {
 
     gui_panel_visible = 1;
-    XMapRaised(gDisplay, gui_panel_win); 
-    /* XSetTransientForHint (gDisplay, gui_panel_win, gVideoWin); FIXME */
+    XMapRaised(gGlob->gDisplay, gGlob->gui_panel_win); 
+    /* XSetTransientForHint (gGlob->gDisplay, gGlob->gui_panel_win, gVideoWin); FIXME */
     update_slider = MAX_UPDSLD;
 
   }
@@ -392,39 +412,43 @@ void gui_toggle_panel_visibility (widget_t *w, void *data) {
 void gui_change_audio_channel(widget_t *w, void *data) {
   
   if(((int)data) == NEXT) {
-    xine_select_audio_channel(gXine, (xine_get_audio_channel(gXine) + 1));
+    xine_select_audio_channel(gGlob->gXine,
+			      (xine_get_audio_channel(gGlob->gXine) + 1));
   }
   else if(((int)data) == PREV) {
-    if(xine_get_audio_channel(gXine))
-      xine_select_audio_channel(gXine, (xine_get_audio_channel(gXine) - 1));
+    if(xine_get_audio_channel(gGlob->gXine))
+      xine_select_audio_channel(gGlob->gXine, 
+				(xine_get_audio_channel(gGlob->gXine) - 1));
   }
   
-  sprintf (gui_audiochan, "%3d", xine_get_audio_channel(gXine));
+  sprintf (gui_audiochan, "%3d", xine_get_audio_channel(gGlob->gXine));
   label_change_label (gui_widget_list, gui_audiochan_label, gui_audiochan);
 }
 
 void gui_change_spu_channel(widget_t *w, void *data) {
   
   if(((int)data) == NEXT) {
-    xine_select_spu_channel(gXine, (xine_get_spu_channel(gXine) + 1));
+    xine_select_spu_channel(gGlob->gXine, 
+			    (xine_get_spu_channel(gGlob->gXine) + 1));
   }
   else if(((int)data) == PREV) {
-    if(xine_get_spu_channel(gXine) >= 0) {
+    if(xine_get_spu_channel(gGlob->gXine) >= 0) {
       /* 
        * Subtitle will be disabled; so hide it otherwise 
        * the latest still be showed forever.
        */
       /* FIXME
-      if((xine_get_spu_channel(gXine) - 1) == -1)
+      if((xine_get_spu_channel(gGlob->gXine) - 1) == -1)
       	vo_hide_spu();
 	*/
 
-      xine_select_spu_channel(gXine, (xine_get_spu_channel(gXine) - 1));
+      xine_select_spu_channel(gGlob->gXine, 
+			      (xine_get_spu_channel(gGlob->gXine) - 1));
     }
   }
   
-  if(xine_get_spu_channel(gXine) >= 0) 
-    sprintf (gui_spuid, "%3d", xine_get_spu_channel (gXine));
+  if(xine_get_spu_channel(gGlob->gXine) >= 0) 
+    sprintf (gui_spuid, "%3d", xine_get_spu_channel (gGlob->gXine));
   else 
     sprintf (gui_spuid, "%3s", "off");
 
@@ -434,8 +458,8 @@ void gui_change_spu_channel(widget_t *w, void *data) {
 void gui_set_current_position (int pos) {
 
   gui_ignore_status = 1;
-  xine_stop (gXine);
-  xine_play (gXine, gui_filename, pos);
+  xine_stop (gGlob->gXine);
+  xine_play (gGlob->gXine, gGlob->gui_filename, pos);
   gui_ignore_status = 0;
   update_slider = MAX_UPDSLD;
   check_pause();
@@ -445,14 +469,14 @@ void gui_slider(widget_t *w, void *data, int pos) {
 
   if(w == gui_slider_play) {
     gui_set_current_position (pos);
-    if(xine_get_status(gXine) != XINE_PLAY)
+    if(xine_get_status(gGlob->gXine) != XINE_PLAY)
       slider_reset(gui_widget_list, gui_slider_play);
   }
   else if(w == gui_slider_mixer) {
     // TODO
   }
   else
-    xprintf(VERBOSE|GUI, "unknown widget slider caller\n");
+    fprintf(stderr, "unknown widget slider caller\n");
 
   check_pause();
 }
@@ -493,14 +517,14 @@ gui_image_t *gui_load_image(const char *image)
 
   i = (gui_image_t *) xmalloc(sizeof(gui_image_t));
 
-  if( !( img = Imlib_load_image(gImlib_data, (char *)image) ) ) {
+  if( !( img = Imlib_load_image(gGlob->gImlib_data, (char *)image) ) ) {
 	  fprintf(stderr, "xine-panel: couldn't find image %s\n", image);
     	  exit(-1);
   }
 
-  Imlib_render (gImlib_data, img, img->rgb_width, img->rgb_height);
+  Imlib_render (gGlob->gImlib_data, img, img->rgb_width, img->rgb_height);
   
-  i->image  = Imlib_copy_image(gImlib_data, img);
+  i->image  = Imlib_copy_image(gGlob->gImlib_data, img);
   i->width  = img->rgb_width;
   i->height = img->rgb_height;
 
@@ -519,66 +543,67 @@ void gui_open_panel (void) {
   XClassHint             *xclasshint;
 
 
-  if (gui_panel_win)
+  if (gGlob->gui_panel_win)
     return ; /* panel already open  - FIXME: bring to foreground */
 
-  XLockDisplay (gDisplay);
+  XLockDisplay (gGlob->gDisplay);
   
   /*
    * load bg image before opening window, so we can determine it's size
    */
 
-  if (!(gui_bg_image = Imlib_load_image(gImlib_data,
-					gui_get_skinfile("BackGround")))) {
+  if (!(gGlob->gui_bg_image = 
+	Imlib_load_image(gGlob->gImlib_data,
+			 gui_get_skinfile("BackGround")))) {
     fprintf(stderr, "xine-panel: couldn't find image for background\n");
     exit(-1);
   }
 
-  screen = DefaultScreen(gDisplay);
-  /* FIXME
-  hint.x = config_file_lookup_int ("x_panel", 200);
-  hint.y = config_file_lookup_int ("y_panel", 100);
-  */
+  screen = DefaultScreen(gGlob->gDisplay);
+
+  hint.x = config_lookup_int ("x_panel", 200);
+  hint.y = config_lookup_int ("y_panel", 100);
+
   hint.x = 200;
   hint.y = 100;
-  hint.width = gui_bg_image->rgb_width;
-  hint.height = gui_bg_image->rgb_height;
+  hint.width = gGlob->gui_bg_image->rgb_width;
+  hint.height = gGlob->gui_bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
-  gui_panel_win = XCreateWindow (gDisplay, DefaultRootWindow(gDisplay), 
+  gGlob->gui_panel_win = XCreateWindow (gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay), 
 				 hint.x, hint.y, hint.width, hint.height, 0, 
 				 CopyFromParent, CopyFromParent, 
 				 CopyFromParent,
 				 0, &attr);
   
-  XSetStandardProperties(gDisplay, gui_panel_win, title, title,
+  XSetStandardProperties(gGlob->gDisplay, gGlob->gui_panel_win, title, title,
 			 None, NULL, 0, &hint);
   /*
    * wm, no border please
    */
 
-  prop = XInternAtom(gDisplay, "_MOTIF_WM_HINTS", False);
+  prop = XInternAtom(gGlob->gDisplay, "_MOTIF_WM_HINTS", False);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
 
-  XChangeProperty(gDisplay, gui_panel_win, prop, prop, 32,
+  XChangeProperty(gGlob->gDisplay, gGlob->gui_panel_win, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  /* XSetTransientForHint (gDisplay, gui_panel_win, gVideoWin); */
+  /* XSetTransientForHint (gGlob->gDisplay, gGlob->gui_panel_win, gVideoWin); */
 
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = "Xine Panel";
     xclasshint->res_class = "Xine";
-    XSetClassHint(gDisplay, gui_panel_win, xclasshint);
+    XSetClassHint(gGlob->gDisplay, gGlob->gui_panel_win, xclasshint);
   }
 
-  gc = XCreateGC(gDisplay, gui_panel_win, 0, 0);
+  gc = XCreateGC(gGlob->gDisplay, gGlob->gui_panel_win, 0, 0);
 
-  XSelectInput(gDisplay, gui_panel_win,
+  XSelectInput(gGlob->gDisplay, gGlob->gui_panel_win,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
 
@@ -587,24 +612,24 @@ void gui_open_panel (void) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
     wm_hint->flags = InputHint | StateHint;
-    XSetWMHints(gDisplay, gui_panel_win, wm_hint);
+    XSetWMHints(gGlob->gDisplay, gGlob->gui_panel_win, wm_hint);
     XFree(wm_hint);
   }
   
-  Imlib_apply_image(gImlib_data, gui_bg_image, gui_panel_win);
-  XSync(gDisplay, False); 
+  Imlib_apply_image(gGlob->gImlib_data, gGlob->gui_bg_image, gGlob->gui_panel_win);
+  XSync(gGlob->gDisplay, False); 
 
-  XUnlockDisplay (gDisplay);
+  XUnlockDisplay (gGlob->gDisplay);
 
   /*
    * drag and drop
    */
   
-  if((xdnd_panel_win = (DND_struct_t *) 
+  if((gGlob->xdnd_panel_win = (DND_struct_t *) 
       xmalloc(sizeof(DND_struct_t))) != NULL) {
-    gui_init_dnd(xdnd_panel_win);
-    gui_dnd_set_callback (xdnd_panel_win, gui_dndcallback);
-    gui_make_window_dnd_aware (xdnd_panel_win, gui_panel_win);
+    gui_init_dnd(gGlob->xdnd_panel_win);
+    gui_dnd_set_callback (gGlob->xdnd_panel_win, gui_dndcallback);
+    gui_make_window_dnd_aware (gGlob->xdnd_panel_win, gGlob->gui_panel_win);
   }
   else {
     fprintf(stderr, "Cannot allocate memory: %s\n", strerror(errno));
@@ -617,7 +642,7 @@ void gui_open_panel (void) {
   gui_widget_list->l = gui_list_new ();
   gui_widget_list->focusedWidget = NULL;
   gui_widget_list->pressedWidget = NULL;
-  gui_widget_list->win           = gui_panel_win;
+  gui_widget_list->win           = gGlob->gui_panel_win;
   gui_widget_list->gc            = gc;
  
   /* Check and place some extra images on GUI */
@@ -733,7 +758,7 @@ void gui_open_panel (void) {
 			   (gui_title_label = 
 			    create_label (gui_get_skinX("TitleLabel"),
 					  gui_get_skinY("TitleLabel"),
-					  60, gui_filename, 
+					  60, gGlob->gui_filename, 
 					  gui_get_skinfile("TitleLabel"))));
 
   /* runtime label */
@@ -794,9 +819,9 @@ void gui_open_panel (void) {
     y = gui_get_skinY("AutoPlayGUI");
     
     ip = xine_get_input_plugin_list (&num_plugins);
-    xprintf (VERBOSE|GUI, "%d input plugins ...\n",num_plugins);
+    fprintf (stderr, "%d input plugins ...\n",num_plugins);
     for (i = 0; i < num_plugins; i++) {
-      xprintf (VERBOSE|GUI, "plugin #%d : id=%s\n", i, ip->get_identifier());
+      fprintf (stderr, "plugin #%d : id=%s\n", i, ip->get_identifier());
       if(ip->get_capabilities() & INPUT_CAP_AUTOPLAY) {
 	gui_list_append_content (gui_widget_list->l,
 		       (tmp =
@@ -863,7 +888,7 @@ void gui_handle_event (XEvent *event) {
       /* FIXME
       if (myexposeevent->window == gVideoWin)
 	gVideoDriver->handle_event (event);
-      else */ if (event->xany.window == gui_panel_win)
+      else */ if (event->xany.window == gGlob->gui_panel_win)
 	paint_widget_list (gui_widget_list);
     }
   }
@@ -872,7 +897,7 @@ void gui_handle_event (XEvent *event) {
   case MotionNotify:
 
     /* printf ("MotionNotify\n"); */
-    if(event->xany.window == gui_panel_win) {
+    if(event->xany.window == gGlob->gui_panel_win) {
       motion_notify_widget_list (gui_widget_list, event->xbutton.x, event->xbutton.y);
       /* if window-moving is enabled move the window */
       old_event = event;
@@ -881,10 +906,10 @@ void gui_handle_event (XEvent *event) {
 	x = (event->xmotion.x_root) + ( event->xmotion.x_root - old_event->xmotion.x_root) - gui_move.offset_x;
 	y = (event->xmotion.y_root) + ( event->xmotion.y_root - old_event->xmotion.y_root) - gui_move.offset_y;
 	
-	if(event->xany.window == gui_panel_win) {
-	  XLockDisplay (gDisplay);
-	  XMoveWindow(gDisplay, gui_panel_win, x, y);
-	  XUnlockDisplay (gDisplay);
+	if(event->xany.window == gGlob->gui_panel_win) {
+	  XLockDisplay (gGlob->gDisplay);
+	  XMoveWindow(gGlob->gDisplay, gGlob->gui_panel_win, x, y);
+	  XUnlockDisplay (gGlob->gDisplay);
 
 	  /* FIXME
 	  config_file_set_int ("x_panel",x);
@@ -897,18 +922,18 @@ void gui_handle_event (XEvent *event) {
 
   case MappingNotify:
     /* printf ("MappingNotify\n");*/
-    XLockDisplay (gDisplay);
+    XLockDisplay (gGlob->gDisplay);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUnlockDisplay (gDisplay);
+    XUnlockDisplay (gGlob->gDisplay);
     break;
 
   case DestroyNotify:
     printf ("DestroyNotify\n"); 
     /* FIXME
-    if(event->xany.window == gui_panel_win 
+    if(event->xany.window == gGlob->gui_panel_win 
        || event->xany.window == gVideoWin) {
        */
-      xine_exit (gXine);
+      xine_exit (gGlob->gXine);
       gui_running = 0;
       /*} */
     break;
@@ -934,7 +959,7 @@ void gui_handle_event (XEvent *event) {
     */
     
     /* if no widget is hit enable moving the window */
-    if(bevent->window == gui_panel_win) {
+    if(bevent->window == gGlob->gui_panel_win) {
       gui_move.enabled = !click_notify_widget_list (gui_widget_list, 
 						    event->xbutton.x, 
 						    event->xbutton.y, 0);
@@ -948,7 +973,7 @@ void gui_handle_event (XEvent *event) {
 
   case ButtonRelease:
     /* printf ("ButtonRelease\n");*/
-    if(event->xany.window == gui_panel_win) {
+    if(event->xany.window == gGlob->gui_panel_win) {
       click_notify_widget_list (gui_widget_list, event->xbutton.x, 
 				event->xbutton.y, 1);
       gui_move.enabled = 0; /* disable moving the window       */  
@@ -966,9 +991,9 @@ void gui_handle_event (XEvent *event) {
 
     /* printf ("KeyPress (state : %d, keycode: %d)\n", mykeyevent.state, mykeyevent.keycode);  */
       
-    XLockDisplay (gDisplay);
+    XLockDisplay (gGlob->gDisplay);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay (gDisplay);
+    XUnlockDisplay (gGlob->gDisplay);
 
     switch (mykey) {
     
@@ -1130,19 +1155,19 @@ void gui_handle_event (XEvent *event) {
     /*  background */
     /*
     XLOCK ();
-    Imlib_apply_image(gImlib_data, gui_bg_image, gui_panel_win);
+    Imlib_apply_image(gGlob->gImlib_data, gGlob->gui_bg_image, gGlob->gui_panel_win);
     XUNLOCK ();
     paint_widget_list (gui_widget_list);
     XLOCK ();
-    XSync(gDisplay, False);
+    XSync(gGlob->gDisplay, False);
     XUNLOCK ();
     */
     break;
 
   case ClientMessage:
     /* printf ("ClientMessage\n"); */
-    if(event->xany.window == gui_panel_win)
-      gui_dnd_process_client_message (xdnd_panel_win, event);
+    if(event->xany.window == gGlob->gui_panel_win)
+      gui_dnd_process_client_message (gGlob->xdnd_panel_win, event);
     /* FIXME
     else if(event->xany.window == gVideoWin)
       gVideoDriver->handle_event (event);
@@ -1172,7 +1197,7 @@ void gui_status_callback (int nStatus) {
 
     if(update_slider > MAX_UPDSLD) {
       slider_set_pos(gui_widget_list, gui_slider_play, 
-		     xine_get_current_position(gXine));
+		     xine_get_current_position(gGlob->gXine));
     
       update_slider = 0;
     }
@@ -1181,11 +1206,11 @@ void gui_status_callback (int nStatus) {
   }
 
   if (nStatus == XINE_STOP) {
-    gui_playlist_cur++;
+    gGlob->gui_playlist_cur++;
     slider_reset(gui_widget_list, gui_slider_play);
-    if (gui_playlist_cur < gui_playlist_num) {
-      gui_set_current_mrl(gui_playlist[gui_playlist_cur]);
-      xine_play ( gXine, gui_filename, 0 );
+    if (gGlob->gui_playlist_cur < gGlob->gui_playlist_num) {
+      gui_set_current_mrl(gGlob->gui_playlist[gGlob->gui_playlist_cur]);
+      xine_play (gGlob->gXine, gGlob->gui_filename, 0 );
     } else {
 
       /* FIXME
@@ -1196,7 +1221,7 @@ void gui_status_callback (int nStatus) {
       /* FIXME
       vo_set_logo_mode (1); 
       */
-      gui_playlist_cur--;
+      gGlob->gui_playlist_cur--;
     }
   }
 }
@@ -1206,10 +1231,10 @@ void gui_status_callback (int nStatus) {
      startevent.type = KeyPress;                                              \
      startevent.xkey.type = KeyPress;                                         \
      startevent.xkey.send_event = True;                                       \
-     startevent.xkey.display = gDisplay;                                      \
-     startevent.xkey.window = gui_panel_win;                                  \
-     startevent.xkey.keycode = XKeysymToKeycode(gDisplay, key);               \
-     XSendEvent(gDisplay, gui_panel_win, True, KeyPressMask, &startevent);    \
+     startevent.xkey.display = gGlob->gDisplay;                                      \
+     startevent.xkey.window = gGlob->gui_panel_win;                                  \
+     startevent.xkey.keycode = XKeysymToKeycode(gGlob->gDisplay, key);               \
+     XSendEvent(gGlob->gDisplay, gGlob->gui_panel_win, True, KeyPressMask, &startevent);    \
    }
 
 void gui_start (int nfiles, char *filenames[]) {
@@ -1226,25 +1251,25 @@ void gui_start (int nfiles, char *filenames[]) {
   gui_move.offset_y = 0; 
 
   for (i=0; i<nfiles; i++)
-    gui_playlist[i]     = filenames[i];
-  gui_playlist_num = nfiles; 
-  gui_playlist_cur = 0;
+    gGlob->gui_playlist[i]     = filenames[i];
+  gGlob->gui_playlist_num = nfiles; 
+  gGlob->gui_playlist_cur = 0;
 
   if (nfiles)
-    strcpy(gui_filename, gui_playlist [gui_playlist_cur]);
+    strcpy(gGlob->gui_filename, gGlob->gui_playlist [gGlob->gui_playlist_cur]);
   else 
-    sprintf(gui_filename, "DROP A FILE ON XINE");
+    sprintf(gGlob->gui_filename, "DROP A FILE ON XINE");
 
   /* FIXME
   sprintf (gui_runtime, "%02d:%02d:%02d", nVideoHours, nVideoMins, nVideoSecs);
   */
-  sprintf (gui_audiochan, "%3d", xine_get_audio_channel(gXine));
-  if(xine_get_spu_channel(gXine) >= 0) 
-    sprintf (gui_spuid, "%3d", xine_get_spu_channel(gXine));
+  sprintf (gui_audiochan, "%3d", xine_get_audio_channel(gGlob->gXine));
+  if(xine_get_spu_channel(gGlob->gXine) >= 0) 
+    sprintf (gui_spuid, "%3d", xine_get_spu_channel(gGlob->gXine));
   else
     sprintf (gui_spuid, "%3s", "off");
 
-  gImlib_data = Imlib_init (gDisplay);
+  gGlob->gImlib_data = Imlib_init (gGlob->gDisplay);
 
   /*
    * setup panel
@@ -1252,60 +1277,73 @@ void gui_start (int nfiles, char *filenames[]) {
 
   gui_open_panel ();
 
-  XLockDisplay (gDisplay);
-  /* FIXME
-  if (config_file_lookup_int ("open_panel", 1)) {
-  */
-    XMapRaised(gDisplay, gui_panel_win); 
+  XLockDisplay (gGlob->gDisplay);
+  
+  if (config_lookup_int("open_panel", 1)) {
+    XMapRaised(gGlob->gDisplay, gGlob->gui_panel_win); 
     gui_panel_visible = 1;
-    /* FIXME
-  } else
+  } 
+  else {
     gui_panel_visible = 0;
-    */
+  }
 
-    /* FIXME
-       vo_display_cursor(gui_panel_visible);
-    */
+  /* FIXME
+     vo_display_cursor(gui_panel_visible);
+  */
   cursor_visible = gui_panel_visible;
-  XUnlockDisplay (gDisplay);
+  XUnlockDisplay (gGlob->gDisplay);
   
   /*  The user request "play on start" */
-  /* FIXME 
-  if(xine_user_pref & PLAY_ON_START) {
-
-     probe DVD && VCD 
-    {
-      int i, num_plugins;
-      input_plugin_t *ip;
+  if(gGlob->autoplay_options & PLAY_ON_START) {
+    /* probe DVD && VCD  */
+    int i = 0;
+    int num_plugins;
+    char **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGlob->gXine);
+    
+    perr("autoplay\n");
+    
+    while(autoplay_plugins[i] != NULL) {
       
-      ip = xine_get_input_plugin_list (&num_plugins);
-      for (i = 0; i < num_plugins; i++) {
-	
-	if(ip->get_capabilities() & INPUT_CAP_AUTOPLAY) {
-	  if((xine_user_pref & PLAY_FROM_DVD) 
-	     && (!strcasecmp(ip->get_identifier(), "DVD"))) {
-	    pl_scan_input(NULL, ip);
-	  }
-	  if((xine_user_pref & PLAY_FROM_VCD) 
-	     && (!strcasecmp(ip->get_identifier(), "VCD"))) {
-	    pl_scan_input(NULL, ip);
+      perr("try '%s'\n", autoplay_plugins[i]);
+      if(gGlob->autoplay_options & PLAY_FROM_DVD)
+
+	if(!strcasecmp(autoplay_plugins[i], "DVD")) {
+	  char **autoplay_mrls = xine_get_autoplay_mrls (gGlob->gXine, "DVD");
+	  int j = 0;
+	    
+	  while(autoplay_mrls[j]) {
+	    printf("DVD: autoplaylist[%d]='%s'\n", j, autoplay_mrls[j]);
+	    j++;
 	  }
 	}
-	ip++;
-      }
+
+      if(gGlob->autoplay_options & PLAY_FROM_VCD)
+	if(!strcasecmp(autoplay_plugins[i], "VCD")) {
+	  char **autoplay_mrls = xine_get_autoplay_mrls (gGlob->gXine, "VCD");
+	  int j = 0;
+	    
+	  while(autoplay_mrls[j]) {
+	    printf("VCD: autoplaylist[%d]='%s'\n", j, autoplay_mrls[j]);
+	    j++;
+	  }
+	}
+
+      i++;
     }
-    
-    The user wants to hide control panel 
-    if(gui_panel_visible && (xine_user_pref & HIDEGUI_ON_START))
+
+    /*  The user wants to hide control panel  */
+    if(gui_panel_visible && (gGlob->autoplay_options & HIDEGUI_ON_START))
       SEND_KEVENT(XK_G);
-
-      The user wants to see in fullscreen mode 
-    if(xine_user_pref & FULL_ON_START)
+    
+    /*  The user wants to see in fullscreen mode  */
+    if(gGlob->autoplay_options & FULL_ON_START)
       SEND_KEVENT(XK_F);
+    
+    if(gGlob->gui_playlist[0] != NULL)
+      SEND_KEVENT(XK_Return);
 
-    SEND_KEVENT(XK_Return);
-    xine_user_pref |= PLAYED_ON_START;    
-  } */
+    gGlob->autoplay_options |= PLAYED_ON_START;    
+  }
 
   /* install sighandler */
   action.sa_handler = gui_handleSIG;
@@ -1324,17 +1362,17 @@ void gui_start (int nfiles, char *filenames[]) {
 #ifdef HAVE_LIRC
   if(!no_lirc) {
     init_lirc();
-    if(lirc_enable) {
-      pthread_create (&lirc_thread, NULL, xine_lirc_loop, NULL) ;
+    if(gGlob->lirc_enable) {
+      pthread_create (&gGlob->lirc_thread, NULL, xine_lirc_loop, NULL) ;
       printf ("gui_main: LIRC thread created\n");
     }
   }
 #endif
 
   while (gui_running) {
-    xprintf (VERBOSE | GUI, "gui: XNextEvent\n");
-    XNextEvent (gDisplay, &myevent) ;
-    xprintf (VERBOSE | GUI, "gui: =>handle event\n");
+    //    fprintf (stderr, "gui: XNextEvent\n");
+    XNextEvent (gGlob->gDisplay, &myevent) ;
+    //    fprintf (stderr, "gui: =>handle event\n");
 
     gui_handle_event (&myevent) ;
   }
@@ -1436,7 +1474,8 @@ static void *xine_lirc_loop(void *dummy) {
       
       pthread_testcancel();
       
-      while((ret = lirc_code2char(xlirc_config, code, &c)) == 0 && c != NULL) {
+      while((ret = lirc_code2char(gGlob->xlirc_config, code, &c)) == 0 
+	    && c != NULL) {
 	//fprintf(stdout, "Command Received = '%s'\n", c);
 	
 	if((lsub = handle_lirc_command(&c, lirc_commands, &uc)) != -1) {
@@ -1463,7 +1502,7 @@ static void *xine_lirc_loop(void *dummy) {
 	    break;
 
 	  case lPLAY:
-	    if(xine_get_status(gXine) != XINE_PLAY)
+	    if(xine_get_status(gGlob->gXine) != XINE_PLAY)
 	      gui_play(NULL, NULL);
 	    else
 	      gui_stop(NULL, NULL);
@@ -1555,24 +1594,24 @@ static void *xine_lirc_loop(void *dummy) {
 static void init_lirc(void) {
   /*  int flags; */
 
-  if((lirc_fd = lirc_init("xine", 1)) == -1) {
-    lirc_enable = 0;
+  if((gGlob->lirc_fd = lirc_init("xine", 1)) == -1) {
+    gGlob->lirc_enable = 0;
     return;
   }
   /*
   else {
-    flags = fcntl(lirc_fd, F_GETFL, 0);
+    flags = fcntl(gGlob->lirc_fd, F_GETFL, 0);
     if(flags != -1)
-      fcntl(lirc_fd, F_SETFL, flags|FASYNC|O_NONBLOCK);
+      fcntl(gGlob->lirc_fd, F_SETFL, flags|FASYNC|O_NONBLOCK);
   }
   */
 
-  if(lirc_readconfig(NULL, &xlirc_config, NULL) != 0) {
-    lirc_enable = 0;
+  if(lirc_readconfig(NULL, &gGlob->xlirc_config, NULL) != 0) {
+    gGlob->lirc_enable = 0;
     return;
   }
 
-  lirc_enable = 1;
+  gGlob->lirc_enable = 1;
 }
 
 /*
@@ -1580,8 +1619,8 @@ static void init_lirc(void) {
  */
 static void deinit_lirc(void) {
 
-  if(lirc_enable) {
-    lirc_freeconfig(xlirc_config);
+  if(gGlob->lirc_enable) {
+    lirc_freeconfig(gGlob->xlirc_config);
     lirc_deinit();
   }
 }

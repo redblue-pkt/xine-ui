@@ -33,10 +33,8 @@
 #include "gui_widget_types.h"
 #include "gui_main.h"
 #include "utils.h"
-#include "monitor.h"
 
-extern Display         *gDisplay;
-extern pthread_mutex_t  gXLock;
+extern gGlob_t         *gGlob;
 extern uint32_t         xine_debug;
 
 #define COMPUTE_COORDS(X,Y)                                                \
@@ -50,15 +48,15 @@ extern uint32_t         xine_debug;
                                 * private_data->ratio);                    \
        }                                                                   \
        else                                                                \
-         xprintf(VERBOSE|GUI, "Unknown slider type (%d)\n",                \
+         fprintf(stderr, "Unknown slider type (%d)\n",                     \
                  private_data->sType);                                     \
                                                                            \
        if(private_data->pos > private_data->max) {                         \
-         xprintf(VERBOSE|GUI, "slider POS > MAX!.\n");                     \
+         fprintf(stderr, "slider POS > MAX!.\n");                          \
          private_data->pos = private_data->max;                            \
        }                                                                   \
        if(private_data->pos < private_data->min) {                         \
-         xprintf(VERBOSE|GUI, "slider POS < MIN!.\n");                     \
+         fprintf(stderr, "slider POS < MIN!.\n");                          \
          private_data->pos = private_data->min;                            \
        }                                                                   \
      }
@@ -75,7 +73,7 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
   gui_image_t *bg = (gui_image_t *) private_data->bg_skin;
   gui_image_t *paddle = (gui_image_t *) private_data->paddle_skin;
   
-  XLockDisplay (gDisplay);
+  XLockDisplay (gGlob->gDisplay);
 
   if(private_data->pos > private_data->max
      || private_data->pos < private_data->min)
@@ -92,7 +90,7 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
   tmp /= private_data->max;
   tmp *= private_data->pos;
 
-  XCopyArea (gDisplay, bg->image, win, gc, 0, 0,
+  XCopyArea (gGlob->gDisplay, bg->image, win, gc, 0, 0,
 	     bg->width, bg->height, sl->x, sl->y);
   
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {
@@ -107,27 +105,27 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
     }
     if (private_data->bArmed) {
       if (private_data->bClicked) {
-	XCopyArea (gDisplay, paddle->image, win, gc, 2*button_width, 0,
+	XCopyArea (gGlob->gDisplay, paddle->image, win, gc, 2*button_width, 0,
 		   button_width, paddle->height, x, y);
 	
       } else {
-	XCopyArea (gDisplay, paddle->image, win, gc, button_width, 0,
+	XCopyArea (gGlob->gDisplay, paddle->image, win, gc, button_width, 0,
 		   button_width, paddle->height, x, y);
       }
     } else {
-      XCopyArea (gDisplay, paddle->image, win, gc, 0, 0,
+      XCopyArea (gGlob->gDisplay, paddle->image, win, gc, 0, 0,
 		 button_width, paddle->height, x, y);
     }
-    XSetForeground(gDisplay, gc, gui_color.white.pixel);
+    XSetForeground(gGlob->gDisplay, gc, gui_color.white.pixel);
     
-    XFlush (gDisplay);
+    XFlush (gGlob->gDisplay);
     
   } 
   else
-    xprintf (VERBOSE|GUI, "paint slider on something (%d) "
+    fprintf (stderr, "paint slider on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
   
-  XUnlockDisplay (gDisplay);
+  XUnlockDisplay (gGlob->gDisplay);
 
 }
 /* ------------------------------------------------------------------------- */
@@ -169,7 +167,7 @@ int notify_click_slider (widget_list_t *wl,
        * Loop of death ;-)
        */
       do {
-	XNextEvent (gDisplay, &sliderevent) ;
+	XNextEvent (gGlob->gDisplay, &sliderevent) ;
 	
 	switch(sliderevent.type) {
 	  
@@ -233,7 +231,7 @@ int notify_click_slider (widget_list_t *wl,
     paint_widget_list (wl);
   }
   else
-    xprintf (VERBOSE|GUI, "notify click slider on something (%d) "
+    fprintf (stderr, "notify click slider on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
   return 1;
 }
@@ -248,7 +246,7 @@ int notify_focus_slider (widget_list_t *wl, widget_t *sl, int bEntered) {
   if (sl->widget_type & WIDGET_TYPE_SLIDER)
     private_data->bArmed = bEntered;    
   else
-    xprintf (VERBOSE|GUI, "notify slider button on something (%d) "
+    fprintf (stderr, "notify slider button on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
   return 1;
 }
@@ -266,7 +264,7 @@ void slider_make_step(widget_list_t *wl, widget_t *sl) {
       slider_set_pos(wl, sl, slider_get_pos(sl) + private_data->step);
   } 
   else
-    xprintf (VERBOSE|GUI, "slider_make_step on something (%d) "
+    fprintf (stderr, "slider_make_step on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
 }
 /* ------------------------------------------------------------------------- */
@@ -283,7 +281,7 @@ void slider_make_backstep(widget_list_t *wl, widget_t *sl) {
       slider_set_pos(wl, sl, slider_get_pos(sl) - private_data->step);
   } 
   else
-    xprintf (VERBOSE|GUI, "slider_make_step on something (%d) "
+    fprintf (stderr, "slider_make_step on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
 }
 /* ------------------------------------------------------------------------- */
@@ -304,11 +302,11 @@ void slider_set_min(widget_t *sl, int min) {
 	private_data->ratio = (float)
 	  (private_data->max-private_data->min)/private_data->bg_skin->height;
       else
-	xprintf(VERBOSE|GUI, "Unknown slider type (%d)\n", 
+	fprintf(stderr, "Unknown slider type (%d)\n", 
 		private_data->sType);
     }
   } else
-    xprintf(VERBOSE|GUI, "slider_set_min on something (%d) "
+    fprintf(stderr, "slider_set_min on something (%d) "
 	    "that is not a slider\n", sl->widget_type);
 }
 /* ------------------------------------------------------------------------- */
@@ -323,7 +321,7 @@ int slider_get_min(widget_t *sl) {
     return private_data->realmin;
   } 
   else
-    xprintf (VERBOSE|GUI, "slider_get_pos on something (%d) "
+    fprintf (stderr, "slider_get_pos on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
   return -1;
 }
@@ -339,7 +337,7 @@ int slider_get_max(widget_t *sl) {
     return private_data->max;
   } 
   else
-    xprintf (VERBOSE|GUI, "slider_get_pos on something (%d) "
+    fprintf (stderr, "slider_get_pos on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
   return -1;
 }
@@ -361,12 +359,12 @@ void slider_set_max(widget_t *sl, int max) {
 	private_data->ratio = (float)
 	  (private_data->max-private_data->min)/private_data->bg_skin->height;
       else
-	xprintf(VERBOSE|GUI, "Unknown slider type (%d)\n", 
+	fprintf(stderr, "Unknown slider type (%d)\n", 
 		private_data->sType);
     }
   } 
   else
-    xprintf(VERBOSE|GUI, "slider_set_min on something (%d) "
+    fprintf(stderr, "slider_set_min on something (%d) "
 	    "that is not a slider\n", sl->widget_type);
 }
 /* ------------------------------------------------------------------------- */
@@ -387,7 +385,7 @@ void slider_reset(widget_list_t *wl, widget_t *sl) {
     paint_slider(sl, wl->win, wl->gc);
   }
   else
-    xprintf(VERBOSE|GUI, "slider_set_min on something (%d) "
+    fprintf(stderr, "slider_set_min on something (%d) "
 	    "that is not a slider\n", sl->widget_type);
 }
 /* ------------------------------------------------------------------------- */
@@ -408,7 +406,7 @@ void slider_set_to_max(widget_list_t *wl, widget_t *sl) {
     paint_slider(sl, wl->win, wl->gc);
   }
   else
-    xprintf(VERBOSE|GUI, "slider_set_min on something (%d) "
+    fprintf(stderr, "slider_set_min on something (%d) "
 	    "that is not a slider\n", sl->widget_type);
 }
 /* ------------------------------------------------------------------------- */
@@ -426,7 +424,7 @@ int slider_get_pos(widget_t *sl) {
       return private_data->pos;
   } 
   else
-    xprintf (VERBOSE|GUI, "slider_get_pos on something (%d) "
+    fprintf (stderr, "slider_get_pos on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
   return -1;
 }
@@ -453,7 +451,7 @@ void slider_set_pos(widget_list_t *wl, widget_t *sl, int pos) {
       slider_reset(wl, sl);    
   } 
   else
-    xprintf (VERBOSE|GUI, "slider_set_pos on something (%d) "
+    fprintf (stderr, "slider_set_pos on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
 }
 /* ------------------------------------------------------------------------- */
@@ -502,7 +500,7 @@ widget_t *create_slider (int type, int x, int y, int min, int max,
   else if(type == VSLIDER)
     private_data->ratio      = (float)(private_data->max - private_data->min)/private_data->bg_skin->height;
   else
-    xprintf(VERBOSE|GUI, "Unknown slider type (%d)\n", type);
+    fprintf(stderr, "Unknown slider type (%d)\n", type);
 
   private_data->mfunction    = fm;
   private_data->muser_data   = udm;

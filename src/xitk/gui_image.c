@@ -33,10 +33,8 @@
 #include "gui_widget_types.h"
 #include "gui_main.h"
 #include "utils.h"
-#include "monitor.h"
 
-extern Display         *gDisplay;
-extern pthread_mutex_t  gXLock;
+extern gGlob_t         *gGlob;
 extern uint32_t         xine_debug;
 
 void paint_image (widget_t *i,  Window win, GC gc) {
@@ -44,21 +42,21 @@ void paint_image (widget_t *i,  Window win, GC gc) {
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
 
-  XLockDisplay (gDisplay);
+  XLockDisplay (gGlob->gDisplay);
 
   skin = private_data->skin;
 
   if (i->widget_type & WIDGET_TYPE_IMAGE) {
-    XCopyArea (gDisplay, skin->image, win, gc, 0, 0,
+    XCopyArea (gGlob->gDisplay, skin->image, win, gc, 0, 0,
 	       skin->width, skin->height, i->x, i->y);
     
-    XFlush (gDisplay);
+    XFlush (gGlob->gDisplay);
 
   } else
-    xprintf (VERBOSE|GUI, "paint image on something (%d) "
+    fprintf (stderr, "paint image on something (%d) "
 	     "that is not an image\n", i->widget_type);
   
-  XUnlockDisplay (gDisplay);
+  XUnlockDisplay (gGlob->gDisplay);
 }
 
 widget_t *create_image (int x, int y, const char *skin) {

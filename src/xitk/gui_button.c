@@ -30,13 +30,12 @@
 
 #include "xine.h"
 #include "utils.h"
-#include "monitor.h"
 #include "gui_widget.h"
 #include "gui_button.h"
 #include "gui_widget_types.h"
 #include "gui_main.h"
 
-extern Display         *gDisplay;
+extern gGlob_t         *gGlob;
 extern uint32_t         xine_debug;
 
 void paint_button (widget_t *b,  Window win, GC gc) {
@@ -46,7 +45,7 @@ void paint_button (widget_t *b,  Window win, GC gc) {
   
   button_private_data_t *private_data = (button_private_data_t *) b->private_data;
 
-  XLockDisplay (gDisplay);
+  XLockDisplay (gGlob->gDisplay);
 
   skin = private_data->skin;
 
@@ -56,26 +55,26 @@ void paint_button (widget_t *b,  Window win, GC gc) {
     
     if (private_data->bArmed) {
       if (private_data->bClicked) {
-	XCopyArea (gDisplay, skin->image,  win, gc, 2*button_width, 0,
+	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 2*button_width, 0,
 		   button_width, skin->height, b->x, b->y);
 	
       } else {
-	XCopyArea (gDisplay, skin->image,  win, gc, button_width, 0,
+	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, button_width, 0,
 		   button_width, skin->height, b->x, b->y);
       }
     } else {
-      XCopyArea (gDisplay, skin->image,  win, gc, 0, 0,
+      XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 0, 0,
 		 button_width, skin->height, b->x, b->y);
     }
     
     
-    XFlush (gDisplay);
+    XFlush (gGlob->gDisplay);
     
   } else
-    xprintf (VERBOSE|GUI, "paint button on something (%d) that is not a button\n",
+    fprintf (stderr, "paint button on something (%d) that is not a button\n",
 	     b->widget_type);
   
-  XUnlockDisplay (gDisplay);
+  XUnlockDisplay (gGlob->gDisplay);
 }
 
 int notify_click_button (widget_list_t *wl, widget_t *b,int bUp, int x, int y){
@@ -96,8 +95,8 @@ int notify_click_button (widget_list_t *wl, widget_t *b,int bUp, int x, int y){
       paint_widget_list (wl);
     
   } else
-    xprintf (VERBOSE|GUI, "notify click button on something (%d) that is not a button\n",
-	     b->widget_type);
+    fprintf (stderr, "notify click button on something (%d) that is not"
+	     " a button\n", b->widget_type);
   return 1;
 }
 
@@ -109,8 +108,8 @@ int notify_focus_button (widget_list_t *wl, widget_t *b, int bEntered) {
     private_data->bArmed = bEntered;
     
   } else
-    xprintf (VERBOSE|GUI, "notify focus button on something (%d) that is not a button\n",
-	     b->widget_type);
+    fprintf (stderr, "notify focus button on something (%d) that is not"
+	     " a button\n", b->widget_type);
   return 1;
 }
 

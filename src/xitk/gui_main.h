@@ -25,11 +25,61 @@
 #define GUI_MAIN_H
 
 #include <Imlib.h>
+#include <X11/Xlib.h>
+#ifdef HAVE_LIRC
+#include "lirc/lirc_client.h"
+#endif
 #include "xine.h"
 #include "gui_widget.h"
+#include "gui_dnd.h"
 
+#define perr(FMT,ARGS...) fprintf(stderr, FMT, ##ARGS);fflush(stderr)
 
 #define MAX_PLAYLIST_LENGTH  1024
+
+typedef struct {
+  /* Xine lib engine configuration */
+  config_values_t     *gConfig;
+  
+  /* Xine lib instance */
+  xine_t              *gXine;
+
+  /* Xine lib/gui configuration filename */
+  char                *gConfigFilename;
+
+  /* stuff like FULL_ON_START, QUIT_ON_STOP */
+  int                  autoplay_options;
+
+  Display             *gDisplay;
+
+  Window               gui_panel_win;
+  DND_struct_t        *xdnd_panel_win;
+
+
+  uint32_t             debug_level;
+
+  ImlibData           *gImlib_data;
+  ImlibImage          *gui_bg_image;     /* background image */
+
+#ifdef HAVE_LIRC
+  struct lirc_config  *xlirc_config;
+  static int           lirc_fd;
+  static int           lirc_enable = 0;
+  static pthread_t     lirc_thread;
+#endif
+
+  char                 gui_filename[1024];
+
+  /* gui playlist */
+  char                *gui_playlist[MAX_PLAYLIST_LENGTH];
+  int                  gui_playlist_num;
+  int                  gui_playlist_cur;
+
+
+
+} gGlob_t;
+
+
 char *gui_get_skindir(const char file[]);
 
 typedef struct gui_move_s {
@@ -77,6 +127,17 @@ typedef struct _mwmhints {
 #define PLAY_FROM_VCD      0x00000040
 
 
+/*
+ * Configuration file lookup/set functions
+ */
+char *config_lookup_str(char *, char *);
+int config_lookup_int(char *, int);
+void config_set_str(char *, char *);
+void config_set_int(char *, int);
+void config_save(void);
+void config_reset(void);
+
+
 gui_image_t *gui_load_image(const char *image);
 
 void gui_start (int nfiles, char *filenames[]);
@@ -87,7 +148,7 @@ void gui_dndcallback (char *filename) ;
 
 void gui_set_current_mrl(const char *mrl);
 
-void gui_play(widget_t *, void*);
+void gui_play(widget_t *, void *);
 
 void gui_stop (widget_t *, void *);
 
@@ -97,8 +158,9 @@ int  is_gui_panel_visible(void);
  * seamless branching support:
  */
 
-char *gui_get_next_mrl ();
+char *gui_get_next_mrl (void);
 
-void gui_notify_demux_branched ();
+void gui_notify_demux_branched (void);
 
 #endif
+

@@ -64,9 +64,7 @@
 /*
  * global variables
  */
-Display  *gDisplay;
-uint32_t  debug_level;
-xine_t   *gXine;
+gGlob_t  *gGlob;
 
 /* options args */
 static const char *short_options = "?hS4"
@@ -181,7 +179,7 @@ int handle_debug_subopt(char *sopt) {
   int subopt;
   char *str = sopt;
   char *val = NULL;
-  const char *debuglvl[] = {
+  char *debuglvl[] = {
     "verbose", "metronom", "audio", "demux", 
     "input", "video", "pts", "mpeg", "avi", 
     "ac3", "loop", "gui",
@@ -195,10 +193,10 @@ int handle_debug_subopt(char *sopt) {
       /* If debug feature is already enabled, with 
        * XINE_DEBUG envvar, turn it off 
        */
-      if((debug_level & 0x8000>>(subopt + 1)))
-	debug_level &= ~0x8000>>(subopt + 1);
+      if((gGlob->debug_level & 0x8000>>(subopt + 1)))
+	gGlob->debug_level &= ~0x8000>>(subopt + 1);
       else
-	debug_level |= 0x8000>>(subopt + 1);
+	gGlob->debug_level |= 0x8000>>(subopt + 1);
       break;
     }
   }
@@ -225,7 +223,7 @@ int handle_demux_strategy_subopt(char *sopt) {
   int subopt;
   char *str = sopt;
   char *val = NULL;
-  const char *ds_available[] = {
+  char *ds_available[] = {
     "default",
     "revert",
     "content",
@@ -285,18 +283,19 @@ int main(int argc, char *argv[]) {
   int              spu_channel = -1;
   int              no_lirc = 0;
   int              audio_options = 0;
-  int              autoplay_options = 0; /* stuff like FULL_ON_START, QUIT_ON_STOP */
   char            *audio_driver_id = NULL;
   char            *video_driver_id = NULL;
   ao_functions_t  *audio_driver = NULL ;
   vo_driver_t     *video_driver = NULL;
   char            *display_name = ":0.0";
-  char             filename[1024];
-  config_values_t *cfg;
 
   show_banner();
 
-  debug_level = 0;
+  gGlob = (gGlob_t *) xmalloc(sizeof(gGlob_t));
+
+  gGlob->debug_level = 0;
+  gGlob->autoplay_options = 0;
+
 #ifdef DEBUG
   /* If XINE_DEBUG envvar is set, parse it */
   if(getenv("XINE_DEBUG") != NULL) {
@@ -335,7 +334,7 @@ int main(int argc, char *argv[]) {
 
     case 'A': /* Select audio driver */
       if(optarg != NULL) {
-	audio_driver_id = malloc (strlen (optarg) + 1);
+	audio_driver_id = xmalloc (strlen (optarg) + 1);
 	strcpy (audio_driver_id, optarg);
       } else {
 	fprintf (stderr, "audio driver id required for -A option\n");
@@ -345,7 +344,7 @@ int main(int argc, char *argv[]) {
 
     case 'V': /* select video driver by plugin id */
       if(optarg != NULL) {
-	video_driver_id = malloc (strlen (optarg) + 1);
+	video_driver_id = xmalloc (strlen (optarg) + 1);
 	strncpy (video_driver_id, optarg, strlen (optarg));
 	printf("video_driver_id = '%s'\n", video_driver_id);
       } else {
@@ -355,22 +354,22 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'p':/* Play [[in fullscreen][then quit]] on start */
-      autoplay_options |= PLAY_ON_START;
+      gGlob->autoplay_options |= PLAY_ON_START;
       if(optarg != NULL) {
 	if(strrchr(optarg, 'f')) {
-	  autoplay_options |= FULL_ON_START;
+	  gGlob->autoplay_options |= FULL_ON_START;
 	}
 	if(strrchr(optarg, 'h')) {
-	  autoplay_options |= HIDEGUI_ON_START;
+	  gGlob->autoplay_options |= HIDEGUI_ON_START;
 	}
 	if(strrchr(optarg, 'q')) {
-	  autoplay_options |= QUIT_ON_STOP;
+	  gGlob->autoplay_options |= QUIT_ON_STOP;
 	}
 	if(strrchr(optarg, 'd')) {
-	  autoplay_options |= PLAY_FROM_DVD;
+	  gGlob->autoplay_options |= PLAY_FROM_DVD;
 	}
 	if(strrchr(optarg, 'v')) {
-	  autoplay_options |= PLAY_FROM_VCD;
+	  gGlob->autoplay_options |= PLAY_FROM_VCD;
 	}
       }
       break;
@@ -413,9 +412,16 @@ int main(int argc, char *argv[]) {
   /*
    * generate and init a config "object"
    */
+  {
+    char *homedir;
 
-  sprintf (filename, "%s/.xinerc", get_homedir());
-  cfg = config_file_init (filename);
+    homedir = strdup(get_homedir());
+    gGlob->gConfigFilename = (char *) xmalloc(strlen(homedir) + 8 + 1);
+
+    sprintf (gGlob->gConfigFilename, "%s/.xinerc", homedir);
+  }
+
+  gGlob->gConfig = config_file_init (gGlob->gConfigFilename);
 
   /*
    * init X11
@@ -429,9 +435,9 @@ int main(int argc, char *argv[]) {
   if(getenv("DISPLAY"))
     display_name = getenv("DISPLAY");
 
-  gDisplay = XOpenDisplay(display_name);
+  gGlob->gDisplay = XOpenDisplay(display_name);
 
-  if (gDisplay == NULL) {
+  if (gGlob->gDisplay == NULL) {
     fprintf(stderr,"Can not open display\n");
     exit(1);
   }
@@ -449,9 +455,9 @@ int main(int argc, char *argv[]) {
 
   }
 
-  video_driver = xine_load_video_output_plugin(cfg, video_driver_id,
+  video_driver = xine_load_video_output_plugin(gGlob->gConfig, video_driver_id,
 					       VISUAL_TYPE_X11, 
-					       (void *) gDisplay);
+					       (void *) gGlob->gDisplay);
 
   if (!video_driver) {
     printf ("main: video driver <%s> failed\n", video_driver_id);
@@ -466,7 +472,8 @@ int main(int argc, char *argv[]) {
 
   }
 
-  audio_driver = xine_load_audio_output_plugin(cfg, audio_driver_id);
+  audio_driver = xine_load_audio_output_plugin(gGlob->gConfig, 
+					       audio_driver_id);
 
   if (!audio_driver) {
     printf ("main: audio driver <%s> failed\n", audio_driver_id);
@@ -478,20 +485,20 @@ int main(int argc, char *argv[]) {
 
   printf ("main: starting xine engine\n");
 
-  gXine = xine_init (video_driver, audio_driver, 
-		     gui_status_callback, cfg);
+  gGlob->gXine = xine_init (video_driver, audio_driver, 
+		     gui_status_callback, gGlob->gConfig);
 
   printf ("main: (pre-)selection audio/spu channels\n");
 
-  xine_select_audio_channel (gXine, audio_channel);
-  xine_select_spu_channel (gXine, spu_channel);
+  xine_select_audio_channel (gGlob->gXine, audio_channel);
+  xine_select_spu_channel (gGlob->gXine, spu_channel);
 
   /*
    * start CORBA server thread
    */
 #ifdef HAVE_ORBIT
   if (!no_lirc)
-    xine_server_start (gXine);
+    xine_server_start (gGlob->gXine);
 #endif
 
   /*
@@ -502,10 +509,9 @@ int main(int argc, char *argv[]) {
 
 #ifdef HAVE_ORBIT
   if (!no_lirc)
-    xine_server_exit(gXine);
+    xine_server_exit(gGlob->gXine);
 #endif
 
   return 0;
 }
-
 

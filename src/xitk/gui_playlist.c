@@ -50,11 +50,9 @@
 
 #define MAX_LIST 9
 
-static widget_t       *pl_list = NULL;
+extern gGlob_t        *gGlob;
 
-extern char           *gui_playlist[MAX_PLAYLIST_LENGTH];
-extern int             gui_playlist_num;
-extern int             gui_playlist_cur;
+static widget_t       *pl_list = NULL;
 
 static Window          pl_win;
 static DND_struct_t   *xdnd_pl_win;
@@ -66,10 +64,6 @@ static int             pl_running;
 static int             pl_panel_visible;
 
 extern Window          gVideoWin;
-extern Display        *gDisplay;
-extern ImlibData      *gImlib_data;
-extern pthread_mutex_t gXLock;
-extern xine_t         *gXine;
 
 #define MOVEUP 1
 #define MOVEDN 2
@@ -81,7 +75,7 @@ extern xine_t         *gXine;
  */
 void pl_update_playlist(void) {
 
-  browser_update_list(pl_list, gui_playlist, gui_playlist_num, 0);
+  browser_update_list(pl_list, gGlob->gui_playlist, gGlob->gui_playlist_num, 0);
 }
 /*
  *
@@ -89,7 +83,7 @@ void pl_update_playlist(void) {
 static void handle_selection(widget_t *w, void *data) {
 
   //  perr(" +++ Selection called = %d = '%s'\n", 
-  //       ((int)data), gui_playlist[((int)data)]);
+  //       ((int)data), gGlob->gui_playlist[((int)data)]);
 }
 /*
  * Leaving playlist editor
@@ -99,13 +93,13 @@ void pl_exit(widget_t *w, void *data) {
   pl_running = 0;
   pl_panel_visible = 0;
 
-  XUnmapWindow(gDisplay, pl_win);
+  XUnmapWindow(gGlob->gDisplay, pl_win);
 
   gui_list_free(pl_widget_list->l);
   free(pl_widget_list);
   pl_widget_list = NULL;
 
-  XDestroyWindow(gDisplay, pl_win);
+  XDestroyWindow(gGlob->gDisplay, pl_win);
 
   if(xdnd_pl_win)
     free(xdnd_pl_win);
@@ -120,13 +114,13 @@ static void pl_play(widget_t *w, void *data) {
   
   j = browser_get_current_selected(pl_list);
 
-  if(j>=0 && gui_playlist[j] != NULL) {
+  if(j>=0 && gGlob->gui_playlist[j] != NULL) {
     
-    gui_set_current_mrl(gui_playlist[j]);
-    if(xine_get_status(gXine) != XINE_STOP)
+    gui_set_current_mrl(gGlob->gui_playlist[j]);
+    if(xine_get_status(gGlob->gXine) != XINE_STOP)
       gui_stop(NULL, NULL);
     
-    gui_playlist_cur = j;
+    gGlob->gui_playlist_cur = j;
     
     gui_play(NULL, NULL);
     browser_release_all_buttons(pl_list);
@@ -141,17 +135,17 @@ static void pl_delete(widget_t *w, void *data) {
   j = browser_get_current_selected(pl_list);
   
   if(j >= 0) {
-    for(i = j; i < gui_playlist_num; i++) {
-      gui_playlist[i] = gui_playlist[i+1];
+    for(i = j; i < gGlob->gui_playlist_num; i++) {
+      gGlob->gui_playlist[i] = gGlob->gui_playlist[i+1];
     }
-    gui_playlist_num--;
-    if(gui_playlist_cur) gui_playlist_cur--;
+    gGlob->gui_playlist_num--;
+    if(gGlob->gui_playlist_cur) gGlob->gui_playlist_cur--;
   }
 
   browser_rebuild_browser(pl_list, 0);
   
-  if(gui_playlist_num)
-    gui_set_current_mrl(gui_playlist[gui_playlist_cur]);
+  if(gGlob->gui_playlist_num)
+    gui_set_current_mrl(gGlob->gui_playlist[gGlob->gui_playlist_cur]);
   else
     gui_set_current_mrl(NULL);
 
@@ -162,14 +156,14 @@ static void pl_delete(widget_t *w, void *data) {
 static void pl_delete_all(widget_t *w, void *data) {
   int i;
 
-  for(i = 0; i < gui_playlist_num; i++) {
-    gui_playlist[i] = NULL;
+  for(i = 0; i < gGlob->gui_playlist_num; i++) {
+    gGlob->gui_playlist[i] = NULL;
   }
 
-  gui_playlist_num = 0;
-  gui_playlist_cur = 0;
+  gGlob->gui_playlist_num = 0;
+  gGlob->gui_playlist_cur = 0;
 
-  browser_update_list(pl_list, gui_playlist, gui_playlist_num, 0);
+  browser_update_list(pl_list, gGlob->gui_playlist, gGlob->gui_playlist_num, 0);
   gui_set_current_mrl(NULL);
 
 }
@@ -181,25 +175,25 @@ static void pl_move_updown(widget_t *w, void *data) {
   
   j = browser_get_current_selected(pl_list);
   
-  if((j >= 0) && gui_playlist[gui_playlist_cur] != NULL) {
+  if((j >= 0) && gGlob->gui_playlist[gGlob->gui_playlist_cur] != NULL) {
     
     if(((int)data) == MOVEUP && (j > 0)) {
       char *tmplist[MAX_PLAYLIST_LENGTH];
       char *tmp;
       int i, k;
 
-      tmp = gui_playlist[j-1];
+      tmp = gGlob->gui_playlist[j-1];
       for(i=0; i<j-1; i++) {
-	tmplist[i] = gui_playlist[i];
+	tmplist[i] = gGlob->gui_playlist[i];
       }
-      tmplist[i] = gui_playlist[j];
+      tmplist[i] = gGlob->gui_playlist[j];
       tmplist[i+1] = tmp;
       i += 2;
-      for(k=i++; k<gui_playlist_num; k++) {
-	tmplist[k] = gui_playlist[k];
+      for(k=i++; k<gGlob->gui_playlist_num; k++) {
+	tmplist[k] = gGlob->gui_playlist[k];
       }
-      for(i=0; i<gui_playlist_num; i++)
-	gui_playlist[i] = tmplist[i];
+      for(i=0; i<gGlob->gui_playlist_num; i++)
+	gGlob->gui_playlist[i] = tmplist[i];
 
       if(j > MAX_LIST || (browser_get_current_start(pl_list) != 0)) {
 	j -= ((MAX_LIST-1)/2);
@@ -212,23 +206,23 @@ static void pl_move_updown(widget_t *w, void *data) {
 	browser_set_select(pl_list, j-1);
       }
     }
-    else if(((int)data) == MOVEDN && (j < (gui_playlist_num-1))) {
+    else if(((int)data) == MOVEDN && (j < (gGlob->gui_playlist_num-1))) {
       char *tmplist[MAX_PLAYLIST_LENGTH];
       char *tmp;
       int i, k;
 
-      tmp = gui_playlist[j];
+      tmp = gGlob->gui_playlist[j];
       for(i=0; i<j; i++) {
-	tmplist[i] = gui_playlist[i];
+	tmplist[i] = gGlob->gui_playlist[i];
       }
-      tmplist[i] = gui_playlist[j+1];
+      tmplist[i] = gGlob->gui_playlist[j+1];
       tmplist[i+1] = tmp;
       i += 2;
-      for(k=i++; k<gui_playlist_num; k++) {
-	tmplist[k] = gui_playlist[k];
+      for(k=i++; k<gGlob->gui_playlist_num; k++) {
+	tmplist[k] = gGlob->gui_playlist[k];
       }
-      for(i=0; i<gui_playlist_num; i++)
-	gui_playlist[i] = tmplist[i];
+      for(i=0; i<gGlob->gui_playlist_num; i++)
+	gGlob->gui_playlist[i] = tmplist[i];
 
       if(j >= (MAX_LIST-1)) {
 	browser_rebuild_browser(pl_list, j);
@@ -300,12 +294,12 @@ static void pl_load_pl(widget_t *w, void *data) {
   fclose(plfile);
   
   if(tmp_playlist_num >= 0) {
-    gui_playlist_num = tmp_playlist_num;
+    gGlob->gui_playlist_num = tmp_playlist_num;
     
     for(i = 0; i < tmp_playlist_num; i++)
-      gui_playlist[i] = tmp_playlist[i];
+      gGlob->gui_playlist[i] = tmp_playlist[i];
     
-    browser_update_list(pl_list, gui_playlist, gui_playlist_num, 0);
+    browser_update_list(pl_list, gGlob->gui_playlist, gGlob->gui_playlist_num, 0);
     //    browser_rebuild_browser(pl_list, 0);
   }
   
@@ -318,7 +312,7 @@ static void pl_save_pl(widget_t *w, void *data) {
   char buf[1024], tmpbuf[256];
   int i;
 
-  if(!gui_playlist_num) return;
+  if(!gGlob->gui_playlist_num) return;
 
   memset(&buf, 0, sizeof(buf));
   memset(&tmpbuf, 0, sizeof(tmpbuf));
@@ -332,9 +326,9 @@ static void pl_save_pl(widget_t *w, void *data) {
     sprintf(buf, "%s", "[PLAYLIST]\n");
     fputs(buf, plfile);
     
-    for(i = 0; i < gui_playlist_num; i++) {
+    for(i = 0; i < gGlob->gui_playlist_num; i++) {
       memset(&buf, 0, sizeof(buf));
-      sprintf(buf, "%s\n", gui_playlist[i]);
+      sprintf(buf, "%s\n", gGlob->gui_playlist[i]);
       fputs(buf, plfile);
     }
     
@@ -350,7 +344,7 @@ static void pl_save_pl(widget_t *w, void *data) {
  */
 void pl_scan_input(widget_t *w, void *ip) {
   /* FIXME
-  if(xine_get_status(gXine) == XINE_STOP) {
+  if(xine_get_status(gGlob->gXine) == XINE_STOP) {
     
     // FIXME: unifying both
     if(!strcasecmp(((input_plugin_t*)ip)->get_identifier(), "DVD")) {
@@ -360,14 +354,14 @@ void pl_scan_input(widget_t *w, void *ip) {
       if ((list = ((input_plugin_t*)ip)->get_autoplay_list (&nfiles))) {
 	
 	for (i=0; i<nfiles; i++) {
-	  gui_playlist[gui_playlist_num + i] = list[i]; 
+	  gGlob->gui_playlist[gGlob->gui_playlist_num + i] = list[i]; 
 	}
 	
-	gui_playlist_num += nfiles; 
-	for (i=0; i<gui_playlist_num; i++) {
+	gGlob->gui_playlist_num += nfiles; 
+	for (i=0; i<gGlob->gui_playlist_num; i++) {
 	}
-	gui_playlist_cur = 0;
-	gui_set_current_mrl(gui_playlist[gui_playlist_cur]);	
+	gGlob->gui_playlist_cur = 0;
+	gui_set_current_mrl(gGlob->gui_playlist[gGlob->gui_playlist_cur]);	
       }
     }
     else if(!strcasecmp(((input_plugin_t*)ip)->get_identifier(), "VCD")) {
@@ -377,16 +371,16 @@ void pl_scan_input(widget_t *w, void *ip) {
       if ((list = ((input_plugin_t*)ip)->get_autoplay_list (&nfiles))) {
 	
 	for (i=0; i<nfiles; i++) {
-	  gui_playlist[gui_playlist_num + i]     = list[i]; 
+	  gGlob->gui_playlist[gGlob->gui_playlist_num + i]     = list[i]; 
 	}
 	
-	gui_playlist_num += nfiles; 
-	gui_playlist_cur = 0;
-	gui_set_current_mrl(gui_playlist[gui_playlist_cur]);
+	gGlob->gui_playlist_num += nfiles; 
+	gGlob->gui_playlist_cur = 0;
+	gui_set_current_mrl(gGlob->gui_playlist[gGlob->gui_playlist_cur]);
       }
     }
     //    pl_rebuild_buttons(0);
-    browser_update_list(pl_list, gui_playlist, gui_playlist_num, 0);
+    browser_update_list(pl_list, gGlob->gui_playlist, gGlob->gui_playlist_num, 0);
   }
   */
 }
@@ -398,11 +392,11 @@ void pl_raise_window(void) {
   if(pl_win) {
     if(pl_panel_visible && pl_running) {
       if(pl_running) {
-	XMapRaised(gDisplay, pl_win); 
-/*  	XSetTransientForHint (gDisplay, pl_win, gVideoWin); FIXME  */
+	XMapRaised(gGlob->gDisplay, pl_win); 
+/*  	XSetTransientForHint (gGlob->gDisplay, pl_win, gVideoWin); FIXME  */
       }
     } else {
-      XUnmapWindow (gDisplay, pl_win);
+      XUnmapWindow (gGlob->gDisplay, pl_win);
     }
   }
 }
@@ -413,12 +407,12 @@ void pl_toggle_panel_visibility (widget_t *w, void *data) {
   
   if (pl_panel_visible && pl_running) {
     pl_panel_visible = 0;
-    XUnmapWindow (gDisplay, pl_win);
+    XUnmapWindow (gGlob->gDisplay, pl_win);
   } else {
     if(pl_running) {
       pl_panel_visible = 1;
-      XMapRaised(gDisplay, pl_win); 
-/*        XSetTransientForHint (gDisplay, pl_win, gVideoWin); FIXME  */
+      XMapRaised(gGlob->gDisplay, pl_win); 
+/*        XSetTransientForHint (gGlob->gDisplay, pl_win, gVideoWin); FIXME  */
     }
   }
 }
@@ -460,7 +454,7 @@ void playlist_handle_event(XEvent *event) {
 	
 	if(event->xany.window == pl_win) {
 	  XLOCK ();
-	  XMoveWindow(gDisplay, pl_win, x, y);
+	  XMoveWindow(gGlob->gDisplay, pl_win, x, y);
 	  XUNLOCK ();
 	  config_file_set_int ("x_playlist",x);
 	  config_file_set_int ("y_playlist",y);
@@ -523,7 +517,7 @@ void playlist_editor(void) {
   /* This shouldn't be happend */
   if(pl_win) {
     /*  XLOCK (); FIXME  */
-    XMapRaised(gDisplay, pl_win); 
+    XMapRaised(gGlob->gDisplay, pl_win); 
     /*  XUNLOCK(); FIXME  */
     pl_panel_visible = 1;
     pl_running = 1;
@@ -534,13 +528,13 @@ void playlist_editor(void) {
   
   /*  XLOCK (); FIXME  */
 
-  if (!(pl_bg_image = Imlib_load_image(gImlib_data,
+  if (!(pl_bg_image = Imlib_load_image(gGlob->gImlib_data,
 				       gui_get_skinfile("PlBG")))) {
     fprintf(stderr, "xine-playlist: couldn't find image for background\n");
     exit(-1);
   }
 
-  screen = DefaultScreen(gDisplay);
+  screen = DefaultScreen(gGlob->gDisplay);
   /*  hint.x = config_file_lookup_int ("x_playlist", 200); FIXME  */
   /*  hint.y = config_file_lookup_int ("y_playlist", 100); FIXME  */
   hint.width = pl_bg_image->rgb_width;
@@ -548,39 +542,39 @@ void playlist_editor(void) {
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
-  pl_win = XCreateWindow (gDisplay, DefaultRootWindow(gDisplay), 
+  pl_win = XCreateWindow (gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay), 
 			  hint.x, hint.y, hint.width, hint.height, 0, 
 			  CopyFromParent, CopyFromParent, 
 			  CopyFromParent,
 			  0, &attr);
   
-  XSetStandardProperties(gDisplay, pl_win, title, title,
+  XSetStandardProperties(gGlob->gDisplay, pl_win, title, title,
 			 None, NULL, 0, &hint);
   /*
    * wm, no border please
    */
 
-  prop = XInternAtom(gDisplay, "_MOTIF_WM_HINTS", True);
+  prop = XInternAtom(gGlob->gDisplay, "_MOTIF_WM_HINTS", True);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
 
-  XChangeProperty(gDisplay, pl_win, prop, prop, 32,
+  XChangeProperty(gGlob->gDisplay, pl_win, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-/*    XSetTransientForHint (gDisplay, pl_win, gVideoWin); FIXME  */
+/*    XSetTransientForHint (gGlob->gDisplay, pl_win, gVideoWin); FIXME  */
 
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = "Xine Playlist Editor";
     xclasshint->res_class = "Xine";
-    XSetClassHint(gDisplay, pl_win, xclasshint);
+    XSetClassHint(gGlob->gDisplay, pl_win, xclasshint);
   }
 
-  gc = XCreateGC(gDisplay, pl_win, 0, 0);
+  gc = XCreateGC(gGlob->gDisplay, pl_win, 0, 0);
 
-  XSelectInput(gDisplay, pl_win,
+  XSelectInput(gGlob->gDisplay, pl_win,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
 
@@ -589,12 +583,12 @@ void playlist_editor(void) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
     wm_hint->flags = InputHint | StateHint;
-    XSetWMHints(gDisplay, pl_win, wm_hint);
+    XSetWMHints(gGlob->gDisplay, pl_win, wm_hint);
     XFree(wm_hint);
   }
   
-  Imlib_apply_image(gImlib_data, pl_bg_image, pl_win);
-  XSync(gDisplay, False); 
+  Imlib_apply_image(gGlob->gImlib_data, pl_bg_image, pl_win);
+  XSync(gGlob->gDisplay, False); 
 
   /*  XUNLOCK (); FIXME  */
   
@@ -713,7 +707,7 @@ void playlist_editor(void) {
 						     gui_get_fcolor("PlItemBtn"),
 						     gui_get_ccolor("PlItemBtn"),
 						     gui_get_skinfile("PlItemBtn"),
-						     9, gui_playlist_num, gui_playlist,
+						     9, gGlob->gui_playlist_num, gGlob->gui_playlist,
 						     handle_selection, NULL)));
   
   gui_list_append_content (pl_widget_list->l,
@@ -731,9 +725,9 @@ void playlist_editor(void) {
     y = gui_get_skinY("AutoPlayBG");
     
     ip = xine_get_input_plugin_list (&num_plugins);
-    xprintf (VERBOSE|GUI, "%d input plugins ...\n",num_plugins);
+    fprintf (stderr, "%d input plugins ...\n",num_plugins);
     for (i = 0; i < num_plugins; i++) {
-      xprintf (VERBOSE|GUI, "plugin #%d : id=%s\n", i, ip->get_identifier());
+      fprintf (stderr, "plugin #%d : id=%s\n", i, ip->get_identifier());
       if(ip->get_capabilities() & INPUT_CAP_AUTOPLAY) {
 	gui_list_append_content (pl_widget_list->l, 
 		       (tmp =
@@ -751,9 +745,9 @@ void playlist_editor(void) {
     }
   }
   */
-  browser_update_list(pl_list, gui_playlist, gui_playlist_num, 0);
+  browser_update_list(pl_list, gGlob->gui_playlist, gGlob->gui_playlist_num, 0);
 
-  XMapRaised(gDisplay, pl_win); 
+  XMapRaised(gGlob->gDisplay, pl_win); 
 
   pl_panel_visible = 1;
 

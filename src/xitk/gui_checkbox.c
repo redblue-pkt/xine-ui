@@ -34,10 +34,8 @@
 #include "gui_widget_types.h"
 #include "gui_main.h"
 #include "utils.h"
-#include "monitor.h"
 
-extern Display         *gDisplay;
-extern pthread_mutex_t  gXLock;
+extern gGlob_t         *gGlob;
 extern uint32_t         xine_debug;
 
 /*
@@ -49,7 +47,7 @@ void paint_checkbox (widget_t *c, Window win, GC gc) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
-  XLockDisplay (gDisplay);
+  XLockDisplay (gGlob->gDisplay);
   
   skin = private_data->skin;
   
@@ -58,30 +56,30 @@ void paint_checkbox (widget_t *c, Window win, GC gc) {
     
     if (private_data->cArmed) {
       if (private_data->cClicked) { //click
-	XCopyArea (gDisplay, skin->image,  win, gc, 2*checkbox_width, 0,
+	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       }
       else {
 	if(!private_data->cState) //focus
-	  XCopyArea (gDisplay, skin->image,  win, gc, checkbox_width, 0,
+	  XCopyArea (gGlob->gDisplay, skin->image,  win, gc, checkbox_width, 0,
 		     checkbox_width, skin->height, c->x, c->y);
       }
     } else {
       if(private_data->cState) //click
-	XCopyArea (gDisplay, skin->image,  win, gc, 2*checkbox_width, 0,
+	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       else  //normal
-	XCopyArea (gDisplay, skin->image,  win, gc, 0, 0,
+	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 0, 0,
 		   checkbox_width, skin->height, c->x, c->y);
     }
 
-    XFlush (gDisplay);
+    XFlush (gGlob->gDisplay);
   } 
   else
-    xprintf (VERBOSE|GUI, "paint checkbox something (%d) "
+    fprintf (stderr, "paint checkbox something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
   
-  XUnlockDisplay (gDisplay);
+  XUnlockDisplay (gGlob->gDisplay);
 }
 
 /*
@@ -108,7 +106,7 @@ int notify_click_checkbox (widget_list_t *wl, widget_t *c,
     if(!bRepaint) 
       paint_widget_list (wl);
   } else
-    xprintf (VERBOSE|GUI, "notify click checkbox on something (%d) "
+    fprintf (stderr, "notify click checkbox on something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
   return 1;
 }
@@ -123,7 +121,7 @@ int notify_focus_checkbox (widget_list_t *wl, widget_t *c, int cEntered) {
   if (c->widget_type & WIDGET_TYPE_CHECKBOX)
     private_data->cArmed = cEntered;
   else
-    xprintf (VERBOSE|GUI, "notify focus checkbox on something (%d) "
+    fprintf (stderr, "notify focus checkbox on something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
   return 1;
 }
@@ -136,7 +134,7 @@ int checkbox_get_state(widget_t *c) {
     (checkbox_private_data_t *) c->private_data;
   
   if (c->widget_type & ~WIDGET_TYPE_CHECKBOX) {
-    xprintf (VERBOSE|GUI, "notify click checkbox on something (%d) "
+    fprintf (stderr, "notify click checkbox on something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
   }
 
@@ -169,7 +167,7 @@ void checkbox_set_state(widget_t *c, int state, Window win, GC gc) {
     }
   }
   else
-    xprintf (VERBOSE|GUI, "notify click checkbox on something (%d) "
+    fprintf (stderr, "notify click checkbox on something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
 }
 

@@ -30,6 +30,7 @@
 
 #include "xine.h"
 #include "utils.h"
+#include "gui_main.h"
 #include "gui_widget.h"
 #include "gui_widget_types.h"
 #include "gui_browser.h"
@@ -38,7 +39,6 @@
 #include "gui_labelbutton.h"
 #include "gui_slider.h"
 
-extern Display         *gDisplay;
 extern uint32_t         xine_debug;
 extern pthread_mutex_t  gXLock;
 

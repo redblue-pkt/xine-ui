@@ -62,9 +62,8 @@ static int             ctl_panel_visible;
 
 extern Window          gVideoWin;
 extern vo_driver_t    *gVideoDriver;
-extern Display        *gDisplay;
-extern ImlibData      *gImlib_data;
-extern pthread_mutex_t gXLock;
+
+extern gGlob_t        *gGlob;
 
 
 /*
@@ -182,13 +181,13 @@ void control_exit(widget_t *w, void *data) {
   ctl_running = 0;
   ctl_panel_visible = 0;
 
-  XUnmapWindow(gDisplay, ctl_win);
+  XUnmapWindow(gGlob->gDisplay, ctl_win);
 
   gui_list_free(ctl_widget_list->l);
   free(ctl_widget_list);
   ctl_widget_list = NULL;
 
-  XDestroyWindow(gDisplay, ctl_win);
+  XDestroyWindow(gGlob->gDisplay, ctl_win);
 
   if(xdnd_ctl_win)
     free(xdnd_ctl_win);
@@ -220,12 +219,12 @@ void control_raise_window(void) {
   if(ctl_win) {
     if(ctl_panel_visible && ctl_running) {
       if(ctl_running) {
-	XMapRaised(gDisplay, ctl_win);
+	XMapRaised(gGlob->gDisplay, ctl_win);
 	ctl_panel_visible = 1;
-/*  	XSetTransientForHint (gDisplay, ctl_win, gVideoWin); FIXME  */
+/*  	XSetTransientForHint (gGlob->gDisplay, ctl_win, gVideoWin); FIXME  */
       }
     } else {
-      XUnmapWindow (gDisplay, ctl_win);
+      XUnmapWindow (gGlob->gDisplay, ctl_win);
       ctl_panel_visible = 0;
     }
   }
@@ -237,12 +236,12 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
   
   if (ctl_panel_visible && ctl_running) {
     ctl_panel_visible = 0;
-    XUnmapWindow (gDisplay, ctl_win);
+    XUnmapWindow (gGlob->gDisplay, ctl_win);
   } else {
     if(ctl_running) {
       ctl_panel_visible = 1;
-      XMapRaised(gDisplay, ctl_win); 
-/*        XSetTransientForHint (gDisplay, ctl_win, gVideoWin); FIXME  */
+      XMapRaised(gGlob->gDisplay, ctl_win); 
+/*        XSetTransientForHint (gGlob->gDisplay, ctl_win, gVideoWin); FIXME  */
     }
   }
 }
@@ -285,7 +284,7 @@ void control_handle_event(XEvent *event) {
 	
 	if(event->xany.window == ctl_win) {
 	  XLOCK ();
-	  XMoveWindow(gDisplay, ctl_win, x, y);
+	  XMoveWindow(gGlob->gDisplay, ctl_win, x, y);
 	  XUNLOCK ();
 	  config_file_set_int ("x_control",x);
 	  config_file_set_int ("y_control",y);
@@ -348,7 +347,7 @@ void control_panel(void) {
   /* This shouldn't be happend */
   if(ctl_win) {
     /*  XLOCK (); FIXME  */
-    XMapRaised(gDisplay, ctl_win); 
+    XMapRaised(gGlob->gDisplay, ctl_win); 
     /*  XUNLOCK(); FIXME  */
     ctl_panel_visible = 1;
     ctl_running = 1;
@@ -359,13 +358,13 @@ void control_panel(void) {
 
   /*  XLOCK (); FIXME  */
 
-  if (!(ctl_bg_image = Imlib_load_image(gImlib_data,
+  if (!(ctl_bg_image = Imlib_load_image(gGlob->gImlib_data,
 					gui_get_skinfile("CtlBG")))) {
     fprintf(stderr, "xine-playlist: couldn't find image for background\n");
     exit(-1);
   }
 
-  screen = DefaultScreen(gDisplay);
+  screen = DefaultScreen(gGlob->gDisplay);
   /* FIXME
   hint.x = config_file_lookup_int ("x_control", 200);
   hint.y = config_file_lookup_int ("y_control", 100);
@@ -375,39 +374,39 @@ void control_panel(void) {
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
-  ctl_win = XCreateWindow (gDisplay, DefaultRootWindow(gDisplay), 
+  ctl_win = XCreateWindow (gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay), 
 			   hint.x, hint.y, hint.width, hint.height, 0, 
 			   CopyFromParent, CopyFromParent, 
 			   CopyFromParent,
 			   0, &attr);
   
-  XSetStandardProperties(gDisplay, ctl_win, title, title,
+  XSetStandardProperties(gGlob->gDisplay, ctl_win, title, title,
 			 None, NULL, 0, &hint);
   /*
    * wm, no border please
    */
 
-  prop = XInternAtom(gDisplay, "_MOTIF_WM_HINTS", True);
+  prop = XInternAtom(gGlob->gDisplay, "_MOTIF_WM_HINTS", True);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
 
-  XChangeProperty(gDisplay, ctl_win, prop, prop, 32,
+  XChangeProperty(gGlob->gDisplay, ctl_win, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-/*    XSetTransientForHint (gDisplay, ctl_win, gVideoWin); FIXME  */
+/*    XSetTransientForHint (gGlob->gDisplay, ctl_win, gVideoWin); FIXME  */
 
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = "Xine Control Panel";
     xclasshint->res_class = "Xine";
-    XSetClassHint(gDisplay, ctl_win, xclasshint);
+    XSetClassHint(gGlob->gDisplay, ctl_win, xclasshint);
   }
 
-  gc = XCreateGC(gDisplay, ctl_win, 0, 0);
+  gc = XCreateGC(gGlob->gDisplay, ctl_win, 0, 0);
 
-  XSelectInput(gDisplay, ctl_win,
+  XSelectInput(gGlob->gDisplay, ctl_win,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
 
@@ -416,12 +415,12 @@ void control_panel(void) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
     wm_hint->flags = InputHint | StateHint;
-    XSetWMHints(gDisplay, ctl_win, wm_hint);
+    XSetWMHints(gGlob->gDisplay, ctl_win, wm_hint);
     XFree(wm_hint);
   }
   
-  Imlib_apply_image(gImlib_data, ctl_bg_image, ctl_win);
-  XSync(gDisplay, False); 
+  Imlib_apply_image(gGlob->gImlib_data, ctl_bg_image, ctl_win);
+  XSync(gGlob->gDisplay, False); 
 
   /*  XUNLOCK (); FIXME  */
   
@@ -590,7 +589,7 @@ void control_panel(void) {
 					       gui_get_fcolor("CtlDismiss"),
 					       gui_get_ccolor("CtlDismiss")));
 
-  XMapRaised(gDisplay, ctl_win); 
+  XMapRaised(gGlob->gDisplay, ctl_win); 
 
   ctl_panel_visible = 1;
 }
