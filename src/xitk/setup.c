@@ -40,7 +40,7 @@ static char                     *boldfontname = "-*-helvetica-bold-r-*-*-10-*-*-
 static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
 #define WINDOW_WIDTH             500
-#define WINDOW_HEIGHT            480
+#define WINDOW_HEIGHT            500
 
 #define FRAME_WIDTH              350
 #define FRAME_HEIGHT             40
@@ -379,7 +379,7 @@ static void setup_clear_tab(void) {
   xitk_image_t *im;
 
   im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
-  			       (WINDOW_HEIGHT - (51 + 57) + 1 + 4));
+  			       (WINDOW_HEIGHT - (51 + 57 + 20) + 1 + 4));
 
   draw_outter(gGui->imlib_data, im->image, im->width, im->height);
 
@@ -1014,7 +1014,7 @@ static void setup_sections (void) {
   XUnlockDisplay(gGui->display);
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
-			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)) + 4);
+			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57 + 20)) + 4);
   xitk_window_change_background(gGui->imlib_data, setup->xwin, bg->pixmap,
 				WINDOW_WIDTH, WINDOW_HEIGHT);
   
@@ -1055,6 +1055,7 @@ void setup_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_slider_widget_t       sl;
+  xitk_label_widget_t        lbl;
   int                        x, y;
   xitk_widget_t             *w;
 
@@ -1106,10 +1107,23 @@ void setup_panel(void) {
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)),
    (setup->slider_wg = xitk_noskin_slider_create(setup->widget_list, &sl,
 						 (WINDOW_WIDTH - 41), 70, 
-						 16, (WINDOW_HEIGHT - 140), XITK_VSLIDER)));
+						 16, (WINDOW_HEIGHT - 160), XITK_VSLIDER)));
 
   setup_sections();
   setup_paint_widgets();
+
+  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
+
+  lbl.window              = xitk_window_get_window(setup->xwin);
+  lbl.gc                  = (XITK_WIDGET_LIST_GC(setup->widget_list));
+  lbl.skin_element_name   = NULL;
+  lbl.label               = _("(*)  you need to restart xine for this setting to take effect");
+  lbl.callback            = NULL;
+  lbl.userdata            = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)),
+   (w = xitk_noskin_label_create(setup->widget_list, &lbl,
+				 50, WINDOW_HEIGHT - 65, WINDOW_WIDTH - 100, 15, fontname)));
+  xitk_enable_and_show_widget(w);
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
