@@ -227,6 +227,11 @@ video.driver                    video driver to use, same as command line
 video.xshm_gamma		gamma correction for XShm driver (-100..100)
 				note: in fact, it may be referred as brightness
 
+video.disable_scaling           some drivers (like XShm) do image scaling by
+                                software. disabling it will greatly improve 
+                                playback performance, but the video will never
+                                be scaled to fit window size.
+
 *** NOTE: not all XV attributes are available for every video card/driver
       
 video.XV_COLORKEY               -1000..1000: X11 XVideo COLORKEY property value.
