@@ -107,7 +107,7 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
       XLockDisplay(gGui->display);
       XRaiseWindow(gGui->display, window);
       XMapWindow(gGui->display, window);
-      if(!gGui->use_root_window)
+      if(!gGui->use_root_window && gGui->video_display == gGui->display)
         XSetTransientForHint (gGui->display, window, gGui->video_window);
       XUnlockDisplay(gGui->display);
       layer_above_video(window);
@@ -398,7 +398,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 					       NULL, 400, ALIGN_CENTER,
 					       buffer);
       XLockDisplay(gGui->display);
-      if(!gGui->use_root_window)
+      if(!gGui->use_root_window && gGui->video_display == gGui->display)
 	XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
       XSync(gGui->display, False);
       XUnlockDisplay(gGui->display);
@@ -645,7 +645,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
    * This prevent xine waiting till the end of time for an
    * XEvent when lirc (and futur other control ways) is used to quit .
    */
-  gui_send_expose_to_window(gGui->video_window);
+  if( gGui->video_display == gGui->display )
+    gui_send_expose_to_window(gGui->video_window);
   xitk_skin_unload_config(gGui->skin_config);
 }
 
@@ -971,7 +972,7 @@ void gui_toggle_aspect(int aspect) {
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
     
@@ -986,7 +987,7 @@ void gui_toggle_interlaced(void) {
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
   }
@@ -1782,7 +1783,7 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
   }
@@ -1799,7 +1800,7 @@ void gui_reset_zoom(void) {
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
   }

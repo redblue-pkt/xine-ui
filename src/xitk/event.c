@@ -710,10 +710,10 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_GRAB_POINTER:
     if(!gGui->cursor_grabbed) {
       if(!panel_is_visible()) {
-	XLockDisplay(gGui->display);
-	XGrabPointer(gGui->display, gGui->video_window, 1, None, 
+	XLockDisplay(gGui->video_display);
+	XGrabPointer(gGui->video_display, gGui->video_window, 1, None, 
 		     GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
-	XUnlockDisplay(gGui->display);
+	XUnlockDisplay(gGui->video_display);
       }
       
       gGui->cursor_grabbed = 1;
@@ -1186,6 +1186,7 @@ void gui_deinit(void) {
 void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute) {
   int    i;
   char  *server;
+  char  *video_display_name;
 
   /*
    * init playlist
@@ -1237,6 +1238,31 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   if((gGui->display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
     fprintf(stderr, _("Cannot open display\n"));
     exit(1);
+  }
+
+  video_display_name = 
+    (char *)xine_config_register_string (gGui->xine, "gui.video_display", 
+					 "",
+					 _("Name of video display"),
+					 _("Use this setting to configure to which "
+                                           "display xine will show videos. When left blank, "
+                                           "the main display will be used. Setting this "                  "option to something like ':0.1' or ':1' makes "
+                                           "possible to display video and control on different "
+                                           "screens (very useful for TV presentations)."),
+					 CONFIG_LEVEL_ADV,
+					 NULL,
+					 CONFIG_NO_DATA);
+  
+  gGui->video_display = NULL;
+  if ( strlen(video_display_name) ) {
+  
+    if ((gGui->video_display = XOpenDisplay(video_display_name)) == NULL )
+      fprintf(stderr, _("Cannot open display '%s' for video. Falling back to primary display.\n"),
+              video_display_name);
+  }
+  
+  if ( gGui->video_display == NULL ) {
+    gGui->video_display = gGui->display;
   }
 
   if (xine_config_register_bool (gGui->xine, "gui.xsynchronize", 
@@ -1454,6 +1480,10 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);
+  
+  XLockDisplay (gGui->video_display);
+  gGui->video_screen = DefaultScreen(gGui->video_display);
+  XUnlockDisplay (gGui->video_display);
 
   /* Some infos */
   if(gGui->verbosity) {
@@ -1756,4 +1786,6 @@ void gui_run(char **session_opts) {
   kbindings_free_kbinding(&gGui->kbindings);
 
   XCloseDisplay(gGui->display);
+  if( gGui->video_display != gGui->display )
+    XCloseDisplay(gGui->video_display);
 }

@@ -64,7 +64,7 @@ static void errors_create_window(char *title, char *message) {
 						 NULL, _errors_display_log, 
 						 NULL, 400, ALIGN_CENTER,
 						 message);
-  if(!gGui->use_root_window) {
+  if(!gGui->use_root_window && gGui->video_display == gGui->display) {
     XLockDisplay(gGui->display);
     XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
     XUnlockDisplay(gGui->display);
@@ -113,7 +113,7 @@ void xine_error(char *message, ...) {
     xitk_subst_special_chars(buf, buf2);
     xw = xitk_window_dialog_error(gGui->imlib_data, buf2);
     
-    if(!gGui->use_root_window) {
+    if(!gGui->use_root_window && gGui->video_display == gGui->display) {
       XLockDisplay(gGui->display);
       XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
       XUnlockDisplay(gGui->display);
@@ -208,7 +208,7 @@ void xine_info(char *message, ...) {
     xitk_subst_special_chars(buf, buf2);
     xw = xitk_window_dialog_info(gGui->imlib_data, buf2);
 
-    if(!gGui->use_root_window) {
+    if(!gGui->use_root_window && gGui->video_display == gGui->display) {
       XLockDisplay(gGui->display);
       XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
       XUnlockDisplay(gGui->display);

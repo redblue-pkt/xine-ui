@@ -743,9 +743,12 @@ void video_window_menu(xitk_widget_list_t *wl) {
   menu_entries[0].menu = buffer;
 
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
-  (void) xitk_get_mouse_coords(gGui->display, 
-			       gGui->video_window, NULL, NULL, &x, &y);
   
+  XLockDisplay(gGui->video_display);
+  (void) xitk_get_mouse_coords(gGui->video_display, 
+			       gGui->video_window, NULL, NULL, &x, &y);
+  XUnlockDisplay(gGui->video_display);
+
   menu.menu_tree         = &menu_entries[0];
   menu.parent_wlist      = wl;
   menu.skin_element_name = NULL;

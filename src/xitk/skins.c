@@ -1071,7 +1071,7 @@ void download_skin(char *url) {
   while(!xitk_is_window_visible(gGui->display, xitk_window_get_window(xwin)))
     xine_usec_sleep(5000);
   
-  if(!gGui->use_root_window) {
+  if(!gGui->use_root_window && gGui->video_display == gGui->display) {
     XLockDisplay(gGui->display);
     XSetTransientForHint (gGui->display, 
 			  xitk_window_get_window(xwin), gGui->video_window);
@@ -1227,7 +1227,7 @@ void download_skin(char *url) {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, xitk_window_get_window(skdloader->xwin));
     XMapWindow(gGui->display, xitk_window_get_window(skdloader->xwin));
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint (gGui->display, 
 			    xitk_window_get_window(skdloader->xwin), gGui->video_window);
     XUnlockDisplay(gGui->display);

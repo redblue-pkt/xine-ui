@@ -730,15 +730,15 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
   x11_visual_t            vis;
   int                     driver_num;
 
-  vis.display           = gGui->display;
-  vis.screen            = gGui->screen;
+  vis.display           = gGui->video_display;
+  vis.screen            = gGui->video_screen;
   vis.d                 = gGui->video_window;
-  XLockDisplay(gGui->display);
-  res_h                 = (DisplayWidth  (gGui->display, gGui->screen)*1000 
-			   / DisplayWidthMM (gGui->display, gGui->screen));
-  res_v                 = (DisplayHeight (gGui->display, gGui->screen)*1000
-			   / DisplayHeightMM (gGui->display, gGui->screen));
-  XUnlockDisplay(gGui->display);
+  XLockDisplay(gGui->video_display);
+  res_h                 = (DisplayWidth  (gGui->video_display, gGui->video_screen)*1000 
+			   / DisplayWidthMM (gGui->video_display, gGui->video_screen));
+  res_v                 = (DisplayHeight (gGui->video_display, gGui->video_screen)*1000
+			   / DisplayHeightMM (gGui->video_display, gGui->video_screen));
+  XUnlockDisplay(gGui->video_display);
   gGui->pixel_aspect    = res_v / res_h;
   
 #ifdef DEBUG

@@ -462,7 +462,7 @@ void control_change_skins(void) {
     control->bg_image = new_img;
     
     XLockDisplay(gGui->display);
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint(gGui->display, control->window, gGui->video_window);
     
     Imlib_destroy_image(gGui->imlib_data, old_img);

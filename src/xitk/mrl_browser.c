@@ -52,7 +52,7 @@ void mrl_browser_show_tips(int enabled, unsigned long timeout) {
 void set_mrl_browser_transient(void) {
 
   if(mrlb) {
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       xitk_mrlbrowser_set_transient(mrlb, gGui->video_window);
   }
 }
@@ -242,7 +242,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
 
   XITK_WIDGET_INIT(&mb, gGui->imlib_data);
 
-  mb.window_trans                   = (gGui->use_root_window) ? None : gGui->video_window;
+  mb.window_trans                   = (gGui->use_root_window || gGui->video_display != gGui->display) ? None : gGui->video_window;
   mb.layer_above                    = (is_layer_above());
   mb.icon                           = &gGui->icon;
   mb.set_wm_window_normal           = !video_window_is_visible();

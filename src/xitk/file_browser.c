@@ -398,7 +398,7 @@ static void fb_create_input_window(char *title, char *text,
   XLockDisplay(gGui->display);
   XRaiseWindow(gGui->display, xitk_window_get_window(fne->xwin));
   XMapWindow(gGui->display, xitk_window_get_window(fne->xwin));
-  if(!gGui->use_root_window)
+  if(!gGui->use_root_window && gGui->video_display == gGui->display)
     XSetTransientForHint(gGui->display, 
 			 xitk_window_get_window(fne->xwin), gGui->video_window);
   XUnlockDisplay(gGui->display);

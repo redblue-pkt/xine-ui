@@ -539,7 +539,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 						     kmsg);
     free(kmsg);
     XLockDisplay(gGui->display);
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
     XSync(gGui->display, False);
     XUnlockDisplay(gGui->display);

@@ -268,6 +268,8 @@ typedef struct {
 
   ImlibData                *imlib_data;
 
+  Display                  *video_display;
+  int                       video_screen;
   Window                    video_window; 
   int                       cursor_visible;
   int                       cursor_grabbed;
@@ -385,7 +387,7 @@ void reparent_window(Window window);
       XRaiseWindow(gGui->display, (window));                                             \
       XMapWindow(gGui->display, (window));                                               \
       try_to_set_input_focus((window));                                                  \
-      if(!gGui->use_root_window)                                                         \
+      if(!gGui->use_root_window && gGui->video_display == gGui->display)                 \
         XSetTransientForHint (gGui->display, (window), gGui->video_window);              \
       XUnlockDisplay(gGui->display);                                                     \
     }                                                                                    \
@@ -393,7 +395,7 @@ void reparent_window(Window window);
       XLockDisplay(gGui->display);                                                       \
       XRaiseWindow(gGui->display, window);                                               \
       XMapWindow(gGui->display, window);                                                 \
-      if(!gGui->use_root_window)                                                         \
+      if(!gGui->use_root_window && gGui->video_display == gGui->display)                 \
         XSetTransientForHint (gGui->display, window, gGui->video_window);                \
       XUnlockDisplay(gGui->display);                                                     \
       layer_above_video(window);                                                         \

@@ -347,7 +347,7 @@ static void setup_apply(xitk_widget_t *w, void *data) {
 				 ALIGN_CENTER,
 				 _("You changed some configuration value which require"
 				   " to restart xine to take effect."));
-      if(!gGui->use_root_window) {
+      if(!gGui->use_root_window && gGui->video_display == gGui->display) {
 	XLockDisplay(gGui->display);
 	XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
 	XUnlockDisplay(gGui->display);

@@ -888,7 +888,7 @@ void playlist_change_skins(void) {
 
     XLockDisplay(gGui->display);
     
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint(gGui->display, playlist->window, gGui->video_window);
     
     Imlib_destroy_image(gGui->imlib_data, old_img);

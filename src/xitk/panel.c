@@ -173,7 +173,7 @@ void panel_change_skins(void) {
 
   XLockDisplay(gGui->display);
 
-  if(!gGui->use_root_window)
+  if(!gGui->use_root_window && gGui->video_display == gGui->display)
     XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
 
   Imlib_destroy_image(gGui->imlib_data, old_img);
@@ -551,7 +551,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       help_toggle_visibility(NULL, NULL);
   }
 
-  if (panel->visible) {
+  if (panel->visible && gGui->video_display == gGui->display) {
     
     XLockDisplay(gGui->display);
     
@@ -573,10 +573,11 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
       XIconifyWindow(gGui->display, gGui->panel_window, (XDefaultScreen(gGui->display)));
 
     if(gGui->cursor_grabbed)
-       XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
+      XGrabPointer(gGui->video_display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
     
     /* Give focus to video output window */
     try_to_set_input_focus(gGui->video_window);
+    
     XUnlockDisplay(gGui->display);
      
   }
@@ -589,7 +590,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     XRaiseWindow(gGui->display, gGui->panel_window); 
     XMapWindow(gGui->display, gGui->panel_window); 
-    if(!gGui->use_root_window)
+    if(!gGui->use_root_window && gGui->video_display == gGui->display)
       XSetTransientForHint (gGui->display,  gGui->panel_window, gGui->video_window);
     XUnlockDisplay (gGui->display);
 
@@ -1128,7 +1129,7 @@ void panel_init (void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  if(!gGui->use_root_window)
+  if(!gGui->use_root_window && gGui->video_display == gGui->display)
     XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
 
   /* 
@@ -1453,7 +1454,7 @@ void panel_init (void) {
     config_update_num ("gui.panel_visible", panel->visible);
   }
   
-  if(gGui->use_root_window && (!panel->visible))
+  if((gGui->use_root_window || gGui->video_display != gGui->display) && (!panel->visible))
     panel->visible = 1;
   
   if (panel->visible) {
