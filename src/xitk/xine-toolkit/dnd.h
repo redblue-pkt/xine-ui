@@ -28,6 +28,8 @@
 
 typedef void (*xitk_dnd_callback_t) (char *filename);
 
+#define MAX_SUPPORTED_TYPE 2
+
 typedef struct {
   Display             *display;
   Window               win;
@@ -54,7 +56,7 @@ typedef struct {
   Atom                 _XA_XdndTypeList;
   Atom                 _XA_XITK_PROTOCOL_ATOM;
   Atom                 _XA_WM_DELETE_WINDOW;
-  Atom                 supported;
+  Atom                 supported[MAX_SUPPORTED_TYPE];
   Atom                 version;
 
 } xitk_dnd_t;

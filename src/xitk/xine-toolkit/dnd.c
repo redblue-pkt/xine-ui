@@ -44,6 +44,18 @@
 /*
  * PRIVATES
  */
+
+static int _is_atom_match(xitk_dnd_t *xdnd, Atom atom) {
+  int i;
+  
+  for(i = 0; i <= MAX_SUPPORTED_TYPE; i++) {
+    if(atom == xdnd->supported[i])
+      return i;
+  }
+  
+  return -1;
+}
+
 /*
  * Send XdndFinished to 'window' from target 'from'
  */
@@ -119,10 +131,10 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
     
     /* Okay, got something, handle */
     {
-      char  buf[nread + 1];
+      char  buf[nread + 2];
       
       memset(&buf, '\0', sizeof(buf));
-      snprintf(buf, nread, "%s", s);
+      sprintf(buf, "%s", s);
       
       if(strlen(buf)) {
 	char *p, *pbuf;
@@ -320,7 +332,8 @@ void xitk_init_dnd(Display *display, xitk_dnd_t *xdnd) {
   xdnd->_XA_XdndTypeList          = XInternAtom(xdnd->display, "XdndTypeList", False);
   xdnd->_XA_WM_DELETE_WINDOW      = XInternAtom(xdnd->display, "WM_DELETE_WINDOW", False);
   xdnd->_XA_XITK_PROTOCOL_ATOM    = XInternAtom(xdnd->display, "XiTKXSelWindowProperty", False);
-  xdnd->supported                 = XInternAtom(xdnd->display, "text/uri-list", False);
+  xdnd->supported[0]              = XInternAtom(xdnd->display, "text/uri-list", False);
+  xdnd->supported[1]              = XInternAtom(xdnd->display, "text/plain", False);
   
   XUNLOCK(xdnd->display);
 
@@ -452,16 +465,18 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
 	int   i;
 	
 	for(i = 0; xdnd->dragger_typelist[i] != 0; i++) {
+
 #ifdef DEBUG_DND
 	  XLOCK(xdnd->display);
 	  printf("%d: '%s' ", i, XGetAtomName(xdnd->display, xdnd->dragger_typelist[i]));
 	  XUNLOCK(xdnd->display);
 #endif
-	  if(xdnd->dragger_typelist[i] == xdnd->supported) {
+
+	  if(_is_atom_match(xdnd, xdnd->dragger_typelist[i] >= 0)) {
 #ifdef DEBUG_DND
 	    printf(" << SUPPORTED");
 #endif
-	    xdnd->desired = xdnd->supported;//xdnd->dragger_typelist[i];
+	    xdnd->desired = xdnd->dragger_typelist[i];
 	  }
 #ifdef DEBUG_DND
 	  printf("\n");
