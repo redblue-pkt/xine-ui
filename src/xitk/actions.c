@@ -394,13 +394,13 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
     return 0;
   }
  
-  if((!_sub) && gGui->spu_stream)
+  if(!_sub)
     xine_close (gGui->spu_stream);
-  else if(_sub) {
+  else {
     
-    xine_stream_master_slave(gGui->stream, 
-			     gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
-    (void) xine_open(gGui->spu_stream, _sub);
+    if(xine_open(gGui->spu_stream, _sub))
+      xine_stream_master_slave(gGui->stream, 
+			       gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
   }
   
   if(!gui_xine_play(gGui->stream, start_pos, start_time, 1))
