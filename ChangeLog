@@ -1,5 +1,6 @@
 xine-ui (0.99.1) unstable; urgency=low
 
+  * fix lirc skeleton and '%', and 100% CPU eating when lircd quit (thanks to Christoph Bartelmus <lirc@bartelmus.de>)
   * playlist meta info scanning no more disturn playback,
   * auto buttons can be limited in skinconfig (update your already downloaded skins),
   * change and add checkbox styles (user selectable, see xitk README),
