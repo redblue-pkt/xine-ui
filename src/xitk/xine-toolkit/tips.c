@@ -318,7 +318,7 @@ void xitk_tips_hide_tips(void) {
 int xitk_tips_show_widget_tips(xitk_widget_t *w) {
 
   /* Don't show when window invisible. This call may occur directly after iconifying window. */
-  if(!xitk_is_window_visible(tips.display, w->wl->win))
+  if(!xitk_is_window_visible(w->imlibdata->x.disp, w->wl->win))
     return 0;
 
   pthread_mutex_lock(&tips.mutex);
