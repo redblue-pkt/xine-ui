@@ -233,6 +233,9 @@ void video_window_set_fullscreen (int req_fullscreen) {
   gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 				      GUI_DATA_EX_DEST_POS_SIZE_CHANGED, 
 				      &area);
+
+  /* Tell the video driver if we are in fullscreen mode or not */
+  gGui->vo_driver->gui_data_exchange(gGui->vo_driver, GUI_DATA_EX_FULLSCREEN, (int *)gVw->fullscreen_mode);
 }
 
 /*
