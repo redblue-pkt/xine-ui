@@ -476,6 +476,7 @@ void pl_toggle_visibility (widget_t *w, void *data) {
 	XMapRaised(gGui->display, playlist->window); 
 	XSetTransientForHint (gGui->display, 
 			      playlist->window, gGui->video_window);
+	layer_above_video(playlist->window);
       }
     }
   }

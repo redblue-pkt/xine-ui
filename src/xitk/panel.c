@@ -146,6 +146,7 @@ void panel_toggle_visibility (widget_t *w, void *data) {
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
 
+    layer_above_video(gGui->panel_window);
   }
 
   config_set_int("open_panel", panel->visible);
@@ -657,3 +658,5 @@ void panel_init (void) {
 
   pthread_create(&panel->slider_thread, NULL, slider_loop, NULL);
 }
+
+

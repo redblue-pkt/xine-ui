@@ -404,8 +404,7 @@ void gui_handle_event (XEvent *event, void *data) {
 
     case XK_h:
     case XK_H:
-      if(panel_is_visible())
-	video_window_set_visibility(!(video_window_is_visible()));
+      gui_toggle_visibility (NULL, NULL);
       break;
       
     case XK_plus:

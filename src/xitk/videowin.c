@@ -235,10 +235,12 @@ void video_window_adapt_size (int video_width, int video_height,
   XSetWindowAttributes  attr;
   Atom                  prop;
   Atom                  wm_delete_window;
+  static Atom           XA_WIN_LAYER = None;
   MWMHints              mwmhints;
   XEvent                xev;
   XGCValues             xgcv;
   Window                old_video_window = None;
+  long data[1];
 
   XLockDisplay (gGui->display);
 
@@ -310,6 +312,22 @@ void video_window_adapt_size (int video_width, int video_height,
     XChangeProperty(gGui->display, gGui->video_window, prop, prop, 32,
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
+
+    /*
+     * layer above most other things, like gnome panel
+     * WIN_LAYER_ABOVE_DOCK  = 10
+     *
+     */
+
+    if( XA_WIN_LAYER == None )
+      XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+    
+    data[0] = 10;
+    XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
+		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		    1);
+    
+
     XSetTransientForHint(gGui->display, gGui->video_window, None);
     XRaiseWindow(gGui->display, gGui->video_window);
 
@@ -469,10 +487,26 @@ int video_window_is_cursor_visible(void) {
  */
 void video_window_set_visibility(int show_window) {
 
+  static Atom  XA_WIN_LAYER = None;
+  long         data[1];
+
   gVw->show = show_window;
 
   if (gVw->show == 1) {
     XLockDisplay (gGui->display);
+    /*
+     * layer above most other things, like gnome panel
+     * WIN_LAYER_ABOVE_DOCK  = 10
+     *
+     */
+
+    if( XA_WIN_LAYER == None )
+      XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+    
+    data[0] = 10;
+    XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
+		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		    1);
     XMapRaised (gGui->display, gGui->video_window);
     XUnlockDisplay (gGui->display);
   }

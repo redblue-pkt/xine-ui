@@ -240,6 +240,7 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
 	XMapRaised(gGui->display, control->window); 
 	XSetTransientForHint (gGui->display, 
 			      control->window, gGui->video_window);
+	layer_above_video(control->window);
       }
     }
   }

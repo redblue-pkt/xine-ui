@@ -41,6 +41,8 @@ void gui_pause (widget_t *w, void *data, int state) ;
 
 void gui_eject(widget_t *w, void *data);
 
+void gui_toggle_visibility(widget_t *w, void *data);
+
 void gui_toggle_fullscreen(widget_t *w, void *data);
 
 void gui_toggle_aspect(void);
@@ -70,5 +72,7 @@ char *gui_get_next_mrl (void);
 void gui_control_show(widget_t *w, void *data);
 
 void gui_mrl_browser_show(widget_t *w, void *data);
+
+void layer_above_video(Window w);
 
 #endif

@@ -64,4 +64,6 @@ void panel_update_channel_display () ;
 
 void panel_update_mrl_display ();
 
+void panel_layer_above(int);
+
 #endif

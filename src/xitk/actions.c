@@ -159,10 +159,26 @@ void gui_eject(widget_t *w, void *data) {
   }
 }
 
+void gui_toggle_visibility(widget_t *w, void *data) {
+  if(panel_is_visible()) {
+    video_window_set_visibility(!(video_window_is_visible()));
+    
+    /* workaround for Enlightenment: need to re-map for reparenting */
+    panel_toggle_visibility(NULL, NULL);
+    panel_toggle_visibility(NULL, NULL);
+  }
+}
+
 void gui_toggle_fullscreen(widget_t *w, void *data) {
 
-  video_window_set_fullscreen (!video_window_is_fullscreen ());
-
+  if(!(video_window_is_visible())) {
+    video_window_set_visibility(True);
+    video_window_set_fullscreen(True);
+  }
+  else {
+    video_window_set_fullscreen (!video_window_is_fullscreen ());
+  }
+  
   /* Drawable has changed, update cursor visiblity */
   if(!gGui->cursor_visible) {
     video_window_set_cursor_visibility(gGui->cursor_visible);
@@ -175,6 +191,10 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
   }
+
+  /* workaround for Enlightenment: need to re-map for reparenting */
+  panel_toggle_visibility(NULL, NULL);
+  panel_toggle_visibility(NULL, NULL);
   
   if(mrl_browser_is_visible()) {
     show_mrl_browser();
@@ -377,4 +397,36 @@ void gui_control_show(widget_t *w, void *data) {
     control_panel();
   else
     control_exit(NULL, NULL);
+}
+
+
+
+/*
+ * set window layer property to something above GNOME (and KDE?) panel
+ * (reset to normal if do_raise == 0)
+ */
+void layer_above_video(Window w) {
+
+  static Atom XA_WIN_LAYER = None;
+  XEvent xev;
+
+  if( XA_WIN_LAYER == None )
+    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+
+  xev.type = ClientMessage;
+  xev.xclient.type = ClientMessage;
+  xev.xclient.window = w;
+  xev.xclient.message_type = XA_WIN_LAYER;
+  xev.xclient.format = 32;
+
+  /* top layer if video is fullscreen, otherwise normal layer */
+  if (video_window_is_fullscreen() && video_window_is_visible()) 
+    xev.xclient.data.l[0] = (long) 10;
+  else
+    xev.xclient.data.l[0] = (long) 4;
+
+  xev.xclient.data.l[1] = 0;
+
+  XSendEvent(gGui->display, RootWindow(gGui->display, gGui->screen), False,
+	     SubstructureNotifyMask, (XEvent*) &xev);
 }
