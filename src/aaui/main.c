@@ -468,6 +468,16 @@ int main(int argc, char *argv[]) {
   xine_config_load (aaxine.xine, aaxine.configfile);
 
   /*
+   * xine init
+   */
+  xine_init (aaxine.xine);
+  
+  if(!aaxine.xine) {
+    fprintf(stderr, "xine_init() failed.\n");
+    goto failure;
+  }
+
+  /*
    * Initialize AALib
    */
   aaxine.context = aa_autoinit(&aa_defparams);
@@ -534,16 +544,6 @@ int main(int argc, char *argv[]) {
   if (!aaxine.ao_driver)
     printf ("main: audio driver %s failed\n", audio_driver_id);
   
-  /*
-   * xine init
-   */
-  xine_init (aaxine.xine);
-  
-  if(!aaxine.xine) {
-    fprintf(stderr, "xine_init() failed.\n");
-    goto failure;
-  }
-
   aaxine.stream = xine_stream_new(aaxine.xine, aaxine.ao_driver, aaxine.vo_driver);
   
   /* Init mixer control */

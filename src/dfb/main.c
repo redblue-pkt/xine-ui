@@ -265,6 +265,13 @@ int main(int argc, char *argv[]) {
   dfbxine.xine = (xine_t *) xine_new();
   xine_config_load (dfb.xine, configfile);
   
+  xine_init (dfbxine.xine,  dfbxine.ao_driver, dfbxine.vo_driver);
+  
+  if(!dfbxine.xine) {
+    fprintf(stderr, "xine_init() failed.\n");
+    goto failure;
+  }
+  
   /*
    * init video output driver
    */
@@ -309,13 +316,6 @@ int main(int argc, char *argv[]) {
   /*
    * xine init
    */
-  xine_init (dfbxine.xine,  dfbxine.ao_driver, dfbxine.vo_driver);
-  
-  if(!dfbxine.xine) {
-    fprintf(stderr, "xine_init() failed.\n");
-    goto failure;
-  }
-  
   /* Init mixer control */
   dfbxine.mixer.enable = 0;
   dfbxine.mixer.caps = 0;
