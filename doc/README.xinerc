@@ -53,10 +53,10 @@ dxr3_XXX		see README.dxr3
 esd_latency             latency between time of audio sample
 			output to esd and actual playback 
 			in audio samples (default 30000)
+			use this to manually adjust a/v sync
+			for esd output
 
-esd_gap_tolerance       maximum resulting gap between audio packets
-			allowed when using esd, given in pts  
-			(default 15000)
+esd_gap_tolerance       deprecated
 
 five_lfe_channel        1/0 : enable 5.1-channel playback
 
