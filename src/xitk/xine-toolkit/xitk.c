@@ -1759,9 +1759,12 @@ void xitk_subst_special_chars(char *src, char *dest) {
     
     switch(*s) {
     case '%':
-      /* %20 is ' ' */
-      if((*(s) == '%') && (*(s + 1) == '2') && (*(s + 2) == '0')) {
-	*d = ' ';
+      if((*(s) == '%') && (*(s + 1) != '%')) {
+	char    buffer[5] = { '0', 'x', *(s + 1) , *(s + 2), 0 };
+	char   *p         = buffer;
+	int     character = strtol(p, &p, 16);
+	
+	*d = character;
 	s += 2;
       }
       else {

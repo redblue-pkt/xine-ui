@@ -2145,10 +2145,11 @@ void mediamark_free_entry(int offset) {
   }
 }
 
-int mediamark_concat_mediamarks(const char *filename) {
+int mediamark_concat_mediamarks(const char *_filename) {
   playlist_t             *playlist;
   int                     i, found;
   mediamark_t           **mmk = NULL;
+  const char             *filename = _filename;
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
     guess_smil_playlist,
@@ -2159,6 +2160,11 @@ int mediamark_concat_mediamarks(const char *filename) {
     guess_raw_playlist,
     NULL
   };
+
+  if(_filename) {
+    if(!strncasecmp("file:/", _filename, 6))
+      filename = (_filename + 6);
+  }
 
   playlist = (playlist_t *) xine_xmalloc(sizeof(playlist_t));
 
@@ -2191,11 +2197,12 @@ int mediamark_concat_mediamarks(const char *filename) {
   return 1;
 }
 
-void mediamark_load_mediamarks(const char *filename) {
+void mediamark_load_mediamarks(const char *_filename) {
   playlist_t             *playlist;
   int                     i, found, onum;
   mediamark_t           **mmk = NULL;
   mediamark_t           **ommk;
+  const char             *filename = _filename;
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
     guess_smil_playlist,
@@ -2206,6 +2213,11 @@ void mediamark_load_mediamarks(const char *filename) {
     guess_raw_playlist,
     NULL
   };
+
+  if(_filename) {
+    if(!strncasecmp("file:/", _filename, 6))
+      filename = (_filename + 6);
+  }
 
   playlist = (playlist_t *) xine_xmalloc(sizeof(playlist_t));
 
