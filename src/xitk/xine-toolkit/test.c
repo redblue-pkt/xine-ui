@@ -837,7 +837,7 @@ int main(int argc, char **argv) {
 
   XMapRaised(test->display, xitk_window_get_window(test->xwin));
 
-  xitk_run();
+  xitk_run(NULL, NULL);
 
   deinit_test();
 

@@ -1186,15 +1186,17 @@ void gui_init_imlib (Visual *vis) {
 /*
  *
  */
-static void *thread_auto_start(void *dummy) {
-  pthread_detach(pthread_self());
-  sleep(1);
-  gui_execute_action_id(ACTID_PLAY);
-  pthread_exit(NULL);
+static void on_start(void *data) {
+  int start = (int) data;
+
+  gui_display_logo();
+  
+  if(start)
+    gui_execute_action_id(ACTID_PLAY);
 }
 
 void gui_run (void) {
-  int i;
+  int       i, auto_start = 0;
   
   video_window_change_skins();
   panel_add_autoplay_buttons();
@@ -1205,8 +1207,6 @@ void gui_run (void) {
 
   /* Register config entries related to video control settings */
   control_config_register();
-
-  gui_display_logo();
 
   /* autoscan playlist  */
   if(gGui->autoscan_plugin != NULL) {
@@ -1302,13 +1302,7 @@ void gui_run (void) {
     /*  The user request "play on start" */
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAY)) {
       if((mediamark_get_current_mrl()) != NULL) {
-	pthread_t thread;
-	int       err;
-
-	if((err = pthread_create(&thread, NULL, thread_auto_start, NULL)) != 0) {
-	  printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-	  abort();
-	}
+	auto_start = 1;
       }
     }
 
@@ -1319,7 +1313,7 @@ void gui_run (void) {
     }
   }
 
-  xitk_run();
+  xitk_run(on_start, (void *)&auto_start);
 
   gGui->running = 0;
 

@@ -1428,7 +1428,7 @@ void xitk_init(Display *display) {
  * Start widget event handling.
  * It will block till widget_stop() call
  */
-void xitk_run(void) {
+void xitk_run(xitk_startup_callback_t cb, void *data) {
   XEvent            myevent;
   struct sigaction  action;
   __gfx_t          *fx;
@@ -1513,10 +1513,17 @@ void xitk_run(void) {
 
   MUTUNLOCK();
 
+  /* We're ready to handle anything */
+  if(cb)
+    cb(data);
+
   /*
    * Now, wait for a new xevent
    */
   while(gXitk->running) {
+    
+
+
     /* XLOCK(gXitk->display); 
        
        if(XPending (gXitk->display)) { 

@@ -91,6 +91,7 @@ typedef struct xitk_font_s xitk_font_t;
 typedef struct xitk_pixmap_s xitk_pixmap_t;
 typedef struct xitk_window_s xitk_window_t;
 
+typedef void (*xitk_startup_callback_t)(void *);
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
@@ -682,7 +683,7 @@ void xitk_set_window_layer(Window window, int layer);
  * This function start the widget live. It's a block function,
  * it will only return after a widget_stop() call.
  */
-void xitk_run(void);
+void xitk_run(xitk_startup_callback_t cb, void *data);
 
 /*
  * This function terminate the widget lib loop event. 
