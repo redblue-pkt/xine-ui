@@ -370,10 +370,6 @@ static void create_labelofinputtext(xitk_widget_t *w,
     XUNLOCK(private_data->imlibdata->x.disp);
   }
 
-  printf("private_data->cursor_pos: %d\n", private_data->cursor_pos);
-  printf("private_data->disp_offstet: %d\n", private_data->disp_offset);
-  printf("(private_data->cursor_pos - private_data->disp_offset): %d\n", (private_data->cursor_pos - private_data->disp_offset));
-
   /* Draw cursor pointer */
   if(private_data->cursor_pos >= 0) {
     
