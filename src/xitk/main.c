@@ -1035,6 +1035,16 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
 	break;
 
+	/* (warning message) */
+      case XINE_MSG_SECURITY:
+	report = xine_info;
+	if(data->explanation)
+	  sprintf(buffer, "%s %s",
+		  (char *) data + data->explanation, (char *) data + data->parameters);
+	else
+	  sprintf(buffer, _("No Informations available."));
+	break;
+
       default:
 	sprintf(buffer, "%s", _("*sight*, unkown error."));
 	if(data->explanation)
