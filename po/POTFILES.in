@@ -16,6 +16,7 @@ src/xitk/mrl_browser.c
 src/xitk/osd.c
 src/xitk/panel.c
 src/xitk/playlist.c
+src/xitk/post.c
 src/xitk/setup.c
 src/xitk/skins.c
 src/xitk/snapshot.c

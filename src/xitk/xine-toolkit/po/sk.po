@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.x\n"
-"POT-Creation-Date: 2002-11-18 04:15+0100\n"
+"POT-Creation-Date: 2003-01-15 11:42+0100\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: Daniel Bena  <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -13,15 +13,15 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1123
+#: src/xitk/xine-toolkit/mrlbrowser.c:1157
 msgid "Select current entry"
 msgstr "Vybra» aktuálnu polo¾ku"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1131
+#: src/xitk/xine-toolkit/mrlbrowser.c:1165
 msgid "Play selected entry"
 msgstr "Prehra» aktuálnu polo¾ku"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1142
+#: src/xitk/xine-toolkit/mrlbrowser.c:1176
 msgid "Close MRL browser window"
 msgstr "Zatvori» okno MRL prehliadaèa"
 
@@ -75,34 +75,34 @@ msgstr "init_test() zlyhal\n"
 msgid "My Fucking Window"
 msgstr "Moje okno"
 
-#: src/xitk/xine-toolkit/test.c:803
+#: src/xitk/xine-toolkit/test.c:804
 msgid "Quit"
 msgstr "Skonèi»"
 
-#: src/xitk/xine-toolkit/window.c:826
+#: src/xitk/xine-toolkit/window.c:968
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:889 src/xitk/xine-toolkit/window.c:1087
+#: src/xitk/xine-toolkit/window.c:1032 src/xitk/xine-toolkit/window.c:1235
 msgid "Question?"
 msgstr "Otázka?"
 
-#: src/xitk/xine-toolkit/window.c:1018 src/xitk/xine-toolkit/window.c:1229
+#: src/xitk/xine-toolkit/window.c:1165 src/xitk/xine-toolkit/window.c:1382
 msgid "Yes"
 msgstr "Áno"
 
-#: src/xitk/xine-toolkit/window.c:1018 src/xitk/xine-toolkit/window.c:1229
+#: src/xitk/xine-toolkit/window.c:1165 src/xitk/xine-toolkit/window.c:1382
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1229
+#: src/xitk/xine-toolkit/window.c:1382
 msgid "Cancel"
 msgstr "Zru¹i»"
 
-#: src/xitk/xine-toolkit/xitk.h:2003 src/xitk/xine-toolkit/xitk.h:2019
+#: src/xitk/xine-toolkit/xitk.h:2062 src/xitk/xine-toolkit/xitk.h:2071
 msgid "Error"
 msgstr ""
 
-#: src/xitk/xine-toolkit/xitk.h:2008 src/xitk/xine-toolkit/xitk.h:2024
+#: src/xitk/xine-toolkit/xitk.h:2065 src/xitk/xine-toolkit/xitk.h:2074
 msgid "Information"
 msgstr ""
