@@ -494,6 +494,10 @@
       surround (see 5.2.4). You'll have to enable it in your ~/.xinerc:
 
        ac3_pass_through:1
+       
+5.2.6 Changing the volume with the GUI control has not affect! What's up!?
+
+      [xxx]
 
 
 5.3 VIDEO RELATED QUESTIONS
