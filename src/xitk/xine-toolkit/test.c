@@ -934,6 +934,10 @@ static void create_menu(void) {
   xitk_menu_show_menu(test->menu);
 }
 
+static void test_dndcb(char *file) {
+  printf("file: '%s'\n", file);
+}
+
 /*
  *
  */
@@ -1008,7 +1012,7 @@ int main(int argc, char **argv) {
 					   (xitk_window_get_window(test->xwin)),
 					   test_handle_event,
 					   NULL,
-					   NULL,
+					   test_dndcb,
 					   test->widget_list,
 					   NULL);
 

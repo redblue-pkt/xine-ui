@@ -692,7 +692,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
 
       if(s->browser_entries > -1)
 	printf("  browser entries = %d\n", s->browset_entries);
-
+      
       printf("  animation   = %d\n", s->animation);
       printf("  step        = %d\n", s->animation_step);
       printf("  print       = %d\n", s->print);
@@ -956,6 +956,21 @@ int xitk_skin_get_visibility(xitk_skin_config_t *skonfig, const char *str) {
 
   return 1;
 }
+
+/*
+ *
+ */
+int xitk_skin_get_printability(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  ABORT_IF_NULL(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->print;
+
+  return 1;
+}
+
 
 /*
  *

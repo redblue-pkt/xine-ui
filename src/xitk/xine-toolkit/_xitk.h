@@ -325,6 +325,7 @@ void xitk_unset_current_menu(void);
 
 int xitk_skin_get_direction(xitk_skin_config_t *, const char *);
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
+int xitk_skin_get_printability(xitk_skin_config_t *, const char *);
 int xitk_skin_get_enability(xitk_skin_config_t *, const char *);
 int xitk_skin_get_coord_x(xitk_skin_config_t *, const char *);
 int xitk_skin_get_coord_y(xitk_skin_config_t *, const char *);

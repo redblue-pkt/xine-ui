@@ -51,6 +51,8 @@ typedef struct {
   int                     anim_running;
   int                     anim_offset;
 
+  int                     label_visible;
+
   pthread_t               thread;
   pthread_mutex_t         paint_mutex;
   pthread_mutex_t         change_mutex;

@@ -1530,6 +1530,11 @@ int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
 /*
  *
  */
+int xitk_skin_get_printability(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
 int xitk_skin_get_enability(xitk_skin_config_t *, const char *);
 
 /*
