@@ -929,7 +929,7 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
-      char   langbuf[32];
+      char   langbuf[XINE_LANG_MAX];
       
       memset(&langbuf, 0, sizeof(langbuf));
       
