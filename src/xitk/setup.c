@@ -45,7 +45,26 @@
 
 extern gGui_t          *gGui;
 
-static char            *fontname = "-*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*";
+static char            *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+
+#define FRAME_WIDTH   350
+#define FRAME_HEIGHT  40
+
+#define PLACE_LABEL(widget) {                                                            \
+    int           wx, wy, wh, fh;                                                        \
+    xitk_font_t  *fs;                                                                    \
+                                                                                         \
+    fs = xitk_font_load_font(gGui->display, fontname);                                   \
+    xitk_font_set_font(fs, setup->widget_list->gc);                                      \
+    fh = xitk_font_get_string_height(fs, labelkey);                                      \
+    xitk_font_unload_font(fs);                                                           \
+                                                                                         \
+    xitk_get_widget_pos(##widget##, &wx, &wy);                                           \
+    wx += xitk_get_widget_width(##widget##);                                             \
+    wh = xitk_get_widget_height(##widget##);                                             \
+                                                                                         \
+    setup_add_label (wx + 20, (wy + (wh >> 1)) - (fh>>1), (FRAME_WIDTH - wx), labelkey); \
+  } 
 
 typedef struct {
   xitk_window_t        *xwin;
@@ -229,6 +248,13 @@ static void setup_add_label (int x, int y, int w, char *str) {
 
   xitk_label_widget_t lb;
   xitk_widget_t      *label;
+  xitk_font_t        *fs;
+  int                 height;
+
+  fs = xitk_font_load_font(gGui->display, fontname);
+  xitk_font_set_font(fs, setup->widget_list->gc);
+  height = xitk_font_get_string_height(fs, str);
+  xitk_font_unload_font(fs);
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
@@ -239,7 +265,7 @@ static void setup_add_label (int x, int y, int w, char *str) {
 
   xitk_list_append_content(setup->widget_list->l, 
 			   (label = xitk_noskin_label_create(&lb,
-							     x, y, w, fontname)));
+							     x, y, w, height, fontname)));
 
   setup->tmp_widgets[setup->num_tmp_widgets] = label;
   setup->num_tmp_widgets++;
@@ -248,7 +274,7 @@ static void setup_add_label (int x, int y, int w, char *str) {
 /*
  *
  */
-static void setup_add_slider (int x, int y, int min, int max, int pos) {
+static void setup_add_slider (char *labelkey, int x, int y, int min, int max, int pos) {
 
   xitk_slider_widget_t  sl;
   xitk_widget_t        *slider;
@@ -266,9 +292,11 @@ static void setup_add_slider (int x, int y, int min, int max, int pos) {
   sl.motion_userdata          = NULL;
   xitk_list_append_content(setup->widget_list->l,
 			   (slider = xitk_noskin_slider_create(&sl,
-							       x, y, 117, 16,
+							       x, y, 150, 16,
 							       XITK_HSLIDER)));
   xitk_slider_set_pos(setup->widget_list, slider, pos);
+
+  PLACE_LABEL(slider);
 
   setup->tmp_widgets[setup->num_tmp_widgets] = slider;
   setup->num_tmp_widgets++;
@@ -277,7 +305,7 @@ static void setup_add_slider (int x, int y, int min, int max, int pos) {
 /*
  *
  */
-static void setup_add_inputtext(int x, int y, char *str) {
+static void setup_add_inputtext(char *labelkey, int x, int y, char *str) {
 
   xitk_inputtext_widget_t  inp;
   xitk_widget_t           *input;
@@ -293,8 +321,11 @@ static void setup_add_inputtext(int x, int y, char *str) {
   xitk_list_append_content (setup->widget_list->l,
 			   (input = 
 			    xitk_noskin_inputtext_create(&inp,
-							 x, y, 150, 20,
+							 x, y - 5, 150, 20,
 							 "Black", "Black", fontname)));
+
+  PLACE_LABEL(input);
+
   setup->tmp_widgets[setup->num_tmp_widgets] = input;
   setup->num_tmp_widgets++;
 }
@@ -302,7 +333,7 @@ static void setup_add_inputtext(int x, int y, char *str) {
 /*
  *
  */
-static void setup_add_checkbox (int x, int y, int state) {
+static void setup_add_checkbox (char *labelkey, int x, int y, int state) {
 
   xitk_checkbox_widget_t   cb;
   xitk_widget_t           *checkbox;
@@ -320,6 +351,8 @@ static void setup_add_checkbox (int x, int y, int state) {
 							x, y, 10, 10)));
   xitk_checkbox_set_state (checkbox, state, xitk_window_get_window(setup->xwin),
 			   setup->widget_list->gc);
+  
+  PLACE_LABEL(checkbox);
 
   setup->tmp_widgets[setup->num_tmp_widgets] = checkbox;
   setup->num_tmp_widgets++;
@@ -339,7 +372,7 @@ static void combo_select(xitk_widget_t *w, void *data, int value) {
 /*
  *
  */
-static void setup_add_combo (int x, int y, cfg_entry_t *entry, int state, char **choices) {
+static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry, int state, char **choices) {
 
   xitk_combo_widget_t      cmb;
   xitk_widget_t           *combo;
@@ -357,6 +390,8 @@ static void setup_add_combo (int x, int y, cfg_entry_t *entry, int state, char *
 			    xitk_noskin_combo_create(&cmb,
 						     x, y, 150)));
 
+  PLACE_LABEL(combo);
+
   setup->tmp_widgets[setup->num_tmp_widgets] = combo;
   setup->num_tmp_widgets++;
 }
@@ -371,33 +406,25 @@ static void setup_section_widgets (int s) {
   cfg_entry_t         *entry;
   int                  len;
   char                *section;
-  char                *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
-  int width, height;
+  char                *labelkey;
 
   section = setup->sections[s];
   len     = strlen (section);
   entry   = gGui->config->first;
   
-  //	setup_add_label (x, y+24, 400, entry->description);
-  
   while (entry) {
 
     if (!strncmp (entry->key, section, len) && entry->description) {
       
-      //      printf ("setup: generating labels for %s\n", entry->key);
-      //      printf ("setup: generating labels for %s\n", entry->description);
-      
       /* Made frames */
       {
-	/* Need image widget frame: draw it. */
 	xitk_image_t        *image;
 	xitk_image_widget_t  im;
-	GC            gc;
-	XGCValues     gcv;
-	int lbearing, rbearing, width, ascent, descent;
-	xitk_font_t  *fs;
+	int                  lbearing, rbearing, width, ascent, descent;
+	char                *fontname = "*-lucida-*-r-*-*-10-*-*-*-*-*-*-*";
+	xitk_font_t         *fs;
 
-	image = xitk_image_create_image(gGui->imlib_data, 351, 51);
+	image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
 	xitk_image_add_mask(gGui->imlib_data, image);
 
 	fs = xitk_font_load_font(gGui->display, fontname);
@@ -408,19 +435,6 @@ static void setup_section_widgets (int s) {
 
 	XLockDisplay(gGui->display);
 
-	gcv.graphics_exposures = False;
-	gc = XCreateGC(gGui->display, image->mask, GCGraphicsExposures, &gcv);
-	XSetForeground(gGui->display, gc, 1);
-	XFillRectangle(gGui->display, image->mask, gc, 0, 0, image->width, image->height);
-
-	XSetForeground(gGui->display, gc, 0);
-	XFillRectangle(gGui->display, image->mask, gc,
-		       5, (ascent+(descent*2)), 
-		       (image->width - 10), (image->height - (ascent+(descent*2))) - descent);
-
-	XFreeGC(gGui->display, gc);
-
-
 	XSetForeground(gGui->display, setup->widget_list->gc, 
 		       xitk_get_pixel_color_gray(gGui->imlib_data));
 	XFillRectangle(gGui->display, image->image, setup->widget_list->gc,
@@ -430,7 +444,7 @@ static void setup_section_widgets (int s) {
 	draw_inner_frame(gGui->imlib_data, image->image, 
 			 entry->description, fontname, 
 			 0, (ascent+descent), 
-			 350, 50);
+			 FRAME_WIDTH, FRAME_HEIGHT);
 	
 	XITK_WIDGET_INIT(&im, gGui->imlib_data);
 	im.skin_element_name = NULL;
@@ -446,36 +460,36 @@ static void setup_section_widgets (int s) {
 	  
 	}
       }	
-
       
-      y += 26;
+      y += FRAME_HEIGHT >> 1;
 
-      setup_add_label (x + 200, y, 130, &entry->key[len+1]);
+      labelkey = &entry->key[len+1];
 
       switch (entry->type) {
 
       case CONFIG_TYPE_RANGE: /* slider */
-	setup_add_slider (x + 10, y, entry->range_min, entry->range_max, entry->num_value);
+	setup_add_slider (labelkey, x + 10, y, entry->range_min, entry->range_max, entry->num_value);
 	break;
 	
       case CONFIG_TYPE_STRING:
-	setup_add_inputtext (x + 10, y, entry->str_value);
+	setup_add_inputtext (labelkey, x + 10, y, entry->str_value);
 	break;
 	
       case CONFIG_TYPE_ENUM:
-	setup_add_combo (x + 10, y, entry, entry->num_value, entry->enum_values);
+	setup_add_combo (labelkey, x + 10, y, entry, entry->num_value, entry->enum_values);
 	break;
 	
       case CONFIG_TYPE_NUM:
+	printf("%s is CONFIG_TYPE_NUM\n", labelkey);
 	break;
 
       case CONFIG_TYPE_BOOL:
-	setup_add_checkbox (x + 10, y, entry->num_value);
+	setup_add_checkbox (labelkey, x + 10, y, entry->num_value);
 	break;
 
       }
       
-      y += 26;
+      y += (FRAME_HEIGHT >> 1) + 2;
       
     }
     
@@ -491,8 +505,6 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   int i;
 
   /* remove old widgets */
-  /* FIXME: free memory / resources */
-
   for (i=0; i<setup->num_tmp_widgets; i++ ) {
     xitk_widget_t *w;
 
@@ -539,7 +551,6 @@ static void setup_sections (void) {
     point = strchr(entry->key, '.');
     
     if (point) {
-
       int found ;
       int i;
       int len;
@@ -599,6 +610,9 @@ static void setup_sections (void) {
   setup_section_widgets (0);
 }
 
+/*
+ *
+ */
 static void setup_end(xitk_widget_t *w, void *data) {
   setup_exit(NULL, NULL);
 }
@@ -607,7 +621,6 @@ static void setup_end(xitk_widget_t *w, void *data) {
  * Create setup panel window
  */
 void setup_panel(void) {
-
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
 
@@ -621,7 +634,7 @@ void setup_panel(void) {
 
   /* Create window */
   setup->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
-						 "xine setup", 
+						 _("xine setup"), 
 						 100, 100, 
 						 640, 600);
   
@@ -643,7 +656,7 @@ void setup_panel(void) {
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Close";
+  lb.label             = _("Close");
   lb.callback          = setup_end; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;

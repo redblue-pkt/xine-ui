@@ -66,6 +66,22 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 /*
  *
  */
+static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
+  label_private_data_t *private_data = 
+    (label_private_data_t *) w->private_data;
+  
+  if(w->widget_type & WIDGET_TYPE_LABEL) {
+    if(sk == FOREGROUND_SKIN && private_data->font) {
+      return private_data->font;
+    }
+  }
+
+  return NULL;
+}
+
+/*
+ *
+ */
 static void paint_label(xitk_widget_t *l, Window win, GC gc) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;
@@ -79,46 +95,33 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
     if(private_data->skin_element_name == NULL) {
       xitk_font_t   *fs = NULL;
       int            lbear, rbear, wid, asc, des;
-      int            w, h;
       xitk_image_t  *bg;
 
       /* Clean old */
-      if(private_data->font) {
-	draw_flat(private_data->imlibdata, private_data->font->image, 
-		  private_data->font->width, private_data->font->height);
-	XLOCK (private_data->imlibdata->x.disp);
-	XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, win, 
-		   gc, 0, 0, private_data->font->width, private_data->font->height, l->x, l->y);
-	XUNLOCK (private_data->imlibdata->x.disp);
-	xitk_image_free_image(private_data->imlibdata, &private_data->font);
-      }
+      XLOCK (private_data->imlibdata->x.disp);
+      XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, win, 
+		 gc, 0, 0, private_data->font->width, private_data->font->height, l->x, l->y);
+      XUNLOCK (private_data->imlibdata->x.disp);
 
       fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
       xitk_font_set_font(fs, gc);
       xitk_font_string_extent(fs, private_data->label, &lbear, &rbear, &wid, &asc, &des);
 
-      l->width = w = private_data->length;
-      l->height = h = asc + des;
-      bg = xitk_image_create_image(private_data->imlibdata, w, h);
-      draw_flat(private_data->imlibdata, bg->image, w, h);
+      bg = xitk_image_create_image(private_data->imlibdata, l->width, l->height);
 
       XLOCK (private_data->imlibdata->x.disp);
+      XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, bg->image, 
+		 gc, 0, 0, private_data->font->width, private_data->font->height, 0, 0);
       XSetForeground(private_data->imlibdata->x.disp, gc, 
 		     xitk_get_pixel_color_black(private_data->imlibdata));
       XDrawString(private_data->imlibdata->x.disp, bg->image, gc,
-		  0, (asc+des)-des, private_data->label, strlen(private_data->label));
+		  2, ((private_data->font->height + asc + des)>>1) - des,
+		  private_data->label, strlen(private_data->label));
+      XCopyArea (private_data->imlibdata->x.disp, bg->image, win, 
+		 gc, 0, 0, private_data->font->width, private_data->font->height, l->x, l->y);
       XUNLOCK (private_data->imlibdata->x.disp);
-      
-      private_data->font = xitk_image_create_image(private_data->imlibdata, w, h);
-
-      xitk_image_change_image(private_data->imlibdata, bg, private_data->font, w, h);
-
-      XLOCK (private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, win, 
-		 gc, 0, 0, w, h, l->x, l->y);
 
       xitk_image_free_image(private_data->imlibdata, &bg);
-      XUNLOCK (private_data->imlibdata->x.disp);
       
       xitk_font_unload_font(fs);
 
@@ -346,7 +349,10 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
   private_data->lWidget        = mywidget;
 
   if(skin_element_name == NULL) {
-    private_data->font         = NULL;
+    private_data->font         = xitk_image_create_image(private_data->imlibdata, width, height);
+    draw_flat(private_data->imlibdata, private_data->font->image, 
+	      private_data->font->width, private_data->font->height);
+
     private_data->fontname     = strdup(fontname);
     private_data->char_length  = 0;
     private_data->char_height  = 0;
@@ -394,7 +400,7 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
   mywidget->notify_inside      = NULL;
   mywidget->notify_change_skin = (skin_element_name == NULL) ? NULL : notify_change_skin;
   mywidget->notify_destroy     = notify_destroy;
-  mywidget->get_skin           = NULL;
+  mywidget->get_skin           = get_skin;
   
   pthread_mutex_init(&private_data->mutex, NULL);
 
@@ -423,16 +429,8 @@ xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_
  *
  */
 xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
-					int x, int y, int width, char *fontname) {
-  xitk_font_t  *fs;
-  int           height;
-
+					int x, int y, int width, int height, char *fontname) {
   XITK_CHECK_CONSTITENCY(l);
-  
-  fs = xitk_font_load_font(l->imlibdata->x.disp, fontname);
-  xitk_font_set_font(fs, l->gc);
-  height = xitk_font_get_string_height(fs, "HEIGHT");
-  xitk_font_unload_font(fs);
 
   return _xitk_label_create(NULL, l, x, y, width, height, NULL, fontname);
 }

@@ -347,30 +347,19 @@ static void create_inputtext(void) {
  *
  */
 static void create_label(void) {
-  xitk_label_widget_t  lbl;
+  xitk_label_widget_t   lbl;
   char                 *fontname = "*-lucida-*-r-*-*-14-*-*-*-*-*-*-*";
-  int                   x = 150, y = 120, width, height, len = 100;
-  Pixmap                bg;
+  int                   x = 150, y = 120, len = 100;
   xitk_font_t          *fs;
   int                   lbear, rbear, wid, asc, des;
   char                 *label = _("A Label");
 
   XITK_WIDGET_INIT(&lbl, test->imlibdata);
 
-  xitk_window_get_window_size(test->xwin, &width, &height);
-  bg = xitk_image_create_pixmap(test->imlibdata, width, height);
-  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg,
-	    test->widget_list->gc, 0, 0, width, height, 0, 0);
-
   fs = xitk_font_load_font(test->display, fontname);
   xitk_font_set_font(fs, test->widget_list->gc);
   xitk_font_string_extent(fs, label, &lbear, &rbear, &wid, &asc, &des);
   xitk_font_unload_font(fs);
-
-  XSetForeground(test->display, test->widget_list->gc, xitk_get_pixel_color_black(test->imlibdata));
-  XDrawRectangle(test->display, bg, test->widget_list->gc, x - 2, y - 2, len + 4, asc+des + 4);
-  
-  xitk_window_change_background(test->imlibdata, test->xwin, bg, width, height);
 
   lbl.window    = xitk_window_get_window(test->xwin);
   lbl.gc        = test->widget_list->gc;
@@ -379,8 +368,15 @@ static void create_label(void) {
   xitk_list_append_content(test->widget_list->l, 
 			   (test->label = 
 			    xitk_noskin_label_create(&lbl,
-						     x, y, len, fontname)));
-  XFreePixmap(test->display, bg);
+						     x, y, len, (asc+des)*2, fontname)));
+
+  {
+    xitk_image_t *wimage = xitk_get_widget_foreground_skin(test->label);
+    
+    if(wimage) {
+      draw_rectangular_inner_box(test->imlibdata, wimage->image, 0, 0, wimage->width-1, wimage->height-1);
+    }
+  }
 }
 
 /*
@@ -525,21 +521,22 @@ static void create_combo(void) {
   xitk_font_t           *fs;
 
   XITK_WIDGET_INIT(&cmb, test->imlibdata);
-
+  /*
   xitk_window_get_window_size(test->xwin, &wwidth, &wheight);
   bg = xitk_image_create_pixmap(test->imlibdata, wwidth, wheight);
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg, test->widget_list->gc,
 	    0, 0, wwidth, wheight, 0, 0);
-
+  */
   fs = xitk_font_load_font(test->display, fontname);
   xitk_font_set_font(fs, test->widget_list->gc);
   height = xitk_font_get_string_height(fs, "HEIGHT");
   xitk_font_unload_font(fs);
-
+  /*
   draw_rectangular_inner_box(test->imlibdata, bg, (x - 4), (y - 4), (width + 8), (height + 7));
   xitk_window_change_background(test->imlibdata, test->xwin, bg, wwidth, wheight);
-
+  
   XFreePixmap(test->display, bg);
+  */
 
   cmb.skin_element_name = NULL;
   cmb.parent_wlist      = test->widget_list;

@@ -910,7 +910,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
   } else {
     if (wl->pressedWidget) {
       if (wl->pressedWidget->notify_click 
-	  && wl->pressedWidget->enable == WIDGET_ENABLE && mywidget->running)
+	  && wl->pressedWidget->enable == WIDGET_ENABLE && wl->pressedWidget->running)
 	bRepaint |= (wl->pressedWidget->notify_click) (wl, wl->pressedWidget, LBUTTON_UP, x, y);
 
     }

@@ -231,8 +231,8 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       
       xitk_get_widget_pos(private_data->label_widget, &xx, &yy);
       yy += xitk_get_widget_height(private_data->label_widget);
-      x += (xx - 4);
-      y += yy + 2;
+      x += xx;
+      y += yy;
       
       XLOCK(private_data->imlibdata->x.disp);
       XMoveWindow(private_data->imlibdata->x.disp, 
@@ -299,13 +299,16 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
   Atom                        XA_WIN_LAYER;
   long                        data[1];
   char                      **entries = c->entries;
-  unsigned int                itemw = 80, itemh = 20;
+  unsigned int                itemw, itemh = 20;
   unsigned int                slidw = 12;
   xitk_browser_widget_t       browser;
   XClassHint                  xclasshint;
   Status                      status;
   
   XITK_WIDGET_INIT(&browser, c->imlibdata);
+
+  itemw = xitk_get_widget_width(private_data->label_widget);
+  itemw += xitk_get_widget_width(private_data->button_widget);
 
   XLOCK(c->imlibdata->x.disp);
 
@@ -335,7 +338,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
   }
   
   private_data->xwin = xitk_window_create_simple_window(c->imlibdata, 0, 0,
-							(itemw + slidw) + 2, (itemh * 5) + 2);
+							(itemw + 2), (itemh * 5) + 2);
   if(c->layer_above) {
     XA_WIN_LAYER = XInternAtom(c->imlibdata->x.disp, "_WIN_LAYER", False);
     
@@ -387,7 +390,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
 			    (private_data->browser_widget = 
 			     xitk_noskin_browser_create(&browser,
 							private_data->gc, 1, 1, 
-							itemw, itemh, slidw,
+							(itemw - slidw), itemh, slidw,
 							DEFAULT_FONT_10)));
   
   xitk_browser_update_list(private_data->browser_widget, 
@@ -412,7 +415,8 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
   mywidget->visible                      = 1;
   mywidget->have_focus                   = FOCUS_LOST;
 
-  mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
+
+  //  mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
   
   mywidget->widget_type                  = WIDGET_TYPE_COMBO | WIDGET_TYPE_GROUP;
   mywidget->paint                        = paint;
@@ -505,7 +509,8 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     xitk_font_set_font(fs, c->parent_wlist->gc);
     height = xitk_font_get_string_height(fs, "HEIGHT");
     xitk_font_unload_font(fs);
-    
+
+
     lbl.window            = c->parent_wlist->win;
     lbl.gc                = c->parent_wlist->gc;
     lbl.skin_element_name = NULL;
@@ -513,7 +518,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     xitk_list_append_content(c->parent_wlist->l, 
 			     (private_data->label_widget = 
 			      xitk_noskin_label_create(&lbl,
-						       x, y, (width - height), DEFAULT_FONT_12)));
+						       x, y-4, (width - height), (height + 8), DEFAULT_FONT_12)));
 
     cb.skin_element_name = NULL;
     cb.callback          = _combo_rollunroll;
@@ -524,8 +529,21 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
 			      xitk_noskin_checkbox_create(&cb,
 							  x + (width - height), (y - 4),
 							  (height + 8), (height + 8))));
+
+    mywidget->x = x;
+    mywidget->y = y-4;
+    
+    mywidget->width = (width - height) + (height + 8);
+    mywidget->height = (height + 8);
+    
     {
-      xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->button_widget);
+      xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->label_widget);
+      
+      if(wimage) {
+	draw_rectangular_inner_box(c->imlibdata, wimage->image, 0, 0, wimage->width - 1, wimage->height - 1);
+      }
+      
+      wimage = xitk_get_widget_foreground_skin(private_data->button_widget);
       
       if(wimage) {
 	draw_arrow_down(c->imlibdata, wimage);

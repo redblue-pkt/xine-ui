@@ -866,16 +866,16 @@ static void _draw_frame(ImlibData *im, Pixmap p,
     xitk_font_set_font(fs, gc);
     fheight = xitk_font_get_string_height(fs, title);
     fwidth = xitk_font_get_string_length(fs, title);
-    
-    if(fwidth > w) {
+
+    if(fwidth >= (w - 12)) {
       int nchar = 0;
-      
+
       memset(&buf, 0, sizeof(buf));
       /* Limit the title to width of frame */
       do {
 	nchar++;
 	snprintf(buf, nchar, "%s", title);
-      } while(xitk_font_get_string_length(fs, buf) < (w - 6));
+      } while(xitk_font_get_string_length(fs, buf) < (w - 12));
       /* Cut title, add three dots a the end */
       nchar -= 4;
       snprintf(buf, nchar, "%s", title);

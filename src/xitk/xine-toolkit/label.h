@@ -69,7 +69,8 @@ xitk_widget_t *xitk_label_create (xitk_skin_config_t *skonfig, xitk_label_widget
  * Same as above, without skinable feature.
  */
 xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
-					int x, int y, int len, char *fontname);
+					int x, int y, int width, int height, char *fontname);
+
 /**
  * Change label of widget 'widget'.
  */
