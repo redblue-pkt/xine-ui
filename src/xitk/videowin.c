@@ -94,7 +94,7 @@ typedef struct {
 
   int            visible_width;   /* Size of currently visible portion of screen */
   int            visible_height;  /* May differ from fullscreen_* e.g. for TV mode */
-  double         visible_ratio;   /* Pixel ratio of currently vissible screen */
+  double         visible_aspect;  /* Pixel ratio of currently vissible screen */
 
   int            using_xinerama;
 #ifdef HAVE_XINERAMA
@@ -199,7 +199,7 @@ void video_window_select_visual (void) {
  *
  * will set
  * output_width/output_height
- * visible_width/visible_height/visible_ratio
+ * visible_width/visible_height/visible_aspect
  */
 static void video_window_adapt_size (void) { 
 
@@ -371,19 +371,6 @@ static void video_window_adapt_size (void) {
 	  printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif
 
-	  if (fabs(gGui->pixel_aspect - 1.0) < 0.01) {
-	    /*
-	     * we have a display with *almost* square pixels (<1% error),
-	     * to avoid time consuming software scaling in video_out_xshm,
-	     * correct this to the exact value of 1.0 and pretend we have
-	     * perfect square pixels.
-	     */
-	    gGui->pixel_aspect  = 1.0;
-#ifdef DEBUG
-	    printf("display_ratio: corrected to square pixels!\n");
-#endif
-	  }
-	  
 	  // TODO
 	  /*
 	   * just in case the mouse pointer is off the visible area, move it
@@ -463,12 +450,12 @@ static void video_window_adapt_size (void) {
   
   gVw->visible_width  = gVw->fullscreen_width;
   gVw->visible_height = gVw->fullscreen_height;
-  gVw->visible_ratio  = 1.0;   // TODO
+  gVw->visible_aspect = gGui->pixel_aspect;
 
   if(gGui->xine) {
 #warning FIXME NEWAPI
 #if 0
-    xine_tvmode_size2 (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_ratio, NULL);
+    xine_tvmode_size2 (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_aspect, NULL);
     xine_tvmode_size2 (gGui->xine, &hint.width, &hint.height, NULL, NULL);
 #endif
   }
@@ -635,19 +622,6 @@ static void video_window_adapt_size (void) {
 #ifdef DEBUG
 	   printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif
-
-	   if (fabs(gGui->pixel_aspect - 1.0) < 0.01) {
-	     /*
-	      * we have a display with *almost* square pixels (<1% error),
-	      * to avoid time consuming software scaling in video_out_xshm,
-	      * correct this to the exact value of 1.0 and pretend we have
-	      * perfect square pixels.
-	      */
-	     gGui->pixel_aspect  = 1.0;
-#ifdef DEBUG
-	     printf("display_ratio: corrected to square pixels!\n");
-#endif
-	   }
 	}
 #endif
 
@@ -828,8 +802,6 @@ void video_window_dest_size_cb (void *data,
 				int *dest_width, int *dest_height,
 				double *dest_pixel_aspect)  {
   
-  *dest_pixel_aspect = gGui->pixel_aspect;
-  
   /* correct size with video_pixel_aspect */
   if (video_pixel_aspect >= gGui->pixel_aspect)
     video_width  = video_width * video_pixel_aspect / gGui->pixel_aspect + .5;
@@ -850,6 +822,7 @@ void video_window_dest_size_cb (void *data,
          */  
         *dest_width  = (int) ((float) video_width * mag);
         *dest_height = (int) ((float) video_height * mag);
+        *dest_pixel_aspect = gGui->pixel_aspect;
         return;
       }
     }
@@ -858,9 +831,11 @@ void video_window_dest_size_cb (void *data,
   if (gVw->fullscreen_mode) {
     *dest_width  = gVw->visible_width;
     *dest_height = gVw->visible_height;
+    *dest_pixel_aspect = gVw->visible_aspect;
   } else {
     *dest_width  = gVw->output_width;
     *dest_height = gVw->output_height;
+    *dest_pixel_aspect = gGui->pixel_aspect;
   }
 }
 
@@ -874,8 +849,6 @@ void video_window_frame_output_cb (void *data,
 				   int *dest_width, int *dest_height,
 				   double *dest_pixel_aspect,
 				   int *win_x, int *win_y) {
-  
-  *dest_pixel_aspect = gGui->pixel_aspect;
   
   /* correct size with video_pixel_aspect */
   if (video_pixel_aspect >= gGui->pixel_aspect)
@@ -921,10 +894,12 @@ void video_window_frame_output_cb (void *data,
   if (gVw->fullscreen_mode) {
     *dest_width  = gVw->visible_width;
     *dest_height = gVw->visible_height;
+    *dest_pixel_aspect = gVw->visible_aspect;
     /* TODO: check video size/fps/ar if tv mode and call video_window_adapt_size if necessary */
   } else {
     *dest_width  = gVw->output_width;
     *dest_height = gVw->output_height;
+    *dest_pixel_aspect = gGui->pixel_aspect;
   }
 
   *win_x = (gVw->xwin < 0) ? 0 : gVw->xwin;
