@@ -1573,7 +1573,7 @@ int main(int argc, char *argv[]) {
    */
   old_playlist_cfg = 
     xine_config_register_bool(gGui->xine, "gui.playlist_auto_reload", 
-			      1,
+			      0,
 			      _("Automatically reload old playlist"),
 			      _("If it's enabled and if you don't specify any MRL in command "
 				"line, xine will automatically load previous playlist."), 
