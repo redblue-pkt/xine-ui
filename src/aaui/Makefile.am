@@ -12,13 +12,13 @@ endif
 bin_PROGRAMS = $(aa_programs) $(caca_programs)
 
 aaxine_SOURCES = $(GETOPT_C) main.c
-aaxine_CFLAGS = $(AALIB_CFLAGS) -DAA
+aaxine_CFLAGS = $(AALIB_CFLAGS) -DAA $(AM_CFLAGS)
 aaxine_LDADD = @XINE_LIBS@ $(AALIB_LIBS) $(DYNAMIC_LD_LIBS) -lm \
 	       $(top_builddir)/src/common/libcommon.la
 aaxine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la
 
 cacaxine_SOURCES = $(GETOPT_C) main.c
-cacaxine_CFLAGS = $(CACA_CFLAGS) -DCACA
+cacaxine_CFLAGS = $(CACA_CFLAGS) -DCACA $(AM_CFLAGS)
 cacaxine_LDADD = @XINE_LIBS@ $(CACA_LIBS) $(DYNAMIC_LD_LIBS) -lm \
 	       $(top_builddir)/src/common/libcommon.la
 cacaxine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la
