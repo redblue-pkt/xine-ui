@@ -1,8 +1,9 @@
 xine-ui (0.5.2-2) unstable; urgency=low
 
   * updated build-depends (closes: #111083)
+  * corrected doc pathname in package description (thanks to Rich Wareham!)
 
- --
+  -- Siggi Langauf <siggi@debian.org>  Tue,  4 Sep 2001 18:49:34 +0200
 
 xine-ui (0.5.2-1) unstable; urgency=low
 

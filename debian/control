@@ -22,6 +22,6 @@ Description: the xine video player, user interface
  .
  Most DVDs on the market today are play-protected by the Content Scrambling
  System (CSS). Xine does not provide any code to descrample those DVDs,
- because of legal uncertainties. Have a look at /usr/share/doc/README.Debian
- for more information!
+ because of legal uncertainties. Have a look at
+ /usr/share/doc/xine-ui/README.Debian for more information!
 
