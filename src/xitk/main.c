@@ -78,9 +78,8 @@ gGui_t   *gGui;
 int       no_lirc;
 #endif
 
-#define	OPTION_VISUAL_CLASS	1000
-#define	OPTION_VISUAL_ID	1001
-#define	OPTION_INSTALL_COLORMAP	1002
+#define	OPTION_VISUAL		1000
+#define	OPTION_INSTALL_COLORMAP	1001
 
 /* options args */
 static const char *short_options = "?h"
@@ -106,8 +105,7 @@ static struct option long_options[] = {
   {"audio-driver"   , required_argument, 0, 'A' },
   {"deinterlace"    , required_argument, 0, 'D' },
   {"auto-play"      , optional_argument, 0, 'p' },
-  {"visual"	    , required_argument, 0,  OPTION_VISUAL_CLASS },
-  {"visualid"	    , required_argument, 0,  OPTION_VISUAL_ID },
+  {"visual"	    , required_argument, 0,  OPTION_VISUAL },
   {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
   {"version"        , no_argument      , 0, 'v' },
   {0                , no_argument      , 0,  0  }
@@ -186,9 +184,8 @@ void show_usage (void) {
   printf("                                 'content': only by content,\n");
   printf("                                 'extension': only by extension.\n");
   printf("                                 -if no option is given, 'revert' is selected\n");
-  printf("      --visual <visual class>  Use a X11 <visual class> window for video output.\n");
-  printf("      --visualid <visualID>    Use the X11 visual <visualID> for the video\n");
-  printf("                               window.\n");
+  printf("      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n");
+  printf("                               is either an X11 visual class, or a visual id.\n");
   printf("      --install                Install a private colormap.\n");
 #ifdef DEBUG
   printf("  -d, --debug <flags>          Debug mode for <flags> ('help' for list).\n");
@@ -666,8 +663,10 @@ int main(int argc, char *argv[]) {
       }
       break;
 
-    case OPTION_VISUAL_CLASS:
-      if (strcasecmp(optarg, "StaticGray") == 0)
+    case OPTION_VISUAL:
+      if (sscanf(optarg, "%x", &visual) == 1)
+	gGui->prefered_visual_id = visual;
+      else if (strcasecmp(optarg, "StaticGray") == 0)
 	gGui->prefered_visual_class = StaticGray;
       else if (strcasecmp(optarg, "GrayScale") == 0)
 	gGui->prefered_visual_class = GrayScale;
@@ -683,14 +682,6 @@ int main(int argc, char *argv[]) {
 	show_usage();
 	exit(1);
       }
-      break;
-
-    case OPTION_VISUAL_ID:
-      if (sscanf(optarg, "%x", &visual) != 1) {
-	show_usage();
-	exit(1);
-      }
-      gGui->prefered_visual_id = visual;
       break;
 
     case OPTION_INSTALL_COLORMAP:

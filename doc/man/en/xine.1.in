@@ -1,6 +1,6 @@
 .\" -*-Nroff-*-
 .\""
-.TH XINE 1x 2001-07-18 "The xine project"
+.TH XINE 1x 2001-09-24 "The xine project"
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\""
@@ -69,19 +69,18 @@ Valid options are:
 "extension" (only by extension). If no option is given, 
 "revert" is selected
 .TP
-.B \-\-visual <visual class>
-Try to use a specific X11 server visual class for xine windows.  The
-<visual class> parameter is one of StaticGray, GrayScale, StaticColor,
-PseudoColor, TrueColor or DirectColor.  For a given visual class, Xine
-tries to find a visual of depth 15 or 16, 24 or 32, 8 (in that order).
-The default visual class used by xine is TrueColor.
-.br
-If no usable visual of the given class is found, xine falls back to
+.B \-\-visual <visual-class-or-id>
+Try to use a specific X11 server visual for xine windows.  The
+<visual-class-or-id> parameter is either the name of an X11 visual
+class (StaticGray, GrayScale, StaticColor, PseudoColor, TrueColor or
+DirectColor) or the hexadecimal value for a specific X11 visual.
+
+When used with a visual class name, xine tries to find such a visual
+with depth 15 or 16, 24 or 32, 8 (in that order).  The default visual
+class used by xine in absence of a --visual option is TrueColor.
+
+If no usable visual is found, xine falls back to
 the default visual used on the X11 server's root window.
-.TP
-.B \-\-visualid <visualID>
-Try to use a specific X11 server visual for xine windows. The parameter
-is the visual's id that should be used (a hexdecimal number).
 .TP
 .B \-\-install
 When using an X11 visual with changable colors (colormaps), install a
