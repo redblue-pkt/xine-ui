@@ -1731,14 +1731,15 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
 
   }
 
+  /* destroy font caching */
+  xitk_font_cache_done();
+  
   xitk_list_free(gXitk->list);
   xitk_list_free(gXitk->gfx);
   xitk_config_deinit(gXitk->config);
   
   XITK_FREE(gXitk);
 
-  /* destroy font caching */
-  xitk_font_cache_done();
 }
 
 /*
