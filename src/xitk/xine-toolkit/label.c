@@ -72,9 +72,10 @@ static void _create_label_pixmap(xitk_widget_t *w) {
     
     if ((i < len) && (_label[i] >= 32))
       c = _label[i] - 32;
+
     if (c >= 0) {
       int px, py;
-      
+         
       px = (c % 32) * private_data->char_length;
       py = (c / 32) * private_data->char_height;
       
@@ -87,6 +88,18 @@ static void _create_label_pixmap(xitk_widget_t *w) {
     }
     
     x_dest += private_data->char_length;
+  }
+  
+  /* fill gap with spaces */
+  if(len < private_data->length) {
+    XLOCK(private_data->imlibdata->x.disp);
+    for(; i < private_data->length; i++) {
+      XCopyArea(private_data->imlibdata->x.disp, font->image->pixmap, 
+		private_data->labelpix->pixmap, private_data->labelpix->gc, 0, 0,
+		private_data->char_length, private_data->char_height, x_dest, 0);
+      x_dest += private_data->char_length;
+    }
+    XUNLOCK(private_data->imlibdata->x.disp);
   }
 
   free(_label);
