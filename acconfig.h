@@ -32,3 +32,10 @@
 #undef HAVE_ORBIT
 
 #undef HAVE_AA
+
+/* Define this if you have libXv installed */
+#undef HAVE_XV
+
+/* Define this if you have libXinerama installed */
+#undef HAVE_XINERAMA
+
