@@ -483,53 +483,6 @@ static int sock_create(const char *service, const char *transport, struct sockad
   return sock;
 }
 
-static int sock_client(const char *host, const char *service, const char *transport) {
-  struct sockaddr_in   sin;
-  struct hostent      *ihost;
-  int                  sock;
-  
-  sock = sock_create(service, transport, &sin);
-
-  if ((sin.sin_addr.s_addr = inet_addr(host)) == -1) {
-    ihost = gethostbyname(host);
-    
-    if(!ihost) {
-      sock_err("Unknown host: %s\n", host);
-      return -1;
-    }
-    memcpy(&sin.sin_addr, ihost->h_addr, ihost->h_length);
-  }
-  
-  if(connect(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
-    int err = errno;
-
-    close(sock);
-    errno = err;
-    sock_err("Unable to connect %s[%s]: %s\n", host, service, strerror(errno));
-    return -1;
-  }
-
-  return sock;
-}
-
-static int sock_serv(const char *service, const char *transport, int queue_length) {
-  struct sockaddr_in  sin;
-  int                 sock;
-  int                 on = 1;
-
-  sock = sock_create(service, transport, &sin);
-  
-  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int));
-  
-  if(bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0)
-    sock_err("Unable to link socket %s: %s\n", service, strerror(errno));
-  
-  if(strcmp(transport, "udp") && listen(sock, queue_length) < 0)
-    sock_err("Passive mode impossible on %s: %s\n", service, strerror(errno));
-  
-  return sock;
-}
-
 /*
  * Check for socket validity.
  */
@@ -557,46 +510,6 @@ static int sock_check_opened(int socket) {
   }
 
   return 0;
-}
-
-/*
- * Read from socket.
- */
-static int sock_read(int socket, char *buf, int len) {
-  char    *pbuf;
-  int      r, rr;
-  void    *nl;
-  
-  if((socket < 0) || (buf == NULL))
-    return -1;
-
-  if(!sock_check_opened(socket))
-    return -1;
-  
-  if (--len < 1)
-    return(-1);
-  
-  pbuf = buf;
-  
-  do {
-    
-    if((r = recv(socket, pbuf, len, MSG_PEEK)) <= 0)
-      return -1;
-
-    if((nl = memchr(pbuf, '\n', r)) != NULL)
-      r = ((char *) nl) - pbuf + 1;
-    
-    if((rr = read(socket, pbuf, r)) < 0)
-      return -1;
-    
-    pbuf += rr;
-    len -= rr;
-
-  } while((nl == NULL) && len);
-  
-  *pbuf = '\0';
-  
-  return (pbuf - buf);
 }
 
 /*
@@ -678,6 +591,34 @@ static char *_atoa(char *str) {
 }
 
 #ifdef NETWORK_CLIENT
+static int sock_client(const char *host, const char *service, const char *transport) {
+  struct sockaddr_in   sin;
+  struct hostent      *ihost;
+  int                  sock;
+  
+  sock = sock_create(service, transport, &sin);
+
+  if ((sin.sin_addr.s_addr = inet_addr(host)) == -1) {
+    ihost = gethostbyname(host);
+    
+    if(!ihost) {
+      sock_err("Unknown host: %s\n", host);
+      return -1;
+    }
+    memcpy(&sin.sin_addr, ihost->h_addr, ihost->h_length);
+  }
+  
+  if(connect(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
+    int err = errno;
+
+    close(sock);
+    errno = err;
+    sock_err("Unable to connect %s[%s]: %s\n", host, service, strerror(errno));
+    return -1;
+  }
+
+  return sock;
+}
 
 #if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 91)
 #define write_to_console_unlocked(session, msg, args...)  __sock_write(session->console, 1, msg, ##args)
@@ -1383,6 +1324,64 @@ int main(int argc, char **argv) {
 }
 
 #else
+
+static int sock_serv(const char *service, const char *transport, int queue_length) {
+  struct sockaddr_in  sin;
+  int                 sock;
+  int                 on = 1;
+
+  sock = sock_create(service, transport, &sin);
+  
+  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int));
+  
+  if(bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0)
+    sock_err("Unable to link socket %s: %s\n", service, strerror(errno));
+  
+  if(strcmp(transport, "udp") && listen(sock, queue_length) < 0)
+    sock_err("Passive mode impossible on %s: %s\n", service, strerror(errno));
+  
+  return sock;
+}
+
+/*
+ * Read from socket.
+ */
+static int sock_read(int socket, char *buf, int len) {
+  char    *pbuf;
+  int      r, rr;
+  void    *nl;
+  
+  if((socket < 0) || (buf == NULL))
+    return -1;
+
+  if(!sock_check_opened(socket))
+    return -1;
+  
+  if (--len < 1)
+    return(-1);
+  
+  pbuf = buf;
+  
+  do {
+    
+    if((r = recv(socket, pbuf, len, MSG_PEEK)) <= 0)
+      return -1;
+
+    if((nl = memchr(pbuf, '\n', r)) != NULL)
+      r = ((char *) nl) - pbuf + 1;
+    
+    if((rr = read(socket, pbuf, r)) < 0)
+      return -1;
+    
+    pbuf += rr;
+    len -= rr;
+
+  } while((nl == NULL) && len);
+  
+  *pbuf = '\0';
+  
+  return (pbuf - buf);
+}
 
 /*
  * Password related
