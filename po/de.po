@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
 "POT-Creation-Date: 2003-02-03 01:35+0100\n"
-"PO-Revision-Date: 2003-01-30 21:48+0100\n"
+"PO-Revision-Date: 2003-02-10 10:20+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -155,9 +155,8 @@ msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): Konnte Hintergrund-Bild nicht finden\n"
 
 #: src/xitk/control.c:506
-#, fuzzy
 msgid "xine Control Window"
-msgstr "Einstellungen-Fenster schließen"
+msgstr "xine Einstellungensfenster"
 
 #: src/xitk/control.c:521
 msgid "control: couldn't find image for background\n"
@@ -1359,7 +1358,6 @@ msgid "All extensions"
 msgstr "Alle Dateitypen"
 
 #: src/xitk/mrl_browser.c:261
-#, fuzzy
 msgid "xine MRL Browser"
 msgstr "xine MRL Browser"
 
@@ -1431,7 +1429,6 @@ msgid "Mute toggle"
 msgstr "Lautlos"
 
 #: src/xitk/panel.c:852
-#, fuzzy
 msgid "xine Panel"
 msgstr "xine Bedienfeld"
 
@@ -1549,9 +1546,8 @@ msgid "Save a playlist"
 msgstr "Playliste speichern"
 
 #: src/xitk/playlist.c:1006
-#, fuzzy
 msgid "xine Playlist Editor"
-msgstr "Xine Playlisten Editor"
+msgstr "xine Playlisten Editor"
 
 #: src/xitk/playlist.c:1024
 msgid "playlist: couldn't find image for background\n"
@@ -1949,19 +1945,16 @@ msgid "height for xinerama fullscreen (-8192 = autodetect)"
 msgstr "Höhe für Xinerama-Vollbildmodus (-8192 = automatisch)"
 
 #: src/xitk/videowin.c:1335
-#, fuzzy
 msgid "xine Video Window"
-msgstr "Xine Video Fenster"
+msgstr "xine Video Fenster"
 
 #: src/xitk/videowin.c:1339
-#, fuzzy
 msgid "xine Video Fullscreen Window"
-msgstr "Xine Video Vollbildfenster"
+msgstr "xine Video Vollbildfenster"
 
 #: src/xitk/videowin.c:1343
-#, fuzzy
 msgid "xine Video Borderless Window"
-msgstr "Xine Video rahmenloses Fenster"
+msgstr "xine Video rahmenloses Fenster"
 
 #: src/xitk/videowin.c:1364
 msgid "XAllocWMHints() failed\n"
