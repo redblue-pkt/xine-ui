@@ -186,6 +186,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 # binaries
 %{prefix}/bin/xine
+%{prefix}/bin/xine-bugreport
+%{prefix}/bin/xine-check
 %{prefix}/share/idl/xine.idl
 # skins
 @XINE_SKINDIR@/lcd/*
@@ -198,10 +200,11 @@ rm -rf $RPM_BUILD_ROOT
 # desktop entries/icons
 @XINE_DESKTOPDIR@/*
 # documentation
-%{prefix}/man/fr/man1/xine.1*
-%{prefix}/man/es/man1/xine.1*
-%{prefix}/man/pl/man1/xine.1*
-%{prefix}/man/man1/xine.1*
+%{prefix}/man/de/man1/xine*.1*
+%{prefix}/man/fr/man1/xine*.1*
+%{prefix}/man/es/man1/xine*.1*
+%{prefix}/man/pl/man1/xine*.1*
+%{prefix}/man/man1/xine*.1*
 %{prefix}/share/doc/xine-ui/FAQ_en
 %{prefix}/share/doc/xine-ui/FAQ_es
 %{prefix}/share/doc/xine-ui/FAQ_fr
@@ -220,6 +223,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/share/doc/xine-ui/README.config_en
 %{prefix}/share/doc/xine-ui/README_en
 %{prefix}/share/doc/xine-ui/README_es
+%{prefix}/share/doc/xine-ui/README_fi
 %{prefix}/share/doc/xine-ui/README_pl
 %{prefix}/share/doc/xine-ui/README_it
 %{prefix}/share/doc/xine-ui/README_uk
@@ -245,9 +249,13 @@ rm -rf $RPM_BUILD_ROOT
 @HAVE_AA_TRUE@%defattr(-,root,root)
 @HAVE_AA_TRUE@%{prefix}/bin/aaxine
 @HAVE_AA_TRUE@%{prefix}/man/man1/aaxine.1*
+@HAVE_AA_TRUE@%{prefix}/man/de/man1/aaxine.1*
 @HAVE_AA_TRUE@%{prefix}/man/pl/man1/aaxine.1*
 
 %changelog
+* Sun Mar 31 2001 Matthias Dahl <matthew2k@web.de>
+- added xine-bugreport and xine-check, including their man pages.
+- added german man pages and README_fi.
 * Fri Dec 14 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add portuguese brazilian *.mo files: thanks to Miguel Freitas <miguel@cetuc.puc-rio.br> ;-)
 * Tue Nov 27 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>

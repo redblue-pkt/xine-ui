@@ -6,19 +6,6 @@
 
    VERSION
     => $Id$
-
-  
-  IMPORTANT NOTE
-    
-    Starting from XINE release 0.9.4 a new version  of  this  plugin  is
-    included which basically is a complete rewrite.
-    
-    Even though we are trying to make things as stable as possible,  you
-    *might* experience some problems we haven't yet fixed  or  we  don't
-    know about yet. Please refer to the end  of  this  README  for  more
-    information on known bugs and how to report new ones.
-  
-    Thanks for your help to get this plugin as rock-solid as possible.
   
 
 * WHAT IS THIS PLUGIN ABOUT and WHY SHOULD I EVEN CONSIDER TO USE IT? :)
