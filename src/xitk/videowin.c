@@ -1420,11 +1420,8 @@ static void video_window_handle_event (XEvent *event, void *data) {
     gui_handle_event(event, data);
     break;
 
-#warning ADAPT ME
-#if 0
   case MotionNotify: {
     XMotionEvent *mevent = (XMotionEvent *) event;
-    xine_input_event_t xine_event;
     int x, y;
 
     /* printf("Mouse event:mx=%d my=%d\n",mevent->x, mevent->y); */
@@ -1435,22 +1432,22 @@ static void video_window_handle_event (XEvent *event, void *data) {
     }
 
     if (video_window_translate_point(mevent->x, mevent->y, &x, &y)) {
-      xine_event.event.type = XINE_EVENT_MOUSE_MOVE;
-      xine_event.button = 0; /*  No buttons, just motion. */
-      xine_event.x = x;
-      xine_event.y = y;
-      xine_send_event(gGui->xine, (xine_event_t*)(&xine_event));
+      xine_event_t event;
+      xine_input_data_t input;
+      event.type = XINE_EVENT_INPUT_MOUSE_MOVE;
+      event.stream = gGui->stream;
+      event.data = &input;
+      event.data_length = sizeof(input);
+      input.button = 0; /*  No buttons, just motion. */
+      input.x = x;
+      input.y = y;
+      xine_event_send(gGui->stream, &event);
     }
   }
   break;
-#endif
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
-#warning ADAPT ME
-#if 0
-    xine_input_event_t xine_event;
-#endif
     int x, y;
 
     if(!gGui->cursor_visible) {
@@ -1462,16 +1459,18 @@ static void video_window_handle_event (XEvent *event, void *data) {
       panel_toggle_visibility(NULL, NULL);
 
     if (bevent->button == Button1) {
-#warning ADAPT ME
-#if 0
       if (video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
-	xine_event.event.type = XINE_EVENT_MOUSE_BUTTON;
-	xine_event.button = 1;
-	xine_event.x = x;
-	xine_event.y = y;
-	xine_send_event(gGui->xine, (xine_event_t*)(&xine_event));
+	xine_event_t event;
+	xine_input_data_t input;
+	event.type = XINE_EVENT_INPUT_MOUSE_BUTTON;
+	event.stream = gGui->stream;
+	event.data = &input;
+	event.data_length = sizeof(input);
+	input.button = 1;
+	input.x = x;
+	input.y = y;
+	xine_event_send(gGui->stream, &event);
       }
-#endif
     }
   }
   break;
