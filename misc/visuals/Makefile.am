@@ -4,6 +4,10 @@ visualsdir = $(datadir)/xine/visuals
 
 visuals_DATA = default.avi
 
+debug:
+install-debug: debug
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
+
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*
 

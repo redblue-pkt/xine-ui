@@ -29,7 +29,14 @@ xine-bugreport: xine-check
 
 
 debug:
+	@list='$(SUBDIRS)'; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) $@) || exit; \
+	done;
+
 install-debug: debug
+	@list='$(SUBDIRS)'; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) $@) || exit; \
+	done;
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
 mostlyclean-generic:

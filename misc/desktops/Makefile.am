@@ -11,6 +11,9 @@ pixmap_DATA = xine_16x16.png \
 desktopdir = $(datadir)/xine/desktop
 desktop_DATA = xine.desktop
 
+debug:
+install-debug: debug
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*
