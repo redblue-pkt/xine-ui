@@ -455,17 +455,16 @@ void odk_free(odk_t *odk) {
 
 void odk_enqueue(odk_t *odk, const char *mrl)
 {
-  int t = 0;
-  int playlist_num = gGui->playlist.num;
-
-  gui_dndcallback((char *)mrl);
-
-  /* wait a bit to get it enqueued */
-  while( t < 20 && playlist_num == gGui->playlist.num )
-      usleep(10000);
+  if(mrl_look_like_playlist((char *)mrl)) {
+    if(!mediamark_concat_mediamarks(mrl))
+      mediamark_append_entry(mrl, mrl, NULL, 0, -1, 0, 0);
+  }
+  else
+    mediamark_append_entry(mrl, mrl, NULL, 0, -1, 0, 0);
 }
 
 int odk_open_and_play(odk_t *odk, const char *mrl) {
+  int entry_num = gGui->playlist.num;
 
   odk_enqueue(odk, mrl);
 
@@ -475,8 +474,9 @@ int odk_open_and_play(odk_t *odk, const char *mrl) {
     gGui->ignore_next = 0;
   }
 
-  if( gGui->playlist.num ) {
-    gui_set_current_mmk(gGui->playlist.mmk[gGui->playlist.num - 1]);
+  if( gGui->playlist.num > entry_num ) {
+    gGui->playlist.cur = entry_num;
+    gui_set_current_mmk(gGui->playlist.mmk[entry_num]);
 
     return gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
            gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 0);
