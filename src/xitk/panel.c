@@ -441,17 +441,46 @@ void panel_reset_slider (void) {
  * Update audio/spu channel displayed informations.
  */
 void panel_update_channel_display (void) {
-  const char* lang;
+  int channel;
+  const char *lang;
 
-  if((lang =
-      xine_get_audio_lang(gGui->xine,
-			  (xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)))) != NULL)
-    xitk_label_change_label(panel->widget_list, panel->audiochan_label, lang);
+  channel = xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+  switch (channel) {
+  case -2:
+    lang = "off";
+    break;
+  case -1:
+    lang = xine_get_audio_lang (gGui->xine, channel);
+    if (!lang)
+      lang = "auto";
+    break;
+  default:
+    {
+      static char audio[4];
+      sprintf(audio, "%3d", channel);
+      lang = audio;
+    }
+  }
+  xitk_label_change_label (panel->widget_list, panel->audiochan_label, lang);
   
-  if((lang = 
-      xine_get_spu_lang(gGui->xine,
-			(xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL)))) != NULL)
-    xitk_label_change_label (panel->widget_list, panel->spuid_label, lang);
+  channel = xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL);
+  switch (channel) {
+  case -2:
+    lang = "off";
+    break;
+  case -1:
+    lang = xine_get_spu_lang (gGui->xine, channel);
+    if (!lang)
+      lang = "auto";
+    break;
+  default:
+    {
+      static char spu[4];
+      sprintf(spu, "%3d", channel);
+      lang = spu;
+    }
+  }
+  xitk_label_change_label (panel->widget_list, panel->spuid_label, lang);
 }
 
 /*
@@ -908,7 +937,7 @@ void panel_init (void) {
 
   /*  Runtime label */
   lbl.skin_element_name = "TimeLabel";
-  lbl.label             = panel->runtime;
+  lbl.label             = "00:00:00";
   lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 	   (panel->runtime_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));
