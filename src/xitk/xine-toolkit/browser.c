@@ -296,7 +296,7 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
     else if(j > (private_data->max_length - 1))
       max = j - (private_data->max_length - 1);
     
-    if((start >= 0) && max)
+    if(((start >= 0) && max) || ((start == 0) && (max == 0)))
       private_data->current_start = start;
 
     private_data->need_h_slider = 0;

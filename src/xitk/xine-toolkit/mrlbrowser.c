@@ -309,7 +309,6 @@ static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
   int old_mrls_num = private_data->mrls_num;
 
   for (i = 0; i < num_mrls; i++) {
-
     if(private_data->mc->mrls[i] == NULL)
       private_data->mc->mrls[i] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
 
@@ -359,7 +358,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 	sprintf(private_data->last_mrl_source, "%s", old_old_src);
 	return;
       }
-
+      
       mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
     }
     
@@ -795,6 +794,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
 					       buf, &num_mrls);
 
       mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
+
     }
     
     update_current_origin(private_data);
