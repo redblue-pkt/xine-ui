@@ -1503,15 +1503,17 @@ static void subselector_callback(filebrowser_t *fb) {
       if(mmk) {
 	mediamark_replace_entry(&gGui->playlist.mmk[gGui->playlist.cur],
 				mmk->mrl, mmk->ident, file, mmk->start, mmk->end);
+	mediamark_free_mmk(&mmk);
 
-	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	mmk = (mediamark_t *) mediamark_get_current_mmk();
+	gui_set_current_mrl(mmk);
 	
 	playlist_mrlident_toggle();
 	
 	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
 	  int curpos;
 	  xine_close (gGui->spu_stream);
-	  
+
 	  if(xine_open(gGui->spu_stream, mmk->sub))
 	    xine_stream_master_slave(gGui->stream, 
 				     gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
@@ -1521,7 +1523,6 @@ static void subselector_callback(filebrowser_t *fb) {
 	    gui_set_current_position(curpos);
 	  }
 	}
-	mediamark_free_mmk(&mmk);
       }
     }
     free(file);

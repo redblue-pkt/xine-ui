@@ -528,6 +528,16 @@ void gui_execute_action_id(action_id_t action) {
     xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, 0);
     break;
 
+  case ACTID_SV_SYNC_p:
+    xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, 
+		   (xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET)) + 1);
+    break;
+
+  case ACTID_SV_SYNC_m:
+    xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, 
+		   (xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET)) - 1);
+      break;
+
   case ACTID_SPEED_FAST:
     gui_change_speed_playback(NULL, (void*)GUI_PREV);
     break;

@@ -120,6 +120,8 @@ typedef enum {
   ACTID_OSD_SINFOS,
   ACTID_FILESELECTOR,
   ACTID_SUBSELECT,
+  ACTID_SV_SYNC_p,
+  ACTID_SV_SYNC_m,
 
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 
