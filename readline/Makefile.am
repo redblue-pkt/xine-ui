@@ -7,17 +7,70 @@ endif
 
 noinst_LTLIBRARIES = $(readline_lib)
 
-EXTRA_DIST = emacs_keymap.c vi_keymap.c savestring.c histexpand.c \
-	CHANGELOG CHANGES COPYING INSTALL MANIFEST README USAGE
+EXTRA_DIST = \
+	CHANGELOG \
+	CHANGES \
+	COPYING \
+	INSTALL \
+	MANIFEST \
+	README \
+	USAGE \
+	emacs_keymap.c \
+	histexpand.c \
+	savestring.c \
+	vi_keymap.c
 
-libreadline_la_SOURCES = readline.c vi_mode.c funmap.c keymaps.c parens.c search.c rltty.c \
-	complete.c bind.c isearch.c display.c signals.c util.c kill.c undo.c macro.c input.c \
-	callback.c terminal.c nls.c compat.c xmalloc.c history.c histexpand.c histfile.c \
-	histsearch.c shell.c tilde.c
+libreadline_la_SOURCES = \
+	bind.c \
+	callback.c \
+	compat.c \
+	complete.c \
+	display.c \
+	funmap.c \
+	history.c \
+	histexpand.c \
+	histfile.c \
+	histsearch.c \
+	input.c \
+	isearch.c \
+	keymaps.c \
+	kill.c \
+	macro.c \
+	nls.c \
+	parens.c \
+	readline.c \
+	rltty.c \
+	search.c \
+	shell.c \
+	signals.c \
+	terminal.c \
+	tilde.c \
+	undo.c \
+	util.c \
+	vi_mode.c \
+	xmalloc.c 
 
-noinst_HEADERS = ansi_stdlib.h history.h posixjmp.h rlconf.h rlshell.h rltypedefs.h tilde.h \
-	chardefs.h keymaps.h posixstat.h rldefs.h rlstdc.h rlwinsize.h xmalloc.h histlib.h \
-	posixdir.h readline.h rlprivate.h rltty.h tcap.h
+noinst_HEADERS = \
+	ansi_stdlib.h \
+	chardefs.h \
+	histlib.h \
+	history.h \
+	keymaps.h \
+	posixdir.h \
+	posixjmp.h \
+	posixstat.h \
+	readline.h \
+	rlconf.h \
+	rldefs.h \
+	rlprivate.h \
+	rlshell.h \
+	rlstdc.h \
+	rltty.h \
+	rltypedefs.h \
+	rlwinsize.h \
+	tcap.h \
+	tilde.h \
+	xmalloc.h 
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) @READLINE_LOCAL_CFLAGS@ -DRL_LIBRARY_VERSION=\\\"@LIBVERSION@\\\" -static"

@@ -34,7 +34,7 @@ main()
 ])
 AC_MSG_RESULT($bash_cv_dup2_broken)
 if test $bash_cv_dup2_broken = yes; then
-AC_DEFINE(DUP2_BROKEN)
+AC_DEFINE(DUP2_BROKEN,,[Define if dup2 fails to clear the close-on-exec flag])
 fi
 ])
 
@@ -70,11 +70,11 @@ AC_CACHE_VAL(bash_cv_signal_vintage,
 ])
 AC_MSG_RESULT($bash_cv_signal_vintage)
 if test "$bash_cv_signal_vintage" = posix; then
-AC_DEFINE(HAVE_POSIX_SIGNALS)
+AC_DEFINE(HAVE_POSIX_SIGNALS,,[Define if we have Posix signals])
 elif test "$bash_cv_signal_vintage" = "4.2bsd"; then
-AC_DEFINE(HAVE_BSD_SIGNALS)
+AC_DEFINE(HAVE_BSD_SIGNALS,,[Define if we have BSD signals])
 elif test "$bash_cv_signal_vintage" = svr3; then
-AC_DEFINE(HAVE_USG_SIGHOLD)
+AC_DEFINE(HAVE_USG_SIGHOLD,,[Define if we have USG SIGHOLD])
 fi
 ])
 
@@ -137,7 +137,7 @@ main()
 ])
 AC_MSG_RESULT($bash_cv_pgrp_pipe)
 if test $bash_cv_pgrp_pipe = yes; then
-AC_DEFINE(PGRP_PIPE)
+AC_DEFINE(PGRP_PIPE,,[Define if whether pgrps need synchronization])
 fi
 ])
 
@@ -195,9 +195,9 @@ main()
 ])
 AC_MSG_RESULT($bash_cv_type_rlimit)
 if test $bash_cv_type_rlimit = quad_t; then
-AC_DEFINE(RLIMTYPE, quad_t)
+AC_DEFINE(RLIMTYPE, quad_t,[Define if RLIMTYPE is quad_t])
 elif test $bash_cv_type_rlimit = rlim_t; then
-AC_DEFINE(RLIMTYPE, rlim_t)
+AC_DEFINE(RLIMTYPE, rlim_t,[Define if RLIMTYPE is rlim_t])
 fi
 ])
 
@@ -217,7 +217,7 @@ AC_CACHE_VAL(bash_cv_decl_under_sys_siglist,
   [AC_MSG_ERROR(cannot check for _sys_siglist[] if cross compiling -- defaulting to no)])])dnl
 AC_MSG_RESULT($bash_cv_decl_under_sys_siglist)
 if test $bash_cv_decl_under_sys_siglist = yes; then
-AC_DEFINE(UNDER_SYS_SIGLIST_DECLARED)
+AC_DEFINE(UNDER_SYS_SIGLIST_DECLARED,,[Define if _sys_siglist is in signal.h or unistd.h])
 fi
 ])
 
@@ -244,7 +244,7 @@ exit(msg == 0);
 	 bash_cv_under_sys_siglist=no])])
 AC_MSG_RESULT($bash_cv_under_sys_siglist)
 if test $bash_cv_under_sys_siglist = yes; then
-AC_DEFINE(HAVE_UNDER_SYS_SIGLIST)
+AC_DEFINE(HAVE_UNDER_SYS_SIGLIST,,[Define if _sys_siglist is in system C library])
 fi
 ])
 
@@ -271,7 +271,7 @@ exit(msg == 0);
 	 bash_cv_sys_siglist=no])])
 AC_MSG_RESULT($bash_cv_sys_siglist)
 if test $bash_cv_sys_siglist = yes; then
-AC_DEFINE(HAVE_SYS_SIGLIST)
+AC_DEFINE(HAVE_SYS_SIGLIST,,[Define sys_siglist is in system C library])
 fi
 ])
 
@@ -286,7 +286,7 @@ AC_CACHE_VAL(bash_cv_sys_errlist,
     bash_cv_sys_errlist=yes, bash_cv_sys_errlist=no)])dnl
 AC_MSG_RESULT($bash_cv_sys_errlist)
 if test $bash_cv_sys_errlist = yes; then
-AC_DEFINE(HAVE_SYS_ERRLIST)
+AC_DEFINE(HAVE_SYS_ERRLIST,,[Define if sys_errlist and sys_nerr were found])
 fi
 ])
 
@@ -333,7 +333,7 @@ exit (dir == 0);
 )])
 AC_MSG_RESULT($bash_cv_opendir_not_robust)
 if test $bash_cv_opendir_not_robust = yes; then
-AC_DEFINE(OPENDIR_NOT_ROBUST)
+AC_DEFINE(OPENDIR_NOT_ROBUST,,[Define if opendir() does not opens non-directories])
 fi
 ])
 
@@ -353,7 +353,7 @@ void (*signal ()) ();],
 [int i;], bash_cv_void_sighandler=yes, bash_cv_void_sighandler=no)])dnl
 AC_MSG_RESULT($bash_cv_void_sighandler)
 if test $bash_cv_void_sighandler = yes; then
-AC_DEFINE(VOID_SIGHANDLER)
+AC_DEFINE(VOID_SIGHANDLER,,[Define if signal handlers are of type void])
 fi
 ])
 
@@ -387,9 +387,9 @@ AC_MSG_CHECKING(which builtin C type is 32 bits wide)
 fi
 AC_MSG_RESULT($bash_cv_type_int32_t);
 if test "$bash_cv_type_int32_t" = "int"; then
-AC_DEFINE(int32_t, int)
+AC_DEFINE(int32_t, int,[Define if type int is 32 bits wide])
 else
-AC_DEFINE(int32_t, long)
+AC_DEFINE(int32_t, long,[Define if type long is 32 bits wide])
 fi
 ])
 
@@ -423,9 +423,9 @@ AC_MSG_CHECKING(which unsigned builtin C type is 32 bits wide)
 fi
 AC_MSG_RESULT($bash_cv_type_u_int32_t);
 if test "$bash_cv_type_u_int32_t" = "int"; then
-AC_DEFINE(u_int32_t, unsigned int)
+AC_DEFINE(u_int32_t, unsigned int,[Define if unsigned int is 32 bits wide])
 else
-AC_DEFINE(u_int32_t, unsigned long)
+AC_DEFINE(u_int32_t, unsigned long,[Define if unsigned long is 32 bits wide])
 fi
 ])
 
@@ -459,9 +459,9 @@ AC_MSG_CHECKING(which builtin C type is correct for ptrdiff_t)
 fi
 AC_MSG_RESULT($bash_cv_type_ptrdiff_t);
 if test "$bash_cv_type_ptrdiff_t" = "int"; then
-AC_DEFINE(ptrdiff_t, int)
+AC_DEFINE(ptrdiff_t, int,[Define if type int is correct for ptrdiff_t])
 else
-AC_DEFINE(ptrdiff_t, long)
+AC_DEFINE(ptrdiff_t, long,[Define if type long is correct for ptrdiff_t])
 fi
 ])
 
@@ -474,7 +474,7 @@ AC_CACHE_VAL(bash_cv_have_strsignal,
  bash_cv_have_strsignal=yes, bash_cv_have_strsignal=no)])
 AC_MSG_RESULT($bash_cv_have_strsignal)
 if test $bash_cv_have_strsignal = yes; then
-AC_DEFINE(HAVE_STRSIGNAL)
+AC_DEFINE(HAVE_STRSIGNAL,,[Define if the existence of strsignal])
 fi
 ])
 
@@ -488,7 +488,7 @@ AC_CACHE_CHECK([for lstat], bash_cv_func_lstat,
 ],[ lstat(".",(struct stat *)0); ],
 bash_cv_func_lstat=yes, bash_cv_func_lstat=no)])
 if test $bash_cv_func_lstat = yes; then
-  AC_DEFINE(HAVE_LSTAT)
+  AC_DEFINE(HAVE_LSTAT,,[Define if have lstat])
 fi
 ])
 
@@ -500,7 +500,7 @@ AC_CACHE_VAL(bash_cv_termios_ldisc,
   bash_cv_termios_ldisc=yes, bash_cv_termios_ldisc=no)])dnl
 AC_MSG_RESULT($bash_cv_termios_ldisc)
 if test $bash_cv_termios_ldisc = yes; then
-AC_DEFINE(TERMIOS_LDISC)
+AC_DEFINE(TERMIOS_LDISC,,[Define if we have a c_line member of struct termios])
 fi
 ])
 
@@ -512,7 +512,7 @@ AC_CACHE_VAL(bash_cv_termio_ldisc,
   bash_cv_termio_ldisc=yes, bash_cv_termio_ldisc=no)])dnl
 AC_MSG_RESULT($bash_cv_termio_ldisc)
 if test $bash_cv_termio_ldisc = yes; then
-AC_DEFINE(TERMIO_LDISC)
+AC_DEFINE(TERMIO_LDISC,,[Define if we ahve a c_line member of struct termio])
 fi
 ])
 
@@ -556,7 +556,7 @@ exit(s == 0);	/* force optimizer to leave getenv in */
 )])
 AC_MSG_RESULT($bash_cv_getenv_redef)
 if test $bash_cv_getenv_redef = yes; then
-AC_DEFINE(CAN_REDEFINE_GETENV)
+AC_DEFINE(CAN_REDEFINE_GETENV,,[Define if getenv can be redefined])
 fi
 ])
 
@@ -582,7 +582,7 @@ exit(pf == 0);
 )])
 AC_MSG_RESULT($bash_cv_printf_declared)
 if test $bash_cv_printf_declared = yes; then
-AC_DEFINE(PRINTF_DECLARED)
+AC_DEFINE(PRINTF_DECLARED,,[Define if declaration of printf is present in <stdio.h>])
 fi
 ])
 
@@ -601,7 +601,7 @@ exit (maxfds == -1L);
 )])
 AC_MSG_RESULT($bash_cv_ulimit_maxfds)
 if test $bash_cv_ulimit_maxfds = yes; then
-AC_DEFINE(ULIMIT_MAXFDS)
+AC_DEFINE(ULIMIT_MAXFDS,,[Define if ulimit can be substituted for getdtablesize])
 fi
 ])
 
@@ -733,7 +733,7 @@ main()
 )])
 AC_MSG_RESULT($bash_cv_getcwd_calls_popen)
 if test $bash_cv_getcwd_calls_popen = yes; then
-AC_DEFINE(GETCWD_BROKEN)
+AC_DEFINE(GETCWD_BROKEN,,[Define if getcwd() calls popen()])
 fi
 ])
 
@@ -766,7 +766,7 @@ struct dirent d; int z; z = d.d_ino;
 ], bash_cv_dirent_has_dino=yes, bash_cv_dirent_has_dino=no)])
 AC_MSG_RESULT($bash_cv_dirent_has_dino)
 if test $bash_cv_dirent_has_dino = yes; then
-AC_DEFINE(STRUCT_DIRENT_HAS_D_INO)
+AC_DEFINE(STRUCT_DIRENT_HAS_D_INO,,[Define if struct dirent has a d_ino member])
 fi
 ])
 
@@ -799,7 +799,7 @@ struct dirent d; int z; z = d.d_fileno;
 ], bash_cv_dirent_has_d_fileno=yes, bash_cv_dirent_has_d_fileno=no)])
 AC_MSG_RESULT($bash_cv_dirent_has_d_fileno)
 if test $bash_cv_dirent_has_d_fileno = yes; then
-AC_DEFINE(STRUCT_DIRENT_HAS_D_FILENO)
+AC_DEFINE(STRUCT_DIRENT_HAS_D_FILENO,,[Define if struct dirent has a d_fileno member])
 fi
 ])
 
@@ -857,7 +857,7 @@ main()
 )])
 AC_MSG_RESULT($bash_cv_must_reinstall_sighandlers)
 if test $bash_cv_must_reinstall_sighandlers = yes; then
-AC_DEFINE(MUST_REINSTALL_SIGHANDLERS)
+AC_DEFINE(MUST_REINSTALL_SIGHANDLERS,,[Define if signal handlers must be reinstalled when invoked])
 fi
 ])
 
@@ -868,7 +868,7 @@ AC_CACHE_VAL(bash_cv_sbrk_declared,
  bash_cv_sbrk_declared=yes, bash_cv_sbrk_declared=no)])
 AC_MSG_RESULT($bash_cv_sbrk_declared)
 if test $bash_cv_sbrk_declared = yes; then
-AC_DEFINE(SBRK_DECLARED)
+AC_DEFINE(SBRK_DECLARED,,[Define if declaration of sbrk is in <unistd.h>])
 fi
 ])
 
@@ -926,7 +926,7 @@ exit(0);
 )])
 AC_MSG_RESULT($bash_cv_job_control_missing)
 if test $bash_cv_job_control_missing = missing; then
-AC_DEFINE(JOB_CONTROL_MISSING)
+AC_DEFINE(JOB_CONTROL_MISSING,,[Define if there is the presence of necessary job control definitions])
 fi
 ])
 
@@ -971,7 +971,7 @@ exit(0);
 )])
 AC_MSG_RESULT($bash_cv_sys_named_pipes)
 if test $bash_cv_sys_named_pipes = missing; then
-AC_DEFINE(NAMED_PIPES_MISSING)
+AC_DEFINE(NAMED_PIPES_MISSING,,[Define if named pipes are not found])
 fi
 ])
 
@@ -1022,7 +1022,7 @@ exit(1);
 )])
 AC_MSG_RESULT($bash_cv_func_sigsetjmp)
 if test $bash_cv_func_sigsetjmp = present; then
-AC_DEFINE(HAVE_POSIX_SIGSETJMP)
+AC_DEFINE(HAVE_POSIX_SIGSETJMP,,[Define if POSIX-style sigsetjmp/siglongjmp is found])
 fi
 ])
 
@@ -1034,7 +1034,7 @@ AC_CACHE_VAL(bash_cv_tiocgwinsz_in_ioctl,
   bash_cv_tiocgwinsz_in_ioctl=yes,bash_cv_tiocgwinsz_in_ioctl=no)])
 AC_MSG_RESULT($bash_cv_tiocgwinsz_in_ioctl)
 if test $bash_cv_tiocgwinsz_in_ioctl = yes; then   
-AC_DEFINE(GWINSZ_IN_SYS_IOCTL)
+AC_DEFINE(GWINSZ_IN_SYS_IOCTL,,[Define if TIOCGWINSZ is in sys/ioctl.h])
 fi
 ])
 
@@ -1050,10 +1050,10 @@ AC_CACHE_VAL(bash_cv_struct_winsize_header,
 ])])
 if test $bash_cv_struct_winsize_header = ioctl_h; then
   AC_MSG_RESULT(sys/ioctl.h)
-  AC_DEFINE(STRUCT_WINSIZE_IN_SYS_IOCTL)
+  AC_DEFINE(STRUCT_WINSIZE_IN_SYS_IOCTL,,[Define if struct winsize is in sys/ioctl.h])
 elif test $bash_cv_struct_winsize_header = termios_h; then
   AC_MSG_RESULT(termios.h)
-  AC_DEFINE(STRUCT_WINSIZE_IN_TERMIOS)
+  AC_DEFINE(STRUCT_WINSIZE_IN_TERMIOS,,[Define if struct winsize is in termios.h])
 else
   AC_MSG_RESULT(not found)
 fi
@@ -1067,7 +1067,7 @@ AC_CACHE_VAL(bash_cv_tiocstat_in_ioctl,
   bash_cv_tiocstat_in_ioctl=yes,bash_cv_tiocstat_in_ioctl=no)])
 AC_MSG_RESULT($bash_cv_tiocstat_in_ioctl)
 if test $bash_cv_tiocstat_in_ioctl = yes; then   
-AC_DEFINE(TIOCSTAT_IN_SYS_IOCTL)
+AC_DEFINE(TIOCSTAT_IN_SYS_IOCTL,,[Define if TIOCSTAT is in sys/ioctl.h])
 fi
 ])
 
@@ -1079,7 +1079,7 @@ AC_CACHE_VAL(bash_cv_fionread_in_ioctl,
   bash_cv_fionread_in_ioctl=yes,bash_cv_fionread_in_ioctl=no)])
 AC_MSG_RESULT($bash_cv_fionread_in_ioctl)
 if test $bash_cv_fionread_in_ioctl = yes; then   
-AC_DEFINE(FIONREAD_IN_SYS_IOCTL)
+AC_DEFINE(FIONREAD_IN_SYS_IOCTL,,[Define if FIONREAD is in sys/ioctl.h])
 fi
 ])
 
@@ -1096,7 +1096,7 @@ AC_CACHE_VAL(bash_cv_speed_t_in_sys_types,
   bash_cv_speed_t_in_sys_types=yes,bash_cv_speed_t_in_sys_types=no)])
 AC_MSG_RESULT($bash_cv_speed_t_in_sys_types)
 if test $bash_cv_speed_t_in_sys_types = yes; then   
-AC_DEFINE(SPEED_T_IN_SYS_TYPES)
+AC_DEFINE(SPEED_T_IN_SYS_TYPES,,[Define if speed_t is in sys/types.h])
 fi
 ])
 
@@ -1111,8 +1111,8 @@ extern struct passwd *getpwnam();],
 [struct passwd *z; z = getpwent(); z = getpwuid(0); z = getpwnam("root");],
   bash_cv_can_redecl_getpw=yes,bash_cv_can_redecl_getpw=no)])
 AC_MSG_RESULT($bash_cv_can_redecl_getpw)
-if test $bash_cv_can_redecl_getpw = no; then
-AC_DEFINE(HAVE_GETPW_DECLS)
+if test x"$bash_cv_can_redecl_getpw" = "xno"; then
+AC_DEFINE(HAVE_GETPW_DECLS,,[Declare if problems are able to redeclare gepw functions])
 fi
 ])
 
@@ -1129,11 +1129,11 @@ AC_CACHE_VAL(bash_cv_dev_fd,
 ])
 AC_MSG_RESULT($bash_cv_dev_fd)
 if test $bash_cv_dev_fd = "standard"; then
-  AC_DEFINE(HAVE_DEV_FD)
-  AC_DEFINE(DEV_FD_PREFIX, "/dev/fd/")
+  AC_DEFINE(HAVE_DEV_FD,,[Define if /dev/fd is available])
+  AC_DEFINE(DEV_FD_PREFIX, "/dev/fd/",[Define floppy drive prefix])
 elif test $bash_cv_dev_fd = "whacky"; then
-  AC_DEFINE(HAVE_DEV_FD)
-  AC_DEFINE(DEV_FD_PREFIX, "/proc/self/fd/")
+  AC_DEFINE(HAVE_DEV_FD,,[Define if /dev/fd is /proc/self/fd])
+  AC_DEFINE(DEV_FD_PREFIX, "/proc/self/fd/",[Define floppy drive prefix])
 fi
 ])
 
@@ -1179,8 +1179,8 @@ if test $bash_cv_have_socklib = yes; then
   else
     LIBS="-lsocket $LIBS"
   fi
-  AC_DEFINE(HAVE_LIBSOCKET)
-  AC_DEFINE(HAVE_GETPEERNAME)
+  AC_DEFINE(HAVE_LIBSOCKET,,[Define if libsocket is found])
+  AC_DEFINE(HAVE_GETPEERNAME,,[Define if getpeername is found])
 fi
 ])
 
@@ -1201,15 +1201,15 @@ AC_CACHE_VAL(bash_cv_mail_dir,
 ])
 AC_MSG_RESULT($bash_cv_mail_dir)
 if test $bash_cv_mail_dir = "/var/mail"; then
-   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "/var/mail")
+   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "/var/mail",[Define default mail directory])
 elif test $bash_cv_mail_dir = "/usr/mail"; then
-   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "/usr/mail")
+   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "/usr/mail",[Define default mail directory])
 elif test $bash_cv_mail_dir = "/var/spool/mail"; then
-   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "/var/spool/mail")
+   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "/var/spool/mail",[Define default mail directory])
 elif test $bash_cv_mail_dir = "/usr/spool/mail"; then
-   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "/usr/spool/mail")
+   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "/usr/spool/mail",[Define default mail directory])
 else
-   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "unknown")
+   AC_DEFINE(DEFAULT_MAIL_DIRECTORY, "unknown",[Define default mail directory])
 fi
 ])
 
@@ -1240,7 +1240,7 @@ AC_CACHE_VAL(bash_cv_kernel_rlimit,
 )])
 AC_MSG_RESULT($bash_cv_kernel_rlimit)
 if test $bash_cv_kernel_rlimit = yes; then
-AC_DEFINE(RLIMIT_NEEDS_KERNEL)
+AC_DEFINE(RLIMIT_NEEDS_KERNEL,,[Define if $host_os needs _KERNEL for RLIMIT defines])
 fi
 ])
 
@@ -1289,7 +1289,7 @@ char    *v[];
 )])
 AC_MSG_RESULT($bash_cv_func_strcoll_broken)
 if test $bash_cv_func_strcoll_broken = yes; then
-AC_DEFINE(STRCOLL_BROKEN)
+AC_DEFINE(STRCOLL_BROKEN,,[Define if strcoll and strcmp differ])
 fi
 ])
 
@@ -1377,6 +1377,6 @@ main ()
    AC_MSG_ERROR(cannot check restartable syscalls if cross compiling))
 ])
 if test $bash_cv_sys_restartable_syscalls = yes; then
-  AC_DEFINE(HAVE_RESTARTABLE_SYSCALLS)
+  AC_DEFINE(HAVE_RESTARTABLE_SYSCALLS,,[Define if restarted system calls after a signal handler has been installed with signal()])
 fi
 ])

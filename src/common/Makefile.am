@@ -1,6 +1,14 @@
 
-EXTRA_DIST = getopt.c getopt1.c getopt.h utils.c xscreensaver-remote.c
-noinst_HEADERS = utils.h xscreensaver-remote.h
+EXTRA_DIST = \
+	getopt.c \
+	getopt1.c \
+	getopt.h \
+	utils.c \
+	xscreensaver-remote.c
+
+noinst_HEADERS = \
+	utils.h \
+	xscreensaver-remote.h
 
 debug:
 install-debug: debug

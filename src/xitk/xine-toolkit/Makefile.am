@@ -11,16 +11,62 @@ CFLAGS = @BUILD_LIB_STATIC@ @CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
 
 EXTRA_PROGRAMS = test
 noinst_LTLIBRARIES = libxitk.la
-libxitk_la_SOURCES = browser.c button.c checkbox.c combo.c dnd.c filebrowser.c font.c \
-		image.c inputtext.c label.c labelbutton.c list.c mrlbrowser.c skin.c \
-		slider.c widget.c window.c tabs.c intbox.c config.c tips.c xitk.c
-libxitk_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 -lXext $(X_EXTRA_LIBS) \
-	$(THREAD_LIBS) $(INTLLIBS) $(top_builddir)/src/Imlib-light/libImlib-light.la
 
-noinst_HEADERS = _xitk.h browser.h button.h checkbox.c checkbox.h combo.h dnd.h tabs.h \
-		filebrowser.h font.h image.h inputtext.h label.h labelbutton.h xitkintl.h \
-		list.h mrlbrowser.h skin.h slider.h window.h widget.h widget_types.h \
-		intbox.h _config.h tips.h xitk.h
+libxitk_la_SOURCES = \
+	browser.c \
+	button.c \
+	checkbox.c \
+	combo.c \
+	config.c \
+	dnd.c \
+	filebrowser.c \
+	font.c \
+	image.c \
+	inputtext.c \
+	intbox.c \
+	label.c \
+	labelbutton.c \
+	list.c \
+	mrlbrowser.c \
+	skin.c \
+	slider.c \
+	tabs.c \
+	tips.c \
+	widget.c \
+	window.c \
+	xitk.c
+
+libxitk_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 \
+	-lXext $(X_EXTRA_LIBS)  $(THREAD_LIBS) $(INTLLIBS) \
+	$(top_builddir)/src/Imlib-light/libImlib-light.la
+
+noinst_HEADERS = \
+	_config.h \
+	_xitk.h \
+	browser.h \
+	button.h \
+	checkbox.c \
+	checkbox.h \
+	combo.h \
+	dnd.h \
+	filebrowser.h \
+	font.h \
+	image.h \
+	inputtext.h \
+	intbox.h \
+	label.h \
+	labelbutton.h \
+	list.h \
+	mrlbrowser.h \
+	skin.h \
+	slider.h \
+	tabs.h \
+	tips.h \
+	window.h \
+	widget.h \
+	widget_types.h \
+	xitk.h \
+	xitkintl.h
 
 test_SOURCES = test.c
 test_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la

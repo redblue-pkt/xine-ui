@@ -51,9 +51,9 @@ if [ "$DIE" -eq 1 ]; then
         exit 1
 fi
 
-aclocalinclude="$ACLOCAL_FLAGS"; \
+aclocalinclude=`xine-config --acflags`; \
 (echo $_echo_n " + Running aclocal: $_echo_c"; \
-    aclocal $aclocalinclude; \
+    aclocal $aclocalinclude -I m4; \
  echo "done.") && \
 (echo $_echo_n " + Running libtoolize: $_echo_c"; \
     libtoolize --force --copy >/dev/null 2>&1; \

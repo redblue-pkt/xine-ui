@@ -3,9 +3,19 @@ DEBUG_CFLAGS = @BUILD_LIB_STATIC@ @DEBUG_CFLAGS@ @X_CFLAGS@
 
 noinst_LTLIBRARIES = libImlib-light.la
 
-libImlib_light_la_SOURCES = cache.c load.c misc.c rend.c utils.c snprintf.c colors.c
+libImlib_light_la_SOURCES = \
+	cache.c \
+	colors.c \
+	load.c \
+	misc.c \
+	rend.c \
+	snprintf.c \
+	utils.c 
 
-noinst_HEADERS = Imlib.h Imlib_private.h Imlib_types.h
+noinst_HEADERS = \
+	Imlib.h \
+	Imlib_private.h \
+	Imlib_types.h
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"

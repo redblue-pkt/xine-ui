@@ -2,12 +2,13 @@ dnl
 dnl Configure.in for xine
 dnl
 
-AC_INIT(src/xitk/main.c)
+AC_INIT
+AC_CONFIG_SRCDIR([src/xitk/main.c])
 
 dnl
 dnl Require autoconf version 2.13
 dnl
-AC_PREREQ(2.13)
+AC_PREREQ(2.53)
 
 dnl
 dnl Require libtool minimum version 1.4.0
@@ -32,7 +33,7 @@ AC_SUBST(TAR_NAME)
 AC_SUBST(SPEC_VERSION)
 
 ##
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET([])
 
 ##
 AM_INIT_AUTOMAKE("xine-ui", $XINE_MAJOR.$XINE_MINOR.$XINE_SUB$XINE_PRE)
@@ -59,7 +60,7 @@ AC_ISC_POSIX
 CFLAGS="$saved_CFLAGS"
 AC_PROG_CC
 AC_MINIX dnl readline
-AC_STDC_HEADERS
+AC_HEADER_STDC([])
 AC_PROG_MAKE_SET
 AC_PROG_INSTALL
 dnl obsolete AC_PROG_RANLIB
@@ -95,7 +96,14 @@ dnl AM_WITH_NLS(use-libtool,,)
 dnl ALL_LINGUAS="cs da de el en@quot en@boldquot es et fr gl id it ja ko nl nn no pl pt pt_BR ru sl sv tr zh"
 ALL_LINGUAS="fr es pt_BR de sk pl_PL uk cs"
 AM_GNU_GETTEXT(use-libtool)
-AC_LINK_FILES($nls_cv_header_libgt, $nls_cv_header_intl)
+ac_sources="$nls_cv_header_libgt"
+ac_dests="$nls_cv_header_intl"
+while test -n "$ac_sources"; do
+  set $ac_dests; ac_dest=$1; shift; ac_dests=$*
+  set $ac_sources; ac_source=$1; shift; ac_sources=$*
+  ac_config_links_1="$ac_config_links_1 $ac_dest:$ac_source"
+done
+AC_CONFIG_LINKS([$ac_config_links_1])
 if test x"$USE_INCLUDED_LIBINTL" = x"yes"; then
    INTLDIR="-I\$(top_builddir)/intl -I\$(top_srcdir)/intl"
 fi
@@ -109,7 +117,7 @@ AC_C_CONST
 AC_C_INLINE
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
-dnl AM_TYPE_PTRDIFF_T
+dnl AC_CHECK_TYPES([ptrdiff_t])
 dnl AC_C_BIGENDIAN
 
 AC_SUBST(DEBUG_CFLAGS)
@@ -158,7 +166,7 @@ dnl Checks for X11
 dnl
 AC_PATH_XTRA
 if test x"$no_x" != x"yes"; then
-    AC_DEFINE(HAVE_X11)
+    AC_DEFINE(HAVE_X11,,[Define this if you have X11R6 installed])
 fi
 
 
@@ -183,13 +191,17 @@ if test "x$enable_shm" = "xyes"; then
   dnl configured to build without shared memory extensions.
 
   dnl Check for shared memory
-  AC_CHECK_HEADER(sys/ipc.h, AC_DEFINE(HAVE_IPC_H), no_sys_ipc=yes)
-  AC_CHECK_HEADER(sys/shm.h, AC_DEFINE(HAVE_SHM_H), no_sys_shm=yes)
+  AC_CHECK_HEADER(sys/ipc.h, 
+	AC_DEFINE(HAVE_IPC_H,,[Define if ipc.h installed])
+	, no_sys_ipc=yes)
+  AC_CHECK_HEADER(sys/shm.h,
+	AC_DEFINE(HAVE_SHM_H,,[Define if shm.h installed])
+	, no_sys_shm=yes)
 
   if test "x$no_sys_ipc" != "xyes" \
      && test "x$no_sys_shm" != "xyes" \
      && test "x$no_xshm_ext" != "xyes" ; then
-    AC_DEFINE(HAVE_SHM)
+    AC_DEFINE(HAVE_SHM,,[Define if have shm])
   fi
 
   # Check whether shmctl IPC_RMID allowes subsequent attaches
@@ -218,7 +230,7 @@ if test "x$enable_shm" = "xyes"; then
             exit (0);
           }
       ],
-      AC_DEFINE(IPC_RMID_DEFERRED_RELEASE)
+      AC_DEFINE(IPC_RMID_DEFERRED_RELEASE,,[Define if IPC_RMID_DEFERRED_RELEASE is true])
         AC_MSG_RESULT(yes),
       AC_MSG_RESULT(no),
       AC_MSG_RESULT(assuming no))
@@ -233,7 +245,7 @@ if test "x$enable_shm" = "xyes"; then
   else
     if test -f "$x_includes/X11/extensions/XShm.h"; then
       AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_XSHM_H)
+      AC_DEFINE(HAVE_XSHM_H,,[Define if includes XShm.h])
     else
       AC_MSG_RESULT(no)
       no_xshm=yes
@@ -247,7 +259,7 @@ dnl Checks for Xinerama extension
 dnl
 AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
              X_PRE_LIBS="$X_PRE_LIBS -lXinerama"
-             AC_DEFINE(HAVE_XINERAMA)
+             AC_DEFINE(HAVE_XINERAMA,,[Define this if you have libXinerama installed])
              ac_have_xinerama="yes",,
              $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
 AM_CONDITIONAL(HAVE_XINERAMA, test x$ac_have_xinerama = "xyes")
@@ -258,7 +270,7 @@ dnl Checks for XF86VidMode extension
 dnl
 AC_CHECK_LIB(Xxf86vm, XF86VidModeQueryExtension, 
              X_PRE_LIBS="$X_PRE_LIBS -lXxf86vm"
-             AC_DEFINE(HAVE_XF86VIDMODE)
+             AC_DEFINE(HAVE_XF86VIDMODE,,[Define this if you have libXxf86vm installed])
              ac_have_xf86vidmode="yes",,
              $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
 AM_CONDITIONAL(HAVE_XF86VIDMODE, test x$ac_have_xf86vidmode = "xyes")
@@ -269,7 +281,7 @@ dnl XTest Extension
 dnl
 AC_CHECK_LIB(Xtst, XTestFakeKeyEvent, 
              XTEST_LIBS="-lXtst"
-             AC_DEFINE(HAVE_XTESTEXTENSION)
+             AC_DEFINE(HAVE_XTESTEXTENSION,,[Define this if you have libXtst installed])
 	     ac_have_xtest="yes",, $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
 AC_SUBST(XTEST_LIBS)
 AM_CONDITIONAL(HAVE_XTESTEXTENSION, test x$ac_have_xtest = "xyes")
@@ -291,7 +303,7 @@ AC_ARG_WITH(curses,
 if test "$opt_curses" = "yes"; then
 	prefer_curses=yes
 fi
-AC_RETSIGTYPE
+AC_TYPE_SIGNAL([])
 
 AC_HEADER_STAT
 AC_HEADER_DIRENT
@@ -472,7 +484,7 @@ dnl
 dnl
 AC_CHECK_LIB(posix4, nanosleep)
 AC_CHECK_FUNCS(vsnprintf snprintf strpbrk strsep nanosleep)
-AC_CHECK_HEADER(stdarg.h, AC_DEFINE(HAVE_STDARGS))
+AC_CHECK_HEADER(stdarg.h, AC_DEFINE(HAVE_STDARGS,,[Define this is you have stdarg.h header file installed]))
 AC_CHECK_HEADERS(string.h strings.h alloca.h)
 
 
@@ -489,7 +501,7 @@ AC_ARG_ENABLE(orbit,[  --enable-orbit          build orbit dependant parts of xi
 
 if test "x$enable_orbit" = "xyes"; then
   AM_PATH_ORBIT(0.4.0, [
-    AC_DEFINE(HAVE_ORBIT)
+    AC_DEFINE(HAVE_ORBIT,,[Define this if you have ORBit (libORBit) installed])
     ORBIT_LIBS="$ORBIT_LIBS -lORBitCosNaming"
   ], [
     AC_MSG_RESULT(*** All of ORBit dependent parts will be disabled ***)
@@ -549,8 +561,8 @@ case "$host_or_hostalias" in
   i386-*-freebsd*)
     CFLAGS="$CFLAGS -pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions -D_REENTRANT"
     DEBUG_CFLAGS="$X_CFLAGS $DEBUG_CFLAGS -D_REENTRANT -DDEBUG"
-    AC_DEFINE(__i386__)
-    AC_DEFINE([ARCH_X86],,[x86 architecture])
+    AC_DEFINE(__i386__,1,[Define this if you're running x86 architecture])
+    AC_DEFINE([ARCH_X86],,[Define this if you're running x86 architectur])
     ;;
 
   i?86*-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-*)
@@ -617,26 +629,31 @@ case "$host_or_hostalias" in
 	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
     fi
 
-    AC_DEFINE(__i386__)
-    AC_DEFINE([ARCH_X86],,[x86 architecture])
+    AC_DEFINE(__i386__,,[Define this if you're running x86 architecture])
+    AC_DEFINE([ARCH_X86],,[Define this if you're running x86 architectur])
     ;;
 
   alphaev56-*)
+    AC_DEFINE(__alpha__,,[Define this if you're running Alpha architecture])
     CFLAGS="$CFLAGS -O3 -mcpu=ev56 -mieee"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mcpu=ev56 -mieee"
     ;;
 
   alpha*)
+    AC_DEFINE(__alpha__,,[Define this if you're running Alpha architecture])
     CFLAGS="$CFLAGS -O3 -mieee"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mieee"
     ;;
 
   ppc-*-linux-* | powerpc-*) 
+    AC_DEFINE(__ppc__,,[Define this if you're running PowerPC architecture])
     CFLAGS="$CFLAGS -O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
     ;;
 
   sparc64-*-linux-* | sparc-*)
+    AC_DEFINE(__sparc,,[/* Define this if you're running Sparc architecture])
+
     if test "$GCC" = yes; then
 	CFLAGS="$CFLAGS -O3"
 	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
@@ -721,7 +738,9 @@ int main(int argc, char **argv) {
   }
   return 0;
 }
-], [AC_MSG_RESULT(yes); ac_getopt_long=yes; AC_DEFINE(HAVE_GETOPT_LONG)], 
+], [AC_MSG_RESULT(yes); 
+	ac_getopt_long=yes; 
+	AC_DEFINE(HAVE_GETOPT_LONG,,[Define this if you have GNU getopt_long() implemented])], 
    [AC_MSG_RESULT(no); ac_getopt_long=no],
    [AC_MSG_RESULT(no); ac_getopt_long=no])
 AM_CONDITIONAL(HAVE_GETOPT_LONG, test x"$ac_getopt_long" = "xyes")
@@ -732,11 +751,11 @@ dnl skins dir location, xine-config told us about this.
 dnl
 XINE_SKINDIR="$xine_data_dir/skins"
 AC_SUBST(XINE_SKINDIR)
-AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR")
+AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of Xine skin directory])
 
 XINE_LOGO_MRL="$xine_logo_mrl"
 AC_SUBST(XINE_LOGO_MRL)
-AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL")
+AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL",[official logo mrl])
 
 dnl
 dnl desktop dir location, xine-config told us about this.
@@ -744,13 +763,13 @@ dnl
 escapedprefix="`echo $prefix | sed -e 's/\\//\\\\\//g'`"
 XINE_SCRIPTDIR="`echo $xine_script_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_SCRIPTDIR)
-AC_DEFINE_UNQUOTED(XINE_SCRIPTDIR, "$XINE_SCRIPTDIR")
+AC_DEFINE_UNQUOTED(XINE_SCRIPTDIR, "$XINE_SCRIPTDIR", [Location of the scripts])
 XINE_DESKTOPDIR="`echo $xine_desktop_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_DESKTOPDIR)
 
 XINE_LOCALE="`echo $xine_locale_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_LOCALE)
-AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XINE_LOCALE")
+AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XINE_LOCALE",[Location of Xine catalog files])
 
 
 dnl
@@ -765,7 +784,7 @@ fi
 XINE_DOCPATH="${datadir}/doc/xine-ui"
 eval XINE_DOCDIR=`eval echo "$XINE_DOCPATH"`
 AC_SUBST(XINE_DOCDIR)
-AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR")
+AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR",[Location of documentation files])
 
 
 dnl
@@ -774,7 +793,7 @@ dnl
 INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/readline -I$(top_builddir)/readline -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
 AC_SUBST(INCLUDES)
 
-AC_DEFINE(NEED_MRLBROWSER)
+AC_DEFINE(NEED_MRLBROWSER,,[Define this to add mrl browser into xitk lib])
 
 dnl
 dnl It seems automake 1.5 don't take care about this script
@@ -788,7 +807,7 @@ dnl
 dnl Output configuration files
 dnl
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 m4/Makefile
 intl/Makefile
@@ -830,4 +849,6 @@ misc/xine-ui.spec
 misc/relchk.sh
 misc/desktops/Makefile
 po/Makefile.in
-],[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh ./misc/relchk.sh])
+])
+AC_CONFIG_COMMANDS([default],[[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh ./misc/relchk.sh]],[[]])
+AC_OUTPUT

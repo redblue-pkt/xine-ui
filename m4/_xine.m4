@@ -42,7 +42,7 @@ AC_DEFUN([AC_CHECK_LIRC],
         for llirc in $lirc_libprefix /lib /usr/lib /usr/local/lib; do
           AC_CHECK_FILE(["$llirc/liblirc_client.a"],
              [LIRC_LIBS="$llirc/liblirc_client.a"]
-             AC_DEFINE([HAVE_LIRC]),,)
+             AC_DEFINE([HAVE_LIRC],,[Define this if you have LIRC (liblir_client) installed]),,)
         done
      else
          AC_MSG_RESULT([*** LIRC client support not available, LIRC support will be disabled ***]);

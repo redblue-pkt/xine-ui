@@ -11,12 +11,16 @@ EXTRA_DIST = xine.idl xine-impl.c example.py corba-utils.c
 if HAVE_ORBIT
 xine.h:
 	$(ORBIT_IDL) $(top_srcdir)/corba/xine.idl
+
 xine-common.c: xine.h
 	$(ORBIT_IDL) $(top_srcdir)/corba/xine.idl
+
 xine-skels.c: xine.h
 	$(ORBIT_IDL) $(top_srcdir)/corba/xine.idl
+
 xine-stubs.c: xine.h
 	$(ORBIT_IDL) $(top_srcdir)/corba/xine.idl
+
 corbalib_libs = libcorba.la
 corbalib_srcs = xine-common.c xine-skels.c xine-stubs.c \
 	corba-utils.c
