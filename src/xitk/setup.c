@@ -58,6 +58,9 @@ typedef struct {
   char                 *sections[20];
   int                   num_sections;
 
+  xitk_widget_t        *tmp_widgets[200];
+  int                   num_tmp_widgets;
+
   xitk_register_key_t   kreg;
 
 } _setup_t;
@@ -214,18 +217,22 @@ void setup_handle_event(XEvent *event, void *data) {
 
 static void setup_add_label (int x, int y, int w, char *str) {
 
-  xitk_label_widget_t label;
+  xitk_label_widget_t lb;
+  xitk_widget_t      *label;
 
-  XITK_WIDGET_INIT(&label, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
-  label.window              = xitk_window_get_window(setup->xwin);
-  label.gc                  = setup->widget_list->gc;
-  label.skin_element_name   = NULL;
-  label.label               = str;
+  lb.window              = xitk_window_get_window(setup->xwin);
+  lb.gc                  = setup->widget_list->gc;
+  lb.skin_element_name   = NULL;
+  lb.label               = str;
 
   xitk_list_append_content(setup->widget_list->l, 
-			   xitk_noskin_label_create(&label,
-						     x, y, w, fontname));
+			   (label = xitk_noskin_label_create(&lb,
+							     x, y, w, fontname)));
+
+  setup->tmp_widgets[setup->num_tmp_widgets] = label;
+  setup->num_tmp_widgets++;
 }
 
 static void setup_add_slider (int x, int y, int min, int max, int pos) {
@@ -249,6 +256,9 @@ static void setup_add_slider (int x, int y, int min, int max, int pos) {
 							       x, y, 117, 16,
 							       XITK_HSLIDER)));
   xitk_slider_set_pos(setup->widget_list, slider, pos);
+
+  setup->tmp_widgets[setup->num_tmp_widgets] = slider;
+  setup->num_tmp_widgets++;
 }
 
 static void setup_add_inputtext(int x, int y, char *str) {
@@ -269,6 +279,8 @@ static void setup_add_inputtext(int x, int y, char *str) {
 			    xitk_noskin_inputtext_create(&inp,
 							 x, y, 150, 20,
 							 "Black", "Black", fontname)));
+  setup->tmp_widgets[setup->num_tmp_widgets] = input;
+  setup->num_tmp_widgets++;
 }
 
 static void setup_add_checkbox (int x, int y, int state) {
@@ -290,6 +302,31 @@ static void setup_add_checkbox (int x, int y, int state) {
   xitk_checkbox_set_state (checkbox, state, xitk_window_get_window(setup->xwin),
 			   setup->widget_list->gc);
 
+  setup->tmp_widgets[setup->num_tmp_widgets] = checkbox;
+  setup->num_tmp_widgets++;
+}
+
+static void setup_add_combo (int x, int y, int state, char **choices) {
+
+  xitk_combo_widget_t      cmb;
+  xitk_widget_t           *combo;
+
+  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+
+  cmb.skin_element_name = NULL;
+  cmb.parent_wlist      = setup->widget_list;
+  cmb.entries           = choices;
+  cmb.parent_wkey       = &setup->kreg;
+  /* cmb.callback          = combo_select; */
+  cmb.callback          = NULL;
+  cmb.userdata          = NULL;
+  xitk_list_append_content(setup->widget_list->l, 
+			   (combo = 
+			    xitk_noskin_combo_create(&cmb,
+						     x, y, 150)));
+
+  setup->tmp_widgets[setup->num_tmp_widgets] = combo;
+  setup->num_tmp_widgets++;
 }
 
 
@@ -311,32 +348,33 @@ static void setup_section_widgets (int s) {
       printf ("setup: generating labels for %s\n", entry->key);
       printf ("setup: generating labels for %s\n", entry->description);
 
-      setup_add_label (150, y, 100, &entry->key[len+1]);
-      setup_add_label (150, y+20, 400, entry->description);
+      setup_add_label (150, y+4, 130, &entry->key[len+1]);
+      setup_add_label (150, y+24, 400, entry->description);
 
       switch (entry->type) {
 
       case CONFIG_TYPE_RANGE: /* slider */
-	setup_add_slider (250, y, entry->range_min, entry->range_max, entry->num_value);
+	setup_add_slider (280, y, entry->range_min, entry->range_max, entry->num_value);
 	break;
 
       case CONFIG_TYPE_STRING:
-	setup_add_inputtext (250, y, entry->str_value);
+	setup_add_inputtext (280, y, entry->str_value);
 	break;
 	
       case CONFIG_TYPE_ENUM:
+	setup_add_combo (280, y, entry->num_value, entry->enum_values);
 	break;
 	
       case CONFIG_TYPE_NUM:
 	break;
 
       case CONFIG_TYPE_BOOL:
-	setup_add_checkbox (250, y, entry->num_value);
+	setup_add_checkbox (280, y, entry->num_value);
 	break;
 
       }
 
-      y += 40;
+      y += 50;
 
     }
 
@@ -345,11 +383,46 @@ static void setup_section_widgets (int s) {
 
 }
 
+static void setup_change_section(xitk_widget_t *w, void *data) {
+  int section = (int)data;
+  int i;
+
+  /* remove old widgets */
+  /* FIXME: free memory / resources */
+
+  for (i=0; i<setup->num_tmp_widgets; i++ ) {
+
+    xitk_widget_t *w;
+
+    w = (xitk_widget_t *) xitk_list_first_content (setup->widget_list->l);
+
+    while (w) {
+      
+      if (setup->tmp_widgets[i] == w) {
+	xitk_list_delete_current (setup->widget_list->l);
+	
+	w = (xitk_widget_t *) setup->widget_list->l->cur;
+
+      } else
+	w = (xitk_widget_t *) xitk_list_next_content (setup->widget_list->l);
+    }
+  }
+
+  setup->num_tmp_widgets = 0;
+
+  
+  setup_section_widgets (section);
+
+  XClearWindow (gGui->display,xitk_window_get_window(setup->xwin) );
+  xitk_paint_widget_list (setup->widget_list); 
+}
+
+
 /* 
  * collect config categories, setup browser widget
  */
 
-void setup_sections () {
+static void setup_sections () {
 
   cfg_entry_t *entry;
   xitk_browser_widget_t      browser;
@@ -405,7 +478,7 @@ void setup_sections () {
   browser.callback                      = change_inputtext;
   browser.dbl_click_callback            = change_inputtext_dbl_click;
   */
-  browser.callback                      = NULL;
+  browser.callback                      = setup_change_section;
   browser.dbl_click_callback            = NULL;
   browser.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
   browser.parent_wlist                  = setup->widget_list;
@@ -420,6 +493,7 @@ void setup_sections () {
 
   xitk_browser_set_select(setup->browser, 0);
 
+  setup->num_tmp_widgets = 0;
   setup_section_widgets (0);
 }
 
@@ -447,7 +521,7 @@ void setup_panel(void) {
   setup->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
 						 "xine setup", 
 						 100, 100, 
-						 640, 480);
+						 640, 600);
   
   XLockDisplay (gGui->display);
 
@@ -474,7 +548,7 @@ void setup_panel(void) {
   lb.skin_element_name = NULL;
   xitk_list_append_content(setup->widget_list->l, 
 	   xitk_noskin_labelbutton_create(&lb,
-					  (640 / 2) - 50, 440,
+					  (640 / 2) - 50, 560,
 					  100, 23,
 					  "Black", "Black", "White", fontname));
 
@@ -491,7 +565,6 @@ void setup_panel(void) {
 
   XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
 
-  
   setup->visible = 1;
   setup->running = 1;
 
