@@ -65,6 +65,8 @@ typedef struct {
 
   int            video_width;     /* size of currently displayed video     */
   int            video_height;
+  int            last_video_width;
+  int            last_video_height;
   int            win_width;       /* size of non-fullscreen window         */
   int            win_height;
   int            output_width;    /* output video window width/height      */
@@ -76,12 +78,18 @@ typedef struct {
 				   * switch to fullscreen mode             */
   int            fullscreen_width;
   int            fullscreen_height;
+
+  int            using_xinerama;
 #ifdef HAVE_XINERAMA
   XineramaScreenInfo *xinerama;   /* pointer to xinerama struct, or NULL */
   int            xinerama_cnt;    /* number of screens in Xinerama */
 #endif
+
   int            xwin;            /* current X location */
   int            ywin;            /* current Y location */
+  int            old_xwin;
+  int            old_ywin;
+
   int            desktopWidth;    /* desktop width */
   int            desktopHeight;   /* desktop height */
   int            completion_type;
@@ -358,6 +366,7 @@ static void video_window_adapt_size (void) {
   if (gVw->fullscreen_req) {
 
     if (gGui->video_window) {
+      int dummy;
 
       if (gVw->fullscreen_mode && gGui->visual == gVw->visual) {
 #ifdef HAVE_XF86VIDMODE
@@ -374,7 +383,10 @@ static void video_window_adapt_size (void) {
 	
 	return;
       }
-
+      
+      xitk_get_window_position(gGui->display, gGui->video_window,
+      			       &gVw->old_xwin, &gVw->old_ywin, &dummy, &dummy);
+      
       xitk_unregister_event_handler(&gVw->old_widget_key);
       old_video_window = gGui->video_window;
     }
@@ -466,7 +478,18 @@ static void video_window_adapt_size (void) {
     hint.height      = gVw->win_height;
 #endif
     hint.flags       = PPosition | PSize;
-
+    
+    /*
+     * user sets window geom, move back to original location.
+     * This probably break something with Xinerama, but i can't
+     * test it.
+     */
+    if((gVw->using_xinerama == 0) && 
+       (gVw->last_video_width == -1) && (gVw->last_video_height == -1)) {
+      hint.x           = gVw->old_xwin;
+      hint.y           = gVw->old_ywin;
+    }
+    
     gVw->output_width  = hint.width;
     gVw->output_height = hint.height;
 
@@ -637,7 +660,24 @@ static void video_window_adapt_size (void) {
 void video_window_dest_size_cb (void *data,
 				int video_width, int video_height,
 				int *dest_width, int *dest_height)  {
+  
 
+  if((gVw->last_video_width != -1) && (gVw->last_video_height != -1)) {
+
+    if(gVw->video_width != video_width || gVw->video_height != video_height) {
+      
+      gVw->last_video_width = gVw->video_width;
+      gVw->last_video_height = gVw->video_height;
+      
+      gVw->video_width  = video_width;
+      gVw->video_height = video_height;
+      
+      if((video_width > 0) && (video_height > 0))
+	video_window_set_mag(1.0);
+
+    }
+  }
+  
   if (gVw->fullscreen_mode) {
     *dest_width  = gVw->fullscreen_width;
     *dest_height = gVw->fullscreen_height;
@@ -656,8 +696,22 @@ void video_window_frame_output_cb (void *data,
 				   int *dest_width, int *dest_height,
 				   int *win_x, int *win_y) {
   
-  gVw->video_width  = video_width;
-  gVw->video_height = video_height;
+  if((gVw->last_video_width == -1) && (gVw->last_video_height == -1)) {
+    gVw->video_width  = video_width;
+    gVw->video_height = video_height;
+  }
+  else {
+    if((gVw->video_width != video_width || gVw->video_height != video_height) &&
+       (gVw->last_video_width != video_width || gVw->last_video_height != video_height)) {
+      
+      gVw->video_width  = video_width;
+      gVw->video_height = video_height;
+      
+      if(video_width && video_height)
+	video_window_set_mag(1.0);
+
+    }
+  }
 
   *dest_x = 0;
   *dest_y = 0;
@@ -805,6 +859,7 @@ void video_window_init (window_attributes_t *window_attribute) {
   gVw->desktopWidth       = DisplayWidth(gGui->display, gGui->screen);
   gVw->desktopHeight      = DisplayHeight(gGui->display, gGui->screen);
 
+  gVw->using_xinerama     = 0;
 #ifdef HAVE_XINERAMA
   gVw->xinerama		  = NULL;
   gVw->xinerama_cnt	  = 0;
@@ -823,6 +878,7 @@ void video_window_init (window_attributes_t *window_attribute) {
 	     screeninfo[0].width, screeninfo[0].height);
 #endif
     if (XineramaIsActive(gGui->display)) {
+      gVw->using_xinerama = 1;
       gVw->fullscreen_width  = screeninfo[0].width;
       gVw->fullscreen_height = screeninfo[0].height;
       gVw->xinerama = screeninfo;
@@ -935,10 +991,12 @@ void video_window_init (window_attributes_t *window_attribute) {
   if((window_attribute->width > 0) && (window_attribute->height > 0)) {
     gVw->video_width  = window_attribute->width;
     gVw->video_height = window_attribute->height;
+    gVw->last_video_width = gVw->last_video_height = -1;
   }
   else {
     gVw->video_width  = 768;
     gVw->video_height = 480;
+    gVw->last_video_width = gVw->last_video_height = 0;
   }
   
   video_window_set_mag(1.0);
@@ -952,8 +1010,8 @@ void video_window_init (window_attributes_t *window_attribute) {
     Window tmp_win;
     
     if((window_attribute->x > -8192) && (window_attribute->y > -8192)) {
-      gVw->xwin = window_attribute->x;
-      gVw->ywin = window_attribute->y;
+      gVw->xwin = gVw->old_xwin = window_attribute->x;
+      gVw->ywin = gVw->old_ywin = window_attribute->y;
       
       XLockDisplay (gGui->display);
       XMoveResizeWindow (gGui->display, gGui->video_window, 
@@ -1037,7 +1095,10 @@ static int video_window_translate_point(int gui_x, int gui_y,
  * Set/Get magnification.
  */
 void video_window_set_mag(float mag) {
-  
+
+  if(gVw->fullscreen_mode)
+    return;
+
   gVw->mag = mag;
   gVw->win_width  = (int) ((float) gVw->video_width) * gVw->mag;
   gVw->win_height = (int) ((float) gVw->video_height) * gVw->mag;
