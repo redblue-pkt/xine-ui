@@ -691,7 +691,7 @@ void panel_add_mixer_control(void) {
   
   gGui->mixer.caps = MIXER_CAP_NOTHING;
 
-  if(gGui->ao_driver) {
+  if(gGui->ao_port) {
     if((xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME)) != -1)
       gGui->mixer.caps |= MIXER_CAP_VOL;
     if((xine_get_param(gGui->stream, XINE_PARAM_AUDIO_MUTE)) != -1)

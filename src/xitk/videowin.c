@@ -159,7 +159,7 @@ void video_window_select_visual (void) {
   XVisualInfo *vinfo = (XVisualInfo *) -1;
 
   XLockDisplay (gGui->display);
-  if (gGui->vo_driver) {
+  if (gGui->vo_port) {
 
     xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_SELECT_VISUAL, &vinfo);
 
@@ -247,7 +247,7 @@ static void video_window_adapt_size (void) {
 					 CopyFromParent, CopyFromParent, CopyFromParent, 
 					 CWBackPixel | CWOverrideRedirect, &attr);
       
-      if(gGui->vo_driver)
+      if(gGui->vo_port)
 	xine_gui_send_vo_data(gGui->stream, 
 			      XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
 
@@ -507,7 +507,7 @@ static void video_window_adapt_size (void) {
 		     gVw->visual,
 		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
 
-    if(gGui->vo_driver)
+    if(gGui->vo_port)
       xine_gui_send_vo_data(gGui->stream,
 			    XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
     
@@ -656,7 +656,7 @@ static void video_window_adapt_size (void) {
 		    gVw->depth, InputOutput, gVw->visual,
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
     
-    if(gGui->vo_driver)
+    if(gGui->vo_port)
       xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
     
     if(gVw->borderless) {

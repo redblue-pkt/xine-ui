@@ -109,8 +109,8 @@
                          } while(0)
 
 typedef struct {
-  xine_vo_driver_t         *vo_driver;
-  xine_ao_driver_t         *ao_driver;
+  xine_video_port_t        *vo_port;
+  xine_audio_port_t        *ao_port;
 
   xine_stream_t            *stream;
 

@@ -212,11 +212,11 @@ void gui_exit (xitk_widget_t *w, void *data) {
   xine_dispose(gGui->stream);
   /* xine_dispose(gGui->visual_anim.stream); */
 
-  if(gGui->vo_driver)
-    xine_close_video_driver(gGui->xine, gGui->vo_driver);
+  if(gGui->vo_port)
+    xine_close_video_driver(gGui->xine, gGui->vo_port);
 
-  if(gGui->ao_driver)
-    xine_close_audio_driver(gGui->xine, gGui->ao_driver);
+  if(gGui->ao_port)
+    xine_close_audio_driver(gGui->xine, gGui->ao_port);
 
   xine_exit(gGui->xine); 
 
@@ -294,10 +294,11 @@ void gui_stop (xitk_widget_t *w, void *data) {
 
 void gui_pause (xitk_widget_t *w, void *data, int state) {
   
-  if (xine_get_param(gGui->stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
+  if(xine_get_param(gGui->stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
   else
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+
   panel_check_pause();
   visual_anim_pause();
 }
