@@ -23,6 +23,10 @@
  *
  */
 
+#ifndef __sun
+#define _XOPEN_SOURCE 500
+#endif
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -32,29 +36,60 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <string.h>
-#include <fcntl.h>
 #include <errno.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-#include <sys/time.h>
-#include <pwd.h>
 #include <aalib.h>
-#include <termios.h>
+
+#ifdef HAVE_GETOPT_LONG
+#  include <getopt.h>
+#else
+#  include "getopt.h"
+#endif
+
+#include "utils.h"
 
 #include "xine.h"
 
 /*
  * global variables
  */
+typedef struct {
+  xine_t           *xine;
+  int               ignore_status;
+  vo_driver_t      *vo_driver;
+  config_values_t  *config;
+  aa_context       *context;
+  ao_functions_t   *ao_driver;
+  char             *mrl[1024];
+  int               num_mrls;
+  int               current_mrl;
+#ifdef DEBUG
+  int               debug_level;
+#endif
+} aaxine_t;
 
-vo_driver_t      *vo_driver;
-config_values_t  *config;
-xine_t           *xine;
-aa_context       *context;
-ao_functions_t   *ao_driver;
-char             *mrl;
+static aaxine_t aaxine;
 
-void show_banner(void) {
+/* options args */
+static const char *short_options = "?ha:"
+#ifdef DEBUG
+ "d:"
+#endif
+ "A:R::";
+static struct option long_options[] = {
+  {"help"           , no_argument      , 0, 'h' },
+  {"audio-channel"  , required_argument, 0, 'a' },
+#ifdef DEBUG
+  {"debug"          , required_argument, 0, 'd' },
+#endif
+  {"audio-driver"   , required_argument, 0, 'A' },
+  {"recognize-by"   , optional_argument, 0, 'R' },
+  {0                , no_argument      , 0,  0  }
+};
+
+/*
+ * Display an informative banner.
+ */
+static void show_banner(void) {
 
   printf("This is xine (aalib ui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
   printf("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n", 
@@ -65,49 +100,39 @@ void show_banner(void) {
 	 xine_get_sub_version(), xine_get_str_version());
 }
 
-void gui_status_callback (int nStatus) {
-}
+/*
+ * Display full help.
+ */
+static void print_usage (void) {
+  char **driver_ids;
+  char  *driver_id;
 
-const char *get_homedir(void) {
-  struct passwd *pw = NULL;
-  char *homedir = NULL;
-#ifdef HAVE_GETPWUID_R
-  int ret;
-  struct passwd pwd;
-  char *buffer = NULL;
-  int bufsize = 128;
-
-  buffer = (char *) xmalloc(bufsize);
-  
-  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) < 0) {
-#else
-  if((pw = getpwuid(getuid())) == NULL) {
-#endif
-    if((homedir = getenv("HOME")) == NULL) {
-      fprintf(stderr, "Unable to get home directory, set it to /tmp.\n");
-      homedir = strdup("/tmp");
-    }
-  }
-  else {
-    if(pw) 
-      homedir = strdup(pw->pw_dir);
-  }
-  
-  
-#ifdef HAVE_GETPWUID_R
-  if(buffer) 
-    free(buffer);
-#endif
-  
-  return homedir;
-}
-
-void print_usage () {
-  printf("usage: aaxine [aalib-options] [-A audio_driver] mrl\n"
+  printf("usage: aaxine [aalib-options] [aaxine-options] mrl\n"
 	 "aalib-options:\n"
 	 "%s", aa_help);
   printf("\n");
-  printf("examples for valid MRLs (media resource locator):\n");
+  printf("AAXINE options:\n");
+  printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
+  printf("                               ");
+  driver_ids = xine_list_audio_output_plugins ();
+  driver_id  = *driver_ids++;
+  while (driver_id) {
+    printf ("%s ", driver_id);
+    driver_id  = *driver_ids++;
+  }
+  printf ("\n");
+  printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
+  printf("  -R, --recognize-by [option]  Try to recognize stream type. Option are:\n");
+  printf("                                 'default': by content, then by extension,\n");
+  printf("                                 'revert': by extension, then by content,\n");
+  printf("                                 'content': only by content,\n");
+  printf("                                 'extension': only by extension.\n");
+  printf("                                 -if no option is given, 'revert' is selected\n");
+#ifdef DEBUG
+  printf("  -d, --debug <flags>          Debug mode for <flags> ('help' for list).\n");
+#endif
+  printf("\n");
+  printf("Examples for valid MRLs (media resource locator):\n");
   printf("  File:  'path/foo.vob'\n");
   printf("         '/path/foo.vob'\n");
   printf("         'file://path/foo.vob'\n");
@@ -118,62 +143,277 @@ void print_usage () {
   printf("\n");
 }
 
-void set_position (int pos) {
+/*
+ * Handling xine engine status changes.
+ */
+static void gui_status_callback (int nStatus) {
 
-  xine_stop (xine);
-  xine_play (xine, mrl, pos);
+  if (aaxine.ignore_status)
+    return;
+  
+  if(nStatus == XINE_STOP) {
+    aaxine.current_mrl++;
+   
+    if (aaxine.current_mrl < aaxine.num_mrls)
+      xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0 );
+    else
+      aaxine.current_mrl--;
+
+  }
 
 }
 
+/*
+ * Return next available mrl to xine engine.
+ */
+static char *gui_next_mrl_callback (void ) {
+
+  if(aaxine.current_mrl >= (aaxine.num_mrls - 1)) 
+    return NULL;
+  
+  return aaxine.mrl[aaxine.current_mrl + 1];
+}
+
+/*
+ * Xine engine branch success.
+ */
+static void gui_branched_callback (void ) {
+
+  if(aaxine.current_mrl < (aaxine.num_mrls - 1)) {
+    aaxine.current_mrl++;
+  }
+}
+
+/*
+ * Seek in current stream.
+ */
+static void set_position (int pos) {
+
+  aaxine.ignore_status = 1;
+  xine_stop(aaxine.xine);
+  xine_play(aaxine.xine, aaxine.mrl[aaxine.current_mrl], pos);
+  aaxine.ignore_status = 0;
+}
+
+#ifdef DEBUG
+/*
+ * *FIXME* Turn on some debug info.
+ */
+static int handle_debug_subopt(char *sopt) {
+  int i, subopt;
+  char *str = sopt;
+  char *val = NULL;
+  char *debuglvl[] = {
+    "verbose", "metronom", "audio", "demux", 
+    "input", "video", "pts", "mpeg", "avi", 
+    "ac3", "loop", "gui",
+    NULL
+  };
+
+  while(*str) {
+    subopt = getsubopt(&str, debuglvl, &val);
+    switch(subopt) {
+    case -1:
+      i = 0;
+      fprintf(stderr, "Valid debug flags are:\n\t");
+      while(debuglvl[i] != NULL) {
+	fprintf(stderr,"%s, ", debuglvl[i]);
+	i++;
+      }
+      fprintf(stderr, "\b\b.\n");
+      return 0;
+    default:
+      /* If debug feature is already enabled, with
+       * XINE_DEBUG envvar, turn it off
+       */
+      if((aaxine.debug_level & 0x8000>>(subopt + 1)))
+	aaxine.debug_level &= ~0x8000>>(subopt + 1);
+      else
+	aaxine.debug_level |= 0x8000>>(subopt + 1);
+      break;
+    }
+  }
+
+  return 1;
+}
+#endif
+
+/*
+ * Handle demuxer strategy user choice here.
+ */
+static int handle_demux_strategy_subopt(char *sopt) {
+  int subopt;
+  char *str = sopt;
+  char *val = NULL;
+  char *ds_available[] = {
+    "default",
+    "revert",
+    "content",
+    "extension",
+    NULL
+  };
+  enum DEMUX_S {
+    DS_DEFAULT,
+    DS_REVERT,
+    DS_CONTENT,
+    DS_EXT
+  };
+
+  while((subopt = getsubopt(&str, ds_available, &val)) != -1) {
+
+    switch(subopt) {
+
+    case DS_DEFAULT:
+      return DEMUX_DEFAULT_STRATEGY;
+      break;      
+    case DS_REVERT:
+      return DEMUX_REVERT_STRATEGY;
+      break;      
+    case DS_CONTENT:
+      return DEMUX_CONTENT_STRATEGY;
+      break;      
+    case DS_EXT:
+      return DEMUX_EXTENSION_STRATEGY;
+      break;      
+    }
+  }
+
+  if(val) {
+    int i;
+
+    fprintf(stderr, "Error: '%s' is a wrong recognition strategy option.\n", 
+	    val);
+    fprintf(stderr, "Available strategies are:");
+    for(i = 0; ds_available[i] != NULL; i++)
+      fprintf(stderr, " %s,", ds_available[i]);
+    fprintf(stderr, "\b.\nStrategy forced to 'default'.\n");
+  }
+  
+  return DEMUX_DEFAULT_STRATEGY;
+}
+
+/*
+ * Extract mrls from argv[] and store them to playlist.
+ */
+void extract_mrls(int num_mrls, char **mrls) {
+  int i;
+
+  for(i = 0; i < num_mrls; i++)
+    aaxine.mrl[i] = mrls[i];
+
+  aaxine.num_mrls = num_mrls;
+  aaxine.current_mrl = 0;
+
+  for(i = 0; i < aaxine.num_mrls; i++)
+    printf("++ '%s'\n", aaxine.mrl[i]);
+  printf("current/num %d/%d\n", aaxine.current_mrl, aaxine.num_mrls);
+}
+
+/*
+ * Errrr, i forget my mind ;-).
+ */
 int main(int argc, char *argv[]) {
-
-  char          *configfile;
-  struct termios stored_settings;
-  struct termios new_settings;
-  char           c;
+  int            c = '?';
+  int            option_index    = 0;
   int            running;
-  char          *ao_drv = "oss";
+  int            key;
+  char          *configfile;
+  int            demux_strategy  = DEMUX_DEFAULT_STRATEGY;
+  char          *audio_driver_id = NULL;
+  int            audio_channel   = 0;
 
-  /* Check xine library version */
+  /*
+   * Check xine library version 
+   */
   if(!xine_check_version(0, 5, 0)) {
     fprintf(stderr, "require xine library version 0.5.0, found %d.%d.%d.\n", 
 	    xine_get_major_version(), xine_get_minor_version(),
 	    xine_get_sub_version());
-    exit(1);
+    goto failure;
   }
 
   show_banner();
 
-  /* aalib help and option-parsing */
+#ifdef DEBUG
+  aaxine.debug_level = 0;
+#endif
+  aaxine.num_mrls = 0;
+  aaxine.current_mrl = 0;
+
+  /* 
+   * AALib help and option-parsing
+   */
   if (!aa_parseoptions(NULL, NULL, &argc, argv)) {
     print_usage();
-    exit(1);
+    goto failure;
   }
+
+#ifdef DEBUG
+  /* If XINE_DEBUG envvar is set, parse it */
+  if(getenv("XINE_DEBUG") != NULL) {
+    if(!(handle_debug_subopt(chomp((getenv("XINE_DEBUG"))))))
+      exit(1);
+  }
+#endif
 
   /*
    * parse command line
    */
-  if ((argc!=2) && (argc != 4)) {
-    print_usage();
-    exit(1);
-  }
+  opterr = 0;
+  while((c = getopt_long(argc, argv, short_options, 
+			 long_options, &option_index)) != EOF) {
+    switch(c) {
 
-  if (argc==4) {
+    case 'a': /* Select audio channel */
+      sscanf(optarg, "%i", &audio_channel);
+      break;
+      
+    case 'A': /* Select audio driver */
+      if(optarg != NULL) {
+	audio_driver_id = xmalloc (strlen (optarg) + 1);
+	strcpy (audio_driver_id, optarg);
+      } else {
+	fprintf (stderr, "audio driver id required for -A option\n");
+	exit (1);
+      }
+      break;
 
-    if (strncmp (argv[1], "-A", 2)) {
+    case 'R': /* Set a strategy to recognizing stream type */
+      if(optarg != NULL)
+	demux_strategy = handle_demux_strategy_subopt(chomp(optarg));
+      else
+	demux_strategy = DEMUX_REVERT_STRATEGY;
+      break;
+
+#ifdef DEBUG      
+    case 'd': /* Select debug levels */
+      if(optarg != NULL) {
+	if(!(handle_debug_subopt(chomp(optarg))))
+	  exit(1);
+      }
+      break;
+#endif
+      
+    case 'h': /* Display usage */
+    case '?':
       print_usage();
       exit(1);
-    } 
-    
-    ao_drv = argv[2];
-
-    mrl = argv[3];
-
-  } else {
-    mrl = argv[1];
+      break;
+      
+    default:
+      print_usage();
+      fprintf (stderr, "invalid argument %d => exit\n",c);
+      exit(1);
+    }
   }
 
-
+  if(!(argc - optind)) {
+    fprintf(stderr, "You should specify an MRL.\n");
+    goto failure;
+  }
+  else
+    extract_mrls((argc - optind), &argv[optind]);
+  
   /*
    * generate and init a config "object"
    */
@@ -181,103 +421,161 @@ int main(int argc, char *argv[]) {
     char *homedir;
 
     homedir = strdup(get_homedir());
-    configfile = (char *) malloc(strlen(homedir) + 8 + 1);
+    configfile = (char *) xmalloc(strlen(homedir) + 8 + 1);
 
     sprintf (configfile, "%s/.xinerc", homedir);
   }
 
-  config = config_file_init (configfile);
+  aaxine.config = config_file_init (configfile);
+  aaxine.config->set_int(aaxine.config, "demux_strategy", demux_strategy);
+  aaxine.config->save(aaxine.config);
 
+  /*
+   * Initialize AALib
+   */
+  aaxine.context = aa_autoinit(&aa_defparams);
+  if(aaxine.context == NULL) {
+    fprintf(stderr,"Cannot initialize AA-lib. Sorry\n");
+    goto failure;
+  }
+
+  /*
+   * Initialize AA keyboard support.
+   * It seems there a little bug if you init
+   * this with AA_SENDRELEASE, some keys aren't
+   * correctly handled.
+   */
+  if(aa_autoinitkbd(aaxine.context, 0) < 1) {
+    fprintf(stderr, "aa_autoinitkdb() failed.\n");
+    goto failure;
+  }
+  
+  aa_hidecursor(aaxine.context);
 
   /*
    * init video output driver
    */
-
-  context = aa_autoinit(&aa_defparams);
-  if(context == NULL) {
-    fprintf(stderr,"Cannot initialize AA-lib. Sorry\n");
-    exit(1);
-  }
-
-  vo_driver = xine_load_video_output_plugin(config, 
-					    "aa",
-					    VISUAL_TYPE_AA, 
-					    (void *) context);
+  aaxine.vo_driver = xine_load_video_output_plugin(aaxine.config, 
+						   "aa",
+						   VISUAL_TYPE_AA, 
+						   (void *) aaxine.context);
   
-  if (!vo_driver) {
+  if (!aaxine.vo_driver) {
     printf ("main: video driver aa failed\n");
-    exit (1);
+    goto failure;
   }
 
   /*
    * init audio output driver
    */
-  ao_driver = xine_load_audio_output_plugin(config,
-					    ao_drv);
-
-  if (!ao_driver) {
-    printf ("main: audio driver %s failed\n", ao_drv);
+  if(!audio_driver_id)
+    audio_driver_id = aaxine.config->lookup_str(aaxine.config, 
+						"audio_driver_name", "oss");
+  else {
+    aaxine.config->set_str(aaxine.config, 
+			   "audio_driver_name", audio_driver_id);
+    aaxine.config->save(aaxine.config);
+  }
+    
+  aaxine.ao_driver = xine_load_audio_output_plugin(aaxine.config,
+						   audio_driver_id);
+		    
+  if (!aaxine.ao_driver) {
+    printf ("main: audio driver %s failed\n", audio_driver_id);
   }
 
   /*
    * xine init
    */
+  aaxine.xine = xine_init (aaxine.vo_driver,
+			   aaxine.ao_driver, 
+			   aaxine.config,
+			   gui_status_callback,
+			   gui_next_mrl_callback, 
+			   gui_branched_callback);
 
-  printf ("main: starting xine engine\n");
+  if(!aaxine.xine) {
+    fprintf(stderr, "xine_init() failed.\n");
+    goto failure;
+  }
 
-  xine = xine_init (vo_driver, ao_driver, 
-		    config, gui_status_callback,
-		    NULL, NULL);
-
-  xine_select_audio_channel (xine, 0);
+  xine_select_audio_channel (aaxine.xine, audio_channel);
 
   /*
    * ui loop
    */
 
-  tcgetattr(0,&stored_settings);
-  
-  new_settings = stored_settings;
-  
-  /* Disable canonical mode, and set buffer size to 1 byte */
-  new_settings.c_lflag &= (~ICANON);
-  new_settings.c_lflag &= (~ECHO);
-  new_settings.c_cc[VTIME] = 0;
-  new_settings.c_cc[VMIN] = 1;
-  
-  tcsetattr(0,TCSANOW,&new_settings);
-
-  xine_play (xine, mrl, 0);
+  xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0);
 
   running = 1;
 
   while (running) {
 
-    c = getc(stdin);
+    while((key = aa_getevent(aaxine.context, 0)) == AA_NONE);
+    
+    if((key >= AA_UNKNOWN && key < AA_UNKNOWN) || (key >= AA_RELEASE)) 
+      continue;
 
-    switch (c) {
+    switch (key) {
+
+    case AA_UP:
+      aaxine.ignore_status = 1;
+      xine_stop(aaxine.xine);
+      aaxine.current_mrl--;
+      if((aaxine.current_mrl >= 0) && (aaxine.current_mrl < aaxine.num_mrls)) {
+	xine_play(aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0);
+      } 
+      else {
+	aaxine.current_mrl = 0;
+      }
+      aaxine.ignore_status = 0;
+      break;
+
+    case AA_DOWN:
+      aaxine.ignore_status = 1;
+      xine_stop(aaxine.xine);
+      aaxine.ignore_status = 0;
+      gui_status_callback(XINE_STOP);
+      break;
+
+    case AA_LEFT:
+      break;
+
+    case AA_RIGHT:
+      break;
+
+    case '+':
+      xine_select_audio_channel(aaxine.xine,
+				(xine_get_audio_channel(aaxine.xine) + 1));
+      break;
+      
+    case '-':
+      if(xine_get_audio_channel(aaxine.xine))
+	xine_select_audio_channel(aaxine.xine,
+				  (xine_get_audio_channel(aaxine.xine) - 1));
+      break;
+
     case 'q':
     case 'Q':
-      xine_exit (xine);
+      xine_exit (aaxine.xine);
       running = 0;
       break;
       
     case 13:
     case 'r':
     case 'R':
-      printf ("PLAY\n");
-      xine_play (xine, mrl, 0);
+      xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0);
       break;
 
     case ' ':
     case 'p':
     case 'P':
-      xine_pause (xine);
+      xine_pause (aaxine.xine);
       break;
 
     case 's':
     case 'S':
-      xine_stop (xine);
+      xine_stop (aaxine.xine);
       break;
 
     case '1':
@@ -311,14 +609,22 @@ int main(int argc, char *argv[]) {
       set_position (0);
       break;
 
-
-
     }
   }
 
-  tcsetattr(0,TCSANOW,&stored_settings);
+ failure:
+  
+  if(aaxine.xine)
+    xine_exit(aaxine.xine); 
 
-  aa_close(context);
+  if(aaxine.config) 
+    aaxine.config->save(aaxine.config);
+
+  if(aaxine.context) {
+    aa_showcursor(aaxine.context);
+    aa_uninitkbd(aaxine.context);
+    aa_close(aaxine.context);
+  }
 
   return 0;
 }
