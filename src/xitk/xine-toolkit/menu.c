@@ -430,11 +430,11 @@ static void _menu_destroy_menu_window(menu_window_t **mw) {
 
 static void _menu_destroy_subs(menu_private_data_t *private_data, menu_window_t *menu_window) {
   menu_window_t *mw;
-
+  
   mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
-  while(mw && (menu_window && (mw != menu_window))) {
-    _menu_destroy_menu_window(&mw);
+  while(mw && (mw != menu_window)) {
     xitk_list_delete_current(private_data->menu_windows);
+    _menu_destroy_menu_window(&mw);
     mw = (menu_window_t *) xitk_list_last_content(private_data->menu_windows);
   }
 }
@@ -492,10 +492,18 @@ void xitk_menu_destroy(xitk_widget_t *w) {
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {
     menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
-
-    xitk_unset_current_menu();
+    menu_window_t       *mw;
+    
     private_data->curbranch = NULL;
-    _menu_destroy_subs(private_data, NULL);
+    xitk_unset_current_menu();
+
+    mw = (menu_window_t *) xitk_list_first_content(private_data->menu_windows);
+    while(mw) {
+      xitk_list_delete_current(private_data->menu_windows);
+      _menu_destroy_menu_window(&mw);
+      mw = (menu_window_t *) xitk_list_first_content(private_data->menu_windows);
+    }
+    
     xitk_list_free(private_data->menu_windows);
     _menu_destroy_ntree(&private_data->mtree->first);
   }
@@ -553,18 +561,18 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
     _menu_hide_menu(private_data);
 
     if(me->menu_entry->cb)
-      me->menu_entry->cb(me->widget, me->menu_entry, me->menu_entry->user_data);
+      me->menu_entry->cb(widget, me->menu_entry, me->menu_entry->user_data);
     
-    xitk_menu_destroy(me->widget);
+    xitk_menu_destroy(widget);
   }
   else {
     if(!_menu_is_title(me->menu_entry)) {
       _menu_hide_menu(private_data);
 
       if(me->menu_entry->cb)
-	me->menu_entry->cb(me->widget, me->menu_entry, me->menu_entry->user_data);
+	me->menu_entry->cb(widget, me->menu_entry, me->menu_entry->user_data);
       
-      xitk_menu_destroy(me->widget);
+      xitk_menu_destroy(widget);
     }
   }
 }
