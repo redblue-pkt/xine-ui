@@ -38,6 +38,7 @@
 #include "event.h"
 #include "actions.h"
 #include "videowin.h"
+#include "playlist.h"
 #include "mrl_browser.h"
 #include "errors.h"
 
