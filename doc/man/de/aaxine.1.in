@@ -58,15 +58,15 @@ Wird nur \fB\-R\fP ohne einen weiteren Parameter angegeben, so wird `\fBrevert\f
 .SH "MRLs"
 MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Titel. Gültige MRLs können einfache Dateinamen sein oder folgendermaßen aussehen:
 .TP 
-.BI file:// <path>
+.BI file: <Pfad>
 .TP 
-.BI fifo:/ /<path>
+.BI fifo: <Pfad>
 .TP 
-.BR stdin://mpeg1\  oder \ stdin://mpeg2
+.BR stdin:/
 .TP 
-.BI dvd://VTS_ xx _ y .VOB
+.BI dvd:/ <Titel> . <Part>
 .TP 
-.BI vcd:// <Track\ Nummer>
+.BI vcd:/ <Track\ Nummer>
 .TP 
 .BI tcp:// <host> : <port>
 .TP 
@@ -79,6 +79,26 @@ MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Tit
 .BI http:// <host>...
 .PP 
 Mehrere MRLs können angegeben werden, um mehrere Titel nacheinander zu spielen. Die oben aufgeführten MRLs werden standardmäßig von libxine unterstützt. Zusätzliche Plugins können diese Liste um weitere MRLs ergänzen.
+.br
+Nach einem trennenden
+.B #
+können Parameter für den Abspielvorgang angegeben werden:
+.TP
+.B novideo
+Videodaten werden ignoriert
+.TP
+.B noaudio
+Tondaten werden ignoriert
+.TP
+.B nospu
+Untertitel werden ignoriert
+.TP
+.BI demux: <Demux\ Name>
+bestimmt das zu verwendende Demux Plugin
+.TP
+.IB <Konfigurationseintrag> : <Wert>
+weist einem Konfigurationseintrag einen neuen Wert zu
+
 .SH "BEDIENTASTEN"
 Viele Funktionen können über Tastatur bedient werden. Die Tastaturzuordnung ist wie folgt:
 .IP  "\fB<RETURN>\fP oder \fBR\fP"

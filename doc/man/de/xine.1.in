@@ -174,13 +174,13 @@ Benutzt den Desktophintergrund zur Videoausgabe.
 MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Titel. Gültige MRLs können einfache Dateinamen sein oder folgendermaßen aussehen:
 .RS
 .TP 
-.BI file:// <Pfad>
+.BI file: <Pfad>
 .TP 
-.BI fifo:// <Pfad>
+.BI fifo: <Pfad>
 .TP 
-.BR stdin://mpeg1\  oder \ stdin://mpeg2
+.BR stdin:/
 .TP 
-.BI dvd://VTS_ xx _ y .VOB
+.BI dvd:/ <Titel> . <Part>
 .TP 
 .BI vcd:// <Titelnummer>
 .TP 
@@ -201,9 +201,30 @@ Das Herüberziehen vom \fBGNOME Midnight Commander\fP (gmc), \fBNautilus\fP und \
 .TP
 .B AVI Untertitel Dateien
 .br
-Dateien mit Textuntertiteln können (durch ein `%' getrennt) an die Datei-MRL angehängt werden:
+Dateien mit Textuntertiteln können (durch ein `?' getrennt) an die Datei-MRL angehängt werden:
 .br
-.BI file:// <Pfad> % <Untertiteldatei>
+.BI file:// <Pfad> ? <Untertiteldatei>
+.TP
+.B Abspieloptionen
+.br
+Nach einem trennenden
+.B #
+können Parameter für den Abspielvorgang angegeben werden:
+.TP
+.B novideo
+Videodaten werden ignoriert
+.TP
+.B noaudio
+Tondaten werden ignoriert
+.TP
+.B nospu
+Untertitel werden ignoriert
+.TP
+.BI demux: <Demuxer\ Name>
+bestimmt das zu verwendende Demuxer Plugin
+.TP
+.IB <Konfigurationseintrag> : <Wert>
+weist einem Konfigurationseintrag einen neuen Wert zu
 .RE
 
 .SH "BEDIENTASTEN"

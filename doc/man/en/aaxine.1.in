@@ -66,17 +66,15 @@ If \fB\-R\fP is given without an additional option, `\fBrevert\fP' is selected.
 MRLs are similar to URLs in your web browser. They describe the media
 to read from. valid MRLs may be plain file names or one of the following:
 .br
-.BI file:// <path>
+.BI file: <path>
 .br
-.BI fifo:// <path>
+.BI fifo: <path>
 .br
-.B stdin://mpeg1
-or
-.B stdin://mpeg2
+.B stdin:/
 .br
-.BI dvd://VTS_ xx _ y .VOB
+.BI dvd:/ <title> . <part>
 .br
-.BI vcd:// <tracknumber>
+.BI vcd:/ <tracknumber>
 .br
 .BI tcp:// <host> : <port>
 .br
@@ -91,6 +89,25 @@ or
 Several MRLs may be specified in order to play a number of consecutive
 streams. Additional input plugins will provide additional MRL types.
 The ones listed above are available with stock libxine...
+.br
+After a delimiting
+.B #
+you can add several stream parameters:
+.TP
+.B novideo
+video will be ignored
+.TP
+.B noaudio
+audio will be ignored
+.TP
+.B nospu
+subpictures will be ignored
+.TP
+.BI demux: <demux\ name>
+specify the demux plugin to use
+.TP
+.IB <config\ entry> : <config\ value>
+assign a new value to any config entry
 
 .SH CONTROL KEYS
 Many features can be controlled by pressing control keys. The Key bindings are:
