@@ -328,6 +328,11 @@ void widget_show_widgets(widget_list_t *);
  */
 void widget_hide_widgets(widget_list_t *);
 
+/**
+ * Pass events to UI
+ */
+void widget_xevent_notify(XEvent *event);
+
 /* 
  * *** Sliders ***
  */

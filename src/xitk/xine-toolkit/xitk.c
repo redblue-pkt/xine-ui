@@ -389,7 +389,7 @@ int widget_get_window_info(widgetkey_t key, window_info_t *winf) {
  * handled, then if a event handler callback was passed
  * at register time, it will be called.
  */
-static void widget_xevent_notify(XEvent *event) {
+void widget_xevent_notify(XEvent *event) {
   __gfx_t  *fx;
 
     

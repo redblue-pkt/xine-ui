@@ -229,7 +229,11 @@ static int notify_click_slider (widget_list_t *wl,
 				   retpos);
 	  }
 	  break;
-	}
+
+	default:
+	  widget_xevent_notify (&sliderevent);
+ 	  break;	}
+	
       } while (sliderevent.type != ButtonRelease); 
     }
     /* CHECKME    paint_widget_list (wl); */
