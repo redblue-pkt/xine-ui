@@ -19,8 +19,8 @@ Version:     %{version}
 Release:     %{release}
 Copyright:   GPL
 Group:       Applications/Multimedia
-Source:      http://xine.sourceforge.net/files/%{name}-%{version}.tar.gz
-URL:         http://xine.sourceforge.net/
+Source:      http://xinehq.de/files/%{name}-%{version}.tar.gz
+URL:         http://xinehq.de
 Packager:    Manfred Tremmel <Manfred.Tremmel@iiv.de>
 Obsoletes:   xine
 Requires:    %{libname} >= %{libvers}
