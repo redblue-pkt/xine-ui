@@ -207,8 +207,14 @@ void gui_handle_xine_error(void) {
     break;
 
   case XINE_ERROR_DEMUX_FAILED:
-    xine_error_with_more(_("- xine engine error -\n\ndemuxer failed. "
+    xine_error_with_more(_("- xine engine error -\n\nDemuxer failed. "
 			   "Maybe '%s' is a broken file?\n"), 
+			 gGui->filename);
+    break;
+    
+  case XINE_ERROR_MALFORMED_MRL:
+    xine_error_with_more(_("- xine engine error -\n\nMalformed mrl. "
+			   "Mrl '%s' seems malformed/invalid.\n"), 
 			 gGui->filename);
     break;
     
