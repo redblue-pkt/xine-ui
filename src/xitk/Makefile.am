@@ -34,10 +34,12 @@ xine_SOURCES = \
 	videowin.c \
 	viewlog.c
 
-xine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
+xine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la $(top_builddir)/src/xitk/xine-toolkit/libxitk.la $(top_builddir)/libcurl/libcurl.la
+
 # double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
 xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
+	     $(top_builddir)/libcurl/libcurl.la \
 	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) -lX11 -lm
 
@@ -75,6 +77,9 @@ noinst_HEADERS = \
 
 $(top_builddir)/readline/libreadline.la:
 	@cd $(top_builddir)/readline && $(MAKE) libreadline.la
+
+$(top_builddir)/libcurl/libcurl.la:
+	@cd $(top_builddir)/libcurl && $(MAKE) libcurl.la
 
 $(top_builddir)/src/common/libcommon.la:
 	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
