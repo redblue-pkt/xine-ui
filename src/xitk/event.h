@@ -121,6 +121,8 @@ typedef struct {
 
   int                  layer_above;
   int                  reparent_hack;
+
+  int                  use_root_window;
   
   kbinding_t          *kbindings;
   

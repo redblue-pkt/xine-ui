@@ -872,7 +872,6 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
  * Initialize the GUI
  */
 void gui_init (int nfiles, char *filenames[]) {
-
   int                   i;
   char                 *display_name = ":0.0";
 
@@ -1092,7 +1091,10 @@ void gui_run (void) {
   xitk_run();
 
   gGui->running = 0;
-  
+
+  if(gGui->use_root_window)
+    video_window_restore_background();
+
   kbindings_save_kbinding(gGui->kbindings);
   kbindings_free_kbinding(&gGui->kbindings);
 

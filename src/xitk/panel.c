@@ -272,9 +272,14 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     XLockDisplay(gGui->display);
     
     if (video_window_is_visible ()) {
-      panel->visible = 0;
-      XUnmapWindow (gGui->display, gGui->panel_window);
-      xitk_hide_widgets(panel->widget_list);
+      if(gGui->use_root_window) { /* Using root window */
+	XIconifyWindow(gGui->display, gGui->panel_window, gGui->screen);
+      }
+      else {
+	panel->visible = 0;
+	XUnmapWindow (gGui->display, gGui->panel_window);
+	xitk_hide_widgets(panel->widget_list);
+      }
     }
 
     if(gGui->cursor_grabbed)
@@ -881,6 +886,9 @@ void panel_init (void) {
 						"gui panel visibility",
 						NULL, NULL, NULL);
   
+  if(gGui->use_root_window && (!panel->visible))
+    panel->visible = 1;
+
   if (panel->visible)
     XMapRaised(gGui->display, gGui->panel_window); 
   

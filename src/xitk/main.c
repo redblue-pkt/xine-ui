@@ -97,7 +97,7 @@ static const char *short_options = "?hHgfv"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::s:";
+ "u:a:V:A:p::s:R";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
@@ -118,6 +118,7 @@ static struct option long_options[] = {
   {"visual"	    , required_argument, 0,  OPTION_VISUAL           },
   {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
   {"keymap"         , optional_argument, 0,  DISPLAY_KEYMAP          },
+  {"root"           , no_argument,       0, 'R'                      },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -201,6 +202,7 @@ void show_usage (void) {
   printf(_("                                 'lirc': display draft of a .lircrc config file.\n"));
   printf(_("                                 'remapped': user remapped keymap table.\n"));
   printf(_("                                 -if no option is given, 'default' is selected.\n"));
+  printf(_("  -R, --root                   Use root window as video window\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -482,16 +484,17 @@ int main(int argc, char *argv[]) {
   
   gGui = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
 
-  gGui->debug_level = 0;
-  gGui->autoscan_plugin = NULL;
-  gGui->prefered_visual_class = -1;
-  gGui->prefered_visual_id = None;
-  gGui->install_colormap = 0;
-  gGui->cursor_grabbed = 0;
+  gGui->debug_level            = 0;
+  gGui->autoscan_plugin        = NULL;
+  gGui->prefered_visual_class  = -1;
+  gGui->prefered_visual_id     = None;
+  gGui->install_colormap       = 0;
+  gGui->cursor_grabbed         = 0;
+  gGui->use_root_window        = 0;
 #ifdef HAVE_XF86VIDMODE
   gGui->XF86VidMode_fullscreen = 0;
 #endif
-  gGui->actions_on_start[aos] = ACTID_NOKEY;
+  gGui->actions_on_start[aos]  = ACTID_NOKEY;
 
   /*
    * initialize CORBA server
@@ -624,6 +627,10 @@ int main(int argc, char *argv[]) {
       else
 	kbindings_display_default_bindings();
       exit(1);
+      break;
+
+    case 'R': /* Use root window for video output */
+      gGui->use_root_window = 1;
       break;
 
     case 'v': /* Display version and exit*/

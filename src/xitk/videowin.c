@@ -89,6 +89,11 @@ typedef struct {
   XF86VidModeModeInfo** XF86_modelines;
   int                   XF86_modelines_count;
 #endif
+
+  Pixmap         root_bg;
+  XImage        *root_image;
+  GC             root_gc;
+  
 } gVw_t;
 
 static gVw_t    *gVw;
@@ -98,6 +103,61 @@ extern int XShmGetEventBase(Display *);
 #endif
 
 static void video_window_handle_event (XEvent *event, void *data);
+
+/*
+ * Store/restore window background (used when using root window for vo) 
+ */
+void video_window_backup_background(void) {
+
+  XLockDisplay (gGui->display);
+
+#if 0 /* This is buggy */
+
+  gVw->root_bg = XCreatePixmap(gGui->display, 
+			       (XRootWindow(gGui->display, XDefaultScreen(gGui->display))), 
+			       gVw->fullscreen_width, gVw->fullscreen_height, 
+			       (DefaultDepth(gGui->display, XDefaultScreen(gGui->display))));
+  
+  gVw->root_image = XGetImage(gGui->display,
+			      (XRootWindow(gGui->display, XDefaultScreen(gGui->display))), 
+			      0, 0, gVw->fullscreen_width, gVw->fullscreen_height, 
+			      AllPlanes, ZPixmap);
+  
+  XPutImage(gGui->display, gVw->root_bg, 
+	    (XDefaultGC(gGui->display, XDefaultScreen(gGui->display))),
+	    gVw->root_image, 0, 0, gVw->fullscreen_width, gVw->fullscreen_height, 
+	    gVw->fullscreen_width, gVw->fullscreen_height);
+
+#endif
+
+  XUnlockDisplay (gGui->display);
+  
+}
+
+void video_window_restore_background(void) {
+
+  XLockDisplay (gGui->display);
+
+#if 0 /* This is buggy */
+
+  XSetWindowBackgroundPixmap(gGui->display, 
+			     (XRootWindow(gGui->display, XDefaultScreen(gGui->display))),
+			     gVw->root_bg);
+
+  XClearWindow(gGui->display, (XRootWindow(gGui->display, XDefaultScreen(gGui->display))));
+  XDestroyImage(gVw->root_image);
+  //  XMapRaised(gGui->display, (XRootWindow(gGui->display, XDefaultScreen(gGui->display))));
+  XFlush(gGui->display);
+
+#else
+
+  XClearWindow(gGui->display, (XRootWindow(gGui->display, XDefaultScreen(gGui->display))));
+  XFlush(gGui->display);
+
+#endif
+  
+  XUnlockDisplay (gGui->display);
+}
 
 /*
  * Let the video driver override the selected visual
@@ -143,18 +203,17 @@ void video_window_change_sizepos(int x, int y, int w, int h) {
  *
  */
 void video_window_set_fullscreen (int req_fullscreen) {
-
   x11_rectangle_t area;
 
   gVw->fullscreen_req = req_fullscreen;
-
+  
   video_window_adapt_size (NULL, gVw->video_width, gVw->video_height, 
 			   &area.x, &area.y, &area.w, &area.h);
-
+  
   gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 				      GUI_DATA_EX_DEST_POS_SIZE_CHANGED, 
 				      &area);
-
+  
   /* Tell the video driver if we are in fullscreen mode or not */
   gGui->vo_driver->gui_data_exchange(gGui->vo_driver, GUI_DATA_EX_FULLSCREEN, (int *)gVw->fullscreen_mode);
 }
@@ -238,6 +297,46 @@ void video_window_adapt_size (void *this,
   gVw->video_height = video_height;
   *dest_x = 0;
   *dest_y = 0;
+
+  if(gGui->use_root_window) { /* Using root window */
+
+    *dest_width  = gVw->fullscreen_width;
+    *dest_height = gVw->fullscreen_height;
+    *dest_x = 0;
+    *dest_y = 0;
+    
+    gVw->fullscreen_mode = 1;
+    gVw->visual   = gGui->visual;
+    gVw->depth    = gGui->depth;
+    gVw->colormap = gGui->colormap;
+    
+    gGui->video_window = RootWindow(gGui->display, XDefaultScreen(gGui->display));
+    
+    if(gGui->vo_driver)
+      gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
+					  GUI_DATA_EX_DRAWABLE_CHANGED, 
+					  (void*)gGui->video_window);
+    
+    gVw->gc = DefaultGC(gGui->display, XDefaultScreen(gGui->display));
+    
+    XSetWindowBackground(gGui->display, gGui->video_window, gGui->black.pixel);
+    //    XResizeWindow (gGui->display, gGui->video_window,
+    //		   gVw->fullscreen_width, gVw->fullscreen_height);
+    
+    XClearWindow(gGui->display, gGui->video_window);
+
+    gVw->old_widget_key = gVw->widget_key;
+    gVw->widget_key = xitk_register_event_handler("video_window", 
+						  gGui->video_window, 
+						  video_window_handle_event,
+						  video_window_change_sizepos,
+						  gui_dndcallback,
+						  NULL, NULL);
+    
+    XUnlockDisplay (gGui->display);
+    
+    return;
+  }
 
 #ifdef HAVE_XF86VIDMODE
   /* XF86VidMode Extension
@@ -608,6 +707,9 @@ void video_window_adapt_size (void *this,
  */
 void video_window_set_cursor_visibility(int show_cursor) {
 
+  if(gGui->use_root_window)
+    return;
+  
   gVw->cursor_visible = show_cursor;
 
   XLockDisplay (gGui->display);
@@ -830,6 +932,9 @@ void video_window_init (void) {
 #endif
 
   XUnlockDisplay (gGui->display);
+
+  if(gGui->use_root_window)
+    video_window_backup_background();
 
   video_window_adapt_size (NULL, 768, 480, &x, &y, &w, &h);
 }
