@@ -64,7 +64,7 @@ msgid ""
 "New entries selected in combo box is:\n"
 "%s [%d]."
 msgstr ""
-"Na nouvelle entrée sélectionnée dans la combo box est:\n"
+"La nouvelle entrée sélectionnée dans la combo box est:\n"
 "%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:771
