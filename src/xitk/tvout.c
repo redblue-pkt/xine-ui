@@ -225,6 +225,14 @@ static int ati_tvout_get_fullscreen_mode(void *data) {
 static void ati_tvout_deinit(void *data) {
   ati_private_t *private = (ati_private_t *) data;
 
+  if(private->fullscreen && private->atitvout_cmds[0] && strlen(private->atitvout_cmds[0])) {
+    int err;
+    
+    if((err = xine_system(0, private->atitvout_cmds[0])))
+      fprintf(stderr, "command: '%s' failed with error code %d.\n", 
+	      private->atitvout_cmds[0], err);
+  }
+    
   free(private);
 }
 
