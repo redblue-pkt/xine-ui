@@ -81,24 +81,48 @@ typedef struct {
 } filebrowser_filter_t;
 
 static filebrowser_filter_t __fb_filters[] = {
-  { NULL                  , "*"                        },
-  { NULL                  , "sub,srt,asc,smi,ssa"      }, /* subtitles */
-  { NULL                  , "pls,m3u,sfv,tox,asx,smil" }, /* playlists */
-  { "*.vob"               , "vob"                      }, /* mpeg block */
-  { "*.mpv"               , "mpv"                      }, /* elementary */
-  { "*.mpg, *.mpeg, *.mpe", "mpg,mpeg,mpe"             }, /* mpeg */
-  { "*.avi"               , "avi"                      }, /* avi */
-  { "*.mp3"               , "mp3"                      }, /* mp3 */
-  { "*.asf, *.wma, *.wmv" , "asf,wma,wmv"              }, /* asf */
-  { "*.cpk, *.cak, *.film", "cpk,cak,film"             }, /* film */
-  { "*.ogg"               , "ogg"                      }, /* ogg */
-  { "*.vdr"               , "vdr"                      }, /* pes */
-  { "*.mov, *.mp4, *.qt"  , "mov,mp4,qt"               }, /* QT */
-  { "*.rm"                , "rm"                       }, /* rm */
-  { "*.roq"               , "roq"                      }, /* roq */
-  { "*.m2t, *.ts, *.trp"  , "m2t,ts,trp"               }, /* ts */
-  { "*.dv"                , "dv"                       }, /* dv */
-  { NULL                  , NULL                       }
+  { NULL, "*"                                                                      },
+ /* subtitles */
+  { NULL, ".sub .srt .asc .smi .ssa "                                              },
+  /* playlists */
+  { NULL, ".pls .m3u .sfv .tox .asx .smil "                                        },
+  { "*.4xm", ".4xm "                                                               },
+  { "*.ac3", ".ac3 "                                                               },
+  { "*.aif, *.aiff,", ".aif .aiff "                                                },
+  {"*.asf, *.wmv, *.wma, *.wvx, *.wax", ".asf .wmv .wma .wvx .wax "                },
+  { "*.aud", ".aud "                                                               },
+  { "*.avi", ".avi "                                                               },
+  { "*.cin,", ".cin "                                                              },
+  { "*.cpk, *.cak, *.film,", ".cpk .cak .film "                                    },
+  { "*.dv, *.dif", ".dv .dif "                                                     },
+  { "*.fli, *.flc,", ".fli .flc "                                                  },
+  { "*.mp3, *.mp2, *.mpa, *.mpega", ".mp3 .mp2 .mpa .mpega "                       },
+  { "*.mjpg", ".mjpg "                                                             },
+  { "*.mov, *.qt, *.mp4,", ".mov .qt .mp4 "                                        },
+  { "*.mpg, *.mpeg", ".mpg .mpeg "                                                 },
+  { "*.mpv", ".mpv "                                                               },
+  { "*.mve, *.mv8", ".mve .mv8 "                                                   },
+  { "*.nsf", ".nsf "                                                               },
+  { "*.nsv", ".nsv "                                                               },
+  { "*.ogg, *.ogm, *.spx,", ".ogg .ogm .spx "                                      },
+  { "*.pes", ".pes "                                                               },
+  { "*.png, *.mng,", ".png .mng "                                                  },
+  { "*.pva", ".pva "                                                               },
+  { "*.ra", ".ra "                                                                 },
+  { "*.rm, *.ram", ".rm .ram "                                                     },
+  { "*.roq", ".roq "                                                               },
+  { "*.str, *.iki, *.ik2, *.dps, *.dat, *.xa1, *.xa2, *.xas, *.xap, *.xa,",
+    ".str .iki .ik2 .dps .dat .xa1 .xa2 .xas .xap .xa "                            },
+  { "*.snd, *.au", ".snd .au "                                                     },
+  { "*.ts, *.m2t, *.trp,", ".ts .m2t .trp "                                        },
+  { "*.vqa,", ".vqa "                                                              },
+  { "*.vob", ".vob "                                                               },
+  { "*.voc", ".voc "                                                               },
+  { "*.vox", ".vox "                                                               },
+  { "*.wav", ".wav "                                                               },
+  { "*.wve", ".wve "                                                               },
+  { "*.y4m", ".y4m "                                                               },
+  { NULL, NULL                                                                     }
 };
 
 typedef struct {
@@ -381,22 +405,21 @@ static void fb_create_input_window(char *title, char *text,
  * Return 1 if file match with current filter, otherwise 0.
  */
 static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
-  char  *filter_ends, *m, *ending;
-  
+
   if(!fb->filter_selected)
     return 1;
-  
-  xine_strdupa(filter_ends, __fb_filters[fb->filter_selected].ending);
-  if((ending = strrchr(file, '.')) != NULL) {
-    
-    while((m = xine_strsep(&filter_ends, ",")) != NULL) {
+  else {
+    char *ending;
+
+    if((ending = strrchr(file, '.'))) {
+      char ext[strlen(ending) + 2];
       
-      if(!strcasecmp((ending + 1), m))
+      sprintf(ext, "%s ", ending);
+      if(strstr(__fb_filters[fb->filter_selected].ending, ext))
 	return 1;
       
     }
   }
-  
   return 0;
 }
 
