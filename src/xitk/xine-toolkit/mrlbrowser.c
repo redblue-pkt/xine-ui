@@ -1127,6 +1127,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
     xclasshint->res_name  = mb->resource_name ? mb->resource_name : "xitk mrl browser";
     xclasshint->res_class = mb->resource_class ? mb->resource_class : "xitk";
     XSetClassHint(mb->imlibdata->x.disp, private_data->window, xclasshint);
+    XFree(xclasshint);
   }
   XUNLOCK(mb->imlibdata->x.disp);
   

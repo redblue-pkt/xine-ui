@@ -480,7 +480,7 @@ static void video_window_adapt_size (void) {
     if (gGui->video_window) {
       int dummy;
 
-      if ((!(gVw->fullscreen_mode & WINDOWED_MODE)) && gGui->visual == gVw->visual) {
+      if ((gVw->fullscreen_mode & FULLSCR_XI_MODE) && gGui->visual == gVw->visual) {
         if (gVw->visible_width != gVw->output_width || gVw->visible_height != gVw->output_height) {
           /*
            * resizing the video window may be necessary if the modeline or tv mode has
@@ -556,11 +556,6 @@ static void video_window_adapt_size (void) {
     XChangeProperty(gGui->display, gGui->video_window, prop, prop, 32,
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
-
-    if(!gGui->use_root_window)
-      XSetTransientForHint(gGui->display, gGui->video_window, None);
-
-    XRaiseWindow(gGui->display, gGui->video_window);
 
   } else
 #endif /* HAVE_XINERAMA */
@@ -822,7 +817,11 @@ static void video_window_adapt_size (void) {
       xitk_set_layer_above(gGui->video_window);
     }
     
-    if((!(gVw->fullscreen_mode & WINDOWED_MODE)) && wm_not_ewmh_only())
+    /* inform the window manager that we are fullscreen. This info musn't be set for xinerama-fullscreen,
+       otherwise there are 2 different window size for one fullscreen mode ! (kwin doesn't accept this) */
+    if( !(gVw->fullscreen_mode & WINDOWED_MODE)
+     && !(gVw->fullscreen_mode & FULLSCR_XI_MODE)
+     && wm_not_ewmh_only())
       xitk_set_ewmh_fullscreen(gGui->video_window);
     
   }

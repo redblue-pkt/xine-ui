@@ -269,6 +269,17 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
   return _argv;
 }
 
+static void free_command_line_args(char ***argv, int argc) {
+  int _argc = argc - 1;
+  
+  while(_argc >= 0) {
+    free((*argv)[_argc]);
+    _argc--;
+  }
+  
+  free(*(argv));
+}
+
 static int parse_geometry(window_attributes_t *window_attribute, char *geomstr) {
   int width, height, xoff, yoff, ret;  
   
@@ -1777,6 +1788,7 @@ int main(int argc, char *argv[]) {
 
     }
 
+    free_command_line_args(&_argv, _argc);
     return 0;
   }
 
@@ -1891,7 +1903,7 @@ int main(int argc, char *argv[]) {
    * xine init
    */
   xine_init(gGui->xine);
-  
+
   /* Get old working path from input plugin */
   {
     xine_cfg_entry_t  cfg_entry;
@@ -2081,8 +2093,10 @@ int main(int argc, char *argv[]) {
   pthread_mutex_destroy(&gGui->xe_mutex);
   pthread_mutex_destroy(&gGui->download_mutex);
 
-  if(gGui->report)
+  if(gGui->report != stdout)
     fclose(gGui->report);
+
+  free_command_line_args(&_argv, _argc);
 
   return 0;
 }

@@ -162,7 +162,6 @@ typedef struct client_info_s client_info_t;
 typedef struct passwds_s passwds_t;
 typedef void (*cmd_func_t)(commands_t *, client_info_t *);
 
-static pthread_t     thread_server;
 static passwds_t   **passwds = NULL;
 
 static void do_commands(commands_t *, client_info_t *);
@@ -2921,8 +2920,7 @@ static void *client_thread(void *data) {
   for(i = 0; i < 256; i++)
     SAFE_FREE(client_info->command.args[i]);
   
-  SAFE_FREE(client_info);
-
+  free(client_info);
   client_info = NULL;
 
   pthread_exit(NULL);
@@ -3003,10 +3001,13 @@ static void *server_thread(void *data) {
     
     if(client_info->socket < 0) {
       
+      free(client_info);
+      
       if(errno == EINTR)
 	continue;
       
       sock_err("accept: %s\n", strerror(errno));
+      continue;
     }
     
     close(msock);
@@ -3036,10 +3037,10 @@ static void *server_thread(void *data) {
  *
  */
 void start_remote_server(void) {
+  pthread_t thread;
 
-  if(gGui->network) {
-    pthread_create(&thread_server, NULL, server_thread, NULL);
-  }
+  if(gGui->network)
+    pthread_create(&thread, NULL, server_thread, NULL);
   
 }
 

@@ -1111,6 +1111,7 @@ void panel_init (void) {
     xclasshint->res_name = title;
     xclasshint->res_class = "xine";
     XSetClassHint(gGui->display, gGui->panel_window, xclasshint);
+    XFree(xclasshint);
   }
 
   wm_hint = XAllocWMHints();

@@ -1108,6 +1108,7 @@ void playlist_editor(void) {
     xclasshint->res_name = title;
     xclasshint->res_class = "xine";
     XSetClassHint(gGui->display, playlist->window, xclasshint);
+    XFree(xclasshint);
   }
 
   wm_hint = XAllocWMHints();

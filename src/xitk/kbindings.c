@@ -502,11 +502,11 @@ static void _kbindings_free_bindings(kbinding_t *kbt) {
     return;
 
   k = kbt->entry;
-  for(i = (kbt->num_entries - 1); i > 0; i--) {
+  for(i = (kbt->num_entries - 1); i >= 0; i--) {
     SAFE_FREE(k[i]->comment);
     SAFE_FREE(k[i]->action);
     SAFE_FREE(k[i]->key);
-    SAFE_FREE(k[i]);
+    free(k[i]);
   }
   SAFE_FREE(kbt);
 }
@@ -753,15 +753,17 @@ static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
  */
 static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
   int               brace_offset;
-  user_kbinding_t  *ukb;
+  user_kbinding_t   ukb;
   char              *p;
   
   ABORT_IF_NULL(kbt);
   ABORT_IF_NULL(kbdf);
 
   if((kbdf->ln != NULL) && (*kbdf->ln != '\0')) {
+    int found = 0;
     
-    ukb = (user_kbinding_t *) xine_xmalloc(sizeof(user_kbinding_t));
+    memset(&ukb, 0, sizeof(ukb));
+    found = 1;
   
     p = kbdf->ln;
     
@@ -769,9 +771,8 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
       *(kbdf->ln + brace_offset) = '\0';
       _kbindings_clean_eol(kbdf);
       
-
-      ukb->action   = strdup(kbdf->ln);
-      ukb->is_alias = 0;
+      ukb.action   = strdup(kbdf->ln);
+      ukb.is_alias = 0;
 
       while(_kbindings_end_section(kbdf) < 0) {
 	
@@ -780,35 +781,34 @@ static void _kbindings_parse_section(kbinding_t *kbt, kbinding_file_t *kbdf) {
 	if(kbdf->ln != NULL) {
 	  if(!strncasecmp(kbdf->ln, "modifier", 8)) {
 	    _kbindings_set_pos_to_value(&p);
-	    ukb->modifier = strdup(p);
+	    ukb.modifier = strdup(p);
 	  }
 	  if(!strncasecmp(kbdf->ln, "entry", 5)) {
 	    _kbindings_set_pos_to_value(&p);
-	    ukb->alias = strdup(p);
+	    ukb.alias = strdup(p);
 	  }
 	  else if(!strncasecmp(kbdf->ln, "key", 3)) {
 	    _kbindings_set_pos_to_value(&p);
-	    ukb->key = strdup(p);
+	    ukb.key = strdup(p);
 	  }	  
 	}
 	else
 	  break;
       }
 
-      if(ukb && ukb->alias && ukb->action && ukb->key) {
-	_kbindings_add_entry(kbt, ukb);
+      if(found && ukb.alias && ukb.action && ukb.key) {
+	_kbindings_add_entry(kbt, &ukb);
       }
-      else if(ukb && ukb->action && ukb->key) {
-	_kbindings_replace_entry(kbt, ukb);
+      else if(found && ukb.action && ukb.key) {
+	_kbindings_replace_entry(kbt, &ukb);
       }
-
+      
     }
 
-    SAFE_FREE(ukb->alias);
-    SAFE_FREE(ukb->action);
-    SAFE_FREE(ukb->key);
-    SAFE_FREE(ukb->modifier);
-    SAFE_FREE(ukb);
+    SAFE_FREE(ukb.alias);
+    SAFE_FREE(ukb.action);
+    SAFE_FREE(ukb.key);
+    SAFE_FREE(ukb.modifier);
   }
 }
 
@@ -960,7 +960,7 @@ static kbinding_t *_kbindings_init_to_default(void) {
     kbt->entry[i]->key = strdup(default_binding_table[i].key);
     kbt->entry[i]->modifier = default_binding_table[i].modifier;
   }
-  kbt->entry[i] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
+  kbt->entry[i] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_entry_t));
   kbt->entry[i]->comment = NULL;
   kbt->entry[i]->action = NULL;
   kbt->entry[i]->action_id = 0;

@@ -618,6 +618,8 @@ void control_panel(void) {
     xclasshint->res_name = title;
     xclasshint->res_class = "xine";
     XSetClassHint(gGui->display, control->window, xclasshint);
+    XFree(xclasshint);
+    
   }
 
   wm_hint = XAllocWMHints();
