@@ -2414,7 +2414,8 @@ static void network_messenger(void *data, char *message) {
 }
 
 static void do_snap(commands_t *cmd, client_info_t *client_info) {
-  create_snapshot(network_messenger, network_messenger, (void *)client_info->socket);
+  create_snapshot(gGui->mmk.mrl, 
+		  network_messenger, network_messenger, (void *)client_info->socket);
 }
 
 /*

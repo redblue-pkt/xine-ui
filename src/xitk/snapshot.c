@@ -55,10 +55,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
+
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
 
 #ifdef HAVE_PNG_H
 #include <png.h>
@@ -161,35 +167,6 @@ static void yuy2toyv12( struct prvt_image_s *image )
  *   With thanks to the xawtv project
  *   from where it was pinched.
  */
-
-char* snap_filename(char *base, char *ext)
-{
-    static time_t last = 0;
-    static int count = 0;
-    static char *filename = NULL;
-    
-    time_t now;
-    struct tm* tm;
-    char timestamp[32];
-    
-    time(&now);
-    tm = localtime(&now);
-    
-    if (last != now)
-	count = 0;
-    last = now;
-    count++;
-    
-    if (filename != NULL)
-	free(filename);	
-
-    filename = (char *) xine_xmalloc(strlen(base) + strlen(ext) + 32);
-    
-    strftime(timestamp,31,"%Y%m%d-%H%M%S",tm);
-    sprintf(filename,"%s-%s-%d.%s",
-	    base,timestamp,count,ext);
-    return filename;
-}
 
 /*
  * Scale line with no horizontal scaling. For NTSC mpeg2 dvd input in
@@ -693,10 +670,36 @@ static void rgb_free( struct prvt_image_s *image )
  *  Handler functions for image structure
  */
 
+static char *snap_build_filename(const char *mrl) {
+  static char   buffer[XITK_NAME_MAX + XITK_PATH_MAX + 1];
+  char          basename[XITK_NAME_MAX + 1] = "xine_snapshot";
+  char         *p = strrchr(mrl, '/');
+  struct stat   sstat;
+  int           i;
+
+  if(p && (strlen(p) > 1)) {
+    char *ext;
+    
+    p++;
+    
+    sprintf(basename, "%s", p);
+    
+    if((ext = strrchr(basename, '.')) != NULL)
+      *ext = '\0';
+    
+  }
+
+  for(i = 1;; i++) {
+    sprintf(buffer, "%s/%s-%d.png", gGui->snapshot_location, basename, i);
+    if(((stat(buffer, &sstat)) == -1) && (errno == ENOENT))
+      break;
+  }
+  
+  return &buffer[0];
+}
+
 static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
 {
-  char *filename;
-  
   *image = (struct prvt_image_s*) xine_xmalloc( sizeof( struct prvt_image_s ) );
   
   if (*image == NULL) 
@@ -707,11 +710,6 @@ static int prvt_image_alloc( struct prvt_image_s **image, int imgsize )
     free(*image);
     return 0;
   }
-  
-  filename = (char *) alloca(strlen(gGui->snapshot_location) + 10);
-  sprintf(filename, "%s/%s", gGui->snapshot_location, "xinesnap");
-  
-  (*image)->file_name = snap_filename( filename, "png" );
   
   return( 1 );
 }
@@ -851,7 +849,7 @@ static void write_row_callback( png_structp png_ptr, png_uint_32 row, int pass)
  *  External function
  */
 
-void create_snapshot (snapshot_messenger_t error_mcb,
+void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 		      snapshot_messenger_t info_mcb, void *mcb_data)
 {
   int err = 0;
@@ -988,6 +986,8 @@ void create_snapshot (snapshot_messenger_t error_mcb,
 
   /**/
 
+  image->file_name = snap_build_filename(mrl);
+  
   if ( (image->fp = fopen(image->file_name, "wb")) == NULL ) {
     
     if(error_msg_cb) {

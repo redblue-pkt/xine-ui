@@ -675,7 +675,7 @@ static void panel_snapshot_info(void *data, char *message) {
   xine_info(message);
 }
 void panel_snapshot(xitk_widget_t *w, void *data) {
-  create_snapshot(panel_snapshot_error, panel_snapshot_info, NULL);
+  create_snapshot(gGui->mmk.mrl, panel_snapshot_error, panel_snapshot_info, NULL);
 }
 
 /*
