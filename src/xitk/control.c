@@ -325,7 +325,8 @@ void control_handle_event(XEvent *event, void *data) {
 void control_change_skins(void) {
   XEvent        xev;
   ImlibImage   *new_img, *old_img;
- 
+  XSizeHints    hint;
+
   if(control_is_running()) {
     
     xitk_skin_lock(gGui->skin_config);
@@ -339,6 +340,11 @@ void control_change_skins(void) {
       xine_error(_("%s(): couldn't find image for background\n"), __FUNCTION__);
       exit(-1);
     }
+    
+    hint.width  = new_img->rgb_width;
+    hint.height = new_img->rgb_height;
+    hint.flags  = PSize;
+    XSetWMNormalHints(gGui->display, control->window, &hint);
     
     XResizeWindow (gGui->display, control->window,
 		   (unsigned int)new_img->rgb_width,

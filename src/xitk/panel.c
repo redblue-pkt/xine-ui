@@ -121,6 +121,7 @@ static void panel_store_new_position(int x, int y, int w, int h) {
 void panel_change_skins(void) {
   XEvent        xev;
   ImlibImage   *new_img, *old_img;
+  XSizeHints    hint;
   
   xitk_skin_lock(gGui->skin_config);
 
@@ -134,6 +135,11 @@ void panel_change_skins(void) {
     xine_error("%s(): couldn't find image for background\n", __FUNCTION__);
     exit(-1);
   }
+  
+  hint.width  = new_img->rgb_width;
+  hint.height = new_img->rgb_height;
+  hint.flags  = PSize;
+  XSetWMNormalHints(gGui->display, gGui->panel_window, &hint);
   
   XResizeWindow (gGui->display, gGui->panel_window,
 		 (unsigned int)new_img->rgb_width,

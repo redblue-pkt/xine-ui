@@ -596,6 +596,7 @@ static void pl_add_input(xitk_widget_t *w, void *data, char *filename) {
 void playlist_change_skins(void) {
   XEvent        xev;
   ImlibImage   *new_img, *old_img;
+  XSizeHints    hint;
 
   if(pl_is_running()) {
     
@@ -611,6 +612,11 @@ void playlist_change_skins(void) {
       exit(-1);
     }
     
+    hint.width  = new_img->rgb_width;
+    hint.height = new_img->rgb_height;
+    hint.flags  = PSize;
+    XSetWMNormalHints(gGui->display, playlist->window, &hint);
+
     XResizeWindow (gGui->display, playlist->window,
 		   (unsigned int)new_img->rgb_width,
 		   (unsigned int)new_img->rgb_height);

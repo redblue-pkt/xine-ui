@@ -493,7 +493,8 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
   XEvent                     xev;
   ImlibImage                *new_img, *old_img;
   mrlbrowser_private_data_t *private_data;
-  
+  XSizeHints                 hint;
+
   if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
@@ -502,13 +503,18 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     XLOCK(private_data->imlibdata->x.disp);
     
     XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
-
+    
     if(!(new_img = Imlib_load_image(private_data->imlibdata,
 				    xitk_skin_get_skin_filename(skonfig, 
 							private_data->skin_element_name)))) {
       XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
     }
     
+    hint.width  = new_img->rgb_width;
+    hint.height = new_img->rgb_height;
+    hint.flags  = PSize;
+    XSetWMNormalHints(private_data->imlibdata->x.disp, private_data->window, &hint);
+
     XResizeWindow (private_data->imlibdata->x.disp, private_data->window,
 		   (unsigned int)new_img->rgb_width,
 		   (unsigned int)new_img->rgb_height);
