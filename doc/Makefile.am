@@ -7,7 +7,7 @@ docdir = ${prefix}/share/doc/xine-ui
 docs_DOCS = FAQ FAQ_es FAQ_fr FAQ_it FAQ_pl \
 	README README.corba README.dxr3 README.freebsd README.irix README.mrl \
 	README.solaris README.syncfb README.xinerc README_es README_pl \
-	bug_report_form
+	bug_report_form README.divx4
 
 check:
 	@documentations='$(docs_DOCS)'; \

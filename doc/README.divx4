@@ -1,0 +1,77 @@
+XINE and the divx4 decoder plugin
+=================================
+
+0: History of this readme
+
+oct 9 2001: inital version
+
+1. Requirements and overview
+
+You'll need the decore library of the divx project. Currently, there are two
+implementations (I'm not talking about projects that provide divx4 decoding
+support like ffmpeg):
+
+- opendivx, open source (but not GPL, so it probably won't be included
+in the xine sources), available at http://www.projectmayo.com.
+There is an alternative (but based on opendivx) project at 
+http://www.videocoding.de and mplayer (http://www.mplayerhq.hu) includes 
+another tweaked opendivx version.
+
+- divx4, commercial version of opendivx, binary package available for x86 
+linux at http://www.divx.com or http://avifile.sourceforge.net
+
+OpenDivx development seems not very active these days. I couldn't get
+the one from projectmayo to work at all (divxcore nor divx4linux).
+The one from videocoding did work but has some issues, most notably
+that it only worked if compiled with the -g flag, not -O2. 
+
+The binary divx4 package is much more solid, but not open. However,
+since it has postprocessing to remove some mpeg4 artefacts and is
+supposedly more optimised, it is, at least for i386 linux users and 
+barring free software principles, preferred over the ffmpeg decoder.  
+
+2. .xinerc 
+
+There are a number of settings that can be configured in .xinerc.
+If you're using the binary divx4 package in a standard library
+location, you'll probably only be interested in the priority and 
+postproc settings. Adventurous souls with OpenDivx should carefully 
+read all descriptions ;-)
+
+- divx4_libdivxdecore (string, default "libdivxdecore.so")
+
+The decore library that the plugin attempts to open. Use a relative
+filename, like the default, to search in the library path, or an
+absolute one for a specific file. If the library is not found, the
+divx4 plugin will disable itself, so that ffmpeg can take over.
+
+- divx4_priority (int, default 6)
+
+The priority of the divx4 plugin. By default, higher than the ffmpeg
+priority. 
+
+- divx4_postproc (int, default 3)
+
+The postprocessing level, 0 = none and fast, 6 = all and slow. You
+might want to set this to 0 if you're having problems with opendivx.
+Also, lower this to reduce the cpu load if you're getting dropped
+frames.
+
+- divx4_decoreformat (int, default 1)
+
+If 0, the decore function writes straight into the frame's yuv data
+buffer, if 1 the decore function returns pointers to it's internal
+buffers and we copy it to the frame ourselves. 0 may be faster, 1 is
+certainly safer. You probably need 1 for OpenDivx (this may be due to a 
+API difference between divx4 and OpenDivx regarding the layout of the 
+YV12 buffer). Use 0 if you want to see if it speeds things up.
+
+- divx4_msmpeg4 (int, default 1)
+
+Determines wether this plugin should say it can decode msmpeg4v3 or
+not. The binary divx4 package can, opendivx cannot and it's difficult
+to tell which is which. Set to 1 for divx4, 0 for opendivx. If you're
+getting a lot of DEC_EXIT messages, chances are you're trying to
+decode a msmpeg4v3 avi with OpenDivx.
+
+
