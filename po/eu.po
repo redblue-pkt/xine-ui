@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: xine-ui-eu\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-03-02 22:46+0100\n"
-"PO-Revision-Date: 2005-02-07 17:46+0100\n"
+"PO-Revision-Date: 2005-02-15 23:19+0100\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
 "MIME-Version: 1.0\n"
@@ -65,7 +65,7 @@ msgstr ""
 
 #: src/xitk/actions.c:413
 msgid "Start Playback ?"
-msgstr "Erreproduzitzen hasi?"
+msgstr "Erreproduzitzen hasi ?"
 
 #: src/xitk/actions.c:706
 msgid "No MRL (input stream) specified"
@@ -358,14 +358,14 @@ msgid ""
 "\n"
 "http://xinehq.de/index.php/faq#SPEEDUP"
 msgstr ""
-"Alda batetara utzitako trama kopurua oso handia da, zure sistema oso geldoa "
+"Alda batetara utzitako marko kopurua oso handia da, zure sistema oso geldoa "
 "da, ez dago behar bezala konfiguraturik edo karga handiegia du.\n"
 "\n"
 "http://xinehq.de/index.php/faq#SPEEDUP"
 
 #: src/xitk/errors.c:337
 msgid "Warn user when too much frames are dropped."
-msgstr "Abisatu erabiltzailea trama gehiegi alde batetara uztean."
+msgstr "Abisatu erabiltzailea marko gehiegi alde batetara uztean."
 
 #: src/xitk/errors.c:352
 msgid "Learn More..."
@@ -396,7 +396,7 @@ msgstr "A/V desplazamendua: %s"
 
 #: src/xitk/event.c:675
 msgid "A/V Offset: reset."
-msgstr "A/V desplazamendua: berrezarri"
+msgstr "A/V desplazamendua: berrezarri."
 
 #: src/xitk/event.c:684 src/xitk/event.c:694
 #, c-format
@@ -680,7 +680,7 @@ msgstr "Gaituta badago, xine-k bere splash pantaila bistaratuko du"
 
 #: src/xitk/event.c:1514
 msgid "Audio mixer control method"
-msgstr "Audio nahale kontrol metodoa"
+msgstr "Audio nahase kontrol metodoa"
 
 #: src/xitk/event.c:1515
 msgid "Which method used to control audio volume."
@@ -816,7 +816,7 @@ msgstr "Benetan fitxategi hau ezabatu nahi duzula: '%s'"
 
 #: src/xitk/file_browser.c:1012
 msgid "Confirm deletion ?"
-msgstr "Ezabatzea berretsi nahi duzu?"
+msgstr "Ezabatzea berretsi nahi duzu ?"
 
 #: src/xitk/file_browser.c:1031
 #, c-format
@@ -879,7 +879,7 @@ msgstr "Laguntza"
 
 #: src/xitk/help.c:383
 msgid "No Help Section Available"
-msgstr "Ez dago azalpenik erabilgarri."
+msgstr "Ez dago azalpenik erabilgarri"
 
 #: src/xitk/kbindings.c:579
 msgid "and"
@@ -1066,7 +1066,7 @@ msgstr "   -Audio irteera:\n"
 
 #: src/xitk/main.c:499
 msgid "   -Video output:\n"
-msgstr "    -bideo-irteera:\n"
+msgstr "-Bideo irteera:\n"
 
 #: src/xitk/main.c:500
 msgid "   -Demuxer:\n"
@@ -1156,7 +1156,7 @@ msgstr "  -u, --spu-channel <#>        Hautatu '#' SPU (azpititulua) kanala.\n"
 #: src/xitk/main.c:612
 #, c-format
 msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
-msgstr "  -a, --audio-channel <#>        Hautatu '#' audio-kanala.\n"
+msgstr "-a, --audio-channel <#> Hautatu '#' audio-kanala.\n"
 
 #: src/xitk/main.c:613
 #, c-format
@@ -1216,7 +1216,7 @@ msgstr "  -g, --hide-gui               ezkutatu GUI (panela, etab.)\n"
 #: src/xitk/main.c:629
 #, c-format
 msgid "  -I, --no-gui                 disable GUI\n"
-msgstr "  -I, --no-gui                  GUI ezgaitu\n"
+msgstr "-I, --no-gui GUI ezgaitu\n"
 
 #: src/xitk/main.c:630
 #, c-format
@@ -1350,8 +1350,7 @@ msgstr "      --skin-server-url <url>  Definitu azal-zerbitzariaren url-a.\n"
 msgid ""
 "      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
 msgstr ""
-"      --enqueue <mrl>          Gehitu martxan dagoen saio baten mrl-a ilaran"
-"(0 saioa)\n"
+"--enqueue <mrl> ...Gehitu martxan dagoen saio baten mrl-a ilaran (0 saioa)\n"
 
 #: src/xitk/main.c:658
 #, c-format
@@ -1386,39 +1385,30 @@ msgid ""
 "                    play, slow2, slow4, pause, fast2,\n"
 "                    fast4, stop, quit, fullscreen, eject.\n"
 msgstr ""
-"  -S, --session <1aukera,2aukera,...>\n"
-"                               Saio kudeatzaileak. Aukerak:\n"
-"                    session=n   ezarri <n> saio zenbakia,\n"
-"                    mrl=m       gehitu <m> mrl erreprodukzioa zerrendara,\n"
-"                    audio=c     aukeratu audio kanala (<c>: 'next' edo "
-"'prev'),\n"
-"                    spu=c       aukeratu spu kanala (<c>: 'next' edo "
-"'prev'),\n"
-"                    volume=v    ezarri audio bolumena,\n"
-"                    anp=v       anplifikazio maila ezarri,\n"
-"                    loop=m      errepikatze modua ezarri (<m>: 'none' 'loop' "
-"'repeat' 'shuffle' edo 'shuffle+'),\n"
-"                    get_speed   abiadura balioa eskuratu (begiratu manual "
-"orria itzuklitako balioa ulertzeko)\n"
-"                    (playlist|pl)=p\n"
-"                                 <p> aukerak:\n"
-"                                   'clear'  zerrenda garbitu,\n"
-"                                   'first'  Zerrendako lehen sarrera play "
-"first entry in the erreproduzitu,\n"
-"                                   'prev'   Zerrendako aurreko sarrera "
-"erreproduzitu,\n"
-"                                   'next'   Zerrendako hurrengo sarrera "
-"erreproduzitu,\n"
-"                                   'last'   Zerrendako azken sarrera "
-"erreproduzitu,\n"
-"                                   'load:s' <s> fitxategiko zerrenda "
-"kargatu,\n"
-"                                   'stop'   erreprodukzioa utzi unekoa "
-"amaizterakoan.\n"
-"                                   'cont'   jarraitu erreprodukzioa zerrenda "
-"amaiatu arte.\n"
-"                    play, slow2, slow4, pause, fast2,\n"
-"                    fast4, stop, quit, fullscreen, eject.\n"
+"-S, --session <1aukera,2aukera,...>\n"
+"Saio kudeatzaileak. Aukerak:\n"
+"session=n   ezarri <n> saio zenbakia,\n"
+"mrl=m gehitu <m> mrl erreprodukzioa zerrendara,\n"
+"audio=c aukeratu audio kanala (<c>: 'next' edo 'prev'),\n"
+"spu=c aukeratu spu kanala (<c>: 'next' edo 'prev'),\n"
+"volume=v ezarri audio bolumena,\n"
+"anp=v anplifikazio maila ezarri,\n"
+"loop=m errepikatze modua ezarri (<m>: 'none' 'loop' 'repeat' 'shuffle' edo "
+"'shuffle+'),\n"
+"get_speed abiadura balioa eskuratu (begiratu manual orria itzuklitako balioa "
+"ulertzeko)\n"
+"(playlist|pl)=p\n"
+"<p> aukerak:\n"
+"'clear'  zerrenda garbitu,\n"
+"'first'  Zerrendako lehen sarrera erreproduzitu,\n"
+"'prev' Zerrendako aurreko sarrera erreproduzitu,\n"
+"'next' Zerrendako hurrengo sarrera erreproduzitu,\n"
+"'last' Zerrendako azken sarrera erreproduzitu,\n"
+"'load:s' <s> fitxategiko zerrenda kargatu,\n"
+"'stop' erreprodukzioa utzi unekoa amaizterakoan.\n"
+"'cont' jarraitu erreprodukzioa zerrenda amaiatu arte.\n"
+"play, slow2, slow4, pause, fast2,\n"
+"fast4, stop, quit, fullscreen, eject.\n"
 
 #: src/xitk/main.c:680
 #, c-format
@@ -1516,10 +1506,10 @@ msgid ""
 "                    audio_out, video_out, demux, input, sub, post,\n"
 "                    audio_decoder, video_decoder.\n"
 msgstr ""
-"      --list-plugins [=mota]   Plugin erabilgarrien zerrenda bistarazi\n"
-"                               Aukerako <mota>:\n"
-"                    audio_out, video_out, demux, input, sub, post,\n"
-"                    audio_decoder, video_decoder.\n"
+"--list-plugins [=mota]   Plugin erabilgarrien zerrenda bistarazi\n"
+"Aukerako <mota>:\n"
+"audio_out, video_out, demux, input, sub, post,\n"
+"audio_decoder, video_decoder.\n"
 
 #: src/xitk/main.c:713
 #, c-format
@@ -1551,13 +1541,13 @@ msgid ""
 "  VCD:   'vcd://<track number>'\n"
 msgstr ""
 "Baliozko MRL (Media Resource Locator) adibideak:\n"
-"  Fitxategia:  'path/ffo.vob'\n"
-"         '/path/foo.vob'\n"
-"         'file://path/foo.vob'\n"
-"         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
-"         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
-"  DVD:   'dvd://VTS_01_2.VOB'\n"
-"  VCD:   'vcd://<Kanta zenbakia>'\n"
+"Fitxategia:  'path/ffo.vob'\n"
+"'/path/foo.vob'\n"
+"'file://path/foo.vob'\n"
+"'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
+"'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
+"DVD: 'dvd://VTS_01_2.VOB'\n"
+"VCD: 'vcd://<Kanta zenbakia>'\n"
 
 #: src/xitk/main.c:781 src/xitk/main.c:897
 msgid "video driver to use"
@@ -1785,7 +1775,7 @@ msgstr "Azpitituluen fitxategia"
 
 #: src/xitk/main.c:1930
 msgid "Automatically load subtitles if they exist."
-msgstr "Berritu automatikoki erreprodukzio-zerrenda zaharra"
+msgstr "Kargatu automatikoki erreprodukzio zerrenda zaharra balego."
 
 #: src/xitk/main.c:1938
 msgid "Enable deinterlacing by default"
@@ -1864,7 +1854,7 @@ msgstr "Mediamark-en hasiera-ordua (segundoak)."
 
 #: src/xitk/mediamark.c:3366
 msgid "End at"
-msgstr "Bukatu hemen:\t"
+msgstr "Bukatu hemen:"
 
 #: src/xitk/mediamark.c:3381
 msgid "Mediamark end time (secs)."
@@ -2148,7 +2138,7 @@ msgstr "Ezarpenak/bideoa..."
 
 #: src/xitk/menus.c:719
 msgid "Settings/TV Analog..."
-msgstr "Ezarpenak/Telebista Analogikoa"
+msgstr "Ezarpenak/Telebista Analogikoa..."
 
 #: src/xitk/menus.c:727
 msgid "Help..."
@@ -2507,7 +2497,7 @@ msgstr "POST_PARAM_TYPE_STRINGLIST parametro-mota oraindik ez da onartzen.\n"
 
 #: src/xitk/post.c:602
 msgid "No description available"
-msgstr "Ez dago azalpenik erabilgarri."
+msgstr "Ez dago azalpenik erabilgarri"
 
 #: src/xitk/post.c:772
 msgid "No Filter"
@@ -2535,7 +2525,7 @@ msgstr "Gaitu"
 
 #: src/xitk/post.c:2096
 msgid "Deinterlace plugin."
-msgstr "Gurutzelarkatuak bereizi: %d"
+msgstr ""
 
 #: src/xitk/post.c:2097
 msgid ""
@@ -2543,7 +2533,7 @@ msgid ""
 "separator is ';')."
 msgstr ""
 "Elkar-ezloturikoa erabiltzean erabiliko den plugin (eta aukerako "
-"parametroak)."
+"parametroak). Plugin bereizlea ';' da)."
 
 #: src/xitk/session.c:818
 #, c-format
@@ -2588,7 +2578,7 @@ msgstr "Ados"
 #: src/xitk/skins.c:282 src/xitk/skins.c:478
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
-msgstr "Ezin izan da %s/%s kargatu. Kargatu %s segurtasun-azala\n"
+msgstr "Ezin izan da %s/%s kargatu. Kargatu %s segurtasun azala\n"
 
 #: src/xitk/skins.c:288
 #, c-format
@@ -2868,7 +2858,7 @@ msgstr "nvtv Telebista irteera sistema"
 
 #: src/xitk/tvout.c:94
 msgid "Select which TV output system supported by your TV."
-msgstr "Aukeratu zein Telebista irteera onartzen duen zure Telebistak"
+msgstr "Aukeratu zein Telebista irteera onartzen duen zure Telebistak."
 
 #: src/xitk/tvout.c:101
 msgid "Enable XRandr extension"
@@ -3039,7 +3029,7 @@ msgstr ""
 
 #: src/xitk/viewlog.c:261
 msgid "log info"
-msgstr "erregistro informazioa "
+msgstr "erregistro informazioa"
 
 #: src/xitk/viewlog.c:263
 #, c-format
