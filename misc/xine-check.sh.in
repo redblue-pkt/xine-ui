@@ -1,0 +1,919 @@
+#! /bin/sh
+#
+# xine-check - some simple diagnostics for running xine
+#
+# Copyright (c) 2002 Siggi Langauf
+# This file is free software. You may do with it whatever you want, but
+# if you give away any copies (modified or unmodified), you must include
+# the Authors' names. This comes with no warranty, use at your own risk!
+#
+# Authors: Siggi Langauf <siggi at users dot sf dot net> (main hacking)
+#          Toby J Coleridge <toby at 4mationnet dot com> (excessive testing)
+#          Colin Marquardt <colin at marquardt-home dot de> (DMA message)
+
+VERSION=0.9.8
+
+COMMON_PLACES=/:/usr:/usr/local:/usr/local/xine:/usr/xine:/opt:/opt/xine:/usr/X11:/usr/X11R6
+logfile=""
+bugreport=/tmp/xine-bugreport
+verbose=false
+quiet=false
+batch=false
+#batch=true
+runmode=interactive
+do_log=false
+messagefile=/tmp/xck.$$.xine-check.en
+#messagefile=/tmp/xine-check.en
+indent="         "
+DUMPVARS="" #this holds the variables to dump into bugreports, use vars()!
+
+
+## auto-insert-language-files-here ##
+
+case "$0" in
+  *-bugreport)
+    runmode=bugreport
+    ;;
+esac
+
+
+clean_exit() {
+    test -f "$messagefile" && rm "$messagefile"
+    test -f "$tmpfile" && rm "$tmpfile"
+    exit "$@"
+}
+ 
+search() {
+  test="-f"
+  case "$1" in
+    -?)
+       test="$1"
+       shift
+	;;
+  esac
+  target="$1"
+  path="$2"
+  test -z "$path" && path=$COMMON_PLACES
+  found=""
+  for dir in `echo "$path"|sed -e 's/:/ /g'`; do
+    if test $test "$dir/$target"; then
+	if [ -z "$found" ]; then
+	  found="$dir/$target"
+	else
+	  found="$found
+$dir/$target"
+	fi
+    fi
+  done
+  test -n "$found"
+}
+
+log() {
+  [ -n "$logfile" ] && echo "$@" >>$logfile
+}
+
+add() {
+  [ -n "$bugreport" ] && echo "$@" >>$bugreport
+}
+
+
+resolve_symlink() {
+    target="$1"
+    while test -L "$target"; do
+	local dir=`dirname $target`
+	target=`ls -l $target | sed -e 's/^.*-> //'`
+	if echo $target|grep -v ^/ >/dev/null 2>&1; then 
+	  target="$dir/$target"
+	fi
+    done
+    echo "$target"
+}
+
+check_perm(){
+    if [ "$#" -ne 2 ]; then
+      echo "internal error: invalid check_perm parameter count" >&2
+    fi
+    result=true
+    case "$1" in
+	*r*)
+	    test -r "$2" || result=false
+	    ;;
+    esac
+    case "$1" in
+	*w*)
+	    test -w "$2" || result=false
+	    ;;
+    esac
+    case "$1" in
+	*x*)
+	    test -x "$2" || result=false
+	    ;;
+    esac;
+    $result
+}
+
+
+# prompt/wait for <enter>
+confirm() {
+   echo "${indent}press <enter> to continue..."
+   read foo;
+}
+
+
+# get (possibly localized) message descriptions for message id
+# usage: getmessage <id>
+# where <id> is the message id
+# this function will set
+# $short       = short (<70 char> message>
+# $description = verbose description of the issue, including any instructions
+getmessage(){
+    id="$1"
+    headline=false
+    found=false
+    short=
+    description=
+    tmpfile=/tmp/xine-check-dsc.$$
+    true >$tmpfile
+    cat $messagefile | while read line; do
+	if $found; then
+	  if test -n "$line"; then
+	    eval "echo \"$indent$line\" >>$tmpfile"
+	  else
+	    found=false #end of description
+	fi
+	else
+	  if $headline; then
+	    set -- $line
+	    if [ "$1" = "$id" ]; then
+		found=true;
+		shift
+		eval "echo \"$*\" >>$tmpfile"
+		$do_log && log "$status $id"
+	    fi
+	    else
+	    if [ x"$line" = x ]; then
+		headline=true
+	    else
+		headline=false
+	    fi
+	  fi
+	fi
+    done
+    short=`head -1 <$tmpfile`
+    description="`tail +2 <$tmpfile`"
+    rm $tmpfile
+    if test -z "$short"; then
+      echo "internal error: no message for $id" >&2
+    fi
+}
+
+
+
+# give a standard message to the user
+# usage: msg <id> [<status>]
+# where <id> is the name of the message
+# and <status> is one of
+# 0 - okay, everything's fine
+# 1 - hint for possible problem
+# 2 - ouch! something's really wrong
+# if <status> is not given, use the return code from previous command
+msg(){
+    status=$?
+    id="$1"
+    shift
+    if [ "$#" -eq 1 ]; then
+      status="$1"
+      shift
+    fi
+    if [ "$#" -ne 0 ]; then
+	echo "internal error: msg with illegal parms">&2
+	clean_exit 1
+    fi
+    getmessage "$id"
+    case "$status" in
+	0)
+	    echo "[ good ] $short"
+	    if $verbose; then
+	      echo "$description"
+	    fi
+	    ;;
+	1)
+	    echo "[ hint ] $short"
+	    if $quiet; then
+	      echo "         type '$0 explain $id' for more"
+	    else
+	      echo "$description"
+	      $batch || confirm
+	    fi
+	    ;;
+	2)
+	    echo "[OUCH!!] $short"
+	    if $quiet; then
+	      echo "         type '$0 explain $id' for more"
+	    else
+	      echo "$description"
+	      $batch || confirm
+	    fi
+	    ;;
+	ex)
+	    echo "message $id:"
+ 	    echo "* $short"
+	    echo "$description"
+	    ;;
+	-)
+	    oldindent="$indent"
+	    indent=""
+	    echo "$description"
+	    indent="$oldindent"
+	    ;;
+	*)
+	    echo "internal error: unknown status ($status)" >&2
+	    clean_exit 1
+	    ;;
+    esac
+    
+}
+
+vars(){ #add to the list of variables to dump
+  DUMPVARS="$DUMPVARS $*"
+}
+
+
+menu(){
+  n=0
+  answertext=""
+  while [ "$answertext" = "" ]; do
+    for i in "$@"; do
+	n=`expr $n + 1`
+	echo "${n}) $i"
+    done
+    echo -n "please select (1..${n}): " #FIXME: anybody need echo "...\c" here?
+    read answer
+    n=0
+    for i in "$@"; do
+	n=`expr $n + 1`
+	if [ $n -eq "$answer" ]; then
+	  answertext="$i"
+	  answer=$n #the pure number, strip all junk
+	fi
+    done
+    [ "$answertext" = "" ] && echo 'please enter a number between 1 and '$n'!'
+  done
+}
+
+yesno() {
+  echo "$* (y/n)?"
+  read answer
+  case "$answer" in
+    y*)
+	true;;
+    n*)
+	false;;
+    *)
+	echo "'pardon?? neither yes nor no? assuming no..."
+ 	false;;
+  esac
+}
+
+ask() {
+  echo "$@"
+  read answer
+}
+
+
+# command line
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -q|--quiet)
+      quiet=true
+      shift
+      ;;
+    -v|--verbose)
+      verbose=true
+      shift
+      ;;
+    -B|--batch)
+      batch=true
+      shift
+      ;;
+    -b|--bug|--bugreport)
+      runmode=bugreport
+      shift
+      ;;
+    explain|-e)
+      indent=
+      msg "$2" ex
+      clean_exit 0
+      ;;
+    *)
+	cat <<EOF
+xine-check version $VERSION
+
+This script will check your system, to see if it is ready for playing
+video with xine.
+
+usage: $0 [options] 
+
+options may be one of these:
+-q  --quiet    only give one-line messages, even for found problems
+-v  --verbose  describe each check in detail (produces kind of FAQ)
+-B  --batch    do not wait for confirmation after long messages
+-b  --bug      produce a terse description, (NOT YET IMPLEMENTED)
+EOF
+	clean_exit 0
+	;;
+  esac
+done
+
+
+if [ "$runmode" = "bugreport" ]; then
+  do_log=true
+  logfile=/tmp/xine-check.log
+  echo logging to ${logfile}...
+  echo >$logfile
+fi
+
+
+
+## actual checks start here:
+
+if [ `id -u` -eq 0 ]; then
+  msg root 2
+fi
+
+# operating system dependant checks
+
+UNAME=`uname -a`
+OS=`uname -s`
+ARCH=`uname -m||arch`
+
+DISTRO=unknown
+test -f /etc/debian_version && DISTRO=Debian
+test -f /etc/redhat-release && DISTRO=RedHat
+
+vars UNAME OS ARCH DISTRO
+
+case "$OS" in
+  Linux)
+    [ "$DISTRO" = "unknown" ] && DISTRO="unknown_Linux"
+    msg using-linux 0
+    if test -f /proc/version; then
+      msg have-procfs 0
+      KERNEL_VERSION=`awk '{print $3}' </proc/version`
+      KERNEL_SUBMINOR=`echo $KERNEL_VERSION | sed -e 's/^.\..\.//' -e 's/[^0-9].*$//'`
+      case "$KERNEL_VERSION" in
+        1.*)
+	  msg kernel-1.x 2
+	  ;;
+        2.2.*)
+	  if [ "$KERNEL_SUBMINOR" -lt 17 ]; then
+	    msg kernel-2.2.old 1
+	  else
+	    msg kernel-2.2.new 0
+	  fi
+	  ;;
+	2.4.*|2.5.*)
+	  if [ "$KERNEL_SUBMINOR" -gt 10 -a "$KERNEL_SUBMINOR" -lt 16 ]; then
+	    msg kernel-2.4.bad 1
+	  else
+	    msg kernel-2.4.good 0
+	  fi
+	  ;;
+	2.*)
+	  msg kernel-pre-2.2 1
+	  ;;
+	*)
+	  msg kernel-unknown 1
+	  ;;
+      esac
+
+      vars KERNEL_VERSION
+
+      # MTRR support
+      case "$ARCH" in
+        i?86|k6|k7|athlon)
+	  msg arch-i386-mtrr
+	  if test -f /proc/mtrr; then
+	    if [ `wc -l </proc/mtrr` -lt 2 ]; then
+		msg mtrr-not-configured 1
+	    else
+	      msg mtrr-set 0
+	    fi
+	  else
+	    msg no-mtrr 2
+	  fi
+	  ;;
+	*)
+	  msg arch-non-i386 1
+	  ;;
+      esac
+    else
+	msg no-procfs 2
+    fi
+    ;;
+  *)
+    msg unknown-os 1
+    ;;
+esac
+
+# search for xine executable
+
+xine_executables=""
+if search -x bin/xine; then
+  xine_executables="$found"
+  if [ `echo "$xine_executables" | wc -l` -gt 1 ]; then
+    msg several-xine 1
+  else
+    msg found-xine 0
+  fi
+else
+  msg no-xine 0
+fi
+
+
+# search for xine executable in PATH
+
+xine_executable=""
+if search -x xine "$PATH"; then
+  xine_executable1="$found"
+  if [ `echo "$xine_executable1" | wc -l` -gt 1 ]; then
+    xine_executable=`echo "$xine_executable1" | head -1`
+    msg several-xine-in-path 1
+  else
+    xine_executable="$xine_executable1"
+    msg xine-in-path 0
+  fi
+else
+  msg no-xine-in-path 2
+fi
+
+vars xine_executable xine_executables
+
+# search for xine-config in PATH
+
+xine_config=""
+if search -x xine-config "$PATH"; then
+  xine_config="$found"
+  if [ `echo "$xine_config" | wc -l` -gt 1 ]; then
+    xine_configs="$xine_config"
+    xine_config=`echo "$xine_configs" | head -1`
+    msg several-xine-config 1
+  else
+    msg xine-config-in-path 0
+  fi
+else
+  if search -f bin/xine-config; then
+    xine_config="$found";
+    if [ `echo "$xine_config" | wc -l` -gt 1 ]; then
+      xine_configs="$xine_config"
+      xine_config=`echo "$xine_configs" | head -1`
+      msg several-xine-config 1
+    else
+      msg xine-config-somewhere 0
+    fi
+    if test -x "$xine_config"; then
+      msg xine-config-executable
+    else
+      msg xine-config-not-executable 2
+      xine_config=""
+    fi
+  else
+    if [ "$xine_executable" = "/usr/bin/xine" ]; then
+       xine_prefix=/usr
+       plugindir=/usr/lib/xine/plugins
+       skindir=/usr/share/xine
+       case "$DISTRO" in
+	 Debian)
+	    msg assuming-xine-package-deb 1
+	    ;;
+	 RedHat)
+	    msg assuming-xine-package-rpm 1
+	    ;;
+	 *)
+	    msg assuming-xine-package 1
+	    ;;
+       esac
+    fi
+    msg no-xine-config 2
+  fi
+fi
+
+vars xine_configs xine_config xine_prefix plugindir skindir
+
+if test -n "$xine_config"; then
+  xine_prefix=`$xine_config --prefix`
+  if [ "$xine_prefix" != `$xine_config --exec-prefix` ]; then
+    custom-exec-prefix 1
+  else
+    plugindir=`$xine_config --plugindir`
+    skindir=`$xine_config --skindir`
+  fi
+fi
+  
+## consistency checks of xine-lib installation
+if test -n "$plugindir"; then
+  if test -d "$plugindir"; then
+      vars input demux decoder video_out
+      msg plugindir-exists
+      input=
+      demux=
+      decoder=
+      video_out=
+      audio_out=
+      cd $plugindir
+      for i in *.so; do
+	case "$i" in
+	  xineplug_inp_*)
+	    type=input;
+	    pfx=xineplug_inp_;
+	    ;;
+	  xineplug_dmx_*)
+	    type=demux;
+	    pfx=xineplug_dmx_;
+	    ;;
+	  xineplug_decode_*)
+	    type=decoder;
+	    pfx=xineplug_decode_;
+	    ;;
+	  xineplug_vo_out_*)
+	    type=video_out;
+	    pfx=xineplug_vo_out_;
+	    ;;
+	  xineplug_ao_out_*)
+	    type=audio_out;
+	    pfx=xineplug_ao_out_;
+	    ;;
+	  *)
+	    msg unknown-plugin
+	    ;;
+	esac
+	name=`echo $i | sed -e "s/^$pfx//" -e 's/.so$//'`
+	eval $type=\"\$$type $name\"
+      done
+
+      for type in input demux decoder video_out audio_out; do
+	eval plugins=\"\$$type\"
+        if test -n "$plugins"; then
+	  msg found-plugins
+	else
+	  msg missing-plugins 2
+	fi
+      done
+  else
+    msg no-plugindir 2
+  fi
+else
+  msg unknown-plugindir 1
+fi
+
+
+if test -n "$skindir"; then
+    if test -d "$skindir"; then
+      msg skindir-exists
+      cd $skindir
+      if test -f xine_logo.png; then
+        msg logo-exists
+      else
+        msg no-xine-logo 2
+      fi
+      skins=
+      for dir in *; do
+        test -f "$dir/skinconfig" && skins="$skins $dir"
+      done
+      vars skins
+      if test -n "$skins"; then
+	msg found-skins
+      else
+        msg no-skins 2
+      fi
+    else
+      msg no-skindir 2
+    fi
+fi
+
+
+
+
+
+# device tests
+
+vars CDROM DVDROM
+
+CDROM=`resolve_symlink /dev/cdrom`
+if test -b "$CDROM"; then
+  if test -r "$CDROM"; then
+    msg have-cdrom
+  else
+    msg cdrom-not-readable
+  fi
+else
+  msg no-cdrom 1
+fi
+
+DVDROM=`resolve_symlink /dev/dvd`
+if test -b "$DVDROM"; then
+  if check_perm rw "$DVDROM"; then
+    msg have-dvdrom
+  else
+    msg dvdrom-not-rw
+  fi
+else
+  if test -z "$DVDROM"; then
+    msg no-dvdrom 1
+  else
+    msg dangling-dvdrom
+    DVDROM=""
+  fi
+fi
+
+
+# DMA settings
+if test -r "$DVDROM"; then # only test DMA if we have a drive...
+
+    search -x hdparm "$PATH" || search -x bin/hdparm || search -x sbin/hdparm;
+    if test -n "$found"; then
+      hdparm=`echo "$found"|head -1`
+    fi
+
+    case `basename "$DVDROM"` in
+	hd?)
+	    drivetype="ATAPI"
+	    ;;
+	scd*)
+	    drivetype="SCSI"
+	    ;;
+	*)
+	    drivetype="unknown"
+	    ;;
+    esac
+    vars drivetype hdparm dma
+    if test -n "$hdparm" && [ "$drivetype" = "ATAPI" ]; then
+      dma=`$hdparm -d /dev/dvd | awk '$1 == "using_dma" {print $3}'`
+      if [ 0"$dma" -eq 0 ]; then
+	msg dvd-dma-disabled 1
+      else
+	msg dvd-dma-enabled 0 
+      fi
+    else
+      if [ "$drivetype" != ATAPI ]; then
+	msg dvd-not-atapi 1
+      else
+	msg no-hdparm 1
+      fi
+    fi
+	
+fi #have DVDROM
+
+
+# X checks
+if [ "x$DISPLAY" = "x" ]; then
+    msg no-display 2
+else
+
+vars DISPLAY xvinfo XVIDEO YUV YUY2 planes
+
+# Xv extension
+search -x xvinfo "$PATH" || search -x bin/xvinfo;
+if test -n "$found"; then
+  xvinfo=`echo "$found"|head -1`
+  XVIDEO=`$xvinfo|head -1`
+  msg have-xv 0
+  YUV=false
+  YUY2=false
+  planes=""
+  for p in `$xvinfo|awk '$1=="id:" {print $3}' |sed -e 's/(//' -e 's/)//'`; do
+    planes="$planes $p";
+    case $p in
+      YUY2|2YUY)
+        YUY2=true
+	;;
+      YV12|21VY)
+        YUV=true
+	;;
+    esac
+  done
+  if $YUV; then
+    msg have-yuv
+  else
+    msg no-yuv
+  fi
+  if $YUY2; then
+    msg have-yuy2
+  else
+    msg no-yuy2
+  fi
+  #if $YUV || $YUY2; then
+  #  msg xv-broken-hint 1
+  #fi
+  if test -n "$planes"; then
+    msg xv-planes 0
+  else
+    msg no-xv-in-server 1
+  fi
+else
+  # no xvinfo found
+  msg no-xvinfo 2
+fi
+
+fi #DISPLAY check
+
+# dump variables for bug report
+if [ "$runmode" = "bugreport" ]; then
+  for var in $DUMPVARS; do
+    eval log ${var}=\"\$$var\"
+  done
+else
+  clean_exit 0    
+fi
+
+if test -f "$bugreport"; then
+  echo "Hmmm, I already found a bug report in ${bugreport}."
+  if yesno "Do you want me to overwrite that file?"; then
+    rm "$bugreport"
+  else
+    echo "Okay, aborting on your request."
+    clean_exit 0
+  fi
+fi
+  
+echo
+echo
+if yesno "Could you solve your xine problems using the previous hints?"; then
+  echo 'Fine! It was a pleasure to help you. Any time again...'
+  clean_exit
+fi
+
+echo
+echo "What kind of trouble does xine cause for you?"
+echo
+menu "plays audio, but no video" \
+     "plays video, but no audio"\
+     "audio is interrupted and/or crackling"\
+     "audio and video are out of sync"\
+     "can't play DVDs"\
+     "xine hangs instead of playing anything"\
+     "xine doesn't start"\
+     "something else"
+
+if [ "$answertext" = "something else" ]; then
+  echo "please describe your xine problem briefly in _one_ line ( < 65 characters):"
+  read problem
+else
+  problem="$answertext"
+fi
+
+echo
+
+add "short description: $problem"
+
+if test -n "$xine_config"; then
+  lib_version=`$xine_config --version`
+else
+  lib_version=unknown
+fi
+add "xine-lib version: $lib_version"
+add "xine --version says:"
+add "`$xine_executable --version 2>&1`"
+add ""
+
+have_xine_output="false"
+# further checks for specific problems
+case "$answer" in
+  5) #can't play DVDs
+    echo "which DVD plugin are you trying?"
+    menu "DVD (as shipped with xine)" \
+	 "NAV (dvdnav from dvd.sourceforge.net)" \
+	 "d4d (by captain_css)" \
+	 "d5d (by captain_css)" \
+	 "dmd"
+    add   "used DVD plugin: $answertext"
+    if [ $answer -ne 1 ]; then
+      ask "What version of that plugin have you tried?"
+      add "        version: $answer"
+    fi 
+    add "searching for libdvdread.so and libdvdcss.so gives:"
+    search -r lib/libdvdread.so
+    dvdlibs="$found"
+    search -r lib/libdvdcss
+    dvdlibs="$dvdlibs $found"    
+    for lib in $dvdlibs; do
+      add "$lib is `resolve_symlink $lib`"
+    done
+    add "(end of dvd lib list)"
+    ;;
+  6) #xine hangs
+    echo "Please try to run xine using this command:"
+    echo "xine -V XShm"
+    echo "(you may add a MRL at the end of the command, if you want)"
+    if yesno "Does this hang as well?"; then
+      add "I tried 'xine -V XShm', but that hangs as well..."
+    else
+      echo
+      echo "Okay, looks like we have found the problem:"
+      echo "Your XVideo extension, ie your X server, is broken."
+      echo "You have told xine to use XShm instead, which works, but consumes"
+      echo "considerably more CPU time."
+      echo "xine will remember this setting."
+      echo "If xine runs fast enough with XShm, you can just leave it like that."
+      echo "If it's too slow on your machine, you'll need a working"
+      echo "XVideo extension. You'll have to upgrade your X server for that."
+      echo "Please check with your distribution if they have a newer version"
+      echo "of XFree86. If they don't, you'll have to look at www.xfree86.org."
+      echo 'Good luck!'
+      echo
+      if yesno "Do you still want too report this as a xine bug?"; then
+        echo
+	echo "okay, I'll continue."
+	echo "But note that your report is likely to be ignored if you don't"
+	echo "report any xine bug. Broken X servers don't count..."
+	add "xine-check thinks this is not a xine bug, but I do. (see below)"
+	confirm
+      else
+        clean_exit 0
+      fi
+    fi
+    ;;
+esac
+
+subject="bug: $problem"
+
+echo
+echo "You should include a _complete_ copy of xine's output in your bug report."
+echo "Note, however, that there is a 40K limit on messages sent to the mailing list,"
+echo "So you should strip down the parts that repeat over and over,"
+echo "if there are any."
+echo "You can either copy&paste this output from the terminal where you ran xine,"
+echo "or you can collect xine's output in a file named /tmp/xine.out, using"
+echo "this command:"
+echo "xine >/tmp/xine.out 2>&1"
+echo "(assuming you have a Bourne compatible shell, like bash, for example)"
+echo "If you need to add any parameters, you can do so..."
+echo "This method is useful if you want to remove part of the output..."
+echo "Which method would you prefer?"
+menu "copy&paste" "logfile /tmp/xine.out"
+add ""
+add "xine output:"
+add "-----------"
+
+echo
+if [ $answer -eq 1 ]; then
+  echo "okay, please paste your xine output into this window and"
+  echo 'PRESS CTRL-D on a new line TO FINISH! (sorry for shouting...)'
+  cat >>"$bugreport"
+else
+  echo 'please press <return> when you have the log ready in /tmp/xine.out'
+  if test -r /tmp/xine.out; then
+    cat /tmp/xine.out >>"$bugreport"
+    echo "Okay, got a copy of the log file. You may remove it, if you wish..."
+  else
+    echo
+    echo "Hmmm, I could not read the /tmp/xine.out file. Skipping this step."
+    echo "You may add the output later, if this wasn't your intention..."
+    confirm
+    echo
+  fi 
+fi
+
+add ""
+add "additional description:"
+add "----------------------"
+add ""
+add "(nothing, this whole message was created by xine-check)"
+add ""
+add ""
+add "system info, as found by xine-check:"
+add "-----------------------------------"
+cat "$logfile" >>$bugreport
+
+echo
+echo 'Okay.' "That's all I could guide you through..."
+echo "I have assembled a skeleton for your bugreport in the file"
+echo
+echo "   $bugreport"
+echo
+echo "You're strongly encouraged to add a detailed description of your problem."
+echo "Just look for 'additional description', and fill it in..."
+echo
+echo "When you're finished, you can use your favourite mailer to send it to"
+echo "<xine-user@lists.sf.net>. Please use this subject line, or something similar:"
+echo "Subject: $subject"
+
+if search -x mail "$PATH" || search -x mailx "$PATH"; then
+  mailer=`echo "$found"|head -1`
+  echo "Alternatively, I could try to send the bug report for you, using"
+  echo $mailer -s \""$subject"\"
+  echo 'Please make sure to add the additional description before saying "yes"!' 
+  if yesno "Do you want me to do this now?"; then
+    $mailer -s "$subject" <"$bugreport" xine-user@lists.sf.net
+    echo "okay, done."
+    echo "If your machine is set up correctly to send mail to the internet,"
+    echo "everything's fine and the message is on the way..."
+    echo "Note that I cannot check if the mail went out correcly, so if you"
+    echo "cannot send mails to the 'net using $mailer, you'll have to send"
+    echo "the bugreport manually."
+  fi
+fi
+
+echo 'Thanks for your bugreport! Have a nice day!' 
+ 
+

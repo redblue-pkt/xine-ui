@@ -2,11 +2,22 @@
 SUBDIRS = desktops
 
 EXTRA_DIST = $(bin_SCRIPTS) autogen.sh SlackBuild.in SlackBuild build_rpms.sh \
-	xine-ui.spec.in xine-ui.spec
+	xine-ui.spec.in xine-ui.spec xine-check.sh.in xine-check.en \
+	build-xine-check
 
-bindir = @XINE_SCRIPTDIR@
+# should use real bindir...
+#bindir = @XINE_SCRIPTDIR@
 
-bin_SCRIPTS = xineshot
+# removed xineshot. should no longer be needed... -siggi
+bin_SCRIPTS = xine-check xine-bugreport
+
+xine-check: xine-check.sh.in xine-check.en
+	perl build-xine-check xine-check.en
+	chmod a+x xine-check
+
+xine-bugreport: xine-check
+	ln -s xine-check xine-bugreport
+
 
 debug:
 install-debug: debug
