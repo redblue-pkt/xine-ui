@@ -15,7 +15,7 @@ msgstr ""
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:920
 msgid "Select current entry"
-msgstr "Výbìr aktuální polo¾ky"
+msgstr "Vybrání aktuální polo¾ky"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:927
 msgid "Play selected entry"
