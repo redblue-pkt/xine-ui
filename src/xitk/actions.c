@@ -54,7 +54,7 @@ extern _panel_t        *panel;
  * Callback-functions for widget-button click
  */
 void gui_exit (xitk_widget_t *w, void *data) {
-
+  
 #ifdef HAVE_XF86VIDMODE
   /* just in case a different modeline than the original one is running,
    * toggle back to window mode which automatically causes a switch back to

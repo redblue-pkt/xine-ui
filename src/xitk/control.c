@@ -378,11 +378,10 @@ void control_change_skins(void) {
  *
  */
 static void control_select_new_skin(xitk_widget_t *w, void *data) {
-  skins_locations_t **sks = get_available_skins();
   int                 selected = (int)data;
 
   xitk_browser_release_all_buttons(control->skinlist);
-  select_new_skin(sks[selected]);
+  select_new_skin(selected);
 }
 
 /*
