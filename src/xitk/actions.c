@@ -175,10 +175,8 @@ int gui_xine_open_and_play(char *mrl, int start_pos, int start_time) {
     return 0;
   }
 
-  if(!strcmp(mrl, gGui->mmk.mrl)) {
-    printf("*** same URL as mmk.mrl, played = 1\n");
+  if(!strcmp(mrl, gGui->mmk.mrl))
     gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
-  }
 
   return 1;
 }

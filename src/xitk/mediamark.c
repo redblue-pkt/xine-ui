@@ -947,7 +947,11 @@ void mediamark_load_mediamarks(const char *filename) {
   
   gGui->playlist.mmk = mmk;
   gGui->playlist.num = playlist->entries;
-  gGui->playlist.cur = 0;
+
+  if(gGui->playlist.loop == PLAYLIST_LOOP_SHUFFLE)
+    gGui->playlist.cur = mediamark_get_shuffle_next();
+  else
+    gGui->playlist.cur = 0;
 
   for(i = 0; i < onum; i++)
     (void) _mediamark_free_mmk(&ommk[i]);

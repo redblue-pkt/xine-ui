@@ -291,6 +291,7 @@ static void _playlist_load_playlist(xitk_widget_t *w, void *data) {
   memset(&buffer, 0, sizeof(buffer));
   sprintf(buffer, "%s/.xine/playlist", xine_get_homedir());
   mediamark_load_mediamarks(buffer);
+  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
   playlist_update_playlist();
 }
 
