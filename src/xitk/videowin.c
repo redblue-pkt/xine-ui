@@ -1316,7 +1316,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
   case KeyPress:
     
-    if((!gGui->cursor_visible) && (event->xkey.keycode != gVw->kc_shift_l)) {
+    if((!gGui->cursor_visible) 
+#ifdef HAVE_XTESTEXTENSION
+       && (event->xkey.keycode != gVw->kc_shift_l)
+#endif
+       ) {
       gGui->cursor_visible = !gGui->cursor_visible;
       video_window_set_cursor_visibility(gGui->cursor_visible);
     }
