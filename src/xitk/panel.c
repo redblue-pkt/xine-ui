@@ -230,7 +230,7 @@ void panel_change_skins(void) {
       break;
     }
 
-    if(max && (i < max)) {
+    if(max) {
       while(panel->autoplay_plugins[i] != NULL) {
 	xitk_disable_and_hide_widget(panel->autoplay_plugins[i]);
 	i++;

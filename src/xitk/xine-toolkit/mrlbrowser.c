@@ -771,7 +771,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
 	break;
       }
 
-      if(max && (i < max)) {
+      if(max) {
 	while(private_data->autodir_plugins[i] != NULL) {
 	  xitk_disable_and_hide_widget(private_data->autodir_plugins[i]);
 	  i++;
