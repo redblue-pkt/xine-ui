@@ -140,6 +140,7 @@ void show_usage (void) {
   printf("\n");
   printf("Usage: xine [OPTIONS]... [MRL]\n");
   printf("\n");
+  printf("  -v, --version                Display version.\n");
   printf("OPTIONS are:\n");
   printf("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n");
   printf("                               ");

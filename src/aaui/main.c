@@ -76,30 +76,38 @@ typedef struct {
 static aaxine_t aaxine;
 
 /* options args */
-static const char *short_options = "?ha:"
-"q"
+static const char *short_options = "?h"
 #ifdef DEBUG
  "d:"
 #endif
- "A:R::";
+ "a:qA:R::v";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
-  {"auto-quit"      , no_argument      , 0, 'q' },
-  {"audio-channel"  , required_argument, 0, 'a' },
 #ifdef DEBUG
   {"debug"          , required_argument, 0, 'd' },
 #endif
+  {"audio-channel"  , required_argument, 0, 'a' },
+  {"auto-quit"      , no_argument      , 0, 'q' },
   {"audio-driver"   , required_argument, 0, 'A' },
   {"recognize-by"   , optional_argument, 0, 'R' },
+  {"version"        , optional_argument, 0, 'v' },
   {0                , no_argument      , 0,  0  }
 };
+
+/*
+ * Display version.
+ */
+static void show_version(void) {
+
+  printf("This is xine (aalib ui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
+}
 
 /*
  * Display an informative banner.
  */
 static void show_banner(void) {
 
-  printf("This is xine (aalib ui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
+  show_version();
   printf("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n", 
 	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, 
 	 XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
@@ -115,10 +123,11 @@ static void print_usage (void) {
   char **driver_ids;
   char  *driver_id;
 
-  printf("usage: aaxine [aalib-options] [aaxine-options] mrl\n"
+  printf("usage: aaxine [aalib-options] [aaxine-options] mrl ...\n"
 	 "aalib-options:\n"
 	 "%s", aa_help);
   printf("\n");
+  printf("  -v, --version                Display version.\n");
   printf("AAXINE options:\n");
   printf("  -q, --auto-quit              Quit after playing all mrl's.\n");
   printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
@@ -339,8 +348,6 @@ int main(int argc, char *argv[]) {
     goto failure;
   }
 
-  show_banner();
-
 #ifdef DEBUG
   aaxine.debug_level = 0;
 #endif
@@ -372,14 +379,23 @@ int main(int argc, char *argv[]) {
 			 long_options, &option_index)) != EOF) {
     switch(c) {
 
-    case 'q': /* Automatic quit option */
-      aaxine.auto_quit = 1;
+#ifdef DEBUG      
+    case 'd': /* Select debug levels */
+      if(optarg != NULL) {
+	if(!(handle_debug_subopt(chomp(optarg))))
+	  exit(1);
+      }
       break;
+#endif
 
     case 'a': /* Select audio channel */
       sscanf(optarg, "%i", &audio_channel);
       break;
       
+    case 'q': /* Automatic quit option */
+      aaxine.auto_quit = 1;
+      break;
+
     case 'A': /* Select audio driver */
       if(optarg != NULL) {
 	audio_driver_id = xmalloc (strlen (optarg) + 1);
@@ -396,16 +412,12 @@ int main(int argc, char *argv[]) {
       else
 	demux_strategy = DEMUX_REVERT_STRATEGY;
       break;
-
-#ifdef DEBUG      
-    case 'd': /* Select debug levels */
-      if(optarg != NULL) {
-	if(!(handle_debug_subopt(chomp(optarg))))
-	  exit(1);
-      }
+     
+    case 'v': /* Display version and exit*/
+      show_version();
+      exit(1);
       break;
-#endif
-      
+
     case 'h': /* Display usage */
     case '?':
       print_usage();
@@ -426,6 +438,8 @@ int main(int argc, char *argv[]) {
   else
     extract_mrls((argc - optind), &argv[optind]);
   
+  show_banner();
+
   /*
    * generate and init a config "object"
    */
@@ -553,9 +567,17 @@ int main(int argc, char *argv[]) {
       break;
 
     case AA_LEFT:
+      if(xine_get_speed(aaxine.xine) > SPEED_PAUSE)
+        xine_set_speed(aaxine.xine, xine_get_speed(aaxine.xine) / 2);
       break;
-
+      
     case AA_RIGHT:
+      if(xine_get_speed(aaxine.xine) < SPEED_FAST_4) {
+        if(xine_get_speed(aaxine.xine) > SPEED_PAUSE)
+          xine_set_speed(aaxine.xine, xine_get_speed (aaxine.xine) * 2);
+        else
+          xine_set_speed(aaxine.xine, SPEED_SLOW_4);
+      }
       break;
 
     case '+':
