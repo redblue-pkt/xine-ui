@@ -1,18 +1,19 @@
+# translation of pl_PL.po to Polish
 # Polish xine-ui translation file.
-# Copyright (C) 2002 Free Software Foundation, Inc.
-# Bart³omiej Muryn <_4ever_@irc.pl>, 2002.
+# Copyright (C) 2002,2003 Free Software Foundation, Inc.
+# Bart³omiej Muryn <_4ever_@irc.pl>, 2002,2003.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.13\n"
-"POT-Creation-Date: 2003-04-21 01:51+0200\n"
-"PO-Revision-Date: 2003-02-15 15:01+0100\n"
+"Project-Id-Version: pl_PL\n"
+"POT-Creation-Date: 2003-04-27 01:05+0200\n"
+"PO-Revision-Date: 2003-04-13 09:37+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.9.6\n"
+"X-Generator: KBabel 1.0\n"
 
 #: src/xitk/actions.c:279
 #, c-format
@@ -64,59 +65,59 @@ msgstr ""
 msgid "Start Playback ?"
 msgstr "Odtwarzaæ?"
 
-#: src/xitk/actions.c:565
+#: src/xitk/actions.c:566
 msgid "No MRL (input stream) specified"
 msgstr "Brak podanego MRL (strumienia wej¶cia)"
 
-#: src/xitk/actions.c:831
+#: src/xitk/actions.c:832
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Proporcje ekranu: %s"
 
-#: src/xitk/actions.c:852
+#: src/xitk/actions.c:853
 #, c-format
 msgid "Deinterlace: %d"
 msgstr "Usuwanie przeplotu: %d"
 
-#: src/xitk/actions.c:1070 src/xitk/actions.c:1087 src/xitk/post.c:53
+#: src/xitk/actions.c:1071 src/xitk/actions.c:1088 src/xitk/post.c:53
 #: src/xitk/post.c:65
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): nie mogê utworzyæ nowego w±tku (%s)\n"
 
-#: src/xitk/actions.c:1350
+#: src/xitk/actions.c:1351
 msgid "There is no mrl."
 msgstr "Brak MRL."
 
-#: src/xitk/actions.c:1489 src/xitk/actions.c:1501 src/xitk/menus.c:247
+#: src/xitk/actions.c:1490 src/xitk/actions.c:1502 src/xitk/menus.c:247
 #: src/xitk/menus.c:261 src/xitk/panel.c:749 src/xitk/session.c:403
 msgid "Audio Volume"
 msgstr "Natê¿enie d¼wiêku"
 
-#: src/xitk/actions.c:1561
+#: src/xitk/actions.c:1562
 #, c-format
 msgid "TV Mode: %d"
 msgstr "Tryb TV: %d"
 
-#: src/xitk/actions.c:1582
+#: src/xitk/actions.c:1583
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) zawiód³.\n"
 
-#: src/xitk/actions.c:1674 src/xitk/actions.c:1732 src/xitk/event_sender.c:497
-#: src/xitk/mediamark.c:2445
+#: src/xitk/actions.c:1675 src/xitk/actions.c:1733 src/xitk/event_sender.c:497
+#: src/xitk/mediamark.c:2446
 msgid "Select"
 msgstr "Wybór"
 
-#: src/xitk/actions.c:1677
+#: src/xitk/actions.c:1678
 msgid "Select all"
 msgstr "Wybór wszystkiego"
 
-#: src/xitk/actions.c:1682
+#: src/xitk/actions.c:1683
 msgid "Stream(s) loading"
 msgstr "£adowanie strumienia(i): "
 
-#: src/xitk/actions.c:1737 src/xitk/mediamark.c:2450
+#: src/xitk/actions.c:1738 src/xitk/mediamark.c:2451
 msgid "Pick a subtitle file"
 msgstr "Wybór pliku napisów"
 
@@ -302,7 +303,7 @@ msgstr ""
 
 #: src/xitk/event.c:176
 msgid "Amplification Level"
-msgstr ""
+msgstr "Poziom wzmocnienia"
 
 #: src/xitk/event.c:316
 msgid "Zoom: 1:1"
@@ -545,7 +546,7 @@ msgstr ""
 
 #: src/xitk/event.c:1232
 msgid "amplification level"
-msgstr ""
+msgstr "poziom wzmocnienia"
 
 #. Some infos
 #: src/xitk/event.c:1246
@@ -661,12 +662,12 @@ msgid "Part"
 msgstr "Czê¶æ"
 
 #: src/xitk/event_sender.c:686 src/xitk/file_browser.c:1572
-#: src/xitk/mediamark.c:2650 src/xitk/setup.c:1310
+#: src/xitk/mediamark.c:2651 src/xitk/setup.c:1310
 #: src/xitk/stream_infos.c:1021 src/xitk/viewlog.c:487
 msgid "Close"
 msgstr "Koniec"
 
-#: src/xitk/file_browser.c:317 src/xitk/mediamark.c:2635 src/xitk/setup.c:1299
+#: src/xitk/file_browser.c:317 src/xitk/mediamark.c:2636 src/xitk/setup.c:1299
 msgid "Apply"
 msgstr "Zastosuj"
 
@@ -856,6 +857,11 @@ msgstr "mod5"
 msgid "Grab"
 msgstr "Przechwytuj"
 
+#: src/xitk/lang.c:487
+#, fuzzy
+msgid "Unknown"
+msgstr "nieznany"
+
 #: src/xitk/main.c:349
 #, c-format
 msgid "Bad geometry '%s'\n"
@@ -896,11 +902,15 @@ msgstr "  -v, --version                Wy¶wietlenie numeru wersji.\n"
 #: src/xitk/main.c:429
 msgid "      --verbose [=level]       Set verbosity level. Default is 1.\n"
 msgstr ""
+"      --verbose [=poziom]       Ustaw poziom \"gadatliwo¶ci\" programu. "
+"Domy¶lnie 1.\n"
 
 #: src/xitk/main.c:430
 msgid ""
 "  -c, --config <file>          Use config file instead of default one.\n"
 msgstr ""
+"  -c, --config <plik>          U¿yj podanego pliku konfiguracyjnego zamiast "
+"domy¶lnego.\n"
 
 #: src/xitk/main.c:431
 msgid ""
@@ -1159,14 +1169,12 @@ msgstr ""
 "'prev'),\n"
 
 #: src/xitk/main.c:502
-#, fuzzy
 msgid "                    volume=v    set audio volume,\n"
-msgstr "                     session=n ustaw numer sesji <n>,\n"
+msgstr "                     volume=v ustaw g³o¶no¶æ d¼wiêku,\n"
 
 #: src/xitk/main.c:503
-#, fuzzy
 msgid "                    amp=v       set amplification level,\n"
-msgstr "                                 <p> mo¿e byæ:\n"
+msgstr "                    amp=v       ustaw poziom wzmocnienia,\n"
 
 #: src/xitk/main.c:504
 msgid "                    (playlist|pl)=p\n"
@@ -1208,28 +1216,30 @@ msgid "                    fast4, stop, quit, fullscreen, eject.\n"
 msgstr "                    fast4, stop, quit, fullscreen, eject.\n"
 
 #: src/xitk/main.c:512
-#, fuzzy
 msgid ""
 "  -Z                           Don't automatically start playback (smart "
 "mode).\n"
-msgstr "                                 'loop': powtarzaj ca³± listê.\n"
+msgstr ""
+"  -Z                           Nie rozpoczynaj automatycznie odtwarzania "
+"(smart-mode).\n"
 
 #: src/xitk/main.c:513
-#, fuzzy
 msgid "  -D, --deinterlace            Deinterlace video output\n"
-msgstr "  -H, --hide-video             ukrywanie okna wideo\n"
+msgstr "  -D, --deinterlace              Zlikwiduj przeplot obrazu\n"
 
 #: src/xitk/main.c:514
 msgid ""
 "  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"
 msgstr ""
+"  -r, --aspect-ratio <tryb>    Ustaw proporcje obrazu. Mo¿liwe tryby to:\n"
 
 #: src/xitk/main.c:515
-#, fuzzy
 msgid ""
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
-msgstr "                                 'clear' wyczy¶æ ca³± listê,\n"
+msgstr ""
+"                                 'auto', 'square', '4:3', 'anamorphic',  "
+"'dvb'.\n"
 
 #: src/xitk/main.c:517
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -1379,125 +1389,129 @@ msgstr ""
 msgid "*sight*, unkown error."
 msgstr ""
 
-#: src/xitk/main.c:1089
+#: src/xitk/main.c:1088
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr "Wymaga biblioteki xine 1.0.0, znaleziono %d.%d.%d.\n"
 
-#: src/xitk/main.c:1097
+#: src/xitk/main.c:1096
 msgid "sigprocmask() failed.\n"
 msgstr "sigprocmask() zawiód³.\n"
 
-#: src/xitk/main.c:1170
+#: src/xitk/main.c:1169
 msgid "video driver id required for -V option\n"
 msgstr "id serownika wideo wymagane dla opcji -V\n"
 
-#: src/xitk/main.c:1179
+#: src/xitk/main.c:1178
 msgid "audio driver id required for -A option\n"
 msgstr "ID serownika d¼wiêku wymagane dla opcji -A\n"
 
-#: src/xitk/main.c:1250
-#, fuzzy, c-format
+#: src/xitk/main.c:1249
+#, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
-msgstr "B³êdny tryb powtarzania '%s', Zobacz xine --help\n"
+msgstr "B³êdne proporcjie ekranu '%s', Zobacz xine --help\n"
 
-#: src/xitk/main.c:1314
+#: src/xitk/main.c:1313
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "B³êdna geometria '%s', Zobacz xine --help\n"
 
-#: src/xitk/main.c:1346
+#: src/xitk/main.c:1345
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "B³êdny tryb powtarzania '%s', Zobacz xine --help\n"
 
-#: src/xitk/main.c:1412
+#: src/xitk/main.c:1404
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "B³êdny argument %d => exit\n"
 
-#: src/xitk/main.c:1601
+#: src/xitk/main.c:1424
+msgid "You should specify one MRL to enqueue, at least!.\n"
+msgstr ""
+
+#: src/xitk/main.c:1599
 msgid "Logo mrl"
 msgstr "Po³o¿enie logo"
 
-#: src/xitk/mediamark.c:2153 src/xitk/mediamark.c:2199
+#: src/xitk/mediamark.c:2154 src/xitk/mediamark.c:2200
 #, c-format
 msgid "Playlist file (%s) is valid (%s).\n"
 msgstr "Plik listy odtwarzania (%s) jest poprawny (%s).\n"
 
-#: src/xitk/mediamark.c:2155 src/xitk/mediamark.c:2201
+#: src/xitk/mediamark.c:2156 src/xitk/mediamark.c:2202
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
 msgstr "Plik listy odtwarzania (%s) jest niepoprawny.\n"
 
-#: src/xitk/mediamark.c:2270
+#: src/xitk/mediamark.c:2271
 #, c-format
 msgid "Playlist '%s' saved.\n"
 msgstr "Lista odtwarzania '%s' zachowana.\n"
 
-#: src/xitk/mediamark.c:2273
+#: src/xitk/mediamark.c:2274
 #, c-format
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr "Nie mogê zachowaæ listy odtwarzania (%s): %s.\n"
 
 #. Create window
-#: src/xitk/mediamark.c:2493
+#: src/xitk/mediamark.c:2494
 msgid "Mediamark Editor"
 msgstr "Edytor Mediamark"
 
-#: src/xitk/mediamark.c:2522
+#: src/xitk/mediamark.c:2523
 msgid "Identifier"
 msgstr "Identyfikator"
 
-#: src/xitk/mediamark.c:2538
+#: src/xitk/mediamark.c:2539
 msgid "Mediamark Identifier"
 msgstr "Identyfikator Mediamark"
 
-#: src/xitk/mediamark.c:2542
+#: src/xitk/mediamark.c:2543
 msgid "Mrl"
 msgstr "MRL"
 
-#: src/xitk/mediamark.c:2557
+#: src/xitk/mediamark.c:2558
 msgid "Mediamark Mrl"
 msgstr "MRL Mediamark"
 
-#: src/xitk/mediamark.c:2561 src/xitk/menus.c:821
+#: src/xitk/mediamark.c:2562 src/xitk/menus.c:821
 msgid "Subtitle"
 msgstr "Napisy"
 
-#: src/xitk/mediamark.c:2576
+#: src/xitk/mediamark.c:2577
 msgid "Subtitle File"
 msgstr "Plik napisów"
 
-#: src/xitk/mediamark.c:2580
+#: src/xitk/mediamark.c:2581
 msgid "Sub File"
 msgstr "Plik nap."
 
-#: src/xitk/mediamark.c:2590
+#: src/xitk/mediamark.c:2591
 msgid "Select a subtitle file to use together with the mrl."
 msgstr "Wybierz plik napisów do odtwarzania z MRL."
 
-#: src/xitk/mediamark.c:2596
+#: src/xitk/mediamark.c:2597
 msgid "Start at"
 msgstr "Rozpocznij od"
 
-#: src/xitk/mediamark.c:2611
+#: src/xitk/mediamark.c:2612
 msgid "Mediamark start time (secs)."
 msgstr "Czas startu Mediamark (sek)."
 
-#: src/xitk/mediamark.c:2615
+#: src/xitk/mediamark.c:2616
 msgid "End at"
 msgstr "Koniec na"
 
-#: src/xitk/mediamark.c:2630
+#: src/xitk/mediamark.c:2631
 msgid "Mediamark end time (secs)."
 msgstr "Czas koñca Mediamark (sek)."
 
-#: src/xitk/mediamark.c:2645
+#: src/xitk/mediamark.c:2646
 msgid "Apply the changes to the playlist."
 msgstr "Zastosuj zmiany do pliku listy odtwarzania."
 
-#: src/xitk/mediamark.c:2660
+#: src/xitk/mediamark.c:2661
 msgid "Discard changes and dismiss the window."
 msgstr "Porzuæ zmiany i zamknij okno."
 
@@ -2181,9 +2195,3 @@ msgstr "podgl±d logów xine"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Od¶wie¿anie"
-
-#~ msgid "Key Bindings"
-#~ msgstr "Mapowanie"
-
-#~ msgid "Xine Control Panel"
-#~ msgstr "Panel Sterowania xine"

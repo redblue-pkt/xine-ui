@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
-"POT-Creation-Date: 2003-04-21 01:51+0200\n"
+"POT-Creation-Date: 2003-04-27 01:05+0200\n"
 "PO-Revision-Date: 2003-04-05 00:45+0200\n"
 "Last-Translator: Giovanni Venturi <jumpyj@libero.it>\n"
 "Language-Team: italiano <kde-i18n-it@mail.kde.org>\n"
@@ -65,59 +65,59 @@ msgstr ""
 msgid "Start Playback ?"
 msgstr "Avvio riproduzione?"
 
-#: src/xitk/actions.c:565
+#: src/xitk/actions.c:566
 msgid "No MRL (input stream) specified"
 msgstr "Nesun MRL (stream di input) specificato"
 
-#: src/xitk/actions.c:831
+#: src/xitk/actions.c:832
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Proporzioni: %s"
 
-#: src/xitk/actions.c:852
+#: src/xitk/actions.c:853
 #, c-format
 msgid "Deinterlace: %d"
 msgstr "Deinterlaccia: %d"
 
-#: src/xitk/actions.c:1070 src/xitk/actions.c:1087 src/xitk/post.c:53
+#: src/xitk/actions.c:1071 src/xitk/actions.c:1088 src/xitk/post.c:53
 #: src/xitk/post.c:65
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): non può creare un nuovo thread (%s)\n"
 
-#: src/xitk/actions.c:1350
+#: src/xitk/actions.c:1351
 msgid "There is no mrl."
 msgstr "Non c'è alcun MRL."
 
-#: src/xitk/actions.c:1489 src/xitk/actions.c:1501 src/xitk/menus.c:247
+#: src/xitk/actions.c:1490 src/xitk/actions.c:1502 src/xitk/menus.c:247
 #: src/xitk/menus.c:261 src/xitk/panel.c:749 src/xitk/session.c:403
 msgid "Audio Volume"
 msgstr "Volume Audio"
 
-#: src/xitk/actions.c:1561
+#: src/xitk/actions.c:1562
 #, c-format
 msgid "TV Mode: %d"
 msgstr "TV Mode: %d"
 
-#: src/xitk/actions.c:1582
+#: src/xitk/actions.c:1583
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) fallita.\n"
 
-#: src/xitk/actions.c:1674 src/xitk/actions.c:1732 src/xitk/event_sender.c:497
-#: src/xitk/mediamark.c:2445
+#: src/xitk/actions.c:1675 src/xitk/actions.c:1733 src/xitk/event_sender.c:497
+#: src/xitk/mediamark.c:2446
 msgid "Select"
 msgstr "Seleziona"
 
-#: src/xitk/actions.c:1677
+#: src/xitk/actions.c:1678
 msgid "Select all"
 msgstr "Seleziona tutto"
 
-#: src/xitk/actions.c:1682
+#: src/xitk/actions.c:1683
 msgid "Stream(s) loading"
 msgstr "Sto caricando stream"
 
-#: src/xitk/actions.c:1737 src/xitk/mediamark.c:2450
+#: src/xitk/actions.c:1738 src/xitk/mediamark.c:2451
 msgid "Pick a subtitle file"
 msgstr "Utililzza un file di sottotitoli"
 
@@ -651,12 +651,12 @@ msgid "Part"
 msgstr "Parte"
 
 #: src/xitk/event_sender.c:686 src/xitk/file_browser.c:1572
-#: src/xitk/mediamark.c:2650 src/xitk/setup.c:1310
+#: src/xitk/mediamark.c:2651 src/xitk/setup.c:1310
 #: src/xitk/stream_infos.c:1021 src/xitk/viewlog.c:487
 msgid "Close"
 msgstr "Chiudi"
 
-#: src/xitk/file_browser.c:317 src/xitk/mediamark.c:2635 src/xitk/setup.c:1299
+#: src/xitk/file_browser.c:317 src/xitk/mediamark.c:2636 src/xitk/setup.c:1299
 msgid "Apply"
 msgstr "Applica"
 
@@ -837,6 +837,10 @@ msgstr "mod5"
 
 #: src/xitk/kbindings.c:2227
 msgid "Grab"
+msgstr ""
+
+#: src/xitk/lang.c:487
+msgid "Unknown"
 msgstr ""
 
 #: src/xitk/main.c:349
@@ -1311,125 +1315,129 @@ msgstr ""
 msgid "*sight*, unkown error."
 msgstr ""
 
-#: src/xitk/main.c:1089
+#: src/xitk/main.c:1088
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr ""
 
-#: src/xitk/main.c:1097
+#: src/xitk/main.c:1096
 msgid "sigprocmask() failed.\n"
 msgstr ""
 
-#: src/xitk/main.c:1170
+#: src/xitk/main.c:1169
 msgid "video driver id required for -V option\n"
 msgstr ""
 
-#: src/xitk/main.c:1179
+#: src/xitk/main.c:1178
 msgid "audio driver id required for -A option\n"
 msgstr ""
 
-#: src/xitk/main.c:1250
+#: src/xitk/main.c:1249
 #, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1314
+#: src/xitk/main.c:1313
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1346
+#: src/xitk/main.c:1345
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1412
+#: src/xitk/main.c:1404
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr ""
 
-#: src/xitk/main.c:1601
+#: src/xitk/main.c:1424
+msgid "You should specify one MRL to enqueue, at least!.\n"
+msgstr ""
+
+#: src/xitk/main.c:1599
 msgid "Logo mrl"
 msgstr ""
 
-#: src/xitk/mediamark.c:2153 src/xitk/mediamark.c:2199
+#: src/xitk/mediamark.c:2154 src/xitk/mediamark.c:2200
 #, c-format
 msgid "Playlist file (%s) is valid (%s).\n"
 msgstr ""
 
-#: src/xitk/mediamark.c:2155 src/xitk/mediamark.c:2201
+#: src/xitk/mediamark.c:2156 src/xitk/mediamark.c:2202
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
 msgstr ""
 
-#: src/xitk/mediamark.c:2270
+#: src/xitk/mediamark.c:2271
 #, c-format
 msgid "Playlist '%s' saved.\n"
 msgstr ""
 
-#: src/xitk/mediamark.c:2273
+#: src/xitk/mediamark.c:2274
 #, c-format
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr ""
 
 #. Create window
-#: src/xitk/mediamark.c:2493
+#: src/xitk/mediamark.c:2494
 msgid "Mediamark Editor"
 msgstr ""
 
-#: src/xitk/mediamark.c:2522
+#: src/xitk/mediamark.c:2523
 msgid "Identifier"
 msgstr ""
 
-#: src/xitk/mediamark.c:2538
+#: src/xitk/mediamark.c:2539
 msgid "Mediamark Identifier"
 msgstr ""
 
-#: src/xitk/mediamark.c:2542
+#: src/xitk/mediamark.c:2543
 msgid "Mrl"
 msgstr ""
 
-#: src/xitk/mediamark.c:2557
+#: src/xitk/mediamark.c:2558
 msgid "Mediamark Mrl"
 msgstr ""
 
-#: src/xitk/mediamark.c:2561 src/xitk/menus.c:821
+#: src/xitk/mediamark.c:2562 src/xitk/menus.c:821
 msgid "Subtitle"
 msgstr ""
 
-#: src/xitk/mediamark.c:2576
+#: src/xitk/mediamark.c:2577
 msgid "Subtitle File"
 msgstr ""
 
-#: src/xitk/mediamark.c:2580
+#: src/xitk/mediamark.c:2581
 msgid "Sub File"
 msgstr ""
 
-#: src/xitk/mediamark.c:2590
+#: src/xitk/mediamark.c:2591
 msgid "Select a subtitle file to use together with the mrl."
 msgstr ""
 
-#: src/xitk/mediamark.c:2596
+#: src/xitk/mediamark.c:2597
 msgid "Start at"
 msgstr ""
 
-#: src/xitk/mediamark.c:2611
+#: src/xitk/mediamark.c:2612
 msgid "Mediamark start time (secs)."
 msgstr ""
 
-#: src/xitk/mediamark.c:2615
+#: src/xitk/mediamark.c:2616
 msgid "End at"
 msgstr ""
 
-#: src/xitk/mediamark.c:2630
+#: src/xitk/mediamark.c:2631
 msgid "Mediamark end time (secs)."
 msgstr ""
 
-#: src/xitk/mediamark.c:2645
+#: src/xitk/mediamark.c:2646
 msgid "Apply the changes to the playlist."
 msgstr ""
 
-#: src/xitk/mediamark.c:2660
+#: src/xitk/mediamark.c:2661
 msgid "Discard changes and dismiss the window."
 msgstr ""
 

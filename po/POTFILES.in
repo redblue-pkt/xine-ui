@@ -10,6 +10,7 @@ src/xitk/event_sender.c
 src/xitk/file_browser.c
 src/xitk/i18n.h
 src/xitk/kbindings.c
+src/xitk/lang.c
 src/xitk/main.c
 src/xitk/mediamark.c
 src/xitk/menus.c
