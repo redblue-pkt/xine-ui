@@ -586,7 +586,7 @@ static void _pplugin_set_param_char(xitk_widget_t *w, void *data, char *text) {
     xitk_inputtext_change_text(pobj->value, (char *)(pobj->param_data + pobj->param->offset));
   }
   else
-    xine_error(_("parameter type POST_PARAM_TYPE_STRING) not supported yet.\n"));
+    xine_error(_("parameter type POST_PARAM_TYPE_STRING not supported yet.\n"));
 
 }
 
@@ -2030,7 +2030,7 @@ static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_ele
 			  _pplugin_update_parameter(&pobj);
 			}
 			else
-			  fprintf(stderr, "parameter type POST_PARAM_TYPE_STRING) not supported yet.\n");
+			  fprintf(stderr, "parameter type POST_PARAM_TYPE_STRING not supported yet.\n");
 		      }
 		      break;
 		      

@@ -2,12 +2,14 @@
 #  $ head -3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] | grep -v src/xitk/session_ctrl.c >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
 
 src/xitk/actions.c
+src/xitk/config_wrapper.c
 src/xitk/control.c
 src/xitk/download.c
 src/xitk/errors.c
 src/xitk/event.c
 src/xitk/event_sender.c
 src/xitk/file_browser.c
+src/xitk/help.c
 src/xitk/i18n.h
 src/xitk/kbindings.c
 src/xitk/lang.c

@@ -1643,7 +1643,7 @@ int main(int argc, char *argv[]) {
 
   gGui->subtitle_autoload = 
     xine_config_register_bool(gGui->xine, "gui.subtitle_autoload", 1,
-			      _("Subtitle autologin"),
+			      _("Subtitle autoloading"),
 			      _("Automatically load subtitles if they exist."), 
 			      CONFIG_LEVEL_BEG,
 			      sub_autoload_cb,
