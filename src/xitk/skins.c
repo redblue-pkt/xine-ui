@@ -619,10 +619,10 @@ static void download_skin_cancel(xitk_widget_t *w, void *data) {
 
   skdloader->xwin = None;
 
-  xitk_list_free(skdloader->widget_list->l);
+  xitk_list_free((XITK_WIDGET_LIST_LIST(skdloader->widget_list)));
   
   XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, skdloader->widget_list->gc);
+  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)));
   XUnlockDisplay(gGui->display);
   
   free(skdloader->widget_list);
@@ -785,7 +785,7 @@ static void download_skin_handle_event(XEvent *event, void *data) {
       xitk_widget_t *w;
       
       w = xitk_get_focused_widget(skdloader->widget_list);
-      if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
+      if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
 	if(mykey == XK_Down)
 	  xitk_browser_step_up(skdloader->browser, NULL);
 	else
@@ -799,7 +799,7 @@ static void download_skin_handle_event(XEvent *event, void *data) {
       xitk_widget_t *w;
       
       w = xitk_get_focused_widget(skdloader->widget_list);
-      if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
+      if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
 	if(mykey == XK_Up)
 	  xitk_browser_step_down(skdloader->browser, NULL);
 	else
@@ -894,10 +894,11 @@ void download_skin(char *url) {
 	      bg->gc, 0, 0, width, height, 0, 0);
     XUnlockDisplay (gGui->display);
 
-    skdloader->widget_list                = xitk_widget_list_new();
-    skdloader->widget_list->l             = xitk_list_new();
-    skdloader->widget_list->win           = (xitk_window_get_window(skdloader->xwin));
-    skdloader->widget_list->gc            = gc;
+    skdloader->widget_list = xitk_widget_list_new();
+    xitk_widget_list_set(skdloader->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+    xitk_widget_list_set(skdloader->widget_list, 
+			 WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(skdloader->xwin)));
+    xitk_widget_list_set(skdloader->widget_list, WIDGET_LIST_GC, gc);
     
     skdloader->slxs = slxs;
     
@@ -926,10 +927,10 @@ void download_skin(char *url) {
     br.dbl_click_callback            = NULL;
     br.parent_wlist                  = skdloader->widget_list;
     br.userdata                      = NULL;
-    xitk_list_append_content(skdloader->widget_list->l, 
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(skdloader->widget_list)), 
 			     (skdloader->browser = 
 			      xitk_noskin_browser_create(skdloader->widget_list, &br,
-							 skdloader->widget_list->gc, 10, 30, 
+							 (XITK_WIDGET_LIST_GC(skdloader->widget_list)), 10, 30, 
 							 WINDOW_WIDTH - (20 + 10) , 20, 12, fontname)));
     
     xitk_browser_update_list(skdloader->browser, 
@@ -946,12 +947,12 @@ void download_skin(char *url) {
     
     lb.button_type       = CLICK_BUTTON;
     lb.label             = _("Cancel");
-    lb.align             = LABEL_ALIGN_CENTER;
+    lb.align             = ALIGN_CENTER;
     lb.callback          = download_skin_cancel; 
     lb.state_callback    = NULL;
     lb.userdata          = NULL;
     lb.skin_element_name = NULL;
-    xitk_list_append_content(skdloader->widget_list->l, 
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(skdloader->widget_list)), 
 			     xitk_noskin_labelbutton_create(skdloader->widget_list, 
 							    &lb, x, y, 100, 23,
 							    "Black", "Black", "White", btnfontname));

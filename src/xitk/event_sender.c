@@ -309,10 +309,10 @@ void event_sender_exit(xitk_widget_t *w, void *data) {
   xitk_window_destroy_window(gGui->imlib_data, eventer->xwin);
 
   eventer->xwin = None;
-  xitk_list_free(eventer->widget_list->l);
+  xitk_list_free((XITK_WIDGET_LIST_LIST(eventer->widget_list)));
   
   XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, eventer->widget_list->gc);
+  XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(eventer->widget_list)));
   XUnlockDisplay(gGui->display);
 
   free(eventer->widget_list);
@@ -434,10 +434,11 @@ void event_sender_panel(void) {
 		 (xitk_window_get_window(eventer->xwin)), None, None);
   XUnlockDisplay (gGui->display);
   
-  eventer->widget_list                = xitk_widget_list_new();
-  eventer->widget_list->l             = xitk_list_new();
-  eventer->widget_list->win           = (xitk_window_get_window(eventer->xwin));
-  eventer->widget_list->gc            = gc;
+  eventer->widget_list = xitk_widget_list_new();
+  xitk_widget_list_set(eventer->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(eventer->widget_list, 
+		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(eventer->xwin)));
+  xitk_widget_list_set(eventer->widget_list, WIDGET_LIST_GC, gc);
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
@@ -446,12 +447,12 @@ void event_sender_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Up");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = event_sender_up; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l,  
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)),
 	   (eventer->navigator.up = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 70, 40,
@@ -463,12 +464,12 @@ void event_sender_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Left");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = event_sender_left; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->navigator.left = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 70, 40,
@@ -480,12 +481,12 @@ void event_sender_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Select");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = event_sender_select; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->navigator.select = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 60, 30,
@@ -497,12 +498,12 @@ void event_sender_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Right");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = event_sender_right; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->navigator.right = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 70, 40,
@@ -514,12 +515,12 @@ void event_sender_panel(void) {
  
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Down");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = event_sender_down; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->navigator.down = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 70, 40,
@@ -537,7 +538,7 @@ void event_sender_panel(void) {
 
     lb.button_type       = CLICK_BUTTON;
     lb.label             = number;
-    lb.align             = LABEL_ALIGN_CENTER;
+    lb.align             = ALIGN_CENTER;
     lb.callback          = event_sender_num;
     lb.state_callback    = NULL;
     lb.userdata          = (void *)i;
@@ -546,7 +547,7 @@ void event_sender_panel(void) {
     if(!i)
       x -= 46;
 
-    xitk_list_append_content(eventer->widget_list->l, 
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	     (eventer->numbers.number[i] = 
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 23, 23,
@@ -573,13 +574,13 @@ void event_sender_panel(void) {
     
     lb.button_type       = CLICK_BUTTON;
     lb.label             = number;
-    lb.align             = LABEL_ALIGN_CENTER;
+    lb.align             = ALIGN_CENTER;
     lb.callback          = event_sender_num;
     lb.state_callback    = NULL;
     lb.userdata          = (void *)i;
     lb.skin_element_name = NULL;
     
-    xitk_list_append_content(eventer->widget_list->l, 
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	     (eventer->numbers.number[i] = 
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 46, 23,
@@ -591,12 +592,12 @@ void event_sender_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Angle +");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = event_sender_angle; 
   lb.state_callback    = NULL;
   lb.userdata          = (void *)1;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->angles.next = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 80, 23,
@@ -605,12 +606,12 @@ void event_sender_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Angle -");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = event_sender_angle; 
   lb.state_callback    = NULL;
   lb.userdata          = (void *)0;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	   (eventer->angles.prev = 
 	    xitk_noskin_labelbutton_create(eventer->widget_list, 
 					   &lb, x, y, 80, 23,
@@ -640,12 +641,12 @@ void event_sender_panel(void) {
   for(i = 0; i < 7; i++) {
     lb.button_type       = CLICK_BUTTON;
     lb.label             = "";
-    lb.align             = LABEL_ALIGN_CENTER;
+    lb.align             = ALIGN_CENTER;
     lb.callback          = event_sender_menu; 
     lb.state_callback    = NULL;
     lb.userdata          = (void *)i;
     lb.skin_element_name = NULL;
-    xitk_list_append_content(eventer->widget_list->l, 
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
 	     (eventer->menus.menu[i] = 
 	      xitk_noskin_labelbutton_create(eventer->widget_list, 
 					     &lb, x, y, 80, 23,
@@ -669,12 +670,12 @@ void event_sender_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = event_sender_end; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(eventer->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(eventer->widget_list)), 
    xitk_noskin_labelbutton_create(eventer->widget_list, 
 				  &lb, x, y, 70, 23,
 				  "Black", "Black", "White", eventerfontname));

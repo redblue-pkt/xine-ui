@@ -227,10 +227,10 @@ void control_exit(xitk_widget_t *w, void *data) {
     XUnlockDisplay(gGui->display);
 
     control->window = None;
-    xitk_list_free(control->widget_list->l);
+    xitk_list_free((XITK_WIDGET_LIST_LIST(control->widget_list)));
 
     XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, control->widget_list->gc);
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(control->widget_list)));
     XUnlockDisplay(gGui->display);
 
     free(control->widget_list);
@@ -522,16 +522,16 @@ void control_panel(void) {
   /*
    * Widget-list
    */
-  control->widget_list                = xitk_widget_list_new();
-  control->widget_list->l             = xitk_list_new ();
-  control->widget_list->win           = control->window;
-  control->widget_list->gc            = gc;
+  control->widget_list = xitk_widget_list_new();
+  xitk_widget_list_set(control->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(control->widget_list, WIDGET_LIST_WINDOW, (void *) control->window);
+  xitk_widget_list_set(control->widget_list, WIDGET_LIST_GC, gc);
   
   { /* All of sliders are disabled by default*/
     int min = 0, max = 65535, cur;
 
-    lbl.window = control->widget_list->win;
-    lbl.gc     = control->widget_list->gc;
+    lbl.window = XITK_WIDGET_LIST_WINDOW(control->widget_list);
+    lbl.gc     = XITK_WIDGET_LIST_GC(control->widget_list);
 
     /* HUE */
     cur = get_current_param(XINE_PARAM_VO_HUE);
@@ -544,7 +544,7 @@ void control_panel(void) {
     sl.userdata          = NULL;
     sl.motion_callback   = set_hue;
     sl.motion_userdata   = NULL;
-    xitk_list_append_content(control->widget_list->l,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 	     (control->hue = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->hue, cur);
     xitk_set_widget_tips(control->hue, _("Control HUE value"));
@@ -552,7 +552,7 @@ void control_panel(void) {
     lbl.skin_element_name = "CtlHueLbl";
     lbl.label             = _("Hue");
     lbl.callback          = NULL;
-    xitk_list_append_content(control->widget_list->l,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
     xitk_disable_widget(control->hue);
     
@@ -567,7 +567,7 @@ void control_panel(void) {
     sl.userdata          = NULL;
     sl.motion_callback   = set_saturation;
     sl.motion_userdata   = NULL;
-    xitk_list_append_content(control->widget_list->l,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 	      (control->sat = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->sat, cur);
     xitk_set_widget_tips(control->sat, _("Control SATURATION value"));
@@ -575,7 +575,7 @@ void control_panel(void) {
     lbl.skin_element_name = "CtlSatLbl";
     lbl.label             = _("Sat");
     lbl.callback          = NULL;
-    xitk_list_append_content(control->widget_list->l,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
     xitk_disable_widget(control->sat);
 
@@ -590,7 +590,7 @@ void control_panel(void) {
     sl.userdata          = NULL;
     sl.motion_callback   = set_brightness;
     sl.motion_userdata   = NULL;
-    xitk_list_append_content(control->widget_list->l,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 	    (control->bright = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->bright, cur);
     xitk_set_widget_tips(control->bright, _("Control BRIGHTNESS value"));
@@ -598,7 +598,7 @@ void control_panel(void) {
     lbl.skin_element_name = "CtlBrightLbl";
     lbl.label             = _("Brt");
     lbl.callback          = NULL;
-    xitk_list_append_content(control->widget_list->l,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
     xitk_disable_widget(control->bright);
       
@@ -613,7 +613,7 @@ void control_panel(void) {
     sl.userdata          = NULL;
     sl.motion_callback   = set_contrast;
     sl.motion_userdata   = NULL;
-    xitk_list_append_content(control->widget_list->l,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 	      (control->contr = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->contr, cur);
     xitk_set_widget_tips(control->contr, _("Control CONTRAST value"));
@@ -621,7 +621,7 @@ void control_panel(void) {
     lbl.skin_element_name = "CtlContLbl";
     lbl.label             = _("Ctr");
     lbl.callback          = NULL;
-    xitk_list_append_content(control->widget_list->l,
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
     xitk_disable_widget(control->contr);
 
@@ -642,7 +642,7 @@ void control_panel(void) {
   lbl.skin_element_name = "CtlSkLbl";
   lbl.label             = _("Choose a Skin");
   lbl.callback          = NULL;
-  xitk_list_append_content(control->widget_list->l,
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 			   xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
 
   br.arrow_up.skin_element_name    = "CtlSkUp";
@@ -657,7 +657,7 @@ void control_panel(void) {
   br.callback                      = control_select_new_skin;
   br.dbl_click_callback            = NULL;
   br.parent_wlist                  = control->widget_list;
-  xitk_list_append_content (control->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(control->widget_list)), 
 			   (control->skinlist = 
 			    xitk_browser_create(control->widget_list, gGui->skin_config, &br)));
 
@@ -671,7 +671,7 @@ void control_panel(void) {
   lb.callback          = control_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
-  xitk_list_append_content (control->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(control->widget_list)), 
 		    (w = xitk_labelbutton_create (control->widget_list, gGui->skin_config, &lb)));
   xitk_set_widget_tips(w, _("Close control window"));
 

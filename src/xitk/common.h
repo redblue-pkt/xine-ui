@@ -178,8 +178,6 @@ typedef struct {
   xitk_skin_config_t       *skin_config;
   char                     *skin_server_url;
 
-  xitk_dnd_t                xdnd;
-
   ImlibData                *imlib_data;
 
   Window                    video_window; 

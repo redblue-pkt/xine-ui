@@ -92,10 +92,10 @@ void viewlog_exit(xitk_widget_t *w, void *data) {
   xitk_window_destroy_window(gGui->imlib_data, viewlog->xwin);
 
   viewlog->xwin = None;
-  xitk_list_free(viewlog->widget_list->l);
+  xitk_list_free(XITK_WIDGET_LIST_LIST(viewlog->widget_list));
   
   XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, viewlog->widget_list->gc);
+  XFreeGC(gGui->display, XITK_WIDGET_LIST_GC(viewlog->widget_list));
   XUnlockDisplay(gGui->display);
 
   free(viewlog->widget_list);
@@ -208,7 +208,7 @@ static void viewlog_clear_tab(void) {
   
   XLockDisplay(gGui->display);
   XCopyArea(gGui->display, im->image->pixmap, (xitk_window_get_window(viewlog->xwin)),
-	    viewlog->widget_list->gc, 0, 0, im->width, im->height, 20, 51);
+	    (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 0, 0, im->width, im->height, 20, 51);
   XUnlockDisplay(gGui->display);
   
   xitk_image_free_image(gGui->imlib_data, &im);
@@ -350,7 +350,7 @@ static void viewlog_create_tabs(void) {
   tab.parent_wlist      = viewlog->widget_list;
   tab.callback          = viewlog_change_section;
   tab.userdata          = NULL;
-  xitk_list_append_content (viewlog->widget_list->l,
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(viewlog->widget_list)),
     (viewlog->tabs = 
      xitk_noskin_tabs_create(viewlog->widget_list, &tab, 20, 24, WINDOW_WIDTH - 40, tabsfontname)));
 
@@ -416,10 +416,11 @@ void viewlog_window(void) {
 		 (xitk_window_get_window(viewlog->xwin)), None, None);
   XUnlockDisplay (gGui->display);
   
-  viewlog->widget_list                = xitk_widget_list_new();
-  viewlog->widget_list->l             = xitk_list_new ();
-  viewlog->widget_list->win           = (xitk_window_get_window(viewlog->xwin));
-  viewlog->widget_list->gc            = gc;
+  viewlog->widget_list = xitk_widget_list_new();
+  xitk_widget_list_set(viewlog->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(viewlog->widget_list, 
+		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(viewlog->xwin)));
+  xitk_widget_list_set(viewlog->widget_list, WIDGET_LIST_GC, gc);
 
   viewlog_create_tabs();
 
@@ -436,14 +437,14 @@ void viewlog_window(void) {
   br.dbl_click_callback            = NULL;
   br.parent_wlist                  = viewlog->widget_list;
   br.userdata                      = NULL;
-  xitk_list_append_content(viewlog->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
 			   (viewlog->browser_widget = 
 			    xitk_noskin_browser_create(viewlog->widget_list, &br,
-						       viewlog->widget_list->gc, 25, 58, 
+						       (XITK_WIDGET_LIST_GC(viewlog->widget_list)), 25, 58, 
 						       WINDOW_WIDTH - (50 + 16), 20,
 						       16, br_fontname)));
 
-  xitk_browser_set_alignment(viewlog->browser_widget, LABEL_ALIGN_LEFT);
+  xitk_browser_set_alignment(viewlog->browser_widget, ALIGN_LEFT);
   xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->real_num_entries, 0);
   
   viewlog_paint_widgets();
@@ -455,12 +456,12 @@ void viewlog_window(void) {
   
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Refresh");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = viewlog_refresh; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(viewlog->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
 	   xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
 					  x, y, 100, 23,
 					  "Black", "Black", "White", tabsfontname));
@@ -469,12 +470,12 @@ void viewlog_window(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = viewlog_end; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(viewlog->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(viewlog->widget_list)), 
 	   xitk_noskin_labelbutton_create(viewlog->widget_list, &lb,
 					  x, y, 100, 23,
 					  "Black", "Black", "White", tabsfontname));

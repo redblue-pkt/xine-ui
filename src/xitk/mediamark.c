@@ -1182,10 +1182,10 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(gGui->imlib_data, mmkeditor->xwin);
     
     mmkeditor->xwin = None;
-    xitk_list_free(mmkeditor->widget_list->l);
+    xitk_list_free((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)));
     
     XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, mmkeditor->widget_list->gc);
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(mmkeditor->widget_list)));
     XUnlockDisplay(gGui->display);
     
     free(mmkeditor->widget_list);
@@ -1342,10 +1342,11 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 		 (xitk_window_get_window(mmkeditor->xwin)), None, None);
   XUnlockDisplay (gGui->display);
   
-  mmkeditor->widget_list                = xitk_widget_list_new();
-  mmkeditor->widget_list->l             = xitk_list_new();
-  mmkeditor->widget_list->win           = (xitk_window_get_window(mmkeditor->xwin));
-  mmkeditor->widget_list->gc            = gc;
+  mmkeditor->widget_list = xitk_widget_list_new();
+  xitk_widget_list_set(mmkeditor->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(mmkeditor->widget_list, 
+		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(mmkeditor->xwin)));
+  xitk_widget_list_set(mmkeditor->widget_list, WIDGET_LIST_GC, gc);
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
@@ -1373,7 +1374,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   inp.max_length        = 2048;
   inp.callback          = NULL;
   inp.userdata          = NULL;
-  xitk_list_append_content(mmkeditor->widget_list->l,
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	   (mmkeditor->ident = 
 	    xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
 					 x, y, w, 20,
@@ -1392,7 +1393,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   inp.max_length        = 2048;
   inp.callback          = NULL;
   inp.userdata          = NULL;
-  xitk_list_append_content(mmkeditor->widget_list->l,
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->mrl = 
 	     xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
 					  x, y, w, 20,
@@ -1414,7 +1415,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.parent_wlist      = mmkeditor->widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
-  xitk_list_append_content(mmkeditor->widget_list->l,
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->start = 
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
 				       x, y, w, 20, NULL, NULL, NULL)));
@@ -1433,7 +1434,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   ib.parent_wlist      = mmkeditor->widget_list;
   ib.callback          = NULL;
   ib.userdata          = NULL;
-  xitk_list_append_content(mmkeditor->widget_list->l,
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
 	    (mmkeditor->end = 
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
 				       x, y, w, 20, NULL, NULL, NULL)));
@@ -1444,12 +1445,12 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   x = 15;
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Apply");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = mmkeditor_apply; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(mmkeditor->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)), 
 	   (b = xitk_noskin_labelbutton_create(mmkeditor->widget_list, 
 					       &lb, x, y, 100, 23,
 					       "Black", "Black", "White", btnfontname)));
@@ -1459,12 +1460,12 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = mmkeditor_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(mmkeditor->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)), 
 	   (b = xitk_noskin_labelbutton_create(mmkeditor->widget_list, 
 					       &lb, x, y, 100, 23,
 					       "Black", "Black", "White", btnfontname)));

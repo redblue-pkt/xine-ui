@@ -102,7 +102,7 @@ static void stream_infos_update(xitk_widget_t *w, void *data) {
   stream_infos_update_infos();
 }
 
-static void set_label(xitk_widget_t *w, const char *label) {
+static void set_label(xitk_widget_t *w, char *label) {
   xitk_label_change_label(sinfos->widget_list, w, label);
 }
 
@@ -149,7 +149,7 @@ static void get_meta_info(xitk_widget_t *w, int meta) {
   const char *minfo;
   
   minfo = xine_get_meta_info(gGui->stream, meta);
-  set_label(w, (minfo) ? minfo : _("Unavailable"));
+  set_label(w, (minfo) ? (char *) minfo : _("Unavailable"));
 }
 
 static void get_stream_info(xitk_widget_t *w, int info) {
@@ -266,10 +266,10 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     xitk_window_destroy_window(gGui->imlib_data, sinfos->xwin);
 
     sinfos->xwin = None;
-    xitk_list_free(sinfos->widget_list->l);
+    xitk_list_free((XITK_WIDGET_LIST_LIST(sinfos->widget_list)));
     
     XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, sinfos->widget_list->gc);
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(sinfos->widget_list)));
     XUnlockDisplay(gGui->display);
     
     free(sinfos->widget_list);
@@ -474,10 +474,11 @@ void stream_infos_panel(void) {
 		 (xitk_window_get_window(sinfos->xwin)), None, None);
   XUnlockDisplay (gGui->display);
 
-  sinfos->widget_list                = xitk_widget_list_new();
-  sinfos->widget_list->l             = xitk_list_new ();
-  sinfos->widget_list->win           = (xitk_window_get_window(sinfos->xwin));
-  sinfos->widget_list->gc            = gc;
+  sinfos->widget_list = xitk_widget_list_new();
+  xitk_widget_list_set(sinfos->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(sinfos->widget_list, 
+		       WIDGET_LIST_WINDOW, (void *) (xitk_window_get_window(sinfos->xwin)));
+  xitk_widget_list_set(sinfos->widget_list, WIDGET_LIST_GC, gc);
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
@@ -503,11 +504,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Title: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.title = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -518,11 +519,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Comment: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.comment = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -533,11 +534,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Artist: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.artist = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -547,11 +548,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Genre: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.genre = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -560,11 +561,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Year: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.year = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -576,11 +577,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Album: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.album = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -597,11 +598,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Input Plugin: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.input_plugin = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -610,11 +611,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("System Layer: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.systemlayer = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -623,11 +624,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Bitrate: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.bitrate = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -636,11 +637,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Frame Duration: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.frame_duration = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -651,11 +652,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Is Seekable: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.seekable = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -664,11 +665,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Has Chapters: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.has_chapters = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -677,11 +678,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Ignore Spu: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.ignore_spu = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -690,11 +691,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Has Still: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.has_still = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -713,11 +714,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Has: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.has_video = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -725,11 +726,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Handled: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.video_handled = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -738,11 +739,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Ignore: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.ignore_video = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -751,11 +752,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Codec: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.videocodec = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -767,11 +768,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("FourCC: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.video_fourcc = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -780,11 +781,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Channel(s): "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.video_channels = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -793,11 +794,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Bitrate: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.video_bitrate = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -807,11 +808,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Resolution: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.video_resolution = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -820,11 +821,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Ratio: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.video_ratio = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -833,11 +834,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Stream(s): "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.video_streams = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -856,11 +857,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Has: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.has_audio = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -869,11 +870,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Handled: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.audio_handled = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -882,11 +883,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Ignore: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.ignore_audio = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -896,11 +897,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Codec: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->meta_infos.audiocodec = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -912,11 +913,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("FourCC: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.audio_fourcc = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -925,11 +926,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Channel(s): "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.audio_channels = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -938,11 +939,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Bitrate: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.audio_bitrate = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -951,11 +952,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Bits: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.audio_bits = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -965,11 +966,11 @@ void stream_infos_panel(void) {
   draw_inner_frame(gGui->imlib_data, bg, _("Samplerate: "), lfontname, 
 		    x - 5, y - 2, w + 10, 20 + 15);
   lbl.window            = xitk_window_get_window(sinfos->xwin);
-  lbl.gc                = sinfos->widget_list->gc;
+  lbl.gc                = (XITK_WIDGET_LIST_GC(sinfos->widget_list));
   lbl.skin_element_name = NULL;
   lbl.label             = "";
   lbl.callback          = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 			   (sinfos->infos.audio_samplerate = 
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x, y, w, 20, sinfosfontname)));
@@ -981,12 +982,12 @@ void stream_infos_panel(void) {
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Update");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = stream_infos_update; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 	   (sinfos->update = 
 	    xitk_noskin_labelbutton_create(sinfos->widget_list, 
 					   &lb, x, y, 100, 23,
@@ -999,12 +1000,12 @@ void stream_infos_panel(void) {
   
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
-  lb.align             = LABEL_ALIGN_CENTER;
+  lb.align             = ALIGN_CENTER;
   lb.callback          = stream_infos_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
-  xitk_list_append_content(sinfos->widget_list->l, 
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(sinfos->widget_list)), 
 	   xitk_noskin_labelbutton_create(sinfos->widget_list, 
 					  &lb, x, y, 100, 23,
 					  "Black", "Black", "White", btnfontname));

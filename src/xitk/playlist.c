@@ -440,7 +440,7 @@ static void _playlist_handle_event(XEvent *event, void *data) {
       mmk_editor_end();
       
       w = xitk_get_focused_widget(playlist->widget_list);
-      if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
+      if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
 	if(mykey == XK_Down)
 	  xitk_browser_step_up(playlist->playlist, NULL);
 	else
@@ -455,7 +455,7 @@ static void _playlist_handle_event(XEvent *event, void *data) {
 
       mmk_editor_end();
       w = xitk_get_focused_widget(playlist->widget_list);
-      if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
+      if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
 	if(mykey == XK_Up)
 	  xitk_browser_step_down(playlist->playlist, NULL);
 	else
@@ -637,10 +637,10 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     XUnlockDisplay(gGui->display);
 
     playlist->window = None;
-    xitk_list_free(playlist->widget_list->l);
+    xitk_list_free((XITK_WIDGET_LIST_LIST(playlist->widget_list)));
 
     XLockDisplay(gGui->display);
-    XFreeGC(gGui->display, playlist->widget_list->gc);
+    XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(playlist->widget_list)));
     XUnlockDisplay(gGui->display);
 
     _playlist_free_playlists();
@@ -1042,17 +1042,17 @@ void playlist_editor(void) {
    * Widget-list
    */
   playlist->widget_list                = xitk_widget_list_new();
-  playlist->widget_list->l             = xitk_list_new();
-  playlist->widget_list->win           = playlist->window;
-  playlist->widget_list->gc            = gc;
+  xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_LIST, (xitk_list_new()));
+  xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_WINDOW, (void *) playlist->window);
+  xitk_widget_list_set(playlist->widget_list, WIDGET_LIST_GC, gc);
 
-  lbl.window          = playlist->widget_list->win;
-  lbl.gc              = playlist->widget_list->gc;
+  lbl.window          = (XITK_WIDGET_LIST_WINDOW(playlist->widget_list));
+  lbl.gc              = (XITK_WIDGET_LIST_GC(playlist->widget_list));
 
   b.skin_element_name = "PlMoveUp";
   b.callback          = _playlist_move_updown;
   b.userdata          = (void *)MOVEUP;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->move_up = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->move_up, _("Move up selected MRL"));
 
@@ -1060,28 +1060,28 @@ void playlist_editor(void) {
   b.skin_element_name = "PlMoveDn";
   b.callback          = _playlist_move_updown;
   b.userdata          = (void *)MOVEDN;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->move_down = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->move_down, _("Move down selected MRL"));
 
   b.skin_element_name = "PlPlay";
   b.callback          = _playlist_play;
   b.userdata          = NULL;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->play = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->play, _("Start playback of selected MRL"));
   
   b.skin_element_name = "PlDelete";
   b.callback          = _playlist_delete;
   b.userdata          = NULL;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->delete = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->delete, _("Delete selected MRL from playlist"));
 
   b.skin_element_name = "PlDeleteAll";
   b.callback          = _playlist_delete_all;
   b.userdata          = NULL;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->delete_all = xitk_button_create (playlist->widget_list, gGui->skin_config, &b)));
   xitk_set_widget_tips(playlist->delete_all, _("Delete all entries in playlist"));
 
@@ -1091,7 +1091,7 @@ void playlist_editor(void) {
   lb.callback          = open_mrlbrowser;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->add = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
   xitk_set_widget_tips(playlist->add, _("Add one or more entries in playlist"));
     
@@ -1102,7 +1102,7 @@ void playlist_editor(void) {
   lb.callback          = _playlist_load_playlist;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->load = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
   xitk_set_widget_tips(playlist->load, _("Load saved playlist"));
 
@@ -1112,7 +1112,7 @@ void playlist_editor(void) {
   lb.callback          = _playlist_save_playlist;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->save = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
   xitk_set_widget_tips(playlist->save, _("Save playlist"));
 
@@ -1122,7 +1122,7 @@ void playlist_editor(void) {
   lb.callback          = playlist_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->close = xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
   xitk_set_widget_tips(playlist->delete, _("Close playlist window"));
 
@@ -1138,13 +1138,13 @@ void playlist_editor(void) {
   br.callback                      = _playlist_handle_selection;
   br.dbl_click_callback            = _playlist_play_on_dbl_click;
   br.parent_wlist                  = playlist->widget_list;
-  xitk_list_append_content (playlist->widget_list->l, 
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
     (playlist->playlist = xitk_browser_create(playlist->widget_list, gGui->skin_config, &br)));
 
   lbl.skin_element_name = "AutoPlayLbl";
   lbl.label             = _("Scan for:");
   lbl.callback          = NULL;
-  xitk_list_append_content (playlist->widget_list->l,
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)),
 			    xitk_label_create (playlist->widget_list, gGui->skin_config, &lbl));
   
   inp.skin_element_name = "PlInputText";
@@ -1152,7 +1152,7 @@ void playlist_editor(void) {
   inp.max_length        = 256;
   inp.callback          = _playlist_add_input;
   inp.userdata          = NULL;
-  xitk_list_append_content (playlist->widget_list->l,
+  xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)),
    (playlist->winput = xitk_inputtext_create (playlist->widget_list, gGui->skin_config, &inp)));
   xitk_set_widget_tips(playlist->winput, _("Direct MRL entry"));
 
@@ -1173,11 +1173,11 @@ void playlist_editor(void) {
       lb.callback          = playlist_scan_input;
       lb.state_callback    = NULL;
       lb.userdata          = NULL;
-      xitk_list_append_content (playlist->widget_list->l,
+      xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)),
 	       (playlist->autoplay_plugins[i] = 
 		xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
       xitk_set_widget_tips(playlist->autoplay_plugins[i], 
-		   xine_get_input_plugin_description(gGui->xine, (char *)autoplay_plugins[i]));
+		   (char *) xine_get_input_plugin_description(gGui->xine, (char *)autoplay_plugins[i]));
       
       (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
       

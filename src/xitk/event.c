@@ -680,10 +680,6 @@ void gui_handle_event (XEvent *event, void *data) {
   case ConfigureNotify:
     break;
 
-  case ClientMessage:
-    xitk_process_client_dnd_message (&gGui->xdnd, event);
-    break;
-
     /*
       default:
       printf("Got event: %i\n", event->type);
