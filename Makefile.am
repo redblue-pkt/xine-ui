@@ -9,7 +9,7 @@ SUBDIRS = src m4 doc misc
 EXTRA_DIST = cvscompile.sh automake.diff \
              debian/README.Debian debian/changelog debian/control \
              debian/copyright debian/dirs debian/menu debian/rules \
-             debian/xine.docs
+             debian/xine.docs debian/shlibdeps.sh
 
 debug:
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
