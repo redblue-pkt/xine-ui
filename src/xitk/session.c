@@ -396,7 +396,6 @@ void *ctrlsocket_func(void *data) {
     case CMD_VOLUME:
       {
 	uint32_t *vol = (uint32_t *)shdr->data;
-	printf("VOLUME %d\n", *vol);
 
 	if((*vol >= 0) && (*vol <= 100) && (gGui->mixer.caps & MIXER_CAP_VOL)) { 
 	  gGui->mixer.volume_level = *vol;
@@ -411,7 +410,6 @@ void *ctrlsocket_func(void *data) {
     case CMD_AMP:
       {
 	uint32_t *amp = (uint32_t *)shdr->data;
-	printf("AMP %d\n", *amp);
 
 	if((*amp >= 0) && (*amp <= 200))
 	  config_update_num("gui.amp_level", (int) *amp);
@@ -589,13 +587,11 @@ void session_handle_subopt(char *suboptarg, int *session) {
       /* volume */
     case 16:
       volume = strtol(optstr, &optstr, 10);
-      printf("Volume %d\n", volume);
       break;
 
       /* amplification */
     case 17:
       amp = strtol(optstr, &optstr, 10);
-      printf("Amp %d\n", amp);
       break;
       
     }
@@ -669,15 +665,11 @@ void session_handle_subopt(char *suboptarg, int *session) {
       spu_prev--;
     }
 
-    if(volume >= 0) {
-      printf("SEND Volume: %d\n", volume);
+    if(volume >= 0)
       send_uint32(*session, CMD_VOLUME, (uint32_t) volume);
-    }
 
-    if(amp >= 0) {
-      printf("SEND Amp: %d\n", amp);
+    if(amp >= 0)
       send_uint32(*session, CMD_AMP, (uint32_t) amp);
-    }
 
   }
   else
