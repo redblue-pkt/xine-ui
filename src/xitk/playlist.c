@@ -326,6 +326,8 @@ static void _playlist_load_callback(filebrowser_t *fb) {
     mediamark_load_mediamarks(file);
     gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
     playlist_update_playlist();
+    if((!is_playback_widgets_enabled()) && gGui->playlist.num)
+      enable_playback_controls(1);
     free(file);
   }
   playlist_reactivate();
