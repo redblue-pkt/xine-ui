@@ -184,11 +184,6 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
     }
 
    }
-#ifdef DEBUG_GUI
- else
-    fprintf (stderr, "paint labal on something (%d) that "
-	     "is not a label\n", l->widget_type);
-#endif
 }
 
 /*
@@ -342,11 +337,6 @@ int xitk_label_change_label (xitk_widget_list_t *wl, xitk_widget_t *l, char *new
 
     return 1;
   }
-#ifdef DEBUG_GUI
- else
-    fprintf (stderr, "notify focus label button on something (%d) "
-	     "that is not a label button\n", l->widget_type);
-#endif
 
   return 0;
 }

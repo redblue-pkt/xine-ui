@@ -130,11 +130,7 @@ static void paint_button (xitk_widget_t *b, Window win, GC gc) {
 
     XUNLOCK (private_data->imlibdata->x.disp);
   } 
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "paint button on something (%d) that is not a button\n",
-	     b->widget_type);
-#endif
+
 }
 
 /*
@@ -183,11 +179,6 @@ static int notify_click_button (xitk_widget_list_t *wl,
     }
 
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify click button on something (%d) that is not"
-	     " a button\n", b->widget_type);
-#endif
 
   return 1;
 }
@@ -204,11 +195,6 @@ static int notify_focus_button (xitk_widget_list_t *wl, xitk_widget_t *b, int bE
     private_data->bArmed = bEntered;
     
   } 
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify focus button on something (%d) that is not"
-	     " a button\n", b->widget_type);
-#endif
   
   return 1;
 }

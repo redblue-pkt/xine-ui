@@ -1322,6 +1322,11 @@ int xitk_skin_get_label_animation(xitk_skin_config_t *, const char *);
 /*
  *
  */
+int xitk_skin_get_label_alignment(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
 char *xitk_skin_get_label_fontname(xitk_skin_config_t *, const char *);
 
 /*

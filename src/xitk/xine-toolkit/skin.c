@@ -251,6 +251,31 @@ static int skin_get_bool_value(const char *val) {
 }
 
 /*
+ * Return alignement value.
+ */
+static int skin_get_align_value(const char *val) {
+  static struct {
+    const char *str;
+    int value;
+  } aligns[] = {
+    { "left",   LABEL_ALIGN_LEFT   }, 
+    { "center", LABEL_ALIGN_CENTER }, 
+    { "right",  LABEL_ALIGN_RIGHT  },
+    { NULL,     0 }
+  };
+  int i;
+  
+  assert(val != NULL);
+  
+  for(i = 0; aligns[i].str != NULL; i++) {
+    if(!(strcasecmp(aligns[i].str, val)))
+      return aligns[i].value;
+  }
+
+  return LABEL_ALIGN_CENTER;
+}
+
+/*
  * Set char pointer to first char of value. Delimiter of 
  * value is '=' or ':', e.g: "mykey = myvalue".
  */
@@ -320,6 +345,8 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
     else if(!strncasecmp(skonfig->ln, "label", 5)) {
       skonfig->celement->print = 1;
       
+      skonfig->celement->align = LABEL_ALIGN_CENTER;
+
       while(skin_end_section(skonfig) < 0) {
 	skin_get_next_line(skonfig);
 	p = skonfig->ln;
@@ -344,6 +371,10 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->pixmap_font = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
 	  sprintf(skonfig->celement->pixmap_font, "%s/%s", skonfig->path, p);
+	}
+	else if(!strncasecmp(skonfig->ln, "align", 5)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->align = skin_get_align_value(p);
 	}
 	else if(!strncasecmp(skonfig->ln, "color", 5)) {
 	  skin_set_pos_to_value(&p);
@@ -827,6 +858,20 @@ int xitk_skin_get_label_printable(xitk_skin_config_t *skonfig, const char *str) 
     return s->print;
   
   return 1;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_label_alignment(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->align;
+  
+  return LABEL_ALIGN_CENTER;
 }
 
 /*

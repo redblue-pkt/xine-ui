@@ -320,6 +320,7 @@ skin.PlItemBtn {
 	}
 	pixmap = pl_item_btn.png
 	label {
+	  align = left
 	  color = Black
 	  color_focus = White
 	  color_click = White
@@ -616,6 +617,7 @@ skin.CtlSkItemBtn {
 	}
 	pixmap = ctl_sk_item.png
 	label {
+	  align = left
 	  color = Black
 	  color_focus = White
 	  color_click = White
@@ -655,6 +657,7 @@ skin.MrlItemBtn {
 	}
 	pixmap = pl_item_btn.png
 	label {
+	  align = left
 	  color = Black
 	  color_focus = White
 	  color_click = White

@@ -407,11 +407,7 @@ static void paint_inputtext(xitk_widget_t *it, Window win, GC gc) {
 
     XUNLOCK(private_data->imlibdata->x.disp);
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "paint input text on something (%d) "
-	     "that is not an input text\n", it->widget_type);
-#endif
+
 }
 
 /*
@@ -470,11 +466,6 @@ static int notify_click_inputtext(xitk_widget_list_t *wl, xitk_widget_t *it,
     paint_inputtext(it, wl->win, wl->gc);
 
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify focus input text on something (%d) "
-	     "that is not an input text\n", it->widget_type);
-#endif
 
   return 1;
 }
@@ -495,11 +486,6 @@ static int notify_focus_inputtext(xitk_widget_list_t *wl,
     paint_inputtext(it, wl->win, wl->gc);
 
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf(stderr, "notify focus input text on something (%d) "
-	    "that is not an input text\n", it->widget_type);
-#endif
 
   return 1;
 }
@@ -944,11 +930,6 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl,
       //      printf("got unhandled key = [%ld]\n", key);
     }
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify key event input text on something (%d) "
-	     "that is not an input text\n", it->widget_type);
-#endif
 
 }
 
@@ -962,11 +943,6 @@ char *xitk_inputtext_get_text(xitk_widget_t *it) {
   if (it->widget_type & WIDGET_TYPE_INPUTTEXT) {
     return private_data->text;
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf(stderr, "change input text on something (%d) "
-	    "that is not an input text\n", it->widget_type);
-#endif
   
   return NULL;
 }
@@ -984,11 +960,7 @@ void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, char 
     private_data->cursor_pos = -1;
     paint_inputtext(it, wl->win, wl->gc);
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf(stderr, "change input text on something (%d) "
-	    "that is not an input text\n", it->widget_type);
-#endif
+
 }
 
 /*

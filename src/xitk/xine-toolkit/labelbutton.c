@@ -303,11 +303,7 @@ static void paint_labelbutton (xitk_widget_t *lb, Window win, GC gc) {
 
     XUNLOCK(private_data->imlibdata->x.disp);
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "paint label button on something (%d) "
-	     "that is not a label button\n", lb->widget_type);
-#endif
+
 }
 
 /*
@@ -344,11 +340,6 @@ static int notify_click_labelbutton (xitk_widget_list_t *wl, xitk_widget_t *lb,
 
     
   }
-#ifdef DEBUG_GUI
- else
-    fprintf (stderr, "notify click label button on something (%d) "
-	     "that is not a label button\n", lb->widget_type);
-#endif
 
   return 1;
 }
@@ -370,11 +361,6 @@ int xitk_labelbutton_change_label(xitk_widget_list_t *wl,
     paint_labelbutton(lb, wl->win, wl->gc);
     return 1;
   }
-#ifdef DEBUG_GUI
- else
-    fprintf (stderr, "notify focus label button on something (%d) "
-	     "that is not a label button\n", lb->widget_type);
-#endif
 
   return 0;
 }
@@ -389,11 +375,6 @@ char *xitk_labelbutton_get_label(xitk_widget_t *lb) {
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
     return private_data->label;
   }
-#ifdef DEBUG_GUI
- else
-    fprintf (stderr, "notify focus label button on something (%d) "
-	     "that is not a label button\n", lb->widget_type);
-#endif
 
   return NULL;
 }
@@ -409,11 +390,6 @@ static int notify_focus_labelbutton (xitk_widget_list_t *wl,
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
     private_data->bArmed = bEntered;
   }
-#ifdef DEBUG_GUI
- else
-    fprintf (stderr, "notify focus label button on something (%d) "
-	     "that is not a label button\n", lb->widget_type);
-#endif
 
   return 1;
 }
@@ -444,6 +420,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       private_data->fontname      = strdup(xitk_skin_get_label_fontname(skonfig, 
 							private_data->skin_element_name));
       private_data->label_visible = xitk_skin_get_label_printable(skonfig, private_data->skin_element_name);
+      
+      private_data->align         = xitk_skin_get_label_alignment(skonfig, private_data->skin_element_name);
 
       lb->x                    = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
       lb->y                    = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
@@ -466,11 +444,6 @@ int xitk_labelbutton_get_state(xitk_widget_t *lb) {
     if(private_data->bType == RADIO_BUTTON)
       return private_data->bState;
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify click label button on something (%d) "
-	     "that is not a label button\n", lb->widget_type);
-#endif
   
   return -1;
 }
@@ -527,11 +500,7 @@ void xitk_labelbutton_set_state(xitk_widget_t *lb, int state, Window win, GC gc)
       }
     }
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify click label button on something (%d) "
-	     "that is not a label button\n", lb->widget_type);
-#endif
+
 }
 
 /*
@@ -572,7 +541,7 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_skin_config_t *skonfig,
   private_data->clickcolor        = strdup(ccolor);
   private_data->fontname          = strdup(fontname);
 
-  private_data->align             = b->align;
+  private_data->align             = skin_element_name ? (xitk_skin_get_label_alignment(skonfig, skin_element_name)) : b->align;
 
   mywidget->private_data          = private_data;
 

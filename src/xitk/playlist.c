@@ -799,7 +799,6 @@ void playlist_editor(void) {
   lb.skin_element_name = "PlAdd";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Add");
-  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = open_mrlbrowser;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -809,7 +808,6 @@ void playlist_editor(void) {
   lb.skin_element_name = "PlLoad";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Load");
-  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = pl_load_pl;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -819,7 +817,6 @@ void playlist_editor(void) {
   lb.skin_element_name = "PlSave";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Save");
-  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = pl_save_pl;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -829,7 +826,6 @@ void playlist_editor(void) {
   lb.skin_element_name = "PlDismiss";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Dismiss");
-  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = pl_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -877,7 +873,6 @@ void playlist_editor(void) {
       lb.skin_element_name = "AutoPlayBG";
       lb.button_type       = CLICK_BUTTON;
       lb.label             = autoplay_plugins[i];
-      lb.align             = LABEL_ALIGN_CENTER;
       lb.callback          = pl_scan_input;
       lb.state_callback    = NULL;
       lb.userdata          = NULL;

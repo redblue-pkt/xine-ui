@@ -133,12 +133,7 @@ static void paint_checkbox (xitk_widget_t *c, Window win, GC gc) {
 
     XUNLOCK (private_data->imlibdata->x.disp);
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "paint checkbox something (%d) "
-	     "that is not a checkbox\n", c->widget_type);
-  
-#endif
+
 }
 
 /*
@@ -164,11 +159,6 @@ static int notify_click_checkbox (xitk_widget_list_t *wl, xitk_widget_t *c,
     paint_checkbox(c, wl->win, wl->gc);
 
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify click checkbox on something (%d) "
-	     "that is not a checkbox\n", c->widget_type);
-#endif
 
   return 1;
 }
@@ -183,11 +173,6 @@ static int notify_focus_checkbox (xitk_widget_list_t *wl,
   
   if (c->widget_type & WIDGET_TYPE_CHECKBOX)
     private_data->cArmed = cEntered;
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify focus checkbox on something (%d) "
-	     "that is not a checkbox\n", c->widget_type);
-#endif
 
   return 1;
 }
@@ -225,11 +210,6 @@ int xitk_checkbox_get_state(xitk_widget_t *c) {
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
   return private_data->cState;
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify click checkbox on something (%d) "
-	     "that is not a checkbox\n", c->widget_type);
-#endif
 
   return 0;
 }
@@ -259,11 +239,7 @@ void xitk_checkbox_set_state(xitk_widget_t *c, int state, Window win, GC gc) {
       paint_checkbox(c, win, gc);
     }
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify click checkbox on something (%d) "
-	     "that is not a checkbox\n", c->widget_type);
-#endif
+
 }
 
 /*

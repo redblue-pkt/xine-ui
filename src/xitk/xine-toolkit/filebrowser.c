@@ -1127,7 +1127,6 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = fb->homedir.caption;
-  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = filebrowser_homedir;
   lb.state_callback    = NULL;
   lb.userdata          = (void *)private_data;
@@ -1137,7 +1136,6 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = fb->select.caption;
-  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback          = filebrowser_select;
   lb.state_callback    = NULL;
   lb.userdata          = (void *)private_data;
@@ -1147,7 +1145,6 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 
   lb.button_type    = CLICK_BUTTON;
   lb.label          = fb->dismiss.caption;
-  lb.align             = LABEL_ALIGN_CENTER;
   lb.callback       = xitk_filebrowser_exit;
   lb.state_callback = (void *)mywidget;
   lb.userdata       = (void *)private_data;
