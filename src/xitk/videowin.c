@@ -194,7 +194,7 @@ static void video_window_adapt_size (void) {
 
     gVw->output_width    = gVw->fullscreen_width;
     gVw->output_height   = gVw->fullscreen_height;
-      
+    
     if(gGui->video_window == None) {
       XGCValues   gcv;
       
@@ -202,37 +202,35 @@ static void video_window_adapt_size (void) {
       gVw->visual          = gGui->visual;
       gVw->depth           = gGui->depth;
       gVw->colormap        = gGui->colormap;
-
+      
       attr.override_redirect = True;
       attr.background_pixel  = gGui->black.pixel;
       
       border_width = 0;
-
+      
       gGui->video_window = XCreateWindow(gGui->display, DefaultRootWindow(gGui->display),
 					 0, 0, gVw->fullscreen_width, gVw->fullscreen_height, 
 					 border_width, 
 					 CopyFromParent, CopyFromParent, CopyFromParent, 
 					 CWBackPixel | CWOverrideRedirect, &attr);
-/* fprintf (stderr, "***** XCreateWindow 1 visual %p id 0x%x depth %d\n", gVw->visual, gVw->visual->visualid, gVw->depth); */
       
       if(gGui->vo_driver)
 	gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
 					    GUI_DATA_EX_DRAWABLE_CHANGED, 
 					    (void*)gGui->video_window);
+
+      XSelectInput(gGui->display, gGui->video_window, ExposureMask);
       
       XSetStandardProperties(gGui->display, gGui->video_window, 
 			     window_title, window_title, None, NULL, 0, 0);
       
-
+      
       gcv.foreground         = gGui->black.pixel;
       gcv.background         = gGui->black.pixel;
       gcv.graphics_exposures = False;
       gVw->gc = XCreateGC(gGui->display, gGui->video_window, 
 			  GCForeground | GCBackground | GCGraphicsExposures, &gcv);
-      
-      XSetStandardProperties(gGui->display, gGui->video_window, 
-			     window_title, window_title, None, NULL, 0, 0);
-      
+
       hint.flags  = USSize | USPosition | PPosition | PSize;
       hint.x      = 0;
       hint.y      = 0;

@@ -694,6 +694,16 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
   }
+  
+  /* 
+   * Using root window mode don't allow
+   * window geometry, so, reset those params.
+   */
+  if(gGui->use_root_window) {
+    window_attribute.x     = window_attribute.y      = -8192;
+    window_attribute.width = window_attribute.height = -1;
+    window_attribute.borderless = 0;
+  }
 
   gGui->actions_on_start[aos] = ACTID_NOKEY;
 
