@@ -358,7 +358,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
     xitk_labelbutton_widget_t  lb;
     xitk_button_widget_t       b;
     int                        xx = x;
-    btnlist_t                 *bt;
       
     fs = xitk_font_load_font(t->imlibdata->x.disp, fontname);
 
