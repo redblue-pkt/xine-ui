@@ -400,6 +400,12 @@ static void pl_load_pl(xitk_widget_t *w, void *data) {
     xitk_browser_update_list(playlist->playlist, 
 			     gGui->playlist, gGui->playlist_num, 0);
     /* xitk_browser_rebuild_browser(playlist->playlist, 0); */
+    
+    gGui->playlist_cur = 0;
+    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+    
+    if(!is_playback_widgets_enabled())
+      enable_playback_controls(1);
   }
   
 }
