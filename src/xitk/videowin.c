@@ -2005,8 +2005,10 @@ static void video_window_handle_event (XEvent *event, void *data) {
   break;
 
   case ButtonPress: {
-    XButtonEvent *bevent = (XButtonEvent *) event;
-    int x, y;
+    XButtonEvent       *bevent = (XButtonEvent *) event;
+    xine_input_data_t   input;
+    xine_event_t        event;
+    int                 x, y;
 
     if(!gGui->cursor_visible) {
       gGui->cursor_visible = !gGui->cursor_visible;
@@ -2023,22 +2025,9 @@ static void video_window_handle_event (XEvent *event, void *data) {
       
       timercpy(&gVw->click_time, &old_click_time);
       gettimeofday(&gVw->click_time, 0);
-      
-      if (video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
-	xine_input_data_t input;
-	xine_event_t      event;
-	
-	event.type        = XINE_EVENT_INPUT_MOUSE_BUTTON;
-	event.stream      = gGui->stream;
-	event.data        = &input;
-	event.data_length = sizeof(input);
-	timercpy(&old_click_time, &event.tv);
-	input.button      = 1;
-	input.x           = x;
-	input.y           = y;
-	xine_event_send(gGui->stream, &event);
-      }
 
+      timercpy(&old_click_time, &event.tv);
+      
       timersub(&gVw->click_time, &old_click_time, &tm_diff);
       click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
       
@@ -2049,6 +2038,18 @@ static void video_window_handle_event (XEvent *event, void *data) {
       }
       
     }
+
+    if(video_window_translate_point(bevent->x, bevent->y, &x, &y)) {	
+      event.type        = XINE_EVENT_INPUT_MOUSE_BUTTON;
+      event.stream      = gGui->stream;
+      event.data        = &input;
+      event.data_length = sizeof(input);
+      input.button      = bevent->button;
+      input.x           = x;
+      input.y           = y;
+      xine_event_send(gGui->stream, &event);
+    }
+
   }
   break;
 
