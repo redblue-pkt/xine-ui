@@ -938,7 +938,7 @@ void video_window_set_visibility(int show_window) {
   if(gGui->use_root_window)
     return;
 
-  xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (void *)&show_window);
+  xine_gui_send_vo_data(gGui->stream, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (void *)show_window);
   
   gVw->show = show_window;
 
