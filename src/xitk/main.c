@@ -1061,8 +1061,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-  gGui->actions_on_start[aos] = ACTID_NOKEY;
-
   gGui->xine = xine_new();
   xine_config_load(gGui->xine, gGui->configfile);
   /*
@@ -1155,7 +1153,6 @@ int main(int argc, char *argv[]) {
     gGui->ao_port = load_audio_out_driver(driver_num);
   }
   SAFE_FREE(audio_driver_id);
-  
 
   {
     const char *const *pol = xine_list_post_plugins(gGui->xine);
@@ -1223,7 +1220,6 @@ int main(int argc, char *argv[]) {
 
   }
 
-
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
 
   osd_init();
@@ -1277,6 +1273,8 @@ int main(int argc, char *argv[]) {
   /*
    * hand control over to gui
    */
+  gGui->actions_on_start[aos] = ACTID_NOKEY;
+  
   gui_run();
 
 #ifdef HAVE_ORBIT
