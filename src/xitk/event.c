@@ -537,7 +537,7 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_AV_SYNC_RESET:
     xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, 0);
-    osd_display_info(_("SPU Offset: reset."));
+    osd_display_info(_("A/V Offset: reset."));
     break;
 
   case ACTID_SV_SYNC_p:
