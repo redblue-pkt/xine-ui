@@ -121,7 +121,7 @@ void show_usage (void) {
   printf("OPTIONS are:\n");
   printf("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n");
   printf("                               ");
-  driver_ids = list_video_output_plugins (VISUAL_TYPE_X11);
+  driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
   driver_id  = *driver_ids++;
   while (driver_id) {
     printf ("%s ", driver_id);
@@ -432,7 +432,7 @@ int main(int argc, char *argv[]) {
    */
 
   if (!video_driver_id) {
-    char **driver_ids = list_video_output_plugins (VISUAL_TYPE_X11);
+    char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
     video_driver_id = driver_ids[0];
 
     printf ("main: auto-selected %s video output plugin\n", video_driver_id);
@@ -443,7 +443,6 @@ int main(int argc, char *argv[]) {
 					       VISUAL_TYPE_X11, 
 					       (void *) gDisplay);
   audio_driver = xine_load_audio_output_plugin(cfg,
-					       audio_driver_name,
 					       audio_driver_id);
 
 
