@@ -4,7 +4,7 @@
 
 AUTOMAKE_OPTIONS = foreign nostdinc
 
-EXTRA_DIST = getdate.y config.h.in ca-bundle.crt COPYING
+EXTRA_DIST = getdate.y ca-bundle.crt COPYING
 
 noinst_LTLIBRARIES = libcurl.la
 
