@@ -238,6 +238,8 @@ static void show_banner(void) {
 static void print_usage (void) {
   const char *const *driver_ids;
   char              *driver_id;
+  const char *const *post_ids;
+  char              *post_id;
   xine_t            *xine;
   char              *cfgdir = ".xine";
   char              *cfgfile = CONFIGFILE;
@@ -283,8 +285,16 @@ static void print_usage (void) {
   }
   printf ("\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
-  printf("  -P, --post-plugin <name>     Use plugin <name> for video less stream animation.\n");
+  printf("  -P, --post-plugin <name>     Plugin <name> for video less stream animation:\n");
   printf("                                 (default is goom).\n");
+  printf("                               ");
+  post_ids = xine_list_post_plugins_typed(xine, XINE_POST_TYPE_AUDIO_VISUALIZATION);
+  post_id  = (char *)*post_ids++;
+  while (post_id) {
+    printf ("%s ", post_id);
+    post_id  = (char *)*post_ids++;
+  }
+  printf("\n");
   printf("  -N, --no-post                Don't use post effect at all\n");
   printf("  -d, --debug                  Show debug messages.\n");
   printf("\n");
@@ -735,7 +745,7 @@ int main(int argc, char *argv[]) {
     aaxine.no_post = 1;
   }
   
-  /* Init post plugin, is desired */
+  /* Init post plugin, if desired */
   if(!aaxine.no_post) {
     if(aaxine.post_plugin_name == NULL)
       aaxine.post_plugin_name = "goom";
