@@ -259,7 +259,15 @@ static void label_setup_label(xitk_widget_t *l, char *label_) {
       void *dummy;
 
       private_data->anim_running = 0;
+      /*
+       * xitk_label_animation_loop may be already running due to a call
+       * from gui_dndcallback, inside mrl_add_and_play. paint_label will
+       * try to lock this mutex and will block. If we don´t unlock it here,
+       * we will block too waiting for the join... Deadlock!
+       */
+      pthread_mutex_unlock(&private_data->mutex);
       pthread_join (private_data->thread, &dummy);
+      pthread_mutex_lock(&private_data->mutex);
     }
 
     if (label_len > private_data->length) {
