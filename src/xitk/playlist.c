@@ -563,7 +563,7 @@ void playlist_scan_for_infos(void) {
     int            old_pos = 0, rerun = 0;
     xine_stream_t *stream = gGui->playlist.scan_stream;
     int            mute = gGui->mixer.mute;
-    
+
     /* 
      * Because we share audio driver (and since we can't stat infos of
      * audio only streams without audio driver), pausing the gGui->stream
@@ -605,6 +605,8 @@ void playlist_scan_for_infos(void) {
 	  
 	  free(ident);
 	}
+
+	xine_close(stream);
       }
     }
     
@@ -748,7 +750,13 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	  xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i], &num_mrls);
 	
 	if(autoplay_mrls) {
-	  int j;
+	  int            j;
+	  int            cdda_mode = 0;
+	  xine_stream_t *stream = gGui->playlist.scan_stream;
+
+	  printf("button: %s\n", autoplay_plugins[i]);
+	  if(!strcasecmp(autoplay_plugins[i], "cd"))
+	    cdda_mode = 1;
 	  
 	  /* Flush playlist in newbie mode */
 	  if(gGui->smart_mode) {
@@ -762,8 +770,19 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	  if(!gGui->playlist.num)
 	    gGui->playlist.cur = 0;
 	  
-	  for (j = 0; j < num_mrls; j++)
-	    mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
+	  for (j = 0; j < num_mrls; j++) {
+	    char *ident = NULL;
+	    
+	    if(cdda_mode && xine_open(stream, autoplay_mrls[j])) {
+	      ident = stream_infos_get_ident_from_stream(stream);
+	      xine_close(stream);
+	    }
+
+	    mediamark_add_entry(autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
+
+	    if(ident)
+	      free(ident);
+	  }
 	  
 	  if(gGui->playlist.cur == 0)
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
