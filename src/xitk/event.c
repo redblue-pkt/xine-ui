@@ -1046,11 +1046,15 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    * init playlist
    */
   for (i = 0; i < nfiles; i++) {
-    char *sub;
+    char *sub = NULL;
     
-    if((sub = strstr(filenames[i], "::")) != NULL) {
-      *sub = 0;
-      sub += 2;
+    if((sub = get_last_double_semicolon(filenames[i])) != NULL) {
+      if(is_ipv6_double_semicolon(filenames[i]))
+	sub = NULL;
+      else {
+	*sub = 0;
+	sub += 2;
+      }
     }
     
     mediamark_add_entry((const char *)filenames[i], (const char *)filenames[i], sub, 0, -1, 0, 0);

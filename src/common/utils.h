@@ -70,4 +70,8 @@ int mkdir_safe(char *path);
  */
 int get_bool_value(const char *val);
 
+
+char *get_last_double_semicolon(char *str);
+int is_ipv6_double_semicolon(char *str);
+
 #endif

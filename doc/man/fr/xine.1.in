@@ -234,7 +234,7 @@ Si vous désirez spécifier une autre session, utilisez l'option \fB\-S session=\f
 Gestion de session. Toutes les options peuvent être utilisées plus d'une fois, 
 excepté \fBsession\fP.
 .br
-Les options sont::
+Les options sont:
 .br
 \fBsession=\fP\fIn\fP specifie le numéro de session \<\fIn\fP\>,
 .br
