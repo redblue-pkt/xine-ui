@@ -16,9 +16,14 @@ bin_PROGRAMS = ${aa_programs}
 aaxine_SOURCES = $(GETOPT_C) main.c
 aaxine_LDADD = @XINE_LIBS@ $(AALIB_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
-$(GETOPT_C):
+getopt.c:
 	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c
+
+getopt1.c:
+
 	$(LN_S) $(top_srcdir)/src/common/getopt1.c ./getopt1.c
+
+getopt.h:
 	$(LN_S) $(top_srcdir)/src/common/getopt.h ./getopt.h
 
 debug:
