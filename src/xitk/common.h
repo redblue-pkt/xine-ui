@@ -239,6 +239,7 @@ typedef struct {
   } playlist;
 
 
+  int                       on_quit;
   int                       running;
   int                       ignore_next;
 

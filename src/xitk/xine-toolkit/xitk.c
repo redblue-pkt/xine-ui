@@ -1177,6 +1177,16 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 
 	  if(!handled) {
+
+	    if(gXitk->menu && 
+	       ((fx->widget_list && 
+		 ((!fx->widget_list->widget_focused) || 
+		  (!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) ||
+		(!fx->widget_list)))  {
+	      
+	      xitk_set_current_menu(NULL);
+	    }
+	    
 	    if((w == NULL) || (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) == 0))) {
 	      if(fx->xevent_callback) {
 		fx->xevent_callback(event, fx->user_data);

@@ -719,6 +719,9 @@ void gui_execute_action_id(action_id_t action) {
  */
 void gui_handle_event (XEvent *event, void *data) {
 
+  if(gGui->on_quit)
+    return;
+  
   switch(event->type) {
 
   case MappingNotify:
@@ -1183,6 +1186,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   init_skins_support();
 
+  gGui->on_quit = 0;
   gGui->running = 1;
 
   video_window_init (window_attribute, 

@@ -425,6 +425,18 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
  */
 void gui_exit (xitk_widget_t *w, void *data) {
   
+  gGui->on_quit = 1;
+
+  if(panel_is_visible()) {
+    XLockDisplay(gGui->display);
+    XUnmapWindow(gGui->display, gGui->panel_window);
+    XSync(gGui->display, False);
+    XUnlockDisplay(gGui->display);
+  }
+
+  if(video_window_is_visible())
+    video_window_set_visibility(0);
+
   gui_stop(NULL, NULL);
 
   video_window_exit ();
