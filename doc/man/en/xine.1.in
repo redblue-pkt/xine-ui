@@ -452,12 +452,16 @@ Select event
 .SS Synchronization fine tuning
 Some streams have bad timestamps, so synchronization fails. This can be
 tweaked using these keys:
-.IP "n | N"
+.IP "n"
 press if video runs ahead of audio
-.IP "m | "
+.IP "m"
 press if video lags behind audio
 .IP "\fB<home>\fP"
 press to reset audio/video offset to \fB0\fP, so stream timestamps are unchanged.
+
+.SS Subtitle synchronization
+You can adjust subtitle synchronization by using these keys:
+.IP "M / N"
 
 .SS Numeric Input
 It is possible to give numeric input, however for backward
@@ -469,7 +473,7 @@ the modifier value of "SetPosition\fI<X>\fR%" and "Number\fI<Y>\fR" (where
 \fI<X>\fR is 0, 10, .. 90, and \fI<Y>\fR is 0..9). In particular replace
 these lines in your xine keymap file \fI~/.xine/keymap\fP.
 
-.Vb 119
+.Vb
 # Set position to beginning or 10..90% of current stream.
 SetPosition0% {
 	key = 0

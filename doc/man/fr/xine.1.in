@@ -493,7 +493,7 @@ Evènement Angle suivant.
 .BR <PavéNum\ Entrée> :
 Evènement Sélection.
 .br
-.SH Affinage de la synchronization
+.SH Ajustement de la synchronization audio/video
 Il existe des flux ayant de mauvaises informations de temporisation, de ce 
 fait la synchronisation échoue. Il est possible de corriger ceci en utilisant
 les touches directionnelle:
@@ -506,6 +506,12 @@ Pressez cette touche si le vidéo est en retard par rapport à l'audio.
 .br
 .BR <début> :
 Pressez cette touche pour remettre à 0.
+.br
+.SH Ajustement de la synchronization des sous-titres
+Il est possible de modifier la synchronisation des sous-titres en utilisant les touches suivantes:
+.br
+\fBM\fP et \fBN\fP
+.br
 .SH FICHIERS
 Tout les fichiers de configurations sont désormais dans ~/.xine:
 .br
