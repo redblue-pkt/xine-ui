@@ -133,6 +133,10 @@ static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   }
 }
 
+const char **post_get_audio_plugins_names(void) {
+  return (const char **) post_audio_plugins;
+}
+
 void post_init(void) {
 
   gGui->visual_anim.post_output = NULL;
@@ -167,7 +171,7 @@ void post_init(void) {
 				    _("Audio visualization plugin"),
 				    _("Post audio plugin to used when playing streams without video"),
 				    CONFIG_LEVEL_BEG,
-				    post_audio_plugin_cb, 
+				    post_audio_plugin_cb,
 				    CONFIG_NO_DATA);
 	
 	gGui->visual_anim.post_output = 

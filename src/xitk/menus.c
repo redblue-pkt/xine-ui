@@ -270,6 +270,12 @@ static void menu_audio_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
     break;
   }
 }
+
+static void menu_audio_viz(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  int viz = (int) data;
+  
+  config_update_num("gui.post_audio_plugin", viz);
+}
 static void menu_audio_chan(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int channel = (int) data;
 
@@ -470,25 +476,37 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "SEP",  
       "<separator>",
       NULL, NULL                                                                             },
-    { "Volume",
+    { "Audio",
       "<branch>",
       NULL, NULL                                                                             },
-    { "Volume/Mute",
+    { "Audio/Volume",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "Audio/Volume/Mute",
       gGui->mixer.mute ? "<checked>" : "<check>",
       menu_audio_ctrl, (void *) AUDIO_MUTE                                                   },
-    { "Volume/Increase 10%",
+    { "Audio/Volume/Increase 10%",
       NULL,
       menu_audio_ctrl, (void *) AUDIO_INCRE_VOL                                              },
-    { "Volume/Decrease 10%",
+    { "Audio/Volume/Decrease 10%",
       NULL,
       menu_audio_ctrl, (void *) AUDIO_DECRE_VOL                                              },
-    { "Audio Channel",
+    { "Audio/Channel",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "Audio/Visualization",
       "<branch>",
       NULL, NULL                                                                             },
     /*
       audio channels
     */
-    { "Sub Channel",
+    { "SEP",  
+      "<separator>",
+      NULL, NULL                                                                             },
+    { "Subtitle",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "Subtitle/Channel",
       "<branch>",
       NULL, NULL                                                                             },
     /*
@@ -639,20 +657,50 @@ void video_window_menu(xitk_widget_list_t *wl) {
     }
   }
 
+  { /* Audio Viz */
+    xitk_menu_entry_t   menu_entry;
+    const char        **viz_names = post_get_audio_plugins_names();
+
+    if(viz_names && *viz_names) {
+      int                 i = 0;
+      char               *location = "Audio/Visualization";
+      char                buffer[2048];
+
+      while(viz_names[i]) {
+	sprintf(buffer, "%s/%s", location, viz_names[i]);
+	menu_entry.menu      = buffer;
+	menu_entry.type      = IS_CHANNEL_CHECKED(i, gGui->visual_anim.post_plugin_num);
+	menu_entry.cb        = menu_audio_viz;
+	menu_entry.user_data = (void *) i;
+	xitk_menu_add_entry(w, &menu_entry);
+	i++;
+      }
+
+    }
+    else {
+      menu_entry.menu      = "Audio/Visualization/None";
+      menu_entry.type      = NULL;
+      menu_entry.cb        = NULL;
+      menu_entry.user_data = NULL;
+      xitk_menu_add_entry(w, &menu_entry);
+    }
+    
+  }
+
   { /* Audio channels */
     xitk_menu_entry_t   menu_entry;
     int                 i;
-    char               *location = "Audio Channel";
+    char               *location = "Audio/Channel";
     char                buffer[2048];
     int                 channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
     
-    menu_entry.menu      = "Audio Channel/Off";
+    menu_entry.menu      = "Audio/Channel/Off";
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
     menu_entry.cb        = menu_audio_chan;
     menu_entry.user_data = (void *) -2;
     xitk_menu_add_entry(w, &menu_entry);
     
-    menu_entry.menu      = "Audio Channel/Auto";
+    menu_entry.menu      = "Audio/Channel/Auto";
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
     menu_entry.cb        = menu_audio_chan;
     menu_entry.user_data = (void *) -1;
@@ -692,17 +740,17 @@ void video_window_menu(xitk_widget_list_t *wl) {
   { /* SPU channels */
     xitk_menu_entry_t   menu_entry;
     int                 i;
-    char               *location = "Sub Channel";
+    char               *location = "Subtitle/Channel";
     char                buffer[2048];
     int                 channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
     
-    menu_entry.menu      = "Sub Channel/Off";
+    menu_entry.menu      = "Subtitle/Channel/Off";
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
     menu_entry.cb        = menu_spu_chan;
     menu_entry.user_data = (void *) -2;
     xitk_menu_add_entry(w, &menu_entry);
     
-    menu_entry.menu      = "Sub Channel/Auto";
+    menu_entry.menu      = "Subtitle/Channel/Auto";
     menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
     menu_entry.cb        = menu_spu_chan;
     menu_entry.user_data = (void *) -1;

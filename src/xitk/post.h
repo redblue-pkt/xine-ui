@@ -31,6 +31,7 @@ typedef struct {
   char           *name;
 } post_element_t;
 
+const char **post_get_audio_plugins_names(void);
 void post_init(void);
 void post_rewire_visual_anim(void);
 int post_rewire_audio_port_to_stream(xine_stream_t *stream);
