@@ -1,6 +1,6 @@
 .\" -*-Nroff-*-
 .\""
-.TH XINE 1x 2000-11-19 "The xine project"
+.TH XINE 1x 2001-07-18 "The xine project"
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\""
@@ -58,10 +58,15 @@ or VCD 'v'.
 .TP
 .B \-R, \-\-recognize\-by <option>
 Change the way xine will try to recognize stream types. 
-Valid options are: "default" (first by content, then by extension),
+Valid options are: 
+.br
+"default" (first by content, then by extension),
+.br
 "revert" (first by extension, then by content),
+.br
 "content" (only by content),
-"extension" (only by extension). Ff no option is given, 
+.br
+"extension" (only by extension). If no option is given, 
 "revert" is selected
 .TP
 .B MRL (media resource locator)
@@ -102,7 +107,7 @@ or
 Pause
 .br
 .BR F :
-Toggle fullscreen mode (Xv only)
+Toggle fullscreen mode.
 .br
 .BR G :
 Hide/show the gui.
@@ -112,6 +117,9 @@ Hide/show the video output window.
 .br
 .BR A :
 Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
+.br
+.BR B :
+Hide/show the MRL browser.
 .br
 .BR C :
 Show/hide the video settings window.
@@ -137,18 +145,23 @@ Select next audio channel (may take up to a few seconds to take effect)
 .BR - :
 Select prev audio channel
 .br
-.BR Ctrl
+.BR Ctrl :
 Show/hide mouse cursor (only when the GUI is hide)
 .br
-.BR >
-or
+.BR > :
+Enlarge the ouput window.
+.br
 .BR . :
 Select next sub-title channel.
 .br
-.BR <
-or
+.BR < :
+Reduce the output window.
+.br
 .BR , :
 Select previous sub-title channel.
+.br
+.BR Q :
+Exit.
 .br
 .SH Synchronization fine tuning
 Some streams have bad timestamps, so synchronization fails. This can be
@@ -168,4 +181,3 @@ This manual page was written by Siggi Langauf <siggi@debian.org>,
 for the xine project. Lots of additions by
 Guenter Bartsch <guenter@users.sourceforge.net> and
 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-

@@ -1,6 +1,6 @@
 .\" -*-Nroff-*-
 .\""
-.TH XINE 1x 2000-11-19 "Le projet xine"
+.TH XINE 1x 2001-07-18 "Le projet xine"
 .SH NOM
 xine \- Lecteur audio/vidéo MPEG2/MPEG1.
 .SH SYNOPSIS
@@ -9,62 +9,70 @@ xine \- Lecteur audio/vidéo MPEG2/MPEG1.
 .SH DESCRIPTION
 Cette page de manuel documente brièvement le lecteur audio/vidéo \fBxine\fP.
 .PP
-\fBxine\fP lis les flux système MPEG, synchronise les flux audio et vidèo.
-Il peux lire les flux a partir de fichiers, CD Vidéo, DVD et d'autres sources.
+\fBxine\fP lis les flux MPEG, synchronise les flux audio et vidéo.
+Il peux lire les flux a partir de fichiers, CD Vidéo, DVD ou d'autres sources.
 .SH OPTIONS
-Ce programme suis la syntaxe de ligne de commande GNU, avec les longues
-options commençant par deux tirets ('-').
-Une list de ces options est incluse plus bas.
-Pour une description complète, lisez les fichiers README et FAQ 
-dans @prefix@/share/doc/xine ou sur la homepage.
+Ce programme utilise la syntaxe GNU pour la ligne de commande, avec les 
+longues options commençant par deux tirets ('-').
+Une liste de ces options est donnée plus bas.
+Pour une description complète, lisez les fichiers README et FAQ présents
+dans le répertoire @prefix@/share/doc/xine ou sur la page du projet.
 .TP
 .B \-h, \-\-help
-Affiche la liste des options.
-.TP
-.B \-s, \-\-shared\-memory
-utilise l'extension 'X Shared Memory' pour la sortie.
-.br
-Cela peut être utile si vous rencontrez des problèmes en utilisant
-l'extension 'Xv', Xv est utilisée par defaut, si elle est disponible.
-Comme Xv est accélérée materiellement, elle offre plus de fonctionnalitées
-et de meilleurs performances.
+Affiche la liste des options ainsi que la liste des pilotes 
+(plugins) disponibles.
 .TP
 .B \-a, \-\-audio\-channel <num>
 Sélectionne le canal audio spécifié. <num> est le numéro du canal, la valeur
 par defaut est '0'.
 .br
-Pour les flux MPEG2, les flux audio AC3 sont numérotés de 0 à 7, tandis 
-que les flux MPEG sont numérotés de 8 à 39 (si il y a plusieurs sous 
-flux audio, bien entendu)
+xine 0.5 et plus tente de collecter tous les canaux audio (ac3, mpeg 
+audio, avi audio, ...) du flux et les classe en "canaux virtuels" 
+en partant du canal 0.
+.TP
+.B \-V, \-\-video\-driver <drv>
+Sélectionne le pilote vidéo. Utilisez "xine --help" pour avoir la
+liste des pilotes disponible sur votre système. Cette sélection est
+automatiquement enregistrée dans votre .xinerc, donc vous n'avez à
+spécifier ce paramêtre qu'une seule fois.
 .TP
 .B \-A, \-\-audio\-driver <drv>
-Sélectionne le pilote audio. Les pilotes valides sont "oss" (defaut), 
-"alsa", "esd" ou "null".
-Par defaut ESD est utilisé si la variable d'environnement "ESPEAKER"
-est positionnée, sinon ALSA si présent, ou alors OSS. Le pilote "null" 
-peut être utilisé pour supprimer la sortie audio, par exemple, si il y 
-a des problemes avec la carte son.
+Sélectionne le pilote audio. Utilisez "xine --help" pour avoir la
+liste des pilotes disponible sur votre système. Cette sélection est
+automatiquement enregistrée dans votre .xinerc, donc vous n'avez à
+spécifier ce paramêtre qu'une seule fois.
 .TP
 .B \-u, \-\-spu\-channel <num>
-Sélectionne le canal de subpicture (sous-titres). <num> est le numéro
-du canal de subpicture, par défaut il n'y a pas de sous-titre (\-1)
-.TP
-.B \-S, \-\-spdif
-Met en fonction la sortie AC3 via SPDIF. Ne fonctionne qu'avec
-certains pilotes ALSA supportant la fonctionnalité AC3 taversante.
+Sélectionne le canal de sous-titre. <num> est le numéro
+du canal de sous-titre. par défaut il n'y a pas de sous-titre (\-1)
 .TP
 .B \-p[f][h][q][d][v], 
-Démarre la lecture immédiatement apres l'execution. Peut être suivi
+Démarre la lecture immédiatement apres l'exécution. Peut être suivi
 par 'f' pour passer en mode plein écran, et/ou par 'h' pour
 masquer le panneau de contrôle, et/ou par 'q' pour quitter
 à la fin de la lecture. Il est possible d'obtenir automatiquement
 les listes de lecture à partir d'un DVD 'd', ou d'un VCD 'v'.
 .TP
+.B \-R, \-\-recognize\-by <option>
+Change la méthode par laquelle xine va tenter de reconnaitre le
+type de flux.
+Les options valides sont:
+.br
+"default" (d'abord par contenu, puis par extension),
+.br
+"revert" (d'abord par extension, puis par contenu),
+.br
+"content" (uniquement par contenu),
+.br
+"extension" (uniquement par extention).
+.br
+Si aucune option n'est utilisée, "revert" est sélectionné.
+.TP
 .B MRL (media resource locator)
 .br
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles
 définissent le média à utiliser comme source de lecture.
-Les MRLs valides peuvent être les noms de fichiers ou un de ceux qui suis:
+Les MRLs valides peuvent être des noms de fichiers ou un de ceux qui suis:
 .br
 .BR file://<chemin>
 .br
@@ -80,7 +88,7 @@ or
 .br
 .BR "net://???"
 .LP
-Plusieurs MRLs peuvent être spécifiées pour lire un nombre consecutif
+Plusieurs MRLs peuvent être spécifiées pour lire un nombre consécutif
 de flux.
 .LP
 Si vous ne spécifiez aucune MRL, vous pourrez sélectionner un fichier
@@ -88,11 +96,11 @@ par glisser-lacher.
 Glisser des fichiers depuis GNOME Midnight Commander (gmc) est connu
 pour fonctionner.
 .SH "VOIR AUSSI"
-Le programme est complement documenté sur la homepage de xine:
+Le programme est complètement documenté sur la page du projet de xine:
 .IR "http://xine.sourceforge.net/"
-.SH TOUCHES DE CONTROLE
+.SH TOUCHES DE CONTRÔLE
 Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches.
-La liste de ces touches sont:
+La liste de ces touches est:
 .LP
 .BR ENTREE :
 Lecture
@@ -103,7 +111,7 @@ ou
 Pause
 .br
 .BR F :
-Bascule plein écran (Xv seulement).
+Bascule plein écran/fenêtré.
 .br
 .BR G :
 Affiche/masque le panneau de contrôle.
@@ -113,6 +121,9 @@ Affiche/masque la fenêtre de sortie.
 .br
 .BR A :
 Bascule du ratio d'aspect (AUTO/16:9/4:3/DVB) 
+.br
+.BR B :
+Affiche/masque le gestionnaire de MRL.
 .br
 .BR C :
 Affiche/masque la fenêtre des réglages vidéo.
@@ -133,33 +144,44 @@ Saute au flux precédent dans la liste de lecture.
 Saute au flux suivant dans la liste de lecture.
 .br
 .BR + :
-Sélectionne le canal audio suivant (peux prendre quelques secondes
-avant effet).
+Sélectionne le canal audio suivant.
 .br
 .BR - :
-Sélectionne le canal audio precédent.
+Sélectionne le canal audio précédent.
 .br
 .BR Ctrl
 Affiche/masque le pointeur de souris (uniquement quand le panneau de
 contrôle est masqué).
 .br
-.BR >
-ou
+.BR > :
+Agrandi la fenêtre de sortie.
+.br
+.BR < :
+Réduit la fenêtre de sortie.
+.br
 .BR . :
 Sélectionne le canal de sous-titres suivant.
 .br
-.BR <
-ou
 .BR , :
-Sélectionne le canal de sous-titres precédant.
+Sélectionne le canal de sous-titres précédant.
+.br
+.BR Q :
+Quitte.
+.br
+.SH Affinage de la synchronization
+Il existe des flux ayant de mauvaises informations de temporisation, de ce 
+fait la synchronisation échoue. Il est possible de corriger ceci en utilisant
+les touches directionnelle:
 .br
 .BR Gauche :
-Change négativement la synchronisation A/V.
+Pressez cette touche si la vidéo est en avance par rapport à l'audio.
 .br
 .BR Droit :
-Change positivement la synchronisation A/V.
+Pressez cette touche si le vidéo est en retard par rapport à l'audio.
 .br
 .BR Début :
-Remise à zéro de la synchronisation A/V.
+Pressez cette touche pour remettre à 0.
 .SH AUTEURS
-Cette page de manuel a été écrite par Siggi Langauf <siggi@users.sourceforge.net>, traduite par Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>, pour le projet xine.
+Cette page de manuel a été écrite par Siggi Langauf <siggi@users.sourceforge.net>, de nombreux ajouts de Guenter Bartsch <guenter@users.sourceforge.net> et
+Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>, pour le projet xine.
+Traduction par Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>.
