@@ -35,9 +35,7 @@ typedef struct {
 
 #define WINDOWED_MODE              0x00000001
 #define FULLSCR_MODE               0x00000002
-#ifdef HAVE_XINERAMA
 #define FULLSCR_XI_MODE            0x00000004
-#endif
 
 #define CURSOR_ARROW               1
 #define CURSOR_HAND                2
