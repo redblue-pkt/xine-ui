@@ -67,8 +67,9 @@ static void get_available_skins_from(char *path) {
     return;
 
   if((pdir = opendir(path)) != NULL) {
-    struct stat   pstat;
+    struct stat   pstat, sstat;
     char          fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    char          skcfgname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     
     while((pdirent = readdir(pdir)) != NULL) {
       memset(&fullfilename, 0, sizeof(fullfilename));
@@ -80,13 +81,27 @@ static void get_available_skins_from(char *path) {
 	 && (!(strlen(pdirent->d_name) == 1 && pdirent->d_name[0] == '.' )
 	     && !(strlen(pdirent->d_name) == 2 
 		  && (pdirent->d_name[0] == '.' && pdirent->d_name[1] == '.')))) {
-	skins_avail = (skins_locations_t **) 
-	  realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
-	skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
-	
-	skins_avail[skins_avail_num]->pathname = strdup(path);
-	skins_avail[skins_avail_num]->skin = strdup(pdirent->d_name);
-	skins_avail_num++;
+
+	/*
+	 * Check if a skinconfig file exist
+	 */
+	memset(&skcfgname, 0, sizeof(skcfgname));
+	sprintf(skcfgname, "%s/%s", fullfilename, "skinconfig");
+	if(((stat(skcfgname, &sstat)) > -1) && (S_ISREG(sstat.st_mode))) {
+	  
+	  skins_avail = (skins_locations_t **) realloc(skins_avail, 
+						       (skins_avail_num + 2) * sizeof(skins_locations_t*));
+	  skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
+	  
+	  skins_avail[skins_avail_num]->pathname = strdup(path);
+	  skins_avail[skins_avail_num]->skin = strdup(pdirent->d_name);
+	  skins_avail_num++;
+	  
+	}
+	else {
+	  fprintf(stderr, "skinconfig file in '%s' is missing: skin '%s' skiped.\n",
+		  fullfilename, pdirent->d_name);
+	}
       }
     }
     closedir(pdir);
@@ -215,7 +230,7 @@ void change_skin(skins_locations_t *sk) {
   char                *old_skin;
   skins_locations_t   *sks = sk;
   cfg_entry_t         *entry;
-  int                  twice = 0;
+  int                  twice = 0, twice_load = 0;
 
   if(!sk)
     return;
@@ -236,20 +251,33 @@ void change_skin(skins_locations_t *sk) {
  __reload_skin:
   memset(&buf, 0, sizeof(buf));
   sprintf(buf, "%s/%s", sks->pathname, sks->skin);
-  
+
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
-    xine_error(_("Failed to load %s/%s. Reload old skin '%s'.\n"), buf, "skinconfig", old_skin);
+    skins_locations_t   *osks;
+
     gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(old_skin)));
-    sks = get_skin_location(old_skin);
-    if(!twice) {
-      twice++;
+    osks = get_skin_location(old_skin);
+    if((!strcmp(osks->pathname, sks->pathname)) && (!strcmp(osks->skin, sks->skin))) {
+      xine_error(_("Failed to load %s/%s. Load fallback skin %s\n"), 
+		 buf, "skinconfig", DEFAULT_SKIN);
+      gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+      sks = get_skin_location(DEFAULT_SKIN);
+    }
+    else {
+      xine_error(_("Failed to load %s/%s. Reload old skin '%s'.\n"), buf, "skinconfig", old_skin);
+      sks = osks;
+    }
+    
+    if(!twice_load) {
+      twice_load++;
       goto __reload_skin;
     }
     else {
       exit(-1);
     }
   }
-  
+  twice_load = 0;
+
   /* Check skin version */
   if(xitk_skin_check_version(gGui->skin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config(gGui->skin_config);
@@ -313,7 +341,7 @@ static void skin_change_cb(void *data, cfg_entry_t *cfg) {
 void init_skins_support(void) {
   skins_locations_t   *sk;
   char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-  int                  twice = 0;
+  int                  twice = 0, twice_load = 0;
   int                  skin_num, i;
     
   change_config_entry = 0;
@@ -349,15 +377,25 @@ void init_skins_support(void) {
     }
   } 
   
+ __reload_skin:
   memset(&buf, 0, XITK_PATH_MAX + XITK_NAME_MAX);
   sprintf(buf, "%s/%s", sk->pathname, sk->skin);
 
- __reload_skin:
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
-    fprintf(stderr, _("Failed to load %s/%s. Exiting.\n"), buf, "skinconfig");
-    xitk_skin_free_config(gGui->skin_config);
-    exit(-1);
+    if(!twice_load) {
+      twice_load++;
+      fprintf(stderr, _("Failed to load %s/%s. Load fallback skin %s\n"), 
+	      buf, "skinconfig", DEFAULT_SKIN);
+      gGui->config->update_num(gGui->config, "gui.skin", (get_skin_offset(DEFAULT_SKIN)));
+      sk = get_skin_location(DEFAULT_SKIN);
+      goto __reload_skin;
+    }
+    else {
+      fprintf(stderr, _("Failed to load %s/%s. Exiting.\n"), buf, "skinconfig");
+      exit(-1);
+    }
   }
+  twice_load = 0;
 
   /* Check skin version */
   if(xitk_skin_check_version(gGui->skin_config, SKIN_IFACE_VERSION) < 1) {

@@ -180,6 +180,13 @@ static void gui_signal_handler (int sig, void *data) {
 void gui_execute_action_id(action_id_t action) {
   xine_event_t   xine_event;
 
+  if(action & ACTID_IS_INPUT_EVENT) {
+    /* events for advanced input plugins. */
+    xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
+    xine_send_event(gGui->xine, &xine_event);
+    return;
+  }
+
   switch(action) {
     
   case ACTID_WINDOWREDUCE:
@@ -395,70 +402,6 @@ void gui_execute_action_id(action_id_t action) {
     panel_snapshot(NULL, NULL);
     break;
     
-    /* events for advanced input plugins: */
-
-  case ACTID_EVENT_MENU1:
-    xine_event.type = XINE_EVENT_INPUT_MENU1;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_MENU2:
-    xine_event.type = XINE_EVENT_INPUT_MENU2;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_MENU3:
-    xine_event.type = XINE_EVENT_INPUT_MENU3;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_UP:
-    xine_event.type = XINE_EVENT_INPUT_UP;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_DOWN:
-    xine_event.type = XINE_EVENT_INPUT_DOWN;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_LEFT:
-    xine_event.type = XINE_EVENT_INPUT_LEFT;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_RIGHT:
-    xine_event.type = XINE_EVENT_INPUT_RIGHT;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_NEXT:
-    xine_event.type = XINE_EVENT_INPUT_NEXT;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_PRIOR:
-    xine_event.type = XINE_EVENT_INPUT_PREVIOUS;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-  
-  case ACTID_EVENT_ANGLE_NEXT:
-    xine_event.type = XINE_EVENT_INPUT_ANGLE_NEXT;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-
-  case ACTID_EVENT_ANGLE_PRIOR:
-    xine_event.type = XINE_EVENT_INPUT_ANGLE_PREVIOUS;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-    
-  case ACTID_EVENT_SELECT:
-    xine_event.type = XINE_EVENT_INPUT_SELECT;
-    xine_send_event(gGui->xine, &xine_event);
-    break;
-    
-    /* END OF: events for advanced input plugins: */
-
   case ACTID_ZOOM_IN:
     gui_change_zoom(1);
     break;
