@@ -79,7 +79,7 @@ void video_window_draw_logo(void) {
   
   XLockDisplay (gGui->display);
   
-  XClearWindow (gGui->display, gGui->video_window); 
+  /* XClearWindow (gGui->display, gGui->video_window);  */
 
   if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
 		  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
@@ -112,13 +112,23 @@ void video_window_draw_logo(void) {
 
 void video_window_hide_logo(void) {
 
+  XLockDisplay (gGui->display);
   XUnmapWindow (gGui->display, gGui->video_window);
   XMapWindow (gGui->display, gGui->video_window);
+  XUnlockDisplay (gGui->display);
   /*
   gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
 				      GUI_DATA_EX_DRAWABLE_CHANGED, 
 				      (void*)gGui->video_window);
 				      */
+}
+
+void video_window_show_logo(void) {
+
+  XLockDisplay (gGui->display);
+  XClearWindow (gGui->display, gGui->video_window); 
+  video_window_draw_logo();
+  XUnlockDisplay (gGui->display);
 }
 
 /*
@@ -535,18 +545,24 @@ void video_window_handle_event (XEvent *event) {
   
   switch(event->type) {
 
-  case Expose:
-    if(event->xany.window == gGui->video_window) {
-      if(xine_get_status(gGui->xine) == XINE_STOP)
-	video_window_draw_logo();
-      else {
+  case Expose: {
+    XExposeEvent * xev = (XExposeEvent *) event;
 
-	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
-					    GUI_DATA_EX_EXPOSE_EVENT, 
-					    event);
+    if (xev->count == 0) {
+
+      if(event->xany.window == gGui->video_window) {
+	if(xine_get_status(gGui->xine) == XINE_STOP)
+	  video_window_draw_logo();
+	else {
+
+	  gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+					      GUI_DATA_EX_EXPOSE_EVENT, 
+					      event);
+	}
       }
     }
-    break;
+  }
+  break;
 
   case ConfigureNotify:
   case VisibilityNotify:
@@ -563,7 +579,6 @@ void video_window_handle_event (XEvent *event) {
 	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 					    GUI_DATA_EX_DEST_POS_SIZE_CHANGED, 
 					    &area);
-	
 	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 					    GUI_DATA_EX_EXPOSE_EVENT, 
 					    event);
