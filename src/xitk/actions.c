@@ -505,3 +505,18 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
 			  gGui->panel_window, gGui->video_window);
   }
 }
+
+/*
+ * Reset zooming by recall aspect ratio.
+ */
+void gui_reset_zoom(void) {
+  
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO,
+				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO));
+  
+  if (panel_is_visible())  {
+    XRaiseWindow (gGui->display, gGui->panel_window);
+    XSetTransientForHint (gGui->display, 
+			  gGui->panel_window, gGui->video_window);
+  }
+}

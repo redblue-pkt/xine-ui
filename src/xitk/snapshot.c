@@ -66,9 +66,6 @@
 #define PIXSZ 3
 #define BIT_DEPTH 8
 
-#define FN_SIZE 256
-#define FN "file.png"
-
 /* internal function use to scale yuv data */
 typedef void (*scale_line_func_t) (uint8_t *source, uint8_t *dest,
                                    int width, int step);

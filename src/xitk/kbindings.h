@@ -95,7 +95,8 @@ typedef enum {
   ACTID_ZOOM_X_IN,
   ACTID_ZOOM_X_OUT,
   ACTID_ZOOM_Y_IN,
-  ACTID_ZOOM_Y_OUT
+  ACTID_ZOOM_Y_OUT,
+  ACTID_ZOOM_RESET
 } action_id_t;
   
 kbinding_t *kbindings_init_kbinding(void);

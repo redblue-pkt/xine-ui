@@ -622,6 +622,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_change_zoom(0,-1);
     break;
 
+  case ACTID_ZOOM_RESET:
+    gui_reset_zoom();
+    break;
+
   case ACTID_GRAB_POINTER:
     if(!gGui->cursor_grabbed) {
       if(!panel_is_visible())

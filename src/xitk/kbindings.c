@@ -262,6 +262,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ZoomInY",                ACTID_ZOOM_Y_IN               , "z",        KEYMOD_META    },
   { "Zoom out of video vertically, distorting aspect ratio.",
     "ZoomOutY",               ACTID_ZOOM_Y_OUT              , "Z",        KEYMOD_META    },
+  { "Reset zooming.",
+    "ZoomReset",              ACTID_ZOOM_RESET              , "z",        KEYMOD_CONTROL | KEYMOD_META    },
   { 0,
     0,                        0,                            0,            0              }
 };
