@@ -84,6 +84,7 @@ static int _gui_xine_play(xine_stream_t *stream,
 			  int start_pos, int start_time_in_secs, int update_mmk) {
   int      ret;
   int      has_video;
+  int      already_playing = (gGui->logo_mode == 0);
   
   if(gGui->visual_anim.post_changed && (xine_get_status(stream) == XINE_STATUS_STOP)) {
     post_rewire_visual_anim();
@@ -201,7 +202,8 @@ static int _gui_xine_play(xine_stream_t *stream,
       }
       
       xine_usec_sleep(100);
-      osd_update_status();
+      if(!already_playing)
+	osd_update_status();
     }
   }
   
