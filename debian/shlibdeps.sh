@@ -21,5 +21,12 @@ for file in `echo $OPTIONAL $RECOMMENDED`; do
     REQUIRED=`echo "$REQUIRED" | grep -v $file`
 done
 
+for file in $RECOMMENDED; do
+    if test ! -f "$file"; then
+	echo "WARNING: non-existing file \"$file\" in RECOMMENDED list"
+	RECOMMENDED=`echo "$var" | grep -v $file`
+    fi
+done
+
 dpkg-shlibdeps -Tdebian/$1.substvars \
                $REQUIRED -dRecommends $RECOMMENDED -dSuggests $OPTIONAL

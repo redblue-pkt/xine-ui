@@ -11,7 +11,7 @@ export DH_COMPAT=2
 configure: configure-stamp
 configure-stamp:
 	dh_testdir
-	./configure --prefix=/usr 
+	./configure --prefix=/usr --mandir=\$${prefix}/share/man
 
 	touch configure-stamp
 
@@ -59,6 +59,7 @@ binary-arch: build install
 	dh_fixperms
 	dh_installdeb
 #	dh_shlibdeps
+	chmod +x debian/shlibdeps.sh
 	debian/shlibdeps.sh xine-ui
 	dh_gencontrol
 	dh_md5sums

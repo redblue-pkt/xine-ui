@@ -1,3 +1,19 @@
+xine-ui (0.9.2-3) unstable; urgency=high
+  
+  * allow for architectures that won't compile aaxine
+  * forcing mandir to /usr/share/man again (closes: #116050)
+  * 0.9.2-2 was rejected because of checksum problems...
+
+ -- Siggi Langauf <siggi@debian.org>  Sat, 20 Oct 2001 14:47:48 +0200
+
+xine-ui (0.9.2-2) unstable; urgency=high
+
+  * added permission workaround for shlibdeps.sh, so it compiles even from
+    .patch.gz generated source trees...
+  * naming DESTDIR works for me!?! (closes: #115885)
+
+ -- Siggi Langauf <siggi@debian.org>  Wed, 17 Oct 2001 01:01:14 +0200
+
 xine-ui (0.9.2-1) unstable; urgency=medium
 
   * added mailcap (MIME) support (closes: #113071)
