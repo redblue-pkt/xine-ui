@@ -17,6 +17,8 @@ src/xitk/osd.c
 src/xitk/panel.c
 src/xitk/playlist.c
 src/xitk/post.c
+src/xitk/session.c
+src/xitk/session_ctrl.c
 src/xitk/setup.c
 src/xitk/skins.c
 src/xitk/snapshot.c

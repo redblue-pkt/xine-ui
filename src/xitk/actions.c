@@ -747,10 +747,21 @@ void gui_set_xinerama_fullscreen_mode(xitk_widget_t *w, void *data) {
 }
 
 void gui_toggle_aspect(void) {
-  
+  static char *ratios[XINE_VO_ASPECT_NUM_RATIOS + 1] = {
+    "Auto",
+    "Square",
+    "4:3",
+    "Anamorphic",
+    "DVB",
+    NULL
+  };
+
   xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, 
 		 (xine_get_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO)) + 1);
-
+  
+  osd_display_info(_("Aspect ratio: %s"), 
+		   ratios[xine_get_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO)]);
+  
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
@@ -1367,7 +1378,8 @@ void gui_toggle_tvmode(void) {
 
   xine_set_param(gGui->stream, XINE_PARAM_VO_TVMODE,
 		 xine_get_param(gGui->stream, XINE_PARAM_VO_TVMODE) + 1);
-  				 
+
+  osd_display_info(_("TV Mode: %d"), xine_get_param(gGui->stream, XINE_PARAM_VO_TVMODE));
 }
 
 /*

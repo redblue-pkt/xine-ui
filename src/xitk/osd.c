@@ -160,7 +160,7 @@ void osd_init(void) {
   xine_osd_set_text_palette(gGui->osd.status, 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
 
-  gGui->osd.info = xine_osd_new(gGui->stream, 0, 0, 300, fonth + (fonth >> 1));
+  gGui->osd.info = xine_osd_new(gGui->stream, 0, 0, 2048, fonth + (fonth >> 1));
   xine_osd_set_font(gGui->osd.info, "sans", fonth);
   xine_osd_set_text_palette(gGui->osd.info, 
 			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);

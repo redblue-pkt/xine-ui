@@ -624,6 +624,7 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
   if(gGui->mixer.caps & MIXER_CAP_MUTE) {
     gGui->mixer.mute = state;
     xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, gGui->mixer.mute);
+    osd_display_info(_("Audio: %s"), gGui->mixer.mute ? _("Muted") : _("Unmuted"));
   }
   panel_check_mute();
 }

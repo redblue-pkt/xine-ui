@@ -298,14 +298,17 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_ZOOM_1_1:
   case ACTID_WINDOW100:
     video_window_set_mag (1.0);
+    osd_display_info(_("Zoom: 1:1"));
     break;
 
   case ACTID_WINDOW200:
     video_window_set_mag (2.0);
+    osd_display_info(_("Zoom: 200%%"));
     break;
 
   case ACTID_WINDOW50:
     video_window_set_mag (0.5);
+    osd_display_info(_("Zoom: 50%%"));
     break;
 
   case ACTID_SPU_NEXT:
@@ -515,29 +518,46 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_AV_SYNC_m3600:
-    xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, 
-		   (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET)) - 3600);
+    {
+      int offset = (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET) - 3600);
+
+      xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, offset);
+      osd_display_info(_("A/V offset: %d"), offset);
+    }
     break;
     
   case ACTID_AV_SYNC_p3600:
-    xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET,
-		   (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET)) + 3600);
+    {
+      int offset = (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET) + 3600);
+      
+      xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, offset);
+      osd_display_info(_("A/V offset: %d"), offset);
+    }
     break;
 
   case ACTID_AV_SYNC_RESET:
     xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, 0);
+    osd_display_info(_("SPU Offset: reset."));
     break;
 
   case ACTID_SV_SYNC_p:
-    xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, 
-		   (xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET)) + 1);
+    {
+      int offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) + 1;
+      
+      xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, offset);
+      osd_display_info(_("SPU Offset: %d"), offset);
+    }
     break;
 
   case ACTID_SV_SYNC_m:
-    xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, 
-		   (xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET)) - 1);
-      break;
-
+    {
+      int offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) - 1;
+      
+      xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, offset);
+      osd_display_info(_("SPU Offset: %d"), offset);
+    }
+    break;
+    
   case ACTID_SPEED_FAST:
     gui_change_speed_playback(NULL, (void*)GUI_PREV);
     break;
@@ -651,19 +671,19 @@ void gui_execute_action_id(action_id_t action) {
     /* Temporary informations */    
     switch(gGui->playlist.loop) {
     case PLAYLIST_LOOP_NO_LOOP:
-      osd_display_info(_("playlist: no loop."));
+      osd_display_info(_("Playlist: no loop."));
       break;
     case PLAYLIST_LOOP_LOOP:
-      osd_display_info(_("playlist: loop."));
+      osd_display_info(_("Playlist: loop."));
       break;
     case PLAYLIST_LOOP_REPEAT:
-      osd_display_info(_("playlist: entry repeat."));
+      osd_display_info(_("Playlist: entry repeat."));
       break;
     case PLAYLIST_LOOP_SHUFFLE:
-      osd_display_info(_("playlist: shuffle."));
+      osd_display_info(_("Playlist: shuffle."));
       break;
     case PLAYLIST_LOOP_SHUF_PLUS:
-      osd_display_info(_("playlist: shuffle forever."));
+      osd_display_info(_("Playlist: shuffle forever."));
       break;
     }
     break;
