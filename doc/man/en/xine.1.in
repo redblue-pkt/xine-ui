@@ -234,6 +234,15 @@ Select next audio channel (may take up to a few seconds to take effect)
 .BR - :
 Select prev audio channel
 .br
+.BR Esc :
+Menu 1 (e.g. root menu)
+.br
+.BR F1 :
+Menu 2 (e.g. title menu)
+.br
+.BR F2 :
+Menu 3
+.br
 
 .SH Synchronization fine tuning
 Some streams have bad timestamps, so synchronization fails. This can be
