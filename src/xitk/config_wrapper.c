@@ -140,9 +140,18 @@ void config_reset(void) {
  * Handle 'cfg:/' mrl style
  */
 void config_mrl(char *mrl) {
+  xine_cfg_entry_t entry;
   char *key;
   char *config;
   char *_mrl;
+  
+  if (!xine_config_lookup_entry(gGui->xine, "misc.implicit_config", &entry) ||
+      entry.type != XINE_CONFIG_TYPE_BOOL || !entry.num_value) {
+    xine_info(_("You tried to change the configuration with a cfg: MRL.\n"
+		"This is not allowed unless you enable the 'misc.implicit_config' setting "
+		"after reading and understanding its help text."));
+    return;
+  }
 
   xine_strdupa(_mrl, mrl);
   config = strchr(_mrl, '/');
@@ -157,7 +166,6 @@ void config_mrl(char *mrl) {
       *str_value++ = '\0';
 
     if(str_value && strlen(str_value)) {
-      xine_cfg_entry_t entry;
       
       if(xine_config_lookup_entry(gGui->xine, key, &entry)) {
 
