@@ -21,6 +21,8 @@
    2.4.1 Keyboard shortcuts
    2.4.2 Selecting audio channels
    2.4.3 Selecting subtitles
+   2.4.4 LIRC
+   2.4.5 Setting xine config-options on the commandline
    
    3   WHAT'S LEFT TO SAY
    3.1 Freedom, DVDs and stuff...
@@ -391,6 +393,20 @@
                repeat = 0
                config = PlaylistFrom:NAV
        end
+
+2.4.5 Setting xine config-options on the commandline
+
+      You can set any option (see README.config_en) from the commandline
+      to override the default value in $HOME/.xine/config.
+
+      For example you can do something like
+
+         xine vcd://1 opt:input.vcd_device:/dev/cdrom2 vcd://1
+
+      to change the vcd_device between playing two mrls.
+
+      These opt: settings will not be saved in the configuration file, they
+      are only temporary.
 
 
 3   WHAT'S LEFT TO SAY
