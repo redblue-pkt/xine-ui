@@ -43,6 +43,9 @@ CtlBtn:		67	46	setup.png
 MrlBtn:		81	7	mrl.png
 SliderBGPlay:	149	70	slider_bg.png
 SliderFGPlay:	0	0	slider_pad.png
+Mute:		134	70	mute.png
+SliderBGVol:	103	22	volumebg.png
+SliderFGVol:	103	22	volumepad.png
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png

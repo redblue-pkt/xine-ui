@@ -40,8 +40,9 @@
 static void paint_checkbox (widget_t *c, Window win, GC gc) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
-  int          checkbox_width;
-  gui_image_t *skin;
+  GC            lgc;
+  int           checkbox_width;
+  gui_image_t  *skin;
   
   if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && c->visible) {
     
@@ -50,27 +51,37 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
     
     XLOCK (private_data->display);
     
+    lgc = XCreateGC(private_data->display, win, None, None);
+    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, lgc);
+
+    if (skin->mask) {
+      XSetClipOrigin(private_data->display, lgc, c->x, c->y);
+      XSetClipMask(private_data->display, lgc, skin->mask);
+    }
+
     if (private_data->cArmed) {
       if (private_data->cClicked) { //click
 	XCopyArea (private_data->display, skin->image, 
-		   win, gc, 2*checkbox_width, 0,
+		   win, lgc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       }
       else {
 	if(!private_data->cState) //focus
 	  XCopyArea (private_data->display, skin->image, 
-		     win, gc, checkbox_width, 0,
+		     win, lgc, checkbox_width, 0,
 		     checkbox_width, skin->height, c->x, c->y);
       }
     } else {
       if(private_data->cState) //click
 	XCopyArea (private_data->display, skin->image, 
-		   win, gc, 2*checkbox_width, 0,
+		   win, lgc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       else  //normal
-	XCopyArea (private_data->display, skin->image,  win, gc, 0, 0,
+	XCopyArea (private_data->display, skin->image, win, lgc, 0, 0,
 		   checkbox_width, skin->height, c->x, c->y);
     }
+
+    XFreeGC(private_data->display, lgc);
 
     XUNLOCK (private_data->display);
   }
@@ -89,22 +100,21 @@ static int notify_click_checkbox (widget_list_t *wl, widget_t *c,
 				  int cUp, int x, int y) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
-  int bRepaint = 0;
   
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
 
     private_data->cClicked = !cUp;
     if (cUp && private_data->cArmed) {
       private_data->cState = !private_data->cState;
-      bRepaint = paint_widget_list (wl);
       if(private_data->callback) {
 	private_data->callback(private_data->cWidget, 
 			       private_data->userdata,
 			       private_data->cState);
       }
     }
-    if(!bRepaint) 
-      paint_widget_list (wl);
+
+    paint_checkbox(c, wl->win, wl->gc);
+
   }
 #ifdef DEBUG_GUI
   else

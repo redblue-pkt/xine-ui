@@ -61,6 +61,8 @@ typedef struct {
   int                     button_width;
   float                   ratio;
 
+  int                     paddle_cover_bg;
+
 } slider_private_data_t;
 
 /* *************************************************************** */

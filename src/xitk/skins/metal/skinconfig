@@ -47,6 +47,7 @@ AutoPlayGUI:	185	45	smallbtn.png	LightGray	Yellow	White	*-lucida-*-r-*-*-10-*-*-
 MrlBtn:		218	45	mrl.png
 PlBtn:		234	45	playlist.png
 CtlBtn:		250	45	setup.png
+Mute:		333	44	mute.png
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png

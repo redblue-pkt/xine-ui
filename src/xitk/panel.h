@@ -35,7 +35,13 @@ typedef struct {
   widget_t        *title_label;
   widget_t        *runtime_label;
   widget_t        *slider_play;
-  widget_t        *slider_mixer;
+
+  struct {
+    widget_t        *slider;
+    widget_t        *mute;
+  } mixer;
+
+
   widget_t        *checkbox_pause;
   int              visible;
   char             runtime[20];
@@ -52,15 +58,21 @@ void panel_init (void);
 
 void panel_add_autoplay_buttons(void);
 
-int panel_is_visible(void) ;
+void panel_add_mixer_control(void);
 
-void panel_toggle_visibility (widget_t *w, void *data) ;
+int panel_is_visible(void);
 
-void panel_check_pause(void) ;
+void panel_toggle_visibility (widget_t *w, void *data);
+
+void panel_toggle_audio_mute(widget_t *w, void *data, int status);
+
+void panel_check_pause(void);
+
+void panel_check_mute(void);
 
 void panel_reset_slider (void);
 
-void panel_update_channel_display (void) ;
+void panel_update_channel_display (void);
 
 void panel_update_runtime_display(void);
 

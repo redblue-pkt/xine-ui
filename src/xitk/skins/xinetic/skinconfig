@@ -49,6 +49,12 @@ Play:		429	12	MainPlay.png
 Stop:		459	29	MainStop.png
 Prev:		413	47	MainPrev.png
 
+Mute:		366	77	MainMute.png
+SliderBGVol:	350	21	MainVolumeBg.png
+SliderFGVol:	350	21	MainVolumePad.png
+
+
+
 AutoPlayGUI:	174	55	MainAutoButton.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 PlBtn:		216	54	PlBtn.png
 CtlBtn:		258	54	CtlBtn.png

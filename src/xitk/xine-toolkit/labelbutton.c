@@ -154,6 +154,7 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   int          button_width, state = 0;
+  GC           lgc;
   gui_image_t *skin;
   Pixmap       btn, bgtmp;
   XWindowAttributes attr;
@@ -166,6 +167,14 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
     
     skin = private_data->skin;
     
+    lgc = XCreateGC(private_data->display, win, None, None);
+    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, lgc);
+    
+    if (skin->mask) {
+      XSetClipOrigin(private_data->display, lgc, lb->x, lb->y);
+      XSetClipMask(private_data->display, lgc, skin->mask);
+    }
+
     button_width = skin->width / 3;
     bgtmp = XCreatePixmap(private_data->display, skin->image,
 			  button_width, skin->height, attr.depth);
@@ -218,10 +227,13 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
     btn = create_labelofbutton(lb, win, gc, bgtmp,
 			       button_width, skin->height, 
 			       private_data->label, state);
-    XCopyArea (private_data->display, btn, win, gc, 0, 0,
+
+    XCopyArea (private_data->display, btn, win, lgc, 0, 0,
 	       button_width, skin->height, lb->x, lb->y);
 
     XFreePixmap(private_data->display, bgtmp);
+
+    XFreeGC(private_data->display, lgc);
 
     XUNLOCK(private_data->display);
   }
@@ -237,7 +249,6 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
  */
 static int notify_click_labelbutton (widget_list_t *wl, widget_t *lb, 
 				     int bUp, int x, int y) {
-  int bRepaint = 0;
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   
@@ -247,7 +258,7 @@ static int notify_click_labelbutton (widget_list_t *wl, widget_t *lb,
     
     if (bUp && private_data->bArmed) {
       private_data->bState = !private_data->bState;
-      bRepaint = paint_widget_list (wl);
+      paint_labelbutton(lb, wl->win, wl->gc);
       if(private_data->bType == RADIO_BUTTON) {
 	if(private_data->state_callback) {
 	  private_data->state_callback(private_data->bWidget, 
@@ -262,9 +273,9 @@ static int notify_click_labelbutton (widget_list_t *wl, widget_t *lb,
 	}
       }
     }
-    
-    if(!bRepaint) 
-      paint_widget_list (wl);
+    else
+      paint_labelbutton(lb, wl->win, wl->gc);
+
     
   }
 #ifdef DEBUG_GUI

@@ -77,4 +77,8 @@ void gui_mrl_browser_show(widget_t *w, void *data);
 
 void layer_above_video(Window w);
 
+void gui_increase_audio_volume(void);
+
+void gui_decrease_audio_volume(void);
+
 #endif

@@ -544,6 +544,8 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_M:
       if(modifier & MODIFIER_META)
 	gui_mrlbrowser_show(NULL, NULL);
+      else if(modifier & MODIFIER_CTRL)
+	panel_toggle_audio_mute(NULL, NULL, !gGui->mixer.mute);
       else
 	xine_set_av_offset (gGui->xine, xine_get_av_offset (gGui->xine) + 3600);
       break;
@@ -559,7 +561,14 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_Down:
       gui_change_speed_playback(NULL, (void*)GUI_NEXT);
       break;
-      
+
+    case XK_V:
+      gui_increase_audio_volume();
+      break;
+
+    case XK_v:
+      gui_decrease_audio_volume();
+      break;
     }
   }
   break;
@@ -887,7 +896,7 @@ void gui_run (void) {
   struct sigaction      action;
 
   panel_add_autoplay_buttons();
-
+  panel_add_mixer_control();
   panel_update_channel_display () ;
   panel_update_mrl_display ();
   panel_update_runtime_display();

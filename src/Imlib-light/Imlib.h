@@ -13,6 +13,7 @@ extern              "C"
   ImlibImage         *Imlib_load_image(ImlibData * id, char *file);
   void                Imlib_apply_image(ImlibData * id, ImlibImage * im, Window p);
   Pixmap              Imlib_copy_image(ImlibData * id, ImlibImage * im);
+  Pixmap              Imlib_copy_mask(ImlibData * id, ImlibImage * im);
   int                 Imlib_render(ImlibData * id, ImlibImage * image, int width, int height);
   Pixmap              Imlib_move_image(ImlibData * id, ImlibImage * image);
   Pixmap              Imlib_move_mask(ImlibData * id, ImlibImage * im);

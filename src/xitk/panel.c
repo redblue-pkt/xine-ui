@@ -165,6 +165,12 @@ void panel_toggle_visibility (widget_t *w, void *data) {
   
 }
 
+void panel_check_mute(void) {
+
+  checkbox_set_state(panel->mixer.mute, gGui->mixer.mute, 
+		     gGui->panel_window, panel->widget_list->gc);
+}
+
 /*
  * Check and set the correct state of pause button.
  */
@@ -237,6 +243,17 @@ void panel_update_mrl_display (void) {
 }
 
 /*
+ *
+ */
+void panel_toggle_audio_mute(widget_t *w, void *data, int state) {
+
+  if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
+    gGui->mixer.mute = state;
+    xine_set_audio_property(gGui->xine, AO_PROP_MUTE_VOL, gGui->mixer.mute);
+  }
+  panel_check_mute();
+}
+/*
  * Handle paddle moving of slider.
  */
 static void panel_slider_cb(widget_t *w, void *data, int pos) {
@@ -247,8 +264,9 @@ static void panel_slider_cb(widget_t *w, void *data, int pos) {
       panel_reset_slider();
     }
   }
-  else if(w == panel->slider_mixer) {
-    // TODO
+  else if(w == panel->mixer.slider) {
+    gGui->mixer.volume_level = pos;
+    xine_set_audio_property(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
   }
   else
     fprintf(stderr, "unknown widget slider caller\n");
@@ -317,6 +335,35 @@ void panel_add_autoplay_buttons(void) {
     x -= widget_get_width(tmp) + 1;
     i++;
   }
+}
+
+/*
+ * Check if there a mixer control available,
+ * We couldn't do this into panel_init(), this function is
+ * called before xine engine initialization.
+ */
+void panel_add_mixer_control(void) {
+  
+  gGui->mixer.caps = xine_get_audio_capabilities(gGui->xine);
+
+  if(gGui->mixer.caps & AO_CAP_PCM_VOL)
+    gGui->mixer.volume_mixer = AO_PROP_PCM_VOL;
+  else if(gGui->mixer.caps & AO_CAP_MIXER_VOL)
+    gGui->mixer.volume_mixer = AO_PROP_MIXER_VOL;
+  
+  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+    widget_enable(panel->mixer.slider);
+    gGui->mixer.volume_level = xine_get_audio_property(gGui->xine, gGui->mixer.volume_mixer);
+    slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+  }
+
+  if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
+    widget_enable(panel->mixer.mute);
+    gGui->mixer.mute = xine_get_audio_property(gGui->xine, AO_PROP_MUTE_VOL);
+    checkbox_set_state(panel->mixer.mute, gGui->mixer.mute,
+		       gGui->panel_window, panel->widget_list->gc);
+  }
+
 }
 
 /*
@@ -630,7 +677,7 @@ void panel_init (void) {
   gui_list_append_content (panel->widget_list->l, 
 			   (panel->slider_play = slider_create(&sl)));
 
-  /* FIXME: Need to implement mixer control
+  /* Mixer volume slider */
   sl.x               = gui_get_skinX("SliderBGVol");
   sl.y               = gui_get_skinY("SliderBGVol");
   sl.slider_type     = VSLIDER;
@@ -639,13 +686,23 @@ void panel_init (void) {
   sl.step            = 1;
   sl.background_skin = gui_get_skinfile("SliderBGVol");
   sl.paddle_skin     = gui_get_skinfile("SliderFGVol");
-  sl.callback        = panel_slider_cb;
+  sl.callback        = NULL;
   sl.userdata        = NULL;
   sl.motion_callback = panel_slider_cb;
   sl.motion_userdata = NULL;
   gui_list_append_content (panel->widget_list->l, 
-			   (panel->slider_mixer = slider_create(&sl)));
-  */
+			   (panel->mixer.slider = slider_create(&sl)));
+  widget_disable(panel->mixer.slider);
+
+  /*  Mute toggle */
+  cb.x        = gui_get_skinX("Mute");
+  cb.y        = gui_get_skinY("Mute");
+  cb.callback = panel_toggle_audio_mute;
+  cb.userdata = NULL;
+  cb.skin     = gui_get_skinfile("Mute");
+  gui_list_append_content (panel->widget_list->l, 
+			   (panel->mixer.mute = checkbox_create (&cb)));
+  widget_disable(panel->mixer.mute);
 
   /*  Playback speed slow */
   b.x        = gui_get_skinX("PlaySlow");

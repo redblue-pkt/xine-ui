@@ -49,8 +49,11 @@ gui_image_t *gui_load_image(ImlibData *idata, char *image) {
   Imlib_render (idata, img, img->rgb_width, img->rgb_height);
   
   i->image  = Imlib_copy_image(idata, img);
+  i->mask   = Imlib_copy_mask(idata, img);
   i->width  = img->rgb_width;
   i->height = img->rgb_height;
+  
+  Imlib_destroy_image (idata, img);
   
   return i;
 } 
@@ -60,18 +63,29 @@ gui_image_t *gui_load_image(ImlibData *idata, char *image) {
  */
 static void paint_image (widget_t *i,  Window win, GC gc) {
   gui_image_t *skin;
+  GC lgc;
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
-
+  
   if ((i->widget_type & WIDGET_TYPE_IMAGE) && i->visible) {
 
     skin = private_data->skin;
     
     XLOCK (private_data->display);
 
-    XCopyArea (private_data->display, skin->image, win, gc, 0, 0,
+    lgc = XCreateGC(private_data->display, win, 0, 0);
+    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, lgc);
+    
+    if (skin->mask) {
+      XSetClipOrigin(private_data->display, lgc, i->x, i->y);
+      XSetClipMask(private_data->display, lgc, skin->mask);
+    }
+    
+    XCopyArea (private_data->display, skin->image, win, lgc, 0, 0,
 	       skin->width, skin->height, i->x, i->y);
     
+    XFreeGC(private_data->display, lgc);
+
     XUNLOCK (private_data->display);
   }
 #ifdef DEBUG_GUI

@@ -777,6 +777,8 @@ void motion_notify_widget_list (widget_list_t *wl,
 	bRepaint |= (wl->focusedWidget->notify_focus) (wl, wl->focusedWidget, FOCUS_LOST);
 	wl->focusedWidget->have_focus = FOCUS_LOST;
       }
+      if(wl->focusedWidget->paint)
+	(wl->focusedWidget->paint) (wl->focusedWidget, wl->win, wl->gc);
     }
     
     wl->focusedWidget = mywidget;
@@ -786,11 +788,11 @@ void motion_notify_widget_list (widget_list_t *wl,
 	bRepaint |= (mywidget->notify_focus) (wl, mywidget, FOCUS_RECEIVED);
 	mywidget->have_focus = FOCUS_RECEIVED;
       }
+      if(mywidget->paint)
+	(mywidget->paint) (mywidget, wl->win, wl->gc);
     }
   }
-  
-  if (bRepaint)
-    paint_widget_list (wl);
+
 }
 
 /*
@@ -810,23 +812,18 @@ int click_notify_widget_list (widget_list_t *wl,
     if (mywidget) {
       if (mywidget->notify_click && mywidget->enable == WIDGET_ENABLE)
 	bRepaint |= (mywidget->notify_click) (wl, mywidget, LBUTTON_DOWN, x, y);
+
     }
   } else {
     if (wl->pressedWidget) {
       if (wl->pressedWidget->notify_click 
 	  && wl->pressedWidget->enable == WIDGET_ENABLE)
 	bRepaint |= (wl->pressedWidget->notify_click) (wl, wl->pressedWidget, LBUTTON_UP, x, y);
+
     }
   }
   
   return((bRepaint == 1));
-  /*
-  if (bRepaint && wl && wl->win && wl->gc) {
-    paint_widget_list (wl);
-    return 1;
-  } else
-    return 0;
-  */
 }
 
 /*

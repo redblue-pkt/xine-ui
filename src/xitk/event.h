@@ -92,6 +92,13 @@ typedef struct {
   int                  lirc_enable;
 #endif
 
+  struct {
+    int                caps;
+    int                volume_mixer;
+    int                volume_level;
+    int                mute;
+  } mixer;
+
   widgetkey_t          widget_key;
 
 } gGui_t;

@@ -87,9 +87,10 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
   int                    button_width, button_height;	
   slider_private_data_t *private_data = 
     (slider_private_data_t *) sl->private_data;
+  GC                     bgc, pgc;
   gui_image_t           *bg = (gui_image_t *) private_data->bg_skin;
   gui_image_t           *paddle = (gui_image_t *) private_data->paddle_skin;
-  gui_color_t            gui_color;
+  int                    srcx1, srcx2, destx1, srcy1, srcy2, desty1;
   
   if ((sl->widget_type & WIDGET_TYPE_SLIDER) && sl->visible) {
     int x=0, y=0;
@@ -102,16 +103,28 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
     
     button_width = private_data->button_width;
     button_height = private_data->paddle_skin->height;
+
+    srcx1 = srcx2 = destx1 = srcy1 = srcy2 = desty1 = 0;
+
+    bgc = XCreateGC(private_data->display, win, None, None);
+    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, bgc);
+    pgc = XCreateGC(private_data->display, win, None, None);
+    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, pgc);
+    
+    if (bg->mask) {
+      XSetClipOrigin(private_data->display, bgc, sl->x, sl->y);
+      XSetClipMask(private_data->display, bgc, bg->mask);
+    }
     
     if(private_data->sType == HSLIDER)
       tmp = sl->width - button_width;
     if(private_data->sType == VSLIDER)
       tmp = sl->height - button_height;
-    
+
     tmp /= private_data->max;
     tmp *= private_data->pos;
     
-    XCopyArea (private_data->display, bg->image, win, gc, 0, 0,
+    XCopyArea (private_data->display, bg->image, win, bgc, 0, 0,
 	       bg->width, bg->height, sl->x, sl->y);
     
     if(private_data->sType == HSLIDER) {
@@ -122,22 +135,64 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
       x = sl->x;
       y = rint(sl->y + private_data->bg_skin->height - button_height - tmp);
     }
-    if (private_data->bArmed) {
-      if (private_data->bClicked) {
-	XCopyArea (private_data->display, paddle->image, 
-		   win, gc, 2*button_width, 0,
-		   button_width, paddle->height, x, y);
-	
-      } else {
-	XCopyArea (private_data->display, paddle->image, 
-		   win, gc, button_width, 0,
-		   button_width, paddle->height, x, y);
+
+    if(private_data->paddle_cover_bg == 1) {
+      int pixpos;
+      
+      pixpos = (int)(private_data->pos / private_data->ratio);
+      
+      if(private_data->sType == VSLIDER) {
+	pixpos = button_height - pixpos;
+	srcx1  = 0;
+	srcy1  = pixpos;
+	srcx2  = button_width;
+	srcy2  = paddle->height - pixpos;
+	destx1 = sl->x;
+	desty1 = sl->y + pixpos;
       }
-    } else {
-      XCopyArea (private_data->display, paddle->image, win, gc, 0, 0,
-		 button_width, paddle->height, x, y);
+      else if(private_data->sType == HSLIDER) {
+	srcx1  = 0;
+	srcy1  = 0;
+	srcx2  = pixpos;
+	srcy2  = paddle->height;
+	destx1 = sl->x;
+	desty1 = sl->y;
+      }
+
+                  
+      if (paddle->mask) {
+	XSetClipOrigin(private_data->display, pgc, sl->x, sl->y);
+	XSetClipMask(private_data->display, pgc, paddle->mask);
+      }
+      
     }
-    XSetForeground(private_data->display, gc, gui_color.white.pixel);
+    else {
+      
+      if (paddle->mask) {
+	XSetClipOrigin(private_data->display, pgc, x, y);
+	XSetClipMask(private_data->display, pgc, paddle->mask);
+      }
+      
+      srcy1  = 0;
+      srcx2  = button_width;
+      srcy2  = paddle->height;
+      destx1 = x;
+      desty1 = y;
+
+    }
+
+    if (private_data->bArmed) {
+      if (private_data->bClicked)
+	srcx1 = 2*button_width;
+      else
+	srcx1 = button_width;
+    }
+
+    XCopyArea (private_data->display, paddle->image, win, pgc,
+	       srcx1, srcy1, srcx2, srcy2, destx1, desty1);
+    
+    XFreeGC(private_data->display, pgc);
+    XFreeGC(private_data->display, bgc);
     
     XUNLOCK (private_data->display);
   }
@@ -542,6 +597,16 @@ widget_t *slider_create (xitk_slider_t *s) {
     private_data->ratio         = (float)(private_data->max - private_data->min)/private_data->bg_skin->height;
   else
     fprintf(stderr, "Unknown slider type (%d)\n", s->slider_type);
+
+  private_data->paddle_cover_bg = 0;
+  if(s->slider_type == HSLIDER) {
+    if(private_data->button_width == private_data->bg_skin->width)
+      private_data->paddle_cover_bg = 1;
+  }
+  else if(s->slider_type == VSLIDER) {
+    if(private_data->paddle_skin->height == private_data->bg_skin->height)
+      private_data->paddle_cover_bg = 1;
+  }
 
   private_data->motion_callback = s->motion_callback;
   private_data->motion_userdata = s->motion_userdata;

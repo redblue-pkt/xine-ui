@@ -75,6 +75,7 @@ typedef struct {
 
 typedef struct {
   Pixmap    image;
+  Pixmap    mask;
   int       width;
   int       height;
 } gui_image_t;

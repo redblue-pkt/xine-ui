@@ -247,10 +247,11 @@ static Pixmap create_labelofinputtext(widget_t *it,
 static void paint_inputtext(widget_t *it, Window win, GC gc) {
   inputtext_private_data_t *private_data = 
     (inputtext_private_data_t *) it->private_data;
-  int          button_width, state = 0;
-  gui_image_t *skin;
-  Pixmap       btn, bgtmp;
-  XWindowAttributes attr;
+  int                 button_width, state = 0;
+  gui_image_t        *skin;
+  Pixmap              btn, bgtmp;
+  GC                  lgc;
+  XWindowAttributes   attr;
 
   if ((it->widget_type & WIDGET_TYPE_INPUTTEXT) && it->visible) {
         
@@ -258,6 +259,14 @@ static void paint_inputtext(widget_t *it, Window win, GC gc) {
     
     skin = private_data->skin;
     
+    lgc = XCreateGC(private_data->display, win, None, None);
+    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, lgc);
+
+    if (skin->mask) {
+      XSetClipOrigin(private_data->display, lgc, it->x, it->y);
+      XSetClipMask(private_data->display, lgc, skin->mask);
+    }
+
     button_width = skin->width/2;
     
     bgtmp = XCreatePixmap(private_data->display, skin->image,
@@ -283,11 +292,13 @@ static void paint_inputtext(widget_t *it, Window win, GC gc) {
 				  button_width, skin->height, 
 				  private_data->text, state);
     
-    XCopyArea (private_data->display, btn, win, gc, 0, 0,
+    XCopyArea (private_data->display, btn, win, lgc, 0, 0,
 	       button_width, skin->height, it->x, it->y);
 
 
     XFreePixmap(private_data->display, bgtmp);
+
+    XFreeGC(private_data->display, lgc);
 
     XUNLOCK(private_data->display);
   }

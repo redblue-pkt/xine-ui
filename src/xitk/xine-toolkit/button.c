@@ -34,37 +34,50 @@
 #include "widget_types.h"
 
 #include "_xitk.h"
+
 /**
  *
  */
-static void paint_button (widget_t *b,  Window win, GC gc) {
+static void paint_button (widget_t *b, Window win, GC gc) {
   button_private_data_t *private_data = 
     (button_private_data_t *) b->private_data;
-  int          button_width;
-  gui_image_t *skin;
+  GC                  lgc;
+  int                 button_width;
+  gui_image_t        *skin;
 
   if((b->widget_type & WIDGET_TYPE_BUTTON) && b->visible) {
 
     skin         = private_data->skin;
     button_width = skin->width / 3;
-    
+
     XLOCK (private_data->display);
         
+    lgc = XCreateGC(private_data->display, win, None, None);
+    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, lgc);
+
+    if (skin->mask) {
+      XSetClipOrigin(private_data->display, lgc, b->x, b->y);
+      XSetClipMask(private_data->display, lgc, skin->mask);
+    }
+
     if(private_data->bArmed) {
       if(private_data->bClicked) {
 	XCopyArea (private_data->display, skin->image,  
-		   win, gc, 2*button_width, 0,
+		   win, lgc, 2*button_width, 0,
 		   button_width, skin->height, b->x, b->y);
 	
       } else {
 	XCopyArea (private_data->display, skin->image,  
-		   win, gc, button_width, 0,
+		   win, lgc, button_width, 0,
 		   button_width, skin->height, b->x, b->y);
       }
     } else {
-      XCopyArea (private_data->display, skin->image,  win, gc, 0, 0,
+      XCopyArea (private_data->display, skin->image, 
+		 win, lgc, 0, 0,
 		 button_width, skin->height, b->x, b->y);
     }
+
+    XFreeGC(private_data->display, lgc);
 
     XUNLOCK (private_data->display);
   } 
@@ -82,22 +95,19 @@ static int notify_click_button (widget_list_t *wl,
 				widget_t *b,int bUp, int x, int y){
   button_private_data_t *private_data = 
     (button_private_data_t *) b->private_data;
-  int bRepaint = 0;
   
   if (b->widget_type & WIDGET_TYPE_BUTTON) {
     private_data->bClicked = !bUp;
     
+    paint_button(b, wl->win, wl->gc);
+
     if (bUp && private_data->bArmed) {
-      bRepaint = paint_widget_list (wl);
       if(private_data->callback) {
 	private_data->callback(private_data->bWidget, 
 			       private_data->userdata);
       }
     }
 
-    if(!bRepaint) 
-      paint_widget_list (wl);
-    
   }
 #ifdef DEBUG_GUI
   else

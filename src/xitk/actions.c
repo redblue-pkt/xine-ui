@@ -45,6 +45,7 @@
 #include "mrl_browser.h"
 
 extern gGui_t          *gGui;
+extern _panel_t        *panel;
 
 /*
  * Callback-functions for widget-button click
@@ -459,4 +460,26 @@ void layer_above_video(Window w) {
 
   XSendEvent(gGui->display, RootWindow(gGui->display, gGui->screen), False,
 	     SubstructureNotifyMask, (XEvent*) &xev);
+}
+
+void gui_increase_audio_volume(void) {
+
+  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+    if(gGui->mixer.volume_level < 100) {
+      gGui->mixer.volume_level++;
+      xine_set_audio_property(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
+      slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+    }
+  }
+}
+
+void gui_decrease_audio_volume(void) {
+  
+  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+    if(gGui->mixer.volume_level > 0) {
+      gGui->mixer.volume_level--;
+      xine_set_audio_property(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
+      slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+    }
+  }
 }
