@@ -992,7 +992,7 @@ void visual_anim_init(void) {
 }
 void visual_anim_add_animation(char *mrl) {
   gGui->visual_anim.mrls = (char **) realloc(gGui->visual_anim.mrls, sizeof(char *) * 
-					     (gGui->visual_anim.num_mrls + 2));
+					     ((gGui->visual_anim.num_mrls + 1) + 2));
   
   gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++]   = strdup(mrl);
   gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]     = NULL;
