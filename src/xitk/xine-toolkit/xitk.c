@@ -1671,21 +1671,17 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
 
     select(xconnection + 1, &r, 0, 0, &tv);
     
-    if(FD_ISSET(xconnection, &r)) {
+    XLOCK(gXitk->display);
+    got_event = XCheckIfEvent(gXitk->display, &myevent, is_event, (XPointer) NULL);
+    XUNLOCK(gXitk->display);
+      
+    while(got_event == True) {
+
+      xitk_xevent_notify(&myevent);
 
       XLOCK(gXitk->display);
       got_event = XCheckIfEvent(gXitk->display, &myevent, is_event, (XPointer) NULL);
       XUNLOCK(gXitk->display);
-      
-      while(got_event == True) {
-	
-	xitk_xevent_notify(&myevent);
-	
-	XLOCK(gXitk->display);
-	got_event = XCheckIfEvent(gXitk->display, &myevent, is_event, (XPointer) NULL);
-	XUNLOCK(gXitk->display);
-      }
-
     }
 
   }
