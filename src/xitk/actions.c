@@ -862,7 +862,8 @@ void gui_toggle_interlaced(void) {
 
 void gui_direct_change_audio_channel(xitk_widget_t *w, void *data, int value) {
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, value);
-  panel_update_channel_display ();
+  panel_update_channel_display();
+  osd_display_audio_lang();
 }
 
 void gui_change_audio_channel(xitk_widget_t *w, void *data) {
@@ -881,7 +882,8 @@ void gui_change_audio_channel(xitk_widget_t *w, void *data) {
 
 void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value) {
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, value);
-  panel_update_channel_display ();
+  panel_update_channel_display();
+  osd_display_spu_lang();
 }
 
 void gui_change_spu_channel(xitk_widget_t *w, void *data) {

@@ -34,6 +34,8 @@
 void osd_init(void);
 void osd_deinit(void);
 void osd_update(void);
+void osd_display_spu_lang(void);
+void osd_display_lang_lang(void);
 void osd_stream_infos(void);
 void osd_update_status(void);
 void osd_stream_position(int pos);

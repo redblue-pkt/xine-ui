@@ -48,6 +48,8 @@
 extern int no_lirc;
 #endif
 
+#define STEP_SIZE 256
+
 /*
  * global variables
  */
@@ -730,54 +732,62 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_HUECONTROLp:
-    if(gGui->video_settings.hue <= (65535 - 10)) {
-      config_update_num("gui.vo_hue", gGui->video_settings.hue + 10);
+    if(gGui->video_settings.hue <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_hue", gGui->video_settings.hue + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
+      osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_HUECONTROLm:
-    if(gGui->video_settings.hue >= 10) {
-      config_update_num("gui.vo_hue", gGui->video_settings.hue - 10);
+    if(gGui->video_settings.hue >= STEP_SIZE) {
+      config_update_num("gui.vo_hue", gGui->video_settings.hue - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_HUE, gGui->video_settings.hue);
+      osd_draw_bar(_("Hue"), 0, 65535, gGui->video_settings.hue, OSD_BAR_STEPPER);
     }
     break;
 
   case ACTID_SATURATIONCONTROLp:
-    if(gGui->video_settings.saturation <= (65535 - 10)) {
-      config_update_num("gui.vo_saturation", gGui->video_settings.saturation + 10);
+    if(gGui->video_settings.saturation <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_saturation", gGui->video_settings.saturation + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
+      osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_SATURATIONCONTROLm:
-    if(gGui->video_settings.saturation >= 10) {
-      config_update_num("gui.vo_saturation", gGui->video_settings.saturation - 10);
+    if(gGui->video_settings.saturation >= STEP_SIZE) {
+      config_update_num("gui.vo_saturation", gGui->video_settings.saturation - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_SATURATION, gGui->video_settings.saturation);
+      osd_draw_bar(_("Saturation"), 0, 65535, gGui->video_settings.saturation, OSD_BAR_STEPPER);
     }
     break;
 
   case ACTID_BRIGHTNESSCONTROLp:
-    if(gGui->video_settings.brightness <= (65535 - 10)) {
-      config_update_num("gui.vo_brightness", gGui->video_settings.brightness + 10);
+    if(gGui->video_settings.brightness <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_brightness", gGui->video_settings.brightness + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
+      osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_BRIGHTNESSCONTROLm:
-    if(gGui->video_settings.brightness >= 10) {
-      config_update_num("gui.vo_brightness", gGui->video_settings.brightness - 10);
+    if(gGui->video_settings.brightness >= STEP_SIZE) {
+      config_update_num("gui.vo_brightness", gGui->video_settings.brightness - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_BRIGHTNESS, gGui->video_settings.brightness);
+      osd_draw_bar(_("Brightness"), 0, 65535, gGui->video_settings.brightness, OSD_BAR_STEPPER);
     }
     break;
 
   case ACTID_CONTRASTCONTROLp:
-    if(gGui->video_settings.contrast <= (65535 - 10)) {
-      config_update_num("gui.vo_contrast", gGui->video_settings.contrast + 10);
+    if(gGui->video_settings.contrast <= (65535 - STEP_SIZE)) {
+      config_update_num("gui.vo_contrast", gGui->video_settings.contrast + STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
+      osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
     break;
   case ACTID_CONTRASTCONTROLm:
-    if(gGui->video_settings.contrast >= 10) {
-      config_update_num("gui.vo_contrast", gGui->video_settings.contrast - 10);
+    if(gGui->video_settings.contrast >= STEP_SIZE) {
+      config_update_num("gui.vo_contrast", gGui->video_settings.contrast - STEP_SIZE);
       control_set_image_prop(XINE_PARAM_VO_CONTRAST, gGui->video_settings.contrast);
+      osd_draw_bar(_("Contrast"), 0, 65535, gGui->video_settings.contrast, OSD_BAR_STEPPER);
     }
     break;
 

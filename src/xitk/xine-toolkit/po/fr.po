@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
-"POT-Creation-Date: 2003-03-31 19:08+0200\n"
+"POT-Creation-Date: 2003-04-17 14:59+0200\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"

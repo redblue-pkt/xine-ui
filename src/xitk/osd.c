@@ -527,9 +527,9 @@ void osd_display_info(char *info, ...) {
       if((buf = realloc(buf, size)) == NULL)
 	return;
     }
-    
+
     xine_osd_clear(gGui->osd.info);
-    
+
     xine_osd_draw_text(gGui->osd.info, 0, 0, buf, XINE_OSD_TEXT1);
     xine_osd_set_position(gGui->osd.info, 20, 10 + 30);
     xine_osd_show(gGui->osd.info, 0);
@@ -595,4 +595,62 @@ void osd_update_status(void) {
     xine_osd_show(gGui->osd.status, 0);
     gGui->osd.status_visible = gGui->osd.timeout;
   }
+}
+
+void osd_display_spu_lang(void) {
+  char   buffer[32];
+  char   lang_buffer[10];
+  char  *lang = NULL;
+  int    channel;
+  
+  channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
+
+  switch(channel) {
+  case -2:
+    lang = "off";
+    break;
+  case -1:
+    if(!xine_get_spu_lang(gGui->stream, channel, &lang_buffer[0]))
+      lang = "auto";
+    else
+      lang = lang_buffer;
+    break;
+  default:
+    if(!xine_get_spu_lang(gGui->stream, channel, &lang_buffer[0]))
+      sprintf(lang_buffer, "%3d", channel);
+    lang = lang_buffer;
+    break;
+  }
+  
+  sprintf(buffer, _("Subtitles: %s"), lang);
+  osd_display_info(buffer);
+}
+
+void osd_display_audio_lang(void) {
+  char   buffer[32];
+  char   lang_buffer[10];
+  char  *lang = NULL;
+  int    channel;
+
+  channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+
+  switch(channel) {
+  case -2:
+    lang = "off";
+    break;
+  case -1:
+    if(!xine_get_audio_lang(gGui->stream, channel, &lang_buffer[0]))
+      lang = "auto";
+    else
+      lang = lang_buffer;
+    break;
+  default:
+    if(!xine_get_audio_lang(gGui->stream, channel, &lang_buffer[0]))
+      sprintf(lang_buffer, "%3d", channel);
+    lang = lang_buffer;
+    break;
+  }
+
+  sprintf(buffer, _("Audio Channel: %s"), lang);
+  osd_display_info(buffer);
 }
