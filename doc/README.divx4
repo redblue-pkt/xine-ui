@@ -99,3 +99,11 @@ implement version checking, or to test an old library that you
 expect to work, set divx4_forceversion to some date that xine 
 accepts, for example 20010901.
 
+Some old versions of OpenDivx are known to cause a segmentation fault
+when probed for the version number. The divx4 plugin attempts to
+catch this signal and prints a message when it happens. The solution
+is to either
+- remove the offending libdivx4decore, or
+- disable the version check by forcing the version to a too low number, 
+e.g. set "divx4_forceversion:1" in .xinerc
+
