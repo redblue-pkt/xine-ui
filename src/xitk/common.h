@@ -134,9 +134,7 @@ typedef struct {
   xine_audio_port_t        *ao_port;
 
   xine_stream_t            *stream;
-#if 0
   xine_stream_t            *spu_stream;
-#endif
 
   xine_t                   *xine;
 
