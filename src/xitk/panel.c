@@ -68,7 +68,6 @@ void enable_playback_controls(int enable) {
   enability(panel->playback_widgets.play);
   enability(panel->playback_widgets.pause);
   enability(panel->playback_widgets.next);
-  enability(panel->playback_widgets.eject);
   enability(panel->playback_widgets.slider_play);
 }
 
