@@ -39,7 +39,7 @@
 #include "panel.h"
 #include "playlist.h"
 #include "videowin.h"
-#include "file_browser.h"
+#include "mrl_browser.h"
 
 extern gGui_t          *gGui;
 
@@ -153,9 +153,9 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
 			  gGui->panel_window, gGui->video_window);
   }
   
-  if(file_browser_is_visible()) {
-    show_file_browser();
-    set_file_browser_transient();
+  if(mrl_browser_is_visible()) {
+    show_mrl_browser();
+    set_mrl_browser_transient();
   }
 }
 
@@ -223,7 +223,7 @@ void gui_set_current_position (int pos) {
 
 void gui_dndcallback (char *filename) {
 
-  printf("%s() add %s\n", __FUNCTION__, filename);
+  //  printf("%s() add %s\n", __FUNCTION__, filename);
 
   if(filename) {
     gGui->playlist_cur = gGui->playlist_num++;
@@ -270,6 +270,16 @@ void gui_playlist_show(widget_t *w, void *data) {
   }
   else {
     pl_exit(NULL, NULL);
+  }
+}
+
+void gui_mrlbrowser_show(widget_t *w, void *data) {
+
+  if(!mrl_browser_is_running()) {
+    open_mrlbrowser(NULL, NULL);
+  }
+  else {
+    destroy_mrl_browser();
   }
 }
 

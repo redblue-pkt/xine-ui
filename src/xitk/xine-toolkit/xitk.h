@@ -26,9 +26,17 @@
 #ifndef _XITK_H_
 #define _XITK_H_
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdlib.h>
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
+
+#ifdef NEED_MRLBROWSER
+#include "xine.h"
+#endif
 
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
@@ -500,6 +508,8 @@ widget_t *button_create (Display *display, ImlibData *idata,
 /**
  * Create the list browser
  */
+/* Default time (in ms) between mouse click to act as double click */
+#define DEFAULT_DBL_CLICK_TIME 200
 typedef struct {
 
   struct {
@@ -542,6 +552,9 @@ typedef struct {
   void            (*callback) (widget_t *, void *);
   /* user data passed to callback */
   void             *user_data;
+
+  int               dbl_click_time;
+  void            (*dbl_click_cb) (widget_t *, int, void *);
 } browser_placements_t;
 
 widget_t *browser_create(Display *display, ImlibData *idata,
@@ -655,5 +668,93 @@ void filebrowser_show(widget_t *w);
 void filebrowser_set_transient(widget_t *w, Window window);
 void filebrowser_destroy(widget_t *w);
 char *filebrowser_get_current_dir(widget_t *w);
+
+
+#ifdef NEED_MRLBROWSER
+
+typedef struct {
+  
+  int                     x;
+  int                     y;
+  char                   *window_title;
+  char                   *bg_skinfile;
+  char                   *resource_name;
+  char                   *resource_class;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *skin_filename;
+    int                   max_length;
+    char                 *cur_origin;
+  } origin;
+  
+  dnd_callback_t          dndcallback;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *caption;
+    char                 *skin_filename;
+    char                 *normal_color;
+    char                 *focused_color;
+    char                 *clicked_color;
+    void                (*callback) (widget_t *widget, void *data, mrl_t *);
+  } select;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *caption;
+    char                 *skin_filename;
+    char                 *normal_color;
+    char                 *focused_color;
+    char                 *clicked_color;
+  } dismiss;
+
+  struct {
+    void                (*callback) (widget_t *widget, void *data);
+  } kill;
+
+  char                  **ip_availables;
+
+  struct {
+
+    struct {
+      int                 x;
+      int                 y;
+      char               *skin_filename;
+      char               *normal_color;
+      char               *focused_color;
+      char               *clicked_color;
+    } button;
+
+    struct {
+      int                 x;
+      int                 y;
+      char               *skin_filename;
+      char               *label_str;
+    } label;
+
+  } ip_name;
+
+  xine_t                 *xine;
+
+  browser_placements_t   *br_placement;
+
+} mrlbrowser_placements_t;
+
+widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
+			    Window window_trans,
+			    mrlbrowser_placements_t *fbp);
+
+int mrlbrowser_is_running(widget_t *w);
+int mrlbrowser_is_visible(widget_t *w);
+void mrlbrowser_hide(widget_t *w);
+void mrlbrowser_show(widget_t *w);
+void mrlbrowser_set_transient(widget_t *w, Window window);
+void mrlbrowser_destroy(widget_t *w);
+
+#endif
 
 #endif

@@ -21,20 +21,23 @@
  *
  */
 
-#ifndef HAVE_WIDGET_TYPES_H
-#define HAVE_WIDGET_TYPES_H
+#ifndef MRL_BROWSER_H
+#define MRL_BROWSER_H
 
-#define WIDGET_TYPE_GROUP         0xFFFF8000
+#include "xine.h"
 
-#define WIDGET_TYPE_BUTTON        0x00000001
-#define WIDGET_TYPE_LABELBUTTON   0x00000002
-#define WIDGET_TYPE_SLIDER        0x00000004
-#define WIDGET_TYPE_LABEL         0x00000008
-#define WIDGET_TYPE_CHECKBOX      0x00000010
-#define WIDGET_TYPE_IMAGE         0x00000020
-#define WIDGET_TYPE_BROWSER       0x00000040
-#define WIDGET_TYPE_FILEBROWSER   0x00000080
-#define WIDGET_TYPE_MRLBROWSER    0x00000100
+typedef void (*select_cb_t) (widget_t *, void *);
+typedef void (*add_cb_t) (widget_t *widget, void *data, const char *);
+typedef void (*mrl_add_cb_t) (widget_t *widget, void *data, mrl_t *);
+
+void mrl_browser(mrl_add_cb_t add_cb, select_cb_t sel_cb, dnd_callback_t dnd_cb);
+void open_mrlbrowser(widget_t *w, void *data);
+void destroy_mrl_browser(void);
+int mrl_browser_is_running(void);
+int mrl_browser_is_visible(void);
+void mrl_browser_toggle_visibility(void);
+void hide_mrl_browser(void);
+void show_mrl_browser(void);
+void set_mrl_browser_transient(void);
 
 #endif
-

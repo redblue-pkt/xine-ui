@@ -9,6 +9,7 @@ data_DATA = arrowdn.png arrowup.png arrowdn2.png arrowup2.png bg.png \
 	right.png slider_bg.png slider_pad.png slider_v.png smallbtn.png \
 	stop.png playlist.png setup.png mrl.png skinconfig
 
+debug:
 install-debug: install
 
 mostlyclean-generic:

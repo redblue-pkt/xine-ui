@@ -29,6 +29,12 @@
 #include "dnd.h"
 #include "widget.h"
 
+/* Duplicate s to d timeval values */
+#define timercpy(s, d) { \
+      (d)->tv_sec = (s)->tv_sec; \
+      (d)->tv_usec = (s)->tv_usec; \
+    }
+
 typedef void (*widget_cb_event_t)(XEvent *event, void *user_data);
 typedef void (*widget_cb_newpos_t)(int, int, int, int);
 

@@ -12,7 +12,7 @@ aaxine_LDADD = @XINE_LIBS@ $(AALIB_STATIC_LIBS) \
 	$(THREAD_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 debug:
-	$(MAKE) CFLAGS="$(AALIB_CFLAGS) $(DEBUG_CFLAGS)"
+	@$(MAKE) CFLAGS="$(AALIB_CFLAGS) $(DEBUG_CFLAGS)"
 
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am

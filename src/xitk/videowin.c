@@ -94,36 +94,39 @@ void video_window_draw_logo(void) {
   double ratio = 1;
   Window rootwin;
   
-  XLockDisplay (gGui->display);
-  
-  /* XClearWindow (gGui->display, gGui->video_window);  */
-
-  if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
-		  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+  if(video_window_is_visible()) {
     
-    tmp = (wwin / 100) * 86;
-    ratio = (tmp < gGui->video_window_logo_pixmap.width && tmp >= 1) ? 
-      (ratio = (double)tmp / (double)gGui->video_window_logo_pixmap.width) : 1;
+    XLockDisplay (gGui->display);
+    
+    /* XClearWindow (gGui->display, gGui->video_window);  */
+    
+    if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
+		    &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+      
+      tmp = (wwin / 100) * 86;
+      ratio = (tmp < gGui->video_window_logo_pixmap.width && tmp >= 1) ? 
+	(ratio = (double)tmp / (double)gGui->video_window_logo_pixmap.width):1;
+    }
+    
+    resized_image = Imlib_clone_image(gGui->imlib_data, 
+				      gGui->video_window_logo_image);
+    Imlib_render (gGui->imlib_data, resized_image, 
+		  (int)gGui->video_window_logo_pixmap.width * ratio, 
+		  (int)gGui->video_window_logo_pixmap.height * ratio);
+    
+    XCopyArea (gGui->display, resized_image->pixmap, gGui->video_window, 
+	       gVw->gc, 0, 0,
+	       resized_image->width, resized_image->height, 
+	       (wwin - resized_image->width) / 2, 
+	       (hwin - resized_image->height) / 2);
+    
+    
+    XFlush(gGui->display);
+    
+    Imlib_destroy_image(gGui->imlib_data, resized_image);
+    
+    XUnlockDisplay (gGui->display);
   }
-  
-  resized_image = Imlib_clone_image(gGui->imlib_data, 
-				    gGui->video_window_logo_image);
-  Imlib_render (gGui->imlib_data, resized_image, 
-		(int)gGui->video_window_logo_pixmap.width * ratio, 
-		(int)gGui->video_window_logo_pixmap.height * ratio);
-
-  XCopyArea (gGui->display, resized_image->pixmap, gGui->video_window, 
-	     gVw->gc, 0, 0,
-	     resized_image->width, resized_image->height, 
-	     (wwin - resized_image->width) / 2, 
-	     (hwin - resized_image->height) / 2);
-
-  
-  XFlush(gGui->display);
-  
-  Imlib_destroy_image(gGui->imlib_data, resized_image);
-
-  XUnlockDisplay (gGui->display);
 }
 
 /*
@@ -131,15 +134,17 @@ void video_window_draw_logo(void) {
  */
 void video_window_hide_logo(void) {
 
-  XLockDisplay (gGui->display);
-  XUnmapWindow (gGui->display, gGui->video_window);
-  XMapWindow (gGui->display, gGui->video_window);
-  XUnlockDisplay (gGui->display);
+  if(video_window_is_visible()) {
+    XLockDisplay (gGui->display);
+    XUnmapWindow (gGui->display, gGui->video_window);
+    XMapWindow (gGui->display, gGui->video_window);
+    XUnlockDisplay (gGui->display);
+  }
   /*
-  gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
-				      GUI_DATA_EX_DRAWABLE_CHANGED, 
-				      (void*)gGui->video_window);
-				      */
+    gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
+    GUI_DATA_EX_DRAWABLE_CHANGED, 
+    (void*)gGui->video_window);
+  */
 }
 
 /*
@@ -147,10 +152,12 @@ void video_window_hide_logo(void) {
  */
 void video_window_show_logo(void) {
 
-  XLockDisplay (gGui->display);
-  XClearWindow (gGui->display, gGui->video_window); 
-  video_window_draw_logo();
-  XUnlockDisplay (gGui->display);
+  if(video_window_is_visible()) {
+    XLockDisplay (gGui->display);
+    XClearWindow (gGui->display, gGui->video_window); 
+    video_window_draw_logo();
+    XUnlockDisplay (gGui->display);
+  }
 }
 
 /*
@@ -359,7 +366,6 @@ void video_window_adapt_size (int video_width, int video_height,
   XSetWMProtocols(gGui->display, gGui->video_window, &wm_delete_window, 1);
 
   /* Map window. */
-  
   XMapRaised(gGui->display, gGui->video_window);
   
   /* Wait for map. */
@@ -419,10 +425,16 @@ void video_window_set_visibility(int show_window) {
 
   gVw->show = show_window;
 
-  if (gVw->show == 1)
+  if (gVw->show == 1) {
+    XLockDisplay (gGui->display);
     XMapRaised (gGui->display, gGui->video_window);
-  else
+    XUnlockDisplay (gGui->display);
+  }
+  else {
+    XLockDisplay (gGui->display);
     XUnmapWindow (gGui->display, gGui->video_window);
+    XUnlockDisplay (gGui->display);
+  }
 }
 
 /*

@@ -31,6 +31,5 @@ void pl_toggle_visibility(widget_t *, void *);
 void pl_raise_window(void);
 void pl_scan_input(widget_t *, void *);
 void pl_update_playlist(void);
-void open_filebrowser(widget_t *, void *);
 
 #endif

@@ -25,6 +25,10 @@
 #endif
 
 #include <stdio.h>
+#include <sys/time.h>
+#include <unistd.h>
+
+#include "_xitk.h"
 
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
@@ -176,7 +180,7 @@ static void browser_slidmove(widget_t *w, void *data, int pos) {
   int realpos;
   
   
-  if(w->widget_type & (WIDGET_TYPE_SLIDER | WIDGET_TYPE_BUTTON)) {
+  if(w->widget_type & (WIDGET_TYPE_SLIDER | WIDGET_TYPE_BUTTON | WIDGET_TYPE_BROWSER)) {
     if(browser_get_current_selected(((widget_t*)data)) > -1)
       browser_release_all_buttons(((widget_t*)data));
     
@@ -218,7 +222,7 @@ static void browser_up(widget_t *w, void *data) {
 static void browser_down(widget_t *w, void *data) {
   browser_private_data_t *private_data = 
     (browser_private_data_t *) ((widget_t*)data)->private_data;
-  widget_list_t* wl;
+  widget_list_t *wl;
 
   if(w->widget_type & WIDGET_TYPE_BUTTON) {
     wl = (widget_list_t*) gui_xmalloc(sizeof(widget_list_t));
@@ -233,10 +237,51 @@ static void browser_down(widget_t *w, void *data) {
 }
 
 /**
+ * slide up (extern).
+ */
+void browser_step_up(widget_t *w, void *data) {
+  browser_private_data_t *private_data = 
+    (browser_private_data_t *) w->private_data;
+  widget_list_t *wl;
+  
+  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+    wl = (widget_list_t*) gui_xmalloc(sizeof(widget_list_t));
+    wl->win = private_data->win;
+    wl->gc = private_data->gc;
+    
+    slider_make_backstep(wl, private_data->item_tree[WSLID]);
+    browser_slidmove(w, w, slider_get_pos(private_data->item_tree[WSLID]));
+
+    free(wl);
+  }
+}
+
+/**
+ * slide Down (extern).
+ */
+void browser_step_down(widget_t *w, void *data) {
+  browser_private_data_t *private_data = 
+    (browser_private_data_t *) w->private_data;
+  widget_list_t* wl;
+  
+  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+    wl = (widget_list_t*) gui_xmalloc(sizeof(widget_list_t));
+    wl->win = private_data->win;
+    wl->gc = private_data->gc;
+
+    slider_make_step(wl, private_data->item_tree[WSLID]);
+    browser_slidmove(w, w, slider_get_pos(private_data->item_tree[WSLID]));
+
+    free(wl);
+  }
+}
+
+
+/**
  * Handle list selections
  */
 static void browser_select(widget_t *w, void *data, int state) {
-  int i;
+  int i, btn_selected;
   browser_private_data_t *private_data = 
     (browser_private_data_t*) ((btnlist_t*)data)->itemlist->private_data;
 
@@ -249,7 +294,7 @@ static void browser_select(widget_t *w, void *data, int state) {
 						 sel]),
 			    0, private_data->win, private_data->gc);
     }
-    
+
     for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
       if((labelbutton_get_state(private_data->item_tree[i]))
 	 && (i != ((btnlist_t*)data)->sel)) {
@@ -257,14 +302,75 @@ static void browser_select(widget_t *w, void *data, int state) {
 			    private_data->win, private_data->gc);
       }
     }
-    
+
     if((i = browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
       // Callback call
       if(private_data->function)
 	private_data->function(((btnlist_t*)data)->itemlist, (void*)(i));
     }
+
+
+    /* A button is currently selected */
+    if((btn_selected = 
+	browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
+      
+      private_data->current_button_clicked = btn_selected;
+
+      if(private_data->last_button_clicked == private_data->current_button_clicked) {
+	struct timeval old_click_time, tm_diff;
+	long int click_diff;
+	
+	private_data->last_button_clicked = -1;
+		
+	timercpy(&private_data->click_time, &old_click_time);
+	gettimeofday(&private_data->click_time, 0);
+	timersub(&private_data->click_time, &old_click_time, &tm_diff);
+	click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
+	
+	/* Ok, double click occur, call cb */
+	if(click_diff < private_data->dbl_click_time) {
+	  if(private_data->dbl_click_cb)
+	    private_data->dbl_click_cb(w, 
+				       private_data->current_button_clicked,
+				       private_data->user_data);
+	}
+
+      }
+      else {
+	private_data->last_button_clicked = private_data->current_button_clicked;
+      }
+      
+      gettimeofday(&private_data->click_time, 0);
+      
+      /*
+      if(private_data->last_button_clicked == -1)
+      	private_data->last_button_clicked = private_data->current_button_clicked;
+      */
+
+    }
+    else if((browser_get_current_selected(((btnlist_t*)data)->itemlist) < 0)
+	    && (private_data->current_button_clicked > -1)) {
+      struct timeval old_click_time, tm_diff;
+      long int click_diff;
+      
+      timercpy(&private_data->click_time, &old_click_time);
+      gettimeofday(&private_data->click_time, 0);
+      timersub(&private_data->click_time, &old_click_time, &tm_diff);
+      click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
+
+      /* Ok, double click occur, call cb */
+      if(click_diff < private_data->dbl_click_time) {
+	if(private_data->dbl_click_cb)
+	  private_data->dbl_click_cb(w, 
+				     private_data->current_button_clicked,
+				     private_data->user_data);
+      }
+      private_data->last_button_clicked = private_data->current_button_clicked;
+      private_data->current_button_clicked = -1;
+    }
+
+    gettimeofday(&private_data->click_time, 0);
   }
-  
 }
 
 /**
@@ -281,11 +387,23 @@ widget_t *browser_create(Display *display, ImlibData *idata,
   private_data = 
     (browser_private_data_t *) gui_xmalloc(sizeof(browser_private_data_t));
 
-  private_data->bWidget = mywidget;
-  private_data->content = bp->browser.entries;
-  private_data->list_length = bp->browser.num_entries;
-  private_data->max_length = bp->browser.max_displayed_entries;
+  private_data->bWidget          = mywidget;
+  private_data->display          = display;
+  private_data->content          = bp->browser.entries;
+  private_data->list_length      = bp->browser.num_entries;
+  private_data->max_length       = bp->browser.max_displayed_entries;
 
+  if(bp->dbl_click_time)
+    private_data->dbl_click_time = bp->dbl_click_time;
+  else
+    private_data->dbl_click_time = DEFAULT_DBL_CLICK_TIME;
+
+  if(bp->dbl_click_cb)
+    private_data->dbl_click_cb   = bp->dbl_click_cb;
+  else
+    private_data->dbl_click_cb   = NULL;
+    
+    
   gui_list_append_content(thelist->l, 
 	  (private_data->item_tree[WBUP] = 
 	   button_create(display, idata, 
@@ -343,6 +461,9 @@ widget_t *browser_create(Display *display, ImlibData *idata,
     }
   }
   
+  private_data->current_button_clicked = -1;
+  private_data->last_button_clicked = -1;
+
   private_data->win = thelist->win;
   private_data->gc = thelist->gc;
   

@@ -35,10 +35,11 @@
 
 #include "Imlib-light/Imlib.h"
 #include "event.h"
-#include "file_browser.h"
 #include "parseskin.h"
 #include "actions.h"
+#include "mrl_browser.h"
 #include "utils.h"
+
 #include "xine.h"
 
 #define MAX_LIST 9
@@ -133,6 +134,24 @@ static void pl_play(widget_t *w, void *data) {
       gui_stop(NULL, NULL);
     
     gGui->playlist_cur = j;
+    
+    gui_play(NULL, NULL);
+    browser_release_all_buttons(playlist->playlist);
+  }
+}
+
+/*
+ * Start to play the selected stream on double click event in playlist.
+ */
+static void pl_on_dbl_click(widget_t *w, int selected, void *data) {
+
+  if(gGui->playlist[selected] != NULL) {
+    
+    gui_set_current_mrl(gGui->playlist[selected]);
+    if(xine_get_status(gGui->xine) != XINE_STOP)
+      gui_stop(NULL, NULL);
+    
+    gGui->playlist_cur = selected;
     
     gui_play(NULL, NULL);
     browser_release_all_buttons(playlist->playlist);
@@ -276,20 +295,12 @@ int pl_is_visible(void) {
 }
 
 /*
- * Callback called by filebrowser on add event.
+ * Callback called by mrl_browser on add event.
  */
 static void playlist_add(widget_t *w, void *data, const char *filename) {
 
   if(filename)
     gui_dndcallback((char *)filename);
-}
-
-/*
- *
- */
-void open_filebrowser(widget_t *w, void *data) {
-  
-  file_browser(playlist_add, handle_selection, gui_dndcallback);
 }
 
 /*
@@ -652,7 +663,7 @@ void playlist_editor(void) {
 						gui_get_skinX("PlAdd"), 
                                                 gui_get_skinY("PlAdd"), 
                                                 CLICK_BUTTON, "Add", 
-                                                open_filebrowser, NULL,  
+                                                open_mrlbrowser, NULL,  
                                                 gui_get_skinfile("PlAdd"), 
                                                 gui_get_ncolor("PlAdd"), 
                                                 gui_get_fcolor("PlAdd"), 
@@ -715,7 +726,7 @@ void playlist_editor(void) {
   bp->browser.num_entries           = gGui->playlist_num;
   bp->browser.entries               = gGui->playlist;
   bp->callback                      = handle_selection;
-  bp->user_data                     = NULL;
+  bp->dbl_click_cb                  = pl_on_dbl_click;
 
   gui_list_append_content (playlist->widget_list->l, 
 			   (playlist->playlist = 

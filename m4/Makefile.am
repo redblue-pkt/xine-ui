@@ -4,7 +4,6 @@
 EXTRA_DIST = _xine.m4 ORBit.m4 xine.m4 aa.m4
 
 debug:
-
 install-debug: debug
 
 mostlyclean-generic:

@@ -24,6 +24,8 @@
 #ifndef FILE_BROWSER_H
 #define FILE_BROWSER_H
 
+#ifdef NEED_FILEBROWSER
+
 typedef void (*select_cb_t) (widget_t *, void *);
 typedef void (*add_cb_t) (widget_t *widget, void *data, const char *);
 
@@ -35,5 +37,7 @@ void file_browser_toggle_visibility(void);
 void hide_file_browser(void);
 void show_file_browser(void);
 void set_file_browser_transient(void);
+
+#endif
 
 #endif

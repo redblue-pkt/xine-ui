@@ -21,8 +21,10 @@
  *
  */
 
-#ifndef HAVE_FILEBROWSER_H
-#define HAVE_FILEBROWSER_H
+#ifndef HAVE_MRLBROWSER_H
+#define HAVE_MRLBROWSER_H
+
+#ifdef NEED_MRLBROWSER
 
 #include <limits.h>
 #include <X11/Xlib.h>
@@ -32,10 +34,9 @@
 #include "dnd.h"
 #include "browser.h"
 
-#define MAXFILES      65535
+#include "xine.h"
 
-#define DEFAULT_SORT 0
-#define REVERSE_SORT 1
+#define MAXFILES      65535
 
 #ifndef NAME_MAX
 #define NAME_MAX 256
@@ -45,13 +46,9 @@
 #endif
 
 typedef struct {
-  /* Files handle by the file browser */
-  char                  *dir_contents[MAXFILES];
-  /* Files displayed by the browser widget */
-  char                  *dir_disp_contents[MAXFILES];
-
-  int                    sort_order;
-} file_contents_t;
+  mrl_t                  *mrls[MAXFILES];
+  char                   *mrls_disp[MAXFILES];
+} mrl_contents_t;
 
 typedef struct {
   
@@ -66,21 +63,9 @@ typedef struct {
     int                   x;
     int                   y;
     char                 *skin_filename;
-  } sort_default;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
-  } sort_reverse;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *skin_filename;
     int                   max_length;
-    char                 *cur_directory;
-  } current_dir;
+    char                 *cur_origin;
+  } origin;
   
   dnd_callback_t          dndcallback;
 
@@ -92,17 +77,7 @@ typedef struct {
     char                 *normal_color;
     char                 *focused_color;
     char                 *clicked_color;
-  } homedir;
-
-  struct {
-    int                   x;
-    int                   y;
-    char                 *caption;
-    char                 *skin_filename;
-    char                 *normal_color;
-    char                 *focused_color;
-    char                 *clicked_color;
-    void                (*callback) (widget_t *widget, void *data, const char *);
+    void                (*callback) (widget_t *widget, void *data, mrl_t *);
   } select;
 
   struct {
@@ -118,15 +93,34 @@ typedef struct {
   struct {
     void                (*callback) (widget_t *widget, void *data);
   } kill;
- 
+
+  char                  **ip_availables;
+  
+  struct {
+
+    struct {
+      int                 x;
+      int                 y;
+      char               *skin_filename;
+      char               *normal_color;
+      char               *focused_color;
+      char               *clicked_color;
+    } button;
+
+    struct {
+      int                 x;
+      int                 y;
+      char               *skin_filename;
+      char               *label_str;
+    } label;
+
+  } ip_name;
+  
+  xine_t                 *xine;
+
   browser_placements_t   *br_placement;
 
-} filebrowser_placements_t;
-
-typedef struct {
-  int                    sort;
-  widget_t               *w;
-} sort_param_t;
+} mrlbrowser_placements_t;
 
 typedef struct {
 
@@ -141,34 +135,39 @@ typedef struct {
   ImlibImage             *bg_image;
   widget_list_t          *widget_list; /* File browser widget list */
   
-  file_contents_t        *fc; /* file browser content */
-  int                     dir_contents_num; /* number of entries in file browser */
+  xine_t                 *xine;
 
-  widget_t               *widget_current_dir; /* Current directory widget */
-  char                    current_dir[PATH_MAX + 1]; /* Current directory */
+  mrl_contents_t         *mc;
+  int                     mrls_num;
+
+  char                   *last_mrl_source;
+
+  widget_t               *widget_origin; /* Current directory widget */
+  char                    current_origin[PATH_MAX + 1]; /* Current directory */
 
   int                     running; /* Boolean status */
   int                     visible; /* Boolean status */
 
-  widget_t               *fb_list; /*  Browser list widget */
+  widget_t               *mrlb_list; /*  Browser list widget */
 
-  sort_param_t           sort_default;
-  sort_param_t           sort_reverse;
-
-  void                  (*add_callback) (widget_t *widget, void *data, const char *filename);
+  void                  (*add_callback) (widget_t *widget, void *data, mrl_t *mrl);
   void                  (*kill_callback) (widget_t *widget, void *data);
 
-} filebrowser_private_data_t;
+  void                  (*ip_callback) (widget_t *widget, void *data);
 
-widget_t *filebrowser_create(Display *display, ImlibData *idata,
-			     Window window_trans,
-			     filebrowser_placements_t *fbp);
+} mrlbrowser_private_data_t;
 
-int filebrowser_is_running(widget_t *w);
-int filebrowser_is_visible(widget_t *w);
-void filebrowser_hide(widget_t *w);
-void filebrowser_show(widget_t *w);
-void filebrowser_set_transient(widget_t *w, Window window);
-void filebrowser_destroy(widget_t *w);
-char *filebrowser_get_current_dir(widget_t *w);
+widget_t *mrlbrowser_create(Display *display, ImlibData *idata,
+			    Window window_trans,
+			    mrlbrowser_placements_t *fbp);
+
+int mrlbrowser_is_running(widget_t *w);
+int mrlbrowser_is_visible(widget_t *w);
+void mrlbrowser_hide(widget_t *w);
+void mrlbrowser_show(widget_t *w);
+void mrlbrowser_set_transient(widget_t *w, Window window);
+void mrlbrowser_destroy(widget_t *w);
+
+#endif
+
 #endif

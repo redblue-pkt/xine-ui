@@ -10,6 +10,7 @@ data_DATA = arrowdn.png fastf.png  pl_bg.png  power.png smallbtn.png \
 	fastb.png    pause.png     play.png        slider_pad.png\
 	playlist.png setup.png mrl.png skinconfig
 
+debug:
 install-debug: install
 
 mostlyclean-generic:

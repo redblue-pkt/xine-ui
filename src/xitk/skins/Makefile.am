@@ -6,6 +6,7 @@ install-exec-am:
 	  $(LN_S) @XINE_SKINDIR@/metal @XINE_SKINDIR@/default; \
 	fi
 
+debug:
 install-debug: install
 
 mostlyclean-generic:

@@ -3,7 +3,7 @@ EXTRA_DIST = getopt.c getopt1.c getopt.h utils.c monitor.c \
 	xscreensaver-remote.c
 noinst_HEADERS = utils.h monitor.h xscreensaver-remote.h
 
-
+debug:
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 

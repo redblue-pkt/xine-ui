@@ -29,6 +29,8 @@
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
 
+#define DEFAULT_DBL_CLICK_TIME 200
+
 typedef struct {
   widget_t    *itemlist;
   int          sel;
@@ -76,6 +78,9 @@ typedef struct {
   void            (*callback) (widget_t *, void *);
   /* user data passed to callback */
   void             *user_data;
+
+  int               dbl_click_time;
+  void            (*dbl_click_cb) (widget_t *, int, void *);
 } browser_placements_t;
 
 typedef struct {
@@ -95,6 +100,12 @@ typedef struct {
 
   void           (*function) (widget_t *, void *);
   void          *user_data;
+
+  int            last_button_clicked;
+  int            current_button_clicked;
+  struct timeval click_time;
+  int            dbl_click_time;
+  void           (*dbl_click_cb) (widget_t *, int, void *);
 
 } browser_private_data_t;
 
@@ -132,4 +143,6 @@ void browser_release_all_buttons(widget_t *w);
  */
 int browser_get_current_start(widget_t *w);
 
+void browser_step_up(widget_t *w, void *data);
+void browser_step_down(widget_t *w, void *data);
 #endif

@@ -51,6 +51,7 @@
 #include "xine.h"
 #include "utils.h"
 #include "xscreensaver-remote.h"
+#include "mrl_browser.h"
 
 #ifdef HAVE_LIRC
 extern int no_lirc;
@@ -270,7 +271,7 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_h:
     case XK_H:
       if(panel_is_visible())
-	video_window_set_visibility(!video_window_is_visible());
+	video_window_set_visibility(!(video_window_is_visible()));
       break;
       
     case XK_plus:
@@ -309,6 +310,11 @@ void gui_handle_event (XEvent *event, void *data) {
       gui_exit(NULL, NULL);
       break;
 
+    case XK_m:
+    case XK_M:
+      gui_mrlbrowser_show(NULL, NULL);
+      break;
+
     case XK_Return:
     case XK_KP_Enter:
       gui_play(NULL, NULL);
@@ -331,11 +337,6 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_e:
     case XK_E:
       gui_eject(NULL, NULL);
-      break;
-
-    case XK_b:
-    case XK_B:
-      open_filebrowser(NULL, NULL);
       break;
 
     case XK_1:

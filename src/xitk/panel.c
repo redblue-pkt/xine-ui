@@ -42,7 +42,7 @@
 #include "videowin.h"
 #include "parseskin.h"
 #include "panel.h"
-#include "file_browser.h"
+#include "mrl_browser.h"
 
 extern gGui_t     *gGui;
 
@@ -102,11 +102,10 @@ void panel_toggle_visibility (widget_t *w, void *data) {
     control_toggle_panel_visibility(NULL, NULL);
   }
 
-  if(!panel->visible && file_browser_is_visible()) {}
+  if(!panel->visible && mrl_browser_is_visible()) {}
   else {
-    file_browser_toggle_visibility();
+    mrl_browser_toggle_visibility();
   }
-
 
 
   if (panel->visible) {
@@ -558,7 +557,7 @@ void panel_init (void) {
 					  gGui->imlib_data, 
 					  gui_get_skinX("MrlBtn"),
 					  gui_get_skinY("MrlBtn"),
-					  gui_mrl_browser_show, 
+					  gui_mrlbrowser_show, 
 					  NULL, 
 					  gui_get_skinfile("MrlBtn")));
   

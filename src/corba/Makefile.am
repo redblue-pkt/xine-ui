@@ -41,7 +41,7 @@ clean-generic:
 
 
 debug:
-	$(MAKE) CFLAGS="$(DEBUG_CFLAGS) @ORBIT_CFLAGS@"
+	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) @ORBIT_CFLAGS@"
 
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am

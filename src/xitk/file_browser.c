@@ -26,6 +26,8 @@
 #include "config.h"
 #endif
 
+#ifdef NEED_FILEBROWSER
+
 #include <stdio.h>
 #include <errno.h>
 #include <X11/Xlib.h>
@@ -222,4 +224,9 @@ void file_browser(add_cb_t add_cb, select_cb_t sel_cb, dnd_callback_t dnd_cb) {
 
   fb = filebrowser_create(gGui->display, gGui->imlib_data, 
 			  gGui->video_window, fbp);
+
+  free(bp);
+  free(fbp);
 }
+
+#endif

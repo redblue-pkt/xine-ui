@@ -9,14 +9,14 @@ SUBDIRS = src m4 misc
 EXTRA_DIST = cvscompile.sh automake.diff
 
 debug:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  (cd $$subdir && $(MAKE) $@) \
+	@list='$(SUBDIRS)'; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) $@) || exit; \
 	done;
 	$(MAKE) CFLAGS="$(DEBUG_CFLAGS) @ORBIT_CFLAGS@"
 
 install-debug: debug
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  (cd $$subdir && $(MAKE) $@) \
+	@list='$(SUBDIRS)'; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) $@) || exit; \
 	done;
 
 prune-cache:

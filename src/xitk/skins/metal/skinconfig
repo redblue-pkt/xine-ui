@@ -65,7 +65,6 @@ FBCurDir:	35	186	letters.png
 FBSortRev:	345	160	arrowup2.png
 FBSortDef:	345	175	arrowdn2.png
 
-
 #Control Panel
 CtlBG:		0	0	pl_bg.png
 CtlHueBG:	80	40	pl_slidv.png
@@ -84,3 +83,16 @@ CtlSave:	31	210	pl_btn.png	LightGray	White	Red
 CtlReset:	109 	210	pl_btn.png	LightGray	White	Red
 CtlDummy:	187	210	pl_btn.png	LightGray	White	Red
 CtlDismiss:	350	210	pl_btn.png	LightGray	White	Red
+
+### MRL Browser ##
+MrlBG:		0	0	pl_bg.png
+MrlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red
+MrlSelect:	61	210	pl_btn.png	LightGray	White	Red
+MrlDismiss:	350	210	pl_btn.png	LightGray	White	Red
+MrlUp:		328	30	arrowup2.png
+MrlSlidBG:	327	45	pl_slidv.png
+MrlSlidFG:	0	0	pl_slidpad.png
+MrlDn:		328	175	arrowdn2.png
+MrlCurOrigin:	35	186	letters.png
+MrlPlugLabel:	360	40	letters.png
+MrlPlugNameBG:	350	62	pl_btn.png	LightGray	White	Red

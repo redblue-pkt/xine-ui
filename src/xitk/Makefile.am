@@ -2,6 +2,7 @@ SUBDIRS = xine-toolkit skins
 
 CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
+EXTRA_DIST = file_browser.c file_browser.h
 
 bin_PROGRAMS = xine
 
@@ -13,13 +14,13 @@ endif
 
 xine_SOURCES = $(GETOPT_C) utils.c monitor.c xscreensaver-remote.c \
 	main.c event.c control.c playlist.c parseskin.c \
-	videowin.c panel.c lirc.c actions.c file_browser.c
+	videowin.c panel.c lirc.c actions.c mrl_browser.c
 xine_DEPENDENTIES = utils.h monitor.h 
 xine_LDADD = @XINE_LIBS@  $(LIRC_LIBS) -lm $(THREAD_LIBS) \
 	$(DYNAMIC_LD_LIBS) $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
 
 noinst_HEADERS = event.h parseskin.h playlist.h control.h \
-	panel.h lirc.h actions.h videowin.h file_browser.h
+	panel.h lirc.h actions.h videowin.h mrl_browser.h
 
 utils.c:
 	$(LN_S) $(top_srcdir)/src/common/utils.c ./utils.c
@@ -37,11 +38,11 @@ $(GETOPT_C):
 	$(LN_S) $(top_srcdir)/src/common/getopt.h ./getopt.h
 
 debug:
-	$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
+	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS) -Ixine-toolkit/"
 
 install-debug: debug
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  (cd $$subdir && $(MAKE) $@) \
+	@list='$(SUBDIRS)'; for subdir in $$list; do \
+	  (cd $$subdir && $(MAKE) $@) || exit;\
 	done;
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 

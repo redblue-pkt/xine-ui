@@ -57,6 +57,8 @@ void gui_nextprev(widget_t *w, void *data);
 
 void gui_playlist_show(widget_t *w, void *data);
 
+void gui_mrlbrowser_show(widget_t *w, void *data);
+
 void gui_set_current_mrl(const char *mrl);
 
 char *gui_get_next_mrl (void);

@@ -1,4 +1,4 @@
- /* 
+/* 
  * Copyright (C) 2000-2001 the xine project
  * 
  * This file is part of xine, a unix video player.
@@ -83,15 +83,6 @@ extern int errno;
 #define S_ISDIR(mode) 0
 #endif
 
-#ifndef	NAME_MAX
-#define	NAME_MAX      255
-#endif
-
-#define MAXFILES      4096
-
-#define DEFAULT_SORT 0
-#define REVERSE_SORT 1
-
 typedef struct {
   char                  *name;
   char                  *linkname;
@@ -164,7 +155,7 @@ void filebrowser_show(widget_t *w) {
 }
 
 /*
- * Set filefrowser transient for hints for given window.
+ * Set filebrowser transient for hints for given window.
  */
 void filebrowser_set_transient(widget_t *w, Window window) {
   filebrowser_private_data_t *private_data;
@@ -361,7 +352,7 @@ static void load_files(widget_t *w, void *data) {
   DIR             *pdir;
   struct dirent   *pdirent;
   finfo_t         *hide_files, *dir_files, *norm_files;
-  char             fullfilename[FPATH_MAX + FNAME_MAX + 1];
+  char             fullfilename[PATH_MAX + NAME_MAX + 1];
   int              num_hide_files  = 0;
   int              num_dir_files   = 0;
   int              num_norm_files  = 0;
@@ -395,11 +386,11 @@ static void load_files(widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(dir_files[num_dir_files].marker == '@') {
-	char linkbuf[FPATH_MAX + FNAME_MAX + 1];
+	char linkbuf[PATH_MAX + NAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, FPATH_MAX + FNAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, FPATH_MAX + FNAME_MAX);
+	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
 	
 	if(linksize < 0) {
 	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
@@ -424,11 +415,11 @@ static void load_files(widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(hide_files[num_hide_files].marker == '@') {
-	char linkbuf[FPATH_MAX + FNAME_MAX + 1];
+	char linkbuf[PATH_MAX + NAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, FPATH_MAX + FNAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, FPATH_MAX + FNAME_MAX);
+	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
 	
 	if(linksize < 0) {
 	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
@@ -452,11 +443,11 @@ static void load_files(widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(norm_files[num_norm_files].marker == '@') {
-	char linkbuf[FPATH_MAX + FNAME_MAX + 1];
+	char linkbuf[PATH_MAX + NAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, FPATH_MAX + FNAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, FPATH_MAX + FNAME_MAX);
+	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
 	
 	if(linksize < 0) {
 	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
@@ -780,63 +771,80 @@ static void filebrowser_homedir(widget_t *w, void *data) {
   paint_widget_list (private_data->widget_list);
 }
 
+static void filebrowser_select_entry(filebrowser_private_data_t *private_data, int j) {
+  char buf[PATH_MAX + NAME_MAX + 1];
+
+  /* Want to re-read current dir */
+  if(!strcasecmp(private_data->fc->dir_contents[j], ".")) {
+    /* NOOP */
+  }
+  else if(!strcasecmp(private_data->fc->dir_contents[j], "..")) {
+    char *p;
+    
+    memset(&buf, '\0', sizeof(buf));
+    sprintf(buf, "%s", private_data->current_dir);
+    if(strlen(buf) > 1) { /* not '/' directory */
+      
+      p = &buf[strlen(buf)-1];
+      while(*p && *p != '/') {
+	*p = '\0';
+	p--;
+      }
+      
+      /* Remove last '/' if current_dir isn't root */
+      if((strlen(buf) > 1) && *p == '/') 
+	*p = '\0';
+      
+      sprintf(private_data->current_dir, "%s", buf);
+    }
+  }
+  else {
+    
+    /* not '/' directory */
+    if(strcasecmp(private_data->current_dir, "/")) {
+      memset(&buf, '\0', sizeof(buf));
+      sprintf(buf, "%s/%s", private_data->current_dir, 
+	      private_data->fc->dir_contents[j]);
+    }
+    else {
+      memset(&buf, '\0', sizeof(buf));
+      sprintf(buf, "/%s", private_data->fc->dir_contents[j]);
+    }
+    
+    if(is_a_dir(buf)) {
+      sprintf(private_data->current_dir, "%s", buf);
+    }
+    else {
+      if(private_data->add_callback)
+	private_data->add_callback(NULL, (void *) j, buf);
+    }
+  }
+}
+
 /*
  * Handle selection in browser.
  */
 static void filebrowser_select(widget_t *w, void *data) {
   filebrowser_private_data_t *private_data = (filebrowser_private_data_t *)data;
   int j = -1;
-  char buf[FPATH_MAX + FNAME_MAX + 1];
 
   if((j = browser_get_current_selected(private_data->fb_list)) >= 0) {
 
-    /* Want to re-read current dir */
-    if(!strcasecmp(private_data->fc->dir_contents[j], ".")) {
-      /* NOOP */
-    }
-    else if(!strcasecmp(private_data->fc->dir_contents[j], "..")) {
-      char *p;
-      
-      memset(&buf, '\0', sizeof(buf));
-      sprintf(buf, "%s", private_data->current_dir);
-      if(strlen(buf) > 1) { /* not '/' directory */
-	
-	p = &buf[strlen(buf)-1];
-	while(*p && *p != '/') {
-	  *p = '\0';
-	  p--;
-	}
+    filebrowser_select_entry(private_data, j);
 
-	/* Remove last '/' if current_dir isn't root */
-	if((strlen(buf) > 1) && *p == '/') 
-	  *p = '\0';
-	
-	sprintf(private_data->current_dir, "%s", buf);
-      }
-    }
-    else {
-
-      /* not '/' directory */
-      if(strcasecmp(private_data->current_dir, "/")) {
-	memset(&buf, '\0', sizeof(buf));
-	sprintf(buf, "%s/%s", private_data->current_dir, 
-		private_data->fc->dir_contents[j]);
-      }
-      else {
-	memset(&buf, '\0', sizeof(buf));
-	sprintf(buf, "/%s", private_data->fc->dir_contents[j]);
-      }
-      
-      if(is_a_dir(buf)) {
-	sprintf(private_data->current_dir, "%s", buf);
-      }
-      else {
-	if(private_data->add_callback)
-	  private_data->add_callback(NULL, (void *) j, buf);
-      }
-    }
   }
   
+  load_files(NULL, (void *)private_data);
+}
+
+/*
+ * Handle double click in labelbutton list.
+ */
+static void handle_dbl_click(widget_t *w, int selected, void *data) {
+  filebrowser_private_data_t *private_data = (filebrowser_private_data_t *)data;
+
+  filebrowser_select_entry(private_data, selected);
+
   load_files(NULL, (void *)private_data);
 }
 
@@ -871,6 +879,14 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
 
     case XK_asciitilde:
       filebrowser_homedir(NULL, (void *)private_data);
+    break;
+
+    case XK_Down:
+      browser_step_up((widget_t *)private_data->fb_list, NULL);
+    break;
+
+    case XK_Up:
+      browser_step_down((widget_t *)private_data->fb_list, NULL);
     break;
     }
   }
@@ -1040,6 +1056,8 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
   private_data->add_callback = fbp->select.callback;
   private_data->kill_callback = fbp->kill.callback;
 
+  fbp->br_placement->dbl_click_cb = handle_dbl_click;
+  fbp->br_placement->user_data = (void *)private_data;
 
   gui_list_append_content (private_data->widget_list->l,
 			   (private_data->fb_list = 

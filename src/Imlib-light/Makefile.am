@@ -8,7 +8,7 @@ libImlib_light_la_SOURCES = cache.c load.c misc.c rend.c utils.c snprintf.c
 noinst_HEADERS = Imlib.h Imlib_private.h Imlib_types.h
 
 debug:
-	$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
+	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
 
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am

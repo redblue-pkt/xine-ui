@@ -46,27 +46,10 @@ PlUp:		324	21	arrowup.png
 PlSlidBG:	326	36	pl_slidv.png
 PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		324	160	arrowdn.png
-AutoPlayLbl:	4100	40	letters.png
-AutoPlayBG:	30	185	pl_btn.png	Black   Black	Black
+AutoPlayLbl:	355	20	letters.png
+AutoPlayBG:	355	40	pl_btn.png	Black   Black	Black
 
-#File Browser
-FBBG:		0	0	pl_bg.png
-FBItemBtn:	30	20	pl_itembtn.png	Black   Black	Black
-FBMoveUp:	143	185	pl_btn.png	Black	Black	Black
-FBMoveDn:	143	202	pl_btn.png	Black	Black	Black
-FBSlidBG:	326	36	pl_slidv.png
-FBSlidFG:	0	0	pl_slidpad.png
-FBSelect:	30	234	pl_btn.png	Black	Black	Black
-FBHome:		143 	234	pl_btn.png	Black	Black	Black
-FBDismiss:	355	234	pl_btn.png	Black	Black	Black
-FBUp:		324	21	arrowup.png
-FBDn:		324	160	arrowdn.png
-FBCurDirLbl:	30	190	letters.png
-FBCurDir:	95	190	letters.png
-FBSortRev:	340	145	arrowup.png
-FBSortDef:	340	160	arrowdn.png
-
-## control panel ##
+# Control panel
 CtlBG:		0	0	pl_bg.png
 CtlHueBG:	80	40	pl_slidv.png
 CtlHueFG:	0	0	pl_slidpad.png
@@ -85,3 +68,17 @@ CtlReset:	143 	234	pl_btn.png	Black	Black	Black
 CtlDummy:	251	234	pl_btn.png	Black	Black	Black
 CtlDismiss:	355	234	pl_btn.png	Black	Black	Black
 
+#MRL Browser
+MrlBG:		0	0	pl_bg.png
+MrlItemBtn:	30	20	pl_itembtn.png	Black   Black	Black
+MrlMoveUp:	143	185	pl_btn.png	Black	Black	Black
+MrlMoveDn:	143	202	pl_btn.png	Black	Black	Black
+MrlSlidBG:	326	36	pl_slidv.png
+MrlSlidFG:	0	0	pl_slidpad.png
+MrlSelect:	30	234	pl_btn.png	Black	Black	Black
+MrlDismiss:	355	234	pl_btn.png	Black	Black	Black
+MrlUp:		324	21	arrowup.png
+MrlDn:		324	160	arrowdn.png
+MrlCurOrigin:	95	190	letters.png
+MrlPlugLabel:	355	20	letters.png
+MrlPlugNameBG:	355	40	pl_btn.png	Black   Black	Black

@@ -2,7 +2,6 @@ EXTRA_DIST = autogen.sh SlackBuild.in SlackBuild build_rpms.sh \
 	xine-ui.spec.in xine-ui.spec
 
 debug:
-
 install-debug: debug
 
 mostlyclean-generic:

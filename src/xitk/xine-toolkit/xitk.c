@@ -402,7 +402,7 @@ static void widget_xevent_notify(XEvent *event) {
 	      }
 	    }
 
-	    // XFlush(gXitk->display);
+	    XFlush(gXitk->display);
 
 	    XUNLOCK(gXitk->display);
 
