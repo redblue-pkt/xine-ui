@@ -56,6 +56,7 @@
 #include "setup.h"
 #include "skins.h"
 #include "snapshot.h"
+#include "splash.h"
 #include "stream_infos.h"
 #include "tvset.h"
 #include "viewlog.h"
@@ -297,6 +298,8 @@ typedef struct {
   int                        play_anyway;
 
   int                        got_reference_stream;
+
+  int                        splash;
 
   pthread_mutex_t            download_mutex;
 

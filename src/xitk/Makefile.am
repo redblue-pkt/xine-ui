@@ -40,6 +40,7 @@ xine_SOURCES = \
 	setup.c \
 	skins.c \
 	snapshot.c \
+	splash.c \
 	stream_infos.c \
 	tvset.c \
 	videowin.c \
@@ -90,6 +91,7 @@ noinst_HEADERS = \
 	setup.h \
 	skins.h \
 	snapshot.h \
+	splash.h \
 	stream_infos.h \
 	tvset.h \
 	videowin.h \

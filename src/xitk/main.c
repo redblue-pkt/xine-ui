@@ -99,6 +99,8 @@ typedef struct {
 #define OPTION_NO_LOGO          1007
 #define OPTION_POST             1008
 #define OPTION_DISABLE_POST     1009
+#define OPTION_NO_SPLASH        1010
+
 
 /* options args */
 static const char *short_options = "?hHgfvn"
@@ -155,6 +157,7 @@ static struct option long_options[] = {
   {"no-reload"      , no_argument      , 0, 'E'                      },
   {"post"           , required_argument, 0, OPTION_POST              },
   {"disable-post"   , no_argument      , 0, OPTION_DISABLE_POST      },
+  {"no-splash"      , no_argument      , 0, OPTION_NO_SPLASH         },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -544,6 +547,7 @@ void show_usage (void) {
   printf(_("                               Parameters are comma separated.\n"));
   printf(_("                               This option can be used more than one time.\n"));
   printf(_("      --disable-post           Don't enable post plugin(s).\n"));
+  printf(_("      --no-splash              Don't display the splash screen.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1174,6 +1178,7 @@ int main(int argc, char *argv[]) {
   gGui->post_elements          = NULL;
   gGui->post_elements_num      = 0;
   gGui->post_enable            = 1;
+  gGui->splash                 = 1;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1475,6 +1480,10 @@ int main(int argc, char *argv[]) {
 
     case OPTION_DISABLE_POST:
       gGui->post_enable = 0;
+      break;
+
+    case OPTION_NO_SPLASH:
+      gGui->splash = 0;
       break;
 
     case 'v': /* Display version and exit*/

@@ -1248,17 +1248,26 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       exp_level_cb, 
 			       CONFIG_NO_DATA)) * 10;
 
-  gGui->mixer.amp =  xine_config_register_range(gGui->xine, "gui.amp_level", 
-						100, 0, 200,
-						_("Amplification level"),
-						NULL,
-						CONFIG_LEVEL_ADV,
-						amp_level_cb, 
-						CONFIG_NO_DATA);
+  gGui->mixer.amp = xine_config_register_range(gGui->xine, "gui.amp_level", 
+					       100, 0, 200,
+					       _("Amplification level"),
+					       NULL,
+					       CONFIG_LEVEL_ADV,
+					       amp_level_cb, 
+					       CONFIG_NO_DATA);
 
+  gGui->splash = 
+    gGui->splash ? (xine_config_register_bool(gGui->xine, "gui.splash", 
+					      1,
+					      _("Display splash screen"),
+					      _("If enabled, xine will display its splash screen"), 
+					      CONFIG_LEVEL_BEG,
+					      CONFIG_NO_CB,
+					      CONFIG_NO_DATA)) : 0;
+  
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
-
+  
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);
@@ -1297,7 +1306,10 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   xine_pid = getppid();
   
   xitk_init(gGui->display);
-  
+
+  if(gGui->splash)
+    splash_create();
+
   init_skins_support();
 
   gGui->on_quit = 0;
@@ -1523,6 +1535,8 @@ void gui_run(void) {
       gGui->actions_on_start[1] = ACTID_NOKEY;
     }
   }
+
+  splash_destroy();
 
   xitk_run(on_start, (void *)auto_start);
 

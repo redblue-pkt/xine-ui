@@ -1,3 +1,4 @@
+#warning IMPLEMENT POST SUPPORT
 /*
  * Copyright (C) 2000-2003 the xine project
  * 
