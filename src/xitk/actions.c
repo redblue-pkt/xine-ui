@@ -731,7 +731,7 @@ void gui_seek_relative (int off_sec) {
   }
 }
 
-void gui_dndcallback (char *filename) {
+void gui_dndcallback(char *filename) {
 
   if(filename) {
     char  buffer[strlen(filename) + 10];
@@ -777,13 +777,14 @@ void gui_dndcallback (char *filename) {
       sprintf(buffer, "%s", filename);
     
     mediamark_add_entry(buffer, buffer, 0, -1);
-    gGui->playlist.cur = (gGui->playlist.num - 1);
     
-    if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode)
+    if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
+      gGui->playlist.cur = (gGui->playlist.num - 1);
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-    
-    playlist_update_playlist();
+    }   
 
+    playlist_update_playlist();
+    
     if((!is_playback_widgets_enabled()) && gGui->playlist.num)
       enable_playback_controls(1);
   }

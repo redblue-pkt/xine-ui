@@ -1298,6 +1298,6 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
   }
 
   return _xitk_browser_create(wl, NULL, br, x, y, 
-			      (itemw + slidw), (itemh * br->browser.max_displayed_entries), 
+			      (itemw + slidw), (itemh * br->browser.max_displayed_entries) + slidw, 
 			      NULL, mywidget, private_data, 1, 1);
 }

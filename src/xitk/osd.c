@@ -1,21 +1,25 @@
 /*
-** Copyright (C) 2002 Daniel Caujolle-Bert <segfault@club-internet.fr>
-**  
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**  
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**  
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-**  
-*/
+ * Copyright (C) 2000-2002 the xine project
+ * 
+ * This file is part of xine, a unix video player.
+ * 
+ * xine is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * xine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+ *
+ * $Id$
+ *
+ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +33,7 @@
 #include "common.h"
 
 extern gGui_t     *gGui;
+
 #define OVL_PALETTE_SIZE 256
 
 #ifdef	__GNUC__
@@ -168,6 +173,7 @@ void osd_deinit(void) {
     xine_osd_hide(gGui->osd.bar[0], 0);
     xine_osd_hide(gGui->osd.bar[1], 0);
   } 
+
   if(gGui->osd.status_visible) {
     gGui->osd.status_visible = 0;
     xine_osd_hide(gGui->osd.status, 0);
@@ -266,7 +272,7 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     xine_osd_clear(gGui->osd.bar[0]);
     xine_osd_clear(gGui->osd.bar[1]);
     
-    memset(bar_color, (XINE_OSD_TEXT1 + 7), sizeof(int) * 40);
+    memset(&bar_color, (XINE_OSD_TEXT1 + 7), sizeof(int) * 40);
     
     switch(type) {
     case OSD_BAR_PROGRESS:
@@ -319,8 +325,11 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     vwidth  = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
     vheight = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
     
-    xine_osd_set_position(gGui->osd.bar[0], (vwidth - BAR_WIDTH) >> 1 , (vheight - BAR_HEIGHT) - 40);
-    xine_osd_set_position(gGui->osd.bar[1], (vwidth - BAR_WIDTH) >> 1 , (vheight - (BAR_HEIGHT * 2)) - 40);
+    xine_osd_set_position(gGui->osd.bar[0], 
+			  (vwidth - BAR_WIDTH) >> 1 , (vheight - BAR_HEIGHT) - 40);
+    xine_osd_set_position(gGui->osd.bar[1], 
+			  (vwidth - BAR_WIDTH) >> 1 , (vheight - (BAR_HEIGHT * 2)) - 40);
+
     xine_osd_show(gGui->osd.bar[0], 0);
     if(title)
       xine_osd_show(gGui->osd.bar[1], 0);

@@ -379,7 +379,7 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
   res_v                 = (DisplayHeight (gGui->display, gGui->screen)*1000
 			   / DisplayHeightMM (gGui->display, gGui->screen));
   
-  gGui->pixel_aspect    = res_h / res_v;
+  gGui->pixel_aspect    = res_v / res_h;
   
 #ifdef DEBUG
   printf("pixel_aspect: %f\n", gGui->pixel_aspect);
