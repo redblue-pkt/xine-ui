@@ -1357,8 +1357,8 @@ int main(int argc, char *argv[]) {
   gGui->XF86VidMode_fullscreen = 0;
 #endif
   gGui->actions_on_start[aos]  = ACTID_NOKEY;
+  gGui->playlist.mmk           = NULL;
   gGui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
-  gGui->playlist.on_start      = NULL;
   gGui->playlist.control       = 0;
   gGui->skin_server_url        = NULL;
   gGui->verbosity              = 0;
@@ -1594,10 +1594,13 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'P':
-      if(aos < MAX_ACTIONS_ON_START) {
+      if((!actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST) && (aos < MAX_ACTIONS_ON_START)))
 	gGui->actions_on_start[aos++] = ACTID_PLAYLIST;
-	gGui->playlist.on_start = strdup(optarg);
-      }
+      
+      if(!gGui->playlist.mmk)
+	mediamark_load_mediamarks(optarg);
+      else
+	mediamark_concat_mediamarks(optarg);
       break;
 
     case 'l':

@@ -294,8 +294,6 @@ typedef struct {
     int                     ref_append;            /* append mrl reference entry to this position */
     int                     loop;                  /* current loop mode (see PLAYLIST_LOOP_* */
     int                     control;               /* see PLAYLIST_CONTROL_* */
-
-    char                   *on_start;
   } playlist;
 
 

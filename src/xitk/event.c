@@ -1741,7 +1741,7 @@ void gui_run(char **session_opts) {
 
     /* User load a playlist on startup */
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) {
-      mediamark_load_mediamarks(gGui->playlist.on_start);
+      gGui->playlist.cur = 0;
       gui_set_current_mmk(mediamark_get_current_mmk());
       if((!is_playback_widgets_enabled()) && gGui->playlist.num)
 	enable_playback_controls(1);
