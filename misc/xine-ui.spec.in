@@ -1,101 +1,63 @@
-# Note that this is NOT a relocatable package
-%define ver     @SPEC_VERSION@
-%define rel     0
-%define prefix  /usr
-%define name    @PACKAGE@
-%define ginstall @INSTALL@
+%define name	@PACKAGE@
+%define version	@SPEC_VERSION@
+%define release	1
+
+%define skindir	 %(xine-config --skindir)
+%define deskdir	 %(xine-config --desktopdir)
+
+%define	ginstall install -c
 
 Name:        %{name}
-Summary:     A Free Video Player.
-Summary(ko): °ø°³ µ¿¿µ»ó ÇÃ·¹ÀÌ¾î
-Version:     %{ver}
-Release:     %{rel}
+Summary:     A Free Audio/Video Player.
+Version:     %{version}
+Release:     %{release}
 Copyright:   GPL
 Group:       Applications/Multimedia
-Source:      http://xine.sourceforge.net/files/@PACKAGE@-@VERSION@.tar.gz
-URL:         http://xine.sourceforge.net
+Source:      http://xine.sourceforge.net/files/%{name}-%{version}.tar.gz
+URL:         http://xine.sourceforge.net/
 Packager:    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-Requires:    xine-lib >= %{ver}
-BuildRoot:   /tmp/%{name}-root
-
-@HAVE_AA_TRUE@%package aa
-@HAVE_AA_TRUE@Summary:     XINE - Ascii Art player.
-@HAVE_AA_TRUE@Group:       Applications/Multimedia
-@HAVE_AA_TRUE@Requires:    xine-lib >= %{ver}, xine-lib-aa
+Requires:    libxine >= %{version}
+BuildRoot:   %{_tmppath}/%{name}-buildroot
 
 %description
-xine is a free gpl-licensed video player for unix-like systems.
-We support mpeg-2 and mpeg-1 system (audio + video multiplexed) streams,
-eventually mpeg-4 and other formats might be added.
-
-xine plays the video and audio data of mpeg-2 videos and synchronizes
-the playback of both. Depending on the properties of the mpeg stream,
-playback will need more or less processor power, 100% frame rate
-has been seen on a 400 MHz P II system.
-
-%description -l fr
-xine est un lecteur vidéo libre sous license GPL pour les systèmes de
-type unix. Nous supportons les flux mpeg-2 et mpeg-1 (audio + vidéo 
-multiplexés), éventuellement le mpeg-4 et d'autres formats peuvent
-êtres ajoutés.
-
-xine joue les données vidéo et audio de vidéo mpeg-2 et synchronise
-la lecture des deux. En fonction des propriétes du flux mpeg,
-la lecture aura besoin de plus ou moins de puissance du processeur, 
-100% de restitution de trame a été vus sur un système PII 400MHz.
-
-%description -l ko
-xine ´Â GPL¶óÀÌ¼±½º¸¦ µû¸£´Â UNIX¿ë °ø°³ µ¿¿µ»ó ÇÃ·¹ÀÌ¾îÀÔ´Ï´Ù. ÀÌ
-ÇÃ·¹ÀÌ¾î´Â mpeg-2 ¿Í mpeg 1 ½ºÆ®¸²À» Áö¿øÇÏ¸ç, ÇöÀç´Â Áö¿øÇÏÁö
-¾ÊÁö¸¸ ³ªÁß¿¡´Â mpeg-4 ¿Í ´Ù¸¥ Çü½ÄÀÇ µ¿¿µ»óµµ Áö¿øÇÒ ¿¹Á¤ÀÔ´Ï´Ù.
-
-%description -l pt
-O xine é um leitor de vídeo livre ao abrigo da GPL para sistemas tipo
-Unix. Lê ficheiros MPEG-2 e MPEG-1, bem como AVIs que contenham
-MS MPEG-4 / OpenDivX Video.
-
-O xine lê o conteúdo vídeo e áudio e sincroniza-os em tempo-real. As
-necessidades de processador dependem das propriedades de cada ficheiro.
-Em princípio, um sistema equipado com um Pentium-II a 400 MHz consegue
-ler qualquer vídeo com máximo desempenho.
-
-@HAVE_AA_TRUE@%description aa
-@HAVE_AA_TRUE@Video player using Ascii Art library.
+xine is a fully-featured free audio/video player for unix-like systems which
+uses libxine for audio/video decoding and playback. For more informations on
+what formats are supported, please refer to the libxine documentation.
 
 %prep
-%setup -n @TAR_NAME@
+%setup -n %{name}-%{version}
 
 %build
-./configure --prefix=%{prefix}
-make
+if [ ! -f configure ]; then
+   ./cvscompile.sh
+fi
+%configure
+%make
 
 %install
-if [ -d $RPM_BUILD_ROOT ]; then rm -rf $RPM_BUILD_ROOT; fi
-#mkdir -p $RPM_BUILD_ROOT/usr/include/X11/pixmaps
-make install-strip DESTDIR=$RPM_BUILD_ROOT
-#cp doc/*.xpm $RPM_BUILD_ROOT/usr/include/X11/pixmaps
+rm -rf $RPM_BUILD_ROOT
+%makeinstall_std
 
 %post
-#/sbin/ldconfig
-if test -d @XINE_SKINDIR@/metal; then rm -rf @XINE_SKINDIR@/metal; fi
-if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/xinetic @XINE_SKINDIR@/default; fi
-# Icons
-if test ! -d /usr/share/icons; then 
-  %{ginstall} -m 755 -o 0 -g 0 -d /usr/share/icons
+if test -d %{skindir}/metal; then rm -rf %{skindir}/metal; fi
+if test -d %{skindir}/default; then rm -rf %{skindir}/default && ln -s %{skindir}/xinetic %{skindir}/default; fi
+
+if test ! -d %{_datadir}/icons; then 
+  %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/icons
 fi
-%{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.xpm /usr/share/icons/xine.xpm
-if test ! -d /usr/share/pixmaps; then 
-  %{ginstall} -m 755 -o 0 -g 0 -d /usr/share/pixmaps
+%{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm %{_datadir}/icons/xine.xpm
+if test ! -d %{_datadir}/pixmaps; then 
+  %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/pixmaps
 fi
-%{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.xpm /usr/share/pixmaps/xine.xpm
-if test -d /etc/X11/wmconfig; then 
-  %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.wmconfig /etc/X11/wmconfig/xine
+%{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm %{_datadir}/pixmaps/xine.xpm
+if test -d %{_sysconfdir}/X11/wmconfig; then 
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.wmconfig %{_sysconfdir}/X11/wmconfig/xine
 fi
-if test -d /etc/X11/applnk; then
-  if test ! -d /etc/X11/applnk/Multimedia; then 
-    %{ginstall} -m 755 -o 0 -g 0 -d /etc/X11/applnk/Multimedia
+if test -d %{_sysconfdir}/X11/applnk; then
+  if test ! -d %{_sysconfdir}/X11/applnk/Multimedia; then 
+    %{ginstall} -m 755 -o 0 -g 0 -d %{_sysconfdir}/X11/applnk/Multimedia
   fi
-  %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /etc/X11/applnk/Multimedia/xine.desktop
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop
 fi
 # End Icons
 # Gnome
@@ -103,20 +65,20 @@ if test -d /opt/gnome; then
   if test ! -d /opt/gnome/share/pixmaps; then 
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/pixmaps
   fi
-  %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
   if test -d /opt/gnome/share/gnome/apps/Multimedia; then
-    %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
   else
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/gnome/apps/Multimedia
-    %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
   fi
 else
-  if test -d /usr/share/gnome/apps; then
-    if test -d /usr/share/gnome/apps/Multimedia; then
-      %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /usr/share/gnome/apps/Multimedia/xine.desktop
+  if test -d %{_datadir}/gnome/apps; then
+    if test -d %{_datadir}/gnome/apps/Multimedia; then
+      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop
     else
-      %{ginstall} -m 755 -o 0 -g 0 -d /usr/share/gnome/apps/Multimedia
-      %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /usr/share/gnome/apps/Multimedia/xine.desktop
+      %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/gnome/apps/Multimedia
+      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop
     fi
   fi
 fi
@@ -129,22 +91,22 @@ if test -d /opt/kde2/; then
   LORES='32x32 22x22 16x16'
   for hires in $$HIRES; do
     %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI/$hires/apps
-    %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine_$hires.png $DIR_HI/$hires/apps/xine.png
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$hires.png $DIR_HI/$hires/apps/xine.png
   done
   for lores in $$LORES; do
     %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO/$lores/apps
-    %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine_$lores.png $DIR_LO/$lores/apps/xine.png
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$lores.png $DIR_LO/$lores/apps/xine.png
   done
   if test ! -d /opt/kde2/share/applnk/Multimedia; then 
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
   fi
-  %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop
 else
-  if test -d /usr/share/applnk/Multimedia; then
-    if test ! -d /usr/share/applnk/Multimedia; then 
-      %{ginstall} -m 755 -o 0 -g 0 -d /usr/share/applnk/Multimedia
+  if test -d %{_datadir}/applnk/Multimedia; then
+    if test ! -d %{_datadir}/applnk/Multimedia; then 
+      %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/applnk/Multimedia
     fi
-    %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /usr/share/applnk/Multimedia/xine.desktop
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
   fi
 fi
 # End Kde2
@@ -156,17 +118,20 @@ if test -d /opt/kde; then
   if test ! -d /opt/kde/share/applnk/Multimedia; then 
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/applnk/Multimedia
   fi
-  %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.xpm /opt/kde/share/icons/xine.xpm
-  %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm /opt/kde/share/icons/xine.xpm
+  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
 else
-  if test -d /usr/share/applnk/Multimedia; then 
-    %{ginstall} -m 644 -o 0 -g 0 @XINE_DESKTOPDIR@/xine.desktop /usr/share/applnk/Multimedia/xine.desktop
+  if test -d %{_datadir}/applnk/Multimedia; then 
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
   fi
 fi
 # End Kde
 
 %preun
-  REMOVALS='/usr/share/icons/xine.xpm /usr/share/pixmaps/xine.xpm /etc/X11/wmconfig/xine /etc/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop /usr/share/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop /usr/share/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop /usr/share/applnk/Multimedia/xine.desktop'
+  DIR_HI=/opt/kde2/share/icons/hicolor
+  DIR_LO=/opt/kde2/share/icons/locolor
+
+  REMOVALS='%{_datadir}/icons/xine.xpm %{_datadir}/pixmaps/xine.xpm %{_sysconfdir}/X11/wmconfig/xine %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop'
   for remove in $REMOVALS; do
     rm -f $remove
   done
@@ -184,78 +149,21 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-# binaries
-%{prefix}/bin/xine
-@HAVE_TERMCAP_TRUE@%{prefix}/bin/xine-remote
-%{prefix}/bin/xine-bugreport
-%{prefix}/bin/xine-check
-%{prefix}/share/idl/xine.idl
-# skins
-@XINE_SKINDIR@/lcd/*
-@XINE_SKINDIR@/pitt/*
-@XINE_SKINDIR@/xinetic/*
-@XINE_SKINDIR@/cloudy/*
-@XINE_SKINDIR@/mp2k/*
-@XINE_SKINDIR@/CelomaGold/*
-@XINE_SKINDIR@/CelomaMdk/*
-@XINE_SKINDIR@/CelomaChrome/*
-# desktop entries/icons
-@XINE_DESKTOPDIR@/*
-# documentation
-%{prefix}/man/de/man1/xine*.1*
-%{prefix}/man/fr/man1/xine*.1*
-%{prefix}/man/es/man1/xine*.1*
-%{prefix}/man/pl/man1/xine*.1*
-%{prefix}/man/man1/xine*.1*
-%{prefix}/share/doc/xine-ui/FAQ_en
-%{prefix}/share/doc/xine-ui/FAQ_es
-%{prefix}/share/doc/xine-ui/FAQ_fr
-%{prefix}/share/doc/xine-ui/FAQ_it
-%{prefix}/share/doc/xine-ui/FAQ_pl
-%{prefix}/share/doc/xine-ui/FAQ_uk
-%{prefix}/share/doc/xine-ui/README.corba
-%{prefix}/share/doc/xine-ui/README.divx4
-%{prefix}/share/doc/xine-ui/README.dxr3
-%{prefix}/share/doc/xine-ui/README.dxr3_pl
-%{prefix}/share/doc/xine-ui/README.freebsd
-%{prefix}/share/doc/xine-ui/README.irix
-%{prefix}/share/doc/xine-ui/README.mrl
-%{prefix}/share/doc/xine-ui/README.solaris
-%{prefix}/share/doc/xine-ui/README.syncfb
-%{prefix}/share/doc/xine-ui/README.config_en
-%{prefix}/share/doc/xine-ui/README_en
-%{prefix}/share/doc/xine-ui/README_es
-%{prefix}/share/doc/xine-ui/README_fi
-%{prefix}/share/doc/xine-ui/README_pl
-%{prefix}/share/doc/xine-ui/README_it
-%{prefix}/share/doc/xine-ui/README_uk
-%{prefix}/share/doc/xine-ui/bug_report_form
-%{prefix}/share/doc/xitk/README
-## intl files
-%{prefix}/share/locale/fr/LC_MESSAGES/xine-ui.mo
-%{prefix}/share/locale/fr/LC_MESSAGES/xitk.mo
-%{prefix}/share/locale/es/LC_MESSAGES/xine-ui.mo
-%{prefix}/share/locale/es/LC_MESSAGES/xitk.mo
-%{prefix}/share/locale/pt_BR/LC_MESSAGES/xine-ui.mo
-%{prefix}/share/locale/pt_BR/LC_MESSAGES/xitk.mo
-%{prefix}/share/locale/de/LC_MESSAGES/xine-ui.mo
-%{prefix}/share/locale/de/LC_MESSAGES/xitk.mo
-%{prefix}/share/locale/sk/LC_MESSAGES/xine-ui.mo
-%{prefix}/share/locale/sk/LC_MESSAGES/xitk.mo
-%{prefix}/share/locale/pl_PL/LC_MESSAGES/xitk.mo
-%{prefix}/share/locale/pl_PL/LC_MESSAGES/xine-ui.mo
-%{prefix}/share/locale/uk/LC_MESSAGES/xitk.mo
-%{prefix}/share/locale/uk/LC_MESSAGES/xine-ui.mo
-
-
-@HAVE_AA_TRUE@%files aa
-@HAVE_AA_TRUE@%defattr(-,root,root)
-@HAVE_AA_TRUE@%{prefix}/bin/aaxine
-@HAVE_AA_TRUE@%{prefix}/man/man1/aaxine.1*
-@HAVE_AA_TRUE@%{prefix}/man/de/man1/aaxine.1*
-@HAVE_AA_TRUE@%{prefix}/man/pl/man1/aaxine.1*
+%doc doc/FAQ_* doc/README.* doc/README_* doc/bug_report_form
+%{_bindir}/xine*
+%{skindir}/*
+%{_datadir}/idl/xine.idl
+%{_datadir}/xine/desktop/*
+%lang(de) %{_mandir}/de/man1/*
+%lang(fr) %{_mandir}/fr/man1/*
+%lang(es) %{_mandir}/es/man1/*
+%lang(pl) %{_mandir}/pl/man1/*
+%{_mandir}/man1/*
+%{_datadir}/locale/*
 
 %changelog
+* Sat May 11 2002 Matthias Dahl <matthew2k@web.de>
+- reworked/revamped spec file, still needs some tuning (BuildPreReq, ...)
 * Fri May 03 2002 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - add xitk README file.
 * Sun Mar 31 2002 Matthias Dahl <matthew2k@web.de>
