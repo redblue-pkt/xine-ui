@@ -3,6 +3,7 @@
 
 src/xitk/actions.c
 src/xitk/control.c
+src/xitk/download.c
 src/xitk/errors.c
 src/xitk/event.c
 src/xitk/event_sender.c

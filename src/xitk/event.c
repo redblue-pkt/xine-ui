@@ -992,7 +992,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     (char *)xine_config_register_string (gGui->xine, "gui.skin_server_url", 
 					 SKIN_SERVER_URL,
 					 _("Skin Server Url"),
-					 _("From we can get skins."),
+					 _("From where we can get skins."),
 					 CONFIG_LEVEL_EXP,
 					 skin_server_url_cb,
 					 CONFIG_NO_DATA);
@@ -1004,8 +1004,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     xine_config_register_bool(gGui->xine, "gui.osd_enabled", 
 			      1,
 			      _("Enable OSD support"),
-			      _("Enabling OSD permit to display view information "
-				"status in output window."), 
+			      _("Enabling OSD permit to display some status/informations "
+				"in output window."), 
 			      CONFIG_LEVEL_EXP,
 			      osd_enabled_cb,
 			      CONFIG_NO_DATA);
