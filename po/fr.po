@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-02-07 15:14+0100\n"
+"POT-Creation-Date: 2002-02-21 01:32+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: Frensh <fr@li.org>\n"
@@ -382,95 +382,95 @@ msgstr "Brouteur de MRL de Xine"
 msgid "Source:"
 msgstr "Source :"
 
-#: src/xitk/panel.c:513
+#: src/xitk/panel.c:516
 msgid "Volume control"
 msgstr "Contrôle du volume"
 
-#: src/xitk/panel.c:515
+#: src/xitk/panel.c:518
 msgid "Mute toggle"
 msgstr "Muêt"
 
-#: src/xitk/panel.c:682
+#: src/xitk/panel.c:690
 msgid "Play previous entry from playlist"
 msgstr "Joue l'entrée précédente de la liste de lecture"
 
-#: src/xitk/panel.c:689
+#: src/xitk/panel.c:697
 msgid "Stop playback"
 msgstr "Stoppe la lecture"
 
-#: src/xitk/panel.c:696
+#: src/xitk/panel.c:704
 msgid "Play selected entry"
 msgstr "Joue l'entrée sélectionnée"
 
-#: src/xitk/panel.c:704
+#: src/xitk/panel.c:712
 msgid "Pause/Resume playback"
 msgstr "Pause/Reprise lecture"
 
-#: src/xitk/panel.c:711
+#: src/xitk/panel.c:719
 msgid "Play next entry from playlist"
 msgstr "Joue l'entrée suivante dans le liste de lecture"
 
-#: src/xitk/panel.c:718
+#: src/xitk/panel.c:726
 msgid "Eject current medium"
 msgstr "Ejecte le medium courant"
 
-#: src/xitk/panel.c:725
+#: src/xitk/panel.c:733
 msgid "Quit"
 msgstr "Quitte"
 
-#: src/xitk/panel.c:732
+#: src/xitk/panel.c:740
 msgid "Setup window"
 msgstr "Fenêtre de réglage"
 
-#: src/xitk/panel.c:739
+#: src/xitk/panel.c:747
 msgid "Hide GUI"
 msgstr "Cache l'interface utilisateur"
 
-#: src/xitk/panel.c:746
+#: src/xitk/panel.c:754
 msgid "Fullscreen/Window mode"
 msgstr "Mode plein écran/fenêtre"
 
-#: src/xitk/panel.c:753
+#: src/xitk/panel.c:761
 msgid "Next audio channel"
 msgstr "Canal audio suivant"
 
-#: src/xitk/panel.c:760
+#: src/xitk/panel.c:768
 msgid "Previous audio channel"
 msgstr "Canal audio precédent"
 
-#: src/xitk/panel.c:767
+#: src/xitk/panel.c:775
 msgid "Next SPU channel"
 msgstr "Canal sous-titre suivant"
 
-#: src/xitk/panel.c:774
+#: src/xitk/panel.c:782
 msgid "Previous SPU channel"
 msgstr "Canal sous-titre precédent"
 
-#: src/xitk/panel.c:811
+#: src/xitk/panel.c:819
 msgid "Stream playback position slider"
 msgstr "Curseur de position de lecture du flux"
 
-#: src/xitk/panel.c:839
+#: src/xitk/panel.c:847
 msgid "Take a snapshot"
 msgstr "Capture une image"
 
-#: src/xitk/panel.c:846
+#: src/xitk/panel.c:854
 msgid "Slow motion"
 msgstr "Ralenti"
 
-#: src/xitk/panel.c:853
+#: src/xitk/panel.c:861
 msgid "Fast motion"
 msgstr "Accélère"
 
-#: src/xitk/panel.c:860
+#: src/xitk/panel.c:868
 msgid "Playlist"
 msgstr "Liste de lecture"
 
-#: src/xitk/panel.c:867
+#: src/xitk/panel.c:875
 msgid "Control"
 msgstr "Contrôle"
 
-#: src/xitk/panel.c:874
+#: src/xitk/panel.c:882
 msgid "MRL Browser"
 msgstr "Brouteur de MRL"
 
