@@ -23,7 +23,7 @@ xine_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 
 noinst_HEADERS = $(GETOPT_H) event.h playlist.h control.h skins.h kbindings.h \
 	panel.h lirc.h actions.h videowin.h mrl_browser.h snapshot.h setup.h viewlog.h \
-	lang.h
+	lang.h i18n.h
 
 utils.c:
 	$(LN_S) $(top_srcdir)/src/common/utils.c ./utils.c

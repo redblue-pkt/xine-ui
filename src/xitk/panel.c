@@ -35,7 +35,6 @@
 
 #include "xitk.h"
 
-
 #include "event.h"
 #include "actions.h"
 #include "control.h"

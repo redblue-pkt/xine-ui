@@ -16,10 +16,35 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 **  
 */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#include <locale.h>
+
+#ifdef ENABLE_NLS
+#    include <libintl.h>
+#    define _(String) gettext (String)
+#    ifdef gettext_noop
+#        define N_(String) gettext_noop (String)
+#    else
+#        define N_(String) (String)
+#    endif
+#else
+/* Stubs that do something close enough.  */
+#    define textdomain(String) (String)
+#    define gettext(String) (String)
+#    define dgettext(Domain,Message) (Message)
+#    define dcgettext(Domain,Message,Type) (Message)
+#    define bindtextdomain(Domain,Directory) (Domain)
+#    define _(String) (String)
+#    define N_(String) (String)
+#endif
+
 #include "xitk.h"
 
 typedef struct {
@@ -705,13 +730,14 @@ int main(int argc, char **argv) {
   }
 
 #ifdef HAVE_SETLOCALE
+  xitk_set_locale();
   setlocale (LC_ALL, "");
+  printf("locale\n");
 #endif
-
+  
   bindtextdomain("xitk", XITK_LOCALE);
   textdomain("xitk");
 
-  bindtextdomain("xitk", XITK_LOCALE);
 
   /* Create window */
   test->xwin = xitk_window_create_dialog_window(test->imlibdata,

@@ -30,6 +30,7 @@
 #include "Imlib-light/Imlib.h"
 #include "kbindings.h"
 #include "xitk.h"
+#include "i18n.h"
 
 #ifdef __GNUC__
 #define perr(FMT,ARGS...) {fprintf(stderr, FMT, ##ARGS);fflush(stderr);}

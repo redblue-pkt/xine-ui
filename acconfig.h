@@ -1,5 +1,6 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
+@TOP@
 
 /* Define this if you're running x86 architecture */
 #undef __i386__
@@ -60,4 +61,5 @@
 /* Path where docs files will be. */
 #undef XINE_DOCDIR
 
+@BOTTOM@
 #endif

@@ -50,9 +50,10 @@
 
 extern gGui_t              *gGui;
 
-static char                *br_fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+//static char                *br_fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+static char                *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
 
-#define WINDOW_WIDTH        500
+#define WINDOW_WIDTH        580
 #define WINDOW_HEIGHT       480
 #define MAX_DISP_ENTRIES    18
         
@@ -267,8 +268,9 @@ static void viewlog_clear_tab(void) {
  *
  */
 static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
-  int    i;
+  int    i, j, k;
   char **log = xine_get_log(gGui->xine, section);
+  char   buf[2048], *p;
   
   /* Freeing entries */
   for(i = 0; i <= viewlog->log_entries; i++) {
@@ -276,29 +278,76 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   }
   
   /* Compute log entries */
-  viewlog->log_entries = 0;
+  viewlog->log_entries = k = 0;
   
   if(log) {
     
     /* Look for entries number */
-    while(log[viewlog->log_entries] != NULL)
-      viewlog->log_entries++;
-    
-    viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * (viewlog->log_entries + 1));
-    
-    for(i = 0; i < viewlog->log_entries; i++) {
+    while(log[k] != NULL) k++;
+
+    for(i = 0, j = 0; i < k; i++) {
+
+      memset(&buf, 0, sizeof(buf));
       
-      /* label widget hate empty labels */
-      viewlog->log[i] = strdup(strlen(log[i]) ? log[i] : " ");
+      //      printf("handling line: %d '%s'\n", i, log[i]);
       
-      /* Remove newline */
-      if(viewlog->log[i][strlen(viewlog->log[i]) - 1] == '\n')
-	viewlog->log[i][strlen(viewlog->log[i]) - 1] = '\0';
+      p = &log[i][0];
       
+      if(strlen(log[i]) > 0) {
+	while(*p != '\0') {
+	  
+	  switch(*p) {
+	  
+	    /* Ignore */
+	  case '\t':
+	  case '\a':
+	  case '\b':
+	  case '\f':
+	  case '\r':
+	  case '\v':
+	    break;
+	    
+	  case '\n':
+	    if(strlen(buf)) {
+	      viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	      viewlog->log[j++] = strdup(buf);
+	      //	      printf("added line '%s'\n", viewlog->log[j-1]);
+	    }
+	    memset(&buf, 0, sizeof(buf));
+	    break;
+	    
+	  default:
+	    //	    printf("- %c", *p);
+	    sprintf(buf, "%s%c", buf, *p);
+	    break;
+	  }
+	  
+	  p++;
+	}
+
+	/* Remaining chars */
+	if(strlen(buf)) {
+	  viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	  viewlog->log[j++] = strdup(buf);
+	}
+	
+      }
+      else {
+	/* Empty log entry line */
+	viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
+	viewlog->log[j++] = strdup(" ");
+      }
     }
-    /* I like null terminated arrays ;-) */
-    viewlog->log[i] = NULL;
     
+    /* I like null terminated arrays ;-) */
+    //    printf("viewlog->log[%d] = NULL\n", j);
+    viewlog->log[j]      = NULL;
+    viewlog->log_entries = j;
+    
+    /*
+    for(i = 0; i < j; i++)
+      printf("line %d '%s'\n", i, viewlog->log[i]);
+    */
   }
   
 #if DEBUG_VIEWLOG
@@ -329,13 +378,14 @@ static void viewlog_create_tabs(void) {
   Pixmap               bg;
   xitk_tabs_widget_t   tab;
   const char         **log_sections = xine_get_log_names();
-  char                *tab_sections[XINE_LOG_NUM + 1];
+  unsigned int         log_section_count = xine_get_log_section_count();
+  char                *tab_sections[log_section_count + 1];
   int                  i;
 
   /* 
    * create log sections
    */
-  for(i = 0; i < (XINE_LOG_NUM); i++) {
+  for(i = 0; i < log_section_count; i++) {
     tab_sections[i] = (char *)log_sections[i];
   }
   tab_sections[i] = NULL;
@@ -343,7 +393,7 @@ static void viewlog_create_tabs(void) {
   XITK_WIDGET_INIT(&tab, gGui->imlib_data);
   
   tab.skin_element_name = NULL;
-  tab.num_entries       = XINE_LOG_NUM;
+  tab.num_entries       = log_section_count;
   tab.entries           = tab_sections;
   tab.parent_wlist      = viewlog->widget_list;
   tab.callback          = viewlog_change_section;

@@ -520,6 +520,10 @@ AC_DEFINE_UNQUOTED(XINE_SCRIPTDIR, "$XINE_SCRIPTDIR")
 XINE_DESKTOPDIR="`echo $xine_desktop_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_DESKTOPDIR)
 
+XINE_LOCALE="`echo $xine_locale_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
+AC_SUBST(XINE_LOCALE)
+AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XINE_LOCALE")
+
 
 dnl
 dnl NLS, part II
@@ -530,11 +534,6 @@ fi
 if test "x$exec_prefix" = xNONE; then
    exec_prefix='${prefix}'
 fi
-XITK_LOCALEDIR="${datadir}/locale"
-eval XITK_LOCALE=`eval echo "$XITK_LOCALEDIR"`
-AC_SUBST(XITK_LOCALE)
-AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XITK_LOCALE")
-
 XINE_DOCPATH="${datadir}/doc/xine-ui"
 eval XINE_DOCDIR=`eval echo "$XINE_DOCPATH"`
 AC_SUBST(XINE_DOCDIR)

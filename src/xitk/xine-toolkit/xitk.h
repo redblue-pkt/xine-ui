@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <X11/Xlib.h>
-#include "xitkintl.h"
+#include <pthread.h>
 #include "Imlib-light/Imlib.h"
 
 #ifdef NEED_MRLBROWSER
@@ -317,6 +317,12 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf);
  * Initialization function, should be the first call to widget lib.
  */
 void xitk_init(Display *display);
+
+/*
+ *
+ */
+char *xitk_set_locale(void);
+
 
 /*
  * This function start the widget live. It's a block function,

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2000-2001 the xine project
  * 
  * This file is part of xine, a unix video player.
@@ -20,14 +20,15 @@
  * $Id$
  *
  */
-#ifndef HAVE_XITKINTL_H
-#define HAVE_XITKINTL_H
+
+#ifndef HAVE_I18N_H
+#define HAVE_I18N_H
 
 #include <locale.h>
 
 #ifdef ENABLE_NLS
 #    include <libintl.h>
-#    define _(String) dgettext ("xitk", String)
+#    define _(String) gettext (String)
 #    ifdef gettext_noop
 #        define N_(String) gettext_noop (String)
 #    else

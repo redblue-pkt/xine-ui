@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-12-17 02:52+0100\n"
+"POT-Creation-Date: 2001-12-26 00:24+0100\n"
 "PO-Revision-Date: 2001-12-13 20:06GMT\n"
 "Last-Translator: Miguel Freitas <miguel@cetuc.puc-rio.br>\n"
 "Language-Team: \n"
@@ -14,36 +14,36 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/control.c:314
+#: src/xitk/control.c:316
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): Não é possível encontrar a imagem de fundo\n"
 
-#: src/xitk/control.c:385
+#: src/xitk/control.c:387
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "xine-playlist: não é possível encontrar a imagem de fundo\n"
 
-#: src/xitk/control.c:510
+#: src/xitk/control.c:511
 msgid "Hue"
 msgstr "Hue"
 
-#: src/xitk/control.c:533
+#: src/xitk/control.c:534
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:556
+#: src/xitk/control.c:557
 msgid "Brt"
 msgstr "Bri"
 
-#: src/xitk/control.c:579
+#: src/xitk/control.c:580
 msgid "Ctr"
 msgstr "Ctr"
 
-#: src/xitk/control.c:615
+#: src/xitk/control.c:616
 msgid "Choose a Skin"
 msgstr "Escolha um skin"
 
-#: src/xitk/control.c:652 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:834
+#: src/xitk/control.c:653 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:829
 msgid "Dismiss"
 msgstr "Fechar"
 
@@ -352,88 +352,92 @@ msgstr "Xine MRL Browser"
 msgid "Source:"
 msgstr "Source:"
 
-#: src/xitk/panel.c:646
-msgid "Play previous entry from playlist"
+#: src/xitk/panel.c:487
+msgid "Volume control"
 msgstr ""
 
-#: src/xitk/panel.c:653
-msgid "Stop playback"
-msgstr ""
-
-#: src/xitk/panel.c:660
-msgid "Play selected entry"
-msgstr ""
-
-#: src/xitk/panel.c:668
-msgid "Pause/Resume playback"
-msgstr ""
-
-#: src/xitk/panel.c:675
-msgid "Play next entry from playlist"
-msgstr ""
-
-#: src/xitk/panel.c:682
-msgid "Eject current medium"
-msgstr ""
-
-#: src/xitk/panel.c:689
-msgid "Quit"
-msgstr ""
-
-#: src/xitk/panel.c:696
-msgid "Setup window"
-msgstr ""
-
-#: src/xitk/panel.c:703
-msgid "Hide GUI"
-msgstr ""
-
-#: src/xitk/panel.c:710
-msgid "Fullscreen/Window mode"
-msgstr ""
-
-#: src/xitk/panel.c:717
-msgid "Next audio channel"
-msgstr ""
-
-#: src/xitk/panel.c:724
-msgid "Previous audio channel"
-msgstr ""
-
-#: src/xitk/panel.c:731
-msgid "Next SPU channel"
-msgstr ""
-
-#: src/xitk/panel.c:738
-msgid "Previous SPU channel"
-msgstr ""
-
-#: src/xitk/panel.c:796
+#: src/xitk/panel.c:489
 msgid "Mute toggle"
 msgstr ""
 
-#: src/xitk/panel.c:803
+#: src/xitk/panel.c:656
+msgid "Play previous entry from playlist"
+msgstr ""
+
+#: src/xitk/panel.c:663
+msgid "Stop playback"
+msgstr ""
+
+#: src/xitk/panel.c:670
+msgid "Play selected entry"
+msgstr ""
+
+#: src/xitk/panel.c:678
+msgid "Pause/Resume playback"
+msgstr ""
+
+#: src/xitk/panel.c:685
+msgid "Play next entry from playlist"
+msgstr ""
+
+#: src/xitk/panel.c:692
+msgid "Eject current medium"
+msgstr ""
+
+#: src/xitk/panel.c:699
+msgid "Quit"
+msgstr ""
+
+#: src/xitk/panel.c:706
+msgid "Setup window"
+msgstr ""
+
+#: src/xitk/panel.c:713
+msgid "Hide GUI"
+msgstr ""
+
+#: src/xitk/panel.c:720
+msgid "Fullscreen/Window mode"
+msgstr ""
+
+#: src/xitk/panel.c:727
+msgid "Next audio channel"
+msgstr ""
+
+#: src/xitk/panel.c:734
+msgid "Previous audio channel"
+msgstr ""
+
+#: src/xitk/panel.c:741
+msgid "Next SPU channel"
+msgstr ""
+
+#: src/xitk/panel.c:748
+msgid "Previous SPU channel"
+msgstr ""
+
+#: src/xitk/panel.c:812
 msgid "Take a snapshot"
 msgstr ""
 
-#: src/xitk/panel.c:810
+#: src/xitk/panel.c:819
 msgid "Slow motion"
 msgstr ""
 
-#: src/xitk/panel.c:817
+#: src/xitk/panel.c:826
 msgid "Fast motion"
 msgstr ""
 
-#: src/xitk/panel.c:824
+#: src/xitk/panel.c:833
 msgid "Playlist"
 msgstr ""
 
-#: src/xitk/panel.c:831
+#: src/xitk/panel.c:840
 #, fuzzy
 msgid "Control"
 msgstr "Ctr"
 
-#: src/xitk/panel.c:838
+#: src/xitk/panel.c:847
 #, fuzzy
 msgid "MRL Browser"
 msgstr "Xine MRL Browser"
@@ -443,108 +447,106 @@ msgstr "Xine MRL Browser"
 msgid "Can't read %s: %s\n"
 msgstr "Não é possível ler %s: %s\n"
 
-#: src/xitk/playlist.c:804
+#: src/xitk/playlist.c:799
 msgid "Add"
 msgstr "Adiciona"
 
-#: src/xitk/playlist.c:814
+#: src/xitk/playlist.c:809
 msgid "Load"
 msgstr "Carrega"
 
-#: src/xitk/playlist.c:824
+#: src/xitk/playlist.c:819
 msgid "Save"
 msgstr "Salva"
 
-#: src/xitk/playlist.c:858
+#: src/xitk/playlist.c:853
 msgid "Scan for:"
 msgstr "Procura por:"
 
-#: src/xitk/setup.c:952
+#: src/xitk/setup.c:954
 msgid "Help"
 msgstr ""
 
-#: src/xitk/setup.c:954
+#: src/xitk/setup.c:956
 msgid "README"
 msgstr ""
 
-#: src/xitk/setup.c:956
+#: src/xitk/setup.c:958
 msgid "FAQ"
 msgstr ""
 
-#: src/xitk/setup.c:1107
+#: src/xitk/setup.c:1109
 msgid "xine setup"
 msgstr "xine setup"
 
-#: src/xitk/setup.c:1166 src/xitk/viewlog.c:467
+#: src/xitk/setup.c:1168 src/xitk/viewlog.c:472
 msgid "Close"
 msgstr "Fecha"
 
-#: src/xitk/skins.c:211
+#: src/xitk/skins.c:225
 #, c-format
 msgid "Failed to load %s/%s. Reload old skin '%s'.\n"
 msgstr ""
 
-#: src/xitk/skins.c:226
+#: src/xitk/skins.c:240
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
 
-#: src/xitk/skins.c:253 src/xitk/skins.c:292
+#: src/xitk/skins.c:267 src/xitk/skins.c:306
 #, c-format
 msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
 msgstr ""
 
-#: src/xitk/skins.c:280
+#: src/xitk/skins.c:294
 msgid "No available skin found. Say goodbye.\n"
 msgstr ""
 
-#: src/xitk/skins.c:296
+#: src/xitk/skins.c:310
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
 msgstr ""
 
-#: src/xitk/skins.c:305
+#: src/xitk/skins.c:319
 #, fuzzy, c-format
 msgid "Failed to load %s/%s. Exiting.\n"
 msgstr "Não é possível carregar o logo %s \n"
 
-#: src/xitk/skins.c:314
+#: src/xitk/skins.c:328
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
 
-#: src/xitk/snapshot.c:901
-#, c-format
-msgid ""
-"Unknown\n"
-"Error: Ratio Code %d Unknown\n"
-msgstr ""
-"Desconhecido\n"
-"Erro: Ratio Code %d desconhecido\n"
-
-#: src/xitk/snapshot.c:935
+#: src/xitk/snapshot.c:943
 #, c-format
 msgid "File open failed (%s)\n"
 msgstr "Não é possível abrir o arquivo (%s)\n"
 
 #.
-#: src/xitk/snapshot.c:1083
+#: src/xitk/snapshot.c:1091
 #, c-format
 msgid "File '%s' written.\n"
 msgstr "Arquivo '%s' salvo.\n"
 
-#: src/xitk/viewlog.c:304
+#: src/xitk/viewlog.c:306
 msgid "log info"
 msgstr "Informação de log"
 
-#: src/xitk/viewlog.c:306
+#: src/xitk/viewlog.c:308
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
 msgstr "Não existe entrada no log para a seção '%s'.\n"
 
-#: src/xitk/viewlog.c:403
+#: src/xitk/viewlog.c:405
 msgid "xine log viewer"
 msgstr "xine log viewer"
 
-#: src/xitk/viewlog.c:453
+#: src/xitk/viewlog.c:455 src/xitk/viewlog.c:458
 msgid "Refresh"
 msgstr "Redesenha"
+
+#~ msgid ""
+#~ "Unknown\n"
+#~ "Error: Ratio Code %d Unknown\n"
+#~ msgstr ""
+#~ "Desconhecido\n"
+#~ "Erro: Ratio Code %d desconhecido\n"

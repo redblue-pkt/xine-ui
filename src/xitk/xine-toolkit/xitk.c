@@ -39,6 +39,8 @@
 #include <time.h>
 #include <setjmp.h>
 
+#include <locale.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 
@@ -778,6 +780,22 @@ int xitk_get_focus_color(void) {
 }
 int xitk_get_select_color(void) {
   return xitk_config_get_select_color(gXitk->config);
+}
+
+/*
+ *
+ */
+char *xitk_set_locale(void) {
+  char *cur_locale = NULL;
+  
+  if(setlocale (LC_ALL,"") == NULL) {
+    XITK_WARNING("locale not supported by C library\n");
+    return NULL;
+  }
+  
+  cur_locale = setlocale(LC_ALL, NULL);
+  
+  return cur_locale;
 }
 
 /*
