@@ -1,3 +1,10 @@
+xine-ui (0.9.5-1) unstable; urgency=high
+
+  * new upstream release
+  * fixed build dependancy (version of libxine0-dev)
+
+ -- Siggi Langauf <siggi@debian.org>  Sun, 11 Nov 2001 11:56:39 +0100
+
 xine-ui (0.9.4-1) unstable; urgency=medium
 
   * new upstream release
