@@ -395,7 +395,16 @@ static xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
     const char *const *driver_ids;
     int    i;
     
-    if (strcmp (default_driver, "auto")) {
+    if((!strcasecmp(default_driver, "none")) || (!strcasecmp(default_driver, "null"))) {
+      video_driver = xine_open_video_driver(gGui->xine,
+					    default_driver,
+					    XINE_VISUAL_TYPE_NONE,
+					    (void *) &vis);
+      if (video_driver)
+	return video_driver;
+      
+    }
+    else if(strcmp(default_driver, "auto")) {
       
       video_driver = xine_open_video_driver(gGui->xine, 
 					    default_driver,
