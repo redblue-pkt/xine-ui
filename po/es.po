@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.20\n"
-"POT-Creation-Date: 2003-12-19 22:02+0100\n"
+"POT-Creation-Date: 2003-12-23 17:17+0100\n"
 "PO-Revision-Date: 2003-12-17 12:15+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -989,7 +989,7 @@ msgstr ""
 msgid "   -Video decoder:\n"
 msgstr ""
 
-#: src/xitk/main.c:514 src/xitk/main.c:526
+#: src/xitk/main.c:514 src/xitk/main.c:527
 msgid ""
 "\n"
 " Available xine's plugins:\n"
@@ -1000,25 +1000,25 @@ msgstr ""
 msgid "No available plugins found of %s type!.\n"
 msgstr "No hay pieles disponibles. Diga adios.\n"
 
-#: src/xitk/main.c:567
+#: src/xitk/main.c:568
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Uso: xine [OPTIONS]... [MRL]\n"
 
-#: src/xitk/main.c:570
+#: src/xitk/main.c:571
 msgid "  -v, --version                Display version.\n"
 msgstr "  -v, --version                Mostrar versión.\n"
 
-#: src/xitk/main.c:571
+#: src/xitk/main.c:572
 msgid "      --verbose [=level]       Set verbosity level. Default is 1.\n"
 msgstr "      --verbose [=nivel]       Nivel de información. Por defecto, 1.\n"
 
-#: src/xitk/main.c:572
+#: src/xitk/main.c:573
 msgid ""
 "  -c, --config <file>          Use config file instead of default one.\n"
 msgstr ""
 "  -c, --config <arch>          Usar arch. config. en vez del predeterm.\n"
 
-#: src/xitk/main.c:573
+#: src/xitk/main.c:574
 msgid ""
 "  -V, --video-driver <drv>     Select video driver by id. Available "
 "drivers: \n"
@@ -1026,7 +1026,7 @@ msgstr ""
 "  -V, --video-driver <drv>     Seleccionar id. manejador de vídeo. "
 "Disponibles: \n"
 
-#: src/xitk/main.c:584
+#: src/xitk/main.c:585
 msgid ""
 "  -A, --audio-driver <drv>     Select audio driver by id. Available "
 "drivers: \n"
@@ -1034,16 +1034,16 @@ msgstr ""
 "  -A, --audio-driver <drv>     Select id. manejador de sonido. "
 "Disponibles: \n"
 
-#: src/xitk/main.c:594
+#: src/xitk/main.c:595
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
 msgstr ""
 "  -u, --spu-channel <#>        Seleccionar núm. canal SPU (subtítulos).\n"
 
-#: src/xitk/main.c:595
+#: src/xitk/main.c:596
 msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
 msgstr "  -a, --audio-channel <#>      Seleccionar núm. canal de audio.\n"
 
-#: src/xitk/main.c:596
+#: src/xitk/main.c:597
 msgid ""
 "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
 "                    'f': in fullscreen mode.\n"
@@ -1056,21 +1056,21 @@ msgid ""
 "VCD)\n"
 msgstr ""
 
-#: src/xitk/main.c:604
+#: src/xitk/main.c:605
 msgid "                    'F': in xinerama fullscreen mode.\n"
 msgstr "                    'F': modo a pantalla completa de xinerama.\n"
 
-#: src/xitk/main.c:606
+#: src/xitk/main.c:607
 msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
 msgstr ""
 "  -s, --auto-scan <plugin>     buscar automáticamente lista repr. con "
 "<plugin>\n"
 
-#: src/xitk/main.c:607
+#: src/xitk/main.c:608
 msgid "  -f, --fullscreen             start in fullscreen mode,\n"
 msgstr "  -f, --fullscreen             empezar en modo de pantalla completa,\n"
 
-#: src/xitk/main.c:609
+#: src/xitk/main.c:610
 msgid ""
 "  -F, --xineramafull           start in xinerama fullscreen (display on "
 "several screens),\n"
@@ -1078,19 +1078,19 @@ msgstr ""
 "  -F, --xineramafull           comenzar en pantalla completa de xinerama "
 "(varias pantallas),\n"
 
-#: src/xitk/main.c:611
+#: src/xitk/main.c:612
 msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
 msgstr "  -g, --hide-gui               ocultar interfaz (panel, etc.)\n"
 
-#: src/xitk/main.c:612
+#: src/xitk/main.c:613
 msgid "  -H, --hide-video             hide video window\n"
 msgstr "  -H, --hide-video             ocultar ventana de vídeo\n"
 
-#: src/xitk/main.c:614
+#: src/xitk/main.c:615
 msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-lirc                Desactivar el soporte LIRC.\n"
 
-#: src/xitk/main.c:616
+#: src/xitk/main.c:617
 #, fuzzy
 msgid ""
 "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
@@ -1099,11 +1099,11 @@ msgid ""
 msgstr ""
 "                               es o una clase visual X11 o un id. visual.\n"
 
-#: src/xitk/main.c:618
+#: src/xitk/main.c:619
 msgid "      --install                Install a private colormap.\n"
 msgstr "      --install                Instala un mapa de color privado.\n"
 
-#: src/xitk/main.c:619
+#: src/xitk/main.c:620
 msgid ""
 "      --keymap [=option]       Display keymap. Option are:\n"
 "                                 'default': display default keymap table,\n"
@@ -1116,25 +1116,25 @@ msgid ""
 "selected.\n"
 msgstr ""
 
-#: src/xitk/main.c:625
+#: src/xitk/main.c:626
 msgid "  -n, --network                Enable network remote control server.\n"
 msgstr "  -n, --network                Activar serv. control remoto por red.\n"
 
-#: src/xitk/main.c:626
+#: src/xitk/main.c:627
 msgid "  -R, --root                   Use root window as video window.\n"
 msgstr ""
 "  -R, --root                   Usar ventana raíz como ventana de vídeo.\n"
 
-#: src/xitk/main.c:627
+#: src/xitk/main.c:628
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
 msgstr "  -G, --geometry <WxH[+X+Y]>   Geometría ventana salida (estilo X).\n"
 
-#: src/xitk/main.c:628
+#: src/xitk/main.c:629
 msgid "  -B, --borderless             Borderless video output window.\n"
 msgstr ""
 "  -B, --borderless             Ventana de salida de vídeo sin bordes.\n"
 
-#: src/xitk/main.c:629
+#: src/xitk/main.c:630
 #, fuzzy
 msgid ""
 "  -N, --animation <mrl>        Specify mrl to play when video output isn't "
@@ -1143,12 +1143,12 @@ msgid ""
 msgstr ""
 "  -N, --animation <mrl>        mrl a reproducir si no hay salida de vídeo.\n"
 
-#: src/xitk/main.c:631
+#: src/xitk/main.c:632
 msgid "  -P, --playlist <filename>    Load a playlist file.\n"
 msgstr ""
 "  -P, --playlist <archivo>     Carga un archivo de lista de reproducción.\n"
 
-#: src/xitk/main.c:632
+#: src/xitk/main.c:633
 msgid ""
 "  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes "
 "are:\n"
@@ -1160,18 +1160,18 @@ msgid ""
 "indefinetely replay the playlist.\n"
 msgstr ""
 
-#: src/xitk/main.c:637
+#: src/xitk/main.c:638
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
 msgstr "      --skin-server-url <url>  Define la url del servidor de pieles.\n"
 
-#: src/xitk/main.c:638
+#: src/xitk/main.c:639
 #, fuzzy
 msgid ""
 "      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
 msgstr ""
 "      --enqueue <mrl> ...      Encola mrl en una sesión activa (session 0)\n"
 
-#: src/xitk/main.c:639
+#: src/xitk/main.c:640
 msgid ""
 "  -S, --session <option1,option2,...>\n"
 "                               Session managements. Options can be:\n"
@@ -1202,7 +1202,7 @@ msgid ""
 "                    fast4, stop, quit, fullscreen, eject.\n"
 msgstr ""
 
-#: src/xitk/main.c:660
+#: src/xitk/main.c:661
 msgid ""
 "  -Z                           Don't automatically start playback (smart "
 "mode).\n"
@@ -1210,7 +1210,7 @@ msgstr ""
 "  -Z                           No empezar reprod. automática (modo "
 "inteligente).\n"
 
-#: src/xitk/main.c:661
+#: src/xitk/main.c:662
 msgid ""
 "  -D, --deinterlace [post]...  Deinterlace video output. One or more post "
 "plugin\n"
@@ -1219,7 +1219,7 @@ msgid ""
 "                                 Syntax is the same as --post option.\n"
 msgstr ""
 
-#: src/xitk/main.c:664
+#: src/xitk/main.c:665
 #, fuzzy
 msgid ""
 "  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"
@@ -1229,7 +1229,7 @@ msgstr ""
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
 
-#: src/xitk/main.c:667
+#: src/xitk/main.c:668
 #, fuzzy
 msgid ""
 "      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
@@ -1237,17 +1237,17 @@ msgid ""
 "port'\n"
 msgstr "                                   «clear»  borra la lista,\n"
 
-#: src/xitk/main.c:670
+#: src/xitk/main.c:671
 #, fuzzy
 msgid "      --no-logo                Don't display the logo.\n"
 msgstr "      --install                Instala un mapa de color privado.\n"
 
-#: src/xitk/main.c:671
+#: src/xitk/main.c:672
 #, fuzzy
 msgid "  -E, --no-reload              Don't reload old playlist.\n"
 msgstr "                    (playlist|pl)=p\n"
 
-#: src/xitk/main.c:672
+#: src/xitk/main.c:673
 msgid ""
 "      --post <plugin>[:parameter=value][,...][;...]\n"
 "                               Load one or many post plugin(s).\n"
@@ -1255,27 +1255,27 @@ msgid ""
 "                               This option can be used more than one time.\n"
 msgstr ""
 
-#: src/xitk/main.c:676
+#: src/xitk/main.c:677
 msgid "      --disable-post           Don't enable post plugin(s).\n"
 msgstr ""
 
-#: src/xitk/main.c:677
+#: src/xitk/main.c:678
 #, fuzzy
 msgid "      --no-splash              Don't display the splash screen.\n"
 msgstr "                    'q': salir cuando acabe la reproducción.\n"
 
-#: src/xitk/main.c:678
+#: src/xitk/main.c:679
 #, fuzzy
 msgid ""
 "      --stdctl                 Control xine by the console, using lirc "
 "commands.\n"
 msgstr "      --install                Instala un mapa de color privado.\n"
 
-#: src/xitk/main.c:679
+#: src/xitk/main.c:680
 msgid "  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"
 msgstr ""
 
-#: src/xitk/main.c:689
+#: src/xitk/main.c:690
 msgid ""
 "      --list-plugins [=type]   Display the list of all available plugins,\n"
 "                               Optional <type> can be:\n"
@@ -1283,7 +1283,7 @@ msgid ""
 "                    audio_decoder, video_decoder.\n"
 msgstr ""
 
-#: src/xitk/main.c:693
+#: src/xitk/main.c:694
 msgid ""
 "      --bug-report [=mrl]      Enable bug report mode:\n"
 "                                 Turn on verbosity, gather all output\n"
@@ -1293,7 +1293,7 @@ msgid ""
 "                                 then quit (like -pq).\n"
 msgstr ""
 
-#: src/xitk/main.c:700
+#: src/xitk/main.c:701
 msgid ""
 "examples for valid MRLs (media resource locator):\n"
 "  File:  'path/foo.vob'\n"
@@ -1305,64 +1305,64 @@ msgid ""
 "  VCD:   'vcd://<track number>'\n"
 msgstr ""
 
-#: src/xitk/main.c:747 src/xitk/main.c:869
+#: src/xitk/main.c:748 src/xitk/main.c:871
 msgid "video driver to use"
 msgstr "manejador de vídeo a utilizar"
 
-#: src/xitk/main.c:748 src/xitk/main.c:870
+#: src/xitk/main.c:749 src/xitk/main.c:872
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
 "Seleccione el dispositivo de vídeo. AVISO: debe reiniciar xine para usar el "
 "dispositivo nuevo"
 
-#: src/xitk/main.c:795
+#: src/xitk/main.c:797
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr "main: probando plugin de vídeo de salida <%s>\n"
 
-#: src/xitk/main.c:809
+#: src/xitk/main.c:811
 msgid "main: all available video drivers failed.\n"
 msgstr "main: fallaron todos los manejadores de vídeo disponibles.\n"
 
-#: src/xitk/main.c:847
+#: src/xitk/main.c:849
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr "main: falló el manejador de vídeo <%s>\n"
 
-#: src/xitk/main.c:880
+#: src/xitk/main.c:882
 msgid "audio driver to use"
 msgstr "manejador de autio a usar"
 
-#: src/xitk/main.c:881
+#: src/xitk/main.c:883
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
 "Seleccione el dispositivo de audio. AVISO: debe reiniciar xine para usar el "
 "dispositivo nuevo"
 
-#: src/xitk/main.c:895 src/xitk/main.c:939
+#: src/xitk/main.c:898 src/xitk/main.c:946
 msgid "main: not using any audio driver (as requested).\n"
 msgstr "main: no usando ningún manejador de audio (como se pidió).\n"
 
-#: src/xitk/main.c:915
+#: src/xitk/main.c:919
 #, c-format
 msgid "main: probing <%s> audio output plugin\n"
 msgstr "main: probando plugin de salida de audio <%s>\n"
 
-#: src/xitk/main.c:917
+#: src/xitk/main.c:923
 #, fuzzy, c-format
 msgid "main: skipping <%s> audio output plugin from auto-probe\n"
 msgstr "main: probando plugin de salida de audio <%s>\n"
 
-#: src/xitk/main.c:932
+#: src/xitk/main.c:938
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr "main: prueba de manejador de audio falló => no hay salida de audio\n"
 
-#: src/xitk/main.c:952
+#: src/xitk/main.c:959
 #, c-format
 msgid "main: audio driver <%s> failed\n"
 msgstr "main: falló el manejador de audio <%s>\n"
 
-#: src/xitk/main.c:1090
+#: src/xitk/main.c:1097
 msgid ""
 "*drum roll*, xine lib wants to take your attention to deliver an important "
 "message to you ;-):"
@@ -1370,11 +1370,12 @@ msgstr ""
 "*solo de batería*. La biblioteca de xine le quiere informar de que hay un "
 "mensaje importante para usted ;-):"
 
-#: src/xitk/main.c:1096 src/xitk/main.c:1173
-msgid "No Informations available."
+#: src/xitk/main.c:1103
+#, fuzzy
+msgid "No Information available."
 msgstr "No hay información disponible."
 
-#: src/xitk/main.c:1102
+#: src/xitk/main.c:1109
 msgid ""
 "The host you're trying to connect is unknown.\n"
 "Check the validity of the specified hostname."
@@ -1382,11 +1383,11 @@ msgstr ""
 "La máquina a la que está intentando conectarse es desonocida.\n"
 "Compruebe la validez del nombre de la máquina especificado."
 
-#: src/xitk/main.c:1110
+#: src/xitk/main.c:1117
 msgid "The device name you specified seems invalid."
 msgstr "El nombre de dispositivo que especiicó parece no válido."
 
-#: src/xitk/main.c:1117
+#: src/xitk/main.c:1124
 msgid ""
 "The network looks unreachable.\n"
 "Check your network setup and/or the server name."
@@ -1394,7 +1395,7 @@ msgstr ""
 "Parece que la red no se puede alcanzar.\n"
 "Compruebe la configuración de su red y/o el nombre del servidor."
 
-#: src/xitk/main.c:1125
+#: src/xitk/main.c:1132
 msgid ""
 "The connection was refused.\n"
 "Check the host name."
@@ -1402,11 +1403,11 @@ msgstr ""
 "La conexión fue rechazada.\n"
 "Compruebe el nombre de la máquina."
 
-#: src/xitk/main.c:1132
+#: src/xitk/main.c:1139
 msgid "The specified file or mrl is not found. Please check it twice."
 msgstr "El archivo o mrl especificado no se encontró. Vuelva a comprobarlo."
 
-#: src/xitk/main.c:1139
+#: src/xitk/main.c:1146
 msgid ""
 "The source can't be read.\n"
 "Maybe you don't have enough rights for this, or source doesn't contain data "
@@ -1416,15 +1417,15 @@ msgstr ""
 "Puede ser que no tenga suficientes privilegios o que el origen no tenga "
 "datos (por ejemplo, que no haya disco en la unidad)."
 
-#: src/xitk/main.c:1148
+#: src/xitk/main.c:1155
 msgid "A problem occur while loading a library or a decoder"
 msgstr "Ocurrió un problema al cargar una biblioteca o un decodificador"
 
-#: src/xitk/main.c:1155
+#: src/xitk/main.c:1162
 msgid "The source seems encrypted, and can't be read."
 msgstr "El origen parece cifrado y no se puede leer."
 
-#: src/xitk/main.c:1157
+#: src/xitk/main.c:1164
 msgid ""
 "\n"
 "You DVD is probably crypted. According to your country laws, you can or "
@@ -1434,88 +1435,92 @@ msgstr ""
 "Probablemente su DVD esté cifrado. Según las leyes de su país, podrá "
 "instalar/usar o no libdvdcss para permitirle leer el disco que compró."
 
-#: src/xitk/main.c:1177
+#: src/xitk/main.c:1180
+msgid "No Informations available."
+msgstr "No hay información disponible."
+
+#: src/xitk/main.c:1184
 msgid "*sight*, unkown error."
 msgstr "*suspiro*, error desconocido."
 
-#: src/xitk/main.c:1312
+#: src/xitk/main.c:1319
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr ""
 "Se requiere la versión 1.0.0 de la biblioteca de xine, se encontró la %d.%d.%"
 "d.\n"
 
-#: src/xitk/main.c:1398
+#: src/xitk/main.c:1405
 msgid "video driver id required for -V option\n"
 msgstr "id. manejador de vídeo requerido en opción -V\n"
 
-#: src/xitk/main.c:1407
+#: src/xitk/main.c:1414
 msgid "audio driver id required for -A option\n"
 msgstr "id. manejador de vídeo requerido en opción -A\n"
 
-#: src/xitk/main.c:1485
+#: src/xitk/main.c:1492
 #, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr "Modo de aspecto '%s' incorrecto, vea xine --help\n"
 
-#: src/xitk/main.c:1549
+#: src/xitk/main.c:1556
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Geometría incorrecta \"%s\", vea xine --help\n"
 
-#: src/xitk/main.c:1581
+#: src/xitk/main.c:1588
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "Modo de repetición «%s» incorrecto, vea xine --help\n"
 
-#: src/xitk/main.c:1710
+#: src/xitk/main.c:1717
 msgid "*** NOTE ***\n"
 msgstr ""
 
-#: src/xitk/main.c:1711
+#: src/xitk/main.c:1718
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
 
-#: src/xitk/main.c:1749
+#: src/xitk/main.c:1756
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "argumento %d no válido => fin\n"
 
-#: src/xitk/main.c:1769
+#: src/xitk/main.c:1776
 msgid "You should specify one MRL to enqueue, at least!.\n"
 msgstr "Debe especificar un MRL al menos para ser encolado.\n"
 
-#: src/xitk/main.c:1834
+#: src/xitk/main.c:1841
 msgid "Automatically reload old playlist"
 msgstr ""
 
-#: src/xitk/main.c:1835
+#: src/xitk/main.c:1842
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
 
-#: src/xitk/main.c:1850
+#: src/xitk/main.c:1857
 #, fuzzy
 msgid "Subtitle autoloading"
 msgstr "Archivo de subtítulos"
 
-#: src/xitk/main.c:1851
+#: src/xitk/main.c:1858
 msgid "Automatically load subtitles if they exist."
 msgstr ""
 
-#: src/xitk/main.c:1859
+#: src/xitk/main.c:1866
 msgid "Enable deinterlacing by default"
 msgstr ""
 
-#: src/xitk/main.c:1860
+#: src/xitk/main.c:1867
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
 msgstr ""
 
-#: src/xitk/main.c:1998
+#: src/xitk/main.c:2005
 msgid "Logo mrl"
 msgstr "Logo mrl"
 
