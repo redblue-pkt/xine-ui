@@ -213,86 +213,11 @@ int get_bool_value(const char *val) {
   return 0;
 }
 
-static int is_valid_inthex(char *strval) {
-  char *p = strval;
-  
-  if(p && strlen(p)) {
-    while(*p) {
-      if(!isxdigit(*p))
-	return 0;
-
-      p++;
-    }
-
-    return 1;
-  }
-
-  return 0;
-}
-
-static int check_valid_value(char *value) {
-  char *p   = value;
-  char  buffer[2048];
-  char *pp  = buffer;
-  int   end = 0;
-  
-  while(*p && !end) {
-    switch(*p) {
-    case ':':
-    case '\0':
-      end++;
-      break;
-      
-    default:
-      *pp++ = *p++;
-      break;
-    }
-  }
-  
-  *pp = '\0';
-
-  return(is_valid_inthex(buffer));
-}
-
-static char *get_ipv6_addr(char *str) {
+const char *get_last_double_semicolon(const char *str) {
   int len;
 
   if(str && (len = strlen(str))) {
-    char *p = str + (len - 1);
-    char *bracketl, *bracketr = NULL;
-
-    while(p > str) {
-
-      if(*p == ']')
-	bracketr = p;
-      else if((*p == ':') && (*(p - 1) == ':')) {
-	if(bracketr) {
-	  bracketl = p;
-
-	  while(bracketl && (bracketl > str)) {
-	    
-	    if(*bracketl == '[')
-	      return bracketl;
-	    
-	    bracketl--;
-	  }
-	}
-	
-	return (p - 1);
-      }
-      
-      p--;
-    }
-  }
-
-  return NULL;
-}
-
-char *get_last_double_semicolon(char *str) {
-  int len;
-
-  if(str && (len = strlen(str))) {
-    char *p = str + (len - 1);
+    const char *p = str + (len - 1);
 
     while(p > str) {
 
@@ -306,80 +231,81 @@ char *get_last_double_semicolon(char *str) {
   return NULL;
 }
 
-int is_ipv6_double_semicolon(char *ostr) {
+int is_ipv6_last_double_semicolon(const char *str) {
+  
+  if(str && strlen(str)) {
+    const char *d_semic = get_last_double_semicolon(str);
 
-  if(ostr) {
-    char *bracketl, *bracketr, *d_semic;
-    char *str = get_ipv6_addr(ostr);
-    
-    if(str && (bracketl = strchr(str, '[')) && (bracketr = strchr(str, ']')) && 
-       (d_semic = strstr(str, "::")) && 
-       ((bracketl < d_semic) && (d_semic < bracketr))) {
-      char   *addr;
-      size_t  len;
+    if(d_semic) {
+      const char *bracketl = NULL;
+      const char *bracketr = NULL;
+      const char *p        = d_semic + 2;
+      
+      while(*p && !bracketr) {
+	if(*p == ']')
+	  bracketr = p;
 
-      if(strstr(d_semic + 2, "::"))
-	return 0;
-      
-      /* Okay there is something like [...::...] */
-      len  = (bracketr - bracketl) + 1;
-      
-      /* [::] = unspecified address */
-      if(len == 4) {
-	return 1;
+	p++;
       }
-      else {
-	char *semic;
-	char  buffer[2048];
-	
-	memset(&buffer, 0, sizeof(buffer));
-	
-	len--;
-	
-	addr = (char *) alloca(len);
-	memcpy(addr, bracketl + 1, len);
-	
-	addr[len-1] = '\0';
-	d_semic      = addr + (d_semic - bracketl) - 1;
-	
-	if((semic = strrchr(d_semic, ':')))
-	  semic++;
-	
-	if(semic && (semic > (d_semic + 2))) {
-	  if((semic != (d_semic + 1)) && (semic != (d_semic + 2))) {
-	    
-	    /* IPv6 style: '::%x:' */
-	    if((*d_semic == ':') && (*(d_semic + 1) == ':'))
-	      return(check_valid_value(d_semic + 2));
-	    
-	  }
+      
+      if(bracketr) {
+	p = d_semic;
+
+	while((p >= str) && !bracketl) {
+	  if(*p == '[')
+	    bracketl = p;
+
+	  p--;
 	}
-	else {
-	  if(semic) {
-	    int   ipv4[4];
-	    
-	    /* IPv6 style: '::%x' */
-	    if(check_valid_value(semic))
-	      return 1;
-	    /* IPv4 style: ::%d.%d.%d.%d  ::%x|%d:....:%d.%d.%d.%d */
-	    else if((sscanf(semic, "%d.%d.%d.%d", &ipv4[0], &ipv4[1], &ipv4[2], &ipv4[3])) == 4)
-	      return 1;
-	    
-	  }
-	  
-	  /* IPv6 style: '%x::' */
-	  if((*addr == ':') && (*(addr + 1) == ':'))
-	    return (check_valid_value(addr + 2));
-	  
-	  /* IPv6 style: ':%x::' '%x::' */
-	  else if((*(addr + (len - 2)) == ':') && (*(addr + (len - 3)) == ':')) {
-	    *(addr + (len - 3)) = '\0';
-	    
-	    if((semic = strrchr(addr, ':')))
-	      return (check_valid_value(semic + 1));
-	    else
-	      return (check_valid_value(addr));
-	    
+	
+	if(bracketl) {
+
+	  /* Look like an IPv6 address, check it */
+	  p = d_semic + 2;
+
+	  while(*p) {
+	    switch(*p) {
+	    case ':':
+	    case '.':
+	      break;
+
+	    case ']': /* IPv6 delimiter end */
+
+	      /* now go back to '[' */
+	      p = d_semic;
+	      
+	      while(p >= str) {
+		switch(*p) {
+		case ':':
+		  break;
+		  
+		case '.': /* This couldn't happen */
+		  return 0;
+		  break;
+
+		case '[': /* We reach the beginning, it's a valid IPv6 */
+		  return 1;
+		  break;
+		  
+		default:
+		  if(!isxdigit(*p))
+		    return 0;
+		  break;
+
+		}
+
+		p--;
+	      }
+	      break;
+
+	    default:
+	      if(!isxdigit(*p))
+		return 0;
+	      break;
+
+	    }
+
+	    p++;
 	  }
 	}
       }

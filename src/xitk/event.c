@@ -1048,8 +1048,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   for (i = 0; i < nfiles; i++) {
     char *sub = NULL;
     
-    if((sub = get_last_double_semicolon(filenames[i])) != NULL) {
-      if(is_ipv6_double_semicolon(filenames[i]))
+    if((sub = (char *)get_last_double_semicolon(filenames[i])) != NULL) {
+      if(is_ipv6_last_double_semicolon(filenames[i]))
 	sub = NULL;
       else {
 	*sub = 0;
