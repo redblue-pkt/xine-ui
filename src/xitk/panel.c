@@ -288,9 +288,6 @@ void panel_update_channel_display (void) {
   
   xine_get_spu_lang (gGui->xine, panel->spuid);
 
-  if(-1 == (atoi(panel->spuid)))
-    sprintf(panel->spuid, "%s", "off");
-  
   xitk_label_change_label (panel->widget_list, panel->spuid_label, 
 			   panel->spuid);
 }

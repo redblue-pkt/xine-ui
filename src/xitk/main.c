@@ -525,7 +525,7 @@ int main(int argc, char *argv[]) {
   int              c = '?', aos = 0;
   int              option_index = 0;
   int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
-  int              audio_channel = 0;
+  int              audio_channel = -1;
   int              spu_channel = -1;
 #ifdef HAVE_XF86VIDMODE
   int              use_xvidext = 0;

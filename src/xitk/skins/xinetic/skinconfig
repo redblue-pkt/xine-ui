@@ -1,7 +1,7 @@
 #Xine skin data file
 skin.name    = Xinetic
-skin.version = 0.4
-skin.date    = 12.10.2001
+skin.version = 0.5
+skin.date    = 15.11.2001
 skin.author  = Darjeeling (Jérôme Villette)<villette@chem.leidenuniv.nl>
 skin.url     = none
 
@@ -72,7 +72,7 @@ skin.TimeLabel {
 
 skin.AudioNext {
 	coords {
-	  x = 233
+	  x = 186
 	  y = 37
 	}
 	pixmap = SmallArrowUp.png
@@ -80,7 +80,7 @@ skin.AudioNext {
 
 skin.AudioPrev {
 	coords {
-	  x = 233
+	  x = 186
 	  y = 45
 	}
 	pixmap = SmallArrowDown.png
@@ -88,11 +88,11 @@ skin.AudioPrev {
 
 skin.AudioLabel {
 	coords {
-	  x = 270
+	  x = 222
 	  y = 37
 	}
 	label {
-	  length = 3
+	  length = 7
 	  animation = False
 	  pixmap = Letters.png
 	}
@@ -100,7 +100,7 @@ skin.AudioLabel {
 
 skin.SpuNext {
 	coords {
-	  x = 294
+	  x = 268
 	  y = 37
 	}
 	pixmap = SmallArrowUp.png
@@ -108,7 +108,7 @@ skin.SpuNext {
 
 skin.SpuPrev {
 	coords {
-	  x = 294
+	  x = 268
 	  y = 45
 	}
 	pixmap = SmallArrowDown.png
@@ -116,11 +116,11 @@ skin.SpuPrev {
 
 skin.SpuLabel {
 	coords {
-	  x = 330
+	  x = 306
 	  y = 37
 	}
 	label {
-	  length = 3
+	  length = 7
 	  animation = False
 	  pixmap = Letters.png
 	}

@@ -267,10 +267,8 @@ void gui_change_spu_channel(xitk_widget_t *w, void *data) {
 			    (xine_get_spu_channel(gGui->xine) + 1));
   }
   else if(((int)data) == GUI_PREV) {
-    if(xine_get_spu_channel(gGui->xine) >= 0) {
-      xine_select_spu_channel(gGui->xine, 
-			      (xine_get_spu_channel(gGui->xine) - 1));
-    }
+    xine_select_spu_channel(gGui->xine, 
+			    (xine_get_spu_channel(gGui->xine) - 1));
   }
 
   panel_update_channel_display ();
