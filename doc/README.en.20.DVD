@@ -1,1 +1,87 @@
-TODO: short description of the various pitfalls of DVD playback
+In theory, DVD playback with xine should work out of the box. If it does for
+you, consider yourself lucky and skip over to the next section. There is nothing
+interesting for you in here.
+
+But in a lot of cases, it does not work that easily. This can have various
+reasons. At first, make sure xine can find your DVD drive. There should be a
+symbolic link called /dev/dvd pointing to the device node of your DVD drive.
+When your drive is connected as the first IDE device on the second IDE channel,
+this would usually be /dev/hdc. You need to have read and write access to that
+device. If your xine installation was prepared for you by the distributor of
+your Linux setup, this should all have been taken care of for you, but it is
+never a bad idea to double check.
+If you do not want to have the symbolic link, you can alternatively change the
+config option input.dvd_device accordingly.
+
+The next set of problems you should be aware of comes with the various
+restrictions the DVD officials try to enforce on us.
+
+
+CSS
+---
+
+Almost all commercial DVDs are encrypted with a system called CSS, Content
+Scrambling System. This is a quite weak cryptographic mechanism that was meant
+as a way of copy control. Since circumventing copy protection mechanisms is
+illegal in some countries, xine does not come with any means to break CSS.
+Because of that, you will be unable to play commercial DVDs with an out-of-the-
+box version of xine. You should inform yourself about the legal situation of
+copy protection and bypassing it in the country you live in. If it is allowed
+to you, install libdvdcss and xine will play those DVDs.
+
+
+The region code
+---------------
+
+From a DVDs point of view, the world is divided into eight regions. The idea is
+that drives bought in one region shall only play discs made for that region.
+To ensure that, every DVD carries information, in which regions it wants to be
+played.
+
+Older drives are so called RPC-I drives and do not check this region code at
+all. If you have such a drive, treat it well and be happy. xine will be able to
+play any disc on this planet for you without any trouble.
+
+Newer drives fall in the RPC-II category. They have an internal region setting,
+which is checked against the region code of the DVD you insert. If they match,
+everything will work just fine. If they don't it is up to the drive's firmware,
+what exactly will happen. Some nicer drives just don't allow you to read the
+parts of the disc where the cryptographic keys for CSS are stored. Most likely,
+you will still be able to play the disc in that case. But there are more
+restrictive drives, which deny any access to the disc. In that case you will be
+out of luck.
+
+With RPC-II drives, it therefore seems to be a good idea to have the drives
+internal region setting match that of the DVDs you intend to buy. There is a
+Linux command line tool to modify this setting in the drive and the drive even
+allows you to change this setting for a limited amount of times, usually five.
+
+But if you just bought a fresh RPC-II drive, do not be too hasty setting the
+region. The factory default might be worth a look. Some drives already come
+preset to a specific region. Bad luck, go ahead and set the right code, if the
+preset does not fit your needs. But some drives come with a default setting of
+region 0. This region does not exist on the globe, it generally means "region
+code free". And with some drives you are really lucky, because with the
+factory setting of 0, they will behave like RPC-I drives. You should do
+everything to keep it that way. Be extremely careful, when using commercial
+operating systems on the same machine. Some change the region code without
+asking you. But unfortunately, other drives will simply not play any DVD when
+set to region 0. This leaves you with no choice but to set the region code to
+a setting you see fit.
+
+
+Authentication
+--------------
+
+Most DVD drives need a step called "authentication" before they grant you access
+to a DVD. This is a process, where the software tells the drive what it wants
+and the drive decides whether to allow that or not. Unfortunately, this special
+negotiation can in rare cases confuse the Linux kernel. Some drives cannot be
+authenticated, when they are running in ide-scsi emulation. Others work only in
+this mode, while a third group has no problems with either. It seems that USB
+drives currently are not supported at all.
+
+
+If you still have questions to these points or experience any problems not
+mentioned here, have a look at the xine FAQ. If that still does not help you,
+post your question on the xine-user mailinglist.

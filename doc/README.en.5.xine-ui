@@ -1,1 +1,89 @@
-TODO: short and easy introduction to xine-ui 
+What the user sees as "xine" really consists of two major parts:
+* xine-lib or libxine is the so called engine, it contains all of xine's core
+  functionality like retrieving media from the various input sources supported,
+  video and audio decoding, synchronized playback and post processing.
+  This part of xine is only a mere accumulation of functionality, programmers
+  call this a library. End users cannot use this directly, since there is no
+  interface to interact with xine-lib.
+* The second part is the so called frontend. This wraps a user interface around
+  xine-lib, making it usable for everyone.
+
+The benefit of this division is that you can choose between a variety of
+different frontends. The one you are using now is known as "xine-ui". Some
+interesting features of xine-ui are briefly noted below:
+
+
+The menu
+--------
+
+All key functions of xine can be accessed through the main xine-ui menu which
+you get by right-clicking in either the video window or the panel.
+Most of the entries should be self explaining.
+
+
+MRL browser
+-----------
+
+xine's way of describing the media to play are MRLs. You can read more about
+this interesting concept in the MRLs section. Due to their power, an ordinary
+file selection dialog is not enough to tell xine, what stream to play. The
+MRL browser therefore not only allows you to browse through your files, it also
+lets you select other types of media input, which offer their own choice of
+possible streams to play. You can open the MRL browser with the related icon in
+your favourite skin or by selecting Open->Location from the menu.
+
+An ordinary file dialog is available as well, you can get it at Open->File in
+the menu.
+
+
+Playlists
+---------
+
+xine-ui also handles playlists, of course. The playlist editor, located at
+Playlist->Editor or represented by a button in your current skin, allows you to
+load, save and edit playlists. The mediamark editor allows you to edit the
+current playlist entry in detail and attach further playback options, like a
+separate subtitle file. By default, the mediamark editor can be opened by
+pressing Ctrl-e.
+
+
+Autoscan buttons
+----------------
+
+You find the autoscan buttons within the xine panel or in the playlist editor.
+They are a shortcut to create a playlist for a certain, well-known media source
+and, with the default settings, also starts to play it. For example, pressing
+the autoscan button labeled "DVD" will do, what the name suggests: It starts
+playing the DVD in your drive by creating a playlist best suited for this job.
+
+
+Post effects
+------------
+
+xine also offers a growing set of post processing effects you can apply to your
+video. From the menu, open Video->Postprocess->Chain reaction to open the Chain
+reaction window, where you can create a stack of post effects to be applied to
+the video. Choose from the drop down box to select a post filter and select and
+modify the available options to tweak it to your liking. Click on "New filter"
+to add another effect to the chain.
+
+
+Media menu navigation
+---------------------
+
+Some types of media are interactive, the most common example today being DVDs,
+where you can choose all sorts of options from sometimes quite elaborate menus.
+xine offers multiple means to navigate within such interactive content.
+* First, you can directly click with your mouse on items in the video window.
+* Second, you can use the so called event sender panel, which you can open from
+  the menu under Menus->Naviagation.
+* Third, you can use the menu entries under Menus to jump directly to various
+  submenus of your interactive medium. This will only have an effect, if the
+  source you play offers the designated menu.
+* And last but not least, you can use the keyboard. By default, the arrow keys
+  on the numeric keypad will let you move the menu highlight and Enter will
+  select the highlighted button.
+  Some other interesting features are also available via the numeric keypad:
+  (The keys listed are those of the default key mapping.)
+  PgUp and PgDown will let you jump back and forth between chapters.
+  Home and End will select the angle to play in multiangle features.

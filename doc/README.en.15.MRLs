@@ -78,7 +78,7 @@ Some examples should show you, how powerful the MRLs are:
 
      yourmovie.avi#subtitle:yoursubtitles.srt
      
-                                    plays the specified avi overlaying the
+                                    plays the specified avi overlayed with the
                                     subtitles from the given file
 
      http://some.server.org/stream.mpg#save:savedstream.mpg

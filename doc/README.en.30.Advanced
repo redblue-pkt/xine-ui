@@ -1,1 +1,14 @@
-TODO: pointers to documentation for advanced usage 
+The more advanced uses of xine will be discussed in separate documents to which
+we will point you from here:
+
+For using xine from command line or controlling it over a network, read the
+manpages of xine and xine-remote.
+
+For watching DVB (Digital Video Broadcast) television with xine, follow the
+instructions written in README.dvb in the documentation directory of xine-lib.
+
+To use your DXR3 or Hollywood+ MPEG decoder card with xine, consult the file
+README.dxr3 in the documentation directory of xine-lib.
+
+To play audio CDs or DVDs over a network, see the file README.network_dvd in the
+documentation directory of xine-lib.

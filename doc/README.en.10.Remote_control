@@ -35,9 +35,9 @@ Each entry will look like this:
 It's yours to specify the remote name, and assign the button.
 
 
-To Retrieve a playlist from a given input plugin, you can use the special
-'PlaylistFrom:' keyword, followed by the plugin name (the same as the button
-label in the xine panel):
+To Retrieve an autoscan playlist from a given input plugin, you can use the
+special 'PlaylistFrom:' keyword, followed by the plugin name (the same as the
+button label in the xine panel):
 
        # Retrieve playlist from DVD plugin.
        begin
