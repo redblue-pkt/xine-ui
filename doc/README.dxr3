@@ -228,9 +228,9 @@ top & bottom.  It crops the video on the left and right sides to
 maintain the correct aspect ratio. Use SHIFT-z to disable.
 
 
-TVmode Cycling Feature
+TV mOde Cycling Feature
 ======================
-Pressing ALT-z repeatedly will allow you to cycle between tv modes PAL, 
+Pressing CTRL-o repeatedly will allow you to cycle between tv modes PAL, 
 PAL60, & NTSC.  The format selected will only remain valid for the 
 current xine session, on startup the tv mode will revert to the default
 in .xinerc
