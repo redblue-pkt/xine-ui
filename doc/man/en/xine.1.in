@@ -1,6 +1,6 @@
 .\" -*-Nroff-*-
 .\""
-.TH XINE 1x 2001-09-24 "The xine project"
+.TH XINE 1x 2001-10-13 "The xine project"
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\""
@@ -138,19 +138,23 @@ Dragging files from the GNOME Midnight Commander (gmc) is known to work.
 The programs are documented fully on the xine home page:
 .IR "http://xine.sourceforge.net/"
 .SH CONTROL KEYS
-Many features can be controlled by pressing control keys. The Key bindings are:
+Many features can be controlled by pressing control keys. '\fBM\-\fP' is the Meta key ('Alt' key on PC keyboard), '\fBC\-\fP' is the Control 'CTRL' key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the HOME key is displayed \fB<home>\fP.
+The Key bindings are:
 .LP
-.BR RETURN :
-Play
+.BR 0 :
+Jump to start of current stream
 .br
-.BR SPACE
-or
-.BR P :
-Pause
+.BR 1..9 :
+Jump to 10%..90% of current stream
 .br
-.BR UP/DOWN :
-fast forward / slow motion
+.BR A :
+Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
 .br
+.BR M\-C | M\-c :
+Show/hide the video settings window.
+.br
+.BR E :
+Eject the current media.
 .br
 .BR F :
 Toggle fullscreen mode.
@@ -161,32 +165,68 @@ Hide/show the gui.
 .BR H :
 Hide/show the video output window.
 .br
-.BR A :
-Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
+.BR i | I :
+Toggle deinterlaced methods.
 .br
-.BR B :
+.BR M\-m | M\-M :
 Hide/show the MRL browser.
 .br
-.BR C :
-Show/hide the video settings window.
+.BR C\-m | C\-M :
+Audio mute toggle.
 .br
-.BR E :
-Eject the current media.
+.BR p | P :
+Pause
 .br
-.BR 0 :
-Jump to start of current stream
+.BR M\-p | M\-P:
+Show/hide the playlist window.
 .br
-.BR 1..9 :
-Jump to 10%..90% of current stream
+.BR Q :
+Exit.
 .br
-.BR Left/Right :
-seek -+ 15 sec (+CTRL: 60 sec)
+.BR s | S :
+Zoom x1.
 .br
-.BR PgUp :
+.BR v :
+Decrease audio volume.
+.br
+.BR V :
+Increase audio volume.
+.br
+.BR x | X :
+Take a snapshot.
+.br
+.BR <return> :
+Play
+.br
+.BR <space> :
+Pause
+.br
+.BR <up>/<down> :
+fast forward / slow motion
+.br
+.BR <left>/<right> :
+seek -+ 15 sec.
+.br
+.BR C\-<left> / C\-<right> :
+seek +- 60 sec.
+.br
+.BR <page\ up> :
 Jump to previous stream in playlist
 .br
-.BR PgDown :
+.BR <page\ down> :
 Jump to next stream in playlist
+.br
+.BR C\-< :
+Reduce the output window.
+.br
+.BR C\-> :
+Enlarge the ouput window.
+.br
+.BR . :
+Select next sub-title channel.
+.br
+.BR , :
+Select previous sub-title channel.
 .br
 .BR + :
 Select next audio channel (may take up to a few seconds to take effect)
@@ -194,32 +234,18 @@ Select next audio channel (may take up to a few seconds to take effect)
 .BR - :
 Select prev audio channel
 .br
-.BR > :
-Enlarge the ouput window.
-.br
-.BR . :
-Select next sub-title channel.
-.br
-.BR < :
-Reduce the output window.
-.br
-.BR , :
-Select previous sub-title channel.
-.br
-.BR Q :
-Exit.
-.br
+
 .SH Synchronization fine tuning
 Some streams have bad timestamps, so synchronization fails. This can be
 tweaked using arrow keys:
 .br
-.BR n :
+.BR n | N :
 press if video runs ahead of audio
 .br
-.BR m :
+.BR m | M:
 press if video lags behind audio
 .br
-.BR Home :
+.BR <home> :
 press to reset audio/video offset to 0, so stream timestamps are unchanged.
 
 .SH AUTHOR

@@ -1,8 +1,8 @@
 .\" -*-Nroff-*-
 .\""
-.TH XINE 1x 2001-07-18 "Le projet xine"
+.TH XINE 1x 2001-10-13 "Le projet xine"
 .SH NOM
-xine \- Lecteur audio/vidéo MPEG2/MPEG1.
+xine \- Lecteur audio/vidéo libre.
 .SH SYNOPSIS
 .B xine
 .I "[options] [MRL] ..."
@@ -99,16 +99,22 @@ pour fonctionner.
 Le programme est complètement documenté sur la page du projet de xine:
 .IR "http://xine.sourceforge.net/"
 .SH TOUCHES DE CONTRÔLE
-Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches.
-La liste de ces touches est:
+Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches. '\fBM\-\fP' est la touche Meta ('Alt' sur les claviers de PC), '\fBC\-\fP' est la touche Control 'Ctrl', les autres touches spéciales sont délimitées par les caractères '\fB<\fP' et '\fB>\fP', par exemple: la touche FIN est affichèe \fB<fin>\fP. La liste de ces touches est:
 .LP
-.BR ENTREE :
-Lecture
+.BR 0 :
+Saute au début du flux courant.
 .br
-.BR ESPACE
-ou 
-.BR P :
-Pause
+.BR 1..9 :
+Saute à 10%..90% du flux courant.
+.br
+.BR A :
+Bascule du ratio d'aspect (AUTO/16:9/4:3/DVB).
+.br
+.BR M\-C | M\-c :
+Affiche/masque la fenêtre des réglages vidéo.
+.br
+.BR E :
+Ejecte le média courant.
 .br
 .BR F :
 Bascule plein écran/fenêtré.
@@ -119,41 +125,62 @@ Affiche/masque le panneau de contrôle.
 .BR H :
 Affiche/masque la fenêtre de sortie.
 .br
-.BR A :
-Bascule du ratio d'aspect (AUTO/16:9/4:3/DVB) 
+.BR i | I :
+Bascule des méthodes de dé-entrelacement.
 .br
-.BR B :
+.BR M\-m | M\-M :
 Affiche/masque le gestionnaire de MRL.
 .br
-.BR C :
-Affiche/masque la fenêtre des réglages vidéo.
+.BR C\-m | C\-M :
+Bascule du mode muêt.
 .br
-.BR E :
-Ejecte le média courant.
+.BR p | P :
+Pause.
 .br
-.BR 0 :
-Saute au début du flux courant.
+.BR M\-p | M\-P:
+Affiche/masque le fenêtre de liste de lecture.
 .br
-.BR 1..9 :
-Saute à 10%..90% du flux courant.
+.BR Q :
+Quitte.
 .br
-.BR PgUp :
+.BR s | S :
+Zoom x1.
+.br
+.BR v :
+Reduit le volume audio.
+.br
+.BR V :
+Augmente le volume audio.
+.br
+.BR x | X :
+Prends une photo.
+.br
+.BR <entrée> :
+Lecture.
+.br
+.BR <espace> :
+Pause.
+.br
+.BR <haut>/<bas> :
+Avance rapide, ralenti.
+.br
+.BR <gauche>/<droite> :
+Saute -+ 15 sec.
+.br
+.BR C\-<gauche> / C\-<droite> :
+Saute +- 60 sec.
+.br
+.BR <page\ précédente> :
 Saute au flux precédent dans la liste de lecture.
 .br
-.BR PgDown :
+.BR <page\ suivante> :
 Saute au flux suivant dans la liste de lecture.
 .br
-.BR + :
-Sélectionne le canal audio suivant.
-.br
-.BR - :
-Sélectionne le canal audio précédent.
-.br
-.BR > :
-Agrandi la fenêtre de sortie.
-.br
-.BR < :
+.BR C\-< :
 Réduit la fenêtre de sortie.
+.br
+.BR C\-> :
+Agrandi la fenêtre de sortie.
 .br
 .BR . :
 Sélectionne le canal de sous-titres suivant.
@@ -161,21 +188,24 @@ Sélectionne le canal de sous-titres suivant.
 .BR , :
 Sélectionne le canal de sous-titres précédant.
 .br
-.BR Q :
-Quitte.
+.BR + :
+Sélectionne le canal audio suivant.
+.br
+.BR - :
+Sélectionne le canal audio précédent.
 .br
 .SH Affinage de la synchronization
 Il existe des flux ayant de mauvaises informations de temporisation, de ce 
 fait la synchronisation échoue. Il est possible de corriger ceci en utilisant
 les touches directionnelle:
 .br
-.BR Gauche :
+.BR n | N :
 Pressez cette touche si la vidéo est en avance par rapport à l'audio.
 .br
-.BR Droit :
+.BR m | M :
 Pressez cette touche si le vidéo est en retard par rapport à l'audio.
 .br
-.BR Début :
+.BR <début> :
 Pressez cette touche pour remettre à 0.
 .SH AUTEURS
 Cette page de manuel a été écrite par Siggi Langauf <siggi@users.sourceforge.net>, de nombreux ajouts de Guenter Bartsch <guenter@users.sourceforge.net> et
