@@ -174,7 +174,7 @@ void panel_change_skins(void) {
   
   hint.width  = new_img->rgb_width;
   hint.height = new_img->rgb_height;
-  hint.flags  = PSize;
+  hint.flags  = PPosition | PSize;
   XSetWMNormalHints(gGui->display, gGui->panel_window, &hint);
   
   XResizeWindow (gGui->display, gGui->panel_window,

@@ -48,8 +48,8 @@
 
 #define XITK_MAJOR_VERSION (0)
 #define XITK_MINOR_VERSION (9)
-#define XITK_SUB_VERSION   (1)
-#define XITK_VERSION       "0.9.1"
+#define XITK_SUB_VERSION   (2)
+#define XITK_VERSION       "0.9.2"
 
 #include "dnd.h"
 #include "widget.h"

@@ -307,7 +307,7 @@ void control_change_skins(void) {
     
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
-    hint.flags  = PSize;
+    hint.flags  = PPosition | PSize;
     XSetWMNormalHints(gGui->display, control->window, &hint);
     
     XResizeWindow (gGui->display, control->window,
@@ -477,7 +477,7 @@ void control_panel(void) {
     wm_hint->initial_state = NormalState;
     wm_hint->flags         = InputHint | StateHint;
     XSetWMHints(gGui->display, control->window, wm_hint);
-    XFree(wm_hint); /* CHECKME */
+    XFree(wm_hint);
   }
   
   gc = XCreateGC(gGui->display, control->window, 0, 0);

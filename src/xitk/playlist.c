@@ -312,7 +312,7 @@ static void _playlist_handle_event(XEvent *event, void *data) {
     else if(bevent->button == Button5)
       xitk_browser_step_up(playlist->playlist, NULL);
   }
-  break;
+    break;
 
   case ButtonRelease:
     gui_handle_event(event, data);
@@ -698,7 +698,7 @@ void playlist_change_skins(void) {
     
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
-    hint.flags  = PSize;
+    hint.flags  = PPosition | PSize;
     XSetWMNormalHints(gGui->display, playlist->window, &hint);
 
     XResizeWindow (gGui->display, playlist->window,
@@ -867,7 +867,7 @@ void playlist_editor(void) {
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = title;//"Xine Playlist Editor";
+    xclasshint->res_name = title;
     xclasshint->res_class = "Xine";
     XSetClassHint(gGui->display, playlist->window, xclasshint);
   }

@@ -541,13 +541,11 @@ void xitk_mrlbrowser_hide(xitk_widget_t *w) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
-
+      private_data->visible = 0;
+      xitk_hide_widgets(private_data->widget_list);
       XLOCK(private_data->imlibdata->x.disp);
       XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
       XUNLOCK(private_data->imlibdata->x.disp);
-
-      xitk_hide_widgets(private_data->widget_list);
-      private_data->visible = 0;
     }
   }
 }
@@ -560,16 +558,13 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
 
   if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
 	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
-
     private_data = (mrlbrowser_private_data_t *)w->private_data;
-
+    
+    private_data->visible = 1;
     xitk_show_widgets(private_data->widget_list);
-
     XLOCK(private_data->imlibdata->x.disp);
     XMapRaised(private_data->imlibdata->x.disp, private_data->window); 
     XUNLOCK(private_data->imlibdata->x.disp);
-
-    private_data->visible = 1;
   }
 }
 
@@ -695,7 +690,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     
     hint.width  = new_img->rgb_width;
     hint.height = new_img->rgb_height;
-    hint.flags  = PSize;
+    hint.flags  = PPosition | PSize;
     XSetWMNormalHints(private_data->imlibdata->x.disp, private_data->window, &hint);
 
     XResizeWindow (private_data->imlibdata->x.disp, private_data->window,
@@ -858,15 +853,16 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   XLOCK(private_data->imlibdata->x.disp);
   XPeekEvent(private_data->imlibdata->x.disp, &xev);
   XUNLOCK(private_data->imlibdata->x.disp);
-
+  
   xitk_get_key_modifier(&xev, &modifier);
-
+  
   if((modifier & MODIFIER_CTRL) && (modifier & MODIFIER_SHIFT))
     mrlbrowser_select_mrl(private_data, selected, 1, 1);
   else if(modifier & MODIFIER_CTRL)
     mrlbrowser_select_mrl(private_data, selected, 1, 0);
   else
     mrlbrowser_select_mrl(private_data, selected, 0, 1); 
+
 }
 
 /*
@@ -892,17 +888,12 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
-
-    XLOCK(private_data->imlibdata->x.disp);
-    XRaiseWindow(private_data->imlibdata->x.disp, private_data->window);
-    XUNLOCK(private_data->imlibdata->x.disp);
-
     if (bevent->button == Button4)
       xitk_browser_step_down((xitk_widget_t *)private_data->mrlb_list, NULL);
     else if(bevent->button == Button5)
       xitk_browser_step_up((xitk_widget_t *)private_data->mrlb_list, NULL);
   }
-  break;
+    break;
 
   case MappingNotify:
     XLOCK(private_data->imlibdata->x.disp);
@@ -1051,11 +1042,9 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   attr.colormap		 = Imlib_get_colormap(mb->imlibdata);
 
   private_data->window   = XCreateWindow (mb->imlibdata->x.disp,
-					  DefaultRootWindow(mb->imlibdata->x.disp), 
-					  hint.x, hint.y, hint.width, 
-					  hint.height, 0, 
-					  mb->imlibdata->x.depth, 
-					  InputOutput, 
+					  mb->imlibdata->x.root, 
+					  hint.x, hint.y, hint.width, hint.height, 0, 
+					  mb->imlibdata->x.depth, InputOutput, 
 					  mb->imlibdata->x.visual,
 					  CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
 					  &attr);
@@ -1089,6 +1078,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   XChangeProperty(mb->imlibdata->x.disp, private_data->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);						
+
   if(mb->window_trans != None)
     XSetTransientForHint (mb->imlibdata->x.disp, private_data->window, mb->window_trans);
 
@@ -1276,8 +1266,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 				mrlbrowser_handle_event,
 				NULL,
 				mb->dndcallback,
-				private_data->widget_list,
-				(void *) private_data);
+				private_data->widget_list,(void *) private_data);
 
   
   xitk_mrlbrowser_change_skins(mywidget, skonfig);
