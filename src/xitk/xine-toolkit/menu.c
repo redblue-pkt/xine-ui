@@ -498,7 +498,7 @@ static void __menu_find_branch_by_name(menu_node_t *mnode, menu_node_t **fnode, 
 static menu_node_t *_menu_find_branch_by_name(menu_node_t *mnode, char *name) {
   menu_node_t *m = NULL;
   
-  __menu_find_branch_by_name(mnode, &m, name);
+  if (mnode) __menu_find_branch_by_name(mnode, &m, name);
 
   return m;
 }
