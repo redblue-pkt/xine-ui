@@ -43,7 +43,7 @@
    5.1.3 Jak odtwarzaæ strumienie z STDIN?
    5.1.4 Jak zmieniaæ skórê interfejsu u¿ytkonika xine?
    5.1.5 Co to jest aalib? Jak tego u¿ywaæ w xine?
-   5.1.6 Co znacz± te wszytkie linie w .xine/config?
+   5.1.6 Co znacz± te wszytkie linie w ~/.xine/config?
    5.1.7 Jak u¿ywaæ wtyczki DVD?
    5.1.8 Mam problemy z ustawieniem odpowiedniego regionu w moim napêdzie RPC-2!
    5.1.9 Czy xine mo¿e odtwarzaæ dyski (S)VCD?
@@ -288,7 +288,7 @@
     do wyszukiwania bibliotek dll, ale mo¿esz to zmieniæ w Twoim .xine/config
     edytuj±c liniê:
 
-     win32_path:/usr/lib/win32
+     codec.win32_path:/usr/lib/win32
 
 
 5   PRZYJEMNO¦Æ W U¯YWANIU XINE :)
@@ -399,17 +399,15 @@
 
 5.1.4 Jak zmieniaæ skórê interfejsu u¿ytkonika xine?
 
-      Uruchom xine przynajmniej raz - powinien on utworzyæ swój katalog/plik
-      konfiguracyjny .xine/config w Twoim katalogu domowym. Teraz wyedytuj ten
-      plik i zmodyfikuj wpis:
-      
-       skin:default
-     
-      aby zawiera³ nazwê skóry, której chcesz u¿ywaæ.
-     
-      Mo¿esz równie¿ interaktywnie zmieniaæ skórê u¿ywaj±c do tego przycisku
-      na interfejsie u¿ytkownika (ten sam przycisk co w 5.3.6).
+      Najprostrzym sposobem jest wybranie twojej ulubionej skóry poprzez
+      odpowiednie pole dialogowe samego panelu xine. Aby to zrobiæ kliknij
+      przycisk na panelu który otwiera okno menu (to które zawiera np.
+      kontroler kontrastu). Tam mo¿esz znale¼æ pole wyboru skóry xine.
+      Kliknij na wybran± skórê a panel zmieni j± natychmiast.
 
+      A je¶li chcesz to zrobiæ w bardziej skomplikowany sposób :), mo¿esz
+      wyedytowaæ odpowiedni± linie w pliku ~/.xine/config.(gui.skin)
+     
 5.1.5 Co to jest aalib? Jak tego u¿ywaæ w xine?
 
       aalib to biblioteka ascii art. xine jest dystrybuowane wraz z wtyczk±
@@ -425,9 +423,9 @@
 
       pozwoli na u¿ycie biblioteki aalib jako wyj¶cia wideo.
 
-5.1.6 Co znacz± te wszystkie linie w .xine/config?
+5.1.6 Co znacz± te wszystkie linie w ~/.xine/config?
      
-      Znajdziesz wiêcej informacji na ten temat w xine-ui/doc/README.xinerc.
+      Znajdziesz wiêcej informacji na ten temat w xine-ui/doc/README.config_en.
 
 5.1.7 Jak u¿ywaæ wtyczki DVD?
 
@@ -522,23 +520,37 @@
       ¿e sterownik to wspiera. Podczas uruchomienia xine "mówi" Ci jakie tryby
       s± obs³ugiwane przez twój sterownik d¼wiêku, np:
 
-       audio_oss_out : supported modes are mono stereo (4-channel not enabled
-       in .xinerc) (ac3-pass-through not enabled in .xinerc)
+        audio_alsa_out : supported modes are mono stereo (4-channel not enabled
+        in xine config) (5-channel not enabled in xine config) (5.1-channel not
+        enabled in xine config) (a/52 and DTS pass-through not enabled in xine
+        config)
 
       Na tej przyk³adowej maszynie 4-kana³owe wyj¶cie surround by³oby mo¿liwe.
       Tymczasem poniewa¿ xine nie mo¿e sprawdziæ czy masz pod³±czone g³o¶niki
-      do dodatkowych kana³ów, musisz sam w³±czyæ ten tryb modyfikuj±c
-      odpowiedni wpis w Twoim ~/.xine/config:
+      do dodatkowych kana³ów, musisz sam uaktywniæ ten tryb.
 
-       four_channel:1
+      Mo¿esz to zrobiæ w oknie konfiguracyjnym podczas dzia³ania xine
+      (naci¶nij przycisk konfiguracji na panelu xine i wybierz zak³adkê
+      AUDIO) lub, bardziej skomplikowan± metod±, edytuj±c plik konfiguracyjny
+      xine ~/.xine/config:
+
+	# 4-channel:
+         audio.four_channel:1
+ 
+        # 5-channel:
+         audio.five_channel:1
+
+        # 5.1-channel
+         audio.five_lfe_channel:0
 
 5.2.5 Co z wyj¶ciem ac3 przez spdif do zewnêtrznego dekodera ac3?
 
       xine ma równie¿ tak± mo¿liwo¶æ. Bardzo podobna historia do tej
-      z 4-/5-kana³owym surround (zobacz 5.2.4). Musisz to w³±czyæ w
-      Twoim ~/.xine/config:
+      z 4-/5-kana³owym surround (zobacz 5.2.4). Mo¿esz to w³±czyæ w
+      odpowiednim oknie konfiguracji xine lub edytuj±c wpis w Twoim 
+      ~/.xine/config:
 
-       ac3_pass_through:1
+       audio.a52_pass_through:1
        
 5.2.6 Zmiana g³o¶no¶ci przez interfejs u¿ytkonika xine nic nie daje! Co jest!?
 
@@ -598,7 +610,7 @@
       kluczowym u¿ywanym przez Xv. Mo¿esz zmieniæ kolor kluczowy aby tego
       unikn±æ. Powiniene¶ zmodyfikowaæ nastêpuj±c± liniê:
 
-       colorkey:2110
+      video.XV_COLORKEY:2110
 
       w Twoim ~/.xine/config aby zmieniæ kolor u¿ywany przez xine do
       wy¶wietlania w trybie overlay.
@@ -613,9 +625,9 @@
       i przez XShm. Znajdziesz trzy wpisy takie jak te dla Xv w Twoim
       ~/.xine/config:
 
-       XV_BRIGHTNESS:0
-       XV_SATURATION:0
-       XV_CONTRAST:128
+       video.XV_BRIGHTNESS:0
+       video.XV_SATURATION:0
+       video.XV_CONTRAST:128
 
       Warto¶ci i mo¿liwe zakresy zale¿± od Twojego sterownika Xv, wiêc
       bêdziesz musia³ poeksperymentowaæ troszeczkê aby otrzymaæ dobry obraz.
@@ -623,7 +635,7 @@
       W przypadku XShm, mo¿esz zmieniaæ jasno¶æ (korekta gamma) przez edycjê
       tego elementu konfiguracji z ~/.xine/config
        
-       xshm_gamma
+       video.xshm_gamma:0
        
       Musi on mieæ zakres od -100 do +100. Poeksperymentuj trochê a¿ osi±gniesz
       wymagan± jasno¶æ.
@@ -635,8 +647,8 @@
       kontrastu - inaczej nie bêdzie mo¿liwe zmienianie tych ustawieñ.
       (logiczne, nie?)
       
-      (Proszê zagl±dn±æ do dokumentu README.xinerc aby siê dowiedzieæ czego¶
-      wiêcej na temat opcji które mo¿esz zmieniaæ.)
+      (Proszê zagl±dn±æ do dokumentu README.config_en aby siê dowiedzieæ
+      czego¶ wiêcej na temat opcji które mo¿esz zmieniaæ.)
 
 
 5.4 KOMUNIKATY O B£ÊDACH: CO ONE OZNACZAJ¡ I CO MO¯ESZ ZROBIÆ.
