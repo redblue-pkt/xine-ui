@@ -1,4 +1,4 @@
-.TH aaxine 1 "August 29, 2001" "The xine project"
+.TH AAXINE 1 "August 29, 2001" "The xine project"
 
 .SH NAME
 aaxine \- an ASCII art video player
@@ -34,9 +34,10 @@ or on the xine home page.
 .B
 .IP \-h,\ \-\-help
 Show summary of options and available output drivers (plugins).
+.PP
 A big bunch of these options is provided by aalib. Please refer to your
 aalib documentation for those!
-
+.PP
 The remaining options, labelled
 .B AAXINE options:
 when listed with "aaxine \-\-help", are explained here.
@@ -59,7 +60,7 @@ content: only by content,
 .br
 extension: only by extension.
 .br
-If \-R is given without an additional option,, 'revert' is selected.
+If \-R is given without an additional option, 'revert' is selected.
 
 .SH MRLs
 MRLs are similar to URLs in your web browser. They describe the media
@@ -127,15 +128,17 @@ Well, there are surely a few of those. You can probably best ask for support
 (and report bugs) on our mailing list at <xine-user@lists.sf.net>.
 
 .SH SEE ALSO
-.BR xine (1)
-.br
-.BR http://xine.sf.net
-.br
-.BR http://aa-project.sf.net/aalib
-.br
+.BR xine (1),
+.UR http://xine.sourceforge.net/
+.BR http://xine.sf.net,
+.UE
+.UR http://aa-project.sourceforge.net/aalib/
+.BR http://aa-project.sf.net/aalib,
+.UE
 .BR xine-lib (3)
 
 .SH AUTHOR
 Siggi Langauf for the xine project.
-.br
+
+.SH COPYRIGHT
 Copyright \(co 2001 The xine project

@@ -97,7 +97,9 @@ Glisser des fichiers depuis GNOME Midnight Commander (gmc) est connu
 pour fonctionner.
 .SH "VOIR AUSSI"
 Le programme est complètement documenté sur la page du projet de xine:
+.UR http://xine.sourceforge.net/
 .IR "http://xine.sourceforge.net/"
+.UE
 .SH TOUCHES DE CONTRÔLE
 Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches. '\fBM\-\fP' est la touche Meta ('Alt' sur les claviers de PC), '\fBC\-\fP' est la touche Control 'Ctrl', les autres touches spéciales sont délimitées par les caractères '\fB<\fP' et '\fB>\fP', par exemple: la touche FIN est affichèe \fB<fin>\fP. La liste de ces touches est:
 .LP

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XINE 1.0\n"
-"POT-Creation-Date: 2002-01-28 04:58+0100\n"
+"POT-Creation-Date: 2002-02-07 15:16+0100\n"
 "PO-Revision-Date: 2002-02-05 14:34+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -88,14 +88,14 @@ msgstr "No"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:905
+#: src/xitk/xine-toolkit/mrlbrowser.c:909
 msgid "Select current entry"
 msgstr "Selecciona entrada actual"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:912
+#: src/xitk/xine-toolkit/mrlbrowser.c:916
 msgid "Play selected entry"
 msgstr "Reproduce entrada actual"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:922
+#: src/xitk/xine-toolkit/mrlbrowser.c:926
 msgid "Close MRL browser window"
 msgstr "Cierra la ventana del navegador de MRL"

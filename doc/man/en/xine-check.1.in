@@ -1,4 +1,4 @@
-.TH xine-check 1 "Januar 16, 2002" "The xine project"
+.TH XINE-CHECK 1 "Januar 16, 2002" "The xine project"
 
 .SH NAME
 xine-check \- a checker for the xine video player
@@ -45,7 +45,7 @@ or on the xine home page.
 .B
 .IP \-h,\ \-\-help
 Show summary of options and version number.
-
+.PP
 The remaining options, labelled
 .B XINE-CHECK options:
 when listed with "xine-check \-\-help", are explained here.
@@ -73,17 +73,15 @@ Well, there are surely a few of those. You can probably best ask for support
 (and report bugs) on our mailing list at <xine-user@lists.sf.net>.
 
 .SH SEE ALSO
-.BR xine (1), aaxine (1), xine-lib (3)
-.br
+.BR xine (1),
+.BR aaxine (1),
+.BR xine-lib (3),
+.UR http://xine.sourceforge.net/
 .BR http://xine.sf.net
-.br
-.BR xine-lib (3)
+.UE
 
 .SH AUTHOR
-This manpage: Philipp Hahn
-.br
-Copyright \(co 2002 The xine project
-.br
-xine-check: Siggi Langauf
-.br
+This manual page was written by Philipp Hahn <pmhahn@users.sf.net> for the xine project.
+
+.SH COPYRIGHT NOTICE
 Copyright \(co 2002 Siggi Langauf

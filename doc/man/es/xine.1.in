@@ -104,7 +104,9 @@ y soltarlo. Archivos arrastrados del Midnight Commander de GNOME (gmc) se
 sabe que funciona.
 .SH "VEA TAMBIÉN"
 El programa esta totalmente documentado en la página inicial de Xine:
+.UR http://xine.sourceforge.net/
 .IR "http://xine.sourceforge.net/"
+.UE
 .SH TECLAS DE CONTROL
 Muchas de las características pueden se controladas presionando las teclas de
 control. Las teclas asociadas  son:

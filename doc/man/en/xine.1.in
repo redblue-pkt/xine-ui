@@ -136,7 +136,9 @@ If you don't specify any MRL, you'll have to select  a file by drag'n-drop.
 Dragging files from the GNOME Midnight Commander (gmc) is known to work.
 .SH "SEE ALSO"
 The programs are documented fully on the xine home page:
+.UR http://xine.sourceforge.net/
 .IR "http://xine.sourceforge.net/"
+.UE
 .SH CONTROL KEYS
 Many features can be controlled by pressing control keys. '\fBM\-\fP' is the Meta key ('Alt' key on PC keyboard), '\fBC\-\fP' is the Control 'CTRL' key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the HOME key is displayed \fB<home>\fP.
 The default key bindings are:

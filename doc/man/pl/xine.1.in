@@ -167,7 +167,9 @@ GNOME Midnight Commander (gmc).
 Program jest w pe³ni udokumentowany na stronie g³ównej
 .B xine
 :
+.UR http://xine.sourceforge.net/
 .IR "http://xine.sourceforge.net/"
+.UE
 .SH KLAWISZE KONTROLNE
 Wiele funkcji mo¿e byæ kontrolowanych przez naci¶niêcie odpowiednich klawiszy.
 Skróty klawiszowe to:

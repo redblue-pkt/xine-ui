@@ -1,4 +1,4 @@
-.TH aaxine 1 "Pa¼dziernik 9, 2001" "Projekt xine"
+.TH AAXINE 1 "PaÅ’dziernik 9, 2001" "Projekt xine"
 
 .SH NAME
 aaxine \- odtwarzacz wideo ASCII art
@@ -132,12 +132,13 @@ No dobrze, jakie¶ na pewno s±. Mo¿esz prawdopodobnie poprosiæ o pomoc,
 pod adresem <xine-user@lists.sf.net>.
 
 .SH ZOBACZ RÓWNIE¯
-.BR xine (1)
-.br
-.BR http://xine.sf.net
-.br
-.BR http://aa-project.sf.net/aalib
-.br
++ .BR xine (1),
++ .UR http://xine.sourceforge.net/
++ .BR http://xine.sf.net,
++ .UE
++ .UR http://aa-project.sourceforge.net/aalib/
++ .BR http://aa-project.sf.net/aalib,
++ .UE
 .BR xine-lib (3)
 
 .SH AUTOR

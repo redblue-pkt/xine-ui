@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-01-28 04:58+0100\n"
+"POT-Creation-Date: 2002-02-07 15:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,14 +86,14 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:905
+#: src/xitk/xine-toolkit/mrlbrowser.c:909
 msgid "Select current entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:912
+#: src/xitk/xine-toolkit/mrlbrowser.c:916
 msgid "Play selected entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:922
+#: src/xitk/xine-toolkit/mrlbrowser.c:926
 msgid "Close MRL browser window"
 msgstr ""
