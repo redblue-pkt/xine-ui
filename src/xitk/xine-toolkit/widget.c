@@ -952,19 +952,22 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
       dump_widget_type(mywidget);
 #endif
       
-      xitk_tips_show_widget_tips(mywidget);
+      if(xitk_tips_show_widget_tips(mywidget)) {
       
-      if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
-	   (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
-	    ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER &&
-	     (wl->widget_focused->type & WIDGET_KEYABLE)))) &&
-	 (mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
-	event.type  = WIDGET_EVENT_FOCUS;
-	event.focus = FOCUS_MOUSE_IN;
-	(void) mywidget->event(mywidget, &event, NULL);
+	/* Only give focus and paint when tips are accepted, otherwise associated window is invisible. */
+	/* This call may occur from MotionNotify directly after iconifying window.                     */
+	if(!(wl->widget_focused && wl->widget_focused == wl->widget_under_mouse &&
+	     (((wl->widget_focused->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) ||
+	      ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER &&
+	       (wl->widget_focused->type & WIDGET_KEYABLE)))) &&
+	   (mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
+	  event.type  = WIDGET_EVENT_FOCUS;
+	  event.focus = FOCUS_MOUSE_IN;
+	  (void) mywidget->event(mywidget, &event, NULL);
 
-	event.type  = WIDGET_EVENT_PAINT;
-	(void) mywidget->event(mywidget, &event, NULL);
+	  event.type  = WIDGET_EVENT_PAINT;
+	  (void) mywidget->event(mywidget, &event, NULL);
+	}
       }
     }
   }

@@ -28,8 +28,9 @@
 
 void xitk_tips_init(Display *display);
 void xitk_tips_deinit(void);
-void xitk_tips_show_widget_tips(xitk_widget_t *w);
 void xitk_tips_hide_tips(void);
+
+int xitk_tips_show_widget_tips(xitk_widget_t *w);
 
 void xitk_tips_set_timeout(xitk_widget_t *w, unsigned long timeout);
 void xitk_tips_set_tips(xitk_widget_t *w, char *str);

@@ -299,8 +299,8 @@ void xitk_tips_hide_tips(void) {
 
   if(pthread_mutex_trylock(&tips.mutex))
     return;
- 
- if(tips.running) {
+
+  if(tips.running) {
     tips.new_widget = NULL;
     if(tips.prewait) {
       tips.prewait = 0;
@@ -315,7 +315,12 @@ void xitk_tips_hide_tips(void) {
 /*
  *
  */
-void xitk_tips_show_widget_tips(xitk_widget_t *w) {
+int xitk_tips_show_widget_tips(xitk_widget_t *w) {
+
+  /* Don't show when window invisible. This call may occur directly after iconifying window. */
+  if(!xitk_is_window_visible(tips.display, w->wl->win))
+    return 0;
+
   pthread_mutex_lock(&tips.mutex);
   if(tips.running) {
     tips.new_widget = w;
@@ -329,6 +334,7 @@ void xitk_tips_show_widget_tips(xitk_widget_t *w) {
       pthread_cond_signal(&tips.new_cond);
   }
   pthread_mutex_unlock(&tips.mutex);
+  return 1;
 }
 
 /*
