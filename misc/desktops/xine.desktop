@@ -2,6 +2,7 @@
 Name=Xine
 Comment=Video Player
 Exec=xine
+MimeType=video/mpeg;video/quicktime;video/x-msvideo;audio/x-mp3;audio/x-mp2;
 Icon=xine.xpm
 Terminal=0
 Type=Application
