@@ -823,7 +823,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
   case MotionNotify: {
     XMotionEvent *mevent = (XMotionEvent *) event;
-    mouse_event_t xine_event;
+    xine_input_event_t xine_event;
     int x, y;
 
     /* printf("Mouse event:mx=%d my=%d\n",mevent->x, mevent->y); */
@@ -834,18 +834,18 @@ static void video_window_handle_event (XEvent *event, void *data) {
     }
 
     if (video_window_translate_point(mevent->x, mevent->y, &x, &y)) {
-      xine_event.event.type = XINE_MOUSE_EVENT;
+      xine_event.event.type = XINE_EVENT_MOUSE_MOVE;
       xine_event.button = 0; /*  No buttons, just motion. */
       xine_event.x = x;
       xine_event.y = y;
-      xine_send_event(gGui->xine, (event_t*)(&xine_event), NULL);
+      xine_send_event(gGui->xine, (xine_event_t*)(&xine_event));
     }
   }
   break;
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
-    mouse_event_t xine_event;
+    xine_input_event_t xine_event;
     int x, y;
 
     if(!gGui->cursor_visible) {
@@ -858,11 +858,11 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
     if (bevent->button == Button1) {
       if (video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
-	xine_event.event.type = XINE_MOUSE_EVENT;
+	xine_event.event.type = XINE_EVENT_MOUSE_BUTTON;
 	xine_event.button = 1;
 	xine_event.x = x;
 	xine_event.y = y;
-	xine_send_event(gGui->xine, (event_t*)(&xine_event), NULL);
+	xine_send_event(gGui->xine, (xine_event_t*)(&xine_event));
       }
     }
   }

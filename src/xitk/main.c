@@ -469,28 +469,37 @@ static void load_audio_out_driver(char *audio_driver_id,
 /*
  *
  */
-void event_listener (xine_t *xine, event_t *event, void *data) {
-  /* Check Xine handle is not NULL */
-  if(xine == NULL) {
-    return;
-  }
+void event_listener (void *user_data, xine_event_t *event) {
   
   switch(event->type) { 
-  case XINE_UI_EVENT:
-    {
-      ui_event_t *uevent = (ui_event_t*)event;
+  case XINE_EVENT_UI_CHANNELS_CHANGED:
+    /* Update the panel */
+    panel_update_channel_display ();
+    break;
 
-      switch(uevent->sub_type) {
-       case XINE_UI_UPDATE_CHANNEL:
-	/* Update the panel */
-	panel_update_channel_display ();
-  	break;
-       case XINE_UI_SET_TITLE:
-	panel_set_title((char*)(uevent->data));
-	break;
-      }      
+  case XINE_EVENT_UI_SET_TITLE: 
+    {
+
+      xine_ui_event_t *uevent = (xine_ui_event_t *)event;
+      panel_set_title((char*)(uevent->data));
     }
-  }
+    break;
+  case XINE_EVENT_PLAYBACK_FINISHED:
+    gui_status_callback (XINE_STOP);
+    break;
+  case XINE_EVENT_NEED_NEXT_MRL:
+    {
+      xine_ui_event_t *uevent = (xine_ui_event_t *)event;
+
+      uevent->handled = 1;
+      uevent->data = gui_next_mrl_callback ();
+    }
+    break;
+  case XINE_EVENT_BRANCHED:
+    gui_branched_callback ();
+    break;
+  }      
+  
 }
 
 /*
@@ -746,10 +755,7 @@ int main(int argc, char *argv[]) {
    */
 
   gGui->xine = xine_init (gGui->vo_driver, audio_driver,
-			  gGui->config,
-			  gui_status_callback,
-			  gui_next_mrl_callback,
-			  gui_branched_callback);
+			  gGui->config);
 
   xine_select_audio_channel (gGui->xine, audio_channel);
   xine_select_spu_channel (gGui->xine, spu_channel);
@@ -757,7 +763,7 @@ int main(int argc, char *argv[]) {
   /*
    * Register an event listener
    */
-  xine_register_event_listener(gGui->xine, event_listener);
+  xine_register_event_listener(gGui->xine, event_listener, gGui);
 
   /*
    * start CORBA server thread

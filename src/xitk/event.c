@@ -310,7 +310,7 @@ void gui_handle_event (XEvent *event, void *data) {
   KeySym         mykey;
   char           kbuf[256];
   int            len;
-  event_t        xine_event;
+  xine_event_t   xine_event;
 
   switch(event->type) {
 
@@ -582,16 +582,16 @@ void gui_handle_event (XEvent *event, void *data) {
       break;
 
     case XK_Escape:
-      xine_event.type = XINE_MENU1_EVENT;
-      xine_send_event(gGui->xine, &xine_event, NULL);
+      xine_event.type = XINE_EVENT_INPUT_MENU1;
+      xine_send_event(gGui->xine, &xine_event);
       break;
     case XK_F1:
-      xine_event.type = XINE_MENU2_EVENT;
-      xine_send_event(gGui->xine, &xine_event, NULL);
+      xine_event.type = XINE_EVENT_INPUT_MENU2;
+      xine_send_event(gGui->xine, &xine_event);
       break;
     case XK_F2:
-      xine_event.type = XINE_MENU3_EVENT;
-      xine_send_event(gGui->xine, &xine_event, NULL);
+      xine_event.type = XINE_EVENT_INPUT_MENU3;
+      xine_send_event(gGui->xine, &xine_event);
       break;
     
     

@@ -249,12 +249,11 @@ void gui_change_audio_channel(widget_t *w, void *data) {
   
   if(((int)data) == GUI_NEXT) {
     xine_select_audio_channel(gGui->xine,
-			      (xine_get_audio_channel(gGui->xine) + 1));
+			      (xine_get_audio_selection(gGui->xine) + 1));
   }
   else if(((int)data) == GUI_PREV) {
-    if(xine_get_audio_channel(gGui->xine))
-      xine_select_audio_channel(gGui->xine, 
-				(xine_get_audio_channel(gGui->xine) - 1));
+    xine_select_audio_channel(gGui->xine, 
+			      (xine_get_audio_selection(gGui->xine) - 1));
   }
   
   panel_update_channel_display ();

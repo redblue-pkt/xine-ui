@@ -6498,8 +6498,10 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	      return 0;
 	    }
 	   mask = XCreatePixmap(id->x.disp, id->x.base_window, w, h, 1);
+	   /*
 	   fprintf(stderr, "created ph2 mask pixmap %x (%i x %i)\n",
 		   (int) mask, w, h);
+	   */
 	  if (!mask)
 	    {
 	      fprintf(stderr, "IMLIB ERROR: Cannot create shape pixmap\n");

@@ -515,10 +515,7 @@ int main(int argc, char *argv[]) {
    */
   aaxine.xine = xine_init (aaxine.vo_driver,
 			   aaxine.ao_driver, 
-			   aaxine.config,
-			   gui_status_callback,
-			   gui_next_mrl_callback, 
-			   gui_branched_callback);
+			   aaxine.config);
 
   if(!aaxine.xine) {
     fprintf(stderr, "xine_init() failed.\n");

@@ -230,38 +230,15 @@ void panel_reset_slider (void) {
  * Update audio/spu channel displayed informations.
  */
 void panel_update_channel_display (void) {
-  ui_event_t uevent;
 
-  uevent.event.type = XINE_UI_EVENT;
-  uevent.handled = 0;
-
-  uevent.sub_type = XINE_UI_GET_AUDIO_LANG;
-  uevent.data = panel->audiochan;
-  uevent.data_len = 4;
-
-  xine_send_event(gGui->xine, &uevent.event, NULL);
-
-  if(!uevent.handled)
-    sprintf (panel->audiochan, "%3d", xine_get_audio_channel(gGui->xine));
+  xine_get_audio_lang (gGui->xine, panel->audiochan);
   label_change_label (panel->widget_list, panel->audiochan_label, 
 		      panel->audiochan);
 
-  if(xine_get_spu_channel(gGui->xine) >= 0) {
-    uevent.event.type = XINE_UI_EVENT;
-    uevent.handled = 0;
-    uevent.sub_type = XINE_UI_GET_SPU_LANG;
-    uevent.data = panel->spuid;
-    uevent.data_len = 4;
-
-    xine_send_event(gGui->xine, &uevent.event, NULL);
-
-    if(!uevent.handled)
-      sprintf (panel->spuid, "%3d", xine_get_spu_channel (gGui->xine));
-  } else {
-    sprintf (panel->spuid, "%3s", "off");
-  }
-
-  label_change_label (panel->widget_list, panel->spuid_label, panel->spuid);
+  
+  xine_get_spu_lang (gGui->xine, panel->spuid);
+  label_change_label (panel->widget_list, panel->spuid_label, 
+		      panel->spuid);
 }
 
 /*
