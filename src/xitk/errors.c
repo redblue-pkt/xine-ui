@@ -99,13 +99,16 @@ void xine_error(char *message, ...) {
       return;
   }
   
-  {
+  if(gGui->stdctl_enable) {
+    printf("%s\n", buf);
+  }
+  else {
     xitk_window_t *xw;
     char buf2[(strlen(buf) * 2) + 1];
-
+    
     xitk_subst_special_chars(buf, buf2);
     xw = xitk_window_dialog_error(gGui->imlib_data, buf2);
-
+    
     if(!gGui->use_root_window) {
       XLockDisplay(gGui->display);
       XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
@@ -113,6 +116,7 @@ void xine_error(char *message, ...) {
     }
     layer_above_video(xitk_window_get_window(xw));
   }
+
   free(buf);
 }
 
@@ -123,11 +127,6 @@ void xine_error_with_more(char *message, ...) {
   va_list   args;
   char     *buf;
   int       n, size = 100;
-  
-  if (gGui->stdctl_enable) {
-    printf("%s\n", message);
-    return;
-  }
   
   if((buf = xitk_xmalloc(size)) == NULL) 
     return;
@@ -150,13 +149,17 @@ void xine_error_with_more(char *message, ...) {
       return;
   }
   
-  {
+  if(gGui->stdctl_enable) {
+    printf("%s\n", buf);
+  }
+  else {
     char buf2[(strlen(buf) * 2) + 1];
     xitk_subst_special_chars(buf, buf2);
     errors_create_window(_("Error"), buf2);
   }
+  
   free(buf);
-  }
+}
 
 /*
  * Display an informative window.
@@ -187,7 +190,10 @@ void xine_info(char *message, ...) {
       return;
   }
   
-  {
+  if(gGui->stdctl_enable) {
+    printf("%s\n", buf);
+  }
+  else {
     xitk_window_t *xw;
     char           buf2[(strlen(buf) * 2) + 1];
 
@@ -201,6 +207,7 @@ void xine_info(char *message, ...) {
     }
     layer_above_video(xitk_window_get_window(xw));
   }
+
   free(buf);
 }
 
