@@ -80,6 +80,7 @@ int       no_lirc;
 
 #define	OPTION_VISUAL_CLASS	1000
 #define	OPTION_VISUAL_ID	1001
+#define	OPTION_INSTALL_COLORMAP	1002
 
 /* options args */
 static const char *short_options = "?h"
@@ -107,6 +108,7 @@ static struct option long_options[] = {
   {"auto-play"      , optional_argument, 0, 'p' },
   {"visual"	    , required_argument, 0,  OPTION_VISUAL_CLASS },
   {"visualid"	    , required_argument, 0,  OPTION_VISUAL_ID },
+  {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
   {"version"        , no_argument      , 0, 'v' },
   {0                , no_argument      , 0,  0  }
 };
@@ -185,8 +187,9 @@ void show_usage (void) {
   printf("                                 'extension': only by extension.\n");
   printf("                                 -if no option is given, 'revert' is selected\n");
   printf("      --visual <visual class>  Use a X11 <visual class> window for video output.\n");
-  printf("      --visualid <visualID>    Use the specified X11 visual for the video\n");
+  printf("      --visualid <visualID>    Use the X11 visual <visualID> for the video\n");
   printf("                               window.\n");
+  printf("      --install                Install a private colormap.\n");
 #ifdef DEBUG
   printf("  -d, --debug <flags>          Debug mode for <flags> ('help' for list).\n");
 #endif
@@ -557,6 +560,7 @@ int main(int argc, char *argv[]) {
   gGui->autoplay_options = 0;
   gGui->prefered_visual_class = -1;
   gGui->prefered_visual_id = None;
+  gGui->install_colormap = 0;
 
 #ifdef DEBUG
   /* If XINE_DEBUG envvar is set, parse it */
@@ -687,6 +691,10 @@ int main(int argc, char *argv[]) {
 	exit(1);
       }
       gGui->prefered_visual_id = visual;
+      break;
+
+    case OPTION_INSTALL_COLORMAP:
+      gGui->install_colormap = 1;
       break;
 
     case 'v': /* Display version and exit*/

@@ -63,6 +63,7 @@ typedef struct {
 
   int		       prefered_visual_class;
   VisualID	       prefered_visual_id;
+  int		       install_colormap;
 
   xitk_dnd_t           xdnd;
 

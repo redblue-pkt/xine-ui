@@ -803,6 +803,22 @@ void gui_init (int nfiles, char *filenames[]) {
 
   imlib_init.flags = PARAMS_VISUALID;
   imlib_init.visualid = gGui->visual->visualid;
+  if (gGui->install_colormap && (gGui->visual->class & 1)) {
+      /*
+       * We're using a visual with changable colors / colormaps
+       * (According to the comment in X11/X.h, an odd display class
+       * has changable colors), and the user requested to install a
+       * private colormap for xine.  Allocate a fresh colormap for
+       * Imlib and Xine.
+       */
+      Colormap cm;
+      cm = XCreateColormap(gGui->display, 
+			   RootWindow(gGui->display, gGui->screen),
+			   gGui->visual, AllocNone);
+
+      imlib_init.cmap = cm;
+      imlib_init.flags |= PARAMS_COLORMAP;
+  }
   gGui->imlib_data = Imlib_init_with_params (gGui->display, &imlib_init);
   if (gGui->imlib_data == NULL) {
     fprintf(stderr, "Unable to initialize Imlib\n");
