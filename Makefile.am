@@ -6,7 +6,7 @@ AUTOMAKE_OPTIONS = 1.3
 
 SUBDIRS = src m4 misc 
 
-EXTRA_DIST = cvscompile
+EXTRA_DIST = cvscompile.sh
 
 debug:
 	list='$(SUBDIRS)'; for subdir in $$list; do \
