@@ -376,9 +376,73 @@ static void _playlist_handle_event(XEvent *event, void *data) {
 
 /* End of privates */
 
-/*
- *
- */
+void playlist_scan_for_infos(void) {
+  
+  if(gGui->playlist.num) {
+    int            i;
+    char          *ident;
+    int            old_pos = 0, rerun = 0;
+    xine_stream_t *stream = gGui->playlist.scan_stream;
+    int            mute = gGui->mixer.mute;
+    
+    /* 
+     * Because we share audio driver (and since we can't stat infos of
+     * audio only streams without audio driver), pausing the gGui->stream
+     * avoid some sync/crash problems.
+     */
+    if(((xine_get_status(gGui->stream)) != XINE_STATUS_STOP) && (gGui->logo_mode == 0)) {
+      xine_get_pos_length(gGui->stream, &old_pos, NULL, NULL);
+      gui_stop(NULL, NULL);
+      rerun = 1;
+    }
+    if((!mute) && gGui->mixer.caps & XINE_PARAM_AO_MUTE) {
+      mute = 1;
+      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, 1);
+    }
+    else
+      mute = 0;
+    
+    for(i = 0; i < gGui->playlist.num; i++) {
+      
+      if((xine_open(stream, gGui->playlist.mmk[i]->mrl)) && (xine_play(stream, 0, 0))) {
+	
+	xine_usec_sleep(5000);
+
+	if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
+	  
+	  if(gGui->playlist.mmk[i]->ident)
+	    free(gGui->playlist.mmk[i]->ident);
+	  
+	  gGui->playlist.mmk[i]->ident = strdup(ident);
+	  
+	  if(i == gGui->playlist.cur) {
+	    
+	    if(gGui->mmk.ident)
+	      free(gGui->mmk.ident);
+	    
+	    gGui->mmk.ident = strdup(ident);
+	    
+	    panel_update_mrl_display();
+	  }
+	  
+	  free(ident);
+	}
+      }
+    }
+    
+    /* Restoring previous play status */
+    if(mute)
+      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, mute);
+    
+    if(rerun)
+      gui_xine_open_and_play(gGui->mmk.mrl, old_pos, 0);
+    else
+      xine_stop(stream);
+    
+    playlist_mrlident_toggle();
+  }
+}
+
 void playlist_show_tips(int enabled, unsigned long timeout) {
   
   if(playlist) {

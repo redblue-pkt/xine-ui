@@ -166,6 +166,8 @@ typedef struct {
     int                     num;                   /* number of entries in playlist */
     int                     cur;                   /* current entry in playlist */
     int                     loop;                  /* not used yet */
+
+    xine_stream_t          *scan_stream;
   } playlist;
 
 

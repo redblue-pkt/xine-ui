@@ -371,6 +371,8 @@ static kbinding_entry_t default_binding_table[] = {
     "DPMSStandby",            ACTID_DPMSSTANDBY             , "d",        KEYMOD_NOMOD   , 0 },
   { "Display Mrl/Ident toggle.",
     "MrlIdentToggle",         ACTID_MRLIDENTTOGGLE          , "t",        KEYMOD_CONTROL , 0 },
+  { "Scan playlist to grab stream infos.",
+    "ScanPlaylistInfo",       ACTID_SCANPLAYLIST            , "s",        KEYMOD_CONTROL , 0 },
   { 0,
     0,                        0,                            0,            0              , 0 }
 };

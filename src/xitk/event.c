@@ -549,6 +549,10 @@ void gui_execute_action_id(action_id_t action) {
     playlist_mrlident_toggle();
     break;
     
+  case ACTID_SCANPLAYLIST:
+    playlist_scan_for_infos();
+    break;
+
   default:
     break;
   }

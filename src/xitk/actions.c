@@ -75,46 +75,18 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
     gui_handle_xine_error(stream);
   }
   else {
-    const char *title = NULL;
-    const char *artist = NULL;
-    const char *album = NULL;
+    char *ident;
     
     if(gGui->logo_mode != 2)
       gGui->logo_mode = 0;
-
+    
     if(gGui->logo_mode == 0) {
       int has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
       
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
-
-      title = xine_get_meta_info(gGui->stream, XINE_META_INFO_TITLE);
-      artist = xine_get_meta_info(gGui->stream, XINE_META_INFO_ARTIST);
-      album = xine_get_meta_info(gGui->stream, XINE_META_INFO_ALBUM);
       
-      if(title) {
-	char *ident;
-	int   len = strlen(title);
-	
-	if(artist && strlen(artist))
-	  len += strlen(artist) + 3;
-	if(album && strlen(album))
-	  len += strlen(album) + 3;
-	
-	ident = (char *) alloca(len + 1);
-	memset(ident, 0, len + 1);
-	sprintf(ident, "%s", title);
-	
-	if((artist && strlen(artist)) || (album && strlen(album))) {
-	  strcat(ident, " (");
-	  if(artist && strlen(artist))
-	    sprintf(ident, "%s%s", ident, artist);
-	  if((artist && strlen(artist)) && (album && strlen(album)))
-	    strcat(ident, " - ");
-	  if(album && strlen(album))
-	    sprintf(ident, "%s%s", ident, album);
-	  strcat(ident, ")");
-	}
+      if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
 	
 	if(gGui->mmk.ident)
 	  free(gGui->mmk.ident);
@@ -126,6 +98,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
 	
 	playlist_mrlident_toggle();
 	panel_update_mrl_display();
+	free(ident);
       }
 
       if(has_video) {

@@ -122,6 +122,45 @@ static char *get_num_string(uint32_t num) {
   return &buffer[0];
 }
 
+char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
+  const char *title = NULL;
+  const char *artist = NULL;
+  const char *album = NULL;
+  char       *ident = NULL;
+  
+  if(!stream)
+    return NULL;
+  
+  title = xine_get_meta_info(stream, XINE_META_INFO_TITLE);
+  artist = xine_get_meta_info(stream, XINE_META_INFO_ARTIST);
+  album = xine_get_meta_info(stream, XINE_META_INFO_ALBUM);
+  
+  if(title) {
+    int len = strlen(title);
+    
+    if(artist && strlen(artist))
+      len += strlen(artist) + 3;
+    if(album && strlen(album))
+      len += strlen(album) + 3;
+    
+    ident = (char *) xine_xmalloc(len + 1);
+    sprintf(ident, "%s", title);
+    
+    if((artist && strlen(artist)) || (album && strlen(album))) {
+      strcat(ident, " (");
+      if(artist && strlen(artist))
+	sprintf(ident, "%s%s", ident, artist);
+      if((artist && strlen(artist)) && (album && strlen(album)))
+	strcat(ident, " - ");
+      if(album && strlen(album))
+	sprintf(ident, "%s%s", ident, album);
+      strcat(ident, ")");
+    }
+  }
+
+  return ident;
+}
+
 void stream_infos_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
 

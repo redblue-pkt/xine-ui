@@ -571,7 +571,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
     /* request title display change in ui */
   case XINE_EVENT_UI_SET_TITLE:
-    {
+    if(event->stream == gGui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
       if(gGui->mmk.ident)
@@ -581,7 +581,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       
       gGui->mmk.ident = strdup(uevent->str);
       gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(uevent->str);
-     
+      
       playlist_mrlident_toggle();
       panel_update_mrl_display();
     }
@@ -589,11 +589,10 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
     /* message (dialog) for the ui to display */
   case XINE_EVENT_UI_MESSAGE: 
-    {
+    if(event->stream == gGui->stream) {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
-      if(event->stream == gGui->stream)
-	xine_info((char *)uevent->str);
+      xine_info((char *)uevent->str);
     }
     break;
     
@@ -603,12 +602,11 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
     /* report current audio level (l/r) */
   case XINE_EVENT_AUDIO_LEVEL:
-    {
+    if(event->stream == gGui->stream) {
       xine_audio_level_data_t *aevent = (xine_audio_level_data_t *) event->data;
-
-      if(event->stream == gGui->stream)
-	printf("XINE_EVENT_AUDIO_LEVEL: left 0>%d<255, right 0>%d<255\n", 
-	       aevent->left, aevent->right);
+      
+      printf("XINE_EVENT_AUDIO_LEVEL: left 0>%d<255, right 0>%d<255\n", 
+	     aevent->left, aevent->right);
     }
     break;
 
@@ -618,16 +616,14 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
     /* index creation/network connections */
   case XINE_EVENT_PROGRESS:
-    {
+    if(event->stream == gGui->stream) {
       xine_progress_data_t *pevent = (xine_progress_data_t *) event->data;
       char                  buffer[1024];
-
-      if(event->stream == gGui->stream) {
-	memset(&buffer, 0, sizeof(buffer));
-	printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
-	sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
-	panel_set_title(buffer);
-      }
+      
+      memset(&buffer, 0, sizeof(buffer));
+      printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
+      sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
+      panel_set_title(buffer);
     }
     break;
   }
@@ -1063,6 +1059,10 @@ int main(int argc, char *argv[]) {
   xine_event_create_listener_thread(gGui->visual_anim.event_queue, event_listener, NULL);
   xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -2);
   xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
+
+  /* Playlist scanning feature stream */
+  gGui->playlist.scan_stream = xine_stream_new(gGui->xine, gGui->ao_driver, gGui->vo_driver);
+  xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_SPU_CHANNEL, -2);
   
   /* init the video window */
   video_window_select_visual ();
