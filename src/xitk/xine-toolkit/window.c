@@ -633,7 +633,6 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
   xitk_dialog_t *wd = (xitk_dialog_t *)data;
 
   xitk_window_destroy_window(wd->imlibdata, wd->xwin);
-  xitk_unregister_event_handler(&wd->key);
 
   switch(wd->type) {
 
@@ -667,6 +666,8 @@ static void _xitk_window_destroy_window(xitk_widget_t *w, void *data) {
     break;
 
   }
+
+  xitk_unregister_event_handler(&wd->key);
 
   if(wd->widget_list) {
     xitk_destroy_widgets(wd->widget_list);

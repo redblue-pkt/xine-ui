@@ -602,7 +602,7 @@ msgstr "ctrl"
 
 #: src/xitk/kbindings.c:2066
 msgid "meta"
-msgstr "mèta"
+msgstr "méta"
 
 #: src/xitk/kbindings.c:2088
 msgid "mod3"
