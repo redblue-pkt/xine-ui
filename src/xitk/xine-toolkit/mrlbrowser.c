@@ -1274,6 +1274,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   _duplicate_mrl_filters(private_data, mb->mrl_filters);
 
   cmb.skin_element_name = mb->combo.skin_element_name;
+  cmb.layer_above       = mb->layer_above;
   cmb.parent_wlist      = private_data->widget_list;
   cmb.entries           = private_data->filters;
   cmb.parent_wkey       = &private_data->widget_key;

@@ -649,7 +649,7 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	      mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
 	    else { 
 	      if(new_num > 1) {
-		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (new_num + 1));
+		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (new_num + 2));
 	      }
 	    }
 	    

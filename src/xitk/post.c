@@ -561,6 +561,7 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	  
 	  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 	  cmb.skin_element_name = NULL;
+	  cmb.layer_above       = (is_layer_above());
 	  cmb.parent_wlist      = pplugin->widget_list;
 	  cmb.entries           = pobj->param->enum_values;
 	  cmb.parent_wkey       = &pplugin->widget_key;
@@ -635,6 +636,7 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
 	
 	XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 	cmb.skin_element_name = NULL;
+	cmb.layer_above       = (is_layer_above());
 	cmb.parent_wlist      = pplugin->widget_list;
 	cmb.entries           = (char **)(pobj->param_data + pobj->param->offset);
 	cmb.parent_wkey       = &pplugin->widget_key;
@@ -860,6 +862,7 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
     
     XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
     cmb.skin_element_name = NULL;
+    cmb.layer_above       = (is_layer_above());
     cmb.parent_wlist      = pplugin->widget_list;
     cmb.entries           = pobj->properties_names;
     cmb.parent_wkey       = &pplugin->widget_key;
@@ -1041,6 +1044,7 @@ static void _pplugin_create_filter_object(void) {
   
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
   cmb.skin_element_name = NULL;
+  cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = pplugin->widget_list;
   cmb.entries           = pplugin->plugin_names;
   cmb.parent_wkey       = &pplugin->widget_key;

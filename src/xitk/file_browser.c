@@ -1459,6 +1459,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   w = xitk_get_widget_width(fb->files_browser);
 
   cmb.skin_element_name = NULL;
+  cmb.layer_above       = (is_layer_above());
   cmb.parent_wlist      = fb->widget_list;
   cmb.entries           = fb->file_filters;
   cmb.parent_wkey       = &fb->widget_key;
