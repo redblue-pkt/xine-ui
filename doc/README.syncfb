@@ -196,9 +196,6 @@
   
 * KNOWN BUGs
   
-  + SyncFB overlay is placed out of the video window at xine startup.
-    (this is a bug with xine-ui and will be fixed soon)
-
   + SyncFB overlay won't turn off when video window is minimized or
     somehow else hidden.
     
