@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.22\n"
 "POT-Creation-Date: 2003-11-30 00:08+0100\n"
-"PO-Revision-Date: 2003-11-19 08:46+0200\n"
+"PO-Revision-Date: 2003-12-01 09:25+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -536,11 +536,11 @@ msgstr ""
 
 #: src/xitk/event.c:1285
 msgid "Use unscaled OSD"
-msgstr ""
+msgstr "Unvergrößertes OSD benutzen"
 
 #: src/xitk/event.c:1286
 msgid "Use unscaled (full screen resolution) OSD if possible"
-msgstr ""
+msgstr "Benutze unvergößertes (Vollbildauflösung) OSD falls möglich"
 
 #: src/xitk/event.c:1294
 msgid "Dismiss OSD time (s)"
@@ -2505,6 +2505,7 @@ msgstr "xine Konfiguration"
 #: src/xitk/setup.c:1116
 msgid "(*)  you need to restart xine for this setting to take effect"
 msgstr ""
+"(*)  xine muß neu gestartet werden, damit diese EInstellung wirksam wird"
 
 #: src/xitk/setup.c:1146
 msgid "OK"
