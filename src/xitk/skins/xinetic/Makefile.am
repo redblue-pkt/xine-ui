@@ -2,18 +2,19 @@ EXTRA_DIST = $(data_DATA)
 
 datadir = $(XINE_SKINDIR)/xinetic
 
-data_DATA = BigArrowDown.png MainClose.png MrlBg.png PlItemBtn.png \
-	BigArrowUp.png MainEject.png MrlBtn.png PlMoveDn.png CtlBg.png \
-	MainFastB.png MrlDismiss.png PlMoveUp.png CtlBtn.png MainFastF.png \
-	MrlSelect.png PlPlay.png CtlDismiss.png MainFullScreen.png Onglet.png \
-	SliderHBg.png CtlDummy.png MainNext.png PlBg.png SliderHPad.png \
-	CtlReset.png MainPause.png PlBtn.png SliderVBg.png CtlSave.png \
-	MainPlay.png PlDelete.png SliderVPad.png Letters.png MainPower.png \
-	PlDeleteAll.png SmallArrowDown.png MainAutoButton.png MainPrev.png \
-	PlDismiss.png SmallArrowUp.png MainBg.png MainStop.png PlInputTxt.png \
-	ArrowUp.png ArrowDown.png MainVolumeBg.png MainVolumePad.png MainMute.png \
-	MainCam.png MainUp.png MainDown.png SkItemBtn.png SkSlidBG.png SkSlidPad.png \
-	SkArrowUp.png SkArrowDown.png MainSetup.png skinconfig
+data_DATA =                                                                                       \
+	ArrowDown.png	   MainBg.png	      MainPower.png	PlBg.png        SkItemBtn.png     \
+	ArrowUp.png	   MainCam.png	      MainPrev.png	PlBtn.png	SkSlidBG.png      \
+	BigArrowDown.png   MainClose.png      MainSetup.png	PlDelete.png    SkSlidPad.png     \
+	BigArrowUp.png	   MainDown.png	      MainStop.png	PlDeleteAll.png SliderHBg.png     \
+	CtlBg.png	   MainEject.png      MainUp.png	PlDismiss.png   SliderHPad.png    \
+	CtlBtn.png	   MainFastB.png      MainVolumeBg.png  PlInputTxt.png  SliderVBg.png     \
+	CtlDismiss.png	   MainFastF.png      MainVolumePad.png PlItemBtn.png   SliderVPad.png    \
+	CtlDummy.png	   MainFullScreen.png MrlBg.png	        PlMoveDn.png    SmallArrowDown.png\
+	CtlReset.png	   MainMute.png	      MrlBtn.png	PlMoveUp.png    SmallArrowUp.png  \
+	CtlSave.png	   MainNext.png	      MrlDismiss.png	PlPlay.png	Letters.png       \
+	MainPause.png      MrlSelect.png      SkArrowDown.png	                                  \
+	MainAutoButton.png MainPlay.png	      Onglet.png	SkArrowUp.png   skinconfig
 
 debug:
 install-debug: install

@@ -193,6 +193,8 @@ rm -rf $RPM_BUILD_ROOT
 @XINE_SKINDIR@/xinetic/*
 @XINE_SKINDIR@/cloudy/*
 @XINE_SKINDIR@/mp2k/*
+@XINE_SKINDIR@/CelomaGold/*
+@XINE_SKINDIR@/CelomaMdk/*
 # desktop entries/icons
 @XINE_DESKTOPDIR@/*
 # documentation

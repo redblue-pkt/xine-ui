@@ -1,8 +1,8 @@
 #Xine skin data file
-# revision 0.5.2
+# revision 0.6
 skin.name    = Xinetic
 skin.version = 1
-skin.date    = 14.11.2001
+skin.date    = 20.01.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
 
@@ -222,7 +222,7 @@ skin.Snapshot {
 
 skin.AutoPlayGUI {
 	coords {
-	  x = 258
+	  x = 300
 	  y = 43
 	}
 	pixmap = MainAutoButton.png
@@ -236,7 +236,7 @@ skin.AutoPlayGUI {
 
 skin.PlBtn {
 	coords {
-	  x = 5
+	  x = 4
 	  y = 18
 	}
 	pixmap = PlBtn.png
@@ -244,16 +244,16 @@ skin.PlBtn {
 
 skin.CtlBtn {
 	coords {
-	  x = 5
-	  y = 38
+	  x = 4
+	  y = 37
 	}
 	pixmap = CtlBtn.png
 }
 
 skin.MrlBtn {
 	coords {
-	  x = 300
-	  y = 55
+	  x = 4
+	  y = 56
 	}
 	pixmap = MrlBtn.png
 }

@@ -1,4 +1,4 @@
-SUBDIRS = lcd pitt xinetic cloudy mp2k
+SUBDIRS = lcd pitt xinetic cloudy mp2k CelomaGold CelomaMdk
 
 install-exec-am:
 	if test -d @XINE_SKINDIR@/metal; then \
