@@ -9,8 +9,8 @@ xine \- Lecteur audio/vidéo libre.
 .SH DESCRIPTION
 Cette page de manuel documente brièvement le lecteur audio/vidéo \fBxine\fP.
 .PP
-\fBxine\fP lis les flux MPEG, synchronise les flux audio et vidéo.
-Il peux lire les flux a partir de fichiers, CD Vidéo, DVD ou d'autres sources.
+\fBxine\fP est capable de jouer les flux MPEG (audio et vidéo), les flux mpeg élémentaire (ex: fichiers .mp3 ou .mpv), 
+les flux mpeg transport, les fichiers ogg, avi, asf, quicktime, les (S)VCD et DVD, et bien plus...
 .SH OPTIONS
 Ce programme utilise la syntaxe GNU pour la ligne de commande, avec les 
 longues options commençant par deux tirets ('\-').
