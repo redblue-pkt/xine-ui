@@ -25,6 +25,7 @@
 #endif
 
 #include <stdio.h>
+#include <limits.h>	/*PATH_MAX*/
 #include <dirent.h>
 #include <sys/stat.h>       
 #include "panel.h"
@@ -35,6 +36,14 @@
 #include "skins.h"
 #include "xitk.h"
 #include "utils.h"
+
+#ifndef NAME_MAX
+#define NAME_MAX 256
+#endif
+#ifndef PATH_MAX
+#define PATH_MAX 768
+#endif
+
 
 #define DEFAULT_SKIN "xinetic"
 
