@@ -1709,7 +1709,7 @@ void gui_run(char **session_opts) {
       if(video_window_is_visible())
 	video_window_set_visibility(!(video_window_is_visible()));
       else
-	xine_gui_send_vo_data(gGui->stream,
+	xine_port_send_gui_data(gGui->vo_port,
 			      XINE_GUI_SEND_VIDEOWIN_VISIBLE,
 			      (int *)0);
       
