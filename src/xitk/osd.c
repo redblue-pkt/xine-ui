@@ -321,6 +321,9 @@ void osd_stream_infos(void) {
       xine_osd_get_text_size(gGui->osd.info, buffer, &w, &h);
       if(w > osdw)
 	osdw = w;
+
+      osd_draw_bar(_("Position in Stream"), 0, 100, 
+		   (((float)playedtime / (float)totaltime) * 100), OSD_BAR_PROGRESS);
     }
     
     x = (vwidth - osdw) - 40;
