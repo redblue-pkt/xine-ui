@@ -139,22 +139,15 @@ static void help_add_section(char *filename, int order_num, char *section_name) 
   }
 }
 
-static int readme_select(const struct dirent *dir_entry) {
-  int           num;
-  char          section[XITK_NAME_MAX];
-  
-  if((sscanf(dir_entry->d_name, "README.en.%d.%s", &num, &section[0])) == 2)
-    return 1;
-  
-  return 0;
-}
-
-
 static void help_sections(void) {
-  static struct dirent **namelist;
-  int                    i;
-  
-  if((i = scandir(XINE_DOCDIR, &namelist, readme_select, 0)) > 0) {
+  DIR                 *dir;
+  int                  i;
+
+  if ((dir = opendir(XINE_DOCDIR)) == NULL) {
+    xine_error("Cannot open help files: %s", strerror(errno));
+  }
+  else {
+    struct dirent       *dir_entry;
     const langs_t       *lang = get_lang();
     char                 locale_file[XITK_NAME_MAX];
     char                 locale_readme[XITK_PATH_MAX + XITK_NAME_MAX + 1];
@@ -162,31 +155,31 @@ static void help_sections(void) {
     char                 ending[XITK_NAME_MAX];
     char                 section_name[1024];
     struct stat          pstat;
-    
-    while(--i >= 0) {
+
+    while ((dir_entry = readdir(dir)) != NULL) {
       int order_num;
 
       memset(&ending, 0, sizeof(ending));
       memset(&section_name, 0, sizeof(section_name));
       
-      sscanf(namelist[i]->d_name, "README.en.%s", &ending[0]);
-      sscanf(namelist[i]->d_name, "README.en.%d.%s", &order_num, &section_name[0]);
-      
-      sprintf(locale_file, "%s.%s.%s", "README", lang->ext, ending);
-      sprintf(locale_readme, "%s/%s", XINE_DOCDIR, locale_file);
-      sprintf(default_readme, "%s/%s", XINE_DOCDIR, namelist[i]->d_name);
-      
-      if((strcmp(locale_file, namelist[i]->d_name))
-	 && ((stat(locale_readme, &pstat)) == 0) && (S_ISREG(pstat.st_mode)))
-	help_add_section(locale_readme, order_num, section_name);
-      else
-	help_add_section(default_readme, order_num, section_name);
+      if ((sscanf(dir_entry->d_name, "README.en.%d.%s", &order_num, &section_name[0])) == 2) {
+	sscanf(dir_entry->d_name, "README.en.%s", &ending[0]);
 
-      free(namelist[i]);
+	sprintf(locale_file, "%s.%s.%s", "README", lang->ext, ending);
+	sprintf(locale_readme, "%s/%s", XINE_DOCDIR, locale_file);
+	sprintf(default_readme, "%s/%s", XINE_DOCDIR, dir_entry->d_name);
+
+	if ((strcmp(locale_file, dir_entry->d_name)) && ((stat(locale_readme, &pstat)) == 0) && (S_ISREG(pstat.st_mode))) {
+	  help_add_section(locale_readme, order_num, section_name);
+	}
+	else {
+	  help_add_section(default_readme, order_num, section_name);
+	}
+      }
     }
-    
-    free(namelist);
-    
+
+    closedir(dir);
+
     if(help->num_sections) {
 
       /* Sort sections */
@@ -217,12 +210,6 @@ static void help_sections(void) {
 	help->tab_sections[i + 1] = NULL;
       }
     } 
-  }
-  else {
-    if(i == -1) {
-      /* an error occured, whish one ? */
-      xine_error("Cannot open help files: %s", strerror(errno));
-    }
   }
 }
 
