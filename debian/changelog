@@ -1,10 +1,9 @@
-xine-ui (0.5.1.1.sl1) unstable; urgency=low
+xine-ui (0.5.2-1) unstable; urgency=low
 
-  => prerelease, for testing only!
-  
+  * new upstream release, featuring slow/fast playback  
   * added compiler flags for m68k 
 
- -- Siggi Langauf <siggi@debian.org>  Fri, 31 Aug 2001 00:09:16 +0200
+ -- Siggi Langauf <siggi@debian.org>  Sun,  2 Sep 2001 22:15:09 +0200
 
 xine-ui (0.5.1-1) unstable; urgency=low
 

@@ -17,7 +17,7 @@ sufficient... (provided that an Xv capable video adapter is available)
 
 Another minor issue is the lack of a static libxine. This is currently not
 really supported, but I'll try my best to add it to libxine-dev if someone
-needs it...
+needs it. Just contact me at <xine@packages.debian.org> in that case!
 
 
 the CSS issue
@@ -32,10 +32,21 @@ available as xine plugins. So if you have such a DVD, have a look at one of
 the CSS plugin sites! If you are positive that it's allowed where you live,
 you can just install the Plugin and watch all your DVDs...
 
+DISCLAIMER:
+----------
+The sites listed below are in no way connected to me, Debian or the xine
+project. We don't have any control over these sites and therefore can't take
+any responsibility for the things you might find there.
+Using or distributing the plugins on these sites may be illegal where you
+live. If it is, you should not use them. We can't take any responsibility if
+you use them anyway.
+
+(end of disclaimer)
+
 The sites that I have heared of are:
 
 http://www.geocities.com/captain_css
 http://dvd.sf.net
 
 
- -- Siggi Langauf <siggi@debian.org>, Sun, 12 Aug 2001 23:59:02 +0200
+ -- Siggi Langauf <siggi@debian.org>, Sun, 02 Sep 2001

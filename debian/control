@@ -2,12 +2,12 @@ Source: xine-ui
 Section: graphics
 Priority: optional
 Maintainer: Siggi Langauf <siggi@debian.org>
-Build-Depends: debhelper (>> 2.0.0), libxine-dev (>= 0.5.0)
+Build-Depends: debhelper (>> 2.0.0), libxine-dev (>= 0.5.2)
 Standards-Version: 3.2.1
 
 Package: xine-ui
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: libxine0 (>=0.5.2), ${shlibs:Depends}
 Conflicts: xine (<<0.5.0)
 Replaces: xine
 Description: the xine video player, user interface 
@@ -15,6 +15,10 @@ Description: the xine video player, user interface
  a skin based media player that can play all the audio/video formats that
  libxine supports. Currently, this includes MPEG1/2, some AVI files and
  disc based media (VCD, SVCD, DVD).
+ .
+ This package contains an additional frontend, aaxine, which uses aalib to
+ render ASCII art video. This is more a proof of concept, but you can use it
+ to watch DVDs on your old vt100 terminal, of course. ;-)
  .
  Most DVDs on the market today are play-protected by the Content Scrambling
  System (CSS). Xine does not provide any code to descrample those DVDs,
