@@ -170,10 +170,10 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
   char *mrl = _mrl;
   
   if((!strncasecmp(mrl, "ftp://", 6)) || (!strncasecmp(mrl, "dload:/", 7)))  {
-    char        *url = _mrl;
+    char        *url = mrl;
     download_t  *download;
     
-    if(!strncasecmp(_mrl, "dload:/", 7))
+    if(!strncasecmp(mrl, "dload:/", 7))
       url = _mrl + 7;
     
     download = (download_t *) xine_xmalloc(sizeof(download_t));
@@ -220,6 +220,25 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
 
   }
 
+  {
+    char *extension;
+    
+    extension = strrchr(mrl, '.');
+    if(extension && /* All known playlist ending */
+       ((!strncasecmp(extension, ".asx", 4)) ||
+	(!strncasecmp(extension, ".pls", 4)) ||
+	(!strncasecmp(extension, ".m3u", 4)) ||
+    	(!strncasecmp(extension, ".sfv", 4)) ||
+    	(!strncasecmp(extension, ".tox", 4)))) {
+      
+      if(mediamark_concat_mediamarks(mrl)) {
+	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	mrl = gGui->mmk.mrl;
+      }
+    }
+    
+  }
+  
   if(!xine_open(gGui->stream, (const char *) mrl)) {
     gui_handle_xine_error(gGui->stream);
     return 0;

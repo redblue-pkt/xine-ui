@@ -50,6 +50,7 @@ const mediamark_t *mediamark_get_current_mmk();
 const char *mediamark_get_current_mrl(void);
 const char *mediamark_get_current_ident(void);
 
+int mediamark_concat_mediamarks(const char *filename);
 void mediamark_load_mediamarks(const char *filename);
 void mediamark_save_mediamarks(const char *filename);
 

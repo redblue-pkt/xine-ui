@@ -43,7 +43,7 @@ static int progress_callback(void *userdata,
 
   memset(&buffer, 0, sizeof(buffer));
   sprintf(buffer, "Download progress: %d%%.\n", (int) (dlnow * 100.0 / dltotal));
-  gGui->mrl_overrided += 5;
+  gGui->mrl_overrided = 5;
   panel_set_title(buffer);
   
   /* return non 0 abort transfert */

@@ -653,7 +653,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       memset(&buffer, 0, sizeof(buffer));
       printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
       sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
-      gGui->mrl_overrided += 5;
+      gGui->mrl_overrided = 5;
       panel_set_title(buffer);
     }
     break;

@@ -960,6 +960,50 @@ void mediamark_free_entry(int offset) {
   }
 }
 
+int mediamark_concat_mediamarks(const char *filename) {
+  playlist_t             *playlist;
+  int                     i, found;
+  mediamark_t           **mmk = NULL;
+  playlist_guess_func_t   guess_functions[] = {
+    guess_asx_playlist,
+    guess_toxine_playlist,
+    guess_pls_playlist,
+    guess_m3u_playlist,
+    guess_sfv_playlist,
+    guess_raw_playlist,
+    NULL
+  };
+
+  playlist = (playlist_t *) xine_xmalloc(sizeof(playlist_t));
+
+  for(i = 0, found = 0; (guess_functions[i] != NULL) && (found == 0); i++) {
+    if((mmk = guess_functions[i](playlist, filename)) != NULL)
+      found = 1;
+  }
+  
+  if(found)
+    printf(_("Playlist file (%s) is valid (%s).\n"), filename, playlist->type);
+  else {
+    fprintf(stderr, _("Playlist file (%s) is invalid.\n"), filename);
+    SAFE_FREE(playlist);
+    return 0;
+  }
+
+  gGui->playlist.cur = gGui->playlist.num;
+
+  for(i = 0; i < playlist->entries; i++)
+    mediamark_add_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->start, mmk[i]->end);
+  
+  for(i = 0; i < playlist->entries; i++)
+    (void) _mediamark_free_mmk(&mmk[i]);
+  
+  SAFE_FREE(mmk);
+  SAFE_FREE(playlist->type);
+  SAFE_FREE(playlist);
+
+  return 1;
+}
+
 void mediamark_load_mediamarks(const char *filename) {
   playlist_t             *playlist;
   int                     i, found, onum;
