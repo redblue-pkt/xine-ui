@@ -120,6 +120,9 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       y          = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       w->visible = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       w->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
+
+      private_data->max_length = xitk_skin_get_browser_entries(skonfig, 
+							       private_data->skin_element_name);
       
       for(i = WBSTART; i < private_data->max_length + WBSTART; i++) {
 	

@@ -437,6 +437,10 @@ typedef struct {
   xine_t                   *xine;
 
   xitk_browser_widget_t     browser;
+  
+  struct {
+    char                    *skin_element_name;
+  } combo;
 
 } xitk_mrlbrowser_widget_t;
 #endif

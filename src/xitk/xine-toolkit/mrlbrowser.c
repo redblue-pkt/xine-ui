@@ -48,10 +48,34 @@
 #include "inputtext.h"
 #include "dnd.h"
 #include "window.h"
+#include "combo.h"
 #include "widget.h"
 #include "widget_types.h"
 
 #undef DEBUG_MRLB
+
+typedef struct {
+  char *name;
+  char *ending;
+} mrl_filter_t;
+
+static mrl_filter_t mrl_filters[] = {
+  { "All"                 , "*"            },
+  { "*.vob"               , "vob"          }, /* mpeg block */
+  { "*.mpv"               , "mpv"          }, /* elementary */
+  { "*.mpg, *.mpeg, *.mpe", "mpg,mpeg,mpe" }, /* mpeg */
+  { "*.avi"               , "avi"          }, /* avi */
+  { "*.mp3"               , "mp3"          }, /* mp3 */
+  { "*.asf, *.wmv"        , "asf,wmv"      }, /* asf */
+  { "*.cpk, *.cak, *.film", "cpk,cak,film" }, /* film */
+  { "*.ogg"               , "ogg"          }, /* ogg */
+  { "*.vdr"               , "vdr"          }, /* pes */
+  { "*.mov, *.mp4, *.qt"  , "mov,mp4,qt"   }, /* QT */
+  { "*.roq"               , "roq"          }, /* roq */
+  { "*.m2t, *.ts, *.trp"  , "m2t,ts,trp"   }, /* ts */
+  { NULL                  , NULL           }
+};
+
 
 /*
  *
@@ -104,36 +128,112 @@ static int get_mrl_marker(mrl_t *mrl) {
 }
 
 /*
+ *
+ */
+static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
+  int i;
+  int old_filtered_mrls_num = private_data->mc->mrls_to_disp;
+
+  /* filtering is enabled */
+  if(private_data->filter_selected) {
+    char *filter_ends;
+    char *p, *m;
+    char *ending;
+
+    private_data->mc->mrls_to_disp = 0;
+
+    xitk_strdupa(filter_ends, mrl_filters[private_data->filter_selected].ending);
+    p = filter_ends;
+
+    for(i = 0; i < private_data->mrls_num; i++) {
+
+      if(private_data->mc->mrls[i]->type & mrl_file_directory) {
+
+	if(private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] == NULL)
+	  private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
+
+	MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp]);
+	private_data->mc->mrls_to_disp++;
+      }
+      else {
+	ending = strrchr(private_data->mc->mrls[i]->mrl, '.');
+	
+	if(ending) {
+	  while((m = xitk_strsep(&filter_ends, ",")) != NULL) {
+	    
+	    while(*m == ' ' || *m == '\t') m++;
+	    
+	    if(!strcasecmp((ending + 1), m)) {
+
+	      if(private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] == NULL)
+		private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
+	      
+	      MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp]);
+	      private_data->mc->mrls_to_disp++;
+	    }
+	  }
+	  
+	  filter_ends = p;
+	}
+      }    
+    }
+  }
+  else { /* no filtering */
+
+    for(i = 0; i < private_data->mrls_num; i++) {
+      
+      if(private_data->mc->filtered_mrls[i] == NULL)
+	private_data->mc->filtered_mrls[i] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
+      
+      MRL_DUPLICATE(private_data->mc->mrls[i], private_data->mc->filtered_mrls[i]);
+    }
+    private_data->mc->mrls_to_disp = i;
+  }
+  
+  /* free unused mrls */
+  while(old_filtered_mrls_num > private_data->mc->mrls_to_disp) {
+    MRL_ZERO(private_data->mc->filtered_mrls[old_filtered_mrls_num - 1]);
+    XITK_FREE(private_data->mc->filtered_mrls[old_filtered_mrls_num - 1]);
+    private_data->mc->filtered_mrls[old_filtered_mrls_num - 1] = NULL;
+    old_filtered_mrls_num--;
+  }
+
+  private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = NULL;
+}
+
+/*
  * Create *eye candy* entries in browser.
  */
 static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *private_data) {
   int i = 0;
   
-  while(private_data->mc->mrls[i]) {
-    char *p = private_data->mc->mrls[i]->mrl;
+  mrlbrowser_filter_mrls(private_data);
 
-    if(private_data->mc->mrls[i]->origin) {
+  while(private_data->mc->filtered_mrls[i]) {
+    char *p = private_data->mc->filtered_mrls[i]->mrl;
 
-      p += strlen(private_data->mc->mrls[i]->origin);
+    if(private_data->mc->filtered_mrls[i]->origin) {
+
+      p += strlen(private_data->mc->filtered_mrls[i]->origin);
       
       if(*p == '/') 
 	p++;
     }
     
-    if(private_data->mc->mrls[i]->type & mrl_file_symlink) {
+    if(private_data->mc->filtered_mrls[i]->type & mrl_file_symlink) {
 
       if(private_data->mc->mrls_disp[i])
 	private_data->mc->mrls_disp[i] = (char *) 
 	  realloc(private_data->mc->mrls_disp[i], strlen(p) + 4 + 
-		  strlen(private_data->mc->mrls[i]->link) + 2);
+		  strlen(private_data->mc->filtered_mrls[i]->link) + 2);
       else
 	private_data->mc->mrls_disp[i] = (char *) 
 	  xitk_xmalloc(strlen(p) + 4 + 
-		      strlen(private_data->mc->mrls[i]->link) + 2);
+		      strlen(private_data->mc->filtered_mrls[i]->link) + 2);
       
       sprintf(private_data->mc->mrls_disp[i], "%s%c -> %s", 
-	      p, get_mrl_marker(private_data->mc->mrls[i]), 
-	      private_data->mc->mrls[i]->link);
+	      p, get_mrl_marker(private_data->mc->filtered_mrls[i]), 
+	      private_data->mc->filtered_mrls[i]->link);
 
     }
     else {
@@ -141,10 +241,10 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
 	private_data->mc->mrls_disp[i] = (char *) 
 	  realloc(private_data->mc->mrls_disp[i], strlen(p) + 2);
       else
-      private_data->mc->mrls_disp[i] = (char *) xitk_xmalloc(strlen(p) + 2);
+	private_data->mc->mrls_disp[i] = (char *) xitk_xmalloc(strlen(p) + 2);
       
       sprintf(private_data->mc->mrls_disp[i], "%s%c", 
-	      p, get_mrl_marker(private_data->mc->mrls[i]));
+	      p, get_mrl_marker(private_data->mc->filtered_mrls[i]));
     }
 
     i++;
@@ -160,7 +260,7 @@ static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
   int i;
   int old_mrls_num = private_data->mrls_num;
 
-  for (i=0; i<num_mrls; i++) {
+  for (i = 0; i < num_mrls; i++) {
 
     if(private_data->mc->mrls[i] == NULL)
       private_data->mc->mrls[i] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
@@ -178,6 +278,7 @@ static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
   }
 
   private_data->mc->mrls[private_data->mrls_num] = NULL;
+
 }
 
 /*
@@ -219,7 +320,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
     mrlbrowser_create_enlighted_entries(private_data);
     xitk_browser_update_list(private_data->mrlb_list, 
 			     private_data->mc->mrls_disp, 
-			     private_data->mrls_num, 0);
+			     private_data->mc->mrls_to_disp, 0);
   }
 }
 
@@ -485,8 +586,14 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
       for(i = private_data->mrls_num; i > 0; i--) {
 	MRL_ZERO(private_data->mc->mrls[i]);
 	XITK_FREE(private_data->mc->mrls[i]);
+	MRL_ZERO(private_data->mc->filtered_mrls[i]);
+	XITK_FREE(private_data->mc->filtered_mrls[i]);
 	XITK_FREE(private_data->mc->mrls_disp[i]);
       }
+      
+      for(i = 0; private_data->filters[i] != NULL; i++)
+	free(private_data->filters[i]);
+
     }
     
     XITK_FREE(private_data->skin_element_name);
@@ -589,7 +696,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
  */
 static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
 				  int j, int add_callback, int play_callback) {
-  mrl_t *ms = private_data->mc->mrls[j];
+  mrl_t *ms = private_data->mc->filtered_mrls[j];
   char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
   memset(&buf, '\0', sizeof(buf));
@@ -646,7 +753,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     mrlbrowser_create_enlighted_entries(private_data);
     xitk_browser_update_list(private_data->mrlb_list, 
 			     private_data->mc->mrls_disp, 
-			     private_data->mrls_num, 0);
+			     private_data->mc->mrls_to_disp, 0);
     
   }
   else {
@@ -655,11 +762,11 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
 
     if(add_callback && private_data->add_callback)
       private_data->add_callback(NULL, (void *) j, 
-				 private_data->mc->mrls[j]);
+				 private_data->mc->filtered_mrls[j]);
     
     if(play_callback && private_data->play_callback)
       private_data->play_callback(NULL, (void *) j,
-				  private_data->mc->mrls[j]);
+				  private_data->mc->filtered_mrls[j]);
   }
 }
 
@@ -706,7 +813,20 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   else if(modifier & MODIFIER_CTRL)
     mrlbrowser_select_mrl(private_data, selected, 1, 0);
   else
-    mrlbrowser_select_mrl(private_data, selected, 0, 1);
+    mrlbrowser_select_mrl(private_data, selected, 0, 1); 
+}
+
+/*
+ * Refresh filtered list
+ */
+static void combo_filter_select(xitk_widget_t *w, void *data, int select) {
+  mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
+
+  private_data->filter_selected = select;
+  mrlbrowser_create_enlighted_entries(private_data);
+  xitk_browser_update_list(private_data->mrlb_list, 
+  			   private_data->mc->mrls_disp, 
+  			   private_data->mc->mrls_to_disp, 0);
 }
 
 /*
@@ -803,6 +923,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   xitk_labelbutton_widget_t   lb;
   xitk_button_widget_t        pb;
   xitk_label_widget_t         lbl;
+  xitk_combo_widget_t         cmb;
   xitk_widget_t              *w;
   long                        data[1];
   
@@ -821,6 +942,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   XITK_WIDGET_INIT(&pb, mb->imlibdata);
   XITK_WIDGET_INIT(&lbl, mb->imlibdata);
   XITK_WIDGET_INIT(&mb->browser, mb->imlibdata);
+  XITK_WIDGET_INIT(&cmb, mb->imlibdata);
   
   mywidget                        = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   
@@ -1047,7 +1169,30 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
     if(i)
       private_data->autodir_plugins[i+1] = NULL;
   }
-    
+
+
+  private_data->filters = (char **) xitk_xmalloc(sizeof(char *) * 
+						 (sizeof(mrl_filters) / sizeof(mrl_filter_t)));
+  {
+    int i;
+
+    for(i = 0; mrl_filters[i].name != NULL; i++)
+      private_data->filters[i] = strdup(mrl_filters[i].name);
+
+    private_data->filters[i] = NULL;
+    private_data->filter_selected = 0;
+  }
+  
+  cmb.skin_element_name = mb->combo.skin_element_name;
+  cmb.parent_wlist      = private_data->widget_list;
+  cmb.entries           = private_data->filters;
+  cmb.parent_wkey       = &private_data->widget_key;
+  cmb.callback          = combo_filter_select;
+  cmb.userdata          = (void *)private_data;
+  xitk_list_append_content(private_data->widget_list->l, 
+			   (private_data->combo_filter = 
+			    xitk_combo_create(skonfig, &cmb, NULL, NULL)));
+
   private_data->visible        = 1;
   
   mywidget->enable             = 1;

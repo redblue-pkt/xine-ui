@@ -60,7 +60,7 @@ typedef struct {
 /*
  * Create a combo box.
  */
-xitk_widget_t *xitk_create_combo(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s,
+xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_t *s,
 				 xitk_widget_t **lw, xitk_widget_t **bw);
 
 /*

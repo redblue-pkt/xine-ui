@@ -238,6 +238,8 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.browser.callback                   = sel_cb;
   mb.browser.userdata                   = NULL;
 
+  mb.combo.skin_element_name            = "MrlFilt";
+
   mrlb = xitk_mrlbrowser_create(gGui->skin_config, &mb);
 
   if(ip_availables)

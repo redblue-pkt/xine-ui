@@ -38,6 +38,7 @@
 #include "widget.h"
 #include "list.h"
 #include "_xitk.h"
+#include "combo.h"
 #include "tips.h"
 
 extern int errno;
@@ -953,7 +954,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
       /* Kill (hide) tips */
       xitk_tips_tips_kill(wl->widget_focused);
       
-      if (wl->widget_focused->notify_focus && wl->widget_focused->enable == WIDGET_ENABLE) {
+      if(wl->widget_focused->notify_focus && wl->widget_focused->enable == WIDGET_ENABLE) {
 	(void) (wl->widget_focused->notify_focus) (wl, wl->widget_focused, FOCUS_LOST);
 	wl->widget_focused->have_focus = FOCUS_LOST;
       }

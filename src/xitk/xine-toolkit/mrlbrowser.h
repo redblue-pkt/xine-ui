@@ -39,7 +39,9 @@
 
 typedef struct {
   mrl_t                    *mrls[MAXFILES];
+  mrl_t                    *filtered_mrls[MAXFILES];
   char                     *mrls_disp[MAXFILES];
+  int                       mrls_to_disp;
 } mrl_contents_t;
 
 typedef struct {
@@ -72,6 +74,10 @@ typedef struct {
 
   xitk_widget_t            *mrlb_list; /*  Browser list widget */
   xitk_widget_t            *autodir_plugins[64];
+
+  xitk_widget_t            *combo_filter;
+  char                    **filters;
+  int                       filter_selected;
 
   xitk_mrl_callback_t       add_callback;
   xitk_mrl_callback_t       play_callback;

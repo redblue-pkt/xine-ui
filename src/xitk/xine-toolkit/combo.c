@@ -177,17 +177,21 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
     private_data = (combo_private_data_t *) w->private_data;
-    
+
     if(private_data->skin_element_name) {
       int x, y;
 
       xitk_skin_lock(skonfig);
-
+      
       w->visible = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       w->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
-
+      
       xitk_set_widget_pos(w, w->x, w->y);
       xitk_get_widget_pos(private_data->label_widget, &x, &y);
+      
+      w->x = x;
+      w->y = y;
+
       x += xitk_get_widget_width(private_data->label_widget);
       
       (void) xitk_set_widget_pos(private_data->button_widget, x, y);
@@ -363,7 +367,7 @@ void xitk_combo_update_list(xitk_widget_t *w, char **list, int len) {
   
   if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
 	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
-    
+ 
     private_data              = (combo_private_data_t *) w->private_data;
     private_data->entries     = list;
     private_data->num_entries = len;
@@ -562,15 +566,23 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
   if(bw)
     *bw = private_data->button_widget;
 
+  
+  
   {
     int x, y;
     
     xitk_get_widget_pos(private_data->label_widget, &x, &y);
+    printf("X %d, Y %d\n", x, y);
+
+    mywidget->x = x;
+    mywidget->y = y;
+    // FIXME    mywidget->width = (width - height) + (height + 4);
+    //    mywidget->height = (height + 4);
+
     x += xitk_get_widget_width(private_data->label_widget);
     
     (void) xitk_set_widget_pos(private_data->button_widget, x, y);
   }
-
   return _xitk_combo_create(skonfig, c, c->skin_element_name, mywidget, private_data,
 			    (xitk_skin_get_visibility(skonfig, c->skin_element_name)) ? 1 : -1,
 			    xitk_skin_get_enability(skonfig, c->skin_element_name));

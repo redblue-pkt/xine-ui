@@ -1207,6 +1207,10 @@ typedef struct {
   xine_t                    *xine;
 
   xitk_browser_widget_t      browser;
+  
+  struct {
+    char                    *skin_element_name;
+  } combo;
 
 } xitk_mrlbrowser_widget_t;
 
@@ -1545,7 +1549,7 @@ void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
 
 
 typedef struct {
-  int                       magic;
+  int                      magic;
   ImlibData               *imlibdata;
   char                    *skin_element_name;
   xitk_widget_list_t      *parent_wlist;
