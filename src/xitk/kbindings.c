@@ -364,6 +364,8 @@ static kbinding_entry_t default_binding_table[] = {
     "StreamInfosShow",        ACTID_STREAM_INFOS            , "i",        KEYMOD_META    , 0 , 1},
   { "display stream information using OSD",
     "OSDStreamInfos",         ACTID_OSD_SINFOS              , "i",        KEYMOD_CONTROL , 0 , 0},
+  { "show OSD menu",
+    "OSDMenu",                ACTID_OSD_MENU                , "O",        KEYMOD_NOMOD   , 0 , 0},
   { "enter key binding editor",
     "KeyBindingEditor",       ACTID_KBEDIT	            , "k",	  KEYMOD_META    , 0 , 1},
   { "open file selector",

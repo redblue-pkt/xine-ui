@@ -1066,6 +1066,7 @@ src/xitk/xine-toolkit/Makefile
 src/xitk/xine-toolkit/po/Makefile.in
 src/xitk/skins/Makefile
 src/xitk/skins/xinetic/Makefile
+src/xitk/oxine/Makefile
 src/aaui/Makefile
 src/dfb/Makefile
 src/fb/Makefile

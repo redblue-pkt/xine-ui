@@ -43,6 +43,7 @@
 #include <stdlib.h>
 
 #include "common.h"
+#include "oxine/oxine.h"
 
 #define STEP_SIZE 256
 
@@ -394,6 +395,10 @@ void gui_execute_action_id(action_id_t action) {
       gGui->numeric.arg = 0;
     }
 
+    /* check if osd menu like this event */
+    if( oxine_action_event(action & ~ACTID_IS_INPUT_EVENT) )
+      return;
+    
     /* events for advanced input plugins. */
     xine_event.type        = action & ~ACTID_IS_INPUT_EVENT;
     xine_event.data_length = 0;
@@ -850,6 +855,10 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_OSD_SINFOS:
     osd_stream_infos();
+    break;
+  
+  case ACTID_OSD_MENU:
+    oxine_menu();
     break;
 
   case ACTID_FILESELECTOR:
@@ -1803,6 +1812,8 @@ void gui_run(char **session_opts) {
   startup.start        = auto_start;
   startup.session_opts = session_opts;
 
+  oxine_init();
+  
   xitk_run(on_start, (void *)&startup);
 
   /* save playlist */

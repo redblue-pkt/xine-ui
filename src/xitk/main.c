@@ -57,7 +57,7 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#include "common.h"
+#include "common.h" 
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
@@ -2109,7 +2109,7 @@ int main(int argc, char *argv[]) {
   video_window_select_visual();
 
   xine_set_param(gGui->stream, XINE_PARAM_VO_ASPECT_RATIO, aspect_ratio);
-  
+        
   /*
    * hand control over to gui
    */

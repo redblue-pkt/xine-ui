@@ -1,4 +1,4 @@
-SUBDIRS = Imlib-light xine-toolkit skins
+SUBDIRS = Imlib-light xine-toolkit skins oxine
 
 AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
@@ -15,6 +15,7 @@ EXTRA_PROGRAMS = session_ctrl kbindings_man
 
 kbindings_man_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
+	     $(top_builddir)/src/xitk/oxine/liboxine.la \
 	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lm
@@ -54,11 +55,14 @@ xine_SOURCES = \
 	videowin.c \
 	viewlog.c
 
-xine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
+xine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la \
+                    $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
+                    $(top_builddir)/src/xitk/oxine/liboxine.la
 
 # double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
 xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
 	     $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
+	     $(top_builddir)/src/xitk/oxine/liboxine.la \
 	     $(X_PRE_LIBS) @XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
 	     $(X_LIBS) $(XTEST_LIBS) $(CURL_LIBS) $(NVTVSIMPLE_LIBS) \
 	     -lX11 -lm $(DBG_LIBS)

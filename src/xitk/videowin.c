@@ -47,6 +47,7 @@
 #endif
 
 #include "common.h"
+#include "oxine/oxine.h"
 
 #define EST_KEEP_VALID  10	  /* #frames to allow for changing fps */
 #define EST_MAX_JITTER  0.01	  /* maximum jitter to detect valid fps */
@@ -1037,6 +1038,7 @@ static void video_window_adapt_size (void) {
     XUnlockDisplay (gGui->video_display);
   }
 
+  oxine_adapt();
 }
 
 static float get_default_mag(int video_width, int video_height) {
@@ -1131,6 +1133,9 @@ void video_window_frame_output_cb (void *data,
       gVw->use_duration = video_duration;
   }
 #endif
+
+  if(gVw->video_width != video_width || gVw->video_height != video_height )
+    oxine_adapt();
 
   if(!gVw->stream_resize_window) {
     gVw->video_width  = video_width;
@@ -1978,6 +1983,8 @@ static void video_window_handle_event (XEvent *event, void *data) {
 
   case MotionNotify: {
     XMotionEvent *mevent = (XMotionEvent *) event;
+    xine_event_t event;
+    xine_input_data_t input;
     int x, y;
 
     /* printf("Mouse event:mx=%d my=%d\n",mevent->x, mevent->y); */
@@ -1987,19 +1994,19 @@ static void video_window_handle_event (XEvent *event, void *data) {
       video_window_set_cursor_visibility(gGui->cursor_visible);
     }
 
-    if (video_window_translate_point(mevent->x, mevent->y, &x, &y)) {
-      xine_event_t event;
-      xine_input_data_t input;
+    event.type            = XINE_EVENT_INPUT_MOUSE_MOVE;
+    if (!oxine_mouse_event(event.type, mevent->x, mevent->y) ) {
+      if (video_window_translate_point(mevent->x, mevent->y, &x, &y)) {
+        event.stream      = gGui->stream;
+        event.data        = &input;
+        event.data_length = sizeof(input);
+        gettimeofday(&event.tv, NULL);
+        input.button      = 0; /*  No buttons, just motion. */
+        input.x           = x;
+        input.y           = y;
 
-      event.type        = XINE_EVENT_INPUT_MOUSE_MOVE;
-      event.stream      = gGui->stream;
-      event.data        = &input;
-      event.data_length = sizeof(input);
-      gettimeofday(&event.tv, NULL);
-      input.button      = 0; /*  No buttons, just motion. */
-      input.x           = x;
-      input.y           = y;
-      xine_event_send(gGui->stream, &event);
+        xine_event_send(gGui->stream, &event);
+      }
     }
   }
   break;
@@ -2039,17 +2046,20 @@ static void video_window_handle_event (XEvent *event, void *data) {
       
     }
 
-    if(video_window_translate_point(bevent->x, bevent->y, &x, &y)) {	
-      event.type        = XINE_EVENT_INPUT_MOUSE_BUTTON;
-      event.stream      = gGui->stream;
-      event.data        = &input;
-      event.data_length = sizeof(input);
-      input.button      = bevent->button;
-      input.x           = x;
-      input.y           = y;
-      xine_event_send(gGui->stream, &event);
-    }
+    event.type            = XINE_EVENT_INPUT_MOUSE_BUTTON;
+    if( bevent->button != Button1 ||
+        !oxine_mouse_event(event.type, bevent->x, bevent->y) ) {
+      if(video_window_translate_point(bevent->x, bevent->y, &x, &y)) {
+        event.stream      = gGui->stream;
+        event.data        = &input;
+        event.data_length = sizeof(input);
+        input.button      = bevent->button;
+        input.x           = x;
+        input.y           = y;
 
+        xine_event_send(gGui->stream, &event);
+      }
+    }
   }
   break;
 
@@ -2094,6 +2104,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
       if(osd_is_visible() && ((h != gVw->output_height) || (w != gVw->output_width)))
 	osd_update_osd();
 
+      oxine_adapt();
     }
     break;
     

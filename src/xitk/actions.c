@@ -40,6 +40,7 @@
 #include <pthread.h>
 
 #include "common.h"
+#include "oxine/oxine.h"
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
@@ -566,6 +567,8 @@ int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub) {
  * Callback-functions for widget-button click
  */
 void gui_exit (xitk_widget_t *w, void *data) {
+
+  oxine_exit();
 
   if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
     gGui->ignore_next = 1;
