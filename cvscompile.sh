@@ -1,6 +1,8 @@
 #!/bin/sh
 # Run this to generate all the initial Makefiles, etc.
 
+rm -f config.cache
+
 m4_files="_xine.m4 ORBit.m4 xine.m4 aa.m4"
 if test -d m4; then
     rm -f acinclude.m4
