@@ -575,7 +575,6 @@ void playlist_editor(void) {
   gc = XCreateGC(gGui->display, playlist->window, 0, 0);
   
   Imlib_apply_image(gGui->imlib_data, playlist->bg_image, playlist->window);
-  XSync(gGui->display, False); 
 
   /*
    * Widget-list
@@ -774,5 +773,4 @@ void playlist_editor(void) {
   playlist->running = 1;
    
   XUnlockDisplay (gGui->display);
-  XSync(gGui->display, False);
 }

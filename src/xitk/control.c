@@ -354,7 +354,6 @@ void control_panel(void) {
   gc = XCreateGC(gGui->display, control->window, 0, 0);
   
   Imlib_apply_image(gGui->imlib_data, control->bg_image, control->window);
-  XSync(gGui->display, False); 
 
   /*
    * Widget-list
@@ -555,5 +554,4 @@ void control_panel(void) {
   control->running = 1;
 
   XUnlockDisplay (gGui->display);
-  XSync(gGui->display, False);
 }

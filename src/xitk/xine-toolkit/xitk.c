@@ -33,6 +33,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <signal.h>
+#include <setjmp.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -42,7 +43,6 @@
 #include "dnd.h"
 
 extern int              errno;
-
 #undef TRACE_LOCKS
 
 #ifdef TRACE_LOCKS
@@ -113,6 +113,8 @@ typedef struct {
 
 static __xitk_t  *gXitk;
 static pid_t      xitk_pid;
+static sigjmp_buf kill_jmp;
+
 
 void widget_stop(void);
 
@@ -131,13 +133,13 @@ static void xitk_signal_handler(int sig) {
       fprintf(stderr, "XITK killed with signal %d\n", sig);
 
       MUTLOCK();
-      
       gXitk->running = 0;
 
       /* 
        * Tada.... and now Ladies and Gentlemen, the dirty hack
        */
-      fx = (__gfx_t *) gui_xmalloc(sizeof(__gfx_t));
+      fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+
       while(fx) {
 	if(fx->window) {
 	  XEvent event;
@@ -150,14 +152,17 @@ static void xitk_signal_handler(int sig) {
 	  event.xclient.message_type = fx->XA_XITK;
 	  event.xclient.format = 32;
 	  memset(&event.xclient.data, 0, sizeof(event.xclient.data));
-	  event.xclient.data.b[0] = 'K';
+	  snprintf(event.xclient.data.b, 20, "%s", "KILL");
 	  
-	  if (!XSendEvent (gXitk->display, fx->window, False, 0L, &event)) {
+	  XLOCK(gXitk->display);
+	  if (!XSendEvent (gXitk->display, fx->window, True, 0L, &event)) {
 	    fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n",
 		    (unsigned int) fx->window);
 	  }
+	  XUNLOCK(gXitk->display);
 
 	  MUTUNLOCK();
+	  siglongjmp(kill_jmp, 1);
 	  return;
 	}
 	fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
@@ -295,12 +300,14 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
       xexp.xexpose.send_event = True;
       xexp.xexpose.display    = gXitk->display;
       xexp.xexpose.window     = fx->window;
-      xexp.xexpose.count      = 1;
+      xexp.xexpose.count      = 0;
+      
+      XLOCK(gXitk->display);
       if(!XSendEvent(gXitk->display, fx->window, False, ExposureMask, &xexp)) {
 	fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n",
 		(unsigned int) fx->window);
       }
-
+      XUNLOCK(gXitk->display);
     }
   }
   else
@@ -362,6 +369,7 @@ static void widget_xevent_notify(XEvent *event) {
     if(fx->window != None) {
 
       //      printf("event %d\n", event->type);
+
       if(fx->window == event->xany.window) {
 	
 	switch(event->type) {
@@ -488,7 +496,6 @@ static void widget_xevent_notify(XEvent *event) {
 	break;
 
 	case ClientMessage:
-	  printf("client message\n");
 	  if(fx->xdnd)
 	    dnd_process_client_message(fx->xdnd, event);
 	  break;
@@ -564,7 +571,12 @@ void widget_run(void) {
   while(gXitk->running) {
     /* XLOCK(gXitk->display); 
 
-    if(XPending (gXitk->display)) { */
+       if(XPending (gXitk->display)) { 
+    */
+
+    if(sigsetjmp(kill_jmp, 1) != 0)
+      goto killing_end;
+    
       XNextEvent (gXitk->display, &myevent) ;
       /* XUNLOCK(gXitk->display);  */
       widget_xevent_notify(&myevent);
@@ -577,6 +589,8 @@ void widget_run(void) {
     */
   }
   /*XUNLOCK(gXitk->display); */
+
+ killing_end:
 
   gui_list_free(gXitk->list);
   gui_list_free(gXitk->gfx);

@@ -119,7 +119,6 @@ void video_window_draw_logo(void) {
 
   
   XFlush(gGui->display);
-  XSync(gGui->display, False);
   
   Imlib_destroy_image(gGui->imlib_data, resized_image);
 
@@ -371,7 +370,6 @@ void video_window_adapt_size (int video_width, int video_height,
   } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
 
   XFlush(gGui->display);
-  XSync(gGui->display, False);
   
   gVw->gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
 

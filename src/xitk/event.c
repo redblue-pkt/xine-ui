@@ -491,6 +491,7 @@ void gui_init (int nfiles, char *filenames[]) {
 
   for (i=0; i<nfiles; i++)
     gGui->playlist[i] = filenames[i];
+
   gGui->playlist_num = nfiles; 
   gGui->playlist_cur = 0;
 

@@ -585,7 +585,6 @@ void panel_init (void) {
   video_window_set_cursor_visibility (panel->visible);
 
   XUnlockDisplay (gGui->display);
-  XSync(gGui->display, False); 
 
   pthread_create(&panel->slider_thread, NULL, slider_loop, NULL);
 }
