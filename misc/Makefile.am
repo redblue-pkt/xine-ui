@@ -8,7 +8,6 @@ EXTRA_DIST = \
 	$(bin_SCRIPTS) \
 	SlackBuild.in \
 	SlackBuild \
-	autogen.sh \
 	build_rpms.sh \
 	build-xine-check.pl \
 	xine-ui.spec.in \
