@@ -72,119 +72,122 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=%{?buildroot:%{buildroot}} install
 
 %post
-if test -d %{skindir}/metal; then rm -rf %{skindir}/metal; fi
-if test -d %{skindir}/default; then rm -rf %{skindir}/default && ln -s %{skindir}/xinetic %{skindir}/default; fi
+if [ "$1" = "1" ]; then # install
+  if test -d %{skindir}/metal; then rm -rf %{skindir}/metal; fi
+  if test -d %{skindir}/default; then rm -rf %{skindir}/default && ln -s %{skindir}/xinetic %{skindir}/default; fi
 
-if test ! -d %{_datadir}/icons; then
-  %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/icons
-fi
-%{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm %{_datadir}/icons/xine.xpm
-if test ! -d %{_datadir}/pixmaps; then
-  %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/pixmaps
-fi
-if test -d %{_sysconfdir}/X11/wmconfig; then
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.wmconfig %{_sysconfdir}/X11/wmconfig/xine
-fi
-if test -d %{_sysconfdir}/X11/applnk; then
-  if test ! -d %{_sysconfdir}/X11/applnk/Multimedia; then
-    %{ginstall} -m 755 -o 0 -g 0 -d %{_sysconfdir}/X11/applnk/Multimedia
+  if test ! -d %{_datadir}/icons; then
+    %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/icons
   fi
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop
-fi
-# End Icons
-# Gnome
-if test -d /opt/gnome; then
-  if test ! -d /opt/gnome/share/pixmaps; then
-    %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/pixmaps
+  %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm %{_datadir}/icons/xine.xpm
+  if test ! -d %{_datadir}/pixmaps; then
+    %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/pixmaps
   fi
-  %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
-  if test -d /opt/gnome/share/gnome/apps/Multimedia; then
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
-  else
-    %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/gnome/apps/Multimedia
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
+  if test -d %{_sysconfdir}/X11/wmconfig; then
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.wmconfig %{_sysconfdir}/X11/wmconfig/xine
   fi
-else
-  if test -d %{_datadir}/gnome/apps; then
-    if test -d %{_datadir}/gnome/apps/Multimedia; then
-      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop
+  if test -d %{_sysconfdir}/X11/applnk; then
+    if test ! -d %{_sysconfdir}/X11/applnk/Multimedia; then
+      %{ginstall} -m 755 -o 0 -g 0 -d %{_sysconfdir}/X11/applnk/Multimedia
+    fi
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop
+  fi
+  # End Icons
+  # Gnome
+  if test -d /opt/gnome; then
+    if test ! -d /opt/gnome/share/pixmaps; then
+      %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/pixmaps
+    fi
+    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
+    if test -d /opt/gnome/share/gnome/apps/Multimedia; then
+      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
     else
-      %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/gnome/apps/Multimedia
-      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop
+      %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/gnome/apps/Multimedia
+      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop
+    fi
+  else
+    if test -d %{_datadir}/gnome/apps; then
+      if test -d %{_datadir}/gnome/apps/Multimedia; then
+        %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop
+      else
+        %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/gnome/apps/Multimedia
+        %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop
+      fi
     fi
   fi
-fi
-# End Gnome
-# Kde3
-if test -d /opt/kde3/; then
-  DIR_HI3=/opt/kde3/share/icons/hicolor
-  DIR_LO3=/opt/kde3/share/icons/locolor
-  HIRES3='48x48 32x32 22x22'
-  LORES3='32x32 22x22 16x16'
-  for hires in $HIRES3; do
-    %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI3/$hires/apps
-    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$hires.png $DIR_HI3/$hires/apps/xine.png
-  done
-  for lores in $LORES3; do
-    %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO3/$lores/apps
-    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$lores.png $DIR_LO3/$lores/apps/xine.png
-  done
-  if test ! -d /opt/kde3/share/applnk/Multimedia; then
-    %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde3/share/applnk/Multimedia
-  fi
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop
-  cat %{deskdir}/xine.desktop | sed -e "s/xine.xpm/\xine/g" > %{deskdir}/xine.desktop.kde
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde3/share/applnk/Multimedia/xine.desktop
-  rm %{deskdir}/xine.desktop.kde
-fi
-# End Kde3
-# Kde2
-if test -d /opt/kde2/; then
-  DIR_HI=/opt/kde2/share/icons/hicolor
-  DIR_LO=/opt/kde2/share/icons/locolor
-  HIRES='48x48 32x32 22x22'
-  LORES='32x32 22x22 16x16'
-  for hires in $HIRES; do
-    %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI/$hires/apps
-    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$hires.png $DIR_HI/$hires/apps/xine.png
-  done
-  for lores in $LORES; do
-    %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO/$lores/apps
-    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$lores.png $DIR_LO/$lores/apps/xine.png
-  done
-  if test ! -d /opt/kde2/share/applnk/Multimedia; then
-    %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
-  fi
-  cat %{deskdir}/xine.desktop | sed -e "s/xine.xpm/\xine/g" > %{deskdir}/xine.desktop.kde
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde2/share/applnk/Multimedia/xine.desktop
-  rm %{deskdir}/xine.desktop.kde
-else
-  if test -d %{_datadir}/applnk/Multimedia; then
-    if test ! -d %{_datadir}/applnk/Multimedia; then
-      %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/applnk/Multimedia
+  # End Gnome
+  # Kde3
+  if test -d /opt/kde3/; then
+    DIR_HI3=/opt/kde3/share/icons/hicolor
+    DIR_LO3=/opt/kde3/share/icons/locolor
+    HIRES3='48x48 32x32 22x22'
+    LORES3='32x32 22x22 16x16'
+    for hires in $HIRES3; do
+      %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI3/$hires/apps
+      %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$hires.png $DIR_HI3/$hires/apps/xine.png
+    done
+    for lores in $LORES3; do
+      %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO3/$lores/apps
+      %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$lores.png $DIR_LO3/$lores/apps/xine.png
+    done
+    if test ! -d /opt/kde3/share/applnk/Multimedia; then
+      %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde3/share/applnk/Multimedia
     fi
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop
+    cat %{deskdir}/xine.desktop | sed -e "s/xine.xpm/\xine/g" > %{deskdir}/xine.desktop.kde
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde3/share/applnk/Multimedia/xine.desktop
+    rm %{deskdir}/xine.desktop.kde
   fi
+  # End Kde3
+  # Kde2
+  if test -d /opt/kde2/; then
+    DIR_HI=/opt/kde2/share/icons/hicolor
+    DIR_LO=/opt/kde2/share/icons/locolor
+    HIRES='48x48 32x32 22x22'
+    LORES='32x32 22x22 16x16'
+    for hires in $HIRES; do
+      %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI/$hires/apps
+      %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$hires.png $DIR_HI/$hires/apps/xine.png
+    done
+    for lores in $LORES; do
+      %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO/$lores/apps
+      %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine_$lores.png $DIR_LO/$lores/apps/xine.png
+    done
+    if test ! -d /opt/kde2/share/applnk/Multimedia; then
+      %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
+    fi
+    cat %{deskdir}/xine.desktop | sed -e "s/xine.xpm/\xine/g" > %{deskdir}/xine.desktop.kde
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop.kde /opt/kde2/share/applnk/Multimedia/xine.desktop
+    rm %{deskdir}/xine.desktop.kde
+  else
+    if test -d %{_datadir}/applnk/Multimedia; then
+      if test ! -d %{_datadir}/applnk/Multimedia; then
+        %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/applnk/Multimedia
+      fi
+      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
+    fi
+  fi
+  # End Kde2
+  # Kde
+  if test -d /opt/kde; then
+    if test ! -d /opt/kde/share/icons; then
+      %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/icons
+    fi
+    if test ! -d /opt/kde/share/applnk/Multimedia; then
+      %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/applnk/Multimedia
+    fi
+    %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm /opt/kde/share/icons/xine.xpm
+    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
+  else
+    if test -d %{_datadir}/applnk/Multimedia; then
+      %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
+    fi
+  fi
+  # End Kde
 fi
-# End Kde2
-# Kde
-if test -d /opt/kde; then
-  if test ! -d /opt/kde/share/icons; then
-    %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/icons
-  fi
-  if test ! -d /opt/kde/share/applnk/Multimedia; then
-    %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/applnk/Multimedia
-  fi
-  %{ginstall} -m 644 -o 0 -g 0 %{_datadir}/pixmaps/xine.xpm /opt/kde/share/icons/xine.xpm
-  %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
-else
-  if test -d %{_datadir}/applnk/Multimedia; then
-    %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
-  fi
-fi
-# End Kde
 
 %preun
+if [ "$1" = "0" ]; then # remove
   DIR_HI=/opt/kde2/share/icons/hicolor
   DIR_LO=/opt/kde2/share/icons/locolor
   DIR_HI3=/opt/kde3/share/icons/hicolor
@@ -212,6 +215,7 @@ fi
   for lores in $LORES; do
     rm -f $DIR_LO3/$lores/apps/xine.png
   done
+fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -231,6 +235,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Fri Dec 06 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- do post and pre only when install and remove, saves entries at update
 * Sat Nov 16 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - replaced cvscompile.sh with autogen.sh
 * Sat Nov 09 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
