@@ -416,6 +416,8 @@ void deinit_session(void) {
     char          socketname[XITK_PATH_MAX + XINE_NAME_MAX + 1];
     struct stat   sstat;
     
+    going = 0;
+    close(ctrl_fd);
     sprintf(socketname, "%s/.xine/session.%d", (xine_get_homedir()), session_id);
     if(((stat(socketname, &sstat)) > -1) && (S_ISSOCK(sstat.st_mode)))
       unlink(socketname);
