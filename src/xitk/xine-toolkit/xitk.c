@@ -84,6 +84,10 @@ static int ml = 0;
 #define MUTUNLOCK() { pthread_mutex_unlock(&gXitk->mutex); }
 #endif
 
+#define FXLOCK(_fx) { pthread_mutex_lock(&_fx->mutex); }
+#define FXUNLOCK(_fx) { pthread_mutex_unlock(&_fx->mutex); }
+
+
 typedef struct {
   Window                      window;
   Atom                        XA_XITK;
@@ -112,6 +116,9 @@ typedef struct {
   xitk_register_key_t         key;
   xitk_dnd_t                 *xdnd;
   void                       *user_data;
+
+  pthread_mutex_t             mutex;
+  int                         destroy;
 } __gfx_t;
 
 typedef struct {
@@ -933,13 +940,13 @@ void xitk_set_wm_window_type(Window window, xitk_wm_window_type_t type) {
 xitk_widget_list_t *xitk_widget_list_new (void) {
   xitk_widget_list_t *l;
 
-  MUTLOCK();
-
   l = (xitk_widget_list_t *) xitk_xmalloc(sizeof(xitk_widget_list_t));
 
   l->widget_focused     = NULL;
   l->widget_under_mouse = NULL;
   l->widget_pressed     = NULL;
+
+  MUTLOCK();
 
   xitk_list_append_content(gXitk->list, l);
 
@@ -962,6 +969,7 @@ void xitk_change_window_for_event_handler (xitk_register_key_t key, Window windo
   
   while(fx) {
 
+    FXLOCK(fx);
     if(fx->key == key) {
 
       fx->window = window;
@@ -971,9 +979,12 @@ void xitk_change_window_for_event_handler (xitk_register_key_t key, Window windo
 	  xitk_unset_dnd_callback(fx->xdnd);
       }
       
+      FXUNLOCK(fx);
       MUTUNLOCK();
       return;
     }
+    
+    FXUNLOCK(fx);
     fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
 
@@ -1013,6 +1024,7 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
   fx->width     = 0;
   fx->height    = 0;
   fx->user_data = user_data;
+  pthread_mutex_init(&fx->mutex, NULL);
   
   if(window != None) {
     XWindowAttributes wattr;
@@ -1090,6 +1102,65 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
   return fx->key;
 }
 
+static void __fx_destroy(__gfx_t *fx, int locked) {
+  __gfx_t *cur;
+  
+  if(!fx)
+    return;
+  
+  if(!locked)
+    MUTLOCK();
+  
+  cur = (__gfx_t *) xitk_list_get_current(gXitk->gfx);
+  
+  if(fx->xdnd) {
+    xitk_unset_dnd_callback(fx->xdnd);
+    free(fx->xdnd);
+  }
+  
+  fx->xevent_callback = NULL;
+  fx->newpos_callback = NULL;
+  fx->user_data       = NULL;
+
+  free(fx->name);
+  
+  if(cur) {
+    if(cur == fx)
+      xitk_list_delete_current(gXitk->gfx); 
+    else {
+      __gfx_t *cfx;
+      
+      cfx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
+      while(cfx) {
+	if(cfx == fx) {
+	  xitk_list_delete_current(gXitk->gfx); 
+	  break;
+	}
+	
+	cfx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+      }
+      
+      /* set current back */
+      cfx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
+      while(cfx) {
+	
+	if(cfx == cur)
+	  break;
+	
+	cfx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+      }
+    }
+  }
+  
+  FXUNLOCK(fx);
+  pthread_mutex_destroy(&fx->mutex);
+
+  free(fx);
+  
+  if(!locked)
+    MUTUNLOCK();
+}
+
 /*
  * Remove from the list the window/event_handler
  * specified by the key.
@@ -1104,28 +1175,27 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
   
   while(fx) {
-    
-    if(fx->key == *key) {
-      *key = 0; 
-      
-      if(fx->xdnd) {
-	xitk_unset_dnd_callback(fx->xdnd);
-	free(fx->xdnd);
+
+    if(pthread_mutex_trylock(&fx->mutex)) {
+      if(fx->key == *key) {
+	*key        = 0; 
+	fx->destroy = 1;
+	MUTUNLOCK();
+	return;
       }
-
-      fx->xevent_callback = NULL;
-      fx->newpos_callback = NULL;
-      fx->user_data       = NULL;
-
-      xitk_list_delete_current(gXitk->gfx); 
-
-      free(fx->name);
-      free(fx);
-      fx = NULL;
-      
-      MUTUNLOCK();
-      return;
     }
+    else {
+      if(fx->key == *key) {
+	*key = 0; 
+	
+	__fx_destroy(fx, 1);
+	fx = NULL;
+	MUTUNLOCK();
+	return;
+      }
+    }
+
+    FXUNLOCK(fx);
 
     fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
@@ -1138,13 +1208,17 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
  */
 int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   __gfx_t  *fx;
-  
+
   MUTLOCK();
 
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
     
   while(fx) {
+    int  already_locked = 0;
     
+    if(pthread_mutex_trylock(&fx->mutex))
+      already_locked = 1;
+
     if((fx->key == key) && (fx->window != None)) {
       Window c;
       
@@ -1164,12 +1238,18 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
       winf->height = fx->height;
       winf->width  = fx->width;
       
+      if(!already_locked)
+	FXUNLOCK(fx);
+
       MUTUNLOCK();
       return 1;
 
     }
+    
+    if(!already_locked)
+      FXUNLOCK(fx);
+    
     fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
-
   }
 
   MUTUNLOCK();
@@ -1182,9 +1262,12 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
  */
 void xitk_xevent_notify(XEvent *event) {
   __gfx_t  *fx;
-    
-  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
-
+     
+  if(!(fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx)))
+    return;
+  
+  FXLOCK(fx);
+  
   if(gXitk->modalw != None) {
     while(fx && (fx->window != gXitk->modalw)) {
       
@@ -1253,6 +1336,7 @@ void xitk_xevent_notify(XEvent *event) {
 	      xitk_set_focus_to_next_widget(fx->widget_list, 0);
 	    }
 
+	    FXUNLOCK(fx);
 	    return;
 	  }
 	  
@@ -1262,6 +1346,7 @@ void xitk_xevent_notify(XEvent *event) {
 	      xitk_widget_t *m = xitk_menu_get_menu(w);
 	      
 	      xitk_menu_destroy(m);
+	      FXUNLOCK(fx);
 	      return;
 	    }
 	  }
@@ -1398,6 +1483,14 @@ void xitk_xevent_notify(XEvent *event) {
 	      
 	    }
 	  }
+	  
+	  if(fx->destroy) {
+	    __fx_destroy(fx, 0);
+	    fx = NULL;
+	  }
+	  else
+	    FXUNLOCK(fx);
+
 	  return;
 	}
 	break;
@@ -1612,23 +1705,41 @@ void xitk_xevent_notify(XEvent *event) {
       /* Don't forward event to all of windows */
       if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
 	fx->xevent_callback(event, fx->user_data);
-
+      
     }
-
+    
+    if(fx->destroy) {
+      __fx_destroy(fx, 0);
+      fx = NULL;
+    }
+    else
+      FXUNLOCK(fx);
+    
+#warning FIXME
     if(gXitk->modalw != None) {
       fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
 
       /* Flush remain fxs */
       while(fx && (fx->window != gXitk->modalw)) {
+	FXLOCK(fx);
+	
 	if(fx->xevent_callback && (fx->window != None && event->type != KeyRelease))
 	  fx->xevent_callback(event, fx->user_data);
-
+	
+	if(fx->destroy) {
+	  __fx_destroy(fx, 0);
+	  fx = NULL;
+	}
+	else
+	  FXUNLOCK(fx);
+	
 	fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
       }
       return;
     }
-    
-    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
+
+    if((fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx)))
+      FXLOCK(fx);
   }
 }
 
@@ -1816,7 +1927,8 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
   
   while(fx) {
-    
+    FXLOCK(fx);
+   
     if(fx->window != None && fx->widget_list) {
       XEvent xexp;
       
@@ -1833,6 +1945,8 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
       }
       XUNLOCK(gXitk->display);
     }
+
+    FXUNLOCK(fx);
     fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
 

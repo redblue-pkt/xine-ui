@@ -1196,15 +1196,19 @@ void *xitk_list_prev_content (xitk_list_t *l);
 void xitk_list_append_content (xitk_list_t *l, void *content);
 
 /**
- * Insert content in list. NOT IMPLEMENTED
+ * Insert content in list.
  */
 void xitk_list_insert_content (xitk_list_t *l, void *content);
 
 /**
- * Remove current content in list. NOT IMPLEMENTED
+ * Remove current content in list.
  */
 void xitk_list_delete_current (xitk_list_t *l);
 
+/**
+ * Return current content
+ */
+xitk_node_t *xitk_list_get_current(xitk_list_t *l);
 
 /*
  * *** Label Buttons
