@@ -187,13 +187,13 @@ static void _playlist_xine_play(void) {
       return;
     }
 
-    if(!mmk->sub)
-      xine_close(gGui->spu_stream);
-    else {
+    if(mmk->sub) {
       if(xine_open(gGui->spu_stream, mmk->sub))
 	xine_stream_master_slave(gGui->stream, 
 				 gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
     }
+    else
+      xine_close(gGui->spu_stream);
     
     if(!gui_xine_play(gGui->stream, 0, mmk->start, 0)) {
       enable_playback_controls(0);
