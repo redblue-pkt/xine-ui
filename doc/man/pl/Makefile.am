@@ -1,6 +1,6 @@
 mansubdir=/pl/man1
 
-man_MANS = xine.1 aaxine.1
+man_MANS = xine.1 aaxine.1 xine-remote.1
 
 EXTRA_DIST = $(man_MANS) xine.1.in aaxine.1.in
 

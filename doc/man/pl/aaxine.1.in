@@ -1,6 +1,6 @@
-.TH AAXINE 1 "PaÅ’dziernik 9, 2001" "Projekt xine"
+.TH AAXINE 1 "Sierpieñ 29, 2001" "Projekt xine"
 
-.SH NAME
+.SH NAZWA
 aaxine \- odtwarzacz wideo ASCII art
 
 .SH SK£ADNIA
@@ -30,14 +30,14 @@ co wspiera xinelib.
 Program na¶laduje sk³adniê wiersza poleceñ w stylu GNU, z d³ugimi nazwami
 opcji zaczynaj±cymi siê od podwójnego my¶lnika (`-').
 Lista opcji jest zebrana poni¿ej.
-Pe³nego opisu szukaj w dokumentach \fIREADME\fP i \fIFAQ\fP w katalogu
+Pe³nego opisu szukaj w dokumentach \fIREADME_pl\fP i \fIFAQ_pl\fP w katalogu
 \fI@XINE_DOCDIR@\fP lub na stronie g³ównej xine.
 .B
 .IP \-h,\ \-\-help
 Pokazuje listê opcji i dostêpnych sterowników wyj¶cia (wtyczek).
 Wielki bukiet opcji i dostêpnych sterowników wyj¶cia (wtyczek)
 jest udostêpniany przez aalib. Proszê siê odnie¶æ do dokumentacji aalib.
-
+.PP
 Pozosta³e opcje, nazwane
 .B opcjami AAXINE:
 gdy s± wylistowane przez "aaxine \-\-help", s± wyt³umacznoe poni¿ej.
@@ -67,83 +67,99 @@ Je¿eli \-R jest podany bez dodatkowej opcji, wybierany jest 'revert'.
 MRL jest podobny do URL w Twojej przegl±darce internetowej. One opisuj±
 medium z którego nale¿y czytaæ. Poprawnym MRL mo¿e byæ nazwa pliku, lub jeden z:
 .br
-.BR file://<¶cie¿ka>
+.BI file:/ <¶cie¿ka>
 .br
-.BR fifo://<¶cie¿ka>
+.BI fifo:/ <¶cie¿ka>
 .br
-.BR stdin://mpeg1
-or
-.BR "stdin://mpeg2"
+.BI stdin:/
 .br
-.BR "dvd://VTS_xx_y.VOB"
+.BI dvd:/ <tytu³> . <czê¶æ>
 .br
-.BR "vcd://<numer ¶cie¿ki>"
+.BI vcd:/ <numer ¶cie¿ki>
 .br
-.BR "tcp://<host>:<port>"
+.BI tcp:// <host> : <port>
 .br
-.BR "rtp://<host>:<port>"
+.BI rtp:// <host> : <port>
 .br
-.BR "udp://<host>:<port>"
+.BI udp:// <host> : <port>
+.br
+.BI mms:// <host>...
+.br
+.BI http:// <host>
 .LP
 Mo¿na zdefiniowaæ kilka MRL, aby odtwarzaæ jak±¶ ilo¶æ nastêpuj±cych
-po sobie sekwencji. Dodatkowo podane MRL pozwalaj± na okre¶lenie dodatowych typów
-no¶ników. Te wymienione powy¿ej s± dostêpne wraz z libxine.
+po sobie sekwencji. Dodatkowo podane MRL pozwalaj± na okre¶lenie dodatowych
+typów no¶ników. Te wymienione powy¿ej s± dostêpne wraz z libxine.
+.br
+Po separatorze
+.B #
+mo¿esz dodaæ kilka parametrów strumienia:
+.TP novideo
+Obraz bêdzie ignorowany
+.TP
+.B noaudio
+D¼wiêk bêdzie ignorowany
+.TP
+.B nospu
+Subobrazy bêd± ignorowane
+.TP
+.BI demux: <demux\ nazwa>
+Podaj nazwê demultipleksera która ma byæ u¿yta
+.TP
+.BI volume: <level>
+Ustaw g³o¶no¶æ d¼wiêku
+.TP
+.BI compression: <level>
+Ustaw dynamiczny zakres kompresji d¼wiêku
+.TP
+.IB <config\ entry> : <config\ value>
+Przypisz now± warto¶æ do jakiegokolwiek wpisu konfiguracji
 
 .SH KLAWISZE KONTROLNE
 Wiele funkcji mo¿e byæ kontrolowanych przez naci¶niêcie odpowiednich klawiszy.
 Skróty klawiszowe to:
-.LP
-.BR RETURN
-lub
-.BR R :
-Odtwarzaj
-.br
-.BR SPACE
-lub
-.BR P :
-Stop klatka
-.br
-.BR 0 :
-Przeskocz do pocz±tku bie¿±cej sekwencji
-.br
-.BR 1 .. 9 :
-Przeskocz do 10%..90% bie¿±cej sekwencji
-.br
-.BR PgUp :
-Przeskocz do poprzedniej sekwencji nali¶cie
-.br
-.BR PgDown :
-Przeskocz do nastêpnej sekwencji nali¶cie
-.br
-.BR + :
-Wybierz nastêpny kana³ audio (mo¿e trwaæ do kilku sekund)
-.br
-.BR \- :
-Wybierz poprzedni kana³ audio
-.br
-.BR Q :
-Zakoñcz pracê programu
+.IP "\fB<RETURN>\fP / \fBR\fP"
+Odtwarzanie
+.IP "\fB<SPACE>\fP / \fBP\fP"
+Pauza
+.IP "\fB0\fP"
+Przeskocz do pocz±tku bierz±cego strumienia
+.IP "\fB1\fP .. \fB9\fP"
+Przeskocz do 10%..90% bierz±cego strumienia
+.IP "\fB<PgUp>\fP"
+Przeskocz do poprzedniego strumienia na li¶cie odtwarzania
+.IP "\fB<PgDown>\fP"
+Przeskocz do nastêpnego strumienia na li¶cie odtwarzania
+.IP "\fB+\fP"
+Wybierz nastêpny kana³ d¼wiêku (mo¿e potrwaæ do kilku sekund)
+.IP "\fB\-\fP"
+Wybierz poprzedni kana³ d¼wiêku
+.IP "\fBQ\fP"
+Zakoñcz
 
 .SH B£ÊDY
 oczywi¶cie, ¿adnych ;-)
-
 No dobrze, jakie¶ na pewno s±. Mo¿esz prawdopodobnie poprosiæ o pomoc,
 (i zg³osiæ b³êdy) na naszej li¶cie dyskusyjnej
 pod adresem <xine-user@lists.sf.net>.
 
 .SH ZOBACZ RÓWNIE¯
-+ .BR xine (1),
-+ .UR http://xine.sourceforge.net/
-+ .BR http://xine.sf.net,
-+ .UE
-+ .UR http://aa-project.sourceforge.net/aalib/
-+ .BR http://aa-project.sf.net/aalib,
-+ .UE
+.BR xine (1),
+.UR http://xine.sourceforge.net/
+.BR http://xine.sf.net,
+.UE
+.UR http://aa-project.sourceforge.net/aalib/
+.BR http://aa-project.sf.net/aalib,
+.UE
 .BR xine-lib (3)
 
 .SH AUTOR
 Siggi Langauf for the xine project.
 .br
+
+.SH COPYRIGHT
 Copyright \(co 2001 The xine project
+
 .SH T£UMACZENIE
 Bart³omiej Muryn <_4ever_@irc.pl>
+

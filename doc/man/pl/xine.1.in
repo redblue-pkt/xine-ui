@@ -1,5 +1,15 @@
 .\" -*-Nroff-*-
 .\""
+.de Vb \" Begin verbatim text
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve \" End verbatim text
+.ft R
+
+.fi
+..
 .TH XINE 1x 2001-10-09 "Projekt xine"
 .\" NAZWY powinny byæ ca³e du¿ymi literami , SEKCJA powinna byæ 1-8, mo¿e z podsekcj±
 .\" inne parametry s± dozwolone: zobacz man(7), man(1)
@@ -12,19 +22,19 @@
 .I "[opcje] [MRL] ..."
 .SH "OPIS"
 Ta strona manuala skrótowo opisuje
-odtwarzacz audio/wideo
+odtwarzacz d¼wiêku/obrazu 
 .BR xine.
 .PP
 .B xine
-odtwarza sekwencje MPEG (audio and video), elementarne sekwencje MPEG
-(np. pliki .mp3 lub .mpv), pliki avi (u¿ywaj±c kodeków win32), (S)VCD
-i DVD.
+odtwarza sekwencje MPEG (obraz i d¼wiêk), elementarne sekwencje MPEG
+(np. pliki .mp3 lub .mpv), struminie transmisji mpeg, pliki ogg,
+pliki avi, asf, quicktime oraz DVD i (S)VCD.
 .SH OPCJE
 Program na¶laduje sk³adniê wiersza poleceñ w stylu GNU, z d³ugimi nazwami
 opcji zaczynaj±cymi siê od podwójnego my¶lnika (`-').
 Lista opcji jest zebrana poni¿ej.
-Pe³nego opisu szukaj w dokumentach \fIREADME\fP i \fIFAQ\fP w katalogu \fI@XINE_DOCDIR@\fP
-lub na stronie g³ównej
+Pe³nego opisu szukaj w dokumentach \fIREADME_pl\fP i \fIFAQ_pl\fP w katalogu \fI@XINE_DOCDIR@\fP
+lub na stronie g³ównej projektu
 .B xine
 .
 .TP
@@ -33,235 +43,555 @@ Pokazuje listê opcji i dostêpnych sterowników wyj¶cia (wtyczek).
 .TP
 .B \-a, \-\-audio\-channel <numer>
 Wybiera podany kana³ d¼wiêkowy. <numer> jest numerem kana³u d¼wiêkowego,
-domy¶lnym jest "0".
+domy¶lnym jest \fB0\fP.
 .br
-xine 0.5 i nowszy próbuje najlepiej jak umie skompletowaæ listê kana³ów
+xine 0.5 i nowszy próbuje najlepiej jak umie wyszukaæ listê kana³ów
 (ac3, mpeg audio, avi audio, ...) z sekwencji d¼wiêkowych i mapuje je
-do "kana³ów wirtualnych" z numerami kana³ów zaczynaj±cymi siê od "0".
+do "kana³ów wirtualnych" z numerami kana³ów zaczynaj±cymi siê od \fB0\fP.
 .TP
-.B \-V, \-\-video\-driver <sterownik wideo>
-Wybiera sterownik wideo. Spróbuj "xine --help" by otrzymaæ listê dostêpnych
-sterowników wideo w Twoim systemie. Ten wybór zostanie automatycznie zapisany
-do Twojego .xinerc wiêc musisz zdefiniowaæ sterownik wideo tylko raz.
+.B \-V, \-\-video\-driver <sterownik>
+Wybiera sterownik wideo. Spróbuj \fIxine\ \-\-help\fP by otrzymaæ listê
+dostêpnych sterowników wideo w Twoim systemie. Ten wybór zostanie
+automatycznie zapisany do Twojego \fI~/.xine/config\fP wiêc musisz
+zdefiniowaæ sterownik wideo tylko raz.
 .TP
 .B \-A, \-\-audio\-driver <sterownik d¼wiêku>
-Wybiera sterownik d¼wiêku. Sróbuj "xine --help" by otrzymaæ listê dostêpnych
-sterowników d¼wiêku w Twoim systemie. Ten wybór jest automatycznie zapisywany
-do Twojego .xinerc wiêc bêdziesz musia³ zdefiniowaæ sterownik d¼wiêku tylko raz.
+Wybiera sterownik d¼wiêku. Sróbuj \fIxine \-\-help\fP by otrzymaæ listê
+dostêpnych sterowników d¼wiêku w Twoim systemie. Ten wybór jest
+automatycznie zapisywany do Twojego .xinerc wiêc bêdziesz musia³ zdefiniowaæ
+sterownik d¼wiêku tylko raz.
 .TP
 .B \-u, \-\-spu\-channel <numer>
-Wybierz kana³ "podobrazu" (napisów)(napisy w DVD s± zapisane jako bitmapy
-a nie czcionka. przyp. t³um.).
-<numer> to numer kana³u napisów domy¶lnie jest "brak" (-1).
+Wybierz kana³ (podobrazu napisów).\fI<numer>\fP to numer kana³u napisów
+domy¶lnie jest bez (\fB\-1fP).
 .TP
-.B \-p[q][d][v], \-\-auto\-play=[q][d][v]
-Zaczyna odtwarzaæ od razy po starcie programu. Mo¿na dodaæ "q" ¿eby zakoñczyæ
-program po zakoñczeniu odtwarzania. Tak jak we wcze¶niejszych wersjach
-.B xine
-mo¿liwe jest równie¿ zapytanie o listê odtwarzania z DVD 'd', lub VCD 'v'.
-Teraz jest dostêpna opcja bardziej generalna
-.B \-\-auto\-scan.
-(patrz ni¿ej). Tak wiêc podopcje "d" i "v" mog± byæ usuniête pewnego dnia.
+.B \-p[q][d][v], \-\-auto\-play= [f][F][h][w][q][d][v]
+Zaczyna odtwarzaæ od razy po starcie programu. Mo¿na dodaæ:
+.br
+`\fIf\fP' w trybie pe³noekranowym,
+.br
+`\fIF\fP' w trybie pe³noekranowym xinerama,
+.br
+`\fIh\fP' ukryj GUI (panel g³ówny, etc...),
+.br
+`\fIw\fP' ukryj okno wyj¶cia obrazu,
+.br
+`\fIq\fP' aby zakoñczyæ program po zakoñczeniu odtwarzania,
+.br
+Jest równie¿ mo¿liwe pobranie listy odtwarzania z DVD `\fId\fP', lub
+VCD `\fIv\fP'.
+Jest teraz równie¿ bardziej ogólna opcja, \fI\-\-auto\-scan\fP (zobacz ni¿ej).
 .TP
-.B \-s <plugin>, \-\-auto\-scan <wtyczka>
-Automatycznie skanuj listê odtwarzania z wywo³anej wtyczki wej¶cia.
-Wiele wtyczek pozwala na odczyt domy¶lnych list odtwarzania, by móc odtwarzaæ
-"wszystko". To pracuje poprawnie, na przyk³ad, z DVD lub VCD. Podanie tej opcji
-daje ten sam efekt jak przyci¶niêcie odpowiedniego przycisku na g³ównym panelu
-.B xine.
+.BI \-s,\ \-\-auto\-scan\  <wtyczka>
+Automatycznie pobierz listê odtwarzania z wtyczki wej¶cia. Wiele wtyczek
+pozwala na odczyt domy¶lnej listy odtwarzania, aby odtworzyæ \fBwszystko\fP.
+To dzia³a w przypadku, np. DVD lub VCD. Podaj±c tak± opcjê daje taki sam
+effekt jak przyci¶niêcie odpowiedniego przycisku na panelu g³ównym xine.
 
-Opcja ta jest zw³aszcza u¿yteczna w kombinacji z automatycznym odtwarzaniem
-(
-.B \-\-auto\-play
-). Mo¿esz uruchomiæ "xine --auto-play --auto-scan dvd" aby
-odtworzyæ ca³y DVD bez naciskania ¿adnych dodatkowych przycisków. To dzia³a
-równie¿ z wtyczkami które nie s± dostarczane z
-.B xine
-, poprostu wpisz nazwê przycisku który jest dodany przez wtyczkê której chcesz u¿yæ.
+Ta opcja jest g³ównie przydatna w kombinacji z auto-odtwarzaniem. Mo¿esz
+wystartowaæ \fIxine\~\-\-auto\-play\~\-\-auto\-scan\~dvd\fP aby odtworzyæ
+ca³e DVD bez naciskania jakichkolwiek dodatkowych przycisków. To dzia³a równie¿
+z wtyczkami nie rozprowadzanymi z xine, po prostu podaj nazwê przycisku który
+wymagana wtyczka dodaje do panelu xine!
 .TP
 .B \-f, \-\-fullscreen
-Prze³±cz
-.B xine
-do trybu pe³noekranowego przy uruchomieniu (tak jak naci¶niêcie "F")
+Prze³±cz xine do trybu pe³noekranowego przy uruchomieniu (tak jak naci¶niêcie
+`\fBf\fP')
+.TP
+.B \-F,\ \-\-xineramafull
+Prze³±cz xine do trybu pe³noekranowego przy starcie (po prostu jak naci¶niêcie
+`\fBF\fP'). To znaczy, próbuje rozci±gn±æ wy¶wietlacz na kilka ekranów.
+Ekrany które maj± byæ u¿yte s± definiowane w pliku konfiguracyjnym.
 .TP
 .B \-g, \-\-hide\-gui
-Ukryj wszystkie okna interfejsu u¿ytkownika (z wyj±tkiem okna wideo) przy uruchomieniu.
-Dzia³a tak samo jak naci¶niêcie "G" w uruchomionym
-.B xine.
+Ukryj wszystkie okna GUI (z wyj±tkiem okna wy¶wietlania) przy starcie. Dzia³a
+tak samo jak naci¶niecie `\fBG\fP' podczas dzia³ania xine.
 .TP
-.B \-R, \-\-recognize\-by <opcja>
-Zmienia sposób w jaki
-.B xine
-próbuje rozpoznaæ typ sekwencji.
-Poprawne opcje to:
-.br
-"default" (najpierw po zawarto¶ci, potem po rozszerzeniu),
-.br
-"revert" (najpierw po rozszerzeniu, potem po zawarto¶ci),
-.br
-"content" (tylko po zawarto¶ci),
-.br
-"extension" (tylko po rozszerzeniu). Je¶li ¿adna opcja nie jest podana,
-.B xine
-wybierze "revert".
+.B \-H, \-\-hide\-video
+Ukryj okno wyj¶cia obrazu.
+.TP
+.B \-L, \-\-no\-lirc
+Wy³±cz obs³ugê LIRC. Ta opcja jest \fIdostêpna\~tylko\FP je¶li xine zosta³o
+skompilowane z obs³ug± LIRC.
 .TP
 .B \-\-visual <typ-wy¶witlania-lub-id>
-Próbuje u¿yæ specyficznego typu wy¶wietlania serwera X11 dla okien
-.B xine.
-Parametr <typ-wy¶wietlania-lub-id> jest albo nazw± typu wy¶wietlania X11
-(StaticGray, GrayScale, StaticColor, PseudoColor, TrueColor lub DirectColor),
-albo jego warto¶ci± szesnastkow±.
+Próbuje u¿yæ specyficznego typu wy¶wietlania serwera X11 dla okien xine.
+Parametr \fI<typ\-wy¶wietlania\-lub\-id>\fP jest albo nazw± typu wy¶wietlania
+X11 (\fBStaticGray\fP, \fBGrayScale\fP, \fBStaticColor\fP, \fBPseudoColor\fP,
+\fBTrueColor\fP or \fBDirectColor\fP) albo jego warto¶ci± \fBszesnastkow±\fP.
 
-Je¿eli u¿yte z nazw± typu wy¶witlania kolorów,
-.B xine
-próbuje znale¼æ taki typ sp¶ród g³êbii 15, lub 16, 24, 32, 8 (w tej kolejno¶ci).
-Domy¶lny typ wy¶wietlania u¿ywany przez
-.B xine
-w przypadku braku opcji
-.B \-\-visual
-to TrueColor.
-
-Je¿eli ¿adna g³êbia kolorów nie zostanie znaleziona,
-.B xine
-przeskoczy z powrotem do g³êbii u¿ytej przez g³ówne okno serwera X11.
+Je¿eli u¿yte z nazw± typu wy¶witlania kolorów, xine próbuje znale¼æ taki typ
+sp¶ród g³êbii \fB15\fP albo \fB16\fP, \fB24\fP, \fB32\fP lub \fB8\fP (w tej
+kolejno¶ci). Domy¶lny typ wy¶wietlania u¿ywany przez xine w przypadku braku
+opcji \fI\-\-visual\fP to \fBTrueColor\fP.
+Je¿eli ¿adna g³êbia kolorów nie zostanie znaleziona, xine przeskoczy z powrotem
+do g³êbii u¿ytej przez g³ówne okno serwera X11.
 .TP
 .B \-\-install
 Kiedy u¿yta jest wy¶witlanie X11 ze zmienn± map± kolorów, instaluje
-osobist± mapê kolorów dla
-.B xine.
-Z osobist± map± kolorów,
-.B xine
-mo¿e mapowaæ wiêcej kolorów tak ¿e wyj¶ciowy ekran wideo mo¿e wygl±daæ lepiej.
+osobist± mapê kolorów dla xine. Z osobist± map± kolorów, xine mo¿e mapowaæ
+wiêcej kolorów tak ¿e wyj¶ciowy ekran wideo mo¿e wygl±daæ lepiej.
+.TP
+.BI \-\-keymap\=[opcja]
+Wy¶wietl mapowanie klawiszy. Opcjami s±:
+.br
+`\fBdefault\fP' wy¶wietl domy¶lne mapowanie klawiszy,
+.br
+`\fBlirc\fP' wy¶wietl szablon pliku konfiguracyjnego \fI~/.lircrc\fP,
+.br
+`\fBremapped\fP' przemapowane przez u¿ytkownika mapowania klawiszy,
+.br
+Je¶li ¿adna opcja nie jest podana, wybrana zostaje `\fBdefault\fP'.
+.TP
+.B \-n, \-\-network
+Aktywuj sieciowy serwer zdalnej kontroli.
+Aby u¿ywaæ sieciowy serwer zdalnej kontroli, wymagany jest plik z has³em.
+Je¶li xine nie mo¿e go znale¼æ, serwer zostaje zatrzymany.
+Sk³adnia pliku hase³ na¶laduje dobrze znany schemat
+<\fIidentyfikator\fP>:<\fIhas³o\fP>.
+Poniewa¿ kryptografia jest obiektem prawnych problemów w niektórych krajach,
+has³o jest niezaszyfrowane jak równie¿ przesy³ane niezaszyfrowane, wiêc nale¿y
+zachowaæ szczególn± ostro¿no¶æ przy zdalnych po³±czeniach.
+Dwie dodatkowe (opcjonalne) zasady s± równie¿ dostêpne (jedna na raz):
+.nf
+\fBALL:ALLOW\fP or \fBALL:DENY\fP
+.fi
+W pierwszym przypadku, wszystkie klienty s± autoryzowane do wykonywania
+wszystkich dostêpnych komend, bez ograniczeñ. W drugim przypadku , nikt
+nie jest autoryzowany do wykonywania jakichkolwiek komend z wyj±tkiem
+zidentyfikowanych u¿ytkowników (u¿ywaj±cych komendy 'identify').
+
+Je¶li wpis has³a zaczyna siê od gwiazdki `\fB*\fP', u¿ytkownik jest blokowany.
+Je¶li wpis has³a jest pusty, ca³y wpis jest ignorowany. Oto przyk³ad ma³ego
+pliku hase³ \fI~/.xine/passwd\fP:
+.nf
+
+ALL:DENY
+daniel:mojehas³o
+foo:*
+
+.fi
+To pozwoli tylko 'danielowi' wykonywaæ komendy po udanym etapie identyfikacji.
+
+Domy¶lny port serwera to \fB6789\fP, ten numer jest absolutnie dowolny.
+Mo¿esz po³±czyæ siê z serwerem u¿ywaj±c prostej komendy \fItelnet\fP:
+.nf
+\fBtelnet\~localhost\~6789\fP
+.fi
+Aby zmieniæ domy¶lny port, mo¿esz (jako root) wyedytowaæ swój
+\fI/etc/services\fP, i dodaæ podobny wpis:
+.nf
+
+xinectl    7890/tcp        # xine control
+
+.fi
+to zmieni domy¶lny port z 6789 na 7890, i stworzy serwis nazwany \fIxinectl\fP.
+
+Serwer jako taki oferuje nastêpuj±c± pomoc/sk³adnie komend:
+.br
+.BI help\  [komenda]
+.br
+Bez podanej \fIkomendy\fP, zostan± wy¶wietlone wszystkie mo¿liwe komendy.
+Je¶li komenda jest podana, wy¶wietlony zostanie krótki tekst opisuj±cy
+funkcjonalno¶æ tej komendy.
+.br
+.BI syntax\  <komenda>
+.br
+Wy¶wietla sk³adniê \fIkomendy\fP.
+.TP
+.B \-R, \-\-root
+U¿yj okna g³ównego jako okna wyj¶cia obrazu.
+.TP
+.BI \-G,\ \-\-geometry\  <WxH[+X+Y]>
+Mo¿na ustawiæ rozmiar i pozycjê okna wyj¶cia obrazu u¿ywaj±c geometrii znanej z
+X windows (patrz \fBX\fR(7)). \fBX\fP i \fBY\fP to parametry opcjonalne.
+.TP
+.B \-B, \-\-borderless
+Usuñ obramowanie okna wyj¶cia obrazu w trybie okienkowym.
+.TP
+.B \-P, \-\-playlist <nazwa_pliku>
+U¿yj pliku jako listy odtwarzania. Rozpoznawane formaty to: asx, toxine, m3u,
+pls, sfv i plik textowy.
+.TP
+.B \-l, \-\-loop [mode]
+Ustaw tryb powtarzania listy odtwarzania. Je¶li tryb nie zostanie podany,
+zostanie u¿yty \fBloop\fP jako domy¶lny. Obs³ugiwane tryby to:
+.br
+\fBloop\fP: powtarzanie ca³ej listy.
+.br
+\fBrepeat\fP: powtarzanie aktualnej pozycji z listy.
+.br
+\fBshuffle\fP: wybierz losowo jeszcze nie odtwarzan± pozycjê z listy.
+.br
+\fBshuffle\+\fP: to samo co shuffle, ale w nieskoñczono¶æ powtarzaj listê.
 .TP
 .B MRL (media resource locator)
 .br
-MRL jest podobny do URL w Twojej przegl±darce internetowej. One opisuj±
-medium z którego nale¿y czytaæ. Poprawnym MRL mo¿e byæ nazwa pliku, lub jeden z:
-.BR file://<¶cie¿ka>
+MRL jest podobny do URL w Twojej przegl±darce internetowej. Opisuj± one
+no¶nik z którego nale¿y czytaæ. Poprawnym MRL mo¿e byæ nazwa pliku, lub jeden z:
 .br
-.BR fifo://<¶cie¿ka>
+.BI file: <¶cie¿ka>
 .br
-.BR stdin://mpeg1
-or
-.BR "stdin://mpeg2"
+.BI fifo: <¶cie¿ka>
 .br
-.BR "dvd://VTS_xx_y.VOB"
+.B stdin:/
 .br
-.BR "vcd://<numer ¶cie¿ki>"
+.BI dvd:/ <tytu³> . <rozdzia³>
 .br
-.BR "tcp://<host>:<port>"
+.BI vcd:/ <numer ¶cie¿ki>
 .br
-.BR "rtp://<host>:<port>"
+.BI tcp:// <host> : <port>
 .br
-.BR "udp://<host>:<port>"
+.BI rtp:// <host> : <port>
+.br
+.BI udp:// <host> : <port>
+.br
+.BI http:// <host>
 .LP
 Mo¿na zdefiniowaæ kilka MRL, aby odtwarzaæ jak±¶ ilo¶æ nastêpuj±cych
-po sobie sekwencji.
+po sobie sekwencji. Dodatkowe wtyczki wej¶cia wzbogacaj± listê dostêpnych MRL.
+Te wymienione powy¿ej s± dostêpne z libxine...
 .LP
-Je¶li nie zdefiniujesz ¿adnego MRL'a, bêdziesz musia³ wybrany plik przeci±gn±æ
-myszk± na okno panela
-.B xine.
-Przeci±ganie i upuszczanie pliku by³o przetestowane z
-GNOME Midnight Commander (gmc).
-.SH ZOBACZ TAK¯E
-Program jest w pe³ni udokumentowany na stronie g³ównej
-.B xine
-:
+Je¶li nie zdefiniujesz ¿adnego MRL'a, bêdziesz musia³ wybraæ plik poprzez
+"przeci±gnij i upu¶æ". Dzia³a to z \fBGNOME\~Midnight\~Commander\fP (gmc),
+\fBNautilusem\fP i \fBKonquerorem\fP.
+.TP
+.B pliki napisów avi
+.br
+Pliki tekstowe napisów mog± byæ dodane do pliku MRL (odseparowane znakiem `?'):
+.br
+.BI file:// <¶cie¿ka> ? <plik_z_napisami>
+.TP
+.B opcje strumieni
+.br
+Po separatorze
+.B #
+mo¿na dodaæ ró¿ne parametry strumienia:
+.TP
+.B novideo
+obraz bêdzie ignorowany
+.TP
+.B noaudio
+d¼wiêk bêdzie ignorowany
+.TP
+.B nospu
+subobrazy bêd± ingorowane
+.TP
+.BI demux: <nazwa demultipleksera>
+podaj nazwê wtyczki demultipleksera
+.TP
+.BI volume: <poziom>
+ustawia g³o¶no¶æ d¼wiêku
+.TP
+.BI compression: <poziom>
+ustawia dynamiczny zakres kompresji d¼wiêku
+.TP
+.IB <config\ wpis> : <config\ warto¶æ>
+przypisuje now± warto¶æ do jakiegokolwiek wpisu konfiguracji
+.SH KLAWISZE KONTROLNE
+Wiele funkcji mo¿e byæ kontrolowanych przez naci¶niêcie odpowiednich klawiszy.
+'\fBM\-\fP' to modyfikator (klawisz `\fBAlt\fP' na klawiaturze PC), '\fBC\-\fP'
+to klawisz Control `\fBCTRL\fP', inne klawisze specjalne s± zamkniête znakami
+'\fB<\fP' i '\fB>\fP', np:
+klawisz `\fBHOME\fP' jest wy¶wietlany jako \fB<home>\fP.
+Domy¶lne mapowania klawiszy to:
+.IP "\fB0\fP .. \fB9\fP"
+Przeskocz do 0%....90% aktualnego strumienia
+.IP "\fB/\fP"
+Przeskocz do miejsca okre¶lonego przez warto¶æ numerycznego argumentu
+(w procentach). Jest to bardziej ogólne zastosowanie ni¿ powy¿sze komendy
+0...9. Zobacz równie¿ sekcjê "Wprowadzanie numerów" poni¿ej.
+.IP "\fBA\fP"
+Prze³±cz proporcje ekranu (AUTO/16:9/4:3/DVB)
+.IP "\fBC\fP\-\fBa\fP"
+Dodaj do listy odtwarzania znak no¶nika, z obecnej pozycji odtwarzania
+strumienia.
+.IP "\fBM\fP\-\fBC\fP"
+Poka¿/Ukryj okno ustawieñ obrazu.
+.IP "\fBE\fP"
+Wysuñ bierz±cy no¶nik.
+.IP "\fBf\fP"
+Prze³±cz tryb pe³noekranowy.
+.IP "\fBF\fP"
+Prze³±cz tryb pe³noekranowy xinerama.
+.IP "\fBG\fP"
+Ukryj/poka¿ GUI (Graficzny Interfejs U¿ytkownika)
+.IP "\fBH\fP"
+Ukryj/poka¿ okno wy¶wietlania obrazu.
+.IP "\fBi\fP | \fBI\fP"
+Prze³±cz tryby korekty przeplotu.
+.IP "\fBl\fP"
+Prze³±cz pomiêdzy trybami powtarzania.
+.IP "\fBM\fP\-\fBl\fP"
+Poka¿/Ukryj okno logów.
+.IP "\fBM\fP\-\fBm\fP"
+Poka¿/ukryj przegl±darkê MRL
+.IP "\fBC\fP\-\fBm\fP"
+Prze³±czenie trybu wyciszania d¼wiêku (mute).
+.IP "\fBCM\fP\-\fBo\fP"
+Prze³±cz system TV na karcie DXR3.
+.IP "\fBC\fP\-\fBo\fP"
+Otwórz przegl±darkê plików.
+.IP "\fBM\fP\-\fBp\fP"
+Poka¿/ukryj okno listy odtwarzania.
+.IP "\fBQ\fP"
+Wyj¶cie.
+.IP "\fBd\fP"
+Prze³±cz monitor w tryb oszczêdzania energi DPMS.
+.IP "\fBs\fP"
+Zoom 1:1.
+.IP "\fBS\fP"
+Zatrzymaj odtwarzanie.
+.IP "\fBM\fP\-\fBs\fP"
+Poka¿/ukryj okno ustawieñ.
+.IP "\fBz\fP | \fBZ\fP"
+Zoom - powiêkszanie/pomniejszanie.
+.IP "\fBM\fP\-\fBC\fP\-\fBz\fP"
+Resetowanie powiêkszenia.
+.IP "\fBv\fP"
+Zmniejsz g³o¶no¶æ d¼wiêku.
+.IP "\fBV\fP"
+Zwiêksz g³o¶no¶æ d¼wiêku.
+.IP "\fBt\fP"
+Zrób zdjêcie - zrzut obrazu.
+.IP "\fB<return>\fP"
+Odtwarzaj
+.IP "\fB<space>\fP"
+Stopklatka
+.IP "\fB<up>\fP | \fB<down>\fP"
+Szybkie przewijanie / zwolnienie
+.IP "\fBC\fP\-\fB<left>\fP | \fBC\fP\-\fB<right>\fP"
+Przeskocz o -+15 sek.
+.IP "\fB<left>\fP | \fB<right>\fP"
+Przeskocz o -+60 sek.
+.IP "\fB<page\ up>\fP"
+Przeskocz do poprzedniego strumienia na li¶cie odtwarzania.
+.IP "\fB<page\ down>\fP"
+Przeskocz do nastêpnego strumienia na li¶cie odtwarzania.
+.IP "\fB<\fP"
+Zmniejsz okno wy¶wietlania.
+.IP "\fB>\fP"
+Zwiêksz okno wy¶wietlania.
+.IP "\fBM\fP\-\fB1\fP"
+Ustaw rozmiar okna wy¶wietlania na 50%
+.IP "\fBM\fP\-\fB2\fP"
+Ustaw rozmiar okna wy¶wietlania na 100%
+.IP "\fBM\fP\-\fB3\fP"
+Ustaw rozmiar okna wy¶wietlania na 200%
+.IP "\fB.\fP"
+Wybierz nastêpny kana³ napisów.
+.IP "\fB,\fP"
+Wybierz poprzedni kana³ napisów.
+.IP "\fB+\fP"
+Wybierz nastêpny kana³ d¼wiêku (mo¿e potrwaæ do kilku sekund)
+.IP "\fB-\fP"
+Wybierz poprzedni kana³ d¼wiêku
+.IP "\fB<Esc>\fP"
+Menu 1 (np. g³ówne menu)
+.IP "\fB<F1>\fP"
+Menu 2 (np. menu rozdzia³u)
+.IP "\fB<F2>\fP"
+Menu 3
+.IP "\fB<Insert>\fP"
+Prze³±cz widoczno¶æ kursora.
+.IP "\fBM\fP\-\fBe\fP"
+Poka¿/ukryj okno Nawigatora.
+.IP "\fBM\fP\-\fBi\fP"
+Poka¿ ukryj okno wy¶wietlania informacji o strumieniu.
+.IP "\fBC\fP\-\fBt\fP"
+Prze³±cz tryb wy¶wietlania pomiêdzy MRL a identyfikatorem.
+.IP "\fBC\fP\-\fBs\fP"
+Uaktualnij informacje o strumieniach listy odtwarzania (je¶li mo¿liwe)
+.IP "\fBC\fP\-\fBe\fP"
+W oknie listy odtwarzania, u¿ywaj±c tego skrótu mo¿na zmieniæ zawarto¶æ
+znacznika no¶nika (takie jak identyfikator, mrl, czast startu i zatrzymania).
+
+.SS Zewnêtrzne wtyczki
+Nastêpuj±ce skróty s± u¿ywane przez wtyczki zewnêtrzne, generalnie do nawigacji
+DVD:
+.IP "\fB<KeyPad\ Up>\fP"
+Góra.
+.IP "\fB<KeyPad\ Down>\fP"
+Dó³.
+.IP "\fB<KeyPad\ Left>\fP"
+Lewo.
+.IP "\fB<KeyPad\ Right>\fP"
+Prawo.
+.IP "\fB<KeyPad\ Prior>\fP"
+Wstecz.
+.IP "\fB<KeyPad\ Next>\fP"
+Naprzód.
+.IP "\fB<KeyPad\ End>\fP"
+Poprzedni k±t kamery.
+.IP "\fB<KeyPad\ Home>\fP"
+Nastêpny k±t kamery.
+.IP "\fB<KeyPad\ Enter>\fP"
+Wybierz.
+
+.SS Dostrajanie synchronizacji
+Niektóre strumienie maj± b³êdne znaczniki czasu, wiêc synchronizacja siê nie
+udaje. Mo¿na to poprawiæ u¿ywaj±c nastêpuj±cych klawiszy:
+.IP "n | N"
+Naci¶nij je¶li d¼wiêk nie nad±¿a za obrazem
+.IP "m | "
+Naci¶nij je¶li obraz nie nad±¿a za d¼wiêkiem
+.IP "\fB<home>\fP"
+Naci¶nij aby zresetowaæ ustawienia przesuniêæ na \fB0\fP, tak aby znaczniki
+czasu strumienia pozosta³y niezmienione.
+
+.SS Wprowadzanie numerów
+Jest mo¿liwe podawanie numerycznych skrótów, pomimo ¿e dla wstecznej
+kompatybilno¶ci klawisze numeryczne nie s± przypisane do ich cyfrowej
+warto¶ci. Co wiêcej, cyfry od 0 do 9 s± przypisane do symboli które nie mog±
+normalnie byæ wprowadzone z klawiatury. Dlatego mo¿liwo¶æ wprowadzania
+numerów jest domy¶lnie wy³±czona. Mo¿na, jednak, to zmieniæ przez
+prze³±czenie warto¶ci modyfikatora "SetPosition\fI<X>\fR%" i "Number\fI<Y>\fR"	(gdzie \fI<X>\fR jest 0, 10, ... 90, i \fI<Y>\fR jest 0..9). W szczególno¶ci
+nale¿y zast±piæ poni¿sze linie w pliku mapowania klawiszy \fI~/.xine/keymap\fP.
+
+.Vb 119
+# Ustaw pozycjê na pocz±tek lub 10...90% aktualnego strumienia.
+SetPosition0% {
+        key = 0
+        modifier = mod3
+}
+SetPosition10% {
+        key = 1
+        modifier = mod3
+}
+SetPosition20% {
+        key = 2
+        modifier = mod3
+}
+SetPosition30% {
+        key = 3
+        modifier = mod3
+}
+SetPosition40% {
+        key = 4
+        modifier = mod3
+}
+SetPosition50% {
+        key = 5
+        modifier = mod3
+}
+SetPosition60% {
+        key = 6
+        modifier = mod3
+}
+SetPosition70% {
+        key = 7
+        modifier = mod3
+}
+SetPosition80% {
+        key = 8
+        modifier = mod3
+}
+SetPosition90% {
+        key = 9
+        modifier = mod3
+}
+
+# Wprowad¼ numery od 0 do  9.
+Number0 {
+        key = 0
+        modifier = none
+}
+Number1 {
+        key = 1
+        modifier = none
+}
+Number2 {
+        key = 2
+        modifier = none
+}
+Number3 {
+        key = 3
+        modifier = none
+}
+Number4 {
+        key = 4
+        modifier = none
+}
+Number5 {
+        key = 5
+        modifier = none
+}
+Number6 {
+        key = 6
+        modifier = none
+}
+Number7 {
+        key = 7
+        modifier = none
+}
+Number8 {
+        key = 8
+        modifier = none
+}
+Number9 {
+        key = 9
+        modifier = none
+}
+.Ve
+.PP
+Dokonuj±c powy¿szych zmian, mo¿esz podaæ numeryczny argument do komendy,
+wprowadzaj±c numer i nastêpnie klawisz funkcyjny. Np. wprowadzaj±c "99/",
+to jest klawisz "9" dwa razy a nastêpnie klawisz "/", mo¿na przeskoczyæ do
+99% bierz±cego strumienia.
+.PP
+Nowa eksperymentalna wtyczka VCD/SVCD, VCDX, pozwala na niektóre wprowadzania
+numerów. Wprowadzaj±c numer i nastêpuj±cy po nim sygna³ "wybierz"
+(domy¶lnie Enter na numerycznej klawiaturze), mo¿na przej¶æ do podanego
+"Rozdzia³u" (¶cie¿ki lub pozycji) lub numeru selekcji. Jako ¿e jest to
+relatywnie nowa funkcjonalno¶æ, mo¿liwe ¿e z czasem wiêcej wtyczek bêdzie
+u¿ywaæ wprowadzania numerów.
+.PP
+Inne komendy które mog± byæ numeryczne, poprzedzone numerów argumentem s±
+nastêpny/poprzedni MRL, (\fBMRL_NEXT\fP, \fBMRL_PRIOR\fP), nastêpny/poprzedni
+kana³ napisów (\fBSPU_NEXT\fP, \fBSPU_PRIOR\fP), i nastêpny/poprzedni kana³
+d¼wiêku (\fBAUDIOCHAN_NEXT\fP, \fBAUDIOCHAN_PRIOR\fP). Z numerycznym prefiksem
+to tak jak by wykonaæ dan± komendê okre¶lon± ilo¶æ razy. Tutaj argument "0"
+jest interpretowany jako "1" bo inaczej by³by bez znaczenia.
+.PP
+U¿ycie wprowadzania numerów ma raczej ograniczon± warto¶æ u¿ytkow±. Z czasem
+mo¿e zostanie zaimplementowanych wiêcej takich jak np. podawanie okre¶lonego
+albo absolutnego MRL, kana³u napisów lub kana³u d¼wiêku.
+
+.SH PLIKI
+.TP \w'~/.xine/passwdXX'u
+~/.xine/config
+G³ówny plik konfiguracyjny xine
+.TP
+~/.xine/keymap
+Mapowanie klawiszy xine-ui
+.TP
+~/.xine/passwd
+Plik hase³ xine-ui
+.TP
+~/.xine/xinerc
+Dodatkowe argumenty lini poleceñ
+.br
+Ka¿da linia okre¶la dodatkowy argument lini poleceñ (jeden argument na liniê):
+.nf
+\-\-geometry 720x576+0+0
+\-\-network
+\-s DVD
+\-p
+.fi
+.SH ZOBACZ RÓWNIE¿
+\fBxine-remote\fP(1).
+.br
+Program jest w pe³ni udokumentowany na stronie domowej projektu xine:
 .UR http://xine.sourceforge.net/
 .IR "http://xine.sourceforge.net/"
 .UE
-.SH KLAWISZE KONTROLNE
-Wiele funkcji mo¿e byæ kontrolowanych przez naci¶niêcie odpowiednich klawiszy.
-Skróty klawiszowe to:
-.LP
-.BR RETURN :
-Odtwarzaj
-.br
-.BR SPACE
-lub
-.BR P :
-Stop klatka
-.br
-.BR UP/DOWN :
-szybki podgl±d / zwolnienie
-.br
-.br
-.BR F :
-Prze³±cza tryb pe³noekranowy.
-.br
-.BR G :
-Ukryj/odkryj interfejs u¿ytkownika.
-.br
-.BR H :
-Ukryj/odkryj okno wy¶wietlania wideo.
-.br
-.BR A :
-Prze³±cz proporcje ekranu (AUTO/16:9/4:3/DVB) 
-.br
-.BR B :
-Ukryj/odkryj przegl±darkê MRL.
-.br
-.BR C :
-Ukryj/odkryj okno ustawieñ wideo.
-.br
-.BR E :
-Wysuñ aktualnie u¿ywane media.
-.br
-.BR 0 :
-Przeskocz do pocz±tku bie¿±cej sekwencji
-.br
-.BR 1..9 :
-Przeskocz do 10%..90% bie¿±cej sekwencji
-.br
-.BR Left/Right :
-Szukaj -+ 15 sek. (+CTRL: 60 sek.)
-.br
-.BR PgUp :
-Przeskocz do poprzedniej sekwencji nali¶cie
-.br
-.BR PgDown :
-Przeskocz do nastêpnej sekwencji nali¶cie
-.br
-.BR + :
-Wybierz nastêpny kana³ audio (mo¿e trwaæ do kilku sekund)
-.br
-.BR - :
-Wybierz poprzedni kana³ audio
-.br
-.BR > :
-Powiêksz okno odtwarzania.
-.br
-.BR . :
-Wybierz nastêpny kana³ napisów.
-.br
-.BR < :
-Zmniejsz okno odtwarzania..
-.br
-.BR , :
-Wybierz poprzedni kana³ napisów.
-.br
-.BR Q :
-Zakoñcz dzia³anie programu.
-.br
-.SH DOSTRAJANIE SYNCHRONIZACJI
-Niektóre sekwencje maj± b³êdne znaczniki czasu, wiêc synchronizacja nie dzia³a.
-Mo¿na to skorygowaæ u¿ywaj±c klawiszy:
-.br
-.BR n :
-naci¶nij je¶li wideo odgrywane jest przed d¼wiêkiem.
-.br
-.BR m :
-naci¶nij je¶li wideo spó¼nia siê za d¼wiêkiem.
-.br
-.BR Home :
-naci¶nij by zresetowaæ opó¼nienie wideo/d¼wiêk do "0",
-aby znaczniki czasu pozosta³y nie zmienione.
-
-.SH AUTORZY
+.SH AUTOR
 Ta strona manuala zosta³a napisana przez Siggi'ego Langauf'a <siggi@debian.org>,
-dla projektu
-.B xine.
-Du¿o dodatków Guenter Bartsch <guenter@users.sourceforge.net> i
+dla projektu xine. Du¿o dodatków:
+Guenter Bartsch <guenter@users.sourceforge.net>
 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+Rocky Bernstein <rocky@panix.com>, i
+Philipp Hahn <pmhahn@users.sourceforge.net>.
 .SH T£UMACZENIE
 Bart³omiej Muryn <_4ever_@irc.pl>
+

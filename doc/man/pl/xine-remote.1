@@ -1,0 +1,74 @@
+.\" -*-Nroff-*-
+.\""
+.\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
+.\" other parms are allowed: see man(7), man(1)
+.\""
+.TH XINE-REMOTE 1x 2002-04-16 "Projekt xine"
+.SH NAZWA
+xine-remote \- ma³e narzêdzie do ³±czenia siê z serwerem zdalnej kontroli xine.
+.SH SK£ADNIA
+.B xine-remote
+.I [opcje]
+.SH OPIS
+Ta strona manuala opisuje w skrócie narzêdzie
+.BR xine-remote
+\.
+.PP
+.B xine-remote
+mo¿e zast±piæ \fIsurowe\fP, telnetowe po³±czenie do serwera zdalnej kontroli xine. U¿ywa on programów wspomagaj±cych \fBreadline\fP (uzupe³nianie, skróty vi/emacs, historia poleceñ, etc...).
+Domy¶lnie, próbuje on po³±czyæ siê lokalnie, u¿ywaj±c domy¶lnego portu (patrz
+\fIxine\fP(1)).
+.SH OPCJE
+Program  na¶laduje  sk³adniê  wiersza  poleceñ  w  stylu GNU, z d³ugimi nazwami
+opcji zaczynaj±cymi siê od podwójnego  my¶lnika  (\`\-\').
+Skrót opcji zamieszczony jest poni¿ej
+.TP
+.BR \-H,\ \-\-host\  <nazwa_hosta>
+Próbuj po³±czyæ do <\fBnazwa_hosta\fP>.
+.TP
+.BR \-P,\ \-\-port\  <port>
+Próbuj po³±czyæ z hostem u¿ywaj±c <\fBport\fP>.
+.TP
+.BR \-c,\ \-\-command\  <polecenie>
+Wy¶lij \fBpolecenie\fP do serwera i zamknij po³±czenie.
+Polecenie powinno znajdowaæ siê miêdzy apostrofami je¿eli zawiera spacje, lub
+znaki specjalne. 
+.TP
+.BR \-n,\ \-\-noconnect
+Nie próbuj siê po³±czyæ przy starcie
+.TP
+.BR \-v,\ \-\-version
+Wy¶wietl wersjê programu
+.TP
+.BR \-h,\ \-\-help
+Wy¶wietla skrót pomocy
+.br
+.SH POLECENIA
+Jest dostêpnych kilka poleceñ, które s± u¿ywane do otwierania i zamykania
+po³±czeñ:
+.TP
+.B ?
+Wy¶wietla dostêpne polecenia (programu xine-remote + serwera je¶li po³±czenie
+jest ustanowione).
+.TP
+.B version
+Wy¶wietla wersjê.
+.TP
+.BR open\  <serwer[:port]>
+Otwiera po³±czenie do \fBserwera\fP. Mo¿na opcjonalnie podaæ \fBport\fP
+u¿ywaj±c separatora (\fB:\fP).
+.TP
+.B close
+Zamknij po³±czenie.
+.TP
+.B quit
+Zakoñcz xine-remote.
+.SH "ZOBACZ RÓWNIE¯"
+.BR xine (1).
+
+.SH AUTHOR
+Ten podrêcznik zosta³ napisany przez Daniel Caujolle-Bert <f1rmb@users.sourceforge.net> dla projektu xine.
+
+.SH T£UMACZENIE
+Bart³omiej Muryn <_4ever_@irc.pl>
+
