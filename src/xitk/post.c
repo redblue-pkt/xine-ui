@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2004 the xine project
+ * Copyright (C) 2000-2005 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -2073,7 +2073,7 @@ void pplugin_parse_and_store_post(const char *post_chain) {
     }
     else {
       gGui->post_elements     = posts;
-      gGui->post_elements_num = num;;
+      gGui->post_elements_num = num;
     }
   }
   

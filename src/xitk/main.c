@@ -1331,8 +1331,10 @@ int main(int argc, char *argv[]) {
   int                     retval           = 0;
   
 #ifdef HAVE_SETLOCALE
-  if((xitk_set_locale()) != NULL)
+  if((xitk_set_locale()) != NULL) {
     setlocale(LC_ALL, "");
+    setlocale(LC_NUMERIC, "C");
+  }
 #endif
 
   bindtextdomain(PACKAGE, XITK_LOCALE);

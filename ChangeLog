@@ -3,6 +3,7 @@
   * merge some osd menus from oxine
   * aspect ratio fixed for multihead setups (especially TwinView)
     [bugs #1089328, #1001702 and #989157]
+  * fixed parsing post plugin parameters of type double for some locales
   
 xine-ui (0.99.3) unstable; urgency=low
   * enlarge stream info window (required for Russian translation),
