@@ -30,7 +30,7 @@ plays MPEG system (audio and video) streams, mpeg elementary streams
 avi files, asf files, quicktime files, (S)VCDs and DVDs.
 .SH OPTIONS
 The programs follow the usual GNU command line syntax, with long
-options starting with two dashes (\`\-\').
+options starting with two dashes (`--').
 A summary of options are included below.
 For a complete description, see README and FAQ in \fI@prefix@/share/doc/xine-ui\fP
 or on the xine home page.
@@ -38,43 +38,43 @@ or on the xine home page.
 .B \-h, \-\-help
 Show summary of options and available output drivers (plugins).
 .TP
-.B \-a, \-\-audio\-channel <num>
-Select the given audio channel. \fB<num>\fP is the audio channel number, default
+.BI \-a,\ \-\-audio\-channel\  <num>
+Select the given audio channel. \fI<num>\fP is the audio channel number, default
 is \fB0\fP.
 .br
 xine 0.5 and newer tries its best to collect all valid audio channels
 (ac3, mpeg audio, avi audio, ...) from the stream and maps them
 to "virtual channels" with channel numbers starting at \fB0\fP.
 .TP
-.B \-V, \-\-video\-driver <drv>
+.BI \-V,\ \-\-video\-driver\  <drv>
 Select video driver. Check out \fIxine\ \-\-help\fP for a list of available
 video output plugins on your system. This selection is stored automatically
-in your \fB~/.xine/config\fP so you'll have to specify the video driver only once.
+in your \fI~/.xine/config\fP so you'll have to specify the video driver only once.
 .TP
-.B \-A, \-\-audio\-driver <drv>
+.BI \-A,\ \-\-audio\-driver\  <drv>
 Select audio driver. Check out \fIxine \-\-help\fP for a list of available
 audio output plugins on your system. This selection is stored automatically
-in your \fB~/.xine/config\fP so you'll have to specify the audio driver only once.
+in your \fI~/.xine/config\fP so you'll have to specify the audio driver only once.
 .TP
-.B \-u, \-\-spu\-channel <num>
-Select subpicture (subtitle) channel. \fB<num>\fP is the subpicture channel
+.BI \-u,\ \-\-spu\-channel\  <num>
+Select subpicture (subtitle) channel. \fI<num>\fP is the subpicture channel
 id, default is no subtitle (\fB\-1\fP).
 .TP
-.B \-p[f][h][w][q][d][v], \-\-auto\-play=[f][h][w][q][d][v]
+.BI \-p,\ \-\-auto\-play= [f][h][w][q][d][v]
 Start playing immediately after start. Can be followed by:
 .br
-\'\fBf\fP\' in fullscreen mode,
+`\fIf\fP' in fullscreen mode,
 .br
-\'\fBh\fP\' hide GUI (main panel, etc...),
+`\fIh\fP' hide GUI (main panel, etc...),
 .br
-\'\fBw\fP\' hide video output window,
+`\fIw\fP' hide video output window,
 .br
-\'\fBq\fP\' for quitting after playback,
+`\fIq\fP' for quitting after playback,
 .br
-It is also possible to request the playlist from DVD \'\fBd\fP\', or VCD \'\fBv\fP\'. 
+It is also possible to request the playlist from DVD `\fId\fP', or VCD `\fIv\fP'. 
 There is now a more generic option, \fI\-\-auto\-scan\fP, for that (see below).
 .TP
-.B \-s <plugin>, \-\-auto\-scan <plugin>
+.BI \-s,\ \-\-auto\-scan\  <plugin>
 Auto-scan playlist from named input plugin. Many plugins allow to read a
 default playlist, in order to play \fBeverything\fP. This works fine for DVDs
 or VCDs, for example. Giving this option has the same effect as pressing
@@ -86,12 +86,12 @@ having to press any additional buttons. This also works for plugins that are
 not supplied with xine, just give the name of the button that the desired
 plugin adds to the xine panel!
 .TP
-.B \-f, \-\-fullscreen
-Switch xine to fullscreen mode on start (just like pressing \'\fBF\fP\')
+.B \-f,\ \-\-fullscreen
+Switch xine to fullscreen mode on start (just like pressing `\fBF\fP')
 .TP
 .B \-g, \-\-hide\-gui
 Hide all GUI windows (except the video window) on start. This is the same as
-pressing \'\fBG\fP\' within xine.
+pressing `\fBG\fP' within xine.
 .TP
 .B \-H, \-\-hide\-video
 Hide video output window.
@@ -100,9 +100,9 @@ Hide video output window.
 Turn off LIRC support. This option is \fIonly\~available\fP if xine has been compiled
 with LIRC support.
 .TP
-.B \-\-visual <visual\-class\-or\-id>
+.BI \-\-visual\  <visual\-class\-or\-id>
 Try to use a specific X11 server visual for xine windows.  The
-\fB<visual\-class\-or\-id>\fP parameter is either the name of an X11 visual
+\fI<visual\-class\-or\-id>\fP parameter is either the name of an X11 visual
 class (\fBStaticGray\fP, \fBGrayScale\fP, \fBStaticColor\fP, \fBPseudoColor\fP, \fBTrueColor\fP or
 \fBDirectColor\fP) or the \fBhexadecimal\fP value for a specific X11 visual.
 
@@ -118,23 +118,23 @@ When using an X11 visual with changeable colors (colormaps), install a
 private colormap for xine. With a private colormap, xine can allocate
 more colors so that video output may look better.
 .TP
-.B \-\-keymap [option]
+.BI \-\-keymap\  [option]
 Display keymap. Option are:
 .br
-\'\fBdefault\fP\' display default keymap table,
+`\fBdefault\fP' display default keymap table,
 .br
-\'\fBlirc\fP\' display draft of a .lircrc config file,
+`\fBlirc\fP' display draft of a .lircrc config file,
 .br
-\'\fBremapped\fP\' user remapped keymap table,
+`\fBremapped\fP' user remapped keymap table,
 .br
-If no option is given, \'\fBdefault\fP\' is selected.
+If no option is given, `\fBdefault\fP' is selected.
 .TP
 .B \-n, \-\-network
 Enable network remote control server.
 To use network remote control server, a password file is required. 
 If xine cannot find it, the server is stopped. 
 The syntax of the password file follows the (familliar) scheme
-<\fBidentification\fP>:<\fBpassword\fP>. Since cryptography is subject to
+<\fIidentification\fP>:<\fIpassword\fP>. Since cryptography is subject to
 legal issues in some countries, the password is not encrypted and also
 transmitted unencrypted, so take care with remote connections.
 Two (optional) generic rules are available as well (one at a time)
@@ -145,7 +145,7 @@ In the first case, all clients are allowed to execute all available commands,
 without restriction. In the second case, no\-one is allowed to execute 
 any commands, except identified users (using 'identify' command).
 
-If a password entry begins with an asterisk \'\fB*\fP\', 
+If a password entry begins with an asterisk `\fB*\fP', 
 the user is blocked. If a password entry is empty, 
 the full entry is ignored. Here is an example
 of a small \fI~/.xine/passwd\fP file:
@@ -174,21 +174,21 @@ called \fIxinectl\fP.
 
 The server itself offers command help/syntax:
 .br
-.BR help [command]
+.BR help\  [command]
 .br
 Without \fIcommand\fP specified, all available commands will be displayed. 
 If a command is specified, short text about the command functionnality will
 be given.
 .br
-.BR syntaxe <command>
+.BR syntax\  <command>
 .br
 Display the \fIcommand\fP syntax.
 .TP
 .B \-R, \-\-root
 Use root window as video window.
 .TP
-.B \-G, \-\-geometry <WxH[+X+Y]>
-You can set video output size and position using the X like geometry (\fIsee X(7)\fP).
+.BI \-G,\ \-\-geometry\  <WxH[+X+Y]>
+You can set video output size and position using the X like geometry (see \fBX\fR(7)).
 \fBX\fP and \fBY\fP offset are optional.
 .TP
 .B \-B, \-\-borderless
@@ -198,27 +198,28 @@ Remove borders of video output window, in windowed mode.
 .br
 MRLs are similar to URLs in your web browser. They describe the media
 to read from. valid MRLs may be plain file names or one of the following:
-.BR file://<path>
 .br
-.BR fifo://<path>
+.BI file:// <path>
 .br
-.BR stdin://mpeg1
+.BI fifo:// <path>
+.br
+.B stdin://mpeg1
 or
-.BR stdin://mpeg2
+.B stdin://mpeg2
 .br
-.BR dvd://VTS_xx_y.VOB
+.BI dvd://VTS_ xx _ y .VOB
 .br
-.BR vcd://<tracknumber>
+.BI vcd:// <tracknumber>
 .br
-.BR tcp://<host>:<port>
+.BI tcp:// <host> : <port>
 .br
-.BR rtp://<host>:<port>
+.BI rtp:// <host> : <port>
 .br
-.BR udp://<host>:<port>
+.BI udp:// <host> : <port>
 .br
-.BR mms://<host>...
+.BI mms:// <host>...
 .br
-.BR http://<host>...
+.BI http:// <host>...
 .LP
 Several MRLs may be specified in order to play a number of consecutive
 streams.
@@ -229,187 +230,132 @@ is known to work.
 .TP
 .B avi subtitle files
 .br
-Text subtitle files may be appended (seperated by \`%\')
+Text subtitle files may be appended (seperated by `%')
 to a file MRL:
 .br 
-.BR file://<path>%<subtitlefile>
+.BI file:// <path> % <subtitlefile>
 .SH CONTROL KEYS
 Many features can be controlled by pressing control keys. '\fBM\-\fP' is 
-the Meta key (\'\fBAlt\fP\' key on PC keyboard), '\fBC\-\fP' is the Control \'\fBCTRL\fP\' 
-key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the \'\fBHOME\fP\' key is displayed \fB<home>\fP.
+the Meta key (`\fBAlt\fP' key on PC keyboard), '\fBC\-\fP' is the Control `\fBCTRL\fP' 
+key, other special key are delimited by '\fB<\fP' and '\fB>\fP' characters, eg: the `\fBHOME\fP' key is displayed \fB<home>\fP.
 The default key bindings are:
-.LP
-.BR 0..9 :
+.IP "\fB0\fP .. \fB9\fP"
 Jump to 0%..90% of current stream
-.br
-.BR / :
+.IP "\fB/\fP"
 Seek to the percentage specified by the numeric argument. This is more
 general than the above 0..9 commands. See the section on "Numeric Input" below.
-.br
-.BR A :
+.IP "\fBA\fP"
 Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
-.br
-.BR M\-C | M\-c :
+.IP "\fBM\fP\-\fBC\fP | \fBM\fP\-\fBc\fP"
 Show/hide the video settings window.
-.br
-.BR E :
+.IP "\fBE\fP"
 Eject the current media.
-.br
-.BR F :
+.IP "\fBF\fP"
 Toggle fullscreen mode.
-.br
-.BR G :
+.IP "\fBG\fP"
 Hide/show the gui.
-.br
-.BR H :
+.IP "\fBH\fP"
 Hide/show the video output window.
-.br
-.BR i | I :
+.IP "\fBi\fP | \fBI\fP"
 Toggle deinterlace methods.
-.br
-.BR M\-l | M\-L :
+.IP "\fBM\fP\-\fBl\fP | \fBM\fP\-\fBL\fP"
 Show/hide log window.
-.br
-.BR M\-m | M\-M :
+.IP "\fBM\fP\-\fBm\fP | \fBM\fP\-\fBM\fP"
 Hide/show the MRL browser.
-.br
-.BR C\-m | C\-M :
+.IP "\fBC\fP\-\fBm\fP | \fBC\fP\-\fBM\fP"
 Audio mute toggle.
-.br
-.BR C\-o :
+.IP "\fBC\fP\-\fBo\fP"
 Toggle TV modes on the DXR3
-.br
-.BR M\-p | M\-P:
+.IP "\fBM\fP\-\fBp\fP | \fBM\fP\-\fBP\fP"
 Show/hide the playlist window.
-.br
-.BR Q :
+.IP "\fBQ\fP"
 Exit.
-.br
-.BR s :
+.IP "\fBs\fP"
 Zoom 1:1.
-.br
-.BR S :
+.IP "\fBS\fP"
 Stop playback.
-.br
-.BR M\-s :
+.IP "\fBM\fP\-\fBs\fP"
 Show/hide setup window.
-.br
-.BR z | Z :
+.IP "\fBz\fP | \fBZ\fP"
 Zoom in/out.
-.br
-.BR M\-C\-z :
+.IP "\fBM\fP\-\fBC\fP\-\fBz\fP"
 Reset zoom.
-.br
-.BR v :
+.IP "\fBv\fP"
 Decrease audio volume.
-.br
-.BR V :
+.IP "\fBV\fP"
 Increase audio volume.
-.br
-.BR t :
+.IP "\fBt\fP"
 Take a snapshot.
-.br
-.BR <return> :
+.IP "\fB<return>\fP"
 Play
-.br
-.BR <space> :
+.IP "\fB<space>\fP"
 Pause
-.br
-.BR <up>/<down> :
+.IP "\fB<up>\fP | \fB<down>\fP"
 fast forward / slow motion
-.br
-.BR C\-<left>/C\-<right> :
+.IP "\fBC\fP\-\fB<left>\fP | \fBC\fP\-\fB<right>\fP"
 seek -+ 15 sec.
-.br
-.BR <left> / <right> :
+.IP "\fB<left>\fP | \fB<right>\fP"
 seek +- 60 sec.
-.br
-.BR <page\ up> :
+.IP "\fB<page\ up>\fP"
 Jump to previous stream in playlist
-.br
-.BR <page\ down> :
+.IP "\fB<page\ down>\fP"
 Jump to next stream in playlist
-.br
-.BR < :
+.IP "\fB<\fP"
 Reduce the output window.
-.br
-.BR > :
+.IP "\fB>\fP"
 Enlarge the ouput window.
-.br
-.BR M\-1 :
+.IP "\fBM\fP\-\fB1\fP"
 Set video output window to 50%
-.br
-.BR M\-2 :
+.IP "\fBM\fP\-\fB2\fP"
 Set video output window to 100%
-.br
-.BR M\-3 :
+.IP "\fBM\fP\-\fB3\fP"
 Set video output window to 200%
-.br
-.BR . :
+.IP "\fB.\fP"
 Select next sub-title channel.
-.br
-.BR , :
+.IP "\fB,\fP"
 Select previous sub-title channel.
-.br
-.BR + :
+.IP "\fB+\fP"
 Select next audio channel (may take up to a few seconds to take effect)
-.br
-.BR - :
+.IP "\fB-\fP"
 Select prev audio channel
-.br
-.BR Esc :
+.IP "\fB<Esc>\fP"
 Menu 1 (e.g. root menu)
-.br
-.BR F1 :
+.IP "\fB<F1>\fP"
 Menu 2 (e.g. title menu)
-.br
-.BR F2 :
+.IP "\fB<F2>\fP"
 Menu 3
-.br
-.BR <Insert> :
+.IP "\fB<Insert>\fP"
 Grab pointer toggle.
-.br
 
+.SS Third party plugins
 Following shortcuts are used by third party plugins, generally for DVD navigation:
-.LP
-.BR <KeyPad\ Up> :
+.IP "\fB<KeyPad\ Up>\fP"
 Up event.
-.br
-.BR <KeyPad\ Down> :
+.IP "\fB<KeyPad\ Down>\fP"
 Down event.
-.br
-.BR <KeyPad\ Left> :
+.IP "\fB<KeyPad\ Left>\fP"
 Left event.
-.br
-.BR <KeyPad\ Right> :
+.IP "\fB<KeyPad\ Right>\fP"
 Right event.
-.br
-.BR <KeyPad\ Prior> :
+.IP "\fB<KeyPad\ Prior>\fP"
 Prior event.
-.br
-.BR <KeyPad\ Next> :
+.IP "\fB<KeyPad\ Next>\fP"
 Next event.
-.br
-.BR <KeyPad\ End> :
+.IP "\fB<KeyPad\ End>\fP"
 Previous angle event.
-.br
-.BR <KeyPad\ Home> :
+.IP "\fB<KeyPad\ Home>\fP"
 Next angle event.
-.br
-.BR <KeyPad\ Enter> :
+.IP "\fB<KeyPad\ Enter>\fP"
 Select event
-.br
-.SH Synchronization fine tuning
+
+.SS Synchronization fine tuning
 Some streams have bad timestamps, so synchronization fails. This can be
 tweaked using these keys:
-.br
-.BR n | N :
+.IP "n | N"
 press if video runs ahead of audio
-.br
-.BR m | M:
+.IP "m | "
 press if video lags behind audio
-.br
-.BR <home> :
+.IP "\fB<home>\fP"
 press to reset audio/video offset to \fB0\fP, so stream timestamps are unchanged.
 .SH Numeric Input
 It is possible to give numeric input, however for backward
@@ -417,10 +363,9 @@ compatibility the number keys are not bound their corresponding digit
 values. Moreover, the digits 0 to 9 are bound to symbols that can't
 normally be entered on a keyboard. Thus the ability to enter numeric
 input is disabled by default. However you can change this by switching
-the modifier value of "SetPosition\fIX\fR%" and "Number\fIY\fR" (where
-\fIX\fR is 0, 10, .. 90, and \fIY\fR is 0..9. In particular replace
-these lines in your xine keymap file
-(\f(CW\*(C`~/.xine/keymap\*C'\fR).
+the modifier value of "SetPosition\fI<X>\fR%" and "Number\fI<Y>\fR" (where
+\fI<X>\fR is 0, 10, .. 90, and \fI<Y>\fR is 0..9. In particular replace
+these lines in your xine keymap file \fI~/.xine/keymap\fP.
 
 .Vb 119
 # Set position to beginning of current stream.
@@ -568,19 +513,20 @@ time perhaps more useful commands like specifying a specific or
 absolute MRL, subtitle or audio channel number will be implemented.
 
 .SH FILES
-All config files are now to be found in (\f(CW\*(C`~/.xine\*C'\fR:
+.TP \w'~/.xine/passwdXX'u
+~/.xine/config
+Main config file
+.TP
+~/.xine/keymap
+Key bindings for xine-ui
+.TP
+~/.xine/passwd
+Passwords file xine-ui
+.TP
+~/.xine/xinerc
+Additional command line arguments
 .br
-.BR ~/.xine/config :
-main config file
-.br
-.BR ~/.xine/keymap :
-key bindings for xine-ui
-.br
-.BR ~/.xine/passwd :
-passwords file xine-ui
-.br
-.BR ~/xine/xinerc :
-you can add usual command argument(s) in this file (one argument per line), like:
+Each line specifies an additional command line argument (one argument per line):
 .nf
 \-\-geometry 720x576+0+0
 \-\-network
@@ -598,5 +544,6 @@ The programs are documented fully on the xine home page:
 This manual page was written by Siggi Langauf <siggi@debian.org>,
 for the xine project. Lots of additions by
 Guenter Bartsch <guenter@users.sourceforge.net>,
-Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>, and
-Rocky Bernstein <rocky@panix.com>
+Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>,
+Rocky Bernstein <rocky@panix.com>, and
+Philipp Hahn <pmhahn@users.sourceforge.net>.
