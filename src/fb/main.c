@@ -88,6 +88,19 @@ static void event_listener(void *user_data, const xine_event_t *event)
 	}
 }
 
+static int open_and_play(const char *mrl)
+{
+	if((!xine_open(fbxine.stream, fbxine.mrl[fbxine.current_mrl])) ||
+	   (!xine_play(fbxine.stream, 0, 0)))
+	{
+		fprintf(stderr, "Unable to open MRL '%s'\n",
+			fbxine.mrl[fbxine.current_mrl]);
+		return 0;
+	}
+
+	return 1;
+}
+
 static void exit_video(void)
 {
 	xine_close_video_driver(fbxine.xine, fbxine.video_port);
@@ -159,14 +172,6 @@ static int init_stream(void)
 	xine_event_create_listener_thread(fbxine.event_queue, 
 	                                  event_listener, NULL);
 
-	if((!xine_open(fbxine.stream, fbxine.mrl[fbxine.current_mrl])) ||
-	   (!xine_play(fbxine.stream, 0, 0)))
-	{
-		fprintf(stderr, "Unable to open MRL '%s'\n",
-			fbxine.mrl[fbxine.current_mrl]);
-		return 0;
-	}
-
 	return 1;
 }
 
@@ -200,6 +205,7 @@ static void wait_for_exit(void)
 void fbxine_exit(void)
 {
 	pthread_mutex_lock(&fbxine.mutex);
+	fbxine.current_mrl = fbxine.num_mrls;
 	pthread_cond_signal(&fbxine.exit_cond);
 	pthread_mutex_unlock(&fbxine.mutex);
 }
@@ -256,7 +262,15 @@ int main(int argc, char *argv[])
 	pthread_mutex_lock(&fbxine.mutex);
 	if(fbxine_init(argc, argv))
 	{
-		wait_for_exit();
+		while(fbxine.current_mrl < fbxine.num_mrls) 
+		{
+			if(open_and_play(fbxine.mrl[fbxine.current_mrl]))
+			{
+				wait_for_exit();
+				xine_close(fbxine.stream);
+			}
+			fbxine.current_mrl++;
+		}
 		exit_code = 0;
 	}
 	fbxine_do_exit();
