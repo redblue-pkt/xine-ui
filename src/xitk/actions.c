@@ -243,6 +243,7 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
       if(mediamark_concat_mediamarks(mrl)) {
 	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	mrl = gGui->mmk.mrl;
+	playlist_update_playlist();
       }
     }
     
