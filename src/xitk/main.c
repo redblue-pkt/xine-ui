@@ -1300,8 +1300,12 @@ int main(int argc, char *argv[]) {
   }
   SAFE_FREE(audio_driver_id);
 
-  {
-    const char *const *pol = xine_list_post_plugins_typed(gGui->xine, XINE_POST_TYPE_AUDIO_VISUALIZATION);
+  gGui->visual_anim.post_output = NULL;
+  gGui->visual_anim.post_plugin_num = -1;
+  
+  if(gGui->ao_port) {
+    const char *const *pol = xine_list_post_plugins_typed(gGui->xine, 
+							  XINE_POST_TYPE_AUDIO_VISUALIZATION);
     
     if(pol) {
       int  i = 0;
@@ -1342,12 +1346,10 @@ int main(int argc, char *argv[]) {
 		       &gGui->ao_port, &gGui->vo_port);
       
     }
-    else {
-      gGui->visual_anim.post_output = NULL;
-      gGui->visual_anim.post_plugin_num = -1;
-    }
-
   }
+
+  gGui->post_video = NULL;
+  gGui->post_video_num = -1;
 
   {
     const char *const *pol = xine_list_post_plugins_typed(gGui->xine, XINE_POST_TYPE_VIDEO_FILTER);
@@ -1393,11 +1395,6 @@ int main(int argc, char *argv[]) {
 		       0, &gGui->ao_port, &gGui->vo_port);
       
     }
-    else {
-      gGui->post_video = NULL;
-      gGui->post_video_num = -1;
-    }
-
   }
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
