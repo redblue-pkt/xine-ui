@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.13\n"
-"POT-Creation-Date: 2002-11-22 00:07+0100\n"
-"PO-Revision-Date: 2002-11-04 09:16+0200\n"
+"Project-Id-Version: xine-ui 1.0.0\n"
+"POT-Creation-Date: 2002-11-22 03:28+0100\n"
+"PO-Revision-Date: 2002-11-22 19:04+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr "%s(): Kann keinen neuen Thread erzeugen (%s)\n"
 
 #: src/xitk/actions.c:902
 msgid "There is no mrl."
-msgstr ""
+msgstr "Das ist keine MRL."
 
 #: src/xitk/actions.c:1113
 #, c-format
@@ -41,9 +41,8 @@ msgid "Xine Control Panel"
 msgstr "Xine Einstellungen"
 
 #: src/xitk/control.c:436
-#, fuzzy
 msgid "control: couldn't find image for background\n"
-msgstr "%s(): Konnte Hintergrund-Bild nicht finden\n"
+msgstr "control: Konnte Hintergrundbild nicht finden\n"
 
 #: src/xitk/control.c:562
 msgid "Control HUE value"
@@ -192,66 +191,58 @@ msgstr "Warnung! Synchrones X aktiviert - das wird ziemlich langsam...\n"
 
 #: src/xitk/event.c:888
 msgid "Windows stacking"
-msgstr ""
+msgstr "Fensterüberlagerung"
 
 #: src/xitk/event.c:889
-#, fuzzy
 msgid "Use wm layer property to place window on top."
-msgstr "Benutze Fenstermanager-Ebenen um Fenster oben zu plazieren"
+msgstr "Benutze Fenstermanagerebenen um Fenster oben zu plazieren"
 
 #: src/xitk/event.c:896
 msgid "Windows stacking (more)"
-msgstr ""
+msgstr "Fensterüberlagerung (mehr)"
 
 #: src/xitk/event.c:897
-#, fuzzy
 msgid "Use WM layer property to place windows on top."
-msgstr "Benutze Fenstermanager-Ebenen um Fenster oben zu plazieren"
+msgstr "Benutze Fenstermanagerebenen um Fenster oben zu plazieren"
 
 #: src/xitk/event.c:908
-#, fuzzy
 msgid "Snapshot location"
-msgstr "Schneller abspielen"
+msgstr "Schnappschußverzeichnis"
 
 #: src/xitk/event.c:909
-#, fuzzy
 msgid "Where snapshots will be saved."
-msgstr "Verzeichnis für Schnappschüsse"
+msgstr "Wo Schnappschüsse abgespeichert werden."
 
 #: src/xitk/event.c:916
 msgid "Screensaver wakeup"
-msgstr ""
+msgstr "Bildschirmschonerbenachrichtigung"
 
 #: src/xitk/event.c:917
-#, fuzzy
 msgid "Time between two screensaver fake events, 0 to disable."
 msgstr ""
 "Zeit zwischen zwei Ereignissen für Bildschirmschoner, 0 für deaktiviert"
 
 #: src/xitk/event.c:924
 msgid "Chapter hoping"
-msgstr ""
+msgstr "Kapitelspringen"
 
 #: src/xitk/event.c:925
-#, fuzzy
 msgid "Play next|previous chapter instead of mrl (dvdnav)"
 msgstr "Nächstes|Vorheriges Kapitel anstatt MRL wiedergeben (dvdnav)"
 
 #: src/xitk/event.c:932
 msgid "Visiblity behavoir of output window"
-msgstr ""
+msgstr "Anzeigeverhalten des Ausgabefensters"
 
 #: src/xitk/event.c:933
-#, fuzzy
 msgid "Show/hide video output window regarding to the stream type"
 msgstr "Video-Fenster in Abhängigkeit vom Datenstromtyp anzeigen/verstecken "
 
 #: src/xitk/event.c:940
 msgid "Visiblility behavior of panel"
-msgstr ""
+msgstr "Anzeigeverhalten von Bedienfeld"
 
 #: src/xitk/event.c:941
-#, fuzzy
 msgid ""
 "Automatically show/hide panel window, according to "
 "auto_video_output_visibility"
@@ -260,9 +251,8 @@ msgstr ""
 "anzeigen/verstecken"
 
 #: src/xitk/event.c:949
-#, fuzzy
 msgid "Event sender behavior"
-msgstr "Ereignissender"
+msgstr "Verhalten von Ereignissender"
 
 #: src/xitk/event.c:950
 msgid "Event sender window stick to main panel"
@@ -270,21 +260,21 @@ msgstr "Ereignissendefester klebt am Hauptbedienfeld"
 
 #: src/xitk/event.c:958
 msgid "Visual animation"
-msgstr ""
+msgstr "Videoanimation"
 
 #: src/xitk/event.c:959
 msgid ""
 "Display some video animations when current stream is audio only (eg: mp3)."
 msgstr ""
+"Videoanimation anzeigen, wenn der aktuelle Stream nur Audio hat (z.B.: mp3)."
 
 #: src/xitk/event.c:968
-#, fuzzy
 msgid "Stream informations"
 msgstr "Datenstrominformationen"
 
 #: src/xitk/event.c:969
 msgid "Update stream informations (in stream infos window) each half seconds."
-msgstr ""
+msgstr "Aktualisiere Datenstrominformationen (im Datenstrominfofenster) jede halbe Sekunde."
 
 #. Some infos
 #: src/xitk/event.c:983
@@ -351,66 +341,56 @@ msgstr "Winkel -"
 
 #. Initialize menu labels
 #: src/xitk/event_sender.c:633
-#, fuzzy
 msgid "Menu 1"
-msgstr "Menü %d"
+msgstr "Menü 1"
 
 #: src/xitk/event_sender.c:634
-#, fuzzy
 msgid "Menu 2"
-msgstr "Menü %d"
+msgstr "Menü 2"
 
 #: src/xitk/event_sender.c:635
-#, fuzzy
 msgid "Menu 3"
-msgstr "Menü %d"
+msgstr "Menü 3"
 
 #: src/xitk/event_sender.c:636
-#, fuzzy
 msgid "Menu 4"
-msgstr "Menü %d"
+msgstr "Menü 4"
 
 #: src/xitk/event_sender.c:637
-#, fuzzy
 msgid "Menu 5"
-msgstr "Menü %d"
+msgstr "Menü 5"
 
 #: src/xitk/event_sender.c:638
-#, fuzzy
 msgid "Menu 6"
-msgstr "Menü %d"
+msgstr "Menü 6"
 
 #: src/xitk/event_sender.c:639
-#, fuzzy
 msgid "Menu 7"
-msgstr "Menü %d"
+msgstr "Menü 7"
 
 #: src/xitk/event_sender.c:641 src/xitk/event_sender.c:643
 msgid "Root"
-msgstr ""
+msgstr "Anfang"
 
 #: src/xitk/event_sender.c:642
-#, fuzzy
 msgid "Title"
-msgstr "Titel: "
+msgstr "Titel"
 
 #: src/xitk/event_sender.c:644
 msgid "Subpicture"
-msgstr ""
+msgstr "Untertitel"
 
 #: src/xitk/event_sender.c:645 src/xitk/stream_infos.c:842
-#, fuzzy
 msgid "Audio"
-msgstr "Hat Audio: "
+msgstr "Audio"
 
 #: src/xitk/event_sender.c:646
-#, fuzzy
 msgid "Angle"
-msgstr "Winkel -"
+msgstr "Winkel"
 
 #: src/xitk/event_sender.c:647
 msgid "Part"
-msgstr ""
+msgstr "Kapitel"
 
 #: src/xitk/event_sender.c:683 src/xitk/mediamark.c:1279 src/xitk/setup.c:1170
 #: src/xitk/stream_infos.c:995 src/xitk/viewlog.c:487
@@ -717,43 +697,39 @@ msgid ""
 "  -N, --animation <mrl>        Specify mrl to play when video output isn't "
 "used.\n"
 msgstr ""
+"  -N, --animation <mrl>        MRL zum Abspielen, falls keine Videoanteil vorhanden ist.\n"
 
 #: src/xitk/main.c:342
-#, fuzzy
 msgid "                                 -can be used more than one time.\n"
-msgstr ""
-"                                 'remapped': Zeige aktuelle Tastentabelle.\n"
+msgstr "                                 -Kann mehrfach angegeben werden.\n"
 
 #: src/xitk/main.c:343
 msgid "  -P, --playlist <filename>    Load a playlist file.\n"
-msgstr ""
+msgstr "  -P, --playlist <Dateiname>   Lädt eine Playliste.\n"
 
 #: src/xitk/main.c:344
 msgid ""
 "  -l, --loop [mode]            Set playlist loop mode (default: loop). Modes "
 "are:\n"
 msgstr ""
+"  -l, --loop [Modus]           Setzt Playlistwiederholungsmodus (Standard: loop). Modi sind:\n"
 
 #: src/xitk/main.c:345
-#, fuzzy
 msgid "                                 'loop': loop entire playlist.\n"
-msgstr ""
-"                                 'remapped': Zeige aktuelle Tastentabelle.\n"
+msgstr "                                 'loop': Gesamte Playlist wiederholen.\n"
 
 #: src/xitk/main.c:346
-#, fuzzy
 msgid ""
 "                                 'repeat': repeat current playlist entry.\n"
 msgstr ""
-"                                 'remapped': Zeige aktuelle Tastentabelle.\n"
+"                                 'repeat': Aktuellen Playlisteintrag wiederholen.\n"
 
 #: src/xitk/main.c:347
-#, fuzzy
 msgid ""
 "                                 'shuffle': select randomly an entry in "
 "playlist.\n"
 msgstr ""
-"                                 'remapped': Zeige aktuelle Tastentabelle.\n"
+"                                 'shuffle': Eintrag zufällig aus Playlist auswählen.\n"
 
 #: src/xitk/main.c:349
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -830,9 +806,9 @@ msgid "main: audio driver <%s> failed\n"
 msgstr "main: Audio Treiber <%s> konnte nicht geladen werden\n"
 
 #: src/xitk/main.c:690
-#, fuzzy, c-format
+#, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
-msgstr "Benötigte xine Bibliothek Version 0.9.14, gefunden: %d.%d.%d.\n"
+msgstr "Benötigte xine Bibliothek Version 1.0.0, gefunden: %d.%d.%d.\n"
 
 #: src/xitk/main.c:698
 msgid "sigprocmask() failed.\n"
@@ -852,9 +828,9 @@ msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Fehlerhafte Geometrie '%s', siehe xine --help\n"
 
 #: src/xitk/main.c:910
-#, fuzzy, c-format
+#, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
-msgstr "Fehlerhafte Geometrie '%s', siehe xine --help\n"
+msgstr "Fehlerhafter Wiederholmodus '%s', siehe xine --help\n"
 
 #: src/xitk/main.c:931
 #, c-format
@@ -868,73 +844,71 @@ msgstr "Logo MRL"
 #: src/xitk/mediamark.c:894
 #, c-format
 msgid "Playlist file (%s) is valid (%s).\n"
-msgstr ""
+msgstr "Playlistdatei (%s) ist gültig (%s).\n"
 
 #: src/xitk/mediamark.c:896
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
-msgstr ""
+msgstr "Playlistdatei (%s) ist ungültig.\n"
 
 #: src/xitk/mediamark.c:960
 #, c-format
 msgid "Playlist '%s' saved.\n"
-msgstr ""
+msgstr "Playliste '%s' gespeichert.\n"
 
 #: src/xitk/mediamark.c:963
 #, c-format
 msgid "Unable to save playlist (%s): %s.\n"
-msgstr ""
+msgstr "Playlist kann nicht gespeichert werden (%s): %s.\n"
 
 #. Create window
 #: src/xitk/mediamark.c:1157
 msgid "Mediamark Editor"
-msgstr ""
+msgstr "Mediamarkeditor"
 
 #: src/xitk/mediamark.c:1183
-#, fuzzy
 msgid "Identifier"
-msgstr "Zusatztasten"
+msgstr "Bezeichner"
 
 #: src/xitk/mediamark.c:1199
 msgid "Mediamark Identifier"
-msgstr ""
+msgstr "Mediamarkbezeichner"
 
 #: src/xitk/mediamark.c:1203
 msgid "Mrl"
-msgstr ""
+msgstr "MRL"
 
 #: src/xitk/mediamark.c:1218
 msgid "Mediamark Mrl"
-msgstr ""
+msgstr "Mediamark-MRL"
 
 #: src/xitk/mediamark.c:1224
 msgid "Start at"
-msgstr ""
+msgstr "Start bei"
 
 #: src/xitk/mediamark.c:1239
 msgid "Mediamark start time (secs)."
-msgstr ""
+msgstr "Mediamark Startzeit (sek)."
 
 #: src/xitk/mediamark.c:1243
-#, fuzzy
 msgid "End at"
-msgstr "Ändern"
+msgstr "Ende bei"
 
 #: src/xitk/mediamark.c:1258
 msgid "Mediamark end time (secs)."
-msgstr ""
+msgstr "Mediamark Endzeit (sek)."
 
 #: src/xitk/mediamark.c:1264
 msgid "Apply"
-msgstr ""
+msgstr "Anwenden"
 
 #: src/xitk/mediamark.c:1274
 msgid "Apply the changes to the playlist."
-msgstr ""
+msgstr "Wende Änderungen auf Playlist an."
 
 #: src/xitk/mediamark.c:1289
 msgid "Discard changes and dismiss the window."
-msgstr ""
+msgstr "Änderungen verwerfen und Fenster schließen."
 
 #: src/xitk/mrl_browser.c:192
 msgid "All extensions"
@@ -977,9 +951,8 @@ msgid "Xine Panel"
 msgstr "xine Bedienfeld"
 
 #: src/xitk/panel.c:767
-#, fuzzy
 msgid "panel: couldn't find image for background\n"
-msgstr "xine-panel: Kann Hintergrundbild nicht finden\n"
+msgstr "panel: Kann Hintergrundbild nicht finden\n"
 
 #: src/xitk/panel.c:908
 msgid "Stop playback"
@@ -1079,9 +1052,8 @@ msgid "Xine Playlist Editor"
 msgstr "Xine Playlisten Editor"
 
 #: src/xitk/playlist.c:859
-#, fuzzy
 msgid "playlist: couldn't find image for background\n"
-msgstr "xine-playlist: Kann Hintergrund-Bild nicht finden\n"
+msgstr "playlist: Kann Hintergrund-Bild nicht finden\n"
 
 #: src/xitk/playlist.c:974
 msgid "Move up selected MRL"
@@ -1223,7 +1195,7 @@ msgstr "Fehler: %s\n"
 #: src/xitk/snapshot.c:884
 #, c-format
 msgid "Wrong image size: %dx%d. Snapshot aborted.\n"
-msgstr ""
+msgstr "Falsche Bildgröße: %dx%d. Schnappschuß abgebrochen.\n"
 
 #. the dxr3 driver does not allocate yuv buffers
 #. image->u and image->v are always 0 for YUY2
@@ -1251,13 +1223,12 @@ msgstr "Nicht verfügbar"
 
 #. Create window
 #: src/xitk/stream_infos.c:478
-#, fuzzy
 msgid "Stream Information"
 msgstr "Datenstrominformationen"
 
 #: src/xitk/stream_infos.c:503
 msgid "General"
-msgstr ""
+msgstr "Allgemein"
 
 #: src/xitk/stream_infos.c:510
 msgid "Title: "
@@ -1285,7 +1256,7 @@ msgstr "Album: "
 
 #: src/xitk/stream_infos.c:598
 msgid "Misc"
-msgstr ""
+msgstr "Verschiedenes"
 
 #: src/xitk/stream_infos.c:604
 msgid "Input Plugin: "
@@ -1297,9 +1268,8 @@ msgstr "Systemebene: "
 
 #: src/xitk/stream_infos.c:630 src/xitk/stream_infos.c:787
 #: src/xitk/stream_infos.c:932
-#, fuzzy
 msgid "Bitrate: "
-msgstr "Bitrate (b/s): "
+msgstr "Bitrate: "
 
 #: src/xitk/stream_infos.c:643
 msgid "Frame Duration: "
@@ -1319,61 +1289,51 @@ msgstr "Ignoriert SPU: "
 
 #: src/xitk/stream_infos.c:699
 msgid "Video"
-msgstr ""
+msgstr "Video"
 
 #: src/xitk/stream_infos.c:707 src/xitk/stream_infos.c:850
-#, fuzzy
 msgid "Has: "
-msgstr "Hat Video: "
+msgstr "Hat: "
 
 #: src/xitk/stream_infos.c:719 src/xitk/stream_infos.c:863
-#, fuzzy
 msgid "Handled: "
-msgstr "Audiobezeichner: "
+msgstr "Verarbeitet: "
 
 #: src/xitk/stream_infos.c:732 src/xitk/stream_infos.c:876
-#, fuzzy
 msgid "Ignore: "
-msgstr "Ignoriert SPU: "
+msgstr "Ignoriert: "
 
 #: src/xitk/stream_infos.c:745 src/xitk/stream_infos.c:890
-#, fuzzy
 msgid "Codec: "
-msgstr "Audiocodec: "
+msgstr "Codec: "
 
 #: src/xitk/stream_infos.c:761 src/xitk/stream_infos.c:906
-#, fuzzy
 msgid "FourCC: "
-msgstr " Video FourCC: "
+msgstr "FourCC: "
 
 #: src/xitk/stream_infos.c:774 src/xitk/stream_infos.c:919
-#, fuzzy
 msgid "Channel(s): "
-msgstr "Videokanäle: "
+msgstr "Kanäle: "
 
 #: src/xitk/stream_infos.c:801
 msgid "Resolution: "
-msgstr ""
+msgstr "Auflösung: "
 
 #: src/xitk/stream_infos.c:814
-#, fuzzy
 msgid "Ratio: "
-msgstr "Seitenverhältnis: "
+msgstr "Verhältnis: "
 
 #: src/xitk/stream_infos.c:827
-#, fuzzy
 msgid "Stream(s): "
-msgstr "Videoströme: "
+msgstr "Ströme: "
 
 #: src/xitk/stream_infos.c:945
-#, fuzzy
 msgid "Bits: "
-msgstr "Audiobits: "
+msgstr "Bits: "
 
 #: src/xitk/stream_infos.c:959
-#, fuzzy
 msgid "Samplerate: "
-msgstr "Audiosamplerate: "
+msgstr "Samplerate: "
 
 #: src/xitk/stream_infos.c:977
 msgid "Update"
