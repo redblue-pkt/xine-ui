@@ -293,6 +293,12 @@ void gui_exit (xitk_widget_t *w, void *data) {
   xine_event_dispose_queue(gGui->event_queue);
   xine_event_dispose_queue(gGui->visual_anim.event_queue);
 
+  /* we are going to dispose this stream, so make sure slider_loop 
+   * won't use it anymore (otherwise -> segfault on exit).
+   */
+  gGui->running = 0;
+  gGui->stream = NULL;
+
   xine_dispose(gGui->stream);
   /* xine_dispose(gGui->visual_anim.stream); */
 
@@ -303,8 +309,6 @@ void gui_exit (xitk_widget_t *w, void *data) {
     xine_close_audio_driver(gGui->xine, gGui->ao_port);
 
   xine_exit(gGui->xine); 
-
-  gGui->running = 0;
 
 #ifdef HAVE_LIRC
   if(gGui->lirc_enable)
