@@ -78,7 +78,7 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
   if(count) {
     /* some uncovered codepages */
     for(i = 0; i < count; i++) {
-      if(strcmp("ISO10646-1", missing[i]) == 0) {
+      if(strcasecmp("ISO10646-1", missing[i]) == 0) {
         XITK_WARNING("font \"%s\" doesn't contain charset %s\n", name, missing[i]);
         XFreeStringList(missing);
         return 1;
@@ -640,12 +640,31 @@ int xitk_font_get_char_width(xitk_font_t *xtfs, char *c, int maxnbytes, int *nby
 int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int nbytes) {
 #ifdef WITH_XMB
   XRectangle logic;
-	
+  int height = 0;
+
   XLOCK(xtfs->display);  
+
   XmbTextExtents(xtfs->fontset, c, nbytes, NULL, &logic);
+  if (logic.height) height = logic.height;
+  else {
+  /* if XmbTextExtents had problems, then char-per-char computing height */
+    mbstate_t state;
+    size_t    i = 0, n;
+
+    memset(&state, '\0', sizeof(mbstate_t));
+
+    while (i < nbytes) {
+      n = mbrtowc(NULL, c, nbytes - i, &state);
+      if (n == (size_t)-1 || n == (size_t)-2 || i + n > nbytes) n = 1;
+      XmbTextExtents(xtfs->fontset, c + i, n, NULL, &logic);
+      if (logic.height > height) height = logic.height;
+      i += n;
+    }
+  }
+
   XUNLOCK(xtfs->display);  
-  
-  return logic.height;
+
+  return height ? height : 12;
 #else
   int lbearing, rbearing, width, ascent, descent, height;
   
@@ -682,7 +701,7 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, char *c, int maxnbytes, int *nb
   if(nbytes) 
     *nbytes = n;
 
-  return xitk_font_get_text_width(xtfs, c, n);
+  return xitk_font_get_text_height(xtfs, c, n);
 #else
   return (xitk_font_get_text_height(xtfs, c, 1));
 #endif
