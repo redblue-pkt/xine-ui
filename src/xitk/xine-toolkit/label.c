@@ -215,7 +215,17 @@ void *label_animation_loop(void *data) {
     
     paint_label(private_data->lWidget, private_data->window, private_data->gc);
     
+#if HAVE_NANOSLEEP
+    // nanosleep is prefered on solaris, because it's mt-safe
+    {
+      struct timespec ts;
+      ts.tv_sec = 0;
+      ts.tv_nsec = 200000000;
+      nanosleep(&ts, NULL);
+    }
+#else
     usleep(200000);
+#endif
     
   } while(w->running);
   
