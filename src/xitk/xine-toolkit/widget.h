@@ -24,6 +24,7 @@
 #ifndef HAVE_WIDGET_H
 #define HAVE_WIDGET_H
 
+#include <stdint.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
@@ -40,6 +41,16 @@
 #define BROWSER_MAX_ENTRIES 4096
 
 typedef int widgetkey_t;
+
+#define MWM_HINTS_DECORATIONS   (1L << 1)
+#define PROP_MWM_HINTS_ELEMENTS 5
+typedef struct {
+  uint32_t flags;
+  uint32_t functions;
+  uint32_t decorations;
+  int32_t  input_mode;
+  uint32_t status;
+} MWMHints;
 
 typedef struct {
   int red;

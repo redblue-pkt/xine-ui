@@ -19,18 +19,28 @@
  *
  * $Id$
  *
+ * Unique public header file for xitk µTK.
+ *
  */
 
-#ifndef PLAYLIST_H
-#define PLAYLIST_H
+#ifndef __XITK_H_
+#define __XITK_H_
 
-void playlist_editor(void);
-void pl_exit(widget_t *, void *);
-int pl_is_running(void);
-void pl_toggle_visibility(widget_t *, void *);
-void pl_raise_window(void);
-void pl_scan_input(widget_t *, void *);
-void pl_update_playlist(void);
-void open_filebrowser(widget_t *, void *);
+#include <X11/Xlib.h>
+#include "dnd.h"
+#include "widget.h"
+
+typedef void (*widget_cb_event_t)(XEvent *event, void *user_data);
+typedef void (*widget_cb_newpos_t)(int, int, int, int);
+
+widget_list_t *widget_list_new (void);
+widgetkey_t widget_register_event_handler(char *name, Window window,
+					  widget_cb_event_t cb,
+					  widget_cb_newpos_t pos_cb,
+					  dnd_callback_t dnd_cb,
+					  widget_list_t *wl,
+					  void *user_data);
+void widget_unregister_event_handler(widgetkey_t *key);
 
 #endif
+

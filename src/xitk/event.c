@@ -178,7 +178,7 @@ static void gui_signal_handler (int sig) {
 /*
  * top-level event handler
  */
-void gui_handle_event (XEvent *event) {
+void gui_handle_event (XEvent *event, void *data) {
   XKeyEvent      mykeyevent;
   KeySym         mykey;
   char           kbuf[256];
@@ -332,6 +332,11 @@ void gui_handle_event (XEvent *event) {
     case XK_e:
     case XK_E:
       gui_eject(NULL, NULL);
+      break;
+
+    case XK_b:
+    case XK_B:
+      open_filebrowser(NULL, NULL);
       break;
 
     case XK_1:
@@ -699,7 +704,8 @@ void gui_run (void) {
   gGui->widget_key = widget_register_event_handler("NO WINDOW", None,
 						   gui_handle_event, 
 						   NULL,
-						   gui_dndcallback, NULL);
+						   gui_dndcallback, 
+						   NULL, NULL);
   
   widget_run();
 

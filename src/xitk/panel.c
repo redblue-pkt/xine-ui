@@ -42,6 +42,7 @@
 #include "videowin.h"
 #include "parseskin.h"
 #include "panel.h"
+#include "file_browser.h"
 
 extern gGui_t     *gGui;
 
@@ -97,7 +98,10 @@ void panel_toggle_visibility (widget_t *w, void *data) {
   pl_toggle_visibility(NULL, NULL);
 
   if(!panel->visible && control_is_visible()) {}
-  else control_toggle_panel_visibility(NULL, NULL);
+  else {
+    control_toggle_panel_visibility(NULL, NULL);
+    file_browser_toggle_visibility();
+  }
 
   if (panel->visible) {
     
@@ -185,7 +189,7 @@ static void panel_slider_cb(widget_t *w, void *data, int pos) {
 /*
  * Handle X events here.
  */
-void panel_handle_event(XEvent *event) {
+void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
@@ -566,7 +570,8 @@ void panel_init (void) {
 						    panel_handle_event,
 						    panel_store_new_position,
 						    gui_dndcallback,
-						    panel->widget_list);
+						    panel->widget_list,
+						    NULL);
 
   video_window_set_cursor_visibility (panel->visible);
 

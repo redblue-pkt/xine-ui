@@ -39,6 +39,7 @@
 #include "panel.h"
 #include "playlist.h"
 #include "videowin.h"
+#include "file_browser.h"
 
 extern gGui_t          *gGui;
 
@@ -151,6 +152,11 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
   }
+  
+  if(is_file_browser_visible()) {
+    show_file_browser();
+    set_file_browser_transient();
+  }
 }
 
 void gui_toggle_aspect(void) {
@@ -225,7 +231,7 @@ void gui_dndcallback (char *filename) {
 
     if((xine_get_status(gGui->xine) == XINE_STOP)) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      gui_play (NULL, NULL); 
+      /* IS IT REALLY A GOOD IDEA ?? gui_play (NULL, NULL);  */
     }
 
     pl_update_playlist();

@@ -124,9 +124,9 @@ void browser_rebuild_browser(widget_t *w, int start) {
     wl->gc = private_data->gc;
     
     for(i = 0; i < private_data->max_length; i++) {
-      if(private_data->content[private_data->current_start+i] != NULL) {
-	labelbutton_change_label(wl, 
-				 private_data->item_tree[i+WBSTART], 
+      if (((private_data->current_start+i)<private_data->list_length) 
+	  && (private_data->content[private_data->current_start+i] != NULL)) {
+	labelbutton_change_label(wl, private_data->item_tree[i+WBSTART], 
 				 private_data->content[private_data->
 						      current_start+i]);
       }
@@ -271,13 +271,8 @@ static void browser_select(widget_t *w, void *data, int state) {
  * Create the list browser
  */
 widget_t *create_browser(Display *display, ImlibData *idata,
-			 widget_list_t *thelist, int upX, int upY, char *upSK,
-			 int slX, int slY, char *slSKB, char *slSKF,
-			 int dnX, int dnY, char *dnSK,
-			 int btnX, int btnY, 
-			 char *btnN, char *btnF, char *btnC, char *btnSK,
-			 int max_length, int list_length, char **content,
-			 void *selCB, void *data) {
+			 widget_list_t *thelist,
+			 browser_placements_t *bp) {
   widget_t *mywidget;
   browser_private_data_t *private_data;
 
@@ -287,41 +282,44 @@ widget_t *create_browser(Display *display, ImlibData *idata,
     (browser_private_data_t *) gui_xmalloc(sizeof(browser_private_data_t));
 
   private_data->bWidget = mywidget;
-  private_data->content = content;
-  private_data->list_length = list_length;
-  private_data->max_length = max_length;
+  private_data->content = bp->browser.entries;
+  private_data->list_length = bp->browser.num_entries;
+  private_data->max_length = bp->browser.max_displayed_entries;
 
   gui_list_append_content(thelist->l, 
-			  (private_data->item_tree[WBUP] = 
-			   create_button(display, idata, upX, upY, 
-					 browser_up, (void*)mywidget, upSK)));
+	  (private_data->item_tree[WBUP] = 
+	   create_button(display, idata, 
+			 bp->arrow_up.x, bp->arrow_up.y, 
+			 browser_up, (void*)mywidget, 
+			 bp->arrow_up.skinfile)));
   
   gui_list_append_content(thelist->l,
-			  (private_data->item_tree[WSLID] = 
-			   create_slider(display, idata, VSLIDER,
-					 slX, slY, 0,
-					 (list_length>(max_length-1)
-					  ? list_length-1 : 0), 
-					 1, slSKB, slSKF,
-					 browser_slidmove, (void*)mywidget,
-					 browser_slidmove, (void*)mywidget)));
+	  (private_data->item_tree[WSLID] = 
+	   create_slider(display, idata, VSLIDER,
+			 bp->slider.x, bp->slider.y, 0,
+			 (bp->browser.num_entries > (bp->browser.max_displayed_entries-1)
+			  ? bp->browser.num_entries-1 : 0), 
+			 1, bp->slider.skinfile, bp->paddle.skinfile,
+			 browser_slidmove, (void*)mywidget,
+			 browser_slidmove, (void*)mywidget)));
   
   slider_set_to_max(thelist, private_data->item_tree[WSLID]);
   
   gui_list_append_content(thelist->l, 
-			  (private_data->item_tree[WBDN] = 
-			   create_button (display, idata, dnX, dnY, 
-					  browser_down, 
-					  (void*)mywidget, dnSK)));
+	  (private_data->item_tree[WBDN] = 
+	   create_button (display, idata, 
+			  bp->arrow_dn.x, bp->arrow_dn.y, 
+			  browser_down, 
+			  (void*)mywidget, bp->arrow_dn.skinfile)));
   
   {
     int x, y, i;
     btnlist_t *bt;
     
-    x = btnX;
-    y = btnY;
+    x = bp->browser.x;
+    y = bp->browser.y;
     
-    for(i = WBSTART; i < max_length+WBSTART; i++) {
+    for(i = WBSTART; i < bp->browser.max_displayed_entries+WBSTART; i++) {
       
       bt = (btnlist_t *) gui_xmalloc(sizeof(btnlist_t));
       bt->itemlist = (widget_t *) gui_xmalloc(sizeof(widget_t));
@@ -329,15 +327,17 @@ widget_t *create_browser(Display *display, ImlibData *idata,
       bt->sel = i;
       
       gui_list_append_content(thelist->l, 
-			      (private_data->item_tree[i] =
-			       create_label_button (display, idata, 
-						    x, y,
-						    RADIO_BUTTON, 
-						    "",
-						    browser_select, 
-						    (void*)(bt), 
-						    btnSK,
-						    btnN, btnF, btnC)));
+		      (private_data->item_tree[i] =
+		       create_label_button (display, idata, 
+					    x, y,
+					    RADIO_BUTTON, 
+					    "",
+					    browser_select, 
+					    (void*)(bt), 
+					    bp->browser.skinfile,
+					    bp->browser.norm_color,
+					    bp->browser.focused_color, 
+					    bp->browser.clicked_color)));
       
       y += widget_get_height(private_data->item_tree[i]) + 1;
     }
@@ -346,8 +346,8 @@ widget_t *create_browser(Display *display, ImlibData *idata,
   private_data->win = thelist->win;
   private_data->gc = thelist->gc;
   
-  private_data->function = selCB;
-  private_data->user_data = data;
+  private_data->function = bp->callback;
+  private_data->user_data = bp->user_data;
   
   mywidget->private_data = private_data;
 

@@ -69,7 +69,7 @@ static int ml = 0;
 #endif
 
 
-typedef void (*widget_cb_event_t)(XEvent *event);
+typedef void (*widget_cb_event_t)(XEvent *event, void *user_data);
 typedef void (*widget_cb_newpos_t)(int, int, int, int);
 
 typedef struct {
@@ -98,7 +98,7 @@ typedef struct {
   widget_cb_newpos_t  newpos_callback;
   widgetkey_t         key;
   DND_struct_t       *xdnd;
-
+  void               *user_data;
 } __gfx_t;
 
 typedef struct {
@@ -225,7 +225,7 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
 					  widget_cb_event_t cb,
 					  widget_cb_newpos_t pos_cb,
 					  dnd_callback_t dnd_cb,
-					  widget_list_t *wl) {
+					  widget_list_t *wl, void *user_data) {
   __gfx_t   *fx;
 
   //  printf("%s()\n", __FUNCTION__);
@@ -237,6 +237,7 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
   fx->window = window;
   fx->width  = 0;
   fx->height = 0;
+  fx->user_data = user_data;
   
   if(window != None) {
     XWindowAttributes wattr;
@@ -488,14 +489,14 @@ static void widget_xevent_notify(XEvent *event) {
 	}
 	
 	if(fx->xevent_callback) {
-	  fx->xevent_callback(event);
+	  fx->xevent_callback(event, fx->user_data);
 	}
       }
     }
     else {
       
       if(fx->xevent_callback) {
-	fx->xevent_callback(event);
+	fx->xevent_callback(event, fx->user_data);
       }
       
     }

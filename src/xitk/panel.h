@@ -56,8 +56,6 @@ int panel_is_visible(void) ;
 
 void panel_toggle_visibility (widget_t *w, void *data) ;
 
-void panel_handle_event(XEvent *event) ;
-
 void panel_check_pause(void) ;
 
 void panel_reset_slider ();

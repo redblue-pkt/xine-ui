@@ -248,7 +248,7 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
 /*
  * Handle X events here.
  */
-void control_handle_event(XEvent *event) {
+void control_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
   case MappingNotify:
@@ -544,7 +544,7 @@ void control_panel(void) {
 				  control_handle_event, 
 				  control_store_new_position,
 				  gui_dndcallback,
-				  control->widget_list);
+				  control->widget_list, NULL);
   
   control->visible = 1;
   control->running = 1;

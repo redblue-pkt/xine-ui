@@ -203,18 +203,6 @@ void gui_list_delete_current (gui_list_t *l) {
   gui_node_t *nodeprev;
   gui_node_t *nodenext;
 
-  /*    / first   / prev
-   list |      node
-        |         \ next
-        |         / prev
-        +cur  node
-	\ last    \ next
-                  / prev
-              node
-                  \ next
-
-   */
-
   if(l->cur->prev) {
     nodeprev = l->cur->prev;
   }

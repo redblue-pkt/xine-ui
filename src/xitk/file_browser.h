@@ -21,16 +21,19 @@
  *
  */
 
-#ifndef PLAYLIST_H
-#define PLAYLIST_H
+#ifndef FILE_BROWSER_H
+#define FILE_BROWSER_H
 
-void playlist_editor(void);
-void pl_exit(widget_t *, void *);
-int pl_is_running(void);
-void pl_toggle_visibility(widget_t *, void *);
-void pl_raise_window(void);
-void pl_scan_input(widget_t *, void *);
-void pl_update_playlist(void);
-void open_filebrowser(widget_t *, void *);
+typedef void (*select_cb_t) (widget_t *, void *);
+typedef void (*add_cb_t) (widget_t *widget, void *data, const char *);
+
+void file_browser(add_cb_t add_cb, select_cb_t sel_cb, dnd_callback_t dnd_cb);
+void destroy_file_browser(void);
+int is_file_browser_running(void);
+int is_file_browser_visible(void);
+void file_browser_toggle_visibility(void);
+void hide_file_browser(void);
+void show_file_browser(void);
+void set_file_browser_transient(void);
 
 #endif

@@ -30,6 +30,7 @@ SliderFGPlay:	0	0	slider_pad.png
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png
+PlAdd:		400	158	pl_btn.png	Black   Yellow	White
 PlLoad:		400	181	pl_btn.png	Black   Yellow	White
 PlSave:		400	204	pl_btn.png	Black   Yellow	White
 PlItemBtn:	75	40	pl_itembtn.png	Black   Yellow	White
@@ -64,3 +65,22 @@ CtlSave:	101	227	pl_btn.png        Black   Yellow    White
 CtlReset:	179 	227	pl_btn.png        Black   Yellow    White
 CtlDummy:	257	227	pl_btn.png        Black   Yellow    White
 CtlDismiss:	400	227	pl_btn.png        Black   Yellow    White
+
+### File Browser ##
+FBBG:		0	0	pl_bg.png
+FBItemBtn:	75	40	pl_itembtn.png	Black   Yellow	White
+##FBDnto:		101	227	pl_btn.png        Black   Yellow    White
+##FBUpto:		179 	227	pl_btn.png        Black   Yellow    White
+FBSelect:		101	227	pl_btn.png        Black   Yellow    White
+FBHome:		179 	227	pl_btn.png        Black   Yellow    White
+
+##FBAdd:		257	227	pl_btn.png        Black   Yellow    White
+FBDismiss:	400	227	pl_btn.png        Black   Yellow    White
+FBUp:		375	40	arrowup.png
+FBSlidBG:	377	55	pl_slidv.png
+FBSlidFG:	0	0	pl_slidpad.png
+FBDn:		375	178	arrowdn.png
+FBCurDirLbl:	75	200	letters.png
+FBCurDir:	140	200	letters.png
+FBSortRev:	362	150	arrowup.png
+FBSortDef:	362	165	arrowdn.png

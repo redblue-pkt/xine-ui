@@ -25,7 +25,6 @@
 #define CONTROL_H
 
 void control_panel(void);
-void control_handle_event(XEvent *);
 void control_exit(widget_t *, void *);
 int control_is_visible(void);
 int control_is_running(void);

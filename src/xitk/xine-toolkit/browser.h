@@ -36,6 +36,50 @@ typedef struct {
 
 typedef struct {
 
+  struct {
+    int               x;
+    int               y;
+    char             *skinfile;
+  } arrow_up;
+  
+  struct {
+    int               x;
+    int               y;
+    char             *skinfile;
+  } slider;
+
+  struct {
+    char             *skinfile;
+  } paddle;
+
+  struct {
+    int               x;
+    int               y;
+    char             *skinfile;
+  } arrow_dn;
+
+  struct {
+    int               x;
+    int               y;
+    char             *norm_color;
+    char             *focused_color;
+    char             *clicked_color;
+    char             *skinfile;
+    
+    int               max_displayed_entries;
+    
+    int               num_entries;
+    char            **entries;
+  } browser;
+  
+  /* Callback on selection function */
+  void            (*callback) (widget_t *, void *);
+  /* user data passed to callback */
+  void             *user_data;
+} browser_placements_t;
+
+typedef struct {
+
   Display       *display;
 
   widget_t      *bWidget;
@@ -61,21 +105,7 @@ typedef struct {
  */
 widget_t *create_browser(Display *display, ImlibData *idata,
 			 /* The receiver list */
-			 widget_list_t *thelist, 
-			 /* X, Y, skin for slider up button */
-			 int upX, int upY, char *upSK,
-			 /* X, Y, backgrnd, foregrnd skin for slider */
-			 int slX, int slY, char *slSKB, char *slSKF,
-			 /* X, Y, skin for slider up button */
-			 int dnX, int dnY, char *dnSK,
-			 /* X, Y for item buttons */
-			 int btnX, int btnY, 
-			 /* normal/focus/click colors, skin for item buttons */
-			 char *btnN, char *btnF, char *btnC, char *btnSK,
-			 /* max item displayed, length of content, content */
-			 int maxlength, int listlength, char **content,
-			 /* callback and data to pass to callback */
-			 void *selCB, void *data);
+			 widget_list_t *thelist, browser_placements_t *bp);
 
 /**
  * Redraw buttons/slider

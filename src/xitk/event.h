@@ -87,16 +87,6 @@ typedef struct {
 
 char *gui_get_skindir(const char file[]);
 
-#define MWM_HINTS_DECORATIONS   (1L << 1)
-#define PROP_MWM_HINTS_ELEMENTS 5
-typedef struct _mwmhints {
-  uint32_t flags;
-  uint32_t functions;
-  uint32_t decorations;
-  int32_t  input_mode;
-  uint32_t status;
-} MWMHints;
-
 /*
  * flags for autoplay options
  */

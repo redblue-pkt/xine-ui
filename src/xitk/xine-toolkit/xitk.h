@@ -30,6 +30,16 @@
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
 
+#define MWM_HINTS_DECORATIONS   (1L << 1)
+#define PROP_MWM_HINTS_ELEMENTS 5
+typedef struct _mwmhints {
+  uint32_t flags;
+  uint32_t functions;
+  uint32_t decorations;
+  int32_t  input_mode;
+  uint32_t status;
+} MWMHints;
+
 typedef struct {
     int enabled;
     int offset_x;
@@ -122,7 +132,7 @@ typedef struct DND_struct_s {
  * register time, only event for this window
  * will be send to this function.
  */
-typedef void (*widget_cb_event_t)(XEvent *event);
+typedef void (*widget_cb_event_t)(XEvent *event, void *data);
 
 /*
  * New positioning window callback function.
@@ -165,7 +175,7 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
 					  widget_cb_event_t cb,
 					  widget_cb_newpos_t pos_cb,
 					  dnd_callback_t dnd_cb,
-					  widget_list_t *wl);
+					  widget_list_t *wl, void *user_data);
 
 /*
  * Remove widgetkey_t entry in internal table.
@@ -490,23 +500,54 @@ widget_t *create_button (Display *display, ImlibData *idata,
 /**
  * Create the list browser
  */
+typedef struct {
+
+  struct {
+    int               x;
+    int               y;
+    char             *skinfile;
+  } arrow_up;
+  
+  struct {
+    int               x;
+    int               y;
+    char             *skinfile;
+  } slider;
+
+  struct {
+    char             *skinfile;
+  } paddle;
+
+  struct {
+    int               x;
+    int               y;
+    char             *skinfile;
+  } arrow_dn;
+
+  struct {
+    int               x;
+    int               y;
+    char             *norm_color;
+    char             *focused_color;
+    char             *clicked_color;
+    char             *skinfile;
+    
+    int               max_displayed_entries;
+    
+    int               num_entries;
+    char            **entries;
+  } browser;
+  
+  /* Callback on selection function */
+  void            (*callback) (widget_t *, void *);
+  /* user data passed to callback */
+  void             *user_data;
+} browser_placements_t;
+
 widget_t *create_browser(Display *display, ImlibData *idata,
 			 /* The receiver list */
 			 widget_list_t *thelist, 
-			 /* X, Y, skin for slider up button */
-			 int upX, int upY, char *upSK,
-			 /* X, Y, backgrnd, foregrnd skin for slider */
-			 int slX, int slY, char *slSKB, char *slSKF,
-			 /* X, Y, skin for slider up button */
-			 int dnX, int dnY, char *dnSK,
-			 /* X, Y for item buttons */
-			 int btnX, int btnY, 
-			 /* normal/focus/click colors, skin for item buttons */
-			 char *btnN, char *btnF, char *btnC, char *btnSK,
-			 /* max item displayed, length of content, content */
-			 int maxlength, int listlength, char **content,
-			 /* callback and data to pass to callback */
-			 void *selCB, void *data);
+			 browser_placements_t *bp);
 
 /**
  * Redraw buttons/slider
@@ -532,5 +573,86 @@ void browser_release_all_buttons(widget_t *w);
  * Return the real number of first displayed in list
  */
 int browser_get_current_start(widget_t *w);
+
+
+typedef struct {
+  
+  int                     x;
+  int                     y;
+  char                   *window_title;
+  char                   *bg_skinfile;
+  char                   *resource_name;
+  char                   *resource_class;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *skin_filename;
+  } sort_default;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *skin_filename;
+  } sort_reverse;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *skin_filename;
+    int                   max_length;
+    char                 *cur_directory;
+  } current_dir;
+  
+  dnd_callback_t          dndcallback;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *caption;
+    char                 *skin_filename;
+    char                 *normal_color;
+    char                 *focused_color;
+    char                 *clicked_color;
+  } homedir;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *caption;
+    char                 *skin_filename;
+    char                 *normal_color;
+    char                 *focused_color;
+    char                 *clicked_color;
+    void                (*callback) (widget_t *widget, void *data, const char *);
+  } select;
+
+  struct {
+    int                   x;
+    int                   y;
+    char                 *caption;
+    char                 *skin_filename;
+    char                 *normal_color;
+    char                 *focused_color;
+    char                 *clicked_color;
+  } dismiss;
+
+  struct {
+    void                (*callback) (widget_t *widget, void *data);
+  } kill;
+ 
+  browser_placements_t   *br_placement;
+
+} filebrowser_placements_t;
+
+widget_t *filebrowser_create(Display *display, ImlibData *idata,
+			     Window window_trans,
+			     filebrowser_placements_t *fbp);
+int filebrowser_is_running(widget_t *w);
+int filebrowser_is_visible(widget_t *w);
+void filebrowser_hide(widget_t *w);
+void filebrowser_show(widget_t *w);
+void filebrowser_set_transient(widget_t *w, Window window);
+void filebrowser_destroy(widget_t *w);
 
 #endif

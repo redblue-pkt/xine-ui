@@ -69,11 +69,11 @@ typedef struct {
 
 static gVw_t    *gVw;
 
-void video_window_handle_event (XEvent *);
-
 #ifndef XShmGetEventBase
 extern int XShmGetEventBase(Display *);
 #endif
+
+static void video_window_handle_event (XEvent *event, void *data);
 
 /*
  * Will called by toolkit on every move/resize event.
@@ -392,7 +392,7 @@ void video_window_adapt_size (int video_width, int video_height,
 						  video_window_handle_event,
 						  video_window_change_sizepos,
 						  gui_dndcallback,
-						  NULL);
+						  NULL, NULL);
   
   XUnlockDisplay (gGui->display);
 }
@@ -562,7 +562,7 @@ void video_window_init (void) {
 /*
  *
  */
-void video_window_handle_event (XEvent *event) {
+static void video_window_handle_event (XEvent *event, void *data) {
   
   switch(event->type) {
 

@@ -35,6 +35,7 @@
 
 #include "Imlib-light/Imlib.h"
 #include "event.h"
+#include "file_browser.h"
 #include "parseskin.h"
 #include "actions.h"
 #include "utils.h"
@@ -63,7 +64,7 @@ static _playlist_t   *playlist;
 #define PL_FILENAME  ".xinepl"
 
 
-void playlist_handle_event(XEvent *event);
+void playlist_handle_event(XEvent *event, void *data);
 
 /*
  * Toolkit event handler will call this function with new
@@ -80,8 +81,9 @@ static void playlist_store_new_position(int x, int y, int w, int h) {
  */
 void pl_update_playlist(void) {
 
-  browser_update_list(playlist->playlist, 
-		      gGui->playlist, gGui->playlist_num, 0);
+  if(playlist)
+    browser_update_list(playlist->playlist, 
+			gGui->playlist, gGui->playlist_num, 0);
 }
 
 /*
@@ -90,7 +92,6 @@ void pl_update_playlist(void) {
 static void handle_selection(widget_t *w, void *data) {
 
   //  perr(" +++ Selection called = %d = '%s'\n", 
-  //       ((int)data), gGui->gui_playlist[((int)data)]);
 }
 
 /*
@@ -112,7 +113,7 @@ void pl_exit(widget_t *w, void *data) {
   gui_list_free(playlist->widget_list->l);
   free(playlist->widget_list->gc);
   free(playlist->widget_list);
-
+ 
   free(playlist);
   playlist = NULL;
 }
@@ -176,7 +177,8 @@ static void pl_delete_all(widget_t *w, void *data) {
   gGui->playlist_num = 0;
   gGui->playlist_cur = 0;
 
-  browser_update_list(playlist->playlist, gGui->playlist, gGui->playlist_num, 0);
+  browser_update_list(playlist->playlist, 
+		      gGui->playlist, gGui->playlist_num, 0);
   gui_set_current_mrl(NULL);
 
 }
@@ -271,6 +273,23 @@ int pl_is_visible(void) {
     return playlist->visible;
 
   return 0;
+}
+
+/*
+ * Callback called by filebrowser on add event.
+ */
+static void playlist_add(widget_t *w, void *data, const char *filename) {
+
+  if(filename)
+    gui_dndcallback((char *)filename);
+}
+
+/*
+ *
+ */
+void open_filebrowser(widget_t *w, void *data) {
+  
+  file_browser(playlist_add, handle_selection, gui_dndcallback);
 }
 
 /*
@@ -447,7 +466,7 @@ void pl_toggle_visibility (widget_t *w, void *data) {
 /*
  * Handle X events here.
  */
-void playlist_handle_event(XEvent *event) {
+void playlist_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
@@ -472,6 +491,7 @@ void playlist_editor(void) {
   Atom                    prop;
   MWMHints                mwmhints;
   XClassHint             *xclasshint;
+  browser_placements_t   *bp;
 
   /* This shouldn't be happend */
   if(playlist != NULL) {
@@ -557,7 +577,7 @@ void playlist_editor(void) {
    * Widget-list
    */
   playlist->widget_list                = widget_list_new();
-  playlist->widget_list->l             = gui_list_new ();
+  playlist->widget_list->l             = gui_list_new();
   playlist->widget_list->focusedWidget = NULL;
   playlist->widget_list->pressedWidget = NULL;
   playlist->widget_list->win           = playlist->window;
@@ -624,6 +644,18 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlDeleteAll")));
 
   gui_list_append_content (playlist->widget_list->l, 
+                           create_label_button (gGui->display,
+						gGui->imlib_data,
+						gui_get_skinX("PlAdd"), 
+                                                gui_get_skinY("PlAdd"), 
+                                                CLICK_BUTTON, "Add", 
+                                                open_filebrowser, NULL,  
+                                                gui_get_skinfile("PlAdd"), 
+                                                gui_get_ncolor("PlAdd"), 
+                                                gui_get_fcolor("PlAdd"), 
+                                                gui_get_ccolor("PlAdd")));
+
+  gui_list_append_content (playlist->widget_list->l, 
 			   create_label_button (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlLoad"),
@@ -659,31 +691,36 @@ void playlist_editor(void) {
 						gui_get_fcolor("PlDismiss"),
 						gui_get_ccolor("PlDismiss")));
 
+  bp = (browser_placements_t *) xmalloc(sizeof(browser_placements_t));
+  bp->arrow_up.x                    = gui_get_skinX("PlUp");
+  bp->arrow_up.y                    = gui_get_skinY("PlUp");
+  bp->arrow_up.skinfile             = gui_get_skinfile("PlUp");
+  bp->slider.x                      = gui_get_skinX("PlSlidBG");
+  bp->slider.y                      = gui_get_skinY("PlSlidBG");
+  bp->slider.skinfile               = gui_get_skinfile("PlSlidBG");
+  bp->paddle.skinfile               = gui_get_skinfile("PlSlidFG");
+  bp->arrow_dn.x                    = gui_get_skinX("PlDn");
+  bp->arrow_dn.y                    = gui_get_skinY("PlDn");
+  bp->arrow_dn.skinfile             = gui_get_skinfile("PlDn");
+  bp->browser.x                     = gui_get_skinX("PlItemBtn");
+  bp->browser.y                     = gui_get_skinY("PlItemBtn");
+  bp->browser.norm_color            = gui_get_ncolor("PlItemBtn");
+  bp->browser.focused_color         = gui_get_fcolor("PlItemBtn");
+  bp->browser.clicked_color         = gui_get_ccolor("PlItemBtn");
+  bp->browser.skinfile              = gui_get_skinfile("PlItemBtn");
+  bp->browser.max_displayed_entries = 9;
+  bp->browser.num_entries           = gGui->playlist_num;
+  bp->browser.entries               = gGui->playlist;
+  bp->callback                      = handle_selection;
+  bp->user_data                     = NULL;
 
   gui_list_append_content (playlist->widget_list->l, 
-		   (playlist->playlist = 
-		    create_browser(gGui->display,
-				   gGui->imlib_data,
-				   playlist->widget_list,
-				   gui_get_skinX("PlUp"),
-				   gui_get_skinY("PlUp"),
-				   gui_get_skinfile("PlUp"),
-				   gui_get_skinX("PlSlidBG"),
-				   gui_get_skinY("PlSlidBG"),
-				   gui_get_skinfile("PlSlidBG"),
-				   gui_get_skinfile("PlSlidFG"),
-				   gui_get_skinX("PlDn"),
-				   gui_get_skinY("PlDn"),
-				   gui_get_skinfile("PlDn"),
-				   gui_get_skinX("PlItemBtn"),
-				   gui_get_skinY("PlItemBtn"),
-				   gui_get_ncolor("PlItemBtn"),
-				   gui_get_fcolor("PlItemBtn"),
-				   gui_get_ccolor("PlItemBtn"),
-				   gui_get_skinfile("PlItemBtn"),
-				   9, gGui->playlist_num, gGui->playlist,
-				   handle_selection, NULL)));
-  
+			   (playlist->playlist = 
+			    create_browser(gGui->display,
+					   gGui->imlib_data,
+					   playlist->widget_list,
+					   bp)));
+
   gui_list_append_content (playlist->widget_list->l,
 			   create_label (gGui->display, gGui->imlib_data, 
 					 gui_get_skinX("AutoPlayLbl"),
@@ -727,7 +764,7 @@ void playlist_editor(void) {
 				  playlist_handle_event,
 				  playlist_store_new_position,
 				  gui_dndcallback,
-				  playlist->widget_list);
+				  playlist->widget_list, NULL);
 
   playlist->visible = 1;
   playlist->running = 1;

@@ -50,6 +50,4 @@ int video_window_is_visible (void);
 void video_window_show_logo(void);
 void video_window_hide_logo(void);
 
-void video_window_handle_event(XEvent *);
-
 #endif
