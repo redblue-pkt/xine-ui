@@ -24,6 +24,7 @@
    3.2 How do I compile xine?
    3.2.1 simple build instructions for beginners
    3.2.2 complete build instructions
+   3.2.3 making your own RPM packages (xine-lib, xine-ui)
    
    3.3 Can I provide additional CFLAGS for compilation?
    3.4 Are there binaries for my K7 available? Can I build them?
@@ -175,53 +176,97 @@
 
 3.2.1 simple build instructions for beginners
 
-    Download the latest xine-lib and xine-ui tarballs, then follow
-    these instruction. To unpack a tarball, use
+      Download the latest xine-lib and xine-ui tarballs, then follow
+      these instruction. To unpack a tarball, use:
   
-    tar xfvz tarballname.tar.gz
+       tar xfvz tarballname.tar.gz
 
-    the following instructions will install xine in /usr/local
-    for all users. You need root privileges to do this on most
-    systems.
+      The following instructions will install xine in /usr/local for all
+      users. You need root privileges to do this on most systems.
 
-    first unpack xine-lib, then:
-    # ./configure
-    # make install
+      First unpack xine-lib, then:
+      
+       ./configure
+       make install
 
-    make sure your /etc/ld.so.conf contains /usr/local/lib, then
+      Make sure your /etc/ld.so.conf contains /usr/local/lib, then:
 
-    # ldconfig
+       ldconfig
 
-    now unpack xine-ui, then:
-    # ./configure
-    # make install
+      Now unpack xine-ui, then:
+      
+       ./configure
+       make install
 
 3.2.2 complete build instructions
 
-    The build process is the same for all of the xine modules (see 2.1 for
-    an explanation about the modules).
+      The build process is the same for all of the xine modules (see 2.1 for
+      an explanation about the modules).
 
-    You have to start with xine-lib. If build and installed successfully, you
-    can continue with xine-ui and/or xine-plugin.
+      You have to start with xine-lib. If build and installed successfully, you
+      can continue with xine-ui and/or xine-plugin.
     
-    Please note that if you have installed xine-lib to a non-standard prefix,
-    make sure you have $prefix/bin in your PATH and your linker will find libs
-    in $prefix/lib - otherwise the compilation of every module that relies
-    on xine-lib will fail with configure complaing about not finding certain
-    parts of libxine. Using bash you can do something like
+      Please note that if you have installed xine-lib to a non-standard prefix,
+      make sure you have $prefix/bin in your PATH and your linker will find
+      libs in $prefix/lib - otherwise the compilation of every module that
+      relies on xine-lib will fail with configure complaining about not
+      finding certain parts of libxine. Using bash you can do something like:
     
-     export PATH="$prefix/bin:$PATH"
-     export LD_LIBRARY_PATH="$prefix/lib:$LD_LIBRARY_PATH"
+       export PATH="$prefix/bin:$PATH"
+       export LD_LIBRARY_PATH="$prefix/lib:$LD_LIBRARY_PATH"
 
-    to make sure libxine can be found by xine-ui/xine-plugin/....
+      to make sure libxine can be found by xine-ui/xine-plugin/....
 
-    Last but not least. Here the compilation instructions. Like stated earlier,
-    those are the same for every xine module.
+      Last but not least. Here the build instructions. Like stated earlier,
+      those are the same for every xine module.
     
-     ./cvscompile.sh [-> only necessary if you checked your sources out of CVS]
-     ./configure
-     make
-     make install
+       ./cvscompile.sh [-> *only* if you checked your sources out of CVS]
+       ./configure
+       make
+       make install
+
+3.2.3 making your own RPM packages (xine-lib, xine-ui)
+      
+      People keep on reporting those spec-files delivered with xine are broken
+      and that they cannot build their packages with them. Well let's prove
+      them wrong because it works just fine... at least for Daniel and me. :)
+      
+      First of all - *don't* use the existing spec-files because those will
+      indeed probably not work for your system because they have to built by
+      the appropriate configure script for they contain dynamic/optional
+      features that your system won't necessarily support.
+      
+      The following instructions are valid for both xine-lib and xine-ui.
+      
+      Get the appropriate sources - either as a tar-ball from our web
+      site or check out a more recent development version from our CVS. In
+      the source directory run "./configure" (or ./cvscompile.sh if you have
+      a CVS checkout) which'll test your system and accordingly enable/disable
+      support of specific xine features. Once this is finished, special for
+      your system adjusted spec files have been created in the source tree's
+      subdirectory misc/ (xine-ui.spec or xine-lib.spec respectively). Copy
+      that spec-file to your RPM spec directory (e.g. /usr/src/RPM/SPECS/) and
+      the source tar-ball to your RPM source dir (e.g. /usr/src/RPM/SOURCES/).
+      Please note that if you have a CVS checkout, you won't have a tar-ball
+      at hand, so follow those simple steps to get one:
+        
+	* take a look at the xine-ui.spec/xine-lib.spec - there is a line
+	  called SOURCE at the very beginning, use the filename written there
+	  for your tar-ball in the next step
+	* switch to the directory where your xine-lib/xine-ui dir's are and
+	  run a "tar cf FILENAME_FROM_ABOVE xine-lib/"
+        * Place that tar-ball in your RPM source directory :)
+
+      Now run a rpm -ba xine-lib.spec (or xine-ui.spec respectively) in your
+      RPM spec directory and after compilation you will have your binary RPMs
+      in your RPM binary dir (e.g. /usr/src/RPM/RPMS/i686) and a source RPM
+      in the appropriate directory too (e.g. /usr/src/RPM/SRPMS).
+      
+      That's it, actually. Just be sure that you install the xine-lib RPMs you
+      built before going on with the xine-ui stuff because this will already
+      fail at the configure stage if no xine-lib is installed.
+      
+      Easy, wasn't it? ;-))
 
 3.3 Can I provide additional CFLAGS for compilation?
     
@@ -528,9 +573,10 @@
 
 5.1.10 How can I watch files with external AVI subtitles?
 
-      use a MRL like:
+       use a MRL like:
+ 
+        xine foo.avi%bar.sub
 
-       xine foo.avi%bar.sub
 
 5.2 AUDIO RELATED QUESTIONS
 
