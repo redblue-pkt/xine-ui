@@ -48,6 +48,8 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
+#define FONT "/usr/local/share/directfb-examples/fonts/decker.ttf"
+
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
 #else
@@ -80,10 +82,18 @@ typedef struct {
   int               auto_quit;
 
   IDirectFB        *dfb;
+  IDirectFBDisplayLayer  *layer;
   IDirectFBSurface *primary;
+  IDirectFBSurface *bg_surface;
+  IDirectFBWindow  *main_window;
+  IDirectFBSurface *main_surface;
+
+  IDirectFBFont    *font;
+  int               fontheight;
+  DFBDisplayLayerConfig  layer_config;
+ 
   int               screen_width;
   int               screen_height;
-  IDirectFBInputBuffer *input_buffer;
 
   struct {
     int                enable;
@@ -261,14 +271,20 @@ typedef struct {
 int main(int argc, char *argv[]) {
   int            c = '?';
   int            option_index    = 0;
-  int            key;
   char          *configfile;
   char          *audio_driver_id = NULL;
   char          *video_driver_id = NULL;
   int            audio_channel   = 0;
   char          *driver_name;
   dfb_visual_info_t visual_info;
-  DFBInputEvent evt;
+  DFBCardCapabilities    caps;
+  IDirectFBInputBuffer *input_buf;
+  IDirectFBInputDevice *keyboard = NULL;
+  int window_grabbed = 0;
+  int startx = 0;
+  int starty = 0;
+  int endx = 0;
+  int endy = 0;
 
   /*
    * Check xine library version 
@@ -378,24 +394,87 @@ int main(int argc, char *argv[]) {
    * Initialise primary surface
    */
   DFBCHECK(DirectFBCreate(&(dfbxine.dfb)));
-  DFBCHECK(dfbxine.dfb->SetCooperativeLevel(dfbxine.dfb, 
-					    DFSCL_FULLSCREEN));
-  DFBCHECK(dfbxine.dfb->CreateInputBuffer(dfbxine.dfb,
-					  DICAPS_KEYS | DICAPS_AXIS | 
-					  DICAPS_BUTTONS,
-					  &(dfbxine.input_buffer)));
+  /* DFBCHECK(dfbxine.dfb->SetCooperativeLevel(dfbxine.dfb, 
+					    DFSCL_FULLSCREEN));*/
+
+ dfbxine.dfb->GetCardCapabilities( dfbxine.dfb, &caps );
+ dfbxine.dfb->GetDisplayLayer( dfbxine.dfb, DLID_PRIMARY, &(dfbxine.layer) );
+ 
+ if (!((caps.blitting_flags & DSBLIT_BLEND_ALPHACHANNEL) &&
+       (caps.blitting_flags & DSBLIT_BLEND_COLORALPHA  )))
   {
-   DFBSurfaceDescription dsc;
-   dsc.flags = DSDESC_CAPS;
-   dsc.caps  = DSCAPS_PRIMARY | DSCAPS_FLIPPING;
-   DFBCHECK(dfbxine.dfb->CreateSurface(dfbxine.dfb, &dsc, &(dfbxine.primary)));
+   dfbxine.layer_config.flags = DLCONF_BUFFERMODE;
+   dfbxine.layer_config.buffermode = DLBM_BACKSYSTEM;
+   
+   dfbxine.layer->SetConfiguration( dfbxine.layer, &(dfbxine.layer_config) );
   }
+ 
+ dfbxine.layer->GetConfiguration( dfbxine.layer, &(dfbxine.layer_config) );
+ dfbxine.layer->EnableCursor ( dfbxine.layer, 1 );
+
+  {
+   DFBFontDescription desc;
+   
+   desc.flags = DFDESC_HEIGHT;
+   desc.height = dfbxine.layer_config.width/50;
+   
+   DFBCHECK(dfbxine.dfb->CreateFont( dfbxine.dfb, FONT, &desc, 
+				     &(dfbxine.font) ));
+   dfbxine.font->GetHeight( dfbxine.font, &(dfbxine.fontheight) );
+  }
+
+  {
+   DFBSurfaceDescription desc;
+   
+   desc.flags = DSDESC_WIDTH | DSDESC_HEIGHT;
+   desc.width = dfbxine.layer_config.width;
+   desc.height = dfbxine.layer_config.height;
+
+   DFBCHECK(dfbxine.dfb->CreateSurface(dfbxine.dfb, &desc, 
+				       &(dfbxine.primary)));
+  }
+
  DFBCHECK(dfbxine.primary->GetSize(dfbxine.primary, &(dfbxine.screen_width),
 				   &(dfbxine.screen_height)));
- DFBCHECK(dfbxine.primary->FillRectangle(dfbxine.primary, 0, 0, 
-					 dfbxine.screen_width, 
-					 dfbxine.screen_height));
- DFBCHECK(dfbxine.primary->Flip(dfbxine.primary, NULL, 0));
+ DFBCHECK(dfbxine.primary->SetFont(dfbxine.primary, dfbxine.font));
+ DFBCHECK(dfbxine.primary->SetColor(dfbxine.primary, 0xCF, 0xCF, 0xFF, 0xFF));
+ DFBCHECK(dfbxine.primary->DrawString(dfbxine.primary,
+				      "This is the DirectFB output mode "
+				      "for Xine",
+				      -1,0,0, DSTF_LEFT | DSTF_TOP));
+ DFBCHECK(dfbxine.layer->SetBackgroundImage(dfbxine.layer,dfbxine.primary));
+ DFBCHECK(dfbxine.layer->SetBackgroundMode(dfbxine.layer, DLBM_IMAGE));
+	  
+  {
+   DFBWindowDescription desc;
+   
+   desc.flags = ( DWDESC_POSX | DWDESC_POSY |
+		  DWDESC_WIDTH | DWDESC_HEIGHT );
+
+   desc.posx = 20;
+   desc.posy = 120;
+   desc.width = 768/2;
+   desc.height = 576/2;
+
+   DFBCHECK( dfbxine.layer->CreateWindow( dfbxine.layer, &desc, 
+					  &(dfbxine.main_window) ) );
+   dfbxine.main_window->GetSurface( dfbxine.main_window, 
+				    &(dfbxine.main_surface) );
+   dfbxine.main_window->SetOpacity(dfbxine.main_window, 0xff);
+
+   dfbxine.main_surface->SetColor( dfbxine.main_surface,
+			      0x00, 0x30, 0x10, 0xc0 );
+   dfbxine.main_surface->DrawRectangle( dfbxine.main_surface, 0, 0,
+     				   desc.width, desc.height );
+   dfbxine.main_surface->SetColor( dfbxine.main_surface,
+			      0x80, 0xa0, 0x00, 0x90 );
+   dfbxine.main_surface->FillRectangle( dfbxine.main_surface, 1, 1,
+				   desc.width-2, desc.height-2 );
+   
+   dfbxine.main_surface->Flip(dfbxine.main_surface, NULL, 0);
+  }
+ dfbxine.main_window->RequestFocus(dfbxine.main_window);
+ dfbxine.main_window->RaiseToTop(dfbxine.main_window);
 
  /*
   * init video output driver
@@ -404,7 +483,7 @@ int main(int argc, char *argv[]) {
   video_driver_id = "directfb";
  
  visual_info.dfb = dfbxine.dfb;
- visual_info.primary = dfbxine.primary;
+ visual_info.primary = dfbxine.main_surface;
  dfbxine.vo_driver = xine_load_video_output_plugin(dfbxine.config, 
 						   video_driver_id,
 						   VISUAL_TYPE_DFB, 
@@ -473,16 +552,57 @@ int main(int argc, char *argv[]) {
   
   dfbxine.running = 1;
 
+  DFBCHECK (dfbxine.dfb->GetInputDevice (dfbxine.dfb,
+					 DIDID_KEYBOARD, &keyboard));
+  DFBCHECK (keyboard->CreateInputBuffer (keyboard, &input_buf));
+
   while (dfbxine.running) {
-    while(dfbxine.input_buffer->GetEvent(dfbxine.input_buffer, 
-					&evt) == DFB_OK) {
-      if (evt.type == DIET_KEYPRESS) {
-	switch(evt.keycode) {
-	 case DIKC_Q:
-	  dfbxine.running = 0;
-	  break;
-	 default:
+    DFBWindowEvent evt;
+    DFBInputEvent event;
+
+    input_buf->WaitForEventWithTimeout(input_buf, 0, 10000000);
+    
+    dfbxine.main_window->WaitForEventWithTimeout(dfbxine.main_window,
+						 0, 10000000);
+    
+    while (dfbxine.main_window->GetEvent( dfbxine.main_window,
+					  &evt ) == DFB_OK) {
+      switch (evt.type) {
+       case DWET_BUTTONDOWN:
+	if(!window_grabbed && evt.button == DIBI_LEFT) {
+	  window_grabbed = 1;
+	  dfbxine.layer->GetCursorPosition(dfbxine.layer, &startx,
+					   &starty);
+	  dfbxine.main_window->GrabPointer(dfbxine.main_window);
 	}
+	break;
+       case DWET_BUTTONUP:
+	if(evt.button == DIBI_LEFT) {
+	  dfbxine.main_window->UngrabPointer(dfbxine.main_window);
+	  window_grabbed = 0;
+	}
+	break;
+       case DWET_MOTION:
+	endx = evt.cx;
+	endy = evt.cy;
+	break;
+       default:
+      }
+    }
+
+    if(window_grabbed) {
+      dfbxine.main_window->Move(dfbxine.main_window,
+				endx-startx, endy-starty);
+      startx = endx;
+      starty = endy;
+    }
+    
+    while(input_buf->GetEvent(input_buf, &event) == DFB_OK) {
+      switch(event.type) {
+       case DIET_KEYPRESS:
+	dfbxine.running = 0;
+	break;
+       default:
       }
     }
   }
@@ -495,10 +615,14 @@ failure:
   if(dfbxine.xine)
     xine_exit(dfbxine.xine); 
 
-  if(dfbxine.input_buffer)
-   DFBCHECK(dfbxine.input_buffer->Release(dfbxine.input_buffer));
+  if(dfbxine.main_surface)
+   DFBCHECK(dfbxine.main_surface->Release(dfbxine.main_surface));
+  if(dfbxine.main_window)
+   DFBCHECK(dfbxine.main_window->Release(dfbxine.main_window));
   if(dfbxine.primary)
    DFBCHECK(dfbxine.primary->Release(dfbxine.primary));
+  if(dfbxine.layer)
+   DFBCHECK(dfbxine.layer->Release(dfbxine.layer));
   if(dfbxine.dfb) 
    DFBCHECK(dfbxine.dfb->Release(dfbxine.dfb));
 
