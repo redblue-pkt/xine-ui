@@ -300,6 +300,19 @@ void video_window_adapt_size (int video_width, int video_height,
     if (gVw->xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint);
 
+    hint.x = 0;
+    hint.y = 0;
+    hint.width  = gVw->fullscreen_width;
+    hint.height = gVw->fullscreen_height;
+    hint.win_gravity = StaticGravity;
+    hint.flags  = PPosition | PSize | PWinGravity;
+    
+    XSetStandardProperties(gGui->display, gGui->video_window, 
+ 			   window_title, window_title, None, NULL, 0, 0);
+    
+    XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
+    
+    
     XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
 
     /*
@@ -396,7 +409,8 @@ void video_window_adapt_size (int video_width, int video_height,
     /* Tell other applications about gGui window */
 
     XSetStandardProperties(gGui->display, gGui->video_window, 
-			   window_title, window_title, None, NULL, 0, &hint);
+			   window_title, window_title, None, NULL, 0, 0);
+    XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
   }
   
   
