@@ -59,6 +59,7 @@ typedef struct {
   Visual	*visual;	  /* Visual for video window               */
   Colormap	 colormap;	  /* Colormap for video window		   */
   XClassHint    *xclasshint;
+  XClassHint    *xclasshint_fullscreen;
   GC             gc;
 
   int            video_width;     /* size of currently displayed video     */
@@ -398,8 +399,8 @@ static void video_window_adapt_size (void) {
 					  GUI_DATA_EX_DRAWABLE_CHANGED, 
 					  (void*)gGui->video_window);
     
-    if (gVw->xclasshint != NULL)
-      XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint);
+    if (gVw->xclasshint_fullscreen != NULL)
+      XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint_fullscreen);
 
 #ifndef HAVE_XINERAMA
     hint.x      = 0;
@@ -817,6 +818,10 @@ void video_window_init (void) {
   if ((gVw->xclasshint = XAllocClassHint()) != NULL) {
     gVw->xclasshint->res_name = "Xine Video Window";
     gVw->xclasshint->res_class = "Xine";
+  }
+  if ((gVw->xclasshint_fullscreen = XAllocClassHint()) != NULL) {
+    gVw->xclasshint_fullscreen->res_name = "Xine Video Fullscreen Window";
+    gVw->xclasshint_fullscreen->res_class = "Xine";
   }
 
   /* 
