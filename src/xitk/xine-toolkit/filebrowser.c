@@ -990,7 +990,6 @@ widget_t *filebrowser_create(Display *display, ImlibData *idata,
   gc = XCreateGC(display, private_data->window, 0, 0);
   
   Imlib_apply_image(idata, private_data->bg_image, private_data->window);
-  XSync(display, False);
 
   private_data->widget_list                = widget_list_new() ;
   private_data->widget_list->l             = gui_list_new ();

@@ -1,4 +1,4 @@
-/* 
+//* 
  * Copyright (C) 2000-2001 the xine project
  * 
  * This file is part of xine, a unix video player.
@@ -291,24 +291,6 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
     XChangeProperty (gXitk->display, fx->window, fx->XA_XITK, XA_ATOM,
 		     32, PropModeAppend, (unsigned char *)&VERSION, 1);
     
-    /*  Force to repain the widget list if it exist */
-    if(fx->widget_list) {
-      XEvent xexp;
-      
-      xexp.xany.type          = Expose;
-      xexp.xexpose.type       = Expose;
-      xexp.xexpose.send_event = True;
-      xexp.xexpose.display    = gXitk->display;
-      xexp.xexpose.window     = fx->window;
-      xexp.xexpose.count      = 0;
-      
-      XLOCK(gXitk->display);
-      if(!XSendEvent(gXitk->display, fx->window, False, ExposureMask, &xexp)) {
-	fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n",
-		(unsigned int) fx->window);
-      }
-      XUNLOCK(gXitk->display);
-    }
   }
   else
     fx->XA_XITK = None;
@@ -420,7 +402,7 @@ static void widget_xevent_notify(XEvent *event) {
 	      }
 	    }
 
-	    XFlush(gXitk->display);
+	    // XFlush(gXitk->display);
 
 	    XUNLOCK(gXitk->display);
 
@@ -546,6 +528,7 @@ void widget_init(Display *display) {
 void widget_run(void) {
   XEvent            myevent;
   struct sigaction  action;
+  __gfx_t          *fx;
 
   action.sa_handler = xitk_signal_handler;
   sigemptyset(&(action.sa_mask));
@@ -568,6 +551,40 @@ void widget_run(void) {
 
   gXitk->running = 1;
 
+  /*
+   * Force to repain the widget list if it exist
+   */
+  MUTLOCK();
+
+  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+  
+  while(fx) {
+
+    if(fx->window != None && fx->widget_list) {
+      XEvent xexp;
+      
+      xexp.xany.type          = Expose;
+      xexp.xexpose.type       = Expose;
+      xexp.xexpose.send_event = True;
+      xexp.xexpose.display    = gXitk->display;
+      xexp.xexpose.window     = fx->window;
+      xexp.xexpose.count      = 0;
+      
+      XLOCK(gXitk->display);
+      if(!XSendEvent(gXitk->display, fx->window, False, ExposureMask, &xexp)) {
+	fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n",
+		(unsigned int) fx->window);
+      }
+      XUNLOCK(gXitk->display);
+    }
+    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
+  }
+
+  MUTUNLOCK();
+
+  /*
+   * Now, wait for a new xevent
+   */
   while(gXitk->running) {
     /* XLOCK(gXitk->display); 
 
