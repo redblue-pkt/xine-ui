@@ -345,7 +345,6 @@ static void load_video_out_driver(const char *video_driver_id) {
 			   / DisplayHeightMM (gGui->display, gGui->screen));
   
   gGui->pixel_aspect    = res_h / res_v;
-  printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #ifdef DEBUG
   printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif
