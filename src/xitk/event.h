@@ -29,7 +29,11 @@
 #include "xine.h"
 #include "xitk.h"
 
-#define perr(FMT,ARGS...) fprintf(stderr, FMT, ##ARGS);fflush(stderr)
+#ifdef __GNUC__
+#define perr(FMT,ARGS...) {fprintf(stderr, FMT, ##ARGS);fflush(stderr);}
+#else	/* C99 version: */
+#define perr(...)	  {fprintf(stderr, __VA_ARGS__);fflush(stderr);}
+#endif
 
 #define MAX_PLAYLIST_LENGTH  1024
 

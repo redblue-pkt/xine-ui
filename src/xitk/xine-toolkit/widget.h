@@ -220,6 +220,12 @@ void widget_show_widgets(widget_list_t *);
  */
 void widget_hide_widgets(widget_list_t *);
 
+
+#ifndef __GNUC__
+#define	__FUNCTION__	__func__
+#endif
+
+
 /*
  * small utility function to debug xlock races
  */

@@ -43,7 +43,11 @@ extern uint32_t xine_debug;
 #define LOOP           (xine_debug & 0x8000>>11)
 #define GUI            (xine_debug & 0x8000>>12)
 
+#ifdef  __GNUC__
 #define perr(FMT,ARGS...) {fprintf(stderr, FMT, ##ARGS);fflush(stderr);}
+#else   /* C99 version: */
+#define perr(...)         {fprintf(stderr, __VA_ARGS__);fflush(stderr);}
+#endif
 
 #ifdef DEBUG
 
@@ -53,9 +57,16 @@ extern uint32_t xine_debug;
 
 //#define perr(FMT,ARGS...) {fprintf(stderr, FMT, ##ARGS);fflush(stderr);}
 
+#ifdef  __GNUC__
 #define xprintf(LVL, FMT, ARGS...) {                                          \
                                      if(LVL) {                                \
-                                       printf(FMT, ##ARGS);          \
+                                       printf(FMT, ##ARGS);		      \
+                                     }                                        \
+                                   }
+#else	/* C99 version: */
+#define xprintf(LVL, ...) {						      \
+                                     if(LVL) {                                \
+                                       printf(__VA_ARGS__);		      \
                                      }                                        \
                                    }
 /*
@@ -76,7 +87,11 @@ void profiler_print_results ();
 
 //#define perr(FMT,ARGS...) 
 
+#ifdef  __GNUC__
 #define xprintf(LVL, FMT, ARGS...) 
+#else   /* C99 version: */
+#define xprintf(LVL, ...) 
+#endif
 
 #define profiler_init()
 #define profiler_set_label(id, label)

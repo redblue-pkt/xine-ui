@@ -33,25 +33,25 @@
 #include <time.h>
 #include <sys/types.h>
 
+#ifndef __GNUC__
+#define	__FUNCTION__	__func__
+#endif
+
 /*
  *
  */
 void *xmalloc(size_t size) {
-  void *ptrmalloc, *ptrmemset;
+  void *ptr;
 
-  if((ptrmalloc = malloc(size)) == NULL) {
+  if((ptr = malloc(size)) == NULL) {
     fprintf(stderr, "%s: malloc() failed: %s.\n",
 	    __FUNCTION__, strerror(errno));
     return NULL;
   }
 
-  if((ptrmemset = memset(ptrmalloc, 0, size)) == NULL) {
-    fprintf(stderr, "%s: memset() failed: %s.\n", 
-	    __FUNCTION__, strerror(errno));
-    return NULL;
-  }
+  memset(ptr, 0, size);
 
-  return ptrmemset;
+  return ptr;
 }
 
 /*

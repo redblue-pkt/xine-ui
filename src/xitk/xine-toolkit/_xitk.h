@@ -35,6 +35,7 @@
 #include "dnd.h"
 #include "widget.h"
 
+
 typedef void (*xitk_simple_callback_t)(widget_t *, void *);
 typedef void (*xitk_state_callback_t)(widget_t *, void *, int);
 typedef void (*xitk_string_callback_t)(widget_t *, void *, char *);
