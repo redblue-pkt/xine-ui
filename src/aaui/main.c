@@ -145,46 +145,47 @@ static void config_update(xine_cfg_entry_t *entry,
 
 #if 0 /* No used yet */
 static void config_update_range(char *key, int min, int max) {
-  xine_cfg_entry_t *entry = xine_config_lookup_entry(aaxine.xine, key);
+  xine_cfg_entry_t entry;
   
-  if(entry)
-    config_update(entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
+  if(xine_config_lookup_entry(aaxine.xine, key, &entry))
+    config_update(&entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
 }
 static void config_update_enum(char *key, int value) {
-  xine_cfg_entry_t *entry = xine_config_lookup_entry(aaxine.xine, key);
+  xine_cfg_entry_t entry;
   
-  if(entry)
-    config_update(entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
+  if(xine_config_lookup_entry(aaxine.xine, key, &entry))
+    config_update(&entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
 }
 
 static void config_update_bool(char *key, int value) {
-  xine_cfg_entry_t *entry = xine_config_lookup_entry(aaxine.xine, key);
+  xine_cfg_entry_t entry;
 
-  if(entry)
-    config_update(entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
+  if(xine_config_lookup_entry(aaxine.xine, key, &entry))
+    config_update(&entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
 }
 
 static void config_update_num(char *key, int value) {
-  xine_cfg_entry_t *entry = xine_config_lookup_entry(aaxine.xine, key);
+  xine_cfg_entry_t entry;
 
-  if(entry)
-    config_update(entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
+  if(xine_config_lookup_entry(aaxine.xine, key, &entry))
+    config_update(&entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
 }
 #endif
 
 static void config_update_string(char *key, char *string) {
-  xine_cfg_entry_t *entry = xine_config_lookup_entry(aaxine.xine, key);
+  xine_cfg_entry_t entry;
   
-  if(entry && string)
-    config_update(entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
+  memset(&entry, 0, sizeof(entry));
+  if (xine_config_lookup_entry(aaxine.xine, key, &entry) && string)
+    config_update(&entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
   else {
     if(string == NULL)
       fprintf(stderr, "string is NULL\n");
