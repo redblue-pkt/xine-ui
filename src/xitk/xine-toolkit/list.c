@@ -52,14 +52,28 @@ xitk_list_t *xitk_list_new (void) {
  *
  */
 void xitk_list_free(xitk_list_t *l) {
+  xitk_node_t *node;
 
-  l->cur = l->first;
-
-  while(l->cur->next) {
-    XITK_FREE(l->cur->content);
-    l->cur = l->cur->next;
+  if (!l) {
+    XITK_WARNING("%s(): No list.\n", __FUNCTION__);
+    return;
+  }
+ 
+  if(!l->first) {
+    XITK_WARNING("%s(): No node.\n", __FUNCTION__);
+    return;
   }
 
+  node = l->first;
+  
+  while(node) {
+    xitk_node_t *n = node;
+    
+    XITK_FREE(n->content);
+    node = n->next;
+    XITK_FREE(n);
+  }
+  
   l->first = l->cur = l->last = NULL;
 }
 
@@ -91,7 +105,7 @@ void *xitk_list_next_content (xitk_list_t *l) {
     
   } 
   else {
-    XITK_WARNING("xitk_list : passed end of list");
+    XITK_WARNING("%s(): passed end of list", __FUNCTION__);
     return NULL;
   }    
 }
