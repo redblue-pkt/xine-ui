@@ -6,6 +6,9 @@ dnl
 dnl
 dnl Check if dup2() does not clear the close on exec flag
 dnl
+dnl 30/04/2002 Daniel Caujolle-Bert <segfault@club-internet.fr>
+dnl  - Change BASH_CHECK_LIB_TERMCAP() found/not_found args. 
+dnl
 AC_DEFUN(BASH_DUP2_CLOEXEC_CHECK,
 [AC_MSG_CHECKING(if dup2 fails to clear the close-on-exec flag)
 AC_CACHE_VAL(bash_cv_dup2_broken,
@@ -602,37 +605,56 @@ AC_DEFINE(ULIMIT_MAXFDS)
 fi
 ])
 
-AC_DEFUN(BASH_CHECK_LIB_TERMCAP,
-[
-if test "X$bash_cv_termcap_lib" = "X"; then
-_bash_needmsg=yes
-else
-AC_MSG_CHECKING(which library has the termcap functions)
-_bash_needmsg=
-fi
-AC_CACHE_VAL(bash_cv_termcap_lib,
-[AC_CHECK_LIB(termcap, tgetent, bash_cv_termcap_lib=libtermcap,
-    [AC_CHECK_LIB(curses, tgetent, bash_cv_termcap_lib=libcurses,
-	[AC_CHECK_LIB(ncurses, tgetent, bash_cv_termcap_lib=libncurses,
-	    bash_cv_termcap_lib=gnutermcap)])])])
-if test "X$_bash_needmsg" = "Xyes"; then
-AC_MSG_CHECKING(which library has the termcap functions)
-fi
-AC_MSG_RESULT(using $bash_cv_termcap_lib)
-if test $bash_cv_termcap_lib = gnutermcap && test -z "$prefer_curses"; then
-dnl DCB: disable it, it doesn't exist LDFLAGS="$LDFLAGS -L./lib/termcap"
-TERMCAP_LIB="./lib/termcap/libtermcap.a"
-TERMCAP_DEP="./lib/termcap/libtermcap.a"
-elif test $bash_cv_termcap_lib = libtermcap && test -z "$prefer_curses"; then
-TERMCAP_LIB=-ltermcap
-TERMCAP_DEP=
-elif test $bash_cv_termcap_lib = libncurses; then
-TERMCAP_LIB=-lncurses
-TERMCAP_DEP=
-else
-TERMCAP_LIB=-lcurses
-TERMCAP_DEP=
-fi
+dnl
+dnl BASH_CHECK_LIB_TERMCAP([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND ])
+dnl
+AC_DEFUN([BASH_CHECK_LIB_TERMCAP],
+ [ no_termcap=""
+   if test "X$bash_cv_termcap_lib" = "X"; then
+     _bash_needmsg=yes
+   else
+     AC_MSG_CHECKING([which library has the termcap functions])
+     _bash_needmsg=
+   fi
+   AC_CACHE_VAL(bash_cv_termcap_lib,
+                [AC_CHECK_LIB(termcap, tgetents, bash_cv_termcap_lib=libtermcap,
+                              [AC_CHECK_LIB(curses, tgetents, bash_cv_termcap_lib=libcurses,
+	                                    [AC_CHECK_LIB(ncurses, tgetents, bash_cv_termcap_lib=libncurses,
+	                                                  [ bash_cv_termcap_lib=unset
+                                                            no_termcap=yes])
+                                            ])
+                              ])
+                ])
+
+   if test "X$_bash_needmsg" = "Xyes"; then
+     AC_MSG_CHECKING([which library has the termcap functions])
+   fi
+
+   if test x"$no_termcap" = "x"; then
+     AC_MSG_RESULT([using $bash_cv_termcap_lib])
+   else
+     AC_MSG_RESULT([none])
+   fi
+
+   if test x"$no_termcap" = "xyes" && test -z "$prefer_curses"; then
+     :
+   elif test x"$bash_cv_termcap_lib" = "xlibtermcap" && test -z "$prefer_curses"; then
+     TERMCAP_LIB=-ltermcap
+     TERMCAP_DEP=
+   elif test x"$bash_cv_termcap_lib" = "xlibncurses"; then
+     TERMCAP_LIB=-lncurses
+     TERMCAP_DEP=
+   else
+     TERMCAP_LIB=-lcurses
+     TERMCAP_DEP=
+   fi
+
+   if test x"$no_termcap" = "x"; then
+     ifelse([$1], , :, [$1])
+   else
+     ifelse([$2], , :, [$2])
+   fi
+
 ])
 
 AC_DEFUN(BASH_FUNC_GETCWD,

@@ -186,7 +186,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 # binaries
 %{prefix}/bin/xine
-%{prefix}/bin/xine-remote
+@HAVE_TERMCAP_TRUE@%{prefix}/bin/xine-remote
 %{prefix}/bin/xine-bugreport
 %{prefix}/bin/xine-check
 %{prefix}/share/idl/xine.idl

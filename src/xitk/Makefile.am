@@ -4,7 +4,11 @@ CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ -I$(top_src
 
 EXTRA_DIST = file_browser.c file_browser.h
 
-bin_PROGRAMS = xine xine-remote
+if HAVE_TERMCAP
+remote = xine-remote
+endif
+
+bin_PROGRAMS = xine $(remote)
 
 if HAVE_GETOPT_LONG
 else

@@ -1,7 +1,11 @@
 
 CFLAGS = @CFLAGS@ @READLINE_LOCAL_CFLAGS@ -DRL_LIBRARY_VERSION=\"@LIBVERSION@\" -static
 
-noinst_LTLIBRARIES = libreadline.la
+if HAVE_TERMCAP
+readline_lib = libreadline.la
+endif
+
+noinst_LTLIBRARIES = $(readline_lib)
 
 EXTRA_DIST = emacs_keymap.c vi_keymap.c savestring.c histexpand.c \
 	CHANGELOG CHANGES COPYING INSTALL MANIFEST README USAGE

@@ -220,7 +220,7 @@ AC_FUNC_STRCOLL
 
 AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h \
 		limits.h sys/ptem.h sys/pte.h sys/stream.h sys/select.h \
-		termcap.h termios.h termio.h sys/file.h locale.h memory.h )
+		termcap.h termios.h termio.h sys/file.h locale.h memory.h)
 
 dnl BASH_SYS_SIGNAL_VINTAGE dnl pure 2.50
 dnl BASH_SYS_REINSTALL_SIGHANDLERS dnl pure 2.50
@@ -245,10 +245,8 @@ case "$host_os" in
 aix*)   prefer_curses=yes ;;
 esac
 
-BASH_CHECK_LIB_TERMCAP
-if test "$TERMCAP_LIB" = "./lib/termcap/libtermcap.a"; then
-	TERMCAP_LIB="-ltermcap"	#default
-fi
+BASH_CHECK_LIB_TERMCAP([],
+                       AC_MSG_RESULT([*** All of READLINE dependent parts will be disabled ***]))
 
 case "$host_cpu" in
 *cray*)	READLINE_LOCAL_CFLAGS=-DCRAY ;;
@@ -262,6 +260,7 @@ esac
 AC_SUBST(READLINE_LOCAL_CFLAGS)
 AC_SUBST(TERMCAP_LIB)
 AC_SUBST(LIBVERSION)
+AM_CONDITIONAL(HAVE_TERMCAP, test x"$no_termcap" != "xyes")
 
 
 NET_LIBS=""
