@@ -662,7 +662,6 @@ static void video_window_handle_event (XEvent *event, void *data) {
   break;
 
   case ConfigureNotify:
-  case VisibilityNotify:
     if(event->xany.window == gGui->video_window) {
       if(xine_get_status(gGui->xine) != XINE_STOP) {
 	XConfigureEvent *cev = (XConfigureEvent *) event;
@@ -676,9 +675,6 @@ static void video_window_handle_event (XEvent *event, void *data) {
 	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 					    GUI_DATA_EX_DEST_POS_SIZE_CHANGED, 
 					    &area);
-	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
-					    GUI_DATA_EX_EXPOSE_EVENT, 
-					    event);
       }
     }
     break;
