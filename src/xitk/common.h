@@ -283,7 +283,7 @@ typedef struct {
     
     int                     num;                   /* number of entries in playlist */
     int                     cur;                   /* current entry in playlist */
-    int                     loop;                  /* not used yet */
+    int                     loop;                  /* current loop mode (see PLAYLIST_LOOP_* */
 
     xine_stream_t          *scan_stream;
 

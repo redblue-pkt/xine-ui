@@ -419,8 +419,8 @@ void *ctrlsocket_func(void *data) {
 
     case CMD_VOLUME:
       {
-	uint32_t *vol = (uint32_t *)shdr->data;
-
+	int *vol = (int *)shdr->data;
+	
 	if((gGui->mixer.method == SOUND_CARD_MIXER) && 
 	   (gGui->mixer.caps & MIXER_CAP_VOL) && ((*vol >= 0) && (*vol <= 100)))
 	  change_audio_vol(*vol);
@@ -433,11 +433,30 @@ void *ctrlsocket_func(void *data) {
 
     case CMD_AMP:
       {
-	uint32_t *amp = (uint32_t *)shdr->data;
+	int *amp = (int *)shdr->data;
 	
 	if((*amp >= 0) && (*amp <= 200))
 	  change_amp_vol(*amp);
 
+	send_ack(shdr);
+      }
+      break;
+      
+    case CMD_LOOP:
+      {
+	int *loop = (int *)shdr->data;
+
+	switch(*loop) {
+	case PLAYLIST_LOOP_NO_LOOP:
+	case PLAYLIST_LOOP_LOOP:
+	case PLAYLIST_LOOP_REPEAT:
+	case PLAYLIST_LOOP_SHUFFLE:
+	case PLAYLIST_LOOP_SHUF_PLUS:
+	case PLAYLIST_LOOP_MODES_NUM:
+	  gGui->playlist.loop = *loop;
+	  break;
+	}
+	
 	send_ack(shdr);
       }
       break;
@@ -485,8 +504,8 @@ int init_session(void) {
       snprintf(saddr.sun_path, 108, "%s/.xine/session.%d", (xine_get_homedir()), i);
       if(!is_remote_running(i)) {
 	if((unlink(saddr.sun_path) == -1) && errno != ENOENT) {
-	  printf("setup_ctrlsocket(): Failed to unlink %s (Error: %s)", 
-		 saddr.sun_path, strerror(errno));
+	  fprintf(stderr, "setup_ctrlsocket(): Failed to unlink %s (Error: %s)", 
+		  saddr.sun_path, strerror(errno));
 	}
       }
       else
@@ -504,14 +523,14 @@ int init_session(void) {
 	break;
       }
       else {
-	printf("setup_ctrlsocket(): Failed to assign %s to a socket (Error: %s)",
-	       saddr.sun_path, strerror(errno));
+	fprintf(stderr, "setup_ctrlsocket(): Failed to assign %s to a socket (Error: %s)",
+		saddr.sun_path, strerror(errno));
 	break;
       }
     }
   }
   else
-    printf("setup_ctrlsocket(): Failed to open socket: %s", strerror(errno));
+    fprintf(stderr, "setup_ctrlsocket(): Failed to open socket: %s", strerror(errno));
   
   if(!retval) {
     if(ctrl_fd != -1)
@@ -527,7 +546,7 @@ void session_handle_subopt(char *suboptarg, int *session) {
   int          optsess = -1;
   int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev;
   int          audio_next, audio_prev, spu_next, spu_prev;
-  int          volume, amp;
+  int          volume, amp, loop;
   char        *playlist_load = NULL;
   int          fullscreen, s, c;
   uint32_t     state;
@@ -537,13 +556,14 @@ void session_handle_subopt(char *suboptarg, int *session) {
   const char  *tokens[] = {
     /* Don't change order */
     "play", "slow2", "slow4", "pause", "fast2", "fast4", "stop", "quit", "fullscreen", "eject",
-    "audio", "spu", "session", "mrl", "playlist", "pl", "volume", "amp", NULL
+    "audio", "spu", "session", "mrl", "playlist", "pl", "volume", "amp", "loop", NULL
   };
   
   playlist_first = playlist_last = playlist_clear = playlist_next = playlist_prev = fullscreen = 0;
   audio_next = audio_prev = spu_next = spu_prev = 0;
   volume = amp = -1;
   state = 0;
+  loop = -1;
 
   while((c = getsubopt(&sopts, (char *const *)tokens, &optstr)) != -1) {
     switch(c) {
@@ -622,6 +642,20 @@ void session_handle_subopt(char *suboptarg, int *session) {
       amp = strtol(optstr, &optstr, 10);
       break;
       
+      /* loop */
+    case 18:
+      if(!strcasecmp(optstr, "none"))
+	loop = PLAYLIST_LOOP_NO_LOOP;
+      else if(!strcasecmp(optstr, "loop"))
+	loop = PLAYLIST_LOOP_LOOP;
+      else if(!strcasecmp(optstr, "repeat"))
+	loop = PLAYLIST_LOOP_REPEAT;
+      else if(!strcasecmp(optstr, "shuffle"))
+	loop = PLAYLIST_LOOP_SHUFFLE;
+      else if(!strcasecmp(optstr, "shuffle+"))
+	loop = PLAYLIST_LOOP_SHUF_PLUS;
+      break;
+
     }
   }
   
@@ -699,6 +733,9 @@ void session_handle_subopt(char *suboptarg, int *session) {
     if(amp >= 0)
       send_uint32(*session, CMD_AMP, (uint32_t) amp);
 
+    if(loop > -1)
+      send_uint32(*session, CMD_LOOP, (uint32_t) loop);
+
     if(playlist_first)
       remote_cmd(*session, CMD_PLAYLIST_FIRST);
 
@@ -707,7 +744,7 @@ void session_handle_subopt(char *suboptarg, int *session) {
 
   }
   else
-    printf(_("Session %d isn't running.\n"), *session);
+    fprintf(stderr, _("Session %d isn't running.\n"), *session);
 }
 
 #else /* CTRL_TEST */

@@ -640,6 +640,7 @@ static void show_usage (void) {
   printf(_("                    spu=c       select spu channel (<c>: 'next' or 'prev'),\n"));
   printf(_("                    volume=v    set audio volume,\n"));
   printf(_("                    amp=v       set amplification level,\n"));
+  printf(_("                    loop=m      set loop mode (<m>: 'none' 'loop' 'repeat' 'shuffle' or 'shuffle+'),\n"));
   printf(_("                    (playlist|pl)=p\n"));
   printf(_("                                 <p> can be:\n"));
   printf(_("                                   'clear'  clear the playlist,\n"));

@@ -794,8 +794,8 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 	
 	panel_update_runtime_display();
-        }
       }
+    }
   }
   else if(w == panel->mixer.slider) {
 
