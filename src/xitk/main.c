@@ -369,14 +369,14 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
       audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						   audio_driver_id);
       if (!audio_driver) {
-	printf (_("main: the specified audio driver '%s' failed\n",
+	printf(_("main: the specified audio driver '%s' failed\n"),
 		audio_driver_id);
 	exit(1);
       }
     }
   }
 
-  if (!(*audio_driver))
+  if (!audio_driver)
     printf (_("main: audio driver <%s> failed\n"), audio_driver_id);
 
   return audio_driver;
