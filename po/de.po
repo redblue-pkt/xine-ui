@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.12\n"
 "POT-Creation-Date: 2002-08-30 16:27+0200\n"
-"PO-Revision-Date: 2002-08-01 18:25+0200\n"
+"PO-Revision-Date: 2002-09-02 08:20+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -193,13 +193,15 @@ msgstr "Nächstes|Vorheriges Kapitel anstatt MRL wiedergeben (dvdnav)"
 
 #: src/xitk/event.c:813
 msgid "show/hide video output window regarding to the stream type"
-msgstr ""
+msgstr "Video-Fenster in Abhängigkeit vom Datenstromtyp anzeigen/verstecken "
 
 #: src/xitk/event.c:817
 msgid ""
 "automatically show/hide panel window, according to "
 "auto_video_output_visibility"
 msgstr ""
+"Bedienfeld in Abhängigkeit von auto_video_output_visibility automatisch "
+"anzeigen/verstecken"
 
 #. Some infos
 #: src/xitk/event.c:828
@@ -225,7 +227,7 @@ msgstr "        Tiefe: %d.\n"
 #: src/xitk/event.c:843
 #, c-format
 msgid "        XShmQueryVersion: %d.%d.\n"
-msgstr ""
+msgstr "        XShm-Version: %d.%d.\n"
 
 #: src/xitk/event.c:905
 msgid "Unable to initialize Imlib\n"
