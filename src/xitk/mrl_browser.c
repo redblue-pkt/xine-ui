@@ -187,6 +187,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb,
   mb.select.normal_color            = gui_get_ncolor("MrlSelect");
   mb.select.focused_color           = gui_get_fcolor("MrlSelect");
   mb.select.clicked_color           = gui_get_ccolor("MrlSelect");
+  mb.select.fontname                = gui_get_fontname("MrlSelect");
   mb.select.callback                = add_cb;
 
   mb.dismiss.x                      = gui_get_skinX("MrlDismiss");
@@ -196,6 +197,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb,
   mb.dismiss.normal_color           = gui_get_ncolor("MrlDismiss");
   mb.dismiss.focused_color          = gui_get_fcolor("MrlDismiss");
   mb.dismiss.clicked_color          = gui_get_ccolor("MrlDismiss");
+  mb.dismiss.fontname               = gui_get_fontname("MrlDismiss");
 
   mb.kill.callback                  = mrl_browser_kill;
 
@@ -207,6 +209,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb,
   mb.ip_name.button.normal_color    = gui_get_ncolor("MrlPlugNameBG");
   mb.ip_name.button.focused_color   = gui_get_fcolor("MrlPlugNameBG");
   mb.ip_name.button.clicked_color   = gui_get_ccolor("MrlPlugNameBG");
+  mb.ip_name.button.fontname        = gui_get_fontname("MrlPlugNameBG");
 
   mb.ip_name.label.x                = gui_get_skinX("MrlPlugLabel");
   mb.ip_name.label.y                = gui_get_skinY("MrlPlugLabel");
@@ -241,6 +244,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb,
   mb.browser.browser.focused_color  = gui_get_fcolor("MrlItemBtn");
   mb.browser.browser.clicked_color  = gui_get_ccolor("MrlItemBtn");
   mb.browser.browser.skin_filename  = gui_get_skinfile("MrlItemBtn");
+  mb.browser.browser.fontname       = gui_get_fontname("MrlItemBtn");
   mb.browser.browser.max_displayed_entries = MAX_LIST;
   mb.browser.browser.num_entries    = 0;
   mb.browser.browser.entries        = NULL;

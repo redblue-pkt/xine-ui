@@ -231,10 +231,12 @@ void control_toggle_panel_visibility (widget_t *w, void *data) {
   if(control != NULL) {
     if (control->visible && control->running) {
       control->visible = 0;
+      widget_hide_widgets(control->widget_list);
       XUnmapWindow (gGui->display, control->window);
     } else {
       if(control->running) {
 	control->visible = 1;
+	widget_show_widgets(control->widget_list);
 	XMapRaised(gGui->display, control->window); 
 	XSetTransientForHint (gGui->display, 
 			      control->window, gGui->video_window);
@@ -540,7 +542,9 @@ void control_panel(void) {
   lb.display        = gGui->display;
   lb.imlibdata      = gGui->imlib_data;
 
-  { /*  stopgap button ;-), will gone */
+  /*  stopgap button ;-), will gone */
+  /*
+  {
     widget_t *w;
     
     lb.x              = gui_get_skinX("CtlSave");
@@ -554,7 +558,7 @@ void control_panel(void) {
     lb.normcolor      = gui_get_ncolor("CtlDummy");
     lb.focuscolor     = gui_get_fcolor("CtlDummy");
     lb.clickcolor     = gui_get_ccolor("CtlDummy");
-    
+    lb.fonct
     gui_list_append_content (control->widget_list->l, 
 	     (w = label_button_create (&lb)));
 
@@ -594,6 +598,7 @@ void control_panel(void) {
 
     widget_disable(w);
   }
+  */
   
   lb.x              = gui_get_skinX("CtlDismiss");
   lb.y              = gui_get_skinY("CtlDismiss");
@@ -606,6 +611,7 @@ void control_panel(void) {
   lb.normcolor      = gui_get_ncolor("CtlDismiss");
   lb.focuscolor     = gui_get_fcolor("CtlDismiss");
   lb.clickcolor     = gui_get_ccolor("CtlDismiss");
+  lb.fontname       = gui_get_fontname("CtlDismiss");
 
   gui_list_append_content (control->widget_list->l, 
 			  label_button_create (&lb));

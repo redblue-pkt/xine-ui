@@ -467,10 +467,12 @@ void pl_toggle_visibility (widget_t *w, void *data) {
   if(playlist != NULL) {
     if (playlist->visible && playlist->running) {
       playlist->visible = 0;
+      widget_hide_widgets(playlist->widget_list);
       XUnmapWindow (gGui->display, playlist->window);
     } else {
       if(playlist->running) {
 	playlist->visible = 1;
+	widget_show_widgets(playlist->widget_list);
 	XMapRaised(gGui->display, playlist->window); 
 	XSetTransientForHint (gGui->display, 
 			      playlist->window, gGui->video_window);
@@ -717,6 +719,7 @@ void playlist_editor(void) {
   lb.normcolor      = gui_get_ncolor("PlAdd");
   lb.focuscolor     = gui_get_fcolor("PlAdd");
   lb.clickcolor     = gui_get_ccolor("PlAdd");
+  lb.fontname       = gui_get_fontname("PlAdd");
 
   gui_list_append_content (playlist->widget_list->l, 
                            label_button_create (&lb));
@@ -732,6 +735,7 @@ void playlist_editor(void) {
   lb.normcolor      = gui_get_ncolor("PlLoad");
   lb.focuscolor     = gui_get_fcolor("PlLoad");
   lb.clickcolor     = gui_get_ccolor("PlLoad");
+  lb.fontname       = gui_get_fontname("PlLoad");
 
   gui_list_append_content (playlist->widget_list->l, 
 			   label_button_create (&lb));
@@ -747,6 +751,7 @@ void playlist_editor(void) {
   lb.normcolor      = gui_get_ncolor("PlSave");
   lb.focuscolor     = gui_get_fcolor("PlSave");
   lb.clickcolor     = gui_get_ccolor("PlSave");
+  lb.fontname       = gui_get_fontname("PlSave");
 
   gui_list_append_content (playlist->widget_list->l, 
 			   label_button_create (&lb));
@@ -762,7 +767,8 @@ void playlist_editor(void) {
   lb.normcolor      = gui_get_ncolor("PlDismiss");
   lb.focuscolor     = gui_get_fcolor("PlDismiss");
   lb.clickcolor     = gui_get_ccolor("PlDismiss");
-  
+  lb.fontname       = gui_get_fontname("PlDismiss");
+
   gui_list_append_content (playlist->widget_list->l, 
 			   label_button_create (&lb));
 
@@ -783,6 +789,7 @@ void playlist_editor(void) {
   br.browser.normal_color          = gui_get_ncolor("PlItemBtn");
   br.browser.focused_color         = gui_get_fcolor("PlItemBtn");
   br.browser.clicked_color         = gui_get_ccolor("PlItemBtn");
+  br.browser.fontname              = gui_get_fontname("PlItemBtn");
   br.browser.skin_filename         = gui_get_skinfile("PlItemBtn");
   br.browser.max_displayed_entries = 9;
   br.browser.num_entries           = gGui->playlist_num;
@@ -815,6 +822,7 @@ void playlist_editor(void) {
   inp.skin_filename = gui_get_skinfile("PlInputText");
   inp.normal_color  = gui_get_ncolor("PlInputText");
   inp.focused_color = gui_get_fcolor("PlInputText");
+  inp.fontname      = gui_get_fontname("PlInputText");
 
   gui_list_append_content (playlist->widget_list->l,
 			   (playlist->winput = inputtext_create (&inp)));
@@ -841,6 +849,7 @@ void playlist_editor(void) {
       lb.normcolor      = gui_get_ncolor("AutoPlayBG");
       lb.focuscolor     = gui_get_fcolor("AutoPlayBG");
       lb.clickcolor     = gui_get_ccolor("AutoPlayBG");
+      lb.fontname       = gui_get_fontname("AutoPlayBG");
 
       gui_list_append_content (playlist->widget_list->l,
 	       (tmp = label_button_create (&lb)));

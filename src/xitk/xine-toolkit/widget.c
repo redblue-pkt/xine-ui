@@ -907,5 +907,36 @@ void widget_stop_widgets(widget_list_t *wl) {
     
     mywidget = (widget_t *) gui_list_next_content (wl->l);
   }
+}
 
+/*
+ *
+ */
+void widget_show_widgets(widget_list_t *wl) {
+  widget_t *mywidget;
+  
+  mywidget = (widget_t *) gui_list_first_content (wl->l);
+
+  while(mywidget) {
+    
+    mywidget->visible = 1;
+    
+    mywidget = (widget_t *) gui_list_next_content (wl->l);
+  }
+}
+
+/*
+ *
+ */
+void widget_hide_widgets(widget_list_t *wl) {
+  widget_t *mywidget;
+  
+  mywidget = (widget_t *) gui_list_first_content (wl->l);
+
+  while(mywidget) {
+    
+    mywidget->visible = 0;
+    
+    mywidget = (widget_t *) gui_list_next_content (wl->l);
+  }
 }

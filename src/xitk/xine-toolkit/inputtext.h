@@ -42,6 +42,7 @@ typedef struct {
   void                   *userdata;
 
   char                   *text;
+  const char             *fontname;
   const char             *normal_color;
   const char             *focused_color;
 

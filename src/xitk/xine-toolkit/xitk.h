@@ -318,6 +318,16 @@ void widget_disable(widget_t *);
  */
 void widget_stop_widgets(widget_list_t *wl);
 
+/**
+ * Set widgets of widget list visible.
+ */
+void widget_show_widgets(widget_list_t *);
+
+/**
+ * Set widgets of widget list not visible.
+ */
+void widget_hide_widgets(widget_list_t *);
+
 /* 
  * *** Sliders ***
  */
@@ -466,14 +476,16 @@ typedef struct {
   int                     x;
   int                     y;
   int                     button_type;
-  const char             *label;
+  char                   *label;
+  char                   *fontname;
+
   xitk_simple_callback_t  callback;
   xitk_state_callback_t   state_callback;
   void                   *userdata;
-  const char             *skin;
-  const char             *normcolor;
-  const char             *focuscolor;
-  const char             *clickcolor;
+  char                   *skin;
+  char                   *normcolor;
+  char                   *focuscolor;
+  char                   *clickcolor;
 } xitk_labelbutton_t;
 
 /**
@@ -489,7 +501,7 @@ int labelbutton_change_label(widget_list_t *wl, widget_t *, const char *);
 /**
  * Return label of button 'widget'.
  */
-const char *labelbutton_get_label(widget_t *);
+char *labelbutton_get_label(widget_t *);
 
 /**
  * Get state of button 'widget'.
@@ -650,6 +662,7 @@ typedef struct {
     char                 *focused_color;
     char                 *clicked_color;
     char                 *skin_filename;
+    char                 *fontname;
     
     int                   max_displayed_entries;
     
@@ -745,6 +758,7 @@ typedef struct {
     char                    *normal_color;
     char                    *focused_color;
     char                    *clicked_color;
+    char                    *fontname;
   } homedir;
 
   struct {
@@ -755,6 +769,7 @@ typedef struct {
     char                    *normal_color;
     char                    *focused_color;
     char                    *clicked_color;
+    char                    *fontname;
     xitk_string_callback_t   callback;
   } select;
 
@@ -766,6 +781,7 @@ typedef struct {
     char                    *normal_color;
     char                    *focused_color;
     char                    *clicked_color;
+    char                    *fontname;
   } dismiss;
 
   struct {
@@ -818,6 +834,7 @@ typedef struct {
     char                    *normal_color;
     char                    *focused_color;
     char                    *clicked_color;
+    char                    *fontname;
     xitk_mrl_callback_t      callback;
   } select;
 
@@ -829,6 +846,7 @@ typedef struct {
     char                    *normal_color;
     char                    *focused_color;
     char                    *clicked_color;
+    char                    *fontname;
   } dismiss;
 
   struct {
@@ -846,6 +864,7 @@ typedef struct {
       char                  *normal_color;
       char                  *focused_color;
       char                  *clicked_color;
+      char                  *fontname;
     } button;
 
     struct {
@@ -884,13 +903,15 @@ typedef struct {
   const char             *text;
   int                     max_length;
 
+  const char             *fontname;
+
   xitk_string_callback_t  callback;
   void                   *userdata;
 
   const char             *skin_filename;
-
   const char             *normal_color;
   const char             *focused_color;
+
 } xitk_inputtext_t;
 
 /**

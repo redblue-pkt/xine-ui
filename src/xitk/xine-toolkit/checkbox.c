@@ -43,12 +43,12 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
   int          checkbox_width;
   gui_image_t *skin;
   
-  skin = private_data->skin;
-
-  XLOCK (private_data->display);
-  
-  checkbox_width = skin->width / 3;
-  if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
+  if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && c->visible) {
+    
+    skin           = private_data->skin;
+    checkbox_width = skin->width / 3;
+    
+    XLOCK (private_data->display);
     
     if (private_data->cArmed) {
       if (private_data->cClicked) { //click
@@ -72,16 +72,14 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
 		   checkbox_width, skin->height, c->x, c->y);
     }
 
-  } 
+    XUNLOCK (private_data->display);
+  }
 #ifdef DEBUG_GUI
   else
     fprintf (stderr, "paint checkbox something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
   
 #endif
-
-  XUNLOCK (private_data->display);
-  /* XSync (private_data->display, False); */
 }
 
 /*
@@ -211,6 +209,7 @@ widget_t *checkbox_create (xitk_checkbox_t *cb) {
 
   mywidget->enable          = 1;
   mywidget->running         = 1;
+  mywidget->visible         = 1;
   mywidget->have_focus      = FOCUS_LOST;
   mywidget->x               = cb->x;
   mywidget->y               = cb->y;

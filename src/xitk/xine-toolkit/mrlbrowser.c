@@ -328,6 +328,7 @@ void mrlbrowser_hide(widget_t *w) {
     if(private_data->visible) {
       XLOCK(private_data->display);
       XUnmapWindow(private_data->display, private_data->window);
+      widget_hide_widgets(private_data->widget_list);
       XUNLOCK(private_data->display);
       private_data->visible = 0;
     }
@@ -344,6 +345,7 @@ void mrlbrowser_show(widget_t *w) {
     private_data = w->private_data;
 
     XLOCK(private_data->display);
+    widget_show_widgets(private_data->widget_list);
     XMapRaised(private_data->display, private_data->window); 
     XUNLOCK(private_data->display);
     private_data->visible = 1;
@@ -746,6 +748,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   lb.normcolor      = mb->select.normal_color;
   lb.focuscolor     = mb->select.focused_color;
   lb.clickcolor     = mb->select.clicked_color;
+  lb.fontname       = mb->select.fontname;
 
   gui_list_append_content(private_data->widget_list->l,
 			  label_button_create (&lb));
@@ -763,6 +766,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   lb.normcolor      = mb->dismiss.normal_color;
   lb.focuscolor     = mb->dismiss.focused_color;
   lb.clickcolor     = mb->dismiss.clicked_color;
+  lb.fontname       = mb->dismiss.fontname;
 
   gui_list_append_content(private_data->widget_list->l,
 			  label_button_create (&lb));
@@ -839,6 +843,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
       lb.normcolor      = mb->ip_name.button.normal_color;
       lb.focuscolor     = mb->ip_name.button.focused_color;
       lb.clickcolor     = mb->ip_name.button.clicked_color;
+      lb.fontname       = mb->ip_name.button.fontname;
 
       gui_list_append_content(private_data->widget_list->l,
 			      (tmp = label_button_create (&lb)));
@@ -852,6 +857,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
 
   mywidget->enable          = 1;
   mywidget->running         = 1;
+  mywidget->visible         = 1;
   mywidget->have_focus      = FOCUS_LOST;
   mywidget->x               = mb->x;
   mywidget->y               = mb->y;

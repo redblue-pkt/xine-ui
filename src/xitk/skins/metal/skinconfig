@@ -1,4 +1,20 @@
-#Function	X	Y	Filename
+## WARNING:  All fields are tab separate, space is no more valid.
+###
+#
+# Text		X       Y       Filename        Length  Animation
+# Label                         of pixfont
+#
+###
+#
+# Labeled						Text
+# Button	X	Y	Filename	Normal  Focus   Click  Fontname
+#				 of bg		Color	Color	Color
+###
+#
+# Other		X	Y	Filename
+#				of skin
+#
+###
 
 BackGround:	0	0	bg.png
 MaskBackGround:	0	0	bg_mask.png
@@ -25,30 +41,30 @@ SliderBGPlay:	17	3	slider_bg.png
 SliderFGPlay:	0	0	slider_pad.png
 SliderBGVol:	2	20	slider_v.png
 SliderFGVol:	0	0	slider_pad.png
-AutoPlayGUI:	185	45	smallbtn.png	LightGray	Yellow	White
+AutoPlayGUI:	185	45	smallbtn.png	LightGray	Yellow	White	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
 MrlBtn:		218	45	mrl.png
 PlBtn:		234	45	playlist.png
 CtlBtn:		250	45	setup.png
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png
-PlAdd:		350	141	pl_btn.png	LightGray	White	Red
-PlLoad:		350	164	pl_btn.png	LightGray	White	Red
-PlSave:		350	187	pl_btn.png	LightGray	White	Red
-PlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red
+PlAdd:		350	141	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+PlLoad:		350	164	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+PlSave:		350	187	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+PlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 PlPlay:		62	210	pl_play.png
 PlDelete:	109 	210	pl_delete.png
 PlDeleteAll:	156	210	pl_deleteall.png
 PlMoveUp:	203	210	pl_moveup.png
 PlMoveDn:	250	210	pl_movedown.png
-PlDismiss:	350	210	pl_btn.png	LightGray	White	Red
+PlDismiss:	350	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 PlUp:		328	30	arrowup2.png
 PlSlidBG:	327	45	pl_slidv.png
 PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		328	175	arrowdn2.png
 AutoPlayLbl:	360	40	letters.png	9	False
-AutoPlayBG:	350	62	pl_btn.png	LightGray	White	Red
-PlInputText:	35	186     pl_inputtxt.png	LightGray	White	Red
+AutoPlayBG:	350	62	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+PlInputText:	35	190	pl_inputtxt.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 
 #Control Panel
 CtlBG:		0	0	pl_bg.png
@@ -64,20 +80,20 @@ CtlBrightLbl:	156	168	letters.png	3	False
 CtlContBG:	200	40	pl_slidv.png
 CtlContFG:	0	0	pl_slidpad.png
 CtlContLbl:	196	168	letters.png	3	False
-CtlSave:	31	210	pl_btn.png	LightGray	White	Red
-CtlReset:	109 	210	pl_btn.png	LightGray	White	Red
-CtlDummy:	187	210	pl_btn.png	LightGray	White	Red
-CtlDismiss:	350	210	pl_btn.png	LightGray	White	Red
+CtlSave:	31	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+CtlReset:	109	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+CtlDummy:	187	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+CtlDismiss:	350	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 
 ### MRL Browser ##
 MrlBG:		0	0	pl_bg.png
-MrlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red
-MrlSelect:	61	210	pl_btn.png	LightGray	White	Red
-MrlDismiss:	350	210	pl_btn.png	LightGray	White	Red
+MrlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+MrlSelect:	61	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+MrlDismiss:	350	210	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 MrlUp:		328	30	arrowup2.png
 MrlSlidBG:	327	45	pl_slidv.png
 MrlSlidFG:	0	0	pl_slidpad.png
 MrlDn:		328	175	arrowdn2.png
 MrlCurOrigin:	35	186	letters.png	50	False
 MrlPlugLabel:	360	40	letters.png	7	False
-MrlPlugNameBG:	350	62	pl_btn.png	LightGray	White	Red
+MrlPlugNameBG:	350	62	pl_btn.png	LightGray	White	Red	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*

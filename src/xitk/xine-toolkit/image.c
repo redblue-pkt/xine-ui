@@ -63,24 +63,22 @@ static void paint_image (widget_t *i,  Window win, GC gc) {
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
 
-  skin = private_data->skin;
+  if ((i->widget_type & WIDGET_TYPE_IMAGE) && i->visible) {
 
-  XLOCK (private_data->display);
+    skin = private_data->skin;
+    
+    XLOCK (private_data->display);
 
-  if (i->widget_type & WIDGET_TYPE_IMAGE) {
     XCopyArea (private_data->display, skin->image, win, gc, 0, 0,
 	       skin->width, skin->height, i->x, i->y);
     
-
+    XUNLOCK (private_data->display);
   }
 #ifdef DEBUG_GUI
  else
     fprintf (stderr, "paint image on something (%d) "
 	     "that is not an image\n", i->widget_type);
 #endif
-
-  XUNLOCK (private_data->display);
-  /* XSync (private_data->display, False); */
 }
 
 /*
@@ -104,6 +102,7 @@ widget_t *image_create (xitk_image_t *im) {
 
   mywidget->enable          = 1;
   mywidget->running         = 1;
+  mywidget->visible         = 1;
   mywidget->have_focus      = FOCUS_LOST;
   mywidget->x               = im->x;
   mywidget->y               = im->y;

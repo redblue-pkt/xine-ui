@@ -114,11 +114,13 @@ void panel_toggle_visibility (widget_t *w, void *data) {
     if (video_window_is_visible ()) {
       panel->visible = 0;
       XUnmapWindow (gGui->display, gGui->panel_window);
+      widget_hide_widgets(panel->widget_list);
     }
     
   } else {
 
     panel->visible = 1;
+    widget_show_widgets(panel->widget_list);
     XMapRaised(gGui->display, gGui->panel_window); 
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
@@ -244,6 +246,7 @@ void panel_add_autoplay_buttons(void) {
     lb.normcolor      = gui_get_ncolor("AutoPlayGUI");
     lb.focuscolor     = gui_get_fcolor("AutoPlayGUI");
     lb.clickcolor     = gui_get_ccolor("AutoPlayGUI");
+    lb.fontname       = gui_get_fontname("AutoPlayGUI");
 
     gui_list_append_content (panel->widget_list->l,
 	     (tmp =

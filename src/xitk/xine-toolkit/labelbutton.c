@@ -50,7 +50,7 @@ static Pixmap create_labelofbutton(widget_t *lb,
 				   const char *label, int state) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
-  XFontStruct *fs;
+  XFontStruct *fs = NULL;
   XCharStruct cs;
   int dir, as, des, len, xoff = 0, yoff = 0, DefaultColor = -1;
   unsigned int fg;
@@ -62,9 +62,21 @@ static Pixmap create_labelofbutton(widget_t *lb,
   color.flags = DoRed|DoBlue|DoGreen;
 
   /* Try to load font */
-  fs = XLoadQueryFont(private_data->display, "fixed");
+  if(private_data->fontname)
+    fs = XLoadQueryFont(private_data->display, private_data->fontname);
+
+  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "fixed");
   if(fs == NULL) fs = XLoadQueryFont(private_data->display, "times-roman");
   if(fs == NULL) fs = XLoadQueryFont(private_data->display, "*times-medium-r*");
+
+  if(fs == NULL) {
+    fprintf(stderr, "%s()@%d: XLoadQueryFont() returned NULL!. Exiting\n",
+	    __FUNCTION__, __LINE__);
+    exit(1);
+  }
+
+  XSetFont(private_data->display, gc, fs->fid);
+
   XTextExtents(fs, label, strlen(label), &dir, &as, &des, &cs);
   len = cs.width;
 
@@ -147,18 +159,18 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
   Pixmap       btn, bgtmp;
   XWindowAttributes attr;
 
-  XGetWindowAttributes(private_data->display, win, &attr);
-
-  skin = private_data->skin;
-
-  button_width = skin->width / 3;
-  bgtmp = XCreatePixmap(private_data->display, skin->image,
-			button_width, skin->height, attr.depth);
-
-  XLOCK(private_data->display);
-
-  if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
+  if ((lb->widget_type & WIDGET_TYPE_LABELBUTTON) && lb->visible) {
     
+    XGetWindowAttributes(private_data->display, win, &attr);
+    
+    skin = private_data->skin;
+    
+    button_width = skin->width / 3;
+    bgtmp = XCreatePixmap(private_data->display, skin->image,
+			  button_width, skin->height, attr.depth);
+    
+    XLOCK(private_data->display);
+
     if (private_data->bArmed) {
       if (private_data->bClicked) {
 	state = CLICK;
@@ -212,14 +224,13 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
 
     XFreePixmap(private_data->display, bgtmp);
 
+    XUNLOCK(private_data->display);
   }
 #ifdef DEBUG_GUI
   else
     fprintf (stderr, "paint label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
 #endif
-  
-  XUNLOCK(private_data->display);
 }
 
 /*
@@ -270,15 +281,15 @@ static int notify_click_labelbutton (widget_list_t *wl, widget_t *lb,
  * Changing button caption
  */
 int labelbutton_change_label(widget_list_t *wl, 
-			     widget_t *lb, const char *newlabel) {
+			     widget_t *lb, char *newlabel) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
-    if((private_data->label = 
-	(const char *) realloc((char *) private_data->label, 
-			       strlen(newlabel)+1)) != NULL) {
-      strcpy((char*)private_data->label, (char*)newlabel);
+    if((private_data->label = (char *) 
+	realloc(private_data->label, 
+		strlen(newlabel)+1)) != NULL) {
+      strcpy(private_data->label, newlabel);
     }
     paint_labelbutton(lb, wl->win, wl->gc);
     return 1;
@@ -295,7 +306,7 @@ int labelbutton_change_label(widget_list_t *wl,
 /*
  * Return the current button label
  */
-const char *labelbutton_get_label(widget_t *lb) {
+char *labelbutton_get_label(widget_t *lb) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
 
@@ -414,11 +425,13 @@ widget_t *label_button_create (xitk_labelbutton_t *b) {
   private_data->normcolor      = strdup(b->normcolor);
   private_data->focuscolor     = strdup(b->focuscolor);
   private_data->clickcolor     = strdup(b->clickcolor);
+  private_data->fontname       = (b->fontname ? strdup(b->fontname) : NULL);
 
   mywidget->private_data       = private_data;
 
   mywidget->enable             = 1;
   mywidget->running            = 1;
+  mywidget->visible            = 1;
   mywidget->have_focus         = FOCUS_LOST;
   mywidget->x                  = b->x;
   mywidget->y                  = b->y;

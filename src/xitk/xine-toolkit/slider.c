@@ -91,28 +91,29 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
   gui_image_t           *paddle = (gui_image_t *) private_data->paddle_skin;
   gui_color_t            gui_color;
   
-  if(private_data->pos > private_data->max
-     || private_data->pos < private_data->min)
-    return;
-
-  XLOCK (private_data->display);
-
-  button_width = private_data->button_width;
-  button_height = private_data->paddle_skin->height;
-  
-  if(private_data->sType == HSLIDER)
-    tmp = sl->width - button_width;
-  if(private_data->sType == VSLIDER)
-    tmp = sl->height - button_height;
-
-  tmp /= private_data->max;
-  tmp *= private_data->pos;
-
-  XCopyArea (private_data->display, bg->image, win, gc, 0, 0,
-	     bg->width, bg->height, sl->x, sl->y);
-  
-  if (sl->widget_type & WIDGET_TYPE_SLIDER) {
+  if ((sl->widget_type & WIDGET_TYPE_SLIDER) && sl->visible) {
     int x=0, y=0;
+
+    if(private_data->pos > private_data->max
+       || private_data->pos < private_data->min)
+      return;
+    
+    XLOCK (private_data->display);
+    
+    button_width = private_data->button_width;
+    button_height = private_data->paddle_skin->height;
+    
+    if(private_data->sType == HSLIDER)
+      tmp = sl->width - button_width;
+    if(private_data->sType == VSLIDER)
+      tmp = sl->height - button_height;
+    
+    tmp /= private_data->max;
+    tmp *= private_data->pos;
+    
+    XCopyArea (private_data->display, bg->image, win, gc, 0, 0,
+	       bg->width, bg->height, sl->x, sl->y);
+    
     if(private_data->sType == HSLIDER) {
       x = rint(sl->x + tmp);
       y = sl->y;
@@ -138,16 +139,13 @@ static void paint_slider (widget_t *sl, Window win, GC gc) {
     }
     XSetForeground(private_data->display, gc, gui_color.white.pixel);
     
-  } 
+    XUNLOCK (private_data->display);
+  }
 #ifdef DEBUG_GUI
   else
     fprintf (stderr, "paint slider on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
 #endif
-
-    
-  XUNLOCK (private_data->display);
-  /* XSync (private_data->display, False); */
 }
 
 /*
@@ -564,6 +562,7 @@ widget_t *slider_create (xitk_slider_t *s) {
 
   mywidget->enable              = 1;
   mywidget->running             = 1;
+  mywidget->visible             = 1;
   mywidget->have_focus          = FOCUS_LOST;
   mywidget->x                   = s->x;
   mywidget->y                   = s->y;

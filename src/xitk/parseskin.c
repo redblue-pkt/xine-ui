@@ -95,11 +95,11 @@ int is_entry_exist(const char *entry) {
 }
 
 #define LN_FORWARD   {                                                      \
-                      while(*ln == ' ' || *ln == '\t' || *ln == ':') ++ln;  \
-                      while(*ln != ':' && *ln != ' ' && *ln != '\t'         \
+                      while(*ln == '\t' || *ln == ':') ++ln;  \
+                      while(*ln != ':' && *ln != '\t'         \
                             && *ln != '\n' && *ln != 0) ++ln;               \
                       ++ln;                                                 \
-                      while(*ln == ' ' || *ln == '\t' || *ln == ':') ++ln;  \
+                      while(*ln == '\t' || *ln == ':') ++ln;  \
                      }
 /*
  * Return a *char value of column 'pos' for *entry in skinfile description.
@@ -122,14 +122,14 @@ char *extract_value(const char *entry, int pos) {
   if((fd_read = fopen(skincfgfile, "r")) != NULL) {
     ln = fgets(buf, 255, fd_read);
     while(ln != NULL) {
-      while(*ln == ' ' || *ln == '\t') ++ln ;
+      while(*ln == '\t') ++ln ;
       if(!strncasecmp(ln, tok, strlen(tok))) {
 	for(i=0;i<pos;i++) {
 	  LN_FORWARD;
 	}
 	oln = ln;
-	while(*ln == ' ' || *ln == '\t' || *ln == ':') ++ln;
-	while(*ln != ':' && *ln != ' ' && *ln != '\t' && *ln != '\n' 
+	while(*ln == '\t' || *ln == ':') ++ln;
+	while(*ln != ':' && *ln != '\t' && *ln != '\n' 
 	      && *ln != 0) ++ln;
 	memcpy(val, oln, ln-oln);
       }
@@ -252,6 +252,18 @@ int gui_get_animation(const char *str) {
   }
   
   return anim;
+}
+
+/*
+ * Return font name.
+ */
+char *gui_get_fontname(const char *str) {
+  char *v = NULL;
+  
+  if(is_entry_exist(str))
+    v = extract_value(str, 7);
+  
+  return v;
 }
 
 /*

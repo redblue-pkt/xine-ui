@@ -197,6 +197,7 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.homedir.normal_color           = gui_get_ncolor("FBHome");
   fbr.homedir.focused_color          = gui_get_fcolor("FBHome");
   fbr.homedir.clicked_color          = gui_get_ccolor("FBHome");
+  fbr.homedir.fontname               = gui_get_fontname("FBHome");
 
   fbr.select.x                       = gui_get_skinX("FBSelect");
   fbr.select.y                       = gui_get_skinY("FBSelect");
@@ -205,6 +206,7 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.select.normal_color            = gui_get_ncolor("FBSelect");
   fbr.select.focused_color           = gui_get_fcolor("FBSelect");
   fbr.select.clicked_color           = gui_get_ccolor("FBSelect");
+  fbr.select.fontname                = gui_get_fontname("FBSelect");
   fbr.select.callback                = add_cb;
 
   fbr.dismiss.x                      = gui_get_skinX("FBDismiss");
@@ -214,6 +216,7 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.dismiss.normal_color           = gui_get_ncolor("FBDismiss");
   fbr.dismiss.focused_color          = gui_get_fcolor("FBDismiss");
   fbr.dismiss.clicked_color          = gui_get_ccolor("FBDismiss");
+  fbr.dismiss.fontname               = gui_get_fontname("FBDismiss");
 
   fbr.kill.callback                  = file_browser_kill;
 

@@ -48,10 +48,11 @@ typedef struct {
    
   void                   *userdata;
    
-  const char             *label;
-  const char             *normcolor;
-  const char             *focuscolor;
-  const char             *clickcolor;
+  char                   *label;
+  char                   *normcolor;
+  char                   *focuscolor;
+  char                   *clickcolor;
+  char                   *fontname;
 
 } lbutton_private_data_t;
 
@@ -65,12 +66,12 @@ widget_t *label_button_create (xitk_labelbutton_t *b);
 /**
  * Change label of button 'widget'.
  */
-int labelbutton_change_label(widget_list_t *wl, widget_t *, const char *);
+int labelbutton_change_label(widget_list_t *wl, widget_t *, char *);
 
 /**
  * Return label of button 'widget'.
  */
-const char *labelbutton_get_label(widget_t *);
+char *labelbutton_get_label(widget_t *);
 
 /**
  * Get state of button 'widget'.

@@ -62,24 +62,34 @@ static Pixmap create_labelofinputtext(widget_t *it,
 				      char *label, int state) {
   inputtext_private_data_t *private_data = 
     (inputtext_private_data_t *) it->private_data;
-  char *plabel = label;
-  XFontStruct *fs;
-  XCharStruct cs;
-  int dir, as, des, len, yoff = 0, DefaultColor = -1;
-  unsigned int fg;
-  XColor color;
-  gui_color_names_t *gColors;
+  char               *plabel = label;
+  XFontStruct        *fs = NULL;
+  XCharStruct         cs;
+  int                 dir, as, des, len, yoff = 0, DefaultColor = -1;
+  unsigned int        fg;
+  XColor              color;
+  gui_color_names_t  *gColors;
 
   gColors = gui_get_color_names();
 
   color.flags = DoRed|DoBlue|DoGreen;
 
   /* Try to load font */
-  fs = XLoadQueryFont(private_data->display, "fixed");
-  if(fs == NULL) 
-    fs = XLoadQueryFont(private_data->display, "times-roman");
-  if(fs == NULL) 
-    fs = XLoadQueryFont(private_data->display, "*times-medium-r*");
+  /*
+  if(private_data->fontname)
+    fs = XLoadQueryFont(private_data->display, private_data->fontname);
+  */
+  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "fixed");
+  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "times-roman");
+  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "*times-medium-r*");
+
+  if(fs == NULL) {
+    fprintf(stderr, "%s()@%d: XLoadQueryFont() returned NULL!. Exiting\n",
+	    __FUNCTION__, __LINE__);
+    exit(1);
+  }
+
+  XSetFont(private_data->display, gc, fs->fid);
 
   XTextExtents(fs, label, strlen(label), &dir, &as, &des, &cs);
   len = cs.width;
@@ -149,21 +159,25 @@ static Pixmap create_labelofinputtext(widget_t *it,
 
   /* Draw cursor pointer */
   if(private_data->cursor_pos >= 0) {
-    XDrawLine(private_data->display, pix, gc, 
-	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 2
-	      , 2, 
-	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 2,
-	      ysize - 3);
+    
     XDrawLine(private_data->display, pix, gc,
 	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 1,
 	      2, 
 	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 3,
 	      2);
+
+    XDrawLine(private_data->display, pix, gc, 
+	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 2
+	      , 2, 
+	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 2,
+	      ysize - 3);
+
     XDrawLine(private_data->display, pix, gc, 
 	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 1,
 	      ysize - 3, 
 	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 3,
 	      ysize - 3);
+
   }
   
   XFreeFont(private_data->display, fs);
@@ -182,18 +196,18 @@ static void paint_inputtext(widget_t *it, Window win, GC gc) {
   Pixmap       btn, bgtmp;
   XWindowAttributes attr;
 
-  XGetWindowAttributes(private_data->display, win, &attr);
-
-  skin = private_data->skin;
-
-  button_width = skin->width/2;
-
-  bgtmp = XCreatePixmap(private_data->display, skin->image,
-			button_width, skin->height, attr.depth);
-
-  XLOCK(private_data->display);
-
-  if (it->widget_type & WIDGET_TYPE_INPUTTEXT) {
+  if ((it->widget_type & WIDGET_TYPE_INPUTTEXT) && it->visible) {
+        
+    XGetWindowAttributes(private_data->display, win, &attr);
+    
+    skin = private_data->skin;
+    
+    button_width = skin->width/2;
+    
+    bgtmp = XCreatePixmap(private_data->display, skin->image,
+			  button_width, skin->height, attr.depth);
+    
+    XLOCK(private_data->display);
     
     if(private_data->have_focus) {
       state = FOCUS;
@@ -219,14 +233,13 @@ static void paint_inputtext(widget_t *it, Window win, GC gc) {
 
     XFreePixmap(private_data->display, bgtmp);
 
+    XUNLOCK(private_data->display);
   }
 #ifdef DEBUG_GUI
   else
     fprintf (stderr, "paint input text on something (%d) "
 	     "that is not an input text\n", it->widget_type);
 #endif
-  
-  XUNLOCK(private_data->display);
 }
 
 /*
@@ -788,8 +801,9 @@ widget_t *inputtext_create (xitk_inputtext_t *it) {
   
   private_data->iWidget       = mywidget;
   private_data->text          = strdup((it->text != NULL)?it->text:"");
-  
-  
+
+  private_data->fontname       = (it->fontname) ? strdup(it->fontname) : NULL;
+ 
   private_data->max_length    = it->max_length;
   private_data->cursor_pos    = -1;
 
@@ -808,6 +822,7 @@ widget_t *inputtext_create (xitk_inputtext_t *it) {
 
   mywidget->enable            = 1;
   mywidget->running           = 1;
+  mywidget->visible         = 1;
   mywidget->have_focus        = FOCUS_LOST;
   mywidget->x                 = it->x;
   mywidget->y                 = it->y;

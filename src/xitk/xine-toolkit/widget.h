@@ -101,6 +101,7 @@ typedef struct widget_s {
   int                        enable;
   int                        have_focus;
   int                        running;
+  int                        visible;
 
   widget_paint_callback_t    paint;
 
@@ -202,7 +203,17 @@ void widget_disable(widget_t *);
 /**
  * Stop each (if widget handle it) widgets of widget list.
  */
-void widget_stop_widgets(widget_list_t *wl);
+void widget_stop_widgets(widget_list_t *);
+
+/**
+ * Set widgets of widget list visible.
+ */
+void widget_show_widgets(widget_list_t *);
+
+/**
+ * Set widgets of widget list not visible.
+ */
+void widget_hide_widgets(widget_list_t *);
 
 /*
  * small utility function to debug xlock races

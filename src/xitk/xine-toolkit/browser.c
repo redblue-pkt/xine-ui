@@ -471,7 +471,7 @@ widget_t *browser_create(xitk_browser_t *br) {
       lb.x              = x;
       lb.y              = y;
       lb.button_type    = RADIO_BUTTON;
-      lb.label          = " ";
+      lb.label          = "";
       lb.callback       = NULL;
       lb.state_callback = browser_select;
       lb.userdata       = (void *)(bt);
@@ -479,6 +479,7 @@ widget_t *browser_create(xitk_browser_t *br) {
       lb.normcolor      = br->browser.normal_color;
       lb.focuscolor     = br->browser.focused_color;
       lb.clickcolor     = br->browser.clicked_color;
+      lb.fontname       = (br->browser.fontname ? strdup(br->browser.fontname) : NULL);
       
       gui_list_append_content(br->parent_wlist->l, 
 			      (private_data->item_tree[i] = 
@@ -501,6 +502,7 @@ widget_t *browser_create(xitk_browser_t *br) {
 
   mywidget->enable                     = 1;
   mywidget->running                    = 1;
+  mywidget->visible                    = 1;
   mywidget->have_focus                 = FOCUS_LOST;
   
   mywidget->x = mywidget->x = mywidget->width = mywidget->height = 0;    

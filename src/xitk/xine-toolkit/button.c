@@ -43,16 +43,15 @@ static void paint_button (widget_t *b,  Window win, GC gc) {
   int          button_width;
   gui_image_t *skin;
 
-  skin = private_data->skin;
+  if((b->widget_type & WIDGET_TYPE_BUTTON) && b->visible) {
 
-  button_width = skin->width / 3;
-  
-  XLOCK (private_data->display);
-
-  if (b->widget_type & WIDGET_TYPE_BUTTON) {
+    skin         = private_data->skin;
+    button_width = skin->width / 3;
     
-    if (private_data->bArmed) {
-      if (private_data->bClicked) {
+    XLOCK (private_data->display);
+        
+    if(private_data->bArmed) {
+      if(private_data->bClicked) {
 	XCopyArea (private_data->display, skin->image,  
 		   win, gc, 2*button_width, 0,
 		   button_width, skin->height, b->x, b->y);
@@ -67,15 +66,13 @@ static void paint_button (widget_t *b,  Window win, GC gc) {
 		 button_width, skin->height, b->x, b->y);
     }
 
+    XUNLOCK (private_data->display);
   } 
 #ifdef DEBUG_GUI
   else
     fprintf (stderr, "paint button on something (%d) that is not a button\n",
 	     b->widget_type);
 #endif
-  
-  XUNLOCK (private_data->display);
-  /* XSync (private_data->display, False); */
 }
 
 /*
@@ -157,6 +154,7 @@ widget_t *button_create (xitk_button_t *b) {
 
   mywidget->enable          = 1;
   mywidget->running         = 1;
+  mywidget->visible         = 1;
   mywidget->have_focus      = FOCUS_LOST; 
   mywidget->x               = b->x;
   mywidget->y               = b->y;
