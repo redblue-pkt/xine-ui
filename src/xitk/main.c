@@ -1248,8 +1248,7 @@ int main(int argc, char *argv[]) {
     }
     gGui->ao_port = load_audio_out_driver(driver_num);
   }
-  SAFE_FREE(audio_driver_id)
-;
+  SAFE_FREE(audio_driver_id);
   post_init();
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
