@@ -114,7 +114,7 @@ static int init_video(void)
 
 	fbxine.video_port =
 		xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
-				       XINE_VISUAL_TYPE_FB, (void *)&fbxine);
+				       XINE_VISUAL_TYPE_FB, NULL);
 	if(!fbxine.video_port)
 	{
 		fprintf(stderr, "Video port failed.\n");
