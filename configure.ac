@@ -629,30 +629,30 @@ case "$host_or_hostalias" in
 	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
     fi
 
-    AC_DEFINE(__i386__,,[Define this if you're running x86 architecture])
+    AC_DEFINE(__i386__,1,[Define this if you're running x86 architecture])
     AC_DEFINE([ARCH_X86],,[Define this if you're running x86 architectur])
     ;;
 
   alphaev56-*)
-    AC_DEFINE(__alpha__,,[Define this if you're running Alpha architecture])
+    AC_DEFINE(__alpha__,1,[Define this if you're running Alpha architecture])
     CFLAGS="$CFLAGS -O3 -mcpu=ev56 -mieee"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mcpu=ev56 -mieee"
     ;;
 
   alpha*)
-    AC_DEFINE(__alpha__,,[Define this if you're running Alpha architecture])
+    AC_DEFINE(__alpha__,1,[Define this if you're running Alpha architecture])
     CFLAGS="$CFLAGS -O3 -mieee"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mieee"
     ;;
 
   ppc-*-linux-* | powerpc-*) 
-    AC_DEFINE(__ppc__,,[Define this if you're running PowerPC architecture])
+    AC_DEFINE(__ppc__,1,[Define this if you're running PowerPC architecture])
     CFLAGS="$CFLAGS -O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
     DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
     ;;
 
   sparc64-*-linux-* | sparc-*)
-    AC_DEFINE(__sparc,,[/* Define this if you're running Sparc architecture])
+    AC_DEFINE(__sparc,1,[Define this if you're running Sparc architecture])
 
     if test "$GCC" = yes; then
 	CFLAGS="$CFLAGS -O3"
