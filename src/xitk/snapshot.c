@@ -875,6 +875,17 @@ void create_snapshot (snapshot_messenger_t error_mcb,
 
   width = xine_get_stream_info(gGui->stream,XINE_STREAM_INFO_VIDEO_WIDTH);
   height = xine_get_stream_info(gGui->stream,XINE_STREAM_INFO_VIDEO_HEIGHT);
+
+  if((!width) || (!height)) {
+    if(error_msg_cb) {
+      char umessage[4096];
+      
+      memset(&umessage, 0, sizeof(umessage));
+      sprintf(umessage, _("Wrong image size: %dx%d. Snapshot aborted.\n"), width, height);
+      error_msg_cb(msg_cb_data, umessage);
+    }
+    return;
+  }
   
   printf("snapshot.c: allocating space for a %d x %d image\n", width, height );
   
