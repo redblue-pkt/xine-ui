@@ -255,7 +255,10 @@ void gui_play (xitk_widget_t *w, void *data) {
       return;
     }
     
-    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+      gui_display_logo();
+
   } 
   else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -270,6 +273,8 @@ void gui_stop (xitk_widget_t *w, void *data) {
   gGui->ignore_next = 1;
   xine_stop (gGui->stream);
   gGui->ignore_next = 0;
+
+  mediamark_reset_played_state();
 
   if(gGui->visual_anim.running) {
     xine_stop(gGui->visual_anim.stream);
@@ -744,8 +749,11 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  
 	  gGui->ignore_next = 1;
 	  gGui->playlist.cur = newcur;
+	  gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+	  if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	    gui_display_logo();
+
 	  gGui->ignore_next = 0;
 	}
 	else {
@@ -781,8 +789,11 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  gGui->playlist.cur -= value;
 	  
 	  if((gGui->playlist.cur < gGui->playlist.num)) {
+	    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+	    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	      gui_display_logo();
+
 	  }
 	  else
 	    gGui->playlist.cur = 0;
@@ -799,8 +810,10 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  gGui->playlist.cur -= value;
 	  
 	  if((gGui->playlist.cur < gGui->playlist.num)) {
+	    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+	    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	      gui_display_logo();
 	  }
 	  else
 	    gGui->playlist.cur = 0;
@@ -810,9 +823,10 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  int newcur = (gGui->playlist.cur - value) + gGui->playlist.num;
 	  
 	  gGui->playlist.cur = newcur;
-	  
+	  gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+	  if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
+	    gui_display_logo();
 	}
 
 	gGui->ignore_next = 0;

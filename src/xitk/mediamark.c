@@ -1,21 +1,25 @@
 /*
-** Copyright (C) 2002 Daniel Caujolle-Bert <segfault@club-internet.fr>
-**  
-** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License as published by
-** the Free Software Foundation; either version 2 of the License, or
-** (at your option) any later version.
-**  
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-** GNU General Public License for more details.
-**  
-** You should have received a copy of the GNU General Public License
-** along with this program; if not, write to the Free Software
-** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-**  
-*/
+ * Copyright (C) 2000-2002 the xine project
+ * 
+ * This file is part of xine, a unix video player.
+ * 
+ * xine is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * xine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+ *
+ * $Id$
+ *
+ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -123,10 +127,11 @@ int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, i
   if((mmk != NULL) && (mrl != NULL)) {
     
     (*mmk) = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
-    (*mmk)->mrl   = strdup(mrl);
-    (*mmk)->ident = strdup((ident != NULL) ? ident : mrl);
-    (*mmk)->start = start;
-    (*mmk)->end   = end;
+    (*mmk)->mrl    = strdup(mrl);
+    (*mmk)->ident  = strdup((ident != NULL) ? ident : mrl);
+    (*mmk)->start  = start;
+    (*mmk)->end    = end;
+    (*mmk)->played = 0;
     return 1;
   }
 
@@ -798,6 +803,29 @@ void mediamark_free_mediamarks(void) {
   }
 }
 
+void mediamark_reset_played_state(void) {
+  
+  if(gGui->playlist.num) {
+    int i;
+    
+    for(i = 0; i < gGui->playlist.num; i++)
+      gGui->playlist.mmk[i]->played = 0;
+  }
+}
+
+int mediamark_all_played(void) {
+  
+  if(gGui->playlist.num) {
+    int i;
+    
+    for(i = 0; i < gGui->playlist.num; i++) {
+      if(gGui->playlist.mmk[i]->played == 0)
+	return 0;
+    }
+  }
+
+  return 1;
+}
 void mediamark_replace_entry(mediamark_t **mmk, 
 			     const char *mrl, const char *ident, int start, int end) {
   SAFE_FREE((*mmk)->mrl);
