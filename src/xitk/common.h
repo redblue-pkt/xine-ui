@@ -87,17 +87,6 @@
 #define CONFIG_NO_CB            NULL
 #define CONFIG_NO_DATA          NULL
 
-/*
- * flags for autoplay options
- */
-#define PLAY_ON_START           0x00000001
-#define PLAYED_ON_START         0x00000002
-#define QUIT_ON_STOP            0x00000004
-#define FULL_ON_START           0x00000008
-#define HIDEGUI_ON_START        0x00000010
-#define PLAY_FROM_DVD           0x00000020
-#define PLAY_FROM_VCD           0x00000040
-
 /* Sound mixer capabilities */
 #define MIXER_CAP_NOTHING       0x00000000
 #define MIXER_CAP_VOL           0x00000001
@@ -187,7 +176,7 @@ typedef struct {
   int                       logo_mode;
   int                       logo_has_changed;
 
-  /* stuff like FULL_ON_START, QUIT_ON_STOP */
+  /* stuff like ACTID_x */
   action_id_t               actions_on_start[16];
   char                     *autoscan_plugin;
 

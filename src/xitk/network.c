@@ -2934,4 +2934,3 @@ static const char *get_homedir(void) {
 }
 
 #endif
-

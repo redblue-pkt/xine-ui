@@ -107,7 +107,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::S:";
+ "u:a:V:A:p::s:RG:BN:P:l::S:Z";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
@@ -506,6 +506,7 @@ void show_usage (void) {
   printf(_("                                   'load:s' load playlist file <s>.\n"));
   printf(_("                    play, slow2, slow4, pause, fast2,\n"));
   printf(_("                    fast4, stop, quit, fullscreen, eject.\n"));
+  printf(_("  -Z                           Don't automatically start playback (smart mode).\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -912,6 +913,7 @@ int main(int argc, char *argv[]) {
   int                     driver_num;
   int                     session = -1;
   char                   *session_mrl = NULL;
+  int                     no_auto_start = 0;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1174,6 +1176,10 @@ int main(int argc, char *argv[]) {
       session_handle_subopt(optarg, &session);
       break;
 
+    case 'Z':
+      no_auto_start = 1;
+      break;
+
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -1254,9 +1260,9 @@ int main(int argc, char *argv[]) {
   pthread_mutex_init(&gGui->download_mutex, NULL);
   
   /* Automatically start playback if new_mode is enabled and playlist is filled */
-  if(gGui->smart_mode && 
-     (gGui->playlist.num || actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) &&
-     (!(actions_on_start(gGui->actions_on_start, ACTID_PLAY))))
+  if((gGui->smart_mode && 
+      (gGui->playlist.num || actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) &&
+      (!(actions_on_start(gGui->actions_on_start, ACTID_PLAY)))) && (no_auto_start == 0))
     gGui->actions_on_start[aos++] = ACTID_PLAY;
   
   /*

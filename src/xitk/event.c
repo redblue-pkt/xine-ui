@@ -1188,7 +1188,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->on_quit = 0;
   gGui->running = 1;
-
+  
   video_window_init (window_attribute, 
 		     ((actions_on_start(gGui->actions_on_start, 
 				       ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
