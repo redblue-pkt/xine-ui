@@ -6,13 +6,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
 "POT-Creation-Date: 2002-04-16 01:33+0200\n"
-"PO-Revision-Date: 2002-02-20 00:00+0100\n"
+"PO-Revision-Date: 2002-04-22 00:51+0200\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
-"Language-Team: Spanish <es@li.org>\n"
+"Language-Team: Spanish <kde-es@kyb.uni-stuttgart.de>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.9.5\n"
+"X-Generator: KBabel 0.9.6\n"
 
 #: src/xitk/control.c:339
 #, c-format
@@ -69,15 +69,15 @@ msgstr "Cerrar la ventana de control"
 
 #: src/xitk/errors.c:63
 msgid "Done"
-msgstr ""
+msgstr "Hecho"
 
 #: src/xitk/errors.c:63
 msgid "More..."
-msgstr ""
+msgstr "Más..."
 
 #: src/xitk/errors.c:131
 msgid "Error"
-msgstr ""
+msgstr "Error"
 
 #: src/xitk/errors.c:183
 #, c-format
@@ -180,8 +180,7 @@ msgstr ""
 
 #: src/xitk/main.c:182
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
-msgstr ""
-"  -u, --spu-channel <#>        Seleccionar núm. canal SPU (subtítulos).\n"
+msgstr "  -u, --spu-channel <#>        Seleccionar núm. canal SPU (subtítulos).\n"
 
 #: src/xitk/main.c:183
 msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
@@ -189,8 +188,7 @@ msgstr "  -a, --audio-channel <#>      Seleccionar núm. canal de audio.\n"
 
 #: src/xitk/main.c:184
 msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
-msgstr ""
-"  -p, --auto-play [opt]        Reproducir al comenzar. Puede seguirlo:\n"
+msgstr "  -p, --auto-play [opt]        Reproducir al comenzar. Puede seguirlo:\n"
 
 #: src/xitk/main.c:185
 msgid "                    'f': in fullscreen mode.\n"
@@ -247,8 +245,7 @@ msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-lirc                Desactivar el soporte LIRC.\n"
 
 #: src/xitk/main.c:198
-msgid ""
-"      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+msgid "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
 msgstr ""
 "      --visual <class-or-id>   Usar el visual X11 especificado. <class-or-"
 "id>\n"
@@ -257,8 +254,7 @@ msgstr ""
 msgid ""
 "                               is either an X11 visual class, or a visual "
 "id.\n"
-msgstr ""
-"                               es o una clase visual X11 o un id. visual.\n"
+msgstr "                               es o una clase visual X11 o un id. visual.\n"
 
 #: src/xitk/main.c:200
 msgid "      --install                Install a private colormap.\n"
@@ -269,8 +265,7 @@ msgid "      --keymap [option]        Display keymap. Option are:\n"
 msgstr "      --keymap [option]        Mostrar mapeo de teclado. Opciones:\n"
 
 #: src/xitk/main.c:202
-msgid ""
-"                                 'default': display default keymap table,\n"
+msgid "                                 'default': display default keymap table,\n"
 msgstr ""
 "                                 'default': muestra mapeo teclado por "
 "defecto,\n"
@@ -284,8 +279,7 @@ msgstr ""
 "lircrc.\n"
 
 #: src/xitk/main.c:204
-msgid ""
-"                                 'remapped': user remapped keymap table.\n"
+msgid "                                 'remapped': user remapped keymap table.\n"
 msgstr ""
 "                                 'remapped': mapeo tecl. remapeado por "
 "usuario.\n"
@@ -300,18 +294,15 @@ msgstr ""
 
 #: src/xitk/main.c:206
 msgid "  -n, --network                Enable network remote control server.\n"
-msgstr ""
+msgstr "  -n, --network                Activar serv. control remoto por red.\n"
 
 #: src/xitk/main.c:207
-#, fuzzy
 msgid "  -R, --root                   Use root window as video window.\n"
-msgstr ""
-"  -R, --root                   Usar ventana raíz como ventana de vídeo\n"
+msgstr "  -R, --root                   Usar ventana raíz como ventana de vídeo.\n"
 
 #: src/xitk/main.c:209
 msgid "examples for valid MRLs (media resource locator):\n"
-msgstr ""
-"ejemplos de MRLs válidos (media resource locator - localizador de medios):\n"
+msgstr "ejemplos de MRLs válidos (media resource locator - localizador de medios):\n"
 
 #: src/xitk/main.c:210
 msgid "  File:  'path/foo.vob'\n"
@@ -372,8 +363,7 @@ msgstr "main: falló el manejador de audio especificado '%s'\n"
 #: src/xitk/main.c:468
 #, c-format
 msgid "Require xine library version 0.9.9, found %d.%d.%d.\n"
-msgstr ""
-"Se requiere la versión 0.9.9 de la biblioteca de xine, encontrada %d.%d.%d.\n"
+msgstr "Se requiere la versión 0.9.9 de la biblioteca de xine, encontrada %d.%d.%d.\n"
 
 #: src/xitk/main.c:540
 msgid "video driver id required for -V option\n"
@@ -600,8 +590,7 @@ msgstr "Fallo al cargar %s/%s. Saliendo.\n"
 #: src/xitk/skins.c:348
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
-msgstr ""
-"Fallo al cargar la piel %s, versión incorrecta. Se carga la piel '%s'.\n"
+msgstr "Fallo al cargar la piel %s, versión incorrecta. Se carga la piel '%s'.\n"
 
 #: src/xitk/snapshot.c:943
 #, c-format
@@ -638,3 +627,4 @@ msgstr "Refrescar"
 #, fuzzy
 #~ msgid "Close MRL browser window"
 #~ msgstr "Cerrar la ventana de control"
+
