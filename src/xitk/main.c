@@ -650,7 +650,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       memset(&buffer, 0, sizeof(buffer));
       printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
       sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
-      gGui->mrl_overrided += 20;
+      gGui->mrl_overrided += 5;
       panel_set_title(buffer);
     }
     break;
@@ -713,6 +713,7 @@ int main(int argc, char *argv[]) {
 #endif
   gGui->actions_on_start[aos]  = ACTID_NOKEY;
   gGui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
+  gGui->playlist.on_start      = NULL;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -895,7 +896,8 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'P':
-      mediamark_load_mediamarks(optarg);
+      gGui->actions_on_start[aos++] = ACTID_PLAYLIST;
+      gGui->playlist.on_start = strdup(optarg);
       break;
 
     case 'l':

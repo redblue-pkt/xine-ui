@@ -27,6 +27,7 @@
 #include "config.h"
 #endif
 
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -165,9 +166,61 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
   return ret;
 }
 
-int gui_xine_open_and_play(char *mrl, int start_pos, int start_time) {
+int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
+  char *mrl = _mrl;
   
-  if(!xine_open(gGui->stream, (const char *)mrl)) {
+  if((!strncasecmp(mrl, "ftp://", 6)) || (!strncasecmp(mrl, "dload:/", 7)))  {
+    char        *url = _mrl;
+    download_t  *download;
+    
+    if(!strncasecmp(_mrl, "dload:/", 7))
+      url = _mrl + 7;
+    
+    download = (download_t *) xine_xmalloc(sizeof(download_t));
+    download->buf    = NULL;
+    download->error  = NULL;
+    download->size   = 0;
+    download->status = 0; 
+    
+    if((network_download(url, download))) {
+      char *filename;
+      
+      filename = strrchr(url, '/');
+      if(strlen(filename) >= 2) {
+	FILE *fd;
+	
+	filename++;
+	
+	if((fd = fopen(filename, "w+b")) != NULL) {
+	  char  *newmrl, *ident;
+	  int    start, end;
+	  
+	  xine_strdupa(newmrl, filename);
+	  xine_strdupa(ident, gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	  start = gGui->playlist.mmk[gGui->playlist.cur]->start;
+	  end = gGui->playlist.mmk[gGui->playlist.cur]->end;
+	  
+	  fwrite(download->buf, download->size, 1, fd);
+	  fflush(fd);
+	  fclose(fd);
+
+	  mediamark_replace_entry(&gGui->playlist.mmk[gGui->playlist.cur], 
+				  newmrl, ident, start, end);
+	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	  mrl = gGui->mmk.mrl;
+	}
+      }
+    }
+
+    if(download->buf)
+      free(download->buf);
+    if(download->error)
+      free(download->error);
+    free(download);
+
+  }
+
+  if(!xine_open(gGui->stream, (const char *) mrl)) {
     gui_handle_xine_error(gGui->stream);
     return 0;
   }

@@ -84,134 +84,37 @@ typedef struct {
   char               *type;
 } playlist_t;
 
-typedef struct {
-  char *buf;
-  char *error;
-  int   size;
-  int   status;
-} databuf_t;
-
 typedef mediamark_t **(*playlist_guess_func_t)(playlist_t *, const char *);
 
-static int progress_callback(void *userdata, 
-			     double dltotal, double dlnow, double ultotal, double ulnow) {
-  databuf_t  *databuf = (databuf_t *) userdata;
-  /*   printf("dltotal %e\n", dltotal); */
-  /*   printf("dlnow %e\n", dlnow); */
-  /*   printf("ultotal %e\n", ultotal); */
-  /*   printf("ulnow %e\n", ulnow); */
-  
-  //  _draw_bar("download", 0, 100, dlnow * 100.0 / dltotal);
-  printf("%d < %d > %d\n", 0, (int) (dlnow * 100.0 / dltotal), 100);
-  /* return non 0 abort transfert */
-  return databuf->status;
-}
-
-
-static int store_data(void *ptr, size_t size, size_t nmemb, void *userdata) {
-  databuf_t  *databuf = (databuf_t *) userdata;
-  int         rsize = size * nmemb;
-  
-  if(databuf->size == 0)
-    databuf->buf = (char *) malloc(rsize);
-  else
-    databuf->buf = (char *) realloc(databuf->buf, databuf->size + rsize + 1);
-  
-  if(databuf->buf) {
-    memcpy(&(databuf->buf[databuf->size]), ptr, rsize);
-    databuf->size += rsize;
-    databuf->buf[databuf->size] = 0;
-  }
-  else
-    databuf->status = 1; /* error */
-  
-  return rsize;
-}
-
-static int download(const char *url, void *userdata) {
-  databuf_t  *databuf = (databuf_t *) userdata;
-  CURL       *curl;
-  CURLcode    res;
-  
-  curl_global_init(CURL_GLOBAL_DEFAULT);
-  
-  if((curl = curl_easy_init()) != NULL) {
-    char error_buffer[CURL_ERROR_SIZE + 1];
-    char user_agent[256];
-    
-    memset(&error_buffer, 0, sizeof(error_buffer));
-    
-    memset(&user_agent, 0, sizeof(user_agent));
-    sprintf(user_agent, "User-Agent: xine/%s", VERSION);
-    
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 
-#ifdef DEBUG
-		     TRUE
-#else
-		     FALSE
-#endif
-		     );
-    
-    curl_easy_setopt(curl, CURLOPT_URL, url);
-    
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, user_agent);
-    curl_easy_setopt(curl, CURLOPT_NOSIGNAL, TRUE);
-    curl_easy_setopt(curl, CURLOPT_FAILONERROR, TRUE); 
-    curl_easy_setopt(curl, CURLOPT_NETRC, TRUE);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, TRUE);
-
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, store_data);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, userdata);
-
-    curl_easy_setopt(curl, CURLOPT_NOPROGRESS, FALSE);
-    curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
-    curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, userdata);
-
-    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, &error_buffer);
-    
-    if((res = curl_easy_perform(curl)) != 0) {
-      databuf->error = strdup((strlen(error_buffer)) ? error_buffer : "Unknown error");
-      databuf->status = 1;
-    }
-    
-    curl_easy_cleanup(curl);
-  }
-  
-  curl_global_cleanup();
-  
-  return (databuf->status == 0);
-}
-
 static char *_download_file(const char *filename, int *size) {
-  databuf_t  *databuf;
-  char       *buf = NULL;
+  download_t  *download;
+  char        *buf = NULL;
   
   if((!filename) || (!strlen(filename))) {
     fprintf(stderr, "%s(): Empty or NULL filename.\n", __XINE_FUNCTION__);
     return NULL;
   }
   
-  databuf = (databuf_t *) malloc(sizeof(databuf_t));
-  databuf->buf    = NULL;
-  databuf->error  = NULL;
-  databuf->size   = 0;
-  databuf->status = 0; 
+  download = (download_t *) xine_xmalloc(sizeof(download_t));
+  download->buf    = NULL;
+  download->error  = NULL;
+  download->size   = 0;
+  download->status = 0; 
   
-  if((download(filename, (void *)databuf))) {
-    *size = databuf->size;
+  if((network_download(filename, download))) {
+    printf("network_download returned 1\n");
+    *size = download->size;
     buf = (char *) xine_xmalloc(*size);
-    memcpy(buf, databuf->buf, *size);
+    memcpy(buf, download->buf, *size);
   }
-  else {
-    printf("** An error occured:\n");
-    printf("-> %s\n", databuf->error);
-  }
+  else
+    xine_error("Unable to download '%s':\n%s.", filename, download->error);
 
-  if(databuf->buf)
-    free(databuf->buf);
-  if(databuf->error)
-    free(databuf->error);
-  free(databuf);
+  if(download->buf)
+    free(download->buf);
+  if(download->error)
+    free(download->error);
+  free(download);
   
   return buf;
 }

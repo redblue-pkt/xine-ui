@@ -15,6 +15,7 @@ xine_SOURCES = \
 	actions.c \
 	config_wrapper.c \
 	control.c \
+	download.c \
 	errors.c \
 	event.c \
 	event_sender.c \
@@ -56,6 +57,7 @@ noinst_HEADERS = \
 	actions.h \
 	config_wrapper.h \
 	control.h \
+	download.h \
 	errors.h \
 	event.h \
 	event_sender.h \

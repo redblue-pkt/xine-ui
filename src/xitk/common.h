@@ -56,6 +56,7 @@
 #include "snapshot.h"
 #include "stream_infos.h"
 #include "viewlog.h"
+#include "download.h"
 
 #include "utils.h"
 
@@ -190,6 +191,8 @@ typedef struct {
     int                     loop;                  /* not used yet */
 
     xine_stream_t          *scan_stream;
+
+    char                   *on_start;
   } playlist;
 
 
