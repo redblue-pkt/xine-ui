@@ -27,6 +27,7 @@ messagefile=/tmp/xck.$$.xine-check.en
 indent="         "
 DUMPVARS="" #this holds the variables to dump into bugreports, use vars()!
 
+echo "Please be patient, this script may take a while to run..."
 
 ## auto-insert-language-files-here ##
 
@@ -761,6 +762,7 @@ if [ "$answertext" = "something else" ]; then
 else
   problem="$answertext"
 fi
+bugclass=$answer
 
 echo
 
@@ -776,9 +778,31 @@ add "xine --version says:"
 add "`$xine_executable --version 2>&1`"
 add ""
 
-have_xine_output="false"
+# problems involving audio drivers
+case $bugclass in
+  2|3|4)
+    echo
+    echo "What audio drivers are you using?"
+    echo
+    menu "OSS/Free (eg. Linux Kernel) drivers" \
+	 "ALSA, version 0.9.x" \
+	 "ALSA, version 0.5.x" \
+	 "older ALSA version" \
+	 "other driver"
+    if [ $answer -eq 5 ]; then
+      ask "What driver (name/version) are you using?"
+      audio_driver="$answer"
+    else
+      audio_driver="$answertext"
+    fi
+    add "Audio driver: $audio_driver"
+    ask "What sound card are you using?"
+    add "Sound card: $answer"
+    ;;
+esac
+
 # further checks for specific problems
-case "$answer" in
+case "$bugclass" in
   5) #can't play DVDs
     echo "which DVD plugin are you trying?"
     menu "DVD (as shipped with xine)" \
