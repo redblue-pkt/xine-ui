@@ -195,16 +195,23 @@
 
   
 * KNOWN BUGs
-
-  + toggling hardware deinterlacing will reset video out window  to  the
-    original video size. (bug or feature?)
-
-  + zooming in/out of a video exposes  a  bug  with  the  SyncFB  kernel
-    module and should currently be considered broken. (being worked on)
   
-  + quitting xine by closing the video window, won't properly deactivate
-    the overlay - this is a problem with the xitk signal handler.
+  + SyncFB overlay is placed out of the video window at xine startup.
+    (this is a bug with xine-ui and will be fixed soon)
 
+  + SyncFB overlay won't turn off when video window is minimized or
+    somehow else hidden.
+    
+    (currently there is no way for the SyncFB plugin to know about the
+     state of the video window except if the original xine-ui hide function
+     is used to hide the video window... this will be fixed soon)
+     
+  + zooming in/out of a video exposes  a  bug  with  the  SyncFB  kernel
+    module and should currently be considered broken.
+    (for now, don't expect this to be fixed soon - sorry)
+  
+  + zooming in/out won't show any effect until the video window is moved
+    (zooming feature is broken anyway, so why bother *grin*)
 
 * WHAT IS ON THE TODO LIST?
 
