@@ -28,46 +28,47 @@
 
 #include "common.h"
 
-extern gGui_t             *gGui;
-extern _panel_t           *panel;
+extern gGui_t                  *gGui;
+extern _panel_t                *panel;
 
-#define PLAYB_PLAY         1
-#define PLAYB_STOP         2
-#define PLAYB_PAUSE        3
-#define PLAYB_NEXT         4
-#define PLAYB_PREV         5
-#define PLAYB_SPEEDM       6
-#define PLAYB_SPEEDL       7
+#define PLAYB_PLAY              1
+#define PLAYB_STOP              2
+#define PLAYB_PAUSE             3
+#define PLAYB_NEXT              4
+#define PLAYB_PREV              5
+#define PLAYB_SPEEDM            6
+#define PLAYB_SPEEDL            7
 
-#define PLAYL_LOAD        10
-#define PLAYL_SAVE        11
-#define PLAYL_EDIT        12
-#define PLAYL_NO_LOOP     13
-#define PLAYL_LOOP        14
-#define PLAYL_REPEAT      15
-#define PLAYL_SHUFFLE     16
-#define PLAYL_SHUF_PLUS   17
+#define PLAYL_LOAD              10
+#define PLAYL_SAVE              11
+#define PLAYL_EDIT              12
+#define PLAYL_NO_LOOP           13
+#define PLAYL_LOOP              14
+#define PLAYL_REPEAT            15
+#define PLAYL_SHUFFLE           16
+#define PLAYL_SHUF_PLUS         17
 
-#define AUDIO_MUTE        20
-#define AUDIO_INCRE_VOL   21
-#define AUDIO_DECRE_VOL   22
+#define AUDIO_MUTE              20
+#define AUDIO_INCRE_VOL         21
+#define AUDIO_DECRE_VOL         22
 
-#define VIDEO_FULLSCR     30
-#define VIDEO_2X          31
-#define VIDEO_1X          32
-#define VIDEO__5X         33
-#define VIDEO_INTERLEAVE  34
-#define VIDEO_PPROCESS    35
+#define VIDEO_FULLSCR           30
+#define VIDEO_2X                31
+#define VIDEO_1X                32
+#define VIDEO__5X               33
+#define VIDEO_INTERLEAVE        34
+#define VIDEO_PPROCESS          35
+#define VIDEO_PPROCESS_ENABLE   36
 
-#define SETS_SETUP        40
-#define SETS_KEYMAP       41
-#define SETS_VIDEO        42
-#define SETS_LOGS         43
-#define SETS_SKINDL       44
-#define SETS_TVANALOG     45
+#define SETS_SETUP              40
+#define SETS_KEYMAP             41
+#define SETS_VIDEO              42
+#define SETS_LOGS               43
+#define SETS_SKINDL             44
+#define SETS_TVANALOG           45
 
-#define STREAM_OSDI       50     
-#define STREAM_WINI       51
+#define STREAM_OSDI             50
+#define STREAM_WINI             51
 
 #define IS_CHANNEL_CHECKED(C, N) (C == N) ? "<checked>" : "<check>"
 
@@ -313,6 +314,10 @@ static void menu_video_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data)
     gui_execute_action_id(ACTID_VPP);
     break;
 
+  case VIDEO_PPROCESS_ENABLE:
+    gui_execute_action_id(ACTID_VPP_ENABLE);
+    break;
+
   default:
     printf("%s(): unknown control %d\n", __XINE_FUNCTION__, ctrl);
     break;
@@ -504,9 +509,15 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { "Video/SEP",
       "<separator>",
       NULL, NULL                                                                             },
-    { "Video/Postprocess...",
+    { "Video/Postprocess",
+      "<branch>",
+      NULL, NULL                                                                             },
+    { "Video/Postprocess/Chain Reaction...",
       NULL,
       menu_video_ctrl, (void *) VIDEO_PPROCESS                                               },
+    { "Video/Postprocess/Enable",
+      gGui->post_enable ? "<checked>" : "<check>",
+      menu_video_ctrl, (void *) VIDEO_PPROCESS_ENABLE                                        },
     { "Video/SEP",
       "<separator>",
       NULL, NULL                                                                             },
