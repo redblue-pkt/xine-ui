@@ -210,7 +210,7 @@ static size_t xitk_cache_get_oldest(void) {
   unsigned long   lru;
 
   if(!cache.n) {
-    fprintf(stderr, "%s(%d): cache.n != 0. Aborting.\n", __FUNCTION__, __LINE__);
+    fprintf(stderr, "%s(%d): cache.n == 0. Aborting.\n", __FUNCTION__, __LINE__);
     abort();
   }
   
