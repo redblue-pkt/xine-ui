@@ -52,9 +52,10 @@ typedef struct {
 
   Display             *gDisplay;
 
+  Window               gVideoWin; /* video output window */
+
   Window               gui_panel_win;
   DND_struct_t        *xdnd_panel_win;
-
 
   uint32_t             debug_level;
 
