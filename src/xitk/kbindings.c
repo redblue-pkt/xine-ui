@@ -1589,6 +1589,8 @@ static void kbedit_exit(xitk_widget_t *w, void *data) {
     free(kbedit);
     kbedit = NULL;
     gGui->ssaver_enabled = 1;
+
+    try_to_set_input_focus(gGui->video_window);
   }
 }
 

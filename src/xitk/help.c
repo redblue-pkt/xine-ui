@@ -269,6 +269,8 @@ static void help_exit(xitk_widget_t *w, void *data) {
     free(help->widget_list);
     
     SAFE_FREE(help);
+
+    try_to_set_input_focus(gGui->video_window);
   }
 }
 

@@ -220,6 +220,8 @@ static void setup_exit(xitk_widget_t *w, void *data) {
     
     free(setup);
     setup = NULL;
+
+    try_to_set_input_focus(gGui->video_window);
   }
 }
 

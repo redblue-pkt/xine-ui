@@ -142,6 +142,8 @@ void destroy_mrl_browser(void) {
     }
     xitk_mrlbrowser_destroy(mrlb);
     mrlb = NULL;
+
+    try_to_set_input_focus(gGui->video_window);
   }
 }
 
@@ -157,6 +159,8 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
       config_update_num ("gui.mrl_browser_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
+
+    try_to_set_input_focus(gGui->video_window);
   }
 
   /* FIXME */

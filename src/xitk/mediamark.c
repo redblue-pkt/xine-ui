@@ -3000,6 +3000,8 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
     
     free(mmkeditor);
     mmkeditor = NULL;
+
+    playlist_get_input_focus();
   }
 }
 

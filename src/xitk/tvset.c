@@ -208,6 +208,8 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     
     free(tvset);
     tvset = NULL;
+
+    try_to_set_input_focus(gGui->video_window);
   }
 }
 

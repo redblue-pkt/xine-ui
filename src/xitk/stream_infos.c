@@ -280,6 +280,8 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
     
     free(sinfos);
     sinfos = NULL;
+
+    try_to_set_input_focus(gGui->video_window);
   }
 }
 

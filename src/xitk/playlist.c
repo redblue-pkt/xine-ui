@@ -529,6 +529,11 @@ static void _playlist_apply_cb(void *data) {
   gui_set_current_mmk(mediamark_get_current_mmk());
 }
 
+void playlist_get_input_focus(void) {
+  if(playlist)
+    try_to_set_input_focus(playlist->window);
+}
+
 void playlist_mmk_editor(void) {
   if(playlist) {
     int sel = xitk_browser_get_current_selected(playlist->playlist);
@@ -684,7 +689,9 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     free(playlist->widget_list);
     
     free(playlist);
-    playlist = NULL;  
+    playlist = NULL;
+
+    try_to_set_input_focus(gGui->video_window);
   }
 }
 
