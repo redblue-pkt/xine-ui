@@ -68,8 +68,7 @@ void splash_create(void) {
     change_class_name((xitk_window_get_window(xwin)));
     change_icon((xitk_window_get_window(xwin)));
     
-    xitk_window_change_background(gGui->imlib_data, xwin, 
-				  xim->image->pixmap, xim->width, xim->height);
+    xitk_window_change_background_with_image(gGui->imlib_data, xwin, xim, xim->width, xim->height);
     
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, xitk_window_get_window(xwin)); 
