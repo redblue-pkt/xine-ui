@@ -1,0 +1,154 @@
+
+   ----------------------
+            xine
+   ----------------------
+
+   wolny odtwarzacz wideo
+
+
+Wstêp
+=====
+
+Ta dokumantacja jest przeznaczona dla u¿ytkowników dekodera dxr3
+firmy Creative Labs lub Sigma Designs.
+
+Ta wersja xine domy¶lnie zawiera wtyczkê dla wsparcia wspomnianych
+dekoderów sprzêtowych. Brakuj±cym elementem jest modu³ j±dra systemu.
+Ten modu³ jest dostêpny na stronie g³ównej projektu dxr3/hw+ pod
+adresem
+
+	http://dxr3.sourceforge.net/
+
+Ró¿ne formaty dystrybucji (skompresowane, RPMy) s± wyszczególnione
+pod adresem
+
+	http://dxr3.sourceforge.net/download.html
+
+Poniewa¿ konfiguracja sterownika dxr3/hw+ jest nieco skomplikowane,
+proszê zagl±dn±æ do dokumentu HOWTO:
+
+	http://dxr3.sourceforge.net/howto.html
+
+Wtyczka xine dxr3 wymaga modu³u w wersji przynajmniej
+
+	em8300-0.8.1
+	
+
+Kompilacja
+==========
+
+Bardzo wa¿nym jest skompilowanie i zainstalowanie sterwonika
+(modu³u) dxr3/hw+ *przed* kompilacj± xine-lib. Nie zachowanie
+wspomnianej zasady spowoduje wy³±czenie obs³ugi dxr3 z ostrze¿eniem
+przez skryp ./configure.
+
+W celu aktywacji wtyczkê, plik em8300.h musi byæ dostêpny
+w katalogu /usr/src/linux/include/linux. Je¶li masz niestandardowy
+katalog ¼róde³ j±dra linuxa np. /usr/src/linux-2.4.5, musisz
+podaæ go jako parametr:
+
+./configure --with-linux-path=/usr/src/linux-2.4.5
+
+
+Konfiguracja XINE
+=================
+
+XINE ma wiele opcji konfiguracyjnych w pliku $HOME/.xinerc
+(zobacz równie¿ doc/README.xinerc)
+
+Niektóre z nich s± wa¿ne dla odtwarzania za pomoc± dxr3:
+*) dxr3_tvmode:
+	default U¿yj obecnych ustawieñ sterownika
+	ntsc    NTSC 60Hz
+	pal     PAL 50Hz
+	pal60   PAL 60Hz
+	overlay Wyj¶cie wideo na ekranie monitora VGA
+	
+*) dxr3_keycolor: (tylko w trybie overlay)
+	0x80a040 Szesnastkowa warto¶æ RGB koloru kluczowego.
+                 Nie powinna byæ zmieniana.
+
+*) dxr3_color_interval: (tylko w trybie overlay)
+	50.0	Zakres tolerancji dla koloru kluczowego. Wy¿sza warto¶æ
+                pozwala na wiêkszy zakres kolorów kluczowych. U¿ywane
+                do korekcji b³êdów w wy¶wietlaniu kolorów na wyj¶ciu VGA.
+                Mniejsza warto¶æ jest zalecana aby nie u¿ywaæ "b³êdnych"
+                kolorów do trybu overlay. Rozs±dny zakres to 20.0 - 200.0
+
+*) dxr3_scr_prio:
+	10	Priorytet wtyczki dxr3 scr. <5 oznacza ¿e czasomierz
+                systemowy ma byæ u¿yty. >5 narzuca u¿ycie dxr3 jako
+                ¼ród³o synchronizacji. Je¶li tego nie rozumiesz
+                pozostaw ustawienia domy¶lne.
+	
+*) video_driver_name:
+	dxr3    Potrzebne do ustawienia tv_mode, jasno¶ci, kontrastu,
+                wype³nienia i proporcji ekranu. Je¶li nie ustawione
+                to odtwarzanie bêdzie wci±¿ dzia³aæ ale powy¿sza
+                funkcjonalno¶æ bêdzie wy³±czona.
+
+                To jest tylko prosty sterownik który nie mo¿e wysy³aæ
+                klatek. Klatki s± wysy³ane dopiero przez dekoder sprzêtowy.
+                Kiedy niejest odgrywana zawarto¶æ typu MPEG1/2, musi byæ
+                ustawiony na sterownik "rzeczywisty" typu "Xv" lub "Xshm".
+
+*) audio_driver_name:
+	oss	wyj¶cie em8300 audio jest dostêpne jako zwyk³e urz±dzenie
+                OSS. Sterownik audio musi wiêc byæ ustawione na oss.
+                Mo¿e byæ równie¿ ustawione przy u¿yciu "-A oss" jako
+                opcji w lini poleceñ.
+
+*) oss_device_num:
+	0-16	komputery z zainstalowan± kart± dxr3 czêsto maj± równie¿
+                zainstaloan± kartê d¼wiêkow±. Je¶li odtwarzanie d¼wiêku
+                odbywa siê za pomoc± b³êdnego urz±dzenia, wymagane
+                urz±dzenie mo¿e byæ ustawione za pomoc± tej opcji.
+
+Zalecane jest uruchomienie XINE przynajmniej raz przed edycj±
+pliku konfiguracyjnego, poniewa¿ wszystkie opcje s± zapisywane w
+pliku .xinerc i maj± swoj± domy¶ln± warto¶æ. Xine mo¿na zmusiæ do
+u¿ycia sterownika dxr3 u¿ywaj±c opcji "-V dxr3" w lini poleceñ.
+Je¶li domy¶lne ustawienia sterownika s± b³êdne - trzeba poprawiæ
+jedynie warto¶æ opcji tvmode.
+
+
+Uruchamianie XINE z obs³ug± dxr3/hw+
+====================================
+
+Dekoder sprzêtowy jest automatycznie uruchamiany je¶li sterownik
+mo¿e byæ poprawnie otwarty. Wideo Mpeg1/2 (np. DVD) s± odtwarzane
+przez dekoder sprzêtowy, podczas gdy inne formaty s± odgrywane na
+ekranie. W takim przypadku pamiêtaj o ustawieniu innego wyj¶cia
+wideo ni¿ "dxr3".
+
+
+Funkcjonalno¶æ VGA overlay
+==========================
+
+W poprzednich wersjach xine, trzeba by³o u¿ywaæ dxr3view by u¿ywaæ
+mechanizmu em8300 overlay. Teraz od wersji 0.5, mo¿na odtwarzaæ w trybie
+em8300 overlay bezbo¶rednio w oknie video xine.
+
+Pierwszy pomys³ i poprawnie pracuj±cy kod przyszed³ od Mike Lampard
+<mjl@datafast.net.au>. Chwa³a mu za t± now± funkcjonalno¶æ.
+
+W celu aktywacji, "dxr3_tvmode" musi byæ ustawiony na "overlay".
+Ale to nie zadzia³a dopóki stary dxr3view te¿ bêdzie uruchomiony
+(po prostu sprawd¼). Przed pierwszym u¿yciem, musisz uruchomiæ "autocal".
+To zachowa parametry trybu overlay w pliku "~/.overlay". Wiêcej informacji
+równie¿ w HOWTO dxr3.
+
+Rzuæ równie¿ okiem na wy¿ej opisane opcje xinerc dxr3_keycolor i
+dxr3_color_interval.
+
+
+--- 
+Wersja tego pliku:
+$Id$
+
+*********************************
+* T³umaczenie: Bart³omiej Muryn *
+* Uwagi do t³umaczenia proszê   *
+* przesy³aæ na adres            *
+*      _4ever_@irc.pl           *
+*********************************

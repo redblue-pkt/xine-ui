@@ -5,7 +5,7 @@ EXTRA_DIST = $(docs_DOCS)
 
 docdir = ${prefix}/share/doc/xine-ui
 docs_DOCS = FAQ FAQ_es FAQ_fr FAQ_it FAQ_pl \
-	README README.corba README.dxr3 README.freebsd README.irix README.mrl \
+	README README.corba README.dxr3 README.dxr3_pl README.freebsd README.irix README.mrl \
 	README.solaris README.syncfb README.xinerc README_es README_pl README_it \
 	bug_report_form README.divx4
 

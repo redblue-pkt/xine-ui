@@ -208,6 +208,7 @@ rm -rf $RPM_BUILD_ROOT
 %{prefix}/share/doc/xine-ui/README
 %{prefix}/share/doc/xine-ui/README.corba
 %{prefix}/share/doc/xine-ui/README.dxr3
+%{prefix}/share/doc/xine-ui/README.dxr3_pl
 %{prefix}/share/doc/xine-ui/README.freebsd
 %{prefix}/share/doc/xine-ui/README.irix
 %{prefix}/share/doc/xine-ui/README.mrl
