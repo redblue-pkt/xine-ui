@@ -30,3 +30,6 @@
 
 /* Define this if you have ORBit (libORBit) installed */
 #undef HAVE_ORBIT
+
+/* Define this to skins directory location */
+#undef XINE_SKINDIR
