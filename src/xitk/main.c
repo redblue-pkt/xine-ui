@@ -112,7 +112,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef HAVE_XF86VIDMODE
  "F"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::S:ZD::r:c:ET:";
+ "u:a:V:A:p::s:RG:BN:P:l::S:ZD::r:c:ET:I";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
@@ -161,6 +161,7 @@ static struct option long_options[] = {
   {"tvout"          , required_argument, 0, 'T'                      },
   {"list-plugins"   , optional_argument, 0, OPTION_LIST_PLUGINS      },
   {"bug-report"     , optional_argument, 0, OPTION_BUG_REPORT        },
+  {"no-gui"         , no_argument      , 0, 'I'                      },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -620,6 +621,7 @@ static void show_usage (void) {
   printf(_("  -F, --xineramafull           start in xinerama fullscreen (display on several screens),\n"));
 #endif
   printf(_("  -g, --hide-gui               hide GUI (panel, etc.)\n"));
+  printf(_("  -I, --no-gui                 disable GUI\n"));
   printf(_("  -H, --hide-video             hide video window\n"));
 #ifdef HAVE_LIRC
   printf(_("  -L, --no-lirc                Turn off LIRC support.\n"));
@@ -1372,6 +1374,7 @@ int main(int argc, char *argv[]) {
   gGui->deinterlace_enable     = 0;
   gGui->report                 = stdout;
   gGui->ssaver_enabled         = 1;
+  gGui->no_gui                 = 0;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1767,6 +1770,10 @@ int main(int argc, char *argv[]) {
 	    gGui->actions_on_start[aos++] = ACTID_QUIT;
 	}
       }
+      break;
+
+    case 'I':
+      gGui->no_gui = 1;
       break;
 
     default:

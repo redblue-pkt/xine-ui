@@ -3139,7 +3139,7 @@ static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
   else
     open_path = gGui->curdir;
   
-  (void *) create_filebrowser(_("Pick a subtitle file"), open_path, &cbb, NULL, NULL);
+  (void *) create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb, NULL, NULL);
 }
 
 void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data) {

@@ -2000,7 +2000,7 @@ void gui_file_selector(void) {
     cbb[1].need_a_file = 0;
     cbb[2].callback = fileselector_cancel_callback;
     cbb[2].need_a_file = 0;
-    load_stream = create_filebrowser(_("Stream(s) loading"), gGui->curdir, &cbb[0], &cbb[1], &cbb[2]);
+    load_stream = create_filebrowser(_("Stream(s) loading"), gGui->curdir, hidden_file_cb, &cbb[0], &cbb[1], &cbb[2]);
   }
 }
 
@@ -2079,7 +2079,7 @@ void gui_select_sub(void) {
 	else
 	  open_path = gGui->curdir;
 	
-	load_sub = create_filebrowser(_("Pick a subtitle file"), open_path, &cbb[0], NULL, &cbb[1]);
+	load_sub = create_filebrowser(_("Pick a subtitle file"), open_path, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
       }
     }
   }

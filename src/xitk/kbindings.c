@@ -111,6 +111,7 @@ struct kbinding_entry_s {
   char             *key;         /* key binding */
   int               modifier;    /* Modifier key of binding (can be OR'ed) */
   int               is_alias;    /* is made from an alias entry ? */
+  int               is_gui;
 };
 
 #define MAX_ENTRIES 255
@@ -160,6 +161,7 @@ typedef struct {
   char             *key;
   char             *modifier;
   int               is_alias;
+  int               is_gui;
 } user_kbinding_t;
 
 /*
@@ -178,267 +180,277 @@ typedef struct {
  */
 static kbinding_entry_t default_binding_table[] = {
   { "start playback",
-    "Play",                   ACTID_PLAY                    , "Return",   KEYMOD_NOMOD   , 0 },
+    "Play",                   ACTID_PLAY                    , "Return",   KEYMOD_NOMOD   , 0 , 0},
   { "playback pause toggle",
-    "Pause",                  ACTID_PAUSE                   , "space",    KEYMOD_NOMOD   , 0 },
+    "Pause",                  ACTID_PAUSE                   , "space",    KEYMOD_NOMOD   , 0 , 0},
   { "stop playback",
-    "Stop",                   ACTID_STOP                    , "S",        KEYMOD_NOMOD   , 0 },
+    "Stop",                   ACTID_STOP                    , "S",        KEYMOD_NOMOD   , 0 , 0},
   { "take a snapshot",
-    "Snapshot",               ACTID_SNAPSHOT                , "t",        KEYMOD_NOMOD   , 0 },
+    "Snapshot",               ACTID_SNAPSHOT                , "t",        KEYMOD_NOMOD   , 0 , 0},
   { "eject the current medium",
-    "Eject",                  ACTID_EJECT                   , "e",        KEYMOD_NOMOD   , 0 },
+    "Eject",                  ACTID_EJECT                   , "e",        KEYMOD_NOMOD   , 0 , 0},
   { "select and play next MRL in the playlist",
-    "NextMrl",                ACTID_MRL_NEXT                , "Next",     KEYMOD_NOMOD   , 0 },
+    "NextMrl",                ACTID_MRL_NEXT                , "Next",     KEYMOD_NOMOD   , 0 , 0},
   { "select and play previous MRL in the playlist",
-    "PriorMrl",               ACTID_MRL_PRIOR               , "Prior",    KEYMOD_NOMOD   , 0 },
+    "PriorMrl",               ACTID_MRL_PRIOR               , "Prior",    KEYMOD_NOMOD   , 0 , 0},
   { "loop mode toggle",
-    "ToggleLoopMode",         ACTID_LOOPMODE	            , "l",	  KEYMOD_NOMOD   , 0 },
+    "ToggleLoopMode",         ACTID_LOOPMODE	            , "l",	  KEYMOD_NOMOD   , 0 , 0},
   { "stop playback after played stream",
-    "PlaylistStop",           ACTID_PLAYLIST_STOP           , "l",	  KEYMOD_CONTROL , 0 },
+    "PlaylistStop",           ACTID_PLAYLIST_STOP           , "l",	  KEYMOD_CONTROL , 0 , 0},
   { "scan playlist to grab stream infos",
-    "ScanPlaylistInfo",       ACTID_SCANPLAYLIST            , "s",        KEYMOD_CONTROL , 0 },
+    "ScanPlaylistInfo",       ACTID_SCANPLAYLIST            , "s",        KEYMOD_CONTROL , 0 , 0},
   { "add a mediamark from current playback",
-    "AddMediamark",           ACTID_ADDMEDIAMARK            , "a",        KEYMOD_CONTROL , 0 },
+    "AddMediamark",           ACTID_ADDMEDIAMARK            , "a",        KEYMOD_CONTROL , 0 , 0},
   { "edit selected mediamark",
-    "MediamarkEditor",        ACTID_MMKEDITOR               , "e",        KEYMOD_CONTROL , 0 },
+    "MediamarkEditor",        ACTID_MMKEDITOR               , "e",        KEYMOD_CONTROL , 0 , 1},
   { "set position to -60 seconds in current stream",
-    "SeekRelative-60",        ACTID_SEEK_REL_m60            , "Left",     KEYMOD_NOMOD   , 0 }, 
+    "SeekRelative-60",        ACTID_SEEK_REL_m60            , "Left",     KEYMOD_NOMOD   , 0 , 0}, 
   { "set position to +60 seconds in current stream",
-    "SeekRelative+60",        ACTID_SEEK_REL_p60            , "Right",    KEYMOD_NOMOD   , 0 },
+    "SeekRelative+60",        ACTID_SEEK_REL_p60            , "Right",    KEYMOD_NOMOD   , 0 , 0},
   { "set position to -30 seconds in current stream",
-    "SeekRelative-30",        ACTID_SEEK_REL_m30            , "Left",     KEYMOD_META    , 0 }, 
+    "SeekRelative-30",        ACTID_SEEK_REL_m30            , "Left",     KEYMOD_META    , 0 , 0}, 
   { "set position to +30 seconds in current stream",
-    "SeekRelative+30",        ACTID_SEEK_REL_p30            , "Right",    KEYMOD_META    , 0 },
+    "SeekRelative+30",        ACTID_SEEK_REL_p30            , "Right",    KEYMOD_META    , 0 , 0},
   { "set position to -15 seconds in current stream",
-    "SeekRelative-15",        ACTID_SEEK_REL_m15            , "Left",     KEYMOD_CONTROL , 0 },
+    "SeekRelative-15",        ACTID_SEEK_REL_m15            , "Left",     KEYMOD_CONTROL , 0 , 0},
   { "set position to +15 seconds in current stream",
-    "SeekRelative+15",        ACTID_SEEK_REL_p15            , "Right",    KEYMOD_CONTROL , 0 },
+    "SeekRelative+15",        ACTID_SEEK_REL_p15            , "Right",    KEYMOD_CONTROL , 0 , 0},
   { "set position to -7 seconds in current stream",
-    "SeekRelative-7",         ACTID_SEEK_REL_m7             , "Left",     KEYMOD_MOD3    , 0 }, 
+    "SeekRelative-7",         ACTID_SEEK_REL_m7             , "Left",     KEYMOD_MOD3    , 0 , 0}, 
   { "set position to +7 seconds in current stream",
-    "SeekRelative+7",         ACTID_SEEK_REL_p7             , "Right",    KEYMOD_MOD3    , 0 },
+    "SeekRelative+7",         ACTID_SEEK_REL_p7             , "Right",    KEYMOD_MOD3    , 0 , 0},
   { "set position to beginning of current stream",
-    "SetPosition0%",          ACTID_SET_CURPOS_0            , "0",        KEYMOD_CONTROL , 0 },
+    "SetPosition0%",          ACTID_SET_CURPOS_0            , "0",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 10% of current stream",
-    "SetPosition10%",         ACTID_SET_CURPOS_10           , "1",        KEYMOD_CONTROL , 0 },
+    "SetPosition10%",         ACTID_SET_CURPOS_10           , "1",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 20% of current stream",
-    "SetPosition20%",         ACTID_SET_CURPOS_20           , "2",        KEYMOD_CONTROL , 0 },
+    "SetPosition20%",         ACTID_SET_CURPOS_20           , "2",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 30% of current stream",
-    "SetPosition30%",         ACTID_SET_CURPOS_30           , "3",        KEYMOD_CONTROL , 0 },
+    "SetPosition30%",         ACTID_SET_CURPOS_30           , "3",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 40% of current stream",
-    "SetPosition40%",         ACTID_SET_CURPOS_40           , "4",        KEYMOD_CONTROL , 0 },
+    "SetPosition40%",         ACTID_SET_CURPOS_40           , "4",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 50% of current stream",
-    "SetPosition50%",         ACTID_SET_CURPOS_50           , "5",        KEYMOD_CONTROL , 0 },
+    "SetPosition50%",         ACTID_SET_CURPOS_50           , "5",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 60% of current stream",
-    "SetPosition60%",         ACTID_SET_CURPOS_60           , "6",        KEYMOD_CONTROL , 0 },
+    "SetPosition60%",         ACTID_SET_CURPOS_60           , "6",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 70% of current stream",
-    "SetPosition70%",         ACTID_SET_CURPOS_70           , "7",        KEYMOD_CONTROL , 0 },
+    "SetPosition70%",         ACTID_SET_CURPOS_70           , "7",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 80% of current stream",
-    "SetPosition80%",         ACTID_SET_CURPOS_80           , "8",        KEYMOD_CONTROL , 0 },
+    "SetPosition80%",         ACTID_SET_CURPOS_80           , "8",        KEYMOD_CONTROL , 0 , 0},
   { "set position to 90% of current stream",
-    "SetPosition90%",         ACTID_SET_CURPOS_90           , "9",        KEYMOD_CONTROL , 0 },
+    "SetPosition90%",         ACTID_SET_CURPOS_90           , "9",        KEYMOD_CONTROL , 0 , 0},
   { "increment playback speed",
-    "SpeedFaster",            ACTID_SPEED_FAST              , "Up",       KEYMOD_NOMOD   , 0 },
+    "SpeedFaster",            ACTID_SPEED_FAST              , "Up",       KEYMOD_NOMOD   , 0 , 0},
   { "decrement playback speed",
-    "SpeedSlower",            ACTID_SPEED_SLOW              , "Down",     KEYMOD_NOMOD   , 0 },
+    "SpeedSlower",            ACTID_SPEED_SLOW              , "Down",     KEYMOD_NOMOD   , 0 , 0},
   { "reset playback speed",
-    "SpeedReset",             ACTID_SPEED_RESET             , "Down",     KEYMOD_META    , 0 },
+    "SpeedReset",             ACTID_SPEED_RESET             , "Down",     KEYMOD_META    , 0 , 0},
   { "increment audio volume",
-    "Volume+",                ACTID_pVOLUME                 , "V",        KEYMOD_NOMOD   , 0 },
+    "Volume+",                ACTID_pVOLUME                 , "V",        KEYMOD_NOMOD   , 0 , 0},
   { "decrement audio volume",
-    "Volume-",                ACTID_mVOLUME                 , "v",        KEYMOD_NOMOD   , 0 },
+    "Volume-",                ACTID_mVOLUME                 , "v",        KEYMOD_NOMOD   , 0 , 0},
   { "increment amplification level",
-    "Amp+",                   ACTID_pAMP                    , "V",        KEYMOD_CONTROL , 0 },
+    "Amp+",                   ACTID_pAMP                    , "V",        KEYMOD_CONTROL , 0 , 0},
   { "decrement amplification level",
-    "Amp-",                   ACTID_mAMP                    , "v",        KEYMOD_CONTROL , 0 },
+    "Amp-",                   ACTID_mAMP                    , "v",        KEYMOD_CONTROL , 0 , 0},
   { "reset amplification to default value",
-    "ResetAmp",               ACTID_AMP_RESET               , "A",        KEYMOD_CONTROL , 0 },
+    "ResetAmp",               ACTID_AMP_RESET               , "A",        KEYMOD_CONTROL , 0 , 0},
   { "audio muting toggle",
-    "Mute",                   ACTID_MUTE                    , "m",        KEYMOD_CONTROL , 0 },
+    "Mute",                   ACTID_MUTE                    , "m",        KEYMOD_CONTROL , 0 , 0},
   { "select next audio channel",
-    "AudioChannelNext",       ACTID_AUDIOCHAN_NEXT          , "plus",     KEYMOD_NOMOD   , 0 },
+    "AudioChannelNext",       ACTID_AUDIOCHAN_NEXT          , "plus",     KEYMOD_NOMOD   , 0 , 0},
   { "select previous audio channel",
-    "AudioChannelPrior",      ACTID_AUDIOCHAN_PRIOR         , "minus",    KEYMOD_NOMOD   , 0 },
+    "AudioChannelPrior",      ACTID_AUDIOCHAN_PRIOR         , "minus",    KEYMOD_NOMOD   , 0 , 0},
   { "select next sub picture (subtitle) channel",
-    "SpuNext",                ACTID_SPU_NEXT                , "period",   KEYMOD_NOMOD   , 0 },
+    "SpuNext",                ACTID_SPU_NEXT                , "period",   KEYMOD_NOMOD   , 0 , 0},
   { "select previous sub picture (subtitle) channel",
-    "SpuPrior",               ACTID_SPU_PRIOR               , "comma",    KEYMOD_NOMOD   , 0 },
+    "SpuPrior",               ACTID_SPU_PRIOR               , "comma",    KEYMOD_NOMOD   , 0 , 0},
   { "interlaced mode toggle",
-    "ToggleInterleave",       ACTID_TOGGLE_INTERLEAVE       , "i",        KEYMOD_NOMOD   , 0 },
+    "ToggleInterleave",       ACTID_TOGGLE_INTERLEAVE       , "i",        KEYMOD_NOMOD   , 0 , 0},
   { "cycle aspect ratio values",
-    "ToggleAspectRatio",      ACTID_TOGGLE_ASPECT_RATIO     , "a",        KEYMOD_NOMOD   , 0 },
+    "ToggleAspectRatio",      ACTID_TOGGLE_ASPECT_RATIO     , "a",        KEYMOD_NOMOD   , 0 , 0},
   { "reduce the output window size by factor 1.2",
-    "WindowReduce",           ACTID_WINDOWREDUCE            , "less",     KEYMOD_NOMOD   , 0 },
+    "WindowReduce",           ACTID_WINDOWREDUCE            , "less",     KEYMOD_NOMOD   , 0 , 0},
   { "enlarge the output window size by factor 1.2",
-    "WindowEnlarge",          ACTID_WINDOWENLARGE           , "greater",  KEYMOD_NOMOD   , 0 },
+    "WindowEnlarge",          ACTID_WINDOWENLARGE           , "greater",  KEYMOD_NOMOD   , 0 , 0},
   { "set video output window to 50%",
-    "Window50",               ACTID_WINDOW50                , "1",        KEYMOD_META    , 0 },
+    "Window50",               ACTID_WINDOW50                , "1",        KEYMOD_META    , 0 , 0},
   { "set video output window to 100%",
-    "Window100",              ACTID_WINDOW100               , "2",        KEYMOD_META    , 0 },
+    "Window100",              ACTID_WINDOW100               , "2",        KEYMOD_META    , 0 , 0},
   { "set video output window to 200%",
-    "Window200",              ACTID_WINDOW200               , "3",        KEYMOD_META    , 0 },
+    "Window200",              ACTID_WINDOW200               , "3",        KEYMOD_META    , 0 , 0},
   { "zoom in",
-    "ZoomIn",                 ACTID_ZOOM_IN                 , "z",        KEYMOD_NOMOD   , 0 },
+    "ZoomIn",                 ACTID_ZOOM_IN                 , "z",        KEYMOD_NOMOD   , 0 , 0},
   { "zoom out",
-    "ZoomOut",                ACTID_ZOOM_OUT                , "Z",        KEYMOD_NOMOD   , 0 },
+    "ZoomOut",                ACTID_ZOOM_OUT                , "Z",        KEYMOD_NOMOD   , 0 , 0},
   { "zoom in horizontally",
-    "ZoomInX",                ACTID_ZOOM_X_IN               , "z",        KEYMOD_CONTROL , 0 },
+    "ZoomInX",                ACTID_ZOOM_X_IN               , "z",        KEYMOD_CONTROL , 0 , 0},
   { "zoom out horizontally",
-    "ZoomOutX",               ACTID_ZOOM_X_OUT              , "Z",        KEYMOD_CONTROL , 0 },
+    "ZoomOutX",               ACTID_ZOOM_X_OUT              , "Z",        KEYMOD_CONTROL , 0 , 0},
   { "zoom in vertically",
-    "ZoomInY",                ACTID_ZOOM_Y_IN               , "z",        KEYMOD_META    , 0 },
+    "ZoomInY",                ACTID_ZOOM_Y_IN               , "z",        KEYMOD_META    , 0 , 0},
   { "zoom out vertically",
-    "ZoomOutY",               ACTID_ZOOM_Y_OUT              , "Z",        KEYMOD_META    , 0 },
+    "ZoomOutY",               ACTID_ZOOM_Y_OUT              , "Z",        KEYMOD_META    , 0 , 0},
   { "reset zooming",
-    "ZoomReset",              ACTID_ZOOM_RESET              , "z",        KEYMOD_CONTROL | KEYMOD_META , 0 },
+    "ZoomReset",              ACTID_ZOOM_RESET              , "z",        KEYMOD_CONTROL | KEYMOD_META , 0 , 0},
   { "resize output window to stream size",
-    "Zoom1:1",                ACTID_ZOOM_1_1                , "s",        KEYMOD_NOMOD   , 0 },
+    "Zoom1:1",                ACTID_ZOOM_1_1                , "s",        KEYMOD_NOMOD   , 0 , 0},
   { "fullscreen toggle",
-    "ToggleFullscreen",       ACTID_TOGGLE_FULLSCREEN       , "f",        KEYMOD_NOMOD   , 0 },
+    "ToggleFullscreen",       ACTID_TOGGLE_FULLSCREEN       , "f",        KEYMOD_NOMOD   , 0 , 0},
 #ifdef HAVE_XINERAMA
   { "Xinerama fullscreen toggle",
     "ToggleXineramaFullscr",  ACTID_TOGGLE_XINERAMA_FULLSCREEN 
-                                                            , "F",        KEYMOD_NOMOD   , 0 },
+                                                            , "F",        KEYMOD_NOMOD   , 0 , 0},
 #endif
   { "jump to media Menu",
-    "Menu",                   ACTID_EVENT_MENU1             , "Escape",   KEYMOD_NOMOD   , 0 },
+    "Menu",                   ACTID_EVENT_MENU1             , "Escape",   KEYMOD_NOMOD   , 0 , 0},
   { "jump to Title Menu",
-    "TitleMenu",              ACTID_EVENT_MENU2             , "F1",       KEYMOD_NOMOD   , 0 },
+    "TitleMenu",              ACTID_EVENT_MENU2             , "F1",       KEYMOD_NOMOD   , 0 , 0},
   { "jump to Root Menu",
-    "RootMenu",               ACTID_EVENT_MENU3             , "F2",       KEYMOD_NOMOD   , 0 },
+    "RootMenu",               ACTID_EVENT_MENU3             , "F2",       KEYMOD_NOMOD   , 0 , 0},
   { "jump to Subpicture Menu",
-    "SubpictureMenu",         ACTID_EVENT_MENU4             , "F3",       KEYMOD_NOMOD   , 0 },
+    "SubpictureMenu",         ACTID_EVENT_MENU4             , "F3",       KEYMOD_NOMOD   , 0 , 0},
   { "jump to Audio Menu",
-    "AudioMenu",              ACTID_EVENT_MENU5             , "F4",       KEYMOD_NOMOD   , 0 },
+    "AudioMenu",              ACTID_EVENT_MENU5             , "F4",       KEYMOD_NOMOD   , 0 , 0},
   { "jump to Angle Menu",
-    "AngleMenu",              ACTID_EVENT_MENU6             , "F5",       KEYMOD_NOMOD   , 0 },
+    "AngleMenu",              ACTID_EVENT_MENU6             , "F5",       KEYMOD_NOMOD   , 0 , 0},
   { "jump to Part Menu",
-    "PartMenu",               ACTID_EVENT_MENU7             , "F6",       KEYMOD_NOMOD   , 0 },
+    "PartMenu",               ACTID_EVENT_MENU7             , "F6",       KEYMOD_NOMOD   , 0 , 0},
   { "menu navigate up",
-    "EventUp",                ACTID_EVENT_UP                , "KP_Up",    KEYMOD_NOMOD   , 0 },
+    "EventUp",                ACTID_EVENT_UP                , "KP_Up",    KEYMOD_NOMOD   , 0 , 0},
   { "menu navigate down",
-    "EventDown",              ACTID_EVENT_DOWN              , "KP_Down",  KEYMOD_NOMOD   , 0 },
+    "EventDown",              ACTID_EVENT_DOWN              , "KP_Down",  KEYMOD_NOMOD   , 0 , 0},
   { "menu navigate left",
-    "EventLeft",              ACTID_EVENT_LEFT              , "KP_Left",  KEYMOD_NOMOD   , 0 },
+    "EventLeft",              ACTID_EVENT_LEFT              , "KP_Left",  KEYMOD_NOMOD   , 0 , 0},
   { "menu navigate right",
-    "EventRight",             ACTID_EVENT_RIGHT             , "KP_Right", KEYMOD_NOMOD   , 0 },
+    "EventRight",             ACTID_EVENT_RIGHT             , "KP_Right", KEYMOD_NOMOD   , 0 , 0},
   { "menu select",
-    "EventSelect",            ACTID_EVENT_SELECT            , "KP_Enter", KEYMOD_NOMOD   , 0 },
+    "EventSelect",            ACTID_EVENT_SELECT            , "KP_Enter", KEYMOD_NOMOD   , 0 , 0},
   { "jump to next chapter",
-    "EventNext",              ACTID_EVENT_NEXT              , "KP_Next",  KEYMOD_NOMOD   , 0 },
+    "EventNext",              ACTID_EVENT_NEXT              , "KP_Next",  KEYMOD_NOMOD   , 0 , 0},
   { "jump to previous chapter",
-    "EventPrior",             ACTID_EVENT_PRIOR             , "KP_Prior", KEYMOD_NOMOD   , 0 },
+    "EventPrior",             ACTID_EVENT_PRIOR             , "KP_Prior", KEYMOD_NOMOD   , 0 , 0},
   { "select next angle",
-    "EventAngleNext",         ACTID_EVENT_ANGLE_NEXT        , "KP_Home",  KEYMOD_NOMOD   , 0 },
+    "EventAngleNext",         ACTID_EVENT_ANGLE_NEXT        , "KP_Home",  KEYMOD_NOMOD   , 0 , 0},
   { "select previous angle",
-    "EventAnglePrior",        ACTID_EVENT_ANGLE_PRIOR       , "KP_End",   KEYMOD_NOMOD   , 0 },
+    "EventAnglePrior",        ACTID_EVENT_ANGLE_PRIOR       , "KP_End",   KEYMOD_NOMOD   , 0 , 0},
   { "visibility toggle of help window",
-    "HelpShow",               ACTID_HELP_SHOW               , "h",        KEYMOD_META    , 0 },
+    "HelpShow",               ACTID_HELP_SHOW               , "h",        KEYMOD_META    , 0 , 1},
   { "visibility toggle of video post effect window",
-    "VPProcessShow",          ACTID_VPP                     , "P",        KEYMOD_META    , 0 },
+    "VPProcessShow",          ACTID_VPP                     , "P",        KEYMOD_META    , 0 , 1},
   { "toggle post effect usage",
-    "VPProcessEnable",        ACTID_VPP_ENABLE              , "P",        KEYMOD_CONTROL | KEYMOD_META , 0 },
+    "VPProcessEnable",        ACTID_VPP_ENABLE              , "P",        KEYMOD_CONTROL | KEYMOD_META , 0 , 0},
   { "visibility toggle of output window",
-    "ToggleWindowVisibility", ACTID_TOGGLE_WINOUT_VISIBLITY , "h",        KEYMOD_NOMOD   , 0 },
+    "ToggleWindowVisibility", ACTID_TOGGLE_WINOUT_VISIBLITY , "h",        KEYMOD_NOMOD   , 0 , 1},
   { "visibility toggle of UI windows",
-    "ToggleVisibility",       ACTID_TOGGLE_VISIBLITY        , "g",        KEYMOD_NOMOD   , 0 },
+    "ToggleVisibility",       ACTID_TOGGLE_VISIBLITY        , "g",        KEYMOD_NOMOD   , 0 , 1},
   { "visibility toggle of control window",
-    "ControlShow",            ACTID_CONTROLSHOW             , "c",        KEYMOD_META    , 0 },
+    "ControlShow",            ACTID_CONTROLSHOW             , "c",        KEYMOD_META    , 0 , 1},
   { "visibility toggle of mrl browser window",
-    "MrlBrowser",             ACTID_MRLBROWSER              , "m",        KEYMOD_META    , 0 },
+    "MrlBrowser",             ACTID_MRLBROWSER              , "m",        KEYMOD_META    , 0 , 1},
   { "visibility toggle of playlist editor window",
-    "PlaylistEditor",         ACTID_PLAYLIST                , "p",        KEYMOD_META    , 0 },
+    "PlaylistEditor",         ACTID_PLAYLIST                , "p",        KEYMOD_META    , 0 , 1},
   { "visibility toggle of the setup window",
-    "SetupShow",              ACTID_SETUP                   , "s",        KEYMOD_META    , 0 },
+    "SetupShow",              ACTID_SETUP                   , "s",        KEYMOD_META    , 0 , 1},
   { "visibility toggle of the event sender window",
-    "EventSenderShow",        ACTID_EVENT_SENDER            , "e",        KEYMOD_META    , 0 },
+    "EventSenderShow",        ACTID_EVENT_SENDER            , "e",        KEYMOD_META    , 0 , 1},
   { "visibility toggle of analog TV window",
-    "TVAnalogShow",           ACTID_TVANALOG                , "t",        KEYMOD_META    , 0 },
+    "TVAnalogShow",           ACTID_TVANALOG                , "t",        KEYMOD_META    , 0 , 1},
   { "visibility toggle of log viewer",
-    "ViewlogShow",            ACTID_VIEWLOG	            , "l",	  KEYMOD_META    , 0 },
+    "ViewlogShow",            ACTID_VIEWLOG	            , "l",	  KEYMOD_META    , 0 , 1},
   { "visibility toggle of stream info window",
-    "StreamInfosShow",        ACTID_STREAM_INFOS            , "i",        KEYMOD_META    , 0 },
+    "StreamInfosShow",        ACTID_STREAM_INFOS            , "i",        KEYMOD_META    , 0 , 1},
   { "display stream information using OSD",
-    "OSDStreamInfos",         ACTID_OSD_SINFOS              , "i",        KEYMOD_CONTROL , 0 },
+    "OSDStreamInfos",         ACTID_OSD_SINFOS              , "i",        KEYMOD_CONTROL , 0 , 0},
   { "enter key binding editor",
-    "KeyBindingEditor",       ACTID_KBEDIT	            , "k",	  KEYMOD_META    , 0 },
+    "KeyBindingEditor",       ACTID_KBEDIT	            , "k",	  KEYMOD_META    , 0 , 1},
   { "open file selector",
-    "FileSelector",           ACTID_FILESELECTOR            , "o",        KEYMOD_CONTROL , 0 },
+    "FileSelector",           ACTID_FILESELECTOR            , "o",        KEYMOD_CONTROL , 0 , 1},
   { "select a subtitle file",
-    "SubSelector",            ACTID_SUBSELECT               , "S",        KEYMOD_CONTROL , 0 },
+    "SubSelector",            ACTID_SUBSELECT               , "S",        KEYMOD_CONTROL , 0 , 1},
 #ifdef HAVE_CURL
   { "download a skin from the skin server",
-    "SkinDownload",           ACTID_SKINDOWNLOAD            , "d",        KEYMOD_CONTROL , 0 },
+    "SkinDownload",           ACTID_SKINDOWNLOAD            , "d",        KEYMOD_CONTROL , 0 , 1},
 #endif
   { "display MRL/Ident toggle",
-    "MrlIdentToggle",         ACTID_MRLIDENTTOGGLE          , "t",        KEYMOD_CONTROL , 0 },
+    "MrlIdentToggle",         ACTID_MRLIDENTTOGGLE          , "t",        KEYMOD_CONTROL , 0 , 0},
   { "grab pointer toggle",
-    "GrabPointer",            ACTID_GRAB_POINTER            , "Insert",   KEYMOD_NOMOD   , 0 },
+    "GrabPointer",            ACTID_GRAB_POINTER            , "Insert",   KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 0",
-    "Number0",                ACTID_EVENT_NUMBER_0          , "0",        KEYMOD_NOMOD   , 0 },
+    "Number0",                ACTID_EVENT_NUMBER_0          , "0",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 1",
-    "Number1",                ACTID_EVENT_NUMBER_1          , "1",        KEYMOD_NOMOD   , 0 },
+    "Number1",                ACTID_EVENT_NUMBER_1          , "1",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 2",
-    "Number2",                ACTID_EVENT_NUMBER_2          , "2",        KEYMOD_NOMOD   , 0 },
+    "Number2",                ACTID_EVENT_NUMBER_2          , "2",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 3",
-    "Number3",                ACTID_EVENT_NUMBER_3          , "3",        KEYMOD_NOMOD   , 0 },
+    "Number3",                ACTID_EVENT_NUMBER_3          , "3",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 4",
-    "Number4",                ACTID_EVENT_NUMBER_4          , "4",        KEYMOD_NOMOD   , 0 },
+    "Number4",                ACTID_EVENT_NUMBER_4          , "4",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 5",
-    "Number5",                ACTID_EVENT_NUMBER_5          , "5",        KEYMOD_NOMOD   , 0 },
+    "Number5",                ACTID_EVENT_NUMBER_5          , "5",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 6",
-    "Number6",                ACTID_EVENT_NUMBER_6          , "6",        KEYMOD_NOMOD   , 0 },
+    "Number6",                ACTID_EVENT_NUMBER_6          , "6",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 7",
-    "Number7",                ACTID_EVENT_NUMBER_7          , "7",        KEYMOD_NOMOD   , 0 },
+    "Number7",                ACTID_EVENT_NUMBER_7          , "7",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 8",
-    "Number8",                ACTID_EVENT_NUMBER_8          , "8",        KEYMOD_NOMOD   , 0 },
+    "Number8",                ACTID_EVENT_NUMBER_8          , "8",        KEYMOD_NOMOD   , 0 , 0},
   { "enter the number 9",
-    "Number9",                ACTID_EVENT_NUMBER_9          , "9",        KEYMOD_NOMOD   , 0 },
+    "Number9",                ACTID_EVENT_NUMBER_9          , "9",        KEYMOD_NOMOD   , 0 , 0},
   { "add 10 to the next entered number",
-    "Number10add",            ACTID_EVENT_NUMBER_10_ADD     , "plus",     KEYMOD_MOD3    , 0 },
+    "Number10add",            ACTID_EVENT_NUMBER_10_ADD     , "plus",     KEYMOD_MOD3    , 0 , 0},
   { "set position in current stream to numeric percentage",
-    "SetPosition%",           ACTID_SET_CURPOS              , "slash",    KEYMOD_NOMOD   , 0 },
+    "SetPosition%",           ACTID_SET_CURPOS              , "slash",    KEYMOD_NOMOD   , 0 , 0},
   { "set position forward by numeric argument in current stream",
-    "SeekRelative+",          ACTID_SEEK_REL_p              , "Up",       KEYMOD_META    , 0 }, 
+    "SeekRelative+",          ACTID_SEEK_REL_p              , "Up",       KEYMOD_META    , 0 , 0}, 
   { "set position back by numeric argument in current stream",
-    "SeekRelative-",          ACTID_SEEK_REL_m              , "Up",       KEYMOD_MOD3    , 0 }, 
+    "SeekRelative-",          ACTID_SEEK_REL_m              , "Up",       KEYMOD_MOD3    , 0 , 0}, 
   { "change audio video syncing (delay video)",
-    "AudioVideoDecay+",       ACTID_AV_SYNC_p3600           , "m",        KEYMOD_NOMOD   , 0 },
+    "AudioVideoDecay+",       ACTID_AV_SYNC_p3600           , "m",        KEYMOD_NOMOD   , 0 , 0},
   { "change audio video syncing (delay audio)",
-    "AudioVideoDecay-",       ACTID_AV_SYNC_m3600           , "n",        KEYMOD_NOMOD   , 0 },
+    "AudioVideoDecay-",       ACTID_AV_SYNC_m3600           , "n",        KEYMOD_NOMOD   , 0 , 0},
   { "reset audio video syncing offset",
-    "AudioVideoDecayReset",   ACTID_AV_SYNC_RESET           , "Home",     KEYMOD_NOMOD   , 0 },
+    "AudioVideoDecayReset",   ACTID_AV_SYNC_RESET           , "Home",     KEYMOD_NOMOD   , 0 , 0},
   { "change subtitle syncing (delay video)",
-    "SpuVideoDecay+",         ACTID_SV_SYNC_p               , "M",        KEYMOD_NOMOD   , 0 },
+    "SpuVideoDecay+",         ACTID_SV_SYNC_p               , "M",        KEYMOD_NOMOD   , 0 , 0},
   { "change subtitle syncing (delay subtitles)",
-    "SpuVideoDecay-",         ACTID_SV_SYNC_m               , "N",        KEYMOD_NOMOD   , 0 },
+    "SpuVideoDecay-",         ACTID_SV_SYNC_m               , "N",        KEYMOD_NOMOD   , 0 , 0},
   { "reset subtitle syncing offset",
-    "SpuVideoDecayReset",     ACTID_SV_SYNC_RESET           , "End",      KEYMOD_NOMOD   , 0 },
+    "SpuVideoDecayReset",     ACTID_SV_SYNC_RESET           , "End",      KEYMOD_NOMOD   , 0 , 0},
   { "toggle TV modes (on the DXR3)",
-    "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL | KEYMOD_META , 0 },
+    "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL | KEYMOD_META , 0 , 0},
   { "switch Monitor to DPMS standby mode",
-    "DPMSStandby",            ACTID_DPMSSTANDBY             , "d",        KEYMOD_NOMOD   , 0 },
+    "DPMSStandby",            ACTID_DPMSSTANDBY             , "d",        KEYMOD_NOMOD   , 0 , 0},
   { "increase hue by 10",
-    "HueControl+",            ACTID_HUECONTROLp             , "VOID",     KEYMOD_NOMOD   , 0 },
+    "HueControl+",            ACTID_HUECONTROLp             , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "decrease hue by 10",
-    "HueControl-",            ACTID_HUECONTROLm             , "VOID",     KEYMOD_NOMOD   , 0 },
+    "HueControl-",            ACTID_HUECONTROLm             , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "increase saturation by 10",
-    "SaturationControl+",     ACTID_SATURATIONCONTROLp      , "VOID",     KEYMOD_NOMOD   , 0 },
+    "SaturationControl+",     ACTID_SATURATIONCONTROLp      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "decrease saturation by 10",
-    "SaturationControl-",     ACTID_SATURATIONCONTROLm      , "VOID",     KEYMOD_NOMOD   , 0 },
+    "SaturationControl-",     ACTID_SATURATIONCONTROLm      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "increase brightness by 10",
-    "BrightnessControl+",     ACTID_BRIGHTNESSCONTROLp      , "VOID",     KEYMOD_NOMOD   , 0 },
+    "BrightnessControl+",     ACTID_BRIGHTNESSCONTROLp      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "decrease brightness by 10",
-    "BrightnessControl-",     ACTID_BRIGHTNESSCONTROLm      , "VOID",     KEYMOD_NOMOD   , 0 },
+    "BrightnessControl-",     ACTID_BRIGHTNESSCONTROLm      , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "increase contrast by 10",
-    "ContrastControl+",       ACTID_CONTRASTCONTROLp        , "VOID",     KEYMOD_NOMOD   , 0 },
+    "ContrastControl+",       ACTID_CONTRASTCONTROLp        , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "decrease contrast by 10",
-    "ContrastControl-",       ACTID_CONTRASTCONTROLm        , "VOID",     KEYMOD_NOMOD   , 0 },
+    "ContrastControl-",       ACTID_CONTRASTCONTROLm        , "VOID",     KEYMOD_NOMOD   , 0 , 0},
   { "quit the program",
-    "Quit",                   ACTID_QUIT                    , "q",        KEYMOD_NOMOD   , 0 },
+    "Quit",                   ACTID_QUIT                    , "q",        KEYMOD_NOMOD   , 0 , 0},
   { 0,
-    0,                        0,                              0,          0              , 0 }
+    0,                        0,                              0,          0              , 0 , 0}
 };
+
+static int _kbinding_get_is_gui_from_default(char *action) {
+  int i;
+  
+  for(i = 0; default_binding_table[i].action != NULL; i++) {
+    if(!strcmp(default_binding_table[i].action, action))
+      return default_binding_table[i].is_gui;
+  }
+  return 0;
+}
 
 /*
  * Check if there some redundant entries in key binding table kbt.
@@ -738,6 +750,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     /*
      * Add new entry (struct memory already allocated)
      */
+    kbt->entry[kbt->num_entries - 1]->is_gui    = k->is_gui;
     kbt->entry[kbt->num_entries - 1]->is_alias  = 1;
     kbt->entry[kbt->num_entries - 1]->comment   = strdup(k->comment);
     kbt->entry[kbt->num_entries - 1]->action    = strdup(k->action);
@@ -749,6 +762,7 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
      * NULL terminate array.
      */
     kbt->entry[kbt->num_entries] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
+    kbt->entry[kbt->num_entries]->is_gui    = 0;
     kbt->entry[kbt->num_entries]->is_alias  = 0;
     kbt->entry[kbt->num_entries]->comment   = NULL;
     kbt->entry[kbt->num_entries]->action    = NULL;
@@ -774,6 +788,8 @@ static void _kbindings_replace_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     if(!strcmp(kbt->entry[i]->action, ukb->action)) {
       SAFE_FREE(kbt->entry[i]->key);
       kbt->entry[i]->key = strdup(ukb->key);
+      
+      kbt->entry[i]->is_gui = _kbinding_get_is_gui_from_default(ukb->action);
 
       if(ukb->modifier) {
 	char *p;
@@ -1112,6 +1128,7 @@ static kbinding_t *_kbindings_duplicate_kbindings(kbinding_t *kbt) {
     k->entry[i]->key       = strdup(kbt->entry[i]->key);
     k->entry[i]->modifier  = kbt->entry[i]->modifier;
     k->entry[i]->is_alias  = kbt->entry[i]->is_alias;
+    k->entry[i]->is_gui    = kbt->entry[i]->is_gui;
   }
 
   k->entry[i]            = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
@@ -1121,6 +1138,7 @@ static kbinding_t *_kbindings_duplicate_kbindings(kbinding_t *kbt) {
   k->entry[i]->key       = NULL;
   k->entry[i]->modifier  = 0;
   k->entry[i]->is_alias  = 0;
+  k->entry[i]->is_gui    = 0;
   k->num_entries         = i + 1;
   
   return k;
@@ -1331,10 +1349,9 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
 #endif    
 
     k = kbindings_lookup_binding(kbt, xbutton, modifier);
-    
-    if(k) {
+
+    if(k && !(gGui->no_gui && k->is_gui))
       gui_execute_action_id(k->action_id);
-    }
 #if 0  /* DEBUG */
     else
       printf("%s unhandled\n", kbuf);
@@ -1356,8 +1373,8 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
 #endif    
     k = kbindings_lookup_binding(kbt, XKeysymToString(mkey), modifier);
     XUnlockDisplay (gGui->display);
-    
-    if(k)
+  
+    if(k && !(gGui->no_gui && k->is_gui))
       gui_execute_action_id(k->action_id);
 #if 0  /* DEBUG */
     else
@@ -1726,20 +1743,22 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
   switch(kbedit->action_wanted) {
     
   case KBEDIT_ALIASING:
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment = strdup(kbedit->ksel->comment);
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action = strdup(kbedit->ksel->action);
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment   = strdup(kbedit->ksel->comment);
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action    = strdup(kbedit->ksel->action);
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->key = strdup(kbe->key);
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->modifier = kbe->modifier;
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias = 1;
-    
-    kbedit->kbt->entry[kbedit->kbt->num_entries] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->comment = NULL;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->action = NULL;
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->key       = strdup(kbe->key);
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->modifier  = kbe->modifier;
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias  = 1;
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_gui    = kbe->is_gui;
+
+    kbedit->kbt->entry[kbedit->kbt->num_entries]            = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->comment   = NULL;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->action    = NULL;
     kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->key = NULL;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->modifier = 0;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias = 0;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->key       = NULL;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->modifier  = 0;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias  = 0;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->is_gui    = 0;
     
     kbedit->kbt->num_entries++;
     
@@ -1811,6 +1830,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   kbe->action    = strdup(kbedit->ksel->action);
   kbe->action_id = kbedit->ksel->action_id;
   kbe->is_alias  = kbedit->ksel->is_alias;
+  kbe->is_gui    = kbedit->ksel->is_gui;
   
   xitk_labelbutton_change_label(kbedit->grab, _("Press Keyboard Keys..."));
   XLockDisplay(gGui->display);

@@ -376,7 +376,7 @@ void playlist_load_playlist(xitk_widget_t *w, void *data) {
     cbb[1].callback = _playlist_cancel_callback;
     
     playlist_deactivate();
-    load_fb = create_filebrowser(_("Load a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
+    load_fb = create_filebrowser(_("Load a playlist"), buffer, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
   }
 }
 
@@ -409,7 +409,7 @@ void playlist_save_playlist(xitk_widget_t *w, void *data) {
       cbb[1].callback = _playlist_cancel_callback;
       
       playlist_deactivate();
-      save_fb = create_filebrowser(_("Save a playlist"), buffer, &cbb[0], NULL, &cbb[1]);
+      save_fb = create_filebrowser(_("Save a playlist"), buffer, hidden_file_cb, &cbb[0], NULL, &cbb[1]);
     }
   }
 }

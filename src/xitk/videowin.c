@@ -1884,7 +1884,7 @@ float video_window_get_mag (void) {
  * Change displayed logo, if selected skin want to customize it.
  */
 void video_window_update_logo(void) {
-  xine_cfg_entry_t  cfg_entry;
+  xine_cfg_entry_t     cfg_entry;
   char                *skin_logo;
   int                  cfg_err_result;
   

@@ -1480,13 +1480,17 @@ void panel_init (void) {
   /* 
    * show panel 
    */
-  panel->visible = xine_config_register_bool (gGui->xine, "gui.panel_visible", 
-					      1,
-					      _("gui panel visibility"),
-					      CONFIG_NO_HELP,
-					      CONFIG_LEVEL_DEB,
-					      CONFIG_NO_CB,
-					      CONFIG_NO_DATA);
+  {
+    int visible = xine_config_register_bool(gGui->xine, "gui.panel_visible", 
+					    1,
+					    _("gui panel visibility"),
+					    CONFIG_NO_HELP,
+					    CONFIG_LEVEL_DEB,
+					    CONFIG_NO_CB,
+					    CONFIG_NO_DATA);
+
+      panel->visible = (!gGui->no_gui) ? visible : 0;
+  }
   
   /*  The user don't want panel on startup */
   if(panel->visible && (actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_VISIBLITY))) {

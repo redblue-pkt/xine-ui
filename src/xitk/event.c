@@ -107,6 +107,20 @@ static char *shortcut_style[] = {
   NULL
 };
 
+int hidden_file_cb(int action, int value) {
+  xine_cfg_entry_t  cfg_entry;
+  int               retval = 0;
+  
+  if(xine_config_lookup_entry(gGui->xine, "input.file_hidden_files", &cfg_entry)) {
+    if(action)
+      config_update_bool("input.file_hidden_files", value);
+    else
+      retval = cfg_entry.num_value;
+  }
+
+  return retval;
+}
+
 void dummy_config_cb(void *data, xine_cfg_entry_t *cfg) {
   /* It exist to avoid "restart" window message in setup window */
 }

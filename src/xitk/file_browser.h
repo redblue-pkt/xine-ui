@@ -27,6 +27,7 @@
 typedef struct filebrowser_s filebrowser_t;
 
 typedef void (*filebrowser_callback_t)(filebrowser_t *);
+typedef int (*hidden_file_toggle_t)(int action, int value);
 
 typedef struct {
   char                     *label;
@@ -35,7 +36,7 @@ typedef struct {
 } filebrowser_callback_button_t;
 		
 
-filebrowser_t *create_filebrowser(char *, char *,
+filebrowser_t *create_filebrowser(char *, char *, hidden_file_toggle_t,
 				  filebrowser_callback_button_t *, 
 				  filebrowser_callback_button_t *,
 				  filebrowser_callback_button_t *);

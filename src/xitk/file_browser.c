@@ -182,6 +182,8 @@ struct filebrowser_s {
   
   xitk_widget_t                  *close;
 
+  hidden_file_toggle_t            hidden_cb;
+
   filebrowser_callback_button_t   cbb[3];
   xitk_widget_t                  *cb_buttons[2];
   
@@ -1078,6 +1080,7 @@ static void fb_hidden_files(xitk_widget_t *w, void *data, int state) {
   filebrowser_t *fb = (filebrowser_t *) data;
   
   fb->show_hidden_files = state;
+  fb->hidden_cb(1, state);
   fb_getdir(fb);
 }
 static void fb_lbl_hidden_files(xitk_widget_t *w, void *data) {
@@ -1157,7 +1160,7 @@ char **filebrowser_get_all_files(filebrowser_t *fb) {
   return files;
 }
 
-filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
+filebrowser_t *create_filebrowser(char *window_title, char *filepathname, hidden_file_toggle_t hidden_cb,
 				  filebrowser_callback_button_t *cbb1,
 				  filebrowser_callback_button_t *cbb2,
 				  filebrowser_callback_button_t *cbb_close) {
@@ -1220,7 +1223,8 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   fb->files_num                  = 0;
   fb->directories_sort_direction = DEFAULT_SORT;
   fb->files_sort_direction       = DEFAULT_SORT;
-  fb->show_hidden_files          = 1;
+  fb->hidden_cb                  = hidden_cb;
+  fb->show_hidden_files          = hidden_cb(0, 0);
 
   snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", xine_get_homedir());
   memset(&fb->filename, 0, sizeof(fb->filename));

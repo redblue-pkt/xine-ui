@@ -362,6 +362,8 @@ typedef struct {
 
   FILE                      *report;
 
+  int                        no_gui;
+
 } gGui_t;
 
 
