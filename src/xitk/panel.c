@@ -1267,6 +1267,12 @@ void panel_init (void) {
 					      CONFIG_NO_CB,
 					      CONFIG_NO_DATA);
   
+  /*  The user don't want panel on startup */
+  if(panel->visible && (actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_VISIBLITY))) {
+    panel->visible = !panel->visible;
+    config_update_num ("gui.panel_visible", panel->visible);
+  }
+  
   if(gGui->use_root_window && (!panel->visible))
     panel->visible = 1;
   

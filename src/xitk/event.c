@@ -1341,15 +1341,11 @@ void gui_run (void) {
       gui_execute_action_id(ACTID_SETUP);
     }
     
-    /*  The user wants to hide control panel  */
-    if(panel_is_visible() && (actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_VISIBLITY)))
-      gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
-
     /*  The user wants to hide video window  */
     if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) {
       if(!panel_is_visible())
 	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
-
+      
       /* DXR3 case */
       if(video_window_is_visible())
 	video_window_set_visibility(!(video_window_is_visible()));
@@ -1357,7 +1353,7 @@ void gui_run (void) {
 	xine_gui_send_vo_data(gGui->stream,
 			      XINE_GUI_SEND_VIDEOWIN_VISIBLE,
 			      (int *)0);
-
+      
     }
 
     /* The user wants to see in fullscreen mode  */
