@@ -1587,6 +1587,7 @@ void xitk_destroy_widgets(xitk_widget_list_t *wl) {
   }
 }
 
+#if 0
 /*
  * Return the struct of color names/values.
  */
@@ -1594,6 +1595,7 @@ xitk_color_names_t *gui_get_color_names(void) {
 
   return xitk_color_names;
 }
+#endif
 
 /*
  * Return a xitk_color_name_t type from a string color.

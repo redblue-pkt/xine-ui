@@ -44,7 +44,7 @@ void splash_create(void) {
   
   if(skin_path && is_a_dir((char *) skin_path)) {
     memset(&skin_splash_image, 0, sizeof(skin_splash_image));
-    sprintf(skin_splash_image, "%s/%s", skin_path, "xine_splash.png");
+    snprintf(skin_splash_image, sizeof(skin_splash_image), "%s/%s", skin_path, "xine_splash.png");
 
     if(is_a_file(skin_splash_image))
       splash_image = skin_splash_image;

@@ -32,6 +32,7 @@
 #endif
 
 #include "main.h"
+#include "options.h"
 
 #define OPTION_STDCTL           5000
 #define OPTION_POST             1008
@@ -41,7 +42,7 @@ int no_lirc;
 char                  **pplugins        = NULL;
 int                     pplugins_num    = 0;
 
-void extract_mrls(int num_mrls, char **mrls)
+static void extract_mrls(int num_mrls, char **mrls)
 {
 	int i;
 	

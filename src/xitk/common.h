@@ -352,8 +352,6 @@ typedef struct {
 
   int                        play_anyway;
 
-  int                        got_reference_stream;
-
   int                        splash;
 
   pthread_mutex_t            download_mutex;

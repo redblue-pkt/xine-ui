@@ -129,7 +129,7 @@ char *get_fourcc_string(uint32_t f) {
   fcc[4] = 0;
   
   if(f <= 0xFFFF)
-    sprintf(fcc, "0x%x", f);
+    snprintf(fcc, sizeof(fcc), "0x%x", f);
   
   if((fcc[0] == 'm') && (fcc[1] == 's')) {
     if((fcc[2] = 0x0) && (fcc[3] == 0x55)) {
@@ -186,7 +186,7 @@ static void get_stream_video_resolution_info(void) {
   video_w = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
   video_h = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
 
-  sprintf(buffer, "%d X %d", video_w, video_h);
+  snprintf(buffer, sizeof(buffer), "%d X %d", video_w, video_h);
   set_label(sinfos->infos.video_resolution, buffer);
 }
 

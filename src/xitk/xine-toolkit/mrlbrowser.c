@@ -96,10 +96,8 @@ static void _duplicate_mrl_filters(mrlbrowser_private_data_t *private_data,
     for(i = 0; 
 	mrl_filters[i] && (mrl_filters[i]->name && mrl_filters[i]->ending); i++) {
 
-      private_data->mrl_filters            = (xitk_mrlbrowser_filter_t **)
-	realloc(private_data->mrl_filters, sizeof(xitk_mrlbrowser_filter_t *) * (i + 2));
-      private_data->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) 
-	xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+      private_data->mrl_filters            = (xitk_mrlbrowser_filter_t **) realloc(private_data->mrl_filters, sizeof(xitk_mrlbrowser_filter_t *) * (i + 2));
+      private_data->mrl_filters[i]         = (xitk_mrlbrowser_filter_t *) xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
       private_data->mrl_filters[i]->name   = strdup(mrl_filters[i]->name);
       private_data->mrl_filters[i]->ending = strdup(mrl_filters[i]->ending);
     }
@@ -279,14 +277,8 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
     
     if(private_data->mc->filtered_mrls[i]->type & XINE_MRL_TYPE_file_symlink) {
 
-      if(private_data->mc->mrls_disp[i])
-	private_data->mc->mrls_disp[i] = (char *) 
-	  realloc(private_data->mc->mrls_disp[i], strlen(p) + 4 + 
-		  strlen(private_data->mc->filtered_mrls[i]->link) + 2);
-      else
-	private_data->mc->mrls_disp[i] = (char *) 
-	  xitk_xmalloc(strlen(p) + 4 + 
-		      strlen(private_data->mc->filtered_mrls[i]->link) + 2);
+      private_data->mc->mrls_disp[i] = (char *) realloc(private_data->mc->mrls_disp[i], 
+							strlen(p) + 4 + strlen(private_data->mc->filtered_mrls[i]->link) + 2);
       
       sprintf(private_data->mc->mrls_disp[i], "%s%c -> %s", 
 	      p, get_mrl_marker(private_data->mc->filtered_mrls[i]), 
@@ -294,11 +286,7 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
 
     }
     else {
-      if(private_data->mc->mrls_disp[i])
-	private_data->mc->mrls_disp[i] = (char *) 
-	  realloc(private_data->mc->mrls_disp[i], strlen(p) + 2);
-      else
-	private_data->mc->mrls_disp[i] = (char *) xitk_xmalloc(strlen(p) + 2);
+      private_data->mc->mrls_disp[i] = (char *) realloc(private_data->mc->mrls_disp[i], strlen(p) + 2);
       
       sprintf(private_data->mc->mrls_disp[i], "%s%c", 
 	      p, get_mrl_marker(private_data->mc->filtered_mrls[i]));
@@ -347,11 +335,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 
   if(lbl) {
     
-    if(private_data->last_mrl_source)
-      private_data->last_mrl_source = (char *)
-	realloc(private_data->last_mrl_source, strlen(lbl) + 1);
-    else
-      private_data->last_mrl_source = (char *) xitk_xmalloc(strlen(lbl) + 1);
+    private_data->last_mrl_source = (char *) realloc(private_data->last_mrl_source, strlen(lbl) + 1);
     
     old_old_src = strdup(private_data->last_mrl_source);
     sprintf(private_data->last_mrl_source, "%s", lbl);
@@ -362,8 +346,7 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
 					       private_data->last_mrl_source, 
 					       NULL, &num_mrls);
       if(!mtmp) {
-	private_data->last_mrl_source = (char *)
-	  realloc(private_data->last_mrl_source, strlen(old_old_src) + 1);
+	private_data->last_mrl_source = (char *) realloc(private_data->last_mrl_source, strlen(old_old_src) + 1);
 	sprintf(private_data->last_mrl_source, "%s", old_old_src);
 	return;
       }
@@ -664,7 +647,7 @@ void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
 /*
  * Leaving mrlbrowser.
  */
-void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
+static void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
   mrlbrowser_private_data_t *private_data = ((xitk_widget_t *)data)->private_data;
   
   if(private_data->kill_callback)

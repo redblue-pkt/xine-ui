@@ -299,7 +299,7 @@ void osd_stream_infos(void) {
 
     y = x = 0;
 
-    sprintf(buffer, "%s", (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident);
+    snprintf(buffer, sizeof(buffer), "%s", (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident);
     xine_osd_get_text_size(gGui->osd.sinfo, buffer, &osdw, &h);
     p = buffer;
     while(osdw > (wwidth - 40)) {
@@ -314,7 +314,7 @@ void osd_stream_infos(void) {
     y += h;
     
     if(vcodec && vwidth && vheight) {
-      sprintf(buffer, "%s: %dX%d", vcodec, vwidth, vheight);
+      snprintf(buffer, sizeof(buffer), "%s: %dX%d", vcodec, vwidth, vheight);
       xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
       xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
       if(w > osdw)
@@ -323,7 +323,7 @@ void osd_stream_infos(void) {
     }
 
     if(acodec && asrate) {
-      sprintf(buffer, "%s: %dHz", acodec, asrate);
+      snprintf(buffer, sizeof(buffer), "%s: %d%s", acodec, asrate, "Hz");
       xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
       xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
       if(w > osdw)
@@ -333,38 +333,38 @@ void osd_stream_infos(void) {
     
     memset(&buffer, 0, sizeof(buffer));
 
-    sprintf(buffer, _("Audio: "));
+    snprintf(buffer, sizeof(buffer), "%s", _("Audio: "));
     len = strlen(buffer);
     switch(audiochannel) {
     case -2:
-      sprintf(buffer, "%soff", buffer);
+      snprintf(buffer, sizeof(buffer), "%s%s", buffer, "off");
       break;
     case -1:
       if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
-	sprintf(buffer, "%sauto", buffer);
+	snprintf(buffer, sizeof(buffer), "%s%s", buffer, "auto");
       break;
     default:
       if(!xine_get_audio_lang (gGui->stream, audiochannel, &buffer[len]))
-	sprintf(buffer, "%s%3d", buffer, audiochannel);
+	snprintf(buffer, sizeof(buffer), "%s%3d", buffer, audiochannel);
       break;
     }
 
-    sprintf(buffer, "%s, Spu: ", buffer);
+    snprintf(buffer, sizeof(buffer), "%s%s", buffer, ", Spu: ");
     len = strlen(buffer);
     switch (spuchannel) {
     case -2:
-      sprintf(buffer, "%soff", buffer);
+      snprintf(buffer, sizeof(buffer), "%s%s", buffer, "off");
       break;
     case -1:
       if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
-	sprintf(buffer, "%sauto", buffer);
+	snprintf(buffer, sizeof(buffer), "%s%s", buffer, "auto");
       break;
     default:
       if(!xine_get_spu_lang (gGui->stream, spuchannel, &buffer[len]))
-        sprintf(buffer, "%s%3d", buffer, spuchannel);
+        snprintf(buffer, sizeof(buffer), "%s%3d", buffer, spuchannel);
       break;
     }
-    sprintf(buffer, "%s.", buffer);
+    snprintf(buffer, sizeof(buffer), "%s.", buffer);
     xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
     xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
     if(w > osdw)
@@ -373,10 +373,11 @@ void osd_stream_infos(void) {
     y += (h);
 
     if(totaltime) {
-      sprintf(buffer, _("%d:%.2d:%.2d (%.0f%%) of %d:%.2d:%.2d"),
-	      playedtime / 3600, (playedtime % 3600) / 60, playedtime % 60,
-	      ((float)playedtime / (float)totaltime) * 100,
-	      totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
+      snprintf(buffer, sizeof(buffer), "%d:%.2d:%.2d (%.0f%%) %s %d:%.2d:%.2d",
+	       playedtime / 3600, (playedtime % 3600) / 60, playedtime % 60,
+	       ((float)playedtime / (float)totaltime) * 100,
+	       _("of"),
+	       totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
       xine_osd_draw_text(gGui->osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
       xine_osd_get_text_size(gGui->osd.sinfo, buffer, &w, &h);
       if(w > osdw)
@@ -575,7 +576,7 @@ void osd_update_status(void) {
     switch(status) {
     case XINE_STATUS_IDLE:
     case XINE_STATUS_STOP:
-      sprintf(buffer, "%s", (_osd_get_status_sym(status)));
+      snprintf(buffer, sizeof(buffer), "%s", (_osd_get_status_sym(status)));
       break;
       
     case XINE_STATUS_PLAY:
@@ -586,11 +587,11 @@ void osd_update_status(void) {
 	if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
 	  secs /= 1000;
 	  
-	  sprintf(buffer, "%s %02d:%02d:%02d", (_osd_get_speed_sym(speed)), 
-		  secs / (60*60), (secs / 60) % 60, secs % 60);
+	  snprintf(buffer, sizeof(buffer), "%s %02d:%02d:%02d", (_osd_get_speed_sym(speed)), 
+		   secs / (60*60), (secs / 60) % 60, secs % 60);
 	}
 	else
-	  sprintf(buffer, "%s", (_osd_get_speed_sym(speed)));
+	  snprintf(buffer, sizeof(buffer), "%s", (_osd_get_speed_sym(speed)));
 	
       }
       break;
@@ -645,12 +646,12 @@ void osd_display_spu_lang(void) {
     break;
   default:
     if(!xine_get_spu_lang(gGui->stream, channel, &lang_buffer[0]))
-      sprintf(lang_buffer, "%3d", channel);
+      snprintf(lang_buffer, sizeof(lang_buffer), "%3d", channel);
     lang = lang_buffer;
     break;
   }
   
-  sprintf(buffer, _("Subtitles: %s"), get_language_from_iso639_1(lang));
+  snprintf(buffer, sizeof(buffer), "%s%s", _("Subtitles: "), get_language_from_iso639_1(lang));
   osd_display_info(buffer);
 }
 
@@ -674,11 +675,11 @@ void osd_display_audio_lang(void) {
     break;
   default:
     if(!xine_get_audio_lang(gGui->stream, channel, &lang_buffer[0]))
-      sprintf(lang_buffer, "%3d", channel);
+      snprintf(lang_buffer, sizeof(lang_buffer), "%3d", channel);
     lang = lang_buffer;
     break;
   }
 
-  sprintf(buffer, _("Audio Channel: %s"), get_language_from_iso639_1(lang));
+  snprintf(buffer, sizeof(buffer), "%s%s", _("Audio Channel: "), get_language_from_iso639_1(lang));
   osd_display_info(buffer);
 }

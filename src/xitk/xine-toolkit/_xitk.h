@@ -66,7 +66,6 @@ typedef struct {
 #include "combo.h"
 #include "dnd.h"
 #include "doublebox.h"
-#include "filebrowser.h"
 #include "font.h"
 #include "image.h"
 #include "inputtext.h"

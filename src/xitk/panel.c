@@ -269,21 +269,20 @@ void panel_update_runtime_display(void) {
     seconds /= 1000;
     
     if(panel->runtime_mode == 0)
-      sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
+      snprintf(timestr, sizeof(timestr), "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
     else
-      sprintf(timestr, "%02d:%02d:%02d", remain / (60*60), (remain / 60) % 60, remain % 60);
+      snprintf(timestr, sizeof(timestr), "%02d:%02d:%02d", remain / (60*60), (remain / 60) % 60, remain % 60);
     
   }
   else
-    sprintf(timestr, "%s", "--:--:--");
+    snprintf(timestr, sizeof(timestr), "%s", "--:--:--");
   
   if(length) {
     length /= 1000;
-    sprintf(buffer, _("Total time: %02d:%02d:%02d"), 
-	    length / (60*60), (length / 60) % 60, length % 60);
+    snprintf(buffer, sizeof(buffer), "%s%02d:%02d:%02d", _("Total time: "), length / (60*60), (length / 60) % 60, length % 60);
   }
   else
-    sprintf(buffer, "%s", _("Total time: --:--:--"));
+    snprintf(buffer, sizeof(buffer), "%s", _("Total time: --:--:--"));
   
   xitk_set_widget_tips(panel->runtime_label, buffer);
   
@@ -408,11 +407,6 @@ static void *slider_loop(void *dummy) {
 	}
       }
       
-      if(gGui->got_reference_stream) {
-	gGui->got_reference_stream--;
-	gui_play(NULL, NULL);
-      }
-
     }
     
     if(gGui->cursor_visible) {
@@ -705,7 +699,7 @@ void panel_update_channel_display (void) {
 
   default:
     if(!xine_get_audio_lang (gGui->stream, channel, &buffer[0]))
-      sprintf(buffer, "%3d", channel);
+      snprintf(buffer, sizeof(buffer), "%3d", channel);
     lang = buffer;
     break;
   }
@@ -727,7 +721,7 @@ void panel_update_channel_display (void) {
 
   default:
     if(!xine_get_spu_lang (gGui->stream, channel, &buffer[0]))
-      sprintf(buffer, "%3d", channel);
+      snprintf(buffer, sizeof(buffer), "%3d", channel);
     lang = buffer;
     break;
   }
@@ -830,7 +824,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 /*
  * Handle X events here.
  */
-void panel_handle_event(XEvent *event, void *data) {
+static void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
   case ButtonPress:

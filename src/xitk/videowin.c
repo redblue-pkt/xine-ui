@@ -1052,6 +1052,7 @@ int video_window_get_fullscreen_mode (void) {
   return gVw->fullscreen_mode;
 }
 
+#if 0
 /*
  * set/reset xine in xinerama fullscreen
  * ie: try to expend display on further screens
@@ -1068,6 +1069,7 @@ void video_window_set_xinerama_fullscreen_mode(int req_fullscreen) {
 int video_window_get_xinerama_fullscreen_mode(void) {
   return gVw->fullscreen_mode;
 }
+#endif
 
 /*
  * Set cursor
@@ -1240,7 +1242,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->kc_shift_l         = XKeysymToKeycode(gGui->display, XK_Shift_L);
 #endif
   
-  sprintf(gVw->window_title, "%s", "xine");
+  snprintf(gVw->window_title, sizeof(gVw->window_title), "%s", "xine");
   
   gettimeofday(&gVw->click_time, 0);
 
@@ -1954,7 +1956,7 @@ void video_window_get_output_size(int *w, int *h) {
 void video_window_set_mrl(char *mrl) {
   if(mrl && strlen(mrl)) {
     
-    snprintf(gVw->window_title, 1024, "%s: %s", "xine", mrl);
+    snprintf(gVw->window_title, sizeof(gVw->window_title), "%s: %s", "xine", mrl);
     
     XLockDisplay(gGui->display);
     _set_window_title();

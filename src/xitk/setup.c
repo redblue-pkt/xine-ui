@@ -94,7 +94,7 @@ static char                     *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-
     xitk_widget_t *lbl;                                                                         \
     char           _labelkey[strlen(labelkey) + 5];                                             \
                                                                                                 \
-    sprintf(_labelkey, "%s%s", labelkey,                                                        \
+    snprintf(_labelkey, sizeof(_labelkey), "%s%s", labelkey,		                        \
       (!entry->callback_data && !entry->callback) ? " (*)" : "");                               \
                                                                                                 \
     fs = xitk_font_load_font(gGui->display, fontname);                                          \

@@ -35,6 +35,7 @@
 #include "main.h"
 #include "keys.h"
 #include "actions.h"
+#include "stdctl.h"
 
 #ifdef DEBUG
 #define STDCTL_VERBOSE 1
@@ -49,7 +50,7 @@ typedef struct {
 
 static _stdctl_t stdctl;
 
-void *xine_stdctl_loop(void *dummy) {
+static void *xine_stdctl_loop(void *dummy) {
   char              c[255];
   int               len;
   int               k;
@@ -99,7 +100,7 @@ void *xine_stdctl_loop(void *dummy) {
   pthread_exit(NULL);
 }
 
-void exit_stdctl(void) {
+static void exit_stdctl(void) {
   pthread_cancel(stdctl.thread);
   pthread_join(stdctl.thread, NULL);
 }

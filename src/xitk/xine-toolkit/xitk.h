@@ -232,13 +232,12 @@ typedef struct {
 /* Grouped widgets */
 #define WIDGET_GROUP_MASK           0x03FFE000
 #define WIDGET_GROUP_BROWSER        0x00002000
-#define WIDGET_GROUP_FILEBROWSER    0x00004000
-#define WIDGET_GROUP_MRLBROWSER     0x00008000
-#define WIDGET_GROUP_COMBO          0x00010000
-#define WIDGET_GROUP_TABS           0x00020000
-#define WIDGET_GROUP_INTBOX         0x00040000
-#define WIDGET_GROUP_DOUBLEBOX      0x00080000
-#define WIDGET_GROUP_MENU           0x00100000
+#define WIDGET_GROUP_MRLBROWSER     0x00004000
+#define WIDGET_GROUP_COMBO          0x00008000
+#define WIDGET_GROUP_TABS           0x00010000
+#define WIDGET_GROUP_INTBOX         0x00020000
+#define WIDGET_GROUP_DOUBLEBOX      0x00040000
+#define WIDGET_GROUP_MENU           0x00080000
 
 /* Real widgets. */
 #define WIDGET_TYPE_MASK            0x00001FFF
@@ -452,58 +451,6 @@ typedef struct {
 
   xitk_widget_list_t               *parent_wlist;
 } xitk_browser_widget_t;
-
-typedef struct {
-  int                               magic;
-  ImlibData                        *imlibdata;
-
-  char                             *skin_element_name;
-  Window                            window_trans;
-  int                               layer_above;
-
-  int                               x;
-  int                               y;
-  char                             *window_title;
-  char                             *resource_name;
-  char                             *resource_class;
-
-  struct {
-    char                           *skin_element_name;
-  } sort_default;
-
-  struct {
-    char                           *skin_element_name;
-  } sort_reverse;
-
-  struct {
-    char                           *cur_directory;
-    char                           *skin_element_name;
-  } current_dir;
-  
-  xitk_dnd_callback_t               dndcallback;
-
-  struct {
-    char                           *caption;
-    char                           *skin_element_name;
-  } homedir;
-
-  struct {
-    char                           *caption;
-    char                           *skin_element_name;
-    xitk_string_callback_t          callback;
-  } select;
-
-  struct {
-    char                           *caption;
-    char                           *skin_element_name;
-  } dismiss;
-
-  struct {
-    xitk_simple_callback_t          callback;
-  } kill;
- 
-  xitk_browser_widget_t             browser;
-} xitk_filebrowser_widget_t;
 
 #ifdef NEED_MRLBROWSER
 
@@ -1432,65 +1379,6 @@ void xitk_browser_set_alignment(xitk_widget_t *w, int align);
 void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier);
 
 xitk_widget_t *xitk_browser_get_browser(xitk_widget_t *w);
-
-/*
- * Filebrowser
- */
-/**
- *
- */
-xitk_widget_t *xitk_filebrowser_create(xitk_widget_list_t *wl,
-				       xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb);
-
-/**
- *
- */
-void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig);
-
-/**
- *
- */
-int xitk_filebrowser_is_running(xitk_widget_t *w);
-
-/**
- *
- */
-int xitk_filebrowser_is_visible(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_filebrowser_hide(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_filebrowser_show(xitk_widget_t *w);
-
-/**
- *
- */
-void xitk_filebrowser_set_transient(xitk_widget_t *w, Window window);
-
-/**
- *
- */
-void xitk_filebrowser_destroy(xitk_widget_t *w);
-
-/**
- *
- */
-char *xitk_filebrowser_get_current_dir(xitk_widget_t *w);
-
-/**
- *
- */
-int xitk_filebrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
-
-/**
- *
- */
-Window xitk_filebrowser_get_window_id(xitk_widget_t *w);
 
 #ifdef NEED_MRLBROWSER
 /**

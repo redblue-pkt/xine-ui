@@ -353,7 +353,7 @@ static void xrm_parse(void) {
   memset(&wide_dbname, 0, sizeof(wide_dbname));
   memset(str_type, 0, sizeof(str_type));
 
-  sprintf(wide_dbname, "%s%s", "/usr/lib/X11/app-defaults/", classname);
+  snprintf(wide_dbname, sizeof(wide_dbname), "%s%s", "/usr/lib/X11/app-defaults/", classname);
   
   if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL)
     return;
@@ -364,7 +364,7 @@ static void xrm_parse(void) {
   if(XResourceManagerString(display) != NULL)
     server_rmdb = XrmGetStringDatabase(XResourceManagerString(display));
   else {
-    sprintf(user_dbname, "%s%s", (xine_get_homedir()), "/.Xdefaults");
+    snprintf(user_dbname, sizeof(user_dbname), "%s%s", (xine_get_homedir()), "/.Xdefaults");
     server_rmdb = XrmGetFileDatabase(user_dbname);
   }
   
@@ -374,7 +374,7 @@ static void xrm_parse(void) {
     int len;
     
     environment = environement_buf;
-    sprintf(environement_buf, "%s%s", (xine_get_homedir()), "/.Xdefaults-");
+    snprintf(environement_buf, sizeof(environement_buf), "%s%s", (xine_get_homedir()), "/.Xdefaults-");
     len = strlen(environment);
     (void) gethostname(environment + len, (XITK_PATH_MAX + XITK_NAME_MAX) - len);
   }
@@ -460,13 +460,13 @@ static void print_formatted(char *title, const char *const *plugins) {
     len = strlen(buffer);
     
     if((len + (strlen(plugin) + 3)) < 80) {
-      sprintf(buffer, "%s%s%s", buffer, 
+      snprintf(buffer, sizeof(buffer), "%s%s%s", buffer, 
 	      (strlen(buffer) == strlen(blanks)) ? "" : ", ", plugin);
     }
     else {
       printf(buffer);
       printf(",\n");
-      sprintf(buffer, "%s%s", blanks, plugin);
+      snprintf(buffer, sizeof(buffer), "%s%s", blanks, plugin);
     }
     
     plugin = *plugins++;
@@ -1006,10 +1006,6 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
     if(event->stream == gGui->stream) {
 
-      /* There a reference stream waiting to be played, just wait for */
-      if(gGui->got_reference_stream)
-	return;
-
       gui_playlist_start_next();
     }
     else if(event->stream == gGui->visual_anim.stream) {
@@ -1241,7 +1237,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       char                  buffer[1024];
       
       memset(&buffer, 0, sizeof(buffer));
-      sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
+      snprintf(buffer, sizeof(buffer), "%s [%d%%]\n", pevent->description, pevent->percent);
       gGui->mrl_overrided = 3;
       panel_set_title(buffer);
       osd_display_info(buffer);
@@ -1253,28 +1249,18 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
 
       if(ref->alternative == 0) {
-	mediamark_t *mmk = mediamark_clone_mmk((mediamark_t *) mediamark_get_current_mmk());
-
+	mediamark_t *mmk = mediamark_get_current_mmk();
+	
 	if(mmk) {
-	  mediamark_replace_entry(&gGui->playlist.mmk[gGui->playlist.cur],
-				  ref->mrl, 
-				  ((mmk->ident && (strcmp(mmk->mrl, mmk->ident) == 0)) ?
-				   ref->mrl : mmk->ident), 
-				  mmk->sub, mmk->start, mmk->end, mmk->av_offset, mmk->spu_offset);
-	  mediamark_free_mmk(&mmk);
-	  
-	  mmk = (mediamark_t *) mediamark_get_current_mmk();
-	  gui_set_current_mrl(mmk);
-	  
-	  playlist_update_playlist();
-	  panel_update_mrl_display();
-	  
-	  /* We can't do anything more here, otherwise deadlock occur */
-	  gGui->got_reference_stream++;
+	  mediamark_append_alternate_mrl(mmk, ref->mrl);
+	  mediamark_set_got_alternate(mmk);
+	  gui_set_current_mmk(mmk);
 	}
+
       }
-      else
-	mediamark_add_entry(ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
+#warning FIXME
+      //      else
+      //	mediamark_append_entry(ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
 
     }
     break;
@@ -1672,10 +1658,7 @@ int main(int argc, char *argv[]) {
 	session_handle_subopt(optarg, &session);
       else {
 
-	if(!session_argv_num)
-	  session_argv = (char **) xine_xmalloc(sizeof(char *) * 2);
-	else
-	  session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
+	session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
 
 	session_argv[session_argv_num++] = strdup(optarg);
 	session_argv[session_argv_num]   = NULL;
@@ -1702,10 +1685,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case OPTION_POST:
-      if(!pplugins_num)
-	pplugins = (char **) xine_xmalloc(sizeof(char *) * 2);
-      else
-	pplugins = (char **) realloc(pplugins, sizeof(char *) * (pplugins_num + 2));
+      pplugins = (char **) realloc(pplugins, sizeof(char *) * (pplugins_num + 2));
       
       pplugins[pplugins_num++] = optarg;
       pplugins[pplugins_num] = NULL;
@@ -1780,10 +1760,7 @@ int main(int argc, char *argv[]) {
 	if(optarg) {
 	  char *p = xine_chomp(optarg);
 
-	  if(!session_argv_num)
-	    session_argv = (char **) xine_xmalloc(sizeof(char *) * 2);
-	  else
-	    session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
+	  session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
 	  
 	  session_argv[session_argv_num] = (char *) xine_xmalloc(strlen(p) + 5);
 	  sprintf(session_argv[session_argv_num], "mrl=%s", p);
@@ -1897,7 +1874,7 @@ int main(int argc, char *argv[]) {
   if(old_playlist_cfg && (!(_argc - optind)) && (!no_old_playlist)) {
     char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     
-    sprintf(buffer, "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
+    snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
     mediamark_load_mediamarks(buffer);
   }
 
@@ -1950,7 +1927,7 @@ int main(int argc, char *argv[]) {
     xine_cfg_entry_t  cfg_entry;
     
     if(xine_config_lookup_entry(gGui->xine, "input.file_origin_path", &cfg_entry))
-      sprintf(gGui->curdir, "%s", cfg_entry.str_value);
+      snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cfg_entry.str_value);
     else
       (void *) getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
 

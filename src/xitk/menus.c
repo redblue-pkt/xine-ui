@@ -75,6 +75,12 @@ extern _panel_t                *panel;
 
 static char *menu_get_shortcut(char *action) {
   char *shortcut = kbindings_get_shortcut(gGui->kbindings, action);
+#ifdef DEBUG
+  if(!shortcut) {
+    fprintf(stderr, "Action '%s' is invalid\n", action);
+    abort();
+  }
+#endif
   return (shortcut ? strdup(shortcut) : NULL);
 }
 
@@ -234,10 +240,10 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
       gGui->playlist.cur = 0;
     
     for (j = 0; j < num_mrls; j++)
-      mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
+      mediamark_append_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
     
     if(gGui->playlist.cur == 0)
-      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      gui_set_current_mmk(mediamark_get_current_mmk());
     
     /* 
      * If we're in newbie mode, start playback immediately
@@ -732,7 +738,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       NULL, NULL                                                                             }
   };
 
-  sprintf(buffer, _("xine %s"), VERSION);
+  snprintf(buffer, sizeof(buffer), _("xine %s"), VERSION);
   menu_entries[0].menu = buffer;
 
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
@@ -776,7 +782,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 
       memset(&buffer, 0, sizeof(buffer));
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-      sprintf(buffer, "%s/%s", location, plug_id);
+      snprintf(buffer, sizeof(buffer), "%s/%s", location, plug_id);
       
       menu_entry.menu      = buffer;
       menu_entry.cb        = menu_playlist_from;
@@ -797,7 +803,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 
       while(viz_names[i]) {
 	memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-	sprintf(buffer, "%s/%s", location, viz_names[i]);
+	snprintf(buffer, sizeof(buffer), "%s/%s", location, viz_names[i]);
 	menu_entry.menu      = buffer;
 	menu_entry.type      = IS_CHANNEL_CHECKED(i, gGui->visual_anim.post_plugin_num);
 	menu_entry.cb        = menu_audio_viz;
@@ -846,7 +852,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	if(i == 0) {
 	  for(i = 0; i < 15; i++) {
 	    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-	    sprintf(buffer, "%s/%d", location, i);
+	    snprintf(buffer, sizeof(buffer), "%s/%d", location, i);
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_audio_chan;
@@ -859,7 +865,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       }
       
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-      sprintf(buffer, "%s/%s", location, (get_language_from_iso639_1(langbuf)));
+      snprintf(buffer, sizeof(buffer), "%s/%s", location, (get_language_from_iso639_1(langbuf)));
       menu_entry.menu      = buffer;
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_audio_chan;
@@ -900,7 +906,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	if(i == 0) {
 	  for(i = 0; i < 15; i++) {
 	    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-	    sprintf(buffer, "%s/%d", location, i);
+	    snprintf(buffer, sizeof(buffer), "%s/%d", location, i);
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_spu_chan;
@@ -913,7 +919,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       }
       
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-      sprintf(buffer, "%s/%s", location, (get_language_from_iso639_1(langbuf)));
+      snprintf(buffer, sizeof(buffer), "%s/%s", location, (get_language_from_iso639_1(langbuf)));
       menu_entry.menu      = buffer;
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_spu_chan;
@@ -942,7 +948,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu = dvd_menu;
     
     for(i = 0; i < 7; i++) {
-      sprintf(buffer, "%s/%s", location, menu[i]);
+      snprintf(buffer, sizeof(buffer), "%s/%s", location, menu[i]);
       
       memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
       menu_entry.menu      = buffer;
@@ -965,7 +971,7 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
     { NULL,  NULL, NULL,           NULL, NULL }
   };
 
-  sprintf(buffer, "%s", _("Audio"));
+  snprintf(buffer, sizeof(buffer), "%s", _("Audio"));
   menu_entries[0].menu = buffer;
   
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
@@ -1006,7 +1012,7 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 	if(i == 0) {
 	  for(i = 0; i < 15; i++) {
 	    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-	    sprintf(buffer, "%d", i);
+	    snprintf(buffer, sizeof(buffer), "%d", i);
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_audio_chan;
@@ -1041,7 +1047,7 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
     { NULL,  NULL, NULL,           NULL, NULL }
   };
 
-  sprintf(buffer, "%s", _("Subtitle"));
+  snprintf(buffer, sizeof(buffer), "%s", _("Subtitle"));
   menu_entries[0].menu = buffer;
   
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
@@ -1081,7 +1087,7 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 	if(i == 0) {
 	  for(i = 0; i < 15; i++) {
 	    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
-	    sprintf(buffer, "%d", i);
+	    snprintf(buffer, sizeof(buffer), "%d", i);
 	    menu_entry.menu      = buffer;
 	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
 	    menu_entry.cb        = menu_spu_chan;
@@ -1105,7 +1111,7 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 
   xitk_menu_show_menu(w);
 }
-
+#warning ADD SHORTCUTS
 void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   xitk_menu_widget_t   menu;
   xitk_widget_t       *w = NULL;
@@ -1136,7 +1142,7 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   
   XITK_WIDGET_INIT(&menu, gGui->imlib_data);
   
-  sprintf(buffer, "%s", _("Playlist"));
+  snprintf(buffer, sizeof(buffer), "%s", _("Playlist"));
   if(selected) {
     menu_entries_sel[0].menu = buffer;
     menu.menu_tree           = &menu_entries_sel[0];

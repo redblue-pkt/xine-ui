@@ -28,6 +28,12 @@
 
 typedef void (*apply_callback_t)(void *data);
 
+typedef struct alternate_s alternate_t;
+struct alternate_s {
+  char                     *mrl;
+  alternate_t              *next;
+};
+
 typedef struct {
   char                     *ident;
   char                     *mrl;
@@ -36,13 +42,28 @@ typedef struct {
   int                       end;    /* -1 == <till the end> else (secs) */
   int                       av_offset;
   int                       spu_offset;
+  int                       got_alternate;
+  alternate_t              *cur_alt;
+  alternate_t              *alternates;
   int                       played; /* used with shuffle loop mode */
 } mediamark_t;
+
+
+int mediamark_have_alternates(mediamark_t *mmk);
+void mediamark_free_alternates(mediamark_t *mmk);
+char *mediamark_get_first_alternate_mrl(mediamark_t *mmk);
+char *mediamark_get_next_alternate_mrl(mediamark_t *mmk);
+char *mediamark_get_current_alternate_mrl(mediamark_t *mmk);
+void mediamark_append_alternate_mrl(mediamark_t *mmk, const char *mrl);
+void mediamark_duplicate_alternates(mediamark_t *s_mmk, mediamark_t *d_mmk);
+int mediamark_got_alternate(mediamark_t *mmk);
+void mediamark_set_got_alternate(mediamark_t *mmk);
+void mediamark_unset_got_alternate(mediamark_t *mmk);
 
 int mediamark_free_mmk(mediamark_t **mmk);
 int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 mediamark_t *mediamark_clone_mmk(mediamark_t *mmk);
-void mediamark_add_entry(const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
+void mediamark_append_entry(const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_free_mediamarks(void);
 void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_free_entry(int offset);
@@ -51,7 +72,7 @@ int mediamark_all_played(void);
 int mediamark_get_shuffle_next(void);
 int mediamark_get_entry_from_id(const char *ident);
 
-const mediamark_t *mediamark_get_current_mmk();
+mediamark_t *mediamark_get_current_mmk(void);
 const char *mediamark_get_current_mrl(void);
 const char *mediamark_get_current_ident(void);
 const char *mediamark_get_current_sub(void);

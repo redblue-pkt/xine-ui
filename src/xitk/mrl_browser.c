@@ -163,7 +163,7 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
   mrlb = NULL;
 }
 
-xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
+static xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   xitk_mrlbrowser_filter_t **filters = NULL;
   int                        num_endings = 0;
   char                      *mrl_exts, *p, *pp;
@@ -349,11 +349,11 @@ static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 	playlist_toggle_visibility(NULL, NULL);
     }
     
-    mediamark_add_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
+    mediamark_append_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1, 0, 0);
     
     if((!num) && ((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode)) {
       gGui->playlist.cur = (gGui->playlist.num - 1);
-      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      gui_set_current_mmk(mediamark_get_current_mmk());
     }   
     
     playlist_update_playlist();
@@ -398,7 +398,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
     if(mrl_look_like_playlist(_mrl)) {
       if(mediamark_concat_mediamarks(_mrl)) {
-	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	gui_set_current_mmk(mediamark_get_current_mmk());
 	_mrl = (char *) mediamark_get_current_mrl();
 	playlist_update_playlist();
       }
@@ -422,7 +422,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     mmk.sub   = NULL;
     mmk.start = 0;
     mmk.end   = -1;
-    gui_set_current_mrl(&mmk);
+    gui_set_current_mmk(&mmk);
   }
 }
 

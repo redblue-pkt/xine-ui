@@ -404,7 +404,7 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
 /*
  * Handle X events here.
  */
-void control_handle_event(XEvent *event, void *data) {
+static void control_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
     

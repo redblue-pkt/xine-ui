@@ -103,6 +103,8 @@
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
 
+#include "_xitk.h"
+
 /* Time to throw up. Here is a kludgey function that recursively calls
  * itself (up to a limit) to find the window ID of the KDE desktop to
  * draw on. It works with KDE 2.0, but since KDE 2.0 is less stable

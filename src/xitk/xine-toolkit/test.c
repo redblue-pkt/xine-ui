@@ -178,7 +178,7 @@ static void test_end(xitk_widget_t *w, void *data) {
 /*
  *
  */
-void test_handle_event(XEvent *event, void *data) {
+static void test_handle_event(XEvent *event, void *data) {
   XKeyEvent      mykeyevent;
   KeySym         mykey;
   char           kbuf[256];

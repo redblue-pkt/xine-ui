@@ -436,7 +436,7 @@ static int aaxine_xine_play(xine_stream_t *stream, int start_pos, int start_time
   return ret;
 }
 
-int aaxine_xine_open_and_play(char *mrl, int start_pos, int start_time) {
+static int aaxine_xine_open_and_play(char *mrl, int start_pos, int start_time) {
   
 
   if(!xine_open(aaxine.stream, (const char *)mrl)) {
@@ -569,7 +569,7 @@ static void xinit_thread(void) {
      printf("dlopen() failed: %s\n", dlerror());
 }
 
-int aaxine_get_key_event() {
+static int aaxine_get_key_event(void) {
 #ifdef AA
   int key;
 

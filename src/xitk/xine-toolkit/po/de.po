@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-toolkit 0.9.23\n"
-"POT-Creation-Date: 2004-04-12 15:06+0000\n"
+"POT-Creation-Date: 2004-04-21 16:38+0000\n"
 "PO-Revision-Date: 2003-01-02 09:01+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"

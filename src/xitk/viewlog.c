@@ -229,7 +229,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 	    break;
 	    
 	  default:
-	    sprintf(buf, "%s%c", buf, *p);
+	    snprintf(buf, sizeof(buf), "%s%c", buf, *p);
 	    break;
 	  }
 	  

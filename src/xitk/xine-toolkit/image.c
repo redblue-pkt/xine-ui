@@ -303,6 +303,7 @@ void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p) {
   p->destroy(p);
 }
 
+#if 0
 /*
  *
  */
@@ -319,6 +320,7 @@ Pixmap xitk_image_create_mask_pixmap(ImlibData *im, int width, int height) {
 
   return p;
 }
+#endif
 
 /*
  *
@@ -879,7 +881,7 @@ static void _draw_check_check(ImlibData *im, xitk_image_t *p, int x, int y, int 
   
 }
 
-void draw_check_three_state_round_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked) {
+static void draw_check_three_state_round_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked) {
   int i;
 
   ABORT_IF_NULL(im);
@@ -896,7 +898,7 @@ void draw_check_three_state_round_style(ImlibData *im, xitk_image_t *p, int x, i
   }
 }
 
-void draw_check_three_state_check_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked) {
+static void draw_check_three_state_check_style(ImlibData *im, xitk_image_t *p, int x, int y, int d, int w, int checked) {
   int i;
 
   ABORT_IF_NULL(im);

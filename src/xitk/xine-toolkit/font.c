@@ -313,7 +313,7 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
 # endif
 
 /* convert a -*-* .. style font description into something Xft can digest */
-char * xitk_font_core_string_to_xft( char * old_name) {
+static char * xitk_font_core_string_to_xft( char * old_name) {
   static char new_name[255];
 
   if( strncmp(old_name, "-*", 2) == 0 || strncmp(old_name, "*-", 2) == 0

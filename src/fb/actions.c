@@ -306,7 +306,7 @@ static void action_seek_relative(int off_sec)
 }
 
 
-void change_audio_channel(void *data) 
+static void change_audio_channel(void *data) 
 {
         int dir = (int)data;
 	int channel;
@@ -324,7 +324,7 @@ void change_audio_channel(void *data)
 	osd_display_audio_lang();
 }
 
-void change_spu(void *data) 
+static void change_spu(void *data) 
 {
         int dir = (int)data;
 	int channel;

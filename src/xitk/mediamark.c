@@ -179,21 +179,131 @@ static char *_read_file(const char *filename, int *size) {
   return buf;
 }
 
+int mediamark_have_alternates(mediamark_t *mmk) {
+  if(mmk && mmk->alternates)
+    return 1;
+
+  return 0;
+}
+void mediamark_free_alternates(mediamark_t *mmk) {
+  if(mmk && mediamark_have_alternates(mmk)) {
+    alternate_t *alt = mmk->alternates;
+    
+    while(alt) {
+      alternate_t *c_alt = alt;
+      
+      free(alt->mrl);
+
+      c_alt = alt;
+      alt   = alt->next;
+      free(c_alt);
+    }
+    mmk->alternates = NULL;
+    mmk->cur_alt    = NULL;
+  }
+}
+char *mediamark_get_first_alternate_mrl(mediamark_t *mmk) {
+  if(mmk && mmk->alternates) {
+    mmk->cur_alt = mmk->alternates;
+    return mmk->cur_alt->mrl;
+  }
+  return NULL;
+}
+char *mediamark_get_next_alternate_mrl(mediamark_t *mmk) {
+  if(mmk && mmk->cur_alt) {
+    if(mmk->cur_alt->next) {
+      mmk->cur_alt = mmk->cur_alt->next;
+      return mmk->cur_alt->mrl;
+    }
+  }
+  return NULL;
+}
+char *mediamark_get_current_alternate_mrl(mediamark_t *mmk) {
+  if(mmk && mmk->cur_alt)
+    return mmk->cur_alt->mrl;
+
+  return NULL;
+}
+void mediamark_append_alternate_mrl(mediamark_t *mmk, const char *mrl) {
+  if(mmk && mrl) {
+    alternate_t *alt;
+
+    alt       = (alternate_t *) xine_xmalloc(sizeof(alternate_t));
+    alt->mrl  = strdup(mrl);
+    alt->next = NULL;
+    
+    if(mmk->alternates) {
+      alternate_t *p_alt = mmk->alternates;
+
+      while(p_alt->next)
+	p_alt = p_alt->next;
+      p_alt->next = alt;
+    }
+    else
+      mmk->alternates = alt;
+
+  }
+}
+void mediamark_duplicate_alternates(mediamark_t *s_mmk, mediamark_t *d_mmk) {
+  if(s_mmk && s_mmk->alternates && d_mmk) {
+    alternate_t *alt;
+    
+    if((alt = s_mmk->alternates)) {
+      alternate_t *c_alt, *p_alt = NULL, *t_alt = NULL;
+      
+      while(alt) {
+	
+	c_alt       = (alternate_t *) xine_xmalloc(sizeof(alternate_t));
+	c_alt->mrl  = strdup(alt->mrl);
+	c_alt->next = NULL;
+	
+	if(!p_alt)
+	  t_alt = p_alt = c_alt;
+	else {
+	  p_alt->next = c_alt;
+	  p_alt       = c_alt;
+	}
+	
+	alt = alt->next;
+      }
+
+      d_mmk->alternates = t_alt;
+      d_mmk->cur_alt    = NULL;
+
+    }
+  }
+}
+int mediamark_got_alternate(mediamark_t *mmk) {
+  if(mmk && mmk->got_alternate)
+    return 1;
+  return 0;
+}
+void mediamark_set_got_alternate(mediamark_t *mmk) {
+  if(mmk)
+    mmk->got_alternate = 1;
+}
+void mediamark_unset_got_alternate(mediamark_t *mmk) {
+  if(mmk)
+    mmk->got_alternate = 0;
+}
 int mediamark_store_mmk(mediamark_t **mmk, 
 			const char *mrl, const char *ident, const char *sub, 
 			int start, int end, int av_offset, int spu_offset) {
   
-  if((mmk != NULL) && (mrl != NULL)) {
+  if(mmk && mrl) {
 
     (*mmk) = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
-    (*mmk)->mrl        = strdup(mrl);
-    (*mmk)->ident      = strdup((ident != NULL) ? ident : mrl);
-    (*mmk)->sub        = (sub != NULL) ? strdup(sub) : NULL;
-    (*mmk)->start      = start;
-    (*mmk)->end        = end;
-    (*mmk)->av_offset  = av_offset;
-    (*mmk)->spu_offset = spu_offset;
-    (*mmk)->played     = 0;
+    (*mmk)->mrl           = strdup(mrl);
+    (*mmk)->ident         = strdup((ident != NULL) ? ident : mrl);
+    (*mmk)->sub           = (sub != NULL) ? strdup(sub) : NULL;
+    (*mmk)->start         = start;
+    (*mmk)->end           = end;
+    (*mmk)->av_offset     = av_offset;
+    (*mmk)->spu_offset    = spu_offset;
+    (*mmk)->played        = 0;
+    (*mmk)->got_alternate = 0;
+    (*mmk)->cur_alt       = NULL;
+    (*mmk)->alternates    = NULL;
 
     return 1;
   }
@@ -206,14 +316,16 @@ mediamark_t *mediamark_clone_mmk(mediamark_t *mmk) {
 
   if(mmk && mmk->mrl) {
     cmmk = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
-    cmmk->mrl        = strdup(mmk->mrl);
-    cmmk->ident      = (mmk->ident) ? strdup(mmk->ident) : NULL;
-    cmmk->sub        = (mmk->sub) ? strdup(mmk->sub) : NULL;
-    cmmk->start      = mmk->start;
-    cmmk->end        = mmk->end;
-    cmmk->av_offset  = mmk->av_offset;
-    cmmk->spu_offset = mmk->spu_offset;
-    cmmk->played     = mmk->played;
+    cmmk->mrl           = strdup(mmk->mrl);
+    cmmk->ident         = (mmk->ident) ? strdup(mmk->ident) : NULL;
+    cmmk->sub           = (mmk->sub) ? strdup(mmk->sub) : NULL;
+    cmmk->start         = mmk->start;
+    cmmk->end           = mmk->end;
+    cmmk->av_offset     = mmk->av_offset;
+    cmmk->spu_offset    = mmk->spu_offset;
+    cmmk->played        = mmk->played;
+    cmmk->got_alternate = mmk->got_alternate;
+    mediamark_duplicate_alternates(mmk, cmmk);
   }
 
   return cmmk;
@@ -221,6 +333,7 @@ mediamark_t *mediamark_clone_mmk(mediamark_t *mmk) {
 
 int mediamark_free_mmk(mediamark_t **mmk) {
   if((*mmk) != NULL) {
+    mediamark_free_alternates((*mmk));
     SAFE_FREE((*mmk)->ident);
     SAFE_FREE((*mmk)->mrl);
     SAFE_FREE((*mmk)->sub);
@@ -245,10 +358,7 @@ static int playlist_split_data(playlist_t *playlist) {
     while((p = xine_strsep(&buf, "\n")) != NULL) {
       if(p && (p <= buf) && (strlen(p))) {
 
-	if(playlist->numl == 0)
-	  playlist->lines = (char **) xine_xmalloc(sizeof(char *) * 2);
-	else
-	  playlist->lines = (char **) realloc(playlist->lines, sizeof(char *) * (playlist->numl + 2));
+	playlist->lines = (char **) realloc(playlist->lines, sizeof(char *) * (playlist->numl + 2));
 	
 	while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))
 	  *(p + strlen(p) - 1) = '\0';
@@ -417,21 +527,18 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		  char  buffer[_PATH_MAX + _NAME_MAX + 1];
 		  char *entry;
 		  
-		  if(entries_m3u == 0)
-		    mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-		  else
-		    mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_m3u + 2));
+		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_m3u + 2));
 
 		  entry = ln;
 
 		  if(origin) {
 		    memset(&buffer, 0, sizeof(buffer));
-		    sprintf(buffer, "%s", origin);
+		    snprintf(buffer, sizeof(buffer), "%s", origin);
 		    
 		    if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
 		      buffer[strlen(buffer) - 1] = '\0';
 		    
-		    sprintf(buffer, "%s%s", buffer, ln);
+		    snprintf(buffer, sizeof(buffer), "%s%s", buffer, ln);
 		    
 		    if(_file_exist(buffer))
 		      entry = buffer;
@@ -540,21 +647,18 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 
 		      if(ln && (crc > 0)) {
 			
-			if(entries_sfv == 0)
-			  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-			else
-			  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_sfv + 2));
+			mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_sfv + 2));
 			
 			entry = ln;
 			
 			if(origin) {
 			  memset(&buffer, 0, sizeof(buffer));
-			  sprintf(buffer, "%s", origin);
+			  snprintf(buffer, sizeof(buffer), "%s", origin);
 			  
 			  if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
 			    buffer[strlen(buffer) - 1] = '\0';
 			  
-			  sprintf(buffer, "%s%s", buffer, ln);
+			  snprintf(buffer, sizeof(buffer), "%s%s", buffer, ln);
 			  
 			  if(_file_exist(buffer))
 			    entry = buffer;
@@ -643,21 +747,18 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		  strcat(origin, "/");
 		}
 
-		if(entries_raw == 0)
-		  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-		else
-		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_raw + 2));
+		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_raw + 2));
 		
 		entry = ln;
 
 		if(origin) {
 		  memset(&buffer, 0, sizeof(buffer));
-		  sprintf(buffer, "%s", origin);
+		  snprintf(buffer, sizeof(buffer), "%s", origin);
 		  
 		  if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
 		    buffer[strlen(buffer) - 1] = '\0';
 		  
-		  sprintf(buffer, "%s%s", buffer, ln);
+		  snprintf(buffer, sizeof(buffer), "%s%s", buffer, ln);
 		  
 		  if(_file_exist(buffer))
 		    entry = buffer;
@@ -853,10 +954,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			printf("spu_offset: %d\n", mmkf.spu_offset);
 #endif
 			
-			if(entries_tox == 0)
-			  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-			else
-			  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_tox + 2));
+			mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_tox + 2));
 			
 			mediamark_store_mmk(&mmk[entries_tox], 
 					    mmkf.mrl, mmkf.ident, mmkf.sub, 
@@ -1014,10 +1112,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		      sprintf(real_title, "%s (%s)", real_title, aauthor);
 		  }
 		  
-		  if(entries_asx == 0)
-		    mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-		  else
-		    mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
+		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
 		  
 		  mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1, 0, 0);
 		  playlist->entries = ++entries_asx;
@@ -1067,10 +1162,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		p++;
 
 	      if(p && strlen(p)) {
-		if(entries_asx == 0)
-		  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-		else
-		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
+		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
 		
 		mediamark_store_mmk(&mmk[entries_asx], p, p, NULL, 0, -1, 0, 0);
 		playlist->entries = ++entries_asx;
@@ -1154,10 +1246,7 @@ static void gx_get_entries(playlist_t *playlist,
 	  
 	}
 	
-	if(*entries == 0)
-	  (*mmk) = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-	else
-	  (*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*entries + 2));
+	(*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*entries + 2));
 	
 	mediamark_store_mmk(&(*mmk)[*entries], href, real_title, NULL, start, -1, 0, 0);
 	playlist->entries = ++(*entries);
@@ -1328,10 +1417,7 @@ static mediamark_t **guess_noatun_playlist(playlist_t *playlist, const char *fil
 		  
 		}
 		
-		if(entries_noa == 0)
-		  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-		else
-		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_noa + 2));
+		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_noa + 2));
 		
 		mediamark_store_mmk(&mmk[entries_noa], url, real_title, NULL, 0, -1, 0, 0);
 		playlist->entries = ++entries_noa;
@@ -1440,13 +1526,15 @@ static smil_node_t *smil_new_node(void) {
 static mediamark_t *smil_new_mediamark(void) {
   mediamark_t *mmk;
 
-  mmk         = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
-  mmk->mrl    = NULL;
-  mmk->ident  = NULL;
-  mmk->sub    = NULL;
-  mmk->start  = 0;
-  mmk->end    = -1;
-  mmk->played = 0;
+  mmk             = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
+  mmk->mrl        = NULL;
+  mmk->ident      = NULL;
+  mmk->sub        = NULL;
+  mmk->start      = 0;
+  mmk->end        = -1;
+  mmk->played     = 0;
+  mmk->alternates = NULL;
+  mmk->cur_alt    = NULL;
 
   return mmk;
 }
@@ -1454,13 +1542,15 @@ static mediamark_t *smil_duplicate_mmk(mediamark_t *ommk) {
   mediamark_t *mmk = NULL;
   
   if(ommk) {
-    mmk         = smil_new_mediamark();
-    mmk->mrl    = strdup(ommk->mrl);
-    mmk->ident  = strdup(ommk->ident ? ommk->ident : ommk->mrl);
-    mmk->sub    = ommk->sub ? strdup(ommk->sub) : NULL;
-    mmk->start  = ommk->start;
-    mmk->end    = ommk->end;
-    mmk->played = ommk->played;
+    mmk             = smil_new_mediamark();
+    mmk->mrl        = strdup(ommk->mrl);
+    mmk->ident      = strdup(ommk->ident ? ommk->ident : ommk->mrl);
+    mmk->sub        = ommk->sub ? strdup(ommk->sub) : NULL;
+    mmk->start      = ommk->start;
+    mmk->end        = ommk->end;
+    mmk->played     = ommk->played;
+    mmk->alternates = NULL;
+    mmk->cur_alt    = NULL;
   }
   
   return mmk;
@@ -2108,10 +2198,7 @@ static void smil_switch(smil_t *smil, smil_node_t **snode, xml_node_t *node, smi
 
 static void smil_add_mmk(int *num, mediamark_t ***mmk, smil_node_t *node) {
   if(node->mmk) {
-    if(*num == 0)
-      (*mmk) = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-    else
-      (*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*num + 2));
+    (*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*num + 2));
 
     (*mmk)[*num] = node->mmk;
     *num += 1;
@@ -2324,18 +2411,11 @@ int mediamark_get_entry_from_id(const char *ident) {
   return -1;
 }
 
-void mediamark_add_entry(const char *mrl, const char *ident, 
-			 const char *sub, int start, int end, int av_offset, int spu_offset) {
+void mediamark_append_entry(const char *mrl, const char *ident, 
+			    const char *sub, int start, int end, int av_offset, int spu_offset) {
   char  autosub[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
-  if(!gGui->playlist.num)
-    gGui->playlist.mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-  else { 
-    if(gGui->playlist.num > 1) {
-      gGui->playlist.mmk = (mediamark_t **) 
-	realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 1));
-    }
-  }
+  gGui->playlist.mmk = (mediamark_t **) realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
   
   /*
    * If subtitle_autoload is enabled and subtitle is NULL
@@ -2354,7 +2434,7 @@ void mediamark_add_entry(const char *mrl, const char *ident,
 	_mrl += 5;
       
       memset(&autosub, 0, sizeof(autosub));
-      snprintf(autosub, XITK_PATH_MAX + XITK_NAME_MAX, "%s", _mrl);
+      snprintf(autosub, sizeof(autosub), "%s", _mrl);
       
       if((ending = strrchr(autosub, '.')))
 	ending++;
@@ -2467,15 +2547,18 @@ void mediamark_replace_entry(mediamark_t **mmk,
   SAFE_FREE((*mmk)->mrl);
   SAFE_FREE((*mmk)->ident);
   SAFE_FREE((*mmk)->sub);
+  
+  mediamark_free_alternates((*mmk));
   (*mmk)->start      = 0;
   (*mmk)->end        = -1;
   (*mmk)->av_offset  = 0;
   (*mmk)->spu_offset = 0;
 
+  
   (void) mediamark_store_mmk(mmk, mrl, ident, sub, start, end, av_offset, spu_offset);
 }
 
-const mediamark_t *mediamark_get_current_mmk(void) {
+mediamark_t *mediamark_get_current_mmk(void) {
 
   if(gGui->playlist.mmk && gGui->playlist.num)
     return gGui->playlist.mmk[gGui->playlist.cur];
@@ -2559,8 +2642,8 @@ int mediamark_concat_mediamarks(const char *_filename) {
   gGui->playlist.cur = gGui->playlist.num;
 
   for(i = 0; i < playlist->entries; i++)
-    mediamark_add_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->sub, 
-			mmk[i]->start, mmk[i]->end, mmk[i]->av_offset, mmk[i]->spu_offset);
+    mediamark_append_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->sub, 
+			   mmk[i]->start, mmk[i]->end, mmk[i]->av_offset, mmk[i]->spu_offset);
   
   for(i = 0; i < playlist->entries; i++)
     (void) mediamark_free_mmk(&mmk[i]);
@@ -2760,10 +2843,10 @@ void mediamark_collect_from_directory(char *filepathname) {
 	    ".ram .roq .snd .au .str .iki .ik2 .dps .dat .xa .xa1 .xa2 .xas .xap .ts .m2t "
 	    ".trp .vob .voc .vox .vqa .wav .wve .y4m ";
 	  
-	  sprintf(ext, "%s ", extension);
+	  snprintf(ext, sizeof(ext), "%s ", extension);
 	  if(strstr(valid_endings, ext)) {
-	    mediamark_add_entry((const char *)fullpathname, 
-				(const char *)fullpathname, NULL, 0, -1, 0, 0);
+	    mediamark_append_entry((const char *)fullpathname, 
+				   (const char *)fullpathname, NULL, 0, -1, 0, 0);
 	  }	    
 	}
       }
@@ -2911,7 +2994,7 @@ static void mmkeditor_ok(xitk_widget_t *w, void *data) {
 static void mmk_fileselector_callback(filebrowser_t *fb) {
   char *file;
 
-  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
+  snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", (filebrowser_get_current_dir(fb)));
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     if(file)

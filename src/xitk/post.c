@@ -192,11 +192,7 @@ void post_init(void) {
       
       while(pol[num_plug]) {
 	
-	if(!num_plug)
-	  post_audio_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
-	else
-	  post_audio_plugins = (char **) realloc(post_audio_plugins, 
-						 sizeof(char *) * (num_plug + 2));
+	post_audio_plugins = (char **) realloc(post_audio_plugins, sizeof(char *) * (num_plug + 2));
 	
 	post_audio_plugins[num_plug]     = strdup(pol[num_plug]);
 	post_audio_plugins[num_plug + 1] = NULL;
@@ -775,8 +771,7 @@ static void _pplugin_get_plugins(void) {
     pplugin->plugin_names    = (char **) xine_xmalloc(sizeof(char *) * 2);
     pplugin->plugin_names[i] = strdup(_("No Filter"));
     while(pol[i]) {
-      pplugin->plugin_names = (char **) 
-	realloc(pplugin->plugin_names, sizeof(char *) * (i + 1 + 2));
+      pplugin->plugin_names = (char **) realloc(pplugin->plugin_names, sizeof(char *) * (i + 1 + 2));
       
       pplugin->plugin_names[i + 1] = strdup(pol[i]);
       i++;
@@ -888,8 +883,7 @@ static void _pplugin_kill_filters_from(post_object_t *pobj) {
   _pplugin_send_expose();
 
   if(num != pplugin->object_num) {
-    pplugin->post_objects = (post_object_t **) 
-      realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
+    pplugin->post_objects = (post_object_t **) realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
     pplugin->post_objects[pplugin->object_num + 1] = NULL;
   }
 }
@@ -913,11 +907,7 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
     
     while(parm->type != POST_PARAM_TYPE_LAST) {
       
-      if(!pnum)
-	pobj->properties_names = (char **) xine_xmalloc(sizeof(char *) * 2);
-      else
-	pobj->properties_names = (char **) 
-	  realloc(pobj->properties_names, sizeof(char *) * (pnum + 2));
+      pobj->properties_names = (char **) realloc(pobj->properties_names, sizeof(char *) * (pnum + 2));
       
       pobj->properties_names[pnum]     = strdup(parm->name);
       pobj->properties_names[pnum + 1] = NULL;
@@ -1055,10 +1045,7 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
     p = pobj->api->get_help();
     
     do {
-      if(!lines)
-	hbuf = (char **) xine_xmalloc(sizeof(char *) * 2);
-      else
-	hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
+      hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
 
       hbuf[lines]    = malloc(BROWSER_LINE_WIDTH+1);
       hbuf[lines+1]  = NULL;
@@ -1189,8 +1176,7 @@ static void _pplugin_select_filter(xitk_widget_t *w, void *data, int select) {
     else {
       _pplugin_destroy_base_obj(pobj);
       
-      pplugin->post_objects = (post_object_t **) 
-	realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
+      pplugin->post_objects = (post_object_t **) realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
       pplugin->post_objects[pplugin->object_num + 1] = NULL;
       
       if(!xitk_is_widget_enabled(pplugin->new_filter))
@@ -1273,12 +1259,7 @@ static void _pplugin_create_filter_object(void) {
   
   xitk_disable_widget(pplugin->new_filter);
 
-  if(!pplugin->object_num)
-    pplugin->post_objects = (post_object_t **) xine_xmalloc(sizeof(post_object_t *) * 2);
-  else
-    pplugin->post_objects = (post_object_t **) 
-      realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
-  
+  pplugin->post_objects = (post_object_t **) realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
   pplugin->post_objects[pplugin->object_num + 1] = NULL;
   
   pobj = pplugin->post_objects[pplugin->object_num] = (post_object_t *) xine_xmalloc(sizeof(post_object_t));
@@ -1451,8 +1432,7 @@ static void _pplugin_save_chain(void) {
 	  free(gGui->post_elements[j]);
 	}
 	
-	gGui->post_elements = (post_element_t **) 
-	  realloc(gGui->post_elements, sizeof(post_element_t *) * (post_num + 1));
+	gGui->post_elements = (post_element_t **) realloc(gGui->post_elements, sizeof(post_element_t *) * (post_num + 1));
 	
       }
 	
@@ -1943,11 +1923,7 @@ static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_ele
 	if(post) {
 	  post_object_t  pobj;
 	 
-	  if(!(*post_elements_num))
-	    post_elements = (post_element_t **) xine_xmalloc(sizeof(post_element_t *) * 2);
-	  else
-	    post_elements = (post_element_t **) 
-	      realloc(post_elements, sizeof(post_element_t *) * ((*post_elements_num) + 2));
+	  post_elements = (post_element_t **) realloc(post_elements, sizeof(post_element_t *) * ((*post_elements_num) + 2));
 	  
 	  post_elements[(*post_elements_num)] = (post_element_t *) 
 	    xine_xmalloc(sizeof(post_element_t));
@@ -2079,8 +2055,7 @@ void pplugin_parse_and_store_post(const char *post_chain) {
       int i;
       int ptot = gGui->post_elements_num + num;
       
-      gGui->post_elements = (post_element_t **) realloc(gGui->post_elements, 
-							sizeof(post_element_t *) * (ptot + 1));
+      gGui->post_elements = (post_element_t **) realloc(gGui->post_elements, sizeof(post_element_t *) * (ptot + 1));
       for(i = gGui->post_elements_num; i <  ptot; i++)
 	gGui->post_elements[i] = posts[i - gGui->post_elements_num];
 

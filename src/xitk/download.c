@@ -100,7 +100,7 @@ int network_download(const char *url, download_t *download) {
     memset(&error_buffer, 0, sizeof(error_buffer));
     
     memset(&user_agent, 0, sizeof(user_agent));
-    sprintf(user_agent, "User-Agent: xine/%s", VERSION);
+    snprintf(user_agent, sizeof(user_agent), "User-Agent: xine/%s", VERSION);
     
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 
 #ifdef DEBUG

@@ -286,7 +286,7 @@ static void _pplugin_unwire(void) {
 }
 
 
-void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
+static void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num) {
   
   if(post_elements_num) {
     xine_post_out_t   *vo_source;

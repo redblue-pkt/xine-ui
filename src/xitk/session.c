@@ -257,7 +257,7 @@ int is_remote_running(int session) {
 
 
 #ifndef CTRL_TEST
-void *ctrlsocket_func(void *data) {
+static void *ctrlsocket_func(void *data) {
   fd_set                set;
   struct timeval        tv;
   struct sockaddr_un    saddr;
@@ -370,7 +370,7 @@ void *ctrlsocket_func(void *data) {
 	  gui_stop(NULL, NULL);
 	
 	gGui->playlist.cur = 0;
-	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	gui_set_current_mmk(mediamark_get_current_mmk());
 	gui_play(NULL, NULL);
       }
       send_ack(shdr);
@@ -382,7 +382,7 @@ void *ctrlsocket_func(void *data) {
 	  gui_stop(NULL, NULL);
 	
 	gGui->playlist.cur = gGui->playlist.num - 1;
-	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	gui_set_current_mmk(mediamark_get_current_mmk());
 	gui_play(NULL, NULL);
       }
       send_ack(shdr);
@@ -410,7 +410,7 @@ void *ctrlsocket_func(void *data) {
 
     case CMD_PLAYLIST_LOAD:
       mediamark_load_mediamarks((const char *)shdr->data);
-      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      gui_set_current_mmk(mediamark_get_current_mmk());
       playlist_update_playlist();
       if((!is_playback_widgets_enabled()) && gGui->playlist.num)
 	enable_playback_controls(1);
@@ -610,22 +610,19 @@ void session_handle_subopt(char *suboptarg, int *session) {
       else if(!strcasecmp(optstr, "prev"))
 	spu_prev++;
       break;
-
+      
       /* session */
     case 12:
       if((atoi(optstr)) >= 0)
 	optsess = atoi(optstr);
       break;
-
+      
       /* mrl */
     case 13:
-      if(num_mrls == 0)
-	mrls = (char **) xine_xmalloc(sizeof(char *) * 2);
-      else
-	mrls = (char **) realloc(mrls, sizeof(char *) * (num_mrls + 2));
-	
-	mrls[num_mrls++] = strdup(optstr);
-	mrls[num_mrls]   = NULL;
+      mrls = (char **) realloc(mrls, sizeof(char *) * (num_mrls + 2));
+      
+      mrls[num_mrls++] = strdup(optstr);
+      mrls[num_mrls]   = NULL;
       break;
 
       /* playlist */

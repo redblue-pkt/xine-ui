@@ -573,7 +573,6 @@ AC_SUBST(BUILD_CC)
 AC_SUBST(BUILD_OS)
 AC_SUBST(BUILD_DATE)
 
-
 if test "$GCC" = yes; then
     dnl
     dnl check cflags not supported by all gcc versions
@@ -594,6 +593,19 @@ if test "$GCC" = yes; then
         f_al="-malign-loops=4")
     AC_TRY_CFLAGS("-falign-jumps=4", f_aj="-falign-jumps=4",
         f_aj="-malign-jumps=4")
+    dnl
+    dnl Warnings
+    dnl
+    CFLAGS="-Wchar-subscripts -Wmissing-declarations -Wmissing-prototypes $CFLAGS"
+    CFLAGS="-Wnested-externs -Wcast-align $CFLAGS"
+    dnl some combinations of gcc+glibc produce useless warnings on memset
+    dnl when compiling with -Wpointer-arith, so we check for this first
+    AC_MSG_CHECKING(for sane -Wpointer-arith)
+    SAVE_CFLAGS="$CFLAGS"
+    CFLAGS="-O2 -Wpointer-arith -Werror $CFLAGS"
+    AC_TRY_COMPILE([#include <string.h>],[int a; memset(&a, 0, sizeof(int));],
+	[AC_MSG_RESULT(yes); CFLAGS="-Wpointer-arith $SAVE_CFLAGS"],
+	[AC_MSG_RESULT(no);  CFLAGS="$SAVE_CFLAGS"]);
 fi
 
 dnl Flags not supported by all *cc* variants
@@ -601,7 +613,6 @@ AC_TRY_CFLAGS("-Wall", wall="-Wall", wall="")
 
 dnl Common cflags for all platforms
 COMMON_CFLAGS="$wall -D_FILE_OFFSET_BITS=64"
-
 
 host_or_hostalias="$host"
 if test "$host_or_hostalias" = ""; then
@@ -638,68 +649,114 @@ case "$host_or_hostalias" in
                         ],)
     ;;
 
-  i?86*-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-*)
-    if test "$GCC" = yes; then
+  i?86-*-linux* | i386-*-solaris* | i?86-* | k?-* | athlon-* | pentium*)
+    if test "$GCC" = yes -o "${CC##*/}x" = "iccx" ; then
 
+      if test "$GCC" = yes ; then
 	dnl Check for gcc cpu optimization support
 	AC_TRY_CFLAGS("-mcpu=i386", 
-	    sarchopt="-mcpu",
-	    AC_TRY_CFLAGS("-march=i386", 
-		sarchopt="-march",
-	        [ AC_MSG_RESULT(** no cpu optimization supports **)
-	          sarchopt=no ]))
+		sarchopt="-mcpu",
+		AC_TRY_CFLAGS("-march=i386", 
+			sarchopt="-march",
+			[ AC_MSG_RESULT(** no cpu optimization supports **)
+			  sarchopt=no ]))
 
 	dnl special check for k7 cpu CC support
         AC_TRY_CFLAGS("$sarchopt=athlon", k7cpu="athlon", k7cpu="i686")
 
-	dnl add x86 specific CFLAGS
+	dnl add x86 specific gcc CFLAGS
 	CFLAGS="-O3 -pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions $CFLAGS"
+
 	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
-	
-	dnl enable x86 specific parts of the code
 
 	if test x"$sarchopt" != "xno"; then
-	[
+	    [
 	    archopt_val=
 
-	    case "$host_alias" in
+	    case "$host_or_hostalias" in
 	    i386-*) # *BSD return this even on a P III #-))
-		archopt_val=i386 ;;
+		archopt_val="i386" ;;
 	    i486-*) # oh dear!
-		archopt_val=i486 ;;
+		archopt_val="i486" ;;
 	    i586-*)
-		archopt_val=pentium ;;
-	    i686-*)
-		archopt_val=pentiumpro
+		archopt_val="pentium" 
+                ;;
+	    pentium-mmx-*)
+		archopt_val="pentium-mmx" 
+		;;
+	    pentiumpro-* | pentium2-* | i686-*)
+		archopt_val="pentiumpro"
 		if test x"$check_athlon" = "xyes"; then
 		    if test -f /proc/cpuinfo; then
 			modelname=`cat /proc/cpuinfo | grep "model\ name\	:" | sed -e 's/ //g' | cut -d':' -f2`
 			case "$modelname" in
 			*Athlon* | *Duron* | *K7*)
-			    archopt_val="$k7cpu" ;;
+			    archopt_val="$k7cpu"
+			    ;;
+			VIAEzra)
+			    archopt_val="c3"
+			    ;;
 			esac
 		    fi 
 		fi
 		;;
+	    k6-2-* | k6-3-*)
+		archopt_val="k6-2"
+		;;
 	    k6-*)
-		archopt_val=k6 ;;
-	    k7-*)
-		archopt_val=k7 ;;
-	    athlon-*)
-		archopt_val=athlon ;;
+		archopt_val="k6"
+		;;
+	    pentium3-*)
+		archopt_val="pentium3"
+		;;
+	    pentium4-*)
+		archopt_val="pentium4"
+		;;
+	    athlon-4-* | athlon-xp-* | athlon-mp-*)
+		archopt_val="athlon-4"
+		;;
+	    k7-* | athlon-tbird-* | athlon-*)
+		archopt_val="athlon"
+		;;
+	    
 	    esac
-
 	    if test x"$archopt_val" != x; then
 		CFLAGS="$sarchopt=$archopt_val $CFLAGS"
 		DEBUG_CFLAGS="$sarchopt=$archopt_val $DEBUG_CFLAGS"
 	    fi
-	]
+	    ]
 	fi
+      else
+	dnl we have the Intel compiler
+	CFLAGS="-unroll -ipo -ipo_obj -O3 $CFLAGS"
+	PASS1_CFLAGS="-prof_genx -prof_dir \$(PWD)/\$(top_builddir)/ $PASS1_CFLAGS"
+	PASS2_CFLAGS="-prof_use -prof_dir \$(PWD)/\$(top_builddir)/ $PASS2_CFLAGS"
+	AC_SUBST(PASS1_CFLAGS)
+	AC_SUBST(PASS2_CFLAGS)
+      fi
+	
+    	dnl enable x86 specific parts of the code
+	dnl
+	dnl all of this stuff needs gcc/gas; it uses gnu c compiler extensions
+	dnl like the extended asm() or __attribute(__cdecl__), or other direct
+	dnl mmx/sse/3dnow assembler instructions. 
+	dnl
+    	AC_DEFINE_UNQUOTED(ARCH_X86,,[Define this if you're running x86 architecture])
+	AC_DEFINE(FPM_INTEL,1,[Define to select libmad fixed point arithmetic implementation])
+	enable_ffmmx="yes"
+	enable_w32dll="yes"
 
+        case "$host_or_hostalias" in
+	*-*-cygwin) 
+          enable_w32dll="no" 
+	  LDFLAGS="-no-undefined @INTLLIBS@ $LDFLAGS"
+	  ;;
+	esac
     else
 	dnl add x86 specific cc CFLAGS
 	CFLAGS="-O $CFLAGS"
 	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
+    	AC_DEFINE_UNQUOTED(FPM_64BIT,,[Define to select libmad fixed point arithmetic implementation])
     fi
 
     AC_DEFINE(__i386__,1,[Define this if you're running x86 architecture])
@@ -724,16 +781,58 @@ case "$host_or_hostalias" in
     DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
-  sparc64-*-linux-* | sparc-*)
+  sparc*-*-linux*)
     AC_DEFINE(__sparc,1,[Define this if you're running Sparc architecture])
+    case $host_alias in
+    sparc-*)    cpu_cflags="-mcpu=supersparc -mtune=supersparc" ;;
+    sparc64-*)
+      cpu_cflags="-mcpu=ultrasparc -mtune=ultrasparc"
+    ;;
+    esac
 
+    CFLAGS="-O3 $cpu_cflags -funroll-loops -funroll-all-loops -finline-functions $CFLAGS"
+    DEBUG_CFLAGS="-O $cpu_cflags -funroll-loops -funroll-all-loops -finline-functions $DEBUG_CFLAGS"
+
+    ;;
+
+  sparc-*-solaris*)
+    AC_DEFINE(__sparc,1,[Define this if you're running Sparc architecture])
     if test "$GCC" = yes; then
-	CFLAGS="-O3 $CFLAGS"
-	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
+	case `uname -m` in
+	sun4c) cpu_cflags="-mcpu=v7 -mtune=supersparc" ;;
+	sun4m) cpu_cflags="-mcpu=v8 -mtune=supersparc" ;;
+	sun4u)
+	  case `$CC --version 2>/dev/null` in
+	  1.*|2.*)
+	    # -mcpu=ultrasparc triggers a GCC 2.95.x compiler bug when
+	    # compiling video_out.c:
+	    #   gcc: Internal compiler error: program cc1 got fatal signal 11
+	    # avoid -mcpu=ultrasparc with gcc 2.*
+            cpu_cflags="-mcpu=v8 -mtune=ultrasparc"
+	    ;;
+          *)
+	    # GCC 3 or newer should have no problem with -mcpu=ultrasparc 
+            cpu_cflags="-mcpu=ultrasparc -mtune=ultrasparc"
+	    ;;
+	  esac
+          ;;
+	*)     cpu_cflags= ;;
+	esac
+
+	cc_optimize_cflags="-O3 $cpu_cflags -funroll-loops -funroll-all-loops -finline-functions"
+	cc_debug_cflags="-O $cpu_cflags -funroll-loops -funroll-all-loops -finline-functions"
     else
-	CFLAGS="-O $CFLAGS"
-	DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
+	case `uname -m` in
+	sun4c) cpu_cflags="-xarch=v7 -xchip=ultra2" ;;
+	sun4m) cpu_cflags="-xarch=v8 -xchip=ultra2" ;;
+	sun4u) cpu_cflags="-xarch=v8plusa -xchip=ultra2" ;;
+	esac
+
+	cc_optimize_cflags="-xO5 $cpu_cflags -xCC"
+	cc_debug_cflags="-O"
     fi
+    CFLAGS="$cc_optimize_cflags $CFLAGS"
+    DEBUG_CFLAGS="$cc_debug_cflags $DEBUG_CFLAGS"
     ;;
 
   mips-*)
@@ -742,7 +841,9 @@ case "$host_or_hostalias" in
     ;;
 
   m68k-*)
-    CFLAGS="-O2 $CFLAGS"
+    dnl used to be -O2, but that makes gcc 2.95.2 segfault
+    dnl see http://bugs.debian.org/146006 for more info
+    CFLAGS="-O $CFLAGS"
     DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
@@ -751,14 +852,31 @@ case "$host_or_hostalias" in
     DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
+  hppa-*)
+    dnl -O3 seems to trigger gcc internal compiler errors, at least up to gcc 3.2.1
+    CFLAGS="-O $CFLAGS"
+    DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
+    ;;
+
   hppa*-hp-*)
     CFLAGS="-O2 $CFLAGS"
     DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
     ;;
 
+  x86_64-*)
+    CFLAGS="-O3 -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions $CFLAGS"
+    DEBUG_CFLAGS="-O0 -g $DEBUG_CFLAGS"
+    ;;
+
   s390-*)
     CFLAGS="-O3 $CFLAGS"
     DEBUG_CFLAGS="-O $DEBUG_CFLAGS"
+    ;;
+
+  armv4l-*-linux*)
+    CFLAGS="-O2 -fsigned-char -ffast-math -mcpu=strongarm1100 -fomit-frame-pointer -fthread-jumps -fregmove $CFLAGS"
+    dnl    CFLAGS="-O1 -fforce-mem -fforce-addr -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -fexpensive-optimizations -fregmove -fschedule-insns2 -finline-functions -fsigned-char -fomit-frame-pointer -march=armv4 -mtune=strongarm $CFLAGS"
+    DEBUG_CFLAGS="-O2 $DEBUG_CFLAGS"
     ;;
 
   *)

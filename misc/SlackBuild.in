@@ -5,8 +5,8 @@
 #
 # Some variables.
 #
-CWD=`pwd` 
-PACKAGE=@PACKAGE@.tgz 
+CWD=`pwd`
+BUILD_NUM=1
 SLCK=$CWD/slack
 PREFIX=${PREFIX:-"@prefix@"} 
 PKG=$CWD/slktmp 
@@ -17,7 +17,7 @@ TMPBUILD=$CWD/tmpbuild
 # Create post-install shell script.
 #
 do_doinst() {
-  (mkdir install 
+  (mkdir -p install 
    cd install
   cat > doinst.sh <<EOF
 
@@ -174,7 +174,9 @@ EOF
 # Create package description for pkgtool.
 #
 do_descr() {
-cat > package_descriptions << EOF
+  (mkdir -p install 
+   cd install
+  cat > slack-desc <<EOF
 @PACKAGE@: @PACKAGE@ @SPEC_VERSION@.
 @PACKAGE@:
 @PACKAGE@: xine is a fully-featured free audio/video player for unix-like 
@@ -184,6 +186,7 @@ cat > package_descriptions << EOF
 @PACKAGE@:
 @PACKAGE@:
 EOF
+)
 }
 
 #
@@ -200,11 +203,10 @@ do_build() {
   echo "./configure --prefix=$PREFIX $CONFIG_OPT && make && DESTDIR=$PKG make install-strip "  && \
   ./configure --prefix=$PREFIX $CONFIG_OPT && make && DESTDIR=$PKG make install-strip && \
   cd $PKG && \
-  do_doinst && \
-  echo "n" | /sbin/makepkg $PACKAGE && \
-  mv $PACKAGE $SLCK && \
+  do_doinst && do_descr && export _PACKAGE=@PACKAGE@-@VERSION@-$BUILD_ARCH-$BUILD_NUM.tgz \
+  echo "n" | /sbin/makepkg $_PACKAGE && \
+  mv $_PACKAGE $SLCK && export _PACKAGE="" && \
   cd $SLCK && DIE=0
-  do_descr
 }
 
 #
@@ -212,7 +214,7 @@ do_build() {
 #
 do_clean() {
   rm -rf $TMPBUILD
-  rm -f $PACKAGE package_descriptions
+  rm -f @PACKAGE@*.tgz
   rm -rf $PKG
   cd $CWD
 }
@@ -230,11 +232,9 @@ build_pentiumpro() {
   echo
   echo "*****************************************************"
   rm -rf $PKG
-  export XINE_BUILD=i686-pc-linux-gnu
+  export BUILD_ARCH=i686
+  export XINE_BUILD=$BUILD_ARCH-pc-linux-gnu
   do_build
-  if test "$DIE" -eq 0; then 
-    tar -czvf @PACKAGE@-@VERSION@-i686.tar.gz $PACKAGE package_descriptions
-  fi
   do_clean
 }
 
@@ -251,11 +251,9 @@ build_pentium() {
   echo
   echo "*****************************************************"
   rm -rf $PKG
-  export XINE_BUILD=i586-pc-linux-gnu
+  export BUILD_ARCH=i586
+  export XINE_BUILD=$BUILD_ARCH-pc-linux-gnu
   do_build
-  if test "$DIE" -eq 0; then 
-    tar -czvf @PACKAGE@-@VERSION@-i586.tar.gz $PACKAGE package_descriptions
-  fi
   do_clean
 }
 
@@ -272,11 +270,9 @@ build_k6() {
   echo
   echo "*****************************************************"
   rm -rf $PKG
-  export XINE_BUILD=k6-pc-linux-gnu
+  export BUILD_ARCH=k6
+  export XINE_BUILD=$BUILD_ARCH-pc-linux-gnu
   do_build
-  if test "$DIE" -eq 0; then 
-    tar -czvf @PACKAGE@-@VERSION@-k6.tar.gz $PACKAGE package_descriptions
-  fi
   do_clean
 }
 
@@ -293,11 +289,9 @@ build_k7() {
   echo
   echo "*****************************************************"
   rm -rf $PKG
-  export XINE_BUILD=athlon-pc-linux-gnu
+  export BUILD_ARCH=athlon
+  export XINE_BUILD=$BUILD_ARCH-pc-linux-gnu
   do_build
-  if test "$DIE" -eq 0; then 
-    tar -czvf @PACKAGE@-@VERSION@-k7.tar.gz $PACKAGE package_descriptions
-  fi
   do_clean
 }
 
@@ -312,7 +306,7 @@ main() {
   build_pentium
   build_k6
   build_k7
-  mv -f $CWD/@TAR_NAME@.tar.gz $SLCK
+  cp $CWD/@TAR_NAME@.tar.gz $SLCK
 }
 
 
@@ -324,8 +318,13 @@ build_arch() {
       mkdir -p $SLCK
       rm -f config.cache && ./autogen.sh && make dist
       $barch
-      mv -f $CWD/@TAR_NAME@.tar.gz $SLCK
+      cp -f $CWD/@TAR_NAME@.tar.gz $SLCK
 }
+
+if [ "`id -u`" -ne 0 ]; then
+    echo "You should be root to create packages. Exiting."
+    exit 1
+fi
 
 case "$1" in
     pentiumpro | ppro | i686 | 686)

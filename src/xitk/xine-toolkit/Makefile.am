@@ -24,7 +24,6 @@ libxitk_la_SOURCES = \
 	config.c \
 	dnd.c \
 	doublebox.c \
-	filebrowser.c \
 	font.c \
 	getdeskroot.c \
 	image.c \
@@ -57,7 +56,6 @@ noinst_HEADERS = \
 	combo.h \
 	dnd.h \
 	doublebox.h \
-	filebrowser.h \
 	font.h \
 	image.h \
 	inputtext.h \

@@ -522,7 +522,7 @@ Imlib_load_default_colors(ImlibData * id)
 #endif
   return 1;
 }
-
+ 
 void
 Imlib_free_colors(ImlibData * id)
 {

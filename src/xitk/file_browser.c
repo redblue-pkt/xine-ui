@@ -384,7 +384,7 @@ static void fb_create_input_window(char *title, char *text,
 
   {
     char buffer[256];
-    sprintf(buffer, "filenameed%d", (unsigned int) time(NULL));
+    snprintf(buffer, sizeof(buffer), "filenameed%d", (unsigned int) time(NULL));
     
     fne->widget_key = xitk_register_event_handler(buffer, 
 						  (xitk_window_get_window(fne->xwin)),
@@ -441,15 +441,15 @@ static void fb_update_origin(filebrowser_t *fb) {
   
   if(strcasecmp(fb->current_dir, "/")) {
     if(strlen(fb->filename))
-      sprintf(buf, "%s/%s", fb->current_dir, fb->filename);
+      snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->filename);
     else
-      sprintf(buf, "%s", fb->current_dir);
+      snprintf(buf, sizeof(buf), "%s", fb->current_dir);
   }
   else {
     if(strlen(fb->filename))
-      sprintf(buf, "%s%s", fb->current_dir, fb->filename);
+      snprintf(buf, sizeof(buf), "%s%s", fb->current_dir, fb->filename);
     else
-      sprintf(buf, "%s", fb->current_dir);
+      snprintf(buf, sizeof(buf), "%s", fb->current_dir);
   }
   
   xitk_inputtext_change_text(fb->origin, buf); 
@@ -481,15 +481,15 @@ static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
     
     if(filename && (strlen(filename) > 1)) {
       *filename++ = '\0';
-      sprintf(fb->filename, "%s", filename);
+      snprintf(fb->filename, sizeof(fb->filename), "%s", filename);
       
       if(is_a_dir(_filepathname))
-	sprintf(fb->current_dir, "%s", _filepathname);
+	snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", _filepathname);
 
     }
     else {
       if(is_a_dir((char *)_filepathname)) {
-	sprintf(fb->current_dir, "%s", _filepathname);
+	snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", _filepathname);
 	memset(&fb->filename, 0, sizeof(fb->filename));
       }
     }
@@ -682,7 +682,7 @@ static void fb_getdir(filebrowser_t *fb) {
   while((pdirent = readdir(pdir)) != NULL) {
     
     memset(&fullfilename, 0, sizeof(fullfilename));
-    sprintf(fullfilename, "%s/%s", fb->current_dir, pdirent->d_name);
+    snprintf(fullfilename, sizeof(fullfilename), "%s/%s", fb->current_dir, pdirent->d_name);
     
     if(is_a_dir(fullfilename)) {
       
@@ -743,7 +743,7 @@ static void fb_select(xitk_widget_t *w, void *data, int selected) {
   filebrowser_t *fb = (filebrowser_t *) data;
   
   if(w == fb->files_browser) {
-    sprintf(fb->filename, "%s", fb->norm_files[selected].name);
+    snprintf(fb->filename, sizeof(fb->filename), "%s", fb->norm_files[selected].name);
     fb_update_origin(fb);
   }
 }
@@ -780,7 +780,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
       char *p;
       
       memset(&buf, '\0', sizeof(buf));
-      sprintf(buf, "%s", fb->current_dir);
+      snprintf(buf, sizeof(buf), "%s", fb->current_dir);
       if(strlen(buf) > 1) { /* not '/' directory */
 	
 	p = &buf[strlen(buf)-1];
@@ -793,7 +793,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
 	if((strlen(buf) > 1) && *p == '/') 
 	  *p = '\0';
 	
-	sprintf(fb->current_dir, "%s", buf);
+	snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", buf);
       }
     }
     else {
@@ -801,15 +801,15 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
       /* not '/' directory */
       if(strcasecmp(fb->current_dir, "/")) {
 	memset(&buf, 0, sizeof(buf));
-	sprintf(buf, "%s/%s", fb->current_dir, fb->dir_files[selected].name);
+	snprintf(buf, sizeof(buf), "%s/%s", fb->current_dir, fb->dir_files[selected].name);
       }
       else {
 	memset(&buf, 0, sizeof(buf));
-	sprintf(buf, "/%s", fb->dir_files[selected].name);
+	snprintf(buf, sizeof(buf), "/%s", fb->dir_files[selected].name);
       }
       
       if(is_a_dir(buf))
-	sprintf(fb->current_dir, "%s", buf);
+	snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", buf);
 
     }
     
@@ -817,7 +817,7 @@ static void fb_dbl_select(xitk_widget_t *w, void *data, int selected) {
     fb_getdir(fb);
   }
   else if(w == fb->files_browser) {
-    sprintf(fb->filename, "%s", fb->norm_files[selected].name);
+    snprintf(fb->filename, sizeof(fb->filename), "%s", fb->norm_files[selected].name);
     fb_callback_button_cb(fb->cb_buttons[0], (void *)data);
   }
 
@@ -829,7 +829,7 @@ static void fb_change_origin(xitk_widget_t *w, void *data, char *currenttext) {
   char          *p;
 
   memset(&buf, 0, sizeof(buf));
-  sprintf(buf, "%s", currenttext);
+  snprintf(buf, sizeof(buf), "%s", currenttext);
 
   p = &buf[strlen(buf) - 1];
   while((strlen(buf) > 1) && (*p == '/'))
@@ -975,10 +975,10 @@ static void fb_delete_file_cb(xitk_widget_t *w, void *data, int button) {
       int sel = xitk_browser_get_current_selected(fb->files_browser);
 
       memset(&buf, 0, sizeof(buf));
-      sprintf(buf, "%s", fb->current_dir);
+      snprintf(buf, sizeof(buf), "%s", fb->current_dir);
       if(strlen(fb->current_dir) > 1)
-	sprintf(buf, "%s/", buf);
-      sprintf(buf, "%s%s", buf, fb->norm_files[sel].name);
+	snprintf(buf, sizeof(buf), "%s/", buf);
+      snprintf(buf, sizeof(buf), "%s%s", buf, fb->norm_files[sel].name);
       
       if((unlink(buf)) == -1)
 	xine_error(_("Unable to delete file '%s': %s."), buf, strerror(errno));
@@ -998,10 +998,10 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
   if((sel = xitk_browser_get_current_selected(fb->files_browser)) >= 0) {
     char buf[256 + XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
-    sprintf(buf, "Do you really want to delete the file: '%s", fb->current_dir);
+    snprintf(buf, sizeof(buf), _("Do you really want to delete the file: '%s"), fb->current_dir);
     if(strlen(fb->current_dir) > 1)
-      sprintf(buf, "%s/", buf);
-    sprintf(buf, "%s%s' ?.", buf, fb->norm_files[sel].name);
+      snprintf(buf, sizeof(buf), "%s%c", buf, '/');
+    snprintf(buf, sizeof(buf), "%s%s' ?.", buf, fb->norm_files[sel].name);
     
     fb_deactivate(fb);
     xitk_window_dialog_yesno(gGui->imlib_data, _("Confirm deletion ?"),
@@ -1017,10 +1017,10 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, char *newname) {
   int sel = xitk_browser_get_current_selected(fb->files_browser);
   
   memset(&buf, 0, sizeof(buf));
-  sprintf(buf, "%s", fb->current_dir);
+  snprintf(buf, sizeof(buf), "%s", fb->current_dir);
   if(strlen(fb->current_dir) > 1)
-    sprintf(buf, "%s/", buf);
-  sprintf(buf, "%s%s", buf, fb->norm_files[sel].name);
+    snprintf(buf, sizeof(buf), "%s%c", buf, '/');
+  snprintf(buf, sizeof(buf), "%s%s", buf, fb->norm_files[sel].name);
   
   if((rename(buf, newname)) == -1)
     xine_error(_("Unable to rename file '%s' to '%s': %s."), buf, newname, strerror(errno));
@@ -1036,10 +1036,10 @@ static void fb_rename_file(xitk_widget_t *w, void *data) {
     char buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     
     memset(&buf, 0, sizeof(buf));
-    sprintf(buf, "%s", fb->current_dir);
+    snprintf(buf, sizeof(buf), "%s", fb->current_dir);
     if(strlen(fb->current_dir) > 1)
-      sprintf(buf, "%s/", buf);
-    sprintf(buf, "%s%s", buf, fb->norm_files[sel].name);
+      snprintf(buf, sizeof(buf), "%s%c", buf, '/');
+    snprintf(buf, sizeof(buf), "%s%s", buf, fb->norm_files[sel].name);
     
     fb_deactivate(fb);
     fb_create_input_window(_("Rename file"), buf, fb_rename_file_cb, fb);
@@ -1059,9 +1059,9 @@ static void fb_create_directory(xitk_widget_t *w, void *data) {
   char           buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
   memset(&buf, 0, sizeof(buf));
-  sprintf(buf, "%s", fb->current_dir);
+  snprintf(buf, sizeof(buf), "%s", fb->current_dir);
   if(strlen(fb->current_dir) > 1)
-    sprintf(buf, "%s/", buf);
+    snprintf(buf, sizeof(buf), "%s%c", buf, '/');
   
   fb_deactivate(fb);
   fb_create_input_window(_("Create a new directory"), buf, fb_create_directory_cb, fb);
@@ -1222,7 +1222,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   fb->files_sort_direction       = DEFAULT_SORT;
   fb->show_hidden_files          = 1;
 
-  sprintf(fb->current_dir, "%s", xine_get_homedir());
+  snprintf(fb->current_dir, sizeof(fb->current_dir), "%s", xine_get_homedir());
   memset(&fb->filename, 0, sizeof(fb->filename));
   fb_extract_path_and_file(fb, filepathname);
 
@@ -1632,7 +1632,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
 
   {
     char buffer[256];
-    sprintf(buffer, "filebrowser%d", (unsigned int) time(NULL));
+    snprintf(buffer, sizeof(buffer), "filebrowser%d", (unsigned int) time(NULL));
     fb->widget_key = xitk_register_event_handler(buffer, 
 						 (xitk_window_get_window(fb->xwin)),
 						 fb_handle_events,

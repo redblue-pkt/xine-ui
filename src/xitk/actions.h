@@ -41,8 +41,9 @@ int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *len
 void try_to_set_input_focus(Window window);
 void gui_display_logo(void);
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time, int update_mmk);
+int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub);
 int gui_xine_open_and_play(char *mrl, char *sub, int start_pos, 
-			   int start_time, int av_offset, int spu_offset);
+			   int start_time, int av_offset, int spu_offset, int report_error);
 void gui_exit (xitk_widget_t *w, void *data);
 void gui_play (xitk_widget_t *w, void *data);
 void gui_stop (xitk_widget_t *w, void *data);
@@ -68,7 +69,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value);
 void gui_nextprev(xitk_widget_t *w, void *data);
 void gui_playlist_show(xitk_widget_t *w, void *data);
 void gui_mrlbrowser_show(xitk_widget_t *w, void *data);
-void gui_set_current_mrl(mediamark_t *mmk);
+void gui_set_current_mmk(mediamark_t *mmk);
 void gui_control_show(xitk_widget_t *w, void *data);
 void gui_mrl_browser_show(xitk_widget_t *w, void *data);
 void gui_setup_show(xitk_widget_t *w, void *data);

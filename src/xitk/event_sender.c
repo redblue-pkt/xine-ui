@@ -523,7 +523,7 @@ void event_sender_panel(void) {
     char number[2];
     
     memset(&number, 0, sizeof(number));
-    sprintf(number, "%d", i);
+    snprintf(number, sizeof(number), "%d", i);
 
     lb.button_type       = CLICK_BUTTON;
     lb.label             = number;
@@ -560,7 +560,7 @@ void event_sender_panel(void) {
     i = 10;
     
     memset(&number, 0, sizeof(number));
-    sprintf(number, "+ %d", i);
+    snprintf(number, sizeof(number), "+ %d", i);
     
     lb.button_type       = CLICK_BUTTON;
     lb.label             = number;

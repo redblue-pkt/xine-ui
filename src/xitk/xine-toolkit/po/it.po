@@ -8,7 +8,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xitk\n"
-"POT-Creation-Date: 2004-04-12 15:06+0000\n"
+"POT-Creation-Date: 2004-04-21 16:38+0000\n"
 "PO-Revision-Date: 2003-12-26 12:42+0100\n"
 "Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"

@@ -113,11 +113,8 @@ static void help_add_section(const char *filename, const char *doc_encoding,
 	    buf[st.st_size] = '\0';
 	    
 	    while((p = xine_strsep(&buf, "\n")) != NULL) {
-	      if(!lines)
-		hbuf = (char **) xine_xmalloc(sizeof(char *) * 2);
-	      else
-		hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
-
+	      hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
+	      
 	      while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))
 		*(p + strlen(p) - 1) = '\0';
 
@@ -175,9 +172,9 @@ static void help_sections(void) {
       if ((sscanf(dir_entry->d_name, "README.en.%d.%s", &order_num, &section_name[0])) == 2) {
 	sscanf(dir_entry->d_name, "README.en.%s", &ending[0]);
 
-	sprintf(locale_file, "%s.%s.%s", "README", lang->ext, ending);
-	sprintf(locale_readme, "%s/%s", XINE_DOCDIR, locale_file);
-	sprintf(default_readme, "%s/%s", XINE_DOCDIR, dir_entry->d_name);
+	snprintf(locale_file, sizeof(locale_file), "%s.%s.%s", "README", lang->ext, ending);
+	snprintf(locale_readme, sizeof(locale_readme), "%s/%s", XINE_DOCDIR, locale_file);
+	snprintf(default_readme, sizeof(default_readme), "%s/%s", XINE_DOCDIR, dir_entry->d_name);
 
 	if ((strcmp(locale_file, dir_entry->d_name)) && is_a_file(locale_readme)) {
 	  help_add_section(locale_readme, lang->doc_encoding, order_num, section_name);

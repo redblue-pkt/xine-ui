@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
-"POT-Creation-Date: 2004-04-15 16:57+0000\n"
+"POT-Creation-Date: 2004-04-21 16:32+0000\n"
 "PO-Revision-Date: 2002-02-24 17:35GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -259,21 +259,21 @@ msgstr ""
 msgid "Download progress: %d%%."
 msgstr ""
 
-#: src/xitk/errors.c:61 src/xitk/kbindings.c:2156
+#: src/xitk/errors.c:63 src/xitk/kbindings.c:2161
 #: src/xitk/kbindings_man.c:2078
 msgid "Done"
 msgstr ""
 
-#: src/xitk/errors.c:61
+#: src/xitk/errors.c:63
 msgid "More..."
 msgstr ""
 
-#: src/xitk/errors.c:158
+#: src/xitk/errors.c:164
 msgid "Error"
 msgstr ""
 
 # src/xitk/event.c:663
-#: src/xitk/errors.c:233
+#: src/xitk/errors.c:243
 #, fuzzy, c-format
 msgid ""
 "- xine engine error -\n"
@@ -286,7 +286,7 @@ msgstr ""
 "Нема╓ вх╕дного модулю для обробки файлу (потоку) '%s'.\n"
 
 # src/xitk/event.c:663
-#: src/xitk/errors.c:240
+#: src/xitk/errors.c:251
 #, fuzzy, c-format
 msgid ""
 "- xine engine error -\n"
@@ -299,7 +299,7 @@ msgstr ""
 "Нема╓ вх╕дного модулю для обробки файлу (потоку) '%s'.\n"
 
 # src/xitk/event.c:675
-#: src/xitk/errors.c:247
+#: src/xitk/errors.c:259
 #, fuzzy, c-format
 msgid ""
 "- xine engine error -\n"
@@ -311,7 +311,7 @@ msgstr ""
 "!! Нерозп╕знана помилка !!\n"
 
 # src/xitk/event.c:675
-#: src/xitk/errors.c:252
+#: src/xitk/errors.c:265
 #, fuzzy, c-format
 msgid ""
 "- xine engine error -\n"
@@ -323,7 +323,7 @@ msgstr ""
 "!! Нерозп╕знана помилка !!\n"
 
 # src/xitk/event.c:675
-#: src/xitk/errors.c:257
+#: src/xitk/errors.c:271
 #, fuzzy, c-format
 msgid ""
 "- xine engine error -\n"
@@ -335,7 +335,7 @@ msgstr ""
 "!! Нерозп╕знана помилка !!\n"
 
 # src/xitk/event.c:675
-#: src/xitk/errors.c:262
+#: src/xitk/errors.c:277
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -743,7 +743,7 @@ msgstr "Закрити"
 msgid "Apply"
 msgstr ""
 
-#: src/xitk/file_browser.c:372 src/xitk/kbindings.c:534 src/xitk/skins.c:1213
+#: src/xitk/file_browser.c:372 src/xitk/kbindings.c:536 src/xitk/skins.c:1213
 msgid "Cancel"
 msgstr "В╕дм╕на"
 
@@ -806,7 +806,7 @@ msgid "Rename"
 msgstr ""
 
 # src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:196
-#: src/xitk/file_browser.c:1542 src/xitk/kbindings.c:2112
+#: src/xitk/file_browser.c:1542 src/xitk/kbindings.c:2117
 #: src/xitk/kbindings_man.c:2034 src/xitk/menus.c:1128
 #, fuzzy
 msgid "Delete"
@@ -846,116 +846,116 @@ msgid ""
 "What do you want to do ?\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:533 src/xitk/kbindings_man.c:476
+#: src/xitk/kbindings.c:535 src/xitk/kbindings_man.c:476
 msgid "Keybindings error!"
 msgstr ""
 
-#: src/xitk/kbindings.c:534 src/xitk/kbindings.c:2142
+#: src/xitk/kbindings.c:536 src/xitk/kbindings.c:2147
 #: src/xitk/kbindings_man.c:477 src/xitk/kbindings_man.c:2064
 msgid "Reset"
 msgstr ""
 
-#: src/xitk/kbindings.c:534 src/xitk/kbindings_man.c:478
+#: src/xitk/kbindings.c:536 src/xitk/kbindings_man.c:478
 msgid "Editor"
 msgstr ""
 
 # src/xitk/kbindings.c:663
-#: src/xitk/kbindings.c:911 src/xitk/kbindings_man.c:853
+#: src/xitk/kbindings.c:915 src/xitk/kbindings_man.c:853
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Опс: таблиця прив'язк╕ ключ╕в пуста .\n"
 
-#: src/xitk/kbindings.c:1503 src/xitk/kbindings_man.c:1435
+#: src/xitk/kbindings.c:1508 src/xitk/kbindings_man.c:1435
 msgid "Nothing selected"
 msgstr ""
 
-#: src/xitk/kbindings.c:1504 src/xitk/kbindings_man.c:1436
+#: src/xitk/kbindings.c:1509 src/xitk/kbindings_man.c:1436
 #, fuzzy
 msgid "None"
 msgstr "Н╕"
 
-#: src/xitk/kbindings.c:1674 src/xitk/kbindings_man.c:1598
+#: src/xitk/kbindings.c:1679 src/xitk/kbindings_man.c:1598
 msgid "You can only delete alias entries."
 msgstr ""
 
-#: src/xitk/kbindings.c:1808 src/xitk/kbindings_man.c:1730
+#: src/xitk/kbindings.c:1813 src/xitk/kbindings_man.c:1730
 msgid "Press Keyboard Keys..."
 msgstr ""
 
-#: src/xitk/kbindings.c:1821 src/xitk/kbindings_man.c:1743
+#: src/xitk/kbindings.c:1826 src/xitk/kbindings_man.c:1743
 msgid "Event receiver window"
 msgstr ""
 
 #. Ask if uses want/wont store new shorcut
-#: src/xitk/kbindings.c:1887 src/xitk/kbindings_man.c:1809
+#: src/xitk/kbindings.c:1892 src/xitk/kbindings_man.c:1809
 msgid "Accept?"
 msgstr ""
 
-#: src/xitk/kbindings.c:1891 src/xitk/kbindings_man.c:1813
+#: src/xitk/kbindings.c:1896 src/xitk/kbindings_man.c:1813
 #, c-format
 msgid ""
 "Store %s as\n"
 "'%s' key binding ?."
 msgstr ""
 
-#: src/xitk/kbindings.c:1897 src/xitk/kbindings_man.c:1819
+#: src/xitk/kbindings.c:1902 src/xitk/kbindings_man.c:1819
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
 "\"%s\".\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:1994 src/xitk/kbindings_man.c:1916
+#: src/xitk/kbindings.c:1999 src/xitk/kbindings_man.c:1916
 msgid "key binding editor"
 msgstr ""
 
-#: src/xitk/kbindings.c:2025 src/xitk/kbindings_man.c:1947
+#: src/xitk/kbindings.c:2030 src/xitk/kbindings_man.c:1947
 msgid "Binding action"
 msgstr ""
 
-#: src/xitk/kbindings.c:2031 src/xitk/kbindings_man.c:1953
+#: src/xitk/kbindings.c:2036 src/xitk/kbindings_man.c:1953
 msgid "Key"
 msgstr ""
 
-#: src/xitk/kbindings.c:2036 src/xitk/kbindings_man.c:1958
+#: src/xitk/kbindings.c:2041 src/xitk/kbindings_man.c:1958
 msgid "Modifiers"
 msgstr ""
 
-#: src/xitk/kbindings.c:2082 src/xitk/kbindings_man.c:2004
+#: src/xitk/kbindings.c:2087 src/xitk/kbindings_man.c:2004
 msgid "Alias"
 msgstr ""
 
-#: src/xitk/kbindings.c:2097 src/xitk/kbindings_man.c:2019
+#: src/xitk/kbindings.c:2102 src/xitk/kbindings_man.c:2019
 #: src/xitk/menus.c:1127
 msgid "Edit"
 msgstr ""
 
 # src/xitk/playlist.c:819
-#: src/xitk/kbindings.c:2127 src/xitk/kbindings_man.c:2049
+#: src/xitk/kbindings.c:2132 src/xitk/kbindings_man.c:2049
 #: src/xitk/playlist.c:424 src/xitk/playlist.c:1204
 msgid "Save"
 msgstr "Зберегти"
 
-#: src/xitk/kbindings.c:2222 src/xitk/kbindings_man.c:2144
+#: src/xitk/kbindings.c:2227 src/xitk/kbindings_man.c:2144
 msgid "ctrl"
 msgstr ""
 
-#: src/xitk/kbindings.c:2246 src/xitk/kbindings_man.c:2168
+#: src/xitk/kbindings.c:2251 src/xitk/kbindings_man.c:2168
 msgid "meta"
 msgstr ""
 
-#: src/xitk/kbindings.c:2270 src/xitk/kbindings_man.c:2192
+#: src/xitk/kbindings.c:2275 src/xitk/kbindings_man.c:2192
 msgid "mod3"
 msgstr ""
 
-#: src/xitk/kbindings.c:2294 src/xitk/kbindings_man.c:2216
+#: src/xitk/kbindings.c:2299 src/xitk/kbindings_man.c:2216
 msgid "mod4"
 msgstr ""
 
-#: src/xitk/kbindings.c:2318 src/xitk/kbindings_man.c:2240
+#: src/xitk/kbindings.c:2323 src/xitk/kbindings_man.c:2240
 msgid "mod5"
 msgstr ""
 
-#: src/xitk/kbindings.c:2329 src/xitk/kbindings_man.c:2251
+#: src/xitk/kbindings.c:2334 src/xitk/kbindings_man.c:2251
 msgid "Grab"
 msgstr ""
 
@@ -1534,69 +1534,69 @@ msgstr "ID в╕део драйвера потр╕бен для -V опц╕╖\n"
 msgid "audio driver id required for -A option\n"
 msgstr "ID ауд╕о драйвера потр╕бен для -A опц╕╖\n"
 
-#: src/xitk/main.c:1524
+#: src/xitk/main.c:1534
 #, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1588
+#: src/xitk/main.c:1598
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1620
+#: src/xitk/main.c:1632
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1749
+#: src/xitk/main.c:1761
 msgid "*** NOTE ***\n"
 msgstr ""
 
-#: src/xitk/main.c:1750
+#: src/xitk/main.c:1762
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
 
 # src/xitk/main.c:641
-#: src/xitk/main.c:1788
+#: src/xitk/main.c:1802
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "неправильний параметр %d => вих╕д\n"
 
-#: src/xitk/main.c:1808
+#: src/xitk/main.c:1822
 msgid "You should specify one MRL to enqueue, at least!.\n"
 msgstr ""
 
-#: src/xitk/main.c:1874
+#: src/xitk/main.c:1890
 msgid "Automatically reload old playlist"
 msgstr ""
 
-#: src/xitk/main.c:1875
+#: src/xitk/main.c:1891
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
 
-#: src/xitk/main.c:1890
+#: src/xitk/main.c:1906
 msgid "Subtitle autoloading"
 msgstr ""
 
-#: src/xitk/main.c:1891
+#: src/xitk/main.c:1907
 msgid "Automatically load subtitles if they exist."
 msgstr ""
 
-#: src/xitk/main.c:1899
+#: src/xitk/main.c:1915
 msgid "Enable deinterlacing by default"
 msgstr ""
 
-#: src/xitk/main.c:1900
+#: src/xitk/main.c:1916
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
 msgstr ""
 
-#: src/xitk/main.c:2041
+#: src/xitk/main.c:2064
 msgid "Logo mrl"
 msgstr ""
 

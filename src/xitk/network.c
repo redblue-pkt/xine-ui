@@ -432,7 +432,7 @@ extern gGui_t *gGui;
 
 #endif
 
-void sock_err(const char *error_msg, ...) {
+static void sock_err(const char *error_msg, ...) {
   va_list args;
   
   va_start(args, error_msg);
@@ -440,7 +440,7 @@ void sock_err(const char *error_msg, ...) {
   va_end(args);
 }
 
-int sock_create(const char *service, const char *transport, struct sockaddr_in *sin) {
+static int sock_create(const char *service, const char *transport, struct sockaddr_in *sin) {
   struct servent    *iservice;
   struct protoent *itransport;
   int                sock;
@@ -483,7 +483,7 @@ int sock_create(const char *service, const char *transport, struct sockaddr_in *
   return sock;
 }
 
-int sock_client(const char *host, const char *service, const char *transport) {
+static int sock_client(const char *host, const char *service, const char *transport) {
   struct sockaddr_in   sin;
   struct hostent      *ihost;
   int                  sock;
@@ -512,7 +512,7 @@ int sock_client(const char *host, const char *service, const char *transport) {
   return sock;
 }
 
-int sock_serv(const char *service, const char *transport, int queue_length) {
+static int sock_serv(const char *service, const char *transport, int queue_length) {
   struct sockaddr_in  sin;
   int                 sock;
   int                 on = 1;
@@ -533,7 +533,7 @@ int sock_serv(const char *service, const char *transport, int queue_length) {
 /*
  * Check for socket validity.
  */
-int sock_check_opened(int socket) {
+static int sock_check_opened(int socket) {
   fd_set   readfds, writefds, exceptfds;
   int      retval;
   struct   timeval timeout;
@@ -562,7 +562,7 @@ int sock_check_opened(int socket) {
 /*
  * Read from socket.
  */
-int sock_read(int socket, char *buf, int len) {
+static int sock_read(int socket, char *buf, int len) {
   char    *pbuf;
   int      r, rr;
   void    *nl;
@@ -637,7 +637,7 @@ static int __sock_write(int socket, int cr, char *msg, ...) {
   /* Each line sent is '\n' terminated */
   if(cr) {
     if((buf[strlen(buf)] == '\0') && (buf[strlen(buf) - 1] != '\n'))
-      sprintf(buf, "%s%c", buf, '\n');
+      snprintf(buf, sizeof(buf), "%s%c", buf, '\n');
   }
   
   return _sock_write(socket, buf, strlen(buf));
@@ -799,21 +799,21 @@ static void client_help(session_t *session, session_commands_t *command, const c
   maxlen++; 
   i = 0;  
   
-  sprintf(buf, "%s", "Available commands are:\n       ");
+  snprintf(buf, sizeof(buf), "%s", "Available commands are:\n       ");
   curpos += 7;
   
   while(session_commands[i]->command != NULL) {
     if(session_commands[i]->enable) {
       if((curpos + maxlen) >= 80) {
-	sprintf(buf, "%s\n       ", buf);
+	snprintf(buf, sizeof(buf), "%s\n       ", buf);
 	curpos = 7;
       }
       
-      sprintf(buf, "%s%s", buf, session_commands[i]->command);
+      snprintf(buf, sizeof(buf), "%s%s", buf, session_commands[i]->command);
       curpos += strlen(session_commands[i]->command);
       
       for(j = 0; j < (maxlen - strlen(session_commands[i]->command)); j++) {
-	sprintf(buf, "%s ", buf);
+	snprintf(buf, sizeof(buf), "%s ", buf);
 	curpos++;
       }
     }
@@ -863,7 +863,7 @@ static void client_open(session_t *session, session_commands_t *command, const c
   }
   
   if(cmd) {
-    sprintf(buf, "%s", cmd);
+    snprintf(buf, sizeof(buf), "%s", cmd);
     pbuf = buf;
     if((p = strchr(pbuf, ' ')) != NULL) {
       host = _atoa(p);
@@ -1094,7 +1094,7 @@ static void client_handle_command(session_t *session, const char *command) {
   
   /* Get only first arg of command */
   memset(&cmd, 0, sizeof(cmd));
-  sprintf(cmd, "%s", command);
+  snprintf(cmd, sizeof(cmd), "%s", command);
   if((p = strchr(cmd, ' ')) != NULL)
     *p = '\0';
   
@@ -1171,9 +1171,9 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
 
   for(i = 0; i < num_commands; i++) {
     if(strlen(buf))
-      sprintf(buf, "%s %s", buf, commands[i]);
+      snprintf(buf, sizeof(buf), "%s %s", buf, commands[i]);
     else
-      sprintf(buf, "%s", commands[i]);
+      snprintf(buf, sizeof(buf), "%s", commands[i]);
   }
 
   client_handle_command(session, buf);
@@ -1431,7 +1431,7 @@ static int _passwdfile_is_entry_valid(char *entry, char *name, char *passwd) {
   char buf[_BUFSIZ];
   char *n, *p;
   
-  sprintf(buf, "%s", entry);
+  snprintf(buf, sizeof(buf), "%s", entry);
   n = buf;
   if((p = strrchr(buf, ':')) != NULL) {
     if(strlen(p) > 1) {
@@ -1644,7 +1644,7 @@ static const char *get_arg(client_info_t *client_info, int num) {
 /*
  * return 1 if *arg match with argument <pos>
  */
-int is_arg_contain(client_info_t *client_info, int pos, const char *arg) {
+static int is_arg_contain(client_info_t *client_info, int pos, const char *arg) {
   
   if(client_info && pos && ((arg != NULL) && (strlen(arg))) && (client_info->command.num_args >= pos)) {
     if(!strncmp(client_info->command.args[pos - 1], arg, strlen(client_info->command.args[pos - 1])))
@@ -1661,10 +1661,7 @@ static void set_command_line(client_info_t *client_info, char *line) {
 
   if(client_info && line && strlen(line)) {
 
-    if(client_info->command.line)
-      client_info->command.line = (char *) realloc(client_info->command.line, strlen(line) + 1);
-    else
-      client_info->command.line = (char *) xine_xmalloc(strlen(line) + 1);
+    client_info->command.line = (char *) realloc(client_info->command.line, strlen(line) + 1);
     
     memset(client_info->command.line, 0, sizeof(client_info->command.line));
     sprintf(client_info->command.line, "%s", line);
@@ -1709,15 +1706,15 @@ static void do_commands(commands_t *cmd, client_info_t *client_info) {
   char buf[_BUFSIZ];
 
   memset(&buf, 0, sizeof(buf));
-  sprintf(buf, COMMANDS_PREFIX);
+  snprintf(buf, sizeof(buf), "%s", COMMANDS_PREFIX);
   
   while(commands[i].command != NULL) {
     if(commands[i].public) {
-      sprintf(buf, "%s\t%s", buf, commands[i].command);
+      snprintf(buf, sizeof(buf), "%s\t%s", buf, commands[i].command);
     }
     i++;
   }
-  sprintf(buf, "%s.\n", buf);
+  snprintf(buf, sizeof(buf), "%s.\n", buf);
   sock_write(client_info->socket, buf);
 }
 
@@ -1742,28 +1739,28 @@ static void do_help(commands_t *cmd, client_info_t *client_info) {
     maxlen++; 
     i = 0;  
 
-    sprintf(buf, "Available commands are:\n       ");
+    snprintf(buf, sizeof(buf), "%s", "Available commands are:\n       ");
     curpos += 7;
     
     while(commands[i].command != NULL) {
       if(commands[i].public) {
 	if((curpos + maxlen) >= 80) {
-	  sprintf(buf, "%s\n       ", buf);
+	  snprintf(buf, sizeof(buf), "%s\n       ", buf);
 	  curpos = 7;
 	}
 	
-	sprintf(buf, "%s%s", buf, commands[i].command);
+	snprintf(buf, sizeof(buf), "%s%s", buf, commands[i].command);
 	curpos += strlen(commands[i].command);
 	
 	for(j = 0; j < (maxlen - strlen(commands[i].command)); j++) {
-	  sprintf(buf, "%s ", buf);
+	  snprintf(buf, sizeof(buf), "%s ", buf);
 	  curpos++;
 	}
       }
       i++;
     }
     
-    sprintf(buf, "%s\n", buf);
+    snprintf(buf, sizeof(buf), "%s\n", buf);
     sock_write(client_info->socket, buf);
   }
   else {
@@ -1803,7 +1800,7 @@ static void do_auth(commands_t *cmd, client_info_t *client_info) {
       char *name;
       char *passwd;
       
-      sprintf(buf, "%s", get_arg(client_info, 1));
+      snprintf(buf, sizeof(buf), "%s", get_arg(client_info, 1));
       name = buf;
       if((passwd = strrchr(buf, ':')) != NULL) {
 	if(strlen(passwd) > 1) {
@@ -1847,9 +1844,9 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	xine_stop (gGui->stream);
 	gGui->playlist.cur--;
 	if ((gGui->playlist.cur >= 0) && (gGui->playlist.cur < gGui->playlist.num)) {
-	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	  gui_set_current_mmk(mediamark_get_current_mmk());
 	  (void) gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-					gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset);
+					gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 1);
   
 	} 
 	else {
@@ -1877,7 +1874,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	  xine_stop(gGui->stream);
 	  gGui->ignore_next = 0;
 	}
-	gui_set_current_mrl(gGui->playlist.mmk[gGui->playlist.num - 1]);
+	gui_set_current_mmk(gGui->playlist.mmk[gGui->playlist.num - 1]);
 	if(!(xine_open(gGui->stream, gGui->mmk.mrl) 
 	     && xine_play (gGui->stream, 0, gGui->mmk.start))) {
 	  handle_xine_error(client_info);
@@ -1939,7 +1936,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	    }
 
 	    gGui->playlist.cur = entry;
-	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	    gui_set_current_mmk(mediamark_get_current_mmk());
 	    gui_play(NULL, NULL);
 	  }
 	}
@@ -1963,7 +1960,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	
 	if((j >= 0) && (j <= gGui->playlist.num)) {
 	  gGui->playlist.cur = j;
-	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	  gui_set_current_mmk(mediamark_get_current_mmk());
 
 	  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
 	    gGui->ignore_next = 1;
@@ -2002,8 +1999,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	    for(i = j; i < gGui->playlist.num; i++)
 	      gGui->playlist.mmk[i] = gGui->playlist.mmk[i + 1];
 	    
-	    gGui->playlist.mmk = (mediamark_t **) 
-	      realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
+	    gGui->playlist.mmk = (mediamark_t **) realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
 	    
 	    gGui->playlist.mmk[gGui->playlist.num + 1] = NULL;
 	    
@@ -2015,7 +2011,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	  playlist_update_playlist();
 
 	if(gGui->playlist.num)
-	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	  gui_set_current_mmk(mediamark_get_current_mmk());
 	else {
 	  
 	  if(is_playback_widgets_enabled())
@@ -2024,7 +2020,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
 	    gui_stop(NULL, NULL);
 	  
-	  gui_set_current_mrl(NULL);
+	  gui_set_current_mmk(NULL);
 	}
       }
     }
@@ -2092,22 +2088,22 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	char buf[64];
 	int  status;
 
-	sprintf(buf, "%s", "Current status: ");
+	snprintf(buf, sizeof(buf), "%s", "Current status: ");
 	status = xine_get_status(gGui->stream);
 	
 	if(status <= XINE_STATUS_QUIT)
-	  sprintf(buf, "%s%s", buf, status_struct[status].name);
+	  snprintf(buf, sizeof(buf), "%s%s", buf, status_struct[status].name);
 	else
-	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
+	  snprintf(buf, sizeof(buf), "%s%s", buf, "*UNKNOWN*");
 	
-	sprintf(buf, "%s%c", buf, '\n');
+	snprintf(buf, sizeof(buf), "%s%c", buf, '\n');
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "speed")) {
 	char buf[64];
 	int  speed = -1, i;
 	
-	sprintf(buf, "%s", "Current speed: ");
+	snprintf(buf, sizeof(buf), "%s", "Current speed: ");
 	speed = xine_get_param(gGui->stream, XINE_PARAM_SPEED);
 
 	for(i = 0; speeds_struct[i].name != NULL; i++) {
@@ -2116,11 +2112,11 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	}
 	
 	if(i < ((sizeof(speeds_struct) / sizeof(speeds_struct[0])) - 1))
-	  sprintf(buf, "%s%s", buf, speeds_struct[i].name);
+	  snprintf(buf, sizeof(buf), "%s%s", buf, speeds_struct[i].name);
 	else
-	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
+	  snprintf(buf, sizeof(buf), "%s%s", buf, "*UNKNOWN*");
 	
-	sprintf(buf, "%s%c", buf, '\n');
+	snprintf(buf, sizeof(buf), "%s%c", buf, '\n');
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "position")) {
@@ -2132,7 +2128,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 			    &pos_stream,
 			    &pos_time,
 			    &length_time);
-	sprintf(buf, "Current position: %d\n",pos_time);
+	snprintf(buf, sizeof(buf), "%s: %d\n", "Current position", pos_time);
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "length")) {
@@ -2144,36 +2140,36 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 			    &pos_stream,
 			    &pos_time,
 			    &length_time);
-	sprintf(buf, "Current length: %d\n",length_time);
+	snprintf(buf, sizeof(buf), "%s: %d\n", "Current length", length_time);
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "loop")) {
 	char buf[64];
 
-	sprintf(buf, "Current loop mode is: ");
+	snprintf(buf, sizeof(buf), "%s", "Current loop mode is: ");
 
 	switch(gGui->playlist.loop) {
 	case PLAYLIST_LOOP_NO_LOOP:
-	  sprintf(buf, "%s'No Loop'", buf);
+	  snprintf(buf, sizeof(buf), "%s%s", buf, "'No Loop'");
 	  break;
 	case PLAYLIST_LOOP_LOOP:
-	  sprintf(buf, "%s'Loop'", buf);
+	  snprintf(buf, sizeof(buf), "%s%s", buf, "'Loop'");
 	  break;
 	case PLAYLIST_LOOP_REPEAT:
-	  sprintf(buf, "%s'Repeat'", buf);
+	  snprintf(buf, sizeof(buf), "%s%s", buf, "'Repeat'");
 	  break;
 	case PLAYLIST_LOOP_SHUFFLE:
-	  sprintf(buf, "%s'Shuffle'", buf);
+	  snprintf(buf, sizeof(buf), "%s%s", buf, "'Shuffle'");
 	  break;
 	case PLAYLIST_LOOP_SHUF_PLUS:	
-	  sprintf(buf, "%s'Shuffle forever'", buf);
+	  snprintf(buf, sizeof(buf), "%s%s", buf, "'Shuffle forever'");
 	  break;
 	default:
-	  sprintf(buf, "%s'!!Unknown!!'", buf);
+	  snprintf(buf, sizeof(buf), "%s%s", buf, "'!!Unknown!!'");
 	  break;
 	}
 
-	sprintf(buf, "%s.\n", buf);
+	snprintf(buf, sizeof(buf), "%s.\n", buf);
 	sock_write(client_info->socket, buf);
       }
     }
@@ -2573,10 +2569,10 @@ static void say_hello(client_info_t *client_info) {
   struct hostent *hp = NULL;
   
   if(!gethostname(myfqdn, 255) && (hp = gethostbyname(myfqdn)) != NULL) {
-    sprintf(buf, "%s %s %s remote server. Nice to meet you.\n", hp->h_name, PACKAGE, VERSION);
+    snprintf(buf, sizeof(buf), "%s %s %s %s\n", hp->h_name, PACKAGE, VERSION, "remote server. Nice to meet you.");
   }
   else {
-    sprintf(buf, "%s %s remote server. Nice to meet you.\n", PACKAGE, VERSION);
+    snprintf(buf, sizeof(buf), "%s %s %s\n", PACKAGE, VERSION, "remote server. Nice to meet you.");
   }
   sock_write(client_info->socket, buf);
   
@@ -2638,13 +2634,9 @@ static void parse_destock_remain(client_info_t *client_info) {
 	p++;
       
       if(p)
-	sprintf(remaining, "%s", (_atoa(p)));
+	snprintf(remaining, sizeof(remaining), "%s", (_atoa(p)));
       
-      if(client_info->command.line)
-	client_info->command.line = (char *) realloc(client_info->command.line, 
-						     sizeof(char *) * (strlen(c) + 1));
-      else
-	client_info->command.line = (char *) xine_xmalloc(sizeof(char *) * (strlen(c) + 1));
+      client_info->command.line = (char *) realloc(client_info->command.line, sizeof(char *) * (strlen(c) + 1));
       
       sprintf(client_info->command.line, "%s", c);
       
@@ -2674,12 +2666,8 @@ static void parse_destock_remain(client_info_t *client_info) {
       
     }
     else { /* no ';' in remain, copy AS IS remain to line */
-      if(client_info->command.line)
-	client_info->command.line = (char *) realloc(client_info->command.line, 
-						     sizeof(char *) * (strlen(client_info->command.remain) + 1));
-      else
-	client_info->command.line = (char *) xine_xmalloc(sizeof(char *) * 
-							  (strlen(client_info->command.remain) + 1));
+      client_info->command.line = (char *) realloc(client_info->command.line, 
+						   sizeof(char *) * (strlen(client_info->command.remain) + 1));
       
       sprintf(client_info->command.line, "%s", client_info->command.remain);
       
@@ -2730,11 +2718,8 @@ static void parse_command(client_info_t *client_info) {
     cmd = NULL;
 
   if(cmd) {
-    if(client_info->command.command)
-      client_info->command.command = (char *) realloc(client_info->command.command, 
-						      strlen(client_info->command.line) - strlen(cmd) + 1);
-    else
-      client_info->command.command = (char *) xine_xmalloc(strlen(client_info->command.line) - strlen(cmd) + 1);
+    client_info->command.command = (char *) realloc(client_info->command.command, 
+						    strlen(client_info->command.line) - strlen(cmd) + 1);
 
     memset(client_info->command.command, 0, sizeof(client_info->command.command));
     snprintf(client_info->command.command, 
@@ -2803,10 +2788,7 @@ static void parse_command(client_info_t *client_info) {
     }
   }
   else {
-    if(client_info->command.command)
-      client_info->command.command = (char *) realloc(client_info->command.command, strlen(client_info->command.line) + 1);
-    else
-      client_info->command.command = (char *) xine_xmalloc(strlen(client_info->command.line) + 1);
+    client_info->command.command = (char *) realloc(client_info->command.command, strlen(client_info->command.line) + 1);
     
     memset(client_info->command.command, 0, sizeof(client_info->command.command));
     sprintf(client_info->command.command, "%s", client_info->command.line);
@@ -2972,7 +2954,7 @@ static void *server_thread(void *data) {
     char         passwdfilename[(strlen((get_homedir())) + strlen(passwdfile)) + 2];
     struct stat  st;
     
-    sprintf(passwdfilename, "%s/%s", (get_homedir()), passwdfile);
+    snprintf(passwdfilename, sizeof(passwdfilename), "%s/%s", (get_homedir()), passwdfile);
     
     if(stat(passwdfilename, &st) < 0) {
       fprintf(stderr, "ERROR: there is no password file for network access.!\n");

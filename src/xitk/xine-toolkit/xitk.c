@@ -218,7 +218,7 @@ void xitk_usec_sleep(unsigned long usec) {
 #endif
 }
 
-int _x_error_handler(Display *display, XErrorEvent *xevent) {
+static int _x_error_handler(Display *display, XErrorEvent *xevent) {
   char buffer[2048];
   
   XGetErrorText(display, xevent->error_code, &buffer[0], 1023);

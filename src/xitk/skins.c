@@ -107,7 +107,7 @@ static void get_available_skins_from(char *path) {
     
     while((pdirent = readdir(pdir)) != NULL) {
       memset(&fullfilename, 0, sizeof(fullfilename));
-      sprintf(fullfilename, "%s/%s", path, pdirent->d_name);
+      snprintf(fullfilename, sizeof(fullfilename), "%s/%s", path, pdirent->d_name);
       
       if((is_a_dir(fullfilename))
 	 && (!(strlen(pdirent->d_name) == 1 && pdirent->d_name[0] == '.' )
@@ -118,11 +118,10 @@ static void get_available_skins_from(char *path) {
 	 * Check if a skinconfig file exist
 	 */
 	memset(&skcfgname, 0, sizeof(skcfgname));
-	sprintf(skcfgname, "%s/%s", fullfilename, "skinconfig");
+	snprintf(skcfgname, sizeof(skcfgname), "%s/%s", fullfilename, "skinconfig");
 	if(is_a_file(skcfgname)) {
 	  
-	  skins_avail = (skins_locations_t **) realloc(skins_avail, 
-						       (skins_avail_num + 2) * sizeof(skins_locations_t*));
+	  skins_avail = (skins_locations_t **) realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
 	  skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
 	  
 	  skins_avail[skins_avail_num]->pathname = strdup(path);
@@ -157,7 +156,7 @@ static void looking_for_available_skins(void) {
   skins_avail = (skins_locations_t **) xine_xmalloc(sizeof(skins_locations_t*));
   
   memset(&buf, 0, sizeof(buf));
-  sprintf(buf, "%s/.xine/skins", xine_get_homedir());
+  snprintf(buf, sizeof(buf), "%s%s", xine_get_homedir(), "/.xine/skins");
   
   get_available_skins_from(buf);
   get_available_skins_from(XINE_SKINDIR);
@@ -167,7 +166,7 @@ static void looking_for_available_skins(void) {
 /*
  * Return default skindir.
  */
-char *skin_get_skindir(void) {
+static char *skin_get_skindir(void) {
   static char          tmp[2048];
   xine_cfg_entry_t     entry;
   char                *skin;
@@ -187,7 +186,7 @@ char *skin_get_skindir(void) {
 /*
  * Return the full pathname the skin (default) configfile.
  */
-char *skin_get_configfile(void) {
+static char *skin_get_configfile(void) {
   static char          tmp[2048];
   xine_cfg_entry_t  entry;
   char                *skin;
@@ -222,7 +221,7 @@ int get_available_skins_num(void) {
 /*
  *
  */
-int get_skin_offset(char *skin) {
+static int get_skin_offset(char *skin) {
   int i = 0;
   
   while(skins_avail[i] != NULL) {
@@ -237,7 +236,7 @@ int get_skin_offset(char *skin) {
  * Try to find desired skin in skins_avail, then return
  * a pointer to the right entry.
  */
-skins_locations_t *get_skin_location(char *skin) {
+static skins_locations_t *get_skin_location(char *skin) {
   int i = 0;
   
   while(skins_avail[i] != NULL) {
@@ -272,7 +271,7 @@ static int change_skin(skins_locations_t *sk) {
 
  __reload_skin:
   memset(&buf, 0, sizeof(buf));
-  sprintf(buf, "%s/%s", sks->pathname, sks->skin);
+  snprintf(buf, sizeof(buf), "%s/%s", sks->pathname, sks->skin);
 
   if(!xitk_skin_load_config(nskin_config, buf, "skinconfig")) {
     skins_locations_t   *osks;
@@ -401,7 +400,7 @@ const char *skin_get_current_skin_dir(void) {
   (void) xine_config_lookup_entry(gGui->xine, "gui.skin", &entry);
   skin_num = entry.num_value;
   
-  sprintf(skin_dir, "%s/%s", skins_avail[skin_num]->pathname, skins_avail[skin_num]->skin);
+  snprintf(skin_dir, sizeof(skin_dir), "%s/%s", skins_avail[skin_num]->pathname, skins_avail[skin_num]->skin);
 
   return (const char *) &skin_dir;
 }
@@ -472,7 +471,7 @@ void init_skins_support(void) {
   
  __reload_skin:
   memset(&buf, 0, XITK_PATH_MAX + XITK_NAME_MAX);
-  sprintf(buf, "%s/%s", sk->pathname, sk->skin);
+  snprintf(buf, sizeof(buf), "%s/%s", sk->pathname, sk->skin);
   
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
     if(!twice_load) {
@@ -498,7 +497,7 @@ void init_skins_support(void) {
 	    buf, (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
     config_update_num("gui.skin", (get_skin_offset(DEFAULT_SKIN)));
     sk = get_skin_location(DEFAULT_SKIN);
-    sprintf(buf, "%s/%s", sk->pathname, sk->skin);
+    snprintf(buf, sizeof(buf), "%s/%s", sk->pathname, sk->skin);
     if(!twice) {
       twice++;
       goto __reload_skin;
@@ -624,10 +623,7 @@ static slx_entry_t **skins_get_slx_entries(char *url) {
 		printf("--\n");
 #endif
 		
-		if(entries_slx == 0)
-		  slxs = (slx_entry_t **) xine_xmalloc(sizeof(slx_entry_t *) * 2);
-		else
-		  slxs = (slx_entry_t **) realloc(slxs, sizeof(slx_entry_t *) * (entries_slx + 2));
+		slxs = (slx_entry_t **) realloc(slxs, sizeof(slx_entry_t *) * (entries_slx + 2));
 		
 		slxs[entries_slx] = (slx_entry_t *) xine_xmalloc(sizeof(slx_entry_t));
 		slxs[entries_slx]->name            = strdup(slx.name);
@@ -788,7 +784,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
       skpname++;
     
     memset(&tmpfile, 0, sizeof(tmpfile));
-    sprintf(tmpfile, "/tmp/%d%s", (unsigned int)time(NULL), skpname);
+    snprintf(tmpfile, sizeof(tmpfile), "%s%d%s", "/tmp/", (unsigned int)time(NULL), skpname);
     
     if((fd = fopen(tmpfile, "w+b")) != NULL) {
       ImlibImage    *img = NULL;
@@ -889,7 +885,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
       filename++;
       
       memset(&skindir, 0, sizeof(skindir));
-      sprintf(skindir, "%s/.xine/skins", xine_get_homedir());
+      snprintf(skindir, sizeof(skindir), "%s%s", xine_get_homedir(), "/.xine/skins");
       
       /*
        * Make sure to have the directory
@@ -905,7 +901,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	FILE  *fd;
 	
 	memset(&tmpskin, 0, sizeof(tmpskin));
-	sprintf(tmpskin, "/tmp/%d%s", (unsigned int)time(NULL), filename);
+	snprintf(tmpskin, sizeof(tmpskin), "%s%d%s", "/tmp/", (unsigned int)time(NULL), filename);
 	
 	if((fd = fopen(tmpskin, "w+b")) != NULL) {
 	  char      buffer[2048];
@@ -918,7 +914,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 
 	  memset(&buffer, 0, sizeof(buffer));
 	  
-	  sprintf(buffer, "which tar > /dev/null 2>&1 && tar -C %s -xzf %s", skindir, tmpskin);
+	  snprintf(buffer, sizeof(buffer), "%s %s %s %s", "which tar > /dev/null 2>&1 && tar -C ", skindir, "-xzf", tmpskin);
 	  xine_system(0, buffer);
 	  unlink(tmpskin);
 
@@ -926,12 +922,12 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  snprintf(buffer, ((strlen(filename) + 1) - 7), "%s", filename);
 
 	  memset(&fskin_path, 0, sizeof(fskin_path));
-	  sprintf(fskin_path, "%s/%s/%s", skindir, buffer, "doinst.sh");
+	  snprintf(fskin_path, sizeof(fskin_path), "%s/%s/%s", skindir, buffer, "doinst.sh");
 	  if(is_a_file(fskin_path)) {
 	    char doinst[2048];
 
 	    memset(&doinst, 0, sizeof(doinst));
-	    sprintf(doinst, "cd %s/%s && ./doinst.sh", skindir, buffer);
+	    snprintf(doinst, sizeof(doinst), "%s %s/%s %s", "cd", skindir, buffer, "&& ./doinst.sh");
 	    xine_system(0, doinst);
 	  }
 	  
@@ -944,8 +940,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  }
 	  
 	  if(skin_found == -1) {
-	    skins_avail = (skins_locations_t **) realloc(skins_avail, 
-							 (skins_avail_num + 2) * sizeof(skins_locations_t*));
+	    skins_avail = (skins_locations_t **) realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
 	    skin_names = (char **) realloc(skin_names, (skins_avail_num + 2) * sizeof(char *));
 	    
 	    skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
@@ -1147,10 +1142,7 @@ void download_skin(char *url) {
     i = 0;
     while(slxs[i]) {
 
-      if(i == 0)
-	skdloader->entries = (char **) xine_xmalloc(sizeof(char *) * 2);
-      else
-	skdloader->entries = (char **) realloc(skdloader->entries, sizeof(char *) * (i + 2));
+      skdloader->entries = (char **) realloc(skdloader->entries, sizeof(char *) * (i + 2));
       
       skdloader->entries[i] = strdup(slxs[i]->name);
       i++;

@@ -26,6 +26,7 @@
 #endif
 
 #include "main.h"
+#include "config_wrapper.h"
 
 extern struct fbxine fbxine;
 int get_bool_value(const char *val);
