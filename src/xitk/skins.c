@@ -121,7 +121,7 @@ static void looking_for_available_skins(void) {
   sprintf(buf, "%s/.xine/skins", xine_get_homedir());
   
   get_available_skins_from(buf);
-  /* FIXME_API: XINE_SKINDIR? get_available_skins_from(XINE_SKINDIR); */
+  get_available_skins_from(XINE_SKINDIR);
   
 }
 
@@ -142,8 +142,7 @@ char *skin_get_skindir(void) {
   else
     skin = DEFAULT_SKIN;
   
-  /* FIXME_API: XINE_SKINDIR? snprintf(tmp, 2048, "%s/%s", XINE_SKINDIR, skin); */
-  snprintf(tmp, 2048, "%s/%s", "/usr/share/xine/skins/", skin);
+  snprintf(tmp, 2048, "%s/%s", XINE_SKINDIR, skin);
   
   return tmp;
 }
@@ -165,8 +164,7 @@ char *skin_get_configfile(void) {
   else
     skin = DEFAULT_SKIN;
   
-  /* FIXME_API: XINE_SKINDIR? snprintf(tmp, 2048, "%s/%s/skinconfig", XINE_SKINDIR, skin); */
-  snprintf(tmp, 2048, "%s/%s/skinconfig", "/usr/share/xine/skins/", skin);
+  snprintf(tmp, 2048, "%s/%s/skinconfig", XINE_SKINDIR, skin);
 
   return tmp;
 }
