@@ -290,7 +290,6 @@ int main(int argc, char *argv[]) {
   char            *audio_driver_id = NULL;
   char            *video_driver_id = NULL;
   ao_functions_t  *audio_driver = NULL ;
-  vo_driver_t     *video_driver = NULL;
   double           res_h, res_v;
   x11_visual_t     vis;
 
@@ -457,11 +456,12 @@ int main(int argc, char *argv[]) {
   vis.calc_dest_size    = video_window_calc_dest_size;
   vis.request_dest_size = video_window_adapt_size;
 
-  video_driver = xine_load_video_output_plugin(gGui->config, video_driver_id,
-					       VISUAL_TYPE_X11, 
-					       (void *) &vis);
+  gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
+						  video_driver_id,
+						  VISUAL_TYPE_X11, 
+						  (void *) &vis);
   
-  if (!video_driver) {
+  if (!gGui->vo_driver) {
     printf ("main: video driver <%s> failed\n", video_driver_id);
     exit (1);
   }
@@ -492,7 +492,7 @@ int main(int argc, char *argv[]) {
 
   printf ("main: starting xine engine\n");
 
-  gGui->xine = xine_init (video_driver, audio_driver, 
+  gGui->xine = xine_init (gGui->vo_driver, audio_driver, 
 			  gui_status_callback, gGui->config);
 
   printf ("main: (pre-)selection audio/spu channels\n");
