@@ -51,12 +51,12 @@ static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
 #define WGNEXT              2
 
 #define WINDOW_WIDTH        500
-#define WINDOW_HEIGHT       600
+#define WINDOW_HEIGHT       480
 
 #define FRAME_WIDTH         350
 #define FRAME_HEIGHT        40
 
-#define MAX_DISPLAY_WIDGETS 11
+#define MAX_DISPLAY_WIDGETS 8
 
 #define ADD_FRAME(title) {                                                                      \
     xitk_widget_t       *frame = NULL;                                                          \
