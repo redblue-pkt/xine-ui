@@ -305,8 +305,8 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 
 void gui_set_current_position (int pos) {
 
-  if (!xine_is_stream_seekable (gGui->xine)) 
-    return;
+  if((xine_is_stream_seekable (gGui->xine)) == 0)
+     return;
 
   gGui->ignore_status = 1;
   if(!xine_play (gGui->xine, gGui->filename, pos, 0))
