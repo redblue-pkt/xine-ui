@@ -107,6 +107,13 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       gGui->visual_anim.running = 1;
 
   }
+  else if(has_video && gGui->post_video && (gGui->post_video_num > 0)) {
+    xine_post_out_t *video_source;
+    
+    video_source = xine_get_video_source(stream);
+    if(xine_post_wire_video_port(video_source, gGui->post_video->video_input[0]))
+      printf("xine_post_wire_video_port() succeed\n");
+  }
   
   if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0) {
     gui_handle_xine_error(stream);

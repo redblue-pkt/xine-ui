@@ -76,7 +76,8 @@ int                           no_lirc;
 
 static char                 **video_driver_ids;
 static char                 **audio_driver_ids;
-static char                 **post_output_plugins;
+static char                 **post_audio_plugins;
+static char                 **post_video_plugins;
 static window_attributes_t    window_attribute;
 
 #define CONFIGFILE "config2"
@@ -369,16 +370,55 @@ static void main_change_logo_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->logo_mrl = cfg->str_value;
 }
 
-static void post_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
+static void post_audio_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->visual_anim.post_plugin_num = cfg->num_value;
 
-  if(gGui->visual_anim.post_output)
+  if(gGui->visual_anim.post_output) {
+    xine_post_out_t *audio_source;
+
+    audio_source = xine_get_audio_source(gGui->stream);
+    (void) xine_post_wire_audio_port(audio_source, gGui->ao_port);
+    
     xine_post_dispose(gGui->xine, gGui->visual_anim.post_output);
-  
+  }
+
   gGui->visual_anim.post_output = 
     xine_post_init(gGui->xine,
-		   post_output_plugins[gGui->visual_anim.post_plugin_num], 0,
+		   post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
 		   &gGui->ao_port, &gGui->vo_port);
+  
+  if(gGui->visual_anim.post_output && 
+     (gGui->visual_anim.enabled == 1) && (gGui->visual_anim.running == 1)) {
+    xine_post_out_t *audio_source;
+    
+    audio_source = xine_get_audio_source(gGui->stream);
+    (void) xine_post_wire_audio_port(audio_source, gGui->visual_anim.post_output->audio_input[0]);
+  } 
+}
+
+static void post_video_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->post_video_num = cfg->num_value;
+
+  if(gGui->post_video) {
+    xine_post_out_t *video_source;
+    
+    video_source = xine_get_video_source(gGui->stream);
+    (void) xine_post_wire_video_port(video_source, gGui->vo_port);
+    xine_post_dispose(gGui->xine, gGui->post_video);
+  }
+  
+  gGui->post_video = 
+    xine_post_init(gGui->xine,
+		   post_video_plugins[(gGui->post_video_num == 0) ? 1 : gGui->post_video_num],
+		   0, &gGui->ao_port, &gGui->vo_port);
+  
+  if(gGui->post_video && (gGui->post_video_num > 0)) {
+    xine_post_out_t *video_source;
+    
+    video_source = xine_get_video_source(gGui->stream);
+    if(xine_post_wire_video_port(video_source, gGui->post_video->video_input[0]))
+      printf("xine_post_wire_video_port() succeed\n");
+  }
 }
 
 /*
@@ -1266,13 +1306,13 @@ int main(int argc, char *argv[]) {
 	
 	if(post) {
 	  if(num_plug == 0)
-	    post_output_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+	    post_audio_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
 	  else
-	    post_output_plugins = (char **) realloc(post_output_plugins, 
-						    sizeof(char *) * (num_plug + 1));
+	    post_audio_plugins = (char **) realloc(post_audio_plugins, 
+						   sizeof(char *) * (num_plug + 1));
 	  
-	  post_output_plugins[num_plug]     = strdup(pol[i]);
-	  post_output_plugins[num_plug + 1] = NULL;
+	  post_audio_plugins[num_plug]     = strdup(pol[i]);
+	  post_audio_plugins[num_plug + 1] = NULL;
 	  num_plug++;
 
 	  xine_post_dispose(gGui->xine, post);
@@ -1281,23 +1321,74 @@ int main(int argc, char *argv[]) {
       }
       
       gGui->visual_anim.post_plugin_num = 
-	xine_config_register_enum(gGui->xine, "gui.post_output_plugin", 
-				  0, post_output_plugins,
-				  _("Post output plugin"),
-				  _("Post output plugin to used with video less stream playback"),
+	xine_config_register_enum(gGui->xine, "gui.post_audio_plugin", 
+				  0, post_audio_plugins,
+				  _("Post audio plugin"),
+				  _("Post audio plugin to used with video less stream playback"),
 				  CONFIG_LEVEL_BEG,
-				  post_plugin_cb, 
+				  post_audio_plugin_cb, 
 				  CONFIG_NO_DATA);
       
       gGui->visual_anim.post_output = 
 	xine_post_init(gGui->xine,
-		       post_output_plugins[gGui->visual_anim.post_plugin_num], 0,
+		       post_audio_plugins[gGui->visual_anim.post_plugin_num], 0,
 		       &gGui->ao_port, &gGui->vo_port);
       
     }
     else {
       gGui->visual_anim.post_output = NULL;
       gGui->visual_anim.post_plugin_num = -1;
+    }
+
+  }
+
+  {
+    const char *const *pol = xine_list_post_plugins_typed(gGui->xine, XINE_POST_TYPE_VIDEO_FILTER);
+    
+    if(pol) {
+      int  i = 0;
+      int  num_plug = 0;
+      
+      /* We're only interested by post plugin which handle video in input */
+      post_video_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
+      post_video_plugins[num_plug]     = strdup(_("None"));
+      post_video_plugins[num_plug + 1] = NULL;
+      num_plug++;
+      
+      while(pol[i]) {
+	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
+	
+	if(post) {
+	  post_video_plugins = (char **) realloc(post_video_plugins, 
+						 sizeof(char *) * (num_plug + 2));
+	  
+	  post_video_plugins[num_plug]     = strdup(pol[i]);
+	  post_video_plugins[num_plug + 1] = NULL;
+	  num_plug++;
+
+	  xine_post_dispose(gGui->xine, post);
+	}
+	i++;
+      }
+      
+      gGui->post_video_num = 
+	xine_config_register_enum(gGui->xine, "gui.post_video_plugin", 
+				  0, post_video_plugins,
+				  _("Post video plugin"),
+				  _("Post video plugin"),
+				  CONFIG_LEVEL_BEG,
+				  post_video_plugin_cb,
+				  CONFIG_NO_DATA);
+      
+      gGui->post_video = 
+      	xine_post_init(gGui->xine,
+      		       post_video_plugins[(gGui->post_video_num == 0) ? 1 : gGui->post_video_num],
+		       0, &gGui->ao_port, &gGui->vo_port);
+      
+    }
+    else {
+      gGui->post_video = NULL;
+      gGui->post_video_num = -1;
     }
 
   }

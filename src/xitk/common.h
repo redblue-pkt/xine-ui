@@ -120,6 +120,8 @@
 
 typedef struct {
   xine_video_port_t        *vo_port;
+  int                       post_video_num;
+  xine_post_t              *post_video;
 
   struct {
     int                     hue;
