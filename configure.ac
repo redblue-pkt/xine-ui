@@ -792,7 +792,7 @@ eval XINE_SKINDIR=`eval echo "$XINE_SKINDIR"`
 AC_SUBST(XINE_SKINDIR)
 AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of xine skin directory])
 
-XINE_LOGO_MRL="file://$XINE_SKINDIR/xine_logo.mpv"
+XINE_LOGO_MRL="file:$XINE_SKINDIR/xine_logo.mpv"
 AC_SUBST(XINE_LOGO_MRL)
 AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL",[official logo mrl])
 
