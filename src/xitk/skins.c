@@ -322,7 +322,7 @@ void init_skins_support(void) {
   
   looking_for_available_skins();
   
-  if(skins_avail == NULL) {
+  if((skins_avail == NULL) || (skins_avail_num == 0)) {
     fprintf(stderr, _("No available skin found. Say goodbye.\n"));
     exit(-1);
   }
