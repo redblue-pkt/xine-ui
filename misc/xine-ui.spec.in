@@ -13,7 +13,7 @@
 
 Name:        %{name}
 Summary:     A Free Audio/Video Player.
-Summary(cs): Volnì ¹iøitelný audio/video pøehrávaè
+Summary(cs): Volný audio a video pøehrávaè
 Summary(de): Ein freies Audio- und Video-Abspielprogramm
 Version:     %{version}
 Release:     %{release}
@@ -32,8 +32,8 @@ uses libxine for audio/video decoding and playback. For more informations on
 what formats are supported, please refer to the libxine documentation.
 
 %description -l cs
-xine je velmi atraktivní volnì ¹iøitelný audio/video pøehrávaè pro unixovské
-systémy, který pou¾ívá libxine pro dekódování zvuku a videa a pøehrávání.
+xine je víceúèelový volnì ¹iøitelný audio a video pøehrávaè pro unixovské
+systémy, který pou¾ívá libxine k dekódování zvuku a videa a k pøehrávání.
 Více informací o tom, jaké formáty jsou podporovány získáte v dokumentaci
 od libxine.
 
@@ -259,7 +259,7 @@ rm -rf $RPM_BUILD_ROOT
 * Sun May 20 2002 Matthias Dahl <matthew2k@web.de>
 - added kde3 support by Manfred Tremmel <Manfred.Tremmel@iiv.de>
 * Sat May 18 2002 Matthias Dahl <matthew2k@web.de>
-- added czech translations by valtri@atlas.cz
+- added czech translations by Frantisek Dvorak <valtri@atlas.cz>
 * Thu May 16 2002 Matthias Dahl <matthew2k@web.de>
 - replaced %configure because it was causing trouble on some configurations
 * Sat May 11 2002 Matthias Dahl <matthew2k@web.de>
