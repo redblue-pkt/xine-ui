@@ -43,7 +43,10 @@
 #include <unistd.h>
 #include <errno.h>
 #include <aalib.h>
-
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+       
 #include <xine.h>
 #include <xine/xineutils.h>
 
@@ -77,30 +80,23 @@ typedef struct {
     int                mute;
   } mixer;
 
-
-#ifdef DEBUG
-  int               debug_level;
-#endif
+  int               debug_messages;
 } aaxine_t;
 
 static aaxine_t aaxine;
 
 /* options args */
 static const char *short_options = "?h"
-#ifdef DEBUG
- "d:"
-#endif
- "a:qA:R::v";
+ "da:qA:V:R::v";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
-#ifdef DEBUG
-  {"debug"          , required_argument, 0, 'd' },
-#endif
+  {"debug"          , no_argument      , 0, 'd' },
   {"audio-channel"  , required_argument, 0, 'a' },
   {"auto-quit"      , no_argument      , 0, 'q' },
   {"audio-driver"   , required_argument, 0, 'A' },
+  {"video-driver"   , required_argument, 0, 'V' },
   {"recognize-by"   , optional_argument, 0, 'R' },
-  {"version"        , optional_argument, 0, 'v' },
+  {"version"        , no_argument      , 0, 'v' },
   {0                , no_argument      , 0,  0  }
 };
 
@@ -109,7 +105,7 @@ static struct option long_options[] = {
  */
 static void show_version(void) {
 
-  printf("This is xine (aalib ui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
+  printf("This is xine (aalib ui) - a free video player v%s\n(c) 2000-2002 by G. Bartsch and the xine project team.\n", VERSION);
 }
 
 /*
@@ -140,6 +136,21 @@ static void print_usage (void) {
   printf("  -v, --version                Display version.\n");
   printf("AAXINE options:\n");
   printf("  -q, --auto-quit              Quit after playing all mrl's.\n");
+  printf("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n");
+  printf("                               ");
+  driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_AA);
+  driver_id  = *driver_ids++;
+  while (driver_id) {
+    printf ("%s ", driver_id);
+    driver_id  = *driver_ids++;
+  }
+  driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_FB);
+  driver_id  = *driver_ids++;
+  while (driver_id) {
+    printf ("%s ", driver_id);
+    driver_id  = *driver_ids++;
+  }
+  printf ("\n");
   printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
   printf("                               ");
   driver_ids = xine_list_audio_output_plugins ();
@@ -156,9 +167,7 @@ static void print_usage (void) {
   printf("                                 'content': only by content,\n");
   printf("                                 'extension': only by extension.\n");
   printf("                                 -if no option is given, 'revert' is selected\n");
-#ifdef DEBUG
-  printf("  -d, --debug <flags>          Debug mode for <flags> ('help' for list).\n");
-#endif
+  printf("  -d, --debug                  Show debug messages.\n");
   printf("\n");
   printf("Examples for valid MRLs (media resource locator):\n");
   printf("  File:  'path/foo.vob'\n");
@@ -225,49 +234,6 @@ static void set_position (int pos) {
   aaxine.ignore_status = 0;
 }
 
-#ifdef DEBUG
-/*
- * *FIXME* Turn on some debug info.
- */
-static int handle_debug_subopt(char *sopt) {
-  int i, subopt;
-  char *str = sopt;
-  char *val = NULL;
-  char *debuglvl[] = {
-    "verbose", "metronom", "audio", "demux", 
-    "input", "video", "pts", "mpeg", "avi", 
-    "ac3", "loop", "gui",
-    NULL
-  };
-
-  while(*str) {
-    subopt = getsubopt(&str, debuglvl, &val);
-    switch(subopt) {
-    case -1:
-      i = 0;
-      fprintf(stderr, "Valid debug flags are:\n\t");
-      while(debuglvl[i] != NULL) {
-	fprintf(stderr,"%s, ", debuglvl[i]);
-	i++;
-      }
-      fprintf(stderr, "\b\b.\n");
-      return 0;
-    default:
-      /* If debug feature is already enabled, with
-       * XINE_DEBUG envvar, turn it off
-       */
-      if((aaxine.debug_level & 0x8000>>(subopt + 1)))
-	aaxine.debug_level &= ~0x8000>>(subopt + 1);
-      else
-	aaxine.debug_level |= 0x8000>>(subopt + 1);
-      break;
-    }
-  }
-
-  return 1;
-}
-#endif
-
 /*
  * Extract mrls from argv[] and store them to playlist.
  */
@@ -291,6 +257,7 @@ int main(int argc, char *argv[]) {
   int            key;
   char          *configfile;
   char          *audio_driver_id = NULL;
+  char          *video_driver_id = NULL;
   int            audio_channel   = 0;
   char          *driver_name;
 
@@ -304,12 +271,10 @@ int main(int argc, char *argv[]) {
     goto failure;
   }
 
-#ifdef DEBUG
-  aaxine.debug_level = 0;
-#endif
   aaxine.num_mrls = 0;
   aaxine.current_mrl = 0;
   aaxine.auto_quit = 0; /* default: loop forever */
+  aaxine.debug_messages = 0;
 
   /* 
    * AALib help and option-parsing
@@ -319,14 +284,6 @@ int main(int argc, char *argv[]) {
     goto failure;
   }
 
-#ifdef DEBUG
-  /* If XINE_DEBUG envvar is set, parse it */
-  if(getenv("XINE_DEBUG") != NULL) {
-    if(!(handle_debug_subopt(xine_chomp((getenv("XINE_DEBUG"))))))
-      exit(1);
-  }
-#endif
-
   /*
    * parse command line
    */
@@ -335,14 +292,9 @@ int main(int argc, char *argv[]) {
 			 long_options, &option_index)) != EOF) {
     switch(c) {
 
-#ifdef DEBUG      
-    case 'd': /* Select debug levels */
-      if(optarg != NULL) {
-	if(!(handle_debug_subopt(xine_chomp(optarg))))
-	  exit(1);
-      }
+    case 'd': /* Enable debug messages */
+      aaxine.debug_messages = 1;
       break;
-#endif
 
     case 'a': /* Select audio channel */
       sscanf(optarg, "%i", &audio_channel);
@@ -362,6 +314,16 @@ int main(int argc, char *argv[]) {
       }
       break;
 
+    case 'V': /* Select video driver */
+      if(optarg != NULL) {
+	video_driver_id = xine_xmalloc (strlen (optarg) + 1);
+	strcpy (video_driver_id, optarg);
+      } else {
+	fprintf (stderr, "video driver id required for -V option\n");
+	exit (1);
+      }
+      break;
+      
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -429,11 +391,21 @@ int main(int argc, char *argv[]) {
   /*
    * init video output driver
    */
+  if(!video_driver_id)
+    video_driver_id = "aa";
+
   aaxine.vo_driver = xine_load_video_output_plugin(aaxine.config, 
-						   "aa",
+						   video_driver_id,
 						   VISUAL_TYPE_AA, 
 						   (void *) aaxine.context);
-  
+
+  if (!aaxine.vo_driver) {
+    aaxine.vo_driver = xine_load_video_output_plugin(aaxine.config, 
+						     video_driver_id,
+						     VISUAL_TYPE_FB, 
+						     NULL);
+  }
+    
   if (!aaxine.vo_driver) {
     printf ("main: video driver aa failed\n");
     goto failure;
@@ -491,12 +463,19 @@ int main(int argc, char *argv[]) {
   xine_select_audio_channel (aaxine.xine, audio_channel);
 
   /* Kick off terminal pollution */
-#ifndef DEBUG
-  close(0);
-  close(1);
-  close(2);
-#endif
-
+  if( !aaxine.debug_messages ) {
+    int error_fd;
+    
+    if ( (error_fd = open("/dev/null", O_WRONLY)) < 0)
+         printf("cannot open /dev/null");
+    else {
+      if ( dup2 (error_fd, STDOUT_FILENO) < 0)
+           printf("cannot dup2 stdout");
+      if ( dup2 (error_fd, STDERR_FILENO) < 0)
+           printf("cannot dup2 stderr");
+    }
+  }
+  
   /*
    * ui loop
    */
