@@ -5,6 +5,7 @@ datadir = $(XINE_DESKTOPDIR)
 data_DATA = xine_16x16.png xine_22x22.png xine_32x32.png xine_48x48.png \
 	xine.desktop xine.wmconfig xine.xpm
 
+LN_S = @LN_S@ -f
 debug:
 install-debug: install
 
@@ -18,9 +19,9 @@ install-data-hook:
 	  $(LN_S) @XINE_DESKTOPDIR@/xine.xpm $(DESTDIR)/usr/share/icons/xine.xpm; \
 	  $(mkinstalldirs) $(DESTDIR)/usr/share/pixmaps; \
 	  $(LN_S) @XINE_DESKTOPDIR@/xine.xpm $(DESTDIR)/usr/share/pixmaps/xine.xpm; \
-	  $(mkinstalldirs) $(DESTDIR)/etc/X11/wmconfig; \
-	  $(LN_S) @XINE_DESKTOPDIR@/xine.wmconfig $(DESTDIR)/etc/X11/wmconfig/xine; \
-
+	  if test -d /etc/X11/wmconfig; then \
+	    $(LN_S) @XINE_DESKTOPDIR@/xine.wmconfig $(DESTDIR)/etc/X11/wmconfig/xine; \
+	  fi; \
 	  if test -d /etc/X11/applnk/; then \
 	    $(mkinstalldirs) $(DESTDIR)/etc/X11/applnk/Multimedia; \
 	    $(LN_S) @XINE_DESKTOPDIR@/xine.desktop $(DESTDIR)/etc/X11/applnk/Multimedia/xine.desktop; \
