@@ -28,9 +28,9 @@
 #include "config.h"
 #endif
 
-#include "xitk.h"
+#include <xine.h>
 
-#include "xine.h"
+#include "xitk.h"
 
 typedef void (*select_cb_t) (xitk_widget_t *, void *);
 

@@ -78,6 +78,20 @@ AC_SUBST(BUILD_LIB_STATIC)
 
 
 dnl
+dnl NLS Support
+dnl
+dnl AM_WITH_NLS(use-libtool,,)
+dnl ALL_LINGUAS="cs da de el en@quot en@boldquot es et fr gl id it ja ko nl nn no pl pt pt_BR ru sl sv tr zh"
+ALL_LINGUAS="fr"
+AM_GNU_GETTEXT dnl (use-libtool)
+AC_LINK_FILES($nls_cv_header_libgt, $nls_cv_header_intl)
+if test x"$USE_INCLUDED_LIBINTL" = x"yes"; then
+   INTLDIR="-I\$(top_builddir)/intl -I\$(top_srcdir)/intl"
+fi
+AC_SUBST(INTLDIR)
+
+
+dnl
 dnl Checks for typedefs, structures, and compiler characteristics.
 dnl
 AC_C_CONST
@@ -508,9 +522,24 @@ XINE_DESKTOPDIR="`echo $xine_desktop_dir|sed -e 's/\^'$escapedprefix/'\${prefix}
 AC_SUBST(XINE_DESKTOPDIR)
 
 dnl
+dnl NLS, part II
+dnl
+if test "x$prefix" = xNONE; then
+   prefix="${ac_default_prefix}"
+fi
+if test "x$exec_prefix" = xNONE; then
+   exec_prefix='${prefix}'
+fi
+XITK_LOCALEDIR="${datadir}/locale"
+eval XITK_LOCALE=`eval echo "$XITK_LOCALEDIR"`
+AC_SUBST(XITK_LOCALE)
+AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XITK_LOCALE")
+
+
+dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
 dnl
-INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include'
+INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
 AC_SUBST(INCLUDES)
 
 AC_DEFINE(NEED_MRLBROWSER)
@@ -522,12 +551,14 @@ dnl
 AC_OUTPUT([
 Makefile
 m4/Makefile
+intl/Makefile
 src/Makefile
 src/common/Makefile
 src/corba/Makefile
 src/Imlib-light/Makefile
 src/xitk/Makefile
 src/xitk/xine-toolkit/Makefile
+src/xitk/xine-toolkit/po/Makefile.in
 src/xitk/skins/Makefile
 src/xitk/skins/metal/Makefile
 src/xitk/skins/lcd/Makefile
@@ -551,4 +582,5 @@ misc/build_rpms.sh
 misc/SlackBuild
 misc/xine-ui.spec
 misc/desktops/Makefile
+po/Makefile.in
 ],[chmod +x ./misc/SlackBuild ./misc/build_rpms.sh])

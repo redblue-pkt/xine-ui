@@ -4,7 +4,7 @@
 
 AUTOMAKE_OPTIONS = 1.3
 
-SUBDIRS = src m4 doc misc
+SUBDIRS = intl src m4 doc misc po
 
 EXTRA_DIST = cvscompile.sh automake.diff \
              debian/README.Debian debian/changelog debian/control \

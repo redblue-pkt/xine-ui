@@ -29,7 +29,6 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
-#include <pwd.h>
 #include <time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -40,95 +39,6 @@ extern int errno;
 #ifndef __GNUC__
 #define	__FUNCTION__	__func__
 #endif
-
-/*
- *
- */
-void *xmalloc(size_t size) {
-  void *ptr;
-
-  if((ptr = malloc(size)) == NULL) {
-    fprintf(stderr, "%s: malloc() failed: %s.\n",
-	    __FUNCTION__, strerror(errno));
-    return NULL;
-  }
-
-  memset(ptr, 0, size);
-
-  return ptr;
-}
-
-/*
- *
- */
-void *xmalloc_aligned (size_t alignment, size_t size) {
-  void *pMem;
-
-  pMem = xmalloc (size+alignment);
-
-  while ((int) pMem % alignment)
-    pMem++;
-
-  return pMem;
-}
-
-/*
- *
- */
-const char *get_homedir(void) {
-  struct passwd *pw = NULL;
-  char *homedir = NULL;
-#ifdef HAVE_GETPWUID_R
-  int ret;
-  struct passwd pwd;
-  char *buffer = NULL;
-  int bufsize = 128;
-
-  buffer = (char *) xmalloc(bufsize);
-  
-  if((ret = getpwuid_r(getuid(), &pwd, buffer, bufsize, &pw)) < 0) {
-#else
-  if((pw = getpwuid(getuid())) == NULL) {
-#endif
-    if((homedir = getenv("HOME")) == NULL) {
-      fprintf(stderr, "Unable to get home directory, set it to /tmp.\n");
-      homedir = strdup("/tmp");
-    }
-  }
-  else {
-    if(pw) 
-      homedir = strdup(pw->pw_dir);
-  }
-  
-  
-#ifdef HAVE_GETPWUID_R
-  if(buffer) 
-    free(buffer);
-#endif
-  
-  return homedir;
-}
-
-/*
- *
- */
-char *chomp(char *str) {
-  char *pbuf;
-
-  pbuf = str;
-
-  while(*pbuf != '\0') pbuf++;
-
-  while(pbuf > str) {
-    if(*pbuf == '\r' || *pbuf == '\n' || *pbuf == '"') pbuf = '\0';
-    pbuf--;
-  }
-
-  while(*pbuf == '=' || *pbuf == '"') pbuf++;
-
-  return pbuf;
-}
-
 
 /*
  * A thread-safe usecond sleep

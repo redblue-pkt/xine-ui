@@ -39,24 +39,6 @@
   } while (0)
 #endif
 
-void *xmalloc(size_t size);
-
-void *xmalloc_aligned(size_t alignment, size_t size);
-
-const char *get_homedir(void);
-
-/*
- * Clean a string (remove spaces and '=' at the begin,
- * and '\n', '\r' and spaces at the end.
- */
-
-char *chomp (char *str);
-
-/*
- * A thread-safe usecond sleep
- */
-void xine_usec_sleep(unsigned usec);
-
 /*
  * Execute a shell command.
  */

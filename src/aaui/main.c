@@ -43,15 +43,14 @@
 #include <errno.h>
 #include <aalib.h>
 
+#include <xine.h>
+#include <xine/xineutils.h>
+
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
 #else
 #  include "getopt.h"
 #endif
-
-#include "utils.h"
-
-#include "xine.h"
 
 /*
  * global variables
@@ -311,7 +310,7 @@ int main(int argc, char *argv[]) {
 #ifdef DEBUG
   /* If XINE_DEBUG envvar is set, parse it */
   if(getenv("XINE_DEBUG") != NULL) {
-    if(!(handle_debug_subopt(chomp((getenv("XINE_DEBUG"))))))
+    if(!(handle_debug_subopt(xine_chomp((getenv("XINE_DEBUG"))))))
       exit(1);
   }
 #endif
@@ -327,7 +326,7 @@ int main(int argc, char *argv[]) {
 #ifdef DEBUG      
     case 'd': /* Select debug levels */
       if(optarg != NULL) {
-	if(!(handle_debug_subopt(chomp(optarg))))
+	if(!(handle_debug_subopt(xine_chomp(optarg))))
 	  exit(1);
       }
       break;
@@ -343,7 +342,7 @@ int main(int argc, char *argv[]) {
 
     case 'A': /* Select audio driver */
       if(optarg != NULL) {
-	audio_driver_id = xmalloc (strlen (optarg) + 1);
+	audio_driver_id = xine_xmalloc (strlen (optarg) + 1);
 	strcpy (audio_driver_id, optarg);
       } else {
 	fprintf (stderr, "audio driver id required for -A option\n");
@@ -384,8 +383,8 @@ int main(int argc, char *argv[]) {
   {
     char *homedir;
 
-    homedir = strdup(get_homedir());
-    configfile = (char *) xmalloc(strlen(homedir) + 8 + 1);
+    homedir = strdup(xine_get_homedir());
+    configfile = (char *) xine_xmalloc(strlen(homedir) + 8 + 1);
 
     sprintf (configfile, "%s/.xinerc", homedir);
   }

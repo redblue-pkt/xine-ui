@@ -37,6 +37,8 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
+#include <xine.h>
+
 #include "_xitk.h"
 #include "mrlbrowser.h"
 #include "browser.h"
@@ -46,8 +48,6 @@
 #include "dnd.h"
 #include "widget.h"
 #include "widget_types.h"
-
-#include "xine.h"
 
 /*
  *

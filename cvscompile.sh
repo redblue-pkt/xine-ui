@@ -6,7 +6,7 @@ rm -f config.cache
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-m4_files="_xine.m4 ORBit.m4 xine.m4 aa.m4"
+m4_files="_xine.m4 ORBit.m4 xine.m4 aa.m4 gettext.m4"
 if test -d m4; then
     rm -f acinclude.m4
     for m4f in $m4_files; do

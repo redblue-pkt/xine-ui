@@ -588,6 +588,15 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+#ifdef HAVE_SETLOCALE
+  setlocale (LC_ALL, "");
+#endif
+
+  bindtextdomain("xitk", XITK_LOCALE);
+  textdomain("xitk");
+
+  bindtextdomain("xitk", XITK_LOCALE);
+
   /* Create window */
   test->xwin = xitk_window_create_dialog_window(test->imlibdata,
 						"My Fucking Window", 

@@ -35,7 +35,7 @@
 #include "event.h"
 #include "skins.h"
 #include "xitk.h"
-#include "utils.h"
+#include <xine/xineutils.h>
 
 #ifndef NAME_MAX
 #define NAME_MAX 256
@@ -78,7 +78,7 @@ static void get_available_skins_from(char *path) {
 		  && (pdirent->d_name[0] == '.' && pdirent->d_name[1] == '.')))) {
 	skins_avail = (skins_locations_t **) 
 	  realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
-	skins_avail[skins_avail_num] = (skins_locations_t *) xmalloc(sizeof(skins_locations_t));
+	skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
 	
 	skins_avail[skins_avail_num]->pathname = strdup(path);
 	skins_avail[skins_avail_num]->skin = strdup(pdirent->d_name);
@@ -96,10 +96,10 @@ static void get_available_skins_from(char *path) {
 static void looking_for_available_skins(void) {
   char    buf[NAME_MAX];
 
-  skins_avail = (skins_locations_t **) xmalloc(sizeof(skins_locations_t*));
+  skins_avail = (skins_locations_t **) xine_xmalloc(sizeof(skins_locations_t*));
   
   memset(&buf, 0, sizeof(buf));
-  sprintf(buf, "%s/.xineskins", get_homedir());
+  sprintf(buf, "%s/.xineskins", xine_get_homedir());
 
   get_available_skins_from(buf);
   get_available_skins_from(XINE_SKINDIR);
@@ -200,10 +200,8 @@ void change_skin(skins_locations_t *sk) {
   sprintf(buf, "%s/%s", sks->pathname, sks->skin);
   
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
-    printf("Failed to load %s/%s. Reload old skin '%s'.\n", buf, "skinconfig", old_skin);
-    
+    xine_error("Failed to load %s/%s. Reload old skin '%s'.\n", buf, "skinconfig", old_skin);
     gGui->config->update_string (gGui->config, "gui.skin", old_skin);
-
     sks = get_skin_location(old_skin);
     if(!twice) {
       twice++;
@@ -233,7 +231,7 @@ void init_skins_support(void) {
   looking_for_available_skins();
   
   if(skins_avail == NULL) {
-    printf("No available skin found. Say goodbye.\n");
+    xine_error("No available skin found. Say goodbye.\n");
     exit(-1);
   }
   
@@ -246,17 +244,15 @@ void init_skins_support(void) {
   memset(&buf, 0, sizeof(buf));
 
   if(!sk) {
-    printf("skins: skin '%s' not found, use fallback '%s'.\n", skin, DEFAULT_SKIN);
-
+    xine_error("Ooch, skin '%s' not found, use fallback '%s'.\n", skin, DEFAULT_SKIN);
     gGui->config->update_string (gGui->config, "gui.skin", (char *)sk->skin);
-
     sprintf(buf, "%s/%s", XINE_SKINDIR, DEFAULT_SKIN);
   } else {
     sprintf(buf, "%s/%s", sk->pathname, sk->skin);
   }
   
   if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
-    printf("Failed to load %s/%s. Exiting.\n", buf, "skinconfig");
+    xine_error("Failed to load %s/%s. Exiting.\n", buf, "skinconfig");
     xitk_skin_free_config(gGui->skin_config);
     exit(-1);
   }

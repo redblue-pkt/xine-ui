@@ -38,12 +38,10 @@
 
 #include <xine.h>
 #include <xine/video_out_x11.h>
-
-#include "xine.h"
+#include <xine/xineutils.h>
 
 #include "xitk.h"
 
-#include "utils.h"
 #include "Imlib-light/Imlib.h"
 
 #include "event.h"
@@ -309,7 +307,7 @@ void video_window_adapt_size (void *this,
 	  if(gVw->fullscreen_mode && search == 0)
 	    gGui->XF86VidMode_fullscreen = 0;
        } else {
-	  printf("XF86VidMode Extension: modeline switching failed.\n");
+	  xine_error("XF86VidMode Extension: modeline switching failed.\n");
        }
     }
   }
@@ -635,7 +633,7 @@ void video_window_init (void) {
   int                 dummy_query_event, dummy_query_error;
 #endif
 
-  gVw = (gVw_t *) xmalloc(sizeof(gVw_t));
+  gVw = (gVw_t *) xine_xmalloc(sizeof(gVw_t));
 
   gVw->fullscreen_req                   = 0;
   gVw->fullscreen_mode                  = 0;

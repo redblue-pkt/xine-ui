@@ -38,9 +38,9 @@
 #include "event.h"
 #include "actions.h"
 #include "mrl_browser.h"
-#include "utils.h"
 
-#include "xine.h"
+#include <xine.h>
+#include <xine/xineutils.h>
 
 #define MAX_LIST 9
 
@@ -64,7 +64,7 @@ static _playlist_t   *playlist;
 #define MOVEUP 1
 #define MOVEDN 2
 
-#define PL_FILENAME  ".xinepl"
+#define PL_FILENAME  "playlist"
 
 
 void playlist_handle_event(XEvent *event, void *data);
@@ -328,9 +328,9 @@ static void pl_load_pl(xitk_widget_t *w, void *data) {
   memset(&buf, 0, sizeof(buf));
   memset(&tmpbuf, 0, sizeof(tmpbuf));
   
-  sprintf(tmpbuf, "%s/%s", get_homedir(), PL_FILENAME);
+  sprintf(tmpbuf, "%s/.xine/%s", xine_get_homedir(), PL_FILENAME);
   if((plfile = fopen(tmpbuf, "r")) == NULL) {
-    fprintf(stderr, "Can't read %s: %s\n", tmpbuf, strerror(errno));
+    xine_error(_("Can't read %s: %s\n"), tmpbuf, strerror(errno));
     return;
   }
   else {
@@ -343,7 +343,7 @@ static void pl_load_pl(xitk_widget_t *w, void *data) {
 	
 	while(*ln == ' ' || *ln == '\t') ++ln ;
 	
-	tmp_playlist[tmp_playlist_num] = (char *) xmalloc(strlen(ln));
+	tmp_playlist[tmp_playlist_num] = (char *) xine_xmalloc(strlen(ln));
 	strncpy(tmp_playlist[tmp_playlist_num], ln, strlen(ln)-1);
 	tmp_playlist[tmp_playlist_num][strlen(ln)-1] = '\0';
 	
@@ -385,9 +385,9 @@ static void pl_save_pl(xitk_widget_t *w, void *data) {
   memset(&buf, 0, sizeof(buf));
   memset(&tmpbuf, 0, sizeof(tmpbuf));
 
-  sprintf(tmpbuf, "%s/%s", get_homedir(), PL_FILENAME);
+  sprintf(tmpbuf, "%s/.xine/%s", xine_get_homedir(), PL_FILENAME);
   if((plfile = fopen(tmpbuf, "w")) == NULL) {
-    fprintf(stderr, "Can't read %s: %s\n", tmpbuf, strerror(errno));
+    xine_error(_("Can't read %s: %s\n"), tmpbuf, strerror(errno));
     return;
   }
   else {
@@ -565,7 +565,7 @@ void playlist_change_skins(void) {
     if(!(playlist->bg_image = 
 	 Imlib_load_image(gGui->imlib_data,
 			  xitk_skin_get_skin_filename(gGui->skin_config, "PlBG")))) {
-      fprintf(stderr, "%s(): couldn't find image for background\n", __FUNCTION__);
+      xine_error("%s(): couldn't find image for background\n", __FUNCTION__);
       exit(-1);
     }
     
@@ -635,13 +635,13 @@ void playlist_editor(void) {
   XITK_WIDGET_INIT(&inp, gGui->imlib_data);
   XITK_WIDGET_INIT(&b, gGui->imlib_data);
 
-  playlist = (_playlist_t *) xmalloc(sizeof(_playlist_t));
+  playlist = (_playlist_t *) xine_xmalloc(sizeof(_playlist_t));
 
   XLockDisplay (gGui->display);
 
   if (!(playlist->bg_image = Imlib_load_image(gGui->imlib_data,
 					      xitk_skin_get_skin_filename(gGui->skin_config, "PlBG")))) {
-    fprintf(stderr, "xine-playlist: couldn't find image for background\n");
+    xine_error("xine-playlist: couldn't find image for background\n");
     exit(-1);
   }
 
@@ -778,7 +778,7 @@ void playlist_editor(void) {
 
   lb.skin_element_name = "PlAdd";
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Add";
+  lb.label             = _("Add");
   lb.callback          = open_mrlbrowser;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -787,7 +787,7 @@ void playlist_editor(void) {
 
   lb.skin_element_name = "PlLoad";
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Load";
+  lb.label             = _("Load");
   lb.callback          = pl_load_pl;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -796,7 +796,7 @@ void playlist_editor(void) {
 
   lb.skin_element_name = "PlSave";
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Save";
+  lb.label             = _("Save");
   lb.callback          = pl_save_pl;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -805,7 +805,7 @@ void playlist_editor(void) {
 
   lb.skin_element_name = "PlDismiss";
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Dismiss";
+  lb.label             = _("Dismiss");
   lb.callback          = pl_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
@@ -828,7 +828,7 @@ void playlist_editor(void) {
 			    xitk_browser_create(gGui->skin_config, &br)));
 
   lbl.skin_element_name = "AutoPlayLbl";
-  lbl.label             = "Scan for:";
+  lbl.label             = _("Scan for:");
   xitk_list_append_content (playlist->widget_list->l,
 			    xitk_label_create (gGui->skin_config, &lbl));
   

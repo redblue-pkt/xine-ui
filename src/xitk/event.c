@@ -51,8 +51,8 @@
 #include "panel.h"
 #include "actions.h"
 #include <xine/video_out_x11.h>
-#include "xine.h"
-#include "utils.h"
+#include <xine.h>
+#include <xine/xineutils.h>
 #include "xscreensaver-remote.h"
 #include "mrl_browser.h"
 #include "skins.h"
@@ -839,8 +839,8 @@ void gui_init (int nfiles, char *filenames[]) {
    */
 
   if (!XInitThreads ()) {
-    printf ("\nXInitThreads failed - looks like you don't have a "
-	    "thread-safe xlib.\n");
+    printf (_("\nXInitThreads failed - looks like you don't have a "
+	    "thread-safe xlib.\n"));
     exit (1);
   } 
 
@@ -849,7 +849,7 @@ void gui_init (int nfiles, char *filenames[]) {
     display_name = getenv("DISPLAY");
   
   if((gGui->display = XOpenDisplay(display_name)) == NULL) {
-    fprintf(stderr, "Cannot open display\n");
+    fprintf(stderr, _("Cannot open display\n"));
     exit(1);
   }
 
@@ -883,7 +883,7 @@ void gui_init (int nfiles, char *filenames[]) {
   }
   gGui->imlib_data = Imlib_init_with_params (gGui->display, &imlib_init);
   if (gGui->imlib_data == NULL) {
-    fprintf(stderr, "Unable to initialize Imlib\n");
+    fprintf(stderr, _("Unable to initialize Imlib\n"));
     exit(1);
   }
 
@@ -893,7 +893,7 @@ void gui_init (int nfiles, char *filenames[]) {
    */
   sprintf(buffer, "%s/xine_logo.png", XINE_SKINDIR);
   if((gGui->video_window_logo_image = Imlib_load_image(gGui->imlib_data, buffer)) == NULL) {
-    fprintf(stderr, "Unable to load %s logo\n", buffer);
+    xine_error(_("Unable to load %s logo\n"), buffer);
     exit(1);
   }
 
@@ -1049,6 +1049,7 @@ void gui_run (void) {
 
   gGui->running = 0;
   
+  kbindings_save_kbinding(gGui->kbindings);
   kbindings_free_kbinding(&gGui->kbindings);
 
   reenable_screensavers();

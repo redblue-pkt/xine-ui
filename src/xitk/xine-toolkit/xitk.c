@@ -576,6 +576,10 @@ void xitk_init(Display *display) {
 
   xitk_pid = getppid();
 
+#ifdef ENABLE_NLS
+  bindtextdomain("xitk", XITK_LOCALE);
+#endif  
+
   gXitk = (__xitk_t *) xitk_xmalloc(sizeof(__xitk_t));
 
   gXitk->list    = xitk_list_new();

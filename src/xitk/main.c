@@ -51,11 +51,14 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
+#include <locale.h>
+
+#include <xine.h>
+#include <xine/video_out_x11.h>
+#include <xine/xineutils.h>
+
 #include "xitk.h"
 
-#include "xine.h"
-#include <xine/video_out_x11.h>
-#include "utils.h"
 #include "event.h"
 #include "videowin.h"
 #include "panel.h"
@@ -132,12 +135,12 @@ void show_version(void) {
 void show_banner(void) {
 
   show_version();
-  printf("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n",
-	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, 
-	 XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
-  printf("Found xine library version: %d.%d.%d (%s).\n",
-	 xine_get_major_version(), xine_get_minor_version(),
-	 xine_get_sub_version(), xine_get_str_version());
+  printf(_("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n"),
+	   XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, 
+	   XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
+  printf(_("Found xine library version: %d.%d.%d (%s).\n"),
+	   xine_get_major_version(), xine_get_minor_version(),
+	   xine_get_sub_version(), xine_get_str_version());
 
 }
 
@@ -150,11 +153,11 @@ void show_usage (void) {
   char  *driver_id;
 
   printf("\n");
-  printf("Usage: xine [OPTIONS]... [MRL]\n");
+  printf(_("Usage: xine [OPTIONS]... [MRL]\n"));
   printf("\n");
-  printf("  -v, --version                Display version.\n");
+  printf(_("  -v, --version                Display version.\n"));
   printf("OPTIONS are:\n");
-  printf("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n");
+  printf(_("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n"));
   printf("                               ");
   driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
   driver_id  = *driver_ids++;
@@ -163,7 +166,7 @@ void show_usage (void) {
     driver_id  = *driver_ids++;
   }
   printf ("\n");
-  printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
+  printf(_("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n"));
   printf("                               null ");
   driver_ids = xine_list_audio_output_plugins ();
   driver_id  = *driver_ids++;
@@ -173,39 +176,38 @@ void show_usage (void) {
   }
   printf ("\n");
 
-  printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
-  printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
-  printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
-  printf("                    'f': in fullscreen mode.\n");
-  printf("                    'h': hide GUI (panel, etc.).\n");
-  printf("                    'q': quit when play is done.\n");
-  printf("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n");
-  printf("                    'v': retrieve plqaylist from VCD. (deprecated. use -s VCD)\n");
-  printf("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n");
-  printf("  -f, --fullscreen             start in fullscreen mode,\n");
-  printf("  -g, --hide-gui               hide GUI (panel, etc.)\n");
-  printf("  -H, --hide-video             hide video window\n");
+  printf(_("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"));
+  printf(_("  -a, --audio-channel <#>      Select audio channel '#'.\n"));
+  printf(_("  -p, --auto-play [opt]        Play on start. Can be followed by:\n"));
+  printf(_("                    'f': in fullscreen mode.\n"));
+  printf(_("                    'h': hide GUI (panel, etc.).\n"));
+  printf(_("                    'q': quit when play is done.\n"));
+  printf(_("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n"));
+  printf(_("                    'v': retrieve plqaylist from VCD. (deprecated. use -s VCD)\n"));
+  printf(_("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"));
+  printf(_("  -f, --fullscreen             start in fullscreen mode,\n"));
+  printf(_("  -g, --hide-gui               hide GUI (panel, etc.)\n"));
+  printf(_("  -H, --hide-video             hide video window\n"));
 #ifdef HAVE_LIRC
-  printf("  -L, --no-lirc                Turn off LIRC support.\n");
+  printf(_("  -L, --no-lirc                Turn off LIRC support.\n"));
 #endif
-  printf("      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n");
-  printf("                               is either an X11 visual class, or a visual id.\n");
-  printf("      --install                Install a private colormap.\n");
-  printf("      --keymap [option]        Display keymap. Option are:\n");
-  printf("                                 'default': display default keymap table,\n");
-  printf("                                 'lirc': display draft of a .lircrc config file.\n");
-  printf("                                 'remapped': user remapped keymap table.\n");
-  printf("                                 -if no option is given, 'default' is selected.\n");
-
+  printf(_("      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"));
+  printf(_("                               is either an X11 visual class, or a visual id.\n"));
+  printf(_("      --install                Install a private colormap.\n"));
+  printf(_("      --keymap [option]        Display keymap. Option are:\n"));
+  printf(_("                                 'default': display default keymap table,\n"));
+  printf(_("                                 'lirc': display draft of a .lircrc config file.\n"));
+  printf(_("                                 'remapped': user remapped keymap table.\n"));
+  printf(_("                                 -if no option is given, 'default' is selected.\n"));
   printf("\n");
-  printf("examples for valid MRLs (media resource locator):\n");
-  printf("  File:  'path/foo.vob'\n");
-  printf("         '/path/foo.vob'\n");
-  printf("         'file://path/foo.vob'\n");
-  printf("         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n");
-  printf("         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n");
-  printf("  DVD:   'dvd://VTS_01_2.VOB'\n");
-  printf("  VCD:   'vcd://<track number>'\n");
+  printf(_("examples for valid MRLs (media resource locator):\n"));
+  printf(_("  File:  'path/foo.vob'\n"));
+  printf(_("         '/path/foo.vob'\n"));
+  printf(_("         'file://path/foo.vob'\n"));
+  printf(_("         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"));
+  printf(_("         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"));
+  printf(_("  DVD:   'dvd://VTS_01_2.VOB'\n"));
+  printf(_("  VCD:   'vcd://<track number>'\n"));
   printf("\n");
 }
 
@@ -224,7 +226,7 @@ static void load_video_out_driver(char *video_driver_id) {
   res_v                 = (DisplayHeight (gGui->display, gGui->screen)*1000
 			   / DisplayHeightMM (gGui->display, gGui->screen));
   vis.display_ratio     = res_h / res_v;
-#ifdef	DEBUG
+#ifdef DEBUG
   printf("display_ratio: %f\n", vis.display_ratio);
 #endif
 
@@ -236,7 +238,7 @@ static void load_video_out_driver(char *video_driver_id) {
      * perfect square pixels.
      */
     vis.display_ratio   = 1.0;
-#ifdef	DEBUG
+#ifdef DEBUG
     printf("display_ratio: corrected to square pixels!\n");
 #endif
   }
@@ -271,7 +273,7 @@ static void load_video_out_driver(char *video_driver_id) {
     while (driver_ids[i]) {
       video_driver_id = driver_ids[i];
       
-      printf ("main: probing <%s> video output plugin\n", video_driver_id);
+      printf (_("main: probing <%s> video output plugin\n"), video_driver_id);
 
       gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
 						      video_driver_id,
@@ -287,7 +289,7 @@ static void load_video_out_driver(char *video_driver_id) {
     }
       
     if (!gGui->vo_driver) {
-      printf ("main: all available video drivers failed.\n");
+      printf (_("main: all available video drivers failed.\n"));
       exit (1);
     }
 
@@ -299,7 +301,7 @@ static void load_video_out_driver(char *video_driver_id) {
 						    (void *) &vis);
     
     if (!gGui->vo_driver) {
-      printf ("main: video driver <%s> failed\n", video_driver_id);
+      printf (_("main: video driver <%s> failed\n"), video_driver_id);
       exit (1);
     }
   }
@@ -333,7 +335,7 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
     while ( driver_ids[i] != NULL ) {
       audio_driver_id = driver_ids[i];
 
-      printf("main: trying to autoload '%s' audio driver: ", driver_ids[i]);
+      printf(_("main: trying to autoload '%s' audio driver: "), driver_ids[i]);
       
       audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						    driver_ids[i]);
@@ -350,8 +352,7 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 
       i++;
     }
-
-    printf ("main: audio driver probing failed => no audio output\n");
+    printf(_("main: audio driver probing failed => no audio output\n"));
 	    
     gGui->config->update_string (gGui->config, "audio.driver", 
 				 "null");
@@ -368,14 +369,18 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
       audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						   audio_driver_id);
       if (!audio_driver) {
-	printf ("main: the specified audio driver '%s' failed\n",
+	printf (_("main: the specified audio driver '%s' failed\n",
 		audio_driver_id);
 	exit(1);
       }
     }
   }
 
+  if (!(*audio_driver))
+    printf (_("main: audio driver <%s> failed\n"), audio_driver_id);
+
   return audio_driver;
+
 }
 
 /*
@@ -435,7 +440,7 @@ int main(int argc, char *argv[]) {
 
   /* Check xine library version */
   if(!xine_check_version(0, 9, 4)) {
-    fprintf(stderr, "Require xine library version 0.9.4, found %d.%d.%d.\n",
+    fprintf(stderr, _("Require xine library version 0.9.4, found %d.%d.%d.\n"),
 	    xine_get_major_version(), xine_get_minor_version(),
 	    xine_get_sub_version());
     exit(1);
@@ -447,7 +452,14 @@ int main(int argc, char *argv[]) {
     printf ("video_out: sigprocmask failed.\n");
   }
 
-  gGui = (gGui_t *) xmalloc(sizeof(gGui_t));
+#ifdef HAVE_SETLOCALE
+  setlocale (LC_ALL, "");
+#endif
+
+  bindtextdomain(PACKAGE, XITK_LOCALE);
+  textdomain(PACKAGE);
+  
+  gGui = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
 
   gGui->debug_level = 0;
   gGui->autoscan_plugin = NULL;
@@ -492,21 +504,21 @@ int main(int argc, char *argv[]) {
 
     case 'V': /* select video driver by plugin id */
       if(optarg != NULL) {
-	video_driver_id = xmalloc (strlen (optarg) + 1);
+	video_driver_id = xine_xmalloc (strlen (optarg) + 1);
 	strncpy (video_driver_id, optarg, strlen (optarg));
 	printf("video_driver_id = '%s'\n", video_driver_id);
       } else {
-	fprintf (stderr, "video driver id required for -V option\n");
+	fprintf (stderr, _("video driver id required for -V option\n"));
 	exit (1);
       }
       break;
 
     case 'A': /* Select audio driver */
       if(optarg != NULL) {
-	audio_driver_id = xmalloc (strlen (optarg) + 1);
+	audio_driver_id = xine_xmalloc (strlen (optarg) + 1);
 	strcpy (audio_driver_id, optarg);
       } else {
-	fprintf (stderr, "audio driver id required for -A option\n");
+	fprintf (stderr, _("audio driver id required for -A option\n"));
 	exit (1);
       }
       break;
@@ -545,7 +557,7 @@ int main(int argc, char *argv[]) {
       break;
 
     case 's': /* autoscan on start */
-      gGui->autoscan_plugin = chomp(optarg);
+      gGui->autoscan_plugin = xine_chomp(optarg);
       break;
        
     case OPTION_VISUAL:
@@ -575,7 +587,7 @@ int main(int argc, char *argv[]) {
 
     case DISPLAY_KEYMAP:
       if(optarg != NULL) {
-	char *p = chomp(optarg);
+	char *p = xine_chomp(optarg);
 	if(!strcasecmp(p, "default"))
 	  kbindings_display_default_bindings();
 	else if(!strcasecmp(p, "lirc"))
@@ -603,7 +615,7 @@ int main(int argc, char *argv[]) {
 
     default:
       show_usage();
-      fprintf (stderr, "invalid argument %d => exit\n",c);
+      fprintf (stderr, _("invalid argument %d => exit\n"), c);
       exit(1);
     }
   }
@@ -619,8 +631,8 @@ int main(int argc, char *argv[]) {
     char *homedir;
 
     if (!(gGui->configfile = getenv ("XINERC"))) {
-      homedir = strdup(get_homedir());
-      gGui->configfile = (char *) xmalloc(strlen(homedir) + 8 + 1);
+      homedir = strdup(xine_get_homedir());
+      gGui->configfile = (char *) xine_xmalloc(strlen(homedir) + 8 + 1);
 
       sprintf (gGui->configfile, "%s/.xine/config", homedir);
     }
@@ -681,4 +693,3 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
-

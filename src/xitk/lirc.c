@@ -120,10 +120,8 @@ void init_lirc(void) {
 
   gGui->lirc_enable = 1;
 
-  if(gGui->lirc_enable) {
+  if(gGui->lirc_enable)
     pthread_create (&lirc.thread, NULL, xine_lirc_loop, NULL) ;
-    printf ("gui_main: LIRC thread created\n");
-  }
 }
 
 void deinit_lirc(void) {

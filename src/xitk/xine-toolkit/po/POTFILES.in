@@ -1,0 +1,22 @@
+# For updating this file, look at the result of:
+#  $ grep -l '[^A-Za-z_]_(' {src/xitk/xine-toolkit,src/xitk}/*.[chy]
+
+src/xitk/xine-toolkit/test.c
+src/xitk/xine-toolkit/xitk.c
+src/xitk/xine-toolkit/window.c
+src/xitk/xine-toolkit/mrlbrowser.c
+src/xitk/xine-toolkit/browser.c
+src/xitk/xine-toolkit/button.c
+src/xitk/xine-toolkit/checkbox.c
+src/xitk/xine-toolkit/combo.c
+src/xitk/xine-toolkit/dnd.c
+src/xitk/xine-toolkit/filebrowser.c
+src/xitk/xine-toolkit/font.c
+src/xitk/xine-toolkit/image.c
+src/xitk/xine-toolkit/inputtext.c
+src/xitk/xine-toolkit/labelbutton.c
+src/xitk/xine-toolkit/label.c
+src/xitk/xine-toolkit/list.c
+src/xitk/xine-toolkit/skin.c
+src/xitk/xine-toolkit/slider.c
+src/xitk/xine-toolkit/widget.c

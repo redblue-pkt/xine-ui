@@ -32,10 +32,11 @@
 
 #include <stdlib.h>
 #include <X11/Xlib.h>
+#include "xitkintl.h"
 #include "Imlib-light/Imlib.h"
 
 #ifdef NEED_MRLBROWSER
-#include "xine.h"
+#include <xine.h>
 #endif
 
 #define XITK_WIDGET_MAGIC 0x7869746b
@@ -1480,6 +1481,11 @@ void xitk_window_dialog_ok(ImlibData *im, char *title,
   if(((im) == NULL) || ((message) == NULL))                                                      \
     return;                                                                                      \
   xitk_window_dialog_ok_with_width(im, "Error", NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
+}
+#define xitk_window_dialog_info(im, message, args...) {                                         \
+  if(((im) == NULL) || ((message) == NULL))                                                      \
+    return;                                                                                      \
+  xitk_window_dialog_ok_with_width(im, "Information", NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
 }
 
 /**

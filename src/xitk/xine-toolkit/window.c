@@ -112,10 +112,11 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   XSizeHints             hint;
   XWMHints              *wm_hint;
   XSetWindowAttributes   attr;
-  Atom                   prop;
+  Atom                   prop, XA_WIN_LAYER;
   XColor                 black, dummy;
   MWMHints               mwmhints;
   XClassHint            *xclasshint;
+  long                   data[1];
 
   if((im == NULL) || (width == 0 || height == 0))
     return NULL;
@@ -150,6 +151,13 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
 
+  XA_WIN_LAYER = XInternAtom(im->x.disp, "_WIN_LAYER", False);
+  
+  data[0] = 10;
+  XChangeProperty(im->x.disp, xwin->window, XA_WIN_LAYER,
+		  XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		  1);
+  
   prop = XInternAtom(im->x.disp, "_MOTIF_WM_HINTS", False);
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
@@ -525,7 +533,7 @@ void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
 
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "OK";
+  lb.label             = _("OK");
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -657,7 +665,7 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Yes";
+  lb.label             = _("Yes");
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -670,7 +678,7 @@ void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "No";
+  lb.label             = _("No");
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -806,7 +814,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 
   XITK_WIDGET_INIT(&lb, im);
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Yes";
+  lb.label             = _("Yes");
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -819,7 +827,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "No";
+  lb.label             = _("No");
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;
@@ -832,7 +840,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 					   "Black", "Black", "White", DEFAULT_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Cancel";
+  lb.label             = _("Cancel");
   lb.callback          = _xitk_window_destroy_window;
   lb.state_callback    = NULL;
   lb.userdata          = (void*)wd;

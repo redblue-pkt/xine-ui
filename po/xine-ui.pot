@@ -1,0 +1,341 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2001-11-18 16:30+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/xitk/control.c:308
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr ""
+
+#: src/xitk/control.c:379
+msgid "xine-playlist: couldn't find image for background\n"
+msgstr ""
+
+#: src/xitk/control.c:504
+msgid "Hue"
+msgstr ""
+
+#: src/xitk/control.c:527
+msgid "Sat"
+msgstr ""
+
+#: src/xitk/control.c:550
+msgid "Brt"
+msgstr ""
+
+#: src/xitk/control.c:573
+msgid "Ctr"
+msgstr ""
+
+#: src/xitk/control.c:609
+msgid "Choose a Skin"
+msgstr ""
+
+#: src/xitk/control.c:646 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:808
+msgid "Dismiss"
+msgstr ""
+
+#: src/xitk/event.c:842
+msgid ""
+"\n"
+"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+msgstr ""
+
+#: src/xitk/event.c:852
+msgid "Cannot open display\n"
+msgstr ""
+
+#: src/xitk/event.c:886
+msgid "Unable to initialize Imlib\n"
+msgstr ""
+
+#: src/xitk/event.c:896
+#, c-format
+msgid "Unable to load %s logo\n"
+msgstr ""
+
+#: src/xitk/file_browser.c:182
+msgid "Xine File Browser"
+msgstr ""
+
+#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:196
+msgid "Select"
+msgstr ""
+
+#: src/xitk/kbindings.c:311
+#, c-format
+msgid "Key bindings of '%s' and '%s' are similar.\n"
+msgstr ""
+
+#: src/xitk/kbindings.c:670
+msgid "OOCH: key binding table is NULL.\n"
+msgstr ""
+
+#: src/xitk/main.c:138
+#, c-format
+msgid "Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n"
+msgstr ""
+
+#: src/xitk/main.c:141
+#, c-format
+msgid "Found xine library version: %d.%d.%d (%s).\n"
+msgstr ""
+
+#: src/xitk/main.c:156
+msgid "Usage: xine [OPTIONS]... [MRL]\n"
+msgstr ""
+
+#: src/xitk/main.c:158
+msgid "  -v, --version                Display version.\n"
+msgstr ""
+
+#: src/xitk/main.c:160
+msgid ""
+"  -V, --video-driver <drv>     Select video driver by id. Available "
+"drivers: \n"
+msgstr ""
+
+#: src/xitk/main.c:169
+msgid ""
+"  -A, --audio-driver <drv>     Select audio driver by id. Available "
+"drivers: \n"
+msgstr ""
+
+#: src/xitk/main.c:179
+msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
+msgstr ""
+
+#: src/xitk/main.c:180
+msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
+msgstr ""
+
+#: src/xitk/main.c:181
+msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
+msgstr ""
+
+#: src/xitk/main.c:182
+msgid "                    'f': in fullscreen mode.\n"
+msgstr ""
+
+#: src/xitk/main.c:183
+msgid "                    'h': hide GUI (panel, etc.).\n"
+msgstr ""
+
+#: src/xitk/main.c:184
+msgid "                    'q': quit when play is done.\n"
+msgstr ""
+
+#: src/xitk/main.c:185
+msgid ""
+"                    'd': retrieve playlist from DVD. (deprecated. use -s "
+"DVD)\n"
+msgstr ""
+
+#: src/xitk/main.c:186
+msgid ""
+"                    'v': retrieve plqaylist from VCD. (deprecated. use -s "
+"VCD)\n"
+msgstr ""
+
+#: src/xitk/main.c:187
+msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
+msgstr ""
+
+#: src/xitk/main.c:188
+msgid "  -f, --fullscreen             start in fullscreen mode,\n"
+msgstr ""
+
+#: src/xitk/main.c:189
+msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
+msgstr ""
+
+#: src/xitk/main.c:190
+msgid "  -H, --hide-video             hide video window\n"
+msgstr ""
+
+#: src/xitk/main.c:192
+msgid "  -L, --no-lirc                Turn off LIRC support.\n"
+msgstr ""
+
+#: src/xitk/main.c:194
+msgid ""
+"      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+msgstr ""
+
+#: src/xitk/main.c:195
+msgid ""
+"                               is either an X11 visual class, or a visual "
+"id.\n"
+msgstr ""
+
+#: src/xitk/main.c:196
+msgid "      --install                Install a private colormap.\n"
+msgstr ""
+
+#: src/xitk/main.c:197
+msgid "      --keymap [option]        Display keymap. Option are:\n"
+msgstr ""
+
+#: src/xitk/main.c:198
+msgid ""
+"                                 'default': display default keymap table,\n"
+msgstr ""
+
+#: src/xitk/main.c:199
+msgid ""
+"                                 'lirc': display draft of a .lircrc config "
+"file.\n"
+msgstr ""
+
+#: src/xitk/main.c:200
+msgid ""
+"                                 'remapped': user remapped keymap table.\n"
+msgstr ""
+
+#: src/xitk/main.c:201
+msgid ""
+"                                 -if no option is given, 'default' is "
+"selected.\n"
+msgstr ""
+
+#: src/xitk/main.c:203
+msgid "examples for valid MRLs (media resource locator):\n"
+msgstr ""
+
+#: src/xitk/main.c:204
+msgid "  File:  'path/foo.vob'\n"
+msgstr ""
+
+#: src/xitk/main.c:205
+msgid "         '/path/foo.vob'\n"
+msgstr ""
+
+#: src/xitk/main.c:206
+msgid "         'file://path/foo.vob'\n"
+msgstr ""
+
+#: src/xitk/main.c:207
+msgid "         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
+msgstr ""
+
+#: src/xitk/main.c:208
+msgid "         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
+msgstr ""
+
+#: src/xitk/main.c:209
+msgid "  DVD:   'dvd://VTS_01_2.VOB'\n"
+msgstr ""
+
+#: src/xitk/main.c:210
+msgid "  VCD:   'vcd://<track number>'\n"
+msgstr ""
+
+#: src/xitk/main.c:276
+#, c-format
+msgid "main: probing <%s> video output plugin\n"
+msgstr ""
+
+#: src/xitk/main.c:292
+msgid "main: all available video drivers failed.\n"
+msgstr ""
+
+#: src/xitk/main.c:304
+#, c-format
+msgid "main: video driver <%s> failed\n"
+msgstr ""
+
+#: src/xitk/main.c:339
+#, c-format
+msgid "main: trying to autoload '%s' audio driver: "
+msgstr ""
+
+#: src/xitk/main.c:352
+msgid "main: not using any audio driver (as requested).\n"
+msgstr ""
+
+#: src/xitk/main.c:360
+#, c-format
+msgid "main: the specified audio driver <%s> failed\n"
+msgstr ""
+
+#: src/xitk/main.c:368
+#, c-format
+msgid "main: audio driver <%s> failed\n"
+msgstr ""
+
+#: src/xitk/main.c:429
+#, c-format
+msgid "Require xine library version 0.9.4, found %d.%d.%d.\n"
+msgstr ""
+
+#: src/xitk/main.c:497
+msgid "video driver id required for -V option\n"
+msgstr ""
+
+#: src/xitk/main.c:507
+msgid "audio driver id required for -A option\n"
+msgstr ""
+
+#: src/xitk/main.c:604
+#, c-format
+msgid "invalid argument %d => exit\n"
+msgstr ""
+
+#: src/xitk/mrl_browser.c:185
+msgid "Xine MRL Browser"
+msgstr ""
+
+#: src/xitk/mrl_browser.c:212
+msgid "Source:"
+msgstr ""
+
+#: src/xitk/playlist.c:333 src/xitk/playlist.c:390
+#, c-format
+msgid "Can't read %s: %s\n"
+msgstr ""
+
+#: src/xitk/playlist.c:781
+msgid "Add"
+msgstr ""
+
+#: src/xitk/playlist.c:790
+msgid "Load"
+msgstr ""
+
+#: src/xitk/playlist.c:799
+msgid "Save"
+msgstr ""
+
+#: src/xitk/playlist.c:831
+msgid "Scan for:"
+msgstr ""
+
+#: src/xitk/snapshot.c:901
+#, c-format
+msgid ""
+"Unknown\n"
+"Error: Ratio Code %d Unknown\n"
+msgstr ""
+
+#: src/xitk/snapshot.c:935
+#, c-format
+msgid "File open failed (%s)\n"
+msgstr ""
+
+#.
+#: src/xitk/snapshot.c:1083
+#, c-format
+msgid "File '%s' written.\n"
+msgstr ""

@@ -25,16 +25,26 @@
 #define EVENT_H
 
 #include <X11/Xlib.h>
+#include <xine.h>
+
 #include "Imlib-light/Imlib.h"
 #include "kbindings.h"
 #include "xitk.h"
-#include "xine.h"
 
 #ifdef __GNUC__
 #define perr(FMT,ARGS...) {fprintf(stderr, FMT, ##ARGS);fflush(stderr);}
 #else	/* C99 version: */
 #define perr(...)	  {fprintf(stderr, __VA_ARGS__);fflush(stderr);}
 #endif
+
+#ifdef __GNUC__
+#define xine_error(FMT,ARGS...) xitk_window_dialog_error(gGui->imlib_data, FMT, ##ARGS)
+#define xine_info(FMT,ARGS...)  xitk_window_dialog_info(gGui->imlib_data, FMT, ##ARGS)
+#else	/* C99 version: */
+#define xine_error(...)	        xitk_window_dialog_error(gGui->imlib_data, __VA_ARGS__)
+#define xine_info(FMT,ARGS...)  xitk_window_dialog_info(gGui->imlib_data,  __VA_ARGS__)
+#endif
+
 
 #define MAX_PLAYLIST_LENGTH  1024
 

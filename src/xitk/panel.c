@@ -31,9 +31,10 @@
 #include <string.h>
 #include <pthread.h>
 
+#include <xine/xineutils.h>
+
 #include "xitk.h"
 
-#include "utils.h"
 
 #include "event.h"
 #include "actions.h"
@@ -43,6 +44,7 @@
 #include "panel.h"
 #include "mrl_browser.h"
 #include "snapshot.h"
+#include "utils.h"
 
 extern gGui_t     *gGui;
 
@@ -93,7 +95,7 @@ void panel_change_skins(void) {
   if(!(panel->bg_image = 
        Imlib_load_image(gGui->imlib_data,
 			xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
-    fprintf(stderr, "%s(): couldn't find image for background\n", __FUNCTION__);
+    xine_error("%s(): couldn't find image for background\n", __FUNCTION__);
     exit(-1);
   }
 
@@ -344,7 +346,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
     xine_set_audio_property(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
   }
   else
-    fprintf(stderr, "unknown widget slider caller\n");
+    xine_error("unknown widget slider caller\n");
 
   panel_check_pause();
 }
@@ -463,7 +465,7 @@ void panel_init (void) {
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
 
-  panel = (_panel_t *) xmalloc(sizeof(_panel_t));
+  panel = (_panel_t *) xine_xmalloc(sizeof(_panel_t));
 
   XLockDisplay (gGui->display);
   
@@ -473,7 +475,7 @@ void panel_init (void) {
   if (!(panel->bg_image = 
 	Imlib_load_image(gGui->imlib_data,
 			 xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
-    fprintf(stderr, "xine-panel: couldn't find image for background\n");
+    xine_error("xine-panel: couldn't find image for background\n");
     exit(-1);
   }
 

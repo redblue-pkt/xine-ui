@@ -36,6 +36,7 @@
 #include "dnd.h"
 #include "widget.h"
 #include "skin.h"
+#include "xitkintl.h"
 
 #define XITK_WIDGET_MAGIC 0x7869746b
 
@@ -44,7 +45,7 @@ typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
 
 #ifdef NEED_MRLBROWSER
-#include "xine.h"
+#include <xine.h>
 typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 #endif
 

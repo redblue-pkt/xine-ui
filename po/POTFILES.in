@@ -1,0 +1,11 @@
+# For updating this file, look at the result of:
+#  $ grep -l '[^A-Za-z_]_(' src/xitk/*.[chy]
+
+src/xitk/control.c
+src/xitk/event.c
+src/xitk/file_browser.c
+src/xitk/kbindings.c
+src/xitk/main.c
+src/xitk/mrl_browser.c
+src/xitk/playlist.c
+src/xitk/snapshot.c

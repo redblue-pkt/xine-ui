@@ -31,11 +31,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include <xine/xineutils.h>
+
 #include "xitk.h"
 
 #include "event.h"
 #include "actions.h"
-#include "utils.h"
 #include "mrl_browser.h"
 
 #define MAX_LIST 9
@@ -181,7 +182,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.y                              = gGui->config->register_num (gGui->config, "gui.mrl_browser_y", 100,
 								  "gui mrl browser y coordinate",
 								  NULL, NULL, NULL);
-  mb.window_title                   = "Xine MRL Browser";
+  mb.window_title                   = _("Xine MRL Browser");
   mb.skin_element_name              = "MrlBG";
   mb.resource_name                  = mb.window_title;
   mb.resource_class                 = "Xine";
@@ -192,14 +193,14 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.dndcallback                    = dnd_cb;
 
   mb.select.skin_element_name       = "MrlSelect";
-  mb.select.caption                 = "Select";
+  mb.select.caption                 = _("Select");
   mb.select.callback                = add_cb;
 
   mb.play.skin_element_name         = "MrlPlay";
   mb.play.callback                  = add_and_play_cb;
 
   mb.dismiss.skin_element_name      = "MrlDismiss";
-  mb.dismiss.caption                = "Dismiss";
+  mb.dismiss.caption                = _("Dismiss");
 
   mb.kill.callback                  = mrl_browser_kill;
 
@@ -208,7 +209,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.ip_name.button.skin_element_name = "MrlPlugNameBG";
 
   mb.ip_name.label.skin_element_name = "MrlPlugLabel";
-  mb.ip_name.label.label_str        = "Source:";
+  mb.ip_name.label.label_str        = _("Source:");
 
   mb.xine                           = gGui->xine;
 

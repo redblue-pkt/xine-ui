@@ -60,20 +60,18 @@
 
 #include "xitk.h"
 #include "event.h"
-#include "utils.h"
+#include <xine/xineutils.h>
 
 #include "xine.h"
-#ifdef DEBUG
 #include <xine/xineutils.h>
-#endif
 
 #include "png.h"
 #include "pngconf.h"
 
-#include "monitor.h"
-
 #define PIXSZ 3
 #define BIT_DEPTH 8
+
+extern gGui_t  *gGui;
 
 /* internal function use to scale yuv data */
 typedef void (*scale_line_func_t) (uint8_t *source, uint8_t *dest,
@@ -181,7 +179,7 @@ char* snap_filename(char *base, char *ext)
     if (filename != NULL)
 	free(filename);	
 
-    filename = (char *) xmalloc(strlen(base) + strlen(ext) + 32);
+    filename = (char *) xine_xmalloc(strlen(base) + strlen(ext) + 32);
     
     strftime(timestamp,31,"%Y%m%d-%H%M%S",tm);
     sprintf(filename,"%s-%s-%d.%s",
@@ -703,8 +701,8 @@ static int prvt_image_alloc( struct prvt_image_s **image )
     
   memset( *image, 0, sizeof( struct prvt_image_s ) );
 
-  filename = (char *) alloca(strlen(get_homedir()) + 10);
-  sprintf(filename, "%s/%s", get_homedir(), "xinesnap");
+  filename = (char *) alloca(strlen(xine_get_homedir()) + 10);
+  sprintf(filename, "%s/%s", xine_get_homedir(), "xinesnap");
 
   (*image)->file_name = snap_filename( filename, "png" );
 
@@ -811,12 +809,12 @@ static void yv12_2_rgb( struct prvt_image_s *image )
 
 static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
 {
-  printf( "  Error: %s\n", error_msg );
+  xine_error("Error: %s\n", error_msg);
 }
 
 static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
 {
-  printf( "  Warning: %s\n", warning_msg );
+  xine_error("Warning: %s\n", warning_msg);
 }
 
 /*
@@ -900,7 +898,7 @@ void create_snapshot ( gGui_t *gGui )
       break;
 
     default:                
-      printf( "Unknown\nError: Ratio Code %d Unknown\n", image->ratio_code ); 
+      xine_error(_("Unknown\nError: Ratio Code %d Unknown\n"), image->ratio_code ); 
       prvt_image_free( &image );
       return;
   }
@@ -934,7 +932,7 @@ void create_snapshot ( gGui_t *gGui )
   /**/
 
   if ( (image->fp = fopen(image->file_name, "wb")) == NULL ) {
-    printf( "  File open failed (%s)\n", image->file_name );
+    xine_error(_("File open failed (%s)\n"), image->file_name);
     prvt_image_free( &image );
     return;
   }
@@ -1082,7 +1080,7 @@ void create_snapshot ( gGui_t *gGui )
 #endif
 
   /**/
-  printf("file '%s' written\n", image->file_name);
+  xine_info(_("File '%s' written.\n"), image->file_name);
 
   printf("  prvt_image_free\n" );
   prvt_image_free( &image );

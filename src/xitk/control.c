@@ -33,14 +33,15 @@
 #include <X11/keysym.h>
 #include <pthread.h>
 
+#include <xine.h>
+#include <xine/xineutils.h>
+
 #include "xitk.h"
 
 #include "Imlib-light/Imlib.h"
 #include "event.h"
-#include "utils.h"
 #include "actions.h"
 #include "skins.h"
-#include "xine.h"
 
 extern gGui_t          *gGui;
 
@@ -304,7 +305,7 @@ void control_change_skins(void) {
     if(!(control->bg_image = 
 	 Imlib_load_image(gGui->imlib_data,
 			  xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
-      fprintf(stderr, "%s(): couldn't find image for background\n", __FUNCTION__);
+      xine_error(_("%s(): couldn't find image for background\n"), __FUNCTION__);
       exit(-1);
     }
     
@@ -368,14 +369,14 @@ void control_panel(void) {
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
 
-  control = (_control_t *) xmalloc(sizeof(_control_t));
+  control = (_control_t *) xine_xmalloc(sizeof(_control_t));
 
   XLockDisplay(gGui->display);
   
   if (!(control->bg_image = 
 	Imlib_load_image(gGui->imlib_data,
 			 xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
-    fprintf(stderr, "xine-playlist: couldn't find image for background\n");
+    xine_error(_("xine-playlist: couldn't find image for background\n"));
     exit(-1);
   }
 
@@ -500,7 +501,7 @@ void control_panel(void) {
     xitk_slider_set_pos(control->widget_list, control->hue, cur);
 
     lbl.skin_element_name = "CtlHueLbl";
-    lbl.label             = "Hue";
+    lbl.label             = _("Hue");
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->hue);
@@ -523,7 +524,7 @@ void control_panel(void) {
     xitk_slider_set_pos(control->widget_list, control->sat, cur);
 
     lbl.skin_element_name = "CtlSatLbl";
-    lbl.label             = "Sat";
+    lbl.label             = _("Sat");
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->sat);
@@ -546,7 +547,7 @@ void control_panel(void) {
     xitk_slider_set_pos(control->widget_list, control->bright, cur);
 
     lbl.skin_element_name = "CtlBrightLbl";
-    lbl.label             = "Brt";
+    lbl.label             = _("Brt");
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->bright);
@@ -569,7 +570,7 @@ void control_panel(void) {
     xitk_slider_set_pos(control->widget_list, control->contr, cur);
 
     lbl.skin_element_name = "CtlContLbl";
-    lbl.label             = "Ctr";
+    lbl.label             = _("Ctr");
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(gGui->skin_config, &lbl));
     xitk_disable_widget(control->contr);
@@ -605,7 +606,7 @@ void control_panel(void) {
   }
   
   lbl.skin_element_name = "CtlSkLbl";
-  lbl.label             = "Choose a Skin";
+  lbl.label             = _("Choose a Skin");
   xitk_list_append_content(control->widget_list->l,
 			   xitk_label_create(gGui->skin_config, &lbl));
 
@@ -642,7 +643,7 @@ void control_panel(void) {
 
   lb.skin_element_name = "CtlDismiss";
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = "Dismiss";
+  lb.label             = _("Dismiss");
   lb.callback          = control_exit;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;

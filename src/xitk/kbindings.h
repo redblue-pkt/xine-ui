@@ -75,7 +75,6 @@ typedef enum {
   ACTID_pVOLUME,
   ACTID_mVOLUME,
   ACTID_SNAPSHOT,
-  ACTID_XINESHOT,
   ACTID_ZOOM_1_1,
   ACTID_GRAB_POINTER,
   ACTID_EVENT_MENU1,
@@ -101,6 +100,7 @@ typedef enum {
 } action_id_t;
   
 kbinding_t *kbindings_init_kbinding(void);
+void kbindings_save_kbinding(kbinding_t *);
 void kbindings_reset_kbinding(kbinding_t **);
 void kbindings_free_kbinding(kbinding_t **);
 void kbindings_display_current_bindings(kbinding_t *);

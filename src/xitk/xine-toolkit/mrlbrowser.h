@@ -28,13 +28,12 @@
 
 #include <limits.h>
 #include <X11/Xlib.h>
+#include <xine.h>
 
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
 #include "dnd.h"
 #include "browser.h"
-
-#include "xine.h"
 
 #define MAXFILES      65535
 

@@ -34,11 +34,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include <xine/xineutils.h>
+
 #include "xitk.h"
 
 #include "event.h"
 #include "actions.h"
-#include "utils.h"
 #include "file_browser.h"
 
 #define MAX_LIST 9
@@ -178,7 +179,7 @@ void file_browser(xitk_string_callback_t add_cb,
 
   fbr.x                              = config_lookup_int("x_file_browser", 200);
   fbr.y                              = config_lookup_int("y_file_browser", 100);
-  fbr.window_title                   = "Xine File Browser";
+  fbr.window_title                   = _("Xine File Browser");
   fbr.skin_element_name              = "FBBG";
   fbr.resource_name                  = fbr.window_title;
   fbr.resource_class                 = "Xine";
@@ -189,7 +190,7 @@ void file_browser(xitk_string_callback_t add_cb,
   
   fbr.current_dir.skin_element_name  = "FBCurDir";
   fbr.current_dir.cur_directory      = config_lookup_str("filebrowser_dir",
-							 (char *)get_homedir());
+							 (char *)xine_get_homedir());
 
   fbr.dndcallback                    = dnd_cb;
 
@@ -197,7 +198,7 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.homedir.caption                = "~/";
 
   fbr.select.skin_element_name       = "FBSelect";
-  fbr.select.caption                 = "Select";
+  fbr.select.caption                 = _("Select");
   fbr.select.callback                = add_cb;
 
   fbr.dismiss.skin_element_name      = "FBDismiss";

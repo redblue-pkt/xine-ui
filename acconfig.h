@@ -50,3 +50,6 @@
 
 /* Where scripts are */
 #undef XINE_SCRIPTDIR
+
+/* Path where catalog files will be. */
+#undef XITK_LOCALE
