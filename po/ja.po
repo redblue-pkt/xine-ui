@@ -1,0 +1,2837 @@
+# Japanese xine-ui.po file.
+# Copyright (C) 2004 Free Software Foundation, Inc.
+# This file is distributed under the same license as the xine-ui package.
+# Tadashi Jokagi <elf2000@users.sourceforge.net>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: xine 0.99.1-cvs\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-12-12 15:18+0100\n"
+"PO-Revision-Date: 2004-12-12 14:00+0900\n"
+"Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/xitk/actions.c:352
+#, c-format
+msgid ""
+"The stream '%s' isn't supported by xine:\n"
+"\n"
+msgstr ""
+"ストリーム '%s' は xine をサポートしていません:\n"
+"\n"
+
+#: src/xitk/actions.c:356
+#, c-format
+msgid ""
+"The stream '%s' use an unsupported codec:\n"
+"\n"
+msgstr ""
+"ストリーム '%s' は未サポートコーデックを使用しています:\n"
+"\n"
+
+#: src/xitk/actions.c:366
+#, c-format
+msgid "%sVideo Codec: %s (%s)\n"
+msgstr "%sビデオコーデック: %s (%s)\n"
+
+#: src/xitk/actions.c:367 src/xitk/actions.c:378 src/xitk/stream_infos.c:156
+#: src/xitk/stream_infos.c:351 src/xitk/stream_infos.c:352
+#: src/xitk/stream_infos.c:353 src/xitk/stream_infos.c:354
+#: src/xitk/stream_infos.c:355 src/xitk/stream_infos.c:357
+#: src/xitk/stream_infos.c:358 src/xitk/stream_infos.c:359
+#: src/xitk/stream_infos.c:360
+msgid "Unavailable"
+msgstr "利用不可能"
+
+#: src/xitk/actions.c:377
+#, c-format
+msgid "%sAudio Codec: %s (%s)\n"
+msgstr "%s音声コーデック: %s (%s)\n"
+
+#: src/xitk/actions.c:391
+#, c-format
+msgid ""
+"%s\n"
+"Start playback anyway ?\n"
+msgstr ""
+"%s\n"
+"常に再生を開始しますか?\n"
+
+#: src/xitk/actions.c:399
+msgid "Start Playback ?"
+msgstr "再生開始しますか?"
+
+#: src/xitk/actions.c:690
+msgid "No MRL (input stream) specified"
+msgstr "MRL (入力ストリーム)が指定されませんでした"
+
+#: src/xitk/actions.c:988
+#, c-format
+msgid "Aspect ratio: %s"
+msgstr "アスペクト比: %s"
+
+#: src/xitk/actions.c:1003
+#, c-format
+msgid "Deinterlace: %s"
+msgstr ""
+
+#: src/xitk/actions.c:1003 src/xitk/actions.c:1694
+msgid "enabled"
+msgstr ""
+
+#: src/xitk/actions.c:1003 src/xitk/actions.c:1694
+msgid "disabled"
+msgstr ""
+
+#: src/xitk/actions.c:1224 src/xitk/actions.c:1241 src/xitk/actions.c:1370
+#: src/xitk/lirc.c:165 src/xitk/stdctl.c:112
+#, c-format
+msgid "%s(): can't create new thread (%s)\n"
+msgstr ""
+
+#: src/xitk/actions.c:1586
+msgid "There is no mrl."
+msgstr ""
+
+#: src/xitk/actions.c:1694
+#, c-format
+msgid "Post plugins: %s."
+msgstr ""
+
+#: src/xitk/actions.c:1785
+msgid "Amplification Level"
+msgstr ""
+
+#: src/xitk/actions.c:1803 src/xitk/menus.c:296 src/xitk/menus.c:310
+msgid "Audio Volume"
+msgstr "音声ボリューム"
+
+#: src/xitk/actions.c:1862
+#, c-format
+msgid "TV Mode: %d"
+msgstr "TV モード: %d"
+
+#: src/xitk/actions.c:1883
+#, c-format
+msgid "XSendEvent(display, 0x%x ...) failed.\n"
+msgstr ""
+
+#: src/xitk/actions.c:2013 src/xitk/actions.c:2077 src/xitk/event_sender.c:486
+#: src/xitk/mediamark.c:3174
+msgid "Select"
+msgstr "選択"
+
+#: src/xitk/actions.c:2016
+msgid "Select all"
+msgstr "すべて選択"
+
+#: src/xitk/actions.c:2021
+msgid "Stream(s) loading"
+msgstr "ストリーム読み込み中"
+
+#: src/xitk/actions.c:2100 src/xitk/mediamark.c:3195
+msgid "Pick a subtitle file"
+msgstr ""
+
+#: src/xitk/config_wrapper.c:150
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+
+#: src/xitk/config_wrapper.c:173
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr ""
+
+#: src/xitk/control.c:274
+msgid "hue value"
+msgstr ""
+
+#: src/xitk/control.c:275
+msgid "Hue value."
+msgstr ""
+
+#: src/xitk/control.c:290
+msgid "brightness value"
+msgstr "ブライトネス値"
+
+#: src/xitk/control.c:291
+msgid "Brightness value."
+msgstr "ブライトネス値"
+
+#: src/xitk/control.c:306
+msgid "saturation value"
+msgstr "彩度値"
+
+#: src/xitk/control.c:307
+msgid "Saturation value."
+msgstr "彩度値"
+
+#: src/xitk/control.c:322
+msgid "contrast value"
+msgstr "コントラスト値"
+
+#: src/xitk/control.c:323
+msgid "Contrast value."
+msgstr "コントラスト値"
+
+#: src/xitk/control.c:461 src/xitk/panel.c:201 src/xitk/playlist.c:898
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr ""
+
+#: src/xitk/control.c:548
+msgid "xine Control Window"
+msgstr "xine 制御ウィンドウ"
+
+#: src/xitk/control.c:563
+msgid "control: couldn't find image for background\n"
+msgstr ""
+
+#: src/xitk/control.c:692
+msgid "Control HUE value"
+msgstr ""
+
+#: src/xitk/control.c:695 src/xitk/event.c:825 src/xitk/event.c:832
+msgid "Hue"
+msgstr ""
+
+#: src/xitk/control.c:715
+msgid "Control SATURATION value"
+msgstr ""
+
+#: src/xitk/control.c:718
+msgid "Sat"
+msgstr ""
+
+#: src/xitk/control.c:738
+msgid "Control BRIGHTNESS value"
+msgstr "ブライトネス値制御"
+
+#: src/xitk/control.c:741
+msgid "Brt"
+msgstr ""
+
+#: src/xitk/control.c:761
+msgid "Control CONTRAST value"
+msgstr "コントラスト値制御"
+
+#: src/xitk/control.c:764
+msgid "Ctr"
+msgstr ""
+
+#: src/xitk/control.c:786
+msgid "Choose a Skin"
+msgstr "スキンを選ぶ"
+
+#: src/xitk/control.c:813 src/xitk/mrl_browser.c:295 src/xitk/playlist.c:1219
+msgid "Dismiss"
+msgstr ""
+
+#: src/xitk/control.c:819
+msgid "Close control window"
+msgstr "制御ウィンドウを閉じる"
+
+#: src/xitk/download.c:56
+msgid "Download in progress"
+msgstr "ダウンロード中"
+
+#: src/xitk/download.c:58
+#, c-format
+msgid "Download progress: %d%%."
+msgstr "ダウンロード中: %d%%"
+
+#: src/xitk/errors.c:63 src/xitk/errors.c:330 src/xitk/kbindings.c:2249
+msgid "Done"
+msgstr "終了"
+
+#: src/xitk/errors.c:63
+msgid "More..."
+msgstr "もっと..."
+
+#: src/xitk/errors.c:168
+msgid "Error"
+msgstr "エラー"
+
+#: src/xitk/errors.c:247
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"There is no input plugin available to handle '%s'.\n"
+"Maybe MRL syntax is wrong or file/stream source doesn't exist."
+msgstr ""
+
+#: src/xitk/errors.c:255
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"There is no demuxer plugin available to handle '%s'.\n"
+"Usually this means that the file format was not recognized."
+msgstr ""
+
+#: src/xitk/errors.c:263
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"Demuxer failed. Maybe '%s' is a broken file?\n"
+msgstr ""
+
+#: src/xitk/errors.c:269
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"Malformed mrl. Mrl '%s' seems malformed/invalid.\n"
+msgstr ""
+
+#: src/xitk/errors.c:275
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"Input plugin failed to open mrl '%s'\n"
+msgstr ""
+
+#: src/xitk/errors.c:281
+msgid ""
+"- xine engine error -\n"
+"\n"
+"!! Unhandled error !!\n"
+msgstr ""
+
+#.
+#. * fixme: how to properly open the system browser?
+#. * should we just make it configurable?
+#.
+#: src/xitk/errors.c:298
+msgid "Opening mozilla web browser, this might take a while..."
+msgstr ""
+
+#: src/xitk/errors.c:311
+msgid "Warning"
+msgstr ""
+
+#: src/xitk/errors.c:312
+msgid ""
+"The amount of dropped frame is too high, your system might be slow, not "
+"properly optimized or just too loaded.\n"
+"\n"
+"http://xinehq.de/index.php/faq#SPEEDUP"
+msgstr ""
+
+#: src/xitk/errors.c:318
+msgid "Warn user when too much frames are dropped."
+msgstr ""
+
+#: src/xitk/errors.c:330
+#, fuzzy
+msgid "Learn More..."
+msgstr "もっと..."
+
+#: src/xitk/errors.c:332
+msgid "Disable this warning."
+msgstr ""
+
+#: src/xitk/event.c:387
+msgid "Zoom: 1:1"
+msgstr "拡大: 1:1"
+
+#: src/xitk/event.c:392
+#, c-format
+msgid "Zoom: 200%%"
+msgstr "拡大: 200%%"
+
+#: src/xitk/event.c:397
+#, c-format
+msgid "Zoom: 50%%"
+msgstr "拡大: 50%%"
+
+#: src/xitk/event.c:614 src/xitk/event.c:626
+#, c-format
+msgid "A/V offset: %s"
+msgstr "A/V オフセット: %s"
+
+#: src/xitk/event.c:632
+msgid "A/V Offset: reset."
+msgstr ""
+
+#: src/xitk/event.c:641 src/xitk/event.c:651
+#, c-format
+msgid "SPU Offset: %s"
+msgstr "SPU オフセット: %s"
+
+#: src/xitk/event.c:657
+msgid "SPU Offset: reset."
+msgstr ""
+
+#: src/xitk/event.c:788 src/xitk/menus.c:199
+msgid "Playlist: no loop."
+msgstr ""
+
+#: src/xitk/event.c:791 src/xitk/menus.c:204
+msgid "Playlist: loop."
+msgstr ""
+
+#: src/xitk/event.c:794 src/xitk/menus.c:209
+msgid "Playlist: entry repeat."
+msgstr "再生リスト: エントリを繰り返します。"
+
+#: src/xitk/event.c:797 src/xitk/menus.c:214
+msgid "Playlist: shuffle."
+msgstr "再生リスト: シャッフルします。"
+
+#: src/xitk/event.c:800 src/xitk/menus.c:219
+msgid "Playlist: shuffle forever."
+msgstr "再生リスト: ずっとシャッフルします。"
+
+#: src/xitk/event.c:840 src/xitk/event.c:847
+msgid "Saturation"
+msgstr "彩度"
+
+#: src/xitk/event.c:855 src/xitk/event.c:862
+msgid "Brightness"
+msgstr "ブライトネス"
+
+#: src/xitk/event.c:870 src/xitk/event.c:877
+msgid "Contrast"
+msgstr "コントラスト"
+
+#: src/xitk/event.c:899
+#, c-format
+msgid "Playlist: %s"
+msgstr "再生リスト: %s"
+
+#: src/xitk/event.c:900
+msgid "Stop"
+msgstr "停止"
+
+#: src/xitk/event.c:900
+msgid "Continue"
+msgstr "継続"
+
+#: src/xitk/event.c:1144 src/xitk/videowin.c:262
+#, c-format
+msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
+msgstr ""
+
+#: src/xitk/event.c:1163 src/xitk/videowin.c:281
+#, c-format
+msgid "gui_main: couldn't find true color visual.\n"
+msgstr ""
+
+#: src/xitk/event.c:1238
+#, c-format
+msgid ""
+"\n"
+"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+msgstr ""
+
+#: src/xitk/event.c:1244
+#, c-format
+msgid "Cannot open display\n"
+msgstr "画面が開けませんでした\n"
+
+#: src/xitk/event.c:1251
+msgid "Name of video display"
+msgstr ""
+
+#: src/xitk/event.c:1252
+msgid ""
+"Use this setting to configure to which display xine will show videos. When "
+"left blank, the main display will be used. Setting this option to something "
+"like ':0.1' or ':1' makes possible to display video and control on different "
+"screens (very useful for TV presentations)."
+msgstr ""
+
+#: src/xitk/event.c:1265
+#, c-format
+msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
+msgstr ""
+
+#: src/xitk/event.c:1275
+msgid "Synchronized X protocol (debug)"
+msgstr ""
+
+#: src/xitk/event.c:1284
+#, c-format
+msgid "Warning! Synchronized X activated - this is very slow...\n"
+msgstr ""
+
+#: src/xitk/event.c:1289
+msgid "Windows stacking"
+msgstr "ウィンドウを重ねる"
+
+#: src/xitk/event.c:1290
+msgid "Use wm layer property to place window on top."
+msgstr ""
+
+#: src/xitk/event.c:1297
+msgid "Windows stacking (more)"
+msgstr ""
+
+#: src/xitk/event.c:1298
+msgid "Use WM layer property to place windows on top."
+msgstr ""
+
+#: src/xitk/event.c:1309
+msgid "Snapshot location"
+msgstr ""
+
+#: src/xitk/event.c:1310
+msgid "Where snapshots will be saved."
+msgstr ""
+
+#: src/xitk/event.c:1317
+msgid "Screensaver wakeup"
+msgstr ""
+
+#: src/xitk/event.c:1318
+msgid "Time between two screensaver fake events, 0 to disable."
+msgstr ""
+
+#: src/xitk/event.c:1325
+msgid "Chapter hopping"
+msgstr ""
+
+#: src/xitk/event.c:1326
+msgid "Play next|previous chapter instead of mrl (dvdnav)"
+msgstr ""
+
+#: src/xitk/event.c:1333
+msgid "Visibility behavior of output window"
+msgstr ""
+
+#: src/xitk/event.c:1334
+msgid "Hide video output window if there is no video in the stream"
+msgstr ""
+
+#: src/xitk/event.c:1341
+msgid "Visiblility behavior of panel"
+msgstr ""
+
+#: src/xitk/event.c:1342
+msgid ""
+"Automatically show/hide panel window, according to "
+"auto_video_output_visibility"
+msgstr ""
+
+#: src/xitk/event.c:1350
+msgid "Event sender behavior"
+msgstr ""
+
+#: src/xitk/event.c:1351
+msgid "Event sender window stick to main panel"
+msgstr ""
+
+#: src/xitk/event.c:1360
+msgid "Visual animation style"
+msgstr ""
+
+#: src/xitk/event.c:1361
+msgid ""
+"Display some video animations when current stream is audio only (eg: mp3)."
+msgstr ""
+
+#: src/xitk/event.c:1370
+msgid "Stream information"
+msgstr ""
+
+#: src/xitk/event.c:1371
+msgid "Update stream information (in stream info window) each half seconds."
+msgstr ""
+
+#: src/xitk/event.c:1381
+msgid "Skin Server Url"
+msgstr "スキンサーバー URL"
+
+#: src/xitk/event.c:1382
+msgid "From where we can get skins."
+msgstr ""
+
+#: src/xitk/event.c:1393
+msgid "Enable OSD support"
+msgstr "OSD サポートを有効にする"
+
+#: src/xitk/event.c:1394
+msgid ""
+"Enabling OSD permit to display some status/informations in output window."
+msgstr ""
+
+#: src/xitk/event.c:1403
+msgid "Use unscaled OSD"
+msgstr ""
+
+#: src/xitk/event.c:1404
+msgid "Use unscaled (full screen resolution) OSD if possible"
+msgstr ""
+
+#: src/xitk/event.c:1412
+msgid "Dismiss OSD time (s)"
+msgstr ""
+
+#: src/xitk/event.c:1413
+msgid "Persistence time of OSD visual, in seconds."
+msgstr ""
+
+#: src/xitk/event.c:1421
+msgid "Change xine's behavior for unexperienced user"
+msgstr ""
+
+#: src/xitk/event.c:1422
+msgid "In this mode, xine take some decisions to simplify user's life."
+msgstr ""
+
+#: src/xitk/event.c:1430
+msgid "Ask user for playback with unsupported codec"
+msgstr ""
+
+#: src/xitk/event.c:1431
+msgid ""
+"If xine don't support audio or video codec of current stream the user will "
+"be asked if the stream should be played or not"
+msgstr ""
+
+#: src/xitk/event.c:1440
+msgid "Configuration experience level"
+msgstr ""
+
+#: src/xitk/event.c:1441
+msgid ""
+"Level of user's experience, this will show more or less configuration "
+"options."
+msgstr ""
+
+#: src/xitk/event.c:1449
+msgid "Amplification level"
+msgstr ""
+
+#: src/xitk/event.c:1458
+msgid "Display splash screen"
+msgstr ""
+
+#: src/xitk/event.c:1459
+msgid "If enabled, xine will display its splash screen"
+msgstr ""
+
+#: src/xitk/event.c:1467
+msgid "Audio mixer control method"
+msgstr "オーディオミキサー制御方法"
+
+#: src/xitk/event.c:1468
+msgid "Which method used to control audio volume."
+msgstr ""
+
+#: src/xitk/event.c:1476
+msgid "Menu shortcut style"
+msgstr "メニューショットカットのスタイル"
+
+#: src/xitk/event.c:1477
+msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
+msgstr ""
+
+#: src/xitk/event.c:1565
+#, c-format
+msgid "Unable to initialize Imlib\n"
+msgstr "Imlib を初期化できません\n"
+
+#: src/xitk/event_sender.c:433
+msgid "xine Event Sender"
+msgstr "xine イベント送信"
+
+#: src/xitk/event_sender.c:450
+msgid "Up"
+msgstr "上"
+
+#: src/xitk/event_sender.c:468
+msgid "Left"
+msgstr "左"
+
+#: src/xitk/event_sender.c:504
+msgid "Right"
+msgstr "右"
+
+#: src/xitk/event_sender.c:522
+msgid "Down"
+msgstr "下"
+
+#: src/xitk/event_sender.c:602
+msgid "Angle +"
+msgstr "角度 +"
+
+#: src/xitk/event_sender.c:618
+msgid "Angle -"
+msgstr "角度 -"
+
+#. Initialize menu labels
+#: src/xitk/event_sender.c:633 src/xitk/menus.c:951
+msgid "Menu 1"
+msgstr "メニュー 1"
+
+#: src/xitk/event_sender.c:634 src/xitk/menus.c:951
+msgid "Menu 2"
+msgstr "メニュー 2"
+
+#: src/xitk/event_sender.c:635 src/xitk/menus.c:951
+msgid "Menu 3"
+msgstr "メニュー 3"
+
+#: src/xitk/event_sender.c:636 src/xitk/menus.c:951
+msgid "Menu 4"
+msgstr "メニュー 4"
+
+#: src/xitk/event_sender.c:637 src/xitk/menus.c:952
+msgid "Menu 5"
+msgstr "メニュー 5"
+
+#: src/xitk/event_sender.c:638 src/xitk/menus.c:952
+msgid "Menu 6"
+msgstr "メニュー 6"
+
+#: src/xitk/event_sender.c:639 src/xitk/menus.c:952
+msgid "Menu 7"
+msgstr "メニュー 7"
+
+#: src/xitk/event_sender.c:641 src/xitk/menus.c:955
+msgid "Menu toggle"
+msgstr "メニュートグル"
+
+#: src/xitk/event_sender.c:642 src/xitk/menus.c:955
+msgid "Title"
+msgstr "題名"
+
+#: src/xitk/event_sender.c:643 src/xitk/menus.c:955
+msgid "Root"
+msgstr "ルート"
+
+#: src/xitk/event_sender.c:644 src/xitk/menus.c:955
+msgid "Subpicture"
+msgstr ""
+
+#: src/xitk/event_sender.c:645 src/xitk/menus.c:657 src/xitk/menus.c:956
+#: src/xitk/menus.c:1013 src/xitk/stream_infos.c:874
+msgid "Audio"
+msgstr "音声"
+
+#: src/xitk/event_sender.c:646 src/xitk/menus.c:956
+msgid "Angle"
+msgstr "角度"
+
+#: src/xitk/event_sender.c:647 src/xitk/menus.c:956
+msgid "Part"
+msgstr ""
+
+#: src/xitk/event_sender.c:684 src/xitk/file_browser.c:1619
+#: src/xitk/help.c:442 src/xitk/mediamark.c:3458 src/xitk/setup.c:1188
+#: src/xitk/stream_infos.c:1036 src/xitk/tvset.c:525 src/xitk/viewlog.c:460
+msgid "Close"
+msgstr "閉じる"
+
+#: src/xitk/file_browser.c:355 src/xitk/mediamark.c:3442 src/xitk/setup.c:1175
+msgid "Apply"
+msgstr "適用"
+
+#: src/xitk/file_browser.c:371 src/xitk/kbindings.c:614 src/xitk/skins.c:1208
+msgid "Cancel"
+msgstr "取り消し"
+
+#: src/xitk/file_browser.c:677
+#, c-format
+msgid "Unable to open directory '%s': %s."
+msgstr "ディレクトリ '%s' を開けませんでした: %s"
+
+#: src/xitk/file_browser.c:989
+#, c-format
+msgid "Unable to delete file '%s': %s."
+msgstr "ファイル '%s' のふぁ駆除に失敗しました: %s"
+
+#: src/xitk/file_browser.c:1006
+#, fuzzy, c-format
+msgid "Do you really want to delete the file: '%s'"
+msgstr "本当にファイルを削除しますか: '%s"
+
+#: src/xitk/file_browser.c:1012
+msgid "Confirm deletion ?"
+msgstr "削除確認しますか?"
+
+#: src/xitk/file_browser.c:1031
+#, c-format
+msgid "Unable to rename file '%s' to '%s': %s."
+msgstr "ファイル '%s' を '%s' に名称変更できませんでした: %s"
+
+#: src/xitk/file_browser.c:1050
+msgid "Rename file"
+msgstr "ファイルの名称変更"
+
+#: src/xitk/file_browser.c:1058
+#, c-format
+msgid "Unable to create the directory '%s': %s."
+msgstr "ディレクトリ '%s' の作成が出来ません: %s"
+
+#: src/xitk/file_browser.c:1072
+msgid "Create a new directory"
+msgstr "新規ディレクトリ作成"
+
+#: src/xitk/file_browser.c:1216
+msgid "File Browser"
+msgstr "ファイルブラウザー"
+
+#: src/xitk/file_browser.c:1242
+msgid "All files"
+msgstr "すべてのファイル"
+
+#: src/xitk/file_browser.c:1243
+msgid "All known subtitles"
+msgstr ""
+
+#: src/xitk/file_browser.c:1244
+msgid "All known playlists"
+msgstr ""
+
+#: src/xitk/file_browser.c:1518
+msgid "Show hidden file"
+msgstr "隠しファイルの表示"
+
+#: src/xitk/file_browser.c:1531
+msgid "Rename"
+msgstr "名称変更"
+
+#: src/xitk/file_browser.c:1547 src/xitk/kbindings.c:2205
+#: src/xitk/menus.c:1177
+msgid "Delete"
+msgstr "削除"
+
+#: src/xitk/file_browser.c:1563
+msgid "Create a directory"
+msgstr "ディレクトリ作成"
+
+#: src/xitk/help.c:131
+msgid "Undefined"
+msgstr "未定義"
+
+#: src/xitk/help.c:356 src/xitk/post.c:1131
+msgid "Help"
+msgstr "ヘルプ"
+
+#: src/xitk/help.c:383
+msgid "No Help Section Available"
+msgstr "有効なヘルプセクションがありません"
+
+#: src/xitk/kbindings.c:575
+msgid "and"
+msgstr ""
+
+#: src/xitk/kbindings.c:588
+msgid ""
+"The following key bindings pairs are identical:\n"
+"\n"
+msgstr ""
+
+#: src/xitk/kbindings.c:605
+msgid ""
+".\n"
+"\n"
+"What do you want to do ?\n"
+msgstr ""
+
+#: src/xitk/kbindings.c:613
+msgid "Keybindings error!"
+msgstr "キーバインドのエラー!"
+
+#: src/xitk/kbindings.c:614 src/xitk/kbindings.c:2235
+msgid "Reset"
+msgstr "リセット"
+
+#: src/xitk/kbindings.c:614
+msgid "Editor"
+msgstr "エディタ"
+
+#: src/xitk/kbindings.c:997
+msgid "OOCH: key binding table is NULL.\n"
+msgstr "OOCH: キーバインドテーブルが NULLです。\n"
+
+#: src/xitk/kbindings.c:1269
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#: src/xitk/kbindings.c:1271
+msgid "Alt"
+msgstr "Alt"
+
+#: src/xitk/kbindings.c:1591
+msgid "Nothing selected"
+msgstr "選択されていません"
+
+#: src/xitk/kbindings.c:1592
+msgid "None"
+msgstr "なし"
+
+#: src/xitk/kbindings.c:1765
+msgid "You can only delete alias entries."
+msgstr "別名エントリのみ削除できます。"
+
+#: src/xitk/kbindings.c:1901
+msgid "Press Keyboard Keys..."
+msgstr "キーボードのキーを押してください..."
+
+#: src/xitk/kbindings.c:1914
+msgid "Event receiver window"
+msgstr "イベント受信ウィンドウ"
+
+#. Ask if uses want/wont store new shorcut
+#: src/xitk/kbindings.c:1980
+msgid "Accept?"
+msgstr "受理しますか?"
+
+#: src/xitk/kbindings.c:1984
+#, c-format
+msgid ""
+"Store %s as\n"
+"'%s' key binding ?."
+msgstr ""
+
+#: src/xitk/kbindings.c:1990
+#, c-format
+msgid ""
+"This key bindings is redundant with action:\n"
+"\"%s\".\n"
+msgstr ""
+
+#: src/xitk/kbindings.c:2087
+msgid "key binding editor"
+msgstr "キーバインドエディタ"
+
+#: src/xitk/kbindings.c:2118
+msgid "Binding action"
+msgstr ""
+
+#: src/xitk/kbindings.c:2124
+msgid "Key"
+msgstr "キー"
+
+#: src/xitk/kbindings.c:2129
+msgid "Modifiers"
+msgstr ""
+
+#: src/xitk/kbindings.c:2175
+msgid "Alias"
+msgstr "別名"
+
+#: src/xitk/kbindings.c:2190 src/xitk/menus.c:1175
+msgid "Edit"
+msgstr "編集"
+
+#: src/xitk/kbindings.c:2220 src/xitk/playlist.c:409 src/xitk/playlist.c:1209
+msgid "Save"
+msgstr "保存"
+
+#: src/xitk/kbindings.c:2315
+msgid "ctrl"
+msgstr "ctrl"
+
+#: src/xitk/kbindings.c:2339
+msgid "meta"
+msgstr "meta"
+
+#: src/xitk/kbindings.c:2363
+msgid "mod3"
+msgstr "mod3"
+
+#: src/xitk/kbindings.c:2387
+msgid "mod4"
+msgstr "mod4"
+
+#: src/xitk/kbindings.c:2411
+msgid "mod5"
+msgstr "mod5"
+
+#: src/xitk/kbindings.c:2422
+msgid "Grab"
+msgstr ""
+
+#: src/xitk/lang.c:495
+msgid "Unknown"
+msgstr "未知"
+
+#: src/xitk/main.c:390
+#, c-format
+msgid "Bad geometry '%s'\n"
+msgstr ""
+
+#: src/xitk/main.c:398
+#, c-format
+msgid "Bad visual '%s'\n"
+msgstr ""
+
+#: src/xitk/main.c:424
+#, c-format
+msgid "This is xine (X11 gui) - a free video player v%s"
+msgstr ""
+
+#: src/xitk/main.c:428
+#, c-format
+msgid ""
+".\n"
+"(c) 2000-2004 The xine Team.\n"
+msgstr ""
+".\n"
+"(c) 2000-2004 xine チーム\n"
+
+#: src/xitk/main.c:440
+#, c-format
+msgid "Built with xine library %d.%d.%d (%s)\n"
+msgstr ""
+
+#: src/xitk/main.c:446
+#, c-format
+msgid "Found xine library version: %d.%d.%d (%s).\n"
+msgstr "発見した xine ライブラリバージョン: %d.%d.%d (%s).\n"
+
+#: src/xitk/main.c:495
+msgid "   -Audio output:\n"
+msgstr ""
+
+#: src/xitk/main.c:496
+msgid "   -Video output:\n"
+msgstr ""
+
+#: src/xitk/main.c:497
+msgid "   -Demuxer:\n"
+msgstr ""
+
+#: src/xitk/main.c:498
+msgid "   -Input:\n"
+msgstr ""
+
+#: src/xitk/main.c:499
+msgid "   -Subpicture:\n"
+msgstr ""
+
+#: src/xitk/main.c:500
+msgid "   -Post processing:\n"
+msgstr ""
+
+#: src/xitk/main.c:501
+msgid "   -Audio decoder:\n"
+msgstr ""
+
+#: src/xitk/main.c:502
+msgid "   -Video decoder:\n"
+msgstr ""
+
+#: src/xitk/main.c:527 src/xitk/main.c:540
+#, c-format
+msgid ""
+"\n"
+" Available xine's plugins:\n"
+msgstr ""
+"\n"
+"利用可能な xine のプラグイン:\n"
+
+#: src/xitk/main.c:536
+#, c-format
+msgid "No available plugins found of %s type!.\n"
+msgstr ""
+
+#: src/xitk/main.c:581
+#, c-format
+msgid "Usage: xine [OPTIONS]... [MRL]\n"
+msgstr "利用法: xine [OPTIONS]... [MRL]\n"
+
+#: src/xitk/main.c:584
+#, c-format
+msgid "  -v, --version                Display version.\n"
+msgstr "  -v, --version                バージョン表示\n"
+
+#: src/xitk/main.c:585
+#, c-format
+msgid "      --verbose [=level]       Set verbosity level. Default is 1.\n"
+msgstr ""
+
+#: src/xitk/main.c:586
+#, c-format
+msgid ""
+"  -c, --config <file>          Use config file instead of default one.\n"
+msgstr ""
+
+#: src/xitk/main.c:587
+#, c-format
+msgid ""
+"  -V, --video-driver <drv>     Select video driver by id. Available "
+"drivers: \n"
+msgstr ""
+
+#: src/xitk/main.c:598
+#, c-format
+msgid ""
+"  -A, --audio-driver <drv>     Select audio driver by id. Available "
+"drivers: \n"
+msgstr ""
+
+#: src/xitk/main.c:608
+#, c-format
+msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
+msgstr ""
+
+#: src/xitk/main.c:609
+#, c-format
+msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
+msgstr ""
+
+#: src/xitk/main.c:610
+#, c-format
+msgid ""
+"  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
+"                    'f': in fullscreen mode.\n"
+"                    'h': hide GUI (panel, etc.).\n"
+"                    'w': hide video window.\n"
+"                    'q': quit when play is done.\n"
+"                    'd': retrieve playlist from DVD. (deprecated. use -s "
+"DVD)\n"
+"                    'v': retrieve playlist from VCD. (deprecated. use -s "
+"VCD)\n"
+msgstr ""
+
+#: src/xitk/main.c:618
+#, c-format
+msgid "                    'F': in xinerama fullscreen mode.\n"
+msgstr ""
+
+#: src/xitk/main.c:620
+#, c-format
+msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
+msgstr ""
+
+#: src/xitk/main.c:621
+#, c-format
+msgid "  -f, --fullscreen             start in fullscreen mode,\n"
+msgstr "  -f, --fullscreen             フルスクリーンモードで開始\n"
+
+#: src/xitk/main.c:623
+#, c-format
+msgid ""
+"  -F, --xineramafull           start in xinerama fullscreen (display on "
+"several screens),\n"
+msgstr ""
+
+#: src/xitk/main.c:625
+#, c-format
+msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
+msgstr "  -g, --hide-gui               GUI を隠す (パネルなど)\n"
+
+#: src/xitk/main.c:626
+#, fuzzy, c-format
+msgid "  -I, --no-gui                 disable GUI\n"
+msgstr "  -g, --hide-gui               GUI を隠す (パネルなど)\n"
+
+#: src/xitk/main.c:627
+#, c-format
+msgid "  -H, --hide-video             hide video window\n"
+msgstr "  -H, --hide-video             ビデオウィンドウを隠す\n"
+
+#: src/xitk/main.c:629
+#, c-format
+msgid "  -L, --no-lirc                Turn off LIRC support.\n"
+msgstr "  -L, --no-lirc                LIRC サポートを無効にする\n"
+
+#: src/xitk/main.c:631
+#, c-format
+msgid ""
+"      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+"                               is either an X11 visual class, or a visual "
+"id.\n"
+msgstr ""
+
+#: src/xitk/main.c:633
+#, c-format
+msgid "      --install                Install a private colormap.\n"
+msgstr ""
+"      --install                プライベート色マップをインストールする\n"
+
+#: src/xitk/main.c:634
+#, c-format
+msgid ""
+"      --keymap [=option]       Display keymap. Option are:\n"
+"                                 'default': display default keymap table,\n"
+"                                 'lirc': display draft of a .lircrc config "
+"file.\n"
+"                                 'remapped': user remapped keymap table.\n"
+"                                 'file:<filename>': use <filename> as "
+"keymap.\n"
+"                                 -if no option is given, 'default' is "
+"selected.\n"
+msgstr ""
+
+#: src/xitk/main.c:640
+#, c-format
+msgid "  -n, --network                Enable network remote control server.\n"
+msgstr ""
+"  -n, --network                ネットワークリモート制御サーバーを有効にする\n"
+
+#: src/xitk/main.c:641
+#, fuzzy, c-format
+msgid "      --network-port           Specify network server port number.\n"
+msgstr ""
+"  -n, --network                ネットワークリモート制御サーバーを有効にする\n"
+
+#: src/xitk/main.c:642
+#, c-format
+msgid "  -R, --root                   Use root window as video window.\n"
+msgstr ""
+"  -R, --root                   ルートウィンドウをビデオウィンドウとして使う\n"
+
+#: src/xitk/main.c:643
+#, c-format
+msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
+msgstr "  -G, --geometry <WxH[+X+Y]>   出力ウィンドウの位置設定 (X スタイル)\n"
+
+#: src/xitk/main.c:644
+#, c-format
+msgid "  -B, --borderless             Borderless video output window.\n"
+msgstr "  -B, --borderless             無枠線のビデオ出力ウィンドウ\n"
+
+#: src/xitk/main.c:645
+#, c-format
+msgid ""
+"  -N, --animation <mrl>        Specify mrl to play when video output isn't "
+"used.\n"
+"                                 -can be used more than one time.\n"
+msgstr ""
+
+#: src/xitk/main.c:647
+#, c-format
+msgid "  -P, --playlist <filename>    Load a playlist file.\n"
+msgstr "  -P, --playlist <filename>    再整理すとファイル読み込み\n"
+
+#: src/xitk/main.c:648
+#, c-format
+msgid ""
+"  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes "
+"are:\n"
+"                                 'loop': loop entire playlist.\n"
+"                                 'repeat': repeat current playlist entry.\n"
+"                                 'shuffle': select randomly a yet unplayed "
+"entry from playlist\n"
+"                                 'shuffle+': same as 'shuffle', but "
+"indefinetely replay the playlist.\n"
+msgstr ""
+
+#: src/xitk/main.c:653
+#, c-format
+msgid "      --skin-server-url <url>  Define the skin server url.\n"
+msgstr "      --skin-server-url <url>  スキンサーバー URL の定義をする\n"
+
+#: src/xitk/main.c:654
+#, c-format
+msgid ""
+"      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
+msgstr ""
+
+#: src/xitk/main.c:655
+#, c-format
+msgid ""
+"  -S, --session <option1,option2,...>\n"
+"                               Session managements. Options can be:\n"
+"                    session=n   specify session <n> number,\n"
+"                    mrl=m       add mrl <m> to the playlist,\n"
+"                    audio=c     select audio channel (<c>: 'next' or "
+"'prev'),\n"
+"                    spu=c       select spu channel (<c>: 'next' or 'prev'),\n"
+"                    volume=v    set audio volume,\n"
+"                    amp=v       set amplification level,\n"
+"                    loop=m      set loop mode (<m>: 'none' 'loop' 'repeat' "
+"'shuffle' or 'shuffle+'),\n"
+"                    get_speed   get speed value (see man page for returned "
+"value).\n"
+"                    (playlist|pl)=p\n"
+"                                 <p> can be:\n"
+"                                   'clear'  clear the playlist,\n"
+"                                   'first'  play first entry in the "
+"playlist,\n"
+"                                   'prev'   play previous playlist entry,\n"
+"                                   'next'   play next playlist entry,\n"
+"                                   'last'   play last entry in the "
+"playlist,\n"
+"                                   'load:s' load playlist file <s>,\n"
+"                                   'stop'   stop playback at the end of "
+"current playback.\n"
+"                                   'cont'   continue playback at the end of "
+"current playback.\n"
+"                    play, slow2, slow4, pause, fast2,\n"
+"                    fast4, stop, quit, fullscreen, eject.\n"
+msgstr ""
+
+#: src/xitk/main.c:677
+#, c-format
+msgid ""
+"  -Z                           Don't automatically start playback (smart "
+"mode).\n"
+msgstr ""
+
+#: src/xitk/main.c:678
+#, c-format
+msgid ""
+"  -D, --deinterlace [post]...  Deinterlace video output. One or more post "
+"plugin\n"
+"                                 can be specified, with optional "
+"parameters.\n"
+"                                 Syntax is the same as --post option.\n"
+msgstr ""
+
+#: src/xitk/main.c:681
+#, c-format
+msgid ""
+"  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"
+"                                 'auto', 'square', '4:3', 'anamorphic', "
+"'dvb'.\n"
+msgstr ""
+
+#: src/xitk/main.c:684
+#, c-format
+msgid ""
+"      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
+"                               Slave is started with 'xine slave://address:"
+"port'\n"
+msgstr ""
+
+#: src/xitk/main.c:687
+#, c-format
+msgid "      --no-logo                Don't display the logo.\n"
+msgstr "      --no-logo                ロゴを表示しない。\n"
+
+#: src/xitk/main.c:688
+#, c-format
+msgid "  -E, --no-reload              Don't reload old playlist.\n"
+msgstr "  -E, --no-reload              再生リストを再読み込みしない。\n"
+
+#: src/xitk/main.c:689
+#, c-format
+msgid ""
+"      --post <plugin>[:parameter=value][,...][;...]\n"
+"                               Load one or many post plugin(s).\n"
+"                               Parameters are comma separated.\n"
+"                               This option can be used more than one time.\n"
+msgstr ""
+
+#: src/xitk/main.c:693
+#, c-format
+msgid "      --disable-post           Don't enable post plugin(s).\n"
+msgstr ""
+
+#: src/xitk/main.c:694
+#, c-format
+msgid "      --no-splash              Don't display the splash screen.\n"
+msgstr "      --no-splash              スプラッシュ画面を表示しない\n"
+
+#: src/xitk/main.c:695
+#, c-format
+msgid ""
+"      --stdctl                 Control xine by the console, using lirc "
+"commands.\n"
+msgstr ""
+
+#: src/xitk/main.c:696
+#, c-format
+msgid "  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"
+msgstr ""
+
+#: src/xitk/main.c:706
+#, c-format
+msgid ""
+"      --list-plugins [=type]   Display the list of all available plugins,\n"
+"                               Optional <type> can be:\n"
+"                    audio_out, video_out, demux, input, sub, post,\n"
+"                    audio_decoder, video_decoder.\n"
+msgstr ""
+
+#: src/xitk/main.c:710
+#, c-format
+msgid ""
+"      --bug-report [=mrl]      Enable bug report mode:\n"
+"                                 Turn on verbosity, gather all output\n"
+"                                 messages and write them into a file named\n"
+"                                 BUG-REPORT.TXT.\n"
+"                                 If <mrl> is given, xine will play the mrl\n"
+"                                 then quit (like -pq).\n"
+msgstr ""
+
+#: src/xitk/main.c:717
+#, c-format
+msgid ""
+"examples for valid MRLs (media resource locator):\n"
+"  File:  'path/foo.vob'\n"
+"         '/path/foo.vob'\n"
+"         'file://path/foo.vob'\n"
+"         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
+"         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
+"  DVD:   'dvd://VTS_01_2.VOB'\n"
+"  VCD:   'vcd://<track number>'\n"
+msgstr ""
+
+#: src/xitk/main.c:764 src/xitk/main.c:880
+msgid "video driver to use"
+msgstr "ビデオドライバーを使う"
+
+#: src/xitk/main.c:765 src/xitk/main.c:881
+msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
+msgstr ""
+
+#: src/xitk/main.c:813
+#, c-format
+msgid "main: probing <%s> video output plugin\n"
+msgstr "メイン: <%s> ビデオ出力プラグインを調査中\n"
+
+#: src/xitk/main.c:827
+#, c-format
+msgid "main: all available video drivers failed.\n"
+msgstr "メイン: すべての利用可能なビデオドライバーで失敗しました。\n"
+
+#: src/xitk/main.c:858
+#, c-format
+msgid "main: video driver <%s> failed\n"
+msgstr "メイン: ビデオドライバー <%s> 失敗しました\n"
+
+#: src/xitk/main.c:891
+msgid "audio driver to use"
+msgstr "オーディオドライバーを使う"
+
+#: src/xitk/main.c:892
+msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
+msgstr ""
+
+#: src/xitk/main.c:907 src/xitk/main.c:955
+#, c-format
+msgid "main: not using any audio driver (as requested).\n"
+msgstr ""
+
+#: src/xitk/main.c:928
+#, c-format
+msgid "main: probing <%s> audio output plugin\n"
+msgstr "メイン: <%s> 音声出力プラグイン調査中\n"
+
+#: src/xitk/main.c:932
+#, c-format
+msgid "main: skipping <%s> audio output plugin from auto-probe\n"
+msgstr "メイン: 自動検査から <%s> 音声出力プラグインを飛ばします\n"
+
+#: src/xitk/main.c:947
+#, c-format
+msgid "main: audio driver probing failed => no audio output\n"
+msgstr "メイン: 音声ドライバーの調査に失敗しました => 音声出力はありません\n"
+
+#: src/xitk/main.c:968
+#, c-format
+msgid "main: audio driver <%s> failed\n"
+msgstr "メイン: オーディオドライバー <%s> 失敗しました\n"
+
+#: src/xitk/main.c:1090
+msgid ""
+"*drum roll*, xine lib wants to take your attention to deliver an important "
+"message to you ;-):"
+msgstr ""
+
+#: src/xitk/main.c:1095
+msgid "No Information available."
+msgstr "有効な利用可能情報がありません"
+
+#: src/xitk/main.c:1101
+msgid ""
+"The host you're trying to connect is unknown.\n"
+"Check the validity of the specified hostname."
+msgstr ""
+
+#: src/xitk/main.c:1109
+msgid "The device name you specified seems invalid."
+msgstr ""
+
+#: src/xitk/main.c:1116
+msgid ""
+"The network looks unreachable.\n"
+"Check your network setup and/or the server name."
+msgstr ""
+
+#: src/xitk/main.c:1124
+msgid ""
+"The connection was refused.\n"
+"Check the host name."
+msgstr ""
+
+#: src/xitk/main.c:1131
+msgid "The specified file or mrl is not found. Please check it twice."
+msgstr ""
+
+#: src/xitk/main.c:1138
+msgid ""
+"The source can't be read.\n"
+"Maybe you don't have enough rights for this, or source doesn't contain data "
+"(e.g: not disc in drive)."
+msgstr ""
+
+#: src/xitk/main.c:1147
+msgid "A problem occur while loading a library or a decoder"
+msgstr ""
+
+#: src/xitk/main.c:1154
+msgid "The source seems encrypted, and can't be read."
+msgstr ""
+
+#: src/xitk/main.c:1156
+msgid ""
+"\n"
+"Your DVD is probably crypted. According to your country laws, you can or "
+"can't install/use libdvdcss to be able to read this disc, which you bought."
+msgstr ""
+
+#: src/xitk/main.c:1171
+msgid "No Informations available."
+msgstr "利用可能な情報がありません。"
+
+#: src/xitk/main.c:1176
+msgid ""
+"The audio device is unavailable. Please verify if another program already "
+"use it."
+msgstr ""
+
+#: src/xitk/main.c:1181
+msgid "*sight*, unkown error."
+msgstr ""
+
+#: src/xitk/main.c:1329
+#, c-format
+msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
+msgstr ""
+"xine ライブラリバージョン 1.0.0 が必要です。見つけたのは %d.%d.%d です。\n"
+
+#: src/xitk/main.c:1418
+#, c-format
+msgid "video driver id required for -V option\n"
+msgstr ""
+"-V オプションはビデオドライバー ID が必要です\n"
+"\n"
+
+#: src/xitk/main.c:1427
+#, c-format
+msgid "audio driver id required for -A option\n"
+msgstr "-A オプションは音声ドライバー ID が必要です\n"
+
+#: src/xitk/main.c:1515
+#, c-format
+msgid "Bad aspect ratio mode '%s', see xine --help\n"
+msgstr ""
+
+#: src/xitk/main.c:1579
+#, c-format
+msgid "Bad port number: %d\n"
+msgstr ""
+
+#: src/xitk/main.c:1591
+#, c-format
+msgid "Bad geometry '%s', see xine --help\n"
+msgstr ""
+
+#: src/xitk/main.c:1628
+#, c-format
+msgid "Bad loop mode '%s', see xine --help\n"
+msgstr ""
+
+#: src/xitk/main.c:1751
+#, c-format
+msgid "*** NOTE ***\n"
+msgstr ""
+
+#: src/xitk/main.c:1752
+#, c-format
+msgid ""
+" Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
+msgstr ""
+
+#: src/xitk/main.c:1793
+#, c-format
+msgid "invalid argument %d => exit\n"
+msgstr "無効な引数 %d => 終了\n"
+
+#: src/xitk/main.c:1813
+#, c-format
+msgid "You should specify one MRL to enqueue, at least!.\n"
+msgstr ""
+
+#: src/xitk/main.c:1895
+msgid "Automatically reload old playlist"
+msgstr "古い再生リストを自動で再読み込み"
+
+#: src/xitk/main.c:1896
+msgid ""
+"If it's enabled and if you don't specify any MRL in command line, xine will "
+"automatically load previous playlist."
+msgstr ""
+
+#: src/xitk/main.c:1911
+msgid "Subtitle autoloading"
+msgstr "字幕自動読み込み中"
+
+#: src/xitk/main.c:1912
+msgid "Automatically load subtitles if they exist."
+msgstr "もし存在したら字幕を自動読み込みする"
+
+#: src/xitk/main.c:1920
+msgid "Enable deinterlacing by default"
+msgstr "デフォルトで非インターレースかを有効にする"
+
+#: src/xitk/main.c:1921
+msgid ""
+"Deinterlace plugin will be enabled on startup. Progressive streams are "
+"automaticaly detected with no performance penalty."
+msgstr ""
+
+#: src/xitk/main.c:2073
+msgid "Logo mrl"
+msgstr "ロゴ MRL"
+
+#: src/xitk/mediamark.c:482
+msgid "!!Invalid entry!!"
+msgstr "!!無効な 入力です!!"
+
+#: src/xitk/mediamark.c:2777 src/xitk/mediamark.c:2832
+#, c-format
+msgid "Playlist file (%s) is invalid.\n"
+msgstr "再生リストファイル (%s) が無効です。\n"
+
+#: src/xitk/mediamark.c:2913
+#, c-format
+msgid "Unable to save playlist (%s): %s.\n"
+msgstr "再生リストを保存できません (%s): %s。\n"
+
+#. Create window
+#: src/xitk/mediamark.c:3238
+msgid "Mediamark Editor"
+msgstr "メディアマークエディタ"
+
+#: src/xitk/mediamark.c:3269
+msgid "Identifier"
+msgstr "識別子"
+
+#: src/xitk/mediamark.c:3285
+msgid "Mediamark Identifier"
+msgstr "メディアマーク識別子"
+
+#: src/xitk/mediamark.c:3290
+msgid "Mrl"
+msgstr "MRL"
+
+#: src/xitk/mediamark.c:3305
+msgid "Mediamark Mrl"
+msgstr "メディアマーク MRL"
+
+#: src/xitk/mediamark.c:3310 src/xitk/menus.c:685 src/xitk/menus.c:1089
+msgid "Subtitle"
+msgstr "字幕"
+
+#: src/xitk/mediamark.c:3325
+msgid "Subtitle File"
+msgstr "字幕ファイル"
+
+#: src/xitk/mediamark.c:3330
+msgid "Sub File"
+msgstr ""
+
+#: src/xitk/mediamark.c:3340
+msgid "Select a subtitle file to use together with the mrl."
+msgstr ""
+
+#: src/xitk/mediamark.c:3346
+msgid "Start at"
+msgstr ""
+
+#: src/xitk/mediamark.c:3361
+msgid "Mediamark start time (secs)."
+msgstr "メディアマーク開始時間 (秒)。"
+
+#: src/xitk/mediamark.c:3366
+msgid "End at"
+msgstr ""
+
+#: src/xitk/mediamark.c:3381
+msgid "Mediamark end time (secs)."
+msgstr "メディアマーク終了時間 (秒)。"
+
+#: src/xitk/mediamark.c:3386
+msgid "A/V offset"
+msgstr "A/V オフセット"
+
+#: src/xitk/mediamark.c:3401
+msgid "Offset of Audio and Video."
+msgstr "音声とビデオのオフセット"
+
+#: src/xitk/mediamark.c:3406
+msgid "SPU offset"
+msgstr "SPU オフセット"
+
+#: src/xitk/mediamark.c:3421
+msgid "Subpicture offset."
+msgstr ""
+
+#: src/xitk/mediamark.c:3427 src/xitk/post.c:1007 src/xitk/post.c:1851
+msgid "Ok"
+msgstr "OK"
+
+#: src/xitk/mediamark.c:3437
+msgid "Apply the changes and close the window."
+msgstr "変更を反映し、ウィンドウを閉じます。"
+
+#: src/xitk/mediamark.c:3452
+msgid "Apply the changes to the playlist."
+msgstr "変更を再生リストに反映します。"
+
+#: src/xitk/mediamark.c:3468
+msgid "Discard changes and dismiss the window."
+msgstr "変更の破棄とウィンドウを捨てます。"
+
+#: src/xitk/menus.c:441
+msgid "Show controls"
+msgstr "コントロール表示"
+
+#: src/xitk/menus.c:445
+#, fuzzy
+msgid "Show video window"
+msgstr "xine ビデオウィンドウ"
+
+#: src/xitk/menus.c:449
+msgid "Fullscreen"
+msgstr "フルスクリーン"
+
+#: src/xitk/menus.c:457
+msgid "Open"
+msgstr "開く"
+
+#: src/xitk/menus.c:461
+msgid "Open/File..."
+msgstr "開く/ファイル..."
+
+#: src/xitk/menus.c:465
+msgid "Open/Playlist..."
+msgstr "開く/再生リスト..."
+
+#: src/xitk/menus.c:469
+msgid "Open/Location..."
+msgstr "開く/ロケーション..."
+
+#: src/xitk/menus.c:473 src/xitk/menus.c:979
+msgid "Playback"
+msgstr "再生"
+
+#: src/xitk/menus.c:477
+msgid "Playback/Play"
+msgstr "再生/再生"
+
+#: src/xitk/menus.c:481
+msgid "Playback/Stop"
+msgstr "再生/停止"
+
+#: src/xitk/menus.c:485
+msgid "Playback/Pause"
+msgstr "再生/一時停止"
+
+#: src/xitk/menus.c:489 src/xitk/menus.c:501 src/xitk/menus.c:982
+msgid "Playback/SEP"
+msgstr "再生/SEP"
+
+#: src/xitk/menus.c:493
+msgid "Playback/Next MRL"
+msgstr "再生/次の MRL"
+
+#: src/xitk/menus.c:497
+msgid "Playback/Previous MRL"
+msgstr "再生/前の MRL"
+
+#: src/xitk/menus.c:505
+msgid "Playback/Increase Speed"
+msgstr "再生/スピード増加"
+
+#: src/xitk/menus.c:509
+msgid "Playback/Decrease Speed"
+msgstr "再生/スピード減少"
+
+#: src/xitk/menus.c:513 src/xitk/menus.c:1188 src/xitk/panel.c:1474
+msgid "Playlist"
+msgstr "再生リスト"
+
+#: src/xitk/menus.c:517 src/xitk/menus.c:790
+msgid "Playlist/Get from"
+msgstr "再生リスト/取得"
+
+#: src/xitk/menus.c:521
+msgid "Playlist/Load..."
+msgstr "再生リスト/読み込み..."
+
+#: src/xitk/menus.c:525
+msgid "Playlist/Editor..."
+msgstr "再生リスト/編集..."
+
+#: src/xitk/menus.c:529
+msgid "Playlist/SEP"
+msgstr "再生リスト/SEP"
+
+#: src/xitk/menus.c:533
+msgid "Playlist/Loop modes"
+msgstr "再生リスト/繰り返しモード"
+
+#: src/xitk/menus.c:537
+msgid "Playlist/Loop modes/Disabled"
+msgstr "再生リスト/繰り返しモード/無効"
+
+#: src/xitk/menus.c:541
+msgid "Playlist/Loop modes/Loop"
+msgstr "再生リスト/繰り返しモード/繰り返し"
+
+#: src/xitk/menus.c:545
+msgid "Playlist/Loop modes/Repeat Selection"
+msgstr "再生リスト/繰り返しモード/範囲繰り返し"
+
+#: src/xitk/menus.c:549
+msgid "Playlist/Loop modes/Shuffle"
+msgstr "再生リスト/繰り返しモード/シャッフル"
+
+#: src/xitk/menus.c:553
+msgid "Playlist/Loop modes/Non-stop Shuffle"
+msgstr "再生リスト/繰り返しモード/ノンストップシャッフル"
+
+#: src/xitk/menus.c:557
+msgid "Playlist/Continue Playback"
+msgstr "再生リスト/再生を続ける"
+
+#: src/xitk/menus.c:565 src/xitk/menus.c:949
+msgid "Menus"
+msgstr "メニュー"
+
+#: src/xitk/menus.c:569
+msgid "Menus/Navigation..."
+msgstr "メニュー/ナビゲーション..."
+
+#: src/xitk/menus.c:573
+msgid "Menus/SEP"
+msgstr "メニュー/SEP"
+
+#: src/xitk/menus.c:581
+msgid "Stream"
+msgstr "ストリーム"
+
+#: src/xitk/menus.c:585
+msgid "Stream/Information..."
+msgstr "ストリーム/情報..."
+
+#: src/xitk/menus.c:589
+msgid "Stream/Information (OSD)"
+msgstr "ストリーム/情報 (OSD)"
+
+#: src/xitk/menus.c:593 src/xitk/stream_infos.c:718
+msgid "Video"
+msgstr "ビデオ"
+
+#: src/xitk/menus.c:597
+msgid "Video/Deinterlace"
+msgstr "ビデオ/Deinterlace"
+
+#: src/xitk/menus.c:601 src/xitk/menus.c:641
+msgid "Video/SEP"
+msgstr "ビデオ/SEP"
+
+#: src/xitk/menus.c:605
+msgid "Video/Aspect ratio"
+msgstr "ビデオ/アスペクト比"
+
+#: src/xitk/menus.c:609
+msgid "Video/Aspect ratio/Automatic"
+msgstr "ビデオ/アスペクト比/自動"
+
+#: src/xitk/menus.c:613
+msgid "Video/Aspect ratio/Square"
+msgstr "ビデオ/アスペクト比/四角"
+
+#: src/xitk/menus.c:617
+msgid "Video/Aspect ratio/4:3"
+msgstr "ビデオ/アスペクト比/4:3"
+
+#: src/xitk/menus.c:621
+msgid "Video/Aspect ratio/Anamorphic"
+msgstr "ビデオ/アスペクト比/Anamorphic"
+
+#: src/xitk/menus.c:625
+msgid "Video/Aspect ratio/DVB"
+msgstr "ビデオ/アスペクト比/DVB"
+
+#: src/xitk/menus.c:629
+msgid "Video/200%"
+msgstr "ビデオ/200%"
+
+#: src/xitk/menus.c:633
+msgid "Video/100%"
+msgstr "ビデオ/100%"
+
+#: src/xitk/menus.c:637
+msgid "Video/50%"
+msgstr "ビデオ/50%"
+
+#: src/xitk/menus.c:645
+msgid "Video/Postprocess"
+msgstr "ビデオ/後処理"
+
+#: src/xitk/menus.c:649
+msgid "Video/Postprocess/Chain Reaction..."
+msgstr "ビデオ/後処理/Chain Reaction..."
+
+#: src/xitk/menus.c:653
+msgid "Video/Postprocess/Enable Postprocessing"
+msgstr "ビデオ/後処理/後処理有効"
+
+#: src/xitk/menus.c:661
+msgid "Audio/Volume"
+msgstr "音声/音量"
+
+#: src/xitk/menus.c:665
+msgid "Audio/Volume/Mute"
+msgstr "音声/音量/ミュート"
+
+#: src/xitk/menus.c:669
+msgid "Audio/Volume/Increase 10%"
+msgstr "音声/音量/10% 増加"
+
+#: src/xitk/menus.c:673
+msgid "Audio/Volume/Decrease 10%"
+msgstr "音声/音量/10% 減少"
+
+#: src/xitk/menus.c:677 src/xitk/menus.c:841
+msgid "Audio/Channel"
+msgstr "音声/チャンネル"
+
+#: src/xitk/menus.c:681 src/xitk/menus.c:815
+msgid "Audio/Visualization"
+msgstr "音声/ビデオ化"
+
+#: src/xitk/menus.c:689 src/xitk/menus.c:895
+msgid "Subtitle/Channel"
+msgstr "字幕/チャンネル"
+
+#: src/xitk/menus.c:697
+msgid "Settings"
+msgstr "設定"
+
+#: src/xitk/menus.c:701
+msgid "Settings/Setup..."
+msgstr "設定/セットアップ..."
+
+#: src/xitk/menus.c:706
+msgid "Settings/Skin Downloader..."
+msgstr "設定/ダウンローダー..."
+
+#: src/xitk/menus.c:711
+msgid "Settings/Keymap Editor..."
+msgstr "設定/キーマップエディタ..."
+
+#: src/xitk/menus.c:715
+msgid "Settings/Video..."
+msgstr "設定/ビデオ..."
+
+#: src/xitk/menus.c:719
+msgid "Settings/TV Analog..."
+msgstr "設定/TV アナログ..."
+
+#: src/xitk/menus.c:727
+msgid "Help..."
+msgstr "ヘルプ..."
+
+#: src/xitk/menus.c:731
+msgid "Logs..."
+msgstr "ログ..."
+
+#: src/xitk/menus.c:739 src/xitk/panel.c:1301
+msgid "Quit"
+msgstr "終了"
+
+#: src/xitk/menus.c:752
+#, c-format
+msgid "xine %s"
+msgstr "xine %s"
+
+#: src/xitk/menus.c:776
+msgid "Open/Subtitle..."
+msgstr "開く/字幕..."
+
+#. Save Playlist
+#: src/xitk/menus.c:781
+msgid "Playlist/Save..."
+msgstr "再生リスト/保存..."
+
+#: src/xitk/menus.c:832
+msgid "Audio/Visualization/None"
+msgstr "音声/ビデオ化/なし"
+
+#: src/xitk/menus.c:846
+msgid "Audio/Channel/Off"
+msgstr "音声/チャンネル/オフ"
+
+#: src/xitk/menus.c:853
+msgid "Audio/Channel/Auto"
+msgstr "音声/チャンネル/自動"
+
+#: src/xitk/menus.c:900
+msgid "Subtitle/Channel/Off"
+msgstr "字幕/チャンネル/オフ"
+
+#: src/xitk/menus.c:907
+msgid "Subtitle/Channel/Auto"
+msgstr "字幕/チャンネル/自動"
+
+#: src/xitk/menus.c:989
+msgid "Add Mediamark"
+msgstr "メディアマーク追加"
+
+#: src/xitk/menus.c:1031 src/xitk/menus.c:1107
+msgid "Off"
+msgstr "オフ"
+
+#: src/xitk/menus.c:1038 src/xitk/menus.c:1113
+msgid "Auto"
+msgstr "自動"
+
+#: src/xitk/menus.c:1163 src/xitk/menus.c:1173
+msgid "Scan"
+msgstr "走査"
+
+#: src/xitk/menus.c:1165 src/xitk/menus.c:1174 src/xitk/mrl_browser.c:288
+#: src/xitk/playlist.c:1189
+msgid "Add"
+msgstr "追加"
+
+#: src/xitk/menus.c:1171
+msgid "Play"
+msgstr "再生"
+
+#: src/xitk/menus.c:1178 src/xitk/menus.c:1210
+msgid "Delete All"
+msgstr "すべて削除"
+
+#: src/xitk/menus.c:1180
+msgid "Move Up"
+msgstr "上に移動"
+
+#: src/xitk/menus.c:1181
+msgid "Move Down"
+msgstr "下に移動"
+
+#: src/xitk/mrl_browser.c:207
+msgid "All extensions"
+msgstr "全ての拡張"
+
+#: src/xitk/mrl_browser.c:277
+msgid "xine MRL Browser"
+msgstr "xine MRL ブラウザー"
+
+#: src/xitk/mrl_browser.c:304
+msgid "Source:"
+msgstr "ソース:"
+
+#: src/xitk/osd.c:285
+msgid "post animation"
+msgstr ""
+
+#: src/xitk/osd.c:295
+msgid "unknown"
+msgstr "未知"
+
+#: src/xitk/osd.c:337
+msgid "Audio: "
+msgstr "音声: "
+
+#: src/xitk/osd.c:387
+msgid "of"
+msgstr ""
+
+#: src/xitk/osd.c:530
+msgid "Position in Stream"
+msgstr "ストリームの位置"
+
+#: src/xitk/osd.c:674
+msgid "Subtitles: "
+msgstr "字幕: "
+
+#: src/xitk/osd.c:703
+msgid "Audio Channel: "
+msgstr "音声チャンネル: "
+
+#: src/xitk/panel.c:47
+msgid "Play previous chapter or mrl"
+msgstr "前のチャプターか MRL を再生"
+
+#: src/xitk/panel.c:48
+msgid "Play next chapter or mrl"
+msgstr "次のチャプターか MRL を再生"
+
+#: src/xitk/panel.c:51
+msgid "Play previous entry from playlist"
+msgstr "再整リストから前のエントリを再生"
+
+#: src/xitk/panel.c:52
+msgid "Play next entry from playlist"
+msgstr "再整リストから次のエントリを再生"
+
+#: src/xitk/panel.c:352 src/xitk/panel.c:354 src/xitk/panel.c:357
+msgid "Total time: "
+msgstr "総時間: "
+
+#: src/xitk/panel.c:862
+#, c-format
+msgid "Amp: %s"
+msgstr ""
+
+#: src/xitk/panel.c:862 src/xitk/panel.c:867
+msgid "Muted"
+msgstr "ミュート"
+
+#: src/xitk/panel.c:862 src/xitk/panel.c:867
+msgid "Unmuted"
+msgstr "ミュート解除"
+
+#: src/xitk/panel.c:867
+#, c-format
+msgid "Audio: %s"
+msgstr "音声: %s"
+
+#: src/xitk/panel.c:1057
+msgid "Volume control"
+msgstr "音量制御"
+
+#: src/xitk/panel.c:1059
+msgid "Mute toggle"
+msgstr "ミュートトグル"
+
+#: src/xitk/panel.c:1098
+msgid "xine Panel"
+msgstr "xine パネル"
+
+#: src/xitk/panel.c:1119
+msgid "panel: couldn't find image for background\n"
+msgstr "パネル: 背景用画像を見つけることが出来ませんでした\n"
+
+#: src/xitk/panel.c:1262
+msgid "Stop playback"
+msgstr "再生停止"
+
+#: src/xitk/panel.c:1270
+msgid "Play selected entry"
+msgstr "選択を再生"
+
+#: src/xitk/panel.c:1278
+msgid "Pause/Resume playback"
+msgstr "再生の一時停止/解除"
+
+#: src/xitk/panel.c:1293
+msgid "Eject current medium"
+msgstr ""
+
+#: src/xitk/panel.c:1309
+msgid "Setup window"
+msgstr "セットアップウィンドウ"
+
+#: src/xitk/panel.c:1317
+msgid "Navigator"
+msgstr "ナビゲータ"
+
+#: src/xitk/panel.c:1325
+msgid "Hide GUI"
+msgstr "GUI を隠す"
+
+#: src/xitk/panel.c:1333
+msgid "Fullscreen/Window mode"
+msgstr "フルスクリーン/ウィンドウモード"
+
+#: src/xitk/panel.c:1341
+msgid "Next audio channel"
+msgstr "次の音声チャンネル"
+
+#: src/xitk/panel.c:1349
+msgid "Previous audio channel"
+msgstr "前の音声チャンネル"
+
+#: src/xitk/panel.c:1357
+msgid "Next SPU channel"
+msgstr "次の SPU チャンネル"
+
+#: src/xitk/panel.c:1365
+msgid "Previous SPU channel"
+msgstr "前の SPU チャンネル"
+
+#: src/xitk/panel.c:1380
+msgid "Total time: --:--:--"
+msgstr "総時間: --:--:--"
+
+#: src/xitk/panel.c:1416
+msgid "Stream playback position slider"
+msgstr "ストリーム再生位置スライダー"
+
+#: src/xitk/panel.c:1450
+msgid "Take a snapshot"
+msgstr "スナップショットを取る"
+
+#: src/xitk/panel.c:1458
+msgid "Slow motion"
+msgstr "スローモーション"
+
+#: src/xitk/panel.c:1466
+msgid "Fast motion"
+msgstr "ファーストモーション"
+
+#: src/xitk/panel.c:1482
+msgid "Control"
+msgstr "制御"
+
+#: src/xitk/panel.c:1490
+msgid "Open Location"
+msgstr ""
+
+#: src/xitk/panel.c:1495
+msgid "gui tips visibility"
+msgstr "GUI ティップス可視化"
+
+#: src/xitk/panel.c:1502
+msgid "tips timeout (ms)"
+msgstr "ティップスタイムアウト (ミリ秒)"
+
+#: src/xitk/panel.c:1517
+msgid "gui panel visibility"
+msgstr "GUI パネル可視化"
+
+#: src/xitk/playlist.c:376 src/xitk/playlist.c:1199 src/xitk/skins.c:1193
+msgid "Load"
+msgstr "読み込み"
+
+#: src/xitk/playlist.c:382
+msgid "Load a playlist"
+msgstr "再生リスト読み込み"
+
+#: src/xitk/playlist.c:415
+msgid "Save a playlist"
+msgstr "再生リスト保存"
+
+#: src/xitk/playlist.c:1026
+msgid "xine Playlist Editor"
+msgstr "xine 再生リストエディタ"
+
+#: src/xitk/playlist.c:1044
+msgid "playlist: couldn't find image for background\n"
+msgstr "再生リスト: 背景用画像を見つけることが出来ませんでした\n"
+
+#: src/xitk/playlist.c:1157
+msgid "Move up selected MRL"
+msgstr "選択 MRL を上に移動"
+
+#: src/xitk/playlist.c:1164
+msgid "Move down selected MRL"
+msgstr "選択 MRL を下に移動"
+
+#: src/xitk/playlist.c:1171
+msgid "Start playback of selected MRL"
+msgstr "再生リストから選択 MRL を再生開始"
+
+#: src/xitk/playlist.c:1178
+msgid "Delete selected MRL from playlist"
+msgstr "再生リストから選択 MRL を削除"
+
+#: src/xitk/playlist.c:1185
+msgid "Delete all entries in playlist"
+msgstr "再生リストからすべてのエントリを削除"
+
+#: src/xitk/playlist.c:1195
+msgid "Add one or more entries in playlist"
+msgstr "再生リストにひとつ以上のエントリを追加"
+
+#: src/xitk/playlist.c:1205
+msgid "Load saved playlist"
+msgstr "保存済み再生リストの読み込み"
+
+#: src/xitk/playlist.c:1215
+msgid "Save playlist"
+msgstr "再生リスト保存"
+
+#: src/xitk/playlist.c:1225
+msgid "Close playlist window"
+msgstr "再生リストウィンドウを閉じる"
+
+#: src/xitk/playlist.c:1243
+msgid "Scan for:"
+msgstr ""
+
+#: src/xitk/playlist.c:1255
+msgid "Direct MRL entry"
+msgstr "ダイレクト MRL エントリ"
+
+#: src/xitk/post.c:207
+msgid "Audio visualization plugin"
+msgstr "音声ビジュアル化プラグイン"
+
+#: src/xitk/post.c:208
+msgid "Post audio plugin to used when playing streams without video"
+msgstr ""
+
+#: src/xitk/post.c:517
+#, c-format
+msgid "Entered value is out of bounds (%d>%d<%d)."
+msgstr ""
+
+#: src/xitk/post.c:540
+#, c-format
+msgid "Entered value is out of bounds (%e>%e<%e)."
+msgstr ""
+
+#: src/xitk/post.c:567
+msgid "parameter type POST_PARAM_TYPE_STRING not supported yet.\n"
+msgstr ""
+"パラメータータイプ POST_PARAM_TYPE_STRING はまだサポートされていません。\n"
+
+#: src/xitk/post.c:577
+msgid "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"
+msgstr ""
+"パラメータータイプ POST_PARAM_TYPE_STRINGLIST はまだサポートされていませ"
+"ん。\n"
+
+#: src/xitk/post.c:602
+msgid "No description available"
+msgstr "利用可能な説明がありません。"
+
+#: src/xitk/post.c:772
+msgid "No Filter"
+msgstr "フィルターなし"
+
+#: src/xitk/post.c:981
+msgid "Plugin Help"
+msgstr "プラグインヘルプ"
+
+#: src/xitk/post.c:1152
+msgid "There is no parameter available for this plugin."
+msgstr "このプラグインで利用可能なパラメーターはありません。"
+
+#: src/xitk/post.c:1755
+msgid "Chain Reaction"
+msgstr ""
+
+#: src/xitk/post.c:1802
+msgid "New Filter"
+msgstr "新規フィルター"
+
+#: src/xitk/post.c:1817
+msgid "Enable"
+msgstr "有効"
+
+#: src/xitk/post.c:2090
+msgid "Deinterlace plugin."
+msgstr "インターレース解除プラグイン。"
+
+#: src/xitk/post.c:2091
+msgid ""
+"Plugin (with optional parameters) to use when deinterlace is used (plugin "
+"separator is ';')."
+msgstr ""
+
+#: src/xitk/session.c:818
+#, c-format
+msgid "Session %d isn't running.\n"
+msgstr "セッション %d は実行していません。\n"
+
+#: src/xitk/setup.c:362
+msgid "Important Notice"
+msgstr "重要な通知"
+
+#: src/xitk/setup.c:365
+msgid ""
+"You changed some configuration value which require to restart xine to take "
+"effect."
+msgstr ""
+
+#: src/xitk/setup.c:839 src/xitk/setup.c:841 src/xitk/setup.c:849
+#: src/xitk/setup.c:851 src/xitk/setup.c:859 src/xitk/setup.c:861
+#: src/xitk/setup.c:869 src/xitk/setup.c:871 src/xitk/setup.c:879
+#: src/xitk/setup.c:881
+msgid "No help available"
+msgstr "利用可能なヘルプがありません"
+
+#: src/xitk/setup.c:899
+msgid ""
+"There is no configuration option available in this user experience level."
+msgstr "このユーザーの体験レベルでの利用可能な設定オプションはありません。"
+
+#: src/xitk/setup.c:1097
+msgid "xine setup"
+msgstr "xine セットアップ"
+
+#: src/xitk/setup.c:1132
+msgid "(*)  you need to restart xine for this setting to take effect"
+msgstr "(*) この設定の効果を反映するために xine を再起動する必要があります"
+
+#: src/xitk/setup.c:1162
+msgid "OK"
+msgstr "OK"
+
+#: src/xitk/skins.c:282 src/xitk/skins.c:478
+#, c-format
+msgid "Failed to load %s/%s. Load fallback skin %s\n"
+msgstr "%s/%s の読み込みに失敗しました。前のスキン %s を読み込みます\n"
+
+#: src/xitk/skins.c:288
+#, c-format
+msgid "Failed to load %s/%s. Reload old skin '%s'.\n"
+msgstr "%s/%s の読み込みに失敗しました。古いスキン '%s' を再読み込みします。\n"
+
+#: src/xitk/skins.c:306
+#, c-format
+msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
+msgstr ""
+"%s の読み込みに失敗しました。おかしいバージョンです。前のスキン '%s'を読み込"
+"みます。\n"
+
+#: src/xitk/skins.c:364
+#, c-format
+msgid "Ooch, skin not found, use fallback '%s'.\n"
+msgstr "スキンが見つかりません。前の '%s' を使います。\n"
+
+#: src/xitk/skins.c:394 src/xitk/skins.c:421
+#, c-format
+msgid "No available skin found. Say goodbye.\n"
+msgstr "利用可能なスキンが見つかりません。さようなら。\n"
+
+#: src/xitk/skins.c:435 src/xitk/skins.c:962
+msgid "gui skin theme"
+msgstr "GUI スキンテーマ"
+
+#: src/xitk/skins.c:454
+#, c-format
+msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
+msgstr ""
+
+#: src/xitk/skins.c:461
+#, c-format
+msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
+msgstr "スキン '%s' が見つかりません。前の '%s' を使います。\n"
+
+#: src/xitk/skins.c:466
+#, c-format
+msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
+msgstr ""
+"スキンのフォールバック読み込みに失敗しました。インストール済みスキンを確認し"
+"てください。終了します。\n"
+
+#: src/xitk/skins.c:485
+#, c-format
+msgid "Failed to load %s/%s. Exiting.\n"
+msgstr "%s/%s の読み込みに失敗しました。終了中です。\n"
+
+#: src/xitk/skins.c:495
+#, c-format
+msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
+msgstr ""
+"スキン %s の読み込みに失敗しました。バージョンが不正です。スキン '%s' を"
+"フォールバック読み込みします。\n"
+
+#: src/xitk/skins.c:663
+#, c-format
+msgid "Unable to retrieve skin list from %s: %s"
+msgstr "%s からスキン一覧の取得が出来ません: %s"
+
+#: src/xitk/skins.c:850 src/xitk/skins.c:981
+#, c-format
+msgid "Unable to download '%s': %s\n"
+msgstr "'%s' のダウンロードができません: %s\n"
+
+#: src/xitk/skins.c:897
+#, c-format
+msgid "Unable to create '%s' directory: %s."
+msgstr "ディレクトリ '%s' の作成ができません: %s"
+
+#: src/xitk/skins.c:969
+#, c-format
+msgid "Skin %s correctly installed"
+msgstr "スキン %s を正しくインストールしました"
+
+#: src/xitk/skins.c:975
+#, c-format
+msgid "Unable to create '%s'."
+msgstr "'%s' を作成できません"
+
+#: src/xitk/skins.c:1070
+msgid "Be Patient..."
+msgstr ""
+
+#: src/xitk/skins.c:1072
+#, c-format
+msgid "Retrieve skin list from %s"
+msgstr "%s からスキン一覧を取得"
+
+#: src/xitk/skins.c:1120
+msgid "Choose a skin to download..."
+msgstr "ダウンロードするスキンを選ぶ"
+
+#: src/xitk/snapshot.c:827 src/xitk/snapshot.c:838
+msgid "Error: "
+msgstr "エラー: "
+
+#: src/xitk/snapshot.c:881
+msgid "xine_get_current_frame() failed\n"
+msgstr ""
+
+#: src/xitk/snapshot.c:890
+msgid "Wrong image size: "
+msgstr "間違った画像サイズ: "
+
+#: src/xitk/snapshot.c:890
+msgid ". Snapshot aborted."
+msgstr ""
+
+#: src/xitk/snapshot.c:902
+msgid "prvt_image_alloc failed\n"
+msgstr ""
+
+#: src/xitk/snapshot.c:911
+msgid "Framegrabber failed\n"
+msgstr ""
+
+#. the dxr3 driver does not allocate yuv buffers
+#. image->u and image->v are always 0 for YUY2
+#: src/xitk/snapshot.c:918
+msgid "Not supported for this video out driver\n"
+msgstr "このビデオ出力ドライバーは未サポートです\n"
+
+#: src/xitk/snapshot.c:1027
+msgid "File open failed"
+msgstr "ファイルを開けませんでした"
+
+#: src/xitk/snapshot.c:1047
+msgid "png_create_write_struct() failed\n"
+msgstr "png_create_write_struct() 失敗しました\n"
+
+#: src/xitk/snapshot.c:1061
+msgid "png_create_info_struct() failed\n"
+msgstr "png_create_info_struct() 失敗しました\n"
+
+#: src/xitk/snapshot.c:1081
+msgid "PNG Parsing failed\n"
+msgstr "PNG の解析に失敗しました\n"
+
+#: src/xitk/snapshot.c:1095
+msgid "Error: yuy2_fudge failed\n"
+msgstr "エラー: yuy2_fudge 失敗しました\n"
+
+#: src/xitk/snapshot.c:1126
+msgid "rgb_alloc() failed\n"
+msgstr "rgb_alloc() 失敗しました\n"
+
+#: src/xitk/snapshot.c:1207
+msgid "File written: "
+msgstr ""
+
+#: src/xitk/splash.c:65
+msgid "xine Splash"
+msgstr "xine スプラッシュ"
+
+#. Create window
+#: src/xitk/stream_infos.c:465
+msgid "Stream Information"
+msgstr "ストリーム情報"
+
+#: src/xitk/stream_infos.c:495 src/xitk/tvset.c:362
+msgid "General"
+msgstr "一般"
+
+#: src/xitk/stream_infos.c:502
+msgid "Title: "
+msgstr "題名: "
+
+#: src/xitk/stream_infos.c:518
+msgid "Comment: "
+msgstr "コメント: "
+
+#: src/xitk/stream_infos.c:534
+msgid "Artist: "
+msgstr "アーティスト: "
+
+#: src/xitk/stream_infos.c:549
+msgid "Genre: "
+msgstr "ジャンル: "
+
+#: src/xitk/stream_infos.c:563
+msgid "Year: "
+msgstr "年: "
+
+#: src/xitk/stream_infos.c:580
+msgid "Album: "
+msgstr "アルバム: "
+
+#: src/xitk/stream_infos.c:596
+msgid "Misc"
+msgstr "その他"
+
+#: src/xitk/stream_infos.c:602
+msgid "Input Plugin: "
+msgstr "入力プラグイン: "
+
+#: src/xitk/stream_infos.c:616
+msgid "System Layer: "
+msgstr "システムレイヤー: "
+
+#: src/xitk/stream_infos.c:630 src/xitk/stream_infos.c:814
+#: src/xitk/stream_infos.c:970
+msgid "Bitrate: "
+msgstr "ビットレート"
+
+#: src/xitk/stream_infos.c:644
+msgid "Frame Duration: "
+msgstr "フレーム間隔: "
+
+#: src/xitk/stream_infos.c:660
+msgid "Is Seekable: "
+msgstr ""
+
+#: src/xitk/stream_infos.c:674
+msgid "Has Chapters: "
+msgstr ""
+
+#: src/xitk/stream_infos.c:688
+msgid "Ignore Spu: "
+msgstr ""
+
+#: src/xitk/stream_infos.c:702
+msgid "Has Still: "
+msgstr ""
+
+#: src/xitk/stream_infos.c:726 src/xitk/stream_infos.c:882
+msgid "Has: "
+msgstr ""
+
+#: src/xitk/stream_infos.c:740 src/xitk/stream_infos.c:896
+msgid "Handled: "
+msgstr ""
+
+#: src/xitk/stream_infos.c:754 src/xitk/stream_infos.c:910
+msgid "Ignore: "
+msgstr "無視: "
+
+#: src/xitk/stream_infos.c:769 src/xitk/stream_infos.c:925
+msgid "Codec: "
+msgstr "コーデック: "
+
+#: src/xitk/stream_infos.c:786 src/xitk/stream_infos.c:942
+msgid "FourCC: "
+msgstr ""
+
+#: src/xitk/stream_infos.c:800 src/xitk/stream_infos.c:956
+msgid "Channel(s): "
+msgstr "チャンネル: "
+
+#: src/xitk/stream_infos.c:829
+msgid "Resolution: "
+msgstr "解像度: "
+
+#: src/xitk/stream_infos.c:844
+msgid "Ratio: "
+msgstr "比率: "
+
+#: src/xitk/stream_infos.c:858
+msgid "Stream(s): "
+msgstr "ストリーム"
+
+#: src/xitk/stream_infos.c:984
+msgid "Bits: "
+msgstr "ビット: "
+
+#: src/xitk/stream_infos.c:999
+msgid "Samplerate: "
+msgstr "サンプルレート"
+
+#: src/xitk/stream_infos.c:1017 src/xitk/tvset.c:509
+msgid "Update"
+msgstr "更新"
+
+#: src/xitk/tvout.c:93
+msgid "nvtv TV output system"
+msgstr "nvtv TV 出力システム"
+
+#: src/xitk/tvout.c:94
+msgid "Select which TV output system supported by your TV."
+msgstr ""
+
+#: src/xitk/tvout.c:101
+msgid "Enable XRandr extension"
+msgstr "XRandr 拡張有効"
+
+#: src/xitk/tvout.c:102
+msgid ""
+"Enable the use of xrandr to autofit the screen to match the TV-resolution"
+msgstr ""
+
+#: src/xitk/tvout.c:204
+msgid "Command to turn off TV out"
+msgstr ""
+
+#: src/xitk/tvout.c:205 src/xitk/tvout.c:214
+msgid "atitvout command line used to turn on TV output."
+msgstr ""
+
+#: src/xitk/tvout.c:213
+msgid "Command to turn on TV out"
+msgstr ""
+
+#: src/xitk/tvset.c:332
+msgid "TV/Analog Video parameters"
+msgstr "TV/アナログビデオパラメーター"
+
+#: src/xitk/tvset.c:370
+msgid "Input: "
+msgstr "入力: "
+
+#: src/xitk/tvset.c:394
+msgid "Broadcast system: "
+msgstr ""
+
+#: src/xitk/tvset.c:416
+msgid "Channel: "
+msgstr "チャンネル: "
+
+#: src/xitk/tvset.c:435
+msgid "Standard"
+msgstr "標準"
+
+#: src/xitk/tvset.c:442
+msgid "Frame Rate: "
+msgstr "フレームレート: "
+
+#: src/xitk/tvset.c:467
+msgid "Analog Standard: "
+msgstr "アナログ標準"
+
+#: src/xitk/tvset.c:486
+msgid "Frame Size"
+msgstr "フレームサイズ"
+
+#: src/xitk/tvset.c:496
+msgid "MPEG2"
+msgstr "MPEG2"
+
+#: src/xitk/videowin.c:307
+#, c-format
+msgid "videowin: output driver cannot select a working visual\n"
+msgstr ""
+
+#: src/xitk/videowin.c:314
+#, c-format
+msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
+msgstr ""
+
+#: src/xitk/videowin.c:500
+msgid "XF86VidMode Extension: modeline switching failed.\n"
+msgstr ""
+
+#: src/xitk/videowin.c:1460
+msgid ""
+"Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
+"2 3)"
+msgstr ""
+
+#: src/xitk/videowin.c:1461
+msgid ""
+"Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
+msgstr ""
+
+#: src/xitk/videowin.c:1517
+msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
+msgstr ""
+
+#: src/xitk/videowin.c:1528
+msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
+msgstr ""
+
+#: src/xitk/videowin.c:1539
+msgid "width for xinerama fullscreen (-8192 = autodetect)"
+msgstr "xinerama フルスクリーンの幅 (-8192 = 自動検出)"
+
+#: src/xitk/videowin.c:1550
+msgid "height for xinerama fullscreen (-8192 = autodetect)"
+msgstr "xinerama フルスクリーンの高さ (-8192 = 自動検出)"
+
+#: src/xitk/videowin.c:1586
+msgid "xine Video Window"
+msgstr "xine ビデオウィンドウ"
+
+#: src/xitk/videowin.c:1590
+msgid "xine Video Fullscreen Window"
+msgstr "xine フルスクリーンビデオウィンドウ"
+
+#: src/xitk/videowin.c:1594
+msgid "xine Video Borderless Window"
+msgstr "xine ふちなしビデオウィンドウ"
+
+#: src/xitk/videowin.c:1607
+#, c-format
+msgid "XAllocWMHints() failed\n"
+msgstr "XAllocWMHints() 失敗しました\n"
+
+#: src/xitk/videowin.c:1622
+msgid "New stream sizes resize output window"
+msgstr ""
+
+#: src/xitk/videowin.c:1632
+msgid "Double size for small streams (require stream_resize_window)"
+msgstr ""
+
+#: src/xitk/videowin.c:1656
+msgid "use XVidModeExtension when switching to fullscreen"
+msgstr ""
+
+#: src/xitk/videowin.c:1677
+#, c-format
+msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
+msgstr ""
+
+#: src/xitk/videowin.c:1682
+#, c-format
+msgid "XF86VidMode Extension: %d modelines found.\n"
+msgstr ""
+
+#: src/xitk/videowin.c:1691
+#, c-format
+msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+msgstr ""
+
+#: src/xitk/videowin.c:1722
+#, c-format
+msgid ""
+"XF86VidMode Extension: could not get list of available modelines. Failed.\n"
+msgstr ""
+
+#: src/xitk/videowin.c:1725
+#, c-format
+msgid "XF86VidMode Extension: initialization failed, not using it.\n"
+msgstr "XF86VidMode 拡張: 初期化できませんでした。使用しません。\n"
+
+#: src/xitk/viewlog.c:261
+msgid "log info"
+msgstr "ログ情報"
+
+#: src/xitk/viewlog.c:263
+#, c-format
+msgid "There is no log entry for logging section '%s'.\n"
+msgstr "ログセクション '%s' はログエントリがありません。\n"
+
+#: src/xitk/viewlog.c:395
+msgid "xine log viewer"
+msgstr "xine ログビュアー"
+
+#: src/xitk/viewlog.c:445
+msgid "Refresh"
+msgstr "再描画"
