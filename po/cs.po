@@ -6,13 +6,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.24\n"
 "POT-Creation-Date: 2004-04-11 20:20+0000\n"
-"PO-Revision-Date: 2004-02-23 23:33+0100\n"
+"PO-Revision-Date: 2004-04-11 22:23+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: <xine-docs@lists.sourceforge.net>\n"
 
 #: src/xitk/actions.c:349
 #, c-format
@@ -145,6 +145,9 @@ msgid ""
 "This is not allowed unless you enable the 'misc.implicit_config' setting "
 "after reading and understanding its help text."
 msgstr ""
+"Pokusili jste zmìnit konfiguraci pomocí konfiguraèního MRL cfg://.\n"
+"Toto není dovoleno, pokud nepovolíte nastavení 'misc.implicit_config'."
+"Pøedtím si pøeètìte nápovìdu u této volby."
 
 #: src/xitk/config_wrapper.c:173
 #, c-format
@@ -2023,11 +2026,9 @@ msgstr "Vypnout"
 msgid "Auto"
 msgstr "Automaticky"
 
-# only ISO8859-1 characters (skin)
 #: src/xitk/menus.c:1116 src/xitk/menus.c:1125
-#, fuzzy
 msgid "Scan"
-msgstr "Hledani:"
+msgstr "Prozkoumat"
 
 #: src/xitk/menus.c:1117 src/xitk/menus.c:1126 src/xitk/mrl_browser.c:276
 #: src/xitk/playlist.c:1197
@@ -2567,9 +2568,8 @@ msgid "File '%s' written.\n"
 msgstr "Soubor '%s' ulo¾en.\n"
 
 #: src/xitk/splash.c:65
-#, fuzzy
 msgid "xine Splash"
-msgstr "xine %s"
+msgstr "Úvodní obrázek xine"
 
 # window title
 #. Create window
