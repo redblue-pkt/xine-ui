@@ -361,7 +361,6 @@ typedef struct {
 
 } gGui_t;
 
-void event_listener(void *user_data, const xine_event_t *event);
 
 void set_window_states_start(Window window);
 #define set_window_states_start(window)                                   \

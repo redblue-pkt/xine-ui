@@ -983,7 +983,7 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
 /*
  *
  */
-void event_listener(void *user_data, const xine_event_t *event) {
+static void event_listener(void *user_data, const xine_event_t *event) {
   struct timeval tv;
 
   /*
@@ -2061,12 +2061,17 @@ int main(int argc, char *argv[]) {
 #endif
 
   /* Visual animation stream init */
-  gGui->visual_anim.stream = NULL;
-  gGui->visual_anim.event_queue = NULL;
+  gGui->visual_anim.stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+  gGui->visual_anim.event_queue = xine_event_new_queue(gGui->visual_anim.stream);
   gGui->visual_anim.current = 0;
+  xine_event_create_listener_thread(gGui->visual_anim.event_queue, event_listener, NULL);
+  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -2);
+  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
+  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
   /* subtitle stream */
-  gGui->spu_stream = NULL;
+  gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+  xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
   /* init the video window */
   video_window_select_visual();
