@@ -164,7 +164,7 @@ static kbinding_entry_t default_binding_table[] = {
   { "Enlarge the output window vertical size by one pixel.",
     "WindowEnlargeVPixel",     ACTID_WINDOWENLARGE_V_PIXEL  , "greater",  KEYMOD_META    },
   { "Enlarge the output window (H/V) size by one pixel.",
-    "WindowEnlargeVPixel",     ACTID_WINDOWENLARGE_PIXEL    , "greater",  KEYMOD_CONTROL | KEYMOD_META },
+    "WindowEnlargePixel",      ACTID_WINDOWENLARGE_PIXEL    , "greater",  KEYMOD_CONTROL | KEYMOD_META },
   { "Select next sub picture (subtitle) channel.",
     "SpuNext",                ACTID_SPU_NEXT                , "period",   KEYMOD_NOMOD   },
   { "Select previous sub picture (subtitle) channel.",
