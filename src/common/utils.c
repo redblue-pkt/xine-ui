@@ -832,3 +832,19 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 }
 
 #endif /* !HAVE_X11 */
+
+void dump_error(int verbosity, char *msg) {
+  if(verbosity) {
+    fprintf(stderr, "%s", "\n---------------------- (ERROR) ----------------------\n");
+    fputs(msg, stderr); 
+    fprintf(stderr, "%s","\n------------------ (END OF ERROR) -------------------\n\n");
+  }
+}
+
+void dump_info(int verbosity, char *msg) {
+  if(verbosity) {
+    fprintf(stderr, "%s", "\n---------------------- (INFO) ----------------------\n");
+    fputs(msg, stderr);
+    fprintf(stderr, "%s", "\n------------------- (END OF INFO) ------------------\n\n");
+  }
+}

@@ -92,4 +92,7 @@ void dump_cpu_infos(void);
 void dump_xfree_info(Display *display, int screen, int complete);
 #endif
 
+void dump_error(int verbosity, char *msg);
+void dump_info(int verbosity, char *msg);
+
 #endif

@@ -57,6 +57,8 @@ static void errors_create_window(char *title, char *message) {
   if((title == NULL) || (message == NULL))
     return;
   
+  dump_error(gGui->verbosity, message);
+
   xw = xitk_window_dialog_two_buttons_with_width(gGui->imlib_data, title, 
 						 _("Done"), _("More..."),
 						 NULL, _errors_display_log, 
@@ -106,6 +108,8 @@ void xine_error(char *message, ...) {
     xitk_window_t *xw;
     char buf2[(strlen(buf) * 2) + 1];
     
+    dump_error(gGui->verbosity, buf);
+    
     xitk_subst_special_chars(buf, buf2);
     xw = xitk_window_dialog_error(gGui->imlib_data, buf2);
     
@@ -149,6 +153,8 @@ void xine_error_with_more(char *message, ...) {
       return;
   }
   
+  dump_error(gGui->verbosity, buf);
+
   if(gGui->stdctl_enable) {
     printf("%s\n", buf);
   }
@@ -190,6 +196,8 @@ void xine_info(char *message, ...) {
       return;
   }
   
+  dump_info(gGui->verbosity, buf);
+
   if(gGui->stdctl_enable) {
     printf("%s\n", buf);
   }
@@ -226,10 +234,12 @@ void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
   switch(err) {
 
   case XINE_ERROR_NONE:
+    dump_error(gGui->verbosity, "got XINE_ERROR_NONE.");
     /* noop */
     break;
     
   case XINE_ERROR_NO_INPUT_PLUGIN:
+    dump_error(gGui->verbosity, "got XINE_ERROR_NO_INPUT_PLUGIN.");
     xine_error_with_more(_("- xine engine error -\n\n"
 			   "There is no input plugin available to handle '%s'.\n"
 			   "Maybe MRL syntax is wrong or file/stream source doesn't exist."),
@@ -237,6 +247,7 @@ void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
     break;
     
   case XINE_ERROR_NO_DEMUX_PLUGIN:
+    dump_error(gGui->verbosity, "got XINE_ERROR_NO_DEMUX_PLUGIN.");
     xine_error_with_more(_("- xine engine error -\n\nThere is no demuxer plugin available "
 			   "to handle '%s'.\n"
 			   "Usually this means that the file format was not recognized."), 
@@ -244,21 +255,25 @@ void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
     break;
     
   case XINE_ERROR_DEMUX_FAILED:
+    dump_error(gGui->verbosity, "got XINE_ERROR_DEMUX_FAILED.");
     xine_error_with_more(_("- xine engine error -\n\nDemuxer failed. "
 			   "Maybe '%s' is a broken file?\n"), _mrl);
     break;
     
   case XINE_ERROR_MALFORMED_MRL:
+    dump_error(gGui->verbosity, "got XINE_ERROR_MALFORMED_MRL.");
     xine_error_with_more(_("- xine engine error -\n\nMalformed mrl. "
 			   "Mrl '%s' seems malformed/invalid.\n"), _mrl);
     break;
 
   case XINE_ERROR_INPUT_FAILED:
+    dump_error(gGui->verbosity, "got XINE_ERROR_INPUT_FAILED.");
     xine_error_with_more(_("- xine engine error -\n\nInput plugin failed to open "
 			   "mrl '%s'\n"), _mrl);
     break;
     
   default:
+    dump_error(gGui->verbosity, "got unhandle error.");
     xine_error_with_more(_("- xine engine error -\n\n!! Unhandled error !!\n"));
     break;
   }

@@ -529,6 +529,8 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
     kmsg = (char *) realloc(kmsg, strlen(kmsg) + strlen(footer) + 1);
     sprintf(kmsg, "%s%s", kmsg, footer);
 
+    dump_error(gGui->verbosity, kmsg);
+
     xw = xitk_window_dialog_three_buttons_with_width(gGui->imlib_data,
 						     _("Keybindings error!"),
 						     _("Reset"), _("Editor"), _("Cancel"),
