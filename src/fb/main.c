@@ -114,15 +114,21 @@ static int init_video(void)
 	static struct fbxine_callback exit_callback;
 
 	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_video);
-
-	fbxine.video_port =
-		xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
+	
+	if (!strcmp(fbxine.video_port_id, "none"))
+	    fbxine.video_port =
+	        xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
+				       XINE_VISUAL_TYPE_NONE, NULL);
+	else
+	    fbxine.video_port =
+	        xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
 				       XINE_VISUAL_TYPE_FB, NULL);
 	if(!fbxine.video_port)
 	{
-		fprintf(stderr, "Video port failed.\n");
-		return 0;
+	    fprintf(stderr, "Video port failed.\n");
+	    return 0;
 	}
+	
 
 	return 1;
 }

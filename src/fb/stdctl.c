@@ -55,7 +55,10 @@ void *xine_stdctl_loop(void *dummy) {
   int               k;
   fd_set            set;
   struct timeval    tv;
+  int               secs, last_secs;
 
+  last_secs = -1;
+  
   while(1) {
 
     FD_ZERO(&set);
@@ -80,6 +83,17 @@ void *xine_stdctl_loop(void *dummy) {
 	     do_action(k);
       }
     }
+
+    if(get_pos_length(fbxine.stream, NULL, &secs, NULL)) {
+      secs /= 1000;
+      
+      if (secs != last_secs) {
+	fprintf(stdout, "time: %d\n", secs);
+	fflush(stdout);
+	last_secs = secs;
+      }
+    }
+
   }
   
   pthread_exit(NULL);
