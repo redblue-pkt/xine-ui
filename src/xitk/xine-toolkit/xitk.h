@@ -2215,6 +2215,7 @@ void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
 				       xitk_menu_widget_t *m, int x, int y);
 xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w);
+void xitk_menu_destroy_sub_branchs(xitk_widget_t *w);
 void xitk_menu_destroy(xitk_widget_t *w);
 
 #endif

@@ -115,6 +115,11 @@ static int _menu_is_checked(xitk_menu_entry_t *me) {
     return 1;
   return 0;
 }
+static int _menu_is_title(xitk_menu_entry_t *me) {
+  if(me && me->type && ((strncasecmp(me->type, "<title>", 7) == 0)))
+    return 1;
+  return 0;
+}
 
 #ifdef DEBUG_MENU
 static void _menu_dump(menu_private_data_t *private_data) {
@@ -348,6 +353,20 @@ static int _menu_count_separator_from_branch(menu_node_t *branch) {
 
   return ret;
 }
+static int _menu_is_title_in_branch(menu_node_t *branch) {
+  menu_node_t  *me = branch;
+  int           ret = 0;
+  
+  while(me) {
+    if(_menu_is_title(me->menu_entry)) {
+      ret = 1;
+      break;
+    }
+    me = me->next;
+  }
+  
+  return ret;
+}
 static menu_node_t *_menu_get_wider_menuitem_node(menu_node_t *branch) {
   menu_node_t  *me = branch;
   menu_node_t  *max = NULL;
@@ -471,10 +490,12 @@ static void _menu_click_cb(xitk_widget_t *w, void *data) {
     xitk_menu_destroy(me->widget);
   }
   else {
-    if(me->menu_entry->cb)
-      me->menu_entry->cb(me->widget,me->menu_entry->user_data);
-  
-    xitk_menu_destroy(me->widget);
+    if(!_menu_is_title(me->menu_entry)) {
+      if(me->menu_entry->cb)
+	me->menu_entry->cb(me->widget,me->menu_entry->user_data);
+      
+      xitk_menu_destroy(me->widget);
+    }
   }
 }
 
@@ -493,37 +514,55 @@ static void _menu_handle_xevents(XEvent *event, void *data) {
 
 static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w, int x, int y) {
   menu_private_data_t        *private_data;
-  int                         bentries, bsep, rentries;
+  int                         bentries, bsep, btitle, rentries;
   menu_node_t                *maxnode, *me;
-  int                         maxlen, wwidth;
+  int                         maxlen, wwidth, wheight, swidth, sheight;
   xitk_font_t                *fs;
   static xitk_window_t       *xwin;
   menu_window_t              *menu_window;
   xitk_labelbutton_widget_t   lb;
   xitk_widget_t              *btn;
   xitk_pixmap_t              *bg = NULL;
-  int                         yy = 0;
+  int                         yy = 0, got_title = 0;
   
   private_data = (menu_private_data_t *) w->private_data;
   
   XITK_WIDGET_INIT(&lb, private_data->imlibdata);
-
+  
   bentries = _menu_count_entry_from_branch(branch);
   bsep     = _menu_count_separator_from_branch(branch);
+  btitle   = _menu_is_title_in_branch(branch);
   rentries = bentries - bsep;
   maxnode  = _menu_get_wider_menuitem_node(branch);
   
-  fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_12);
+  if(_menu_is_title(maxnode->menu_entry))
+    fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_14);
+  else
+    fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_12);
+
   xitk_font_set_font(fs, private_data->widget->wl->gc);
   maxlen = xitk_font_get_string_length(fs, maxnode->menu_entry->menu);
   xitk_font_unload_font(fs);
   
   wwidth = maxlen + 40;
+  wheight = (rentries * 20) + (bsep * 2) + (btitle * 2);
+  
+  XLOCK(private_data->imlibdata->x.disp);
+  swidth = DisplayWidth(private_data->imlibdata->x.disp, 
+			(DefaultScreen(private_data->imlibdata->x.disp)));
+  sheight = DisplayHeight(private_data->imlibdata->x.disp, 
+			  (DefaultScreen(private_data->imlibdata->x.disp)));
+  XUNLOCK(private_data->imlibdata->x.disp);
+  
+  if((x + (wwidth + 2)) > swidth)
+    x = swidth - (wwidth + 2);
+  if((y + (wheight + 2)) > sheight)
+    y = sheight - (wheight + 2);
   
   xwin = xitk_window_create_simple_window(private_data->imlibdata, 
-					  x, y, wwidth + 2, (rentries * 20) + (bsep * 4) + 2);
+					  x, y, wwidth + 2, wheight + 2);
   
-  if(bsep) {
+  if(bsep || btitle) {
     int width, height;
     
     xitk_window_get_window_size(xwin, &width, &height);
@@ -543,10 +582,54 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   yy = 1;
   while(me) {
 
-    if(_menu_is_separator(me->menu_entry)) {
+    if(_menu_is_title(me->menu_entry)) {
+
+      if(bg && (!got_title)) {
+	int           lbear, rbear, width, asc, des;
+	unsigned int  cfg, cbg;
+	XColor        xcolorf, xcolorb;
+  
+	fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_14);
+	xitk_font_set_font(fs, private_data->widget->wl->gc);
+	
+	xitk_font_string_extent(fs, me->menu_entry->menu, &lbear, &rbear, &width, &asc, &des);
+
+	xcolorb.red = xcolorb.blue = xcolorb.green = 140<<8;
+	xcolorf.red = xcolorf.blue = xcolorf.green = 255<<8;
+
+	XLOCK(private_data->imlibdata->x.disp);
+	XAllocColor(private_data->imlibdata->x.disp,
+		    Imlib_get_colormap(private_data->imlibdata), &xcolorb);
+	XAllocColor(private_data->imlibdata->x.disp,
+		    Imlib_get_colormap(private_data->imlibdata), &xcolorf);
+	XUNLOCK(private_data->imlibdata->x.disp);
+
+	cfg = xcolorf.pixel;
+	cbg = xcolorb.pixel;
+
+	XLOCK(private_data->imlibdata->x.disp);
+	XSetForeground(private_data->imlibdata->x.disp, private_data->widget->wl->gc, cbg);
+	XFillRectangle(private_data->imlibdata->x.disp, bg->pixmap, private_data->widget->wl->gc, 
+		       1, 1, wwidth , 20);
+	XSetForeground(private_data->imlibdata->x.disp, private_data->widget->wl->gc, cfg);
+	XDrawString(private_data->imlibdata->x.disp, 
+		    bg->pixmap, private_data->widget->wl->gc, 5, 1+ ((20+asc+des)>>1)-des, 
+		    me->menu_entry->menu, strlen(me->menu_entry->menu));
+	XUNLOCK(private_data->imlibdata->x.disp);
+	
+	xitk_font_unload_font(fs);
+
+	yy += 20;
+	got_title = 1;
+
+	goto __sep;
+      }
+    }
+    else if(_menu_is_separator(me->menu_entry)) {
+    __sep:
       if(bg)
-	draw_rectangular_inner_box_light(private_data->imlibdata, bg, 3, yy + 1, wwidth - 6, 1);
-      yy += 4;
+	draw_rectangular_inner_box_light(private_data->imlibdata, bg, 3, yy, wwidth - 6, 1);
+      yy += 2;
     }
     else {
       xitk_image_t  *wimage;
@@ -622,6 +705,20 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   XUNLOCK(private_data->imlibdata->x.disp);
   
   xitk_set_focus_to_widget((xitk_widget_t *) (xitk_list_first_content(menu_window->wl.l)));
+}
+
+void xitk_menu_destroy_sub_branchs(xitk_widget_t *w) {
+  
+  if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU) &&
+	   (w->type & WIDGET_GROUP_WIDGET))) {
+    menu_private_data_t *private_data = (menu_private_data_t *) w->private_data;
+    menu_node_t         *me = private_data->mtree->first;
+
+    if(me && me->next)
+      me = me->next;
+    
+    _menu_destroy_subs(private_data, me->menu_window);
+  }
 }
 
 xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 

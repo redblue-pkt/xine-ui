@@ -88,7 +88,7 @@ endif
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
 
-debug-test:
+test-debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)" test
 
 install-debug: debug

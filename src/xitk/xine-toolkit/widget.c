@@ -917,7 +917,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
     }
     return;
   }
-  //  printf(" no slider\n");
+
   mywidget = xitk_get_widget_at (wl, x, y);
   
   if (mywidget != wl->widget_under_mouse) {
@@ -981,7 +981,7 @@ void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsign
  */
 int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp) {
   int                    bRepaint = 0;
-  xitk_widget_t         *mywidget;
+  xitk_widget_t         *mywidget, *menu = NULL;
   widget_event_t         event;
   widget_event_result_t  result;
 
@@ -1000,6 +1000,10 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
+	
+	if(wl->widget_focused && (wl->widget_focused->type & WIDGET_GROUP_MENU)) {
+	  menu = xitk_menu_get_menu(wl->widget_focused);
+	}
 
 	if((wl->widget_focused->type & WIDGET_GROUP_COMBO)) {
 	  if(((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)
@@ -1100,6 +1104,9 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     }
   }
   
+  if((wl->widget_focused == NULL) && menu)
+    wl->widget_focused = menu;
+
   return((bRepaint == 1));
 }
 

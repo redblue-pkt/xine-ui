@@ -1223,6 +1223,11 @@ void xitk_xevent_notify(XEvent *event) {
 	  fx->old_event = event;
 	  if(fx->move.enabled) {
 
+	    if(fx->widget_list->widget_focused && 
+	       (fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)) {
+	      xitk_menu_destroy_sub_branchs(xitk_menu_get_menu(fx->widget_list->widget_focused));
+	    }
+
 	    fx->old_pos.x = fx->new_pos.x;
 	    fx->old_pos.y = fx->new_pos.y;
 
@@ -1275,6 +1280,7 @@ void xitk_xevent_notify(XEvent *event) {
 	  
 	  if(gXitk->menu && (!fx->widget_list->widget_focused || 
 			     (!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) {
+
 	    xitk_set_current_menu(NULL);
 	  }
 	  
