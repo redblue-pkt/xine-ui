@@ -1,3 +1,11 @@
+xine-ui (0.9.17-1) unstable; urgency=medium
+
+  * new upstream release
+    (fixes xshm includes for non-interactive installs, so this should
+     build on the buildds...)
+
+ -- Siggi Langauf <siggi@debian.org>  Fri,  3 Jan 2003 22:41:00 +0100
+
 xine-ui (0.9.16-1) unstable; urgency=low
 
   * This one is actually uploaded again...
