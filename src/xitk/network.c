@@ -37,6 +37,8 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_READLINE
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -64,10 +66,10 @@
 #include <netdb.h>
 #include <pthread.h>
 
-#include "common.h"
+#include <readline.h>
+#include <history.h>
 
-#include "readline.h"
-#include "history.h"
+#include "common.h"
 
 #ifndef	MSG_NOSIGNAL
 #define	MSG_NOSIGNAL	     0
@@ -3077,3 +3079,5 @@ const char *get_homedir(void) {
 }
 
 #endif
+
+#endif  /* HAVE_READLINE */

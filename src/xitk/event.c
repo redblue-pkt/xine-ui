@@ -1597,7 +1597,9 @@ void gui_run(char **session_opts) {
 						 gui_dndcallback, 
 						 NULL, NULL);
   
+#ifdef HAVE_READLINE
   start_remote_server();
+#endif
   init_session();
 
   if(gGui->tvout) {
