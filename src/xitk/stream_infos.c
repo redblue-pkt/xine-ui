@@ -41,6 +41,8 @@
 #define WINDOW_WIDTH        550
 #define WINDOW_HEIGHT       500
 
+#define METAINFO_CHARSET    "UTF-8"
+
 extern gGui_t          *gGui;
 
 static char            *sinfosfontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
@@ -150,10 +152,19 @@ static char *get_num_string(uint32_t num) {
 }
 
 static void get_meta_info(xitk_widget_t *w, int meta) {
-  const char *minfo;
+  char *minfo;
+  xitk_recode_t *xr;
   
-  minfo = xine_get_meta_info(gGui->stream, meta);
+  xr = xitk_recode_init(METAINFO_CHARSET, "");
+  
+  minfo = (char *)xine_get_meta_info(gGui->stream, meta);
+  if(minfo)
+    minfo = xitk_recode(xr, minfo);
   set_label(w, (minfo) ? (char *) minfo : _("Unavailable"));
+  
+  if(minfo)
+    free(minfo);
+  xitk_recode_done(xr);
 }
 
 static void get_stream_info(xitk_widget_t *w, int info) {
@@ -191,20 +202,30 @@ static void get_stream_video_resolution_info(void) {
 }
 
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
-  const char  *title   = NULL;
+  char        *title   = NULL;
   char        *atitle  = NULL;
-  const char  *album   = NULL;
+  char        *album   = NULL;
   char        *aartist = NULL;
-  const char  *artist  = NULL;
+  char        *artist  = NULL;
   char        *aalbum  = NULL; 
   char        *ident   = NULL;
+  xitk_recode_t *xr;
   
   if(!stream)
     return NULL;
   
-  title = xine_get_meta_info(stream, XINE_META_INFO_TITLE);
-  artist = xine_get_meta_info(stream, XINE_META_INFO_ARTIST);
-  album = xine_get_meta_info(stream, XINE_META_INFO_ALBUM);
+  title = (char *)xine_get_meta_info(stream, XINE_META_INFO_TITLE);
+  artist = (char *)xine_get_meta_info(stream, XINE_META_INFO_ARTIST);
+  album = (char *)xine_get_meta_info(stream, XINE_META_INFO_ALBUM);
+  
+  xr = xitk_recode_init(METAINFO_CHARSET, "");
+  if(title)
+    title = xitk_recode(xr, title);
+  if(artist)
+    artist = xitk_recode(xr, artist);
+  if(album)
+    album = xitk_recode(xr, album);
+  xitk_recode_done(xr);
   
   /*
    * Since meta info can be corrupted/wrong/ugly
@@ -223,6 +244,12 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
     xine_strdupa(aalbum, album);
     aalbum = atoa(aalbum);
   }
+  if(title)
+    free(title);
+  if(artist)
+    free(artist);
+  if(album)
+    free(album);
 
   if(atitle) {
     int len = strlen(atitle);
