@@ -661,8 +661,8 @@ int main(int argc, char *argv[]) {
   int                     _argc;
     
 #ifdef HAVE_SETLOCALE
-  xitk_set_locale();
-  setlocale (LC_ALL, "");
+  if((xitk_set_locale()) != NULL)
+    setlocale(LC_ALL, "");
 #endif
 
   bindtextdomain(PACKAGE, XITK_LOCALE);
