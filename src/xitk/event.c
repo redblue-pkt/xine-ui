@@ -1186,6 +1186,13 @@ void gui_init_imlib (Visual *vis) {
 /*
  *
  */
+static void *thread_auto_start(void *dummy) {
+  pthread_detach(pthread_self());
+  sleep(1);
+  gui_execute_action_id(ACTID_PLAY);
+  pthread_exit(NULL);
+}
+
 void gui_run (void) {
   int i;
   
@@ -1229,6 +1236,35 @@ void gui_run (void) {
     }
   }  
   
+  enable_playback_controls((gGui->playlist.num > 0));
+
+  /* We can't handle signals here, xitk handle this, so
+   * give a function callback for this.
+   */
+  xitk_register_signal_handler(gui_signal_handler, NULL);
+
+  /*
+   * event loop
+   */
+
+#ifdef HAVE_LIRC
+  if(!no_lirc) {
+    init_lirc();
+  }
+#endif
+
+  /*  global event handler */
+  gGui->widget_key = xitk_register_event_handler("NO WINDOW", None,
+						 gui_handle_event, 
+						 NULL,
+						 gui_dndcallback, 
+						 NULL, NULL);
+  
+  start_remote_server();
+
+  /* Need for tvmode */
+  video_window_set_fullscreen_mode((video_window_get_fullscreen_mode()));
+
   if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
     /* Popup setup window if there is no config file */
@@ -1264,46 +1300,24 @@ void gui_run (void) {
     }
     
     /*  The user request "play on start" */
-    if(actions_on_start(gGui->actions_on_start, ACTID_PLAY))
-      
-      if((mediamark_get_current_mrl()) != NULL)
-	gui_execute_action_id(ACTID_PLAY);
-    
+    if(actions_on_start(gGui->actions_on_start, ACTID_PLAY)) {
+      if((mediamark_get_current_mrl()) != NULL) {
+	pthread_t thread;
+	int       err;
+
+	if((err = pthread_create(&thread, NULL, thread_auto_start, NULL)) != 0) {
+	  printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
+	  abort();
+	}
+      }
+    }
+
     /* Flush actions on start */
     if(actions_on_start(gGui->actions_on_start, ACTID_QUIT)) {
       gGui->actions_on_start[0] = ACTID_QUIT;
       gGui->actions_on_start[1] = ACTID_NOKEY;
     }
   }
-
-  enable_playback_controls((gGui->playlist.num > 0));
-
-  /* We can't handle signals here, xitk handle this, so
-   * give a function callback for this.
-   */
-  xitk_register_signal_handler(gui_signal_handler, NULL);
-
-  /*
-   * event loop
-   */
-
-#ifdef HAVE_LIRC
-  if(!no_lirc) {
-    init_lirc();
-  }
-#endif
-
-  /*  global event handler */
-  gGui->widget_key = xitk_register_event_handler("NO WINDOW", None,
-						 gui_handle_event, 
-						 NULL,
-						 gui_dndcallback, 
-						 NULL, NULL);
-  
-  start_remote_server();
-
-  /* Need for tvmode */
-  video_window_set_fullscreen_mode((video_window_get_fullscreen_mode()));
 
   xitk_run();
 
