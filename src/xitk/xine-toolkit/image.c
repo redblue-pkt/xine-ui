@@ -194,6 +194,7 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
 			  NULL, &shmi, width, height);
     if(!xim) {
       XITK_WARNING("XShmCreateImage() failed.\n");
+      free(shminfo);
       goto __noxshm_pixmap;
     }
     
