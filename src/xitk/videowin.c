@@ -38,6 +38,7 @@
 
 #include "event.h"
 #include "videowin.h"
+#include "panel.h"
 
 extern gGui_t *gGui;
 
@@ -567,6 +568,15 @@ static void video_window_handle_event (XEvent *event, void *data) {
   case KeyPress:
     gui_handle_event(event, data);
     break;
+
+
+  case ButtonPress: {
+    XButtonEvent *bevent = (XButtonEvent *) event;
+    
+    if (bevent->button == Button3)
+      panel_toggle_visibility(NULL, NULL);
+  }
+  break;
 
   case Expose: {
     XExposeEvent * xev = (XExposeEvent *) event;
