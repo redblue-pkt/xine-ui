@@ -333,6 +333,31 @@ static void mrl_handle_selection(xitk_widget_t *w, void *data, int selected) {
 /*
  * Callback called by mrlbrowser on add event.
  */
+static void mrl_add_noautoplay(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
+  if(mrl) {
+    int num = gGui->playlist.num;
+    
+    if(!playlist_is_running()) {
+      playlist_editor();
+    }
+    else {
+      if(!playlist_is_visible())
+	playlist_toggle_visibility(NULL, NULL);
+    }
+    
+    mediamark_add_entry((char *)mrl->mrl, (char *)mrl->mrl, NULL, 0, -1);
+    
+    if((!num) && ((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode)) {
+      gGui->playlist.cur = (gGui->playlist.num - 1);
+      gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+    }   
+    
+    playlist_update_playlist();
+    
+    if((!is_playback_widgets_enabled()) && gGui->playlist.num)
+      enable_playback_controls(1);
+  }
+}
 static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   if(mrl) {
@@ -393,6 +418,13 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 void open_mrlbrowser(xitk_widget_t *w, void *data) {
   
   mrl_browser(mrl_add, mrl_play, mrl_handle_selection, gui_dndcallback);
+  set_mrl_browser_transient();
+  mrl_browser_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
+}
+
+void open_mrlbrowser_from_playlist(xitk_widget_t *w, void *data) {
+  
+  mrl_browser(mrl_add_noautoplay, mrl_play, mrl_handle_selection, gui_dndcallback);
   set_mrl_browser_transient();
   mrl_browser_show_tips(panel_get_tips_enable(), panel_get_tips_timeout());
 }

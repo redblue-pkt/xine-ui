@@ -1161,7 +1161,7 @@ void playlist_editor(void) {
   lb.skin_element_name = "PlAdd";
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Add");
-  lb.callback          = open_mrlbrowser;
+  lb.callback          = open_mrlbrowser_from_playlist;
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(playlist->widget_list)), 
