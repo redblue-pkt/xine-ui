@@ -714,6 +714,15 @@ static void video_window_adapt_size (void) {
 						NULL,
 						gui_dndcallback,
 						NULL, NULL);
+
+  { /* take care about window decoration/pos */
+    Window tmp_win;
+
+    XLockDisplay (gGui->display);
+    XTranslateCoordinates(gGui->display, gGui->video_window, DefaultRootWindow(gGui->display), 
+			  0, 0, &gVw->xwin, &gVw->ywin, &tmp_win);
+    XUnlockDisplay (gGui->display);
+  }
   
 }
 
