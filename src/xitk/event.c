@@ -858,6 +858,14 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->screen = DefaultScreen(gGui->display);
 
+  /* Some infos */
+  printf("XServer Vendor: %s. Release: %d,\n", 
+	 XServerVendor(gGui->display), XVendorRelease(gGui->display));
+  printf("        Protocol Version: %d, Revision: %d,\n", 
+	 XProtocolVersion(gGui->display), XProtocolRevision(gGui->display));
+  printf("        Available Screen(s): %d, using %d\n", XScreenCount(gGui->display), gGui->screen);
+  printf("        Depth: %d.\n", XDisplayPlanes(gGui->display, gGui->screen));
+
   gui_find_visual(&gGui->visual, &gGui->depth);
 
   gui_init_imlib (gGui->visual);
