@@ -205,7 +205,7 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
     
     point = strchr(entry->key, '.');
     
-    if(point) {
+    if(entry->type == XINE_CONFIG_TYPE_STRING && point) {
       int len;
       
       len = point - entry->key;
