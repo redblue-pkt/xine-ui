@@ -284,8 +284,12 @@ static commands_t commands[] = {
     "  playlist select <num>\n"
     "  playlist delete all|*\n"
     "  playlist delete <num>\n"
+    "  playlist first\n"
+    "  playlist prev\n"
     "  playlist next\n"
-    "  playlist prev"
+    "  playlist last\n"
+    "  playlist stop\n"
+    "  playlist contine"
   },
   { "stop",        NO_ARGS,         PUBLIC,          NEED_AUTH,     do_stop,
     "stop playback", 
@@ -1845,7 +1849,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	  (void) gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
 					gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset);
-	  
+  
 	} 
 	else {
 	  gGui->playlist.cur = 0;
@@ -1891,8 +1895,11 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
   nargs = is_args(client_info);
   if(nargs) {
     if(nargs == 1) {
+      int first = 0;
+
       if(is_arg_contain(client_info, 1, "show")) {
 	int i;
+
 	if(gGui->playlist.num) {
 	  for(i = 0; i < gGui->playlist.num; i++) {
 	    sock_write(client_info->socket, "%2s %5d %s\n", 
@@ -1912,6 +1919,39 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	set_command_line(client_info, "mrl prev");
 	handle_client_command(client_info);
       }
+      else if((first = is_arg_contain(client_info, 1, "first")) || is_arg_contain(client_info, 1, "last")) {
+
+	if(gGui->playlist.num) {
+	  int entry = gGui->playlist.cur;
+	  
+	  if(entry)
+	    entry = 0;
+	  else
+	    entry = gGui->playlist.num - 1;
+	  
+	  if(entry != gGui->playlist.cur) {
+	    
+	    if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
+	      gGui->ignore_next = 1;
+	      xine_stop (gGui->stream);
+	      gGui->ignore_next = 0;
+	    }
+
+	    gGui->playlist.cur = entry;
+	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	    gui_play(NULL, NULL);
+	  }
+	}
+      }
+      else if(is_arg_contain(client_info, 1, "stop")) {
+	if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
+	  gGui->playlist.control |= PLAYLIST_CONTROL_STOP;
+      }
+      else if(is_arg_contain(client_info, 1, "continue")) {
+	if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
+	  gGui->playlist.control &= !PLAYLIST_CONTROL_STOP;
+      }
+
     }
     else if(nargs >= 2) {
       
