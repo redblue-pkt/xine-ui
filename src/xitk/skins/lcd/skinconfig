@@ -55,7 +55,7 @@ skin.TimeLabel {
 
 skin.AudioPrev {
 	coords {
-	  x = 190
+	  x = 212
 	  y = 60
 	}
 	pixmap = ptdn.png
@@ -63,7 +63,7 @@ skin.AudioPrev {
 
 skin.AudioNext {
 	coords {
-	  x = 190
+	  x = 212
 	  y = 51
 	}
 	pixmap = ptup.png
@@ -71,11 +71,11 @@ skin.AudioNext {
 
 skin.AudioLabel {
 	coords {
-	  x = 170
+	  x = 175
 	  y = 52
 	}
 	label {
-	  length = 3
+	  length = 6
 	  animation = False
 	  pixmap = letters.png
 	}
@@ -83,7 +83,7 @@ skin.AudioLabel {
 
 skin.SpuPrev {
 	coords {
-	  x = 250
+	  x = 286
 	  y = 60
 	}
 	pixmap = ptdn.png
@@ -91,7 +91,7 @@ skin.SpuPrev {
 
 skin.SpuNext {
 	coords {
-	  x = 250
+	  x = 286
 	  y = 51
 	}
 	pixmap = ptup.png
@@ -99,11 +99,11 @@ skin.SpuNext {
 
 skin.SpuLabel {
 	coords {
-	  x = 230
+	  x = 249
 	  y = 52
 	}
 	label {
-	  length = 3
+	  length = 6
 	  animation = False
 	  pixmap = letters.png
 	}
@@ -245,7 +245,7 @@ skin.SliderVol {
 
 skin.Snapshot {
 	coords {
-	  x = 267
+	  x = 300
 	  y = 52
 	}
 	pixmap = cam.png

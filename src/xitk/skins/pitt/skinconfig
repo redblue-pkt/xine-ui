@@ -39,7 +39,7 @@ skin.TitleLabel {
 	  y = 15
 	}
 	label {
-	  length = 35
+	  length = 33
 	  animation = True
 	  pixmap = letters.png
 	}
@@ -75,11 +75,11 @@ skin.AudioNext {
 
 skin.AudioLabel {
 	coords {
-	  x = 246
+	  x = 224
 	  y = 15
 	}
 	label {
-	  length = 3
+	  length = 6
 	  animation = False
 	  pixmap = letters.png
 	}
@@ -217,11 +217,11 @@ skin.SpuNext {
 
 skin.SpuLabel {
 	coords {
-	  x = 271
+	  x = 260
 	  y = 15
 	}
 	label {
-	  length = 3
+	  length = 6
 	  animation = False
 	  pixmap = letters.png
 	}

@@ -92,7 +92,7 @@ skin.AudioLabel {
 	  y = 37
 	}
 	label {
-	  length = 7
+	  length = 6
 	  animation = False
 	  pixmap = Letters.png
 	}
@@ -120,7 +120,7 @@ skin.SpuLabel {
 	  y = 37
 	}
 	label {
-	  length = 7
+	  length = 6
 	  animation = False
 	  pixmap = Letters.png
 	}

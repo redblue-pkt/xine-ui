@@ -75,11 +75,11 @@ skin.TimeLabel {
 
 skin.AudioLabel {
 	coords {
-	  x = 353
+	  x = 338
 	  y = 41
 	}
 	label {
-	  length = 3
+	  length = 6
 	  animation = False
 	  pixmap = letters.png
 	}
@@ -87,7 +87,7 @@ skin.AudioLabel {
 
 skin.SpuPrev {
 	coords {
-	  x = 315
+	  x = 310
 	  y = 50
 	}
 	pixmap = arrowdn.png
@@ -95,7 +95,7 @@ skin.SpuPrev {
 
 skin.SpuNext {
 	coords {
-	  x = 315
+	  x = 310
 	  y = 38
 	}
 	pixmap = arrowup.png
@@ -103,11 +103,11 @@ skin.SpuNext {
 
 skin.SpuLabel {
 	coords {
-	  x = 293
+	  x = 273
 	  y = 41
 	}
 	label {
-	  length = 3
+	  length = 6
 	  animation = False
 	  pixmap = letters.png
 	}
@@ -169,7 +169,6 @@ skin.Next {
 	pixmap = next.png
 }
 
-##AutoPlace:	224	72	left.png
 skin.Eject {
 	coords {
 	  x = 234
@@ -212,7 +211,7 @@ skin.SliderVol {
 
 skin.AutoPlayGUI {
 	coords {
-	  x = 169
+	  x = 159
 	  y = 45
 	}
 	pixmap = smallbtn.png
@@ -226,7 +225,7 @@ skin.AutoPlayGUI {
 
 skin.Snapshot {
 	coords {
-	  x = 202
+	  x = 192
 	  y = 45
 	}
 	pixmap = cam.png
@@ -234,7 +233,7 @@ skin.Snapshot {
 
 skin.MrlBtn {
 	coords {
-	  x = 218
+	  x = 208
 	  y = 45
 	}
 	pixmap = mrl.png
@@ -242,7 +241,7 @@ skin.MrlBtn {
 
 skin.PlBtn {
 	coords {
-	  x = 234
+	  x = 224
 	  y = 45
 	}
 	pixmap = playlist.png
@@ -250,7 +249,7 @@ skin.PlBtn {
 
 skin.CtlBtn {
 	coords {
-	  x = 250
+	  x = 240
 	  y = 45
 	}
 	pixmap = setup.png
@@ -258,7 +257,7 @@ skin.CtlBtn {
 
 skin.Mute {
 	coords {
-	  x = 333
+	  x = 323
 	  y = 44
 	}
 	pixmap = mute.png
