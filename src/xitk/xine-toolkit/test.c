@@ -473,7 +473,7 @@ static void create_checkbox(void) {
 static void create_tabs(void) {
   xitk_pixmap_t      *bg;
   xitk_tabs_widget_t  t;
-  char               *fontname = "*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*";
+  char               *fontname = "-*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*";
   int                 x = 150, y = 200, w = 300;
   int                 width, height;
   static char        *tabs_labels[] = {
@@ -510,7 +510,7 @@ static void create_tabs(void) {
 static void create_frame(void) {
   xitk_pixmap_t  *bg;
   int             width, height;
-  char           *fontname = "*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+  char           *fontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
   int              x = 350, y = 50, w = 200, h = 150;
   
   xitk_window_get_window_size(test->xwin, &width, &height);
@@ -530,7 +530,7 @@ static void create_frame(void) {
  */
 static void create_inputtext(void) {
   xitk_inputtext_widget_t  inp;
-  char                    *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+  char                    *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 
   XITK_WIDGET_INIT(&inp, test->imlibdata);
 
@@ -554,7 +554,7 @@ static void create_inputtext(void) {
  */
 static void create_label(void) {
   xitk_label_widget_t   lbl;
-  char                 *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+  char                 *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
   int                   x = 150, y = 120, len = 100;
   xitk_font_t          *fs;
   int                   lbear, rbear, wid, asc, des;
@@ -616,7 +616,7 @@ static void create_button(void) {
     if(wimage) {
       unsigned int   col;
       xitk_font_t   *fs = NULL;
-      char          *fontname = "*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*";
+      char          *fontname = "-*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*";
       int            lbear, rbear, wid, asc, des;
       char          *label = _("Fire !!");
 
@@ -751,7 +751,7 @@ static void combo_select(xitk_widget_t *w, void *data, int select) {
  */
 static void create_combo(void) {
   xitk_combo_widget_t    cmb;
-  char                  *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+  char                  *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
   int                    x = 150, y = 36, width = 100, height;
   xitk_font_t           *fs;
 
@@ -793,7 +793,7 @@ static void create_combo(void) {
  */
 static void create_browser(void) {
   xitk_browser_widget_t  browser;
-  char                  *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+  char                  *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
   Pixmap                 bg;
   int                    width, height;
 
@@ -937,7 +937,7 @@ static void create_menu(void) {
 int main(int argc, char **argv) {
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
-  char                       *fontname = "*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+  char                       *fontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
   int                         windoww = 600, windowh = 400;
   xitk_widget_t              *w;
   
