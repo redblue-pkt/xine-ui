@@ -1006,23 +1006,31 @@ void video_window_frame_output_cb (void *data,
  */
 void video_window_set_fullscreen_mode (int req_fullscreen) {
   
-  if(((gVw->fullscreen_mode & FULLSCR_MODE) && (req_fullscreen & FULLSCR_MODE))
+  if(!(gVw->fullscreen_mode & req_fullscreen)) {
+
 #ifdef HAVE_XINERAMA
-     || (gVw->xinerama && 
-	 (gVw->fullscreen_mode & FULLSCR_XI_MODE) && (req_fullscreen & FULLSCR_XI_MODE))
-#endif
-     ) {
-    gVw->fullscreen_req = WINDOWED_MODE;
-  }
-  else {
-#ifdef HAVE_XINERAMA
-    if((req_fullscreen & FULLSCR_XI_MODE) && !gVw->xinerama)
-      gVw->fullscreen_req = FULLSCR_MODE;
+    if((req_fullscreen & FULLSCR_XI_MODE) && (!gVw->xinerama)) {
+      if(gVw->fullscreen_mode & FULLSCR_MODE)
+	gVw->fullscreen_req = WINDOWED_MODE;
+      else
+	gVw->fullscreen_req = FULLSCR_MODE;
+    }
     else
 #endif
       gVw->fullscreen_req = req_fullscreen;
+
   }
-  
+  else {
+
+    if((req_fullscreen & FULLSCR_MODE) && (gVw->fullscreen_mode & FULLSCR_MODE))
+      gVw->fullscreen_req = WINDOWED_MODE;
+#ifdef HAVE_XINERAMA
+    else if((req_fullscreen & FULLSCR_XI_MODE) && (gVw->fullscreen_mode & FULLSCR_XI_MODE))
+      gVw->fullscreen_req = WINDOWED_MODE;
+#endif
+
+  }
+
   video_window_adapt_size ();
 }
 
