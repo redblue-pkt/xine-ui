@@ -209,6 +209,42 @@ mode \fBloop\fP est utilisé. Les modes possibles sont:
 .br
 \fBshuffle\+\fP: identique à shuffle, mais rejoue indéfiniement la liste de lecture.
 .TP
+.B \-\-skin\-server\-url <url>
+Defini l'url du serveur d'apparences.
+.TP
+.B \-\-enqueue <mrl>
+Ajoute la \fBmrl\fP à la liste de lecture de la session existante (session 0). 
+Cette option peut être utilisée plus d'une fois.
+.br
+Si vous désirez spécifier une autre session, utilisez l'option \fB\-S session=\fP\fIx\fP.
+.TP
+.B \-S, \-\-session <option1,option2,...>
+.br
+Gestion de session. Toutes les options peuvent être utilisées plus d'une fois, 
+excepté \fBsession\fP.
+.br
+Les options sont::
+.br
+\fBsession=\fP\fIn\fP specifie le numéro de session \<\fIn\fP\>,
+.br
+\fBmrl=\fP\fIm\fP     ajoute la mrl \<\fIm\fP\> à la liste de lecture,
+.br
+\fBaudio=\fP\fIc\fP   sélectionne le canal audio (\<\fIc\fP\>: \fBnext\fP ou \fBprev\fP),
+.br
+\fBspu=\fP\fIc\fP     sélectionne le canal de sous-titre (\<\fIc\fP\>: \fBnext\fP ou \fBprev\fP),
+.br
+(\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
+.br
+  \<\fIp\fP\> peut être:
+.br
+    \fBclear\fP:     efface la liste de lecture,
+    \fBnext\fP:      joue l'entrée suivante de la liste de lecture,
+    \fBprev\fP:      joue l'entrée précédente de la liste de lecture,
+    \fBload:\fP\fIs\fP:    charge le fichier de liste de lecture <\fIs\fP>.
+.br
+Il y a aussi d'autres options qui s'expliquent d'elles même.
+    \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
+.TP
 .B MRL (media resource locator)
 .br
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles

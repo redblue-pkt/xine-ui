@@ -214,6 +214,41 @@ Set playlist loop mode. If mode isn't specified, mode \fBloop\fP is used. Possib
 .br
 \fBshuffle\+\fP: same as shuffle, but indefinetely replay the playlist.
 .TP
+.B \-\-skin\-server\-url <url>
+Define the skin server url.
+.TP
+.B \-\-enqueue <mrl>
+.br
+Enqueue mrl of a running session (session 0). This option can be used more than one time.
+.br
+If you want to specify another session, use \fB\-S session=\fP\fIx\fP option. 
+.TP
+.B \-S, \-\-session <option1,option2,...>
+.br
+Session managements. All options can be used more than one time, except \fBsession\fP.
+.br
+Options are:
+.br
+\fBsession=\fP\fIn\fP specify session \<\fIn\fP\> number,
+.br
+\fBmrl=\fP\fIm\fP     add mrl \<\fIm\fP\> to the playlist,
+.br
+\fBaudio=\fP\fIc\fP   select audio channel (\<\fIc\fP\>: \fBnext\fP or \fBprev\fP),
+.br
+\fBspu=\fP\fIc\fP     select spu channel (\<\fIc\fP\>: \fBnext\fP or \fBprev\fP),
+.br
+(\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
+.br
+  \<\fIp\fP\> can be:
+.br
+    \fBclear\fP:     clear the playlist,
+    \fBnext\fP:      play next playlist entry,
+    \fBprev\fP:      play previous playlist entry,
+    \fBload:\fP\fIs\fP:    load playlist file <\fIs\fP>.
+.br
+There are also some self explanatory options.
+    \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
+.TP
 .B MRL (media resource locator)
 .br
 MRLs are similar to URLs in your web browser. They describe the media
