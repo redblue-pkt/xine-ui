@@ -367,7 +367,7 @@ static void pl_load_pl(xitk_widget_t *w, void *data) {
     
     xitk_browser_update_list(playlist->playlist, 
 			     gGui->playlist, gGui->playlist_num, 0);
-    //    xitk_browser_rebuild_browser(playlist->playlist, 0);
+    /* xitk_browser_rebuild_browser(playlist->playlist, 0); */
   }
   
 }

@@ -332,8 +332,6 @@ void gui_seek_relative (int off_sec) {
 
 void gui_dndcallback (char *filename) {
 
-  //  printf("%s() add %s\n", __FUNCTION__, filename);
-
   if(filename) {
     gGui->playlist_cur = gGui->playlist_num++;
     gGui->playlist[gGui->playlist_cur] = strdup(filename);

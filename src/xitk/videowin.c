@@ -85,7 +85,7 @@ typedef struct {
   int            completion_event;
 
 #ifdef HAVE_XF86VIDMODE
-  // XF86VidMode Extension stuff
+  /* XF86VidMode Extension stuff */
   XF86VidModeModeInfo** XF86_modelines;
   int                   XF86_modelines_count;
 #endif
@@ -329,12 +329,14 @@ void video_window_adapt_size (void *this,
 	 break;
     }
 
-    // in case we have a request for a resolution higher than any available
-    // ones we take the highest currently available.
+    /*
+     * in case we have a request for a resolution higher than any available
+     * ones we take the highest currently available.
+     */
     if(gVw->fullscreen_mode && search >= gVw->XF86_modelines_count)
        search = 0;
        
-    // just switching to a different modeline if necessary
+    /* just switching to a different modeline if necessary */
     if(!(gVw->XF86_modelines_count <= 1) && !(search >= gVw->XF86_modelines_count)) {
        if(XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[search])) {
 	  XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
@@ -344,12 +346,16 @@ void video_window_adapt_size (void *this,
 	  gVw->fullscreen_width  = gVw->XF86_modelines[search]->hdisplay;
 	  gVw->fullscreen_height = gVw->XF86_modelines[search]->vdisplay;
 	  
-	  // just in case the mouse pointer is off the visible area, move it
-	  // to the middle of the video window
+	  /*
+	   *just in case the mouse pointer is off the visible area, move it
+	   * to the middle of the video window
+	   */
 	  XWarpPointer(gGui->display, None, gGui->video_window, 0, 0, 0, 0, gVw->fullscreen_width/2, gVw->fullscreen_height/2);
 	  
-	  // if this is true, we are back at the original resolution, so there
-	  // is no need to further worry about anything.
+	  /*
+	   * if this is true, we are back at the original resolution, so there
+	   * is no need to further worry about anything.
+	   */
 	  if(gVw->fullscreen_mode && search == 0)
 	    gGui->XF86VidMode_fullscreen = 0;
        } else {
@@ -429,8 +435,10 @@ void video_window_adapt_size (void *this,
 
       if (gVw->fullscreen_mode) {
 #ifdef HAVE_XF86VIDMODE
-	// resizing the video window may be necessary if the modeline has
-	// just been switched
+	/*
+	 * resizing the video window may be necessary if the modeline has
+	 * just been switched
+	 */
 	XResizeWindow (gGui->display, gGui->video_window,
 		       gVw->fullscreen_width, gVw->fullscreen_height);
 #endif
@@ -531,8 +539,10 @@ void video_window_adapt_size (void *this,
 
       if (gVw->fullscreen_mode) {
 #ifdef HAVE_XF86VIDMODE
-	// toggling from fullscreen to window mode - time to switch back to
-	// the original modeline
+	/*
+	 * toggling from fullscreen to window mode - time to switch back to
+	 * the original modeline
+	 */
 	if(gVw->XF86_modelines_count > 1) {
 	   XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[0]);
 	   XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);

@@ -114,7 +114,7 @@ static void yuy2toyv12( struct prvt_image_s *image )
 
     int i,j,w2;
 
-    //I420
+    /* I420 */
     uint8_t *y = image->y;
     uint8_t *u = image->u;
     uint8_t *v = image->v;
@@ -136,7 +136,7 @@ static void yuy2toyv12( struct prvt_image_s *image )
 	*(v++) = *(input++);
       }
       
-      //down sampling
+      /* down sampling */
       
       for (j=0; j<w2; j++) {
 	/* skip every second line for U and V */
