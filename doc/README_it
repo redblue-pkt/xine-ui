@@ -284,7 +284,7 @@ xine usa software dai seguenti progetti software free:
 - libmpg123 del progetto mpg123 di Michael Hipp
   (vedi http://www.mpg123.de/)
 - libmad di Robert Leslie
-- varii decoders dal progetto ffmpeg di Gerard Lantau
+- varii decoders dal progetto ffmpeg di Fabrice Bellard
 
 ... senza questi grandi pezzi di software naturalmente xine non sarebbe dove
 è adesso.

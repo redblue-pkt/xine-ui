@@ -127,7 +127,7 @@
      - liba52 - Aaron Holtzman ja Michel Lespinasse
      - libmpeg2 - Aaron Holtzman ja Michel Lespinasse
      - libmad - Robert Leslie
-     - libffmpeg - Gerard Lantau
+     - libffmpeg - Fabrice Bellard
 
     Ilman n‰it‰ mahtavia ohjelman palasia Xine ei tietenk‰‰n olisi
     nykyisess‰ pisteess‰‰n.

@@ -125,7 +125,7 @@
      - liba52 by Aaron Holtzman and Michel Lespinasse
      - libmpeg2 by Aaron Holtzman and Michel Lespinasse
      - libmad by Robert Leslie
-     - libffmpeg by Gerard Lantau
+     - libffmpeg by Fabrice Bellard
 
     Without these great pieces of software xine would of course not be
     where it is now.

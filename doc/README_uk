@@ -148,7 +148,7 @@
      - liba52, автори Аарон Хольцман (Aaron Holtzman) ╕ М╕шель Лесп╕наз╕ (Michel Lespinasse)
      - libmpeg2, автори Аарон Хольцман (Aaron Holtzman) ╕ М╕шель Лесп╕наз╕ (Michel Lespinasse)
      - libmad, автор Роберт Лесл╕ (Robert Leslie)
-     - libffmpeg, автор Джерард Лантау (Gerard Lantau)
+     - libffmpeg, автор Джерард Лантау (Fabrice Bellard)
 
     Без цих чудових частин програмного забезпечення Xine зв╕сно не став би
     тим, чим в╕н ╓ сьогодн╕.
