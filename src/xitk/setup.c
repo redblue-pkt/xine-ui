@@ -379,6 +379,7 @@ static void setup_save(xitk_widget_t *w, void *data) {
 	}
       }
     }
+    config_save();
   }
 }
 /*

@@ -89,14 +89,12 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       
   has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
   
-  if((has_video || gGui->visual_anim.enabled == 1) && gGui->visual_anim.running) {
+  if((has_video && gGui->visual_anim.enabled == 1) && gGui->visual_anim.running) {
     xine_post_out_t * audio_source;
 
     audio_source = xine_get_audio_source(stream);
-    if(xine_post_wire_audio_port(audio_source, gGui->ao_port)) {
-      if(gGui->visual_anim.enabled == 1)
-	gGui->visual_anim.running = 0;
-    }
+    if(xine_post_wire_audio_port(audio_source, gGui->ao_port))
+      gGui->visual_anim.running = 0;
     
   } else if (!has_video && (gGui->visual_anim.enabled == 1) && 
 	     (gGui->visual_anim.running == 0) && gGui->visual_anim.post_output) {
@@ -109,7 +107,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   }
   else if(has_video && gGui->post_video && (gGui->post_video_num > 0)) {
     xine_post_out_t *video_source;
-    
+
     video_source = xine_get_video_source(stream);
     if(xine_post_wire_video_port(video_source, gGui->post_video->video_input[0]))
       printf("xine_post_wire_video_port() succeed\n");
