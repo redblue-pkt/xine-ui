@@ -767,10 +767,8 @@ void gui_eject(xitk_widget_t *w, void *data) {
 
       }
 
-      if(is_playback_widgets_enabled() && (!gGui->playlist.num)) {
+      if(is_playback_widgets_enabled() && (!gGui->playlist.num))
 	enable_playback_controls(0);
-	gui_display_logo();
-      }
 
     }
     
