@@ -89,6 +89,8 @@ static void *_tips_destroy_thread(void *data) {
   /* Waiting enought time to read the tips */
   xitk_usec_sleep(1500000);
 
+  pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,NULL);
+
   pthread_mutex_lock(&tp->mutex);
 
   /* Kill tips window */
@@ -127,6 +129,8 @@ static void *_tips_thread(void *data) {
   /* Wait timeout */
   xitk_usec_sleep((tp->w->tips_timeout * 1000));
 
+  pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,NULL);
+  
   /* Get parent window position */
   xitk_get_window_position(tp->w->imlibdata->x.disp, tp->wl->win, &x, &y, NULL, NULL);
   
@@ -233,6 +237,8 @@ static void *_tips_thread(void *data) {
     pthread_create(&tp->thread, &pth_attrs, _tips_destroy_thread, (void *)tp);
   }
   
+  tp->w->tips_thread = 0;
+
   pthread_exit(NULL);
 }
 
