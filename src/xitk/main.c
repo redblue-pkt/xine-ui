@@ -848,11 +848,13 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
       /* TODO: check num_parameters, provide customized messages, hints... */
       if(data->explanation) {
-	xine_info("%s %s",data->explanation, data->parameters);
-	osd_display_info("%s %s",data->explanation, data->parameters);
+	xine_info("%s %s",(char *) data + data->explanation,
+                          (char *) data + data->parameters);
+	osd_display_info("%s %s",(char *) data + data->explanation,
+                                 (char *) data + data->parameters);
       } else {
-	xine_info(data->parameters);
-	osd_display_info(data->parameters);
+	xine_info((char *) data + data->parameters);
+	osd_display_info((char *) data + data->parameters);
       }
     }
     break;
