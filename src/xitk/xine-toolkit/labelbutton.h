@@ -40,7 +40,9 @@ typedef struct {
   xitk_widget_t          *bWidget;
   int                     bType;
   int                     bClicked;
-  int                     bArmed;
+
+  int                     focus;
+
   int                     bState;
   int                     bOldState;
   xitk_image_t            *skin;

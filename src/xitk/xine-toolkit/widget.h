@@ -34,8 +34,11 @@
 #include "skin.h"
 #include "widget_types.h"
 
-#define FOCUS_RECEIVED 1
-#define FOCUS_LOST     0
+#define FOCUS_LOST      0
+#define FOCUS_RECEIVED  1
+#define FOCUS_MOUSE_IN  3
+#define FOCUS_MOUSE_OUT 4
+
 #define LBUTTON_DOWN   0
 #define LBUTTON_UP     1
 
@@ -160,8 +163,9 @@ typedef struct xitk_widget_list_s {
 
   xitk_list_t                *l;
 
-  xitk_widget_t              *focusedWidget;
-  xitk_widget_t              *pressedWidget;
+  xitk_widget_t              *widget_focused;
+  xitk_widget_t              *widget_under_mouse;
+  xitk_widget_t              *widget_pressed;
 
   Window                      win;
   GC                          gc;
@@ -225,6 +229,11 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) ;
  * Notify widget (if enabled) if click event happend at x, y coords.
  */
 int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp) ;
+
+/**
+ *
+ */
+void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward);
 
 /**
  *

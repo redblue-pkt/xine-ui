@@ -34,7 +34,7 @@ typedef struct {
   char                   *skin_element_name;
   xitk_widget_t          *bWidget;
   int                     bClicked;
-  int                     bArmed;
+  int                     focus;
   xitk_image_t            *skin;
 
   /* callback function (active_widget, user_data) */

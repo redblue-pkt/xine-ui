@@ -109,7 +109,7 @@ static void paint_button (xitk_widget_t *b, Window win, GC gc) {
       XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
     }
 
-    if(private_data->bArmed) {
+    if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
       if(private_data->bClicked) {
 	XCopyArea (private_data->imlibdata->x.disp, skin->image,  
 		   win, lgc, 2*button_width, 0,
@@ -166,7 +166,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
  *
  */
 static int notify_click_button (xitk_widget_list_t *wl, 
-				xitk_widget_t *b,int bUp, int x, int y){
+				xitk_widget_t *b,int bUp, int x, int y) {
   button_private_data_t *private_data = 
     (button_private_data_t *) b->private_data;
   
@@ -175,7 +175,7 @@ static int notify_click_button (xitk_widget_list_t *wl,
     
     paint_button(b, wl->win, wl->gc);
 
-    if (bUp && private_data->bArmed) {
+    if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
       if(private_data->callback) {
 	private_data->callback(private_data->bWidget, 
 			       private_data->userdata);
@@ -190,14 +190,12 @@ static int notify_click_button (xitk_widget_list_t *wl,
 /*
  *
  */
-static int notify_focus_button (xitk_widget_list_t *wl, xitk_widget_t *b, int bEntered) {
+static int notify_focus_button (xitk_widget_list_t *wl, xitk_widget_t *b, int focus) {
   button_private_data_t *private_data = 
     (button_private_data_t *) b->private_data;
 
   if (b->widget_type & WIDGET_TYPE_BUTTON) {
-
-    private_data->bArmed = bEntered;
-    
+    private_data->focus = focus;
   } 
   
   return 1;
@@ -221,7 +219,7 @@ static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_but
   
   private_data->bWidget           = mywidget;
   private_data->bClicked          = 0;
-  private_data->bArmed            = 0;
+  private_data->focus             = FOCUS_LOST;
 
   private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(b->skin_element_name);
   private_data->skin              = skin;

@@ -203,10 +203,11 @@ typedef struct xitk_widget_s {
 } xitk_widget_t;
 
 typedef struct witk_widget_list_s {
-  xitk_list_t          *l;
+  xitk_list_t         *l;
 
-  xitk_widget_t            *focusedWidget;
-  xitk_widget_t            *pressedWidget;
+  xitk_widget_t       *widget_focused;
+  xitk_widget_t       *widget_under_mouse;
+  xitk_widget_t       *widget_pressed;
 
   Window               win;
   GC                   gc;
@@ -659,6 +660,10 @@ void xitk_slider_make_step(xitk_widget_list_t *, xitk_widget_t *);
  */
 void xitk_slider_make_backstep(xitk_widget_list_t *, xitk_widget_t *);
 
+/**
+ * Call callback for current position
+ */
+void xitk_slider_callback_exec(xitk_widget_t *);
 
 /*
  * *** Nodes ***
@@ -861,10 +866,10 @@ void xitk_unset_dnd_callback(xitk_dnd_t *);
  */
 typedef struct {
   int                       magic;
-  ImlibData              *imlibdata;
-  xitk_state_callback_t  callback;
-  void                   *userdata;
-  char                   *skin_element_name;
+  ImlibData                *imlibdata;
+  xitk_state_callback_t     callback;
+  void                     *userdata;
+  char                     *skin_element_name;
 } xitk_checkbox_widget_t;
 /**
  * Create a checkbox.
@@ -1640,11 +1645,13 @@ void draw_bevel_two_state(ImlibData *im, xitk_image_t *p);
  *
  */
 void draw_inner(ImlibData *im, Pixmap p, int w, int h);
+void draw_inner_light(ImlibData *im, Pixmap p, int w, int h);
 
 /**
  *
  */
 void draw_outter(ImlibData *im, Pixmap p, int w, int h);
+void draw_outter_light(ImlibData *im, Pixmap p, int w, int h);
 
 /**
  *
@@ -1949,7 +1956,8 @@ typedef struct {
 
 } xitk_tabs_widget_t;
 
-xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int width);
+xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, 
+				       int x, int y, int width, char *fontname);
 int xitk_tabs_get_current_selected(xitk_widget_t *w);
 char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w);
 void xitk_tabs_set_current_selected(xitk_widget_t *w, int select);

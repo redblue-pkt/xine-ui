@@ -49,10 +49,15 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <X11/keysym.h>
 
 #include "widget.h"
 #include "list.h"
 #include "dnd.h"
+#include "inputtext.h"
+#include "checkbox.h"
+#include "slider.h"
+#include "tips.h"
 #include "_config.h"
 
 #include "_xitk.h"
@@ -110,6 +115,7 @@ typedef struct {
   int                         height;
 
   XEvent                     *old_event;
+
   xitk_widget_list_t         *widget_list;
   char                       *name;
   widget_event_callback_t     xevent_callback;
@@ -123,6 +129,7 @@ typedef struct {
   Display                    *display;
   xitk_list_t                *list;
   xitk_list_t                *gfx;
+
   pthread_mutex_t             mutex;
   int                         running;
   xitk_register_key_t         key;
@@ -269,6 +276,10 @@ xitk_widget_list_t *xitk_widget_list_new (void) {
 
   l = (xitk_widget_list_t *) xitk_xmalloc(sizeof(xitk_widget_list_t));
 
+  l->widget_focused     = NULL;
+  l->widget_under_mouse = NULL;
+  l->widget_pressed     = NULL;
+
   xitk_list_append_content(gXitk->list, l);
 
   MUTUNLOCK();
@@ -351,17 +362,8 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
     XUNLOCK(gXitk->display);
     
     if(err != BadDrawable && err != BadWindow) {
-      Window c;
-      
-      XLOCK(gXitk->display);
-      XTranslateCoordinates(gXitk->display, fx->window, wattr.root, 
-			    0,0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
-      XUNLOCK(gXitk->display);
-      
-      /*
       fx->new_pos.x = wattr.x;
       fx->new_pos.y = wattr.y;
-      */
       fx->width     = wattr.width;
       fx->height    = wattr.height;
     }
@@ -490,7 +492,6 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
  */
 void xitk_xevent_notify(XEvent *event) {
   __gfx_t  *fx;
-
     
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
 
@@ -503,6 +504,102 @@ void xitk_xevent_notify(XEvent *event) {
       if(fx->window == event->xany.window) {
 	
 	switch(event->type) {
+
+	case MappingNotify:
+	  XLOCK(gXitk->display);
+	  XRefreshKeyboardMapping((XMappingEvent *) event);
+	  XUNLOCK(gXitk->display);
+	  break;
+
+	case KeyPress:
+	  if(fx->widget_list && 
+	     fx->widget_list->widget_focused && 
+	     (fx->widget_list->widget_focused->widget_type & WIDGET_TYPE_INPUTTEXT)) {
+	    xitk_send_key_event(fx->widget_list, fx->widget_list->widget_focused, event);
+	    return;
+	  }
+	  break;
+
+	case KeyRelease: {
+	  XKeyEvent      mykeyevent;
+	  KeySym         mykey;
+	  char           kbuf[256];
+	  int            len;
+	  int            modifier;
+	  int            handled = 0;
+	  xitk_widget_t *w = NULL;
+
+	  mykeyevent = event->xkey;
+
+	  xitk_get_key_modifier(event, &modifier);
+
+	  XLOCK(gXitk->display);
+	  len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+	  XUNLOCK(gXitk->display);
+
+	  if(fx->widget_list && fx->widget_list->widget_under_mouse)
+	    xitk_tips_tips_kill(fx->widget_list->widget_under_mouse);
+	  
+	  if(fx->widget_list && fx->widget_list->widget_focused)
+	  xitk_tips_tips_kill(fx->widget_list->widget_focused);
+
+
+	  if(fx->widget_list && fx->widget_list->widget_focused)
+	    w = fx->widget_list->widget_focused;
+	  
+	  /* set focus to next widget */
+	  if((mykey == XK_Tab) || (mykey == XK_KP_Tab) || (mykey == XK_ISO_Left_Tab)) {
+	    if(fx->widget_list) {
+	      handled = 1;
+	      xitk_set_focus_to_next_widget(fx->widget_list, (modifier & MODIFIER_SHIFT));
+	    }
+	  }
+	  /* simulate click event on space key event */
+	  else if(mykey == XK_space) {
+	    if(w && (w->notify_click && w->visible && w->enable)) {
+	      
+	      if(w && ((w->widget_type & WIDGET_TYPE_BUTTON) ||
+		       (w->widget_type & WIDGET_TYPE_LABELBUTTON) ||
+		       (w->widget_type & WIDGET_TYPE_CHECKBOX))) {
+		handled = 1;
+		w->notify_click(fx->widget_list, w, 0, w->x, w->y);
+		w->notify_click(fx->widget_list, w, 1, w->x, w->y);
+	      }
+	    }
+	  }
+	  /* move sliders */
+	  else if(((mykey == XK_Left) || (mykey == XK_Right) 
+		   || (mykey == XK_Up) || (mykey == XK_Down)) && (modifier == MODIFIER_NOMOD)) {
+	    
+	    if(w && (w->widget_type & WIDGET_TYPE_SLIDER)) {
+	      
+	      if((mykey == XK_Left) || (mykey == XK_Down)) {
+		handled = 1;
+		xitk_slider_make_backstep(fx->widget_list, w);
+		xitk_slider_callback_exec(w);
+	      }
+	      else {
+		handled = 1;
+		xitk_slider_make_step(fx->widget_list, w);
+		xitk_slider_callback_exec(w);
+	      }
+	    }
+	  }
+	  
+	  /* 
+	   * Don't send keyrelease event to an inputtext widget,
+	   * it already got it in KeyPress event.
+	   */
+	  if((!handled) && 
+	     ((w == NULL) || (w && ((w->widget_type & WIDGET_TYPE_INPUTTEXT) == 0)))) {
+	    if(fx->xevent_callback) {
+	      fx->xevent_callback(event, fx->user_data);
+	    }
+	  }
+	  
+	  return;
+	}
+	break;
 
 	case Expose:
 	  if (fx->widget_list && (event->xexpose.count == 0)) {
@@ -577,13 +674,13 @@ void xitk_xevent_notify(XEvent *event) {
 	  XLOCK(gXitk->display);
 	  status = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
 	  XGetInputFocus(gXitk->display, &focused_window, &revert);
-
+	  
 	  /* 
 	   * Give focus(and raise) to a window after a click, and 
 	   * only if window isn't the current focused one.
 	   */
 	  if((status != BadDrawable) && (status != BadWindow) 
-	     && (wattr.map_state == IsViewable) && (focused_window != fx->window)) {
+	     && (wattr.map_state == IsViewable)/* && (focused_window != fx->window)*/) {
 	    XRaiseWindow(gXitk->display, fx->window);
 	    XSetInputFocus(gXitk->display, fx->window, RevertToParent, CurrentTime);
 	  }
@@ -626,10 +723,11 @@ void xitk_xevent_notify(XEvent *event) {
 	      fx->newpos_callback(fx->new_pos.x, fx->new_pos.y, 
 				  fx->width, fx->height);
 	  }
-	  
-	  if(fx->widget_list) {
-	    xitk_click_notify_widget_list (fx->widget_list, event->xbutton.x, 
-					   event->xbutton.y, 1);
+	  else {
+	    if(fx->widget_list) {
+	      xitk_click_notify_widget_list (fx->widget_list, event->xbutton.x, 
+					     event->xbutton.y, 1);
+	    }
 	  }
 	  break;
 	  
@@ -669,7 +767,7 @@ void xitk_xevent_notify(XEvent *event) {
       
       /* Don't forward event to all of windows */
       if(fx->xevent_callback 
-	 && (fx->window != None && event->type != KeyPress)) {
+	 && (fx->window != None && event->type != KeyRelease)) {
 	fx->xevent_callback(event, fx->user_data);
       }
       
@@ -753,6 +851,10 @@ void xitk_run(void) {
   
   gXitk->running = 1;
   
+  XLOCK(gXitk->display);
+  XSync(gXitk->display, True);
+  XUNLOCK(gXitk->display);
+
   /*
    * Force to repain the widget list if it exist
    */

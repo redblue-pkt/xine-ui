@@ -682,7 +682,7 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   XUNLOCK(private_data->imlibdata->x.disp);
 
   xitk_get_key_modifier(&xev, &modifier);
-  
+
   if((modifier & MODIFIER_CTRL) && (modifier & MODIFIER_SHIFT))
     mrlbrowser_select_mrl(private_data, selected, 1, 1);
   else if(modifier & MODIFIER_CTRL)
@@ -703,14 +703,13 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
-  case EnterNotify:
+  case ButtonPress: {
+    XButtonEvent *bevent = (XButtonEvent *) event;
+
     XLOCK(private_data->imlibdata->x.disp);
     XRaiseWindow(private_data->imlibdata->x.disp, private_data->window);
     XUNLOCK(private_data->imlibdata->x.disp);
-    break;
 
-  case ButtonPress: {
-    XButtonEvent *bevent = (XButtonEvent *) event;
     if (bevent->button == Button4)
       xitk_browser_step_down((xitk_widget_t *)private_data->mrlb_list, NULL);
     else if(bevent->button == Button5)
@@ -724,7 +723,7 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     XUNLOCK(private_data->imlibdata->x.disp);
     break;
     
-  case KeyPress:
+  case KeyRelease:
     mykeyevent = event->xkey;
     
     XLOCK (private_data->imlibdata->x.disp);
@@ -733,7 +732,6 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     
     switch (mykey) {
       
-    case XK_space:
     case XK_s:
     case XK_S:
       mrlbrowser_select(NULL, (void *)private_data);
@@ -928,8 +926,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 
   private_data->widget_list                = xitk_widget_list_new() ;
   private_data->widget_list->l             = xitk_list_new ();
-  private_data->widget_list->focusedWidget = NULL;
-  private_data->widget_list->pressedWidget = NULL;
   private_data->widget_list->win           = private_data->window;
   private_data->widget_list->gc            = gc;
   

@@ -735,7 +735,7 @@ static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
 /*
  *
  */
-static void _draw_relief(ImlibData *im, Pixmap p, int w, int h, int relief) {
+static void _draw_relief(ImlibData *im, Pixmap p, int w, int h, int relief, int light) {
   GC            gc;
   XGCValues     gcv;
   
@@ -756,7 +756,9 @@ static void _draw_relief(ImlibData *im, Pixmap p, int w, int h, int relief) {
     if(relief == DRAW_OUTTER)
       _draw_rectangular_box_with_colors(im, p, 0, 0, w-1, h-1, 
 					xitk_get_pixel_color_white(im),	
-					xitk_get_pixel_color_darkgray(im),
+					((light) 
+					 ? xitk_get_pixel_color_darkgray(im)
+					 : xitk_get_pixel_color_black(im)),
 					relief);
     else if(relief == DRAW_INNER)
       _draw_rectangular_box_with_colors(im, p, 0, 0, w-1, h-1, 
@@ -890,21 +892,27 @@ void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p) {
  *
  */
 void draw_inner(ImlibData *im, Pixmap p, int w, int h) {
-  _draw_relief(im, p, w, h, DRAW_INNER);
+  _draw_relief(im, p, w, h, DRAW_INNER, 0);
+}
+void draw_inner_light(ImlibData *im, Pixmap p, int w, int h) {
+  _draw_relief(im, p, w, h, DRAW_INNER, 1);
 }
 
 /*
  *
  */
 void draw_outter(ImlibData *im, Pixmap p, int w, int h) {
-  _draw_relief(im, p, w, h, DRAW_OUTTER);
+  _draw_relief(im, p, w, h, DRAW_OUTTER, 0);
+}
+void draw_outter_light(ImlibData *im, Pixmap p, int w, int h) {
+  _draw_relief(im, p, w, h, DRAW_OUTTER, 1);
 }
 
 /*
  *
  */
 void draw_flat(ImlibData *im, Pixmap p, int w, int h) {
-  _draw_relief(im, p, w, h, DRAW_FLATTER);
+  _draw_relief(im, p, w, h, DRAW_FLATTER, 1);
 }
 
 /*
@@ -1040,10 +1048,9 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
   
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
   XFillRectangle(im->x.disp, p->image, gc, 0, 0, (w * 3), h);
-  /*
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
   XFillRectangle(im->x.disp, p->image, gc, 0, 3, (w - 1), h);
   XFillRectangle(im->x.disp, p->image, gc, w, 0, (w - 1), h);
-  */
 
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
   XDrawLine(im->x.disp, p->image, gc, 0, 3, w, 3);

@@ -272,7 +272,7 @@ static void paint_slider(xitk_widget_t *sl, Window win, GC gc) {
 
       srcx1 = 0;
       
-      if(private_data->bArmed) {
+      if((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
 	srcx1 += paddle_width;
 	if(private_data->bClicked)
 	  srcx1 += paddle_width;
@@ -345,7 +345,7 @@ static void paint_slider(xitk_widget_t *sl, Window win, GC gc) {
 	desty1 = y;
       }
       
-      if(private_data->bArmed) {
+      if((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
 	if(private_data->bClicked)
 	  srcx1 = 2*button_width;
 	else
@@ -430,7 +430,7 @@ static int notify_click_slider(xitk_widget_list_t *wl,
     
     paint_slider(sl, wl->win, wl->gc);
     
-    if((bUp == 0) && private_data->bArmed) {
+    if((bUp == 0) && (private_data->focus == FOCUS_RECEIVED)) {
       XEvent sliderevent;
 
       /*
@@ -499,12 +499,11 @@ static int notify_click_slider(xitk_widget_list_t *wl,
 /*
  * Got focus
  */
-static int notify_focus_slider(xitk_widget_list_t *wl,
-			       xitk_widget_t *sl, int bEntered) {
+static int notify_focus_slider(xitk_widget_list_t *wl, xitk_widget_t *sl, int focus) {
   slider_private_data_t *private_data = (slider_private_data_t *) sl->private_data;
 
   if(sl->widget_type & WIDGET_TYPE_SLIDER)
-    private_data->bArmed = bEntered;    
+    private_data->focus = focus;    
 
   return 1;
 }
@@ -647,6 +646,30 @@ void xitk_slider_set_pos(xitk_widget_list_t *wl, xitk_widget_t *sl, int pos) {
 }
 
 /*
+ * Call callback for current position
+ */
+void xitk_slider_callback_exec(xitk_widget_t *sl) {
+  slider_private_data_t *private_data = (slider_private_data_t *) sl->private_data;
+  
+  if(sl->widget_type & WIDGET_TYPE_SLIDER) {
+    if(private_data->callback) {
+      private_data->callback(private_data->sWidget,
+			     private_data->userdata,
+			     (int) private_data->value);
+    }
+    else {
+
+      if(private_data->motion_callback) {
+	private_data->motion_callback(private_data->sWidget,
+				      private_data->motion_userdata,
+				      (int) private_data->value);
+      }
+
+    }
+  }
+}
+
+/*
  * Create the widget
  */
 static xitk_widget_t *_xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s,
@@ -666,7 +689,7 @@ static xitk_widget_t *_xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slid
   private_data->sWidget                  = mywidget;
   private_data->sType                    = stype;
   private_data->bClicked                 = 0;
-  private_data->bArmed                   = 0;
+  private_data->focus                    = FOCUS_LOST;
 
   private_data->angle                    = 0.0;
 

@@ -701,6 +701,26 @@ static xitk_color_names_t xitk_color_names[] = {
   {   0,    0,    0,  NULL }
 };
 
+#if 0
+static void dump_widget_type(xitk_widget_t *w) {
+  if(w->widget_type      & WIDGET_TYPE_GROUP)       printf("WIDGET_TYPE_GROUP | ");
+  if(w->widget_type      & WIDGET_TYPE_BUTTON)      printf("WIDGET_TYPE_BUTTON");
+  else if(w->widget_type & WIDGET_TYPE_LABELBUTTON) printf("WIDGET_TYPE_LABELBUTTON");
+  else if(w->widget_type & WIDGET_TYPE_SLIDER)      printf("WIDGET_TYPE_SLIDER");
+  else if(w->widget_type & WIDGET_TYPE_LABEL)       printf("WIDGET_TYPE_LABEL");
+  else if(w->widget_type & WIDGET_TYPE_CHECKBOX)    printf("WIDGET_TYPE_CHECKBOX");
+  else if(w->widget_type & WIDGET_TYPE_IMAGE)       printf("WIDGET_TYPE_IMAGE");
+  else if(w->widget_type & WIDGET_TYPE_BROWSER)     printf("WIDGET_TYPE_BROWSER");
+  else if(w->widget_type & WIDGET_TYPE_FILEBROWSER) printf("WIDGET_TYPE_FILEBROWSER");
+  else if(w->widget_type & WIDGET_TYPE_MRLBROWSER)  printf("WIDGET_TYPE_MRLBROWSER");
+  else if(w->widget_type & WIDGET_TYPE_INPUTTEXT)   printf("WIDGET_TYPE_INPUTTEXT");
+  else if(w->widget_type & WIDGET_TYPE_COMBO)       printf("WIDGET_TYPE_COMBO");
+  else if(w->widget_type & WIDGET_TYPE_TABS)        printf("WIDGET_TYPE_TABS");
+  else if(w->widget_type & WIDGET_TYPE_INTBOX)      printf("WIDGET_TYPE_INTBOX");
+  printf("\n");
+}
+#endif
+
 /*
  * Alloc a memory area of size_t size.
  */
@@ -833,7 +853,8 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
 
   mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
   while (mywidget) {
-    if (xitk_is_inside_widget (mywidget, x, y))
+    if ((xitk_is_inside_widget (mywidget, x, y))
+	&& (mywidget->enable == WIDGET_ENABLE) && mywidget->visible)
       return mywidget;
 
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
@@ -842,12 +863,10 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
 }
 
 /*
- * Call notify_focus function in right widget (the one who get, and
- * the one who loose focus).
+ * Call notify_focus (with FOCUS_MOUSE_[IN|OUT] as focus state), 
+ * function in right widget (the one who get, and the one who lose focus).
  */
-void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
-				int x, int y) {
-  int bRepaint = 0;
+void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) { 
   xitk_widget_t *mywidget;
   
   if(!wl) {
@@ -857,41 +876,47 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
   
   mywidget = xitk_get_widget_at (wl, x, y);
   
-  if (mywidget != wl->focusedWidget) {
-    if (wl->focusedWidget) {
+  if (mywidget != wl->widget_under_mouse) {
+    
+    if (wl->widget_under_mouse) {
       
       /* Kill (hide) tips */
-      xitk_tips_tips_kill(wl->focusedWidget);
+      xitk_tips_tips_kill(wl->widget_under_mouse);
       
-      if (wl->focusedWidget->notify_focus && wl->focusedWidget->enable == WIDGET_ENABLE) {
-	bRepaint |= (wl->focusedWidget->notify_focus) (wl, wl->focusedWidget, FOCUS_LOST);
-	wl->focusedWidget->have_focus = FOCUS_LOST;
+      if (wl->widget_under_mouse->notify_focus 
+	  && wl->widget_under_mouse->enable == WIDGET_ENABLE) {
+      	(void) (wl->widget_under_mouse->notify_focus)(wl, wl->widget_under_mouse, FOCUS_MOUSE_OUT);
       }
-      if(wl->focusedWidget->paint)
-	(wl->focusedWidget->paint) (wl->focusedWidget, wl->win, wl->gc);
+      
+      if(wl->widget_under_mouse->paint)
+	(wl->widget_under_mouse->paint) (wl->widget_under_mouse, wl->win, wl->gc);
+      
     }
     
-    wl->focusedWidget = mywidget;
+    wl->widget_under_mouse = mywidget;
     
-    if (mywidget) {
-      
-      if(mywidget->enable == WIDGET_ENABLE)
-	xitk_tips_create(mywidget, wl);
-      
-      if (mywidget->notify_focus && mywidget->enable == WIDGET_ENABLE) {
-	bRepaint |= (mywidget->notify_focus) (wl, mywidget, FOCUS_RECEIVED);
-	mywidget->have_focus = FOCUS_RECEIVED;
-      }
+    if (mywidget && (mywidget->enable == WIDGET_ENABLE) && mywidget->visible) {
 
+#if 0      
+      dump_widget_type(mywidget);
+#endif
+      
+      xitk_tips_create(mywidget, wl);
+      
+      if (mywidget->notify_focus && mywidget->enable == WIDGET_ENABLE)
+	(void) (mywidget->notify_focus) (wl, mywidget, FOCUS_MOUSE_IN);
+      
       if(mywidget->paint)
 	(mywidget->paint) (mywidget, wl->win, wl->gc);
+      
     }
     
   }
 }
 
 /*
- * Call notify_click function, if exist, of widget at coords x/y.
+ * Call notify_focus (with FOCUS_[RECEIVED|LOST] as focus state), 
+ * then call notify_click function, if exist, of widget at coords x/y.
  */
 int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp) {
   int            bRepaint = 0;
@@ -904,31 +929,217 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
 
   mywidget = xitk_get_widget_at (wl, x, y);
 
-  xitk_motion_notify_widget_list (wl, x, y);
-
-  if (!bUp) {
+  if(mywidget != wl->widget_focused) {
+    if (wl->widget_focused) {
       
-    wl->pressedWidget = mywidget;
+      /* Kill (hide) tips */
+      xitk_tips_tips_kill(wl->widget_focused);
+      
+      if (wl->widget_focused->notify_focus && wl->widget_focused->enable == WIDGET_ENABLE) {
+	(void) (wl->widget_focused->notify_focus) (wl, wl->widget_focused, FOCUS_LOST);
+	wl->widget_focused->have_focus = FOCUS_LOST;
+      }
+
+      if(wl->widget_focused->paint)
+	(wl->widget_focused->paint) (wl->widget_focused, wl->win, wl->gc);
+    }
+    
+
+    wl->widget_focused = mywidget;
     
     if (mywidget) {
-
+      
+      if (mywidget->notify_focus && mywidget->enable == WIDGET_ENABLE) {
+	(void) (mywidget->notify_focus) (wl, mywidget, FOCUS_RECEIVED);
+	mywidget->have_focus = FOCUS_RECEIVED;
+      }
+      else
+	wl->widget_focused = NULL;
+      
+      if(mywidget->paint)
+	(mywidget->paint) (mywidget, wl->win, wl->gc);
+    }
+    
+  }
+  else {
+    if(wl->widget_under_mouse && mywidget && (wl->widget_under_mouse == mywidget)) {
+      
+      if (mywidget->notify_focus && mywidget->enable == WIDGET_ENABLE) {
+	(void) (mywidget->notify_focus) (wl, mywidget, FOCUS_RECEIVED);
+	mywidget->have_focus = FOCUS_RECEIVED;
+      }
+    }
+    
+  }
+  
+  if (!bUp) {
+    
+    wl->widget_pressed = mywidget;
+    
+    if (mywidget) {
+      
       /* Kill (hide) tips */
       xitk_tips_tips_kill(mywidget);
-
+      
       if (mywidget->notify_click && mywidget->enable == WIDGET_ENABLE && mywidget->running)
 	bRepaint |= (mywidget->notify_click) (wl, mywidget, LBUTTON_DOWN, x, y);
-
+      
     }
-  } else {
-    if (wl->pressedWidget) {
-      if (wl->pressedWidget->notify_click 
-	  && wl->pressedWidget->enable == WIDGET_ENABLE && wl->pressedWidget->running)
-	bRepaint |= (wl->pressedWidget->notify_click) (wl, wl->pressedWidget, LBUTTON_UP, x, y);
-
+  } 
+  else {
+    if (wl->widget_pressed) {
+      if (wl->widget_pressed->notify_click 
+	  && wl->widget_pressed->enable == WIDGET_ENABLE && wl->widget_pressed->running)
+	bRepaint |= (wl->widget_pressed->notify_click) (wl, wl->widget_pressed, LBUTTON_UP, x, y);
+      
     }
   }
   
   return((bRepaint == 1));
+}
+
+/*
+ * Find the first focusable widget in wl, according to direction
+ */
+static xitk_widget_t *get_next_focusable_widget(xitk_widget_list_t *wl, int backward) {
+  xitk_widget_t *widget = NULL;
+  int found;
+  
+  if(!wl) {
+    XITK_WARNING("%s(): widget list is NULL.\n", __FUNCTION__);
+    return NULL;
+  }
+  
+  do {
+    
+    found = 0;
+
+    if(backward)
+      widget = (xitk_widget_t *) xitk_list_prev_content (wl->l);
+    else
+      widget = (xitk_widget_t *) xitk_list_next_content (wl->l);
+
+    if(widget == NULL) {
+
+      if(backward)
+	widget = (xitk_widget_t *) xitk_list_last_content (wl->l);
+      else
+	widget = (xitk_widget_t *) xitk_list_first_content (wl->l);
+
+      if(widget == NULL) {
+	
+	do {
+	  
+	  if(backward)
+	    widget = (xitk_widget_t *) xitk_list_last_content (wl->l);
+	  else
+	    widget = (xitk_widget_t *) xitk_list_first_content (wl->l);
+	  
+	  if(widget && (widget->notify_focus) && (widget->enable) && (widget->visible))
+	    found = 1;
+	  
+	} while(!found);
+	
+	return widget;
+      }
+      else
+	if((widget->notify_focus) && (widget->enable) && (widget->visible))
+	  found = 1;
+      
+    }
+    else if((widget->notify_focus) && (widget->enable) && (widget->visible))
+      found = 1;
+    
+  } while(!found);
+  
+  return widget;
+}
+
+/*
+ *
+ */
+void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
+  xitk_widget_t *first_widget, *widget;
+
+  if(!wl) {
+    XITK_WARNING("%s(): widget list is NULL.\n", __FUNCTION__);
+    return;
+  }
+
+  if(backward) 
+    first_widget = widget = (xitk_widget_t *) xitk_list_last_content (wl->l);
+  else
+    first_widget = widget = (xitk_widget_t *) xitk_list_first_content (wl->l);
+  
+  while (widget && wl && wl->l && wl->win && wl->gc) {
+    
+    /* There is no widget focused yet */
+    if(!wl->widget_focused) {
+      
+      if((!first_widget->notify_focus) || (!first_widget->enable) || (!first_widget->visible)) {
+	first_widget = get_next_focusable_widget(wl, backward);
+      }
+      
+      wl->widget_focused = first_widget;
+      
+    __focus_the_widget:
+      
+      /* Kill (hide) tips */
+      xitk_tips_tips_kill(wl->widget_focused);
+
+      if (wl->widget_focused->notify_focus && wl->widget_focused->enable == WIDGET_ENABLE) {
+
+	(void) (wl->widget_focused->notify_focus) (wl, wl->widget_focused, FOCUS_RECEIVED);
+	wl->widget_focused->have_focus = FOCUS_RECEIVED;
+	
+	if(wl->widget_focused->paint)
+	  (wl->widget_focused->paint) (wl->widget_focused, wl->win, wl->gc);
+      }
+      
+      if (wl->widget_focused->notify_click
+      	  && wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
+      	
+      	if(wl->widget_focused->widget_type & WIDGET_TYPE_INPUTTEXT) {
+      	  (void) (wl->widget_focused->notify_click) (wl, wl->widget_focused, LBUTTON_DOWN, 
+      						     wl->widget_focused->x + 1, 
+      						     wl->widget_focused->y + 1);
+	  
+      	  if(wl->widget_focused->paint)
+      	    (wl->widget_focused->paint) (wl->widget_focused, wl->win, wl->gc);
+	  
+      	}
+	
+      }
+      return;
+    }
+    
+    /* next widget will be focused */
+    if(widget == wl->widget_focused) {
+      xitk_widget_t *next_widget;
+      
+      if (wl->widget_focused->notify_focus && wl->widget_focused->enable == WIDGET_ENABLE) {
+	
+	wl->widget_focused->have_focus = FOCUS_LOST;
+	(void) (wl->widget_focused->notify_focus) (wl, wl->widget_focused, FOCUS_LOST);
+	
+	if(wl->widget_focused->paint)
+	  (wl->widget_focused->paint) (wl->widget_focused, wl->win, wl->gc);
+	
+      }
+      
+      next_widget = get_next_focusable_widget(wl, backward);
+      
+      if(next_widget == NULL)
+	next_widget = first_widget;
+      
+      wl->widget_focused = next_widget;
+
+      goto __focus_the_widget;
+    }
+    
+    widget = get_next_focusable_widget(wl, backward);
+  }
+
 }
 
 /*
@@ -950,7 +1161,7 @@ void xitk_send_key_event(xitk_widget_list_t *wl, xitk_widget_t *w, XEvent *xev) 
 xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *wl) {
 
   if(wl) {
-    return wl->focusedWidget;
+    return wl->widget_focused;
   }
   
   XITK_WARNING("widget list is NULL\n");
@@ -963,7 +1174,7 @@ xitk_widget_t *xitk_get_focused_widget(xitk_widget_list_t *wl) {
 xitk_widget_t *xitk_get_pressed_widget(xitk_widget_list_t *wl) {
 
   if(wl)
-    return wl->pressedWidget;
+    return wl->widget_pressed;
   
   XITK_WARNING("widget list is NULL\n");
   return NULL;

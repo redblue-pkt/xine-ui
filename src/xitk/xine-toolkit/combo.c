@@ -40,6 +40,7 @@
 #include "_xitk.h"
 
 static void _combo_rollunroll(xitk_widget_t *w, void *data, int state);
+
 /*
  *
  */
@@ -390,8 +391,6 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
 
   private_data->widget_list                = xitk_widget_list_new() ;
   private_data->widget_list->l             = xitk_list_new ();
-  private_data->widget_list->focusedWidget = NULL;
-  private_data->widget_list->pressedWidget = NULL;
   private_data->widget_list->win           = (xitk_window_get_window(private_data->xwin));
   private_data->widget_list->gc            = private_data->gc;
   
@@ -535,7 +534,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     
     fs = xitk_font_load_font(c->imlibdata->x.disp, DEFAULT_FONT_10);
     xitk_font_set_font(fs, c->parent_wlist->gc);
-    height = xitk_font_get_string_height(fs, "HEIGHT");
+    height = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
     xitk_font_unload_font(fs);
 
 
@@ -546,7 +545,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     xitk_list_append_content(c->parent_wlist->l, 
 			     (private_data->label_widget = 
 			      xitk_noskin_label_create(&lbl,
-						       x, y, (width - height), (height + 8), DEFAULT_FONT_10)));
+						       x, y, (width - height), (height + 4), DEFAULT_FONT_10)));
 
     cb.skin_element_name = NULL;
     cb.callback          = _combo_rollunroll;
@@ -556,7 +555,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
 			     (private_data->button_widget = 
 			      xitk_noskin_checkbox_create(&cb,
 							  x + (width - height), y,
-							  (height + 8), (height + 8))));
+							  (height + 4), (height + 4))));
 
     if(lw)
       *lw = private_data->label_widget;
@@ -565,8 +564,8 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     
     mywidget->x = x;
     mywidget->y = y;
-    mywidget->width = (width - height) + (height + 8);
-    mywidget->height = (height + 8);
+    mywidget->width = (width - height) + (height + 4);
+    mywidget->height = (height + 4);
     
     {
       xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->label_widget);

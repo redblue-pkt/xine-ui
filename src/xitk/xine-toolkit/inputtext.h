@@ -59,6 +59,7 @@ typedef struct {
   char                   *focused_color;
 
   int                     have_focus;
+
   int                     max_length;
   int                     max_visible;
   int                     disp_offset;

@@ -152,11 +152,13 @@ void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p);
  * Draw an inner box.
  */
 void draw_inner(ImlibData *im, Pixmap p, int w, int h);
+void draw_inner_light(ImlibData *im, Pixmap p, int w, int h);
 
 /*
  * Draw and outter box.
  */
 void draw_outter(ImlibData *im, Pixmap p, int w, int h);
+void draw_outter_light(ImlibData *im, Pixmap p, int w, int h);
 
 /*
  * Draw a flat box.

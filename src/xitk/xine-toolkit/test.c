@@ -82,6 +82,9 @@ typedef struct {
   xitk_widget_t        *intbox;
   int                   oldintvalue;
 
+  /* checkbox */
+  xitk_widget_t        *checkbox;
+
   xitk_widget_list_t   *widget_list;
   xitk_register_key_t   kreg;
 } test_t;
@@ -90,6 +93,8 @@ typedef struct {
 static test_t *test;
 static int nlab = 0;
 static int align = LABEL_ALIGN_LEFT;
+#define FONT_HEIGHT_MODEL "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN&й(-и_за)=№~#{[|`\\^@]}%"
+
 /*
  *
  */
@@ -168,36 +173,29 @@ void test_handle_event(XEvent *event, void *data) {
     XUnlockDisplay(test->display);
     break;
 
-  case KeyPress: {
-    xitk_widget_t *w = xitk_get_focused_widget(test->widget_list);
+  case KeyRelease: {
+    int modifier;
     
-    if(w && (w->widget_type & WIDGET_TYPE_INPUTTEXT)) {
-      xitk_send_key_event(test->widget_list, w, event);
-    }
-    else {
-      int modifier;
+    (void) xitk_get_key_modifier(event, &modifier);
+    
+    mykeyevent = event->xkey;
+    
+    XLockDisplay (test->display);
+    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+    XUnlockDisplay (test->display);
+    
+    switch (mykey) {
       
-      (void) xitk_get_key_modifier(event, &modifier);
+    case XK_q:
+    case XK_Q:
+      if(modifier & MODIFIER_CTRL)
+	test_end(NULL, NULL);
+      break;
       
-      mykeyevent = event->xkey;
-      
-      XLockDisplay (test->display);
-      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-      XUnlockDisplay (test->display);
-      
-      switch (mykey) {
-	
-      case XK_q:
-      case XK_Q:
-	if(modifier & MODIFIER_CTRL)
-	  test_end(NULL, NULL);
-	break;
-	
-      }   
-    }
+    }   
   }
   break;
-
+  
   case MappingNotify:
     XLockDisplay(test->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
@@ -375,9 +373,29 @@ static void create_intbox(void) {
 /*
  *
  */
+static void create_checkbox(void) {
+  int x = 250, y = 300;
+  xitk_checkbox_widget_t cb;
+
+  XITK_WIDGET_INIT(&cb, test->imlibdata);
+
+  cb.skin_element_name = NULL;
+  cb.callback          = NULL;
+  cb.userdata          = NULL;
+  xitk_list_append_content (test->widget_list->l,
+			    (test->checkbox = 
+			     xitk_noskin_checkbox_create(&cb, x, y, 20, 20)));
+
+  xitk_set_widget_tips_default(test->checkbox, "This is a checkbox");
+}
+
+/*
+ *
+ */
 static void create_tabs(void) {
   Pixmap              bg;
   xitk_tabs_widget_t  t;
+  char               *fontname = "*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*";
   int                 x = 150, y = 200, w = 300;
   int                 width, height;
   static char        *tabs_labels[] = {
@@ -391,7 +409,7 @@ static void create_tabs(void) {
   XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg,
 	    test->widget_list->gc, 0, 0, width, height, 0, 0);
   
-  draw_rectangular_outter_box(test->imlibdata, bg, x, y+20, w, 60);
+  draw_rectangular_outter_box(test->imlibdata, bg, x, y+20, (w-1), 60);
   xitk_window_change_background(test->imlibdata, test->xwin, bg, width, height);
   XFreePixmap(test->display, bg);
   
@@ -403,7 +421,7 @@ static void create_tabs(void) {
   t.userdata          = NULL;
   xitk_list_append_content (test->widget_list->l,
 			    (test->tabs = 
-			     xitk_noskin_tabs_create(&t, x, y, w)));
+			     xitk_noskin_tabs_create(&t, x, y, w, fontname)));
 
 }
 
@@ -413,7 +431,7 @@ static void create_tabs(void) {
 static void create_frame(void) {
   Pixmap    bg;
   int       width, height;
-  char     *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
+  char     *fontname = "*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
   int       x = 350, y = 50, w = 200, h = 150;
   
   xitk_window_get_window_size(test->xwin, &width, &height);
@@ -433,7 +451,7 @@ static void create_frame(void) {
  */
 static void create_inputtext(void) {
   xitk_inputtext_widget_t  inp;
-  char                    *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
+  char                    *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 
   XITK_WIDGET_INIT(&inp, test->imlibdata);
 
@@ -456,7 +474,7 @@ static void create_inputtext(void) {
  */
 static void create_label(void) {
   xitk_label_widget_t   lbl;
-  char                 *fontname = "*-lucida-*-r-*-*-14-*-*-*-*-*-*-*";
+  char                 *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
   int                   x = 150, y = 120, len = 100;
   xitk_font_t          *fs;
   int                   lbear, rbear, wid, asc, des;
@@ -514,7 +532,7 @@ static void create_button(void) {
     if(wimage) {
       unsigned int   col;
       xitk_font_t   *fs = NULL;
-      char          *fontname = "*-lucida-*-r-*-*-14-*-*-*-*-*-*-*";
+      char          *fontname = "*-helvetica-bold-r-*-*-14-*-*-*-*-*-*-*";
       int            lbear, rbear, wid, asc, des;
       char          *label = _("Fire !!");
 
@@ -645,7 +663,7 @@ static void combo_select(xitk_widget_t *w, void *data, int select) {
  */
 static void create_combo(void) {
   xitk_combo_widget_t    cmb;
-  char                  *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
+  char                  *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
   int                    x = 150, y = 36, width = 100, height;
   xitk_font_t           *fs;
 
@@ -658,7 +676,7 @@ static void create_combo(void) {
   */
   fs = xitk_font_load_font(test->display, fontname);
   xitk_font_set_font(fs, test->widget_list->gc);
-  height = xitk_font_get_string_height(fs, "HEIGHT");
+  height = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
   xitk_font_unload_font(fs);
   /*
   draw_rectangular_inner_box(test->imlibdata, bg, (x - 4), (y - 4), (width + 8), (height + 7));
@@ -685,7 +703,7 @@ static void create_combo(void) {
  */
 static void create_browser(void) {
   xitk_browser_widget_t  browser;
-  char                  *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
+  char                  *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
   Pixmap                 bg;
   int                    width, height;
 
@@ -744,7 +762,7 @@ static void create_browser(void) {
 int main(int argc, char **argv) {
   GC                          gc;
   xitk_labelbutton_widget_t   lb;
-  char                       *fontname = "*-lucida-*-r-*-*-14-*-*-*-*-*-*-*";
+  char                       *fontname = "*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
   int                         windoww = 600, windowh = 400;
   xitk_widget_t              *w;
   
@@ -775,8 +793,6 @@ int main(int argc, char **argv) {
 
   test->widget_list                = xitk_widget_list_new();
   test->widget_list->l             = xitk_list_new ();
-  test->widget_list->focusedWidget = NULL;
-  test->widget_list->pressedWidget = NULL;
   test->widget_list->win           = (xitk_window_get_window(test->xwin));
   test->widget_list->gc            = gc;
 
@@ -805,6 +821,7 @@ int main(int argc, char **argv) {
   create_frame();
   create_tabs();
   create_intbox();
+  create_checkbox();
   
   test->kreg = xitk_register_event_handler("test", 
 					   (xitk_window_get_window(test->xwin)),

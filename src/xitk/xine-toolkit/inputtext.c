@@ -318,9 +318,37 @@ static void create_labelofinputtext(xitk_widget_t *it,
 
   /*  Put text in the right place */
   XLOCK(private_data->imlibdata->x.disp);
-  XDrawString(private_data->imlibdata->x.disp, pix, gc, 
-	      2, ((ysize+asc+des+yoff)>>1)-des, 
-	      plabel, strlen(plabel));
+  if(private_data->skin_element_name) {
+    XDrawString(private_data->imlibdata->x.disp, pix, gc, 
+		2, ((ysize+asc+des+yoff)>>1)-des, 
+		plabel, strlen(plabel));
+  }
+  else {
+    XWindowAttributes attr;
+    Pixmap            tpix;
+    GC                lgc;
+    
+    XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
+    
+    lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
+    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
+    
+    tpix = XCreatePixmap(private_data->imlibdata->x.disp, win,
+			 xsize, ysize, attr.depth);
+    
+    XCopyArea (private_data->imlibdata->x.disp, pix, tpix, lgc, 0, 0,
+	       xsize, ysize, 0, 0);
+    
+    XDrawString(private_data->imlibdata->x.disp, tpix, lgc, 
+		2, ((ysize+asc+des+yoff)>>1)-des, 
+		plabel, strlen(plabel));
+    
+    XCopyArea (private_data->imlibdata->x.disp, tpix, pix, lgc, 0, 0,
+	       xsize - 1, ysize, 0, 0);
+
+    XFreePixmap(private_data->imlibdata->x.disp, tpix);
+    XFreeGC(private_data->imlibdata->x.disp, lgc);
+  }
   XUNLOCK(private_data->imlibdata->x.disp);
 
   width = xitk_font_get_text_width(fs, plabel,
@@ -374,12 +402,12 @@ static void paint_inputtext(xitk_widget_t *it, Window win, GC gc) {
       XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
     }
 
-    button_width = skin->width/2;
+    button_width = skin->width / 2;
     
     btn = XCreatePixmap(private_data->imlibdata->x.disp, skin->image,
 			button_width, skin->height, attr.depth);
     
-    if(private_data->have_focus) {
+    if((it->have_focus == FOCUS_RECEIVED) || (private_data->have_focus == FOCUS_MOUSE_IN)) {
       state = FOCUS;
       XCopyArea (private_data->imlibdata->x.disp, skin->image,
 		 btn, gc, button_width, 0,
@@ -424,7 +452,7 @@ static int notify_click_inputtext(xitk_widget_list_t *wl, xitk_widget_t *it,
     }
 
     pos = x - it->x;
-    
+
     {
       char        *p = private_data->text;
       xitk_font_t *fs = NULL;
@@ -471,20 +499,17 @@ static int notify_click_inputtext(xitk_widget_list_t *wl, xitk_widget_t *it,
 /*
  * Handle motion on input text box.
  */
-static int notify_focus_inputtext(xitk_widget_list_t *wl, 
-				   xitk_widget_t *it, int bEntered) {
+static int notify_focus_inputtext(xitk_widget_list_t *wl, xitk_widget_t *it, int focus) {
   inputtext_private_data_t *private_data = 
     (inputtext_private_data_t *) it->private_data;
   
   if (it->widget_type & WIDGET_TYPE_INPUTTEXT) {
-    private_data->have_focus = bEntered;
-    if(bEntered == FOCUS_LOST) {
-      private_data->cursor_pos = 0;
-    }
-    paint_inputtext(it, wl->win, wl->gc);
+    
+    if((private_data->have_focus = focus) == FOCUS_LOST)
+      private_data->cursor_pos = -1;
 
   }
-
+  
   return 1;
 }
 
@@ -715,6 +740,7 @@ static void inputtext_exec_escape(xitk_widget_list_t *wl, xitk_widget_t *it) {
   
   private_data->cursor_pos = -1;
   it->have_focus = private_data->have_focus = FOCUS_LOST;
+  wl->widget_focused = NULL;
   paint_inputtext(it, wl->win, wl->gc);
 }
 
@@ -781,6 +807,8 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl,
     int         len;
     int         modifier;
     
+    private_data->have_focus = FOCUS_RECEIVED;
+
     XLOCK(private_data->imlibdata->x.disp);
     len = XLookupString(&keyevent, buf, sizeof(buf), &key, NULL);
     XUNLOCK(private_data->imlibdata->x.disp);
@@ -879,6 +907,9 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl,
 
       }
     }
+    else if(key == XK_Tab) {
+      return;
+    }
     else if(key == XK_Delete) {
       inputtext_erase_with_delete(wl, it);
     }
@@ -930,9 +961,11 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl,
       }
       
     }
+#if 0
     else {
-      //      printf("got unhandled key = [%ld]\n", key);
+      printf("got unhandled key = [%ld]\n", key);
     }
+#endif
   }
 
 }
@@ -961,6 +994,7 @@ void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, char 
   if (it->widget_type & WIDGET_TYPE_INPUTTEXT) {
     XITK_FREE(private_data->text);
     private_data->text = strdup((text != NULL)?text:"");
+    private_data->disp_offset = 0;
     private_data->cursor_pos = -1;
     paint_inputtext(it, wl->win, wl->gc);
   }
@@ -998,7 +1032,10 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_skin_config_t *skonfig,
 
   private_data->skin              = skin;
 
-  private_data->max_visible       = (private_data->skin->width/2);
+  private_data->max_visible   = (private_data->skin->width/2);
+  if(private_data->skin_element_name == NULL)
+    private_data->max_visible -= 2;
+
   private_data->disp_offset       = 0;
   
   private_data->callback          = it->callback;

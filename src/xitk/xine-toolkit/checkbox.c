@@ -107,7 +107,7 @@ static void paint_checkbox (xitk_widget_t *c, Window win, GC gc) {
       XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
     }
 
-    if (private_data->cArmed) {
+    if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
       if (private_data->cClicked) { //click
 	XCopyArea (private_data->imlibdata->x.disp, skin->image, 
 		   win, lgc, 2*checkbox_width, 0,
@@ -147,7 +147,7 @@ static int notify_click_checkbox (xitk_widget_list_t *wl, xitk_widget_t *c,
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
 
     private_data->cClicked = !cUp;
-    if (cUp && private_data->cArmed) {
+    if (cUp && (private_data->focus == FOCUS_RECEIVED)) {
       private_data->cState = !private_data->cState;
       if(private_data->callback) {
 	private_data->callback(private_data->cWidget, 
@@ -166,13 +166,12 @@ static int notify_click_checkbox (xitk_widget_list_t *wl, xitk_widget_t *c,
 /*
  *
  */
-static int notify_focus_checkbox (xitk_widget_list_t *wl, 
-				  xitk_widget_t *c, int cEntered) {
+static int notify_focus_checkbox (xitk_widget_list_t *wl, xitk_widget_t *c, int focus) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
   if (c->widget_type & WIDGET_TYPE_CHECKBOX)
-    private_data->cArmed = cEntered;
+    private_data->focus = focus;
 
   return 1;
 }
@@ -223,22 +222,21 @@ int xitk_checkbox_get_state(xitk_widget_t *c) {
  *
  */
 void xitk_checkbox_set_state(xitk_widget_t *c, int state, Window win, GC gc) {
-  checkbox_private_data_t *private_data = 
-    (checkbox_private_data_t *) c->private_data;
-  int clk, arm;
+  checkbox_private_data_t *private_data = (checkbox_private_data_t *) c->private_data;
+  int clk, focus;
 
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
     if(xitk_checkbox_get_state(c) != state) {
-      arm = private_data->cArmed;
+      focus = private_data->focus;
       clk = private_data->cClicked;
 
-      private_data->cArmed = 1;
+      private_data->focus = FOCUS_RECEIVED;
       private_data->cClicked = 1;
       private_data->cState = state;
 
       paint_checkbox(c, win, gc);
 
-      private_data->cArmed = arm;
+      private_data->focus = focus;
       private_data->cClicked = clk;
 
       paint_checkbox(c, win, gc);
@@ -268,7 +266,7 @@ static xitk_widget_t *_xitk_checkbox_create(xitk_skin_config_t *skonfig,
   private_data->cWidget           = mywidget;
   private_data->cClicked          = 0;
   private_data->cState            = 0;
-  private_data->cArmed            = 0;
+  private_data->focus             = FOCUS_LOST;
 
   private_data->skin              = skin;
   private_data->callback          = cb->callback;

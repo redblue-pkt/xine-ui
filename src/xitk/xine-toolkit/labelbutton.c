@@ -243,7 +243,7 @@ static void paint_labelbutton (xitk_widget_t *lb, Window win, GC gc) {
     btn = XCreatePixmap(private_data->imlibdata->x.disp, skin->image,
 			button_width, skin->height, attr.depth);
     
-    if (private_data->bArmed) {
+    if ((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
       if (private_data->bClicked) {
 	state = CLICK;
 	XCopyArea (private_data->imlibdata->x.disp, skin->image, 
@@ -319,7 +319,7 @@ static int notify_click_labelbutton (xitk_widget_list_t *wl, xitk_widget_t *lb,
     private_data->bClicked = !bUp;
     private_data->bOldState = private_data->bState;
     
-    if (bUp && private_data->bArmed) {
+    if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
       private_data->bState = !private_data->bState;
       paint_labelbutton(lb, wl->win, wl->gc);
       if(private_data->bType == RADIO_BUTTON) {
@@ -383,13 +383,12 @@ char *xitk_labelbutton_get_label(xitk_widget_t *lb) {
 /*
  * Handle motion on button
  */
-static int notify_focus_labelbutton (xitk_widget_list_t *wl, 
-				     xitk_widget_t *lb, int bEntered) {
+static int notify_focus_labelbutton (xitk_widget_list_t *wl, xitk_widget_t *lb, int focus) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
-    private_data->bArmed = bEntered;
+    private_data->focus = focus;
   }
 
   return 1;
@@ -486,24 +485,24 @@ int xitk_labelbutton_get_alignment(xitk_widget_t *lb) {
  * Set radio button to state 'state'
  */
 void xitk_labelbutton_set_state(xitk_widget_t *lb, int state, Window win, GC gc) {
-  int clk, arm;
+  int clk, focus;
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
 
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
     if(private_data->bType == RADIO_BUTTON) {
       if(xitk_labelbutton_get_state(lb) != state) {
-	arm = private_data->bArmed;
+	focus = private_data->focus;
 	clk = private_data->bClicked;
 	
-	private_data->bArmed = 1;
+	private_data->focus = FOCUS_RECEIVED;
 	private_data->bClicked = 1;
 	private_data->bOldState = private_data->bState;
 	private_data->bState = state;
 
 	paint_labelbutton(lb, win, gc);
 	
-	private_data->bArmed = arm;
+	private_data->focus = focus;
 	private_data->bClicked = clk;
 	
 	paint_labelbutton(lb, win, gc);
@@ -537,7 +536,7 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_skin_config_t *skonfig,
   private_data->bWidget           = mywidget;
   private_data->bType             = b->button_type;
   private_data->bClicked          = 0;
-  private_data->bArmed            = 0;
+  private_data->focus             = FOCUS_LOST;
   private_data->bState            = 0;
   private_data->bOldState         = 0;
 

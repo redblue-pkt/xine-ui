@@ -43,7 +43,7 @@ typedef struct {
   xitk_widget_t          *sWidget;
   int                     sType;
   int                     bClicked;
-  int                     bArmed;
+  int                     focus;
 
 
   float                   angle;
@@ -133,5 +133,10 @@ void xitk_slider_make_step(xitk_widget_list_t *, xitk_widget_t *);
  * Decrement by step the paddle position.
  */
 void xitk_slider_make_backstep(xitk_widget_list_t *, xitk_widget_t *);
+
+/**
+ * Call callback for current position
+ */
+void xitk_slider_callback_exec(xitk_widget_t *);
 
 #endif

@@ -352,82 +352,78 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
  */
 xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title, 
 						int x, int y, int width, int height) {
-  xitk_window_t         *xwin;
-  XSizeHints             hint;
-  XWMHints              *wm_hint;
-  XSetWindowAttributes   attr;
-  XColor                 black, dummy;
-  XClassHint            *xclasshint;
-  GC                     gc;
-  XGCValues              gcv;
-
-  if((im == NULL) || (width == 0 || height == 0))
+  GC             gc;
+  XGCValues      gcv;
+  xitk_window_t *xwin;
+  Pixmap         bar, pix_bg;
+  unsigned int   colorblack, colorwhite, colorgray;
+  xitk_font_t   *fs = NULL;
+  int            lbear, rbear, wid, asc, des;
+  
+  if((im == NULL) || (title == NULL) || (width == 0 || height == 0))
     return NULL;
 
-  xwin             = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
-  xwin->background = None;
-  xwin->width      = width;
-  xwin->height     = height;
-  
+  xwin = xitk_window_create_simple_window(im, x, y, width, height);
+
+  xitk_window_set_window_title(im, xwin, title);
+
+  bar = xitk_image_create_pixmap(im, width, TITLE_BAR_HEIGHT);
+  pix_bg = xitk_image_create_pixmap(im, width, height);
+
   XLOCK(im->x.disp);
 
-  memset(&hint, 0, sizeof(hint));
-  hint.x               = x;
-  hint.y               = y;
-  hint.width           = width;
-  hint.base_width      = width;
-  hint.min_width       = width;
-  hint.height          = height;
-  hint.base_height     = height;
-  hint.min_height      = height;
-  hint.win_gravity     = NorthWestGravity;
-  hint.flags           = PWinGravity | PBaseSize | PMinSize | USSize | USPosition;
-  
-  XAllocNamedColor(im->x.disp, Imlib_get_colormap(im), "black", &black, &dummy);
-
-  attr.override_redirect = False;
-  attr.background_pixel  = black.pixel;
-  attr.border_pixel      = black.pixel;
-  attr.colormap          = Imlib_get_colormap(im);
-  attr.win_gravity       = NorthWestGravity;
-
-  xwin->window = XCreateWindow(im->x.disp, im->x.root, hint.x, hint.y, hint.width, hint.height,
-			       0, im->x.depth,  InputOutput, im->x.visual,
-			       CWBackPixel | CWBorderPixel | CWColormap | CWWinGravity ,
-			       &attr);
-  
-  XSetStandardProperties(im->x.disp, xwin->window, title, title, None, NULL, 0, &hint);
-
-  XSelectInput(im->x.disp, xwin->window, INPUT_MOTION | KeymapStateMask);
-  
-  if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = "Xine Window";
-    xclasshint->res_class = "Xitk";
-    XSetClassHint(im->x.disp, xwin->window, xclasshint);
-    XFree(xclasshint);
-  }
-  
-  wm_hint = XAllocWMHints();
-  if (wm_hint != NULL) {
-    wm_hint->input         = True;
-    wm_hint->initial_state = NormalState;
-    wm_hint->flags         = InputHint | StateHint;
-    XSetWMHints(im->x.disp, xwin->window, wm_hint);
-    XFree(wm_hint);
-  }
-
-  xwin->width = width;
-  xwin->height = height;
-  
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, xwin->window, GCGraphicsExposures, &gcv);
+
+  XCopyArea(im->x.disp, xwin->background, pix_bg, gc, 0, 0, width, height, 0, 0);
+
+  colorblack = xitk_get_pixel_color_black(im);
+  colorwhite = xitk_get_pixel_color_white(im);
+  colorgray = xitk_get_pixel_color_gray(im);
+
+  { /* Draw window title bar background */
+    int s, bl = 255;
+    unsigned int colorblue;
+
+    colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
+    for(s = 0; s <= TITLE_BAR_HEIGHT; s++, bl -= 8) {
+      XSetForeground(im->x.disp, gc, colorblue);
+      XDrawLine(im->x.disp, bar, gc, 0, s, width, s);
+      colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
+    }
+  }
+
+  XSetForeground(im->x.disp, gc, colorwhite);
+  XDrawLine(im->x.disp, bar, gc, 0, 0, width, 0);
+  XDrawLine(im->x.disp, bar, gc, 0, 0, 0, TITLE_BAR_HEIGHT - 1);
+  XSetForeground(im->x.disp, gc, colorgray);
+  XDrawLine(im->x.disp, bar, gc, width - 1, 0, width - 1, TITLE_BAR_HEIGHT - 1);
+  XDrawLine(im->x.disp, bar, gc, 0, TITLE_BAR_HEIGHT - 1, width - 1, TITLE_BAR_HEIGHT - 1);
   XUNLOCK(im->x.disp);
-  
-  xwin->background = xitk_image_create_pixmap(im, width, height);
-  draw_outter(im, xwin->background, width, height);
-  xitk_window_apply_background(im, xwin);
+
+  fs = xitk_font_load_font(im->x.disp, DEFAULT_BOLD_FONT_12);
+  xitk_font_set_font(fs, gc);
+  xitk_font_string_extent(fs, title, &lbear, &rbear, &wid, &asc, &des);
 
   XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, gc, colorwhite);
+  XDrawString(im->x.disp, bar, gc, 
+	      (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT+asc+des) >> 1) - des, 
+	      title, strlen(title));
+
+  XUNLOCK(im->x.disp);
+
+  xitk_font_unload_font(fs);
+
+  XLOCK(im->x.disp);
+  XCopyArea(im->x.disp, bar, pix_bg, gc, 0, 0, width, TITLE_BAR_HEIGHT, 0, 0);
+  XUNLOCK(im->x.disp);
+  
+  xitk_window_change_background(im, xwin, pix_bg, width, height);
+  
+  XUNLOCK(im->x.disp);
+  XFreePixmap(im->x.disp, bar);
+  XFreePixmap(im->x.disp, pix_bg);
   XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 
@@ -533,13 +529,27 @@ static void _window_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
+  case Expose:
+    wd->widget_list->widget_focused = wd->default_button;
+    if (wd->widget_list->widget_focused->notify_focus 
+	&& wd->widget_list->widget_focused->enable == WIDGET_ENABLE) {
+      xitk_widget_t *w = wd->widget_list->widget_focused;
+
+      (void) (w->notify_focus) (wd->widget_list, w, FOCUS_RECEIVED);
+      w->have_focus = FOCUS_RECEIVED;
+
+      if(w->paint)
+	(w->paint) (w, wd->widget_list->win, wd->widget_list->gc);
+    }
+    break;
+    
   case MappingNotify:
     XLOCK(wd->imlibdata->x.disp);
     XRefreshKeyboardMapping((XMappingEvent *) event);
     XUNLOCK(wd->imlibdata->x.disp);
     break;
 
-  case KeyPress: {
+  case KeyRelease: {
     XKeyEvent  mykeyevent;
     KeySym     mykey;
     char       kbuf[256];
@@ -695,8 +705,6 @@ void xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *
   
   wd->widget_list                = xitk_widget_list_new();
   wd->widget_list->l             = xitk_list_new ();
-  wd->widget_list->focusedWidget = NULL;
-  wd->widget_list->pressedWidget = NULL;
   wd->widget_list->win           = (xitk_window_get_window(wd->xwin));
 
   XLOCK(wd->imlibdata->x.disp);
@@ -724,7 +732,7 @@ void xitk_window_dialog_one_button_with_width(ImlibData *im, char *title, char *
 	    xitk_noskin_labelbutton_create(&lb,
 					   bx, by,
 					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_FONT_12)));
+					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
   wd->default_button = wd->wyes;
 
   /* Draw text area */
@@ -866,8 +874,6 @@ void xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
   
   wd->widget_list                = xitk_widget_list_new();
   wd->widget_list->l             = xitk_list_new ();
-  wd->widget_list->focusedWidget = NULL;
-  wd->widget_list->pressedWidget = NULL;
   wd->widget_list->win           = (xitk_window_get_window(wd->xwin));
   XLOCK(wd->imlibdata->x.disp);
   wd->widget_list->gc            = (XCreateGC(im->x.disp, (xitk_window_get_window(wd->xwin)),
@@ -895,7 +901,7 @@ void xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
 	    xitk_noskin_labelbutton_create(&lb,
 					   bx1, by,
 					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_FONT_12)));
+					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button2_label;
@@ -909,7 +915,7 @@ void xitk_window_dialog_two_buttons_with_width(ImlibData *im, char *title,
 	    xitk_noskin_labelbutton_create(&lb,
 					   bx2, by,
 					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_FONT_12)));
+					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
 
   wd->default_button = wd->wno;
 
@@ -1047,20 +1053,19 @@ void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
 
   windowh = (i->height + 50) + (TITLE_BAR_HEIGHT + 40);
 
-  wd->imlibdata = im;
-  wd->type = DIALOG_TYPE_YESNOCANCEL;
-  wd->yescallback = cb1;
-  wd->nocallback = cb2;
+  wd->imlibdata      = im;
+  wd->type           = DIALOG_TYPE_YESNOCANCEL;
+  wd->yescallback    = cb1;
+  wd->nocallback     = cb2;
   wd->cancelcallback = cb3;
-  wd->userdata = userdata;
-  wd->xwin = xitk_window_create_dialog_window(im, ((title != NULL) ? title : _("Question?")), 
-					      0, 0, windoww, windowh);  
+  wd->userdata       = userdata;
+  wd->xwin           = xitk_window_create_dialog_window(im, ((title != NULL) 
+							     ? title : _("Question?")), 
+							0, 0, windoww, windowh);  
   xitk_window_center_window(im, wd->xwin);
   
   wd->widget_list                = xitk_widget_list_new();
   wd->widget_list->l             = xitk_list_new ();
-  wd->widget_list->focusedWidget = NULL;
-  wd->widget_list->pressedWidget = NULL;
   wd->widget_list->win           = (xitk_window_get_window(wd->xwin));
   XLOCK(wd->imlibdata->x.disp);
   wd->widget_list->gc            = (XCreateGC(im->x.disp, (xitk_window_get_window(wd->xwin)),
@@ -1089,7 +1094,7 @@ void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
 	    xitk_noskin_labelbutton_create(&lb,
 					   bx1, by,
 					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_FONT_12)));
+					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button2_label;
@@ -1103,7 +1108,7 @@ void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
 	    xitk_noskin_labelbutton_create(&lb,
 					   bx2, by,
 					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_FONT_12)));
+					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = button3_label;
@@ -1117,7 +1122,7 @@ void xitk_window_dialog_three_buttons_with_width(ImlibData *im, char *title,
 	    xitk_noskin_labelbutton_create(&lb,
 					   bx3, by,
 					   bwidth, 30,
-					   "Black", "Black", "White", DEFAULT_FONT_12)));
+					   "Black", "Black", "White", DEFAULT_BOLD_FONT_12)));
 
   wd->default_button = wd->wcancel;
 

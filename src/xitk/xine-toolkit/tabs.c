@@ -270,7 +270,8 @@ char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
 /*
  *
  */
-xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int width) {
+xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, 
+				       int x, int y, int width, char *fontname) {
   xitk_widget_t         *mywidget;
   tabs_private_data_t   *private_data;
   
@@ -307,10 +308,10 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
     int                        xx = x;
     btnlist_t                 *bt;
       
-    fs = xitk_font_load_font(t->imlibdata->x.disp, DEFAULT_FONT_12);
+    fs = xitk_font_load_font(t->imlibdata->x.disp, fontname);
 
     xitk_font_set_font(fs, t->parent_wlist->gc);
-    fheight = xitk_font_get_string_height(fs, "HEIGHT");
+    fheight = xitk_font_get_string_height(fs, FONT_HEIGHT_MODEL);
 
     XITK_WIDGET_INIT(&lb, t->imlibdata);
     XITK_WIDGET_INIT(&b, t->imlibdata);
@@ -337,7 +338,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
 				 xitk_noskin_labelbutton_create (&lb, xx, y, fwidth + 20, 
 								 private_data->bheight, 
 								 "Black", "Black", "Black",
-								 DEFAULT_FONT_12)));
+								 fontname)));
       xx += fwidth + 20;
 
       xitk_hide_widget(private_data->parent_wlist, private_data->tabs[i]);
@@ -347,7 +348,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
 
     /* 
        Add left/rigth arrows 
-       FIXME: draw arrows
     */
     {
       xitk_image_t  *wimage;

@@ -104,7 +104,7 @@ static void *_tips_destroy_thread(void *data) {
   pthread_detach(pthread_self());
 
   /* Waiting enought time to read the tips */
-  xitk_usec_sleep(1500000);
+  xitk_usec_sleep(3000000);
 
   pthread_setcancelstate(PTHREAD_CANCEL_DISABLE,NULL);
 

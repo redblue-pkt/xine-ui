@@ -878,7 +878,7 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
-  case EnterNotify:
+  case ButtonPress:
     XLOCK(private_data->imlibdata->x.disp);
     XRaiseWindow(private_data->imlibdata->x.disp, private_data->window);
     XUNLOCK(private_data->imlibdata->x.disp);
@@ -890,7 +890,7 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
     XUNLOCK(private_data->imlibdata->x.disp);
     break;
 
-  case KeyPress:
+  case KeyRelease:
     mykeyevent = event->xkey;
 
     XLOCK (private_data->imlibdata->x.disp);
@@ -1133,8 +1133,6 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 
   private_data->widget_list                = xitk_widget_list_new() ;
   private_data->widget_list->l             = xitk_list_new ();
-  private_data->widget_list->focusedWidget = NULL;
-  private_data->widget_list->pressedWidget = NULL;
   private_data->widget_list->win           = private_data->window;
   private_data->widget_list->gc            = gc;
   
