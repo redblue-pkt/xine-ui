@@ -1,1 +1,115 @@
-.\" dummy
+.\" 
+.TH "aaxine" "1" "24. Januar 2002" "Das xine Projekt" ""
+.SH "NAME"
+aaxine \- Ein ASCII\-Zeichensatz Video\-Player
+
+.SH "SYNTAX"
+.B aaxine 
+.RI [ aalib\-Optionen ] 
+.RI [ \-A <Audiotreiber>] 
+.RI [ \-a <Tonspur>] 
+.RI [ \-R <Erkennungsmethode>] 
+.RI [ MRL ...]
+.br 
+
+.SH "BESCHREIBUNG"
+Diese Handbuchseite beschreibt das Programm
+.B aaxine.
+Aaxine ist eine auf aalib basierende Bedienoberfläche für xine\-lib, einem vielseitigen Video/Multimedia\-Player.
+.PP 
+\fBaaxine\fP ist für Leute ohne hochwertige Grafikkarte gedacht, die dennoch ihre DVDs auf ihrem alten vt100 betrachten wollen :\-)
+
+Wie auch \fBxine\fR spielt \fBaaxine\fP MPEG system streams (Ton und Video), MPEG elementary streams (Z.B. .mp3 und .mpv Dateien), AVI Dateien (benutzt win32 codes oder ffmpeg), (S)VCDs und DVDs ab, kurz gesagt, alles was von xine\-lib unterstützt wird.
+.SH "OPTIONEN"
+Dieses Programm folgt dem üblichen Format der GNU Kommandozeilenoptionen, in dem lange Optionen mit 2 Minuszeichen (`\-') beginnen.
+Eine Zusammenfassung der Optionen ist unten aufgeführt.
+Für eine vollständige Beschreibung wird auf die README und FAQ in @prefix@/share/doc/xine\-ui oder auf die xine\-Homepage verwiesen.
+
+.TP 
+.B \-h,\ \-\-help
+Zeigt eine Zusammenfassung der Optionen und die verfügbaren Ausgabe\-Treiber (Plugins) an.
+.PP 
+Eine Vielzahl der Optionen wird von \fBaalib\fR zur Verfügung gestellt, die in der dortigen Dokumentation beschrieben sind.
+.PP 
+Die folgenden Optionen, die beim Aufruf von "aaxine \-\-help" mit
+.B AAXINE options:
+überschrieben sind, werden im folgenden erläutert.
+.TP 
+.BR \-A,\ \-\-audio\-driver\  <id>
+Angegebenen Audiotreiber benutzen. Zur Verfügung stehende Treiber können mit "aaxine \-\-help" aufgelistet werden.
+.TP 
+.BR \-a,\ \-\-audio\-channel\  #
+Angegebene Tonspur benutzen. Tonkanäle sind fortlaufend von 0 für die erste Tonspur nummeriert.
+.TP 
+.BR \-R,\ \-\-recognize\-by\  [Option]
+Methode zum identifizieren eines Titels festlegen. Mögliche Optionen sind:
+.RS
+.IP  "default"
+Zuerst nach dem Inhalt, dann nach der Erweiterung.
+.IP  "revert"
+Zuerst nach der Erweiterung, dann nach dem Inhalt.
+.IP  "content"
+Nur nach dem Inhalt,
+.IP  "extension"
+Nur nach der Erweiterung.
+.PP 
+Wird nur \-R ohne einen weiteren Parameter angegeben, so wird 'revert' ausgewählt.
+.RE
+.SH "MRLs"
+MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Titel. Gültige MRLs können einfache Dateinamen sein oder folgendermaßen aussehen:
+.TP 
+.B file://<path>
+.TP 
+.B fifo://<path>
+.TP 
+.BR stdin://mpeg1\  oder \ stdin://mpeg2
+.TP 
+.B dvd://VTS_xx_y.VOB
+.TP 
+.B vcd://<track number>
+.TP 
+.B tcp://<host>:<port>
+.TP 
+.B rtp://<host>:<port>
+.TP 
+.B udp://<host>:<port>
+.PP 
+Mehrere MRLs können angegeben werden, um mehrere Titel nacheinander zu spielen. Die oben aufgeführten MRLs werden standardmäßig von libxine unterstützt. Zusätzliche Plugins können diese Liste um weitere MRLs ergänzen.
+.SH "BEDIENTASTEN"
+Viele Funktionen können über Tastatur bedient werden. Die Tastaturzuordnung ist wie folgt:
+.IP  "RETURN oder R"
+Wiedergabe.
+.IP  "LEERTASTE oder P"
+Pause.
+.IP  "0"
+Zum Anfang des momentanen Titels springen.
+.IP  "1 .. 9"
+Zu 10%..90% des momentanen Titels springen.
+.IP  "PgUp"
+Zum vorherigen Titel in der Wiedergabeliste springen.
+.IP  "PgDown"
+Zum nächsten Titel in der Wiedergabeliste springen.
+.IP  "+"
+Nächsten Tonkanal auswählen. (Der Wechsel kann sich bis zu einigen Sekunden verzögern)
+.IP  "\-"
+Vorherigen Tonkanal auswählen.
+.IP  "Q"
+Beenden.
+.SH "FEHLER"
+Natürlich keine ;\-)
+Okay, ein paar könnten schon drin sein. Nach Unterstützung fragen (und Fehler melden) kann man auf der Mailingliste <xine\-user.de@lists.sf.net>.
+
+.SH "SIEHE AUCH"
+.BR xine (1),
+.UR http://xine.sourceforge.net/
+.BR http://xine.sf.net,
+.UE
+.UR http://aa\-project.sourceforge.net/aalib/
+.BR http://aa\-project.sf.net/aalib,
+.UE
+.BR xine\-lib (3)
+
+.SH "AUTOR"
+Diese Hilfe wurde von Philipp Hahn <pmhahn@users.sf.net> für das xine Project übersetzt. Original von Siggi Langauf.
+.SH "COPYRIGHT"
+Copyright \(co 2001\-2002 The xine project
