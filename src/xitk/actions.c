@@ -510,10 +510,9 @@ void gui_play (xitk_widget_t *w, void *data) {
     if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, gGui->mmk.start))
       gui_display_logo();
     
-  } 
+  }
   else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
-    osd_update_status();
   }
   
   panel_check_pause();

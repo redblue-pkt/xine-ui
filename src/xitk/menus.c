@@ -473,7 +473,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
   }
 
 #define IS_CHANNEL_CHECKED(C, N) (C == N) ? "<checked>" : "<check>"
-#undef BIG_DIRTY_HACK
+
   { /* Audio channels */
     xitk_menu_entry_t   menu_entry;
     int                 i;
@@ -498,17 +498,11 @@ void video_window_menu(xitk_widget_list_t *wl) {
       
       memset(&langbuf, 0, sizeof(langbuf));
       
-#ifdef BIG_DIRTY_HACK
-      /* BIG WARNING: THIS IS A BIG DIRTY HACK (i want to remove is ASAP) */
-      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, i);
-      xine_usec_sleep(20000);
-#endif
-
       if(!xine_get_audio_lang(gGui->stream, i, &langbuf[0])) {
 	if(i > 0)
 	  goto __audio_chan_done;
+
 	sprintf(langbuf, "%d", i);
-	
       }
       
       sprintf(buffer, "%s/%s", location, langbuf);
@@ -520,12 +514,8 @@ void video_window_menu(xitk_widget_list_t *wl) {
     }
 
   __audio_chan_done:
-
-#ifdef BIG_DIRTY_HACK
-    /* THE HACK CONTINUE */
-    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, channel);
-#endif    
   }
+
   { /* SPU channels */
     xitk_menu_entry_t   menu_entry;
     int                 i;
@@ -550,18 +540,11 @@ void video_window_menu(xitk_widget_list_t *wl) {
       
       memset(&langbuf, 0, sizeof(langbuf));
       
-#ifdef BIG_DIRTY_HACK
-      /* BIG WARNING: THIS IS A BIG DIRTY HACK (i want to remove is ASAP) */
-      xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, i);
-      xine_usec_sleep(20000);
-#endif
-
       if(!xine_get_spu_lang(gGui->stream, i, &langbuf[0])) {
-	printf("FAILED\n");
 	if(i > 0)
 	  goto __spu_chan_done;
+
 	sprintf(langbuf, "%d", i);
-	
       }
       
       sprintf(buffer, "%s/%s", location, langbuf);
@@ -573,11 +556,6 @@ void video_window_menu(xitk_widget_list_t *wl) {
     }
 
   __spu_chan_done:
-
-#ifdef BIG_DIRTY_HACK
-    /* THE HACK CONTINUE */
-    xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, channel);
-#endif    
   }
 
   xitk_menu_show_menu(w);
