@@ -344,9 +344,11 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 	label_setup_label(w, label);
       }
       
-      pthread_mutex_lock(&private_data->paint_mutex);
-      paint_label(w);
-      pthread_mutex_unlock(&private_data->paint_mutex);
+      if(private_data->on_change == 0) {
+	pthread_mutex_lock(&private_data->paint_mutex);
+	paint_label(w);
+	pthread_mutex_unlock(&private_data->paint_mutex);
+      }
 
       xitk_skin_unlock(skonfig);
 
@@ -411,9 +413,11 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
       if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
 	label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
 
-	pthread_mutex_lock(&private_data->paint_mutex);
-	paint_label(w);
-	pthread_mutex_unlock(&private_data->paint_mutex);
+	if(private_data->on_change == 0) {
+	  pthread_mutex_lock(&private_data->paint_mutex);
+	  paint_label(w);
+	  pthread_mutex_unlock(&private_data->paint_mutex);
+	}
       }
     }
     break;
