@@ -1702,6 +1702,10 @@ int main(int argc, char *argv[]) {
       {
 	FILE   *f;
 
+#ifdef HAVE_SETLOCALE
+	if((xitk_set_locale()) != NULL)
+	  setlocale(LC_ALL, "C");
+#endif
 	if(!(f = fopen("BUG-REPORT.TXT", "w+")))
 	  fprintf(stderr, "fopen(%s) failed: %s.\n", "BUG-REPORT.TXT", strerror(errno));
 	else {
