@@ -33,6 +33,7 @@
 #include "gui_widget_types.h"
 #include "gui_main.h"
 #include "utils.h"
+#include "monitor.h"
 
 extern Display         *gDisplay;
 extern pthread_mutex_t  gXLock;
@@ -74,7 +75,7 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
   gui_image_t *bg = (gui_image_t *) private_data->bg_skin;
   gui_image_t *paddle = (gui_image_t *) private_data->paddle_skin;
   
-  XLOCK ();
+  XLockDisplay (gDisplay);
 
   if(private_data->pos > private_data->max
      || private_data->pos < private_data->min)
@@ -126,7 +127,7 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
     xprintf (VERBOSE|GUI, "paint slider on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
   
-  XUNLOCK ();
+  XUnlockDisplay (gDisplay);
 
 }
 /* ------------------------------------------------------------------------- */

@@ -26,8 +26,10 @@
 #endif
 
 #include <stdio.h>
+#include <inttypes.h>
 #include "gui_widget.h"
 #include "gui_list.h"
+
 extern uint32_t xine_debug;
 
 int paint_widget_list (widget_list_t *wl) {

@@ -79,7 +79,7 @@ typedef struct _mwmhints {
 
 gui_image_t *gui_load_image(const char *image);
 
-void gui_start (xine_t *this, int nfiles, char *filenames[]);
+void gui_start (int nfiles, char *filenames[]);
 
 void gui_status_callback (int nStatus) ;
 

@@ -47,8 +47,6 @@
 #include "gui_browser.h"
 #include "utils.h"
 #include "xine.h"
-#include "../video_out/video_out.h"
-#include "configfile.h"
 
 #define MAX_LIST 9
 
@@ -124,7 +122,7 @@ static void pl_play(widget_t *w, void *data) {
   if(j>=0 && gui_playlist[j] != NULL) {
     
     gui_set_current_mrl(gui_playlist[j]);
-    if(xine_get_status() != XINE_STOP)
+    if(xine_get_status(gXine) != XINE_STOP)
       gui_stop(NULL, NULL);
     
     gui_playlist_cur = j;
@@ -351,7 +349,7 @@ static void pl_save_pl(widget_t *w, void *data) {
  */
 void pl_scan_input(widget_t *w, void *ip) {
 
-  if(xine_get_status() == XINE_STOP) {
+  if(xine_get_status(gXine) == XINE_STOP) {
     
     // FIXME: unifying both
     if(!strcasecmp(((input_plugin_t*)ip)->get_identifier(), "DVD")) {

@@ -28,10 +28,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <inttypes.h>
 
 #include "gui_widget.h"
 #include "gui_list.h"
 #include "utils.h"
+#include "monitor.h"
 
 extern uint32_t xine_debug;
 

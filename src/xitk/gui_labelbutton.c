@@ -147,7 +147,7 @@ void paint_labelbutton (widget_t *lb, Window win, GC gc) {
   gui_image_t *skin;
   Pixmap       btn, bgtmp;
 
-  XLOCK();
+  XLockDisplay(gDisplay);
 
   skin = private_data->skin;
 
@@ -211,7 +211,7 @@ void paint_labelbutton (widget_t *lb, Window win, GC gc) {
     xprintf (VERBOSE|GUI, "paint label button on something (%d) "
 	     "that is not a label button\n", lb->widget_type);
   
-  XUNLOCK();
+  XUnlockDisplay (gDisplay);
 }
 
 /*

@@ -30,7 +30,6 @@
 #include "gui_main.h"
 #include "gui_list.h"
 #include "gui_image.h"
-#include "configfile.h"
 #include "monitor.h"
 #include "utils.h"
 
@@ -41,7 +40,10 @@ char *gui_get_skindir(const char *file) {
   static char tmp[256];
   char *skin;
 
+  /* FIXME
   skin = config_file_lookup_str ("skin", "default");
+  */
+  skin = "default";
 
   sprintf(tmp, "%s/%s/%s", XINE_SKINDIR, skin, file);
 
@@ -54,8 +56,11 @@ char *gui_get_skindir(const char *file) {
 int is_entry_exist(const char *entry) {
   FILE *fd_read;
   char skincfgfile[1024], tok[80], *skin, buf[256], *ln = buf;
-  
+
+  /* FIXME
   skin = config_file_lookup_str ("skin", "default");
+  */
+  skin = "default";
   snprintf(skincfgfile, 1024, "%s/%s/skinconfig", XINE_SKINDIR, skin);
   snprintf(tok, 80, "%s:", entry);
   
@@ -95,8 +100,12 @@ char *extract_value(const char *entry, int pos) {
   char skincfgfile[1024], tok[80], *skin, buf[256], *ln = buf, *oln, val[256],
     *ret = NULL;
   int i;
-  
+
+  /* FIXME
   skin = config_file_lookup_str ("skin", "default");
+  */
+  skin = "default";
+
   snprintf(skincfgfile, 1024, "%s/%s/skinconfig", XINE_SKINDIR, skin);
   snprintf(tok, 80, "%s:", entry);
   memset(&val, 0, sizeof(val));
@@ -209,7 +218,10 @@ char *gui_get_skinfile(const char *str) {
   char *v=NULL;
   char *ret=NULL, *skin;
   
+  /* FIXME
   skin = config_file_lookup_str ("skin", "default");
+  */
+  skin = "default";
   
   if(is_entry_exist(str) && ((v = extract_value(str, 3)) != NULL)) {
     ret = (char *) xmalloc(strlen(XINE_SKINDIR)+strlen(skin)+strlen(v)+3);
@@ -233,7 +245,10 @@ void gui_place_extra_images(widget_list_t *gui_widget_list) {
     buf[256], *ln = buf, *oln;
   int x, y;
 
+  /* FIXME
   skin = config_file_lookup_str ("skin", "default");
+  */
+  skin = "default";
 
   snprintf(skincfgfile, 1024, "%s/%s/skinconfig", XINE_SKINDIR, skin);
 

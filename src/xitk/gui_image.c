@@ -33,6 +33,7 @@
 #include "gui_widget_types.h"
 #include "gui_main.h"
 #include "utils.h"
+#include "monitor.h"
 
 extern Display         *gDisplay;
 extern pthread_mutex_t  gXLock;
@@ -43,7 +44,7 @@ void paint_image (widget_t *i,  Window win, GC gc) {
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
 
-  XLOCK ();
+  XLockDisplay (gDisplay);
 
   skin = private_data->skin;
 
@@ -57,7 +58,7 @@ void paint_image (widget_t *i,  Window win, GC gc) {
     xprintf (VERBOSE|GUI, "paint image on something (%d) "
 	     "that is not an image\n", i->widget_type);
   
-  XUNLOCK ();
+  XUnlockDisplay (gDisplay);
 }
 
 widget_t *create_image (int x, int y, const char *skin) {

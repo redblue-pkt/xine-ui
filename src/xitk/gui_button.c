@@ -37,7 +37,6 @@
 #include "gui_main.h"
 
 extern Display         *gDisplay;
-extern pthread_mutex_t  gXLock;
 extern uint32_t         xine_debug;
 
 void paint_button (widget_t *b,  Window win, GC gc) {
@@ -47,7 +46,7 @@ void paint_button (widget_t *b,  Window win, GC gc) {
   
   button_private_data_t *private_data = (button_private_data_t *) b->private_data;
 
-  XLOCK ();
+  XLockDisplay (gDisplay);
 
   skin = private_data->skin;
 
@@ -76,7 +75,7 @@ void paint_button (widget_t *b,  Window win, GC gc) {
     xprintf (VERBOSE|GUI, "paint button on something (%d) that is not a button\n",
 	     b->widget_type);
   
-  XUNLOCK ();
+  XUnlockDisplay (gDisplay);
 }
 
 int notify_click_button (widget_list_t *wl, widget_t *b,int bUp, int x, int y){

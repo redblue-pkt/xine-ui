@@ -34,6 +34,7 @@
 #include "gui_widget_types.h"
 #include "gui_main.h"
 #include "utils.h"
+#include "monitor.h"
 
 extern Display         *gDisplay;
 extern pthread_mutex_t  gXLock;
@@ -48,7 +49,7 @@ void paint_checkbox (widget_t *c, Window win, GC gc) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
-  XLOCK ();
+  XLockDisplay (gDisplay);
   
   skin = private_data->skin;
   
@@ -80,7 +81,7 @@ void paint_checkbox (widget_t *c, Window win, GC gc) {
     xprintf (VERBOSE|GUI, "paint checkbox something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
   
-  XUNLOCK ();
+  XUnlockDisplay (gDisplay);
 }
 
 /*

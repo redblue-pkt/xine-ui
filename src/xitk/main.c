@@ -61,13 +61,12 @@
 #  include "getopt.h"
 #endif
 
-
-Display *gDisplay;
 /*
  * global variables
  */
-
-static uint32_t debug_level;
+Display  *gDisplay;
+uint32_t  debug_level;
+xine_t   *gXine;
 
 /* options args */
 static const char *short_options = "?hS4"
@@ -268,11 +267,10 @@ int main(int argc, char *argv[]) {
   int              autoplay_options = 0; /* stuff like FULL_ON_START, QUIT_ON_STOP */
   char            *audio_driver_name = NULL;
   ao_functions_t  *audio_driver = NULL ;
-  vo_instance_t   *video_driver = NULL;
+  vo_driver_t     *video_driver = NULL;
   char            *video_driver_name = NULL;
   char            *display_name = ":0.0";
   char             filename[1024];
-  xine_t          *my_xine;
   config_values_t *cfg;
 
   show_banner();
@@ -433,29 +431,29 @@ int main(int argc, char *argv[]) {
    * xine init
    */
 
-  my_xine = xine_init (video_driver, audio_driver, 
-		       gui_status_callback, cfg);
+  gXine = xine_init (video_driver, audio_driver, 
+		     gui_status_callback, cfg);
 
-  xine_select_audio_channel (my_xine, audio_channel);
-  xine_select_spu_channel (my_xine, spu_channel);
+  xine_select_audio_channel (gXine, audio_channel);
+  xine_select_spu_channel (gXine, spu_channel);
 
   /*
    * start CORBA server thread
    */
 #ifdef HAVE_ORBIT
   if (!no_lirc)
-    xine_server_start (my_xine);
+    xine_server_start (gXine);
 #endif
 
   /*
    * hand control over to gui
    */
 
-  gui_start(my_xine, argc-optind, &argv[optind]);
+  gui_start(argc-optind, &argv[optind]);
 
 #ifdef HAVE_ORBIT
   if (!no_lirc)
-    xine_server_exit(my_xine);
+    xine_server_exit(gXine);
 #endif
 
   return 0;
