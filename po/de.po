@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: xine-ui 0.9.23\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-12-17 00:37+0100\n"
-"PO-Revision-Date: 2004-05-12 08:08+0200\n"
+"PO-Revision-Date: 2004-12-17 10:13+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -340,12 +340,11 @@ msgstr ""
 #.
 #: src/xitk/errors.c:298
 msgid "Opening mozilla web browser, this might take a while..."
-msgstr ""
+msgstr "Öffne Mozilla Web-Browser, was ein wenig dauern kann..."
 
 #: src/xitk/errors.c:311
-#, fuzzy
 msgid "Warning"
-msgstr "Warnung: %s\n"
+msgstr "Warnung"
 
 #: src/xitk/errors.c:312
 msgid ""
@@ -354,19 +353,22 @@ msgid ""
 "\n"
 "http://xinehq.de/index.php/faq#SPEEDUP"
 msgstr ""
+"Die Anzahl verworfener Bilder ist zu groß, weil Ihr System  zu langsam, "
+"nicht richtig optimiert oder zu langsam ist.\n"
+"\n"
+"http://xinehq.de/index.php/faq#SPEEDUP"
 
 #: src/xitk/errors.c:318
 msgid "Warn user when too much frames are dropped."
-msgstr ""
+msgstr "Warne Benuzter wenn zu viele Bilder verworfen werden."
 
 #: src/xitk/errors.c:330
-#, fuzzy
 msgid "Learn More..."
-msgstr "Mehr..."
+msgstr "Mehr dazu..."
 
 #: src/xitk/errors.c:332
 msgid "Disable this warning."
-msgstr ""
+msgstr "Deaktiviere diese Warnung."
 
 #: src/xitk/event.c:421
 msgid "Zoom: 1:1"
@@ -464,7 +466,7 @@ msgid ""
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
 "\n"
-"XInitThreads Fehler - Ihre xlib ist anscheinend nicht Thread-sicher.\n"
+"XInitThreads Fehler - Ihre xlib ist anscheinend nicht threadsicher.\n"
 
 #: src/xitk/event.c:1282
 #, c-format
@@ -473,7 +475,7 @@ msgstr "Kann Display nicht öffnen\n"
 
 #: src/xitk/event.c:1289
 msgid "Name of video display"
-msgstr ""
+msgstr "Name des Video-Bildschirms"
 
 #: src/xitk/event.c:1290
 msgid ""
@@ -482,11 +484,17 @@ msgid ""
 "like ':0.1' or ':1' makes possible to display video and control on different "
 "screens (very useful for TV presentations)."
 msgstr ""
+"Diese Einstellung gibt an, auf welchem Bildschirm xine Videos anzeigt. Wenn "
+"leer gelassen wird der Hauptbildschirm benutzt. Einstellungen wie ':0.1' "
+"oder ':1' machen es möglich, das Video auf einem anderen Bildschirm als das "
+"Steuerfeld anzuzeigen (sehr nützlich für TV-Presentationen)."
 
 #: src/xitk/event.c:1303
 #, c-format
 msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
 msgstr ""
+"Kann Bildschirm '%s' nicht für Video öffnen. Falle zurück auf "
+"Hauptbildschirm.\n"
 
 #: src/xitk/event.c:1313
 msgid "Synchronized X protocol (debug)"
@@ -799,7 +807,7 @@ msgid "Unable to delete file '%s': %s."
 msgstr "Kann Datei '%s' nicht löschen: %s."
 
 #: src/xitk/file_browser.c:1006
-#, fuzzy, c-format
+#, c-format
 msgid "Do you really want to delete the file: '%s'"
 msgstr "Datei '%s' wirklich löschen?"
 
@@ -1203,9 +1211,9 @@ msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
 msgstr "  -g, --hide-gui               GUI verstecken (Bedienfeld, usw.)\n"
 
 #: src/xitk/main.c:626
-#, fuzzy, c-format
+#, c-format
 msgid "  -I, --no-gui                 disable GUI\n"
-msgstr "  -g, --hide-gui               GUI verstecken (Bedienfeld, usw.)\n"
+msgstr "  -I, --no-gui                 GUI deaktivieren\n"
 
 #: src/xitk/main.c:627
 #, c-format
@@ -1262,10 +1270,9 @@ msgstr ""
 "  -n, --network                Aktiviere Fernsteuerung über Netzwerk.\n"
 
 #: src/xitk/main.c:641
-#, fuzzy, c-format
+#, c-format
 msgid "      --network-port           Specify network server port number.\n"
-msgstr ""
-"  -n, --network                Aktiviere Fernsteuerung über Netzwerk.\n"
+msgstr "      --network-port           Portnummer für Netzwerkfernsteuerung.\n"
 
 #: src/xitk/main.c:642
 #, c-format
@@ -1338,7 +1345,7 @@ msgstr ""
 "      --enqueue <mrl> ...      MRL in laufende Sitzung (Sitzung 0) anhängen\n"
 
 #: src/xitk/main.c:655
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  -S, --session <option1,option2,...>\n"
 "                               Session managements. Options can be:\n"
@@ -1379,9 +1386,12 @@ msgstr ""
 "                    spu=c       SPU-Kanal wählen (<c>: 'next' oder 'prev'),\n"
 "                    volume=v    Audiolautstärke <v> setzen,\n"
 "                    amp=v       Audioverstärkungslevel <v> setzen,\n"
+"                    get_speed   Geschwindigkeit abfragen\n"
+"                                (siehe Manualseite für zurückgegebene "
+"Werte).\n"
 "                    loop=m      Wiederholmodus (<m>: 'none', 'loop', "
-"'repeat',                                                'shuffle' oder "
-"'shuffle+'),\n"
+"'repeat',\n"
+"                                                'shuffle' oder 'shuffle+'),\n"
 "                    (playlist|pl)=p\n"
 "                      <p> kann sein:\n"
 "                        'clear'  Playliste löschen,\n"
@@ -1551,7 +1561,7 @@ msgstr ""
 
 #: src/xitk/main.c:764 src/xitk/main.c:880
 msgid "video driver to use"
-msgstr "Zu benutzender Video-Treiber"
+msgstr "Zu benutzender Videotreiber"
 
 #: src/xitk/main.c:765 src/xitk/main.c:881
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
@@ -1572,11 +1582,11 @@ msgstr "main: alle verfügbaren Video Treiber konnten nicht geladen werden.\n"
 #: src/xitk/main.c:858
 #, c-format
 msgid "main: video driver <%s> failed\n"
-msgstr "main: Video Treiber <%s> konnte nicht geladen werden\n"
+msgstr "main: Videotreiber <%s> konnte nicht geladen werden\n"
 
 #: src/xitk/main.c:891
 msgid "audio driver to use"
-msgstr "Zu benutzender Audio-Treiber"
+msgstr "Zu benutzender Audiotreiber"
 
 #: src/xitk/main.c:892
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
@@ -1722,7 +1732,7 @@ msgstr "Fehlerhaftes Seitenverhältnis '%s', siehe xine --help\n"
 #: src/xitk/main.c:1579
 #, c-format
 msgid "Bad port number: %d\n"
-msgstr ""
+msgstr "Fehlerhafte Portnummer: %d\n"
 
 #: src/xitk/main.c:1591
 #, c-format
@@ -1899,9 +1909,8 @@ msgid "Show controls"
 msgstr "Bedienpult anzeigen"
 
 #: src/xitk/menus.c:445
-#, fuzzy
 msgid "Show video window"
-msgstr "xine Video Fenster"
+msgstr "Videofenster anzeigen"
 
 #: src/xitk/menus.c:449
 msgid "Fullscreen"
