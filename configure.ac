@@ -398,6 +398,12 @@ dnl
 AM_PATH_AALIB(1.2.0,,)
 AM_CONDITIONAL(HAVE_AA, test x$no_aalib != "xyes")
 
+dnl option for font sets and multibyte string support
+AC_ARG_ENABLE(mbs, [  --disable-mbs           Disable multibyte string support], echo $enable_mbs, enable_mbs="yes")
+if test "x$enable_mbs" = "xyes"; then
+  AC_DEFINE(WITH_XMB,,[Define this if you want support multibyte strings in gui])
+fi
+
 dnl
 dnl Find pkg-config
 dnl
@@ -410,14 +416,6 @@ else
 dnl
 dnl Check for DirectFB
 dnl
-
-dnl option for font sets and multibyte string support
-AC_ARG_ENABLE(mbs, [  --disable-mbs           Disable multibyte string support], echo $enable_mbs, enable_mbs="yes")
-if test "x$enable_mbs" = "xyes"; then
-  AC_DEFINE(WITH_XMB,,[Define this if you want support multibyte strings in gui])
-fi
-
-
 
 dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
 dnl  DFB:
