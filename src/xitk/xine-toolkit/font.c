@@ -350,7 +350,7 @@ static char * xitk_font_core_string_to_xft( char * old_name) {
       snprintf( new_name, sizeof(new_name), "%s-%s", font, size );
     else
       snprintf( new_name, sizeof(new_name), "%s-%s:%s", font, size, style );
-
+ 
     return new_name;
   }
 
