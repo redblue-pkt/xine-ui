@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2003-03-24 11:32+0100\n"
+"POT-Creation-Date: 2003-03-25 15:45+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1129,92 +1129,92 @@ msgstr ""
 msgid "  VCD:   'vcd://<track number>'\n"
 msgstr ""
 
-#: src/xitk/main.c:560 src/xitk/main.c:665
+#: src/xitk/main.c:560 src/xitk/main.c:682
 msgid "video driver to use"
 msgstr ""
 
-#: src/xitk/main.c:561 src/xitk/main.c:666
+#: src/xitk/main.c:561 src/xitk/main.c:683
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
 
-#: src/xitk/main.c:600
+#: src/xitk/main.c:608
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr ""
 
-#: src/xitk/main.c:614
+#: src/xitk/main.c:622
 msgid "main: all available video drivers failed.\n"
 msgstr ""
 
-#: src/xitk/main.c:643
+#: src/xitk/main.c:660
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr ""
 
-#: src/xitk/main.c:676
+#: src/xitk/main.c:693
 msgid "audio driver to use"
 msgstr ""
 
-#: src/xitk/main.c:677
+#: src/xitk/main.c:694
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
 
-#: src/xitk/main.c:691 src/xitk/main.c:729
+#: src/xitk/main.c:708 src/xitk/main.c:746
 msgid "main: not using any audio driver (as requested).\n"
 msgstr ""
 
-#: src/xitk/main.c:710
+#: src/xitk/main.c:727
 #, c-format
 msgid "main: probing <%s> audio output plugin\n"
 msgstr ""
 
-#: src/xitk/main.c:722
+#: src/xitk/main.c:739
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr ""
 
-#: src/xitk/main.c:742
+#: src/xitk/main.c:759
 #, c-format
 msgid "main: audio driver <%s> failed\n"
 msgstr ""
 
-#: src/xitk/main.c:936
+#: src/xitk/main.c:953
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr ""
 
-#: src/xitk/main.c:944
+#: src/xitk/main.c:961
 msgid "sigprocmask() failed.\n"
 msgstr ""
 
-#: src/xitk/main.c:1016
+#: src/xitk/main.c:1033
 msgid "video driver id required for -V option\n"
 msgstr ""
 
-#: src/xitk/main.c:1025
+#: src/xitk/main.c:1042
 msgid "audio driver id required for -A option\n"
 msgstr ""
 
-#: src/xitk/main.c:1096
+#: src/xitk/main.c:1113
 #, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1148
+#: src/xitk/main.c:1165
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1180
+#: src/xitk/main.c:1197
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1235
+#: src/xitk/main.c:1252
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr ""
 
-#: src/xitk/main.c:1410
+#: src/xitk/main.c:1430
 msgid "Logo mrl"
 msgstr ""
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.13\n"
-"POT-Creation-Date: 2003-03-24 11:32+0100\n"
+"POT-Creation-Date: 2003-03-25 15:45+0100\n"
 "PO-Revision-Date: 2003-02-15 15:01+0100\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -1218,97 +1218,97 @@ msgstr "  DVD:   'dvd://VTS_01_2.VOB'\n"
 msgid "  VCD:   'vcd://<track number>'\n"
 msgstr "  VCD:   'vcd://<numer ¶cie¿ki>'\n"
 
-#: src/xitk/main.c:560 src/xitk/main.c:665
+#: src/xitk/main.c:560 src/xitk/main.c:682
 msgid "video driver to use"
 msgstr "wybór sterownika wideo"
 
-#: src/xitk/main.c:561 src/xitk/main.c:666
+#: src/xitk/main.c:561 src/xitk/main.c:683
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
 "Wybierz sterownik obrazu. PAMIÊTAJ: musisz zrestartowaæ xine by u¿yæ nowego "
 "sterownika."
 
-#: src/xitk/main.c:600
+#: src/xitk/main.c:608
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr "main: próbkowanie <%s> wtyczki wyj¶cia wideo\n"
 
-#: src/xitk/main.c:614
+#: src/xitk/main.c:622
 msgid "main: all available video drivers failed.\n"
 msgstr "main: ¿aden z dostêpnych sterowników wyj¶cia wideo nie zadzia³a³.\n"
 
-#: src/xitk/main.c:643
+#: src/xitk/main.c:660
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr "main: sterownik wideo <%s> nie zadzia³a³\n"
 
-#: src/xitk/main.c:676
+#: src/xitk/main.c:693
 msgid "audio driver to use"
 msgstr "wybór sterownika d¼wiêku"
 
-#: src/xitk/main.c:677
+#: src/xitk/main.c:694
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
 "Wybierz sterownik d¼wiêku, PAMIÊTAJ: musisz zrestartowaæ xine by u¿yæ nowego "
 "sterownika."
 
-#: src/xitk/main.c:691 src/xitk/main.c:729
+#: src/xitk/main.c:708 src/xitk/main.c:746
 msgid "main: not using any audio driver (as requested).\n"
 msgstr "main: nie u¿ywam ¿adnego sterownika d¼wiêku (tak jak rz±dano)\n"
 
-#: src/xitk/main.c:710
+#: src/xitk/main.c:727
 #, c-format
 msgid "main: probing <%s> audio output plugin\n"
 msgstr "main: próbkowanie wtyczki wyj¶cia d¼wiêku <%s>\n"
 
-#: src/xitk/main.c:722
+#: src/xitk/main.c:739
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr ""
 "main: próbkowanie sterownika d¼wiêku zawiod³o => brak wyj¶cia d¼wiêku\n"
 
-#: src/xitk/main.c:742
+#: src/xitk/main.c:759
 #, c-format
 msgid "main: audio driver <%s> failed\n"
 msgstr "main: sterownik d¼wiêku <%s> zawiód³\n"
 
-#: src/xitk/main.c:936
+#: src/xitk/main.c:953
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr "Wymaga biblioteki xine 1.0.0, znaleziono %d.%d.%d.\n"
 
-#: src/xitk/main.c:944
+#: src/xitk/main.c:961
 msgid "sigprocmask() failed.\n"
 msgstr "sigprocmask() zawiód³.\n"
 
-#: src/xitk/main.c:1016
+#: src/xitk/main.c:1033
 msgid "video driver id required for -V option\n"
 msgstr "id serownika wideo wymagane dla opcji -V\n"
 
-#: src/xitk/main.c:1025
+#: src/xitk/main.c:1042
 msgid "audio driver id required for -A option\n"
 msgstr "ID serownika d¼wiêku wymagane dla opcji -A\n"
 
-#: src/xitk/main.c:1096
+#: src/xitk/main.c:1113
 #, fuzzy, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr "B³êdny tryb powtarzania '%s', Zobacz xine --help\n"
 
-#: src/xitk/main.c:1148
+#: src/xitk/main.c:1165
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "B³êdna geometria '%s', Zobacz xine --help\n"
 
-#: src/xitk/main.c:1180
+#: src/xitk/main.c:1197
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "B³êdny tryb powtarzania '%s', Zobacz xine --help\n"
 
-#: src/xitk/main.c:1235
+#: src/xitk/main.c:1252
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "B³êdny argument %d => exit\n"
 
-#: src/xitk/main.c:1410
+#: src/xitk/main.c:1430
 msgid "Logo mrl"
 msgstr "Po³o¿enie logo"
 

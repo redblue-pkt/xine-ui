@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.18\n"
-"POT-Creation-Date: 2003-03-24 11:32+0100\n"
+"POT-Creation-Date: 2003-03-25 15:45+0100\n"
 "PO-Revision-Date: 2003-02-08 14:10+0100\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -1251,96 +1251,96 @@ msgstr "  DVD:   'dvd://VTS_01_2.VOB'\n"
 msgid "  VCD:   'vcd://<track number>'\n"
 msgstr "  VCD:   'vcd://<èíslo stopy>'\n"
 
-#: src/xitk/main.c:560 src/xitk/main.c:665
+#: src/xitk/main.c:560 src/xitk/main.c:682
 msgid "video driver to use"
 msgstr "Pou¾ít video ovladaè"
 
-#: src/xitk/main.c:561 src/xitk/main.c:666
+#: src/xitk/main.c:561 src/xitk/main.c:683
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
 "Výbìr video ovladaèe. POZNÁMKA: k pou¾ití nového ovladaèe je tøeba "
 "restartovat xine"
 
-#: src/xitk/main.c:600
+#: src/xitk/main.c:608
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr "main: zkou¹í se výstupní modul videa <%s> \n"
 
-#: src/xitk/main.c:614
+#: src/xitk/main.c:622
 msgid "main: all available video drivers failed.\n"
 msgstr "main: v¹echny dostupné video ovladaèe selhaly.\n"
 
-#: src/xitk/main.c:643
+#: src/xitk/main.c:660
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr "main: video ovladaè <%s> selhal\n"
 
-#: src/xitk/main.c:676
+#: src/xitk/main.c:693
 msgid "audio driver to use"
 msgstr "pou¾ít zvukový ovladaè"
 
-#: src/xitk/main.c:677
+#: src/xitk/main.c:694
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
 "Výbìr zvukového ovladaèe. POZNÁMKA: k pou¾ití nového ovladaèe je tøeba "
 "restartovat xine"
 
-#: src/xitk/main.c:691 src/xitk/main.c:729
+#: src/xitk/main.c:708 src/xitk/main.c:746
 msgid "main: not using any audio driver (as requested).\n"
 msgstr "main: nepou¾ijí se ¾ádné zvukové ovladaèe (jak bylo ¾ádáno)\n"
 
-#: src/xitk/main.c:710
+#: src/xitk/main.c:727
 #, c-format
 msgid "main: probing <%s> audio output plugin\n"
 msgstr "main: zkou¹í se výstupní zvukový modul <%s>\n"
 
-#: src/xitk/main.c:722
+#: src/xitk/main.c:739
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr "main: zkou¹ka zvukového ovladaèe selhala => ¾ádný zvukový výstup\n"
 
-#: src/xitk/main.c:742
+#: src/xitk/main.c:759
 #, c-format
 msgid "main: audio driver <%s> failed\n"
 msgstr "main: zvukový ovladaè <%s> selhal\n"
 
-#: src/xitk/main.c:936
+#: src/xitk/main.c:953
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr "Vy¾adována knihovna xine verze 1.0.0, nalezena %d.%d.%d.\n"
 
-#: src/xitk/main.c:944
+#: src/xitk/main.c:961
 msgid "sigprocmask() failed.\n"
 msgstr "sigprocmask() selhalo.\n"
 
-#: src/xitk/main.c:1016
+#: src/xitk/main.c:1033
 msgid "video driver id required for -V option\n"
 msgstr "u volby -V vy¾adován video ovladaè\n"
 
-#: src/xitk/main.c:1025
+#: src/xitk/main.c:1042
 msgid "audio driver id required for -A option\n"
 msgstr "u volby -A vy¾adován zvukový ovladaè\n"
 
-#: src/xitk/main.c:1096
+#: src/xitk/main.c:1113
 #, fuzzy, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr "©patný re¾im opakování '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:1148
+#: src/xitk/main.c:1165
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "©patnì zadaná velikost a umístìní '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:1180
+#: src/xitk/main.c:1197
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "©patný re¾im opakování '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:1235
+#: src/xitk/main.c:1252
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "neplatný argument %d ==> konec\n"
 
-#: src/xitk/main.c:1410
+#: src/xitk/main.c:1430
 msgid "Logo mrl"
 msgstr "MRL loga"
 
