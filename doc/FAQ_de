@@ -6,7 +6,7 @@
                          FAQ (Häufig gestellte Fragen)
 
 
-___________________________________________________________________2002/01/27
+______________________________________________________________2002/05/02 (1.10)
 INDEX
 
 
@@ -18,11 +18,15 @@ INDEX
 2       ALLGEMEINE FRAGEN
 2.1     Wofür sind diese "xine-lib" und "xine-ui" Module?
 2.2     Wie bekomme ich die neuste Version?
+2.3     Wo gibt es fertig übersetzte Versionen, z.B. RPMs?
 
 
 3       KOMPILIEREN (BUILD-PROZESS)
 3.1     Was benötige ich, um xine fehlerfrei zu kompilieren?
 3.2     Wie kompiliere ich xine?
+3.2.1      Einfache Übersetzungsanweisungen für Anfänger
+3.2.2      Vollständige Übersetzungsanweisungen
+3.2.3      Eigene RPM-Packete erzeugen (xine-lib, xine-ui)
 3.3     Wie kann ich den Build-Prozess mit CFLAGS steuern?
 3.4     Gibt es für den AMD K7 optimierte Binaries?
 3.5     xine-lib lässt sich nicht kompilieren
@@ -30,6 +34,7 @@ INDEX
 3.5.2      Das Xv-Plugin lässt sich nicht kompilieren
 3.6     xine-ui lässt sich nicht kompilieren
 3.6.1      Ich habe xine-lib installiert, aber xine-ui findet es nicht
+3.7     Läßt sich xine im Benutzerverzeichnis ohne root-Rechte installieren ?
 
 
 4       INSTALLATION
@@ -48,6 +53,7 @@ INDEX
 5.1.7      Wie verwende ich das DVD-Plugin?
 5.1.8      Ich kann den Regionscode meines Laufwerks nicht ändern!
 5.1.9      Kann ich mit xine (S)VCDs abspielen?
+5.1.10     Wie kann ich Filme mit externen AVI Untertiteln ansehen?
 
 5.2     Fragen zu Audio
 5.2.1      Ich sehe das Bild, aber der Ton kommt nicht!
@@ -100,6 +106,16 @@ _____________________________________________________________________________
         Diese Mailing-Lists können Sie auf der Homepage von xine
         (http://xine.sourceforge.net) abonnieren.
 
+	Bitte liefern Sie einige Informationen zu ihrer Installation, damit
+	man eine Chance zu Helfen hat, insbesonndere Informationen zur
+	Audio/Video-Hardware und den Treiben, dem Betriebssystem, CPU-Typ und
+	einigen Konsoleausgaben/Fehlermeldungen. Geben Sie bitte auch die von
+	Ihnen verwendeten Kommandozeilenparameter und nach Möglichkeit den
+	Typ des Datenstroms an, den Sie versucht haben abzuspielen. Besonders
+	wichtig ist die von Ihnen verwendete Version von xine und Informationen
+	zu allen zusätzlichen Plugins, die Sie auf ihrem System installiert
+	haben könnten.
+
 
 _____________________________________________________________________________
 2       ALLGEMEINE FRAGEN
@@ -116,6 +132,11 @@ _____________________________________________________________________________
 
         "xine-plugin" ist ein noch unfertiges Plugin für Browser. Damit
         werden Sie Video-Streams über das Internet ansehen können.
+
+	"gnome-xine" ist eine gnome-Bedienoberfläche, die als Ersatz für
+	"xine-ui" verwendet werden kann. Sie konzentriert sich mehr auf die
+	allgemeinen Medienwiedergabe-Aspekte von xine, im Gegensatz zu der
+	vollständigen einem DVD-Spieler ähnlichen Oberfläche "xine-ui".
 
 
 2.2     Wie bekomme ich die neuste Version?
@@ -134,6 +155,18 @@ _____________________________________________________________________________
            cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-ui
 
 
+2.3     Wo gibt es fertig übersetzte Versionen, z.B. RPMs?
+
+	Das xine-Projekt stellt aus rechtlichen Gründen keine fertig
+	übersetzten Versionen zur Verfügung (einige Teile von xine unterliegen
+	in einigen Ländern Patenten). Einige Betriebssystemprojekte/Distribu-
+	toren (insbesondere debian, freebsd, ...) bieten Binärprogramme für
+	ihre Distributionen an - bitte fragen Sie bei diesen nach weiteren
+	Informationen nach. Sie können außerdem auf der xine-Homepage einige
+	Links zu Drittanbietern finden, die xine-RPMs zur Verfügung stellen.
+	Sehen Sie in Abschnitt 3 dieser FAQ nach, wie xine aus den Quellen
+	übersetzt werden kann
+
 _____________________________________________________________________________
 3       KOMPILIEREN (BUILD-PROZESS)
 
@@ -151,6 +184,31 @@ _____________________________________________________________________________
 
 
 3.2     Wie kompiliere ich xine?
+
+3.2.1      Einfache Übersetzungsanweisungen für Anfänger
+
+	Laden Sie die neusten TAR-Archive "xine-lib" und "xine-ui" herunter und
+	folgen Sie den beiteren Anweisungen. Um die TAR-Archive zu entpacken,
+	benutzen Sie
+
+	tar xvfz xine-XXX.tar.gz
+
+	Die folgenden Anweisungen werden xine für alle Benutzer zugänglich nach
+	/usr/local installieren. Sie benötigen dafür auf den meißten Systemem
+	root-Rechte.
+
+	Entpacken Sie zunächst xine-lib, danach:
+        # ./configure
+        # make install
+
+	Stellen Sie sicher, daß /etc/ld.so.conf "/usr/local/lib" enthält, danach
+        # ldconfig
+
+        Nun entpacke xine-ui, danach:
+        # ./configure
+        # make install
+
+3.2.2      Vollständige Übersetzungsanweisungen
 
         Der Ablauf des Build-Prozesses ist bei allen Modulen identisch
         (siehe 2.1).
@@ -179,6 +237,58 @@ _____________________________________________________________________________
            ./configure
            make
            make install
+
+3.2.3      Eigene RPM-Packete erzeugen (xine-lib, xine-ui)
+
+	Einige Personen beschweren sich über die spec-Dateien, die mit xine
+	geliefert werden und behaupten, daß diese defekt seien und daß sie
+	damit keine Packate bauen können. Daß stimmt natürlich nicht, denn
+	immerhin haben es zwei Personen geschafft, was als Gegenbeweis reichen
+	sollte.
+
+	Zu allererst - Benutzen Sie *nicht* die bereits existierenden
+	spec-Dateien, weil diese aller Voraussicht nach nicht auf Ihrem System
+	funktionieren werden, da diese vom configure-Skript erzeugt werden und
+	evtl. dynamische/optionale Features enthalten, die auf Ihrem System
+	nicht vorhanden sind.
+
+	Die folgenden Anweisungen gelten sowohl für xine-lib alsauch xine-ui.
+
+	Besorgen Sie sich die Quellen - emtwerder als tar-Archiv von unserer
+	Webseite oder eine aktuellere Entwicklungsversion aus unserem CVS. Im
+	Verzeichnis mit den Quellen rufen Sie "./configure" (bzw.
+	".cvscompile.sh", falls Sie eine CVS-Version haben) auf, was Ihr System
+	testen wird und die entsprechenden xine-Features entsprechend
+	aktivieren/deaktivieren wird. Nachdem dies beendet ist, sind in den
+	Unterverzeichnissen "misc/" der Quellverzeichnisse die spec-Dateien
+	(xine-lib.spec bzw. xine-ui.spec) zu finden, die speziell an Ihr System
+	angepasst sind. Kopieren Sie diese spec-Dateien in ihr
+	RPM-spec-Verzeichnis (i.E. /usr/src/RPM/SPECS/) und die tar-Archive in
+	das RPM-Quellenverzeichnis (i.E. /usr/src/RPM/SOURCES/). Im Falle, daß
+	Sie eine CVS-Version benutzen, haben Sie natuerlich noch keine
+	tar-Archive, die sich aber durch folgende einfache Zwischenschritte
+	erzeichen lassen:
+
+	* Schauen Sie sich xine-lib.spec/xine-ui.spec an - Eine der ersten
+	  Zeilen sollte mit "SOURCE" anfangen. Benutzen Sie den dahinter
+	  angegebenen Dateinamen für Ihr tar-Archiv im nächsten Schritt
+	* Wechseln Sie in das übergeordnete Verzeichnis, daß Ihre
+	  xine-lib/xine-ui Unterverzeichnisse enthält und rufen Sie
+	  "tar cf DATEINAME_VON_OBEN xine-lib/" auf.
+	* Verschieben Sie diese tar-Archibe in das RPM Quellenverzeichnis.
+
+	Rufen Sie nun "rpm -ba xine-lib.spec" (bzw. xine-ui.spec) in Ihrem
+	RPM-spec-Verzeichnis auf. Danach sollten Sie die fertigen Binär-RPMs in
+	ihrem RPM-Binärverzeichnis (i.E. /usr/src/RPM/RPMS/i686) und
+	Quellen-RPMs im entsprechenden Verzeichnis (i.E. /usr/src/RPM/SRPMS/)
+	haben.
+
+	Das ist alles. Achten Sie jedoch darauf, die xine-lib RPMs zu
+	installieren, *bevor* die mit der Übersetzung von xine-ui fortfahren.
+	Anderenfalls wird die Übersetzung bereits beim Aufruf von "configure"
+	abbrechen oder die falsche Version verwendet.
+
+	Ist doch alles ganz einfach, oder ?
 
 
 3.3     Wie kann ich den Build-Prozess mit CFLAGS steuern?
@@ -260,6 +370,28 @@ _____________________________________________________________________________
            installiert haben sollten (ja, xine-lib mit "make install"
            installieren wäre nicht schlecht...)
 
+3.7     Läßt sich xine im Benutzerverzeichnis ohne root-Rechte installieren ?
+
+        Ja. Zuerst erzeugen Sie ein Unterverzeichnis, in dem Sie ihre private
+        Software installieren wollen, zum Beispiel
+
+        $ mkdir ~/usr
+
+        Danach müssen Sie einige Umgebungsvariablen setzten - eventuell ist es
+        sogar eine gute Idee, diese dauerhaft in Ihre ~/.bashrc oder ähnliches
+        zu setzen:
+
+        export PATH="$HOME/usr/bin:$PATH"
+        export LD_LIBRARY_PATH="$HOME/usr/lib:$LD_LIBRARY_PATH"
+        export CFLAGS="-I$HOME/usr/include -L$HOME/usr/lib -O3"
+        export ACLOCAL_FLAGS="-I $HOME/usr/share/aclocal"
+
+        Nun können Sie die TAR-Archive entpacken, zum Beispiel in "~/usr/src"
+        (ggf. "mkdir ~/usr/src" ausführen), und danach folgendes tun:
+
+        $ ./configure --prefix=$HOME/usr
+        $ make install
+
 
 _____________________________________________________________________________
 4       INSTALLATION
@@ -273,6 +405,12 @@ _____________________________________________________________________________
         für die DLLs. Sie können aber im Konfigurationsfenster (Tipp: auf den
         Schraubenschlüssel klicken) diese Einstellung ändern.
         (Seite "Codec" => "path to win32 codec dlls")
+        Alternativ können Sie auch die Konfigurationsdatei ~/.xine/config
+        editieren und den Eintrag
+
+         codec.win32_path:/usr/lib/win32
+         
+        direkt anpassen.
 
 
 _____________________________________________________________________________
@@ -288,12 +426,6 @@ _____________________________________________________________________________
            -  verwenden Sie einen aktuellen, für Ihre Hardware optimierten
               Kernel (2.4.x).
 
-              Aktivieren Sie die MTRR Unterstützung (wenn Sie XFree 3.x
-              verwenden, lesen Sie bitte das DVD-HOWTO für Details über
-              MTRR Unterstützung mit XFree 3.x). Verwenden Sie
-              "cat /proc/mtrr" um die Unterstützung zu überprüfen (es sollte
-              nicht "No such file or directory" angezeigt werden)
-
            -  verwenden Sie die neueste Version von gas und GCC.
 
            -  beenden Sie alle nicht benötigten Programme (verwenden Sie
@@ -301,7 +433,8 @@ _____________________________________________________________________________
               zu erhalten)
 
            -  Falls Sie nicht Xv verwenden: Stellen Sie für den X-Server
-              16 Bit Farbtiefe ein.
+              16 Bit Farbtiefe ein. 24 Bit oder mehr benötigen wesentlich mehr
+              Bandbreite.
 
            -  Stellen Sie sicher, dass Ihre Festplatte/DVD-Laufwerk DMA
               unterstützt und dass es eingeschaltet ist.
@@ -349,6 +482,18 @@ _____________________________________________________________________________
            -  Verwenden Sie PowerTweak, ein gutes "Frisierwerkzeug":
 
               => http://powertweak.sourceforge.net
+
+           -  Aktivieren Sie die MTRR Unterstützung (wenn Sie XFree 3.x
+              verwenden, lesen Sie bitte das DVD-HOWTO für Details über
+              MTRR Unterstützung mit XFree 3.x).
+
+              Falls Sie XFree 4.x benutzen, sollte die Aktivierung der MTTR-
+              Unterstützung im Kernel genügen.
+
+              Verwenden Sie "cat /proc/mtrr" um die Unterstützung zu überprüfen
+              (es sollte nicht "No such file or directory" angezeigt werden).
+              Falls Sie einen Eintrag passend zur Größe des Speichers Ihrer
+              Grafikkarte finden, sollte alles in Ordnung sein.
 
            -  Verwenden Sie sog. "raw devices", um auf DVD-Laufwerke
               zuzugreifen.
@@ -492,6 +637,13 @@ _____________________________________________________________________________
               xine VCD://<Track-Nummer>
 
 
+5.1.10     Wie kann ich Filme mit externen AVI Untertiteln ansehen?
+
+           Verwenden Sie eine solche MRL:
+
+              xine foo.avi%bar.sub
+
+
 5.2     Fragen zu Audio
 
 5.2.1      Ich sehe das Bild, aber der Ton kommt nicht!
@@ -543,24 +695,37 @@ _____________________________________________________________________________
            stützt. Beim Starten zeigt xine die Modi zur Soundausgabe an,
            z.B.:
 
-              audio_oss_out : supported modes are mono stereo (4-channel not
-              enabled in .xinerc) (ac3-pass-through not enabled in .xinerc)
+              audio_alsa_out : supported modes are mono stereo (4-channel not
+              enabled in xine config) (5-channel not enabled in xine config)
+              (5.1-channel not enabled in xine config) (a/52 and DTS
+              pass-through not enabled in xine config)
 
            Hier ist 4-Kanal Surround-Sound möglich. Da xine aber nicht
            sicherstellen kann, ob auch wirklich Lautsprecher angeschlossen
-           sind, müssen Sie diesen Modus in der Datei ~/.xine/config ein-
-           schalten:
+           sind, müssen Sie diesen Modus von Hand aktivieren.
+           
+           Sie können dies entweder im Konfigurationsdialog während der
+           Laufzeit von xine machen (Drücken Sie den Konfigurationsknopf und
+           wechseln Sie auf die AUDIO-Karte) oder direkt die Konfigurationsdatei
+           ~/.xine/config ändern:
 
-              four_channel:1
+           # 4-channel:
+             audio.four_channel:1
+         
+           # 5-channel:
+             audio.five_channel:1
 
+           # 5.1-channel
+             audio.five_lfe_channel:0
 
 5.2.5      Kann xine AC3 über S/P DIF ausgeben?
 
            Selbstverständlich... Aber auch hier gilt dasselbe wie bei
-           Surround-Sound: Sie müssen die Option manuell aktivieren. Fügen
-           Sie diese Zeile zur Datei ~/.xine/config hinzu:
+           Surround-Sound: Sie müssen die Option manuell aktivieren. Benutzen
+           Sie den Konfigurationsdialog oder editieren Sie folgende Zeile in
+           der Datei ~/.xine/config:
 
-              ac3_pass_through:1
+              audio.ac3_pass_through:1
 
 5.2.6      Ich kann die Lautstärke nicht mit den Knöpfen ändern!
 
@@ -639,9 +804,9 @@ _____________________________________________________________________________
            XShm unterstützt. Sie können diese Werte mit der Bedienoberfläche
            einstellen, oder wie folgt in der Datei ~/.xine/config :
 
-              xv_brightness:0
-              xv_saturation:0
-              xv_contrast:128
+              video.xv_brightness:0
+              video.xv_saturation:0
+              video.xv_contrast:128
 
            Die möglichen Werte hangen von Ihrem XV-Treiber ab, Sie müssen
            also ein wenig experimentieren, um ein gutes Bild zu erhalten.
@@ -649,7 +814,7 @@ _____________________________________________________________________________
            Für XShm fügen Sie folgende Zeile in die Datei ein, um die
            Helligkeit (eigentlich: Gamma-Korrektur) zu verändern:
 
-              xshm_gamma:20
+              video.xshm_gamma:20
 
            Hier können Sie Werte von -100 bis +100 eingeben.
 
