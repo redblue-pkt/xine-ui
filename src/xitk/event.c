@@ -124,13 +124,13 @@ int actions_on_start(action_id_t actions[], action_id_t a) {
 
 void config_save(void) {
 
-  xine_save_config(gGui->xine, gGui->configfile);
+  xine_config_save(gGui->xine, gGui->configfile);
 }
 
 void config_reset(void) {
 
-  xine_reset_config(gGui->xine);
-  xine_load_config(gGui->xine, gGui->configfile);
+  xine_config_reset(gGui->xine);
+  xine_config_load(gGui->xine, gGui->configfile);
 }
 
 /*

@@ -463,7 +463,7 @@ int main(int argc, char *argv[]) {
   }
 
   aaxine.xine = (xine_t *)xine_new();
-  xine_load_config (aaxine.xine, aaxine.configfile);
+  xine_config_load (aaxine.xine, aaxine.configfile);
 
   /*
    * Initialize AALib
@@ -754,7 +754,7 @@ int main(int argc, char *argv[]) {
  failure:
   
   if(aaxine.xine) 
-    xine_save_config(aaxine.xine, aaxine.configfile);
+    xine_config_save(aaxine.xine, aaxine.configfile);
   
   if(aaxine.xine)
     xine_exit(aaxine.xine); 

@@ -942,7 +942,7 @@ int main(int argc, char *argv[]) {
   gGui->actions_on_start[aos] = ACTID_NOKEY;
 
   gGui->xine = xine_new();
-  xine_load_config (gGui->xine, gGui->configfile);
+  xine_config_load (gGui->xine, gGui->configfile);
 
   /*
    * init gui

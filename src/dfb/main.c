@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
   }
   
   dfbxine.xine = (xine_t *) xine_new();
-  xine_load_config (dfb.xine, configfile);
+  xine_config_load (dfb.xine, configfile);
   
   /*
    * init video output driver
@@ -427,7 +427,7 @@ int main(int argc, char *argv[]) {
 failure:
     
   if(dfbxine.xine) 
-    xine_save_config(dfbxine.xine, configfile);
+    xine_config_save(dfbxine.xine, configfile);
  
   if(dfbxine.xine)
    xine_exit(dfbxine.xine); 
