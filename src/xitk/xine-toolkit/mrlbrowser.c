@@ -784,7 +784,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 		   Imlib_get_colormap(mb->imlibdata),
 		   "black", &black, &dummy);
 
-  attr.override_redirect = True;
+  attr.override_redirect = False;
   attr.background_pixel  = black.pixel;
   /*
    * XXX:multivis
@@ -811,8 +811,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 			 None, NULL, 0, &hint);
 
   XSelectInput(mb->imlibdata->x.disp, private_data->window,
-	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
+	       ButtonPressMask | ButtonReleaseMask | KeymapStateMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
   /*

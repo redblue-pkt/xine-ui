@@ -71,6 +71,79 @@ static void _xitk_window_destroy_window(xitk_widget_t *, void *);
 #define TITLE_BAR_HEIGHT 20
 
 /*
+ * Set/Change window title.
+ */
+void xitk_set_window_title(Display *display, Window window, char *title) {
+
+  if((display == NULL) || (window == None) || (title == NULL))
+    return;
+
+  XLOCK(display);
+  XmbSetWMProperties(display, window, title, title, NULL, 0, NULL, NULL, NULL);
+  XUNLOCK(display);
+}
+
+/*
+ * Set/Change window title.
+ */
+void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, char *title) {
+
+  if((im == NULL) || (w == NULL) || (title == NULL))
+    return;
+
+  xitk_set_window_title(im->x.disp, w->window, title);
+}
+
+/*
+ * Get (safely) window pos.
+ */
+void xitk_get_window_position(Display *display, Window window, 
+			      int *x, int *y, int *width, int *height) {
+  XWindowAttributes  wattr;
+  Window             wdummy;
+  int                xx = 0, yy = 0;
+
+  if((display == NULL) || (window == None))
+    return;
+
+  XLOCK(display);
+  if(!XGetWindowAttributes(display, window, &wattr)) {
+    XITK_WARNING("XGetWindowAttributes() failed.n");
+    wattr.width = wattr.height = 0;
+    goto __failure;    
+  }
+  
+  (void) XTranslateCoordinates (display, window, wattr.root, 
+				-wattr.border_width, -wattr.border_width,
+                                &xx, &yy, &wdummy);
+  
+ __failure:
+  
+  XUNLOCK(display);
+  
+  if(x)
+    *x = xx;
+  if(y)
+    *y = yy;
+  if(width)
+    *width = wattr.width;
+  if(height)
+    *height = wattr.height;
+}
+
+/*
+ * Get (safely) window pos.
+ */
+void xitk_window_get_window_position(ImlibData *im, xitk_window_t *w, 
+				     int *x, int *y, int *width, int *height) {
+  
+  if((im == NULL) || (w == NULL))
+    return;
+
+  xitk_get_window_position(im->x.disp, w->window, x, y, width, height);
+}
+
+/*
  * Center a window in root window.
  */
 void xitk_window_move_window(ImlibData *im, xitk_window_t *w, int x, int y) {
@@ -81,6 +154,7 @@ void xitk_window_move_window(ImlibData *im, xitk_window_t *w, int x, int y) {
   XLOCK(im->x.disp);
   XMoveResizeWindow (im->x.disp, w->window, x, y, w->width, w->height);
   XUNLOCK(im->x.disp);
+
 }
 
 /*
@@ -125,35 +199,42 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   if((im == NULL) || (width == 0 || height == 0))
     return NULL;
 
-  xwin = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
+  xwin             = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
   xwin->background = None;
-  xwin->width = width;
-  xwin->height = height;
+  xwin->width      = width;
+  xwin->height     = height;
   
   XLOCK(im->x.disp);
 
-  hint.x      = x;
-  hint.y      = y;
-  hint.width  = width;
-  hint.height = height;
-  hint.flags  = PPosition | PSize;
+  memset(&hint, 0, sizeof(hint));
+  hint.x               = x;
+  hint.y               = y;
+  hint.width           = width;
+  hint.base_width      = width;
+  hint.min_width       = width;
+  hint.height          = height;
+  hint.base_height     = height;
+  hint.min_height      = width;
+  hint.win_gravity     = NorthWestGravity;
+  hint.flags           = PWinGravity | PBaseSize | PMinSize | USSize | USPosition;
   
   XAllocNamedColor(im->x.disp, Imlib_get_colormap(im), "black", &black, &dummy);
 
-  attr.override_redirect = True;
+  attr.override_redirect = False;
   attr.background_pixel  = black.pixel;
   attr.border_pixel      = black.pixel;
   attr.colormap          = Imlib_get_colormap(im);
+  attr.win_gravity       = NorthWestGravity;
 
   xwin->window = XCreateWindow(im->x.disp, im->x.root, hint.x, hint.y, hint.width, hint.height,
-			       0, im->x.depth,  CopyFromParent, im->x.visual,
-			       CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect,
+			       0, im->x.depth,  InputOutput, im->x.visual,
+			       CWBackPixel | CWBorderPixel | CWColormap
+			       | CWOverrideRedirect | CWWinGravity ,
 			       &attr);
   
   XSetStandardProperties(im->x.disp, xwin->window, title, title, None, NULL, 0, &hint);
 
   XSelectInput(im->x.disp, xwin->window,
-	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | KeymapStateMask | ExposureMask | StructureNotifyMask);
   
@@ -176,8 +257,9 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
     xclasshint->res_name = "Xine Window";
     xclasshint->res_class = "Xitk";
     XSetClassHint(im->x.disp, xwin->window, xclasshint);
+    XFree(xclasshint);
   }
-
+  
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
     wm_hint->input         = True;
@@ -186,9 +268,6 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
     XSetWMHints(im->x.disp, xwin->window, wm_hint);
     XFree(wm_hint);
   }
-
-  
-  //  XSetInputFocus(im->x.disp, PointerRoot, RevertToNone, CurrentTime);
 
   XUNLOCK(im->x.disp);
 
@@ -244,6 +323,8 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
     return NULL;
 
   xwin = xitk_window_create_simple_window(im, x, y, width, height);
+
+  xitk_window_set_window_title(im, xwin, title);
 
   bar = xitk_image_create_pixmap(im, width, TITLE_BAR_HEIGHT);
   pix_bg = xitk_image_create_pixmap(im, width, height);
@@ -395,12 +476,6 @@ static void _window_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
-  case Expose:
-    XLOCK(wd->imlibdata->x.disp);
-    XSetInputFocus(wd->imlibdata->x.disp, wd->xwin->window, RevertToParent, CurrentTime);
-    XLOCK(wd->imlibdata->x.disp);
-    break;
-
   case MappingNotify:
     XLOCK(wd->imlibdata->x.disp);
     XRefreshKeyboardMapping((XMappingEvent *) event);
@@ -443,7 +518,7 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
 
   XLOCK(im->x.disp);
   XUnmapWindow(im->x.disp, w->window);
-  if(w->background != None)
+    if(w->background != None)
     XFreePixmap(im->x.disp, w->background);
   w->width = -1;
   w->height = -1;

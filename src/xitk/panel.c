@@ -401,12 +401,6 @@ void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case EnterNotify:
-    XLockDisplay(gGui->display);
-    XRaiseWindow(gGui->display, gGui->panel_window);
-    XUnlockDisplay(gGui->display);
-    break;
-
   case KeyPress:
     gui_handle_event(event, data);
     break;
@@ -550,7 +544,7 @@ void panel_init (void) {
   hint.height = panel->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
-  attr.override_redirect = True;
+  attr.override_redirect = False;
   attr.background_pixel  = gGui->black.pixel;
   /*
    * XXX:multivis
@@ -581,9 +575,8 @@ void panel_init (void) {
 			 None, NULL, 0, &hint);
 
   XSelectInput(gGui->display, gGui->panel_window,
-	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask 
-	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask
+	       | KeyPressMask | KeymapStateMask | ExposureMask | StructureNotifyMask);
 
   /*
    * wm, no border please

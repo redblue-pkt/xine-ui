@@ -390,8 +390,35 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout);
  * small utility function to debug xlock races
  */
 
-/* #define DEBUG_XLOCK */
+/*  #define DEBUG_XLOCK */
 #ifdef DEBUG_XLOCK
+
+#if 1
+
+static int displ;
+#define XLOCK(DISP) {                                                         \
+    int i;                                                                    \
+    displ++;                                                                  \
+    for(i = 0; i < displ; i++) printf("%d",i);                                \
+    printf(">%s: %s(%d) XLock\n",                                             \
+           __FILE__, __FUNCTION__, __LINE__);                                 \
+    fflush(stdout);                                                           \
+    XLockDisplay(DISP);                                                       \
+    printf(" %s: %s(%d) got the lock\n",                                      \
+           __FILE__, __FUNCTION__, __LINE__);                                 \
+  }
+
+#define XUNLOCK(DISP) {                                                       \
+    int i;                                                                    \
+    for(i = 0; i < displ; i++) printf("%d",i);                                \
+    displ--;                                                                  \
+    printf("<%s: %s(%d) XUnlockDisplay\n",                                    \
+           __FILE__, __FUNCTION__, __LINE__);                                 \
+    fflush(stdout);                                                           \
+    XUnlockDisplay(DISP);                                                     \
+  }
+
+#else
 
 #define XLOCK(DISP) {                                                         \
     printf("%s: %s(%d) XLockDisplay (%d)\n",                                  \
@@ -408,6 +435,8 @@ void xitk_set_widget_tips_timeout(xitk_widget_t *w, unsigned long timeout);
     fflush(stdout);                                                           \
     XUnlockDisplay(DISP);                                                     \
   }
+
+#endif
 
 #else
 

@@ -200,12 +200,6 @@ void viewlog_toggle_panel_visibility (xitk_widget_t *w, void *data) {
 void viewlog_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
-    
-  case EnterNotify:
-    XLockDisplay(gGui->display);
-    XRaiseWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
-    XUnlockDisplay(gGui->display);
-    break;
 
   case KeyPress: {
     XKeyEvent      mykeyevent;

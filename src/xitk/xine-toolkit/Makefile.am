@@ -30,6 +30,9 @@ $(top_builddir)/src/xitk/xine-toolkit/libxitk.la:
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
 
+debug-test:
+	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)" test
+
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
