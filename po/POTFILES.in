@@ -5,6 +5,7 @@ src/xitk/actions.c
 src/xitk/control.c
 src/xitk/errors.c
 src/xitk/event.c
+src/xitk/event_sender.c
 src/xitk/file_browser.c
 src/xitk/i18n.h
 src/xitk/kbindings.c

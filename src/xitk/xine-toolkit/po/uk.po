@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.8\n"
-"POT-Creation-Date: 2002-09-24 18:55-0400\n"
+"POT-Creation-Date: 2002-10-29 00:16+0100\n"
 "PO-Revision-Date: 2002-03-23 20:42GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -67,42 +67,42 @@ msgstr ""
 "Нов╕ елементи що обран╕ в комбо бокс╕:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:770
+#: src/xitk/xine-toolkit/test.c:771
 msgid "init_test() failed\n"
 msgstr "init_test() зазнав збою \n"
 
-#: src/xitk/xine-toolkit/test.c:786
+#: src/xitk/xine-toolkit/test.c:787
 msgid "My Fucking Window"
 msgstr "В╕кно"
 
-#: src/xitk/xine-toolkit/test.c:802
+#: src/xitk/xine-toolkit/test.c:803
 msgid "Quit"
 msgstr "Вих╕д"
 
-#: src/xitk/xine-toolkit/window.c:787
+#: src/xitk/xine-toolkit/window.c:826
 msgid "OK"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:850 src/xitk/xine-toolkit/window.c:1048
+#: src/xitk/xine-toolkit/window.c:889 src/xitk/xine-toolkit/window.c:1087
 msgid "Question?"
 msgstr "Питання?"
 
-#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1018 src/xitk/xine-toolkit/window.c:1229
 msgid "Yes"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1018 src/xitk/xine-toolkit/window.c:1229
 msgid "No"
 msgstr "Н╕"
 
-#: src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1229
 msgid "Cancel"
 msgstr "В╕дмова"
 
-#: src/xitk/xine-toolkit/xitk.h:1945 src/xitk/xine-toolkit/xitk.h:1961
+#: src/xitk/xine-toolkit/xitk.h:1993 src/xitk/xine-toolkit/xitk.h:2009
 msgid "Error"
 msgstr ""
 
-#: src/xitk/xine-toolkit/xitk.h:1950 src/xitk/xine-toolkit/xitk.h:1966
+#: src/xitk/xine-toolkit/xitk.h:1998 src/xitk/xine-toolkit/xitk.h:2014
 msgid "Information"
 msgstr ""

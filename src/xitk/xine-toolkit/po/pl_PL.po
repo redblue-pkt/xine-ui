@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-09-24 18:55-0400\n"
+"POT-Creation-Date: 2002-10-29 00:16+0100\n"
 "PO-Revision-Date: 2002-05-31 22:21+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polski <pl@li.org>\n"
@@ -68,42 +68,42 @@ msgstr ""
 "Nowy wybór w polu wyboru to:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:770
+#: src/xitk/xine-toolkit/test.c:771
 msgid "init_test() failed\n"
 msgstr "init_test() zawiód³\n"
 
-#: src/xitk/xine-toolkit/test.c:786
+#: src/xitk/xine-toolkit/test.c:787
 msgid "My Fucking Window"
 msgstr "Moje Okno"
 
-#: src/xitk/xine-toolkit/test.c:802
+#: src/xitk/xine-toolkit/test.c:803
 msgid "Quit"
 msgstr "Koniec"
 
-#: src/xitk/xine-toolkit/window.c:787
+#: src/xitk/xine-toolkit/window.c:826
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:850 src/xitk/xine-toolkit/window.c:1048
+#: src/xitk/xine-toolkit/window.c:889 src/xitk/xine-toolkit/window.c:1087
 msgid "Question?"
 msgstr "Pytanie?"
 
-#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1018 src/xitk/xine-toolkit/window.c:1229
 msgid "Yes"
 msgstr "Tak"
 
-#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1018 src/xitk/xine-toolkit/window.c:1229
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1229
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: src/xitk/xine-toolkit/xitk.h:1945 src/xitk/xine-toolkit/xitk.h:1961
+#: src/xitk/xine-toolkit/xitk.h:1993 src/xitk/xine-toolkit/xitk.h:2009
 msgid "Error"
 msgstr "B³±d"
 
-#: src/xitk/xine-toolkit/xitk.h:1950 src/xitk/xine-toolkit/xitk.h:1966
+#: src/xitk/xine-toolkit/xitk.h:1998 src/xitk/xine-toolkit/xitk.h:2014
 msgid "Information"
 msgstr "Informacja"

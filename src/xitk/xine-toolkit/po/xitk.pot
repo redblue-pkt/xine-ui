@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-09-24 18:55-0400\n"
+"POT-Creation-Date: 2002-10-29 00:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,42 +67,42 @@ msgid ""
 "%s [%d]."
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:770
+#: src/xitk/xine-toolkit/test.c:771
 msgid "init_test() failed\n"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:786
+#: src/xitk/xine-toolkit/test.c:787
 msgid "My Fucking Window"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:802
+#: src/xitk/xine-toolkit/test.c:803
 msgid "Quit"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:787
+#: src/xitk/xine-toolkit/window.c:826
 msgid "OK"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:850 src/xitk/xine-toolkit/window.c:1048
+#: src/xitk/xine-toolkit/window.c:889 src/xitk/xine-toolkit/window.c:1087
 msgid "Question?"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1018 src/xitk/xine-toolkit/window.c:1229
 msgid "Yes"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1018 src/xitk/xine-toolkit/window.c:1229
 msgid "No"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:1190
+#: src/xitk/xine-toolkit/window.c:1229
 msgid "Cancel"
 msgstr ""
 
-#: src/xitk/xine-toolkit/xitk.h:1945 src/xitk/xine-toolkit/xitk.h:1961
+#: src/xitk/xine-toolkit/xitk.h:1993 src/xitk/xine-toolkit/xitk.h:2009
 msgid "Error"
 msgstr ""
 
-#: src/xitk/xine-toolkit/xitk.h:1950 src/xitk/xine-toolkit/xitk.h:1966
+#: src/xitk/xine-toolkit/xitk.h:1998 src/xitk/xine-toolkit/xitk.h:2014
 msgid "Information"
 msgstr ""
