@@ -567,7 +567,7 @@ void xitk_menu_add_entry(xitk_widget_t *w, xitk_menu_entry_t *me) {
       menu_node_t         *branch = NULL;
       int                  in_trunk = 1;
 
-      sprintf(buffer, "%s", me->menu);
+      snprintf(buffer, sizeof(buffer), "%s", me->menu);
       
       o = c = new_entry = buffer;
 

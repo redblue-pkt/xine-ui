@@ -819,7 +819,7 @@ static void create_browser(void) {
     
     for(i = 0; i < 25; i++) {
       memset(&buf, 0, sizeof(buf));
-      sprintf(buf, "Entry %d", i);
+      snprintf(buf, sizeof(buf), "Entry %d", i);
       test->entries[i] = strdup(buf);
     }
     

@@ -424,11 +424,11 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
     switch(*p) {
       
     case '\t':
-      sprintf(bufsubs, "%s%s", bufsubs, "      ");
+      snprintf(bufsubs, sizeof(bufsubs), "%s%s", bufsubs, "      ");
       break;
       
     default:
-      sprintf(bufsubs, "%s%c", bufsubs, *p);
+      snprintf(bufsubs, sizeof(bufsubs), "%s%c", bufsubs, *p);
       break;
     }
     p++;
@@ -455,7 +455,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
       break;
 
     default:
-      sprintf(buf, "%s%c", buf, *p);
+      snprintf(buf, sizeof(buf), "%s%c", buf, *p);
       break;
     }
 
@@ -474,7 +474,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
       }
       else { /* cut to previous char */
 	snprintf(buf2, (p - po), "%s", buf);
-	sprintf(buf2, "%s%c", buf2, '-');
+	snprintf(buf2, sizeof(buf2), "%s%c", buf2, '-');
 	lines[numlines++] = strdup(buf2);
 	po = (p - 1);
 	p -= 2;
@@ -1301,10 +1301,10 @@ static void _draw_frame(ImlibData *im, xitk_pixmap_t *p,
       /* Cut title, add three dots a the end */
       nchar -= 4;
       snprintf(buf, nchar, "%s", title);
-      sprintf(buf, "%s%s", buf, "...");
+      snprintf(buf, sizeof(buf), "%s%s", buf, "...");
     }
     else
-      sprintf(buf, "%s", title);
+      snprintf(buf, sizeof(buf), "%s", title);
 
     fwidth = xitk_font_get_string_length(fs, buf);
   }

@@ -341,10 +341,10 @@ static char * xitk_font_core_string_to_xft( char * old_name) {
       int  sz = strtol(psize, &psize, 10);
 
       sz -= 2;
-      sprintf( size , "%i", sz );
+      snprintf(size , sizeof(size), "%i", sz);
     }
     else
-      sprintf(size, "%s", psize);
+      snprintf(size, sizeof(size), "%s", psize);
     
     if( strcmp( style , "bold" ) != 0 )
       snprintf( new_name, 255, "%s-%s", font, size );

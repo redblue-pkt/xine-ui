@@ -108,7 +108,7 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
       char  buf[nread + 2];
       
       memset(&buf, '\0', sizeof(buf));
-      sprintf(buf, "%s", s);
+      snprintf(buf, sizeof(buf), "%s", s);
       
       if(strlen(buf)) {
 	char *p, *pbuf;

@@ -1627,8 +1627,7 @@ void xitk_init(Display *display, int verbosity) {
 
   pthread_mutex_init (&gXitk->mutex, NULL);
   
-  sprintf(buffer, "-[ xiTK version %d.%d.%d ", 
-	  XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
+  snprintf(buffer, sizeof(buffer), "-[ xiTK version %d.%d.%d ", XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
   
   /* Check if SHM is working */
 #ifdef HAVE_SHM
@@ -1667,7 +1666,7 @@ void xitk_init(Display *display, int verbosity) {
 	    gXitk->use_xshm = 0;
 	  else {
 	    XShmDetach(display, &shminfo);
-	    sprintf(buffer, "%s%s", buffer, "[XShm]");
+	    snprintf(buffer, sizeof(buffer), "%s%s", buffer, "[XShm]");
 	  }
 	  
 	  XDestroyImage(xim);
@@ -1683,12 +1682,12 @@ void xitk_init(Display *display, int verbosity) {
 #endif
 
 #ifdef WITH_XFT
-  sprintf(buffer, "%s%s", buffer, "[XFT]");
+  snprintf(buffer, sizeof(buffer), "%s%s", buffer, "[XFT]");
 #elif defined(WITH_XMB)
-  sprintf(buffer, "%s%s", buffer, "[XMB]");
+  snprintf(buffer, sizeof(buffer), "%s%s", buffer, "[XMB]");
 #endif
   
-  sprintf(buffer, "%s%s", buffer, " ]-");
+  snprintf(buffer, sizeof(buffer), "%s%s", buffer, " ]-");
 
   if(verbosity)
     printf(buffer);

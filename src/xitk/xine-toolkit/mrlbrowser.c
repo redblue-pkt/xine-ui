@@ -149,10 +149,9 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
 static void update_current_origin(mrlbrowser_private_data_t *private_data) {
 
   if(private_data->mc->mrls[0] && private_data->mc->mrls[0]->origin)
-    sprintf(private_data->current_origin, "%s", 
-	    private_data->mc->mrls[0]->origin);
+    snprintf(private_data->current_origin, sizeof(private_data->current_origin), "%s", private_data->mc->mrls[0]->origin);
   else
-    sprintf(private_data->current_origin, "%s", "");
+    snprintf(private_data->current_origin, sizeof(private_data->current_origin), "%s", "");
   
   xitk_label_change_label (private_data->widget_origin, 
 			   private_data->current_origin);
@@ -776,7 +775,7 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
   char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
   memset(&buf, '\0', sizeof(buf));
-  sprintf(buf, "%s", ms->mrl);
+  snprintf(buf, sizeof(buf), "%s", ms->mrl);
   
   if((ms->type & XINE_MRL_TYPE_file) && (ms->type & XINE_MRL_TYPE_file_directory)) {
     char *filename = ms->mrl;
@@ -793,14 +792,14 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
        (filename[strlen(filename) - 2] != '.')) {
       
       memset(&buf, '\0', sizeof(buf));
-      sprintf(buf, "%s", ms->origin);
+      snprintf(buf, sizeof(buf), "%s", ms->origin);
     }
     else if((filename[strlen(filename) - 1] == '.') &&
 	    (filename[strlen(filename) - 2] == '.')) {
       char *p;
       
       memset(&buf, '\0', sizeof(buf));
-      sprintf(buf, "%s", ms->origin);
+      snprintf(buf, sizeof(buf), "%s", ms->origin);
       if(strlen(buf) > 1) { /* not '/' directory */
 	  
 	p = &buf[strlen(buf)-1];
@@ -1204,7 +1203,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   
   memset(&private_data->current_origin, 0, strlen(private_data->current_origin));
   if(mb->origin.cur_origin)
-    sprintf(private_data->current_origin, "%s", mb->origin.cur_origin);
+    snprintf(private_data->current_origin, sizeof(private_data->current_origin), "%s", mb->origin.cur_origin);
 
   if(mb->ip_name.label.label_str) {
 
