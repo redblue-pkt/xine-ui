@@ -22,9 +22,16 @@
  * video window handling functions
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <X11/extensions/XShm.h>
+#ifdef HAVE_XINERAMA
+#include <X11/extensions/Xinerama.h>
+#endif
 
 #include <xine.h>
 #include <xine/video_out_x11.h>
@@ -453,6 +460,11 @@ void video_window_init (void) {
   XWindowAttributes  attribs;
   Pixmap             bm_no;
   int                x,y,w,h;
+#ifdef HAVE_XINERAMA
+  int                   screens;
+  int                   dummy_a, dummy_b;
+  XineramaScreenInfo   *screeninfo = NULL;
+#endif
 
 
   gVw = (gVw_t *) xmalloc(sizeof(gVw_t));
@@ -498,9 +510,9 @@ void video_window_init (void) {
       && (screeninfo = XineramaQueryScreens(gGui->display, &screens))) {
     /* Xinerama Detected */
 #ifdef DEBUG
-    printf ("Display is using Xinerama with %d screens\n", screens);
-    printf (" going to assume we are using the first screen.\n");
-    printf (" size of the first screen is %dx%d.\n", 
+    printf ("videowin: display is using xinerama with %d screens\n", screens);
+    printf ("videowin: going to assume we are using the first screen.\n");
+    printf ("videowin: size of the first screen is %dx%d.\n", 
 	     screeninfo[0].width, screeninfo[0].height);
 #endif
     if (XineramaIsActive(gGui->display)) {

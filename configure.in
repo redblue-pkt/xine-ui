@@ -134,6 +134,18 @@ if test x"$no_x" != x"yes"; then
 fi
 
 dnl
+dnl Checks for Xinerama extension
+dnl
+
+AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
+             X_LIBS="$X_LIBS -lXinerama"
+             AC_DEFINE(HAVE_XINERAMA)
+             ac_have_xinerama="yes",,
+             $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
+AM_CONDITIONAL(HAVE_XINERAMA, test x$ac_have_xinerama = "xyes")
+
+ 
+dnl
 dnl check for ascii-art library
 dnl
 AM_PATH_AALIB(1.2,,)
