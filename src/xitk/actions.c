@@ -262,7 +262,9 @@ void gui_play (xitk_widget_t *w, void *data) {
   } 
   else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
-    visual_anim_pause();
+    /* not needed right now, since starting the master stream already starts
+     * the visual_anim stream as well */
+    /* visual_anim_pause(); */
   }
   
   panel_check_pause();
@@ -300,7 +302,9 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
 
   panel_check_pause();
-  visual_anim_pause();
+  /* not needed now, because pausing the master stream already pauses
+   * the visual_anim stream as well */
+  /* visual_anim_pause(); */
 }
 
 void gui_eject(xitk_widget_t *w, void *data) {
