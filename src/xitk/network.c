@@ -1573,7 +1573,7 @@ static void handle_xine_error(client_info_t *client_info) {
 	       gGui->filename);
     break;
     
-  case XINE_ERROR_NO_DEMUXER_PLUGIN:
+  case XINE_ERROR_NO_DEMUX_PLUGIN:
     sock_write(client_info->socket, 
 	       "xine engine error:\n"
 	       "There is no available demuxer plugin to handle '%s'.\n", 
