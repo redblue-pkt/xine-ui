@@ -146,6 +146,8 @@ typedef struct {
   xitk_widget_t        *frame;
   xitk_widget_t        *label;
   xitk_widget_t        *widget;
+  int                   changed;
+  xine_cfg_entry_t     *cfg;
 } widget_triplet_t;
 
 typedef struct {
@@ -316,6 +318,69 @@ void setup_toggle_visibility (xitk_widget_t *w, void *data) {
   }
 }
 
+static void setup_save(xitk_widget_t *w, void *data) {
+
+  if(setup->num_wg > 0) {
+    int i;
+
+    for(i = 0; i < setup->num_wg; i++) {
+
+      if(setup->wg[i]->widget) {
+	int  type = xitk_get_widget_type(setup->wg[i]->widget);
+	
+	if(setup->wg[i]->changed || 
+	   ((type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) || (type & WIDGET_GROUP_INTBOX)) {
+	  xitk_widget_t *w      = setup->wg[i]->widget;
+	  int            numval = 0;
+	  char          *strval = NULL;
+	  
+	  setup->wg[i]->changed = 0;
+	  
+	  switch(type & WIDGET_TYPE_MASK) {
+	  case WIDGET_TYPE_SLIDER:
+	    numval = xitk_slider_get_pos(w);
+	    break;
+	    
+	  case WIDGET_TYPE_CHECKBOX:
+	    numval = xitk_checkbox_get_state(w);
+	    break;
+	    
+	  case WIDGET_TYPE_INPUTTEXT:
+	    strval = xitk_inputtext_get_text(w);
+	    if(!strcmp(strval, setup->wg[i]->cfg->str_value))
+	      continue;
+	    break;
+	    
+	  default:
+	    if(type & WIDGET_GROUP_COMBO)
+	      numval = xitk_combo_get_current_selected(w);
+	    else if(type & WIDGET_GROUP_INTBOX) {
+	      numval = xitk_intbox_get_value(w);
+	      if(numval == setup->wg[i]->cfg->num_value)
+		continue;
+	    }
+	    
+	    break;
+	  }
+
+	  switch(setup->wg[i]->cfg->type) {
+	  case XINE_CONFIG_TYPE_STRING:
+	    config_update_string((char *)(setup->wg[i]->cfg)->key, strval);
+	    break;
+	  case XINE_CONFIG_TYPE_ENUM:
+	  case XINE_CONFIG_TYPE_NUM:
+	  case XINE_CONFIG_TYPE_BOOL:
+	  case XINE_CONFIG_TYPE_RANGE:
+	    config_update_num((char *)(setup->wg[i]->cfg)->key, numval);
+	    break;
+	  case XINE_CONFIG_TYPE_UNKNOWN:
+	    break;
+	  }
+	}
+      }
+    }
+  }
+}
 /*
  *
  */
@@ -470,27 +535,20 @@ static xitk_widget_t *setup_add_label (int x, int y, int w, const char *str) {
  *
  */
 static void numtype_update(xitk_widget_t *w, void *data, int value) {
-  xine_cfg_entry_t *entry;
+  widget_triplet_t *triplet = (widget_triplet_t *) data;
 
-  entry = (xine_cfg_entry_t *)data;
-  config_update_num((char*)entry->key, value);
+  triplet->changed = 1;
 }
 
 /*
  *
  */
 static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
-  xine_cfg_entry_t *entry;
-  xine_cfg_entry_t check_entry;
+  widget_triplet_t *triplet = (widget_triplet_t *) data;
 
-  entry = (xine_cfg_entry_t *)data;
-
-  config_update_string((char *)entry->key, str);
-  if(xine_config_lookup_entry(gGui->xine, entry->key, &check_entry)) {
-    if(((xitk_get_widget_type(w)) & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
-      xitk_inputtext_change_text(w, check_entry.str_value);
-  }
+  triplet->changed = 1;
 }
+
 
 static widget_triplet_t *setup_add_nothing_available(const char *title, int x, int y) {
   static widget_triplet_t *wt; 
@@ -540,18 +598,19 @@ static widget_triplet_t *setup_add_slider (const char *title, const char *labelk
   sl.callback                 = NULL;
   sl.userdata                 = NULL;
   sl.motion_callback          = numtype_update;
-  sl.motion_userdata          = entry;
+  sl.motion_userdata          = (void *)wt;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)),
 			   (slider = xitk_noskin_slider_create(setup->widget_list, &sl,
 							       x, y, 150, 16,
 							       XITK_HSLIDER)));
   xitk_slider_set_pos(slider, entry->num_value);
-
+  
   ADD_LABEL(slider);
-
+  
   add_widget_to_list(slider);
-
+  
   wt->widget = slider;
+  wt->cfg    = entry;
 
   return wt;
 }
@@ -576,7 +635,7 @@ static widget_triplet_t *setup_add_inputnum(const char *title, const char *label
   ib.step              = 1;
   ib.parent_wlist      = setup->widget_list;
   ib.callback          = numtype_update;
-  ib.userdata          = (void *)entry;
+  ib.userdata          = (void *)wt;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)),
     (intbox = 
      xitk_noskin_intbox_create(setup->widget_list, &ib, x, y - 5, 60, 20, &wi, &wbu, &wbd)));
@@ -589,6 +648,7 @@ static widget_triplet_t *setup_add_inputnum(const char *title, const char *label
   add_widget_to_list(wbd);
   
   wt->widget = intbox;
+  wt->cfg    = entry;
 
   return wt;
 }
@@ -612,7 +672,7 @@ static widget_triplet_t *setup_add_inputtext(const char *title, const char *labe
   inp.text              = entry->str_value;
   inp.max_length        = 256;
   inp.callback          = stringtype_update;
-  inp.userdata          = entry;
+  inp.userdata          = (void *)wt;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)),
 			   (input = 
 			    xitk_noskin_inputtext_create(setup->widget_list, &inp,
@@ -624,7 +684,8 @@ static widget_triplet_t *setup_add_inputtext(const char *title, const char *labe
   add_widget_to_list(input);
     
   wt->widget = input;
-
+  wt->cfg    = entry;
+  
   return wt;
 }
 
@@ -645,7 +706,7 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
 
   cb.skin_element_name = NULL;
   cb.callback          = numtype_update;
-  cb.userdata          = entry;
+  cb.userdata          = (void *)wt;
 
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(setup->widget_list)),
 			   (checkbox = 
@@ -657,6 +718,7 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
   add_widget_to_list(checkbox);
 
   wt->widget = checkbox;
+  wt->cfg    = entry;
 
   return wt;
 }
@@ -681,7 +743,7 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
   cmb.entries           = entry->enum_values;
   cmb.parent_wkey       = &setup->kreg;
   cmb.callback          = numtype_update;
-  cmb.userdata          = entry;
+  cmb.userdata          = (void *)wt;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
 			   (combo = 
 			    xitk_noskin_combo_create(setup->widget_list, &cmb,
@@ -695,6 +757,7 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
   add_widget_to_list(bw);
 
   wt->widget = combo;
+  wt->cfg    = entry;
 
   return wt;
 }
@@ -1160,18 +1223,7 @@ void setup_panel(void) {
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
   x = (WINDOW_WIDTH - (3 * 100))>>2;
-
-  lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Logs");
-  lb.align             = ALIGN_CENTER;
-  lb.callback          = gui_viewlog_show; 
-  lb.state_callback    = NULL;
-  lb.userdata          = NULL;
-  lb.skin_element_name = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
-	   xitk_noskin_labelbutton_create(setup->widget_list, &lb, x, WINDOW_HEIGHT - 40, 100, 23,
-					  "Black", "Black", "White", tabsfontname));
-
+  
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Key Bindings");
   lb.align             = ALIGN_CENTER;
@@ -1180,8 +1232,19 @@ void setup_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
+   xitk_noskin_labelbutton_create(setup->widget_list, &lb, x, WINDOW_HEIGHT - 40, 100, 23,
+				  "Black", "Black", "White", tabsfontname));
+  
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Save");
+  lb.align             = ALIGN_CENTER;
+  lb.callback          = setup_save; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
    xitk_noskin_labelbutton_create(setup->widget_list, &lb, (x * 2) + 100, WINDOW_HEIGHT - 40, 100, 23,
-					  "Black", "Black", "White", tabsfontname));
+				  "Black", "Black", "White", tabsfontname));
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
@@ -1192,16 +1255,16 @@ void setup_panel(void) {
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
    xitk_noskin_labelbutton_create(setup->widget_list, &lb, (x * 3) + (100 * 2), WINDOW_HEIGHT - 40, 100, 23,
-					  "Black", "Black", "White", tabsfontname));
+				  "Black", "Black", "White", tabsfontname));
+
   setup->kreg = xitk_register_event_handler("setup", 
-					   (xitk_window_get_window(setup->xwin)),
-					   setup_handle_event,
-					   NULL,
-					   NULL,
-					   setup->widget_list,
+					    (xitk_window_get_window(setup->xwin)),
+					    setup_handle_event,
+					    NULL,
+					    NULL,
+					    setup->widget_list,
 					   NULL);
-
-
+  
   setup->visible = 1;
   setup->running = 1;
   setup_raise_window();
