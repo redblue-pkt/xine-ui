@@ -249,6 +249,7 @@ static lang_locale_t lang_locales[] = {
 /* global font cache */
 static xitk_font_cache_t cache;
 
+#if 0
 static const lang_locale_t *_get_next_lang_locale(char *lcal, const lang_locale_t *plocale) {
   if(lcal && strlen(lcal) && plocale) {
     const lang_locale_t *llocale = plocale;
@@ -264,6 +265,7 @@ static const lang_locale_t *_get_next_lang_locale(char *lcal, const lang_locale_
   }
   return NULL;
 }
+#endif
 
 static const lang_locale_t *_get_first_lang_locale(char *lcal) {
   const lang_locale_t *llocale;
@@ -449,42 +451,7 @@ void xitk_font_cache_init(void) {
   pthread_mutex_init(&cache.mutex, NULL);
   
 #ifdef WITH_XFT
- {
-   char *lang, *codeset = NULL;
-   
-   if(!(lang = getenv("LC_ALL")))
-     if(!(lang = getenv("LC_MESSAGES")))
-       lang = getenv("LANG");
-   
-   if(lang) {
-     char *lg, *enc, *mod;
-     
-     lg = strdup(lang);
-
-     if((enc = strchr(lg, '.')) && (strlen(enc) > 1)) {
-       enc++;
-
-       if((mod = strchr(enc, '@')))
-	 *mod = '\0';
-       
-       codeset = strdup(enc);
-     }
-     else {
-       const lang_locale_t *llocale = _get_first_lang_locale(lg);
-       
-       if(llocale && llocale->encoding)
-	 codeset = strdup(llocale->encoding);
-
-     }
-
-     free(lg);
-   }
-
-   cache.xr = xitk_recode_init(codeset ? codeset : "", "UTF-8");
-
-   if(codeset)
-     free(codeset);
- }
+  cache.xr = xitk_recode_init("", "UTF-8");
 #else
   cache.xr = NULL;
 #endif
@@ -1291,14 +1258,49 @@ void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
 }
 
 char *xitk_get_system_encoding(void) {
-#ifdef HAVE_LANGINFO_CODESET
-  char *encoding;
+  char *lang, *codeset = NULL;
   
-  encoding = nl_langinfo(CODESET);
-  return encoding ? strdup(encoding) : NULL;
-#else
-  return NULL;
+#ifdef HAVE_LANGINFO_CODESET
+  codeset = nl_langinfo(CODESET);
+  printf("%s\n", codeset);
 #endif
+
+  /*
+   * guess locale codeset according to shell variables
+   * when nl_langinfo(CODESET) isn't available or workig
+   */
+  if (!codeset || strstr(codeset, "ANSI") != 0) {
+    if(!(lang = getenv("LC_ALL")))
+      if(!(lang = getenv("LC_MESSAGES")))
+        lang = getenv("LANG");
+
+    codeset = NULL;
+
+    if(lang) {
+      char *lg, *enc, *mod;
+
+      lg = strdup(lang);
+
+      if((enc = strchr(lg, '.')) && (strlen(enc) > 1)) {
+        enc++;
+
+        if((mod = strchr(enc, '@')))
+          *mod = '\0';
+
+        codeset = enc;
+      }
+      else {
+        const lang_locale_t *llocale = _get_first_lang_locale(lg);
+
+        if(llocale && llocale->encoding)
+          codeset = llocale->encoding;
+      }
+
+      free(lg);
+    }
+  }
+
+  return codeset ? strdup(codeset) : NULL;
 }
 
 xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding) {
