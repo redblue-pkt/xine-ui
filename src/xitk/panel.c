@@ -583,6 +583,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
       
       xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
       xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
+      panel_update_runtime_display();
     }
   }
   else if(w == panel->mixer.slider) {
