@@ -434,30 +434,10 @@ static void setup_paint_widgets(void) {
  */
 static void setup_handle_event(XEvent *event, void *data) {
 
+  /*
   switch(event->type) {
-
-  case KeyPress:
-    gui_handle_event(event, data);
-    break;
-    
-  case MappingNotify:
-    XLockDisplay(gGui->display);
-    XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUnlockDisplay(gGui->display);
-    break;
-
-  case ConfigureNotify: {
-    xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content (setup->widget_list->l);
-    
-    while (w) {
-      if((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO)
-	xitk_combo_update_pos(w);
-      w = (xitk_widget_t *) xitk_list_next_content (setup->widget_list->l);
-    }
   }
-  break;
-
-  }
+  */
 }
 
 /*

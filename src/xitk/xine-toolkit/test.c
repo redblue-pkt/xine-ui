@@ -202,9 +202,9 @@ void test_handle_event(XEvent *event, void *data) {
     XUnlockDisplay(test->display);
     break;
     
-  case ConfigureNotify:
-    xitk_combo_update_pos(test->combo);
-    break;
+    //  case ConfigureNotify:
+    //    xitk_combo_update_pos(test->combo);
+    //    break;
   }
 }
 
@@ -696,7 +696,6 @@ static void create_combo(void) {
 			   (test->combo = 
 			    xitk_noskin_combo_create(&cmb,
 						     x, y, width, NULL, NULL)));
-
 }
 
 /*
@@ -726,7 +725,7 @@ static void create_browser(void) {
   {
     int i;
     char buf[64];
-
+    
     for(i = 0; i < 25; i++) {
       memset(&buf, 0, sizeof(buf));
       sprintf(buf, "Entry %d", i);

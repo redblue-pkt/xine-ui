@@ -401,7 +401,6 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t,
 
   mywidget->private_data          = private_data;
 
-  mywidget->kpressed              = 0;
   mywidget->enable                = 1;
   mywidget->running               = 1;
   mywidget->visible               = 1;

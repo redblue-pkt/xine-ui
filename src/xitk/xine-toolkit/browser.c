@@ -230,7 +230,7 @@ void xitk_browser_set_select(xitk_widget_t *w, int select) {
 void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
   browser_private_data_t *private_data;
   xitk_widget_list_t     *wl;
-  int                     i, j;
+  int                     i, j, max;
 
   if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
 	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
@@ -238,32 +238,38 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
     private_data = (browser_private_data_t *) w->private_data;
     
     xitk_browser_release_all_buttons(w);
-    
-    if(start >= 0)
-      private_data->current_start = start;
-    
+
     wl = (xitk_widget_list_t*) xitk_xmalloc(sizeof(xitk_widget_list_t));
     wl->win = private_data->parent_wlist->win;
     wl->gc = private_data->parent_wlist->gc;
     
+    j = (private_data->list_length > (private_data->max_length - 1) ? 
+	 (private_data->list_length - 1) : 1);
+
+    if(j <= (private_data->max_length - 1))
+      max = 0;
+    else if(j > (private_data->max_length - 1))
+      max = j - (private_data->max_length - 1);
+    
+    if((start >= 0) && max)
+      private_data->current_start = start;
+
     for(i = 0; i < private_data->max_length; i++) {
-      if (((private_data->current_start+i)<private_data->list_length) 
-	  && (private_data->content[private_data->current_start+i] != NULL)) {
-	xitk_labelbutton_change_label(wl, private_data->item_tree[i+WBSTART], 
-				      private_data->content[private_data->
-							   current_start+i]);
+      if (((private_data->current_start + i) < private_data->list_length) 
+	  && (private_data->content[private_data->current_start + i] != NULL)) {
+	xitk_labelbutton_change_label(wl, private_data->item_tree[i + WBSTART], 
+				      private_data->content[private_data->current_start + i]);
       }
       else {
 	xitk_labelbutton_change_label(wl, private_data->item_tree[i+WBSTART], "");
       }
     }
-    j = (private_data->list_length > (private_data->max_length-1) ? 
-	 (private_data->list_length-1) : 1);
-    xitk_slider_set_max(private_data->item_tree[WSLID], j);
+
+    xitk_slider_set_max(private_data->item_tree[WSLID], max);
     
     if(start == 0)
       xitk_slider_set_to_max(wl, private_data->item_tree[WSLID]);
-    else if(j>1)
+    else if(max)
       xitk_slider_set_pos(wl, private_data->item_tree[WSLID], 
 			  (xitk_slider_get_max(private_data->item_tree[WSLID]) 
 			   - xitk_slider_get_min(private_data->item_tree[WSLID]) 
@@ -579,7 +585,6 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
   
   mywidget->private_data               = private_data;
 
-  mywidget->kpressed                   = 0;
   mywidget->enable                     = enable;
   mywidget->running                    = 1;
   mywidget->visible                    = visible;

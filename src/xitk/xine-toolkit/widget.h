@@ -155,8 +155,6 @@ typedef struct xitk_widget_s {
   int                             tips_timeout;
   char                           *tips_string;
 
-  int                             kpressed;
-
   void                           *private_data;
   uint32_t                        widget_type;
 } xitk_widget_t;

@@ -1290,7 +1290,7 @@ void xitk_disable_widget(xitk_widget_t *w) {
     return;
   }
 
-  w->enable = ~WIDGET_ENABLE;
+  w->enable = !WIDGET_ENABLE;
 
 }
 

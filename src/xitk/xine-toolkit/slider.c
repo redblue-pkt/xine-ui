@@ -610,7 +610,6 @@ void xitk_slider_set_max(xitk_widget_t *w, int max) {
     private_data = (slider_private_data_t *) w->private_data;
     slider_update_minmax(w, private_data->lower, (float)((max == private_data->lower) 
 							 ? max + 1 : max));
-
   } 
 }
 
@@ -759,7 +758,6 @@ static xitk_widget_t *_xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slid
 
   mywidget->private_data                 = private_data;
 
-  mywidget->kpressed                     = 0;
   mywidget->enable                       = enable;
   mywidget->running                      = 1;
   mywidget->visible                      = visible;

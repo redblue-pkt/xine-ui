@@ -57,6 +57,7 @@
 #include "checkbox.h"
 #include "browser.h"
 #include "slider.h"
+#include "combo.h"
 #include "tips.h"
 #include "_config.h"
 
@@ -569,7 +570,7 @@ void xitk_xevent_notify(XEvent *event) {
 	    
 	    if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
 	      xitk_widget_t *b = xitk_browser_get_browser(fx->widget_list, w);
-
+	      
 	      if(b) {
 		if(mykey == XK_Up)
 		  xitk_browser_step_down(b, NULL);
@@ -578,7 +579,6 @@ void xitk_xevent_notify(XEvent *event) {
 	      }
 	    }
 	    else if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-	      
 	      if((mykey == XK_Left) || (mykey == XK_Down)) {
 		handled = 1;
 		xitk_slider_make_backstep(fx->widget_list, w);
@@ -749,7 +749,18 @@ void xitk_xevent_notify(XEvent *event) {
 	case ConfigureNotify: {
 	  XWindowAttributes wattr;
 	  Status            err;
-	  
+
+	  if(fx->widget_list && fx->widget_list->l) {
+	    xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content(fx->widget_list->l);
+	    while (w) {
+	      if(((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+		 (w->widget_type & WIDGET_GROUP_WIDGET)) {
+		xitk_combo_update_pos(w);
+	      }
+	      w = (xitk_widget_t *) xitk_list_next_content (fx->widget_list->l);
+	    }
+	  }
+
 	  XLOCK(gXitk->display);
 	  err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
 	  XUNLOCK(gXitk->display);

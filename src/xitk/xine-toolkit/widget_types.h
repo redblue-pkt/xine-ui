@@ -24,7 +24,7 @@
 #ifndef HAVE_XITK_WIDGET_TYPES_H
 #define HAVE_XITK_WIDGET_TYPES_H
 
-/* 
+/*
  *  1 <widget group >                         0x80000000   <mask 0x80000000> WIDGET_GROUP
  *   1 <The groupped widget>                  0x40000000   <mask 0x40000000> WIDGET_GROUP_WIDGET
  *    111111111111111 <group types>           <15 types>   <mask 0x3FFF8000> WIDGET_GROUP_(MASK)
