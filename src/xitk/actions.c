@@ -317,18 +317,17 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
   
   if((!strncasecmp(mrl, "ftp://", 6)) || (!strncasecmp(mrl, "dload:/", 7)))  {
     char        *url = mrl;
-    download_t  *download;
+    download_t   download;
     
     if(!strncasecmp(mrl, "dload:/", 7))
       url = _mrl + 7;
     
-    download = (download_t *) xine_xmalloc(sizeof(download_t));
-    download->buf    = NULL;
-    download->error  = NULL;
-    download->size   = 0;
-    download->status = 0; 
+    download.buf    = NULL;
+    download.error  = NULL;
+    download.size   = 0;
+    download.status = 0; 
     
-    if((network_download(url, download))) {
+    if((network_download(url, &download))) {
       char *filename;
       
       filename = strrchr(url, '/');
@@ -341,31 +340,32 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
 	sprintf(fullfilename, "%s/%s", xine_get_homedir(), filename);
 	
 	if((fd = fopen(fullfilename, "w+b")) != NULL) {
-	  char  *newmrl, *ident;
+	  char  *newmrl, *ident, *sub = NULL;
 	  int    start, end;
 	  
 	  xine_strdupa(newmrl, fullfilename);
 	  xine_strdupa(ident, gGui->playlist.mmk[gGui->playlist.cur]->ident);
+	  if(gGui->playlist.mmk[gGui->playlist.cur]->sub)
+	    xine_strdupa(sub, gGui->playlist.mmk[gGui->playlist.cur]->sub);
 	  start = gGui->playlist.mmk[gGui->playlist.cur]->start;
 	  end = gGui->playlist.mmk[gGui->playlist.cur]->end;
 	  
-	  fwrite(download->buf, download->size, 1, fd);
+	  fwrite(download.buf, download.size, 1, fd);
 	  fflush(fd);
 	  fclose(fd);
 
 	  mediamark_replace_entry(&gGui->playlist.mmk[gGui->playlist.cur], 
-				  newmrl, ident, start, end);
+				  newmrl, ident, sub, start, end);
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	  mrl = gGui->mmk.mrl;
 	}
       }
     }
 
-    if(download->buf)
-      free(download->buf);
-    if(download->error)
-      free(download->error);
-    free(download);
+    if(download.buf)
+      free(download.buf);
+    if(download.error)
+      free(download.error);
 
   }
 
@@ -585,8 +585,11 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	    }
 	    
 	    (void) mediamark_store_mmk(&mmk[new_num], 
-				       gGui->playlist.mmk[i]->mrl, gGui->playlist.mmk[i]->mrl,
-				       gGui->playlist.mmk[i]->start, gGui->playlist.mmk[i]->end);
+				       gGui->playlist.mmk[i]->mrl,
+				       gGui->playlist.mmk[i]->ident,
+				       gGui->playlist.mmk[i]->sub,
+				       gGui->playlist.mmk[i]->start, 
+				       gGui->playlist.mmk[i]->end);
 	    new_num++;
 	  }
 	}
@@ -947,7 +950,7 @@ void gui_dndcallback(char *filename) {
     else
       sprintf(buffer, "%s", filename);
     
-    mediamark_add_entry(buffer, buffer, 0, -1);
+    mediamark_add_entry(buffer, buffer, NULL, 0, -1);
     
     if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
       gGui->playlist.cur = (gGui->playlist.num - 1);
@@ -1355,7 +1358,7 @@ void gui_add_mediamark(void) {
     if(gui_xine_get_pos_length(gGui->stream, NULL, &secs, NULL)) {
       secs /= 1000;
       
-      mediamark_add_entry(gGui->mmk.mrl, gGui->mmk.ident, secs, -1);
+      mediamark_add_entry(gGui->mmk.mrl, gGui->mmk.ident, gGui->mmk.sub, secs, -1);
     }
   }
 }

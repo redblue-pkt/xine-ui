@@ -485,12 +485,13 @@ static void _playlist_handle_event(XEvent *event, void *data) {
 }
 
 /* End of privates */
-void mediamark_editor_change_cb(const char *mrl, const char *ident, int start, int end) {
+void mediamark_editor_change_cb(const char *mrl, const char *ident, const char *sub, 
+				int start, int end) {
   if(playlist) {
     int sel = xitk_browser_get_current_selected(playlist->playlist);
 
     if(sel >= 0) {
-      mediamark_replace_entry(&gGui->playlist.mmk[sel], mrl, ident, start, end);
+      mediamark_replace_entry(&gGui->playlist.mmk[sel], mrl, ident, sub, start, end);
     }
 
   }
@@ -713,7 +714,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	    gGui->playlist.cur = 0;
 	  
 	  for (j = 0; j < num_mrls; j++)
-	    mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], 0, -1);
+	    mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1);
 	  
 	  if(gGui->playlist.cur == 0)
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());

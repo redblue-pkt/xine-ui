@@ -67,7 +67,7 @@ static void lirc_get_playlist(char *from) {
 	
 	for (j = 0; j < num_mrls; j++)
 	  mediamark_add_entry((const char *)autoplay_mrls[j], 
-			      (const char *)autoplay_mrls[j], 0, -1);
+			      (const char *)autoplay_mrls[j], NULL, 0, -1);
 	
 	gGui->playlist.cur = 0;
 	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());

@@ -31,15 +31,16 @@ typedef void (*apply_callback_t)(void *data);
 typedef struct {
   char                     *ident;
   char                     *mrl;
+  char                     *sub;
   int                       start;  /*  0..x (secs)                     */
   int                       end;    /* -1 == <till the end> else (secs) */
   int                       played; /* used with shuffle loop mode */
 } mediamark_t;
 
-int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, int start, int end);
-void mediamark_add_entry(const char *mrl, const char *ident, int start, int end);
+int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end);
+void mediamark_add_entry(const char *mrl, const char *ident, const char *sub, int start, int end);
 void mediamark_free_mediamarks(void);
-void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, int start, int end);
+void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end);
 void mediamark_free_entry(int offset);
 void mediamark_reset_played_state(void);
 int mediamark_all_played(void);
@@ -49,6 +50,7 @@ int mediamark_get_entry_from_id(const char *ident);
 const mediamark_t *mediamark_get_current_mmk();
 const char *mediamark_get_current_mrl(void);
 const char *mediamark_get_current_ident(void);
+const char *mediamark_get_current_sub(void);
 
 int mediamark_concat_mediamarks(const char *filename);
 void mediamark_load_mediamarks(const char *filename);

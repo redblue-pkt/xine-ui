@@ -40,7 +40,7 @@
 #include "common.h"
 
 #define WINDOW_WIDTH        500
-#define WINDOW_HEIGHT       210
+#define WINDOW_HEIGHT       250 /* 210*/
 
 static char            *btnfontname  = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 static char            *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
@@ -55,6 +55,7 @@ typedef struct {
 
   xitk_widget_t                *mrl;
   xitk_widget_t                *ident;
+  xitk_widget_t                *sub;
   xitk_widget_t                *start;
   xitk_widget_t                *end;
 
@@ -174,13 +175,15 @@ static char *_read_file(const char *filename, int *size) {
   return buf;
 }
 
-int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, int start, int end) {
+int mediamark_store_mmk(mediamark_t **mmk, 
+			const char *mrl, const char *ident, const char *sub, int start, int end) {
 
   if((mmk != NULL) && (mrl != NULL)) {
     
     (*mmk) = (mediamark_t *) xine_xmalloc(sizeof(mediamark_t));
     (*mmk)->mrl    = strdup(mrl);
     (*mmk)->ident  = strdup((ident != NULL) ? ident : mrl);
+    (*mmk)->sub    = (sub != NULL) ? strdup(sub) : NULL;
     (*mmk)->start  = start;
     (*mmk)->end    = end;
     (*mmk)->played = 0;
@@ -194,6 +197,7 @@ static int _mediamark_free_mmk(mediamark_t **mmk) {
   if((*mmk) != NULL) {
     SAFE_FREE((*mmk)->ident);
     SAFE_FREE((*mmk)->mrl);
+    SAFE_FREE((*mmk)->sub);
     SAFE_FREE((*mmk));
     return 1;
   }
@@ -292,7 +296,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 		    memset(buffer, 0, sizeof(buffer));
 		    
 		    if((sscanf(ln, "File%d=%s", &entry, &buffer[0])) == 2)
-		      mediamark_store_mmk(&mmk[(entry - 1)], buffer, NULL, 0, -1);
+		      mediamark_store_mmk(&mmk[(entry - 1)], buffer, NULL, NULL, 0, -1);
 		    
 		  }
 		  else {
@@ -398,7 +402,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		      entry = buffer;
 		  }
 		    
-		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, 0, -1);
+		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, NULL, 0, -1);
 		  playlist->entries = ++entries_m3u;
 		  ptitle = title = NULL;
 		}
@@ -498,7 +502,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 			  entry = buffer;
 		      }
 
-		      mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, 0, -1);
+		      mediamark_store_mmk(&mmk[entries_sfv], entry, NULL, NULL, 0, -1);
 		      playlist->entries = ++entries_sfv;
 		    }
 		  }
@@ -599,7 +603,7 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		    entry = buffer;
 		}
 		
-		mediamark_store_mmk(&mmk[entries_raw], entry, NULL, 0, -1);
+		mediamark_store_mmk(&mmk[entries_raw], entry, NULL, NULL, 0, -1);
 		playlist->entries = ++entries_raw;
 	      }
 	    }
@@ -643,7 +647,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	
 	if(playlist_split_data(playlist)) {
 	  char    buffer[23768];
-	  char    *p, *pp;
+	  char   *p, *pp;
 	  int     start = 0;
 	  int     linen = 0;
 	  char   *ln;
@@ -686,16 +690,18 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 		      
 		      { /* OKAY, check found string */
 			mediamark_t   mmkf;
-			int           mmkf_members[4];
+			int           mmkf_members[5];
 			char         *line;
 			char         *m;
 			
-			mmkf.start = 0;
-			mmkf.end = -1;
+			mmkf.sub        = NULL;
+			mmkf.start      = 0;
+			mmkf.end        = -1;
 			mmkf_members[0] = 0;  /* ident */
 			mmkf_members[1] = -1; /* mrl */
 			mmkf_members[2] = 0;  /* start */
 			mmkf_members[3] = 0;  /* end */
+			mmkf_members[4] = 0;  /* sub */
 			
 			xine_strdupa(line, (atoa(buffer)));
 			
@@ -710,6 +716,13 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 				mmkf_members[0] = 1;
 				set_pos_to_value(&key);
 				xine_strdupa(mmkf.ident, key);
+			      }
+			    }
+			    else if(!strncasecmp(key, "subtitle", 8)) {
+			      if(mmkf_members[4] == 0) {
+				mmkf_members[4] = 1;
+				set_pos_to_value(&key);
+				xine_strdupa(mmkf.sub, key);
 			      }
 			    }
 			    else if(!strncasecmp(key, "start", 5)) {
@@ -751,6 +764,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			printf("DUMP mediamark entry:\n");
 			printf("ident: '%s'\n", mmkf.ident);
 			printf("mrl:   '%s'\n", mmkf.mrl);
+			printf("sub:   '%s'\n", mmkf.sub);
 			printf("start:  %d\n", mmkf.start);
 			printf("end:    %d\n", mmkf.end);
 #endif
@@ -760,7 +774,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			else
 			  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_tox + 2));
 			mediamark_store_mmk(&mmk[entries_tox], 
-					    mmkf.mrl, mmkf.ident, mmkf.start, mmkf.end);
+					    mmkf.mrl, mmkf.ident, mmkf.sub, mmkf.start, mmkf.end);
 			
 			playlist->entries = ++entries_tox;
 			
@@ -910,7 +924,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		  else
 		    mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
 		  
-		  mediamark_store_mmk(&mmk[entries_asx], href, real_title, 0, -1);
+		  mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1);
 		  playlist->entries = ++entries_asx;
 		}
 		
@@ -960,7 +974,7 @@ int mediamark_get_entry_from_id(const char *ident) {
   return -1;
 }
 
-void mediamark_add_entry(const char *mrl, const char *ident, int start, int end) {
+void mediamark_add_entry(const char *mrl, const char *ident, const char *sub, int start, int end) {
   if(!gGui->playlist.num)
     gGui->playlist.mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
   else { 
@@ -970,7 +984,7 @@ void mediamark_add_entry(const char *mrl, const char *ident, int start, int end)
     }
   }
   
-  if(mediamark_store_mmk(&gGui->playlist.mmk[gGui->playlist.num], mrl, ident, start, end))
+  if(mediamark_store_mmk(&gGui->playlist.mmk[gGui->playlist.num], mrl, ident, sub, start, end))
     gGui->playlist.num++;
 }
 
@@ -1056,13 +1070,15 @@ int mediamark_get_shuffle_next(void) {
 }
 
 void mediamark_replace_entry(mediamark_t **mmk, 
-			     const char *mrl, const char *ident, int start, int end) {
+			     const char *mrl, const char *ident, const char *sub,
+			     int start, int end) {
   SAFE_FREE((*mmk)->mrl);
   SAFE_FREE((*mmk)->ident);
+  SAFE_FREE((*mmk)->sub);
   (*mmk)->start = 0;
   (*mmk)->end = -1;
 
-  (void) mediamark_store_mmk(mmk, mrl, ident, start, end);
+  (void) mediamark_store_mmk(mmk, mrl, ident, sub, start, end);
 }
 
 const mediamark_t *mediamark_get_current_mmk(void) {
@@ -1085,6 +1101,14 @@ const char *mediamark_get_current_ident(void) {
 
   if(gGui->playlist.mmk && gGui->playlist.num)
     return gGui->playlist.mmk[gGui->playlist.cur]->ident;
+
+  return NULL;
+}
+
+const char *mediamark_get_current_sub(void) {
+
+  if(gGui->playlist.mmk && gGui->playlist.num)
+    return gGui->playlist.mmk[gGui->playlist.cur]->sub;
 
   return NULL;
 }
@@ -1129,7 +1153,7 @@ int mediamark_concat_mediamarks(const char *filename) {
   gGui->playlist.cur = gGui->playlist.num;
 
   for(i = 0; i < playlist->entries; i++)
-    mediamark_add_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->start, mmk[i]->end);
+    mediamark_add_entry(mmk[i]->mrl, mmk[i]->ident, mmk[i]->sub, mmk[i]->start, mmk[i]->end);
   
   for(i = 0; i < playlist->entries; i++)
     (void) _mediamark_free_mmk(&mmk[i]);
@@ -1226,6 +1250,7 @@ void mediamark_save_mediamarks(const char *filename) {
 	fprintf(fd, "\nentry {\n");
 	fprintf(fd, "\tidentifier = %s;\n", gGui->playlist.mmk[i]->ident);
 	fprintf(fd, "\tmrl = %s;\n", gGui->playlist.mmk[i]->mrl);
+	fprintf(fd, "\tsubtitle = %s;\n", gGui->playlist.mmk[i]->sub);
 	fprintf(fd, "\tstart = %d;\n", gGui->playlist.mmk[i]->start);
 	fprintf(fd, "\tend = %d;\n", gGui->playlist.mmk[i]->end);
 	fprintf(fd,"};\n");
@@ -1348,19 +1373,21 @@ void mmkeditor_set_mmk(mediamark_t **mmk) {
     
     xitk_inputtext_change_text(mmkeditor->mrl, (*mmk)->mrl);
     xitk_inputtext_change_text(mmkeditor->ident, (*mmk)->ident);
+    xitk_inputtext_change_text(mmkeditor->sub, (*mmk)->sub);
     xitk_intbox_set_value(mmkeditor->start, (*mmk)->start);
     xitk_intbox_set_value(mmkeditor->end, (*mmk)->end);
   }
 }
 
 static void mmkeditor_apply(xitk_widget_t *w, void *data) {
-  const char *ident, *mrl;
+  const char *ident, *mrl, *sub;
   int         start, end;
 
   if(mmkeditor->mmk) {
     
     mrl = xitk_inputtext_get_text(mmkeditor->mrl); 
     ident = xitk_inputtext_get_text(mmkeditor->ident);
+    sub = xitk_inputtext_get_text(mmkeditor->sub);
     start = xitk_intbox_get_value(mmkeditor->start);
     end = xitk_intbox_get_value(mmkeditor->end);
 
@@ -1370,13 +1397,39 @@ static void mmkeditor_apply(xitk_widget_t *w, void *data) {
     if(end < -1)
       end = -1;
 
-    mediamark_replace_entry(mmkeditor->mmk, mrl, ident, start, end);
+    mediamark_replace_entry(mmkeditor->mmk, mrl, ident, sub, start, end);
 
     if(mmkeditor->callback)
       mmkeditor->callback(mmkeditor->user_data);
       
   }
   
+}
+
+static void mmk_fileselector_cancel_callback(filebrowser_t *fb) {
+  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
+}
+static void mmk_fileselector_callback(filebrowser_t *fb) {
+  char *file;
+
+  sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
+
+  if((file = filebrowser_get_full_filename(fb)) != NULL) {
+    if(file)
+      xitk_inputtext_change_text(mmkeditor->sub, file);
+    free(file);
+  }
+  
+}
+static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
+  filebrowser_callback_button_t  cbb[2];
+  
+  cbb[0].label = _("Select");
+  cbb[0].callback = mmk_fileselector_callback;
+  cbb[0].need_a_file = 1;
+  cbb[1].callback = mmk_fileselector_cancel_callback;
+  cbb[1].need_a_file = 0;
+  (void *) create_filebrowser(_("Pick a subtitle file"), gGui->curdir, &cbb[0], NULL, &cbb[1]);
 }
 
 void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data) {
@@ -1484,7 +1537,40 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 					  x, y, w, 20,
 					  "Black", "Black", fontname)));
   xitk_set_widget_tips_default(mmkeditor->mrl, _("Mediamark Mrl"));
+
+  x = 5;
+  y += 40;
+  draw_outter_frame(gGui->imlib_data, bg, _("Subtitle"), btnfontname, 
+		    x, y, WINDOW_WIDTH - 10, 20 + 15 + 10);
+
+  x = 15;
+  y += 5;
+  inp.skin_element_name = NULL;
+  inp.text              = NULL;
+  inp.max_length        = 2048;
+  inp.callback          = NULL;
+  inp.userdata          = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)),
+	    (mmkeditor->sub = 
+	     xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
+					  x, y, w - 115, 20,
+					  "Black", "Black", fontname)));
+  xitk_set_widget_tips_default(mmkeditor->mrl, _("Subtitle File"));
   
+  x = WINDOW_WIDTH - 115;
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Sub File");
+  lb.align             = ALIGN_CENTER;
+  lb.callback          = mmkeditor_select_sub; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(mmkeditor->widget_list)), 
+	   (b = xitk_noskin_labelbutton_create(mmkeditor->widget_list, 
+					       &lb, x, y - 2, 100, 23,
+					       "Black", "Black", "White", btnfontname)));
+  xitk_set_widget_tips_default(b, _("Select a subtitle file to use together with the mrl."));
+
 
   x = 5;
   y += 40;
@@ -1524,7 +1610,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
 				       x, y, w, 20, NULL, NULL, NULL)));
   xitk_set_widget_tips_default(mmkeditor->end, _("Mediamark end time (secs)."));
-  
 
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
