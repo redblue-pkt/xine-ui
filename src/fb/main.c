@@ -81,6 +81,10 @@ static void exit_video(void)
 
 static int init_video(void)
 {
+	static struct fbxine_callback exit_callback;
+
+	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_video);
+
 	fbxine.video_port =
 		xine_open_video_driver(fbxine.xine, fbxine.video_port_id,
 				       XINE_VISUAL_TYPE_FB, (void *)&fbxine);
@@ -100,6 +104,10 @@ static void exit_audio(void)
 
 static int init_audio(void)
 {
+	static struct fbxine_callback exit_callback;
+
+	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_audio);
+
 	if(!fbxine.audio_port_id)
 		fbxine.audio_port_id =
 			xine_config_register_string(fbxine.xine, 
@@ -126,6 +134,10 @@ static void exit_stream(void)
 
 static int init_stream(void)
 {
+	static struct fbxine_callback exit_callback;
+
+	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_stream);
+
 	fbxine.stream = xine_stream_new(fbxine.xine, fbxine.audio_port,
 					fbxine.video_port);
 	fbxine.event_queue = xine_event_new_queue(fbxine.stream);  
