@@ -130,7 +130,7 @@ Keyboard shortcuts:
 Key             action
 
 <RETURN>        play
-<SPACE>, P      pause
+<SPACE>         pause
 <Up>/<Down>     fast forward / slow motion
 
 0               seek start of current stream
@@ -139,22 +139,80 @@ Key             action
 <PgUp>/<Prior>  jump to previous playlist entry
 <PgDown>/<Next> jump to next playlist entry
 
-F               toggle fullscreen mode
-A               toggle aspect ratio (AUTO/16:9/4:3/DVB)
-I               toggle interlaced mode
+f               toggle fullscreen mode
+a               toggle aspect ratio (AUTO/16:9/4:3/DVB)
+i               toggle interlaced mode
+
+z / Shift-Z	zoom into / out of video
+                add Ctrl to zoom horizontally or Meta to zoom vertically
+
 "<", ">"        modify output window size
 + -             change audio channel
 , .             change subtitle channel
-N M             adjust a/v sync
+n m             adjust a/v sync
 <HOME>          reset a/v sync
 
 <INSERT>        toggle grabbing of the mouse cursor in the video output window
 
-Q               quit
+q               quit
+
+h		hide video window (useful for mp3 playback)
 
 more to come.
 
-Rightclick (or press 'G') on the video window to toggle panel visibility.
+Right click (or press 'g') on the video window to toggle panel visibility.
+
+Changing shortcuts:
+  You can also change one/many/all of the shortcuts. For this, you should have
+  a .xine_keymap in your $HOME directory. The key entry syntax is:
+
+  WindowReduce {
+          key = less
+          modifier = none
+  }
+
+  The key should match with X11 key strings (see below). The
+  modifier could be:
+	- 'none' for no modifier,
+	- 'control' (or 'ctrl') for the control key,
+	- 'meta' (or 'alt' on PC) for meta key,
+	- 'mod3' or 'mod4' or 'mod5' only available on some platforms.
+
+  Modifiers can be mixed, separated with comma:
+  WindowReduce {
+          key = less
+          modifier = control, alt
+  }
+
+  If you don't specify a modifier line, that's equal to specifying 'none'.
+
+  You can also add alias keystrokes, like:
+  Alias {
+          entry = Pause
+          key = p
+  }
+
+  meaning you add another key stroke to 'Pause' entry, by pressing 'p',
+  you can also add a modifier section (see above). If you don't specify
+  it, the modifier will be the same as in the original section ('Pause' in
+  this case).
+
+Tracking X11 key names:
+  To know a X11 key string, you could use 'xev', which it's provided 
+  with your X11 package. Start 'xev' from a xterm, give focus to the small 
+  displayed window, and hit the key you want to specify. 
+  Then you will see something like:
+  ...
+  KeyRelease event, serial 27, synthetic NO, window 0x3200001,
+      root 0x3c, subw 0x0, time 4144050914, (259,265), root:(272,319),
+      state 0x0, keycode 81 (keysym 0xff9a, KP_Prior), same_screen YES,
+                                            ^-> This is what you looking for.
+
+Displaying current/remapped shortcuts:
+  You could use 'xine --keymap' or 'xine --keymap=default' to display
+  default shortcuts. You can redirect the result to a file, which can
+  become a .xine_keymap itself.
+  To see the result of a remapping, just use 'xine --keymap=remapped'.
 
 
 selecting audio channels:
@@ -187,8 +245,7 @@ using LIRC with xine:
 ---------------------
 
 xine can be remotly controlled with by IR. For this, you should have
-LIRC installed (http://www.lirc.org). You should get latest CVS snapshot
-if you're running recent Linux kernels (2.2 or 2.4 series). 
+LIRC installed (http://www.lirc.org).
 
 You should add some entries in your ~/.lircrc, like this:
 begin
@@ -196,49 +253,32 @@ begin
 	button = Button_Play
 	prog   = xine
 	repeat = 0
-	config = PLAY
-end
-begin
-	remote = SAMSUNG
-	button = Button_Src
-	prog   = xine
-	repeat = 0
-	config = DVD
+	config = Play
 end
 begin
 	remote = SAMSUNG
 	button = Button_1
 	prog   = xine
 	repeat = 0
-	config = 10%
+	config = SetPosition10%
 end
 ...
 
+Xine can self generate lirc entries draft, using 'xine --keymap=lirc',
+then you can redirect the output to file to polish the settings.
+Each entries will looked like:
+...
+# Reduce the output window size.
+begin
+        remote = xxxxx
+        button = xxxxx
+        prog   = xine
+        repeat = 0
+        config = WindowReduce
+end
+...
 
-Valid commands for lirc are (case insensitive):
-
- - to quit:
-      quit
- - to set the current position in current stream playback:
-      0%, 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90% 
- - to play or stop:
-      play
- - for pausing:
-      pause
- - for eject:
-      eject
- - for next/previous MRL in the playlist:
-      next, prev
- - for next/previous audio track selection:
-      audio+, audio-
- - for next/previous sub-title selection:
-      spu+, spu-
- - to get the playlist from a DVD/VCD:
-      dvd, vcd
- - to hide/show the GUI, the output video window:
-      hidegui, hideoutput
- - to toggle the output video window<->fullscreen
-      fullscr
+It's yours to specify the remote name, and assign the button.
 
 
 freedom, DVDs and stuff:
