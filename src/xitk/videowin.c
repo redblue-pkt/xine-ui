@@ -242,13 +242,15 @@ void video_window_adapt_size (int video_width, int video_height,
   Window                old_video_window = None;
   long data[1];
 
-  printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
-            video_width,
-            video_height,
-            dest_x,
-            dest_y,
-            dest_width,
-            dest_height); 
+/*  printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
+ *           video_width,
+ *           video_height,
+ *           dest_x,
+ *           dest_y,
+ *           dest_width,
+ *           dest_height); 
+ */
+
   XLockDisplay (gGui->display);
 
   gVw->video_width = video_width;
@@ -670,7 +672,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
     int xwin, ywin;
     unsigned int wwin, hwin, bwin, dwin;
     float xf,yf;
-    float scale, width_scale, height_scale;
+    float scale, width_scale, height_scale,aspect;
     Window rootwin;
 
     /* printf("Mouse event:mx=%d my=%d\n",mevent->x, mevent->y); */
@@ -687,24 +689,27 @@ static void video_window_handle_event (XEvent *event, void *data) {
       /* Scale co-ordinate to image dimensions. */
       height_scale=(float)gVw->video_height/(float)hwin;
       width_scale=(float)gVw->video_width/(float)wwin;
+      aspect=(float)gVw->video_width/(float)gVw->video_height;
       if (((float)wwin/(float)hwin)<((float)gVw->video_width/(float)gVw->video_height)) {
         scale=width_scale;
-        xf=(float)mevent->x * scale;
+        xf=(float)mevent->x * scale ;
         yf=(float)mevent->y * scale;
         //wwin=wwin * scale;
         hwin=hwin * scale;
-        xine_event.x=xf;
+        /* FIXME: The 1.25 should really come from the NAV packets. */
+        xine_event.x=xf * 1.25 / aspect;
         xine_event.y=yf-((hwin-gVw->video_height)/2);
-        /* printf("wscale:s=%f, x=%d, y=%d\n",scale,xine_event.x,xine_event.y); */ 
+        /* printf("wscale:a=%f, s=%f, x=%d, y=%d\n",aspect, scale,xine_event.x,xine_event.y);  */
       } else {
         scale=height_scale;
-        xf=(float)mevent->x * scale;
+        xf=(float)mevent->x * scale ;
         yf=(float)mevent->y * scale;
         wwin=wwin * scale;
         //hwin=hwin * scale;
-        xine_event.x=xf-((wwin-gVw->video_width)/2);
+        /* FIXME: The 1.25 should really come from the NAV packets. */
+        xine_event.x=(xf-((wwin-gVw->video_width)/2)) * 1.25 / aspect;
         xine_event.y=yf;
-        /* printf("hscale:s=%f x=%d, y=%d\n",scale,xine_event.x,xine_event.y); */ 
+        /* printf("hscale:a=%f s=%f x=%d, y=%d\n",aspect,scale,xine_event.x,xine_event.y);  */
       }
       //xf = (float)mevent->x / (float)wwin;
       //yf = (float)mevent->y / (float)hwin;
