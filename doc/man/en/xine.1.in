@@ -5,7 +5,7 @@
 .\" other parms are allowed: see man(7), man(1)
 .\""
 .SH NAME
-xine \- MPEG2/MPEG1 audio/video player
+xine \- a free video player
 .SH SYNOPSIS
 .B xine
 .I "[options] [MRL] ..."
@@ -15,8 +15,9 @@ This manual page documents briefly the
 audio/video player.
 .PP
 .B xine
-plays MPEG system streams, synchronizing audio and video substreams. It
-can play streams from files, Video CDs, DVDs and other sources.
+plays MPEG system (audio and video) streams, mpeg elementary streams
+(e.g. .mp3 or .mpv files), avi files (using win32 codecs), (S)VCDs
+and DVDs.
 .SH OPTIONS
 The programs follow the usual GNU command line syntax, with long
 options starting with two dashes (`-').
@@ -25,46 +26,43 @@ For a complete description, see the README and FAQ in @prefix@/share/doc/xine
 or on the xine home page.
 .TP
 .B \-h, \-\-help
-Show summary of options.
-.TP
-.B \-s, \-\-shared\-memory
-Use X shared memory extension for output.
-.br
-This may be useful if you experience
-problems using the Xv extension. Xv is used as default, if it is available.
-Since Xv is hardware accelerated, it usually provides more features and
-better performance.
+Show summary of options and available output drivers (plugins).
 .TP
 .B \-a, \-\-audio\-channel <num>
 Select the given audio channel. <num> is the audio channel number, default
 is "0".
 .br
-For MPEG2-Streams, AC3 audio streams are numbered from 0 to 7, while MPEG
-audio streams are numbered from 8 to 15 and lpcm audio streams are
-numbered 16 to 23 (provided that there are this many audio substreams, 
-of course). Finding the right audio stream might needs some experimenting,
-as some mp2-streams contain audio in strange tracks (track 0 and 1 may
-be empty but track 2 contains valid audio, for example).
+xine 0.5 and newer tries it's best to collect all valid audio channels
+(ac3, mpeg audio, avi audio, ...) from the stream and maps them
+to "virtual channels" with channel numbers starting at 0.
+.TP
+.B \-V, \-\-video\-driver <drv>
+Select video driver. Check out "xine --help" for a list of available
+video output plugins on your system. This selection is stored automatically
+in your .xinerc so you'll have to specify the video driver only once.
 .TP
 .B \-A, \-\-audio\-driver <drv>
-Select audio driver. Valid drivers are "oss", "alsa", "esd" or "null". The
-default is to use ESD when the "ESPEAKER" environment variable is set,
-otherwise ALSA if present, otherwise OSS. The "null" driver may be used to
-disable audio output, eg. if there are problems with your sound card.
+Select audio driver. Check out "xine --help" for a list of available
+audio output plugins on your system. This selection is stored automatically
+in your .xinerc so you'll have to specify the audio driver only once.
 .TP
 .B \-u, \-\-spu\-channel <num>
 Select subpicture (subtitle) channel. <num> is the subpicture channel
 id, default is no subtitle (-1).
-.TP
-.B \-S, \-\-spdif
-Enable AC3 output via SPDIF. Works only on some ALSA drivers that support
-the AC3 passthrough feature.
 .TP
 .B \-p[f][h][q][d][v]
 Start playing immediately after start. Can be followed by "f" to turn
 on fullscreen mode and/or "h" to hide GUI, and/or by "q" for quitting 
 at the end. It is also possible to request the playlist from DVD 'd',
 or VCD 'v'.
+.TP
+.B \-R, \-\-recognize\-by <option>
+Change the way xine will try to recognize stream types. 
+Valid options are: "default" (first by content, then by extension),
+"revert" (first by extension, then by content),
+"content" (only by content),
+"extension" (only by extension). Ff no option is given, 
+"revert" is selected
 .TP
 .B MRL (media resource locator)
 .br
