@@ -33,6 +33,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
+#include <sys/utsname.h>
 #include <alloca.h>
 
 #ifdef HAVE_X11
@@ -344,6 +345,29 @@ inline int is_a_file(char *filename) {
   return (S_ISREG(pstat.st_mode));
 }
 
+void dump_host_info(void) {
+  struct utsname uts;
+
+  if((uname(&uts)) == -1) {
+    printf("uname() failed: %s\n", strerror(errno));
+  }
+  else {
+    printf("   Plateform informations:\n");
+    printf("   ----------------------\n");
+    printf("        system name     : %s\n", uts.sysname);
+    printf("        node name       : %s\n", uts.nodename);
+    printf("        release         : %s\n", uts.release);
+    printf("        version         : %s\n", uts.version);
+    printf("        machine         : %s\n", uts.machine);
+    /* ignoring the GNU extension domainname, it's useless here */
+#if 0
+#ifdef _GNU_SOURCE
+    printf("        domain name     : %s\n", uts.domainname);
+#endif
+#endif
+  }
+}
+
 void dump_cpu_infos(void) {
 #if defined (__linux__)
   FILE *stream;
@@ -352,6 +376,7 @@ void dump_cpu_infos(void) {
   if((stream = fopen("/proc/cpuinfo", "r"))) {
     
     printf("   CPU Informations:\n");
+    printf("   ----------------\n");
     
     memset(&buffer, 0, sizeof(buffer));
     while(fread(&buffer, 1, 2047, stream)) {

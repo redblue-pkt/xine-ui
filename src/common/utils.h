@@ -85,6 +85,7 @@ int is_ipv6_last_double_semicolon(const char *str);
 inline int is_a_dir(char *filename);
 inline int is_a_file(char *filename);
 
+void dump_host_info(void);
 #ifdef HAVE_X11
 void dump_cpu_infos(void);
 void dump_xfree_info(Display *display, int screen, int complete);
