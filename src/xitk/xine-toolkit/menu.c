@@ -144,6 +144,24 @@ static int _menu_is_title(xitk_menu_entry_t *me) {
     return 1;
   return 0;
 }
+static int _menu_branch_have_check(menu_node_t *branch) {
+  while(branch) {
+    if(_menu_is_check(branch->menu_entry) || _menu_is_checked(branch->menu_entry))
+      return 1;
+    
+    branch = branch->next;
+  }
+  return 0;
+}
+static int _menu_branch_have_branch(menu_node_t *branch) {
+  while(branch) {
+    if(_menu_is_branch(branch->menu_entry))
+      return 1;
+    
+    branch = branch->next;
+  }
+  return 0;
+}
 
 #ifdef DUMP_MENU
 #ifdef	__GNUC__
@@ -270,7 +288,7 @@ static menu_node_t *_menu_get_wider_menuitem_node(menu_node_t *branch) {
     
     me = me->next;
   }
-  
+
   return max;
 }
 
@@ -651,6 +669,8 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
   xitk_font_unload_font(fs);
   
   wwidth = maxlen + 40;
+  if(_menu_branch_have_check(branch) || _menu_branch_have_branch(branch))
+    wwidth += 20;
   wheight = (rentries * 20) + (bsep * 2) + (btitle * 2);
   
   XLOCK(private_data->imlibdata->x.disp);
@@ -723,9 +743,9 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 		       1, 1, wwidth , 20);
 	XSetForeground(private_data->imlibdata->x.disp, private_data->widget->wl->gc, cfg);
 	xitk_font_draw_string(fs, bg->pixmap, 
-		    private_data->widget->wl->gc, 
-		    5, 1+ ((20+asc+des)>>1)-des, 
-		    me->menu_entry->menu, strlen(me->menu_entry->menu));
+			      private_data->widget->wl->gc, 
+			      5, 1+ ((20+asc+des)>>1)-des, 
+			      me->menu_entry->menu, strlen(me->menu_entry->menu));
 	XUNLOCK(private_data->imlibdata->x.disp);
 	
 	xitk_font_unload_font(fs);
