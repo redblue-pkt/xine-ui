@@ -1376,6 +1376,9 @@ int main(int argc, char *argv[]) {
 	  }
 	}
       }
+      else if(!strcasecmp(video_driver_ids[cfg_vo_entry.num_value], "fb"))
+	gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+
     }
   }
   SAFE_FREE(video_driver_id);
