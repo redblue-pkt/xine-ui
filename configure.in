@@ -10,7 +10,7 @@ dnl
 AC_PREREQ(2.13)
 
 dnl
-dnl Require libtool minimum version 1.3.5
+dnl Require libtool minimum version 1.4.0
 dnl
 dnl AC_PREREQ_LIBTOOL(1.4.0,,AC_MSG_ERROR(*** You should have libtool >= 1.4 installed ***))
 
@@ -155,7 +155,7 @@ fi
 
 AC_CHECK_LIB(png, png_read_info,
   AC_CHECK_HEADER(png.h, png_ok=yes, png_ok=no),
-  AC_MSG_ERROR(*** libpng is needed (PNG library not found) - try to use --with-png-prefix option ***), $PNG_LIB $PNG_CFLAGS -lz -lm $X_LIBS)
+  AC_MSG_ERROR(*** libpng is needed (PNG library not found) - try to use --with-png-prefix option ***), $PNG_LIB -lz -lm $X_LIBS)
 
 if test x"$png_prefix" != "x"; then
     CPPFLAGS="$old_CPPFLAGS"
@@ -184,18 +184,18 @@ fi
 CFLAGS="$saved_CFLAGS"
 
 if test x"$png_ok" = xyes; then
-    X_LIBS="$X_LIBS $PNG_LIB $PNG_CFLAGS -lpng -lz"
+    X_LIBS="$X_LIBS $PNG_LIB -lpng -lz"
+    X_CFLAGS="$X_CFLAGS $PNG_CFLAGS"
 fi
 
 
 dnl
 dnl
 dnl
-AC_CHECK_FUNCS(vsnprintf)
-AC_CHECK_FUNCS(snprintf)
+AC_CHECK_LIB(posix4, nanosleep)
+AC_CHECK_FUNCS(vsnprintf snprintf nanosleep)
 AC_CHECK_HEADER(stdarg.h, AC_DEFINE(HAVE_STDARGS))
-AC_CHECK_HEADER(string.h)
-AC_CHECK_HEADER(strings.h)
+AC_CHECK_HEADERS(string.h strings.h)
 
 
 dnl

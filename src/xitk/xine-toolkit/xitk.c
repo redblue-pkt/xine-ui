@@ -600,7 +600,17 @@ void widget_run(void) {
       /*
     } else {  
       XUNLOCK(gXitk->display); 
-      usleep(16666);  1/60 sec 
+#if HAVE_NANOSLEEP
+      // nanosleep is prefered on solaris, because it's mt-safe
+      {
+	struct timespec ts;
+	ts.tv_sec = 0;
+	ts.tv_nsec = 16666666;
+	nanosleep(&ts, NULL);
+      }
+#else
+      usleep(16666); // 1/60 sec
+#endif
     } 
 
     */
