@@ -157,7 +157,7 @@ static void intbox_change_value(xitk_widget_t *x, void *data, char *string) {
     private_data->value = strtol(string, &string, 10);
     
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%d", private_data->value);
+    snprintf(buf, sizeof(buf), "%d", private_data->value);
     xitk_inputtext_change_text(private_data->input_widget, buf);
     if(private_data->force_value == 0)
       if(private_data->callback)
@@ -176,7 +176,7 @@ void xitk_intbox_set_value(xitk_widget_t *w, int value) {
     char                   buf[256];
 
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%d", value);
+    snprintf(buf, sizeof(buf), "%d", value);
     private_data->force_value = 1;
     intbox_change_value(NULL, (void*)w, buf);
     private_data->force_value = 0;
@@ -312,7 +312,7 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage;
 
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%d", ib->value);
+    snprintf(buf, sizeof(buf), "%d", ib->value);
 
     inp.skin_element_name = NULL;
     inp.text              = buf; 

@@ -103,7 +103,7 @@ static char *_get_expanded_command(xitk_skin_config_t *skonfig, char *cmd) {
     if(strchr(cmd, '$')) {
 
       memset(&buf, 0, sizeof(buf));
-      snprintf(buf, (BUFSIZ - 1), "%s", cmd);
+      snprintf(buf, sizeof(buf), "%s", cmd);
 
       memset(&buf2, 0, sizeof(buf2));
       
@@ -132,44 +132,44 @@ static char *_get_expanded_command(xitk_skin_config_t *skonfig, char *cmd) {
 		snprintf(ppath, sizeof(ppath), "%s", skonfig->path);
 		if((z = strrchr(ppath, '/')) != NULL) {
 		  *z = '\0';
-		  snprintf(buf2, sizeof(buf2), "%s%s", buf2, ppath);
+		  sprintf(buf2, "%s%s", buf2, ppath);
 		}
 	      }
 	    }
 	    else if(!strncmp("SKIN_VERSION", var, strlen(var))) {
 	      if(skonfig->version >= 0)
-		snprintf(buf2, sizeof(buf2), "%s%d", buf2, skonfig->version);
+		sprintf(buf2, "%s%d", buf2, skonfig->version);
 	    }
 	    else if(!strncmp("SKIN_AUTHOR", var, strlen(var))) {
 	      if(skonfig->author)
-		snprintf(buf2, sizeof(buf2), "%s%s", buf2, skonfig->author);
+		sprintf(buf2, "%s%s", buf2, skonfig->author);
 	    }
 	    else if(!strncmp("SKIN_PATH", var, strlen(var))) {
 	      if(skonfig->path)
-		snprintf(buf2, sizeof(buf2), "%s%s", buf2, skonfig->path);
+		sprintf(buf2, "%s%s", buf2, skonfig->path);
 	    }
 	    else if(!strncmp("SKIN_NAME", var, strlen(var))) {
 	      if(skonfig->name)
-		snprintf(buf2, sizeof(buf2), "%s%s", buf2, skonfig->name);
+		sprintf(buf2, "%s%s", buf2, skonfig->name);
 	    }
 	    else if(!strncmp("SKIN_DATE", var, strlen(var))) {
 	      if(skonfig->date)
-		snprintf(buf2, sizeof(buf2), "%s%s", buf2, skonfig->date);
+		sprintf(buf2, "%s%s", buf2, skonfig->date);
 	    }
 	    else if(!strncmp("SKIN_URL", var, strlen(var))) {
 	      if(skonfig->url)
-		snprintf(buf2, sizeof(buf2), "%s%s", buf2, skonfig->url);
+		sprintf(buf2, "%s%s", buf2, skonfig->url);
 	    }
 	    else if(!strncmp("HOME", var, strlen(var))) {
 	      if(skonfig->url)
-		snprintf(buf2, sizeof(buf2), "%s%s", buf2, xitk_get_homedir());
+		sprintf(buf2, "%s%s", buf2, xitk_get_homedir());
 	    }
 	    /* else ignore */
 	  }
 	  break;
 	  
 	default:
-	  snprintf(buf2, sizeof(buf2), "%s%c", buf2, *p);
+	  sprintf(buf2, "%s%c", buf2, *p);
 	  break;
 	}
 	p++;
@@ -848,7 +848,7 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, char *path, char *filenam
   skonfig->path     = strdup(path);
   skonfig->skinfile = strdup(filename);
 
-  snprintf(buf, 2048, "%s/%s", skonfig->path, skonfig->skinfile);
+  snprintf(buf, sizeof(buf), "%s/%s", skonfig->path, skonfig->skinfile);
 
   if((skonfig->fd = fopen(buf, "r")) != NULL) {
     

@@ -157,7 +157,7 @@ static void doublebox_change_value(xitk_widget_t *x, void *data, char *string) {
     private_data->value = strtod(string, &string);
     
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%e", private_data->value);
+    snprintf(buf, sizeof(buf), "%e", private_data->value);
     xitk_inputtext_change_text(private_data->input_widget, buf);
     if(private_data->force_value == 0)
       if(private_data->callback)
@@ -176,7 +176,7 @@ void xitk_doublebox_set_value(xitk_widget_t *w, double value) {
     char                      buf[256];
 
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%e", value);
+    snprintf(buf, sizeof(buf), "%e", value);
     private_data->force_value = 1;
     doublebox_change_value(NULL, (void*)w, buf);
     private_data->force_value = 0;
@@ -315,7 +315,7 @@ xitk_widget_t *xitk_noskin_doublebox_create(xitk_widget_list_t *wl,
     xitk_image_t *wimage;
 
     memset(&buf, 0, sizeof(buf));
-    snprintf(buf, 256, "%e", ib->value);
+    snprintf(buf, sizeof(buf), "%e", ib->value);
 
     inp.skin_element_name = NULL;
     inp.text              = buf; 

@@ -598,7 +598,7 @@ static void _pplugin_add_parameter_widget(post_object_t *pobj) {
     xitk_font_t          *fs;
 
     memset(&buffer, 0, sizeof(buffer));
-    snprintf(buffer, 2047, "%s:", (pobj->param->description) 
+    snprintf(buffer, sizeof(buffer), "%s:", (pobj->param->description) 
 	     ? pobj->param->description : _("No description available"));
 
     fs = xitk_font_load_font(gGui->display, boldfontname);

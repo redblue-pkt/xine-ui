@@ -144,7 +144,7 @@ static char *get_num_string(uint32_t num) {
   static char buffer[1024];
 
   memset(&buffer, 0, sizeof(buffer));
-  snprintf(buffer, 1023, "%d", num);
+  snprintf(buffer, sizeof(buffer), "%d", num);
 
   return &buffer[0];
 }

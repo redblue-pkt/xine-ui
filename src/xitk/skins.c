@@ -171,14 +171,14 @@ static char *skin_get_skindir(void) {
   xine_cfg_entry_t     entry;
   char                *skin;
   
-  memset(&tmp, 0, 2048);
+  memset(&tmp, 0, sizeof(tmp));
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
   if(xine_config_lookup_entry(gGui->xine, "gui.skin", &entry))
     skin = (char *) skins_avail[entry.num_value]->skin;
   else
     skin = DEFAULT_SKIN;
   
-  snprintf(tmp, 2048, "%s/%s", XINE_SKINDIR, skin);
+  snprintf(tmp, sizeof(tmp), "%s/%s", XINE_SKINDIR, skin);
   
   return tmp;
 }
@@ -191,14 +191,14 @@ static char *skin_get_configfile(void) {
   xine_cfg_entry_t  entry;
   char                *skin;
   
-  memset(&tmp, 0, 2048);
+  memset(&tmp, 0, sizeof(tmp));
   memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
   if (xine_config_lookup_entry(gGui->xine, "gui.skin",&entry)) 
     skin = (char *) skins_avail[entry.num_value]->skin;
   else
     skin = DEFAULT_SKIN;
   
-  snprintf(tmp, 2048, "%s/%s/skinconfig", XINE_SKINDIR, skin);
+  snprintf(tmp, sizeof(tmp), "%s/%s/skinconfig", XINE_SKINDIR, skin);
 
   return tmp;
 }

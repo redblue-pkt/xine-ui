@@ -637,7 +637,7 @@ static int __sock_write(int socket, int cr, char *msg, ...) {
   /* Each line sent is '\n' terminated */
   if(cr) {
     if((buf[strlen(buf)] == '\0') && (buf[strlen(buf) - 1] != '\n'))
-      snprintf(buf, sizeof(buf), "%s%c", buf, '\n');
+      sprintf(buf, "%s%c", buf, '\n');
   }
   
   return _sock_write(socket, buf, strlen(buf));
@@ -805,15 +805,15 @@ static void client_help(session_t *session, session_commands_t *command, const c
   while(session_commands[i]->command != NULL) {
     if(session_commands[i]->enable) {
       if((curpos + maxlen) >= 80) {
-	snprintf(buf, sizeof(buf), "%s\n       ", buf);
+	sprintf(buf, "%s\n       ", buf);
 	curpos = 7;
       }
       
-      snprintf(buf, sizeof(buf), "%s%s", buf, session_commands[i]->command);
+      sprintf(buf, "%s%s", buf, session_commands[i]->command);
       curpos += strlen(session_commands[i]->command);
       
       for(j = 0; j < (maxlen - strlen(session_commands[i]->command)); j++) {
-	snprintf(buf, sizeof(buf), "%s ", buf);
+	sprintf(buf, "%s ", buf);
 	curpos++;
       }
     }
@@ -1171,7 +1171,7 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
 
   for(i = 0; i < num_commands; i++) {
     if(strlen(buf))
-      snprintf(buf, sizeof(buf), "%s %s", buf, commands[i]);
+      sprintf(buf, "%s %s", buf, commands[i]);
     else
       snprintf(buf, sizeof(buf), "%s", commands[i]);
   }
@@ -1710,11 +1710,11 @@ static void do_commands(commands_t *cmd, client_info_t *client_info) {
   
   while(commands[i].command != NULL) {
     if(commands[i].public) {
-      snprintf(buf, sizeof(buf), "%s\t%s", buf, commands[i].command);
+      sprintf(buf, "%s\t%s", buf, commands[i].command);
     }
     i++;
   }
-  snprintf(buf, sizeof(buf), "%s.\n", buf);
+  sprintf(buf, "%s.\n", buf);
   sock_write(client_info->socket, buf);
 }
 
@@ -1745,22 +1745,22 @@ static void do_help(commands_t *cmd, client_info_t *client_info) {
     while(commands[i].command != NULL) {
       if(commands[i].public) {
 	if((curpos + maxlen) >= 80) {
-	  snprintf(buf, sizeof(buf), "%s\n       ", buf);
+	  sprintf(buf, "%s\n       ", buf);
 	  curpos = 7;
 	}
 	
-	snprintf(buf, sizeof(buf), "%s%s", buf, commands[i].command);
+	sprintf(buf, "%s%s", buf, commands[i].command);
 	curpos += strlen(commands[i].command);
 	
 	for(j = 0; j < (maxlen - strlen(commands[i].command)); j++) {
-	  snprintf(buf, sizeof(buf), "%s ", buf);
+	  sprintf(buf, "%s ", buf);
 	  curpos++;
 	}
       }
       i++;
     }
     
-    snprintf(buf, sizeof(buf), "%s\n", buf);
+    sprintf(buf, "%s\n", buf);
     sock_write(client_info->socket, buf);
   }
   else {
@@ -2092,11 +2092,11 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	status = xine_get_status(gGui->stream);
 	
 	if(status <= XINE_STATUS_QUIT)
-	  snprintf(buf, sizeof(buf), "%s%s", buf, status_struct[status].name);
+	  sprintf(buf, "%s%s", buf, status_struct[status].name);
 	else
-	  snprintf(buf, sizeof(buf), "%s%s", buf, "*UNKNOWN*");
+	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
 	
-	snprintf(buf, sizeof(buf), "%s%c", buf, '\n');
+	sprintf(buf, "%s%c", buf, '\n');
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "speed")) {
@@ -2112,11 +2112,11 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	}
 	
 	if(i < ((sizeof(speeds_struct) / sizeof(speeds_struct[0])) - 1))
-	  snprintf(buf, sizeof(buf), "%s%s", buf, speeds_struct[i].name);
+	  sprintf(buf, "%s%s", buf, speeds_struct[i].name);
 	else
-	  snprintf(buf, sizeof(buf), "%s%s", buf, "*UNKNOWN*");
+	  sprintf(buf, "%s%s", buf, "*UNKNOWN*");
 	
-	snprintf(buf, sizeof(buf), "%s%c", buf, '\n');
+	sprintf(buf, "%s%c", buf, '\n');
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "position")) {
@@ -2150,26 +2150,26 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 
 	switch(gGui->playlist.loop) {
 	case PLAYLIST_LOOP_NO_LOOP:
-	  snprintf(buf, sizeof(buf), "%s%s", buf, "'No Loop'");
+	  sprintf(buf, "%s%s", buf, "'No Loop'");
 	  break;
 	case PLAYLIST_LOOP_LOOP:
-	  snprintf(buf, sizeof(buf), "%s%s", buf, "'Loop'");
+	  sprintf(buf, "%s%s", buf, "'Loop'");
 	  break;
 	case PLAYLIST_LOOP_REPEAT:
-	  snprintf(buf, sizeof(buf), "%s%s", buf, "'Repeat'");
+	  sprintf(buf, "%s%s", buf, "'Repeat'");
 	  break;
 	case PLAYLIST_LOOP_SHUFFLE:
-	  snprintf(buf, sizeof(buf), "%s%s", buf, "'Shuffle'");
+	  sprintf(buf, "%s%s", buf, "'Shuffle'");
 	  break;
 	case PLAYLIST_LOOP_SHUF_PLUS:	
-	  snprintf(buf, sizeof(buf), "%s%s", buf, "'Shuffle forever'");
+	  sprintf(buf, "%s%s", buf, "'Shuffle forever'");
 	  break;
 	default:
-	  snprintf(buf, sizeof(buf), "%s%s", buf, "'!!Unknown!!'");
+	  sprintf(buf, "%s%s", buf, "'!!Unknown!!'");
 	  break;
 	}
 
-	snprintf(buf, sizeof(buf), "%s.\n", buf);
+	sprintf(buf, "%s.\n", buf);
 	sock_write(client_info->socket, buf);
       }
     }

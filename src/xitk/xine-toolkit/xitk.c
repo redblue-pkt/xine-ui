@@ -1666,7 +1666,7 @@ void xitk_init(Display *display, int verbosity) {
 	    gXitk->use_xshm = 0;
 	  else {
 	    XShmDetach(display, &shminfo);
-	    snprintf(buffer, sizeof(buffer), "%s%s", buffer, "[XShm]");
+	    sprintf(buffer, "%s%s", buffer, "[XShm]");
 	  }
 	  
 	  XDestroyImage(xim);
@@ -1682,12 +1682,12 @@ void xitk_init(Display *display, int verbosity) {
 #endif
 
 #ifdef WITH_XFT
-  snprintf(buffer, sizeof(buffer), "%s%s", buffer, "[XFT]");
+  sprintf(buffer, "%s%s", buffer, "[XFT]");
 #elif defined(WITH_XMB)
-  snprintf(buffer, sizeof(buffer), "%s%s", buffer, "[XMB]");
+  sprintf(buffer, "%s%s", buffer, "[XMB]");
 #endif
   
-  snprintf(buffer, sizeof(buffer), "%s%s", buffer, " ]-");
+  sprintf(buffer, "%s%s", buffer, " ]-");
 
   if(verbosity)
     printf(buffer);

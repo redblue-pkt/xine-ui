@@ -84,7 +84,7 @@ static int connect_to_session(int session) {
     euid             = geteuid();
     setuid(euid);
 
-    snprintf(saddr.sun_path, 108, "%s/.xine/session.%d", (xine_get_homedir()), session);
+    snprintf(saddr.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", session);
     setreuid(stored_uid, euid);
 
     if((connect(fd,(struct sockaddr *) &saddr, sizeof(saddr))) != -1)
@@ -513,7 +513,7 @@ int init_session(void) {
     for(i = 0;; i++)	{
       saddr.sun_family = AF_UNIX;
       
-      snprintf(saddr.sun_path, 108, "%s/.xine/session.%d", (xine_get_homedir()), i);
+      snprintf(saddr.sun_path, 108, "%s%s%d", (xine_get_homedir()), "/.xine/session.", i);
       if(!is_remote_running(i)) {
 	if((unlink(saddr.sun_path) == -1) && errno != ENOENT) {
 	  fprintf(stderr, "setup_ctrlsocket(): Failed to unlink %s (Error: %s)", 

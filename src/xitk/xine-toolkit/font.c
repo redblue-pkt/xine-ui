@@ -347,9 +347,9 @@ static char * xitk_font_core_string_to_xft( char * old_name) {
       snprintf(size, sizeof(size), "%s", psize);
     
     if( strcmp( style , "bold" ) != 0 )
-      snprintf( new_name, 255, "%s-%s", font, size );
+      snprintf( new_name, sizeof(new_name), "%s-%s", font, size );
     else
-      snprintf( new_name, 255, "%s-%s:%s", font, size, style );
+      snprintf( new_name, sizeof(new_name), "%s-%s:%s", font, size, style );
 
     return new_name;
   }

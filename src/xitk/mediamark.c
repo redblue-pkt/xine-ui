@@ -538,7 +538,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		    if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
 		      buffer[strlen(buffer) - 1] = '\0';
 		    
-		    snprintf(buffer, sizeof(buffer), "%s%s", buffer, ln);
+		    sprintf(buffer, "%s%s", buffer, ln);
 		    
 		    if(_file_exist(buffer))
 		      entry = buffer;
@@ -658,7 +658,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 			  if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
 			    buffer[strlen(buffer) - 1] = '\0';
 			  
-			  snprintf(buffer, sizeof(buffer), "%s%s", buffer, ln);
+			  sprintf(buffer, "%s%s", buffer, ln);
 			  
 			  if(_file_exist(buffer))
 			    entry = buffer;
@@ -758,7 +758,7 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
 		  if((buffer[strlen(buffer) - 1] == '/') && (*ln == '/'))
 		    buffer[strlen(buffer) - 1] = '\0';
 		  
-		  snprintf(buffer, sizeof(buffer), "%s%s", buffer, ln);
+		  sprintf(buffer, "%s%s", buffer, ln);
 		  
 		  if(_file_exist(buffer))
 		    entry = buffer;
@@ -2817,8 +2817,7 @@ void mediamark_collect_from_directory(char *filepathname) {
     while((dentry = readdir(dir))) {
       char fullpathname[XITK_PATH_MAX + XITK_NAME_MAX];
       
-      snprintf(fullpathname, (XITK_PATH_MAX + XITK_NAME_MAX) - 1,
-	       "%s/%s", filepathname, dentry->d_name);
+      snprintf(fullpathname, sizeof(fullpathname), "%s/%s", filepathname, dentry->d_name);
       
       if(fullpathname[strlen(fullpathname) - 1] == '/')
 	fullpathname[strlen(fullpathname) - 1] = '\0';

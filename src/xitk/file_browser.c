@@ -978,7 +978,7 @@ static void fb_delete_file_cb(xitk_widget_t *w, void *data, int button) {
       snprintf(buf, sizeof(buf), "%s", fb->current_dir);
       if(strlen(fb->current_dir) > 1)
 	snprintf(buf, sizeof(buf), "%s/", buf);
-      snprintf(buf, sizeof(buf), "%s%s", buf, fb->norm_files[sel].name);
+      sprintf(buf, "%s%s", buf, fb->norm_files[sel].name);
       
       if((unlink(buf)) == -1)
 	xine_error(_("Unable to delete file '%s': %s."), buf, strerror(errno));
@@ -1000,8 +1000,8 @@ static void fb_delete_file(xitk_widget_t *w, void *data) {
 
     snprintf(buf, sizeof(buf), _("Do you really want to delete the file: '%s"), fb->current_dir);
     if(strlen(fb->current_dir) > 1)
-      snprintf(buf, sizeof(buf), "%s%c", buf, '/');
-    snprintf(buf, sizeof(buf), "%s%s' ?.", buf, fb->norm_files[sel].name);
+      strcat(buf, "/");
+    sprintf(buf, "%s%s' ?.", buf, fb->norm_files[sel].name);
     
     fb_deactivate(fb);
     xitk_window_dialog_yesno(gGui->imlib_data, _("Confirm deletion ?"),
@@ -1019,8 +1019,8 @@ static void fb_rename_file_cb(xitk_widget_t *w, void *data, char *newname) {
   memset(&buf, 0, sizeof(buf));
   snprintf(buf, sizeof(buf), "%s", fb->current_dir);
   if(strlen(fb->current_dir) > 1)
-    snprintf(buf, sizeof(buf), "%s%c", buf, '/');
-  snprintf(buf, sizeof(buf), "%s%s", buf, fb->norm_files[sel].name);
+    strcat(buf, "/");
+  sprintf(buf, "%s%s", buf, fb->norm_files[sel].name);
   
   if((rename(buf, newname)) == -1)
     xine_error(_("Unable to rename file '%s' to '%s': %s."), buf, newname, strerror(errno));
@@ -1038,8 +1038,8 @@ static void fb_rename_file(xitk_widget_t *w, void *data) {
     memset(&buf, 0, sizeof(buf));
     snprintf(buf, sizeof(buf), "%s", fb->current_dir);
     if(strlen(fb->current_dir) > 1)
-      snprintf(buf, sizeof(buf), "%s%c", buf, '/');
-    snprintf(buf, sizeof(buf), "%s%s", buf, fb->norm_files[sel].name);
+      strcat(buf, "/");
+    sprintf(buf, "%s%s", buf, fb->norm_files[sel].name);
     
     fb_deactivate(fb);
     fb_create_input_window(_("Rename file"), buf, fb_rename_file_cb, fb);
@@ -1061,7 +1061,7 @@ static void fb_create_directory(xitk_widget_t *w, void *data) {
   memset(&buf, 0, sizeof(buf));
   snprintf(buf, sizeof(buf), "%s", fb->current_dir);
   if(strlen(fb->current_dir) > 1)
-    snprintf(buf, sizeof(buf), "%s%c", buf, '/');
+    strcat(buf, "/");
   
   fb_deactivate(fb);
   fb_create_input_window(_("Create a new directory"), buf, fb_create_directory_cb, fb);

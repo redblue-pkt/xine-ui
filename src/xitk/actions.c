@@ -360,9 +360,9 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       
       minfo = xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC);
       vfcc = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_FOURCC);
-      snprintf(buffer, sizeof(buffer), _("%sVideo Codec: %s (%s)\n"), buffer,
-	       (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
-	       (get_fourcc_string(vfcc)));
+      sprintf(buffer, _("%sVideo Codec: %s (%s)\n"), buffer,
+	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
+	      (get_fourcc_string(vfcc)));
     }
     
     if(a_unhandled) {
@@ -371,9 +371,9 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
       
       minfo = xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC);
       afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
-      snprintf(buffer, sizeof(buffer), _("%sAudio Codec: %s (%s)\n"), buffer,
-	       (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
-	       (get_fourcc_string(afcc)));
+      sprintf(buffer,  _("%sAudio Codec: %s (%s)\n"), buffer,
+	      (minfo && strlen(minfo)) ? (char *) minfo : _("Unavailable"), 
+	      (get_fourcc_string(afcc)));
     }
     
 
@@ -385,7 +385,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     if(!gGui->play_anyway) {
       xitk_window_t *xw;
 
-      snprintf(buffer, sizeof(buffer), _("%s\nStart playback anyway ?\n"), buffer);
+      sprintf(buffer, _("%s\nStart playback anyway ?\n"), buffer);
       
       play_data.stream             = stream;
       play_data.start_pos          = start_pos;
@@ -534,10 +534,10 @@ int gui_open_and_play_alternates(mediamark_t *mmk, const char *sub) {
     alt = mediamark_get_first_alternate_mrl(mmk);
   
   do {
-    if(gui_xine_open_and_play(alt, gGui->mmk.sub, 0, 0, 0, 0, 0)) {
-#warning UPDATE gGui->mmk.mrl
+
+    if(gui_xine_open_and_play(alt, gGui->mmk.sub, 0, 0, 0, 0, 0))
       return 1;
-    }
+
   } while((alt = mediamark_get_next_alternate_mrl(&(gGui->mmk))));
   return 0;
 }
