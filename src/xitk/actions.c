@@ -239,8 +239,7 @@ void gui_change_spu_channel(widget_t *w, void *data) {
 void gui_set_current_position (int pos) {
 
   gGui->ignore_status = 1;
-  xine_stop (gGui->xine);
-  xine_play (gGui->xine, gGui->filename, pos);
+  xine_seek (gGui->xine, gGui->filename, pos);
   gGui->ignore_status = 0;
   panel_check_pause();
 }

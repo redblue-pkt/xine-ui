@@ -190,8 +190,7 @@ static void gui_branched_callback (void ) {
 static void set_position (int pos) {
 
   aaxine.ignore_status = 1;
-  xine_stop(aaxine.xine);
-  xine_play(aaxine.xine, aaxine.mrl[aaxine.current_mrl], pos);
+  xine_seek(aaxine.xine, aaxine.mrl[aaxine.current_mrl], pos);
   aaxine.ignore_status = 0;
 }
 

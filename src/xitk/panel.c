@@ -62,14 +62,16 @@ static void panel_store_new_position(int x, int y, int w, int h) {
  * Update slider thread.
  */
 static void *slider_loop(void *dummy) {
-
+  
   pthread_detach(pthread_self());
 
   while(gGui->running) {
 
     if(panel_is_visible()) {
       if(gGui->xine) {
-	if(xine_get_status(gGui->xine) != XINE_STOP) {
+	int status = xine_get_status(gGui->xine);
+
+	if(status == XINE_PLAY || status == XINE_SEEK) {
 	  slider_set_pos(panel->widget_list, panel->slider_play, 
 			 xine_get_current_position(gGui->xine));
 	}
