@@ -8,7 +8,7 @@
 zakres tego documentu:
 ----------------------
 
-To jest dokumentacja u¿ytkownika koñcowego xine-ib i xine-ui. Wiêcej
+To jest dokumentacja u¿ytkownika koñcowego xine-lib i xine-ui. Wiêcej
 informacji znajdziesz w katalogu doc/ obydwóch pakietów.
 
 o xine:
@@ -110,17 +110,17 @@ Je¶li chcesz wys³aæ d¼wiêk przez sieæ za pomoc± ESD, ustaw zmienn±
 
 Sekwencj± wej¶cia mo¿e byæ nazwa pliku lub co¶ co nazywamy
 "MediaResourceLocator" MRL, który wygl±da podobnie do URLa.
-Najpierw podaj ¼ród³o wej¶cia przed "://" i specyficzny identyfikator
-¼ród³a wej¶cia. Jakich ¼róde³ wej¶cia mo¿esz u¿yæ, zale¿y od tego
-jakie wtyczki wej¶cia zainstalowa³e¶ (dla zwyk³ych plików mo¿esz
-pomin±æ identyfikator ¼ród³a wej¶cia). Spróbuj
+Najpierw podaj ¼ród³o wej¶cia przed "://" nastêpnie specyficzny
+identyfikator ¼ród³a wej¶cia. Jakich ¼róde³ wej¶cia mo¿esz u¿yæ,
+zale¿y od tego jakie wtyczki wej¶cia zainstalowa³e¶ (dla zwyk³ych
+plików mo¿esz pomin±æ identyfikator ¼ród³a wej¶cia). Spróbuj
 
 $ xine --help
 
 by otrzymaæ pe³n± listê opcji u¿ytkowania.
 
 xine u¿ywa protoko³u xdnd (Versja 3) wiêc je¶li masz wyszukiwarkê plików
-z nim wspó³pracuj±c± (np gmc) mo¿esz po prostu "przci±gn±æ" pliki wideo
+z nim wspó³pracuj±c± (np gmc) mo¿esz po prostu "przeci±gn±æ" pliki wideo
 na xine by je odtworzyæ.
 
 Odtwarzanie scie¿ki 3 z VCD:
@@ -215,9 +215,9 @@ Do³±czone s± dwa przyk³ady programów klienckich:
   1. "xine-remote" to przyk³ad klienta napisany w C, mo¿e byæ u¿yty
      do wys³ania komand play/stop/pause do uruchomionej instancji xine.
   2. "example.py" to ma³y skrypt w Python'ie który pokazuje jak w prosty
-     sposób sterowaæ xine za pomoc± jezyka skryptowego.
+     sposób sterowaæ xine za pomoc± jêzyka skryptowego.
 
-u¿ywanie LIRC z xine:
+U¿ywanie LIRC z xine:
 ---------------------
 
 xine mo¿e byæ sterowany zdalnie przez podczerwieñ. Do tego potrzebujesz
@@ -274,7 +274,7 @@ Wszystkie dzia³aj±ce komendy to:
  - prze³±czenie trybu wy¶wietlania okno <-> pe³ny ekran
       fullscr
 
-Wielko¶æ liter nie ma znaczenia.
+Wielko¶æ liter w nazwach komend nie ma znaczenia.
 
 U¿yte oprogramowanie:
 ---------------------
@@ -286,17 +286,17 @@ xine u¿ywa oprogramowania z nastêpuj±cych projektów wolnego oprogramowania:
 - libmpg123 z projektu mpg123 Michaela Hippa
   (zobacz http://www.mpg123.de/)
 
-...Bez tych ¶wietnych programów xine nie by³oby oczywi¶cie tym
+...bez tych ¶wietnych programów xine nie by³oby oczywi¶cie tym
 czym jest teraz.
 
 Równie¿ wielkie podziêkowania dla Linux Video and DVD Project "LiViD"
-(http://www.linuxvideo.org/), sk±d oryginalny pomys³
-wolnego odtwarzacza DVD.
+(http://www.linuxvideo.org/), sk±d oryginalny pomys³ wolnego
+i darmowego odtwarzacza DVD.
 
-Deweloperzy xine:
+Autorzy xine:
 -------------------
 
-  G³ówny deweloper xine:
+  G³ówny programista xine:
     Guenter Bartsch
 
   Ró¿ne sugestie, poprawki b³êdów i kompilacji, wtyczka alsa, gui
@@ -318,11 +318,14 @@ Kontakt z projektem xine:
 
        http://xine.sourceforge.net
 
-   Informacja zwrotna lub chêæ pomocy mile widziana, kontakt:
+   Informacja zwrotna, lub chêæ pomocy mile widziana, kontakt:
 
        lista dyskusyjna u¿ytkowników xine <xine-user@lists.sourceforge.net>
 
 *********************************
 * T³umaczenie: Bart³omiej Muryn *
-* mailto: _4ever_@irc.pl        *
+* Uwagi do t³umaczenia proszê   *
+* przesy³aæ na adres            *
+*      _4ever_@irc.pl           *
 *********************************
+
