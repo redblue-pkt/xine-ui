@@ -1,5 +1,15 @@
 .\" -*-Nroff-*-
 .\""
+.de Vb \" Begin verbatim text
+.ft CW
+.nf
+.ne \\$1
+..
+.de Ve \" End verbatim text
+.ft R
+
+.fi
+..
 .TH XINE 1x 2002-04-16 "The xine project"
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
@@ -232,6 +242,10 @@ The default key bindings are:
 .BR 0..9 :
 Jump to 0%..90% of current stream
 .br
+.BR / :
+Seek to the percentage specified by the numeric argument. This is more
+general than the above 0..9 commands. See the section on "Numeric Input" below.
+.br
 .BR A :
 Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
 .br
@@ -397,8 +411,164 @@ press if video lags behind audio
 .br
 .BR <home> :
 press to reset audio/video offset to \fB0\fP, so stream timestamps are unchanged.
+.SH Numeric Input
+It is possible to give numeric input, however for backward
+compatibility the number keys are not bound their corresponding digit
+values. Moreover, the digits 0 to 9 are bound to symbols that can't
+normally be entered on a keyboard. Thus the ability to enter numeric
+input is disabled by default. However you can change this by switching
+the modifier value of "SetPosition\fIX\fR%" and "Number\fIY\fR" (where
+\fIX\fR is 0, 10, .. 90, and \fIY\fR is 0..9. In particular replace
+these lines in your xine keymap file
+(\f(CW\*(C`~/.xine/keymap\*C'\fR).
+
+.Vb 119
+# Set position to beginning of current stream.
+SetPosition0% {
+	key = 0
+	modifier = mod3
+}
+
+# Set position to 10% of current stream.
+SetPosition10% {
+	key = 1
+	modifier = mod3
+}
+
+# Set position to 20% of current stream.
+SetPosition20% {
+	key = 2
+	modifier = mod3
+}
+
+# Set position to 30% of current stream.
+SetPosition30% {
+	key = 3
+	modifier = mod3
+}
+
+# Set position to 40% of current stream.
+SetPosition40% {
+	key = 4
+	modifier = mod3
+}
+
+# Set position to 50% of current stream.
+SetPosition50% {
+	key = 5
+	modifier = mod3
+}
+
+# Set position to 60% of current stream.
+SetPosition60% {
+	key = 6
+	modifier = mod3
+}
+
+# Set position to 70% of current stream.
+SetPosition70% {
+	key = 7
+	modifier = mod3
+}
+
+# Set position to 80% of current stream.
+SetPosition80% {
+	key = 8
+	modifier = mod3
+}
+
+# Set position to 90% of current stream.
+SetPosition90% {
+	key = 9
+	modifier = mod3
+}
+
+# Enter the number 0.
+Number0 {
+	key = 0
+	modifier = none
+}
+
+# Enter the number 1.
+Number1 {
+	key = 1
+	modifier = none
+}
+
+# Enter the number 2.
+Number2 {
+	key = 2
+	modifier = none
+}
+
+# Enter the number 3.
+Number3 {
+	key = 3
+	modifier = none
+}
+
+# Enter the number 4.
+Number4 {
+	key = 4
+	modifier = none
+}
+
+# Enter the number 5.
+Number5 {
+	key = 5
+	modifier = none
+}
+
+# Enter the number 6.
+Number6 {
+	key = 6
+	modifier = none
+}
+
+# Enter the number 7.
+Number7 {
+	key = 7
+	modifier = none
+}
+
+# Enter the number 8.
+Number8 {
+	key = 8
+	modifier = none
+}
+
+# Enter the number 9.
+Number9 {
+	key = 9
+	modifier = none
+}
+.Ve
+.PP
+Having made the above change, you can specify a numeric argument to be
+applied to a command typing in a number and then entering a function
+key. For example entering "99/", that is, the number-9 key twice and then
+the slash key, you should seek 99% of the current stream. 
+.PP
+The new experimental VCD/SVCD plugin, VCDX, allows some numeric
+input. Entering a number followed by the "Select event" (by default
+the keypad enter), one can go to a specific "Chapter" (track or entry)
+or selection number. As this is a relatively new feature, perhaps over
+time more plugins will make use of numeric selection.
+.PP
+Other commands that can be numeric prefaced by a numeric argument are
+next/previous MRL (MRL_NEXT, MRL_PRIOR), next/previous subtitle
+(SPU_NEXT, SPU_PRIOR), and next/previous audio channel
+(AUDIOCHAN_NEXT, AUDIOCHAN_PRIOR). With a numeric prefix, it is as
+though one entered that command the number of times.  Here, the
+argument 0, since it would otherwise meaningless, is interpreted here
+to be 1 instead. 
+.PP 
+Admittedly the use of numeric input here is of limited value. Over
+time perhaps more useful commands like specifying a specific or
+absolute MRL, subtitle or audio channel number will be implemented.
+
 .SH FILES
-All config files are now to be found in ~/.xine:
+All config files are now to be found in (\f(CW\*(C`~/.xine\*C'\fR:
 .br
 .BR ~/.xine/config :
 main config file
@@ -427,5 +597,6 @@ The programs are documented fully on the xine home page:
 .SH AUTHOR
 This manual page was written by Siggi Langauf <siggi@debian.org>,
 for the xine project. Lots of additions by
-Guenter Bartsch <guenter@users.sourceforge.net> and
-Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+Guenter Bartsch <guenter@users.sourceforge.net>,
+Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>, and
+Rocky Bernstein <rocky@panix.com>
