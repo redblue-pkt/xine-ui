@@ -513,7 +513,7 @@ static void list_plugins(char *type) {
 	if((plugins = list_functions[i].func(xine))) {
 	  printf(_("\n Available xine's plugins:\n"));
 	  print_formatted(list_functions[i].name, plugins);
-	  break;
+	  goto __found;
 	}
       }
 
@@ -521,6 +521,7 @@ static void list_plugins(char *type) {
     }
 
     printf(_("No available plugins found of %s type!.\n"), type);
+  __found: ;
   }
   else {
     printf(_("\n Available xine's plugins:\n"));
