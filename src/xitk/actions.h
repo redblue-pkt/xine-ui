@@ -85,4 +85,6 @@ void gui_decrease_audio_volume(void);
 
 void gui_change_zoom(int zoom_dx, int zoom_dy);
 
+void gui_reset_zoom(void);
+
 #endif
