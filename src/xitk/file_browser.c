@@ -85,6 +85,7 @@ void show_file_browser(void) {
   if(fb) {
     filebrowser_show(fb);
     set_file_browser_transient();
+    layer_above_video((filebrowser_get_window_id(fb)));
   }
 }
 

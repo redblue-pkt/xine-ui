@@ -164,7 +164,12 @@ void gui_toggle_visibility(widget_t *w, void *data) {
 
   if(panel_is_visible()) {
     video_window_set_visibility(!(video_window_is_visible()));
-    XMapRaised (gGui->display, gGui->panel_window);
+    XMapRaised (gGui->display, gGui->panel_window); 
+
+    if(gGui->reparent_hack) {
+      panel_toggle_visibility(NULL, NULL);
+      panel_toggle_visibility(NULL, NULL);
+    }
   }
 }
 
@@ -186,6 +191,11 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
 			  gGui->panel_window, gGui->video_window);
   }
   
+  if(gGui->reparent_hack) {
+    panel_toggle_visibility(NULL, NULL);
+    panel_toggle_visibility(NULL, NULL);
+  }
+
   if(mrl_browser_is_visible()) {
     show_mrl_browser();
     set_mrl_browser_transient();

@@ -280,6 +280,21 @@ static void mrlbrowser_dumpmrl(widget_t *w, void *data) {
  *****************************************************************************/
 
 /*
+ * Return window id of widget.
+ */
+Window mrlbrowser_get_window_id(widget_t *w) {
+  mrlbrowser_private_data_t *private_data;
+  
+  if(w) {
+    private_data = w->private_data;
+    return private_data->window;
+  }
+ 
+  return None;
+}
+
+
+/*
  * Fill window information struct of given widget.
  */
 int mrlbrowser_get_window_info(widget_t *w, window_info_t *inf) {

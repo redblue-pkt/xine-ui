@@ -84,6 +84,7 @@ void show_mrl_browser(void) {
   if(mrlb) {
     mrlbrowser_show(mrlb);
     set_mrl_browser_transient();
+    layer_above_video((mrlbrowser_get_window_id(mrlb)));
   }
 }
 

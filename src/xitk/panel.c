@@ -49,6 +49,29 @@ extern gGui_t     *gGui;
 _panel_t          *panel;
 
 /*
+ * Try to guess if current WM is E.
+ */
+static int is_wm_is_enlightenment(Display *display, Window window) {
+  Atom  *atoms;
+  int    i, natoms;
+  
+  XLockDisplay (gGui->display);
+  atoms = XListProperties(display, window, &natoms);
+  
+  if(natoms) {
+    for(i = 0; i < natoms; i++) {
+      if(!strncasecmp("_E_FRAME_SIZE", (XGetAtomName(display, atoms[i])), 13)) {
+	XUnlockDisplay (gGui->display);
+	return 1;
+      }
+    }
+  }
+  
+  XUnlockDisplay (gGui->display);
+  return 0;
+}
+
+/*
  * Toolkit event handler will call this function with new
  * coords of panel window.
  */
@@ -815,6 +838,7 @@ void panel_init (void) {
 
   XUnlockDisplay (gGui->display);
 
+  gGui->reparent_hack = is_wm_is_enlightenment(gGui->display, gGui->panel_window);
 
   {
     pthread_attr_t       pth_attrs;

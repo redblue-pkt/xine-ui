@@ -103,6 +103,7 @@ typedef struct {
   widgetkey_t          widget_key;
 
   int                  layer_above;
+  int                  reparent_hack;
 
 } gGui_t;
 
