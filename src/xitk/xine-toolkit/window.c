@@ -577,8 +577,10 @@ int xitk_window_change_background(ImlibData *im,
     
     XResizeWindow (im->x.disp, w->window, wwin, hwin);
   }
-  else
+  else {
+    XUNLOCK(im->x.disp);
     return 0;
+  }
   
   XCopyArea(im->x.disp, bg, w->background->pixmap, w->background->gc, 0, 0, width, height, 0, 0);
   XUNLOCK(im->x.disp);
@@ -615,8 +617,10 @@ int xitk_window_change_background_with_image(ImlibData *im, xitk_window_t *w, xi
     
     XResizeWindow (im->x.disp, w->window, wwin, hwin);
   }
-  else
+  else {
+    XUNLOCK(im->x.disp);
     return 0;
+  }
   
   XCopyArea(im->x.disp, img->image->pixmap, w->background->pixmap, w->background->gc, 0, 0, width, height, 0, 0);
   if(w->background_mask)

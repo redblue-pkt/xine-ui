@@ -137,6 +137,7 @@ static int init_test(void) {
   test->imlibdata = Imlib_init_with_params(test->display, &imlib_init);
   if (test->imlibdata == NULL) {
     fprintf(stderr, _("Imlib_init_with_params() failed.\n"));
+    XUnlockDisplay (test->display);
     return 0;
   }
 
