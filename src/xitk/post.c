@@ -33,7 +33,7 @@
 
 extern gGui_t    *gGui;
 
-#undef TRACE_WIRE
+#undef TRACE_REWIRE
 
 #define WINDOW_WIDTH        500
 #define WINDOW_HEIGHT       500
