@@ -860,10 +860,17 @@ void gui_eject(xitk_widget_t *w, void *data) {
 void gui_toggle_visibility(xitk_widget_t *w, void *data) {
 
   if(panel_is_visible() && (!gGui->use_root_window)) {
+    int visible = !video_window_is_visible();
 
-    video_window_set_visibility(!(video_window_is_visible()));
+    video_window_set_visibility(visible);
+
 
     /* We need to reparent all visible windows because of redirect tweaking */
+    if(!visible) { /* Show the panel in taskbar */
+      XLockDisplay(gGui->display);
+      XReparentWindow(gGui->display, gGui->panel_window, gGui->imlib_data->x.root, 0, 0);
+      XUnlockDisplay(gGui->display);
+    }
     reparent_all_windows();
 
     /* (re)start/stop visual animation */
