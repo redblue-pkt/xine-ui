@@ -96,6 +96,7 @@ rm -rf $RPM_BUILD_ROOT
 @XINE_SKINDIR@/xinetic/*
 # documentation
 %{prefix}/man/fr/man1/xine.1*
+%{prefix}/man/es/man1/xine.1*
 %{prefix}/man/man1/xine.1*
 %{prefix}/share/doc/xine-ui/FAQ
 %{prefix}/share/doc/xine-ui/FAQ_es
