@@ -82,7 +82,7 @@ typedef struct {
 
 static filebrowser_filter_t __fb_filters[] = {
   { NULL                  , "*"                        },
-  { NULL                  , "sub,srt"                  }, /* subtitles */
+  { NULL                  , "sub,srt,asc,smi,ssa"      }, /* subtitles */
   { NULL                  , "pls,m3u,sfv,tox,asx,smil" }, /* playlists */
   { "*.vob"               , "vob"                      }, /* mpeg block */
   { "*.mpv"               , "mpv"                      }, /* elementary */
