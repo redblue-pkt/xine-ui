@@ -574,6 +574,7 @@ int main(int argc, char *argv[]) {
 
   gGui->config = config_file_init (gGui->configfile);
 
+  config_set_int("demux_strategy", demux_strategy);
 
   /*
    * init gui

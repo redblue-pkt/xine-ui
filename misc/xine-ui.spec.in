@@ -10,7 +10,7 @@ Summary(ko): 공개 동영상 플레이어
 Version:     %{ver}
 Release:     %{rel}
 Copyright:   GPL
-Group:       Applications/X11
+Group:       Applications/Multimedia
 Source:      http://xine.sourceforge.net/files/@PACKAGE@-@VERSION@.tar.gz
 URL:         http://xine.sourceforge.net
 Packager:    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>

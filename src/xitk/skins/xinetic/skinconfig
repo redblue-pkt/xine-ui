@@ -17,60 +17,61 @@
 ###
 #Xine skin data file
 #Title:     Xinetic for Xine
-#Version:   0.1
-#Released:  22.07.2001
-#Author:    Darjeeling <villette@chem.leidenuniv.nl>
+#Version:   0.2
+#Released:  25.07.2001
+#Author:    Darjeeling (Jérôme Villette)<villette@chem.leidenuniv.nl>
 #URL:       none
 
 ## Main GUI ##
 BackGround:	0	0	MainBg.png
-Close:		549	1	MainClose.png
-Eject:		527	62	MainEject.png
+Close:		494	1	MainClose.png
+Eject:		473	62	MainEject.png
 Exit:		7	75	MainPower.png
-FullScreen:	524	3	MainFullScreen.png
-TitleLabel:	48	17	Letters.png	59	True
-TimeLabel:	235	36	Letters.png	8	False
+FullScreen:	470	3	MainFullScreen.png
 
-AudioPrev:	288	44	SmallArrowDown.png
-AudioNext:	288	36	SmallArrowUp.png
-AudioLabel:	325	36	Letters.png	3	False
+TitleLabel:	42	17	Letters.png	51	True
+TimeLabel:	240	36	Letters.png	8	False
 
-SpuNext:	347	36	SmallArrowUp.png
-SpuPrev:	347	44	SmallArrowDown.png
-SpuLabel:	384	36	Letters.png	3	False
+AudioNext:	294	55	SmallArrowUp.png
+AudioPrev:	294	63	SmallArrowDown.png
+AudioLabel:	330	55	Letters.png	3	False
 
-Next:		504	49	MainNext.png
-Pause:		454	29	MainPause.png
-Play:		482	12	MainPlay.png
-Stop:		504 	29	MainStop.png
-Prev:		454	49	MainPrev.png
+SpuNext:		294	36	SmallArrowUp.png
+SpuPrev:		294	44	SmallArrowDown.png
+SpuLabel:	330	36	Letters.png	3	False
 
-AutoPlayGUI:	156	43	MainAutoButton.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-PlBtn:		210	55	PlBtn.png
-CtlBtn:		264	55	CtlBtn.png
-MrlBtn:		318	55	MrlBtn.png
-SliderBGPlay:	35	4	SliderHBg.png
+Next:		450	50	MainNext.png
+Pause:		400	28	MainPause.png
+Play:		428	12	MainPlay.png
+Stop:		450	29	MainStop.png
+Prev:		400	50	MainPrev.png
+
+AutoPlayGUI:	126	44	MainAutoButton.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+PlBtn:		168	54	PlBtn.png
+CtlBtn:		210	54	CtlBtn.png
+MrlBtn:		252	54	MrlBtn.png
+SliderBGPlay:	36	4	SliderHBg.png
 SliderFGPlay:	0	0	SliderHPad.png
 
 ## Playlist ##
 PlBG:		0	0	PlBg.png
-PlAdd:		333	110	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-PlLoad:		333	127	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-PlSave:		333	144	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-PlItemBtn:	20	20	PlItemBtn.png	Gray	Gray	Black	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-PlPlay:		15	219	PlPlay.png
-PlDelete:	69 	219	PlDelete.png
-PlDeleteAll:	123	219	PlDeleteAll.png
-PlMoveUp:	177	219	PlMoveUp.png
-PlMoveDn:	231	219	PlMoveDn.png
-PlDismiss:	333	207	PlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+PlAdd:		333	110	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+PlLoad:		333	127	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+PlSave:		333	144	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+PlItemBtn:	20	20	PlItemBtn.png	#a4aab4	#a4aab4	#081e2f	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+PlPlay:		15	218	PlPlay.png
+PlDelete:	69 	218	PlDelete.png
+PlDeleteAll:	123	218	PlDeleteAll.png
+PlMoveUp:	177	218	PlMoveUp.png
+PlMoveDn:	231	218	PlMoveDn.png
+PlDismiss:	333	207	PlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 PlUp:		310	17	BigArrowUp.png
 PlSlidBG:	312	38	SliderVBg.png
 PlSlidFG:	0	0	SliderVPad.png
 PlDn:		310	164	BigArrowDown.png
 AutoPlayLbl:	337	20	Letters.png	9	False
-AutoPlayBG:	333	42	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-PlInputText:	26	193	PlInputTxt.png	Gray	Gray	Black	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+AutoPlayBG:	333	42	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+PlInputText:	26	192	PlInputTxt.png	#a4aab4	#a4aab4	#081e2f	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
 
 #Control Panel
 CtlBG:		0	0	CtlBg.png
@@ -86,20 +87,20 @@ CtlBrightLbl:	111	191	Letters.png	3	False
 CtlContBG:	170	39	SliderVBg.png
 CtlContFG:	0	0	SliderVPad.png
 CtlContLbl:	157	192	Letters.png	3	False
-CtlSave:        13	214	CtlSave.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-CtlDismiss:	135	206	CtlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+CtlSave:        13	214	CtlSave.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-8-*-*-*-*-*-*-*
+CtlDismiss:	135	206	CtlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 
 ### MRL Browser ###
 MrlBG:		0	0	MrlBg.png
-MrlItemBtn:	20	20	PlItemBtn.png	Gray	Gray	Black	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-MrlSelect:	15	207	MrlSelect.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-MrlDismiss:	333	207	MrlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+MrlItemBtn:	20	20	PlItemBtn.png	#a4aab4	#a4aab4	#081e2f	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+MrlSelect:	15	207	MrlSelect.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+MrlDismiss:	333	206	MrlDismiss.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 MrlUp:		310	17	BigArrowUp.png
 MrlSlidBG:	312	38	SliderVBg.png
 MrlSlidFG:	0	0	SliderVPad.png
 MrlDn:		310	164	BigArrowDown.png
-MrlCurOrigin:	21	193	Letters.png	43	True
-MrlPlugNameBG:	333	42	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+MrlCurOrigin:	21	192	Letters.png	43	True
+MrlPlugNameBG:	333	42	Onglet.png	#344b5d	#081e2f	#344b5d	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 MrlPlugLabel:	337	20	Letters.png	7	False
 
 
