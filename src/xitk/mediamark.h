@@ -63,6 +63,7 @@ void mediamark_unset_got_alternate(mediamark_t *mmk);
 int mediamark_free_mmk(mediamark_t **mmk);
 int mediamark_store_mmk(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 mediamark_t *mediamark_clone_mmk(mediamark_t *mmk);
+void mediamark_insert_entry(int index, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_append_entry(const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
 void mediamark_free_mediamarks(void);
 void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ident, const char *sub, int start, int end, int av_offset, int spu_offset);
@@ -76,6 +77,7 @@ mediamark_t *mediamark_get_current_mmk(void);
 const char *mediamark_get_current_mrl(void);
 const char *mediamark_get_current_ident(void);
 const char *mediamark_get_current_sub(void);
+mediamark_t *mediamark_get_mmk_by_index(int index);
 
 int mediamark_concat_mediamarks(const char *filename);
 void mediamark_load_mediamarks(const char *filename);

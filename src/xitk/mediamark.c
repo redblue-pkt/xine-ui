@@ -2508,11 +2508,16 @@ int mediamark_get_entry_from_id(const char *ident) {
   return -1;
 }
 
-void mediamark_append_entry(const char *mrl, const char *ident, 
+void mediamark_insert_entry(int index, const char *mrl, const char *ident, 
 			    const char *sub, int start, int end, int av_offset, int spu_offset) {
   char  autosub[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
   gGui->playlist.mmk = (mediamark_t **) realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
+  
+  if( index < gGui->playlist.num )
+    memmove( &gGui->playlist.mmk[index+1], 
+             &gGui->playlist.mmk[index], 
+             (gGui->playlist.num - index) * sizeof(gGui->playlist.mmk[0]) );
   
   /*
    * If subtitle_autoload is enabled and subtitle is NULL
@@ -2552,9 +2557,15 @@ void mediamark_append_entry(const char *mrl, const char *ident,
     }
   }
 
-  if(mediamark_store_mmk(&gGui->playlist.mmk[gGui->playlist.num], 
+  if(mediamark_store_mmk(&gGui->playlist.mmk[index], 
 			 mrl, ident, sub, start, end, av_offset, spu_offset))
     gGui->playlist.num++;
+}
+
+void mediamark_append_entry(const char *mrl, const char *ident, 
+			    const char *sub, int start, int end, int av_offset, int spu_offset) {
+
+  mediamark_insert_entry(gGui->playlist.num, mrl, ident, sub, start, end, av_offset, spu_offset);
 }
 
 void mediamark_free_mediamarks(void) {
@@ -2659,6 +2670,14 @@ mediamark_t *mediamark_get_current_mmk(void) {
 
   if(gGui->playlist.mmk && gGui->playlist.num)
     return gGui->playlist.mmk[gGui->playlist.cur];
+
+  return (mediamark_t *) NULL;
+}
+
+mediamark_t *mediamark_get_mmk_by_index(int index) {
+
+  if(gGui->playlist.mmk && index < gGui->playlist.num)
+    return gGui->playlist.mmk[index];
 
   return (mediamark_t *) NULL;
 }

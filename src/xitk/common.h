@@ -291,6 +291,7 @@ typedef struct {
     
     int                     num;                   /* number of entries in playlist */
     int                     cur;                   /* current entry in playlist */
+    int                     ref_append;            /* append mrl reference entry to this position */
     int                     loop;                  /* current loop mode (see PLAYLIST_LOOP_* */
     int                     control;               /* see PLAYLIST_CONTROL_* */
 

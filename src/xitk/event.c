@@ -962,15 +962,6 @@ void gui_playlist_start_next(void) {
     return;
   }
   
-  if(mediamark_got_alternate(&(gGui->mmk)) && mediamark_have_alternates(&(gGui->mmk))) {
-    mediamark_unset_got_alternate(&(gGui->mmk));
-    
-    if(!gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub))
-      gui_display_logo();
-    
-    return;
-  }
-
   switch(gGui->playlist.loop) {
 
   case PLAYLIST_LOOP_NO_LOOP:
@@ -980,21 +971,19 @@ void gui_playlist_start_next(void) {
     if(gGui->playlist.cur < gGui->playlist.num) {
       gui_set_current_mmk(mediamark_get_current_mmk());
       
-      if(mediamark_have_alternates(&(gGui->mmk))) {
-	if(!gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub))
-	  gui_display_logo();
-      }
-      else {
-	if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				   gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 1)) {
-	  
-	  
-	  if((gGui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) && 
-	     mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
-	    gui_exit(NULL, NULL);
-	  
-	  gui_display_logo();
-	}
+      if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
+                                 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 
+                                 !mediamark_have_alternates(&(gGui->mmk)))) {
+      
+        if(!mediamark_have_alternates(&(gGui->mmk)) || 
+	   !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
+        
+          if((gGui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) && 
+              mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+            gui_exit(NULL, NULL);
+          
+          gui_display_logo();
+        }
       }
     }
     else {
@@ -1011,36 +1000,32 @@ void gui_playlist_start_next(void) {
 	gGui->playlist.cur = 0;
 	gui_set_current_mmk(mediamark_get_current_mmk());
 
-	if(mediamark_have_alternates(&(gGui->mmk))) {
-	  if(!gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub))
-	    gui_display_logo();
-	}
-	else {
-	  if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
-				     gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 1)) {
-	    
-	    if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
-	      gui_exit(NULL, NULL);
-	    
-	    gui_display_logo();
-	  }
-	}
+        if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
+                                   gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 
+                                   !mediamark_have_alternates(&(gGui->mmk)))) {
+          
+          if(!mediamark_have_alternates(&(gGui->mmk)) ||
+             !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
+              gui_display_logo();
+            if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+              gui_exit(NULL, NULL);
+            
+            gui_display_logo();
+          }
+        }
       }
-
     }
     break;
     
   case PLAYLIST_LOOP_REPEAT:
     gui_set_current_mmk(mediamark_get_current_mmk());
-    if(mediamark_have_alternates(&(gGui->mmk))) {
-      if(!gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub))
-	gui_display_logo();
-    }
-    else {
-      if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 1)) {
-	
-	gui_display_logo();
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
+                               gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset,
+                               !mediamark_have_alternates(&(gGui->mmk)))) {
+      
+      if(mediamark_have_alternates(&(gGui->mmk))) {
+        if(!gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub))
+          gui_display_logo();
       }
     }
     break;
@@ -1053,19 +1038,18 @@ void gui_playlist_start_next(void) {
       gGui->playlist.cur = mediamark_get_shuffle_next();
       
       gui_set_current_mmk(mediamark_get_current_mmk());
-      if(mediamark_have_alternates(&(gGui->mmk))) {
-	if(!gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub))
-	  gui_display_logo();
-      }
-      else {
-	if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				   gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 1)) {
-	  
-	  if(!mediamark_all_played())
-	    goto __shuffle_restart;
-	  else
-	    gui_display_logo();
-	}
+      if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
+                                 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset,
+                                 !mediamark_have_alternates(&(gGui->mmk)))) {
+        
+        if(!mediamark_have_alternates(&(gGui->mmk)) ||
+           !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
+        
+          if(!mediamark_all_played())
+            goto __shuffle_restart;
+          else
+            gui_display_logo();
+        }
       }
     }
     else {

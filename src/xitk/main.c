@@ -1243,19 +1243,22 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     if((event->stream == gGui->stream) && gGui->playlist.num) {
       xine_mrl_reference_data_t *ref = (xine_mrl_reference_data_t *) event->data;
 
+      if(gGui->verbosity)
+	printf("XINE_EVENT_MRL_REFERENCE got mrl [%s] (alternative=%d)\n",
+               ref->mrl, ref->alternative);
+
       if(ref->alternative == 0) {
-	mediamark_t *mmk = mediamark_get_current_mmk();
+        gGui->playlist.ref_append++;
+        mediamark_insert_entry(gGui->playlist.ref_append, ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
+      } else {
+	mediamark_t *mmk = mediamark_get_mmk_by_index(gGui->playlist.ref_append);
 	
 	if(mmk) {
 	  mediamark_append_alternate_mrl(mmk, ref->mrl);
 	  mediamark_set_got_alternate(mmk);
-	  gui_set_current_mmk(mmk);
 	}
 
       }
-#warning FIXME
-      //      else
-      //	mediamark_append_entry(ref->mrl, ref->mrl, NULL, 0, -1, 0, 0);
 
     }
     break;

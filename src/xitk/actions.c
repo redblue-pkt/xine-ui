@@ -672,17 +672,13 @@ void gui_play (xitk_widget_t *w, void *data) {
       return;
     }
 
-    if(mediamark_have_alternates(&(gGui->mmk))) {
-      if(!gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
-	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
-	  gui_exit(NULL, NULL);
-	gui_display_logo();
-      }
-    }
-    else {
-      if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset, 1)) {
-	
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
+                                gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset,
+                                !mediamark_have_alternates(&(gGui->mmk)))) {
+      
+      if(!mediamark_have_alternates(&(gGui->mmk)) ||
+          !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
+    
 	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
 	  gui_exit(NULL, NULL);
 	gui_display_logo();
@@ -1556,6 +1552,8 @@ void gui_set_current_mmk(mediamark_t *mmk) {
   event_sender_update_menu_buttons();
   panel_update_mrl_display();
   playlist_update_focused_entry();
+  
+  gGui->playlist.ref_append = gGui->playlist.cur;
 }
 
 void gui_control_show(xitk_widget_t *w, void *data) {
