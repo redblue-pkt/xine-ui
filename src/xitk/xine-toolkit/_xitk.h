@@ -46,6 +46,11 @@
 
 #include "Imlib-light/Imlib.h"
 
+#define XITK_MAJOR_VERSION (0)
+#define XITK_MINOR_VERSION (9)
+#define XITK_SUB_VERSION   (0)
+#define XITK_VERSION       "0.9.0"
+
 #include "dnd.h"
 #include "widget.h"
 #include "skin.h"
@@ -85,35 +90,26 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 
 #ifdef	__GNUC__
-#define XITK_DIE(FMT, ARGS...) { fprintf(stderr, "XITK DIE: "FMT, ##ARGS); exit(-1); }
-#define XITK_WARNING(FMT, ARGS...) fprintf(stderr, "XITK WARNING: "FMT, ##ARGS)
+#define XITK_DIE(FMT, ARGS...) do { fprintf(stderr, "xiTK DIE: "FMT, ##ARGS); exit(-1); } while(0)
+#define XITK_WARNING(FMT, ARGS...) do { fprintf(stderr, "xiTK WARNING: "FMT, ##ARGS); } while(0)
 #else	/* C99 version: */
-#define XITK_DIE(...) { fprintf(stderr, "XITK DIE: "__VA_ARGS__); exit(-1); }
-#define XITK_WARNING(...) fprintf(stderr, "XITK WARNING: "__VA_ARGS__)
+#define XITK_DIE(...) do { fprintf(stderr, "xiTK DIE: "__VA_ARGS__); exit(-1); } while(0)
+#define XITK_WARNING(...) do { fprintf(stderr, "xiTK WARNING: "__VA_ARGS__); } while(0)
 #endif
 
-#define XITK_FREE(X) { if((X)) { free((X)); (X) = NULL; }}
-/*  #define XITK_FREE_XITK_IMAGE(X) {                                                        \ */
-/*                                       if(((X)) && ((X)->image)) {                         \ */
-/*                                         (X)->image->destroy((X)->image));                 \ */
-/*                                         if(((X)->mask))                                   \ */
-/*                                          (X)->mask->destroy((X)->mask);                   \ */
-/*                                       }                                                   \ */
-/*                                  } */
+#define XITK_FREE(X) do { if((X)) { free((X)); (X) = NULL; } } while(0)
 
-
-
-#define XITK_WIDGET_INIT(X, IMLIBDATA) {                                                 \
+#define XITK_WIDGET_INIT(X, IMLIBDATA) do {                                              \
                                          (X)->magic = XITK_WIDGET_MAGIC;                 \
                                          (X)->imlibdata = IMLIBDATA;                     \
-                                       }
+                                       } while(0)
 
-#define XITK_CHECK_CONSTITENCY(X) {                                                       \
+#define XITK_CHECK_CONSTITENCY(X) do {                                                    \
                                     if(((X) == NULL) || ((X)->magic != XITK_WIDGET_MAGIC) \
                                        || ((X)->imlibdata == NULL))                       \
                                       XITK_DIE("%s(): widget constitency failed.!\n",     \
                                                __FUNCTION__);                             \
-                                  }
+                                  } while(0)
 
 /*
  * timeradd/timersub is missing on solaris' sys/time.h, provide
@@ -202,21 +198,21 @@ static inline char *_x_strsep(char **stringp, const char *delim) {
 #endif
 
 void xitk_strdupa(char *dest, char *src);
-#define xitk_strdupa(d, s) {                                        \
+#define xitk_strdupa(d, s) do {                                     \
   (d) = NULL;                                                       \
   if((s) != NULL) {                                                 \
     (d) = (char *) alloca(strlen((s)) + 1);                         \
     strcpy((d), (s));                                               \
   }                                                                 \
-}
+} while(0)
 
 /* Duplicate s to d timeval values */
-#define timercpy(s, d) {                                                      \
+#define timercpy(s, d) do {                                                   \
       (d)->tv_sec = (s)->tv_sec;                                              \
       (d)->tv_usec = (s)->tv_usec;                                            \
-    }
+} while(0)
 
-#define WINDOW_INFO_ZERO(w) {                                                 \
+#define WINDOW_INFO_ZERO(w) do {                                              \
       if((w)->name)                                                           \
 	free((w)->name);                                                      \
       (w)->window = None;                                                     \
@@ -225,12 +221,14 @@ void xitk_strdupa(char *dest, char *src);
       (w)->y      = 0;                                                        \
       (w)->height = 0;                                                        \
       (w)->width  = 0;                                                        \
-    }
+} while(0)
 
 #define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
                       KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
                       StructureNotifyMask | PropertyChangeMask |              \
                       LeaveWindowMask | EnterWindowMask | PointerMotionMask)
+
+int xitk_x_error;
 
 typedef struct xitk_pixmap_s xitk_pixmap_t;
 
@@ -486,6 +484,9 @@ void xitk_xevent_notify(XEvent *event);
 
 #endif
 
+int xitk_install_x_error_handler(void);
+int xitk_uninstall_x_error_handler(void);
+
 const char *xitk_get_homedir(void);
 void xitk_usec_sleep(unsigned long);
 int xitk_system(int dont_run_as_root, char *command);
@@ -561,7 +562,10 @@ typedef struct {
 typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
 struct xitk_pixmap_s {
   ImlibData                *imlibdata;
+  XImage                   *xim;
   Pixmap                    pixmap;
+  GC                        gc;
+  XGCValues                 gcv;
   int                       width;
   int                       height;
   int                       shm;

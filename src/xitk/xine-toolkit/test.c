@@ -391,7 +391,7 @@ static void create_checkbox(void) {
  *
  */
 static void create_tabs(void) {
-  Pixmap              bg;
+  xitk_pixmap_t      *bg;
   xitk_tabs_widget_t  t;
   char               *fontname = "*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*";
   int                 x = 150, y = 200, w = 300;
@@ -403,13 +403,13 @@ static void create_tabs(void) {
   XITK_WIDGET_INIT(&t, test->imlibdata);
 
   xitk_window_get_window_size(test->xwin, &width, &height);
-  bg = xitk_image_create_pixmap(test->imlibdata, width, height);
-  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg,
-	    test->widget_list->gc, 0, 0, width, height, 0, 0);
+  bg = xitk_image_create_xitk_pixmap(test->imlibdata, width, height);
+  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg->pixmap,
+	    bg->gc, 0, 0, width, height, 0, 0);
   
   draw_rectangular_outter_box(test->imlibdata, bg, x, y+20, (w-1), 60);
-  xitk_window_change_background(test->imlibdata, test->xwin, bg, width, height);
-  XFreePixmap(test->display, bg);
+  xitk_window_change_background(test->imlibdata, test->xwin, bg->pixmap, width, height);
+  xitk_image_destroy_xitk_pixmap(bg);
   
   t.skin_element_name = NULL;
   t.num_entries       = 9;
@@ -427,21 +427,21 @@ static void create_tabs(void) {
  *
  */
 static void create_frame(void) {
-  Pixmap    bg;
-  int       width, height;
-  char     *fontname = "*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
-  int       x = 350, y = 50, w = 200, h = 150;
+  xitk_pixmap_t  *bg;
+  int             width, height;
+  char           *fontname = "*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+  int              x = 350, y = 50, w = 200, h = 150;
   
   xitk_window_get_window_size(test->xwin, &width, &height);
-  bg = xitk_image_create_pixmap(test->imlibdata, width, height);
-  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg,
-	    test->widget_list->gc, 0, 0, width, height, 0, 0);
+  bg = xitk_image_create_xitk_pixmap(test->imlibdata, width, height);
+  XCopyArea(test->display, (xitk_window_get_background(test->xwin)), bg->pixmap,
+	    bg->gc, 0, 0, width, height, 0, 0);
   
   draw_outter_frame(test->imlibdata, bg, _("My Frame"), fontname, x, y, w, h);
   draw_inner_frame(test->imlibdata, bg, NULL, NULL, x+(w>>2), y+(h>>2), w>>1, h>>1);
   
-  xitk_window_change_background(test->imlibdata, test->xwin, bg, width, height);
-  XFreePixmap(test->display, bg);
+  xitk_window_change_background(test->imlibdata, test->xwin, bg->pixmap, width, height);
+  xitk_image_destroy_xitk_pixmap(bg);
 }
 
 /*
@@ -502,7 +502,7 @@ static void create_label(void) {
     
     if(wimage) {
       draw_rectangular_inner_box(test->imlibdata, 
-				 wimage->image->pixmap, 0, 0, wimage->width-1, wimage->height-1);
+				 wimage->image, 0, 0, wimage->width-1, wimage->height-1);
     }
   }
 }

@@ -896,7 +896,7 @@ xitk_widget_t *xitk_noskin_slider_create(xitk_widget_list_t *wl,
   b = xitk_image_create_image(s->imlibdata, width, height);
   xitk_image_add_mask(s->imlibdata, b);
   if((type == XITK_HSLIDER) || (type == XITK_VSLIDER))
-    draw_inner(s->imlibdata, b->image->pixmap, width, height);
+    draw_inner(s->imlibdata, b->image, width, height);
   else if(type == XITK_RSLIDER) {
     draw_rotate_button(s->imlibdata, b);
   }

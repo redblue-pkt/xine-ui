@@ -41,6 +41,15 @@
 #include <xine.h>
 #endif
 
+#define XITK_MAJOR_VERSION (0)
+#define XITK_MINOR_VERSION (9)
+#define XITK_SUB_VERSION   (0)
+
+#define XITK_CHECK_VERSION(major, minor, sub)                                                    \
+   (XITK_MAJOR_VERSION > (major) ||                                                              \
+    (XITK_MAJOR_VERSION == (major) && XITK_MINOR_VERSION > (minor)) ||                           \
+    (XITK_MAJOR_VERSION == (major) && XITK_MINOR_VERSION == (minor) && XITK_SUB_VERSION >= (sub)))
+
 #define XITK_WIDGET_MAGIC       0x7869746b
 
 #ifndef NAME_MAX
@@ -85,7 +94,7 @@ typedef struct {
   int       width;
 } window_info_t;
 
-#define WINDOW_INFO_ZERO(w) {                                                 \
+#define WINDOW_INFO_ZERO(w) do {                                              \
       if((w)->name)                                                           \
 	free((w)->name);                                                      \
       (w)->window = None;                                                     \
@@ -94,17 +103,21 @@ typedef struct {
       (w)->y      = 0;                                                        \
       (w)->height = 0;                                                        \
       (w)->width  = 0;                                                        \
-    }
+} while(0)
 
-#define XITK_WIDGET_INIT(X, IMLIBDATA) {                                      \
+#define XITK_WIDGET_INIT(X, IMLIBDATA) do {                                   \
                                          (X)->magic = XITK_WIDGET_MAGIC;      \
                                          (X)->imlibdata = IMLIBDATA;          \
-                                       }
+                                       } while(0)
+
 typedef struct xitk_pixmap_s xitk_pixmap_t;
 typedef void (*xitk_pixmap_destroyer_t)(xitk_pixmap_t *);
 struct xitk_pixmap_s {
   ImlibData                *imlibdata;
+  XImage                   *xim;
   Pixmap                    pixmap;
+  GC                        gc;
+  XGCValues                 gcv;
   int                       width;
   int                       height;
   int                       shm;
@@ -1693,6 +1706,8 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap(ImlibData *im, int width, int heigh
 
 xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int height);
 
+void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p);
+
 /**
  * Free an image object.
  */
@@ -1726,19 +1741,19 @@ void draw_bevel_two_state(ImlibData *im, xitk_image_t *p);
 /**
  *
  */
-void draw_inner(ImlibData *im, Pixmap p, int w, int h);
-void draw_inner_light(ImlibData *im, Pixmap p, int w, int h);
+void draw_inner(ImlibData *im, xitk_pixmap_t *p, int w, int h);
+void draw_inner_light(ImlibData *im, xitk_pixmap_t *p, int w, int h);
 
 /**
  *
  */
-void draw_outter(ImlibData *im, Pixmap p, int w, int h);
-void draw_outter_light(ImlibData *im, Pixmap p, int w, int h);
+void draw_outter(ImlibData *im, xitk_pixmap_t *p, int w, int h);
+void draw_outter_light(ImlibData *im, xitk_pixmap_t *p, int w, int h);
 
 /**
  *
  */
-void draw_flat(ImlibData *im, Pixmap p, int w, int h);
+void draw_flat(ImlibData *im, xitk_pixmap_t *p, int w, int h);
 
 /**
  *
@@ -1763,19 +1778,21 @@ void draw_arrow_right(ImlibData *im, xitk_image_t *p);
 /**
  *
  */
-void draw_rectangular_inner_box(ImlibData *im, Pixmap p, int x, int y, int width, int height);
+void draw_rectangular_inner_box(ImlibData *im, xitk_pixmap_t *p, 
+				int x, int y, int width, int height);
 
 /**
  *
  */
-void draw_rectangular_outter_box(ImlibData *im, Pixmap p, int x, int y, int width, int height);
+void draw_rectangular_outter_box(ImlibData *im, xitk_pixmap_t *p,
+				 int x, int y, int width, int height);
 
 /**
  *
  */
-void draw_inner_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
+void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
 		      int x, int y, int w, int h);
-void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
+void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
 		       int x, int y, int w, int h);
 
 void draw_tab(ImlibData *im, xitk_image_t *p);
@@ -1910,37 +1927,37 @@ void xitk_window_dialog_ok(ImlibData *im, char *title,
 			   xitk_state_callback_t cb, void *userdata, int align, char *message, ...);
 
 #ifdef	__GNUC__
-#define xitk_window_dialog_ok(im, title, cb, userdata, align, message, args...) {                \
+#define xitk_window_dialog_ok(im, title, cb, userdata, align, message, args...) do               \
   if(((im) == NULL) || ((message) == NULL))                                                      \
     return;                                                                                      \
   xitk_window_dialog_ok_with_width(im, title, cb, userdata, 400, align, message, ##args);        \
-}
-#define xitk_window_dialog_error(im, message, args...) {                                         \
-  if(((im) == NULL) || ((message) == NULL))                                                      \
-    return;                                                                                      \
-  xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
-}
-#define xitk_window_dialog_info(im, message, args...) {                                                \
-  if(((im) == NULL) || ((message) == NULL))                                                            \
-    return;                                                                                            \
-  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
-}
+} while(0)
+#define xitk_window_dialog_error(im, message, args...) do {                                        \
+  if(((im) == NULL) || ((message) == NULL))                                                        \
+    return;                                                                                        \
+  xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, message, ##args);\
+} while(0)
+#define xitk_window_dialog_info(im, message, args...) do {                                               \
+  if(((im) == NULL) || ((message) == NULL))                                                              \
+    return;                                                                                              \
+  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, message, ##args);\
+} while(0)
 #else
-#define xitk_window_dialog_ok(im, title, cb, userdata, align, ...) {                               \
+#define xitk_window_dialog_ok(im, title, cb, userdata, align, ...) do {                            \
   if(((im) == NULL))                                                                               \
     return;                                                                                        \
   xitk_window_dialog_ok_with_width(im, title, cb, userdata, 400, align, __VA_ARGS__);              \
-}
-#define xitk_window_dialog_error(im, ...) {                                                        \
+} while(0)
+#define xitk_window_dialog_error(im, ...) do {                                                     \
   if(((im) == NULL))                                                                               \
     return;                                                                                        \
-  xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__);       \
-}
-#define xitk_window_dialog_info(im, ...) {                                                         \
-  if(((im) == NULL))                                                                               \
-    return;                                                                                        \
-  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__); \
-}
+  xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__);    \
+} while(0)
+#define xitk_window_dialog_info(im, ...) do {                                                        \
+  if(((im) == NULL))                                                                                 \
+    return;                                                                                          \
+  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__);\
+} while(0)
 #endif
 
 /*
@@ -1972,17 +1989,17 @@ void xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
 				    void *userdata, int align, char *message, ...);
 
 #ifdef __GNUC__
-#define xitk_window_dialog_yesnocancel(im, title, ycb, ncb, ccb, userdata, align, message, args...) {         \
+#define xitk_window_dialog_yesnocancel(im, title, ycb, ncb, ccb, userdata, align, message, args...) do {      \
   if(((im) == NULL) || ((message) == NULL))                                                                   \
     return;                                                                                                   \
   xitk_window_dialog_yesnocancel_with_width(im, title, ycb, ncb, ccb, userdata, 400, align, message, ##args); \
-}
+} while(0)
 #else
-#define xitk_window_dialog_yesnocancel(im, title, ycb, ncb, ccb, userdata, align, ...) {         \
-  if(((im) == NULL))                                                                   \
-    return;                                                                                                   \
-  xitk_window_dialog_yesnocancel_with_width(im, title, ycb, ncb, ccb, userdata, 400, align, __VA_ARGS__); \
-}
+#define xitk_window_dialog_yesnocancel(im, title, ycb, ncb, ccb, userdata, align, ...) do {              \
+  if(((im) == NULL))                                                                                     \
+    return;                                                                                              \
+  xitk_window_dialog_yesnocancel_with_width(im, title, ycb, ncb, ccb, userdata, 400, align, __VA_ARGS__);\
+} while(0)
 #endif
 
 /*
@@ -2012,17 +2029,17 @@ void xitk_window_dialog_yesno(ImlibData *im, char *title,
 			      xitk_state_callback_t ncb, 
 			      void *userdata, int align, char *message, ...);
 #ifdef __GNUC__
-#define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, message, args...) {         \
+#define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, message, args...) do {      \
   if(((im) == NULL) || ((message) == NULL))                                                        \
     return;                                                                                        \
   xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, message, ##args); \
-}
+} while(0)
 #else
-#define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, ...) {                      \
+#define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, ...) do {                   \
   if(((im) == NULL))                                                                               \
     return;                                                                                        \
   xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, __VA_ARGS__);     \
-}
+} while(0)
 #endif
 
 

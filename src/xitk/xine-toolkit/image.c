@@ -56,7 +56,6 @@ unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b) {
   XUNLOCK(im->x.disp);
 
   pixcol = xcolor.pixel;
-  
 
   return pixcol;
 }
@@ -115,10 +114,10 @@ void xitk_image_free_image(ImlibData *im, xitk_image_t **src) {
   assert(im && *src);
 
   if((*src)->mask)
-    (*src)->mask->destroy((*src)->mask);
+    xitk_image_destroy_xitk_pixmap((*src)->mask);
   
   if((*src)->image)
-    (*src)->image->destroy((*src)->image);
+    xitk_image_destroy_xitk_pixmap((*src)->image);
 
   XITK_FREE((*src));
   *src = NULL;
@@ -139,6 +138,9 @@ Pixmap xitk_image_create_pixmap(ImlibData *im, int width, int height) {
   return p;
 }
 
+/*
+ *
+ */
 static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 
   assert(xpix);
@@ -148,23 +150,29 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 #ifdef HAVE_SHM
   if(xpix->shm)
     XShmDetach(xpix->imlibdata->x.disp, xpix->shminfo);
-#endif
 
-  if(xpix->pixmap != None)
-    XFreePixmap(xpix->imlibdata->x.disp, xpix->pixmap);
+  if(xpix->xim)
+    XDestroyImage(xpix->xim);
 
-  XUNLOCK(xpix->imlibdata->x.disp);
-
-#ifdef HAVE_SHM
   if(xpix->shm) {
     shmdt(xpix->shminfo->shmaddr);
     free(xpix->shminfo);
   }
 #endif
   
+  if(xpix->pixmap != None)
+    XFreePixmap(xpix->imlibdata->x.disp, xpix->pixmap);
+  
+  XFreeGC(xpix->imlibdata->x.disp, xpix->gc);
+  
+  XUNLOCK(xpix->imlibdata->x.disp);
+  
   XITK_FREE(xpix);
 }
 
+/*
+ *
+ */
 xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, 
 							int width, int height, int depth) {
   xitk_pixmap_t    *xpix;
@@ -179,21 +187,25 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
   xpix->destroy   = xitk_image_xitk_pixmap_destroyer;
   xpix->width     = width;
   xpix->height    = height;
+  xpix->xim       = NULL;
+  xpix->shm       = 0;
   
   XLOCK(im->x.disp);
   
 #ifdef HAVE_SHM
-  shminfo = (XShmSegmentInfo *) xitk_xmalloc(sizeof(XShmSegmentInfo));
   if(xitk_is_use_xshm() == 2) {
-    XImage           *xim;
-    XShmSegmentInfo   shmi;
-    Status            status;
+    XImage   *xim;
     
-    xim = XShmCreateImage(im->x.disp, im->x.visual, depth, ZPixmap, 
-			  NULL, &shmi, width, height);
+    shminfo = (XShmSegmentInfo *) xitk_xmalloc(sizeof(XShmSegmentInfo));
+    
+    xitk_x_error = 0;
+    xitk_install_x_error_handler();
+    
+    xim = XShmCreateImage(im->x.disp, im->x.visual, depth, ZPixmap, NULL, shminfo, width, height);
     if(!xim) {
       XITK_WARNING("XShmCreateImage() failed.\n");
       free(shminfo);
+      xitk_uninstall_x_error_handler();
       goto __noxshm_pixmap;
     }
     
@@ -202,38 +214,60 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
       XITK_WARNING("shmget() failed.\n");
       XDestroyImage(xim);
       free(shminfo);
+      xitk_uninstall_x_error_handler();
       goto __noxshm_pixmap;
     }
     
-    shminfo->shmaddr  = shmat(shminfo->shmid, 0, 0);
-    shminfo->readOnly = False;
+    shminfo->shmaddr  = xim->data = shmat(shminfo->shmid, 0, 0);
+    if(xim->data == (char *) -1) {
+      XITK_WARNING("shmmat() failed.\n");
+      XDestroyImage(xim);
+      shmctl(shminfo->shmid, IPC_RMID, 0);
+      free(shminfo);
+      xitk_uninstall_x_error_handler();
+      goto __noxshm_pixmap;
+    }
     
-    status = XShmAttach(im->x.disp, shminfo);
-    if(status == 0) {
-      XITK_WARNING("XShmAttach() failed (bad status).\n");
+    shminfo->readOnly = False;
+    XShmAttach(im->x.disp, shminfo);
+    XSync(im->x.disp, False);
+    
+    if(xitk_x_error) {
+      XITK_WARNING("XShmAttach() failed.\n");
       XDestroyImage(xim);
       shmdt(shminfo->shmaddr);
       shmctl(shminfo->shmid, IPC_RMID, 0);
       free(shminfo);
+      xitk_uninstall_x_error_handler();
       goto __noxshm_pixmap;
     }
-    
+
+    xpix->xim = xim;
     xpix->pixmap = XShmCreatePixmap(im->x.disp, im->x.base_window, 
 				    shminfo->shmaddr, shminfo, width, height, depth);
-    XSync(im->x.disp, False);
     if(!xpix->pixmap) {
       XITK_WARNING("XShmCreatePixmap() failed.\n");
+      XShmDetach(xpix->imlibdata->x.disp, xpix->shminfo);
       XDestroyImage(xim);
       shmdt(shminfo->shmaddr);
       shmctl(shminfo->shmid, IPC_RMID, 0);
       free(shminfo);
+      xitk_uninstall_x_error_handler();
       goto __noxshm_pixmap;
     }
     else {
       xpix->shm = 1;
-      XDestroyImage(xim);
+      //      XDestroyImage(xim);
       xpix->shminfo = shminfo;
+      xpix->gcv.graphics_exposures = False;
+      xpix->gc = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &xpix->gcv);
       shmctl(shminfo->shmid, IPC_RMID, 0);
+
+      //      XShmPutImage(im->x.disp, xpix->pixmap, xpix->gc, xpix->xim, 
+      //		   0, 0, 0, 0, width, height, False);
+      //      XSync(im->x.disp, False);
+      
+      xitk_uninstall_x_error_handler();
     }
   }
   else
@@ -247,6 +281,9 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
       xpix->shminfo = NULL;
 #endif
       xpix->pixmap  = XCreatePixmap(im->x.disp, im->x.base_window, width, height, depth);
+
+      xpix->gcv.graphics_exposures = False;
+      xpix->gc = XCreateGC(im->x.disp, xpix->pixmap, GCGraphicsExposures, &xpix->gcv);
     }
   
   XUNLOCK(im->x.disp);
@@ -259,6 +296,11 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap(ImlibData *im, int width, int heigh
 }
 xitk_pixmap_t *xitk_image_create_xitk_mask_pixmap(ImlibData *im, int width, int height) {
   return xitk_image_create_xitk_pixmap_with_depth(im, width, height, 1);
+}
+
+void xitk_image_destroy_xitk_pixmap(xitk_pixmap_t *p) {
+  assert(p);
+  p->destroy(p);
 }
 
 /*
@@ -281,42 +323,33 @@ Pixmap xitk_image_create_mask_pixmap(ImlibData *im, int width, int height) {
  */
 void xitk_image_change_image(ImlibData *im, 
 			     xitk_image_t *src, xitk_image_t *dest, int width, int height) {
-  GC         gc;
-  XGCValues  gcv;
-
   assert(im && src && dest && width && height);
   
   if(dest->mask)
-    dest->mask->destroy(dest->mask);
+    xitk_image_destroy_xitk_pixmap(dest->mask);
   
   if(src->mask) {
+    xitk_image_destroy_xitk_pixmap(src->mask);
+
     dest->mask = xitk_image_create_xitk_pixmap(im, width, height);
+
     XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-    XSync(im->x.disp, False);
-#endif
-    gcv.graphics_exposures = False;
-    gc = XCreateGC(im->x.disp, dest->mask->pixmap, GCGraphicsExposures, &gcv);
-    XCopyArea(im->x.disp, src->mask->pixmap, dest->mask->pixmap, gc, 0, 0, width, height, 0, 0);
-    XFreeGC(im->x.disp, gc);
+    XCopyArea(im->x.disp, src->mask->pixmap, dest->mask->pixmap, dest->mask->gc,
+	      0, 0, width, height, 0, 0);
     XUNLOCK(im->x.disp);
+
   }
   else
     dest->mask = NULL;
   
   if(dest->image)
-    dest->image->destroy(dest->image);
+    xitk_image_destroy_xitk_pixmap(dest->image);
   
   dest->image = xitk_image_create_xitk_pixmap(im, width, height);
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, dest->image->pixmap, GCGraphicsExposures, &gcv);
-  XCopyArea(im->x.disp, src->image->pixmap, dest->image->pixmap, gc, 0, 0, width, height, 0, 0);
-  XFreeGC(im->x.disp, gc);
+  XCopyArea(im->x.disp, src->image->pixmap, dest->image->pixmap, dest->image->gc,
+	    0, 0, width, height, 0, 0);
   XUNLOCK(im->x.disp);
   
   dest->width = width;
@@ -369,6 +402,10 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   length = xitk_font_get_string_length(fs, str);
   height = xitk_font_get_string_height(fs, str);
   descent = xitk_font_get_descent(fs, str);
+
+  XLOCK(im->x.disp);
+  XFreeGC(im->x.disp, gc);
+  XUNLOCK(im->x.disp);
 
   memset(&bufsubs, 0, sizeof(bufsubs));
   memset(&buf, 0, sizeof(buf));
@@ -444,15 +481,15 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
     lines[numlines++] = strdup(buf);
   
   image = xitk_image_create_image(im, width, ((height * numlines) + (3 * numlines)));
-  draw_flat_with_color(im, image->image->pixmap, image->width, image->height, background);
+  draw_flat_with_color(im, image->image, image->width, image->height, background);
   
   { /* Draw string in image */
     int i, j, x = 0;
 
     XLOCK(im->x.disp);
-    XSetForeground(im->x.disp, gc, foreground);
+    XSetForeground(im->x.disp, image->image->gc, foreground);
     XUNLOCK(im->x.disp);
-
+    
     j = height;
     for(i = 0; i < numlines; i++, j += (height + 3)) {
       length = xitk_font_get_string_length(fs, lines[i]);
@@ -465,10 +502,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
 	x = (width - length);
       
       XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-      XSync(im->x.disp, False);
-#endif
-      XDrawString(im->x.disp, image->image->pixmap, gc, 
+      XDrawString(im->x.disp, image->image->pixmap, image->image->gc, 
 		  x, (j - descent), lines[i], strlen(lines[i]));
       XUNLOCK(im->x.disp);
 	
@@ -477,10 +511,6 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   }
 
   xitk_font_unload_font(fs);
-
-  XLOCK(im->x.disp);
-  XFreeGC(im->x.disp, gc);
-  XUNLOCK(im->x.disp);
 
   return image;
 }
@@ -496,25 +526,16 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
  *
  */
 void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest) {
-  GC            gc;
-  XGCValues     gcv;
-
   assert(im && dest);
   
   if(dest->mask)
-    dest->mask->destroy(dest->mask);
+    xitk_image_destroy_xitk_pixmap(dest->mask);
 
   dest->mask = xitk_image_create_xitk_mask_pixmap(im, dest->width, dest->height);
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, dest->mask->pixmap, GCGraphicsExposures, &gcv);
-  XSetForeground(im->x.disp, gc, 1);
-  XFillRectangle(im->x.disp, dest->mask->pixmap, gc, 0, 0, dest->width, dest->height);
-  XFreeGC(im->x.disp, gc);
+  XSetForeground(im->x.disp, dest->mask->gc, 1);
+  XFillRectangle(im->x.disp, dest->mask->pixmap, dest->mask->gc, 0, 0, dest->width, dest->height);
   XUNLOCK(im->x.disp);
 }
 
@@ -522,8 +543,6 @@ void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest) {
  *
  */
 static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
-  GC             gc;
-  XGCValues      gcv;
   int            w;
   int            h;
   XPoint         points[4];
@@ -538,9 +557,7 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
 
   XLOCK(im->x.disp);
   
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
   XUNLOCK(im->x.disp);
 
   for(i = 0; i < 3; i++) {
@@ -607,16 +624,11 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
     offset += w;
 
     XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-    XSync(im->x.disp, False);
-#endif
-    XFillPolygon(im->x.disp, p->image->pixmap, gc, &points[0], 4, Complex, CoordModeOrigin);
+    XFillPolygon(im->x.disp, p->image->pixmap, p->image->gc, 
+		 &points[0], 4, Complex, CoordModeOrigin);
     XUNLOCK(im->x.disp);
   }
 
-  XLOCK(im->x.disp);
-  XFreeGC(im->x.disp, gc);
-  XUNLOCK(im->x.disp);
 }
 
 /*
@@ -638,38 +650,28 @@ void draw_arrow_right(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-static void _draw_rectangular_box(ImlibData *im, Pixmap p, 
+static void _draw_rectangular_box(ImlibData *im, xitk_pixmap_t *p, 
 				  int x, int y, int excstart, int excstop,
 				  int width, int height, int relief) {
-  GC            gc;
-  XGCValues     gcv;
-
   assert(im && p && width && height);
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
 
   if(relief == DRAW_OUTTER)
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_white(im));
   else if(relief == DRAW_INNER)
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
-
-  XDrawLine(im->x.disp, p, gc, x, y, (x + excstart), y);
-  XDrawLine(im->x.disp, p, gc, (x + excstop), y, (x + width), y);
-  XDrawLine(im->x.disp, p, gc, x, y, x, (y + height));
-  if(relief == DRAW_OUTTER)
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
-  else if(relief == DRAW_INNER)
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_black(im));
   
-  XDrawLine(im->x.disp, p, gc, (x + width), y, (x + width), (y + height));
-  XDrawLine(im->x.disp, p, gc, x, (y + height), (x + width), (y + height));
-
-  XFreeGC(im->x.disp, gc);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, (x + excstart), y);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + excstop), y, (x + width), y);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, x, (y + height));
+  if(relief == DRAW_OUTTER)
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_black(im));
+  else if(relief == DRAW_INNER)
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_white(im));
+  
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + width), y, (x + width), (y + height));
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, (y + height), (x + width), (y + height));
 
   XUNLOCK(im->x.disp);
 }
@@ -677,38 +679,28 @@ static void _draw_rectangular_box(ImlibData *im, Pixmap p,
 /*
  *
  */
-static void _draw_rectangular_box_light(ImlibData *im, Pixmap p, 
+static void _draw_rectangular_box_light(ImlibData *im, xitk_pixmap_t *p, 
 					int x, int y, int excstart, int excstop,
 					int width, int height, int relief) {
-  GC            gc;
-  XGCValues     gcv;
-
   assert(im && p && width && height);
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
   
   if(relief == DRAW_OUTTER)
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_white(im));
   else if(relief == DRAW_INNER)
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_darkgray(im));
 
-  XDrawLine(im->x.disp, p, gc, x, y, (x + excstart), y);
-  XDrawLine(im->x.disp, p, gc, (x + excstop), y, (x + width), y);
-  XDrawLine(im->x.disp, p, gc, x, y, x, (y + height));
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, (x + excstart), y);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + excstop), y, (x + width), y);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, x, (y + height));
   if(relief == DRAW_OUTTER)
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_darkgray(im));
   else if(relief == DRAW_INNER)
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_white(im));
   
-  XDrawLine(im->x.disp, p, gc, (x + width), y, (x + width), (y + height));
-  XDrawLine(im->x.disp, p, gc, x, (y + height), (x + width), (y + height));
-
-  XFreeGC(im->x.disp, gc);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + width), y, (x + width), (y + height));
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, (y + height), (x + width), (y + height));
 
   XUNLOCK(im->x.disp);
 }
@@ -716,39 +708,29 @@ static void _draw_rectangular_box_light(ImlibData *im, Pixmap p,
 /*
  *
  */
-static void _draw_rectangular_box_with_colors(ImlibData *im, Pixmap p, 
+static void _draw_rectangular_box_with_colors(ImlibData *im, xitk_pixmap_t *p, 
 					      int x, int y, int width, int height, 
 					      unsigned int lcolor, unsigned int dcolor,
 					      int relief) {
-  GC            gc;
-  XGCValues     gcv;
-
   assert(im && p && width && height);
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
   
   if(relief == DRAW_OUTTER)
-    XSetForeground(im->x.disp, gc, lcolor);
+    XSetForeground(im->x.disp, p->gc, lcolor);
   else if(relief == DRAW_INNER)
-    XSetForeground(im->x.disp, gc, dcolor);
+    XSetForeground(im->x.disp, p->gc, dcolor);
 
-  XDrawLine(im->x.disp, p, gc, x, y, (x + width), y);
-  XDrawLine(im->x.disp, p, gc, x, y, x, (y + height));
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, (x + width), y);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, y, x, (y + height));
 
   if(relief == DRAW_OUTTER)
-    XSetForeground(im->x.disp, gc, dcolor);
+    XSetForeground(im->x.disp, p->gc, dcolor);
   else if(relief == DRAW_INNER)
-    XSetForeground(im->x.disp, gc, lcolor);
+    XSetForeground(im->x.disp, p->gc, lcolor);
   
-  XDrawLine(im->x.disp, p, gc, (x + width), y, (x + width), (y + height));
-  XDrawLine(im->x.disp, p, gc, x, (y + height), (x + width), (y + height));
-
-  XFreeGC(im->x.disp, gc);
+  XDrawLine(im->x.disp, p->pixmap, p->gc, (x + width), y, (x + width), (y + height));
+  XDrawLine(im->x.disp, p->pixmap, p->gc, x, (y + height), (x + width), (y + height));
 
   XUNLOCK(im->x.disp);
 }
@@ -756,10 +738,12 @@ static void _draw_rectangular_box_with_colors(ImlibData *im, Pixmap p,
 /*
  *
  */
-void draw_rectangular_inner_box(ImlibData *im, Pixmap p, int x, int y, int width, int height) {
+void draw_rectangular_inner_box(ImlibData *im, xitk_pixmap_t *p, 
+				int x, int y, int width, int height) {
   _draw_rectangular_box(im, p, x, y, 0, 0, width, height, DRAW_INNER);
 }
-void draw_rectangular_outter_box(ImlibData *im, Pixmap p, int x, int y, int width, int height) {
+void draw_rectangular_outter_box(ImlibData *im, xitk_pixmap_t *p, 
+				 int x, int y, int width, int height) {
   _draw_rectangular_box(im, p, x, y, 0, 0, width, height, DRAW_OUTTER);
 }
 
@@ -767,8 +751,6 @@ void draw_rectangular_outter_box(ImlibData *im, Pixmap p, int x, int y, int widt
  *
  */
 static void _draw_three_state(ImlibData *im, xitk_image_t *p, int style) {
-  GC            gc;
-  XGCValues     gcv;
   int           w;
   int           h;
 
@@ -778,52 +760,45 @@ static void _draw_three_state(ImlibData *im, xitk_image_t *p, int style) {
   h = p->height;
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
   
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, 0, 0, w , h);
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, w, 0, (w * 2) , h);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_gray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, w , h);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, w, 0, (w * 2) , h);
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
   if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image->pixmap, gc, 0, 0, w, 0);
-    XDrawLine(im->x.disp, p->image->pixmap, gc, 0, 0, 0, (h - 1));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, w, 0);
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, 0, (h - 1));
   }
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w, 0, (w * 2), 0);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w, 0, w, (h - 1));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, 0, (w * 2), 0);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, 0, w, (h - 1));
   
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray(im));
   if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image->pixmap, gc, (w - 2), 2, (w - 2), (h - 3));
-    XDrawLine(im->x.disp, p->image->pixmap, gc, 2, (h - 2), w-2, (h - 2));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w - 2), 2, (w - 2), (h - 3));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 2, (h - 2), w-2, (h - 2));
   }
-  XDrawLine(im->x.disp, p->image->pixmap, gc, 2*w - 2,     2, 2*w - 2, h - 3);
-  XDrawLine(im->x.disp, p->image->pixmap, gc,     w+2, h - 2, 2*w - 2, h - 2);
-  XDrawLine(im->x.disp, p->image->pixmap, gc,   w * 2,     0,   w * 3,     0);
-  XDrawLine(im->x.disp, p->image->pixmap, gc,   w * 2,     0,   w * 2, h - 1);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 2*w - 2,     2, 2*w - 2, h - 3);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc,     w+2, h - 2, 2*w - 2, h - 2);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc,   w * 2,     0,   w * 3,     0);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc,   w * 2,     0,   w * 2, h - 1);
 
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, w * 2 , 0, (w - 1), (h - 1));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, w * 2 , 0, (w - 1), (h - 1));
  
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
   if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image->pixmap, gc, (w - 1), 0, (w - 1), (h - 1));
-    XDrawLine(im->x.disp, p->image->pixmap, gc, 0, (h - 1), w-1, (h - 1));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w - 1), 0, (w - 1), (h - 1));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, (h - 1), w-1, (h - 1));
   }
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2)+1, 1, (w * 3)-1, 1);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2)+1, 1, (w * 2)+1, (h - 2));
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2) - 1, 0, (w * 2) - 1, h);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w, (h - 1), (w * 2)-1, (h - 1));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2)+1, 1, (w * 3)-1, 1);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2)+1, 1, (w * 2)+1, (h - 2));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) - 1, 0, (w * 2) - 1, h);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, (h - 1), (w * 2)-1, (h - 1));
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 3) - 1, 1, (w * 3) - 1, (h - 1));
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2) + 1, (h - 1), (w * 3), (h - 1));
-
-  XFreeGC(im->x.disp, gc);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 3) - 1, 1, (w * 3) - 1, (h - 1));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) + 1, (h - 1), (w * 3), (h - 1));
 
   XUNLOCK(im->x.disp);
 }
@@ -832,8 +807,6 @@ static void _draw_three_state(ImlibData *im, xitk_image_t *p, int style) {
  *
  */
 static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
-  GC            gc;
-  XGCValues     gcv;
   int           w;
   int           h;
 
@@ -843,34 +816,27 @@ static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
   h = p->height;
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, 0, 0, w - 1, h - 1);
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, w, 0, (w * 2) - 1 , h - 1);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_gray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, w - 1, h - 1);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, w, 0, (w * 2) - 1 , h - 1);
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
   if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image->pixmap, gc, 0, 0, w, 0);
-    XDrawLine(im->x.disp, p->image->pixmap, gc, 0, 0, 0, (h - 1));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, w, 0);
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, 0, (h - 1));
   }
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w, 0, (w * 2), 0);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w, 0, w, (h - 1));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, 0, (w * 2), 0);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, 0, w, (h - 1));
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
   if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image->pixmap, gc, (w - 1), 0 , (w - 1), (h - 1));
-    XDrawLine(im->x.disp, p->image->pixmap, gc, 0 ,(h - 1), w , (h - 1));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w - 1), 0 , (w - 1), (h - 1));
+    XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0 ,(h - 1), w , (h - 1));
   }
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2) - 1, 0, (w * 2) - 1, h);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w, (h - 1),(w * 2), (h - 1));
-
-  XFreeGC(im->x.disp, gc);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) - 1, 0, (w * 2) - 1, h);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, (h - 1),(w * 2), (h - 1));
 
   XUNLOCK(im->x.disp);
 }
@@ -878,26 +844,18 @@ static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
 /*
  *
  */
-static void _draw_relief(ImlibData *im, Pixmap p, int w, int h, int relief, int light) {
-  GC            gc;
-  XGCValues     gcv;
-  
+static void _draw_relief(ImlibData *im, xitk_pixmap_t *p, int w, int h, int relief, int light) {
   assert(im && p);
-
-  XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
   
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p, gc, 0, 0, w , h);
+  XLOCK(im->x.disp);
 
+  XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_gray(im));
+  XFillRectangle(im->x.disp, p->pixmap, p->gc, 0, 0, w , h);
+ 
   XUNLOCK(im->x.disp);
   
   if(relief != DRAW_FLATTER) {
-
+    
     if(relief == DRAW_OUTTER)
       _draw_rectangular_box_with_colors(im, p, 0, 0, w-1, h-1, 
 					xitk_get_pixel_color_white(im),	
@@ -912,9 +870,6 @@ static void _draw_relief(ImlibData *im, Pixmap p, int w, int h, int relief, int 
 					relief);
   }
 
-  XLOCK(im->x.disp);
-  XFreeGC(im->x.disp, gc);
-  XUNLOCK(im->x.disp);
 }
 
 /*
@@ -942,8 +897,6 @@ void draw_bevel_two_state(ImlibData *im, xitk_image_t *p) {
  *
  */
 static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int direction) {
-  GC            gc, mgc;
-  XGCValues     gcv;
   int           w;
   int           h;
 
@@ -953,51 +906,42 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
   h = p->height;
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
-
-  gcv.graphics_exposures = False;
-  mgc = XCreateGC(im->x.disp, p->mask->pixmap, GCGraphicsExposures, &gcv);
 
   /* Draw mask */
-  XSetForeground(im->x.disp, mgc, 0);
+  XSetForeground(im->x.disp, p->mask->gc, 0);
   /* Top */
-  XDrawLine(im->x.disp, p->mask->pixmap, mgc, 0, 0, (w - 1), 0);
-  XDrawLine(im->x.disp, p->mask->pixmap, mgc, 0, 1, (w - 1), 1);
+  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, (w - 1), 0);
+  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 1, (w - 1), 1);
   /* Bottom */
-  XDrawLine(im->x.disp, p->mask->pixmap, mgc, 0, (h - 1), (w - 1), (h - 1));
-  XDrawLine(im->x.disp, p->mask->pixmap, mgc, 0, (h - 1) - 1, (w - 1), (h - 1) - 1);
+  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, (h - 1), (w - 1), (h - 1));
+  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, (h - 1) - 1, (w - 1), (h - 1) - 1);
   /* Left */
-  XDrawLine(im->x.disp, p->mask->pixmap, mgc, 0, 0, 0, (h - 1));
-  XDrawLine(im->x.disp, p->mask->pixmap, mgc, 1, 0, 1, (h - 1));
+  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, 0, (h - 1));
+  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, 1, 0, 1, (h - 1));
   /* Right */
-  XDrawLine(im->x.disp, p->mask->pixmap, mgc, (w - 1), 0, (w - 1), (h - 1));
-  XDrawLine(im->x.disp, p->mask->pixmap, mgc, (w - 1) - 1, 0, (w - 1) - 1, (h - 1));
+  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, (w - 1), 0, (w - 1), (h - 1));
+  XDrawLine(im->x.disp, p->mask->pixmap, p->mask->gc, (w - 1) - 1, 0, (w - 1) - 1, (h - 1));
   
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, 2, 2, w - 4, (h - 1) - 2);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_gray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, 2, 2, w - 4, (h - 1) - 2);
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, w + 2, 2, (w * 2) - 4, (h - 1) - 2);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, w + 2, 2, (w * 2) - 4, (h - 1) - 2);
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, (w * 2) + 2, 2, ((w * 3) - 1) - 4, (h - 1) - 2);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) + 2, 2, ((w * 3) - 1) - 4, (h - 1) - 2);
 
   XUNLOCK(im->x.disp);
   
-  _draw_rectangular_box_with_colors(im, p->image->pixmap, 2, 2, (w-1)-4, (h-1)-4, 
+  _draw_rectangular_box_with_colors(im, p->image, 2, 2, (w-1)-4, (h-1)-4, 
 				    xitk_get_pixel_color_white(im),
 				    xitk_get_pixel_color_black(im),
 				    DRAW_OUTTER);
-  _draw_rectangular_box_with_colors(im, p->image->pixmap, w+2, 2, (w-1)-4, (h-1)-4, 
+  _draw_rectangular_box_with_colors(im, p->image, w+2, 2, (w-1)-4, (h-1)-4, 
 				    xitk_get_pixel_color_white(im),
 				    xitk_get_pixel_color_black(im),
 				    DRAW_OUTTER);
-  _draw_rectangular_box_with_colors(im, p->image->pixmap, (w*2)+2, 2, (w-1)-4, (h-1)-4, 
+  _draw_rectangular_box_with_colors(im, p->image, (w*2)+2, 2, (w-1)-4, (h-1)-4, 
 				    xitk_get_pixel_color_white(im),
 				    xitk_get_pixel_color_black(im),
 				    DRAW_INNER);
@@ -1019,14 +963,10 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
 
     for(i = 0; i < 3; i++, offset += w) {
       if(i == 2) { xx++; yy++; }
-      draw_rectangular_outter_box(im, p->image->pixmap, xx + offset, yy, ww, hh);
+      draw_rectangular_outter_box(im, p->image, xx + offset, yy, ww, hh);
     }
   }
   
-  XLOCK(im->x.disp);
-  XFreeGC(im->x.disp, gc);
-  XFreeGC(im->x.disp, mgc);
-  XUNLOCK(im->x.disp);
 }
 
 /*
@@ -1042,80 +982,58 @@ void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
-void draw_inner(ImlibData *im, Pixmap p, int w, int h) {
+void draw_inner(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
   _draw_relief(im, p, w, h, DRAW_INNER, 0);
 }
-void draw_inner_light(ImlibData *im, Pixmap p, int w, int h) {
+void draw_inner_light(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
   _draw_relief(im, p, w, h, DRAW_INNER, 1);
 }
 
 /*
  *
  */
-void draw_outter(ImlibData *im, Pixmap p, int w, int h) {
+void draw_outter(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
   _draw_relief(im, p, w, h, DRAW_OUTTER, 0);
 }
-void draw_outter_light(ImlibData *im, Pixmap p, int w, int h) {
+void draw_outter_light(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
   _draw_relief(im, p, w, h, DRAW_OUTTER, 1);
 }
 
 /*
  *
  */
-void draw_flat(ImlibData *im, Pixmap p, int w, int h) {
+void draw_flat(ImlibData *im, xitk_pixmap_t *p, int w, int h) {
   _draw_relief(im, p, w, h, DRAW_FLATTER, 1);
 }
 
 /*
  *
  */
-void draw_flat_with_color(ImlibData *im, Pixmap p, int w, int h, unsigned int color) {
-  GC            gc;
-  XGCValues     gcv;
-  
-  assert(im && (p != None));
+void draw_flat_with_color(ImlibData *im, xitk_pixmap_t *p, int w, int h, unsigned int color) {
+  assert(im && p);
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
-  
-  XSetForeground(im->x.disp, gc, color);
-  XFillRectangle(im->x.disp, p, gc, 0, 0, w , h);
-  
-  XFreeGC(im->x.disp, gc);
+  XSetForeground(im->x.disp, p->gc, color);
+  XFillRectangle(im->x.disp, p->pixmap, p->gc, 0, 0, w , h);
   XUNLOCK(im->x.disp);
 }
 
 /*
  *
  */
-static void _draw_frame(ImlibData *im, Pixmap p, 
+static void _draw_frame(ImlibData *im, xitk_pixmap_t *p, 
 			char *title, char *fontname, int style, int x, int y, int w, int h) {
-  GC             gc = None;
-  XGCValues      gcv;
   xitk_font_t   *fs = NULL;
   int            sty[2];
   int            yoff = 0, xstart = 0, xstop = 0, fheight = 0, fwidth = 0;
   char           buf[BUFSIZ];
 
-  assert(im && (p != None));
+  assert(im && p);
   
   if(title) {
 
-    XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-    XSync(im->x.disp, False);
-#endif
-    gcv.graphics_exposures = False;
-    gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
-    XUNLOCK(im->x.disp);
-    
     fs = xitk_font_load_font(im->x.disp, (fontname ? fontname : DEFAULT_FONT_12));
-    xitk_font_set_font(fs, gc);
+    xitk_font_set_font(fs, p->gc);
     fheight = xitk_font_get_string_height(fs, title);
     fwidth = xitk_font_get_string_length(fs, title);
 
@@ -1161,18 +1079,11 @@ static void _draw_frame(ImlibData *im, Pixmap p,
   
   if(title) {
     XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-    XSync(im->x.disp, False);
-#endif
-    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
-    XDrawString(im->x.disp, p, gc, (x + 6), y, buf, strlen(buf));
+    XSetForeground(im->x.disp, p->gc, xitk_get_pixel_color_black(im));
+    XDrawString(im->x.disp, p->pixmap, p->gc, (x + 6), y, buf, strlen(buf));
     XUNLOCK(im->x.disp);
     
     xitk_font_unload_font(fs);
-    
-    XLOCK(im->x.disp);
-    XFreeGC(im->x.disp, gc);
-    XUNLOCK(im->x.disp);
   }
 
 }
@@ -1180,11 +1091,11 @@ static void _draw_frame(ImlibData *im, Pixmap p,
 /*
  *
  */
-void draw_inner_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
+void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
 		      int x, int y, int w, int h) {
   _draw_frame(im, p, title, fontname, DRAW_INNER, x, y, w, h);
 }
-void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
+void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
 		       int x, int y, int w, int h) {
   _draw_frame(im, p, title, fontname, DRAW_OUTTER, x, y, w, h);
 }
@@ -1193,47 +1104,38 @@ void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
  *
  */
 void draw_tab(ImlibData *im, xitk_image_t *p) {
-  GC            gc;
-  XGCValues     gcv;
   int           w, h;
 
   assert(im && p);
 
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
 
   w = p->width / 3;
   h = p->height;
 
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_gray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, (w * 3), h);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_lightgray(im));
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, 0, 3, (w - 1), h);
+  XFillRectangle(im->x.disp, p->image->pixmap, p->image->gc, w, 0, (w - 1), h);
+
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, 3, w, 3);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, 3, 0, h);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, 0, (w * 2) - 1, 0);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w, 0, w, h);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) + 3, 0, (w * 3) - 1, 0);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2), 3, (w * 2), (h - 1));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2), 3, (w * 2) + 3, 0);
+
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w - 1), 3, (w - 1), h);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) - 1, 0, (w * 2) - 1, h);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 3) - 1, 0, (w * 3) - 1, h);
+
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 0, (h - 1), (w * 2) - 1, (h - 1));
   
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, 0, 0, (w * 3), h);
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, 0, 3, (w - 1), h);
-  XFillRectangle(im->x.disp, p->image->pixmap, gc, w, 0, (w - 1), h);
-
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
-  XDrawLine(im->x.disp, p->image->pixmap, gc, 0, 3, w, 3);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, 0, 3, 0, h);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w, 0, (w * 2) - 1, 0);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w, 0, w, h);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2) + 3, 0, (w * 3) - 1, 0);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2), 3, (w * 2), (h - 1));
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2), 3, (w * 2) + 3, 0);
-
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w - 1), 3, (w - 1), h);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2) - 1, 0, (w * 2) - 1, h);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 3) - 1, 0, (w * 3) - 1, h);
-
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
-  XDrawLine(im->x.disp, p->image->pixmap, gc, 0, (h - 1), (w * 2) - 1, (h - 1));
-  
-  XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 }
 
@@ -1241,8 +1143,6 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
  *
  */
 void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
-  GC            gc, mgc;
-  XGCValues     gcv;
   int           w;
   int           h;
   unsigned int  ccolor, fcolor, ncolor;
@@ -1257,42 +1157,30 @@ void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
   
   XLOCK(im->x.disp);
   
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
-  
-  gcv.graphics_exposures = False;
-  mgc = XCreateGC(im->x.disp, p->mask->pixmap, GCGraphicsExposures, &gcv);
-  
   {
     int x, i;
     unsigned int bg_colors[3] = { ncolor, fcolor, ccolor };
     
-    XSetForeground(im->x.disp, mgc, 0);
-    XFillRectangle(im->x.disp, p->mask->pixmap, mgc, 0, 0, w * 3 , h);
+    XSetForeground(im->x.disp, p->mask->gc, 0);
+    XFillRectangle(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, w * 3 , h);
     
-    XSetForeground(im->x.disp, mgc, 1);
+    XSetForeground(im->x.disp, p->mask->gc, 1);
 
     for(x = 0, i = 0; i < 3; i++) {
-      XSetForeground(im->x.disp, mgc, 1);
-      XFillArc(im->x.disp, p->mask->pixmap, mgc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
-      XDrawArc(im->x.disp, p->mask->pixmap, mgc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      XSetForeground(im->x.disp, p->mask->gc, 1);
+      XFillArc(im->x.disp, p->mask->pixmap, p->mask->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      XDrawArc(im->x.disp, p->mask->pixmap, p->mask->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
       
-      XSetForeground(im->x.disp, gc, bg_colors[i]);
-      XFillArc(im->x.disp, p->image->pixmap, gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
-      XDrawArc(im->x.disp, p->image->pixmap, gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
-      XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
-      XDrawArc(im->x.disp, p->image->pixmap, gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      XSetForeground(im->x.disp, p->image->gc, bg_colors[i]);
+      XFillArc(im->x.disp, p->image->pixmap, p->image->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      XDrawArc(im->x.disp, p->image->pixmap, p->image->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
+      XDrawArc(im->x.disp, p->image->pixmap, p->image->gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
 
       x += w;
     }
   }
 
-  XFreeGC(im->x.disp, mgc);
-  XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 }
 
@@ -1300,8 +1188,6 @@ void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
  *
  */
 void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
-  GC            gc, mgc;
-  XGCValues     gcv;
   int           w;
   int           h;
   
@@ -1312,37 +1198,25 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
 
   XLOCK(im->x.disp);
 
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
-
-  gcv.graphics_exposures = False;
-  mgc = XCreateGC(im->x.disp, p->mask->pixmap, GCGraphicsExposures, &gcv);
-
   /* Draw mask */
-  XSetForeground(im->x.disp, mgc, 0);
-  XFillRectangle(im->x.disp, p->mask->pixmap, mgc, 0, 0, w , h);
+  XSetForeground(im->x.disp, p->mask->gc, 0);
+  XFillRectangle(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, w , h);
   
-  XSetForeground(im->x.disp, mgc, 1);
-  XFillArc(im->x.disp, p->mask->pixmap, mgc, 0, 0, w-1, h-1, (0 * 64), (360 * 64));
+  XSetForeground(im->x.disp, p->mask->gc, 1);
+  XFillArc(im->x.disp, p->mask->pixmap, p->mask->gc, 0, 0, w-1, h-1, (0 * 64), (360 * 64));
   
   /* */
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
-  XFillArc(im->x.disp, p->image->pixmap, gc, 0, 0, w-1, h-1, (0 * 64), (360 * 64));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_gray(im));
+  XFillArc(im->x.disp, p->image->pixmap, p->image->gc, 0, 0, w-1, h-1, (0 * 64), (360 * 64));
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
-  //  XDrawArc(im->x.disp, p->image, gc, 0, 0, w-1, h-1, (30 * 64), (180 * 64));
-  XDrawArc(im->x.disp, p->image->pixmap, gc, 1, 1, w-2, h-2, (30 * 64), (180 * 64));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_white(im));
+  //  XDrawArc(im->x.disp, p->image, p->image->gc, 0, 0, w-1, h-1, (30 * 64), (180 * 64));
+  XDrawArc(im->x.disp, p->image->pixmap, p->image->gc, 1, 1, w-2, h-2, (30 * 64), (180 * 64));
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
-  //  XDrawArc(im->x.disp, p->image, gc, 0, 0, w-1, h-1, (210 * 64), (180 * 64));
-  XDrawArc(im->x.disp, p->image->pixmap, gc, 1, 1, w-3, h-3, (210 * 64), (180 * 64));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_darkgray(im));
+  //  XDrawArc(im->x.disp, p->image, p->image->gc, 0, 0, w-1, h-1, (210 * 64), (180 * 64));
+  XDrawArc(im->x.disp, p->image->pixmap, p->image->gc, 1, 1, w-3, h-3, (210 * 64), (180 * 64));
   
-  XFreeGC(im->x.disp, mgc);
-  XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 }
 
@@ -1350,8 +1224,6 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
  *
  */
 void draw_button_plus(ImlibData *im, xitk_image_t *p) {
-  GC            gc;
-  XGCValues     gcv;
   int           w, h;
   
   assert(im && p);
@@ -1362,19 +1234,12 @@ void draw_button_plus(ImlibData *im, xitk_image_t *p) {
   h = p->height;
   
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
-
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
  
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w >> 1) - 1, 2, (w >> 1) - 1, h - 4);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w + (w >> 1) - 1, 2, w + (w >> 1) - 1, h - 4);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2) + (w >> 1), 3, (w * 2) + (w >> 1), h - 3);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w >> 1) - 1, 2, (w >> 1) - 1, h - 4);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w + (w >> 1) - 1, 2, w + (w >> 1) - 1, h - 4);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) + (w >> 1), 3, (w * 2) + (w >> 1), h - 3);
 
-  XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 }
 
@@ -1382,8 +1247,6 @@ void draw_button_plus(ImlibData *im, xitk_image_t *p) {
  *
  */
 void draw_button_minus(ImlibData *im, xitk_image_t *p) {
-  GC            gc;
-  XGCValues     gcv;
   int           w, h;
   
   assert(im && p);
@@ -1392,19 +1255,12 @@ void draw_button_minus(ImlibData *im, xitk_image_t *p) {
   h = p->height;
   
   XLOCK(im->x.disp);
-#ifdef HAVE_SHM
-  XSync(im->x.disp, False);
-#endif
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
-
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
  
-  XDrawLine(im->x.disp, p->image->pixmap, gc, 2, (h >> 1) - 1, w - 4, (h >> 1) - 1);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, w + 2, (h >> 1) - 1, (w * 2) - 4, (h >> 1) - 1);
-  XDrawLine(im->x.disp, p->image->pixmap, gc, (w * 2) + 3, h >> 1, (w * 3) - 3, h >> 1);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, 2, (h >> 1) - 1, w - 4, (h >> 1) - 1);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, w + 2, (h >> 1) - 1, (w * 2) - 4, (h >> 1) - 1);
+  XDrawLine(im->x.disp, p->image->pixmap, p->image->gc, (w * 2) + 3, h >> 1, (w * 3) - 3, h >> 1);
   
-  XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 }
 

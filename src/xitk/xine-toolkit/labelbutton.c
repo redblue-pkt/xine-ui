@@ -306,7 +306,7 @@ static void paint_labelbutton (xitk_widget_t *w, Window win, GC gc) {
       XLOCK(private_data->imlibdata->x.disp);
       XCopyArea (private_data->imlibdata->x.disp, btn->pixmap, win, lgc, 0, 0,
 		 button_width, skin->height, w->x, w->y);
-      btn->destroy(btn);
+      xitk_image_destroy_xitk_pixmap(btn);
       XFreeGC(private_data->imlibdata->x.disp, lgc);
       XUNLOCK(private_data->imlibdata->x.disp);
     }

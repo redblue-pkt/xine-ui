@@ -132,6 +132,8 @@ typedef struct {
   xitk_list_t                *gfx;
   int                         use_xshm;
 
+  int                        (*x_error_handler)(Display *, XErrorEvent *);
+
   pthread_mutex_t             mutex;
   int                         running;
   xitk_register_key_t         key;
@@ -207,6 +209,37 @@ void xitk_usec_sleep(unsigned long usec) {
 #endif
 }
 
+int _x_error_handler(Display *display, XErrorEvent *xevent) {
+  char buffer[2048];
+  
+  XGetErrorText(display, xevent->error_code, &buffer[0], 1023);
+  
+  XITK_WARNING("X error received: '%s'\n", buffer);
+  
+  xitk_x_error = 1;
+  return 0;
+  
+}
+
+int xitk_install_x_error_handler(void) {
+  if(gXitk->x_error_handler == NULL) {
+    gXitk->x_error_handler = XSetErrorHandler(_x_error_handler);
+    XSync(gXitk->display, False);
+    return 1;
+  }
+  return 0;
+}
+
+int xitk_uninstall_x_error_handler(void) {
+  if(gXitk->x_error_handler != NULL) {
+    XSetErrorHandler(gXitk->x_error_handler);
+    gXitk->x_error_handler = NULL;
+    XSync(gXitk->display, False);
+    return 1;
+  }
+  return 0;
+}
+
 /*
  *
  */
@@ -249,15 +282,17 @@ static void xitk_signal_handler(int sig) {
  */
 static int xitk_check_xshm(Display *display) {
 #ifdef HAVE_SHM
-  int major, minor, ignore;
-  Bool pixmaps;
-  
-  if(XQueryExtension(display, "MIT-SHM", &ignore, &ignore, &ignore)) {
-    if(XShmQueryVersion(display, &major, &minor, &pixmaps ) == True) {
-      if((pixmaps == True) && ((XShmPixmapFormat(display)) == ZPixmap))
-	return 2;
-      else if(pixmaps == True)
-	return 1;
+  if(XShmQueryExtension(display)) {
+    int major, minor, ignore;
+    Bool pixmaps;
+    
+    if(XQueryExtension(display, "MIT-SHM", &ignore, &ignore, &ignore)) {
+      if(XShmQueryVersion(display, &major, &minor, &pixmaps ) == True) {
+	if((pixmaps == True) && ((XShmPixmapFormat(display)) == ZPixmap))
+	  return 2;
+	else if(pixmaps == True)
+	  return 1;
+      }
     }
   }
 #endif
@@ -415,7 +450,7 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
     XLOCK(gXitk->display);
     fx->XA_XITK = XInternAtom(gXitk->display, "_XITK_EVENT", False);
     XChangeProperty (gXitk->display, fx->window, fx->XA_XITK, XA_ATOM,
-		     32, PropModeAppend, (unsigned char *)&VERSION, 1);
+		     32, PropModeAppend, (unsigned char *)&XITK_VERSION, 1);
     XUNLOCK(gXitk->display);
 
   }
@@ -867,6 +902,9 @@ void xitk_xevent_notify(XEvent *event) {
  * Initiatization of widget internals.
  */
 void xitk_init(Display *display) {
+  
+  printf("-[ xiTK version %d.%d.%d ]-\n",
+	 XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
 
   xitk_pid = getppid();
 
@@ -876,17 +914,72 @@ void xitk_init(Display *display) {
 
   gXitk = (__xitk_t *) xitk_xmalloc(sizeof(__xitk_t));
 
-  gXitk->list         = xitk_list_new();
-  gXitk->gfx          = xitk_list_new();
-  gXitk->display      = display;
-  gXitk->key          = 0;
-  gXitk->sig_callback = NULL;
-  gXitk->sig_data     = NULL;
-  gXitk->config       = xitk_config_init();
-  gXitk->use_xshm     = (xitk_config_get_shm_feature(gXitk->config)) ? (xitk_check_xshm(display)) : 0;
-  
+  gXitk->list           = xitk_list_new();
+  gXitk->gfx            = xitk_list_new();
+  gXitk->display        = display;
+  gXitk->key            = 0;
+  gXitk->sig_callback   = NULL;
+  gXitk->sig_data       = NULL;
+  gXitk->config         = xitk_config_init();
+  gXitk->use_xshm       = (xitk_config_get_shm_feature(gXitk->config)) ? (xitk_check_xshm(display)) : 0;
+  xitk_x_error          = 0;
+  gXitk->x_error_handler = NULL;
+
   pthread_mutex_init (&gXitk->mutex, NULL);
-  
+
+  /* Check if SHM is working */
+#ifdef HAVE_SHM
+  if(gXitk->use_xshm) {
+    XImage             *xim;
+    XShmSegmentInfo     shminfo;
+    
+    xim = XShmCreateImage(display, 
+			  (DefaultVisual(display, (DefaultScreen(display)))), 
+			  (DefaultDepth(display, (DefaultScreen(display)))),
+			  ZPixmap, NULL, &shminfo, 10, 10);
+    if(!xim)
+      gXitk->use_xshm = 0;
+    else {
+      shminfo.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
+      if(shminfo.shmid < 0) {
+	XDestroyImage(xim);
+	gXitk->use_xshm = 0;
+      }
+      else {
+	shminfo.shmaddr = xim->data =  shmat(shminfo.shmid, 0, 0);
+	if(shminfo.shmaddr == (char *) -1) {
+	  XDestroyImage(xim);
+	  shmctl(shminfo.shmid, IPC_RMID, 0);
+	  gXitk->use_xshm = 0;
+	}
+	else {
+	  shminfo.readOnly = False;
+	  
+	  xitk_x_error = 0;
+	  xitk_install_x_error_handler();
+	  
+	  XShmAttach(display, &shminfo);
+	  XSync(display, False);
+	  if(xitk_x_error) {
+	    gXitk->use_xshm = 0;
+	    XITK_WARNING("-[ xiTK can't use XShm ]-\n");
+	  }
+	  else {
+	    XShmDetach(display, &shminfo);
+	    printf("-[ xiTK will use XShm ]-\n");
+	  }
+
+	  XDestroyImage(xim);
+	  shmdt(shminfo.shmaddr);
+	  shmctl(shminfo.shmid, IPC_RMID, 0);
+
+	  xitk_uninstall_x_error_handler();
+	  xitk_x_error = 0;
+	}
+      }
+    }
+  }
+#endif
 }
 
 /*

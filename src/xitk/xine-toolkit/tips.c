@@ -211,7 +211,7 @@ static void *_tips_thread(void *data) {
     xitk_window_change_background(tp->w->imlibdata, tp->xwin, bg->pixmap, width, height);
     
     XLOCK(tp->w->imlibdata->x.disp);
-    bg->destroy(bg);
+    xitk_image_destroy_xitk_pixmap(bg);
     XFreeGC(tp->w->imlibdata->x.disp, gc);
     XUNLOCK(tp->w->imlibdata->x.disp);
     
@@ -297,8 +297,10 @@ void xitk_tips_tips_kill(xitk_widget_t *w) {
   if(!w)
     return;
 
-  if(w->tips_thread)
+  if(w->tips_thread) {
     pthread_cancel(w->tips_thread);
+    w->tips_thread = 0;
+  }
   
   /* If there a current tips displayed, kill it */
   _tips_kill_running();
