@@ -979,6 +979,22 @@ int main(int argc, char **argv) {
   
   XLockDisplay (test->display);
 
+#undef DUMP_ATOMS
+#ifdef DUMP_ATOMS
+  {
+    int   i = 1;
+    char *atom_name;
+
+    for(;;i++) {
+      if((atom_name = XGetAtomName(test->display, (Atom)i)))
+	printf("Atom %d: '%s'\n", i, atom_name);
+      else
+	break;
+    }
+  }
+#endif
+
+
   gc = XCreateGC(test->display, 
 		 (xitk_window_get_window(test->xwin)), None, None);
 
