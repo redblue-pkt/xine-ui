@@ -381,6 +381,13 @@ else
 dnl
 dnl Check for DirectFB
 dnl
+
+dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+dnl  DFB:
+dnl  Temporary disabled, port to new API needed
+dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+if test "x" != "x"; then
+
   DIRECTFB_REQUIRED_VERSION=0.9.10
 
   AC_MSG_CHECKING(for DirectFB)
@@ -392,6 +399,8 @@ dnl
   else
     AC_MSG_RESULT([*** All of DIRECTFB dependent parts will be disabled ***])
   fi
+
+fi
 
 fi
 
