@@ -948,7 +948,7 @@ static int __line_wrap(char *s, int pos, int line_size)
 {
   int word_size = 0;
 
-  while( *s && *s != ' ' && *s != '\n' ) {
+  while( *s && *s != '\t' && *s != ' ' && *s != '\n' ) {
     s++;
     word_size++;
   }
@@ -1045,17 +1045,23 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
     p = pobj->api->get_help();
     
     do {
+      char c;
       hbuf  = (char **) realloc(hbuf, sizeof(char *) * (lines + 2));
 
       hbuf[lines]    = malloc(BROWSER_LINE_WIDTH+1);
       hbuf[lines+1]  = NULL;
 
-      for(i = 0; !__line_wrap(p,i,BROWSER_LINE_WIDTH) && *p && *p != '\n'; i++)
-        hbuf[lines][i] = *p++;
+      for(i = 0; !__line_wrap(p,i,BROWSER_LINE_WIDTH) && (c = *p++) != 0 && c != '\n'; i++)
+	if (c == '\t') {
+	  do {
+	    hbuf[lines][i] = ' ';
+	  } while (++i & 7 && i < BROWSER_LINE_WIDTH);
+	  --i; /* allow for loop increment */
+        }
+	else
+	  hbuf[lines][i] = c;
 
       hbuf[lines][i] = '\0';
-      if( *p && (*p == '\n' || *p == ' ') )
-        p++;
 
       lines++;
     } while( *p );

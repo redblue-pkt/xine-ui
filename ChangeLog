@@ -1,4 +1,5 @@
   * use UTF-8 for Japanese locale if nl_langinfo doesn't work [bug #1096974]
+  * expand tabs in post-plugin help
 
 xine-ui (0.99.3) unstable; urgency=low
   * enlarge stream info window (required for Russian translation),
