@@ -1,6 +1,6 @@
 Please Note:
 
-The 'opengl' output plugin is still in a very early alpha stage.
+The 'opengl' output plugin is still in alpha stage.
 Expect crashes and strange behaviour.
 Most times it seems to run fine, though.
 
@@ -8,9 +8,9 @@ Most times it seems to run fine, though.
 Startup
 -------
 
-Start xine with '-V opengl'. If this fails, xine will tell you which
-visual it wants to use. Now start xine with '-V opengl --visual xyz', xyz
-being the visual xine told you.
+Start xine with '-V opengl'.  Note that xine might choose a visual with a
+different color depth than you would prefer.  Choose an appropriate visual
+with 'glxinfo' and select it with '-V opengl --visual xyz' in this case.
 
 
 Known Problems
@@ -22,9 +22,9 @@ Known Problems
   This seems to relate to some race conditions that are still present
   in the current code. This will change in time.
 
-* The overlays (and controls) look odd
-
-  The overlays still seem to be interpreted as YUV, not as RGB right now.
+  Jun. 25, 2002: I think this issue is resolved now.  If you still encounter
+  any problems, please let me know.  Otherwise I will remove this statement
+  in the future.
 
 * There is a (small) memory leak
 
@@ -39,17 +39,6 @@ Known Problems
   Background: The OpenGL context can only be used by the render thread and
   not by the GUI thread. I tried to use a second context within the same
   drawable, but this destabilized the plugin to an unusable state.
-
-* The scaled output looks blocky
-
-  Currently the plugin uses glDrawPixels() which does not interpolate.
-  This will be changed in the near future. Using textures should be faster
-  as well.
-
-* I don't want to select the visual myself
-
-  This will be changed in the future. In the xine context, it is
-  nontrivial, though.
 
 
 Matthias Hopf <mat@mshopf.de>
