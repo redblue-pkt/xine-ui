@@ -437,7 +437,8 @@ void setup_handle_event(XEvent *event, void *data) {
     xitk_widget_t *w = (xitk_widget_t *) xitk_list_first_content (setup->widget_list->l);
     
     while (w) {
-      xitk_combo_update_pos(w);
+      if(w->widget_type & WIDGET_TYPE_COMBO)
+	xitk_combo_update_pos(w);
       w = (xitk_widget_t *) xitk_list_next_content (setup->widget_list->l);
     }
   }

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-11-24 01:38+0100\n"
+"POT-Creation-Date: 2001-11-26 13:42+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,21 +47,21 @@ msgstr ""
 msgid "Dismiss"
 msgstr ""
 
-#: src/xitk/event.c:842
+#: src/xitk/event.c:846
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
 
-#: src/xitk/event.c:852
+#: src/xitk/event.c:856
 msgid "Cannot open display\n"
 msgstr ""
 
-#: src/xitk/event.c:886
+#: src/xitk/event.c:890
 msgid "Unable to initialize Imlib\n"
 msgstr ""
 
-#: src/xitk/event.c:896
+#: src/xitk/event.c:900
 #, c-format
 msgid "Unable to load %s logo\n"
 msgstr ""
@@ -74,12 +74,12 @@ msgstr ""
 msgid "Select"
 msgstr ""
 
-#: src/xitk/kbindings.c:311
+#: src/xitk/kbindings.c:313
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr ""
 
-#: src/xitk/kbindings.c:667
+#: src/xitk/kbindings.c:669
 msgid "OOCH: key binding table is NULL.\n"
 msgstr ""
 
@@ -335,10 +335,10 @@ msgstr ""
 msgid "File '%s' written.\n"
 msgstr ""
 
-#: src/xitk/setup.c:652
+#: src/xitk/setup.c:928
 msgid "xine setup"
 msgstr ""
 
-#: src/xitk/setup.c:674
+#: src/xitk/setup.c:982
 msgid "Close"
 msgstr ""

@@ -30,6 +30,7 @@
 #ifndef __sun
 #define _XOPEN_SOURCE 500
 #endif
+#define _BSD_SOURCE 1
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,8 +39,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 #include <errno.h>
 #include <aalib.h>
 
@@ -67,6 +68,16 @@ typedef struct {
   int               current_mrl;
   int               running;
   int               auto_quit;
+  
+  struct {
+    int                enable;
+    int                caps;
+    int                volume_mixer;
+    int                volume_level;
+    int                mute;
+  } mixer;
+
+
 #ifdef DEBUG
   int               debug_level;
 #endif
@@ -281,6 +292,7 @@ int main(int argc, char *argv[]) {
   char          *configfile;
   char          *audio_driver_id = NULL;
   int            audio_channel   = 0;
+  char          *driver_name;
 
   /*
    * Check xine library version 
@@ -381,16 +393,16 @@ int main(int argc, char *argv[]) {
    * generate and init a config "object"
    */
   {
-    char *homedir;
-
-    homedir = strdup(xine_get_homedir());
-    configfile = (char *) xine_xmalloc(strlen(homedir) + 8 + 1);
-
-    sprintf (configfile, "%s/.xinerc", homedir);
+    char *cfgfile = ".xine/config";
+    
+    if (!(configfile = getenv("XINERC"))) {
+      configfile = (char *) xine_xmalloc((strlen((xine_get_homedir())) + strlen(cfgfile))+2);
+      sprintf(configfile, "%s/%s", (xine_get_homedir()), cfgfile);
+    }
+      
   }
 
   aaxine.config = config_file_init (configfile);
-  aaxine.config->save(aaxine.config);
 
   /*
    * Initialize AALib
@@ -430,19 +442,20 @@ int main(int argc, char *argv[]) {
   /*
    * init audio output driver
    */
+  driver_name = aaxine.config->register_string (aaxine.config, "audio.driver", "oss",
+						"audio driver to use",
+						NULL, NULL, NULL);
   if(!audio_driver_id)
-    audio_driver_id = aaxine.config->register_string(aaxine.config, 
-						     "audio.driver", "oss",
-						     "Audio driver id",
-						     NULL, NULL, NULL);
-    
-  aaxine.ao_driver = xine_load_audio_output_plugin(aaxine.config,
-						   audio_driver_id);
-		    
+    audio_driver_id = driver_name;
+  else
+    aaxine.config->update_string (aaxine.config, "audio.driver", audio_driver_id);
+  
+  aaxine.ao_driver = xine_load_audio_output_plugin(aaxine.config, audio_driver_id);
+
   if (!aaxine.ao_driver) {
     printf ("main: audio driver %s failed\n", audio_driver_id);
   }
-
+  
   /*
    * xine init
    */
@@ -455,7 +468,34 @@ int main(int argc, char *argv[]) {
     goto failure;
   }
 
+  /* Init mixer control */
+  aaxine.mixer.enable = 0;
+  aaxine.mixer.caps = xine_get_audio_capabilities(aaxine.xine);
+
+  if(aaxine.mixer.caps & AO_CAP_PCM_VOL)
+    aaxine.mixer.volume_mixer = AO_PROP_PCM_VOL;
+  else if(aaxine.mixer.caps & AO_CAP_MIXER_VOL)
+    aaxine.mixer.volume_mixer = AO_PROP_MIXER_VOL;
+  
+  if(aaxine.mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+    aaxine.mixer.enable = 1;
+    aaxine.mixer.volume_level = xine_get_audio_property(aaxine.xine, aaxine.mixer.volume_mixer);
+  }
+  
+  if(aaxine.mixer.caps & AO_CAP_MUTE_VOL) {
+    aaxine.mixer.mute = xine_get_audio_property(aaxine.xine, AO_PROP_MUTE_VOL);
+  }
+
+
+  /* Select audio channel */
   xine_select_audio_channel (aaxine.xine, audio_channel);
+
+  /* Kick off terminal pollution */
+#ifndef DEBUG
+  close(0);
+  close(1);
+  close(2);
+#endif
 
   /*
    * ui loop
@@ -523,7 +563,6 @@ int main(int argc, char *argv[]) {
 
     case 'q':
     case 'Q':
-      xine_exit (aaxine.xine);
       aaxine.running = 0;
       break;
       
@@ -545,6 +584,40 @@ int main(int argc, char *argv[]) {
     case 's':
     case 'S':
       xine_stop (aaxine.xine);
+      break;
+
+    case 'V':
+      if(aaxine.mixer.enable) {
+	if(aaxine.mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+	  if(aaxine.mixer.volume_level < 100) {
+	    aaxine.mixer.volume_level++;
+	    xine_set_audio_property(aaxine.xine, 
+				    aaxine.mixer.volume_mixer, aaxine.mixer.volume_level);
+	  }
+	}
+      }
+      break;
+
+    case 'v':
+      if(aaxine.mixer.enable) {
+	if(aaxine.mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+	  if(aaxine.mixer.volume_level > 0) {
+	    aaxine.mixer.volume_level--;
+	    xine_set_audio_property(aaxine.xine, 
+				    aaxine.mixer.volume_mixer, aaxine.mixer.volume_level);
+	  }
+	}
+      }
+      break;
+
+    case 'm':
+    case 'M':
+      if(aaxine.mixer.enable) {
+	if(aaxine.mixer.caps & AO_CAP_MUTE_VOL) {
+	  aaxine.mixer.mute = !aaxine.mixer.mute;
+	  xine_set_audio_property(aaxine.xine, AO_PROP_MUTE_VOL, aaxine.mixer.mute);
+	}
+      }
       break;
 
     case '1':
@@ -583,12 +656,12 @@ int main(int argc, char *argv[]) {
 
  failure:
   
-  if(aaxine.xine)
-    xine_exit(aaxine.xine); 
-
   if(aaxine.config) 
     aaxine.config->save(aaxine.config);
-
+  
+  if(aaxine.xine)
+    xine_exit(aaxine.xine); 
+  
   if(aaxine.context) {
     aa_showcursor(aaxine.context);
     aa_uninitkbd(aaxine.context);

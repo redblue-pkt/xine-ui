@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.4\n"
-"POT-Creation-Date: 2001-11-24 01:38+0100\n"
+"POT-Creation-Date: 2001-11-26 13:42+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -47,7 +47,7 @@ msgstr "Choix de peaux"
 msgid "Dismiss"
 msgstr "Quitte"
 
-#: src/xitk/event.c:842
+#: src/xitk/event.c:846
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -55,15 +55,15 @@ msgstr ""
 "\n"
 "XInitThreads a échoué - il semble que vous ne possédez pas une xlib sûre.\n"
 
-#: src/xitk/event.c:852
+#: src/xitk/event.c:856
 msgid "Cannot open display\n"
 msgstr "Ne peux pas ouvrir l'affichage.\n"
 
-#: src/xitk/event.c:886
+#: src/xitk/event.c:890
 msgid "Unable to initialize Imlib\n"
 msgstr "Impossible d'initialiser Imlib.\n"
 
-#: src/xitk/event.c:896
+#: src/xitk/event.c:900
 #, c-format
 msgid "Unable to load %s logo\n"
 msgstr "Impossible de charger le logo %s.\n"
@@ -76,12 +76,12 @@ msgstr "Brouteur de fichier de Xine"
 msgid "Select"
 msgstr "Prends"
 
-#: src/xitk/kbindings.c:311
+#: src/xitk/kbindings.c:313
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Les sequences de touches '%s' et '%s' sont similaires.\n"
 
-#: src/xitk/kbindings.c:667
+#: src/xitk/kbindings.c:669
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Ouille: le table de séquences de touche est NULLE.\n"
 
@@ -357,10 +357,10 @@ msgstr "Échec a l'ouverture du fichier (%s)\n"
 msgid "File '%s' written.\n"
 msgstr "Le fichier '%s' a été crée.\n"
 
-#: src/xitk/setup.c:652
+#: src/xitk/setup.c:928
 msgid "xine setup"
 msgstr "Reglage de Xine"
 
-#: src/xitk/setup.c:674
+#: src/xitk/setup.c:982
 msgid "Close"
 msgstr "Fermer"

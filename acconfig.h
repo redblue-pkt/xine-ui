@@ -1,3 +1,6 @@
+#ifndef _CONFIG_H_
+#define _CONFIG_H_
+
 /* Define this if you're running x86 architecture */
 #undef __i386__
 
@@ -53,3 +56,5 @@
 
 /* Path where catalog files will be. */
 #undef XITK_LOCALE
+
+#endif

@@ -238,7 +238,6 @@ void init_skins_support(void) {
   skin = gGui->config->register_string (gGui->config, "gui.skin", DEFAULT_SKIN,
 					"gui skin theme", 
 					NULL, NULL, NULL);
-
   sk = get_skin_location(skin);
 
   memset(&buf, 0, sizeof(buf));

@@ -77,6 +77,7 @@ make install-strip DESTDIR=$RPM_BUILD_ROOT
 
 %post
 #/sbin/ldconfig
+if test -d @XINE_SKINDIR@/metal; then rm -rf @XINE_SKINDIR@/metal; fi
 if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/xinetic @XINE_SKINDIR@/default; fi
 # Icons
 if test ! -d /usr/share/icons; then 
