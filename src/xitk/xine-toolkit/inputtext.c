@@ -152,13 +152,13 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
   return (*modifier != MODIFIER_NOMOD);
 }
 
-int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[]) {
+int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen) {
   int len = 0;
   if(event) {
     XKeyEvent  pkeyev = event->xkey;
     
     XLOCK(pkeyev.display);
-    len = XLookupString(&pkeyev, kbuf, sizeof(kbuf), ksym, NULL);
+    len = XLookupString(&pkeyev, kbuf, kblen, ksym, NULL);
     XUNLOCK(pkeyev.display);
   }
   return len;
@@ -172,7 +172,7 @@ KeySym xitk_get_key_pressed(XEvent *event) {
   
   if(event) {
     char  buf[256];
-    (void) xitk_get_keysym_and_buf(event, &pkey, buf);
+    (void) xitk_get_keysym_and_buf(event, &pkey, buf, sizeof(buf));
   }
 
   return pkey;
@@ -868,7 +868,7 @@ static void notify_keyevent_inputtext(xitk_widget_t *w, XEvent *xev) {
 
     private_data->have_focus = FOCUS_RECEIVED;
 
-    len = xitk_get_keysym_and_buf(xev, &key, buf);
+    len = xitk_get_keysym_and_buf(xev, &key, buf, sizeof(buf));
     buf[len] = '\0';
 
     (void) xitk_get_key_modifier(xev, &modifier);

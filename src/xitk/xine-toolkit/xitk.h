@@ -1540,7 +1540,7 @@ void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned lo
  * define ksym
  * kbuf should be large enought (256 usually)
  */
-int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[]);
+int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[], int kblen);
 
 /**
  * return keypressed
