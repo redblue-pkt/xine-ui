@@ -494,6 +494,11 @@ void xitk_font_draw_string(xitk_font_t *xtfs, Pixmap pix, GC gc,
 			   int x, int y, const char *text, 
 			   size_t nbytes) {
 
+#ifdef DEBUG
+  if (nbytes > strlen(text) + 1) {
+    XITK_WARNING("draw: %d > %d\n", nbytes, strlen(text));
+  }
+#endif
 #ifdef WITH_XMB
   XmbDrawString(xtfs->display, pix, xtfs->fontset, gc, x, y, 
 		text, nbytes);
@@ -682,6 +687,12 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, char *c, int maxnbytes, int *nb
  */
 void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent) {
+
+#ifdef DEBUG
+  if (nbytes > strlen(c) + 1) {
+    XITK_WARNING("extent: %d > %d\n", nbytes, strlen(c));
+  }
+#endif
 #ifdef WITH_XMB
   XRectangle logic;
 
@@ -694,6 +705,10 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   if (rbearing) *rbearing = 0;
 
   if (nbytes <= 0) {
+#ifdef DEBUG
+    if (nbytes < 0)
+      XITK_WARNING("nbytes < 0\n");
+#endif
     if (width) *width     = 0;
     if (ascent) *ascent   = 0;
     if (descent) *descent = 0;

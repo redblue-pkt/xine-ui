@@ -498,6 +498,7 @@ static int notify_click_inputtext(xitk_widget_t *w, int button, int bUp, int x, 
     if((p = private_data->text)) {
       xitk_font_t *fs = NULL;
       int          width = 0, i = 1;
+      int          max_len;
       
       p += private_data->disp_offset;
 
@@ -511,6 +512,11 @@ static int notify_click_inputtext(xitk_widget_t *w, int button, int bUp, int x, 
 	XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
       
       xitk_font_set_font(fs, w->wl->gc);
+      
+      max_len = xitk_font_get_text_width(fs, p, strlen(p));
+      
+      if(pos > max_len)
+	pos = max_len + 1;
       
       while(width < pos) {
 	width = xitk_font_get_text_width(fs, p, i);
