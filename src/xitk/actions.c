@@ -76,6 +76,13 @@ void reparent_all_windows(void) {
 
 }
 
+void wait_for_window_visible(Display *display, Window window) {
+  int t = 0;
+
+  while((!xitk_is_window_visible(display, window)) && (++t < 3))
+    xine_usec_sleep(5000);
+}
+
 void raise_window(Window window, int visible, int running) {
   if(window) {
     if(visible && running) {
@@ -87,6 +94,7 @@ void raise_window(Window window, int visible, int running) {
 
 void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible, int running) {
   if(window && (*visible) && running) {
+
     XLockDisplay(gGui->display);
     if(gGui->use_root_window) {
       if(xitk_is_window_visible(gGui->display, window))
@@ -103,17 +111,21 @@ void toggle_window(Window window, xitk_widget_list_t *widget_list, int *visible,
       XUnmapWindow(gGui->display, window);
     }
     XUnlockDisplay(gGui->display);
+
   }
   else {
     if(running) {
       *visible = 1;
       xitk_show_widgets(widget_list);
+
       XLockDisplay(gGui->display);
       XRaiseWindow(gGui->display, window);
       XMapWindow(gGui->display, window);
       if(!gGui->use_root_window && gGui->video_display == gGui->display)
         XSetTransientForHint (gGui->display, window, gGui->video_window);
       XUnlockDisplay(gGui->display);
+
+      wait_for_window_visible(gGui->display, window);
       layer_above_video(window);
     }
   }
@@ -156,10 +168,8 @@ int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *len
  *
  */
 void try_to_set_input_focus(Window window) {
-  int t = 0;
 
-  while((!xitk_is_window_visible(gGui->display, window)) && (++t < 3))
-    xine_usec_sleep(5000);
+  wait_for_window_visible(gGui->display, window);
   
   if(xitk_is_window_visible(gGui->display, window)) {
     XLockDisplay (gGui->display);

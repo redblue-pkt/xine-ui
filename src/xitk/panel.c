@@ -300,6 +300,7 @@ void panel_update_runtime_display(void) {
     return;
 
   if(!gui_xine_get_pos_length(gGui->stream, &pos, &seconds, &length)) {
+
     if((gGui->stream_length.pos || gGui->stream_length.time) && gGui->stream_length.length) {
       pos     = gGui->stream_length.pos;
       seconds = gGui->stream_length.time;
@@ -307,6 +308,7 @@ void panel_update_runtime_display(void) {
     }
     else
       return;
+
   }
 
   if(pos || seconds) {
@@ -456,44 +458,45 @@ static void *slider_loop(void *dummy) {
 	      
 	    }
 	  }  
+	}
+
+	if(gGui->logo_mode == 0) {
 	  
-	  if(gGui->logo_mode == 0) {
+	  if(panel_is_visible()) {
+
+	    panel_update_runtime_display();
 	    
-	    if(panel_is_visible()) {
-	      
-	      panel_update_runtime_display();
-	      
-	      if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
-		if(pos >= 0)
-		  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
-	      }
-	      
-	      if(!(i % 20)) {
-		int level = 0;
-		
-		panel_update_channel_display();
-		
-		if((gGui->mixer.method == SOUND_CARD_MIXER) &&
-		   (gGui->mixer.caps & MIXER_CAP_VOL)) {
-		  level = gGui->mixer.volume_level = 
-		    xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-		}
-		else if(gGui->mixer.method == SOFTWARE_MIXER) {
-		  level = gGui->mixer.amp_level = 
-		    xine_get_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL);
-		}
-		
-		xitk_slider_set_pos(panel->mixer.slider, level);
-		panel_check_mute();
-		
-		i = 0;
-	      }
-	      
+	    if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+	      if(pos >= 0)
+		xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 	    }
 	    
-	    if(stream_infos_is_visible() && gGui->stream_info_auto_update)
-	      stream_infos_update_infos();
+	    if(!(i % 20)) {
+	      int level = 0;
+	      
+	      panel_update_channel_display();
+	      
+	      if((gGui->mixer.method == SOUND_CARD_MIXER) &&
+		 (gGui->mixer.caps & MIXER_CAP_VOL)) {
+		level = gGui->mixer.volume_level = 
+		  xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
+	      }
+	      else if(gGui->mixer.method == SOFTWARE_MIXER) {
+		level = gGui->mixer.amp_level = 
+		  xine_get_param(gGui->stream, XINE_PARAM_AUDIO_AMP_LEVEL);
+	      }
+	      
+	      xitk_slider_set_pos(panel->mixer.slider, level);
+	      panel_check_mute();
+	      
+	      i = 0;
+	    }
+	    
 	  }
+	  
+	  if(stream_infos_is_visible() && gGui->stream_info_auto_update)
+	    stream_infos_update_infos();
+
 	}
       }
     }
@@ -618,9 +621,10 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
     XRaiseWindow(gGui->display, gGui->panel_window); 
     XMapWindow(gGui->display, gGui->panel_window); 
     if(!gGui->use_root_window && gGui->video_display == gGui->display)
-      XSetTransientForHint (gGui->display,  gGui->panel_window, gGui->video_window);
+      XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay (gGui->display);
 
+    wait_for_window_visible(gGui->display, gGui->panel_window);
     layer_above_video(gGui->panel_window);
      
     if(gGui->cursor_grabbed) {
@@ -674,6 +678,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 	panel_update_runtime_display();
       }
+
       panel_update_mrl_display();
     }
     
