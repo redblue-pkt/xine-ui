@@ -173,6 +173,10 @@ void video_window_hide_logo(void) {
     XClearWindow (gGui->display, gGui->video_window);
 
     /* Force ConfigureNotify event */
+    /* 
+     *   no longer needed, video_out_xv repaints it's colorkey now on
+     * GUI_DATA_EX_LOGO_VISIBILITY 
+     *
     {
       Window        rootwin;
       int           xwin, ywin;
@@ -185,6 +189,7 @@ void video_window_hide_logo(void) {
 	XMoveResizeWindow (gGui->display, gGui->video_window, xwin, ywin, wwin, hwin);
       }
     }
+    */
     
     gGui->vo_driver->gui_data_exchange(gGui->vo_driver, GUI_DATA_EX_LOGO_VISIBILITY, (int *)0);
 #endif
