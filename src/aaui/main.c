@@ -864,15 +864,18 @@ int main(int argc, char *argv[]) {
   if(aaxine.xine) 
     xine_config_save(aaxine.xine, aaxine.configfile);
   
-  xine_close(aaxine.stream);
-  xine_event_dispose_queue(aaxine.event_queue);
-  xine_dispose(aaxine.stream);
+  if(aaxine.stream) {
+    xine_close(aaxine.stream);
+    xine_event_dispose_queue(aaxine.event_queue);
+    xine_dispose(aaxine.stream);
+  }
 
   if(aaxine.xine)
     xine_exit(aaxine.xine); 
 
-  xine_close_video_driver(aaxine.xine, aaxine.vo_port);
-
+  if(aaxine.vo_port)
+    xine_close_video_driver(aaxine.xine, aaxine.vo_port);
+  
   if(aaxine.ao_port)
     xine_close_audio_driver(aaxine.xine, aaxine.ao_port);
   
@@ -881,7 +884,7 @@ int main(int argc, char *argv[]) {
     aa_uninitkbd(aaxine.context);
     aa_close(aaxine.context);
   }
-
+  
   if(aaxine.configfile)
     free(aaxine.configfile);
 
