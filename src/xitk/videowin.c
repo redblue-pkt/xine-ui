@@ -405,7 +405,8 @@ void video_window_adapt_size (int video_width, int video_height,
   if (wm_hint != NULL) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
-    wm_hint->flags = InputHint | StateHint;
+    wm_hint->icon_pixmap = gGui->icon;
+    wm_hint->flags = InputHint | StateHint | IconPixmapHint;
     XSetWMHints(gGui->display, gGui->video_window, wm_hint);
     XFree(wm_hint);
   }
