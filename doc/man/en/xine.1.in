@@ -32,7 +32,7 @@ Show summary of options and available output drivers (plugins).
 Select the given audio channel. <num> is the audio channel number, default
 is "0".
 .br
-xine 0.5 and newer tries it's best to collect all valid audio channels
+xine 0.5 and newer tries its best to collect all valid audio channels
 (ac3, mpeg audio, avi audio, ...) from the stream and maps them
 to "virtual channels" with channel numbers starting at 0.
 .TP
