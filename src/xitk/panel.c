@@ -290,14 +290,16 @@ static void *slider_loop(void *dummy) {
 	    }
 	  }
 	  
-	  if((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE))) {
-	    if(!xitk_is_widget_enabled(panel->playback_widgets.slider_play))
-	      xitk_enable_widget(panel->playback_widgets.slider_play);
-	  }
-	  else {
-	    if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
-	      xitk_slider_reset(panel->playback_widgets.slider_play);
-	      xitk_disable_widget(panel->playback_widgets.slider_play);
+	  if(gGui->playlist.num) {
+	    if((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE))) {
+	      if(!xitk_is_widget_enabled(panel->playback_widgets.slider_play))
+		xitk_enable_widget(panel->playback_widgets.slider_play);
+	    }
+	    else {
+	      if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+		xitk_slider_reset(panel->playback_widgets.slider_play);
+		xitk_disable_widget(panel->playback_widgets.slider_play);
+	      }
 	    }
 	  }
 	}
@@ -1125,9 +1127,13 @@ void panel_init (void) {
   sl.motion_userdata   = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(panel->widget_list)), 
     (panel->playback_widgets.slider_play = xitk_slider_create(panel->widget_list, gGui->skin_config, &sl)));
+
   xitk_set_widget_tips(panel->playback_widgets.slider_play, _("Stream playback position slider"));
   xitk_slider_reset(panel->playback_widgets.slider_play);
-
+  
+  if(!gGui->playlist.num)
+    xitk_disable_widget(panel->playback_widgets.slider_play);
+  
   /* Mixer volume slider */
   sl.skin_element_name = "SliderVol";
   sl.min               = 0;
@@ -1231,7 +1237,7 @@ void panel_init (void) {
   
   if(gGui->use_root_window && (!panel->visible))
     panel->visible = 1;
-
+  
   if (panel->visible) {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window); 
