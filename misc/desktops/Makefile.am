@@ -8,7 +8,7 @@ pixmap_DATA = xine_16x16.png \
 	xine_48x48.png \
 	xine.xpm
 
-desktopdir = $(datadir)/gnome/share/Multimedia
+desktopdir = $(datadir)/xine/desktop
 desktop_DATA = xine.desktop
 
 

@@ -5,8 +5,8 @@
 %define major   1
 %define libname libxine%{major}
 
-%define skindir	 %(_datadir}/xine/skins
-%define deskdir	 %(_datadir}/xine/desktop
+%define skindir	 %{_datadir}/xine/skins
+%define deskdir	 %{_datadir}/xine/desktop
 
 %define	ginstall install -c
 
