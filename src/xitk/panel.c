@@ -561,28 +561,28 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
      * We should rather test whether screen size has changed
      * and move the panel on screen if it doesn't fit any longer */
     fullscreen = video_window_get_fullscreen_mode();
-    if (((!(fullscreen & WINDOWED_MODE)) 
+    if (((!(fullscreen & (WINDOWED_MODE | FULLSCR_MODE)))
 #ifdef HAVE_XINERAMA
-	 && (!(fullscreen & FULLSCR_XI_MODE))
+	 && (fullscreen & FULLSCR_XI_MODE)
 #endif
 	 )
 #ifdef HAVE_XF86VIDMODE
-        || gGui->XF86VidMode_fullscreen
+	|| gGui->XF86VidMode_fullscreen
 #endif
 	) {
-    /*
-     * necessary to place the panel in a visible area (otherwise it might
-     * appear off the video window while switched to a differenti
-     * modeline or tv mode)
-     */
+      /*
+       * necessary to place the panel in a visible area (otherwise it might
+       * appear off the video window while switched to a different
+       * modeline or tv mode)
+       */
       XLockDisplay (gGui->display);
       XMoveWindow(gGui->display, gGui->panel_window, 40, 40);
       XUnlockDisplay (gGui->display);
     }
-
+    
     if(gGui->logo_mode == 0) {
       int pos;
-
+      
       if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
 	if(gui_xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
 	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
