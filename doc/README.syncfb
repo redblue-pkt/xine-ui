@@ -223,7 +223,21 @@
   way to avoid it. Yet, like stated earlier, it is truely  harmless  and
   just a cosmetical side effect.
 
+
+* THE XINE PANEL DOES NOT APPEAR WHEN I WATCH A MOVIE IN FULLSCREEN?!
+
+  Actually it does appear - you just don't see it. :)     This is a side
+  effect of how SyncFB works.  The X server can't display anything where
+  the actual overlay from SyncFB is being displayed because this area in
+  your video memory is constantly over written - so are the changes done
+  by your X Server (like a window graphic that is placed there).
   
+  This is just cosmetical and harmless, so no need to worry. If you want
+  to do something with the xine panel when the video overlay  is  taking
+  all your screen, just switch back to window mode and do  what you have
+  to do and after that, back to fullscreen it goes. :-)
+
+
 * KNOWN BUGs
 
   + the default_repeat config option is currently hardcoded to 0 because
