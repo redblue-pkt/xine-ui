@@ -5,14 +5,14 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.18\n"
-"POT-Creation-Date: 2003-12-23 17:17+0100\n"
-"PO-Revision-Date: 2003-12-17 12:17+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-12-23 22:47+0100\n"
+"PO-Revision-Date: 2003-12-23 23:51+0100\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Report-Msgid-Bugs-To: \n"
 
 #: src/xitk/actions.c:341
 #, c-format
@@ -1048,6 +1048,13 @@ msgid ""
 "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
 msgstr ""
+"  -p, --auto-play [opt]        Pøi startu zaèít pøehrávat. Mù¾e následovat:\n"
+"                    'f': v celoobrazovkovém re¾imu.\n"
+"                    'h': skrýt GUI (panel, atd.).\n"
+"                    'w': skrýt okno s videem.\n"
+"                    'q': skonèit, kdy¾ skonèí pøehrávání.\n"
+"                    'd': získat playlist z DVD. (radìji pou¾ijte -s DVD)\n"
+"                    'v': získat playlist z VCD. (radìji pou¾ijte -s VCD)\n"
 
 #: src/xitk/main.c:605
 msgid "                    'F': in xinerama fullscreen mode.\n"
@@ -1082,14 +1089,13 @@ msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-lirc                Vypnout podporu LIRC.\n"
 
 #: src/xitk/main.c:617
-#, fuzzy
 msgid ""
 "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
 "                               is either an X11 visual class, or a visual "
 "id.\n"
 msgstr ""
-"                               Jde buï o tøídu zobrazení X11 nebo id. "
-"obrazovky.\n"
+"      --visual <tøída-nebo-id> Pou¾ít uvedené zobrazení X11.\n"
+"                               Jde buï o tøídu zobrazení X11 nebo id. obrazovky.\n"
 
 #: src/xitk/main.c:619
 msgid "      --install                Install a private colormap.\n"
@@ -1107,6 +1113,12 @@ msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
 msgstr ""
+"      --keymap [=volba]        Zobrazit mapu klávesnice. Volby jsou:\n"
+"                                 'default': zobrazit implicitní mapu klávesnice,\n"
+"                                 'lirc': zobrazit vzorový konfiguraèní soubor .lircrc.\n"
+"                                 'remapped': u¾ivatelem pozmìnìnou mapu klávesnice.\n"
+"                                 'file:<soubor>': pou¾ít <soubor> jako mapu klávesnice.\n"
+"                                 -jestli¾e není zadána ¾ádná volba, je vybráno 'default'.\n"
 
 #: src/xitk/main.c:626
 msgid "  -n, --network                Enable network remote control server.\n"
@@ -1129,14 +1141,13 @@ msgid "  -B, --borderless             Borderless video output window.\n"
 msgstr "  -B, --borderless             Výstupní okno s videem bez okrajù\n"
 
 #: src/xitk/main.c:630
-#, fuzzy
 msgid ""
 "  -N, --animation <mrl>        Specify mrl to play when video output isn't "
 "used.\n"
 "                                 -can be used more than one time.\n"
 msgstr ""
-"  -N, --animation <MRL>        Specifikování MRL, které se má pøehrát, kdy¾ "
-"není aktivní videovýstup.\n"
+"  -N, --animation <MRL>        Specifikování MRL, které se má pøehrát, kdy¾ není pou¾it výstup videa.\n"
+"                                 -mù¾e být pou¾ito více ne¾ jednou.\n"
 
 #: src/xitk/main.c:632
 msgid "  -P, --playlist <filename>    Load a playlist file.\n"
@@ -1153,13 +1164,17 @@ msgid ""
 "                                 'shuffle+': same as 'shuffle', but "
 "indefinetely replay the playlist.\n"
 msgstr ""
+"  -l, --loop [=re¾im]          Nastavit re¾im opakování playlistu (implicitnì: loop). Re¾imy jsou:\n"
+"                                 'loop': opakovat celý playlist.\n"
+"                                 'repeat': opakovat aktuální polo¾ku playlistu.\n"
+"                                 'shuffle': náhodnì vybrat zatím nepøehranou polo¾ku playlistu.\n"
+"                                 'shuffle+': stejnì jako 'shuffle', ale do nekoneèna pøehrávat playlist.\n"
 
 #: src/xitk/main.c:638
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
 msgstr "      --skin-server-url <URL>  Definovat URL serveru se skiny.\n"
 
 #: src/xitk/main.c:639
-#, fuzzy
 msgid ""
 "      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
 msgstr ""
@@ -1196,6 +1211,27 @@ msgid ""
 "                    play, slow2, slow4, pause, fast2,\n"
 "                    fast4, stop, quit, fullscreen, eject.\n"
 msgstr ""
+"  -S, --session <volba1,volba2,...>\n"
+"                               Správa relací. Volby mohou být:\n"
+"                    session=n   specifikování èísla relace <n>,\n"
+"                    mrl=m       pøidat MRL <m> do playlistu,\n"
+"                    audio=k     vybrat zvukový kanál (<k>: 'next' nebo 'prev'),\n"
+"                    spu=k       vybrat kanál s titulky (<k>: 'next' nebo 'prev'),\n"
+"                    volume=v    nastavit hlasitost zvuku,\n"
+"                    amp=v       nastavit úroveò zesílení\n"
+"                    loop=r      nastavit re¾im opakování (<r>: 'none' 'loop' 'repeat' 'shuffle' nebo 'shuffle+'),\n"
+"                    (playlist|pl)=p\n"
+"                                 <p> mù¾e být:\n"
+"                                   'clear'  vyèistit playlist,\n"
+"                                   'first'  pøehrát první polo¾ku playlistu,\n"
+"                                   'prev'   pøehrát pøedchozí polo¾ku playlistu,\n"
+"                                   'next'   pøehrát dal¹í polo¾ku playlistu,\n"
+"                                   'last'   pøehrát poslední polo¾ku playlistu,\n"
+"                                   'load:s' naèíst soubor playlistu <s>.\n"
+"                                   'stop'   na konci zastavit pøehrávání.\n"
+"                                   'cont'   na konci pokraèovat v pøehrávání.\n"
+"                    play, slow2, slow4, pause, fast2,\n"
+"                    fast4, stop, quit, fullscreen, eject.\n"
 
 #: src/xitk/main.c:661
 msgid ""
@@ -1219,22 +1255,21 @@ msgstr ""
 "                                 Syntaxe je stejná jako u volby --post.\n"
 
 #: src/xitk/main.c:665
-#, fuzzy
 msgid ""
 "  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
 msgstr ""
-"                                 'auto', 'square', '4:3', 'anamorphic', "
-"'dvb'.\n"
+"  -r, --aspect-ratio <re¾im>   Nastavit pomìr stran výstupu videa. Re¾imy jsou:\n"
+"                                 'auto', 'square', '4:3', 'anamorphic', 'dvb'.\n"
 
 #: src/xitk/main.c:668
-#, fuzzy
 msgid ""
 "      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
 "                               Slave is started with 'xine slave://address:"
 "port'\n"
 msgstr ""
+"      --broadcast-port <port>  Nastavit port vysílaèe xine (strana mastera)\n"
 "                               Slave se spustí: 'xine slave://addresa:port'\n"
 
 #: src/xitk/main.c:671
@@ -1252,6 +1287,10 @@ msgid ""
 "                               Parameters are comma separated.\n"
 "                               This option can be used more than one time.\n"
 msgstr ""
+"      --post <modul>[:parametr=hodnota][,...][;...]\n"
+"                               Naèíst jeden nebo více koncových modulù.\n"
+"                               Parametry jsou oddìleny èárkou.\n"
+"                               Tato volba mù¾e být pou¾ita více ne¾ jednou.\n"
 
 #: src/xitk/main.c:677
 msgid "      --disable-post           Don't enable post plugin(s).\n"
@@ -1280,6 +1319,10 @@ msgid ""
 "                    audio_out, video_out, demux, input, sub, post,\n"
 "                    audio_decoder, video_decoder.\n"
 msgstr ""
+"      --list-plugins [=typ]    Zobrazit seznam v¹ech dostupných modulù,\n"
+"                               Volitelný <typ> mù¾e být:\n"
+"                    audio_out, video_out, demux, input, sub, post,\n"
+"                    audio_decoder, video_decoder.\n"
 
 #: src/xitk/main.c:694
 msgid ""
@@ -1290,6 +1333,12 @@ msgid ""
 "                                 If <mrl> is given, xine will play the mrl\n"
 "                                 then quit (like -pq).\n"
 msgstr ""
+"      --bug-report [=mrl]      Povolit re¾im zprávy o chybì:\n"
+"                                 Zapne upovídanost, vezme v¹echny výstupní\n"
+"                                 zprávy a zapí¹e je do souboru pojmenovaného\n"
+"                                 BUG-REPORT.TXT.\n"
+"                                 Jestli¾e je dodáno <mrl>, xine ho pøehraje\n"
+"                                 a potom skonèí (jako -pq).\n"
 
 #: src/xitk/main.c:701
 msgid ""
@@ -1302,6 +1351,14 @@ msgid ""
 "  DVD:   'dvd://VTS_01_2.VOB'\n"
 "  VCD:   'vcd://<track number>'\n"
 msgstr ""
+"Pøíklady platných MRL (media resource locator):\n"
+" Soubor: 'cesta/soubor.vob'\n"
+"         '/cesta/soubor.vob'\n"
+"         'file://cesta/soubor.vob'\n"
+"         'fifo://[[mpeg1|mpeg2]:/]cesta/soubor'\n"
+"         'stdin://[mpeg1|mpeg2]' nebo '-' (pouze mpeg2)\n"
+"  DVD:   'dvd://VTS_01_2.VOB'\n"
+"  VCD:   'vcd://<èíslo stopy>'\n"
 
 #: src/xitk/main.c:748 src/xitk/main.c:871
 msgid "video driver to use"
@@ -1369,7 +1426,6 @@ msgstr ""
 "zprávu ;-):"
 
 #: src/xitk/main.c:1103
-#, fuzzy
 msgid "No Information available."
 msgstr "Informace nejsou k dispozici."
 
@@ -1473,12 +1529,13 @@ msgstr "©patný re¾im opakování '%s', viz. xine --help\n"
 
 #: src/xitk/main.c:1717
 msgid "*** NOTE ***\n"
-msgstr ""
+msgstr "*** POZNÁMKA ***\n"
 
 #: src/xitk/main.c:1718
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
+" Re¾im zprávy o chybì: V¹echny výstupní zprávy budou pøidány do souboru BUG-REPORT.TXT.\n"
 
 #: src/xitk/main.c:1756
 #, c-format
@@ -1511,13 +1568,15 @@ msgstr "Automaticky naèíst titulky, pokud existují"
 
 #: src/xitk/main.c:1866
 msgid "Enable deinterlacing by default"
-msgstr ""
+msgstr "Standardnì povolit korekci prokládání"
 
 #: src/xitk/main.c:1867
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
 msgstr ""
+"Modul na korekci prokládání bude pøi startu povolen. Progresivní sekvence"
+"jsou automaticky rozpoznány bez ztráty výkonu."
 
 #: src/xitk/main.c:2005
 msgid "Logo mrl"
