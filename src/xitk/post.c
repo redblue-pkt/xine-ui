@@ -80,6 +80,8 @@ typedef struct {
   xitk_widget_t               *up;
   xitk_widget_t               *down;
 
+  xitk_widget_t               *help;
+
   int                          readonly;
 
   char                       **properties_names;
@@ -929,8 +931,18 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
   return 0;
 }
 
+static void _pplugin_show_help(xitk_widget_t *w, void *data) {
+  post_object_t *pobj = (post_object_t *) data;
+  printf("(FIXME: create help window)\n"
+         "--------------------------------------------------\n"
+         "%s"
+         "--------------------------------------------------\n",
+         pobj->api->get_help());
+}
+
 static void _pplugin_retrieve_parameters(post_object_t *pobj) {
   xitk_combo_widget_t         cmb;
+  xitk_labelbutton_widget_t   lb;
   
   if(__pplugin_retrieve_parameters(pobj)) {
     
@@ -950,6 +962,22 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
     
     xitk_combo_set_select(pobj->properties, 0);
     xitk_combo_callback_exec(pobj->properties);
+
+
+    XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+    lb.button_type       = CLICK_BUTTON;
+    lb.label             = _("Help");
+    lb.align             = ALIGN_CENTER;
+    lb.callback          = _pplugin_show_help; 
+    lb.state_callback    = NULL;
+    lb.userdata          = pobj;
+    lb.skin_element_name = NULL;
+    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
+     (pobj->help = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+						  &lb, pobj->x + 390, pobj->y, 50, 20,
+						  "Black", "Black", "White", btnfontname)));
+    xitk_show_widget(pobj->help);
+    xitk_enable_widget(pobj->help);
   }
   else {
     xitk_label_widget_t   lb;
