@@ -2,7 +2,6 @@
 # Copyright (C) YEAR Free Software Foundation, Inc.
 # FIRST AUTHOR <jens.gutzeit@web.de>, 2002.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
@@ -277,9 +276,8 @@ msgstr ""
 "'default' benutzt.\n"
 
 #: src/xitk/main.c:205
-#, fuzzy
 msgid "  -R, --root                   Use root window as video window\n"
-msgstr "                    'w': Video-Fenster verstecken.\n"
+msgstr "  -R, --root                   Desktophintergrund für Video benutzen\n"
 
 #: src/xitk/main.c:207
 msgid "examples for valid MRLs (media resource locator):\n"

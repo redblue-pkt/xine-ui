@@ -364,7 +364,7 @@ int main(int argc, char *argv[]) {
       
   }
 
-  aaxine.config = config_file_init (configfile);
+  aaxine.config = xine_config_file_init (configfile);
 
   /*
    * Initialize AALib

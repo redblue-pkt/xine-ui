@@ -673,7 +673,7 @@ int main(int argc, char *argv[]) {
 
   }
 
-  gGui->config = config_file_init (gGui->configfile);
+  gGui->config = xine_config_file_init (gGui->configfile);
 
   /*
    * init gui
