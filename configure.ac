@@ -101,15 +101,6 @@ dnl
 dnl AM_WITH_NLS(use-libtool,,)
 dnl ALL_LINGUAS="cs da de el en@quot en@boldquot es et fr gl id it ja ko nl nn no pl pt pt_BR ru sl sv tr zh"
 ALL_LINGUAS="fr es pt_BR de sk pl_PL uk cs it"
-AM_GNU_GETTEXT(use-libtool)
-dnl ac_sources="$nls_cv_header_libgt"
-dnl ac_dests="$nls_cv_header_intl"
-dnl while test -n "$ac_sources"; do
-dnl   set $ac_dests; ac_dest=$1; shift; ac_dests=$*
-dnl   set $ac_sources; ac_source=$1; shift; ac_sources=$*
-dnl   ac_config_links_1="$ac_config_links_1 $ac_dest:$ac_source"
-dnl done
-dnl AC_CONFIG_LINKS([$ac_config_links_1])
 AM_GNU_GETTEXT(use-libtool, need-ngettext)
 AC_PROG_GMSGFMT_PLURAL
 AC_CONFIG_LINKS($nls_cv_header_libgt, $nls_cv_header_intl)
