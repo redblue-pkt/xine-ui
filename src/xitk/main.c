@@ -65,6 +65,7 @@
 #include "i18n.h"
 
 #include "xitk.h"
+#include "errors.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"
@@ -565,19 +566,41 @@ void event_listener (void *user_data, xine_event_t *event) {
  
 }
 
-static void codec_reporting(void *user_data, int codec_type,
-			    uint32_t fourcc, char *description, int handled) {
-  if(!handled) {
+static void codec_reporting( void *user_data, int codec_type,
+                             uint32_t fourcc, char *description, int handled )
+{
+  char fourcc_txt[10];
+  
+  /* store fourcc as text */
+  *(uint32_t *)fourcc_txt = fourcc;
+  fourcc_txt[4] = '\0';
+  
+  /* report error for unknown/unhandled codecs */
+  if( !handled ) {
     switch(codec_type) {
 
-    case XINE_CODEC_AUDIO:
-      xine_error(_("No audio plugin found to decode '%s'."), description);
-      break;
-      
     case XINE_CODEC_VIDEO:
+      
+      /* display fourcc if no description available */
+      if( !description[0] )
+        description = fourcc_txt;
+        
       xine_error(_("No video plugin found to decode '%s'."), description);
       break;
-     
+            
+    case XINE_CODEC_AUDIO:
+      
+      /* display fourcc if no description available */
+      if( !description[0] ) {
+        description = fourcc_txt;
+        
+        /* show waveformattag in hexa */
+        if( fourcc < 0x10000 ) {
+          sprintf(fourcc_txt, "0x%x", fourcc );
+        }  
+      }
+      xine_error(_("No audio plugin found to decode '%s'."), description);
+      break;
     }
   }
 }
