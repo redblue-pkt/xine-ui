@@ -931,12 +931,18 @@ int main(int argc, char *argv[]) {
    * Initialize config
    */
   {
-    char *cfgfile = ".xine/config2";
+    char *cfgdir = ".xine";
+    char *cfgfile = "config2";
     struct stat st;
     
     if (!(gGui->configfile = getenv ("XINERC"))) {
-      gGui->configfile = (char *) xine_xmalloc((strlen((xine_get_homedir())) + strlen(cfgfile))+2);
-      sprintf (gGui->configfile, "%s/%s", (xine_get_homedir()), cfgfile);
+      gGui->configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+					       + strlen(cfgdir) 
+					       + strlen(cfgfile)
+					       + 3);
+      sprintf (gGui->configfile, "%s/%s", xine_get_homedir(), cfgdir);
+      mkdir (gGui->configfile, 0755);
+      sprintf (gGui->configfile + strlen(gGui->configfile), "/%s", cfgfile);
     }
 
     /* Popup setup window if there is no config file */
