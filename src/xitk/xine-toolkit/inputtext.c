@@ -500,7 +500,7 @@ static int notify_click_inputtext(xitk_widget_t *w, int button, int bUp, int x, 
       
       xitk_font_set_font(fs, w->wl->gc);
       
-      while(width < pos) {
+      while((width < pos) && ((i-1) < strlen(p)) ) {
 	
 	width = xitk_font_get_text_width(fs, p, i);
 	i++;
@@ -535,7 +535,7 @@ static int notify_focus_inputtext(xitk_widget_t *w, int focus) {
     private_data = (inputtext_private_data_t *) w->private_data;
     
     if((private_data->have_focus = focus) == FOCUS_LOST)
-      private_data->cursor_pos = -1;
+      private_data->cursor_pos = 0;
   
     if((focus == FOCUS_MOUSE_OUT) || (focus == FOCUS_LOST))
       _cursor_focus(private_data, w->wl->win, 0);
@@ -749,7 +749,7 @@ static void inputtext_move_right(xitk_widget_t *w) {
 static void inputtext_exec_return(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
 
-  private_data->cursor_pos   = -1;
+  private_data->cursor_pos   = 0;
   w->have_focus              = 
     private_data->have_focus = FOCUS_LOST;
   //  wl->widget_focused = NULL;
@@ -768,7 +768,7 @@ static void inputtext_exec_return(xitk_widget_t *w) {
 static void inputtext_exec_escape(xitk_widget_t *w) {
   inputtext_private_data_t *private_data = (inputtext_private_data_t *) w->private_data;
   
-  private_data->cursor_pos = -1;
+  private_data->cursor_pos = 0;
   w->have_focus = private_data->have_focus = FOCUS_LOST;
   w->wl->widget_focused = NULL;
   _cursor_focus(private_data, w->wl->win, 0);
@@ -1069,7 +1069,7 @@ void xitk_inputtext_change_text(xitk_widget_t *w, char *text) {
     XITK_FREE(private_data->text);
     private_data->text = strdup((text != NULL) ? text : "");
     private_data->disp_offset = 0;
-    private_data->cursor_pos = -1;
+    private_data->cursor_pos = 0;
     paint_inputtext(w);
   }
 
@@ -1103,7 +1103,7 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
   private_data->fontname          = strdup(fontname);
  
   private_data->max_length        = it->max_length;
-  private_data->cursor_pos        = -1;
+  private_data->cursor_pos        = 0;
 
   private_data->skin              = skin;
 
