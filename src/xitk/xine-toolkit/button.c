@@ -38,10 +38,11 @@
  *
  */
 static void notify_destroy(xitk_widget_t *w, void *data) {
-  button_private_data_t *private_data = 
-    (button_private_data_t *) w->private_data;
-
-  if(w->widget_type & WIDGET_TYPE_BUTTON) {
+  button_private_data_t *private_data;
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    private_data = (button_private_data_t *) w->private_data;
+    
     XITK_FREE(private_data->skin_element_name);
     xitk_image_free_image(private_data->imlibdata, &private_data->skin);
     XITK_FREE(private_data);
@@ -52,10 +53,11 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
  *
  */
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
-  button_private_data_t *private_data = 
-    (button_private_data_t *) w->private_data;
+  button_private_data_t *private_data;
   
-  if(w->widget_type & WIDGET_TYPE_BUTTON) {
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    private_data = (button_private_data_t *) w->private_data;
+    
     if(sk == FOREGROUND_SKIN && private_data->skin) {
       return private_data->skin;
     }
@@ -67,35 +69,36 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 /*
  *
  */
-static int notify_inside(xitk_widget_t *b, int x, int y) {
-  button_private_data_t *private_data = 
-    (button_private_data_t *) b->private_data;
+static int notify_inside(xitk_widget_t *w, int x, int y) {
+  button_private_data_t *private_data;
 
-  if(b->widget_type & WIDGET_TYPE_BUTTON) {
-    if((b->visible == 1)) {
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    private_data = (button_private_data_t *) w->private_data;
+
+    if((w->visible == 1)) {
       xitk_image_t *skin = private_data->skin;
       
-      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, b, skin->mask, x, y);
+      return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, w, skin->mask, x, y);
     }
     else 
       return 0;
   }
-
+  
   return 1;
 }
 
 /**
  *
  */
-static void paint_button (xitk_widget_t *b, Window win, GC gc) {
-  button_private_data_t *private_data = 
-    (button_private_data_t *) b->private_data;
-  GC                  lgc;
-  int                 button_width;
-  xitk_image_t       *skin;
+static void paint_button (xitk_widget_t *w, Window win, GC gc) {
+  button_private_data_t *private_data;
+  GC                     lgc;
+  int                    button_width;
+  xitk_image_t          *skin;
 
-  if((b->widget_type & WIDGET_TYPE_BUTTON) && (b->visible == 1)) {
+  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) && (w->visible == 1))) {
 
+    private_data = (button_private_data_t *) w->private_data;
     skin         = private_data->skin;
     button_width = skin->width / 3;
 
@@ -105,7 +108,7 @@ static void paint_button (xitk_widget_t *b, Window win, GC gc) {
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
 
     if (skin->mask) {
-      XSetClipOrigin(private_data->imlibdata->x.disp, lgc, b->x, b->y);
+      XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
       XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
     }
 
@@ -113,17 +116,17 @@ static void paint_button (xitk_widget_t *b, Window win, GC gc) {
       if(private_data->bClicked) {
 	XCopyArea (private_data->imlibdata->x.disp, skin->image,  
 		   win, lgc, 2*button_width, 0,
-		   button_width, skin->height, b->x, b->y);
+		   button_width, skin->height, w->x, w->y);
 	
       } else {
 	XCopyArea (private_data->imlibdata->x.disp, skin->image,  
 		   win, lgc, button_width, 0,
-		   button_width, skin->height, b->x, b->y);
+		   button_width, skin->height, w->x, w->y);
       }
     } else {
       XCopyArea (private_data->imlibdata->x.disp, skin->image, 
 		 win, lgc, 0, 0,
-		 button_width, skin->height, b->x, b->y);
+		 button_width, skin->height, w->x, w->y);
     }
 
     XFreeGC(private_data->imlibdata->x.disp, lgc);
@@ -137,27 +140,27 @@ static void paint_button (xitk_widget_t *b, Window win, GC gc) {
  *
  */
 static void notify_change_skin(xitk_widget_list_t *wl, 
-			       xitk_widget_t *b, xitk_skin_config_t *skonfig) {
-  button_private_data_t *private_data = 
-    (button_private_data_t *) b->private_data;
+			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+  button_private_data_t *private_data;
   
-  if(b->widget_type & WIDGET_TYPE_BUTTON) {
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    private_data = (button_private_data_t *) w->private_data;
     
     if(private_data->skin_element_name) {
       xitk_skin_lock(skonfig);
       XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->skin);
       private_data->skin              = xitk_image_load_image(private_data->imlibdata,
 							      (xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)));
-      b->x                            = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-      b->y                            = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-      b->width                        = private_data->skin->width/3;
-      b->height                       = private_data->skin->height;
+      w->x                            = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+      w->y                            = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      w->width                        = private_data->skin->width/3;
+      w->height                       = private_data->skin->height;
       
-      b->visible                      = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
-      b->enable                       = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
+      w->visible                      = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
+      w->enable                       = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
     
       xitk_skin_unlock(skonfig);
-      xitk_set_widget_pos(b, b->x, b->y);
+      xitk_set_widget_pos(w, w->x, w->y);
     }
   }
 }
@@ -166,15 +169,15 @@ static void notify_change_skin(xitk_widget_list_t *wl,
  *
  */
 static int notify_click_button (xitk_widget_list_t *wl, 
-				xitk_widget_t *b,int bUp, int x, int y) {
-  button_private_data_t *private_data = 
-    (button_private_data_t *) b->private_data;
-  
-  if (b->widget_type & WIDGET_TYPE_BUTTON) {
+				xitk_widget_t *w, int bUp, int x, int y) {
+  button_private_data_t *private_data;
+    
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    private_data = (button_private_data_t *) w->private_data;
     private_data->bClicked = !bUp;
     
-    paint_button(b, wl->win, wl->gc);
-
+    paint_button(w, wl->win, wl->gc);
+    
     if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
       if(private_data->callback) {
 	private_data->callback(private_data->bWidget, 
@@ -190,11 +193,11 @@ static int notify_click_button (xitk_widget_list_t *wl,
 /*
  *
  */
-static int notify_focus_button (xitk_widget_list_t *wl, xitk_widget_t *b, int focus) {
-  button_private_data_t *private_data = 
-    (button_private_data_t *) b->private_data;
-
-  if (b->widget_type & WIDGET_TYPE_BUTTON) {
+static int notify_focus_button (xitk_widget_list_t *wl, xitk_widget_t *w, int focus) {
+  button_private_data_t *private_data;
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    private_data = (button_private_data_t *) w->private_data;
     private_data->focus = focus;
   } 
   

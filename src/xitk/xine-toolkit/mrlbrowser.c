@@ -58,7 +58,9 @@
  */
 static void notify_destroy(xitk_widget_t *w, void *data) {
 
-  if(w->widget_type & WIDGET_TYPE_MRLBROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
     xitk_mrlbrowser_destroy(w);
   }
 }
@@ -301,7 +303,9 @@ static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
 void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned long timeout) {
   mrlbrowser_private_data_t *private_data;
   
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
     if(enabled)
@@ -317,7 +321,9 @@ void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned lo
 Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
   
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     return private_data->window;
   }
@@ -332,7 +338,9 @@ Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w) {
 int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
     return((xitk_get_window_info(private_data->widget_key, inf))); 
@@ -347,7 +355,9 @@ int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
 int xitk_mrlbrowser_is_running(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
  
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     return (private_data->running);
   }
@@ -361,7 +371,9 @@ int xitk_mrlbrowser_is_running(xitk_widget_t *w) {
 int xitk_mrlbrowser_is_visible(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     return (private_data->visible);
   }
@@ -375,7 +387,9 @@ int xitk_mrlbrowser_is_visible(xitk_widget_t *w) {
 void xitk_mrlbrowser_hide(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
@@ -396,7 +410,9 @@ void xitk_mrlbrowser_hide(xitk_widget_t *w) {
 void xitk_mrlbrowser_show(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     xitk_show_widgets(private_data->widget_list);
@@ -415,7 +431,8 @@ void xitk_mrlbrowser_show(xitk_widget_t *w) {
 void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER) && (window != None)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET)) && (window != None)) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
@@ -434,7 +451,8 @@ void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window) {
 void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) && 
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     private_data->running = 0;
@@ -500,7 +518,8 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
   mrlbrowser_private_data_t *private_data;
   XSizeHints                 hint;
 
-  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
     xitk_skin_lock(skonfig);
@@ -660,7 +679,6 @@ static void mrlbrowser_select(xitk_widget_t *w, void *data) {
  * Handle selection in mrlbrowser, then 
  */
 static void mrlbrowser_play(xitk_widget_t *w, void *data) {
-  
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
   int j = -1;
   
@@ -723,7 +741,7 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     XUNLOCK(private_data->imlibdata->x.disp);
     break;
     
-  case KeyRelease:
+  case KeyPress:
     mykeyevent = event->xkey;
     
     XLOCK (private_data->imlibdata->x.disp);
@@ -752,18 +770,8 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
       mrlbrowser_dumpmrl(NULL, (void *)private_data);
       break;
 #endif
-      
-    case XK_Down:
-    case XK_Next:
-      xitk_browser_step_up((xitk_widget_t *)private_data->mrlb_list, NULL);
-      break;
-      
-    case XK_Up:
-    case XK_Prior:
-      xitk_browser_step_down((xitk_widget_t *)private_data->mrlb_list, NULL);
-      break;
+
     }
-    
     break;
   }
 }
@@ -937,6 +945,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   lb.skin_element_name = mb->select.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
 			   (w = xitk_labelbutton_create (skonfig, &lb)));
+  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
   xitk_set_widget_tips(w, _("Select current entry"));
   
   pb.skin_element_name = mb->play.skin_element_name;
@@ -944,6 +953,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   pb.userdata          = (void *)private_data;
   xitk_list_append_content(private_data->widget_list->l,
 			   (w = xitk_button_create (skonfig, &pb)));
+  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
   xitk_set_widget_tips(w, _("Play selected entry"));
 
   lb.button_type       = CLICK_BUTTON;
@@ -954,6 +964,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   lb.skin_element_name = mb->dismiss.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
 			   (w = xitk_labelbutton_create (skonfig, &lb)));
+  w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
   xitk_set_widget_tips(w, _("Close MRL browser window"));
   
   private_data->add_callback      = mb->select.callback;
@@ -965,14 +976,17 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   xitk_list_append_content (private_data->widget_list->l,
 			   (private_data->mrlb_list = 
 			    xitk_browser_create(skonfig, &mb->browser)));
+  private_data->mrlb_list->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
 
   lbl.label             = "";
   lbl.skin_element_name = mb->origin.skin_element_name;
   lbl.window            = private_data->widget_list->win;
   lbl.gc                = private_data->widget_list->gc;
+  lbl.callback          = NULL;
   xitk_list_append_content(private_data->widget_list->l,
 			  (private_data->widget_origin = 
 			   xitk_label_create(skonfig, &lbl)));
+  private_data->widget_origin->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
   
   memset(&private_data->current_origin, 0, strlen(private_data->current_origin));
   if(mb->origin.cur_origin)
@@ -984,8 +998,11 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
     lbl.skin_element_name = mb->ip_name.label.skin_element_name;
     lbl.window            = private_data->widget_list->win;
     lbl.gc                = private_data->widget_list->gc;
+    lbl.callback          = NULL;
     xitk_list_append_content(private_data->widget_list->l, 
-			    xitk_label_create (skonfig, &lbl));
+			     (w = xitk_label_create (skonfig, &lbl)));
+    w->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
+
   }
 
   /*
@@ -1011,6 +1028,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 			       (private_data->autodir_plugins[i] = xitk_labelbutton_create (skonfig, &lb)));
       xitk_set_widget_tips(private_data->autodir_plugins[i], 
 			   xine_get_input_plugin_description(mb->xine, mb->ip_availables[i]));
+
+      private_data->autodir_plugins[i]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
       
       (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
 
@@ -1033,7 +1052,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   mywidget->y                  = mb->y;
   mywidget->width              = private_data->bg_image->width;
   mywidget->height             = private_data->bg_image->height;
-  mywidget->widget_type        = WIDGET_TYPE_MRLBROWSER | WIDGET_TYPE_GROUP;
+  mywidget->widget_type        = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_MRLBROWSER;
   mywidget->paint              = NULL;
   mywidget->notify_click       = NULL;
   mywidget->notify_focus       = NULL;

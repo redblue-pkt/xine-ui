@@ -55,6 +55,7 @@
 #include "dnd.h"
 #include "inputtext.h"
 #include "checkbox.h"
+#include "browser.h"
 #include "slider.h"
 #include "tips.h"
 #include "_config.h"
@@ -334,8 +335,17 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
     XUNLOCK(gXitk->display);
     
     if(err != BadDrawable && err != BadWindow) {
-      fx->new_pos.x = wattr.x;
-      fx->new_pos.y = wattr.y;
+      Window c;
+      
+      XLOCK(gXitk->display);
+      XTranslateCoordinates(gXitk->display, fx->window, wattr.root, 
+			    0, 0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
+      XUNLOCK(gXitk->display);
+      
+      /*
+	fx->new_pos.x = wattr.x;
+	fx->new_pos.y = wattr.y;
+      */
       fx->width     = wattr.width;
       fx->height    = wattr.height;
     }
@@ -483,21 +493,7 @@ void xitk_xevent_notify(XEvent *event) {
 	  XUNLOCK(gXitk->display);
 	  break;
 
-	case KeyPress:
-	  if(fx->widget_list && 
-	     fx->widget_list->widget_focused) {
-
-	    fx->widget_list->widget_focused->kpressed = 1;
-	    
-	    if(fx->widget_list->widget_focused->widget_type & WIDGET_TYPE_INPUTTEXT) {
-	      xitk_send_key_event(fx->widget_list, fx->widget_list->widget_focused, event);
-	      //	      fx->widget_list->widget_pressed = fx->widget_list->widget_focused;
-	      return;
-	    }
-	  }
-	  break;
-
-	case KeyRelease: {
+	case KeyPress: {
 	  XKeyEvent      mykeyevent;
 	  KeySym         mykey;
 	  char           kbuf[256];
@@ -505,16 +501,7 @@ void xitk_xevent_notify(XEvent *event) {
 	  int            modifier;
 	  int            handled = 0;
 	  xitk_widget_t *w = NULL;
-
-	  if(fx->widget_list && 
-	     fx->widget_list->widget_focused) {
-
-	    /* Release from not pressed */
-	    if(fx->widget_list->widget_focused->kpressed == 0)
-	      return;
-	    
-	  }
-
+	  
 	  mykeyevent = event->xkey;
 
 	  xitk_get_key_modifier(event, &modifier);
@@ -527,12 +514,28 @@ void xitk_xevent_notify(XEvent *event) {
 	    xitk_tips_tips_kill(fx->widget_list->widget_under_mouse);
 	  
 	  if(fx->widget_list && fx->widget_list->widget_focused)
-	  xitk_tips_tips_kill(fx->widget_list->widget_focused);
+	    xitk_tips_tips_kill(fx->widget_list->widget_focused);
 
 
 	  if(fx->widget_list && fx->widget_list->widget_focused) {
 	    w = fx->widget_list->widget_focused;
-	    w->kpressed = 0;
+	  }
+
+	  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) &&
+		   (mykey != XK_Tab) && (mykey != XK_KP_Tab) && (mykey != XK_ISO_Left_Tab))) {
+
+	    if((mykey == XK_Return) || 
+	       (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
+	      
+	      if(w->paint)
+		(w->paint) (w, fx->widget_list->win, fx->widget_list->gc);
+	      
+	      xitk_set_focus_to_next_widget(fx->widget_list, 0);
+	    }
+	    else
+	      xitk_send_key_event(fx->widget_list, w, event);
+
+	    return;
 	  }
 	  
 	  /* set focus to next widget */
@@ -547,12 +550,16 @@ void xitk_xevent_notify(XEvent *event) {
 		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
 	    if(w && (w->notify_click && w->visible && w->enable)) {
 	      
-	      if(w && ((w->widget_type & WIDGET_TYPE_BUTTON) ||
-		       (w->widget_type & WIDGET_TYPE_LABELBUTTON) ||
-		       (w->widget_type & WIDGET_TYPE_CHECKBOX))) {
+	      if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
+		       ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
+		       ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
 		handled = 1;
+
 		w->notify_click(fx->widget_list, w, 0, w->x, w->y);
 		w->notify_click(fx->widget_list, w, 1, w->x, w->y);
+
+		//		if(fx->xevent_callback)
+		//		  fx->xevent_callback(event, fx->user_data);
 	      }
 	    }
 	  }
@@ -560,7 +567,17 @@ void xitk_xevent_notify(XEvent *event) {
 	  else if(((mykey == XK_Left) || (mykey == XK_Right) 
 		   || (mykey == XK_Up) || (mykey == XK_Down)) && (modifier == MODIFIER_NOMOD)) {
 	    
-	    if(w && (w->widget_type & WIDGET_TYPE_SLIDER)) {
+	    if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+	      xitk_widget_t *b = xitk_browser_get_browser(fx->widget_list, w);
+
+	      if(b) {
+		if(mykey == XK_Up)
+		  xitk_browser_step_down(b, NULL);
+		else if(mykey == XK_Down)
+		  xitk_browser_step_up(b, NULL);
+	      }
+	    }
+	    else if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
 	      
 	      if((mykey == XK_Left) || (mykey == XK_Down)) {
 		handled = 1;
@@ -573,19 +590,18 @@ void xitk_xevent_notify(XEvent *event) {
 		xitk_slider_callback_exec(w);
 	      }
 	    }
+
 	  }
 	  
-	  /* 
-	   * Don't send keyrelease event to an inputtext widget,
-	   * it already got it in KeyPress event.
-	   */
 	  if(!handled) {
-	    if((w == NULL) || (w && ((w->widget_type & WIDGET_TYPE_INPUTTEXT) == 0))) {
+#warning CHECKME
+	    if((w == NULL) || (w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) == 0))) {
 	      if(fx->xevent_callback) {
 		fx->xevent_callback(event, fx->user_data);
 	      }
 	    }
-	    if(w && (w->widget_type & WIDGET_TYPE_INPUTTEXT) && 
+	    
+	    if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) && 
 	       ((mykey == XK_Return) || (mykey == XK_KP_Enter) 
 		|| (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter))) {
 	      

@@ -32,31 +32,34 @@
 #include "_xitk.h"
 
 typedef struct {
-  ImlibData        *imlibdata;
-  char             *skin_element_name;
-  GC                gc;
-  Window            window;
+  ImlibData              *imlibdata;
+  char                   *skin_element_name;
+  GC                      gc;
+  Window                  window;
 
-  xitk_widget_t    *lWidget;
+  xitk_widget_t          *lWidget;
 
 
-  int               char_length; /* length of 1 char */
-  int               char_height; /* height of 1 char */
+  int                     char_length; /* length of 1 char */
+  int                     char_height; /* height of 1 char */
 
-  Pixmap            labelpix;
+  Pixmap                  labelpix;
 
-  int               length;      /* length in char */
-  xitk_image_t     *font;
-  char             *fontname;
-  char             *label;
+  int                     length;      /* length in char */
+  xitk_image_t           *font;
+  char                   *fontname;
+  char                   *label;
 
-  int               animation;
-  int               anim_running;
-  int               anim_offset;
+  xitk_simple_callback_t  callback;
+  void                   *userdata;
 
-  int               on_change;
+  int                     animation;
+  int                     anim_running;
+  int                     anim_offset;
 
-  pthread_t         thread;
+  int                     on_change;
+
+  pthread_t               thread;
 
 } label_private_data_t;
 

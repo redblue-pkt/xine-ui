@@ -173,7 +173,7 @@ void test_handle_event(XEvent *event, void *data) {
     XUnlockDisplay(test->display);
     break;
 
-  case KeyRelease: {
+  case KeyPress: {
     int modifier;
     
     (void) xitk_get_key_modifier(event, &modifier);
@@ -487,10 +487,11 @@ static void create_label(void) {
   xitk_font_string_extent(fs, label, &lbear, &rbear, &wid, &asc, &des);
   xitk_font_unload_font(fs);
 
-  lbl.window    = xitk_window_get_window(test->xwin);
-  lbl.gc        = test->widget_list->gc;
+  lbl.window            = xitk_window_get_window(test->xwin);
+  lbl.gc                = test->widget_list->gc;
   lbl.skin_element_name = NULL;
   lbl.label             = label;
+  lbl.callback          = NULL;
   xitk_list_append_content(test->widget_list->l, 
 			   (test->label = 
 			    xitk_noskin_label_create(&lbl,

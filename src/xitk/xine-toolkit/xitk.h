@@ -147,21 +147,29 @@ typedef xitk_image_t *(*widget_get_skin_t)(struct xitk_widget_s *, int);
 
 typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
 
-#define WIDGET_TYPE_GROUP         0xFFFF8000
+/* Group of widgets widget */
+#define WIDGET_GROUP              0x80000000
+/* Grouped widget, itself */
+#define WIDGET_GROUP_WIDGET       0x40000000
 
+/* Grouped widgets */
+#define WIDGET_GROUP_MASK         0x3FFF8000 
+#define WIDGET_GROUP_BROWSER      0x00080000
+#define WIDGET_GROUP_FILEBROWSER  0x00100000
+#define WIDGET_GROUP_MRLBROWSER   0x00200000
+#define WIDGET_GROUP_COMBO        0x00400000
+#define WIDGET_GROUP_TABS         0x00800000
+#define WIDGET_GROUP_INTBOX       0x01000000
+
+/* Real widgets. */
+#define WIDGET_TYPE_MASK          0x00007FFF
 #define WIDGET_TYPE_BUTTON        0x00000001
 #define WIDGET_TYPE_LABELBUTTON   0x00000002
+#define WIDGET_TYPE_LABEL         0x00000003
 #define WIDGET_TYPE_SLIDER        0x00000004
-#define WIDGET_TYPE_LABEL         0x00000008
-#define WIDGET_TYPE_CHECKBOX      0x00000010
-#define WIDGET_TYPE_IMAGE         0x00000020
-#define WIDGET_TYPE_BROWSER       0x00000040
-#define WIDGET_TYPE_FILEBROWSER   0x00000080
-#define WIDGET_TYPE_MRLBROWSER    0x00000100
-#define WIDGET_TYPE_INPUTTEXT     0x00000200
-#define WIDGET_TYPE_COMBO         0x00000400
-#define WIDGET_TYPE_TABS          0x00000800
-#define WIDGET_TYPE_INTBOX        0x00001000
+#define WIDGET_TYPE_CHECKBOX      0x00000005
+#define WIDGET_TYPE_IMAGE         0x00000006
+#define WIDGET_TYPE_INPUTTEXT     0x00000007
 
 typedef struct xitk_widget_s {
   ImlibData                      *imlibdata;
@@ -790,11 +798,13 @@ int xitk_labelbutton_get_alignment(xitk_widget_t *);
  */
 typedef struct {
   int                       magic;
-  ImlibData              *imlibdata;
-  Window                  window;
-  GC                      gc;
-  char                   *label;
-  char                   *skin_element_name;
+  ImlibData                *imlibdata;
+  Window                    window;
+  GC                        gc;
+  char                     *label;
+  char                     *skin_element_name;
+  xitk_simple_callback_t    callback;
+  void                     *userdata;
 } xitk_label_widget_t;
 
 /**
@@ -1017,6 +1027,7 @@ int xitk_browser_get_current_start(xitk_widget_t *w);
  */
 void xitk_browser_set_alignment(xitk_widget_t *w, int align);
 
+xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w);
 /*
  * Filebrowser
  */
@@ -1611,6 +1622,14 @@ unsigned int xitk_get_pixel_color_warning_background(ImlibData *im);
 /**
  *
  */
+xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im, 
+							      char *fontname, 
+							      int width, int align, char *str,
+							      unsigned int foreground,
+							      unsigned int background);
+xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
+						  char *fontname, 
+						  int width, int align, char *str);
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
 
 /**

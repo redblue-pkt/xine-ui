@@ -40,7 +40,7 @@
  * Get a pixel color from rgb values.
  */
 unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b) {
-  XColor xcolor;
+  XColor       xcolor;
   unsigned int pixcol;
 
   assert(im);
@@ -1214,9 +1214,10 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
  *
  */
 static void notify_destroy(xitk_widget_t *w, void *data) {
-  image_private_data_t *private_data = (image_private_data_t *) w->private_data;
-
-  if(w->widget_type & WIDGET_TYPE_IMAGE) {
+  image_private_data_t *private_data;
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
+    private_data = (image_private_data_t *) w->private_data;
     XITK_FREE(private_data->skin_element_name);
     xitk_image_free_image(private_data->imlibdata, &private_data->skin);
     XITK_FREE(private_data);
@@ -1234,9 +1235,10 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
  *
  */
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
-  image_private_data_t *private_data = (image_private_data_t *) w->private_data;
+  image_private_data_t *private_data;
   
-  if(w->widget_type & WIDGET_TYPE_IMAGE) {
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
+    private_data = (image_private_data_t *) w->private_data;
     if(sk == BACKGROUND_SKIN && private_data->skin) {
       return private_data->skin;
     }
@@ -1248,13 +1250,13 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 /*
  *
  */
-static void paint_image (xitk_widget_t *i, Window win, GC gc) {
-  xitk_image_t *skin;
-  GC lgc;
-  image_private_data_t *private_data = 
-    (image_private_data_t *) i->private_data;
+static void paint_image (xitk_widget_t *w, Window win, GC gc) {
+  image_private_data_t *private_data;
+  xitk_image_t         *skin;
+  GC                    lgc;
   
-  if ((i->widget_type & WIDGET_TYPE_IMAGE) && (i->visible == 1)) {
+  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (w->visible == 1))) {
+    private_data = (image_private_data_t *) w->private_data;
 
     skin = private_data->skin;
     
@@ -1264,12 +1266,12 @@ static void paint_image (xitk_widget_t *i, Window win, GC gc) {
     XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
     
     if (skin->mask) {
-      XSetClipOrigin(private_data->imlibdata->x.disp, lgc, i->x, i->y);
+      XSetClipOrigin(private_data->imlibdata->x.disp, lgc, w->x, w->y);
       XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
     }
     
     XCopyArea (private_data->imlibdata->x.disp, skin->image, win, lgc, 0, 0,
-	       skin->width, skin->height, i->x, i->y);
+	       skin->width, skin->height, w->x, w->y);
     
     XFreeGC(private_data->imlibdata->x.disp, lgc);
 
@@ -1281,12 +1283,13 @@ static void paint_image (xitk_widget_t *i, Window win, GC gc) {
 /*
  *
  */
-static void notify_change_skin(xitk_widget_list_t *wl, 
-			       xitk_widget_t *i, xitk_skin_config_t *skonfig) {
-  image_private_data_t *private_data = 
-    (image_private_data_t *) i->private_data;
+static void notify_change_skin(xitk_widget_list_t *wl,
+			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+  image_private_data_t *private_data;
   
-  if ((i->widget_type & WIDGET_TYPE_IMAGE) && (i->visible == 1)) {
+  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE) && (w->visible == 1))) {
+    private_data = (image_private_data_t *) w->private_data;
+
     if(private_data->skin_element_name) {
       
       xitk_skin_lock(skonfig);
@@ -1295,14 +1298,14 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       private_data->skin = xitk_image_load_image(private_data->imlibdata,
 						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
       
-      i->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-      i->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-      i->width           = private_data->skin->width;
-      i->height          = private_data->skin->height;
+      w->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+      w->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      w->width           = private_data->skin->width;
+      w->height          = private_data->skin->height;
 
       xitk_skin_unlock(skonfig);
       
-      xitk_set_widget_pos(i, i->x, i->y);
+      xitk_set_widget_pos(w, w->x, w->y);
     }
   }
 }

@@ -104,4 +104,6 @@ void xitk_browser_step_down(xitk_widget_t *w, void *data);
  */
 void xitk_browser_set_alignment(xitk_widget_t *w, int align);
 
+xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w);
+
 #endif

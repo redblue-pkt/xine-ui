@@ -39,8 +39,8 @@
 #include "utils.h"
 #include "_xitk.h"
 
-static void _create_label_pixmap(xitk_widget_t *l) {
-  label_private_data_t  *private_data = (label_private_data_t *) l->private_data;
+static void _create_label_pixmap(xitk_widget_t *w) {
+  label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
   xitk_image_t          *font         = (xitk_image_t *) private_data->font;
   int                    pixwidth;
   char                  *_label;
@@ -104,10 +104,10 @@ static void _create_label_pixmap(xitk_widget_t *l) {
  */
 static void notify_destroy(xitk_widget_t *w, void *data) {
   label_private_data_t *private_data;
-
-  if(w->widget_type & WIDGET_TYPE_LABEL) {
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     private_data = (label_private_data_t *) w->private_data;
-
+    
     private_data->on_change = 1;
     
     if(private_data->anim_running) {
@@ -140,8 +140,9 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
   label_private_data_t *private_data;
   
-  if(w->widget_type & WIDGET_TYPE_LABEL) {
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     private_data = (label_private_data_t *) w->private_data;
+
     if(sk == FOREGROUND_SKIN && private_data->font) {
       return private_data->font;
     }
@@ -156,7 +157,7 @@ static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
 char *xitk_label_get_label(xitk_widget_t *w) {
   label_private_data_t *private_data;
   
-  if(w->widget_type & WIDGET_TYPE_LABEL) {
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     private_data = (label_private_data_t *) w->private_data;
     return private_data->label;
   }
@@ -167,13 +168,13 @@ char *xitk_label_get_label(xitk_widget_t *w) {
 /*
  *
  */
-static void paint_label(xitk_widget_t *l, Window win, GC gc) {
+static void paint_label(xitk_widget_t *w, Window win, GC gc) {
   label_private_data_t  *private_data;
   xitk_image_t          *font;
 
-  if ((l->widget_type & WIDGET_TYPE_LABEL) && (l->visible == 1)) {
+  if (w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL) && (w->visible == 1))) {
     
-    private_data = (label_private_data_t *) l->private_data;
+    private_data = (label_private_data_t *) w->private_data;
     font = (xitk_image_t *) private_data->font;
 
     /* non skinable widget */
@@ -185,14 +186,14 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
       /* Clean old */
       XLOCK (private_data->imlibdata->x.disp);
       XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, win, 
-		 gc, 0, 0, private_data->font->width, private_data->font->height, l->x, l->y);
+		 gc, 0, 0, private_data->font->width, private_data->font->height, w->x, w->y);
       XUNLOCK (private_data->imlibdata->x.disp);
 
       fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
       xitk_font_set_font(fs, gc);
       xitk_font_string_extent(fs, private_data->label, &lbear, &rbear, &wid, &asc, &des);
 
-      bg = xitk_image_create_image(private_data->imlibdata, l->width, l->height);
+      bg = xitk_image_create_image(private_data->imlibdata, w->width, w->height);
 
       XLOCK (private_data->imlibdata->x.disp);
       XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, bg->image, 
@@ -203,7 +204,7 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
 		  2, ((private_data->font->height + asc + des)>>1) - des,
 		  private_data->label, strlen(private_data->label));
       XCopyArea (private_data->imlibdata->x.disp, bg->image, win, 
-		 gc, 0, 0, private_data->font->width, private_data->font->height, l->x, l->y);
+		 gc, 0, 0, private_data->font->width, private_data->font->height, w->x, w->y);
       XUNLOCK (private_data->imlibdata->x.disp);
 
       xitk_image_free_image(private_data->imlibdata, &bg);
@@ -219,7 +220,7 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
       XCopyArea(private_data->imlibdata->x.disp, private_data->labelpix, win, gc, 
 		private_data->anim_offset, 0, 
 		width, private_data->char_height, 
-		l->x, l->y);
+		w->x, w->y);
       XUNLOCK(private_data->imlibdata->x.disp);
       
     }
@@ -269,8 +270,8 @@ void *xitk_label_animation_loop(void *data) {
 /*
  *
  */
-static void label_setup_label(xitk_widget_t *l, char *label_) {
-  label_private_data_t *private_data = (label_private_data_t *) l->private_data;
+static void label_setup_label(xitk_widget_t *w, char *label_) {
+  label_private_data_t *private_data = (label_private_data_t *) w->private_data;
   int label_len;
   
   /* Inform animation thread to not paint the label */
@@ -292,7 +293,7 @@ static void label_setup_label(xitk_widget_t *l, char *label_) {
   private_data->label = strdup((label_ != NULL) ? label_ : "");
 
   if(private_data->skin_element_name != NULL)
-    _create_label_pixmap(l);
+    _create_label_pixmap(w);
   else
     private_data->anim_offset = 0;
 
@@ -332,13 +333,14 @@ static void label_setup_label(xitk_widget_t *l, char *label_) {
  *
  */
 static void notify_change_skin(xitk_widget_list_t *wl, 
-			       xitk_widget_t *l, xitk_skin_config_t *skonfig) {
-  label_private_data_t *private_data = 
-    (label_private_data_t *) l->private_data;
+			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+  label_private_data_t *private_data;
   
-  if(l->widget_type & WIDGET_TYPE_LABEL) {
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
+    private_data = (label_private_data_t *) w->private_data;
+    
     if(private_data->skin_element_name) {
-
+      
       xitk_skin_lock(skonfig);
 
       XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->font);
@@ -350,19 +352,19 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       private_data->length      = xitk_skin_get_label_length(skonfig, private_data->skin_element_name);
       private_data->animation   = xitk_skin_get_label_animation(skonfig, private_data->skin_element_name);
       
-      l->x                      = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-      l->y                      = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-      l->width                  = private_data->char_length * private_data->length;
-      l->height                 = private_data->char_height;
-      l->visible                = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
-      l->enable                 = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
+      w->x                      = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+      w->y                      = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      w->width                  = private_data->char_length * private_data->length;
+      w->height                 = private_data->char_height;
+      w->visible                = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
+      w->enable                 = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       xitk_skin_unlock(skonfig);
 
       if(private_data->skin_element_name != NULL)
-	_create_label_pixmap(l);
+	_create_label_pixmap(w);
 
-      xitk_set_widget_pos(l, l->x, l->y);
+      xitk_set_widget_pos(w, w->x, w->y);
     }
   }
 }
@@ -370,17 +372,37 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 /*
  *
  */
-int xitk_label_change_label (xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel) {
+int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *w, char *newlabel) {
 
-  if(l->widget_type & WIDGET_TYPE_LABEL) {
-
-    label_setup_label(l, newlabel);
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     
-    paint_label(l, wl->win, wl->gc);
+    label_setup_label(w, newlabel);
+    
+    paint_label(w, wl->win, wl->gc);
 
     return 1;
   }
 
+  return 0;
+}
+
+/*
+ *
+ */
+static int notify_click_label(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp, int x, int y) {
+  label_private_data_t *private_data;
+  
+  if (w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
+    private_data = (label_private_data_t *) w->private_data;
+    
+    if(private_data->callback) {
+      if(bUp)
+	private_data->callback(private_data->lWidget, private_data->userdata);
+      return 1;
+    }
+
+  }
+  
   return 0;
 }
 
@@ -400,6 +422,8 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
 
   private_data->imlibdata      = l->imlibdata;
   private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(l->skin_element_name);
+  private_data->callback       = l->callback;
+  private_data->userdata       = l->userdata;
 
   private_data->lWidget        = mywidget;
 
@@ -452,7 +476,7 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
   }
   mywidget->widget_type        = WIDGET_TYPE_LABEL;
   mywidget->paint              = paint_label;
-  mywidget->notify_click       = NULL;
+  mywidget->notify_click       = notify_click_label;
   mywidget->notify_focus       = NULL;
   mywidget->notify_keyevent    = NULL;
   mywidget->notify_inside      = NULL;

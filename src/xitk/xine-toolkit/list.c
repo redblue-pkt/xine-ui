@@ -136,7 +136,7 @@ void *xitk_list_last_content (xitk_list_t *l) {
 /*
  *
  */
-void *xitk_list_prev_content (xitk_list_t *l){
+void *xitk_list_prev_content (xitk_list_t *l) {
 
   if (l->cur) {
     if (l->cur->prev) {

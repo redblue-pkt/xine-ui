@@ -48,9 +48,11 @@ typedef struct {
  */
 static void notify_destroy(xitk_widget_t *w, void *data) {
   tabs_private_data_t *private_data;
-
-  if(w->widget_type & WIDGET_TYPE_TABS) {
+  
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
     int i;
+    
     private_data = (tabs_private_data_t *) w->private_data;
 
     XITK_FREE(private_data->skin_element_name);
@@ -67,7 +69,8 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 static void tabs_arrange(xitk_widget_t *w) {
   tabs_private_data_t  *private_data;
 
-  if((w->widget_type & WIDGET_TYPE_TABS) && (w->visible == 1)) {
+  if(w && ((((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
+	    (w->widget_type & WIDGET_GROUP_WIDGET)) && (w->visible == 1))) {
     int i = 0, width, x;
     
     private_data = (tabs_private_data_t*) w->private_data;
@@ -143,9 +146,12 @@ static void tabs_arrange(xitk_widget_t *w) {
  */
 static void paint(xitk_widget_t *w, Window win, GC gc) {
   tabs_private_data_t *private_data;
+  
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
 
-  if(w->widget_type & WIDGET_TYPE_TABS) {
     private_data = (tabs_private_data_t*)w->private_data;
+
     if((w->visible == 1)) {
       tabs_arrange(w);
       if(private_data->old_offset == -2)
@@ -216,7 +222,9 @@ void xitk_tabs_set_current_selected(xitk_widget_t *w, int select) {
   if(!w)
     XITK_WARNING("%s(): widget is NULL\n", __FUNCTION__);
   
-  if(w->widget_type & WIDGET_TYPE_TABS) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
     private_data = (tabs_private_data_t*)w->private_data;
     
     if(select <= private_data->num_entries) {
@@ -239,7 +247,9 @@ int xitk_tabs_get_current_selected(xitk_widget_t *w) {
     return -1;
   }
     
-  if(w->widget_type & WIDGET_TYPE_TABS) {
+  if(((w->widget_type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
+     (w->widget_type & WIDGET_GROUP_WIDGET)) {
+
     private_data = (tabs_private_data_t*)w->private_data;
     return (private_data->selected);
   }
@@ -259,7 +269,9 @@ char *xitk_tabs_get_current_tab_selected(xitk_widget_t *w) {
     return NULL;
   }
 
-  if(w->widget_type & WIDGET_TYPE_TABS) {
+  if(((w->widget_type & WIDGET_GROUP_MASK) == WIDGET_GROUP_TABS) &&
+     (w->widget_type & WIDGET_GROUP_WIDGET)) {
+
     private_data = (tabs_private_data_t*)w->private_data;
     return ((xitk_labelbutton_get_label(private_data->tabs[private_data->selected])));
   }
@@ -339,6 +351,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t,
 								 private_data->bheight, 
 								 "Black", "Black", "Black",
 								 fontname)));
+      private_data->tabs[i]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
       xx += fwidth + 20;
 
       xitk_hide_widget(private_data->parent_wlist, private_data->tabs[i]);
@@ -358,6 +371,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t,
       xitk_list_append_content(t->parent_wlist->l,
        (private_data->left = xitk_noskin_button_create(&b, (private_data->x + width) - 40, 
 						       (y-1) + (private_data->bheight - 20), 20, 20)));
+      private_data->left->widget_type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
       
       wimage = xitk_get_widget_foreground_skin(private_data->left);
       if(wimage)
@@ -370,6 +384,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t,
       xitk_list_append_content(t->parent_wlist->l,
        (private_data->right = xitk_noskin_button_create(&b, (private_data->x + width) - 20,
 							(y-1) + (private_data->bheight - 20), 20, 20)));
+      private_data->right->widget_type |= WIDGET_GROUP | WIDGET_GROUP_TABS;
 
       wimage = xitk_get_widget_foreground_skin(private_data->right);
       if(wimage)
@@ -394,7 +409,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t,
   mywidget->have_focus            = FOCUS_LOST; 
   mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x = mywidget->y = mywidget->width = mywidget->height = 0;
-  mywidget->widget_type           = WIDGET_TYPE_TABS | WIDGET_TYPE_GROUP;
+  mywidget->widget_type           = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_TABS;
   mywidget->paint                 = paint;
   mywidget->notify_click          = NULL;
   mywidget->notify_focus          = NULL;

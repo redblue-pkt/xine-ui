@@ -703,20 +703,31 @@ static xitk_color_names_t xitk_color_names[] = {
 
 #if 0
 void dump_widget_type(xitk_widget_t *w) {
-  if(w->widget_type      & WIDGET_TYPE_GROUP)       printf("WIDGET_TYPE_GROUP | ");
-  if(w->widget_type      & WIDGET_TYPE_BUTTON)      printf("WIDGET_TYPE_BUTTON");
-  else if(w->widget_type & WIDGET_TYPE_LABELBUTTON) printf("WIDGET_TYPE_LABELBUTTON");
-  else if(w->widget_type & WIDGET_TYPE_SLIDER)      printf("WIDGET_TYPE_SLIDER");
-  else if(w->widget_type & WIDGET_TYPE_LABEL)       printf("WIDGET_TYPE_LABEL");
-  else if(w->widget_type & WIDGET_TYPE_CHECKBOX)    printf("WIDGET_TYPE_CHECKBOX");
-  else if(w->widget_type & WIDGET_TYPE_IMAGE)       printf("WIDGET_TYPE_IMAGE");
-  else if(w->widget_type & WIDGET_TYPE_BROWSER)     printf("WIDGET_TYPE_BROWSER");
-  else if(w->widget_type & WIDGET_TYPE_FILEBROWSER) printf("WIDGET_TYPE_FILEBROWSER");
-  else if(w->widget_type & WIDGET_TYPE_MRLBROWSER)  printf("WIDGET_TYPE_MRLBROWSER");
-  else if(w->widget_type & WIDGET_TYPE_INPUTTEXT)   printf("WIDGET_TYPE_INPUTTEXT");
-  else if(w->widget_type & WIDGET_TYPE_COMBO)       printf("WIDGET_TYPE_COMBO");
-  else if(w->widget_type & WIDGET_TYPE_TABS)        printf("WIDGET_TYPE_TABS");
-  else if(w->widget_type & WIDGET_TYPE_INTBOX)      printf("WIDGET_TYPE_INTBOX");
+  if(w->widget_type & WIDGET_GROUP) {
+    printf("WIDGET_TYPE_GROUP: ");
+    if(w->widget_type & WIDGET_GROUP_WIDGET)
+      printf("[THE_WIDGET] ");
+    if((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)
+      printf("WIDGET_TYPE_BROWSER | ");
+    if((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_FILEBROWSER)
+      printf("WIDGET_TYPE_FILEBROWSER | ");
+    if((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MRLBROWSER)
+      printf("WIDGET_TYPE_MRLBROWSER | ");
+    if((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO)
+      printf("WIDGET_TYPE_COMBO | ");
+    if((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS)
+      printf("WIDGET_TYPE_TABS | ");
+    if((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX)
+      printf("WIDGET_TYPE_INTBOX | ");
+  }
+
+  if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)      printf("WIDGET_TYPE_BUTTON ");
+  if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) printf("WIDGET_TYPE_LABELBUTTON ");
+  if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)      printf("WIDGET_TYPE_SLIDER ");
+  if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)       printf("WIDGET_TYPE_LABEL ");
+  if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)    printf("WIDGET_TYPE_CHECKBOX ");
+  if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)       printf("WIDGET_TYPE_IMAGE ");
+  if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)   printf("WIDGET_TYPE_INPUTTEXT ");
   printf("\n");
 }
 #endif
@@ -882,20 +893,19 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) {
       /* Kill (hide) tips */
       xitk_tips_tips_kill(wl->widget_under_mouse);
       
-      if (wl->widget_under_mouse->notify_focus 
-	  && wl->widget_under_mouse->enable == WIDGET_ENABLE) {
-      	(void) (wl->widget_under_mouse->notify_focus)(wl, wl->widget_under_mouse, FOCUS_MOUSE_OUT);
+      if (wl->widget_under_mouse->notify_focus && 
+	  wl->widget_under_mouse->enable == WIDGET_ENABLE) {
+	(void) (wl->widget_under_mouse->notify_focus)(wl, wl->widget_under_mouse, FOCUS_MOUSE_OUT);
       }
       
       if(wl->widget_under_mouse->paint)
 	(wl->widget_under_mouse->paint) (wl->widget_under_mouse, wl->win, wl->gc);
-      
     }
     
     wl->widget_under_mouse = mywidget;
     
     if (mywidget && (mywidget->enable == WIDGET_ENABLE) && mywidget->visible) {
-
+      
 #if 0
       dump_widget_type(mywidget);
 #endif
@@ -906,8 +916,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) {
 	(void) (mywidget->notify_focus) (wl, mywidget, FOCUS_MOUSE_IN);
       
       if(mywidget->paint)
-	(mywidget->paint) (mywidget, wl->win, wl->gc);
-      
+	  (mywidget->paint) (mywidget, wl->win, wl->gc);
     }
     
   }
@@ -1065,6 +1074,8 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
     return;
   }
 
+#warning FIXME, take care about group widgets.
+
   if(backward) 
     first_widget = widget = (xitk_widget_t *) xitk_list_last_content (wl->l);
   else
@@ -1098,7 +1109,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
       if (wl->widget_focused->notify_click
       	  && wl->widget_focused->enable == WIDGET_ENABLE && wl->widget_focused->running) {
       	
-      	if(wl->widget_focused->widget_type & WIDGET_TYPE_INPUTTEXT) {
+      	if((wl->widget_focused->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
       	  (void) (wl->widget_focused->notify_click) (wl, wl->widget_focused, LBUTTON_DOWN, 
       						     wl->widget_focused->x + 1, 
       						     wl->widget_focused->y + 1);

@@ -549,7 +549,7 @@ static void _window_handle_event(XEvent *event, void *data) {
     XUNLOCK(wd->imlibdata->x.disp);
     break;
 
-  case KeyRelease: {
+  case KeyPress: {
     XKeyEvent  mykeyevent;
     KeySym     mykey;
     char       kbuf[256];

@@ -274,6 +274,8 @@ typedef struct {
   GC                        gc;
   char                     *label;
   char                     *skin_element_name;
+  xitk_simple_callback_t    callback;
+  void                     *userdata;
 } xitk_label_widget_t;
 
 #define XITK_VSLIDER 1

@@ -56,10 +56,13 @@ static void notify_change_skin(xitk_widget_list_t *, xitk_widget_t *, xitk_skin_
  *
  */
 static void paint(xitk_widget_t *w, Window win, GC gc) {
-  browser_private_data_t *private_data = (browser_private_data_t *) w->private_data;
+  browser_private_data_t *private_data;
   
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
     int i;
+    
+    private_data = (browser_private_data_t *) w->private_data;
 
     if((w->visible == 1)) {
       if(!private_data->skin_element_name) {
@@ -100,9 +103,13 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
  */
 static void notify_change_skin(xitk_widget_list_t *wl, 
 			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  browser_private_data_t *private_data = (browser_private_data_t *) w->private_data;
+  browser_private_data_t *private_data;
   
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
+    private_data = (browser_private_data_t *) w->private_data;
+    
     xitk_skin_lock(skonfig);
     
     if(private_data->skin_element_name) {
@@ -129,10 +136,11 @@ static void notify_change_skin(xitk_widget_list_t *wl,
  * Return the real number of first displayed in list
  */
 int xitk_browser_get_current_start(xitk_widget_t *w) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
+  browser_private_data_t *private_data;
 
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    private_data = (browser_private_data_t *) w->private_data;
     return private_data->current_start;
   }
 
@@ -143,11 +151,14 @@ int xitk_browser_get_current_start(xitk_widget_t *w) {
  * Change browser labels alignment
  */
 void xitk_browser_set_alignment(xitk_widget_t *w, int align) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
+  browser_private_data_t *private_data;
   int i;
   
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
+    private_data = (browser_private_data_t *) w->private_data;
+    
     for(i = 0; i < private_data->max_length; i++) {
       xitk_labelbutton_set_alignment(private_data->item_tree[i+WBSTART], align);
     }
@@ -158,11 +169,14 @@ void xitk_browser_set_alignment(xitk_widget_t *w, int align) {
  * Return the current selected button (if not, return -1)
  */
 int xitk_browser_get_current_selected(xitk_widget_t *w) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
-  int i;
+  browser_private_data_t *private_data;
+  int                     i;
   
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
+    private_data = (browser_private_data_t *) w->private_data;
+    
     for(i = 0; i < private_data->max_length; i++) {
       if(xitk_labelbutton_get_state(private_data->item_tree[i+WBSTART]))
 	return (private_data->current_start + i);
@@ -176,11 +190,14 @@ int xitk_browser_get_current_selected(xitk_widget_t *w) {
  * Release all enabled buttons
  */
 void xitk_browser_release_all_buttons(xitk_widget_t *w) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
-  int i;
+  browser_private_data_t *private_data;
+  int                     i;
   
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
+    private_data = (browser_private_data_t *) w->private_data;
+    
     for(i = 0; i < private_data->max_length; i++) {
       xitk_labelbutton_set_state(private_data->item_tree[i+WBSTART], 0, 
 				 private_data->parent_wlist->win,
@@ -193,10 +210,13 @@ void xitk_browser_release_all_buttons(xitk_widget_t *w) {
  * Select the item 'select' in list
  */
 void xitk_browser_set_select(xitk_widget_t *w, int select) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
+  browser_private_data_t *private_data;
   
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
+    private_data = (browser_private_data_t *) w->private_data;
+    
     xitk_browser_release_all_buttons(w);
     
     xitk_labelbutton_set_state(private_data->item_tree[select+WBSTART], 1, 
@@ -208,12 +228,15 @@ void xitk_browser_set_select(xitk_widget_t *w, int select) {
  * Redraw buttons/slider
  */
 void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
-  xitk_widget_list_t* wl;
-  int i, j;
+  browser_private_data_t *private_data;
+  xitk_widget_list_t     *wl;
+  int                     i, j;
 
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
+    private_data = (browser_private_data_t *) w->private_data;
+    
     xitk_browser_release_all_buttons(w);
     
     if(start >= 0)
@@ -255,15 +278,15 @@ void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
  */
 void xitk_browser_update_list(xitk_widget_t *w, char **list, int len, int start) {
   browser_private_data_t *private_data;
-
-  if(w) {
-    if(w->widget_type & WIDGET_TYPE_BROWSER) {
-      private_data = (browser_private_data_t *) w->private_data;
-      private_data->content = list;
-      private_data->list_length = len;
-      private_data->current_start = start;
-      xitk_browser_rebuild_browser(w, start);
-    }
+  
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
+    private_data = (browser_private_data_t *) w->private_data;
+    private_data->content = list;
+    private_data->list_length = len;
+    private_data->current_start = start;
+    xitk_browser_rebuild_browser(w, start);
   }
 }  
 
@@ -271,12 +294,13 @@ void xitk_browser_update_list(xitk_widget_t *w, char **list, int len, int start)
  * Handle slider movments
  */
 static void browser_slidmove(xitk_widget_t *w, void *data, int pos) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) ((xitk_widget_t*)data)->private_data;
-  int realpos;
+  browser_private_data_t *private_data;
+  int                     realpos;
   
-  
-  if(w->widget_type & (WIDGET_TYPE_SLIDER | WIDGET_TYPE_BUTTON | WIDGET_TYPE_BROWSER)) {
+  if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+
+    private_data = (browser_private_data_t *) ((xitk_widget_t*)data)->private_data;
+    
     if(xitk_browser_get_current_selected(((xitk_widget_t*)data)) > -1)
       xitk_browser_release_all_buttons(((xitk_widget_t*)data));
     
@@ -296,11 +320,12 @@ static void browser_slidmove(xitk_widget_t *w, void *data, int pos) {
  * slide up
  */
 static void browser_up(xitk_widget_t *w, void *data) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) ((xitk_widget_t*)data)->private_data;
-  xitk_widget_list_t* wl;
+  browser_private_data_t *private_data;
+  xitk_widget_list_t     *wl;
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    private_data = (browser_private_data_t *) ((xitk_widget_t*)data)->private_data;
 
-  if(w->widget_type & WIDGET_TYPE_BUTTON) {
     wl = (xitk_widget_list_t*) xitk_xmalloc(sizeof(xitk_widget_list_t));
     wl->win = private_data->parent_wlist->win;
     wl->gc = private_data->parent_wlist->gc;
@@ -316,11 +341,12 @@ static void browser_up(xitk_widget_t *w, void *data) {
  * slide down
  */
 static void browser_down(xitk_widget_t *w, void *data) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) ((xitk_widget_t*)data)->private_data;
-  xitk_widget_list_t *wl;
+  browser_private_data_t *private_data;
+  xitk_widget_list_t     *wl;
 
-  if(w->widget_type & WIDGET_TYPE_BUTTON) {
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
+    private_data = (browser_private_data_t *) ((xitk_widget_t*)data)->private_data;
+    
     wl = (xitk_widget_list_t*) xitk_xmalloc(sizeof(xitk_widget_list_t));
     wl->win = private_data->parent_wlist->win;
     wl->gc = private_data->parent_wlist->gc;
@@ -336,11 +362,13 @@ static void browser_down(xitk_widget_t *w, void *data) {
  * slide up (extern).
  */
 void xitk_browser_step_up(xitk_widget_t *w, void *data) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
-  xitk_widget_list_t *wl;
+  browser_private_data_t *private_data;
+  xitk_widget_list_t     *wl;
   
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    private_data = (browser_private_data_t *) w->private_data;
+    
     wl = (xitk_widget_list_t*) xitk_xmalloc(sizeof(xitk_widget_list_t));
     wl->win = private_data->parent_wlist->win;
     wl->gc = private_data->parent_wlist->gc;
@@ -356,11 +384,14 @@ void xitk_browser_step_up(xitk_widget_t *w, void *data) {
  * slide Down (extern).
  */
 void xitk_browser_step_down(xitk_widget_t *w, void *data) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
-  xitk_widget_list_t* wl;
+  browser_private_data_t *private_data;
+  xitk_widget_list_t     *wl;
   
-  if(w->widget_type & WIDGET_TYPE_BROWSER) {
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    
+    private_data = (browser_private_data_t *) w->private_data;
+    
     wl = (xitk_widget_list_t*) xitk_xmalloc(sizeof(xitk_widget_list_t));
     wl->win = private_data->parent_wlist->win;
     wl->gc = private_data->parent_wlist->gc;
@@ -377,11 +408,13 @@ void xitk_browser_step_down(xitk_widget_t *w, void *data) {
  * Handle list selections
  */
 static void browser_select(xitk_widget_t *w, void *data, int state) {
-  int i, btn_selected;
-  browser_private_data_t *private_data = 
-    (browser_private_data_t*) ((btnlist_t*)data)->itemlist->private_data;
-
-  if(w->widget_type & WIDGET_TYPE_LABELBUTTON) { 
+  browser_private_data_t *private_data;
+  int                     i, btn_selected;
+  
+  if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) { 
+    
+    private_data = (browser_private_data_t*) ((btnlist_t*)data)->itemlist->private_data;
+    
     if(private_data->dbl_click_callback || private_data->callback) {
       if(!strcasecmp((xitk_labelbutton_get_label(private_data->
 						 item_tree[(int)((btnlist_t*)data)->
@@ -481,6 +514,27 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
   }
 }
 
+/*
+ *
+ */
+xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w) {
+  xitk_widget_t *widget = NULL;
+  
+  if(wl && w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+
+    widget = (xitk_widget_t *) xitk_list_first_content(wl->l);
+    while(widget && (widget != w)) {
+      widget = (xitk_widget_t *) xitk_list_next_content(wl->l);
+    }
+    while(widget && (!(((widget->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+		       (widget->widget_type & WIDGET_GROUP_WIDGET)))) {
+      widget = (xitk_widget_t *) xitk_list_next_content(wl->l);
+    }
+  }
+
+  return widget;
+}
+
 /**
  * Create the list browser
  */
@@ -537,7 +591,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
   mywidget->width                      = width;
   mywidget->height                     = height;
   
-  mywidget->widget_type                = WIDGET_TYPE_BROWSER | WIDGET_TYPE_GROUP;
+  mywidget->widget_type                = WIDGET_GROUP | WIDGET_GROUP_WIDGET | WIDGET_GROUP_BROWSER;
   mywidget->paint                      = paint;
   mywidget->notify_click               = NULL;
   mywidget->notify_focus               = NULL;
@@ -573,31 +627,6 @@ xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_wid
   private_data = (browser_private_data_t *) xitk_xmalloc(sizeof(browser_private_data_t));
   private_data->skonfig = skonfig;
 
-  b.skin_element_name = br->arrow_up.skin_element_name;
-  b.callback          = browser_up;
-  b.userdata          = (void *)mywidget;
-  xitk_list_append_content(br->parent_wlist->l, 
-			   (private_data->item_tree[WBUP] = xitk_button_create(skonfig, &b)));
-  
-  sl.min                      = 0;
-  sl.max                      = (br->browser.num_entries > (br->browser.max_displayed_entries-1) ? br->browser.num_entries-1 : 0);
-  sl.step                     = 1;
-  sl.skin_element_name        = br->slider.skin_element_name;
-  sl.callback                 = browser_slidmove;
-  sl.userdata                 = (void*)mywidget;
-  sl.motion_callback          = browser_slidmove;
-  sl.motion_userdata          = (void*)mywidget;
-  xitk_list_append_content(br->parent_wlist->l,
-	  (private_data->item_tree[WSLID] = xitk_slider_create(skonfig, &sl)));
-  
-  xitk_slider_set_to_max(br->parent_wlist, private_data->item_tree[WSLID]);
-  
-  b.skin_element_name = br->arrow_dn.skin_element_name;
-  b.callback          = browser_down;
-  b.userdata          = (void *)mywidget;
-  xitk_list_append_content(br->parent_wlist->l, 
-			  private_data->item_tree[WBDN] = xitk_button_create (skonfig, &b));
-  
   {
 
     int x, y, i;
@@ -622,12 +651,41 @@ xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_wid
       xitk_list_append_content(br->parent_wlist->l, 
 			       (private_data->item_tree[i] = 
 				xitk_labelbutton_create (skonfig, &lb)));
+      private_data->item_tree[i]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
       
       (void) xitk_set_widget_pos(private_data->item_tree[i], x, y);
 
       y += xitk_get_widget_height(private_data->item_tree[i]) + 1;
     }
   }
+  
+  b.skin_element_name = br->arrow_up.skin_element_name;
+  b.callback          = browser_up;
+  b.userdata          = (void *)mywidget;
+  xitk_list_append_content(br->parent_wlist->l, 
+			   (private_data->item_tree[WBUP] = xitk_button_create(skonfig, &b)));
+  private_data->item_tree[WBUP]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
+  
+  sl.min                      = 0;
+  sl.max                      = (br->browser.num_entries > (br->browser.max_displayed_entries-1) ? br->browser.num_entries-1 : 0);
+  sl.step                     = 1;
+  sl.skin_element_name        = br->slider.skin_element_name;
+  sl.callback                 = browser_slidmove;
+  sl.userdata                 = (void*)mywidget;
+  sl.motion_callback          = browser_slidmove;
+  sl.motion_userdata          = (void*)mywidget;
+  xitk_list_append_content(br->parent_wlist->l,
+	  (private_data->item_tree[WSLID] = xitk_slider_create(skonfig, &sl)));
+  private_data->item_tree[WSLID]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
+
+  xitk_slider_set_to_max(br->parent_wlist, private_data->item_tree[WSLID]);
+  
+  b.skin_element_name = br->arrow_dn.skin_element_name;
+  b.callback          = browser_down;
+  b.userdata          = (void *)mywidget;
+  xitk_list_append_content(br->parent_wlist->l, 
+			  private_data->item_tree[WBDN] = xitk_button_create (skonfig, &b));
+  private_data->item_tree[WBDN]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
   
   return _xitk_browser_create(skonfig, br, 
 			      0, 0, 0, 0, br->browser.skin_element_name, mywidget, private_data,
@@ -656,56 +714,6 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, int 
   private_data = (browser_private_data_t *) xitk_xmalloc(sizeof(browser_private_data_t));
   private_data->skonfig = NULL;
 
-  b.skin_element_name = NULL;
-  b.callback          = browser_up;
-  b.userdata          = (void *)mywidget;
-  xitk_list_append_content(br->parent_wlist->l, 
-			   (private_data->item_tree[WBUP] = 
-			    xitk_noskin_button_create(&b,
-						      x + itemw, y + 0, slidw, btnh)));
-  
-  { /* Draw arrow in button */
-    xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBUP]);
-    
-    if(wimage)
-      draw_arrow_up(b.imlibdata, wimage);
-
-  }
-
-  sl.min                      = 0;
-  sl.max                      = (br->browser.num_entries > (br->browser.max_displayed_entries-1) ? br->browser.num_entries-1 : 0);
-  sl.step                     = 1;
-  sl.skin_element_name        = NULL;
-  sl.callback                 = browser_slidmove;
-  sl.userdata                 = (void*)mywidget;
-  sl.motion_callback          = browser_slidmove;
-  sl.motion_userdata          = (void*)mywidget;
-  xitk_list_append_content(br->parent_wlist->l,
-	   (private_data->item_tree[WSLID] = 
-	    xitk_noskin_slider_create(&sl,
-				      x + itemw, y + btnh, slidw, 
-				      (itemh * br->browser.max_displayed_entries) - (btnh * 2),
-				      XITK_VSLIDER)));
-			   
-  xitk_slider_set_to_max(br->parent_wlist, private_data->item_tree[WSLID]);
-  
-  b.skin_element_name = NULL;
-  b.callback          = browser_down;
-  b.userdata          = (void *)mywidget;
-  xitk_list_append_content(br->parent_wlist->l, 
-	   (private_data->item_tree[WBDN] = 
-	    xitk_noskin_button_create(&b,
-				      x + itemw, 
-				      y + ((itemh * br->browser.max_displayed_entries) - btnh), 
-				      slidw, btnh)));
-  
-  { /* Draw arrow in button */
-    xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBDN]);
-    
-    if(wimage)
-      draw_arrow_down(b.imlibdata, wimage);
-
-  }
   {
     int            ix = x, iy = y, i;
     btnlist_t     *bt;
@@ -732,6 +740,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, int 
 								"Black", "Black", "White", 
 								fontname)));
       
+      private_data->item_tree[i]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
       wimage = xitk_get_widget_foreground_skin(private_data->item_tree[i]);
       if(wimage)
 	draw_flat_three_state(br->imlibdata, wimage);				
@@ -740,6 +749,60 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, int 
 
       iy += itemh;
     }
+  }
+
+  b.skin_element_name = NULL;
+  b.callback          = browser_up;
+  b.userdata          = (void *)mywidget;
+  xitk_list_append_content(br->parent_wlist->l, 
+			   (private_data->item_tree[WBUP] = 
+			    xitk_noskin_button_create(&b,
+						      x + itemw, y + 0, slidw, btnh)));
+  private_data->item_tree[WBUP]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
+
+  { /* Draw arrow in button */
+    xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBUP]);
+    
+    if(wimage)
+      draw_arrow_up(b.imlibdata, wimage);
+
+  }
+
+  sl.min                      = 0;
+  sl.max                      = (br->browser.num_entries > (br->browser.max_displayed_entries-1) ? br->browser.num_entries-1 : 0);
+  sl.step                     = 1;
+  sl.skin_element_name        = NULL;
+  sl.callback                 = browser_slidmove;
+  sl.userdata                 = (void*)mywidget;
+  sl.motion_callback          = browser_slidmove;
+  sl.motion_userdata          = (void*)mywidget;
+  xitk_list_append_content(br->parent_wlist->l,
+	   (private_data->item_tree[WSLID] = 
+	    xitk_noskin_slider_create(&sl,
+				      x + itemw, y + btnh, slidw, 
+				      (itemh * br->browser.max_displayed_entries) - (btnh * 2),
+				      XITK_VSLIDER)));
+  private_data->item_tree[WSLID]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
+			   
+  xitk_slider_set_to_max(br->parent_wlist, private_data->item_tree[WSLID]);
+  
+  b.skin_element_name = NULL;
+  b.callback          = browser_down;
+  b.userdata          = (void *)mywidget;
+  xitk_list_append_content(br->parent_wlist->l, 
+	   (private_data->item_tree[WBDN] = 
+	    xitk_noskin_button_create(&b,
+				      x + itemw, 
+				      y + ((itemh * br->browser.max_displayed_entries) - btnh), 
+				      slidw, btnh)));
+  private_data->item_tree[WBDN]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_BROWSER;
+
+  { /* Draw arrow in button */
+    xitk_image_t *wimage = xitk_get_widget_foreground_skin(private_data->item_tree[WBDN]);
+    
+    if(wimage)
+      draw_arrow_down(b.imlibdata, wimage);
+
   }
   
   return _xitk_browser_create(NULL, br, x, y, 
