@@ -25,6 +25,8 @@
 
 /* required for getsubopt() */
 #define _XOPEN_SOURCE 500
+/* required for strncasecmp() */
+#define _BSD_SOURCE 1
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -283,7 +285,7 @@ int handle_demux_strategy_subopt(char *sopt) {
 }
 
 /*
- * Try to load an video output plugin, by stored name or probing
+ * Try to load video output plugin, by stored name or probing
  */
 static void load_video_out_driver(char *video_driver_id) {
   double        res_h, res_v;
@@ -314,6 +316,8 @@ static void load_video_out_driver(char *video_driver_id) {
 						      VISUAL_TYPE_X11, 
 						      (void *) &vis);
       if (gGui->vo_driver) {
+	if(driver_ids)
+	  free(driver_ids);
 	return;
       } 
     }
@@ -330,8 +334,10 @@ static void load_video_out_driver(char *video_driver_id) {
 						      (void *) &vis);
       if (gGui->vo_driver) {
 	config_set_str("video_driver_name", video_driver_id);
+	if(driver_ids)
+	  free(driver_ids);
 	return;
-      } 
+      }
      
       i++;
     }
@@ -356,6 +362,59 @@ static void load_video_out_driver(char *video_driver_id) {
     
     config_set_str("video_driver_name", video_driver_id);
   }
+}
+
+/*
+ * Try to load audio output plugin, by stored name or probing
+ */
+static void load_audio_out_driver(char *audio_driver_id, 
+				  ao_functions_t **audio_driver) {
+  
+  if (!audio_driver_id) {
+    char **driver_ids = xine_list_audio_output_plugins ();
+    int i = 0;
+    
+    /* Try to init audio with stored information */
+    audio_driver_id = config_lookup_str("audio_driver_name", NULL);
+    if(audio_driver_id) {
+      *audio_driver = xine_load_audio_output_plugin(gGui->config, 
+						    audio_driver_id);
+      if(*audio_driver) {
+	config_set_str("audio_driver_name", audio_driver_id);
+	if(driver_ids)
+	  free(driver_ids);
+	return;
+      }
+    }
+    
+    while(driver_ids[i] != NULL && *audio_driver == NULL) {
+      audio_driver_id = driver_ids[i];
+
+      printf("try to autoload '%s' audio driver: ", driver_ids[i]);
+      
+      *audio_driver = xine_load_audio_output_plugin(gGui->config, 
+						    driver_ids[i]);
+      i++;
+    }
+  }
+  else {
+
+    /* Don't want to load an audio driver */
+    if(!strncasecmp(audio_driver_id, "NULL", strlen(audio_driver_id))) {
+      /* We don't store NULL driver name, i guess it's not very useful */
+      *audio_driver = NULL;
+      printf("Don't use any audio driver (requested).\n");
+      return;
+    }
+    else
+      *audio_driver = xine_load_audio_output_plugin(gGui->config, 
+						    audio_driver_id);
+  }
+  
+  if (*audio_driver)
+    config_set_str("audio_driver_name", audio_driver_id);
+  else
+    printf ("main: audio driver <%s> failed\n", audio_driver_id);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -539,30 +598,12 @@ int main(int argc, char *argv[]) {
   load_video_out_driver(video_driver_id);
 
   /* Audio out plugin */
-  if (!audio_driver_id) {
-    char **driver_ids = xine_list_audio_output_plugins ();
-    int i = 0;
-    
-    while(driver_ids[i] != NULL && audio_driver == NULL) {
-      printf("try to autoload '%s' audio driver: ", driver_ids[i]);
-      
-      audio_driver = xine_load_audio_output_plugin(gGui->config, 
-						   driver_ids[i]);
-      i++;
-    }
-  }
-  else
-    audio_driver = xine_load_audio_output_plugin(gGui->config, 
-						 audio_driver_id);    
+  load_audio_out_driver(audio_driver_id, &audio_driver);
 
-  if (!audio_driver) {
-    printf ("main: audio driver <%s> failed\n", audio_driver_id);
-  }
 
   /*
    * xine init
    */
-
   printf ("main: starting xine engine\n");
 
   gGui->xine = xine_init (gGui->vo_driver, audio_driver, 
