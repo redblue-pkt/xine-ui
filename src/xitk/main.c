@@ -140,11 +140,12 @@ static struct option long_options[] = {
   {0                , no_argument      , 0,  0                       }
 };
 
+#undef TRACE_RC
 
 /*
  *    RC file related functions
  */
-#if DEBUG
+#ifdef TRACE_RC
 static void _rc_file_check_args(int argc, char **argv) {
   int i;
   
@@ -759,7 +760,7 @@ int main(int argc, char *argv[]) {
   window_attribute.borderless = 0;
 
   _argv = build_command_line_args(argc, argv, &_argc);
-#if DEBUG
+#ifdef TRACE_RC
   _rc_file_check_args(_argc, _argv);
 #endif
 
