@@ -128,8 +128,17 @@ void show_usage (void) {
     driver_id  = *driver_ids++;
   }
   printf ("\n");
+  printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
+  printf("                               ");
+  driver_ids = xine_list_audio_output_plugins ();
+  driver_id  = *driver_ids++;
+  while (driver_id) {
+    printf ("%s ", driver_id);
+    driver_id  = *driver_ids++;
+  }
+  printf ("\n");
 
-/*    printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
+  printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
   printf("  -S, --spdif                  enable AC3 output via SPDIF Port.\n");
   printf("  -4, --4-channel              enable 4-channel surround audio.\n");
@@ -151,7 +160,7 @@ void show_usage (void) {
 #ifdef DEBUG
   printf("  -d, --debug <flags>          Debug mode for <flags> ('help' for list).\n");
 #endif
-*/
+
   printf("\n");
   printf("examples for valid MRLs (media resource locator):\n");
   printf("  File:  'path/foo.vob'\n");
@@ -428,32 +437,41 @@ int main(int argc, char *argv[]) {
   }
 
   /*
-   * init output drivers
+   * load and init output drivers
    */
+
+  if (!audio_driver_id) {
+    char **driver_ids = xine_list_audio_output_plugins ();
+    audio_driver_id = driver_ids[0];
+
+    printf ("main: auto-selected <%s> audio output plugin\n", audio_driver_id);
+
+  }
+
+  audio_driver = xine_load_audio_output_plugin(cfg, audio_driver_id);
 
   if (!video_driver_id) {
     char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
     video_driver_id = driver_ids[0];
 
-    printf ("main: auto-selected %s video output plugin\n", video_driver_id);
+    printf ("main: auto-selected <%s> video output plugin\n", video_driver_id);
 
   }
 
   video_driver = xine_load_video_output_plugin(cfg, video_driver_id,
 					       VISUAL_TYPE_X11, 
 					       (void *) gDisplay);
-  audio_driver = xine_load_audio_output_plugin(cfg,
-					       audio_driver_id);
-
-
-  
 
   /*
    * xine init
    */
 
+  printf ("main: starting xine engine\n");
+
   gXine = xine_init (video_driver, audio_driver, 
 		     gui_status_callback, cfg);
+
+  printf ("main: (pre-)selection audio/spu channels\n");
 
   xine_select_audio_channel (gXine, audio_channel);
   xine_select_spu_channel (gXine, spu_channel);
@@ -478,6 +496,6 @@ int main(int argc, char *argv[]) {
 #endif
 
   return 0;
-}		
+}
 
 
