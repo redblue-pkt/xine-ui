@@ -65,6 +65,7 @@ void gui_exit (widget_t *w, void *data) {
 void gui_play (widget_t *w, void *data) {
 
   fprintf(stderr, "xine-panel: PLAY\n");
+  video_window_hide_logo();
   xine_play (gGui->xine, gGui->filename, 0 );
 
   panel_check_pause();

@@ -106,6 +106,17 @@ void video_window_draw_logo(void) {
   XUnlockDisplay (gGui->display);
 }
 
+void video_window_hide_logo(void) {
+
+  XUnmapWindow (gGui->display, gGui->video_window);
+  XMapWindow (gGui->display, gGui->video_window);
+  /*
+  gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
+				      GUI_DATA_EX_DRAWABLE_CHANGED, 
+				      (void*)gGui->video_window);
+				      */
+}
+
 /*
  *
  */
@@ -403,7 +414,7 @@ void video_window_init (void) {
 
   gVw->fullscreen_req  = 0;
   gVw->fullscreen_mode = 0;
-  gGui->video_window  = 0;
+  gGui->video_window   = 0;
   gVw->show            = 1;
 
   XLockDisplay (gGui->display);
