@@ -1,5 +1,7 @@
 xine-ui (0.9.18) unstable; urgency=low
 
+  * add linux fb frontend from Fredrik Noring <noring@nocrew.org>
+  * add session control support
   * support again text subtitle in mrl (::<sub file>),
   * ask user when duplicate shortcuts are found,
   * add subtitle field in mediamark editor, add shortcut to select,
