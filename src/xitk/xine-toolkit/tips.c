@@ -121,7 +121,9 @@ static void *_tips_loop_thread(void *data) {
       
       fs = xitk_font_load_font(tips.display, DEFAULT_FONT_10);
       xitk_font_set_font(fs, tips.widget->wl->gc);
-      string_length = xitk_font_get_string_length(fs, tips.widget->tips_string);
+
+      string_length = MIN((xitk_font_get_string_length(fs, tips.widget->tips_string)), (xitk_get_display_width()/3));
+
       xitk_font_unload_font(fs);
       
       cwarnfore = xitk_get_pixel_color_warning_foreground(tips.widget->imlibdata);

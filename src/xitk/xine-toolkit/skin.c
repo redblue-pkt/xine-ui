@@ -107,6 +107,7 @@ static void skin_free_cache(xitk_skin_config_t *skonfig) {
 /*
  *
  */
+#warning FIXME
 static char *_get_expanded_command(xitk_skin_config_t *skonfig, char *cmd) {
   char *p;
   char *ret = NULL;

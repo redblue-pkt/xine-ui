@@ -38,6 +38,7 @@
 #define ALIGN_RIGHT   3
 #define ALIGN_DEFAULT (ALIGN_LEFT)
 
+#define TABULATION_SIZE 6 /* number of chars inserted in place of a tabulation */
 
 typedef struct {
   ImlibData            *imlibdata;

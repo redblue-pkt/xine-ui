@@ -116,6 +116,8 @@ typedef struct {
 
 typedef struct {
   Display                    *display;
+  int                         display_width;
+  int                         display_height;
   int                         verbosity;
   xitk_list_t                *list;
   xitk_list_t                *gfx;
@@ -1642,6 +1644,8 @@ void xitk_init(Display *display, int verbosity) {
 
   gXitk = (__xitk_t *) xitk_xmalloc(sizeof(__xitk_t));
 
+  gXitk->display_width   = DisplayWidth(display, DefaultScreen(display));
+  gXitk->display_height  = DisplayHeight(display, DefaultScreen(display));
   gXitk->verbosity       = verbosity;
   gXitk->list            = xitk_list_new();
   gXitk->gfx             = xitk_list_new();
@@ -1932,6 +1936,14 @@ int xitk_get_checkstyle_feature(void) {
 int xitk_get_menu_shortcuts_enability(void) {
   return xitk_config_get_menu_shortcuts_enability(gXitk->config);
 }
+
+int xitk_get_display_width(void) {
+  return gXitk->display_width;
+}
+int xitk_get_display_height(void) {
+  return gXitk->display_height;
+}
+
 /*
  * copy src to dest and substitute special chars. dest should have 
  * enought space to store chars.
