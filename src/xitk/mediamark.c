@@ -2724,11 +2724,10 @@ static void mmkeditor_apply(xitk_widget_t *w, void *data) {
     if((start = xitk_intbox_get_value(mmkeditor->start)) < 0)
       start = 0;
 
-    if((end = xitk_intbox_get_value(mmkeditor->end)) < start)
-      end = start + 1;
-
-    if(end < -1)
+    if((end = xitk_intbox_get_value(mmkeditor->end)) <= -1)
       end = -1;
+    else if (end < start)
+      end = start + 1;
     
     av_offset  = xitk_intbox_get_value(mmkeditor->av_offset);
     spu_offset = xitk_intbox_get_value(mmkeditor->spu_offset);
