@@ -700,6 +700,15 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	if(autoplay_mrls) {
 	  int j;
 	  
+	  /* Flush playlist in newbie mode */
+	  if(gGui->newbie_mode) {
+	    mediamark_free_mediamarks();
+	    playlist_update_playlist();
+	    if(playlist != NULL)
+	      xitk_inputtext_change_text(playlist->winput, NULL);
+	    gGui->playlist.cur = 0;
+	  }
+
 	  if(!gGui->playlist.num)
 	    gGui->playlist.cur = 0;
 	  
