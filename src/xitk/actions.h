@@ -44,7 +44,7 @@ void gui_eject(xitk_widget_t *w, void *data);
 
 void gui_toggle_visibility(xitk_widget_t *w, void *data);
 
-void gui_toggle_fullscreen(xitk_widget_t *w, void *data);
+void gui_set_fullscreen_mode(xitk_widget_t *w, void *data);
 
 void gui_toggle_aspect(void);
 

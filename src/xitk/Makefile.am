@@ -28,7 +28,7 @@ xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 
 xine_remote_SOURCES = $(GETOPT_C) xine-remote.c
 xine_remote_DEPENDENTIES = xine-remote.c
-xine_remote_LDADD = $(TERMCAP_LIB) $(NET_LIBS) $(THREAD_LIBS) $(top_builddir)/readline/libreadline.la
+xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) $(top_builddir)/readline/libreadline.la $(TERMCAP_LIB)
 
 noinst_HEADERS = $(GETOPT_H) event.h playlist.h control.h skins.h kbindings.h \
 	panel.h lirc.h actions.h videowin.h mrl_browser.h snapshot.h setup.h viewlog.h \

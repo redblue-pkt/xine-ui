@@ -136,13 +136,13 @@ static void snapshot_loc_cb(void *data, cfg_entry_t *cfg) {
 }
 
 static int actions_on_start(action_id_t actions[], action_id_t a) {
-  int i = 0;
+  int i = 0, num = 0;
   while(actions[i] != ACTID_NOKEY) {
     if(actions[i] == a)
-      return 1;
+      num++;
     i++;
   }
-  return 0;
+  return num;
 }
 
 /**
@@ -382,7 +382,7 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_TOGGLE_FULLSCREEN:
-    gui_toggle_fullscreen(NULL, NULL);
+    gui_set_fullscreen_mode(NULL, NULL);
     break;
 
   case ACTID_TOGGLE_ASPECT_RATIO:
@@ -979,6 +979,8 @@ void gui_init_imlib (Visual *vis) {
  */
 void gui_run (void) {
 
+  int i;
+
   video_window_change_skins();
   panel_add_autoplay_buttons();
   panel_add_mixer_control();
@@ -1028,7 +1030,7 @@ void gui_run (void) {
     }
 
     /*  The user wants to see in fullscreen mode  */
-    if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_FULLSCREEN))
+    for (i = actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_FULLSCREEN); i > 0; i--)
       gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
     
     /*  The user request "play on start" */

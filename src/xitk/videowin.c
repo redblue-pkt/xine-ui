@@ -47,8 +47,14 @@
 #include "panel.h"
 #include "actions.h"
 #include "errors.h"
-
 #include "xitk.h"
+
+
+#define EST_KEEP_VALID  10	  /* #frames to allow for changing fps */
+#define EST_MAX_JITTER  0.01	  /* maximum jitter to detect valid fps */
+#define EST_MAX_DIFF    0.01      /* maximum diff to detect valid fps */
+#define ABS(x) ((x)>0?(x):-(x))
+
 
 extern gGui_t *gGui;
 
@@ -65,6 +71,10 @@ typedef struct {
 
   int            video_width;     /* size of currently displayed video     */
   int            video_height;
+  double         video_duration;  /* frame duratrion in seconds */
+  double         video_average;   /* average frame duration in seconds */
+  double         use_duration;    /* duration used for tv mode selection */
+  int            video_duration_valid; /* is use_duration trustable? */
   int            win_width;       /* size of non-fullscreen window         */
   int            win_height;
   int            output_width;    /* output video window width/height      */
@@ -74,11 +84,15 @@ typedef struct {
   int            stream_resize_window; /* Boolean, 1 if new stream resize output window */
   int            zoom_small_stream; /* Boolean, 1 to double size small streams */
 
-  int            fullscreen_mode; /* are we currently in fullscreen mode?  */
-  int            fullscreen_req;  /* ==1 => video_window will 
+  int            fullscreen_mode; /* 0: regular  1: fullscreen  2: TV mode */
+  int            fullscreen_req;  /* ==1..2 => video_window will 
 				   * switch to fullscreen mode             */
   int            fullscreen_width;
   int            fullscreen_height;
+
+  int            visible_width;   /* Size of currently visible portion of screen */
+  int            visible_height;  /* May differ from fullscreen_* e.g. for TV mode */
+  double         visible_ratio;   /* Pixel ratio of currently vissible screen */
 
   int            using_xinerama;
 #ifdef HAVE_XINERAMA
@@ -165,6 +179,7 @@ void video_window_select_visual (void) {
  *
  * will set
  * output_width/output_height
+ * visible_width/visible_height/visible_ratio
  */
 static void video_window_adapt_size (void) { 
 
@@ -265,6 +280,20 @@ static void video_window_adapt_size (void) {
     return;
   }
 
+  switch (gVw->fullscreen_req) {
+  case 0:
+  case 1:
+    xine_tvmode_switch (0, gVw->video_width, gVw->video_height, gVw->video_duration);
+    break;
+  case 2:
+    if (xine_tvmode_switch (1, gVw->video_width, gVw->video_height, gVw->video_duration) != 1)
+      gVw->fullscreen_req = 0;
+    break;
+  default:
+    xine_tvmode_switch (0, gVw->video_width, gVw->video_height, gVw->video_duration);
+    gVw->fullscreen_req = 0;
+  }
+
 #ifdef HAVE_XF86VIDMODE
   /* XF86VidMode Extension
    * In case a fullscreen request is received or if already in fullscreen, the
@@ -293,6 +322,7 @@ static void video_window_adapt_size (void) {
 	  gVw->fullscreen_width        = gVw->XF86_modelines[search]->hdisplay;
 	  gVw->fullscreen_height       = gVw->XF86_modelines[search]->vdisplay;
 	  
+	  // TODO
 	  /*
 	   * just in case the mouse pointer is off the visible area, move it
 	   * to the middle of the video window
@@ -369,24 +399,32 @@ static void video_window_adapt_size (void) {
   hint.y = 0;   /* for now -- could change later */
 #endif
   
+  gVw->visible_width  = gVw->fullscreen_width;
+  gVw->visible_height = gVw->fullscreen_height;
+  gVw->visible_ratio  = 1.0;   // TODO
+  xine_tvmode_size (&gVw->visible_width, &gVw->visible_height, &gVw->visible_ratio, NULL);
+  xine_tvmode_size (&hint.width, &hint.height, NULL, NULL);
+
   if (gVw->fullscreen_req) {
 
     if (gGui->video_window) {
       int dummy;
 
       if (gVw->fullscreen_mode && gGui->visual == gVw->visual) {
-#ifdef HAVE_XF86VIDMODE
-	if(gVw->XF86_modelines_count > 1) {
+//#ifdef HAVE_XF86VIDMODE
+//	if(gVw->XF86_modelines_count > 1) {
+	if (gVw->visible_width != gVw->output_width || gVw->visible_height != gVw->output_height) {
 	   /*
-	    * resizing the video window may be necessary if the modeline has
+	    * resizing the video window may be necessary if the modeline or tv mode has
 	    * just been switched
 	    */
 	   XResizeWindow (gGui->display, gGui->video_window,
-			  gVw->fullscreen_width, gVw->fullscreen_height);
-	   gVw->output_width    = gVw->fullscreen_width;
-	   gVw->output_height   = gVw->fullscreen_height;
+			  gVw->visible_width, gVw->visible_height);
+	   gVw->output_width    = gVw->visible_width;
+	   gVw->output_height   = gVw->visible_height;
 	}
-#endif
+//#endif
+        gVw->fullscreen_mode = gVw->fullscreen_req;
 	XUnlockDisplay (gGui->display);
 	
 	return;
@@ -399,7 +437,7 @@ static void video_window_adapt_size (void) {
       old_video_window = gGui->video_window;
     }
 
-    gVw->fullscreen_mode = 1;
+    gVw->fullscreen_mode = gVw->fullscreen_req;
     gVw->visual   = gGui->visual;
     gVw->depth    = gGui->depth;
     gVw->colormap = gGui->colormap;
@@ -416,7 +454,7 @@ static void video_window_adapt_size (void) {
 
     gGui->video_window = 
       XCreateWindow (gGui->display, gGui->imlib_data->x.root, 
-		     hint.x, hint.y, gVw->fullscreen_width, gVw->fullscreen_height, 
+		     hint.x, hint.y, gVw->visible_width, gVw->visible_height, 
 		     border_width, gVw->depth, InputOutput,
 		     gVw->visual,
 		     CWBackPixel | CWBorderPixel | CWColormap, &attr);
@@ -432,8 +470,8 @@ static void video_window_adapt_size (void) {
 #ifndef HAVE_XINERAMA
     hint.x      = 0;
     hint.y      = 0;
-    hint.width  = gVw->fullscreen_width;
-    hint.height = gVw->fullscreen_height;
+    hint.width  = gVw->visible_width;
+    hint.height = gVw->visible_height;
 #endif
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
@@ -677,6 +715,7 @@ void video_window_dest_size_cb (void *data,
 				int video_width, int video_height,
 				int *dest_width, int *dest_height)  {
   
+  /* TODO: Interface change:  *dest_ratio */
 
   if(gVw->stream_resize_window && !gVw->fullscreen_mode) {
 
@@ -698,8 +737,8 @@ void video_window_dest_size_cb (void *data,
   }
   
   if (gVw->fullscreen_mode) {
-    *dest_width  = gVw->fullscreen_width;
-    *dest_height = gVw->fullscreen_height;
+    *dest_width  = gVw->visible_width;
+    *dest_height = gVw->visible_height;
   } else {
     *dest_width  = gVw->output_width;
     *dest_height = gVw->output_height;
@@ -715,6 +754,24 @@ void video_window_frame_output_cb (void *data,
 				   int *dest_width, int *dest_height,
 				   int *win_x, int *win_y) {
   
+  /* TODO: Interface change: video_duration, *dest_ratio */
+  /* Please do NOT remove, support will be added soon! */
+#if 0
+  double jitter;
+  gVw->video_duration = video_duration;
+  gVw->video_average  = 0.5 * gVw->video_average + 0.5 video_duration;
+  jitter = ABS (video_duration - gVw->video_average) / gVw->video_average;
+  if (jitter > EST_MAX_JITTER) {
+    if (gVw->duration_valid > -EST_KEEP_VALID)
+      gVw->duration_valid--;
+  } else {
+    if (gVw->duration_valid < EST_KEEP_VALID)
+      gVw->duration_valid++;
+    if (ABS (video_duration - gVw->use_duration) / video_duration > EST_MAX_DIFF)
+      gVw->use_duration = video_duration;
+  }
+#endif
+
   if(!gVw->stream_resize_window) {
     gVw->video_width  = video_width;
     gVw->video_height = video_height;
@@ -734,8 +791,9 @@ void video_window_frame_output_cb (void *data,
   *dest_y = 0;
 
   if (gVw->fullscreen_mode) {
-    *dest_width  = gVw->fullscreen_width;
-    *dest_height = gVw->fullscreen_height;
+    *dest_width  = gVw->visible_width;
+    *dest_height = gVw->visible_height;
+    /* TODO: check video size/fps/ar if tv mode and call video_window_adapt_size if necessary */
   } else {
     *dest_width  = gVw->output_width;
     *dest_height = gVw->output_height;
@@ -749,7 +807,7 @@ void video_window_frame_output_cb (void *data,
 /*
  *
  */
-void video_window_set_fullscreen (int req_fullscreen) {
+void video_window_set_fullscreen_mode (int req_fullscreen) {
   gVw->fullscreen_req = req_fullscreen;
   
   video_window_adapt_size ();
@@ -758,7 +816,7 @@ void video_window_set_fullscreen (int req_fullscreen) {
 /*
  *
  */
-int video_window_is_fullscreen (void) {
+int video_window_get_fullscreen_mode (void) {
   return gVw->fullscreen_mode;
 }
 
@@ -853,6 +911,7 @@ void video_window_init (window_attributes_t *window_attribute) {
   int                   dummy_query_event, dummy_query_error;
 #endif
 
+  xine_tvmode_init ();
   gVw = (gVw_t *) xine_xmalloc(sizeof(gVw_t));
 
   gVw->fullscreen_req     = 0;
@@ -913,6 +972,8 @@ void video_window_init (window_attributes_t *window_attribute) {
     gVw->fullscreen_width  = DisplayWidth (gGui->display, gGui->screen);
     gVw->fullscreen_height = DisplayHeight (gGui->display, gGui->screen);
   } 
+  gVw->visible_width  = gVw->fullscreen_width;
+  gVw->visible_height = gVw->fullscreen_height;
 
   /* create xclass hint for video window */
 
@@ -1074,6 +1135,13 @@ void video_window_init (window_attributes_t *window_attribute) {
   }
 }
 
+
+/*
+ * Necessary cleanup
+ */
+void video_window_exit (void) {
+  xine_tvmode_exit ();
+}
 
 
 /*

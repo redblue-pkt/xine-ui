@@ -35,6 +35,8 @@ typedef struct {
 
 void video_window_init (window_attributes_t *window_attribute);
 
+void video_window_exit (void);
+
 void video_window_select_visual (void);
 
 void video_window_frame_output_cb (void *this,
@@ -48,8 +50,8 @@ void video_window_dest_size_cb (void *this,
 				int *dest_width, int *dest_height);
 
 /* set/check fullscreen mode */
-void video_window_set_fullscreen (int req_fullscreen);
-int video_window_is_fullscreen (void);
+void video_window_set_fullscreen_mode (int req_fullscreen);
+int video_window_get_fullscreen_mode (void);
 
 /* hide/show cursor in video window*/
 void video_window_set_cursor_visibility(int show_cursor);

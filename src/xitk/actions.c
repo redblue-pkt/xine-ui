@@ -56,13 +56,16 @@ extern _panel_t        *panel;
  */
 void gui_exit (xitk_widget_t *w, void *data) {
   
+  video_window_exit ();
+
 #ifdef HAVE_XF86VIDMODE
   /* just in case a different modeline than the original one is running,
    * toggle back to window mode which automatically causes a switch back to
    * the original modeline
    */
   if(gGui->XF86VidMode_fullscreen)
-     gui_toggle_fullscreen(NULL,NULL);
+     video_window_set_fullscreen_mode (0);
+//     gui_set_fullscreen_mode(NULL,NULL);
 #endif
    
   destroy_mrl_browser();
@@ -200,12 +203,12 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
   }
 }
 
-void gui_toggle_fullscreen(xitk_widget_t *w, void *data) {
+void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
 
   if(!(video_window_is_visible()))
     video_window_set_visibility(1);
   
-  video_window_set_fullscreen (!video_window_is_fullscreen ());
+  video_window_set_fullscreen_mode (video_window_get_fullscreen_mode () + 1);
   
   /* Drawable has changed, update cursor visiblity */
   if(!gGui->cursor_visible) {
@@ -526,7 +529,7 @@ void layer_above_video(Window w) {
   xev.xclient.format = 32;
 
   /* top layer if video is fullscreen, otherwise normal layer */
-  if (video_window_is_fullscreen() && video_window_is_visible()) 
+  if (video_window_get_fullscreen_mode() && video_window_is_visible()) 
     xev.xclient.data.l[0] = (long) 10;
   else
     xev.xclient.data.l[0] = (long) 4;

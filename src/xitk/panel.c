@@ -334,14 +334,21 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     if(gGui->cursor_grabbed)
        XUngrabPointer(gGui->display, CurrentTime);
      
+    /* TODO: Currently this is a quick hack
+     * We should rather test whether screen size has changed
+     * and move the panel on screen if it doesn't fit any longer */
+    if (video_window_get_fullscreen_mode () > 1 
 #ifdef HAVE_XF86VIDMODE
+        || gGui->XF86VidMode_fullscreen
+#endif
+       ) {
     /*
      * necessary to place the panel in a visible area (otherwise it might
-     * appear off the video window while switched to a different modline)
+     * appear off the video window while switched to a differenti
+     * modeline or tv mode)
      */
-    if(gGui->XF86VidMode_fullscreen)
-       XMoveWindow(gGui->display, gGui->panel_window, 0, 0);
-#endif
+       XMoveWindow(gGui->display, gGui->panel_window, 40, 40);
+    }
 
     XUnlockDisplay(gGui->display);
   }
@@ -772,7 +779,7 @@ void panel_init (void) {
 
   /*  Fullscreen button */
   b.skin_element_name = "FullScreen";
-  b.callback          = gui_toggle_fullscreen;
+  b.callback          = gui_set_fullscreen_mode;
   b.userdata          = NULL;
   xitk_list_append_content(panel->widget_list->l, (w = xitk_button_create(gGui->skin_config, &b)));
   xitk_set_widget_tips(w, _("Fullscreen/Window mode"));
