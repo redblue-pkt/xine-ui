@@ -127,13 +127,13 @@ static void tabs_arrange(xitk_widget_t *w) {
       
       p = xitk_image_create_image(private_data->imlibdata, 
 				  ((private_data->width - 40) - private_data->gap_widthstart) * 3,
-				  private_data->bheight);
+				  private_data->bheight>>1);
       
       if(p) {
-	draw_tab(private_data->imlibdata, p);
-	
 	gcv.graphics_exposures = False;
 
+	draw_flat(private_data->imlibdata, p->image, p->width, p->height);
+	
 	XLOCK(private_data->imlibdata->x.disp);
 	gc = XCreateGC(private_data->imlibdata->x.disp, 
 		       p->image->pixmap, GCGraphicsExposures, &gcv);
@@ -141,13 +141,22 @@ static void tabs_arrange(xitk_widget_t *w) {
 		  p->image->pixmap, private_data->parent_wlist->win, gc, 
 		  0, 0, p->width/3, p->height, 
 		  private_data->x + private_data->gap_widthstart, private_data->y);
+	XUNLOCK(private_data->imlibdata->x.disp);
+	
+	draw_tab(private_data->imlibdata, p);
+	
+	XLOCK(private_data->imlibdata->x.disp);
+	XCopyArea(private_data->imlibdata->x.disp, 
+		  p->image->pixmap, private_data->parent_wlist->win, gc, 
+		  0, 0, p->width/3, p->height, 
+		  private_data->x + private_data->gap_widthstart, private_data->y + p->height);
 	XFreeGC(private_data->imlibdata->x.disp, gc);
 	XUNLOCK(private_data->imlibdata->x.disp);
 
 	xitk_image_free_image(private_data->imlibdata, &p);
       }
     }
-     
+
     if(private_data->offset != private_data->old_offset) {
       if(i < private_data->num_entries)
 	xitk_start_widget(private_data->right);
