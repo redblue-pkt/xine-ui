@@ -1,4 +1,4 @@
-xine-ui (0.9.9-1) unstable; urgency=low
+xine-ui (0.9.9-1) unstable; urgency=medium
 
   * new upstream release
   * added "Video" menu hint (closes: #121037)
