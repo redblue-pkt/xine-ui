@@ -350,7 +350,7 @@ void menu_auto_pop(xitk_widget_t *w);
 struct xitk_font_s {
   Display       *display;
 #ifdef WITH_XFT
-	XftFont       *font;
+  XftFont       *font;
 #else
 # ifdef WITH_XMB
   XFontSet       fontset;

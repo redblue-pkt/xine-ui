@@ -92,24 +92,14 @@ static void help_change_section(xitk_widget_t *wx, void *data, int section) {
 static void help_add_section(const char *filename, const char *doc_encoding, 
                              int order_num, char *section_name) {
   struct stat  st;
-#ifdef USE_CONV
-  char *locale_encoding;
-  iconv_t cd;
-  char *inbuf, *outbuf;
-  size_t inbytes, outbytes;
-#endif
+  xitk_recode_t *xr;
   
   /* ensure that the file is not empty */
   if(help->num_sections < MAX_SECTIONS) {
     if((stat(filename, &st) == 0) && (st.st_size)) {
       int   fd;
 
-#ifdef USE_CONV
-      if (doc_encoding && (locale_encoding = nl_langinfo(CODESET)) != NULL)
-        cd = iconv_open(locale_encoding, doc_encoding);
-      else
-        cd = (iconv_t)-1;
-#endif
+      xr = xitk_recode_init(doc_encoding, "");
 
       if((fd = open(filename, O_RDONLY)) >= 0) {
 	char  *buf = NULL;
@@ -131,33 +121,7 @@ static void help_add_section(const char *filename, const char *doc_encoding,
 	      while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))
 		*(p + strlen(p) - 1) = '\0';
 
-#ifdef USE_CONV
-              if (cd != (iconv_t)-1) {
-                inbytes = strlen(p);
-                outbytes = 2 * inbytes;
-                inbuf = p;
-                hbuf[lines] = outbuf = xine_xmalloc(outbytes);
-
-                /* 
-                 * convert the string, 
-                 * if conversion fails original string will be used 
-                 */
-                while (inbytes) {
-                  if (iconv(cd, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
-                    free(hbuf[lines]);
-                    hbuf[lines] = NULL;
-                    break;
-                  }
-                }
-                if (hbuf[lines]) hbuf[lines] = realloc(hbuf[lines], strlen(hbuf[lines]) + 1);
-                else hbuf[lines] = strdup(p);
-
-              } else {
-                hbuf[lines] = strdup(p);
-              }
-#else
-	      hbuf[lines] = strdup(p);
-#endif	      
+              hbuf[lines] = xitk_recode(xr, p);
 	      hbuf[++lines]   = NULL;
 	    }
 	    
@@ -181,9 +145,7 @@ static void help_add_section(const char *filename, const char *doc_encoding,
 	}
 	close(fd);
       }
-#ifdef USE_CONV
-      if (cd != (iconv_t)-1) iconv_close(cd);
-#endif
+      xitk_recode_done(xr);
     }
   }
 }
