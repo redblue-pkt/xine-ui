@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 1.0.0\n"
+"Project-Id-Version: xine-ui 0.9.15\n"
 "POT-Creation-Date: 2002-11-30 07:45+0100\n"
 "PO-Revision-Date: 2002-11-22 19:04+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
@@ -27,9 +27,8 @@ msgid "There is no mrl."
 msgstr "Das ist keine MRL."
 
 #: src/xitk/actions.c:1087 src/xitk/actions.c:1099
-#, fuzzy
 msgid "Audio Volume"
-msgstr "Nur Audio"
+msgstr "Lautstärke"
 
 #: src/xitk/actions.c:1165
 #, c-format
@@ -95,12 +94,12 @@ msgstr "Einstellungen-Fenster schließen"
 
 #: src/xitk/download.c:48
 msgid "Download in progress"
-msgstr ""
+msgstr "Download läuft"
 
 #: src/xitk/download.c:50
 #, c-format
 msgid "Download progress: %d%%."
-msgstr ""
+msgstr "Downloadfortschritt: %d%%."
 
 #: src/xitk/errors.c:61 src/xitk/kbindings.c:1977
 msgid "Done"
@@ -237,7 +236,6 @@ msgstr ""
 "Zeit zwischen zwei Ereignissen für Bildschirmschoner, 0 für deaktiviert"
 
 #: src/xitk/event.c:939
-#, fuzzy
 msgid "Chapter hopping"
 msgstr "Kapitelspringen"
 
@@ -246,14 +244,12 @@ msgid "Play next|previous chapter instead of mrl (dvdnav)"
 msgstr "Nächstes|Vorheriges Kapitel anstatt MRL wiedergeben (dvdnav)"
 
 #: src/xitk/event.c:947
-#, fuzzy
 msgid "Visibility behavior of output window"
 msgstr "Anzeigeverhalten des Ausgabefensters"
 
 #: src/xitk/event.c:948
-#, fuzzy
 msgid "Hide video output window if there is no video in the stream"
-msgstr "Video-Fenster in Abhängigkeit vom Datenstromtyp anzeigen/verstecken "
+msgstr "Videofenster verstecken wenn kein Video im Datenstrom ist"
 
 #: src/xitk/event.c:955
 msgid "Visiblility behavior of panel"
@@ -286,41 +282,38 @@ msgstr ""
 "Videoanimation anzeigen, wenn der aktuelle Stream nur Audio hat (z.B.: mp3)."
 
 #: src/xitk/event.c:983
-#, fuzzy
 msgid "Stream information"
 msgstr "Datenstrominformationen"
 
 #: src/xitk/event.c:984
-#, fuzzy
 msgid "Update stream information (in stream info window) each half seconds."
 msgstr ""
-"Aktualisiere Datenstrominformationen (im Datenstrominfofenster) jede halbe "
-"Sekunde."
+"Aktualisiere jede halbe Sekunde Datenstrominformationen (im Datenstrominfofenster)."
 
 #: src/xitk/event.c:994
 msgid "Skin Server Url"
-msgstr ""
+msgstr "Skin-Server URL"
 
 #: src/xitk/event.c:995
 msgid "From where we can get skins."
-msgstr ""
+msgstr "Von wo es Skins gibt."
 
 #: src/xitk/event.c:1006
 msgid "Enable OSD support"
-msgstr ""
+msgstr "OSD-Unterstützung aktivieren"
 
 #: src/xitk/event.c:1007
 msgid ""
 "Enabling OSD permit to display some status/informations in output window."
-msgstr ""
+msgstr "Erlaubt das Anzeigen des Status und anderer Informationen im Ausgabefenster."
 
 #: src/xitk/event.c:1016
 msgid "Dismiss OSD time (s)"
-msgstr ""
+msgstr "OSD Anzeigezeit [s]"
 
 #: src/xitk/event.c:1017
 msgid "Persistence time of OSD visual, in seconds."
-msgstr ""
+msgstr "Anzeigezeit von OSD Informationen in Sekunden."
 
 #. Some infos
 #: src/xitk/event.c:1030
@@ -775,17 +768,16 @@ msgstr ""
 "wiederholen.\n"
 
 #: src/xitk/main.c:349
-#, fuzzy
 msgid ""
 "                                 'shuffle': select randomly a yet unplayed "
 "entry from playlist\n"
 msgstr ""
-"                                 'shuffle': Eintrag zufällig aus Playlist "
-"auswählen.\n"
+"                                 'shuffle': Zufällig ungespielten Eintrag aus "
+"Playlist auswählen.\n"
 
 #: src/xitk/main.c:350
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
-msgstr ""
+msgstr "      --skin-server-url <url>  URL für Skin-Server.\n"
 
 #: src/xitk/main.c:352
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -1244,46 +1236,46 @@ msgstr ""
 "Kann Skin \"%s\" nicht Laden, falsche Version. Lade sicheren Skin \"%s\".\n"
 
 #: src/xitk/skins.c:593
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to retrieve skin list from %s: %s"
-msgstr "Playlist kann nicht gespeichert werden (%s): %s.\n"
+msgstr "Kann Skinliste von %s nicht bekommen: %s"
 
 #: src/xitk/skins.c:671
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to create '%s' directory: %s."
-msgstr "Playlist kann nicht gespeichert werden (%s): %s.\n"
+msgstr "Kann Verzeichnis '%s' nicht anlegen: %s."
 
 #: src/xitk/skins.c:733
 #, c-format
 msgid "Skin %s correctly installed"
-msgstr ""
+msgstr "Skin %s korrekt installiert"
 
 #: src/xitk/skins.c:739
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to create '%s'."
-msgstr "Playlist kann nicht gespeichert werden (%s): %s.\n"
+msgstr "Kann '%s' nicht erzeichen."
 
 #: src/xitk/skins.c:745
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to download '%s': %s\n"
-msgstr "Playlist kann nicht gespeichert werden (%s): %s.\n"
+msgstr "Kann '%s' nicht herunterladen: %s\n"
 
 #: src/xitk/skins.c:769
 msgid "Be Patient..."
-msgstr ""
+msgstr "Habe Geduld..."
 
 #: src/xitk/skins.c:771
 #, c-format
 msgid "Retrieve skin list from %s"
-msgstr ""
+msgstr "Beziehe Skinliste von %s"
 
 #: src/xitk/skins.c:820
 msgid "Choose a skin to download..."
-msgstr ""
+msgstr "Wähle einen Skin zum Herunterladen..."
 
 #: src/xitk/skins.c:874
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: src/xitk/snapshot.c:825 src/xitk/snapshot.c:836
 #, c-format
