@@ -342,15 +342,13 @@ void show_usage (void) {
  */
 static const xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
   const xine_vo_driver_t *video_driver = NULL;
-  //  double                  res_h, res_v;
+  double                  res_h, res_v;
   x11_visual_t            vis;
   const char             *default_driver;
 
   vis.display           = gGui->display;
   vis.screen            = gGui->screen;
   vis.d                 = gGui->video_window;
-#warning FIXME NEWAPI
-#if 0
   res_h                 = (DisplayWidth  (gGui->display, gGui->screen)*1000 
 			   / DisplayWidthMM (gGui->display, gGui->screen));
   res_v                 = (DisplayHeight (gGui->display, gGui->screen)*1000
@@ -373,8 +371,6 @@ static const xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
     printf("display_ratio: corrected to square pixels!\n");
 #endif
   }
-
-#endif /* 0 */
 
   vis.dest_size_cb      = video_window_dest_size_cb;
   vis.frame_output_cb   = video_window_frame_output_cb;
@@ -403,10 +399,8 @@ static const xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
 					    video_driver_id,
 					    XINE_VISUAL_TYPE_X11,
 					    (void *) &vis);
-      if (video_driver) {
-	config_update_string("video.driver", video_driver_id);
+      if (video_driver)
 	return video_driver;
-      }
     }
     
     i = 0;
@@ -521,9 +515,6 @@ static const xine_ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 	printf(_("main: the specified audio driver '%s' failed\n"), audio_driver_id);
 	exit(1);
       }
-      
-      config_update_string("audio.driver", audio_driver_id);
-      
     }
   }
 
