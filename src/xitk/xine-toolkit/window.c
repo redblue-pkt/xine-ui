@@ -602,6 +602,7 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
 
   XLOCK(im->x.disp);
   XUnmapWindow(im->x.disp, w->window);
+  XSync(im->x.disp, False);
   XUNLOCK(im->x.disp);
 
   if(w->background)
@@ -614,6 +615,7 @@ void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w) {
 
   XLOCK(im->x.disp);
   XDestroyWindow(im->x.disp, w->window);
+  XSync(im->x.disp, False);
   XUNLOCK(im->x.disp);
 
   XITK_FREE(w);

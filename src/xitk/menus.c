@@ -574,10 +574,19 @@ void video_window_menu(xitk_widget_list_t *wl) {
       memset(&langbuf, 0, sizeof(langbuf));
       
       if(!xine_get_audio_lang(gGui->stream, i, &langbuf[0])) {
-	if(i > 0)
-	  goto __audio_chan_done;
 
-	sprintf(langbuf, "%d", i);
+	if(i == 0) {
+	  for(i = 0; i < 15; i++) {
+	    sprintf(buffer, "%s/%d", location, i);
+	    menu_entry.menu      = buffer;
+	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
+	    menu_entry.cb        = menu_audio_chan;
+	    menu_entry.user_data = (void *) i;
+	    xitk_menu_add_entry(w, &menu_entry);
+	  }
+	}
+
+	goto __audio_chan_done;
       }
       
       sprintf(buffer, "%s/%s", location, langbuf);
@@ -616,10 +625,19 @@ void video_window_menu(xitk_widget_list_t *wl) {
       memset(&langbuf, 0, sizeof(langbuf));
       
       if(!xine_get_spu_lang(gGui->stream, i, &langbuf[0])) {
-	if(i > 0)
-	  goto __spu_chan_done;
+	
+	if(i == 0) {
+	  for(i = 0; i < 15; i++) {
+	    sprintf(buffer, "%s/%d", location, i);
+	    menu_entry.menu      = buffer;
+	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
+	    menu_entry.cb        = menu_spu_chan;
+	    menu_entry.user_data = (void *) i;
+	    xitk_menu_add_entry(w, &menu_entry);
+	  }
+	}
 
-	sprintf(langbuf, "%d", i);
+	goto __spu_chan_done;
       }
       
       sprintf(buffer, "%s/%s", location, langbuf);
