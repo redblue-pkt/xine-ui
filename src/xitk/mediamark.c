@@ -1038,6 +1038,7 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 	      char *title  = NULL;
 	      char *href   = NULL;
 	      char *author = NULL;
+	      char *sub    = NULL;
 
 	      asx_ref = asx_entry->child;
 	      while(asx_ref) {
@@ -1063,12 +1064,18 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 		      if(!href)
 			href = asx_prop->value;
 		    }
+		    /* This is not part of the ASX specs */
+		    else if(!strcasecmp(asx_prop->name, "SUBTITLE")) {
 		      
-		    if(href)
+		      if(!sub)
+			sub = asx_prop->value;
+		    }
+
+		    if(href && sub)
 		      break;
 		  }
-		}		    
-		  
+		}
+
 		asx_ref = asx_ref->next;
 	      }
 		
@@ -1102,7 +1109,7 @@ static mediamark_t **xml_asx_playlist(playlist_t *playlist, const char *filename
 		  
 		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
 		  
-		mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1, 0, 0);
+		mediamark_store_mmk(&mmk[entries_asx], href, real_title, sub, 0, -1, 0, 0);
 		playlist->entries = ++entries_asx;
 
 		SAFE_FREE(real_title);
