@@ -242,6 +242,13 @@ void video_window_adapt_size (int video_width, int video_height,
   Window                old_video_window = None;
   long data[1];
 
+  printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
+            video_width,
+            video_height,
+            dest_x,
+            dest_y,
+            dest_width,
+            dest_height); 
   XLockDisplay (gGui->display);
 
   gVw->video_width = video_width;
@@ -638,6 +645,8 @@ void video_window_init (void) {
 
 }
 
+
+
 /*
  *
  */
@@ -661,7 +670,10 @@ static void video_window_handle_event (XEvent *event, void *data) {
     int xwin, ywin;
     unsigned int wwin, hwin, bwin, dwin;
     float xf,yf;
+    float scale, width_scale, height_scale;
     Window rootwin;
+
+    /* printf("Mouse event:mx=%d my=%d\n",mevent->x, mevent->y); */
     
     if(!gGui->cursor_visible) {
       gGui->cursor_visible = !gGui->cursor_visible;
@@ -673,10 +685,31 @@ static void video_window_handle_event (XEvent *event, void *data) {
       xine_event.event.type = XINE_MOUSE_EVENT;
       xine_event.button = 0; /*  No buttons, just motion. */
       /* Scale co-ordinate to image dimensions. */
-      xf = (float)mevent->x / (float)wwin;
-      yf = (float)mevent->y / (float)hwin;
-      xine_event.x = (uint16_t)( xf * gVw->video_width ); 
-      xine_event.y = (uint16_t)( yf * gVw->video_height );
+      height_scale=(float)gVw->video_height/(float)hwin;
+      width_scale=(float)gVw->video_width/(float)wwin;
+      if (((float)wwin/(float)hwin)<((float)gVw->video_width/(float)gVw->video_height)) {
+        scale=width_scale;
+        xf=(float)mevent->x * scale;
+        yf=(float)mevent->y * scale;
+        //wwin=wwin * scale;
+        hwin=hwin * scale;
+        xine_event.x=xf;
+        xine_event.y=yf-((hwin-gVw->video_height)/2);
+        /* printf("wscale:s=%f, x=%d, y=%d\n",scale,xine_event.x,xine_event.y); */ 
+      } else {
+        scale=height_scale;
+        xf=(float)mevent->x * scale;
+        yf=(float)mevent->y * scale;
+        wwin=wwin * scale;
+        //hwin=hwin * scale;
+        xine_event.x=xf-((wwin-gVw->video_width)/2);
+        xine_event.y=yf;
+        /* printf("hscale:s=%f x=%d, y=%d\n",scale,xine_event.x,xine_event.y); */ 
+      }
+      //xf = (float)mevent->x / (float)wwin;
+      //yf = (float)mevent->y / (float)hwin;
+      //xine_event.x = (uint16_t)( xf * gVw->video_width ); 
+      //xine_event.y = (uint16_t)( yf * gVw->video_height );
       xine_send_event(gGui->xine, (event_t*)(&xine_event), NULL);
     }
   }
