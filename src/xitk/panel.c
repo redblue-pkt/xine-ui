@@ -920,14 +920,14 @@ void panel_init (void) {
 
   /*  Audio channel label */
   lbl.skin_element_name = "AudioLabel";
-  lbl.label             = NULL;
+  lbl.label             = "";
   lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 	   (panel->audiochan_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));
 
   /*  Spuid label */
   lbl.skin_element_name = "SpuLabel";
-  lbl.label             = NULL;
+  lbl.label             = "";
   lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 	   (panel->spuid_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));
