@@ -148,11 +148,11 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
   }
   if(artist && strlen(artist)) {
     xine_strdupa(aartist, artist);
-    atitle = atoa(aartist);
+    aartist = atoa(aartist);
   }
   if(album && strlen(album)) {
     xine_strdupa(aalbum, album);
-    atitle = atoa(aalbum);
+    aalbum = atoa(aalbum);
   }
 
   if(atitle) {
