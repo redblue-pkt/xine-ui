@@ -2,6 +2,9 @@
 %define version	@SPEC_VERSION@
 %define release	1
 
+%define major   0
+%define libname libxine%{major}
+
 %define skindir	 %(xine-config --skindir)
 %define deskdir	 %(xine-config --desktopdir)
 
@@ -16,7 +19,8 @@ Group:       Applications/Multimedia
 Source:      http://xine.sourceforge.net/files/%{name}-%{version}.tar.gz
 URL:         http://xine.sourceforge.net/
 Packager:    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-Requires:    libxine >= %{version}
+Requires:    %{libname} >= %{version}
+BuildPreReq: %{libname}-devel >= %{version}
 BuildRoot:   %{_tmppath}/%{name}-buildroot
 
 %description
@@ -32,11 +36,11 @@ if [ ! -f configure ]; then
    ./cvscompile.sh
 fi
 %configure
-%make
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-%makeinstall_std
+make DESTDIR=%{?buildroot:%{buildroot}} install
 
 %post
 if test -d %{skindir}/metal; then rm -rf %{skindir}/metal; fi
