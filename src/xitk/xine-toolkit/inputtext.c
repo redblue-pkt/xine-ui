@@ -73,6 +73,9 @@ static void notify_destroy(xitk_widget_t *w) {
     XFreeCursor(private_data->imlibdata->x.disp, private_data->cursor[1]);
     XUNLOCK(private_data->imlibdata->x.disp);
 
+    if(!private_data->skin_element_name)
+      xitk_image_free_image(private_data->imlibdata, &(private_data->skin));
+    
     XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data->text);
     XITK_FREE(private_data->normal_color);

@@ -129,7 +129,7 @@ static void *_tips_destroy_thread(void *data) {
 static void *_tips_thread(void *data) {
   tips_private_t     *tp = (tips_private_t *)data;
   int                 x, y, string_length;
-  xitk_image_t       *i;
+  xitk_image_t       *image;
   xitk_font_t        *fs;
   XWindowAttributes   wattr;
   Status              status;
@@ -156,15 +156,14 @@ static void *_tips_thread(void *data) {
   cwarnfore = xitk_get_pixel_color_warning_foreground(tp->w->imlibdata);
   cwarnback = xitk_get_pixel_color_warning_background(tp->w->imlibdata);
   
-  i = xitk_image_create_image_with_colors_from_string(tp->w->imlibdata, DEFAULT_FONT_10,
-						      string_length + 1, ALIGN_LEFT, 
-						      tp->w->tips_string, cwarnfore, cwarnback);
-
+  image = xitk_image_create_image_with_colors_from_string(tp->w->imlibdata, DEFAULT_FONT_10,
+							  string_length + 1, ALIGN_LEFT, 
+							  tp->w->tips_string, cwarnfore, cwarnback);
   
-  /* Create the tips window, horizontaly centered from parent widget */
-  tp->xwin = xitk_window_create_simple_window(tp->w->imlibdata, x - (((i->width + 10) >> 1) 
+    /* Create the tips window, horizontaly centered from parent widget */
+  tp->xwin = xitk_window_create_simple_window(tp->w->imlibdata, x - (((image->width + 10) >> 1) 
 								     - (tp->w->width >> 1)), y, 
-					      i->width + 10, i->height + 10);
+					      image->width + 10, image->height + 10);
 
   /* WM should ignore tips windows */
   {
@@ -201,8 +200,8 @@ static void *_tips_thread(void *data) {
     XLOCK(tp->w->imlibdata->x.disp);
     XSetForeground(tp->w->imlibdata->x.disp, gc, cwarnback);
     XFillRectangle(tp->w->imlibdata->x.disp, bg->pixmap, gc, 1, 1, width - 2, height - 2);
-    XCopyArea(tp->w->imlibdata->x.disp, i->image->pixmap, bg->pixmap,
-	      gc, 0, 0, i->width, i->height, (width - i->width)>>1, ((height - i->height)>>1) + 1);
+    XCopyArea(tp->w->imlibdata->x.disp, image->image->pixmap, bg->pixmap,
+	      gc, 0, 0, image->width, image->height, (width - image->width)>>1, ((height - image->height)>>1) + 1);
     XUNLOCK(tp->w->imlibdata->x.disp);
     
     xitk_window_change_background(tp->w->imlibdata, tp->xwin, bg->pixmap, width, height);
@@ -213,8 +212,7 @@ static void *_tips_thread(void *data) {
     XFreeGC(tp->w->imlibdata->x.disp, gc);
     XUNLOCK(tp->w->imlibdata->x.disp);
     
-    xitk_image_free_image(tp->w->imlibdata, &i);
-    
+    xitk_image_free_image(tp->w->imlibdata, &image);
   }
   
   XLOCK(tp->w->imlibdata->x.disp);

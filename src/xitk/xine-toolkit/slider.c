@@ -210,6 +210,11 @@ static void notify_destroy(xitk_widget_t *w) {
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     private_data = (slider_private_data_t *) w->private_data;
 
+    if(!private_data->skin_element_name) {
+      xitk_image_free_image(private_data->imlibdata, &(private_data->paddle_skin));
+      xitk_image_free_image(private_data->imlibdata, &(private_data->bg_skin));
+    }
+
     XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data);
   }

@@ -128,6 +128,9 @@ static void notify_destroy(xitk_widget_t *w) {
       private_data->labelpix = NULL;
     }
     
+    if(!private_data->skin_element_name)
+      xitk_image_free_image(private_data->imlibdata, &(private_data->font));
+
     XITK_FREE(private_data->label);
     XITK_FREE(private_data->fontname);
     XITK_FREE(private_data->skin_element_name);

@@ -156,7 +156,7 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 #ifdef HAVE_SHM
   if(xpix->shm) {
     XShmSegmentInfo *shminfo = xpix->shminfo;
-    
+
     XShmDetach(xpix->imlibdata->x.disp, shminfo);
     
     if(xpix->xim)
@@ -1593,6 +1593,10 @@ static void notify_destroy(xitk_widget_t *w) {
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
     private_data = (image_private_data_t *) w->private_data;
+
+    if(!private_data->skin_element_name)
+      xitk_image_free_image(private_data->imlibdata, &(private_data->skin));
+
     XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data);
   }
