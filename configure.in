@@ -204,7 +204,9 @@ opt_curses=no
 opt_shared=no
 
 dnl arguments to configure
-AC_ARG_WITH(curses, --with-curses               use the curses library instead of the termcap library,opt_curses=$withval)
+AC_ARG_WITH(curses, 
+  [  --with-curses           use the curses library instead of the termcap library],
+  opt_curses=$withval)
 
 if test "$opt_curses" = "yes"; then
 	prefer_curses=yes
