@@ -750,7 +750,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gGui->ssaver_timeout =
     gGui->config->register_num (gGui->config, "gui.screensaver_timeout", 10,
-				_("time between two screensaver fake events"),
+				_("time between two screensaver fake events, 0 to disable"),
 				NULL, ssaver_timeout_cb, NULL);
   
   XLockDisplay (gGui->display);

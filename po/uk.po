@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
-"POT-Creation-Date: 2002-06-11 01:22+0200\n"
+"POT-Creation-Date: 2002-06-16 13:51+0200\n"
 "PO-Revision-Date: 2002-02-24 17:35GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -18,13 +18,13 @@ msgstr ""
 msgid "No MRL (input stream) specified"
 msgstr ""
 
-#: src/xitk/actions.c:621
+#: src/xitk/actions.c:619
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr ""
 
 # src/xitk/control.c:317
-#: src/xitk/control.c:370 src/xitk/panel.c:135 src/xitk/playlist.c:610
+#: src/xitk/control.c:370 src/xitk/panel.c:135 src/xitk/playlist.c:634
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): не можу знайти зображення тла\n"
@@ -34,7 +34,7 @@ msgid "Xine Control Panel"
 msgstr ""
 
 # src/xitk/control.c:388
-#: src/xitk/control.c:462 src/xitk/playlist.c:706
+#: src/xitk/control.c:462 src/xitk/playlist.c:730
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "список композиц╕й xine: не можу знайти зображення для тла\n"
 
@@ -80,7 +80,7 @@ msgid "Choose a Skin"
 msgstr "Виберить стиль Г╤К"
 
 # src/xitk/control.c:654 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:828
-#: src/xitk/control.c:714 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:875
+#: src/xitk/control.c:714 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:899
 msgid "Dismiss"
 msgstr "В╕дмова"
 
@@ -189,7 +189,7 @@ msgid "where snapshots will be saved"
 msgstr ""
 
 #: src/xitk/event.c:753
-msgid "time between two screensaver fake events"
+msgid "time between two screensaver fake events, 0 to disable"
 msgstr ""
 
 #. Some infos
@@ -310,7 +310,7 @@ msgid "Delete"
 msgstr "Вибрати"
 
 # src/xitk/playlist.c:819
-#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:865
+#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:889
 msgid "Save"
 msgstr "Зберегти"
 
@@ -662,19 +662,19 @@ msgstr ""
 msgid "No audio plugin available to decode '%s'."
 msgstr ""
 
-#: src/xitk/main.c:623
+#: src/xitk/main.c:624
 msgid "never"
 msgstr ""
 
-#: src/xitk/main.c:624
+#: src/xitk/main.c:625
 msgid "video only"
 msgstr ""
 
-#: src/xitk/main.c:625
+#: src/xitk/main.c:626
 msgid "audio only"
 msgstr ""
 
-#: src/xitk/main.c:626
+#: src/xitk/main.c:627
 msgid "always"
 msgstr ""
 
@@ -871,65 +871,65 @@ msgstr ""
 msgid "Can't read %s: %s\n"
 msgstr "Не можу прочитати %s: %s\n"
 
-#: src/xitk/playlist.c:692
+#: src/xitk/playlist.c:716
 msgid "Xine Playlist Editor"
 msgstr ""
 
-#: src/xitk/playlist.c:811
+#: src/xitk/playlist.c:835
 msgid "Move up selected MRL"
 msgstr "Пересунути вгору вибраний MRL"
 
-#: src/xitk/playlist.c:819
+#: src/xitk/playlist.c:843
 msgid "Move down selected MRL"
 msgstr "Пересунути вниз вибраний MRL"
 
-#: src/xitk/playlist.c:826
+#: src/xitk/playlist.c:850
 msgid "Start playback of selected MRL"
 msgstr "Програти вибраний MRL"
 
 # src/xitk/panel.c:684
-#: src/xitk/playlist.c:833
+#: src/xitk/playlist.c:857
 msgid "Delete selected MRL from playlist"
 msgstr "Видалити вибраний MRL з списку"
 
 # src/xitk/panel.c:684
-#: src/xitk/playlist.c:840
+#: src/xitk/playlist.c:864
 msgid "Delete all entries in playlist"
 msgstr "Видалити вс╕ елементи списку"
 
 # src/xitk/playlist.c:801
-#: src/xitk/playlist.c:844
+#: src/xitk/playlist.c:868
 msgid "Add"
 msgstr "Додати"
 
-#: src/xitk/playlist.c:850
+#: src/xitk/playlist.c:874
 msgid "Add one or more entries in playlist"
 msgstr "Додати дек╕лька елемент╕в до списку"
 
 # src/xitk/playlist.c:810
-#: src/xitk/playlist.c:855
+#: src/xitk/playlist.c:879
 msgid "Load"
 msgstr "Завантаження"
 
-#: src/xitk/playlist.c:861
+#: src/xitk/playlist.c:885
 msgid "Load saved playlist"
 msgstr "Завантаження збереженого списку"
 
 # src/xitk/panel.c:832
-#: src/xitk/playlist.c:871
+#: src/xitk/playlist.c:895
 msgid "Save playlist"
 msgstr "Зберегти список"
 
-#: src/xitk/playlist.c:881
+#: src/xitk/playlist.c:905
 msgid "Close playlist window"
 msgstr "Закрити в╕кно списку"
 
 # src/xitk/playlist.c:851
-#: src/xitk/playlist.c:897
+#: src/xitk/playlist.c:921
 msgid "Scan for:"
 msgstr "Сканувати на:"
 
-#: src/xitk/playlist.c:909
+#: src/xitk/playlist.c:933
 msgid "Direct MRL entry"
 msgstr "Ввести адресу MRL"
 

@@ -223,7 +223,7 @@ static void *slider_loop(void *dummy) {
   while(gGui->running) {
     int status = xine_get_status(gGui->xine);
     
-    if(status == XINE_PLAY) {
+    if(status == XINE_PLAY && gGui->ssaver_timeout) {
       
       screensaver_timer++;
       

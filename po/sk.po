@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-06-11 01:22+0200\n"
+"POT-Creation-Date: 2002-06-16 13:51+0200\n"
 "PO-Revision-Date: 2002-01-17 00:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -17,12 +17,12 @@ msgstr ""
 msgid "No MRL (input stream) specified"
 msgstr ""
 
-#: src/xitk/actions.c:621
+#: src/xitk/actions.c:619
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr ""
 
-#: src/xitk/control.c:370 src/xitk/panel.c:135 src/xitk/playlist.c:610
+#: src/xitk/control.c:370 src/xitk/panel.c:135 src/xitk/playlist.c:634
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s() : nemô¾em nájs» obrázok na pozadie.\n"
@@ -31,7 +31,7 @@ msgstr "%s() : nemô¾em nájs» obrázok na pozadie.\n"
 msgid "Xine Control Panel"
 msgstr ""
 
-#: src/xitk/control.c:462 src/xitk/playlist.c:706
+#: src/xitk/control.c:462 src/xitk/playlist.c:730
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "xine-playlist : nemô¾em nájs» obrázok na pozadie.\n"
 
@@ -71,7 +71,7 @@ msgstr "Kontrast"
 msgid "Choose a Skin"
 msgstr "Vyber skin"
 
-#: src/xitk/control.c:714 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:875
+#: src/xitk/control.c:714 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:899
 msgid "Dismiss"
 msgstr "Zavrie»"
 
@@ -174,7 +174,7 @@ msgid "where snapshots will be saved"
 msgstr ""
 
 #: src/xitk/event.c:753
-msgid "time between two screensaver fake events"
+msgid "time between two screensaver fake events, 0 to disable"
 msgstr ""
 
 #. Some infos
@@ -287,7 +287,7 @@ msgstr ""
 msgid "Delete"
 msgstr "Vybra»"
 
-#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:865
+#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:889
 msgid "Save"
 msgstr "Ulo¾i»"
 
@@ -592,19 +592,19 @@ msgstr ""
 msgid "No audio plugin available to decode '%s'."
 msgstr ""
 
-#: src/xitk/main.c:623
+#: src/xitk/main.c:624
 msgid "never"
 msgstr ""
 
-#: src/xitk/main.c:624
+#: src/xitk/main.c:625
 msgid "video only"
 msgstr ""
 
-#: src/xitk/main.c:625
+#: src/xitk/main.c:626
 msgid "audio only"
 msgstr ""
 
-#: src/xitk/main.c:626
+#: src/xitk/main.c:627
 msgid "always"
 msgstr ""
 
@@ -770,59 +770,59 @@ msgstr ""
 msgid "Can't read %s: %s\n"
 msgstr "Nemô¾em èíta» %s : %s\n"
 
-#: src/xitk/playlist.c:692
+#: src/xitk/playlist.c:716
 msgid "Xine Playlist Editor"
 msgstr ""
 
-#: src/xitk/playlist.c:811
+#: src/xitk/playlist.c:835
 msgid "Move up selected MRL"
 msgstr "Posunú» hore vybrané MRL"
 
-#: src/xitk/playlist.c:819
+#: src/xitk/playlist.c:843
 msgid "Move down selected MRL"
 msgstr "Posunú» dole vybrané MRL"
 
-#: src/xitk/playlist.c:826
+#: src/xitk/playlist.c:850
 msgid "Start playback of selected MRL"
 msgstr "Zaèa» prehráva» vybrané MRL"
 
-#: src/xitk/playlist.c:833
+#: src/xitk/playlist.c:857
 msgid "Delete selected MRL from playlist"
 msgstr "Zmaza» vybrané MRL z playlistu"
 
-#: src/xitk/playlist.c:840
+#: src/xitk/playlist.c:864
 msgid "Delete all entries in playlist"
 msgstr "Zmaza» v¹etky polo¾ky v playliste"
 
-#: src/xitk/playlist.c:844
+#: src/xitk/playlist.c:868
 msgid "Add"
 msgstr "Prida»"
 
-#: src/xitk/playlist.c:850
+#: src/xitk/playlist.c:874
 msgid "Add one or more entries in playlist"
 msgstr "Prida» jednu alebo viaceré polo¾ky do playlistu"
 
-#: src/xitk/playlist.c:855
+#: src/xitk/playlist.c:879
 msgid "Load"
 msgstr "Otvori»"
 
-#: src/xitk/playlist.c:861
+#: src/xitk/playlist.c:885
 msgid "Load saved playlist"
 msgstr "Otvori» ulo¾ený playlist"
 
-#: src/xitk/playlist.c:871
+#: src/xitk/playlist.c:895
 msgid "Save playlist"
 msgstr "Playlist ulo¾i»"
 
-#: src/xitk/playlist.c:881
+#: src/xitk/playlist.c:905
 msgid "Close playlist window"
 msgstr "Zavrie» okno playlistu"
 
-#: src/xitk/playlist.c:897
+#: src/xitk/playlist.c:921
 msgid "Scan for:"
 msgstr "Hµada»:"
 
-#: src/xitk/playlist.c:909
+#: src/xitk/playlist.c:933
 msgid "Direct MRL entry"
 msgstr "Priame zadanie MRL"
 

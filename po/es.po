@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-06-11 01:22+0200\n"
+"POT-Creation-Date: 2002-06-16 13:51+0200\n"
 "PO-Revision-Date: 2002-05-26 12:33+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -18,12 +18,12 @@ msgstr ""
 msgid "No MRL (input stream) specified"
 msgstr "No se especificó MRL (flujo de entrada)"
 
-#: src/xitk/actions.c:621
+#: src/xitk/actions.c:619
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr ""
 
-#: src/xitk/control.c:370 src/xitk/panel.c:135 src/xitk/playlist.c:610
+#: src/xitk/control.c:370 src/xitk/panel.c:135 src/xitk/playlist.c:634
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): no se pudo encontrar la imagen de fondo\n"
@@ -32,7 +32,7 @@ msgstr "%s(): no se pudo encontrar la imagen de fondo\n"
 msgid "Xine Control Panel"
 msgstr ""
 
-#: src/xitk/control.c:462 src/xitk/playlist.c:706
+#: src/xitk/control.c:462 src/xitk/playlist.c:730
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "xine-playlist: no se pudo encontrar la imagen de fondo\n"
 
@@ -72,7 +72,7 @@ msgstr "Ctr"
 msgid "Choose a Skin"
 msgstr "Seleccione piel"
 
-#: src/xitk/control.c:714 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:875
+#: src/xitk/control.c:714 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:899
 msgid "Dismiss"
 msgstr "Cancel."
 
@@ -177,7 +177,7 @@ msgid "where snapshots will be saved"
 msgstr ""
 
 #: src/xitk/event.c:753
-msgid "time between two screensaver fake events"
+msgid "time between two screensaver fake events, 0 to disable"
 msgstr ""
 
 #. Some infos
@@ -291,7 +291,7 @@ msgstr ""
 msgid "Delete"
 msgstr "Selecc."
 
-#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:865
+#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:889
 msgid "Save"
 msgstr "Guardar"
 
@@ -597,19 +597,19 @@ msgstr ""
 msgid "No audio plugin available to decode '%s'."
 msgstr ""
 
-#: src/xitk/main.c:623
+#: src/xitk/main.c:624
 msgid "never"
 msgstr ""
 
-#: src/xitk/main.c:624
+#: src/xitk/main.c:625
 msgid "video only"
 msgstr ""
 
-#: src/xitk/main.c:625
+#: src/xitk/main.c:626
 msgid "audio only"
 msgstr ""
 
-#: src/xitk/main.c:626
+#: src/xitk/main.c:627
 msgid "always"
 msgstr ""
 
@@ -776,59 +776,59 @@ msgstr ""
 msgid "Can't read %s: %s\n"
 msgstr "No se puede leer %s: %s\n"
 
-#: src/xitk/playlist.c:692
+#: src/xitk/playlist.c:716
 msgid "Xine Playlist Editor"
 msgstr ""
 
-#: src/xitk/playlist.c:811
+#: src/xitk/playlist.c:835
 msgid "Move up selected MRL"
 msgstr "Sube MRL seleccionado"
 
-#: src/xitk/playlist.c:819
+#: src/xitk/playlist.c:843
 msgid "Move down selected MRL"
 msgstr "Baja MRL seleccionado"
 
-#: src/xitk/playlist.c:826
+#: src/xitk/playlist.c:850
 msgid "Start playback of selected MRL"
 msgstr "Inicia reproducción de MRL seleccionado"
 
-#: src/xitk/playlist.c:833
+#: src/xitk/playlist.c:857
 msgid "Delete selected MRL from playlist"
 msgstr "Borra la entrada seleccionada de la lista de reproducción"
 
-#: src/xitk/playlist.c:840
+#: src/xitk/playlist.c:864
 msgid "Delete all entries in playlist"
 msgstr "Borra todas las entradas de la lista de reproducción"
 
-#: src/xitk/playlist.c:844
+#: src/xitk/playlist.c:868
 msgid "Add"
 msgstr "Añadir"
 
-#: src/xitk/playlist.c:850
+#: src/xitk/playlist.c:874
 msgid "Add one or more entries in playlist"
 msgstr "Añade una o más entrada en la lista de reproducción"
 
-#: src/xitk/playlist.c:855
+#: src/xitk/playlist.c:879
 msgid "Load"
 msgstr "Cargar"
 
-#: src/xitk/playlist.c:861
+#: src/xitk/playlist.c:885
 msgid "Load saved playlist"
 msgstr "Carga una lista de reproducción salvada"
 
-#: src/xitk/playlist.c:871
+#: src/xitk/playlist.c:895
 msgid "Save playlist"
 msgstr "Guarda la lista de reproducción"
 
-#: src/xitk/playlist.c:881
+#: src/xitk/playlist.c:905
 msgid "Close playlist window"
 msgstr "Cierra la ventana de lista de reproducción"
 
-#: src/xitk/playlist.c:897
+#: src/xitk/playlist.c:921
 msgid "Scan for:"
 msgstr "Buscar:"
 
-#: src/xitk/playlist.c:909
+#: src/xitk/playlist.c:933
 msgid "Direct MRL entry"
 msgstr "Entrada directa de MRL"
 
