@@ -14,63 +14,64 @@ install-data-hook:
 	uid=0\(* ) \
 ## Icons
 	  echo "Installing destops icons/entries"; \
-	  $(mkinstalldirs) /usr/share/icons; \
-	  $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.xpm /usr/share/icons/xine.xpm; \
-	  $(mkinstalldirs) /usr/share/pixmaps; \
-	  $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.xpm /usr/share/pixmaps/xine.xpm; \
-	  if test -d /etc/X11/wmconfig; then \
-	    $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.wmconfig /etc/X11/wmconfig/xine; \
-	  fi; \
+	  $(mkinstalldirs) $(DESTDIR)/usr/share/icons; \
+	  $(LN_S) @XINE_DESKTOPDIR@/xine.xpm $(DESTDIR)/usr/share/icons/xine.xpm; \
+	  $(mkinstalldirs) $(DESTDIR)/usr/share/pixmaps; \
+	  $(LN_S) @XINE_DESKTOPDIR@/xine.xpm $(DESTDIR)/usr/share/pixmaps/xine.xpm; \
+	  $(mkinstalldirs) $(DESTDIR)/etc/X11/wmconfig; \
+	  $(LN_S) @XINE_DESKTOPDIR@/xine.wmconfig $(DESTDIR)/etc/X11/wmconfig/xine; \
+
 	  if test -d /etc/X11/applnk/; then \
-	    $(mkinstalldirs) /etc/X11/applnk/Multimedia; \
-	    $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.desktop /etc/X11/applnk/Multimedia/xine.desktop; \
+	    $(mkinstalldirs) $(DESTDIR)/etc/X11/applnk/Multimedia; \
+	    $(LN_S) @XINE_DESKTOPDIR@/xine.desktop $(DESTDIR)/etc/X11/applnk/Multimedia/xine.desktop; \
 	  fi; \
 ## End Icons
 ## Gnome
 	  if test -d /opt/gnome; then \
-	    $(mkinstalldirs) /opt/gnome/share/pixmaps; \
-	    $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.xpm /opt/gnome/share/pixmaps/xine.xpm; \
-	    $(mkinstalldirs) /opt/gnome/share/gnome/apps/Multimedia; \
-	    $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.desktop /opt/gnome/share/gnome/apps/Multimedia/xine.desktop; \
+	    $(mkinstalldirs) $(DESTDIR)/opt/gnome/share/pixmaps; \
+	    $(LN_S) @XINE_DESKTOPDIR@/xine.xpm $(DESTDIR)/opt/gnome/share/pixmaps/xine.xpm; \
+	    $(mkinstalldirs) $(DESTDIR)/opt/gnome/share/gnome/apps/Multimedia; \
+	    $(LN_S) @XINE_DESKTOPDIR@/xine.desktop $(DESTDIR)/opt/gnome/share/gnome/apps/Multimedia/xine.desktop; \
 	  else \
 	    if test -d /usr/share/gnome/apps; then \
-	      $(mkinstalldirs) /usr/share/gnome/apps/Multimedia; \
-	      $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.desktop /usr/share/gnome/apps/Multimedia/xine.desktop; \
+	      $(mkinstalldirs) $(DESTDIR)/usr/share/gnome/apps/Multimedia; \
+	      $(LN_S) @XINE_DESKTOPDIR@/xine.desktop $(DESTDIR)/usr/share/gnome/apps/Multimedia/xine.desktop; \
 	    fi; \
 	  fi; \
 ## End Gnome
 ## Kde2
 	  if test -d /opt/kde2; then \
-	    DIR_HI=/opt/kde2/share/icons/hicolor; \
-	    DIR_LO=/opt/kde2/share/icons/locolor; \
+	    DIR_HI=$(DESTDIR)/opt/kde2/share/icons/hicolor; \
+	    DIR_LO=$(DESTDIR)/opt/kde2/share/icons/locolor; \
 	    HIRES='48x48 32x32 22x22'; \
 	    LORES='32x32 22x22 16x16'; \
 	    for hires in $$HIRES; do \
 	      $(mkinstalldirs) $$DIR_HI/$$hires/apps; \
-	      $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine_$$hires.png $$DIR_HI/$$hires/apps/xine.png; \
+	      $(LN_S) @XINE_DESKTOPDIR@/xine_$$hires.png $$DIR_HI/$$hires/apps/xine.png; \
 	    done; \
 	    for lores in $$LORES; do \
 	      $(mkinstalldirs) $$DIR_LO/$$lores/apps; \
-	      $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine_$$lores.png $$DIR_LO/$$lores/apps/xine.png; \
+	      $(LN_S) @XINE_DESKTOPDIR@/xine_$$lores.png $$DIR_LO/$$lores/apps/xine.png; \
 	    done; \
-	    $(mkinstalldirs) /opt/kde2/share/applnk/Multimedia; \
-	    $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop; \
+	    $(mkinstalldirs) $(DESTDIR)/opt/kde2/share/applnk/Multimedia; \
+	    $(LN_S) @XINE_DESKTOPDIR@/xine.desktop $(DESTDIR)/opt/kde2/share/applnk/Multimedia/xine.desktop; \
 	  else \
 	    if test -d /usr/share/applnk/Multimedia; then \
-	      $(mkinstalldirs) /usr/share/applnk/Multimedia; \
-	      $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.desktop /usr/share/applnk/Multimedia/xine.desktop; \
+	      $(mkinstalldirs) $(DESTDIR)/usr/share/applnk/Multimedia; \
+	      $(LN_S) @XINE_DESKTOPDIR@/xine.desktop $(DESTDIR)/usr/share/applnk/Multimedia/xine.desktop; \
 	    fi; \
 	  fi; \
 ## End Kde2
 ## Kde
 	  if test -d /opt/kde/; then \
-	    $(mkinstalldirs) /opt/kde/share/icons; \
-	    $(mkinstalldirs) /opt/kde/share/applnk/Multimedia/; \
-	    $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.xpm /opt/kde/share/icons/xine.xpm; \
-	    $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop; \
+	    $(mkinstalldirs) $(DESTDIR)/opt/kde/share/icons; \
+	    $(mkinstalldirs) $(DESTDIR)/opt/kde/share/applnk/Multimedia/; \
+	    $(LN_S) @XINE_DESKTOPDIR@/xine.xpm $(DESTDIR)/opt/kde/share/icons/xine.xpm; \
+	    $(LN_S) @XINE_DESKTOPDIR@/xine.desktop $(DESTDIR)/opt/kde/share/applnk/Multimedia/xine.desktop; \
 	  else \
 	    if test -d /usr/share/applnk/Multimedia/; then \
-	      $(INSTALL_DATA) -o 0 -g 0 $(DESTDIR)@XINE_DESKTOPDIR@/xine.desktop /usr/share/applnk/Multimedia/xine.desktop; \
+	      rm -f $(DESTDIR)/usr/share/applnk/Multimedia/xine.desktop; \
+	      $(LN_S) @XINE_DESKTOPDIR@/xine.desktop $(DESTDIR)/usr/share/applnk/Multimedia/xine.desktop; \
 	    fi; \
 	  fi; \
 ## End Kde

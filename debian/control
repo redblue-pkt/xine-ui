@@ -2,7 +2,7 @@ Source: xine-ui
 Section: graphics
 Priority: optional
 Maintainer: Siggi Langauf <siggi@debian.org>
-Build-Depends: debhelper (>> 2.0.0), libxine-dev (>= 0.9.8), libpng2-dev (>=1.0.12), xlibs-dev (>=4.1), aalib1-dev (>> 1.4), libgpmg1-dev (>> 1.19.6)
+Build-Depends: debhelper (>> 2.0.0), libxine-dev (>= 0.9.9), libpng2-dev (>=1.0.12), xlibs-dev (>=4.1), aalib1-dev (>> 1.4), libgpmg1-dev (>> 1.19.6)
 Standards-Version: 3.2.1
 
 Package: xine-ui
@@ -10,7 +10,7 @@ Architecture: any
 Depends: ${shlibs:Depends}
 Recommends: ${shlibs:Recommends}
 Suggests: ${shlibs:Suggests}
-Conflicts: xine (<<0.5.0), libxine0 (>= 0.9.9)
+Conflicts: xine (<<0.5.0), libxine0 (>= 0.9.10)
 Replaces: xine
 Description: the xine video player, user interface 
  This is an X11 based GUI for the libxine video player library.

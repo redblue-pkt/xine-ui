@@ -1,2 +1,3 @@
 ?package(xine-ui):needs=X11 section=Apps/Viewers\
-  title="xine media player" command="/usr/bin/xine"
+  title="xine media player" command="/usr/bin/xine" \
+  hints="Video" icon="/usr/share/xine/desktop/xine_32x32.png"
