@@ -36,6 +36,12 @@
 
 #include "common.h"
 
+#if defined(HAVE_ICONV) && defined(HAVE_LANGINFO_CODESET)
+#  include <iconv.h>
+#  include <langinfo.h>
+#  define USE_CONV
+#endif
+
 extern gGui_t                   *gGui;
 
 static char                     *br_fontname = "-misc-fixed-medium-r-normal-*-10-*-*-*-*-*-*-*";
@@ -83,13 +89,27 @@ static void help_change_section(xitk_widget_t *wx, void *data, int section) {
 			     help->sections[section]->line_num, 0);
 }
 
-static void help_add_section(char *filename, int order_num, char *section_name) {
+static void help_add_section(const char *filename, const char *doc_encoding, 
+                             int order_num, char *section_name) {
   struct stat  st;
+#ifdef USE_CONV
+  char *locale_encoding;
+  iconv_t cd;
+  char *inbuf, *outbuf;
+  size_t inbytes, outbytes;
+#endif
   
   /* ensure that the file is not empty */
   if(help->num_sections < MAX_SECTIONS) {
     if((stat(filename, &st) == 0) && (st.st_size)) {
       int   fd;
+
+#ifdef USE_CONV
+      if (doc_encoding && (locale_encoding = nl_langinfo(CODESET)) != NULL)
+        cd = iconv_open(locale_encoding, doc_encoding);
+      else
+        cd = (iconv_t)-1;
+#endif
 
       if((fd = open(filename, O_RDONLY)) >= 0) {
 	char  *buf = NULL;
@@ -110,9 +130,35 @@ static void help_add_section(char *filename, int order_num, char *section_name) 
 
 	      while((*(p + strlen(p) - 1) == '\n') || (*(p + strlen(p) - 1) == '\r'))
 		*(p + strlen(p) - 1) = '\0';
-	      
-	      hbuf[lines++] = strdup(p);
-	      hbuf[lines]   = NULL;
+
+#ifdef USE_CONV
+              if (cd != (iconv_t)-1) {
+                inbytes = strlen(p);
+                outbytes = 2 * inbytes;
+                inbuf = p;
+                hbuf[lines] = outbuf = xine_xmalloc(outbytes);
+
+                /* 
+                 * convert the string, 
+                 * if conversion fails original string will be used 
+                 */
+                while (inbytes) {
+                  if (iconv(cd, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
+                    free(hbuf[lines]);
+                    hbuf[lines] = NULL;
+                    break;
+                  }
+                }
+                if (hbuf[lines]) hbuf[lines] = realloc(hbuf[lines], strlen(hbuf[lines]) + 1);
+                else hbuf[lines] = strdup(p);
+
+              } else {
+                hbuf[lines] = strdup(p);
+              }
+#else
+	      hbuf[lines] = strdup(p);
+#endif	      
+	      hbuf[++lines]   = NULL;
 	    }
 	    
 	    if(lines) {
@@ -132,9 +178,12 @@ static void help_add_section(char *filename, int order_num, char *section_name) 
 	  }
 
 	  free(buf);
-	}	
+	}
 	close(fd);
       }
+#ifdef USE_CONV
+      if (cd != (iconv_t)-1) iconv_close(cd);
+#endif
     }
   }
 }
@@ -170,10 +219,10 @@ static void help_sections(void) {
 	sprintf(default_readme, "%s/%s", XINE_DOCDIR, dir_entry->d_name);
 
 	if ((strcmp(locale_file, dir_entry->d_name)) && ((stat(locale_readme, &pstat)) == 0) && (S_ISREG(pstat.st_mode))) {
-	  help_add_section(locale_readme, order_num, section_name);
+	  help_add_section(locale_readme, lang->doc_encoding, order_num, section_name);
 	}
 	else {
-	  help_add_section(default_readme, order_num, section_name);
+	  help_add_section(default_readme, "ISO-8859-1", order_num, section_name);
 	}
       }
     }

@@ -33,13 +33,15 @@ typedef enum {
   PORTUGUESE,
   SPANISH,
   POLISH,
-  UKRAINIAN
+  UKRAINIAN,
+  CZECH
 } lang_code_t;
 
 typedef struct {
   char         *lang;
   lang_code_t   code;
   char         *ext;
+  char         *doc_encoding;
 } langs_t;
 
 const langs_t *get_lang(void);
