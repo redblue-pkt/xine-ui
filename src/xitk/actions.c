@@ -164,22 +164,16 @@ void gui_toggle_visibility(widget_t *w, void *data) {
 
   if(panel_is_visible()) {
     video_window_set_visibility(!(video_window_is_visible()));
-    
-    /* workaround for Enlightenment: need to re-map for reparenting */
-    panel_toggle_visibility(NULL, NULL);
-    panel_toggle_visibility(NULL, NULL);
+    XMapRaised (gGui->display, gGui->panel_window);
   }
 }
 
 void gui_toggle_fullscreen(widget_t *w, void *data) {
 
-  if(!(video_window_is_visible())) {
-    video_window_set_visibility(True);
-    video_window_set_fullscreen(True);
-  }
-  else {
-    video_window_set_fullscreen (!video_window_is_fullscreen ());
-  }
+  if(!(video_window_is_visible()))
+    video_window_set_visibility(1);
+  
+  video_window_set_fullscreen (!video_window_is_fullscreen ());
   
   /* Drawable has changed, update cursor visiblity */
   if(!gGui->cursor_visible) {
@@ -187,19 +181,12 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
   }
   
   if (panel_is_visible())  {
-    XRaiseWindow (gGui->display, gGui->panel_window);
+    printf("panel is visible\n");
+    XMapRaised (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
   }
-
-  /*
-   * workaround for Enlightenment: need to re-map for reparenting 
-   */
-  if (panel_is_visible()) {
-    panel_toggle_visibility(NULL, NULL);
-    panel_toggle_visibility(NULL, NULL);
-  }
-
+  
   if(mrl_browser_is_visible()) {
     show_mrl_browser();
     set_mrl_browser_transient();
@@ -260,15 +247,6 @@ void gui_change_spu_channel(widget_t *w, void *data) {
   }
   else if(((int)data) == GUI_PREV) {
     if(xine_get_spu_channel(gGui->xine) >= 0) {
-      /* 
-       * Subtitle will be disabled; so hide it otherwise 
-       * the latest still be showed forever.
-       */
-      /* FIXME
-      if((xine_get_spu_channel(gGui->xine) - 1) == -1)
-      	vo_hide_spu();
-      */
-
       xine_select_spu_channel(gGui->xine, 
 			      (xine_get_spu_channel(gGui->xine) - 1));
     }
@@ -441,6 +419,10 @@ void layer_above_video(Window w) {
   static Atom XA_WIN_LAYER = None;
   XEvent xev;
 
+
+  if(!gGui->layer_above)
+    return;
+  
   if( XA_WIN_LAYER == None )
     XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
 

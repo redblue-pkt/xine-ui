@@ -164,6 +164,7 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.display                        = gGui->display;
   fbr.imlibdata                      = gGui->imlib_data;
   fbr.window_trans                   = gGui->video_window;
+  fbr.layer_above                    = gGui->layer_above;
 
   fbr.x                              = config_lookup_int("x_file_browser", 200);
   fbr.y                              = config_lookup_int("y_file_browser", 100);

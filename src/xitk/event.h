@@ -102,6 +102,8 @@ typedef struct {
 
   widgetkey_t          widget_key;
 
+  int                  layer_above;
+
 } gGui_t;
 
 

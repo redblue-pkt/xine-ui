@@ -311,14 +311,16 @@ void video_window_adapt_size (int video_width, int video_height,
      * WIN_LAYER_ABOVE_DOCK  = 10
      *
      */
-    if( XA_WIN_LAYER == None )
-      XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-    
-    data[0] = 10;
-    XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
-		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		    1);
-    
+    if(gGui->layer_above) {
+      if( XA_WIN_LAYER == None )
+	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+      
+      data[0] = 10;
+      XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
+		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		      1);
+    }
+
     /*
      * wm, no borders please
      */
@@ -496,13 +498,15 @@ void video_window_set_visibility(int show_window) {
      * WIN_LAYER_ABOVE_DOCK  = 10
      *
      */
-    if( XA_WIN_LAYER == None )
-      XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
-    
-    data[0] = 10;
-    XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
-		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
-		    1);
+    if(gGui->layer_above) {
+      if( XA_WIN_LAYER == None )
+	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+      
+      data[0] = 10;
+      XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
+		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		      1);
+    }
     
     XMapRaised (gGui->display, gGui->video_window);
     XUnlockDisplay (gGui->display);
@@ -667,7 +671,7 @@ static void video_window_handle_event (XEvent *event, void *data) {
     if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
 		    &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
       xine_event.event.type = XINE_MOUSE_EVENT;
-      xine_event.button = 0; // No buttons, just motion.
+      xine_event.button = 0; /*  No buttons, just motion. */
       /* Scale co-ordinate to image dimensions. */
       xf = (float)mevent->x / (float)wwin;
       yf = (float)mevent->y / (float)hwin;

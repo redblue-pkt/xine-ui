@@ -164,6 +164,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.display                        = gGui->display;
   mb.imlibdata                      = gGui->imlib_data;
   mb.window_trans                   = gGui->video_window;
+  mb.layer_above                    = gGui->layer_above;
 
   mb.x                              = config_lookup_int("x_mrl_browser", 200);
   mb.y                              = config_lookup_int("y_mrl_browser", 100);

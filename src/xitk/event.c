@@ -807,6 +807,8 @@ void gui_init (int nfiles, char *filenames[]) {
     exit(1);
   }
 
+  gGui->layer_above = config_lookup_int("layer_above", 1);
+
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);
@@ -978,7 +980,7 @@ void gui_run (void) {
   }
 #endif
 
-  //global event handler
+  /*  global event handler */
   gGui->widget_key = widget_register_event_handler("NO WINDOW", None,
 						   gui_handle_event, 
 						   NULL,

@@ -929,7 +929,7 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   XSizeHints                  hint;
   XSetWindowAttributes        attr;
   char                       *title = fb->window_title;
-  Atom                        prop;
+  Atom                        prop, XA_WIN_LAYER;
   MWMHints                    mwmhints;
   XWMHints                   *wm_hint;
   XClassHint                 *xclasshint;
@@ -940,6 +940,7 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   xitk_labelbutton_t          lb;
   xitk_label_t                lbl;
   filebrowser_private_data_t *private_data;
+  long data[1];
   
   mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
 
@@ -1010,6 +1011,20 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
+  /*
+   * layer above most other things, like gnome panel
+   * WIN_LAYER_ABOVE_DOCK  = 10
+   *
+   */
+  if(fb->layer_above) {
+    XA_WIN_LAYER = XInternAtom(fb->display, "_WIN_LAYER", False);
+    
+    data[0] = 10;
+    XChangeProperty(fb->display, private_data->window, XA_WIN_LAYER,
+		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		    1);
+  }
+
   /*
    * wm, no border please
    */

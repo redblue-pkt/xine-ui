@@ -157,7 +157,7 @@ void panel_toggle_visibility (widget_t *w, void *data) {
     XMapRaised(gGui->display, gGui->panel_window); 
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
-
+    
     layer_above_video(gGui->panel_window);
   }
 
@@ -398,13 +398,14 @@ void panel_init (void) {
   XWMHints               *wm_hint;
   XSetWindowAttributes    attr;
   char                    title[] = {"Xine Panel"}; /* window-title     */
-  Atom                    prop;
+  Atom                    prop, XA_WIN_LAYER;
   MWMHints                mwmhints;
   XClassHint             *xclasshint;
   xitk_button_t           b;
   xitk_checkbox_t         cb;
   xitk_label_t            lbl;
   xitk_slider_t           sl;
+  long data[1];
   
   if (gGui->panel_window)
     return ; /* panel already open  - FIXME: bring to foreground */
@@ -481,6 +482,20 @@ void panel_init (void) {
   
   XSetTransientForHint (gGui->display, 
 			gGui->panel_window, gGui->video_window);
+
+  /*
+   * layer above most other things, like gnome panel
+   * WIN_LAYER_ABOVE_DOCK  = 10
+   *
+   */
+  if(gGui->layer_above) {
+    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+    
+    data[0] = 10;
+    XChangeProperty(gGui->display, gGui->panel_window, XA_WIN_LAYER,
+		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		    1);
+  }
 
   /* 
    * set wm properties 

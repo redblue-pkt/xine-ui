@@ -725,6 +725,7 @@ typedef struct {
   Display                   *display;
   ImlibData                 *imlibdata;
   Window                     window_trans;
+  int                        layer_above;
 
   int                        x;
   int                        y;
@@ -813,6 +814,7 @@ typedef struct {
   Display                   *display;
   ImlibData                 *imlibdata;
   Window                     window_trans;
+  int                        layer_above;
 
   int                        x;
   int                        y;

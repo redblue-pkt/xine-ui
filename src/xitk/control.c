@@ -275,13 +275,14 @@ void control_panel(void) {
   XWMHints               *wm_hint;
   XSetWindowAttributes    attr;
   char                    title[] = {"Xine Control Panel"};
-  Atom                    prop;
+  Atom                    prop, XA_WIN_LAYER;
   MWMHints                mwmhints;
   XClassHint             *xclasshint;
   xitk_labelbutton_t      lb;
   xitk_label_t            lbl;
   xitk_slider_t           sl;
-  
+  long data[1];
+
   /* This shouldn't be happend */
   if(control != NULL) {
     if(control->window)
@@ -330,6 +331,20 @@ void control_panel(void) {
   XSelectInput(gGui->display, control->window,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+  
+  /*
+   * layer above most other things, like gnome panel
+   * WIN_LAYER_ABOVE_DOCK  = 10
+   *
+   */
+  if(gGui->layer_above) {
+    XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+    
+    data[0] = 10;
+    XChangeProperty(gGui->display, control->window, XA_WIN_LAYER,
+		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		    1);
+  }
   
   /*
    * wm, no border please

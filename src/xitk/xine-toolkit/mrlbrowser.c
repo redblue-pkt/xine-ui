@@ -632,7 +632,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   XSizeHints                 hint;
   XSetWindowAttributes       attr;
   char                      *title = mb->window_title;
-  Atom                       prop;
+  Atom                       prop, XA_WIN_LAYER;
   MWMHints                   mwmhints;
   XWMHints                  *wm_hint;
   XClassHint                *xclasshint;
@@ -643,6 +643,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   xitk_labelbutton_t         lb;
   xitk_button_t              pb;
   xitk_label_t               lbl;
+  long data[1];
   
   if(mb->ip_availables == NULL) {
     fprintf(stderr, "Something's going wrong, there is no input plugin "
@@ -722,6 +723,20 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   XSelectInput(mb->display, private_data->window,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+  
+  /*
+   * layer above most other things, like gnome panel
+   * WIN_LAYER_ABOVE_DOCK  = 10
+   *
+   */
+  if(mb->layer_above) {
+    XA_WIN_LAYER = XInternAtom(mb->display, "_WIN_LAYER", False);
+    
+    data[0] = 10;
+    XChangeProperty(mb->display, private_data->window, XA_WIN_LAYER,
+		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
+		    1);
+  }
   
   /*
    * wm, no border please
