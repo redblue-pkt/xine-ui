@@ -315,7 +315,8 @@ static commands_t commands[] = {
     "  get spu lang\n"
     "  get speed\n"
     "  get position\n"
-    "  get length"
+    "  get length\n"
+    "  get loop"
   },
   { "set",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_set,
     "set values", 
@@ -324,7 +325,8 @@ static commands_t commands[] = {
     "  set audio mute <state>\n"
     "  set spu channel <num>\n"
     "  set speed <XINE_SPEED_PAUSE|XINE_SPEED_SLOW_4|XINE_SPEED_SLOW_2|XINE_SPEED_NORMAL|XINE_SPEED_FAST_2|XINE_SPEED_FAST_4>\n"
-    "            <        |       |        /4       |        /2       |        =        |        *2       |        *4       >"
+    "            <        |       |        /4       |        /2       |        =        |        *2       |        *4       >\n"
+    "  set loop <no | loop | repeat | shuffle | shuffle+>"
   },
   { "gui",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_gui,
     "manage gui windows",
@@ -2065,7 +2067,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 			    &pos_stream,
 			    &pos_time,
 			    &length_time);
-	sprintf(buf,"Current position: %d\n",pos_time);
+	sprintf(buf, "Current position: %d\n",pos_time);
 	sock_write(client_info->socket, buf);
       }
       else if(is_arg_contain(client_info, 1, "length")) {
@@ -2077,7 +2079,36 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 			    &pos_stream,
 			    &pos_time,
 			    &length_time);
-	sprintf(buf,"Current length: %d\n",length_time);
+	sprintf(buf, "Current length: %d\n",length_time);
+	sock_write(client_info->socket, buf);
+      }
+      else if(is_arg_contain(client_info, 1, "loop")) {
+	char buf[64];
+
+	sprintf(buf, "Current loop mode is: ");
+
+	switch(gGui->playlist.loop) {
+	case PLAYLIST_LOOP_NO_LOOP:
+	  sprintf(buf, "%s'No Loop'", buf);
+	  break;
+	case PLAYLIST_LOOP_LOOP:
+	  sprintf(buf, "%s'Loop'", buf);
+	  break;
+	case PLAYLIST_LOOP_REPEAT:
+	  sprintf(buf, "%s'Repeat'", buf);
+	  break;
+	case PLAYLIST_LOOP_SHUFFLE:
+	  sprintf(buf, "%s'Shuffle'", buf);
+	  break;
+	case PLAYLIST_LOOP_SHUF_PLUS:	
+	  sprintf(buf, "%s'Shuffle forever'", buf);
+	  break;
+	default:
+	  sprintf(buf, "%s'!!Unknown!!'", buf);
+	  break;
+	}
+
+	sprintf(buf, "%s.\n", buf);
 	sock_write(client_info->socket, buf);
       }
     }
@@ -2159,6 +2190,28 @@ static void do_set(commands_t *cmd, client_info_t *client_info) {
 	  speed = atoi((get_arg(client_info, 2)));
 	
 	xine_set_param(gGui->stream, XINE_PARAM_SPEED, speed);
+      }
+      else if(is_arg_contain(client_info, 1, "loop")) {
+	int i;
+	struct {
+	  char *mode;
+	  int   loop_mode;
+	} loop_modes[] = {
+	  { "no",       PLAYLIST_LOOP_NO_LOOP   },
+	  { "loop",     PLAYLIST_LOOP_LOOP      },
+	  { "repeat",   PLAYLIST_LOOP_REPEAT    },
+	  { "shuffle",  PLAYLIST_LOOP_SHUFFLE   },
+	  { "shuffle+", PLAYLIST_LOOP_SHUF_PLUS },
+	  { NULL,       -1                      }
+	};
+	char *arg = (char *) get_arg(client_info, 2);
+
+	for(i = 0; loop_modes[i].mode; i++) {
+	  if(!strncmp(arg, loop_modes[i].mode, strlen(arg))) {
+	    gGui->playlist.loop = loop_modes[i].loop_mode;
+	    return;
+	  }
+	}
       }
     }
     else if(nargs >= 3) {
