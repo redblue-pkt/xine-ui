@@ -325,6 +325,9 @@ void playlist_move_current_updown(xitk_widget_t *w, void *data) {
 
     if(((int)data) == DIRECTION_UP && (j > 0)) {
       mmk = gGui->playlist.mmk[j - 1];
+      
+      if(j == gGui->playlist.cur)
+	gGui->playlist.cur--;
 
       gGui->playlist.mmk[j - 1] = gGui->playlist.mmk[j];
       gGui->playlist.mmk[j] = mmk;
@@ -333,6 +336,9 @@ void playlist_move_current_updown(xitk_widget_t *w, void *data) {
     else if(((int)data) == DIRECTION_DOWN && (j < (gGui->playlist.num - 1))) {
       mmk = gGui->playlist.mmk[j + 1];
       
+      if(j == gGui->playlist.cur)
+	gGui->playlist.cur++;
+
       gGui->playlist.mmk[j + 1] = gGui->playlist.mmk[j];
       gGui->playlist.mmk[j] = mmk;
       j++;
@@ -348,6 +354,8 @@ void playlist_move_current_updown(xitk_widget_t *w, void *data) {
       _playlist_update_browser_list(-1);
 
     xitk_browser_set_select(playlist->playlist, j);
+
+    
   }
 }
 
