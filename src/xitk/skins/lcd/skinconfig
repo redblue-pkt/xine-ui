@@ -1,0 +1,66 @@
+#							Text
+#Function	X	Y	Filename	Normal  Focus   Click
+#						Color	Color	Color
+## Main GUI ##
+BackGround:	0	0	bg.png
+Close:		520	6	close.png
+Eject:		0	0	eject.png
+Exit:		61	74	power.png
+FullScreen:	508	6	fullsc.png
+Letters:	0	0	letters.png
+TitleLabel:	170	32	letters.png
+TimeLabel:	480	51	letters.png
+AudioPrev:	190	60	ptdn.png
+AudioNext:	190	51	ptup.png
+AudioLabel:	170	52	letters.png
+SpuPrev:	250	60	ptdn.png
+SpuNext:	250	51	ptup.png
+SpuLabel:	230	52	letters.png
+Next:		324	77	next.png
+Pause:		199	77	pause.png
+Play:		149	77	play.png
+Stop:		174 	77	stop.png
+Prev:		249	77	prev.png
+Eject:		349	77	eject.png
+AutoPlayGUI:	322	55	smallbtn.png	Black	Yellow	White
+PlBtn:		355	52	largebtn.png        Black   Blue    White
+CtlBtn:		415	52	largebtn.png        Black   Blue    White
+SliderBGPlay:	149	70	slider_bg.png
+SliderFGPlay:	0	0	slider_pad.png
+
+## Playlist ##
+PlBG:		0	0	pl_bg.png
+PlLoad:		400	181	pl_btn.png	Black   Yellow	White
+PlSave:		400	204	pl_btn.png	Black   Yellow	White
+PlItemBtn:	75	40	pl_itembtn.png	Black   Yellow	White
+PlMoveUp:	140	204	pl_btn.png	Black	Yellow	White
+PlMoveDn:	218	204	pl_btn.png	Black	Yellow	White
+PlPlay:		101	227	pl_btn.png        Black   Yellow    White
+PlDelete:	179 	227	pl_btn.png        Black   Yellow    White
+PlDeleteAll:	257	227	pl_btn.png        Black   Yellow    White
+PlDismiss:	400	227	pl_btn.png        Black   Yellow    White
+PlUp:		375	40	arrowup.png
+PlSlidBG:	377	55	pl_slidv.png
+PlSlidFG:	0	0	pl_slidpad.png
+PlDn:		375	178	arrowdn.png
+AutoPlayLbl:	410	40	letters.png
+AutoPlayBG:	400	62	pl_btn.png	Black   Yellow	White
+
+#Control Panel
+CtlBG:		0	0	pl_bg.png
+CtlHueBG:	80	40	pl_slidv.png
+CtlHueFG:	0	0	pl_slidpad.png
+CtlHueLbl:	77	168	letters.png
+CtlSatBG:	120	40	pl_slidv.png
+CtlSatFG:	0	0	pl_slidpad.png
+CtlSatLbl:	117	168	letters.png
+CtlBrightBG:	160	40	pl_slidv.png
+CtlBrightFG:	0	0	pl_slidpad.png
+CtlBrightLbl:	157	168	letters.png
+CtlContBG:	200	40	pl_slidv.png
+CtlContFG:	0	0	pl_slidpad.png
+CtlContLbl:	197	168	letters.png
+CtlSave:	101	227	pl_btn.png        Black   Yellow    White
+CtlReset:	179 	227	pl_btn.png        Black   Yellow    White
+CtlDummy:	257	227	pl_btn.png        Black   Yellow    White
+CtlDismiss:	400	227	pl_btn.png        Black   Yellow    White

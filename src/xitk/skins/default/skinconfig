@@ -1,0 +1,68 @@
+#Function	X	Y	Filename
+
+BackGround:	0	0	bg.png
+MaskBackGround:	0	0	bg_mask.png
+AudioPrev:	375	50	arrowdn.png
+AudioNext:	375	38	arrowup.png
+Close:		383	4	close.png
+FullScreen:	388	20	fullsc.png
+Letters:	0	0	letters.png
+TitleLabel:	20	18	letters.png
+TimeLabel:	20	41	letters.png
+AudioLabel:	353	41	letters.png
+SpuPrev:	315	50	arrowdn.png
+SpuNext:	315	38	arrowup.png
+SpuLabel:	293	41	letters.png
+Next:		180	71	next.png
+Pause:		140	71	pause.png
+Play:		100	71	play.png
+Stop:		60	71	stop.png
+Prev:		20	71	prev.png
+AutoPlace:	224	71	left.png
+Eject:		234	71	eject.png
+Exit:		253	71	exit.png
+AutoPlace:	272	71	right.png
+SliderBGPlay:	17	3	slider_bg.png
+SliderFGPlay:	0	0	slider_pad.png
+SliderBGVol:	2	20	slider_v.png
+SliderFGVol:	0	0	slider_pad.png
+AutoPlayGUI:	117	45	smallbtn.png	LightGray	Yellow	White
+PlBtn:		150	42	largebtn.png	LightGray	White	Red
+CtlBtn:		210	42	largebtn.png    LightGray	White	Red
+
+## Playlist ##
+PlBG:		0	0	pl_bg.png
+PlLoad:		350	164	pl_btn.png	LightGray	White	Red
+PlSave:		350	187	pl_btn.png	LightGray	White	Red
+PlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red
+PlMoveUp:	100	186	pl_btn.png	LightGray	White	Red
+PlMoveDn:	178	186	pl_btn.png	LightGray	White	Red
+PlPlay:		61	210	pl_btn.png	LightGray	White	Red
+PlDelete:	139 	210	pl_btn.png	LightGray	White	Red
+PlDeleteAll:	217	210	pl_btn.png	LightGray	White	Red
+PlDismiss:	350	210	pl_btn.png	LightGray	White	Red
+PlUp:		328	30	arrowup2.png
+PlSlidBG:	327	45	pl_slidv.png
+PlSlidFG:	0	0	pl_slidpad.png
+PlDn:		328	175	arrowdn2.png
+AutoPlayLbl:	360	40	letters.png
+AutoPlayBG:	350	62	pl_btn.png	LightGray	White	Red
+
+#Control Panel
+CtlBG:		0	0	pl_bg.png
+CtlHueBG:	80	40	pl_slidv.png
+CtlHueFG:	0	0	pl_slidpad.png
+CtlHueLbl:	76	168	letters.png
+CtlSatBG:	120	40	pl_slidv.png
+CtlSatFG:	0	0	pl_slidpad.png
+CtlSatLbl:	116	168	letters.png
+CtlBrightBG:	160	40	pl_slidv.png
+CtlBrightFG:	0	0	pl_slidpad.png
+CtlBrightLbl:	156	168	letters.png
+CtlContBG:	200	40	pl_slidv.png
+CtlContFG:	0	0	pl_slidpad.png
+CtlContLbl:	196	168	letters.png
+CtlSave:	31	210	pl_btn.png	LightGray	White	Red
+CtlReset:	109 	210	pl_btn.png	LightGray	White	Red
+CtlDummy:	187	210	pl_btn.png	LightGray	White	Red
+CtlDismiss:	350	210	pl_btn.png	LightGray	White	Red
