@@ -910,12 +910,18 @@ void video_window_init (void) {
   /* Ensure we load the right logo */
   video_window_change_skins();
 
-  // for plugins that aren't really bind to the window, it's necessary that the
-  // gVw->xwin and gVw->ywin variables are set to right values, otherwise the
-  // overlay will be displayed somewhere outside the window
+  /*
+   * for plugins that aren't really bind to the window, it's necessary that the
+   * gVw->xwin and gVw->ywin variables are set to right values, otherwise the
+   * overlay will be displayed somewhere outside the window
+   */
   if(gGui->video_window) {
-     Window tmp_win;
-     XTranslateCoordinates(gGui->display, gGui->video_window, DefaultRootWindow(gGui->display), 0, 0, &gVw->xwin, &gVw->ywin, &tmp_win);
+    Window tmp_win;
+    
+    XLockDisplay (gGui->display);
+    XTranslateCoordinates(gGui->display, gGui->video_window, DefaultRootWindow(gGui->display), 
+			  0, 0, &gVw->xwin, &gVw->ywin, &tmp_win);
+    XUnlockDisplay (gGui->display);
   }
 }
 
