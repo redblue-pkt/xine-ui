@@ -92,48 +92,57 @@ void gui_pause (widget_t *w, void *data, int state) {
 void gui_eject(widget_t *w, void *data) {
   char *tmp_playlist[MAX_PLAYLIST_LENGTH];
   int i, new_num = 0;
-  char *tok = NULL;
   
-  if (gGui->playlist_num && xine_eject(gGui->filename)) {
-    /*
-     * If MRL is dvd:// or vcd:// remove all of them in playlist
-     */
-    if(!strncasecmp(gGui->playlist[gGui->playlist_cur], "dvd://", 6))
-      tok = "dvd://";
-    else if(!strncasecmp(gGui->playlist[gGui->playlist_cur], "vcd://", 6))
-      tok = "vcd://";
-    
-    if(tok != NULL) {
-      /* 
-       * Store all of not maching entries
+  if (xine_eject(gGui->xine)) {
+
+    if(gGui->playlist_num) {
+      char  *tok = NULL;
+      char  *mrl;
+      int    len;
+      /*
+       * If it's an mrl (____://) remove all of them in playlist
        */
-      for(i=0; i < gGui->playlist_num; i++) {
-	if(strncasecmp(gGui->playlist[i], tok, strlen(tok))) {
-	  tmp_playlist[new_num] = gGui->playlist[i];
-	  new_num++;
-	}
+      mrl = strstr(gGui->playlist[gGui->playlist_cur], "://");
+      if(mrl) {
+	len = (mrl - gGui->playlist[gGui->playlist_cur]) + 4;
+	tok = (char *) alloca(len + 1);
+	memset(tok, 0, len + 1);
+  	snprintf(tok, len, "%s", gGui->playlist[gGui->playlist_cur]);
       }
-      /*
-       * Create new _cleaned_ playlist
-       */
-      memset(&gGui->playlist, 0, sizeof(gGui->playlist));
-      for(i=0; i<new_num; i++)
-	gGui->playlist[i] = tmp_playlist[i];
 
-      gGui->playlist_num = new_num;
-
+      if(tok != NULL) {
+	/* 
+	 * Store all of not maching entries
+	 */
+	for(i=0; i < gGui->playlist_num; i++) {
+	  if(strncasecmp(gGui->playlist[i], tok, strlen(tok))) {
+	    tmp_playlist[new_num] = gGui->playlist[i];
+	    new_num++;
+	  }
+	}
+	/*
+	 * Create new _cleaned_ playlist
+	 */
+	memset(&gGui->playlist, 0, sizeof(gGui->playlist));
+	for(i=0; i<new_num; i++)
+	  gGui->playlist[i] = tmp_playlist[i];
+	
+	gGui->playlist_num = new_num;
+	if(new_num)
+	  gGui->playlist_cur = 0;
+      }
+      else {
+	/*
+	 * Remove only the current MRL
+	 */
+	for(i = gGui->playlist_cur; i < gGui->playlist_num; i++)
+	  gGui->playlist[i] = gGui->playlist[i+1];
+	
+	gGui->playlist_num--;
+	if(gGui->playlist_cur) gGui->playlist_cur--;
+      }
     }
-    else {
-      /*
-       * Remove only the current MRL
-       */
-      for(i = gGui->playlist_cur; i < gGui->playlist_num; i++)
-	gGui->playlist[i] = gGui->playlist[i+1];
-      
-      gGui->playlist_num--;
-      if(gGui->playlist_cur) gGui->playlist_cur--;
-    }
-
+    
     gui_set_current_mrl(gGui->playlist [gGui->playlist_cur]);
     pl_update_playlist();
   }
