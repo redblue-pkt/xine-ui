@@ -504,10 +504,12 @@ void playlist_handle_event(XEvent *event, void *data) {
       switch (mykey) {
 	
       case XK_Down:
+      case XK_Next:
 	browser_step_up(playlist->playlist, NULL);
 	break;
 	
       case XK_Up:
+      case XK_Prior:
 	browser_step_down(playlist->playlist, NULL);
 	break;
 	
@@ -784,6 +786,7 @@ void playlist_editor(void) {
   br.browser.entries               = gGui->playlist;
   br.callback                      = handle_selection;
   br.dbl_click_callback            = pl_on_dbl_click;
+  br.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
   br.parent_wlist                  = playlist->widget_list;
 
   gui_list_append_content (playlist->widget_list->l, 

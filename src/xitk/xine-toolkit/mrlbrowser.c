@@ -560,36 +560,40 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     XRefreshKeyboardMapping((XMappingEvent *) event);
     XUNLOCK(private_data->display);
     break;
-
+    
   case KeyPress:
     mykeyevent = event->xkey;
-
+    
     XLOCK (private_data->display);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
     XUNLOCK (private_data->display);
-
-    switch (mykey) {
     
+    switch (mykey) {
+      
     case XK_s:
     case XK_S:
       mrlbrowser_select(NULL, (void *)private_data);
-    break;
-
-    /* This is for debugging purpose */
+      break;
+      
+      /* This is for debugging purpose */
     case XK_d:
     case XK_D:
       mrlbrowser_dumpmrl(NULL, (void *)private_data);
-    break;
-
+      break;
+      
     case XK_Down:
+    case XK_Next:
       browser_step_up((widget_t *)private_data->mrlb_list, NULL);
-    break;
-
+      break;
+      
     case XK_Up:
+    case XK_Prior:
       browser_step_down((widget_t *)private_data->mrlb_list, NULL);
-    break;
-
+      break;
     }
+    
+    break;
+    
   }
 }
 
@@ -763,9 +767,10 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   
   private_data->add_callback      = mb->select.callback;
   private_data->kill_callback     = mb->kill.callback;
-  mb->browser.dbl_click_callback = handle_dbl_click;
-  mb->browser.userdata           = (void *)private_data;
-  mb->browser.parent_wlist       = private_data->widget_list;
+  mb->browser.dbl_click_callback  = handle_dbl_click;
+  mb->browser.dbl_click_time      = DEFAULT_DBL_CLICK_TIME;
+  mb->browser.userdata            = (void *)private_data;
+  mb->browser.parent_wlist        = private_data->widget_list;
   gui_list_append_content (private_data->widget_list->l,
 			   (private_data->mrlb_list = 
 			    browser_create(&mb->browser)));

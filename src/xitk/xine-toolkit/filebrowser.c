@@ -882,23 +882,25 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
     XUNLOCK (private_data->display);
 
     switch (mykey) {
-    
+      
     case XK_s:
     case XK_S:
       filebrowser_select(NULL, (void *)private_data);
-    break;
-
+      break;
+      
     case XK_asciitilde:
       filebrowser_homedir(NULL, (void *)private_data);
-    break;
-
+      break;
+      
     case XK_Down:
+    case XK_Next:
       browser_step_up((widget_t *)private_data->fb_list, NULL);
-    break;
-
+      break;
+      
     case XK_Up:
+    case XK_Prior:
       browser_step_down((widget_t *)private_data->fb_list, NULL);
-    break;
+      break;
     }
   }
 }
@@ -1085,6 +1087,7 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   private_data->kill_callback     = fb->kill.callback;
 
   fb->browser.dbl_click_callback = handle_dbl_click;
+  fb->browser.dbl_click_time     = DEFAULT_DBL_CLICK_TIME;
   fb->browser.userdata           = (void *)private_data;
   fb->browser.parent_wlist       = private_data->widget_list;
   gui_list_append_content(private_data->widget_list->l,
