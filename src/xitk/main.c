@@ -1047,6 +1047,17 @@ int main(int argc, char *argv[]) {
    */
   /* Video out plugin */
   gGui->vo_port = load_video_out_driver(video_driver_id);
+  if(!strcasecmp(video_driver_id, "dxr3")) {
+    xine_cfg_entry_t  cfg_entry;
+    
+    if(xine_config_lookup_entry(gGui->xine, "dxr3.videoout_mode", &cfg_entry)) {
+      if(((!strcmp(cfg_entry.str_value, "letterboxed tv")) ||
+	  (!strcmp(cfg_entry.str_value, "widescreen tv"))) && 
+	 (!(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)))) {
+	gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+      }
+    }
+  }
   free(video_driver_id);
 
   /* Audio out plugin */
