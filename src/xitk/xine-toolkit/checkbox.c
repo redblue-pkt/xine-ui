@@ -146,28 +146,31 @@ static void paint_checkbox (xitk_widget_t *w) {
 /*
  *
  */
-static int notify_click_checkbox (xitk_widget_t *w, int cUp, int x, int y) {
+static int notify_click_checkbox (xitk_widget_t *w, int button, int cUp, int x, int y) {
   checkbox_private_data_t *private_data;
+  int                      ret = 0;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)) {
-    
-    private_data = (checkbox_private_data_t *) w->private_data;
-    
-    private_data->cClicked = !cUp;
-    if (cUp && (private_data->focus == FOCUS_RECEIVED)) {
-      private_data->cState = !private_data->cState;
-
-      if(private_data->callback) {
-	private_data->callback(private_data->cWidget, 
-			       private_data->userdata,
-			       private_data->cState);
+    if(button == Button1) {
+      private_data = (checkbox_private_data_t *) w->private_data;
+      
+      private_data->cClicked = !cUp;
+      if (cUp && (private_data->focus == FOCUS_RECEIVED)) {
+	private_data->cState = !private_data->cState;
+	
+	if(private_data->callback) {
+	  private_data->callback(private_data->cWidget, 
+				 private_data->userdata,
+				 private_data->cState);
+	}
       }
+      
+      paint_checkbox(w);
+      ret = 1;
     }
-    
-    paint_checkbox(w);
   }
 
-  return 1;
+  return ret;
 }
 
 /*
@@ -219,7 +222,8 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     paint_checkbox(w);
     break;
   case WIDGET_EVENT_CLICK:
-    result->value = notify_click_checkbox(w, event->button_pressed, event->x, event->y);
+    result->value = notify_click_checkbox(w, event->button,
+					  event->button_pressed, event->x, event->y);
     retval = 1;
     break;
   case WIDGET_EVENT_FOCUS:

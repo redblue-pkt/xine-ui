@@ -59,7 +59,6 @@ extern int XShmGetEventBase(Display *);
 #endif
 
 extern char **environ;
-extern int errno;
 #undef TRACE_LOCKS
 
 #ifdef TRACE_LOCKS
@@ -1055,10 +1054,11 @@ void xitk_xevent_notify(XEvent *event) {
 
 		handled = 1;
 
-		event.type = WIDGET_EVENT_CLICK;
+		event.type           = WIDGET_EVENT_CLICK;
+		event.x              = w->x;
+		event.y              = w->y;
 		event.button_pressed = LBUTTON_DOWN;
-		event.x = w->x;
-		event.y = w->y;
+		event.button         = Button1;
 
 		(void) w->event(w, &event, &result);
 
@@ -1238,8 +1238,30 @@ void xitk_xevent_notify(XEvent *event) {
 
 	    fx->move.enabled = !xitk_click_notify_widget_list (fx->widget_list, 
 							       event->xbutton.x, 
-							       event->xbutton.y, 0);
-	    if (fx->move.enabled) {
+							       event->xbutton.y, 
+							       event->xbutton.button, 0);
+	    if(event->xbutton.button != Button1) {
+	      xitk_widget_t *w = fx->widget_list->widget_focused;
+
+	      fx->move.enabled = 0;
+	      
+	      if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+		xitk_widget_t *b = xitk_browser_get_browser(w);
+		
+		if(b) {
+		  
+		  if(event->xbutton.button == Button4) {
+		    xitk_browser_step_down(b, NULL);
+		  }
+		  else if(event->xbutton.button == Button5) {
+		    xitk_browser_step_up(b, NULL);
+		  }
+		  
+		}
+	      }
+	    }
+
+	    if(fx->move.enabled) {
 	      XWindowAttributes wattr;
 	      Status            err;
 
@@ -1275,8 +1297,9 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 	  else {
 	    if(fx->widget_list) {
-	      xitk_click_notify_widget_list (fx->widget_list, event->xbutton.x, 
-					     event->xbutton.y, 1);
+	      xitk_click_notify_widget_list (fx->widget_list, 
+					     event->xbutton.x, event->xbutton.y,
+					     event->xbutton.button, 1);
 	    }
 	  }
 	  break;

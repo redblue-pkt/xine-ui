@@ -384,20 +384,22 @@ int xitk_label_change_label(xitk_widget_t *w, char *newlabel) {
 /*
  *
  */
-static int notify_click_label(xitk_widget_t *w, int bUp, int x, int y) {
-  
-  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
-    label_private_data_t *private_data = (label_private_data_t *) w->private_data;
-    
-    if(private_data->callback) {
-      if(bUp)
-	private_data->callback(private_data->lWidget, private_data->userdata);
-      return 1;
-    }
+static int notify_click_label(xitk_widget_t *w, int button, int bUp, int x, int y) {
+  int  ret = 0;
 
+  if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
+    if(button == Button1) {
+      label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+      
+      if(private_data->callback) {
+	if(bUp)
+	  private_data->callback(private_data->lWidget, private_data->userdata);
+	ret = 1;
+      }
+    }
   }
   
-  return 0;
+  return ret;
 }
 
 static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_result_t *result) {
@@ -408,7 +410,8 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     paint_label(w);
     break;
   case WIDGET_EVENT_CLICK:
-    result->value = notify_click_label(w, event->button_pressed, event->x, event->y);
+    result->value = notify_click_label(w, event->button, 
+				       event->button_pressed, event->x, event->y);
     retval = 1;
     break;
   case WIDGET_EVENT_CHANGE_SKIN:

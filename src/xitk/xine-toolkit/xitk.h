@@ -767,7 +767,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
 /**
  * Notify widget (if enabled) if click event happend at x, y coords.
  */
-int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp);
+int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp);
 
 /**
  *

@@ -409,14 +409,10 @@ static void _playlist_handle_event(XEvent *event, void *data) {
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
-    if (bevent->button == Button4) {
-      xitk_browser_step_down(playlist->playlist, NULL);
+
+    if((bevent->button == Button4) ||(bevent->button == Button5))
       mmk_editor_end();
-    }
-    else if(bevent->button == Button5) {
-      xitk_browser_step_up(playlist->playlist, NULL);
-      mmk_editor_end();
-    }
+
   }
     break;
 

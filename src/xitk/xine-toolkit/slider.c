@@ -486,52 +486,55 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 /*
  * Got click
  */
-static int notify_click_slider(xitk_widget_t *w, int bUp, int x, int y) {
+static int notify_click_slider(xitk_widget_t *w, int button, int bUp, int x, int y) {
   slider_private_data_t *private_data;
-  
+  int                    ret = 0;
+
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
-    
-    private_data = (slider_private_data_t *) w->private_data;    
-    
-    if(private_data->focus == FOCUS_RECEIVED) {
-      int old_value = (int) private_data->value;
+    if(button == Button1) {
+      private_data = (slider_private_data_t *) w->private_data;    
       
-      slider_update(w, (x - w->x), (y - w->y));
-      
-      if(private_data->bClicked == bUp)
-	private_data->bClicked = !bUp;
-      
-      if(bUp == 0) {
+      if(private_data->focus == FOCUS_RECEIVED) {
+	int old_value = (int) private_data->value;
 	
-	if(old_value != ((int) private_data->value))
-	  paint_slider(w);
+	slider_update(w, (x - w->x), (y - w->y));
 	
-	/*
-	 * Exec motion callback function (if available)
+	if(private_data->bClicked == bUp)
+	  private_data->bClicked = !bUp;
+	
+	if(bUp == 0) {
+	  
+	  if(old_value != ((int) private_data->value))
+	    paint_slider(w);
+	  
+	  /*
+	   * Exec motion callback function (if available)
 	   */
-	if(old_value != ((int) private_data->value)) {
-	  if(private_data->motion_callback)
-	    private_data->motion_callback(private_data->sWidget,
-					  private_data->motion_userdata,
-					  (int) private_data->value);
+	  if(old_value != ((int) private_data->value)) {
+	    if(private_data->motion_callback)
+	      private_data->motion_callback(private_data->sWidget,
+					    private_data->motion_userdata,
+					    (int) private_data->value);
+	  }
+	  
 	}
-	
-      }
-      else if(bUp == 1) {
-	private_data->bClicked = 0;
-	
-	xitk_slider_set_pos(w, private_data->value);
-	
-	if(private_data->callback) {
-	  private_data->callback(private_data->sWidget,
-				 private_data->userdata,
-				 (int) private_data->value);
+	else if(bUp == 1) {
+	  private_data->bClicked = 0;
+	  
+	  xitk_slider_set_pos(w, private_data->value);
+	  
+	  if(private_data->callback) {
+	    private_data->callback(private_data->sWidget,
+				   private_data->userdata,
+				   (int) private_data->value);
+	  }
 	}
       }
+      ret = 1;
     }
   }
 
-  return 1;
+  return ret;
 }
 
 /*
@@ -557,7 +560,8 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     paint_slider(w);
     break;
   case WIDGET_EVENT_CLICK:
-    result->value = notify_click_slider(w, event->button_pressed, event->x, event->y);
+    result->value = notify_click_slider(w, event->button, 
+					event->button_pressed, event->x, event->y);
     retval = 1;
     break;
   case WIDGET_EVENT_FOCUS:

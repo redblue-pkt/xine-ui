@@ -64,6 +64,7 @@ typedef struct {
   int                   y;
   
   int                   button_pressed;
+  int                   button;
   
   int                   focus;
   

@@ -37,8 +37,6 @@
 
 #include "_xitk.h"
 
-extern int errno;
-
 static xitk_color_names_t xitk_color_names[] = {
   { 255,  250,  250,  "snow" },
   { 248,  248,  255,  "GhostWhite" },
@@ -891,7 +889,7 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
  * Call notify_focus (with FOCUS_MOUSE_[IN|OUT] as focus state), 
  * function in right widget (the one who get, and the one who lose focus).
  */
-void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsigned int state) { 
+void xitk_motion_notify_widget_list(xitk_widget_list_t *wl, int x, int y, unsigned int state) { 
   xitk_widget_t *mywidget;
   widget_event_t event;
   
@@ -912,7 +910,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
       event.x              = x;
       event.y              = y;
       event.button_pressed = LBUTTON_DOWN;
-      
+      event.button         = Button1;
       (void) wl->widget_focused->event(wl->widget_focused, &event, &result);
     }
     return;
@@ -968,7 +966,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
 	event.x              = x;
 	event.y              = y;
 	event.button_pressed = LBUTTON_DOWN;
-	
+	event.button         = Button1;
 	(void) mywidget->event(mywidget, &event, &result);
       }
     }
@@ -979,7 +977,7 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsig
  * Call notify_focus (with FOCUS_[RECEIVED|LOST] as focus state), 
  * then call notify_click function, if exist, of widget at coords x/y.
  */
-int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp) {
+int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int button, int bUp) {
   int                    bRepaint = 0;
   xitk_widget_t         *mywidget;
   widget_event_t         event;
@@ -1077,6 +1075,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
 	event.x              = x;
 	event.y              = y;
 	event.button_pressed = LBUTTON_DOWN;
+	event.button         = button;
 
 	if(mywidget->event(mywidget, &event, &result))
 	  bRepaint |= result.value;
@@ -1091,6 +1090,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
 	event.x              = x;
 	event.y              = y;
 	event.button_pressed = LBUTTON_UP;
+	event.button         = button;
 
 	if(wl->widget_pressed->event(wl->widget_pressed, &event, &result))
 	  bRepaint |= result.value;
@@ -1212,6 +1212,7 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
 	  event.x              = wl->widget_focused->x + 1;
 	  event.y              = wl->widget_focused->y + 1;
 	  event.button_pressed = LBUTTON_DOWN;
+	  event.button         = AnyButton;
       	  (void) wl->widget_focused->event(wl->widget_focused, &event, &result);
 
 	  event.type = WIDGET_EVENT_PAINT;
@@ -1311,10 +1312,11 @@ void xitk_set_focus_to_widget(xitk_widget_t *w) {
 	 (wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) {
 	widget_event_result_t  result;
 	
-	event.type = WIDGET_EVENT_CLICK;
-	event.x = wl->widget_focused->x + 1;
-	event.y = wl->widget_focused->y + 1;
+	event.type           = WIDGET_EVENT_CLICK;
+	event.x              = wl->widget_focused->x + 1;
+	event.y              = wl->widget_focused->y + 1;
 	event.button_pressed = LBUTTON_DOWN;
+	event.button         = AnyButton;
 	(void) wl->widget_focused->event(wl->widget_focused, &event, &result);
 	
 	event.type = WIDGET_EVENT_PAINT;

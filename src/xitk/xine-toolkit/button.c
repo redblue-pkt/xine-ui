@@ -167,25 +167,28 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 /*
  *
  */
-static int notify_click_button (xitk_widget_t *w, int bUp, int x, int y) {
+static int notify_click_button (xitk_widget_t *w, int button, int bUp, int x, int y) {
   button_private_data_t *private_data;
+  int                    ret = 0;
     
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)) {
-    private_data = (button_private_data_t *) w->private_data;
-    private_data->bClicked = !bUp;
-    
-    paint_button(w);
-    
-    if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
-      if(private_data->callback) {
-	private_data->callback(private_data->bWidget, 
-			       private_data->userdata);
+    if(button == Button1) {
+      private_data = (button_private_data_t *) w->private_data;
+      private_data->bClicked = !bUp;
+      
+      paint_button(w);
+      
+      if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
+	if(private_data->callback) {
+	  private_data->callback(private_data->bWidget, 
+				 private_data->userdata);
+	}
       }
+      ret = 1;
     }
-
   }
 
-  return 1;
+  return ret;
 }
 
 /*
@@ -210,7 +213,8 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     paint_button(w);
     break;
   case WIDGET_EVENT_CLICK:
-    result->value = notify_click_button(w, event->button_pressed, event->x, event->y);
+    result->value = notify_click_button(w, event->button, 
+					event->button_pressed, event->x, event->y);
     retval = 1;
     break;
   case WIDGET_EVENT_FOCUS:

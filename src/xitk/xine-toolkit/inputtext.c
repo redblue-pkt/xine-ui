@@ -467,7 +467,7 @@ static void paint_inputtext(xitk_widget_t *w) {
 /*
  * Handle click events.
  */
-static int notify_click_inputtext(xitk_widget_t *w, int bUp, int x, int y) {
+static int notify_click_inputtext(xitk_widget_t *w, int button, int bUp, int x, int y) {
   inputtext_private_data_t *private_data;
   int pos;
   
@@ -1014,7 +1014,8 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     paint_inputtext(w);
     break;
   case WIDGET_EVENT_CLICK:
-    result->value = notify_click_inputtext(w, event->button_pressed, event->x, event->y);
+    result->value = notify_click_inputtext(w, event->button,
+					   event->button_pressed, event->x, event->y);
     retval = 1;
     break;
   case WIDGET_EVENT_FOCUS:

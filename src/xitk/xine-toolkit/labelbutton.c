@@ -324,38 +324,42 @@ static void paint_labelbutton (xitk_widget_t *w) {
 /*
  * Handle click events
  */
-static int notify_click_labelbutton (xitk_widget_t *w, int bUp, int x, int y) {
+static int notify_click_labelbutton (xitk_widget_t *w, int button, int bUp, int x, int y) {
   lbutton_private_data_t *private_data;
+  int                     ret = 0;
   
   if (w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON)) {
-    private_data = (lbutton_private_data_t *) w->private_data;
-    
-    private_data->bClicked = !bUp;
-    private_data->bOldState = private_data->bState;
-    
-    if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
-      private_data->bState = !private_data->bState;
-      paint_labelbutton(w);
-      if(private_data->bType == RADIO_BUTTON) {
-	if(private_data->state_callback) {
-	  private_data->state_callback(private_data->bWidget, 
-				       private_data->userdata,
-				       private_data->bState);
+    if(button == Button1) {
+      private_data = (lbutton_private_data_t *) w->private_data;
+      
+      private_data->bClicked = !bUp;
+      private_data->bOldState = private_data->bState;
+      
+      if (bUp && (private_data->focus == FOCUS_RECEIVED)) {
+	private_data->bState = !private_data->bState;
+	paint_labelbutton(w);
+	if(private_data->bType == RADIO_BUTTON) {
+	  if(private_data->state_callback) {
+	    private_data->state_callback(private_data->bWidget, 
+					 private_data->userdata,
+					 private_data->bState);
+	  }
+	}
+	else if(private_data->bType == CLICK_BUTTON) {
+	  if(private_data->callback) {
+	    private_data->callback(private_data->bWidget, 
+				   private_data->userdata);
+	  }
 	}
       }
-      else if(private_data->bType == CLICK_BUTTON) {
-	if(private_data->callback) {
-	  private_data->callback(private_data->bWidget, 
-				 private_data->userdata);
-	}
-      }
+      else
+	paint_labelbutton(w);
+      
+      ret = 1;
     }
-    else
-      paint_labelbutton(w);
-
   }
 
-  return 1;
+  return ret;
 }
 
 /*
@@ -463,7 +467,8 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     paint_labelbutton(w);
     break;
   case WIDGET_EVENT_CLICK:
-    result->value = notify_click_labelbutton(w, event->button_pressed, event->x, event->y);
+    result->value = notify_click_labelbutton(w, event->button,
+					     event->button_pressed, event->x, event->y);
     retval = 1;
     break;
   case WIDGET_EVENT_FOCUS:
