@@ -204,7 +204,7 @@ Set playlist loop mode. If mode isn't specified, mode \fBloop\fP is used. Possib
 .br
 \fBrepeat\fP: repeat current playlist entry.
 .br
-\fBshuffle\fP: select randomly an entry in playlist.
+\fBshuffle\fP: select randomly an entry in playlist from those not yet played.
 .TP
 .B MRL (media resource locator)
 .br

@@ -344,7 +344,7 @@ void show_usage (void) {
   printf(_("  -l, --loop [mode]            Set playlist loop mode (default: loop). Modes are:\n"));
   printf(_("                                 'loop': loop entire playlist.\n"));
   printf(_("                                 'repeat': repeat current playlist entry.\n"));
-  printf(_("                                 'shuffle': select randomly an entry in playlist.\n"));
+  printf(_("                                 'shuffle': select randomly a yet unplayed entry from playlist\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
