@@ -1393,7 +1393,9 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   xine_pid = getppid();
   
   xitk_init(gGui->display);
-
+  
+  preinit_skins_support();
+  
   if(gGui->splash)
     splash_create();
 

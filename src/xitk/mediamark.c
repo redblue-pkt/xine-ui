@@ -227,21 +227,6 @@ int mediamark_free_mmk(mediamark_t **mmk) {
 }
 
 /*
- * Check if filename is a regular file
- */
-static int playlist_check_for_file(const char *filename) {
-  struct stat   pstat;
-  
-  if(filename) {
-
-    if(((stat(filename, &pstat)) > -1) && (S_ISREG(pstat.st_mode)))
-      return 1;
-
-  }
-  return 0;
-}
-
-/*
  * Split lines from playlist->data
  */
 static int playlist_split_data(playlist_t *playlist) {
@@ -292,7 +277,7 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
   char         *extension;
 
   if(filename) {
-    if(playlist_check_for_file(filename)) {
+    if(is_a_file((char *) filename)) {
       
       extension = strrchr(filename, '.');
       
@@ -385,7 +370,7 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
   mediamark_t **mmk = NULL;
   
   if(filename) {
-    if(playlist_check_for_file(filename)) {
+    if(is_a_file((char *) filename)) {
       char *m3u_content;
       int   size;
       
@@ -491,7 +476,7 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
   mediamark_t **mmk = NULL;
 
   if(filename) {
-    if(playlist_check_for_file(filename)) {
+    if(is_a_file((char *) filename)) {
       char  *extension;
   
       extension = strrchr(filename, '.');
@@ -624,7 +609,7 @@ static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filena
   mediamark_t **mmk = NULL;
 
   if(filename) {
-    if(playlist_check_for_file(filename)) {
+    if(is_a_file((char *) filename)) {
       char *raw_content;
       int   size;
       
@@ -705,7 +690,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
   mediamark_t **mmk = NULL;
   
   if(filename) {
-    if(playlist_check_for_file(filename)) {
+    if(is_a_file((char *) filename)) {
       int   entries_tox = 0;
       char *tox_content;
       int   size;

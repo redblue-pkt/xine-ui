@@ -75,5 +75,6 @@ const char *get_last_double_semicolon(const char *str);
 int is_ipv6_last_double_semicolon(const char *str);
 
 inline int is_a_dir(char *filename);
+inline int is_a_file(char *filename);
 
 #endif

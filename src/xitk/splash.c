@@ -38,8 +38,19 @@ static xitk_window_t     *xwin = NULL;
 
 void splash_create(void) {
   xitk_image_t *xim;
+  char         *splash_image = XINE_SPLASH;
+  char          skin_splash_image[XINE_PATH_MAX + XINE_NAME_MAX];
+  const char   *skin_path = skin_get_current_skin_dir();
   
-  if((xim = xitk_image_load_image(gGui->imlib_data, XINE_SPLASH))) {
+  if(skin_path && is_a_dir((char *) skin_path)) {
+    memset(&skin_splash_image, 0, sizeof(skin_splash_image));
+    sprintf(skin_splash_image, "%s/%s", skin_path, "xine_splash.png");
+
+    if(is_a_file(skin_splash_image))
+      splash_image = skin_splash_image;
+  }
+
+  if((xim = xitk_image_load_image(gGui->imlib_data, splash_image))) {
     int  x, y;
     
     XLockDisplay(gGui->display);

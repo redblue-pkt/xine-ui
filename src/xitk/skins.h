@@ -32,8 +32,10 @@ typedef struct {
 
 skins_locations_t **get_available_skins(void);
 int get_available_skins_num(void);
+void preinit_skins_support(void);
 void init_skins_support(void);
 void select_new_skin(int selected);
 void download_skin(char *url);
+const char *skin_get_current_skin_dir(void);
 
 #endif

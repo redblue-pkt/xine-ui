@@ -218,7 +218,7 @@ static void help_sections(void) {
 	sprintf(locale_readme, "%s/%s", XINE_DOCDIR, locale_file);
 	sprintf(default_readme, "%s/%s", XINE_DOCDIR, dir_entry->d_name);
 
-	if ((strcmp(locale_file, dir_entry->d_name)) && ((stat(locale_readme, &pstat)) == 0) && (S_ISREG(pstat.st_mode))) {
+	if ((strcmp(locale_file, dir_entry->d_name)) && is_a_file(locale_readme)) {
 	  help_add_section(locale_readme, lang->doc_encoding, order_num, section_name);
 	}
 	else {

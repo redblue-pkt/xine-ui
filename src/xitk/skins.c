@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <dirent.h>
-#include <sys/stat.h>       
+#include <sys/stat.h>
 #include <errno.h>
 
 #include <X11/Xlib.h>
@@ -101,7 +101,6 @@ static void get_available_skins_from(char *path) {
     return;
 
   if((pdir = opendir(path)) != NULL) {
-    struct stat   sstat;
     char          fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     char          skcfgname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     
@@ -119,7 +118,7 @@ static void get_available_skins_from(char *path) {
 	 */
 	memset(&skcfgname, 0, sizeof(skcfgname));
 	sprintf(skcfgname, "%s/%s", fullfilename, "skinconfig");
-	if(((stat(skcfgname, &sstat)) > -1) && (S_ISREG(sstat.st_mode))) {
+	if(is_a_file(skcfgname)) {
 	  
 	  skins_avail = (skins_locations_t **) realloc(skins_avail, 
 						       (skins_avail_num + 2) * sizeof(skins_locations_t*));
@@ -169,7 +168,7 @@ static void looking_for_available_skins(void) {
  */
 char *skin_get_skindir(void) {
   static char          tmp[2048];
-  xine_cfg_entry_t  entry;
+  xine_cfg_entry_t     entry;
   char                *skin;
   
   memset(&tmp, 0, 2048);
@@ -381,17 +380,36 @@ void select_new_skin(int selected) {
 }
 
 /*
+ * Return path of current skin
+ */
+const char *skin_get_current_skin_dir(void) {
+  xine_cfg_entry_t     entry;
+  int                  skin_num = 0;
+  static char          skin_dir[XINE_PATH_MAX + XINE_NAME_MAX];
+  
+  if((skins_avail == NULL) || (skins_avail_num == 0)) {
+    fprintf(stderr, _("No available skin found. Say goodbye.\n"));
+    exit(-1);
+  }
+  
+  memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
+  (void) xine_config_lookup_entry(gGui->xine, "gui.skin", &entry);
+  skin_num = entry.num_value;
+  
+  sprintf(skin_dir, "%s/%s", skins_avail[skin_num]->pathname, skins_avail[skin_num]->skin);
+
+  return (const char *) &skin_dir;
+}
+
+/*
  * Initialize skin support.
  */
-void init_skins_support(void) {
-  skins_locations_t   *sk;
-  char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-  int                  twice = 0, twice_load = 0;
-  int                  skin_num, i;
-  char                *skin_anim;
-    
-  change_config_entry = 0;
+void preinit_skins_support(void) {
+  int  skin_num;
+  int  i;
 
+  change_config_entry = 0;
+  
   gGui->skin_config = xitk_skin_init_config();
   
   looking_for_available_skins();
@@ -416,7 +434,24 @@ void init_skins_support(void) {
 					CONFIG_LEVEL_BEG,
 					skin_change_cb, 
 					CONFIG_NO_DATA);
+}
 
+void init_skins_support(void) {
+  skins_locations_t   *sk;
+  char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+  int                  twice = 0, twice_load = 0;
+  int                  skin_num;
+  char                *skin_anim;
+  xine_cfg_entry_t     entry;
+
+  memset(&entry, 0, sizeof(xine_cfg_entry_t)); 
+  if(xine_config_lookup_entry(gGui->xine, "gui.skin", &entry))
+    skin_num = entry.num_value;
+  else {
+    fprintf(stderr, _("Ooch, gui.skin config entry isn't registered. Say goodbye.\n"));
+    exit(-1);
+  }
+  
   sk = (skin_num < skins_avail_num) ? skins_avail[skin_num] : NULL;
   
   if(!sk) {
