@@ -104,6 +104,8 @@ binary-arch: build install
 	dh_link
 	$(DH_STRIP)
 	dh_compress
+# kick me, I'm a policy violation! (making help dialog work, Q&D)
+	gunzip debian/xine-ui/usr/share/doc/xine-ui/README.??.*.gz
 	dh_fixperms
 	dh_installdeb
 #	dh_shlibdeps

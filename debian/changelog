@@ -1,4 +1,10 @@
-xine-ui (0.9.23-0) unstable; urgency=low
+xine-ui (0.9.23-2) unstable; urgency=low
+
+  * rebuild against xine-lib 1-rc3a-2 corrects dependancies (closes: 225613)
+
+ -- Siggi Langauf <siggi@debian.org>  Wed, 31 Dec 2003 19:05:28 +0100
+
+xine-ui (0.9.23-1) unstable; urgency=low
 
   * new upstream release
     * improved support for multibyte locales (closes: 224861)
