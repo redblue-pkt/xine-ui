@@ -242,7 +242,7 @@ skin.AutoPlayGUI {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-11-*-*-*-*-*-*-*
+	  font = -*-courier-*-*-*-*-11-*-*-*-*-*-*-*
 	}
 }
 
@@ -301,7 +301,7 @@ skin.PlAdd {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -315,7 +315,7 @@ skin.PlLoad {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -329,7 +329,7 @@ skin.PlSave {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -347,7 +347,7 @@ skin.PlItemBtn {
 	  color = #adc9ff
 	  color_focus = #adc9ff
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -401,7 +401,7 @@ skin.PlDismiss {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -485,7 +485,7 @@ skin.AutoPlayBG {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -499,7 +499,7 @@ skin.PlInputText {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -619,7 +619,7 @@ skin.CtlSave {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -704,7 +704,7 @@ skin.CtlSkItemBtn {
 	  color = #adc9ff
 	  color_focus = #adc9ff
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -718,7 +718,7 @@ skin.CtlDismiss {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -745,7 +745,7 @@ skin.MrlItemBtn {
 	  color = #adc9ff
 	  color_focus = #adc9ff
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -759,7 +759,7 @@ skin.MrlSelect {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -781,7 +781,7 @@ skin.MrlDismiss {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -865,7 +865,7 @@ skin.MrlPlugNameBG {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*
 	}
 }
 
