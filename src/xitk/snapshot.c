@@ -854,7 +854,7 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
 {
   int err = 0;
   struct prvt_image_s *image;
-  int width, height;
+  int width, height, ratio_code, format;
   
 #ifdef DEBUG
   static int	   prof_scale_image = -1;
@@ -873,8 +873,12 @@ void create_snapshot (const char *mrl, snapshot_messenger_t error_mcb,
   info_msg_cb = info_mcb;
   msg_cb_data = mcb_data;
 
-  width = xine_get_stream_info(gGui->stream,XINE_STREAM_INFO_VIDEO_WIDTH);
-  height = xine_get_stream_info(gGui->stream,XINE_STREAM_INFO_VIDEO_HEIGHT);
+  err = xine_get_current_frame(gGui->stream, &width, &height, &ratio_code, &format, NULL);
+  
+  if (err == 0) {
+    printf("   xine_get_current_frame() failed\n");
+    return;
+  }
 
   if((!width) || (!height)) {
     if(error_msg_cb) {
