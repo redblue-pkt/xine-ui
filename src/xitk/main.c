@@ -190,7 +190,7 @@ void show_usage (void) {
  */
 #ifdef DEBUG
 int handle_debug_subopt(char *sopt) {
-  int subopt;
+  int i, subopt;
   char *str = sopt;
   char *val = NULL;
   char *debuglvl[] = {
@@ -200,12 +200,21 @@ int handle_debug_subopt(char *sopt) {
     NULL
   };
 
-  while((subopt = getsubopt(&str, debuglvl, &val)) != -1) {
-    
+  while(*str) {
+    subopt = getsubopt(&str, debuglvl, &val);
     switch(subopt) {
+    case -1:
+      i = 0;
+      fprintf(stderr, "Valid debug flags are:\n\t");
+      while(debuglvl[i] != NULL) {
+	fprintf(stderr,"%s, ", debuglvl[i]);
+	i++;
+      }
+      fprintf(stderr, "\b\b.\n");
+      return 0;
     default:
-      /* If debug feature is already enabled, with 
-       * XINE_DEBUG envvar, turn it off 
+      /* If debug feature is already enabled, with
+       * XINE_DEBUG envvar, turn it off
        */
       if((gGui->debug_level & 0x8000>>(subopt + 1)))
 	gGui->debug_level &= ~0x8000>>(subopt + 1);
@@ -214,21 +223,11 @@ int handle_debug_subopt(char *sopt) {
       break;
     }
   }
-
-  if(val) {
-    int i = 0;
-    fprintf(stderr, "Valid debug flags are:\n\t");
-    while(debuglvl[i] != NULL) {
-      fprintf(stderr,"%s, ", debuglvl[i]);
-      i++;
-    }
-    fprintf(stderr, "\b\b.\n");
-    return 0;
-  }
-
+  
   return 1;
 }
 #endif
+
 /* ------------------------------------------------------------------------- */
 /*
  * Handle sub-option of 'recognize-by' command line argument
