@@ -593,16 +593,16 @@ static void show_usage (void) {
   printf ("\n");
   printf(_("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"));
   printf(_("  -a, --audio-channel <#>      Select audio channel '#'.\n"));
-  printf(_("  -p, --auto-play [opt]        Play on start. Can be followed by:\n"));
-  printf(_("                    'f': in fullscreen mode.\n"));
+  printf(_("  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
+	   "                    'f': in fullscreen mode.\n"
+	   "                    'h': hide GUI (panel, etc.).\n"
+	   "                    'w': hide video window.\n"
+	   "                    'q': quit when play is done.\n"
+	   "                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n"
+	   "                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n"));
 #ifdef HAVE_XINERAMA
   printf(_("                    'F': in xinerama fullscreen mode.\n"));
 #endif
-  printf(_("                    'h': hide GUI (panel, etc.).\n"));
-  printf(_("                    'w': hide video window.\n"));
-  printf(_("                    'q': quit when play is done.\n"));
-  printf(_("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n"));
-  printf(_("                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n"));
   printf(_("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"));
   printf(_("  -f, --fullscreen             start in fullscreen mode,\n"));
 #ifdef HAVE_XINERAMA
@@ -613,66 +613,66 @@ static void show_usage (void) {
 #ifdef HAVE_LIRC
   printf(_("  -L, --no-lirc                Turn off LIRC support.\n"));
 #endif
-  printf(_("      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"));
-  printf(_("                               is either an X11 visual class, or a visual id.\n"));
+  printf(_("      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+	   "                               is either an X11 visual class, or a visual id.\n"));
   printf(_("      --install                Install a private colormap.\n"));
-  printf(_("      --keymap [=option]       Display keymap. Option are:\n"));
-  printf(_("                                 'default': display default keymap table,\n"));
-  printf(_("                                 'lirc': display draft of a .lircrc config file.\n"));
-  printf(_("                                 'remapped': user remapped keymap table.\n"));
-  printf(_("                                 'file:<filename>': use <filename> as keymap.\n"));
-  printf(_("                                 -if no option is given, 'default' is selected.\n"));
+  printf(_("      --keymap [=option]       Display keymap. Option are:\n"
+	   "                                 'default': display default keymap table,\n"
+	   "                                 'lirc': display draft of a .lircrc config file.\n"
+	   "                                 'remapped': user remapped keymap table.\n"
+	   "                                 'file:<filename>': use <filename> as keymap.\n"
+	   "                                 -if no option is given, 'default' is selected.\n"));
   printf(_("  -n, --network                Enable network remote control server.\n"));
   printf(_("  -R, --root                   Use root window as video window.\n"));
   printf(_("  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"));
   printf(_("  -B, --borderless             Borderless video output window.\n"));
-  printf(_("  -N, --animation <mrl>        Specify mrl to play when video output isn't used.\n"));
-  printf(_("                                 -can be used more than one time.\n"));
+  printf(_("  -N, --animation <mrl>        Specify mrl to play when video output isn't used.\n"
+	   "                                 -can be used more than one time.\n"));
   printf(_("  -P, --playlist <filename>    Load a playlist file.\n"));
-  printf(_("  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes are:\n"));
-  printf(_("                                 'loop': loop entire playlist.\n"));
-  printf(_("                                 'repeat': repeat current playlist entry.\n"));
-  printf(_("                                 'shuffle': select randomly a yet unplayed entry from playlist\n"));
-  printf(_("                                 'shuffle+': same as 'shuffle', but indefinetely replay the playlist.\n"));
+  printf(_("  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes are:\n"
+	   "                                 'loop': loop entire playlist.\n"
+	   "                                 'repeat': repeat current playlist entry.\n"
+	   "                                 'shuffle': select randomly a yet unplayed entry from playlist\n"
+	   "                                 'shuffle+': same as 'shuffle', but indefinetely replay the playlist.\n"));
   printf(_("      --skin-server-url <url>  Define the skin server url.\n"));
   printf(_("      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"));
-  printf(_("  -S, --session <option1,option2,...>\n"));
-  printf(_("                               Session managements. Options can be:\n"));
-  printf(_("                    session=n   specify session <n> number,\n"));
-  printf(_("                    mrl=m       add mrl <m> to the playlist,\n"));
-  printf(_("                    audio=c     select audio channel (<c>: 'next' or 'prev'),\n"));
-  printf(_("                    spu=c       select spu channel (<c>: 'next' or 'prev'),\n"));
-  printf(_("                    volume=v    set audio volume,\n"));
-  printf(_("                    amp=v       set amplification level,\n"));
-  printf(_("                    loop=m      set loop mode (<m>: 'none' 'loop' 'repeat' 'shuffle' or 'shuffle+'),\n"));
-  printf(_("                    (playlist|pl)=p\n"));
-  printf(_("                                 <p> can be:\n"));
-  printf(_("                                   'clear'  clear the playlist,\n"));
-  printf(_("                                   'first'  play first entry in the playlist,\n"));
-  printf(_("                                   'prev'   play previous playlist entry,\n"));
-  printf(_("                                   'next'   play next playlist entry,\n"));
-  printf(_("                                   'last'   play last entry in the playlist,\n"));
-  printf(_("                                   'load:s' load playlist file <s>,\n"));
-  printf(_("                                   'stop'   stop playback at the end of current playback.\n")); 
-  printf(_("                                   'cont'   continue playback at the end of current playback.\n")); 
-  printf(_("                    play, slow2, slow4, pause, fast2,\n"));
-  printf(_("                    fast4, stop, quit, fullscreen, eject.\n"));
+  printf(_("  -S, --session <option1,option2,...>\n"
+	   "                               Session managements. Options can be:\n"
+	   "                    session=n   specify session <n> number,\n"
+	   "                    mrl=m       add mrl <m> to the playlist,\n"
+	   "                    audio=c     select audio channel (<c>: 'next' or 'prev'),\n"
+	   "                    spu=c       select spu channel (<c>: 'next' or 'prev'),\n"
+	   "                    volume=v    set audio volume,\n"
+	   "                    amp=v       set amplification level,\n"
+	   "                    loop=m      set loop mode (<m>: 'none' 'loop' 'repeat' 'shuffle' or 'shuffle+'),\n"
+	   "                    (playlist|pl)=p\n"
+	   "                                 <p> can be:\n"
+	   "                                   'clear'  clear the playlist,\n"
+	   "                                   'first'  play first entry in the playlist,\n"
+	   "                                   'prev'   play previous playlist entry,\n"
+	   "                                   'next'   play next playlist entry,\n"
+	   "                                   'last'   play last entry in the playlist,\n"
+	   "                                   'load:s' load playlist file <s>,\n"
+	   "                                   'stop'   stop playback at the end of current playback.\n"
+	   "                                   'cont'   continue playback at the end of current playback.\n"
+	   "                    play, slow2, slow4, pause, fast2,\n"
+	   "                    fast4, stop, quit, fullscreen, eject.\n"));
   printf(_("  -Z                           Don't automatically start playback (smart mode).\n"));
   printf(_("  -D, --deinterlace [post]...  Deinterlace video output. One or more post plugin\n"
 	   "                                 can be specified, with optional parameters.\n"
 	   "                                 Syntax is the same as --post option.\n"));
-  printf(_("  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"));
-  printf(_("                                 'auto', 'square', '4:3', 'anamorphic', 'dvb'.\n"));
+  printf(_("  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"
+	   "                                 'auto', 'square', '4:3', 'anamorphic', 'dvb'.\n"));
 #ifdef XINE_PARAM_BROADCASTER_PORT
-  printf(_("      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"));
-  printf(_("                               Slave is started with 'xine slave://address:port'\n"));
+  printf(_("      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
+	   "                               Slave is started with 'xine slave://address:port'\n"));
 #endif
   printf(_("      --no-logo                Don't display the logo.\n"));
   printf(_("  -E, --no-reload              Don't reload old playlist.\n"));
-  printf(_("      --post <plugin>[:parameter=value][,...][;...]\n"));
-  printf(_("                               Load one or many post plugin(s).\n"));
-  printf(_("                               Parameters are comma separated.\n"));
-  printf(_("                               This option can be used more than one time.\n"));
+  printf(_("      --post <plugin>[:parameter=value][,...][;...]\n"
+	   "                               Load one or many post plugin(s).\n"
+	   "                               Parameters are comma separated.\n"
+	   "                               This option can be used more than one time.\n"));
   printf(_("      --disable-post           Don't enable post plugin(s).\n"));
   printf(_("      --no-splash              Don't display the splash screen.\n"));
   printf(_("      --stdctl                 Control xine by the console, using lirc commands.\n"));
@@ -686,25 +686,25 @@ static void show_usage (void) {
     }
   }
   printf("\n");
-  printf(_("      --list-plugins [=type]   Display the list of all available plugins,\n"));
-  printf(_("                               Optional <type> can be:\n"));
-  printf(_("                    audio_out, video_out, demux, input, sub, post,\n"));
-  printf(_("                    audio_decoder, video_decoder.\n"));
-  printf(_("      --bug-report [=mrl]      Enable bug report mode:\n"));
-  printf(_("                                 Turn on verbosity, gather all output\n"));
-  printf(_("                                 messages and write them into a file named\n"));
-  printf(_("                                 BUG-REPORT.TXT.\n"));
-  printf(_("                                 If <mrl> is given, xine will play the mrl\n"));
-  printf(_("                                 then quit (like -pq).\n")); 
+  printf(_("      --list-plugins [=type]   Display the list of all available plugins,\n"
+	   "                               Optional <type> can be:\n"
+	   "                    audio_out, video_out, demux, input, sub, post,\n"
+	   "                    audio_decoder, video_decoder.\n"));
+  printf(_("      --bug-report [=mrl]      Enable bug report mode:\n"
+	   "                                 Turn on verbosity, gather all output\n"
+	   "                                 messages and write them into a file named\n"
+	   "                                 BUG-REPORT.TXT.\n"
+	   "                                 If <mrl> is given, xine will play the mrl\n"
+	   "                                 then quit (like -pq).\n"));
   printf("\n\n");
-  printf(_("examples for valid MRLs (media resource locator):\n"));
-  printf(_("  File:  'path/foo.vob'\n"));
-  printf(_("         '/path/foo.vob'\n"));
-  printf(_("         'file://path/foo.vob'\n"));
-  printf(_("         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"));
-  printf(_("         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"));
-  printf(_("  DVD:   'dvd://VTS_01_2.VOB'\n"));
-  printf(_("  VCD:   'vcd://<track number>'\n"));
+  printf(_("examples for valid MRLs (media resource locator):\n"
+	   "  File:  'path/foo.vob'\n"
+	   "         '/path/foo.vob'\n"
+	   "         'file://path/foo.vob'\n"
+	   "         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
+	   "         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
+	   "  DVD:   'dvd://VTS_01_2.VOB'\n"
+	   "  VCD:   'vcd://<track number>'\n"));
   printf("\n");
 
   xine_exit(xine);
