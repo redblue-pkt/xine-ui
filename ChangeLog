@@ -1,5 +1,6 @@
 xine-ui (0.9.20) unstable; urgency=low
 
+  * many skins updates (don't forget to update you local copies)
   * add menu events in main menu,
   * fix segfault with wrong DISPLAY envvar,
   * fb: fix xine's driver initialization,
