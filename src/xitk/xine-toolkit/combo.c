@@ -44,6 +44,34 @@ static void _combo_rollunroll(xitk_widget_t *w, void *data, int state);
 /*
  *
  */
+static void enability(xitk_widget_t *w) {
+  combo_private_data_t *private_data;
+  
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_COMBO) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
+    private_data = (combo_private_data_t *) w->private_data;
+
+    if(w->enable == WIDGET_ENABLE) {
+      xitk_enable_widget(private_data->label_widget);
+      xitk_enable_widget(private_data->button_widget);
+    }
+    else {
+
+      if(private_data->visible) {
+	xitk_checkbox_set_state(private_data->button_widget, 0,
+				private_data->parent_wlist->win, private_data->parent_wlist->gc);
+	_combo_rollunroll(private_data->button_widget, (void *)w, 0);
+      }
+
+
+      xitk_disable_widget(private_data->label_widget);
+      xitk_disable_widget(private_data->button_widget);
+    }
+
+  }
+}
+
 static void notify_destroy(xitk_widget_t *w, void *data) {
   combo_private_data_t *private_data;
   
@@ -53,7 +81,7 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
     private_data = (combo_private_data_t *) w->private_data;
     
     if(private_data->visible)
-      _combo_rollunroll(NULL, (void *)w, 0);
+      _combo_rollunroll(private_data->button_widget, (void *)w, 0);
 
     xitk_destroy_widgets(private_data->widget_list);
     xitk_list_free(private_data->widget_list->l);
@@ -86,7 +114,7 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
     if(private_data->visible == 1 && (w->visible < 1)) {
       xitk_checkbox_set_state(private_data->button_widget, 0,
 			      private_data->parent_wlist->win, private_data->parent_wlist->gc);
-      _combo_rollunroll(NULL, (void *)w, 0);
+      _combo_rollunroll(private_data->button_widget, (void *)w, 0);
     }
     if((w->visible == 1)) {
       int bx, lw;
@@ -109,15 +137,13 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
 /*
  * Called on select action.
  */
-static void combo_select(xitk_widget_t *w, void *data) {
+static void combo_select(xitk_widget_t *w, void *data, int selected) {
   combo_private_data_t *private_data;
   xitk_widget_t        *c;
-  int                   selected;
 
   if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
     c = (xitk_widget_t *) ((browser_private_data_t *)w->private_data)->userdata;
     private_data = (combo_private_data_t *)c->private_data;
-    selected = (int)data;
     
     private_data->selected = selected;
     
@@ -159,6 +185,15 @@ static void _combo_handle_event(XEvent *event, void *data) {
     if(private_data->visible) { 
       if(!xitk_is_inside_widget(private_data->browser_widget, 
 				event->xbutton.x, event->xbutton.y)) {
+	xitk_combo_update_pos(private_data->combo_widget);
+      }
+    }
+    break;
+
+  case MotionNotify:
+    if(private_data->visible) {
+      if(event->xmotion.state & (Button1MotionMask | Button2MotionMask |
+				 Button3MotionMask | Button4MotionMask | Button5MotionMask)) {
 	xitk_combo_update_pos(private_data->combo_widget);
       }
     }
@@ -519,6 +554,7 @@ static xitk_widget_t *_xitk_combo_create(xitk_widget_list_t *wl,
   mywidget->notify_change_skin           = (skin_element_name == NULL) ? NULL : notify_change_skin;
   mywidget->notify_destroy               = notify_destroy;
   mywidget->get_skin                     = NULL;
+  mywidget->notify_enable                = enability;
 
   mywidget->tips_timeout                 = 0;
   mywidget->tips_string                  = NULL;

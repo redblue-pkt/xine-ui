@@ -2,8 +2,6 @@ SUBDIRS = xine-toolkit skins
 
 AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
-EXTRA_DIST = file_browser.c file_browser.h
-
 if HAVE_TERMCAP
 remote = xine-remote
 endif
@@ -19,6 +17,7 @@ xine_SOURCES = \
 	errors.c \
 	event.c \
 	event_sender.c \
+	file_browser.c \
 	kbindings.c \
 	lang.c \
 	lirc.c \
@@ -61,6 +60,7 @@ noinst_HEADERS = \
 	errors.h \
 	event.h \
 	event_sender.h \
+	file_browser.h \
 	i18n.h \
 	kbindings.h \
 	lang.h \

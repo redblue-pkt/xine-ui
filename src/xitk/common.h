@@ -58,6 +58,7 @@
 #include "viewlog.h"
 #include "download.h"
 #include "osd.h"
+#include "file_browser.h"
 
 #include "utils.h"
 

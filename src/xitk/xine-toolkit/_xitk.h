@@ -48,8 +48,8 @@
 
 #define XITK_MAJOR_VERSION (0)
 #define XITK_MINOR_VERSION (9)
-#define XITK_SUB_VERSION   (2)
-#define XITK_VERSION       "0.9.2"
+#define XITK_SUB_VERSION   (3)
+#define XITK_VERSION       "0.9.3"
 
 #include "dnd.h"
 #include "widget.h"
@@ -356,7 +356,7 @@ typedef struct {
   xitk_state_callback_t     dbl_click_callback;
 
   /* Callback on selection function */
-  xitk_simple_callback_t    callback;
+  xitk_state_callback_t     callback;
   void                     *userdata;
 
   xitk_widget_list_t       *parent_wlist;

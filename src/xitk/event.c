@@ -625,6 +625,10 @@ void gui_execute_action_id(action_id_t action) {
     osd_stream_infos();
     break;
 
+  case ACTID_FILEBROWSER:
+    open_filebrowser();
+    break;
+
   default:
     break;
   }

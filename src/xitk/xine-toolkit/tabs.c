@@ -43,9 +43,35 @@ typedef struct {
   int               sel;
 } btnlist_t;
 
+static void tabs_arrange(xitk_widget_t *);
+
 /*
  *
  */
+static void enability(xitk_widget_t *w) {
+  tabs_private_data_t *private_data;
+  
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_TABS) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    int i;
+    
+    private_data = (tabs_private_data_t *) w->private_data;
+
+    if(w->enable == WIDGET_ENABLE) {
+      xitk_enable_widget(private_data->left);
+      xitk_enable_widget(private_data->right);
+      for(i = 0; i <= private_data->num_entries; i++)
+	xitk_enable_widget(private_data->tabs[i]);
+    }
+    else {
+      xitk_disable_widget(private_data->left);
+      xitk_disable_widget(private_data->right);
+      for(i = 0; i <= private_data->num_entries; i++)
+	xitk_disable_widget(private_data->tabs[i]);
+    }
+  }
+}
+  
 static void notify_destroy(xitk_widget_t *w, void *data) {
   tabs_private_data_t *private_data;
   
@@ -424,6 +450,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_widget_list_t *wl,
   mywidget->notify_change_skin    = NULL;
   mywidget->notify_destroy        = NULL;//notify_destroy;
   mywidget->get_skin              = NULL;
+  mywidget->notify_enable         = enability;
 
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;

@@ -644,8 +644,7 @@ static void download_skin_cancel(xitk_widget_t *w, void *data) {
   skdloader = NULL;
 }
 
-static void download_skin_select(xitk_widget_t *w, void *data) {
-  int          selected = (int)data;
+static void download_skin_select(xitk_widget_t *w, void *data, int selected) {
   download_t  *download;
   
   download = (download_t *) xine_xmalloc(sizeof(download_t));

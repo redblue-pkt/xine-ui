@@ -385,9 +385,7 @@ void control_change_skins(void) {
 /*
  *
  */
-static void control_select_new_skin(xitk_widget_t *w, void *data) {
-  int                 selected = (int)data;
-
+static void control_select_new_skin(xitk_widget_t *w, void *data, int selected) {
   xitk_browser_release_all_buttons(control->skinlist);
   select_new_skin(selected);
 }

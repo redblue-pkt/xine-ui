@@ -1570,6 +1570,7 @@ xitk_widget_t *xitk_noskin_filebrowser_create(xitk_widget_list_t *wl,
   mywidget->notify_change_skin = NULL;
   mywidget->notify_destroy     = notify_destroy;
   mywidget->get_skin           = NULL;
+  mywidget->notify_enable      = NULL;
 
   mywidget->tips_timeout       = 0;
   mywidget->tips_string        = NULL;

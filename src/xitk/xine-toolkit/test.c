@@ -286,9 +286,8 @@ static void change_label(xitk_widget_t *w, void *data) {
 /*
  *
  */
-static void change_inputtext(xitk_widget_t *w, void *data) {
-  int selected = (int)data;
-  
+static void change_inputtext(xitk_widget_t *w, void *data, int selected) {
+
   if(test->entries[selected] != NULL)
     xitk_inputtext_change_text(test->widget_list, test->input, test->entries[selected]);
 

@@ -383,6 +383,8 @@ static kbinding_entry_t default_binding_table[] = {
     "AddMediamark",           ACTID_ADDMEDIAMARK            , "a",        KEYMOD_CONTROL , 0 },
   { "Download a skin from the skin server.",
     "SkinDownload",           ACTID_SKINDOWNLOAD            , "d",        KEYMOD_CONTROL , 0 },
+  { "File Browser.",
+    "FileBrowser",            ACTID_FILEBROWSER             , "f",        KEYMOD_META    , 0 },
   { 0,
     0,                        0,                            0,            0              , 0 }
 };
@@ -1433,10 +1435,9 @@ void kbedit_exit(xitk_widget_t *w, void *data) {
 /*
  *
  */
-static void kbedit_sel(xitk_widget_t *w, void *data) {
-  int s;
+static void kbedit_sel(xitk_widget_t *w, void *data, int s) {
 
-  if((s = xitk_browser_get_current_selected(kbedit->browser)) >= 0)
+  if(s >= 0)
     kbedit_select(s);
 }
 

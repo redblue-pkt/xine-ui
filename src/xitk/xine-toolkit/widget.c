@@ -1350,7 +1350,10 @@ void xitk_enable_widget(xitk_widget_t *w) {
     XITK_WARNING("widget is NULL\n");
     return;
   }
+
   w->enable = WIDGET_ENABLE;
+  if((w->widget_type & WIDGET_GROUP) && (w->notify_enable))
+    w->notify_enable(w);
 }
 
 /*
@@ -1383,6 +1386,8 @@ void xitk_disable_widget(xitk_widget_t *w) {
   }
   
   w->enable = !WIDGET_ENABLE;
+  if((w->widget_type & WIDGET_GROUP) && (w->notify_enable))
+    w->notify_enable(w);
 }
 
 /*

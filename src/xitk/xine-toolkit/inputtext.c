@@ -400,7 +400,7 @@ static void paint_inputtext(xitk_widget_t *w, Window win, GC gc) {
     if(w->visible == 1) {
     
       
-      if((!private_data->cursor_focus) 
+      if(w->enable && (!private_data->cursor_focus) 
 	 && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, win, w)))
 	_cursor_focus(private_data, win, 1);
 
@@ -468,7 +468,7 @@ static int notify_click_inputtext(xitk_widget_list_t *wl,
     if(w->have_focus == FOCUS_LOST)
       w->have_focus = private_data->have_focus = FOCUS_RECEIVED;
     
-    if((!private_data->cursor_focus)
+    if(w->enable && (!private_data->cursor_focus)
        && (xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, wl->win, w)))
       _cursor_focus(private_data, wl->win, 1);
     
@@ -531,7 +531,7 @@ static int notify_focus_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, int 
   
     if((focus == FOCUS_MOUSE_OUT) || (focus == FOCUS_LOST))
       _cursor_focus(private_data, wl->win, 0);
-    else if(focus == FOCUS_MOUSE_IN)
+    else if(w->enable && (focus == FOCUS_MOUSE_IN))
       _cursor_focus(private_data, wl->win, 1);
 
   }
@@ -1105,6 +1105,7 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
   mywidget->notify_change_skin    = (skin_element_name == NULL) ? NULL : notify_change_skin;
   mywidget->notify_destroy        = notify_destroy;
   mywidget->get_skin              = get_skin;
+  mywidget->notify_enable         = NULL;
 
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;

@@ -156,6 +156,7 @@ static int _mkdir_safe(char *path) {
     /* Check of found file is a directory file */
     if(!S_ISDIR(pstat.st_mode)) {
       fprintf(stderr, "%s is not a directory.\n", path);
+      errno = EEXIST;
       return 0;
     }
   }

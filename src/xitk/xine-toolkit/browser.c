@@ -62,6 +62,30 @@ static void notify_change_skin(xitk_widget_list_t *, xitk_widget_t *, xitk_skin_
 /*
  *
  */
+static void enability(xitk_widget_t *w) {
+  browser_private_data_t *private_data;
+
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    int i;
+    int max;
+    
+    private_data = (browser_private_data_t *) w->private_data;
+
+    max = private_data->max_length;
+    max += (private_data->skin_element_name) ? EXTRA_BTNS : WBSTART;
+   
+    if(w->enable == WIDGET_ENABLE) {
+      for(i = WBUP; i < max; i++)
+	xitk_enable_widget(private_data->item_tree[i]);
+    }
+    else {
+      for(i = WBUP; i < max; i++)
+	xitk_disable_widget(private_data->item_tree[i]);
+    }
+  }
+}
+
 static void paint(xitk_widget_t *w, Window win, GC gc) {
   browser_private_data_t *private_data;
   
@@ -723,7 +747,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	private_data->jumped = i;
 
 	if(private_data->callback)
-	  private_data->callback(((btnlist_t*)data)->itemlist, (void*)(i));
+	  private_data->callback(((btnlist_t*)data)->itemlist, private_data->userdata, i);
       }
       
       
@@ -747,7 +771,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	  /* Ok, double click occur, call cb */
 	  if(click_diff < private_data->dbl_click_time) {
 	    if(private_data->dbl_click_callback)
-	      private_data->dbl_click_callback(w, 
+	      private_data->dbl_click_callback(((btnlist_t*)data)->itemlist/*w*/, 
 					       private_data->userdata, 
 					       private_data->current_button_clicked);
 	  }
@@ -778,7 +802,7 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	/* Ok, double click occur, call cb */
 	if(click_diff < private_data->dbl_click_time) {
 	  if(private_data->dbl_click_callback)
-	    private_data->dbl_click_callback(w, 
+	    private_data->dbl_click_callback(((btnlist_t*)data)->itemlist/*w*/, 
 					     private_data->userdata,
 					     private_data->current_button_clicked);
 	}
@@ -985,6 +1009,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_widget_list_t *wl,
   mywidget->notify_inside              = NULL;
   mywidget->notify_destroy             = NULL;
   mywidget->get_skin                   = NULL;
+  mywidget->notify_enable              = enability;
 
   mywidget->tips_timeout               = 0;
   mywidget->tips_string                = NULL;
@@ -1152,7 +1177,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_widget_list_t *wl,
     xitk_image_t  *wimage;
 
     for(i = WBSTART; i < (br->browser.max_displayed_entries+WBSTART); i++) {
-      
+
       bt = (btnlist_t *) xitk_xmalloc(sizeof(btnlist_t));
       bt->itemlist = mywidget;
       bt->sel = i;

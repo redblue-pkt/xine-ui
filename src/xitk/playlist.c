@@ -122,8 +122,7 @@ static void _playlist_create_playlists(void) {
 /*
  *
  */
-static void _playlist_handle_selection(xitk_widget_t *w, void *data) {
-  int selected = (int)data;
+static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selected) {
 
   if(playlist->playlist_mrls[selected] != NULL) {
     xitk_inputtext_change_text(playlist->widget_list, 

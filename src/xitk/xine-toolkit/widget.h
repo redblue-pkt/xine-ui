@@ -103,6 +103,8 @@ typedef int (*widget_inside_callback_t)(xitk_widget_t *, int, int);
 
 typedef void (*widget_change_skin_callback_t)(xitk_widget_list_t *, xitk_widget_t *, xitk_skin_config_t *);
 
+typedef void (*widget_enable_callback_t)(xitk_widget_t *);
+
 typedef xitk_image_t *(*widget_get_skin_t)(xitk_widget_t *, int);
 
 typedef void (*widget_destroy_t)(xitk_widget_t *, void *);
@@ -139,6 +141,8 @@ struct xitk_widget_s {
   widget_destroy_t                notify_destroy;
 
   widget_get_skin_t               get_skin;
+
+  widget_enable_callback_t        notify_enable;
 
   pthread_t                       tips_thread;
   int                             tips_timeout;

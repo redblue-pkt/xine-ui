@@ -305,6 +305,7 @@ static xitk_widget_t *_xitk_checkbox_create(xitk_widget_list_t *wl,
   mywidget->notify_change_skin    = (skin_element_name == NULL) ? NULL : notify_change_skin;
   mywidget->notify_destroy        = notify_destroy;
   mywidget->get_skin              = get_skin;
+  mywidget->notify_enable         = NULL;
 
   mywidget->tips_timeout          = 0;
   mywidget->tips_string           = NULL;
