@@ -48,6 +48,8 @@ void gui_toggle_fullscreen(xitk_widget_t *w, void *data);
 
 void gui_toggle_aspect(void);
 
+void gui_set_aspect_ratio(int ratio_code);
+ 
 void gui_toggle_interlaced(void);
 
 void gui_change_audio_channel(xitk_widget_t *w, void *data);

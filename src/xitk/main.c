@@ -63,6 +63,7 @@
 #include "event.h"
 #include "videowin.h"
 #include "panel.h"
+#include "actions.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"
@@ -552,7 +553,15 @@ void event_listener (void *user_data, xine_event_t *event) {
   case XINE_EVENT_BRANCHED:
     gui_branched_callback ();
     break;
+  
+  case XINE_EVENT_ASPECT_CHANGE:
+    {
+     xine_aspect_ratio_event_t *aevent = (xine_aspect_ratio_event_t*)event;
+     gui_set_aspect_ratio(aevent->ratio_code);
+    }
+    break;
   }      
+
   
 }
 
