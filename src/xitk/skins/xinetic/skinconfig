@@ -53,7 +53,7 @@ Mute:		366	77	MainMute.png
 SliderBGVol:	350	21	MainVolumeBg.png
 SliderFGVol:	350	21	MainVolumePad.png
 
-
+Snapshot:	349	77	MainCam.png
 
 AutoPlayGUI:	174	55	MainAutoButton.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 PlBtn:		216	54	PlBtn.png

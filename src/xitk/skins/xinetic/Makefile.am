@@ -11,7 +11,8 @@ data_DATA = BigArrowDown.png MainClose.png MrlBg.png PlItemBtn.png \
 	MainPlay.png PlDelete.png SliderVPad.png Letters.png MainPower.png \
 	PlDeleteAll.png SmallArrowDown.png MainAutoButton.png MainPrev.png \
 	PlDismiss.png SmallArrowUp.png MainBg.png MainStop.png PlInputTxt.png \
-	ArrowUp.png ArrowDown.png MainVolumeBg.png MainVolumePad.png MainMute.png skinconfig
+	ArrowUp.png ArrowDown.png MainVolumeBg.png MainVolumePad.png MainMute.png \
+	MainCam.png skinconfig
 
 debug:
 install-debug: install

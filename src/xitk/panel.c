@@ -742,6 +742,14 @@ void panel_init (void) {
 			   (panel->mixer.mute = checkbox_create (&cb)));
   widget_disable(panel->mixer.mute);
 
+  /* Snapshot */
+  b.x        = gui_get_skinX("Snapshot");
+  b.y        = gui_get_skinY("Snapshot");
+  b.callback = panel_execute_snapshot;
+  b.userdata = NULL;
+  b.skin     = gui_get_skinfile("Snapshot");
+  gui_list_append_content(panel->widget_list->l, button_create(&b));
+
   /*  Playback speed slow */
   b.x        = gui_get_skinX("PlaySlow");
   b.y        = gui_get_skinY("PlaySlow");

@@ -50,7 +50,7 @@ SpuLabel:	271	15	letters.png	3	False
 Mute:		196	39	mute.png
 SliderBGVol:	216	39	volumebg.png
 SliderFGVol:	216	39	volumepad.png
-
+Snapshot:	175	37	cam.png
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png
