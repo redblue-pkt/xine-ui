@@ -245,7 +245,8 @@ typedef struct {
   int                       display_logo;
 
   /* stuff like ACTID_x */
-  action_id_t               actions_on_start[16];
+#define MAX_ACTIONS_ON_START 32
+  action_id_t               actions_on_start[MAX_ACTIONS_ON_START];
   char                     *autoscan_plugin;
 
   /* basic X11 stuff */

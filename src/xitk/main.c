@@ -1449,24 +1449,30 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'p':/* Play [[in fullscreen][then quit]] on start */
-      gGui->actions_on_start[aos++] = ACTID_PLAY;
+      if(aos < MAX_ACTIONS_ON_START)
+	gGui->actions_on_start[aos++] = ACTID_PLAY;
       if(optarg != NULL) {
 	if(strrchr(optarg, 'f')) {
-	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
+	  if(aos < MAX_ACTIONS_ON_START)
+	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
 	}
 #ifdef HAVE_XINERAMA
 	if(strrchr(optarg, 'F')) {
-	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
+	  if(aos < MAX_ACTIONS_ON_START)
+	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
 	}
 #endif
 	if(strrchr(optarg, 'h')) {
-	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
+	  if(aos < MAX_ACTIONS_ON_START)
+	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
 	}
 	if(strrchr(optarg, 'q')) {
-	  gGui->actions_on_start[aos++] = ACTID_QUIT;
+	  if(aos < MAX_ACTIONS_ON_START)
+	    gGui->actions_on_start[aos++] = ACTID_QUIT;
 	}
 	if(strrchr(optarg, 'w')) {
-	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+	  if(aos < MAX_ACTIONS_ON_START)
+	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
 	}
 	if(strrchr(optarg, 'd')) {
 	  gGui->autoscan_plugin = "DVD";
@@ -1478,20 +1484,24 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'g': /* hide panel on start */
-      gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
+      if(aos < MAX_ACTIONS_ON_START)
+	gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
       break;
 
     case 'H': /* hide video on start */
-      gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+      if(aos < MAX_ACTIONS_ON_START)
+	gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
       break;
 
     case 'f': /* full screen mode on start */
-      gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
+      if(aos < MAX_ACTIONS_ON_START)
+	gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
       break;
 
 #ifdef HAVE_XINERAMA
     case 'F': /* xinerama full screen mode on start */
-      gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
+      if(aos < MAX_ACTIONS_ON_START)
+	gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCREEN;
       break;
 #endif
 
@@ -1600,8 +1610,10 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'P':
-      gGui->actions_on_start[aos++] = ACTID_PLAYLIST;
-      gGui->playlist.on_start = strdup(optarg);
+      if(aos < MAX_ACTIONS_ON_START) {
+	gGui->actions_on_start[aos++] = ACTID_PLAYLIST;
+	gGui->playlist.on_start = strdup(optarg);
+      }
       break;
 
     case 'l':
@@ -1777,8 +1789,10 @@ int main(int argc, char *argv[]) {
 	  sprintf(session_argv[session_argv_num], "mrl=%s", p);
 	  session_argv[++session_argv_num]   = NULL;
 
-	  gGui->actions_on_start[aos++] = ACTID_PLAY;
-	  gGui->actions_on_start[aos++] = ACTID_QUIT;
+	  if(aos < MAX_ACTIONS_ON_START)
+	    gGui->actions_on_start[aos++] = ACTID_PLAY;
+	  if(aos < MAX_ACTIONS_ON_START)
+	    gGui->actions_on_start[aos++] = ACTID_QUIT;
 	}
       }
       break;
@@ -1840,8 +1854,10 @@ int main(int argc, char *argv[]) {
     sprintf (gGui->configfile + strlen(gGui->configfile), "/%s", cfgfile);
     
     /* Popup setup window if there is no config file */
-    if(stat(gGui->configfile, &st) < 0)
-      gGui->actions_on_start[aos++] = ACTID_SETUP;
+    if(stat(gGui->configfile, &st) < 0) {
+      if(aos < MAX_ACTIONS_ON_START)
+	gGui->actions_on_start[aos++] = ACTID_SETUP;
+    }
     
   }
   
@@ -1904,8 +1920,10 @@ int main(int argc, char *argv[]) {
 			        NULL,
 			        CONFIG_NO_DATA);
 
-  if( enable_deinterlace )
-    gGui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
+  if( enable_deinterlace ) {
+    if(aos < MAX_ACTIONS_ON_START)
+      gGui->actions_on_start[aos++] = ACTID_TOGGLE_INTERLEAVE;
+  }
 
   /*
    * init gui
@@ -1917,8 +1935,10 @@ int main(int argc, char *argv[]) {
   /* Automatically start playback if new_mode is enabled and playlist is filled */
   if((gGui->smart_mode && 
       (gGui->playlist.num || actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) &&
-      (!(actions_on_start(gGui->actions_on_start, ACTID_PLAY)))) && (no_auto_start == 0))
-    gGui->actions_on_start[aos++] = ACTID_PLAY;
+      (!(actions_on_start(gGui->actions_on_start, ACTID_PLAY)))) && (no_auto_start == 0)) {
+    if(aos < MAX_ACTIONS_ON_START)
+      gGui->actions_on_start[aos++] = ACTID_PLAY;
+  }
   
   /*
    * xine init
@@ -1980,12 +2000,15 @@ int main(int argc, char *argv[]) {
 	  if(((!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "letterboxed tv")) ||
 	      (!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "widescreen tv"))) && 
 	     (!(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)))) {
-	    gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+	    if(aos < MAX_ACTIONS_ON_START)
+	      gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
 	  }
 	}
       }
-      else if(!strcasecmp(video_driver_ids[cfg_vo_entry.num_value], "fb"))
-	gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+      else if(!strcasecmp(video_driver_ids[cfg_vo_entry.num_value], "fb")) {
+	if(aos < MAX_ACTIONS_ON_START)
+	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
+      }
 
     }
   }
@@ -2081,7 +2104,8 @@ int main(int argc, char *argv[]) {
   /*
    * hand control over to gui
    */
-  gGui->actions_on_start[aos] = ACTID_NOKEY;
+  if(aos < MAX_ACTIONS_ON_START)
+    gGui->actions_on_start[aos] = ACTID_NOKEY;
   
   /* Initialize posts, if required */
   if(pplugins_num) {
