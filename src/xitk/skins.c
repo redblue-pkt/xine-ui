@@ -163,6 +163,7 @@ static void looking_for_available_skins(void) {
   
 }
 
+#if 0
 /*
  * Return default skindir.
  */
@@ -202,6 +203,7 @@ static char *skin_get_configfile(void) {
 
   return tmp;
 }
+#endif
 
 /*
  * Return pointer to skins_avail.

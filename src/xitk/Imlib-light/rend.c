@@ -255,6 +255,7 @@ render_shaped_15_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XIma
     }
 }
 
+#if 0
 static void
 render_shaped_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 			       XImage * sxim, int *er1, int *er2, int *xarray,
@@ -312,6 +313,7 @@ render_shaped_15_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int
       img += jmp;
     }
 }
+#endif
 
 static void
 render_15_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
@@ -465,6 +467,7 @@ render_shaped_16_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XIma
     }
 }
 
+#if 0
 static void
 render_shaped_16_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 			       XImage * sxim, int *er1, int *er2, int *xarray,
@@ -522,6 +525,7 @@ render_shaped_16_fast_dither_ordered(ImlibData * id, ImlibImage * im, int w, int
       img += jmp;
     }
 }
+#endif
 
 static void
 render_16_fast_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
@@ -686,6 +690,7 @@ render_shaped_15_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * 
     }
 }
 
+#if 0
 static void
 render_shaped_15_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 				XImage * sxim, int *er1, int *er2, int *xarray,
@@ -737,6 +742,7 @@ render_shaped_15_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, X
 	}
     }
 }
+#endif
 
 static void
 render_15_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
@@ -873,6 +879,7 @@ render_shaped_16_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * 
     }
 }
 
+#if 0
 static void
 render_shaped_16_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
 				XImage * sxim, int *er1, int *er2, int *xarray,
@@ -924,6 +931,7 @@ render_shaped_16_dither_ordered(ImlibData * id, ImlibImage * im, int w, int h, X
 	}
     }
 }
+#endif
 
 static void
 render_16_dither(ImlibData * id, ImlibImage * im, int w, int h, XImage * xim,
