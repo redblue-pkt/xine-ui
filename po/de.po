@@ -477,7 +477,7 @@ msgstr "Ausgewählten Eintrag aus der Playlist entfernen"
 
 #: src/xitk/playlist.c:829
 msgid "Delete all entries in playlist"
-msgid "Alle Einträge aus der Playlist entfernen"
+msgstr "Alle Einträge aus der Playlist entfernen"
 
 #: src/xitk/playlist.c:833
 msgid "Add"
