@@ -30,6 +30,7 @@ xine-bugreport: xine-check
 
 debug:
 install-debug: debug
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#* 
