@@ -48,6 +48,7 @@ typedef enum {
   ACTID_TOGGLE_WINOUT_VISIBLITY,
   ACTID_AUDIOCHAN_NEXT,
   ACTID_AUDIOCHAN_PRIOR,
+  ACTID_AUDIOCHAN_DEFAULT,
   ACTID_PLAYLIST,
   ACTID_PAUSE,
   ACTID_TOGGLE_VISIBLITY,
@@ -160,5 +161,8 @@ typedef enum {
 
 int default_command_action(char *action_str);
 void do_action(int action);
+
+int get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length);
+
 
 #endif /* ACTIONS_H */

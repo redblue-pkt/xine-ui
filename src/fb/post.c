@@ -116,7 +116,7 @@ void pplugin_parse_and_store_post(const char *post) {
 	fbxine.post_elements = (post_element_t **) xine_xmalloc(sizeof(post_element_t *) * 2);
       else
 	fbxine.post_elements = (post_element_t **) 
-	  realloc(fbxine.post_elements, sizeof(post_element_t *) * (fbxine.post_elements_num + 2));
+	  realloc(fbxine.post_elements, sizeof(post_element_t *) * (fbxine.post_elements_num + 1));
       
       fbxine.post_elements[fbxine.post_elements_num] = (post_element_t *) 
 	xine_xmalloc(sizeof(post_element_t));

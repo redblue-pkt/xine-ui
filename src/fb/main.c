@@ -29,10 +29,11 @@
 
 #include "lirc.h"
 #include "main.h"
-#include "post.h"
 #include "keys.h"
 #include "stdctl.h"
 #include "options.h"
+#include "osd.h"
+#include "post.h"
 
 #define XINE_CONFIG_DIR  ".xine"
 #define XINE_CONFIG_FILE "config"
@@ -206,6 +207,7 @@ static void wait_for_exit(void)
 
 void fbxine_exit(void)
 {
+        osd_deinit();
 	pthread_mutex_lock(&fbxine.mutex);
 	fbxine.current_mrl = fbxine.num_mrls;
 	pthread_cond_signal(&fbxine.exit_cond);
@@ -255,6 +257,8 @@ static int fbxine_init(int argc, char **argv)
 	  pplugin_rewire_posts();
 	}
 
+	osd_init();
+	fbxine.osd.enabled = 1;
 	return 1;
 }
 

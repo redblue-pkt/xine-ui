@@ -93,6 +93,25 @@ struct fbxine
 	pthread_cond_t exit_cond;
 
 	pthread_t keyboard_thread;
+        pthread_t          osd_thread;
+
+
+  struct {
+    int                     enabled;
+    int                     timeout;
+
+    xine_osd_t             *bar[2];
+    int                     bar_visible;
+
+    xine_osd_t             *status;
+    int                     status_visible;
+
+    xine_osd_t             *info;
+    int                     info_visible;
+
+  } osd;
+
+
 };
 
 extern struct fbxine fbxine;

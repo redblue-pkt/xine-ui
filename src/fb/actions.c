@@ -32,10 +32,12 @@
 
 #include "main.h"
 #include "actions.h"
+#include "osd.h"
 
 
 #define GUI_NEXT     1
 #define GUI_PREV     2
+#define GUI_RESET    3
 
 
 static const struct
@@ -53,6 +55,8 @@ static const struct
 		  "AudioChannelNext", ACTID_AUDIOCHAN_NEXT },
 	{ "Select previous audio channel.",
 		  "AudioChannelPrior", ACTID_AUDIOCHAN_PRIOR },
+	{ "Set default audio channel.",
+		  "AudioChannelDefault", ACTID_AUDIOCHAN_DEFAULT },
 	{ "Playback pause toggle.",
 		  "Pause", ACTID_PAUSE },
 	{ "Aspect ratio values toggle.",
@@ -224,10 +228,10 @@ static void action_pause(void)
 	xine_set_param(fbxine.stream, XINE_PARAM_SPEED,
 		       xine_get_param(fbxine.stream, XINE_PARAM_SPEED) ==
 		       XINE_SPEED_PAUSE ? XINE_SPEED_NORMAL:XINE_SPEED_PAUSE);
+	osd_update_status();
 }
 
-static int get_pos_length(xine_stream_t *stream, int *pos,
-			  int *time, int *length)
+int get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length)
 {
 	int t = 0, ret = 0;
 
@@ -270,10 +274,10 @@ static void *seek_relative_thread(void *data)
 			sec += off_sec;
 		
 		play(fbxine.stream, 0, sec, 1);
+		osd_stream_position();
 	}
 	
 	fbxine.ignore_next = 0;
-	
 	pthread_exit(0);
 	return 0;
 }
@@ -300,12 +304,6 @@ static void action_seek_relative(int off_sec)
 }
 
 
-void direct_change_audio_channel(void *data, int value) 
-{
-        xine_set_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, value);
-}
-
-
 void change_audio_channel(void *data) 
 {
         int dir = (int)data;
@@ -317,8 +315,11 @@ void change_audio_channel(void *data)
 	     channel++;
 	else if(dir == GUI_PREV)
 	     channel--;
+	else if(dir == GUI_RESET)
+	     channel = -1;
   
-	direct_change_audio_channel(data, channel);
+        xine_set_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, channel);
+	osd_display_audio_lang();
 }
 
 void do_action(int action)
@@ -389,6 +390,10 @@ void do_action(int action)
 		        change_audio_channel((void*)GUI_PREV);
 			break;
 
+	        case ACTID_AUDIOCHAN_DEFAULT:
+		        change_audio_channel((void*)GUI_RESET);
+			break;
+			
 		case ACTID_PAUSE:
 			action_pause();
 			break;
