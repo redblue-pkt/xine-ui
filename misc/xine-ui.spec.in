@@ -48,25 +48,12 @@ werden die xine-Bibliotheken aus libxine verwendet. Weitere Informationen
 %prep
 %setup -n %{name}-%{version}
 
-docdir=%{_docdir}
-export docdir
-# change for lsf conform architectures
-if [ "${docdir}" = "/usr/share/doc/packages" ] ; then
-   mv configure.ac configure.ac.save
-   cat configure.ac.save | sed  -e "s/\${datadir}\/doc\/xine-ui/\${datadir}\/doc\/packages\/xine-ui/g" > configure.ac
-fi
-
 %build
-export CFLAGS="%{optflags}"
+export CFLAGS="${RPM_OPT_FLAGS}"
+export XINE_DOCPATH="%{_docdir}/xine-ui"
 
 if [ ! -f configure ]; then
    NO_CONFIGURE=1 ./autogen.sh
-fi
-
-# change for lsf conform architectures
-if [ "${docdir}" = "/usr/share/doc/packages" ] ; then
-   mv configure configure.save
-   cat configure.save | sed  -e "s/\${datadir}\/doc\/xine-ui/\${datadir}\/doc\/packages\/xine-ui/g" > configure
 fi
 
 #
@@ -253,6 +240,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Fri Apr 09 2004 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- removed ugly hack to use the right docdir end set XINE_DOCPATH instead
 * Sun Jan 18 2004 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - added readline and curl dependency
 * Wed May 14 2003 Manfred Tremmel <Manfred.Tremmel@iiv.de>
