@@ -451,14 +451,7 @@ void xitk_font_cache_init(void) {
   pthread_mutex_init(&cache.mutex, NULL);
   
 #ifdef WITH_XFT
-  {
-    char *encoding = xitk_get_system_encoding();
-
-    cache.xr = xitk_recode_init((encoding ? encoding : ""), "UTF-8");
-
-    if(encoding)
-      free(encoding);
-  }
+  cache.xr = xitk_recode_init("", "UTF-8");
 #else
   cache.xr = NULL;
 #endif
@@ -1334,7 +1327,7 @@ xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encodi
   if (!dst_enc)
     goto exception1;
   
-  if ((id = iconv_open(dst_encoding, src_encoding)) == (iconv_t)-1)
+  if ((id = iconv_open(dst_enc, src_enc)) == (iconv_t)-1)
     goto exception2;
   
   free(src_enc);
