@@ -266,6 +266,7 @@ int main(int argc, char *argv[]) {
   int              audio_options = 0;
   int              autoplay_options = 0; /* stuff like FULL_ON_START, QUIT_ON_STOP */
   char            *audio_driver_name = NULL;
+  char            *video_driver_id = NULL;
   ao_functions_t  *audio_driver = NULL ;
   vo_driver_t     *video_driver = NULL;
   char            *video_driver_name = NULL;
@@ -420,9 +421,12 @@ int main(int argc, char *argv[]) {
 
   /* FIXME
   audio_driver = ao_init (audio_driver_name);
-
   video_driver = vo_init (video_driver_name);
   */
+  video_driver = load_video_output_plugin(cfg,
+					  video_driver_name, video_driver_id,
+					  VIDEO_OUTPUT_TYPE_X11, 
+					  (void *) gDisplay);
 
 
   
@@ -458,4 +462,5 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }		
+
 
