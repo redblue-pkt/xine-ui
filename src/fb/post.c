@@ -358,6 +358,7 @@ static void _pplugin_rewire(void) {
 
 #define DEFAULT_DEINTERLACER "tvtime:method=Linear,cheap_mode=1,pulldown=0,use_progressive_frame_flag=1"
 
+#if 0  /* FIXME: unused? */
 static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   post_element_t **posts = NULL;
   int              num, i;
@@ -384,6 +385,7 @@ static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   if(fbxine.deinterlace_enable)
     _pplugin_rewire();
 }
+#endif
 
 
 
