@@ -207,7 +207,7 @@ void show_usage (void) {
   printf(_("                                 -if no option is given, 'default' is selected.\n"));
   printf(_("  -n, --network                Enable network remote control server.\n"));
   printf(_("  -R, --root                   Use root window as video window.\n"));
-  printf(_("  -G, --geometry <WxH[+X+Y]>   Set output window size, according to X geometry (see X(7)).\n"));
+  printf(_("  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"));
   printf(_("  -B, --borderless             Borderless video output window.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));

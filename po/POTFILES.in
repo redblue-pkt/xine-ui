@@ -1,6 +1,7 @@
 # For updating this file, look at the result of:
 #  $ head -3 po/POTFILES.in > /tmp/POTFILES.in && grep -l '[^A-Za-z_]_(' src/xitk/*.[chy] >> /tmp/POTFILES.in && cp /tmp/POTFILES.in po/
 
+src/xitk/actions.c
 src/xitk/control.c
 src/xitk/errors.c
 src/xitk/event.c

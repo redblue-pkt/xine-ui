@@ -1,6 +1,6 @@
 .\" -*-Nroff-*-
 .\""
-.TH XINE 1x 2001-10-13 "Le projet xine"
+.TH XINE 1x 2002-01-05 "Le projet xine"
 .SH NOM
 xine \- Lecteur audio/vidéo libre.
 .SH SYNOPSIS
@@ -13,101 +13,225 @@ Cette page de manuel documente brièvement le lecteur audio/vidéo \fBxine\fP.
 Il peux lire les flux a partir de fichiers, CD Vidéo, DVD ou d'autres sources.
 .SH OPTIONS
 Ce programme utilise la syntaxe GNU pour la ligne de commande, avec les 
-longues options commençant par deux tirets ('-').
+longues options commençant par deux tirets ('\-').
 Une liste de ces options est donnée plus bas.
 Pour une description complète, lisez les fichiers README et FAQ présents
-dans le répertoire @prefix@/share/doc/xine ou sur la page du projet.
+dans le répertoire \fI@prefix@/share/doc/xine\fP ou sur la page du projet.
 .TP
 .B \-h, \-\-help
 Affiche la liste des options ainsi que la liste des pilotes 
 (plugins) disponibles.
 .TP
 .B \-a, \-\-audio\-channel <num>
-Sélectionne le canal audio spécifié. <num> est le numéro du canal, la valeur
-par defaut est '0'.
+Sélectionne le canal audio spécifié. \fBnum\fP est le numéro du canal, la valeur
+par defaut est \fB0\fP.
 .br
 xine 0.5 et plus tente de collecter tous les canaux audio (ac3, mpeg 
 audio, avi audio, ...) du flux et les classe en "canaux virtuels" 
-en partant du canal 0.
+en partant du canal \fB0\fP.
 .TP
 .B \-V, \-\-video\-driver <drv>
-Sélectionne le pilote vidéo. Utilisez "xine --help" pour avoir la
+Sélectionne le pilote vidéo. Utilisez \fIxine \-\-help\fP pour avoir la
 liste des pilotes disponible sur votre système. Cette sélection est
 automatiquement enregistrée dans votre .xinerc, donc vous n'avez à
 spécifier ce paramêtre qu'une seule fois.
 .TP
 .B \-A, \-\-audio\-driver <drv>
-Sélectionne le pilote audio. Utilisez "xine --help" pour avoir la
+Sélectionne le pilote audio. Utilisez \fIxine \-\-help\fP pour avoir la
 liste des pilotes disponible sur votre système. Cette sélection est
 automatiquement enregistrée dans votre .xinerc, donc vous n'avez à
 spécifier ce paramêtre qu'une seule fois.
 .TP
 .B \-u, \-\-spu\-channel <num>
-Sélectionne le canal de sous-titre. <num> est le numéro
-du canal de sous-titre. par défaut il n'y a pas de sous-titre (\-1)
+Sélectionne le canal de sous-titre. \fBnum\fP est le numéro
+du canal de sous-titre. par défaut il n'y a pas de sous-titre (\fB\-1\fP)
 .TP
-.B \-p[f][h][q][d][v], 
-Démarre la lecture immédiatement apres l'exécution. Peut être suivi
-par 'f' pour passer en mode plein écran, et/ou par 'h' pour
-masquer le panneau de contrôle, et/ou par 'q' pour quitter
-à la fin de la lecture. Il est possible d'obtenir automatiquement
-les listes de lecture à partir d'un DVD 'd', ou d'un VCD 'v'.
+.B \-p[f][h][w][q][d][v], \-\-auto\-play=[f][h][w][q][d][v]
+Démarre la lecture immédiatement apres l'exécution. Peut être suivi par:
+.br
+\'\fBf\fP\' en mode plein écran,
+.br
+\'\fBh\fP\' cache l'interface utilisateur (panneau principal, etc...),
+.br
+\'\fBw\fP\' cache la fenêtre de sortie,
+.br
+\'\fBq\fP\' quitte apres la fin de la lecture,
+.br
+Il est possible d'obtenir automatiquement les listes de lecture à partir 
+d'un DVD \'\fBd\fP\', ou d'un VCD \'\fBv\fP\'.
+Il y a désormais un option générique, \fI\-\-auto\-scan\fP, pour çà (voir plus bas).
 .TP
-.B \-R, \-\-recognize\-by <option>
-Change la méthode par laquelle xine va tenter de reconnaitre le
-type de flux.
-Les options valides sont:
-.br
-"default" (d'abord par contenu, puis par extension),
-.br
-"revert" (d'abord par extension, puis par contenu),
-.br
-"content" (uniquement par contenu),
-.br
-"extension" (uniquement par extention).
-.br
-Si aucune option n'est utilisée, "revert" est sélectionné.
+.B \-s <plugin>, \-\-auto\-scan <plugin>
+Recherche automatique de la liste de lecture à partir d'un plugin donné. Beaucoup
+de plugins autorisent une liste de lecture générique, afin de \fBtout\fP lire. Ceci
+fonctionne parfaitement pour les DVDs ou VCDs, par exemple. Specifier cette option
+reviens à presser le bouton concerné dans le paneau pricipal.
+
+Cette option est particulièrement utile en combinaison avec la lecture automatique.
+Vous pouvez executer \fIxine\~\-\-auto\-play\~\-\-auto\-scan\~dvd\fP dans le 
+but de lire un DVD entier, sans avoir a appuyer sur un ou plusieurs boutons. Ceci
+fonctionne aussi avec des plugins non fournis avec xine, donnez seulement le nom
+du bouton que le plugin affiche dans le paneau principal de xine!.
 .TP
+.B \-f, \-\-fullscreen
+Passe en mode plein écran au lancement (comme en pressant \'\fBF\fP\').
+.TP
+.B \-g, \-\-hide\-gui
+Cache toutes les fenêtre graphique (excepté la fenêtre vidéo) au démarrage.
+Ceci reviens à presser \'\fBG\fP\' dans xine.
+.TP
+.B \-H, \-\-hide\-video
+Cache la fenêtre de sortie.
+.TP
+.B \-L, \-\-no\-lirc
+Arrête le support de LIRC. Cette option est \fIseulement\~disponible\fP si xine 
+a été compilé avec le support LIRC.
+.TP
+.B \-\-visual <visual\-class\-or\-id>
+Tente d'utiliser le visuel du serveur X11 pour les fenêtres de xine. Le
+paramêtre \fB<visual\-class\-or\-id>\fP est soit le nom d'une classe
+de visuel X11 (\fBStaticGray\fP, \fBGrayScale\fP, \fBStaticColor\fP, \fBPseudoColor\fP, 
+\fBTrueColor\fP ou \fBDirectColor\fP), soit la valeur \fBhexadecimale\fP du
+visuel X11.
+
+Quand xine est utilisé avec un nom de classe de visuel, xine tente de trouver
+ce visuel avec un profondeur de \fB15\fP or \fB16\fP, \fB24\fP, \fB32\fP ou
+\fB8\fP (dans cet ordre). La classe de visuel par defaut utilisé par xine en
+l'absence de l'option \fI\-\-visual\fP est \fBTrueColor\fP.
+
+Si aucun visuel utilisable n'est trouvé, xine utilisera de visuel par
+defaut de la fenêtre root du serveur X11.
+.TP
+.B \-\-install
+Quand un visuel X11 avec changement de couleurs est utilisé (colormaps), 
+un colormap privé est installé pour xine. Avec un colormap privé, xine
+peux allouer plus de couleurs, donc la sortie vidéo sera meilleure.
+.TP
+.B \-\-keymap [option]
+Affiche l'assignement des touches. Option peux être:
+.br
+\'\fBdefault\fP\' affiche la table d'assignements par defaut,
+.br
+\'\fBlirc\fP\' affiche le brouillon d'un fichier de configuration .lircrc,
+.br
+\'\fBremapped\fP\' table d'assignement de l'utilisateur,
+.br
+Si aucune option n'est spécifié, \'\fBdefault\fP\' sera sélectionné.
+.TP
+.B \-n, \-\-network
+Mise en fonction du serveur de contrôle distant.
+Pour utiliser le serveur de contrôle distant, un fichier de 
+mot de passe est requis.
+Si xine ne le trouve pas, le serveur sera arrêté.
+La syntaxe du fichier de mot de passe suit le schéma (famillier)
+<\fBidentification\fP>:<\fBpassword\fP>. Depuis que la cryptographie
+est sujette à des problèmes de légalitée dans certains pays, le mot
+de passe n'est pas crypté, et est aussi transmis sous une forme non
+crypté. Donc, faites attention avec les connection distantes.
+Deux régles (optionnelles) sont disponible (une seule a la fois)
+.nf
+\fBALL:ALLOW\fP ou \fBALL:DENY\fP
+.fi
+Dans le premier cas, tout les clients sont autorisés à executer toutes les 
+commandes disponibles sans aucune restriction. Dans le second cas, personne
+n'est autorisé à executer de commande, exeption faites des utilisateurs
+authentifiés (en utilisant la commande 'identify').
+
+Si un champ de mot de passe commence avec un asterisque \'\fB*\fP\',
+l'utilisateur est bloqué. Si un champ de mot de passe est vide, l'entrée
+complète sera ignorée. Voici un exemple d'un petit fichier \fI~/.xine/passwd\fP: 
+.nf
+
+ALL:DENY
+daniel:mypasswd
+foo:*
+
+.fi
+Ceci autorisera uniquement 'daniel' à executer des commandes, aprés
+avoir été correctement authentifié.
+
+Le port par defaut du serveur est \fB6789\fP, ce nombre est totalement arbitraire. Vous
+pouvez connecter le serveur en utilisant un simple \fItelnet\fP:
+.nf
+\fBtelnet\~localhost\~6789\fP
+.fi
+Pour changer le port par defaut, vous pouvez (en tand que root) editer votre \fI/etc/services\fP,
+et ajouter une entrée comme ceci:
+.nf
+
+xinectl    7890/tcp        # xine control
+
+.fi
+Ceci changera le port par defaut de 6789 à 7890, et créera un service "humain" 
+appelé \fIxinectl\fP.
+
+Ce serveur offre de lui même l'aide et la syntaxe des commandes:
+.br
+.BR help [commande]
+.br
+Sans \fIcommande\fP spécifié, toutes les commandes disponibles seront affichées.
+Si une commande est spécifié, un court texte à propos de la fonctionnalité de
+la commande sera affiché.
+.br
+.BR syntaxe <commande>
+.br
+Affiche la syntaxe de la \fIcommande\fP.
+.TP
+.B \-R, \-\-root
+Utilise la fenêtre root comme fenêtre de sortie.
+.TP
+.B \-G, \-\-geometry <WxH[+X+Y]>
+Vous pouvez spécifié la taille et la position de la fenêtre de sortie en utilisant
+la géométrie de style X (\fIvoir X(7)\fP). Les décalages \fBX\fP et \fBY\fP sont optionnels.
+.TP
+.B \-B, \-\-borderless
+Retire les bordures de la fenêtre de sortie, en mode fenêtré.
 .B MRL (media resource locator)
 .br
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles
 définissent le média à utiliser comme source de lecture.
-Les MRLs valides peuvent être des noms de fichiers ou un de ceux qui suis:
-.br
+Les MRLs valides peuvent être des noms de fichiers ou un de ceux qui suit:
 .BR file://<chemin>
 .br
 .BR fifo://<chemin>
 .br
 .BR stdin://mpeg1
-or
-.BR "stdin://mpeg2"
+ou
+.BR stdin://mpeg2
 .br
 .BR dvd://VTS_xx_y.VOB
 .br
-.BR "vcd://<numéro piste>"
+.BR vcd://<numéropiste>
 .br
-.BR "net://???"
+.BR tcp://<hôte>:<port>
+.br
+.BR rtp://<hôte>:<port>
+.br
+.BR udp://<hôte>:<port>
+.br
+.BR mms://<hôte>...
+.br
+.BR http://<hôte>...
 .LP
-Plusieurs MRLs peuvent être spécifiées pour lire un nombre consécutif
+Plusieures MRLs peuvent être spécifiées pour lire un nombre consécutif
 de flux.
 .LP
 Si vous ne spécifiez aucune MRL, vous pourrez sélectionner un fichier
 par glisser-lacher.
-Glisser des fichiers depuis GNOME Midnight Commander (gmc) est connu
-pour fonctionner.
-.SH "VOIR AUSSI"
-Le programme est complètement documenté sur la page du projet de xine:
-.UR http://xine.sourceforge.net/
-.IR "http://xine.sourceforge.net/"
-.UE
+Glisser des fichiers depuis \fBGNOME\~Midnight\~Commander\fP (gmc), \fBNautilus\fP 
+ou \fBKonqueror\fP est connu pour fonctionner.
+////
+.TP
+.B sous-titre pour les fichiers avi
+.br
+Les fichiers de sous-titre peuvent êre ajoutés (séparé par \`%\') a une MRL de fichier:
+.br 
+.BR file://<path>%<fichiersoustitre>
 .SH TOUCHES DE CONTRÔLE
 Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches. '\fBM\-\fP' est la touche Meta ('Alt' sur les claviers de PC), '\fBC\-\fP' est la touche Control 'Ctrl', les autres touches spéciales sont délimitées par les caractères '\fB<\fP' et '\fB>\fP', par exemple: la touche FIN est affichèe \fB<fin>\fP. La liste de ces touches est:
 .LP
-.BR 0 :
-Saute au début du flux courant.
-.br
-.BR 1..9 :
-Saute à 10%..90% du flux courant.
+.BR 0..9 :
+Saute à 0%..90% du flux courant.
 .br
 .BR A :
 Bascule du ratio d'aspect (AUTO/16:9/4:3/DVB).
@@ -130,14 +254,17 @@ Affiche/masque la fenêtre de sortie.
 .BR i | I :
 Bascule des méthodes de dé-entrelacement.
 .br
+.BR M\-l | M\-L:
+affiche/masque la fenêtre de log.
+.br
 .BR M\-m | M\-M :
 Affiche/masque le gestionnaire de MRL.
 .br
 .BR C\-m | C\-M :
 Bascule du mode muêt.
 .br
-.BR p | P :
-Pause.
+.BR C\-o :
+Bascule du mode TV pour les carte DXR3.
 .br
 .BR M\-p | M\-P:
 Affiche/masque le fenêtre de liste de lecture.
@@ -145,8 +272,20 @@ Affiche/masque le fenêtre de liste de lecture.
 .BR Q :
 Quitte.
 .br
-.BR s | S :
-Zoom x1.
+.BR s :
+Zoom 1:1.
+.br
+.BR S :
+Stoppe la lecture.
+.br
+.BR M\-s :
+Affiche/masque la fenêtre de configuration.
+.br
+.BR z | Z :
+Zoom avant/arrière.
+.br
+.BR M\-C\-z :
+Ràz zoom.
 .br
 .BR v :
 Reduit le volume audio.
@@ -154,7 +293,7 @@ Reduit le volume audio.
 .BR V :
 Augmente le volume audio.
 .br
-.BR x | X :
+.BR t :
 Prends une photo.
 .br
 .BR <entrée> :
@@ -166,10 +305,10 @@ Pause.
 .BR <haut>/<bas> :
 Avance rapide, ralenti.
 .br
-.BR <gauche>/<droite> :
+.BR C\-<gauche>/C-\<droite> :
 Saute -+ 15 sec.
 .br
-.BR C\-<gauche> / C\-<droite> :
+.BR <gauche> / <droite> :
 Saute +- 60 sec.
 .br
 .BR <page\ précédente> :
@@ -178,11 +317,20 @@ Saute au flux precédent dans la liste de lecture.
 .BR <page\ suivante> :
 Saute au flux suivant dans la liste de lecture.
 .br
-.BR C\-< :
+.BR < :
 Réduit la fenêtre de sortie.
 .br
-.BR C\-> :
+.BR > :
 Agrandi la fenêtre de sortie.
+.br
+.BR M\-1 :
+Fenêtre de sortie vidéo à 50%
+.br
+.BR M\-2 :
+Fenêtre de sortie vidéo à 100%
+.br
+.BR M\-3 :
+Fenêtre de sortie vidéo à 200%
 .br
 .BR . :
 Sélectionne le canal de sous-titres suivant.
@@ -195,6 +343,48 @@ Sélectionne le canal audio suivant.
 .br
 .BR - :
 Sélectionne le canal audio précédent.
+.br
+.BR Esc :
+Menu 1 (ex: menu principal)
+.br
+.BR F1 :
+Menu 2 (ex: menu titre)
+.br
+.BR F2 :
+Menu 3
+.br
+.BR <Insert> :
+Bascule capture de pointeur.
+.br
+
+Les raccourcis suivant sont utilisés dans des plugin tiers, généralement pour la navigation de DVD:
+.LP
+.BR <PavéNum\ Haut> :
+Evènement Haut.
+.br
+.BR <PavéNum\ Bas> :
+Evènement Bas.
+.br
+.BR <PavéNum\ Gauche> :
+Evènement Gauche.
+.br
+.BR <PavéNum\ Droit> :
+Evènement Droit..
+.br
+.BR <PavéNum\ PgPréc> :
+Evènement Précédent.
+.br
+.BR <PavéNum\ PgSuiv> :
+Evènement Suivant.
+.br
+.BR <PavéNum\ Fin> :
+Evènement Angle précédent.
+.br
+.BR <PavéNum\ Début> :
+Evènement Angle suivant.
+.br
+.BR <PavéNum\ Entrée> :
+Evènement Sélection.
 .br
 .SH Affinage de la synchronization
 Il existe des flux ayant de mauvaises informations de temporisation, de ce 
@@ -209,6 +399,24 @@ Pressez cette touche si le vidéo est en retard par rapport à l'audio.
 .br
 .BR <début> :
 Pressez cette touche pour remettre à 0.
+.SH FICHIERS
+Tout les fichiers de configurations sont désormais dans ~/.xine:
+.br
+.BR ~/.xine/config :
+fichier principal de configuration
+.br
+.BR ~/.xine/keymap :
+fichier d'assignement des touches de xine-ui
+.br
+.BR ~/.xine/passwd :
+fichier de mots de passes de xine-ui
+.SH "VOIR AUSSI"
+\fBxine-remote\fP(1).
+.br
+Le programme est complètement documenté sur la page du projet de xine:
+.UR http://xine.sourceforge.net/
+.IR "http://xine.sourceforge.net/"
+.UE
 .SH AUTEURS
 Cette page de manuel a été écrite par Siggi Langauf <siggi@users.sourceforge.net>, de nombreux ajouts de Guenter Bartsch <guenter@users.sourceforge.net> et
 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>, pour le projet xine.

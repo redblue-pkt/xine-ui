@@ -177,6 +177,13 @@ Display the \fIcommand\fP syntax.
 .B \-R, \-\-root
 Use root window as video window.
 .TP
+.B \-G, \-\-geometry <WxH[+X+Y]>
+You can set video output size and position using the X like geometry (\fIsee X(7)\fP).
+\fBX\fP and \fBY\fP offset are optional.
+.TP
+.B \-B, \-\-borderless
+Remove borders of video output window, in windowed mode.
+.TP
 .B MRL (media resource locator)
 .br
 MRLs are similar to URLs in your web browser. They describe the media
@@ -246,7 +253,7 @@ Hide/show the video output window.
 .BR i | I :
 Toggle deinterlace methods.
 .br
-.BR M\-l :
+.BR M\-l | M\-L :
 Show/hide log window.
 .br
 .BR M\-m | M\-M :
@@ -297,7 +304,7 @@ Pause
 .BR <up>/<down> :
 fast forward / slow motion
 .br
-.BR c\-<left>/C\-<right> :
+.BR C\-<left>/C\-<right> :
 seek -+ 15 sec.
 .br
 .BR <left> / <right> :
@@ -344,9 +351,6 @@ Menu 2 (e.g. title menu)
 .br
 .BR F2 :
 Menu 3
-.br
-.BR M\-L :
-show log viewer window
 .br
 .BR <Insert> :
 Grab pointer toggle.

@@ -93,7 +93,7 @@ void gui_play (xitk_widget_t *w, void *data) {
   if (xine_get_status (gGui->xine) != XINE_PLAY) {
 
     if (!strncmp (gGui->filename, "xine-ui version", 15)) {
-      xine_error ("No MRL (input stream) specified");
+      xine_error (_("No MRL (input stream) specified"));
       return;
     }
 
