@@ -570,9 +570,14 @@ void gui_handle_event (XEvent *event, void *data) {
       gui_decrease_audio_volume();
       break;
 
+    case XK_t:
+    case XK_T:
+      panel_snapshot(NULL, NULL);
+      break;
+
     case XK_x:
     case XK_X:
-      panel_execute_snapshot(NULL, NULL);
+      panel_execute_xineshot(NULL, NULL);
       break;
     
     case XK_s:

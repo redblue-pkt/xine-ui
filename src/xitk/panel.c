@@ -43,6 +43,7 @@
 #include "parseskin.h"
 #include "panel.h"
 #include "mrl_browser.h"
+#include "snapshot.h"
 
 extern gGui_t     *gGui;
 
@@ -278,9 +279,10 @@ void panel_toggle_audio_mute(widget_t *w, void *data, int state) {
 }
 
 /*
- *
+ *  Call external "xineshot" program to get a fullscreen
+ *  snapshot.
  */
-void panel_execute_snapshot(widget_t *w, void *data) {
+void panel_execute_xineshot(widget_t *w, void *data) {
   int err;
   char cmd[2048];
   char *vo_name;
@@ -296,6 +298,15 @@ void panel_execute_snapshot(widget_t *w, void *data) {
   else
     printf("Grab snapshots only works with XShm video driver.\n");
   
+}
+
+/*
+ *  Use internal xine-lib framegrabber function
+ *  to snapshot current frame.
+ */
+void panel_snapshot(widget_t *w, void *data) {
+  printf("Snapshot:\n");
+  create_snapshot( gGui );
 }
 
 /*
@@ -767,7 +778,7 @@ void panel_init (void) {
   /* Snapshot */
   b.x        = gui_get_skinX("Snapshot");
   b.y        = gui_get_skinY("Snapshot");
-  b.callback = panel_execute_snapshot;
+  b.callback = panel_snapshot;
   b.userdata = NULL;
   b.skin     = gui_get_skinfile("Snapshot");
   gui_list_append_content(panel->widget_list->l, button_create(&b));
