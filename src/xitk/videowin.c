@@ -300,7 +300,7 @@ static void video_window_adapt_size (void) {
     return;
   }
 
-  switch (gVw->fullscreen_req) {
+  switch (gVw->fullscreen_req && gGui->xine) {
   case 0:
   case 1:
     xine_tvmode_switch (gGui->xine, 0, gVw->video_width, gVw->video_height, gVw->video_duration);
@@ -423,9 +423,12 @@ static void video_window_adapt_size (void) {
   gVw->visible_width  = gVw->fullscreen_width;
   gVw->visible_height = gVw->fullscreen_height;
   gVw->visible_ratio  = 1.0;   // TODO
-  xine_tvmode_size (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_ratio, NULL);
-  xine_tvmode_size (gGui->xine, &hint.width, &hint.height, NULL, NULL);
 
+  if(gGui->xine) {
+    xine_tvmode_size (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_ratio, NULL);
+    xine_tvmode_size (gGui->xine, &hint.width, &hint.height, NULL, NULL);
+  }
+  
   if (gVw->fullscreen_req) {
 
     if (gGui->video_window) {
@@ -839,7 +842,7 @@ void video_window_frame_output_cb (void *data,
  */
 void video_window_set_fullscreen_mode (int req_fullscreen) {
   gVw->fullscreen_req = req_fullscreen;
-  
+
   video_window_adapt_size ();
 }
 
@@ -941,7 +944,6 @@ void video_window_init (window_attributes_t *window_attribute) {
   int                   dummy_query_event, dummy_query_error;
 #endif
 
-  xine_tvmode_init (gGui->xine);
   gVw = (gVw_t *) xine_xmalloc(sizeof(gVw_t));
 
   gVw->fullscreen_req     = 0;

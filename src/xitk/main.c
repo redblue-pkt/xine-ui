@@ -942,6 +942,7 @@ int main(int argc, char *argv[]) {
 
   gGui->xine = xine_init (gGui->vo_driver, audio_driver,
 			  gGui->config);
+  xine_tvmode_init(gGui->xine);
 
   xine_select_audio_channel (gGui->xine, audio_channel);
   xine_select_spu_channel (gGui->xine, spu_channel);

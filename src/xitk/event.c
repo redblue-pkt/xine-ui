@@ -782,7 +782,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   panel_init ();
 }
 
-
 void gui_init_imlib (Visual *vis) {
   XColor                dummy;
   ImlibInitParams	imlib_init;
@@ -835,7 +834,6 @@ void gui_init_imlib (Visual *vis) {
  *
  */
 void gui_run (void) {
-
   int i;
 
   video_window_change_skins();
@@ -932,6 +930,9 @@ void gui_run (void) {
 						 NULL, NULL);
   
   start_remote_server();
+
+  /* Need for tvmode */
+  video_window_set_fullscreen_mode((video_window_get_fullscreen_mode()));
 
   xitk_run();
 
