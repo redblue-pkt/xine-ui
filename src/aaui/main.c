@@ -57,6 +57,11 @@
 #  include "getopt.h"
 #endif
 
+/* Sound mixer capabilities */
+#define MIXER_CAP_NOTHING   0x00000000
+#define MIXER_CAP_VOL       0x00000001
+#define MIXER_CAP_MUTE      0x00000002
+
 /*
  * global variables
  */
@@ -559,21 +564,21 @@ int main(int argc, char *argv[]) {
   
   /* Init mixer control */
   aaxine.mixer.enable = 0;
-  aaxine.mixer.caps = 0;
+  aaxine.mixer.caps = MIXER_CAP_NOTHING;
   
-  if(xine_get_param(aaxine.stream, XINE_PARAM_AO_MIXER_VOL))
-    aaxine.mixer.caps |= XINE_PARAM_AO_MIXER_VOL;
-  if(xine_get_param(aaxine.stream, XINE_PARAM_AO_PCM_VOL))
-    aaxine.mixer.caps |= XINE_PARAM_AO_PCM_VOL;
-  if(xine_get_param(aaxine.stream, XINE_PARAM_AO_MUTE))
-    aaxine.mixer.caps |= XINE_PARAM_AO_MUTE;
+  if(aaxine.ao_port) {
+    if((xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME)) != -1)
+      aaxine.mixer.caps |= MIXER_CAP_VOL;
+    if((xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_MUTE)) != -1)
+      aaxine.mixer.caps |= MIXER_CAP_MUTE;
+  }
 
-  if(aaxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+  if(aaxine.mixer.caps & MIXER_CAP_VOL) { 
     aaxine.mixer.enable = 1;
     aaxine.mixer.volume_level = xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME);
   }
   
-  if(aaxine.mixer.caps & XINE_PARAM_AO_MUTE)
+  if(aaxine.mixer.caps & MIXER_CAP_MUTE)
     aaxine.mixer.mute = xine_get_param(aaxine.stream, XINE_PARAM_AUDIO_MUTE);
   
   /* Select audio channel */
@@ -702,7 +707,7 @@ int main(int argc, char *argv[]) {
 
     case 'V':
       if(aaxine.mixer.enable) {
-	if(aaxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+	if(aaxine.mixer.caps & MIXER_CAP_VOL) { 
 	  if(aaxine.mixer.volume_level < 100) {
 	    aaxine.mixer.volume_level++;
 	    xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME, aaxine.mixer.volume_level);
@@ -713,7 +718,7 @@ int main(int argc, char *argv[]) {
       
     case 'v':
       if(aaxine.mixer.enable) {
-	if(aaxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+	if(aaxine.mixer.caps & MIXER_CAP_VOL) { 
 	  if(aaxine.mixer.volume_level > 0) {
 	    aaxine.mixer.volume_level--;
 	    xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_VOLUME, aaxine.mixer.volume_level);
@@ -725,7 +730,7 @@ int main(int argc, char *argv[]) {
     case 'm':
     case 'M':
       if(aaxine.mixer.enable) {
-	if(aaxine.mixer.caps & XINE_PARAM_AO_MUTE) {
+	if(aaxine.mixer.caps & MIXER_CAP_MUTE) {
 	  aaxine.mixer.mute = !aaxine.mixer.mute;
 	  xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_MUTE, aaxine.mixer.mute);
 	}
