@@ -1,0 +1,112 @@
+# Japanese xitk.po file.
+# Copyright (C) 2004 Free Software Foundation, Inc.
+# This file is distributed under the same license as the xitk package.
+# none none <none@none>, 2004.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: xine-ui 0.9.2\n"
+"POT-Creation-Date: 2004-04-21 16:38+0000\n"
+"PO-Revision-Date: 2004-12-13 21:35+0100\n"
+"Last-Translator: none none <none@none>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:1180
+msgid "Select current entry"
+msgstr ""
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:1188
+msgid "Play selected entry"
+msgstr ""
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:1199
+msgid "Close MRL browser window"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:117
+msgid "XInitThreads() failed.\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:124
+msgid "Cannot open display\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:138
+msgid "Imlib_init_with_params() failed.\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:374
+#, c-format
+msgid "New integer value is: %d. Confirm ?"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:426
+#, c-format
+msgid "New double value is: %e. Confirm ?"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:522
+msgid "My Frame"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:562
+msgid "A Label"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:622
+msgid "Fire !!"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:653
+msgid "!BOOM!"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:745
+#, c-format
+msgid ""
+"New entries selected in combo box is:\n"
+"%s [%d]."
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:948
+msgid "init_test() failed\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:964
+msgid "My Fucking Window"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:981
+msgid "Quit"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:972
+msgid "OK"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:1036 src/xitk/xine-toolkit/window.c:1242
+msgid "Question?"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:1172 src/xitk/xine-toolkit/window.c:1392
+msgid "Yes"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:1172 src/xitk/xine-toolkit/window.c:1392
+msgid "No"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:1392
+msgid "Cancel"
+msgstr ""
+
+#: src/xitk/xine-toolkit/xitk.h:2247 src/xitk/xine-toolkit/xitk.h:2256
+msgid "Error"
+msgstr ""
+
+#: src/xitk/xine-toolkit/xitk.h:2250 src/xitk/xine-toolkit/xitk.h:2259
+msgid "Information"
+msgstr ""
