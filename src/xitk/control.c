@@ -266,53 +266,69 @@ void control_config_register(void) {
   
   probe_active_controls();
   
-  if(hue_ena)
-    set_current_param(XINE_PARAM_VO_HUE,
-		    (gGui->video_settings.hue = 
-		     xine_config_register_range(gGui->xine, "gui.vo_hue",
-						(get_current_param(XINE_PARAM_VO_HUE)),
-						0, 65535,
-						_("hue value"),
-						_("Hue value."), 
-						CONFIG_LEVEL_DEB,
-						hue_changes_cb, 
-						CONFIG_NO_DATA)));
+  if(hue_ena) {
+    gGui->video_settings.hue = 
+     xine_config_register_range(gGui->xine, "gui.vo_hue",
+				-1,
+				0, 65535,
+				_("hue value"),
+				_("Hue value."), 
+				CONFIG_LEVEL_DEB,
+				hue_changes_cb, 
+				CONFIG_NO_DATA);
+    if( gGui->video_settings.hue < 0 )
+      gGui->video_settings.hue = get_current_param(XINE_PARAM_VO_HUE);
+    else 
+      set_current_param(XINE_PARAM_VO_HUE,gGui->video_settings.hue);
+  }
   
-  if(bright_ena)
-    set_current_param(XINE_PARAM_VO_BRIGHTNESS, 
-		    (gGui->video_settings.brightness = 
-		     xine_config_register_range(gGui->xine, "gui.vo_brightness",
-						(get_current_param(XINE_PARAM_VO_BRIGHTNESS)),
-						0, 65535,
-						_("brightness value"),
-						_("Brightness value."), 
-						CONFIG_LEVEL_DEB,
-						brightness_changes_cb, 
-						CONFIG_NO_DATA)));
+  if(bright_ena) {
+    gGui->video_settings.brightness = 
+     xine_config_register_range(gGui->xine, "gui.vo_brightness",
+				-1,
+				0, 65535,
+				_("brightness value"),
+				_("Brightness value."), 
+				CONFIG_LEVEL_DEB,
+				brightness_changes_cb, 
+				CONFIG_NO_DATA);
+    if( gGui->video_settings.brightness < 0 )
+      gGui->video_settings.brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
+    else 
+      set_current_param(XINE_PARAM_VO_BRIGHTNESS,gGui->video_settings.brightness);
+  }
 
-  if(sat_ena)
-    set_current_param(XINE_PARAM_VO_SATURATION,
-		    (gGui->video_settings.saturation = 
-		     xine_config_register_range(gGui->xine, "gui.vo_saturation",
-						(get_current_param(XINE_PARAM_VO_SATURATION)),
-						0, 65535,
-						_("saturation value"),
-						_("Saturation value."), 
-						CONFIG_LEVEL_DEB,
-						saturation_changes_cb, 
-						CONFIG_NO_DATA)));
+  if(sat_ena) {
+   gGui->video_settings.saturation = 
+     xine_config_register_range(gGui->xine, "gui.vo_saturation",
+				-1,
+				0, 65535,
+				_("saturation value"),
+				_("Saturation value."), 
+				CONFIG_LEVEL_DEB,
+				saturation_changes_cb, 
+				CONFIG_NO_DATA);
+    if( gGui->video_settings.saturation < 0 )
+      gGui->video_settings.saturation = get_current_param(XINE_PARAM_VO_SATURATION);
+    else 
+      set_current_param(XINE_PARAM_VO_SATURATION,gGui->video_settings.saturation);
+  }
 
-  if(contr_ena)
-    set_current_param(XINE_PARAM_VO_CONTRAST,
-		    (gGui->video_settings.contrast = 
-		     xine_config_register_range(gGui->xine, "gui.vo_contrast",
-						(get_current_param(XINE_PARAM_VO_CONTRAST)),
-						0, 65535,
-						_("contrast value"),
-						_("Contrast value."), 
-						CONFIG_LEVEL_DEB,
-						contrast_changes_cb, 
-						CONFIG_NO_DATA)));
+  if(contr_ena) {
+    gGui->video_settings.contrast = 
+     xine_config_register_range(gGui->xine, "gui.vo_contrast",
+				-1,
+				0, 65535,
+				_("contrast value"),
+				_("Contrast value."), 
+				CONFIG_LEVEL_DEB,
+				contrast_changes_cb, 
+				CONFIG_NO_DATA);
+    if( gGui->video_settings.contrast < 0 )
+      gGui->video_settings.contrast = get_current_param(XINE_PARAM_VO_CONTRAST);
+    else 
+      set_current_param(XINE_PARAM_VO_CONTRAST,gGui->video_settings.contrast);
+  }
 }
 
 /*
