@@ -280,9 +280,7 @@ static void change_label(xitk_widget_t *w, void *data) {
   //  xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, ALIGN_DEFAULT, "**Thisprogramisfreesoftware;youcanredistributeitand/ormodify**itunderthetermsoftheGNUGeneralPublicLicenseaspublishedby**TheFreeSoftwareFoundation;eitherversion2oftheLicense,or**(atyouroption)anylaterversion.");
   xitk_window_dialog_error(test->imlibdata, 
 			   "Stream number %d <%s.mpg> is not valid.\n", nlab, labels[nlab]);
-
 }
-
 
 /*
  *

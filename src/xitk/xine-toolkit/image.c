@@ -275,6 +275,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   po = p = &bufsubs[0];
 
   while(*p != '\0') {
+
     switch(*p) {
       
       /* Ignore */

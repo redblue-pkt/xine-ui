@@ -481,6 +481,11 @@ int xitk_get_white_color(void);
 int xitk_get_background_color(void);
 int xitk_get_focus_color(void);
 int xitk_get_select_color(void);
+/*
+ * copy src to dest and substitute special chars. dest should have 
+ * enought space to store chars.
+ */
+void xitk_subst_special_chars(char *, char *);
 unsigned long xitk_get_timer_label_animation(void);
 long int xitk_get_timer_dbl_click(void);
 unsigned long xitk_get_warning_foreground(void);

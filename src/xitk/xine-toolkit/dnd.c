@@ -81,31 +81,6 @@ static void _dnd_send_finished (xitk_dnd_t *xdnd, Window window, Window from) {
 }
 
 /*
- * Find and replace special chars.
- */
-static void _dnd_subst_specials(char *buf) {
-  char *r, *w;
-  
-  r = w = buf;
- 
-  while(*r != '\0') {
-    
-    /* %20 = ' '*/
-    if((*(r) == '%') && (*(r + 1) == '2') && (*(r + 2) == '0')) {
-      *w = ' ';
-      r += 2;
-    }
-    else
-      *w = *r;
-    
-    r++;
-    w++;
-  }
-
-  *w = '\0';
-}
-
-/*
  * WARNING: X unlocked function 
  */
 static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from, 
@@ -153,13 +128,14 @@ static int _dnd_paste_prop_internal(xitk_dnd_t *xdnd, Window from,
 	    p[plen--] = '\0';
 	  
 	  if(strlen(p)) {
-	    _dnd_subst_specials(p);
+	    char buf[(strlen(p) * 2) + 1];
+	    xitk_subst_special_chars(p, buf);
 	    
 #ifdef DEBUG_DND
-	    printf("GOT '%s'\n", p);
+	    printf("GOT '%s'\n", buf);
 #endif
 	    if(xdnd->callback) {
-	      xdnd->callback(p);
+	      xdnd->callback(buf);
 	    }
 	  }
 	}

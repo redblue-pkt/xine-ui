@@ -96,7 +96,11 @@ void xine_error(char *message, ...) {
       return;
   }
   
-  xitk_window_dialog_error(gGui->imlib_data, buf);
+  {
+    char buf2[(strlen(buf) * 2) + 1];
+    xitk_subst_special_chars(buf, buf2);
+    xitk_window_dialog_error(gGui->imlib_data, buf2);
+  }
   free(buf);
 }
 
@@ -129,7 +133,11 @@ void xine_error_with_more(char *message, ...) {
       return;
   }
   
-  errors_create_window(_("Error"), buf);
+  {
+    char buf2[(strlen(buf) * 2) + 1];
+    xitk_subst_special_chars(buf, buf2);
+    errors_create_window(_("Error"), buf2);
+  }
   free(buf);
   }
 
@@ -162,7 +170,11 @@ void xine_info(char *message, ...) {
       return;
   }
   
-  xitk_window_dialog_info(gGui->imlib_data, buf);
+  {
+    char buf2[(strlen(buf) * 2) + 1];
+    xitk_subst_special_chars(buf, buf2);
+    xitk_window_dialog_info(gGui->imlib_data, buf2);
+  }
   free(buf);
 }
 
@@ -201,6 +213,4 @@ void gui_handle_xine_error(void) {
     break;
   }
 
-
 }
-

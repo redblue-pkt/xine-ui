@@ -979,6 +979,51 @@ unsigned long xitk_get_warning_background(void) {
 long int xitk_get_timer_dbl_click(void) {
   return xitk_config_get_timer_dbl_click(gXitk->config);
 }
+
+/*
+ * copy src to dest and substitute special chars. dest should have 
+ * enought space to store chars.
+ */
+void xitk_subst_special_chars(char *src, char *dest) {
+  char *s, *d;
+  
+  if((src == NULL) || (dest == NULL)) {
+    XITK_WARNING("%s(): pass NULL argument(s)\n", __FUNCTION__);
+    return;
+  }
+  
+  if(!strlen(src))
+    return;
+
+  printf("src '%s'\n", src);
+  memset(dest, 0, sizeof(dest));
+  s = src;
+  d = dest;
+  while(*s != '\0') {
+    
+    switch(*s) {
+    case '%':
+      /* %20 is ' ' */
+      if((*(s) == '%') && (*(s + 1) == '2') && (*(s + 2) == '0')) {
+	*d = ' ';
+	d += 2;
+      }
+      else {
+	*d++ = '%';
+	*d = '%';
+      }
+      break;
+      
+    default:
+      *d = *s;
+      break;
+    }
+    s++;
+    d++;
+  }
+  *d = '\0';
+}
+
 /*
  *
  */
