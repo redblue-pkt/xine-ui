@@ -17,49 +17,49 @@
 ###
 #Xine skin data file
 #Title:     Xinetic for Xine
-#Version:   0.3
-#Released:  19.08.2001
+#Version:   0.4
+#Released:  12.10.2001
 #Author:    Darjeeling (Jérôme Villette)<villette@chem.leidenuniv.nl>
 #URL:       none
 
 ## Main GUI ##
 BackGround:	0	0	MainBg.png
-Close:		501	2	MainClose.png
-Eject:		434	63	MainEject.png
+Close:		500	2	MainClose.png
+Eject:		434	64	MainEject.png
 Exit:		8	76	MainPower.png
-FullScreen:	487	2	MainFullScreen.png
+FullScreen:	486	2	MainFullScreen.png
 
-TitleLabel:	42	17	Letters.png	51	True
-TimeLabel:	66	36	Letters.png	8	False
+TitleLabel:	42	18	Letters.png	51	True
+TimeLabel:	66	37	Letters.png	8	False
 
-AudioNext:	233	36	SmallArrowUp.png
-AudioPrev:	233	44	SmallArrowDown.png
-AudioLabel:	270	36	Letters.png	3	False
+AudioNext:	233	37	SmallArrowUp.png
+AudioPrev:	233	45	SmallArrowDown.png
+AudioLabel:	270	37	Letters.png	3	False
 
-SpuNext:	294	36	SmallArrowUp.png
-SpuPrev:	294	44	SmallArrowDown.png
-SpuLabel:	330	36	Letters.png	3	False
+SpuNext:	294	37	SmallArrowUp.png
+SpuPrev:	294	45	SmallArrowDown.png
+SpuLabel:	330	37	Letters.png	3	False
 
-PlayFast:	396	25	ArrowUp.png
-PlaySlow:	396	55	ArrowDown.png
+PlayFast:	389	16	MainUp.png
+PlaySlow:	389	45	MainDown.png
 
-Next:		459	48	MainNext.png
-Pause:		413	29	MainPause.png
-Play:		429	12	MainPlay.png
-Stop:		459	29	MainStop.png
-Prev:		413	47	MainPrev.png
+Next:		459	49	MainNext.png
+Pause:		413	30	MainPause.png
+Play:		429	13	MainPlay.png
+Stop:		459	30	MainStop.png
+Prev:		413	49	MainPrev.png
 
-Mute:		366	77	MainMute.png
-SliderBGVol:	350	21	MainVolumeBg.png
-SliderFGVol:	350	21	MainVolumePad.png
+Mute:		366	45	MainMute.png
+SliderBGVol:	347	22	MainVolumeBg.png
+SliderFGVol:	347	22	MainVolumePad.png
 
-Snapshot:	349	77	MainCam.png
+Snapshot:	346	75	MainCam.png
 
-AutoPlayGUI:	174	55	MainAutoButton.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
-PlBtn:		216	54	PlBtn.png
-CtlBtn:		258	54	CtlBtn.png
-MrlBtn:		300	54	MrlBtn.png
-SliderBGPlay:	36	4	SliderHBg.png
+AutoPlayGUI:	174	43	MainAutoButton.png	#344b5d	#081e2f	#a4abb0	*-lucida-*-i-*-*-12-*-*-*-*-*-*-*
+PlBtn:		216	55	PlBtn.png
+CtlBtn:		258	55	CtlBtn.png
+MrlBtn:		300	55	MrlBtn.png
+SliderBGPlay:	36	5	SliderHBg.png
 SliderFGPlay:	0	0	SliderHPad.png
 
 ## Playlist ##
