@@ -366,7 +366,7 @@ AC_SUBST(NET_LIBS)
 dnl
 dnl check for ascii-art library
 dnl
-AM_PATH_AALIB(1.2,,)
+AM_PATH_AALIB(1.2.0,,)
 AM_CONDITIONAL(HAVE_AA, test x$no_aalib != "xyes")
 
 dnl
