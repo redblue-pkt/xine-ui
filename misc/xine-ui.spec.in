@@ -215,7 +215,7 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %doc doc/FAQ_* doc/README.* doc/README_* doc/bug_report_form
-%{_bindir}/xine*
+%{_bindir}/*xine*
 %{skindir}/*
 %{_datadir}/idl/xine.idl
 %{_datadir}/xine/desktop/*
