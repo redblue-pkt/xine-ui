@@ -592,7 +592,33 @@ void xitk_xevent_notify(XEvent *event) {
 	    }
 
 	  }
-	  
+	  else if((mykey == XK_0) || (mykey == XK_1) || (mykey == XK_2) || (mykey == XK_3) || 
+		  (mykey == XK_4) || (mykey == XK_5) || (mykey == XK_6) || (mykey == XK_7) || 
+		  (mykey == XK_8) || (mykey == XK_9) || 
+		  (mykey == XK_a) || (mykey == XK_A) || (mykey == XK_b) || (mykey == XK_B) ||
+		  (mykey == XK_c) || (mykey == XK_C) || (mykey == XK_d) || (mykey == XK_D) ||
+		  (mykey == XK_e) || (mykey == XK_E) || (mykey == XK_f) || (mykey == XK_F) ||
+		  (mykey == XK_g) || (mykey == XK_G) || (mykey == XK_h) || (mykey == XK_H) ||
+		  (mykey == XK_i) || (mykey == XK_I) || (mykey == XK_j) || (mykey == XK_J) ||
+		  (mykey == XK_k) || (mykey == XK_K) || (mykey == XK_l) || (mykey == XK_L) ||
+		  (mykey == XK_m) || (mykey == XK_M) || (mykey == XK_n) || (mykey == XK_N) ||
+		  (mykey == XK_o) || (mykey == XK_O) || (mykey == XK_p) || (mykey == XK_P) ||
+		  (mykey == XK_q) || (mykey == XK_Q) || (mykey == XK_r) || (mykey == XK_R) ||
+		  (mykey == XK_s) || (mykey == XK_S) || (mykey == XK_t) || (mykey == XK_T) ||
+		  (mykey == XK_u) || (mykey == XK_U) || (mykey == XK_v) || (mykey == XK_V) ||
+		  (mykey == XK_w) || (mykey == XK_W) || (mykey == XK_x) || (mykey == XK_X) ||
+		  (mykey == XK_y) || (mykey == XK_Y) || (mykey == XK_z) || (mykey == XK_Z)) {
+
+	    
+	    if(w && ((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
+	      xitk_widget_t *b = xitk_browser_get_browser(fx->widget_list, w);
+	      
+	      if(b)
+		xitk_browser_warp_jump(b, kbuf, modifier);
+
+	    }
+	  }
+
 	  if(!handled) {
 	    if((w == NULL) || (w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) == 0))) {
 	      if(fx->xevent_callback) {

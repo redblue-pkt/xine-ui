@@ -714,10 +714,6 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
  */
 static void mrlbrowser_handle_event(XEvent *event, void *data) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
-  XKeyEvent      mykeyevent;
-  KeySym         mykey;
-  char           kbuf[256];
-  int            len;
   
   switch(event->type) {
 
@@ -741,7 +737,15 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     XUNLOCK(private_data->imlibdata->x.disp);
     break;
     
-  case KeyPress:
+  case KeyPress: {
+    XKeyEvent      mykeyevent;
+    KeySym         mykey;
+    char           kbuf[256];
+    int            len;
+    int            modifier;
+
+    xitk_get_key_modifier(event, &modifier);
+    
     mykeyevent = event->xkey;
     
     XLOCK (private_data->imlibdata->x.disp);
@@ -749,10 +753,20 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     XUNLOCK (private_data->imlibdata->x.disp);
     
     switch (mykey) {
-      
+
+    case XK_d: 
+    case XK_D:
+#ifdef DEBUG_MRLB
+      /* This is for debugging purpose */
+      if(modifier & MODIFIER_CTRL)
+	mrlbrowser_dumpmrl(NULL, (void *)private_data);
+#endif
+      break;
+
     case XK_s:
     case XK_S:
-      mrlbrowser_select(NULL, (void *)private_data);
+      if(modifier & MODIFIER_CTRL)
+	mrlbrowser_select(NULL, (void *)private_data);
       break;
 
     case XK_Return: {
@@ -762,17 +776,11 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
 	mrlbrowser_select_mrl(private_data, selected, 0, 1);
     }
     break;
-      
-      /* This is for debugging purpose */
-#ifdef DEBUG_MRLB
-    case XK_d:
-    case XK_D:
-      mrlbrowser_dumpmrl(NULL, (void *)private_data);
-      break;
-#endif
 
     }
-    break;
+  }
+  break;
+
   }
 }
 

@@ -37,6 +37,7 @@
 #include "button.h"
 #include "labelbutton.h"
 #include "slider.h"
+#include "inputtext.h"
 
 #include "_xitk.h"
 
@@ -458,6 +459,8 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
       
       if((i = xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
 	// Callback call
+	private_data->jumped = i;
+
 	if(private_data->callback)
 	  private_data->callback(((btnlist_t*)data)->itemlist, (void*)(i));
       }
@@ -556,6 +559,100 @@ xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w
   return widget;
 }
 
+/*
+ * Jump to entry in list which match with the alphanum char key.
+ */
+void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier) {
+  browser_private_data_t *private_data;
+
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+
+    private_data = (browser_private_data_t *) w->private_data;
+    
+    if((modifier == MODIFIER_NOMOD) || (modifier & MODIFIER_SHIFT)) {
+      int jumped;
+      int start, end, mark;
+      int focus;
+
+      /* Jump wasn't happend yet */
+      if(private_data->jumped == -1)
+	jumped = 0;
+      else {
+	if((private_data->jumped + 1) < private_data->list_length)
+	  jumped = private_data->jumped + 1;
+	else
+	  jumped = 0;
+      }
+
+      start = jumped;
+      end = ((start - 1) > 0) ? (start - 1) : 0;
+      mark = private_data->list_length;
+      
+      for(; start < mark; start++) {
+	
+	if(!strncasecmp(private_data->content[start], key, strlen(key))) {
+	  
+	  private_data->jumped = start;
+
+	  focus = 0;
+	  if((private_data->list_length - start) <= private_data->max_length) {
+
+	    if(private_data->list_length >= private_data->max_length) {
+	      focus = private_data->max_length - (private_data->list_length - start);
+	      start = (private_data->list_length - private_data->max_length);
+	    }
+	    else
+	      focus = start;
+
+	  }
+	  
+	  xitk_browser_rebuild_browser(w, start);
+
+	  if(private_data->parent_wlist->widget_focused) {
+	    
+	    if(private_data->parent_wlist->widget_focused->notify_focus && 
+	       private_data->parent_wlist->widget_focused->enable == WIDGET_ENABLE) {
+	      
+	      (void) (private_data->parent_wlist->widget_focused->notify_focus) (private_data->parent_wlist, private_data->parent_wlist->widget_focused, FOCUS_LOST);
+	      
+	      private_data->parent_wlist->widget_focused->have_focus = FOCUS_LOST;
+	    }
+	    
+	    if(private_data->parent_wlist->widget_focused->paint)
+	      (private_data->parent_wlist->widget_focused->paint) (private_data->parent_wlist->widget_focused, private_data->parent_wlist->win, private_data->parent_wlist->gc);
+
+	  }
+	  
+	  xitk_browser_set_select(w, focus);
+	  
+	  private_data->parent_wlist->widget_focused = private_data->item_tree[WBSTART + focus];
+	  
+	  if(private_data->parent_wlist->widget_focused->notify_focus && private_data->parent_wlist->widget_focused->enable == WIDGET_ENABLE) {
+	    
+	    (void) (private_data->parent_wlist->widget_focused->notify_focus) (private_data->parent_wlist, private_data->parent_wlist->widget_focused, FOCUS_RECEIVED);
+	    
+	    private_data->parent_wlist->widget_focused->have_focus = FOCUS_RECEIVED;
+	    
+	  }
+	  
+	  if(private_data->parent_wlist->widget_focused->paint)
+	    (private_data->parent_wlist->widget_focused->paint) (private_data->parent_wlist->widget_focused, private_data->parent_wlist->win, private_data->parent_wlist->gc);
+	  
+	  return;
+	}
+
+	if(((start + 1) == mark) && end) {
+	  mark = end;
+	  start = end = -1;
+	}
+      }
+
+      private_data->jumped = -1;
+    }
+  }
+}
+
 /**
  * Create the list browser
  */
@@ -579,6 +676,7 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
   private_data->bWidget              = mywidget;
   private_data->imlibdata            = br->imlibdata;
   private_data->skin_element_name    = (skin_element_name == NULL) ? NULL : strdup(br->browser.skin_element_name);
+  private_data->jumped               = -1;
   private_data->content              = br->browser.entries;
   private_data->list_length          = br->browser.num_entries;
   private_data->max_length           = br->browser.max_displayed_entries;

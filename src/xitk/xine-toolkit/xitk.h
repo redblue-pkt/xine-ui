@@ -1031,7 +1031,13 @@ int xitk_browser_get_current_start(xitk_widget_t *w);
  */
 void xitk_browser_set_alignment(xitk_widget_t *w, int align);
 
+/*
+ * Jump to entry in list which match with the alphanum char key.
+ */
+void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier);
+
 xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w);
+
 /*
  * Filebrowser
  */

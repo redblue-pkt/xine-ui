@@ -41,6 +41,8 @@ typedef struct {
 
   xitk_skin_config_t     *skonfig;
 
+  int                     jumped;
+
   char                  **content;
   int                     max_length;
   int                     list_length;
@@ -110,4 +112,5 @@ void xitk_browser_set_alignment(xitk_widget_t *w, int align);
 
 xitk_widget_t *xitk_browser_get_browser(xitk_widget_list_t *wl, xitk_widget_t *w);
 
+void xitk_browser_warp_jump(xitk_widget_t *w, char *key, int modifier);
 #endif
