@@ -1322,14 +1322,14 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 			       100,
 			       CONFIG_NO_DESC,
 			       CONFIG_NO_HELP,
-			       CONFIG_LEVEL_BEG,
+			       CONFIG_LEVEL_DEB,
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA);
   y = xine_config_register_num(gGui->xine, "gui.mmk_editor_y",
 			       100,
 			       CONFIG_NO_DESC,
 			       CONFIG_NO_HELP,
-			       CONFIG_LEVEL_BEG,
+			       CONFIG_LEVEL_DEB,
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA);
   

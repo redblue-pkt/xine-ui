@@ -78,6 +78,19 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
+static char *exp_levels[6] = {
+  "Beginner",
+  "Advanced",
+  "Expert",
+  "Master of the known universe",
+#ifdef DEBUG
+  "Debugger",
+#else  
+  NULL,
+#endif
+  NULL
+};
+
 static void auto_vo_visibility_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->auto_vo_visibility = cfg->num_value;
 }
@@ -141,6 +154,13 @@ static void osd_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
 static void newbie_mode_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->newbie_mode = cfg->num_value;
 }
+
+static void exp_level_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->experience_level = (cfg->num_value * 10);
+}
+
+
+
 
 int actions_on_start(action_id_t actions[], action_id_t a) {
   int i = 0, num = 0;
@@ -910,7 +930,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				 0,
 				 _("synchronized X protocol (debug)"), 
 				 CONFIG_NO_HELP,
-				 CONFIG_LEVEL_EXP,
+				 CONFIG_LEVEL_ADV,
 				 CONFIG_NO_CB,
 				 CONFIG_NO_DATA)) {
 
@@ -922,7 +942,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     xine_config_register_bool (gGui->xine, "gui.layer_above", 1,
 			       _("Windows stacking"),
 			       _("Use wm layer property to place window on top."), 
-			       CONFIG_LEVEL_EXP,
+			       CONFIG_LEVEL_ADV,
 			       layer_above_cb,
 			       CONFIG_NO_DATA);
 
@@ -930,7 +950,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     xine_config_register_bool (gGui->xine, "gui.always_layer_above", 0,
 			       _("Windows stacking (more)"),
 			       _("Use WM layer property to place windows on top."), 
-			       CONFIG_LEVEL_EXP,
+			       CONFIG_LEVEL_ADV,
 			       always_layer_above_cb,
 			       CONFIG_NO_DATA);
 
@@ -942,7 +962,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 					 (char *) (xine_get_homedir()),
 					 _("Snapshot location"),
 					 _("Where snapshots will be saved."),
-					 CONFIG_LEVEL_EXP,
+					 CONFIG_LEVEL_BEG,
 					 snapshot_loc_cb,
 					 CONFIG_NO_DATA);
   
@@ -950,7 +970,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     xine_config_register_num (gGui->xine, "gui.screensaver_timeout", 10,
 			      _("Screensaver wakeup"),
 			      _("Time between two screensaver fake events, 0 to disable."),
-			      CONFIG_LEVEL_EXP,
+			      CONFIG_LEVEL_ADV,
 			      ssaver_timeout_cb,
 			      CONFIG_NO_DATA);
   
@@ -958,7 +978,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     xine_config_register_bool (gGui->xine, "gui.skip_by_chapter", 1,
 			       _("Chapter hopping"),
 			       _("Play next|previous chapter instead of mrl (dvdnav)"), 
-			       CONFIG_LEVEL_EXP,
+			       CONFIG_LEVEL_ADV,
 			       skip_by_chapter_cb, 
 			       CONFIG_NO_DATA);
   
@@ -966,7 +986,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     xine_config_register_bool (gGui->xine, "gui.auto_video_output_visibility", 0,
 			       _("Visibility behavior of output window"),
 			       _("Hide video output window if there is no video in the stream"), 
-			       CONFIG_LEVEL_EXP,
+			       CONFIG_LEVEL_ADV,
 			       auto_vo_visibility_cb, 
 			       CONFIG_NO_DATA);
 
@@ -974,7 +994,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     xine_config_register_bool (gGui->xine, "gui.auto_panel_visibility", 0,
 			       _("Visiblility behavior of panel"),
 			       _("Automatically show/hide panel window, according to auto_video_output_visibility"), 
-			       CONFIG_LEVEL_EXP,
+			       CONFIG_LEVEL_ADV,
 			       auto_panel_visibility_cb,
 			       CONFIG_NO_DATA); 
  
@@ -983,7 +1003,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      1,
 			      _("Event sender behavior"),
 			      _("Event sender window stick to main panel"), 
-			      CONFIG_LEVEL_EXP,
+			      CONFIG_LEVEL_ADV,
 			      event_sender_sticky_cb,
 			      CONFIG_NO_DATA);
 
@@ -993,7 +1013,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      _("Visual animation"),
 			      _("Display some video animations when "
 				"current stream is audio only (eg: mp3)."), 
-			      CONFIG_LEVEL_EXP,
+			      CONFIG_LEVEL_BEG,
 			      visual_anim_cb,
 			      CONFIG_NO_DATA);
 
@@ -1003,7 +1023,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      _("Stream information"),
 			      _("Update stream information (in stream info window) "
 				"each half seconds."), 
-			      CONFIG_LEVEL_EXP,
+			      CONFIG_LEVEL_ADV,
 			      stream_info_auto_update_cb,
 			      CONFIG_NO_DATA);
   
@@ -1013,7 +1033,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 					 SKIN_SERVER_URL,
 					 _("Skin Server Url"),
 					 _("From where we can get skins."),
-					 CONFIG_LEVEL_EXP,
+					 CONFIG_LEVEL_ADV,
 					 skin_server_url_cb,
 					 CONFIG_NO_DATA);
   
@@ -1026,7 +1046,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      _("Enable OSD support"),
 			      _("Enabling OSD permit to display some status/informations "
 				"in output window."), 
-			      CONFIG_LEVEL_EXP,
+			      CONFIG_LEVEL_BEG,
 			      osd_enabled_cb,
 			      CONFIG_NO_DATA);
 
@@ -1035,18 +1055,29 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      3,
 			      _("Dismiss OSD time (s)"),
 			      _("Persistence time of OSD visual, in seconds."),
-			      CONFIG_LEVEL_EXP,
+			      CONFIG_LEVEL_BEG,
 			      osd_timeout_cb,
 			      CONFIG_NO_DATA);
 
   gGui->newbie_mode = 
-    xine_config_register_bool (gGui->xine, "gui.newbie_mode", 
-			       1,
-			       _("change xine's behavior for unexperienced user"), 
-			       _("In this mode, xine take some decisions to simplify user's life."),
-			       CONFIG_LEVEL_EXP,
-			       newbie_mode_cb,
-			       CONFIG_NO_DATA);
+    xine_config_register_bool(gGui->xine, "gui.newbie_mode", 
+			      1,
+			      _("change xine's behavior for unexperienced user"), 
+			      _("In this mode, xine take some decisions to simplify user's life."),
+			      CONFIG_LEVEL_BEG,
+			      newbie_mode_cb,
+			      CONFIG_NO_DATA);
+
+  gGui->experience_level =
+    xine_config_register_enum(gGui->xine, "gui.experience_level", 
+			      0, exp_levels,
+			      _("configuration experience level"),
+			      _("Level of user's experience, this will show more or less "
+				"configuration options."), 
+			      CONFIG_LEVEL_BEG,
+			      exp_level_cb, 
+			      CONFIG_NO_DATA);
+
 
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;

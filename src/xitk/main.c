@@ -408,7 +408,7 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
   default_driver = xine_config_register_string (gGui->xine, "video.driver", "auto",
 						_("video driver to use"),
 						CONFIG_NO_HELP, 
-						CONFIG_LEVEL_EXP,
+						CONFIG_LEVEL_ADV,
 						CONFIG_NO_CB, 
 						CONFIG_NO_DATA);
   if (!video_driver_id) {
@@ -502,7 +502,7 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
   default_driver = xine_config_register_string (gGui->xine, "audio.driver", "auto",
 						_("audio driver to use"),
 						CONFIG_NO_HELP, 
-						CONFIG_LEVEL_EXP,
+						CONFIG_LEVEL_ADV,
 						CONFIG_NO_CB, 
 						CONFIG_NO_DATA);
 

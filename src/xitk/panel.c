@@ -822,14 +822,14 @@ void panel_init (void) {
 						200,
 						CONFIG_NO_DESC,
 						CONFIG_NO_HELP,
-						CONFIG_LEVEL_BEG,
+						CONFIG_LEVEL_DEB,
 						CONFIG_NO_CB,
 						CONFIG_NO_DATA);
   panel->y = hint.y = xine_config_register_num (gGui->xine, "gui.panel_y",
 						100,
 						CONFIG_NO_DESC,
 						CONFIG_NO_HELP,
-						CONFIG_LEVEL_BEG,
+						CONFIG_LEVEL_DEB,
 						CONFIG_NO_CB,
 						CONFIG_NO_DATA);
 
@@ -1172,14 +1172,14 @@ void panel_init (void) {
 						 1,
 						 _("gui tips visibility"), 
 						 CONFIG_NO_HELP,
-						 CONFIG_LEVEL_EXP,
+						 CONFIG_LEVEL_ADV,
 						 panel_enable_tips_cb,
 						 CONFIG_NO_DATA);
   panel->tips.timeout = xine_config_register_num(gGui->xine, "gui.tips_timeout", 
 						 500,
 						 _("tips timeout (ms)"), 
 						 CONFIG_NO_HELP,
-						 CONFIG_LEVEL_EXP,
+						 CONFIG_LEVEL_ADV,
 						 panel_timeout_tips_cb, 
 						 CONFIG_NO_DATA);
 
@@ -1194,7 +1194,7 @@ void panel_init (void) {
 					      1,
 					      _("gui panel visibility"),
 					      CONFIG_NO_HELP,
-					      CONFIG_LEVEL_BEG,
+					      CONFIG_LEVEL_DEB,
 					      CONFIG_NO_CB,
 					      CONFIG_NO_DATA);
   

@@ -246,14 +246,14 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
 								200,
 								"gui mrl browser x coordinate",
 								CONFIG_NO_HELP,
-								CONFIG_LEVEL_BEG,
+								CONFIG_LEVEL_DEB,
 								CONFIG_NO_CB,
 								CONFIG_NO_DATA);
   mb.y                              = xine_config_register_num (gGui->xine, "gui.mrl_browser_y",
 								100,
 								"gui mrl browser y coordinate",
 								CONFIG_NO_HELP,
-								CONFIG_LEVEL_BEG,
+								CONFIG_LEVEL_DEB,
 								CONFIG_NO_CB,
 								CONFIG_NO_DATA);
 

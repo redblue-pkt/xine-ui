@@ -406,14 +406,14 @@ void event_sender_panel(void) {
 					 100,
 					 CONFIG_NO_DESC,
 					 CONFIG_NO_HELP,
-					 CONFIG_LEVEL_BEG,
+					 CONFIG_LEVEL_DEB,
 					 CONFIG_NO_CB,
 					 CONFIG_NO_DATA);
   eventer->y = xine_config_register_num (gGui->xine, "gui.eventer_y",
 					 100,
 					 CONFIG_NO_DESC,
 					 CONFIG_NO_HELP,
-					 CONFIG_LEVEL_BEG,
+					 CONFIG_LEVEL_DEB,
 					 CONFIG_NO_CB,
 					 CONFIG_NO_DATA);
   

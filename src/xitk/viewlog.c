@@ -395,14 +395,14 @@ void viewlog_window(void) {
 				100, 
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
-				CONFIG_LEVEL_EXP,
+				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   y = xine_config_register_num (gGui->xine, "gui.viewlog_y", 
 				100,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
-				CONFIG_LEVEL_EXP,
+				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
 

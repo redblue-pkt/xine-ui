@@ -76,6 +76,8 @@
 #define CONFIG_LEVEL_BEG        0 /* => beginner */
 #define CONFIG_LEVEL_ADV        10 /* advanced user */
 #define CONFIG_LEVEL_EXP        20 /* expert */
+#define CONFIG_LEVEL_MAS        40 /* motku */
+#define CONFIG_LEVEL_DEB        50 /* debugger (only available in debug mode) */
 
 #define CONFIG_NO_DESC          NULL
 #define CONFIG_NO_HELP          NULL
@@ -156,6 +158,7 @@ typedef struct {
 
   /* xine lib/gui configuration filename */
   char                     *configfile;
+  int                       experience_level;
 
   const char               *logo_mrl;
   int                       logo_mode;

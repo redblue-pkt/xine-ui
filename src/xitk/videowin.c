@@ -1375,7 +1375,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 			      0,
 			      _("New stream sizes resize output window"),
 			      CONFIG_NO_HELP,
-			      CONFIG_LEVEL_BEG,
+			      CONFIG_LEVEL_ADV,
 			      _video_window_resize_cb,
 			      CONFIG_NO_DATA);
   
@@ -1385,7 +1385,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 			      0,
 			      _("Double size for small streams (require stream_resize_window)"),
 			      CONFIG_NO_HELP,
-			      CONFIG_LEVEL_BEG,
+			      CONFIG_LEVEL_ADV,
 			      _video_window_zoom_small_cb,
 			      CONFIG_NO_DATA);
   
@@ -1409,7 +1409,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 			       0,
 			       _("use XVidModeExtension when switching to fullscreen"),
 			       CONFIG_NO_HELP,
-			       CONFIG_LEVEL_BEG,
+			       CONFIG_LEVEL_EXP,
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA)) {
     /* 

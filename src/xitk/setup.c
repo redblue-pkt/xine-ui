@@ -758,8 +758,9 @@ static void setup_section_widgets(int s) {
     
     while (cfg_err_result) {
       
-      if (!strncmp (entry->key, section, len) && entry->description) {
-
+      if((entry->exp_level <= gGui->experience_level) &&
+	 ((!strncmp(entry->key, section, len)) && entry->description)) {
+	
 	labelkey = &entry->key[len+1];
 	
 	switch (entry->type) {
@@ -1065,14 +1066,14 @@ void setup_panel(void) {
 				100, 
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
-				CONFIG_LEVEL_EXP,
+				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   y = xine_config_register_num (gGui->xine, "gui.setup_y", 
 				100,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
-				CONFIG_LEVEL_EXP,
+				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
 

@@ -454,14 +454,14 @@ void stream_infos_panel(void) {
 				100,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
-				CONFIG_LEVEL_BEG,
+				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   y = xine_config_register_num (gGui->xine, "gui.sinfos_y",
 				100,
 				CONFIG_NO_DESC,
 				CONFIG_NO_HELP,
-				CONFIG_LEVEL_BEG,
+				CONFIG_LEVEL_DEB,
 				CONFIG_NO_CB,
 				CONFIG_NO_DATA);
   
