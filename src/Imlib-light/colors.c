@@ -1,10 +1,13 @@
 #define _GNU_SOURCE
-#include <config.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "Imlib.h"
 #include "Imlib_private.h"
 
 #ifdef __EMX__
-extern const char *__XOS2RedirRoot(const char *);
+extern const char *__XOS2RedirRoot(const char*);
 #endif
 
 static int PaletteLUTGet(ImlibData *id);
@@ -82,7 +85,7 @@ PaletteLUTSet(ImlibData *id)
   Atom                to_set;
   unsigned char       *prop;
   int                 i, j;
-
+  
   to_set = XInternAtom(id->x.disp, "_IMLIB_COLORMAP", False);
   prop = malloc((id->num_colors * 4) + 1 + (32 * 32 * 32));
   prop[0] = id->num_colors;
@@ -159,7 +162,7 @@ int
 Imlib_load_colors(ImlibData * id, char *file)
 {
   FILE               *f;
-  char                s[256];
+  char                s[1024];
   int                 i;
   int                 pal[768];
   int                 r, g, b;
@@ -168,18 +171,19 @@ Imlib_load_colors(ImlibData * id, char *file)
 #ifndef __EMX__
   f = fopen(file, "r");
 #else
-  if (*file == '/')
-  f = fopen(__XOS2RedirRoot(file), "rt");
- else
-  f = fopen(file, "rt");
+  if (*file =='/')
+    f = fopen(__XOS2RedirRoot(file), "rt");
+  else
+    f = fopen(file, "rt");
 #endif
+
   if (!f)
     {
       fprintf(stderr, "ImLib ERROR: Cannot find palette file %s\n", file);
       return 0;
     }
   i = 0;
-  while (fgets(s, 256, f))
+  while (fgets(s, sizeof(s), f))
     {
       if (s[0] == '0')
 	{
@@ -204,14 +208,6 @@ Imlib_load_colors(ImlibData * id, char *file)
 	break;
     }
   fclose(f);
-#ifdef DEBUG
-  /*
-   * WARNING: you cannot single step into the
-   * XGrabServer()...XUngrabServer() part of the code in a debugger,
-   * if your debugger/xterm/ide uses the same X11 display as the
-   * debugged client.
-   */
-#endif
   XGrabServer(id->x.disp);
   _PaletteAlloc(id, (i / 3), pal);
   if (!PaletteLUTGet(id))
@@ -236,14 +232,6 @@ Imlib_load_colors(ImlibData * id, char *file)
       PaletteLUTSet(id);
     }
   XUngrabServer(id->x.disp);
-#ifdef DEBUG
-  /*
-   * Add an XSync() here to flush the XUngrabServer() op to the X11 server,
-   * so that we can continue debugging after the "return", or use a "next"
-   * to step over this subroutine.
-   */
-  XSync(id->x.disp, 0);
-#endif
   return 1;
 }
 

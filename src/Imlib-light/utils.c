@@ -9,6 +9,11 @@
 #include "Imlib.h"
 #include "Imlib_private.h"
 
+#ifdef __EMX__
+#include <io.h>
+#include <process.h>
+#endif
+
 #ifndef HAVE_SNPRINTF
 #define snprintf my_snprintf
 #ifdef HAVE_STDARGS

@@ -11,7 +11,11 @@
  *      Split the ID - damages input
  */
 static char *_SplitID(char *file) {
+#ifndef __EMX__
   char *p = strrchr(file, ':');
+#else
+  char *p = strrchr(file, ';');
+#endif
   
   if (p == NULL)
     return "";

@@ -1,5 +1,8 @@
 #define _GNU_SOURCE
-#include <config.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "Imlib.h"
 #include "Imlib_private.h"
 
@@ -6236,25 +6239,25 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   Pixmap              pmap, mask;
   int                 shared_pixmap, shared_image, ok;
 
-   if (!pd)
-      pd = id->x.disp;
-   if (tgc)
-     {
-	if (id->x.disp != pd)
-	  {
-	     XFreeGC(pd, tgc);
-	     tgc = 0;
-	  }
-     }
-   if (stgc)
-     {
-	if (id->x.disp != pd)
-	  {
-	     XFreeGC(pd, stgc);
-	     stgc = 0;
-	  }
-     }
-   pd = id->x.disp;
+  if (!pd)
+    pd = id->x.disp;
+  if (tgc)
+    {
+      if (id->x.disp != pd)
+	{
+	  XFreeGC(pd, tgc);
+	  tgc = 0;
+	}
+    }
+  if (stgc)
+    {
+      if (id->x.disp != pd)
+	{
+	  XFreeGC(pd, stgc);
+	  stgc = 0;
+	}
+    }
+  pd = id->x.disp;
   
   sxim = NULL;
   xim = NULL;
@@ -6423,8 +6426,13 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
   shared_image = 0;
   if ((id->x.shmp) && (id->x.shm) && (!huge))
     {
+#if defined(__alpha__)
+      shared_pixmap = 0;
+      shared_image = 1;
+#else
       shared_pixmap = 1;
       shared_image = 0;
+#endif
     }
   else if ((id->x.shm) && (!huge))
     {
@@ -6439,6 +6447,238 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 
 /* init images and pixmaps */
   ok = 1;
+#ifdef HAVE_SHM
+  if (shared_pixmap)
+    {
+      xim = XShmCreateImage(id->x.disp, id->x.visual, id->x.depth, ZPixmap, NULL, &id->x.last_shminfo, w, h);
+      if (!xim)
+	{
+	  fprintf(stderr, "IMLIB ERROR: Mit-SHM can't create XImage for Shared Pixmap Wrapper\n");
+	  fprintf(stderr, "             Falling back on Shared XImages\n");
+	  shared_pixmap = 0;
+	  shared_image = 1;
+	  ok = 0;
+	}
+      if (ok)
+	{
+	  id->x.last_shminfo.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
+	  if (id->x.last_shminfo.shmid == -1)
+	    {
+	      fprintf(stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared Pixmap Wrapper\n");
+	      fprintf(stderr, "             Falling back on Shared XImages\n");
+	      XDestroyImage(xim);
+	      shared_pixmap = 0;
+	      shared_image = 1;
+	      ok = 0;
+	    }
+	  if (ok)
+	    {
+	      id->x.last_shminfo.shmaddr = xim->data = shmat(id->x.last_shminfo.shmid, 0, 0);
+	      if (xim->data == (char *)-1)
+		{
+		  fprintf(stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared Pixmap Wrapper\n");
+		  fprintf(stderr, "             Falling back on Shared XImages\n");
+		  XDestroyImage(xim);
+		  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+		  shared_pixmap = 0;
+		  shared_image = 1;
+		  ok = 0;
+		}
+	      if (ok)
+		{
+		  id->x.last_shminfo.readOnly = False;
+		  XShmAttach(id->x.disp, &id->x.last_shminfo);
+		  tmp = (unsigned char *)xim->data;
+		  id->x.last_xim = xim;
+		  pmap = XShmCreatePixmap(id->x.disp, id->x.base_window,
+					  id->x.last_shminfo.shmaddr,
+				      &id->x.last_shminfo, w, h, id->x.depth);
+		  if (!tgc)
+		    tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
+		  if ((im->shape_color.r >= 0) && (im->shape_color.g >= 0) && (im->shape_color.b >= 0))
+		    {
+		      sxim = XShmCreateImage(id->x.disp, id->x.visual, 1, ZPixmap, NULL, &id->x.last_sshminfo, w, h);
+		      if (!sxim)
+			{
+			  fprintf(stderr, "IMLIB ERROR: Mit-SHM can't create XImage for Shared Pixmap mask Wrapper\n");
+			  fprintf(stderr, "             Falling back on Shared XImages\n");
+			  XShmDetach(id->x.disp, &id->x.last_shminfo);
+			  XDestroyImage(xim);
+			  shmdt(id->x.last_shminfo.shmaddr);
+			  shared_pixmap = 0;
+			  shared_image = 1;
+			  ok = 0;
+			}
+		      if (ok)
+			{
+			  id->x.last_sshminfo.shmid = shmget(IPC_PRIVATE, sxim->bytes_per_line * sxim->height, IPC_CREAT | 0777);
+			  if (id->x.last_sshminfo.shmid == -1)
+			    {
+			      fprintf(stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared Pixmap mask Wrapper\n");
+			      fprintf(stderr, "             Falling back on Shared XImages\n");
+			      XShmDetach(id->x.disp, &id->x.last_shminfo);
+			      XDestroyImage(xim);
+			      shmdt(xim->data);
+			      /* missing shmctl(RMID) */
+			      XDestroyImage(sxim);
+			      shared_pixmap = 0;
+			      shared_image = 1;
+			      ok = 0;
+			    }
+			  if (ok)
+			    {
+			      id->x.last_sshminfo.shmaddr = sxim->data = shmat(id->x.last_sshminfo.shmid, 0, 0);
+			      if (sxim->data == (char *)-1)
+				{
+				  fprintf(stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared Pixmap mask Wrapper\n");
+				  fprintf(stderr, "             Falling back on Shared XImages\n");
+				  XShmDetach(id->x.disp, &id->x.last_shminfo);
+				  XDestroyImage(xim);
+				  shmdt(xim->data);
+				  /* missing shmctl(RMID) */
+				  XDestroyImage(sxim);
+				  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+				  shared_pixmap = 0;
+				  shared_image = 1;
+				  ok = 0;
+				}
+			      if (ok)
+				{
+				  id->x.last_sshminfo.readOnly = False;
+				  XShmAttach(id->x.disp, &id->x.last_sshminfo);
+				  stmp = (unsigned char *)sxim->data;
+				  id->x.last_sxim = sxim;
+				  mask = XShmCreatePixmap(id->x.disp, id->x.base_window,
+						  id->x.last_sshminfo.shmaddr,
+					       &id->x.last_sshminfo, w, h, 1);
+				  if (!stgc)
+				    stgc = XCreateGC(id->x.disp, mask, GCGraphicsExposures, &gcv);
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+  ok = 1;
+  if (shared_image)
+    {
+      xim = XShmCreateImage(id->x.disp, id->x.visual, id->x.depth, ZPixmap, NULL, &id->x.last_shminfo, w, h);
+      if (!xim)
+	{
+	  fprintf(stderr, "IMLIB ERROR: Mit-SHM can't create Shared XImage\n");
+	  fprintf(stderr, "             Falling back on XImages\n");
+	  shared_pixmap = 0;
+	  shared_image = 0;
+	  ok = 0;
+	}
+      if (ok)
+	{
+	  id->x.last_shminfo.shmid = shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height, IPC_CREAT | 0777);
+	  if (id->x.last_shminfo.shmid == -1)
+	    {
+	      fprintf(stderr, "IMLIB ERROR: SHM can't get SHM Identifier for Shared XImage\n");
+	      fprintf(stderr, "             Falling back on XImages\n");
+	      XDestroyImage(xim);
+	      shared_pixmap = 0;
+	      shared_image = 0;
+	      ok = 0;
+	    }
+	  if (ok)
+	    {
+	      id->x.last_shminfo.shmaddr = xim->data = shmat(id->x.last_shminfo.shmid, 0, 0);
+
+	      if (xim->data == (char *)-1)
+		{
+		  fprintf(stderr, "IMLIB ERROR: SHM can't attach SHM Segment for Shared XImage\n");
+		  fprintf(stderr, "             Falling back on XImages\n");
+		  XDestroyImage(xim);
+		  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+		  shared_pixmap = 0;
+		  shared_image = 0;
+		  ok = 0;
+		}
+	      if (ok)
+		{
+		  id->x.last_shminfo.readOnly = False;
+		  XShmAttach(id->x.disp, &id->x.last_shminfo);
+		  tmp = (unsigned char *)xim->data;
+		  id->x.last_xim = xim;
+		  pmap = XCreatePixmap(id->x.disp, id->x.base_window, w, h, id->x.depth);
+		  if (!tgc)
+		    tgc = XCreateGC(id->x.disp, pmap, GCGraphicsExposures, &gcv);
+		  im->pixmap = pmap;
+		  if ((im->shape_color.r >= 0) && (im->shape_color.g >= 0) && (im->shape_color.b >= 0))
+		    {
+		      sxim = XShmCreateImage(id->x.disp, id->x.visual, 1, ZPixmap, NULL, &id->x.last_sshminfo, w, h);
+		      if (!sxim)
+			{
+			  fprintf(stderr, "IMLIB ERROR: Mit-SHM can't create Shared XImage mask\n");
+			  fprintf(stderr, "             Falling back on XImages\n");
+			  XShmDetach(id->x.disp, &id->x.last_shminfo);
+			  XDestroyImage(xim);
+			  shmdt(id->x.last_shminfo.shmaddr);
+			  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+			  shared_pixmap = 0;
+			  shared_image = 0;
+			  ok = 0;
+			}
+		      if (ok)
+			{
+			  id->x.last_sshminfo.shmid = shmget(IPC_PRIVATE, sxim->bytes_per_line * sxim->height, IPC_CREAT | 0777);
+			  if (id->x.last_sshminfo.shmid == -1)
+			    {
+			      fprintf(stderr, "Imlib ERROR: SHM can't get SHM Identifier for Shared XImage mask\n");
+			      fprintf(stderr, "             Falling back on XImages\n");
+			      XShmDetach(id->x.disp, &id->x.last_shminfo);
+			      XDestroyImage(xim);
+			      shmdt(xim->data);
+			      /* missing shmctl(RMID) */
+			      XDestroyImage(sxim);
+			      shared_pixmap = 0;
+			      shared_image = 0;
+			      ok = 0;
+			    }
+			  if (ok)
+			    {
+			      id->x.last_sshminfo.shmaddr = sxim->data = shmat(id->x.last_sshminfo.shmid, 0, 0);
+			      if (sxim->data == (char *)-1)
+				{
+				  fprintf(stderr, "Imlib ERROR: SHM can't attach SHM Segment for Shared XImage mask\n");
+				  fprintf(stderr, "             Falling back on XImages\n");
+				  XShmDetach(id->x.disp, &id->x.last_shminfo);
+				  XDestroyImage(xim);
+				  shmdt(xim->data);
+				  /* missing shmctl(RMID) */
+				  XDestroyImage(sxim);
+				  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+				  shared_pixmap = 0;
+				  shared_image = 0;
+				  ok = 0;
+				}
+
+			      if (ok)
+				{
+				  id->x.last_sshminfo.readOnly = False;
+				  XShmAttach(id->x.disp, &id->x.last_sshminfo);
+				  stmp = (unsigned char *)sxim->data;
+				  id->x.last_sxim = sxim;
+				  mask = XCreatePixmap(id->x.disp, id->x.base_window, w, h, 1);
+				  if (!stgc)
+				    stgc = XCreateGC(id->x.disp, mask, GCGraphicsExposures, &gcv);
+				  im->shape_mask = mask;
+				}
+			    }
+			}
+		    }
+		}
+	    }
+	}
+    }
+  ok = 1;
+  if ((!shared_pixmap) && (!shared_image))
+#endif /* HAVE_SHM */
     {
       tmp = (unsigned char *)malloc(w * h * bpp);
       if (!tmp)
@@ -6461,7 +6701,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	}
       if (xim->bits_per_pixel != bpp)
 	xim->data = realloc(xim->data, xim->bytes_per_line * xim->height);
-       pmap = XCreatePixmap(id->x.disp, id->x.base_window, w, h, id->x.depth);
+      pmap = XCreatePixmap(id->x.disp, id->x.base_window, w, h, id->x.depth);
       if (!pmap)
 	{
 	  fprintf(stderr, "IMLIB ERROR: Cannot create pixmap\n");
@@ -6497,11 +6737,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	      XDestroyImage(xim);
 	      return 0;
 	    }
-	   mask = XCreatePixmap(id->x.disp, id->x.base_window, w, h, 1);
-	   /*
-	   fprintf(stderr, "created ph2 mask pixmap %x (%i x %i)\n",
-		   (int) mask, w, h);
-	   */
+	  mask = XCreatePixmap(id->x.disp, id->x.base_window, w, h, 1);
 	  if (!mask)
 	    {
 	      fprintf(stderr, "IMLIB ERROR: Cannot create shape pixmap\n");
@@ -6520,7 +6756,7 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 /* copy XImage to the pixmap, if not a shared pixmap */
   if ((im->shape_color.r >= 0) && (im->shape_color.g >= 0) && (im->shape_color.b >= 0))
     {
-     if ((im->mod.gamma == 256) && (im->mod.brightness == 256) && (im->mod.contrast == 256) &&
+      if ((im->mod.gamma == 256) && (im->mod.brightness == 256) && (im->mod.contrast == 256) &&
 	  (im->rmod.gamma == 256) && (im->rmod.brightness == 256) && (im->rmod.contrast == 256) &&
 	  (im->gmod.gamma == 256) && (im->gmod.brightness == 256) && (im->gmod.contrast == 256) &&
 	  (im->bmod.gamma == 256) && (im->bmod.brightness == 256) && (im->bmod.contrast == 256))
@@ -6537,6 +6773,57 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	  else
 	    render_shaped_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, id->x.render_depth);
 	}
+#ifdef HAVE_SHM
+      if (shared_image)
+	{
+	  XShmPutImage(id->x.disp, pmap, tgc, xim, 0, 0, 0, 0, w, h, False);
+	  XShmPutImage(id->x.disp, mask, stgc, sxim, 0, 0, 0, 0, w, h, False);
+	  XSync(id->x.disp, False);
+	  XShmDetach(id->x.disp, &id->x.last_shminfo);
+	  XDestroyImage(xim);
+	  shmdt(id->x.last_shminfo.shmaddr);
+	  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+	  XShmDetach(id->x.disp, &id->x.last_sshminfo);
+	  XDestroyImage(sxim);
+	  shmdt(id->x.last_sshminfo.shmaddr);
+	  shmctl(id->x.last_sshminfo.shmid, IPC_RMID, 0);
+	  id->x.last_xim = NULL;
+	  id->x.last_sxim = NULL;
+	  xim = NULL;
+	  sxim = NULL;
+/*	  XFreeGC(id->x.disp, tgc);*/
+/*	  XFreeGC(id->x.disp, stgc);*/
+	}
+      else if (shared_pixmap)
+	{
+	  Pixmap              p2, m2;
+
+	  p2 = XCreatePixmap(id->x.disp, id->x.base_window, w, h, id->x.depth);
+	  m2 = XCreatePixmap(id->x.disp, id->x.base_window, w, h, 1);
+	  XCopyArea(id->x.disp, pmap, p2, tgc, 0, 0, w, h, 0, 0);
+	  XCopyArea(id->x.disp, mask, m2, stgc, 0, 0, w, h, 0, 0);
+	  im->pixmap = p2;
+	  im->shape_mask = m2;
+/*	  XFreeGC(id->x.disp, tgc);*/
+/*	  XFreeGC(id->x.disp, stgc);*/
+	  XFreePixmap(id->x.disp, pmap);
+	  XFreePixmap(id->x.disp, mask);
+	  XSync(id->x.disp, False);
+	  XShmDetach(id->x.disp, &id->x.last_shminfo);
+	  XDestroyImage(xim);
+	  shmdt(id->x.last_shminfo.shmaddr);
+	  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+	  XShmDetach(id->x.disp, &id->x.last_sshminfo);
+	  XDestroyImage(sxim);
+	  shmdt(id->x.last_sshminfo.shmaddr);
+	  shmctl(id->x.last_sshminfo.shmid, IPC_RMID, 0);
+	  id->x.last_xim = NULL;
+	  id->x.last_sxim = NULL;
+	  xim = NULL;
+	  sxim = NULL;
+	}
+      else
+#endif /* HAVE_SHM */
 	{
 	  XPutImage(id->x.disp, pmap, tgc, xim, 0, 0, 0, 0, w, h);
 	  XPutImage(id->x.disp, mask, stgc, sxim, 0, 0, 0, 0, w, h);
@@ -6567,6 +6854,40 @@ Imlib_render(ImlibData * id, ImlibImage * im, int w, int h)
 	  else
 	    render_mod(id, im, w, h, xim, sxim, er1, er2, xarray, yarray, id->x.render_depth);
 	}
+#ifdef HAVE_SHM
+      if (shared_image)
+	{
+	  XShmPutImage(id->x.disp, pmap, tgc, xim, 0, 0, 0, 0, w, h, False);
+	  XSync(id->x.disp, False);
+	  XShmDetach(id->x.disp, &id->x.last_shminfo);
+	  XDestroyImage(xim);
+	  shmdt(id->x.last_shminfo.shmaddr);
+	  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+	  id->x.last_xim = NULL;
+	  xim = NULL;
+	  sxim = NULL;
+/*	  XFreeGC(id->x.disp, tgc);*/
+	}
+      else if (shared_pixmap)
+	{
+	  Pixmap              p2;
+
+	  p2 = XCreatePixmap(id->x.disp, id->x.base_window, w, h, id->x.depth);
+	  XCopyArea(id->x.disp, pmap, p2, tgc, 0, 0, w, h, 0, 0);
+	  im->pixmap = p2;
+/*	  XFreeGC(id->x.disp, tgc);*/
+	  XFreePixmap(id->x.disp, pmap);
+	  XSync(id->x.disp, False);
+	  XShmDetach(id->x.disp, &id->x.last_shminfo);
+	  XDestroyImage(xim);
+	  shmdt(id->x.last_shminfo.shmaddr);
+	  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+	  id->x.last_xim = NULL;
+	  xim = NULL;
+	  sxim = NULL;
+	}
+      else
+#endif /* HAVE_SHM */
 	{
 	  XPutImage(id->x.disp, pmap, tgc, xim, 0, 0, 0, 0, w, h);
 	  XDestroyImage(xim);
