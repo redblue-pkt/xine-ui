@@ -570,13 +570,9 @@ static void video_window_adapt_size (void) {
     gVw->output_width    = hint.width;
     gVw->output_height   = hint.height;
 
-    if(is_layer_above())
-      xitk_set_layer_above(gGui->video_window);
-
     /*
      * wm, no borders please
      */
-
     prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
     mwmhints.flags = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = 0;
@@ -673,13 +669,9 @@ static void video_window_adapt_size (void) {
     gVw->output_width    = hint.width;
     gVw->output_height   = hint.height;
     
-    if(is_layer_above())
-      xitk_set_layer_above(gGui->video_window);
-
     /*
      * wm, no borders please
      */
-    
     prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
     mwmhints.flags = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = 0;
@@ -760,15 +752,14 @@ static void video_window_adapt_size (void) {
 	
 	XUnlockDisplay (gGui->display);
 	
-	return;
-	
+	return;	
       }
     }
 
-    gVw->fullscreen_mode = 0;
-    gVw->visual   = gGui->visual;
-    gVw->depth    = gGui->depth;
-    gVw->colormap = gGui->colormap;
+    gVw->fullscreen_mode   = 0;
+    gVw->visual            = gGui->visual;
+    gVw->depth             = gGui->depth;
+    gVw->colormap          = gGui->colormap;
 
     attr.background_pixel  = gGui->black.pixel;
     attr.border_pixel      = gGui->black.pixel;
@@ -795,7 +786,8 @@ static void video_window_adapt_size (void) {
 	XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint_borderless);
     }
     else {
-      if (gVw->xclasshint != NULL)
+
+      if(gVw->xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint);
     }
 
@@ -805,9 +797,6 @@ static void video_window_adapt_size (void) {
     XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
 
     XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
-
-    if(gGui->always_layer_above)
-      xitk_set_layer_above(gGui->video_window);
 
     if(gVw->borderless) {
       prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
@@ -840,23 +829,25 @@ static void video_window_adapt_size (void) {
   }
   else {
     /* Map window. */
-    
+
+    if(gGui->always_layer_above || (gVw->fullscreen_mode && is_layer_above()))
+      xitk_set_layer_above(gGui->video_window);
+        
     XRaiseWindow(gGui->display, gGui->video_window);
     XMapWindow(gGui->display, gGui->video_window);
     
     /* Wait for map. */
-    
     do  {
       XMaskEvent(gGui->display, 
 		 StructureNotifyMask, 
 		 &xev) ;
-      
     } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
+    
   }
-
+  
   XSync(gGui->display, False);
 
-  if (gVw->gc != None) 
+  if(gVw->gc != None) 
     XFreeGC(gGui->display, gVw->gc);
 
   gVw->gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
@@ -884,7 +875,6 @@ static void video_window_adapt_size (void) {
     XSetTransientForHint(gGui->display, gGui->panel_window,
 			 gGui->video_window);
   }
-  /* FIXME: update TransientForHint on control panel and mrl browser... */
 
   /* The old window should be destroyed now */
   if(old_video_window != None) {
@@ -915,7 +905,7 @@ static void video_window_adapt_size (void) {
 			  0, 0, &gVw->xwin, &gVw->ywin, &tmp_win);
     XUnlockDisplay (gGui->display);
   }
-  
+
 }
 
 static float get_default_mag(int video_width, int video_height) {
@@ -1114,21 +1104,23 @@ void video_window_set_visibility(int show_window) {
   
   gVw->show = show_window;
 
-  if (gVw->show == 1) {
+  XLockDisplay(gGui->display);
+  
+  if(gVw->show == 1) {
     
-    if((is_layer_above()) && (gVw->hide_on_start == 0))
+    if((gGui->always_layer_above || (gVw->fullscreen_mode && is_layer_above())) && 
+       (gVw->hide_on_start == 0)) {
       xitk_set_layer_above(gGui->video_window);
+    }
     
-    XLockDisplay (gGui->display);
     XRaiseWindow(gGui->display, gGui->video_window);
     XMapWindow(gGui->display, gGui->video_window);
-    XUnlockDisplay (gGui->display);
+    
   }
-  else {
-    XLockDisplay (gGui->display);
+  else
     XUnmapWindow (gGui->display, gGui->video_window);
-    XUnlockDisplay (gGui->display);
-  }
+  
+  XUnlockDisplay (gGui->display);
   
   /* User used '-H', now he want to show video window */
   if(gVw->hide_on_start == -1)
