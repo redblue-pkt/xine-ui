@@ -1,5 +1,6 @@
 xine-ui (0.9.19) unstable; urgency=low
 
+  * construct better filenames for snapshots.
   * need xine-lib beta5 (don't forward/get completion X event),
   * support reference streams (useful with Qt trailers and many wrong urls),
   * add menu widget (right click in video window),
