@@ -826,6 +826,50 @@ int mediamark_all_played(void) {
 
   return 1;
 }
+
+int mediamark_get_shuffle_next(void) {
+  int  next = 0;
+  
+  if(gGui->playlist.num >= 3) {
+    int    remain = gGui->playlist.num;
+    int    entries[remain];
+    float  num = (float) gGui->playlist.num;
+    int    found = 0;
+    
+    memset(&entries, 0, sizeof(int) * remain);
+
+    srandom((unsigned int)time(NULL));
+    entries[gGui->playlist.cur] = 1;
+
+    do {
+      next = (int) (num * random() / RAND_MAX);
+
+      if(next != gGui->playlist.cur) {
+
+	if(gGui->playlist.mmk[next]->played == 0)
+	  found = 1;
+	else if(entries[next] == 0) {
+	  entries[next] = 1;
+	  remain--;
+	}
+
+	if((!found) && (!remain))
+	  found = 2; /* No more choice */
+
+      }
+
+    } while(!found);
+
+    if(found == 2)
+      next = gGui->playlist.cur;
+
+  }
+  else if(gGui->playlist.num)
+    next = !gGui->playlist.cur;
+  
+  return next;
+}
+
 void mediamark_replace_entry(mediamark_t **mmk, 
 			     const char *mrl, const char *ident, int start, int end) {
   SAFE_FREE((*mmk)->mrl);

@@ -45,8 +45,6 @@ extern _panel_t        *panel;
 
 static pthread_t        seek_thread;
 
-
-
 /*
  *
  */
@@ -177,6 +175,11 @@ int gui_xine_open_and_play(char *mrl, int start_pos, int start_time) {
     return 0;
   }
 
+  if(!strcmp(mrl, gGui->mmk.mrl)) {
+    printf("*** same URL as mmk.mrl, played = 1\n");
+    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
+  }
+
   return 1;
 }
 
@@ -257,10 +260,9 @@ void gui_play (xitk_widget_t *w, void *data) {
       return;
     }
     
-    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
     if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
       gui_display_logo();
-
+    
   } 
   else
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -741,7 +743,6 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  
 	  gGui->ignore_next = 1;
 	  gGui->playlist.cur = newcur;
-	  gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	  if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
 	    gui_display_logo();
@@ -781,7 +782,6 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  gGui->playlist.cur -= value;
 	  
 	  if((gGui->playlist.cur < gGui->playlist.num)) {
-	    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
 	      gui_display_logo();
@@ -802,7 +802,6 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  gGui->playlist.cur -= value;
 	  
 	  if((gGui->playlist.cur < gGui->playlist.num)) {
-	    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	    if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
 	      gui_display_logo();
@@ -815,7 +814,6 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 	  int newcur = (gGui->playlist.cur - value) + gGui->playlist.num;
 	  
 	  gGui->playlist.cur = newcur;
-	  gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	  if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
 	    gui_display_logo();

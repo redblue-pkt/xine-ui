@@ -43,6 +43,7 @@ void mediamark_replace_entry(mediamark_t **mmk, const char *mrl, const char *ide
 void mediamark_free_entry(int offset);
 void mediamark_reset_played_state(void);
 int mediamark_all_played(void);
+int mediamark_get_shuffle_next(void);
 int mediamark_get_entry_from_id(const char *ident);
 
 const mediamark_t *mediamark_get_current_mmk();
