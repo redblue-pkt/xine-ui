@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.9.15\n"
 "POT-Creation-Date: 2003-01-02 22:41+0100\n"
-"PO-Revision-Date: 2002-12-10 21:54+0100\n"
+"PO-Revision-Date: 2003-01-03 18:27+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -51,37 +51,35 @@ msgstr "Cargando flujo(s)"
 
 #: src/xitk/control.c:231
 msgid "hue value"
-msgstr ""
+msgstr "valor de transparencia"
 
 #: src/xitk/control.c:232
 msgid "Hue value."
-msgstr ""
+msgstr "Valor de transparencia."
 
 #: src/xitk/control.c:242
 msgid "brightness value"
-msgstr ""
+msgstr "valor de brillo"
 
 #: src/xitk/control.c:243
 msgid "Brightness value."
-msgstr ""
+msgstr "Valor de brillo."
 
 #: src/xitk/control.c:253
 msgid "saturation value"
-msgstr ""
+msgstr "valor de saturación"
 
 #: src/xitk/control.c:254
 msgid "Saturation value."
-msgstr ""
+msgstr "Valor de saturación."
 
 #: src/xitk/control.c:264
-#, fuzzy
 msgid "contrast value"
-msgstr "Control del valor de TRANSPARENCIA"
+msgstr "valor de contraste"
 
 #: src/xitk/control.c:265
-#, fuzzy
 msgid "Contrast value."
-msgstr "Control del valor de TRANSPARENCIA"
+msgstr "Valor de contraste."
 
 #: src/xitk/control.c:416 src/xitk/panel.c:147 src/xitk/playlist.c:841
 #, c-format
@@ -325,9 +323,8 @@ msgid "Event sender window stick to main panel"
 msgstr "La ventana del emisor de eventos se pega al panel principal"
 
 #: src/xitk/event.c:1022
-#, fuzzy
 msgid "Visual animation style"
-msgstr "Animación visual"
+msgstr "Estilo de animación visual"
 
 #: src/xitk/event.c:1023
 msgid ""
@@ -375,21 +372,25 @@ msgstr "Tiempo de persistencia de la visualización de OSD, en segundos."
 
 #: src/xitk/event.c:1074
 msgid "change xine's behavior for unexperienced user"
-msgstr ""
+msgstr "cambiar el comportamiento de xine para un usuario sin experiencia"
 
 #: src/xitk/event.c:1075
 msgid "In this mode, xine take some decisions to simplify user's life."
 msgstr ""
+"En este modo, xine toma algunas decisiones que simplifican la vida del "
+"usuario."
 
 #: src/xitk/event.c:1083
 msgid "configuration experience level"
-msgstr ""
+msgstr "nivel de experiencia en la configuración"
 
 #: src/xitk/event.c:1084
 msgid ""
 "Level of user's experience, this will show more or less configuration "
 "options."
 msgstr ""
+"Nivel de experiencia del usuario. Esto le mostrará más o menos opciones de "
+"configuración."
 
 #. Some infos
 #: src/xitk/event.c:1098
@@ -677,14 +678,14 @@ msgid "Grab"
 msgstr "Capturar"
 
 #: src/xitk/main.c:347
-#, fuzzy, c-format
+#, c-format
 msgid "Bad geometry '%s'\n"
-msgstr "Geometría incorrecta \"%s\", vea xine --help\n"
+msgstr "Geometría incorrecta «%s»\n"
 
 #: src/xitk/main.c:355
 #, c-format
 msgid "Bad visual '%s'\n"
-msgstr ""
+msgstr "Visual incorrecto «%s»\n"
 
 #: src/xitk/main.c:429
 #, c-format
@@ -748,9 +749,8 @@ msgid "                    'f': in fullscreen mode.\n"
 msgstr "                    'f': en modo de pantalla completa.\n"
 
 #: src/xitk/main.c:505
-#, fuzzy
 msgid "                    'F': in xinerama fullscreen mode.\n"
-msgstr "                    'f': en modo de pantalla completa.\n"
+msgstr "                    'F': modo a pantalla completa de xinerama.\n"
 
 #: src/xitk/main.c:507
 msgid "                    'h': hide GUI (panel, etc.).\n"
@@ -791,11 +791,12 @@ msgid "  -f, --fullscreen             start in fullscreen mode,\n"
 msgstr "  -f, --fullscreen             empezar en modo de pantalla completa,\n"
 
 #: src/xitk/main.c:515
-#, fuzzy
 msgid ""
 "  -F, --xineramafull           start in xinerama fullscreen (display on "
 "several screens),\n"
-msgstr "  -f, --fullscreen             empezar en modo de pantalla completa,\n"
+msgstr ""
+"  -F, --xineramafull           comenzar en pantalla completa de xinerama "
+"(varias pantallas),\n"
 
 #: src/xitk/main.c:517
 msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
@@ -923,13 +924,12 @@ msgstr ""
 "no reproducida de la lista\n"
 
 #: src/xitk/main.c:541
-#, fuzzy
 msgid ""
 "                                 'shuffle+': same as 'shuffle', but "
 "indefinetely replay the playlist.\n"
 msgstr ""
-"                                 'shuffle': selecciona una entrada aleatoria "
-"no reproducida de la lista\n"
+"                                 'shuffle+': como «shuffle», pero repite "
+"indefinidamente la lista.\n"
 
 #: src/xitk/main.c:542
 msgid "      --skin-server-url <url>  Define the skin server url.\n"
@@ -975,6 +975,8 @@ msgstr "manejador de vídeo a utilizar"
 #: src/xitk/main.c:591 src/xitk/main.c:696
 msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
+"Seleccione el dispositivo de vídeo. AVISO: debe reiniciar xine para usar el "
+"dispositivo nuevo"
 
 #: src/xitk/main.c:630
 #, c-format
@@ -997,6 +999,8 @@ msgstr "manejador de autio a usar"
 #: src/xitk/main.c:707
 msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
 msgstr ""
+"Seleccione el dispositivo de audio. AVISO: debe reiniciar xine para usar el "
+"dispositivo nuevo"
 
 #: src/xitk/main.c:721 src/xitk/main.c:759
 msgid "main: not using any audio driver (as requested).\n"
@@ -1052,15 +1056,15 @@ msgstr "argumento %d no válido => fin\n"
 
 #: src/xitk/main.c:1337
 msgid "Post audio plugin"
-msgstr ""
+msgstr "Plugin de audio post"
 
 #: src/xitk/main.c:1338
 msgid "Post audio plugin to used with video less stream playback"
-msgstr ""
+msgstr "Plugin de audio post para usar con reproducción de flujos sin vídeo"
 
 #: src/xitk/main.c:1386 src/xitk/main.c:1387
 msgid "Post video plugin"
-msgstr ""
+msgstr "Plugin de vídeo post"
 
 #: src/xitk/main.c:1410
 msgid "Logo mrl"
@@ -1144,18 +1148,17 @@ msgid "Source:"
 msgstr "Fuente:"
 
 #: src/xitk/osd.c:276
-#, fuzzy
 msgid "Audio: "
-msgstr "Audio"
+msgstr "Audio: "
 
 #: src/xitk/osd.c:316
 #, c-format
 msgid "%d:%.2d:%.2d (%.0f%%) of %d:%.2d:%.2d"
-msgstr ""
+msgstr "%d:%.2d:%.2d (%.0f%%) of %d:%.2d:%.2d"
 
 #: src/xitk/osd.c:325
 msgid "Position in Stream"
-msgstr ""
+msgstr "Posición en el flujo"
 
 #: src/xitk/panel.c:43
 msgid "Play previous chapter or mrl"
@@ -1360,6 +1363,8 @@ msgstr "No está disponible la ayuda"
 msgid ""
 "There is no configuration option available in this user experience level."
 msgstr ""
+"No hay disponible una opción de configuración en este nivel de "
+"experiencia de usuario."
 
 #: src/xitk/setup.c:1028
 msgid "Help"
@@ -1657,27 +1662,31 @@ msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
 msgstr ""
+"Pantallas que utilizar en orden para un modo xinearama a múltiples pantallas "
+"completas. (ejemplo 0 2 3)"
 
 #: src/xitk/videowin.c:1211
 msgid ""
 "Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
 msgstr ""
+"Por ejemplo, si quiere que la pantalla se expanda a las pantallas 0, 2 y 3, "
+"introduzca 0 2 3"
 
 #: src/xitk/videowin.c:1259
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
+msgstr "coordenada x para pantalla completa de xinerama (-8192 = autodetectar)"
 
 #: src/xitk/videowin.c:1269
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
+msgstr "coordenada y para pantalla completa de xinerama (-8192 = autodetectar)"
 
 #: src/xitk/videowin.c:1279
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
+msgstr "ancho para la pantalla completa de xinerama (-8192 = autodetectar)"
 
 #: src/xitk/videowin.c:1289
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
-msgstr ""
+msgstr "alto para la pantalla completa de xinerama (-8192 = autodetectar)"
 
 #: src/xitk/videowin.c:1322
 msgid "Xine Video Window"
