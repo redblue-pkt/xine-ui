@@ -116,7 +116,7 @@ void show_usage (void) {
   char  *driver_id;
 
   printf("\n");
-  printf("Usage: %s [OPTIONS]... [MRL]\n", PACKAGE);
+  printf("Usage: xine [OPTIONS]... [MRL]\n");
   printf("\n");
   printf("OPTIONS are:\n");
   printf("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n");
@@ -440,16 +440,7 @@ int main(int argc, char *argv[]) {
    * load and init output drivers
    */
 
-  if (!audio_driver_id) {
-    char **driver_ids = xine_list_audio_output_plugins ();
-    audio_driver_id = driver_ids[0];
-
-    printf ("main: auto-selected <%s> audio output plugin\n", audio_driver_id);
-
-  }
-
-  audio_driver = xine_load_audio_output_plugin(cfg, audio_driver_id);
-
+  
   if (!video_driver_id) {
     char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
     video_driver_id = driver_ids[0];
@@ -461,6 +452,25 @@ int main(int argc, char *argv[]) {
   video_driver = xine_load_video_output_plugin(cfg, video_driver_id,
 					       VISUAL_TYPE_X11, 
 					       (void *) gDisplay);
+
+  if (!video_driver) {
+    printf ("main: video driver <%s> failed\n", video_driver_id);
+    exit (1);
+  }
+
+  if (!audio_driver_id) {
+    char **driver_ids = xine_list_audio_output_plugins ();
+    audio_driver_id = driver_ids[0];
+
+    printf ("main: auto-selected <%s> audio output plugin\n", audio_driver_id);
+
+  }
+
+  audio_driver = xine_load_audio_output_plugin(cfg, audio_driver_id);
+
+  if (!audio_driver) {
+    printf ("main: audio driver <%s> failed\n", audio_driver_id);
+  }
 
   /*
    * xine init
