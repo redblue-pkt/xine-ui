@@ -772,7 +772,11 @@ void panel_init (void) {
   b.userdata          = (void *)GUI_PREV;
   xitk_list_append_content(panel->widget_list->l, 
    (panel->playback_widgets.prev = xitk_button_create(panel->widget_list, gGui->skin_config, &b)));
-  xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous entry from playlist"));
+
+  if (gGui->skip_by_chapter)
+    xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous chapter or mrl")); 
+  else
+    xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous entry from playlist"));
 
   /*  Stop button */
   b.skin_element_name = "Stop";
@@ -804,7 +808,11 @@ void panel_init (void) {
   b.userdata          = (void *)GUI_NEXT;
   xitk_list_append_content(panel->widget_list->l, 
    (panel->playback_widgets.next = xitk_button_create(panel->widget_list, gGui->skin_config, &b)));
-  xitk_set_widget_tips(panel->playback_widgets.next, _("Play next entry from playlist")); 
+
+  if (gGui->skip_by_chapter)
+    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next chapter or mrl")); 
+  else
+    xitk_set_widget_tips(panel->playback_widgets.next, _("Play next entry from playlist")); 
 
   /*  Eject button */
   b.skin_element_name = "Eject";

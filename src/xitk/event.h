@@ -116,6 +116,8 @@ typedef struct {
   
   int                  ssaver_timeout;
 
+  int                  skip_by_chapter;
+
   kbinding_t          *kbindings;
 
 } gGui_t;

@@ -50,6 +50,7 @@
 #include "viewlog.h"
 #include "errors.h"
 #include "i18n.h"
+#include "kbindings.h"
 
 #include "xitk.h"
 
@@ -456,23 +457,42 @@ void gui_dndcallback (char *filename) {
 }
 
 void gui_nextprev(xitk_widget_t *w, void *data) {
-
-  if(((int)data) == GUI_NEXT) {
-    gGui->ignore_status = 0;
-    gui_status_callback (XINE_STOP);
-  }
-  else if(((int)data) == GUI_PREV) {
-    gGui->ignore_status = 1;
-    gGui->playlist_cur--;
-    if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
-      gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
-	gui_handle_xine_error();
-
-    } else {
-      gGui->playlist_cur = 0;
+  int by_chapter;
+  
+  by_chapter = (gGui->skip_by_chapter &&
+		((xine_get_input_plugin_capabilities(gGui->xine)) & INPUT_CAP_CHAPTERS)) ? 1 : 0;
+  
+  if(((int)data) == GUI_NEXT)
+    
+    if(by_chapter)
+      gui_execute_action_id(ACTID_EVENT_NEXT);
+    else {
+      gGui->ignore_status = 0;
+      gui_status_callback (XINE_STOP);
     }
-    gGui->ignore_status = 0;
+  
+  else if(((int)data) == GUI_PREV) {
+    
+    if(by_chapter)
+      gui_execute_action_id(ACTID_EVENT_PRIOR);
+    else {
+
+      gGui->ignore_status = 1;
+      gGui->playlist_cur--;
+
+      if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
+        gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+
+        if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
+	  gui_handle_xine_error();
+	
+      }
+      else {
+        gGui->playlist_cur = 0;
+      }
+      
+      gGui->ignore_status = 0;
+    }
   }
 
   panel_check_pause();

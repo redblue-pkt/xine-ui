@@ -748,6 +748,11 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				_("time between two screensaver fake events, 0 to disable"),
 				NULL, ssaver_timeout_cb, NULL);
   
+  gGui->skip_by_chapter = 
+    gGui->config->register_bool (gGui->config, "gui.skip_by_chapter", 1,
+				 _("play next|previous chapter instead of mrl (dvdnav)"), 
+				 NULL, NULL, NULL);
+  
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);

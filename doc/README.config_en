@@ -300,6 +300,14 @@ gui.zoom_small_stream       automatically double window size when playing small
 
 gui.warn_unhandled_codec    Display popup window on unhandled codecs
                             { never, video only, audio only, always }
+
+gui.skip_by_chapter         If set and plugin supports it (currently only
+                            dvdnav), play next|previous button will skip
+                            by chapter.
+
+                            A value of 0 will revert to the original xine
+                            behavior of always skipping to the next|previous
+                            mrl.
                             
                             
 *** NOTE: following values shouldn't be changed by user:
