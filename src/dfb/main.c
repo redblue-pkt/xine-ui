@@ -48,7 +48,8 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#define FONT "/usr/local/share/directfb-examples/fonts/decker.ttf"
+#define FONT FONTDIR "/cetus.ttf"
+#define POINTER FONTDIR "/pointer2.png"
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
@@ -87,6 +88,7 @@ typedef struct {
   IDirectFBSurface *bg_surface;
   IDirectFBWindow  *main_window;
   IDirectFBSurface *main_surface;
+  IDirectFBSurface *pointer;
 
   IDirectFBFont    *font;
   int               fontheight;
@@ -413,10 +415,23 @@ int main(int argc, char *argv[]) {
  dfbxine.layer->EnableCursor ( dfbxine.layer, 1 );
 
   {
+   DFBSurfaceDescription dsc;
+   IDirectFBImageProvider *provider;
+
+   DFBCHECK(dfbxine.dfb->CreateImageProvider(dfbxine.dfb, POINTER,
+					     &provider));
+   DFBCHECK (provider->GetSurfaceDescription (provider, &dsc));
+   DFBCHECK(dfbxine.dfb->CreateSurface(dfbxine.dfb, &dsc, &(dfbxine.pointer)));
+   DFBCHECK(provider->RenderTo(provider, dfbxine.pointer));
+   provider->Release(provider);
+  }
+ dfbxine.layer->SetCursorShape(dfbxine.layer, dfbxine.pointer, 1,1);
+
+  {
    DFBFontDescription desc;
    
    desc.flags = DFDESC_HEIGHT;
-   desc.height = dfbxine.layer_config.width/50;
+   desc.height = 20;
    
    DFBCHECK(dfbxine.dfb->CreateFont( dfbxine.dfb, FONT, &desc, 
 				     &(dfbxine.font) ));
@@ -436,12 +451,21 @@ int main(int argc, char *argv[]) {
 
  DFBCHECK(dfbxine.primary->GetSize(dfbxine.primary, &(dfbxine.screen_width),
 				   &(dfbxine.screen_height)));
+ DFBCHECK(dfbxine.primary->SetColor(dfbxine.primary, 0x5F, 0x5F, 0x5C, 0xFF));
+ DFBCHECK(dfbxine.primary->FillRectangle(dfbxine.primary, 0,0, 
+					 dfbxine.screen_width,
+					 dfbxine.screen_height));
  DFBCHECK(dfbxine.primary->SetFont(dfbxine.primary, dfbxine.font));
  DFBCHECK(dfbxine.primary->SetColor(dfbxine.primary, 0xCF, 0xCF, 0xFF, 0xFF));
- DFBCHECK(dfbxine.primary->DrawString(dfbxine.primary,
-				      "This is the DirectFB output mode "
-				      "for Xine",
-				      -1,0,0, DSTF_LEFT | DSTF_TOP));
+
+  {int i;
+   for(i=5; i<dfbxine.screen_height-30; i+=25) {
+     DFBCHECK(dfbxine.primary->DrawString(dfbxine.primary,
+					  "This is the DirectFB output mode "
+					  "for Xine (EXPERIMENTAL)",
+					  -1,5,i, DSTF_LEFT | DSTF_TOP));
+   }
+  }
  DFBCHECK(dfbxine.layer->SetBackgroundImage(dfbxine.layer,dfbxine.primary));
  DFBCHECK(dfbxine.layer->SetBackgroundMode(dfbxine.layer, DLBM_IMAGE));
 	  
@@ -453,14 +477,14 @@ int main(int argc, char *argv[]) {
 
    desc.posx = 20;
    desc.posy = 120;
-   desc.width = 768/2;
-   desc.height = 576/2;
+   desc.width = (768*2)/3;
+   desc.height = (576*2)/3;
 
    DFBCHECK( dfbxine.layer->CreateWindow( dfbxine.layer, &desc, 
 					  &(dfbxine.main_window) ) );
    dfbxine.main_window->GetSurface( dfbxine.main_window, 
 				    &(dfbxine.main_surface) );
-   dfbxine.main_window->SetOpacity(dfbxine.main_window, 0xff);
+   dfbxine.main_window->SetOpacity(dfbxine.main_window, 0x9f);
 
    dfbxine.main_surface->SetColor( dfbxine.main_surface,
 			      0x00, 0x30, 0x10, 0xc0 );
@@ -621,6 +645,8 @@ failure:
    DFBCHECK(dfbxine.main_window->Release(dfbxine.main_window));
   if(dfbxine.primary)
    DFBCHECK(dfbxine.primary->Release(dfbxine.primary));
+  if(dfbxine.pointer)
+   DFBCHECK(dfbxine.pointer->Release(dfbxine.pointer));
   if(dfbxine.layer)
    DFBCHECK(dfbxine.layer->Release(dfbxine.layer));
   if(dfbxine.dfb) 
