@@ -138,11 +138,15 @@ dnl
 if test x"$PNG_PREFIX" != "x"; then
    PNG_LIB="-L$PNG_PREFIX/lib"
    PNG_CFLAGS="-I$PNG_PREFIX/include"
+   old_CPPFLAGS="$CPPFLAGS"
+   CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
 fi
 
 AC_CHECK_LIB(png, png_read_info,
   AC_CHECK_HEADER(png.h, png_ok=yes, png_ok=no),
   AC_MSG_ERROR(*** libpng is needed (PNG library not found) ***), $PNG_LIB $PNG_CFLAGS -lz -lm $X_LIBS)
+
+CPPFLAGS="$old_CPPFLAGS"
 
 if test x"$png_ok" = xyes; then
      saved_CFLAGS="$CFLAGS"

@@ -16,7 +16,7 @@ xine_SOURCES = $(GETOPT_C) utils.c monitor.c xscreensaver-remote.c \
 	videowin.c panel.c lirc.c actions.c
 xine_DEPENDENTIES = utils.h monitor.h 
 xine_LDADD = @XINE_LIBS@  $(LIRC_LIBS) -lm $(THREAD_LIBS) \
-	$(DYNAMIC_LD_LIBS) xine-toolkit/libxitk.la
+	$(DYNAMIC_LD_LIBS) $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
 
 noinst_HEADERS = event.h parseskin.h playlist.h control.h \
 	panel.h lirc.h actions.h videowin.h
