@@ -12,6 +12,10 @@ a52_level               0..~200% : a/52 volume control
 
 a52_pass_through        1/0 : enable a/52 output via spdif port
 
+a52_surround_downmix    Enable audio downmixing to 2.0 surround stereo.
+                        (0) off [default]
+			(1) on
+
 alsa_default_device	Device name used for mono.
 			(e.g. default)
 
