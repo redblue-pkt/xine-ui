@@ -39,7 +39,7 @@
 
 #include "common.h"
 
-#define TEST_VO_VALUE(val)  (65535 - val)
+#define TEST_VO_VALUE(val)  (val < 65535/3 || val > 65535*2/3) ? (65535 - val) : 0
 
 extern gGui_t          *gGui;
 
