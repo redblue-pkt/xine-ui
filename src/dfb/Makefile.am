@@ -19,8 +19,8 @@ data_DATA = cetus.ttf pointer1.png pointer2.png
 endif
 
 CFLAGS ='-DFONTDIR="$(XINE_SKINDIR)/../fonts/"'
-dfbxine_SOURCES = $(GETOPT_C) utils.c main.c
-dfbxine_DEPENDENTIES = utils.h 
+dfbxine_SOURCES = $(GETOPT_C) utils.c options.c dfb.c main.c
+dfbxine_DEPENDENTIES = utils.h dfb.h
 dfbxine_LDADD = @XINE_LIBS@ $(DIRECTFB_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 $(GETOPT_C):
