@@ -157,6 +157,9 @@ int main(int argc, char *argv[])
 		case -1:
 			goto exit_option;
 	}
+	
+	fbxine.running = 1;
+	
 	if(!init_video())
 		goto err_video;
 	if(!init_audio())
@@ -169,7 +172,6 @@ int main(int argc, char *argv[])
 	init_lirc();
 #endif
 
-	fbxine.running = 1;
 	wait_for_key();
 
 	exit_code = 0;
