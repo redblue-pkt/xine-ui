@@ -643,6 +643,10 @@ void video_window_frame_output_cb (void *data,
 
   *win_x = (gVw->xwin < 0) ? 0 : gVw->xwin;
   *win_y = (gVw->ywin < 0) ? 0 : gVw->ywin;
+
+  /* Compute mag all the time */
+  gVw->mag = (((float) gVw->output_width / (float) gVw->video_width ) + 
+	      ((float) gVw->output_height / (float) gVw->video_height )) * .5;
 }
 
 /*
@@ -891,13 +895,10 @@ void video_window_init (void) {
 
   XUnlockDisplay (gGui->display);
 
-  gVw->win_width    = 768;
-  gVw->win_height   = 480;
   gVw->video_width  = 768;
   gVw->video_height = 480;
-  gVw->mag          = 1.0;
-
-  video_window_adapt_size ();
+  
+  video_window_set_mag(1.0);
 }
 
 
@@ -964,10 +965,11 @@ static int video_window_translate_point(int gui_x, int gui_y,
 }
 
 void video_window_set_mag(float mag) {
-
-  gVw->win_width  = (float) gVw->video_width * mag;
-  gVw->win_height = (float) gVw->video_height * mag;
-
+  
+  gVw->mag = mag;
+  gVw->win_width  = (int) ((float) gVw->video_width) * gVw->mag;
+  gVw->win_height = (int) ((float) gVw->video_height) * gVw->mag;
+  
   video_window_adapt_size ();
 }
 
