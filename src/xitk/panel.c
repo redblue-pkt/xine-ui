@@ -441,19 +441,17 @@ void panel_reset_slider (void) {
  * Update audio/spu channel displayed informations.
  */
 void panel_update_channel_display (void) {
+  const char* lang;
 
-  xine_get_audio_lang (gGui->xine,
-                       xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL),
-                       panel->audiochan);
-  xitk_label_change_label (panel->widget_list, panel->audiochan_label, 
-			   panel->audiochan);
+  if((lang =
+      xine_get_audio_lang(gGui->xine,
+			  (xine_get_param(gGui->xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)))) != NULL)
+    xitk_label_change_label(panel->widget_list, panel->audiochan_label, lang);
   
-  xine_get_spu_lang (gGui->xine,
-                     xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL),
-                     panel->spuid);
-  
-  xitk_label_change_label (panel->widget_list, panel->spuid_label, 
-			   panel->spuid);
+  if((lang = 
+      xine_get_spu_lang(gGui->xine,
+			(xine_get_param(gGui->xine, XINE_PARAM_SPU_CHANNEL)))) != NULL)
+    xitk_label_change_label (panel->widget_list, panel->spuid_label, lang);
 }
 
 /*
@@ -922,14 +920,14 @@ void panel_init (void) {
 
   /*  Audio channel label */
   lbl.skin_element_name = "AudioLabel";
-  lbl.label             = panel->audiochan;
+  lbl.label             = NULL;
   lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 	   (panel->audiochan_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));
 
   /*  Spuid label */
   lbl.skin_element_name = "SpuLabel";
-  lbl.label             = panel->spuid;
+  lbl.label             = NULL;
   lbl.callback          = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 	   (panel->spuid_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));

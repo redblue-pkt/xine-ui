@@ -85,7 +85,7 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
 		   0, 0, image->width, image->height);                                          \
     XUnlockDisplay(gGui->display);                                                              \
                                                                                                 \
-    draw_inner_frame(gGui->imlib_data, image->image, title, boldfontname,                       \
+    draw_inner_frame(gGui->imlib_data, image->image, (char *)title, boldfontname,               \
                      0, (ascent+descent), FRAME_WIDTH, FRAME_HEIGHT);                           \
 	                                                                                        \
     XITK_WIDGET_INIT(&im, gGui->imlib_data);                                                    \
@@ -451,7 +451,7 @@ static void setup_handle_event(XEvent *event, void *data) {
 /*
  *
  */
-static xitk_widget_t *setup_add_label (int x, int y, int w, char *str) {
+static xitk_widget_t *setup_add_label (int x, int y, int w, const char *str) {
   xitk_label_widget_t   lb;
   xitk_widget_t        *label;
   xitk_font_t          *fs;
@@ -467,7 +467,7 @@ static xitk_widget_t *setup_add_label (int x, int y, int w, char *str) {
   lb.window              = xitk_window_get_window(setup->xwin);
   lb.gc                  = setup->widget_list->gc;
   lb.skin_element_name   = NULL;
-  lb.label               = str;
+  lb.label               = (char *)str;
   lb.callback            = NULL;
 
   xitk_list_append_content(setup->widget_list->l, 
@@ -487,7 +487,7 @@ static void numtype_update(xitk_widget_t *w, void *data, int value) {
   xine_cfg_entry_t *entry;
   
   entry = (xine_cfg_entry_t *)data;
-  config_update_num(entry->key, value);
+  config_update_num((char*)entry->key, value);
 }
 
 /*
@@ -498,7 +498,7 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   
   entry = (xine_cfg_entry_t *)data;
 
-  config_update_string(entry->key, str);
+  config_update_string((char *)entry->key, str);
   check_entry = xine_config_lookup_entry(gGui->xine, entry->key);
   
   if(check_entry) {
@@ -510,7 +510,7 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
 /*
  *
  */
-static widget_triplet_t *setup_add_slider (char *title, char *labelkey, 
+static widget_triplet_t *setup_add_slider (const char *title, const char *labelkey, 
 					   int x, int y, xine_cfg_entry_t *entry ) {
   xitk_slider_widget_t     sl;
   xitk_widget_t           *slider;
@@ -549,7 +549,7 @@ static widget_triplet_t *setup_add_slider (char *title, char *labelkey,
 /*
  *
  */
-static widget_triplet_t *setup_add_inputnum(char *title, char *labelkey, 
+static widget_triplet_t *setup_add_inputnum(const char *title, const char *labelkey, 
 					    int x, int y, xine_cfg_entry_t *entry) {
   xitk_intbox_widget_t      ib;
   xitk_widget_t            *intbox, *wi, *wbu, *wbd;
@@ -590,7 +590,7 @@ static widget_triplet_t *setup_add_inputnum(char *title, char *labelkey,
 /*
  *
  */
-static widget_triplet_t *setup_add_inputtext(char *title, char *labelkey, 
+static widget_triplet_t *setup_add_inputtext(const char *title, const char *labelkey, 
 					     int x, int y, xine_cfg_entry_t *entry) {
   xitk_inputtext_widget_t   inp;
   xitk_widget_t            *input;
@@ -626,7 +626,7 @@ static widget_triplet_t *setup_add_inputtext(char *title, char *labelkey,
 /*
  *
  */
-static widget_triplet_t *setup_add_checkbox (char *title, char *labelkey, 
+static widget_triplet_t *setup_add_checkbox (const char *title, const char *labelkey, 
 					     int x, int y, xine_cfg_entry_t *entry) {
   xitk_checkbox_widget_t    cb;
   xitk_widget_t            *checkbox;
@@ -662,7 +662,7 @@ static widget_triplet_t *setup_add_checkbox (char *title, char *labelkey,
 /*
  *
  */
-static widget_triplet_t *setup_add_combo (char *title, char *labelkey, 
+static widget_triplet_t *setup_add_combo (const char *title, const char *labelkey, 
 					  int x, int y, xine_cfg_entry_t *entry ) {
   xitk_combo_widget_t       cmb;
   xitk_widget_t            *combo, *lw, *bw;
@@ -753,7 +753,7 @@ static void setup_section_widgets(int s) {
   xine_cfg_entry_t    *entry;
   int                  len;
   char                *section;
-  char                *labelkey;
+  const char          *labelkey;
   int                  slidmax = 1;
 
   xitk_disable_widget(setup->slider_wg);

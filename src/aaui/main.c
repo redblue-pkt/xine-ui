@@ -117,7 +117,7 @@ static void config_update(xine_cfg_entry_t *entry,
 
   case XINE_CONFIG_TYPE_STRING: 
     {
-      char *newv = strdup(string);
+      char *newv = string;
       char *oldv = entry->str_value;
       
       oldv = entry->str_value;
@@ -221,9 +221,9 @@ static void show_banner(void) {
  * Display full help.
  */
 static void print_usage (void) {
-  char   **driver_ids;
-  char     *driver_id;
-  xine_t   *xine;
+  const char *const *driver_ids;
+  char              *driver_id;
+  xine_t            *xine;
 
   xine = (xine_t *)xine_new();
   
@@ -236,20 +236,20 @@ static void print_usage (void) {
   printf("  -q, --auto-quit              Quit after playing all mrl's.\n");
   printf("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n");
   printf("                               ");
-  driver_ids = (char **)xine_list_video_output_plugins (xine);
-  driver_id  = *driver_ids++;
+  driver_ids = xine_list_video_output_plugins (xine);
+  driver_id  = (char *)*driver_ids++;
   while (driver_id) {
     printf ("%s ", driver_id);
-    driver_id  = *driver_ids++;
+    driver_id  = (char *)*driver_ids++;
   }
   printf ("\n");
   printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
   printf("                               ");
-  driver_ids = (char **)xine_list_audio_output_plugins (xine);
-  driver_id  = *driver_ids++;
+  driver_ids = xine_list_audio_output_plugins (xine);
+  driver_id  = (char *)*driver_ids++;
   while (driver_id) {
     printf ("%s ", driver_id);
-    driver_id  = *driver_ids++;
+    driver_id  = (char *)*driver_ids++;
   }
   printf ("\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
@@ -504,7 +504,7 @@ int main(int argc, char *argv[]) {
   }
     
   if (!vo_driver) {
-    printf ("main: video driver aa failed\n");
+    printf ("main: video driver %s failed\n", video_driver_id);
     goto failure;
   }
 

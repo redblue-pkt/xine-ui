@@ -67,7 +67,7 @@ static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, i
 
   case XINE_CONFIG_TYPE_STRING: 
     {
-      char *newv = strdup(string);
+      char *newv = string;
       char *oldv = entry->str_value;
       
       oldv = entry->str_value;

@@ -58,10 +58,8 @@ typedef struct {
   
   int                   visible;
   char                  runtime[20];
-  char                  audiochan[20];
   xitk_widget_t        *audiochan_label;
   xitk_widget_t        *autoplay_plugins[64];
-  char                  spuid[20];
   xitk_widget_t        *spuid_label;
   ImlibImage           *bg_image;
   xitk_register_key_t   widget_key;
