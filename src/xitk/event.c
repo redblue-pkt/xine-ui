@@ -928,8 +928,11 @@ void gui_playlist_start_next(void) {
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
 				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
-	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+
+	if((gGui->playlist.loop == PLAYLIST_LOOP_NO_LOOP) && 
+	   mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
 	  gui_exit(NULL, NULL);
+
 	gui_display_logo();
       }
     }
@@ -960,11 +963,8 @@ void gui_playlist_start_next(void) {
   case PLAYLIST_LOOP_REPEAT:
     gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
     if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-			       gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
-      if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
-	gui_exit(NULL, NULL);
+			       gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset))
       gui_display_logo();
-    }
     break;
 
   case PLAYLIST_LOOP_SHUFFLE:
@@ -976,11 +976,8 @@ void gui_playlist_start_next(void) {
       
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
-	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
-	  gui_exit(NULL, NULL);
+				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset))
 	gui_display_logo();
-      }
     }
     else {
       mediamark_reset_played_state();
