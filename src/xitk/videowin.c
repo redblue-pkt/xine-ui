@@ -267,7 +267,7 @@ static void video_window_adapt_size (void) {
    * In case a fullscreen request is received or if already in fullscreen, the
    * appropriate modeline will be looked up and used.
    */
-  if(gVw->fullscreen_req || gVw->fullscreen_mode) {
+  if((gVw->fullscreen_req || gVw->fullscreen_mode) && gVw->XF86_modelines_count > 1) {
     int search = 0;
     
     /* skipping first entry because it is the current modeline */
@@ -284,14 +284,11 @@ static void video_window_adapt_size (void) {
        search = 0;
        
     /* just switching to a different modeline if necessary */
-    if(!(gVw->XF86_modelines_count <= 1) && !(search >= gVw->XF86_modelines_count)) {
+    if(!(search >= gVw->XF86_modelines_count)) {
        if(XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[search])) {
-	  XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
-          
-	  gGui->XF86VidMode_fullscreen = 1;
-	  
-	  gVw->fullscreen_width  = gVw->XF86_modelines[search]->hdisplay;
-	  gVw->fullscreen_height = gVw->XF86_modelines[search]->vdisplay;
+	  gGui->XF86VidMode_fullscreen = 1;	  
+	  gVw->fullscreen_width        = gVw->XF86_modelines[search]->hdisplay;
+	  gVw->fullscreen_height       = gVw->XF86_modelines[search]->vdisplay;
 	  
 	  /*
 	   * just in case the mouse pointer is off the visible area, move it
@@ -299,6 +296,8 @@ static void video_window_adapt_size (void) {
 	   */
 	  XWarpPointer(gGui->display, None, gGui->video_window, 0, 0, 0, 0, gVw->fullscreen_width/2, gVw->fullscreen_height/2);
 	  
+	  XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
+          
 	  /*
 	   * if this is true, we are back at the original resolution, so there
 	   * is no need to further worry about anything.
@@ -374,14 +373,16 @@ static void video_window_adapt_size (void) {
 
       if (gVw->fullscreen_mode && gGui->visual == gVw->visual) {
 #ifdef HAVE_XF86VIDMODE
-	/*
-	 * resizing the video window may be necessary if the modeline has
-	 * just been switched
-	 */
-	XResizeWindow (gGui->display, gGui->video_window,
-		       gVw->fullscreen_width, gVw->fullscreen_height);
-	gVw->output_width    = gVw->fullscreen_width;
-	gVw->output_height   = gVw->fullscreen_height;
+	if(gVw->XF86_modelines_count > 1) {
+	   /*
+	    * resizing the video window may be necessary if the modeline has
+	    * just been switched
+	    */
+	   XResizeWindow (gGui->display, gGui->video_window,
+			  gVw->fullscreen_width, gVw->fullscreen_height);
+	   gVw->output_width    = gVw->fullscreen_width;
+	   gVw->output_height   = gVw->fullscreen_height;
+	}
 #endif
 	XUnlockDisplay (gGui->display);
 	
@@ -713,7 +714,6 @@ void video_window_frame_output_cb (void *data,
       
       if(video_width && video_height)
 	video_window_set_mag(1.0);
-
     }
   }
 
@@ -952,10 +952,44 @@ void video_window_init (window_attributes_t *window_attribute) {
     gVw->completion_event = -1;
   }
 
+  XUnlockDisplay (gGui->display);
+
+  gVw->stream_resize_window = gGui->config->register_bool(gGui->config, 
+							  "gui.stream_resize_window", 0,
+							  "New stream sizes resize output window",
+							  NULL, _video_window_resize_cb, NULL);
+     
+  if((window_attribute->width > 0) && (window_attribute->height > 0)) {
+    gVw->video_width  = window_attribute->width;
+    gVw->video_height = window_attribute->height;
+    /* 
+     * Force to keep window size.
+     * I don't update the config file, i think this window geometry
+     * user defined can be temporary.
+     */
+    gVw->stream_resize_window = 0;
+  }
+  else {
+    gVw->video_width  = 768;
+    gVw->video_height = 480;
+    gVw->last_video_width = gVw->last_video_height = 0;
+  }
+
 #ifdef HAVE_XF86VIDMODE
-  if (gGui->config->register_bool (gGui->config, "gui.use_xvidect", 0,
+  XLockDisplay (gGui->display);
+  
+  if(gGui->config->register_bool(gGui->config, "gui.use_xvidext", 0,
 				   "use XVidModeExtension when switching to fullscreen",
 				   NULL, NULL, NULL)) {
+    /* 
+     * without the "stream resizes window" behavior, the XVidMode support
+     * won't work correctly, so we force it for each session the user wants
+     * to have XVideMode on...
+     * 
+     * FIXME: maybe display a warning message or so?!
+     */
+    gVw->stream_resize_window = 1;
+     
     if(XF86VidModeQueryExtension(gGui->display, &dummy_query_event, &dummy_query_error)) {
       XF86VidModeModeInfo* XF86_modelines_swap;
       int                  major, minor, sort_x, sort_y;
@@ -988,36 +1022,17 @@ void video_window_init (window_attributes_t *window_attribute) {
       printf("XF86VidMode Extension: initialization failed, not using it.\n");
     }
   }
-#endif
+   else
+     gVw->XF86_modelines_count = 0;
 
   XUnlockDisplay (gGui->display);
-
-  gVw->stream_resize_window = gGui->config->register_bool(gGui->config, 
-							  "gui.stream_resize_window", 0,
-							  "New stream sizes resize output window",
-							  NULL, _video_window_resize_cb, NULL);
-     
-  if((window_attribute->width > 0) && (window_attribute->height > 0)) {
-    gVw->video_width  = window_attribute->width;
-    gVw->video_height = window_attribute->height;
-    /* 
-     * Force to keep window size.
-     * I don't update the config file, i think this window geometry
-     * user defined can be temporary.
-     */
-    gVw->stream_resize_window = 0;
-  }
-  else {
-    gVw->video_width  = 768;
-    gVw->video_height = 480;
-    gVw->last_video_width = gVw->last_video_height = 0;
-  }
+#endif
 
   video_window_set_mag(1.0);
 
   /*
    * for plugins that aren't really bind to the window, it's necessary that the
-   * gVw->xwin and gVw->ywin variables are set to right values, otherwise the
+   * gVw->xwin and gVw->ywin variables are set to *real* values, otherwise the
    * overlay will be displayed somewhere outside the window
    */
   if(gGui->video_window) {
@@ -1085,7 +1100,7 @@ static int video_window_translate_point(int gui_x, int gui_y,
     scale=width_scale;
     xf=(float)gui_x * scale;
     yf=(float)gui_y * scale;
-    //wwin=wwin * scale;
+    /* wwin=wwin * scale; */
     hwin=hwin * scale;
     /* FIXME: The 1.25 should really come from the NAV packets. */
     *video_x=xf * 1.25 / aspect;
@@ -1110,7 +1125,7 @@ static int video_window_translate_point(int gui_x, int gui_y,
  */
 void video_window_set_mag(float mag) {
 
-  if(gVw->fullscreen_mode)
+  if(gVw->fullscreen_mode && !(gVw->XF86_modelines_count > 1))
     return;
 
   gVw->mag = mag;
