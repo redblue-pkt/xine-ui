@@ -101,7 +101,7 @@ typedef struct {
 static aaxine_t  aaxine;
 void            *xlib_handle = NULL;
 
-#define CONFIGFILE "config2"
+#define CONFIGFILE "aaxine_config"
 
 /* options args */
 static const char *short_options = "?h"
@@ -118,6 +118,11 @@ static struct option long_options[] = {
   {"version"        , no_argument      , 0, 'v' },
   {0                , no_argument      , 0,  0  }
 };
+
+
+static void post_plugin_cb(void *data, xine_cfg_entry_t *entry) {
+  aaxine.post_plugin_name = entry->str_value;
+}
 
 /*
  * Some config wrapper functions, because it's too much work for updating one entry.
@@ -182,6 +187,7 @@ static void config_update_bool(char *key, int value) {
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
 }
+#endif
 
 static void config_update_num(char *key, int value) {
   xine_cfg_entry_t entry;
@@ -191,7 +197,6 @@ static void config_update_num(char *key, int value) {
   else
     fprintf(stderr, "WOW, key %s isn't registered\n", key);
 }
-#endif
 
 static void config_update_string(char *key, char *string) {
   xine_cfg_entry_t entry;
@@ -286,7 +291,7 @@ static void print_usage (void) {
   printf ("\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
   printf("  -P, --post-plugin <name>     Plugin <name> for video less stream animation:\n");
-  printf("                                 (default is oscope).\n");
+  printf("                                 (default is goom).\n");
   printf("                               ");
   post_ids = xine_list_post_plugins_typed(xine, XINE_POST_TYPE_AUDIO_VISUALIZATION);
   post_id  = (char *)*post_ids++;
@@ -536,6 +541,7 @@ int main(int argc, char *argv[]) {
   char                    *video_driver_id = NULL;
   int                      audio_channel   = 0;
   char                    *driver_name;
+  char                    *post_plugin_name = NULL;
 
   /*
    * Check xine library version 
@@ -605,8 +611,8 @@ int main(int argc, char *argv[]) {
       break;
       
     case 'P':
-      if(!aaxine.post_plugin_name)
-	aaxine.post_plugin_name = strdup(optarg);
+      if(!post_plugin_name)
+	post_plugin_name = strdup(optarg);
       break;
 
     case 'N':
@@ -747,19 +753,39 @@ int main(int argc, char *argv[]) {
   
   /* Init post plugin, if desired */
   if(!aaxine.no_post) {
-    if(aaxine.post_plugin_name == NULL)
-      aaxine.post_plugin_name = "oscope";
     
     if(aaxine.ao_port) {
       const char *const *pol = xine_list_post_plugins_typed(aaxine.xine, 
 							    XINE_POST_TYPE_AUDIO_VISUALIZATION);
       
       if(pol) {
-	aaxine.post_plugin = xine_post_init(aaxine.xine, aaxine.post_plugin_name,
-					    0, &aaxine.ao_port, &aaxine.vo_port);
+	aaxine.post_plugin_name = 
+	  (char *) xine_config_register_string (aaxine.xine, "aaxine.post_plugin", 
+						pol[0],
+						"Post plugin name",
+						NULL, 0, post_plugin_cb, NULL);
+	
+	if(post_plugin_name) {
+	  if((aaxine.post_plugin = xine_post_init(aaxine.xine, post_plugin_name, 
+						  0, &aaxine.ao_port, &aaxine.vo_port)) != NULL) {
+	    config_update_string("aaxine.post_plugin", post_plugin_name);
+	  }
+	}
+	else
+	  aaxine.post_plugin = xine_post_init(aaxine.xine, aaxine.post_plugin_name, 
+					      0, &aaxine.ao_port, &aaxine.vo_port);
+	
 	if(aaxine.post_plugin == NULL) {
 	  printf("failed to initialize post plugins '%s'\n", aaxine.post_plugin_name);
 	  aaxine.no_post = 1;
+	}
+	else {
+	  /* reduce goom default values */
+	  if(!strcmp(aaxine.post_plugin_name, "goom")) {
+	    config_update_num("post.goom_fps", 10);
+	    config_update_num("post.goom_height", 120);
+	    config_update_num("post.goom_width", 120);
+	  }
 	}
       }
     }
@@ -966,8 +992,8 @@ int main(int argc, char *argv[]) {
 
     }
   }
-
- failure:
+  
+    failure:
   
   if(aaxine.xine) 
     xine_config_save(aaxine.xine, aaxine.configfile);
