@@ -1070,17 +1070,14 @@ void video_window_change_skins(void) {
     gGui->config->update_string(gGui->config, "misc.logo_mrl", skin_logo);
   }
   else { /* Skin don't use logo feature, set to xine's default */
-    char  default_logo[2048];
     
     /* 
      * Back to default logo only on a skin 
      * change, not at the first skin loading.
      **/
-    if(cfg_entry && sk_changed) {
-      memset(&default_logo, 0, sizeof(default_logo));
-      snprintf(default_logo, 2048, "file://%s/xine_logo.mpg", XINE_SKINDIR);
-      gGui->config->update_string(gGui->config, "misc.logo_mrl", default_logo);
-    }
+    if(cfg_entry && sk_changed)
+      gGui->config->update_string(gGui->config, "misc.logo_mrl", XINE_LOGO_FILE);
+
   }
 
   sk_changed++;
