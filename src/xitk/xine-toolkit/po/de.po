@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-toolkit 0.9.10\n"
+"Project-Id-Version: xine-toolkit 0.9.23\n"
 "POT-Creation-Date: 2003-12-23 23:10+0100\n"
-"PO-Revision-Date: 2002-01-25 10:11+0100\n"
+"PO-Revision-Date: 2003-01-02 09:01+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -40,12 +40,12 @@ msgstr "Imlib_init_with_params() fehlgeschlagen.\n"
 #: src/xitk/xine-toolkit/test.c:373
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
-msgstr "Neuer Ganzzahl-Wert ist %d. Bitte bestätigen."
+msgstr "Neuer Ganzzahl-Wert ist %d. Bestätigen?"
 
 #: src/xitk/xine-toolkit/test.c:425
-#, fuzzy, c-format
+#, c-format
 msgid "New double value is: %e. Confirm ?"
-msgstr "Neuer Ganzzahl-Wert ist %d. Bitte bestätigen."
+msgstr "Neuer Gleitpunkt-Wert ist %e. Bestätigen?"
 
 #: src/xitk/xine-toolkit/test.c:521
 msgid "My Frame"
