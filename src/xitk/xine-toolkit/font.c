@@ -75,6 +75,7 @@ typedef struct {
 static xitk_font_cache_t cache;
 
 #ifdef WITH_XMB
+# ifndef WITH_XFT
 /*
  * Guess if error occured, release missing charsets list.
  * There is a problem with rendering when "ISO10646-1" charset is missing.
@@ -100,6 +101,7 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
 
   return 0;
 }
+# endif
 
 /* convert a -*-* .. style font description into something Xft can digest */
 char * xitk_font_core_string_to_xft( char * old_name) {
@@ -132,6 +134,7 @@ char * xitk_font_core_string_to_xft( char * old_name) {
   return old_name;
 }
 
+# ifndef WITH_XFT
 /*
  * XCreateFontSet requires font name starting with '-'
  */
@@ -150,6 +153,7 @@ static char *xitk_font_right_name(char *name) {
 
   return strdup(right_name);
 }
+# endif
 #endif
 
 /*
@@ -158,7 +162,7 @@ static char *xitk_font_right_name(char *name) {
 static int xitk_font_load_one(Display *display, char *font, xitk_font_t *xtfs) {
   int    ok;
 #ifdef WITH_XFT
-# else
+#else
 # ifdef WITH_XMB
   char **missing;
   char  *def;
