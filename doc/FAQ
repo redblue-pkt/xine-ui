@@ -33,11 +33,11 @@ make
 make install
 
 if you have installed xine-lib to a non-standard prefix, make
-sure you have <prefix>/bin in your PATH and your linker will
-find libs in <prefix>/lib. Using bash you can do something like
+sure you have $prefix/bin in your PATH and your linker will
+find libs in $prefix/lib. Using bash you can do something like
 
-export PATH="<prefix>/bin:$PATH"
-export LD_LIBRARY_PATH="<prefix>/lib:$LD_LIBRARY_PATH"
+export PATH="$prefix/bin:$PATH"
+export LD_LIBRARY_PATH="$prefix/lib:$LD_LIBRARY_PATH"
 
 to make sure libxine can be found by xine-ui.
 
@@ -50,15 +50,15 @@ make
 make install
 
 if ./configure complains about not finding xine-lib, again (see above) 
-check that <prefix>/bin is in your path and your linker will find
-libs installed in </prefix>/lib.
+check that $prefix/bin is in your path and your linker will find
+libs installed in $prefix/lib.
 
 
 xine-lib installed nicely but xine-ui complains about not finding xine-lib
 --------------------------------------------------------------------------
 
-make sure <prefix>/bin is in your path and the linker is able to find
-libraries installed in <prefix>/lib, where <prefix> is where you installed
+make sure $prefix/bin is in your path and the linker is able to find
+libraries installed in $prefix/lib, where $prefix is where you installed
 xine-lib (yes, you have to "make install" xine-lib first before you
 can compile xine-ui). See previous question for details about how to
 properly compile and install xine-lib and xine-ui.
