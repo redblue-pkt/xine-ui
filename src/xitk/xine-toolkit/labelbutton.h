@@ -52,6 +52,7 @@ typedef struct {
    
   int                     align;
   int                     label_visible;
+  int                     label_static;
 
   char                   *label;
   char                   *normcolor;

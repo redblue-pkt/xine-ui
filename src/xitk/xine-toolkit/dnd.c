@@ -39,7 +39,7 @@
 
 #define XDND_VERSION 3
 
-#undef DEBUG_DND
+#define DEBUG_DND
 
 /*
  * PRIVATES

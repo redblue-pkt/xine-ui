@@ -1356,7 +1356,12 @@ char *xitk_skin_get_label_fontname(xitk_skin_config_t *, const char *);
 /*
  *
  */
-int xitk_skin_get_label_printable(xitk_skin_config_t *skonfig, const char *str);
+int xitk_skin_get_label_printable(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
+int xitk_skin_get_label_staticity(xitk_skin_config_t *, const char *);
 
 /*
  *
@@ -1366,17 +1371,17 @@ char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
 /*
  *
  */
-char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str);
+char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *, const char *);
 
 /*
  *
  */
-int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str);
+int xitk_skin_get_slider_type(xitk_skin_config_t *, const char *);
 
 /*
  *
  */
-int xitk_skin_get_slider_radius(xitk_skin_config_t *skonfig, const char *str);
+int xitk_skin_get_slider_radius(xitk_skin_config_t *, const char *);
 
 /*
  *

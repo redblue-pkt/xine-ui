@@ -414,6 +414,10 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skonfig->celement->pixmap_font = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
 	  sprintf(skonfig->celement->pixmap_font, "%s/%s", skonfig->path, p);
 	}
+	else if(!strncasecmp(skonfig->ln, "static", 6)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->staticity = skin_get_bool_value(p);
+	}
 	else if(!strncasecmp(skonfig->ln, "align", 5)) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->align = skin_get_align_value(p);
@@ -594,6 +598,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
 
       printf("  animation   = %d\n", s->animation);
       printf("  print       = %d\n", s->print);
+      printf("  static      = %d\n", s->staticity);
       printf("  length      = %d\n", s->length);
       printf("  color       = '%s'\n", s->color);
       printf("  color focus = '%s'\n", s->color_focus);
@@ -614,6 +619,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  pixmap      = '%s'\n", s->pixmap);
       printf("  animation   = %d\n", s->animation);
       printf("  print       = %d\n", s->print);
+      printf("  static      = %d\n", s->staticity);
       printf("  length      = %d\n", s->length);
       printf("  color       = '%s'\n", s->color);
       printf("  color focus = '%s'\n", s->color_focus);
@@ -951,6 +957,20 @@ int xitk_skin_get_label_printable(xitk_skin_config_t *skonfig, const char *str) 
     return s->print;
   
   return 1;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_label_staticity(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->staticity;
+  
+  return 0;
 }
 
 /*

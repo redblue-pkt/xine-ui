@@ -44,6 +44,7 @@ typedef struct xitk_skin_element_s {
   int                           radius;
   
   /* label */
+  int                           staticity;
   int                           print;
   int                           align;
   int                           animation;
