@@ -72,6 +72,7 @@
 #include "tips.h"
 #include "widget.h"
 #include "window.h"
+#include "menu.h"
 #include "xitkintl.h"
 
 #define XITK_WIDGET_MAGIC 0x7869746b
@@ -273,6 +274,8 @@ unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
 void xitk_modal_window(Window w);
 void xitk_unmodal_window(Window w);
+void xitk_set_current_menu(xitk_widget_t *menu);
+void xitk_unset_current_menu(void);
 
 int xitk_skin_get_direction(xitk_skin_config_t *, const char *);
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);

@@ -85,6 +85,9 @@ typedef struct {
   /* checkbox */
   xitk_widget_t        *checkbox;
 
+  /* menu */
+  xitk_widget_t        *menu;
+
   xitk_widget_list_t   *widget_list;
   xitk_register_key_t   kreg;
 } test_t;
@@ -95,6 +98,7 @@ static int nlab = 0;
 static int align = ALIGN_LEFT;
 #define FONT_HEIGHT_MODEL "azertyuiopqsdfghjklmwxcvbnAZERTYUIOPQSDFGHJKLMWXCVBN&й(-и_за)=№~#{[|`\\^@]}%"
 
+static void create_menu(void);
 /*
  *
  */
@@ -171,6 +175,15 @@ void test_handle_event(XEvent *event, void *data) {
     XLockDisplay(test->display);
     XRaiseWindow(test->display, xitk_window_get_window(test->xwin));
     XUnlockDisplay(test->display);
+    break;
+
+  case ButtonPress:
+    {
+      XButtonEvent *bevent = (XButtonEvent *) event;
+      
+      if(bevent->button == Button3)
+	create_menu();
+    }
     break;
 
   case KeyPress: {
@@ -755,6 +768,53 @@ static void create_browser(void) {
   xitk_browser_update_list(test->browser, 
 			   (const char *const *)test->entries, test->num_entries, 0);
 
+}
+
+static void create_menu(void) {
+  xitk_menu_widget_t   menu;
+  int                  x = 10, y = 10;
+  xitk_menu_entry_t    menu_entries[] = {
+    { "Load a file",                     NULL,            NULL, NULL },
+    { "Reload",                          NULL,            NULL, NULL },
+    { "Auto save",                       "<check>",       NULL, NULL },
+    { "SEP",                             "<separator>",   NULL, NULL },
+    { "Playlist",                        "<branch>",      NULL, NULL },
+    { "Playlist/Load",                   NULL,            NULL, NULL },
+    { "Playlist/Loop",                   "<branch>",      NULL, NULL },
+    { "Playlist/Loop/no loop",           "<checked>",     NULL, NULL },
+    { "Playlist/Loop/simple loop",       "<check>",       NULL, NULL },
+    { "Playlist/Loop/SEP",               "<separator>",   NULL, NULL },
+    { "Playlist/Loop/repeat entry",      "<check>",       NULL, NULL },
+    { "Playlist/Loop/SEP",               "<separator>",   NULL, NULL },
+    { "Playlist/Loop/shuffle",           "<check>",       NULL, NULL },
+    { "Playlist/Loop/infinite shuffle",  "<check>",       NULL, NULL },
+    { "Playlist/Save",                   NULL,            NULL, NULL },
+    { "SEP",                             "<separator>",   NULL, NULL },
+    { "Save a file",                     NULL,            NULL, NULL },
+    { "SEP",                             "<separator>",   NULL, NULL },
+    { "Video",                           "<branch>",      NULL, NULL },
+    { "Video/premier",                   "<branch>",      NULL, NULL },
+    { "Video/premier/Le Voili",          NULL,            NULL, NULL },
+    { "Video/second",                    NULL,            NULL, NULL },
+    { "Video/troisieme",                 NULL,            NULL, NULL },
+    { "Video/quatrieme",                 NULL,            NULL, NULL },
+    { "SEP",                             "<separator>",   NULL, NULL },
+    { "Quit",                            NULL,            test_end, NULL },
+    { NULL,                              NULL,            NULL, NULL }
+  };
+  
+  XITK_WIDGET_INIT(&menu, test->imlibdata);
+
+  (void) xitk_get_mouse_coords(test->display, 
+			       (xitk_window_get_window(test->xwin)), NULL, NULL, &x, &y);
+  
+  menu.menu_tree         = &menu_entries[0];
+  menu.parent_wlist      = test->widget_list;
+  menu.skin_element_name = NULL;
+  
+  xitk_list_append_content(XITK_WIDGET_LIST_LIST(test->widget_list), 
+  			   (test->menu = 
+			    xitk_noskin_menu_create(test->widget_list, &menu, x, y)));
 }
 
 /*

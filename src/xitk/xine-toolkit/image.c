@@ -534,6 +534,58 @@ void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest) {
   XUNLOCK(im->x.disp);
 }
 
+void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p) {
+  int            w;
+  int            h;
+  XPoint         points[4];
+  int            i, offset = 0;
+  short          x1, x2, x3;
+  short          y1, y2, y3;
+  
+  assert(im && p);
+  
+  w = p->width / 3;
+  h = p->height;
+  
+  XLOCK(im->x.disp);
+  XSetForeground(im->x.disp, p->image->gc, xitk_get_pixel_color_black(im));
+  XUNLOCK(im->x.disp);
+  
+  for(i = 0; i < 3; i++) {
+
+    x1 = (w - 10) + offset;
+    y1 = (h / 4);
+    
+    x2 = (w - 10) + offset;
+    y2 = ((h / 4) * 3);
+    
+    x3 = (w - 4) + offset;
+    y3 = (h / 2); 
+    
+    if(i == 2) {
+      x1++; x2++; x3++;
+      y1++; y2++; y3++;
+    }
+    
+    points[0].x = x1;
+    points[0].y = y1;
+    points[1].x = x2;
+    points[1].y = y2;
+    points[2].x = x3;
+    points[2].y = y3;
+    points[3].x = x1;
+    points[3].y = y1;
+    
+    offset += w;
+
+    XLOCK(im->x.disp);
+    XFillPolygon(im->x.disp, p->image->pixmap, p->image->gc, 
+		 &points[0], 4, Complex, CoordModeOrigin);
+    XUNLOCK(im->x.disp);
+  }
+
+}
+
 /*
  *
  */
@@ -741,6 +793,28 @@ void draw_rectangular_inner_box(ImlibData *im, xitk_pixmap_t *p,
 void draw_rectangular_outter_box(ImlibData *im, xitk_pixmap_t *p, 
 				 int x, int y, int width, int height) {
   _draw_rectangular_box(im, p, x, y, 0, 0, width, height, DRAW_OUTTER);
+}
+void draw_rectangular_inner_box_light(ImlibData *im, xitk_pixmap_t *p, 
+				      int x, int y, int width, int height) {
+  _draw_rectangular_box_light(im, p, x, y, 0, 0, width, height, DRAW_INNER);
+}
+void draw_rectangular_outter_box_light(ImlibData *im, xitk_pixmap_t *p, 
+				       int x, int y, int width, int height) {
+  _draw_rectangular_box_light(im, p, x, y, 0, 0, width, height, DRAW_OUTTER);
+}
+
+void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked) {
+  int      h, w;
+  int      relief = (checked) ? DRAW_INNER : DRAW_OUTTER;
+  
+  assert(im && p);
+  
+  w = p->width / 3;
+  h = p->height - 12;
+  
+  _draw_rectangular_box(im, p->image, 4,               6,     0, 0, 12, h, relief);
+  _draw_rectangular_box(im, p->image, w + 4,           6,     0, 0, 12, h, relief);
+  _draw_rectangular_box(im, p->image, (w * 2) + 4 + 1, 6 + 1, 0, 0, 12, h, relief);
 }
 
 /*

@@ -28,6 +28,7 @@ libxitk_la_SOURCES = \
 	label.c \
 	labelbutton.c \
 	list.c \
+	menu.c \
 	mrlbrowser.c \
 	skin.c \
 	slider.c \
@@ -57,6 +58,7 @@ noinst_HEADERS = \
 	intbox.h \
 	label.h \
 	labelbutton.h \
+	menu.h \
 	mrlbrowser.h \
 	skin.h \
 	slider.h \

@@ -134,6 +134,7 @@ typedef struct {
   void                       *sig_data;
 
   Window                      modalw;
+  xitk_widget_t              *menu;
 } __xitk_t;
 
 static __xitk_t    *gXitk;
@@ -222,6 +223,16 @@ int _x_error_handler(Display *display, XErrorEvent *xevent) {
   xitk_x_error = 1;
   return 0;
   
+}
+
+void xitk_set_current_menu(xitk_widget_t *menu) {
+  if(gXitk->menu)
+    xitk_menu_destroy(gXitk->menu);
+
+  gXitk->menu = menu;
+}
+void xitk_unset_current_menu(void) {
+  gXitk->menu = NULL;
 }
 
 int xitk_install_x_error_handler(void) {
@@ -644,7 +655,7 @@ void xitk_set_layer_above(Window window) {
     long propvalue[1];
     
     propvalue[0] = xitk_get_layer_level();
-    
+
     XLockDisplay(gXitk->display);
     XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
 		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
@@ -1055,7 +1066,15 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 	  
 	  /* set focus to next widget */
-	  if((mykey == XK_Tab) || (mykey == XK_KP_Tab) || (mykey == XK_ISO_Left_Tab)) {
+	  if(mykey == XK_Escape) {
+	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)) {
+	      xitk_widget_t *m = xitk_menu_get_menu(w);
+	      
+	      xitk_menu_destroy(m);
+	      return;
+	    }
+	  }
+	  else if((mykey == XK_Tab) || (mykey == XK_KP_Tab) || (mykey == XK_ISO_Left_Tab)) {
 	    if(fx->widget_list) {
 	      handled = 1;
 	      xitk_set_focus_to_next_widget(fx->widget_list, (modifier & MODIFIER_SHIFT));
@@ -1065,14 +1084,12 @@ void xitk_xevent_notify(XEvent *event) {
 	  else if((mykey == XK_space) || (mykey == XK_Return) || 
 		  (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
 	    if(w && ((w->type & WIDGET_CLICKABLE) && w->visible && w->enable)) {
-	      printf("RETURN\n");
+
 	      if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON) ||
 		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABELBUTTON) ||
 		       ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX))) {
 		widget_event_t         event;
 		widget_event_result_t  result;
-
-		printf("BUTTON\n");
 
 		handled = 1;
 
@@ -1255,6 +1272,11 @@ void xitk_xevent_notify(XEvent *event) {
 	    XSetInputFocus(gXitk->display, fx->window, RevertToParent, CurrentTime);
 	  }
 	  XUNLOCK(gXitk->display);
+	  
+	  if(gXitk->menu && (!fx->widget_list->widget_focused || 
+			     (!(fx->widget_list->widget_focused->type & WIDGET_GROUP_MENU)))) {
+	    xitk_set_current_menu(NULL);
+	  }
 	  
 	  if(fx->widget_list) {
 

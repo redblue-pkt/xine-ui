@@ -103,7 +103,7 @@ void *xitk_list_next_content (xitk_list_t *l) {
     
   } 
   else {
-    XITK_WARNING("Passed end of list");
+    XITK_WARNING("Passed end of list\n");
     return NULL;
   }    
 }
@@ -126,7 +126,7 @@ void *xitk_list_last_content (xitk_list_t *l) {
     return l->last->content;
   } 
   else {
-    XITK_WARNING("Wanted last of empty list");
+    XITK_WARNING("Wanted last of empty list\n");
     return NULL;
   }    
 }
@@ -145,7 +145,7 @@ void *xitk_list_prev_content (xitk_list_t *l) {
       return NULL;
   } 
   else {
-    XITK_WARNING("Passed begin of list");
+    XITK_WARNING("Passed begin of list\n");
     return NULL;
   }    
 }
@@ -216,8 +216,7 @@ void xitk_list_delete_current (xitk_list_t *l) {
     l->cur = node_cur->next;
   }
   else { /* last entry in the list */
-    l->last = node_cur->prev;
-    l->cur = node_cur->prev;
+    l->last = l->cur = node_cur->prev;
   }
 
   //  XITK_FREE(node_cur->content);

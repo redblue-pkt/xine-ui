@@ -43,8 +43,8 @@
 
 #define XITK_MAJOR_VERSION          (0)
 #define XITK_MINOR_VERSION          (10)
-#define XITK_SUB_VERSION            (1)
-#define XITK_VERSION                "0.10.1"
+#define XITK_SUB_VERSION            (2)
+#define XITK_VERSION                "0.10.2"
 
 #define XITK_CHECK_VERSION(major, minor, sub)                          \
                                     (XITK_MAJOR_VERSION > (major) ||   \
@@ -227,6 +227,7 @@ typedef struct {
 #define WIDGET_GROUP_COMBO          0x00010000
 #define WIDGET_GROUP_TABS           0x00020000
 #define WIDGET_GROUP_INTBOX         0x00040000
+#define WIDGET_GROUP_MENU           0x00080000
 
 /* Real widgets. */
 #define WIDGET_TYPE_MASK            0x00001FFF
@@ -603,6 +604,25 @@ typedef struct {
   void                             *userdata;
 } xitk_intbox_widget_t;
 
+typedef struct {
+  char                             *menu;
+  char                             *type; /* NULL, <separator>, <branch>, <check>, <checked> */
+  xitk_simple_callback_t            cb;
+  void                             *user_data;
+} xitk_menu_entry_t;
+
+typedef struct {
+  int                              magic;
+  ImlibData                       *imlibdata;
+  
+  char                            *skin_element_name;
+  
+  xitk_widget_list_t              *parent_wlist;
+
+  xitk_menu_entry_t               *menu_tree; /* NULL terminated */
+
+} xitk_menu_widget_t;
+
 
 /* *******
  * INIT: widget lib initialization and friends
@@ -918,6 +938,11 @@ void xitk_set_widgets_tips_timeout(xitk_widget_list_t *wl, unsigned long timeout
  *
  */
 int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w);
+
+/**
+ *
+ */
+int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *rx, int *ry);
 
 /**
  *
@@ -1920,6 +1945,18 @@ void draw_rectangular_outter_box(ImlibData *im, xitk_pixmap_t *p,
 /**
  *
  */
+void draw_rectangular_inner_box_light(ImlibData *im, xitk_pixmap_t *p, 
+				      int x, int y, int width, int height);
+
+/**
+ *
+ */
+void draw_rectangular_outter_box_light(ImlibData *im, xitk_pixmap_t *p,
+				       int x, int y, int width, int height);
+
+/**
+ *
+ */
 void draw_inner_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
 		      int x, int y, int w, int h);
 void draw_outter_frame(ImlibData *im, xitk_pixmap_t *p, char *title, char *fontname,
@@ -1932,6 +1969,9 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p);
 
 void draw_button_plus(ImlibData *im, xitk_image_t *p);
 void draw_button_minus(ImlibData *im, xitk_image_t *p);
+
+void menu_draw_check(ImlibData *im, xitk_image_t *p, int checked);
+void menu_draw_arrow_branch(ImlibData *im, xitk_image_t *p);
 
 /*
  * Windows
@@ -2171,5 +2211,10 @@ int xitk_intbox_get_value(xitk_widget_t *);
 
 int xitk_widget_list_set(xitk_widget_list_t *wl, int param, void *data);
 void *xitk_widget_list_get(xitk_widget_list_t *wl, int param);
+
+xitk_widget_t *xitk_noskin_menu_create(xitk_widget_list_t *wl, 
+				       xitk_menu_widget_t *m, int x, int y);
+xitk_widget_t *xitk_menu_get_menu(xitk_widget_t *w);
+void xitk_menu_destroy(xitk_widget_t *w);
 
 #endif

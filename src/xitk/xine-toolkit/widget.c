@@ -714,6 +714,8 @@ void dump_widget_type(xitk_widget_t *w) {
       printf("WIDGET_TYPE_TABS | ");
     if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_INTBOX)
       printf("WIDGET_TYPE_INTBOX | ");
+    if((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_MENU)
+      printf("WIDGET_TYPE_MENU | ");
   }
 
   if((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_BUTTON)      printf("WIDGET_TYPE_BUTTON ");
@@ -987,9 +989,9 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     XITK_WARNING("widget list was NULL.\n");
     return 0;
   }
-
-  mywidget = xitk_get_widget_at (wl, x, y);
   
+  mywidget = xitk_get_widget_at (wl, x, y);
+
   if(mywidget != wl->widget_focused) {
     if (wl->widget_focused) {
       
@@ -998,7 +1000,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
       
       if((wl->widget_focused->type & WIDGET_FOCUSABLE) &&
 	 wl->widget_focused->enable == WIDGET_ENABLE) {
-	
+
 	if((wl->widget_focused->type & WIDGET_GROUP_COMBO)) {
 	  if(((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_CHECKBOX)
 	     || ((wl->widget_focused->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
@@ -2017,6 +2019,44 @@ int xitk_is_mouse_over_widget(Display *display, Window window, xitk_widget_t *w)
       retval = 1;
     }
     
+  }
+  
+  return retval;
+}
+
+int xitk_get_mouse_coords(Display *display, Window window, int *x, int *y, int *rx, int *ry) {
+  Bool            ret;
+  Window          root_window, child_window;
+  int             root_x, root_y, win_x, win_y;
+  unsigned int    mask;
+  int             retval = 0;
+
+  if(window == None) {
+    XITK_WARNING("window is None\n");
+    return 0;
+  }
+  
+  XLOCK(display);
+  ret = XQueryPointer(display, window, 
+		      &root_window, &child_window, &root_x, &root_y, &win_x, &win_y, &mask);
+  XUNLOCK(display);
+  
+  if((ret == False) ||
+     ((child_window == None) && (win_x == 0) && (win_y == 0))) {
+    retval = 0;
+  }
+  else {
+
+    if(x)
+      *x = win_x;
+    if(y)
+      *y = win_y;
+    if(rx)
+      *rx = root_x;
+    if(ry)
+      *ry = root_y;
+    
+    retval = 1;
   }
   
   return retval;

@@ -64,6 +64,7 @@ static void enability(xitk_widget_t *w) {
   }
 }
   
+/*
 static void notify_destroy(xitk_widget_t *w) {
   tabs_private_data_t *private_data;
   
@@ -80,7 +81,7 @@ static void notify_destroy(xitk_widget_t *w) {
     XITK_FREE(private_data);
   }
 }
-
+*/
 /*
  *
  */
