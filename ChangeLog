@@ -1,6 +1,11 @@
+xine-ui (0.9.11) unstable; urgency=low
 
-this file is deprecated. see xine-lib/ChangeLog for details on what
-has been changed in xine-lib and xine-ui.
+  * started the xine-ui ChangeLog again
+  * lots of bugfixes
+  * new, cool, default theme
+  * removed all the other themes from default distribution
+    (you can still down load them from http://xine.sf.net)
+  * xine-ui now reports unsupported codec formats
+  * probably more things that I don't recall
 
-12.05.2002 Guenter Bartsch
-
+-- Siggi Langauf <siggi@users.sf.net>
