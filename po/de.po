@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.22\n"
 "POT-Creation-Date: 2003-11-18 22:55+0100\n"
-"PO-Revision-Date: 2003-11-17 08:51+0200\n"
+"PO-Revision-Date: 2003-11-19 08:44+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -384,17 +384,17 @@ msgid "Contrast"
 msgstr "Kontrast"
 
 #: src/xitk/event.c:841
-#, fuzzy, c-format
+#, c-format
 msgid "Playlist: %s"
-msgstr "Playliste"
+msgstr "Playliste: %s"
 
 #: src/xitk/event.c:842
 msgid "Stop"
-msgstr ""
+msgstr "Stopp"
 
 #: src/xitk/event.c:842
 msgid "Continue"
-msgstr ""
+msgstr "Weiter"
 
 #: src/xitk/event.c:1047
 #, c-format
@@ -1297,12 +1297,12 @@ msgid "                    amp=v       set amplification level,\n"
 msgstr "                    amp=v       Audioverstärkungslevel <v> setzen,\n"
 
 #: src/xitk/main.c:643
-#, fuzzy
 msgid ""
 "                    loop=m      set loop mode (<m>: 'none' 'loop' 'repeat' "
 "'shuffle' or 'shuffle+'),\n"
 msgstr ""
-"                    spu=c       SPU-Kanal wählen (<c>: 'next' oder 'prev'),\n"
+"                    loop=m      Wiederholmodus (<m>: 'none' 'loop' 'repeat' "
+"'shuffle' oder 'shuffle+'),\n"
 
 #: src/xitk/main.c:644
 msgid "                    (playlist|pl)=p\n"
@@ -1317,11 +1317,12 @@ msgid "                                   'clear'  clear the playlist,\n"
 msgstr "                                   'clear'  Playliste löschen,\n"
 
 #: src/xitk/main.c:647
-#, fuzzy
 msgid ""
 "                                   'first'  play first entry in the "
 "playlist,\n"
-msgstr "                                   'clear'  Playliste löschen,\n"
+msgstr ""
+"                                   'first'  Ersten Eintrag in "
+"Playlistewiedergeben,\n"
 
 #: src/xitk/main.c:648
 msgid ""
@@ -1337,31 +1338,33 @@ msgstr ""
 "wiedergeben,\n"
 
 #: src/xitk/main.c:650
-#, fuzzy
 msgid ""
 "                                   'last'   play last entry in the "
 "playlist,\n"
-msgstr "                                   'clear'  Playliste löschen,\n"
+msgstr ""
+"                                   'last'   Letzten Eintrag in "
+"Playlistewiedergeben,\n"
 
 #: src/xitk/main.c:651
-#, fuzzy
 msgid "                                   'load:s' load playlist file <s>,\n"
 msgstr ""
-"                                   'load:s' Playliste aus Datei <s> laden.\n"
+"                                   'load:s' Playliste aus Datei <s> laden,\n"
 
 #: src/xitk/main.c:652
-#, fuzzy
 msgid ""
 "                                   'stop'   stop playback at the end of "
 "current playback.\n"
-msgstr "                                   'clear'  Playliste löschen,\n"
+msgstr ""
+"                                   'stop'   Wiedergabe nach momentanen Titel "
+"stoppen.\n"
 
 #: src/xitk/main.c:653
-#, fuzzy
 msgid ""
 "                                   'cont'   continue playback at the end of "
 "current playback.\n"
-msgstr "                                   'clear'  Playliste löschen,\n"
+msgstr ""
+"                                   'cont'   Wiedergabe nach momentaten Titel "
+"weiterführen.\n"
 
 #: src/xitk/main.c:654
 msgid "                    play, slow2, slow4, pause, fast2,\n"
@@ -1926,9 +1929,8 @@ msgid "Playlist/Loop modes/Non-stop Shuffle"
 msgstr "Playliste/Wiederholmodus/Ununterbrochen mischen"
 
 #: src/xitk/menus.c:497
-#, fuzzy
 msgid "Playlist/Continue"
-msgstr "Playliste"
+msgstr "Playliste/Weiter"
 
 #: src/xitk/menus.c:503 src/xitk/menus.c:832
 msgid "Menus"
