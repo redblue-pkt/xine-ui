@@ -346,13 +346,20 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skonfig->celement->pixmap_pad = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
 	  sprintf(skonfig->celement->pixmap_pad, "%s/%s", skonfig->path, p);
 	}
-	else if(!strncasecmp(skonfig->ln, "type", 1)) {
+	else if(!strncasecmp(skonfig->ln, "radius", 6)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->radius = strtol(p, &p, 10);
+	}
+	else if(!strncasecmp(skonfig->ln, "type", 4)) {
 	  skin_set_pos_to_value(&p);
 	  if(!strncasecmp("horizontal", p, strlen(p))) {
 	    skonfig->celement->slider_type = XITK_HSLIDER;
 	  }
 	  else if(!strncasecmp("vertical", p, strlen(p))) {
 	    skonfig->celement->slider_type = XITK_VSLIDER;
+	  }
+	  else if(!strncasecmp("rotate", p, strlen(p))) {
+	    skonfig->celement->slider_type = XITK_RSLIDER;
 	  }
 	  else
 	    skonfig->celement->slider_type = XITK_HSLIDER;
@@ -996,6 +1003,20 @@ int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str) {
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return((s->slider_type) ? s->slider_type : XITK_HSLIDER);
+
+  return 0;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_slider_radius(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->radius;
 
   return 0;
 }

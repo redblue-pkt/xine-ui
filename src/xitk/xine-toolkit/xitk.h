@@ -545,10 +545,12 @@ void xitk_xevent_notify(XEvent *event);
  * *** Sliders ***
  */
 
-/*  To handle a vertical slider */
+/*  vertical slider type */
 #define XITK_VSLIDER 1
-/*  To handle an horizontal slider */
+/*  horizontal slider type */
 #define XITK_HSLIDER 2
+/*  rotate button *slider* type */
+#define XITK_RSLIDER 3
 
 typedef struct {
   int                       magic;
@@ -1367,6 +1369,11 @@ int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str);
 /*
  *
  */
+int xitk_skin_get_slider_radius(xitk_skin_config_t *skonfig, const char *str);
+
+/*
+ *
+ */
 void xitk_skin_lock(xitk_skin_config_t *skonfig);
 
 /*
@@ -1631,6 +1638,9 @@ void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
 		       int x, int y, int w, int h);
 
 void draw_tab(ImlibData *im, xitk_image_t *p);
+
+void draw_paddle_rotate(ImlibData *im, xitk_image_t *p);
+void draw_rotate_button(ImlibData *im, xitk_image_t *p);
 
 #define XITK_WINDOW_ANSWER_UNKNOWN 0
 #define XITK_WINDOW_ANSWER_OK      1

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-02-26 01:38+0100\n"
+"POT-Creation-Date: 2002-03-10 16:02+0100\n"
 "PO-Revision-Date: 2002-01-17 00:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -58,7 +58,7 @@ msgstr "Kontrast"
 msgid "Choose a Skin"
 msgstr "Vyber skin"
 
-#: src/xitk/control.c:689 src/xitk/mrl_browser.c:215 src/xitk/playlist.c:868
+#: src/xitk/control.c:689 src/xitk/mrl_browser.c:216 src/xitk/playlist.c:868
 msgid "Dismiss"
 msgstr "Zavrie»"
 
@@ -66,7 +66,7 @@ msgstr "Zavrie»"
 msgid "Close control window"
 msgstr "Zavrie» okno nastavenia"
 
-#: src/xitk/event.c:648
+#: src/xitk/event.c:692
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -77,7 +77,7 @@ msgstr ""
 "\n"
 "Nie je dostupný vstupný plugin pre '%s'.\n"
 
-#: src/xitk/event.c:654
+#: src/xitk/event.c:698
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -87,7 +87,7 @@ msgstr ""
 "- chyba xine enginu -<\n"
 "Nie je dostupný demuxer plugin pre '%s'.\n"
 
-#: src/xitk/event.c:660
+#: src/xitk/event.c:704
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -97,7 +97,7 @@ msgstr ""
 "\n"
 "!! Neo¹etrená chyba !!\n"
 
-#: src/xitk/event.c:882
+#: src/xitk/event.c:927
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -105,11 +105,11 @@ msgstr ""
 "\n"
 "XInitThreads zlyhali - vyzerá to tak, ¾e nemáte pre thready bezpeènú xlib.\n"
 
-#: src/xitk/event.c:892
+#: src/xitk/event.c:937
 msgid "Cannot open display\n"
 msgstr "Nemô¾em otvori» display.\n"
 
-#: src/xitk/event.c:965
+#: src/xitk/event.c:1010
 msgid "Unable to initialize Imlib\n"
 msgstr "Nemô¾em inicializova» Imlib.\n"
 
@@ -117,16 +117,16 @@ msgstr "Nemô¾em inicializova» Imlib.\n"
 msgid "Xine File Browser"
 msgstr "Xine súborový prehliadaè"
 
-#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:208
+#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:209
 msgid "Select"
 msgstr "Vybra»"
 
-#: src/xitk/kbindings.c:299
+#: src/xitk/kbindings.c:311
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Klávesové skratky '%s' a '%s' sú rovnaké.\n"
 
-#: src/xitk/kbindings.c:655
+#: src/xitk/kbindings.c:667
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Ajajáj: tabuµka klávesových skratiek je PRÁZDNA.\n"
 
@@ -348,29 +348,29 @@ msgstr "main : zlyhal test pou¾iteµnosti audio ovládaèa => bez zvuku\n"
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main : vybraný audio ovládaè '%s' zlyhal\n"
 
-#: src/xitk/main.c:464
+#: src/xitk/main.c:466
 #, c-format
 msgid "Require xine library version 0.9.9, found %d.%d.%d.\n"
 msgstr "Potrebujem xine kni¾nicu verzie 0.9.9, nájdená %d.%d.%d.\n"
 
-#: src/xitk/main.c:535
+#: src/xitk/main.c:537
 msgid "video driver id required for -V option\n"
 msgstr "id video ovládaèa je nutný pre -V voµbu\n"
 
-#: src/xitk/main.c:545
+#: src/xitk/main.c:547
 msgid "audio driver id required for -A option\n"
 msgstr "id audio ovládaèa je nutný pre -A voµbu\n"
 
-#: src/xitk/main.c:649
+#: src/xitk/main.c:651
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Argument %d je neplatný => koniec\n"
 
-#: src/xitk/mrl_browser.c:197
+#: src/xitk/mrl_browser.c:198
 msgid "Xine MRL Browser"
 msgstr "Xine MRL prehliadaè"
 
-#: src/xitk/mrl_browser.c:224
+#: src/xitk/mrl_browser.c:225
 msgid "Source:"
 msgstr "Zdroj :"
 

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-02-26 01:38+0100\n"
+"POT-Creation-Date: 2002-03-10 16:02+0100\n"
 "PO-Revision-Date: 2002-03-05 01:00+ZONE\n"
 "Last-Translator: Bart³omiej MURYN <forever@klub.chip.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -59,7 +59,7 @@ msgstr "Kon"
 msgid "Choose a Skin"
 msgstr "Wybierz Styl GUI"
 
-#: src/xitk/control.c:689 src/xitk/mrl_browser.c:215 src/xitk/playlist.c:868
+#: src/xitk/control.c:689 src/xitk/mrl_browser.c:216 src/xitk/playlist.c:868
 msgid "Dismiss"
 msgstr "Anuluj"
 
@@ -67,7 +67,7 @@ msgstr "Anuluj"
 msgid "Close control window"
 msgstr "Zamknij okino kontrolek"
 
-#: src/xitk/event.c:648
+#: src/xitk/event.c:692
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -78,7 +78,7 @@ msgstr ""
 "\n"
 "Brak odpowiedniej wtyczki wej¶cia do obs³ugi '%s'.\n"
 
-#: src/xitk/event.c:654
+#: src/xitk/event.c:698
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -89,7 +89,7 @@ msgstr ""
 "\n"
 "Brak odpowiedniego kodeka do obs³ugi '%s'.\n"
 
-#: src/xitk/event.c:660
+#: src/xitk/event.c:704
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -99,7 +99,7 @@ msgstr ""
 "\n"
 "!! Nieobs³ugiwany b³±d !!\n"
 
-#: src/xitk/event.c:882
+#: src/xitk/event.c:927
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -107,11 +107,11 @@ msgstr ""
 "\n"
 "XInitThreads failed - wygl±da na to ¿e nie masz thread-safe xlib.\n"
 
-#: src/xitk/event.c:892
+#: src/xitk/event.c:937
 msgid "Cannot open display\n"
 msgstr "Nie mogê otworzyæ okna wy¶wietlania\n"
 
-#: src/xitk/event.c:965
+#: src/xitk/event.c:1010
 msgid "Unable to initialize Imlib\n"
 msgstr "Nie mogê zainicjowaæ Imlib\n"
 
@@ -119,16 +119,16 @@ msgstr "Nie mogê zainicjowaæ Imlib\n"
 msgid "Xine File Browser"
 msgstr "Mened¿er plików xine"
 
-#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:208
+#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:209
 msgid "Select"
 msgstr "Wybierz"
 
-#: src/xitk/kbindings.c:299
+#: src/xitk/kbindings.c:311
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Skróty klawiaturowe '%s' i '%s' s± podobne.\n"
 
-#: src/xitk/kbindings.c:655
+#: src/xitk/kbindings.c:667
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Ojej: tablica skrótów klawiaturowych jest PUSTA.\n"
 
@@ -156,7 +156,7 @@ msgid ""
 "drivers: \n"
 msgstr ""
 "  -V, --video-driver <drv>     Wybierz sterownik wideo. Dostêpne "
-"sterowniki: \n" 
+"sterowniki: \n"
 
 #: src/xitk/main.c:171
 msgid ""
@@ -176,7 +176,8 @@ msgstr "  -a, --audio-channel <#>      Wybierz kana³ d¼wiêku '#'.\n"
 
 #: src/xitk/main.c:183
 msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
-msgstr "  -p, --auto-play [opt]        Odtwarzanie po starcie. Mo¿na u¿ywaæ z:\n"
+msgstr ""
+"  -p, --auto-play [opt]        Odtwarzanie po starcie. Mo¿na u¿ywaæ z:\n"
 
 #: src/xitk/main.c:184
 msgid "                    'f': in fullscreen mode.\n"
@@ -254,6 +255,7 @@ msgid ""
 "                                 'default': display default keymap table,\n"
 msgstr ""
 "                                 'default': wy¶wietl domy¶lne mapowanie,\n"
+
 #: src/xitk/main.c:202
 msgid ""
 "                                 'lirc': display draft of a .lircrc config "
@@ -264,8 +266,7 @@ msgstr ""
 #: src/xitk/main.c:203
 msgid ""
 "                                 'remapped': user remapped keymap table.\n"
-msgstr ""
-"                                 'remapped': mapowanie u¿ytkownika.\n"
+msgstr "                                 'remapped': mapowanie u¿ytkownika.\n"
 
 #: src/xitk/main.c:204
 msgid ""
@@ -331,36 +332,37 @@ msgstr "main: próbuje za³adowaæ sterownik d¼wiêku '%s':"
 
 #: src/xitk/main.c:374
 msgid "main: audio driver probing failed => no audio output\n"
-msgstr "main: próbkowanie sterownika d¼wiêku zawiod³o => brak wyj¶cia d¼wiêku\n"
+msgstr ""
+"main: próbkowanie sterownika d¼wiêku zawiod³o => brak wyj¶cia d¼wiêku\n"
 
 #: src/xitk/main.c:393
 #, c-format
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main: podany sterownik d¼wiêku '%s' zawiód³\n"
 
-#: src/xitk/main.c:464
+#: src/xitk/main.c:466
 #, c-format
 msgid "Require xine library version 0.9.9, found %d.%d.%d.\n"
 msgstr "Wymaga biblioteki xine 0.9.9, znaleziono %d.%d.%d.\n"
 
-#: src/xitk/main.c:535
+#: src/xitk/main.c:537
 msgid "video driver id required for -V option\n"
 msgstr "id serownika wideo wymagane dla opcji -V\n"
 
-#: src/xitk/main.c:545
+#: src/xitk/main.c:547
 msgid "audio driver id required for -A option\n"
 msgstr "id serownika d¼wiêku wymagane dla opcji -A\n"
 
-#: src/xitk/main.c:649
+#: src/xitk/main.c:651
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "b³êdny argument %d => exit\n"
 
-#: src/xitk/mrl_browser.c:197
+#: src/xitk/mrl_browser.c:198
 msgid "Xine MRL Browser"
 msgstr "Wyszukiwarka MRL xine"
 
-#: src/xitk/mrl_browser.c:224
+#: src/xitk/mrl_browser.c:225
 msgid "Source:"
 msgstr "¬ród³o:"
 
@@ -558,7 +560,8 @@ msgstr "Nie znalaz³em ¿adnej dostêpnej skóry. Powiedz dowidzenia\n"
 
 #: src/xitk/skins.c:329
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
-msgstr "Nie uda³o siê wróciæ do skóry. Sprawd¼ zainstalowane skóry. Wychodzê.\n"
+msgstr ""
+"Nie uda³o siê wróciæ do skóry. Sprawd¼ zainstalowane skóry. Wychodzê.\n"
 
 #: src/xitk/skins.c:338
 #, c-format

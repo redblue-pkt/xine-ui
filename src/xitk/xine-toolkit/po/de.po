@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-02-07 15:16+0100\n"
+"POT-Creation-Date: 2002-03-10 23:44+0100\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: FULL NAME <siggi at users dot sf dot net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,40 +14,40 @@ msgstr ""
 "Content-Type: text/plain; charset=iso8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/test.c:103
+#: src/xitk/xine-toolkit/test.c:104
 msgid "XInitThreads() failed.\n"
 msgstr "XInitThreads() fehlgeschlagen.\n"
 
-#: src/xitk/xine-toolkit/test.c:113
+#: src/xitk/xine-toolkit/test.c:114
 msgid "Cannot open display\n"
 msgstr "Kann Display nicht öffnen\n"
 
-#: src/xitk/xine-toolkit/test.c:127
+#: src/xitk/xine-toolkit/test.c:128
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_params() fehlgeschlagen.\n"
 
-#: src/xitk/xine-toolkit/test.c:341
+#: src/xitk/xine-toolkit/test.c:350
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "Neuer Ganzzahl-Wert ist %d. Bitte bestätigen."
 
-#: src/xitk/xine-toolkit/test.c:415
+#: src/xitk/xine-toolkit/test.c:424
 msgid "My Frame"
 msgstr "Mein Rahmen"
 
-#: src/xitk/xine-toolkit/test.c:454
+#: src/xitk/xine-toolkit/test.c:463
 msgid "A Label"
 msgstr "Ein Label"
 
-#: src/xitk/xine-toolkit/test.c:510
+#: src/xitk/xine-toolkit/test.c:519
 msgid "Fire !!"
 msgstr "Feuer !!"
 
-#: src/xitk/xine-toolkit/test.c:541
+#: src/xitk/xine-toolkit/test.c:550
 msgid "!BOOM!"
 msgstr "!Bumm!"
 
-#: src/xitk/xine-toolkit/test.c:613
+#: src/xitk/xine-toolkit/test.c:638
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -56,15 +56,15 @@ msgstr ""
 "Der neu gewählte Eintrag der Combobox ist:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:728
+#: src/xitk/xine-toolkit/test.c:753
 msgid "init_test() failed\n"
 msgstr "init_test() fehlgeschlagen\n"
 
-#: src/xitk/xine-toolkit/test.c:744
+#: src/xitk/xine-toolkit/test.c:769
 msgid "My Fucking Window"
 msgstr "Mein Sch***-Fenster"
 
-#: src/xitk/xine-toolkit/test.c:762
+#: src/xitk/xine-toolkit/test.c:787
 msgid "Quit"
 msgstr "Beenden"
 

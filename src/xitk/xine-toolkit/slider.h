@@ -29,10 +29,12 @@
 #include "widget.h"
 #include "_xitk.h"
 
-/*  To handle a vertical slider */
+/*  vertical slider type */
 #define XITK_VSLIDER 1
-/*  To handle an horizontal slider */
+/*  horizontal slider type */
 #define XITK_HSLIDER 2
+/*  rotate button *slider* type */
+#define XITK_RSLIDER 3
 
 typedef struct {
   ImlibData              *imlibdata;
@@ -42,15 +44,20 @@ typedef struct {
   int                     sType;
   int                     bClicked;
   int                     bArmed;
-  int 	                  pos;
-  int                     max;
-  int                     step;
-  int                     min;
-  int                     realmin;
-  int                     realmax;
 
-  xitk_image_t            *paddle_skin;
-  xitk_image_t            *bg_skin;
+
+  float                   angle;
+  float                   percentage;
+
+  float                   upper;
+  float                   value;
+  float                   lower;
+  int                     step;
+
+  int                     radius;
+
+  xitk_image_t           *paddle_skin;
+  xitk_image_t           *bg_skin;
 
   xitk_state_callback_t   motion_callback;
   void                   *motion_userdata;

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-02-26 01:38+0100\n"
+"POT-Creation-Date: 2002-03-10 16:02+0100\n"
 "PO-Revision-Date: 2002-02-20 00:00+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -59,7 +59,7 @@ msgstr "Ctr"
 msgid "Choose a Skin"
 msgstr "Seleccione piel"
 
-#: src/xitk/control.c:689 src/xitk/mrl_browser.c:215 src/xitk/playlist.c:868
+#: src/xitk/control.c:689 src/xitk/mrl_browser.c:216 src/xitk/playlist.c:868
 msgid "Dismiss"
 msgstr "Cancel."
 
@@ -67,7 +67,7 @@ msgstr "Cancel."
 msgid "Close control window"
 msgstr "Cerrar la ventana de control"
 
-#: src/xitk/event.c:648
+#: src/xitk/event.c:692
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -78,7 +78,7 @@ msgstr ""
 "\n"
 "No hay ningún plugin de entrada disponible para manipular '%s'.\n"
 
-#: src/xitk/event.c:654
+#: src/xitk/event.c:698
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -89,7 +89,7 @@ msgstr ""
 "\n"
 "No hay ningún plugin demultiplexador para manipular '%s'.\n"
 
-#: src/xitk/event.c:660
+#: src/xitk/event.c:704
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -99,7 +99,7 @@ msgstr ""
 "\n"
 "¡¡ Error no manipulable !!\n"
 
-#: src/xitk/event.c:882
+#: src/xitk/event.c:927
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -107,11 +107,11 @@ msgstr ""
 "\n"
 "XInitThreads falló - parece que su librería xlib no tiene hilos seguros.\n"
 
-#: src/xitk/event.c:892
+#: src/xitk/event.c:937
 msgid "Cannot open display\n"
 msgstr "No se puede abrir la pantalla\n"
 
-#: src/xitk/event.c:965
+#: src/xitk/event.c:1010
 msgid "Unable to initialize Imlib\n"
 msgstr "No se puede iniciar Imlib\n"
 
@@ -119,16 +119,16 @@ msgstr "No se puede iniciar Imlib\n"
 msgid "Xine File Browser"
 msgstr "Navegador de archivos de xine"
 
-#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:208
+#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:209
 msgid "Select"
 msgstr "Selecc."
 
-#: src/xitk/kbindings.c:299
+#: src/xitk/kbindings.c:311
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Los atajos de teclado '%s' y '%s' son similares.\n"
 
-#: src/xitk/kbindings.c:655
+#: src/xitk/kbindings.c:667
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "OOCH: la tabla de atajos de teclado es NULL.\n"
 
@@ -352,30 +352,30 @@ msgstr "main: prueba de manejador de audio falló => no hay salida de audio\n"
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main: falló el manejador de audio especificado '%s'\n"
 
-#: src/xitk/main.c:464
+#: src/xitk/main.c:466
 #, c-format
 msgid "Require xine library version 0.9.9, found %d.%d.%d.\n"
 msgstr ""
 "Se requiere la versión 0.9.9 de la biblioteca de xine, encontrada %d.%d.%d.\n"
 
-#: src/xitk/main.c:535
+#: src/xitk/main.c:537
 msgid "video driver id required for -V option\n"
 msgstr "id. manejador de vídeo requerido en opción -V\n"
 
-#: src/xitk/main.c:545
+#: src/xitk/main.c:547
 msgid "audio driver id required for -A option\n"
 msgstr "id. manejador de vídeo requerido en opción -A\n"
 
-#: src/xitk/main.c:649
+#: src/xitk/main.c:651
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "argumento %d no válido => fin\n"
 
-#: src/xitk/mrl_browser.c:197
+#: src/xitk/mrl_browser.c:198
 msgid "Xine MRL Browser"
 msgstr "Navegador MRL de xine"
 
-#: src/xitk/mrl_browser.c:224
+#: src/xitk/mrl_browser.c:225
 msgid "Source:"
 msgstr "Fuente:"
 

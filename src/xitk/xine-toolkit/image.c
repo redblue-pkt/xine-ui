@@ -1005,6 +1005,104 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
 /*
  *
  */
+void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
+  GC            gc, mgc;
+  XGCValues     gcv;
+  int           w = p->width/3;
+  int           h = p->height;
+  unsigned int  red, yellow, gray;
+
+  assert(im && p);
+  
+  XLOCK(im->x.disp);
+  
+  red    = xitk_get_pixel_color_from_rgb(im, 255, 0, 0);
+  yellow = xitk_get_pixel_color_from_rgb(im, 255, 255, 0);
+  gray   = xitk_get_pixel_color_darkgray(im);
+  
+  gcv.graphics_exposures = False;
+  gc = XCreateGC(im->x.disp, p->image, GCGraphicsExposures, &gcv);
+  
+  gcv.graphics_exposures = False;
+  mgc = XCreateGC(im->x.disp, p->mask, GCGraphicsExposures, &gcv);
+  
+  {
+    int x, i;
+    unsigned int bg_colors[3] = { gray, yellow, red };
+    
+    XSetForeground(im->x.disp, mgc, 0);
+    XFillRectangle(im->x.disp, p->mask, mgc, 0, 0, w * 3 , h);
+    
+    XSetForeground(im->x.disp, mgc, 1);
+
+    for(x = 0, i = 0; i < 3; i++) {
+      XSetForeground(im->x.disp, mgc, 1);
+      XFillArc(im->x.disp, p->mask, mgc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      XDrawArc(im->x.disp, p->mask, mgc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      
+      XSetForeground(im->x.disp, gc, bg_colors[i]);
+      XFillArc(im->x.disp, p->image, gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      XDrawArc(im->x.disp, p->image, gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+      XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+      XDrawArc(im->x.disp, p->image, gc, x, 0, w-1, h-1, (0 * 64), (360 * 64));
+
+      x += w;
+    }
+  }
+
+  XFreeGC(im->x.disp, mgc);
+  XFreeGC(im->x.disp, gc);
+  XUNLOCK(im->x.disp);
+}
+
+/*
+ *
+ */
+void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
+  GC            gc, mgc;
+  XGCValues     gcv;
+  int           w = p->width;
+  int           h = p->height;
+  
+  assert(im && p);
+  
+  XLOCK(im->x.disp);
+  
+
+  gcv.graphics_exposures = False;
+  gc = XCreateGC(im->x.disp, p->image, GCGraphicsExposures, &gcv);
+
+  gcv.graphics_exposures = False;
+  mgc = XCreateGC(im->x.disp, p->mask, GCGraphicsExposures, &gcv);
+
+  /* Draw mask */
+  XSetForeground(im->x.disp, mgc, 0);
+  XFillRectangle(im->x.disp, p->mask, mgc, 0, 0, w , h);
+  
+  XSetForeground(im->x.disp, mgc, 1);
+  XFillArc(im->x.disp, p->mask, mgc, 0, 0, w-1, h-1, (0 * 64), (360 * 64));
+  
+  /* */
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
+  XFillArc(im->x.disp, p->image, gc, 0, 0, w-1, h-1, (0 * 64), (360 * 64));
+
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+  //  XDrawArc(im->x.disp, p->image, gc, 0, 0, w-1, h-1, (30 * 64), (180 * 64));
+  XDrawArc(im->x.disp, p->image, gc, 1, 1, w-2, h-2, (30 * 64), (180 * 64));
+
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
+  //  XDrawArc(im->x.disp, p->image, gc, 0, 0, w-1, h-1, (210 * 64), (180 * 64));
+  XDrawArc(im->x.disp, p->image, gc, 1, 1, w-3, h-3, (210 * 64), (180 * 64));
+  
+  XFreeGC(im->x.disp, mgc);
+  XFreeGC(im->x.disp, gc);
+  XUNLOCK(im->x.disp);
+}
+
+
+/*
+ *
+ */
 xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   ImlibImage    *img = NULL;
   xitk_image_t  *i;

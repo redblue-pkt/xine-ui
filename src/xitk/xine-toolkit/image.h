@@ -205,4 +205,8 @@ void draw_outter_frame(ImlibData *im, Pixmap p, char *title, char *fontname,
 		       int x, int y, int w, int h);
 
 void draw_tab(ImlibData *im, xitk_image_t *p);
+
+void draw_paddle_rotate(ImlibData *im, xitk_image_t *p);
+void draw_rotate_button(ImlibData *im, xitk_image_t *p);
+
 #endif

@@ -61,6 +61,7 @@ typedef struct {
   /* Sliders */
   xitk_widget_t        *hslider;
   xitk_widget_t        *vslider;
+  xitk_widget_t        *rslider;
 
   /* Button */
   xitk_widget_t        *button;
@@ -213,10 +214,18 @@ void test_handle_event(XEvent *event, void *data) {
  * Set same pos in both sliders.
  */
 static void move_sliders(xitk_widget_t *w, void *data, int pos) {
-  if(w == test->vslider)
+  if(w == test->vslider) {
     xitk_slider_set_pos(test->widget_list, test->hslider, pos);
-  else if(w == test->hslider)
+    xitk_slider_set_pos(test->widget_list, test->rslider, pos);
+  }
+  else if(w == test->hslider) {
     xitk_slider_set_pos(test->widget_list, test->vslider, pos);
+    xitk_slider_set_pos(test->widget_list, test->rslider, pos);
+  }
+  else if(w == test->rslider) {
+    xitk_slider_set_pos(test->widget_list, test->vslider, pos);
+    xitk_slider_set_pos(test->widget_list, test->hslider, pos);
+  }
 
 }
 
@@ -562,8 +571,8 @@ static void create_sliders(void) {
 
   XITK_WIDGET_INIT(&sl, test->imlibdata);
 
-  sl.min                      = 0;
-  sl.max                      = 100;
+  sl.min                      = -1000;
+  sl.max                      = 1000;
   sl.step                     = 1;
   sl.skin_element_name        = NULL;
   sl.callback                 = NULL;
@@ -574,12 +583,12 @@ static void create_sliders(void) {
 			   (test->hslider = xitk_noskin_slider_create(&sl,
 								      17, 200, 117, 20,
 								      XITK_HSLIDER)));
-  xitk_slider_set_pos(test->widget_list, test->hslider, 50);
+  xitk_slider_set_pos(test->widget_list, test->hslider, 0);
 
   xitk_set_widget_tips_default(test->hslider, "This is an horizontal slider");
 
-  sl.min                      = 0;
-  sl.max                      = 100;
+  sl.min                      = -1000;
+  sl.max                      = 1000;
   sl.step                     = 1;
   sl.skin_element_name        = NULL;
   sl.callback                 = NULL;
@@ -590,9 +599,25 @@ static void create_sliders(void) {
 			   (test->vslider = xitk_noskin_slider_create(&sl,
 								      17, 230, 20, 117,
 								      XITK_VSLIDER)));
-  xitk_slider_set_pos(test->widget_list, test->vslider, 50);
+  xitk_slider_set_pos(test->widget_list, test->vslider, 0);
 
   xitk_set_widget_tips_default(test->vslider, "This is a vertical slider");
+
+  sl.min                      = -1000;
+  sl.max                      = 1000;
+  sl.step                     = 1;
+  sl.skin_element_name        = NULL;
+  sl.callback                 = NULL;
+  sl.userdata                 = NULL;
+  sl.motion_callback          = move_sliders;
+  sl.motion_userdata          = NULL;
+  xitk_list_append_content(test->widget_list->l,
+			   (test->rslider = xitk_noskin_slider_create(&sl,
+								      50, 240, 80, 80,
+								      XITK_RSLIDER)));
+  xitk_slider_set_pos(test->widget_list, test->rslider, 0);
+  
+  xitk_set_widget_tips_default(test->rslider, "This is a rotate button");
 }
 
 static void combo_select(xitk_widget_t *w, void *data, int select) {

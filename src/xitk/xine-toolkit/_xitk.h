@@ -66,6 +66,12 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 #define XITK_PATH_MAX   PATH_MAX
 #endif
 
+#undef  MAX
+#define MAX(a, b)  (((a) > (b)) ? (a) : (b))
+
+#undef  MIN
+#define MIN(a, b)  (((a) < (b)) ? (a) : (b))
+
 #ifdef	__GNUC__
 #define XITK_DIE(FMT, ARGS...) { fprintf(stderr, "XITK DIE: "FMT, ##ARGS); exit(-1); }
 #define XITK_WARNING(FMT, ARGS...) fprintf(stderr, "XITK WARNING: "FMT, ##ARGS)
@@ -200,6 +206,7 @@ typedef struct {
 
 #define XITK_VSLIDER 1
 #define XITK_HSLIDER 2
+#define XITK_RSLIDER 3
 
 typedef struct {
   int                       magic;
@@ -418,6 +425,7 @@ char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const c
 char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
 char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *, const char *);
 int xitk_skin_get_slider_type(xitk_skin_config_t *, const char *);
+int xitk_skin_get_slider_radius(xitk_skin_config_t *, const char *);
 void xitk_skin_lock(xitk_skin_config_t *);
 void xitk_skin_unlock(xitk_skin_config_t *);
 
