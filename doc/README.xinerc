@@ -50,26 +50,27 @@ deinterlace_method	method to use for software-deinterlacing (currently
 			only supported on Xv driver):
 			0 none
 			1 bob: if movement is detected on interlaced lines
-			       interpolate the pixels. lose resolution only on
-			       moving pixels but should avoid zig-zag effects.
+			    interpolate the pixels. lose resolution only on
+			    moving pixels but should avoid zig-zag effects.
 			2 weave: similar to bob with a tendency to preserve
-			       original image (less interpolation). must be
-			       good for high detail on low-movement scenes,
-			       but usually has bad output.
+			    original image (less interpolation). must be
+			    good for high detail on low-movement scenes,
+			    but usually has bad output.
 			3 greedy: take either the older or newer weave pixel
-			       depending upon which give the smaller comb factor,
-			       and then clip to avoid large damage when wrong.
-			       very good results for low or intermediate motion.
-			4 onefield: always interpolate lines, not matter they are
-			       static or moving. always lose resolution.
+			    depending upon which give the smaller comb factor,
+			    and then clip to avoid large damage when wrong.
+			    very good results for low or intermediate motion.
+			4 onefield: always interpolate lines, not matter they
+			    are static or moving. always lose resolution.
 			5 onefieldxv: the same as onefield except we deliver
-			       half of the lines to Xvideo driver and let it scale
-			       for us. very low cpu usage. not all cards implement
-			       bilinear scaling (interpolation) so this may be
-			       the worst quality method, but it's the only that
-			       don't require MMX.
+			    half of the lines to Xvideo driver and let it scale
+			    for us. very low cpu usage. not all cards implement
+			    bilinear scaling (interpolation) so this may be
+			    the worst quality method, but it's the only that
+			    don't require MMX.
 
-demux_strategy          0..3: Demuxer detection strategy. (see xine.h for details about values).
+demux_strategy          0..3: Demuxer detection strategy. 
+			(see xine.h for details about values).
 
 divx4_XXX               see README.divx4
 
