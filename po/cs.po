@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.18\n"
 "POT-Creation-Date: 2003-11-02 19:43+0100\n"
-"PO-Revision-Date: 2003-10-15 13:19+0200\n"
+"PO-Revision-Date: 2003-11-03 8:11+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -141,6 +141,7 @@ msgid ""
 "For security reason, you're not allowed to change the configuration entry "
 "named '%s'."
 msgstr ""
+"Z bezpeènostních dùvodù nemáte dovoleno mìnit konfiguraèní volbu '%s'."
 
 #: src/xitk/control.c:270
 msgid "hue value"
@@ -668,9 +669,8 @@ msgid "Title"
 msgstr "Název"
 
 #: src/xitk/event_sender.c:619 src/xitk/menus.c:827
-#, fuzzy
 msgid "Root"
-msgstr "Poèátek/Základ/Koøen"
+msgstr "Poèátek"
 
 #: src/xitk/event_sender.c:620 src/xitk/menus.c:827
 msgid "Subpicture"
@@ -774,16 +774,15 @@ msgstr "Vytvoøit adresáø"
 
 #: src/xitk/help.c:124
 msgid "Undefined"
-msgstr ""
+msgstr "Není definováno"
 
 #: src/xitk/help.c:331 src/xitk/post.c:1143
 msgid "Help"
 msgstr "Nápovìda"
 
 #: src/xitk/help.c:356
-#, fuzzy
 msgid "No Help Section Available"
-msgstr "Nápovìda není k dispozici"
+msgstr "®ádná sekce s nápovìdou není k dispozici"
 
 #: src/xitk/kbindings.c:467
 #, c-format
@@ -1590,14 +1589,12 @@ msgstr ""
 "bude automaticky naèítat poslední playlist."
 
 #: src/xitk/main.c:1646
-#, fuzzy
 msgid "Subtitle autoloading"
-msgstr "Soubor s titulky"
+msgstr "Automatické naèítání titulkù"
 
 #: src/xitk/main.c:1647
-#, fuzzy
 msgid "Automatically load subtitles if they exist."
-msgstr "Automaticky znovu naèítat starý playlist"
+msgstr "Automaticky naèíst titulky, pokud existují"
 
 #: src/xitk/main.c:1782
 msgid "Logo mrl"
@@ -1740,9 +1737,8 @@ msgid "Playback/Pause"
 msgstr "Pøehrávíní/Pauza"
 
 #: src/xitk/menus.c:438 src/xitk/menus.c:447
-#, fuzzy
 msgid "Playback/SEP"
-msgstr "Pøehrávání"
+msgstr "Pøehrávání/SEP"
 
 #: src/xitk/menus.c:441
 msgid "Playback/Next MRL"
@@ -1765,9 +1761,8 @@ msgid "Playlist"
 msgstr "Playlist"
 
 #: src/xitk/menus.c:459 src/xitk/menus.c:668
-#, fuzzy
 msgid "Playlist/Get from"
-msgstr "Playlist/Získat z..."
+msgstr "Playlist/Získat z"
 
 #: src/xitk/menus.c:462
 msgid "Playlist/Load..."
@@ -1810,30 +1805,24 @@ msgid "Menus"
 msgstr "Volby"
 
 #: src/xitk/menus.c:495
-#, fuzzy
 msgid "Menus/Navigation..."
-msgstr "Otevøít/Umístìní..."
+msgstr "Volby/Navigace..."
 
 #: src/xitk/menus.c:498
-#, fuzzy
 msgid "Menus/SEP"
-msgstr "Volby"
+msgstr "Volby/SEP"
 
 #: src/xitk/menus.c:504
 msgid "Stream"
 msgstr "Sekvence"
 
-# window title
 #: src/xitk/menus.c:507
-#, fuzzy
 msgid "Stream/Information..."
-msgstr "Informace o datech"
+msgstr "Sekvence/Informace..."
 
-# window title
 #: src/xitk/menus.c:510
-#, fuzzy
 msgid "Stream/Information (OSD)"
-msgstr "Informace o datech"
+msgstr "Sekvence/Informace (OSD)"
 
 #: src/xitk/menus.c:513
 msgid "Fullscreen\\/Window"
@@ -1896,7 +1885,6 @@ msgid "Video/Postprocess/Chain Reaction..."
 msgstr "Video/Dodateèné zpracování/Zøetìzená reakce..."
 
 #: src/xitk/menus.c:561
-#, fuzzy
 msgid "Video/Postprocess/Enable Postprocessing"
 msgstr "Video/Dodateèné zpracování/Povolit"
 
@@ -1953,14 +1941,12 @@ msgid "Settings/TV Analog..."
 msgstr "Nastavení/Analogová TV..."
 
 #: src/xitk/menus.c:617
-#, fuzzy
 msgid "Help..."
-msgstr "Nápovìda"
+msgstr "Nápovìda..."
 
 #: src/xitk/menus.c:620
-#, fuzzy
 msgid "Logs..."
-msgstr "Zprávy"
+msgstr "Zprávy..."
 
 #: src/xitk/menus.c:626 src/xitk/panel.c:1159
 msgid "Quit"
@@ -2300,7 +2286,6 @@ msgid "Entered value is out of bounds (%e>%e<%e)."
 msgstr "Zadaná hodnota je mimo rozsah (%e>%e<%e)."
 
 #: src/xitk/post.c:589
-#, fuzzy
 msgid "parameter type POST_PARAM_TYPE_STRING not supported yet.\n"
 msgstr "Typ parametru POST_PARAM_TYPE_STRING je¹tì není podporován.\n"
 
@@ -2318,7 +2303,7 @@ msgstr "®ádný filtr"
 
 #: src/xitk/post.c:994
 msgid "Plugin Help"
-msgstr ""
+msgstr "Nápovìda k modulu"
 
 #: src/xitk/post.c:1163
 msgid "There is no parameter available for this plugin."
@@ -2355,13 +2340,14 @@ msgstr "Relace %d nebì¾í.\n"
 
 #: src/xitk/setup.c:344
 msgid "Important Notice"
-msgstr ""
+msgstr "Dùle¾ité upozornìní"
 
 #: src/xitk/setup.c:347
 msgid ""
 "You changed some configuration value which require to restart xine to take "
 "effect."
 msgstr ""
+"Zmìnili jste nìkterou konfiguraèní volbu, která vy¾aduje restartování xine, aby mìla úèinek."
 
 #: src/xitk/setup.c:828 src/xitk/setup.c:830 src/xitk/setup.c:838
 #: src/xitk/setup.c:840 src/xitk/setup.c:848 src/xitk/setup.c:850
