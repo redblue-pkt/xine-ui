@@ -59,15 +59,13 @@ static _lirc_t lirc;
 
 static void lirc_get_playlist(char *from) {
   int    i;
-  char **autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+  char **autoscan_plugins = (char **)xine_get_autoplay_input_plugin_ids(gGui->xine);
 
   for(i = 0; autoscan_plugins[i] != NULL; ++i) {
     if(!strcasecmp(autoscan_plugins[i], from)) {
       int    num_mrls;
       int    j;
-      char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
-						     from,
-						     &num_mrls);
+      char **autoplay_mrls = (char **)xine_get_autoplay_mrls (gGui->xine, from, &num_mrls);
       if(autoplay_mrls) {
 
 	/* First, free existing playlist */

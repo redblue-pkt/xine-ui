@@ -84,12 +84,12 @@ DFBEnumerationResult enum_layers_callback( unsigned int                 id,
 }
 
 int init_dfb() {
-  DFBCardCapabilities    caps;
-  DFBSurfaceDescription  desc;
+  DFBCardCapabilities     caps;
+  DFBSurfaceDescription   desc;
   IDirectFBImageProvider *provider;
-  DFBFontDescription     font_desc;
-  DFBWindowDescription   win_desc;
-  DFBResult                    ret;
+  DFBFontDescription      font_desc;
+  DFBWindowDescription    win_desc;
+  DFBResult               ret;
 
   /* Create global DFB instance */
   DFBCHECK(DirectFBCreate(&(dfbxine.dfb)));

@@ -113,10 +113,10 @@ void gui_play (xitk_widget_t *w, void *data) {
 
     if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0)))
       gui_handle_xine_error();
-  } else {
+  } 
+  else
     xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
-  }
-
+  
   panel_check_pause();
 }
 
@@ -138,7 +138,7 @@ void gui_stop (xitk_widget_t *w, void *data) {
 
 void gui_pause (xitk_widget_t *w, void *data, int state) {
   
-  if (xine_get_param (gGui->xine, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
+  if (xine_get_param(gGui->xine, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
     xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
   else
     xine_set_param(gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -267,9 +267,9 @@ void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {
 
 void gui_toggle_aspect(void) {
   
-  xine_set_param(gGui->xine, XINE_PARAM_VO_ASPECT_RATIO,
-		 xine_get_param(gGui->xine, XINE_PARAM_VO_ASPECT_RATIO) + 1);
-  
+  xine_set_param(gGui->xine, XINE_PARAM_VO_ASPECT_RATIO, 
+		 (xine_get_param(gGui->xine, XINE_PARAM_VO_ASPECT_RATIO)) + 1);
+
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
@@ -279,8 +279,8 @@ void gui_toggle_aspect(void) {
 
 void gui_toggle_interlaced(void) {
 
-  xine_set_param(gGui->xine, XINE_PARAM_VO_DEINTERLACE,
-		 1 - xine_get_param(gGui->xine, XINE_PARAM_VO_DEINTERLACE));
+  xine_set_param(gGui->xine, XINE_PARAM_VO_DEINTERLACE, 
+		 1 - (xine_get_param(gGui->xine, XINE_PARAM_VO_DEINTERLACE)));
 
   if (panel_is_visible())  {
     XRaiseWindow (gGui->display, gGui->panel_window);
@@ -330,13 +330,15 @@ void gui_change_spu_channel(xitk_widget_t *w, void *data) {
 void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 
   if(((int)data) == GUI_NEXT) {
-    if (xine_get_param (gGui->xine, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-      xine_set_param (gGui->xine, XINE_PARAM_SPEED, xine_get_param (gGui->xine, XINE_PARAM_SPEED)/2);
+    if (xine_get_param(gGui->xine, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
+      xine_set_param (gGui->xine, XINE_PARAM_SPEED, 
+		      (xine_get_param(gGui->xine, XINE_PARAM_SPEED)) / 2);
   }
   else if(((int)data) == GUI_PREV) {
     if (xine_get_param (gGui->xine, XINE_PARAM_SPEED) < XINE_SPEED_FAST_4) {
       if (xine_get_param (gGui->xine, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
-	xine_set_param (gGui->xine, XINE_PARAM_SPEED, xine_get_param (gGui->xine, XINE_PARAM_SPEED)*2);
+	xine_set_param (gGui->xine, XINE_PARAM_SPEED, 
+			(xine_get_param(gGui->xine, XINE_PARAM_SPEED)) * 2);
       else
 	xine_set_param (gGui->xine, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
     }
@@ -363,12 +365,13 @@ void *gui_set_current_position_thread(void *data) {
 
 void *gui_seek_relative_thread(void *data) {
   int off_sec = (int)data;
-  int sec, dummy;
+  int sec;
   
   pthread_detach(pthread_self());
   
-  xine_get_pos_length (gGui->xine, &dummy, &sec, &dummy);
+  xine_get_pos_length(gGui->xine, NULL, &sec, NULL);
   sec /= 1000;
+
   if((sec + off_sec) < 0)
     sec = 0;
   else
@@ -386,7 +389,8 @@ void *gui_seek_relative_thread(void *data) {
 void gui_set_current_position (int pos) {
   int err;
   
-  if(!xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE) || (gGui->ignore_status == 1))
+  if(((xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
+     (gGui->ignore_status == 1))
     return;
     
   if(xine_get_status(gGui->xine) != XINE_STATUS_PLAY)
@@ -404,7 +408,8 @@ void gui_set_current_position (int pos) {
 void gui_seek_relative (int off_sec) {
   int err;
   
-  if(!xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE) || (gGui->ignore_status == 1))
+  if(((xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
+     (gGui->ignore_status == 1))
     return;
   
   if(xine_get_status(gGui->xine) != XINE_STATUS_PLAY)
@@ -479,7 +484,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
   int by_chapter;
 
   by_chapter = (gGui->skip_by_chapter &&
-		xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_HAS_CHAPTERS));
+		(xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_HAS_CHAPTERS))) ? 1 : 0;
   
   if(((int)data) == GUI_NEXT) {
 
@@ -533,7 +538,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 
     }
   }
-  
+
   panel_check_pause();
 }
   
@@ -675,21 +680,21 @@ void layer_above_video(Window w) {
 
 void gui_increase_audio_volume(void) {
 
-  if(gGui->mixer.caps & 0 /* FIXME_API: (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL) */) { 
+  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     if(gGui->mixer.volume_level < 100) {
       gGui->mixer.volume_level++;
-      xine_set_param(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
+      xine_set_param(gGui->xine, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
       xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
     }
   }
 }
 
 void gui_decrease_audio_volume(void) {
-  
-  if(gGui->mixer.caps & 0 /* FIXME_API: (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL) */) { 
+
+  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     if(gGui->mixer.volume_level > 0) {
       gGui->mixer.volume_level--;
-      xine_set_param(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
+      xine_set_param(gGui->xine, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
       xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
     }
   }
@@ -713,7 +718,7 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
  * Reset zooming by recall aspect ratio.
  */
 void gui_reset_zoom(void) {
-  
+
   xine_set_param(gGui->xine, XINE_PARAM_VO_ZOOM_X, 100);
   xine_set_param(gGui->xine, XINE_PARAM_VO_ZOOM_Y, 100);
   

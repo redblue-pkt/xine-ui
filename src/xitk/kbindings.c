@@ -1381,16 +1381,8 @@ void kbedit_exit(xitk_widget_t *w, void *data) {
   kbedit->visible = 0;
 
   if((xitk_get_window_info(kbedit->kreg, &wi))) {
-    xine_cfg_entry_t *entry;
-    
-    entry = xine_config_lookup_entry(gGui->xine, "gui.kbedit_x");
-    entry->num_value = wi.x;
-    xine_config_update_entry(gGui->xine, entry);
-    
-    entry = xine_config_lookup_entry(gGui->xine, "gui.kbedit_y");
-    entry->num_value = wi.y;
-    xine_config_update_entry(gGui->xine, entry);
-    
+    config_update_num("gui.kbedit_x", wi.x);
+    config_update_num("gui.kbedit_y", wi.y);
     WINDOW_INFO_ZERO(&wi);
   }
   
@@ -1814,8 +1806,20 @@ void kbedit_window(void) {
       return;
   }
   
-  x = xine_config_register_num (gGui->xine, "gui.kbedit_x", 100, NULL, NULL, 20, NULL, NULL);
-  y = xine_config_register_num (gGui->xine, "gui.kbedit_y", 100, NULL, NULL, 20, NULL, NULL);
+  x = xine_config_register_num(gGui->xine, "gui.kbedit_x", 
+			       100, 
+			       CONFIG_NO_DESC,
+			       CONFIG_NO_HELP,
+			       CONFIG_LEVEL_BEG,
+			       CONFIG_NO_CB,
+			       CONFIG_NO_DATA);
+  y = xine_config_register_num(gGui->xine, "gui.kbedit_y",
+			       100,
+			       CONFIG_NO_DESC,
+			       CONFIG_NO_HELP,
+			       CONFIG_LEVEL_BEG,
+			       CONFIG_NO_CB,
+			       CONFIG_NO_DATA);
   
   kbedit = (_kbedit_t *) xine_xmalloc(sizeof(_kbedit_t));
 

@@ -158,7 +158,7 @@ static void update_current_origin(mrlbrowser_private_data_t *private_data) {
 }
 
 /*
- * Return the *marker* of the giver file *fully named*
+ * Return the *marker* of a given file *fully named*
  */
 static int get_mrl_marker(xine_mrl_t *mrl) {
   
@@ -354,9 +354,8 @@ static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
     {
       int num_mrls;
       const xine_mrl_t *const *mtmp = xine_get_browse_mrls(private_data->xine, 
-					  private_data->last_mrl_source, NULL,
-					  &num_mrls);
-      
+							   private_data->last_mrl_source, 
+							   NULL, &num_mrls);
       if(!mtmp) {
 	private_data->last_mrl_source = (char *)
 	  realloc(private_data->last_mrl_source, strlen(old_old_src) + 1);
@@ -800,9 +799,9 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     {
       int num_mrls;
       const xine_mrl_t *const *mtmp = xine_get_browse_mrls(private_data->xine, 
-					  private_data->last_mrl_source, 
-					  buf, &num_mrls);
-      
+							   private_data->last_mrl_source, 
+							   buf, &num_mrls);
+
       mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
     }
     
@@ -1215,9 +1214,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
       xitk_list_append_content(private_data->widget_list->l,
 		       (private_data->autodir_plugins[i] = 
 			xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
-#warning FIXME NEWAPI
-      //      xitk_set_widget_tips(private_data->autodir_plugins[i], 
-      //			   xine_get_input_plugin_description(mb->xine, mb->ip_availables[i]));
+      xitk_set_widget_tips(private_data->autodir_plugins[i], 
+			   (char *) xine_get_input_plugin_description(mb->xine, mb->ip_availables[i]));
       private_data->autodir_plugins[i]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
       
       (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);

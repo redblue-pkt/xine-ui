@@ -20,7 +20,7 @@ endif
 xine_SOURCES = $(GETOPT_C) utils.c  \
 	main.c event.c control.c playlist.c \
 	videowin.c panel.c kbindings.c lirc.c actions.c mrl_browser.c \
-	snapshot.c skins.c setup.c viewlog.c lang.c errors.c network.c
+	snapshot.c skins.c setup.c viewlog.c lang.c errors.c network.c config_wrapper.c
 xine_DEPENDENTIES = utils.h monitor.h 
 # double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
 xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
@@ -33,7 +33,7 @@ xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) $(top_builddir)/readline/libreadl
 
 noinst_HEADERS = $(GETOPT_H) event.h playlist.h control.h skins.h kbindings.h \
 	panel.h lirc.h actions.h videowin.h mrl_browser.h snapshot.h setup.h viewlog.h \
-	lang.h i18n.h errors.h network.h
+	lang.h i18n.h errors.h network.h config_wrapper.h
 
 $(top_builddir)/readline/libreadline.la:
 	@cd $(top_builddir)/readline && $(MAKE) libreadline.la

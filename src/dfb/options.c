@@ -54,22 +54,24 @@ static void show_version(void) {
  * Display an informative banner.
  */
 static void show_banner(void) {
+  int major, minor, sub;
 
   show_version();
-  printf("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n", 
-	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, 
-	 XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
-  printf("Found xine library version: %d.%d.%d (%s).\n", 
-	 xine_get_major_version(), xine_get_minor_version(),
-	 xine_get_sub_version(), xine_get_str_version());
+  printf("Built with xine library %d.%d.%d..\n", 
+	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION);
+  xine_get_version (&major, &minor, &sub);
+  printf("Found xine library version: %d.%d.%d.\n", major, minor, sub);
 }
 
 /*
  * Display full help.
  */
 static void print_usage (void) {
-  char **driver_ids;
-  char  *driver_id;
+  char   **driver_ids;
+  char    *driver_id;
+  xine_t  *xine;
+
+  xine = (xine_t *) xine_new();
 
   printf("usage: dfbxine [aalib-options] [dfbxine-options] mrl ...\n");
   printf("\n");
@@ -78,7 +80,7 @@ static void print_usage (void) {
   printf("  -q, --auto-quit              Quit after playing all mrl's.\n");
   printf("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n");
   printf("                               ");
-  driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_DFB);
+  driver_ids = (char **)xine_list_video_output_plugins (xine);
   driver_id  = *driver_ids++;
   while (driver_id) {
     printf ("%s ", driver_id);
@@ -87,7 +89,7 @@ static void print_usage (void) {
   printf ("\n");
   printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
   printf("                               ");
-  driver_ids = xine_list_audio_output_plugins ();
+  driver_ids = (char **)xine_list_audio_output_plugins (xine);
   driver_id  = *driver_ids++;
   while (driver_id) {
     printf ("%s ", driver_id);
@@ -112,6 +114,8 @@ static void print_usage (void) {
   printf("  DVD:   'dvd://VTS_01_2.VOB'\n");
   printf("  VCD:   'vcd://<track number>'\n");
   printf("\n");
+  
+  xine_exit(xine);
 }
 
 int do_command_line(int argc, char **argv) {

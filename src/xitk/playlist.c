@@ -116,16 +116,8 @@ void pl_exit(xitk_widget_t *w, void *data) {
     playlist->visible = 0;
 
     if((xitk_get_window_info(playlist->widget_key, &wi))) {
-      xine_cfg_entry_t *entry;
-      
-      entry = xine_config_lookup_entry(gGui->xine, "gui.playlist_x");
-      entry->num_value = wi.x;
-      xine_config_update_entry(gGui->xine, entry);
-      
-      entry = xine_config_lookup_entry(gGui->xine, "gui.playlist_y");
-      entry->num_value = wi.y;
-      xine_config_update_entry(gGui->xine, entry);
-      
+      config_update_num ("gui.playlist_x", wi.x);
+      config_update_num ("gui.playlist_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 
@@ -461,15 +453,15 @@ void pl_scan_input(xitk_widget_t *w, void *ip) {
   
   if(xine_get_status(gGui->xine) == XINE_STATUS_STOP) {
     const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
-    int i = 0;
+    int                i = 0;
     
     if(autoplay_plugins) {
       while(autoplay_plugins[i] != NULL) {
 	
 	if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
-	  int num_mrls;
+	  int                num_mrls;
 	  const char *const *autoplay_mrls = 
-	    xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i], &num_mrls);
+	    xine_get_autoplay_mrls (gGui->xine, (char *)autoplay_plugins[i], &num_mrls);
 
 	  if(autoplay_mrls) {
 	    int j;
@@ -770,10 +762,20 @@ void playlist_editor(void) {
     exit(-1);
   }
 
-  hint.x = xine_config_register_num (gGui->xine, "gui.playlist_x", 200,
-				     NULL, NULL, 20, NULL, NULL);
-  hint.y = xine_config_register_num (gGui->xine, "gui.playlist_y", 200,
-				     NULL, NULL, 20, NULL, NULL);
+  hint.x = xine_config_register_num (gGui->xine, "gui.playlist_x",
+				     200,
+				     CONFIG_NO_DESC,
+				     CONFIG_NO_HELP,
+				     CONFIG_LEVEL_BEG,
+				     CONFIG_NO_CB,
+				     CONFIG_NO_DATA);
+  hint.y = xine_config_register_num (gGui->xine, "gui.playlist_y", 
+				     200,
+				     CONFIG_NO_DESC,
+				     CONFIG_NO_HELP,
+				     CONFIG_LEVEL_BEG,
+				     CONFIG_NO_CB,
+				     CONFIG_NO_DATA);
 
   hint.width = playlist->bg_image->rgb_width;
   hint.height = playlist->bg_image->rgb_height;
@@ -971,8 +973,8 @@ void playlist_editor(void) {
   xitk_set_widget_tips(playlist->winput, _("Direct MRL entry"));
 
   {
-    int x, y;
-    int i = 0;
+    int                x, y;
+    int                i = 0;
     const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     
     x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayBG");
@@ -990,7 +992,7 @@ void playlist_editor(void) {
 	       (playlist->autoplay_plugins[i] = 
 		xitk_labelbutton_create (playlist->widget_list, gGui->skin_config, &lb)));
       xitk_set_widget_tips(playlist->autoplay_plugins[i], 
-			   xine_get_input_plugin_description(gGui->xine, autoplay_plugins[i]));
+		   xine_get_input_plugin_description(gGui->xine, (char *)autoplay_plugins[i]));
       
       (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
       

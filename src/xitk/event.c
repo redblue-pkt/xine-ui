@@ -130,6 +130,7 @@ void config_save(void) {
 void config_reset(void) {
 
   xine_reset_config(gGui->xine);
+  xine_load_config(gGui->xine, gGui->configfile);
 }
 
 /*
@@ -446,17 +447,17 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_AV_SYNC_m3600:
-    xine_set_param (gGui->xine, XINE_PARAM_AV_OFFSET,
-      xine_get_param (gGui->xine, XINE_PARAM_AV_OFFSET) - 3600);
+    xine_set_param(gGui->xine, XINE_PARAM_AV_OFFSET, 
+		   (xine_get_param(gGui->xine, XINE_PARAM_AV_OFFSET)) - 3600);
     break;
-
+    
   case ACTID_AV_SYNC_p3600:
-    xine_set_param (gGui->xine, XINE_PARAM_AV_OFFSET,
-      xine_get_param (gGui->xine, XINE_PARAM_AV_OFFSET) + 3600);
+    xine_set_param(gGui->xine, XINE_PARAM_AV_OFFSET,
+		   (xine_get_param(gGui->xine, XINE_PARAM_AV_OFFSET)) + 3600);
     break;
 
   case ACTID_AV_SYNC_RESET:
-    xine_set_param (gGui->xine, XINE_PARAM_AV_OFFSET, 0);
+    xine_set_param(gGui->xine, XINE_PARAM_AV_OFFSET, 0);
     break;
 
   case ACTID_SPEED_FAST:
@@ -619,7 +620,7 @@ void gui_status_callback (int nStatus) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
       if(!(xine_open(gGui->xine, gGui->filename) && xine_play (gGui->xine, 0, 0 )))
 	gui_handle_xine_error();
-
+      
     } else {
       
       if(gGui->actions_on_start[0] == ACTID_QUIT)
@@ -782,8 +783,14 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     exit(1);
   }
 
-  if (xine_config_register_bool (gGui->xine, "gui.xsynchronize", 0,
-				 _("synchronized X protocol (debug)"), NULL, 20, NULL, NULL)) {
+  if (xine_config_register_bool (gGui->xine, "gui.xsynchronize", 
+				 0,
+				 _("synchronized X protocol (debug)"), 
+				 CONFIG_NO_HELP,
+				 CONFIG_LEVEL_EXP,
+				 CONFIG_NO_CB,
+				 CONFIG_NO_DATA)) {
+
     XSynchronize (gGui->display, True);
     fprintf (stderr, _("Warning! Synchronized X activated - this is way slow...\n"));
   }
@@ -791,32 +798,51 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->layer_above = 
     xine_config_register_bool (gGui->xine, "gui.layer_above", 1,
 			       _("use wm layer property to place window on top"), 
-			       NULL, 0, NULL, NULL);
-  
+			       _("synchronized X protocol (debug)"), 
+			       CONFIG_LEVEL_EXP,
+			       CONFIG_NO_CB,
+			       CONFIG_NO_DATA);
+
   gGui->snapshot_location = 
-    xine_config_register_string (gGui->xine, "gui.snapshotdir", 
-				   (char *) (xine_get_homedir()),
-				   _("where snapshots will be saved"),
-				   NULL, 0, snapshot_loc_cb, NULL);
+    (char *)xine_config_register_string (gGui->xine, "gui.snapshotdir", 
+					 (char *) (xine_get_homedir()),
+					 _("where snapshots will be saved"),
+					 CONFIG_NO_HELP,
+					 CONFIG_LEVEL_EXP,
+					 snapshot_loc_cb,
+					 CONFIG_NO_DATA);
   
   gGui->ssaver_timeout =
     xine_config_register_num (gGui->xine, "gui.screensaver_timeout", 10,
 			      _("time between two screensaver fake events, 0 to disable"),
-			      NULL, 10, ssaver_timeout_cb, NULL);
+			      CONFIG_NO_HELP,
+			      CONFIG_LEVEL_EXP,
+			      ssaver_timeout_cb,
+			      CONFIG_NO_DATA);
   
   gGui->skip_by_chapter = 
     xine_config_register_bool (gGui->xine, "gui.skip_by_chapter", 1,
 			       _("play next|previous chapter instead of mrl (dvdnav)"), 
-			       NULL, 10, skip_by_chapter_cb, NULL);
-
+			       CONFIG_NO_HELP,
+			       CONFIG_LEVEL_EXP,
+			       skip_by_chapter_cb, 
+			       CONFIG_NO_DATA);
+  
   gGui->auto_vo_visibility = 
     xine_config_register_bool (gGui->xine, "gui.auto_video_output_visibility", 0,
 			       _("show/hide video output window regarding to the stream type"), 
-			       NULL, 0, auto_vo_visibility_cb, NULL);
+			       CONFIG_NO_HELP,
+			       CONFIG_LEVEL_EXP,
+			       auto_vo_visibility_cb, 
+			       CONFIG_NO_DATA);
+
   gGui->auto_panel_visibility = 
     xine_config_register_bool (gGui->xine, "gui.auto_panel_visibility", 0,
 			       _("automatically show/hide panel window, according to auto_video_output_visibility"), 
-			       NULL, 0, auto_panel_visibility_cb, NULL); 
+			       CONFIG_NO_HELP,
+			       CONFIG_LEVEL_EXP,
+			       auto_panel_visibility_cb,
+			       CONFIG_NO_DATA); 
  
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
@@ -938,19 +964,17 @@ void gui_run (void) {
   /* autoscan playlist  */
   if(gGui->autoscan_plugin != NULL) {
     const char *const *autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
-    
-    int i;
+    int         i;
 
     if(autoscan_plugins) {
 
       for(i=0; autoscan_plugins[i] != NULL; ++i) {
 
 	if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
-	  int num_mrls;
+	  int                num_mrls, j;
 	  const char *const *autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
 								     gGui->autoscan_plugin,
 								     &num_mrls);
-	  int j;
 	  
 	  if(autoplay_mrls) {
 	    for (j = 0; j < num_mrls; j++)
@@ -982,8 +1006,9 @@ void gui_run (void) {
       if(!panel_is_visible())
 	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
 
-      xine_gui_send_vo_data (gGui->xine, XINE_GUI_SEND_VIDEOWIN_VISIBLE, (int *)0);
-      
+      xine_gui_send_vo_data(gGui->xine,
+			    XINE_GUI_SEND_VIDEOWIN_VISIBLE,
+			    (int *)0);
     }
 
     /*  The user wants to see in fullscreen mode  */

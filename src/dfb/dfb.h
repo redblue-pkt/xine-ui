@@ -74,46 +74,45 @@
 /*** types ***/
 
 typedef struct {
-  xine_t           *xine;
-  int               ignore_status;
-  vo_driver_t      *vo_driver;
-  config_values_t  *config;
-  ao_driver_t      *ao_driver;
-  char             *mrl[1024];
-  int               num_mrls;
-  int               current_mrl;
-  int               running;
-  int               auto_quit;
+  xine_t                  *xine;
+  int                      ignore_status;
+  const xine_vo_driver_t  *vo_driver;
+  const xine_ao_driver_t  *ao_driver;
+  char                    *mrl[1024];
+  int                      num_mrls;
+  int                      current_mrl;
+  int                      running;
+  int                      auto_quit;
 
-  char          *audio_driver_id;
-  char          *video_driver_id;
-  int            audio_channel;
+  char                    *audio_driver_id;
+  char                    *video_driver_id;
+  int                      audio_channel;
 
-  IDirectFB        *dfb;
-  IDirectFBDisplayLayer  *layer;
-  IDirectFBDisplayLayer  *video_layer;
-  IDirectFBSurface *primary;
-  IDirectFBSurface *bg_surface;
-  IDirectFBWindow  *main_window;
-  IDirectFBSurface *main_surface;
-  IDirectFBSurface *pointer;
+  IDirectFB               *dfb;
+  IDirectFBDisplayLayer   *layer;
+  IDirectFBDisplayLayer   *video_layer;
+  IDirectFBSurface        *primary;
+  IDirectFBSurface        *bg_surface;
+  IDirectFBWindow         *main_window;
+  IDirectFBSurface        *main_surface;
+  IDirectFBSurface        *pointer;
 
-  IDirectFBFont    *font;
-  int               fontheight;
-  DFBDisplayLayerConfig  layer_config;
+  IDirectFBFont           *font;
+  int                      fontheight;
+  DFBDisplayLayerConfig    layer_config;
  
-  int               screen_width;
-  int               screen_height;
+  int                      screen_width;
+  int                      screen_height;
 
   struct {
-    int                enable;
-    int                caps;
-    int                volume_mixer;
-    int                volume_level;
-    int                mute;
+    int                    enable;
+    int                    caps;
+    int                    volume_mixer;
+    int                    volume_level;
+    int                    mute;
   } mixer;
 
-  int               debug_messages;
+  int                      debug_messages;
 } dfbxine_t;
 
 typedef struct {

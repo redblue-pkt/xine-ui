@@ -34,17 +34,19 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#include <xine/xineutils.h>
-
-#include "xitk.h"
-
 #include "event.h"
 #include "actions.h"
 #include "file_browser.h"
+#include "i18n.h"
+
+#include "xitk.h"
+
+#include <xine.h>
+#include <xine/xineutils.h>
 
 #define MAX_LIST 9
 
-extern gGui_t       *gGui;
+extern gGui_t            *gGui;
 static xitk_widget_t     *fb = NULL;
 
 /*
@@ -132,8 +134,8 @@ void destroy_file_browser(void) {
 
   if(fb) {
     if((xitk_filebrowser_get_window_info(fb, &wi))) {
-      config_set_int("x_file_browser", wi.x);
-      config_set_int("y_file_browser", wi.y);
+      config_update_num("x_file_browser", wi.x);
+      config_update_num("y_file_browser", wi.y);
     }
     xitk_filebrowser_destroy(fb);
     fb = NULL;
@@ -148,11 +150,11 @@ static void file_browser_kill(xitk_widget_t *w, void *data) {
   window_info_t wi;
   
   if(curdir) {
-    config_set_str("filebrowser_dir", curdir);
+    config_update_string("gui.filebrowser_dir", curdir);
     if(fb) {
       if((xitk_filebrowser_get_window_info(fb, &wi))) {
-	config_set_int("x_file_browser", wi.x);
-	config_set_int("y_file_browser", wi.y);
+	config_update_num("gui.filebrowser_x", wi.x);
+	config_update_num("gui.filebrowser_y", wi.y);
       }
     }
   }
@@ -176,9 +178,23 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.imlibdata                      = gGui->imlib_data;
   fbr.window_trans                   = gGui->video_window;
   fbr.layer_above                    = gGui->layer_above;
-
-  fbr.x                              = config_lookup_int("x_file_browser", 200);
-  fbr.y                              = config_lookup_int("y_file_browser", 100);
+  
+  fbr.x                              = xine_config_register_num(gGui->xine,
+								"gui.filebrowser_x", 
+								200,
+								CONFIG_NO_DESC,
+								CONFIG_NO_HELP,
+								CONFIG_LEVEL_EXP,
+								CONFIG_NO_CB,
+								CONFIG_NO_DATA);
+  fbr.y                              = xine_config_register_num(gGui->xine,
+								"gui.filebrowser_y", 
+								100,
+								CONFIG_NO_DESC,
+								CONFIG_NO_HELP,
+								CONFIG_LEVEL_EXP,
+								CONFIG_NO_CB,
+								CONFIG_NO_DATA);
   fbr.window_title                   = _("Xine File Browser");
   fbr.skin_element_name              = "FBBG";
   fbr.resource_name                  = fbr.window_title;
@@ -189,9 +205,15 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.sort_reverse.skin_element_name = "FBSortRev";
   
   fbr.current_dir.skin_element_name  = "FBCurDir";
-  fbr.current_dir.cur_directory      = config_lookup_str("filebrowser_dir",
-							 (char *)xine_get_homedir());
-
+  fbr.current_dir.cur_directory      = (char *)xine_config_register_string(gGui->xine,
+									   "gui.filebrowser_dir",
+									   (char *)xine_get_homedir(),
+									   CONFIG_NO_DESC,
+									   CONFIG_NO_HELP,
+									   CONFIG_LEVEL_EXP,
+									   CONFIG_NO_CB,
+									   CONFIG_NO_DATA);
+  
   fbr.dndcallback                    = dnd_cb;
 
   fbr.homedir.skin_element_name      = "FBHome";

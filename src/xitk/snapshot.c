@@ -105,6 +105,8 @@ struct prvt_image_s {
   png_infop info_ptr;
 };
 
+#warning FIXME NEWAPI
+#if 0
 /*
  *  This function was pinched from filter_yuy2tov12.c, part of
  *  transcode, a linux video stream processing tool
@@ -856,12 +858,10 @@ void create_snapshot (void)
     return;
   }
 
-  /* FIXME_API: separate yuv pointers?
-  err = xine_get_current_frame( gGui->xine,
-          &image->width, &image->height, &image->ratio_code,
-          &image->format, &image->y, &image->u, &image->v); */
-  err = 0;
-
+  err = xine_get_current_frame(gGui->xine,
+			       &image->width, &image->height, &image->ratio_code,
+			       &image->format, &image->y, &image->u, &image->v); */
+  
   if (err == 0) {
     printf("   Framegrabber failed\n");
     prvt_image_free( &image );
@@ -1105,3 +1105,7 @@ void create_snapshot (void)
 
   return;
 }
+#else
+void create_snapshot(void) {
+}
+#endif

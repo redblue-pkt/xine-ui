@@ -85,14 +85,14 @@ void control_show_tips(int enabled, unsigned long timeout) {
 }
 
 /*
- * Get current parameter 'param' value from xine.
+ * Get current parameter 'param' value.
  */
 static int get_current_param(int param) {
-  return xine_get_param(gGui->xine, param);
+  return (xine_get_param(gGui->xine, param));
 }
 
 /*
- * set parameter 'param' to  value 'value'.
+ * set parameter 'param' to value 'value'.
  */
 static void set_current_param(int param, int value) {
   xine_set_param(gGui->xine, param, value);
@@ -102,31 +102,33 @@ static void set_current_param(int param, int value) {
  * Enable or disable video settings sliders.
  */
 static void active_sliders_video_settings(void) {
-  int vidcap;
+  //  int vidcap;
   
-  /* FIXME_API: if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) { */
-  if ((vidcap = 0)) {
+#warning FIXME NEWAPI MISSING
+#if 0
+  if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) {
     
-    if(vidcap /* FIXME_API: & VO_CAP_BRIGHTNESS */)
+    if(vidcap & VO_CAP_BRIGHTNESS)
       xitk_enable_widget(control->bright);
     else
       xitk_disable_widget(control->bright);
     
-    if(vidcap /* FIXME_API: & VO_CAP_SATURATION */)
+    if(vidcap & VO_CAP_SATURATION)
       xitk_enable_widget(control->sat);
     else
       xitk_disable_widget(control->sat);
     
-    if(vidcap /* FIXME_API: & VO_CAP_HUE */)
+    if(vidcap & VO_CAP_HUE)
       xitk_enable_widget(control->hue);
     else
       xitk_disable_widget(control->hue);
     
-    if(vidcap /* FIXME_API: & VO_CAP_CONTRAST */)
+    if(vidcap & VO_CAP_CONTRAST)
       xitk_enable_widget(control->contr);
     else
       xitk_disable_widget(control->contr);
   }
+#endif
 }
 
 /*
@@ -156,9 +158,8 @@ static void update_sliders_video_settings(void) {
  * Set hue
  */
 static void set_hue(xitk_widget_t *w, void *data, int value) {
-
   set_current_param(XINE_PARAM_VO_HUE, value);
-    
+  
   if(get_current_param(XINE_PARAM_VO_HUE) != value)
     update_sliders_video_settings();
 }
@@ -167,7 +168,6 @@ static void set_hue(xitk_widget_t *w, void *data, int value) {
  * Set saturation
  */
 static void set_saturation(xitk_widget_t *w, void *data, int value) {
-
   set_current_param(XINE_PARAM_VO_SATURATION, value);
    
   if(get_current_param(XINE_PARAM_VO_SATURATION) != value)
@@ -178,7 +178,6 @@ static void set_saturation(xitk_widget_t *w, void *data, int value) {
  * Set brightness
  */
 static void set_brightness(xitk_widget_t *w, void *data, int value) {
-
   set_current_param(XINE_PARAM_VO_BRIGHTNESS, value);
     
   if(get_current_param(XINE_PARAM_VO_BRIGHTNESS) != value)
@@ -189,7 +188,6 @@ static void set_brightness(xitk_widget_t *w, void *data, int value) {
  * Set contrast
  */
 static void set_contrast(xitk_widget_t *w, void *data, int value) {
-
   set_current_param(XINE_PARAM_VO_CONTRAST, value);
     
   if(get_current_param(XINE_PARAM_VO_CONTRAST) != value)
@@ -208,16 +206,8 @@ void control_exit(xitk_widget_t *w, void *data) {
     control->visible = 0;
 
     if((xitk_get_window_info(control->widget_key, &wi))) {
-      xine_cfg_entry_t *entry;
-      
-      entry = xine_config_lookup_entry(gGui->xine, "gui.control_x");
-      entry->num_value = wi.x;
-      xine_config_update_entry(gGui->xine, entry);
-      
-      entry = xine_config_lookup_entry(gGui->xine, "gui.control_y");
-      entry->num_value = wi.y;
-      xine_config_update_entry(gGui->xine, entry);
-      
+      config_update_num("gui.control_x", wi.x);
+      config_update_num("gui.control_y", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
 
@@ -451,10 +441,21 @@ void control_panel(void) {
     exit(-1);
   }
 
-  hint.x = xine_config_register_num (gGui->xine, "gui.control_x", 200,
-				     NULL, NULL, 20, NULL, NULL);
-  hint.y = xine_config_register_num (gGui->xine, "gui.control_y", 100,
-				     NULL, NULL, 20, NULL, NULL);
+  hint.x = xine_config_register_num (gGui->xine, "gui.control_x", 
+				     200,
+				     CONFIG_NO_DESC,
+				     CONFIG_NO_HELP,
+				     CONFIG_LEVEL_BEG,
+				     CONFIG_NO_CB,
+				     CONFIG_NO_DATA);
+  hint.y = xine_config_register_num (gGui->xine, "gui.control_y", 
+				     100,
+				     CONFIG_NO_DESC,
+				     CONFIG_NO_HELP,
+				     CONFIG_LEVEL_BEG,
+				     CONFIG_NO_CB,
+				     CONFIG_NO_DATA);
+
   hint.width = control->bg_image->rgb_width;
   hint.height = control->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
@@ -543,15 +544,17 @@ void control_panel(void) {
   control->widget_list->gc            = gc;
   
   { /* All of sliders are disabled by default*/
-    int min, max, cur;
+    int min = 0, max = 0, cur;
 
     lbl.window = control->widget_list->win;
     lbl.gc     = control->widget_list->gc;
 
     /* HUE */
-    /* FIXME_API:
+#warning FIXME NEWAPI MISSING
+#if 0
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_HUE, &min, &max); */
+					  VO_PROP_HUE, &min, &max);
+#endif
     cur = get_current_param(XINE_PARAM_VO_HUE);
     
     sl.skin_element_name = "SliderCtlHue";
@@ -575,9 +578,11 @@ void control_panel(void) {
     xitk_disable_widget(control->hue);
 
     /* SATURATION */
-    /* FIXME_API:
+#warning FIXME NEWAPI MISSING
+#if 0
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_SATURATION, &min, &max); */
+					  VO_PROP_SATURATION, &min, &max);
+#endif
     cur = get_current_param(XINE_PARAM_VO_SATURATION);
 
     sl.skin_element_name = "SliderCtlSat";
@@ -601,9 +606,11 @@ void control_panel(void) {
     xitk_disable_widget(control->sat);
       
     /* BRIGHTNESS */
-    /* FIXME_API:
+#warning FIXME NEWAPI MISSING
+#if 0
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_BRIGHTNESS, &min, &max); */
+					  VO_PROP_BRIGHTNESS, &min, &max);
+#endif
     cur = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
 
     sl.skin_element_name = "SliderCtlBright";
@@ -627,9 +634,11 @@ void control_panel(void) {
     xitk_disable_widget(control->bright);
       
     /* CONTRAST */
-    /* FIXME_API:
+#warning FIXME NEWAPI MISSING
+#if 0
     gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_CONTRAST, &min, &max); */
+					  VO_PROP_CONTRAST, &min, &max);
+#endif
     cur = get_current_param(XINE_PARAM_VO_CONTRAST);
 
     sl.skin_element_name = "SliderCtlCont";

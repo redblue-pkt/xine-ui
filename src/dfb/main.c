@@ -51,6 +51,97 @@
 
 dfbxine_t dfbxine;
 
+static void config_update(xine_cfg_entry_t *entry, int type, int min, int max, int value, char *string) {
+
+  switch(type) {
+
+  case XINE_CONFIG_TYPE_UNKNOWN:
+    fprintf(stderr, "Config key '%s' isn't registered yet.\n", entry->key);
+    return;
+    break;
+
+  case XINE_CONFIG_TYPE_RANGE:
+    entry->range_min = min;
+    entry->range_max = max;
+    break;
+
+  case XINE_CONFIG_TYPE_STRING: 
+    {
+      char *newv = strdup(string);
+      char *oldv = entry->str_value;
+      
+      oldv = entry->str_value;
+      entry->str_value = newv;
+      
+      if(oldv)
+	free(oldv);
+    }
+    break;
+    
+  case XINE_CONFIG_TYPE_ENUM:
+  case XINE_CONFIG_TYPE_NUM:
+  case XINE_CONFIG_TYPE_BOOL:
+    entry->num_value = value;
+    break;
+
+  default:
+    fprintf(stderr, "Unknown config type %d\n", type);
+    return;
+    break;
+  }
+  
+  xine_config_update_entry(dfbxine.xine, entry);
+}
+
+void config_update_range(char *key, int min, int max) {
+  xine_cfg_entry_t *entry = xine_config_lookup_entry(dfbxine.xine, key);
+  
+  if(entry)
+    config_update(entry, XINE_CONFIG_TYPE_RANGE, min, max, 0, NULL);
+  else
+    fprintf(stderr, "WOW, key %s isn't registered\n", key);
+}
+
+void config_update_string(char *key, char *string) {
+  xine_cfg_entry_t *entry = xine_config_lookup_entry(dfbxine.xine, key);
+  
+  if(entry && string)
+    config_update(entry, XINE_CONFIG_TYPE_STRING, 0, 0, 0, string);
+  else {
+    if(string == NULL)
+      fprintf(stderr, "string is NULL\n");
+    else
+      fprintf(stderr, "WOW, key %s isn't registered\n", key);
+  }
+}
+
+void config_update_enum(char *key, int value) {
+  xine_cfg_entry_t *entry = xine_config_lookup_entry(dfbxine.xine, key);
+  
+  if(entry)
+    config_update(entry, XINE_CONFIG_TYPE_ENUM, 0, 0, value, NULL);
+  else
+    fprintf(stderr, "WOW, key %s isn't registered\n", key);
+}
+
+void config_update_bool(char *key, int value) {
+  xine_cfg_entry_t *entry = xine_config_lookup_entry(dfbxine.xine, key);
+
+  if(entry)
+    config_update(entry, XINE_CONFIG_TYPE_BOOL, 0, 0, ((value > 0) ? 1 : 0), NULL);
+  else
+    fprintf(stderr, "WOW, key %s isn't registered\n", key);
+}
+
+void config_update_num(char *key, int value) {
+  xine_cfg_entry_t *entry = xine_config_lookup_entry(dfbxine.xine, key);
+
+  if(entry)
+    config_update(entry, XINE_CONFIG_TYPE_NUM, 0, 0, value, NULL);
+  else
+    fprintf(stderr, "WOW, key %s isn't registered\n", key);
+}
+
 /*
  * Handling xine engine status changes.
  */
@@ -59,11 +150,13 @@ static void gui_status_callback (int nStatus) {
   if (dfbxine.ignore_status)
     return;
   
-  if(nStatus == XINE_STOP) {
+  if(nStatus == XINE_STATUS_STOP) {
     dfbxine.current_mrl++;
    
-    if (dfbxine.current_mrl < dfbxine.num_mrls)
-      xine_play (dfbxine.xine, dfbxine.mrl[dfbxine.current_mrl], 0, 0 );
+    if (dfbxine.current_mrl < dfbxine.num_mrls) {
+      if(xine_open(dfbxine.xine, dfbxine.mrl[dfbxine.current_mrl]))
+	xine_play (dfbxine.xine, 0, 0 );
+    }
     else {
       if (dfbxine.auto_quit == 1) {
         dfbxine.running = 0;
@@ -101,7 +194,7 @@ static void gui_branched_callback (void ) {
 static void set_position (int pos) {
 
   dfbxine.ignore_status = 1;
-  xine_play(dfbxine.xine, dfbxine.mrl[dfbxine.current_mrl], pos, 0);
+  xine_play(dfbxine.xine, pos, 0);
   dfbxine.ignore_status = 0;
 }
 
@@ -124,28 +217,29 @@ void vm_cb(int w, int h, int bpp, void* cb_data) {
 }
 
 int main(int argc, char *argv[]) {
-  char          *configfile;
-  char          *driver_name;
-  dfb_visual_info_t visual_info;
+  char                 *configfile;
+  char                 *driver_name;
+  dfb_visual_info_t     visual_info;
   IDirectFBEventBuffer *input_buf;
   IDirectFBInputDevice *keyboard = NULL;
-  int window_grabbed = 0;
-  int window_size = 0;
-  int startx = 0;
-  int starty = 0;
-  int endx = 0;
-  int endy = 0;
+  int                   window_grabbed = 0;
+  int                   window_size = 0;
+  int                   startx = 0;
+  int                   starty = 0;
+  int                   endx = 0;
+  int                   endy = 0;
 
   /*
    * Check xine library version 
    */
-  if(!xine_check_version(0, 9, 9)) {
-    fprintf(stderr, "require xine library version 0.9.9, found %d.%d.%d.\n", 
-	    xine_get_major_version(), xine_get_minor_version(),
-	    xine_get_sub_version());
+  if(!xine_check_version(0, 9, 14)) {
+    int major, minor, sub;
+    
+    xine_get_version (&major, &minor, &sub);
+    fprintf(stderr, "require xine library version 0.9.14, found %d.%d.%d.\n", major, minor, sub);
     goto failure;
   }
-
+  
   dfbxine.num_mrls = 0;
   dfbxine.current_mrl = 0;
   dfbxine.auto_quit = 0; /* default: loop forever */
@@ -170,27 +264,28 @@ int main(int argc, char *argv[]) {
       sprintf(configfile, "%s/%s", (xine_get_homedir()), cfgfile);
     }
   }
-  dfbxine.config = xine_config_file_init (configfile);
-
 
   if(!init_dfb()) {
     fprintf(stderr, "Error initialising DirectFB\n");
     goto failure;
   }
   
- /*
-  * init video output driver
-  */
- if(!dfbxine.video_driver_id)
-  dfbxine.video_driver_id = "directfb";
- 
- visual_info.dfb = dfbxine.dfb;
- visual_info.layer = dfbxine.video_layer;
- dfbxine.vo_driver = xine_load_video_output_plugin(dfbxine.config, 
-						   dfbxine.video_driver_id,
-						   VISUAL_TYPE_DFB, 
-						   (void *)(&visual_info));
-
+  dfbxine.xine = (xine_t *) xine_new();
+  xine_load_config (dfb.xine, configfile);
+  
+  /*
+   * init video output driver
+   */
+  if(!dfbxine.video_driver_id)
+    dfbxine.video_driver_id = "directfb";
+  
+  visual_info.dfb = dfbxine.dfb;
+  visual_info.layer = dfbxine.video_layer;
+  dfbxine.vo_driver = xine_open_video_driver(dfbxine.xine, 
+					     dfbxine.video_driver_id,
+					     XINE_VISUAL_TYPE_DFB, 
+					     (void *)(&visual_info));
+  
   if (!dfbxine.vo_driver) {
     printf ("main: video driver failed\n");
     goto failure;
@@ -199,66 +294,69 @@ int main(int argc, char *argv[]) {
   /*
    * init audio output driver
    */
-  driver_name = dfbxine.config->register_string (dfbxine.config, 
-						 "audio.driver", "oss",
-						 "audio driver to use",
-						 NULL, NULL, NULL);
+  driver_name = (char *) xine_config_register_string(dfbxine.xine, 
+						     "audio.driver", 
+						     "oss",
+						     "audio driver to use",
+						     NULL,
+						     20,
+						     NULL,
+						     NULL);
+  
   if(!dfbxine.audio_driver_id)
     dfbxine.audio_driver_id = driver_name;
   else
-    dfbxine.config->update_string (dfbxine.config, "audio.driver", 
-				   dfbxine.audio_driver_id);
+    config_update_string (dfbxine.xine, "audio.driver", dfbxine.audio_driver_id);
   
-  dfbxine.ao_driver = xine_load_audio_output_plugin(dfbxine.config,
-						    dfbxine.audio_driver_id);
-
+  dfbxine.ao_driver = xine_open_audio_driver(dfbxine.xine, dfbxine.audio_driver_id, NULL);
+  
   if (!dfbxine.ao_driver) {
     printf ("main: audio driver %s failed\n", dfbxine.audio_driver_id);
   }
- 
+  
   /*
    * xine init
    */
-  dfbxine.xine = xine_init (dfbxine.vo_driver,
-			   dfbxine.ao_driver, 
-			   dfbxine.config);
- 
+  xine_init (dfbxine.xine,  dfbxine.ao_driver, dfbxine.vo_driver);
+  
   if(!dfbxine.xine) {
     fprintf(stderr, "xine_init() failed.\n");
     goto failure;
   }
-
+  
   /* Init mixer control */
   dfbxine.mixer.enable = 0;
-  dfbxine.mixer.caps = xine_get_audio_capabilities(dfbxine.xine);
+  dfbxine.mixer.caps = 0;
 
-  if(dfbxine.mixer.caps & AO_CAP_PCM_VOL)
-    dfbxine.mixer.volume_mixer = AO_PROP_PCM_VOL;
-  else if(dfbxine.mixer.caps & AO_CAP_MIXER_VOL)
-    dfbxine.mixer.volume_mixer = AO_PROP_MIXER_VOL;
+  if(xine_get_param(dfbxine.xine, XINE_PARAM_AO_MIXER_VOL))
+    dfbxine.mixer.caps |= XINE_PARAM_AO_MIXER_VOL;
+  if(xine_get_param(dfbxine.xine, XINE_PARAM_AO_PCM_VOL))
+    dfbxine.mixer.caps |= XINE_PARAM_AO_PCM_VOL;
+  if(xine_get_param(dfbxine.xine, XINE_PARAM_AO_MUTE))
+    dfbxine.mixer.caps |= XINE_PARAM_AO_MUTE;
   
-  if(dfbxine.mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
+  if(dfbxine.mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
     dfbxine.mixer.enable = 1;
-    dfbxine.mixer.volume_level = xine_get_audio_property(dfbxine.xine, dfbxine.mixer.volume_mixer);
+    dfbxine.mixer.volume_level = xine_get_param(dfbxine.xine, XINE_PARAM_AUDIO_VOLUME);
   }
   
-  if(dfbxine.mixer.caps & AO_CAP_MUTE_VOL) {
-    dfbxine.mixer.mute = xine_get_audio_property(dfbxine.xine, AO_PROP_MUTE_VOL);
-  }
-
+  if(dfbxine.mixer.caps & XINE_PARAM_AO_MUTE)
+    dfbxine.mixer.mute = xine_get_param(dfbxine.xine, XINE_PARAM_AUDIO_MUTE);
+  
   /* Select audio channel */
-  xine_select_audio_channel (dfbxine.xine, dfbxine.audio_channel);
+  xine_set_param(dfbxine.xine, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, dfbxine.audio_channel);
   
   /*
    * ui loop
    */
 
-  xine_play (dfbxine.xine, dfbxine.mrl[dfbxine.current_mrl], 0, 0);
+  if(xine_open(dfbxine.xine, dfbxine.mrl[dfbxine.current_mrl]))
+    xine_play (dfbxine.xine, 0, 0);
   
   dfbxine.running = 1;
-
+  
   DFBCHECK(dfbxine.dfb->GetInputDevice (dfbxine.dfb,
-					 DIDID_KEYBOARD, &keyboard));
+					DIDID_KEYBOARD, &keyboard));
   DFBCHECK(keyboard->CreateEventBuffer (keyboard, &input_buf));
   DFBCHECK(dfbxine.main_window->AttachEventBuffer(dfbxine.main_window,
 						  input_buf));
@@ -336,8 +434,8 @@ int main(int argc, char *argv[]) {
   
 failure:
     
-  if(dfbxine.config) 
-   dfbxine.config->save(dfbxine.config);
+  if(dfbxine.xine) 
+    xine_save_config(dfbxine.xine, configfile);
  
   if(dfbxine.xine)
    xine_exit(dfbxine.xine); 

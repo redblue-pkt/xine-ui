@@ -29,18 +29,30 @@
 
 #include "Imlib-light/Imlib.h"
 #include "kbindings.h"
+#include "config_wrapper.h"
 #include "videowin.h"
 
 #include "xitk.h"
 
 #define MAX_PLAYLIST_LENGTH  1024
 
+#define CONFIG_LEVEL_BEG   0 /* => beginner */
+#define CONFIG_LEVEL_ADV  10 /* advanced user */
+#define CONFIG_LEVEL_EXP  20 /* expert */
+
+#define CONFIG_NO_DESC    NULL
+#define CONFIG_NO_HELP    NULL
+#define CONFIG_NO_CB      NULL
+#define CONFIG_NO_DATA    NULL
+
+
+
 typedef struct {
   /* our video out driver */
   const xine_vo_driver_t *vo_driver;
 
   /* xine engine instance */
-  const xine_t        *xine;
+  const xine_t       *xine;
 
   /* xine lib/gui configuration filename */
   char                *configfile;
@@ -96,7 +108,6 @@ typedef struct {
 
   struct {
     int                caps;
-    int                volume_mixer;
     int                volume_level;
     int                mute;
   } mixer;

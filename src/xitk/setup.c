@@ -191,20 +191,6 @@ static _setup_t    *setup = NULL;
 
 static void setup_end(xitk_widget_t *, void *);
 
-/*
- * Get current parameter 'param' value from xine.
- */
-static int get_current_param(int param) {
-  return xine_get_param(gGui->xine, param);
-}
-
-/*
- * set parameter 'param' to  value 'value'.
- */
-static void set_current_param(int param, int value) {
-  xine_set_param(gGui->xine, param, value);
-}
-
 
 /*
  * Leaving setup panel, release memory.
@@ -217,16 +203,8 @@ void setup_exit(xitk_widget_t *w, void *data) {
   setup->visible = 0;
 
   if((xitk_get_window_info(setup->kreg, &wi))) {
-    xine_cfg_entry_t *entry;
-    
-    entry = xine_config_lookup_entry(gGui->xine, "gui.setup_x");
-    entry->num_value = wi.x;
-    xine_config_update_entry(gGui->xine, entry);
-    
-    entry = xine_config_lookup_entry(gGui->xine, "gui.setup_y");
-    entry->num_value = wi.y;
-    xine_config_update_entry(gGui->xine, entry);
-    
+    config_update_num ("gui.setup_x", wi.x);
+    config_update_num ("gui.setup_y", wi.y);
     WINDOW_INFO_ZERO(&wi);
   }
 
@@ -506,10 +484,10 @@ static xitk_widget_t *setup_add_label (int x, int y, int w, char *str) {
  *
  */
 static void numtype_update(xitk_widget_t *w, void *data, int value) {
-  xine_cfg_entry_t *entry = (xine_cfg_entry_t *)data;
+  xine_cfg_entry_t *entry;
   
-  entry->num_value = value;
-  xine_config_update_entry(gGui->xine, entry);
+  entry = (xine_cfg_entry_t *)data;
+  config_update_num(entry->key, value);
 }
 
 /*
@@ -519,13 +497,10 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   xine_cfg_entry_t *entry, *check_entry;
   
   entry = (xine_cfg_entry_t *)data;
-  
-  free(entry->str_value);
-  entry->str_value = strdup(str);
-  xine_config_update_entry(gGui->xine, entry);
-  
-  check_entry = xine_config_lookup_entry(gGui->xine, entry->key);
 
+  config_update_string(entry->key, str);
+  check_entry = xine_config_lookup_entry(gGui->xine, entry->key);
+  
   if(check_entry) {
     if((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
       xitk_inputtext_change_text(setup->widget_list, w, check_entry->str_value);
@@ -1089,8 +1064,20 @@ void setup_panel(void) {
   
   setup = (_setup_t *) xine_xmalloc(sizeof(_setup_t));
 
-  x = xine_config_register_num (gGui->xine, "gui.setup_x", 100, NULL, NULL, 20, NULL, NULL);
-  y = xine_config_register_num (gGui->xine, "gui.setup_y", 100, NULL, NULL, 20, NULL, NULL);
+  x = xine_config_register_num (gGui->xine, "gui.setup_x", 
+				100, 
+				CONFIG_NO_DESC,
+				CONFIG_NO_HELP,
+				CONFIG_LEVEL_EXP,
+				CONFIG_NO_CB,
+				CONFIG_NO_DATA);
+  y = xine_config_register_num (gGui->xine, "gui.setup_y", 
+				100,
+				CONFIG_NO_DESC,
+				CONFIG_NO_HELP,
+				CONFIG_LEVEL_EXP,
+				CONFIG_NO_CB,
+				CONFIG_NO_DATA);
 
   /* Create window */
   setup->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
