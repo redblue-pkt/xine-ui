@@ -22,12 +22,13 @@
   need that - here the explanation... :)
   
   In order to have an optimal DVD playback the update of the image needs
-  to be syncronized with the refresh of the screen.   Otherwise you will
-  sometimes see part of frame n and part of frame n+1 during an refresh.
-  This results in tearing artefacts on moving objects.
+  to be syncronized with the vertical refresh of the screen.   Otherwise
+  you will sometimes see part of frame n and part of  frame  n+1  during
+  playback of a movie. Resulting in tearing artefacts on moving objects.
   
-  When using this plugin the update of the screen is done in the  V-SYNC
-  phase of your screen - and the tearing artefacts are gone forever.
+  When using this plugin the update of the screen  is  done  during  the
+  vertical retrace of your monitor and  those tearing artefacts are gone
+  forever.
 
 
 * AND HOW DOES IT WORK?
@@ -135,7 +136,7 @@
   
   fixing the plugin to support all features it did before XINE's API change
   
-  other tasks (not up-to-date):  
+  other tasks (out-of-date):  
   The plugin does not yet activate the hardware deinterlacing.
   The mouse cursor doesn't disappear yet when it should be disappearing.
   Prevent the panel from hidding behind the overlay by moving it out of range.
