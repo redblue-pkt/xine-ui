@@ -58,7 +58,7 @@ typedef struct {
   vo_driver_t      *vo_driver;
   config_values_t  *config;
   aa_context       *context;
-  ao_functions_t   *ao_driver;
+  ao_driver_t      *ao_driver;
   char             *mrl[1024];
   int               num_mrls;
   int               current_mrl;
