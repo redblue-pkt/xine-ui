@@ -64,7 +64,11 @@ void gui_exit (xitk_widget_t *w, void *data) {
 #endif
    
   printf("xine-panel: EXIT\n");
-  
+
+  destroy_mrl_browser();
+  control_exit(NULL, NULL);
+  pl_exit(NULL, NULL);
+
   config_save();
 
   xine_exit(gGui->xine); 

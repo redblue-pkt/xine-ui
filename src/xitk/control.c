@@ -161,43 +161,44 @@ void control_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
   int           i;
 
-  control->running = 0;
-  control->visible = 0;
+  if(control) {
+    control->running = 0;
+    control->visible = 0;
 
-  if((xitk_get_window_info(control->widget_key, &wi))) {
-    gGui->config->update_num (gGui->config, "gui.control_x", wi.x);
-    gGui->config->update_num (gGui->config, "gui.control_y", wi.y);
-    WINDOW_INFO_ZERO(&wi);
+    if((xitk_get_window_info(control->widget_key, &wi))) {
+      gGui->config->update_num (gGui->config, "gui.control_x", wi.x);
+      gGui->config->update_num (gGui->config, "gui.control_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
+
+    xitk_unregister_event_handler(&control->widget_key);
+
+    XLockDisplay(gGui->display);
+    XUnmapWindow(gGui->display, control->window);
+    XUnlockDisplay(gGui->display);
+
+    xitk_destroy_widgets(control->widget_list);
+
+    XLockDisplay(gGui->display);
+    XDestroyWindow(gGui->display, control->window);
+    Imlib_destroy_image(gGui->imlib_data, control->bg_image);
+    XUnlockDisplay(gGui->display);
+
+    control->window = None;
+    xitk_list_free(control->widget_list->l);
+
+    XLockDisplay(gGui->display);
+    XFreeGC(gGui->display, control->widget_list->gc);
+    XUnlockDisplay(gGui->display);
+
+    free(control->widget_list);
+
+    for(i = 0; i < control->skins_num; i++)
+      free(control->skins[i]);
+
+    free(control);
+    control = NULL;
   }
-
-  xitk_unregister_event_handler(&control->widget_key);
-
-  XLockDisplay(gGui->display);
-  XUnmapWindow(gGui->display, control->window);
-  XUnlockDisplay(gGui->display);
-
-  xitk_destroy_widgets(control->widget_list);
-
-  XLockDisplay(gGui->display);
-  XDestroyWindow(gGui->display, control->window);
-  Imlib_destroy_image(gGui->imlib_data, control->bg_image);
-  XUnlockDisplay(gGui->display);
-
-  control->window = None;
-  xitk_list_free(control->widget_list->l);
-  
-  XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, control->widget_list->gc);
-  XUnlockDisplay(gGui->display);
-
-  free(control->widget_list);
-  
-  for(i = 0; i < control->skins_num; i++)
-    free(control->skins[i]);
-  
-  free(control);
-  control = NULL;
-
 }
 
 /*

@@ -97,39 +97,41 @@ static void handle_selection(xitk_widget_t *w, void *data) {
 void pl_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
 
-  playlist->running = 0;
-  playlist->visible = 0;
+  if(playlist) {
+    playlist->running = 0;
+    playlist->visible = 0;
 
-  if((xitk_get_window_info(playlist->widget_key, &wi))) {
-    gGui->config->update_num (gGui->config, "gui.playlist_x", wi.x);
-    gGui->config->update_num (gGui->config, "gui.playlist_y", wi.y);
-    WINDOW_INFO_ZERO(&wi);
+    if((xitk_get_window_info(playlist->widget_key, &wi))) {
+      gGui->config->update_num (gGui->config, "gui.playlist_x", wi.x);
+      gGui->config->update_num (gGui->config, "gui.playlist_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
+
+    xitk_unregister_event_handler(&playlist->widget_key);
+
+    XLockDisplay(gGui->display);
+    XUnmapWindow(gGui->display, playlist->window);
+    XUnlockDisplay(gGui->display);
+
+    xitk_destroy_widgets(playlist->widget_list);
+
+    XLockDisplay(gGui->display);
+    XDestroyWindow(gGui->display, playlist->window);
+    Imlib_destroy_image(gGui->imlib_data, playlist->bg_image);
+    XUnlockDisplay(gGui->display);
+
+    playlist->window = None;
+    xitk_list_free(playlist->widget_list->l);
+
+    XLockDisplay(gGui->display);
+    XFreeGC(gGui->display, playlist->widget_list->gc);
+    XUnlockDisplay(gGui->display);
+
+    free(playlist->widget_list);
+
+    free(playlist);
+    playlist = NULL;
   }
-
-  xitk_unregister_event_handler(&playlist->widget_key);
-
-  XLockDisplay(gGui->display);
-  XUnmapWindow(gGui->display, playlist->window);
-  XUnlockDisplay(gGui->display);
-
-  xitk_destroy_widgets(playlist->widget_list);
-
-  XLockDisplay(gGui->display);
-  XDestroyWindow(gGui->display, playlist->window);
-  Imlib_destroy_image(gGui->imlib_data, playlist->bg_image);
-  XUnlockDisplay(gGui->display);
-
-  playlist->window = None;
-  xitk_list_free(playlist->widget_list->l);
-
-  XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, playlist->widget_list->gc);
-  XUnlockDisplay(gGui->display);
-
-  free(playlist->widget_list);
- 
-  free(playlist);
-  playlist = NULL;
 }
 
 /*
