@@ -694,10 +694,12 @@ int video_window_is_cursor_visible(void) {
  * hide/show video window 
  */
 void video_window_set_visibility(int show_window) {
-
   static Atom  XA_WIN_LAYER = None;
   long         data[1];
   
+  if(gGui->use_root_window)
+    return;
+
   gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 				      GUI_DATA_EX_VIDEOWIN_VISIBLE, 
 				      (int *)show_window);
