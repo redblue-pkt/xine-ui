@@ -1002,17 +1002,6 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   
   switch(event->type) { 
     
-  case XINE_EVENT_SPU_BUTTON:
-    {
-      xine_spu_button_t *spubtn = (xine_spu_button_t *) event->data;
-
-      if(spubtn->direction)
-	video_window_set_cursor(CURSOR_HAND);
-      else
-	video_window_set_cursor(CURSOR_ARROW);
-    }
-    break;
-
   /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
     if(event->stream == gGui->stream) {
@@ -1105,108 +1094,115 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	/* (warning message) */
       case XINE_MSG_GENERAL_WARNING:
 	report = xine_info;
-	sprintf(buffer, "%s:", _("*drum roll*, xine lib wants to take your attention "
-				 "to deliver an important message to you ;-):"));
+	snprintf(buffer, sizeof(buffer),
+		 "%s:", _("*drum roll*, xine lib wants to take your attention "
+			  "to deliver an important message to you ;-):"));
 	if(data->explanation)
-	  sprintf(buffer, "%s %s %s", buffer,
-		  (char *) data + data->explanation, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s %s %s", buffer,
+		   (char *) data + data->explanation, (char *) data + data->parameters);
 	else
-	  sprintf(buffer, "%s %s", buffer, _("No Information available."));
+	  snprintf(buffer, sizeof(buffer), "%s %s", buffer, _("No Information available."));
 	  
 	break;
 
         /* (host name) */
       case XINE_MSG_UNKNOWN_HOST:
-	sprintf(buffer, "%s", _("The host you're trying to connect is unknown.\n"
-				"Check the validity of the specified hostname."));
+	snprintf(buffer, sizeof(buffer), "%s", _("The host you're trying to connect is unknown.\n"
+						 "Check the validity of the specified hostname."));
 	if(data->explanation)
-	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s (%s)", buffer, (char *) data + data->parameters);
 	break;
 	
 	/* (device name) */
       case XINE_MSG_UNKNOWN_DEVICE:
-	sprintf(buffer, "%s", _("The device name you specified seems invalid."));
+	snprintf(buffer, sizeof(buffer), "%s", _("The device name you specified seems invalid."));
 	if(data->explanation)
-	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s (%s)", buffer, (char *) data + data->parameters);
 	break;
 
 	/* none */
       case XINE_MSG_NETWORK_UNREACHABLE:
-	sprintf(buffer, "%s", _("The network looks unreachable.\nCheck your network "
-				"setup and/or the server name."));
+	snprintf(buffer, sizeof(buffer), "%s", _("The network looks unreachable.\nCheck your network "
+						 "setup and/or the server name."));
 	if(data->explanation)
-	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s (%s)", buffer, (char *) data + data->parameters);
 	break;
 
 	/* (host name) */
       case XINE_MSG_CONNECTION_REFUSED:
-	sprintf(buffer, "%s", _("The connection was refused.\nCheck the host name."));
+	snprintf(buffer, sizeof(buffer), "%s", _("The connection was refused.\nCheck the host name."));
 	if(data->explanation)
-	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s (%s)", buffer, (char *) data + data->parameters);
 	break;
 
 	/* (file name or mrl) */
       case XINE_MSG_FILE_NOT_FOUND:
-	sprintf(buffer, "%s", _("The specified file or mrl is not found. Please check it twice."));
+	snprintf(buffer, sizeof(buffer), "%s", _("The specified file or mrl is not found. Please check it twice."));
 	if(data->explanation)
-	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s (%s)", buffer, (char *) data + data->parameters);
 	break;
 
 	/* (device/file/mrl) */
       case XINE_MSG_READ_ERROR:
-	sprintf(buffer, "%s", _("The source can't be read.\nMaybe you don't have enough "
-				"rights for this, or source doesn't contain data "
-				"(e.g: not disc in drive)."));
+	snprintf(buffer, sizeof(buffer), "%s", _("The source can't be read.\nMaybe you don't have enough "
+						 "rights for this, or source doesn't contain data "
+						 "(e.g: not disc in drive)."));
 	if(data->explanation)
-	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s (%s)", buffer, (char *) data + data->parameters);
 	break;
 	
 	/* (library/decoder) */
       case XINE_MSG_LIBRARY_LOAD_ERROR:
-	sprintf(buffer, "%s", _("A problem occur while loading a library or a decoder"));
+	snprintf(buffer, sizeof(buffer), "%s", _("A problem occur while loading a library or a decoder"));
 	if(data->explanation)
-	  sprintf(buffer, "%s: %s", buffer, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s: %s", buffer, (char *) data + data->parameters);
 	break;
 
 	/* none */
       case XINE_MSG_ENCRYPTED_SOURCE:
-	sprintf(buffer, "%s", _("The source seems encrypted, and can't be read."));
+	snprintf(buffer, sizeof(buffer), "%s", _("The source seems encrypted, and can't be read."));
 	if(!strncasecmp(gGui->mmk.mrl, "dvd:/", 5)) {
-	  sprintf(buffer, "%s", _("\nYou DVD is probably crypted. "
-				  "According to your country laws, you can or can't "
-				  "install/use libdvdcss to be able to read this disc, "
-				  "which you bought."));
+	  snprintf(buffer, sizeof(buffer), "%s", _("\nYou DVD is probably crypted. "
+						   "According to your country laws, you can or can't "
+						   "install/use libdvdcss to be able to read this disc, "
+						   "which you bought."));
 	}
 	if(data->explanation)
-	  sprintf(buffer, "%s (%s)", buffer, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s (%s)", buffer, (char *) data + data->parameters);
 	break;
 
 	/* (warning message) */
       case XINE_MSG_SECURITY:
 	report = xine_info;
 	if(data->explanation)
-	  sprintf(buffer, "%s %s",
-		  (char *) data + data->explanation, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s %s",
+		   (char *) data + data->explanation, (char *) data + data->parameters);
 	else
-	  sprintf(buffer, _("No Informations available."));
+	  snprintf(buffer, sizeof(buffer), "%s", _("No Informations available."));
+	break;
+
+      case XINE_MSG_AUDIO_OUT_UNAVAILABLE:
+	gui_stop(NULL, NULL);
+	snprintf(buffer, sizeof(buffer), "%s", _("The audio device is unavailable. "
+						 "Please verify if another program already use it."));
 	break;
 
       default:
-	sprintf(buffer, "%s", _("*sight*, unkown error."));
+	snprintf(buffer, sizeof(buffer), "%s", _("*sight*, unkown error."));
 	if(data->explanation)
-	  sprintf(buffer, "%s (%s %s)", buffer,
-		  (char *) data + data->explanation, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s (%s %s)", buffer,
+		   (char *) data + data->explanation, (char *) data + data->parameters);
 	break;
       }
       
       if(gGui->verbosity >= XINE_VERBOSITY_DEBUG) {
-	sprintf(buffer, "%s\n\n[", buffer);
+	snprintf(buffer, sizeof(buffer), "%s\n\n[", buffer);
 	
 	if(data->explanation)
-	  sprintf(buffer, "%s'%s' '%s'", buffer, 
-		  (char *) data + data->explanation, (char *) data + data->parameters);
+	  snprintf(buffer, sizeof(buffer), "%s'%s' '%s'", buffer, 
+		   (char *) data + data->explanation, (char *) data + data->parameters);
 	
-	sprintf(buffer, "%s]", buffer);
+	snprintf(buffer, sizeof(buffer), "%s]", buffer);
       }
       
       if(strlen(buffer))
@@ -1282,6 +1278,31 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 
     }
     break;
+
+  case XINE_EVENT_UI_NUM_BUTTONS:
+    break;
+
+  case XINE_EVENT_SPU_BUTTON:
+    {
+      xine_spu_button_t *spubtn = (xine_spu_button_t *) event->data;
+      
+      if(spubtn->direction)
+	video_window_set_cursor(CURSOR_HAND);
+      else
+	video_window_set_cursor(CURSOR_ARROW);
+    }
+    break;
+
+  case XINE_EVENT_DROPPED_FRAMES:
+    {
+      char buffer[2048];
+      
+      memset(&buffer, 0, sizeof(buffer));
+      snprintf(buffer, sizeof(buffer), "%s", _("Your system seems too slow, the amoung of dropped frames is too high."));
+      xine_error_with_more(buffer);
+    }
+    break;
+
   }
 }
   
