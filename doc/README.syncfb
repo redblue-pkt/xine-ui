@@ -3,30 +3,33 @@
        XINE video output plugin for MATROX G400 / G200 cards *only*
   =====                                                            =====
 
-
-  PLEASE NOTE: The plugin has just been rewritten from scratch.   So you
-               might experience some problems.  We  are  sorry  for  any
-	       inconvenience caused.
-	       
-	       Please help getting the plugin rock  solid  by  reporting
-	       any bugs that are specific to it. We will try to fix them
-	       as soon as possible (hey! who says that?! *grin*). Thanks
-	       in advance for your support.
+  
+  IMPORTANT NOTE
+    
+    Starting from XINE release 0.9.4 a new version  of  this  plugin  is
+    included which basically is a complete rewrite.
+    
+    Even though we are trying to make things as stable as possible,  you
+    *might* experience some problems we haven't yet fixed  or  we  don't
+    know about yet. Please refer to the end  of  this  README  for  more
+    information on known bugs and how to report new ones.
+  
+    Thanks for your help to get this plugin as rock-solid as possible.
   
 
 * WHAT IS THIS PLUGIN ABOUT and WHY SHOULD I EVEN CONSIDER TO USE IT? :)
   
-  This XINE video output plugin uses the so called Teletux  driver which
-  provides special hardware features of the Matrox G400 and  G200  cards
-  like deinterlacing, scaling and YUV data to RGB conversion --- just to
-  name a few.  The plugin makes all those features available to XINE and
-  because all this tasks are done by the graphics card there  is no need
-  for XINE to do them in software -- so you save precious CPU time which
-  you may gonna need for other things. :-)
+  This XINE video output plugin uses the so called  SyncFB  driver (from
+  the Teletux project) which provides special hardware  features  of the
+  Matrox G400 and G200 cards like hardware  deinterlacing,  scaling  and
+  synchronization of your video output to the vertical retrace  of  your
+  monitor - just to name a few. The  plugin  makes  all  those  features
+  available to XINE and because all this tasks are done by the  graphics
+  card there  is  no need for XINE to do them in software -- so you save
+  precious CPU time which you may gonna need for other things. :-)
   
-  Another feature of this plugin is the  synchronisation  of  the  video
-  picture with the refresh of your screen.  Before you ask why you would
-  need that - here the explanation... :)
+  Ok ok -- why should you want to have your video output synchronized to
+  the vertical retrace of your monitor?! Well... :)
   
   In order to have an optimal DVD playback the update of the image needs
   to be syncronized with the vertical refresh of the screen.   Otherwise
@@ -37,13 +40,19 @@
   vertical retrace of your monitor and  those tearing artefacts are gone
   forever.
 
-  And last but not least, you can finally  use  hardware  deinterlacing,
-  so your CPU can lean back and let the graphic card do the work. :)
+  Last but not least, you may ask what's so special about deinterlacing?
+  There are already several deinterlacing methods  available in XINE and
+  why should you care about another one? Well (again)... ;-))
+  
+  All current deinterlacers in XINE are done in software  and  therefore
+  will cost you some CPU power. The SyncFB video out plugin will use the
+  hardware deinterlacing support of your graphics card, thus saving your
+  CPU power because everything is done by your G400/G200 card...
   
 
 * AND HOW DOES IT WORK?
   
-  The Teletux driver is a kernel module you will have to load that makes
+  The SyncFB driver is a kernel  module you will have to load that makes
   a special device (e.g. /dev/syncfb) available which  is  opened by the
   plugin and controlled with certain ioctl calls. Easy, isn't it? ;-)
 
@@ -53,31 +62,46 @@
 
 * OK I HEARD ENOUGH - HOW DO I INSTALL and USE IT? :)
 
-  First of all you will need to get the Teletux driver itself.      It's
-  available at http://teletux.sourceforge.net.  (please note, that we do
-  recommend a recent CVS checkout) Once you downloaded it, unpack  it to
-  a directory of your choice, please read the README and  compile  it (a
-  normal "make" should work out-of-the-box). Now there are  only  a  few
-  things left for you to do...
+  First of all you will need to get the SyncFB kernel  module  which  is
+  part of the Teletux project. (URL: http://teletux.sourceforge.net)
+  
+  Please note that we do recommend a recent CVS checkout.
+  
+  Once you have got your copy of the  module,  please  read  the  README
+  included with it and follow the compilation instructions.   (usually a
+  normal "make" *should* work out-of-the-box)
+  
+  (Currently you *might* experience some problems with  the  compilation
+   process - we know about it and will try to fix them soon)
+
+  Now there are only a few things left for you to do...
   
   1) Become root. Hey now you can take over the world *evil laugh* :-)))
   2) Create a device called /dev/syncfb  ===>  mknod /dev/syncfb c 178 0
   3) Copy the file "syncfb.o" to your modules directory (usually this is
      /lib/modules/YOUR_KERNEL_VERSION/) and do a "depmod -a".
   
-  This should be it. In order to use the Teletux driver you will have to
-  load it with the command "insmod syncfb.o" - please note that you will
-  have to load it every time you reboot if you wanna use the driver.
+  This should be it.  In order to use the SyncFB kernel module, you will
+  have to load it with the command "insmod syncfb.o" -- please note that
+  it is necessary to load the module like this  every  time  you  reboot
+  your system to use this plugin.
 
   Now just start XINE once with the following parameter: "-V SyncFB" and
-  the SyncFB video out plugin will be used as default plugin.
+  the SyncFB video out plugin will be used as default plugin.    (please
+  remember to load the SyncFB module before starting XINE, otherwise  it
+  will fall back to the Xv video out plugin as default)
 
-  It  is  possible now  that the image during video playback is jerking.
-  This could be caused by the syncronisiation of the  video  image  with
-  your screen refresh. You can easily fix that by switching your monitor
-  to the appropriate refresh rates (50 Hz for PAL, 60 Hz for NTSC).  You
+
+* MY IMAGE IS JERKING - WHAT'S THE MATTER?!
+
+  Playing back video material that is mastered for e.g. NTSC  can  cause
+  this jerking if your monitor is not running at a refresh rate  that is
+  a multiple of 30 (PAL: 25).
+
+  You can try to fix that by switching your monitor to  the  appropriate
+  refresh rates (e.g. 50/75/100 Hz for PAL, 60/90/120 Hz for NTSC).  You
   will need to add so called modelines to your XFree86  config  to  make
-  those 50 Hz/60 Hz modes available.
+  those modes available, if you don't already have them.
   
   Here is is a short listing of some sample modelines. Please  add  only
   those two lines (for NTSC and PAL) which exactly  fit  the  screensize
@@ -188,13 +212,11 @@
     the video memory left (video memory - X reserved video memory)
     
   + zooming support (currently only implemented with the Xv video out)
-    [status: implemented, being tested - soon to appear on CVS]
+    [status: implemented, being tested - *may* soon appear on CVS]
     
   + patching the syncfb kernel module itself for devfs and the  recently
-    introduced license tag support
+    introduced license tag support (as well as bug fixing and updating)
     
-  + updating the documentation
-  
   + bug fixes
   + more sanity checks
   + new features
