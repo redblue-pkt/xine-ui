@@ -73,6 +73,8 @@ typedef struct {
   int            output_height;
   float          mag;
 
+  int            stream_resize_window; /* Boolean, 1 if new stream resize output window */
+
   int            fullscreen_mode; /* are we currently in fullscreen mode?  */
   int            fullscreen_req;  /* ==1 => video_window will 
 				   * switch to fullscreen mode             */
@@ -121,6 +123,10 @@ extern int XShmGetEventBase(Display *);
 static void video_window_handle_event (XEvent *event, void *data);
 static void video_window_adapt_size (void);
 
+static void _video_window_resize_cb(void *data, cfg_entry_t *cfg) {
+  gVw->stream_resize_window = cfg->num_value;
+}
+  
 /*
  * Let the video driver override the selected visual
  */
@@ -485,7 +491,7 @@ static void video_window_adapt_size (void) {
      * test it.
      */
     if((gVw->using_xinerama == 0) && 
-       (gVw->last_video_width == -1) && (gVw->last_video_height == -1)) {
+       (gVw->stream_resize_window == 0)) {
       hint.x           = gVw->old_xwin;
       hint.y           = gVw->old_ywin;
     }
@@ -662,7 +668,7 @@ void video_window_dest_size_cb (void *data,
 				int *dest_width, int *dest_height)  {
   
 
-  if((gVw->last_video_width != -1) && (gVw->last_video_height != -1)) {
+  if(!gVw->stream_resize_window) {
 
     if(gVw->video_width != video_width || gVw->video_height != video_height) {
       
@@ -696,7 +702,7 @@ void video_window_frame_output_cb (void *data,
 				   int *dest_width, int *dest_height,
 				   int *win_x, int *win_y) {
   
-  if((gVw->last_video_width == -1) && (gVw->last_video_height == -1)) {
+  if(!gVw->stream_resize_window) {
     gVw->video_width  = video_width;
     gVw->video_height = video_height;
   }
@@ -988,17 +994,27 @@ void video_window_init (window_attributes_t *window_attribute) {
 
   XUnlockDisplay (gGui->display);
 
+  gVw->stream_resize_window = gGui->config->register_bool(gGui->config, 
+							  "gui.stream_resize_window", 0,
+							  "New stream sizes resize output window",
+							  NULL, _video_window_resize_cb, NULL);
+     
   if((window_attribute->width > 0) && (window_attribute->height > 0)) {
     gVw->video_width  = window_attribute->width;
     gVw->video_height = window_attribute->height;
-    gVw->last_video_width = gVw->last_video_height = -1;
+    /* 
+     * Force to keep window size.
+     * I don't update the config file, i think this window geometry
+     * user defined can be temporary.
+     */
+    gVw->stream_resize_window = 0;
   }
   else {
     gVw->video_width  = 768;
     gVw->video_height = 480;
     gVw->last_video_width = gVw->last_video_height = 0;
   }
-  
+
   video_window_set_mag(1.0);
 
   /*
