@@ -79,6 +79,22 @@ static void _tips_kill_running(void) {
 /*
  *
  */
+static void _tips_handle_event(XEvent *event, void *data) {
+  /* tips_private_t      *tp = (tips_private_t *) data; */
+  
+  switch(event->type) {
+    
+  case ButtonRelease:
+  case ButtonPress:
+    _tips_kill_running();
+    break;
+    
+  }
+}
+
+/*
+ *
+ */
 static void *_tips_destroy_thread(void *data) {
   tips_private_t *tp = (tips_private_t *)data;
   
@@ -216,11 +232,11 @@ static void *_tips_thread(void *data) {
   /* TODO: forward key event to parent window */
   tp->key = xitk_register_event_handler("xitk tips", 
 					(xitk_window_get_window(tp->xwin)),
+					_tips_handle_event,
 					NULL,
 					NULL,
 					NULL,
-					NULL,
-					NULL);
+					(void *) tp);
 
   /* Create a thread which will destroy the tips window */  
   {
