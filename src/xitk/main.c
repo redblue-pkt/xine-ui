@@ -248,8 +248,8 @@ static void load_video_out_driver(char *video_driver_id) {
 #endif
   }
 
-  vis.calc_dest_size    = video_window_calc_dest_size;
-  vis.request_dest_size = video_window_adapt_size;
+  vis.dest_size_cb      = video_window_dest_size_cb;
+  vis.frame_output_cb   = video_window_frame_output_cb;
   vis.user_data         = NULL;
   
   /*

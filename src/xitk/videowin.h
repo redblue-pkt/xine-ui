@@ -1,7 +1,7 @@
 /* 
- * Copyright (C) 2000-2001 the xine project
+ * Copyright (C) 2000-2002 the xine project
  * 
- * This file is part of xine, a unix video player.
+ * This file is part of xine, a free video player.
  * 
  * xine is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,16 +29,16 @@ void video_window_init (void);
 
 void video_window_select_visual (void);
 
-void video_window_adapt_size (void *this,
-			      int video_width, int video_height, 
-			      int *dest_x, int *dest_y,
-			      int *dest_width, int *dest_height);
+void video_window_frame_output_cb (void *this,
+				   int video_width, int video_height, 
+				   int *dest_x, int *dest_y,
+				   int *dest_width, int *dest_height);
 
-void video_window_calc_dest_size (void *this,
-				  int video_width, int video_height,
-				  int *dest_width, int *dest_height);
+void video_window_dest_size_cb (void *this,
+				int video_width, int video_height,
+				int *dest_width, int *dest_height);
 
-/* set/get fullscreen mode */
+/* set/check fullscreen mode */
 void video_window_set_fullscreen (int req_fullscreen);
 int video_window_is_fullscreen (void);
 
