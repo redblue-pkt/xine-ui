@@ -426,7 +426,7 @@ void control_panel(void) {
   XSizeHints                 hint;
   XWMHints                  *wm_hint;
   XSetWindowAttributes       attr;
-  char                       title[] = {"Xine Control Panel"};
+  char                      *title;
   Atom                       prop, XA_WIN_LAYER;
   MWMHints                   mwmhints;
   XClassHint                *xclasshint;
@@ -444,6 +444,8 @@ void control_panel(void) {
       return;
   }
   
+  xine_strdupa(title, _("Xine Control Panel"));
+
   XITK_WIDGET_INIT(&br, gGui->imlib_data);
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
@@ -526,7 +528,7 @@ void control_panel(void) {
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = "Xine Control Panel";
+    xclasshint->res_name = title;
     xclasshint->res_class = "Xine";
     XSetClassHint(gGui->display, control->window, xclasshint);
   }

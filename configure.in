@@ -180,16 +180,14 @@ AM_CONDITIONAL(HAVE_XF86VIDMODE, test x$ac_have_xf86vidmode = "xyes")
 
 
 dnl
-dnl Check for DPMS location
+dnl XTest Extension
 dnl
-AC_CHECK_LIB(Xext, DPMSQueryExtension,
-	     DPMS_LIBS=""
-	     AC_DEFINE(HAVE_DPMS),
-             AC_CHECK_LIB(Xdpms, DPMSQueryExtension, 
-                          DPMS_LIBS="-lXdpms"
-			  AC_DEFINE(HAVE_DPMS),, $X_LIBS), 
-             $X_LIBS)
-AC_SUBST(DPMS_LIBS)
+AC_CHECK_LIB(Xtst, XTestFakeKeyEvent, 
+             XTEST_LIBS="-lXtst"
+             AC_DEFINE(HAVE_XTESTEXTENSION)
+	     ac_have_xtest="yes",, $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
+AC_SUBST(XTEST_LIBS)
+AM_CONDITIONAL(HAVE_XTESTEXTENSION, test x$ac_have_xtest = "xyes")
  
 
 dnl

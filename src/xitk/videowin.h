@@ -67,4 +67,6 @@ float video_window_get_mag (void);
 
 void video_window_change_skins(void);
 
+void video_window_reset_ssaver(void);
+
 #endif

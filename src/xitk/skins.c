@@ -334,7 +334,7 @@ void init_skins_support(void) {
 
   skin_num = gGui->config->register_enum (gGui->config, "gui.skin", 
 					  (get_skin_offset(DEFAULT_SKIN)), skin_names,
-					  "gui skin theme number", NULL, skin_change_cb, NULL);
+					  _("gui skin theme"), NULL, skin_change_cb, NULL);
   
   sk = (skin_num < skins_avail_num) ? skins_avail[skin_num] : NULL;
   

@@ -28,12 +28,16 @@
 
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
+#include <X11/keysym.h>
 #include <X11/extensions/XShm.h>
 #ifdef HAVE_XINERAMA
 #include <X11/extensions/Xinerama.h>
 #endif
 #ifdef HAVE_XF86VIDMODE
 #include <X11/extensions/xf86vmode.h>
+#endif
+#ifdef HAVE_XTESTEXTENSION
+#include <X11/extensions/XTest.h>
 #endif
 
 #include <xine.h>
@@ -47,14 +51,13 @@
 #include "panel.h"
 #include "actions.h"
 #include "errors.h"
+#include "i18n.h"
 #include "xitk.h"
-
 
 #define EST_KEEP_VALID  10	  /* #frames to allow for changing fps */
 #define EST_MAX_JITTER  0.01	  /* maximum jitter to detect valid fps */
 #define EST_MAX_DIFF    0.01      /* maximum diff to detect valid fps */
 #define ABS(x) ((x)>0?(x):-(x))
-
 
 extern gGui_t *gGui;
 
@@ -112,6 +115,8 @@ typedef struct {
   int            show;
   int            borderless;      /* borderless window (for windowed mode)? */
 
+  Bool           have_xtest;
+
   XWMHints      *wm_hint;
 
   xitk_register_key_t    widget_key;
@@ -143,7 +148,17 @@ static void _video_window_resize_cb(void *data, cfg_entry_t *cfg) {
 static void _video_window_zoom_small_cb(void *data, cfg_entry_t *cfg) {
   gVw->zoom_small_stream = cfg->num_value;
 }
+
+
+static Bool have_xtestextention(void) {  
+#ifdef HAVE_XTESTEXTENSION
+  int dummy1, dummy2, dummy3, dummy4;
   
+  return (XTestQueryExtension(gGui->display, &dummy1, &dummy2, &dummy3, &dummy4));
+#endif
+  return False;
+}
+
 /*
  * Let the video driver override the selected visual
  */
@@ -156,14 +171,14 @@ void video_window_select_visual (void) {
                                         &vinfo);
     if (vinfo != (XVisualInfo *) -1) {
       if (! vinfo) {
-        fprintf (stderr, "videowin: output driver cannot select a working visual\n");
+        fprintf (stderr, _("videowin: output driver cannot select a working visual\n"));
         exit (1);
       }
       gGui->visual = vinfo->visual;
       gGui->depth  = vinfo->depth;
     }
     if (gGui->visual != gVw->visual) {
-      printf ("videowin: output driver overrides selected visual to visual id 0x%lx\n", gGui->visual->visualid);
+      printf (_("videowin: output driver overrides selected visual to visual id 0x%lx\n"), gGui->visual->visualid);
       gui_init_imlib (gGui->visual);
       video_window_adapt_size ();
     }
@@ -183,7 +198,7 @@ void video_window_select_visual (void) {
  */
 static void video_window_adapt_size (void) { 
 
-  static char          *window_title = "xine video output";
+  static char          *window_title;
   XSizeHints            hint;
   XWMHints             *wm_hint;
   XSetWindowAttributes  attr;
@@ -205,6 +220,8 @@ static void video_window_adapt_size (void) {
  *           dest_width,
  *           dest_height); 
  */
+
+  xine_strdupa(window_title, _("xine video output"));
 
   XLockDisplay (gGui->display);
 
@@ -338,7 +355,7 @@ static void video_window_adapt_size (void) {
 	  if(gVw->fullscreen_mode && search == 0)
 	    gGui->XF86VidMode_fullscreen = 0;
        } else {
-	  xine_error("XF86VidMode Extension: modeline switching failed.\n");
+	  xine_error(_("XF86VidMode Extension: modeline switching failed.\n"));
        }
     }
   }
@@ -922,6 +939,8 @@ void video_window_init (window_attributes_t *window_attribute) {
     gVw->old_widget_key   = 0;
   gVw->gc		  = None;
   gVw->borderless         = window_attribute->borderless;
+  gVw->have_xtest         = have_xtestextention();
+
 
   XLockDisplay (gGui->display);
 
@@ -978,15 +997,15 @@ void video_window_init (window_attributes_t *window_attribute) {
   /* create xclass hint for video window */
 
   if ((gVw->xclasshint = XAllocClassHint()) != NULL) {
-    gVw->xclasshint->res_name = "Xine Video Window";
+    gVw->xclasshint->res_name = _("Xine Video Window");
     gVw->xclasshint->res_class = "Xine";
   }
   if ((gVw->xclasshint_fullscreen = XAllocClassHint()) != NULL) {
-    gVw->xclasshint_fullscreen->res_name = "Xine Video Fullscreen Window";
+    gVw->xclasshint_fullscreen->res_name = _("Xine Video Fullscreen Window");
     gVw->xclasshint_fullscreen->res_class = "Xine";
   }
   if ((gVw->xclasshint_borderless = XAllocClassHint()) != NULL) {
-    gVw->xclasshint_borderless->res_name = "Xine Video Borderless Window";
+    gVw->xclasshint_borderless->res_name = _("Xine Video Borderless Window");
     gVw->xclasshint_borderless->res_class = "Xine";
   }
 
@@ -1007,7 +1026,7 @@ void video_window_init (window_attributes_t *window_attribute) {
 
   gVw->wm_hint = XAllocWMHints();
   if (!gVw->wm_hint) {
-    printf ("XAllocWMHints failed\n");
+    printf (_("XAllocWMHints() failed\n"));
     exit (1);
   }
 
@@ -1028,16 +1047,18 @@ void video_window_init (window_attributes_t *window_attribute) {
 
   XUnlockDisplay (gGui->display);
 
-  gVw->stream_resize_window = gGui->config->register_bool(gGui->config, 
-							  "gui.stream_resize_window", 0,
-							  "New stream sizes resize output window",
-							  NULL, _video_window_resize_cb, NULL);
+  gVw->stream_resize_window = 
+    gGui->config->register_bool(gGui->config, 
+				"gui.stream_resize_window", 0,
+				_("New stream sizes resize output window"),
+				NULL, _video_window_resize_cb, NULL);
   
-  gVw->zoom_small_stream = gGui->config->register_bool(gGui->config, 
-							  "gui.zoom_small_stream", 0,
-							  "Double size for small streams (require stream_resize_window)",
-							  NULL, _video_window_zoom_small_cb, NULL);
-     
+  gVw->zoom_small_stream = 
+    gGui->config->register_bool(gGui->config, 
+				"gui.zoom_small_stream", 0,
+				_("Double size for small streams (require stream_resize_window)"),
+				NULL, _video_window_zoom_small_cb, NULL);
+  
   if((window_attribute->width > 0) && (window_attribute->height > 0)) {
     gVw->video_width  = window_attribute->width;
     gVw->video_height = window_attribute->height;
@@ -1057,8 +1078,8 @@ void video_window_init (window_attributes_t *window_attribute) {
   XLockDisplay (gGui->display);
   
   if(gGui->config->register_bool(gGui->config, "gui.use_xvidext", 0,
-				   "use XVidModeExtension when switching to fullscreen",
-				   NULL, NULL, NULL)) {
+				 _("use XVidModeExtension when switching to fullscreen"),
+				 NULL, NULL, NULL)) {
     /* 
      * without the "stream resizes window" behavior, the XVidMode support
      * won't work correctly, so we force it for each session the user wants
@@ -1073,10 +1094,10 @@ void video_window_init (window_attributes_t *window_attribute) {
       int                  major, minor, sort_x, sort_y;
       
       XF86VidModeQueryVersion(gGui->display, &major, &minor);
-      printf("XF86VidMode Extension (%d.%d) detected, trying to use it.\n", major, minor);
+      printf(_("XF86VidMode Extension (%d.%d) detected, trying to use it.\n"), major, minor);
       
       if(XF86VidModeGetAllModeLines(gGui->display, XDefaultScreen(gGui->display), &(gVw->XF86_modelines_count), &(gVw->XF86_modelines))) {
-	printf("XF86VidMode Extension: %d modelines found.\n", gVw->XF86_modelines_count);
+	printf(_("XF86VidMode Extension: %d modelines found.\n"), gVw->XF86_modelines_count);
 	
 	/*
 	 * sorting modelines, skipping first entry because it is the current
@@ -1094,10 +1115,10 @@ void video_window_init (window_attributes_t *window_attribute) {
 	}
       } else {
 	gVw->XF86_modelines_count = 0;
-	printf("XF86VidMode Extension: could not get list of available modelines. Failed.\n");
+	printf(_("XF86VidMode Extension: could not get list of available modelines. Failed.\n"));
       }
     } else {
-      printf("XF86VidMode Extension: initialization failed, not using it.\n");
+      printf(_("XF86VidMode Extension: initialization failed, not using it.\n"));
     }
   }
    else
@@ -1279,15 +1300,15 @@ static void video_window_handle_event (XEvent *event, void *data) {
     break;
 
   case KeyPress:
-
-    if(!gGui->cursor_visible) {
+    
+    if((!gGui->cursor_visible) && (!((event->xkey.keycode|0xFF00) == XK_Shift_L))) {
       gGui->cursor_visible = !gGui->cursor_visible;
       video_window_set_cursor_visibility(gGui->cursor_visible);
     }
-
+    
     gui_handle_event(event, data);
     break;
-
+    
   case MotionNotify: {
     XMotionEvent *mevent = (XMotionEvent *) event;
     xine_input_event_t xine_event;
@@ -1373,4 +1394,22 @@ static void video_window_handle_event (XEvent *event, void *data) {
 					GUI_DATA_EX_COMPLETION_EVENT, 
 					event);
 
+}
+
+void video_window_reset_ssaver(void) {
+#ifdef HAVE_XTESTEXTENSION
+  if(gVw->have_xtest == True) {
+    XLockDisplay(gGui->display);
+    XTestFakeKeyEvent(gGui->display, XK_Shift_L, True, CurrentTime);
+    XTestFakeKeyEvent(gGui->display, XK_Shift_L, False, CurrentTime);
+    XSync(gGui->display, False);
+    XUnlockDisplay(gGui->display);
+  }
+  else 
+#endif
+    {
+      XLockDisplay(gGui->display);
+      XResetScreenSaver(gGui->display);
+      XUnlockDisplay(gGui->display);
+    }
 }

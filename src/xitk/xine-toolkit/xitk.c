@@ -594,7 +594,6 @@ void xitk_xevent_notify(XEvent *event) {
 	  }
 	  
 	  if(!handled) {
-#warning CHECKME
 	    if((w == NULL) || (w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) == 0))) {
 	      if(fx->xevent_callback) {
 		fx->xevent_callback(event, fx->user_data);

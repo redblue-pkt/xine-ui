@@ -31,9 +31,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include <X11/Xmd.h>
-#ifdef HAVE_DPMS
-# include <X11/extensions/dpms.h>
-#endif
+
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
@@ -52,7 +50,6 @@
 #include <xine/video_out_x11.h>
 #include <xine.h>
 #include <xine/xineutils.h>
-#include "xscreensaver-remote.h"
 #include "mrl_browser.h"
 #include "skins.h"
 #include "errors.h"
@@ -95,38 +92,9 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
-/*
- * Screensavers parameters
- */
-typedef struct {
-
-  /* XFree86 one */
-  struct {
-    int           timeout;
-    int           interval;
-    int           prefer_blanking;
-    int           allow_exposures;
-  } screensaver;
-
-  /* Jamie's Zawinski xscreensaver */
-  struct {
-    int           was_running;
-  } xscreensaver;
-
-#ifdef HAVE_DPMS
-  /* XFree DPMS */
-  struct {
-    int           was_running;
-    CARD16        standby;
-    CARD16        suspend;
-    CARD16        off;
-    CARD16        level;
-  } xdpms;
-#endif
-
-} screen_savers_t;
-
-static screen_savers_t    ssavers;
+static void ssaver_timeout_cb(void *data, cfg_entry_t *cfg) {
+  gGui->ssaver_timeout = cfg->num_value;
+}
 
 /*
  * Callback for snapshots saving location.
@@ -144,116 +112,6 @@ static int actions_on_start(action_id_t actions[], action_id_t a) {
   }
   return num;
 }
-
-/**
- * Disable all screensavers.
- */
-static void disable_screensavers(void) {
-  int dummy;
-  
-#ifdef HAVE_DPMS
-  /* 
-   * XFree DPMS
-   */
-  ssavers.xdpms.was_running = 0;
-  
-  if(DPMSQueryExtension(gGui->display, &dummy, &dummy)) {
-    BOOL   enabled;
-    
-    DPMSInfo(gGui->display, &ssavers.xdpms.level, &enabled);
-    
-    if(enabled) {
-      
-      if(DPMSGetTimeouts(gGui->display, 
-			 &ssavers.xdpms.standby,
-			 &ssavers.xdpms.suspend, &ssavers.xdpms.off) != True) {
-	fprintf(stderr, "DPMSGetTimeouts() failed\n");
-      }
-
-      /* monitor powersave off */
-      (void) DPMSDisable(gGui->display);
-      ssavers.xdpms.was_running = 1;
-    }
-  }
-#endif
-  
-  /*
-   * XFree screensaver
-   */
-  XGetScreenSaver(gGui->display ,&ssavers.screensaver.timeout, 
-		  &ssavers.screensaver.interval,
-		  &ssavers.screensaver.prefer_blanking, 
-		  &ssavers.screensaver.allow_exposures);
-  
-  if((XSetScreenSaver(gGui->display, 0, 0, 
-		      DontPreferBlanking, DontAllowExposures)) == BadValue) {
-    fprintf(stderr, "XSetScreenSaver() failed: %s\n", strerror(errno));
-  }
-  
-  /*
-   * XScreenSaver specific.
-   */
-  xscreensaver_remote_init(gGui->display);
-  ssavers.xscreensaver.was_running = is_xscreensaver_running(gGui->display);
-  
-  if(ssavers.xscreensaver.was_running == 1) {
-    if(xscreensaver_kill_server(gGui->display) < 0)
-      ssavers.xscreensaver.was_running = 0;
-  }
-}
-
-/**
- * Re-enabling previously disabled screensavers.
- */
-static void reenable_screensavers(void) {
-  int dummy;
-  
-#ifdef HAVE_DPMS
-  /*
-   * XFree DPMS
-   */
-  if(ssavers.xdpms.was_running) {
-
-    if(DPMSQueryExtension(gGui->display, &dummy, &dummy)) {
-      
-      /* restoring power saving settings */
-      if((DPMSEnable(gGui->display)) == True) {
-	CARD16 state;
-	BOOL   enabled;
-	
-	(void) DPMSSetTimeouts(gGui->display, ssavers.xdpms.standby, 
-			       ssavers.xdpms.suspend, ssavers.xdpms.off);
-
-	(void) DPMSForceLevel(gGui->display, ssavers.xdpms.level);
-	
-	/* DPMS does not seem to be enabled unless we call DPMSInfo */
-	DPMSInfo(gGui->display, &state, &enabled);
-	
-	if(enabled)
-	  ssavers.xdpms.was_running = 0;
-	
-      }
-    }
-  }
-#endif
-  
-  /*
-   * XFree screensaver
-   */
-  if((XSetScreenSaver(gGui->display, ssavers.screensaver.timeout, 
-		      ssavers.screensaver.interval, 
-		      ssavers.screensaver.prefer_blanking, 
-		      ssavers.screensaver.allow_exposures)) == BadValue) {
-    fprintf(stderr, "XSetScreenSaver() failed: %s\n", strerror(errno));
-  }
-
-  /*
-   * Restart XScreenSaver.
-   */
-  if(ssavers.xscreensaver.was_running == 1)
-    xscreensaver_start_server();
-}
-
 
 void config_save(void) {
 
@@ -801,7 +659,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 			   VisualIDMask, &vinfo_tmpl, 
 			   &num_visuals);
     if (vinfo == NULL) {
-      printf("gui_main: selected visual %#lx does not exist, trying default visual\n",
+      printf(_("gui_main: selected visual %#lx does not exist, trying default visual\n"),
 	     (long) gGui->prefered_visual_id);
     } else {
       depth = vinfo[0].depth;
@@ -820,7 +678,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
     if (XMatchVisualInfo(gGui->display, gGui->screen, depth, TrueColor, &vinfo)) {
       visual = vinfo.visual;
     } else {
-      printf ("gui_main: couldn't find true color visual.\n");
+      printf (_("gui_main: couldn't find true color visual.\n"));
 
       depth = DefaultDepth (gGui->display, gGui->screen);
       visual = DefaultVisual (gGui->display, gGui->screen); 
@@ -874,30 +732,40 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   }
 
   if (gGui->config->register_bool (gGui->config, "gui.xsynchronize", 0,
-				   "synchronized X protocol (debug)", NULL, NULL, NULL)) {
+				   _("synchronized X protocol (debug)"), NULL, NULL, NULL)) {
     XSynchronize (gGui->display, True);
-    fprintf (stderr, "Warning! Synchronized X activated - this is way slow...\n");
+    fprintf (stderr, _("Warning! Synchronized X activated - this is way slow...\n"));
   }
 
-  gGui->layer_above = gGui->config->register_bool (gGui->config, "gui.layer_above", 1,
-						   "use wm layer property to place window on top", 
-						   NULL, NULL, NULL);
+  gGui->layer_above = 
+    gGui->config->register_bool (gGui->config, "gui.layer_above", 1,
+				 _("use wm layer property to place window on top"), 
+				 NULL, NULL, NULL);
   
-  gGui->snapshot_location = gGui->config->register_string (gGui->config, "gui.snapshotdir", 
-							   (char *) (xine_get_homedir()),
-							   "where snapshots will be saved",
-							   NULL, snapshot_loc_cb, NULL);
+  gGui->snapshot_location = 
+    gGui->config->register_string (gGui->config, "gui.snapshotdir", 
+				   (char *) (xine_get_homedir()),
+				   _("where snapshots will be saved"),
+				   NULL, snapshot_loc_cb, NULL);
+  
+  gGui->ssaver_timeout =
+    gGui->config->register_num (gGui->config, "gui.screensaver_timeout", 10,
+				_("time between two screensaver fake events"),
+				NULL, ssaver_timeout_cb, NULL);
+  
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);
 
   /* Some infos */
-  printf("XServer Vendor: %s. Release: %d,\n", 
+  printf(_("XServer Vendor: %s. Release: %d,\n"), 
 	 XServerVendor(gGui->display), XVendorRelease(gGui->display));
-  printf("        Protocol Version: %d, Revision: %d,\n", 
+  printf(_("        Protocol Version: %d, Revision: %d,\n"), 
 	 XProtocolVersion(gGui->display), XProtocolRevision(gGui->display));
-  printf("        Available Screen(s): %d, using %d\n", XScreenCount(gGui->display), gGui->screen);
-  printf("        Depth: %d.\n", XDisplayPlanes(gGui->display, gGui->screen));
+  printf(_("        Available Screen(s): %d, using %d\n")
+	 , XScreenCount(gGui->display), gGui->screen);
+  printf(_("        Depth: %d.\n"),
+	 XDisplayPlanes(gGui->display, gGui->screen));
 
   gui_find_visual(&gGui->visual, &gGui->depth);
 
@@ -921,8 +789,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   video_window_init (window_attribute);
 
   panel_init ();
-
-  disable_screensavers();
 }
 
 
@@ -1076,6 +942,4 @@ void gui_run (void) {
 
   kbindings_save_kbinding(gGui->kbindings);
   kbindings_free_kbinding(&gGui->kbindings);
-
-  reenable_screensavers();
 }

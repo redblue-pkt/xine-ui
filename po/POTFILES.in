@@ -15,4 +15,5 @@ src/xitk/playlist.c
 src/xitk/setup.c
 src/xitk/skins.c
 src/xitk/snapshot.c
+src/xitk/videowin.c
 src/xitk/viewlog.c

@@ -813,12 +813,12 @@ static void yv12_2_rgb( struct prvt_image_s *image )
 
 static void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
 {
-  xine_error("Error: %s\n", error_msg);
+  xine_error(_("Error: %s\n"), error_msg);
 }
 
 static void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
 {
-  xine_error("Warning: %s\n", warning_msg);
+  xine_error(_("Warning: %s\n"), warning_msg);
 }
 
 /*
@@ -868,7 +868,7 @@ void create_snapshot (void)
 
   /* the dxr3 driver does not allocate yuv buffers */
   if (! image->y) { /* image->u and image->v are always 0 for YUY2 */
-    printf("snapshot.c: not supported for this video out driver\n");
+    printf(_("snapshot.c: not supported for this video out driver\n"));
     prvt_image_free( &image );
     return;
   }

@@ -114,6 +114,8 @@ typedef struct {
 
   char                *snapshot_location;
   
+  int                  ssaver_timeout;
+
   kbinding_t          *kbindings;
   
 } gGui_t;

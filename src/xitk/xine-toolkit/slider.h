@@ -45,6 +45,10 @@ typedef struct {
   int                     bClicked;
   int                     focus;
 
+  int                     mousex;
+  int                     mousey;
+  int                     paddlex;
+  int                     paddley;
 
   float                   angle;
   float                   percentage;

@@ -1084,8 +1084,6 @@ void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward) {
     return;
   }
 
-#warning FIXME, take care about group widgets.
-
   if(backward) 
     first_widget = widget = (xitk_widget_t *) xitk_list_last_content (wl->l);
   else

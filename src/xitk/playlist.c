@@ -607,7 +607,7 @@ void playlist_change_skins(void) {
     
     if(!(new_img = Imlib_load_image(gGui->imlib_data,
 				    xitk_skin_get_skin_filename(gGui->skin_config, "PlBG")))) {
-      xine_error("%s(): couldn't find image for background\n", __FUNCTION__);
+      xine_error(_("%s(): couldn't find image for background\n"), __FUNCTION__);
       exit(-1);
     }
     
@@ -671,7 +671,7 @@ void playlist_editor(void) {
   XSizeHints                 hint;
   XWMHints                  *wm_hint;
   XSetWindowAttributes       attr;
-  char                       title[] = {"Xine Playlist Editor"};
+  char                      *title;
   Atom                       prop, XA_WIN_LAYER;
   MWMHints                   mwmhints;
   XClassHint                *xclasshint;
@@ -689,6 +689,8 @@ void playlist_editor(void) {
       return;
   }
 
+  xine_strdupa(title, _("Xine Playlist Editor"));
+
   XITK_WIDGET_INIT(&br, gGui->imlib_data);
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
   XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
@@ -701,7 +703,7 @@ void playlist_editor(void) {
 
   if (!(playlist->bg_image = Imlib_load_image(gGui->imlib_data,
 					      xitk_skin_get_skin_filename(gGui->skin_config, "PlBG")))) {
-    xine_error("xine-playlist: couldn't find image for background\n");
+    xine_error(_("xine-playlist: couldn't find image for background\n"));
     exit(-1);
   }
 
@@ -772,7 +774,7 @@ void playlist_editor(void) {
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = "Xine Playlist Editor";
+    xclasshint->res_name = title;//"Xine Playlist Editor";
     xclasshint->res_class = "Xine";
     XSetClassHint(gGui->display, playlist->window, xclasshint);
   }

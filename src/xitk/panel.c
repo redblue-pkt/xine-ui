@@ -132,7 +132,7 @@ void panel_change_skins(void) {
   
   if(!(new_img = Imlib_load_image(gGui->imlib_data,
 				  xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
-    xine_error("%s(): couldn't find image for background\n", __FUNCTION__);
+    xine_error(_("%s(): couldn't find image for background\n"), __FUNCTION__);
     exit(-1);
   }
   
@@ -212,14 +212,29 @@ void panel_update_runtime_display(void) {
  * Update slider thread.
  */
 static void *slider_loop(void *dummy) {
+  int screensaver_timer = 0;
   
   pthread_detach(pthread_self());
 
+  /* Wait for xine_init() call */
+  while(gGui->xine == NULL)
+    xine_usec_sleep(100000);
+  
   while(gGui->running) {
+    int status = xine_get_status(gGui->xine);
+    
+    if(status == XINE_PLAY) {
+      
+      screensaver_timer++;
+      
+      if(screensaver_timer >= gGui->ssaver_timeout) {
+	screensaver_timer = 0;
+	video_window_reset_ssaver();
+      }
+    }
 
     if(panel_is_visible()) {
       if(gGui->xine) {
-	int status = xine_get_status(gGui->xine);
 	
 	if(status == XINE_PLAY) {
 	  xitk_slider_set_pos(panel->widget_list, panel->slider_play, 
@@ -448,7 +463,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
     xine_set_audio_property(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
   }
   else
-    xine_error("unknown widget slider caller\n");
+    xine_error(_("unknown widget slider caller\n"));
 
   panel_check_pause();
 }
@@ -566,7 +581,7 @@ void panel_init (void) {
   XSizeHints                hint;
   XWMHints                 *wm_hint;
   XSetWindowAttributes      attr;
-  char                      title[] = {"Xine Panel"}; /* window-title     */
+  char                     *title;
   Atom                      prop, XA_WIN_LAYER;
   MWMHints                  mwmhints;
   XClassHint               *xclasshint;
@@ -579,6 +594,8 @@ void panel_init (void) {
   
   if (gGui->panel_window)
     return ; /* panel already open  - FIXME: bring to foreground */
+
+  xine_strdupa(title, _("Xine Panel"));
 
   XITK_WIDGET_INIT(&b, gGui->imlib_data);
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
@@ -595,7 +612,7 @@ void panel_init (void) {
   if (!(panel->bg_image = 
 	Imlib_load_image(gGui->imlib_data,
 			 xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
-    xine_error("xine-panel: couldn't find image for background\n");
+    xine_error(_("xine-panel: couldn't find image for background\n"));
     exit(-1);
   }
 
@@ -678,7 +695,7 @@ void panel_init (void) {
    */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
-    xclasshint->res_name = "Xine Panel";
+    xclasshint->res_name = title;
     xclasshint->res_class = "Xine";
     XSetClassHint(gGui->display, gGui->panel_window, xclasshint);
   }
@@ -925,10 +942,10 @@ void panel_init (void) {
   
 
   panel->tips.enable = gGui->config->register_bool(gGui->config, "gui.tips_visible", 1,
-						   "gui tips visibility", NULL,
+						   _("gui tips visibility"), NULL,
 						   panel_enable_tips_cb, NULL);
   panel->tips.timeout = gGui->config->register_num(gGui->config, "gui.tips_timeout", 500,
-						   "tips timeout (ms)", NULL, 
+						   _("tips timeout (ms)"), NULL, 
 						   panel_timeout_tips_cb, NULL);
 
   panel_show_tips();
@@ -937,7 +954,7 @@ void panel_init (void) {
    * show panel 
    */
   panel->visible = gGui->config->register_bool (gGui->config, "gui.panel_visible", 1,
-						"gui panel visibility",
+						_("gui panel visibility"),
 						NULL, NULL, NULL);
   
   if(gGui->use_root_window && (!panel->visible))

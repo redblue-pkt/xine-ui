@@ -16,7 +16,8 @@ GETOPT_C = getopt.c getopt1.c
 GETOPT_H = getopt.h
 endif
 
-xine_SOURCES = $(GETOPT_C) utils.c xscreensaver-remote.c \
+## xscreensaver-remote.c
+xine_SOURCES = $(GETOPT_C) utils.c  \
 	main.c event.c control.c playlist.c \
 	videowin.c panel.c kbindings.c lirc.c actions.c mrl_browser.c \
 	snapshot.c skins.c setup.c viewlog.c lang.c errors.c network.c
@@ -24,7 +25,7 @@ xine_DEPENDENTIES = utils.h monitor.h
 # double @XINE_LIBS@ to ensure correct libpath (libtool may add -L...)
 xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 	@XINE_LIBS@ $(LIRC_LIBS) $(DYNAMIC_LD_LIBS) \
-	$(X_LIBS) $(DPMS_LIBS) -lX11 -lm
+	$(X_LIBS) $(XTEST_LIBS) -lX11 -lm
 
 xine_remote_SOURCES = $(GETOPT_C) xine-remote.c
 xine_remote_DEPENDENTIES = xine-remote.c
@@ -50,9 +51,9 @@ utils.c:
 monitor.c:
 	$(LN_S) $(top_srcdir)/src/common/monitor.c ./monitor.c
 
-xscreensaver-remote.c:
-	$(LN_S) $(top_srcdir)/src/common/xscreensaver-remote.c \
-	./xscreensaver-remote.c
+##xscreensaver-remote.c:
+##	$(LN_S) $(top_srcdir)/src/common/xscreensaver-remote.c \
+##	./xscreensaver-remote.c
 
 $(GETOPT_C):
 	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c
@@ -75,4 +76,5 @@ maintainer-clean-generic:
 	-@echo "This command is intended for maintainers to use;"
 	-@echo "it deletes files that may require special tools to rebuild."
 	-rm -f Makefile.in
-	-rm -f utils.c monitor.c xscreensaver-remote.c xine-remote.c
+	-rm -f utils.c monitor.c xine-remote.c
+## xscreensaver-remote.c 

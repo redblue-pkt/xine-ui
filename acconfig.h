@@ -20,6 +20,9 @@
 /* Define this if you have X11R6 installed */
 #undef HAVE_X11
 
+/* Define this if you have libXtst installed */
+#undef HAVE_XTESTEXTENSION
+
 /* Define this if you have GNU getopt_long() implemented */
 #undef HAVE_GETOPT_LONG
 
@@ -45,9 +48,6 @@
 
 /* Define this if you have libXxf86vm installed */
 #undef HAVE_XF86VIDMODE
-
-/* Define this if you have DPMS */
-#undef HAVE_DPMS
 
 /* Define this to add mrl browser into xitk lib */
 #undef NEED_MRLBROWSER

@@ -94,6 +94,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
 void gui_play (xitk_widget_t *w, void *data) {
 
+  video_window_reset_ssaver();
+
   if (xine_get_status (gGui->xine) != XINE_PLAY) {
 
     if (!strncmp (gGui->filename, "xine-ui version", 15)) {
@@ -616,7 +618,7 @@ void gui_send_expose_to_window(Window window) {
   
   XLockDisplay(gGui->display);
   if(!XSendEvent(gGui->display, window, False, ExposureMask, &xev)) {
-    fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) window);
+    fprintf(stderr, _("XSendEvent(display, 0x%x ...) failed.\n"), (unsigned int) window);
   }
   XSync(gGui->display, False);
   XUnlockDisplay(gGui->display);

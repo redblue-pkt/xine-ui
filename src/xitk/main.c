@@ -80,11 +80,12 @@
 /*
  * global variables
  */
-gGui_t   *gGui;
+gGui_t    *gGui;
 #ifdef HAVE_LIRC
-int       no_lirc;
+int        no_lirc;
 #endif
-int       unhandled_codec_mode; /* 0 = never, 1 = video, 2 = audio, 3 = always */
+int        unhandled_codec_mode; /* 0 = never, 1 = video, 2 = audio, 3 = always */
+
 
 typedef struct {
   FILE    *fd;
@@ -241,7 +242,8 @@ static char **build_command_line_args(int argc, char *argv[], int *_argc) {
  */
 void show_version(void) {
 
-  printf("This is xine (X11 gui) - a free video player v%s\n(c) 2000-2002 by G. Bartsch and the xine project team.\n", VERSION);
+  printf(_("This is xine (X11 gui) - a free video player v%s\n"
+	   "(c) 2000-2002 by G. Bartsch and the xine project team.\n"), VERSION);
 }
 
 /*
@@ -372,7 +374,7 @@ static void load_video_out_driver(char *video_driver_id) {
    * Setting default (configfile stuff need registering before updating, etc...).
    */
   default_driver = gGui->config->register_string (gGui->config, "video.driver", "auto",
-						  "video driver to use",
+						  _("video driver to use"),
 						  NULL, NULL, NULL);
   if (!video_driver_id) {
     /* video output driver auto-probing */
@@ -449,7 +451,7 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
    * Setting default (configfile stuff need registering before updating, etc...).
    */
   default_driver = gGui->config->register_string (gGui->config, "audio.driver", "auto",
-						  "audio driver to use",
+						  _("audio driver to use"),
 						  NULL, NULL, NULL);
   
   /*
@@ -465,7 +467,7 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
     char **driver_ids = xine_list_audio_output_plugins ();
     int i = 0;
 
-    printf ("main: probing audio drivers...\n");
+    printf (_("main: probing audio drivers...\n"));
     
     while ( driver_ids[i] != NULL ) {
       audio_driver_id = driver_ids[i];
@@ -476,8 +478,7 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 						    driver_ids[i]);
 
       if (audio_driver) {
-	printf ("main: ...worked, using '%s' audio driver.\n",
-		driver_ids[i]);
+	printf (_("main: ...worked, using '%s' audio driver.\n"), driver_ids[i]);
 
 	gGui->config->update_string (gGui->config, "audio.driver", 
 				     audio_driver_id);
@@ -497,7 +498,7 @@ static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
     /* don't want to load an audio driver ? */
     if (!strncasecmp (audio_driver_id, "NULL", 4)) {
 
-      printf("main: not using any audio driver (as requested).\n");
+      printf(_("main: not using any audio driver (as requested).\n"));
       gGui->config->update_string (gGui->config, "audio.driver", 
 				   "null");
 
@@ -567,14 +568,18 @@ void event_listener (void *user_data, xine_event_t *event) {
  
 }
 
-static void unhandled_codec_mode_cb( void *dummy, cfg_entry_t *entry)
-{
+/*
+ * Callback of config value change about reporting mode.
+ */
+static void unhandled_codec_mode_cb( void *dummy, cfg_entry_t *entry) {
   unhandled_codec_mode = entry->num_value;
 }
 
-static void codec_reporting( void *user_data, int codec_type,
-                             uint32_t fourcc, char *description, int handled )
-{
+/*
+ * Callback called on codec reporting.
+ */
+static void codec_reporting(void *user_data, int codec_type,
+			    uint32_t fourcc, char *description, int handled) {
   char fourcc_txt[10];
   
   /* store fourcc as text */
@@ -611,10 +616,33 @@ static void codec_reporting( void *user_data, int codec_type,
 }
 
 /*
+ * initialize codec reporting stuff.
+ */
+static void init_report_codec(void) {
+  char  *warn_unhandled_codec[] = { 
+    _("never"),  
+    _("video only"), 
+    _("audio only"), 
+    _("always"), 
+    NULL
+  };
+  
+  /*
+   * Register codec reporting
+   */
+  xine_register_report_codec_cb(gGui->xine, codec_reporting, (void *) gGui);
+  
+  unhandled_codec_mode = 
+    gGui->config->register_enum (gGui->config,
+				 "gui.warn_unhandled_codec", 3, warn_unhandled_codec,
+				 _("Display popup window on unhandled codecs"),
+				 NULL, unhandled_codec_mode_cb, NULL);
+}
+
+/*
  *
  */
 int main(int argc, char *argv[]) {
-
   /* command line options will end up in these variables: */
   int                   c = '?', aos = 0;
   int                   option_index = 0;
@@ -628,9 +656,16 @@ int main(int argc, char *argv[]) {
   sigset_t              vo_mask;
   char                **_argv;
   int                   _argc;
-  static char          *warn_unhandled_codec[] = 
-                       {"never", "video only", "audio only", "always", NULL};
+    
+#ifdef HAVE_SETLOCALE
+  xine_set_locale();
+  xitk_set_locale();
+  setlocale (LC_ALL, "");
+#endif
 
+  bindtextdomain(PACKAGE, XITK_LOCALE);
+  textdomain(PACKAGE);
+  
   /* Check xine library version */
   if(!xine_check_version(0, 9, 10)) {
     fprintf(stderr, _("Require xine library version 0.9.10, found %d.%d.%d.\n"),
@@ -642,18 +677,9 @@ int main(int argc, char *argv[]) {
   sigemptyset(&vo_mask);
   sigaddset(&vo_mask, SIGALRM);
   if (sigprocmask (SIG_BLOCK,  &vo_mask, NULL)) {
-    printf ("video_out: sigprocmask failed.\n");
+    printf (_("sigprocmask() failed.\n"));
   }
 
-#ifdef HAVE_SETLOCALE
-  xine_set_locale();
-  xitk_set_locale();
-  setlocale (LC_ALL, "");
-#endif
-
-  bindtextdomain(PACKAGE, XITK_LOCALE);
-  textdomain(PACKAGE);
-  
   gGui = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
 
   gGui->debug_level            = 0;
@@ -712,7 +738,6 @@ int main(int argc, char *argv[]) {
       if(optarg != NULL) {
 	video_driver_id = xine_xmalloc (strlen (optarg) + 1);
 	strncpy (video_driver_id, optarg, strlen (optarg));
-	printf("video_driver_id = '%s'\n", video_driver_id);
       } else {
 	fprintf (stderr, _("video driver id required for -V option\n"));
 	exit (1);
@@ -931,17 +956,10 @@ int main(int argc, char *argv[]) {
    */
   xine_register_event_listener(gGui->xine, event_listener, (void *) gGui);
 
+  init_report_codec();
+
   /*
-   * Register codec reporting
-   */
-  xine_register_report_codec_cb(gGui->xine, codec_reporting, (void *) gGui );
-  unhandled_codec_mode = gGui->config->register_enum (gGui->config,
-                         "gui.warn_unhandled_codec", 3, warn_unhandled_codec,
-                         "Display popup window on unhandled codecs",
-                         NULL, unhandled_codec_mode_cb, NULL);
-  
-  /*
-   * start CORBA server thread
+   * start CORBA server threadq
    */
 #ifdef HAVE_ORBIT
   if (!no_lirc)

@@ -31,6 +31,7 @@
 #include "button.h"
 #include "intbox.h"
 #include "font.h"
+#include "image.h"
 #include "_xitk.h"
 
 
