@@ -28,6 +28,9 @@
 
 #include <pthread.h>
 #include <signal.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "common.h"
 
@@ -81,11 +84,21 @@ void *xine_lirc_loop(void *dummy) {
   char             *code, *c;
   int               ret;
   kbinding_entry_t *k;
+  fd_set            set;
+  struct timeval    tv;
 
   while(gGui->running) {
 
+    FD_ZERO(&set);
+    FD_SET(lirc.fd, &set);
+    
+    tv.tv_sec  = 0;
+    tv.tv_usec = 500000;
+
+    select(lirc.fd + 1, &set, NULL, NULL, &tv);
+    
     while(lirc_nextcode(&code) == 0) {
-      
+
       if(code == NULL) 
 	break;
       
