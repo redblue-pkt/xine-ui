@@ -59,6 +59,7 @@ extern gGui_t           *gGui;
 typedef struct {
   xitk_widget_list_t    *wl;
   Cursor                 cursor[3];       /* Cursor pointers                       */
+  char                   window_title[1024];
   int                    current_cursor;  /* arrow or hand */
   int                    cursor_visible;
   int                    cursor_timer;
@@ -166,6 +167,11 @@ static Bool have_xtestextention(void) {
   return xtestext;
 }
 
+static void _set_window_title(void) {
+  XSetStandardProperties(gGui->display, gGui->video_window, gVw->window_title, gVw->window_title, None, NULL, 0, 0);
+  XSync(gGui->display, False);
+}
+
 /*
  * Let the video driver override the selected visual
  */
@@ -205,7 +211,6 @@ void video_window_select_visual (void) {
  * visible_width/visible_height/visible_aspect
  */
 static void video_window_adapt_size (void) { 
-  static char          *window_title;
   XSizeHints            hint;
   XWMHints             *wm_hint;
   XSetWindowAttributes  attr;
@@ -216,17 +221,6 @@ static void video_window_adapt_size (void) {
   XGCValues             xgcv;
   Window                old_video_window = None;
   int                   border_width;
-
-/*  printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
- *           video_width,
- *           video_height,
- *           dest_x,
- *           dest_y,
- *           dest_width,
- *           dest_height); 
- */
-
-  xine_strdupa(window_title, _("xine video output"));
 
   XLockDisplay (gGui->display);
 
@@ -273,9 +267,7 @@ static void video_window_adapt_size (void) {
 
       XSelectInput(gGui->display, gGui->video_window, ExposureMask);
       
-      XSetStandardProperties(gGui->display, gGui->video_window, 
-			     window_title, window_title, None, NULL, 0, 0);
-      
+      _set_window_title();
       
       gcv.foreground         = gGui->black.pixel;
       gcv.background         = gGui->black.pixel;
@@ -546,8 +538,7 @@ static void video_window_adapt_size (void) {
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
 
-    XSetStandardProperties(gGui->display, gGui->video_window,
- 			   window_title, window_title, None, NULL, 0, 0);
+    _set_window_title();
 
     XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
 
@@ -646,8 +637,7 @@ static void video_window_adapt_size (void) {
     hint.win_gravity = StaticGravity;
     hint.flags  = PPosition | PSize | PWinGravity;
     
-    XSetStandardProperties(gGui->display, gGui->video_window, 
- 			   window_title, window_title, None, NULL, 0, 0);
+    _set_window_title();
     
     XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
         
@@ -772,8 +762,7 @@ static void video_window_adapt_size (void) {
       XSetClassHint(gGui->display, gGui->video_window, gVw->xclasshint);
     }
 
-    XSetStandardProperties(gGui->display, gGui->video_window, 
-			   window_title, window_title, None, NULL, 0, 0);
+    _set_window_title();
 
     XSetWMNormalHints (gGui->display, gGui->video_window, &hint);
 
@@ -1251,7 +1240,9 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 #ifdef HAVE_XTESTEXTENSION
   gVw->kc_shift_l         = XKeysymToKeycode(gGui->display, XK_Shift_L);
 #endif
-
+  
+  sprintf(gVw->window_title, "%s", "xine");
+  
   gettimeofday(&gVw->click_time, 0);
 
   gVw->using_xinerama     = 0;
@@ -1946,4 +1937,15 @@ void video_window_get_visible_size(int *w, int *h) {
     *w = gVw->visible_width;
   if(h)
     *h = gVw->visible_height;
+}
+
+void video_window_set_mrl(char *mrl) {
+  if(mrl && strlen(mrl)) {
+    
+    snprintf(gVw->window_title, 1024, "%s: %s", "xine", mrl);
+    
+    XLockDisplay(gGui->display);
+    _set_window_title();
+    XUnlockDisplay(gGui->display);
+  }
 }

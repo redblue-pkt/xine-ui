@@ -1026,6 +1026,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	}
 	gGui->mmk.ident = strdup(uevent->str);
 	
+	video_window_set_mrl(gGui->mmk.ident);
 	playlist_mrlident_toggle();
 	panel_update_mrl_display();
       }
@@ -1319,6 +1320,7 @@ int main(int argc, char *argv[]) {
   gGui->install_colormap       = 0;
   gGui->cursor_grabbed         = 0;
   gGui->network                = 0;
+  gGui->video_window           = None;
   gGui->use_root_window        = 0;
 #ifdef HAVE_XF86VIDMODE
   gGui->XF86VidMode_fullscreen = 0;

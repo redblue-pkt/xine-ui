@@ -223,6 +223,7 @@ static int _gui_xine_play(xine_stream_t *stream,
 	gGui->mmk.ident = strdup(ident);
 	gGui->playlist.mmk[gGui->playlist.cur]->ident = strdup(ident);
 	
+	video_window_set_mrl(gGui->mmk.ident);
 	playlist_mrlident_toggle();
 	panel_update_mrl_display();
 	free(ident);
@@ -1259,8 +1260,8 @@ void gui_dndcallback(char *filename) {
   __do_play:
     
     playlist_update_playlist();
-    
-    if(gGui->playlist.control & PLAYLIST_CONTROL_IGNORE) {
+
+    if(!(gGui->playlist.control & PLAYLIST_CONTROL_IGNORE)) {
       if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
 	if((more_than_one > -1) && ((more_than_one + 1) < gGui->playlist.num))
 	  gGui->playlist.cur = more_than_one + 1;
@@ -1457,7 +1458,7 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 }
 
 void gui_set_current_mrl(mediamark_t *mmk) {
-
+  
   if(gGui->mmk.mrl)
     free(gGui->mmk.mrl);
   if(gGui->mmk.ident)
@@ -1489,6 +1490,7 @@ void gui_set_current_mrl(mediamark_t *mmk) {
     gGui->mmk.spu_offset = 0;
   }
 
+  video_window_set_mrl(gGui->mmk.ident);
   event_sender_update_menu_buttons();
   panel_update_mrl_display ();
   playlist_update_focused_entry();

@@ -1134,8 +1134,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->mrl_overrided  = 0;
   gGui->new_pos        = -1;
 
-  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-
   /*
    * X / imlib stuff
    */
@@ -1399,6 +1397,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   /* kbinding might open an error dialog (double keymapping), which produces a segfault,
    * when done before the video_window_init(). */
   gGui->kbindings = kbindings_init_kbinding();
+
+  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 
   panel_init ();
 }
