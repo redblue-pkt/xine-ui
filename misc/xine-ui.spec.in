@@ -58,7 +58,7 @@ make install-strip prefix=$RPM_BUILD_ROOT%{prefix}
 
 %post
 #/sbin/ldconfig
-#if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/metal @XINE_SKINDIR@/default; fi
+if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/metal @XINE_SKINDIR@/default; fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
