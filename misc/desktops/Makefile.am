@@ -10,7 +10,8 @@ install-debug: install
 
 # Install only as root
 install-data-local:
-	if [ "`id -g`" -eq 0 ]; then \
+	case "`id`" in \
+	uid=0\(* ) \
 ## Icons
 	  echo "Installing destops icons/entries"; \
 	  $(mkinstalldirs) /usr/share/icons; \
@@ -73,7 +74,8 @@ install-data-local:
 	    fi; \
 	  fi; \
 ## End Kde
-	fi
+	  ;; \
+	esac
 
 uninstall-local:
 	REMOVALS='/usr/share/icons/xine.xpm /usr/share/pixmaps/xine.xpm /etc/X11/wmconfig/xine /etc/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop /usr/share/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop /usr/share/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop /usr/share/applnk/Multimedia/xine.desktop'; \
