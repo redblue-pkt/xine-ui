@@ -37,7 +37,7 @@
 #include "errors.h"
 #include "i18n.h"
 
-#include <xine.h>
+#include </usr/local/include/xine.h>
 #include <xine/xineutils.h>
 
 #include "xitk.h"
@@ -415,8 +415,8 @@ void init_skins_support(void) {
 
   /* Check skin version */
   if(xitk_skin_check_version(gGui->skin_config, SKIN_IFACE_VERSION) < 1) {
-    xitk_skin_unload_config(gGui->skin_config);
     xine_cfg_entry_t *entry = xine_config_lookup_entry(gGui->xine, "gui.skin");
+    xitk_skin_unload_config(gGui->skin_config);
     gGui->skin_config = xitk_skin_init_config();
     fprintf(stderr, _("Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"), 
 	    buf, (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
