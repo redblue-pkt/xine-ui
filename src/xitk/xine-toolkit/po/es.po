@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.9.11\n"
-"POT-Creation-Date: 2003-03-24 21:18+0100\n"
+"POT-Creation-Date: 2003-03-31 19:08+0200\n"
 "PO-Revision-Date: 2002-06-21 11:04+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -100,10 +100,10 @@ msgstr "No"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/xitk/xine-toolkit/xitk.h:2121 src/xitk/xine-toolkit/xitk.h:2130
+#: src/xitk/xine-toolkit/xitk.h:2124 src/xitk/xine-toolkit/xitk.h:2133
 msgid "Error"
 msgstr "Error"
 
-#: src/xitk/xine-toolkit/xitk.h:2124 src/xitk/xine-toolkit/xitk.h:2133
+#: src/xitk/xine-toolkit/xitk.h:2127 src/xitk/xine-toolkit/xitk.h:2136
 msgid "Information"
 msgstr "Información"

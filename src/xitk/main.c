@@ -105,7 +105,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef HAVE_XF86VIDMODE
  "F"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:";
+ "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:c:";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
@@ -140,6 +140,7 @@ static struct option long_options[] = {
   {"version"        , no_argument      , 0, 'v'                      },
   {"deinterlace"    , no_argument      , 0, 'D'                      },
   {"aspect-ratio"   , required_argument, 0, 'r'                      },
+  {"config"         , required_argument, 0, 'c'                      },
   {"verbose"        , optional_argument, 0, OPTION_VERBOSE           },
   {0                , no_argument      , 0,  0                       }
 };
@@ -426,6 +427,7 @@ void show_usage (void) {
   printf("OPTIONS are:\n");
   printf(_("  -v, --version                Display version.\n"));
   printf(_("      --verbose [=level]       Set verbosity level. Default is 1.\n"));
+  printf(_("  -c, --config <file>          Use config file instead of default one.\n"));
   printf(_("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n"));
   printf("                               ");
   driver_ids = xine_list_video_output_plugins (xine);
@@ -1236,6 +1238,14 @@ int main(int argc, char *argv[]) {
       no_auto_start = 1;
       break;
 
+    case 'c':
+      {
+	char *cfg = xine_chomp(optarg);
+	
+	gGui->configfile = strdup(cfg);
+      }
+      break;
+
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -1285,7 +1295,7 @@ int main(int argc, char *argv[]) {
   /*
    * Initialize config
    */
-  {
+  if(gGui->configfile == NULL) {
     char *cfgdir = ".xine";
     char *cfgfile = CONFIGFILE;
     struct stat st;

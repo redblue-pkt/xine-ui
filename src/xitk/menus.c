@@ -560,7 +560,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
   menu.parent_wlist      = wl;
   menu.skin_element_name = NULL;
   
-  w = xitk_noskin_menu_create(wl, &menu, x, y);
+  w = xitk_noskin_menu_create(wl, &menu, x + 1, y + 1);
 
   /* Subtitle loader */
   if(gGui->playlist.num) {
