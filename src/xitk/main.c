@@ -845,19 +845,12 @@ static xine_video_port_t *load_video_out_driver(int driver_number) {
 					  video_driver_ids[driver_number],
 					  XINE_VISUAL_TYPE_FB, NULL);
 
-      /* save requested driver (-V) */ 
-      if(video_port)
-        config_update_num("video.driver", driver_number);
     }
     else {
       video_port = xine_open_video_driver(gGui->xine,
 					  video_driver_ids[driver_number],
 					  XINE_VISUAL_TYPE_X11, 
 					  (void *) &vis);
-      
-      /* save requested driver (-V) */ 
-      if(video_port)
-        config_update_num("video.driver", driver_number);
     }
     
     if(!video_port) {
@@ -972,11 +965,9 @@ static xine_audio_port_t *load_audio_out_driver(int driver_number) {
 
       if (!audio_port) {
         printf (_("main: audio driver <%s> failed\n"), audio_driver_ids[driver_number]);
-        exit (1);
+        exit(1);
       }
     
-      /* save requested driver (-A) */ 
-      config_update_num("audio.driver", driver_number);
     }
   
   }
