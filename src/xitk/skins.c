@@ -46,7 +46,7 @@
 #define SKIN_DEBUG 1
 */
 
-#define DEFAULT_SKIN        "xinetic"
+#define DEFAULT_SKIN        "CelomaChrome"
 #define SKIN_IFACE_VERSION  2
 
 extern gGui_t             *gGui;

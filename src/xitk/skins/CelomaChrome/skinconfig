@@ -1,8 +1,8 @@
 #Xine skin data file
-# revision 0.4
+# revision 0.5
 skin.name    = CelomaChrome
 skin.version = 2
-skin.date    = 08.04.2002
+skin.date    = 06.10.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
 
@@ -231,7 +231,7 @@ skin.AutoPlayGUI {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
+	  font = -*-courier-*-*-*-11-*-*-*-*-*-*-*
 	}
 }
 
@@ -282,130 +282,130 @@ skin.PlBG {
 
 skin.PlAdd {
 	coords {
-	  x = 80
-	  y = 116
+	  x = 16
+	  y = 50
 	}
 	pixmap = Onglet.png
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.PlLoad {
 	coords {
-	  x = 80
-	  y = 127
+	  x = 16
+	  y = 67
 	}
 	pixmap = Onglet.png
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.PlSave {
 	coords {
-	  x = 80
-	  y = 138
+	  x = 16
+	  y = 84
 	}
 	pixmap = Onglet.png
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.PlItemBtn {
 	coords {
-	  x = 124
+	  x = 81
 	  y = 50
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 9
+	  entries = 5
 	}
 	label {
 	  align = left
 	  color = #adc9ff
 	  color_focus = #adc9ff
 	  color_click = #303947
-	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.PlPlay {
 	coords {
-	  x = 80
-	  y = 163
+	  x = 16
+	  y = 134
 	}
 	pixmap = PlPlay.png
 }
 
 skin.PlDelete {
 	coords {
-	  x = 122
-	  y = 163
+	  x = 79
+	  y = 134
 	}
 	pixmap = PlDelete.png
 }
 
 skin.PlDeleteAll {
 	coords {
-	  x = 164
-	  y = 163
+	  x = 142
+	  y = 134
 	}
 	pixmap = PlDeleteAll.png
 }
 
 skin.PlMoveUp {
 	coords {
-	  x = 206
-	  y = 163
+	  x = 205
+	  y = 134
 	}
 	pixmap = PlMoveUp.png
 }
 
 skin.PlMoveDn {
 	coords {
-	  x = 248
-	  y = 163
+	  x = 268
+	  y = 134
 	}
 	pixmap = PlMoveDn.png
 }
 
 skin.PlDismiss {
 	coords {
-	  x = 290
-	  y = 139
+	  x = 331
+	  y = 134
 	}
 	pixmap = PlDismiss.png
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.PlUp {
 	coords {
-	  x = 307
-	  y = 50
+	  x = 333
+	  y = 51
 	}
 	pixmap = BigArrowUp.png
 }
 
 skin.SliderPl {
 	coords {
-	  x = 307
-	  y = 70
+	  x = 333
+	  y = 68
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -416,8 +416,8 @@ skin.SliderPl {
 
 skin.PlDn {
 	coords {
-	  x = 307
-	  y = 129
+	  x = 333
+	  y = 136
 	}
 	pixmap = BigArrowDown.png
 }
@@ -437,29 +437,29 @@ skin.AutoPlayLbl {
 
 skin.AutoPlayBG {
 	coords {
-	  x = 80
+	  x = 349
 	  y = 50
 	}
-	pixmap =  Onglet.png
+	pixmap =  OngletSmall.png
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.PlInputText {
 	coords {
-	  x = 124
-	  y = 151
+	  x = 81
+	  y = 136
 	}
 	pixmap = PlInputTxt.png
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -579,7 +579,7 @@ skin.CtlSave {
 	  color = #9fa4ad
 	  color_focus = #081e2f
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -636,7 +636,7 @@ skin.CtlSkItemBtn {
 	  color = #adc9ff
 	  color_focus = #adc9ff
 	  color_click = #303947
-	  font = *-lucida-*-i-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -650,7 +650,7 @@ skin.CtlDismiss {
 	  color = #a0967a
 	  color_focus = #a0967a
 	  color_click = #a0967a
-	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -665,70 +665,70 @@ skin.MrlBG {
 
 skin.MrlItemBtn {
 	coords {
-	  x = 124
+	  x = 81
 	  y=  50
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 9
+	  entries = 5
 	}
 	label {
 	  align = left
 	  color = #adc9ff
 	  color_focus = #adc9ff
 	  color_click = #303947
-	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.MrlSelect {
 	coords {
-	  x = 122
-	  y = 139
+	  x = 79
+	  y = 134
 	}
 	pixmap = MrlSelect.png
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.MrlPlay {
 	coords {
-	  x = 80
-	  y = 163
+	  x = 16
+	  y = 134
 	}
 	pixmap = PlPlay.png
 }
 
 skin.MrlDismiss {
 	coords {
-	  x = 290
-	  y = 139
+	  x = 331
+	  y = 134
 	}
 	pixmap = MrlDismiss.png
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.MrlUp {
 	coords {
-	  x = 307
-	  y = 50
+	  x = 333
+	  y = 51
 	}
 	pixmap = BigArrowUp.png
 }
 
 skin.SliderMrl {
 	coords {
-	  x = 307
-	  y = 70
+	  x = 333
+	  y = 68
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -739,20 +739,20 @@ skin.SliderMrl {
 
 skin.MrlDn {
 	coords {
-	  x = 307
-	  y = 129
+	  x = 333
+	  y = 136
 	}
 	pixmap = BigArrowDown.png
 }
 
 skin.MrlCurOrigin {
 	coords {
-	  x = 124
-	  y = 150
+	  x = 83
+	  y = 138
 	}
 
 	label {
-	  length = 30
+	  length = 41
 	  animation = True
 	pixmap = LettersMiddle.png
 	}
@@ -760,7 +760,7 @@ skin.MrlCurOrigin {
 
 skin.MrlPlugNameBG {
 	coords {
-	  x = 80
+	  x = 16
 	  y = 50
 	}
 	pixmap = Onglet.png
@@ -768,7 +768,7 @@ skin.MrlPlugNameBG {
 	  color = #adc9ff
 	  color_focus = #303947
 	  color_click = #303947
-	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
@@ -802,7 +802,7 @@ skin.FBItemBtn {
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
-	  font = *-lucida-*-i-*-*-8-*-*-*-*-*-*-*
+	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 skin.FBHome {

@@ -11,7 +11,7 @@ data_DATA =                                                                     
 	CtlSliderBg.png    MainEject.png       MainVolumePad.png  PlInputTxt.png   SliderHPad.png \
 	CtlSliderPad.png   MainFastB.png       MrlBg.png	  PlItemBtn.png    SliderVBg.png  \
 	LettersBig.png	   MainFastF.png       MrlBtn.png	  PlMoveDn.png	   SliderVPad.png \
-	LettersDigit.png   MainMute.png        MrlDismiss.png	  PlMoveUp.png	   xine_logo.png  \
+	LettersDigit.png   MainMute.png        MrlDismiss.png	  PlMoveUp.png	                  \
 	LettersGrey.png    MainNext.png        MrlSelect.png	  PlPlay.png                      \
 	LettersMiddle.png  MainPause.png       Onglet.png	  SkArrowDown.png  skinconfig
 
