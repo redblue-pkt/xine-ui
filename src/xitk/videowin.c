@@ -63,7 +63,7 @@ typedef struct {
   XClassHint    *xclasshint_borderless;
   GC             gc;
 
-  int            already_exposed;
+  //  int            already_exposed;
 
   int            video_width;     /* size of currently displayed video     */
   int            video_height;
@@ -789,7 +789,7 @@ void video_window_init (window_attributes_t *window_attribute) {
   gVw->widget_key         = 
     gVw->old_widget_key   = 0;
   gVw->gc		  = None;
-  gVw->already_exposed    = 0;
+  //  gVw->already_exposed    = 0;
   gVw->borderless         = window_attribute->borderless;
 
   XLockDisplay (gGui->display);
@@ -1058,26 +1058,26 @@ void video_window_change_skins(void) {
   cfg_entry_t *cfg_entry;
   char        *new_vo_logo;
 
-  cfg_entry   = gGui->config->lookup_entry(gGui->config, "video.logo_file");
+  cfg_entry   = gGui->config->lookup_entry(gGui->config, "misc.logo_mrl");
   new_vo_logo = xitk_skin_get_skin_filename(gGui->skin_config, "VOLogo");
   
   if(new_vo_logo) {
-
+    
     if(cfg_entry && cfg_entry->str_value) {
       /* Old and new logo are same, don't reload */
       if(!strcmp(cfg_entry->str_value, new_vo_logo))
 	return;
     }
     
-    gGui->config->update_string(gGui->config, "video.logo_file", new_vo_logo);
+    gGui->config->update_string(gGui->config, "misc.logo_mrl", new_vo_logo);
   }
   else {
     char  default_logo[2048];
     
     if(cfg_entry) {
       memset(&default_logo, 0, sizeof(default_logo));
-      snprintf(default_logo, 2048, "%s/xine_logo.zyuy2", XINE_SKINDIR);
-      gGui->config->update_string(gGui->config, "video.logo_file", default_logo);
+      snprintf(default_logo, 2048, "file://%s/xine_logo.mpg", XINE_SKINDIR);
+      gGui->config->update_string(gGui->config, "misc.logo_mrl", default_logo);
     }
   }
 }
@@ -1155,10 +1155,10 @@ static void video_window_handle_event (XEvent *event, void *data) {
     XExposeEvent * xev = (XExposeEvent *) event;
 
     /* Ensure we load the right logo */
-    if(!gVw->already_exposed) {
-      video_window_change_skins();
-      gVw->already_exposed++;
-    }
+    //    if(!gVw->already_exposed) {
+    //      video_window_change_skins();
+    //      gVw->already_exposed++;
+    //    }
 
 
     if (xev->count == 0) {
