@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.13\n"
 "POT-Creation-Date: 2002-11-22 00:07+0100\n"
-"PO-Revision-Date: 2002-11-20 19:42+0100\n"
+"PO-Revision-Date: 2002-11-21 22:43+0100\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -217,8 +217,7 @@ msgstr "synchronizowany protokó³ X (odpluskwianie)"
 # src/xitk/event.c:737
 #: src/xitk/event.c:883
 msgid "Warning! Synchronized X activated - this is way slow...\n"
-msgstr ""
-"Uwaga! Synchronizowany protokó³ X aktywowany - to jest powolna metoda...\n"
+msgstr "Uwaga! Synchronizowany protokó³ X aktywowany - to jest powolna metoda...\n"
 
 #: src/xitk/event.c:888
 msgid "Windows stacking"
@@ -281,8 +280,7 @@ msgstr "Zachowanie panelu"
 msgid ""
 "Automatically show/hide panel window, according to "
 "auto_video_output_visibility"
-msgstr ""
-"Automatycznie poka¿/ukryj panel, zgodnie z auto_video_output_visibility"
+msgstr "Automatycznie poka¿/ukryj panel, zgodnie z auto_video_output_visibility"
 
 #: src/xitk/event.c:949
 msgid "Event sender behavior"
@@ -297,8 +295,7 @@ msgid "Visual animation"
 msgstr "Animacja wizualna"
 
 #: src/xitk/event.c:959
-msgid ""
-"Display some video animations when current stream is audio only (eg: mp3)."
+msgid "Display some video animations when current stream is audio only (eg: mp3)."
 msgstr ""
 "Wy¶wietlaj animacje obrazu gdy odgrywany strumieñ jest wy³±cznie d¼wiêkowy"
 "(np. mp3)"
@@ -385,65 +382,56 @@ msgstr "K±t -"
 
 #. Initialize menu labels
 #: src/xitk/event_sender.c:633
-#, fuzzy
 msgid "Menu 1"
-msgstr "Menu %d"
+msgstr "Menu 1"
 
 #: src/xitk/event_sender.c:634
-#, fuzzy
 msgid "Menu 2"
-msgstr "Menu %d"
+msgstr "Menu 2"
 
 #: src/xitk/event_sender.c:635
-#, fuzzy
 msgid "Menu 3"
-msgstr "Menu %d"
+msgstr "Menu 3"
 
 #: src/xitk/event_sender.c:636
-#, fuzzy
 msgid "Menu 4"
-msgstr "Menu %d"
+msgstr "Menu 4"
 
 #: src/xitk/event_sender.c:637
-#, fuzzy
 msgid "Menu 5"
-msgstr "Menu %d"
+msgstr "Menu 5"
 
 #: src/xitk/event_sender.c:638
-#, fuzzy
 msgid "Menu 6"
-msgstr "Menu %d"
+msgstr "Menu 6"
 
 #: src/xitk/event_sender.c:639
-#, fuzzy
 msgid "Menu 7"
-msgstr "Menu %d"
+msgstr "Menu 7"
 
 #: src/xitk/event_sender.c:641 src/xitk/event_sender.c:643
 msgid "Root"
-msgstr ""
+msgstr "Root"
 
 #: src/xitk/event_sender.c:642
-#, fuzzy
 msgid "Title"
-msgstr "Tytu³: "
+msgstr "Tytu³"
 
 #: src/xitk/event_sender.c:644
 msgid "Subpicture"
-msgstr ""
+msgstr "Napisy"
 
 #: src/xitk/event_sender.c:645 src/xitk/stream_infos.c:842
 msgid "Audio"
 msgstr "D¼wiêk: "
 
 #: src/xitk/event_sender.c:646
-#, fuzzy
 msgid "Angle"
-msgstr "K±t -"
+msgstr "K±t"
 
 #: src/xitk/event_sender.c:647
 msgid "Part"
-msgstr ""
+msgstr "Czê¶æ"
 
 # src/xitk/setup.c:1165 src/xitk/viewlog.c:488
 #: src/xitk/event_sender.c:683 src/xitk/mediamark.c:1279 src/xitk/setup.c:1170
@@ -656,8 +644,7 @@ msgstr "  -a, --audio-channel <#>      Wybór kana³u d¼wiêku '#'.\n"
 # src/xitk/main.c:298
 #: src/xitk/main.c:315
 msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
-msgstr ""
-"  -p, --auto-play [opt]        Odtwarzanie po starcie. Mo¿na u¿ywaæ z:\n"
+msgstr "  -p, --auto-play [opt]        Odtwarzanie po starcie. Mo¿na u¿ywaæ z:\n"
 
 # src/xitk/main.c:299
 #: src/xitk/main.c:316
@@ -684,16 +671,14 @@ msgstr "                    'q': koniec po zakoñczeniu odtwarzania.\n"
 msgid ""
 "                    'd': retrieve playlist from DVD. (deprecated. use -s "
 "DVD)\n"
-msgstr ""
-"                    'd': lista odtwarzania z DVD. (stare. u¿yj -s DVD)\n"
+msgstr "                    'd': lista odtwarzania z DVD. (stare. u¿yj -s DVD)\n"
 
 # src/xitk/main.c:304
 #: src/xitk/main.c:321
 msgid ""
 "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
-msgstr ""
-"                    'v': lista odtwarzania z VCD. (stare. u¿yj -s VCD)\n"
+msgstr "                    'v': lista odtwarzania z VCD. (stare. u¿yj -s VCD)\n"
 
 # src/xitk/main.c:305
 #: src/xitk/main.c:322
@@ -722,18 +707,15 @@ msgstr "  -L, --no-lirc                wy³±czenie wsparcia dla LIRC'a\n"
 
 # src/xitk/main.c:312
 #: src/xitk/main.c:329
-msgid ""
-"      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
-msgstr ""
-"      --visual <klasa-lub-id>  U¿ycie wybranego ekranu X11. <klasa-lub-id>\n"
+msgid "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+msgstr "      --visual <klasa-lub-id>  U¿ycie wybranego ekranu X11. <klasa-lub-id>\n"
 
 # src/xitk/main.c:313
 #: src/xitk/main.c:330
 msgid ""
 "                               is either an X11 visual class, or a visual "
 "id.\n"
-msgstr ""
-"                               jest albo klas± ekranu X11, albo id ekranu.\n"
+msgstr "                               jest albo klas± ekranu X11, albo id ekranu.\n"
 
 # src/xitk/main.c:314
 #: src/xitk/main.c:331
@@ -743,28 +725,23 @@ msgstr "      --install                Instalowanie prywatnej mapy kolorów.\n"
 # src/xitk/main.c:315
 #: src/xitk/main.c:332
 msgid "      --keymap [option]        Display keymap. Option are:\n"
-msgstr ""
-"      --keymap [option]        Wy¶wietlanie mapowania klawiszy. Opcje:\n"
+msgstr "      --keymap [option]        Wy¶wietlanie mapowania klawiszy. Opcje:\n"
 
 # src/xitk/main.c:316
 #: src/xitk/main.c:333
-msgid ""
-"                                 'default': display default keymap table,\n"
-msgstr ""
-"                                 'default': wy¶wietl domy¶lne mapowanie,\n"
+msgid "                                 'default': display default keymap table,\n"
+msgstr "                                 'default': wy¶wietl domy¶lne mapowanie,\n"
 
 # src/xitk/main.c:317
 #: src/xitk/main.c:334
 msgid ""
 "                                 'lirc': display draft of a .lircrc config "
 "file.\n"
-msgstr ""
-"                                 'lirc': wy¶wietl wzór pliku .lircrc \n"
+msgstr "                                 'lirc': wy¶wietl wzór pliku .lircrc \n"
 
 # src/xitk/main.c:318
 #: src/xitk/main.c:335
-msgid ""
-"                                 'remapped': user remapped keymap table.\n"
+msgid "                                 'remapped': user remapped keymap table.\n"
 msgstr "                                 'remapped': mapowanie u¿ytkownika.\n"
 
 # src/xitk/main.c:319
@@ -772,14 +749,12 @@ msgstr "                                 'remapped': mapowanie u¿ytkownika.\n"
 msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
-msgstr ""
-"                                 -je¶li brak opcji, wybrane jest 'default'.\n"
+msgstr "                                 -je¶li brak opcji, wybrane jest 'default'.\n"
 
 # src/xitk/main.c:320
 #: src/xitk/main.c:337
 msgid "  -n, --network                Enable network remote control server.\n"
-msgstr ""
-"  -n, --network                W³±cz sieciowy serwer zdalnej kontroli.\n"
+msgstr "  -n, --network                W³±cz sieciowy serwer zdalnej kontroli.\n"
 
 # src/xitk/main.c:321
 #: src/xitk/main.c:338
@@ -828,8 +803,7 @@ msgstr "                                 'loop': powtarzaj ca³± listê.\n"
 
 # src/xitk/main.c:318
 #: src/xitk/main.c:346
-msgid ""
-"                                 'repeat': repeat current playlist entry.\n"
+msgid "                                 'repeat': repeat current playlist entry.\n"
 msgstr ""
 "                                 'repeat': powtórz aktualn± pozycjê z "
 "listy.\n"
@@ -924,8 +898,7 @@ msgstr "main: próbkowanie wtyczki wyj¶cia d¼wiêku <%s>\n"
 # src/xitk/main.c:491
 #: src/xitk/main.c:532
 msgid "main: audio driver probing failed => no audio output\n"
-msgstr ""
-"main: próbkowanie sterownika d¼wiêku zawiod³o => brak wyj¶cia d¼wiêku\n"
+msgstr "main: próbkowanie sterownika d¼wiêku zawiod³o => brak wyj¶cia d¼wiêku\n"
 
 # src/xitk/main.c:434
 #: src/xitk/main.c:550
@@ -1384,8 +1357,7 @@ msgstr "Nie uda³o siê za³adowaæ %s/%s. Koniec.\n"
 #: src/xitk/skins.c:411
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
-msgstr ""
-"Nie uda³o siê za³adowaæ skóry %s, B³êdna wersja. Powrót do skóry '%s'.\n"
+msgstr "Nie uda³o siê za³adowaæ skóry %s, B³êdna wersja. Powrót do skóry '%s'.\n"
 
 # src/xitk/snapshot.c:816
 #: src/xitk/snapshot.c:825 src/xitk/snapshot.c:836
@@ -1623,8 +1595,7 @@ msgstr "Rozszerzenie XF86VidMode: znaleziono modelines %d.\n"
 
 # src/xitk/videowin.c:1133
 #: src/xitk/videowin.c:1227
-msgid ""
-"XF86VidMode Extension: could not get list of available modelines. Failed.\n"
+msgid "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr ""
 "Rozszerzenie XF86VidMode: Zawiod³a próba znalezienia listy dostêpnych "
 "rozdzielczo¶ci.\n"
@@ -1632,8 +1603,7 @@ msgstr ""
 # src/xitk/videowin.c:1136
 #: src/xitk/videowin.c:1230
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
-msgstr ""
-"Rozszerzenie XF86VidMode: inicjalizacja zawiod³a, nie bêdzie u¿ywany.\n"
+msgstr "Rozszerzenie XF86VidMode: inicjalizacja zawiod³a, nie bêdzie u¿ywany.\n"
 
 # src/xitk/viewlog.c:328
 #: src/xitk/viewlog.c:319
@@ -1655,3 +1625,5 @@ msgstr "podgl±d logów xine"
 #: src/xitk/viewlog.c:473
 msgid "Refresh"
 msgstr "Od¶wie¿anie"
+
+
