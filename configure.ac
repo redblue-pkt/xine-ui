@@ -1025,6 +1025,13 @@ if test ! -z "$am_depcomp"; then
 fi
 AC_SUBST(DEPCOMP)
 
+
+dnl
+dnl Newest automake workaround
+dnl
+AC_SUBST(mkdir_p)
+
+
 dnl
 dnl Output configuration files
 dnl
