@@ -152,6 +152,7 @@ static void _nullify_me(xitk_skin_element_t *s) {
   s->color_click     = NULL;
   s->font            = NULL;
   s->browser_entries = -2;
+  s->direction       = DIRECTION_LEFT; /* Compatibility */
 }
 
 /*
@@ -309,6 +310,32 @@ static int skin_get_align_value(const char *val) {
   }
 
   return LABEL_ALIGN_CENTER;
+}
+
+/*
+ * Return direction
+ */
+static int skin_get_direction(const char *val) {
+  static struct {
+    const char *str;
+    int         value;
+  } directions[] = {
+    { "left",   DIRECTION_LEFT   }, 
+    { "right",  DIRECTION_RIGHT  }, 
+    { "up",     DIRECTION_UP     },
+    { "down",   DIRECTION_DOWN   },
+    { NULL,     0 }
+  };
+  int   i;
+
+  assert(val != NULL);
+  
+  for(i = 0; directions[i].str != NULL; i++) {
+    if(!(strcasecmp(directions[i].str, val)))
+      return directions[i].value;
+  }
+
+  return DIRECTION_LEFT;
 }
 
 /*
@@ -509,7 +536,11 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	  }
 	  else {
 
-	    if(!strncasecmp(skonfig->ln, "visible", 7)) {
+	    if(!strncasecmp(skonfig->ln, "direction", 9)) {
+	      skin_set_pos_to_value(&p);
+	      s->direction = skin_get_direction(p);
+	    }
+	    else if(!strncasecmp(skonfig->ln, "visible", 7)) {
 	      skin_set_pos_to_value(&p);
 	      s->visible = skin_get_bool_value(p);
 	    }
@@ -614,6 +645,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  visible     = %d\n", s->visible);
       printf("  X           = %d\n", s->x);
       printf("  Y           = %d\n", s->y);
+      printf("  direction   = %d\n", s->direction);
       printf("  pixmap      = '%s'\n", s->pixmap);
 
       if(s->slider_type) {
@@ -644,6 +676,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  visible     = %d\n", s->visible);
       printf("  X           = %d\n", s->x);
       printf("  Y           = %d\n", s->y);
+      printf("  direction   = %d\n", s->direction);
       printf("  pixmap      = '%s'\n", s->pixmap);
       printf("  animation   = %d\n", s->animation);
       printf("  print       = %d\n", s->print);
@@ -834,6 +867,20 @@ int xitk_skin_check_version(xitk_skin_config_t *skonfig, int min_version) {
     return 2;
 
   return -1;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_direction(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->direction;
+
+  return DIRECTION_LEFT; /* Compatibility */
 }
 
 /*

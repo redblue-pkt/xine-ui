@@ -37,6 +37,7 @@ typedef struct xitk_skin_element_s {
   char                         *pixmap;
   int                           x;
   int                           y;
+  int                           direction;
 
   /* browser */
   int                           browser_entries;

@@ -796,19 +796,51 @@ void playlist_change_skins(void) {
     xitk_change_skins_widget_list(playlist->widget_list, gGui->skin_config);
     
     {
-      int x, y;
+      int x, y, dir;
       int i = 0;
       
       x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayBG");
       y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayBG");
+      dir = xitk_skin_get_direction(gGui->skin_config, "AutoPlayBG");
       
-      while(playlist->autoplay_plugins[i] != NULL) {
-	
-	(void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
-	
-	y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1;
-	i++;
+      switch(dir) {
+      case DIRECTION_UP:
+      case DIRECTION_DOWN:
+	while(playlist->autoplay_plugins[i] != NULL) {
+	  
+	  (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
+	  
+	  if(dir == DIRECTION_DOWN)
+	    y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1;
+	  else
+	    y -= (xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1);
+	  
+	  i++;
+	}
+	break;
+      case DIRECTION_LEFT:
+      case DIRECTION_RIGHT:
+	while(playlist->autoplay_plugins[i] != NULL) {
+	  
+	  (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
+	  
+	  if(dir == DIRECTION_RIGHT)
+	    x += xitk_get_widget_width(playlist->autoplay_plugins[i]) + 1;
+	  else
+	    x -= (xitk_get_widget_width(playlist->autoplay_plugins[i]) + 1);
+	  
+	  i++;
+	}
+	break;
       }
+      ////
+      /*       while(playlist->autoplay_plugins[i] != NULL) { */
+      
+      /* 	(void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y); */
+      
+      /* 	y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1; */
+      /* 	i++; */
+      /*       } */
     }
     
     xitk_paint_widget_list(playlist->widget_list);
@@ -1059,13 +1091,14 @@ void playlist_editor(void) {
   xitk_set_widget_tips(playlist->winput, _("Direct MRL entry"));
 
   {
-    int                x, y;
+    int                x, y, dir;
     int                i = 0;
     const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     
     x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayBG");
     y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayBG");
-    
+    dir = xitk_skin_get_direction(gGui->skin_config, "AutoPlayBG");
+      
     while(autoplay_plugins[i] != NULL) {
 
       lb.skin_element_name = "AutoPlayBG";
@@ -1082,8 +1115,25 @@ void playlist_editor(void) {
       
       (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
       
-      y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1;
+      switch(dir) {
+      case DIRECTION_UP:
+      case DIRECTION_DOWN:
+	if(dir == DIRECTION_DOWN)
+	  y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1;
+	else
+	  y -= (xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1);
+	break;
+      case DIRECTION_LEFT:
+      case DIRECTION_RIGHT:
+	if(dir == DIRECTION_RIGHT)
+	  x += xitk_get_widget_width(playlist->autoplay_plugins[i]) + 1;
+	else
+	  x -= (xitk_get_widget_width(playlist->autoplay_plugins[i]) + 1);
+	break;
+      }
+
       i++;
+
     }
     if(i)
       playlist->autoplay_plugins[i+1] = NULL;

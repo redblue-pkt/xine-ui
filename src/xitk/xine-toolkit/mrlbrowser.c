@@ -721,19 +721,45 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     {
       int x, y;
       int i = 0;
+      int dir;
       
       x = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name_ip);
       y = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name_ip);
+      dir = xitk_skin_get_direction(skonfig, private_data->skin_element_name_ip);
     
-      while(private_data->autodir_plugins[i] != NULL) {
-	
-	(void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
-	
-	y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;
-	i++;
+      switch(dir) {
+      case DIRECTION_UP:
+      case DIRECTION_DOWN:
+	while(private_data->autodir_plugins[i] != NULL) {
+	  
+	  (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
+	  
+	  if(dir == DIRECTION_DOWN)
+	    y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;
+	  else
+	    y -= (xitk_get_widget_height(private_data->autodir_plugins[i]) + 1);
+	  
+	  i++;
+	}
+	break;
+      case DIRECTION_LEFT:
+      case DIRECTION_RIGHT:
+	while(private_data->autodir_plugins[i] != NULL) {
+	  
+	  (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
+	  
+	  if(dir == DIRECTION_RIGHT)
+	    x += xitk_get_widget_width(private_data->autodir_plugins[i]) + 1;
+	  else
+	    x -= (xitk_get_widget_width(private_data->autodir_plugins[i]) + 1);
+	  
+	  i++;
+	}
+	break;
       }
-    }
 
+    }
+    
     xitk_paint_widget_list(private_data->widget_list);
     
   }
@@ -1186,10 +1212,12 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   {
     int x, y;
     int i = 0;
+    int dir;
     
     private_data->skin_element_name_ip = strdup(mb->ip_name.button.skin_element_name);
     x = xitk_skin_get_coord_x(skonfig, mb->ip_name.button.skin_element_name);
     y = xitk_skin_get_coord_y(skonfig, mb->ip_name.button.skin_element_name);
+    dir = xitk_skin_get_direction(skonfig, mb->ip_name.button.skin_element_name);
     
     while(mb->ip_availables[i] != NULL) {
 
@@ -1207,8 +1235,24 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
       private_data->autodir_plugins[i]->widget_type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
       
       (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
+      
+      switch(dir) {
+      case DIRECTION_UP:
+      case DIRECTION_DOWN:
+	if(dir == DIRECTION_DOWN)
+	  y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;
+	else
+	  y -= (xitk_get_widget_height(private_data->autodir_plugins[i]) + 1);
+	break;
+      case DIRECTION_LEFT:
+      case DIRECTION_RIGHT:
+	if(dir == DIRECTION_RIGHT)
+	  x += xitk_get_widget_width(private_data->autodir_plugins[i]) + 1;
+	else
+	  x -= (xitk_get_widget_width(private_data->autodir_plugins[i]) + 1);
+	break;
+      }
 
-      y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;
       i++;
     }
     if(i)

@@ -1490,6 +1490,15 @@ void xitk_skin_unload_config(xitk_skin_config_t *);
 /*
  *
  */
+#define DIRECTION_UP     1
+#define DIRECTION_DOWN   2
+#define DIRECTION_LEFT   3
+#define DIRECTION_RIGHT  4
+int xitk_skin_get_direction(xitk_skin_config_t *skonfig, const char *str);
+
+/*
+ *
+ */
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
 
 /*

@@ -235,6 +235,11 @@ void xitk_strdupa(char *dest, char *src);
                       StructureNotifyMask | PropertyChangeMask |              \
                       LeaveWindowMask | EnterWindowMask | PointerMotionMask)
 
+#define DIRECTION_UP     1
+#define DIRECTION_DOWN   2
+#define DIRECTION_LEFT   3
+#define DIRECTION_RIGHT  4
+
 int xitk_x_error;
 
 typedef struct xitk_pixmap_s xitk_pixmap_t;
@@ -540,6 +545,7 @@ int xitk_get_barstyle_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
 
+int xitk_skin_get_direction(xitk_skin_config_t *, const char *);
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
 int xitk_skin_get_enability(xitk_skin_config_t *, const char *);
 int xitk_skin_get_coord_x(xitk_skin_config_t *, const char *);

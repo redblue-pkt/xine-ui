@@ -29,11 +29,6 @@
 #define STYLE_FLAT     1
 #define STYLE_BEVEL    2
 
-#define DIRECTION_UP     1
-#define DIRECTION_DOWN   2
-#define DIRECTION_LEFT   3
-#define DIRECTION_RIGHT  4
-
 #define DRAW_INNER     1
 #define DRAW_OUTTER    2
 #define DRAW_FLATTER   3
