@@ -29,5 +29,7 @@ void config_update_string(char *key, char *string);
 void config_update_enum(char *key, int value);
 void config_update_bool(char *key, int value);
 void config_update_num(char *key, int value);
+void config_save(void);
+void config_reset(void);
 
 #endif

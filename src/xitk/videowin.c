@@ -682,6 +682,16 @@ static void video_window_adapt_size (void) {
 
     XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
 
+    if(gGui->always_layer_above) {
+      if(XA_WIN_LAYER == None)
+	XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
+      
+      propvalue[0] = 10;
+      XChangeProperty(gGui->display, gGui->video_window, XA_WIN_LAYER,
+		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
+		      1);
+    }
+
     if(gVw->borderless) {
       prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
       mwmhints.flags = MWM_HINTS_DECORATIONS;

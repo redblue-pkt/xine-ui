@@ -110,3 +110,12 @@ void config_update_num(char *key, int value) {
   else
     fprintf(stderr, "WOW, num key %s isn't registered\n", key);
 }
+
+void config_save(void) {
+  xine_config_save(gGui->xine, gGui->configfile);
+}
+
+void config_reset(void) {
+  xine_config_reset(gGui->xine);
+  xine_config_load(gGui->xine, gGui->configfile);
+}

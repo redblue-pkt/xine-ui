@@ -108,6 +108,29 @@ static void ssaver_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
 }
 
 /*
+ * Layer above callback
+ */
+static void *layer_above_change_thread(void *data) {
+  pthread_detach(pthread_self());
+  sleep(1);
+  config_update_num("gui.layer_above", 1);
+  pthread_exit(NULL);
+  return NULL;
+}
+static void always_layer_above_cb(void *data, xine_cfg_entry_t *cfg) {
+  pthread_t th;
+  
+  gGui->always_layer_above = cfg->num_value;
+  
+  if(gGui->always_layer_above && (!gGui->layer_above)) {
+    /*
+     * This is really ugly, but xine config functions are mutex locked,
+     * so we can access to config stuff within config callback function.
+     */
+    pthread_create(&th, NULL, layer_above_change_thread, NULL);
+  }
+}
+/*
  * Callback for snapshots saving location.
  */
 static void snapshot_loc_cb(void *data, xine_cfg_entry_t *cfg) {
@@ -122,17 +145,6 @@ int actions_on_start(action_id_t actions[], action_id_t a) {
     i++;
   }
   return num;
-}
-
-void config_save(void) {
-
-  xine_config_save(gGui->xine, gGui->configfile);
-}
-
-void config_reset(void) {
-
-  xine_config_reset(gGui->xine);
-  xine_config_load(gGui->xine, gGui->configfile);
 }
 
 /*
@@ -802,10 +814,21 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->layer_above = 
     xine_config_register_bool (gGui->xine, "gui.layer_above", 1,
 			       _("use wm layer property to place window on top"), 
-			       _("synchronized X protocol (debug)"), 
+			       CONFIG_NO_HELP,
 			       CONFIG_LEVEL_EXP,
 			       CONFIG_NO_CB,
 			       CONFIG_NO_DATA);
+
+  gGui->always_layer_above = 
+    xine_config_register_bool (gGui->xine, "gui.always_layer_above", 0,
+			       _("use wm layer property to place windows on top"), 
+			       CONFIG_NO_HELP,
+			       CONFIG_LEVEL_EXP,
+			       always_layer_above_cb,
+			       CONFIG_NO_DATA);
+
+  if(gGui->always_layer_above && (!gGui->layer_above))
+    config_update_num("gui.layer_above", 1);
 
   gGui->snapshot_location = 
     (char *)xine_config_register_string (gGui->xine, "gui.snapshotdir", 

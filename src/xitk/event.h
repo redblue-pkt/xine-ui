@@ -124,6 +124,7 @@ typedef struct {
   xitk_register_key_t  widget_key;
 
   int                  layer_above;
+  int                  always_layer_above;
   int                  reparent_hack;
 
   int                  network;
@@ -165,9 +166,6 @@ typedef struct {
 /*
  * Configuration file convenience functions
  */
-
-void config_save(void);
-void config_reset(void);
 
 int actions_on_start(action_id_t actions[], action_id_t a);
 
