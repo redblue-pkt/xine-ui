@@ -14,6 +14,7 @@ EXTRA_DIST = \
 	progtest.m4 \
 	readline.m4 \
 	curl.m4 \
+	xft.m4 \
 	_xine.m4
 
 

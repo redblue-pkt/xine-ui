@@ -320,7 +320,7 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
 						int x, int y, int width, int height) {
   xitk_window_t *xwin;
   xitk_pixmap_t  *bar, *pix_bg;
-  unsigned int   colorblack, colorwhite, colorgray, colordgray;
+  unsigned int   colorblack, colorwhite, colorgray, colordgray, origin;
   xitk_font_t   *fs = NULL;
   int            lbear, rbear, wid, asc, des;
   int            bar_style = xitk_get_barstyle_feature();
@@ -423,10 +423,16 @@ xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title,
     XSetForeground(im->x.disp, bar->gc, colorwhite);
   else
     XSetForeground(im->x.disp, bar->gc, (xitk_get_pixel_color_from_rgb(im, 85, 12, 135)));
+
+  /* Xft draws from the origin, while core X draws from the absolute bottom */
+#ifdef WITH_XFT
+  origin = (TITLE_BAR_HEIGHT+asc) >> 1;
+#else
+  origin = ((TITLE_BAR_HEIGHT+asc+des) >> 1) - des;
+#endif
   
   xitk_font_draw_string(fs, bar->pixmap, bar->gc, 
-	      (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT+asc+des) >> 1) - des, 
-	      title, strlen(title));
+        (width - wid) - TITLE_BAR_HEIGHT, origin, title, strlen(title));
   XUNLOCK(im->x.disp);
 
   xitk_font_unload_font(fs);

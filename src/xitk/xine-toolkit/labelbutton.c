@@ -105,6 +105,7 @@ static void create_labelofbutton(xitk_widget_t *lb,
   int                      lbear, rbear, width, asc, des;
   int                      xoff = 0, yoff = 0, DefaultColor = -1;
   unsigned int             fg = 0;
+  unsigned int             origin = 0;
   XColor                   xcolor;
   xitk_color_names_t      *color = NULL;
 
@@ -172,7 +173,7 @@ static void create_labelofbutton(xitk_widget_t *lb,
     
     XLOCK(private_data->imlibdata->x.disp);
     XAllocColor(private_data->imlibdata->x.disp,
-		Imlib_get_colormap(private_data->imlibdata), &xcolor);
+    Imlib_get_colormap(private_data->imlibdata), &xcolor);
     XUNLOCK(private_data->imlibdata->x.disp);
 
     fg = xcolor.pixel;
@@ -181,25 +182,29 @@ static void create_labelofbutton(xitk_widget_t *lb,
   XLOCK(private_data->imlibdata->x.disp);
 
   XSetForeground(private_data->imlibdata->x.disp, gc, fg);
+
+  /* Xft draws from the origin, while core X draws from the absolute bottom */
+#ifdef WITH_XFT
+  origin = (ysize+asc+yoff)>>1;
+#else
+  origin = ((ysize+asc+des+yoff)>>1)-des;
+#endif
   
   /*  Put text in the right place */
   if(private_data->align == ALIGN_CENTER) {
     xitk_font_draw_string(fs, pix, gc, 
-		((xsize-(width+xoff))>>1) + private_data->label_offset, 
-		((ysize+asc+des+yoff)>>1)-des, 
-		label, strlen(label));
+    ((xsize-(width+xoff))>>1) + private_data->label_offset, 
+    origin, label, strlen(label));
   }
   else if(private_data->align == ALIGN_LEFT) {
     xitk_font_draw_string(fs, pix, gc, 
-		(((state != CLICK) ? 1 : 5)) + private_data->label_offset, 
-		((ysize+asc+des+yoff)>>1)-des, 
-		label, strlen(label));
+    (((state != CLICK) ? 1 : 5)) + private_data->label_offset, 
+    origin, label, strlen(label));
   }
   else if(private_data->align == ALIGN_RIGHT) {
     xitk_font_draw_string(fs, pix, gc, 
-    		(xsize - (width + ((state != CLICK) ? 5 : 1))) + private_data->label_offset,
-    		((ysize+asc+des+yoff)>>1)-des, 
-    		label, strlen(label));
+    (xsize - (width + ((state != CLICK) ? 5 : 1))) + private_data->label_offset,
+    origin, label, strlen(label));
   }
   
   XUNLOCK(private_data->imlibdata->x.disp);

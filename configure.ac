@@ -419,10 +419,51 @@ dnl
 dnl Find pkg-config
 dnl
 AC_PATH_PROG(PKG_CONFIG, pkg-config, no)
-if test x$PKG_CONFIG = xno ; then
+if test x"$PKG_CONFIG" != "xno" ; then
+
+  if test x$pkg_exec_prefix != x ; then
+    if test x${PKG_CONFIG+set} != xset ; then
+      PKG_CONFIG=$pkg_exec_prefix/bin/pkg-config
+    fi
+  fi
+
+else
   echo "*** pkg-config not found. See http://pkgconfig.sourceforge.net"
   echo "*** All of DIRECTFB dependent parts will be disabled"
-else
+fi
+
+dnl
+dnl Check for Xft
+dnl
+AC_MSG_CHECKING([whether to have Xft support])
+AM_PATH_XFT(yes, XFT=true, XFT=false)
+if test x"$XFT" = "xtrue" ; then
+  saved_CFLAGS=$CFLAGS
+  saved_LIBS=$LIBS
+  CFLAGS="$CFLAGS $XFT_CFLAGS"
+  LIBS="$LIBS $XFT_LIBS"
+  AC_TRY_LINK([
+#include <X11/Xft/Xft.h>], [ XftFontClose(0, 0); return 1; ], 
+    [
+      AC_DEFINE(WITH_XFT, 1, "antialias support")
+      AC_MSG_CHECKING([Xft UTF-8 support])
+      AC_TRY_LINK([
+#include <X11/Xft/Xft.h>
+        ], [ 
+XftDrawStringUtf8(0, 0, 0, 0, 0, 0, 0); return 0; 
+        ],
+          AC_DEFINE(HAVE_XFT_UTF8_STRING, 1, "Xft UTF8 support")
+          AC_MSG_RESULT(yes),
+          AC_MSG_RESULT(no)) 
+    ],
+    [
+      AC_MSG_RESULT([***Could not link with Xft. Install Xft if you want support for it***])
+      XFT=false
+    ])
+  CFLAGS=$saved_CFLAGS
+  LIBS=$saved_LIBS
+fi
+AM_CONDITIONAL(WITH_XFT, test x"$XFT" != "xtrue")
 
 dnl
 dnl Check for DirectFB
@@ -432,21 +473,22 @@ dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE N
 dnl  DFB:
 dnl  Temporary disabled, port to new API needed
 dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-if test "x" != "x"; then
+if test x"$PKG_CONFIG" != "xno" ; then
+  if test "x" != "x"; then
 
-  DIRECTFB_REQUIRED_VERSION=0.9.10
+    DIRECTFB_REQUIRED_VERSION=0.9.10
 
-  AC_MSG_CHECKING(for DirectFB)
-  if $PKG_CONFIG --atleast-version $DIRECTFB_REQUIRED_VERSION directfb ; then
+    AC_MSG_CHECKING(for DirectFB)
+    if $PKG_CONFIG --atleast-version $DIRECTFB_REQUIRED_VERSION directfb ; then
         AC_MSG_RESULT(found)
         DIRECTFB_CFLAGS=`$PKG_CONFIG --cflags directfb`
         DIRECTFB_LIBS=`$PKG_CONFIG --libs directfb`
         have_directfb="yes"
-  else
-    AC_MSG_RESULT([*** All of DIRECTFB dependent parts will be disabled ***])
-  fi
+    else
+        AC_MSG_RESULT([*** All of DIRECTFB dependent parts will be disabled ***])
+    fi
 
-fi
+  fi
 
 fi
 
@@ -548,6 +590,8 @@ dnl
 dnl Check for LIRC client support
 dnl
 AC_CHECK_LIRC
+
+
 
 
 dnl

@@ -7,7 +7,7 @@ docsdir = $(datadir)/doc/xitk
 
 docs_DATA = README
 
-AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
+AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@ @XFT_CFLAGS@
 
 if HAVE_X11
 xitk_lib = libxitk.la
@@ -44,7 +44,7 @@ libxitk_la_SOURCES = \
 	xitk.c
 
 libxitk_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 \
-	-lXext $(X_EXTRA_LIBS)  $(THREAD_LIBS) $(INTLLIBS) \
+	-lXext $(X_EXTRA_LIBS)  $(THREAD_LIBS) $(INTLLIBS) $(XFT_LIBS) \
 	$(top_builddir)/src/xitk/Imlib-light/libImlib-light.la
 
 noinst_HEADERS = \

@@ -46,6 +46,9 @@
 #ifdef HAVE_XSHM_H
 #include <X11/extensions/XShm.h>
 #endif
+#ifdef WITH_XFT
+#include <X11/Xft/Xft.h>
+#endif
 
 #include "xitk/Imlib-light/Imlib.h"
 
@@ -346,10 +349,14 @@ void menu_auto_pop(xitk_widget_t *w);
 
 struct xitk_font_s {
   Display       *display;
-#ifdef WITH_XMB
+#ifdef WITH_XFT
+	XftFont       *font;
+#else
+# ifdef WITH_XMB
   XFontSet       fontset;
-#endif
+# endif
   XFontStruct   *font;
+#endif
   char          *name;
 };
 
