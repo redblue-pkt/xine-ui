@@ -413,15 +413,15 @@ void pl_scan_input(widget_t *w, void *ip) {
       while(autoplay_plugins[i] != NULL) {
 	
 	if(!strcasecmp(autoplay_plugins[i], labelbutton_get_label(w))) {
+	  int num_mrls;
 	  char **autoplay_mrls = 
-	    xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i]);
-	  int j = 0;
-	  
+	    xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i], &num_mrls);
+
 	  if(autoplay_mrls) {
-	    while(autoplay_mrls[j]) {
+	    int j;
+
+	    for (j=0; j<num_mrls; j++) 
 	      gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
-	      j++;
-	    }
 	    
 	    gGui->playlist_num += j;
 	    gGui->playlist_cur = 0;

@@ -750,13 +750,13 @@ void gui_run (void) {
       if(gGui->autoplay_options & PLAY_FROM_DVD)
 
 	if(!strcasecmp(autoplay_plugins[i], "DVD")) {
-	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine, "DVD");
-	  int j = 0;
+	  int num_mrls;
+	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine, "DVD", &num_mrls);
+	  int j;
 	  
-	  while(autoplay_mrls[j]) {
+	  for (j=0; j<num_mrls; j++) 
 	    gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
-	    j++;
-	  }
+
 	  gGui->playlist_num += j;
 	  gGui->playlist_cur = 0;
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
@@ -765,13 +765,13 @@ void gui_run (void) {
 
       if(gGui->autoplay_options & PLAY_FROM_VCD)
 	if(!strcasecmp(autoplay_plugins[i], "VCD")) {
-	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine, "VCD");
-	  int j = 0;
+	  int num_mrls;
+	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine, "VCD", &num_mrls);
+	  int j;
 	    
-	  while(autoplay_mrls[j]) {
+	  for (j=0; j<num_mrls; j++) 
 	    gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
-	    j++;
-	  }
+
 	  gGui->playlist_num += j;
 	  gGui->playlist_cur = 0;
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);

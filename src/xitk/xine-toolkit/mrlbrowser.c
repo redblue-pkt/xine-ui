@@ -140,17 +140,16 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
  * directly with these ones.
  */
 static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
-				      mrl_t **mtmp) {
-  int i = 0;
+				      mrl_t **mtmp, int num_mrls) {
+  int i;
   int old_mrls_num = private_data->mrls_num;
 
-  while(mtmp[i]) {
+  for (i=0; i<num_mrls; i++) {
 
     if(private_data->mc->mrls[i] == NULL)
       private_data->mc->mrls[i] = (mrl_t *) gui_xmalloc(sizeof(mrl_t));
 
     MRL_DUPLICATE(mtmp[i], private_data->mc->mrls[i]);
-    i++;
   }
 
   private_data->mrls_num = i;
@@ -185,8 +184,10 @@ static void mrlbrowser_grab_mrls(widget_t *w, void *data) {
     sprintf(private_data->last_mrl_source, "%s", lbl);
 
     {
+      int num_mrls;
       mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
-					  private_data->last_mrl_source, NULL);
+					  private_data->last_mrl_source, NULL,
+					  &num_mrls);
       
       if(!mtmp) {
 	private_data->last_mrl_source = (char *)
@@ -195,7 +196,7 @@ static void mrlbrowser_grab_mrls(widget_t *w, void *data) {
 	return;
       }
 
-      mrlbrowser_duplicate_mrls(private_data, mtmp);
+      mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
     }
     
     update_current_origin(private_data);
@@ -502,11 +503,12 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     }
     
     {
+      int num_mrls;
       mrl_t **mtmp = xine_get_browse_mrls(private_data->xine, 
 					  private_data->last_mrl_source, 
-					  buf);
+					  buf, &num_mrls);
       
-      mrlbrowser_duplicate_mrls(private_data, mtmp);
+      mrlbrowser_duplicate_mrls(private_data, mtmp, num_mrls);
     }
     
     update_current_origin(private_data);
