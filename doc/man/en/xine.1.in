@@ -197,6 +197,15 @@ Remove borders of video output window, in windowed mode.
 .B \-P, \-\-playlist <filename>
 Use file as playlist. Known formats are: asx, toxine, m3u, pls, sfv and raw text file.
 .TP
+.B \-l, \-\-loop [mode]
+Set playlist loop mode. If mode isn't specified, mode \fBloop\fP is used. Possible modes are:
+.br
+\fBloop\fP: loop entire playlist.
+.br
+\fBrepeat\fP: repeat current playlist entry.
+.br
+\fBshuffle\fP: select randomly an entry in playlist.
+.TP
 .B MRL (media resource locator)
 .br
 MRLs are similar to URLs in your web browser. They describe the media

@@ -191,6 +191,16 @@ Retire les bordures de la fenêtre de sortie, en mode fenêtré.
 Utilise le fichier spécifié comme liste de lecture. Les formats reconnues sont:
 asx, toxine, m3u, pls, sfv et les fichiers texte.
 .TP
+.B \-l, \-\-loop [mode]
+Defini le mode de bouclage de la liste de lecture. Si aucun mode n'est precisé, le 
+mode \fBloop\fP est utilisé. Les modes possibles sont:
+.br
+\fBloop\fP: lecture du debut à la fin de la liste de lecture.
+.br
+\fBrepeat\fP: répète l'entrée courante dans la liste de lecture.
+.br
+\fBshuffle\fP: sélection aléatoire dans la liste de lecture.
+.TP
 .B MRL (media resource locator)
 .br
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles
