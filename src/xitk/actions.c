@@ -747,6 +747,34 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
 }
 
 static void set_fullscreen_mode(int fullscreen_mode) {
+  int panel        = panel_is_visible();
+  int mrl_browser  = mrl_browser_is_visible();
+  int playlist     = playlist_is_visible();
+  int control      = control_is_visible();
+  int setup        = setup_is_visible();
+  int viewlog      = viewlog_is_visible();
+  int kbedit       = kbedit_is_visible();
+  int event_sender = event_sender_is_visible();
+  int stream_infos = stream_infos_is_visible();
+
+  if(panel)
+    panel_toggle_visibility(NULL, NULL);
+  if(mrl_browser)
+    mrl_browser_toggle_visibility(NULL, NULL);
+  if(playlist)
+    playlist_toggle_visibility(NULL, NULL);
+  if(control)
+    control_toggle_visibility(NULL, NULL);
+  if(setup)
+    setup_toggle_visibility(NULL, NULL);
+  if(viewlog)
+    viewlog_toggle_visibility(NULL, NULL);
+  if(kbedit)
+    kbedit_toggle_visibility(NULL, NULL);
+  if(event_sender)
+    event_sender_toggle_visibility(NULL, NULL);
+  if(stream_infos)
+    stream_infos_toggle_visibility(NULL, NULL);
   
   if(!(video_window_is_visible()))
     video_window_set_visibility(1);
@@ -754,48 +782,27 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   video_window_set_fullscreen_mode(fullscreen_mode);
   
   /* Drawable has changed, update cursor visiblity */
-  if(!gGui->cursor_visible) {
+  if(!gGui->cursor_visible)
     video_window_set_cursor_visibility(gGui->cursor_visible);
-  }
   
-  if (panel_is_visible())  {
-    XLockDisplay(gGui->display);
-    XUnmapWindow(gGui->display, gGui->panel_window);
-    XRaiseWindow(gGui->display, gGui->panel_window);
-    XMapWindow(gGui->display, gGui->panel_window);
-    if(!gGui->use_root_window)
-      XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
-    XUnlockDisplay(gGui->display);
-    layer_above_video(gGui->panel_window);
-  }
-
-  if(mrl_browser_is_visible()) {
-    hide_mrl_browser();
-    show_mrl_browser();
-    if(!gGui->use_root_window)
-      set_mrl_browser_transient();
-  }
-
-  if(playlist_is_visible())
-    playlist_raise_window();
-  
-  if(control_is_visible())
-    control_raise_window();
-  
-  if(setup_is_visible())
-    setup_raise_window();
-
-  if(viewlog_is_visible())
-    viewlog_raise_window();
-
-  if(kbedit_is_visible())
-    kbedit_raise_window();
-
-  if(event_sender_is_visible())
-    event_sender_raise_window();
-
-  if(stream_infos_is_visible())
-    stream_infos_raise_window();
+  if(panel)
+    panel_toggle_visibility(NULL, NULL);
+  if(mrl_browser)
+    mrl_browser_toggle_visibility(NULL, NULL);
+  if(playlist)
+    playlist_toggle_visibility(NULL, NULL);
+  if(control)
+    control_toggle_visibility(NULL, NULL);
+  if(setup)
+    setup_toggle_visibility(NULL, NULL);
+  if(viewlog)
+    viewlog_toggle_visibility(NULL, NULL);
+  if(kbedit)
+    kbedit_toggle_visibility(NULL, NULL);
+  if(event_sender)
+    event_sender_toggle_visibility(NULL, NULL);
+  if(stream_infos)
+    stream_infos_toggle_visibility(NULL, NULL);
 }
 
 void gui_set_fullscreen_mode(xitk_widget_t *w, void *data) {

@@ -476,7 +476,8 @@ static uint32_t xitk_check_wm(Display *display) {
   }
   
   /* Check for Extended Window Manager Hints (EWMH) Compliant */
-  if((atom = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", True)) != None) {
+  if(((atom = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", True)) != None) && 
+     (XInternAtom(display, "_NET_WORKAREA", True) != None)) {
     unsigned char   *prop_return = NULL;
     unsigned long    nitems_return;
     unsigned long    bytes_after_return;
