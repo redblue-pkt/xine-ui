@@ -244,7 +244,7 @@ dnl
 AC_CHECK_LIB(posix4, nanosleep)
 AC_CHECK_FUNCS(vsnprintf snprintf nanosleep)
 AC_CHECK_HEADER(stdarg.h, AC_DEFINE(HAVE_STDARGS))
-AC_CHECK_HEADERS(string.h strings.h)
+AC_CHECK_HEADERS(string.h strings.h alloca.h)
 
 
 dnl

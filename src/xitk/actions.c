@@ -27,6 +27,9 @@
 #include "config.h"
 #endif
 
+#if	HAVE_ALLOCA_H
+#include <alloca.h>
+#endif
 #include <X11/Xlib.h>
 #include <xine/video_out_x11.h>
 
