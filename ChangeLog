@@ -1,12 +1,16 @@
 xine-ui (0.9.15) unstable; urgency=low
 
+  * hownload asx playlist. In fact it can download anything, since we
+    use libcurl now. It's experimental and not documented yet (use dload:/
+    as an mrl prefix, ftp:// are also handled)
+  * handle playlist file/mrl in playlist (cryptic words here)
   * tons of toolkit bugfixes,
   * snapshot fixed,
   * update from time to time audio and spu language,
   * fix root window display,
   * output window can be on top even in windowed mode,
   * scan whole playlist about stream info,
-  * playlist support: asx (local), tox, m3u, pls, sfv and raw text,
+  * playlist support: asx, tox, m3u, pls, sfv and raw text,
   * playlist loop modes,
   * new mediamark object support (start/end/ident/mrl),
   * possibility to add a new mediamark from current position playback,
