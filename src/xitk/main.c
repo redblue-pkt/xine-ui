@@ -88,12 +88,9 @@ static const char *short_options = "?hS4"
  "u:a:V:A:p::";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
-  {"spdif"          , no_argument      , 0, 'S' },
-  {"4-channel"      , no_argument      , 0, '4' },
   {"audio-channel"  , required_argument, 0, 'a' },
   {"video-driver"   , required_argument, 0, 'V' },
   {"audio-driver"   , required_argument, 0, 'A' },
-  {"audio-id"       , required_argument, 0, 'i' },
   {"spu-channel"    , required_argument, 0, 'u' },
   {"auto-play"      , optional_argument, 0, 'p' },
 #ifdef HAVE_LIRC
@@ -154,8 +151,6 @@ void show_usage (void) {
 
   printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
-  printf("  -S, --spdif                  enable AC3 output via SPDIF Port.\n");
-  printf("  -4, --4-channel              enable 4-channel surround audio.\n");
   printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
   printf("                                 'f': start in fullscreen mode,\n");
   printf("                                 'h': hide control panel,\n");
@@ -479,10 +474,6 @@ int main(int argc, char *argv[]) {
   while((c = getopt_long(argc, argv, short_options, 
 			 long_options, &option_index)) != EOF) {
     switch(c) {
-
-    case 'S': /* Use SPDIF Port for AC3 Stream */
-      /* audio_options |= AO_MODE_AC3; FIXME */
-      break;
 
     case 'a': /* Select audio channel */
       sscanf(optarg, "%i", &audio_channel);
