@@ -77,7 +77,7 @@ static const char *short_options = "?hS4"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:I:A:p::";
+ "u:a:V:I:A:i:p::";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
   {"spdif"          , no_argument      , 0, 'S' },
@@ -86,6 +86,7 @@ static struct option long_options[] = {
   {"video-driver"   , required_argument, 0, 'V' },
   {"video-id"       , required_argument, 0, 'I' },
   {"audio-driver"   , required_argument, 0, 'A' },
+  {"audio-id"       , required_argument, 0, 'i' },
   {"spu-channel"    , required_argument, 0, 'u' },
   {"auto-play"      , optional_argument, 0, 'p' },
 #ifdef HAVE_LIRC
@@ -117,11 +118,12 @@ void show_usage (void) {
   printf("Usage: %s [OPTIONS]... [MRL]\n", PACKAGE);
   printf("\n");
   printf("OPTIONS are:\n");
- printf("  -V, --video-driver <drv>     Select video driver by name.\n\t\t\t\teg: xineplug_vo_out_xv.so\n");
- printf("  -I, --video-id <drv>     Select video driver by ident.\n\t\t\t\teg: X11_XV\n");
-/*    printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
+  printf("  -V, --video-driver <drv>     Select video driver by name.\n\t\t\t\teg: xineplug_vo_out_xv.so\n");
+  printf("  -I, --video-id <drv>         Select video driver by ident.\n\t\t\t\teg: X11_XV\n");
+  printf("  -A, --audio-driver <drv>     Select audio driver by name.\n\t\t\t\teg: xineplug_ao_out_oss.so\n");
+  printf("  -i, --audio-id <drv>         Select video driver by ident.\n\t\t\t\teg: OSS\n");
+  /*    printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
-  printf("  -A, --audio-driver <drv>     Select audio driver (%s).\n", ao_get_available_drivers());
   printf("  -S, --spdif                  enable AC3 output via SPDIF Port.\n");
   printf("  -4, --4-channel              enable 4-channel surround audio.\n");
   printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
@@ -268,11 +270,12 @@ int main(int argc, char *argv[]) {
   int              no_lirc = 0;
   int              audio_options = 0;
   int              autoplay_options = 0; /* stuff like FULL_ON_START, QUIT_ON_STOP */
-  char            *audio_driver_name = NULL;
-  char            *video_driver_id = NULL;
   ao_functions_t  *audio_driver = NULL ;
+  char            *audio_driver_name = NULL;
+  char            *audio_driver_id = NULL;
   vo_driver_t     *video_driver = NULL;
   char            *video_driver_name = NULL;
+  char            *video_driver_id = NULL;
   char            *display_name = ":0.0";
   char             filename[1024];
   config_values_t *cfg;
@@ -319,9 +322,21 @@ int main(int argc, char *argv[]) {
     case 'A': /* Select audio driver */
       if(optarg != NULL) {
 	audio_driver_name = malloc (strlen (optarg) + 1);
-	strcpy (audio_driver_name, optarg);
+	strncpy (audio_driver_name, optarg, strlen (optarg));
+	printf("audio_driver_name = '%s'\n", audio_driver_name);
       } else {
-	fprintf (stderr, "video driver name required for -V option\n");
+	fprintf (stderr, "Audio driver name required for -V option\n");
+	exit (1);
+      }
+      break;
+
+    case 'i': /* select audio driver by identifier */
+      if(optarg != NULL) {
+	audio_driver_id = malloc (strlen (optarg) + 1);
+	strncpy (audio_driver_id, optarg, strlen (optarg));
+	printf("audio_driver_id = '%s'\n", audio_driver_id);
+      } else {
+	fprintf (stderr, "audio driver id required for -i option\n");
 	exit (1);
       }
       break;
@@ -438,10 +453,14 @@ int main(int argc, char *argv[]) {
   audio_driver = ao_init (audio_driver_name);
   video_driver = vo_init (video_driver_name);
   */
-  video_driver = load_video_output_plugin(cfg,
-					  video_driver_name, video_driver_id,
-					  VIDEO_OUTPUT_TYPE_X11, 
-					  (void *) gDisplay);
+  audio_driver = xine_load_audio_output_plugin(cfg,
+					       audio_driver_name,
+					       audio_driver_id);
+  video_driver = xine_load_video_output_plugin(cfg,
+					       video_driver_name, 
+					       video_driver_id,
+					       VIDEO_OUTPUT_TYPE_X11, 
+					       (void *) gDisplay);
 
 
   
