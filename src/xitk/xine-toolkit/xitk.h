@@ -1591,19 +1591,19 @@ void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
 void xitk_window_dialog_ok(ImlibData *im, char *title,
 			   xitk_state_callback_t cb, void *userdata, int align, char *message, ...);
 
-#define xitk_window_dialog_ok(im, title, cb, userdata, align, message, args...) {         \
-  if(((im) == NULL) || ((message) == NULL))                                               \
-    return;                                                                               \
-  xitk_window_dialog_ok_with_width(im, title, cb, userdata, 400, align, message, ##args); \
+#define xitk_window_dialog_ok(im, title, cb, userdata, align, message, args...) {                \
+  if(((im) == NULL) || ((message) == NULL))                                                      \
+    return;                                                                                      \
+  xitk_window_dialog_ok_with_width(im, title, cb, userdata, 400, align, message, ##args);        \
 }
 #define xitk_window_dialog_error(im, message, args...) {                                         \
   if(((im) == NULL) || ((message) == NULL))                                                      \
     return;                                                                                      \
   xitk_window_dialog_ok_with_width(im, "Error", NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
 }
-#define xitk_window_dialog_info(im, message, args...) {                                         \
-  if(((im) == NULL) || ((message) == NULL))                                                      \
-    return;                                                                                      \
+#define xitk_window_dialog_info(im, message, args...) {                                                \
+  if(((im) == NULL) || ((message) == NULL))                                                            \
+    return;                                                                                            \
   xitk_window_dialog_ok_with_width(im, "Information", NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
 }
 
@@ -1648,10 +1648,10 @@ void xitk_window_dialog_yesno(ImlibData *im, char *title,
 			      xitk_state_callback_t ycb, 
 			      xitk_state_callback_t ncb, 
 			      void *userdata, int align, char *message, ...);
-#define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, message, args...) {        \
-  if(((im) == NULL) || ((message) == NULL))                                                       \
-    return;                                                                                       \
-  xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, message, ##args);\
+#define xitk_window_dialog_yesno(im, title, ycb, ncb, userdata, align, message, args...) {         \
+  if(((im) == NULL) || ((message) == NULL))                                                        \
+    return;                                                                                        \
+  xitk_window_dialog_yesno_with_width(im, title, ycb, ncb, userdata, 400, align, message, ##args); \
 }
 
 

@@ -43,6 +43,10 @@
 #include "actions.h"
 #include "skins.h"
 
+/*
+#define DEBUG_VIEWLOG
+*/
+
 extern gGui_t              *gGui;
 
 static char                *br_fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
@@ -70,8 +74,6 @@ typedef struct {
 } _viewlog_t;
 
 static _viewlog_t    *viewlog = NULL;
-
-static void viewlog_end(xitk_widget_t *, void *);
 
 /*
  * Leaving setup panel, release memory.
@@ -220,36 +222,59 @@ static void viewlog_clear_tab(void) {
  *
  */
 static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
-  int i = 0;
-
-  printf("get xine log section %d\n", section);
-
+  int    i;
+  char **log = xine_get_log(gGui->xine, section);
+  
   /* Freeing entries */
-  for(i = 0; i < viewlog->log_entries; i++) {
+  for(i = 0; i <= viewlog->log_entries; i++) {
     free(viewlog->log[i]);
   }
-  free(viewlog->log);
+
+  /* Compute log entries */
   viewlog->log_entries = 0;
   
-  /* Get new log entries */
-  viewlog->log = xine_get_log(gGui->xine, section);
-  /* Compute log entries */
-  if(viewlog->log) {
-
-    while(viewlog->log[i] != NULL) {
-      printf("log %d: '%s'\n", i, viewlog->log[i]);
+  if(log) {
+    
+    /* Look for entries number */
+    while(log[viewlog->log_entries] != NULL)
       viewlog->log_entries++;
-      i++;
-    } 
 
+    viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * (viewlog->log_entries + 1));
+    
+    for(i = 0; i < viewlog->log_entries; i++) {
+      
+      /* label widget hate empty labels */
+      viewlog->log[i] = strdup(strlen(log[i]) ? log[i] : " ");
+      
+      /* Remove newline */
+      if(viewlog->log[i][strlen(viewlog->log[i]) - 1] == '\n')
+	viewlog->log[i][strlen(viewlog->log[i]) - 1] = '\0';
+      
+    }
+    /* I like null terminated arrays ;-) */
+    viewlog->log[i] = NULL;
+    
   }
-  else
-    printf("empty log\n");
   
+#if DEBUG_VIEWLOG
+  if((viewlog->log_entries == 0) || (log == NULL))
+    xitk_window_dialog_ok(gGui->imlib_data, _("log info"), 
+			  NULL, NULL, ALIGN_CENTER, 
+			  _("There is no log entry for logging section '%s'.\n"), 
+			  xitk_tabs_get_current_tab_selected(viewlog->tabs));
+#endif
+
   xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->log_entries, 0);
 
   viewlog_clear_tab();
   viewlog_paint_widgets();
+}
+
+/*
+ * Refresh current displayed log.
+ */
+static void viewlog_refresh(xitk_widget_t *w, void *data) {
+  viewlog_change_section(NULL, NULL, xitk_tabs_get_current_selected(viewlog->tabs));
 }
 
 /* 
@@ -301,7 +326,7 @@ static void viewlog_create_tabs(void) {
 }
 
 /*
- *
+ * Leave viewlog window.
  */
 static void viewlog_end(xitk_widget_t *w, void *data) {
   viewlog_exit(NULL, NULL);
@@ -324,7 +349,8 @@ void viewlog_window(void) {
   }
   
   viewlog = (_viewlog_t *) xine_xmalloc(sizeof(_viewlog_t));
-
+  viewlog->log = (char **) xine_xmalloc(sizeof(char **));
+  
   x = gGui->config->register_num (gGui->config, "gui.viewlog_x", 100, NULL, NULL, NULL, NULL);
   y = gGui->config->register_num (gGui->config, "gui.viewlog_y", 100, NULL, NULL, NULL, NULL);
 
@@ -376,6 +402,23 @@ void viewlog_window(void) {
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
+  x = (WINDOW_WIDTH - (100 * 2)) / 3;
+  y = WINDOW_HEIGHT - 40;
+  
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Refresh");
+  lb.align             = LABEL_ALIGN_CENTER;
+  lb.callback          = viewlog_refresh; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content(viewlog->widget_list->l, 
+	   xitk_noskin_labelbutton_create(&lb,
+					  x, y, 100, 23,
+					  "Black", "Black", "White", fontname));
+
+  x += x * 2;
+
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = LABEL_ALIGN_CENTER;
@@ -385,8 +428,7 @@ void viewlog_window(void) {
   lb.skin_element_name = NULL;
   xitk_list_append_content(viewlog->widget_list->l, 
 	   xitk_noskin_labelbutton_create(&lb,
-					  (WINDOW_WIDTH>>1) - 50, WINDOW_HEIGHT - 40,
-					  100, 23,
+					  x, y, 100, 23,
 					  "Black", "Black", "White", fontname));
 
   

@@ -65,7 +65,7 @@ typedef struct {
   void                   *userdata;
 
 } xitk_dialog_t;
-  
+
 static void _xitk_window_destroy_window(xitk_widget_t *, void *);
 
 #define TITLE_BAR_HEIGHT 20
@@ -622,6 +622,7 @@ void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
 					NULL,
 					wd->widget_list,
 					(void *)wd);
+
 }
 
 /*

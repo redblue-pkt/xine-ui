@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-12-10 14:16+0100\n"
+"POT-Creation-Date: 2001-12-12 00:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -362,6 +362,23 @@ msgstr ""
 msgid "xine setup"
 msgstr ""
 
-#: src/xitk/setup.c:982
+#: src/xitk/setup.c:982 src/xitk/viewlog.c:423
 msgid "Close"
+msgstr ""
+
+#: src/xitk/viewlog.c:261
+msgid "log info"
+msgstr ""
+
+#: src/xitk/viewlog.c:263
+#, c-format
+msgid "There is no log entry for logging section '%s'.\n"
+msgstr ""
+
+#: src/xitk/viewlog.c:359
+msgid "xine log viewer"
+msgstr ""
+
+#: src/xitk/viewlog.c:409
+msgid "Refresh"
 msgstr ""

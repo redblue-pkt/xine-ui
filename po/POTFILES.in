@@ -10,3 +10,4 @@ src/xitk/mrl_browser.c
 src/xitk/playlist.c
 src/xitk/snapshot.c
 src/xitk/setup.c
+src/xitk/viewlog.c
