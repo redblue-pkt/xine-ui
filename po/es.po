@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine 1.0.0\n"
+"Project-Id-Version: xine 0.9.15\n"
 "POT-Creation-Date: 2002-11-22 00:07+0100\n"
-"PO-Revision-Date: 2002-11-15 17:59+0100\n"
+"PO-Revision-Date: 2002-11-28 17:18+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +25,7 @@ msgstr "%s(): no se puede crear un hilo nuevo (%s)\n"
 
 #: src/xitk/actions.c:902
 msgid "There is no mrl."
-msgstr ""
+msgstr "No hay mrl."
 
 #: src/xitk/actions.c:1113
 #, c-format
@@ -42,9 +42,8 @@ msgid "Xine Control Panel"
 msgstr "Panel de control de xine"
 
 #: src/xitk/control.c:436
-#, fuzzy
 msgid "control: couldn't find image for background\n"
-msgstr "%s(): no se pudo encontrar la imagen de fondo\n"
+msgstr "control: no se pudo encontrar la imagen de fondo\n"
 
 #: src/xitk/control.c:562
 msgid "Control HUE value"
@@ -142,7 +141,7 @@ msgstr ""
 "falló el demultiplexor. ¿Puede ser \"%s\" un archivo roto\n"
 
 #: src/xitk/errors.c:212
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -150,7 +149,7 @@ msgid ""
 msgstr ""
 "- error del motor de xine -\n"
 "\n"
-"falló el demultiplexor. ¿Puede ser \"%s\" un archivo roto\n"
+"Mrl mal formado. El mrl «%s» parece mal formado/no válido.\n"
 
 #: src/xitk/errors.c:218
 msgid ""
@@ -195,66 +194,59 @@ msgstr "Aviso: activado X sincronizado - esto es bastante lento...\n"
 
 #: src/xitk/event.c:888
 msgid "Windows stacking"
-msgstr ""
+msgstr "Apilando ventanas"
 
 #: src/xitk/event.c:889
-#, fuzzy
 msgid "Use wm layer property to place window on top."
 msgstr ""
-"usar propiedades de capas del gestor de ventanas para ubicar la ventana "
-"arriba"
+"Usa la propiedad de las capas del gestor de ventanas para poner la ventana "
+"encima."
 
 #: src/xitk/event.c:896
 msgid "Windows stacking (more)"
-msgstr ""
+msgstr "Apilar ventanas (más)"
 
 #: src/xitk/event.c:897
-#, fuzzy
 msgid "Use WM layer property to place windows on top."
 msgstr ""
-"usar propiedades de capas del gestor de ventanas para ubicar la ventana "
-"arriba"
+"Usa la propiedad de capas del gestor de ventanas para poner las ventanas "
+"arriba."
 
 #: src/xitk/event.c:908
-#, fuzzy
 msgid "Snapshot location"
-msgstr "Reproducción más rápida"
+msgstr "Ubicación de la captura"
 
 #: src/xitk/event.c:909
-#, fuzzy
 msgid "Where snapshots will be saved."
-msgstr "donde se guardarán las capturas de pantalla"
+msgstr "Donde se guardarán las capturas."
 
 #: src/xitk/event.c:916
 msgid "Screensaver wakeup"
-msgstr ""
+msgstr "Activación del salvapantallas"
 
 #: src/xitk/event.c:917
-#, fuzzy
 msgid "Time between two screensaver fake events, 0 to disable."
-msgstr "tiempo entre dos eventos fake del salvapantallas, 0 para desactivar"
+msgstr "Tiempo entre dos eventos fake del salvapantallas, 0 para desactivar."
 
 #: src/xitk/event.c:924
 msgid "Chapter hoping"
-msgstr ""
+msgstr "Espera de capítulo"
 
 #: src/xitk/event.c:925
-#, fuzzy
 msgid "Play next|previous chapter instead of mrl (dvdnav)"
-msgstr "reproducir capítulo anterior|siguiente en lugar de mrl (dvdnav)"
+msgstr "Reproducir capítulo anterior|siguiente en lugar de mrl (dvdnav)"
 
 #: src/xitk/event.c:932
 msgid "Visiblity behavoir of output window"
-msgstr ""
+msgstr "Comportamiento de la visibilidad de la ventana de salida"
 
 #: src/xitk/event.c:933
-#, fuzzy
 msgid "Show/hide video output window regarding to the stream type"
-msgstr "muestra/oculta la ventana de salida de vídeo según el tipo de flujo"
+msgstr "Muestra/oculta la ventana de salida de vídeo según el tipo de flujo"
 
 #: src/xitk/event.c:940
 msgid "Visiblility behavior of panel"
-msgstr ""
+msgstr "Comportamiento de la visibilidad del panel"
 
 #: src/xitk/event.c:941
 msgid ""
@@ -265,31 +257,33 @@ msgstr ""
 "auto_video_output_visibility"
 
 #: src/xitk/event.c:949
-#, fuzzy
 msgid "Event sender behavior"
-msgstr "emisor del evento"
+msgstr "Comportamiento del emisor de eventos"
 
 #: src/xitk/event.c:950
 msgid "Event sender window stick to main panel"
-msgstr "Emisor del evento de pegado de ventana al panel principal"
+msgstr "La ventana del emisor de eventos se pega al panel principal"
 
 #: src/xitk/event.c:958
 msgid "Visual animation"
-msgstr ""
+msgstr "Animación visual"
 
 #: src/xitk/event.c:959
 msgid ""
 "Display some video animations when current stream is audio only (eg: mp3)."
 msgstr ""
+"Muestra algunas animaciones de vídeo cuando el flujo actual es sólo de "
+"audio (por ejemplo, mp3)."
 
 #: src/xitk/event.c:968
-#, fuzzy
 msgid "Stream informations"
-msgstr "información sobre los flujos"
+msgstr "Información sobre el flujo"
 
 #: src/xitk/event.c:969
 msgid "Update stream informations (in stream infos window) each half seconds."
 msgstr ""
+"Actualización de la información (en la ventana de información del flujo) "
+"cada medio segundo."
 
 #. Some infos
 #: src/xitk/event.c:983
@@ -385,30 +379,27 @@ msgstr "Menú 7"
 
 #: src/xitk/event_sender.c:641 src/xitk/event_sender.c:643
 msgid "Root"
-msgstr ""
+msgstr "Raíz"
 
 #: src/xitk/event_sender.c:642
-#, fuzzy
 msgid "Title"
-msgstr "Título: "
+msgstr "Título"
 
 #: src/xitk/event_sender.c:644
 msgid "Subpicture"
-msgstr ""
+msgstr "Subimagen"
 
 #: src/xitk/event_sender.c:645 src/xitk/stream_infos.c:842
-#, fuzzy
 msgid "Audio"
-msgstr "Tiene audio: "
+msgstr "Audio"
 
 #: src/xitk/event_sender.c:646
-#, fuzzy
 msgid "Angle"
-msgstr "Ángulo -"
+msgstr "Ángulo"
 
 #: src/xitk/event_sender.c:647
 msgid "Part"
-msgstr ""
+msgstr "Parte"
 
 #: src/xitk/event_sender.c:683 src/xitk/mediamark.c:1279 src/xitk/setup.c:1170
 #: src/xitk/stream_infos.c:995 src/xitk/viewlog.c:487
@@ -717,47 +708,39 @@ msgid ""
 "  -N, --animation <mrl>        Specify mrl to play when video output isn't "
 "used.\n"
 msgstr ""
+"  -N, --animation <mrl>        mrl a reproducir si no hay salida de "
+"vídeo.\n"
 
 #: src/xitk/main.c:342
-#, fuzzy
 msgid "                                 -can be used more than one time.\n"
-msgstr ""
-"                                 'remapped': mapeo tecl. remapeado por "
-"usuario.\n"
+msgstr "                                 -se puede usar más de una vez.\n"
 
 #: src/xitk/main.c:343
 msgid "  -P, --playlist <filename>    Load a playlist file.\n"
-msgstr ""
+msgstr "  -P, --playlist <archivo>     Carga un archivo de lista de reproducción.\n"
 
 #: src/xitk/main.c:344
 msgid ""
 "  -l, --loop [mode]            Set playlist loop mode (default: loop). Modes "
 "are:\n"
 msgstr ""
+"  -l, --loop [modo]            Fija la lista de reproducción (predet: loop). "
+"Modos:\n"
 
 #: src/xitk/main.c:345
-#, fuzzy
 msgid "                                 'loop': loop entire playlist.\n"
-msgstr ""
-"                                 'remapped': mapeo tecl. remapeado por "
-"usuario.\n"
+msgstr "                                 'loop': repetir la lista completa.\n"
 
 #: src/xitk/main.c:346
-#, fuzzy
 msgid ""
 "                                 'repeat': repeat current playlist entry.\n"
-msgstr ""
-"                                 'remapped': mapeo tecl. remapeado por "
-"usuario.\n"
+msgstr "                                 'repeat': repetir la entrada actual de la lista.\n"
 
 #: src/xitk/main.c:347
-#, fuzzy
 msgid ""
 "                                 'shuffle': select randomly an entry in "
 "playlist.\n"
-msgstr ""
-"                                 'remapped': mapeo tecl. remapeado por "
-"usuario.\n"
+msgstr "                                 'shuffle': entrada aleatoria de la lista.\n"
 
 #: src/xitk/main.c:349
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -857,9 +840,9 @@ msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Geometría incorrecta \"%s\", vea xine --help\n"
 
 #: src/xitk/main.c:910
-#, fuzzy, c-format
+#, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
-msgstr "Geometría incorrecta \"%s\", vea xine --help\n"
+msgstr "Modo de repetición «%s» incorrecto, vea xine --help\n"
 
 #: src/xitk/main.c:931
 #, c-format
@@ -873,77 +856,75 @@ msgstr "Logo mrl"
 #: src/xitk/mediamark.c:894
 #, c-format
 msgid "Playlist file (%s) is valid (%s).\n"
-msgstr ""
+msgstr "El archivo de la lista (%s) es válido (%s).\n"
 
 #: src/xitk/mediamark.c:896
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
-msgstr ""
+msgstr "El archivo de la lista de reproducción (%s) no es válido.\n"
 
 #: src/xitk/mediamark.c:960
 #, c-format
 msgid "Playlist '%s' saved.\n"
-msgstr ""
+msgstr "Lista de reproducción «%s» guardado.\n"
 
 #: src/xitk/mediamark.c:963
 #, c-format
 msgid "Unable to save playlist (%s): %s.\n"
-msgstr ""
+msgstr "No se puede guardar la lista de reproducción (%s): %s.\n"
 
 #. Create window
 #: src/xitk/mediamark.c:1157
 msgid "Mediamark Editor"
-msgstr ""
+msgstr "Editor de marcas"
 
 #: src/xitk/mediamark.c:1183
-#, fuzzy
 msgid "Identifier"
-msgstr "Modificadores"
+msgstr "Identificador"
 
 #: src/xitk/mediamark.c:1199
 msgid "Mediamark Identifier"
-msgstr ""
+msgstr "Identificador de la marca"
 
 #: src/xitk/mediamark.c:1203
 msgid "Mrl"
-msgstr ""
+msgstr "Mrl"
 
 #: src/xitk/mediamark.c:1218
 msgid "Mediamark Mrl"
-msgstr ""
+msgstr "Marca Mrl"
 
 #: src/xitk/mediamark.c:1224
 msgid "Start at"
-msgstr ""
+msgstr "Comienza en"
 
 #: src/xitk/mediamark.c:1239
 msgid "Mediamark start time (secs)."
-msgstr ""
+msgstr "Tiempo de comienzo de la marca (segs)."
 
 #: src/xitk/mediamark.c:1243
-#, fuzzy
 msgid "End at"
-msgstr "Editar"
+msgstr "Acaba en"
 
 #: src/xitk/mediamark.c:1258
 msgid "Mediamark end time (secs)."
-msgstr ""
+msgstr "Tiempo de fin de la marca (segs)."
 
 #: src/xitk/mediamark.c:1264
 msgid "Apply"
-msgstr ""
+msgstr "Aplicar"
 
 #: src/xitk/mediamark.c:1274
 msgid "Apply the changes to the playlist."
-msgstr ""
+msgstr "Aplica los cambios a la lista de reproducción."
 
 #: src/xitk/mediamark.c:1289
 msgid "Discard changes and dismiss the window."
-msgstr ""
+msgstr "Descarta los cambios y cierra la ventana."
 
 #: src/xitk/mrl_browser.c:192
 msgid "All extensions"
-msgstr ""
+msgstr "Todas las extensiones"
 
 #: src/xitk/mrl_browser.c:260
 msgid "Xine MRL Browser"
@@ -1224,7 +1205,7 @@ msgstr "Error: %s\n"
 #: src/xitk/snapshot.c:884
 #, c-format
 msgid "Wrong image size: %dx%d. Snapshot aborted.\n"
-msgstr ""
+msgstr "Tamaño de la imagen incorrecto: %dx%d. Captura detenida.\n"
 
 #. the dxr3 driver does not allocate yuv buffers
 #. image->u and image->v are always 0 for YUY2
@@ -1257,7 +1238,7 @@ msgstr "Información sobre los flujos"
 
 #: src/xitk/stream_infos.c:503
 msgid "General"
-msgstr ""
+msgstr "General"
 
 #: src/xitk/stream_infos.c:510
 msgid "Title: "
@@ -1285,7 +1266,7 @@ msgstr "Álbum: "
 
 #: src/xitk/stream_infos.c:598
 msgid "Misc"
-msgstr ""
+msgstr "Misc"
 
 #: src/xitk/stream_infos.c:604
 msgid "Input Plugin: "
@@ -1297,9 +1278,8 @@ msgstr "Capa del sistema: "
 
 #: src/xitk/stream_infos.c:630 src/xitk/stream_infos.c:787
 #: src/xitk/stream_infos.c:932
-#, fuzzy
 msgid "Bitrate: "
-msgstr "Tasa de bits (bps): "
+msgstr "Tasa de bits: "
 
 #: src/xitk/stream_infos.c:643
 msgid "Frame Duration: "
@@ -1318,63 +1298,52 @@ msgid "Ignore Spu: "
 msgstr "Ignorar spu: "
 
 #: src/xitk/stream_infos.c:699
-#, fuzzy
 msgid "Video"
-msgstr "Tiene vídeo: "
+msgstr "Vídeo"
 
 #: src/xitk/stream_infos.c:707 src/xitk/stream_infos.c:850
-#, fuzzy
 msgid "Has: "
-msgstr "Tiene vídeo: "
+msgstr "Tiene: "
 
 #: src/xitk/stream_infos.c:719 src/xitk/stream_infos.c:863
-#, fuzzy
 msgid "Handled: "
-msgstr "Audio gestionado: "
+msgstr "Gestionado: "
 
 #: src/xitk/stream_infos.c:732 src/xitk/stream_infos.c:876
-#, fuzzy
 msgid "Ignore: "
-msgstr "Ignorar spu: "
+msgstr "Ignorar: "
 
 #: src/xitk/stream_infos.c:745 src/xitk/stream_infos.c:890
-#, fuzzy
 msgid "Codec: "
-msgstr "Codec de audio: "
+msgstr "Codec: "
 
 #: src/xitk/stream_infos.c:761 src/xitk/stream_infos.c:906
-#, fuzzy
 msgid "FourCC: "
-msgstr "Vídeo FourCC: "
+msgstr "FourCC: "
 
 #: src/xitk/stream_infos.c:774 src/xitk/stream_infos.c:919
-#, fuzzy
 msgid "Channel(s): "
-msgstr "Canal(es) de vídeo: "
+msgstr "Canal(es): "
 
 #: src/xitk/stream_infos.c:801
 msgid "Resolution: "
-msgstr ""
+msgstr "Resolución: "
 
 #: src/xitk/stream_infos.c:814
-#, fuzzy
 msgid "Ratio: "
-msgstr "Proporción de vídeo: "
+msgstr "Proporción: "
 
 #: src/xitk/stream_infos.c:827
-#, fuzzy
 msgid "Stream(s): "
-msgstr "Flujo(s) de vídeo: "
+msgstr "Flujo(s): "
 
 #: src/xitk/stream_infos.c:945
-#, fuzzy
 msgid "Bits: "
-msgstr "Bits de audio: "
+msgstr "Bits: "
 
 #: src/xitk/stream_infos.c:959
-#, fuzzy
 msgid "Samplerate: "
-msgstr "Tasa de la muestra de audio: "
+msgstr "Tasa de la muestra: "
 
 #: src/xitk/stream_infos.c:977
 msgid "Update"
@@ -1535,3 +1504,4 @@ msgstr "Refrescar"
 
 #~ msgid "Warning: %s\n"
 #~ msgstr "Aviso: %s\n"
+
