@@ -1,8 +1,8 @@
 #Xine skin data file
-# revision 0.7
+# revision 0.8
 skin.name    = Xinetic
 skin.version = 5
-skin.date    = 08.05.2002
+skin.date    = 25.05.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
 #skin.logo = file://$(SKIN_PARENT_PATH)/xine-ui_logo.mpv
@@ -26,7 +26,7 @@ skin.Close {
 
 skin.Eject {
 	coords {
-	  x = 434
+	  x = 435
 	  y = 64
 	}
 	pixmap = MainEject.png
@@ -42,7 +42,7 @@ skin.Nav {
 
 skin.Exit {
 	coords {
-	  x = 8
+	  x = 13
 	  y = 76
 	}
 	pixmap = MainPower.png
@@ -50,8 +50,8 @@ skin.Exit {
 
 skin.Setup {
 	coords {
-	  x = 20
-	  y = 76
+	  x = 4
+	  y = 56
 	}
 	pixmap = MainSetup.png
 }
@@ -164,7 +164,7 @@ skin.PlaySlow {
 
 skin.Next {
 	coords {
-	  x = 459
+	  x = 461
 	  y = 49
 	}
 	pixmap = MainNext.png
@@ -172,7 +172,7 @@ skin.Next {
 
 skin.Pause {
 	coords {
-	  x = 413
+	  x = 409
 	  y = 30
 	}
 	pixmap = MainPause.png
@@ -180,15 +180,15 @@ skin.Pause {
 
 skin.Play {
 	coords {
-	  x = 429
-	  y = 13
+	  x = 434
+	  y = 14
 	}
 	pixmap = MainPlay.png
 }
 
 skin.Stop {
 	coords {
-	  x = 459
+	  x = 461
 	  y = 30
 	}
 	pixmap = MainStop.png
@@ -196,8 +196,8 @@ skin.Stop {
 
 skin.Prev {
 	coords {
-	  x = 413
-	  y = 49
+	  x = 410
+	  y = 48
 	}
 	pixmap = MainPrev.png
 }
@@ -243,6 +243,7 @@ skin.AutoPlayGUI {
 	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
+	max_buttons = 7
 }
 
 skin.PlBtn {
@@ -263,8 +264,8 @@ skin.CtlBtn {
 
 skin.MrlBtn {
 	coords {
-	  x = 4
-	  y = 56
+	  x = 427
+	  y = 30
 	}
 	pixmap = MrlBtn.png
 }
@@ -486,6 +487,7 @@ skin.AutoPlayBG {
 	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
+	max_buttons = 6
 }
 
 skin.PlInputText {
@@ -852,6 +854,7 @@ skin.MrlPlugNameBG {
 	  color_click = #081e2f
 	  font = *-lucida-*-i-*-*-12-*-*-*-*-*-*-*
 	}
+	max_buttons = 8
 }
 
 skin.MrlPlugLabel {
