@@ -1051,6 +1051,7 @@ static void download_skin_handle_event(XEvent *event, void *data) {
 }
     
 void download_skin(char *url) {
+#ifdef HAVE_TAR
   slx_entry_t         **slxs;
   xitk_window_t        *xwin;
   xitk_pixmap_t        *bg;
@@ -1238,5 +1239,6 @@ void download_skin(char *url) {
   }
   else
     xitk_window_dialog_destroy(xwin);
-  
+
+#endif /* HAVE_TAR */
 }

@@ -541,8 +541,6 @@ dnl
 AC_CHECK_LIRC
 
 
-
-
 dnl
 dnl Check for nvtvsimple library
 dnl
@@ -561,6 +559,17 @@ if test x"$PKG_CONFIG" != "xno" ; then
 fi
 AC_SUBST(NVTVSIMPLE_CFLAGS)
 AC_SUBST(NVTVSIMPLE_LIBS)
+
+
+dnl
+dnl xine-ui use tar, check it
+dnl
+AC_CHECK_PROG(TAR, tar, tar, no)
+if test x"$TAR" = "xno"; then
+    AC_MSG_RESULT([*** tar depend part will be disabled (skin download) ***])
+else
+    AC_DEFINE(HAVE_TAR,,[Define this if you have tar installed])
+fi
 
 
 dnl
