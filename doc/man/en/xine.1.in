@@ -41,6 +41,9 @@ Show summary of options and available output drivers (plugins).
 .BI \-\-verbose [=level]
 Set verbose level.
 .TP
+.BI \-\-config <file>
+Use \fBconfig\fP file instead of default one.
+.TP
 .BI \-a,\ \-\-audio\-channel\  <num>
 Select the given audio channel. \fI<num>\fP is the audio channel number, default
 is \fB0\fP.
@@ -136,6 +139,8 @@ Display keymap. Option are:
 .br
 `\fBremapped\fP' user remapped keymap table,
 .br
+`\fBfile:<file>\fP' use \fBfile\fP as keymap table,
+.br
 If no option is given, `\fBdefault\fP' is selected.
 .TP
 .B \-n, \-\-network
@@ -203,6 +208,9 @@ You can set video output size and position using the X like geometry (see \fBX\f
 .B \-B, \-\-borderless
 Remove borders of video output window, in windowed mode.
 .TP
+.B \-N, \-\-animation <mrl>
+Specify one or more mrl to play with audio only streams.
+.TP
 .B \-P, \-\-playlist <filename>
 Use file as playlist. Known formats are: asx, toxine, m3u, pls, sfv and raw text file.
 .TP
@@ -222,7 +230,7 @@ Define the skin server url.
 .TP
 .B \-\-enqueue <mrl>
 .br
-Enqueue mrl of a running session (session 0). This option can be used more than one time.
+Enqueue one or more mrl in a running session (session 0). 
 .br
 If you want to specify another session, use \fB\-S session=\fP\fIx\fP option. 
 .TP
@@ -256,15 +264,15 @@ Options are:
 There are also some self explanatory options.
     \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
 .TP
+.B \-Z
+Don't automatically start playback, affect only auto-start when smart mode is used.
+.TP
 .B \-D, \-\-deinterlace
 Deinterlace video output.
 .TP
 .B \-r, \-\-aspect\-ratio <mode>
 Set aspect ratio of video output. Modes are:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
-.TP
-.B \-Z
-Don't automatically start playback, affect only auto-start when smart mode is used.
 .TP
 .B MRL (media resource locator)
 .br
@@ -338,8 +346,17 @@ set audio volume
 .BI compression: <level>
 set audio dynamic range compression
 .TP
-.IB <config\ entry> : <config\ value>
+.BI <config\ entry> : <config\ value>
 assign a new value to any config entry
+.TP
+.B change configuration option 'on the fly':
+.br
+You can change a configuration option at anytime, using the special cfg:/ mrl style.
+The syntax is:
+.br	
+	cfg:/<config\ entry> : <config\ value>
+.br
+Unlike stream config option, you can change anything \fIbefore\fP playing the stream.
 .SH CONTROL KEYS
 Many features can be controlled by pressing control keys. '\fBM\-\fP' is 
 the Meta key (`\fBAlt\fP' key on PC keyboard), '\fBC\-\fP' is the Control `\fBCTRL\fP' 

@@ -23,7 +23,10 @@ Affiche la liste des options ainsi que la liste des pilotes
 (plugins) disponibles.
 .TP
 .B \-\-verbose [=level]
-defini le niveau de verbiage.
+Défini le niveau de verbiage.
+.TP
+.B \-\-config <fichier>
+Utilise \fBfichier\fP en tand que fichier de configuration.
 .TP
 .B \-a, \-\-audio\-channel <num>
 Sélectionne le canal audio spécifié. \fBnum\fP est le numéro du canal, la valeur
@@ -49,7 +52,7 @@ spécifier ce paramêtre qu'une seule fois.
 Sélectionne le canal de sous-titre. \fBnum\fP est le numéro
 du canal de sous-titre. par défaut il n'y a pas de sous-titre (\fB\-1\fP)
 .TP
-.B \-p[f][F][h][w][q][d][v], \-\-auto\-play=[f][F][h][w][q][d][v]
+.B \-p, \-\-auto\-play=[f][F][h][w][q][d][v]
 Démarre la lecture immédiatement apres l'exécution. Peut être suivi par:
 .br
 \'\fBf\fP\' en mode plein écran,
@@ -66,7 +69,7 @@ Il est possible d'obtenir automatiquement les listes de lecture à partir
 d'un DVD \'\fBd\fP\', ou d'un VCD \'\fBv\fP\'.
 Il y a désormais un option générique, \fI\-\-auto\-scan\fP, pour çà (voir plus bas).
 .TP
-.B \-s <plugin>, \-\-auto\-scan <plugin>
+.B \-s, \-\-auto\-scan <plugin>
 Recherche automatique de la liste de lecture à partir d'un plugin donné. Beaucoup
 de plugins autorisent une liste de lecture générique, afin de \fBtout\fP lire. Ceci
 fonctionne parfaitement pour les DVDs ou VCDs, par exemple. Specifier cette option
@@ -124,6 +127,8 @@ Affiche l'assignement des touches. Option peux être:
 \'\fBlirc\fP\' affiche le brouillon d'un fichier de configuration .lircrc,
 .br
 \'\fBremapped\fP\' table d'assignement de l'utilisateur,
+.br
+\'\ffile:<fichier>\fP\' utilise \fBfichier\fP comme table d'assignement.
 .br
 Si aucune option n'est spécifié, \'\fBdefault\fP\' sera sélectionné.
 .TP
@@ -196,6 +201,10 @@ la géométrie de style X (\fIvoir X(7)\fP). Les décalages \fBX\fP et \fBY\fP sont
 .B \-B, \-\-borderless
 Retire les bordures de la fenêtre de sortie, en mode fenêtré.
 .TP
+.TP
+.B \-\-animation <mrl>
+Spécifie une ou plusieurs mrls à jouer pour les flux sans video.
+.TP
 .B \-P, \-\-playlist <fichier>
 Utilise le fichier spécifié comme liste de lecture. Les formats reconnues sont:
 asx, toxine, m3u, pls, sfv et les fichiers texte.
@@ -216,8 +225,7 @@ mode \fBloop\fP est utilisé. Les modes possibles sont:
 Defini l'url du serveur d'apparences.
 .TP
 .B \-\-enqueue <mrl>
-Ajoute la \fBmrl\fP à la liste de lecture de la session existante (session 0). 
-Cette option peut être utilisée plus d'une fois.
+Ajoute une ou plusieurs \fBmrls\fP à la liste de lecture de la session existante (session 0). 
 .br
 Si vous désirez spécifier une autre session, utilisez l'option \fB\-S session=\fP\fIx\fP.
 .TP
@@ -252,15 +260,15 @@ Les options sont::
 Il y a aussi d'autres options qui s'expliquent d'elles même.
     \fBplay\fP, \fBslow2\fP, \fBslow4\fP, \fBpause\fP, \fBfast2\fP, \fBfast4\fP, \fBstop\fP, \fBquit\fP, \fBfullscreen\fP, \fBeject\fP.
 .TP
+.B \-Z
+Ne démarre pas automatiquement la lecture. N'affecte que le démarrage automatique de la lecture quand le mode smart est utilisé.
+.TP
 .B \-D, \-\-deinterlace
 Désentrelacement de la vidèo.
 .TP
 .B \-r, \-\-aspect\-ratio <mode>
 Défini le ratio d'aspect le la sortie vidéo. Les modes sont:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP. 
-.TP
-.B \-Z
-Ne démarre pas automatiquement la lecture. N'affecte que le démarrage automatique de la lecture quand le mode smart est utilisé.
 .TP
 .B MRL (media resource locator)
 .br
@@ -338,6 +346,15 @@ définie le niveau de compression dynamique
 .TP
 .IB <section\ de\ configuration> : <valeur\ de\ configuration>
 assigne une nouvelle valeur a n\'importe quelle section de configuration
+.TP
+.B changer une option de configuration 'à la volée':
+.br
+Vous pouvez changer une option de configuration à n'importe quel moment, en utilisant la mrl spéciale cfg:/.
+Sa syntaxe est:
+.br
+	cfg:/<section\ de\ configuration> : <valeur\ de\ configuration>
+.br
+Contrairement à l'option de configuration du flux, vous pouvez changer quelque chose \fIavant\fP de jouer le flux.
 .SH TOUCHES DE CONTRÔLE
 Beaucoup de fonctions peuvent êtres contrôlées en pressant certaines touches. '\fBM\-\fP' est la touche Meta ('Alt' sur les claviers de PC), '\fBC\-\fP' est la touche Control 'Ctrl', les autres touches spéciales sont délimitées par les caractères '\fB<\fP' et '\fB>\fP', par exemple: la touche FIN est affichèe \fB<fin>\fP. La liste de ces touches est:
 .LP
