@@ -182,10 +182,10 @@ AC_ARG_ENABLE(shm, [  --disable-shm           Disable shared memory support if a
 dnl If we are compiling without shared memory support, then don\'t do
 dnl the checks for XShm
 if test "x$enable_shm" = "xyes"; then
-  # Check for the Xext library (needed for XShm extension)
+  dnl Check for the Xext library (needed for XShm extension)
   AC_CHECK_LIB(Xext, XShmAttach, 
       X_LIBS="-lXext $X_LIBS", 
-      # On AIX, it is in XextSam instead, but we still need -lXext
+      dnl On AIX, it is in XextSam instead, but we still need -lXext
       AC_CHECK_LIB(XextSam, XShmAttach, 
           X_LIBS="-lXextSam -lXext $X_LIBS", 
           no_xshm_ext=yes, $X_LIBS),
@@ -208,7 +208,7 @@ if test "x$enable_shm" = "xyes"; then
     AC_DEFINE(HAVE_SHM,,[Define if have shm])
   fi
 
-  # Check whether shmctl IPC_RMID allowes subsequent attaches
+  dnl Check whether shmctl IPC_RMID allowes subsequent attaches
   if test "$ac_cv_header_sys_shm_h" = "yes"; then
     AC_MSG_CHECKING(whether shmctl IPC_RMID allowes subsequent attaches)
     AC_TRY_RUN([
@@ -240,20 +240,19 @@ if test "x$enable_shm" = "xyes"; then
       AC_MSG_RESULT(assuming no))
   fi
 
-  # Check for the X shared memory extension header file
+  dnl Check for the X shared memory extension header file
   AC_MSG_CHECKING(X11/extensions/XShm.h)
   if test "x$no_xext_lib" = "xyes"; then
-    # If we couldn't find XShmAttach earlier, don't use the header
+    dnl If we couldn't find XShmAttach earlier, don't use the header
     AC_MSG_RESULT(no)
     no_xshm=yes
   else
-    if test -f "$x_includes/X11/extensions/XShm.h"; then
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_XSHM_H,,[Define if includes XShm.h])
-    else
-      AC_MSG_RESULT(no)
-      no_xshm=yes
-    fi
+    saved_CPPFLAGS=$CPPFLAGS
+    CPPFLAGS="$CPPFLAGS $X_CFLAGS"
+    AC_CHECK_HEADER(X11/extensions/XShm.h, 
+                   [ AC_DEFINE(HAVE_XSHM_H, 1, [Define if includes XShm.h])], no_xshm=yes,
+                   [#include <X11/Xlib.h>])
+    CPPFLAGS=$saved_CPPFLAGS
   fi
 fi
 
