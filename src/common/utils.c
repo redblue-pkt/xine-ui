@@ -123,3 +123,20 @@ char *chomp(char *str) {
 
   return pbuf;
 }
+
+
+/*
+ * A thread-safe usecond sleep
+ */
+void xine_usec_sleep(unsigned usec) {
+#if HAVE_NANOSLEEP
+  /* nanosleep is prefered on solaris, because it's mt-safe */
+  struct timespec ts;
+
+  ts.tv_sec =   usec / 1000000;
+  ts.tv_nsec = (usec % 1000000) * 1000;
+  nanosleep(&ts, NULL);
+#else
+  usleep(usec);
+#endif
+}

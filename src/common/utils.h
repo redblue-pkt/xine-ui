@@ -52,4 +52,9 @@ const char *get_homedir(void);
 
 char *chomp (char *str);
 
+/*
+ * A thread-safe usecond sleep
+ */
+void xine_usec_sleep(unsigned usec);
+
 #endif
