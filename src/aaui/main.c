@@ -87,6 +87,8 @@ typedef struct {
 
 static aaxine_t aaxine;
 
+#define CONFIGFILE "config2"
+
 /* options args */
 static const char *short_options = "?h"
  "da:qA:V:R::v";
@@ -230,8 +232,23 @@ static void print_usage (void) {
   const char *const *driver_ids;
   char              *driver_id;
   xine_t            *xine;
+  char              *cfgdir = ".xine";
+  char              *cfgfile = CONFIGFILE;
+  char              *configfile;
 
-  xine = (xine_t *)xine_new();
+  if(!(configfile = getenv("XINERC"))) {
+    configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+				       + strlen(cfgdir) 
+				       + strlen(cfgfile)
+				       + 3);
+    sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
+    mkdir(configfile, 0755);
+    sprintf(configfile + strlen(configfile), "/%s", cfgfile);
+  }
+  
+  xine = xine_new();
+  xine_config_load(xine, configfile);
+  xine_init(xine);
   
   printf("usage: aaxine [aalib-options] [aaxine-options] mrl ...\n"
 	 "aalib-options:\n"
@@ -454,14 +471,18 @@ int main(int argc, char *argv[]) {
    * generate and init a config "object"
    */
   {
-    char *cfgfile = ".xine/config2";
+    char *cfgdir = ".xine";
+    char *cfgfile = CONFIGFILE;
     
-    if (!(aaxine.configfile = getenv("XINERC"))) {
-      aaxine.configfile = 
-	(char *) xine_xmalloc((strlen((xine_get_homedir())) + strlen(cfgfile)) + 2);
-      sprintf(aaxine.configfile, "%s/%s", (xine_get_homedir()), cfgfile);
+    if (!(aaxine.configfile = getenv ("XINERC"))) {
+      aaxine.configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+						+ strlen(cfgdir) 
+						+ strlen(cfgfile)
+						+ 3);
+      sprintf(aaxine.configfile, "%s/%s", xine_get_homedir(), cfgdir);
+      mkdir(aaxine.configfile, 0755);
+      sprintf(aaxine.configfile + strlen(aaxine.configfile), "/%s", cfgfile);
     }
-      
   }
 
   aaxine.xine = (xine_t *)xine_new();
