@@ -22,6 +22,7 @@
    2.4.2 Wybieranie ¶cie¿ki d¼wiêkowej
    2.4.3 Wybieranie napisów
    2.4.4 LIRC
+   2.4.5 Ustawianie opcji konfiguracyjnych xine z linii poleceñ
  
    3   CO NIE ZOSTA£O JESZCZE POWIEDZIANE
    3.1 Wolno¶æ, DVD i te sprawy...
@@ -130,12 +131,12 @@
     xine u¿ywa oprogramowania z nastêpuj±cych zewnêtrznych projektów
     wolnego oprogramowania:
 
-    - libac3 Aarona Holtzmana i Michaela Lespinasse
+    - liba52 Aarona Holtzmana i Michaela Lespinasse
     - libmpeg2 Aarona Holtzmana i Michaela Lespinasse
     - libmad Roberta Lesliego
     - libffmpeg Fabrice Bellard'a
 
-    ...bez tych ¶wietnych programów xine nie by³oby oczywi¶cie tym
+    Bez tych ¶wietnych programów xine nie by³oby oczywi¶cie tym
     czym jest teraz.
 
     Równie¿ wielkie podziêkowania dla Linux Video and DVD Project
@@ -146,7 +147,7 @@
 
 2.3 Programi¶ci xine
 
-    g³ówny programista
+    g³ówny programista xine
       Guenter Bartsch <guenter@users.sourceforge.net>
 
     ró¿ne sugestie, poprawki b³êdów i kompilacji, alsa plugin,
@@ -166,7 +167,7 @@
     pakiety dla Debiana, wsparcie dla u¿ytkowników
       Siegfried Langauf <siggi@users.sourceforge.net>
   
-    ...i wielu innych, zobacz plik xine-lib/AUTHORS
+    Oraz wielu innych, zobacz plik xine-lib/AUTHORS
 
 2.4 U¿ytkowanie
 
@@ -213,7 +214,7 @@
       Klawisz            Akcja
 
       [RETURN]           odtwórz
-      [SPACJA], P        stop klatka
+      [SPACJA]           stop klatka
       [Góra]/[Dó³]       szybki podgl±d / zwolnienie
 
       0                  znajd¼ pocz±tek aktualnej sekwencji
@@ -300,6 +301,17 @@
          state 0x0, keycode 81 (keysym 0xff9a, KP_Prior), same_screen YES,
                                                ^^^^^^^^
 					       To jest w³a¶nie poszukiwana nazwa.
+      Je¶li chodzi o przyciski myszy, aby u¿ywaæ na przyk³ad kó³ko myszy,
+      musisz wy¶ledziæ który przycisk bêdzie asygnowany do funkcji, u¿ywaj±c xev:
+
+         ButtonRelease event, serial 27, synthetic NO, window 0x1200001,
+         root 0x3b, subw 0x0, time 2710360666, (107,87), root:(120,117),
+         state 0x1000, button 5, same_screen YES
+                       ^^^^^^^^
+                       To jest ten przycisk
+
+      W tym przypadku musisz ustawiæ "key = XButton_5". Przycisk modyfikacyjny
+      jest równie¿ wspierany z przyciskami myszy.
 
       Wy¶wietlanie obecnych/przemapowanych skrótów.
         Mo¿esz u¿yæ 'xine --keymap' lub 'xine --keymap=default' aby wy¶wietliæ
@@ -372,6 +384,35 @@
 
       Do Ciebie nale¿y wybór pilota i przypisanie przycisków.
 
+      Playlist:
+      ---------
+      Aby odnale¼æ listê odtwarzania z danej wtyczki wej¶cia, mo¿esz u¿yæ
+      specjalnego klucza 'PlaylistFrom:', i nastêpuj±cej po nim nazwy
+      wtyczki (takiej samej jak na przycisku panela):
+
+       # Odnajdywanie listy odtwarzania z wtyczki NAV
+       begin
+               remote = xxxxx
+               button = xxxxx
+               prog   = xine
+               repeat = 0
+               config = PlaylistFrom:NAV
+       end
+
+2.4.5 Ustawianie opcji konfiguracyjnych xine z linii poleceñ
+
+     Mo¿esz ustawiæ ka¿d± opcjê (zobacz README.config_en) z linii
+     poleceñ aby obej¶æ warto¶ci ustawione w $HOME/.xine/config.
+
+     Na przyk³ad mo¿esz zrobiæ co¶ takiego
+
+      xine vcd://1 opt:input.vcd_device=/dev/cdrom2 vcd://1
+
+     aby zmieniæ vcd_device miêdzy odtworzeniem dwóch mrls.
+
+     Te ustawienia opt: nie bêd± zachowane w pliku konfiguracyjnym,
+     gdy¿ s± traktowane jako tymczasowe.
+
 
 3  CO NIE ZOSTA£O JESZCZE POWIEDZIANE
 
@@ -427,3 +468,4 @@
     # T³umaczenie: Bar³omiej Muryn #
     #    mailto: _4ever_@irc.pl    #
     ################################
+
