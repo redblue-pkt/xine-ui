@@ -163,28 +163,69 @@ static tvout_t *nvtv_backend(Display *display) {
 #endif
 
 /* ===== ATI ===== */
+typedef struct {
+  char   *atitvout_cmds[2];
+  int     fullscreen;
+} ati_private_t;
+
 static int ati_tvout_init(Display *display, void **data) {
-  printf("%s()\n", __func__);
+  ati_private_t *private = (ati_private_t *) xine_xmalloc(sizeof(ati_private_t));
+  
+  *data = private;
+  
+  private->atitvout_cmds[0] = (char *) 
+    xine_config_register_string (gGui->xine, "gui.tvout_ati_cmd_off", 
+				 "sudo /usr/local/sbin/atitvout l",
+				 _("Command to turn off TV out"),
+				 _("atitvout command line used to turn on TV output."),
+				 CONFIG_LEVEL_BEG,
+				 CONFIG_NO_CB,
+				 CONFIG_NO_DATA);
+
+  private->atitvout_cmds[1] = (char *) 
+    xine_config_register_string (gGui->xine, "gui.tvout_ati_cmd_on", 
+				 "sudo /usr/local/sbin/atitvout pal lt",
+				 _("Command to turn on TV out"),
+				 _("atitvout command line used to turn on TV output."),
+				 CONFIG_LEVEL_BEG,
+				 CONFIG_NO_CB,
+				 CONFIG_NO_DATA);
+  
+  private->fullscreen = 0;
+  
   return 1;
 }
 
 static int ati_tvout_setup(void *data) {
-  printf("%s()\n", __func__);
   return 1;
 }
 
 static int ati_tvout_set_fullscreen_mode(int fullscreen, int width, int height, void *data) {
-  printf("%s()\n", __func__);
+  ati_private_t *private = (ati_private_t *) data;
+
+  if(private->atitvout_cmds[fullscreen] && strlen(private->atitvout_cmds[fullscreen])) {
+    int err;
+    
+    if((err = xine_system(0, private->atitvout_cmds[fullscreen])))
+      fprintf(stderr, "command: '%s' failed with error code %d.\n", 
+	      private->atitvout_cmds[fullscreen], err);
+  }
+    
+  private->fullscreen = fullscreen;
+  
   return 1;
 }
 
 static int ati_tvout_get_fullscreen_mode(void *data) {
-  printf("%s()\n", __func__);
-  return 1;
+  ati_private_t *private = (ati_private_t *) data;
+  
+  return (private->fullscreen);
 }
 
 static void ati_tvout_deinit(void *data) {
-  printf("%s()\n", __func__);
+  ati_private_t *private = (ati_private_t *) data;
+
+  free(private);
 }
 
 static tvout_t *ati_backend(Display *display) {
@@ -262,8 +303,10 @@ char **tvout_get_backend_names(void) {
   static char *bckends[(sizeof(backends) / sizeof(backends[0]))];
   int i = 0;
   
-  while(backends[i].name)
-    bckends[i] = backends[i++].name;
+  while(backends[i].name) {
+    bckends[i] = backends[i].name;
+    i++;
+  }
   
   bckends[i] = NULL;
   
