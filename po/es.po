@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 1.0\n"
-"POT-Creation-Date: 2001-12-12 00:54+0100\n"
-"PO-Revision-Date: 2001-11-24 16:45+0100\n"
+"POT-Creation-Date: 2001-12-12 01:01+0100\n"
+"PO-Revision-Date: 2001-12-12 00:08+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanmagm@mail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -54,6 +54,9 @@ msgid ""
 "\n"
 "There is no available input plugin available to handle '%s'.\n"
 msgstr ""
+"- error del motor de xine -\n"
+"\n"
+"No hay ningún plugin de entrada disponible para manipular '%s'.\n"
 
 #: src/xitk/event.c:648
 #, c-format
@@ -62,6 +65,9 @@ msgid ""
 "\n"
 "There is no available demuxer plugin to handle '%s'.\n"
 msgstr ""
+"- error del motor de xine -\n"
+"\n"
+"No hay ningún plugin demultiplexador para manipular '%s'.\n"
 
 #: src/xitk/event.c:654
 msgid ""
@@ -69,6 +75,9 @@ msgid ""
 "\n"
 "!! Unhandled error !!\n"
 msgstr ""
+"- error del motor de xine -\n"
+"\n"
+"¡¡ Error no manipulable !!\n"
 
 #: src/xitk/event.c:885
 msgid ""
