@@ -1767,8 +1767,8 @@ int main(int argc, char *argv[]) {
       if(_argv[optind]) {
 	for(i = optind; i < _argc; i++) {
 	  char enqueue_mrl[strlen(_argv[i]) + 256];
-	  
-	  sprintf(enqueue_mrl, "session=%d,mrl=%s", session, _argv[i]);
+
+	  sprintf(enqueue_mrl, "session=%d,mrl=%s", session, atoa(_argv[i]));
 	  session_handle_subopt(enqueue_mrl, &session);
 	}
       }

@@ -1218,24 +1218,18 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
   break;
 
   case KeyPress: {
-    XKeyEvent            mykeyevent;
-    KeySym               mykey;
-    char                 kbuf[256];
-    int                  len;
+    KeySym               mkey;
     int                  mod, modifier;
     kbinding_entry_t    *k;
-    
-    mykeyevent = event->xkey;
 
     (void) xitk_get_key_modifier(event, &mod);
     kbindings_convert_modifier(mod, &modifier);
+    mkey = xitk_get_key_pressed(event);
 
-    XLockDisplay (gGui->display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
 #ifdef TRACE_KBINDINGS
-    printf("KeyPress: %s, modifier: %d\n", (XKeysymToString(mykey)), modifier);
+    printf("KeyPress: %s, modifier: %d\n", (XKeysymToString(mkey)), modifier);
 #endif    
-    k = kbindings_lookup_binding(kbt, XKeysymToString(mykey), modifier);
+    k = kbindings_lookup_binding(kbt, XKeysymToString(mkey), modifier);
     XUnlockDisplay (gGui->display);
     
     if(k)
@@ -1810,6 +1804,11 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 static void kbedit_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
+    
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      kbedit_exit(NULL, NULL);
+    break;
 
   case KeyRelease: {
     xitk_widget_t *w;

@@ -284,6 +284,15 @@ static void fne_cancel_cb(xitk_widget_t *w, void *data) {
   fb_reactivate(fne->fb);
   fne_destroy(fne);
 }
+static void fne_handle_event(XEvent *event, void *data) {
+  switch(event->type) {
+    
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      fne_cancel_cb(NULL, data);
+    break;
+  }
+}
 static void fb_create_input_window(char *title, char *text,
 				   xitk_string_callback_t cb, filebrowser_t *fb) {
   filename_editor_t          *fne;
@@ -379,11 +388,11 @@ static void fb_create_input_window(char *title, char *text,
     
     fne->widget_key = xitk_register_event_handler(buffer, 
 						  (xitk_window_get_window(fne->xwin)),
-						  NULL,
+						  fne_handle_event,
 						  NULL,
 						  NULL,
 						  fne->widget_list,
-						  NULL);
+						  (void *)fne);
   }
   
   XLockDisplay(gGui->display);
@@ -1084,7 +1093,9 @@ static void fb_handle_events(XEvent *event, void *data) {
   switch(event->type) {
 
   case KeyPress:
-    {
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      _fb_exit(NULL, data);
+    else {
       int sel = xitk_browser_get_current_selected(fb->files_browser);
       
       if(sel >= 0)

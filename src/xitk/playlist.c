@@ -443,10 +443,6 @@ static void _playlist_add_input(xitk_widget_t *w, void *data, char *filename) {
  * Handle X events here.
  */
 static void _playlist_handle_event(XEvent *event, void *data) {
-  XKeyEvent      mykeyevent;
-  KeySym         mykey;
-  char           kbuf[256];
-  int            len;
 
   switch(event->type) {
 
@@ -483,51 +479,54 @@ static void _playlist_handle_event(XEvent *event, void *data) {
     break;
 
   case KeyPress:
-    
-    if(!playlist)
-      return;
-    
-    mykeyevent = event->xkey;
-    
-    XLockDisplay(gGui->display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay(gGui->display);
-    
-    switch (mykey) {
+    {
+      KeySym mkey;
       
-    case XK_Down:
-    case XK_Next: {
-      xitk_widget_t *w;
-      
-      mmk_editor_end();
-      w = xitk_get_focused_widget(playlist->widget_list);
-      if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-	if(mykey == XK_Down)
-	  xitk_browser_step_up(playlist->playlist, NULL);
-	else
-	  xitk_browser_page_up(playlist->playlist, NULL);
-      }
-    }
-      break;
-      
-    case XK_Up:
-    case XK_Prior: {
-      xitk_widget_t *w;
+      if(!playlist)
+	return;
 
-      mmk_editor_end();
-      w = xitk_get_focused_widget(playlist->widget_list);
-      if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-	if(mykey == XK_Up)
-	  xitk_browser_step_down(playlist->playlist, NULL);
-	else
-	  xitk_browser_page_down(playlist->playlist, NULL);
+      mkey = xitk_get_key_pressed(event);
+
+      switch (mkey) {
+	
+      case XK_Down:
+      case XK_Next: {
+	xitk_widget_t *w;
+	
+	mmk_editor_end();
+	w = xitk_get_focused_widget(playlist->widget_list);
+	if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
+	  if(mkey == XK_Down)
+	    xitk_browser_step_up(playlist->playlist, NULL);
+	  else
+	    xitk_browser_page_up(playlist->playlist, NULL);
+	}
       }
-    }
-      break;
-      
-    default:
-      gui_handle_event(event, data);
-      break;
+	break;
+	
+      case XK_Up:
+      case XK_Prior: {
+	xitk_widget_t *w;
+	
+	mmk_editor_end();
+	w = xitk_get_focused_widget(playlist->widget_list);
+	if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
+	  if(mkey == XK_Up)
+	    xitk_browser_step_down(playlist->playlist, NULL);
+	  else
+	    xitk_browser_page_down(playlist->playlist, NULL);
+	}
+      }
+	break;
+
+      case XK_Escape:
+	playlist_exit(NULL, NULL);
+	break;
+	
+      default:
+	gui_handle_event(event, data);
+	break;
+      }
     }
     break;
 

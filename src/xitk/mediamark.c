@@ -38,6 +38,7 @@
 #include <alloca.h>
 #endif
 
+#include <X11/keysym.h>
 #include "common.h"
 
 #define WINDOW_WIDTH            505
@@ -2677,6 +2678,15 @@ static void mmkeditor_exit(xitk_widget_t *w, void *data) {
   }
 }
 
+static void mmkeditor_handle_event(XEvent *event, void *data) {
+  switch(event->type) {
+    
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      mmkeditor_exit(NULL, NULL);
+  }
+}
+
 int mmk_editor_is_visible(void) {
   
   if(mmkeditor != NULL)
@@ -3083,7 +3093,7 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
 
   mmkeditor->widget_key = xitk_register_event_handler("mmkeditor", 
 						      (xitk_window_get_window(mmkeditor->xwin)),
-						      NULL,
+						      mmkeditor_handle_event,
 						      NULL,
 						      NULL,
 						      mmkeditor->widget_list,

@@ -1136,17 +1136,19 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    */
   for (i = 0; i < nfiles; i++) {
     char *sub = NULL;
-    
+    char *file = atoa(filenames[i]);
+
     /* grab recursively all files from dir */
-    if(is_a_dir(filenames[i])) {
-      if(filenames[i][strlen(filenames[i]) - 1] == '/')
-	filenames[i][strlen(filenames[i]) - 1] = '\0'; 
+    if(is_a_dir(file)) {
       
-      mediamark_collect_from_directory(filenames[i]);
+      if(file[strlen(file) - 1] == '/')
+	file[strlen(file) - 1] = '\0'; 
+      
+      mediamark_collect_from_directory(file);
     }
     else {
-      if((sub = (char *)get_last_double_semicolon(filenames[i])) != NULL) {
-	if(is_ipv6_last_double_semicolon(filenames[i]))
+      if((sub = (char *)get_last_double_semicolon(file)) != NULL) {
+	if(is_ipv6_last_double_semicolon(file))
 	  sub = NULL;
 	else {
 	  *sub = 0;
@@ -1154,8 +1156,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 	}
       }
       
-      mediamark_add_entry((const char *)filenames[i], 
-			  (const char *)filenames[i], sub, 0, -1, 0, 0);
+      mediamark_add_entry((const char *)file, (const char *)file, sub, 0, -1, 0, 0);
     }
   }
   

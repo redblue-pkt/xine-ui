@@ -930,21 +930,13 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     break;
     
   case KeyPress: {
-    XKeyEvent      mykeyevent;
-    KeySym         mykey;
-    char           kbuf[256];
-    int            len;
+    KeySym         mkey;
     int            modifier;
 
     xitk_get_key_modifier(event, &modifier);
+    mkey = xitk_get_key_pressed(event);
     
-    mykeyevent = event->xkey;
-    
-    XLOCK (private_data->imlibdata->x.disp);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUNLOCK (private_data->imlibdata->x.disp);
-    
-    switch (mykey) {
+    switch (mkey) {
 
     case XK_d: 
     case XK_D:
@@ -969,6 +961,10 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
     }
     break;
 
+    case XK_Escape:
+      xitk_mrlbrowser_exit(NULL, (void *)private_data->fbWidget);
+      break;
+      
     }
   }
   break;

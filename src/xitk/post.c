@@ -1550,24 +1550,15 @@ static void _pplugin_handle_event(XEvent *event, void *data) {
     }
     break;
 
-  case KeyPress: {
-    XKeyEvent      mykeyevent;
-    KeySym         mykey;
-    char           kbuf[256];
-    int            len;
-    int            modifier;
-    
+  case KeyPress:
     if(xitk_is_widget_enabled(pplugin->slider)) {
-      
-      mykeyevent = event->xkey;
+      KeySym         mkey;
+      int            modifier;
       
       xitk_get_key_modifier(event, &modifier);
-      
-      XLockDisplay(gGui->display);
-      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-      XUnlockDisplay(gGui->display);
-      
-      switch(mykey) {
+      mkey = xitk_get_key_pressed(event);
+
+      switch(mkey) {
 	
       case XK_Up:
 	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
@@ -1582,29 +1573,34 @@ static void _pplugin_handle_event(XEvent *event, void *data) {
 	  xitk_slider_callback_exec(pplugin->slider);
 	}
 	break;
-
-
-      case XK_Next: {
-	int pos, max = xitk_slider_get_max(pplugin->slider);
 	
-	pos = max - (pplugin->first_displayed + MAX_DISPLAY_FILTERS);
-	xitk_slider_set_pos(pplugin->slider, (pos >= 0) ? pos : 0);
-	xitk_slider_callback_exec(pplugin->slider);
-      }
-	break;
-
-      case XK_Prior: {
-	int pos, max = xitk_slider_get_max(pplugin->slider);
 	
-	pos = max - (pplugin->first_displayed - MAX_DISPLAY_FILTERS);
-	xitk_slider_set_pos(pplugin->slider, (pos <= max) ? pos : max);
-	xitk_slider_callback_exec(pplugin->slider);
-      }
+      case XK_Next:
+	{
+	  int pos, max = xitk_slider_get_max(pplugin->slider);
+	  
+	  pos = max - (pplugin->first_displayed + MAX_DISPLAY_FILTERS);
+	  xitk_slider_set_pos(pplugin->slider, (pos >= 0) ? pos : 0);
+	  xitk_slider_callback_exec(pplugin->slider);
+	}
 	break;
 	
+      case XK_Prior:
+	{
+	  int pos, max = xitk_slider_get_max(pplugin->slider);
+	  
+	  pos = max - (pplugin->first_displayed - MAX_DISPLAY_FILTERS);
+	  xitk_slider_set_pos(pplugin->slider, (pos <= max) ? pos : max);
+	  xitk_slider_callback_exec(pplugin->slider);
+	}
+	break;
+	
+      case XK_Escape:
+	pplugin_exit(NULL, NULL);
+	break;
+
       }
     }
-  }
     break;
 
   }

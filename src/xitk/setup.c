@@ -461,24 +461,15 @@ static void setup_handle_event(XEvent *event, void *data) {
     }
     break;
 
-  case KeyPress: {
-    XKeyEvent      mykeyevent;
-    KeySym         mykey;
-    char           kbuf[256];
-    int            len;
-    int            modifier;
-    
+  case KeyPress:
     if(xitk_is_widget_enabled(setup->slider_wg)) {
-      
-      mykeyevent = event->xkey;
+      KeySym         mkey;
+      int            modifier;
       
       xitk_get_key_modifier(event, &modifier);
+      mkey = xitk_get_key_pressed(event);
       
-      XLockDisplay(gGui->display);
-      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-      XUnlockDisplay(gGui->display);
-      
-      switch(mykey) {
+      switch(mkey) {
 	
       case XK_Up:
 	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
@@ -493,29 +484,32 @@ static void setup_handle_event(XEvent *event, void *data) {
 	  xitk_slider_callback_exec(setup->slider_wg);
 	}
 	break;
-
-
-      case XK_Next: {
-	int pos, max = xitk_slider_get_max(setup->slider_wg);
 	
-	pos = max - (setup->first_displayed + MAX_DISPLAY_WIDGETS);
-	xitk_slider_set_pos(setup->slider_wg, (pos >= 0) ? pos : 0);
-	xitk_slider_callback_exec(setup->slider_wg);
-      }
-	break;
-
-      case XK_Prior: {
-	int pos, max = xitk_slider_get_max(setup->slider_wg);
-	
-	pos = max - (setup->first_displayed - MAX_DISPLAY_WIDGETS);
-	xitk_slider_set_pos(setup->slider_wg, (pos <= max) ? pos : max);
-	xitk_slider_callback_exec(setup->slider_wg);
-      }
+      case XK_Next:
+	{
+	  int pos, max = xitk_slider_get_max(setup->slider_wg);
+	  
+	  pos = max - (setup->first_displayed + MAX_DISPLAY_WIDGETS);
+	  xitk_slider_set_pos(setup->slider_wg, (pos >= 0) ? pos : 0);
+	  xitk_slider_callback_exec(setup->slider_wg);
+	}
 	break;
 	
+      case XK_Prior:
+	{
+	  int pos, max = xitk_slider_get_max(setup->slider_wg);
+	  
+	  pos = max - (setup->first_displayed - MAX_DISPLAY_WIDGETS);
+	  xitk_slider_set_pos(setup->slider_wg, (pos <= max) ? pos : max);
+	  xitk_slider_callback_exec(setup->slider_wg);
+	}
+	break;
+	
+      case XK_Escape:
+	setup_exit(NULL, NULL);
+	break;
       }
     }
-  }
     break;
     
   }

@@ -1546,6 +1546,18 @@ void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned lo
 
 #endif
 
+/*
+ * return len of keystring (stored in kbuf)
+ * define ksym
+ * kbuf should be large enought (256 usually)
+ */
+int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[]);
+
+/**
+ * return keypressed
+ */
+KeySym xitk_get_key_pressed(XEvent *event);
+
 /**
  * All states of modifiers (see xitk_get_key_modifier() bellow).
  */

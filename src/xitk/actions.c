@@ -540,7 +540,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
       xine_stop(gGui->visual_anim.stream);
 
       while(xine_get_status(gGui->visual_anim.stream) != XINE_STATUS_STOP)
-	xine_usec_sleep(50000);
+      	xine_usec_sleep(50000);
       
       audio_source = xine_get_audio_source(gGui->stream);
       (void) xine_post_wire_audio_port(audio_source, gGui->ao_port);

@@ -346,6 +346,17 @@ static void viewlog_end(xitk_widget_t *w, void *data) {
   viewlog_exit(NULL, NULL);
 }
 
+static void viewlog_handle_event(XEvent *event, void *data) {
+  switch(event->type) {
+    
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      viewlog_exit(NULL, NULL);
+    break;
+    
+  }
+}
+
 void viewlog_reparent(void) {
   if(viewlog)
     reparent_window((xitk_window_get_window(viewlog->xwin)));
@@ -460,7 +471,7 @@ void viewlog_panel(void) {
 
   viewlog->kreg = xitk_register_event_handler("viewlog", 
 					      (xitk_window_get_window(viewlog->xwin)),
-					      NULL,
+					      viewlog_handle_event,
 					      NULL,
 					      NULL,
 					      viewlog->widget_list,

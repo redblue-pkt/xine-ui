@@ -409,10 +409,14 @@ void control_handle_event(XEvent *event, void *data) {
   switch(event->type) {
     
   case KeyPress:
-    gui_handle_event(event, data);
-    break;      
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      control_exit(NULL, NULL);
+    else
+      gui_handle_event(event, data);
+    break;
+    
   }
-
+  
 }
 
 /*

@@ -223,6 +223,17 @@ static void help_sections(void) {
   }
 }
 
+static void help_handle_event(XEvent *event, void *data) {
+
+  switch(event->type) {
+    
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      help_exit(NULL, NULL);
+    break;
+  }
+}
+
 void help_exit(xitk_widget_t *w, void *data) {
 
   if(help) {
@@ -443,7 +454,7 @@ void help_panel(void) {
   
   help->kreg = xitk_register_event_handler("help", 
 					   (xitk_window_get_window(help->xwin)),
-					   NULL,
+					   help_handle_event,
 					   NULL,
 					   NULL,
 					   help->widget_list,

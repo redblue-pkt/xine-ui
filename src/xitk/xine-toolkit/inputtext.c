@@ -160,6 +160,32 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
   return (*modifier != MODIFIER_NOMOD);
 }
 
+int xitk_get_keysym_and_buf(XEvent *event, KeySym *ksym, char kbuf[]) {
+  int len = 0;
+  if(event) {
+    XKeyEvent  pkeyev = event->xkey;
+    
+    XLOCK(pkeyev.display);
+    len = XLookupString(&pkeyev, kbuf, sizeof(kbuf), ksym, NULL);
+    XUNLOCK(pkeyev.display);
+  }
+  return len;
+}
+
+/*
+ * Return key pressed (XK_VoidSymbol on failure)
+ */
+KeySym xitk_get_key_pressed(XEvent *event) {
+  KeySym   pkey = XK_VoidSymbol;
+  
+  if(event) {
+    char  buf[256];
+    (void) xitk_get_keysym_and_buf(event, &pkey, buf);
+  }
+
+  return pkey;
+}
+
 /*
  * Recalculate display offsets.
  */
@@ -836,7 +862,6 @@ static void notify_keyevent_inputtext(xitk_widget_t *w, XEvent *xev) {
   inputtext_private_data_t *private_data;
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
-    XKeyEvent   keyevent = xev->xkey;
     KeySym      key;
     char        buf[256];
     int         len;
@@ -846,10 +871,7 @@ static void notify_keyevent_inputtext(xitk_widget_t *w, XEvent *xev) {
 
     private_data->have_focus = FOCUS_RECEIVED;
 
-    XLOCK(private_data->imlibdata->x.disp);
-    len = XLookupString(&keyevent, buf, sizeof(buf), &key, NULL);
-    XUNLOCK(private_data->imlibdata->x.disp);
-
+    len = xitk_get_keysym_and_buf(xev, &key, buf);
     buf[len] = '\0';
 
     (void) xitk_get_key_modifier(xev, &modifier);

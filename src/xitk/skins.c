@@ -1005,50 +1005,44 @@ static void download_skin_handle_event(XEvent *event, void *data) {
     break;
     
   case KeyPress: {
-    XKeyEvent      mykeyevent;
-    KeySym         mykey;
-    char           kbuf[256];
-    int            len;
+    KeySym         mkey;
     int            modifier;
     
-    mykeyevent = event->xkey;
-    
     xitk_get_key_modifier(event, &modifier);
+    mkey = xitk_get_key_pressed(event);
     
-    XLockDisplay(gGui->display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUnlockDisplay(gGui->display);
-    
-    switch(mykey) {
+    switch(mkey) {
       
     case XK_Down:
-    case XK_Next: {
-      xitk_widget_t *w;
-      
-      w = xitk_get_focused_widget(skdloader->widget_list);
-      if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-	if(mykey == XK_Down)
-	  xitk_browser_step_up(skdloader->browser, NULL);
-	else
-	  xitk_browser_page_up(skdloader->browser, NULL);
+    case XK_Next:
+      {
+	xitk_widget_t *w;
+	
+	w = xitk_get_focused_widget(skdloader->widget_list);
+	if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
+	  if(mkey == XK_Down)
+	    xitk_browser_step_up(skdloader->browser, NULL);
+	  else
+	    xitk_browser_page_up(skdloader->browser, NULL);
+	}
       }
-    }
       break;
       
     case XK_Up:
-    case XK_Prior: {
-      xitk_widget_t *w;
-      
-      w = xitk_get_focused_widget(skdloader->widget_list);
-      if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
-	if(mykey == XK_Up)
-	  xitk_browser_step_down(skdloader->browser, NULL);
-	else
-	  xitk_browser_page_down(skdloader->browser, NULL);
+    case XK_Prior:
+      {
+	xitk_widget_t *w;
+	
+	w = xitk_get_focused_widget(skdloader->widget_list);
+	if((!w) || (w && (!((xitk_get_widget_type(w)) & WIDGET_GROUP_BROWSER)))) {
+	  if(mkey == XK_Up)
+	    xitk_browser_step_down(skdloader->browser, NULL);
+	  else
+	    xitk_browser_page_down(skdloader->browser, NULL);
+	}
       }
-    }
       break;
-     
+      
     case XK_Escape:
       download_skin_cancel(NULL, NULL);
       break;

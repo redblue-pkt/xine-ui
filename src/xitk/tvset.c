@@ -141,7 +141,6 @@ static struct _std_list std_list[] = {
 };
 
 
-
 static void tvset_update(xitk_widget_t *w, void *data) {
   xine_event_t          xine_event;
   xine_set_v4l2_data_t *ev_data;
@@ -210,6 +209,17 @@ static void tvset_exit(xitk_widget_t *w, void *data) {
     free(tvset);
     tvset = NULL;
   }
+}
+
+static void tvset_handle_event(XEvent *event, void *data) {
+  
+  switch(event->type) {
+    
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      tvset_exit(NULL, NULL);
+    break;
+  }  
 }
 
 int tvset_is_visible(void) {
@@ -526,12 +536,12 @@ void tvset_panel(void) {
   xitk_image_destroy_xitk_pixmap(bg);
 
   tvset->widget_key = xitk_register_event_handler("tvset", 
-						   (xitk_window_get_window(tvset->xwin)),
-						   NULL,
-						   NULL,
-						   NULL,
-						   tvset->widget_list,
-						   NULL);
+						  (xitk_window_get_window(tvset->xwin)),
+						  tvset_handle_event,
+						  NULL,
+						  NULL,
+						  tvset->widget_list,
+						  NULL);
   
   tvset->visible = 1;
   tvset->running = 1;

@@ -283,6 +283,16 @@ static void stream_infos_exit(xitk_widget_t *w, void *data) {
   }
 }
 
+static void handle_event(XEvent *event, void *data) {
+  switch(event->type) {
+    
+  case KeyPress:
+    if(xitk_get_key_pressed(event) == XK_Escape)
+      stream_infos_exit(NULL, NULL);
+    break;
+  }
+}
+
 int stream_infos_is_visible(void) {
   
   if(sinfos != NULL) {
@@ -1038,7 +1048,7 @@ void stream_infos_panel(void) {
 
   sinfos->widget_key = xitk_register_event_handler("sinfos", 
 						   (xitk_window_get_window(sinfos->xwin)),
-						   NULL,
+						   handle_event,
 						   NULL,
 						   NULL,
 						   sinfos->widget_list,
