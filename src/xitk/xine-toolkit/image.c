@@ -392,7 +392,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   char            bufsubs[BUFSIZ], buf[BUFSIZ];
 
   assert(im && fontname && str && width);
-  
+
   XLOCK(im->x.disp);
   gc = XCreateGC(im->x.disp, im->x.base_window, None, None);
   XUNLOCK(im->x.disp);
@@ -402,10 +402,6 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   length = xitk_font_get_string_length(fs, str);
   height = xitk_font_get_string_height(fs, str);
   descent = xitk_font_get_descent(fs, str);
-
-  XLOCK(im->x.disp);
-  XFreeGC(im->x.disp, gc);
-  XUNLOCK(im->x.disp);
 
   memset(&bufsubs, 0, sizeof(bufsubs));
   memset(&buf, 0, sizeof(buf));
@@ -487,7 +483,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
     int i, j, x = 0;
 
     XLOCK(im->x.disp);
-    XSetForeground(im->x.disp, image->image->gc, foreground);
+    XSetForeground(im->x.disp, gc, foreground);
     XUNLOCK(im->x.disp);
     
     j = height;
@@ -502,7 +498,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
 	x = (width - length);
       
       XLOCK(im->x.disp);
-      XDrawString(im->x.disp, image->image->pixmap, image->image->gc, 
+      XDrawString(im->x.disp, image->image->pixmap, gc, 
 		  x, (j - descent), lines[i], strlen(lines[i]));
       XUNLOCK(im->x.disp);
 	
@@ -511,6 +507,10 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   }
 
   xitk_font_unload_font(fs);
+
+  XLOCK(im->x.disp);
+  XFreeGC(im->x.disp, gc);
+  XUNLOCK(im->x.disp);
 
   return image;
 }
