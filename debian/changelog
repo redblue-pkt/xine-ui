@@ -1,3 +1,19 @@
+xine-ui (0.5.1.1.sl1) unstable; urgency=low
+
+  => prerelease, for testing only!
+  
+  * added compiler flags for m68k 
+
+ -- Siggi Langauf <siggi@debian.org>  Fri, 31 Aug 2001 00:09:16 +0200
+
+xine-ui (0.5.1-1) unstable; urgency=low
+
+  * new upstream release
+    (0.5.0-1 never reached the archives)
+
+ -- Siggi Langauf <siggi@debian.org>  Mon, 27 Aug 2001 09:49:01 +0200
+
+
 xine-ui (0.5.0-1) unstable; urgency=low
 
   * Initial Release of the new 0.5 architecture with separate libxine
