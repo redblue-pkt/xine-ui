@@ -39,7 +39,7 @@
 #include "common.h"
 
 #define WINDOW_WIDTH        250
-#define WINDOW_HEIGHT       240
+#define WINDOW_HEIGHT       222
 
 extern gGui_t          *gGui;
 
@@ -417,7 +417,7 @@ void event_sender_panel(void) {
 					 CONFIG_NO_CB,
 					 CONFIG_NO_DATA);
   
-    if(gGui->eventer_sticky && panel_is_visible()) {
+  if(gGui->eventer_sticky && panel_is_visible()) {
     int  px, py, pw, ph;
     xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, &ph);
     eventer->x = px + pw;
@@ -425,8 +425,7 @@ void event_sender_panel(void) {
   }
 
   /* Create window */
-  eventer->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
-						   _("event sender"), eventer->x, eventer->y,
+  eventer->xwin = xitk_window_create_simple_window(gGui->imlib_data, eventer->x, eventer->y,
 						   WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
@@ -443,7 +442,7 @@ void event_sender_panel(void) {
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
   x = 70 + 15 + 5;
-  y = 23 + 23 + 11;
+  y = /* 23 +  23 + 11*/ 5 + 23 + 11;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Up");
@@ -528,7 +527,7 @@ void event_sender_panel(void) {
 					   eventerfontname)));
 
   x = 23 * 2 + 5 + 8;
-  y = 23 * 4 + 5 + 40 + 5;
+  y = 5 + 23 * 3 + 5 + 40 + 5;
 
   for(i = 9; i >= 0; i--) {
     char number[2];
@@ -588,7 +587,7 @@ void event_sender_panel(void) {
   }
 
   x = WINDOW_WIDTH - 80 - 5;
-  y = 23 * 4 + 5 + 40 + 5;
+  y = 5 + 23 * 3 + 5 + 40 + 5;
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Angle +");
@@ -636,7 +635,7 @@ void event_sender_panel(void) {
   menu_items_dvd[6]     = _("Part");
 
   x = 5;
-  y = 23;
+  y = 5/* 23 */;
 
   for(i = 0; i < 7; i++) {
     lb.button_type       = CLICK_BUTTON;
