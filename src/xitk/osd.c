@@ -215,7 +215,7 @@ void osd_stream_infos(void) {
   if(gGui->osd.enabled) {
     uint32_t    vwidth, vheight, asrate;
     const char *vcodec, *acodec;
-    char        buffer[256];
+    char        buffer[256], *p;
     int         x, y;
     int         w, h, osdw;
     int         playedtime, totaltime;
@@ -241,11 +241,15 @@ void osd_stream_infos(void) {
 
     sprintf(buffer, "%s", (gGui->is_display_mrl) ? gGui->mmk.mrl : gGui->mmk.ident);
     xine_osd_get_text_size(gGui->osd.info, buffer, &osdw, &h);
+    p = buffer;
     while(osdw > (vwidth - 40)) {
-       buffer[strlen(buffer) - 1] = '\0';
-       xine_osd_get_text_size(gGui->osd.info, buffer, &osdw, &h);
+      *(p++) = '\0';
+      *(p)   = '.';
+      *(p+1) = '.';
+      *(p+2) = '.';
+      xine_osd_get_text_size(gGui->osd.info, p, &osdw, &h);
     }
-    xine_osd_draw_text(gGui->osd.info, x, y, buffer, XINE_OSD_TEXT1);
+    xine_osd_draw_text(gGui->osd.info, x, y, p, XINE_OSD_TEXT1);
     
     y += h;
     
