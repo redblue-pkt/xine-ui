@@ -36,6 +36,7 @@
 #include "image.h"
 #include "label.h"
 #include "widget_types.h"
+#include "utils.h"
 #include "_xitk.h"
 
 /*
@@ -123,17 +124,7 @@ void *label_animation_loop(void *data) {
       
     }
 
-#if HAVE_NANOSLEEP
-    /* nanosleep is prefered on solaris, because it's mt-safe */
-    {
-      struct timespec ts;
-      ts.tv_sec = 0;
-      ts.tv_nsec = 400000000;
-      nanosleep(&ts, NULL);
-    }
-#else
-    usleep(400000);
-#endif
+    xine_usec_sleep(400000);
     
   } while(w->running && private_data->anim_running);
   
