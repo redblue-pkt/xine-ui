@@ -59,8 +59,10 @@ extern gGui_t *gGui;
 /* Video window private structure */
 typedef struct {
   xitk_widget_list_t  *wl;
-  Cursor         cursor[2];       /* Cursor pointers                       */
+  Cursor         cursor[3];       /* Cursor pointers                       */
+  int            current_cursor;  /* arrow or hand */
   int            cursor_visible;
+  int            cursor_timer;
   Visual	*visual;	  /* Visual for video window               */
   Colormap	 colormap;	  /* Colormap for video window		   */
   XClassHint    *xclasshint;
@@ -841,6 +843,7 @@ static void video_window_adapt_size (void) {
        wm_not_ewmh_only()) {
       xitk_set_layer_above(gGui->video_window);
     }
+    
     if(gVw->fullscreen_mode && wm_not_ewmh_only())
       xitk_set_ewmh_fullscreen(gGui->video_window);
     
@@ -1070,6 +1073,26 @@ int video_window_get_xinerama_fullscreen_mode (void) {
 }
 
 /*
+ * Set cursor
+ */
+void video_window_set_cursor(int cursor) {
+
+  if(cursor) {
+    gVw->current_cursor = cursor;
+    
+    if(gVw->cursor_visible) {
+      gVw->cursor_timer = 0;
+      XLockDisplay (gGui->display);
+      XDefineCursor(gGui->display, gGui->video_window, 
+		    gVw->cursor[gVw->current_cursor]);
+      XSync(gGui->display, False);
+      XUnlockDisplay (gGui->display);
+    }
+  }
+
+}
+
+/*
  * hide/show cursor in video window
  */
 void video_window_set_cursor_visibility(int show_cursor) {
@@ -1079,9 +1102,12 @@ void video_window_set_cursor_visibility(int show_cursor) {
   
   gVw->cursor_visible = show_cursor;
 
+  if(show_cursor)
+    gVw->cursor_timer = 0;
+
   XLockDisplay (gGui->display);
   XDefineCursor(gGui->display, gGui->video_window, 
-		gVw->cursor[show_cursor]);
+		gVw->cursor[show_cursor ? gVw->current_cursor : show_cursor]);
   XSync(gGui->display, False);
   XUnlockDisplay (gGui->display);
 }
@@ -1091,6 +1117,14 @@ void video_window_set_cursor_visibility(int show_cursor) {
  */
 int video_window_is_cursor_visible(void) {
   return gVw->cursor_visible;
+}
+
+int video_window_get_cursor_timer(void) {
+  return gVw->cursor_timer;
+}
+
+void video_window_set_cursor_timer(int timer) {
+  gVw->cursor_timer = timer;
 }
 
 /* 
@@ -1361,12 +1395,15 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
    * create cursors
    */
 
-  bm_no = XCreateBitmapFromData(gGui->display, 
-				gGui->imlib_data->x.root, 
-				bm_no_data, 8, 8);
-  gVw->cursor[0] = XCreatePixmapCursor(gGui->display, bm_no, bm_no,
-				      &gGui->black, &gGui->black, 0, 0);
-  gVw->cursor[1] = XCreateFontCursor(gGui->display, XC_left_ptr);
+  bm_no                     = XCreateBitmapFromData(gGui->display, 
+						    gGui->imlib_data->x.root, 
+						    bm_no_data, 8, 8);
+  gVw->cursor[0]            = XCreatePixmapCursor(gGui->display, bm_no, bm_no,
+						  &gGui->black, &gGui->black, 0, 0);
+  gVw->cursor[CURSOR_ARROW] = XCreateFontCursor(gGui->display, XC_left_ptr);
+  gVw->cursor[CURSOR_HAND]  = XCreateFontCursor(gGui->display, XC_hand2);
+  gVw->current_cursor       = CURSOR_ARROW;
+  gVw->cursor_timer         = 0;
 
   /*
    * wm hints

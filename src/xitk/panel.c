@@ -396,8 +396,13 @@ static void *slider_loop(void *dummy) {
     }
     
     if(gGui->cursor_visible) {
-      gGui->cursor_visible = !gGui->cursor_visible;
-      video_window_set_cursor_visibility(gGui->cursor_visible);
+      if(!(i % 2))
+	video_window_set_cursor_timer(video_window_get_cursor_timer() + 1);
+      
+      if(video_window_get_cursor_timer() >= 5) {
+	gGui->cursor_visible = !gGui->cursor_visible;
+	video_window_set_cursor_visibility(gGui->cursor_visible);
+      }
     }
     
     if(gGui->logo_has_changed)

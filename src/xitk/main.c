@@ -813,6 +813,17 @@ static void event_listener(void *user_data, const xine_event_t *event) {
   
   switch(event->type) { 
     
+  case XINE_EVENT_SPU_BUTTON:
+    {
+      xine_spu_button_t *spubtn = (xine_spu_button_t *) event->data;
+
+      if(spubtn->direction)
+	video_window_set_cursor(CURSOR_HAND);
+      else
+	video_window_set_cursor(CURSOR_ARROW);
+    }
+    break;
+
   /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
     /*    printf("xitk/main.c: playback finished\n"

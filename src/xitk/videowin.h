@@ -33,6 +33,9 @@ typedef struct {
   int   borderless;
 } window_attributes_t;
 
+#define CURSOR_ARROW 1
+#define CURSOR_HAND  2
+
 void video_window_init (window_attributes_t *window_attribute, int hide_on_start);
 
 void video_window_exit (void);
@@ -61,10 +64,14 @@ int video_window_get_fullscreen_mode (void);
 void video_window_set_xinerama_fullscreen_mode (int req_fullscreen);
 int video_window_get_xinerama_fullscreen_mode (void);
 
+/* Set cursor */
+void video_window_set_cursor(int cursor);
 /* hide/show cursor in video window*/
 void video_window_set_cursor_visibility(int show_cursor);
 /* Get cursor visiblity (boolean) */
 int video_window_is_cursor_visible(void);
+int video_window_get_cursor_timer(void);
+void video_window_set_cursor_timer(int timer);
 
 /* hide/show video window */
 void video_window_set_visibility(int show_window);
