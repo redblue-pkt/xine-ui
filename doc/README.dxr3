@@ -165,16 +165,6 @@ plugin.
 		Use 1 to enable, 0 to disable. This is EXPERIMENTAL!
 			* Only appears to have effect on tvout. 
 
-*) dxr3_zoom16_9:
-	0	Enables another (experimental) tv-only mode which
-		zooms into the centre of a 16:9 video to display
-		much smaller (or none) black bars top & bottom.
-		It crops the video on the left and right sides to
-		maintain the correct aspect ratio.  Only tested
-		on PAL TVs.  Currently, you must enable/disable
-		here, in the future there may be a dedicated key
-		in xine to enable this feature.  Use 1 to enable.
-
 *) video_driver_name:
 	dxr3    Needed for setting the tv_mode, brightness, contrast,
 		saturation and the aspect ratio. If not, these features
@@ -217,6 +207,15 @@ since all options get written in .xinerc and have their default
 values. The dxr3 video driver can be forced using the "-V dxr3"
 command line option. Only the tvmode value has to be edited
 if the default driver setting is not correct.
+
+
+Zooming Feature (TVout Only)
+============================
+Pressing the 'z' key enables another tv-only mode which zooms into the 
+centre of a 16:9 video to display much smaller (or none) black bars 
+top & bottom.  It crops the video on the left and right sides to 
+maintain the correct aspect ratio. Please read the xine README for
+further information on usage. 
 
 
 VGA overlay feature
