@@ -1,7 +1,7 @@
 #ifndef __IMLIB_H__
 #define __IMLIB_H__
 
-#include <Imlib_types.h>
+#include "Imlib_types.h"
 
 #ifdef __cplusplus
 extern              "C"
