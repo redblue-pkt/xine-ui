@@ -690,52 +690,50 @@ int playlist_is_visible(void) {
  * Handle autoplay buttons hitting (from panel and playlist windows)
  */
 void playlist_scan_input(xitk_widget_t *w, void *ip) {
+  const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+  int                i = 0;
   
-  if(xine_get_status(gGui->stream) == XINE_STATUS_STOP) {
-    const char *const *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
-    int                i = 0;
-    
-    if(autoplay_plugins) {
-      while(autoplay_plugins[i] != NULL) {
+  if(autoplay_plugins) {
+    while(autoplay_plugins[i] != NULL) {
+      
+      if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
+	int                num_mrls;
+	char             **autoplay_mrls = 
+	  xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i], &num_mrls);
 	
-	if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
-	  int                num_mrls;
-	  char             **autoplay_mrls = 
-	    xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i], &num_mrls);
+	if(autoplay_mrls) {
+	  int j;
 	  
-	  if(autoplay_mrls) {
-	    int j;
-	    
-	    for (j = 0; j < num_mrls; j++)
-	      mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], 0, -1);
-	    
+	  if(!gGui->playlist.num)
 	    gGui->playlist.cur = 0;
-	    
+	  
+	  for (j = 0; j < num_mrls; j++)
+	    mediamark_add_entry(autoplay_mrls[j], autoplay_mrls[j], 0, -1);
+	  
+	  if(gGui->playlist.cur == 0)
 	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	    
-	    /* 
-	     * If we're in newbie mode, start playback immediately
-	     * (even ignoring if we're currently playing something
-	     */
-	    if(gGui->newbie_mode) {
-	      gui_play(NULL, NULL);
-	    }
-
-	  }
+	  
+	  /* 
+	   * If we're in newbie mode, start playback immediately
+	   * (even ignoring if we're currently playing something
+	   */
+	  if(gGui->newbie_mode)
+	    gui_play(NULL, NULL);
+	  
 	}
-	
-	i++;
       }
       
-      if(playlist) {
-	_playlist_create_playlists();
-	_playlist_update_browser_list(0);
-      }
-
+      i++;
     }
-
+    
+    if(playlist) {
+      _playlist_create_playlists();
+      _playlist_update_browser_list(0);
+    }
+    
     enable_playback_controls((gGui->playlist.num > 0));
   }
+  
 }
 
 /*
