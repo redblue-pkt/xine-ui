@@ -448,7 +448,9 @@ void panel_add_autoplay_buttons(void) {
     xitk_list_append_content (panel->widget_list->l,
 	     (panel->autoplay_plugins[i] =
 	      xitk_labelbutton_create (gGui->skin_config, &lb)));
-
+    xitk_set_widget_tips(panel->autoplay_plugins[i], 
+			 xine_get_input_plugin_description(gGui->xine, autoplay_plugins[i]));
+    
     (void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
 
     x -= xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
