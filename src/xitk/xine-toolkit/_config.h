@@ -59,6 +59,10 @@ typedef struct {
     int             oldbarstyle;
   } features;
 
+  struct {
+    int             shortcuts;
+  } menus;
+
 } xitk_config_t;
 
 
@@ -79,5 +83,6 @@ unsigned long xitk_config_get_timer_label_animation(xitk_config_t *xtcf);
 long xitk_config_get_timer_dbl_click(xitk_config_t *xtcf);
 unsigned long xitk_config_get_warning_foreground(xitk_config_t *xtcf);
 unsigned long xitk_config_get_warning_background(xitk_config_t *xtcf);
+int xitk_config_get_menu_shortcuts_enability(xitk_config_t *xtcf);
 
 #endif

@@ -856,54 +856,54 @@ static void create_menu(void) {
   xitk_menu_widget_t   menu;
   int                  x = 10, y = 10;
   xitk_menu_entry_t    menu_entries[] = {
-    { "Popup menu:-------------------",  "<title>",       NULL,     NULL },
-    { "Load a file",                     NULL,            NULL,     NULL },
-    { "Reload",                          NULL,            NULL,     NULL },
-    { "Auto save",                       "<check>",       NULL,     NULL },
-    { "SEP",                             "<separator>",   NULL,     NULL },
-    { "Empty",                           "<branch>",      NULL,     NULL },
-    { "Playlist",                        "<branch>",      NULL,     NULL },
-    { "Playlist/Playlist Management",    "<title>",       NULL,     NULL },
-    { "Playlist/Load",                   NULL,            NULL,     NULL },
-    { "Playlist/Loop",                   "<branch>",      NULL,     NULL },
-    { "Playlist/Loop/no loop",           "<checked>",     NULL,     NULL },
-    { "Playlist/Loop/simple loop",       "<check>",       NULL,     NULL },
-    { "Playlist/Loop/SEP",               "<separator>",   NULL,     NULL },
-    { "Playlist/Loop/repeat entry",      "<check>",       NULL,     NULL },
-    { "Playlist/Loop/SEP",               "<separator>",   NULL,     NULL },
-    { "Playlist/Loop/shuffle",           "<check>",       NULL,     NULL },
-    { "Playlist/Loop/infinite shuffle",  "<check>",       NULL,     NULL },
-    { "Playlist/Loop/Extra",             "<branch>",      NULL,     NULL },
-    { "Playlist/Save",                   NULL,            NULL,     NULL },
-    { "Another branch",                  "<branch>",      NULL,     NULL },
-    { "Another branch/dummy",            NULL,            NULL,     NULL },
-    { "Another branch/vice\\/versa",     NULL,            NULL,     NULL },
-    { "SEP",                             "<separator>",   NULL,     NULL },
+    { "Popup menu:",                     NULL,     "<title>",       NULL,     NULL },
+    { "Load a file",                     NULL,     NULL,            NULL,     NULL },
+    { "Reload",                          NULL,     NULL,            NULL,     NULL },
+    { "Auto save",                       NULL,     "<check>",       NULL,     NULL },
+    { "SEP",                             NULL,     "<separator>",   NULL,     NULL },
+    { "Empty",                           NULL,     "<branch>",      NULL,     NULL },
+    { "Playlist",                        NULL,     "<branch>",      NULL,     NULL },
+    { "Playlist/Playlist Management",    NULL,     "<title>",       NULL,     NULL },
+    { "Playlist/Load",                   NULL,     NULL,            NULL,     NULL },
+    { "Playlist/Loop",                   NULL,     "<branch>",      NULL,     NULL },
+    { "Playlist/Loop/no loop",           NULL,     "<checked>",     NULL,     NULL },
+    { "Playlist/Loop/simple loop",       NULL,     "<check>",       NULL,     NULL },
+    { "Playlist/Loop/SEP",               NULL,     "<separator>",   NULL,     NULL },
+    { "Playlist/Loop/repeat entry",      NULL,     "<check>",       NULL,     NULL },
+    { "Playlist/Loop/SEP",               NULL,     "<separator>",   NULL,     NULL },
+    { "Playlist/Loop/shuffle",           NULL,     "<check>",       NULL,     NULL },
+    { "Playlist/Loop/infinite shuffle",  NULL,     "<check>",       NULL,     NULL },
+    { "Playlist/Loop/Extra",             NULL,     "<branch>",      NULL,     NULL },
+    { "Playlist/Save",                   NULL,     NULL,            NULL,     NULL },
+    { "Another branch",                  NULL,     "<branch>",      NULL,     NULL },
+    { "Another branch/dummy",            NULL,     NULL,            NULL,     NULL },
+    { "Another branch/vice\\/versa",     NULL,     NULL,            NULL,     NULL },
+    { "SEP",                             NULL,     "<separator>",   NULL,     NULL },
     /* Testing deep sub-branches */
-    { "Deep",                            "<branch>",      NULL,     NULL },
-    { "Deep/Deep 2",                     "<branch>",      NULL,     NULL },
-    { "Deep/Deep 2/Deep 3",              "<branch>",      NULL,     NULL },
-    { "Deep/Deep 2/Deep 3/Deep 4",       "<branch>",      NULL,     NULL },
+    { "Deep",                            NULL,     "<branch>",      NULL,     NULL },
+    { "Deep/Deep 2",                     NULL,     "<branch>",      NULL,     NULL },
+    { "Deep/Deep 2/Deep 3",              NULL,     "<branch>",      NULL,     NULL },
+    { "Deep/Deep 2/Deep 3/Deep 4",       NULL,     "<branch>",      NULL,     NULL },
     { "Deep/Deep 2/Deep 3/Deep 4/Deep 5",
-                                         "<branch>",      NULL,     NULL },
+                                         NULL,     "<branch>",      NULL,     NULL },
     { "Deep/Deep 2/Deep 3/Deep 4/Deep 5/Entry number 1",
-                                         NULL,            NULL,     NULL },
+                                         NULL,     NULL,            NULL,     NULL },
     { "Deep/Deep 2/Deep 3/Deep 4/Deep 5/SEP",
-                                         "<separator>",   NULL,     NULL },
+                                         NULL,     "<separator>",   NULL,     NULL },
     { "Deep/Deep 2/Deep 3/Deep 4/Deep 5/Entry number 2",
-                                         NULL,            NULL,     NULL },
-    { "SEP",                             "<separator>",   NULL,     NULL },
-    { "Save a file",                     NULL,            NULL,     NULL },
-    { "SEP",                             "<separator>",   NULL,     NULL },
-    { "Video",                           "<branch>",      NULL,     NULL },
-    { "Video/premier",                   "<branch>",      NULL,     NULL },
-    { "Video/premier/Le Voili",          NULL,            NULL,     NULL },
-    { "Video/second",                    NULL,            NULL,     NULL },
-    { "Video/troisieme",                 NULL,            NULL,     NULL },
-    { "Video/quatrieme",                 NULL,            NULL,     NULL },
-    { "SEP",                             "<separator>",   NULL,     NULL },
-    { "Quit",                            NULL,            menu_test_end, NULL },
-    { NULL,                              NULL,            NULL,     NULL }
+                                         NULL,     NULL,            NULL,     NULL },
+    { "SEP",                             NULL,     "<separator>",   NULL,     NULL },
+    { "Save a file",                     NULL,     NULL,            NULL,     NULL },
+    { "SEP",                             NULL,     "<separator>",   NULL,     NULL },
+    { "Video",                           NULL,     "<branch>",      NULL,     NULL },
+    { "Video/premier",                   NULL,     "<branch>",      NULL,     NULL },
+    { "Video/premier/Le Voili",          NULL,     NULL,            NULL,     NULL },
+    { "Video/second",                    NULL,     NULL,            NULL,     NULL },
+    { "Video/troisieme",                 NULL,     NULL,            NULL,     NULL },
+    { "Video/quatrieme",                 NULL,     NULL,            NULL,     NULL },
+    { "SEP",                             NULL,     "<separator>",   NULL,     NULL },
+    { "Quit",                            "C-q",    NULL,            menu_test_end, NULL },
+    { NULL,                              NULL,     NULL,            NULL,     NULL }
   };
   
   XITK_WIDGET_INIT(&menu, test->imlibdata);
@@ -920,10 +920,8 @@ static void create_menu(void) {
   {
     xitk_menu_entry_t menu_entry;
 
+    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
     menu_entry.menu      = "Playlist/Loop/Extra/errrr?";
-    menu_entry.type      = NULL;
-    menu_entry.cb        = NULL;
-    menu_entry.user_data = NULL;
     xitk_menu_add_entry(test->menu, &menu_entry);
   }
   

@@ -67,7 +67,7 @@ static void _create_label_pixmap(xitk_widget_t *w) {
 
   x_dest = 0;
 
-  for (i = 0; i < strlen(_label); i++) {
+  for (i = 0; i < len; i++) {
     int c = 0;
     
     if ((i < len) && (_label[i] >= 32))

@@ -347,6 +347,8 @@ void xitk_skin_unlock(xitk_skin_config_t *);
 void *labelbutton_get_user_data(xitk_widget_t *w);
 void menu_auto_pop(xitk_widget_t *w);
 
+int xitk_get_bool_value(const char *val);
+
 struct xitk_font_s {
   Display       *display;
 #ifdef WITH_XFT

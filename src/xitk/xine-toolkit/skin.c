@@ -309,31 +309,6 @@ static void skin_get_next_line(xitk_skin_config_t *skonfig) {
 }
 
 /*
- * Return 0/1 from char value (valids are 1/0, true/false, 
- * yes/no, on/off. Case isn't checked.
- */
-static int skin_get_bool_value(const char *val) {
-  static struct {
-    const char *str;
-    int value;
-  } bools[] = {
-    { "1",     1 }, { "true",  1 }, { "yes",   1 }, { "on",    1 },
-    { "0",     0 }, { "false", 0 }, { "no",    0 }, { "off",   0 },
-    { NULL,    0 }
-  };
-  int i;
-  
-  ABORT_IF_NULL(val);
-
-  for(i = 0; bools[i].str != NULL; i++) {
-    if(!(strcasecmp(bools[i].str, val)))
-      return bools[i].value;
-  }
-
-  return 0;
-}
-
-/*
  * Return alignement value.
  */
 static int skin_get_align_value(const char *val) {
@@ -493,7 +468,7 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	}
 	else if(!strncasecmp(skonfig->ln, "animation", 9)) {
 	  skin_set_pos_to_value(&p);
-	  skonfig->celement->animation = skin_get_bool_value(p);
+	  skonfig->celement->animation = xitk_get_bool_value(p);
 	}
 	else if(!strncasecmp(skonfig->ln, "length", 6)) {
 	  skin_set_pos_to_value(&p);
@@ -507,7 +482,7 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	}
 	else if(!strncasecmp(skonfig->ln, "static", 6)) {
 	  skin_set_pos_to_value(&p);
-	  skonfig->celement->staticity = skin_get_bool_value(p);
+	  skonfig->celement->staticity = xitk_get_bool_value(p);
 	}
 	else if(!strncasecmp(skonfig->ln, "align", 5)) {
 	  skin_set_pos_to_value(&p);
@@ -519,7 +494,7 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	}
 	else if(!strncasecmp(skonfig->ln, "print", 5)) {
 	  skin_set_pos_to_value(&p);
-	  skonfig->celement->print = skin_get_bool_value(p);
+	  skonfig->celement->print = xitk_get_bool_value(p);
 	}
 	else if(!strncasecmp(skonfig->ln, "timer", 5)) {
 	  skin_set_pos_to_value(&p);
@@ -599,7 +574,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	    }
 	    else if(!strncasecmp(skonfig->ln, "visible", 7)) {
 	      skin_set_pos_to_value(&p);
-	      s->visible = skin_get_bool_value(p);
+	      s->visible = xitk_get_bool_value(p);
 	    }
 	    else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
 	      skin_set_pos_to_value(&p);
@@ -609,7 +584,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	    }
 	    else if(!strncasecmp(skonfig->ln, "enable", 6)) {
 	      skin_set_pos_to_value(&p);
-	      s->enable = skin_get_bool_value(p);
+	      s->enable = xitk_get_bool_value(p);
 	    }
 	    
 	  }

@@ -64,6 +64,9 @@ feature.shm              = 1
 # Use old title bar style (blueish): 0/1 (default = 0)
 feature.old_title_style  = 1
 
+# Enable/disable menus shortcuts displaying (default = 1)
+menus.shortcuts = 1;
+
 --
 
 		     input text widget shortcurts

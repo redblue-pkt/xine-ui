@@ -90,6 +90,7 @@ static xitk_menu_entry_t *_menu_build_menu_entry(xitk_menu_entry_t *me, char *na
 
   mentry            = (xitk_menu_entry_t *) xitk_xmalloc(sizeof(xitk_menu_entry_t));
   mentry->menu      = strdup((name) ? buffer : me->menu);
+  mentry->shortcut  = (me->shortcut) ? strdup(me->shortcut) : NULL;
   mentry->type      = (me->type) ? strdup(me->type) : NULL;
   mentry->cb        = me->cb;
   mentry->user_data = me->user_data;
@@ -278,11 +279,40 @@ static menu_node_t *_menu_get_wider_menuitem_node(menu_node_t *branch) {
   menu_node_t  *max = NULL;
   int           len = 0;
   
+  while(me) {
+    if((!_menu_is_separator(me->menu_entry)) && 
+       (me->menu_entry->menu && 
+	((strlen(me->menu_entry->menu) > len)))) {
+      len = strlen(me->menu_entry->menu);
+      max = me;
+    }
+    
+    me = me->next;
+  }
+
+  return max;
+}
+static int _menu_branch_have_shortcut(menu_node_t *branch) {
+  menu_node_t  *me = branch;
+  
+  while(me) {
+    if((!_menu_is_separator(me->menu_entry)) && me->menu_entry->shortcut)
+      return 1;
+    me = me->next;
+  }
+  
+  return 0;
+}
+static menu_node_t *_menu_get_wider_shortcut_node(menu_node_t *branch) {
+  menu_node_t  *me = branch;
+  menu_node_t  *max = NULL;
+  int           len = 0;
   
   while(me) {
     if((!_menu_is_separator(me->menu_entry)) && 
-       (me->menu_entry->menu && (strlen(me->menu_entry->menu) > len))) {
-      len = strlen(me->menu_entry->menu);
+       (me->menu_entry->shortcut && 
+	((strlen(me->menu_entry->shortcut) > len)))) {
+      len = strlen(me->menu_entry->shortcut);
       max = me;
     }
     
@@ -342,6 +372,8 @@ static void _menu_destroy_ntree(menu_node_t **mn) {
   if((*mn)->menu_entry) {
     if((*mn)->menu_entry->menu)
       free((*mn)->menu_entry->menu);
+    if((*mn)->menu_entry->shortcut)
+      free((*mn)->menu_entry->shortcut);
     if((*mn)->menu_entry->type)
       free((*mn)->menu_entry->type);
     free((*mn)->menu_entry);
@@ -666,9 +698,14 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 
   xitk_font_set_font(fs, private_data->widget->wl->gc);
   maxlen = xitk_font_get_string_length(fs, maxnode->menu_entry->menu);
+
+  if(xitk_get_menu_shortcuts_enability() && _menu_branch_have_shortcut(branch))
+    maxlen += xitk_font_get_string_length(fs, (_menu_get_wider_shortcut_node(branch))->menu_entry->shortcut) + 15;
+
   xitk_font_unload_font(fs);
-  
+
   wwidth = maxlen + 40;
+
   if(_menu_branch_have_check(branch) || _menu_branch_have_branch(branch))
     wwidth += 20;
   wheight = (rentries * 20) + (bsep * 2) + (btitle * 2);
@@ -780,7 +817,29 @@ static void _menu_create_menu_from_branch(menu_node_t *branch, xitk_widget_t *w,
 								     DEFAULT_BOLD_FONT_12)));
       btn->type |= WIDGET_GROUP | WIDGET_GROUP_MENU;
       me->button = btn;
+      
+      if(xitk_get_menu_shortcuts_enability()  && me->menu_entry->shortcut) {
+	int  swidth, max;
+	char buf[2048];
+	
+	fs = xitk_font_load_font(private_data->imlibdata->x.disp, DEFAULT_BOLD_FONT_12);
+	xitk_font_set_font(fs, private_data->widget->wl->gc);
 
+	max = xitk_font_get_string_length(fs, maxnode->menu_entry->menu) + 15;
+	
+	sprintf(buf, "%s ", me->menu_entry->menu);
+	swidth = xitk_font_get_string_length(fs, buf);
+
+	while(swidth <= max) {
+	  sprintf(buf, "%s%c", buf, ' ');
+	  swidth = xitk_font_get_string_length(fs, buf);
+	}
+
+	sprintf(buf, "%s%s", buf, me->menu_entry->shortcut); 
+	xitk_labelbutton_change_label(btn, buf);
+	xitk_font_unload_font(fs);
+      }
+      
       wimage = xitk_get_widget_foreground_skin(btn);
       if(wimage) {
 	draw_flat_three_state(private_data->imlibdata, wimage);				

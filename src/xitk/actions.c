@@ -1506,7 +1506,7 @@ void gui_set_current_mrl(mediamark_t *mmk) {
 
   video_window_set_mrl(gGui->mmk.ident);
   event_sender_update_menu_buttons();
-  panel_update_mrl_display ();
+  panel_update_mrl_display();
   playlist_update_focused_entry();
 }
 

@@ -1109,6 +1109,44 @@ action_id_t kbindings_get_action_id(kbinding_entry_t *kbt) {
   return kbt->action_id;
 }
 
+char *kbindings_get_shortcut(kbinding_t *kbt, char *action) {
+  kbinding_entry_t  *k;
+  static char buf[32];
+  
+  if(kbt && action && (k = kbindings_lookup_action(kbt, action))) {
+    if(strcmp(k->key, "VOID")) {
+      sprintf(buf, "%c", '[');
+#define EMACS_SHORTCUTS
+#ifdef EMACS_SHORTCUTS
+      if(k->modifier & KEYMOD_CONTROL)
+	sprintf(buf, "%s%s", buf, "C-");
+      if(k->modifier & KEYMOD_META)
+	sprintf(buf, "%s%s", buf, "M-");
+      if(k->modifier & KEYMOD_MOD3)
+	sprintf(buf, "%s%s", buf, "M3-");
+      if(k->modifier & KEYMOD_MOD4)
+	sprintf(buf, "%s%s", buf, "M4-");
+      if(k->modifier & KEYMOD_MOD5)
+	sprintf(buf, "%s%s", buf, "M5-");
+#else
+      if(k->modifier & KEYMOD_CONTROL)
+	sprintf(buf, "%s%s", buf, "Ctrl+");
+      if(k->modifier & KEYMOD_META)
+	sprintf(buf, "%s%s", buf, "Alt+");
+      if(k->modifier & KEYMOD_MOD3)
+	sprintf(buf, "%s%s", buf, "M3+");
+      if(k->modifier & KEYMOD_MOD4)
+	sprintf(buf, "%s%s", buf, "M4+");
+      if(k->modifier & KEYMOD_MOD5)
+	sprintf(buf, "%s%s", buf, "M5+");
+#endif
+      sprintf(buf, "%s%s%c", buf, k->key, ']');
+      return buf;
+    }
+  }
+  return NULL;
+}
+
 /*
  * Return a key binding entry (if available) matching with action string.
  */

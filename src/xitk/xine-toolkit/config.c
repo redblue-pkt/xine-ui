@@ -179,6 +179,31 @@ static void xitk_config_features(xitk_config_t *xtcf) {
 }
 
 /*
+ * menus.
+ */
+static void xitk_config_menus(xitk_config_t *xtcf) {
+  char  *p = NULL;
+  char  *c = NULL;
+
+  ABORT_IF_NULL(xtcf);
+  ABORT_IF_NULL(xtcf->ln);
+
+  p = xtcf->ln + 6;
+  if(p)
+    c = strchr(p, '=');
+  
+  if(c) {
+    
+    *(c++) = '\0';
+    
+    while(*c == ' ' || *c == '\t') c++;
+    
+    if(!strncasecmp(p, "shortcuts", 9))
+      xtcf->menus.shortcuts = xitk_get_bool_value(c);
+  }
+}
+
+/*
  * Guess entries.
  */
 static void xitk_config_store_entry(xitk_config_t *xtcf) {
@@ -191,6 +216,8 @@ static void xitk_config_store_entry(xitk_config_t *xtcf) {
     xitk_config_colors(xtcf);
   else if(!strncasecmp(xtcf->ln, "timer.", 6))
     xitk_config_timers(xtcf);
+  else if(!strncasecmp(xtcf->ln, "menus.", 6))
+    xitk_config_menus(xtcf);
   else if(!strncasecmp(xtcf->ln, "font.", 5))
     xitk_config_fonts(xtcf);
     
@@ -299,6 +326,7 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   xtcf->features.shm           = 0;
 #endif
   xtcf->features.oldbarstyle   = 0;
+  xtcf->menus.shortcuts        = 1;
 }
 
 /*
@@ -406,6 +434,13 @@ unsigned long xitk_config_get_warning_background(xitk_config_t *xtcf) {
     return -1;
 
   return xtcf->colors.warn_background;
+}
+int xitk_config_get_menu_shortcuts_enability(xitk_config_t *xtcf) {
+
+  if(!xtcf)
+    return -1;
+
+  return xtcf->menus.shortcuts;
 }
 
 #define SYSTEM_RC  "/etc/xitkrc"

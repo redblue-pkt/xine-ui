@@ -1889,7 +1889,9 @@ long int xitk_get_timer_dbl_click(void) {
 int xitk_get_barstyle_feature(void) {
   return xitk_config_get_barstyle_feature(gXitk->config);
 }
-
+int xitk_get_menu_shortcuts_enability(void) {
+  return xitk_config_get_menu_shortcuts_enability(gXitk->config);
+}
 /*
  * copy src to dest and substitute special chars. dest should have 
  * enought space to store chars.
@@ -1996,4 +1998,29 @@ const char *xitk_get_homedir(void) {
   }
 
   return homedir;
+}
+
+/*
+ * Return 0/1 from char value (valids are 1/0, true/false, 
+ * yes/no, on/off. Case isn't checked.
+ */
+int xitk_get_bool_value(const char *val) {
+  static struct {
+    const char *str;
+    int value;
+  } bools[] = {
+    { "1",     1 }, { "true",  1 }, { "yes",   1 }, { "on",    1 },
+    { "0",     0 }, { "false", 0 }, { "no",    0 }, { "off",   0 },
+    { NULL,    0 }
+  };
+  int i;
+  
+  ABORT_IF_NULL(val);
+
+  for(i = 0; bools[i].str != NULL; i++) {
+    if(!(strcasecmp(bools[i].str, val)))
+      return bools[i].value;
+  }
+
+  return 0;
 }

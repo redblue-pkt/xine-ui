@@ -648,7 +648,8 @@ typedef struct {
 
 struct xitk_menu_entry_s {
   char                             *menu;
-  char                             *type; /* NULL, <separator>, <branch>, <check>, <checked> */
+  char                             *shortcut; /* displayed (can be NULL) */
+  char                             *type;     /* NULL, <separator>, <branch>, <check>, <checked> */
   xitk_menu_callback_t              cb;
   void                             *user_data;
 };
@@ -778,6 +779,7 @@ long int xitk_get_timer_dbl_click(void);
 int xitk_get_barstyle_feature(void);
 unsigned long xitk_get_warning_foreground(void);
 unsigned long xitk_get_warning_background(void);
+int xitk_get_menu_shortcuts_enability(void);
 
 
 /*
