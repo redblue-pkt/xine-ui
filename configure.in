@@ -224,12 +224,9 @@ if test x"$png_ok" = xyes; then
 	png_structp pp; 
 	png_infop info; 
 	png_colorp cmap; 
-	int dummy = PNG_TRANSFORM_IDENTITY;
 
 	png_create_read_struct; 
 	png_set_IHDR;
-	png_set_rows;
-	png_write_png;
 	], png_ok=yes, png_ok=no)
 
     AC_MSG_RESULT($png_ok)
