@@ -47,6 +47,9 @@ extern gGui_t          *gGui;
 
 static char            *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 
+#define WINDOW_WIDTH  640
+#define WINDOW_HEIGHT 600
+
 #define FRAME_WIDTH   350
 #define FRAME_HEIGHT  40
 
@@ -86,6 +89,20 @@ typedef struct {
 } _setup_t;
 
 static _setup_t    *setup = NULL;
+
+/*
+ *
+ */
+static void setup_clear_tab(void) {
+  xitk_image_t *im;
+
+  im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), (WINDOW_HEIGHT - 95)+1);
+  draw_outter(gGui->imlib_data, im->image, im->width, im->height);
+  XLockDisplay(gGui->display);
+  XCopyArea(gGui->display, im->image, (xitk_window_get_window(setup->xwin)),
+	    setup->widget_list->gc, 0, 0, im->width, im->height, 20, 51);
+  XUnlockDisplay(gGui->display);
+}
 
 /*
  * Get current property 'prop' value from vo_driver.
@@ -539,10 +556,9 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   
   setup_section_widgets (section);
   
-  XClearWindow (gGui->display,xitk_window_get_window(setup->xwin) );
+  setup_clear_tab();
   xitk_paint_widget_list (setup->widget_list); 
 }
-
 
 /* 
  * collect config categories, setup tab widget
@@ -551,7 +567,6 @@ static void setup_sections (void) {
   Pixmap               bg;
   cfg_entry_t         *entry;
   xitk_tabs_widget_t   tab;
-  int                  width, height;
 
   setup->num_sections = 0;
   entry = gGui->config->first;
@@ -599,24 +614,23 @@ static void setup_sections (void) {
   tab.userdata          = NULL;
   xitk_list_append_content (setup->widget_list->l,
 			    (setup->tabs = 
-			     xitk_noskin_tabs_create(&tab, 20, 25, 600)));
+			     xitk_noskin_tabs_create(&tab, 20, 25, WINDOW_WIDTH - 40)));
 
-  xitk_window_get_window_size(setup->xwin, &width, &height);
-  
-  bg = xitk_image_create_pixmap(gGui->imlib_data, width, height);
+  bg = xitk_image_create_pixmap(gGui->imlib_data, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay(gGui->display);
   XCopyArea(gGui->display, (xitk_window_get_background(setup->xwin)), bg,
-	    setup->widget_list->gc, 0, 0, width, height, 0, 0);
+	    setup->widget_list->gc, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0, 0);
   XUnlockDisplay(gGui->display);
   
-  draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 40, 600-1, height - 95);
-  xitk_window_change_background(gGui->imlib_data, setup->xwin, bg, width, height);
-
+  draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
+			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - 95));
+  xitk_window_change_background(gGui->imlib_data, setup->xwin, bg, WINDOW_WIDTH, WINDOW_HEIGHT);
+  
   XLockDisplay(gGui->display);
   XFreePixmap(gGui->display, bg);
   XUnlockDisplay(gGui->display);
-
+  
   setup->num_tmp_widgets = 0;
   setup_section_widgets (0);
 }
@@ -647,7 +661,7 @@ void setup_panel(void) {
   setup->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
 						 _("xine setup"), 
 						 100, 100, 
-						 640, 600);
+						 WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
 
@@ -674,7 +688,7 @@ void setup_panel(void) {
   lb.skin_element_name = NULL;
   xitk_list_append_content(setup->widget_list->l, 
 	   xitk_noskin_labelbutton_create(&lb,
-					  (640 / 2) - 50, 560,
+					  (WINDOW_WIDTH>>1) - 50, WINDOW_HEIGHT - 40,
 					  100, 23,
 					  "Black", "Black", "White", fontname));
 

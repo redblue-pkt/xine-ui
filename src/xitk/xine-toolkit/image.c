@@ -954,20 +954,21 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
   XFillRectangle(im->x.disp, p->image, gc, 0, 0, (w * 3) , h);
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
-  XFillRectangle(im->x.disp, p->image, gc, 0, 3, w * 2, h);
+  XFillRectangle(im->x.disp, p->image, gc, 0, 3, (w - 1), h);
+  XFillRectangle(im->x.disp, p->image, gc, w, 0, (w - 1), h);
 
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
   XDrawLine(im->x.disp, p->image, gc, 0, 3, w, 3);
   XDrawLine(im->x.disp, p->image, gc, 0, 3, 0, h);
-  XDrawLine(im->x.disp, p->image, gc, w, 3, (w * 2) - 1, 3);
-  XDrawLine(im->x.disp, p->image, gc, w, 3, w, h);
+  XDrawLine(im->x.disp, p->image, gc, w, 0, (w * 2) - 1, 0);
+  XDrawLine(im->x.disp, p->image, gc, w, 0, w, h);
   XDrawLine(im->x.disp, p->image, gc, (w * 2) + 3, 0, (w * 3) - 1, 0);
   XDrawLine(im->x.disp, p->image, gc, (w * 2), 3, (w * 2), (h - 1));
   XDrawLine(im->x.disp, p->image, gc, (w * 2), 3, (w * 2) + 3, 0);
 
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
   XDrawLine(im->x.disp, p->image, gc, (w - 1), 3, (w - 1), h);
-  XDrawLine(im->x.disp, p->image, gc, (w * 2) - 1, 3, (w * 2) - 1, h);
+  XDrawLine(im->x.disp, p->image, gc, (w * 2) - 1, 0, (w * 2) - 1, h);
   XDrawLine(im->x.disp, p->image, gc, (w * 3) - 1, 0, (w * 3) - 1, h);
 
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));

@@ -708,7 +708,8 @@ xitk_widget_t *xitk_noskin_image_create (xitk_image_widget_t *im,
 /**
  *
  */
-void xitk_change_image(ImlibData *im, GC gc, xitk_image_t *i, Pixmap pix, int width, int height);
+void xitk_image_change_image(ImlibData *im, 
+			     xitk_image_t *src, xitk_image_t *dest, int width, int height);
 
 /*
  * *** DND
@@ -1413,12 +1414,12 @@ Pixmap xitk_image_create_pixmap(ImlibData *idata, int width, int height);
 /**
  *
  */
-void draw_flat_three_state(ImlibData *im, GC gc, xitk_image_t *p);
+void draw_flat_three_state(ImlibData *im, xitk_image_t *p);
 
 /**
  *
  */
-void draw_bevel_three_state(ImlibData *im, GC gc, xitk_image_t *p);
+void draw_bevel_three_state(ImlibData *im, xitk_image_t *p);
 
 /**
  *
@@ -1428,27 +1429,27 @@ void draw_bevel_two_state(ImlibData *im, xitk_image_t *p);
 /**
  *
  */
-void draw_inner(ImlibData *im, GC gc, Pixmap p, int w, int h);
+void draw_inner(ImlibData *im, Pixmap p, int w, int h);
 
 /**
  *
  */
-void draw_outter(ImlibData *im, GC gc, Pixmap p, int w, int h);
+void draw_outter(ImlibData *im, Pixmap p, int w, int h);
 
 /**
  *
  */
-void draw_flat(ImlibData *im, GC gc, Pixmap p, int w, int h);
+void draw_flat(ImlibData *im, Pixmap p, int w, int h);
 
 /**
  *
  */
-void draw_arrow_up(ImlibData *im, GC gc, xitk_image_t *p);
+void draw_arrow_up(ImlibData *im, xitk_image_t *p);
 
 /**
  *
  */
-void draw_arrow_down(ImlibData *im, GC gc, xitk_image_t *p);
+void draw_arrow_down(ImlibData *im, xitk_image_t *p);
 
 /*
  * Draw and arrow (direction is LEFT).

@@ -50,7 +50,9 @@ typedef struct {
   int                     old_selected;
 
   int                     offset;
+  int                     old_offset;
   int                     bheight;
+  int                     gap_widthstart;
 
   xitk_state_callback_t  callback;
   void                   *userdata;

@@ -68,31 +68,34 @@ static void tabs_arrange(xitk_widget_t *w) {
   tabs_private_data_t  *private_data;
 
   if((w->widget_type & WIDGET_TYPE_TABS) && (w->visible)) {
-    int i, width, x;
-
+    int i = 0, width, x;
+    
     private_data = (tabs_private_data_t*) w->private_data;
-
-    for(i = 0; i < private_data->num_entries; i++)
-      xitk_hide_widget(private_data->parent_wlist, private_data->tabs[i]);
-
-    i = private_data->offset;
-    width = 0;
-    x = private_data->x;
-
-    do {      
-      if((width + xitk_get_widget_width(private_data->tabs[i])) <= private_data->width - 40) {
-	xitk_set_widget_pos(private_data->tabs[i], x, private_data->y);
-	width += xitk_get_widget_width(private_data->tabs[i]);
-	x += xitk_get_widget_width(private_data->tabs[i]);
-	xitk_show_widget(private_data->parent_wlist, private_data->tabs[i]);
-      }
-      else 
-	break;
+    
+    if(private_data->offset != private_data->old_offset) {
       
-      i++;
+      for(i = 0; i < private_data->num_entries; i++)
+	xitk_hide_widget(private_data->parent_wlist, private_data->tabs[i]);
+      
+      i = private_data->offset;
+      width = 0;
+      x = private_data->x;
 
-    } while((i < private_data->num_entries) && (width < (private_data->width - 40)));
-
+      do {      
+	if((width + xitk_get_widget_width(private_data->tabs[i])) <= private_data->width - 40) {
+	  xitk_set_widget_pos(private_data->tabs[i], x, private_data->y);
+	  width += xitk_get_widget_width(private_data->tabs[i]);
+	  x += xitk_get_widget_width(private_data->tabs[i]);
+	  xitk_show_widget(private_data->parent_wlist, private_data->tabs[i]);
+	}
+	else 
+	  break;
+	
+	i++;
+	
+      } while((i < private_data->num_entries) && (width < (private_data->width - 40)));
+      private_data->gap_widthstart = width;
+    }
     /*
      * Fill gap
      */
@@ -100,46 +103,52 @@ static void tabs_arrange(xitk_widget_t *w) {
       xitk_image_t *p;
       GC            gc;
       XGCValues     gcv;
-
+      
       p = xitk_image_create_image(private_data->imlibdata, 
-				  ((private_data->width - 40) - width) * 3, private_data->bheight);
-
+				  ((private_data->width - 40) - private_data->gap_widthstart) * 3,
+				  private_data->bheight);
+      
       if(p) {
 	draw_tab(private_data->imlibdata, p);
-
+	
 	XLOCK(private_data->imlibdata->x.disp);
 	gcv.graphics_exposures = False;
 	gc = XCreateGC(private_data->imlibdata->x.disp, p->image, GCGraphicsExposures, &gcv);
 	XCopyArea(private_data->imlibdata->x.disp, p->image, private_data->parent_wlist->win, gc, 
-		  0, 0, p->width/3, p->height, private_data->x + width, private_data->y);
+		  0, 0, p->width/3, p->height, 
+		  private_data->x + private_data->gap_widthstart, private_data->y);
 	XFreeGC(private_data->imlibdata->x.disp, gc);
 	XUNLOCK(private_data->imlibdata->x.disp);
 	xitk_image_free_image(private_data->imlibdata, &p);
       }
     }
-    if(i < private_data->num_entries)
-      xitk_start_widget(private_data->right);
-    else
-      xitk_stop_widget(private_data->right);
-
-    if(private_data->offset == 0)
-      xitk_stop_widget(private_data->left);
-    else
-      xitk_start_widget(private_data->left);
+     
+    if(private_data->offset != private_data->old_offset) {
+      if(i < private_data->num_entries)
+	xitk_start_widget(private_data->right);
+      else
+	xitk_stop_widget(private_data->right);
       
-
-  }
-
+      if(private_data->offset == 0)
+	xitk_stop_widget(private_data->left);
+      else
+	xitk_start_widget(private_data->left);
+    }
+  } 
 }
 
 /*
  *
  */
 static void paint(xitk_widget_t *w, Window win, GC gc) {
+  tabs_private_data_t *private_data;
 
   if(w->widget_type & WIDGET_TYPE_TABS) {
+    private_data = (tabs_private_data_t*)w->private_data;
     if(w->visible) {
       tabs_arrange(w);
+      if(private_data->old_offset == -2)
+	private_data->old_offset = private_data->offset;
     }
   }
 }
@@ -158,7 +167,7 @@ static void tabs_select(xitk_widget_t *w, void *data, int select) {
 			       private_data->parent_wlist->win, private_data->parent_wlist->gc);
 
 
-    tabs_arrange(private_data->widget);
+    //    tabs_arrange(private_data->widget);
     if(private_data->callback)
       private_data->callback(private_data->widget, private_data->userdata, private_data->selected);
   }
@@ -177,6 +186,7 @@ static void tabs_select_prev(xitk_widget_t *w, void *data) {
   tabs_private_data_t *private_data = (tabs_private_data_t*)t->private_data;
 
   if(private_data->offset > 0) {
+    private_data->old_offset = private_data->offset;
     private_data->offset--;
     tabs_arrange(private_data->widget);
   }
@@ -190,6 +200,7 @@ static void tabs_select_next(xitk_widget_t *w, void *data) {
   tabs_private_data_t *private_data = (tabs_private_data_t*)t->private_data;
 
   if(private_data->offset < (private_data->num_entries - 1)) {
+    private_data->old_offset = private_data->offset;
     private_data->offset++;
     tabs_arrange(private_data->widget);
   }
@@ -344,7 +355,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
       b.userdata          = (void *)mywidget;
       xitk_list_append_content(t->parent_wlist->l,
        (private_data->left = xitk_noskin_button_create(&b, (private_data->x + width) - 40, 
-						       y + (private_data->bheight - 20), 20, 20)));
+						       (y-1) + (private_data->bheight - 20), 20, 20)));
       
       wimage = xitk_get_widget_foreground_skin(private_data->left);
       if(wimage)
@@ -356,7 +367,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
       b.userdata          = (void *)mywidget;
       xitk_list_append_content(t->parent_wlist->l,
        (private_data->right = xitk_noskin_button_create(&b, (private_data->x + width) - 20,
-							y + (private_data->bheight - 20), 20, 20)));
+							(y-1) + (private_data->bheight - 20), 20, 20)));
 
       wimage = xitk_get_widget_foreground_skin(private_data->right);
       if(wimage)
@@ -366,6 +377,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
 
     private_data->old_selected = private_data->selected = 0;
     private_data->offset = 0;
+    private_data->old_offset = -2;
     
     xitk_font_unload_font(fs);
   }  
