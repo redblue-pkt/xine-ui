@@ -383,11 +383,11 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 
 static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filename) {
   mediamark_t **mmk = NULL;
-  char         *extension;
 
   if(filename) {
     if(playlist_check_for_file(filename)) {
-      
+      char  *extension;
+  
       extension = strrchr(filename, '.');
       
       if((extension) && (!strcasecmp(extension, ".sfv"))) {
@@ -395,7 +395,18 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 	if((playlist->fd = fopen(filename, "r")) != NULL) {
 	  int valid_pls = 0;
 	  int entries_pls = 0;
+	  char  *path;
+	  char  *origin = NULL;
+	  int    origin_end = 0;
 	  
+	  path = strrchr(filename, '/');
+	  if(path && (path > filename)) {
+	    origin = (char *) xine_xmalloc((path > filename) + 2);
+	    strncat(origin, filename, (path - filename));
+	    strcat(origin, "/");
+	    origin_end = ((path - filename) + 1);
+	  }
+
 	  while(playlist_get_next_line(playlist)) {
 	    
 	    if(playlist->ln) {
@@ -405,8 +416,11 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 		if(strncmp(playlist->ln, ";", 1)) {
 		  char  entry[_PATH_MAX + _NAME_MAX + 1];
 		  int   crc;
-
-		  if((sscanf(playlist->ln, "%s %x", &entry[0], &crc)) == 2) {
+		  
+		  if(origin_end)
+		    sprintf(entry, "%s", origin);
+		  
+		  if((sscanf(playlist->ln, "%s %x", &entry[origin_end], &crc)) == 2) {
 		    
 		    entries_pls++;
 		    
@@ -414,8 +428,8 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 		      mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
 		    else
 		      mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_pls + 1));
-
-		    mediamark_store_mmk(&mmk[(entries_pls - 1)], entry, NULL, 0, -1);
+		      mediamark_store_mmk(&mmk[(entries_pls - 1)], entry, NULL, 0, -1);
+		    
 		    playlist->entries = entries_pls;
 
 		  }
@@ -448,14 +462,16 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 	  if(valid_pls && entries_pls) {
 	    mmk[entries_pls] = NULL;
 	    playlist->type = strdup("SFV");
-	    return mmk;
 	  }
+	  
+	  if(origin)
+	    free(origin);
 	}
       }
     }
   }
 
-  return NULL;
+  return mmk;
 }
 
 static mediamark_t **guess_raw_playlist(playlist_t *playlist, const char *filename) {
