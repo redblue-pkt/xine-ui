@@ -79,6 +79,7 @@ typedef struct {
 #ifdef HAVE_LIRC
   int                  lirc_enable;
 #endif
+
 } gGui_t;
 
 

@@ -51,6 +51,8 @@
 #include "xine.h"
 #include "utils.h"
 
+#include "xscreensaver-remote.h"
+
 #ifdef HAVE_LIRC
 extern int no_lirc;
 #endif
@@ -86,6 +88,25 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
+/* Screensavers parameters */
+typedef struct {
+
+  /* XFree86 one */
+  struct {
+    int           timeout;
+    int           interval;
+    int           prefer_blanking;
+    int           allow_exposures;
+  } screensaver;
+
+  /* Jamie's Zawinski xscreensaver */
+  struct {
+    int           was_running;
+  } xscreensaver;
+
+} screen_savers_t;
+
+static screen_savers_t    ssavers;
 
 /**
  * Configuration file lookup/set functions
@@ -561,6 +582,31 @@ void gui_init (int nfiles, char *filenames[]) {
 
   video_window_init ();
   panel_init ();
+
+  /*
+   * Store original screensaver parameters and sets new ones
+   */
+  XGetScreenSaver(gGui->display ,&ssavers.screensaver.timeout, 
+		  &ssavers.screensaver.interval,
+		  &ssavers.screensaver.prefer_blanking, 
+		  &ssavers.screensaver.allow_exposures);
+  
+  if((XSetScreenSaver(gGui->display, 0, 0, 
+		      DontPreferBlanking, DontAllowExposures)) == BadValue) {
+    fprintf(stderr, "XSetScreenSaver() failed: %s\n", strerror(errno));
+  }
+  
+  /*
+   * XScreenSaver specific.
+   */
+  xscreensaver_remote_init(gGui->display);
+  ssavers.xscreensaver.was_running = is_xscreensaver_running(gGui->display);
+
+  if(ssavers.xscreensaver.was_running == 1) {
+    if(xscreensaver_kill_server(gGui->display) < 0)
+      ssavers.xscreensaver.was_running = 0;
+  }
+  
 }
 
 /*
@@ -686,6 +732,22 @@ void gui_run (void) {
     
     gui_handle_event (&myevent) ;
   }
-
+  
  loop_end: /* Killed by signal */
+  
+  /*
+   * Restore screensaver parameters
+   */
+  if((XSetScreenSaver(gGui->display, ssavers.screensaver.timeout, 
+		      ssavers.screensaver.interval, 
+		      ssavers.screensaver.prefer_blanking, 
+		      ssavers.screensaver.allow_exposures)) == BadValue) {
+    fprintf(stderr, "XSetScreenSaver() failed: %s\n", strerror(errno));
+  }
+
+  /*
+   * Restart XScreenSaver.
+   */
+  if(ssavers.xscreensaver.was_running == 1)
+    xscreensaver_start_server();
 }

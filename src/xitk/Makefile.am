@@ -11,7 +11,7 @@ GETOPT_C = getopt.c getopt1.c
 GETOPT_H = getopt.h
 endif
 
-xine_SOURCES = $(GETOPT_C) utils.c monitor.c \
+xine_SOURCES = $(GETOPT_C) utils.c monitor.c xscreensaver-remote.c \
 	main.c event.c control.c playlist.c parseskin.c \
 	videowin.c panel.c lirc.c actions.c
 xine_DEPENDENTIES = utils.h monitor.h 
@@ -26,6 +26,10 @@ utils.c:
 
 monitor.c:
 	$(LN_S) $(top_srcdir)/src/common/monitor.c ./monitor.c
+
+xscreensaver-remote.c:
+	$(LN_S) $(top_srcdir)/src/common/xscreensaver-remote.c \
+	./xscreensaver-remote.c
 
 $(GETOPT_C):
 	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c
@@ -48,4 +52,4 @@ maintainer-clean-generic:
 	-@echo "This command is intended for maintainers to use;"
 	-@echo "it deletes files that may require special tools to rebuild."
 	-rm -f Makefile.in
-	-rm -f utils.c monitor.c
+	-rm -f utils.c monitor.c xscreensaver-remote.c
