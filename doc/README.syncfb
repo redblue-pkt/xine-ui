@@ -182,6 +182,7 @@
 
 * WHAT IS ON THE TODO LIST?
 
+  + YUY2 and RGB support (currently only YV12)
   + check if the video source is not too big in terms of  dimensions for
     the video memory left (video memory - X reserved video memory)
   + zooming support (currently only implemented with the Xv video out)
