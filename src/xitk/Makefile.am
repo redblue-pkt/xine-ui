@@ -67,7 +67,7 @@ xine_remote_SOURCES = xine-remote.c
 xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la \
 			   $(top_builddir)/src/common/libcommon.la \
 			   xine-remote.c
-xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) \
+xine_remote_LDADD = $(INTLLIBS) $(NET_LIBS) $(THREAD_LIBS) \
 	$(top_builddir)/readline/libreadline.la $(TERMCAP_LIB) \
 	$(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
 
