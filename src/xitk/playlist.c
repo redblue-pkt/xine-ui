@@ -754,7 +754,6 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	  int            cdda_mode = 0;
 	  xine_stream_t *stream = gGui->playlist.scan_stream;
 
-	  printf("button: %s\n", autoplay_plugins[i]);
 	  if(!strcasecmp(autoplay_plugins[i], "cd"))
 	    cdda_mode = 1;
 	  
