@@ -47,6 +47,9 @@ xine 는 GPL라이선스를 따르는 UNIX용 공개 동영상 플레이어입니다. 이
 %setup -n @TAR_NAME@
 
 %build
+cp ./configure ./configure.orig
+sed 's/xine_skin_dir=/xine_skin_dir=$RPM_BUILD_ROOT/' configure.orig > ./configure
+
 ./configure --prefix=%{prefix}
 make
 
@@ -67,8 +70,13 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 %{prefix}/bin/xine
 %{prefix}/share/idl/xine.idl
+@XINE_SKINDIR@/lcd/*
+@XINE_SKINDIR@/metal/*
+@XINE_SKINDIR@/pitt/*
 
 %changelog
+* Tue Jul 03 2001 Matthias Dahl <matthew2k@web.de>
+- fixed the "no-skins-in-final-RPM-package" problem (nice explanation *grin*)
 * Sun Jun 10 2001 Matthias Dahl <matthew2k@web.de>
 - updated filelist and the requirements field
 - removed /sbin/ldconfig as post install script
