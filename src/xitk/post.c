@@ -106,8 +106,8 @@ void post_init(void) {
 	gGui->visual_anim.post_plugin_num = 
 	  xine_config_register_enum(gGui->xine, "gui.post_audio_plugin", 
 				    0, post_audio_plugins,
-				    _("Post audio plugin"),
-				    _("Post audio plugin to used with video less stream playback"),
+				    _("Audio visualization plugin"),
+				    _("Post audio plugin to used when playing streams without video"),
 				    CONFIG_LEVEL_BEG,
 				    post_audio_plugin_cb, 
 				    CONFIG_NO_DATA);
