@@ -361,8 +361,10 @@ static void video_window_adapt_size (void) {
       gVw->depth           = gGui->depth;
       gVw->colormap        = gGui->colormap;
 
-      if(gGui->video_display != gGui->display)
+      if(gGui->video_display != gGui->display) {
         video_window_find_visual (&gVw->visual, &gVw->depth);
+        gVw->colormap = DefaultColormap(gGui->video_display, gGui->video_screen); 
+      }
       
       /* This couldn't happen, but we're paranoid ;-) */
       if((rootwindow = xitk_get_desktop_root_window(gGui->video_display, 
@@ -635,10 +637,10 @@ static void video_window_adapt_size (void) {
     gVw->visual   = gGui->visual;
     gVw->depth    = gGui->depth;
     gVw->colormap = gGui->colormap;
-      
-    if(gGui->video_display != gGui->display)
+    if(gGui->video_display != gGui->display) {
       video_window_find_visual (&gVw->visual, &gVw->depth);
-
+      gVw->colormap = DefaultColormap(gGui->video_display, gGui->video_screen);  
+    }
     /*
      * open fullscreen window
      */
@@ -728,9 +730,11 @@ static void video_window_adapt_size (void) {
     gVw->visual   = gGui->visual;
     gVw->depth    = gGui->depth;
     gVw->colormap = gGui->colormap;
-      
-    if(gGui->video_display != gGui->display)
+    
+    if(gGui->video_display != gGui->display) {
       video_window_find_visual (&gVw->visual, &gVw->depth);
+      gVw->colormap = DefaultColormap(gGui->video_display, gGui->video_screen); 
+    }
 
     /*
      * open fullscreen window
@@ -864,9 +868,10 @@ static void video_window_adapt_size (void) {
     gVw->depth             = gGui->depth;
     gVw->colormap          = gGui->colormap;
       
-    if(gGui->video_display != gGui->display)
+    if(gGui->video_display != gGui->display) {
       video_window_find_visual (&gVw->visual, &gVw->depth);
-
+      gVw->colormap = DefaultColormap(gGui->video_display, gGui->video_screen);
+    }
     attr.background_pixel  = gGui->black.pixel;
     attr.border_pixel      = gGui->black.pixel;
     attr.colormap	   = gVw->colormap;
@@ -1376,9 +1381,11 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->colormap		  = gGui->colormap;
   /* Currently, there no plugin loaded so far, but that might change */
   video_window_select_visual ();
-  
-  if(gGui->video_display != gGui->display)
+ 
+  if(gGui->video_display != gGui->display) {
     video_window_find_visual (&gVw->visual, &gVw->depth);
+    gVw->colormap = DefaultColormap(gGui->video_display, gGui->video_screen); 
+  }
   
   gVw->xwin               = window_attribute->x;
   gVw->ywin               = window_attribute->y;
