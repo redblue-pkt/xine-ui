@@ -1,4 +1,5 @@
 xine-ui (0.9.16) unstable; urgency=low
+  * some bug fixes: config dialog segfault, several race conditions
   * add a real file browser, used to load/save playlist, open a stream,
   * aspect ratio fix
   * add OSD support,

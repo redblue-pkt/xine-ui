@@ -17,7 +17,7 @@ dnl AC_PREREQ_LIBTOOL(1.4.0,,AC_MSG_ERROR(*** You should have libtool >= 1.4 ins
 
 XINE_MAJOR=0
 XINE_MINOR=9
-XINE_SUB=15
+XINE_SUB=16
 if test -f .cvsversion; then
   XINE_PRE="cvs"
 else
