@@ -84,6 +84,7 @@ static void _tips_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
     
+  case MotionNotify:
   case ButtonRelease:
   case ButtonPress:
     _tips_kill_running();
