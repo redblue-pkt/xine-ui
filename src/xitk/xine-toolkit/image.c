@@ -1596,11 +1596,16 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   i->image->pixmap = Imlib_copy_image(im, img);
   XUNLOCK(im->x.disp);
 
-  i->mask          = xitk_image_create_xitk_mask_pixmap(im, img->rgb_width, img->rgb_height);
-  XLOCK(im->x.disp);
-  i->mask->pixmap  = Imlib_copy_mask(im, img);
-  XUNLOCK(im->x.disp);
-
+  if(img->shape_mask) {
+    i->mask          = xitk_image_create_xitk_mask_pixmap(im, img->rgb_width, img->rgb_height);
+    XLOCK(im->x.disp);
+    i->mask->pixmap  = Imlib_copy_mask(im, img);
+    XUNLOCK(im->x.disp);
+  }
+  else {
+    i->mask = NULL;
+  }
+    
   i->width         = img->rgb_width;
   i->height        = img->rgb_height;
   

@@ -2154,12 +2154,22 @@ Pixmap xitk_window_get_background(xitk_window_t *w);
 /**
  *
  */
+Pixmap xitk_window_get_background_mask(xitk_window_t *w);
+
+/**
+ *
+ */
 void xitk_window_apply_background(ImlibData *im, xitk_window_t *w);
 
 /**
  *
  */
 int xitk_window_change_background(ImlibData *im, xitk_window_t *w, Pixmap bg, int width, int height);
+
+/**
+ *
+ */
+int xitk_window_change_background_with_image(ImlibData *im, xitk_window_t *w, xitk_image_t *img, int width, int height);
 
 /**
  *

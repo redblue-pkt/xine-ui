@@ -252,12 +252,13 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   if((im == NULL) || (width == 0 || height == 0))
     return NULL;
 
-  xwin             = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
-  xwin->win_parent = None;
-  xwin->background = NULL;
-  xwin->width      = width;
-  xwin->height     = height;
-  xwin->parent     = NULL;
+  xwin                  = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
+  xwin->win_parent      = None;
+  xwin->background      = NULL;
+  xwin->background_mask = NULL;
+  xwin->width           = width;
+  xwin->height          = height;
+  xwin->parent          = NULL;
   
   memset(&hint, 0, sizeof(hint));
   hint.x               = x;
@@ -517,6 +518,20 @@ Pixmap xitk_window_get_background(xitk_window_t *w) {
 }
 
 /*
+ * Return window background pixmap.
+ */
+Pixmap xitk_window_get_background_mask(xitk_window_t *w) {
+
+  if(w == NULL)
+    return None;
+
+  if(w->background_mask == NULL)
+    return None;
+  
+  return w->background->pixmap;
+}
+
+/*
  * Apply (draw) window background.
  */
 void xitk_window_apply_background(ImlibData *im, xitk_window_t *w) {
@@ -525,7 +540,14 @@ void xitk_window_apply_background(ImlibData *im, xitk_window_t *w) {
     return;
 
   XLOCK(im->x.disp);
+  
   XSetWindowBackgroundPixmap(im->x.disp, w->window, w->background->pixmap);
+  
+  if(w->background_mask)
+    XShapeCombineMask(im->x.disp, w->window, ShapeBounding, 0, 0, w->background_mask->pixmap, ShapeSet);
+  else
+    XShapeCombineMask(im->x.disp, w->window, ShapeBounding, 0, 0, 0, ShapeSet);
+
   XClearWindow(im->x.disp, w->window);
   XUNLOCK(im->x.disp);
 }
@@ -543,7 +565,11 @@ int xitk_window_change_background(ImlibData *im,
     return 0;
 
   xitk_image_destroy_xitk_pixmap(w->background);
-  w->background = xitk_image_create_xitk_pixmap(im, width, height);
+  if(w->background_mask)
+    xitk_image_destroy_xitk_pixmap(w->background_mask);
+  
+  w->background      = xitk_image_create_xitk_pixmap(im, width, height);
+  w->background_mask = NULL;
   
   XLOCK(im->x.disp);
   if(XGetGeometry(im->x.disp, w->window, &rootwin, 
@@ -553,12 +579,52 @@ int xitk_window_change_background(ImlibData *im,
   }
   else
     return 0;
-
+  
   XCopyArea(im->x.disp, bg, w->background->pixmap, w->background->gc, 0, 0, width, height, 0, 0);
   XUNLOCK(im->x.disp);
 
   xitk_window_apply_background(im, w);
 
+  return 1;
+}
+
+/*
+ * Change window background with img, then draw it.
+ */
+int xitk_window_change_background_with_image(ImlibData *im, xitk_window_t *w, xitk_image_t *img, int width, int height) {
+  Window        rootwin;
+  int           xwin, ywin;
+  unsigned int  wwin, hwin, bwin, dwin;
+
+  if((im == NULL) || (w == NULL) || (img == NULL) || (width == 0 || height == 0))
+    return 0;
+  
+  xitk_image_destroy_xitk_pixmap(w->background);
+  if(w->background_mask)
+    xitk_image_destroy_xitk_pixmap(w->background_mask);
+
+  w->background      = xitk_image_create_xitk_pixmap(im, width, height);
+  w->background_mask = NULL;
+  
+  if(img->mask)
+    w->background_mask = xitk_image_create_xitk_mask_pixmap(im, width, height);
+  
+  XLOCK(im->x.disp);
+  if(XGetGeometry(im->x.disp, w->window, &rootwin, 
+		  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+    
+    XResizeWindow (im->x.disp, w->window, wwin, hwin);
+  }
+  else
+    return 0;
+  
+  XCopyArea(im->x.disp, img->image->pixmap, w->background->pixmap, w->background->gc, 0, 0, width, height, 0, 0);
+  if(w->background_mask)
+    XCopyArea(im->x.disp, img->mask->pixmap, w->background_mask->pixmap, w->background_mask->gc, 0, 0, width, height, 0, 0);
+  
+  XUNLOCK(im->x.disp);
+  xitk_window_apply_background(im, w);
+  
   return 1;
 }
 

@@ -384,6 +384,7 @@ struct xitk_window_s {
   Window                    window;
   Window                    win_parent;
   xitk_pixmap_t            *background;
+  xitk_pixmap_t            *background_mask;
   int                       width;
   int                       height;
   xitk_dialog_t            *parent;
