@@ -793,7 +793,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
       int best_visual = -1;
 
       for (i = 0; i < num_visuals; i++) {
-	if (vinfo[i].depth > 8 && vinfo[i].depth <= 16)
+	if (vinfo[i].depth == 15 || vinfo[i].depth == 16)
 	  pref = 3;
 	else if (vinfo[i].depth > 16)
 	  pref = 2;
@@ -898,6 +898,11 @@ void gui_init (int nfiles, char *filenames[]) {
   if((gGui->display = XOpenDisplay(display_name)) == NULL) {
     fprintf(stderr, _("Cannot open display\n"));
     exit(1);
+  }
+
+  if (gGui->config->register_bool (gGui->config, "gui.xsynchronize", 0, "synchronized X protocol (debug)", NULL, NULL, NULL)) {
+    XSynchronize (gGui->display, True);
+    fprintf (stderr, "Warning! Synchronized X activated - this is way slow...\n");
   }
 
   gGui->layer_above = gGui->config->register_bool (gGui->config, "gui.layer_above", 

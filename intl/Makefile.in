@@ -53,7 +53,7 @@ YFLAGS = --name-prefix=__gettext
 DEFS = -DLOCALEDIR=\"$(localedir)\" -DLOCALE_ALIAS_PATH=\"$(aliaspath)\" \
 -DLIBDIR=\"$(libdir)\" @DEFS@
 CPPFLAGS = @CPPFLAGS@
-CFLAGS = @CFLAGS@ -static
+CFLAGS = @CFLAGS@
 DEBUG_CFLAGS = @DEBUG_CFLAGS@
 LDFLAGS = @LDFLAGS@
 
@@ -115,12 +115,11 @@ libintl.a libgnuintl.a: $(OBJECTS)
 	$(AR) cru $@ $(OBJECTS)
 	$(RANLIB) $@
 
+# No -rpath, this is only a convenience library
 libintl.la libgnuintl.la: $(OBJECTS)
 	$(LIBTOOL) --mode=link \
 	  $(CC) $(CPPFLAGS) $(CFLAGS) $(XCFLAGS) $(LDFLAGS) -o $@ \
 	  $(OBJECTS) @LIBICONV@ \
-	  -version-info $(LTV_CURRENT):$(LTV_REVISION):$(LTV_AGE) \
-	  -rpath $(libdir) \
 	  -no-undefined
 
 libintl.h: libgnuintl.h
