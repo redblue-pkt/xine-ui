@@ -35,7 +35,6 @@ typedef struct {
   int                     char_length; /* length of 1 char */
   int                     char_height; /* height of 1 char */
 
-  //  Pixmap                  labelpix;
   xitk_pixmap_t          *labelpix;
 
   int                     length;      /* length in char */
@@ -52,10 +51,9 @@ typedef struct {
   int                     anim_running;
   int                     anim_offset;
 
-  int                     on_change;
-
   pthread_t               thread;
   pthread_mutex_t         paint_mutex;
+  pthread_mutex_t         change_mutex;
 
 } label_private_data_t;
 

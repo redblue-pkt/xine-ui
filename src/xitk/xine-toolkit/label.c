@@ -112,8 +112,9 @@ static void notify_destroy(xitk_widget_t *w) {
   
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     label_private_data_t *private_data = (label_private_data_t *) w->private_data;
-    
-    private_data->on_change = 1;
+
+    pthread_mutex_lock(&private_data->paint_mutex);
+    pthread_mutex_lock(&private_data->change_mutex);
     
     if(private_data->anim_running) {
       void *dummy;
@@ -132,6 +133,7 @@ static void notify_destroy(xitk_widget_t *w) {
     XITK_FREE(private_data->skin_element_name);
 
     pthread_mutex_destroy(&private_data->paint_mutex);
+    pthread_mutex_destroy(&private_data->change_mutex);
 
     XITK_FREE(private_data);
   }
@@ -174,7 +176,7 @@ static void paint_label(xitk_widget_t *w) {
   if (w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL) && (w->visible == 1))) {
     label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
     xitk_image_t          *font = (xitk_image_t *) private_data->font;
-
+    
     pthread_mutex_lock(&private_data->paint_mutex);
     
     /* non skinable widget */
@@ -226,11 +228,14 @@ static void paint_label(xitk_widget_t *w) {
 		w->x, w->y);
       
       /* We can't wait here, otherwise the rolling effect is really jerky */
-      if(private_data->animation && (private_data->on_change == 0))
-	XSync(private_data->imlibdata->x.disp, False);
-      
+      if(private_data->animation) {
+	if(!pthread_mutex_trylock(&private_data->change_mutex)) {
+	  XSync(private_data->imlibdata->x.disp, False);
+	  pthread_mutex_unlock(&private_data->change_mutex);
+	}
+      }
       XUNLOCK(private_data->imlibdata->x.disp);
-
+      
     }
     
     pthread_mutex_unlock(&private_data->paint_mutex);
@@ -262,8 +267,10 @@ static void *xitk_label_animation_loop(void *data) {
        * Label will change sooner, don't try to paint it till the change,
        * otherwise a deadlock will happened.
        */
-      if(private_data->on_change == 0)
+      if(!pthread_mutex_trylock(&private_data->change_mutex)) {
 	paint_label(private_data->lWidget);
+	pthread_mutex_unlock(&private_data->change_mutex);
+      }
 
     }
     xitk_usec_sleep(t_anim);
@@ -282,7 +289,7 @@ static void label_setup_label(xitk_widget_t *w, char *label_) {
   
   /* Inform animation thread to not paint the label */
   pthread_mutex_lock(&private_data->paint_mutex);
-  private_data->on_change = 1;
+  pthread_mutex_lock(&private_data->change_mutex);
   
   if(private_data->anim_running) {
     void *dummy;
@@ -332,7 +339,7 @@ static void label_setup_label(xitk_widget_t *w, char *label_) {
     }
   }
 
-  private_data->on_change = 0;
+  pthread_mutex_unlock(&private_data->change_mutex);
   pthread_mutex_unlock(&private_data->paint_mutex);
 }
 
@@ -371,11 +378,13 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 	label_setup_label(w, label);
       }
       
-      if(private_data->on_change == 0)
+      if(!pthread_mutex_trylock(&private_data->change_mutex)) {
 	paint_label(w);
-
+	pthread_mutex_unlock(&private_data->change_mutex);
+      }
+      
       xitk_skin_unlock(skonfig);
-
+      
       xitk_set_widget_pos(w, w->x, w->y);
     }
   }
@@ -392,11 +401,10 @@ int xitk_label_change_label(xitk_widget_t *w, char *newlabel) {
     if(!newlabel || !private_data->label ||
        (newlabel && (strcmp(private_data->label, newlabel)))) {
 
-      /* Don't change label if another thread is currently doing the same thing */
-      if(!private_data->on_change) {
-	label_setup_label(w, newlabel);
-	paint_label(w);
-      }
+      pthread_mutex_lock(&private_data->change_mutex);
+      pthread_mutex_unlock(&private_data->change_mutex);
+      label_setup_label(w, newlabel);
+      paint_label(w);
     }
     return 1;
   }
@@ -434,9 +442,11 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
       if(w && (((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL))) {
 	label_private_data_t  *private_data = (label_private_data_t *) w->private_data;
 
-	if(private_data->on_change == 0)
+	if(!pthread_mutex_trylock(&private_data->change_mutex)) {
 	  paint_label(w);
-
+	  pthread_mutex_unlock(&private_data->change_mutex);
+	}
+	
       }
     }
     break;
@@ -512,6 +522,7 @@ static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
   private_data->labelpix       = NULL;
 
   pthread_mutex_init(&private_data->paint_mutex, NULL);
+  pthread_mutex_init(&private_data->change_mutex, NULL);
 
   mywidget->private_data       = private_data;
 
