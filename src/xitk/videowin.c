@@ -54,6 +54,7 @@ typedef struct {
   XVisualInfo    vinfo;
   Cursor         cursor[2];       /* Cursor pointers                       */
   int            cursor_visible;
+  Colormap	 colormap;	  /* Colormap for video window		   */
   XClassHint    *xclasshint;
   GC             gc;
   int            video_width;     /* size of currently displayed video     */
@@ -143,8 +144,19 @@ void video_window_hide_logo(void) {
 
   if(video_window_is_visible()) {
     XLockDisplay (gGui->display);
+#if 0
     XUnmapWindow (gGui->display, gGui->video_window);
     XMapWindow (gGui->display, gGui->video_window);
+#else
+    /*
+     * The Unmap/Map trick(?) has the undesirable side-effect, that
+     * all of the video_windows's transient windows are unmapped, too
+     * - messing up their "visible" state.
+     *
+     * Remove the logo by clearing the window.
+     */
+    XClearWindow (gGui->display, gGui->video_window);
+#endif
     XUnlockDisplay (gGui->display);
   }
   /*
@@ -260,20 +272,14 @@ void video_window_adapt_size (int video_width, int video_height,
     attr.background_pixel  = gGui->black.pixel;
     /*
      * XXX:multivis
-     * To avoid BadMatch errors on XCreateWindow:
-     * If the parent and the new window have different depths, we must supply either
-     * a BorderPixmap or a BorderPixel.
-     * If the parent and the new window use different visuals, we must supply a
-     * Colormap
+     * To avoid BadMatch errors on XCreateWindow: 
+     * If the parent and the new window have different depths, we must
+     * supply either a BorderPixmap or a BorderPixel.
+     * If the parent and the new window use different visuals, we must
+     * supply a Colormap
      */
-    attr.border_pixel      = 1;
-    if (gVw->vinfo.visual != DefaultVisual(gGui->display, gGui->screen)) {
-      attr.colormap	   = XCreateColormap(gGui->display,
-					     RootWindow(gGui->display, gGui->screen), 
-					     gVw->vinfo.visual, AllocNone);
-    } else {
-      attr.colormap        = DefaultColormap (gGui->display, gGui->screen);
-    }
+    attr.border_pixel      = gGui->black.pixel;
+    attr.colormap	   = gVw->colormap;
 
     gGui->video_window = 
       XCreateWindow (gGui->display, 
@@ -312,6 +318,12 @@ void video_window_adapt_size (int video_width, int video_height,
     *dest_width  = gVw->video_width;
     *dest_height = gVw->video_height;
 
+    hint.x = 0;
+    hint.y = 0;
+    hint.width  = gVw->video_width;
+    hint.height = gVw->video_height;
+    hint.flags  = PPosition | PSize;
+
     if (gGui->video_window) {
 
       if (gVw->fullscreen_mode) {
@@ -323,6 +335,9 @@ void video_window_adapt_size (int video_width, int video_height,
 	XResizeWindow (gGui->display, gGui->video_window, 
 		       gVw->video_width, gVw->video_height);
 
+	/* Update window size hints with the new size */
+	XSetNormalHints(gGui->display, gGui->video_window, &hint);
+
 	XUnlockDisplay (gGui->display);
 	
 	return;
@@ -332,29 +347,17 @@ void video_window_adapt_size (int video_width, int video_height,
 
     gVw->fullscreen_mode = 0;
 
-    hint.x = 0;
-    hint.y = 0;
-    hint.width  = gVw->video_width;
-    hint.height = gVw->video_height;
-    hint.flags  = PPosition | PSize;
-
     attr.background_pixel  = gGui->black.pixel;
     /*
      * XXX:multivis
-     * To avoid BadMatch errors on XCreateWindow:
-     * If the parent and the new window have different depths, we must supply either
-     * a BorderPixmap or a BorderPixel.
-     * If the parent and the new window use different visuals, we must supply a
-     * Colormap
+     * To avoid BadMatch errors on XCreateWindow: 
+     * If the parent and the new window have different depths, we must
+     * supply either a BorderPixmap or a BorderPixel.
+     * If the parent and the new window use different visuals, we must
+     * supply a Colormap
      */
-    attr.border_pixel      = 1;
-    if (gVw->vinfo.visual != DefaultVisual(gGui->display, gGui->screen)) {
-      attr.colormap        = XCreateColormap(gGui->display,
-					     RootWindow(gGui->display, gGui->screen), 
-					     gVw->vinfo.visual, AllocNone);
-    } else {
-      attr.colormap        = DefaultColormap (gGui->display, gGui->screen);
-    }
+    attr.border_pixel      = gGui->black.pixel;
+    attr.colormap	   = gVw->colormap;
 
     gGui->video_window = 
       XCreateWindow(gGui->display, RootWindow(gGui->display, gGui->screen),
@@ -408,6 +411,7 @@ void video_window_adapt_size (int video_width, int video_height,
 
   XFlush(gGui->display);
   
+  if (gVw->gc != None) XFreeGC(gGui->display, gVw->gc);
   gVw->gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
 
   if (gVw->fullscreen_mode) {
@@ -416,10 +420,17 @@ void video_window_adapt_size (int video_width, int video_height,
     XMoveWindow (gGui->display, gGui->video_window, 0, 0);
   }
 
+  /* Update WM_TRANSIENT_FOR hints on other windows for the new video_window */
+  if (gGui->panel_window != None) {
+    XSetTransientForHint(gGui->display, gGui->panel_window,
+			 gGui->video_window);
+  }
+  /* FIXME: update TransientForHint on control panel and mrl browser... */
 
   /* The old window should be destroyed now */
-  if(old_video_window != None)
+  if(old_video_window != None) {
     XDestroyWindow(gGui->display, old_video_window);
+  }
 
   gVw->old_widget_key = gVw->widget_key;
   gVw->widget_key = widget_register_event_handler("video_window", 
@@ -502,6 +513,7 @@ void video_window_init (void) {
   gGui->video_window                    = None;
   gVw->show                             = 1;
   gVw->widget_key = gVw->old_widget_key = 0;
+  gVw->gc				= None;
 
   XLockDisplay (gGui->display);
 
@@ -529,6 +541,19 @@ void video_window_init (void) {
     gVw->vinfo.visual = DefaultVisual (gGui->display, gGui->screen); 
   }
   
+  /*
+   * XXX:multivis
+   * To avoid BadMatch errors on XCreateWindow:
+   * If the parent and the new window use different visuals, we must supply a
+   * Colormap
+   */
+  if (gVw->vinfo.visual != DefaultVisual(gGui->display, gGui->screen)) {
+    gVw->colormap = XCreateColormap(gGui->display,
+				    RootWindow(gGui->display, gGui->screen), 
+				    gVw->vinfo.visual, AllocNone);
+  } else {
+    gVw->colormap = DefaultColormap (gGui->display, gGui->screen);
+  }
   
 #ifdef HAVE_XINERAMA
   /* Spark

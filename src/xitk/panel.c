@@ -331,7 +331,7 @@ void panel_init (void) {
    * If the parent and the new window use different visuals, we must supply a
    * Colormap
    */
-  attr.border_pixel      = 1;
+  attr.border_pixel      = gGui->black.pixel;
   if (gGui->imlib_data->x.visual != DefaultVisual(gGui->display, gGui->screen)) {
     attr.colormap        = XCreateColormap(gGui->display,
 					   RootWindow(gGui->display, gGui->screen), 
