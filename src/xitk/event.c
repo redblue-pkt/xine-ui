@@ -125,7 +125,7 @@ static void always_layer_above_cb(void *data, xine_cfg_entry_t *cfg) {
   if(gGui->always_layer_above && (!gGui->layer_above)) {
     /*
      * This is really ugly, but xine config functions are mutex locked,
-     * so we can access to config stuff within config callback function.
+     * so we can't access to config stuff within config callback function.
      */
     pthread_create(&th, NULL, layer_above_change_thread, NULL);
   }
