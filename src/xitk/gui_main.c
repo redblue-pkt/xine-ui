@@ -41,6 +41,7 @@
 #include "gui_parseskin.h"
 #include "gui_image.h"
 #include "gui_playlist.h"
+#include "gui_control.h"
 #include "gui_lirc.h"
 #include "gui_videowin.h"
 #include "gui_panel.h"
@@ -117,6 +118,7 @@ void gui_handle_event (XEvent *event) {
 
   panel_handle_event(event);
   playlist_handle_event(event);
+  control_handle_event(event);
 
   switch(event->type) {
 
@@ -186,7 +188,7 @@ void gui_handle_event (XEvent *event) {
 
     case XK_c:
     case XK_C:
-      /* FIXME      gui_control_show(NULL, NULL, 0);*/
+      gui_control_show(NULL, NULL, 0);
       break;
 
     case XK_h:

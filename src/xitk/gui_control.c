@@ -53,7 +53,7 @@ extern gGui_t        *gGui;
 static widget_t       *w_hue = NULL, *w_sat = NULL, *w_bright = NULL;
 static widget_t       *w_cont = NULL;
 static Window          ctl_win;
-static DND_struct_t   *xdnd_ctl_win;
+static DND_struct_t    xdnd_ctl_win;
 static ImlibImage     *ctl_bg_image;
 static gui_move_t      ctl_move; 
 static widget_list_t  *ctl_widget_list;
@@ -63,10 +63,10 @@ static int             ctl_panel_visible;
 
 
 static int get_current_prop(int prop) {
-  return (xine_get_window_property(gGui->xine, prop));
+  return (gGui->vo_driver->get_property(gGui->xine, prop));
 }
 static int set_current_prop(int prop, int value) {
-  return (xine_set_window_property(gGui->xine, prop, value));
+  return (gGui->vo_driver->set_property(gGui->xine, prop, value));
 }
 
 /*
@@ -156,8 +156,8 @@ void control_exit(widget_t *w, void *data) {
 
   XDestroyWindow(gGui->display, ctl_win);
 
-  if(xdnd_ctl_win)
-    free(xdnd_ctl_win);
+  //  if(xdnd_ctl_win)
+  //    free(xdnd_ctl_win);
 
   ctl_win = 0;
 }
@@ -289,7 +289,7 @@ void control_handle_event(XEvent *event) {
       
     case ClientMessage:
       if(event->xany.window == ctl_win)
-	gui_dnd_process_client_message (xdnd_ctl_win, event);
+	gui_dnd_process_client_message (&xdnd_ctl_win, event);
       break;
       
     }
@@ -388,11 +388,11 @@ void control_panel(void) {
 
   /*  XUNLOCK (); FIXME  */
   
-  if((xdnd_ctl_win = (DND_struct_t *) xmalloc(sizeof(DND_struct_t))) != NULL) {
-    gui_init_dnd(gGui->display, xdnd_ctl_win);
-    gui_dnd_set_callback (xdnd_ctl_win, gui_dndcallback);
-    gui_make_window_dnd_aware (xdnd_ctl_win, ctl_win);
-  }
+  //  if((xdnd_ctl_win = (DND_struct_t *) xmalloc(sizeof(DND_struct_t))) != NULL) {
+  gui_init_dnd(gGui->display, &xdnd_ctl_win);
+  gui_dnd_set_callback (&xdnd_ctl_win, gui_dndcallback);
+  gui_make_window_dnd_aware (&xdnd_ctl_win, ctl_win);
+    //  }
 
   /*
    * Widget-list
@@ -410,8 +410,9 @@ void control_panel(void) {
     int min, max, cur;
 
     /* HUE */
-    xine_get_window_property_min_max(gGui->xine, VO_PROP_HUE, &min, &max);
+    gGui->vo_driver->get_property_min_max(gGui->xine, VO_PROP_HUE, &min, &max);
     cur = get_current_prop(VO_PROP_HUE);
+    printf("Hue: min=%d, max=%d\n", min, max);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_hue = create_slider(gGui->display, gGui->imlib_data, 
 				     VSLIDER,
@@ -433,9 +434,10 @@ void control_panel(void) {
     widget_disable(w_hue);
 
     /* SATURATION */
-    xine_get_window_property_min_max(gGui->xine, 
-				     VO_PROP_SATURATION, &min, &max);
+    gGui->vo_driver->get_property_min_max(gGui->xine, 
+					  VO_PROP_SATURATION, &min, &max);
     cur = get_current_prop(VO_PROP_SATURATION);
+    printf("Saturation: min=%d, max=%d\n", min, max);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_sat = create_slider(gGui->display, gGui->imlib_data, 
 				     VSLIDER,
@@ -457,20 +459,21 @@ void control_panel(void) {
     widget_disable(w_sat);
       
     /* BRIGHTNESS */
-    xine_get_window_property_min_max(gGui->xine, 
-				     VO_PROP_BRIGHTNESS, &min, &max);
+    gGui->vo_driver->get_property_min_max(gGui->xine, 
+					  VO_PROP_BRIGHTNESS, &min, &max);
+    printf("Brigthness: min=%d, max=%d\n", min, max);
     cur = get_current_prop(VO_PROP_BRIGHTNESS);
     gui_list_append_content(ctl_widget_list->l,
-	      (w_bright = create_slider(gGui->display, gGui->imlib_data, 
-					VSLIDER,
-					gui_get_skinX("CtlBrightBG"), 
-					gui_get_skinY("CtlBrightBG"), 
-					min, max,
-					1, 
-					gui_get_skinfile("CtlBrightBG"),
-					gui_get_skinfile("CtlBrightFG"),
-					set_brightness, NULL,
-					set_brightness, NULL)));
+	    (w_bright = create_slider(gGui->display, gGui->imlib_data, 
+				      VSLIDER,
+				      gui_get_skinX("CtlBrightBG"), 
+				      gui_get_skinY("CtlBrightBG"), 
+				      min, max,
+				      1, 
+				      gui_get_skinfile("CtlBrightBG"),
+				      gui_get_skinfile("CtlBrightFG"),
+				      set_brightness, NULL,
+				      set_brightness, NULL)));
     slider_set_pos(ctl_widget_list, w_bright, cur);
     gui_list_append_content(ctl_widget_list->l,
 	      (w = create_label(gGui->display, gGui->imlib_data, 
@@ -481,9 +484,10 @@ void control_panel(void) {
     widget_disable(w_bright);
       
     /* CONTRAST */
-    xine_get_window_property_min_max(gGui->xine, 
-				     VO_PROP_CONTRAST, &min, &max);
+    gGui->vo_driver->get_property_min_max(gGui->xine, 
+					  VO_PROP_CONTRAST, &min, &max);
     cur = get_current_prop(VO_PROP_CONTRAST);
+    printf("Contrast: min=%d, max=%d\n", min, max);
     gui_list_append_content(ctl_widget_list->l,
 	      (w_cont = create_slider(gGui->display, gGui->imlib_data, 
 				      VSLIDER,
@@ -507,7 +511,7 @@ void control_panel(void) {
     /*
      * Enable only supported settings.
      */
-    if((vidcap = xine_get_window_capabilities(gGui->xine)) > 0) {
+    if((vidcap = gGui->vo_driver->get_capabilities(gGui->xine)) > 0) {
 
       if(vidcap & VO_CAP_BRIGHTNESS)
 	widget_enable(w_bright);

@@ -34,6 +34,7 @@
 #include "gui_checkbox.h"
 #include "gui_label.h"
 #include "gui_slider.h"
+#include "gui_control.h"
 #include "gui_playlist.h"
 #include "gui_videowin.h"
 #include "gui_parseskin.h"
@@ -68,10 +69,9 @@ void panel_toggle_visibility (widget_t *w, void *data) {
 
   pl_toggle_visibility(NULL, NULL);
 
-  /* FIXME
-  if(!gui_panel_visible && control_is_visible()) {}
+  if(!panel_visible && control_is_visible()) {}
   else control_toggle_panel_visibility(NULL, NULL);
-  */
+
   if (panel_visible) {
     
     if (video_window_is_visible ()) {
@@ -592,7 +592,6 @@ void panel_init (void) {
 						gui_get_fcolor("PlBtn"),
 						gui_get_ccolor("PlBtn")));
 
-  /* FIXME
   gui_list_append_content (panel_widget_list->l, 
 			   create_label_button (gGui->display, 
 						gGui->imlib_data, 
@@ -606,7 +605,6 @@ void panel_init (void) {
 						gui_get_ncolor("CtlBtn"),
 						gui_get_fcolor("CtlBtn"),
 						gui_get_ccolor("CtlBtn")));
-  */
 
   /*
    * moving the window

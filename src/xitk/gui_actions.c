@@ -35,6 +35,7 @@
 #include "gui_slider.h"
 #include "gui_checkbox.h"
 #include "gui_main.h"
+#include "gui_control.h"
 #include "gui_actions.h"
 #include "gui_lirc.h"
 #include "gui_panel.h"
@@ -145,7 +146,7 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
   
   if (panel_is_visible())  {
     pl_raise_window();
-    /*FIXME    control_raise_window();*/
+    control_raise_window();
     XRaiseWindow (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
@@ -289,7 +290,6 @@ void gui_notify_demux_branched () {
 }
 */
 
-/* FIXME
 void gui_control_show(widget_t *w, void *data, int st) {
 
   if(control_is_running() && !control_is_visible())
@@ -299,7 +299,3 @@ void gui_control_show(widget_t *w, void *data, int st) {
   else
     control_exit(NULL, NULL);
 }
-*/
-
-
-
