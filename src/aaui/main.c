@@ -21,6 +21,10 @@
  *
  * xine main for aalib
  *
+ * Changes: 
+ * - first working version (guenter)
+ * - autoquit patch from Jens Viebig (siggi)
+ *
  */
 
 #ifndef __sun
@@ -62,6 +66,8 @@ typedef struct {
   char             *mrl[1024];
   int               num_mrls;
   int               current_mrl;
+  int               running;
+  int               auto_quit;
 #ifdef DEBUG
   int               debug_level;
 #endif
@@ -71,12 +77,14 @@ static aaxine_t aaxine;
 
 /* options args */
 static const char *short_options = "?ha:"
+"q"
 #ifdef DEBUG
  "d:"
 #endif
  "A:R::";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
+  {"auto-quit"      , no_argument      , 0, 'q' },
   {"audio-channel"  , required_argument, 0, 'a' },
 #ifdef DEBUG
   {"debug"          , required_argument, 0, 'd' },
@@ -112,6 +120,7 @@ static void print_usage (void) {
 	 "%s", aa_help);
   printf("\n");
   printf("AAXINE options:\n");
+  printf("  -q, --auto-quit              Quit after playing all mrl's.\n");
   printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
   printf("                               ");
   driver_ids = xine_list_audio_output_plugins ();
@@ -156,9 +165,12 @@ static void gui_status_callback (int nStatus) {
    
     if (aaxine.current_mrl < aaxine.num_mrls)
       xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0, 0 );
-    else
+    else {
+      if (aaxine.auto_quit == 1) {
+        aaxine.running = 0;
+      }
       aaxine.current_mrl--;
-
+    }
   }
 
 }
@@ -311,7 +323,6 @@ void extract_mrls(int num_mrls, char **mrls) {
 int main(int argc, char *argv[]) {
   int            c = '?';
   int            option_index    = 0;
-  int            running;
   int            key;
   char          *configfile;
   int            demux_strategy  = DEMUX_DEFAULT_STRATEGY;
@@ -335,6 +346,7 @@ int main(int argc, char *argv[]) {
 #endif
   aaxine.num_mrls = 0;
   aaxine.current_mrl = 0;
+  aaxine.auto_quit = 0; /* default: loop forever */
 
   /* 
    * AALib help and option-parsing
@@ -359,6 +371,10 @@ int main(int argc, char *argv[]) {
   while((c = getopt_long(argc, argv, short_options, 
 			 long_options, &option_index)) != EOF) {
     switch(c) {
+
+    case 'q': /* Automatic quit option */
+      aaxine.auto_quit = 1;
+      break;
 
     case 'a': /* Select audio channel */
       sscanf(optarg, "%i", &audio_channel);
@@ -503,11 +519,13 @@ int main(int argc, char *argv[]) {
 
   xine_play (aaxine.xine, aaxine.mrl[aaxine.current_mrl], 0, 0);
 
-  running = 1;
+  aaxine.running = 1;
 
-  while (running) {
-
-    while((key = aa_getevent(aaxine.context, 0)) == AA_NONE);
+  while (aaxine.running) {
+    
+    key = AA_NONE;
+    while( ((key = aa_getevent(aaxine.context, 0)) == AA_NONE)
+	   && aaxine.running );
     
     if((key >= AA_UNKNOWN && key < AA_UNKNOWN) || (key >= AA_RELEASE)) 
       continue;
@@ -554,7 +572,7 @@ int main(int argc, char *argv[]) {
     case 'q':
     case 'Q':
       xine_exit (aaxine.xine);
-      running = 0;
+      aaxine.running = 0;
       break;
       
     case 13:
