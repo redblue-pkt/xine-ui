@@ -236,9 +236,10 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   /* Compute log entries */
   if(viewlog->log) {
 
-    while(viewlog->log[i] == NULL) {
+    while(viewlog->log[i] != NULL) {
       printf("log %d: '%s'\n", i, viewlog->log[i]);
       viewlog->log_entries++;
+      i++;
     } 
 
   }
