@@ -286,9 +286,17 @@ static void mrl_add_and_play(xitk_widget_t *w, void *data, mrl_t *mrl) {
     }
 
     gui_set_current_mrl(mrl->mrl);
-    if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
-      gui_handle_xine_error();
+    
+    if(!is_playback_widgets_enabled())
+      enable_playback_controls(1);
+    
+    if(!xine_play (gGui->xine, gGui->filename, 0, 0 )) {
 
+      if((is_playback_widgets_enabled()) && (!gGui->playlist_num))
+	enable_playback_controls(0);
+      
+      gui_handle_xine_error();
+    }
   }
 }
 

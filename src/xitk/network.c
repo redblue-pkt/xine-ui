@@ -1882,12 +1882,16 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	if((is_arg_contain(client_info, 2, "all")) || 
 	   (is_arg_contain(client_info, 2, "*"))) {
 
-	  for(i = 0; i < gGui->playlist_num; i++) {
+	  for(i = 0; i < gGui->playlist_num; i++)
 	    gGui->playlist[i] = NULL;
-	  }
 	  
 	  gGui->playlist_num = 0;
 	  gGui->playlist_cur = 0;
+
+	  if(xine_get_status(gGui->xine) != XINE_STOP)
+	    gui_stop(NULL, NULL);
+
+	  enable_playback_controls(0);
 	}
 	else {
 	  int j;
@@ -1895,9 +1899,13 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	  j = atoi(get_arg(client_info, 2));
 	  
 	  if(j >= 0) {
-	    for(i = j; i < gGui->playlist_num; i++) {
+
+	    if((gGui->playlist_cur == j) && ((xine_get_status(gGui->xine) != XINE_STOP)))
+	      gui_stop(NULL, NULL);
+
+	    for(i = j; i < gGui->playlist_num; i++)
 	      gGui->playlist[i] = gGui->playlist[i+1];
-	    }
+
 	    gGui->playlist_num--;
 	    if(gGui->playlist_cur) gGui->playlist_cur--;
 	  }
@@ -1905,8 +1913,16 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info) {
 	
 	if(gGui->playlist_num)
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	else
+	else {
+
+	  if(is_playback_widgets_enabled() && (!gGui->playlist_num))
+	    enable_playback_controls(0);
+	  
+	  if(xine_get_status(gGui->xine) != XINE_STOP)
+	    gui_stop(NULL, NULL);
+	  
 	  gui_set_current_mrl(NULL);
+	}
       }
       
     }

@@ -196,13 +196,17 @@ static void pl_on_dbl_click(xitk_widget_t *w, void *data, int selected) {
  */
 static void pl_delete(xitk_widget_t *w, void *data) {
   int i, j;
-
+  
   j = xitk_browser_get_current_selected(playlist->playlist);
   
   if(j >= 0) {
-    for(i = j; i < gGui->playlist_num; i++) {
+
+    if((gGui->playlist_cur == j) && ((xine_get_status(gGui->xine) != XINE_STOP)))
+      gui_stop(NULL, NULL);
+
+    for(i = j; i < gGui->playlist_num; i++)
       gGui->playlist[i] = gGui->playlist[i+1];
-    }
+
     gGui->playlist_num--;
     if(gGui->playlist_cur) gGui->playlist_cur--;
   }
@@ -211,8 +215,16 @@ static void pl_delete(xitk_widget_t *w, void *data) {
   
   if(gGui->playlist_num)
     gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-  else
+  else {
+    
+    if(is_playback_widgets_enabled() && (!gGui->playlist_num))
+      enable_playback_controls(0);
+    
+    if(xine_get_status(gGui->xine) != XINE_STOP)
+      gui_stop(NULL, NULL);
+
     gui_set_current_mrl(NULL);
+  }
 
 }
 
@@ -221,18 +233,21 @@ static void pl_delete(xitk_widget_t *w, void *data) {
  */
 static void pl_delete_all(xitk_widget_t *w, void *data) {
   int i;
-
-  for(i = 0; i < gGui->playlist_num; i++) {
+  
+  for(i = 0; i < gGui->playlist_num; i++)
     gGui->playlist[i] = NULL;
-  }
 
   gGui->playlist_num = 0;
   gGui->playlist_cur = 0;
 
+  if(xine_get_status(gGui->xine) != XINE_STOP)
+    gui_stop(NULL, NULL);
+
   xitk_browser_update_list(playlist->playlist, 
 			   gGui->playlist, gGui->playlist_num, 0);
-  gui_set_current_mrl(NULL);
 
+  gui_set_current_mrl(NULL);
+  enable_playback_controls(0);
 }
 
 /*

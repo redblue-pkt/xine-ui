@@ -574,6 +574,10 @@ void gui_status_callback (int nStatus) {
       gGui->playlist_cur--;
     }
   }
+
+  if(is_playback_widgets_enabled() && (!gGui->playlist_num))
+    enable_playback_controls(0);
+
 }
 
 char *gui_next_mrl_callback (void) {
@@ -768,9 +772,9 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    * create and map panel and video window
    */
   xine_pid = getppid();
-
+  
   xitk_init(gGui->display);
-
+  
   init_skins_support();
 
   gGui->kbindings = kbindings_init_kbinding();
@@ -782,6 +786,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				       ACTID_TOGGLE_WINOUT_VISIBLITY)) ? 1 : 0));
 
   panel_init ();
+  enable_playback_controls((gGui->playlist_num > 0));
+
 }
 
 void gui_init_imlib (Visual *vis) {
@@ -837,7 +843,7 @@ void gui_init_imlib (Visual *vis) {
  */
 void gui_run (void) {
   int i;
-
+  
   video_window_change_skins();
   panel_add_autoplay_buttons();
   panel_add_mixer_control();
@@ -863,9 +869,9 @@ void gui_run (void) {
 	  int j;
 	  
 	  if(autoplay_mrls) {
-	    for (j=0; j<num_mrls; j++) {
+	    for (j = 0; j < num_mrls; j++)
 	      gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
-	    }
+	   
 	    gGui->playlist_num += j;
 	    gGui->playlist_cur = 0;
 	    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);

@@ -34,19 +34,28 @@ typedef struct {
   
   xitk_widget_t        *title_label;
   xitk_widget_t        *runtime_label;
-  xitk_widget_t        *slider_play;
 
+  struct {
+    int                enabled;
+    xitk_widget_t     *prev;
+    xitk_widget_t     *stop;
+    xitk_widget_t     *play;
+    xitk_widget_t     *pause;
+    xitk_widget_t     *next;
+    xitk_widget_t     *eject;
+    xitk_widget_t     *slider_play;
+  } playback_widgets;
+  
   struct {
     xitk_widget_t        *slider;
     xitk_widget_t        *mute;
   } mixer;
-
+  
   struct {
     int                   enable;
     unsigned int          timeout;
   } tips;
-
-  xitk_widget_t        *checkbox_pause;
+  
   int                   visible;
   char                  runtime[20];
   char                  audiochan[20];
@@ -57,7 +66,12 @@ typedef struct {
   ImlibImage           *bg_image;
   xitk_register_key_t   widget_key;
   pthread_t             slider_thread;
+  
 } _panel_t;
+
+
+int is_playback_widgets_enabled(void);
+void enable_playback_controls(int enable);
 
 void panel_show_tips(void);
 int panel_get_tips_enable(void);

@@ -127,6 +127,10 @@ void gui_stop (xitk_widget_t *w, void *data) {
   panel_reset_slider ();
   panel_check_pause();
   panel_update_runtime_display();
+
+  if(is_playback_widgets_enabled() && (!gGui->playlist_num))
+     enable_playback_controls(0);
+     
 }
 
 void gui_pause (xitk_widget_t *w, void *data, int state) {
@@ -445,6 +449,9 @@ void gui_dndcallback (char *filename) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
 
     pl_update_playlist();
+
+    if((!is_playback_widgets_enabled()) && gGui->playlist_num)
+      enable_playback_controls(1);
   }
 }
 

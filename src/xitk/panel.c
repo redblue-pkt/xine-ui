@@ -58,6 +58,32 @@ extern gGui_t     *gGui;
 
 _panel_t          *panel;
 
+int is_playback_widgets_enabled(void) {
+  return (panel->playback_widgets.enabled == 1);
+}
+
+void enable_playback_controls(int enable) {
+  
+  if(enable != panel->playback_widgets.enabled) {
+    void (*enability)(xitk_widget_t *) = NULL;
+    
+    panel->playback_widgets.enabled = enable;
+    
+    if(enable)
+      enability = xitk_enable_widget;
+    else
+      enability = xitk_disable_widget;
+    
+    enability(panel->playback_widgets.prev);
+    enability(panel->playback_widgets.stop);
+    enability(panel->playback_widgets.stop);
+    enability(panel->playback_widgets.play);
+    enability(panel->playback_widgets.pause);
+    enability(panel->playback_widgets.eject);
+    enability(panel->playback_widgets.slider_play);
+  }
+}
+
 /*
  *
  */
@@ -244,7 +270,7 @@ static void *slider_loop(void *dummy) {
       if(gGui->xine) {
 	
 	if(status == XINE_PLAY) {
-	  xitk_slider_set_pos(panel->widget_list, panel->slider_play, 
+	  xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, 
 			      xine_get_current_position(gGui->xine));
 	}
 
@@ -389,7 +415,7 @@ void panel_check_mute(void) {
  */
 void panel_check_pause(void) {
   
-  xitk_checkbox_set_state(panel->checkbox_pause, 
+  xitk_checkbox_set_state(panel->playback_widgets.pause, 
 			  (((xine_get_status(gGui->xine) == XINE_PLAY) && 
 			    (xine_get_speed(gGui->xine) == SPEED_PAUSE)) ? 1 : 0 ), 
 			  gGui->panel_window, panel->widget_list->gc);
@@ -400,7 +426,7 @@ void panel_check_pause(void) {
  * Reset the slider of panel window (set to 0).
  */
 void panel_reset_slider (void) {
-  xitk_slider_reset(panel->widget_list, panel->slider_play);
+  xitk_slider_reset(panel->widget_list, panel->playback_widgets.slider_play);
 }
 
 /*
@@ -459,7 +485,7 @@ void panel_snapshot(xitk_widget_t *w, void *data) {
  */
 static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 
-  if(w == panel->slider_play) {
+  if(w == panel->playback_widgets.slider_play) {
     gui_set_current_position (pos);
     if(xine_get_status(gGui->xine) != XINE_PLAY) {
       panel_reset_slider();
@@ -612,6 +638,8 @@ void panel_init (void) {
 
   panel = (_panel_t *) xine_xmalloc(sizeof(_panel_t));
 
+  panel->playback_widgets.enabled = -1;
+
   XLockDisplay (gGui->display);
   
   /*
@@ -742,44 +770,49 @@ void panel_init (void) {
   b.skin_element_name = "Prev";
   b.callback          = gui_nextprev;
   b.userdata          = (void *)GUI_PREV;
-  xitk_list_append_content(panel->widget_list->l, (w = xitk_button_create(gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Play previous entry from playlist"));
+  xitk_list_append_content(panel->widget_list->l, 
+		   (panel->playback_widgets.prev = xitk_button_create(gGui->skin_config, &b)));
+  xitk_set_widget_tips(panel->playback_widgets.prev, _("Play previous entry from playlist"));
 
   /*  Stop button */
   b.skin_element_name = "Stop";
   b.callback          = gui_stop;
   b.userdata          = NULL;
-  xitk_list_append_content(panel->widget_list->l, (w = xitk_button_create(gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Stop playback"));
+  xitk_list_append_content(panel->widget_list->l, 
+		   (panel->playback_widgets.stop = xitk_button_create(gGui->skin_config, &b)));
+  xitk_set_widget_tips(panel->playback_widgets.stop, _("Stop playback"));
   
   /*  Play button */
   b.skin_element_name = "Play";
   b.callback          = gui_play;
   b.userdata          = NULL;
-  xitk_list_append_content(panel->widget_list->l, (w = xitk_button_create(gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Play selected entry"));
+  xitk_list_append_content(panel->widget_list->l, 
+		   (panel->playback_widgets.play = xitk_button_create(gGui->skin_config, &b)));
+  xitk_set_widget_tips(panel->playback_widgets.play, _("Play selected entry"));
 
   /*  Pause button */
   cb.skin_element_name = "Pause";
   cb.callback          = gui_pause;
   cb.userdata          = NULL;
   xitk_list_append_content(panel->widget_list->l, 
-			   (panel->checkbox_pause = xitk_checkbox_create(gGui->skin_config, &cb)));
-  xitk_set_widget_tips(panel->checkbox_pause, _("Pause/Resume playback"));
+		   (panel->playback_widgets.pause = xitk_checkbox_create(gGui->skin_config, &cb)));
+  xitk_set_widget_tips(panel->playback_widgets.pause, _("Pause/Resume playback"));
   
   /*  Next button */
   b.skin_element_name = "Next";
   b.callback          = gui_nextprev;
   b.userdata          = (void *)GUI_NEXT;
-  xitk_list_append_content(panel->widget_list->l, (w = xitk_button_create(gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Play next entry from playlist")); 
+  xitk_list_append_content(panel->widget_list->l, 
+		   (panel->playback_widgets.next = xitk_button_create(gGui->skin_config, &b)));
+  xitk_set_widget_tips(panel->playback_widgets.next, _("Play next entry from playlist")); 
 
   /*  Eject button */
   b.skin_element_name = "Eject";
   b.callback          = gui_eject;
   b.userdata          = NULL;
-  xitk_list_append_content(panel->widget_list->l, (w = xitk_button_create(gGui->skin_config, &b)));
-  xitk_set_widget_tips(w, _("Eject current medium"));
+  xitk_list_append_content(panel->widget_list->l, 
+		   (panel->playback_widgets.eject = xitk_button_create(gGui->skin_config, &b)));
+  xitk_set_widget_tips(panel->playback_widgets.eject, _("Eject current medium"));
 
   /*  Exit button */
   b.skin_element_name = "Exit";
@@ -880,9 +913,9 @@ void panel_init (void) {
   sl.motion_callback   = panel_slider_cb;
   sl.motion_userdata   = NULL;
   xitk_list_append_content (panel->widget_list->l, 
-			   (panel->slider_play = xitk_slider_create(gGui->skin_config, &sl)));
-  xitk_set_widget_tips(panel->slider_play, _("Stream playback position slider"));
-  xitk_slider_reset(panel->widget_list, panel->slider_play);
+	    (panel->playback_widgets.slider_play = xitk_slider_create(gGui->skin_config, &sl)));
+  xitk_set_widget_tips(panel->playback_widgets.slider_play, _("Stream playback position slider"));
+  xitk_slider_reset(panel->widget_list, panel->playback_widgets.slider_play);
 
   /* Mixer volume slider */
   sl.skin_element_name = "SliderVol";
@@ -1002,6 +1035,7 @@ void panel_init (void) {
     
     pthread_create(&panel->slider_thread, &pth_attrs, slider_loop, NULL);
   }
+
 }
 
 void panel_set_title(char *title) {
