@@ -1197,7 +1197,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
       
       if(file[strlen(file) - 1] == '/')
 	file[strlen(file) - 1] = '\0'; 
-      
+
       mediamark_collect_from_directory(file);
     }
     else {
@@ -1226,10 +1226,10 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    * X / imlib stuff
    */
 
-  if (!XInitThreads ()) {
+  if(!XInitThreads()) {
     printf (_("\nXInitThreads failed - looks like you don't have a "
 	    "thread-safe xlib.\n"));
-    exit (1);
+    exit(1);
   } 
   
   if((gGui->display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {

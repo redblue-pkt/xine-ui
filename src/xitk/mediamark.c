@@ -2947,10 +2947,17 @@ void mediamark_collect_from_directory(char *filepathname) {
 	}
       }
       else {
-	char *extension;
-
-	if((extension = strrchr(fullpathname, '.')) && (strlen(extension) > 1)) {
-	  char ext[strlen(extension) + 2];
+	char *p, *extension;
+	char  loname[strlen(fullpathname) + 1];
+	
+	p = strcat(loname, fullpathname);
+	while(*p && (*p != '\0')) {
+	  *p = tolower(*p);
+	  p++;
+	}
+	
+	if((extension = strrchr(loname, '.')) && (strlen(extension) > 1)) {
+	  char  ext[strlen(extension) + 2];
 	  char *valid_endings = 
 	    ".pls .m3u .sfv .tox .asx .smi .smil .xml .fxd " /* Playlists */
 	    ".4xm .ac3 .aif .aiff .asf .wmv .wma .wvx .wax .aud .avi .cin .cpk .cak "
@@ -2960,6 +2967,7 @@ void mediamark_collect_from_directory(char *filepathname) {
 	    ".trp .vob .voc .vox .vqa .wav .wve .y4m ";
 	  
 	  snprintf(ext, sizeof(ext), "%s ", extension);
+
 	  if(strstr(valid_endings, ext)) {
 	    mediamark_append_entry((const char *)fullpathname, 
 				   (const char *)fullpathname, NULL, 0, -1, 0, 0);

@@ -424,9 +424,17 @@ static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
     char *ending;
 
     if((ending = strrchr(file, '.'))) {
-      char ext[strlen(ending) + 2];
+      char  ext[strlen(ending) + 2];
+      char *p;
       
       sprintf(ext, "%s ", ending);
+
+      p = ext;
+      while(*p && (*p != '\0')) {
+	*p = tolower(*p);
+	p++;
+      }
+	
       if(strstr(__fb_filters[fb->filter_selected].ending, ext))
 	return 1;
       

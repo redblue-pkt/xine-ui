@@ -190,7 +190,6 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
   if(private_data->filter_selected) {
     char *filter_ends;
     char *p, *m;
-    char *ending;
 
     private_data->mc->mrls_to_disp = 0;
 
@@ -208,9 +207,9 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 	private_data->mc->mrls_to_disp++;
       }
       else {
-	ending = strrchr(private_data->mc->mrls[i]->mrl, '.');
-	
-	if(ending) {
+	char *ending;
+
+	if((ending = strrchr(private_data->mc->mrls[i]->mrl, '.'))) {
 
 	  while((m = xitk_strsep(&filter_ends, ",")) != NULL) {
 	    
