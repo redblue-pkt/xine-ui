@@ -915,6 +915,25 @@ typedef struct {
 } xitk_inputtext_t;
 
 /**
+ * All states of modifiers (see xitk_get_key_modifier() bellow).
+ */
+#define MODIFIER_NOMOD 0x00000000
+#define MODIFIER_SHIFT 0x00000001
+#define MODIFIER_LOCK  0x00000002
+#define MODIFIER_CTRL  0x00000004
+#define MODIFIER_META  0x00000008
+#define MODIFIER_NUML  0x00000010
+#define MODIFIER_MOD3  0x00000020
+#define MODIFIER_MOD4  0x00000040
+#define MODIFIER_MOD5  0x00000080
+
+/**
+ * return 1 if a modifier key has been pressed (extracted from XEvent *)
+ * modifier pointer will contain the modifier(s) bits (MODIFIER_*)
+ */
+int xitk_get_key_modifier(XEvent *xev, int *modifier);
+
+/**
  * Create an input text box.
  */
 widget_t *inputtext_create (xitk_inputtext_t *it);

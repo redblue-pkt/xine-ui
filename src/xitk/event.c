@@ -343,43 +343,49 @@ void gui_handle_event (XEvent *event, void *data) {
   }
   break;
 
-  case KeyPress:
-    mykeyevent = event->xkey;
+  case KeyPress: {
+    int modifier;
 
+    (void) xitk_get_key_modifier(event, &modifier);
+
+    mykeyevent = event->xkey;
+    
     /* printf ("KeyPress (state : %d, keycode: %d)\n", mykeyevent.state, mykeyevent.keycode);  */
-      
+    
     XLockDisplay (gGui->display);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
     XUnlockDisplay (gGui->display);
 
     switch (mykey) {
-    
+	
     case XK_less:
     case XK_greater:
-      if(!video_window_is_fullscreen()) {
-	int x, y;
-	unsigned int w, h, b, d;
-	Window rootwin;
+      if(modifier & MODIFIER_CTRL) {
+	if(!video_window_is_fullscreen()) {
+	  int x, y;
+	  unsigned int w, h, b, d;
+	  Window rootwin;
+	  
+	  XLockDisplay (gGui->display);
+	  
+	  if(XGetGeometry(gGui->display, 
+			  gGui->video_window, &rootwin, 
+			  &x, &y, &w, &h, &b, &d) != BadDrawable) {
+	  }
 	
-	XLockDisplay (gGui->display);
+	  if(mykey == XK_less) {
+	    w /= 1.2;
+	    h /= 1.2;
+	  }
+	  else {
+	    w *= 1.2;
+	    h *= 1.2;
+	  }
 	
-	if(XGetGeometry(gGui->display, 
-			gGui->video_window, &rootwin, 
-			&x, &y, &w, &h, &b, &d) != BadDrawable) {
+	  XResizeWindow (gGui->display, gGui->video_window, w, h);
+	  XUnlockDisplay(gGui->display);
+	
 	}
-	
-	if(mykey == XK_less) {
-	  w /= 1.2;
-	  h /= 1.2;
-	}
-	else {
-	  w *= 1.2;
-	  h *= 1.2;
-	}
-	
-	XResizeWindow (gGui->display, gGui->video_window, w, h);
-	XUnlockDisplay(gGui->display);
-	
       }
       break;
 
@@ -532,26 +538,26 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_Down:
       xine_set_speed (gGui->xine, SPEED_SLOW_2);
       break;
-
+      
     }
-
-    break;
+  }
+  break;
 
   case ConfigureNotify:
     /* FIXME: FIXED
-    xine_window_handle_event(gGui->xine, (void *)event);
+       xine_window_handle_event(gGui->xine, (void *)event);
     */
 
     /* printf ("ConfigureNotify\n"); */
     /*  background */
     /* CHECKME
-    XLOCK ();
-    Imlib_apply_image(gGui->imlib_data, gGui->gui_bg_image, gGui->gui_panel_win);
-    XUNLOCK ();
-    paint_widget_list (gui_widget_list);
-    XLOCK ();
-    XSync(gGui->display, False);
-    XUNLOCK ();
+       XLOCK ();
+       Imlib_apply_image(gGui->imlib_data, gGui->gui_bg_image, gGui->gui_panel_win);
+       XUNLOCK ();
+       paint_widget_list (gui_widget_list);
+       XLOCK ();
+       XSync(gGui->display, False);
+       XUNLOCK ();
     */
     break;
 
@@ -561,8 +567,8 @@ void gui_handle_event (XEvent *event, void *data) {
 
     break;
     /*
-  default:
-    printf("Got event: %i\n", event->type);
+      default:
+      printf("Got event: %i\n", event->type);
     */
   }
 

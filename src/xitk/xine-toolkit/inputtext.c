@@ -43,15 +43,63 @@
 #define NORMAL                  1
 #define FOCUS                   2
 
-#define MODIFIER_NOMOD 0x00000000
-#define MODIFIER_SHIFT 0x00000001
-#define MODIFIER_LOCK  0x00000002
-#define MODIFIER_CTRL  0x00000004
-#define MODIFIER_META  0x00000008
-#define MODIFIER_NUML  0x00000010
-#define MODIFIER_MOD3  0x00000020
-#define MODIFIER_MOD4  0x00000040
-#define MODIFIER_MOD5  0x00000080
+/*
+ * Extract modifier keys.
+ */
+int xitk_get_key_modifier(XEvent *xev, int *modifier) {
+  
+  *modifier = MODIFIER_NOMOD;
+
+  if(!xev)
+    return 0;
+
+  /*
+  printf("%s(): ", __FUNCTION__);
+  if(xev->xbutton.state & ShiftMask)
+    printf("Shift ");
+  if(xev->xbutton.state & LockMask)
+    printf("CapsLock ");
+  if(xev->xbutton.state & ControlMask)
+    printf("Control ");
+  if(xev->xbutton.state & Mod1Mask)
+    printf("Meta(mod1) ");
+  if(xev->xbutton.state & Mod2Mask)
+    printf("NumLock(mod2) ");
+  if(xev->xbutton.state & Mod3Mask)
+    printf("Mod3 ");
+  if(xev->xbutton.state & Mod4Mask)
+    printf("Mod4 ");
+  if(xev->xbutton.state & Mod5Mask)
+    printf("Mod5 ");
+  printf(".\n");
+  */
+
+  if(xev->xbutton.state & ShiftMask)
+    *modifier |= MODIFIER_SHIFT;
+
+  if(xev->xbutton.state & LockMask)
+    *modifier |= MODIFIER_LOCK;
+
+  if(xev->xbutton.state & ControlMask)
+    *modifier |= MODIFIER_CTRL;
+
+  if(xev->xbutton.state & Mod1Mask)
+    *modifier |= MODIFIER_META;
+
+  if(xev->xbutton.state & Mod2Mask)
+    *modifier |= MODIFIER_NUML;
+
+  if(xev->xbutton.state & Mod3Mask)
+    *modifier |= MODIFIER_MOD3;
+
+  if(xev->xbutton.state & Mod4Mask)
+    *modifier |= MODIFIER_MOD4;
+
+  if(xev->xbutton.state & Mod5Mask)
+    *modifier |= MODIFIER_MOD5;
+
+  return (*modifier != MODIFIER_NOMOD);
+}
 
 /*
  * Return a pixmap with text drawed.
@@ -534,59 +582,6 @@ static void inputtext_move_eol(widget_list_t *wl, widget_t *it) {
 }
 
 /*
- * Extract modifier keys.
- */
-static int get_key_modifier(XEvent *xev, int *mod) {
-  
-  *mod = MODIFIER_NOMOD;
-
-  /*
-  if(xev->xbutton.state & ShiftMask)
-    printf("Shift\n");
-  if(xev->xbutton.state & LockMask)
-    printf("Lock\n");
-  if(xev->xbutton.state & ControlMask)
-    printf("Control\n");
-  if(xev->xbutton.state & Mod1Mask)
-    printf("Mod1\n");
-  if(xev->xbutton.state & Mod2Mask)
-    printf("Mod2\n");
-  if(xev->xbutton.state & Mod3Mask)
-    printf("Mod3\n");
-  if(xev->xbutton.state & Mod4Mask)
-    printf("Mod4\n");
-  if(xev->xbutton.state & Mod5Mask)
-    printf("Mod5\n");
-  */
-  
-  if(xev->xbutton.state & ShiftMask)
-    *mod |= MODIFIER_SHIFT;
-
-  if(xev->xbutton.state & LockMask)
-    *mod |= MODIFIER_LOCK;
-
-  if(xev->xbutton.state & ControlMask)
-    *mod |= MODIFIER_CTRL;
-
-  if(xev->xbutton.state & Mod1Mask)
-    *mod |= MODIFIER_META;
-
-  if(xev->xbutton.state & Mod2Mask)
-    *mod |= MODIFIER_NUML;
-
-  if(xev->xbutton.state & Mod3Mask)
-    *mod |= MODIFIER_MOD3;
-
-  if(xev->xbutton.state & Mod4Mask)
-    *mod |= MODIFIER_MOD4;
-
-  if(xev->xbutton.state & Mod5Mask)
-    *mod |= MODIFIER_MOD5;
-
-  return (*mod != MODIFIER_NOMOD);
-}
-
-/*
  * Handle keyboard event in input text box.
  */
 static void notify_keyevent_inputtext(widget_list_t *wl,
@@ -607,7 +602,7 @@ static void notify_keyevent_inputtext(widget_list_t *wl,
 
     buf[len] = '\0';
 
-    get_key_modifier(xev, &modifier);
+    (void) xitk_get_key_modifier(xev, &modifier);
 
     /* One of modifier key is pressed, none of keylock or shift */
     if(((buf[0] != 0) && (buf[1] == 0)) 

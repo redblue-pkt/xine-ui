@@ -31,6 +31,16 @@
 
 #include "_xitk.h"
 
+#define MODIFIER_NOMOD 0x00000000
+#define MODIFIER_SHIFT 0x00000001
+#define MODIFIER_LOCK  0x00000002
+#define MODIFIER_CTRL  0x00000004
+#define MODIFIER_META  0x00000008
+#define MODIFIER_NUML  0x00000010
+#define MODIFIER_MOD3  0x00000020
+#define MODIFIER_MOD4  0x00000040
+#define MODIFIER_MOD5  0x00000080
+
 typedef struct {
   Display                *display;
 
@@ -59,5 +69,6 @@ typedef struct {
 widget_t *inputtext_create(xitk_inputtext_t *it);
 char *inputttext_get_text(widget_t *it);
 void inputtext_change_text(widget_list_t *wl, widget_t *it, char *text);
+int xitk_get_key_modifier(XEvent *xev, int *modifier);
 
 #endif
