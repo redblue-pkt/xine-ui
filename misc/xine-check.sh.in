@@ -899,9 +899,9 @@ echo "Note, however, that there is a 40K limit on messages sent to the mailing l
 echo "So you should strip down the parts that repeat over and over,"
 echo "if there are any."
 echo "You can either copy&paste this output from the terminal where you ran xine,"
-echo "or you can collect xine's output in a file named /tmp/xine.out, using"
-echo "this command:"
-echo "xine >/tmp/xine.out 2>&1"
+echo "or you can collect xine's output in a file named $tmpdir/xine.out, "
+echo "using this command:"
+echo "xine --verbose=2 >$tmpdir/xine.out 2>&1"
 echo "(assuming you have a Bourne compatible shell, like bash, for example)"
 echo "If you need to add any parameters, you can do so..."
 echo "This method is useful if you want to remove part of the output..."
@@ -917,13 +917,15 @@ if [ $answer -eq 1 ]; then
   echo 'PRESS CTRL-D on a new line TO FINISH! (sorry for shouting...)'
   cat >>"$bugreport"
 else
-  echo 'please press <return> when you have the log ready in /tmp/xine.out'
-  if test -r /tmp/xine.out; then
-    cat /tmp/xine.out >>"$bugreport"
+  echo 'please press <return> when you have the log ready in'
+  echo "$tmpdir/xine.out"
+  if test -r $tmpdir/xine.out; then
+    cat $tmpdir/xine.out >>"$bugreport"
     echo "Okay, got a copy of the log file. You may remove it, if you wish..."
   else
     echo
-    echo "Hmmm, I could not read the /tmp/xine.out file. Skipping this step."
+    echo "Hmmm, I could not read the $tmpdir/xine.out file."
+    echo "Skipping this step."
     echo "You may add the output later, if this wasn't your intention..."
     confirm
     echo
@@ -952,7 +954,8 @@ echo "You're strongly encouraged to add a detailed description of your problem."
 echo "Just look for 'additional description', and fill it in..."
 echo
 echo "When you're finished, you can use your favourite mailer to send it to"
-echo "<xine-user@lists.sf.net>. Please use this subject line, or something similar:"
+echo "<xine-bugreport@xinehq.de>."
+echo " Please use this subject line, or something even more descriptive:"
 echo "Subject: $subject"
 
 if search -x mail "$PATH" || search -x mailx "$PATH"; then
@@ -961,7 +964,7 @@ if search -x mail "$PATH" || search -x mailx "$PATH"; then
   echo $mailer -s \""$subject"\"
   echo 'Please make sure to add the additional description before saying "yes"!' 
   if yesno "Do you want me to do this now?"; then
-    $mailer -s "$subject" <"$bugreport" xine-user@lists.sf.net
+    $mailer -s "$subject" <"$bugreport" xine-bugreport@xinehq.de
     echo "okay, done."
     echo "If your machine is set up correctly to send mail to the internet,"
     echo "everything's fine and the message is on the way..."
@@ -970,6 +973,8 @@ if search -x mail "$PATH" || search -x mailx "$PATH"; then
     echo "the bugreport manually."
   fi
 fi
+
+echo "You'll find the data we just collected in $tmpdir"
 
 echo 'Thanks for your bugreport! Have a nice day!' 
  
