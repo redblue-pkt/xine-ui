@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
-"POT-Creation-Date: 2002-07-20 13:07+0200\n"
+"POT-Creation-Date: 2002-08-22 04:21+0200\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -50,15 +50,15 @@ msgstr "Mon Cadre"
 msgid "A Label"
 msgstr "Un Label"
 
-#: src/xitk/xine-toolkit/test.c:536
+#: src/xitk/xine-toolkit/test.c:537
 msgid "Fire !!"
 msgstr "Feu !!"
 
-#: src/xitk/xine-toolkit/test.c:567
+#: src/xitk/xine-toolkit/test.c:568
 msgid "!BOOM!"
 msgstr "!BOUM!"
 
-#: src/xitk/xine-toolkit/test.c:656
+#: src/xitk/xine-toolkit/test.c:657
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -67,42 +67,42 @@ msgstr ""
 "Na nouvelle entrée sélectionnée dans la combo box est:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:769
+#: src/xitk/xine-toolkit/test.c:770
 msgid "init_test() failed\n"
 msgstr "init_test() a échoué\n"
 
-#: src/xitk/xine-toolkit/test.c:785
+#: src/xitk/xine-toolkit/test.c:786
 msgid "My Fucking Window"
 msgstr "Ma Putain de Fenêtre"
 
-#: src/xitk/xine-toolkit/test.c:801
+#: src/xitk/xine-toolkit/test.c:802
 msgid "Quit"
 msgstr "Quitte"
 
-#: src/xitk/xine-toolkit/window.c:812
+#: src/xitk/xine-toolkit/window.c:811
 msgid "OK"
 msgstr "Ok"
 
-#: src/xitk/xine-toolkit/window.c:875 src/xitk/xine-toolkit/window.c:1073
+#: src/xitk/xine-toolkit/window.c:874 src/xitk/xine-toolkit/window.c:1072
 msgid "Question?"
 msgstr "Question?"
 
-#: src/xitk/xine-toolkit/window.c:1004 src/xitk/xine-toolkit/window.c:1215
+#: src/xitk/xine-toolkit/window.c:1003 src/xitk/xine-toolkit/window.c:1214
 msgid "Yes"
 msgstr "Oui"
 
-#: src/xitk/xine-toolkit/window.c:1004 src/xitk/xine-toolkit/window.c:1215
+#: src/xitk/xine-toolkit/window.c:1003 src/xitk/xine-toolkit/window.c:1214
 msgid "No"
 msgstr "Non"
 
-#: src/xitk/xine-toolkit/window.c:1215
+#: src/xitk/xine-toolkit/window.c:1214
 msgid "Cancel"
 msgstr "Abandon"
 
-#: src/xitk/xine-toolkit/xitk.h:1901 src/xitk/xine-toolkit/xitk.h:1917
+#: src/xitk/xine-toolkit/xitk.h:1921 src/xitk/xine-toolkit/xitk.h:1937
 msgid "Error"
 msgstr "Erreur"
 
-#: src/xitk/xine-toolkit/xitk.h:1906 src/xitk/xine-toolkit/xitk.h:1922
+#: src/xitk/xine-toolkit/xitk.h:1926 src/xitk/xine-toolkit/xitk.h:1942
 msgid "Information"
 msgstr "Information"
