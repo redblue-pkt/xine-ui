@@ -1420,7 +1420,7 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_widget_list_t *wl,
 /**
  * Return the text of widget.
  */
-char *xitk_inputttext_get_text(xitk_widget_t *it);
+char *xitk_inputtext_get_text(xitk_widget_t *it);
 
 /**
  * Change and redisplay the text of widget.

@@ -27,6 +27,9 @@ dfbxine_SOURCES = options.c \
 
 noinst_HEADERS = dfb.h
 
+$(top_builddir)/src/common/libcommon.la:
+	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
+
 debug:
 	@$(MAKE) CFLAGS="-DFONTDIR=\\\"$(XINE_SKINDIR)/../fonts/\\\" $(DEBUG_CFLAGS)"
 

@@ -30,6 +30,7 @@
 
 #include "xitk.h"
 
+void playlist_mmk_editor(void);
 void playlist_scan_for_infos(void);
 void playlist_show_tips(int enabled, unsigned long timeout);
 void playlist_mrlident_toggle(void);

@@ -77,8 +77,7 @@ static void _playlist_update_browser_list(int start) {
 			     playlist->playlist_len, start);
 
   if((sel >= 0) && (start == -1))
-    xitk_browser_set_select(playlist->playlist, 
-			    sel - (xitk_browser_get_current_start(playlist->playlist)));
+    xitk_browser_set_select(playlist->playlist, sel);
 
 }
 
@@ -125,11 +124,13 @@ static void _playlist_create_playlists(void) {
  */
 static void _playlist_handle_selection(xitk_widget_t *w, void *data) {
   int selected = (int)data;
-  
+
   if(playlist->playlist_mrls[selected] != NULL) {
     xitk_inputtext_change_text(playlist->widget_list, 
 			       playlist->winput, playlist->playlist_mrls[selected]);
+    mmkeditor_set_mmk(&gGui->playlist.mmk[selected]);
   }
+
 }
 
 /*
@@ -214,6 +215,8 @@ static void _playlist_delete(xitk_widget_t *w, void *data) {
 	gui_stop(NULL, NULL);
       
       gui_set_current_mrl(NULL);
+      xitk_inputtext_change_text(playlist->widget_list, 
+				 playlist->winput, NULL);
     }
   }
 
@@ -230,6 +233,8 @@ static void _playlist_delete_all(xitk_widget_t *w, void *data) {
   if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
     gui_stop(NULL, NULL);
 
+  xitk_inputtext_change_text(playlist->widget_list, 
+			     playlist->winput, NULL);
   gui_set_current_mrl(NULL);
   enable_playback_controls(0);
 }
@@ -242,6 +247,8 @@ static void _playlist_move_updown(xitk_widget_t *w, void *data) {
 
   if((j = xitk_browser_get_current_selected(playlist->playlist)) >= 0) {
     mediamark_t *mmk;
+    int          start = xitk_browser_get_current_start(playlist->playlist);
+    int          max_vis_len = xitk_browser_get_num_entries(playlist->playlist);
 
     if(((int)data) == MOVEUP && (j > 0)) {
       mmk = gGui->playlist.mmk[j - 1];
@@ -259,8 +266,19 @@ static void _playlist_move_updown(xitk_widget_t *w, void *data) {
     }
 
     _playlist_create_playlists();
-    _playlist_update_browser_list(-1);
-    xitk_browser_set_select(playlist->playlist, j);
+
+    if(j < start) {
+      _playlist_update_browser_list(j);
+      xitk_browser_set_select(playlist->playlist, 0);
+    }
+    else if(j >= (start + max_vis_len)) {
+      _playlist_update_browser_list(start + 1);
+      xitk_browser_set_select(playlist->playlist, max_vis_len - 1);
+    }
+    else {
+      _playlist_update_browser_list(-1);
+      xitk_browser_set_select(playlist->playlist, j - start);
+    }
   }
 }
 
@@ -294,6 +312,7 @@ static void _playlist_add_input(xitk_widget_t *w, void *data, char *filename) {
 
   if(filename)
     gui_dndcallback((char *)filename);
+
 }
 
 /*
@@ -309,14 +328,23 @@ static void _playlist_handle_event(XEvent *event, void *data) {
 
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
-    if (bevent->button == Button4)
+    if (bevent->button == Button4) {
       xitk_browser_step_down(playlist->playlist, NULL);
-    else if(bevent->button == Button5)
+      mmk_editor_end();
+    }
+    else if(bevent->button == Button5) {
       xitk_browser_step_up(playlist->playlist, NULL);
+      mmk_editor_end();
+    }
   }
     break;
 
   case ButtonRelease:
+    if(playlist && playlist->playlist) {
+      if(xitk_browser_get_current_selected(playlist->playlist) < 0)
+	mmk_editor_end();
+    }
+
     gui_handle_event(event, data);
     break;
 
@@ -337,6 +365,8 @@ static void _playlist_handle_event(XEvent *event, void *data) {
     case XK_Next: {
       xitk_widget_t *w;
       
+      mmk_editor_end();
+      
       w = xitk_get_focused_widget(playlist->widget_list);
       if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
 	if(mykey == XK_Down)
@@ -350,7 +380,8 @@ static void _playlist_handle_event(XEvent *event, void *data) {
     case XK_Up:
     case XK_Prior: {
       xitk_widget_t *w;
-      
+
+      mmk_editor_end();
       w = xitk_get_focused_widget(playlist->widget_list);
       if((!w) || (w && (!(w->widget_type & WIDGET_GROUP_BROWSER)))) {
 	if(mykey == XK_Up)
@@ -377,6 +408,33 @@ static void _playlist_handle_event(XEvent *event, void *data) {
 }
 
 /* End of privates */
+void mediamark_editor_change_cb(const char *mrl, const char *ident, int start, int end) {
+  if(playlist) {
+    int sel = xitk_browser_get_current_selected(playlist->playlist);
+
+    if(sel >= 0) {
+      mediamark_replace_entry(&gGui->playlist.mmk[sel], mrl, ident, start, end);
+    }
+
+  }
+}
+
+
+static void _playlist_apply_cb(void *data) {
+  playlist_mrlident_toggle();
+  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+}
+
+void playlist_mmk_editor(void) {
+  if(playlist) {
+    int sel = xitk_browser_get_current_selected(playlist->playlist);
+
+    if(sel >= 0) {
+      mmk_edit_mediamark(&gGui->playlist.mmk[sel], _playlist_apply_cb, NULL);
+    }
+  
+  }
+}
 
 void playlist_scan_for_infos(void) {
   
@@ -460,6 +518,7 @@ void playlist_mrlident_toggle(void) {
   if(playlist && playlist->visible) {
     _playlist_create_playlists();
     _playlist_update_browser_list(-1);
+    mmkeditor_set_mmk(&gGui->playlist.mmk[(xitk_browser_get_current_selected(playlist->playlist))]);
   }
 }
 
@@ -470,8 +529,10 @@ void playlist_update_playlist(void) {
   
   if(playlist) {
     _playlist_create_playlists();
-    if(playlist_is_visible())
+    if(playlist_is_visible()) {
       _playlist_update_browser_list(0);
+      mmk_editor_end();
+    }
   }
 }
 
@@ -482,6 +543,9 @@ void playlist_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
 
   if(playlist) {
+    
+    mmk_editor_end();
+
     playlist->running = 0;
     playlist->visible = 0;
 
@@ -512,11 +576,11 @@ void playlist_exit(xitk_widget_t *w, void *data) {
     XUnlockDisplay(gGui->display);
 
     _playlist_free_playlists();
-
+    
     free(playlist->widget_list);
-
+    
     free(playlist);
-    playlist = NULL;
+    playlist = NULL;  
   }
 }
 
@@ -610,6 +674,7 @@ void playlist_raise_window(void) {
 	XUnlockDisplay(gGui->display);
       }
     }
+    mmk_editor_raise_window();
   }
 }
 
@@ -637,6 +702,7 @@ void playlist_toggle_visibility (xitk_widget_t *w, void *data) {
 	layer_above_video(playlist->window);
       }
     }
+    mmk_editor_toggle_visibility();
   }
 }
 

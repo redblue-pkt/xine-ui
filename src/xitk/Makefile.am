@@ -46,7 +46,8 @@ xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la \
 			   $(top_builddir)/src/common/libcommon.la \
 			   xine-remote.c
 xine_remote_LDADD = $(NET_LIBS) $(THREAD_LIBS) \
-  		    $(top_builddir)/readline/libreadline.la $(TERMCAP_LIB) \			    $(top_builddir)/src/common/libcommon.la
+	$(top_builddir)/readline/libreadline.la $(TERMCAP_LIB) \
+	$(top_builddir)/src/common/libcommon.la
 
 noinst_HEADERS = \
 	common.h \
@@ -72,7 +73,13 @@ noinst_HEADERS = \
 	videowin.h \
 	viewlog.h
 
-xine-remote.c: $(srcdir)/network.c
+$(top_builddir)/readline/libreadline.la:
+	@cd $(top_builddir)/readline && $(MAKE) libreadline.la
+
+$(top_builddir)/src/common/libcommon.la:
+	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
+
+xine-remote.c:	$(srcdir)/network.c
 	$(LN_S) $(srcdir)/network.c ./xine-remote.c
 
 xine-remote.o: xine-remote.c

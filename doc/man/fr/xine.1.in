@@ -186,6 +186,11 @@ la géométrie de style X (\fIvoir X(7)\fP). Les décalages \fBX\fP et \fBY\fP sont
 .TP
 .B \-B, \-\-borderless
 Retire les bordures de la fenêtre de sortie, en mode fenêtré.
+.TP
+.B \-P, \-\-playlist <fichier>
+Utilise le fichier spécifié comme liste de lecture. Les formats reconnues sont:
+asx, toxine, m3u, pls, sfv et les fichiers texte.
+.TP
 .B MRL (media resource locator)
 .br
 Les MRLs sont similaires aux URLs de votre navigateur internet. Elles
@@ -270,6 +275,12 @@ Passe le moniteur en attente DPMS
 .BR e :
 Ejecte le média courant.
 .br
+.BR C\-e :
+Dans la fenêtre de la liste de lecture, ce raccouçis vous permet d'editer le mediamark sélectionné et d'en modifier les paramêtres (identificateur, mrl, debug et fin)
+.br
+.BR M\-e :
+Affiche/masque la fenêtre d'envoi d'évènement.
+.br
 .BR f :
 Bascule plein écran/fenêtré.
 .br
@@ -281,6 +292,9 @@ Affiche/masque la fenêtre de sortie.
 .br
 .BR i :
 Bascule des méthodes de dé-entrelacement.
+.br
+.BR M\-i :
+Affiche/masque la fenêtre d'informations de flux.
 .br
 .BR M\-l :
 Affiche/masque la fenêtre de log.
@@ -384,11 +398,6 @@ Menu 3
 .BR <Insert> :
 Bascule capture de pointeur.
 .br
-.BR M\-e :
-Affiche/masque la fenêtre d'envoi d'évènement.
-.BR M\-i :
-Affiche/masque la fenêtre d'informations de flux.
-
 Les raccourcis suivant sont utilisés dans des plugin tiers, généralement pour la navigation de DVD:
 .LP
 .BR <PavéNum\ Haut> :

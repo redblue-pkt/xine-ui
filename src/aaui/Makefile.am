@@ -12,6 +12,9 @@ aaxine_LDADD = @XINE_LIBS@ $(AALIB_LIBS) $(DYNAMIC_LD_LIBS) -lm \
 	       $(top_builddir)/src/common/libcommon.la
 aaxine_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la
 
+$(top_builddir)/src/common/libcommon.la:
+	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
+
 debug:
 	@$(MAKE) CFLAGS="$(AALIB_CFLAGS) $(DEBUG_CFLAGS)"
 

@@ -33,7 +33,7 @@
 char *stream_infos_get_ident_from_stream(xine_stream_t *stream);
 
 void stream_infos_panel(void);
-void stream_infos_exit(xitk_widget_t *, void *);
+void stream_infos_end(void);
 int stream_infos_is_visible(void);
 int stream_infos_is_running(void);
 void stream_infos_toggle_visibility(xitk_widget_t *, void *);

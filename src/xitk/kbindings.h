@@ -112,6 +112,7 @@ typedef enum {
   ACTID_DPMSSTANDBY,
   ACTID_MRLIDENTTOGGLE,
   ACTID_SCANPLAYLIST,
+  ACTID_MMKEDITOR,
 
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 

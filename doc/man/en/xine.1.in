@@ -194,6 +194,9 @@ You can set video output size and position using the X like geometry (see \fBX\f
 .B \-B, \-\-borderless
 Remove borders of video output window, in windowed mode.
 .TP
+.B \-P, \-\-playlist <filename>
+Use file as playlist. Known formats are: asx, toxine, m3u, pls, sfv and raw text file.
+.TP
 .B MRL (media resource locator)
 .br
 MRLs are similar to URLs in your web browser. They describe the media
@@ -362,6 +365,8 @@ Hide/show the stream informations window.
 Toggle display mode between mrl and identifier.
 .IP "\fBC\fP\-\fBs\fP"
 Update playlist's stream informations (if available).
+.IP "\fBC\fP\-\fBe\fP"
+In playlist window, using this shortcut permit you to change the selected mediamark contents (like identifier, mrl, start and stop time).
 
 .SS Third party plugins
 Following shortcuts are used by third party plugins, generally for DVD navigation:

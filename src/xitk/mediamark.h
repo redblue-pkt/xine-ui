@@ -22,6 +22,8 @@
 
 #include "common.h"
 
+typedef void (*apply_callback_t)(void *data);
+
 typedef struct {
   char                     *ident;
   char                     *mrl;
@@ -42,5 +44,14 @@ const char *mediamark_get_current_ident(void);
 
 void mediamark_load_mediamarks(const char *filename);
 void mediamark_save_mediamarks(const char *filename);
+
+
+void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data);
+int mmk_editor_is_visible(void);
+int mmk_editor_is_running(void);
+void mmk_editor_toggle_visibility(void);
+void mmk_editor_raise_window(void);
+void mmk_editor_end(void);
+void mmkeditor_set_mmk(mediamark_t **mmk);
 
 #endif

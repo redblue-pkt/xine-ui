@@ -32,6 +32,34 @@
 
 #include "common.h"
 
+#define WINDOW_WIDTH        500
+#define WINDOW_HEIGHT       210
+
+static char            *btnfontname  = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
+static char            *fontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+
+typedef struct {
+  apply_callback_t              callback;
+  void                         *user_data;
+
+  xitk_window_t                *xwin;
+
+  xitk_widget_list_t           *widget_list;
+
+  xitk_widget_t                *mrl;
+  xitk_widget_t                *ident;
+  xitk_widget_t                *start;
+  xitk_widget_t                *end;
+
+  mediamark_t                 **mmk;
+
+  int                           running;
+  int                           visible;
+  xitk_register_key_t           widget_key;
+} _mmk_editor_t;
+
+static _mmk_editor_t  *mmkeditor = NULL;
+
 extern int       errno;
 
 extern gGui_t   *gGui;
@@ -864,6 +892,9 @@ void mediamark_save_mediamarks(const char *filename) {
   char *fn;
   int   status = 1;
 
+  if(!gGui->playlist.num)
+    return;
+
   xine_strdupa(fullfn, filename);
   
   pn = fullfn;
@@ -904,4 +935,351 @@ void mediamark_save_mediamarks(const char *filename) {
       fprintf(stderr, _("Unable to save playlist (%s): %s.\n"), filename, strerror(errno));
 
   }
+}
+
+/*
+ *  EDITOR
+ */
+static void mmkeditor_exit(xitk_widget_t *w, void *data) {
+  window_info_t wi;
+  
+  if(mmkeditor) {
+
+    mmkeditor->running = 0;
+    mmkeditor->visible = 0;
+    
+    if((xitk_get_window_info(mmkeditor->widget_key, &wi))) {
+      config_update_num ("gui.mmk_editor_x", wi.x);
+      config_update_num ("gui.mmk_editor_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
+
+    mmkeditor->mmk = NULL;
+    
+    xitk_unregister_event_handler(&mmkeditor->widget_key);
+    
+    XLockDisplay(gGui->display);
+    XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+    XUnlockDisplay(gGui->display);
+    
+    xitk_destroy_widgets(mmkeditor->widget_list);
+    
+    XLockDisplay(gGui->display);
+    XDestroyWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+    XUnlockDisplay(gGui->display);
+    
+    mmkeditor->xwin = None;
+    xitk_list_free(mmkeditor->widget_list->l);
+    
+    XLockDisplay(gGui->display);
+    XFreeGC(gGui->display, mmkeditor->widget_list->gc);
+    XUnlockDisplay(gGui->display);
+    
+    free(mmkeditor->widget_list);
+    
+    free(mmkeditor);
+    mmkeditor = NULL;
+  }
+}
+
+int mmk_editor_is_visible(void) {
+  
+  if(mmkeditor != NULL)
+    return mmkeditor->visible;
+  
+  return 0;
+}
+
+int mmk_editor_is_running(void) {
+  
+  if(mmkeditor != NULL)
+    return mmkeditor->running;
+  
+  return 0;
+}
+
+void mmk_editor_toggle_visibility(void) {
+  if(mmkeditor != NULL) {
+    if (mmkeditor->visible && mmkeditor->running) {
+      mmkeditor->visible = 0;
+      xitk_hide_widgets(mmkeditor->widget_list);
+      XLockDisplay(gGui->display);
+      XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+      XUnlockDisplay(gGui->display);
+    } else {
+      if(mmkeditor->running) {
+	mmkeditor->visible = 1;
+	xitk_show_widgets(mmkeditor->widget_list);
+	XLockDisplay(gGui->display);
+	XMapRaised(gGui->display, xitk_window_get_window(mmkeditor->xwin)); 
+	XSetTransientForHint(gGui->display, 
+			     xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
+	XUnlockDisplay(gGui->display);
+	layer_above_video(xitk_window_get_window(mmkeditor->xwin));
+      }
+    }
+  }
+}
+
+void mmk_editor_raise_window(void) {
+  if(mmkeditor != NULL) {
+    if(mmkeditor->xwin) {
+      if(mmkeditor->visible && mmkeditor->running) {
+	if(mmkeditor->running) {
+	  XLockDisplay(gGui->display);
+	  XMapRaised(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+	  mmkeditor->visible = 1;
+	  XSetTransientForHint(gGui->display, 
+			       xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
+	  XUnlockDisplay(gGui->display);
+	  layer_above_video(xitk_window_get_window(mmkeditor->xwin));
+	}
+      } else {
+	XLockDisplay(gGui->display);
+	XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+	XUnlockDisplay(gGui->display);
+	mmkeditor->visible = 0;
+      }
+    }
+  }
+}
+
+void mmk_editor_end(void) {
+  mmkeditor_exit(NULL, NULL);
+}
+
+void mmkeditor_set_mmk(mediamark_t **mmk) {
+
+  if(mmkeditor) {
+    mmkeditor->mmk = mmk;
+    
+    xitk_inputtext_change_text(mmkeditor->widget_list, mmkeditor->mrl, (*mmk)->mrl);
+    xitk_inputtext_change_text(mmkeditor->widget_list, mmkeditor->ident, (*mmk)->ident);
+    xitk_intbox_set_value(mmkeditor->start, (*mmk)->start);
+    xitk_intbox_set_value(mmkeditor->end, (*mmk)->end);
+  }
+}
+
+static void mmkeditor_apply(xitk_widget_t *w, void *data) {
+  const char *ident, *mrl;
+  int         start, end;
+
+  if(mmkeditor->mmk) {
+    
+    mrl = xitk_inputtext_get_text(mmkeditor->mrl); 
+    ident = xitk_inputtext_get_text(mmkeditor->ident);
+    start = xitk_intbox_get_value(mmkeditor->start);
+    end = xitk_intbox_get_value(mmkeditor->end);
+
+    if(start < 0)
+      start = 0;
+
+    if(end < -1)
+      end = -1;
+
+    mediamark_replace_entry(mmkeditor->mmk, mrl, ident, start, end);
+
+    if(mmkeditor->callback)
+      mmkeditor->callback(mmkeditor->user_data);
+      
+  }
+  
+}
+
+void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data) {
+  GC                          gc;
+  xitk_labelbutton_widget_t   lb;
+  xitk_label_widget_t         lbl;
+  xitk_checkbox_widget_t      cb;
+  xitk_inputtext_widget_t     inp;
+  xitk_intbox_widget_t        ib;
+  xitk_pixmap_t              *bg;
+  xitk_widget_t              *b;
+  int                         x, y, w, width, height;
+
+  if(mmkeditor) {
+    if(!mmkeditor->visible)
+      mmkeditor->visible = !mmkeditor->visible;
+    mmk_editor_raise_window();
+    mmkeditor_set_mmk(mmk);
+    return;
+  }
+
+  mmkeditor = (_mmk_editor_t *) xine_xmalloc(sizeof(_mmk_editor_t));
+  
+  mmkeditor->callback = callback;
+  mmkeditor->user_data = data;
+
+  x = xine_config_register_num(gGui->xine, "gui.mmk_editor_x", 
+			       100,
+			       CONFIG_NO_DESC,
+			       CONFIG_NO_HELP,
+			       CONFIG_LEVEL_BEG,
+			       CONFIG_NO_CB,
+			       CONFIG_NO_DATA);
+  y = xine_config_register_num(gGui->xine, "gui.mmk_editor_y",
+			       100,
+			       CONFIG_NO_DESC,
+			       CONFIG_NO_HELP,
+			       CONFIG_LEVEL_BEG,
+			       CONFIG_NO_CB,
+			       CONFIG_NO_DATA);
+  
+  /* Create window */
+  mmkeditor->xwin = xitk_window_create_dialog_window(gGui->imlib_data, _("Mediamark Editor"), x, y,
+						     WINDOW_WIDTH, WINDOW_HEIGHT);
+  
+  XLockDisplay (gGui->display);
+  
+  gc = XCreateGC(gGui->display, 
+		 (xitk_window_get_window(mmkeditor->xwin)), None, None);
+  
+  mmkeditor->widget_list                = xitk_widget_list_new();
+  mmkeditor->widget_list->l             = xitk_list_new();
+  mmkeditor->widget_list->win           = (xitk_window_get_window(mmkeditor->xwin));
+  mmkeditor->widget_list->gc            = gc;
+  
+  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+  XITK_WIDGET_INIT(&ib, gGui->imlib_data);
+
+  xitk_window_get_window_size(mmkeditor->xwin, &width, &height);
+  bg = xitk_image_create_xitk_pixmap(gGui->imlib_data, width, height);
+  XCopyArea(gGui->display, (xitk_window_get_background(mmkeditor->xwin)), bg->pixmap,
+	    bg->gc, 0, 0, width, height, 0, 0);
+
+  x = 5;
+  y = 35;
+  draw_outter_frame(gGui->imlib_data, bg, _("Identifier"), btnfontname, 
+		    x, y, WINDOW_WIDTH - 10, 20 + 15 + 10);
+
+  x = 15;
+  y += 5;
+  w = WINDOW_WIDTH - 30;
+  inp.skin_element_name = NULL;
+  inp.text              = NULL;
+  inp.max_length        = 2048;
+  inp.callback          = NULL;
+  inp.userdata          = NULL;
+  xitk_list_append_content(mmkeditor->widget_list->l,
+	   (mmkeditor->ident = 
+	    xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
+					 x, y, w, 20,
+					 "Black", "Black", fontname)));
+  xitk_set_widget_tips_default(mmkeditor->ident, _("Mediamark Identifier"));
+
+  x = 5;
+  y += 40;
+  draw_outter_frame(gGui->imlib_data, bg, _("Mrl"), btnfontname, 
+		    x, y, WINDOW_WIDTH - 10, 20 + 15 + 10);
+
+  x = 15;
+  y += 5;
+  inp.skin_element_name = NULL;
+  inp.text              = NULL;
+  inp.max_length        = 2048;
+  inp.callback          = NULL;
+  inp.userdata          = NULL;
+  xitk_list_append_content(mmkeditor->widget_list->l,
+	    (mmkeditor->mrl = 
+	     xitk_noskin_inputtext_create(mmkeditor->widget_list, &inp,
+					  x, y, w, 20,
+					  "Black", "Black", fontname)));
+  xitk_set_widget_tips_default(mmkeditor->mrl, _("Mediamark Mrl"));
+  
+
+  x = 5;
+  y += 40;
+  w = 60;
+  draw_outter_frame(gGui->imlib_data, bg, _("Start at"), btnfontname, 
+		    x, y, w + 60, 20 + 15 + 10);
+
+  x = 35;
+  y += 5;
+  ib.skin_element_name = NULL;
+  ib.value             = 0;
+  ib.step              = 1;
+  ib.parent_wlist      = mmkeditor->widget_list;
+  ib.callback          = NULL;
+  ib.userdata          = NULL;
+  xitk_list_append_content(mmkeditor->widget_list->l,
+	    (mmkeditor->start = 
+	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
+				       x, y, w, 20, NULL, NULL, NULL)));
+  xitk_set_widget_tips_default(mmkeditor->start, _("Mediamark start time (secs)."));
+
+  x += w + 20 + 15;
+  y -= 5;
+  draw_outter_frame(gGui->imlib_data, bg, _("End at"), btnfontname, 
+		    x, y, w + 60, 20 + 15 + 10);
+
+  x += 30;
+  y += 5;
+  ib.skin_element_name = NULL;
+  ib.value             = -1;
+  ib.step              = 1;
+  ib.parent_wlist      = mmkeditor->widget_list;
+  ib.callback          = NULL;
+  ib.userdata          = NULL;
+  xitk_list_append_content(mmkeditor->widget_list->l,
+	    (mmkeditor->end = 
+	     xitk_noskin_intbox_create(mmkeditor->widget_list, &ib, 
+				       x, y, w, 20, NULL, NULL, NULL)));
+  xitk_set_widget_tips_default(mmkeditor->end, _("Mediamark end time (secs)."));
+  
+
+  y = WINDOW_HEIGHT - (23 + 15);
+  x = 15;
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Apply");
+  lb.align             = LABEL_ALIGN_CENTER;
+  lb.callback          = mmkeditor_apply; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content(mmkeditor->widget_list->l, 
+	   (b = xitk_noskin_labelbutton_create(mmkeditor->widget_list, 
+					       &lb, x, y, 100, 23,
+					       "Black", "Black", "White", btnfontname)));
+  xitk_set_widget_tips_default(b, _("Apply the changes to the playlist."));
+
+  x = WINDOW_WIDTH - 115;
+  
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("Close");
+  lb.align             = LABEL_ALIGN_CENTER;
+  lb.callback          = mmkeditor_exit; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content(mmkeditor->widget_list->l, 
+	   (b = xitk_noskin_labelbutton_create(mmkeditor->widget_list, 
+					       &lb, x, y, 100, 23,
+					       "Black", "Black", "White", btnfontname)));
+  xitk_set_widget_tips_default(b, _("Discard changes and dismiss the window."));
+  
+  xitk_window_change_background(gGui->imlib_data, mmkeditor->xwin, bg->pixmap, width, height);
+  xitk_image_destroy_xitk_pixmap(bg);
+
+  XMapRaised(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+  XUnlockDisplay(gGui->display);
+
+  mmkeditor->widget_key = xitk_register_event_handler("mmkeditor", 
+						      (xitk_window_get_window(mmkeditor->xwin)),
+						      NULL,
+						      NULL,
+						      NULL,
+						      mmkeditor->widget_list,
+						      NULL);
+  
+  mmkeditor->visible = 1;
+  mmkeditor->running = 1;
+  mmkeditor_set_mmk(mmk);
+  mmk_editor_raise_window();
+
+  XLockDisplay(gGui->display);
+  XSetInputFocus(gGui->display, xitk_window_get_window(mmkeditor->xwin), RevertToParent, CurrentTime);
+  XUnlockDisplay(gGui->display);
 }

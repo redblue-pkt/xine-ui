@@ -562,6 +562,10 @@ void gui_execute_action_id(action_id_t action) {
     playlist_scan_for_infos();
     break;
 
+  case ACTID_MMKEDITOR:
+    playlist_mmk_editor();
+    break;
+
   default:
     break;
   }

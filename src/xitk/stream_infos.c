@@ -245,41 +245,44 @@ char *stream_infos_get_ident_from_stream(xine_stream_t *stream) {
   return ident;
 }
 
-void stream_infos_exit(xitk_widget_t *w, void *data) {
+static void stream_infos_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
 
-  sinfos->running = 0;
-  sinfos->visible = 0;
-
-  if((xitk_get_window_info(sinfos->widget_key, &wi))) {
-    config_update_num ("gui.sinfos_x", wi.x);
-    config_update_num ("gui.sinfos_y", wi.y);
-    WINDOW_INFO_ZERO(&wi);
+  if(sinfos) {
+    
+    sinfos->running = 0;
+    sinfos->visible = 0;
+    
+    if((xitk_get_window_info(sinfos->widget_key, &wi))) {
+      config_update_num ("gui.sinfos_x", wi.x);
+      config_update_num ("gui.sinfos_y", wi.y);
+      WINDOW_INFO_ZERO(&wi);
+    }
+    
+    xitk_unregister_event_handler(&sinfos->widget_key);
+    
+    XLockDisplay(gGui->display);
+    XUnmapWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
+    XUnlockDisplay(gGui->display);
+    
+    xitk_destroy_widgets(sinfos->widget_list);
+    
+    XLockDisplay(gGui->display);
+    XDestroyWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
+    XUnlockDisplay(gGui->display);
+    
+    sinfos->xwin = None;
+    xitk_list_free(sinfos->widget_list->l);
+    
+    XLockDisplay(gGui->display);
+    XFreeGC(gGui->display, sinfos->widget_list->gc);
+    XUnlockDisplay(gGui->display);
+    
+    free(sinfos->widget_list);
+    
+    free(sinfos);
+    sinfos = NULL;
   }
-
-  xitk_unregister_event_handler(&sinfos->widget_key);
-
-  XLockDisplay(gGui->display);
-  XUnmapWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
-  XUnlockDisplay(gGui->display);
-
-  xitk_destroy_widgets(sinfos->widget_list);
-
-  XLockDisplay(gGui->display);
-  XDestroyWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
-  XUnlockDisplay(gGui->display);
-
-  sinfos->xwin = None;
-  xitk_list_free(sinfos->widget_list->l);
-  
-  XLockDisplay(gGui->display);
-  XFreeGC(gGui->display, sinfos->widget_list->gc);
-  XUnlockDisplay(gGui->display);
-
-  free(sinfos->widget_list);
-
-  free(sinfos);
-  sinfos = NULL;
 }
 
 int stream_infos_is_visible(void) {
@@ -360,7 +363,7 @@ void stream_infos_raise_window(void) {
   }
 }
 
-static void stream_infos_end(xitk_widget_t *w, void *data) {
+void stream_infos_end(void) {
   stream_infos_exit(NULL, NULL);
 }
 
@@ -472,7 +475,7 @@ void stream_infos_panel(void) {
 				CONFIG_NO_DATA);
   
   /* Create window */
-  sinfos->xwin = xitk_window_create_dialog_window(gGui->imlib_data, _("stream informations"), x, y,
+  sinfos->xwin = xitk_window_create_dialog_window(gGui->imlib_data, _("Stream Information"), x, y,
 						  WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
@@ -991,7 +994,7 @@ void stream_infos_panel(void) {
   lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Close");
   lb.align             = LABEL_ALIGN_CENTER;
-  lb.callback          = stream_infos_end; 
+  lb.callback          = stream_infos_exit; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
@@ -1024,51 +1027,3 @@ void stream_infos_panel(void) {
   XSetInputFocus(gGui->display, xitk_window_get_window(sinfos->xwin), RevertToParent, CurrentTime);
   XUnlockDisplay (gGui->display);
 }
-/*
-  titre           1
-  commentaire     1
-  artiste         1/2
-  genre           1/4
-  annee           1/4      
-  album           1/2      3,5L (4)
-
- +- general frame ----------------------+
- |
- |  input plugin    1/4
- |  system layer    1/4
- |  bitrate         1/4
-  frame duration    1/4
-  is seekable     1/4
-  has chapter     1/4     1,5++L (2)
-  ignore spu      1/4     
-
-
- +- video frame ----------------------+
- |
- |  has video    1/5
- |  video handled  1/5
- |  ignore video  1/5
- |  codec video  1/3    --1L
-  video fourcc     1/6
-  video channels   1/6
-  video bitrate     ""
-      video width   "" merge
-      video height ""   merge
-  video ratio      ""
-  video streams    ""       2L
-  
- +- audio frame ----------------------+
- |
- |  has audio 1/5
- |  audio handled 1/5
- |  ignore audio 1/5
- |  codec audio   1/3   --1L
- |  audio fourcc  1/5
-  audio channels 1/5
-  audio bitrate  "" 
-  audio bits     "" 
-  audio samplerate  ""   2L
-  
-
-
- */

@@ -865,7 +865,7 @@ void gui_stream_infos_show(xitk_widget_t *w, void *data) {
   else if(!stream_infos_is_running())
     stream_infos_panel();
   else
-    stream_infos_exit(NULL, NULL);
+    stream_infos_end();
 }
 
 void gui_viewlog_show(xitk_widget_t *w, void *data) {
