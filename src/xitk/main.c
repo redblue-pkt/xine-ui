@@ -435,6 +435,9 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
 	return video_port;
     }
     
+    /* note: xine-lib can do auto-probing for us if we want.
+     *       but doing it here should do no harm.
+     */
     i = 0;
     driver_ids = xine_list_video_output_plugins (gGui->xine);
 
@@ -447,9 +450,6 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
 					  XINE_VISUAL_TYPE_X11, 
 					  (void *) &vis);
       if (video_port) {
-	video_driver_id = strdup(driver_ids[i]);
-	config_update_string("video.driver", video_driver_id);
-	free(video_driver_id);
 	return video_port;
       }
      
@@ -470,12 +470,18 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
 					  video_driver_id,
 					  XINE_VISUAL_TYPE_NONE,
 					  (void *) &vis);
+      
+      /* do not save on config, otherwise user would never see images again... */
     }
     else {
       video_port = xine_open_video_driver(gGui->xine,
 					  video_driver_id,
 					  XINE_VISUAL_TYPE_X11, 
 					  (void *) &vis);
+      
+      /* save requested driver (-V) */ 
+      if( video_port )
+        config_update_string("video.driver", video_driver_id);
     }
 
     if (!video_port) {
@@ -483,7 +489,6 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
       exit (1);
     }
     
-    config_update_string("video.driver", video_driver_id);
   }
 
   return video_port;
@@ -525,6 +530,9 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
 	return audio_port;
     }
     
+    /* note: xine-lib can do auto-probing for us if we want.
+     *       but doing it here should do no harm.
+     */
     i = 0;
     driver_ids = xine_list_audio_output_plugins (gGui->xine);
 
@@ -536,9 +544,6 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
 					  driver_ids[i],
 					  NULL);
       if (audio_port) {
-	audio_driver_id = strdup(driver_ids[i]);
-	config_update_string("audio.driver", audio_driver_id);
-	free(audio_driver_id);
 	return audio_port;
       }
      
@@ -546,8 +551,6 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
     }
       
     printf(_("main: audio driver probing failed => no audio output\n"));
-	    
-    config_update_string("audio.driver", "null");
   }
   else {
     
@@ -555,8 +558,12 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
     if (!strncasecmp (audio_driver_id, "NULL", 4)) {
 
       printf(_("main: not using any audio driver (as requested).\n"));
-      config_update_string("audio.driver", "null");
 
+      /* calling -A null is useful to developers, but we should not save it at
+       * config. if user doesn't have a sound card he may go to setup screen
+       * changing audio.driver to NULL in order to make xine start a bit faster.
+       */
+    
     }
     else {
     
@@ -566,9 +573,11 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
         printf (_("main: audio driver <%s> failed\n"), audio_driver_id);
         exit (1);
       }
+    
+      /* save requested driver (-A) */ 
+      config_update_string("audio.driver", audio_driver_id);
     }
-
-    config_update_string("audio.driver", audio_driver_id);
+  
   }
 
   return audio_port;
