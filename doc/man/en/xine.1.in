@@ -69,6 +69,25 @@ Valid options are:
 "extension" (only by extension). If no option is given, 
 "revert" is selected
 .TP
+.B \-\-visual <visual class>
+Try to use a specific X11 server visual class for xine windows.  The
+<visual class> parameter is one of StaticGray, GrayScale, StaticColor,
+PseudoColor, TrueColor or DirectColor.  For a given visual class, Xine
+tries to find a visual of depth 15 or 16, 24 or 32, 8 (in that order).
+The default visual class used by xine is TrueColor.
+.br
+If no usable visual of the given class is found, xine falls back to
+the default visual used on the X11 server's root window.
+.TP
+.B \-\-visualid <visualID>
+Try to use a specific X11 server visual for xine windows. The parameter
+is the visual's id that should be used (a hexdecimal number).
+.TP
+.B \-\-install
+When using an X11 visual with changable colors (colormaps), install a
+private colormap for xine.  With a private colormap, xine can allocate
+more colors so that video output may look better.
+.TP
 .B MRL (media resource locator)
 .br
 MRLs are similar to URLs in your web browser. They describe the media
