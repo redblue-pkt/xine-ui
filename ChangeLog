@@ -1,8 +1,8 @@
 
 xine-ui (0.9.3) unstable; urgency=low
 
-  * added XF86VidMode extension support for fullscreen resolution switching
-  * mouse can be grabbed in video output window by pressing INSERT key
+  * XF86VidMode extension support for fullscreen resolution switching added
+  * mouse can be grabbed in video output window now by pressing INSERT key
 
  -- Guenter Bartsch <guenter@users.sourceforge.net> Thu Nov  1 16:40:58 CET 2001
 
