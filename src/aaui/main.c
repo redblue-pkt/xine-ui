@@ -456,15 +456,17 @@ int main(int argc, char *argv[]) {
   xine_select_audio_channel (aaxine.xine, audio_channel);
 
   /* Kick off terminal pollution */
-  if( !aaxine.debug_messages ) {
+  if((!aaxine.debug_messages)
+     && ((!strcasecmp(aaxine.context->driver->shortname, "linux"))
+         || (!strcasecmp(aaxine.context->driver->shortname, "X11")))) {
     int error_fd;
     
-    if ( (error_fd = open("/dev/null", O_WRONLY)) < 0)
+    if ((error_fd = open("/dev/null", O_WRONLY)) < 0)
          printf("cannot open /dev/null");
     else {
-      if ( dup2 (error_fd, STDOUT_FILENO) < 0)
+      if (dup2(error_fd, STDOUT_FILENO) < 0)
            printf("cannot dup2 stdout");
-      if ( dup2 (error_fd, STDERR_FILENO) < 0)
+      if (dup2(error_fd, STDERR_FILENO) < 0)
            printf("cannot dup2 stderr");
     }
   }
@@ -480,8 +482,7 @@ int main(int argc, char *argv[]) {
   while (aaxine.running) {
     
     key = AA_NONE;
-    while( ((key = aa_getevent(aaxine.context, 0)) == AA_NONE)
-	   && aaxine.running );
+    while(((key = aa_getevent(aaxine.context, 0)) == AA_NONE) && aaxine.running );
     
     if((key >= AA_UNKNOWN && key < AA_UNKNOWN) || (key >= AA_RELEASE)) 
       continue;
