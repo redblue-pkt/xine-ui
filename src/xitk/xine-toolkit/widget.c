@@ -1061,8 +1061,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
     }
     
   }
-  
-  if (!bUp) {
+  else if (!bUp) {
 
     if(wl->widget_under_mouse && mywidget && (wl->widget_under_mouse == mywidget)) {
       if ((mywidget->type & WIDGET_FOCUSABLE) && mywidget->enable == WIDGET_ENABLE) {
@@ -1072,6 +1071,10 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int but
 	mywidget->have_focus = FOCUS_RECEIVED;
       }
     }
+    
+  }
+  
+  if (!bUp) {
     
     wl->widget_pressed = mywidget;
     
