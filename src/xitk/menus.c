@@ -187,6 +187,8 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
 	gui_stop(NULL, NULL);
       gui_play(NULL, NULL);
     }
+
+    enable_playback_controls((gGui->playlist.num > 0));
   }
 }
 static void menu_stream(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
