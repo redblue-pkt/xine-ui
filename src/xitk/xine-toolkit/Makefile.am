@@ -1,5 +1,5 @@
 
-CFLAGS = -Werror @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
+CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
 
 noinst_LTLIBRARIES = libxitk.la
 libxitk_la_SOURCES = browser.c button.c checkbox.c dnd.c filebrowser.c image.c inputtext.c \
