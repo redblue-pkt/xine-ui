@@ -33,7 +33,7 @@
 
 #include <xine.h>
 #include <pthread.h>
-#include "event.h"
+#include "oxine_event.h"
 
 /*
  * alignments for text

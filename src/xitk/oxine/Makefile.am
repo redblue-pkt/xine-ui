@@ -23,6 +23,7 @@ noinst_HEADERS = \
 	odk.h \
 	otk.h \
 	oxine.h \
+	oxine_event.h \
 	playlist.h \
 	utils.h 
 

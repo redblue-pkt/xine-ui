@@ -25,7 +25,7 @@
 
 #include "odk.h"
 #include "list.h"
-#include "event.h"
+#include "oxine_event.h"
 
 /*
  * alignments for text

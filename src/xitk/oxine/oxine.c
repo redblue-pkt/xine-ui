@@ -37,7 +37,7 @@
 #include "oxine.h"
 #include "odk.h"
 #include "otk.h"
-#include "event.h"
+#include "oxine_event.h"
 #include "xine/xmlparser.h"
 #include "utils.h"
 
