@@ -1,15 +1,15 @@
-# translation of xitk-eu.po to Librezale.org
-# translation of xitk.po to Librezale.org
+# translation of xine-ui-eu.po to Librezale.org
+# translation of xine-ui-orig.po to Librezale.org
 # This file is distributed under the same license as the PACKAGE package.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
 # Piarres Beobide  <pi@beobide.net>, 2005.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xitk-eu\n"
+"Project-Id-Version: xine-ui-eu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-02-08 22:31+0100\n"
-"PO-Revision-Date: 2005-02-08 18:51+0100\n"
+"POT-Creation-Date: 2004-12-17 00:37+0100\n"
+"PO-Revision-Date: 2005-02-07 17:46+0100\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
 "MIME-Version: 1.0\n"
@@ -17,105 +17,3002 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.9.1\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1161
-msgid "Select current entry"
-msgstr "Hautatu aukeratutako sarrera"
-
-#: src/xitk/xine-toolkit/mrlbrowser.c:1169
-msgid "Play selected entry"
-msgstr "Erreproduzitu aukeratutako sarrera"
-
-#: src/xitk/xine-toolkit/mrlbrowser.c:1180
-msgid "Close MRL browser window"
-msgstr "Itxi MRL kudeatzaile leihoa"
-
-#: src/xitk/xine-toolkit/test.c:118
+#: src/xitk/actions.c:355
 #, c-format
-msgid "XInitThreads() failed.\n"
-msgstr "XInitThreads()-ek huts egin du.\n"
+msgid ""
+"The stream '%s' isn't supported by xine:\n"
+"\n"
+msgstr ""
+"Xinek ez du '%s' korrontea onartzen:\n"
+"\n"
 
-#: src/xitk/xine-toolkit/test.c:125
+#: src/xitk/actions.c:359
+#, c-format
+msgid ""
+"The stream '%s' use an unsupported codec:\n"
+"\n"
+msgstr ""
+"'%s' korronteak onartu gabeko kodeka erabiltzen du:\n"
+"\n"
+
+#: src/xitk/actions.c:369
+#, c-format
+msgid "%sVideo Codec: %s (%s)\n"
+msgstr "%sBideo-kodeka: %s (%s)\n"
+
+#: src/xitk/actions.c:370 src/xitk/actions.c:381 src/xitk/stream_infos.c:163
+#: src/xitk/stream_infos.c:378 src/xitk/stream_infos.c:379
+#: src/xitk/stream_infos.c:380 src/xitk/stream_infos.c:381
+#: src/xitk/stream_infos.c:382 src/xitk/stream_infos.c:384
+#: src/xitk/stream_infos.c:385 src/xitk/stream_infos.c:386
+#: src/xitk/stream_infos.c:387
+msgid "Unavailable"
+msgstr "Ez dago erabilgarri"
+
+#: src/xitk/actions.c:380
+#, c-format
+msgid "%sAudio Codec: %s (%s)\n"
+msgstr "%sAudio-kodeka: %s (%s)\n"
+
+#: src/xitk/actions.c:394
+#, c-format
+msgid ""
+"%s\n"
+"Start playback anyway ?\n"
+msgstr ""
+"%s\n"
+"Erreproduzitzen hasi nahi duzu hala ere?\n"
+
+#: src/xitk/actions.c:402
+msgid "Start Playback ?"
+msgstr "Erreproduzitzen hasi?"
+
+#: src/xitk/actions.c:693
+msgid "No MRL (input stream) specified"
+msgstr "Ez da MRLrik (sarrera-korronterik) zehaztu"
+
+#: src/xitk/actions.c:1001
+#, c-format
+msgid "Aspect ratio: %s"
+msgstr "Aspektu-erlazioa: %s"
+
+#: src/xitk/actions.c:1016
+#, c-format
+msgid "Deinterlace: %s"
+msgstr "Gurutzelarkatuak bereizi: %s"
+
+#: src/xitk/actions.c:1016 src/xitk/actions.c:1707
+msgid "enabled"
+msgstr "gaituta"
+
+#: src/xitk/actions.c:1016 src/xitk/actions.c:1707
+msgid "disabled"
+msgstr "desgaituta"
+
+#: src/xitk/actions.c:1237 src/xitk/actions.c:1254 src/xitk/actions.c:1383
+#: src/xitk/lirc.c:165 src/xitk/stdctl.c:112
+#, c-format
+msgid "%s(): can't create new thread (%s)\n"
+msgstr "%s(): ezin da hari berria sortu (%s)\n"
+
+#: src/xitk/actions.c:1599
+msgid "There is no mrl."
+msgstr "Ez dago mrl-rik."
+
+#: src/xitk/actions.c:1707
+#, c-format
+msgid "Post plugins: %s."
+msgstr "Bidali pluginak: %s."
+
+#: src/xitk/actions.c:1798
+msgid "Amplification Level"
+msgstr "Anplifikazio-maila"
+
+#: src/xitk/actions.c:1816 src/xitk/menus.c:296 src/xitk/menus.c:310
+msgid "Audio Volume"
+msgstr "Audioaren bolumena"
+
+#: src/xitk/actions.c:1875
+#, c-format
+msgid "TV Mode: %d"
+msgstr "TB modua: %d"
+
+#: src/xitk/actions.c:1896
+#, c-format
+msgid "XSendEvent(display, 0x%x ...) failed.\n"
+msgstr "XsendEvent-ek (bistaratzea, 0x%x ...) huts egin du.\n"
+
+#: src/xitk/actions.c:2026 src/xitk/actions.c:2090 src/xitk/event_sender.c:486
+#: src/xitk/mediamark.c:3174
+msgid "Select"
+msgstr "Hautatu"
+
+#: src/xitk/actions.c:2029
+msgid "Select all"
+msgstr "Hautatu dena"
+
+#: src/xitk/actions.c:2034
+msgid "Stream(s) loading"
+msgstr "Korrontea(k) kargatzen"
+
+#: src/xitk/actions.c:2113 src/xitk/mediamark.c:3195
+msgid "Pick a subtitle file"
+msgstr "Aukeratu azpitituluen fitxategi bat"
+
+#: src/xitk/config_wrapper.c:150
+msgid ""
+"You tried to change the configuration with a cfg: MRL.\n"
+"This is not allowed unless you enable the 'misc.implicit_config' setting "
+"after reading and understanding its help text."
+msgstr ""
+"Konfigurazio cfg baten bidez aldatzen saiatu zara: MRL.\n"
+"HAu ez da onartzen laguntza textu hau irakurri eta ulertu ondoren "
+"'misc.implicit_config' gaitzen ez baduzu."
+
+#: src/xitk/config_wrapper.c:173
+#, c-format
+msgid ""
+"For security reason, you're not allowed to change the configuration entry "
+"named '%s'."
+msgstr ""
+"Segurasun arrazoiengatik, zu ez duzu '%s' izeneko konfigurazio erregistroa "
+"aldatzeko gaitasunik."
+
+#: src/xitk/control.c:274
+msgid "hue value"
+msgstr "�barduraren balioa"
+
+#: src/xitk/control.c:275
+msgid "Hue value."
+msgstr "�barduraren balioa."
+
+#: src/xitk/control.c:290
+msgid "brightness value"
+msgstr "distiraren balioa"
+
+#: src/xitk/control.c:291
+msgid "Brightness value."
+msgstr "Distiraren balioa."
+
+#: src/xitk/control.c:306
+msgid "saturation value"
+msgstr "saturazioaren balioa"
+
+#: src/xitk/control.c:307
+msgid "Saturation value."
+msgstr "Saturazioaren balioa."
+
+#: src/xitk/control.c:322
+msgid "contrast value"
+msgstr "kontrastearen balioa"
+
+#: src/xitk/control.c:323
+msgid "Contrast value."
+msgstr "Kontrastearen balioa."
+
+#: src/xitk/control.c:461 src/xitk/panel.c:202 src/xitk/playlist.c:898
+#, c-format
+msgid "%s(): couldn't find image for background\n"
+msgstr "%s(): ezin izan da atzeko planorako irudia aurkitu\n"
+
+#: src/xitk/control.c:548
+msgid "xine Control Window"
+msgstr "xine kontrol-leihoa"
+
+#: src/xitk/control.c:563
+msgid "control: couldn't find image for background\n"
+msgstr "kontrola: ezin izan da atzeko planorako irudia aurkitu\n"
+
+#: src/xitk/control.c:692
+msgid "Control HUE value"
+msgstr "Kontrolen �BARDURAREN balioa"
+
+#: src/xitk/control.c:695 src/xitk/event.c:863 src/xitk/event.c:870
+msgid "Hue"
+msgstr "�bardura"
+
+#: src/xitk/control.c:715
+msgid "Control SATURATION value"
+msgstr "Kontrolen SATURAZIOAREN balioa"
+
+#: src/xitk/control.c:718
+msgid "Sat"
+msgstr "Sat"
+
+#: src/xitk/control.c:738
+msgid "Control BRIGHTNESS value"
+msgstr "Kontrolen DISTIRAREN balioa"
+
+#: src/xitk/control.c:741
+msgid "Brt"
+msgstr "Dis"
+
+#: src/xitk/control.c:761
+msgid "Control CONTRAST value"
+msgstr "Kontrolen KONTRASTEAREN balioa"
+
+#: src/xitk/control.c:764
+msgid "Ctr"
+msgstr "Ktr"
+
+#: src/xitk/control.c:786
+msgid "Choose a Skin"
+msgstr "Aukeratu azal bat"
+
+#: src/xitk/control.c:813 src/xitk/mrl_browser.c:295 src/xitk/playlist.c:1219
+msgid "Dismiss"
+msgstr "Itxi"
+
+#: src/xitk/control.c:819
+msgid "Close control window"
+msgstr "Itxi kontrol leihoa"
+
+#: src/xitk/download.c:56
+msgid "Download in progress"
+msgstr "Deskargatzen"
+
+#: src/xitk/download.c:58
+#, c-format
+msgid "Download progress: %d%%."
+msgstr "Deskargatzen: %d%%."
+
+#: src/xitk/errors.c:63 src/xitk/errors.c:330 src/xitk/kbindings.c:2240
+msgid "Done"
+msgstr "Eginda"
+
+#: src/xitk/errors.c:63
+msgid "More..."
+msgstr "Gehiago..."
+
+#: src/xitk/errors.c:168
+msgid "Error"
+msgstr "Errorea"
+
+#: src/xitk/errors.c:247
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"There is no input plugin available to handle '%s'.\n"
+"Maybe MRL syntax is wrong or file/stream source doesn't exist."
+msgstr ""
+"- xine-n errorea-\n"
+"\n"
+"Ez dago sarrera-pluginik erabilgarri '%s' kudeatzeko.\n"
+"Beharbada MRL sintaxia okerra da edo fitxategiaren/korrontearen iturburua ez "
+"dago."
+
+#: src/xitk/errors.c:255
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"There is no demuxer plugin available to handle '%s'.\n"
+"Usually this means that the file format was not recognized."
+msgstr ""
+"- xine-n errorea -\n"
+"\n"
+"Ez dago demuxer plugin-ik erabilgarri '%s' kudeatzeko.\n"
+"Gehienetan horrek esan nahi du fitxategi-formatua ez dela onartzen."
+
+#: src/xitk/errors.c:263
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"Demuxer failed. Maybe '%s' is a broken file?\n"
+msgstr ""
+"- xine-n errorea -\n"
+"\n"
+"Demuxer-ek huts egin du. Beharbada '%s' fitxategia apurtua dago?\n"
+
+#: src/xitk/errors.c:269
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"Malformed mrl. Mrl '%s' seems malformed/invalid.\n"
+msgstr ""
+"- xine-n errorea -\n"
+"\n"
+"mrl gaizki osatuta. Badirudi '%s' Mrl gaizki osatuta dagoela edo baliogabea "
+"dela.\n"
+
+#: src/xitk/errors.c:275
+#, c-format
+msgid ""
+"- xine engine error -\n"
+"\n"
+"Input plugin failed to open mrl '%s'\n"
+msgstr ""
+"- xine-n errorea -\n"
+"\n"
+"Sarrerako plugin-ak ezin izan du '%s' mrl ireki\n"
+
+#: src/xitk/errors.c:281
+msgid ""
+"- xine engine error -\n"
+"\n"
+"!! Unhandled error !!\n"
+msgstr ""
+"- xine-n errorea -\n"
+"\n"
+"Errore ezezaguna!!\n"
+
+#.
+#. * fixme: how to properly open the system browser?
+#. * should we just make it configurable?
+#.
+#: src/xitk/errors.c:298
+msgid "Opening mozilla web browser, this might take a while..."
+msgstr "Mozilla web kudeatzailea irekitzen, honek denbora behar lezake..."
+
+#: src/xitk/errors.c:311
+msgid "Warning"
+msgstr "Kontuz"
+
+#: src/xitk/errors.c:312
+msgid ""
+"The amount of dropped frame is too high, your system might be slow, not "
+"properly optimized or just too loaded.\n"
+"\n"
+"http://xinehq.de/index.php/faq#SPEEDUP"
+msgstr ""
+"Alda batetara utzitako trama kopurua oso handia da, zure sistema oso geldoa "
+"da, ez dago behar bezala konfiguraturik edo karga handiegia du.\n"
+"\n"
+"http://xinehq.de/index.php/faq#SPEEDUP"
+
+#: src/xitk/errors.c:318
+msgid "Warn user when too much frames are dropped."
+msgstr "Abisatu erabiltzailea trama gehiegi alde batetara uztean."
+
+#: src/xitk/errors.c:330
+msgid "Learn More..."
+msgstr "Gehiago ikasi..."
+
+#: src/xitk/errors.c:332
+msgid "Disable this warning."
+msgstr "Ezgaitu abisu hau."
+
+#: src/xitk/event.c:421
+msgid "Zoom: 1:1"
+msgstr "Zooma: 1:1"
+
+#: src/xitk/event.c:426
+#, c-format
+msgid "Zoom: 200%%"
+msgstr "Zooma: %%200"
+
+#: src/xitk/event.c:431
+#, c-format
+msgid "Zoom: 50%%"
+msgstr "Zooma: %%50"
+
+#: src/xitk/event.c:652 src/xitk/event.c:664
+#, c-format
+msgid "A/V offset: %s"
+msgstr "A/V desplazamendua: %s"
+
+#: src/xitk/event.c:670
+msgid "A/V Offset: reset."
+msgstr "A/V desplazamendua: berrezarri"
+
+#: src/xitk/event.c:679 src/xitk/event.c:689
+#, c-format
+msgid "SPU Offset: %s"
+msgstr "SPU desplazamendua: %s"
+
+#: src/xitk/event.c:695
+msgid "SPU Offset: reset."
+msgstr "SPU desplazamendua: berrezarri."
+
+#: src/xitk/event.c:826 src/xitk/menus.c:199
+msgid "Playlist: no loop."
+msgstr "Erreprodukzio-zerrenda: begiztarik ez."
+
+#: src/xitk/event.c:829 src/xitk/menus.c:204
+msgid "Playlist: loop."
+msgstr "Erreprodukzio-zerrenda: begizta."
+
+#: src/xitk/event.c:832 src/xitk/menus.c:209
+msgid "Playlist: entry repeat."
+msgstr "Erreprodukzio-zerrenda: sarrera errepikatzea."
+
+#: src/xitk/event.c:835 src/xitk/menus.c:214
+msgid "Playlist: shuffle."
+msgstr "Erreprodukzio-zerrenda: ausaz."
+
+#: src/xitk/event.c:838 src/xitk/menus.c:219
+msgid "Playlist: shuffle forever."
+msgstr "Erreprodukzio-zerrenda: ausaz etengabe."
+
+#: src/xitk/event.c:878 src/xitk/event.c:885
+msgid "Saturation"
+msgstr "Saturazioa"
+
+#: src/xitk/event.c:893 src/xitk/event.c:900
+msgid "Brightness"
+msgstr "Distira"
+
+#: src/xitk/event.c:908 src/xitk/event.c:915
+msgid "Contrast"
+msgstr "Kontrastea"
+
+#: src/xitk/event.c:937
+#, c-format
+msgid "Playlist: %s"
+msgstr "Erreprodukzio-zerrenda: %s"
+
+#: src/xitk/event.c:938
+msgid "Stop"
+msgstr "Gelditu"
+
+#: src/xitk/event.c:938
+msgid "Continue"
+msgstr "Jarraitu"
+
+#: src/xitk/event.c:1182 src/xitk/videowin.c:262
+#, c-format
+msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
+msgstr ""
+"gui_main: hautatutako %#lx bisuala ez dago, lehenetsitako bisualarekin "
+"saiatzen\n"
+
+#: src/xitk/event.c:1201 src/xitk/videowin.c:281
+#, c-format
+msgid "gui_main: couldn't find true color visual.\n"
+msgstr "gui_main: ezin izan da benetako kolore bisuala aurkitu.\n"
+
+#: src/xitk/event.c:1276
+#, c-format
+msgid ""
+"\n"
+"XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
+msgstr ""
+"\n"
+"XinitThreads-ek huts egin du - hari seguruko xlib-ik ez duzula dirudi.\n"
+
+#: src/xitk/event.c:1282
 #, c-format
 msgid "Cannot open display\n"
 msgstr "Ezin da pantaila ireki\n"
 
-#: src/xitk/xine-toolkit/test.c:139
-#, c-format
-msgid "Imlib_init_with_params() failed.\n"
-msgstr "Imlib_init_with_params()-ek huts egin du.\n"
+#: src/xitk/event.c:1289
+msgid "Name of video display"
+msgstr "Bideo pantaila izena"
 
-#: src/xitk/xine-toolkit/test.c:378
-#, c-format
-msgid "New integer value is: %d. Confirm ?"
-msgstr "Zenbaki oso balio berria: %d. Berretsi?"
-
-#: src/xitk/xine-toolkit/test.c:430
-#, c-format
-msgid "New double value is: %e. Confirm ?"
-msgstr "Bikoitz balio berria: %e. Berretsi?"
-
-#: src/xitk/xine-toolkit/test.c:532
-msgid "My Frame"
-msgstr "Nire Markoa"
-
-#: src/xitk/xine-toolkit/test.c:572
-msgid "A Label"
-msgstr "Etiketa"
-
-#: src/xitk/xine-toolkit/test.c:632
-msgid "Fire !!"
-msgstr "Sua !!"
-
-#: src/xitk/xine-toolkit/test.c:661
-msgid "!BOOM!"
-msgstr "BOOM!"
-
-#: src/xitk/xine-toolkit/test.c:751
-#, c-format
+#: src/xitk/event.c:1290
 msgid ""
-"New entries selected in combo box is:\n"
-"%s [%d]."
+"Use this setting to configure to which display xine will show videos. When "
+"left blank, the main display will be used. Setting this option to something "
+"like ':0.1' or ':1' makes possible to display video and control on different "
+"screens (very useful for TV presentations)."
 msgstr ""
-"Aukera zerrendan aukeratutako sarrera berriak:\n"
-"%s [%d]."
+"Ezarpen hau erabili xine-k bideoak erakusteko zein pantaila erabiliko duen ezartzeko. "
+"Hutsik uzti ezkero, pantaila nagusia erabiliko da. Aukera hau ':0.1' or ':1' edo "
+"antzera ezarri ezkero bideo eta kontrola beste pantaila batetan irekitzeko "
+"aukera emango du (oso erabilgarria telebista presentazioentzat)."
 
-#: src/xitk/xine-toolkit/test.c:964
+#: src/xitk/event.c:1303
 #, c-format
-msgid "init_test() failed\n"
-msgstr "init_test()-ek huts egin du\n"
+msgid "Cannot open display '%s' for video. Falling back to primary display.\n"
+msgstr "Ezin da '%s' pantaila ireki bideoarentzat. Pantaila nagusia irekiko da.\n"
 
-#: src/xitk/xine-toolkit/test.c:979
-msgid "My Fucking Window"
-msgstr "Nire Leiho Madarikatua"
+#: src/xitk/event.c:1313
+msgid "Synchronized X protocol (debug)"
+msgstr "X protokolo sinkronizatua (araztu)"
 
-#: src/xitk/xine-toolkit/test.c:1012
-msgid "Quit"
+#: src/xitk/event.c:1322
+#, c-format
+msgid "Warning! Synchronized X activated - this is very slow...\n"
+msgstr "Abisua! X sinkronizazioa gaiturik - hau oso geldoa da...\n"
+
+#: src/xitk/event.c:1327
+msgid "Windows stacking"
+msgstr "Leiho-pilatzea"
+
+#: src/xitk/event.c:1328
+msgid "Use wm layer property to place window on top."
+msgstr "Erabili wm geruza-propietatea leihoa gainean jartzeko."
+
+#: src/xitk/event.c:1335
+msgid "Windows stacking (more)"
+msgstr "Leiho-pilatzea (gehiago)"
+
+#: src/xitk/event.c:1336
+msgid "Use WM layer property to place windows on top."
+msgstr "Erabili WM geruza-propietatea leihoak gainean jartzeko."
+
+#: src/xitk/event.c:1347
+msgid "Snapshot location"
+msgstr "Argazkiaren kokapena"
+
+#: src/xitk/event.c:1348
+msgid "Where snapshots will be saved."
+msgstr "Argazkiak non gordeko diren."
+
+#: src/xitk/event.c:1355
+msgid "Screensaver wakeup"
+msgstr "Pantaila-babeslea aktibatzea"
+
+#: src/xitk/event.c:1356
+msgid "Time between two screensaver fake events, 0 to disable."
+msgstr "Bi pantaila-babesleren sasigertaeren arteko denbora, 0 desgaitzeko."
+
+#: src/xitk/event.c:1363
+msgid "Chapter hopping"
+msgstr "Atalak saltatzea"
+
+#: src/xitk/event.c:1364
+msgid "Play next|previous chapter instead of mrl (dvdnav)"
+msgstr "Erreproduzitu hurrengo|aurreko atala mrl-n ordez (dvdnav)"
+
+#: src/xitk/event.c:1371
+msgid "Visibility behavior of output window"
+msgstr "Irteerako leihoaren ikusgaitasunaren portaera"
+
+#: src/xitk/event.c:1372
+msgid "Hide video output window if there is no video in the stream"
+msgstr "Ezkutatu bideoaren irteera-leihoa korrontean bideorik ez badago"
+
+#: src/xitk/event.c:1379
+msgid "Visiblility behavior of panel"
+msgstr "Panelaren ikusgarritasunaren portaera"
+
+#: src/xitk/event.c:1380
+msgid ""
+"Automatically show/hide panel window, according to "
+"auto_video_output_visibility"
+msgstr ""
+"Erakutsi/ezkutatu automatikoki panelaren leihoa, "
+"auto_video_output_visibility-ren arabera"
+
+#: src/xitk/event.c:1388
+msgid "Event sender behavior"
+msgstr "Gertaera-bidaltzailearen portaera"
+
+#: src/xitk/event.c:1389
+msgid "Event sender window stick to main panel"
+msgstr "Gertaera-bidaltzailearen leihoa itsatsi panel nagusian"
+
+#: src/xitk/event.c:1398
+msgid "Visual animation style"
+msgstr "Animazio bisualaren estiloa"
+
+#: src/xitk/event.c:1399
+msgid "Display some video animations when current stream is audio only (eg: mp3)."
+msgstr ""
+"Bistaratu bideo-animazio batzuk uneko korrontea audioa bakarrik denean "
+"(adib: mp3)."
+
+#: src/xitk/event.c:1408
+msgid "Stream information"
+msgstr "Korrontearen informazioa"
+
+#: src/xitk/event.c:1409
+msgid "Update stream information (in stream info window) each half seconds."
+msgstr ""
+"Eguneratu korrontearen informazioa (korrontearen informazio-leihoan) segundo-"
+"erdiro."
+
+#: src/xitk/event.c:1419
+msgid "Skin Server Url"
+msgstr "Azal-zerbitzariaren Url-a"
+
+#: src/xitk/event.c:1420
+msgid "From where we can get skins."
+msgstr "Azalak hor lor ditzakegu."
+
+#: src/xitk/event.c:1431
+msgid "Enable OSD support"
+msgstr "Gaitu OSD euskarria"
+
+#: src/xitk/event.c:1432
+msgid "Enabling OSD permit to display some status/informations in output window."
+msgstr "OSD gaitzean, egoera/informazioa bistara daiteke irteerako leihoan."
+
+#: src/xitk/event.c:1441
+msgid "Use unscaled OSD"
+msgstr "Erabili eskala gabeko OSD"
+
+#: src/xitk/event.c:1442
+msgid "Use unscaled (full screen resolution) OSD if possible"
+msgstr "Erabili eskala gabeko (pantaila osoko erresoluzioa) OSD ahal bada"
+
+#: src/xitk/event.c:1450
+msgid "Dismiss OSD time (s)"
+msgstr "Itxi OSD denbora(k)"
+
+#: src/xitk/event.c:1451
+msgid "Persistence time of OSD visual, in seconds."
+msgstr "OSD bisualaren iraunkortasun-denbora, segundotan."
+
+#: src/xitk/event.c:1459
+msgid "Change xine's behavior for unexperienced user"
+msgstr "Aldatu xine-ren portaera esperientziarik gabeko erabiltzailearentzat"
+
+#: src/xitk/event.c:1460
+msgid "In this mode, xine take some decisions to simplify user's life."
+msgstr ""
+"Modu honetan, xine-k erabaki batzuk hartzen ditu erabiltzailearen bizitza "
+"errazteko."
+
+#: src/xitk/event.c:1468
+msgid "Ask user for playback with unsupported codec"
+msgstr "Galdetu erabiltzaileari onartu gabeko kodekarekin erreproduzitzeko"
+
+#: src/xitk/event.c:1469
+msgid ""
+"If xine don't support audio or video codec of current stream the user will "
+"be asked if the stream should be played or not"
+msgstr ""
+"xine-k uneko korrontearen audio- edo bideo-kodeka onartzen ez badu, "
+"erabiltzaileari korrontea erreproduzitu behar den ala ez galdetuko zaio"
+
+#: src/xitk/event.c:1478
+msgid "Configuration experience level"
+msgstr "Konfiguratzeko esperientzia-maila"
+
+#: src/xitk/event.c:1479
+msgid ""
+"Level of user's experience, this will show more or less configuration "
+"options."
+msgstr ""
+"Erabiltzailearen esperientzia-maila, horrek konfigurazio-maila gehiago edo "
+"gutxiago erakutsiko ditu."
+
+#: src/xitk/event.c:1487
+msgid "Amplification level"
+msgstr "Anplifikazio-maila"
+
+#: src/xitk/event.c:1496
+msgid "Display splash screen"
+msgstr "Bistaratu splash pantaila"
+
+#: src/xitk/event.c:1497
+msgid "If enabled, xine will display its splash screen"
+msgstr "Gaituta badago, xine-k bere splash pantaila bistaratuko du"
+
+#: src/xitk/event.c:1505
+msgid "Audio mixer control method"
+msgstr "Audio nahale kontrol metodoa"
+
+#: src/xitk/event.c:1506
+msgid "Which method used to control audio volume."
+msgstr "Zein metodo erabiliko da audio bolumen kontrolerako."
+
+#: src/xitk/event.c:1514
+msgid "Menu shortcut style"
+msgstr "Menu laster-marka estiloa"
+
+#: src/xitk/event.c:1515
+msgid "Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."
+msgstr "Menuko lasterbide aurkezpena, 'Ktrl,Alt' edo 'K,M'."
+
+#: src/xitk/event.c:1603
+#, c-format
+msgid "Unable to initialize Imlib\n"
+msgstr "Ezin izan da Imlib abiarazi\n"
+
+#: src/xitk/event_sender.c:433
+msgid "xine Event Sender"
+msgstr "xine Gertaera Bidaltzailea"
+
+#: src/xitk/event_sender.c:450
+msgid "Up"
+msgstr "Goian"
+
+#: src/xitk/event_sender.c:468
+msgid "Left"
+msgstr "Ezkerrean"
+
+#: src/xitk/event_sender.c:504
+msgid "Right"
+msgstr "Eskuinean"
+
+#: src/xitk/event_sender.c:522
+msgid "Down"
+msgstr "Behean"
+
+#: src/xitk/event_sender.c:602
+msgid "Angle +"
+msgstr "Angelua +"
+
+#: src/xitk/event_sender.c:618
+msgid "Angle -"
+msgstr "Angelua -"
+
+#. Initialize menu labels
+#: src/xitk/event_sender.c:633 src/xitk/menus.c:951
+msgid "Menu 1"
+msgstr "1. menua"
+
+#: src/xitk/event_sender.c:634 src/xitk/menus.c:951
+msgid "Menu 2"
+msgstr "2. menua"
+
+#: src/xitk/event_sender.c:635 src/xitk/menus.c:951
+msgid "Menu 3"
+msgstr "3. menua"
+
+#: src/xitk/event_sender.c:636 src/xitk/menus.c:951
+msgid "Menu 4"
+msgstr "4. menua"
+
+#: src/xitk/event_sender.c:637 src/xitk/menus.c:952
+msgid "Menu 5"
+msgstr "5. menua"
+
+#: src/xitk/event_sender.c:638 src/xitk/menus.c:952
+msgid "Menu 6"
+msgstr "6. menua"
+
+#: src/xitk/event_sender.c:639 src/xitk/menus.c:952
+msgid "Menu 7"
+msgstr "7. menua"
+
+#: src/xitk/event_sender.c:641 src/xitk/menus.c:955
+msgid "Menu toggle"
+msgstr "Menua bai/ez"
+
+#: src/xitk/event_sender.c:642 src/xitk/menus.c:955
+msgid "Title"
+msgstr "Izenburua"
+
+#: src/xitk/event_sender.c:643 src/xitk/menus.c:955
+msgid "Root"
+msgstr "Root"
+
+#: src/xitk/event_sender.c:644 src/xitk/menus.c:955
+msgid "Subpicture"
+msgstr "Azpirudia"
+
+#: src/xitk/event_sender.c:645 src/xitk/menus.c:657 src/xitk/menus.c:956
+#: src/xitk/menus.c:1013 src/xitk/stream_infos.c:901
+msgid "Audio"
+msgstr "Audioa"
+
+#: src/xitk/event_sender.c:646 src/xitk/menus.c:956
+msgid "Angle"
+msgstr "Angelua"
+
+#: src/xitk/event_sender.c:647 src/xitk/menus.c:956
+msgid "Part"
+msgstr "Zatia"
+
+#: src/xitk/event_sender.c:684 src/xitk/file_browser.c:1619
+#: src/xitk/help.c:442 src/xitk/mediamark.c:3458 src/xitk/setup.c:1181
+#: src/xitk/stream_infos.c:1063 src/xitk/tvset.c:525 src/xitk/viewlog.c:460
+msgid "Close"
 msgstr "Itxi"
 
-#: src/xitk/xine-toolkit/window.c:1096
-msgid "OK"
-msgstr "Ados"
+#: src/xitk/file_browser.c:355 src/xitk/mediamark.c:3442 src/xitk/setup.c:1168
+msgid "Apply"
+msgstr "Aplikatu"
 
-#: src/xitk/xine-toolkit/window.c:1174 src/xitk/xine-toolkit/window.c:1415
-msgid "Question?"
-msgstr "Galdera?"
-
-#: src/xitk/xine-toolkit/window.c:1345 src/xitk/xine-toolkit/window.c:1567
-msgid "Yes"
-msgstr "Bai"
-
-#: src/xitk/xine-toolkit/window.c:1345 src/xitk/xine-toolkit/window.c:1567
-msgid "No"
-msgstr "Ez"
-
-#: src/xitk/xine-toolkit/window.c:1567
+#: src/xitk/file_browser.c:371 src/xitk/kbindings.c:616 src/xitk/skins.c:1208
 msgid "Cancel"
 msgstr "Utzi"
 
-#: src/xitk/xine-toolkit/xitk.h:2183 src/xitk/xine-toolkit/xitk.h:2192
-msgid "Error"
-msgstr "Errorea"
+#: src/xitk/file_browser.c:677
+#, c-format
+msgid "Unable to open directory '%s': %s."
+msgstr "Ezin da '%s' direktorioa ireki: %s."
 
-#: src/xitk/xine-toolkit/xitk.h:2186 src/xitk/xine-toolkit/xitk.h:2195
-msgid "Information"
-msgstr "Argiobideak"
+#: src/xitk/file_browser.c:989
+#, c-format
+msgid "Unable to delete file '%s': %s."
+msgstr "Ezin da '%s' fitxategia ezabatu: %s."
+
+#: src/xitk/file_browser.c:1006
+#, c-format
+msgid "Do you really want to delete the file: '%s'"
+msgstr "Benetan fitxategi hau ezabatu nahi duzula: '%s'"
+
+#: src/xitk/file_browser.c:1012
+msgid "Confirm deletion ?"
+msgstr "Ezabatzea berretsi nahi duzu?"
+
+#: src/xitk/file_browser.c:1031
+#, c-format
+msgid "Unable to rename file '%s' to '%s': %s."
+msgstr "Ezin zaio fitxategiari '%s' izenaren ordez '%s' jarri: %s."
+
+#: src/xitk/file_browser.c:1050
+msgid "Rename file"
+msgstr "Aldatu izena fitxategiari"
+
+#: src/xitk/file_browser.c:1058
+#, c-format
+msgid "Unable to create the directory '%s': %s."
+msgstr "Ezin da '%s' direktorioa sortu: %s."
+
+#: src/xitk/file_browser.c:1072
+msgid "Create a new directory"
+msgstr "Sortu direktorio berria"
+
+#: src/xitk/file_browser.c:1216
+msgid "File Browser"
+msgstr "Fitxategi-arakatzailea"
+
+#: src/xitk/file_browser.c:1242
+msgid "All files"
+msgstr "Fitxategi guztiak"
+
+#: src/xitk/file_browser.c:1243
+msgid "All known subtitles"
+msgstr "Azpititulu ezagun guztiak"
+
+#: src/xitk/file_browser.c:1244
+msgid "All known playlists"
+msgstr "Erreprodukzio-zerrenda ezagun guztiak"
+
+#: src/xitk/file_browser.c:1518
+msgid "Show hidden file"
+msgstr "Erakutsi fitxategi ezkutua"
+
+#: src/xitk/file_browser.c:1531
+msgid "Rename"
+msgstr "Izena aldatu"
+
+#: src/xitk/file_browser.c:1547 src/xitk/kbindings.c:2196
+#: src/xitk/menus.c:1177
+msgid "Delete"
+msgstr "Ezabatu"
+
+#: src/xitk/file_browser.c:1563
+msgid "Create a directory"
+msgstr "Sortu direktorioa"
+
+#: src/xitk/help.c:131
+msgid "Undefined"
+msgstr "Definitu gabe"
+
+#: src/xitk/help.c:356 src/xitk/post.c:1131
+msgid "Help"
+msgstr "Laguntza"
+
+#: src/xitk/help.c:383
+msgid "No Help Section Available"
+msgstr "Ez dago azalpenik erabilgarri."
+
+#: src/xitk/kbindings.c:577
+msgid "and"
+msgstr "eta"
+
+#: src/xitk/kbindings.c:590
+msgid ""
+"The following key bindings pairs are identical:\n"
+"\n"
+msgstr ""
+"Hurrengo laster-tekla ezarpen parea bedinak dira:\n"
+"\n"
+
+#: src/xitk/kbindings.c:607
+msgid ""
+".\n"
+"\n"
+"What do you want to do ?\n"
+msgstr ""
+".\n"
+"\n"
+"Zer egin nahi duzu ?\n"
+
+#: src/xitk/kbindings.c:615
+msgid "Keybindings error!"
+msgstr "Laster-teklen errorea!"
+
+#: src/xitk/kbindings.c:616 src/xitk/kbindings.c:2226
+msgid "Reset"
+msgstr "Berrezarri"
+
+#: src/xitk/kbindings.c:616
+msgid "Editor"
+msgstr "Editorea"
+
+#: src/xitk/kbindings.c:999
+msgid "OOCH: key binding table is NULL.\n"
+msgstr "EPA!: laster-teklaren taula NULUA da.\n"
+
+#: src/xitk/kbindings.c:1271
+msgid "Ctrl"
+msgstr "Ktrl"
+
+#: src/xitk/kbindings.c:1273
+msgid "Alt"
+msgstr "Alt"
+
+#: src/xitk/kbindings.c:1597
+msgid "Nothing selected"
+msgstr "Ez dago ezer hautatuta"
+
+#: src/xitk/kbindings.c:1598
+msgid "None"
+msgstr "Bat ere ez"
+
+#: src/xitk/kbindings.c:1771
+msgid "You can only delete alias entries."
+msgstr "Aliasen sarrerak bakarrik ezaba ditzakezu."
+
+#: src/xitk/kbindings.c:1907
+msgid "Press Keyboard Keys..."
+msgstr "Sakatu teklatuko teklak..."
+
+#: src/xitk/kbindings.c:1920
+msgid "Event receiver window"
+msgstr "Gertaera-hartzailearen leihoa"
+
+#. Ask if uses want/wont store new shorcut
+#: src/xitk/kbindings.c:1971
+msgid "Accept?"
+msgstr "Onartu?"
+
+#: src/xitk/kbindings.c:1975
+#, c-format
+msgid ""
+"Store %s as\n"
+"'%s' key binding ?."
+msgstr ""
+"%s gorde \n"
+"'%s' laster-tekla gisa?."
+
+#: src/xitk/kbindings.c:1981
+#, c-format
+msgid ""
+"This key bindings is redundant with action:\n"
+"\"%s\".\n"
+msgstr ""
+"Laster-tekla hau ekintzarekin erredundantea da:\n"
+"\"%s\".\n"
+
+#: src/xitk/kbindings.c:2078
+msgid "key binding editor"
+msgstr "laster-teklen editorea"
+
+#: src/xitk/kbindings.c:2109
+msgid "Binding action"
+msgstr "Lotura-ekintza"
+
+#: src/xitk/kbindings.c:2115
+msgid "Key"
+msgstr "Tekla"
+
+#: src/xitk/kbindings.c:2120
+msgid "Modifiers"
+msgstr "Aldatzaileak"
+
+#: src/xitk/kbindings.c:2166
+msgid "Alias"
+msgstr "Aliasa"
+
+#: src/xitk/kbindings.c:2181 src/xitk/menus.c:1175
+msgid "Edit"
+msgstr "Editatu"
+
+#: src/xitk/kbindings.c:2211 src/xitk/playlist.c:409 src/xitk/playlist.c:1209
+msgid "Save"
+msgstr "Gorde"
+
+#: src/xitk/kbindings.c:2306
+msgid "ctrl"
+msgstr "ktrl"
+
+#: src/xitk/kbindings.c:2330
+msgid "meta"
+msgstr "meta"
+
+#: src/xitk/kbindings.c:2354
+msgid "mod3"
+msgstr "mod3"
+
+#: src/xitk/kbindings.c:2378
+msgid "mod4"
+msgstr "mod4"
+
+#: src/xitk/kbindings.c:2402
+msgid "mod5"
+msgstr "mod5"
+
+#: src/xitk/kbindings.c:2413
+msgid "Grab"
+msgstr "Hartu"
+
+#: src/xitk/lang.c:495
+msgid "Unknown"
+msgstr "Ezezaguna"
+
+#: src/xitk/main.c:390
+#, c-format
+msgid "Bad geometry '%s'\n"
+msgstr "'%s' geometria okerra\n"
+
+#: src/xitk/main.c:398
+#, c-format
+msgid "Bad visual '%s'\n"
+msgstr "'%s' irudi okerra\n"
+
+#: src/xitk/main.c:424
+#, c-format
+msgid "This is xine (X11 gui) - a free video player v%s"
+msgstr "Hau xine da (X11 gui), doako bideo-erreproduzigailua v%s"
+
+#: src/xitk/main.c:428
+#, c-format
+msgid ""
+".\n"
+"(c) 2000-2004 The xine Team.\n"
+msgstr ""
+".\n"
+"(c) 2000-2004 Xine Taldea.\n"
+
+#: src/xitk/main.c:440
+#, c-format
+msgid "Built with xine library %d.%d.%d (%s)\n"
+msgstr "xine liburutegiarekin eraikia %d.%d.%d (%s)\n"
+
+#: src/xitk/main.c:446
+#, c-format
+msgid "Found xine library version: %d.%d.%d (%s).\n"
+msgstr "xine liburutegiaren bertsioa aurkitu da: %d.%d.%d (%s).\n"
+
+#: src/xitk/main.c:495
+msgid "   -Audio output:\n"
+msgstr "   -Audio irteera:\n"
+
+#: src/xitk/main.c:496
+msgid "   -Video output:\n"
+msgstr "    -bideo-irteera:\n"
+
+#: src/xitk/main.c:497
+msgid "   -Demuxer:\n"
+msgstr "   -Demuxer:\n"
+
+#: src/xitk/main.c:498
+msgid "   -Input:\n"
+msgstr "   -Sarrera:\n"
+
+#: src/xitk/main.c:499
+msgid "   -Subpicture:\n"
+msgstr "   -Azpirudia:\n"
+
+#: src/xitk/main.c:500
+msgid "   -Post processing:\n"
+msgstr "   -Post prozesua:\n"
+
+#: src/xitk/main.c:501
+msgid "   -Audio decoder:\n"
+msgstr "   -Audio deskodetzailea:\n"
+
+#: src/xitk/main.c:502
+msgid "   -Video decoder:\n"
+msgstr "   -Bideo deskodetzailea:\n"
+
+#: src/xitk/main.c:527 src/xitk/main.c:540
+#, c-format
+msgid ""
+"\n"
+" Available xine's plugins:\n"
+msgstr ""
+"\n"
+" xine plugin eskuragarriak:\n"
+
+#: src/xitk/main.c:536
+#, c-format
+msgid "No available plugins found of %s type!.\n"
+msgstr "Ez da %s motako plugin erabilgarririk!.\n"
+
+#: src/xitk/main.c:581
+#, c-format
+msgid "Usage: xine [OPTIONS]... [MRL]\n"
+msgstr "Erabilera: xine [AUKERAK]... [MRL]\n"
+
+#: src/xitk/main.c:584
+#, c-format
+msgid "  -v, --version                Display version.\n"
+msgstr "  -v, --version                Bistaratu bertsioa.\n"
+
+#: src/xitk/main.c:585
+#, c-format
+msgid "      --verbose [=level]       Set verbosity level. Default is 1.\n"
+msgstr "      --verbose [=maila]       Ezarri xehetasun-maila. Lehenetsia 1 da.\n"
+
+#: src/xitk/main.c:586
+#, c-format
+msgid "  -c, --config <file>          Use config file instead of default one.\n"
+msgstr ""
+"  -c, --config <file>          Erabili config fitxategia lehenetsiaren "
+"ordez.\n"
+
+#: src/xitk/main.c:587
+#, c-format
+msgid ""
+"  -V, --video-driver <drv>     Select video driver by id. Available "
+"drivers: \n"
+msgstr ""
+"  -V, --video-driver <drv>     Hautatu bideo-kontrolatzailea id bidez. "
+"Erabilgarri dauden kontrolatzaileak:\n"
+
+#: src/xitk/main.c:598
+#, c-format
+msgid ""
+"  -A, --audio-driver <drv>     Select audio driver by id. Available "
+"drivers: \n"
+msgstr ""
+"  -A, --audio-driver <drv>     Hautatu audio-kontrolatzailea id bidez. "
+"Erabilgarri dauden kontrolatzaileak:\n"
+
+#: src/xitk/main.c:608
+#, c-format
+msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
+msgstr "  -u, --spu-channel <#>        Hautatu '#' SPU (azpititulua) kanala.\n"
+
+#: src/xitk/main.c:609
+#, c-format
+msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
+msgstr "  -a, --audio-channel <#>        Hautatu '#' audio-kanala.\n"
+
+#: src/xitk/main.c:610
+#, c-format
+msgid ""
+"  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
+"                    'f': in fullscreen mode.\n"
+"                    'h': hide GUI (panel, etc.).\n"
+"                    'w': hide video window.\n"
+"                    'q': quit when play is done.\n"
+"                    'd': retrieve playlist from DVD. (deprecated. use -s "
+"DVD)\n"
+"                    'v': retrieve playlist from VCD. (deprecated. use -s "
+"VCD)\n"
+msgstr ""
+"  -p, --auto-play [opt]        Abiaraztean erreproduzitu. Hauekin erabili daiteke:\n"
+"                    'f': pantaila oso moduan.\n"
+"                    'h': GUI ezkutatu (panela, etab.).\n"
+"                    'w': bideo leihoa ezkutatu.\n"
+"                    'q': Itxi erreprodukzioa amaitzean.\n"
+"                    'd': erreprodukzio zerrenda DVD-tik jaso. (gaitzetsia. -s "
+"DVD erabili)\n"
+"                    'v': erreprodukzio zerrenda VCD-tik jaso. (gaitzetsia. -s "
+"VCD erabili)\n"
+
+#: src/xitk/main.c:618
+#, c-format
+msgid "                    'F': in xinerama fullscreen mode.\n"
+msgstr "                    'F': xinerama pantaila osoko moduan.\n"
+
+#: src/xitk/main.c:620
+#, c-format
+msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
+msgstr ""
+"  -s, --auto-scan <plugin>     eskaneatu automatikoki erreprodukzio-zerrenda "
+"<plugin>etik\n"
+
+#: src/xitk/main.c:621
+#, c-format
+msgid "  -f, --fullscreen             start in fullscreen mode,\n"
+msgstr "  -f, --pantaila osoa             hasi pantaila osoko moduan,\n"
+
+#: src/xitk/main.c:623
+#, c-format
+msgid ""
+"  -F, --xineramafull           start in xinerama fullscreen (display on "
+"several screens),\n"
+msgstr ""
+"  -F, --xineramafull           hasi xinerama pantaila osoan (bistaratu "
+"hainbat pantailatan),\n"
+
+#: src/xitk/main.c:625
+#, c-format
+msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
+msgstr "  -g, --hide-gui               ezkutatu GUI (panela, etab.)\n"
+
+#: src/xitk/main.c:626
+#, c-format
+msgid "  -I, --no-gui                 disable GUI\n"
+msgstr "  -I, --no-gui                  GUI ezgaitu\n"
+
+#: src/xitk/main.c:627
+#, c-format
+msgid "  -H, --hide-video             hide video window\n"
+msgstr "  -H, --hide-video             ezkutatu bideoaren leihoa\n"
+
+#: src/xitk/main.c:629
+#, c-format
+msgid "  -L, --no-lirc                Turn off LIRC support.\n"
+msgstr "  -L, ---no-lirc                Desaktibatu LIRC euskarria.\n"
+
+#: src/xitk/main.c:631
+#, c-format
+msgid ""
+"      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+"                               is either an X11 visual class, or a visual "
+"id.\n"
+msgstr ""
+"      --visual <class-or-id>   Ezarritako X11 bisual-a erabili. <class-or-id>\n"
+"                               X11 bisual klase bat edo bisual id bat "
+"da.\n"
+
+#: src/xitk/main.c:633
+#, c-format
+msgid "      --install                Install a private colormap.\n"
+msgstr "      --instalatu                Instalatu kolore-mapa pribatu bat.\n"
+
+#: src/xitk/main.c:634
+#, c-format
+msgid ""
+"      --keymap [=option]       Display keymap. Option are:\n"
+"                                 'default': display default keymap table,\n"
+"                                 'lirc': display draft of a .lircrc config "
+"file.\n"
+"                                 'remapped': user remapped keymap table.\n"
+"                                 'file:<filename>': use <filename> as "
+"keymap.\n"
+"                                 -if no option is given, 'default' is "
+"selected.\n"
+msgstr ""
+"      --keymap [=aukera]       Teklatu-mapa bistaratu. Aukerak:\n"
+"                                 'default': lehenetsitako teklatu-mapa bistaratu,\n"
+"                                 'lirc': .lircrc configurazio zirriborro bat bistaratzen "
+"du.\n"
+"                                 'remapped': erabiltzaileak moldatutako teklatu-mapa taula.\n"
+"                                 'file:<filename>': erabili <filename> teklatu-mapa "
+"bezala.\n"
+"                                 -aukerarik ez eman ezkero, 'lehenetsirikoa' erabiliko "
+"da.\n"
+
+#: src/xitk/main.c:640
+#, c-format
+msgid "  -n, --network                Enable network remote control server.\n"
+msgstr ""
+"  -n, --network                Gaitu sarearen urruneko kontrolaren "
+"zerbitzaria.\n"
+
+#: src/xitk/main.c:641
+#, c-format
+msgid "      --network-port           Specify network server port number.\n"
+msgstr "      --network-port           Sare zerbitzari ataka zenbakia ezarri.\n"
+
+#: src/xitk/main.c:642
+#, c-format
+msgid "  -R, --root                   Use root window as video window.\n"
+msgstr "  -R, --root                   Erabili erroko leihoa bideoaren leiho gisa.\n"
+
+#: src/xitk/main.c:643
+#, c-format
+msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
+msgstr ""
+"  -G, --geometria <WxH[+X+Y]>   Ezarri irteerako leihoaren geometria (X "
+"estiloa).\n"
+
+#: src/xitk/main.c:644
+#, c-format
+msgid "  -B, --borderless             Borderless video output window.\n"
+msgstr "  -B, --borderless             Ertzik gabeko bideoaren irteera-leihoa.\n"
+
+#: src/xitk/main.c:645
+#, c-format
+msgid ""
+"  -N, --animation <mrl>        Specify mrl to play when video output isn't "
+"used.\n"
+"                                 -can be used more than one time.\n"
+msgstr ""
+"  -N, --animation <mrl>        Adierazi erreproduzitu beharreko mrl-a bideo-"
+"irteera erabiltzen ez denean.\n"
+"                                 -bein baino gehiago erabili daiteke.\n"
+
+#: src/xitk/main.c:647
+#, c-format
+msgid "  -P, --playlist <filename>    Load a playlist file.\n"
+msgstr ""
+"  -P, --playlist <fitxategi-izena>    Kargatu erreprodukzio--zerrendaren "
+"fitxategia.\n"
+
+#: src/xitk/main.c:648
+#, c-format
+msgid ""
+"  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes "
+"are:\n"
+"                                 'loop': loop entire playlist.\n"
+"                                 'repeat': repeat current playlist entry.\n"
+"                                 'shuffle': select randomly a yet unplayed "
+"entry from playlist\n"
+"                                 'shuffle+': same as 'shuffle', but "
+"indefinetely replay the playlist.\n"
+msgstr ""
+"  -l, --loop [=mode]           Ezarri erreprodkzui zerrenda errepikapena (lehenespena: errepikatu). Moduak:\n"
+"                                 'loop': loop entire playlist.\n"
+"                                 'repeat': repeat current playlist entry.\n"
+"                                 'shuffle': select randomly a yet unplayed "
+"entry from playlist\n"
+"                                 'shuffle+': same as 'shuffle', but "
+"indefinetely replay the playlist.\n"
+
+#: src/xitk/main.c:653
+#, c-format
+msgid "      --skin-server-url <url>  Define the skin server url.\n"
+msgstr "      --skin-server-url <url>  Definitu azal-zerbitzariaren url-a.\n"
+
+#: src/xitk/main.c:654
+#, c-format
+msgid "      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
+msgstr ""
+"      --enqueue <mrl>          Gehitu martxan dagoen saio baten mrl-a ilaran"
+"(0 saioa)\n"
+
+#: src/xitk/main.c:655
+#, c-format
+msgid ""
+"  -S, --session <option1,option2,...>\n"
+"                               Session managements. Options can be:\n"
+"                    session=n   specify session <n> number,\n"
+"                    mrl=m       add mrl <m> to the playlist,\n"
+"                    audio=c     select audio channel (<c>: 'next' or "
+"'prev'),\n"
+"                    spu=c       select spu channel (<c>: 'next' or 'prev'),\n"
+"                    volume=v    set audio volume,\n"
+"                    amp=v       set amplification level,\n"
+"                    loop=m      set loop mode (<m>: 'none' 'loop' 'repeat' "
+"'shuffle' or 'shuffle+'),\n"
+"                    get_speed   get speed value (see man page for returned "
+"value).\n"
+"                    (playlist|pl)=p\n"
+"                                 <p> can be:\n"
+"                                   'clear'  clear the playlist,\n"
+"                                   'first'  play first entry in the "
+"playlist,\n"
+"                                   'prev'   play previous playlist entry,\n"
+"                                   'next'   play next playlist entry,\n"
+"                                   'last'   play last entry in the "
+"playlist,\n"
+"                                   'load:s' load playlist file <s>,\n"
+"                                   'stop'   stop playback at the end of "
+"current playback.\n"
+"                                   'cont'   continue playback at the end of "
+"current playback.\n"
+"                    play, slow2, slow4, pause, fast2,\n"
+"                    fast4, stop, quit, fullscreen, eject.\n"
+msgstr ""
+"  -S, --session <1aukera,2aukera,...>\n"
+"                               Saio kudeatzaileak. Aukerak:\n"
+"                    session=n   ezarri <n> saio zenbakia,\n"
+"                    mrl=m       gehitu <m> mrl erreprodukzioa zerrendara,\n"
+"                    audio=c     aukeratu audio kanala (<c>: 'next' edo "
+"'prev'),\n"
+"                    spu=c       aukeratu spu kanala (<c>: 'next' edo 'prev'),\n"
+"                    volume=v    ezarri audio bolumena,\n"
+"                    anp=v       anplifikazio maila ezarri,\n"
+"                    loop=m      errepikatze modua ezarri (<m>: 'none' 'loop' 'repeat' "
+"'shuffle' edo 'shuffle+'),\n"
+"                    get_speed   abiadura balioa eskuratu (begiratu manual orria itzuklitako balioa ulertzeko)\n"
+"                    (playlist|pl)=p\n"
+"                                 <p> aukerak:\n"
+"                                   'clear'  zerrenda garbitu,\n"
+"                                   'first'  Zerrendako lehen sarrera play first entry in the erreproduzitu,\n"
+"                                   'prev'   Zerrendako aurreko sarrera erreproduzitu,\n"
+"                                   'next'   Zerrendako hurrengo sarrera erreproduzitu,\n"
+"                                   'last'   Zerrendako azken sarrera "
+"erreproduzitu,\n"
+"                                   'load:s' <s> fitxategiko zerrenda kargatu,\n"
+"                                   'stop'   erreprodukzioa utzi unekoa amaizterakoan.\n"
+"                                   'cont'   jarraitu erreprodukzioa zerrenda amaiatu arte.\n"
+"                    play, slow2, slow4, pause, fast2,\n"
+"                    fast4, stop, quit, fullscreen, eject.\n"
+
+#: src/xitk/main.c:677
+#, c-format
+msgid ""
+"  -Z                           Don't automatically start playback (smart "
+"mode).\n"
+msgstr ""
+"  -Z                           Ez hasi automatikoki erreproduzitzen (modu "
+"dotorea).\n"
+
+#: src/xitk/main.c:678
+#, c-format
+msgid ""
+"  -D, --deinterlace [post]...  Deinterlace video output. One or more post "
+"plugin\n"
+"                                 can be specified, with optional "
+"parameters.\n"
+"                                 Syntax is the same as --post option.\n"
+msgstr ""
+
+#: src/xitk/main.c:681
+#, c-format
+msgid ""
+"  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"
+"                                 'auto', 'square', '4:3', 'anamorphic', "
+"'dvb'.\n"
+msgstr ""
+"  -r, --aspect-ratio <mode>    Bideo irteera itxura ezarri. Aukerak:\n"
+"                                 'auto', 'square', '4:3', 'anamorphic', "
+"'dvb'.\n"
+
+#: src/xitk/main.c:684
+#, c-format
+msgid ""
+"      --broadcast-port <port>  Set port of xine broadcaster (master side)\n"
+"                               Slave is started with 'xine slave://address:"
+"port'\n"
+msgstr ""
+"      --broadcast-port <port>  xine difusioaren ataka ezarri (nagusi aldea) \n"
+"                               Bezeroa horrela abiarazi: 'xine slave://helbidea:"
+"ataka'\n"
+
+#: src/xitk/main.c:687
+#, c-format
+msgid "      --no-logo                Don't display the logo.\n"
+msgstr "      --no-logo                Ez bistaratu logotipoa.\n"
+
+#: src/xitk/main.c:688
+#, c-format
+msgid "  -E, --no-reload              Don't reload old playlist.\n"
+msgstr "  -E, --no-reload              Ez berritu erreprodukzio-zerrenda zaharra.\n"
+
+#: src/xitk/main.c:689
+#, c-format
+msgid ""
+"      --post <plugin>[:parameter=value][,...][;...]\n"
+"                               Load one or many post plugin(s).\n"
+"                               Parameters are comma separated.\n"
+"                               This option can be used more than one time.\n"
+msgstr ""
+
+#: src/xitk/main.c:693
+#, c-format
+msgid "      --disable-post           Don't enable post plugin(s).\n"
+msgstr "      --disable-post           Ez gaitu post plugin-a(k).\n"
+
+#: src/xitk/main.c:694
+#, c-format
+msgid "      --no-splash              Don't display the splash screen.\n"
+msgstr "      --no-splash              Ez bistaratu splash pantaila.\n"
+
+#: src/xitk/main.c:695
+#, c-format
+msgid ""
+"      --stdctl                 Control xine by the console, using lirc "
+"commands.\n"
+msgstr ""
+"      --stdctl                 Kontrolatu xine kontsola bidez, lirc "
+"komandoakerabiliz.\n"
+
+#: src/xitk/main.c:696
+#, c-format
+msgid "  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"
+msgstr ""
+"  -T, --tvout <backend>        gaitu edo ezgaitu telebista-irteera onarpena. "
+"Euskarria izan daiteke:\n"
+
+#: src/xitk/main.c:706
+#, c-format
+msgid ""
+"      --list-plugins [=type]   Display the list of all available plugins,\n"
+"                               Optional <type> can be:\n"
+"                    audio_out, video_out, demux, input, sub, post,\n"
+"                    audio_decoder, video_decoder.\n"
+msgstr ""
+"      --list-plugins [=mota]   Plugin erabilgarrien zerrenda bistarazi\n"
+"                               Aukerako <mota>:\n"
+"                    audio_out, video_out, demux, input, sub, post,\n"
+"                    audio_decoder, video_decoder.\n"
+
+#: src/xitk/main.c:710
+#, c-format
+msgid ""
+"      --bug-report [=mrl]      Enable bug report mode:\n"
+"                                 Turn on verbosity, gather all output\n"
+"                                 messages and write them into a file named\n"
+"                                 BUG-REPORT.TXT.\n"
+"                                 If <mrl> is given, xine will play the mrl\n"
+"                                 then quit (like -pq).\n"
+msgstr ""
+"      --bug-report [=mrl]      Arazo erreporte modua gaitu:\n"
+"                                 Xehetasunak gaitu, eskuratu irteera\n"
+"                                 mezu guztiak eta idatzi berau\n"
+"                                 BUG-REPORT.TXT fitxategian.\n"
+"                                 <mrl> eman ezkero, xinek mrl-a\n"
+"                                 erreproduzitu eta irten egingo da.\n"
+
+#: src/xitk/main.c:717
+#, c-format
+msgid ""
+"examples for valid MRLs (media resource locator):\n"
+"  File:  'path/foo.vob'\n"
+"         '/path/foo.vob'\n"
+"         'file://path/foo.vob'\n"
+"         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
+"         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
+"  DVD:   'dvd://VTS_01_2.VOB'\n"
+"  VCD:   'vcd://<track number>'\n"
+msgstr ""
+"Baliozko MRL (Media Resource Locator) adibideak:\n"
+"  Fitxategia:  'path/ffo.vob'\n"
+"         '/path/foo.vob'\n"
+"         'file://path/foo.vob'\n"
+"         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
+"         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
+"  DVD:   'dvd://VTS_01_2.VOB'\n"
+"  VCD:   'vcd://<Kanta zenbakia>'\n"
+
+#: src/xitk/main.c:764 src/xitk/main.c:880
+msgid "video driver to use"
+msgstr "erabili beharreko bideo-kontrolatzailea"
+
+#: src/xitk/main.c:765 src/xitk/main.c:881
+msgid "Choose video driver. NOTE: you may restart xine to use the new driver"
+msgstr ""
+"Aukeratu bideo-kontrolatzailea. OHARRA: xine berrabiaraz "
+"dezakezukontrolatzaile berria erabiltzeko"
+
+#: src/xitk/main.c:813
+#, c-format
+msgid "main: probing <%s> video output plugin\n"
+msgstr "main: <%s> bideo-irteeraren plugin-a probatzen\n"
+
+#: src/xitk/main.c:827
+#, c-format
+msgid "main: all available video drivers failed.\n"
+msgstr "main: bideo-kontrolatzaile erabilgarri guztiek huts egin dute.\n"
+
+#: src/xitk/main.c:858
+#, c-format
+msgid "main: video driver <%s> failed\n"
+msgstr "main: <%s> bideo-kontrolatzaileak huts egin du\n"
+
+#: src/xitk/main.c:891
+msgid "audio driver to use"
+msgstr "erabili beharreko audio-kontrolatzailea"
+
+#: src/xitk/main.c:892
+msgid "Choose audio driver. NOTE: you may restart xine to use the new driver"
+msgstr ""
+"Aukeratu audio-kontrolatzailea. OHARRA: xine berrabiaraz "
+"dezakezukontrolatzaile berria erabiltzeko"
+
+#: src/xitk/main.c:907 src/xitk/main.c:955
+#, c-format
+msgid "main: not using any audio driver (as requested).\n"
+msgstr "main: ez da ari audio-kontrolatzailerik erabiltzen (eskatu bezala).\n"
+
+#: src/xitk/main.c:928
+#, c-format
+msgid "main: probing <%s> audio output plugin\n"
+msgstr "main: <%s> audio-irteeraren plugin-a probatzen\n"
+
+#: src/xitk/main.c:932
+#, c-format
+msgid "main: skipping <%s> audio output plugin from auto-probe\n"
+msgstr "main: audio-irteeraren <%s> plugina saltatzen proba automatikotik\n"
+
+#: src/xitk/main.c:947
+#, c-format
+msgid "main: audio driver probing failed => no audio output\n"
+msgstr ""
+"main: audio-kontrolatzailearen probak huts egin du => ez dago audio-"
+"irteerarik\n"
+
+#: src/xitk/main.c:968
+#, c-format
+msgid "main: audio driver <%s> failed\n"
+msgstr "main: <%s> audio-kontrolatzaileak huts egin du\n"
+
+#: src/xitk/main.c:1090
+msgid ""
+"*drum roll*, xine lib wants to take your attention to deliver an important "
+"message to you ;-):"
+msgstr ""
+"*danbor-soinua*, xine lib-ek zure arreta lortu nahi du mezu garrantzitsu bat "
+"helarazteko ;-):"
+
+#: src/xitk/main.c:1095
+msgid "No Information available."
+msgstr "Ez dago informaziorik erabilgarri."
+
+#: src/xitk/main.c:1101
+msgid ""
+"The host you're trying to connect is unknown.\n"
+"Check the validity of the specified hostname."
+msgstr ""
+"Konektatzen saiatzen ari zaren ostalaria ezezaguna da.\n"
+"Egiaztatu zehaztutako ostalari-izenaren baliozkotasuna."
+
+#: src/xitk/main.c:1109
+msgid "The device name you specified seems invalid."
+msgstr "Zuk adierazitako gailu-izena baliogabea dela dirudi."
+
+#: src/xitk/main.c:1116
+msgid ""
+"The network looks unreachable.\n"
+"Check your network setup and/or the server name."
+msgstr ""
+"Sareak atzitu ezinekoa dirudi.\n"
+"Egiaztatu sarearen konfigurazioa eta/edo zerbitzari-izena."
+
+#: src/xitk/main.c:1124
+msgid ""
+"The connection was refused.\n"
+"Check the host name."
+msgstr ""
+"Konexioa ukatu egin da.\n"
+"Egiaztatu ostalari-izena."
+
+#: src/xitk/main.c:1131
+msgid "The specified file or mrl is not found. Please check it twice."
+msgstr "Adierazitako fitxategia edo mrl-a ez da aurkitu. Egiaztatu bi aldiz."
+
+#: src/xitk/main.c:1138
+msgid ""
+"The source can't be read.\n"
+"Maybe you don't have enough rights for this, or source doesn't contain data "
+"(e.g: not disc in drive)."
+msgstr ""
+"Iturburua ezin da irakurri.\n"
+"Baliteke horretarako nahikoa eskubide ez izatea edo iturburuak daturik ez "
+"edukitzea (adib.: diskorik ez egotea unitatean)."
+
+#: src/xitk/main.c:1147
+msgid "A problem occur while loading a library or a decoder"
+msgstr "Arazoa gertatu da liburutegia edo deskodetzailea kargatzean"
+
+#: src/xitk/main.c:1154
+msgid "The source seems encrypted, and can't be read."
+msgstr "Iturburua enkriptatuta dagoela dirudi eta ezin da irakurri."
+
+#: src/xitk/main.c:1156
+msgid ""
+"\n"
+"Your DVD is probably crypted. According to your country laws, you can or "
+"can't install/use libdvdcss to be able to read this disc, which you bought."
+msgstr ""
+"\n"
+"DVD-a ziurrenik enkriptaturik dago. Zure herrialdeko legeen arabera ezin duzu "
+"libdvdcss instalatu erosi duzun diska hau irakurri ahal izateko."
+
+#: src/xitk/main.c:1171
+msgid "No Informations available."
+msgstr "Ez dago informaziorik erabilgarri."
+
+#: src/xitk/main.c:1176
+msgid ""
+"The audio device is unavailable. Please verify if another program already "
+"use it."
+msgstr ""
+"Ezin da audio gailua erabili. Mesedez egiaztatu beste programa bat erabiltzen "
+"ari den."
+
+#: src/xitk/main.c:1181
+msgid "*sight*, unkown error."
+msgstr "*aiba*, errore ezezaguna."
+
+#: src/xitk/main.c:1329
+#, c-format
+msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
+msgstr "xine liburutegiaren 1.0.0 bertsioa behar da, %d.%d.%d aurkitu da.\n"
+
+#: src/xitk/main.c:1418
+#, c-format
+msgid "video driver id required for -V option\n"
+msgstr "bideo-kontrolatzailearen id-a behar da -V aukerarako\n"
+
+#: src/xitk/main.c:1427
+#, c-format
+msgid "audio driver id required for -A option\n"
+msgstr "audio-kontrolatzailearen id-a behar da -A aukerarako\n"
+
+#: src/xitk/main.c:1515
+#, c-format
+msgid "Bad aspect ratio mode '%s', see xine --help\n"
+msgstr "'%s' aspektu-erlazioaren modu okerra, ikus xine --laguntza\n"
+
+#: src/xitk/main.c:1579
+#, c-format
+msgid "Bad port number: %d\n"
+msgstr "Okerreko ataka zembakia: %d\n"
+
+#: src/xitk/main.c:1591
+#, c-format
+msgid "Bad geometry '%s', see xine --help\n"
+msgstr "'%s' geometria okerra, ikus xine --laguntza\n"
+
+#: src/xitk/main.c:1628
+#, c-format
+msgid "Bad loop mode '%s', see xine --help\n"
+msgstr "'%s' begizta-modu okerra , ikus xine --laguntza\n"
+
+#: src/xitk/main.c:1751
+#, c-format
+msgid "*** NOTE ***\n"
+msgstr "*** OHARRA ***\n"
+
+#: src/xitk/main.c:1752
+#, c-format
+msgid " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
+msgstr " Arazo Erreporte modua: Irteera mezu guztiak BUG-REPORT.TXT fitxategian gordeko dira.\n"
+
+#: src/xitk/main.c:1793
+#, c-format
+msgid "invalid argument %d => exit\n"
+msgstr "%d argumentu baliogabea => irten\n"
+
+#: src/xitk/main.c:1813
+#, c-format
+msgid "You should specify one MRL to enqueue, at least!.\n"
+msgstr "MRL bat adierazi beharko zenuke ilaran gehitzeko, gutxienez!\n"
+
+#: src/xitk/main.c:1895
+msgid "Automatically reload old playlist"
+msgstr "Berritu automatikoki erreprodukzio-zerrenda zaharra"
+
+#: src/xitk/main.c:1896
+msgid ""
+"If it's enabled and if you don't specify any MRL in command line, xine will "
+"automatically load previous playlist."
+msgstr ""
+"Gaituta badago eta komando-lerroan MRLrik adierazten ez baduzu, xine-k "
+"automatikoki kargatuko du aurreko erreprodukzio-zerrenda."
+
+#: src/xitk/main.c:1911
+msgid "Subtitle autoloading"
+msgstr "Azpitituluen fitxategia"
+
+#: src/xitk/main.c:1912
+msgid "Automatically load subtitles if they exist."
+msgstr "Berritu automatikoki erreprodukzio-zerrenda zaharra"
+
+#: src/xitk/main.c:1920
+msgid "Enable deinterlacing by default"
+msgstr "Gaitu elkar-ezloturikoa lehetsi bezala"
+
+#: src/xitk/main.c:1921
+msgid ""
+"Deinterlace plugin will be enabled on startup. Progressive streams are "
+"automaticaly detected with no performance penalty."
+msgstr ""
+"Elkar-ezloturiko plugin-a gaiturik egongo da abiaraztean. Korronte progrsiboak "
+"automatikoki atzemanak izango dira errendimendua jeitsi gabe."
+
+#: src/xitk/main.c:2073
+msgid "Logo mrl"
+msgstr "mrl logotipoa"
+
+#: src/xitk/mediamark.c:482
+msgid "!!Invalid entry!!"
+msgstr "Sarrera baliogabea!!"
+
+#: src/xitk/mediamark.c:2777 src/xitk/mediamark.c:2832
+#, c-format
+msgid "Playlist file (%s) is invalid.\n"
+msgstr "Erreprodukzio-zerrendaren fitxategia (%s) baliogabea da.\n"
+
+#: src/xitk/mediamark.c:2913
+#, c-format
+msgid "Unable to save playlist (%s): %s.\n"
+msgstr "Ezin da erreprodukzio-zerrenda (%s) gorde: %s.\n"
+
+#. Create window
+#: src/xitk/mediamark.c:3238
+msgid "Mediamark Editor"
+msgstr "Mediamark editorea"
+
+#: src/xitk/mediamark.c:3269
+msgid "Identifier"
+msgstr "identifikatzailea"
+
+#: src/xitk/mediamark.c:3285
+msgid "Mediamark Identifier"
+msgstr "Mediamark identifikatzailea"
+
+#: src/xitk/mediamark.c:3290
+msgid "Mrl"
+msgstr "Mrl"
+
+#: src/xitk/mediamark.c:3305
+msgid "Mediamark Mrl"
+msgstr "Mediamark Mrl"
+
+#: src/xitk/mediamark.c:3310 src/xitk/menus.c:685 src/xitk/menus.c:1089
+msgid "Subtitle"
+msgstr "Azpititulua"
+
+#: src/xitk/mediamark.c:3325
+msgid "Subtitle File"
+msgstr "Azpitituluen fitxategia"
+
+#: src/xitk/mediamark.c:3330
+msgid "Sub File"
+msgstr "Azpifitxategia"
+
+#: src/xitk/mediamark.c:3340
+msgid "Select a subtitle file to use together with the mrl."
+msgstr "Hautatu azpitituluen fitxategia mrl-rekin batera erabiltzeko."
+
+#: src/xitk/mediamark.c:3346
+msgid "Start at"
+msgstr "Hasi hemen:"
+
+#: src/xitk/mediamark.c:3361
+msgid "Mediamark start time (secs)."
+msgstr "Mediamark-en hasiera-ordua (segundoak)."
+
+#: src/xitk/mediamark.c:3366
+msgid "End at"
+msgstr "Bukatu hemen:\t"
+
+#: src/xitk/mediamark.c:3381
+msgid "Mediamark end time (secs)."
+msgstr "Mediamark-en amaiera-ordua (segundoak)."
+
+#: src/xitk/mediamark.c:3386
+msgid "A/V offset"
+msgstr "A/V desplazamendua"
+
+#: src/xitk/mediamark.c:3401
+msgid "Offset of Audio and Video."
+msgstr "Audio eta bideo desplazamendua."
+
+#: src/xitk/mediamark.c:3406
+msgid "SPU offset"
+msgstr "SPU desplazamendua"
+
+#: src/xitk/mediamark.c:3421
+msgid "Subpicture offset."
+msgstr "Azpirudi desplazamendua."
+
+#: src/xitk/mediamark.c:3427 src/xitk/post.c:1007 src/xitk/post.c:1851
+msgid "Ok"
+msgstr "Ados"
+
+#: src/xitk/mediamark.c:3437
+msgid "Apply the changes and close the window."
+msgstr "Aplikatu aldaketak eta itxi leihoa."
+
+#: src/xitk/mediamark.c:3452
+msgid "Apply the changes to the playlist."
+msgstr "Aplikatu aldaketak erreprodukzio-zerrendari."
+
+#: src/xitk/mediamark.c:3468
+msgid "Discard changes and dismiss the window."
+msgstr "Baztertu aldaketak eta itxi leihoa."
+
+#: src/xitk/menus.c:441
+msgid "Show controls"
+msgstr "Bistarazi kontrolak"
+
+#: src/xitk/menus.c:445
+msgid "Show video window"
+msgstr "Bistarazi bideo leihoa"
+
+#: src/xitk/menus.c:449
+msgid "Fullscreen"
+msgstr "Pantaila Osoa"
+
+#: src/xitk/menus.c:457
+msgid "Open"
+msgstr "Ireki"
+
+#: src/xitk/menus.c:461
+msgid "Open/File..."
+msgstr "Ireki/fitxategia..."
+
+#: src/xitk/menus.c:465
+msgid "Open/Playlist..."
+msgstr "Ireki/erreprodukzio-zerrenda..."
+
+#: src/xitk/menus.c:469
+msgid "Open/Location..."
+msgstr "Ireki/helbidea..."
+
+#: src/xitk/menus.c:473 src/xitk/menus.c:979
+msgid "Playback"
+msgstr "Erreproduzitu"
+
+#: src/xitk/menus.c:477
+msgid "Playback/Play"
+msgstr "Erreproduzitu/Erreproduzitu"
+
+#: src/xitk/menus.c:481
+msgid "Playback/Stop"
+msgstr "Erreproduzitu/Gelditu"
+
+#: src/xitk/menus.c:485
+msgid "Playback/Pause"
+msgstr "Erreproduzitu/Pausarazi"
+
+#: src/xitk/menus.c:489 src/xitk/menus.c:501 src/xitk/menus.c:982
+msgid "Playback/SEP"
+msgstr "Erreproduzitu/SEP"
+
+#: src/xitk/menus.c:493
+msgid "Playback/Next MRL"
+msgstr "Erreproduzitu/hurrengo MRLa"
+
+#: src/xitk/menus.c:497
+msgid "Playback/Previous MRL"
+msgstr "Erreproduzitu/aurreko MRLa"
+
+#: src/xitk/menus.c:505
+msgid "Playback/Increase Speed"
+msgstr "Erreproduzitu/handiagotu abiadura"
+
+#: src/xitk/menus.c:509
+msgid "Playback/Decrease Speed"
+msgstr "Erreproduzitu/txikiagotu abiadura"
+
+#: src/xitk/menus.c:513 src/xitk/menus.c:1188 src/xitk/panel.c:1436
+msgid "Playlist"
+msgstr "Erreprodukzio-zerrenda"
+
+#: src/xitk/menus.c:517 src/xitk/menus.c:790
+msgid "Playlist/Get from"
+msgstr "Erreprodukzio-zerrenda/Eskuratu hemendik"
+
+#: src/xitk/menus.c:521
+msgid "Playlist/Load..."
+msgstr "Erreprodukzio-zerrenda/kargatu..."
+
+#: src/xitk/menus.c:525
+msgid "Playlist/Editor..."
+msgstr "Erreprodukzio-zerrenda/editorea..."
+
+#: src/xitk/menus.c:529
+msgid "Playlist/SEP"
+msgstr "Erreprodukzio-zerrenda/SEP"
+
+#: src/xitk/menus.c:533
+msgid "Playlist/Loop modes"
+msgstr "Erreprodukzio-zerrenda/begizta moduak"
+
+#: src/xitk/menus.c:537
+msgid "Playlist/Loop modes/Disabled"
+msgstr "Erreprodukzio-zerrenda/begizta moduak/ezgaituta"
+
+#: src/xitk/menus.c:541
+msgid "Playlist/Loop modes/Loop"
+msgstr "Erreprodukzio-zerrenda/begizta moduak/begizta"
+
+#: src/xitk/menus.c:545
+msgid "Playlist/Loop modes/Repeat Selection"
+msgstr "Erreprodukzio-zerrenda/begizta moduak/errepikatu hautapena"
+
+#: src/xitk/menus.c:549
+msgid "Playlist/Loop modes/Shuffle"
+msgstr "Erreprodukzio-zerrenda/nahastu"
+
+#: src/xitk/menus.c:553
+msgid "Playlist/Loop modes/Non-stop Shuffle"
+msgstr "Erreprodukzio-zerrenda/Gelditu gabe nahastu"
+
+#: src/xitk/menus.c:557
+msgid "Playlist/Continue Playback"
+msgstr "Erreprodukzio-zerrenda/Jarraian Erreproduzitu"
+
+#: src/xitk/menus.c:565 src/xitk/menus.c:949
+msgid "Menus"
+msgstr "Menuak"
+
+#: src/xitk/menus.c:569
+msgid "Menus/Navigation..."
+msgstr "Menuak/nabigazioa..."
+
+#: src/xitk/menus.c:573
+msgid "Menus/SEP"
+msgstr "Menuak/SEP"
+
+#: src/xitk/menus.c:581
+msgid "Stream"
+msgstr "Korrontea"
+
+#: src/xitk/menus.c:585
+msgid "Stream/Information..."
+msgstr "Korrontea/informazioa..."
+
+#: src/xitk/menus.c:589
+msgid "Stream/Information (OSD)"
+msgstr "Korrontea/informazioa (OSD)"
+
+#: src/xitk/menus.c:593 src/xitk/stream_infos.c:745
+msgid "Video"
+msgstr "Bideoa"
+
+#: src/xitk/menus.c:597
+msgid "Video/Deinterlace"
+msgstr "Bideoa/gurutzelarkatuak bereizi"
+
+#: src/xitk/menus.c:601 src/xitk/menus.c:641
+msgid "Video/SEP"
+msgstr "Bideoa/SEP"
+
+#: src/xitk/menus.c:605
+msgid "Video/Aspect ratio"
+msgstr "Bideoa/aspektu-erlazioa"
+
+#: src/xitk/menus.c:609
+msgid "Video/Aspect ratio/Automatic"
+msgstr "Bideoa/aspektu-erlazioa/automatikoa"
+
+#: src/xitk/menus.c:613
+msgid "Video/Aspect ratio/Square"
+msgstr "Bideoa/aspektu-erlazioa/karratua"
+
+#: src/xitk/menus.c:617
+msgid "Video/Aspect ratio/4:3"
+msgstr "Bideoa/aspektu-erlazioa/4:3"
+
+#: src/xitk/menus.c:621
+msgid "Video/Aspect ratio/Anamorphic"
+msgstr "Bideoa/aspektu-erlazioa/anamorfikoa"
+
+#: src/xitk/menus.c:625
+msgid "Video/Aspect ratio/DVB"
+msgstr "Bideoa/aspektu-erlazioa/DVB"
+
+#: src/xitk/menus.c:629
+msgid "Video/200%"
+msgstr "Bideoa/200%"
+
+#: src/xitk/menus.c:633
+msgid "Video/100%"
+msgstr "Bideoa/100%"
+
+#: src/xitk/menus.c:637
+msgid "Video/50%"
+msgstr "Bideoa/50%"
+
+#: src/xitk/menus.c:645
+msgid "Video/Postprocess"
+msgstr "Bideo/Postprozesua"
+
+#: src/xitk/menus.c:649
+msgid "Video/Postprocess/Chain Reaction..."
+msgstr "Bideo/Postprozesua/Kanal erreakzioa..."
+
+#: src/xitk/menus.c:653
+msgid "Video/Postprocess/Enable Postprocessing"
+msgstr "Bideo/Postprozesua/Gaitu Postprozesatzea"
+
+#: src/xitk/menus.c:661
+msgid "Audio/Volume"
+msgstr "Audioa/bolumena"
+
+#: src/xitk/menus.c:665
+msgid "Audio/Volume/Mute"
+msgstr "Audioa/bolumena/Mutua"
+
+#: src/xitk/menus.c:669
+msgid "Audio/Volume/Increase 10%"
+msgstr "Audioa/bolumena/handiagotu %10"
+
+#: src/xitk/menus.c:673
+msgid "Audio/Volume/Decrease 10%"
+msgstr "Audioa/bolumena/txikiagotu 10%"
+
+#: src/xitk/menus.c:677 src/xitk/menus.c:841
+msgid "Audio/Channel"
+msgstr "Audio/kanala"
+
+#: src/xitk/menus.c:681 src/xitk/menus.c:815
+msgid "Audio/Visualization"
+msgstr "Audioa bistaratzeko plugin-a"
+
+#: src/xitk/menus.c:689 src/xitk/menus.c:895
+msgid "Subtitle/Channel"
+msgstr "Azpititulua/kanala"
+
+#: src/xitk/menus.c:697
+msgid "Settings"
+msgstr "Ezarpenak"
+
+#: src/xitk/menus.c:701
+msgid "Settings/Setup..."
+msgstr "Ezarpenak/konfigurazioa..."
+
+#: src/xitk/menus.c:706
+msgid "Settings/Skin Downloader..."
+msgstr "Ezarpenak/Azal deskargatzailea..."
+
+#: src/xitk/menus.c:711
+msgid "Settings/Keymap Editor..."
+msgstr "Ezarpenak/Teklastu-mapa Editorea..."
+
+#: src/xitk/menus.c:715
+msgid "Settings/Video..."
+msgstr "Ezarpenak/bideoa..."
+
+#: src/xitk/menus.c:719
+msgid "Settings/TV Analog..."
+msgstr "Ezarpenak/Telebista Analogikoa"
+
+#: src/xitk/menus.c:727
+msgid "Help..."
+msgstr "Laguntza..."
+
+#: src/xitk/menus.c:731
+msgid "Logs..."
+msgstr "Erregistroak..."
+
+#: src/xitk/menus.c:739 src/xitk/panel.c:1263
+msgid "Quit"
+msgstr "Irten"
+
+#: src/xitk/menus.c:752
+#, c-format
+msgid "xine %s"
+msgstr "xine %s"
+
+#: src/xitk/menus.c:776
+msgid "Open/Subtitle..."
+msgstr "Ireki/azpititulua..."
+
+#. Save Playlist
+#: src/xitk/menus.c:781
+msgid "Playlist/Save..."
+msgstr "Erreprodukzio-zerrenda/gorde..."
+
+#: src/xitk/menus.c:832
+msgid "Audio/Visualization/None"
+msgstr "Audio/Bistaratzea/Batez"
+
+#: src/xitk/menus.c:846
+msgid "Audio/Channel/Off"
+msgstr "Audio/kanala/itzalita"
+
+#: src/xitk/menus.c:853
+msgid "Audio/Channel/Auto"
+msgstr "Audio/kanala/automatikoa"
+
+#: src/xitk/menus.c:900
+msgid "Subtitle/Channel/Off"
+msgstr "Azpititulua/kanala/itzalita"
+
+#: src/xitk/menus.c:907
+msgid "Subtitle/Channel/Auto"
+msgstr "Azpititulua/kanala/automatikoa"
+
+#: src/xitk/menus.c:989
+msgid "Add Mediamark"
+msgstr "MedioMarka Gehitu"
+
+#: src/xitk/menus.c:1031 src/xitk/menus.c:1107
+msgid "Off"
+msgstr "Itzalita"
+
+#: src/xitk/menus.c:1038 src/xitk/menus.c:1113
+msgid "Auto"
+msgstr "Automatikoa"
+
+#: src/xitk/menus.c:1163 src/xitk/menus.c:1173
+msgid "Scan"
+msgstr "Bilatu"
+
+#: src/xitk/menus.c:1165 src/xitk/menus.c:1174 src/xitk/mrl_browser.c:288
+#: src/xitk/playlist.c:1189
+msgid "Add"
+msgstr "Gehitu"
+
+#: src/xitk/menus.c:1171
+msgid "Play"
+msgstr "Erreproduzitu"
+
+#: src/xitk/menus.c:1178 src/xitk/menus.c:1210
+msgid "Delete All"
+msgstr "Ezabatu dena"
+
+#: src/xitk/menus.c:1180
+msgid "Move Up"
+msgstr "Mugitu gora"
+
+#: src/xitk/menus.c:1181
+msgid "Move Down"
+msgstr "Mugitu behera"
+
+#: src/xitk/mrl_browser.c:207
+msgid "All extensions"
+msgstr "Luzapen guztiak"
+
+#: src/xitk/mrl_browser.c:277
+msgid "xine MRL Browser"
+msgstr "xine MRL arakatzailea"
+
+#: src/xitk/mrl_browser.c:304
+msgid "Source:"
+msgstr "Iturburua:"
+
+#: src/xitk/osd.c:285
+msgid "post animation"
+msgstr "post animazioa"
+
+#: src/xitk/osd.c:295
+msgid "unknown"
+msgstr "ezezaguna"
+
+#: src/xitk/osd.c:337
+msgid "Audio: "
+msgstr "Audioa: "
+
+#: src/xitk/osd.c:387
+msgid "of"
+msgstr ""
+
+#: src/xitk/osd.c:530
+msgid "Position in Stream"
+msgstr "Korronteko posizioa"
+
+#: src/xitk/osd.c:674
+msgid "Subtitles: "
+msgstr "Azpitituluak: "
+
+#: src/xitk/osd.c:703
+msgid "Audio Channel: "
+msgstr "Audio Kanala: "
+
+#: src/xitk/panel.c:47
+msgid "Play previous chapter or mrl"
+msgstr "Erreproduzitu aurreko kapitulua edo mrl-a"
+
+#: src/xitk/panel.c:48
+msgid "Play next chapter or mrl"
+msgstr "Erreproduzitu hurrengo kapitulua edo mrl-a"
+
+#: src/xitk/panel.c:51
+msgid "Play previous entry from playlist"
+msgstr "Erreproduzitu erreprodukzio-zerrendako aurreko sarrera"
+
+#: src/xitk/panel.c:52
+msgid "Play next entry from playlist"
+msgstr "Erreproduzitu erreprodukzio-zerrendako hurrengo sarrera"
+
+#: src/xitk/panel.c:353 src/xitk/panel.c:355 src/xitk/panel.c:358
+msgid "Total time: "
+msgstr "Denbora guztira: "
+
+#: src/xitk/panel.c:823
+#, c-format
+msgid "Amp: %s"
+msgstr "Anp: %s"
+
+#: src/xitk/panel.c:823 src/xitk/panel.c:828
+msgid "Muted"
+msgstr "Mutututa"
+
+#: src/xitk/panel.c:823 src/xitk/panel.c:828
+msgid "Unmuted"
+msgstr "Mututu gabe"
+
+#: src/xitk/panel.c:828
+#, c-format
+msgid "Audio: %s"
+msgstr "Audioa: %s"
+
+#: src/xitk/panel.c:1019
+msgid "Volume control"
+msgstr "Bolumen-kontrola"
+
+#: src/xitk/panel.c:1021
+msgid "Mute toggle"
+msgstr "Mututu bai/ez"
+
+#: src/xitk/panel.c:1060
+msgid "xine Panel"
+msgstr "xine panela"
+
+#: src/xitk/panel.c:1081
+msgid "panel: couldn't find image for background\n"
+msgstr "panel: ezin izan da atzeko planorako irudia aurkitu\n"
+
+#: src/xitk/panel.c:1224
+msgid "Stop playback"
+msgstr "Utzi erreproduzitzeari"
+
+#: src/xitk/panel.c:1232
+msgid "Play selected entry"
+msgstr "Erreproduzitu hautatutako sarrera"
+
+#: src/xitk/panel.c:1240
+msgid "Pause/Resume playback"
+msgstr "Pausarazi/Berrekin erreprodukzioa"
+
+#: src/xitk/panel.c:1255
+msgid "Eject current medium"
+msgstr "Egotzi uneko euskarria"
+
+#: src/xitk/panel.c:1271
+msgid "Setup window"
+msgstr "Konfigurazio-leihoa"
+
+#: src/xitk/panel.c:1279
+msgid "Navigator"
+msgstr "Nabigatzailea"
+
+#: src/xitk/panel.c:1287
+msgid "Hide GUI"
+msgstr "Ezkutatu GUI"
+
+#: src/xitk/panel.c:1295
+msgid "Fullscreen/Window mode"
+msgstr "Pantaila osoa/Leihoa modua"
+
+#: src/xitk/panel.c:1303
+msgid "Next audio channel"
+msgstr "Hurrengo audio-kanala"
+
+#: src/xitk/panel.c:1311
+msgid "Previous audio channel"
+msgstr "Aurreko audio-kanala"
+
+#: src/xitk/panel.c:1319
+msgid "Next SPU channel"
+msgstr "Hurrengo SPU kanala"
+
+#: src/xitk/panel.c:1327
+msgid "Previous SPU channel"
+msgstr "Hurregno SPU kanala"
+
+#: src/xitk/panel.c:1342
+msgid "Total time: --:--:--"
+msgstr "Denbora guztira: --:--:--"
+
+#: src/xitk/panel.c:1378
+msgid "Stream playback position slider"
+msgstr "Korrontearen erreprodukzio-kokalekuaren graduatzailea"
+
+#: src/xitk/panel.c:1412
+msgid "Take a snapshot"
+msgstr "Egin argazki bat"
+
+#: src/xitk/panel.c:1420
+msgid "Slow motion"
+msgstr "Erreprodukzio geldoa"
+
+#: src/xitk/panel.c:1428
+msgid "Fast motion"
+msgstr "Erreprodukzio azkarra"
+
+#: src/xitk/panel.c:1444
+msgid "Control"
+msgstr "Kontrol"
+
+#: src/xitk/panel.c:1452
+msgid "Open Location"
+msgstr "Ireki helbidea"
+
+#: src/xitk/panel.c:1457
+msgid "gui tips visibility"
+msgstr "gui iradokizunen ikusgaitasuna"
+
+#: src/xitk/panel.c:1464
+msgid "tips timeout (ms)"
+msgstr "iradokizunen denbora-muga (ms)"
+
+#: src/xitk/panel.c:1479
+msgid "gui panel visibility"
+msgstr "gui panelaren ikusgaitasuna"
+
+#: src/xitk/playlist.c:376 src/xitk/playlist.c:1199 src/xitk/skins.c:1193
+msgid "Load"
+msgstr "Kargatu"
+
+#: src/xitk/playlist.c:382
+msgid "Load a playlist"
+msgstr "Kargatu erreprodukzio-zerrenda"
+
+#: src/xitk/playlist.c:415
+msgid "Save a playlist"
+msgstr "Gorde erreprodukzio-zerrenda"
+
+#: src/xitk/playlist.c:1026
+msgid "xine Playlist Editor"
+msgstr "xine erreprodukzio-zerrendaren editorea"
+
+#: src/xitk/playlist.c:1044
+msgid "playlist: couldn't find image for background\n"
+msgstr "playlist: ezin izan da atzeko planorako irudia aurkitu\n"
+
+#: src/xitk/playlist.c:1157
+msgid "Move up selected MRL"
+msgstr "Eraman gora hautatutako MRLa"
+
+#: src/xitk/playlist.c:1164
+msgid "Move down selected MRL"
+msgstr "Eraman behera hautatutako MRLa"
+
+#: src/xitk/playlist.c:1171
+msgid "Start playback of selected MRL"
+msgstr "Hasi hautatutako MRL erreproduzitzen"
+
+#: src/xitk/playlist.c:1178
+msgid "Delete selected MRL from playlist"
+msgstr "Ezabatu hautatutako MRLa erreprodukzio-zerrendatik"
+
+#: src/xitk/playlist.c:1185
+msgid "Delete all entries in playlist"
+msgstr "Ezabatu erreprodukzio-zerrendako sarrera guztiak"
+
+#: src/xitk/playlist.c:1195
+msgid "Add one or more entries in playlist"
+msgstr "Gehitu sarrera bat edo gehiago erreprodukzio-zerrendan"
+
+#: src/xitk/playlist.c:1205
+msgid "Load saved playlist"
+msgstr "Kargatu gordetako erreprodukzio-zerrenda"
+
+#: src/xitk/playlist.c:1215
+msgid "Save playlist"
+msgstr "Gorde erreprodukzio-zerrenda"
+
+#: src/xitk/playlist.c:1225
+msgid "Close playlist window"
+msgstr "Itxi erreprodukzio-zerrendaren leihoa"
+
+#: src/xitk/playlist.c:1243
+msgid "Scan for:"
+msgstr "Bilatu hau:"
+
+#: src/xitk/playlist.c:1255
+msgid "Direct MRL entry"
+msgstr "MRL sarrera zuzena"
+
+#: src/xitk/post.c:207
+msgid "Audio visualization plugin"
+msgstr "Audioa bistaratzeko plugin-a"
+
+#: src/xitk/post.c:208
+msgid "Post audio plugin to used when playing streams without video"
+msgstr "Bideorik gabe erreproduzitzean erabili beharreko post audio-plugin-a"
+
+#: src/xitk/post.c:517
+#, c-format
+msgid "Entered value is out of bounds (%d>%d<%d)."
+msgstr "Sartutako balioa mugetatik kanpo dago (%d>%d<%d)."
+
+#: src/xitk/post.c:540
+#, c-format
+msgid "Entered value is out of bounds (%e>%e<%e)."
+msgstr "Sartutako balioa mugetatik kanpo dago (%e>%e<%e)."
+
+#: src/xitk/post.c:567
+msgid "parameter type POST_PARAM_TYPE_STRING not supported yet.\n"
+msgstr "POST_PARAM_TYPE_STRING parametro-mota oraindik ez da onartzen.\n"
+
+#: src/xitk/post.c:577
+msgid "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"
+msgstr "POST_PARAM_TYPE_STRINGLIST parametro-mota oraindik ez da onartzen.\n"
+
+#: src/xitk/post.c:602
+msgid "No description available"
+msgstr "Ez dago azalpenik erabilgarri."
+
+#: src/xitk/post.c:772
+msgid "No Filter"
+msgstr "Iragazkirik ez"
+
+#: src/xitk/post.c:981
+msgid "Plugin Help"
+msgstr "Plugin-laguntza"
+
+#: src/xitk/post.c:1152
+msgid "There is no parameter available for this plugin."
+msgstr "Ez dago parametrorik erabilgarri plugin honetarako."
+
+#: src/xitk/post.c:1755
+msgid "Chain Reaction"
+msgstr "Kate-erreakzioa"
+
+#: src/xitk/post.c:1802
+msgid "New Filter"
+msgstr "Iragazki berria"
+
+#: src/xitk/post.c:1817
+msgid "Enable"
+msgstr "Gaitu"
+
+#: src/xitk/post.c:2090
+msgid "Deinterlace plugin."
+msgstr "Gurutzelarkatuak bereizi: %d"
+
+#: src/xitk/post.c:2091
+msgid ""
+"Plugin (with optional parameters) to use when deinterlace is used (plugin "
+"separator is ';')."
+msgstr "Elkar-ezloturikoa erabiltzean erabiliko den plugin (eta aukerako parametroak)."
+
+#: src/xitk/session.c:818
+#, c-format
+msgid "Session %d isn't running.\n"
+msgstr "%d saioa ez dago martxan.\n"
+
+#: src/xitk/setup.c:362
+msgid "Important Notice"
+msgstr "Ohar garrantzitsua"
+
+#: src/xitk/setup.c:365
+msgid ""
+"You changed some configuration value which require to restart xine to take "
+"effect."
+msgstr ""
+"Aldatutako konfigurazioa balio batenbat ezartzeko xine berrabiarazi egin "
+"behar da."
+
+#: src/xitk/setup.c:838 src/xitk/setup.c:841
+msgid "No help available"
+msgstr "Ez dago laguntzarik erabilgarri"
+
+#: src/xitk/setup.c:892
+msgid "There is no configuration option available in this user experience level."
+msgstr ""
+"Ez dago konfigurazio-aukerarik erabilgarri erabiltzailearen esperientzia-"
+"maila honetan."
+
+#: src/xitk/setup.c:1090
+msgid "xine setup"
+msgstr "xine-ren konfigurazioa"
+
+#: src/xitk/setup.c:1125
+msgid "(*)  you need to restart xine for this setting to take effect"
+msgstr "(*)  xine berrabiarazi behar duzu ezarpen hauek abiarazteko"
+
+#: src/xitk/setup.c:1155
+msgid "OK"
+msgstr "Ados"
+
+#: src/xitk/skins.c:282 src/xitk/skins.c:478
+#, c-format
+msgid "Failed to load %s/%s. Load fallback skin %s\n"
+msgstr "Ezin izan da %s/%s kargatu. Kargatu %s segurtasun-azala\n"
+
+#: src/xitk/skins.c:288
+#, c-format
+msgid "Failed to load %s/%s. Reload old skin '%s'.\n"
+msgstr "Ezin izan da %s/%s kargatu. Berritu '%s' azal zaharra.\n"
+
+#: src/xitk/skins.c:306
+#, c-format
+msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
+msgstr "Ezin izan da %s kargatu, bertsio okerra. Kargatu '%s' segurtasun-azala.\n"
+
+#: src/xitk/skins.c:364
+#, c-format
+msgid "Ooch, skin not found, use fallback '%s'.\n"
+msgstr "Azala ez da aurkitu, erabili segurtasuneko '%s'.\n"
+
+#: src/xitk/skins.c:394 src/xitk/skins.c:421
+#, c-format
+msgid "No available skin found. Say goodbye.\n"
+msgstr "Ez da azal erabilgarririk aurkitu. Esan agur.\n"
+
+#: src/xitk/skins.c:435 src/xitk/skins.c:962
+msgid "gui skin theme"
+msgstr "gui azalaren gaia"
+
+#: src/xitk/skins.c:454
+#, c-format
+msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
+msgstr "Outx, gui.skin konfigurazio sarrera ez dago erregistraturik. Agur.\n"
+
+#: src/xitk/skins.c:461
+#, c-format
+msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
+msgstr "'%s' azala ez da aurkitu, erabili segurtasuneko '%s'.\n"
+
+#: src/xitk/skins.c:466
+#, c-format
+msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
+msgstr ""
+"Ezin izan da laguntzako azala kargatu. Egiaztatu instalatutako azalak. "
+"Irteten.\n"
+
+#: src/xitk/skins.c:485
+#, c-format
+msgid "Failed to load %s/%s. Exiting.\n"
+msgstr "Ezin izan da %s/%s kargatu. Irteten.\n"
+
+#: src/xitk/skins.c:495
+#, c-format
+msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
+msgstr ""
+"Ezin izan da %s azala kargatu, bertsio okerra. Kargatu '%s' segurtasun-"
+"azala.\n"
+
+#: src/xitk/skins.c:663
+#, c-format
+msgid "Unable to retrieve skin list from %s: %s"
+msgstr "Ezin izan da azalen zerrenda berreskuratu %s(e)tik: %s"
+
+#: src/xitk/skins.c:850 src/xitk/skins.c:981
+#, c-format
+msgid "Unable to download '%s': %s\n"
+msgstr "Ezin izan da '%s' deskargatu: %s\n"
+
+#: src/xitk/skins.c:897
+#, c-format
+msgid "Unable to create '%s' directory: %s."
+msgstr "Ezin da '%s' direktorioa sortu: %s."
+
+#: src/xitk/skins.c:969
+#, c-format
+msgid "Skin %s correctly installed"
+msgstr "%s azala behar bezala instalatuta dago"
+
+#: src/xitk/skins.c:975
+#, c-format
+msgid "Unable to create '%s'."
+msgstr "Ezin da '%s' sortu."
+
+#: src/xitk/skins.c:1070
+msgid "Be Patient..."
+msgstr "Izan pazientzia..."
+
+#: src/xitk/skins.c:1072
+#, c-format
+msgid "Retrieve skin list from %s"
+msgstr "Berreskuratu azalen zerrenda %s(e)tik"
+
+#: src/xitk/skins.c:1120
+msgid "Choose a skin to download..."
+msgstr "Aukeratu deskargatu beharreko azal bat..."
+
+#: src/xitk/snapshot.c:827 src/xitk/snapshot.c:838
+msgid "Error: "
+msgstr "Errorea: "
+
+#: src/xitk/snapshot.c:881
+msgid "xine_get_current_frame() failed\n"
+msgstr "xine_get_current_frame()-k huts egin du\n"
+
+#: src/xitk/snapshot.c:890
+msgid "Wrong image size: "
+msgstr "Okerrerko irudi tamaina: "
+
+#: src/xitk/snapshot.c:890
+msgid ". Snapshot aborted."
+msgstr ". Argazkia utzirik."
+
+#: src/xitk/snapshot.c:902
+msgid "prvt_image_alloc failed\n"
+msgstr "prvt_image_alloc-ek huts egin du\n"
+
+#: src/xitk/snapshot.c:911
+msgid "Framegrabber failed\n"
+msgstr "Framegrabber-ek huts egin du\n"
+
+#. the dxr3 driver does not allocate yuv buffers
+#. image->u and image->v are always 0 for YUY2
+#: src/xitk/snapshot.c:918
+msgid "Not supported for this video out driver\n"
+msgstr "Ez da bideo-kontrolatzaile honetarako onartzen\n"
+
+#: src/xitk/snapshot.c:1027
+msgid "File open failed"
+msgstr "Huts fitxategia irekitzerakoan"
+
+#: src/xitk/snapshot.c:1047
+msgid "png_create_write_struct() failed\n"
+msgstr "png_create_write_struct()-ek huts egin du\n"
+
+#: src/xitk/snapshot.c:1061
+msgid "png_create_info_struct() failed\n"
+msgstr "png_create_info_struct()-ek huts egin du\n"
+
+#: src/xitk/snapshot.c:1081
+msgid "PNG Parsing failed\n"
+msgstr "Ezin izan da PNG analizatu\n"
+
+#: src/xitk/snapshot.c:1095
+msgid "Error: yuy2_fudge failed\n"
+msgstr "Errorea: yuy2_fudge-k huts egin du\n"
+
+#: src/xitk/snapshot.c:1126
+msgid "rgb_alloc() failed\n"
+msgstr "rgb_alloc()-ek huts egin du\n"
+
+#: src/xitk/snapshot.c:1207
+msgid "File written: "
+msgstr "Idatzitako fitxategia: "
+
+#: src/xitk/splash.c:65
+msgid "xine Splash"
+msgstr "xine Abiarazte pantaila"
+
+#. Create window
+#: src/xitk/stream_infos.c:492
+msgid "Stream Information"
+msgstr "Korrontearen informazioa"
+
+#: src/xitk/stream_infos.c:522 src/xitk/tvset.c:362
+msgid "General"
+msgstr "Orokorra"
+
+#: src/xitk/stream_infos.c:529
+msgid "Title: "
+msgstr "Izenburua: "
+
+#: src/xitk/stream_infos.c:545
+msgid "Comment: "
+msgstr "Iruzkina: "
+
+#: src/xitk/stream_infos.c:561
+msgid "Artist: "
+msgstr "Artista: "
+
+#: src/xitk/stream_infos.c:576
+msgid "Genre: "
+msgstr "Generoa: "
+
+#: src/xitk/stream_infos.c:590
+msgid "Year: "
+msgstr "Urtea: "
+
+#: src/xitk/stream_infos.c:607
+msgid "Album: "
+msgstr "Albuma: "
+
+#: src/xitk/stream_infos.c:623
+msgid "Misc"
+msgstr "Hainbat"
+
+#: src/xitk/stream_infos.c:629
+msgid "Input Plugin: "
+msgstr "Sarrerako plugin-a: "
+
+#: src/xitk/stream_infos.c:643
+msgid "System Layer: "
+msgstr "Sistema-geruza: "
+
+#: src/xitk/stream_infos.c:657 src/xitk/stream_infos.c:841
+#: src/xitk/stream_infos.c:997
+msgid "Bitrate: "
+msgstr "Bit-tasa: "
+
+#: src/xitk/stream_infos.c:671
+msgid "Frame Duration: "
+msgstr "Markoaren iraupena: "
+
+#: src/xitk/stream_infos.c:687
+msgid "Is Seekable: "
+msgstr "Bilagarria da: "
+
+#: src/xitk/stream_infos.c:701
+msgid "Has Chapters: "
+msgstr "Atalak ditu: "
+
+#: src/xitk/stream_infos.c:715
+msgid "Ignore Spu: "
+msgstr "Ez ikusi egin Spu-ri: "
+
+#: src/xitk/stream_infos.c:729
+msgid "Has Still: "
+msgstr "Oraindik hau du: "
+
+#: src/xitk/stream_infos.c:753 src/xitk/stream_infos.c:909
+msgid "Has: "
+msgstr "Hau du: "
+
+#: src/xitk/stream_infos.c:767 src/xitk/stream_infos.c:923
+msgid "Handled: "
+msgstr "Kudeatua: "
+
+#: src/xitk/stream_infos.c:781 src/xitk/stream_infos.c:937
+msgid "Ignore: "
+msgstr "Ez ikusi egin: "
+
+#: src/xitk/stream_infos.c:796 src/xitk/stream_infos.c:952
+msgid "Codec: "
+msgstr "Kodeka: "
+
+#: src/xitk/stream_infos.c:813 src/xitk/stream_infos.c:969
+msgid "FourCC: "
+msgstr "FourCC: "
+
+#: src/xitk/stream_infos.c:827 src/xitk/stream_infos.c:983
+msgid "Channel(s): "
+msgstr "Kanala(k): "
+
+#: src/xitk/stream_infos.c:856
+msgid "Resolution: "
+msgstr "Bereizmena: "
+
+#: src/xitk/stream_infos.c:871
+msgid "Ratio: "
+msgstr "Erlazioa: "
+
+#: src/xitk/stream_infos.c:885
+msgid "Stream(s): "
+msgstr "Korrontea(k): "
+
+#: src/xitk/stream_infos.c:1011
+msgid "Bits: "
+msgstr "Bitak: "
+
+#: src/xitk/stream_infos.c:1026
+msgid "Samplerate: "
+msgstr "Laginaren neurria: "
+
+#: src/xitk/stream_infos.c:1044 src/xitk/tvset.c:509
+msgid "Update"
+msgstr "Eguneratu"
+
+#: src/xitk/tvout.c:93
+msgid "nvtv TV output system"
+msgstr "nvtv Telebista irteera sistema"
+
+#: src/xitk/tvout.c:94
+msgid "Select which TV output system supported by your TV."
+msgstr "Aukeratu zein Telebista irteera onartzen duen zure Telebistak"
+
+#: src/xitk/tvout.c:101
+msgid "Enable XRandr extension"
+msgstr "Gaitu XRandr luzapena"
+
+#: src/xitk/tvout.c:102
+msgid "Enable the use of xrandr to autofit the screen to match the TV-resolution"
+msgstr "Gaitu xrandr erabiltzea irudia Telebistaren erresoluziora ipintzeko"
+
+#: src/xitk/tvout.c:204
+msgid "Command to turn off TV out"
+msgstr "Telebista irteera ezgaitzeko komandoa"
+
+#: src/xitk/tvout.c:205 src/xitk/tvout.c:214
+msgid "atitvout command line used to turn on TV output."
+msgstr "komando lerroa atitvout komandoa erabili Telebista irteera gaitzeko."
+
+#: src/xitk/tvout.c:213
+msgid "Command to turn on TV out"
+msgstr "Telebista irteera gaitzeko komandoa"
+
+#: src/xitk/tvset.c:332
+msgid "TV/Analog Video parameters"
+msgstr "Telebista/Bideo Analogiko parametroak"
+
+#: src/xitk/tvset.c:370
+msgid "Input: "
+msgstr "Sarrera: "
+
+#: src/xitk/tvset.c:394
+msgid "Broadcast system: "
+msgstr "Difusio sistema: "
+
+#: src/xitk/tvset.c:416
+msgid "Channel: "
+msgstr "Kanala: "
+
+#: src/xitk/tvset.c:435
+msgid "Standard"
+msgstr "Estandarra"
+
+#: src/xitk/tvset.c:442
+msgid "Frame Rate: "
+msgstr "Markoaren abiadura: "
+
+#: src/xitk/tvset.c:467
+msgid "Analog Standard: "
+msgstr "Estandar analogikoa: "
+
+#: src/xitk/tvset.c:486
+msgid "Frame Size"
+msgstr "Markoaren tamaina"
+
+#: src/xitk/tvset.c:496
+msgid "MPEG2"
+msgstr "MPEG2"
+
+#: src/xitk/videowin.c:307
+#, c-format
+msgid "videowin: output driver cannot select a working visual\n"
+msgstr "videowin: irteera-kontrolatzaileak ezin du martxan dagoen bisuala hautatu\n"
+
+#: src/xitk/videowin.c:314
+#, c-format
+msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
+msgstr ""
+"videowin: irteera-kontrolatzaileak hautatutako bisuala id 0x%lx bisualean "
+"gainidazten du\n"
+
+#: src/xitk/videowin.c:500
+msgid "XF86VidMode Extension: modeline switching failed.\n"
+msgstr "XF86VidMode Extension: ezin izan da modeline aldatu.\n"
+
+#: src/xitk/videowin.c:1460
+msgid ""
+"Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
+"2 3)"
+msgstr ""
+"Xinerama moduan pantaila osoa egiteko erabili behar diren pantailak "
+"(adibidez, 0 2 3)"
+
+#: src/xitk/videowin.c:1461
+msgid "Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
+msgstr ""
+"Adibidez, bistaratzea 0, 2 eta 3 pantailan zabaltzea nahi baduzu, idatzi 0 2 "
+"3"
+
+#: src/xitk/videowin.c:1517
+msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
+msgstr "x koordenatua xinerama pantaila osorako (-8192 = automatikoki detektatzea)"
+
+#: src/xitk/videowin.c:1528
+msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
+msgstr "y koordenatua xinerama pantaila osorako (-8192 = automatikoki detektatzea)"
+
+#: src/xitk/videowin.c:1539
+msgid "width for xinerama fullscreen (-8192 = autodetect)"
+msgstr "xinerama pantaila osoaren zabalera (-8192 = automatikoki detektatzea)"
+
+#: src/xitk/videowin.c:1550
+msgid "height for xinerama fullscreen (-8192 = autodetect)"
+msgstr "xinerama pantaila osoaren altuera (-8192 = automatikoki detektatzea)"
+
+#: src/xitk/videowin.c:1586
+msgid "xine Video Window"
+msgstr "xine bideoaren leihoa"
+
+#: src/xitk/videowin.c:1590
+msgid "xine Video Fullscreen Window"
+msgstr "xine bideoaren pantaila osoaren leihoa"
+
+#: src/xitk/videowin.c:1594
+msgid "xine Video Borderless Window"
+msgstr "xine bideoaren ertzik gabeko leihoa"
+
+#: src/xitk/videowin.c:1607
+#, c-format
+msgid "XAllocWMHints() failed\n"
+msgstr "XAllocWMHints()-ek huts egin du\n"
+
+#: src/xitk/videowin.c:1622
+msgid "New stream sizes resize output window"
+msgstr "Korronteen tamaina berriek irteera-leihoaren tamaina aldatzen dute"
+
+#: src/xitk/videowin.c:1632
+msgid "Double size for small streams (require stream_resize_window)"
+msgstr ""
+"Tamaina bikoitza korronte txikietarako (require stream_resize_window behar "
+"da)"
+
+#: src/xitk/videowin.c:1656
+msgid "use XVidModeExtension when switching to fullscreen"
+msgstr "erabili XVidModeExtension pantaila osora aldatzean"
+
+#: src/xitk/videowin.c:1677
+#, c-format
+msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
+msgstr "XF86VidMode Extension (%d.%d) detektatuta, erabiltzen saiatuko naiz.\n"
+
+#: src/xitk/videowin.c:1682
+#, c-format
+msgid "XF86VidMode Extension: %d modelines found.\n"
+msgstr "XF86VidMode Extension: %d modeline aurkitu dira.\n"
+
+#: src/xitk/videowin.c:1691
+#, c-format
+msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+msgstr "XF86VidModeModeLine %dx%d ez da baliozkoa: baztertuta.\n"
+
+#: src/xitk/videowin.c:1722
+#, c-format
+msgid "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
+msgstr ""
+"XF86VidMode Extension: ezin izan da modeline erabilgarrien zerrenda lortu. "
+"Huts egin du.\n"
+
+#: src/xitk/videowin.c:1725
+#, c-format
+msgid "XF86VidMode Extension: initialization failed, not using it.\n"
+msgstr "XF86VidMode Extension: ezin izan da abiarazi, ez da hori erabiltzen ari.\n"
+
+#: src/xitk/viewlog.c:261
+msgid "log info"
+msgstr "erregistro informazioa "
+
+#: src/xitk/viewlog.c:263
+#, c-format
+msgid "There is no log entry for logging section '%s'.\n"
+msgstr "Ez dago erregistro-sarrerarik '%s' erregistro-atalerako.\n"
+
+#: src/xitk/viewlog.c:395
+msgid "xine log viewer"
+msgstr "xine erregistro-ikustailea"
+
+#: src/xitk/viewlog.c:445
+msgid "Refresh"
+msgstr "Freskatu"
+
