@@ -522,6 +522,30 @@ void pl_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 /*
+ * Update first displayed entry and input text widget content with
+ * current selected playlist entry.
+ */
+void pl_update_focused_entry(void) {
+
+  if(playlist != NULL) {
+    if(playlist->window) {
+      if(playlist->visible && playlist->running && gGui->playlist_num) {
+	if(!strcmp(gGui->filename, gGui->playlist[gGui->playlist_cur])) {
+	  int max_displayed = xitk_browser_get_num_entries(playlist->playlist);
+	  
+	  if((gGui->playlist_num - gGui->playlist_cur) >= max_displayed)
+	    xitk_browser_update_list(playlist->playlist, 
+				     gGui->playlist, gGui->playlist_num, gGui->playlist_cur);
+	  
+	  xitk_inputtext_change_text(playlist->widget_list, 
+				     playlist->winput, gGui->playlist[gGui->playlist_cur]);
+	}
+      }
+    }
+  }
+}
+
+/*
  * Handle X events here.
  */
 void playlist_handle_event(XEvent *event, void *data) {
@@ -956,4 +980,5 @@ void playlist_editor(void) {
 
   playlist->visible = 1;
   playlist->running = 1;
+  pl_update_focused_entry();
 }

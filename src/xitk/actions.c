@@ -449,6 +449,7 @@ void gui_set_current_mrl(char *mrl) {
     panel_set_no_mrl();
   
   panel_update_mrl_display ();
+  pl_update_focused_entry();
 }
 
 char *gui_get_next_mrl () {
