@@ -17,7 +17,7 @@ dnl AC_PREREQ_LIBTOOL(1.4.0,,AC_MSG_ERROR(*** You should have libtool >= 1.4 ins
 XINE_MAJOR=0
 XINE_MINOR=9
 XINE_SUB=6
-XINE_PRE="`if test -f ./.cvsversion; then echo cvs;fi`"
+XINE_PRE="cvs"
 
 TAR_NAME="xine-ui-"$XINE_MAJOR.$XINE_MINOR.$XINE_SUB$XINE_PRE
 SPEC_VERSION=$XINE_MAJOR.$XINE_MINOR.$XINE_SUB$XINE_PRE
