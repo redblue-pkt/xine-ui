@@ -28,7 +28,11 @@
 #include <xine.h>
 #include <xine/video_out_x11.h>
 
+#include "xine.h"
+
 #include "xitk.h"
+
+#include "Imlib-light/Imlib.h"
 
 #include "event.h"
 #include "videowin.h"
@@ -47,8 +51,48 @@ int            gvw_completion_type;
 int            gvw_depth;
 int            gvw_show;
 XWMHints      *gvw_wm_hint;
-
 static DND_struct_t    xdnd_videowin;
+
+
+void video_window_draw_logo(void) {
+  ImlibImage *resized_image;
+  int xwin, ywin, tmp;
+  unsigned int wwin, hwin, bwin, dwin;
+  double ratio = 1;
+  Window rootwin;
+  
+  XLockDisplay (gGui->display);
+  
+  XClearWindow (gGui->display, gGui->video_window); 
+
+  if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
+		  &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+    
+    tmp = (wwin / 100) * 86;
+    ratio = (tmp < gGui->video_window_logo_pixmap.width && tmp >= 1) ? 
+      (ratio = (double)tmp / (double)gGui->video_window_logo_pixmap.width) : 1;
+  }
+  
+  resized_image = Imlib_clone_image(gGui->imlib_data, 
+				    gGui->video_window_logo_image);
+  Imlib_render (gGui->imlib_data, resized_image, 
+		(int)gGui->video_window_logo_pixmap.width * ratio, 
+		(int)gGui->video_window_logo_pixmap.height * ratio);
+
+  XCopyArea (gGui->display, resized_image->pixmap, gGui->video_window, 
+	     gvw_gc, 0, 0,
+	     resized_image->width, resized_image->height, 
+	     (wwin - resized_image->width) / 2, 
+	     (hwin - resized_image->height) / 2);
+
+  
+  XFlush(gGui->display);
+  XSync(gGui->display, False);
+  
+  Imlib_destroy_image(gGui->imlib_data, resized_image);
+
+  XUnlockDisplay (gGui->display);
+}
 
 void video_window_set_fullscreen (int req_fullscreen) {
 
@@ -308,7 +352,7 @@ int video_window_is_visible () {
 
 static unsigned char bm_no_data[] = { 0,0,0,0, 0,0,0,0 };
 
-void video_window_init () {
+void video_window_init (void) {
 
   XWindowAttributes  attribs;
   Pixmap             bm_no;
@@ -405,6 +449,20 @@ void video_window_init () {
   XUnlockDisplay (gGui->display);
 
   video_window_adapt_size (768, 480, &x, &y, &w, &h);
+  video_window_draw_logo();
 
 }
 
+
+void video_window_handle_event (XEvent *event) {
+  
+  switch(event->type) {
+
+  case Expose:
+    if(event->xany.window == gGui->video_window) {
+      if(xine_get_status(gGui->xine) == XINE_STOP)
+	video_window_draw_logo();
+    }
+    break;
+  }
+}

@@ -25,7 +25,7 @@
 #ifndef VIDEOWIN_H
 #define VIDEOWIN_H
 
-void video_window_init ();
+void video_window_init (void);
 
 void video_window_adapt_size (int video_width, int video_height, int *dest_x, int *dest_y,
 			      int *dest_width, int *dest_height) ;
@@ -35,14 +35,16 @@ void video_window_calc_dest_size (int video_width, int video_height,
 
 /* set/get fullscreen mode */
 void video_window_set_fullscreen (int req_fullscreen);
-int video_window_is_fullscreen ();
+int video_window_is_fullscreen (void);
 
 /* hide/show cursor in video window*/
 void video_window_set_cursor_visibility(int show_cursor) ;
 
 /* hide/show video window */
 void video_window_set_visibility(int show_window) ;
-int video_window_is_visible ();
+int video_window_is_visible (void);
 
+void video_window_draw_logo(void);
+void video_window_handle_event(XEvent *);
 
 #endif

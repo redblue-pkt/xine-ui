@@ -120,10 +120,12 @@ void gui_handle_event (XEvent *event) {
   char           kbuf[256];
   int            len;
 
+  video_window_handle_event(event);
   panel_handle_event(event);
   playlist_handle_event(event);
   control_handle_event(event);
-
+  
+  
   switch(event->type) {
 
   case MappingNotify:
@@ -383,9 +385,7 @@ void gui_status_callback (int nStatus) {
       if(gGui->autoplay_options & QUIT_ON_STOP)
 	gui_exit(NULL, NULL);
       
-      /* FIXME
-      vo_set_logo_mode (1); 
-      */
+      video_window_draw_logo();
       gGui->playlist_cur--;
     }
   }
@@ -408,6 +408,7 @@ void gui_init (int nfiles, char *filenames[]) {
   int                   i;
   XColor                dummy;
   char                 *display_name = ":0.0";
+  char                  buffer[PATH_MAX + NAME_MAX + 1]; /* Enought ?? ;-) */
 
   /*
    * init playlist
@@ -446,6 +447,26 @@ void gui_init (int nfiles, char *filenames[]) {
 
   gGui->screen = DefaultScreen(gGui->display);
   gGui->imlib_data = Imlib_init (gGui->display);
+
+  sprintf(buffer, "%s/xine_logo.png", XINE_SKINDIR);
+  if((gGui->video_window_logo_image= 
+      Imlib_load_image(gGui->imlib_data, buffer)) == NULL) {
+    fprintf(stderr, "Unable to load %s logo\n", buffer);
+    exit(1);
+  }
+
+  Imlib_render(gGui->imlib_data, gGui->video_window_logo_image,
+	       gGui->video_window_logo_image->rgb_width,
+	       gGui->video_window_logo_image->rgb_height);
+
+  gGui->video_window_logo_pixmap.image = 
+    Imlib_move_image(gGui->imlib_data, gGui->video_window_logo_image);
+
+  gGui->video_window_logo_pixmap.width = 
+    gGui->video_window_logo_image->rgb_width;
+
+  gGui->video_window_logo_pixmap.height = 
+    gGui->video_window_logo_image->rgb_height;
 
   printf ("imlib visual : %d\n", gGui->imlib_data->x.visual);
 

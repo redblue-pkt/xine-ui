@@ -57,9 +57,10 @@ typedef struct {
   DND_struct_t         xdnd;
 
   ImlibData           *imlib_data;
-  ImlibImage          *bg_image;     /* background image */
 
   Window               video_window; 
+  ImlibImage          *video_window_logo_image;
+  gui_image_t          video_window_logo_pixmap;
 
   Window               panel_window;
 

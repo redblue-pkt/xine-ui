@@ -52,7 +52,7 @@ static char             panel_audiochan[20];
 static widget_t        *panel_audiochan_label;
 static char             panel_spuid[20];
 static widget_t        *panel_spuid_label;
-
+static ImlibImage      *panel_bg_image;
 #define MAX_UPDSLD 25
 static int              panel_slider_timer; /* repaint slider if slider_timer<=0 */
 
@@ -246,7 +246,7 @@ void panel_init (void) {
    * load bg image before opening window, so we can determine it's size
    */
 
-  if (!(gGui->bg_image = 
+  if (!(panel_bg_image = 
 	Imlib_load_image(gGui->imlib_data,
 			 gui_get_skinfile("BackGround")))) {
     fprintf(stderr, "xine-panel: couldn't find image for background\n");
@@ -262,8 +262,8 @@ void panel_init (void) {
 
   hint.x = 200;
   hint.y = 100;
-  hint.width = gGui->bg_image->rgb_width;
-  hint.height = gGui->bg_image->rgb_height;
+  hint.width = panel_bg_image->rgb_width;
+  hint.height = panel_bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
@@ -326,7 +326,7 @@ void panel_init (void) {
   
   gc = XCreateGC(gGui->display, gGui->panel_window, 0, 0);
 
-  Imlib_apply_image(gGui->imlib_data, gGui->bg_image, gGui->panel_window);
+  Imlib_apply_image(gGui->imlib_data, panel_bg_image, gGui->panel_window);
   XSync(gGui->display, False); 
 
   XUnlockDisplay (gGui->display);

@@ -74,7 +74,7 @@ void gui_stop (widget_t *w, void *data) {
 
   gGui->ignore_status = 1;
   xine_stop (gGui->xine);
-  /* FIXME vo_set_logo_mode (1); */
+  video_window_draw_logo();
   gGui->ignore_status = 0; 
   panel_reset_slider ();
   panel_check_pause();
@@ -246,7 +246,7 @@ void gui_nextprev(widget_t *w, void *data) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
       xine_play (gGui->xine, gGui->filename, 0 );
     } else {
-      /* vo_set_logo_mode (1); FIXME */
+      video_window_draw_logo();
       gGui->playlist_cur = 0;
     }
     gGui->ignore_status = 0;
