@@ -146,7 +146,7 @@
     
     Currently there is no way to check if playback has stopped from  the
     plugin's point of view - at least none I'm aware of yet.  Working on
-    it... (yeah that's what they all say *grin*)
+    it... (yeah that's what everyone says *grin*)
 
   + those you may report will be known soon too. :-)
 
@@ -154,7 +154,6 @@
 * WHAT IS ON THE TODO LIST?
 
   + hardware deinterlacing support
-  + fixing the yuv_blending which is necessary for subtitles and DVD menus
    
   + bug fixes
   + new features
