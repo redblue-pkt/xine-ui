@@ -147,7 +147,10 @@ static void *xitk_tips_thread(void *data) {
   
   XLOCK(tp->w->imlibdata->x.disp);
   XMapRaised(tp->w->imlibdata->x.disp, (xitk_window_get_window(tp->xwin)));
-  XSetInputFocus(tp->w->imlibdata->x.disp, tp->wl->win, RevertToNone, CurrentTime);
+
+  if(wattr.map_state == IsViewable)
+    XSetInputFocus(tp->w->imlibdata->x.disp, tp->wl->win, RevertToNone, CurrentTime);
+
   XUNLOCK(tp->w->imlibdata->x.disp);
   
   tp->key = xitk_register_event_handler("xitk tips", 
