@@ -28,6 +28,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <string.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -907,9 +908,10 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	sprintf(tmpskin, "/tmp/%d%s", (unsigned int)time(NULL), filename);
 	
 	if((fd = fopen(tmpskin, "w+b")) != NULL) {
-	  char   buffer[2048];
-	  int    i, skin_found = -1;
-	  
+	  char      buffer[2048];
+	  char      fskin_path[XITK_PATH_MAX];
+	  int       i, skin_found = -1;
+
 	  fwrite(download.buf, download.size, 1, fd);
 	  fflush(fd);
 	  fclose(fd);
@@ -919,10 +921,20 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  sprintf(buffer, "which tar > /dev/null 2>&1 && tar -C %s -xzf %s", skindir, tmpskin);
 	  xine_system(0, buffer);
 	  unlink(tmpskin);
-	  
+
 	  memset(&buffer, 0, sizeof(buffer));
 	  snprintf(buffer, ((strlen(filename) + 1) - 7), "%s", filename);
 
+	  memset(&fskin_path, 0, sizeof(fskin_path));
+	  sprintf(fskin_path, "%s/%s/%s", skindir, buffer, "doinst.sh");
+	  if(is_a_file(fskin_path)) {
+	    char doinst[2048];
+
+	    memset(&doinst, 0, sizeof(doinst));
+	    sprintf(doinst, "cd %s/%s && ./doinst.sh", skindir, buffer);
+	    xine_system(0, doinst);
+	  }
+	  
 	  for(i = 0; i < skins_avail_num; i++) {
 	    if((!strcmp(skins_avail[i]->pathname, skindir)) 
 	       && (!strcmp(skins_avail[i]->skin, buffer))) {
@@ -1077,7 +1089,7 @@ void download_skin(char *url) {
   layer_above_video(xitk_window_get_window(xwin));
   
   if((slxs = skins_get_slx_entries(url)) != NULL) {
-    char                      *fontname    = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+    char                      *fontname    = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
     char                      *btnfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
     int                        i;
     xitk_browser_widget_t      br;
