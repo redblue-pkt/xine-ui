@@ -143,10 +143,22 @@ void xitk_set_dnd_callback (xitk_dnd_t *xdnd, xitk_dnd_callback_t cb) {
 Bool xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
 
   if (event->xclient.format == 32 && event->xclient.data.l[0] == xdnd->_XA_WM_DELETE_WINDOW) {
-    raise(SIGINT); /* video window closed, quit program */
+    XEvent xevent;
 
+    XLOCK(xdnd->display);
+    xevent.xany.type = DestroyNotify;
+    xevent.xany.display = xdnd->display;
+    xevent.xdestroywindow.type = DestroyNotify;
+    xevent.xdestroywindow.send_event = True;
+    xevent.xdestroywindow.display = xdnd->display;
+    xevent.xdestroywindow.event = xdnd->win;
+    xevent.xdestroywindow.window = xdnd->win;
+    
+    XSendEvent(xdnd->display, xdnd->win, True, 0L, &xevent);
+    XUNLOCK(xdnd->display);
+      
   } else if (event->xclient.message_type == xdnd->_XA_XdndEnter) {
-
+    
     if ((event->xclient.data.l[1] & 1) == 0){
       xdnd->atom_support = event->xclient.data.l[2];
     }

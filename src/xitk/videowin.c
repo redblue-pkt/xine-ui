@@ -47,6 +47,7 @@
 #include "event.h"
 #include "videowin.h"
 #include "panel.h"
+#include "actions.h"
 
 extern gGui_t *gGui;
 
@@ -315,13 +316,14 @@ void video_window_adapt_size (void *this,
   *dest_y = 0;
 
 #ifdef HAVE_XF86VIDMODE
-  // XF86VidMode Extension
-  // In case a fullscreen request is received or if already in fullscreen, the
-  // appropriate modeline will be looked up and used.
+  /* XF86VidMode Extension
+   * In case a fullscreen request is received or if already in fullscreen, the
+   * appropriate modeline will be looked up and used.
+   */
   if(gVw->fullscreen_req || gVw->fullscreen_mode) {
     int search = 0;
     
-    // skipping first entry because it is the current modeline
+    /* skipping first entry because it is the current modeline */
     for(search = 1; search < gVw->XF86_modelines_count; search++) {
        if(gVw->XF86_modelines[search]->hdisplay >= gVw->video_width)
 	 break;
@@ -960,6 +962,11 @@ static int video_window_translate_point(int gui_x, int gui_y,
 static void video_window_handle_event (XEvent *event, void *data) {
 
   switch(event->type) {
+
+  case DestroyNotify:
+    if(gGui->video_window == event->xany.window)
+      gui_exit(NULL, NULL);
+    break;
 
   case KeyPress:
 
