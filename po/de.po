@@ -439,7 +439,7 @@ msgid "Synchronized X protocol (debug)"
 msgstr "Synchrones X-Protokoll (Fehlersuche)"
 
 #: src/xitk/event.c:1253
-msgid "Warning! Synchronized X activated - this is way slow...\n"
+msgid "Warning! Synchronized X activated - this is very slow...\n"
 msgstr "Warnung! Synchrones X aktiviert - das wird ziemlich langsam...\n"
 
 #: src/xitk/event.c:1258

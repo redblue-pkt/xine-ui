@@ -734,11 +734,6 @@ void xitk_set_layer_above(Window window) {
   }
   
   switch(gXitk->wm_type & WM_TYPE_COMP_MASK) {
-  case WM_TYPE_MOTIF:
-  case WM_TYPE_LARSWM:
-    return;
-    break;
-    
   case WM_TYPE_KWIN:
     XLockDisplay(gXitk->display);
     XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
@@ -746,26 +741,19 @@ void xitk_set_layer_above(Window window) {
     XUnlockDisplay(gXitk->display);
     break;
     
-  case WM_TYPE_UNKNOWN:
-  case WM_TYPE_WINDOWMAKER:
-  case WM_TYPE_ICE:
-  case WM_TYPE_E:
-  case WM_TYPE_XFCE:
-  case WM_TYPE_SAWFISH:
-  case WM_TYPE_METACITY: /* Untested */
-  case WM_TYPE_AFTERSTEP:
-  case WM_TYPE_BLACKBOX:
   default:
     {
-      long propvalue[1];
-      
-      propvalue[0] = xitk_get_layer_level();
-      
-      XLockDisplay(gXitk->display);
-      XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
-		      XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
-		      1);
-      XUnlockDisplay(gXitk->display);
+      if (XA_WIN_LAYER != None) {
+        long propvalue[1];
+
+        propvalue[0] = xitk_get_layer_level();
+
+        XLockDisplay(gXitk->display);
+        XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
+		        XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
+		        1);
+        XUnlockDisplay(gXitk->display);
+      }
     }
     break;
   }

@@ -1260,7 +1260,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     XLockDisplay(gGui->display);
     XSynchronize (gGui->display, True);
     XUnlockDisplay(gGui->display);
-    fprintf (stderr, _("Warning! Synchronized X activated - this is way slow...\n"));
+    fprintf (stderr, _("Warning! Synchronized X activated - this is very slow...\n"));
   }
 
   gGui->layer_above = 
