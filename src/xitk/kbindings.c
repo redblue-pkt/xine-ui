@@ -429,6 +429,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ContrastControl+",       ACTID_CONTRASTCONTROLp        , "VOID",     KEYMOD_NOMOD   , 0 },
   { "decrease contrast by 10",
     "ContrastControl-",       ACTID_CONTRASTCONTROLm        , "VOID",     KEYMOD_NOMOD   , 0 },
+  { "stop playback after played stream",
+    "PlaylistStop",           ACTID_PLAYLIST_STOP           , "l",	  KEYMOD_CONTROL , 0 },
   { "quit the program",
     "Quit",                   ACTID_QUIT                    , "q",        KEYMOD_NOMOD   , 0 },
   { 0,

@@ -139,6 +139,7 @@ typedef enum {
   ACTID_VPP,
   ACTID_VPP_ENABLE,
   ACTID_HELP_SHOW,
+  ACTID_PLAYLIST_STOP,
 
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 

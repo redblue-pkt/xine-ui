@@ -648,7 +648,9 @@ static void show_usage (void) {
   printf(_("                                   'prev'   play previous playlist entry,\n"));
   printf(_("                                   'next'   play next playlist entry,\n"));
   printf(_("                                   'last'   play last entry in the playlist,\n"));
-  printf(_("                                   'load:s' load playlist file <s>.\n"));
+  printf(_("                                   'load:s' load playlist file <s>,\n"));
+  printf(_("                                   'stop'   stop playback at the end of current playback.\n")); 
+  printf(_("                                   'cont'   continue playback at the end of current playback.\n")); 
   printf(_("                    play, slow2, slow4, pause, fast2,\n"));
   printf(_("                    fast4, stop, quit, fullscreen, eject.\n"));
   printf(_("  -Z                           Don't automatically start playback (smart mode).\n"));

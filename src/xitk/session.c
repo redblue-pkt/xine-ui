@@ -417,6 +417,18 @@ void *ctrlsocket_func(void *data) {
       send_ack(shdr);
       break;
 
+    case CMD_PLAYLIST_STOP:
+      if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
+	gGui->playlist.control |= PLAYLIST_CONTROL_STOP;
+      send_ack(shdr);
+      break;
+
+    case CMD_PLAYLIST_CONTINUE:
+      if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
+	gGui->playlist.control &= !PLAYLIST_CONTROL_STOP;
+      send_ack(shdr);
+      break;
+
     case CMD_VOLUME:
       {
 	int *vol = (int *)shdr->data;
@@ -544,7 +556,7 @@ int init_session(void) {
 void session_handle_subopt(char *suboptarg, int *session) {
   char        *sopts = suboptarg;
   int          optsess = -1;
-  int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev;
+  int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev, playlist_stop_cont;
   int          audio_next, audio_prev, spu_next, spu_prev;
   int          volume, amp, loop;
   char        *playlist_load = NULL;
@@ -559,7 +571,8 @@ void session_handle_subopt(char *suboptarg, int *session) {
     "audio", "spu", "session", "mrl", "playlist", "pl", "volume", "amp", "loop", NULL
   };
   
-  playlist_first = playlist_last = playlist_clear = playlist_next = playlist_prev = fullscreen = 0;
+  playlist_first = playlist_last = playlist_clear = playlist_next = playlist_prev = playlist_stop_cont = 0;
+  fullscreen = 0;
   audio_next = audio_prev = spu_next = spu_prev = 0;
   volume = amp = -1;
   state = 0;
@@ -630,6 +643,10 @@ void session_handle_subopt(char *suboptarg, int *session) {
 	playlist_prev++;
       else if(!strncasecmp(optstr, "load:", 5))
 	playlist_load = strdup(optstr + 5);
+      else if(!strcasecmp(optstr, "stop"))
+	playlist_stop_cont = -1;
+      else if(!strcasecmp(optstr, "cont"))
+	playlist_stop_cont = 1;
       break;
 
       /* volume */
@@ -684,6 +701,12 @@ void session_handle_subopt(char *suboptarg, int *session) {
       playlist_prev--;
     }
     
+    if(playlist_stop_cont < 0)
+      remote_cmd(*session, CMD_PLAYLIST_STOP);
+
+    if(playlist_stop_cont > 0)
+      remote_cmd(*session, CMD_PLAYLIST_CONTINUE);
+
     if(num_mrls) {
       int i;
 

@@ -47,6 +47,7 @@ extern _panel_t                *panel;
 #define PLAYL_REPEAT            15
 #define PLAYL_SHUFFLE           16
 #define PLAYL_SHUF_PLUS         17
+#define PLAYL_CTRL_STOP         18
 
 #define AUDIO_MUTE              20
 #define AUDIO_INCRE_VOL         21
@@ -193,6 +194,10 @@ static void menu_playlist_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
   case PLAYL_SHUF_PLUS:
     gGui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
     osd_display_info(_("Playlist: shuffle forever."));
+    break;
+
+  case PLAYL_CTRL_STOP:
+    gui_execute_action_id(ACTID_PLAYLIST_STOP);
     break;
 
   default:
@@ -486,6 +491,12 @@ void video_window_menu(xitk_widget_list_t *wl) {
     { _("Playlist/Loop modes/Non-stop Shuffle"),
       (gGui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS) ? "<checked>" : "<check>",
       menu_playlist_ctrl, (void *) PLAYL_SHUF_PLUS                                           },
+    { _("Playlist/SEP"),  
+      "<separator>",
+      NULL, NULL                                                                             },
+    { _("Playlist/Continue"),
+      (gGui->playlist.control & PLAYLIST_CONTROL_STOP) ? "<check>" : "<checked>",
+      menu_playlist_ctrl, (void *) PLAYL_CTRL_STOP                                           },
     { "SEP",  
       "<separator>",
       NULL, NULL                                                                             },
