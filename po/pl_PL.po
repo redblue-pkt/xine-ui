@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-06-07 14:44+0200\n"
-"PO-Revision-Date: 2002-06-07 11:46+0200\n"
+"POT-Creation-Date: 2002-06-07 04:22+0200\n"
+"PO-Revision-Date: 2002-06-07 12:31+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polski <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -71,7 +71,7 @@ msgstr "Koniec"
 msgid "Close control window"
 msgstr "Zamykanie panela kontrolnego"
 
-#: src/xitk/errors.c:64 src/xitk/kbindings.c:1918
+#: src/xitk/errors.c:64 src/xitk/kbindings.c:1912
 msgid "Done"
 msgstr "Zrobione"
 
@@ -164,32 +164,32 @@ msgstr "Mapowania klawiszy '%s' i '%s' s± identyczne.\n"
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Ojej: tablica mapowania klawiszy jest PUSTA.\n"
 
-#: src/xitk/kbindings.c:1294
+#: src/xitk/kbindings.c:1288
 msgid "Nothing selected"
-msgstr "Nic nie wybrano"
+msgstr "Nie wybrano"
 
-#: src/xitk/kbindings.c:1295
+#: src/xitk/kbindings.c:1289
 msgid "None"
 msgstr "Brak"
 
-#: src/xitk/kbindings.c:1456
+#: src/xitk/kbindings.c:1450
 msgid "You can only delete alias entries."
 msgstr "Mo¿na usuwaæ tylko aliasy wpisów"
 
-#: src/xitk/kbindings.c:1580
+#: src/xitk/kbindings.c:1574
 msgid "Press Keyboard Keys..."
 msgstr "Naci¶nij kawisz..."
 
-#: src/xitk/kbindings.c:1597
+#: src/xitk/kbindings.c:1591
 msgid "Event receiver window"
 msgstr "Okno odbiornika wydarzeñ"
 
 #. Ask if uses want/wont store new shorcut
-#: src/xitk/kbindings.c:1682
+#: src/xitk/kbindings.c:1676
 msgid "Accept?"
 msgstr "Zaakceptowaæ?"
 
-#: src/xitk/kbindings.c:1686
+#: src/xitk/kbindings.c:1680
 #, c-format
 msgid ""
 "Store %s as\n"
@@ -198,7 +198,7 @@ msgstr ""
 "Zapis %s jako\n"
 "mapowanie klawisza '%s'?."
 
-#: src/xitk/kbindings.c:1693
+#: src/xitk/kbindings.c:1687
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
@@ -207,63 +207,63 @@ msgstr ""
 "To mapowanie klawisza jest redundantne z akcj±\n"
 "\"%s\".\n"
 
-#: src/xitk/kbindings.c:1772
+#: src/xitk/kbindings.c:1766
 msgid "key binding editor"
 msgstr "Edytor mapowania klawiszy"
 
-#: src/xitk/kbindings.c:1797
+#: src/xitk/kbindings.c:1791
 msgid "Binding action"
 msgstr "Akcja skrótu"
 
-#: src/xitk/kbindings.c:1803
+#: src/xitk/kbindings.c:1797
 msgid "Key"
 msgstr "Klawisz"
 
-#: src/xitk/kbindings.c:1808
+#: src/xitk/kbindings.c:1802
 msgid "Modifiers"
 msgstr "Modyfikator"
 
-#: src/xitk/kbindings.c:1849
+#: src/xitk/kbindings.c:1843
 msgid "Alias"
 msgstr "Alias"
 
-#: src/xitk/kbindings.c:1863
+#: src/xitk/kbindings.c:1857
 msgid "Edit"
 msgstr "Edycja"
 
-#: src/xitk/kbindings.c:1877
+#: src/xitk/kbindings.c:1871
 msgid "Delete"
 msgstr "Usuwanie"
 
-#: src/xitk/kbindings.c:1891 src/xitk/playlist.c:863
+#: src/xitk/kbindings.c:1885 src/xitk/playlist.c:863
 msgid "Save"
 msgstr "Zapis"
 
-#: src/xitk/kbindings.c:1905
+#: src/xitk/kbindings.c:1899
 msgid "Reset"
 msgstr "Reset"
 
-#: src/xitk/kbindings.c:1982
+#: src/xitk/kbindings.c:1976
 msgid "ctrl"
 msgstr "ctrl"
 
-#: src/xitk/kbindings.c:2003
+#: src/xitk/kbindings.c:1997
 msgid "meta"
 msgstr "meta"
 
-#: src/xitk/kbindings.c:2025
+#: src/xitk/kbindings.c:2019
 msgid "mod3"
 msgstr "mod3"
 
-#: src/xitk/kbindings.c:2047
+#: src/xitk/kbindings.c:2041
 msgid "mod4"
 msgstr "mod4"
 
-#: src/xitk/kbindings.c:2068
+#: src/xitk/kbindings.c:2062
 msgid "mod5"
 msgstr "mod5"
 
-#: src/xitk/kbindings.c:2077
+#: src/xitk/kbindings.c:2071
 msgid "Grab"
 msgstr "Przechwytuj"
 
@@ -311,8 +311,7 @@ msgstr "  -a, --audio-channel <#>      Wybór kana³u d¼wiêku '#'.\n"
 
 #: src/xitk/main.c:294
 msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
-msgstr ""
-"  -p, --auto-play [opt]        Odtwarzanie po starcie. Mo¿na u¿ywaæ z:\n"
+msgstr "  -p, --auto-play [opt]        Odtwarzanie po starcie. Mo¿na u¿ywaæ z:\n"
 
 #: src/xitk/main.c:295
 msgid "                    'f': in fullscreen mode.\n"
@@ -334,15 +333,13 @@ msgstr "                    'q': koniec po zakoñczeniu odtwarzania.\n"
 msgid ""
 "                    'd': retrieve playlist from DVD. (deprecated. use -s "
 "DVD)\n"
-msgstr ""
-"                    'd': lista odtwarzania z DVD. (stare. u¿yj -s DVD)\n"
+msgstr "                    'd': lista odtwarzania z DVD. (stare. u¿yj -s DVD)\n"
 
 #: src/xitk/main.c:300
 msgid ""
 "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
-msgstr ""
-"                    'v': lista odtwarzania z VCD. (stare. u¿yj -s VCD)\n"
+msgstr "                    'v': lista odtwarzania z VCD. (stare. u¿yj -s VCD)\n"
 
 #: src/xitk/main.c:301
 msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
@@ -365,17 +362,14 @@ msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-lirc                wy³±czenie wsparcia dla LIRC'a\n"
 
 #: src/xitk/main.c:308
-msgid ""
-"      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
-msgstr ""
-"      --visual <klasa-lub-id>  U¿ycie wybranego ekranu X11. <klasa-lub-id>\n"
+msgid "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
+msgstr "      --visual <klasa-lub-id>  U¿ycie wybranego ekranu X11. <klasa-lub-id>\n"
 
 #: src/xitk/main.c:309
 msgid ""
 "                               is either an X11 visual class, or a visual "
 "id.\n"
-msgstr ""
-"                               jest albo klas± ekranu X11, albo id ekranu.\n"
+msgstr "                               jest albo klas± ekranu X11, albo id ekranu.\n"
 
 #: src/xitk/main.c:310
 msgid "      --install                Install a private colormap.\n"
@@ -383,38 +377,31 @@ msgstr "      --install                Instalowanie prywatnej mapy kolorów.\n"
 
 #: src/xitk/main.c:311
 msgid "      --keymap [option]        Display keymap. Option are:\n"
-msgstr ""
-"      --keymap [option]        Wy¶wietlanie mapowania klawiszy. Opcje:\n"
+msgstr "      --keymap [option]        Wy¶wietlanie mapowania klawiszy. Opcje:\n"
 
 #: src/xitk/main.c:312
-msgid ""
-"                                 'default': display default keymap table,\n"
-msgstr ""
-"                                 'default': wy¶wietl domy¶lne mapowanie,\n"
+msgid "                                 'default': display default keymap table,\n"
+msgstr "                                 'default': wy¶wietl domy¶lne mapowanie,\n"
 
 #: src/xitk/main.c:313
 msgid ""
 "                                 'lirc': display draft of a .lircrc config "
 "file.\n"
-msgstr ""
-"                                 'lirc': wy¶wietl wzór pliku .lircrc \n"
+msgstr "                                 'lirc': wy¶wietl wzór pliku .lircrc \n"
 
 #: src/xitk/main.c:314
-msgid ""
-"                                 'remapped': user remapped keymap table.\n"
+msgid "                                 'remapped': user remapped keymap table.\n"
 msgstr "                                 'remapped': mapowanie u¿ytkownika.\n"
 
 #: src/xitk/main.c:315
 msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
-msgstr ""
-"                                 -je¶li brak opcji, wybrane jest 'default'.\n"
+msgstr "                                 -je¶li brak opcji, wybrane jest 'default'.\n"
 
 #: src/xitk/main.c:316
 msgid "  -n, --network                Enable network remote control server.\n"
-msgstr ""
-"  -n, --network                W³±cz sieciowy serwer zdalnej kontroli.\n"
+msgstr "  -n, --network                W³±cz sieciowy serwer zdalnej kontroli.\n"
 
 #: src/xitk/main.c:317
 msgid "  -R, --root                   Use root window as video window.\n"
@@ -481,43 +468,32 @@ msgstr "main: próba za³adowania sterownika d¼wiêku '%s':"
 
 #: src/xitk/main.c:488
 msgid "main: audio driver probing failed => no audio output\n"
-msgstr ""
-"main: próbkowanie sterownika d¼wiêku zawiod³o => brak wyj¶cia d¼wiêku\n"
+msgstr "main: próbkowanie sterownika d¼wiêku zawiod³o => brak wyj¶cia d¼wiêku\n"
 
 #: src/xitk/main.c:507
 #, c-format
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main: podany sterownik d¼wiêku '%s' zawiód³\n"
 
-#: src/xitk/main.c:574
-#, c-format
-msgid "No audio plugin found to decode '%s'."
-msgstr ""
-
-#: src/xitk/main.c:578
-#, c-format
-msgid "No video plugin found to decode '%s'."
-msgstr ""
-
-#: src/xitk/main.c:606
+#: src/xitk/main.c:590
 #, c-format
 msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
 msgstr "Wymaga biblioteki xine 0.9.9, znaleziono %d.%d.%d.\n"
 
-#: src/xitk/main.c:687
+#: src/xitk/main.c:671
 msgid "video driver id required for -V option\n"
 msgstr "id serownika wideo wymagane dla opcji -V\n"
 
-#: src/xitk/main.c:697
+#: src/xitk/main.c:681
 msgid "audio driver id required for -A option\n"
 msgstr "ID serownika d¼wiêku wymagane dla opcji -A\n"
 
-#: src/xitk/main.c:808
+#: src/xitk/main.c:792
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "B³êdna geometria '%s', Zobacz xine --help\n"
 
-#: src/xitk/main.c:832
+#: src/xitk/main.c:816
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "B³êdny argument %d => exit\n"
@@ -701,7 +677,7 @@ msgstr "Logi"
 
 #: src/xitk/setup.c:1154
 msgid "Key Bindings"
-msgstr "Mapowanie klawiszy"
+msgstr "Mapowanie"
 
 #: src/xitk/setup.c:1165 src/xitk/viewlog.c:488
 msgid "Close"
@@ -745,8 +721,7 @@ msgstr "Nie uda³o siê za³adowaæ %s/%s. Koniec.\n"
 #: src/xitk/skins.c:366
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
-msgstr ""
-"Nie uda³o siê za³adowaæ skóry %s, B³êdna wersja. Powrót do skóry '%s'.\n"
+msgstr "Nie uda³o siê za³adowaæ skóry %s, B³êdna wersja. Powrót do skóry '%s'.\n"
 
 #: src/xitk/snapshot.c:947
 #, c-format
@@ -775,3 +750,5 @@ msgstr "podgl±d logów xine"
 #: src/xitk/viewlog.c:474
 msgid "Refresh"
 msgstr "Od¶wie¿anie"
+
+
