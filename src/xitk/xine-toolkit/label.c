@@ -224,7 +224,7 @@ void *label_animation_loop(void *data) {
     }
 
 #if HAVE_NANOSLEEP
-    // nanosleep is prefered on solaris, because it's mt-safe
+    /* nanosleep is prefered on solaris, because it's mt-safe */
     {
       struct timespec ts;
       ts.tv_sec = 0;
