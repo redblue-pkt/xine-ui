@@ -81,8 +81,9 @@ void gui_display_logo(void) {
 }
 
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, int update_mmk) {
-  int ret;
-  int has_video;
+  int      ret;
+  int      has_video, has_audio;
+  uint32_t video_handled, audio_handled;
   
   if(gGui->visual_anim.post_changed && (xine_get_status(stream) == XINE_STATUS_STOP)) {
     post_rewire_visual_anim();
@@ -92,8 +93,35 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   if(start_time_in_secs)
     start_time_in_secs *= 1000;
       
-  has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
-  
+  video_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_HANDLED);
+  audio_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_HANDLED);
+  has_video     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
+  has_audio     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_AUDIO);
+
+  if((has_video && (!video_handled)) || (has_audio && (!audio_handled))) {
+    char      buffer[4096];
+    uint32_t  vfcc, afcc;
+    
+    memset(&buffer, 0, sizeof(buffer));
+    
+    sprintf(buffer, _("The stream you're trying to play (%s) can't be handled by xine:\n\n"),
+	    (stream == gGui->stream) ? gGui->mmk.mrl : gGui->visual_anim.mrls[gGui->visual_anim.current]);
+
+    if(has_video && (!video_handled)) {
+      vfcc = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_FOURCC);
+      sprintf(buffer, "%s%s%s\n", buffer, _("Video FOURCC: "), (get_fourcc_string(vfcc)));
+    }
+    
+    if(has_audio && (!audio_handled)) {
+      afcc = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_FOURCC);
+      sprintf(buffer, "%s%s%s\n", buffer, _("Audio FOURCC: "), (get_fourcc_string(afcc)));
+    }
+
+    xine_error(buffer);
+
+    return 0;
+  }
+
   if((has_video && gGui->visual_anim.enabled == 1) && gGui->visual_anim.running) {
 
     if(post_rewire_audio_port_to_stream(stream))

@@ -112,7 +112,7 @@ static char *get_yesno_string(uint32_t val) {
   return ((val > 0) ? yesno[1] : yesno[0]);
 }
 
-static char *get_fourcc_string(uint32_t f) {
+char *get_fourcc_string(uint32_t f) {
   static char fcc[5];
   
   memset(&fcc, 0, sizeof(fcc));
