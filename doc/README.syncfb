@@ -119,6 +119,7 @@
 
 
 * WHERE IS THE WINDOW A VIDEO IS USUALLY DISPLAYED IN?
+  (this feature is currently broken)
 
   The Teletux driver is writing directly to the video memory of the G400
   or G200 card and bypasses your X server.   Getting that overlay into a
@@ -133,6 +134,8 @@
 * WHAT IS ON THE TODO LIST?
   
   fixing the plugin to support all features it did before XINE's API change
+  
+  other tasks (not up-to-date):  
   The plugin does not yet activate the hardware deinterlacing.
   The mouse cursor doesn't disappear yet when it should be disappearing.
   Prevent the panel from hidding behind the overlay by moving it out of range.
