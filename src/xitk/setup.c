@@ -306,7 +306,15 @@ static void setup_add_checkbox (int x, int y, int state) {
   setup->num_tmp_widgets++;
 }
 
-static void setup_add_combo (int x, int y, int state, char **choices) {
+static void combo_select(xitk_widget_t *w, void *data, int value) {
+  cfg_entry_t *entry;
+  
+  entry = (cfg_entry_t *)data;
+ 
+  entry->config->update_num(entry->config, entry->key, value );
+}
+
+static void setup_add_combo (int x, int y, cfg_entry_t *entry, int state, char **choices) {
 
   xitk_combo_widget_t      cmb;
   xitk_widget_t           *combo;
@@ -317,9 +325,8 @@ static void setup_add_combo (int x, int y, int state, char **choices) {
   cmb.parent_wlist      = setup->widget_list;
   cmb.entries           = choices;
   cmb.parent_wkey       = &setup->kreg;
-  /* cmb.callback          = combo_select; */
-  cmb.callback          = NULL;
-  cmb.userdata          = NULL;
+  cmb.callback          = combo_select;
+  cmb.userdata          = entry;
   xitk_list_append_content(setup->widget_list->l, 
 			   (combo = 
 			    xitk_noskin_combo_create(&cmb,
@@ -362,7 +369,7 @@ static void setup_section_widgets (int s) {
 	break;
 	
       case CONFIG_TYPE_ENUM:
-	setup_add_combo (280, y, entry->num_value, entry->enum_values);
+	setup_add_combo (280, y, entry, entry->num_value, entry->enum_values);
 	break;
 	
       case CONFIG_TYPE_NUM:
