@@ -909,8 +909,6 @@ void xitk_cursors_deinit(Display *display) {
 
   }
   XUNLOCK(display);
-  
-  // free pixies
 }
 
 /* Public */
