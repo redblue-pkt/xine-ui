@@ -462,7 +462,7 @@ fi
 
 xine_executable=""
 if search -x xine "$PATH"; then
-  xine_executable1="$found"
+  xine_executable1=`echo "$found"|sort|uniq`
   if [ `echo "$xine_executable1" | wc -l` -gt 1 ]; then
     xine_executable=`echo "$xine_executable1" | head -1`
     msg several-xine-in-path 1
@@ -480,7 +480,7 @@ vars xine_executable xine_executables
 
 xine_config=""
 if search -x xine-config "$PATH"; then
-  xine_config="$found"
+  xine_config=`echo "$found"|sort|uniq`
   if [ `echo "$xine_config" | wc -l` -gt 1 ]; then
     xine_configs="$xine_config"
     xine_config=`echo "$xine_configs" | head -1`
