@@ -13,7 +13,6 @@ endif
 bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl
 
-## xscreensaver-remote.c
 xine_SOURCES = \
 	actions.c \
 	config_wrapper.c \

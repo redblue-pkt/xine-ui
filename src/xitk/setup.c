@@ -169,13 +169,6 @@ typedef struct {
   int                   num_wg;
   int                   first_displayed;
 
-  const char          **config_content;
-  int                   config_lines;
-  const char          **readme_content;
-  int                   readme_lines;
-  const char          **faq_content;
-  int                   faq_lines;
-
   Cursor                cursor[2];
 
   xitk_register_key_t   kreg;
@@ -198,7 +191,6 @@ void setup_exit(xitk_widget_t *w, void *data) {
 
   if(setup) {
     window_info_t wi;
-    int           i;
     
     setup->running = 0;
     setup->visible = 0;
@@ -225,27 +217,6 @@ void setup_exit(xitk_widget_t *w, void *data) {
     XUnlockDisplay(gGui->display);
     
     free(setup->widget_list);
-    
-    if(setup->config_content) {
-      for(i = 0; i < setup->config_lines; i++) {
-	free((char *)setup->config_content[i]);
-      }
-      free(setup->config_content);
-    }
-    
-    if(setup->faq_content) {
-      for(i = 0; i < setup->faq_lines; i++) {
-	free((char *)setup->faq_content[i]);
-      }
-      free(setup->faq_content);
-    }
-    
-    if(setup->readme_content) {
-      for(i = 0; i < setup->readme_lines; i++) {
-	free((char **)setup->readme_content[i]);
-      }
-      free(setup->readme_content);
-    }
     
     free(setup);
     setup = NULL;
@@ -842,49 +813,6 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
 }
 
 /*
- * Add a browser (needed for help files display).
- */
-static widget_triplet_t *setup_list_browser(int x, int y, const char **content, int len) {
-  xitk_browser_widget_t     br;
-  xitk_widget_t            *browser;
-  static widget_triplet_t  *wt;
-
-  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
-
-  XITK_WIDGET_INIT(&br, gGui->imlib_data);
-
-  br.arrow_up.skin_element_name    = NULL;
-  br.slider.skin_element_name      = NULL;
-  br.arrow_dn.skin_element_name    = NULL;
-  br.browser.skin_element_name     = NULL;
-  br.browser.max_displayed_entries = BROWSER_MAX_DISP_ENTRIES;
-  br.browser.num_entries           = len;
-  br.browser.entries               = content;
-  br.callback                      = NULL;
-  br.dbl_click_callback            = NULL;
-  br.parent_wlist                  = setup->widget_list;
-  br.userdata                      = NULL;
-  xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
-			   (browser = 
-			    xitk_noskin_browser_create(setup->widget_list, &br,
-						       (XITK_WIDGET_LIST_GC(setup->widget_list)), 
-						       x, y,
-						       (WINDOW_WIDTH - 50) - 16,
-						       20, 16, fontname)));
-  
-  xitk_browser_set_alignment(browser, ALIGN_LEFT);
-  xitk_browser_update_list(browser, content, len, 0);
-
-  add_widget_to_list(browser);
-
-  wt->widget = browser;
-  wt->frame  = NULL;
-  wt->label  = NULL;
-
-  return wt;
-}
-
-/*
  *
  */
 static void setup_section_widgets(int s) {
@@ -900,119 +828,99 @@ static void setup_section_widgets(int s) {
   xitk_disable_widget(setup->slider_wg);
   xitk_hide_widget(setup->slider_wg);
   
-  /* Selected tab is one of help sections */
-  if(s >= (setup->num_sections - 3)) {
-    if(s == (setup->num_sections - 3)) {
-      setup->wg[setup->num_wg] = setup_list_browser (25, 70, 
-						     setup->config_content, setup->config_lines);
-    }
-    else if(s == (setup->num_sections - 2)) {
-      setup->wg[setup->num_wg] = setup_list_browser (25, 70, 
-						     setup->readme_content, setup->readme_lines);
-    }
-    else if(s == (setup->num_sections - 1)) {
-      setup->wg[setup->num_wg] = setup_list_browser (25, 70, 
-						     setup->faq_content, setup->faq_lines);
-    }
+  section = setup->sections[s];
+  len     = strlen (section);
+  entry   = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
+  cfg_err_result   = xine_config_get_first_entry(gGui->xine, entry);
     
-    DISABLE_ME(setup->wg[setup->num_wg]);
-    setup->num_wg++;
-  }
-  else {
-    
-    section = setup->sections[s];
-    len     = strlen (section);
-    entry   = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
-    cfg_err_result   = xine_config_get_first_entry(gGui->xine, entry);
-    
-    while (cfg_err_result) {
+  while (cfg_err_result) {
       
-      if((entry->exp_level <= gGui->experience_level) &&
-	 ((!strncmp(entry->key, section, len)) && entry->description)) {
+    if((entry->exp_level <= gGui->experience_level) &&
+       ((!strncmp(entry->key, section, len)) && entry->description)) {
 	
-	labelkey = &entry->key[len+1];
+      labelkey = &entry->key[len+1];
 	
-	switch (entry->type) {
+      switch (entry->type) {
 	  
-	case XINE_CONFIG_TYPE_RANGE: /* slider */
-	  setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  DISABLE_ME(setup->wg[setup->num_wg]);
-	  setup->num_wg++;
-	  break;
+      case XINE_CONFIG_TYPE_RANGE: /* slider */
+	setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
+	break;
 	  
-	case XINE_CONFIG_TYPE_STRING:
-	  setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  DISABLE_ME(setup->wg[setup->num_wg]);
-	  setup->num_wg++;
-	  break;
+      case XINE_CONFIG_TYPE_STRING:
+	setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
+	break;
 	  
-	case XINE_CONFIG_TYPE_ENUM:
-	  setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  DISABLE_ME(setup->wg[setup->num_wg]);
-	  setup->num_wg++;
-	  break;
+      case XINE_CONFIG_TYPE_ENUM:
+	setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
+	break;
 	  
-	case XINE_CONFIG_TYPE_NUM:
-	  setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  DISABLE_ME(setup->wg[setup->num_wg]);
-	  setup->num_wg++;
-	  break;
+      case XINE_CONFIG_TYPE_NUM:
+	setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
+	break;
 	  
-	case XINE_CONFIG_TYPE_BOOL:
-	  setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
-			       (entry->help) ?  (char *) entry->help : _("No help available"));
-	  DISABLE_ME(setup->wg[setup->num_wg]);
-	  setup->num_wg++;
-	  break;
+      case XINE_CONFIG_TYPE_BOOL:
+	setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->widget, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	xitk_set_widget_tips(setup->wg[setup->num_wg]->label, 
+			     (entry->help) ?  (char *) entry->help : _("No help available"));
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
+	break;
 	  
-	}
+      }
 	
-      } else
-        free(entry);
+    } else
+      free(entry);
       
-      entry = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
-      cfg_err_result = xine_config_get_next_entry(gGui->xine, entry);
-    }
-    free(entry);
+    entry = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
+    cfg_err_result = xine_config_get_next_entry(gGui->xine, entry);
+  }
+  free(entry);
 
     
-    if(setup->num_wg == 0) {
-      setup->wg[setup->num_wg++] = 
-	setup_add_nothing_available(_("There is no configuration option available in "
-				      "this user experience level."), x, y);
-    }
-
-
-    if(setup->num_wg > MAX_DISPLAY_WIDGETS) {
-      slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;
-      xitk_show_widget(setup->slider_wg);
-      xitk_enable_widget(setup->slider_wg);
-    }
-    else
-      slidmax = 1;
-
-    xitk_slider_set_max(setup->slider_wg, slidmax);
-    xitk_slider_set_pos(setup->slider_wg, slidmax);
+  if(setup->num_wg == 0) {
+    setup->wg[setup->num_wg++] = 
+      setup_add_nothing_available(_("There is no configuration option available in "
+				    "this user experience level."), x, y);
   }
+
+
+  if(setup->num_wg > MAX_DISPLAY_WIDGETS) {
+    slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;
+    xitk_show_widget(setup->slider_wg);
+    xitk_enable_widget(setup->slider_wg);
+  }
+  else
+    slidmax = 1;
+
+  xitk_slider_set_max(setup->slider_wg, slidmax);
+  xitk_slider_set_pos(setup->slider_wg, slidmax);
+
 }
 
 /*
@@ -1104,13 +1012,6 @@ static void setup_sections (void) {
     cfg_err_result = xine_config_get_next_entry(gGui->xine, &entry);
   }
 
-  setup->sections[setup->num_sections] = strdup(_("Help"));
-  setup->num_sections++;
-  setup->sections[setup->num_sections] = strdup(_("README"));
-  setup->num_sections++;
-  setup->sections[setup->num_sections] = strdup(_("FAQ"));
-  setup->num_sections++;
-
   XITK_WIDGET_INIT(&tab, gGui->imlib_data);
 
   tab.skin_element_name = NULL;
@@ -1168,68 +1069,6 @@ static void setup_nextprev_wg(xitk_widget_t *w, void *data, int pos) {
 }
 
 /*
- * Read adn store some files.
- */
-static const char **_setup_read_given(char *given, int *ndest) {
-  char            buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
-  char            buffer[256], *ln;
-  const langs_t  *l;
-  FILE           *fd;
-  int             first_try = 1;
-  char          **dest = NULL;
-
-  if((given == NULL) || (ndest == NULL))
-    return NULL;
-  
-  *ndest = 0;
-  
-  memset(&buf, 0, sizeof(buf));
-  
-  l = get_lang();
-
- __redo:
-
-  sprintf(buf, "%s/%s%s", XINE_DOCDIR, given, l->ext);
-
-  if((fd = fopen(buf, "r")) != NULL) {
-    
-    while((ln = fgets(buffer, 255, fd)) != NULL) {
-      dest = (char **) realloc(dest, sizeof(char *) * (*ndest + 2));
-      
-      /* label widget hate empty labels */
-      dest[*ndest] = strdup(strlen(ln) ? ln : " ");
-      
-      /* Remove newline */
-      if(dest[*ndest][strlen(dest[*ndest]) - 1] == '\n')
-	dest[*ndest][strlen(dest[*ndest]) - 1] = '\0';
-      
-      (*ndest)++;
-    }
-    
-    dest[*ndest] = NULL;
-    
-    fclose(fd);
-  }
-
-  if(first_try && (dest == NULL)) {
-    l = get_default_lang();
-    first_try--;
-    goto __redo;
-  }
-
-  return (const char **)dest;  
-}
-static void setup_read_config(void) {
-  setup->config_content = _setup_read_given("README.config", &setup->config_lines);
-}
-static void setup_read_readme(void) {
-  setup->readme_content = _setup_read_given("README", &setup->readme_lines);
-}
-static void setup_read_faq(void) {
-  setup->faq_content =  _setup_read_given("FAQ", &setup->faq_lines);
-}
-
-/*
  * Create setup panel window
  */
 void setup_panel(void) {
@@ -1260,11 +1099,6 @@ void setup_panel(void) {
   setup->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
 						 _("xine setup"), 
 						 x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-  /* Read some help files */
-  setup_read_config();
-  setup_read_readme();
-  setup_read_faq();
   
   XLockDisplay (gGui->display);
   gc = XCreateGC(gGui->display, 
