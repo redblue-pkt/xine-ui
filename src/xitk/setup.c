@@ -171,6 +171,9 @@ typedef struct {
   
   xitk_widget_t        *tmp_widgets[200];
   int                   num_tmp_widgets;
+  
+  xine_cfg_entry_t     *config_entries[200];
+  int                   num_config_entries;
 
   xitk_widget_t        *slider_wg;
   widget_triplet_t     *wg[100];
@@ -199,6 +202,7 @@ static void setup_end(xitk_widget_t *, void *);
 void setup_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
   int           i;
+  
 
   setup->running = 0;
   setup->visible = 0;
@@ -229,6 +233,9 @@ void setup_exit(xitk_widget_t *w, void *data) {
   XUnlockDisplay(gGui->display);
 
   free(setup->widget_list);
+  
+  while (setup->num_config_entries)
+    free(setup->config_entries[--setup->num_config_entries]);
 
   if(setup->config_content) {
     for(i = 0; i < setup->config_lines; i++) {
@@ -498,7 +505,6 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   xine_cfg_entry_t *entry;
   xine_cfg_entry_t check_entry;
 
-  memset(&check_entry, 0, sizeof(xine_cfg_entry_t)); 
   entry = (xine_cfg_entry_t *)data;
 
   config_update_string((char *)entry->key, str);
@@ -752,7 +758,7 @@ static void setup_section_widgets(int s) {
   int                  x = ((WINDOW_WIDTH>>1) - (FRAME_WIDTH>>1) - 10);
   int                  y = 70;
   xine_cfg_entry_t    *entry;
-  int                 cfg_err_result;
+  int                  cfg_err_result;
   int                  len;
   char                *section;
   const char          *labelkey;
@@ -782,7 +788,7 @@ static void setup_section_widgets(int s) {
     
     section = setup->sections[s];
     len     = strlen (section);
-    entry= xine_xmalloc(sizeof(xine_cfg_entry_t));
+    entry   = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
     cfg_err_result   = xine_config_get_first_entry(gGui->xine, entry);
     
     while (cfg_err_result) {
@@ -790,6 +796,8 @@ static void setup_section_widgets(int s) {
       if (!strncmp (entry->key, section, len) && entry->description) {
 	
 	labelkey = &entry->key[len+1];
+	
+	setup->config_entries[setup->num_config_entries++] = entry;
 	
 	switch (entry->type) {
 	  
@@ -825,11 +833,13 @@ static void setup_section_widgets(int s) {
 	  
 	}
 	
-      }
+      } else
+        free(entry);
       
-      entry= xine_xmalloc(sizeof(xine_cfg_entry_t));
+      entry = (xine_cfg_entry_t *)xine_xmalloc(sizeof(xine_cfg_entry_t));
       cfg_err_result = xine_config_get_next_entry(gGui->xine, entry);
     }
+    free(entry);
 
     xitk_enable_widget(setup->slider_wg);
 
@@ -892,7 +902,6 @@ static void setup_sections (void) {
   int                 cfg_err_result;
   xitk_tabs_widget_t   tab;
 
-  memset(&entry, 0, sizeof(xine_cfg_entry_t));
   setup->num_sections = 0;
   cfg_err_result = xine_config_get_first_entry(gGui->xine, &entry);
   while (cfg_err_result) {
