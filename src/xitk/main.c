@@ -147,7 +147,7 @@ static struct option long_options[] = {
 static void _rc_file_check_args(int argc, char **argv) {
   int i;
   
-  printf("%s(): argc %d\n", __FUNCTION__, argc);
+  printf("%s(): argc %d\n", __XINE_FUNCTION__, argc);
 
   for(i = 0; i < argc; i++)
     printf("argv[%d] = '%s'\n", i, argv[i]);

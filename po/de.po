@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.12\n"
-"POT-Creation-Date: 2002-07-31 02:48+0200\n"
+"POT-Creation-Date: 2002-08-01 10:44+0200\n"
 "PO-Revision-Date: 2002-07-24 08:53+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
@@ -13,74 +13,74 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/actions.c:110
+#: src/xitk/actions.c:111
 msgid "No MRL (input stream) specified"
 msgstr "Keine MRL (Eingabedatenstrom) angegeben"
 
-#: src/xitk/actions.c:395 src/xitk/actions.c:410
-#, c-format
-msgid "gui_set_current_position: can't create new thread (%s)\n"
+#: src/xitk/actions.c:396 src/xitk/actions.c:411
+#, fuzzy, c-format
+msgid "%s(): can't create new thread (%s)\n"
 msgstr "gui_set_current_position: Kann keinen neuen Thread erzeugen (%s)\n"
 
-#: src/xitk/actions.c:745
+#: src/xitk/actions.c:746
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) fehlgeschlagen.\n"
 
-#: src/xitk/control.c:358 src/xitk/panel.c:180 src/xitk/playlist.c:651
+#: src/xitk/control.c:354 src/xitk/panel.c:176 src/xitk/playlist.c:647
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): Konnte Hintergrund-Bild nicht finden\n"
 
-#: src/xitk/control.c:435
+#: src/xitk/control.c:431
 msgid "Xine Control Panel"
 msgstr "Xine Einstellungen"
 
-#: src/xitk/control.c:450 src/xitk/playlist.c:747
+#: src/xitk/control.c:446 src/xitk/playlist.c:743
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "xine-playlist: Kann Hintergrund-Bild nicht finden\n"
 
-#: src/xitk/control.c:567
+#: src/xitk/control.c:563
 msgid "Control HUE value"
 msgstr "Farbton ändern"
 
-#: src/xitk/control.c:570
+#: src/xitk/control.c:566
 msgid "Hue"
 msgstr "Ton"
 
-#: src/xitk/control.c:592
+#: src/xitk/control.c:588
 msgid "Control SATURATION value"
 msgstr "Sättigung ändern"
 
-#: src/xitk/control.c:595
+#: src/xitk/control.c:591
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:617
+#: src/xitk/control.c:613
 msgid "Control BRIGHTNESS value"
 msgstr "Helligkeit ändern"
 
-#: src/xitk/control.c:620
+#: src/xitk/control.c:616
 msgid "Brt"
 msgstr "Hel"
 
-#: src/xitk/control.c:642
+#: src/xitk/control.c:638
 msgid "Control CONTRAST value"
 msgstr "Kontrast ändern"
 
-#: src/xitk/control.c:645
+#: src/xitk/control.c:641
 msgid "Ctr"
 msgstr "Kon"
 
-#: src/xitk/control.c:666
+#: src/xitk/control.c:662
 msgid "Choose a Skin"
 msgstr "Skin-Auswahl"
 
-#: src/xitk/control.c:702 src/xitk/mrl_browser.c:218 src/xitk/playlist.c:916
+#: src/xitk/control.c:698 src/xitk/mrl_browser.c:218 src/xitk/playlist.c:912
 msgid "Dismiss"
 msgstr "Schließen"
 
-#: src/xitk/control.c:708
+#: src/xitk/control.c:704
 msgid "Close control window"
 msgstr "Einstellungen-Fenster schließen"
 
@@ -304,7 +304,7 @@ msgstr "Ändern"
 msgid "Delete"
 msgstr "Löschen"
 
-#: src/xitk/kbindings.c:1920 src/xitk/playlist.c:906
+#: src/xitk/kbindings.c:1920 src/xitk/playlist.c:902
 msgid "Save"
 msgstr "Speichern"
 
@@ -647,191 +647,191 @@ msgstr "xine MRL Browser"
 msgid "Source:"
 msgstr "Quelle:"
 
-#: src/xitk/panel.c:64
+#: src/xitk/panel.c:60
 msgid "Play previous chapter or mrl"
 msgstr "Vorheriges Kapitel oder MRL wiedergeben"
 
-#: src/xitk/panel.c:65
+#: src/xitk/panel.c:61
 msgid "Play next chapter or mrl"
 msgstr "Nächstes Kapitel oder MRL wiedergeben"
 
-#: src/xitk/panel.c:68
+#: src/xitk/panel.c:64
 msgid "Play previous entry from playlist"
 msgstr "Spiele vorherigen Eintrag aus der Playliste"
 
-#: src/xitk/panel.c:69
+#: src/xitk/panel.c:65
 msgid "Play next entry from playlist"
 msgstr "Spiele nächsten Eintrag in der Playliste"
 
 #. FIXME: this error message does not make sense!
-#: src/xitk/panel.c:512
+#: src/xitk/panel.c:508
 msgid "unknown widget slider caller\n"
 msgstr "Unbekannter 'widget slider' Aufrufer\n"
 
-#: src/xitk/panel.c:611
+#: src/xitk/panel.c:607
 msgid "Volume control"
 msgstr "Lautstärke-Regler"
 
-#: src/xitk/panel.c:613
+#: src/xitk/panel.c:609
 msgid "Mute toggle"
 msgstr "Lautlos"
 
 #. panel already open  - FIXME: bring to foreground
-#: src/xitk/panel.c:644
+#: src/xitk/panel.c:640
 msgid "Xine Panel"
 msgstr "xine Bedienfeld"
 
-#: src/xitk/panel.c:663
+#: src/xitk/panel.c:659
 msgid "xine-panel: couldn't find image for background\n"
 msgstr "xine-panel: Kann Hintergrundbild nicht finden\n"
 
-#: src/xitk/panel.c:794
+#: src/xitk/panel.c:790
 msgid "Stop playback"
 msgstr "Stopp (Abspielen Beenden)"
 
-#: src/xitk/panel.c:802
+#: src/xitk/panel.c:798
 msgid "Play selected entry"
 msgstr "Spiele ausgewählten Eintrag"
 
-#: src/xitk/panel.c:810
+#: src/xitk/panel.c:806
 msgid "Pause/Resume playback"
 msgstr "Pause/weiter abspielen"
 
-#: src/xitk/panel.c:825
+#: src/xitk/panel.c:821
 msgid "Eject current medium"
 msgstr "Momentanes Medium auswerfen"
 
-#: src/xitk/panel.c:833
+#: src/xitk/panel.c:829
 msgid "Quit"
 msgstr "Beenden"
 
-#: src/xitk/panel.c:841
+#: src/xitk/panel.c:837
 msgid "Setup window"
 msgstr "Fenster-Einstellungen"
 
-#: src/xitk/panel.c:849
+#: src/xitk/panel.c:845
 msgid "Hide GUI"
 msgstr "Verstecke GUI"
 
-#: src/xitk/panel.c:857
+#: src/xitk/panel.c:853
 msgid "Fullscreen/Window mode"
 msgstr "Vollbild/Fenster-Modus"
 
-#: src/xitk/panel.c:865
+#: src/xitk/panel.c:861
 msgid "Next audio channel"
 msgstr "Nächsten Audio-Kanal"
 
-#: src/xitk/panel.c:873
+#: src/xitk/panel.c:869
 msgid "Previous audio channel"
 msgstr "Vorherigen Audio-Kanal"
 
-#: src/xitk/panel.c:881
+#: src/xitk/panel.c:877
 msgid "Next SPU channel"
 msgstr "Nächsten Untertitel-Kanal"
 
-#: src/xitk/panel.c:889
+#: src/xitk/panel.c:885
 msgid "Previous SPU channel"
 msgstr "Vorherigen Untertitel-Kanal"
 
 # *schauder*, aber mir fällt auch nix besseres ein...
-#: src/xitk/panel.c:935
+#: src/xitk/panel.c:931
 msgid "Stream playback position slider"
 msgstr "Wiedergabepositionsschieber"
 
-#: src/xitk/panel.c:966
+#: src/xitk/panel.c:962
 msgid "Take a snapshot"
 msgstr "Mache einen Schnappschuss"
 
-#: src/xitk/panel.c:974
+#: src/xitk/panel.c:970
 msgid "Slow motion"
 msgstr "Zeitlupe"
 
-#: src/xitk/panel.c:982
+#: src/xitk/panel.c:978
 msgid "Fast motion"
 msgstr "Schneller abspielen"
 
-#: src/xitk/panel.c:990
+#: src/xitk/panel.c:986
 msgid "Playlist"
 msgstr "Playliste"
 
-#: src/xitk/panel.c:998
+#: src/xitk/panel.c:994
 msgid "Control"
 msgstr "Steuerung"
 
-#: src/xitk/panel.c:1006
+#: src/xitk/panel.c:1002
 msgid "MRL Browser"
 msgstr "MRL Browser"
 
-#: src/xitk/panel.c:1010
+#: src/xitk/panel.c:1006
 msgid "gui tips visibility"
 msgstr "gui Hinweise sichtbar"
 
-#: src/xitk/panel.c:1013
+#: src/xitk/panel.c:1009
 msgid "tips timeout (ms)"
 msgstr "Hinweiszeit (ms)"
 
-#: src/xitk/panel.c:1023
+#: src/xitk/panel.c:1019
 msgid "gui panel visibility"
 msgstr "gui Fenster sichtbar"
 
-#: src/xitk/playlist.c:369 src/xitk/playlist.c:426
+#: src/xitk/playlist.c:365 src/xitk/playlist.c:422
 #, c-format
 msgid "Can't read %s: %s\n"
 msgstr "Kann %s nicht lesen: %s\n"
 
-#: src/xitk/playlist.c:733
+#: src/xitk/playlist.c:729
 msgid "Xine Playlist Editor"
 msgstr "Xine Playlisten Editor"
 
-#: src/xitk/playlist.c:852
+#: src/xitk/playlist.c:848
 msgid "Move up selected MRL"
 msgstr "Gewählte MRL nach oben verschieben"
 
-#: src/xitk/playlist.c:860
+#: src/xitk/playlist.c:856
 msgid "Move down selected MRL"
 msgstr "Gewählte MRL nach unten verschieben"
 
-#: src/xitk/playlist.c:867
+#: src/xitk/playlist.c:863
 msgid "Start playback of selected MRL"
 msgstr "Wiedergabe der gewählten MRL starten"
 
-#: src/xitk/playlist.c:874
+#: src/xitk/playlist.c:870
 msgid "Delete selected MRL from playlist"
 msgstr "Ausgewählten Eintrag aus der Playliste entfernen"
 
-#: src/xitk/playlist.c:881
+#: src/xitk/playlist.c:877
 msgid "Delete all entries in playlist"
 msgstr "Alle Einträge aus der Playliste entfernen"
 
-#: src/xitk/playlist.c:885
+#: src/xitk/playlist.c:881
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: src/xitk/playlist.c:891
+#: src/xitk/playlist.c:887
 msgid "Add one or more entries in playlist"
 msgstr "Einen oder mehrere Einträge der Playliste hinzufügen"
 
-#: src/xitk/playlist.c:896
+#: src/xitk/playlist.c:892
 msgid "Load"
 msgstr "Laden"
 
-#: src/xitk/playlist.c:902
+#: src/xitk/playlist.c:898
 msgid "Load saved playlist"
 msgstr "Gespeicherte Playliste laden"
 
-#: src/xitk/playlist.c:912
+#: src/xitk/playlist.c:908
 msgid "Save playlist"
 msgstr "Playliste speichern"
 
-#: src/xitk/playlist.c:922
+#: src/xitk/playlist.c:918
 msgid "Close playlist window"
 msgstr "Playlisten-Fenster schließen"
 
-#: src/xitk/playlist.c:937
+#: src/xitk/playlist.c:933
 msgid "Scan for:"
 msgstr "Suche nach:"
 
-#: src/xitk/playlist.c:949
+#: src/xitk/playlist.c:945
 msgid "Direct MRL entry"
 msgstr "Direkte MRL-Eingabe"
 

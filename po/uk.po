@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
-"POT-Creation-Date: 2002-07-31 02:48+0200\n"
+"POT-Creation-Date: 2002-08-01 10:44+0200\n"
 "PO-Revision-Date: 2002-02-24 17:35GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -14,82 +14,82 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/actions.c:110
+#: src/xitk/actions.c:111
 msgid "No MRL (input stream) specified"
 msgstr ""
 
-#: src/xitk/actions.c:395 src/xitk/actions.c:410
+#: src/xitk/actions.c:396 src/xitk/actions.c:411
 #, c-format
-msgid "gui_set_current_position: can't create new thread (%s)\n"
+msgid "%s(): can't create new thread (%s)\n"
 msgstr ""
 
-#: src/xitk/actions.c:745
+#: src/xitk/actions.c:746
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr ""
 
 # src/xitk/control.c:317
-#: src/xitk/control.c:358 src/xitk/panel.c:180 src/xitk/playlist.c:651
+#: src/xitk/control.c:354 src/xitk/panel.c:176 src/xitk/playlist.c:647
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): не можу знайти зображення тла\n"
 
-#: src/xitk/control.c:435
+#: src/xitk/control.c:431
 msgid "Xine Control Panel"
 msgstr ""
 
 # src/xitk/control.c:388
-#: src/xitk/control.c:450 src/xitk/playlist.c:747
+#: src/xitk/control.c:446 src/xitk/playlist.c:743
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "список композиц╕й xine: не можу знайти зображення для тла\n"
 
-#: src/xitk/control.c:567
+#: src/xitk/control.c:563
 msgid "Control HUE value"
 msgstr "Контролювати в╕дт╕нок"
 
 # src/xitk/control.c:512
-#: src/xitk/control.c:570
+#: src/xitk/control.c:566
 msgid "Hue"
 msgstr "В╕дт╕нок"
 
-#: src/xitk/control.c:592
+#: src/xitk/control.c:588
 msgid "Control SATURATION value"
 msgstr "Контролювати насиченн╕сть"
 
 # src/xitk/control.c:535
-#: src/xitk/control.c:595
+#: src/xitk/control.c:591
 msgid "Sat"
 msgstr "Суб"
 
-#: src/xitk/control.c:617
+#: src/xitk/control.c:613
 msgid "Control BRIGHTNESS value"
 msgstr "Контролювати яскрав╕сть"
 
 # src/xitk/control.c:558
-#: src/xitk/control.c:620
+#: src/xitk/control.c:616
 msgid "Brt"
 msgstr "Яскр"
 
-#: src/xitk/control.c:642
+#: src/xitk/control.c:638
 msgid "Control CONTRAST value"
 msgstr "Контролювати контраст"
 
 # src/xitk/control.c:581
-#: src/xitk/control.c:645
+#: src/xitk/control.c:641
 msgid "Ctr"
 msgstr "Ctrl"
 
 # src/xitk/control.c:617
-#: src/xitk/control.c:666
+#: src/xitk/control.c:662
 msgid "Choose a Skin"
 msgstr "Виберить стиль Г╤К"
 
 # src/xitk/control.c:654 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:828
-#: src/xitk/control.c:702 src/xitk/mrl_browser.c:218 src/xitk/playlist.c:916
+#: src/xitk/control.c:698 src/xitk/mrl_browser.c:218 src/xitk/playlist.c:912
 msgid "Dismiss"
 msgstr "В╕дмова"
 
-#: src/xitk/control.c:708
+#: src/xitk/control.c:704
 msgid "Close control window"
 msgstr "Закрити в╕кно управл╕ння"
 
@@ -319,7 +319,7 @@ msgid "Delete"
 msgstr "Вибрати"
 
 # src/xitk/playlist.c:819
-#: src/xitk/kbindings.c:1920 src/xitk/playlist.c:906
+#: src/xitk/kbindings.c:1920 src/xitk/playlist.c:902
 msgid "Save"
 msgstr "Зберегти"
 
@@ -718,224 +718,224 @@ msgid "Source:"
 msgstr "Джерело:"
 
 # src/xitk/panel.c:655
-#: src/xitk/panel.c:64
+#: src/xitk/panel.c:60
 #, fuzzy
 msgid "Play previous chapter or mrl"
 msgstr "Програти попередню композиц╕ю в списку"
 
 # src/xitk/panel.c:684
-#: src/xitk/panel.c:65
+#: src/xitk/panel.c:61
 #, fuzzy
 msgid "Play next chapter or mrl"
 msgstr "Програти наступну позиц╕ю в списку композиц╕й"
 
 # src/xitk/panel.c:655
-#: src/xitk/panel.c:68
+#: src/xitk/panel.c:64
 msgid "Play previous entry from playlist"
 msgstr "Програти попередню композиц╕ю в списку"
 
 # src/xitk/panel.c:684
-#: src/xitk/panel.c:69
+#: src/xitk/panel.c:65
 msgid "Play next entry from playlist"
 msgstr "Програти наступну позиц╕ю в списку композиц╕й"
 
 #. FIXME: this error message does not make sense!
-#: src/xitk/panel.c:512
+#: src/xitk/panel.c:508
 msgid "unknown widget slider caller\n"
 msgstr ""
 
 # src/xitk/panel.c:486
-#: src/xitk/panel.c:611
+#: src/xitk/panel.c:607
 msgid "Volume control"
 msgstr "Управл╕ння гучн╕стю"
 
 # src/xitk/panel.c:488
-#: src/xitk/panel.c:613
+#: src/xitk/panel.c:609
 msgid "Mute toggle"
 msgstr "Прокрутка"
 
 #. panel already open  - FIXME: bring to foreground
-#: src/xitk/panel.c:644
+#: src/xitk/panel.c:640
 msgid "Xine Panel"
 msgstr ""
 
 # src/xitk/control.c:388
-#: src/xitk/panel.c:663
+#: src/xitk/panel.c:659
 #, fuzzy
 msgid "xine-panel: couldn't find image for background\n"
 msgstr "список композиц╕й xine: не можу знайти зображення для тла\n"
 
 # src/xitk/panel.c:662
-#: src/xitk/panel.c:794
+#: src/xitk/panel.c:790
 msgid "Stop playback"
 msgstr "Зупинити програвання"
 
 # src/xitk/panel.c:669
-#: src/xitk/panel.c:802
+#: src/xitk/panel.c:798
 msgid "Play selected entry"
 msgstr "Програти вибрану позиц╕ю"
 
 # src/xitk/panel.c:677
-#: src/xitk/panel.c:810
+#: src/xitk/panel.c:806
 msgid "Pause/Resume playback"
 msgstr "Пауза/В╕дновлення програвання"
 
 # src/xitk/panel.c:691
-#: src/xitk/panel.c:825
+#: src/xitk/panel.c:821
 msgid "Eject current medium"
 msgstr "Викинути диск"
 
 # src/xitk/panel.c:698
-#: src/xitk/panel.c:833
+#: src/xitk/panel.c:829
 msgid "Quit"
 msgstr "Вих╕д"
 
 # src/xitk/panel.c:705
-#: src/xitk/panel.c:841
+#: src/xitk/panel.c:837
 msgid "Setup window"
 msgstr "В╕кно установок"
 
 # src/xitk/panel.c:712
-#: src/xitk/panel.c:849
+#: src/xitk/panel.c:845
 msgid "Hide GUI"
 msgstr "Сховати Г╤К"
 
 # src/xitk/panel.c:719
-#: src/xitk/panel.c:857
+#: src/xitk/panel.c:853
 msgid "Fullscreen/Window mode"
 msgstr "Повноекранний/В╕конний режим"
 
 # src/xitk/panel.c:726
-#: src/xitk/panel.c:865
+#: src/xitk/panel.c:861
 msgid "Next audio channel"
 msgstr "Наступний ауд╕о канал"
 
 # src/xitk/panel.c:733
-#: src/xitk/panel.c:873
+#: src/xitk/panel.c:869
 msgid "Previous audio channel"
 msgstr "Попередн╕й ауд╕о канал"
 
 # src/xitk/panel.c:740
-#: src/xitk/panel.c:881
+#: src/xitk/panel.c:877
 msgid "Next SPU channel"
 msgstr "Наступний канал (субтитр╕в)"
 
 # src/xitk/panel.c:747
-#: src/xitk/panel.c:889
+#: src/xitk/panel.c:885
 msgid "Previous SPU channel"
 msgstr "Попередн╕й канал субтитр╕в"
 
-#: src/xitk/panel.c:935
+#: src/xitk/panel.c:931
 msgid "Stream playback position slider"
 msgstr "Повзунок позиц╕╖ програвання"
 
 # src/xitk/panel.c:811
-#: src/xitk/panel.c:966
+#: src/xitk/panel.c:962
 msgid "Take a snapshot"
 msgstr "Зробити знимок екрану"
 
 # src/xitk/panel.c:818
-#: src/xitk/panel.c:974
+#: src/xitk/panel.c:970
 msgid "Slow motion"
 msgstr "Пов╕льне програвання"
 
 # src/xitk/panel.c:825
-#: src/xitk/panel.c:982
+#: src/xitk/panel.c:978
 msgid "Fast motion"
 msgstr "Швидке програвання"
 
 # src/xitk/panel.c:832
-#: src/xitk/panel.c:990
+#: src/xitk/panel.c:986
 msgid "Playlist"
 msgstr "Список композиц╕й"
 
 # src/xitk/panel.c:839
-#: src/xitk/panel.c:998
+#: src/xitk/panel.c:994
 msgid "Control"
 msgstr "Управл╕ння"
 
 # src/xitk/panel.c:846
-#: src/xitk/panel.c:1006
+#: src/xitk/panel.c:1002
 msgid "MRL Browser"
 msgstr "MRL нав╕гатор"
 
-#: src/xitk/panel.c:1010
+#: src/xitk/panel.c:1006
 msgid "gui tips visibility"
 msgstr ""
 
-#: src/xitk/panel.c:1013
+#: src/xitk/panel.c:1009
 msgid "tips timeout (ms)"
 msgstr ""
 
-#: src/xitk/panel.c:1023
+#: src/xitk/panel.c:1019
 msgid "gui panel visibility"
 msgstr ""
 
 # src/xitk/playlist.c:335 src/xitk/playlist.c:392
-#: src/xitk/playlist.c:369 src/xitk/playlist.c:426
+#: src/xitk/playlist.c:365 src/xitk/playlist.c:422
 #, c-format
 msgid "Can't read %s: %s\n"
 msgstr "Не можу прочитати %s: %s\n"
 
-#: src/xitk/playlist.c:733
+#: src/xitk/playlist.c:729
 msgid "Xine Playlist Editor"
 msgstr ""
 
-#: src/xitk/playlist.c:852
+#: src/xitk/playlist.c:848
 msgid "Move up selected MRL"
 msgstr "Пересунути вгору вибраний MRL"
 
-#: src/xitk/playlist.c:860
+#: src/xitk/playlist.c:856
 msgid "Move down selected MRL"
 msgstr "Пересунути вниз вибраний MRL"
 
-#: src/xitk/playlist.c:867
+#: src/xitk/playlist.c:863
 msgid "Start playback of selected MRL"
 msgstr "Програти вибраний MRL"
 
 # src/xitk/panel.c:684
-#: src/xitk/playlist.c:874
+#: src/xitk/playlist.c:870
 msgid "Delete selected MRL from playlist"
 msgstr "Видалити вибраний MRL з списку"
 
 # src/xitk/panel.c:684
-#: src/xitk/playlist.c:881
+#: src/xitk/playlist.c:877
 msgid "Delete all entries in playlist"
 msgstr "Видалити вс╕ елементи списку"
 
 # src/xitk/playlist.c:801
-#: src/xitk/playlist.c:885
+#: src/xitk/playlist.c:881
 msgid "Add"
 msgstr "Додати"
 
-#: src/xitk/playlist.c:891
+#: src/xitk/playlist.c:887
 msgid "Add one or more entries in playlist"
 msgstr "Додати дек╕лька елемент╕в до списку"
 
 # src/xitk/playlist.c:810
-#: src/xitk/playlist.c:896
+#: src/xitk/playlist.c:892
 msgid "Load"
 msgstr "Завантаження"
 
-#: src/xitk/playlist.c:902
+#: src/xitk/playlist.c:898
 msgid "Load saved playlist"
 msgstr "Завантаження збереженого списку"
 
 # src/xitk/panel.c:832
-#: src/xitk/playlist.c:912
+#: src/xitk/playlist.c:908
 msgid "Save playlist"
 msgstr "Зберегти список"
 
-#: src/xitk/playlist.c:922
+#: src/xitk/playlist.c:918
 msgid "Close playlist window"
 msgstr "Закрити в╕кно списку"
 
 # src/xitk/playlist.c:851
-#: src/xitk/playlist.c:937
+#: src/xitk/playlist.c:933
 msgid "Scan for:"
 msgstr "Сканувати на:"
 
-#: src/xitk/playlist.c:949
+#: src/xitk/playlist.c:945
 msgid "Direct MRL entry"
 msgstr "Ввести адресу MRL"
 

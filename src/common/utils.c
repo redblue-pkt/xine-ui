@@ -35,10 +35,6 @@
 extern char **environ;
 extern int errno;
 
-#ifndef __GNUC__
-#define	__FUNCTION__	__func__
-#endif
-
 /*
  * Execute a shell command.
  */

@@ -46,10 +46,6 @@
 
 #include "xitk.h"
 
-#ifndef __GNUC__
-#define __FUNCTION__    __func__
-#endif
-
 extern gGui_t          *gGui;
 
 typedef struct {
@@ -355,7 +351,7 @@ void control_change_skins(void) {
     
     if(!(new_img = Imlib_load_image(gGui->imlib_data,
 				    xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
-      xine_error(_("%s(): couldn't find image for background\n"), __FUNCTION__);
+      xine_error(_("%s(): couldn't find image for background\n"), __XINE_FUNCTION__);
       exit(-1);
     }
     

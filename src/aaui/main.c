@@ -362,12 +362,17 @@ int main(int argc, char *argv[]) {
   /*
    * Initialize AALib
    */
+
   aaxine.context = aa_autoinit(&aa_defparams);
   if(aaxine.context == NULL) {
     fprintf(stderr,"Cannot initialize AA-lib. Sorry\n");
     goto failure;
   }
 
+  printf("USED DRIVER NAME\n\t short '%s'\n\tname '%s'\n", 
+	 aaxine.context->driver->shortname,
+	 aaxine.context->driver->name);
+	 
   /*
    * Initialize AA keyboard support.
    * It seems there a little bug if you init
@@ -451,10 +456,6 @@ int main(int argc, char *argv[]) {
     aaxine.mixer.mute = xine_get_audio_property(aaxine.xine, AO_PROP_MUTE_VOL);
   }
 
-
-  /* Select audio channel */
-  xine_select_audio_channel (aaxine.xine, audio_channel);
-
   /* Kick off terminal pollution */
   if((!aaxine.debug_messages)
      && ((!strcasecmp(aaxine.context->driver->shortname, "linux"))
@@ -465,12 +466,16 @@ int main(int argc, char *argv[]) {
          printf("cannot open /dev/null");
     else {
       if (dup2(error_fd, STDOUT_FILENO) < 0)
-           printf("cannot dup2 stdout");
+      	printf("cannot dup2 stdout");
       if (dup2(error_fd, STDERR_FILENO) < 0)
-           printf("cannot dup2 stderr");
+      	printf("cannot dup2 stderr");
     }
   }
-  
+
+
+  /* Select audio channel */
+  xine_select_audio_channel (aaxine.xine, audio_channel);
+
   /*
    * ui loop
    */

@@ -36,6 +36,7 @@
 #endif
 #include <X11/Xlib.h>
 #include <xine/video_out_x11.h>
+#include <xine/xineutils.h>
 #include <pthread.h>
 
 #include "event.h"
@@ -392,7 +393,7 @@ void gui_set_current_position (int pos) {
   
   if ((err = pthread_create(&seek_thread,
 			    NULL, gui_set_current_position_thread, (void *)pos)) != 0) {
-    printf(_("gui_set_current_position: can't create new thread (%s)\n"), strerror(err));
+    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     abort();
   }
 }
@@ -407,7 +408,7 @@ void gui_seek_relative (int off_sec) {
   
   if ((err = pthread_create(&seek_thread,
 			    NULL, gui_seek_relative_thread, (void *)off_sec)) != 0) {
-    printf(_("gui_set_current_position: can't create new thread (%s)\n"), strerror(err));
+    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     abort();
   }
 }
