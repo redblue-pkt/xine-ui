@@ -40,8 +40,18 @@
 
 #include "_xitk.h"
 
-#define NORMAL    1
-#define FOCUS     2
+#define NORMAL                  1
+#define FOCUS                   2
+
+#define MODIFIER_NOMOD 0x00000000
+#define MODIFIER_SHIFT 0x00000001
+#define MODIFIER_LOCK  0x00000002
+#define MODIFIER_CTRL  0x00000004
+#define MODIFIER_META  0x00000008
+#define MODIFIER_MOD2  0x00000010
+#define MODIFIER_MOD3  0x00000020
+#define MODIFIER_MOD4  0x00000040
+#define MODIFIER_MOD5  0x00000080
 
 /*
  * Return a pixmap with text drawed.
@@ -66,8 +76,11 @@ static Pixmap create_labelofinputtext(widget_t *it,
 
   /* Try to load font */
   fs = XLoadQueryFont(private_data->display, "fixed");
-  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "times-roman");
-  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "*times-medium-r*");
+  if(fs == NULL) 
+    fs = XLoadQueryFont(private_data->display, "times-roman");
+  if(fs == NULL) 
+    fs = XLoadQueryFont(private_data->display, "*times-medium-r*");
+
   XTextExtents(fs, label, strlen(label), &dir, &as, &des, &cs);
   len = cs.width;
 
@@ -284,6 +297,230 @@ static int notify_focus_inputtext(widget_list_t *wl,
 }
 
 /*
+ * Erase one char from right of cursor.
+ */
+static void inputtext_erase_with_delete(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+  char *oldtext, *newtext;
+  char *p, *pp;
+  int offset;
+  
+  if(strlen(private_data->text) > 1) {
+    if((private_data->cursor_pos > 0)
+       && (private_data->cursor_pos < strlen(private_data->text))) {
+      
+      oldtext = strdup(private_data->text);
+      newtext = (char *) gui_xmalloc(strlen(oldtext));
+      
+      offset = 0;
+      p = oldtext;
+      pp = newtext;
+      
+      while(offset < private_data->cursor_pos) {
+	*pp = *p;
+	p++;
+	pp++;
+	offset++;
+      }
+      p++;
+      
+      while(*p != '\0') {
+	*pp = *p;
+	offset++;
+	p++;
+	pp++;
+      } 
+      
+      *pp = 0;
+      
+      free(private_data->text);
+      private_data->text = strdup(newtext);
+      
+      paint_inputtext(it, wl->win, wl->gc);
+      
+      free(oldtext);
+      free(newtext);
+    }
+  }
+  else {
+    sprintf(private_data->text, "%s", "");
+    paint_inputtext(it, wl->win, wl->gc);
+  }
+}
+
+/*
+ * Erase one char from left of cursor.
+ */
+static void inputtext_erase_with_backspace(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+  char *oldtext, *newtext;
+  char *p, *pp;
+  int offset;
+  
+  if(strlen(private_data->text) > 1) {
+    if(private_data->cursor_pos > 0) {
+      
+      oldtext = strdup(private_data->text);
+      newtext = (char *) gui_xmalloc(strlen(oldtext));
+      
+      private_data->cursor_pos--;
+      
+      offset = 0;
+      p = oldtext;
+      pp = newtext;
+      
+      while(offset < private_data->cursor_pos) {
+	*pp = *p;
+	p++;
+	pp++;
+	offset++;
+      }
+      p++;
+      
+      while(*p != '\0') {
+	*pp = *p;
+	offset++;
+	p++;
+	pp++;
+      } 
+      *pp = 0;
+      
+      free(private_data->text);
+      private_data->text = strdup(newtext);
+      
+      paint_inputtext(it, wl->win, wl->gc);
+      
+      free(oldtext);
+      free(newtext);
+    }
+  }
+  else {
+    sprintf(private_data->text, "%s", "");
+    private_data->cursor_pos = 0;
+    paint_inputtext(it, wl->win, wl->gc);
+  }
+}
+
+/*
+ * Erase chars from cursor pos to EOL.
+ */
+static void inputtext_kill_line(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+  char *oldtext, *newtext;
+  
+  if(strlen(private_data->text) > 1) {
+    if(private_data->cursor_pos >= 0) {
+
+      oldtext = strdup(private_data->text);
+      newtext = (char *) gui_xmalloc(strlen(oldtext));
+
+      snprintf(newtext, private_data->cursor_pos + 1, "%s", oldtext);
+
+      free(private_data->text);
+      private_data->text = strdup(newtext);
+      
+      paint_inputtext(it, wl->win, wl->gc);
+      
+      free(oldtext);
+      free(newtext);
+    }
+  }
+}
+
+/*
+ * Move cursor pos to left.
+ */
+static void inputtext_move_left(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+  
+  if(private_data->cursor_pos > 0) {
+    private_data->cursor_pos--;
+    paint_inputtext(it, wl->win, wl->gc);
+  }
+}
+
+/*
+ * Move cursor pos to right.
+ */
+static void inputtext_move_right(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+
+  if(private_data->cursor_pos < strlen(private_data->text)) {
+    private_data->cursor_pos++;
+    paint_inputtext(it, wl->win, wl->gc);
+  }
+}
+
+/*
+ * Remove focus of widget, then call callback function.
+ */
+static void inputtext_exec_return(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+
+  private_data->cursor_pos = -1;
+  it->have_focus = private_data->have_focus = FOCUS_LOST;
+  paint_inputtext(it, wl->win, wl->gc);
+  
+  if(strlen(private_data->text) > 0) {
+    if(private_data->callback)
+      private_data->callback(it, 
+			     private_data->userdata, private_data->text);
+  }
+}
+
+/*
+ * Remove focus of widget.
+ */
+static void inputtext_exec_escape(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+  
+  private_data->cursor_pos = -1;
+  it->have_focus = private_data->have_focus = FOCUS_LOST;
+  paint_inputtext(it, wl->win, wl->gc);
+}
+
+/*
+ * Extract modifier keys.
+ */
+static int get_key_modifier(XEvent *xev, int *mod) {
+  
+  *mod = MODIFIER_NOMOD;
+  
+  if(xev->xbutton.state & ShiftMask)
+    *mod |= MODIFIER_SHIFT;
+
+  if(xev->xbutton.state & LockMask)
+    *mod |= MODIFIER_LOCK;
+
+  if(xev->xbutton.state & ControlMask)
+    *mod |= MODIFIER_CTRL;
+
+  if(xev->xbutton.state & Mod1Mask)
+    *mod |= MODIFIER_META;
+
+  if(xev->xbutton.state & Mod2Mask)
+    *mod |= MODIFIER_MOD2;
+
+  if(xev->xbutton.state & Mod3Mask)
+    *mod |= MODIFIER_MOD3;
+
+  if(xev->xbutton.state & Mod4Mask)
+    *mod |= MODIFIER_MOD4;
+
+  if(xev->xbutton.state & Mod5Mask)
+    *mod |= MODIFIER_MOD5;
+
+  return (*mod != MODIFIER_NOMOD);
+}
+
+/*
  * Handle keyboard event in input text box.
  */
 static void notify_keyevent_inputtext(widget_list_t *wl,
@@ -296,139 +533,114 @@ static void notify_keyevent_inputtext(widget_list_t *wl,
     KeySym      key;
     char        buf[256];
     int         len;
+    int         modifier;
     
     XLOCK(private_data->display);
     len = XLookupString(&keyevent, buf, sizeof(buf), &key, NULL);
     XUNLOCK(private_data->display);
 
     buf[len] = '\0';
-    
-    if(key == XK_Delete) {
-      char *oldtext, *newtext;
-      char *p, *pp;
-      int offset;
-      
-      if(strlen(private_data->text) > 1) {
-	if((private_data->cursor_pos > 0)
-	   && (private_data->cursor_pos < strlen(private_data->text))) {
 
-	  oldtext = strdup(private_data->text);
-	  newtext = (char *) gui_xmalloc(strlen(oldtext));
+    get_key_modifier(xev, &modifier);
 
-	  offset = 0;
-	  p = oldtext;
-	  pp = newtext;
-	  
-	  while(offset < private_data->cursor_pos) {
-	    *pp = *p;
-	    p++;
-	    pp++;
-	    offset++;
+    /* One of modifier key is pressed, none of keylock or shift */
+    if(((buf[0] != 0) && (buf[1] == 0)) && 
+       (((modifier != MODIFIER_NOMOD) &&
+	 ((modifier != MODIFIER_SHIFT) && (modifier != MODIFIER_LOCK))))) {
+
+      switch(key) {
+
+	/* BOL */
+      case XK_a:
+      case XK_A:
+	if(modifier & MODIFIER_CTRL) {
+	  if(private_data->text) {
+	    private_data->cursor_pos = 0;
+	    paint_inputtext(it, wl->win, wl->gc);
 	  }
-	  p++;
-	  
-	  while(*p != '\0') {
-	    *pp = *p;
-	    offset++;
-	    p++;
-	    pp++;
-	  } 
-
-	  *pp = 0;
-
-	  free(private_data->text);
-	  private_data->text = strdup(newtext);
-
-	  paint_inputtext(it, wl->win, wl->gc);
-
-	  free(oldtext);
-	  free(newtext);
 	}
-      }
-      else {
-	sprintf(private_data->text, "%s", "");
-	paint_inputtext(it, wl->win, wl->gc);
-      }
+	break;
 	
+	/* Backward */
+      case XK_b:
+      case XK_B:
+	if(modifier & MODIFIER_CTRL) {
+	  inputtext_move_left(wl, it);
+	}
+	break;
+	
+	/* Cancel */
+      case XK_c:
+      case XK_C:
+	if(modifier & MODIFIER_CTRL) {
+	  inputtext_exec_escape(wl, it);
+	}
+	break;
+
+	/* Delete current char */
+      case XK_d:
+      case XK_D:
+	if(modifier & MODIFIER_CTRL) {
+	  inputtext_erase_with_delete(wl, it);
+	}
+	break;
+	
+	/* EOL */
+      case XK_e:
+      case XK_E:
+	if(modifier & MODIFIER_CTRL) {
+	  if(private_data->text) {
+	    private_data->cursor_pos = strlen(private_data->text);
+	    paint_inputtext(it, wl->win, wl->gc);
+	  }
+	}
+	break;
+
+	/* Forward */
+      case XK_f:
+      case XK_F:
+	if(modifier & MODIFIER_CTRL) {
+	  inputtext_move_right(wl, it);
+	}
+	break;
+
+	/* Kill line (from cursor) */
+      case XK_k:
+      case XK_K:
+	if(modifier & MODIFIER_CTRL) {
+	  inputtext_kill_line(wl, it);
+	}
+	break;
+
+	/* Return */
+      case XK_m:
+      case XK_M:
+	if(modifier & MODIFIER_CTRL) {
+	  inputtext_exec_return(wl, it);
+	}
+	break;
+	
+      }
+    }
+    else if(key == XK_Delete) {
+      inputtext_erase_with_delete(wl, it);
     }
     else if(key == XK_BackSpace) {
-      char *oldtext, *newtext;
-      char *p, *pp;
-      int offset;
-
-      if(strlen(private_data->text) > 1) {
-	if(private_data->cursor_pos > 0) {
-
-	  oldtext = strdup(private_data->text);
-	  newtext = (char *) gui_xmalloc(strlen(oldtext));
-
-	  private_data->cursor_pos--;
-	  
-	  offset = 0;
-	  p = oldtext;
-	  pp = newtext;
-	  
-	  while(offset < private_data->cursor_pos) {
-	    *pp = *p;
-	    p++;
-	    pp++;
-	    offset++;
-	  }
-	  p++;
-	  
-	  while(*p != '\0') {
-	    *pp = *p;
-	    offset++;
-	    p++;
-	    pp++;
-	  } 
-	  *pp = 0;
-	    
-	  free(private_data->text);
-	  private_data->text = strdup(newtext);
-
-	  paint_inputtext(it, wl->win, wl->gc);
-
-	  free(oldtext);
-	  free(newtext);
-	}
-      }
-      else {
-	sprintf(private_data->text, "%s", "");
-	private_data->cursor_pos = 0;
-	paint_inputtext(it, wl->win, wl->gc);
-      }
-	
+      inputtext_erase_with_backspace(wl, it);
     }
     else if(key == XK_Left) {
-      if(private_data->cursor_pos > 0) {
-	private_data->cursor_pos--;
-	paint_inputtext(it, wl->win, wl->gc);
-      }
+      inputtext_move_left(wl, it);
     }
     else if(key == XK_Right) {
-      if(private_data->cursor_pos < strlen(private_data->text)) {
-	private_data->cursor_pos++;
-	paint_inputtext(it, wl->win, wl->gc);
-      }
+      inputtext_move_right(wl, it);
     }
     else if((key == XK_Return) || (key == XK_KP_Enter)) {
-      private_data->cursor_pos = -1;
-      it->have_focus = private_data->have_focus = FOCUS_LOST;
-      paint_inputtext(it, wl->win, wl->gc);
-
-      if(strlen(private_data->text) > 0) {
-	if(private_data->callback)
-	  private_data->callback(it, 
-				 private_data->userdata, private_data->text);
-      }
+      inputtext_exec_return(wl, it);
     }
     else if((key == XK_Escape) || (key == XK_Tab)) {
-      private_data->cursor_pos = -1;
-      it->have_focus = private_data->have_focus = FOCUS_LOST;
-      paint_inputtext(it, wl->win, wl->gc);
+      inputtext_exec_escape(wl, it);
     }
-    else if((buf[0] != 0) && (buf[1] == 0))  {
+    else if((buf[0] != 0) && (buf[1] == 0)) {
       char *oldtext;
       int pos;
       
