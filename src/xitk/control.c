@@ -503,7 +503,7 @@ void control_panel(void) {
   xitk_combo_widget_t        cmb;
   xitk_widget_t             *w;
 
-  xine_strdupa(title, _("Xine Control Panel"));
+  xine_strdupa(title, _("xine Control Window"));
 
   XITK_WIDGET_INIT(&br, gGui->imlib_data);
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
@@ -592,7 +592,7 @@ void control_panel(void) {
 
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = title;
-    xclasshint->res_class = "Xine";
+    xclasshint->res_class = "xine";
     XSetClassHint(gGui->display, control->window, xclasshint);
   }
 

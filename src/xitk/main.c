@@ -306,7 +306,7 @@ static void xrm_parse(void) {
   char          environement_buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char          wide_dbname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char         *environment;
-  char         *classname = "Xine";
+  char         *classname = "xine";
   char         *str_type[20];
   XrmDatabase   rmdb, home_rmdb, server_rmdb, application_rmdb;
   XrmValue      value;
@@ -344,20 +344,20 @@ static void xrm_parse(void) {
   home_rmdb = XrmGetFileDatabase(environment);
   (void) XrmMergeDatabases(home_rmdb, &rmdb);
 
-  if(XrmGetResource(rmdb, "xine.geometry", "Xine.Geometry", str_type, &value) == True) {
+  if(XrmGetResource(rmdb, "xine.geometry", "xine.Geometry", str_type, &value) == True) {
     if(!parse_geometry(&window_attribute, (char *)value.addr))
       printf(_("Bad geometry '%s'\n"), (char *)value.addr);
   } 
-  if(XrmGetResource(rmdb, "xine.border", "Xine.Border", str_type, &value) == True) {
+  if(XrmGetResource(rmdb, "xine.border", "xine.Border", str_type, &value) == True) {
     window_attribute.borderless = !get_bool_value((char *) value.addr);
   }
-  if(XrmGetResource(rmdb, "xine.visual", "Xine.Visual", str_type, &value) == True) {
+  if(XrmGetResource(rmdb, "xine.visual", "xine.Visual", str_type, &value) == True) {
     if(!parse_visual(&gGui->prefered_visual_id, 
 		     &gGui->prefered_visual_class, (char *)value.addr)) {
       printf(_("Bad visual '%s'\n"), (char *)value.addr);
     }
   }
-  if(XrmGetResource(rmdb, "xine.colormap", "Xine.Colormap", str_type, &value) == True) {
+  if(XrmGetResource(rmdb, "xine.colormap", "xine.Colormap", str_type, &value) == True) {
     gGui->install_colormap = !get_bool_value((char *) value.addr);
   }
   

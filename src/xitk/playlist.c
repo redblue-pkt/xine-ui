@@ -1003,7 +1003,7 @@ void playlist_editor(void) {
   xitk_inputtext_widget_t    inp;
   xitk_button_widget_t       b;
 
-  xine_strdupa(title, _("Xine Playlist Editor"));
+  xine_strdupa(title, _("xine Playlist Editor"));
 
   XITK_WIDGET_INIT(&br, gGui->imlib_data);
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
@@ -1090,7 +1090,7 @@ void playlist_editor(void) {
 
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = title;
-    xclasshint->res_class = "Xine";
+    xclasshint->res_class = "xine";
     XSetClassHint(gGui->display, playlist->window, xclasshint);
   }
 

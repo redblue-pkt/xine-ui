@@ -258,10 +258,10 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t play_cb,
 								CONFIG_NO_CB,
 								CONFIG_NO_DATA);
 
-  mb.window_title                          = _("Xine MRL Browser");
+  mb.window_title                          = _("xine MRL Browser");
   mb.skin_element_name                     = "MrlBG";
   mb.resource_name                         = mb.window_title;
-  mb.resource_class                        = "Xine";
+  mb.resource_class                        = "xine";
   
   mb.origin.skin_element_name              = "MrlCurOrigin";
   mb.origin.cur_origin                     = NULL;

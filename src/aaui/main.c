@@ -993,7 +993,7 @@ int main(int argc, char *argv[]) {
     }
   }
   
-    failure:
+ failure:
   
   if(aaxine.xine) 
     xine_config_save(aaxine.xine, aaxine.configfile);

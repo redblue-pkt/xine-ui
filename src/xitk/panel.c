@@ -849,7 +849,7 @@ void panel_init (void) {
   xitk_slider_widget_t      sl;
   xitk_widget_t            *w;
   
-  xine_strdupa(title, _("Xine Panel"));
+  xine_strdupa(title, _("xine Panel"));
 
   XITK_WIDGET_INIT(&b, gGui->imlib_data);
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
@@ -960,7 +960,7 @@ void panel_init (void) {
 
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = title;
-    xclasshint->res_class = "Xine";
+    xclasshint->res_class = "xine";
     XSetClassHint(gGui->display, gGui->panel_window, xclasshint);
   }
 

@@ -1332,16 +1332,16 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   /* create xclass hint for video window */
 
   if ((gVw->xclasshint = XAllocClassHint()) != NULL) {
-    gVw->xclasshint->res_name = _("Xine Video Window");
-    gVw->xclasshint->res_class = "Xine";
+    gVw->xclasshint->res_name = _("xine Video Window");
+    gVw->xclasshint->res_class = "xine";
   }
   if ((gVw->xclasshint_fullscreen = XAllocClassHint()) != NULL) {
-    gVw->xclasshint_fullscreen->res_name = _("Xine Video Fullscreen Window");
-    gVw->xclasshint_fullscreen->res_class = "Xine";
+    gVw->xclasshint_fullscreen->res_name = _("xine Video Fullscreen Window");
+    gVw->xclasshint_fullscreen->res_class = "xine";
   }
   if ((gVw->xclasshint_borderless = XAllocClassHint()) != NULL) {
-    gVw->xclasshint_borderless->res_name = _("Xine Video Borderless Window");
-    gVw->xclasshint_borderless->res_class = "Xine";
+    gVw->xclasshint_borderless->res_name = _("xine Video Borderless Window");
+    gVw->xclasshint_borderless->res_class = "xine";
   }
 
   /* 
