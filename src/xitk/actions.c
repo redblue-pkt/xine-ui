@@ -303,8 +303,17 @@ void gui_mrlbrowser_show(widget_t *w, void *data) {
     open_mrlbrowser(NULL, NULL);
   }
   else {
-    destroy_mrl_browser();
+
+    if(!mrl_browser_is_visible()) {
+      show_mrl_browser();
+      set_mrl_browser_transient();
+    }
+    else {
+      destroy_mrl_browser();
+    }
+
   }
+
 }
 
 void gui_set_current_mrl(char *mrl) {
@@ -340,12 +349,4 @@ void gui_control_show(widget_t *w, void *data) {
     control_panel();
   else
     control_exit(NULL, NULL);
-}
-
-/*
- * FIXME: fill me.
- */
-void gui_mrl_browser_show(widget_t *w, void *data) {
-
-  printf("%s() is not implemented yet.\n", __FUNCTION__);
 }
