@@ -13,6 +13,7 @@ EXTRA_DIST = \
 	lcmessage.m4 \
 	progtest.m4 \
 	readline.m4 \
+	curl.m4 \
 	_xine.m4
 
 
