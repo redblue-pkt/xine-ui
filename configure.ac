@@ -747,19 +747,6 @@ int main(int argc, char **argv) {
    [AC_MSG_RESULT(no); ac_getopt_long=no])
 AM_CONDITIONAL(HAVE_GETOPT_LONG, test x"$ac_getopt_long" = "xyes")
 
-
-dnl
-dnl skins dir location, xine-config told us about this.
-dnl
-XINE_SKINDIR="${datadir}/xine/skins"
-eval XINE_SKINDIR=`eval echo "$XINE_SKINDIR"`
-dnl AC_SUBST(XINE_SKINDIR)
-AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of Xine skin directory])
-
-XINE_LOGO_MRL="$xine_logo_mrl"
-AC_SUBST(XINE_LOGO_MRL)
-AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL",[official logo mrl])
-
 dnl
 dnl desktop dir location, xine-config told us about this.
 dnl
@@ -789,6 +776,17 @@ eval XINE_DOCDIR=`eval echo "$XINE_DOCPATH"`
 AC_SUBST(XINE_DOCDIR)
 AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR",[Location of documentation files])
 
+dnl
+dnl skins dir location, xine-config told us about this.
+dnl
+XINE_SKINDIR="${datadir}/xine/skins"
+eval XINE_SKINDIR=`eval echo "$XINE_SKINDIR"`
+dnl AC_SUBST(XINE_SKINDIR)
+AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR",[Location of xine skin directory])
+
+XINE_LOGO_MRL="$xine_logo_mrl"
+AC_SUBST(XINE_LOGO_MRL)
+AC_DEFINE_UNQUOTED(XINE_LOGO_MRL, "$XINE_LOGO_MRL",[official logo mrl])
 
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
