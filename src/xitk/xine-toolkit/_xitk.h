@@ -29,6 +29,7 @@
 #include "config.h"
 #endif
 
+#include <stdio.h>
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
 
@@ -45,6 +46,10 @@ typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
 #ifdef NEED_MRLBROWSER
 #include "xine.h"
 typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
+#endif
+
+#ifndef BUFSIZ
+#define BUFSIZ 8192
 #endif
 
 #ifdef	__GNUC__

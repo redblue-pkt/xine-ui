@@ -38,6 +38,11 @@
 #define DRAW_OUTTER    2
 #define DRAW_FLATTER   3
 
+#define ALIGN_LEFT    1
+#define ALIGN_CENTER  2
+#define ALIGN_RIGHT   3
+#define ALIGN_DEFAULT (ALIGN_LEFT)
+
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
 #include "_xitk.h"
@@ -105,7 +110,9 @@ xitk_widget_t *xitk_image_create(xitk_skin_config_t *skonfig, xitk_image_widget_
  * Create and image object from a string, width is limited.
  */
 xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
-						  char *fontname, char *str, int width);
+						  char *fontname, 
+						  int width, int align, char *str);
+
 /*
  * Draw in image object a three state pixmap (first state is flat styled).
  */

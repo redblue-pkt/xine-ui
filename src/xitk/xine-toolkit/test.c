@@ -218,10 +218,16 @@ static void change_label(xitk_widget_t *w, void *data) {
   nlab = !nlab;
   xitk_label_change_label(test->widget_list, test->label, labels[nlab]);
   
-  xitk_window_dialog_error_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, "** This program is free software; you can redistribute it and/or modify\n\n\n** it under the terms of the GNU General Public License as published by\n** the Free Software Foundation; either version 2 of the License, or\n** (at your option) any later version.");
-  //  xitk_window_dialog_error(test->imlibdata, NULL, window_message_cb, NULL, "Le programme <linux kernel> a provoqué une faute de protection dans le module <unknown> à l'adresse 0x00001234.\nCitroën dump:\nAX:0x00  BX:0x00\nCX:0x00  GS:0x00;-)");
+  //  xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", NULL, NULL, 500, ALIGN_LEFT, "premier \n\n\nnum %d\n", nlab);
+  //  xitk_window_dialog_ok_with_width(test->imlibdata, "License information", NULL, NULL, 500, ALIGN_CENTER, "** This program is free software; you can redistribute it and/or modify** it under the terms of the GNU General Public License as published by** the Free Software Foundation; either version 2 of the License, or** (at your option) any later version.");
+  //xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, ALIGN_DEFAULT, "** This program is free software; you can redistribute it and/or modify\n** it under the terms of the GNU General Public License as published by\n** the Free Software Foundation; either version 2 of the License, or\n** (at your option) any later version.");
+  // xitk_window_dialog_yesno(test->imlibdata, NULL, NULL, NULL, NULL, ALIGN_LEFT, "Le programme <linux kernel> a provoqué une faute de protection dans le module <unknown> à l'adresse 0x00001234.\nCitroën dump:\nAX:0x00\t\tBX:0x00\nCX:0x00\t\tGS:0x00;-)");
+  //  xitk_window_dialog_ok_with_width(test->imlibdata, "Long error message", window_message_cb, NULL, 500, ALIGN_DEFAULT, "**Thisprogramisfreesoftware;youcanredistributeitand/ormodify**itunderthetermsoftheGNUGeneralPublicLicenseaspublishedby**TheFreeSoftwareFoundation;eitherversion2oftheLicense,or**(atyouroption)anylaterversion.");
+  xitk_window_dialog_error(test->imlibdata, 
+			   "Stream number %d <%s.mpg> is not valid.\n", nlab, labels[nlab]);
 
 }
+
 
 /*
  *
@@ -429,9 +435,6 @@ static void create_sliders(void) {
 }
 
 static void combo_select(xitk_widget_t *w, void *data, int select) {
-  char buf[256];
-
-  sprintf(buf, "New entries selected in combo box is:\n%s [%d].", test->entries[select], select);
 
   /*  
   xitk_window_dialog_error(test->imlibdata, NULL, NULL, NULL, buf);
@@ -445,7 +448,9 @@ static void combo_select(xitk_widget_t *w, void *data, int select) {
   xitk_window_dialog_yesno(test->imlibdata, NULL,
 			   window_message_cb, 
 			   window_message_cb, 
-			   NULL, buf);
+			   NULL, ALIGN_DEFAULT, 
+			   "New entries selected in combo box is:\n%s [%d].", 
+			   test->entries[select], select);
 
 }
 

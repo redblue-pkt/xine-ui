@@ -90,17 +90,11 @@ int xitk_window_change_background(ImlibData *im, xitk_window_t *w, Pixmap bg, in
 void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height);
 
 /*
- * Display an error window (sized), containing the message.
+ * Display an OK window (sized), containing the message.
  */
-void xitk_window_dialog_error_with_width(ImlibData *im, char *title,
-					 xitk_state_callback_t cb, void *userdata, 
-					 int window_width, char *message);
-
-/*
- * Same as above, with static width.
- */
-void xitk_window_dialog_error(ImlibData *im, char *title,
-			      xitk_state_callback_t cb, void *userdata, char *message);
+void xitk_window_dialog_ok_with_width(ImlibData *im, char *title,
+				      xitk_state_callback_t cb, void *userdata, 
+				      int window_width, int align, char *message, ...);
 
 /*
  * Display a question window with 'yes' and 'no' buttons.
@@ -108,13 +102,8 @@ void xitk_window_dialog_error(ImlibData *im, char *title,
 void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
 					 xitk_state_callback_t ycb, 
 					 xitk_state_callback_t ncb, 
-					 void *userdata, int window_width, char *message);
-
-void xitk_window_dialog_yesno(ImlibData *im, char *title,
-			      xitk_state_callback_t ycb, 
-			      xitk_state_callback_t ncb, 
-			      void *userdata, char *message);
-
+					 void *userdata, 
+					 int window_width, int align, char *message, ...);
 /*
  * Display a question window with 'yes', 'no' and 'cancel' buttons.
  */
@@ -122,12 +111,7 @@ void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
 					       xitk_state_callback_t ycb, 
 					       xitk_state_callback_t ncb, 
 					       xitk_state_callback_t ccb, 
-					       void *userdata, int window_width, char *message);
-
-void xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
-				    xitk_state_callback_t ycb, 
-				    xitk_state_callback_t ncb, 
-				    xitk_state_callback_t ccb, 
-				    void *userdata, char *message);
+					       void *userdata, 
+					       int window_width, int align, char *message, ...);
 
 #endif

@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <assert.h>
+#include <stdarg.h>
 #include <X11/Xlib.h>
 
 #include "Imlib-light/Imlib.h"
@@ -195,19 +196,24 @@ xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
   return i;
 }
 
+
 /*
- * Should be rewrite.
+ *
  */
 xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
-						  char *fontname, char *str, int width) {
+						  char *fontname, 
+						  int width, int align, char *str) {
   xitk_image_t   *image;
   xitk_font_t    *fs;
   GC              gc;
   int             length, height, descent;
-  int             force_parsing = 0;
+  char           *po, *p;
+  char           *lines[256];
+  int             numlines = 0;
+  char            bufsubs[BUFSIZ], buf[BUFSIZ];
 
   assert(im && fontname && str && width);
-
+  
   XLOCK(im->x.disp);
   gc = XCreateGC(im->x.disp, im->x.base_window, None, None);
   XUNLOCK(im->x.disp);
@@ -218,112 +224,103 @@ xitk_image_t *xitk_image_create_image_from_string(ImlibData *im,
   height = xitk_font_get_string_height(fs, str);
   descent = xitk_font_get_descent(fs, str);
 
-  if(strrchr(str, '\n'))
-    force_parsing = 1;
+  memset(&bufsubs, 0, sizeof(bufsubs));
+  memset(&buf, 0, sizeof(buf));
+  p = str;
 
-  if((length > width) || force_parsing) {
-    int     llen = 0;
-    char   *lines[256];
-    char   *p = str;
-    char   *o = str;
+  while(*p != '\0') {
+    switch(*p) {
+      
+    case '\t':
+      sprintf(bufsubs, "%s%s", bufsubs, "      ");
+      break;
+      
+    default:
+      sprintf(bufsubs, "%s%c", bufsubs, *p);
+      break;
+    }
+    p++;
+  }
 
-    while(*p) {
-      char buf2[1024];
+  po = p = &bufsubs[0];
 
-      while(*o == ' ' || *o == '\t') p = ++o;
+  while(*p != '\0') {
+    switch(*p) {
+      
+      /* Ignore */
+    case '\a':
+    case '\b':
+    case '\f':
+    case '\r':
+    case '\v':
+      break;
+      
+    case '\n':
+      lines[numlines++] = strdup(buf);
+      po = p + 1;
+      memset(&buf, 0, sizeof(buf));
+      break;
+
+    default:
+      sprintf(buf, "%s%c", buf, *p);
+      break;
+    }
+
+    if(xitk_font_get_string_length(fs, buf) >= width) {
+      char buf2[BUFSIZ];
+      char *ps;
 
       memset(&buf2, 0, sizeof(buf2));
-      snprintf(buf2, (p - o), "%s", o);
-
-      if(xitk_font_get_string_length(fs, buf2) > width) {
-	char *pp = p + 1;
-
-	do {
-	  pp--;
-	  while(*pp != ' ' && *pp != '\t' && pp > o)  pp--; 
-
-	  if(*pp == '\n') {
-	    memset(&buf2, 0, sizeof(buf2));
-	    snprintf(buf2, (pp - o) + 1, "%s", o);
-	    buf2[(pp - o) + 1] = '\0';
-	  }
-	  else {
-	    memset(&buf2, 0, sizeof(buf2));
-	    snprintf(buf2, (pp - o) + 1, "%s", o);
-	  }
-
-	} while((xitk_font_get_string_length(fs, buf2) > width) || (*pp == '\0'));
-
-	if(pp == o) {
-	  lines[llen++] = strdup(o);
-	  goto create_image;
-	}
-
-	memset(&buf2, 0, sizeof(buf2));
-	snprintf(buf2, (pp - o) + 1, "%s", o);
-	lines[llen++] = strdup(buf2);
-
-	o = p = pp+1;
-
+      /* step back */
+      if((ps = strrchr(buf, ' ')) != NULL) { /* Ok, there a space here */
+	ps = p;
+	while(*ps != ' ') ps--;
+	snprintf(buf2, (ps - po)+1, "%s", buf);
+	lines[numlines++] = strdup(buf2);
+	p = po = ps;
       }
-      else {
-
-	p++;
-	if(*p == '\n') {
-	  memset(&buf2, 0, sizeof(buf2));
-	  snprintf(buf2, (p - o) + 1, "%s", o);
-	  buf2[(p - o) + 1] = '\0';
-	  if(buf2[0] == '\n')
-	    memset(&buf2, 0, sizeof(buf2));
-	  lines[llen++] = strdup(buf2);
-	  o = p + 1;
-	  p++;
-	}
-	
+      else { /* cut to previous char */
+	snprintf(buf2, (p - po), "%s", buf);
+	sprintf(buf2, "%s%c", buf2, '-');
+	lines[numlines++] = strdup(buf2);
+	po = (p - 1);
+	p -= 2;
       }
-
-    }
-    if(*o != '\0')
-      lines[llen++] = strdup(o);
-    
-  create_image:
-    
-    image = xitk_image_create_image(im, width, (height * llen) + (3 * llen));
-    draw_flat(im, image->image, width, (height * llen) + (3 * llen));
-    
-    /* Color, DrawString */  
-    {
-      int            i, j;
-      
-      XLOCK(im->x.disp);
-      
-      XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
-      j = height;
-      for(i = 0; i < llen; i++, j += (height + 3)) {
-	XDrawString(im->x.disp, image->image, gc, 0, (j - descent), lines[i], strlen(lines[i]));
-      }
-      XUNLOCK(im->x.disp);
+      memset(&buf, 0, sizeof(buf));
     }
 
-   
-    { /* Free lines */
-      int i;
-      for(i = 0; i<llen;i++)
-	XITK_FREE(lines[i]);
-    }
-
+    p++;
   }
-  else {
-    height = xitk_font_get_string_height(fs, str);
-    image = xitk_image_create_image(im, width, height);
-    draw_flat(im, image->image, width, height);
+
+  /* Last chars aren't stored */
+  if(strlen(buf))
+    lines[numlines++] = strdup(buf);
+  
+  image = xitk_image_create_image(im, width, ((height * numlines) + (3 * numlines)));
+  draw_flat(im, image->image, image->width, image->height);
+  
+  { /* Draw string in image */
+    int i, j, x = 0;
 
     XLOCK(im->x.disp);
     XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
-    XDrawString(im->x.disp, image->image, gc, 0, (height - descent), str, strlen(str));
+    j = height;
+    for(i = 0; i < numlines; i++, j += (height + 3)) {
+      length = xitk_font_get_string_length(fs, lines[i]);
+
+      if((align == ALIGN_DEFAULT) || (align == ALIGN_LEFT))
+	x = 0;
+      else if(align == ALIGN_CENTER)
+	x = (width - length)>>1;
+      else if(align == ALIGN_RIGHT)
+	x = (width - length);
+      
+      XDrawString(im->x.disp, image->image, gc, x, (j - descent), lines[i], strlen(lines[i]));
+      XITK_FREE(lines[i]);
+    }
     XUNLOCK(im->x.disp);
   }
-  
+
   xitk_font_unload_font(fs);
 
   XLOCK(im->x.disp);
