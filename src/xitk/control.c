@@ -35,6 +35,8 @@
 
 #include "common.h"
 
+#define TEST_VO_VALUE(val)  ((val >= 0) && (val < 65000)) ? val + 400 : val - 400
+
 extern gGui_t          *gGui;
 
 typedef struct {
@@ -148,6 +150,50 @@ static void set_contrast(xitk_widget_t *w, void *data, int value) {
     
   if(get_current_param(XINE_PARAM_VO_CONTRAST) != value)
     update_sliders_video_settings();
+}
+
+/*
+ * Enable or disable video settings sliders.
+ */
+static void active_sliders_video_settings(void) {
+  int cur;
+
+  cur = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
+  set_current_param(XINE_PARAM_VO_BRIGHTNESS, TEST_VO_VALUE(cur));
+  if((get_current_param(XINE_PARAM_VO_BRIGHTNESS)) == cur)
+    xitk_disable_widget(control->bright);
+  else {
+    xitk_enable_widget(control->bright);
+    set_current_param(XINE_PARAM_VO_BRIGHTNESS, cur);
+  }
+  
+  cur = get_current_param(XINE_PARAM_VO_SATURATION);
+  set_current_param(XINE_PARAM_VO_SATURATION, TEST_VO_VALUE(cur));
+  if((get_current_param(XINE_PARAM_VO_SATURATION)) == cur)
+    xitk_disable_widget(control->sat);
+  else {
+    xitk_enable_widget(control->sat);
+    set_current_param(XINE_PARAM_VO_SATURATION, cur);
+  }
+
+  cur = get_current_param(XINE_PARAM_VO_HUE);
+  set_current_param(XINE_PARAM_VO_HUE, TEST_VO_VALUE(cur));
+  if((get_current_param(XINE_PARAM_VO_HUE)) == cur)
+    xitk_disable_widget(control->hue);
+  else {
+    xitk_enable_widget(control->hue);
+    set_current_param(XINE_PARAM_VO_HUE, cur);
+  }
+
+  cur = get_current_param(XINE_PARAM_VO_CONTRAST);
+  set_current_param(XINE_PARAM_VO_CONTRAST, TEST_VO_VALUE(cur));
+  if((get_current_param(XINE_PARAM_VO_CONTRAST)) == cur)
+    xitk_disable_widget(control->contr);
+  else {
+    xitk_enable_widget(control->contr);
+    set_current_param(XINE_PARAM_VO_CONTRAST, cur);
+  }
+
 }
 
 /*
@@ -338,6 +384,7 @@ void control_change_skins(void) {
     xitk_change_skins_widget_list(control->widget_list, gGui->skin_config);
     xitk_paint_widget_list(control->widget_list);
 
+    active_sliders_video_settings();
   }
 }
 
@@ -513,13 +560,14 @@ void control_panel(void) {
 	     (control->hue = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->hue, cur);
     xitk_set_widget_tips(control->hue, _("Control HUE value"));
-  
+    
     lbl.skin_element_name = "CtlHueLbl";
     lbl.label             = _("Hue");
     lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
-			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
-
+			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+    xitk_disable_widget(control->hue);
+    
     /* SATURATION */
     cur = get_current_param(XINE_PARAM_VO_SATURATION);
 
@@ -540,7 +588,8 @@ void control_panel(void) {
     lbl.label             = _("Sat");
     lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
-			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+    xitk_disable_widget(control->sat);
 
     /* BRIGHTNESS */
     cur = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
@@ -562,7 +611,8 @@ void control_panel(void) {
     lbl.label             = _("Brt");
     lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
-			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+			     xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+    xitk_disable_widget(control->bright);
       
     /* CONTRAST */
     cur = get_current_param(XINE_PARAM_VO_CONTRAST);
@@ -585,6 +635,9 @@ void control_panel(void) {
     lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
+    xitk_disable_widget(control->contr);
+
+    active_sliders_video_settings();
   }
 
   {
