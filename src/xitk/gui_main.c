@@ -161,6 +161,7 @@ void gui_exit (widget_t *w, void *data) {
 
   fprintf(stderr, "xine-panel: EXIT\n");
 
+  config_save();
 
   xine_exit(gGlob->gXine); 
 
