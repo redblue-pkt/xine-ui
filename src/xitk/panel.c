@@ -353,13 +353,7 @@ void panel_init (void) {
    * Colormap
    */
   attr.border_pixel      = gGui->black.pixel;
-  if (gGui->imlib_data->x.visual != DefaultVisual(gGui->display, gGui->screen)) {
-    attr.colormap        = XCreateColormap(gGui->display,
-					   RootWindow(gGui->display, gGui->screen), 
-					   gGui->imlib_data->x.visual, AllocNone);
-  } else {
-    attr.colormap        = DefaultColormap (gGui->display, gGui->screen);
-  }
+  attr.colormap          = Imlib_get_colormap(gGui->imlib_data);
   /*  
       printf ("imlib_data: %d visual : %d\n",gGui->imlib_data,gGui->imlib_data->x.visual);
       printf ("w : %d h : %d\n",hint.width, hint.height);

@@ -51,9 +51,9 @@ extern gGui_t *gGui;
 
 /* Video window private structure */
 typedef struct {
-  XVisualInfo    vinfo;
   Cursor         cursor[2];       /* Cursor pointers                       */
   int            cursor_visible;
+  Visual	*visual;	  /* Visual for video window               */
   Colormap	 colormap;	  /* Colormap for video window		   */
   XClassHint    *xclasshint;
   GC             gc;
@@ -272,24 +272,15 @@ void video_window_adapt_size (int video_width, int video_height,
      */
 
     attr.background_pixel  = gGui->black.pixel;
-    /*
-     * XXX:multivis
-     * To avoid BadMatch errors on XCreateWindow: 
-     * If the parent and the new window have different depths, we must
-     * supply either a BorderPixmap or a BorderPixel.
-     * If the parent and the new window use different visuals, we must
-     * supply a Colormap
-     */
     attr.border_pixel      = gGui->black.pixel;
     attr.colormap	   = gVw->colormap;
 
     gGui->video_window = 
-      XCreateWindow (gGui->display, 
-		     RootWindow (gGui->display, DefaultScreen(gGui->display)), 
+      XCreateWindow (gGui->display, RootWindow (gGui->display, gGui->screen), 
 		     0, 0, gVw->fullscreen_width, 
 		     gVw->fullscreen_height, 
 		     0, gVw->depth, CopyFromParent, 
-		     gVw->vinfo.visual,
+		     gVw->visual,
 		     CWBackPixel  | CWBorderPixel | CWColormap, &attr);
     
     if(gGui->vo_driver)
@@ -379,21 +370,13 @@ void video_window_adapt_size (int video_width, int video_height,
     gVw->fullscreen_mode = 0;
 
     attr.background_pixel  = gGui->black.pixel;
-    /*
-     * XXX:multivis
-     * To avoid BadMatch errors on XCreateWindow: 
-     * If the parent and the new window have different depths, we must
-     * supply either a BorderPixmap or a BorderPixel.
-     * If the parent and the new window use different visuals, we must
-     * supply a Colormap
-     */
     attr.border_pixel      = gGui->black.pixel;
     attr.colormap	   = gVw->colormap;
-
+    
     gGui->video_window = 
       XCreateWindow(gGui->display, RootWindow(gGui->display, gGui->screen),
 		    hint.x, hint.y, hint.width, hint.height, 4, 
-		    gVw->depth, CopyFromParent, gVw->vinfo.visual,
+		    gVw->depth, CopyFromParent, gVw->visual,
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
     
     if(gGui->vo_driver)
@@ -544,7 +527,6 @@ int video_window_is_visible (void) {
 static unsigned char bm_no_data[] = { 0,0,0,0, 0,0,0,0 };
 void video_window_init (void) {
 
-  XWindowAttributes  attribs;
   Pixmap             bm_no;
   int                x,y,w,h;
 #ifdef HAVE_XINERAMA
@@ -565,43 +547,10 @@ void video_window_init (void) {
 
   XLockDisplay (gGui->display);
 
-  XGetWindowAttributes(gGui->display, 
-		       DefaultRootWindow(gGui->display), &attribs);
 
-  gVw->depth = attribs.depth;
-  
-  if (gVw->depth != 15 
-      && gVw->depth != 16 
-      && gVw->depth != 24 
-      && gVw->depth != 32)  {
-    /* The root window may be 8bit but there might still be
-     * visuals with other bit depths. For example this is the 
-     * case on Sun/Solaris machines.
-     */
-    gVw->depth = 24;
-  }
-
-  if (!XMatchVisualInfo(gGui->display, 
-			gGui->screen, gVw->depth, TrueColor, &gVw->vinfo)) {
-    printf ("gui_main: couldn't find true color visual for video window.\n");
-
-    gVw->depth = DefaultDepth (gGui->display, gGui->screen);
-    gVw->vinfo.visual = DefaultVisual (gGui->display, gGui->screen); 
-  }
-  
-  /*
-   * XXX:multivis
-   * To avoid BadMatch errors on XCreateWindow:
-   * If the parent and the new window use different visuals, we must supply a
-   * Colormap
-   */
-  if (gVw->vinfo.visual != DefaultVisual(gGui->display, gGui->screen)) {
-    gVw->colormap = XCreateColormap(gGui->display,
-				    RootWindow(gGui->display, gGui->screen), 
-				    gVw->vinfo.visual, AllocNone);
-  } else {
-    gVw->colormap = DefaultColormap (gGui->display, gGui->screen);
-  }
+  gVw->depth				= gGui->depth;
+  gVw->visual				= gGui->visual;
+  gVw->colormap				= Imlib_get_colormap(gGui->imlib_data);
   
 #ifdef HAVE_XINERAMA
   /* Spark
@@ -647,7 +596,7 @@ void video_window_init (void) {
    */
 
   bm_no = XCreateBitmapFromData(gGui->display, 
-				DefaultRootWindow(gGui->display), 
+				RootWindow(gGui->display, gGui->screen), 
 				bm_no_data, 8, 8);
   gVw->cursor[0] = XCreatePixmapCursor(gGui->display, bm_no, bm_no,
 				      &gGui->black, &gGui->black, 0, 0);

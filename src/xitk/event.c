@@ -645,6 +645,94 @@ void gui_branched_callback () {
   }
 }
 
+
+static void gui_find_visual (Visual **visual_return, int *depth_return) {
+
+  XWindowAttributes  attribs;
+  XVisualInfo	    *vinfo;
+  XVisualInfo	     vinfo_tmpl;
+  int		     num_visuals;
+  int		     depth = 0;
+  Visual	    *visual = NULL;
+
+  if (gGui->prefered_visual_id == None) {
+    /*
+     * List all available TrueColor visuals, pick the best one for xine.
+     * We prefer visuals of depth 15/16 (fast).  Depth 24/32 may be OK, 
+     * but could be slow.
+     */
+    vinfo_tmpl.screen = gGui->screen;
+    vinfo_tmpl.class  = (gGui->prefered_visual_class != -1
+			 ? gGui->prefered_visual_class : TrueColor);
+    vinfo = XGetVisualInfo(gGui->display,
+			   VisualScreenMask | VisualClassMask,
+			   &vinfo_tmpl, &num_visuals);
+    if (vinfo != NULL) {
+      int i, pref;
+      int best_visual_index = -1;
+      int best_visual = -1;
+
+      for (i = 0; i < num_visuals; i++) {
+	if (vinfo[i].depth > 8 && vinfo[i].depth <= 16)
+	  pref = 3;
+	else if (vinfo[i].depth > 16)
+	  pref = 2;
+	else
+	  pref = 1;
+	
+	if (pref > best_visual) {
+	  best_visual = pref;
+	  best_visual_index = i;
+	}  
+      }
+      
+      if (best_visual_index != -1) {
+	depth = vinfo[best_visual_index].depth;
+	visual = vinfo[best_visual_index].visual;
+      }
+      
+      XFree(vinfo);
+    }
+  } else {
+    /*
+     * Use the visual specified by the user.
+     */
+    vinfo_tmpl.visualid = gGui->prefered_visual_id;
+    vinfo = XGetVisualInfo(gGui->display,
+			   VisualIDMask, &vinfo_tmpl, 
+			   &num_visuals);
+    if (vinfo == NULL) {
+      printf("gui_main: selected visual %#lx does not exist, trying default visual\n",
+	     (long) gGui->prefered_visual_id);
+    } else {
+      depth = vinfo[0].depth;
+      visual = vinfo[0].visual;
+      XFree(vinfo);
+    }
+  }	 
+
+  if (depth == 0) {
+    XGetWindowAttributes(gGui->display, 
+			 RootWindow(gGui->display, gGui->screen), &attribs);
+
+    depth = attribs.depth;
+  
+    if (!XMatchVisualInfo(gGui->display, 
+			  gGui->screen, depth, TrueColor, NULL)) {
+      printf ("gui_main: couldn't find true color visual.\n");
+
+      depth = DefaultDepth (gGui->display, gGui->screen);
+      visual = DefaultVisual (gGui->display, gGui->screen); 
+    }
+  }
+
+  if (depth_return != NULL)
+    *depth_return = depth;
+  if (visual_return != NULL)
+    *visual_return = visual;
+}
+
+
 /*
  * Initialize the GUI
  */
@@ -668,6 +756,7 @@ void gui_init (int nfiles, char *filenames[]) {
   XColor                dummy;
   char                 *display_name = ":0.0";
   char                  buffer[PATH_MAX + NAME_MAX + 1]; /* Enought ?? ;-) */
+  ImlibInitParams	imlib_init;
 
   /*
    * init playlist
@@ -706,7 +795,12 @@ void gui_init (int nfiles, char *filenames[]) {
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);
-  gGui->imlib_data = Imlib_init (gGui->display);
+
+  gui_find_visual(&gGui->visual, &gGui->depth);
+
+  imlib_init.flags = PARAMS_VISUALID;
+  imlib_init.visualid = gGui->visual->visualid;
+  gGui->imlib_data = Imlib_init_with_params (gGui->display, &imlib_init);
   if (gGui->imlib_data == NULL) {
     fprintf(stderr, "Unable to initialize Imlib\n");
     exit(1);

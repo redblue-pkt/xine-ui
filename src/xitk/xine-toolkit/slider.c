@@ -232,7 +232,8 @@ static int notify_click_slider (widget_list_t *wl,
 
 	default:
 	  widget_xevent_notify (&sliderevent);
- 	  break;	}
+ 	  break;
+	}
 	
       } while (sliderevent.type != ButtonRelease); 
     }

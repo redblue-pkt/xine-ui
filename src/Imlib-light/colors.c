@@ -204,6 +204,14 @@ Imlib_load_colors(ImlibData * id, char *file)
 	break;
     }
   fclose(f);
+#ifdef DEBUG
+  /*
+   * WARNING: you cannot single step into the
+   * XGrabServer()...XUngrabServer() part of the code in a debugger,
+   * if your debugger/xterm/ide uses the same X11 display as the
+   * debugged client.
+   */
+#endif
   XGrabServer(id->x.disp);
   _PaletteAlloc(id, (i / 3), pal);
   if (!PaletteLUTGet(id))
@@ -228,6 +236,14 @@ Imlib_load_colors(ImlibData * id, char *file)
       PaletteLUTSet(id);
     }
   XUngrabServer(id->x.disp);
+#ifdef DEBUG
+  /*
+   * Add an XSync() here to flush the XUngrabServer() op to the X11 server,
+   * so that we can continue debugging after the "return", or use a "next"
+   * to step over this subroutine.
+   */
+  XSync(id->x.disp, 0);
+#endif
   return 1;
 }
 

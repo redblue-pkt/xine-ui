@@ -19,7 +19,14 @@ int                 my_snprintf(va_alist);
 #endif
 #endif
 
-char                x_error;
+static char         x_error;
+
+static void
+HandleXError(Display * d, XErrorEvent * ev)
+{
+  x_error = 1;
+}
+
 
 int
 Imlib_get_render_type(ImlibData * id)
@@ -60,6 +67,12 @@ Imlib_set_render_type(ImlibData * id, int rend_type)
 ImlibData          *
 Imlib_init(Display * disp)
 {
+  return Imlib_init_with_params(disp, NULL);
+}
+
+ImlibData          *
+Imlib_init_with_params(Display * disp, ImlibInitParams * p)
+{
   ImlibData          *id;
   XWindowAttributes   xwa;
   XVisualInfo         xvi, *xvir;
@@ -75,11 +88,8 @@ Imlib_init(Display * disp)
   char               *palfile;
   int                 loadpal;
   int                 vis;
-  int                 newcm;
+  int                 newcm = 0;
   char               *old_locale;
-
-  /* fprintf(stderr, "Imlib Init\n");
-  fflush(stderr); */
 
   palfile = NULL;
   if (!disp)
@@ -110,6 +120,29 @@ Imlib_init(Display * disp)
   id->x.shm = 0;
   id->x.shmp = 0;
   id->max_shm = 0;
+#ifdef HAVE_SHM
+  if (XShmQueryExtension(id->x.disp))
+    {
+      int                 maj, min, dum;
+      Bool                pm;
+
+      if (XQueryExtension(id->x.disp, "MIT-SHM", &dum, &dum, &dum))
+	{
+	  if (XShmQueryVersion(id->x.disp, &maj, &min, &pm) == True)
+	    {
+	      id->x.shm = 1;
+	      id->x.shm_event = XShmGetEventBase(id->x.disp) + ShmCompletion;
+	      id->x.last_xim = NULL;
+	      id->x.last_sxim = NULL;
+	      id->max_shm = 0x7fffffff;
+	      if ((XShmPixmapFormat(id->x.disp) == ZPixmap) &&
+		  (pm == True))
+		id->x.shmp = 1;
+	    }
+	}
+    }
+  else
+#endif
   id->cache.on_image = 0;
   id->cache.size_image = 0;
   id->cache.num_image = 0;
@@ -150,20 +183,24 @@ Imlib_init(Display * disp)
   id->num_colors = 0;
   homedir = getenv("HOME");
   snprintf(s, sizeof(s), "%s/.imrc", homedir);
-
   old_locale = strdup(setlocale(LC_NUMERIC, NULL));
   setlocale(LC_NUMERIC, "C");
+
 #ifndef __EMX__
   f = fopen(s, "r");
 #else
   f = fopen(s, "rt");
 #endif
+
   if (!f)
+    {
 #ifndef __EMX__
-    f = fopen(SYSTEM_IMRC, "r");
+      f = fopen(SYSTEM_IMRC, "r");
 #else
-    f = fopen(__XOS2RedirRoot(SYSTEM_IMRC), "rt");
+      f = fopen(__XOS2RedirRoot(SYSTEM_IMRC), "rt");
 #endif
+    }
+  
   if (f)
     {
       while (fgets(s, 4096, f))
@@ -209,6 +246,9 @@ Imlib_init(Display * disp)
 	    }
 	  else if (!strcasecmp("Mit-Shm", s1))
 	    {
+#ifdef HAVE_SHM
+	      if (!strcasecmp("off", s2))
+#endif
 		{
 		  id->x.shm = 0;
 		  id->x.shmp = 0;
@@ -216,6 +256,9 @@ Imlib_init(Display * disp)
 	    }
 	  else if (!strcasecmp("SharedPixmaps", s1))
 	    {
+#ifdef HAVE_SHM
+	      if (!strcasecmp("off", s2))
+#endif
 		id->x.shmp = 0;
 	    }
 	  else if (!strcasecmp("FastRender", s1))
@@ -255,7 +298,7 @@ Imlib_init(Display * disp)
 	    }
 	  else if (!strcasecmp("ForceVisualID", s1))
 	    {
-	      sscanf(s, "%1024s %x", s1, &num);
+	      sscanf(s2, "%x", &num);
 	      vis = num;
 	    }
 	  else if (!strcasecmp("Fallback", s1))
@@ -327,6 +370,50 @@ Imlib_init(Display * disp)
   if (old_locale)
     free(old_locale);
   
+  if (p)
+    {
+      if (p->flags & PARAMS_VISUALID)
+	vis = p->visualid;
+      if (p->flags & PARAMS_PALETTEFILE)
+	strcpy(palfile, p->palettefile);
+      if (p->flags & PARAMS_SHAREDMEM)
+	{
+	  if (!p->sharedmem)
+	    {
+	      id->x.shm = 0;
+	      id->x.shmp = 0;
+	    }
+	  else
+	    {
+	      id->x.shm = 1;
+	      id->x.shmp = 0;
+	    }
+	}
+      if (p->flags & PARAMS_SHAREDPIXMAPS)
+	{
+	  if (id->x.shm)
+	    id->x.shmp = p->sharedpixmaps;
+	}
+      if (p->flags & PARAMS_PALETTEOVERRIDE)
+	override = p->paletteoverride;
+      if (p->flags & PARAMS_REMAP)
+	remap = p->remap;
+      if (p->flags & PARAMS_FASTRENDER)
+	id->fastrend = p->fastrender;
+      if (p->flags & PARAMS_HIQUALITY)
+	id->hiq = p->hiquality;
+      if (p->flags & PARAMS_DITHER)
+	dither = p->dither;
+      if (p->flags & PARAMS_IMAGECACHESIZE)
+	id->cache.size_image = p->imagecachesize;
+      if (p->flags & PARAMS_PIXMAPCACHESIZE)
+	id->cache.size_pixmap = p->pixmapcachesize;
+      if (p->flags & PARAMS_COLORMAP)
+	{
+	  id->x.root_cmap = p->cmap;
+	  newcm = 1;
+	}
+    }
   /* list all visuals for the default screen */
   xvi.screen = id->x.screen;
   xvir = XGetVisualInfo(disp, VisualScreenMask, &xvi, &num);
@@ -387,7 +474,8 @@ Imlib_init(Display * disp)
 		{
 		  if (xvir[i].depth == id->x.depth)
 		    {
-		      if ((xvir[i].class > clas) && (xvir[i].class != DirectColor))
+		      if ((xvir[i].class > clas) &&
+			  (xvir[i].class != DirectColor))
 			{
 			  maxn = i;
 			  clas = xvir[i].class;
@@ -421,8 +509,8 @@ Imlib_init(Display * disp)
 	    }
 	}
     }
-  id->x.render_depth = id->x.depth;
   XFree(xvir);
+  id->x.render_depth = id->x.depth;
   if (id->x.depth == 16)
     {
       xvi.visual = id->x.visual;
@@ -437,6 +525,26 @@ Imlib_init(Display * disp)
     }
   if (id->x.depth < 8)
     id->x.shmp = 0;
+
+  /*
+   * Make sure that we have the colormap we use on later for XCreateWindow
+   * stored on id->x.root_cmap, so that Imlib_load_colors() allocates
+   * colors from the correct colormap.
+   */
+  if ((id->x.visual != DefaultVisual(disp, id->x.screen) && !newcm) ||
+      getenv("PRIVATE_COLORMAP"))
+    {
+      Colormap            cm;
+
+      cm = XCreateColormap(id->x.disp, id->x.root,
+			   id->x.visual, AllocNone);
+      if (cm)
+	{
+	  id->x.root_cmap = cm;
+	  newcm = 1;
+	}
+    }
+  
   if ((id->x.depth <= 8) || (override == 1))
     loadpal = 1;
   if (loadpal)
@@ -484,30 +592,11 @@ Imlib_init(Display * disp)
     at.override_redirect = True;
     mask = CWOverrideRedirect | CWBackPixel | CWBorderPixel |
       CWBackingStore | CWSaveUnder;
-    newcm = 0;
-    /*
-     * XXX:multivis
-     * To avoid BadMatch errors on XCreateWindow:
-     * If the parent and the new window have different depths, we must supply either
-     * a BorderPixmap or a BorderPixel.
-     * If the parent and the new window use different visuals, we must supply a
-     * Colormap
-     */
-    if (id->x.visual != DefaultVisual(disp, id->x.screen))
+    if (newcm)
       {
-	Colormap            cm;
-
-	cm = XCreateColormap(id->x.disp, id->x.root,
-			     id->x.visual, AllocNone);
-	if (cm)
-	  {
-	    mask |= CWColormap;
-	    id->x.root_cmap = cm;
-	    at.colormap = cm;
-	    newcm = 1;
-	  }
+	mask |= CWColormap;
+	at.colormap = id->x.root_cmap;
       }
-  
     id->x.base_window = XCreateWindow(id->x.disp, id->x.root,
 				      -100, -100, 10, 10, 0,
 				      id->x.depth, InputOutput,
@@ -532,9 +621,66 @@ Imlib_init(Display * disp)
   if (palfile)
     free(palfile);
 
+#ifdef HAVE_SHM
+  if (id->x.shm)
+    {
+      XImage             *xim;
+
+      xim = XShmCreateImage(id->x.disp, id->x.visual, id->x.depth,
+			    ZPixmap, NULL, &id->x.last_shminfo, 10, 10);
+      if (!xim)
+	{
+	  id->x.shm = 0;
+	  id->x.shmp = 0;
+	}
+      else
+	{
+	  id->x.last_shminfo.shmid =
+	    shmget(IPC_PRIVATE, xim->bytes_per_line * xim->height,
+		   IPC_CREAT | 0777);
+	  if (id->x.last_shminfo.shmid < 0)
+	    {
+	      XDestroyImage(xim);
+	      id->x.shm = 0;
+	      id->x.shmp = 0;
+	    }
+	  else
+	    {
+	      id->x.last_shminfo.shmaddr = xim->data =
+		shmat(id->x.last_shminfo.shmid, 0, 0);
+	      if (id->x.last_shminfo.shmaddr == (char *)-1)
+		{
+		  XDestroyImage(xim);
+		  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+		  id->x.shm = 0;
+		  id->x.shmp = 0;
+		}
+	      else
+		{
+		  id->x.last_shminfo.readOnly = False;
+		  XSetErrorHandler((XErrorHandler) HandleXError);
+		  x_error = 0;
+		  XShmAttach(id->x.disp, &id->x.last_shminfo);
+		  XSync(disp, False);
+		  if (x_error)
+		    {
+		      id->x.shm = 0;
+		      id->x.shmp = 0;
+		    }
+		  else
+		    XShmDetach(id->x.disp, &id->x.last_shminfo);
+		  XDestroyImage(xim);
+		  shmdt(id->x.last_shminfo.shmaddr);
+		  shmctl(id->x.last_shminfo.shmid, IPC_RMID, 0);
+		}
+	    }
+	}
+    }
+#endif
 
   return id;
 }
+
 
 
 Pixmap

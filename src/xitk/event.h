@@ -56,8 +56,13 @@ typedef struct {
   /* basic X11 stuff */
   Display             *display;
   int                  screen;
+  int		       depth;
+  Visual	      *visual;
   XColor               black;
   Pixmap               icon;
+
+  int		       prefered_visual_class;
+  VisualID	       prefered_visual_id;
 
   xitk_dnd_t           xdnd;
 

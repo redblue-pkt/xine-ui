@@ -594,13 +594,7 @@ void playlist_editor(void) {
    * Colormap
    */
   attr.border_pixel      = 1;
-  if (gGui->imlib_data->x.visual != DefaultVisual(gGui->display, gGui->screen)) {
-    attr.colormap        = XCreateColormap(gGui->display,
-                                           RootWindow(gGui->display, gGui->screen),
-                                           gGui->imlib_data->x.visual, AllocNone);
-  } else {
-    attr.colormap        = DefaultColormap (gGui->display, gGui->screen);
-  }
+  attr.colormap		 = Imlib_get_colormap(gGui->imlib_data);
 
   playlist->window = XCreateWindow (gGui->display, 
 				    DefaultRootWindow(gGui->display), 

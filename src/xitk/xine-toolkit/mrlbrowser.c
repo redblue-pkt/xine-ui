@@ -683,13 +683,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
    * Colormap
    */
   attr.border_pixel      = 1;
-  if (mb->imlibdata->x.visual != DefaultVisual(mb->display, screen)) {
-    attr.colormap        = XCreateColormap(mb->display,
-					   RootWindow(mb->display, screen),
-					   mb->imlibdata->x.visual, AllocNone);
-  } else {
-    attr.colormap        = DefaultColormap (mb->display, screen);
-  }
+  attr.colormap		 = Imlib_get_colormap(mb->imlibdata);
 
   private_data->window   = XCreateWindow (mb->display,
 					  DefaultRootWindow(mb->display), 

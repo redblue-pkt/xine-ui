@@ -992,16 +992,8 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
    * Colormap
    */
   attr.border_pixel            = 1;
-  if (fb->imlibdata->x.visual != DefaultVisual(fb->display, screen)) {
-    attr.colormap              = XCreateColormap(fb->display,
-						 RootWindow(fb->display,
-							    screen),
-						 fb->imlibdata->x.visual,
-						 AllocNone);
-  } else {
-    attr.colormap              = DefaultColormap (fb->display, screen);
-  }
-  
+  attr.colormap		       = Imlib_get_colormap(fb->imlibdata);
+
   private_data->window = 
     XCreateWindow (fb->display, DefaultRootWindow(fb->display), 
 		   hint.x, hint.y, hint.width, 
