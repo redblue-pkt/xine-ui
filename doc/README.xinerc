@@ -159,6 +159,8 @@ xine_debug		Various decimal values.
 			See ./xine-lib/xine-engine/monitor.h
 			for a list.
 
+xshm_gamma		gamma correction for XShm driver (-100..100)
+                        
 XV_COLORKEY             -1000..1000: X11 XVideo COLORKEY property value.
 
 XV_BRIGHTNESS           -1000..1000: X11 XVideo BRIGHTNESS property value.
