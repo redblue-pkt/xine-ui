@@ -74,8 +74,8 @@ skin.TitleLabel {
 	label {
 	  length = 51
 	  animation = True
-	  step = 1
-          timer = 100000
+	  step = 6
+          timer = 500000
 	  pixmap = Letters.png
 	}
 }

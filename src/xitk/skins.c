@@ -916,7 +916,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 
 	  memset(&buffer, 0, sizeof(buffer));
 	  
-	  snprintf(buffer, sizeof(buffer), "%s %s %s %s", "which tar > /dev/null 2>&1 && tar -C ", skindir, "-xzf", tmpskin);
+	  snprintf(buffer, sizeof(buffer), "%s %s %s %s %s", "which tar > /dev/null 2>&1 && cd ", skindir, " && gunzip -c ", tmpskin, " | tar xf -");
 	  xine_system(0, buffer);
 	  unlink(tmpskin);
 
