@@ -58,6 +58,9 @@
 /* Define this to add mrl browser into xitk lib */
 #undef NEED_MRLBROWSER
 
+/* Where skins are */
+#undef XINE_SKINDIR
+
 /* Where scripts are */
 #undef XINE_SCRIPTDIR
 

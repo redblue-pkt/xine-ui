@@ -732,6 +732,7 @@ dnl skins dir location, xine-config told us about this.
 dnl
 XINE_SKINDIR="$xine_skin_dir"
 AC_SUBST(XINE_SKINDIR)
+AC_DEFINE_UNQUOTED(XINE_SKINDIR, "$XINE_SKINDIR")
 dnl
 dnl desktop dir location, xine-config told us about this.
 dnl
