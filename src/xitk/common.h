@@ -289,8 +289,6 @@ typedef struct {
     int                     loop;                  /* current loop mode (see PLAYLIST_LOOP_* */
     int                     control;               /* see PLAYLIST_CONTROL_* */
 
-    xine_stream_t          *scan_stream;
-
     char                   *on_start;
   } playlist;
 
