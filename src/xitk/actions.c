@@ -295,6 +295,9 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 
 void gui_set_current_position (int pos) {
 
+  if (!xine_is_stream_seekable (gGui->xine)) 
+    return;
+
   gGui->ignore_status = 1;
   xine_play (gGui->xine, gGui->filename, pos, 0);
   gGui->ignore_status = 0;
@@ -304,6 +307,9 @@ void gui_set_current_position (int pos) {
 void gui_seek_relative (int off_sec) {
 
   int sec;
+
+  if (!xine_is_stream_seekable (gGui->xine)) 
+    return;
 
   gGui->ignore_status = 1;
 
