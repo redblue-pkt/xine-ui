@@ -445,7 +445,7 @@ static kbinding_entry_t default_binding_table[] = {
  */
 static void _kbinding_reset_cb(xitk_widget_t *w, void *data, int button) {
   kbinding_t *kbt = (kbinding_t *) data;
-  kbindings_reset_kbinding(&kbt);
+  kbindings_reset_kbinding(kbt);
 }
 static void _kbinding_editor_cb(xitk_widget_t *w, void *data, int button) {
   kbedit_window();
@@ -549,7 +549,7 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 /*
  * Free a keybindings object.
  */
-static void _kbindings_free_bindings(kbinding_t *kbt) {
+static void _kbindings_free_bindings_no_kbt(kbinding_t *kbt) {
   kbinding_entry_t **k;
   
   if(kbt == NULL)
@@ -567,7 +567,9 @@ static void _kbindings_free_bindings(kbinding_t *kbt) {
       }
     }
   }
-  
+}
+static void _kbindings_free_bindings(kbinding_t *kbt) {
+  _kbindings_free_bindings_no_kbt(kbt);
   SAFE_FREE(kbt);
 }
 
@@ -1006,11 +1008,8 @@ static void kbindings_convert_modifier(int mod, int *modifier) {
 /*
  * Create a new key binding table from (static) default one.
  */
-static kbinding_t *_kbindings_init_to_default(void) {
-  kbinding_t  *kbt;
+static void _kbindings_init_to_default_no_kbt(kbinding_t *kbt) {
   int          i;
- 
-  kbt = (kbinding_t *) xine_xmalloc(sizeof(kbinding_t));
 
   for(i = 0; default_binding_table[i].action != NULL; i++) {
     kbt->entry[i] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_entry_t));
@@ -1028,6 +1027,12 @@ static kbinding_t *_kbindings_init_to_default(void) {
   kbt->entry[i]->modifier = 0;
 
   kbt->num_entries = i + 1;
+}
+static kbinding_t *_kbindings_init_to_default(void) {
+  kbinding_t  *kbt;
+ 
+  kbt = (kbinding_t *) xine_xmalloc(sizeof(kbinding_t));
+  _kbindings_init_to_default_no_kbt(kbt);
 
   return kbt;
 }
@@ -1067,14 +1072,12 @@ void kbindings_save_kbinding(kbinding_t *kbt) {
 /*
  * Free key binding table kbt, then set it to default table.
  */
-void kbindings_reset_kbinding(kbinding_t **kbt) {
-  kbinding_t *k;
+void kbindings_reset_kbinding(kbinding_t *kbt) {
   
-  ABORT_IF_NULL(*kbt);
+  ABORT_IF_NULL(kbt);
   
-  _kbindings_free_bindings(*kbt);
-  k = _kbindings_init_to_default();
-  *kbt = k;
+  _kbindings_free_bindings_no_kbt(kbt);
+  _kbindings_init_to_default_no_kbt(kbt);
 }
 
 /*
@@ -1273,7 +1276,7 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
 
   /* Be case sensitive */
   for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
-    if((!(strcmp(k->key, key))) && (modifier == k->modifier)) {
+    if(k && k->key && strlen(k->key) && ((!(strcmp(k->key, key))) && (modifier == k->modifier))) {
       kret = k;
       goto __found;
     }
@@ -1288,7 +1291,7 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
   */
   /* Last chance */
   for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
-    if((!(strcmp(k->key, key))) && (k->modifier == KEYMOD_NOMOD)) {
+    if(k && k->key && strlen(k->key) && ((!(strcmp(k->key, key))) && (k->modifier == KEYMOD_NOMOD))) {
       kret = k;
       break;
     }
@@ -1685,7 +1688,7 @@ static void kbedit_reset(xitk_widget_t *w, void *data) {
   xitk_labelbutton_set_state(kbedit->edit, 0);
   xitk_disable_widget(kbedit->grab);
 
-  kbindings_reset_kbinding(&kbedit->kbt);
+  kbindings_reset_kbinding(kbedit->kbt);
   kbedit_create_browser_entries();
   xitk_browser_update_list(kbedit->browser, 
 			   (const char* const*) kbedit->entries, 

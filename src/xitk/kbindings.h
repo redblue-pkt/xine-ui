@@ -179,7 +179,7 @@ typedef enum {
   
 kbinding_t *kbindings_init_kbinding(void);
 void kbindings_save_kbinding(kbinding_t *);
-void kbindings_reset_kbinding(kbinding_t **);
+void kbindings_reset_kbinding(kbinding_t *);
 void kbindings_free_kbinding(kbinding_t **);
 void kbindings_display_current_bindings(kbinding_t *);
 void kbindings_display_default_lirc_bindings(void);
