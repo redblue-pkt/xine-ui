@@ -720,7 +720,7 @@ Each line specifies an additional command line argument (one argument per line):
 \-p
 .fi
 .SH "SEE ALSO"
-\fBxine-remote\fP(1).
+\fBxine-remote\fP(1). There is separate documentation for the VCD plugin.
 .br
 The programs are documented fully on the xine home page:
 .UR http://xinehq.de/
