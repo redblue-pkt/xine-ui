@@ -222,12 +222,11 @@ static int _gui_xine_play(xine_stream_t *stream,
 
   }
 
-  if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0) {
+  if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0)
     gui_handle_xine_error(stream, NULL);
-  }
   else {
     char *ident;
-    
+
     if(gGui->logo_mode != 2)
       gGui->logo_mode = 0;
     
@@ -237,7 +236,6 @@ static int _gui_xine_play(xine_stream_t *stream,
 	stream_infos_update_infos();
       
       if(update_mmk && ((ident = stream_infos_get_ident_from_stream(stream)) != NULL)) {
-	
 	if(gGui->mmk.ident)
 	  free(gGui->mmk.ident);
 	if(gGui->playlist.mmk[gGui->playlist.cur]->ident)
@@ -494,7 +492,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
       playlist_update_playlist();
     }
   }
-  
+
   if(!xine_open(gGui->stream, (const char *) mrl)) {
     
     if(!strcmp(mrl, gGui->mmk.mrl))
@@ -522,7 +520,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
       gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
     return 0;
   }
-  
+
   if(!strcmp(mrl, gGui->mmk.mrl))
     gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
 
@@ -671,14 +669,14 @@ void gui_play (xitk_widget_t *w, void *data) {
       xine_error (_("No MRL (input stream) specified"));
       return;
     }
-
-    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-                                gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset,
-                                !mediamark_have_alternates(&(gGui->mmk)))) {
-      
-      if(!mediamark_have_alternates(&(gGui->mmk)) ||
-          !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
     
+    if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
+			       gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset,
+			       !mediamark_have_alternates(&(gGui->mmk)))) {
+
+      if(!mediamark_have_alternates(&(gGui->mmk)) ||
+	 !gui_open_and_play_alternates(&(gGui->mmk), gGui->mmk.sub)) {
+	
 	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
 	  gui_exit(NULL, NULL);
 	gui_display_logo();
@@ -1052,7 +1050,7 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   osd_update_status();
 }
 
-static void *gui_set_current_position_thread(void *data) {
+static void *_gui_set_current_position(void *data) {
   int  pos = (int) data;
   int  update_mmk = 0;
   
@@ -1127,7 +1125,7 @@ static void *gui_set_current_position_thread(void *data) {
   return NULL;
 }
 
-static void *gui_seek_relative_thread(void *data) {
+static void *_gui_seek_relative(void *data) {
   int off_sec = (int)data;
   int sec, pos;
   
@@ -1185,7 +1183,7 @@ static void *gui_seek_relative_thread(void *data) {
 
 void gui_set_current_position (int pos) {
   int        err;
-  pthread_t  sthread;
+  pthread_t  pth;
 
   if(gGui->new_pos == -1) {
     
@@ -1195,7 +1193,7 @@ void gui_set_current_position (int pos) {
     gGui->new_pos = pos;
     pthread_mutex_unlock(&new_pos_mutex);
     
-    if((err = pthread_create(&sthread, NULL, gui_set_current_position_thread, (void *)pos)) != 0) {
+    if((err = pthread_create(&pth, NULL, _gui_set_current_position, (void *)pos)) != 0) {
       printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
       abort();
     }
@@ -1210,16 +1208,17 @@ void gui_set_current_position (int pos) {
 
 void gui_seek_relative (int off_sec) {
   int        err;
-  pthread_t  sthread;
+  pthread_t  pth;
   
-  if((err = pthread_create(&sthread, NULL, gui_seek_relative_thread, (void *)off_sec)) != 0) {
+  if((err = pthread_create(&sthread, NULL, _gui_seek_relative, (void *)off_sec)) != 0) {
     printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     abort();
   }
 }
 
-void gui_dndcallback(char *filename) {
-  int more_than_one = -2;
+static void *_gui_dndcallback(void *data) {
+  int   more_than_one = -2;
+  char *filename = (char *) data;
 
   if(filename) {
     char  buffer[strlen(filename) + 10];
@@ -1292,6 +1291,7 @@ void gui_dndcallback(char *filename) {
       more_than_one = gGui->playlist.cur;
     }
     else {
+      
       if(mrl_look_like_playlist(buffer)) {
 	int cur = gGui->playlist.cur;
 	
@@ -1303,26 +1303,42 @@ void gui_dndcallback(char *filename) {
       }
       else
 	mediamark_append_entry(buffer, buffer, NULL, 0, -1, 0, 0);
+
     }
     
   __do_play:
-    
+
     playlist_update_playlist();
 
     if(!(gGui->playlist.control & PLAYLIST_CONTROL_IGNORE)) {
       if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
+
 	if((more_than_one > -2) && ((more_than_one + 1) < gGui->playlist.num))
 	  gGui->playlist.cur = more_than_one + 1;
 	else
 	  gGui->playlist.cur = gGui->playlist.num - 1;
+
 	gui_set_current_mmk(mediamark_get_current_mmk());
 	if(gGui->smart_mode)
 	  gui_play(NULL, NULL);
+
       }
     }
     
     if((!is_playback_widgets_enabled()) && gGui->playlist.num)
       enable_playback_controls(1);
+  }
+
+  pthread_exit(NULL);
+}
+
+void gui_dndcallback(char *filename) {
+  int        err;
+  pthread_t  pth;
+
+  if((err = pthread_create(&pth, NULL, _gui_dndcallback, (void *)filename)) != 0) {
+    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
+    abort();
   }
 }
 
