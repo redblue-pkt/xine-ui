@@ -412,6 +412,10 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 			   int start_time, int av_offset, int spu_offset) {
   char *mrl = _mrl;
   
+  if(gGui->verbosity)
+    printf("%s():\n\tmrl: '%s',\n\tsub '%s',\n\tstart_pos %d, start_time %d, av_offset %d, spu_offset %d.\n",
+	   __func__, _mrl, (_sub) ? _sub : "NONE", start_pos, start_time, av_offset, spu_offset);
+  
   if(!strncasecmp(mrl, "cfg:/", 5)) {
     config_mrl(mrl);
     gui_playlist_start_next();

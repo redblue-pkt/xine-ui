@@ -200,6 +200,222 @@ static void audio_mixer_method_cb(void *data, xine_cfg_entry_t *cfg) {
   xitk_slider_set_pos(panel->mixer.slider, vol);
 }
 
+/*
+ * Code hardly based on xdyinfo.c, part of XFree86 
+ * Copyright 1988, 1998  The Open Group
+ * Author:  Jim Fulton, MIT X Consortium
+ */
+static int StrCmp(const void *a, const  void *b) {
+  return strcmp(*(char **)a, *(char **)b);
+}
+static void dump_xfree_info(void) {
+  char                 dummybuf[40];
+  char                *cp;
+  int                  minkeycode, maxkeycode;
+  int                  i, n;
+  long                 req_size;
+  XPixmapFormatValues *pmf;
+  Window               focuswin;
+  int                  focusrevert;
+  char               **extlist;
+      
+  
+  printf("   Display Name:          %s,\n", DisplayString (gGui->display));
+  printf("   XServer Vendor:        %s,\n", XServerVendor(gGui->display));
+  printf("   Protocol Version:      %d, Revision: %d,\n", XProtocolVersion(gGui->display), XProtocolRevision(gGui->display));
+  printf("   Available Screen(s):   %d,\n", XScreenCount(gGui->display));
+  printf("   Default screen number: %d,\n", DefaultScreen (gGui->display));
+  printf("   Using screen:          %d,\n", gGui->screen);
+  printf("   Depth:                 %d,\n", XDisplayPlanes(gGui->display, gGui->screen));
+  
+
+
+#ifdef HAVE_SHM
+  if(XShmQueryExtension(gGui->display)) {
+    int major, minor, ignore;
+    Bool       pixmaps;
+    
+    if(XQueryExtension(gGui->display, "MIT-SHM", &ignore, &ignore, &ignore)) {
+      if(XShmQueryVersion(gGui->display, &major, &minor, &pixmaps ) == True) {
+	printf("   XShmQueryVersion:      %d.%d,\n", major, minor);
+      }
+    }
+  }
+#endif
+  
+  if(gGui->verbosity >= XINE_VERBOSITY_DEBUG) {
+
+    if (strstr(XServerVendor (gGui->display), "XFree86")) {
+      int vendrel = XVendorRelease(gGui->display);
+      
+      printf("   XFree86 version: ");
+      if (vendrel < 336) {
+	/*
+	 * vendrel was set incorrectly for 3.3.4 and 3.3.5, so handle
+	 * those cases here.
+	 */
+	printf("      %d.%d.%d", vendrel / 100, (vendrel / 10) % 10, vendrel % 10);
+      } 
+      else if (vendrel < 3900) {
+	/* 3.3.x versions, other than the exceptions handled above */
+	printf("      %d.%d", vendrel / 1000, (vendrel /  100) % 10);
+	if (((vendrel / 10) % 10) || (vendrel % 10)) {
+	  printf(".%d", (vendrel / 10) % 10);
+	  if (vendrel % 10) {
+	    printf(".%d", vendrel % 10);
+	  }
+	}
+      } else if (vendrel < 40000000) {
+	/* 4.0.x versions */
+	printf("      %d.%d", vendrel / 1000, (vendrel /   10) % 10);
+	if (vendrel % 10) {
+	  printf(".%d", vendrel % 10);
+	}
+      } else {
+	/* post-4.0.x */
+	printf("      %d.%d.%d", vendrel / 10000000, (vendrel /   100000) % 100, (vendrel /     1000) % 100);
+	if (vendrel % 1000) {
+	  printf(".%d", vendrel % 1000);
+	}
+      }
+      printf("\n");
+    }
+    
+    req_size = XExtendedMaxRequestSize (gGui->display);
+    if (!req_size)
+      req_size = XMaxRequestSize (gGui->display);
+    printf("   Maximum request size:  %ld bytes,\n", req_size * 4);
+    printf("   Motion buffer size:    %ld,\n", XDisplayMotionBufferSize (gGui->display));
+    
+    switch (BitmapBitOrder (gGui->display)) {
+    case LSBFirst:
+      cp = "LSBFirst"; 
+      break;
+    case MSBFirst:
+      cp = "MSBFirst"; 
+      break;
+    default:    
+      snprintf(dummybuf, 40, "%s %d", "unknown order", BitmapBitOrder (gGui->display));
+      cp = dummybuf;
+      break;
+    }
+    printf("   Bitmap unit:           %d,\n", BitmapUnit(gGui->display));
+    printf("     Bit order:           %s,\n", cp);
+    printf("     Padding:             %d,\n", BitmapPad(gGui->display));
+    
+    switch (ImageByteOrder (gGui->display)) {
+    case LSBFirst:
+      cp = "LSBFirst";
+      break;
+    case MSBFirst:
+      cp = "MSBFirst";
+      break;
+    default:    
+      snprintf (dummybuf, 40, "%s %d", "unknown order", ImageByteOrder (gGui->display));
+      cp = dummybuf;
+      break;
+    }
+    
+    printf("   Image byte order:      %s,\n", cp);
+    
+    pmf = XListPixmapFormats (gGui->display, &n);
+    printf("   Number of supported pixmap formats: %d,\n", n);
+    if (pmf) {
+      printf("   Supported pixmap formats:\n");
+      printf("     Depth        Bits_per_pixel        Scanline_pad\n");
+      for (i = 0; i < n; i++) {
+	printf("     %5d                 %5d               %5d\n", 
+		 pmf[i].depth, pmf[i].bits_per_pixel, pmf[i].scanline_pad);
+      }
+      printf("     -----------------------------------------------\n\n");
+      XFree ((char *) pmf);
+    }
+    
+    /*
+     * when we get interfaces to the PixmapFormat stuff, insert code here
+     */
+    
+    XDisplayKeycodes (gGui->display, &minkeycode, &maxkeycode);
+    printf("   Keycode range:          min %d, max %d,\n", minkeycode, maxkeycode);
+    
+    XGetInputFocus (gGui->display, &focuswin, &focusrevert);
+    printf("   Focus:                  ");
+    switch (focuswin) {
+    case PointerRoot:
+      printf("PointerRoot\n");
+      break;
+    case None:
+      printf("None\n");
+      break;
+    default:
+      printf("Window 0x%lx, revert to ", focuswin);
+      switch (focusrevert) {
+      case RevertToParent:
+	printf("Parent,\n");
+	break;
+      case RevertToNone:
+	printf("None,\n");
+	break;
+      case RevertToPointerRoot:
+	printf("PointerRoot,\n");
+	
+	break;
+      default:			/* should not happen */
+	printf("%d,\n", focusrevert);
+	break;
+      }
+      break;
+    }
+    
+    extlist = XListExtensions (gGui->display, &n);
+    
+    printf("   Number of extensions:   %d\n", n);
+    if (extlist) {
+      int   i, opcode, event, error;
+      int   j, maxlen = 0;
+      
+      for(j = 0; j < n; j++) {
+	if(maxlen < strlen(extlist[j]))
+	  maxlen = strlen(extlist[j]);
+      }
+      maxlen += 2;
+      
+      qsort(extlist, n, sizeof(char *), StrCmp);
+      for (i = 0; i < n; i++) {
+	Bool retval;
+	
+	retval = XQueryExtension(gGui->display, extlist[i], &opcode, &event, &error);
+	printf("     %s:", extlist[i]);
+	
+	for(j = strlen(extlist[i]); j < maxlen; j++)
+	  printf(" ");
+	
+	if(retval == True) {
+	  printf("[opcode: %d", opcode);
+	  if(event || error) {
+	    printf(", base (");
+	    if (event) {
+	      printf("event: %d", event);
+	      if(error)
+		printf(", ");
+	    }
+	    
+	    if (error)
+	      printf("error: %d", error);
+	    printf(")");
+	  }
+	  printf("]\n");
+	}
+	else
+	  printf("not present.\n"); 
+	
+      }
+      /* Don't free it */
+      /* XFreeExtensionList (extlist); */
+    }
+  }
+}
+
 int wm_not_ewmh_only(void) {
   int wm_type = xitk_get_wm_type();
   
@@ -1360,27 +1576,9 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->screen = DefaultScreen(gGui->display);
 
   /* Some infos */
-  printf(_("XServer Vendor: %s. Release: %d,\n"), 
-	 XServerVendor(gGui->display), XVendorRelease(gGui->display));
-  printf(_("        Protocol Version: %d, Revision: %d,\n"), 
-	 XProtocolVersion(gGui->display), XProtocolRevision(gGui->display));
-  printf(_("        Available Screen(s): %d, using %d\n")
-	 , XScreenCount(gGui->display), gGui->screen);
-  printf(_("        Depth: %d.\n"),
-	 XDisplayPlanes(gGui->display, gGui->screen));
-#ifdef HAVE_SHM
-  if(XShmQueryExtension(gGui->display)) {
-    int major, minor, ignore;
-    Bool pixmaps;
-    
-    if(XQueryExtension(gGui->display, "MIT-SHM", &ignore, &ignore, &ignore)) {
-      if(XShmQueryVersion(gGui->display, &major, &minor, &pixmaps ) == True) {
-	printf(_("        XShmQueryVersion: %d.%d.\n"), major, minor);
-      }
-    }
-  }
-#endif
-  
+  if(gGui->verbosity)
+    dump_xfree_info();
+
   gui_find_visual(&gGui->visual, &gGui->depth);
 
   gui_init_imlib (gGui->visual);
@@ -1392,7 +1590,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    */
   xine_pid = getppid();
   
-  xitk_init(gGui->display);
+  xitk_init(gGui->display, (gGui->verbosity) ? 1 : 0);
   
   preinit_skins_support();
   

@@ -694,7 +694,7 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf);
 /*
  * Initialization function, should be the first call to widget lib.
  */
-void xitk_init(Display *display);
+void xitk_init(Display *display, int verbosity);
 
 /*
  *

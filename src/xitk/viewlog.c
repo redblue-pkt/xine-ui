@@ -263,6 +263,19 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 			  _("There is no log entry for logging section '%s'.\n"), 
 			  xitk_tabs_get_current_tab_selected(viewlog->tabs));
 #endif
+
+  if(gGui->verbosity) {
+    const char   *const *log_sections = xine_get_log_names(gGui->xine);
+
+    printf("\nLOG SECTION [%s]\n", log_sections[section]);
+    i = 0;
+    while(viewlog->log[i]) {
+      if((strlen(viewlog->log[i]) > 1) || (viewlog->log[i][0] != ' '))
+	printf(" '%s'\n", viewlog->log[i]);
+      i++;
+    }
+    printf("-----------------------------------\n\n");
+  }
   
   xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->real_num_entries, 0);
   

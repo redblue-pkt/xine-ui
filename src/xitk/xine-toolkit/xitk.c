@@ -111,6 +111,7 @@ typedef struct {
 
 typedef struct {
   Display                    *display;
+  int                         verbosity;
   xitk_list_t                *list;
   xitk_list_t                *gfx;
   int                         use_xshm;
@@ -552,62 +553,63 @@ static uint32_t xitk_check_wm(Display *display) {
 
   XUnlockDisplay(display);
   
-  printf("-[ WM type: ");
-  
-  if(type & WM_TYPE_GNOME_COMP)
-    printf("(GnomeCompliant) ");
-  if(type & WM_TYPE_EWMH_COMP)
-    printf("(EWMH) ");
-  
-  switch(type & WM_TYPE_COMP_MASK) {
-  case WM_TYPE_UNKNOWN:
-    printf("Unknown");
-    break;
-  case WM_TYPE_KWIN:
-    printf("KWIN");
-    break;
-  case WM_TYPE_E:
-    printf("Enlightenment");
-    break;
-  case WM_TYPE_ICE:
-    printf("Ice");
-    break;
-  case WM_TYPE_WINDOWMAKER:
-    printf("WindowMaker");
-    break;
-  case WM_TYPE_MOTIF:
-    printf("Motif(like?)");
-    break;
-  case WM_TYPE_XFCE:
-    printf("XFce");
-    break;
-  case WM_TYPE_SAWFISH:
-    printf("Sawfish");
-    break;
-  case WM_TYPE_METACITY:
-    printf("Metacity");
-    break;
-  case WM_TYPE_AFTERSTEP:
-    printf("Afterstep");
-    break;
-  case WM_TYPE_BLACKBOX:
-    printf("Blackbox");
-    break;
-  case WM_TYPE_LARSWM:
-    printf("LarsWM");
-    break;
-  case WM_TYPE_DTWM:
-    printf("dtwm");
-    break;
+  if(gXitk->verbosity) {
+    printf("[ WM type: ");
+    
+    if(type & WM_TYPE_GNOME_COMP)
+      printf("(GnomeCompliant) ");
+    if(type & WM_TYPE_EWMH_COMP)
+      printf("(EWMH) ");
+    
+    switch(type & WM_TYPE_COMP_MASK) {
+    case WM_TYPE_UNKNOWN:
+      printf("Unknown");
+      break;
+    case WM_TYPE_KWIN:
+      printf("KWIN");
+      break;
+    case WM_TYPE_E:
+      printf("Enlightenment");
+      break;
+    case WM_TYPE_ICE:
+      printf("Ice");
+      break;
+    case WM_TYPE_WINDOWMAKER:
+      printf("WindowMaker");
+      break;
+    case WM_TYPE_MOTIF:
+      printf("Motif(like?)");
+      break;
+    case WM_TYPE_XFCE:
+      printf("XFce");
+      break;
+    case WM_TYPE_SAWFISH:
+      printf("Sawfish");
+      break;
+    case WM_TYPE_METACITY:
+      printf("Metacity");
+      break;
+    case WM_TYPE_AFTERSTEP:
+      printf("Afterstep");
+      break;
+    case WM_TYPE_BLACKBOX:
+      printf("Blackbox");
+      break;
+    case WM_TYPE_LARSWM:
+      printf("LarsWM");
+      break;
+    case WM_TYPE_DTWM:
+      printf("dtwm");
+      break;
+    }
+    
+    if(wm_name) {
+      printf(" {%s}", wm_name);
+      free(wm_name);
+    }
+    
+    printf(" ]-\n");
   }
-
-  if(wm_name) {
-    printf(" {%s}", wm_name);
-    free(wm_name);
-  }
-
-  printf(" ]-\n");
-
 
   return type;
 }
@@ -866,7 +868,7 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
 						xitk_dnd_callback_t dnd_cb,
 						xitk_widget_list_t *wl, void *user_data) {
   __gfx_t   *fx;
-
+  
   //  printf("%s()\n", __FUNCTION__);
 
   fx = (__gfx_t *) xitk_xmalloc(sizeof(__gfx_t));
@@ -1497,12 +1499,9 @@ void xitk_xevent_notify(XEvent *event) {
 /*
  * Initiatization of widget internals.
  */
-void xitk_init(Display *display) {
+void xitk_init(Display *display, int verbosity) {
   char buffer[256];
   
-  sprintf(buffer, "-[ xiTK version %d.%d.%d ", 
-	  XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
-
   xitk_pid = getppid();
 
 #ifdef ENABLE_NLS
@@ -1511,6 +1510,7 @@ void xitk_init(Display *display) {
 
   gXitk = (__xitk_t *) xitk_xmalloc(sizeof(__xitk_t));
 
+  gXitk->verbosity       = verbosity;
   gXitk->list            = xitk_list_new();
   gXitk->gfx             = xitk_list_new();
   gXitk->display         = display;
@@ -1524,7 +1524,10 @@ void xitk_init(Display *display) {
   gXitk->modalw          = None;
 
   pthread_mutex_init (&gXitk->mutex, NULL);
-
+  
+  sprintf(buffer, "-[ xiTK version %d.%d.%d ", 
+	  XITK_MAJOR_VERSION, XITK_MINOR_VERSION, XITK_SUB_VERSION);
+  
   /* Check if SHM is working */
 #ifdef HAVE_SHM
   if(gXitk->use_xshm) {
@@ -1581,8 +1584,10 @@ void xitk_init(Display *display) {
   sprintf(buffer, "%s%s", buffer, "[XMB]");
 #endif
   
-  sprintf(buffer, "%s%s", buffer, "]-\n");
-  printf(buffer);
+  sprintf(buffer, "%s%s", buffer, " ]-");
+
+  if(verbosity)
+    printf(buffer);
 
   gXitk->wm_type = xitk_check_wm(display);
   

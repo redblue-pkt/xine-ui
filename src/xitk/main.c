@@ -98,6 +98,7 @@ typedef struct {
 #define OPTION_NO_SPLASH        1010
 #define OPTION_STDCTL           1011
 #define OPTION_LIST_PLUGINS     1012
+#define OPTION_BUG_REPORT       1013
 
 
 /* options args */
@@ -159,6 +160,7 @@ static struct option long_options[] = {
   {"no-splash"      , no_argument      , 0, OPTION_NO_SPLASH         },
   {"tvout"          , required_argument, 0, 'T'                      },
   {"list-plugins"   , optional_argument, 0, OPTION_LIST_PLUGINS      },
+  {"bug-report"     , optional_argument, 0, OPTION_BUG_REPORT        },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -417,16 +419,18 @@ static void show_version(void) {
  */
 static void show_banner(void) {
   int major, minor, sub;
-
+  
   show_version();
-  printf(_("Built with xine library %d.%d.%d (%s)\n"),
-	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_VERSION);
+
+  if(gGui->verbosity)
+    printf(_("Built with xine library %d.%d.%d (%s)\n"),
+	    XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_VERSION);
   
   xine_get_version (&major, &minor, &sub);
 
-  printf(_("Found xine library version: %d.%d.%d (%s).\n"), 
-	 major, minor, sub, xine_get_version_string());
-
+  if(gGui->verbosity)
+    printf(_("Found xine library version: %d.%d.%d (%s).\n"), 
+	    major, minor, sub, xine_get_version_string());
 }
 
 static void print_formatted(char *title, const char *const *plugins) {
@@ -1171,7 +1175,7 @@ static void event_listener(void *user_data, const xine_event_t *event) {
 	break;
       }
       
-      if(gGui->verbosity >= 2) {
+      if(gGui->verbosity >= XINE_VERBOSITY_DEBUG) {
 	sprintf(buffer, "%s\n\n[", buffer);
 	
 	if(data->explanation)
@@ -1305,9 +1309,8 @@ int main(int argc, char *argv[]) {
 
   sigemptyset(&vo_mask);
   sigaddset(&vo_mask, SIGALRM);
-  if (sigprocmask (SIG_BLOCK,  &vo_mask, NULL)) {
-    printf (_("sigprocmask() failed.\n"));
-  }
+  if (sigprocmask (SIG_BLOCK,  &vo_mask, NULL))
+    fprintf (stderr, "sigprocmask() failed.\n");
 
   gGui = (gGui_t *) xine_xmalloc(sizeof(gGui_t));
   
@@ -1341,6 +1344,7 @@ int main(int argc, char *argv[]) {
   gGui->lirc_enable            = 1;
 #endif
   gGui->deinterlace_enable     = 0;
+  gGui->report                 = stdout;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1688,6 +1692,43 @@ int main(int argc, char *argv[]) {
       }
       break;
 
+    case OPTION_BUG_REPORT:
+      {
+	FILE   *f;
+
+	if(!(f = fopen("BUG-REPORT.TXT", "w+")))
+	  fprintf(stderr, "fopen(%s) failed: %s.\n", "BUG-REPORT.TXT", strerror(errno));
+	else {
+	  
+	  printf(_("*** NOTE ***\n"));
+	  printf(_(" Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"));
+	  
+	  if (dup2((fileno(f)), STDOUT_FILENO) < 0)
+	    fprintf(stderr, "dup2() failed: %s.\n", strerror(errno));
+	  else {
+	    if (dup2((fileno(f)), STDERR_FILENO) < 0)
+	      fprintf(stdout, "dup2() failed: %s.\n", strerror(errno));
+	  }
+
+	  gGui->report = f;
+	  gGui->verbosity = 0xff;
+	}
+	
+	if(optarg) {
+	  char *p = xine_chomp(optarg);
+
+	  if(!session_argv_num)
+	    session_argv = (char **) xine_xmalloc(sizeof(char *) * 2);
+	  else
+	    session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
+	  
+	  session_argv[session_argv_num] = (char *) xine_xmalloc(strlen(p) + 5);
+	  sprintf(session_argv[session_argv_num], "mrl=%s", p);
+	  session_argv[++session_argv_num]   = NULL;
+	}
+      }
+      break;
+
     default:
       show_usage();
       fprintf (stderr, _("invalid argument %d => exit\n"), c);
@@ -1994,7 +2035,7 @@ int main(int argc, char *argv[]) {
   
   if(session_argv_num) {
     int i = 0;
-
+    
     while(session_argv[i])
       free(session_argv[i++]);
     
@@ -2003,6 +2044,9 @@ int main(int argc, char *argv[]) {
 
   pthread_mutex_destroy(&gGui->xe_mutex);
   pthread_mutex_destroy(&gGui->download_mutex);
+
+  if(gGui->report)
+    fclose(gGui->report);
 
   return 0;
 }

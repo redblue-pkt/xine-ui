@@ -138,7 +138,7 @@ static int init_test(void) {
     return 0;
   }
 
-  xitk_init(test->display);
+  xitk_init(test->display, 1);
 
   XUnlockDisplay (test->display);
 

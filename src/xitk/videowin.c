@@ -1388,7 +1388,8 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 #endif
   {
     /* no Xinerama */
-    printf ("Display is not using Xinerama.\n");
+    if(gGui->verbosity) 
+      printf ("Display is not using Xinerama.\n");
     gVw->fullscreen_width  = DisplayWidth (gGui->display, gGui->screen);
     gVw->fullscreen_height = DisplayHeight (gGui->display, gGui->screen);
   }

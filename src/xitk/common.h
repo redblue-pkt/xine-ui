@@ -28,6 +28,8 @@
 #include "config.h"
 #endif
 
+#include <stdio.h>
+
 #include <xine.h>
 #include <xine/xineutils.h>
 
@@ -357,6 +359,8 @@ typedef struct {
   int                        splash;
 
   pthread_mutex_t            download_mutex;
+
+  FILE                      *report;
 
 } gGui_t;
 
