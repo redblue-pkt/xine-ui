@@ -6,7 +6,7 @@
                          FAQ (Häufig gestellte Fragen)
 
 
-______________________________________________________________2002/05/13 (1.11)
+______________________________________________________________2002/05/27 (1.12)
 INDEX
 
 
@@ -240,18 +240,25 @@ _____________________________________________________________________________
 
 3.2.3      Eigene RPM-Packete erzeugen (xine-lib, xine-ui)
 
-	Es könnte nicht einfacher sein - führen Sie einfach foldendes
-	Kommando aus:
+	Im Prinzip müssen Sie nur ein einziges Kommando ausführen, wenn Sie
+	die Quellcode-tar-Dateien von der WWW-Seite heruntergeladen haben:
 
 	   rpm -ta DER_NAME_DES_TAR_ARCHIVES
 	
-	Die RPMs sollten damit automatisch generiert werden. Die die
-	fertigen Binär-RPMs sollten Sie in ihrem RPM-Binärverzeichnis
-	(i.E.  /usr/src/RPM/RPMS/i686) und die Quellen-RPMs im
-	entsprechenden Verzeichnis (i.E. /usr/src/RPM/SRPMS/) haben.
+	Dies wird das Erzeugen der Binär-RPMs und Quellen-RPMs starten. Nach
+	dem Übersetzen finden Sie das Binär-RPM in ihrem RPM-Binärverzeichnis,
+	welches normalerweise /usr/src/RPM/RPMS/[IHRE_CPU_ARCHITEKTUR] ist.
+	Das Quellen-RPMs wird in ihr RPM-Quelldateienverzeichnis geschrieben
+	(normalerweise /usr/src/RPM/SRPMS/).
 
-	Vergessen Sie bitte nicht, daß Sie xine-lib übersetzen und
-	installieren müssen, *bevor* Sie mit xine-ui fortfahren.
+	Falls Sie eine frische CVS-Version verwenden, müssen Sie zunächst
+	folgendes ausführen, um ein tar-Archive zu erzeugen, daß Sie dann
+	wie oben beschrieben mit "rpm -ta" benutzen können:
+
+	   ./cvscompile.sh && make clean && make dist
+
+	Auf jeden Fall sollten Sie nicht vergessen, daß Sie xine-lib
+	übersetzen und installieren müssen, bevor Sie mit xine-ui fortfahren.
 
 
 3.3     Wie kann ich den Build-Prozess mit CFLAGS steuern?
@@ -917,3 +924,5 @@ _____________________________________________________________________________
 
         Übersetzung dieses Textes ins Deutsche:
            Stephan Walter <stephan.walter@gmx.ch>
+	Aktualisiert von:
+	   Philipp Hahn <pmhahn@users.sourceforge.net>
