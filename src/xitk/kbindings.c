@@ -481,8 +481,8 @@ static void _kbindings_subst_percent(char *src, char *dest) {
     strncpy(dest, src, strlen(src));
 }
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
-  int            i, j, found = -1;
-  xitk_window_t *xw;
+  int            i, j, found = 0;
+  char          *kmsg = NULL;
       
   if(kbt == NULL)
     return;
@@ -493,37 +493,57 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 	if((!strcmp(kbt->entry[i]->key, kbt->entry[j]->key)) &&
 	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier) && 
 	   (strcasecmp(kbt->entry[i]->key, "void"))) {
-	  char  buffer[4096];
-	  char  action1[1024], action2[1024];
+	  char action1[1024], action2[1024];
+	  char *dna = _("and");
+	  int  len;
+	  
+	  found++;
 	  
 	  memset(&action1, 0, sizeof(action1));
 	  memset(&action2, 0, sizeof(action2));
-	  _kbindings_subst_percent(kbt->entry[j]->action, &action2[0]);
 	  _kbindings_subst_percent(kbt->entry[i]->action, &action1[0]);
-	  
-	  found = i;
-	  
-	  memset(&buffer, 0, sizeof(buffer));
-	  sprintf(buffer, _("Key bindings of '%s' and '%s' are the same.\n\n"
-			    "What do you want to do with current key bindings?\n"), action1, action2);
+	  _kbindings_subst_percent(kbt->entry[j]->action, &action2[0]);
 
-	  xw = xitk_window_dialog_three_buttons_with_width(gGui->imlib_data,
-							   _("Keybindings error!"),
-							   _("Reset"), _("Editor"), _("Cancel"),
-							   _kbinding_reset_cb, _kbinding_editor_cb, NULL,
-							   (void *) kbt, 400, ALIGN_CENTER,
-							   buffer);
-	  XLockDisplay(gGui->display);
-	  if(!gGui->use_root_window)
-	    XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-	  XSync(gGui->display, False);
-	  XUnlockDisplay(gGui->display);
-	  layer_above_video(xitk_window_get_window(xw));
+	  len = strlen(action1) + 1 + strlen(dna) + 1 + strlen(action2);
+
+	  if(!kmsg) {
+	    char *header = _("The following key bindings pairs are identical:\n\n");
+	    len += strlen(header);
+	    kmsg = (char *) xine_xmalloc(len + 1);
+	    sprintf(kmsg, "%s%s%c%s%c%s", header, action1,' ', dna, ' ', action2);
+	  }
+	  else {
+	    len += 2;
+	    kmsg = (char *) realloc(kmsg, strlen(kmsg) + len + 1);
+	    sprintf(kmsg, "%s%s%s%c%s%c%s", kmsg, ", ", action1, ' ', dna, ' ', action2);
+	  }
 	}
       }
     }
   }
-  
+
+  if(found) {
+    xitk_window_t *xw;
+    char          *footer = _(".\n\nWhat do you want to do ?\n");
+    
+    kmsg = (char *) realloc(kmsg, strlen(kmsg) + strlen(footer) + 1);
+    sprintf(kmsg, "%s%s", kmsg, footer);
+
+    xw = xitk_window_dialog_three_buttons_with_width(gGui->imlib_data,
+						     _("Keybindings error!"),
+						     _("Reset"), _("Editor"), _("Cancel"),
+						     _kbinding_reset_cb, _kbinding_editor_cb, NULL,
+						     (void *) kbt, 450, ALIGN_CENTER,
+						     kmsg);
+    free(kmsg);
+    XLockDisplay(gGui->display);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
+    XSync(gGui->display, False);
+    XUnlockDisplay(gGui->display);
+    layer_above_video(xitk_window_get_window(xw));
+  }
+
 }
 
 /*
@@ -531,18 +551,23 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
  */
 static void _kbindings_free_bindings(kbinding_t *kbt) {
   kbinding_entry_t **k;
-  int                i;
   
   if(kbt == NULL)
     return;
-
-  k = kbt->entry;
-  for(i = (kbt->num_entries - 1); i >= 0; i--) {
-    SAFE_FREE(k[i]->comment);
-    SAFE_FREE(k[i]->action);
-    SAFE_FREE(k[i]->key);
-    free(k[i]);
+  
+  if((k = kbt->entry)) {
+    int i = kbt->num_entries - 1;
+    
+    if(i && (i < MAX_ENTRIES)) {
+      for(; i >= 0; i--) {
+	SAFE_FREE(k[i]->comment);
+	SAFE_FREE(k[i]->action);
+	SAFE_FREE(k[i]->key);
+	free(k[i]);
+      }
+    }
   }
+  
   SAFE_FREE(kbt);
 }
 
@@ -709,7 +734,6 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     /*
      * Add new entry (struct memory already allocated)
      */
-
     kbt->entry[kbt->num_entries - 1]->is_alias  = 1;
     kbt->entry[kbt->num_entries - 1]->comment   = strdup(k->comment);
     kbt->entry[kbt->num_entries - 1]->action    = strdup(k->action);
@@ -729,7 +753,6 @@ static void _kbindings_add_entry(kbinding_t *kbt, user_kbinding_t *ukb) {
     kbt->entry[kbt->num_entries]->modifier  = 0;
   
     kbt->num_entries++;
-
   }
 }
 
@@ -876,6 +899,7 @@ static void _kbinding_load_config(kbinding_t *kbt, char *file) {
 
   SAFE_FREE(kbdf->bindingfile);
   SAFE_FREE(kbdf);
+
 }
 
 static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FILE *stream) {
@@ -948,6 +972,7 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
     fprintf(stream, "##\n# End of xine key bindings.\n##\n");
     break;
   }
+
 }
 /*
  * Display all key bindings from kbt key binding table.
@@ -1001,8 +1026,8 @@ static kbinding_t *_kbindings_init_to_default(void) {
   kbt->entry[i]->action_id = 0;
   kbt->entry[i]->key = NULL;
   kbt->entry[i]->modifier = 0;
-  
-  kbt->num_entries = i+1;
+
+  kbt->num_entries = i + 1;
 
   return kbt;
 }
@@ -1073,7 +1098,7 @@ kbinding_t *kbindings_duplicate_kbindings(kbinding_t *kbt) {
   ABORT_IF_NULL(kbt);
   
   k = (kbinding_t *) xine_xmalloc(sizeof(kbinding_t));
-  
+
   for(i = 0; kbt->entry[i]->action != NULL; i++) {
     k->entry[i]            = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_entry_t));
     k->entry[i]->comment   = strdup(kbt->entry[i]->comment);
@@ -1186,10 +1211,12 @@ char *kbindings_get_shortcut(kbinding_t *kbt, char *action) {
   kbinding_entry_t  *k;
   static char shortcut[32];
   
-  if(kbt && action && (k = kbindings_lookup_action(kbt, action))) {
-    if(strcmp(k->key, "VOID")) {
-      sprintf(shortcut, "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(k), ']');
-      return shortcut;
+  if(kbt) {
+    if(action && (k = kbindings_lookup_action(kbt, action))) {
+      if(strcmp(k->key, "VOID")) {
+	sprintf(shortcut, "%c%s%c", '[', _kbindings_get_shortcut_from_kbe(k), ']');
+	return shortcut;
+      }
     }
   }
   return NULL;
@@ -1199,7 +1226,7 @@ char *kbindings_get_shortcut(kbinding_t *kbt, char *action) {
  * Return a key binding entry (if available) matching with action string.
  */
 kbinding_entry_t *kbindings_lookup_action(kbinding_t *kbt, const char *action) {
-  kbinding_entry_t  *k;
+  kbinding_entry_t  *kret = NULL, *k;
   int                i;
 
   if((action == NULL) || (kbt == NULL))
@@ -1207,24 +1234,25 @@ kbinding_entry_t *kbindings_lookup_action(kbinding_t *kbt, const char *action) {
 
   /* CHECKME: Not case sensitive */
   for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
-    if(!strcasecmp(k->action, action))
-      return k;
+    if(!strcasecmp(k->action, action)) {
+      kret = k;
+      break;
+    }
   }
-
+  
   /* Unknown action */
-  return NULL;
+  return kret;
 }
 
 /*
  * Try to find and entry in key binding table matching with key and modifier value.
  */
 static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *key, int modifier) {
-  kbinding_entry_t *k;
+  kbinding_entry_t *kret = NULL, *k;
   int               i;
 
   if((key == NULL) || (kbt == NULL))
     return NULL;
-
 
 #ifdef TRACE_KBINDINGS
   printf("Looking for: '%s' [", key);
@@ -1245,8 +1273,10 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
 
   /* Be case sensitive */
   for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
-    if((!(strcmp(k->key, key))) && (modifier == k->modifier))
-      return k;
+    if((!(strcmp(k->key, key))) && (modifier == k->modifier)) {
+      kret = k;
+      goto __found;
+    }
   }
 
   /* Not case sensitive */
@@ -1258,12 +1288,16 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
   */
   /* Last chance */
   for(i = 0, k = kbt->entry[0]; kbt->entry[i]->action != NULL; i++, k = kbt->entry[i]) {
-    if((!(strcmp(k->key, key))) && (k->modifier == KEYMOD_NOMOD))
-      return k;
+    if((!(strcmp(k->key, key))) && (k->modifier == KEYMOD_NOMOD)) {
+      kret = k;
+      break;
+    }
   }
 
+ __found:
+
   /* Keybinding unknown */
-  return NULL;
+  return kret;
 }
 
 /*
@@ -1389,13 +1423,13 @@ static void kbedit_create_browser_entries(void) {
     free((char **)kbedit->entries);
     free((char **)kbedit->shortcuts);
   }
-
-  kbedit->entries   = (char **) xine_xmalloc(sizeof(char *) * (kbedit->kbt->num_entries + 1));
-  kbedit->shortcuts = (char **) xine_xmalloc(sizeof(char *) * (kbedit->kbt->num_entries + 1));
-  kbedit->num_entries = (kbedit->kbt->num_entries - 1);
   
   fs = xitk_font_load_font(gGui->display, br_fontname);
   xitk_font_set_font(fs, (XITK_WIDGET_LIST_GC(kbedit->widget_list)));
+  
+  kbedit->entries   = (char **) xine_xmalloc(sizeof(char *) * kbedit->kbt->num_entries);
+  kbedit->shortcuts = (char **) xine_xmalloc(sizeof(char *) * kbedit->kbt->num_entries);
+  kbedit->num_entries = kbedit->kbt->num_entries - 1;
   
   for(i = 0; i < kbedit->num_entries; i++) {
     char  buf[2048];
@@ -1608,8 +1642,11 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
   
   /* We can delete alias entries, only */
   if(s >= 0) {
+    
     if(kbedit->kbt->entry[s]->is_alias) {
       int i;
+      
+      
       xitk_browser_release_all_buttons(kbedit->browser);
       
       free(kbedit->kbt->entry[s]->comment);
@@ -1617,8 +1654,13 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
       free(kbedit->kbt->entry[s]->key);
       free(kbedit->kbt->entry[s]);
       
+      
       for(i = s; s < kbedit->num_entries; s++)
 	kbedit->kbt->entry[s] = kbedit->kbt->entry[s + 1];
+
+      kbedit->kbt->entry[s]->comment = NULL;
+      kbedit->kbt->entry[s]->action  = NULL;
+      kbedit->kbt->entry[s]->key     = NULL;
       
       kbedit->kbt->num_entries--;
       
@@ -1628,9 +1670,9 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
 			       (const char* const*) kbedit->entries, 
 			       (const char* const*) kbedit->shortcuts, kbedit->num_entries, 0);
     }
-    else {
+    else
       xine_error(_("You can only delete alias entries."));
-    }
+    
   }
 }
 
@@ -1676,6 +1718,7 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
   switch(kbedit->action_wanted) {
     
   case KBEDIT_ALIASING:
+
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment = strdup(kbedit->ksel->comment);
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action = strdup(kbedit->ksel->action);
     kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
@@ -1718,6 +1761,7 @@ static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
   SAFE_FREE(kbe->key);
   SAFE_FREE(kbe);
   kbedit_unset();
+
 }
 
 static void kbedit_accept_no(xitk_widget_t *w, void *data, int state) {
