@@ -22,10 +22,9 @@ Group:       Applications/Multimedia
 Source:      http://xinehq.de/files/%{name}-%{version}.tar.gz
 URL:         http://xinehq.de
 Packager:    Manfred Tremmel <Manfred.Tremmel@iiv.de>
-Obsoletes:   xine
 Requires:    %{libname} >= %{libvers}
 Requires:    curl
-Requires:    readline 
+Requires:    readline
 BuildPreReq: %{libname}-devel >= %{libvers}
 BuildRoot:   %{_tmppath}/%{name}-buildroot
 
