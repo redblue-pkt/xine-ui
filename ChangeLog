@@ -3,6 +3,8 @@
     set gui.video_display to the second display name, usually ":0.1" or ":1",
   * removed -funroll-all-loops from SPARC and PPC targets.
   * fix xitk trying set a window property when its atom may be undefined
+  * add --disable-shm-default configure option which sets feature.shm to zero
+    but keeps the shm code compiled in
 
 xine-ui (0.99.1) unstable; urgency=low
 

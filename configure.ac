@@ -196,7 +196,12 @@ AM_CONDITIONAL(HAVE_XV, test x$ac_have_xv = "xyes")
 dnl
 dnl Shm
 dnl
-AC_ARG_ENABLE(shm, [  --disable-shm           Disable shared memory support if available.], echo $enable_shm, enable_shm="yes")
+AC_ARG_ENABLE(shm, [  --disable-shm           Disable shared memory support in build.], disable_shm_default="yes", enable_shm="yes")
+AC_ARG_ENABLE(shm, [  --disable-shm-default   Disable shared memory support by default.], disable_shm_default="yes",)
+
+if test "x$disable_shm_default" = "xyes"; then
+  AC_DEFINE(DISABLE_SHM_DEFAULT,,[Disable shared memory by default])
+fi
 
 dnl If we are compiling without shared memory support, then don\'t do
 dnl the checks for XShm

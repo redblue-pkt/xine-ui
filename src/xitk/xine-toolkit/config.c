@@ -328,10 +328,10 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   xtcf->colors.warn_background = -1;
   xtcf->timers.label_anim      = 50000;
   xtcf->timers.dbl_click       = 400;
-#ifdef HAVE_SHM
-  xtcf->features.shm           = 1;
-#else
+#ifdef DISABLE_SHM_DEFAULT
   xtcf->features.shm           = 0;
+#else
+  xtcf->features.shm           = 1;
 #endif
   xtcf->features.oldbarstyle   = 0;
   xtcf->features.checkstyle    = CHECK_STYLE_CHECK;
