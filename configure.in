@@ -16,7 +16,7 @@ dnl AC_PREREQ_LIBTOOL(1.4.0,,AC_MSG_ERROR(*** You should have libtool >= 1.4 ins
 
 XINE_MAJOR=0
 XINE_MINOR=9
-XINE_SUB=13
+XINE_SUB=14
 if test -f .cvsversion; then
   XINE_PRE="cvs"
 else
@@ -118,7 +118,7 @@ AC_SUBST(DEBUG_CFLAGS)
 dnl
 dnl Check for xine-lib
 dnl
-AM_PATH_XINE(0.9.13,, AC_MSG_ERROR(*** You should install xine-lib first ***))
+AM_PATH_XINE(0.9.14,, AC_MSG_ERROR(*** You should install xine-lib first ***))
 
 
 dnl
