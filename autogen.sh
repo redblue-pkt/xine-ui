@@ -1,7 +1,7 @@
 #!/bin/sh
 # run this to generate all the initial makefiles, etc.
 
-PROG=xine-lib
+PROG=xine-ui
 
 # Check how echo works in this /bin/sh
 case `echo -n` in
