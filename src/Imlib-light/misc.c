@@ -7,6 +7,10 @@
 #include "Imlib_private.h"
 #include <locale.h>
 
+#ifdef HAVE_SHM
+#include <X11/extensions/XShm.h>
+#endif
+
 #ifdef __EMX__
 extern const char *__XOS2RedirRoot(const char *);
 #endif
