@@ -101,6 +101,7 @@ static void playlist_reactivate(void) {
 
 static void _playlist_update_browser_list(int start) {
   int sel = xitk_browser_get_current_selected(playlist->playlist);
+  int old_start = xitk_browser_get_current_start(playlist->playlist);
 
   if(gGui->is_display_mrl)
     xitk_browser_update_list(playlist->playlist, 
@@ -111,9 +112,8 @@ static void _playlist_update_browser_list(int start) {
 			     (const char **)playlist->playlist_idents, 
 			     playlist->playlist_len, start);
 
-  if((sel >= 0) && (start == -1))
+  if((sel >= 0) && ((start == -1) || (old_start == start)))
     xitk_browser_set_select(playlist->playlist, sel);
-
 }
 
 
@@ -228,6 +228,8 @@ static void _playlist_play_on_dbl_click(xitk_widget_t *w, void *data, int select
 static void _playlist_delete(xitk_widget_t *w, void *data) {
   int i, j;
   
+  mmk_editor_end();
+
   if((j = xitk_browser_get_current_selected(playlist->playlist)) >= 0) {
     
     if((gGui->playlist.cur == j) && ((xine_get_status(gGui->stream) != XINE_STATUS_STOP)))
@@ -269,6 +271,8 @@ static void _playlist_delete(xitk_widget_t *w, void *data) {
  */
 static void _playlist_delete_all(xitk_widget_t *w, void *data) {
 
+  mmk_editor_end();
+
   mediamark_free_mediamarks();
   playlist_update_playlist();
   
@@ -285,6 +289,8 @@ static void _playlist_delete_all(xitk_widget_t *w, void *data) {
  */
 static void _playlist_move_updown(xitk_widget_t *w, void *data) {
   int j;
+
+  mmk_editor_end();
 
   if((j = xitk_browser_get_current_selected(playlist->playlist)) >= 0) {
     mediamark_t *mmk;
@@ -308,18 +314,14 @@ static void _playlist_move_updown(xitk_widget_t *w, void *data) {
 
     _playlist_create_playlists();
 
-    if(j < start) {
+    if(j <= start)
       _playlist_update_browser_list(j);
-      xitk_browser_set_select(playlist->playlist, 0);
-    }
-    else if(j >= (start + max_vis_len)) {
+    else if(j >= (start + max_vis_len))
       _playlist_update_browser_list(start + 1);
-      xitk_browser_set_select(playlist->playlist, max_vis_len - 1);
-    }
-    else {
+    else
       _playlist_update_browser_list(-1);
-      xitk_browser_set_select(playlist->playlist, j - start);
-    }
+
+    xitk_browser_set_select(playlist->playlist, j);
   }
 }
 
@@ -328,6 +330,8 @@ static void _playlist_move_updown(xitk_widget_t *w, void *data) {
  */
 static void _playlist_load_callback(filebrowser_t *fb) {
   char *file;
+
+  mmk_editor_end();
 
   if((file = filebrowser_get_full_filename(fb)) != NULL) {
     mediamark_load_mediamarks(file);
@@ -591,8 +595,11 @@ void playlist_show_tips(int enabled, unsigned long timeout) {
 void playlist_mrlident_toggle(void) {
 
   if(playlist && playlist->visible) {
+    int start = xitk_browser_get_current_start(playlist->playlist);
+    
     _playlist_create_playlists();
-    _playlist_update_browser_list(-1);
+    _playlist_update_browser_list(start);
+
     mmkeditor_set_mmk(&gGui->playlist.mmk[(xitk_browser_get_current_selected(playlist->playlist))]);
   }
 }
@@ -812,14 +819,27 @@ void playlist_update_focused_entry(void) {
 	  
 	  if(!strcmp(pa_mrl, pl_mrl)) {
 	    int max_displayed = xitk_browser_get_num_entries(playlist->playlist);
+	    int start = xitk_browser_get_current_start(playlist->playlist);
+	    int selected = xitk_browser_get_current_selected(playlist->playlist);
 	    
-	    if((gGui->playlist.num - gGui->playlist.cur) >= max_displayed)
+	    /* current is bottom */
+	    if((selected >= 0) && (gGui->playlist.cur != selected))
+	      _playlist_update_browser_list(start);
+	    else if((gGui->playlist.cur - start) >= max_displayed)
 	      _playlist_update_browser_list(gGui->playlist.cur);
-	    else
+	    else if((gGui->playlist.cur - start) < start)
 	      _playlist_update_browser_list(gGui->playlist.num - max_displayed);
+	    else
+	      _playlist_update_browser_list(start);
 	    
-	    xitk_inputtext_change_text(playlist->winput, 
-				       playlist->playlist_mrls[gGui->playlist.cur]);
+	    if(selected >= 0) {
+	      xitk_browser_set_select(playlist->playlist, selected);
+ 	      xitk_inputtext_change_text(playlist->winput,
+ 					 playlist->playlist_mrls[selected]);
+	    }
+	    else
+	      xitk_inputtext_change_text(playlist->winput, 
+					 playlist->playlist_mrls[gGui->playlist.cur]);
 	    
 	  }
 	  
@@ -922,14 +942,6 @@ void playlist_change_skins(void) {
 	}
 	break;
       }
-      ////
-      /*       while(playlist->autoplay_plugins[i] != NULL) { */
-      
-      /* 	(void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y); */
-      
-      /* 	y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1; */
-      /* 	i++; */
-      /*       } */
     }
     
     xitk_paint_widget_list(playlist->widget_list);

@@ -314,6 +314,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 
 int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time) {
   char *mrl = _mrl;
+  int   sub_opened = 0;
   
   if((!strncasecmp(mrl, "ftp://", 6)) || (!strncasecmp(mrl, "dload:/", 7)))  {
     char        *url = mrl;
@@ -393,10 +394,15 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
     gui_handle_xine_error(gGui->stream);
     return 0;
   }
-  if(!gui_xine_play(gGui->stream, start_pos, start_time, 1)) {
-    return 0;
-  }
 
+#if 0
+  if(_sub)
+    sub_opened = xine_open(gGui->spu_stream, _sub);
+#endif
+  
+  if(!gui_xine_play(gGui->stream, start_pos, start_time, 1))
+    return 0;
+  
   if(!strcmp(mrl, gGui->mmk.mrl))
     gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
   
@@ -445,7 +451,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
     xine_post_dispose(gGui->xine, gGui->visual_anim.post_output);
 
   xine_dispose(gGui->stream);
-  /* xine_dispose(gGui->visual_anim.stream); */
+  xine_dispose(gGui->visual_anim.stream);
 
   if(gGui->vo_port)
     xine_close_video_driver(gGui->xine, gGui->vo_port);
@@ -1144,7 +1150,7 @@ void gui_set_current_mrl(mediamark_t *mmk) {
   if(mmk) {
     gGui->mmk.mrl   = strdup(mmk->mrl);
     gGui->mmk.ident = strdup(((mmk->ident) ? mmk->ident : mmk->mrl));
-    gGui->mmk.sub   = mmk->sub ? strdup(mmk->sub) : NULL;
+    gGui->mmk.sub   = mmk->sub ? strdup(mmk->sub): NULL;
     gGui->mmk.start = mmk->start;
     gGui->mmk.end   = mmk->end;
   }

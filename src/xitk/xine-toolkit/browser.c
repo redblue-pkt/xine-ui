@@ -289,7 +289,7 @@ void xitk_browser_set_select(xitk_widget_t *w, int select) {
     
     xitk_browser_release_all_buttons(w);
     
-    xitk_labelbutton_set_state(private_data->item_tree[select+WBSTART], 1);
+    xitk_labelbutton_set_state(private_data->item_tree[(select - private_data->current_start) + WBSTART], 1);
   }
 }
 
@@ -668,33 +668,24 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
     private_data = (browser_private_data_t*) ((btnlist_t*)data)->itemlist->private_data;
     
     if(private_data->dbl_click_callback || private_data->callback) {
-      if(!strcasecmp((xitk_labelbutton_get_label(private_data->
-						 item_tree[(int)((btnlist_t*)data)->
-							  sel])), "")) {
-	xitk_labelbutton_set_state((xitk_widget_t*)(private_data->
-						    item_tree[(int)((btnlist_t*)data)->sel]), 0);
+      if(!strcasecmp((xitk_labelbutton_get_label(private_data-> item_tree[(int)((btnlist_t*)data)->sel])), "")) {
+	xitk_labelbutton_set_state((xitk_widget_t*)(private_data->item_tree[(int)((btnlist_t*)data)->sel]), 0);
       }
       
       for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
-	if((xitk_labelbutton_get_state(private_data->item_tree[i]))
-	   && (i != ((btnlist_t*)data)->sel)) {
+	if((xitk_labelbutton_get_state(private_data->item_tree[i])) && (i != ((btnlist_t*)data)->sel)) {
 	  xitk_labelbutton_set_state(private_data->item_tree[i], 0);
 	}
       }
       
-      if((i = xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
-	// Callback call
-	private_data->jumped = i;
-
-	if(private_data->callback)
-	  private_data->callback(((btnlist_t*)data)->itemlist, private_data->userdata, i);
-      }
-      
-      
-      /* A button is currently selected */
-      if((btn_selected = 
-	  xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
+      if((btn_selected = xitk_browser_get_current_selected(((btnlist_t*)data)->itemlist)) > -1) {
+	/*  Callback call */
+	private_data->jumped = btn_selected;
 	
+	if(private_data->callback)
+	  private_data->callback(((btnlist_t*)data)->itemlist, private_data->userdata, btn_selected);
+      
+	/* A button is currently selected */
 	private_data->current_button_clicked = btn_selected;
 	
 	if(private_data->last_button_clicked == private_data->current_button_clicked) {

@@ -1248,11 +1248,15 @@ int main(int argc, char *argv[]) {
     }
     gGui->ao_port = load_audio_out_driver(driver_num);
   }
-  SAFE_FREE(audio_driver_id);
-
+  SAFE_FREE(audio_driver_id)
+;
   post_init();
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
+#if 0
+  gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+  xine_stream_master_slave(gGui->stream, gGui->spu_stream, 0);
+#endif
 
   osd_init();
 
