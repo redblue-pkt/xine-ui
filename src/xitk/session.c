@@ -422,6 +422,8 @@ int setup_ctrlsocket(void) {
 		 saddr.sun_path, strerror(errno));
 	}
       }
+      else
+	continue;
       
       if((bind(ctrl_fd, (struct sockaddr *) &saddr, sizeof (saddr))) != -1) {
 
