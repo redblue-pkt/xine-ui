@@ -1,5 +1,8 @@
 xine-ui (0.9.18) unstable; urgency=low
 
+  * support spu offset tunning.
+  * 'newbie mode' has been renamed 'smart mode', it seems some people 
+    found this mode name quite offending (but they was wrong!).
   * add linux fb frontend from Fredrik Noring <noring@nocrew.org>
   * add session control support
   * support again text subtitle in mrl (::<sub file>),
