@@ -38,6 +38,13 @@ audio_driver_name       audio driver to use, same as command line
                         option -A
                         (e.g. alsa05, alsa09, arts, esd, sun)
 
+audio_force_rate	If non-zero, force audio output rate to specified
+			value for systems with braindead audio drivers that
+			don't properly communicate back what audio rates they
+			do support.  The default value of 0 attempts to
+			automatically detect the optimum audio output rate
+			(e.g. use 44100 to force 44.1 KHz audio)
+
 audio_resample_mode	Adjust whether resampling is done or not.
 			1 force off
 			2 force on
