@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.11\n"
+"Project-Id-Version: xine-ui 0.9.13\n"
 "POT-Creation-Date: 2002-07-31 02:48+0200\n"
 "PO-Revision-Date: 2002-01-17 00:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
@@ -20,7 +20,7 @@ msgstr "MRL (vstupný prúd) nebolo ¹pecifikované"
 #: src/xitk/actions.c:395 src/xitk/actions.c:410
 #, c-format
 msgid "gui_set_current_position: can't create new thread (%s)\n"
-msgstr ""
+msgstr "gui_set_current_position: nemô¾em vytvori» nový thread (%s)\n"
 
 #: src/xitk/actions.c:745
 #, c-format
@@ -119,7 +119,7 @@ msgid ""
 msgstr ""
 "- chyba xine enginu -\n"
 "\n"
-"Nie je dostupný vstupný plugin pre '%s'.\n"
+"Nie je dostupný demuxer plugin pre '%s'.\n"
 "Obyèajne to znamená, ¾e formát súboru nebol rozpoznaný."
 
 #: src/xitk/errors.c:207
@@ -171,7 +171,7 @@ msgstr "synchronizovaný X protokol (debug)"
 
 #: src/xitk/event.c:765
 msgid "Warning! Synchronized X activated - this is way slow...\n"
-msgstr "Varovanie! Synchronizovaný X aktivovaný - toto je pomalé..\n"
+msgstr "Varovanie! Synchronizovaný X aktivovaný - toto je pomalé.\n"
 
 #: src/xitk/event.c:770
 msgid "use wm layer property to place window on top"
@@ -187,7 +187,7 @@ msgstr "èas medzi screensaver fake udalos»ami, 0 na zakázanie"
 
 #: src/xitk/event.c:786
 msgid "play next|previous chapter instead of mrl (dvdnav)"
-msgstr ""
+msgstr "prehra» ïal¹iu|predchádzajúcu kapitolu namiesto mrl (dvdnav)"
 
 #. Some infos
 #: src/xitk/event.c:797
@@ -887,7 +887,7 @@ msgstr "Nepodarilo sa natiahnu» %s, zlá verzia. Natiahnite starý skin '%s'.\n"
 #: src/xitk/skins.c:327
 #, fuzzy, c-format
 msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr "Och, skin '%s' sa nena¹iel, pou¾ite bezpeèný '%s'.\n"
+msgstr "Och, skin sa nena¹iel, pou¾ite bezpeèný '%s'.\n"
 
 #: src/xitk/skins.c:354
 msgid "No available skin found. Say goodbye.\n"
@@ -1011,7 +1011,7 @@ msgstr "XF86VidMode Extension: %d modeline nájdené.\n"
 #: src/xitk/videowin.c:1161
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
-msgstr "XF86VidMode Extension: nemohol získa» zoznam dost. modeline. Zlyhal.\n"
+msgstr "XF86VidMode Extension: nemohol získa» zoznam dost. modeline Zlyhal.\n"
 
 #: src/xitk/videowin.c:1164
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
