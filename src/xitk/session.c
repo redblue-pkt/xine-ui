@@ -413,15 +413,14 @@ void *ctrlsocket_func(void *data) {
 
 void deinit_session(void) {
   if(session_id >= 0) {
-    char          socketname[XITK_PATH_MAX + XINE_NAME_MAX + 1];
     struct stat   sstat;
     
     going = 0;
     close(ctrl_fd);
-    sprintf(socketname, "%s/.xine/session.%d", (xine_get_homedir()), session_id);
-    if(((stat(socketname, &sstat)) > -1) && (S_ISSOCK(sstat.st_mode)))
-      unlink(socketname);
+    if(((stat(socket_name, &sstat)) > -1) && (S_ISSOCK(sstat.st_mode)))
+      unlink(socket_name);
     
+    free(socket_name);
   }
 }
 
