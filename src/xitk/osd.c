@@ -116,7 +116,7 @@ static uint8_t trans[OVL_PALETTE_SIZE];
 
 #define MINIMUM_WIN_WIDTH  300
 #define FONT_SIZE          20
-#define UNSCALED_FONT_SIZE 32
+#define UNSCALED_FONT_SIZE 24
 
 static void  _xine_osd_show(xine_osd_t *osd, int64_t vpts) {
   if( gGui->osd.use_unscaled && gGui->osd.unscaled_available )
