@@ -182,6 +182,7 @@ static lang_locale_t lang_locales[] = {
   { "it_IT",    "iso88591",   NULL       },
   { "it_IT",    "iso885915",  "euro"     },
   { "iw_IL",    "iso88598",   NULL       },
+  { "ja_JP",    "utf8",       NULL       },
   { "ja_JP",    "eucjp",      NULL       },
   { "ja_JP",    "ujis",       NULL       },
   { "japanese", "euc",        NULL       },
