@@ -194,7 +194,7 @@ void gui_handle_xine_error(void) {
     
   case XINE_ERROR_NO_INPUT_PLUGIN:
     xine_error_with_more(_("- xine engine error -\n\n"
-			   "There is no input plugin available to handle '%s'.\nMaybe MRL syntax is wrong or file/stream source doesn not exist."),
+			   "There is no input plugin available to handle '%s'.\nMaybe MRL syntax is wrong or file/stream source doesn't exist."),
 			 gGui->filename);
     break;
     
