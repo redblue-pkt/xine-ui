@@ -1372,7 +1372,8 @@ int main(int argc, char *argv[]) {
   gGui->report                 = stdout;
   gGui->ssaver_enabled         = 1;
   gGui->no_gui                 = 0;
-
+  gGui->nongui_error_msg       = NULL;
+  
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
   window_attribute.borderless = 0;

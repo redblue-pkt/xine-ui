@@ -59,6 +59,11 @@ static void errors_create_window(char *title, char *message) {
   
   dump_error(gGui->verbosity, message);
 
+  if( gGui->nongui_error_msg ) {
+    gGui->nongui_error_msg( message );
+    return;
+  }
+  
   xw = xitk_window_dialog_two_buttons_with_width(gGui->imlib_data, title, 
 						 _("Done"), _("More..."),
 						 NULL, _errors_display_log, 
@@ -109,20 +114,26 @@ void xine_error(char *message, ...) {
     printf("%s\n", buf);
   }
   else {
-    xitk_window_t *xw;
     char buf2[(strlen(buf) * 2) + 1];
     
     dump_error(gGui->verbosity, buf);
-    
+
     xitk_subst_special_chars(buf, buf2);
-    xw = xitk_window_dialog_error(gGui->imlib_data, buf2);
-    
-    if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-      XLockDisplay(gGui->display);
-      XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-      XUnlockDisplay(gGui->display);
+
+    if( gGui->nongui_error_msg ) {
+      gGui->nongui_error_msg( buf2 );
+    } else {
+      xitk_window_t *xw;
+
+      xw = xitk_window_dialog_error(gGui->imlib_data, buf2);
+
+      if(!gGui->use_root_window && gGui->video_display == gGui->display) {
+        XLockDisplay(gGui->display);
+        XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
+        XUnlockDisplay(gGui->display);
+      }
+      layer_above_video(xitk_window_get_window(xw));
     }
-    layer_above_video(xitk_window_get_window(xw));
   }
 
   free(buf);
@@ -164,7 +175,9 @@ void xine_error_with_more(char *message, ...) {
   }
   else {
     char buf2[(strlen(buf) * 2) + 1];
+
     xitk_subst_special_chars(buf, buf2);
+
     errors_create_window(_("Error"), buf2);
   }
   
@@ -206,18 +219,24 @@ void xine_info(char *message, ...) {
     printf("%s\n", buf);
   }
   else {
-    xitk_window_t *xw;
     char           buf2[(strlen(buf) * 2) + 1];
 
     xitk_subst_special_chars(buf, buf2);
-    xw = xitk_window_dialog_info(gGui->imlib_data, buf2);
 
-    if(!gGui->use_root_window && gGui->video_display == gGui->display) {
-      XLockDisplay(gGui->display);
-      XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
-      XUnlockDisplay(gGui->display);
+    if( gGui->nongui_error_msg ) {
+      gGui->nongui_error_msg( buf2 );
+    } else {
+      xitk_window_t *xw;
+
+      xw = xitk_window_dialog_info(gGui->imlib_data, buf2);
+
+      if(!gGui->use_root_window && gGui->video_display == gGui->display) {
+        XLockDisplay(gGui->display);
+        XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
+        XUnlockDisplay(gGui->display);
+      }
+      layer_above_video(xitk_window_get_window(xw));
     }
-    layer_above_video(xitk_window_get_window(xw));
   }
 
   free(buf);
@@ -323,7 +342,10 @@ void too_slow_window(void) {
 
   if( !display_warning )
     return;
-  
+
+  if( gGui->nongui_error_msg || gGui->stdctl_enable )
+    return;
+      
   _dont_show_too_slow_again(NULL, NULL, checked);
     
   xw = xitk_window_dialog_checkbox_two_buttons_with_width(gGui->imlib_data, title, 

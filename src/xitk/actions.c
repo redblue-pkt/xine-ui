@@ -1560,6 +1560,8 @@ void gui_playlist_show(xitk_widget_t *w, void *data) {
 
 void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
+  gGui->nongui_error_msg = NULL;
+
   if(!mrl_browser_is_running()) {
     open_mrlbrowser(NULL, NULL);
   }
@@ -2032,6 +2034,8 @@ static void fileselector_all_callback(filebrowser_t *fb) {
 
 void gui_file_selector(void) {
   filebrowser_callback_button_t  cbb[3];
+
+  gGui->nongui_error_msg = NULL;
 
   if(load_stream)
     filebrowser_raise_window(load_stream);

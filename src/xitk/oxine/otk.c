@@ -154,6 +154,7 @@ struct otk_label_s {
 
   char            *text;
   int              alignment;
+  int              font_size;
 };
 
 struct otk_window_s {
@@ -641,6 +642,7 @@ static void button_draw(otk_widget_t *this) {
 		     this->y+this->h/2, 
 		     displayed_text, ODK_ALIGN_CENTER | ODK_ALIGN_VCENTER,
 		     this->otk->textcolor_win);
+    free(displayed_text);
     break;
   case OTK_BUTTON_PIXMAP:
     printf("OTK_BUTTON_PIXMAP..\n");
@@ -876,6 +878,7 @@ static void listentry_draw (otk_widget_t *this) {
 		   this->y+this->h/2, 
 		   displayed_text, ODK_ALIGN_LEFT | ODK_ALIGN_VCENTER,
 		   this->otk->textcolor_win);
+  free(displayed_text);
 }
 
 static void listentry_select(otk_widget_t *this) {
@@ -1253,12 +1256,19 @@ otk_widget_t *otk_list_new (otk_widget_t *win, int x, int y, int w, int h,
 static void label_draw (otk_widget_t *this) {
 
   otk_label_t *label = (otk_label_t*) this;
+  char *displayed_text;
 
   if (!is_correct_widget(this, OTK_WIDGET_LABEL)) return;
- 
-  odk_set_font (this->odk, this->otk->label_font, this->otk->label_font_size);
-  odk_draw_text (this->odk, this->x, this->y, label->text, label->alignment, 
+
+  displayed_text = strdup(label->text);
+
+  odk_set_font (this->odk, this->otk->label_font,
+                (label->font_size) ? label->font_size : this->otk->label_font_size);
+  check_text_width(this->odk, displayed_text, this->win->w );
+  odk_draw_text (this->odk, this->x, this->y, displayed_text, label->alignment, 
       this->otk->label_color);
+
+  free(displayed_text);
 }
 
 static void label_destroy (otk_widget_t *this) {
@@ -1268,6 +1278,7 @@ static void label_destroy (otk_widget_t *this) {
   if (!is_correct_widget(this, OTK_WIDGET_LABEL)) return;
 
   remove_widget_from_win(this);
+  ho_free(label->text);
   ho_free(label);
 }
 
@@ -1291,12 +1302,20 @@ otk_widget_t *otk_label_new (otk_widget_t *win, int x, int y, int alignment, cha
   label->widget.needupdate  = 0;
   label->widget.major       = 0;
   label->alignment          = alignment;
-  label->text               = text;
+  label->text               = ho_strdup(text);
+  label->font_size          = 0; /* use default */
  
   window->subs = g_list_append (window->subs, label);
 
   return (otk_widget_t*) label;
 }
+
+void otk_label_set_font_size(otk_widget_t *this, int font_size)
+{
+  otk_label_t *label = (otk_label_t *) this;
+  label->font_size = font_size;
+}
+
 
 /*
  * layout widget

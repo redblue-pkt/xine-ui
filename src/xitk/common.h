@@ -357,6 +357,8 @@ typedef struct {
 
   int                        no_gui;
 
+  void                     (*nongui_error_msg)(char *text);
+
 } gGui_t;
 
 

@@ -614,6 +614,7 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   else {
 
     panel->visible = 1;
+    gGui->nongui_error_msg = NULL;
     xitk_show_widgets(panel->widget_list);
     
     XLockDisplay(gGui->display);

@@ -104,6 +104,12 @@ otk_widget_t *otk_layout_new(otk_widget_t *win, int x, int y, int w, int h, int 
 void otk_selector_set(otk_widget_t *this, int pos);
 
 /*
+ * label widget functions
+ */
+
+void otk_label_set_font_size(otk_widget_t *this, int font_size);
+
+/*
  * button widget functions
  */
 

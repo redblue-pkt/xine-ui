@@ -272,9 +272,7 @@ static void media_returnto_cb(void *data) {
 */
 
 static void shutdown_cb (void *data) {
-  /*
-  oxine_t *oxine = (oxine_t*) data;
-  */
+  gui_execute_action_id(ACTID_QUIT);
 }
 
 static void dvb_cb (void *data) {
@@ -425,6 +423,48 @@ static void main_menu_cb(void *data) {
   otk_draw_all(oxine->otk);
 }
 
+static void return_cb(void *this) {
+  oxine_t *oxine = (oxine_t*) this;
+
+  if (oxine->reentry)
+    oxine->reentry(oxine->reentry_data);
+  else
+    oxine->main_menu_cb(oxine);
+  return;
+}
+
+static void oxine_error_msg(char *text)
+{
+  oxine_t *oxine = oxine_instance;
+  otk_widget_t *b;
+  int l;
+  char *text2, *s;
+
+  s = text2 = strdup(text);
+  
+  otk_clear(oxine->otk);
+  oxine->main_window = otk_window_new (oxine->otk, NULL, 100, 150, 600, 300);
+
+  for( l = 0; l < 4 && s && strlen(s); l++ ) {
+    char *line = s;
+    otk_widget_t *label;
+
+    if( (s = strchr(s,'\n')) ) {
+      *s++ = '\0';
+    }
+    
+    label = otk_label_new(oxine->main_window, 300, 30 + l*25,
+                          OTK_ALIGN_CENTER|OTK_ALIGN_VCENTER, line);
+    otk_label_set_font_size(label, 20);
+  }
+  
+  b = otk_button_new(oxine->main_window, 260, 240, 80, 50, "OK", return_cb, oxine);
+  otk_set_focus(b);
+  otk_draw_all(oxine->otk);
+
+  free(text2);
+}
+
 /*
  * initialisation
  */
@@ -498,6 +538,8 @@ void oxine_menu(void)
   oxine_adapt();
       
   if( oxine->mode != OXINE_MODE_MAINMENU ) {
+    gGui->nongui_error_msg = oxine_error_msg;
+
     if( oxine->reentry )
       oxine->reentry(oxine->reentry_data);
     else
@@ -540,6 +582,7 @@ int oxine_action_event(int xine_event_type)
     otk_send_event(oxine->otk, &ev);
     return 1;
   case XINE_EVENT_INPUT_SELECT:
+    gGui->nongui_error_msg = oxine_error_msg;
     ev.key = OXINE_KEY_SELECT;
     otk_send_event(oxine->otk, &ev);
     return 1;
@@ -566,6 +609,7 @@ int oxine_mouse_event(int xine_event_type, int x, int y) {
     ev.type = OXINE_EVENT_MOTION;
     return otk_send_event(oxine->otk, &ev);
   case XINE_EVENT_INPUT_MOUSE_BUTTON:
+    gGui->nongui_error_msg = oxine_error_msg;
     ev.type = OXINE_EVENT_BUTTON;
     ev.key = OXINE_BUTTON1;
     return otk_send_event(oxine->otk, &ev);
@@ -585,3 +629,4 @@ void oxine_adapt(void)
   ev.type = OXINE_EVENT_FORMAT_CHANGED;
   otk_send_event(oxine->otk, &ev);
 }
+

@@ -748,6 +748,8 @@ void video_window_menu(xitk_widget_list_t *wl) {
 
   if(gGui->no_gui)
     return;
+
+  gGui->nongui_error_msg = NULL;
   
   snprintf(buffer, sizeof(buffer), _("xine %s"), VERSION);
   menu_entries[0].menu = buffer;

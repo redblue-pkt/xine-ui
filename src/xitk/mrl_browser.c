@@ -106,6 +106,7 @@ int mrl_browser_is_running(void) {
 void show_mrl_browser(void) {
 
   if(mrlb) {
+    gGui->nongui_error_msg = NULL;
     xitk_mrlbrowser_show(mrlb);
     set_mrl_browser_transient();
     layer_above_video((xitk_mrlbrowser_get_window_id(mrlb)));
