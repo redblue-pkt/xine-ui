@@ -162,7 +162,7 @@ static void paint_label(xitk_widget_t *w) {
     xitk_image_t          *font = (xitk_image_t *) private_data->font;
 
     pthread_mutex_lock(&private_data->paint_mutex);
-
+    
     /* non skinable widget */
     if(private_data->skin_element_name == NULL) {
       xitk_font_t   *fs = NULL;
@@ -198,11 +198,13 @@ static void paint_label(xitk_widget_t *w) {
       
       xitk_font_unload_font(fs);
       
+      pthread_mutex_unlock(&private_data->paint_mutex);
       return;
     }
     else {
       int width = private_data->char_length * private_data->length;
       
+
       XLOCK(private_data->imlibdata->x.disp);
       XCopyArea(private_data->imlibdata->x.disp, 
 		private_data->labelpix->pixmap, w->wl->win, font->image->gc, 
@@ -214,6 +216,7 @@ static void paint_label(xitk_widget_t *w) {
 	XSync(private_data->imlibdata->x.disp, False);
       
       XUNLOCK(private_data->imlibdata->x.disp);
+
     }
     
     pthread_mutex_unlock(&private_data->paint_mutex);
