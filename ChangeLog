@@ -1,8 +1,9 @@
 xine-ui (0.9.16) unstable; urgency=low
-  * add OSD support.
-  * remove embedded libcurl (use conditionally external one),
-  * take care of origin when using sfv playlist,
+  * add a real file browser, used to load/save playlist, open a stream,
   * aspect ratio fix
+  * add OSD support,
+  * remove embedded libcurl (use conditionally external one),
+  * take care of origin when using sfv playlist.
 	
 xine-ui (0.9.15) unstable; urgency=low
 

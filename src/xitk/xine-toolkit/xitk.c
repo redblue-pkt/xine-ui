@@ -133,7 +133,7 @@ typedef struct {
   xitk_list_t                *gfx;
   int                         use_xshm;
 
-  int                         wm_type;
+  uint32_t                    wm_type;
 
   int                        (*x_error_handler)(Display *, XErrorEvent *);
 
@@ -306,13 +306,149 @@ int xitk_is_use_xshm(void) {
   return gXitk->use_xshm;
 }
 
-int xitk_check_wm(Display *display) {
-  Atom   *atoms;
-  int     i, natoms;
-  int     type = WM_TYPE_UNKNOWN;
-  Window  window;
+static char *get_wm_name(Display *display, Window win, char *atom_name) {
+  char *wm_name = NULL;
+  Atom  atom;
+
+  /* Extract WM Name */	
+  if((atom = XInternAtom(display, atom_name, True)) != None) {
+    unsigned char   *prop_return = NULL;
+    unsigned long    nitems_return;
+    unsigned long    bytes_after_return;
+    Atom             type_return, type_utf8;
+    int              format_return;
+    
+    if((XGetWindowProperty(display, win, atom, 0, 4, False, XA_STRING,
+			   &type_return, &format_return, &nitems_return,
+			   &bytes_after_return, &prop_return)) == Success) {
+      
+      if(type_return != None) {
+	if(type_return != XA_STRING) {
+	  type_utf8 = XInternAtom(display, "UTF8_STRING", True);
+	  if(type_utf8 != None) {
+	    
+	    if(type_return == type_utf8) {
+	      
+	      if(prop_return)
+		XFree(prop_return);
+	      prop_return = NULL;
+	      
+	      if((XGetWindowProperty(display, win, atom, 0, 4, False, type_utf8,
+				     &type_return, &format_return, &nitems_return,
+				     &bytes_after_return, &prop_return)) == Success) {
+		
+		if(format_return == 8)
+		  wm_name = strdup((char *)prop_return);
+
+	      }
+	    }
+	    else if(format_return == 8)
+	      wm_name = strdup((char *)prop_return);
+
+	  }
+	}
+	else
+	  wm_name = strdup((char *)prop_return);
+
+      }
+      
+      if(prop_return)
+	XFree(prop_return);
+    }
+  }
+  
+  return wm_name;
+}
+static uint32_t xitk_check_wm(Display *display) {
+  Atom     *atoms, atom;
+  int       i, natoms;
+  uint32_t  type = WM_TYPE_UNKNOWN;
+  Window    window;
+  char     *wm_name = NULL;
   
   XLockDisplay(display);
+
+  if((atom = XInternAtom(display, "XFWM_FLAGS", True)) != None) {
+    type |= WM_TYPE_XFCE;
+  }
+  if((atom = XInternAtom(display, "_WINDOWMAKER_WM_PROTOCOLS", True)) != None) {
+    type |= WM_TYPE_WINDOWMAKER;
+  }
+  if((atom = XInternAtom(display, "_SAWMILL_TIMESTAMP", True)) != None) {
+    type |= WM_TYPE_SAWFISH;
+  }
+  if((atom = XInternAtom(display, "ENLIGHTENMENT_COMMS", True)) != None) {
+    type |= WM_TYPE_E;
+  }
+  if((atom = XInternAtom(display, "_METACITY_RESTART_MESSAGE", True)) != None) {
+    type |= WM_TYPE_METACITY;
+  }
+  if((atom = XInternAtom(display, "_WIN_SUPPORTING_WM_CHECK", True)) != None) {
+    unsigned char   *prop_return = NULL;
+    unsigned long    nitems_return;
+    unsigned long    bytes_after_return;
+    Atom             type_return;
+    int              format_return;
+    Status           status;
+    
+    /* Check for Gnome Compliant WM */
+    if((XGetWindowProperty(display, (XDefaultRootWindow(display)), atom, 0,
+			   1, False, XA_CARDINAL,
+			   &type_return, &format_return, &nitems_return,
+			   &bytes_after_return, &prop_return)) == Success) {
+
+      if((type_return != None) && (type_return == XA_CARDINAL) &&
+	 ((format_return == 32) && (nitems_return == 1) && (bytes_after_return == 0))) {
+	unsigned char   *prop_return2 = NULL;
+	Window           win_id;
+	
+	win_id = *(long *)prop_return;
+	
+	xitk_install_x_error_handler();
+	
+	status = XGetWindowProperty(display, win_id, atom, 0,
+				    1, False, XA_CARDINAL,
+				    &type_return, &format_return, &nitems_return,
+				    &bytes_after_return, &prop_return2);
+	
+	xitk_uninstall_x_error_handler();
+	
+	if((status == Success) && (type_return != None) && (type_return == XA_CARDINAL)) {
+	  
+	  if((format_return == 32) && (nitems_return == 1) 
+	     && (bytes_after_return == 0) && (win_id == *(long *)prop_return2)) {
+	    type |= WM_TYPE_GNOME_COMP;
+	  }
+	}
+
+	if(prop_return2)
+	  XFree(prop_return2);
+
+	if((wm_name = get_wm_name(display, win_id, "_NET_WM_NAME")) == NULL) {
+	  /*
+	   * Enlightenment is Gnome compliant, but don't set 
+	   * the _NET_WM_NAME atom property 
+	   */
+	  wm_name = get_wm_name(display, (XDefaultRootWindow(display)), "_WIN_WM_NAME");
+	}
+      }
+      
+      if(prop_return)
+	XFree(prop_return);
+      prop_return = NULL;
+    }
+    
+    /* Check for Extended Window Manager Hints (EWMH) Compliant */
+
+    //// ....................
+
+
+    ///
+
+    
+    
+    }
+
   window = XCreateSimpleWindow(display, RootWindow(display, (XDefaultScreen(display))), 
 			       0, 0, 1, 1, 0, 0, 0);
   XSelectInput(display, window, PropertyChangeMask | StructureNotifyMask );
@@ -328,29 +464,31 @@ int xitk_check_wm(Display *display) {
     for(i = 0; i < natoms; i++) {
       char *atomname = XGetAtomName(display, atoms[i]);
       
-      if(!strncasecmp("_E_FRAME_SIZE",atomname, 13))
-	type = WM_TYPE_E;
-      else if(!strncasecmp("_KDE_",atomname, 5))
-	type = WM_TYPE_KDE;
+      if(!strncasecmp("_KDE_",atomname, 5))
+	type |= WM_TYPE_KDE;
       else if(!strncasecmp("_ICEWM_",atomname, 7))
-	type = WM_TYPE_ICE;
-      else if(!strncasecmp("KWM_WIN_DESKTOP",atomname, 15))
-	type = WM_TYPE_WMAKER;
+	type |= WM_TYPE_ICE;
     }
   }
   
   XDestroyWindow(display, window);
-  
-  switch(type) {
+
+  switch(type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_KDE:
     XA_WIN_LAYER    = XInternAtom(display, "_NET_WM_STATE", False);
     XA_STAYS_ON_TOP = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
     break;
+
+  case WM_TYPE_MOTIF:
+    break;
+
   case WM_TYPE_UNKNOWN:
   case WM_TYPE_E:
   case WM_TYPE_ICE:
-  case WM_TYPE_WMAKER:
-  case WM_TYPE_GNOMECOMP:
+  case WM_TYPE_WINDOWMAKER:
+  case WM_TYPE_XFCE:
+  case WM_TYPE_SAWFISH:
+  case WM_TYPE_METACITY: /* Untested */
     XA_WIN_LAYER = XInternAtom(display, "_WIN_LAYER", False);
     break;
   }
@@ -358,7 +496,13 @@ int xitk_check_wm(Display *display) {
   XUnlockDisplay(display);
   
   printf("-[ WM type: ");
-  switch(type) {
+  
+  if(type & WM_TYPE_GNOME_COMP)
+    printf("(GnomeCompliant) ");
+  if(type & WM_TYPE_EWMH_COMP)
+    printf("(EWMH) ");
+  
+  switch(type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_UNKNOWN:
     printf("Unknown");
     break;
@@ -371,38 +515,60 @@ int xitk_check_wm(Display *display) {
   case WM_TYPE_ICE:
     printf("Ice");
     break;
-  case WM_TYPE_WMAKER:
+  case WM_TYPE_WINDOWMAKER:
     printf("WindowMaker");
     break;
-  case WM_TYPE_GNOMECOMP:
-    printf("GnomeCompliant");
+  case WM_TYPE_MOTIF:
+    printf("Motif(like?)");
+    break;
+  case WM_TYPE_XFCE:
+    printf("XFce");
+    break;
+  case WM_TYPE_SAWFISH:
+    printf("Sawfish");
+    break;
+  case WM_TYPE_METACITY:
+    printf("Metacity");
     break;
   }
+
+  if(wm_name) {
+    printf(" {%s}", wm_name);
+    free(wm_name);
+  }
+
   printf(" ]-\n");
+
 
   return type;
 }
-int xitk_get_wm_type(void) {
+uint32_t xitk_get_wm_type(void) {
   return gXitk->wm_type;
 }
 
 int xitk_get_layer_level(void) {
   int level = 10;
   
-  switch(gXitk->wm_type) {
-  case WM_TYPE_GNOMECOMP:
+  if(gXitk->wm_type & WM_TYPE_GNOME_COMP)
+    level = 10;
+  
+  switch(gXitk->wm_type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_UNKNOWN:
   case WM_TYPE_KDE:
+  case WM_TYPE_SAWFISH:
+  case WM_TYPE_METACITY: /* Untested */
     level = 10; /* Wrong, but we need to provide a default value */
     break;
-  case WM_TYPE_WMAKER:
-    level = 6;
-    break;
   case WM_TYPE_ICE:
+  case WM_TYPE_XFCE:
     level = 8;
     break;
   case WM_TYPE_E:
+  case WM_TYPE_WINDOWMAKER:
     level = 6;
+    break;
+  case WM_TYPE_MOTIF:
+    level = 0;
     break;
   }
   return level;     
@@ -410,7 +576,23 @@ int xitk_get_layer_level(void) {
 
 void xitk_set_layer_above(Window window) {
 
-  switch(gXitk->wm_type) {
+  if(gXitk->wm_type & WM_TYPE_GNOME_COMP) {
+    long propvalue[1];
+    
+    propvalue[0] = xitk_get_layer_level();
+    
+    XLockDisplay(gXitk->display);
+    XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
+		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)propvalue,
+		    1);
+    XUnlockDisplay(gXitk->display);
+    return;
+  }
+  
+  switch(gXitk->wm_type & WM_TYPE_COMP_MASK) {
+  case WM_TYPE_MOTIF:
+    return;
+    break;
 
   case WM_TYPE_KDE:
     XLockDisplay(gXitk->display);
@@ -418,12 +600,14 @@ void xitk_set_layer_above(Window window) {
 		    XA_ATOM, 32, PropModeReplace, (unsigned char *)&XA_STAYS_ON_TOP, 1);
     XUnlockDisplay(gXitk->display);
     break;
-
-  case WM_TYPE_GNOMECOMP:
+    
   case WM_TYPE_UNKNOWN:
-  case WM_TYPE_WMAKER:
+  case WM_TYPE_WINDOWMAKER:
   case WM_TYPE_ICE:
   case WM_TYPE_E:
+  case WM_TYPE_XFCE:
+  case WM_TYPE_SAWFISH:
+  case WM_TYPE_METACITY: /* Untested */
   default:
     {
       long propvalue[1];
@@ -442,7 +626,7 @@ void xitk_set_layer_above(Window window) {
 void xitk_set_window_layer(Window window, int layer) {
   XEvent xev;
 
-  if(gXitk->wm_type == WM_TYPE_KDE)
+  if((gXitk->wm_type & WM_TYPE_COMP_MASK) == WM_TYPE_KDE)
     return;
 
   xev.type                 = ClientMessage;

@@ -308,6 +308,8 @@ Hide/show the MRL browser.
 Audio mute toggle.
 .IP "\fBCM\fP\-\fBo\fP"
 Toggle TV modes on the DXR3
+.IP "\fBC\fP\-\fBo\fP"
+Open file browser.
 .IP "\fBM\fP\-\fBp\fP"
 Show/hide the playlist window.
 .IP "\fBQ\fP"

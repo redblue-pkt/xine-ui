@@ -324,6 +324,9 @@ Bascule du mode muêt.
 .BR CM\-o :
 Bascule du mode TV pour les carte DXR3.
 .br
+.BR C\-o :
+Ouvre la fenêtre du sélecteur de fichiers.
+.br
 .BR M\-p :
 Affiche/masque le fenêtre de liste de lecture.
 .br

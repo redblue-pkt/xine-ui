@@ -64,12 +64,18 @@
 #define XITK_PATH_MAX           PATH_MAX
 #endif
 
-#define WM_TYPE_UNKNOWN         0
-#define WM_TYPE_KDE             1
-#define WM_TYPE_E               2
-#define WM_TYPE_ICE             3
-#define WM_TYPE_WMAKER          4
-#define WM_TYPE_GNOMECOMP       5
+#define WM_TYPE_COMP_MASK       0x00007FFF
+#define WM_TYPE_UNKNOWN         0x00000000
+#define WM_TYPE_GNOME_COMP      0x80000000
+#define WM_TYPE_EWMH_COMP       0x40000000
+#define WM_TYPE_KDE             0x00000001
+#define WM_TYPE_E               0x00000002
+#define WM_TYPE_ICE             0x00000003
+#define WM_TYPE_WINDOWMAKER     0x00000004
+#define WM_TYPE_MOTIF           0x00000005
+#define WM_TYPE_XFCE            0x00000006
+#define WM_TYPE_SAWFISH         0x00000007
+#define WM_TYPE_METACITY        0x00000008
 
 #define INPUT_MOTION (ExposureMask | ButtonPressMask | ButtonReleaseMask |    \
                       KeyPressMask | KeyReleaseMask | ButtonMotionMask |      \
@@ -386,7 +392,7 @@ int xitk_get_layer_level(void);
 /*
  * Return WM_TYPE_*
  */
-int xitk_get_wm_type(void);
+uint32_t xitk_get_wm_type(void);
 
 /*
  *
