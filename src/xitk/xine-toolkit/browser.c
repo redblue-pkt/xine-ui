@@ -718,7 +718,7 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, int 
       
       lb.button_type       = RADIO_BUTTON;
       lb.label             = "";
-      lb.align             = LABEL_ALIGN_CENTER;
+      lb.align             = LABEL_ALIGN_LEFT;
       lb.callback          = NULL;
       lb.state_callback    = browser_select;
       lb.userdata          = (void *)(bt);

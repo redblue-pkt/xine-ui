@@ -328,6 +328,7 @@ skin.PlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	label {
+	  align = left
 	  color = #a4abb0
 	  color_focus = #a4abb0
 	  color_click = #081e2f
@@ -662,6 +663,7 @@ skin.MrlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	label {
+	  align = left
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f
@@ -786,6 +788,7 @@ skin.FBItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	label {
+	  align = left
 	  color = #a4aab4
 	  color_focus = #a4aab4
 	  color_click = #081e2f

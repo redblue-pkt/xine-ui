@@ -951,9 +951,6 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
 			   (private_data->mrlb_list = 
 			    xitk_browser_create(skonfig, &mb->browser)));
 
-  xitk_browser_set_alignment(private_data->mrlb_list, LABEL_ALIGN_LEFT);
-
-
   lbl.label             = "";
   lbl.skin_element_name = mb->origin.skin_element_name;
   lbl.window            = private_data->widget_list->win;

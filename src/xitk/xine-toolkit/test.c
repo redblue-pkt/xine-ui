@@ -89,7 +89,7 @@ typedef struct {
 
 static test_t *test;
 static int nlab = 0;
-static int align = LABEL_ALIGN_CENTER;
+static int align = LABEL_ALIGN_LEFT;
 /*
  *
  */
