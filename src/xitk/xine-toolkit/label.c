@@ -371,12 +371,15 @@ int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *w, char *newl
   if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     label_private_data_t *private_data = (label_private_data_t *) w->private_data;
     
-    label_setup_label(w, newlabel);
-    
-    pthread_mutex_lock(&private_data->paint_mutex);
-    paint_label(w, wl->win, wl->gc);
-    pthread_mutex_unlock(&private_data->paint_mutex);
-
+    if(!newlabel ||
+       (newlabel && (strcmp(private_data->label, newlabel)))) {
+      
+      label_setup_label(w, newlabel);
+      
+      pthread_mutex_lock(&private_data->paint_mutex);
+      paint_label(w, wl->win, wl->gc);
+      pthread_mutex_unlock(&private_data->paint_mutex);
+    }
     return 1;
   }
 
