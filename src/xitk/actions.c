@@ -589,7 +589,7 @@ void gui_send_expose_to_window(Window window) {
   if(!XSendEvent(gGui->display, window, False, ExposureMask, &xev)) {
     fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) window);
   }
-  XFlush(gGui->display);
+  XSync(gGui->display, False);
   XUnlockDisplay(gGui->display);
   
 }

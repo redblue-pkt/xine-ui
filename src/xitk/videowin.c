@@ -563,7 +563,7 @@ static void video_window_adapt_size (void) {
 	       &xev) ;
   } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
 
-  XFlush(gGui->display);
+  XSync(gGui->display, False);
 
   if (gVw->gc != None) XFreeGC(gGui->display, gVw->gc);
   gVw->gc = XCreateGC(gGui->display, gGui->video_window, 0L, &xgcv);
@@ -679,7 +679,7 @@ void video_window_set_cursor_visibility(int show_cursor) {
   XLockDisplay (gGui->display);
   XDefineCursor(gGui->display, gGui->video_window, 
 		gVw->cursor[show_cursor]);
-  XFlush(gGui->display);
+  XSync(gGui->display, False);
   XUnlockDisplay (gGui->display);
 }
 

@@ -123,7 +123,8 @@ void panel_change_skins(void) {
   XSizeHints    hint;
   
   xitk_skin_lock(gGui->skin_config);
-  
+  xitk_hide_widgets(panel->widget_list);
+
   XLockDisplay(gGui->display);
   
   if(!(new_img = Imlib_load_image(gGui->imlib_data,

@@ -943,6 +943,7 @@ void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig
     private_data = (filebrowser_private_data_t *)w->private_data;
     
     xitk_skin_lock(skonfig);
+    xitk_hide_widgets(private_data->widget_list);
 
     XLOCK(private_data->imlibdata->x.disp);
     

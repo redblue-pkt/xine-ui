@@ -28,23 +28,27 @@
 #include <stdio.h>
 
 typedef struct {
-  FILE        *fd;
-  char        *cfgfilename;
-  char        *ln;
-  char         buf[256];
+  FILE             *fd;
+  char             *cfgfilename;
+  char             *ln;
+  char              buf[256];
   
   struct {
-    char      *fallback;
-    char      *system;
+    char           *fallback;
+    char           *system;
   } fonts;
 
   struct {
-    int        black;
-    int        white;
-    int        background;
-    int        focus;
-    int        select;
+    int             black;
+    int             white;
+    int             background;
+    int             focus;
+    int             select;
   } colors;
+
+  struct {
+    unsigned long   label_anim;
+  } timers;
 
 } xitk_config_t;
 
@@ -58,5 +62,6 @@ int xitk_config_get_white_color(xitk_config_t *xtcf);
 int xitk_config_get_background_color(xitk_config_t *xtcf);
 int xitk_config_get_focus_color(xitk_config_t *xtcf);
 int xitk_config_get_select_color(xitk_config_t *xtcf);
+unsigned long xitk_config_get_timer_label_animation(xitk_config_t *xtcf);
 
 #endif

@@ -600,6 +600,7 @@ void playlist_change_skins(void) {
   if(pl_is_running()) {
     
     xitk_skin_lock(gGui->skin_config);
+    xitk_hide_widgets(playlist->widget_list);
 
     XLockDisplay(gGui->display);
     

@@ -186,7 +186,7 @@ int xitk_system(int dont_run_as_root, char *command) {
 /*
  * A thread-safe usecond sleep
  */
-void xitk_usec_sleep(unsigned usec) {
+void xitk_usec_sleep(unsigned long usec) {
 #if HAVE_NANOSLEEP
   /* nanosleep is prefered on solaris, because it's mt-safe */
   struct timespec ts;
@@ -215,13 +215,13 @@ static void xitk_signal_handler(int sig) {
   case SIGTERM:
   case SIGQUIT:
     if(cur_pid == xitk_pid) {
-      __gfx_t   *fx;
+      __gfx_t  *fx;
       
       XITK_WARNING("XITK killed with signal %d\n", sig);
 
       MUTLOCK();
       gXitk->running = 0;
-
+      
       /* 
        * Tada.... and now Ladies and Gentlemen, the dirty hack
        */
@@ -532,18 +532,22 @@ void xitk_xevent_notify(XEvent *event) {
 
 	    XMoveWindow(gXitk->display, fx->window,
 			fx->new_pos.x, fx->new_pos.y);
-
 	    err = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
+
+	    XUNLOCK(gXitk->display);
+
 	    if(err != BadDrawable && err != BadWindow) {
 	      if(wattr.your_event_mask & PointerMotionMask) {
-
+		
+		XLOCK(gXitk->display);
 		while(XCheckWindowEvent(gXitk->display, fx->window, 
 					PointerMotionMask, event) == True);
+		XUNLOCK(gXitk->display);
 	      }
 	    }
 
-	    XFlush(gXitk->display);
-
+	    XLOCK(gXitk->display);
+	    XSync(gXitk->display, False);
 	    XUNLOCK(gXitk->display);
 
 	  }
@@ -831,6 +835,9 @@ int xitk_get_focus_color(void) {
 }
 int xitk_get_select_color(void) {
   return xitk_config_get_select_color(gXitk->config);
+}
+unsigned long xitk_get_timer_label_animation(void) {
+  return xitk_config_get_timer_label_animation(gXitk->config);
 }
 
 /*

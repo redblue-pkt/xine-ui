@@ -499,6 +499,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     private_data = (mrlbrowser_private_data_t *)w->private_data;
     
     xitk_skin_lock(skonfig);
+    xitk_hide_widgets(private_data->widget_list);
 
     XLOCK(private_data->imlibdata->x.disp);
     
@@ -524,8 +525,6 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
       xitk_usec_sleep(10000);
     }
 
-    
-    
     old_img = private_data->bg_image;
     private_data->bg_image = new_img;
 

@@ -469,7 +469,7 @@ void xitk_xevent_notify(XEvent *event);
 #endif
 
 const char *xitk_get_homedir(void);
-void xitk_usec_sleep(unsigned usec);
+void xitk_usec_sleep(unsigned long);
 int xitk_system(int dont_run_as_root, char *command);
 
 char *xitk_get_system_font(void);
@@ -480,6 +480,7 @@ int xitk_get_white_color(void);
 int xitk_get_background_color(void);
 int xitk_get_focus_color(void);
 int xitk_get_select_color(void);
+unsigned long xitk_get_timer_label_animation(void);
 
 int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
 int xitk_skin_get_enability(xitk_skin_config_t *, const char *);

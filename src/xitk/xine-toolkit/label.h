@@ -43,20 +43,20 @@ typedef struct {
   int               char_length; /* length of 1 char */
   int               char_height; /* height of 1 char */
 
+  Pixmap            labelpix;
+
   int               length;      /* length in char */
   xitk_image_t     *font;
   char             *fontname;
   char             *label;
 
   int               animation;
-  char             *animated_label;
   int               anim_running;
   int               anim_offset;
 
   int               on_change;
 
   pthread_t         thread;
-  pthread_mutex_t   mutex;
 
 } label_private_data_t;
 

@@ -735,7 +735,7 @@ void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *s
   }
   mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
   while (mywidget && wl && wl->l && wl->win && wl->gc && skonfig) {
-    
+
     if(mywidget->notify_change_skin)
       (mywidget->notify_change_skin) (wl, mywidget, skonfig);
     

@@ -329,6 +329,7 @@ void control_change_skins(void) {
   if(control_is_running()) {
     
     xitk_skin_lock(gGui->skin_config);
+    xitk_hide_widgets(control->widget_list);
 
     XLockDisplay(gGui->display);
     

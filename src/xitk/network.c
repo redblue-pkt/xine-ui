@@ -2152,7 +2152,7 @@ static void do_gui(commands_t *cmd, client_info_t *client_info) {
 
       /* Flush event when xine !play */
       if(flushing && ((xine_get_status(gGui->xine) != XINE_PLAY))) {
-	XFlush(gGui->display);
+	XSync(gGui->display, False);
       }
     }
   }

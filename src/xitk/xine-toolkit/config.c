@@ -98,6 +98,30 @@ static void xitk_config_fonts(xitk_config_t *xtcf) {
 }
 
 /*
+ * Extract timer.
+ */
+static void xitk_config_timers(xitk_config_t *xtcf) {
+  char  *p = NULL;
+  char  *c = NULL;
+
+  assert(xtcf != NULL && xtcf->ln != NULL);
+
+  p = xtcf->ln + 6;
+  if(p)
+    c = strchr(p, '=');
+  
+  if(c) {
+    
+    *(c++) = '\0';
+    
+    while(*c == ' ' || *c == '\t') c++;
+    
+    if(!strncasecmp(p, "label_animation", 15))
+      xtcf->timers.label_anim = strtol(c, &c, 10);
+  }
+}
+
+/*
  * Guess entries.
  */
 static void xitk_config_store_entry(xitk_config_t *xtcf) {
@@ -106,9 +130,11 @@ static void xitk_config_store_entry(xitk_config_t *xtcf) {
 
   if(!strncasecmp(xtcf->ln, "color.", 6))
     xitk_config_colors(xtcf);
+  else if(!strncasecmp(xtcf->ln, "timer.", 6))
+    xitk_config_timers(xtcf);
   else if(!strncasecmp(xtcf->ln, "font.", 5))
     xitk_config_fonts(xtcf);
-
+    
 }
 
 /*
@@ -191,13 +217,14 @@ static void xitk_config_load_configfile(xitk_config_t *xtcf) {
 static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   assert(xtcf != NULL);
 
-  xtcf->fonts.system = strdup("fixed");
-  xtcf->fonts.fallback = NULL;
-  xtcf->colors.black = -1;
-  xtcf->colors.white = -1;
+  xtcf->fonts.system      = strdup("fixed");
+  xtcf->fonts.fallback    = NULL;
+  xtcf->colors.black      = -1;
+  xtcf->colors.white      = -1;
   xtcf->colors.background = -1;
-  xtcf->colors.focus = -1;
-  xtcf->colors.select = -1;
+  xtcf->colors.focus      = -1;
+  xtcf->colors.select     = -1;
+  xtcf->timers.label_anim = 50000;
 }
 
 /*
@@ -251,6 +278,13 @@ int xitk_config_get_select_color(xitk_config_t *xtcf) {
     return -1;
   
   return xtcf->colors.select;
+}
+unsigned long xitk_config_get_timer_label_animation(xitk_config_t *xtcf) {
+  
+  if(!xtcf)
+    return 5000;
+  
+  return xtcf->timers.label_anim;
 }
 
 #define SYSTEM_RC  "/etc/xitkrc"
