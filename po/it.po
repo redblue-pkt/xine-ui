@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "POT-Creation-Date: 2003-12-13 11:47+0100\n"
-"PO-Revision-Date: 2003-11-23 00:47+0100\n"
+"PO-Revision-Date: 2003-12-16 17:57+0100\n"
 "Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"
 "MIME-Version: 1.0\n"
@@ -541,11 +541,11 @@ msgstr ""
 
 #: src/xitk/event.c:1285
 msgid "Use unscaled OSD"
-msgstr ""
+msgstr "Usa OSD non scalato"
 
 #: src/xitk/event.c:1286
 msgid "Use unscaled (full screen resolution) OSD if possible"
-msgstr ""
+msgstr "Usa OSD non scalato (risoluzione a pieno schermo) se possibile"
 
 #: src/xitk/event.c:1294
 msgid "Dismiss OSD time (s)"
@@ -1498,36 +1498,32 @@ msgstr "                    audio_decoder, video_decoder.\n"
 
 #: src/xitk/main.c:693
 msgid "      --bug-report [=mrl]      Enable bug report mode:\n"
-msgstr ""
+msgstr "      --bug-report [=mrl]      Abilità modo riporta bug:\n"
 
 #: src/xitk/main.c:694
-#, fuzzy
 msgid "                                 Turn on verbosity, gather all output\n"
-msgstr "                                   'clear'  cancella la playlist,\n"
+msgstr ""
+"                                 Attiva verbosità, raggruppa tutti i "
+"messaggi\n"
 
 #: src/xitk/main.c:695
-#, fuzzy
 msgid ""
 "                                 messages and write them into a file named\n"
-msgstr "                                 -può essere usato più di una volta.\n"
+msgstr ""
+"                                 di output e li scrive in un file chiamato\n"
 
 #: src/xitk/main.c:696
-#, fuzzy
 msgid "                                 BUG-REPORT.TXT.\n"
-msgstr "                                 <p> può essere:\n"
+msgstr "                                 BUG-REPORT.TXT.\n"
 
 #: src/xitk/main.c:697
-#, fuzzy
 msgid ""
 "                                 If <mrl> is given, xine will play the mrl\n"
-msgstr ""
-"                                 -se non si dà alcun opzione, si seleziona "
-"'default'.\n"
+msgstr "                                 Se si dà <mrl>, xine eseguirà l'MRL\n"
 
 #: src/xitk/main.c:698
-#, fuzzy
 msgid "                                 then quit (like -pq).\n"
-msgstr "                                 <p> può essere:\n"
+msgstr "                                 quindi termina (come -pq).\n"
 
 #: src/xitk/main.c:700
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -1726,12 +1722,14 @@ msgstr "Modalità di ciclo '%s' errata, vedi xine --help\n"
 
 #: src/xitk/main.c:1709
 msgid "*** NOTE ***\n"
-msgstr ""
+msgstr "*** NOTA ***\n"
 
 #: src/xitk/main.c:1710
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
+" Modo riporta Bug: tutti i messaggi saranno aggiunti nel file BUG-REPORT."
+"TXT.\n"
 
 #: src/xitk/main.c:1748
 #, c-format
@@ -2532,7 +2530,7 @@ msgstr "impostazioni di Xine"
 
 #: src/xitk/setup.c:1116
 msgid "(*)  you need to restart xine for this setting to take effect"
-msgstr ""
+msgstr "(*)  devi riavviare xine affinché queste opzioni abbiano effetto"
 
 #: src/xitk/setup.c:1146
 msgid "OK"
@@ -2570,7 +2568,7 @@ msgstr "tema della skin GUI"
 
 #: src/xitk/skins.c:451
 msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
-msgstr ""
+msgstr "Ooch, la voce di configurazione gui.skin non è registrata. Ciao.\n"
 
 #: src/xitk/skins.c:458
 #, c-format
