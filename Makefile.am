@@ -26,7 +26,8 @@ debug:
 	@list='$(SUBDIRS)'; for subdir in $$list; do \
 	  (cd $$subdir && $(MAKE) $@) || exit; \
 	done;
-	$(MAKE) CFLAGS="$(DEBUG_CFLAGS) @ORBIT_CFLAGS@"
+	$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
+## corba disabled @ORBIT_CFLAGS@"
 
 install-debug: debug
 	@list='$(SUBDIRS)'; for subdir in $$list; do \

@@ -509,30 +509,28 @@ dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE N
 dnl  CORBA:
 dnl  Temporary disabled, port to new API needed
 dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
-if test "x" != "x"; then
 dnl
 dnl CORBA support
 dnl
-AC_ARG_ENABLE(orbit,[  --enable-orbit          build orbit dependant parts of xine [default=no]], , enable_orbit=no)
+dnl AC_ARG_ENABLE(orbit,[  --enable-orbit          build orbit dependant parts of xine [default=no]], , enable_orbit=no)
+dnl 
+dnl if test "x$enable_orbit" = "xyes"; then
+dnl   AM_PATH_ORBIT(0.4.0, [
+dnl     AC_DEFINE(HAVE_ORBIT,,[Define this if you have ORBit (libORBit) installed])
+dnl     ORBIT_LIBS="$ORBIT_LIBS -lORBitCosNaming"
+dnl   ], [
+dnl     AC_MSG_RESULT(*** All of ORBit dependent parts will be disabled ***)
+dnl     enable_orbit=no])
+dnl fi
 
-if test "x$enable_orbit" = "xyes"; then
-  AM_PATH_ORBIT(0.4.0, [
-    AC_DEFINE(HAVE_ORBIT,,[Define this if you have ORBit (libORBit) installed])
-    ORBIT_LIBS="$ORBIT_LIBS -lORBitCosNaming"
-  ], [
-    AC_MSG_RESULT(*** All of ORBit dependent parts will be disabled ***)
-    enable_orbit=no])
-fi
+dnl AM_CONDITIONAL(HAVE_ORBIT, test x"$enable_orbit" = "xyes")
+dnl if test x"$enable_orbit" = "xyes"; then
+dnl    CORBA_DEP=""
+dnl else 
+dnl    CORBA_DEP="#"
+dnl fi
+dnl AC_SUBST(CORBA_DEP)
 
-AM_CONDITIONAL(HAVE_ORBIT, test x"$enable_orbit" = "xyes")
-if test x"$enable_orbit" = "xyes"; then
-   CORBA_DEP=""
-else 
-   CORBA_DEP="#"
-fi
-AC_SUBST(CORBA_DEP)
-
-fi
 
 
 if test "$GCC" = yes; then
