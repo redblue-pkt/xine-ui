@@ -9,7 +9,7 @@ debug:
 install-debug: install
 
 # Install only as root
-install-data-local:
+install-data-hook:
 	case "`id`" in \
 	uid=0\(* ) \
 ## Icons
