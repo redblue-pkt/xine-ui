@@ -953,7 +953,7 @@ static void video_window_adapt_size (void) {
     XRaiseWindow(gGui->video_display, gGui->video_window);
     XMapWindow(gGui->video_display, gGui->video_window);
     
-    while(!xitk_is_window_visible(gGui->display, gGui->video_window))
+    while(!xitk_is_window_visible(gGui->video_display, gGui->video_window))
       xine_usec_sleep(5000);
 
     if((gGui->always_layer_above || 

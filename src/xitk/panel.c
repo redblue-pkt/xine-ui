@@ -417,7 +417,7 @@ static void *slider_loop(void *dummy) {
       }
       
       if(((status == XINE_STATUS_PLAY) && (speed != XINE_SPEED_PAUSE)) && 
-	 (!xitk_is_window_iconified(gGui->display, gGui->video_window))) {
+	 (!xitk_is_window_iconified(gGui->video_display, gGui->video_window))) {
 
 	if(gGui->ssaver_timeout) {
 	  
