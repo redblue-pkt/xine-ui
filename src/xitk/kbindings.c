@@ -450,6 +450,36 @@ static void _kbinding_reset_cb(xitk_widget_t *w, void *data, int button) {
 static void _kbinding_editor_cb(xitk_widget_t *w, void *data, int button) {
   kbedit_window();
 }
+static void _kbindings_subst_percent(char *src, char *dest) {
+  char *s, *d;
+  
+  if(!src || !dest)
+    return;
+  
+  if(!strlen(src))
+    return;
+
+  if(strchr(src, '%')) {
+    s = src;
+    d = dest;
+    while(*s != '\0') {
+      
+      switch(*s) {
+      case '%':
+	if((*(s) == '%') && (*(s + 1) != '%'))
+	  *d++ = *s;
+      default:
+	*d = *s;
+	break;
+      }
+      s++;
+      d++;
+    }
+    *d = '\0';
+  }
+  else
+    strncpy(dest, src, strlen(src));
+}
 static void _kbindings_check_redundancy(kbinding_t *kbt) {
   int            i, j, found = -1;
   xitk_window_t *xw;
@@ -464,21 +494,25 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 	   (kbt->entry[i]->modifier == kbt->entry[j]->modifier) && 
 	   (strcasecmp(kbt->entry[i]->key, "void"))) {
 	  char  buffer[4096];
+	  char  action1[1024], action2[1024];
+	  
+	  memset(&action1, 0, sizeof(action1));
+	  memset(&action2, 0, sizeof(action2));
+	  _kbindings_subst_percent(kbt->entry[j]->action, &action2[0]);
+	  _kbindings_subst_percent(kbt->entry[i]->action, &action1[0]);
 	  
 	  found = i;
 	  
 	  memset(&buffer, 0, sizeof(buffer));
 	  sprintf(buffer, _("Key bindings of '%s' and '%s' are the same.\n\n"
-			    "What do you want to do with current key bindings?\n"),
-		  kbt->entry[i]->action, kbt->entry[j]->action);
-	  
-	  xw = xitk_window_dialog_two_buttons_with_width(gGui->imlib_data,
-							 _("Keybindings error!"),
-							 _("Reset"),
-							 _("Editor"),
-							 _kbinding_reset_cb, _kbinding_editor_cb, 
-							 (void *) kbt, 400, ALIGN_CENTER,
-							 buffer);
+			    "What do you want to do with current key bindings?\n"), action1, action2);
+
+	  xw = xitk_window_dialog_three_buttons_with_width(gGui->imlib_data,
+							   _("Keybindings error!"),
+							   _("Reset"), _("Editor"), _("Cancel"),
+							   _kbinding_reset_cb, _kbinding_editor_cb, NULL,
+							   (void *) kbt, 400, ALIGN_CENTER,
+							   buffer);
 	  XLockDisplay(gGui->display);
 	  if(!gGui->use_root_window)
 	    XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
