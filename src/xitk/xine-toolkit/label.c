@@ -323,7 +323,7 @@ static void label_setup_label(xitk_widget_t *w, char *label_) {
     
     if(label_len > private_data->length) {
       pthread_attr_t       pth_attrs;
-#if ! defined (__OpenBSD__)
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
       struct sched_param   pth_params;
 #endif
       
@@ -331,15 +331,13 @@ static void label_setup_label(xitk_widget_t *w, char *label_) {
       
       pthread_attr_init(&pth_attrs);
 
-      /* this won't work on linux, freebsd 5.0 */
-#if ! defined (__OpenBSD__)
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
       pthread_attr_getschedparam(&pth_attrs, &pth_params);
       pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
       pthread_attr_setschedparam(&pth_attrs, &pth_params);
 #endif
       
-      pthread_create(&private_data->thread, &pth_attrs, 
-      		     xitk_label_animation_loop, (void *)private_data);
+      pthread_create(&private_data->thread, &pth_attrs, xitk_label_animation_loop, (void *)private_data);
     }
   }
 

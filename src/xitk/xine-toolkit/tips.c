@@ -244,7 +244,7 @@ void xitk_tips_init(Display *disp) {
   
   if(!tips.running) {
     pthread_attr_t       pth_attrs;
-#if ! defined (__OpenBSD__)
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
     struct sched_param   pth_params;
 #endif
 
@@ -263,7 +263,8 @@ void xitk_tips_init(Display *disp) {
     pthread_cond_init(&tips.prewait_cond, NULL);
     
     pthread_attr_init(&pth_attrs);
-#if ! defined (__OpenBSD__)
+
+#ifdef _POSIX_THREAD_PRIORITY_SCHEDULING
     pthread_attr_getschedparam(&pth_attrs, &pth_params);
     pth_params.sched_priority = sched_get_priority_min(SCHED_OTHER);
     pthread_attr_setschedparam(&pth_attrs, &pth_params);
