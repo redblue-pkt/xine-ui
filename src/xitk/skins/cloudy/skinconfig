@@ -7,7 +7,7 @@
 #      add load/unload command support.
 #
 skin.name           = cloudy
-skin.version        = 4
+skin.version        = 5
 skin.date           = 2002.01.09
 skin.author         = Daniel Erat <dan_erat@pobox.com>
 skin.url            = http://www.pobox.com/~dan_erat/

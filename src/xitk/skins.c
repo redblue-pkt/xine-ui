@@ -81,7 +81,7 @@ static skin_downloader_t  *skdloader = NULL;
 #undef SKIN_DEBUG
 
 #define DEFAULT_SKIN        "xinetic"
-#define SKIN_IFACE_VERSION  4
+#define SKIN_IFACE_VERSION  5
 
 extern gGui_t             *gGui;
 
