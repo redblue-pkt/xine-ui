@@ -308,62 +308,74 @@ static void load_video_out_driver(char *video_driver_id) {
 /*
  * Try to load audio output plugin, by stored name or probing
  */
-static void load_audio_out_driver(char *audio_driver_id, 
-				  ao_driver_t **audio_driver) {
-  
-  if (!audio_driver_id) {
-    char **driver_ids = xine_list_audio_output_plugins ();
-    int i = 0;
-    
-    /* Try to init audio with stored information */
+static ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 
+  ao_driver_t *audio_driver = NULL;
+  
+  /*
+   * if no audio driver was specified at the command line, 
+   * look up audio driver id in the config file
+   */
+
+  if (!audio_driver_id) 
     audio_driver_id = gGui->config->register_string (gGui->config, "audio.driver", "auto",
 						     "audio driver to use",
 						     NULL, NULL, NULL);
-    *audio_driver = NULL;
-    if (strcmp (audio_driver_id, "auto")) {
-      *audio_driver = xine_load_audio_output_plugin(gGui->config, 
-						    audio_driver_id);
-      if(*audio_driver) {
-	if(driver_ids)
-	    free(driver_ids);
-	return;
-      }
-    }
 
-    while(driver_ids[i] != NULL && *audio_driver == NULL) {
+  /* probe ? */
+
+  if (!strncmp (audio_driver_id, "auto",4)) {
+    char **driver_ids = xine_list_audio_output_plugins ();
+    int i = 0;
+
+    printf ("main: probing audio drivers...\n");
+    
+    while ( driver_ids[i] != NULL ) {
       audio_driver_id = driver_ids[i];
 
       printf("main: trying to autoload '%s' audio driver: ", driver_ids[i]);
       
-      *audio_driver = xine_load_audio_output_plugin(gGui->config, 
+      audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						    driver_ids[i]);
+
+      if (audio_driver) {
+	printf ("main: ...worked, using '%s' audio driver.\n",
+		driver_ids[i]);
+
+	gGui->config->update_string (gGui->config, "audio.driver", 
+				     audio_driver_id);
+
+	return audio_driver;
+      }
+
       i++;
     }
-  }
-  else {
 
-    /* Don't want to load an audio driver */
-    if(!strncasecmp(audio_driver_id, "NULL", strlen(audio_driver_id))) {
-      /* We don't store NULL driver name, i guess it's not very useful */
-      *audio_driver = NULL;
+    printf ("main: audio driver probing failed => no audio output\n");
+	    
+    gGui->config->update_string (gGui->config, "audio.driver", 
+				 "null");
+
+  } else {
+
+    /* don't want to load an audio driver ? */
+    if (!strncasecmp (audio_driver_id, "NULL", 4)) {
+
       printf("main: not using any audio driver (as requested).\n");
-      return;
 
     } else {
 
-      *audio_driver = xine_load_audio_output_plugin(gGui->config, 
-						    audio_driver_id);
-      if (!*audio_driver) {
-	printf ("main: the specified audio driver <%s> failed\n",
+      audio_driver = xine_load_audio_output_plugin(gGui->config, 
+						   audio_driver_id);
+      if (!audio_driver) {
+	printf ("main: the specified audio driver '%s' failed\n",
 		audio_driver_id);
 	exit(1);
       }
     }
   }
 
-  if (!(*audio_driver))
-    printf ("main: audio driver <%s> failed\n", audio_driver_id);
+  return audio_driver;
 }
 
 /*
@@ -630,7 +642,7 @@ int main(int argc, char *argv[]) {
   load_video_out_driver(video_driver_id);
 
   /* Audio out plugin */
-  load_audio_out_driver(audio_driver_id, &audio_driver);
+  audio_driver = load_audio_out_driver(audio_driver_id);
 
 
   /*
