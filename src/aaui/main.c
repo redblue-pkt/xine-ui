@@ -872,9 +872,9 @@ int main(int argc, char *argv[]) {
 	else {
 	  /* reduce goom default values */
 	  if(!strcmp(aaxine.post_plugin_name, "goom")) {
-	    config_update_num("post.goom_fps", 10);
-	    config_update_num("post.goom_height", 120);
-	    config_update_num("post.goom_width", 120);
+	    config_update_num("effects.goom.fps", 10);
+	    config_update_num("effects.goom.height", 120);
+	    config_update_num("effects.goom.width", 120);
 	  }
 	}
       }

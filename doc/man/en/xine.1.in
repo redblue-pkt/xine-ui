@@ -387,7 +387,7 @@ refers to a playback control entry but there is no playback control, your
 playback number will silently be converted into the corresponding entry number.
 
 You can configure various things that affect MRLs are selected when
-there is some ambiguity in the MRL name. vcd.autoplay sets what kind
+there is some ambiguity in the MRL name. media.vcd.autoplay sets what kind
 of unit to to use in a MRL is none is given.  Another configuration
 setting, vcd.device, determines what device to use if that part is
 not given. When you hit the VCD button, that is equivalent to

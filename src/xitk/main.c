@@ -1954,7 +1954,7 @@ int main(int argc, char *argv[]) {
   {
     xine_cfg_entry_t  cfg_entry;
     
-    if(xine_config_lookup_entry(gGui->xine, "input.file_origin_path", &cfg_entry))
+    if(xine_config_lookup_entry(gGui->xine, "media.files.origin_path", &cfg_entry))
       snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cfg_entry.str_value);
     else
       (void *) getcwd(&(gGui->curdir[0]), XITK_PATH_MAX);
@@ -2001,7 +2001,7 @@ int main(int argc, char *argv[]) {
       if(!strcasecmp(video_driver_ids[cfg_vo_entry.num_value], "dxr3")) {
 	xine_cfg_entry_t  cfg_entry;
 	
-	if(xine_config_lookup_entry(gGui->xine, "dxr3.videoout_mode", &cfg_entry)) {
+	if(xine_config_lookup_entry(gGui->xine, "dxr3.output.mode", &cfg_entry)) {
 	  if(((!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "letterboxed tv")) ||
 	      (!strcmp(cfg_entry.enum_values[cfg_entry.num_value], "widescreen tv"))) && 
 	     (!(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)))) {

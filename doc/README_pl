@@ -406,7 +406,7 @@
 
      Na przyk³ad mo¿esz zrobiæ co¶ takiego
 
-      xine vcd://1 opt:input.vcd_device=/dev/cdrom2 vcd://1
+      xine vcd://1 opt:media.vcd.device=/dev/cdrom2 vcd://1
 
      aby zmieniæ vcd_device miêdzy odtworzeniem dwóch mrls.
 

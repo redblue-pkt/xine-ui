@@ -401,7 +401,7 @@
 
       For example you can do something like
 
-         xine vcd://1 opt:input.vcd_device=/dev/cdrom2 vcd://1
+         xine vcd://1 opt:media.vcd.device=/dev/cdrom2 vcd://1
 
       to change the vcd_device between playing two mrls.
 

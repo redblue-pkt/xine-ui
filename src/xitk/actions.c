@@ -1908,7 +1908,7 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
   if(fb == load_stream) {
     if(cur_dir && strlen(cur_dir)) {
       snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cur_dir);
-      config_update_string("input.file_origin_path", gGui->curdir);
+      config_update_string("media.files.origin_path", gGui->curdir);
     }
     load_stream = NULL;
   }
@@ -1922,7 +1922,7 @@ static void fileselector_callback(filebrowser_t *fb) {
   
   if(cur_dir && strlen(cur_dir)) {
     snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", cur_dir);
-    config_update_string("input.file_origin_path", gGui->curdir);
+    config_update_string("media.files.origin_path", gGui->curdir);
   }
   
   if(((file = filebrowser_get_full_filename(fb)) != NULL) && strlen(file)) {
@@ -1957,7 +1957,7 @@ static void fileselector_all_callback(filebrowser_t *fb) {
   
   if(path && strlen(path)) {
     snprintf(gGui->curdir, sizeof(gGui->curdir), "%s", path);
-    config_update_string("input.file_origin_path", gGui->curdir);
+    config_update_string("media.files.origin_path", gGui->curdir);
   }
   
   if((files = filebrowser_get_all_files(fb)) != NULL) {

@@ -111,9 +111,9 @@ int hidden_file_cb(int action, int value) {
   xine_cfg_entry_t  cfg_entry;
   int               retval = 0;
   
-  if(xine_config_lookup_entry(gGui->xine, "input.file_hidden_files", &cfg_entry)) {
+  if(xine_config_lookup_entry(gGui->xine, "media.files.show_hidden_files", &cfg_entry)) {
     if(action)
-      config_update_bool("input.file_hidden_files", value);
+      config_update_bool("media.files.show_hidden_files", value);
     else
       retval = cfg_entry.num_value;
   }

@@ -11,7 +11,7 @@ device. If your xine installation was prepared for you by the distributor of
 your Linux setup, this should all have been taken care of for you, but it is
 never a bad idea to double check.
 If you do not want to have the symbolic link, you can alternatively change the
-config option input.dvd_device accordingly.
+config option media.dvd.device accordingly.
 
 The next set of problems you should be aware of comes with the various
 restrictions the DVD officials try to enforce on us.
