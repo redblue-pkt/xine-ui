@@ -22,7 +22,6 @@
  * xine main for X11
  *
  */
-
 /* required for getsubopt(); the __sun test gives us strncasecmp() on solaris */
 #ifndef __sun
 #define _XOPEN_SOURCE 500
@@ -1322,6 +1321,7 @@ int main(int argc, char *argv[]) {
 
   }
 
+  pthread_mutex_init(&gGui->xe_mutex, NULL);
   gGui->xine = xine_new();
   xine_config_load(gGui->xine, gGui->configfile);
   xine_engine_set_param(gGui->xine, XINE_ENGINE_PARAM_VERBOSITY, verbosity);

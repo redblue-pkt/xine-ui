@@ -1566,12 +1566,17 @@ void xitk_init(Display *display) {
   gXitk->wm_type = xitk_check_wm(display);
 }
 
+#define XEVENT_NEW_METHOD 1
+#define FORWARD_COMPLETION
+    
+#ifndef FORWARD_COMPLETION
 /* Return True is event type isn't completion */
 static Bool is_not_completion(Display *display, XEvent *event, XPointer arg) {
   if(event->type != (int) arg)
     return True;
   return False;
 }
+#endif
 
 /*
  * Start widget event handling.
@@ -1582,7 +1587,9 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   struct sigaction  action;
   fd_set            r;
   int               completion;
+#ifndef FORWARD_COMPLETION
   Bool              got_event;
+#endif
   __gfx_t          *fx;
 
   action.sa_handler = xitk_signal_handler;
@@ -1678,9 +1685,6 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
    */
   while(gXitk->running) {
 
-#define XEVENT_NEW_METHOD 1
-#define FORWARD_COMPLETION
-    
 #if XEVENT_NEW_METHOD
     
 #ifdef FORWARD_COMPLETION

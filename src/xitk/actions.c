@@ -44,16 +44,38 @@
 extern gGui_t          *gGui;
 extern _panel_t        *panel;
 
-static pthread_t        seek_thread;
+static pthread_mutex_t new_pos_mutex =  PTHREAD_MUTEX_INITIALIZER;
 
 int gui_xine_get_pos_length(xine_stream_t *stream, int *pos, int *time, int *length) {
   int t = 0, ret = 0;
-
+  int lpos, ltime, llength;
+  
+  if(pthread_mutex_trylock(&gGui->xe_mutex))
+    return 0;
+  
   if(stream && (xine_get_status(stream) == XINE_STATUS_PLAY)) {
-    while(((ret = xine_get_pos_length(stream, pos, time, length)) == 0) && (++t < 10) && (!gGui->on_quit))
+    while(((ret = xine_get_pos_length(stream, &lpos, &ltime, &llength)) == 0) && (++t < 10) && (!gGui->on_quit))
       xine_usec_sleep(100000); /* wait before trying again */
   }
   
+  if(ret == 0) {
+    lpos = ltime = llength = 0;
+  }
+  
+  if(pos)
+    *pos    = lpos;
+  if(time)
+    *time   = ltime;
+  if(length)
+    *length = llength;
+  
+  if((ret != 0) && (stream == gGui->stream)) {
+    gGui->stream_length.pos = lpos;
+    gGui->stream_length.time = ltime;
+    gGui->stream_length.length = llength;
+  }
+
+  pthread_mutex_unlock(&gGui->xe_mutex);
   return ret;
 }
 
@@ -421,6 +443,8 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
   
   if(!strcmp(mrl, gGui->mmk.mrl))
     gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
+
+  gui_xine_get_pos_length(gGui->stream, NULL, NULL, NULL);
   
   return 1;
 }
@@ -554,6 +578,8 @@ void gui_stop (xitk_widget_t *w, void *data) {
   xine_stop (gGui->stream);
   gGui->ignore_next = 0;
 
+  gGui->stream_length.pos = gGui->stream_length.time = gGui->stream_length.length = 0;
+  
   mediamark_reset_played_state();
   if(gGui->visual_anim.running) {
     xine_stop(gGui->visual_anim.stream);
@@ -883,70 +909,27 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   osd_update_status();
 }
 
-void *gui_set_current_position_thread(void *data) {
-  int pos = (int)data;
-  int update_mmk = 0;
-
-  pthread_detach(pthread_self());
-  
-  if(gGui->playlist.num && 
-     (!strcmp(gGui->playlist.mmk[gGui->playlist.cur]->mrl, gGui->mmk.mrl)))
-    update_mmk = 1;
-  
-  (void) gui_xine_play(gGui->stream, pos, 0, update_mmk);
-  
-  gGui->ignore_next = 0;
-  panel_check_pause();
-
-  pthread_exit(NULL);
-  return NULL;
-}
-
-void *gui_seek_relative_thread(void *data) {
-  int off_sec = (int)data;
-  int sec, pos;
+static void *gui_set_current_position_thread(void *data) {
+  int  pos = (int) data;
+  int  update_mmk = 0;
   
   pthread_detach(pthread_self());
-  
-  if(!gui_xine_get_pos_length(gGui->stream, NULL, &sec, NULL)) {
-    pthread_exit(NULL);
-    return NULL;
-  }
-  
-  sec /= 1000;
-
-  if((sec + off_sec) < 0)
-    sec = 0;
-  else
-    sec += off_sec;
-
-  (void) gui_xine_play(gGui->stream, 0, sec, 1);
-
-  if(gui_xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
-    osd_stream_position(pos);
-  
-  gGui->ignore_next = 0;
-  panel_check_pause();
-
-  pthread_exit(NULL);
-  return NULL;
-}
-
-void gui_set_current_position (int pos) {
-  int err;
-  
-  osd_stream_position(pos);
 
   if(gGui->logo_mode && (mediamark_get_current_mrl())) {
     if(!xine_open(gGui->stream, (mediamark_get_current_mrl()))) {
       gui_handle_xine_error(gGui->stream, (char *)(mediamark_get_current_mrl()));
-      return;
+      pthread_mutex_unlock(&gGui->xe_mutex);
+      pthread_exit(NULL);
+      return NULL;
     }
   }
 
   if(((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
-     (gGui->ignore_next == 1))
-    return;
+     (gGui->ignore_next == 1)) {
+    pthread_mutex_unlock(&gGui->xe_mutex);
+    pthread_exit(NULL);
+    return NULL;
+  }
     
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
     xine_open(gGui->stream, gGui->mmk.mrl);
@@ -962,27 +945,131 @@ void gui_set_current_position (int pos) {
   
   gGui->ignore_next = 1;
   
-  if ((err = pthread_create(&seek_thread,
-			    NULL, gui_set_current_position_thread, (void *)pos)) != 0) {
-    printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
-    abort();
-  }
+  if(gGui->playlist.num && 
+     (!strcmp(gGui->playlist.mmk[gGui->playlist.cur]->mrl, gGui->mmk.mrl)))
+    update_mmk = 1;
+  
+  do {
+    int opos;
+    
+    pthread_mutex_lock(&new_pos_mutex);
+    opos = gGui->new_pos;
+    pthread_mutex_unlock(&new_pos_mutex);
+    
+    xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+    osd_stream_position(pos);
+    
+    (void) gui_xine_play(gGui->stream, pos, 0, update_mmk);
+    
+    xine_get_pos_length(gGui->stream,
+			&(gGui->stream_length.pos),
+			&(gGui->stream_length.time), 
+			&(gGui->stream_length.length));
+    panel_update_runtime_display();
+    
+    pthread_mutex_lock(&new_pos_mutex);
+    if(opos == gGui->new_pos)
+      gGui->new_pos = -1;
+    
+    pos = gGui->new_pos;
+    pthread_mutex_unlock(&new_pos_mutex);
+    
+  } while(pos != -1);
+  
+  gGui->ignore_next = 0;
+  panel_check_pause();
+
+  pthread_mutex_unlock(&gGui->xe_mutex);
+  pthread_exit(NULL);
+  return NULL;
 }
 
-void gui_seek_relative (int off_sec) {
-  int err;
+static void *gui_seek_relative_thread(void *data) {
+  int off_sec = (int)data;
+  int sec, pos;
   
+  pthread_detach(pthread_self());
+  
+  pthread_mutex_lock(&new_pos_mutex);
+  gGui->new_pos = -1;
+  pthread_mutex_unlock(&new_pos_mutex);
+
+  if(!gui_xine_get_pos_length(gGui->stream, NULL, &sec, NULL)) {
+    pthread_exit(NULL);
+    return NULL;
+  }
+  
+  if(pthread_mutex_trylock(&gGui->xe_mutex)) {
+    pthread_exit(NULL);
+    return NULL;
+  }
+
   if(((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
-     (gGui->ignore_next == 1))
-    return;
+     (gGui->ignore_next == 1)) {
+    pthread_mutex_unlock(&gGui->xe_mutex);
+    pthread_exit(NULL);
+    return NULL;
+  }
   
-  if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY)
-    return;
+  if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
+    pthread_mutex_unlock(&gGui->xe_mutex);
+    pthread_exit(NULL);
+    return NULL;
+  }
   
   gGui->ignore_next = 1;
   
-  if ((err = pthread_create(&seek_thread,
-			    NULL, gui_seek_relative_thread, (void *)off_sec)) != 0) {
+  sec /= 1000;
+
+  if((sec + off_sec) < 0)
+    sec = 0;
+  else
+    sec += off_sec;
+
+  (void) gui_xine_play(gGui->stream, 0, sec, 1);
+  
+  pthread_mutex_unlock(&gGui->xe_mutex);
+
+  if(gui_xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
+    osd_stream_position(pos);
+  
+  gGui->ignore_next = 0;
+  panel_check_pause();
+
+  pthread_exit(NULL);
+  return NULL;
+}
+
+void gui_set_current_position (int pos) {
+  int        err;
+  pthread_t  sthread;
+
+  if(gGui->new_pos == -1) {
+    
+    pthread_mutex_lock(&gGui->xe_mutex);
+
+    pthread_mutex_lock(&new_pos_mutex);
+    gGui->new_pos = pos;
+    pthread_mutex_unlock(&new_pos_mutex);
+    
+    if((err = pthread_create(&sthread, NULL, gui_set_current_position_thread, (void *)pos)) != 0) {
+      printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
+      abort();
+    }
+  }
+  else {
+    pthread_mutex_lock(&new_pos_mutex);
+    gGui->new_pos = pos;
+    pthread_mutex_unlock(&new_pos_mutex);
+  }
+
+}
+
+void gui_seek_relative (int off_sec) {
+  int        err;
+  pthread_t  sthread;
+  
+  if((err = pthread_create(&sthread, NULL, gui_seek_relative_thread, (void *)off_sec)) != 0) {
     printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     abort();
   }

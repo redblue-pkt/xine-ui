@@ -315,7 +315,7 @@ void xitk_browser_set_select(xitk_widget_t *w, int select) {
  */
 void xitk_browser_rebuild_browser(xitk_widget_t *w, int start) {
   browser_private_data_t *private_data;
-  int                     i, j, max;
+  int                     i, j, max = 0;
 
   if(w && (((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
 	   (w->type & WIDGET_GROUP_WIDGET))) {

@@ -254,7 +254,6 @@ void gui_execute_action_id(action_id_t action) {
   xine_event_t   xine_event;
   
   if(action & ACTID_IS_INPUT_EVENT) {
-    
     if((action >= ACTID_EVENT_NUMBER_0) && (action <= ACTID_EVENT_NUMBER_9)) {
 
       if(!gGui->numeric.set) {
@@ -984,6 +983,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   
   gGui->is_display_mrl = 0;
   gGui->mrl_overrided = 0;
+  gGui->new_pos = -1;
 
   gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 

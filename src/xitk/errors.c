@@ -246,4 +246,5 @@ void gui_handle_xine_error(xine_stream_t *stream, char *mrl) {
     break;
   }
 
+  gGui->new_pos = -1;
 }

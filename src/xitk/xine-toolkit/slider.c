@@ -504,8 +504,10 @@ static int notify_click_slider(xitk_widget_t *w, int button, int bUp, int x, int
 	
 	if(bUp == 0) {
 	  
-	  if(old_value != ((int) private_data->value))
+	  if(old_value != ((int) private_data->value)) {
+	    slider_update_value(w, private_data->value);
 	    paint_slider(w);
+	  }
 	  
 	  /*
 	   * Exec motion callback function (if available)
@@ -521,7 +523,8 @@ static int notify_click_slider(xitk_widget_t *w, int button, int bUp, int x, int
 	else if(bUp == 1) {
 	  private_data->bClicked = 0;
 	  
-	  xitk_slider_set_pos(w, private_data->value);
+	  slider_update_value(w, private_data->value);
+	  paint_slider(w);
 	  
 	  if(private_data->callback) {
 	    private_data->callback(private_data->sWidget,

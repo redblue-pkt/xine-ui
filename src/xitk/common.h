@@ -125,9 +125,18 @@ typedef struct {
   xine_audio_port_t        *ao_port;
 
   xine_stream_t            *stream;
+
+  struct {
+    int                     pos;
+    int                     time;
+    int                     length;
+  } stream_length;
+
   xine_stream_t            *spu_stream;
 
   xine_t                   *xine;
+  pthread_mutex_t           xe_mutex;
+  int                       new_pos;
 
   xine_event_queue_t       *event_queue;
 

@@ -243,9 +243,16 @@ void panel_update_runtime_display(void) {
   if(!panel_is_visible())
     return;
 
-  if(!gui_xine_get_pos_length(gGui->stream, &pos, &seconds, &length))
-    return;
-  
+  if(!gui_xine_get_pos_length(gGui->stream, &pos, &seconds, &length)) {
+    if((gGui->stream_length.pos || gGui->stream_length.time) && gGui->stream_length.length) {
+      pos     = gGui->stream_length.pos;
+      seconds = gGui->stream_length.time;
+      length  = gGui->stream_length.length;
+    }
+    else
+      return;
+  }
+
   if((pos || seconds) && length) {
     remain = (length - seconds) / 1000;
     seconds /= 1000;
@@ -293,10 +300,13 @@ static void *slider_loop(void *dummy) {
 	if(gui_xine_get_pos_length(gGui->stream, &pos, &secs, NULL)) {
 	  secs /= 1000;
 
+	  pthread_mutex_lock(&gGui->xe_mutex);
+
 	  if(gGui->playlist.num && gGui->mmk.end != -1) {
 	    if(secs >= gGui->playlist.mmk[gGui->playlist.cur]->end) {
 	      gGui->ignore_next = 0;
 	      gui_playlist_start_next();
+	      pthread_mutex_unlock(&gGui->xe_mutex);
 	      goto __next_iteration;
 	    }
 	  }
@@ -313,6 +323,8 @@ static void *slider_loop(void *dummy) {
 	      }
 	    }
 	  }
+
+	  pthread_mutex_unlock(&gGui->xe_mutex);
 	}
 	else
 	  pos = -1;
@@ -357,7 +369,7 @@ static void *slider_loop(void *dummy) {
 	    if(!(i % 20)) {
 	      panel_update_channel_display();
 	      
-	      if(gGui->mixer.caps & MIXER_CAP_VOL) { 
+	      if(gGui->mixer.caps & MIXER_CAP_VOL) {
 		gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
 		xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
 		panel_check_mute();
