@@ -54,10 +54,10 @@ skin.TitleLabel {
 	  x = 20
 	  y = 18
 	}
-	pixmap = letters.png
 	label {
 	  length = 60
 	  animation = True
+	  pixmap = letters.png
 	}
 }
 
@@ -66,10 +66,10 @@ skin.TimeLabel {
 	  x = 20
 	  y = 41
 	}
-	pixmap = letters.png
 	label {
 	  length = 8
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -78,10 +78,10 @@ skin.AudioLabel {
 	  x = 353
 	  y = 41
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -106,10 +106,10 @@ skin.SpuLabel {
 	  x = 293
 	  y = 41
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -416,10 +416,10 @@ skin.AutoPlayLbl {
 	  x = 360
 	  y = 40
 	}
-	pixmap = letters.png
 	label {
 	  length = 9
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -477,10 +477,10 @@ skin.CtlHueLbl {
 	  x = 76
 	  y = 168
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -501,10 +501,10 @@ skin.CtlSatLbl {
 	  x = 116
 	  y = 168
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -525,10 +525,10 @@ skin.CtlBrightLbl {
 	  x = 156
 	  y = 168
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -549,10 +549,10 @@ skin.CtlContLbl {
 	  x = 196
 	  y = 168
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -589,10 +589,10 @@ skin.CtlSkLbl {
 	  x = 305
 	  y = 25
 	}
-	pixmap = letters.png
 	label {
 	  length = 13
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -744,10 +744,10 @@ skin.MrlCurOrigin {
 	  x = 35
 	  y = 186
 	}
-	pixmap = letters.png
 	label {
 	  length = 50
 	  animation = True
+	  pixmap = letters.png
 	}
 }
 
@@ -756,10 +756,10 @@ skin.MrlPlugLabel {
 	  x = 360
 	  y = 40
 	}
-	pixmap = letters.png
 	label {
 	  length = 7
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 

@@ -32,6 +32,7 @@
 #include "widget.h"
 #include "image.h"
 #include "labelbutton.h"
+#include "font.h"
 #include "widget_types.h"
 
 #include "_xitk.h"
@@ -63,36 +64,30 @@ static Pixmap create_labelofbutton(xitk_widget_t *lb,
 				   Window win, GC gc, Pixmap pix, 
 				   int xsize, int ysize, 
 				   char *label, int state) {
-  lbutton_private_data_t *private_data = 
+  lbutton_private_data_t  *private_data = 
     (lbutton_private_data_t *) lb->private_data;
-  XFontStruct *fs = NULL;
-  XCharStruct cs;
-  int dir, as, des, len, xoff = 0, yoff = 0, DefaultColor = -1;
-  unsigned int fg;
-  XColor color;
-  xitk_color_names_t *gColor = NULL;
+  xitk_font_t             *fs = NULL;
+  int                      lbear, rbear, width, asc, des;
+  int                      xoff = 0, yoff = 0, DefaultColor = -1;
+  unsigned int             fg;
+  XColor                   color;
+  xitk_color_names_t      *gColor = NULL;
 
   color.flags = DoRed|DoBlue|DoGreen;
 
   /* Try to load font */
   if(private_data->fontname)
-    fs = XLoadQueryFont(private_data->display, private_data->fontname);
-
-  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "fixed");
-  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "times-roman");
-  if(fs == NULL) fs = XLoadQueryFont(private_data->display, "*times-medium-r*");
-
+    fs = xitk_font_load_font(private_data->display, private_data->fontname);
+  
+  if(fs == NULL)
+    fs = xitk_font_load_font(private_data->display, "fixed");
+  
   if(fs == NULL) {
-    XITK_DIE("%s()@%d: XLoadQueryFont() returned NULL!. Exiting\n", __FUNCTION__, __LINE__);
+    XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
   }
-
-  XLOCK(private_data->display);
-  XSetFont(private_data->display, gc, fs->fid);
-
-  XTextExtents(fs, label, strlen(label), &dir, &as, &des, &cs);
-  XUNLOCK(private_data->display);
-
-  len = cs.width;
+  
+  xitk_font_set_font(fs, gc);
+  xitk_font_string_extent(fs, label, &lbear, &rbear, &width, &asc, &des);
 
   /*  Some colors configurations */
   switch(state) {
@@ -145,12 +140,12 @@ static Pixmap create_labelofbutton(xitk_widget_t *lb,
 
   /*  Put text in the right place */
   XDrawString(private_data->display, pix, gc, 
-	      (xsize-(len+xoff))>>1, ((ysize+as+des+yoff)>>1)-des, 
+	      (xsize-(width+xoff))>>1, ((ysize+asc+des+yoff)>>1)-des, 
 	      label, strlen(label));
   
-  XFreeFont(private_data->display, fs);
-
   XUNLOCK(private_data->display);
+
+  xitk_font_unload_font(fs);
 
   if(gColor) {
     XITK_FREE(gColor->colorname);

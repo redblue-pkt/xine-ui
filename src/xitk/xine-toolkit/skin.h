@@ -40,6 +40,7 @@ typedef struct xitk_skin_element_s {
   /* label */
   int                           animation;
   int                           length;
+  char                         *pixmap_font;
   char                         *color;
   char                         *color_focus;
   char                         *color_click;

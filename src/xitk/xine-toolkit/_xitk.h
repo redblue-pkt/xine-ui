@@ -368,8 +368,14 @@ char *xitk_skin_get_label_color_click(xitk_skin_config_t *, const char *);
 int xitk_skin_get_label_length(xitk_skin_config_t *, const char *);
 int xitk_skin_get_label_animation(xitk_skin_config_t *, const char *);
 char *xitk_skin_get_label_fontname(xitk_skin_config_t *, const char *);
+char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const char *str);
 char *xitk_skin_get_skin_filename(xitk_skin_config_t *, const char *);
 char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str);
 int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str);
+
+typedef struct {
+  Display       *display;
+  XFontStruct   *font;
+} xitk_font_t;
 
 #endif

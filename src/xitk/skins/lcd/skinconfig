@@ -34,10 +34,10 @@ skin.TitleLabel {
 	  x = 170
 	  y = 32
 	}
-	pixmap = letters.png
 	label {
 	  length = 60
 	  animation = True
+	  pixmap = letters.png
 	}
 }
 
@@ -46,10 +46,10 @@ skin.TimeLabel {
 	  x = 480
 	  y = 51
 	}
-	pixmap = letters.png
 	label {
 	  length = 8
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -74,10 +74,10 @@ skin.AudioLabel {
 	  x = 170
 	  y = 52
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -102,10 +102,10 @@ skin.SpuLabel {
 	  x = 230
 	  y = 52
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -403,10 +403,10 @@ skin.AutoPlayLbl {
 	  x = 410
 	  y = 40
 	}
-	pixmap = letters.png
 	label {
 	  length = 9
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -464,10 +464,10 @@ skin.CtlHueLbl {
 	  x = 77
 	  y = 168
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -488,10 +488,10 @@ skin.CtlSatLbl {
 	  x = 117
 	  y = 168
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -512,10 +512,10 @@ skin.CtlBrightLbl {
 	  x = 157
 	  y = 168
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -536,10 +536,10 @@ skin.CtlContLbl {
 	  x = 197
 	  y = 168
 	}
-	pixmap = letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -576,10 +576,10 @@ skin.CtlSkLbl {
 	  x = 350
 	  y = 30
 	}
-	pixmap = letters.png
 	label {
 	  length = 13
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 
@@ -732,10 +732,10 @@ skin.MrlCurOrigin {
 	  x = 75
 	  y = 200
 	}
-	pixmap = letters.png
 	label {
 	  length = 50
 	  animation = True
+	  pixmap = letters.png
 	}
 }
 
@@ -758,10 +758,10 @@ skin.MrlPlugLabel {
 	  x = 410
 	  y = 40
 	}
-	pixmap = letters.png
 	label {
 	  length = 7
 	  animation = False
+	  pixmap = letters.png
 	}
 }
 

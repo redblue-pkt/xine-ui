@@ -984,4 +984,81 @@ char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char
  *
  */
 int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str);
+
+
+/**
+ * Font manipulations.
+ */
+typedef void xitk_font_t;
+/*
+ *
+ */
+xitk_font_t *xitk_font_load_font(Display *display, char *font);
+
+/*
+ *
+ */
+void xitk_font_unload_font(xitk_font_t *xtfs);
+
+/*
+ *
+ */
+Font xitk_font_get_font_id(xitk_font_t *xtfs);
+
+/*
+ *
+ */
+int xitk_font_is_font_8(xitk_font_t *xtfs);
+
+/*
+ *
+ */
+int xitk_font_is_font_16(xitk_font_t *xtfs);
+
+/*
+ *
+ */
+int xitk_font_get_text_width(xitk_font_t *xtfs, const char *c, int length);
+
+/*
+ *
+ */
+int xitk_font_get_string_length(xitk_font_t *xtfs, const char *c);
+
+/*
+ *
+ */
+int xitk_font_get_char_width(xitk_font_t *xtfs, unsigned char *c);
+
+/*
+ *
+ */
+int xitk_font_get_text_height(xitk_font_t *xtfs, const char *c, int length);
+
+/*
+ *
+ */
+int xitk_font_get_string_height(xitk_font_t *xtfs, const char *c);
+
+/*
+ *
+ */
+int xitk_font_get_char_height(xitk_font_t *xtfs, unsigned char *c);
+
+/*
+ *
+ */
+void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int length,
+			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
+
+/*
+ *
+ */
+void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
+			    int *lbearing, int *rbearing, int *width, int *ascent, int *descent);
+
+/*
+ *
+ */
+void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
 #endif

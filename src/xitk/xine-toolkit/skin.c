@@ -245,6 +245,11 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->length = strtol(p, &p, 10);
 	}
+	else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->pixmap_font = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
+	  sprintf(skonfig->celement->pixmap_font, "%s/%s", skonfig->path, p);
+	}
 	else if(!strncasecmp(skonfig->ln, "color", 5)) {
 	  skin_set_pos_to_value(&p);
 	  skonfig->celement->color = strdup(p);
@@ -389,6 +394,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  color       = '%s'\n", s->color);
       printf("  color focus = '%s'\n", s->color_focus);
       printf("  color click = '%s'\n", s->color_click);
+      printf("  pixmap font = '%s'\n", s->pixmap_font);
       printf("  font        = '%s'\n", s->font);
       s = s->next;
     }
@@ -405,6 +411,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
       printf("  color       = '%s'\n", s->color);
       printf("  color focus = '%s'\n", s->color_focus);
       printf("  color click = '%s'\n", s->color_click);
+      printf("  pixmap font = '%s'\n", s->pixmap_font);
       printf("  font        = '%s'\n", s->font);
       s = s->prev;
     }
@@ -465,6 +472,7 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
 	XITK_FREE(s->section);
 	XITK_FREE(s->pixmap);
 	XITK_FREE(s->pixmap_pad);
+	XITK_FREE(s->pixmap_font);
 	XITK_FREE(s->color);
 	XITK_FREE(s->color_focus);
 	XITK_FREE(s->color_click);
@@ -633,6 +641,18 @@ char *xitk_skin_get_label_fontname(xitk_skin_config_t *skonfig, const char *str)
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->font;
+  
+  return NULL;
+}
+
+/*
+ *
+ */
+char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->pixmap_font;
   
   return NULL;
 }

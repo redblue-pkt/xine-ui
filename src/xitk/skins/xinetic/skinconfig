@@ -51,10 +51,10 @@ skin.TitleLabel {
 	  x = 42
 	  y = 18
 	}
-	pixmap = Letters.png
 	label {
 	  length = 51
 	  animation = True
+	  pixmap = Letters.png
 	}
 }
 
@@ -63,10 +63,10 @@ skin.TimeLabel {
 	  x = 66
 	  y = 37
 	}
-	pixmap = Letters.png
 	label {
 	  length = 8
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -91,10 +91,10 @@ skin.AudioLabel {
 	  x = 270
 	  y = 37
 	}
-	pixmap = Letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -119,10 +119,10 @@ skin.SpuLabel {
 	  x = 330
 	  y = 37
 	}
-	pixmap = Letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -413,10 +413,10 @@ skin.AutoPlayLbl {
 	  x = 337
 	  y = 20
 	}
-	pixmap = Letters.png
 	label {
 	  length = 9
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -474,10 +474,10 @@ skin.CtlHueLbl {
 	  x = 23
 	  y = 190
 	}
-	pixmap = Letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -498,10 +498,10 @@ skin.CtlSatLbl {
 	  x = 67
 	  y = 190
 	}
-	pixmap = Letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -522,10 +522,10 @@ skin.CtlBrightLbl {
 	  x = 111
 	  y = 190
 	}
-	pixmap = Letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -546,10 +546,10 @@ skin.CtlContLbl {
 	  x = 155
 	  y = 190
 	}
-	pixmap = Letters.png
 	label {
 	  length = 3
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -572,10 +572,10 @@ skin.CtlSkLbl {
 	  x = 268
 	  y = 20
 	}
-	pixmap = Letters.png
 	label {
 	  length = 13
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 
@@ -727,10 +727,10 @@ skin.MrlCurOrigin {
 	  x = 21
 	  y = 192
 	}
-	pixmap = Letters.png
 	label {
 	  length = 43
 	  animation = True
+	  pixmap = Letters.png
 	}
 }
 
@@ -753,10 +753,10 @@ skin.MrlPlugLabel {
 	  x = 337
 	  y = 20
 	}
-	pixmap = Letters.png
 	label {
 	  length = 7
 	  animation = False
+	  pixmap = Letters.png
 	}
 }
 ### File Browser ##

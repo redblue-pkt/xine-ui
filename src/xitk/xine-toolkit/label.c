@@ -212,7 +212,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     
     XITK_FREE_XITK_IMAGE(private_data->display, private_data->font);
     private_data->font        = xitk_load_image(private_data->imlibdata, 
-						   xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+						   xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
     private_data->char_length = (private_data->font->width/32);
     private_data->char_height = (private_data->font->height/3);
     
@@ -273,7 +273,7 @@ xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_
   private_data->lWidget        = mywidget;
 
   private_data->font           = xitk_load_image(private_data->imlibdata, 
-						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+						 xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
   private_data->char_length    = (private_data->font->width/32);
   private_data->char_height    = (private_data->font->height/3);
 
