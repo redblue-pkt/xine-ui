@@ -450,9 +450,13 @@ void gui_execute_action_id(action_id_t action) {
     break;
     
   case ACTID_TOGGLE_WINOUT_VISIBLITY:
-    gui_toggle_visibility (NULL, NULL);
+    gui_toggle_visibility(NULL, NULL);
     break;
     
+  case ACTID_TOGGLE_WINOUT_BORDER:
+    gui_toggle_border(NULL, NULL);
+    break;
+
   case ACTID_AUDIOCHAN_NEXT:
     if(!gGui->numeric.set)
       gui_change_audio_channel(NULL, (void*)GUI_NEXT);

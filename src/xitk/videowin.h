@@ -92,4 +92,7 @@ void video_window_get_visible_size(int *w, int *h);
 void video_window_get_output_size(int *w, int *h);
 
 void video_window_set_mrl(char *mrl);
+
+void video_window_toggle_border(void);
+
 #endif

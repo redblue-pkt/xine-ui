@@ -2166,3 +2166,34 @@ void video_window_set_mrl(char *mrl) {
     XUnlockDisplay(gGui->video_display);
   }
 }
+
+void video_window_toggle_border(void) {
+  
+  if(!gGui->use_root_window && (gVw->fullscreen_mode & WINDOWED_MODE)) {
+    gVw->borderless = !gVw->borderless;
+    
+    if(gVw->show) {
+      Atom         prop;
+      MWMHints     mwmhints;
+      XClassHint  *xclasshint;
+
+      XLockDisplay(gGui->video_display);
+
+      prop                 = XInternAtom(gGui->video_display, "_MOTIF_WM_HINTS", False);
+      mwmhints.flags       = MWM_HINTS_DECORATIONS;
+      mwmhints.decorations = gVw->borderless ? 0 : 1;
+      xclasshint           = gVw->borderless ? gVw->xclasshint_borderless : gVw->xclasshint;
+
+      XChangeProperty(gGui->video_display, gGui->video_window, prop, prop, 32,
+		      PropModeReplace, (unsigned char *) &mwmhints,
+		      PROP_MWM_HINTS_ELEMENTS);
+      
+      if(xclasshint != NULL)
+	XSetClassHint(gGui->video_display, gGui->video_window, xclasshint);
+
+      XUnlockDisplay (gGui->video_display);
+      
+      xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void *)gGui->video_window);
+    }
+  }
+}

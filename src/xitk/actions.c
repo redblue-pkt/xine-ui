@@ -887,8 +887,11 @@ void gui_toggle_visibility(xitk_widget_t *w, void *data) {
 	gGui->visual_anim.running = 2;
       }
     }
-
   }
+}
+
+void gui_toggle_border(xitk_widget_t *w, void *data) {
+  video_window_toggle_border();
 }
 
 static void set_fullscreen_mode(int fullscreen_mode) {
