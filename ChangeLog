@@ -1,0 +1,10 @@
+xine-ui (0.9.1) unstable; urgency=low
+
+  * started changelog for xine-ui
+  * fixed some race conditions
+  * xine panel shouldn't suddenly appear any more when switching to/from
+    full screen
+  * corrected symbol for MRL browser		
+
+ -- Siggi Langauf <siggi@debian.org>  Tue, 18 Sep 2001 01:32:06 +0200
+
