@@ -64,6 +64,32 @@ five_channel            1/0 : enable 5-channel playback
 
 four_channel            1/0 : enable 4-channel playback
 
+oss_audio_sync          Type of audio/video synchronization desired
+                        0 = AUTO_DETECT:      System attempts to automatically
+                                              detect thhe optimal type of audio/
+                                              video synchronization, with the
+                                              preference order being GETODELAY,
+                                              GETOPTR, and finally SOFTSYNC
+                        1 = FORCE_GETODELAY:  Try to force use of the
+                                              SNDCTL_DSP_GETODELAY ioctl
+                                              to achieve true audio/video
+                                              synchronization, even if the
+                                              audio driver doesn't claim
+                                              to support real-time
+                        2 = FORCE_GETOPTR:    Try to force use of the
+                                              SNDCTL_DSP_GETOPTR ioctl
+                                              to achieve true audio/video
+                                              synchronization, even if the
+                                              system supports the preferred
+                                              SNDCTL_DSP_GETODELAY ioctl
+                        3 = FORCE_SOFTSYNC:   Force use of the system real-time
+                                              clock for audio softsync with
+                                              the video, even if the audio
+                                              driver actually has support for
+                                              real-time - there may be audio/
+                                              video synchronization issues
+                                              with use of this setting
+
 oss_resample            XINE can play different sample rates than your
 			soundcard supports.
 			0 = AUTO: Only do resampling with different
