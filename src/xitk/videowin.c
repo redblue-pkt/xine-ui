@@ -24,6 +24,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
+#include <X11/extensions/XShm.h>
 
 #include <xine.h>
 #include <xine/video_out_x11.h>
@@ -59,6 +60,9 @@ typedef struct {
   int            show;
   XWMHints      *wm_hint;
   DND_struct_t   xdnd;
+
+  int            completion_event;
+
 } gVw_t;
 
 static gVw_t    *gVw;
@@ -507,6 +511,16 @@ void video_window_init (void) {
   gVw->wm_hint->icon_pixmap   = gGui->icon;
   gVw->wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
 
+  /*
+   * completion event
+   */
+
+  if (XShmQueryExtension (gGui->display) == True) {
+    gVw->completion_event = XShmGetEventBase (gGui->display) + ShmCompletion;
+  } else {
+    gVw->completion_event = -1;
+  }
+
   XUnlockDisplay (gGui->display);
 
   video_window_adapt_size (768, 480, &x, &y, &w, &h);
@@ -561,4 +575,10 @@ void video_window_handle_event (XEvent *event) {
     dnd_process_client_message (&gVw->xdnd, event);
     break;
   }
+
+  if (event->type == gVw->completion_event) 
+    gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
+					GUI_DATA_EX_COMPLETION_EVENT, 
+					event);
+
 }
