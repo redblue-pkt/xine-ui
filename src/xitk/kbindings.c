@@ -409,6 +409,8 @@ static kbinding_entry_t default_binding_table[] = {
     "SpuVideoDecay+",         ACTID_SV_SYNC_p               , "M",        KEYMOD_NOMOD   , 0 },
   { "change subtitle syncing (delay subtitles)",
     "SpuVideoDecay-",         ACTID_SV_SYNC_m               , "N",        KEYMOD_NOMOD   , 0 },
+  { "reset subtitle syncing offset",
+    "SpuVideoDecayReset",     ACTID_SV_SYNC_RESET           , "End",      KEYMOD_NOMOD   , 0 },
   { "toggle TV modes (on the DXR3)",
     "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL | KEYMOD_META , 0 },
   { "switch Monitor to DPMS standby mode",

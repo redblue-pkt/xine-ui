@@ -272,6 +272,27 @@ static void gui_signal_handler (int sig, void *data) {
 
 }
 
+
+/*
+ * convert pts value to string
+ */
+char *pts2str(int64_t pts) {
+  static char buf[40];
+  int64_t min;
+  int ds;
+  double sec;
+
+  min = pts / (90000 * 60);
+  sec = fabs((double)pts / 90000 - 60 * min);
+  ds = sec / 10;
+  sec -= 10 * ds;
+
+  snprintf(buf, sizeof(buf), "%s%02" PRIi64 ":%d%.2f (%" PRIi64 " pts)", pts < 0 ? "-" : "", min, ds, sec, pts >= 0 ? pts : -pts);
+
+  return buf;
+}
+
+
 /*
  *
  */
@@ -563,7 +584,7 @@ void gui_execute_action_id(action_id_t action) {
       if (gGui->playlist.cur < gGui->playlist.num)
         gGui->playlist.mmk[gGui->playlist.cur]->av_offset = av_offset;
       xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, av_offset);
-      osd_display_info(_("A/V offset: %d"), av_offset);
+      osd_display_info(_("A/V offset: %s"), pts2str(av_offset));
     }
     break;
     
@@ -575,7 +596,7 @@ void gui_execute_action_id(action_id_t action) {
       if (gGui->playlist.cur < gGui->playlist.num)
         gGui->playlist.mmk[gGui->playlist.cur]->av_offset = av_offset;
       xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, av_offset);
-      osd_display_info(_("A/V offset: %d"), av_offset);
+      osd_display_info(_("A/V offset: %s"), pts2str(av_offset));
     }
     break;
 
@@ -589,7 +610,8 @@ void gui_execute_action_id(action_id_t action) {
       int spu_offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) + 3600;
       
       xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
-      osd_display_info(_("SPU Offset: %d"), spu_offset);
+      
+      osd_display_info(_("SPU Offset: %s"), pts2str(spu_offset));
     }
     break;
 
@@ -598,10 +620,16 @@ void gui_execute_action_id(action_id_t action) {
       int spu_offset = xine_get_param(gGui->stream, XINE_PARAM_SPU_OFFSET) - 3600;
       
       xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
-      osd_display_info(_("SPU Offset: %d"), spu_offset);
+      
+      osd_display_info(_("SPU Offset: %s"), pts2str(spu_offset));
     }
     break;
     
+  case ACTID_SV_SYNC_RESET:
+    xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, 0);
+    osd_display_info(_("SPU Offset: reset."));
+    break;
+
   case ACTID_SPEED_FAST:
     gui_change_speed_playback(NULL, (void*)GUI_PREV);
     break;
