@@ -1,3 +1,10 @@
+xine-ui (1-alpha0-0) unstable; urgency=low
+
+  * new upstream (alpha!) release
+    (not suited for upload yet)
+
+ -- Siggi Langauf <siggi@flake.langauf.de>  Sun,  3 Nov 2002 20:50:40 +0100
+
 xine-ui (0.9.13-1) unstable; urgency=low
 
   * new upstream release
