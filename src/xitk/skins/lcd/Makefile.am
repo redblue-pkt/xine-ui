@@ -9,7 +9,8 @@ data_DATA = arrowdn.png arrowup.png bg.png close.png eject.png fastb.png \
 	slider_pad.png smallbtn.png stop.png playlist.png setup.png \
 	mrl.png pl_inputtxt.png pl_play.png pl_delete.png pl_deleteall.png \
 	pl_moveup.png pl_movedown.png ctl_bg.png mrl_bg.png mrl_play.png \
-	playslow.png playfast.png volumebg.png volumepad.png mute.png cam.png skinconfig
+	playslow.png playfast.png volumebg.png volumepad.png mute.png cam.png \
+	sk_slidv.png sk_itembtn.png skinconfig
 
 debug:
 install-debug: install

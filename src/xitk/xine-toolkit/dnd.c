@@ -20,7 +20,6 @@
  * $Id$
  *
  */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -50,9 +49,10 @@ Atom _XA_XINE_XDNDEXCHANGE;
 
 #define XDND_VERSION 3
 
-//static gui_dnd_callback_t gui_dnd_callback;
-
-void dnd_init_dnd(Display *display, xitk_dnd_t *xdnd) {
+/*
+ *
+ */
+void xitk_init_dnd(Display *display, xitk_dnd_t *xdnd) {
 
   xdnd->display = display;
 
@@ -75,7 +75,10 @@ void dnd_init_dnd(Display *display, xitk_dnd_t *xdnd) {
   xdnd->callback = NULL;
 }
 
-void dnd_make_window_aware (xitk_dnd_t *xdnd, Window window) {
+/*
+ *
+ */
+void xitk_make_window_dnd_aware (xitk_dnd_t *xdnd, Window window) {
   
   if(!xdnd->display)
     return;
@@ -87,7 +90,10 @@ void dnd_make_window_aware (xitk_dnd_t *xdnd, Window window) {
   XUNLOCK (xdnd->display);
 }
 
-Bool dnd_process_selection(xitk_dnd_t *xdnd, XEvent *event) {
+/*
+ *
+ */
+Bool xitk_process_dnd_selection(xitk_dnd_t *xdnd, XEvent *event) {
   Atom ret_type;
   int ret_format;
   unsigned long ret_item;
@@ -137,11 +143,17 @@ Bool dnd_process_selection(xitk_dnd_t *xdnd, XEvent *event) {
   return False;
 }
 
-void dnd_set_callback (xitk_dnd_t *xdnd, void *cb) {
+/*
+ *
+ */
+void xitk_set_dnd_callback (xitk_dnd_t *xdnd, xitk_dnd_callback_t cb) {
   xdnd->callback = cb;
 }
 
-Bool dnd_process_client_message(xitk_dnd_t *xdnd, XEvent *event) {
+/*
+ *
+ */
+Bool xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
 
   if (event->xclient.format == 32 && event->xclient.data.l[0] == xdnd->_XA_WM_DELETE_WINDOW) {
     raise(SIGINT); /* video window closed, quit program */
@@ -169,7 +181,7 @@ Bool dnd_process_client_message(xitk_dnd_t *xdnd, XEvent *event) {
       XUNLOCK (xdnd->display);
 
 
-      dnd_process_selection (xdnd, event);
+      xitk_process_dnd_selection (xdnd, event);
     }
 
     return True;
@@ -205,4 +217,3 @@ Bool dnd_process_client_message(xitk_dnd_t *xdnd, XEvent *event) {
   }
   return False;
 }
-

@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_GUI_LABEL_H
-#define HAVE_GUI_LABEL_H
+#ifndef HAVE_XITK_LABEL_H
+#define HAVE_XITK_LABEL_H
 
 #include <X11/Xlib.h>
 #include <pthread.h>
@@ -33,17 +33,19 @@
 
 typedef struct {
   Display          *display;
+  ImlibData        *imlibdata;
+  char             *skin_element_name;
   GC                gc;
   Window            window;
 
-  widget_t         *lWidget;
+  xitk_widget_t    *lWidget;
 
 
   int               char_length; /* length of 1 char */
   int               char_height; /* height of 1 char */
 
   int               length;      /* length in char */
-  gui_image_t      *font;
+  xitk_image_t      *font;
   char             *label;
 
   int               animation;
@@ -61,12 +63,12 @@ typedef struct {
 /**
  * Create a label widget.
  */
-widget_t *label_create (xitk_label_t *l);
+xitk_widget_t *xitk_label_create (xitk_skin_config_t *skonfig, xitk_label_widget_t *l);
 
 /**
  * Change label of wodget 'widget'.
  */
-int label_change_label (widget_list_t *wl, widget_t *l, char *newlabel);
+int xitk_label_change_label (xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel);
 
 #endif
 

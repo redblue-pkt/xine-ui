@@ -20,7 +20,6 @@
  * $Id$
  *
  */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -35,15 +34,14 @@
 /*
  *
  */
-gui_image_t *gui_load_image(ImlibData *idata, char *image) {
+xitk_image_t *xitk_load_image(ImlibData *idata, char *image) {
   ImlibImage *img = NULL;
-  gui_image_t *i;
+  xitk_image_t *i;
 
-  i = (gui_image_t *) gui_xmalloc(sizeof(gui_image_t));
+  i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
   
   if(!(img = Imlib_load_image(idata, (char *)image))) {
-    fprintf(stderr, "xine-panel: couldn't find image %s\n", image);
-    exit(-1);
+    XITK_DIE("%s(): couldn't find image %s\n", __FUNCTION__, image);
   }
   
   Imlib_render (idata, img, img->rgb_width, img->rgb_height);
@@ -61,8 +59,8 @@ gui_image_t *gui_load_image(ImlibData *idata, char *image) {
 /*
  *
  */
-static void paint_image (widget_t *i, Window win, GC gc) {
-  gui_image_t *skin;
+static void paint_image (xitk_widget_t *i, Window win, GC gc) {
+  xitk_image_t *skin;
   GC lgc;
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
@@ -98,35 +96,64 @@ static void paint_image (widget_t *i, Window win, GC gc) {
 /*
  *
  */
-widget_t *image_create (xitk_image_t *im) {
-  widget_t              *mywidget;
+static void notify_change_skin(xitk_widget_list_t *wl, 
+			       xitk_widget_t *i, xitk_skin_config_t *skonfig) {
+  image_private_data_t *private_data = 
+    (image_private_data_t *) i->private_data;
+  
+  if ((i->widget_type & WIDGET_TYPE_IMAGE) && i->visible) {
+    
+    XITK_FREE_XITK_IMAGE(private_data->display, private_data->skin);
+    private_data->skin = xitk_load_image(private_data->imlibdata,
+					 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+    
+    i->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+    i->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+    i->width           = private_data->skin->width;
+    i->height          = private_data->skin->height;
+    
+    xitk_set_widget_pos(i, i->x, i->y);
+  }
+}
+
+/*
+ *
+ */
+xitk_widget_t *xitk_image_create (xitk_skin_config_t *skonfig, xitk_image_widget_t *im) {
+  xitk_widget_t              *mywidget;
   image_private_data_t *private_data;
 
-  mywidget = (widget_t *) gui_xmalloc (sizeof(widget_t));
+  XITK_CHECK_CONSTITENCY(im);
+
+  mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   private_data = (image_private_data_t *) 
-    gui_xmalloc (sizeof (image_private_data_t));
+    xitk_xmalloc (sizeof (image_private_data_t));
 
-  private_data->display   = im->display;
+  private_data->display           = im->display;
+  private_data->imlibdata         = im->imlibdata;
+  private_data->skin_element_name = strdup(im->skin_element_name);
 
-  private_data->bWidget   = mywidget;
-  private_data->skin      = gui_load_image(im->imlibdata, im->skin);
 
-  mywidget->private_data  = private_data;
+  private_data->bWidget           = mywidget;
+  private_data->skin              = xitk_load_image(private_data->imlibdata,
+						    xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+  mywidget->private_data          = private_data;
 
-  mywidget->enable          = 1;
-  mywidget->running         = 1;
-  mywidget->visible         = 1;
-  mywidget->have_focus      = FOCUS_LOST;
-  mywidget->x               = im->x;
-  mywidget->y               = im->y;
-  mywidget->width           = private_data->skin->width;
-  mywidget->height          = private_data->skin->height;
-  mywidget->widget_type     = WIDGET_TYPE_IMAGE;
-  mywidget->paint           = paint_image;
-  mywidget->notify_click    = NULL;
-  mywidget->notify_focus    = NULL;
-  mywidget->notify_keyevent = NULL;
+  mywidget->enable                = 1;
+  mywidget->running               = 1;
+  mywidget->visible               = 1;
+  mywidget->have_focus            = FOCUS_LOST;
+  mywidget->x                     = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+  mywidget->y                     = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+  mywidget->width                 = private_data->skin->width;
+  mywidget->height                = private_data->skin->height;
+  mywidget->widget_type           = WIDGET_TYPE_IMAGE;
+  mywidget->paint                 = paint_image;
+  mywidget->notify_click          = NULL;
+  mywidget->notify_focus          = NULL;
+  mywidget->notify_keyevent       = NULL;
+  mywidget->notify_change_skin    = notify_change_skin;
 
   return mywidget;
 }

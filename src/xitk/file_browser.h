@@ -20,7 +20,6 @@
  * $Id$
  *
  */
-
 #ifndef FILE_BROWSER_H
 #define FILE_BROWSER_H
 
@@ -28,14 +27,11 @@
 #include "config.h"
 #endif
 
-#ifdef NEED_FILEBROWSER
-
 #include "xitk.h"
 
-typedef void (*select_cb_t) (widget_t *, void *);
-
-void file_browser(xitk_string_callback_t add_cb,
-		  select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb);
+typedef void (*select_cb_t) (xitk_widget_t *, void *);
+void file_browser(xitk_string_callback_t add_cb, select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb);
+void file_browser_change_skins(void);
 void destroy_file_browser(void);
 int file_browser_is_running(void);
 int file_browser_is_visible(void);
@@ -43,7 +39,4 @@ void file_browser_toggle_visibility(void);
 void hide_file_browser(void);
 void show_file_browser(void);
 void set_file_browser_transient(void);
-
-#endif
-
 #endif

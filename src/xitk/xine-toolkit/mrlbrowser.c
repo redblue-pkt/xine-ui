@@ -60,9 +60,9 @@ static void update_current_origin(mrlbrowser_private_data_t *private_data) {
   else
     sprintf(private_data->current_origin, "%s", "");
   
-  label_change_label (private_data->widget_list, 
-		      private_data->widget_origin, 
-		      private_data->current_origin);
+  xitk_label_change_label (private_data->widget_list, 
+			   private_data->widget_origin, 
+			   private_data->current_origin);
   
 }
 
@@ -112,7 +112,7 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
 		  strlen(private_data->mc->mrls[i]->link) + 2);
       else
 	private_data->mc->mrls_disp[i] = (char *) 
-	  gui_xmalloc(strlen(p) + 4 + 
+	  xitk_xmalloc(strlen(p) + 4 + 
 		      strlen(private_data->mc->mrls[i]->link) + 2);
       
       sprintf(private_data->mc->mrls_disp[i], "%s%c -> %s", 
@@ -125,7 +125,7 @@ static void mrlbrowser_create_enlighted_entries(mrlbrowser_private_data_t *priva
 	private_data->mc->mrls_disp[i] = (char *) 
 	  realloc(private_data->mc->mrls_disp[i], strlen(p) + 2);
       else
-      private_data->mc->mrls_disp[i] = (char *) gui_xmalloc(strlen(p) + 2);
+      private_data->mc->mrls_disp[i] = (char *) xitk_xmalloc(strlen(p) + 2);
       
       sprintf(private_data->mc->mrls_disp[i], "%s%c", 
 	      p, get_mrl_marker(private_data->mc->mrls[i]));
@@ -147,7 +147,7 @@ static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
   for (i=0; i<num_mrls; i++) {
 
     if(private_data->mc->mrls[i] == NULL)
-      private_data->mc->mrls[i] = (mrl_t *) gui_xmalloc(sizeof(mrl_t));
+      private_data->mc->mrls[i] = (mrl_t *) xitk_xmalloc(sizeof(mrl_t));
 
     MRL_DUPLICATE(mtmp[i], private_data->mc->mrls[i]);
   }
@@ -156,7 +156,7 @@ static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
 
   while(old_mrls_num > private_data->mrls_num) {
     MRL_ZERO(private_data->mc->mrls[old_mrls_num-1]);
-    free(private_data->mc->mrls[old_mrls_num-1]);
+    XITK_FREE(private_data->mc->mrls[old_mrls_num-1]);
     private_data->mc->mrls[old_mrls_num-1] = NULL;
     old_mrls_num--;
   }
@@ -167,9 +167,9 @@ static void mrlbrowser_duplicate_mrls(mrlbrowser_private_data_t *private_data,
 /*
  * Grab mrls from xine-engine.
  */
-static void mrlbrowser_grab_mrls(widget_t *w, void *data) {
+static void mrlbrowser_grab_mrls(xitk_widget_t *w, void *data) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
-  char *lbl = (char *) labelbutton_get_label(w);
+  char *lbl = (char *) xitk_labelbutton_get_label(w);
   char *old_old_src;
 
   if(lbl) {
@@ -178,7 +178,7 @@ static void mrlbrowser_grab_mrls(widget_t *w, void *data) {
       private_data->last_mrl_source = (char *)
 	realloc(private_data->last_mrl_source, strlen(lbl) + 1);
     else
-      private_data->last_mrl_source = (char *) gui_xmalloc(strlen(lbl) + 1);
+      private_data->last_mrl_source = (char *) xitk_xmalloc(strlen(lbl) + 1);
     
     old_old_src = strdup(private_data->last_mrl_source);
     sprintf(private_data->last_mrl_source, "%s", lbl);
@@ -201,20 +201,20 @@ static void mrlbrowser_grab_mrls(widget_t *w, void *data) {
     
     update_current_origin(private_data);
     mrlbrowser_create_enlighted_entries(private_data);
-    browser_update_list(private_data->mrlb_list, 
-			private_data->mc->mrls_disp, 
-			private_data->mrls_num, 0);
+    xitk_browser_update_list(private_data->mrlb_list, 
+			     private_data->mc->mrls_disp, 
+			     private_data->mrls_num, 0);
   }
 }
 
 /*
  * Dump informations, on terminal, about selected mrl.
  */
-static void mrlbrowser_dumpmrl(widget_t *w, void *data) {
+static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
   int j = -1;
   
-  if((j = browser_get_current_selected(private_data->mrlb_list)) >= 0) {
+  if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
     mrl_t *ms = private_data->mc->mrls[j];
     
     printf("mrl '%s'\n\t+", ms->mrl);
@@ -282,14 +282,14 @@ static void mrlbrowser_dumpmrl(widget_t *w, void *data) {
 /*
  * Return window id of widget.
  */
-Window mrlbrowser_get_window_id(widget_t *w) {
+Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
   
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
     return private_data->window;
   }
- 
+
   return None;
 }
 
@@ -297,21 +297,26 @@ Window mrlbrowser_get_window_id(widget_t *w) {
 /*
  * Fill window information struct of given widget.
  */
-int mrlbrowser_get_window_info(widget_t *w, window_info_t *inf) {
-  mrlbrowser_private_data_t *private_data = 
-    (mrlbrowser_private_data_t *)w->private_data;
+int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
+  mrlbrowser_private_data_t *private_data;
+
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
+    
+    return((xitk_get_window_info(private_data->widget_key, inf))); 
+  }
+  return 0;
   
-  return((widget_get_window_info(private_data->widget_key, inf))); 
 }
 
 /*
  * Boolean about running state.
  */
-int mrlbrowser_is_running(widget_t *w) {
+int xitk_mrlbrowser_is_running(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
  
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
     return (private_data->running);
   }
 
@@ -321,11 +326,11 @@ int mrlbrowser_is_running(widget_t *w) {
 /*
  * Boolean about visible state.
  */
-int mrlbrowser_is_visible(widget_t *w) {
+int xitk_mrlbrowser_is_visible(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
     return (private_data->visible);
   }
 
@@ -335,16 +340,16 @@ int mrlbrowser_is_visible(widget_t *w) {
 /*
  * Hide mrlbrowser.
  */
-void mrlbrowser_hide(widget_t *w) {
+void xitk_mrlbrowser_hide(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
       XLOCK(private_data->display);
       XUnmapWindow(private_data->display, private_data->window);
-      widget_hide_widgets(private_data->widget_list);
+      xitk_hide_widgets(private_data->widget_list);
       XUNLOCK(private_data->display);
       private_data->visible = 0;
     }
@@ -354,14 +359,14 @@ void mrlbrowser_hide(widget_t *w) {
 /*
  * Show mrlbrowser.
  */
-void mrlbrowser_show(widget_t *w) {
+void xitk_mrlbrowser_show(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     XLOCK(private_data->display);
-    widget_show_widgets(private_data->widget_list);
+    xitk_show_widgets(private_data->widget_list);
     XMapRaised(private_data->display, private_data->window); 
     XUNLOCK(private_data->display);
     private_data->visible = 1;
@@ -371,11 +376,11 @@ void mrlbrowser_show(widget_t *w) {
 /*
  * Set mrlbrowser transient for hints for given window.
  */
-void mrlbrowser_set_transient(widget_t *w, Window window) {
+void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w && (window != None)) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER) && (window != None)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
       XLOCK(private_data->display);
@@ -390,11 +395,11 @@ void mrlbrowser_set_transient(widget_t *w, Window window) {
 /*
  * Destroy the mrlbrowser.
  */
-void mrlbrowser_destroy(widget_t *w) {
+void xitk_mrlbrowser_destroy(xitk_widget_t *w) {
   mrlbrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
 
     private_data->running = 0;
     private_data->visible = 0;
@@ -403,36 +408,36 @@ void mrlbrowser_destroy(widget_t *w) {
     XUnmapWindow(private_data->display, private_data->window);
     XUNLOCK(private_data->display);
    
-    widget_stop_widgets(private_data->widget_list);
-    gui_list_free(private_data->widget_list->l);
-    free(private_data->widget_list);
+    xitk_stop_widgets(private_data->widget_list);
+    xitk_list_free(private_data->widget_list->l);
+    XITK_FREE(private_data->widget_list);
 
     {
       int i;
       for(i = private_data->mrls_num; i > 0; i--) {
 	MRL_ZERO(private_data->mc->mrls[i]);
-	free(private_data->mc->mrls[i]);
-	free(private_data->mc->mrls_disp[i]);
+	XITK_FREE(private_data->mc->mrls[i]);
+	XITK_FREE(private_data->mc->mrls_disp[i]);
       }
     }
     
-    free(private_data->mc);
+    XITK_FREE(private_data->mc);
 
     XLOCK(private_data->display);
     XDestroyWindow(private_data->display, private_data->window);
     XUNLOCK(private_data->display);
 
-    widget_unregister_event_handler(&private_data->widget_key);
-    free(private_data->fbWidget);
-    free(private_data);
+    xitk_unregister_event_handler(&private_data->widget_key);
+    XITK_FREE(private_data->fbWidget);
+    XITK_FREE(private_data);
   }
 }
 
 /*
  * Leaving mrlbrowser.
  */
-void mrlbrowser_exit(widget_t *w, void *data) {
-  mrlbrowser_private_data_t *private_data = ((widget_t *)data)->private_data;
+void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
+  mrlbrowser_private_data_t *private_data = ((xitk_widget_t *)data)->private_data;
   
   if(private_data->kill_callback)
     private_data->kill_callback(private_data->fbWidget, NULL);
@@ -444,28 +449,85 @@ void mrlbrowser_exit(widget_t *w, void *data) {
   XUnmapWindow(private_data->display, private_data->window);
   XUNLOCK(private_data->display);
 
-  widget_stop_widgets(private_data->widget_list);
-  gui_list_free(private_data->widget_list->l);
-  free(private_data->widget_list);
+  xitk_stop_widgets(private_data->widget_list);
+  xitk_list_free(private_data->widget_list->l);
+  XITK_FREE(private_data->widget_list);
 
   {
     int i;
     for(i = private_data->mrls_num; i > 0; i--) {
       MRL_ZERO(private_data->mc->mrls[i]);
-      free(private_data->mc->mrls[i]);
-      free(private_data->mc->mrls_disp[i]);
+      XITK_FREE(private_data->mc->mrls[i]);
+      XITK_FREE(private_data->mc->mrls_disp[i]);
     }
   }
 
-  free(private_data->mc);
+  XITK_FREE(private_data->mc);
   
   XLOCK(private_data->display);
   XDestroyWindow(private_data->display, private_data->window);
   XUNLOCK(private_data->display);
 
-  widget_unregister_event_handler(&private_data->widget_key);
-  free(private_data->fbWidget);
-  free(private_data);
+  xitk_unregister_event_handler(&private_data->widget_key);
+  XITK_FREE(private_data->fbWidget);
+  XITK_FREE(private_data);
+}
+
+
+/*
+ *
+ */
+void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+  mrlbrowser_private_data_t *private_data;
+  
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
+    
+    XLOCK(private_data->display);
+    
+    Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
+    
+    if(!(private_data->bg_image = 
+	 Imlib_load_image(private_data->imlibdata,
+			  xitk_skin_get_skin_filename(skonfig, 
+						      private_data->skin_element_name)))) {
+      XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
+    }
+    
+    XResizeWindow (private_data->display, private_data->window,
+		   (unsigned int)private_data->bg_image->rgb_width,
+		   (unsigned int)private_data->bg_image->rgb_height);
+    
+    /*
+     * We should here, otherwise new skined window will have wrong size.
+     */
+    XFlush(private_data->display);
+    
+    Imlib_apply_image(private_data->imlibdata, private_data->bg_image, private_data->window);
+    
+    XUNLOCK(private_data->display);
+    
+    xitk_change_skins_widget_list(private_data->widget_list, skonfig);
+
+    {
+      int x, y;
+      int i = 0;
+      
+      x = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name_ip);
+      y = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name_ip);
+    
+      while(private_data->autodir_plugins[i] != NULL) {
+	
+	(void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
+	
+	y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;
+	i++;
+      }
+    }
+
+    xitk_paint_widget_list(private_data->widget_list);
+    
+  }
 }
 
 /*
@@ -528,14 +590,14 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
     
     update_current_origin(private_data);
     mrlbrowser_create_enlighted_entries(private_data);
-    browser_update_list(private_data->mrlb_list, 
-			private_data->mc->mrls_disp, 
-			private_data->mrls_num, 0);
+    xitk_browser_update_list(private_data->mrlb_list, 
+			     private_data->mc->mrls_disp, 
+			     private_data->mrls_num, 0);
     
   }
   else {
     
-    browser_release_all_buttons(private_data->mrlb_list);
+    xitk_browser_release_all_buttons(private_data->mrlb_list);
     if(do_callback && private_data->add_callback)
       private_data->add_callback(NULL, (void *) j, 
 				 private_data->mc->mrls[j]);
@@ -546,11 +608,11 @@ static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
 /*
  * Handle selection in mrlbrowser.
  */
-static void mrlbrowser_select(widget_t *w, void *data) {
+static void mrlbrowser_select(xitk_widget_t *w, void *data) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
   int j = -1;
 
-  if((j = browser_get_current_selected(private_data->mrlb_list)) >= 0) {
+  if((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0) {
     mrlbrowser_select_mrl(private_data, j, 1);
   }
 }
@@ -558,13 +620,13 @@ static void mrlbrowser_select(widget_t *w, void *data) {
 /*
  * Handle selection in mrlbrowser, then 
  */
-static void mrlbrowser_play(widget_t *w, void *data) {
+static void mrlbrowser_play(xitk_widget_t *w, void *data) {
 
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
   int j = -1;
   
   if(private_data->play_callback && 
-     ((j = browser_get_current_selected(private_data->mrlb_list)) >= 0)) {
+     ((j = xitk_browser_get_current_selected(private_data->mrlb_list)) >= 0)) {
     
     mrlbrowser_select_mrl(private_data, j, 0);
     private_data->play_callback(NULL, (void *) j, private_data->mc->mrls[j]);
@@ -574,7 +636,7 @@ static void mrlbrowser_play(widget_t *w, void *data) {
 /*
  * Handle double click in labelbutton list.
  */
-static void handle_dbl_click(widget_t *w, void *data, int selected) {
+static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   mrlbrowser_private_data_t *private_data = (mrlbrowser_private_data_t *)data;
 
   mrlbrowser_select_mrl(private_data, selected, 1);
@@ -625,12 +687,12 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
       
     case XK_Down:
     case XK_Next:
-      browser_step_up((widget_t *)private_data->mrlb_list, NULL);
+      xitk_browser_step_up((xitk_widget_t *)private_data->mrlb_list, NULL);
       break;
       
     case XK_Up:
     case XK_Prior:
-      browser_step_down((widget_t *)private_data->mrlb_list, NULL);
+      xitk_browser_step_down((xitk_widget_t *)private_data->mrlb_list, NULL);
       break;
     }
     
@@ -642,59 +704,60 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
 /*
  * Create mrlbrowser window.
  */
-widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
-  GC                         gc;
-  XSizeHints                 hint;
-  XSetWindowAttributes       attr;
-  char                      *title = mb->window_title;
-  Atom                       prop, XA_WIN_LAYER;
-  MWMHints                   mwmhints;
-  XWMHints                  *wm_hint;
-  XClassHint                *xclasshint;
-  XColor                     black, dummy;
-  int                        screen;
-  widget_t                  *mywidget;
-  mrlbrowser_private_data_t *private_data;
-  xitk_labelbutton_t         lb;
-  xitk_button_t              pb;
-  xitk_label_t               lbl;
+xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb) {
+  GC                          gc;
+  XSizeHints                  hint;
+  XSetWindowAttributes        attr;
+  char                       *title = mb->window_title;
+  Atom                        prop, XA_WIN_LAYER;
+  MWMHints                    mwmhints;
+  XWMHints                   *wm_hint;
+  XClassHint                 *xclasshint;
+  XColor                      black, dummy;
+  int                         screen;
+  xitk_widget_t              *mywidget;
+  mrlbrowser_private_data_t  *private_data;
+  xitk_labelbutton_widget_t   lb;
+  xitk_button_widget_t        pb;
+  xitk_label_widget_t         lbl;
   long data[1];
   
+  XITK_CHECK_CONSTITENCY(mb);
+
   if(mb->ip_availables == NULL) {
-    fprintf(stderr, "Something's going wrong, there is no input plugin "
-	    "available having INPUT_CAP_GET_DIR capability !!\nExiting.\n");
-    exit(1);
+    XITK_DIE("Something's going wrong, there is no input plugin "
+	     "available having INPUT_CAP_GET_DIR capability !!\nExiting.\n");
   }
 
   if(mb->xine == NULL) {
-    fprintf(stderr, "Xine engine should be initialized first !!\nExiting.\n");
-    exit(1);
+    XITK_DIE("Xine engine should be initialized first !!\nExiting.\n");
   }
 
-  mywidget               = (widget_t *) gui_xmalloc(sizeof(widget_t));
+  mywidget                        = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   
-  private_data           = (mrlbrowser_private_data_t *) 
-    gui_xmalloc(sizeof(mrlbrowser_private_data_t));
+  private_data                    = (mrlbrowser_private_data_t *) xitk_xmalloc(sizeof(mrlbrowser_private_data_t));
 
-  mywidget->private_data = private_data;
+  mywidget->private_data          = private_data;
 
-  private_data->fbWidget = mywidget;
-  private_data->display  = mb->display;
-  private_data->xine     = mb->xine;
-  private_data->running  = 1;
+  private_data->fbWidget          = mywidget;
+  private_data->display           = mb->display;
+  private_data->imlibdata         = mb->imlibdata;
+  private_data->skin_element_name = strdup(mb->skin_element_name);
+
+  private_data->xine              = mb->xine;
+  private_data->running           = 1;
 
   XLOCK(mb->display);
 
   if(!(private_data->bg_image = Imlib_load_image(mb->imlibdata, 
-						 mb->background_skin))) {
-    fprintf(stderr, "%s(%d): couldn't find image for background\n",
-	    __FILE__, __LINE__);
+						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)))) {
+    XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
     
     XUNLOCK(mb->display);
     return NULL;
   }
 
-  private_data->mc              = (mrl_contents_t *) gui_xmalloc(sizeof(mrl_contents_t));
+  private_data->mc              = (mrl_contents_t *) xitk_xmalloc(sizeof(mrl_contents_t));
   private_data->mrls_num        = 0;
   private_data->last_mrl_source = NULL;
 
@@ -788,59 +851,45 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   Imlib_apply_image(mb->imlibdata, 
 		    private_data->bg_image, private_data->window);
 
-  private_data->widget_list                = widget_list_new() ;
-  private_data->widget_list->l             = gui_list_new ();
+  private_data->widget_list                = xitk_widget_list_new() ;
+  private_data->widget_list->l             = xitk_list_new ();
   private_data->widget_list->focusedWidget = NULL;
   private_data->widget_list->pressedWidget = NULL;
   private_data->widget_list->win           = private_data->window;
   private_data->widget_list->gc            = gc;
   
-  lb.display        = mb->display;
-  lb.imlibdata      = mb->imlibdata;
-  lb.x              = mb->select.x;
-  lb.y              = mb->select.y;
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = mb->select.caption;
-  lb.callback       = mrlbrowser_select;
-  lb.state_callback = NULL;
-  lb.userdata       = (void *)private_data;
-  lb.skin           = mb->select.skin_filename;
-  lb.normcolor      = mb->select.normal_color;
-  lb.focuscolor     = mb->select.focused_color;
-  lb.clickcolor     = mb->select.clicked_color;
-  lb.fontname       = mb->select.fontname;
+  lb.display           = mb->display;
+  lb.imlibdata         = mb->imlibdata;
 
-  gui_list_append_content(private_data->widget_list->l,
-			  label_button_create (&lb));
+  pb.display           = mb->display;
+  pb.imlibdata         = mb->imlibdata;
 
-  pb.display        = mb->display;
-  pb.imlibdata      = mb->imlibdata;
-  pb.x              = mb->play.x;
-  pb.y              = mb->play.y;
-  pb.callback       = mrlbrowser_play;
-  pb.userdata       = (void *)private_data;
-  pb.skin           = mb->play.skin_filename;
+  lbl.display          = mb->display;
+  lbl.imlibdata        = mb->imlibdata;
 
-  gui_list_append_content(private_data->widget_list->l,
-			  button_create (&pb));
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = mb->select.caption;
+  lb.callback          = mrlbrowser_select;
+  lb.state_callback    = NULL;
+  lb.userdata          = (void *)private_data;
+  lb.skin_element_name = mb->select.skin_element_name;
+  xitk_list_append_content(private_data->widget_list->l,
+			  xitk_labelbutton_create (skonfig, &lb));
 
-  lb.display        = mb->display;
-  lb.imlibdata      = mb->imlibdata;
-  lb.x              = mb->dismiss.x;
-  lb.y              = mb->dismiss.y;
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = mb->dismiss.caption;
-  lb.callback       = mrlbrowser_exit;
-  lb.state_callback = NULL;
-  lb.userdata       = (void *)mywidget;
-  lb.skin           = mb->dismiss.skin_filename;
-  lb.normcolor      = mb->dismiss.normal_color;
-  lb.focuscolor     = mb->dismiss.focused_color;
-  lb.clickcolor     = mb->dismiss.clicked_color;
-  lb.fontname       = mb->dismiss.fontname;
+  pb.skin_element_name = mb->play.skin_element_name;
+  pb.callback          = mrlbrowser_play;
+  pb.userdata          = (void *)private_data;
+  xitk_list_append_content(private_data->widget_list->l,
+			  xitk_button_create (skonfig, &pb));
 
-  gui_list_append_content(private_data->widget_list->l,
-			  label_button_create (&lb));
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = mb->dismiss.caption;
+  lb.callback          = xitk_mrlbrowser_exit;
+  lb.state_callback    = NULL;
+  lb.userdata          = (void *)mywidget;
+  lb.skin_element_name = mb->dismiss.skin_element_name;
+  xitk_list_append_content(private_data->widget_list->l,
+			  xitk_labelbutton_create (skonfig, &lb));
   
   private_data->add_callback      = mb->select.callback;
   private_data->play_callback     = mb->play.callback;
@@ -849,24 +898,17 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   mb->browser.dbl_click_time      = DEFAULT_DBL_CLICK_TIME;
   mb->browser.userdata            = (void *)private_data;
   mb->browser.parent_wlist        = private_data->widget_list;
-  gui_list_append_content (private_data->widget_list->l,
+  xitk_list_append_content (private_data->widget_list->l,
 			   (private_data->mrlb_list = 
-			    browser_create(&mb->browser)));
+			    xitk_browser_create(skonfig, &mb->browser)));
 
-  lbl.display   = mb->display;
-  lbl.imlibdata = mb->imlibdata;
-  lbl.x         = mb->origin.x;
-  lbl.y         = mb->origin.y;
-  lbl.length    = mb->origin.max_length;
-  lbl.label     = "";
-  lbl.font      = mb->origin.skin_filename;
-  lbl.animation = mb->origin.animation;
-  lbl.window    = private_data->widget_list->win;
-  lbl.gc        = private_data->widget_list->gc;
-  
-  gui_list_append_content(private_data->widget_list->l,
+  lbl.label             = "";
+  lbl.skin_element_name = mb->origin.skin_element_name;
+  lbl.window            = private_data->widget_list->win;
+  lbl.gc                = private_data->widget_list->gc;
+  xitk_list_append_content(private_data->widget_list->l,
 			  (private_data->widget_origin = 
-			   label_create (&lbl)));
+			   xitk_label_create(skonfig, &lbl)));
   
   memset(&private_data->current_origin, 0, strlen(private_data->current_origin));
   if(mb->origin.cur_origin)
@@ -874,19 +916,12 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
 
   if(mb->ip_name.label.label_str) {
 
-    lbl.display   = mb->display;
-    lbl.imlibdata = mb->imlibdata;
-    lbl.x         = mb->ip_name.label.x;
-    lbl.y         = mb->ip_name.label.y;;
-    lbl.font      = mb->ip_name.label.skin_filename;
-    lbl.label     = mb->ip_name.label.label_str;
-    lbl.length    = mb->ip_name.label.length;
-    lbl.animation = mb->ip_name.label.animation;
-    lbl.window    = private_data->widget_list->win;
-    lbl.gc        = private_data->widget_list->gc;
-
-    gui_list_append_content(private_data->widget_list->l, 
-			    label_create (&lbl));
+    lbl.label             = mb->ip_name.label.label_str;
+    lbl.skin_element_name = mb->ip_name.label.skin_element_name;
+    lbl.window            = private_data->widget_list->win;
+    lbl.gc                = private_data->widget_list->gc;
+    xitk_list_append_content(private_data->widget_list->l, 
+			    xitk_label_create (skonfig, &lbl));
   }
 
   /*
@@ -895,68 +930,64 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   {
     int x, y;
     int i = 0;
-    widget_t *tmp;
     
-    x = mb->ip_name.button.x;
-    y = mb->ip_name.button.y;
+    private_data->skin_element_name_ip = strdup(mb->ip_name.button.skin_element_name);
+    x = xitk_skin_get_coord_x(skonfig, mb->ip_name.button.skin_element_name);
+    y = xitk_skin_get_coord_y(skonfig, mb->ip_name.button.skin_element_name);
     
     while(mb->ip_availables[i] != NULL) {
 
-      lb.display        = mb->display;
-      lb.imlibdata      = mb->imlibdata;
-      lb.x              = x;
-      lb.y              = y;
       lb.button_type    = CLICK_BUTTON;
       lb.label          = mb->ip_availables[i];
       lb.callback       = mrlbrowser_grab_mrls;
       lb.state_callback = NULL;
       lb.userdata       = (void *)private_data;
-      lb.skin           = mb->ip_name.button.skin_filename;
-      lb.normcolor      = mb->ip_name.button.normal_color;
-      lb.focuscolor     = mb->ip_name.button.focused_color;
-      lb.clickcolor     = mb->ip_name.button.clicked_color;
-      lb.fontname       = mb->ip_name.button.fontname;
+      lb.skin_element_name = mb->ip_name.button.skin_element_name;
+      xitk_list_append_content(private_data->widget_list->l,
+			      (private_data->autodir_plugins[i] = xitk_labelbutton_create (skonfig, &lb)));
 
-      gui_list_append_content(private_data->widget_list->l,
-			      (tmp = label_button_create (&lb)));
+      (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
 
-      y += widget_get_height(tmp) + 1;
+      y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;
       i++;
     }
+    if(i)
+      private_data->autodir_plugins[i+1] = NULL;
   }
     
-  private_data->visible     = 1;
+  private_data->visible        = 1;
 
-  mywidget->enable          = 1;
-  mywidget->running         = 1;
-  mywidget->visible         = 1;
-  mywidget->have_focus      = FOCUS_LOST;
-  mywidget->x               = mb->x;
-  mywidget->y               = mb->y;
-  mywidget->width           = private_data->bg_image->width;
-  mywidget->height          = private_data->bg_image->height;
-  mywidget->widget_type     = WIDGET_TYPE_MRLBROWSER | WIDGET_TYPE_GROUP;
-  mywidget->paint           = NULL;
-  mywidget->notify_click    = NULL;
-  mywidget->notify_focus    = NULL;
-  mywidget->notify_keyevent = NULL;
-  mywidget->notify_inside   = NULL;
+  mywidget->enable             = 1;
+  mywidget->running            = 1;
+  mywidget->visible            = 1;
+  mywidget->have_focus         = FOCUS_LOST;
+  mywidget->x                  = mb->x;
+  mywidget->y                  = mb->y;
+  mywidget->width              = private_data->bg_image->width;
+  mywidget->height             = private_data->bg_image->height;
+  mywidget->widget_type        = WIDGET_TYPE_MRLBROWSER | WIDGET_TYPE_GROUP;
+  mywidget->paint              = NULL;
+  mywidget->notify_click       = NULL;
+  mywidget->notify_focus       = NULL;
+  mywidget->notify_keyevent    = NULL;
+  mywidget->notify_inside      = NULL;
+  mywidget->notify_change_skin = NULL;
 
-  browser_update_list(private_data->mrlb_list, 
-		      private_data->mc->mrls_disp, 
-		      private_data->mrls_num, 0);
+  xitk_browser_update_list(private_data->mrlb_list, 
+			   private_data->mc->mrls_disp, 
+			   private_data->mrls_num, 0);
   
   XMapRaised(mb->display, private_data->window); 
 
   private_data->widget_key = 
-    widget_register_event_handler("mrl browser",
-				  private_data->window, 
-				  mrlbrowser_handle_event,
-				  NULL,
-				  mb->dndcallback,
-				  private_data->widget_list,
-				  (void *) private_data);
-
+    xitk_register_event_handler("mrl browser",
+				private_data->window, 
+				mrlbrowser_handle_event,
+				NULL,
+				mb->dndcallback,
+				private_data->widget_list,
+				(void *) private_data);
+  
   XUNLOCK (mb->display);
 
   return mywidget;

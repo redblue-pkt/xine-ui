@@ -20,7 +20,6 @@
  * $Id$
  *
  */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -39,10 +38,11 @@
 
 #include "widget.h"
 #include "list.h"
+#include "_xitk.h"
 
 extern int errno;
 
-static gui_color_names_t gui_color_names[] = {
+static xitk_color_names_t xitk_color_names[] = {
   { 255,  250,  250,  "snow" },
   { 248,  248,  255,  "GhostWhite" },
   { 245,  245,  245,  "WhiteSmoke" },
@@ -702,50 +702,80 @@ static gui_color_names_t gui_color_names[] = {
 };
 
 /*
- *
+ * Alloc a memory area of size_t size.
  */
-void *gui_xmalloc(size_t size) {
-  void *ptrmalloc, *ptrmemset;
+void *xitk_xmalloc(size_t size) {
+  void *ptrmalloc;
+  
+  if(size <= 0) {
+    XITK_WARNING("%s(): size was <= 0.\n", __FUNCTION__);
+    return NULL;
+  }
 
   if((ptrmalloc = malloc(size)) == NULL) {
-    fprintf(stderr, "%s: malloc() failed: %s.\n",
-	    __FUNCTION__, strerror(errno));
+    XITK_WARNING("%s: malloc() failed: %s.\n", __FUNCTION__, strerror(errno));
     return NULL;
   }
 
-  if((ptrmemset = memset(ptrmalloc, 0, size)) == NULL) {
-    fprintf(stderr, "%s: memset() failed: %s.\n", 
-	    __FUNCTION__, strerror(errno));
-    return NULL;
-  }
+  memset(ptrmalloc, 0, size);
 
-  return ptrmemset;
+  return ptrmalloc;
 }
 
 /*
- *
+ * Call the notify_change_skin function, if exist, of each widget in
+ * the specifier widget list.
  */
-int paint_widget_list (widget_list_t *wl) {
-  widget_t *mywidget;
+void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *skonfig) {
+  xitk_widget_t *mywidget;
 
-  mywidget = (widget_t *) gui_list_first_content (wl->l);
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
+  while (mywidget && wl && wl->l && wl->win && wl->gc && skonfig) {
+    
+    if(mywidget->notify_change_skin)
+      (mywidget->notify_change_skin) (wl, mywidget, skonfig);
+    
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l); 
+  }
+}
+
+/*
+ * (re)paint the specified widget list.
+ */
+int xitk_paint_widget_list (xitk_widget_list_t *wl) {
+  xitk_widget_t *mywidget;
+
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
   while (mywidget && wl && wl->l && wl->win && wl->gc) {
-
+    
     if(mywidget->paint)
       (mywidget->paint) (mywidget, wl->win, wl->gc);
-
-    mywidget = (widget_t *) gui_list_next_content (wl->l); 
+    
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l); 
   }
   return 1;
 }
 
 /*
- *
+ * Return 1 if the mouse poiter is in the visible area of widget.
  */
-int widget_is_cursor_out_mask(Display *display, widget_t *w, Pixmap mask, int x, int y) {
+int xitk_is_cursor_out_mask(Display *display, xitk_widget_t *w, Pixmap mask, int x, int y) {
   XImage *xi;
   Pixel p;
   
+  if(!display) {
+    XITK_WARNING("%s(): display was unset.\n", __FUNCTION__);
+    return 0;
+  }
+  if(!w) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return 0;
+  }
+
   if(mask) {
     int xx, yy;
     
@@ -753,11 +783,11 @@ int widget_is_cursor_out_mask(Display *display, widget_t *w, Pixmap mask, int x,
     if((yy = (y - w->y)) == w->height) yy--;
     
     XLOCK(display);
-
+    
     xi = XGetImage(display, mask, xx, yy, 1, 1, AllPlanes, ZPixmap);
     p = XGetPixel(xi, 0, 0);
     XDestroyImage(xi);
-
+    
     XUNLOCK(display);
 
     return (int) p;
@@ -767,49 +797,66 @@ int widget_is_cursor_out_mask(Display *display, widget_t *w, Pixmap mask, int x,
 }
 
 /*
- *
+ * Return 1 if mouse pointer is in widget area.
  */
-int is_inside_widget (widget_t *widget, int x, int y) {
+int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
   int inside = 0;
-
   
+  if(!widget) {
+    XITK_WARNING("%s(): widget was NULL.\n", __FUNCTION__);
+    return 0;
+  }
+
   if ((x >= widget->x) && 
       (x <= (widget->x + widget->width)) && 
       (y >= widget->y) && (y <= (widget->y + widget->height))) {
-
+    
     inside = 1;
-
+    
     if(widget->notify_inside) 
       inside = widget->notify_inside(widget, x, y);
-    
+
   }
 
   return inside;
 }
 
 /*
- *
+ * Return widget present at specified coords.
  */
-widget_t *get_widget_at (widget_list_t *wl, int x, int y) {
-  widget_t *mywidget;
+xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
+  xitk_widget_t *mywidget;
 
-  mywidget = (widget_t *) gui_list_first_content (wl->l);
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return 0;
+  }
+
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
   while (mywidget) {
-    if (is_inside_widget (mywidget, x, y))
+    if (xitk_is_inside_widget (mywidget, x, y))
       return mywidget;
 
-    mywidget = (widget_t *) gui_list_next_content (wl->l);
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
   return NULL;
 }
 
 /*
- *
+ * Call notify_focus function in right widget (the one who get, and
+ * the one who loose focus).
  */
-void motion_notify_widget_list (widget_list_t *wl,
+void xitk_motion_notify_widget_list (xitk_widget_list_t *wl,
 				int x, int y) {
   int bRepaint = 0;
-  widget_t *mywidget = get_widget_at (wl, x, y);
+  xitk_widget_t *mywidget;
+  
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+  
+  mywidget = xitk_get_widget_at (wl, x, y);
   
   if (mywidget != wl->focusedWidget) {
     if (wl->focusedWidget) {
@@ -837,14 +884,20 @@ void motion_notify_widget_list (widget_list_t *wl,
 }
 
 /*
- *
+ * Call notify_click function, if exist, of widget at coords x/y.
  */
-int click_notify_widget_list (widget_list_t *wl, 
-			       int x, int y, int bUp) {
-  int bRepaint = 0;
-  widget_t *mywidget = get_widget_at (wl, x, y);
+int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp) {
+  int            bRepaint = 0;
+  xitk_widget_t  *mywidget;
 
-  motion_notify_widget_list (wl, x, y);
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return 0;
+  }
+
+  mywidget = xitk_get_widget_at (wl, x, y);
+
+  xitk_motion_notify_widget_list (wl, x, y);
 
   if (!bUp) {
       
@@ -868,79 +921,137 @@ int click_notify_widget_list (widget_list_t *wl,
 }
 
 /*
- *
+ * Call notify_keyevent, if exist, of specified plugin. This pass an X11 XEvent.
  */
-void widget_send_key_event(widget_list_t *wl, widget_t *w, XEvent *xev) {
+void xitk_send_key_event(xitk_widget_list_t *wl, xitk_widget_t *w, XEvent *xev) {
   
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
   if(w->notify_keyevent)
     w->notify_keyevent(wl, w, xev);
 }
 
 /*
- *
+ * Return widget width.
  */
-int widget_get_width(widget_t *lb) {
+int xitk_get_widget_width(xitk_widget_t *w) {
  
-  return lb->width;  
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return -1;
+  }
+  return w->width;  
 }
 
 /*
- *
+ * Return widget height.
  */
-int widget_get_height(widget_t *lb) {
+int xitk_get_widget_height(xitk_widget_t *w) {
   
-  return lb->height;  
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return -1;
+  }
+  return w->height;  
 }
 
 /*
- *
+ * Set position of a widget.
  */
-int widget_enabled(widget_t *w) {
+int xitk_set_widget_pos(xitk_widget_t *w, int x, int y) {
 
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return 0;
+  }
+  w->x = x;
+  w->y = y;
+  return 1;
+}
+
+/*
+ * Get position of a widget.
+ */
+int xitk_get_widget_pos(xitk_widget_t *w, int *x, int *y) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return 0;
+  }
+  *x = w->x;
+  *y = w->y;
+  return 1;
+}
+
+/*
+ * Return 1 if widget is enabled.
+ */
+int xitk_is_widget_enabled(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return 0;
+  }
   return (w->enable == WIDGET_ENABLE);
 }
 
 /*
- *
+ * Return 1 if widget have focus.
  */
-int widget_have_focus(widget_t *w) {
+int xitk_is_widget_focused(xitk_widget_t *w) {
 
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return 0;
+  }
   return(w->have_focus == FOCUS_RECEIVED);
 }
 
 /*
- *
+ * Enable a widget.
  */
-void widget_enable(widget_t *w) {
+void xitk_enable_widget(xitk_widget_t *w) {
 
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
   w->enable = WIDGET_ENABLE;
 }
 
 /*
- *
+ * Disable a widget.
  */
-void widget_disable(widget_t *w) {
+void xitk_disable_widget(xitk_widget_t *w) {
 
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
   w->enable = ~WIDGET_ENABLE;
 }
 
 /*
- *
+ * Return the struct of color names/values.
  */
-gui_color_names_t *gui_get_color_names(void) {
+xitk_color_names_t *gui_get_color_names(void) {
 
-  return gui_color_names;
+  return xitk_color_names;
 }
 
 /*
- *
+ * Return a xitk_color_name_t type from a string color.
  */
-gui_color_names_t *gui_get_color_name(char *color) {
-  gui_color_names_t *cn = NULL;
-  gui_color_names_t *pcn = NULL;
+xitk_color_names_t *xitk_get_color_name(char *color) {
+  xitk_color_names_t *cn = NULL;
+  xitk_color_names_t *pcn = NULL;
 
-  if(color == NULL)
+  if(color == NULL) {
+    XITK_WARNING("%s(): color was NULL.\n", __FUNCTION__);
     return NULL;
+  }
 
   /* Hexa X triplet */
   if((strncasecmp(color, "#", 1) <= 0) && (strlen(color) == 7)) {
@@ -960,25 +1071,25 @@ gui_color_names_t *gui_get_color_name(char *color) {
     }
     lowercolorname = p;
 
-    cn = (gui_color_names_t *) gui_xmalloc(sizeof(gui_color_names_t));
+    cn = (xitk_color_names_t *) xitk_xmalloc(sizeof(xitk_color_names_t));
     
     if((sscanf(lowercolorname, 
 	       "%2x%2x%2x", &cn->red, &cn->green, &cn->blue)) != 3) {
-      fprintf(stderr, "sscanf() failed: %s\n", strerror(errno));
+      XITK_WARNING("sscanf() failed: %s\n", strerror(errno));
       cn->red = cn->green = cn->blue = 0;
     }
 
     cn->colorname = strdup(color);
     
-    free(p);
+    XITK_FREE(p);
 
     return cn;
   } 
   else {
-    for(pcn = gui_color_names; pcn->colorname != NULL; pcn++) {
+    for(pcn = xitk_color_names; pcn->colorname != NULL; pcn++) {
       if(!strncasecmp(pcn->colorname, color, strlen(pcn->colorname))) {
 
-	cn = (gui_color_names_t *) gui_xmalloc(sizeof(gui_color_names_t));
+	cn = (xitk_color_names_t *) xitk_xmalloc(sizeof(xitk_color_names_t));
 
 	cn->red       = pcn->red;
 	cn->green     = pcn->green;
@@ -994,49 +1105,64 @@ gui_color_names_t *gui_get_color_name(char *color) {
 }
 
 /*
- *
+ * Stop a widget.
  */
-void widget_stop_widgets(widget_list_t *wl) {
-  widget_t *mywidget;
+void xitk_stop_widgets(xitk_widget_list_t *wl) {
+  xitk_widget_t *mywidget;
   
-  mywidget = (widget_t *) gui_list_first_content (wl->l);
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+    
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
 
   while(mywidget) {
     
     mywidget->running = 0;
     
-    mywidget = (widget_t *) gui_list_next_content (wl->l);
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
 }
 
 /*
- *
+ * Show widgets from widget list.
  */
-void widget_show_widgets(widget_list_t *wl) {
-  widget_t *mywidget;
+void xitk_show_widgets(xitk_widget_list_t *wl) {
+  xitk_widget_t *mywidget;
   
-  mywidget = (widget_t *) gui_list_first_content (wl->l);
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+    
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
 
   while(mywidget) {
     
     mywidget->visible = 1;
     
-    mywidget = (widget_t *) gui_list_next_content (wl->l);
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
 }
 
 /*
- *
+ * Hide widgets from widget list..
  */
-void widget_hide_widgets(widget_list_t *wl) {
-  widget_t *mywidget;
+void xitk_hide_widgets(xitk_widget_list_t *wl) {
+  xitk_widget_t *mywidget;
   
-  mywidget = (widget_t *) gui_list_first_content (wl->l);
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+    
+  mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
 
   while(mywidget) {
     
     mywidget->visible = 0;
     
-    mywidget = (widget_t *) gui_list_next_content (wl->l);
+    mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
 }

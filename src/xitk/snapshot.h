@@ -22,5 +22,9 @@
  * Image snapshot related stuff
  *
  */
+#ifndef SNAPSHOT_H
+#define SNAPSHOT_H
 
 void create_snapshot ( gGui_t *gGui );
+
+#endif

@@ -96,11 +96,11 @@ const char *filebrowser_get_homedir(void);
 /*
  * Return window id of widget.
  */
-Window filebrowser_get_window_id(widget_t *w) {
+Window xitk_filebrowser_get_window_id(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
   
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
     return private_data->window;
   }
   
@@ -110,21 +110,25 @@ Window filebrowser_get_window_id(widget_t *w) {
 /*
  * Fill window information struct of given widget.
  */
-int filebrowser_get_window_info(widget_t *w, window_info_t *inf) {
-  filebrowser_private_data_t *private_data = 
-    (filebrowser_private_data_t *)w->private_data;
+int xitk_filebrowser_get_window_info(xitk_widget_t *w, window_info_t *inf) {
+  filebrowser_private_data_t *private_data;
   
-  return((widget_get_window_info(private_data->widget_key, inf))); 
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
+    return((xitk_get_window_info(private_data->widget_key, inf))); 
+  }
+
+  return 0;
 }
 
 /*
  * Boolean about running state.
  */
-int filebrowser_is_running(widget_t *w) {
+int xitk_filebrowser_is_running(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
  
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
     return (private_data->running);
   }
 
@@ -134,11 +138,11 @@ int filebrowser_is_running(widget_t *w) {
 /*
  * Boolean about visible state.
  */
-int filebrowser_is_visible(widget_t *w) {
+int xitk_filebrowser_is_visible(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
     return (private_data->visible);
   }
 
@@ -148,16 +152,16 @@ int filebrowser_is_visible(widget_t *w) {
 /*
  * Hide filebrowser.
  */
-void filebrowser_hide(widget_t *w) {
+void xitk_filebrowser_hide(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
       XLOCK(private_data->display);
       XUnmapWindow(private_data->display, private_data->window);
-      widget_hide_widgets(private_data->widget_list);
+      xitk_hide_widgets(private_data->widget_list);
       XUNLOCK(private_data->display);
       private_data->visible = 0;
     }
@@ -167,14 +171,14 @@ void filebrowser_hide(widget_t *w) {
 /*
  * Show filebrowser.
  */
-void filebrowser_show(widget_t *w) {
+void xitk_filebrowser_show(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
 
     XLOCK(private_data->display);
-    widget_show_widgets(private_data->widget_list);
+    xitk_show_widgets(private_data->widget_list);
     XMapRaised(private_data->display, private_data->window); 
     XUNLOCK(private_data->display);
     private_data->visible = 1;
@@ -184,11 +188,11 @@ void filebrowser_show(widget_t *w) {
 /*
  * Set filebrowser transient for hints for given window.
  */
-void filebrowser_set_transient(widget_t *w, Window window) {
+void xitk_filebrowser_set_transient(xitk_widget_t *w, Window window) {
   filebrowser_private_data_t *private_data;
 
-  if(w && (window != None)) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER) && (window != None)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
       XLOCK(private_data->display);
@@ -203,11 +207,11 @@ void filebrowser_set_transient(widget_t *w, Window window) {
 /*
  * Destroy a filebrowser.
  */
-void filebrowser_destroy(widget_t *w) {
+void xitk_filebrowser_destroy(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
 
     private_data->running = 0;
     private_data->visible = 0;
@@ -216,36 +220,36 @@ void filebrowser_destroy(widget_t *w) {
     XUnmapWindow(private_data->display, private_data->window);
     XUNLOCK(private_data->display);
 	
-    widget_stop_widgets(private_data->widget_list);
-    gui_list_free(private_data->widget_list->l);
-    free(private_data->widget_list);
+    xitk_stop_widgets(private_data->widget_list);
+    xitk_list_free(private_data->widget_list->l);
+    XITK_FREE(private_data->widget_list);
     
     {
       int i;
       for(i = 0; i < private_data->dir_contents_num; i++) {
-	free(private_data->fc->dir_contents[i]);
-	free(private_data->fc->dir_disp_contents[i]);
+	XITK_FREE(private_data->fc->dir_contents[i]);
+	XITK_FREE(private_data->fc->dir_disp_contents[i]);
       }
     }
-    free(private_data->fc);
+    XITK_FREE(private_data->fc);
     XLOCK(private_data->display);
     XDestroyWindow(private_data->display, private_data->window);
     XUNLOCK(private_data->display);
 
-    widget_unregister_event_handler(&private_data->widget_key);
-    free(private_data->fbWidget);
-    free(private_data);
+    xitk_unregister_event_handler(&private_data->widget_key);
+    XITK_FREE(private_data->fbWidget);
+    XITK_FREE(private_data);
   }
 }
 
 /*
  * Return the current directory location.
  */
-char *filebrowser_get_current_dir(widget_t *w) {
+char *xitk_filebrowser_get_current_dir(xitk_widget_t *w) {
   filebrowser_private_data_t *private_data;
 
-  if(w) {
-    private_data = w->private_data;
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
 
     return private_data->current_dir;
   }
@@ -258,9 +262,9 @@ char *filebrowser_get_current_dir(widget_t *w) {
  */
 static void update_current_dir(filebrowser_private_data_t *private_data) {
 
-  label_change_label (private_data->widget_list, 
-		      private_data->widget_current_dir, 
-		      private_data->current_dir);
+  xitk_label_change_label (private_data->widget_list, 
+			   private_data->widget_current_dir, 
+			   private_data->current_dir);
   
 }
 
@@ -379,7 +383,7 @@ static int _sortfiles_reverse(const finfo_t *s1, const finfo_t *s2) {
 /*
  * Function fill the dir_contents array entries with found files.
  */
-static void load_files(widget_t *w, void *data) {
+static void load_files(xitk_widget_t *w, void *data) {
   filebrowser_private_data_t *private_data = (filebrowser_private_data_t *)data;
   DIR             *pdir;
   struct dirent   *pdirent;
@@ -394,9 +398,9 @@ static void load_files(widget_t *w, void *data) {
   if((pdir = opendir(private_data->current_dir)) == NULL)
     return;
 
-  hide_files = (finfo_t *) gui_xmalloc(sizeof(finfo_t) * MAXFILES);
-  norm_files = (finfo_t *) gui_xmalloc(sizeof(finfo_t) * MAXFILES);
-  dir_files = (finfo_t *) gui_xmalloc(sizeof(finfo_t) * MAXFILES);
+  hide_files = (finfo_t *) xitk_xmalloc(sizeof(finfo_t) * MAXFILES);
+  norm_files = (finfo_t *) xitk_xmalloc(sizeof(finfo_t) * MAXFILES);
+  dir_files = (finfo_t *) xitk_xmalloc(sizeof(finfo_t) * MAXFILES);
   
   while((pdirent = readdir(pdir)) != NULL) {
 
@@ -411,7 +415,7 @@ static void load_files(widget_t *w, void *data) {
     
     if(is_a_dir(fullfilename)) {
       dir_files[num_dir_files].name = (char *) 
-	gui_xmalloc(strlen(pdirent->d_name) + 1);
+	xitk_xmalloc(strlen(pdirent->d_name) + 1);
       strcpy(dir_files[num_dir_files].name, pdirent->d_name);
       dir_files[num_dir_files].marker = get_file_marker(fullfilename);
       dir_files[num_dir_files].linkname = NULL;
@@ -425,12 +429,11 @@ static void load_files(widget_t *w, void *data) {
 	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
 	
 	if(linksize < 0) {
-	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
-		  __FUNCTION__, __LINE__, strerror(errno));
+	  XITK_WARNING("%s(%d): readlink() failed: %s\n", __FUNCTION__, __LINE__, strerror(errno));
 	}
 	else {
 	  dir_files[num_dir_files].linkname = (char *) 
-	    gui_xmalloc(linksize + 1);
+	    xitk_xmalloc(linksize + 1);
 	  
 	  strncpy(dir_files[num_dir_files].linkname, linkbuf, linksize);
 	}
@@ -440,7 +443,7 @@ static void load_files(widget_t *w, void *data) {
     } /* Hmmmm, an hidden file ? */
     else if(pdirent->d_name[0] == '.') {
       hide_files[num_hide_files].name = (char *) 
-	gui_xmalloc(strlen(pdirent->d_name) + 1);
+	xitk_xmalloc(strlen(pdirent->d_name) + 1);
       strcpy(hide_files[num_hide_files].name, pdirent->d_name);
       hide_files[num_hide_files].marker = get_file_marker(fullfilename);
       hide_files[num_hide_files].linkname = NULL;
@@ -454,12 +457,11 @@ static void load_files(widget_t *w, void *data) {
 	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
 	
 	if(linksize < 0) {
-	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
-		  __FUNCTION__, __LINE__, strerror(errno));
+	  XITK_WARNING("%s(%d): readlink() failed: %s\n", __FUNCTION__, __LINE__, strerror(errno));
 	}
 	else {
 	  hide_files[num_hide_files].linkname = (char *) 
-	    gui_xmalloc(linksize + 1);
+	    xitk_xmalloc(linksize + 1);
 	  strncpy(hide_files[num_hide_files].linkname, linkbuf, linksize);
 	}
       }
@@ -468,7 +470,7 @@ static void load_files(widget_t *w, void *data) {
     } /* So a *normal* one. */
     else {
       norm_files[num_norm_files].name = (char *) 
-	gui_xmalloc(strlen(pdirent->d_name) + 1);
+	xitk_xmalloc(strlen(pdirent->d_name) + 1);
       strcpy(norm_files[num_norm_files].name, pdirent->d_name);
       norm_files[num_norm_files].marker = get_file_marker(fullfilename);
       norm_files[num_norm_files].linkname = NULL;
@@ -482,12 +484,11 @@ static void load_files(widget_t *w, void *data) {
 	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
 	
 	if(linksize < 0) {
-	  fprintf(stderr, "%s(%d): readlink() failed: %s\n", 
-		  __FUNCTION__, __LINE__, strerror(errno));
+	  XITK_WARNING("%s(%d): readlink() failed: %s\n", __FUNCTION__, __LINE__, strerror(errno));
 	}
 	else {
 	  norm_files[num_norm_files].linkname = (char *) 
-	    gui_xmalloc(linksize + 1);
+	    xitk_xmalloc(linksize + 1);
 	  strncpy(norm_files[num_norm_files].linkname, linkbuf, linksize);
 	}
       }
@@ -543,7 +544,7 @@ static void load_files(widget_t *w, void *data) {
 	  }
 	  else {
 	    private_data->fc->dir_contents[num_files] = (char *) 
-	      gui_xmalloc(strlen(dir_files[i].name) + 1);
+	      xitk_xmalloc(strlen(dir_files[i].name) + 1);
 	  }
 	  
 	  /* It's a link file, display the source */
@@ -556,7 +557,7 @@ static void load_files(widget_t *w, void *data) {
 	    }
 	    else {
 	      private_data->fc->dir_disp_contents[num_files] = (char *) 
-		gui_xmalloc(strlen(dir_files[i].name) + 4 +
+		xitk_xmalloc(strlen(dir_files[i].name) + 4 +
 			strlen(dir_files[i].linkname) + 2);
 	    }
 	    
@@ -573,7 +574,7 @@ static void load_files(widget_t *w, void *data) {
 	    }
 	    else {
 	      private_data->fc->dir_disp_contents[num_files] = (char *) 
-		gui_xmalloc(strlen(dir_files[i].name) + 2);
+		xitk_xmalloc(strlen(dir_files[i].name) + 2);
 	    }
 	    
 	    sprintf(private_data->fc->dir_disp_contents[num_files], "%s%c", 
@@ -599,7 +600,7 @@ static void load_files(widget_t *w, void *data) {
 	  }
 	  else {
 	    private_data->fc->dir_contents[num_files] = (char *) 
-	      gui_xmalloc(strlen(hide_files[i].name) + 1);
+	      xitk_xmalloc(strlen(hide_files[i].name) + 1);
 	  }
 	  
 	  /* It's a link file, display the source */
@@ -612,7 +613,7 @@ static void load_files(widget_t *w, void *data) {
 	    }
 	    else {
 	      private_data->fc->dir_disp_contents[num_files] = (char *) 
-		gui_xmalloc(strlen(hide_files[i].name) + 4 +
+		xitk_xmalloc(strlen(hide_files[i].name) + 4 +
 			strlen(hide_files[i].linkname) + 2);
 	    }
 	    
@@ -629,7 +630,7 @@ static void load_files(widget_t *w, void *data) {
 	    }
 	    else {
 	      private_data->fc->dir_disp_contents[num_files] = (char *) 
-		gui_xmalloc(strlen(hide_files[i].name) + 2);
+		xitk_xmalloc(strlen(hide_files[i].name) + 2);
 	    }
 	  
 	    sprintf(private_data->fc->dir_disp_contents[num_files], "%s%c",
@@ -656,7 +657,7 @@ static void load_files(widget_t *w, void *data) {
 	  }
 	  else {
 	    private_data->fc->dir_contents[num_files] = (char *) 
-	      gui_xmalloc(strlen(norm_files[i].name) + 1);
+	      xitk_xmalloc(strlen(norm_files[i].name) + 1);
 	  }
 	  
 	  /* It's a link file, display the source */
@@ -669,7 +670,7 @@ static void load_files(widget_t *w, void *data) {
 	    }
 	    else {
 	      private_data->fc->dir_disp_contents[num_files] = (char *) 
-		gui_xmalloc(strlen(norm_files[i].name) + 4 +
+		xitk_xmalloc(strlen(norm_files[i].name) + 4 +
 			strlen(norm_files[i].linkname) + 2);
 	    }
 	    
@@ -686,7 +687,7 @@ static void load_files(widget_t *w, void *data) {
 	    }
 	    else {
 	      private_data->fc->dir_disp_contents[num_files] = (char *) 
-		gui_xmalloc(strlen(norm_files[i].name) + 2);
+		xitk_xmalloc(strlen(norm_files[i].name) + 2);
 	    }
 	  
 	    sprintf(private_data->fc->dir_disp_contents[num_files], "%s%c",
@@ -702,33 +703,30 @@ static void load_files(widget_t *w, void *data) {
 
     /* Some cleanups before leaving */
     for(i = 0; i < num_dir_files; i++) {
-      free(dir_files[i].name);
-      if(dir_files[i].linkname)
-	free(dir_files[i].linkname);
+      XITK_FREE(dir_files[i].name);
+      XITK_FREE(dir_files[i].linkname);
     }
-    free(dir_files);
+    XITK_FREE(dir_files);
     
     for(i = 0; i < num_hide_files; i++){
-      free(hide_files[i].name);
-      if(hide_files[i].linkname)
-	free(hide_files[i].linkname);
+      XITK_FREE(hide_files[i].name);
+      XITK_FREE(hide_files[i].linkname);
     }
-    free(hide_files);
+    XITK_FREE(hide_files);
     
     for(i = 0; i < num_norm_files; i++) {
-      free(norm_files[i].name);
-      if(norm_files[i].linkname)
-	free(norm_files[i].linkname);
+      XITK_FREE(norm_files[i].name);
+      XITK_FREE(norm_files[i].linkname);
     }
-    free(norm_files);
+    XITK_FREE(norm_files);
 
   }
   else 
     private_data->dir_contents_num = 0;
   
-  browser_update_list(private_data->fb_list, 
-		      private_data->fc->dir_disp_contents, 
-		      private_data->dir_contents_num, 0);
+  xitk_browser_update_list(private_data->fb_list, 
+			   private_data->fc->dir_disp_contents, 
+			   private_data->dir_contents_num, 0);
   
   update_current_dir(private_data);
 }
@@ -736,8 +734,8 @@ static void load_files(widget_t *w, void *data) {
 /*
  * Leaving add files dialog
  */
-void filebrowser_exit(widget_t *w, void *data) {
-  filebrowser_private_data_t *private_data = ((widget_t *)data)->private_data;
+void xitk_filebrowser_exit(xitk_widget_t *w, void *data) {
+  filebrowser_private_data_t *private_data = ((xitk_widget_t *)data)->private_data;
   
   if(private_data->kill_callback)
     private_data->kill_callback(private_data->fbWidget, NULL);
@@ -749,34 +747,34 @@ void filebrowser_exit(widget_t *w, void *data) {
   XUnmapWindow(private_data->display, private_data->window);
   XUNLOCK(private_data->display);
   
-  widget_stop_widgets(private_data->widget_list);
-  gui_list_free(private_data->widget_list->l);
-  free(private_data->widget_list);
+  xitk_stop_widgets(private_data->widget_list);
+  xitk_list_free(private_data->widget_list->l);
+  XITK_FREE(private_data->widget_list);
   
   {
     int i;
     for(i = 0; i < private_data->dir_contents_num; i++) {
-      free(private_data->fc->dir_contents[i]);
-      free(private_data->fc->dir_disp_contents[i]);
+      XITK_FREE(private_data->fc->dir_contents[i]);
+      XITK_FREE(private_data->fc->dir_disp_contents[i]);
     }
   }
-  free(private_data->fc);
+  XITK_FREE(private_data->fc);
 
   XLOCK(private_data->display);
   XDestroyWindow(private_data->display, private_data->window);
   XUNLOCK(private_data->display);
 
-  widget_unregister_event_handler(&private_data->widget_key);
-  free(private_data->fbWidget);
-  free(private_data);
+  xitk_unregister_event_handler(&private_data->widget_key);
+  XITK_FREE(private_data->fbWidget);
+  XITK_FREE(private_data);
 }
 
 /*
  * Change sort order of file list
  */
-static void filebrowser_sortfiles(widget_t *w, void *data) {
+static void filebrowser_sortfiles(xitk_widget_t *w, void *data) {
   filebrowser_private_data_t *private_data = 
-    ((widget_t*)((sort_param_t *)data)->w)->private_data;
+    ((xitk_widget_t*)((sort_param_t *)data)->w)->private_data;
   int sort_order = ((sort_param_t*)data)->sort;
 
   switch(sort_order) {
@@ -801,12 +799,12 @@ static void filebrowser_sortfiles(widget_t *w, void *data) {
 /*
  * Set current directory to home directory then read the directory content.
  */
-static void filebrowser_homedir(widget_t *w, void *data) {
+static void filebrowser_homedir(xitk_widget_t *w, void *data) {
   filebrowser_private_data_t *private_data = (filebrowser_private_data_t *) data;
   
   sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
   load_files(NULL, (void *)private_data);
-  paint_widget_list (private_data->widget_list);
+  xitk_paint_widget_list (private_data->widget_list);
 }
 
 /*
@@ -865,11 +863,11 @@ static void filebrowser_select_entry(filebrowser_private_data_t *private_data, i
 /*
  * Handle selection in browser.
  */
-static void filebrowser_select(widget_t *w, void *data) {
+static void filebrowser_select(xitk_widget_t *w, void *data) {
   filebrowser_private_data_t *private_data = (filebrowser_private_data_t *)data;
   int j = -1;
 
-  if((j = browser_get_current_selected(private_data->fb_list)) >= 0) {
+  if((j = xitk_browser_get_current_selected(private_data->fb_list)) >= 0) {
 
     filebrowser_select_entry(private_data, j);
 
@@ -881,7 +879,7 @@ static void filebrowser_select(widget_t *w, void *data) {
 /*
  * Handle double click in labelbutton list.
  */
-static void handle_dbl_click(widget_t *w, void *data, int selected) {
+static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   filebrowser_private_data_t *private_data = (filebrowser_private_data_t *)data;
 
   filebrowser_select_entry(private_data, selected);
@@ -924,64 +922,103 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
       
     case XK_Down:
     case XK_Next:
-      browser_step_up((widget_t *)private_data->fb_list, NULL);
+      xitk_browser_step_up((xitk_widget_t *)private_data->fb_list, NULL);
       break;
       
     case XK_Up:
     case XK_Prior:
-      browser_step_down((widget_t *)private_data->fb_list, NULL);
+      xitk_browser_step_down((xitk_widget_t *)private_data->fb_list, NULL);
       break;
     }
   }
 }
 
 /*
+ *
+ */
+void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+  filebrowser_private_data_t *private_data;
+
+  if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
+    private_data = (filebrowser_private_data_t *)w->private_data;
+    
+    XLOCK(private_data->display);
+    
+    Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
+    
+    if(!(private_data->bg_image = 
+	 Imlib_load_image(private_data->imlibdata,
+			  xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)))) {
+      XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
+    }
+    
+    XResizeWindow (private_data->display, private_data->window,
+		   (unsigned int)private_data->bg_image->rgb_width,
+		   (unsigned int)private_data->bg_image->rgb_height);
+    
+    /*
+     * We should here, otherwise new skined window will have wrong size.
+     */
+    XFlush(private_data->display);
+    
+    Imlib_apply_image(private_data->imlibdata, private_data->bg_image, private_data->window);
+    
+    XUNLOCK(private_data->display);
+    
+    xitk_change_skins_widget_list(private_data->widget_list, skonfig);
+    
+    xitk_paint_widget_list(private_data->widget_list);
+  }
+}
+
+/*
  * Create file browser window
  */
-widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
-  GC                          gc;
-  XSizeHints                  hint;
-  XSetWindowAttributes        attr;
-  char                       *title = fb->window_title;
-  Atom                        prop, XA_WIN_LAYER;
-  MWMHints                    mwmhints;
-  XWMHints                   *wm_hint;
-  XClassHint                 *xclasshint;
-  XColor                      black, dummy;
-  int                         screen;
-  widget_t                   *mywidget;
-  xitk_button_t               b;
-  xitk_labelbutton_t          lb;
-  xitk_label_t                lbl;
-  filebrowser_private_data_t *private_data;
+xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb) {
+  GC                            gc;
+  XSizeHints                    hint;
+  XSetWindowAttributes          attr;
+  char                         *title = fb->window_title;
+  Atom                          prop, XA_WIN_LAYER;
+  MWMHints                      mwmhints;
+  XWMHints                     *wm_hint;
+  XClassHint                   *xclasshint;
+  XColor                        black, dummy;
+  int                           screen;
+  xitk_widget_t                *mywidget;
+  xitk_button_widget_t          b;
+  xitk_labelbutton_widget_t     lb;
+  xitk_label_widget_t           lbl;
+  filebrowser_private_data_t   *private_data;
   long data[1];
   
-  mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
+  XITK_CHECK_CONSTITENCY(fb);
 
-  private_data                 = (filebrowser_private_data_t *) 
-    gui_xmalloc(sizeof(filebrowser_private_data_t));
+  mywidget                        = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
 
-  mywidget->private_data       = private_data;
+  private_data                    = (filebrowser_private_data_t *) xitk_xmalloc(sizeof(filebrowser_private_data_t));
 
-  private_data->fbWidget       = mywidget;
+  mywidget->private_data          = private_data;
 
-  private_data->display        = fb->display;
+  private_data->fbWidget          = mywidget;
 
-  private_data->running        = 1;
+  private_data->display           = fb->display;
+  private_data->imlibdata         = fb->imlibdata;
+  private_data->skin_element_name = strdup(fb->skin_element_name);
+  private_data->running           = 1;
 
   XLOCK(fb->display);
-
+  
   if(!(private_data->bg_image  = Imlib_load_image(fb->imlibdata, 
-						  fb->background_skin))) {
-    fprintf(stderr, "%s(%d): couldn't find image for background\n",
-	    __FILE__, __LINE__);
+						  xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)))) {
+    XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
     
     XUNLOCK(fb->display);
     return NULL;
   }
 
   private_data->fc             = (file_contents_t *)
-    gui_xmalloc(sizeof(file_contents_t));
+    xitk_xmalloc(sizeof(file_contents_t));
   private_data->fc->sort_order = DEFAULT_SORT;
 
   hint.x                       = fb->x;
@@ -1074,66 +1111,49 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   Imlib_apply_image(fb->imlibdata, 
 		    private_data->bg_image, private_data->window);
 
-  private_data->widget_list                = widget_list_new() ;
-  private_data->widget_list->l             = gui_list_new ();
+  private_data->widget_list                = xitk_widget_list_new() ;
+  private_data->widget_list->l             = xitk_list_new ();
   private_data->widget_list->focusedWidget = NULL;
   private_data->widget_list->pressedWidget = NULL;
   private_data->widget_list->win           = private_data->window;
   private_data->widget_list->gc            = gc;
   
-  lb.display        = fb->display;
-  lb.imlibdata      = fb->imlibdata;
-  lb.x              = fb->homedir.x;
-  lb.y              = fb->homedir.y;
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = fb->homedir.caption;
-  lb.callback       = filebrowser_homedir;
-  lb.state_callback = NULL;
-  lb.userdata       = (void *)private_data;
-  lb.skin           = fb->homedir.skin_filename;
-  lb.normcolor      = fb->homedir.normal_color;
-  lb.focuscolor     = fb->homedir.focused_color;
-  lb.clickcolor     = fb->homedir.clicked_color;
-  lb.fontname       = fb->homedir.fontname;
-      
-  gui_list_append_content(private_data->widget_list->l,
-			  label_button_create (&lb));
+  b.display            = fb->display;
+  b.imlibdata          = fb->imlibdata;
 
-  lb.display        = fb->display;
-  lb.imlibdata      = fb->imlibdata;
-  lb.x              = fb->select.x;
-  lb.y              = fb->select.y;
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = fb->select.caption;
-  lb.callback       = filebrowser_select;
-  lb.state_callback = NULL;
-  lb.userdata       = (void *)private_data;
-  lb.skin           = fb->select.skin_filename;
-  lb.normcolor      = fb->select.normal_color;
-  lb.focuscolor     = fb->select.focused_color;
-  lb.clickcolor     = fb->select.clicked_color;
-  lb.fontname       = fb->select.fontname;
+  lb.display           = fb->display;
+  lb.imlibdata         = fb->imlibdata;
 
-  gui_list_append_content(private_data->widget_list->l,
-			  label_button_create (&lb));
+  lbl.display          = fb->display;
+  lbl.imlibdata        = fb->imlibdata;
 
-  lb.display        = fb->display;
-  lb.imlibdata      = fb->imlibdata;
-  lb.x              = fb->dismiss.x;
-  lb.y              = fb->dismiss.y;
+
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = fb->homedir.caption;
+  lb.callback          = filebrowser_homedir;
+  lb.state_callback    = NULL;
+  lb.userdata          = (void *)private_data;
+  lb.skin_element_name = fb->homedir.skin_element_name;
+  xitk_list_append_content(private_data->widget_list->l,
+			  xitk_labelbutton_create (skonfig, &lb));
+
+  lb.button_type       = CLICK_BUTTON;
+  lb.label             = fb->select.caption;
+  lb.callback          = filebrowser_select;
+  lb.state_callback    = NULL;
+  lb.userdata          = (void *)private_data;
+  lb.skin_element_name = fb->select.skin_element_name;
+  xitk_list_append_content(private_data->widget_list->l,
+			  xitk_labelbutton_create (skonfig, &lb));
+
   lb.button_type    = CLICK_BUTTON;
   lb.label          = fb->dismiss.caption;
-  lb.callback       = filebrowser_exit;
+  lb.callback       = xitk_filebrowser_exit;
   lb.state_callback = (void *)mywidget;
   lb.userdata       = (void *)private_data;
-  lb.skin           = fb->dismiss.skin_filename;
-  lb.normcolor      = fb->dismiss.normal_color;
-  lb.focuscolor     = fb->dismiss.focused_color;
-  lb.clickcolor     = fb->dismiss.clicked_color;
-  lb.fontname       = fb->dismiss.fontname;
-
-  gui_list_append_content(private_data->widget_list->l,
-			  label_button_create (&lb));
+  lb.skin_element_name = fb->dismiss.skin_element_name;
+  xitk_list_append_content(private_data->widget_list->l,
+			  xitk_labelbutton_create (skonfig, &lb));
   
   private_data->add_callback      = fb->select.callback;
   private_data->kill_callback     = fb->kill.callback;
@@ -1142,51 +1162,35 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   fb->browser.dbl_click_time     = DEFAULT_DBL_CLICK_TIME;
   fb->browser.userdata           = (void *)private_data;
   fb->browser.parent_wlist       = private_data->widget_list;
-
-  gui_list_append_content(private_data->widget_list->l,
+  xitk_list_append_content(private_data->widget_list->l,
 			  (private_data->fb_list = 
-			   browser_create(&fb->browser)));
+			   xitk_browser_create(skonfig, &fb->browser)));
 
-  b.display   = fb->display;
-  b.imlibdata = fb->imlibdata;
-  b.x         = fb->sort_default.x;
-  b.y         = fb->sort_default.y;
-  b.callback  = filebrowser_sortfiles;
-  b.userdata  = (void*)&private_data->sort_default;
-  b.skin      = fb->sort_default.skin_filename;
+  b.skin_element_name = fb->sort_default.skin_element_name;
+  b.callback          = filebrowser_sortfiles;
+  b.userdata          = (void*)&private_data->sort_default;
   
   private_data->sort_default.sort = DEFAULT_SORT;
   private_data->sort_default.w    = mywidget;
-  gui_list_append_content (private_data->widget_list->l, 
-			   button_create (&b));
+  xitk_list_append_content (private_data->widget_list->l, 
+			   xitk_button_create (skonfig, &b));
   
-  b.display   = fb->display;
-  b.imlibdata = fb->imlibdata;
-  b.x         = fb->sort_reverse.x;
-  b.y         = fb->sort_reverse.y;
-  b.callback  = filebrowser_sortfiles;
-  b.userdata  = (void*)&private_data->sort_reverse;
-  b.skin      = fb->sort_reverse.skin_filename;
+  b.skin_element_name = fb->sort_reverse.skin_element_name;
+  b.callback          = filebrowser_sortfiles;
+  b.userdata          = (void*)&private_data->sort_reverse;
   
   private_data->sort_reverse.sort = REVERSE_SORT;
   private_data->sort_reverse.w    = mywidget;
-  gui_list_append_content (private_data->widget_list->l, 
-			   button_create (&b));
+  xitk_list_append_content (private_data->widget_list->l, 
+			   xitk_button_create (skonfig, &b));
   
-  lbl.display   = fb->display;
-  lbl.imlibdata = fb->imlibdata;
-  lbl.x         = fb->current_dir.x;
-  lbl.y         = fb->current_dir.y;
-  lbl.length    = fb->current_dir.max_length;
-  lbl.label     = fb->current_dir.cur_directory;
-  lbl.font      = fb->current_dir.skin_filename;
-  lbl.animation = fb->current_dir.animation;
-  lbl.window    = private_data->widget_list->win;
-  lbl.gc        = private_data->widget_list->gc;
-
-  gui_list_append_content (private_data->widget_list->l,
+  lbl.label             = fb->current_dir.cur_directory;
+  lbl.skin_element_name = fb->current_dir.skin_element_name;
+  lbl.window            = private_data->widget_list->win;
+  lbl.gc                = private_data->widget_list->gc;
+  xitk_list_append_content (private_data->widget_list->l,
 			   (private_data->widget_current_dir = 
-			    label_create (&lbl)));
+			    xitk_label_create (skonfig, &lbl)));
   
 
   if(fb->current_dir.cur_directory) {
@@ -1218,20 +1222,20 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
 
   load_files(NULL, (void *)private_data);
   
-  browser_update_list(private_data->fb_list, 
-		      private_data->fc->dir_disp_contents,
-		      private_data->dir_contents_num, 0);
+  xitk_browser_update_list(private_data->fb_list, 
+			   private_data->fc->dir_disp_contents,
+			   private_data->dir_contents_num, 0);
 
   XMapRaised(fb->display, private_data->window); 
 
   private_data->widget_key = 
-    widget_register_event_handler("file browser",
-				  private_data->window, 
-				  filebrowser_handle_event,
-				  NULL,
-				  fb->dndcallback,
-				  private_data->widget_list,
-				  (void *) private_data);
+    xitk_register_event_handler("file browser",
+				private_data->window, 
+				filebrowser_handle_event,
+				NULL,
+				fb->dndcallback,
+				private_data->widget_list,
+				(void *) private_data);
 
   XUNLOCK (fb->display);
   /* XSync(fb->display, False); */
@@ -1258,7 +1262,7 @@ const char *filebrowser_get_homedir(void) {
   if((pw = getpwuid(getuid())) == NULL) {
 #endif
     if((homedir = getenv("HOME")) == NULL) {
-      fprintf(stderr, "Unable to get home directory, set it to /tmp.\n");
+      XITK_WARNING("Unable to get home directory, set it to /tmp.\n");
       homedir = strdup("/tmp");
     }
   }
@@ -1270,7 +1274,7 @@ const char *filebrowser_get_homedir(void) {
   
 #ifdef HAVE_GETPWUID_R
   if(buffer) 
-    free(buffer);
+    XITK_FREE(buffer);
 #endif
   
   return homedir;

@@ -20,7 +20,6 @@
  * $Id$
  *
  */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -32,14 +31,15 @@
 
 #include "widget.h"
 #include "list.h"
+#include "_xitk.h"
 
 /*
  *
  */
-gui_list_t *gui_list_new (void) {
-  gui_list_t *list;
+xitk_list_t *xitk_list_new (void) {
+  xitk_list_t *list;
 
-  list = (gui_list_t *) gui_xmalloc(sizeof(gui_list_t));
+  list = (xitk_list_t *) xitk_xmalloc(sizeof(xitk_list_t));
 
   list->first=NULL;
   list->last =NULL;
@@ -51,12 +51,12 @@ gui_list_t *gui_list_new (void) {
 /*
  *
  */
-void gui_list_free(gui_list_t *l) {
+void xitk_list_free(xitk_list_t *l) {
 
   l->cur = l->first;
 
   while(l->cur->next) {
-    free(l->cur->content);
+    XITK_FREE(l->cur->content);
     l->cur = l->cur->next;
   }
 
@@ -66,7 +66,7 @@ void gui_list_free(gui_list_t *l) {
 /*
  *
  */
-void *gui_list_first_content (gui_list_t *l) {
+void *xitk_list_first_content (xitk_list_t *l) {
 
   l->cur = l->first;
 
@@ -79,19 +79,19 @@ void *gui_list_first_content (gui_list_t *l) {
 /*
  *
  */
-void *gui_list_next_content (gui_list_t *l) {
+void *xitk_list_next_content (xitk_list_t *l) {
   if (l->cur) {
 
     if (l->cur->next) {
       l->cur = l->cur->next;
       return l->cur->content;
-    } else
+    } 
+    else
       return NULL;
-
-  } else {
-
-    fprintf (stderr, "gui_list : passed end of list");
-
+    
+  } 
+  else {
+    XITK_WARNING("xitk_list : passed end of list");
     return NULL;
   }    
 }
@@ -99,7 +99,7 @@ void *gui_list_next_content (gui_list_t *l) {
 /*
  *
  */
-int gui_list_is_empty (gui_list_t *l) {
+int xitk_list_is_empty (xitk_list_t *l) {
 
   return (l->first != NULL);
 }
@@ -107,17 +107,14 @@ int gui_list_is_empty (gui_list_t *l) {
 /*
  *
  */
-void *gui_list_last_content (gui_list_t *l) {
-  if (l->last) {
+void *xitk_list_last_content (xitk_list_t *l) {
 
+  if (l->last) {
     l->cur = l->last;
     return l->last->content;
-
-  } else {
-
-
-    fprintf (stderr, "gui_list : wanted last of empty list");
-
+  } 
+  else {
+    XITK_WARNING("xitk_list : wanted last of empty list");
     return NULL;
   }    
 }
@@ -125,20 +122,18 @@ void *gui_list_last_content (gui_list_t *l) {
 /*
  *
  */
-void *gui_list_prev_content (gui_list_t *l){
+void *xitk_list_prev_content (xitk_list_t *l){
 
   if (l->cur) {
-
     if (l->cur->prev) {
       l->cur = l->cur->prev;
       return l->cur->content;
-    } else
+    } 
+    else
       return NULL;
-
-  } else {
-
-    fprintf (stderr, "gui_list : passed begin of list");
-
+  } 
+  else {
+    XITK_WARNING("xitk_list : passed begin of list");
     return NULL;
   }    
 }
@@ -146,23 +141,20 @@ void *gui_list_prev_content (gui_list_t *l){
 /*
  *
  */
-void gui_list_append_content (gui_list_t *l, void *content) {
-  gui_node_t *node;
+void xitk_list_append_content (xitk_list_t *l, void *content) {
+  xitk_node_t *node;
 
-  node = (gui_node_t *) gui_xmalloc(sizeof(gui_node_t));
+  node = (xitk_node_t *) xitk_xmalloc(sizeof(xitk_node_t));
   node->content = content;
 
   if (l->last) {
-
     node->next = NULL;
-
     node->prev = l->last;
     l->last->next = node;
     l->last = node;
-
     l->cur = node;
-    
-  } else {
+  } 
+  else {
     l->first = l->last = l->cur = node;
     node->prev = node->next = NULL;
   }
@@ -171,27 +163,23 @@ void gui_list_append_content (gui_list_t *l, void *content) {
 /*
  *
  */
-void gui_list_insert_content (gui_list_t *l, void *content) {
-  gui_node_t *nodecur, *nodenext, *nodenew;
+void xitk_list_insert_content (xitk_list_t *l, void *content) {
+  xitk_node_t *nodecur, *nodenext, *nodenew;
   
   if(l->cur->next) {
-    nodenew = (gui_node_t *) gui_xmalloc(sizeof(gui_node_t));
+    nodenew = (xitk_node_t *) xitk_xmalloc(sizeof(xitk_node_t));
 
     nodenew->content = content;
-    
     nodecur = l->cur;
     nodenext = l->cur->next;
-
     nodecur->next = nodenew;
     nodenext->prev = nodenew;
-
     nodenew->prev = nodecur;
     nodenew->next = nodenext;
-
     l->cur = nodenew;
   }
   else { /* current is last, append to the list */
-    gui_list_append_content(l, content);
+    xitk_list_append_content(l, content);
   }
 
 }
@@ -199,37 +187,27 @@ void gui_list_insert_content (gui_list_t *l, void *content) {
 /*
  *
  */
-void gui_list_delete_current (gui_list_t *l) {
-
-  gui_node_t *node_cur;
+void xitk_list_delete_current (xitk_list_t *l) {
+  xitk_node_t *node_cur;
 
   node_cur = l->cur;
 
   if(node_cur->prev) {
-
     node_cur->prev->next = node_cur->next;
-
-  } else { /* First entry */
-
+  } 
+  else { /* First entry */
     l->first = node_cur->next;
-    
   }
   
   if(node_cur->next) {
-
     node_cur->next->prev = node_cur->prev;
     l->cur = node_cur->next;
-
-  }  else { /* last entry in the list */
-
+  }
+  else { /* last entry in the list */
     l->last = node_cur->prev;
-
     l->cur = node_cur->prev;
   }
 
-  free(node_cur->content);
-  free(node_cur);
-
+  XITK_FREE(node_cur->content);
+  XITK_FREE(node_cur);
 }
-
-

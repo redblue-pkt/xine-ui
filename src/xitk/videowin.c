@@ -72,8 +72,8 @@ typedef struct {
   int            show;
   XWMHints      *wm_hint;
 
-  widgetkey_t    widget_key;
-  widgetkey_t    old_widget_key;
+  xitk_register_key_t    widget_key;
+  xitk_register_key_t    old_widget_key;
 
   int            completion_event;
 
@@ -310,7 +310,7 @@ void video_window_adapt_size (int video_width, int video_height,
 	return;
       }
 
-      widget_unregister_event_handler(&gVw->old_widget_key);
+      xitk_unregister_event_handler(&gVw->old_widget_key);
       old_video_window = gGui->video_window;
     }
 
@@ -412,7 +412,7 @@ void video_window_adapt_size (int video_width, int video_height,
 	}
 #endif
 
-	widget_unregister_event_handler(&gVw->old_widget_key);
+	xitk_unregister_event_handler(&gVw->old_widget_key);
 	old_video_window = gGui->video_window;
       }
       else {
@@ -515,12 +515,12 @@ void video_window_adapt_size (int video_width, int video_height,
   }
 
   gVw->old_widget_key = gVw->widget_key;
-  gVw->widget_key = widget_register_event_handler("video_window", 
-						  gGui->video_window, 
-						  video_window_handle_event,
-						  video_window_change_sizepos,
-						  gui_dndcallback,
-						  NULL, NULL);
+  gVw->widget_key = xitk_register_event_handler("video_window", 
+						gGui->video_window, 
+						video_window_handle_event,
+						video_window_change_sizepos,
+						gui_dndcallback,
+						NULL, NULL);
   
   XUnlockDisplay (gGui->display);
 }

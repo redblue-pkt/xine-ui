@@ -26,6 +26,7 @@
 #include "config.h"
 #endif
 
+#define NEED_FILEBROWSER
 #ifdef NEED_FILEBROWSER
 
 #include <stdio.h>
@@ -36,14 +37,23 @@
 #include "xitk.h"
 
 #include "event.h"
+#include "actions.h"
 #include "utils.h"
-#include "parseskin.h"
 #include "file_browser.h"
 
 #define MAX_LIST 9
 
 extern gGui_t       *gGui;
-static widget_t     *fb = NULL;
+static xitk_widget_t     *fb = NULL;
+
+/*
+ *
+ */
+void file_browser_change_skins(void) {
+
+  if(fb)
+    xitk_filebrowser_change_skins(fb, gGui->skin_config);
+}
 
 /*
  *
@@ -51,7 +61,7 @@ static widget_t     *fb = NULL;
 int file_browser_is_visible(void) {
 
   if(fb)
-    return(filebrowser_is_visible(fb));
+    return(xitk_filebrowser_is_visible(fb));
   
   return 0;
 }
@@ -62,7 +72,7 @@ int file_browser_is_visible(void) {
 int file_browser_is_running(void) {
 
   if(fb)
-    return(filebrowser_is_running(fb));
+    return(xitk_filebrowser_is_running(fb));
   
   return 0;
 }
@@ -73,7 +83,7 @@ int file_browser_is_running(void) {
 void set_file_browser_transient(void) {
 
   if(fb) {
-    filebrowser_set_transient(fb, gGui->video_window);
+    xitk_filebrowser_set_transient(fb, gGui->video_window);
   }
 }
 
@@ -83,9 +93,9 @@ void set_file_browser_transient(void) {
 void show_file_browser(void) {
 
   if(fb) {
-    filebrowser_show(fb);
+    xitk_filebrowser_show(fb);
     set_file_browser_transient();
-    layer_above_video((filebrowser_get_window_id(fb)));
+    layer_above_video((xitk_filebrowser_get_window_id(fb)));
   }
 }
 
@@ -95,7 +105,7 @@ void show_file_browser(void) {
 void hide_file_browser(void) {
 
   if(fb) {
-    filebrowser_hide(fb);
+    xitk_filebrowser_hide(fb);
   }
 }
 
@@ -120,11 +130,11 @@ void destroy_file_browser(void) {
   window_info_t wi;
 
   if(fb) {
-    if((filebrowser_get_window_info(fb, &wi))) {
+    if((xitk_filebrowser_get_window_info(fb, &wi))) {
       config_set_int("x_file_browser", wi.x);
       config_set_int("y_file_browser", wi.y);
     }
-    filebrowser_destroy(fb);
+    xitk_filebrowser_destroy(fb);
     fb = NULL;
   }
 }
@@ -132,14 +142,14 @@ void destroy_file_browser(void) {
 /*
  *
  */
-static void file_browser_kill(widget_t *w, void *data) {
-  char *curdir = filebrowser_get_current_dir(fb);
+static void file_browser_kill(xitk_widget_t *w, void *data) {
+  char *curdir = xitk_filebrowser_get_current_dir(fb);
   window_info_t wi;
   
   if(curdir) {
     config_set_str("filebrowser_dir", curdir);
     if(fb) {
-      if((filebrowser_get_window_info(fb, &wi))) {
+      if((xitk_filebrowser_get_window_info(fb, &wi))) {
 	config_set_int("x_file_browser", wi.x);
 	config_set_int("y_file_browser", wi.y);
       }
@@ -154,7 +164,7 @@ static void file_browser_kill(widget_t *w, void *data) {
  */
 void file_browser(xitk_string_callback_t add_cb, 
 		  select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
-  xitk_filebrowser_t fbr;
+  xitk_filebrowser_widget_t fbr;
   
   if(fb != NULL) {
     show_file_browser();
@@ -170,55 +180,28 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.x                              = config_lookup_int("x_file_browser", 200);
   fbr.y                              = config_lookup_int("y_file_browser", 100);
   fbr.window_title                   = "Xine File Browser";
-  fbr.background_skin                = gui_get_skinfile("FBBG");
+  fbr.skin_element_name              = "FBBG";
   fbr.resource_name                  = fbr.window_title;
   fbr.resource_class                 = "Xine";
 
-  fbr.sort_default.x                 = gui_get_skinX("FBSortDef");
-  fbr.sort_default.y                 = gui_get_skinY("FBSortDef");
-  fbr.sort_default.skin_filename     = gui_get_skinfile("FBSortDef");
+  fbr.sort_default.skin_element_name = "FBSortDef";
 
-  fbr.sort_reverse.x                 = gui_get_skinX("FBSortRev");
-  fbr.sort_reverse.y                 = gui_get_skinY("FBSortRev");
-  fbr.sort_reverse.skin_filename     = gui_get_skinfile("FBSortRev");
-
-  fbr.current_dir.x                  = gui_get_skinX("FBCurDir");
-  fbr.current_dir.y                  = gui_get_skinY("FBCurDir");
-  fbr.current_dir.skin_filename      = gui_get_skinfile("FBCurDir");
-  fbr.current_dir.max_length         = gui_get_label_length("FBCurDir");
+  fbr.sort_reverse.skin_element_name = "FBSortRev";
+  
+  fbr.current_dir.skin_element_name  = "FBCurDir";
   fbr.current_dir.cur_directory      = config_lookup_str("filebrowser_dir",
 							 (char *)get_homedir());
-  fbr.current_dir.animation          = gui_get_animation("FBCurDir");
 
   fbr.dndcallback                    = dnd_cb;
 
-  fbr.homedir.x                      = gui_get_skinX("FBHome");
-  fbr.homedir.y                      = gui_get_skinY("FBHome");
+  fbr.homedir.skin_element_name      = "FBHome";
   fbr.homedir.caption                = "~/";
-  fbr.homedir.skin_filename          = gui_get_skinfile("FBHome");
-  fbr.homedir.normal_color           = gui_get_ncolor("FBHome");
-  fbr.homedir.focused_color          = gui_get_fcolor("FBHome");
-  fbr.homedir.clicked_color          = gui_get_ccolor("FBHome");
-  fbr.homedir.fontname               = gui_get_fontname("FBHome");
 
-  fbr.select.x                       = gui_get_skinX("FBSelect");
-  fbr.select.y                       = gui_get_skinY("FBSelect");
+  fbr.select.skin_element_name       = "FBSelect";
   fbr.select.caption                 = "Select";
-  fbr.select.skin_filename           = gui_get_skinfile("FBSelect");
-  fbr.select.normal_color            = gui_get_ncolor("FBSelect");
-  fbr.select.focused_color           = gui_get_fcolor("FBSelect");
-  fbr.select.clicked_color           = gui_get_ccolor("FBSelect");
-  fbr.select.fontname                = gui_get_fontname("FBSelect");
   fbr.select.callback                = add_cb;
 
-  fbr.dismiss.x                      = gui_get_skinX("FBDismiss");
-  fbr.dismiss.y                      = gui_get_skinY("FBDismiss");
-  fbr.dismiss.caption                = "Dismiss";
-  fbr.dismiss.skin_filename          = gui_get_skinfile("FBDismiss");
-  fbr.dismiss.normal_color           = gui_get_ncolor("FBDismiss");
-  fbr.dismiss.focused_color          = gui_get_fcolor("FBDismiss");
-  fbr.dismiss.clicked_color          = gui_get_ccolor("FBDismiss");
-  fbr.dismiss.fontname               = gui_get_fontname("FBDismiss");
+  fbr.dismiss.skin_element_name      = "FBDismiss";
 
   fbr.kill.callback                  = file_browser_kill;
 
@@ -226,26 +209,14 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.browser.display                = gGui->display;
   fbr.browser.imlibdata              = gGui->imlib_data;
 
-  fbr.browser.arrow_up.x             = gui_get_skinX("FBUp");
-  fbr.browser.arrow_up.y             = gui_get_skinY("FBUp");
-  fbr.browser.arrow_up.skin_filename = gui_get_skinfile("FBUp");
+  fbr.browser.arrow_up.skin_element_name = "FBUp";
 
-  fbr.browser.slider.x               = gui_get_skinX("FBSlidBG");
-  fbr.browser.slider.y               = gui_get_skinY("FBSlidBG");
-  fbr.browser.slider.skin_filename   = gui_get_skinfile("FBSlidBG");
+  fbr.browser.slider.skin_element_name_bg = "FBSlidBG";
+  fbr.browser.slider.skin_element_name_paddle = "FBSlidFG";
 
-  fbr.browser.paddle.skin_filename   = gui_get_skinfile("FBSlidFG");
+  fbr.browser.arrow_dn.skin_element_name = "FBDn";
 
-  fbr.browser.arrow_dn.x             = gui_get_skinX("FBDn");
-  fbr.browser.arrow_dn.y             = gui_get_skinY("FBDn");
-  fbr.browser.arrow_dn.skin_filename = gui_get_skinfile("FBDn");
-
-  fbr.browser.browser.x              = gui_get_skinX("FBItemBtn");
-  fbr.browser.browser.y              = gui_get_skinY("FBItemBtn");
-  fbr.browser.browser.normal_color   = gui_get_ncolor("FBItemBtn");
-  fbr.browser.browser.focused_color  = gui_get_fcolor("FBItemBtn");
-  fbr.browser.browser.clicked_color  = gui_get_ccolor("FBItemBtn");
-  fbr.browser.browser.skin_filename  = gui_get_skinfile("FBItemBtn");
+  fbr.browser.browser.skin_element_name = "FBItemBtn";
   fbr.browser.browser.max_displayed_entries = MAX_LIST;
   fbr.browser.browser.num_entries    = 0;
   fbr.browser.browser.entries        = NULL;
@@ -253,7 +224,7 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.browser.callback               = sel_cb;
   fbr.browser.userdata               = NULL;
 
-  fb = filebrowser_create(&fbr);
+  fb = xitk_filebrowser_create(gGui->skin_config, &fbr);
 
 }
 

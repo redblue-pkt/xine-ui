@@ -66,13 +66,14 @@ typedef struct {
   VisualID	       prefered_visual_id;
   int		       install_colormap;
 
+  xitk_skin_config_t  *skin_config;
   xitk_dnd_t           xdnd;
 
   ImlibData           *imlib_data;
 
   Window               video_window; 
   ImlibImage          *video_window_logo_image;
-  gui_image_t          video_window_logo_pixmap;
+  xitk_image_t          video_window_logo_pixmap;
   int                  cursor_visible;
   int                  cursor_grabbed;
 
@@ -105,15 +106,13 @@ typedef struct {
     int                mute;
   } mixer;
 
-  widgetkey_t          widget_key;
+  xitk_register_key_t          widget_key;
 
   int                  layer_above;
   int                  reparent_hack;
 
 } gGui_t;
 
-
-char *gui_get_skindir(const char file[]);
 
 /*
  * flags for autoplay options
@@ -137,6 +136,8 @@ void config_set_str(char *, char *);
 void config_set_int(char *, int);
 void config_save(void);
 void config_reset(void);
+char *gui_get_skindir(void);
+char *gui_get_configfile(void);
 
 
 void gui_init (int nfiles, char *filenames[]);

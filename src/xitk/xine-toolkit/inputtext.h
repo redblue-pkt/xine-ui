@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_GUI_INPUTTEXT_H
-#define HAVE_GUI_INPUTTEXT_H
+#ifndef HAVE_XITK_INPUTTEXT_H
+#define HAVE_XITK_INPUTTEXT_H
 
 #include <X11/Xlib.h>
 
@@ -43,11 +43,12 @@
 
 typedef struct {
   Display                *display;
+  ImlibData              *imlibdata;
+  char                   *skin_element_name;
 
-  widget_t               *iWidget;
+  xitk_widget_t          *iWidget;
 
-  gui_image_t            *skin;
-  ImlibData		 *imlibdata;
+  xitk_image_t            *skin;
 
   xitk_string_callback_t callback;
   void                   *userdata;
@@ -67,9 +68,9 @@ typedef struct {
 
 /* ***************************************************************** */
 
-widget_t *inputtext_create(xitk_inputtext_t *it);
-char *inputttext_get_text(widget_t *it);
-void inputtext_change_text(widget_list_t *wl, widget_t *it, char *text);
+xitk_widget_t *xitk_inputtext_create(xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it);
+char *xitk_inputttext_get_text(xitk_widget_t *it);
+void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, char *text);
 int xitk_get_key_modifier(XEvent *xev, int *modifier);
 
 #endif

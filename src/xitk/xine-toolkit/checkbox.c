@@ -20,7 +20,6 @@
  * $Id$
  *
  */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -37,14 +36,14 @@
 /*
  *
  */
-static int notify_inside(widget_t *c, int x, int y) {
+static int notify_inside(xitk_widget_t *c, int x, int y) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
   if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && c->visible) {
-    gui_image_t *skin = private_data->skin;
+    xitk_image_t *skin = private_data->skin;
     
-    return widget_is_cursor_out_mask(private_data->display, c, skin->mask, x, y);
+    return xitk_is_cursor_out_mask(private_data->display, c, skin->mask, x, y);
   }
 
   return 1;
@@ -53,12 +52,12 @@ static int notify_inside(widget_t *c, int x, int y) {
 /*
  *
  */
-static void paint_checkbox (widget_t *c, Window win, GC gc) {
+static void paint_checkbox (xitk_widget_t *c, Window win, GC gc) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   GC            lgc;
   int           checkbox_width;
-  gui_image_t  *skin;
+  xitk_image_t  *skin;
   
   if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && c->visible) {
     
@@ -112,7 +111,7 @@ static void paint_checkbox (widget_t *c, Window win, GC gc) {
 /*
  *
  */
-static int notify_click_checkbox (widget_list_t *wl, widget_t *c, 
+static int notify_click_checkbox (xitk_widget_list_t *wl, xitk_widget_t *c, 
 				  int cUp, int x, int y) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
@@ -144,8 +143,8 @@ static int notify_click_checkbox (widget_list_t *wl, widget_t *c,
 /*
  *
  */
-static int notify_focus_checkbox (widget_list_t *wl, 
-				  widget_t *c, int cEntered) {
+static int notify_focus_checkbox (xitk_widget_list_t *wl, 
+				  xitk_widget_t *c, int cEntered) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
@@ -163,30 +162,54 @@ static int notify_focus_checkbox (widget_list_t *wl,
 /*
  *
  */
-int checkbox_get_state(widget_t *c) {
+static void notify_change_skin(xitk_widget_list_t *wl, 
+			       xitk_widget_t *c, xitk_skin_config_t *skonfig) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
-  if (c->widget_type & ~WIDGET_TYPE_CHECKBOX) {
-#ifdef DEBUG_GUI
-    fprintf (stderr, "notify click checkbox on something (%d) "
-	     "that is not a checkbox\n", c->widget_type);
-#endif
+  if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
+    
+    XITK_FREE_XITK_IMAGE(private_data->display, private_data->skin);
+    private_data->skin = xitk_load_image(private_data->imlibdata,
+					 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+    c->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+    c->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+    c->width           = private_data->skin->width/3;
+    c->height          = private_data->skin->height;
+       
+    xitk_set_widget_pos(c, c->x, c->y);
   }
-
-  return private_data->cState;
 }
 
 /*
  *
  */
-void checkbox_set_state(widget_t *c, int state, Window win, GC gc) {
+int xitk_checkbox_get_state(xitk_widget_t *c) {
+  checkbox_private_data_t *private_data = 
+    (checkbox_private_data_t *) c->private_data;
+  
+  if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
+  return private_data->cState;
+  }
+#ifdef DEBUG_GUI
+  else
+    fprintf (stderr, "notify click checkbox on something (%d) "
+	     "that is not a checkbox\n", c->widget_type);
+#endif
+
+  return 0;
+}
+
+/*
+ *
+ */
+void xitk_checkbox_set_state(xitk_widget_t *c, int state, Window win, GC gc) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   int clk, arm;
 
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
-    if(checkbox_get_state(c) != state) {
+    if(xitk_checkbox_get_state(c) != state) {
       arm = private_data->cArmed;
       clk = private_data->cClicked;
 
@@ -212,41 +235,48 @@ void checkbox_set_state(widget_t *c, int state, Window win, GC gc) {
 /*
  *
  */
-widget_t *checkbox_create (xitk_checkbox_t *cb) {
-  widget_t *mywidget;
+xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cb) {
+  xitk_widget_t *mywidget;
   checkbox_private_data_t *private_data;
 
-  mywidget = (widget_t *) gui_xmalloc (sizeof(widget_t));
+  XITK_CHECK_CONSTITENCY(cb);
+
+  mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   private_data = (checkbox_private_data_t *) 
-    gui_xmalloc (sizeof (checkbox_private_data_t));
+    xitk_xmalloc (sizeof (checkbox_private_data_t));
 
-  private_data->display   = cb->display;
+  private_data->display           = cb->display;
+  private_data->imlibdata         = cb->imlibdata;
+  private_data->skin_element_name = strdup(cb->skin_element_name);
 
-  private_data->cWidget   = mywidget;
-  private_data->cClicked  = 0;
-  private_data->cState    = 0;
-  private_data->cArmed    = 0;
-  private_data->skin      = gui_load_image(cb->imlibdata, cb->skin);
-  private_data->callback  = cb->callback;
-  private_data->userdata  = cb->userdata;
+  private_data->cWidget           = mywidget;
+  private_data->cClicked          = 0;
+  private_data->cState            = 0;
+  private_data->cArmed            = 0;
 
-  mywidget->private_data = private_data;
+  private_data->skin              = xitk_load_image(private_data->imlibdata,
+						    xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+  private_data->callback          = cb->callback;
+  private_data->userdata          = cb->userdata;
 
-  mywidget->enable          = 1;
-  mywidget->running         = 1;
-  mywidget->visible         = 1;
-  mywidget->have_focus      = FOCUS_LOST;
-  mywidget->x               = cb->x;
-  mywidget->y               = cb->y;
-  mywidget->width           = private_data->skin->width/3;
-  mywidget->height          = private_data->skin->height;
-  mywidget->widget_type     = WIDGET_TYPE_CHECKBOX;
-  mywidget->paint           = paint_checkbox;
-  mywidget->notify_click    = notify_click_checkbox;
-  mywidget->notify_focus    = notify_focus_checkbox;
-  mywidget->notify_keyevent = NULL;
-  mywidget->notify_inside   = notify_inside;
+  mywidget->private_data          = private_data;
+
+  mywidget->enable                = 1;
+  mywidget->running               = 1;
+  mywidget->visible               = 1;
+  mywidget->have_focus            = FOCUS_LOST;
+  mywidget->x                     = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+  mywidget->y                     = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+  mywidget->width                 = private_data->skin->width/3;
+  mywidget->height                = private_data->skin->height;
+  mywidget->widget_type           = WIDGET_TYPE_CHECKBOX;
+  mywidget->paint                 = paint_checkbox;
+  mywidget->notify_click          = notify_click_checkbox;
+  mywidget->notify_focus          = notify_focus_checkbox;
+  mywidget->notify_keyevent       = NULL;
+  mywidget->notify_inside         = notify_inside;
+  mywidget->notify_change_skin    = notify_change_skin;
   
   return mywidget;
 }

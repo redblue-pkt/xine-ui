@@ -20,8 +20,7 @@
  * $Id$
  *
  */
-
-#define _XITK_C_ 1
+#define _XITK_C_
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,7 +46,7 @@
 
 #include "_xitk.h"
 
-extern int              errno;
+extern int errno;
 #undef TRACE_LOCKS
 
 #ifdef TRACE_LOCKS
@@ -75,50 +74,50 @@ static int ml = 0;
 #define MUTUNLOCK() { pthread_mutex_unlock(&gXitk->mutex); }
 #endif
 
-typedef void (*widget_cb_event_t)(XEvent *event, void *user_data);
-typedef void (*widget_cb_newpos_t)(int, int, int, int);
+typedef void (*widget_event_callback_t)(XEvent *event, void *user_data);
+typedef void (*widget_newpos_callback_t)(int, int, int, int);
 
 typedef struct {
-  Window              window;
-  Atom                XA_XITK;
+  Window                      window;
+  Atom                        XA_XITK;
 
-  gui_move_t          move;
+  xitk_move_t                  move;
 
   struct {
-    int               x;
-    int               y;
+    int                         x;
+    int                         y;
   } old_pos;
 
   struct {
-    int               x;
-    int               y;
+    int                         x;
+    int                         y;
   } new_pos;
 
-  int                width;
-  int                height;
+  int                         width;
+  int                         height;
 
-  XEvent             *old_event;
-  widget_list_t      *widget_list;
-  char               *name;
-  widget_cb_event_t   xevent_callback;
-  widget_cb_newpos_t  newpos_callback;
-  widgetkey_t         key;
-  xitk_dnd_t         *xdnd;
-  void               *user_data;
+  XEvent                     *old_event;
+  xitk_widget_list_t         *widget_list;
+  char                       *name;
+  widget_event_callback_t     xevent_callback;
+  widget_newpos_callback_t    newpos_callback;
+  xitk_register_key_t         key;
+  xitk_dnd_t                 *xdnd;
+  void                       *user_data;
 } __gfx_t;
 
 typedef struct {
-  Display            *display;
-  gui_list_t         *list;
-  gui_list_t         *gfx;
-  pthread_mutex_t     mutex;
-  int                 running;
-  widgetkey_t         key;
+  Display                    *display;
+  xitk_list_t                *list;
+  xitk_list_t                *gfx;
+  pthread_mutex_t             mutex;
+  int                         running;
+  xitk_register_key_t         key;
 } __xitk_t;
 
-static __xitk_t  *gXitk;
-static pid_t      xitk_pid;
-static sigjmp_buf kill_jmp;
+static __xitk_t    *gXitk;
+static pid_t        xitk_pid;
+static sigjmp_buf   kill_jmp;
 
 
 void widget_stop(void);
@@ -135,7 +134,7 @@ static void xitk_signal_handler(int sig) {
     if(cur_pid == xitk_pid) {
       __gfx_t   *fx;
       
-      fprintf(stderr, "XITK killed with signal %d\n", sig);
+      XITK_WARNING("XITK killed with signal %d\n", sig);
 
       MUTLOCK();
       gXitk->running = 0;
@@ -143,7 +142,7 @@ static void xitk_signal_handler(int sig) {
       /* 
        * Tada.... and now Ladies and Gentlemen, the dirty hack
        */
-      fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+      fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
 
       while(fx) {
 	if(fx->window) {
@@ -161,8 +160,7 @@ static void xitk_signal_handler(int sig) {
 	  
 	  XLOCK(gXitk->display);
 	  if (!XSendEvent (gXitk->display, fx->window, True, 0L, &event)) {
-	    fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n",
-		    (unsigned int) fx->window);
+	    XITK_WARNING("XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) fx->window);
 	  }
 	  XUNLOCK(gXitk->display);
 
@@ -170,7 +168,7 @@ static void xitk_signal_handler(int sig) {
 	  siglongjmp(kill_jmp, 1);
 	  return;
 	}
-	fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
+	fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
       }
       MUTUNLOCK();
     }
@@ -179,16 +177,16 @@ static void xitk_signal_handler(int sig) {
 }
 /*
  * Create a new widget_list, store the pointer in private
- * list of widget_list_t, then return the widget_list pointer.
+ * list of xitk_widget_list_t, then return the widget_list pointer.
  */
-widget_list_t *widget_list_new (void) {
-  widget_list_t *l;
+xitk_widget_list_t *xitk_widget_list_new (void) {
+  xitk_widget_list_t *l;
 
   MUTLOCK();
 
-  l = (widget_list_t *) gui_xmalloc(sizeof(widget_list_t));
+  l = (xitk_widget_list_t *) xitk_xmalloc(sizeof(xitk_widget_list_t));
 
-  gui_list_append_content(gXitk->list, l);
+  xitk_list_append_content(gXitk->list, l);
 
   MUTUNLOCK();
 
@@ -200,12 +198,12 @@ widget_list_t *widget_list_new (void) {
  * at widget_register_event_handler() time. It also remade it
  * DND aware, only if DND stuff was initialized at register time too.
  */
-void widget_change_window_for_event_handler (widgetkey_t key, Window window) {
+void xitk_change_window_for_event_handler (xitk_register_key_t key, Window window) {
   __gfx_t  *fx;
   
   MUTLOCK();
       
-  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
   
   while(fx) {
 
@@ -216,13 +214,13 @@ void widget_change_window_for_event_handler (widgetkey_t key, Window window) {
       fx->window = window;
 
       if(fx->xdnd && (window != None))
-	dnd_make_window_aware(fx->xdnd, window);
+	xitk_make_window_dnd_aware(fx->xdnd, window);
       
       XUNLOCK(gXitk->display);
       MUTUNLOCK();
       return;
     }
-    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
 
   MUTUNLOCK();
@@ -231,16 +229,16 @@ void widget_change_window_for_event_handler (widgetkey_t key, Window window) {
  * Register a window, with his own event handler, callback
  * for DND events, and widget list.
  */
-widgetkey_t widget_register_event_handler(char *name, Window window,
-					  widget_cb_event_t cb,
-					  widget_cb_newpos_t pos_cb,
-					  xitk_dnd_callback_t dnd_cb,
-					  widget_list_t *wl, void *user_data) {
+xitk_register_key_t xitk_register_event_handler(char *name, Window window,
+						widget_event_callback_t cb,
+						widget_newpos_callback_t pos_cb,
+						xitk_dnd_callback_t dnd_cb,
+						xitk_widget_list_t *wl, void *user_data) {
   __gfx_t   *fx;
 
   //  printf("%s()\n", __FUNCTION__);
 
-  fx = (__gfx_t *) gui_xmalloc(sizeof(__gfx_t));
+  fx = (__gfx_t *) xitk_xmalloc(sizeof(__gfx_t));
 
   fx->name = (name != NULL) ? name : "NO_SET";
 
@@ -270,9 +268,7 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
   if(cb)
     fx->xevent_callback = cb;
   else {
-    fprintf(stderr, "%s()@%d: Callback should be non NULL\n",
-	    __FUNCTION__, __LINE__);
-    exit(1);
+    XITK_DIE("%s()@%d: Callback should be non NULL\n", __FUNCTION__, __LINE__);
   }
 
   if(pos_cb && window)
@@ -286,11 +282,11 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
     fx->widget_list = NULL;
 
   if(dnd_cb && (window != None)) {
-    fx->xdnd = (xitk_dnd_t *) gui_xmalloc(sizeof(xitk_dnd_t));
+    fx->xdnd = (xitk_dnd_t *) xitk_xmalloc(sizeof(xitk_dnd_t));
     
-    dnd_init_dnd(gXitk->display, fx->xdnd);
-    dnd_set_callback(fx->xdnd, dnd_cb);
-    dnd_make_window_aware(fx->xdnd, fx->window);
+    xitk_init_dnd(gXitk->display, fx->xdnd);
+    xitk_set_dnd_callback(fx->xdnd, dnd_cb);
+    xitk_make_window_dnd_aware(fx->xdnd, fx->window);
   }
   else
   fx->xdnd = NULL;
@@ -311,7 +307,7 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
 
   MUTLOCK();
 
-  gui_list_append_content(gXitk->gfx, fx);
+  xitk_list_append_content(gXitk->gfx, fx);
 
   MUTUNLOCK();
 
@@ -322,26 +318,26 @@ widgetkey_t widget_register_event_handler(char *name, Window window,
  * Remove from the list the window/event_handler
  * specified by the key.
  */
-void widget_unregister_event_handler(widgetkey_t *key) {
+void xitk_unregister_event_handler(xitk_register_key_t *key) {
   __gfx_t  *fx;
 
   //  printf("%s()\n", __FUNCTION__);
 
   MUTLOCK();
 
-  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
   
   
   while(fx) {
 
     if(fx->key == *key) {
-      gui_list_delete_current(gXitk->gfx); 
+      xitk_list_delete_current(gXitk->gfx); 
 
       *key = 0; 
       MUTUNLOCK();
       return;
     }
-    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
 
   }
   
@@ -352,12 +348,12 @@ void widget_unregister_event_handler(widgetkey_t *key) {
 /*
  * Copy window information matching with key in passed window_info_t struct.
  */
-int widget_get_window_info(widgetkey_t key, window_info_t *winf) {
+int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   __gfx_t  *fx;
   
   MUTLOCK();
 
-  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
     
   while(fx) {
 
@@ -377,7 +373,7 @@ int widget_get_window_info(widgetkey_t key, window_info_t *winf) {
       return 1;
 
     }
-    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
 
   }
 
@@ -389,11 +385,11 @@ int widget_get_window_info(widgetkey_t key, window_info_t *winf) {
  * handled, then if a event handler callback was passed
  * at register time, it will be called.
  */
-void widget_xevent_notify(XEvent *event) {
+void xitk_xevent_notify(XEvent *event) {
   __gfx_t  *fx;
 
     
-  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
 
   while(fx) {
 
@@ -406,7 +402,7 @@ void widget_xevent_notify(XEvent *event) {
 	switch(event->type) {
 	case Expose:
 	  if (fx->widget_list && (event->xexpose.count == 0)) {
-	    paint_widget_list (fx->widget_list);
+	    xitk_paint_widget_list (fx->widget_list);
 	  }
 	  /*
 	  else {
@@ -458,8 +454,8 @@ void widget_xevent_notify(XEvent *event) {
 	  }
 	  else {
 	    if(fx->widget_list)
-	      motion_notify_widget_list (fx->widget_list,
-					 event->xbutton.x, event->xbutton.y);
+	      xitk_motion_notify_widget_list (fx->widget_list,
+					      event->xbutton.x, event->xbutton.y);
 	  }
 	}
 	break;
@@ -468,9 +464,9 @@ void widget_xevent_notify(XEvent *event) {
 	  
 	  if(fx->widget_list) {
 
-	    fx->move.enabled = !click_notify_widget_list (fx->widget_list, 
-							  event->xbutton.x, 
-							  event->xbutton.y, 0);
+	    fx->move.enabled = !xitk_click_notify_widget_list (fx->widget_list, 
+							       event->xbutton.x, 
+							       event->xbutton.y, 0);
 	    if (fx->move.enabled) {
 	      XWindowAttributes wattr;
 	      Status            err;
@@ -504,8 +500,8 @@ void widget_xevent_notify(XEvent *event) {
 	  }
 	  
 	  if(fx->widget_list) {
-	    click_notify_widget_list (fx->widget_list, event->xbutton.x, 
-				      event->xbutton.y, 1);
+	    xitk_click_notify_widget_list (fx->widget_list, event->xbutton.x, 
+					   event->xbutton.y, 1);
 	  }
 	  break;
 	  
@@ -531,7 +527,7 @@ void widget_xevent_notify(XEvent *event) {
 
 	case ClientMessage:
 	  if(fx->xdnd)
-	    dnd_process_client_message(fx->xdnd, event);
+	    xitk_process_client_dnd_message(fx->xdnd, event);
 	  break;
 	}
 
@@ -550,22 +546,22 @@ void widget_xevent_notify(XEvent *event) {
       
     }
     
-    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
 }
 
 /*
  * Initiatization of widget internals.
  */
-void widget_init(Display *display) {
+void xitk_init(Display *display) {
 
 
   xitk_pid = getppid();
 
-  gXitk = (__xitk_t *) gui_xmalloc(sizeof(__xitk_t));
+  gXitk = (__xitk_t *) xitk_xmalloc(sizeof(__xitk_t));
 
-  gXitk->list    = gui_list_new();
-  gXitk->gfx     = gui_list_new();
+  gXitk->list    = xitk_list_new();
+  gXitk->gfx     = xitk_list_new();
   gXitk->display = display;
   gXitk->key     = 0;
 
@@ -577,7 +573,7 @@ void widget_init(Display *display) {
  * Start widget event handling.
  * It will block till widget_stop() call
  */
-void widget_run(void) {
+void xitk_run(void) {
   XEvent            myevent;
   struct sigaction  action;
   __gfx_t          *fx;
@@ -586,19 +582,19 @@ void widget_run(void) {
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
   if(sigaction(SIGINT, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGINT) failed: %s\n", strerror(errno));
+    XITK_WARNING("sigaction(SIGINT) failed: %s\n", strerror(errno));
   }
   action.sa_handler = xitk_signal_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
   if(sigaction(SIGTERM, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGTERM) failed: %s\n", strerror(errno));
+    XITK_WARNING("sigaction(SIGTERM) failed: %s\n", strerror(errno));
   }
   action.sa_handler = xitk_signal_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
   if(sigaction(SIGQUIT, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGQUIT) failed: %s\n", strerror(errno));
+    XITK_WARNING("sigaction(SIGQUIT) failed: %s\n", strerror(errno));
   }
 
   gXitk->running = 1;
@@ -608,7 +604,7 @@ void widget_run(void) {
    */
   MUTLOCK();
 
-  fx = (__gfx_t *) gui_list_first_content(gXitk->gfx);
+  fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
   
   while(fx) {
 
@@ -624,12 +620,11 @@ void widget_run(void) {
       
       XLOCK(gXitk->display);
       if(!XSendEvent(gXitk->display, fx->window, False, ExposureMask, &xexp)) {
-	fprintf(stderr, "XSendEvent(display, 0x%x ...) failed.\n",
-		(unsigned int) fx->window);
+	XITK_WARNING("XSendEvent(display, 0x%x ...) failed.\n", (unsigned int) fx->window);
       }
       XUNLOCK(gXitk->display);
     }
-    fx = (__gfx_t *) gui_list_next_content(gXitk->gfx);
+    fx = (__gfx_t *) xitk_list_next_content(gXitk->gfx);
   }
 
   MUTUNLOCK();
@@ -648,7 +643,7 @@ void widget_run(void) {
     
       XNextEvent (gXitk->display, &myevent) ;
       /* XUNLOCK(gXitk->display);  */
-      widget_xevent_notify(&myevent);
+      xitk_xevent_notify(&myevent);
       /*
     } else {  
       XUNLOCK(gXitk->display); 
@@ -661,14 +656,14 @@ void widget_run(void) {
 
  killing_end:
 
-  gui_list_free(gXitk->list);
-  gui_list_free(gXitk->gfx);
-  free(gXitk);
+  xitk_list_free(gXitk->list);
+  xitk_list_free(gXitk->gfx);
+  XITK_FREE(gXitk);
 }
 
 /*
  * Stop the wait xevent loop
  */
-void widget_stop(void) {
+void xitk_stop(void) {
   gXitk->running = 0;
 }

@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_GUI_SLIDER_H
-#define HAVE_GUI_SLIDER_H
+#ifndef HAVE_XITK_SLIDER_H
+#define HAVE_XITK_SLIDER_H
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
@@ -36,8 +36,11 @@
 
 typedef struct {
   Display                *display;
+  ImlibData              *imlibdata;
+  char                   *skin_element_name_bg;
+  char                   *skin_element_name_paddle;
 
-  widget_t               *sWidget;
+  xitk_widget_t          *sWidget;
   int                     sType;
   int                     bClicked;
   int                     bArmed;
@@ -48,8 +51,8 @@ typedef struct {
   int                     realmin;
   int                     realmax;
 
-  gui_image_t            *paddle_skin;
-  gui_image_t            *bg_skin;
+  xitk_image_t            *paddle_skin;
+  xitk_image_t            *bg_skin;
 
   /* callback function (active_widget, user_data, current_position) */
   xitk_state_callback_t   motion_callback;
@@ -70,56 +73,56 @@ typedef struct {
 /**
  * Create a slider
  */
-widget_t *slider_create(xitk_slider_t *s);
+xitk_widget_t *xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s);
 
 /**
  * Get current position of paddle.
  */
-int slider_get_pos(widget_t *);
+int xitk_slider_get_pos(xitk_widget_t *);
 
 /**
  * Set position of paddle.
  */
-void slider_set_pos(widget_list_t *, widget_t *, int);
+void xitk_slider_set_pos(xitk_widget_list_t *, xitk_widget_t *, int);
 
 /**
  * Set min value of slider.
  */
-void slider_set_min(widget_t *, int);
+void xitk_slider_set_min(xitk_widget_t *, int);
 
 /**
  * Set max value of slider.
  */
-void slider_set_max(widget_t *, int);
+void xitk_slider_set_max(xitk_widget_t *, int);
 
 /**
  * Get min value of slider.
  */
-int slider_get_min(widget_t *);
+int xitk_slider_get_min(xitk_widget_t *);
 
 /**
  * Get max value of slider.
  */
-int slider_get_max(widget_t *);
+int xitk_slider_get_max(xitk_widget_t *);
 
 /**
  * Set position to 0 and redraw the widget.
  */
-void slider_reset(widget_list_t *, widget_t *);
+void xitk_slider_reset(xitk_widget_list_t *, xitk_widget_t *);
 
 /**
  * Set position to max and redraw the widget.
  */
-void slider_set_to_max(widget_list_t *, widget_t *);
+void xitk_slider_set_to_max(xitk_widget_list_t *, xitk_widget_t *);
 
 /**
  * Increment by step the paddle position
  */
-void slider_make_step(widget_list_t *, widget_t *);
+void xitk_slider_make_step(xitk_widget_list_t *, xitk_widget_t *);
 
 /**
  * Decrement by step the paddle position.
  */
-void slider_make_backstep(widget_list_t *, widget_t *);
+void xitk_slider_make_backstep(xitk_widget_list_t *, xitk_widget_t *);
 
 #endif

@@ -20,8 +20,8 @@
  * $Id$
  *
  */
-#ifndef HAVE_GUI_CHECKBOX_H
-#define HAVE_GUI_CHECKBOX_H
+#ifndef HAVE_XITK_CHECKBOX_H
+#define HAVE_XITK_CHECKBOX_H
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
@@ -30,11 +30,13 @@
 
 typedef struct {
   Display               *display;
-  widget_t              *cWidget;
+  ImlibData             *imlibdata;
+  char                  *skin_element_name;
+  xitk_widget_t         *cWidget;
   int                    cClicked;
   int                    cArmed;
   int                    cState;
-  gui_image_t           *skin;
+  xitk_image_t           *skin;
 
   xitk_state_callback_t  callback;
   void                  *userdata;
@@ -46,16 +48,16 @@ typedef struct {
 /**
  * Create a checkbox.
  */
-widget_t *checkbox_create (xitk_checkbox_t *cb);
+xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cb);
 
 /**
  * get state of checkbox "widget".
  */
-int checkbox_get_state(widget_t *);
+int xitk_checkbox_get_state(xitk_widget_t *);
 
 /**
  * Set state of checkbox .
  */
-void checkbox_set_state(widget_t *, int, Window, GC);
+void xitk_checkbox_set_state(xitk_widget_t *, int, Window, GC);
 
 #endif

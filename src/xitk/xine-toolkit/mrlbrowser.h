@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_MRLBROWSER_H
-#define HAVE_MRLBROWSER_H
+#ifndef HAVE_XITK_MRLBROWSER_H
+#define HAVE_XITK_MRLBROWSER_H
 
 #ifdef NEED_MRLBROWSER
 
@@ -52,16 +52,19 @@ typedef struct {
 
 typedef struct {
 
-  widget_t                 *fbWidget; /*  My widget */
+  xitk_widget_t            *fbWidget; /*  My widget */
 
   Display                  *display; /* Current display */
+  ImlibData                *imlibdata;
+  char                     *skin_element_name;
+  char                     *skin_element_name_ip;
 
-  widgetkey_t               widget_key;
+  xitk_register_key_t       widget_key;
 
   Window                    window; /* file browser window */
   
   ImlibImage               *bg_image;
-  widget_list_t            *widget_list; /* File browser widget list */
+  xitk_widget_list_t       *widget_list; /* File browser widget list */
   
   xine_t                   *xine;
 
@@ -70,29 +73,30 @@ typedef struct {
 
   char                     *last_mrl_source;
 
-  widget_t                 *widget_origin; /* Current directory widget */
+  xitk_widget_t            *widget_origin; /* Current directory widget */
   char                      current_origin[PATH_MAX + 1]; /* Current directory */
 
   int                       running; /* Boolean status */
   int                       visible; /* Boolean status */
 
-  widget_t                 *mrlb_list; /*  Browser list widget */
+  xitk_widget_t            *mrlb_list; /*  Browser list widget */
+  xitk_widget_t            *autodir_plugins[64];
 
-  xitk_mrl_callback_t      add_callback;
-  xitk_mrl_callback_t      play_callback;
-  xitk_simple_callback_t   kill_callback;
-  xitk_simple_callback_t   ip_callback;
+  xitk_mrl_callback_t       add_callback;
+  xitk_mrl_callback_t       play_callback;
+  xitk_simple_callback_t    kill_callback;
+  xitk_simple_callback_t    ip_callback;
 
 } mrlbrowser_private_data_t;
 
-widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb);
-int mrlbrowser_is_running(widget_t *w);
-int mrlbrowser_is_visible(widget_t *w);
-void mrlbrowser_hide(widget_t *w);
-void mrlbrowser_show(widget_t *w);
-void mrlbrowser_set_transient(widget_t *w, Window window);
-void mrlbrowser_destroy(widget_t *w);
-int mrlbrowser_get_window_info(widget_t *w, window_info_t *inf);
+xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
+int xitk_mrlbrowser_is_running(xitk_widget_t *w);
+int xitk_mrlbrowser_is_visible(xitk_widget_t *w);
+void xitk_mrlbrowser_hide(xitk_widget_t *w);
+void xitk_mrlbrowser_show(xitk_widget_t *w);
+void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window);
+void xitk_mrlbrowser_destroy(xitk_widget_t *w);
+int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
 
 #endif
 

@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_GUI_BROWSER_H
-#define HAVE_GUI_BROWSER_H
+#ifndef HAVE_XITK_BROWSER_H
+#define HAVE_XITK_BROWSER_H
 
 #include <X11/Xlib.h>
 
@@ -35,10 +35,10 @@
 typedef struct {
 
   Display                *display;
+  char                   *skin_element_name;
 
-  widget_t               *bWidget;
-
-  widget_t               *item_tree[BROWSER_MAX_ENTRIES];
+  xitk_widget_t          *bWidget;
+  xitk_widget_t          *item_tree[BROWSER_MAX_ENTRIES];
   Window                  win;
   GC                      gc;
 
@@ -65,33 +65,33 @@ typedef struct {
 /**
  * Create the list browser
  */
-widget_t *browser_create(xitk_browser_t *b);
+xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
 
 /**
  * Redraw buttons/slider
  */
-void browser_rebuild_browser(widget_t *w, int start);
+void xitk_browser_rebuild_browser(xitk_widget_t *w, int start);
 /**
  * Update the list, and rebuild button list
  */
-void browser_update_list(widget_t *w, char **list, int len, int start);
+void xitk_browser_update_list(xitk_widget_t *w, char **list, int len, int start);
 /**
  * Return the current selected button (if not, return -1)
  */
-int browser_get_current_selected(widget_t *w);
+int xitk_browser_get_current_selected(xitk_widget_t *w);
 /**
  * Select the item 'select' in list
  */
-void browser_set_select(widget_t *w, int select);
+void xitk_browser_set_select(xitk_widget_t *w, int select);
 /**
  * Release all enabled buttons
  */
-void browser_release_all_buttons(widget_t *w);
+void xitk_browser_release_all_buttons(xitk_widget_t *w);
 /**
  * Return the real number of first displayed in list
  */
-int browser_get_current_start(widget_t *w);
+int xitk_browser_get_current_start(xitk_widget_t *w);
 
-void browser_step_up(widget_t *w, void *data);
-void browser_step_down(widget_t *w, void *data);
+void xitk_browser_step_up(xitk_widget_t *w, void *data);
+void xitk_browser_step_down(xitk_widget_t *w, void *data);
 #endif

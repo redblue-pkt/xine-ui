@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_WIDGET_TYPES_H
-#define HAVE_WIDGET_TYPES_H
+#ifndef HAVE_XITK_WIDGET_TYPES_H
+#define HAVE_XITK_WIDGET_TYPES_H
 
 #define WIDGET_TYPE_GROUP         0xFFFF8000
 

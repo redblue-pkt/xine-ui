@@ -44,7 +44,6 @@
 #include "Imlib-light/Imlib.h"
 
 #include "event.h"
-#include "parseskin.h"
 #include "playlist.h"
 #include "control.h"
 #include "lirc.h"
@@ -56,6 +55,7 @@
 #include "utils.h"
 #include "xscreensaver-remote.h"
 #include "mrl_browser.h"
+#include "skins.h"
 
 #ifdef HAVE_LIRC
 extern int no_lirc;
@@ -123,7 +123,6 @@ typedef struct {
 } screen_savers_t;
 
 static screen_savers_t    ssavers;
-
 
 /**
  * Disable all screensavers.
@@ -315,14 +314,12 @@ void gui_handle_event (XEvent *event, void *data) {
   switch(event->type) {
 
   case MappingNotify:
-    /* printf ("MappingNotify\n");*/
     XLockDisplay(gGui->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
     XUnlockDisplay(gGui->display);
     break;
 
   case DestroyNotify:
-    /*  printf ("DestroyNotify\n");  */
     if(event->xany.window == gGui->panel_window
        || event->xany.window == gGui->video_window) {
       xine_exit (gGui->xine);
@@ -602,8 +599,8 @@ void gui_handle_event (XEvent *event, void *data) {
         uint8_t *y, *u, *v;
         
         if( xine_get_current_frame (gGui->xine, &width, &height,
-                                   &ratio_code, &format,
-                                   &y, &u, &v) ) {
+				    &ratio_code, &format,
+				    &y, &u, &v) ) {
           
           XLockDisplay (gGui->display);
           XResizeWindow (gGui->display, gGui->video_window, width, height);
@@ -629,25 +626,10 @@ void gui_handle_event (XEvent *event, void *data) {
   break;
 
   case ConfigureNotify:
-    /* FIXME: FIXED
-       xine_window_handle_event(gGui->xine, (void *)event);
-    */
-
-    /* printf ("ConfigureNotify\n"); */
-    /*  background */
-    /* CHECKME
-       XLOCK ();
-       Imlib_apply_image(gGui->imlib_data, gGui->gui_bg_image, gGui->gui_panel_win);
-       XUNLOCK ();
-       paint_widget_list (gui_widget_list);
-       XLOCK ();
-       XSync(gGui->display, False);
-       XUNLOCK ();
-    */
     break;
 
   case ClientMessage:
-    dnd_process_client_message (&gGui->xdnd, event);
+    xitk_process_client_dnd_message (&gGui->xdnd, event);
     break;
 
     /*
@@ -709,7 +691,6 @@ void gui_branched_callback () {
 
 
 static void gui_find_visual (Visual **visual_return, int *depth_return) {
-
   XWindowAttributes  attribs;
   XVisualInfo	    *vinfo;
   XVisualInfo	     vinfo_tmpl;
@@ -934,7 +915,9 @@ void gui_init (int nfiles, char *filenames[]) {
 
   xine_pid = getppid();
 
-  widget_init(gGui->display);
+  xitk_init(gGui->display);
+
+  init_skins_support();
 
   gGui->running = 1;
 
@@ -949,7 +932,6 @@ void gui_init (int nfiles, char *filenames[]) {
  *
  */
 void gui_run (void) {
-  
   struct sigaction      action;
 
   panel_add_autoplay_buttons();
@@ -1031,13 +1013,13 @@ void gui_run (void) {
 #endif
 
   /*  global event handler */
-  gGui->widget_key = widget_register_event_handler("NO WINDOW", None,
-						   gui_handle_event, 
-						   NULL,
-						   gui_dndcallback, 
-						   NULL, NULL);
+  gGui->widget_key = xitk_register_event_handler("NO WINDOW", None,
+						 gui_handle_event, 
+						 NULL,
+						 gui_dndcallback, 
+						 NULL, NULL);
   
-  widget_run();
+  xitk_run();
 
   gGui->running = 0;
   

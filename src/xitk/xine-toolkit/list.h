@@ -21,74 +21,74 @@
  *
  */
 
-#ifndef HAVE_GUI_H
-#define HAVE_GUI_H
+#ifndef HAVE_XITK_LIST_H
+#define HAVE_XITK_LIST_H
 
-typedef struct gui_node_s {
+typedef struct xitk_node_s {
 
-  struct gui_node_s    *next, *prev;
-
-  void                 *content;
-
-} gui_node_t;
+  struct xitk_node_s    *next, *prev;
+  
+  void                  *content;
+  
+} xitk_node_t;
 
 
 typedef struct {
 
-  gui_node_t    *first, *last, *cur;
+  xitk_node_t    *first, *last, *cur;
 
-} gui_list_t;
+} xitk_list_t;
 
 /* ***************************************************************** */
 
 /**
  * Create a new list.
  */
-gui_list_t *gui_list_new (void);
+xitk_list_t *xitk_list_new (void);
 
 /**
  * Freeing list.
  */
-void gui_list_free(gui_list_t *l);
+void xitk_list_free(xitk_list_t *l);
 
 /**
  * Boolean, status of list.
  */
-int gui_list_is_empty (gui_list_t *l);
+int xitk_list_is_empty (xitk_list_t *l);
 
 /**
  * return content of first entry in list.
  */
-void *gui_list_first_content (gui_list_t *l);
+void *xitk_list_first_content (xitk_list_t *l);
 
 /**
  * return next content in list.
  */
-void *gui_list_next_content (gui_list_t *l);
+void *xitk_list_next_content (xitk_list_t *l);
 
 /**
  * Return last content of list.
  */
-void *gui_list_last_content (gui_list_t *l);
+void *xitk_list_last_content (xitk_list_t *l);
 
 /**
  * Return previous content of list.
  */
-void *gui_list_prev_content (gui_list_t *l);
+void *xitk_list_prev_content (xitk_list_t *l);
 
 /**
  * Append content to list.
  */
-void gui_list_append_content (gui_list_t *l, void *content);
+void xitk_list_append_content (xitk_list_t *l, void *content);
 
 /**
- * Insert content in list. NOT IMPLEMENTED
+ * Insert content in list.
  */
-void gui_list_insert_content (gui_list_t *l, void *content);
+void xitk_list_insert_content (xitk_list_t *l, void *content);
 
 /**
- * Remove current content in list. NOT IMPLEMENTED
+ * Remove current content in list.
  */
-void gui_list_delete_current (gui_list_t *l);
+void xitk_list_delete_current (xitk_list_t *l);
 
 #endif

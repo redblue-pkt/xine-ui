@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_FILEBROWSER_H
-#define HAVE_FILEBROWSER_H
+#ifndef HAVE_XITK_FILEBROWSER_H
+#define HAVE_XITK_FILEBROWSER_H
 
 #include <limits.h>
 #include <X11/Xlib.h>
@@ -56,32 +56,34 @@ typedef struct {
 
 typedef struct {
   int                    sort;
-  widget_t               *w;
+  xitk_widget_t               *w;
 } sort_param_t;
 
 typedef struct {
 
-  widget_t               *fbWidget; /*  My widget */
+  xitk_widget_t          *fbWidget; /*  My widget */
 
   Display                *display; /* Current display */
+  ImlibData              *imlibdata;
+  char                   *skin_element_name;
 
-  widgetkey_t             widget_key;
+  xitk_register_key_t     widget_key;
 
   Window                  window; /* file browser window */
   
   ImlibImage             *bg_image;
-  widget_list_t          *widget_list; /* File browser widget list */
+  xitk_widget_list_t     *widget_list; /* File browser widget list */
   
   file_contents_t        *fc; /* file browser content */
   int                     dir_contents_num; /* number of entries in file browser */
 
-  widget_t               *widget_current_dir; /* Current directory widget */
+  xitk_widget_t          *widget_current_dir; /* Current directory widget */
   char                    current_dir[PATH_MAX + 1]; /* Current directory */
 
   int                     running; /* Boolean status */
   int                     visible; /* Boolean status */
 
-  widget_t               *fb_list; /*  Browser list widget */
+  xitk_widget_t          *fb_list; /*  Browser list widget */
 
   sort_param_t            sort_default;
   sort_param_t            sort_reverse;
@@ -91,15 +93,15 @@ typedef struct {
 
 } filebrowser_private_data_t;
 
-widget_t *filebrowser_create(xitk_filebrowser_t *fb);
+xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb);
 
-int filebrowser_is_running(widget_t *w);
-int filebrowser_is_visible(widget_t *w);
-void filebrowser_hide(widget_t *w);
-void filebrowser_show(widget_t *w);
-void filebrowser_set_transient(widget_t *w, Window window);
-void filebrowser_destroy(widget_t *w);
-char *filebrowser_get_current_dir(widget_t *w);
-int filebrowser_get_window_info(widget_t *w, window_info_t *inf);
+int xitk_filebrowser_is_running(xitk_widget_t *w);
+int xitk_filebrowser_is_visible(xitk_widget_t *w);
+void xitk_filebrowser_hide(xitk_widget_t *w);
+void xitk_filebrowser_show(xitk_widget_t *w);
+void xitk_filebrowser_set_transient(xitk_widget_t *w, Window window);
+void xitk_filebrowser_destroy(xitk_widget_t *w);
+char *xitk_filebrowser_get_current_dir(xitk_widget_t *w);
+int xitk_filebrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
 
 #endif

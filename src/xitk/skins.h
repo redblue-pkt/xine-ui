@@ -21,20 +21,19 @@
  *
  */
 
-#ifndef PARSESKIN_H
-#define PARSESKIN_H
+#ifndef SKINS_H
+#define SKINS_H
 
-#include "xitk.h"
+typedef struct {
+  const char *pathname;
+  const char *skin;
+} skins_locations_t;
 
-char *gui_get_skindir(const char *);
-int gui_get_skinX(const char *);
-int gui_get_skinY(const char *);
-char *gui_get_skinfile(const char *);
-void gui_place_extra_images(widget_list_t *);
-char *gui_get_ncolor(const char *str);
-char *gui_get_fcolor(const char *str);
-char *gui_get_ccolor(const char *str);
-char *gui_get_fontname(const char *str);
-int gui_get_animation(const char *str);
-int gui_get_label_length(const char *str);
+char *gui_get_skindir(void);
+char *gui_get_configfile(void);
+skins_locations_t **get_available_skins(void);
+int get_available_skins_num(void);
+void init_skins_support(void);
+void change_skin(skins_locations_t *sk);
+
 #endif

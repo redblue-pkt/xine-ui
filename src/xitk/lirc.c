@@ -253,7 +253,7 @@ void *xine_lirc_loop(void *dummy) {
 	  }*/
 	
       }
-      paint_widget_list (panel->widget_list);
+      xitk_paint_widget_list (panel->widget_list);
       free(code);
 
       if(ret == -1) 

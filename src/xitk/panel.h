@@ -30,31 +30,34 @@
 #include "xitk.h"
 
 typedef struct {
-  widget_list_t   *widget_list;
+  xitk_widget_list_t   *widget_list;
   
-  widget_t        *title_label;
-  widget_t        *runtime_label;
-  widget_t        *slider_play;
+  xitk_widget_t        *title_label;
+  xitk_widget_t        *runtime_label;
+  xitk_widget_t        *slider_play;
 
   struct {
-    widget_t        *slider;
-    widget_t        *mute;
+    xitk_widget_t        *slider;
+    xitk_widget_t        *mute;
   } mixer;
 
 
-  widget_t        *checkbox_pause;
-  int              visible;
-  char             runtime[20];
-  char             audiochan[20];
-  widget_t        *audiochan_label;
-  char             spuid[20];
-  widget_t        *spuid_label;
-  ImlibImage      *bg_image;
-  widgetkey_t      widget_key;
-  pthread_t        slider_thread;
+  xitk_widget_t        *checkbox_pause;
+  int                   visible;
+  char                  runtime[20];
+  char                  audiochan[20];
+  xitk_widget_t        *audiochan_label;
+  xitk_widget_t        *autoplay_plugins[64];
+  char                  spuid[20];
+  xitk_widget_t        *spuid_label;
+  ImlibImage           *bg_image;
+  xitk_register_key_t   widget_key;
+  pthread_t             slider_thread;
 } _panel_t;
 
 void panel_init (void);
+
+void panel_change_skins(void);
 
 void panel_add_autoplay_buttons(void);
 
@@ -62,13 +65,13 @@ void panel_add_mixer_control(void);
 
 int panel_is_visible(void);
 
-void panel_toggle_visibility (widget_t *w, void *data);
+void panel_toggle_visibility (xitk_widget_t *w, void *data);
 
-void panel_toggle_audio_mute(widget_t *w, void *data, int status);
+void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int status);
 
-void panel_execute_xineshot(widget_t *w, void *data);
+void panel_execute_xineshot(xitk_widget_t *w, void *data);
 
-void panel_snapshot(widget_t *w, void *data);
+void panel_snapshot(xitk_widget_t *w, void *data);
 
 void panel_check_pause(void);
 

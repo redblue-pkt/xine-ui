@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef _HAVE_GUI_DND_H
-#define _HAVE_GUI_DND_H
+#ifndef _HAVE_XITK_DND_H
+#define _HAVE_XITK_DND_H
 
 #include <X11/Xlib.h>
 
@@ -99,16 +99,12 @@ typedef struct {
 
 
 
-void dnd_init_dnd(Display *display, xitk_dnd_t *);
+void xitk_init_dnd(Display *display, xitk_dnd_t *);
 
-void dnd_make_window_aware (xitk_dnd_t *, Window);
+void xitk_make_window_dnd_aware(xitk_dnd_t *, Window);
 
-//Bool gui_accept_dnd(Window window);
+Bool xitk_process_client_dnd_message(xitk_dnd_t *, XEvent *);
 
-Bool dnd_process_client_message(xitk_dnd_t *, XEvent *);
-
-//typedef void (*gui_dnd_callback_t) (char *filename);
-
-void dnd_set_callback (xitk_dnd_t *, void *);
+void xitk_set_dnd_callback(xitk_dnd_t *, xitk_dnd_callback_t);
 
 #endif

@@ -31,29 +31,29 @@
 #define GUI_NEXT     1
 #define GUI_PREV     2
 
-void gui_exit (widget_t *w, void *data);
+void gui_exit (xitk_widget_t *w, void *data);
 
-void gui_play (widget_t *w, void *data);
+void gui_play (xitk_widget_t *w, void *data);
 
-void gui_stop (widget_t *w, void *data);
+void gui_stop (xitk_widget_t *w, void *data);
 
-void gui_pause (widget_t *w, void *data, int state) ;
+void gui_pause (xitk_widget_t *w, void *data, int state) ;
 
-void gui_eject(widget_t *w, void *data);
+void gui_eject(xitk_widget_t *w, void *data);
 
-void gui_toggle_visibility(widget_t *w, void *data);
+void gui_toggle_visibility(xitk_widget_t *w, void *data);
 
-void gui_toggle_fullscreen(widget_t *w, void *data);
+void gui_toggle_fullscreen(xitk_widget_t *w, void *data);
 
 void gui_toggle_aspect(void);
 
 void gui_toggle_interlaced(void);
 
-void gui_change_audio_channel(widget_t *w, void *data);
+void gui_change_audio_channel(xitk_widget_t *w, void *data);
 
-void gui_change_spu_channel(widget_t *w, void *data);
+void gui_change_spu_channel(xitk_widget_t *w, void *data);
 
-void gui_change_speed_playback(widget_t *w, void *data);
+void gui_change_speed_playback(xitk_widget_t *w, void *data);
 
 void gui_set_current_position (int pos);
 
@@ -61,19 +61,21 @@ void gui_seek_relative (int off_sec) ;
 
 void gui_dndcallback (char *filename);
 
-void gui_nextprev(widget_t *w, void *data);
+void gui_change_skin(xitk_widget_t *w, void *data);
 
-void gui_playlist_show(widget_t *w, void *data);
+void gui_nextprev(xitk_widget_t *w, void *data);
 
-void gui_mrlbrowser_show(widget_t *w, void *data);
+void gui_playlist_show(xitk_widget_t *w, void *data);
+
+void gui_mrlbrowser_show(xitk_widget_t *w, void *data);
 
 void gui_set_current_mrl(char *mrl);
 
 char *gui_get_next_mrl (void);
 
-void gui_control_show(widget_t *w, void *data);
+void gui_control_show(xitk_widget_t *w, void *data);
 
-void gui_mrl_browser_show(widget_t *w, void *data);
+void gui_mrl_browser_show(xitk_widget_t *w, void *data);
 
 void layer_above_video(Window w);
 

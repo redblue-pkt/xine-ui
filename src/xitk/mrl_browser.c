@@ -36,13 +36,21 @@
 #include "event.h"
 #include "actions.h"
 #include "utils.h"
-#include "parseskin.h"
 #include "mrl_browser.h"
 
 #define MAX_LIST 9
 
 extern gGui_t       *gGui;
-static widget_t     *mrlb = NULL;
+static xitk_widget_t     *mrlb = NULL;
+
+/*
+ *
+ */
+void mrl_browser_change_skins(void) {
+
+  if(mrlb)
+    xitk_mrlbrowser_change_skins(mrlb, gGui->skin_config);
+}
 
 /*
  *
@@ -50,7 +58,7 @@ static widget_t     *mrlb = NULL;
 int mrl_browser_is_visible(void) {
 
   if(mrlb)
-    return(mrlbrowser_is_visible(mrlb));
+    return(xitk_mrlbrowser_is_visible(mrlb));
   
   return 0;
 }
@@ -61,7 +69,7 @@ int mrl_browser_is_visible(void) {
 int mrl_browser_is_running(void) {
 
   if(mrlb)
-    return(mrlbrowser_is_running(mrlb));
+    return(xitk_mrlbrowser_is_running(mrlb));
   
   return 0;
 }
@@ -72,7 +80,7 @@ int mrl_browser_is_running(void) {
 void set_mrl_browser_transient(void) {
 
   if(mrlb) {
-    mrlbrowser_set_transient(mrlb, gGui->video_window);
+    xitk_mrlbrowser_set_transient(mrlb, gGui->video_window);
   }
 }
 
@@ -82,9 +90,9 @@ void set_mrl_browser_transient(void) {
 void show_mrl_browser(void) {
 
   if(mrlb) {
-    mrlbrowser_show(mrlb);
+    xitk_mrlbrowser_show(mrlb);
     set_mrl_browser_transient();
-    layer_above_video((mrlbrowser_get_window_id(mrlb)));
+    layer_above_video((xitk_mrlbrowser_get_window_id(mrlb)));
   }
 }
 
@@ -94,7 +102,7 @@ void show_mrl_browser(void) {
 void hide_mrl_browser(void) {
 
   if(mrlb) {
-    mrlbrowser_hide(mrlb);
+    xitk_mrlbrowser_hide(mrlb);
   }
 }
 
@@ -119,12 +127,12 @@ void destroy_mrl_browser(void) {
   window_info_t wi;
 
   if(mrlb) {
-    if((mrlbrowser_get_window_info(mrlb, &wi))) {
+    if((xitk_mrlbrowser_get_window_info(mrlb, &wi))) {
       config_set_int("x_mrl_browser", wi.x);
       config_set_int("y_mrl_browser", wi.y);
       WINDOW_INFO_ZERO(&wi);
     }
-    mrlbrowser_destroy(mrlb);
+    xitk_mrlbrowser_destroy(mrlb);
     mrlb = NULL;
   }
 }
@@ -132,11 +140,11 @@ void destroy_mrl_browser(void) {
 /*
  *
  */
-static void mrl_browser_kill(widget_t *w, void *data) {
+static void mrl_browser_kill(xitk_widget_t *w, void *data) {
   window_info_t wi;
 
   if(mrlb) {
-    if((mrlbrowser_get_window_info(mrlb, &wi))) {
+    if((xitk_mrlbrowser_get_window_info(mrlb, &wi))) {
       config_set_int("x_mrl_browser", wi.x);
       config_set_int("y_mrl_browser", wi.y);
       WINDOW_INFO_ZERO(&wi);
@@ -152,7 +160,7 @@ static void mrl_browser_kill(widget_t *w, void *data) {
  */
 void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb,
 		 select_cb_t sel_cb, xitk_dnd_callback_t dnd_cb) {
-  xitk_mrlbrowser_t   mb;
+  xitk_mrlbrowser_widget_t   mb;
   char              **ip_availables = 
     xine_get_browsable_input_plugin_ids(gGui->xine);
 
@@ -170,61 +178,33 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.x                              = config_lookup_int("x_mrl_browser", 200);
   mb.y                              = config_lookup_int("y_mrl_browser", 100);
   mb.window_title                   = "Xine MRL Browser";
-  mb.background_skin                = gui_get_skinfile("MrlBG");
+  mb.skin_element_name              = "MrlBG";
   mb.resource_name                  = mb.window_title;
   mb.resource_class                 = "Xine";
   
-  mb.origin.x                       = gui_get_skinX("MrlCurOrigin");
-  mb.origin.y                       = gui_get_skinY("MrlCurOrigin");
-  mb.origin.skin_filename           = gui_get_skinfile("MrlCurOrigin");
-  mb.origin.max_length              = gui_get_label_length("MrlCurOrigin");;
+  mb.origin.skin_element_name       = "MrlCurOrigin";
   mb.origin.cur_origin              = NULL;
-  mb.origin.animation               = gui_get_animation("MrlCurOrigin");
 
   mb.dndcallback                    = dnd_cb;
 
-  mb.select.x                       = gui_get_skinX("MrlSelect");
-  mb.select.y                       = gui_get_skinY("MrlSelect");
+  mb.select.skin_element_name       = "MrlSelect";
   mb.select.caption                 = "Select";
-  mb.select.skin_filename           = gui_get_skinfile("MrlSelect");
-  mb.select.normal_color            = gui_get_ncolor("MrlSelect");
-  mb.select.focused_color           = gui_get_fcolor("MrlSelect");
-  mb.select.clicked_color           = gui_get_ccolor("MrlSelect");
-  mb.select.fontname                = gui_get_fontname("MrlSelect");
   mb.select.callback                = add_cb;
 
-  mb.play.x                         = gui_get_skinX("MrlPlay");
-  mb.play.y                         = gui_get_skinY("MrlPlay");
-  mb.play.skin_filename             = gui_get_skinfile("MrlPlay");
+  mb.play.skin_element_name         = "MrlPlay";
   mb.play.callback                  = add_and_play_cb;
 
-  mb.dismiss.x                      = gui_get_skinX("MrlDismiss");
-  mb.dismiss.y                      = gui_get_skinY("MrlDismiss");
+  mb.dismiss.skin_element_name      = "MrlDismiss";
   mb.dismiss.caption                = "Dismiss";
-  mb.dismiss.skin_filename          = gui_get_skinfile("MrlDismiss");
-  mb.dismiss.normal_color           = gui_get_ncolor("MrlDismiss");
-  mb.dismiss.focused_color          = gui_get_fcolor("MrlDismiss");
-  mb.dismiss.clicked_color          = gui_get_ccolor("MrlDismiss");
-  mb.dismiss.fontname               = gui_get_fontname("MrlDismiss");
 
   mb.kill.callback                  = mrl_browser_kill;
 
   mb.ip_availables                  = ip_availables;
 
-  mb.ip_name.button.x               = gui_get_skinX("MrlPlugNameBG");
-  mb.ip_name.button.y               = gui_get_skinY("MrlPlugNameBG");
-  mb.ip_name.button.skin_filename   = gui_get_skinfile("MrlPlugNameBG");
-  mb.ip_name.button.normal_color    = gui_get_ncolor("MrlPlugNameBG");
-  mb.ip_name.button.focused_color   = gui_get_fcolor("MrlPlugNameBG");
-  mb.ip_name.button.clicked_color   = gui_get_ccolor("MrlPlugNameBG");
-  mb.ip_name.button.fontname        = gui_get_fontname("MrlPlugNameBG");
+  mb.ip_name.button.skin_element_name = "MrlPlugNameBG";
 
-  mb.ip_name.label.x                = gui_get_skinX("MrlPlugLabel");
-  mb.ip_name.label.y                = gui_get_skinY("MrlPlugLabel");
-  mb.ip_name.label.skin_filename    = gui_get_skinfile("MrlPlugLabel");
+  mb.ip_name.label.skin_element_name = "MrlPlugLabel";
   mb.ip_name.label.label_str        = "Source:";
-  mb.ip_name.label.length           = gui_get_label_length("MrlPlugLabel");
-  mb.ip_name.label.animation        = gui_get_animation("MrlPlugLabel");
 
   mb.xine                           = gGui->xine;
 
@@ -232,27 +212,14 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.browser.display                = gGui->display;
   mb.browser.imlibdata              = gGui->imlib_data;
 
-  mb.browser.arrow_up.x             = gui_get_skinX("MrlUp");
-  mb.browser.arrow_up.y             = gui_get_skinY("MrlUp");
-  mb.browser.arrow_up.skin_filename = gui_get_skinfile("MrlUp");
+  mb.browser.arrow_up.skin_element_name = "MrlUp";
 
-  mb.browser.slider.x               = gui_get_skinX("MrlSlidBG");
-  mb.browser.slider.y               = gui_get_skinY("MrlSlidBG");
-  mb.browser.slider.skin_filename   = gui_get_skinfile("MrlSlidBG");
+  mb.browser.slider.skin_element_name_bg = "MrlSlidBG";
+  mb.browser.slider.skin_element_name_paddle = "MrlSlidFG";
 
-  mb.browser.paddle.skin_filename   = gui_get_skinfile("MrlSlidFG");
+  mb.browser.arrow_dn.skin_element_name = "MrlDn";
 
-  mb.browser.arrow_dn.x             = gui_get_skinX("MrlDn");
-  mb.browser.arrow_dn.y             = gui_get_skinY("MrlDn");
-  mb.browser.arrow_dn.skin_filename = gui_get_skinfile("MrlDn");
-
-  mb.browser.browser.x              = gui_get_skinX("MrlItemBtn");
-  mb.browser.browser.y              = gui_get_skinY("MrlItemBtn");
-  mb.browser.browser.normal_color   = gui_get_ncolor("MrlItemBtn");
-  mb.browser.browser.focused_color  = gui_get_fcolor("MrlItemBtn");
-  mb.browser.browser.clicked_color  = gui_get_ccolor("MrlItemBtn");
-  mb.browser.browser.skin_filename  = gui_get_skinfile("MrlItemBtn");
-  mb.browser.browser.fontname       = gui_get_fontname("MrlItemBtn");
+  mb.browser.browser.skin_element_name = "MrlItemBtn";
   mb.browser.browser.max_displayed_entries = MAX_LIST;
   mb.browser.browser.num_entries    = 0;
   mb.browser.browser.entries        = NULL;
@@ -260,7 +227,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.browser.callback               = sel_cb;
   mb.browser.userdata               = NULL;
 
-  mrlb = mrlbrowser_create(&mb);
+  mrlb = xitk_mrlbrowser_create(gGui->skin_config, &mb);
 
   if(ip_availables)
     free(ip_availables);
@@ -270,14 +237,14 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
 /*
  *
  */
-static void mrl_handle_selection(widget_t *w, void *data) {
+static void mrl_handle_selection(xitk_widget_t *w, void *data) {
   //  perr(" +++ Selection called = %d = '%s'\n", 
 }
 
 /*
  * Callback called by mrlbrowser on add event.
  */
-static void mrl_add(widget_t *w, void *data, mrl_t *mrl) {
+static void mrl_add(xitk_widget_t *w, void *data, mrl_t *mrl) {
 
   if(mrl)
     gui_dndcallback((char *)mrl->mrl);
@@ -286,7 +253,7 @@ static void mrl_add(widget_t *w, void *data, mrl_t *mrl) {
 /*
  * Callback called by mrlbrowser on play event.
  */
-static void mrl_add_and_play(widget_t *w, void *data, mrl_t *mrl) {
+static void mrl_add_and_play(xitk_widget_t *w, void *data, mrl_t *mrl) {
 
   if(mrl) {
     gui_dndcallback((char *)mrl->mrl);
@@ -305,7 +272,7 @@ static void mrl_add_and_play(widget_t *w, void *data, mrl_t *mrl) {
 /*
  * Create a new mrl browser.
  */
-void open_mrlbrowser(widget_t *w, void *data) {
+void open_mrlbrowser(xitk_widget_t *w, void *data) {
   
   mrl_browser(mrl_add, mrl_add_and_play, mrl_handle_selection, gui_dndcallback);
 }

@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_GUI_BUTTON_H
-#define HAVE_GUI_BUTTON_H
+#ifndef HAVE_XITK_BUTTON_H
+#define HAVE_XITK_BUTTON_H
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
@@ -31,10 +31,12 @@
 
 typedef struct {
   Display                *display;
-  widget_t               *bWidget;
+  ImlibData              *imlibdata;
+  char                   *skin_element_name;
+  xitk_widget_t          *bWidget;
   int                     bClicked;
   int                     bArmed;
-  gui_image_t            *skin;
+  xitk_image_t            *skin;
 
   /* callback function (active_widget, user_data) */
   xitk_simple_callback_t  callback;
@@ -47,6 +49,6 @@ typedef struct {
 /**
  * Create a button
  */
-widget_t *button_create (xitk_button_t *b);
+xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widget_t *b);
 
 #endif

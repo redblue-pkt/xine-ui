@@ -1,18 +1,15 @@
 
-CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
+CFLAGS = -Werror @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
 
 noinst_LTLIBRARIES = libxitk.la
-libxitk_la_SOURCES = button.c labelbutton.c label.c \
-	widget.c dnd.c list.c slider.c checkbox.c \
-	image.c browser.c xitk.c filebrowser.c mrlbrowser.c inputtext.c
+libxitk_la_SOURCES = browser.c button.c checkbox.c dnd.c filebrowser.c image.c inputtext.c \
+		label.c labelbutton.c list.c mrlbrowser.c skin.c slider.c widget.c xitk.c
 libxitk_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 -lXext $(X_EXTRA_LIBS) \
 	$(THREAD_LIBS) $(top_builddir)/src/Imlib-light/libImlib-light.la
 
-noinst_HEADERS = button.h labelbutton.h label.h \
-	widget.h dnd.h list.h slider.h \
-	checkbox.c image.h widget_types.h checkbox.h \
-	browser.h filebrowser.h mrlbrowser.h inputtext.h xitk.h _xitk.h
-
+noinst_HEADERS = _xitk.h browser.h button.h checkbox.c checkbox.h dnd.h filebrowser.h \
+		image.h inputtext.h label.h labelbutton.h list.h mrlbrowser.h skin.h \
+		slider.h widget.h widget_types.h xitk.h
 
 $(top_builddir)/src/Imlib-light/libImlib-light.la:
 	@cd $(top_builddir)/src/Imlib-light && $(MAKE) libImlib-light.la

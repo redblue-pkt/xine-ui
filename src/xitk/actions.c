@@ -50,7 +50,7 @@ extern _panel_t        *panel;
 /*
  * Callback-functions for widget-button click
  */
-void gui_exit (widget_t *w, void *data) {
+void gui_exit (xitk_widget_t *w, void *data) {
 
 #ifdef HAVE_XF86VIDMODE
   // just in case a different modeline than the original one is running,
@@ -73,10 +73,11 @@ void gui_exit (widget_t *w, void *data) {
     deinit_lirc();
   }
 #endif
-  widget_stop();
+  xitk_stop();
+  xitk_skin_unload_config(gGui->skin_config);
 }
 
-void gui_play (widget_t *w, void *data) {
+void gui_play (xitk_widget_t *w, void *data) {
 
   fprintf(stderr, "xine-panel: PLAY\n");
 
@@ -90,7 +91,7 @@ void gui_play (widget_t *w, void *data) {
   panel_check_pause();
 }
 
-void gui_stop (widget_t *w, void *data) {
+void gui_stop (xitk_widget_t *w, void *data) {
 
   gGui->ignore_status = 1;
   xine_stop (gGui->xine);
@@ -100,7 +101,7 @@ void gui_stop (widget_t *w, void *data) {
   panel_check_pause();
 }
 
-void gui_pause (widget_t *w, void *data, int state) {
+void gui_pause (xitk_widget_t *w, void *data, int state) {
   
   if (xine_get_speed (gGui->xine) != SPEED_PAUSE)
     xine_set_speed(gGui->xine, SPEED_PAUSE);
@@ -109,7 +110,7 @@ void gui_pause (widget_t *w, void *data, int state) {
   panel_check_pause();
 }
 
-void gui_eject(widget_t *w, void *data) {
+void gui_eject(xitk_widget_t *w, void *data) {
   char *tmp_playlist[MAX_PLAYLIST_LENGTH];
   int i, new_num = 0;
   
@@ -168,7 +169,7 @@ void gui_eject(widget_t *w, void *data) {
   }
 }
 
-void gui_toggle_visibility(widget_t *w, void *data) {
+void gui_toggle_visibility(xitk_widget_t *w, void *data) {
 
   if(panel_is_visible()) {
     video_window_set_visibility(!(video_window_is_visible()));
@@ -183,7 +184,7 @@ void gui_toggle_visibility(widget_t *w, void *data) {
   }
 }
 
-void gui_toggle_fullscreen(widget_t *w, void *data) {
+void gui_toggle_fullscreen(xitk_widget_t *w, void *data) {
 
   if(!(video_window_is_visible()))
     video_window_set_visibility(1);
@@ -245,7 +246,7 @@ void gui_toggle_interlaced(void) {
   }
 }
 
-void gui_change_audio_channel(widget_t *w, void *data) {
+void gui_change_audio_channel(xitk_widget_t *w, void *data) {
   
   if(((int)data) == GUI_NEXT) {
     xine_select_audio_channel(gGui->xine,
@@ -259,7 +260,7 @@ void gui_change_audio_channel(widget_t *w, void *data) {
   panel_update_channel_display ();
 }
 
-void gui_change_spu_channel(widget_t *w, void *data) {
+void gui_change_spu_channel(xitk_widget_t *w, void *data) {
   
   if(((int)data) == GUI_NEXT) {
     xine_select_spu_channel(gGui->xine, 
@@ -276,7 +277,7 @@ void gui_change_spu_channel(widget_t *w, void *data) {
   
 }
 
-void gui_change_speed_playback(widget_t *w, void *data) {
+void gui_change_speed_playback(xitk_widget_t *w, void *data) {
 
   if(((int)data) == GUI_NEXT) {
     if (xine_get_speed (gGui->xine) > SPEED_PAUSE)
@@ -335,7 +336,7 @@ void gui_dndcallback (char *filename) {
   }
 }
 
-void gui_nextprev(widget_t *w, void *data) {
+void gui_nextprev(xitk_widget_t *w, void *data) {
 
   if(((int)data) == GUI_NEXT) {
     gGui->ignore_status = 1;
@@ -360,7 +361,7 @@ void gui_nextprev(widget_t *w, void *data) {
   panel_check_pause();
 }
 
-void gui_playlist_show(widget_t *w, void *data) {
+void gui_playlist_show(xitk_widget_t *w, void *data) {
 
   if(!pl_is_running()) {
     playlist_editor();
@@ -374,7 +375,7 @@ void gui_playlist_show(widget_t *w, void *data) {
 
 }
 
-void gui_mrlbrowser_show(widget_t *w, void *data) {
+void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
   if(!mrl_browser_is_running()) {
     open_mrlbrowser(NULL, NULL);
@@ -418,7 +419,7 @@ void gui_notify_demux_branched () {
 }
 */
 
-void gui_control_show(widget_t *w, void *data) {
+void gui_control_show(xitk_widget_t *w, void *data) {
 
   if(control_is_running() && !control_is_visible())
     control_toggle_panel_visibility(NULL, NULL);
@@ -469,7 +470,7 @@ void gui_increase_audio_volume(void) {
     if(gGui->mixer.volume_level < 100) {
       gGui->mixer.volume_level++;
       xine_set_audio_property(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
-      slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+      xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
     }
   }
 }
@@ -480,7 +481,7 @@ void gui_decrease_audio_volume(void) {
     if(gGui->mixer.volume_level > 0) {
       gGui->mixer.volume_level--;
       xine_set_audio_property(gGui->xine, gGui->mixer.volume_mixer, gGui->mixer.volume_level);
-      slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+      xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
     }
   }
 }

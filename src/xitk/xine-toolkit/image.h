@@ -21,8 +21,8 @@
  *
  */
 
-#ifndef HAVE_GUI_IMAGE_H
-#define HAVE_GUI_IMAGE_H
+#ifndef HAVE_XITK_IMAGE_H
+#define HAVE_XITK_IMAGE_H
 
 #include <X11/Xlib.h>
 
@@ -31,21 +31,23 @@
 #include "_xitk.h"
 
 typedef struct {
-  Display     *display;
-  widget_t    *bWidget;
-  gui_image_t *skin;
+  Display              *display;
+  ImlibData            *imlibdata;
+  char                 *skin_element_name;
+  xitk_widget_t        *bWidget;
+  xitk_image_t         *skin;
 } image_private_data_t;
 
 /* *************************************************************** */
 
 /**
- * Load image and return a gui_image_t data type.
+ * Load image and return a xitk_image_t data type.
  */
-gui_image_t *gui_load_image(ImlibData *idata, char *image);
+xitk_image_t *xitk_load_image(ImlibData *idata, char *image);
 
 /**
  * Create an image widget type.
  */
-widget_t *image_create (xitk_image_t *im);
+xitk_widget_t *xitk_image_create (xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
 
 #endif

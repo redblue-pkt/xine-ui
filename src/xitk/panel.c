@@ -40,7 +40,6 @@
 #include "control.h"
 #include "playlist.h"
 #include "videowin.h"
-#include "parseskin.h"
 #include "panel.h"
 #include "mrl_browser.h"
 #include "snapshot.h"
@@ -83,6 +82,58 @@ static void panel_store_new_position(int x, int y, int w, int h) {
 }
 
 /*
+ * Change the current skin.
+ */
+void panel_change_skins(void) {
+
+  XLockDisplay(gGui->display);
+
+  Imlib_destroy_image(gGui->imlib_data, panel->bg_image);
+  
+  if(!(panel->bg_image = 
+       Imlib_load_image(gGui->imlib_data,
+			xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
+    fprintf(stderr, "%s(): couldn't find image for background\n", __FUNCTION__);
+    exit(-1);
+  }
+
+  XResizeWindow (gGui->display, gGui->panel_window,
+		 (unsigned int)panel->bg_image->rgb_width,
+		 (unsigned int)panel->bg_image->rgb_height);
+
+  /*
+   * We should here, otherwise new skined window will have wrong size.
+   */
+  XFlush(gGui->display);
+
+  Imlib_apply_image(gGui->imlib_data, panel->bg_image, gGui->panel_window);
+  
+  XUnlockDisplay(gGui->display);
+  
+  xitk_change_skins_widget_list(panel->widget_list, gGui->skin_config);
+  /*
+   * Update position of dynamic buttons.
+   */
+  {
+    int i = 0, x, y;
+    
+    x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
+    y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
+    
+    while(panel->autoplay_plugins[i] != NULL) {
+      
+      (void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
+      
+      x -= xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
+      i++;
+    }
+  }
+
+  xitk_paint_widget_list(panel->widget_list);
+
+}
+
+/*
  * Update runtime displayed informations.
  */
 void panel_update_runtime_display(void) {
@@ -98,7 +149,7 @@ void panel_update_runtime_display(void) {
 	   seconds / (60*60),
 	   (seconds / 60) % 60, seconds % 60);
   
-  label_change_label (panel->widget_list, panel->runtime_label, timestr); 
+  xitk_label_change_label (panel->widget_list, panel->runtime_label, timestr); 
 }
 
 /*
@@ -115,8 +166,8 @@ static void *slider_loop(void *dummy) {
 	int status = xine_get_status(gGui->xine);
 	
 	if(status == XINE_PLAY) {
-	  slider_set_pos(panel->widget_list, panel->slider_play, 
-			 xine_get_current_position(gGui->xine));
+	  xitk_slider_set_pos(panel->widget_list, panel->slider_play, 
+			      xine_get_current_position(gGui->xine));
 	}
 	panel_update_runtime_display();
       }
@@ -148,7 +199,7 @@ int panel_is_visible(void) {
 /*
  * Show/Hide panel window.
  */
-void panel_toggle_visibility (widget_t *w, void *data) {
+void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
   if(!panel->visible && pl_is_visible()) {}
   else {
@@ -171,7 +222,7 @@ void panel_toggle_visibility (widget_t *w, void *data) {
     if (video_window_is_visible ()) {
       panel->visible = 0;
       XUnmapWindow (gGui->display, gGui->panel_window);
-      widget_hide_widgets(panel->widget_list);
+      xitk_hide_widgets(panel->widget_list);
     }
 
     if(gGui->cursor_grabbed)
@@ -180,7 +231,7 @@ void panel_toggle_visibility (widget_t *w, void *data) {
   } else {
 
     panel->visible = 1;
-    widget_show_widgets(panel->widget_list);
+    xitk_show_widgets(panel->widget_list);
     XMapRaised(gGui->display, gGui->panel_window); 
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
@@ -203,8 +254,8 @@ void panel_toggle_visibility (widget_t *w, void *data) {
 
 void panel_check_mute(void) {
 
-  checkbox_set_state(panel->mixer.mute, gGui->mixer.mute, 
-		     gGui->panel_window, panel->widget_list->gc);
+  xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute, 
+			  gGui->panel_window, panel->widget_list->gc);
 }
 
 /*
@@ -212,10 +263,10 @@ void panel_check_mute(void) {
  */
 void panel_check_pause(void) {
   
-  checkbox_set_state(panel->checkbox_pause, 
-		     (((xine_get_status(gGui->xine) == XINE_PLAY) && 
-		      (xine_get_speed(gGui->xine) == SPEED_PAUSE)) ? 1 : 0 ), 
-		     gGui->panel_window, panel->widget_list->gc);
+  xitk_checkbox_set_state(panel->checkbox_pause, 
+			  (((xine_get_status(gGui->xine) == XINE_PLAY) && 
+			    (xine_get_speed(gGui->xine) == SPEED_PAUSE)) ? 1 : 0 ), 
+			  gGui->panel_window, panel->widget_list->gc);
   
 }
 
@@ -223,7 +274,7 @@ void panel_check_pause(void) {
  * Reset the slider of panel window (set to 0).
  */
 void panel_reset_slider (void) {
-  slider_reset(panel->widget_list, panel->slider_play);
+  xitk_slider_reset(panel->widget_list, panel->slider_play);
 }
 
 /*
@@ -232,13 +283,12 @@ void panel_reset_slider (void) {
 void panel_update_channel_display (void) {
 
   xine_get_audio_lang (gGui->xine, panel->audiochan);
-  label_change_label (panel->widget_list, panel->audiochan_label, 
-		      panel->audiochan);
-
+  xitk_label_change_label (panel->widget_list, panel->audiochan_label, 
+			   panel->audiochan);
   
   xine_get_spu_lang (gGui->xine, panel->spuid);
-  label_change_label (panel->widget_list, panel->spuid_label, 
-		      panel->spuid);
+  xitk_label_change_label (panel->widget_list, panel->spuid_label, 
+			   panel->spuid);
 }
 
 /*
@@ -253,13 +303,14 @@ void panel_set_no_mrl(void) {
  * Update displayed MRL according to the current one.
  */
 void panel_update_mrl_display (void) {
+
   panel_set_title(gGui->filename);
 }
 
 /*
  *
  */
-void panel_toggle_audio_mute(widget_t *w, void *data, int state) {
+void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
 
   if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
     gGui->mixer.mute = state;
@@ -272,7 +323,7 @@ void panel_toggle_audio_mute(widget_t *w, void *data, int state) {
  *  Call external "xineshot" program to get a fullscreen
  *  snapshot.
  */
-void panel_execute_xineshot(widget_t *w, void *data) {
+void panel_execute_xineshot(xitk_widget_t *w, void *data) {
   int err;
   char cmd[2048];
   char *vo_name;
@@ -294,7 +345,7 @@ void panel_execute_xineshot(widget_t *w, void *data) {
  *  Use internal xine-lib framegrabber function
  *  to snapshot current frame.
  */
-void panel_snapshot(widget_t *w, void *data) {
+void panel_snapshot(xitk_widget_t *w, void *data) {
   printf("Snapshot:\n");
   create_snapshot( gGui );
 }
@@ -302,7 +353,7 @@ void panel_snapshot(widget_t *w, void *data) {
 /*
  * Handle paddle moving of slider.
  */
-static void panel_slider_cb(widget_t *w, void *data, int pos) {
+static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 
   if(w == panel->slider_play) {
     gui_set_current_position (pos);
@@ -348,39 +399,37 @@ void panel_handle_event(XEvent *event, void *data) {
 void panel_add_autoplay_buttons(void) {
   int                  x, y;
   int                  i = 0;
-  xitk_labelbutton_t   lb;
-  widget_t            *tmp;
+  xitk_labelbutton_widget_t   lb;
   char               **autoplay_plugins = 
     xine_get_autoplay_input_plugin_ids(gGui->xine);
   
-  x = gui_get_skinX("AutoPlayGUI");
-  y = gui_get_skinY("AutoPlayGUI");
+  x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
+  y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
   
   lb.display   = gGui->display;
   lb.imlibdata = gGui->imlib_data;
 
   while(autoplay_plugins[i] != NULL) {
 
-    lb.x              = x;
-    lb.y              = y;
-    lb.button_type    = CLICK_BUTTON;
-    lb.label          = autoplay_plugins[i];
-    lb.callback       = pl_scan_input;
-    lb.state_callback = NULL;
-    lb.userdata       = NULL;
-    lb.skin           = gui_get_skinfile("AutoPlayGUI");
-    lb.normcolor      = gui_get_ncolor("AutoPlayGUI");
-    lb.focuscolor     = gui_get_fcolor("AutoPlayGUI");
-    lb.clickcolor     = gui_get_ccolor("AutoPlayGUI");
-    lb.fontname       = gui_get_fontname("AutoPlayGUI");
+    lb.skin_element_name = "AutoPlayGUI";
+    lb.button_type       = CLICK_BUTTON;
+    lb.label             = autoplay_plugins[i];
+    lb.callback          = pl_scan_input;
+    lb.state_callback    = NULL;
+    lb.userdata          = NULL;
+    xitk_list_append_content (panel->widget_list->l,
+	     (panel->autoplay_plugins[i] =
+	      xitk_labelbutton_create (gGui->skin_config, &lb)));
 
-    gui_list_append_content (panel->widget_list->l,
-	     (tmp =
-	      label_button_create (&lb)));
+    (void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
 
-    x -= widget_get_width(tmp) + 1;
+    x -= xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
     i++;
   }
+
+  if(i)
+    panel->autoplay_plugins[i+1] = NULL;
+
 }
 
 /*
@@ -398,16 +447,16 @@ void panel_add_mixer_control(void) {
     gGui->mixer.volume_mixer = AO_PROP_MIXER_VOL;
   
   if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL)) { 
-    widget_enable(panel->mixer.slider);
+    xitk_enable_widget(panel->mixer.slider);
     gGui->mixer.volume_level = xine_get_audio_property(gGui->xine, gGui->mixer.volume_mixer);
-    slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+    xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
   }
 
   if(gGui->mixer.caps & AO_CAP_MUTE_VOL) {
-    widget_enable(panel->mixer.mute);
+    xitk_enable_widget(panel->mixer.mute);
     gGui->mixer.mute = xine_get_audio_property(gGui->xine, AO_PROP_MUTE_VOL);
-    checkbox_set_state(panel->mixer.mute, gGui->mixer.mute,
-		       gGui->panel_window, panel->widget_list->gc);
+    xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute,
+			    gGui->panel_window, panel->widget_list->gc);
   }
 
 }
@@ -416,18 +465,18 @@ void panel_add_mixer_control(void) {
  * Create the panel window, and fit all widgets in.
  */
 void panel_init (void) {
-  GC                      gc;
-  XSizeHints              hint;
-  XWMHints               *wm_hint;
-  XSetWindowAttributes    attr;
-  char                    title[] = {"Xine Panel"}; /* window-title     */
-  Atom                    prop, XA_WIN_LAYER;
-  MWMHints                mwmhints;
-  XClassHint             *xclasshint;
-  xitk_button_t           b;
-  xitk_checkbox_t         cb;
-  xitk_label_t            lbl;
-  xitk_slider_t           sl;
+  GC                        gc;
+  XSizeHints                hint;
+  XWMHints                 *wm_hint;
+  XSetWindowAttributes      attr;
+  char                      title[] = {"Xine Panel"}; /* window-title     */
+  Atom                      prop, XA_WIN_LAYER;
+  MWMHints                  mwmhints;
+  XClassHint               *xclasshint;
+  xitk_button_widget_t      b;
+  xitk_checkbox_widget_t    cb;
+  xitk_label_widget_t       lbl;
+  xitk_slider_widget_t      sl;
   long data[1];
   
   if (gGui->panel_window)
@@ -440,10 +489,9 @@ void panel_init (void) {
   /*
    * load bg image before opening window, so we can determine it's size
    */
-
   if (!(panel->bg_image = 
 	Imlib_load_image(gGui->imlib_data,
-			 gui_get_skinfile("BackGround")))) {
+			 xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
     fprintf(stderr, "xine-panel: couldn't find image for background\n");
     exit(-1);
   }
@@ -552,8 +600,8 @@ void panel_init (void) {
    * Widget-list
    */
 
-  panel->widget_list                = widget_list_new();
-  panel->widget_list->l             = gui_list_new ();
+  panel->widget_list                = xitk_widget_list_new();
+  panel->widget_list->l             = xitk_list_new ();
   panel->widget_list->focusedWidget = NULL;
   panel->widget_list->pressedWidget = NULL;
   panel->widget_list->win           = gGui->panel_window;
@@ -573,245 +621,182 @@ void panel_init (void) {
   sl.display    = gGui->display;
   sl.imlibdata  = gGui->imlib_data;
 
-  /* Check and place some extra images on GUI */
-  gui_place_extra_images(panel->widget_list);
-
   /*  Prev button */
-  b.x        = gui_get_skinX("Prev");
-  b.y        = gui_get_skinY("Prev");
-  b.callback = gui_nextprev;
-  b.userdata = (void *)GUI_PREV;
-  b.skin     = gui_get_skinfile("Prev");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "Prev";
+  b.callback          = gui_nextprev;
+  b.userdata          = (void *)GUI_PREV;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Stop button */
-  b.x        = gui_get_skinX("Stop");
-  b.y        = gui_get_skinY("Stop");
-  b.callback = gui_stop;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("Stop");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "Stop";
+  b.callback          = gui_stop;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
   
   /*  Play button */
-  b.x        = gui_get_skinX("Play");
-  b.y        = gui_get_skinY("Play");
-  b.callback = gui_play;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("Play");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "Play";
+  b.callback          = gui_play;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Pause button */
-  cb.x        = gui_get_skinX("Pause");
-  cb.y        = gui_get_skinY("Pause");
-  cb.callback = gui_pause;
-  cb.userdata = NULL;
-  cb.skin     = gui_get_skinfile("Pause");
-  gui_list_append_content (panel->widget_list->l, 
-			   (panel->checkbox_pause = 
-			    checkbox_create (&cb)));
+  cb.skin_element_name = "Pause";
+  cb.callback          = gui_pause;
+  cb.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, 
+			   (panel->checkbox_pause = xitk_checkbox_create(gGui->skin_config, &cb)));
   
   /*  Next button */
-  b.x        = gui_get_skinX("Next");
-  b.y        = gui_get_skinY("Next");
-  b.callback = gui_nextprev;
-  b.userdata = (void *)GUI_NEXT;
-  b.skin     = gui_get_skinfile("Next");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  //FIXME
+  b.skin_element_name = "Next";
+  b.callback          = gui_nextprev;
+  b.userdata          = (void *)GUI_NEXT;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Eject button */
-  b.x        = gui_get_skinX("Eject");
-  b.y        = gui_get_skinY("Eject");
-  b.callback = gui_eject;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("Eject");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "Eject";
+  b.callback          = gui_eject;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Exit button */
-  b.x        = gui_get_skinX("Exit");
-  b.y        = gui_get_skinY("Exit");
-  b.callback = gui_exit;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("Exit");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "Exit";
+  b.callback          = gui_exit;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Close button */
-  b.x        = gui_get_skinX("Close");
-  b.y        = gui_get_skinY("Close");
-  b.callback = panel_toggle_visibility;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("Close");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "Close";
+  b.callback          = panel_toggle_visibility;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Fullscreen button */
-  b.x        = gui_get_skinX("FullScreen");
-  b.y        = gui_get_skinY("FullScreen");
-  b.callback = gui_toggle_fullscreen;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("FullScreen");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "FullScreen";
+  b.callback          = gui_toggle_fullscreen;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Next audio channel */
-  b.x        = gui_get_skinX("AudioNext");
-  b.y        = gui_get_skinY("AudioNext");
-  b.callback = gui_change_audio_channel;
-  b.userdata = (void *)GUI_NEXT;
-  b.skin     = gui_get_skinfile("AudioNext");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "AudioNext";
+  b.callback          = gui_change_audio_channel;
+  b.userdata          = (void *)GUI_NEXT;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Prev audio channel */
-  b.x        = gui_get_skinX("AudioPrev");
-  b.y        = gui_get_skinY("AudioPrev");
-  b.callback = gui_change_audio_channel;
-  b.userdata = (void *)GUI_PREV;
-  b.skin     = gui_get_skinfile("AudioPrev");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "AudioPrev";
+  b.callback          = gui_change_audio_channel;
+  b.userdata          = (void *)GUI_PREV;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Prev spuid */
-  b.x        = gui_get_skinX("SpuNext");
-  b.y        = gui_get_skinY("SpuNext");
-  b.callback = gui_change_spu_channel;
-  b.userdata = (void *)GUI_NEXT;
-  b.skin     = gui_get_skinfile("SpuNext");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "SpuNext";
+  b.callback          = gui_change_spu_channel;
+  b.userdata          = (void *)GUI_NEXT;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Next spuid */
-  b.x        = gui_get_skinX("SpuPrev");
-  b.y        = gui_get_skinY("SpuPrev");
-  b.callback = gui_change_spu_channel;
-  b.userdata = (void *)GUI_PREV;
-  b.skin     = gui_get_skinfile("SpuPrev");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "SpuPrev";
+  b.callback          = gui_change_spu_channel;
+  b.userdata          = (void *)GUI_PREV;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Label title */
-  lbl.x         = gui_get_skinX("TitleLabel");
-  lbl.y         = gui_get_skinY("TitleLabel");
-  lbl.length    = gui_get_label_length("TitleLabel");
-  lbl.label     = gGui->filename;
-  lbl.font      = gui_get_skinfile("TitleLabel");
-  lbl.animation = gui_get_animation("TitleLabel");
-  gui_list_append_content (panel->widget_list->l, 
-			   (panel->title_label = label_create (&lbl)));
+  lbl.skin_element_name = "TitleLabel";
+  lbl.label             = gGui->filename;
+  xitk_list_append_content (panel->widget_list->l, 
+			   (panel->title_label = xitk_label_create (gGui->skin_config, &lbl)));
 
   /*  Runtime label */
-  lbl.x         = gui_get_skinX("TimeLabel");
-  lbl.y         = gui_get_skinY("TimeLabel");
-  lbl.length    = gui_get_label_length("TimeLabel");
-  lbl.label     = panel->runtime;
-  lbl.font      = gui_get_skinfile("TimeLabel");
-  lbl.animation = gui_get_animation("TimeLabel");
-  gui_list_append_content (panel->widget_list->l, 
-			   (panel->runtime_label = label_create (&lbl)));
+  lbl.skin_element_name = "TimeLabel";
+  lbl.label             = panel->runtime;
+  xitk_list_append_content (panel->widget_list->l, 
+			   (panel->runtime_label = xitk_label_create (gGui->skin_config, &lbl)));
 
   /*  Audio channel label */
-  lbl.x         = gui_get_skinX("AudioLabel");
-  lbl.y         = gui_get_skinY("AudioLabel");
-  lbl.length    = gui_get_label_length("AudioLabel");
-  lbl.label     = panel->audiochan;
-  lbl.font      = gui_get_skinfile("AudioLabel");
-  lbl.animation = gui_get_animation("AudioLabel");
-  gui_list_append_content (panel->widget_list->l, 
-			   (panel->audiochan_label = label_create (&lbl)));
+  lbl.skin_element_name = "AudioLabel";
+  lbl.label             = panel->audiochan;
+  xitk_list_append_content (panel->widget_list->l, 
+			   (panel->audiochan_label = xitk_label_create (gGui->skin_config, &lbl)));
 
   /*  Spuid label */
-  lbl.x         = gui_get_skinX("SpuLabel");
-  lbl.y         = gui_get_skinY("SpuLabel");
-  lbl.length    = gui_get_label_length("SpuLabel");
-  lbl.label     = panel->spuid;
-  lbl.font      = gui_get_skinfile("SpuLabel");
-  lbl.animation = gui_get_animation("SpuLabel");
-  gui_list_append_content (panel->widget_list->l, 
-			   (panel->spuid_label = label_create (&lbl)));
+  lbl.skin_element_name = "SpuLabel";
+  lbl.label             = panel->spuid;
+  xitk_list_append_content (panel->widget_list->l, 
+			   (panel->spuid_label = xitk_label_create (gGui->skin_config, &lbl)));
 
   /*  slider seek */
-  sl.x               = gui_get_skinX("SliderBGPlay");
-  sl.y               = gui_get_skinY("SliderBGPlay");
-  sl.slider_type     = HSLIDER;
-  sl.min             = 0;
-  sl.max             = 65535;
-  sl.step            = 1;
-  sl.background_skin = gui_get_skinfile("SliderBGPlay");
-  sl.paddle_skin     = gui_get_skinfile("SliderFGPlay");
-  sl.callback        = NULL; /* panel_slider_cb; */
-  sl.userdata        = NULL;
-  sl.motion_callback = panel_slider_cb;
-  sl.motion_userdata = NULL;
-  gui_list_append_content (panel->widget_list->l, 
-			   (panel->slider_play = slider_create(&sl)));
+  sl.skin_element_name_bg     = "SliderBGPlay";
+  sl.skin_element_name_paddle = "SliderFGPlay";
+  sl.slider_type              = HSLIDER;
+  sl.min                      = 0;
+  sl.max                      = 65535;
+  sl.step                     = 1;
+  sl.callback                 = NULL;
+  sl.userdata                 = NULL;
+  sl.motion_callback          = panel_slider_cb;
+  sl.motion_userdata          = NULL;
+  xitk_list_append_content (panel->widget_list->l, 
+			   (panel->slider_play = xitk_slider_create(gGui->skin_config, &sl)));
 
   /* Mixer volume slider */
-  sl.x               = gui_get_skinX("SliderBGVol");
-  sl.y               = gui_get_skinY("SliderBGVol");
-  sl.slider_type     = VSLIDER;
-  sl.min             = 0;
-  sl.max             = 100;
-  sl.step            = 1;
-  sl.background_skin = gui_get_skinfile("SliderBGVol");
-  sl.paddle_skin     = gui_get_skinfile("SliderFGVol");
-  sl.callback        = NULL;
-  sl.userdata        = NULL;
-  sl.motion_callback = panel_slider_cb;
-  sl.motion_userdata = NULL;
-  gui_list_append_content (panel->widget_list->l, 
-			   (panel->mixer.slider = slider_create(&sl)));
-  widget_disable(panel->mixer.slider);
+  sl.skin_element_name_bg     = "SliderBGVol";
+  sl.skin_element_name_paddle = "SliderFGVol";
+  sl.slider_type              = VSLIDER;
+  sl.min                      = 0;
+  sl.max                      = 100;
+  sl.step                     = 1;
+  sl.callback                 = NULL;
+  sl.userdata                 = NULL;
+  sl.motion_callback          = panel_slider_cb;
+  sl.motion_userdata          = NULL;
+  xitk_list_append_content (panel->widget_list->l, 
+			   (panel->mixer.slider = xitk_slider_create(gGui->skin_config, &sl)));
+  xitk_disable_widget(panel->mixer.slider);
 
   /*  Mute toggle */
-  cb.x        = gui_get_skinX("Mute");
-  cb.y        = gui_get_skinY("Mute");
-  cb.callback = panel_toggle_audio_mute;
-  cb.userdata = NULL;
-  cb.skin     = gui_get_skinfile("Mute");
-  gui_list_append_content (panel->widget_list->l, 
-			   (panel->mixer.mute = checkbox_create (&cb)));
-  widget_disable(panel->mixer.mute);
+  cb.skin_element_name = "Mute";
+  cb.callback          = panel_toggle_audio_mute;
+  cb.userdata          = NULL;
+  xitk_list_append_content (panel->widget_list->l, 
+			   (panel->mixer.mute = xitk_checkbox_create (gGui->skin_config, &cb)));
+  xitk_disable_widget(panel->mixer.mute);
 
   /* Snapshot */
-  b.x        = gui_get_skinX("Snapshot");
-  b.y        = gui_get_skinY("Snapshot");
-  b.callback = panel_snapshot;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("Snapshot");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "Snapshot";
+  b.callback          = panel_snapshot;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Playback speed slow */
-  b.x        = gui_get_skinX("PlaySlow");
-  b.y        = gui_get_skinY("PlaySlow");
-  b.callback = gui_change_speed_playback;
-  b.userdata = (void *)GUI_NEXT;
-  b.skin     = gui_get_skinfile("PlaySlow");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "PlaySlow";
+  b.callback          = gui_change_speed_playback;
+  b.userdata          = (void *)GUI_NEXT;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Playback speed fast */
-  b.x        = gui_get_skinX("PlayFast");
-  b.y        = gui_get_skinY("PlayFast");
-  b.callback = gui_change_speed_playback;
-  b.userdata = (void *)GUI_PREV;
-  b.skin     = gui_get_skinfile("PlayFast");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "PlayFast";
+  b.callback          = gui_change_speed_playback;
+  b.userdata          = (void *)GUI_PREV;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Playlist button */
-  b.x        = gui_get_skinX("PlBtn");
-  b.y        = gui_get_skinY("PlBtn");
-  b.callback = gui_playlist_show;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("PlBtn");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "PlBtn";
+  b.callback          = gui_playlist_show;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
   
   /*  Control button */
-  b.x        = gui_get_skinX("CtlBtn");
-  b.y        = gui_get_skinY("CtlBtn");
-  b.callback = gui_control_show;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("CtlBtn");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "CtlBtn";
+  b.callback          = gui_control_show;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
 
   /*  Mrl button */
-  b.x        = gui_get_skinX("MrlBtn");
-  b.y        = gui_get_skinY("MrlBtn");
-  b.callback = gui_mrlbrowser_show;
-  b.userdata = NULL;
-  b.skin     = gui_get_skinfile("MrlBtn");
-  gui_list_append_content(panel->widget_list->l, button_create(&b));
+  b.skin_element_name = "MrlBtn";
+  b.callback          = gui_mrlbrowser_show;
+  b.userdata          = NULL;
+  xitk_list_append_content(panel->widget_list->l, xitk_button_create(gGui->skin_config, &b));
   
   /* 
    * show panel 
@@ -821,13 +806,13 @@ void panel_init (void) {
   if (panel->visible)
     XMapRaised(gGui->display, gGui->panel_window); 
   
-  panel->widget_key = widget_register_event_handler("panel", 
-						    gGui->panel_window, 
-						    panel_handle_event,
-						    panel_store_new_position,
-						    gui_dndcallback,
-						    panel->widget_list,
-						    NULL);
+  panel->widget_key = xitk_register_event_handler("panel", 
+						  gGui->panel_window, 
+						  panel_handle_event,
+						  panel_store_new_position,
+						  gui_dndcallback,
+						  panel->widget_list,
+						  NULL);
 
   gGui->cursor_visible = 1;
   video_window_set_cursor_visibility(gGui->cursor_visible);
@@ -855,5 +840,5 @@ void panel_init (void) {
 }
 
 void panel_set_title(char *title) {
-  label_change_label (panel->widget_list, panel->title_label, title);
+  xitk_label_change_label (panel->widget_list, panel->title_label, title);
 }

@@ -21,14 +21,15 @@
  *
  */
 
-#ifndef HAVE_WIDGET_H
-#define HAVE_WIDGET_H
+#ifndef HAVE_XITK_WIDGET_H
+#define HAVE_XITK_WIDGET_H
 
 #include <inttypes.h> 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
 #include "list.h"
+#include "skin.h"
 #include "widget_types.h"
 
 #define FOCUS_RECEIVED 1
@@ -40,7 +41,7 @@
 
 #define BROWSER_MAX_ENTRIES 65535
 
-typedef int widgetkey_t;
+typedef int xitk_register_key_t;
 
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
@@ -57,14 +58,14 @@ typedef struct {
   int                         green;
   int                         blue;
   char                       *colorname;
-} gui_color_names_t;
+} xitk_color_names_t;
 
 typedef struct {
   Pixmap                      image;
   Pixmap                      mask;
   int                         width;
   int                         height;
-} gui_image_t;
+} xitk_image_t;
 
 typedef struct {
   XColor                      red;
@@ -73,164 +74,183 @@ typedef struct {
   XColor                      white;
   XColor                      black;
   XColor                      tmp;
-} gui_color_t;
+} xitk_color_t;
 
 typedef struct {
   int                         enabled;
   int                         offset_x;
   int                         offset_y;
-} gui_move_t;
+} xitk_move_t;
 
-struct widget_list_s;
+struct xitk_widget_list_s;
 
-struct widget_s;
+struct xitk_widget_s;
 
-typedef void (*widget_paint_callback_t)(struct widget_s *, Window, GC);
+typedef void (*widget_paint_callback_t)(struct xitk_widget_s *, Window, GC);
 
-typedef int (*widget_click_callback_t) (struct widget_list_s *, struct widget_s *, int, int, int);
+typedef int (*widget_click_callback_t) (struct xitk_widget_list_s *, struct xitk_widget_s *, int, int, int);
 
-typedef int (*widget_focus_callback_t)(struct widget_list_s *, struct widget_s *, int);
+typedef int (*widget_focus_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, int);
 
-typedef void (*widget_keyevent_callback_t)(struct widget_list_s *, struct widget_s *, XEvent *);
+typedef void (*widget_keyevent_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, XEvent *);
 
-typedef int (*widget_inside_callback_t)(struct widget_s *, int, int);
+typedef int (*widget_inside_callback_t)(struct xitk_widget_s *, int, int);
 
-typedef struct widget_s {
-  int                        x;
-  int                        y;
-  int                        width;
-  int                        height;
+typedef void (*widget_change_skin_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, xitk_skin_config_t *);
 
-  int                        enable;
-  int                        have_focus;
-  int                        running;
-  int                        visible;
+typedef struct xitk_widget_s {
+  int                             x;
+  int                             y;
+  int                             width;
+  int                             height;
 
-  widget_paint_callback_t    paint;
+  int                             enable;
+  int                             have_focus;
+  int                             running;
+  int                             visible;
+
+  widget_paint_callback_t         paint;
 
   /* notify callback return value : 1 => repaint necessary 0=> do nothing */
                                        /*   parameter: up (1) or down (0) */
-  widget_click_callback_t    notify_click;
+  widget_click_callback_t         notify_click;
                                        /*            entered (1) left (0) */
-  widget_focus_callback_t    notify_focus;
+  widget_focus_callback_t         notify_focus;
 
-  widget_keyevent_callback_t notify_keyevent;
+  widget_keyevent_callback_t      notify_keyevent;
 
-  widget_inside_callback_t   notify_inside;
+  widget_inside_callback_t        notify_inside;
 
-  void                      *private_data;
-  uint32_t                   widget_type;
-} widget_t;
+  widget_change_skin_callback_t   notify_change_skin;
 
-typedef struct widget_list_s {
+  void                           *private_data;
+  uint32_t                        widget_type;
+} xitk_widget_t;
 
-  gui_list_t                 *l;
+typedef struct xitk_widget_list_s {
 
-  widget_t                   *focusedWidget;
-  widget_t                   *pressedWidget;
+  xitk_list_t                *l;
+
+  xitk_widget_t              *focusedWidget;
+  xitk_widget_t              *pressedWidget;
 
   Window                      win;
   GC                          gc;
-} widget_list_t;
+} xitk_widget_list_t;
 
 /* ****************************************************************** */
 
 /**
  * Allocate an clean memory area of size "size".
  */
-void *gui_xmalloc(size_t size);
+void *xitk_xmalloc(size_t size);
 
 /**
- * return pointer to the gui_color_names struct.
+ * return pointer to the xitk_color_names struct.
  */
-gui_color_names_t *gui_get_color_names(void);
+xitk_color_names_t *xitk_get_color_names(void);
 
 /**
  *
  */
-gui_color_names_t *gui_get_color_name(char *color);
+xitk_color_names_t *xitk_get_color_name(char *color);
 
 /**
  * (re)Paint a widget list.
  */
-int paint_widget_list (widget_list_t *wl) ;
+int xitk_paint_widget_list (xitk_widget_list_t *wl) ;
+
+/*
+ *
+ */
+void xitk_change_skins_widget_list(xitk_widget_list_t *wl, xitk_skin_config_t *skonfig);
 
 /**
  * Check if cursor is in a mask pixmap or not. Return 1 if the cursor
  * is in visible area (or mask don't exist), and 0 if the pointed
  * area is not visible.
  */
-int widget_is_cursor_out_mask(Display *display, widget_t *w, Pixmap mask, int x, int y);
+int xitk_is_cursor_out_mask(Display *display, xitk_widget_t *w, Pixmap mask, int x, int y);
 
 /**
  * Boolean function, if x and y coords is in widget.
  */
-int is_inside_widget (widget_t *widget, int x, int y) ;
+int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) ;
 
 /**
  * Return widget from widget list 'wl' localted at x,y coords.
  */
-widget_t *get_widget_at (widget_list_t *wl, int x, int y) ;
+xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) ;
 
 /**
  * Notify widget (if enabled) if motion happend at x, y coords.
  */
-void motion_notify_widget_list (widget_list_t *wl, int x, int y) ;
+void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) ;
 
 /**
  * Notify widget (if enabled) if click event happend at x, y coords.
  */
-int click_notify_widget_list (widget_list_t *wl, int x, int y, int bUp) ;
+int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp) ;
 
 /**
  *
  */
-void widget_send_key_event(widget_list_t *, widget_t *, XEvent *);
+void xitk_send_key_event(xitk_widget_list_t *, xitk_widget_t *, XEvent *);
 
 /**
  * Return width (in pixel) of widget.
  */
-int widget_get_width(widget_t *);
+int xitk_get_widget_width(xitk_widget_t *);
 
 /**
  * Return height (in pixel) of widget.
  */
-int widget_get_height(widget_t *);
+int xitk_get_widget_height(xitk_widget_t *);
+
+/*
+ * Set position of a widget.
+ */
+int xitk_set_widget_pos(xitk_widget_t *w, int x, int y);
+
+/*
+ * Get position of a widget.
+ */
+int xitk_get_widget_pos(xitk_widget_t *w, int *x, int *y);
 
 /*
  * Boolean, return 1 if widget 'w' have focus.
  */
-int widget_have_focus(widget_t *);
+int xitk_is_widget_focused(xitk_widget_t *);
 
 /**
  * Boolean, enable state of widget.
  */
-int widget_enabled(widget_t *);
+int xitk_is_widget_enabled(xitk_widget_t *);
 
 /**
  * Enable widget.
  */
-void widget_enable(widget_t *);
+void xitk_enable_widget(xitk_widget_t *);
 
 /**
  * Disable widget.
  */
-void widget_disable(widget_t *);
+void xitk_disable_widget(xitk_widget_t *);
 
 /**
  * Stop each (if widget handle it) widgets of widget list.
  */
-void widget_stop_widgets(widget_list_t *);
+void xitk_stop_widgets(xitk_widget_list_t *);
 
 /**
  * Set widgets of widget list visible.
  */
-void widget_show_widgets(widget_list_t *);
+void xitk_show_widgets(xitk_widget_list_t *);
 
 /**
  * Set widgets of widget list not visible.
  */
-void widget_hide_widgets(widget_list_t *);
+void xitk_hide_widgets(xitk_widget_list_t *);
 
 
 #ifndef __GNUC__

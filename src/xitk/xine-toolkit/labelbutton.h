@@ -21,8 +21,8 @@
   *
   */
 
-#ifndef HAVE_GUI_LBUTTON_H
-#define HAVE_GUI_LBUTTON_H
+#ifndef HAVE_XITK_LABELBUTTON_H
+#define HAVE_XITK_LABELBUTTON_H
 
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
@@ -35,13 +35,15 @@
 typedef struct {
 
   Display                *display;
-  widget_t               *bWidget;
+  char                   *skin_element_name;
+
+  xitk_widget_t          *bWidget;
   int                     bType;
   int                     bClicked;
   int                     bArmed;
   int                     bState;
   int                     bOldState;
-  gui_image_t            *skin;
+  xitk_image_t            *skin;
   ImlibData		 *imlibdata;
 
   xitk_simple_callback_t  callback;
@@ -62,26 +64,26 @@ typedef struct {
  /**
   * Create a labeled button.
   */
-widget_t *label_button_create (xitk_labelbutton_t *b);
+xitk_widget_t *xitk_labelbutton_create (xitk_skin_config_t *skonfig, xitk_labelbutton_widget_t *b);
 
 /**
  * Change label of button 'widget'.
  */
-int labelbutton_change_label(widget_list_t *wl, widget_t *, char *);
+int xitk_labelbutton_change_label(xitk_widget_list_t *wl, xitk_widget_t *, char *);
 
 /**
  * Return label of button 'widget'.
  */
-char *labelbutton_get_label(widget_t *);
+char *xitk_labelbutton_get_label(xitk_widget_t *);
 
 /**
  * Get state of button 'widget'.
  */
-int labelbutton_get_state(widget_t *);
+int xitk_labelbutton_get_state(xitk_widget_t *);
 
 /**
  * Set state of button "widget'.
  */
-void labelbutton_set_state(widget_t *, int, Window, GC);
+void xitk_labelbutton_set_state(xitk_widget_t *, int, Window, GC);
 
 #endif

@@ -1,102 +1,873 @@
-## WARNING:  All fields are tab separate, space is no more valid.
-###
-#
-# Text		X       Y       Filename        Length  Animation
-# Label                         of pixfont
-#
-###
-#
-# Labeled						Text
-# Button	X	Y	Filename	Normal  Focus   Click  Fontname
-#				 of bg		Color	Color	Color
-###
-#
-# Other		X	Y	Filename
-#				of skin
-#
-###
 ## Main GUI ##
-BackGround:	0	0	bg.png
-Close:		520	6	close.png
-Eject:		0	0	eject.png
-Exit:		61	74	power.png
-FullScreen:	508	6	fullsc.png
-TitleLabel:	170	32	letters.png	60	True
-TimeLabel:	480	51	letters.png	8	False
-AudioPrev:	190	60	ptdn.png
-AudioNext:	190	51	ptup.png
-AudioLabel:	170	52	letters.png	3	False
-SpuPrev:	250	60	ptdn.png
-SpuNext:	250	51	ptup.png
-SpuLabel:	230	52	letters.png	3	False
-PlaySlow:	6	10	playslow.png
-PlayFast:	35	10	playfast.png
-Next:		324	77	next.png
-Pause:		199	77	pause.png
-Play:		149	77	play.png
-Stop:		174 	77	stop.png
-Prev:		249	77	prev.png
-Eject:		349	77	eject.png
-AutoPlayGUI:	420	55	smallbtn.png	Black	Yellow	White	*-lucida-*-r-*-*-10-*-*-*-*-*-*-*
-PlBtn:		68	24	playlist.png
-CtlBtn:		67	46	setup.png
-MrlBtn:		81	7	mrl.png
-SliderBGPlay:	149	70	slider_bg.png
-SliderFGPlay:	0	0	slider_pad.png
-Mute:		134	70	mute.png
-SliderBGVol:	103	22	volumebg.png
-SliderFGVol:	103	22	volumepad.png
-Snapshot:	267	52	cam.png
+skin.BackGround {
+	pixmap = bg.png
+}
+
+skin.Close {
+	coords {
+	  x = 520
+	  y = 6
+	}
+	pixmap = close.png
+}
+
+skin.Exit {
+	coords {
+	  x = 61
+	  y = 74
+	}
+	pixmap = power.png
+}
+
+skin.FullScreen {
+	coords {
+	  x = 508
+	  y = 6
+	}
+	pixmap = fullsc.png
+}
+
+skin.TitleLabel {
+	coords {
+	  x = 170
+	  y = 32
+	}
+	pixmap = letters.png
+	label {
+	  length = 60
+	  animation = True
+	}
+}
+
+skin.TimeLabel {
+	coords {
+	  x = 480
+	  y = 51
+	}
+	pixmap = letters.png
+	label {
+	  length = 8
+	  animation = False
+	}
+}
+
+skin.AudioPrev {
+	coords {
+	  x = 190
+	  y = 60
+	}
+	pixmap = ptdn.png
+}
+
+skin.AudioNext {
+	coords {
+	  x = 190
+	  y = 51
+	}
+	pixmap = ptup.png
+}
+
+skin.AudioLabel {
+	coords {
+	  x = 170
+	  y = 52
+	}
+	pixmap = letters.png
+	label {
+	  length = 3
+	  animation = False
+	}
+}
+
+skin.SpuPrev {
+	coords {
+	  x = 250
+	  y = 60
+	}
+	pixmap = ptdn.png
+}
+
+skin.SpuNext {
+	coords {
+	  x = 250
+	  y = 51
+	}
+	pixmap = ptup.png
+}
+
+skin.SpuLabel {
+	coords {
+	  x = 230
+	  y = 52
+	}
+	pixmap = letters.png
+	label {
+	  length = 3
+	  animation = False
+	}
+}
+
+skin.PlaySlow {
+	coords {
+	  x = 6
+	  y = 10
+	}
+	pixmap = playslow.png
+}
+
+skin.PlayFast {
+	coords {
+	  x = 35
+	  y = 10
+	}
+	pixmap = playfast.png
+}
+
+skin.Next {
+	coords {
+	  x = 324
+	  y = 77
+	}
+	pixmap = next.png
+}
+
+skin.Pause {
+	coords {
+	  x = 199
+	  y = 77
+	}
+	pixmap = pause.png
+}
+
+skin.Play {
+	coords {
+	  x = 149
+	  y = 77
+	}
+	pixmap = play.png
+}
+
+skin.Stop {
+	coords {
+	  x = 174
+	  y = 77
+	}
+	pixmap = stop.png
+}
+
+skin.Prev {
+	coords {
+	  x = 249
+	  y = 77
+	}
+	pixmap = prev.png
+}
+
+skin.Eject {
+	coords {
+	  x = 349
+	  y = 77
+	}
+	pixmap = eject.png
+}
+
+skin.AutoPlayGUI {
+	coords {
+	  x = 420
+	  y = 55
+	}
+	pixmap = smallbtn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-10-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlBtn {
+	coords {
+	  x = 68
+	  y = 24
+	}
+	pixmap = playlist.png
+}
+
+skin.CtlBtn {
+	coords {
+	  x = 67
+	  y = 46
+	}
+	pixmap = setup.png
+}
+
+skin.MrlBtn {
+	coords {
+	  x = 81
+	  y = 7
+	}
+	pixmap = mrl.png
+}
+
+skin.SliderBGPlay {
+	coords {
+	  x = 149
+	  y = 70
+	}
+	pixmap = slider_bg.png
+}
+
+skin.SliderFGPlay {
+	pixmap = slider_pad.png
+}
+
+skin.Mute {
+	coords {
+	  x = 134
+	  y = 70
+	}
+	pixmap = mute.png
+}
+
+skin.SliderBGVol {
+	coords {
+	  x = 103
+	  y = 22
+	}
+	pixmap = volumebg.png
+}
+
+skin.SliderFGVol {
+	pixmap = volumepad.png
+}
+
+skin.Snapshot {
+	coords {
+	  x = 267
+	  y = 52
+	}
+	pixmap = cam.png
+}
 
 ## Playlist ##
-PlBG:		0	0	pl_bg.png
-PlAdd:		400	158	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-PlLoad:		400	181	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-PlSave:		400	204	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-PlItemBtn:	75	40	pl_itembtn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-PlPlay:		101	227	pl_play.png
-PlDelete:	148 	227	pl_delete.png
-PlDeleteAll:	195	227	pl_deleteall.png
-PlMoveUp:	242	227	pl_moveup.png
-PlMoveDn:	289	227	pl_movedown.png
-PlDismiss:	400	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-PlUp:		375	40	arrowup.png
-PlSlidBG:	377	55	pl_slidv.png
-PlSlidFG:	0	0	pl_slidpad.png
-PlDn:		375	178	arrowdn.png
-AutoPlayLbl:	410	40	letters.png	9	False
-AutoPlayBG:	400	62	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-PlInputText:	75	200	pl_inputtxt.png	Black	Yellow	Black	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+skin.PlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = pl_bg.png
+}
+
+skin.PlAdd {
+	coords {
+	  x = 400
+	  y = 158
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlLoad {
+	coords {
+	  x = 400
+	  y = 181
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlSave {
+	coords {
+	  x = 400
+	  y = 204
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlItemBtn {
+	coords {
+	  x = 75
+	  y = 40
+	}
+	pixmap = pl_itembtn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlPlay {	
+	coords {
+	  x = 101
+	  y = 227
+	}
+	pixmap = pl_play.png
+}
+
+skin.PlDelete {
+	coords {
+	  x = 148
+	  y = 227
+	}
+	pixmap = pl_delete.png
+}
+
+skin.PlDeleteAll {
+	coords {
+	  x = 195
+	  y = 227
+	}
+	pixmap = pl_deleteall.png
+}
+
+skin.PlMoveUp {
+	coords {
+	  x = 242
+	  y = 227
+	}
+	pixmap = pl_moveup.png
+}
+
+skin.PlMoveDn {
+	coords {
+	  x = 289
+	  y = 227
+	}
+	pixmap = pl_movedown.png
+}
+
+skin.PlDismiss {
+	coords {
+	  x = 400
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlUp {
+	coords {
+	  x = 375
+	  y = 40
+	}
+	pixmap = arrowup.png
+}
+
+skin.PlSlidBG {
+	coords {
+	  x = 377
+	  y = 55
+	}
+	pixmap = pl_slidv.png
+}
+
+skin.PlSlidFG {
+	pixmap = pl_slidpad.png
+}
+
+skin.PlDn {
+	coords {
+	  x = 375
+	  y = 178
+	}
+	pixmap = arrowdn.png
+}
+
+skin.AutoPlayLbl {
+	coords {
+	  x = 410
+	  y = 40
+	}
+	pixmap = letters.png
+	label {
+	  length = 9
+	  animation = False
+	}
+}
+
+skin.AutoPlayBG {
+	coords {
+	  x = 400
+	  y = 62
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.PlInputText {
+	coords {
+	  x = 75
+	  y = 200
+	}
+	pixmap = pl_inputtxt.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = Black
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
 
 #Control Panel
-CtlBG:		0	0	ctl_bg.png
-CtlHueBG:	80	40	pl_slidv.png
-CtlHueFG:	0	0	pl_slidpad.png
-CtlHueLbl:	77	168	letters.png	3	False
-CtlSatBG:	120	40	pl_slidv.png
-CtlSatFG:	0	0	pl_slidpad.png
-CtlSatLbl:	117	168	letters.png	3	False
-CtlBrightBG:	160	40	pl_slidv.png
-CtlBrightFG:	0	0	pl_slidpad.png
-CtlBrightLbl:	157	168	letters.png	3	False
-CtlContBG:	200	40	pl_slidv.png
-CtlContFG:	0	0	pl_slidpad.png
-CtlContLbl:	197	168	letters.png	3	False
-CtlSave:	101	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-CtlReset:	179 	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-CtlDummy:	257	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-CtlDismiss:	400	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+skin.CtlBG {
+	coords {
+	  x = 0	
+	  y = 0
+	}
+	pixmap = ctl_bg.png
+}
+
+skin.CtlHueBG {
+	coords {
+	  x = 80
+	  y = 40
+	}
+	pixmap = pl_slidv.png
+}
+
+skin.CtlHueFG {
+	pixmap = pl_slidpad.png
+}
+
+skin.CtlHueLbl {
+	coords {
+	  x = 77
+	  y = 168
+	}
+	pixmap = letters.png
+	label {
+	  length = 3
+	  animation = False
+	}
+}
+
+skin.CtlSatBG {
+	coords {
+	  x = 120
+	  y = 40
+	}
+	pixmap = pl_slidv.png
+}
+
+skin.CtlSatFG {
+	pixmap = pl_slidpad.png
+}
+
+skin.CtlSatLbl {
+	coords {
+	  x = 117
+	  y = 168
+	}
+	pixmap = letters.png
+	label {
+	  length = 3
+	  animation = False
+	}
+}
+
+skin.CtlBrightBG {
+	coords {
+	  x = 160
+	  y = 40
+	}
+	pixmap = pl_slidv.png
+}
+
+skin.CtlBrightFG {
+	pixmap = pl_slidpad.png
+}
+
+skin.CtlBrightLbl {
+	coords {
+	  x = 157
+	  y = 168
+	}
+	pixmap = letters.png
+	label {
+	  length = 3
+	  animation = False
+	}
+}
+
+skin.CtlContBG {
+	coords {
+	  x = 200
+	  y = 40
+	}
+	pixmap = pl_slidv.png
+}
+
+skin.CtlContFG {
+	pixmap = pl_slidpad.png
+}
+
+skin.CtlContLbl {
+	coords {
+	  x = 197
+	  y = 168
+	}
+	pixmap = letters.png
+	label {
+	  length = 3
+	  animation = False
+	}
+}
+
+skin.CtlSave {
+	coords {
+	  x = 101
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.CtlReset {
+	coords {
+	  x = 179
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.CtlSkLbl {
+	coords {
+	  x = 350
+	  y = 30
+	}
+	pixmap = letters.png
+	label {
+	  length = 13
+	  animation = False
+	}
+}
+
+skin.CtlSkUp {
+	coords {
+	  x = 460
+	  y = 48
+	}
+	pixmap = arrowup.png
+}
+
+skin.CtlSkSlidBG {
+	coords {
+	  x = 462
+	  y = 63
+	}
+	pixmap = sk_slidv.png
+}
+
+skin.CtlSkSlidFG {
+	pixmap = pl_slidpad.png
+}
+
+skin.CtlSkDn {
+	coords {
+	  x = 460
+	  y = 117
+	}
+	pixmap = arrowdn.png
+}
+
+skin.CtlSkItemBtn {
+	coords {
+	  x = 325
+	  y = 48
+	}
+	pixmap = sk_itembtn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.CtlDismiss {
+	coords {
+	  x = 400
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
 
 ### MRL Browser ###
-MrlBG:		0	0	mrl_bg.png
-MrlItemBtn:	75	40	pl_itembtn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-MrlSelect:	101	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-MrlPlay:	179	227	mrl_play.png
-MrlDismiss:	400	227	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-MrlUp:		375	40	arrowup.png
-MrlSlidBG:	377	55	pl_slidv.png
-MrlSlidFG:	0	0	pl_slidpad.png
-MrlDn:		375	178	arrowdn.png
-MrlCurOrigin:	75	200	letters.png	50	True
-MrlPlugNameBG:	400	62	pl_btn.png	Black	Yellow	White	*-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-MrlPlugLabel:	410	40	letters.png	7	False
+skin.MrlBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = mrl_bg.png
+}
+
+skin.MrlItemBtn {
+	coords {
+	  x = 75
+	  y = 40
+	}
+	pixmap = pl_itembtn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlSelect {
+	coords {
+	  x = 101
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlPlay {
+	coords {
+	  x = 179
+	  y = 227
+	}
+	pixmap = mrl_play.png
+}
+
+skin.MrlDismiss {
+	coords {
+	  x = 400
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlUp {
+	coords {
+	  x = 375
+	  y = 40
+	}
+	pixmap = arrowup.png
+}
+
+skin.MrlSlidBG {
+	coords {
+	  x = 377
+	  y = 55
+	}
+	pixmap = pl_slidv.png
+}
+
+skin.MrlSlidFG {
+	pixmap = pl_slidpad.png
+}
+
+skin.MrlDn {
+	coords {
+	  x = 375
+	  y = 178
+	}
+	pixmap = arrowdn.png
+}
+
+skin.MrlCurOrigin {
+	coords {
+	  x = 75
+	  y = 200
+	}
+	pixmap = letters.png
+	label {
+	  length = 50
+	  animation = True
+	}
+}
+
+skin.MrlPlugNameBG {
+	coords {
+	  x = 400
+	  y = 62
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}
+
+skin.MrlPlugLabel {
+	coords {
+	  x = 410
+	  y = 40
+	}
+	pixmap = letters.png
+	label {
+	  length = 7
+	  animation = False
+	}
+}
+
+### File Browser ##
+skin.FBBG {
+	coords {
+	  x = 0
+	  y = 0
+	}
+	pixmap = pl_bg.png
+}
+skin.FBItemBtn {
+	coords {
+	  x = 75
+	  y = 40
+	}
+	pixmap = pl_itembtn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBHome {
+	coords {	
+	  x = 179
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBSelect {
+	coords {
+	  x = 257
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBDismiss {
+	coords {
+	  x = 400
+	  y = 227
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	}
+}
+skin.FBUp {
+	coords {
+	  x = 375
+	  y = 40
+	}
+	pixmap = arrowup.png
+}
+skin.FBSlidBG {
+	coords {
+	  x = 377
+	  y = 55
+	}
+	pixmap = pl_slidv.png
+}
+skin.FBSlidFG {
+	pixmap = pl_slidpad.png
+}
+skin.FBDn {
+	coords {
+	  x = 375
+	  y = 178
+	}
+	pixmap = arrowdn.png
+}
+skin.FBCurDirLbl {
+	coords {
+	  x = 75
+	  y = 200
+	}
+	pixmap = letters.png
+}
+skin.FBCurDir {
+	coords {
+	  x = 140
+	  y = 200
+	}
+	pixmap = letters.png
+}
+skin.FBSortRev {
+	coords {
+	  x = 362
+	  y = 150
+	}
+	pixmap = arrowup.png
+}
+skin.FBSortDef {
+	coords {
+	  x = 362
+	  y = 165
+	}
+	pixmap = arrowdn.png
+}
