@@ -3,8 +3,8 @@ EXTRA_DIST = $(skins_DATA)
 skinsdir = $(datadir)/xine/skins/xinetic
 
 skins_DATA =                                                                                       \
-	ArrowDown.png	   MainBg.png	      MainPower.png	PlBg.png        SkItemBtn.png     \
-	ArrowUp.png	   MainCam.png	      MainPrev.png	PlBtn.png	SkSlidBG.png      \
+	MainBg.png         MainPower.png	PlBg.png        SkItemBtn.png     \
+	MainCam.png	      MainPrev.png	PlBtn.png	SkSlidBG.png      \
 	BigArrowDown.png   MainClose.png      MainSetup.png	PlDelete.png    SkSlidPad.png     \
 	BigArrowUp.png	   MainDown.png	      MainStop.png	PlDeleteAll.png SliderHBg.png     \
 	CtlBg.png	   MainEject.png      MainUp.png	PlDismiss.png   SliderHPad.png    \
@@ -17,7 +17,8 @@ skins_DATA =                                                                    
 	MainAutoButton.png MainPlay.png	      Onglet.png	SkArrowUp.png   MainNav.png       \
 	MainAutoButton.png MainPlay.png	      Onglet.png	SkArrowUp.png                     \
 	ArrowLeft.png	   ArrowRight.png     BigArrowLeft.png  BigArrowRight.png                 \
-	PlSlidHBg.png      SliderHPad.png     SkSlidHBg.png     SlidHPad.png	skinconfig
+	PlSlidHBg.png      SliderHPad.png     SkSlidHBg.png     SlidHPad.png	SkArrowLeft.png   \
+	SkArrowRight.png   SkSlidHPad.png     skinconfig
 
 debug:
 install-debug: install

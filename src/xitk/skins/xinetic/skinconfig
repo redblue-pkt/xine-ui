@@ -33,8 +33,8 @@ skin.Eject {
 
 skin.Nav {
 	coords {
-	  x = 489
-	  y = 75
+	  x = 492
+	  y = 54
 	}
 	pixmap = MainNav.png
 }
@@ -234,7 +234,6 @@ skin.AutoPlayGUI {
 	  y = 43
 	}
 	pixmap = MainAutoButton.png
-	direction = left
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
@@ -270,7 +269,7 @@ skin.MrlBtn {
 skin.SliderPlay {
 	coords {
 	  x = 36
-	  y = 5
+	  y = 2
 	}
 	pixmap = SliderHBg.png
 	slider {
@@ -412,8 +411,8 @@ skin.PlUp {
 
 skin.SliderPl {
 	coords {
-	  x = 312
-	  y = 38
+	  x = 310
+	  y = 36
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -511,8 +510,8 @@ skin.CtlBG {
 
 skin.SliderCtlHue {
 	coords {
-	  x = 36
-	  y = 38
+	  x = 34
+	  y = 36
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -535,8 +534,8 @@ skin.CtlHueLbl {
 
 skin.SliderCtlSat {
 	coords {
-	  x = 80
-	  y = 38
+	  x = 78
+	  y = 36
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -559,8 +558,8 @@ skin.CtlSatLbl {
 
 skin.SliderCtlBright {
 	coords {
-	  x = 124
-	  y = 38
+	  x = 122
+	  y = 36
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -584,8 +583,8 @@ skin.CtlBrightLbl {
 
 skin.SliderCtlCont {
 	coords {
-	  x = 168
-	  y = 38
+	  x = 166
+	  y = 36
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -622,80 +621,80 @@ skin.CtlSave {
 
 skin.CtlSkLbl {
 	coords {
-	  x = 288
-	  y = 20
+	  x = 218
+	  y = 18
 	}
 	label {
-	  length = 13
-	  animation = True
+	  length = 25
+	  animation = False
 	pixmap = Letters.png
 	}
 }
 
 skin.CtlSkUp {
 	coords {
-	  x = 378
-	  y = 41
+	  x = 372
+	  y = 17
 	}
 	pixmap = SkArrowUp.png
 }
 
 skin.SliderCtlSk {
 	coords {
-	  x = 380
-	  y = 62
+	  x = 372
+	  y = 36
 	}
-	pixmap = SkSlidBG.png
+	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SkSlidPad.png
+	  pixmap = SliderVPad.png
 	  type = vertical
 	}
 }
 
 skin.CtlSkDn {
 	coords {
-	  x = 378
-	  y = 116
+	  x = 372
+	  y = 164
 	}
 	pixmap = SkArrowDown.png
 }
 
 skin.CtlSkLeft {
         coords {
-          x = 283
-          y = 118
+          x = 190
+          y = 164
         }
-        pixmap = BigArrowLeft.png
+        pixmap = SkArrowLeft.png
 }
 
 skin.SliderHCtlSk {
         coords {
-          x = 300
-          y = 118
+          x = 209
+          y = 164
         }
         pixmap = SkSlidHBg.png
         slider {
-          pixmap = SlidHPad.png
+          pixmap = SkSlidHPad.png
           type = horizontal
         }
 }
 
 skin.CtlSkRight {
         coords {
-          x = 356
-          y = 118
+          x = 350
+          y = 164
         }
-        pixmap = BigArrowRight.png
+        pixmap = SkArrowRight.png
 }
 
 skin.CtlSkItemBtn {
 	coords {
-	  x = 288
-	  y = 44
+	  x = 200
+	  y = 37
 	}
 	pixmap = SkItemBtn.png
 	browser {
-	  entries = 4
+	  entries = 7
 	}
 	label {
 	  color = #a4aab4
@@ -792,8 +791,8 @@ skin.MrlUp {
 
 skin.SliderMrl {
 	coords {
-	  x = 312
-	  y = 38
+	  x = 310
+	  y = 36
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -847,7 +846,7 @@ skin.MrlCurOrigin {
 	label {
 	  length = 43
 	  animation = True
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
@@ -874,14 +873,14 @@ skin.MrlPlugLabel {
 	label {
 	  length = 7
 	  animation = False
-	  pixmap = Letters.png
+	pixmap = Letters.png
 	}
 }
 
 skin.MrlFilt {
 	coords {
-	  x = 160
-	  y = 214
+	  x = 155
+	  y = 213
 	}
 	pixmap = SkArrowDown.png
 	label {
