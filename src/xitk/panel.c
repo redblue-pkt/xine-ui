@@ -350,7 +350,6 @@ void panel_execute_xineshot(xitk_widget_t *w, void *data) {
  *  to snapshot current frame.
  */
 void panel_snapshot(xitk_widget_t *w, void *data) {
-  printf("Snapshot:\n");
   create_snapshot( gGui );
 }
 
@@ -401,18 +400,16 @@ void panel_handle_event(XEvent *event, void *data) {
  * called before xine engine initialization.
  */
 void panel_add_autoplay_buttons(void) {
-  int                  x, y;
-  int                  i = 0;
-  xitk_labelbutton_widget_t   lb;
-  char               **autoplay_plugins = 
-    xine_get_autoplay_input_plugin_ids(gGui->xine);
+  int                        x, y;
+  int                        i = 0;
+  xitk_labelbutton_widget_t  lb;
+  char                     **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
   
+  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+
   x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
   y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
   
-  lb.display   = gGui->display;
-  lb.imlibdata = gGui->imlib_data;
-
   while(autoplay_plugins[i] != NULL) {
 
     lb.skin_element_name = "AutoPlayGUI";
@@ -486,6 +483,11 @@ void panel_init (void) {
   if (gGui->panel_window)
     return ; /* panel already open  - FIXME: bring to foreground */
 
+  XITK_WIDGET_INIT(&b, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
+  XITK_WIDGET_INIT(&sl, gGui->imlib_data);
+
   panel = (_panel_t *) xmalloc(sizeof(_panel_t));
 
   XLockDisplay (gGui->display);
@@ -528,7 +530,7 @@ void panel_init (void) {
   */
   
   gGui->panel_window = XCreateWindow (gGui->display, 
-				      DefaultRootWindow(gGui->display), 
+				      gGui->imlib_data->x.root, 
 				      hint.x, hint.y,
 				      hint.width, hint.height, 0, 
 				      gGui->imlib_data->x.depth,
@@ -611,21 +613,10 @@ void panel_init (void) {
   panel->widget_list->win           = gGui->panel_window;
   panel->widget_list->gc            = gc;
  
-  b.display     = gGui->display;
-  b.imlibdata   = gGui->imlib_data;
-
-  cb.display    = gGui->display;
-  cb.imlibdata  = gGui->imlib_data;
-
-  lbl.display   = gGui->display;
-  lbl.imlibdata = gGui->imlib_data;
   lbl.window    = panel->widget_list->win;
   lbl.gc        = panel->widget_list->gc;
 
-  sl.display    = gGui->display;
-  sl.imlibdata  = gGui->imlib_data;
-
-  /*  Prev button */
+  /* Prev button */
   b.skin_element_name = "Prev";
   b.callback          = gui_nextprev;
   b.userdata          = (void *)GUI_PREV;
@@ -651,7 +642,6 @@ void panel_init (void) {
 			   (panel->checkbox_pause = xitk_checkbox_create(gGui->skin_config, &cb)));
   
   /*  Next button */
-  //FIXME
   b.skin_element_name = "Next";
   b.callback          = gui_nextprev;
   b.userdata          = (void *)GUI_NEXT;

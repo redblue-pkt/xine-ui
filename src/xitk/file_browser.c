@@ -172,7 +172,6 @@ void file_browser(xitk_string_callback_t add_cb,
     return;
   }
 
-  fbr.display                        = gGui->display;
   fbr.imlibdata                      = gGui->imlib_data;
   fbr.window_trans                   = gGui->video_window;
   fbr.layer_above                    = gGui->layer_above;
@@ -206,7 +205,6 @@ void file_browser(xitk_string_callback_t add_cb,
   fbr.kill.callback                  = file_browser_kill;
 
   /* The browser */  
-  fbr.browser.display                = gGui->display;
   fbr.browser.imlibdata              = gGui->imlib_data;
 
   fbr.browser.arrow_up.skin_element_name = "FBUp";

@@ -885,3 +885,30 @@ skin.FBSortDef {
 	}
 	pixmap = arrowdn.png
 }
+
+skin.combotest {
+	coords {
+	  x = 250
+	  y = 50
+	}
+	pixmap = arrowdn.png
+	label {
+	  length = 10
+	  animation = True
+	  pixmap = lettersw.png
+	}
+}
+
+skin.TEST {
+	coords {
+	  x = 10
+	  y = 10
+	}
+	pixmap = pl_btn.png
+	label {
+	  color = Black
+	  color_focus = Yellow
+	  color_click = White
+	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
+	}
+}

@@ -348,7 +348,7 @@ void video_window_adapt_size (void *this,
     attr.colormap	   = gVw->colormap;
 
     gGui->video_window = 
-      XCreateWindow (gGui->display, RootWindow (gGui->display, gGui->screen), 
+      XCreateWindow (gGui->display, gGui->imlib_data->x.root, 
 		     0, 0, gVw->fullscreen_width, 
 		     gVw->fullscreen_height, 
 		     0, gVw->depth, CopyFromParent, 
@@ -460,7 +460,7 @@ void video_window_adapt_size (void *this,
     attr.colormap	   = gVw->colormap;
     
     gGui->video_window = 
-      XCreateWindow(gGui->display, RootWindow(gGui->display, gGui->screen),
+      XCreateWindow(gGui->display, gGui->imlib_data->x.root,
 		    hint.x, hint.y, hint.width, hint.height, 4, 
 		    gVw->depth, CopyFromParent, gVw->visual,
 		    CWBackPixel | CWBorderPixel | CWColormap, &attr);
@@ -695,7 +695,7 @@ void video_window_init (void) {
    */
 
   bm_no = XCreateBitmapFromData(gGui->display, 
-				RootWindow(gGui->display, gGui->screen), 
+				gGui->imlib_data->x.root, 
 				bm_no_data, 8, 8);
   gVw->cursor[0] = XCreatePixmapCursor(gGui->display, bm_no, bm_no,
 				      &gGui->black, &gGui->black, 0, 0);

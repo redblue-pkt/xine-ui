@@ -107,16 +107,25 @@ void pl_exit(xitk_widget_t *w, void *data) {
   }
 
   xitk_unregister_event_handler(&playlist->widget_key);
+
+  XLockDisplay(gGui->display);
+  XUnlockDisplay(gGui->display);
   XUnmapWindow(gGui->display, playlist->window);
 
-  XDestroyWindow(gGui->display, playlist->window);
-  XFlush(gGui->display);
+  xitk_destroy_widgets(playlist->widget_list);
 
+  XLockDisplay(gGui->display);
+  XDestroyWindow(gGui->display, playlist->window);
   Imlib_destroy_image(gGui->imlib_data, playlist->bg_image);
+  XUnlockDisplay(gGui->display);
+
   playlist->window = None;
-  xitk_stop_widgets(playlist->widget_list);
   xitk_list_free(playlist->widget_list->l);
-  free(playlist->widget_list->gc);
+
+  XLockDisplay(gGui->display);
+  XFreeGC(gGui->display, playlist->widget_list->gc);
+  XUnlockDisplay(gGui->display);
+
   free(playlist->widget_list);
  
   free(playlist);
@@ -533,7 +542,6 @@ void playlist_handle_event(XEvent *event, void *data) {
   }
 }
 
-
 /*
  *
  */
@@ -600,19 +608,19 @@ void playlist_change_skins(void) {
  * Create playlist editor window
  */
 void playlist_editor(void) {
-  GC                      gc;
-  XSizeHints              hint;
-  XWMHints               *wm_hint;
-  XSetWindowAttributes    attr;
-  char                    title[] = {"Xine Playlist Editor"};
-  Atom                    prop, XA_WIN_LAYER;
-  MWMHints                mwmhints;
-  XClassHint             *xclasshint;
-  xitk_browser_widget_t          br;
-  xitk_labelbutton_widget_t      lb;
-  xitk_label_widget_t            lbl;
-  xitk_inputtext_widget_t        inp;
-  xitk_button_widget_t           b;
+  GC                         gc;
+  XSizeHints                 hint;
+  XWMHints                  *wm_hint;
+  XSetWindowAttributes       attr;
+  char                       title[] = {"Xine Playlist Editor"};
+  Atom                       prop, XA_WIN_LAYER;
+  MWMHints                   mwmhints;
+  XClassHint                *xclasshint;
+  xitk_browser_widget_t       br;
+  xitk_labelbutton_widget_t   lb;
+  xitk_label_widget_t         lbl;
+  xitk_inputtext_widget_t     inp;
+  xitk_button_widget_t        b;
   long data[1];
 
   /* This shouldn't be happend */
@@ -620,6 +628,12 @@ void playlist_editor(void) {
     if(playlist->window)
       return;
   }
+
+  XITK_WIDGET_INIT(&br, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
+  XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+  XITK_WIDGET_INIT(&b, gGui->imlib_data);
 
   playlist = (_playlist_t *) xmalloc(sizeof(_playlist_t));
 
@@ -651,7 +665,7 @@ void playlist_editor(void) {
   attr.colormap		 = Imlib_get_colormap(gGui->imlib_data);
 
   playlist->window = XCreateWindow (gGui->display, 
-				    DefaultRootWindow(gGui->display), 
+				    gGui->imlib_data->x.root, 
 				    hint.x, hint.y, hint.width, 
 				    hint.height, 0, 
 				    gGui->imlib_data->x.depth, CopyFromParent, 
@@ -723,24 +737,9 @@ void playlist_editor(void) {
   playlist->widget_list->pressedWidget = NULL;
   playlist->widget_list->win           = playlist->window;
   playlist->widget_list->gc            = gc;
-  
 
-  br.display          = gGui->display;
-  br.imlibdata        = gGui->imlib_data;
-
-  lb.display          = gGui->display;
-  lb.imlibdata        = gGui->imlib_data;
-
-  lbl.display         = gGui->display;
-  lbl.imlibdata       = gGui->imlib_data;
   lbl.window          = playlist->widget_list->win;
   lbl.gc              = playlist->widget_list->gc;
-
-  b.display           = gGui->display;
-  b.imlibdata         = gGui->imlib_data;
-
-  inp.display         = gGui->display;
-  inp.imlibdata       = gGui->imlib_data;
 
   b.skin_element_name = "PlMoveUp";
   b.callback          = pl_move_updown;

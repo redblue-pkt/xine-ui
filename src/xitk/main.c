@@ -538,8 +538,8 @@ int main(int argc, char *argv[]) {
   sigset_t         vo_mask;
 
   /* Check xine library version */
-  if(!xine_check_version(0, 9, 0)) {
-    fprintf(stderr, "Require xine library version 0.9.0, found %d.%d.%d.\n",
+  if(!xine_check_version(0, 9, 4)) {
+    fprintf(stderr, "Require xine library version 0.9.4, found %d.%d.%d.\n",
 	    xine_get_major_version(), xine_get_minor_version(),
 	    xine_get_sub_version());
     exit(1);

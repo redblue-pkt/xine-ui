@@ -466,7 +466,7 @@ void layer_above_video(Window w) {
 
   xev.xclient.data.l[1] = 0;
 
-  XSendEvent(gGui->display, RootWindow(gGui->display, gGui->screen), False,
+  XSendEvent(gGui->display, gGui->imlib_data->x.root, False,
 	     SubstructureNotifyMask, (XEvent*) &xev);
 }
 

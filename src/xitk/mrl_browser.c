@@ -170,8 +170,8 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
     return;
   }
 
-  mb.display                        = gGui->display;
-  mb.imlibdata                      = gGui->imlib_data;
+  XITK_WIDGET_INIT(&mb, gGui->imlib_data);
+
   mb.window_trans                   = gGui->video_window;
   mb.layer_above                    = gGui->layer_above;
 
@@ -209,8 +209,6 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   mb.xine                           = gGui->xine;
 
   /* The browser */
-  mb.browser.display                = gGui->display;
-  mb.browser.imlibdata              = gGui->imlib_data;
 
   mb.browser.arrow_up.skin_element_name = "MrlUp";
 

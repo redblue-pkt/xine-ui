@@ -60,6 +60,9 @@ typedef struct {
   int                   running;
   int                   visible;
   xitk_register_key_t   widget_key;
+
+  xitk_widget_t         *combo;
+
 } _control_t;
 
 static _control_t    *control = NULL;
@@ -167,17 +170,25 @@ void control_exit(xitk_widget_t *w, void *data) {
   }
 
   xitk_unregister_event_handler(&control->widget_key);
+
+  XLockDisplay(gGui->display);
   XUnmapWindow(gGui->display, control->window);
+  XUnlockDisplay(gGui->display);
 
+  xitk_destroy_widgets(control->widget_list);
+
+  XLockDisplay(gGui->display);
   XDestroyWindow(gGui->display, control->window);
-  XFlush(gGui->display);
-
   Imlib_destroy_image(gGui->imlib_data, control->bg_image);
-  control->window = None;
+  XUnlockDisplay(gGui->display);
 
-  xitk_stop_widgets(control->widget_list);
+  control->window = None;
   xitk_list_free(control->widget_list->l);
-  free(control->widget_list->gc);
+  
+  XLockDisplay(gGui->display);
+  XFreeGC(gGui->display, control->widget_list->gc);
+  XUnlockDisplay(gGui->display);
+
   free(control->widget_list);
   
   for(i = 0; i < control->skins_num; i++)
@@ -271,6 +282,11 @@ void control_handle_event(XEvent *event, void *data) {
     XRefreshKeyboardMapping((XMappingEvent *) event);
     XUnlockDisplay(gGui->display);
     break;
+
+  case ConfigureNotify:
+    /*  xitk_combo_update_pos(control->combo); */
+    break;
+
   }
 }
 
@@ -325,19 +341,20 @@ static void control_select_new_skin(xitk_widget_t *w, void *data) {
  * Create control panel window
  */
 void control_panel(void) {
-  GC                      gc;
-  XSizeHints              hint;
-  XWMHints               *wm_hint;
-  XSetWindowAttributes    attr;
-  char                    title[] = {"Xine Control Panel"};
-  Atom                    prop, XA_WIN_LAYER;
-  MWMHints                mwmhints;
-  XClassHint             *xclasshint;
-  xitk_browser_widget_t          br;
-  xitk_labelbutton_widget_t      lb;
-  xitk_label_widget_t            lbl;
-  xitk_slider_widget_t           sl;
-  long data[1];
+  GC                         gc;
+  XSizeHints                 hint;
+  XWMHints                  *wm_hint;
+  XSetWindowAttributes       attr;
+  char                       title[] = {"Xine Control Panel"};
+  Atom                       prop, XA_WIN_LAYER;
+  MWMHints                   mwmhints;
+  XClassHint                *xclasshint;
+  xitk_browser_widget_t      br;
+  xitk_labelbutton_widget_t  lb;
+  xitk_label_widget_t        lbl;
+  xitk_slider_widget_t       sl;
+  xitk_combo_widget_t        cmb;
+  long                       data[1];
 
   /* This shouldn't be happend */
   if(control != NULL) {
@@ -345,6 +362,12 @@ void control_panel(void) {
       return;
   }
   
+  XITK_WIDGET_INIT(&br, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+  XITK_WIDGET_INIT(&lbl, gGui->imlib_data);
+  XITK_WIDGET_INIT(&sl, gGui->imlib_data);
+  XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+
   control = (_control_t *) xmalloc(sizeof(_control_t));
 
   XLockDisplay(gGui->display);
@@ -376,7 +399,7 @@ void control_panel(void) {
   attr.colormap		 = Imlib_get_colormap(gGui->imlib_data);
 
   control->window = XCreateWindow (gGui->display,
-				   DefaultRootWindow(gGui->display),
+				   gGui->imlib_data->x.root,
 				   hint.x, hint.y, hint.width, hint.height, 0, 
 				   gGui->imlib_data->x.depth, CopyFromParent, 
 				   gGui->imlib_data->x.visual,
@@ -448,18 +471,6 @@ void control_panel(void) {
   control->widget_list->win           = control->window;
   control->widget_list->gc            = gc;
   
-  br.display    = gGui->display;
-  br.imlibdata  = gGui->imlib_data;
-
-  lb.display    = gGui->display;
-  lb.imlibdata  = gGui->imlib_data;
-
-  lbl.display   = gGui->display;
-  lbl.imlibdata = gGui->imlib_data;
-
-  sl.display    = gGui->display;
-  sl.imlibdata  = gGui->imlib_data;
-
   { /* All of sliders are disabled by default*/
     int vidcap = 0;
     int min, max, cur;
@@ -611,6 +622,19 @@ void control_panel(void) {
 
   xitk_browser_update_list(control->skinlist, 
 			   control->skins, control->skins_num, 0);
+
+  /* Temporary test, don't remove me.
+  cmb.skin_element_name = "combotest";
+  cmb.layer_above       = gGui->layer_above;
+  cmb.parent_wlist      = control->widget_list;
+  cmb.entries           = control->skins;
+  cmb.parent_wkey       = &control->widget_key;
+  cmb.callback          = NULL;
+  cmb.userdata          = NULL;
+  xitk_list_append_content(control->widget_list->l, 
+			   (control->combo = xitk_combo_create(gGui->skin_config, &cmb)));
+  xitk_combo_set_select(control->widget_list, control->combo, 3);
+  */
 
   lb.skin_element_name = "CtlDismiss";
   lb.button_type       = CLICK_BUTTON;

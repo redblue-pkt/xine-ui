@@ -63,6 +63,9 @@
 #include "utils.h"
 
 #include "xine.h"
+#ifdef DEBUG
+#include <xine/monitor.h>
+#endif
 
 #include "png.h"
 #include "pngconf.h"

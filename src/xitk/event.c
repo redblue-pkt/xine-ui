@@ -816,8 +816,7 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
   if (depth == 0) {
     XVisualInfo vinfo;
 
-    XGetWindowAttributes(gGui->display, 
-			 RootWindow(gGui->display, gGui->screen), &attribs);
+    XGetWindowAttributes(gGui->display, gGui->imlib_data->x.root, &attribs);
 
     depth = attribs.depth;
   
@@ -923,8 +922,7 @@ void gui_init (int nfiles, char *filenames[]) {
    * the official Xine logo.
    */
   sprintf(buffer, "%s/xine_logo.png", XINE_SKINDIR);
-  if((gGui->video_window_logo_image= 
-      Imlib_load_image(gGui->imlib_data, buffer)) == NULL) {
+  if((gGui->video_window_logo_image = Imlib_load_image(gGui->imlib_data, buffer)) == NULL) {
     fprintf(stderr, "Unable to load %s logo\n", buffer);
     exit(1);
   }
@@ -951,7 +949,7 @@ void gui_init (int nfiles, char *filenames[]) {
    */
   
   gGui->icon = XCreateBitmapFromData (gGui->display, 
-				      DefaultRootWindow(gGui->display),
+				      gGui->imlib_data->x.root,
 				      xine_bits, 40, 40);
 
 
