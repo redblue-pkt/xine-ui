@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.21\n"
-"POT-Creation-Date: 2004-05-07 23:11+0000\n"
-"PO-Revision-Date: 2004-05-07 23:15+0000\n"
+"POT-Creation-Date: 2004-05-08 21:49+0000\n"
+"PO-Revision-Date: 2004-05-08 21:50+0000\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -59,75 +59,75 @@ msgstr ""
 msgid "Start Playback ?"
 msgstr "Lance la Lecture ?\""
 
-#: src/xitk/actions.c:666
+#: src/xitk/actions.c:670
 msgid "No MRL (input stream) specified"
 msgstr "Pas de MRL (flux d'entrée) spécifié."
 
-#: src/xitk/actions.c:964
+#: src/xitk/actions.c:968
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Ratio d'aspect: %s"
 
-#: src/xitk/actions.c:979
+#: src/xitk/actions.c:983
 #, c-format
 msgid "Deinterlace: %s"
 msgstr "Désentrelacement: %s"
 
-#: src/xitk/actions.c:979 src/xitk/actions.c:1633
+#: src/xitk/actions.c:983 src/xitk/actions.c:1645
 msgid "enabled"
 msgstr "en fonction"
 
-#: src/xitk/actions.c:979 src/xitk/actions.c:1633
+#: src/xitk/actions.c:983 src/xitk/actions.c:1645
 msgid "disabled"
 msgstr "hors fonction"
 
-#: src/xitk/actions.c:1198 src/xitk/actions.c:1215 src/xitk/lirc.c:165
+#: src/xitk/actions.c:1202 src/xitk/actions.c:1219 src/xitk/lirc.c:165
 #: src/xitk/stdctl.c:112
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): ne peux pas créer le nouveau thread (%s)\n"
 
-#: src/xitk/actions.c:1527
+#: src/xitk/actions.c:1539
 msgid "There is no mrl."
 msgstr "Il n'y a aucune mrl."
 
-#: src/xitk/actions.c:1633
+#: src/xitk/actions.c:1645
 #, c-format
 msgid "Post plugins: %s."
 msgstr "Post plugins: %s."
 
-#: src/xitk/actions.c:1724
+#: src/xitk/actions.c:1736
 msgid "Amplification Level"
 msgstr "Niveau d'Amplification"
 
-#: src/xitk/actions.c:1742 src/xitk/menus.c:297 src/xitk/menus.c:311
+#: src/xitk/actions.c:1754 src/xitk/menus.c:297 src/xitk/menus.c:311
 msgid "Audio Volume"
 msgstr "Volume Audio"
 
-#: src/xitk/actions.c:1801
+#: src/xitk/actions.c:1813
 #, c-format
 msgid "TV Mode: %d"
 msgstr "Mode TV: %d"
 
-#: src/xitk/actions.c:1822
+#: src/xitk/actions.c:1834
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) a échoué.\n"
 
-#: src/xitk/actions.c:1940 src/xitk/actions.c:1998 src/xitk/event_sender.c:469
+#: src/xitk/actions.c:1952 src/xitk/actions.c:2010 src/xitk/event_sender.c:469
 #: src/xitk/mediamark.c:3002
 msgid "Select"
 msgstr "Choisir"
 
-#: src/xitk/actions.c:1943
+#: src/xitk/actions.c:1955
 msgid "Select all"
 msgstr "Tout selectionner"
 
-#: src/xitk/actions.c:1948
+#: src/xitk/actions.c:1960
 msgid "Stream(s) loading"
 msgstr "Chargement de flux "
 
-#: src/xitk/actions.c:2019 src/xitk/mediamark.c:3023
+#: src/xitk/actions.c:2031 src/xitk/mediamark.c:3023
 msgid "Pick a subtitle file"
 msgstr "Choisissez un fichier de sous-titre"
 
@@ -1811,8 +1811,8 @@ msgid "Show controls"
 msgstr "Affiche les Contrôles"
 
 #: src/xitk/menus.c:442
-msgid "Fullscreen\\/Windowed View"
-msgstr "Vue plein écran\\/fenêtré"
+msgid "Fullscreen"
+msgstr "Plein écran"
 
 #: src/xitk/menus.c:450
 msgid "Open"
@@ -2956,9 +2956,8 @@ msgstr "Visualiseur des logs de xine"
 msgid "Refresh"
 msgstr "Rafraîchir"
 
-#, fuzzy
-#~ msgid "Fullscreen"
-#~ msgstr "Plein écran\\/Fenêtré"
+#~ msgid "Fullscreen\\/Windowed View"
+#~ msgstr "Vue plein écran\\/fenêtré"
 
 #~ msgid "GUI visiblity"
 #~ msgstr "Interface utilisateur"

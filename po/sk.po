@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.24\n"
-"POT-Creation-Date: 2004-05-07 23:11+0000\n"
+"POT-Creation-Date: 2004-05-08 21:49+0000\n"
 "PO-Revision-Date: 2004-05-07 23:16+0000\n"
 "Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -63,75 +63,75 @@ msgstr ""
 msgid "Start Playback ?"
 msgstr "Zaèa» prehrávanie ?"
 
-#: src/xitk/actions.c:666
+#: src/xitk/actions.c:670
 msgid "No MRL (input stream) specified"
 msgstr "MRL (vstupný prúd) nebolo ¹pecifikované"
 
-#: src/xitk/actions.c:964
+#: src/xitk/actions.c:968
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Pomer strán: %s"
 
-#: src/xitk/actions.c:979
+#: src/xitk/actions.c:983
 #, c-format
 msgid "Deinterlace: %s"
 msgstr "Deinterlace: %s"
 
-#: src/xitk/actions.c:979 src/xitk/actions.c:1633
+#: src/xitk/actions.c:983 src/xitk/actions.c:1645
 msgid "enabled"
 msgstr "povolený"
 
-#: src/xitk/actions.c:979 src/xitk/actions.c:1633
+#: src/xitk/actions.c:983 src/xitk/actions.c:1645
 msgid "disabled"
 msgstr "zakázaný"
 
-#: src/xitk/actions.c:1198 src/xitk/actions.c:1215 src/xitk/lirc.c:165
+#: src/xitk/actions.c:1202 src/xitk/actions.c:1219 src/xitk/lirc.c:165
 #: src/xitk/stdctl.c:112
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): nemô¾em vytvori» nový thread (%s)\n"
 
-#: src/xitk/actions.c:1527
+#: src/xitk/actions.c:1539
 msgid "There is no mrl."
 msgstr "Nie je ¾iadne MRL"
 
-#: src/xitk/actions.c:1633
+#: src/xitk/actions.c:1645
 #, c-format
 msgid "Post plugins: %s."
 msgstr "Následný plugin: %s."
 
-#: src/xitk/actions.c:1724
+#: src/xitk/actions.c:1736
 msgid "Amplification Level"
 msgstr "Úroveò zosilnenia"
 
-#: src/xitk/actions.c:1742 src/xitk/menus.c:297 src/xitk/menus.c:311
+#: src/xitk/actions.c:1754 src/xitk/menus.c:297 src/xitk/menus.c:311
 msgid "Audio Volume"
 msgstr "Hlasitos»"
 
-#: src/xitk/actions.c:1801
+#: src/xitk/actions.c:1813
 #, c-format
 msgid "TV Mode: %d"
 msgstr "TV mód: %d"
 
-#: src/xitk/actions.c:1822
+#: src/xitk/actions.c:1834
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) zlyhal.\n"
 
-#: src/xitk/actions.c:1940 src/xitk/actions.c:1998 src/xitk/event_sender.c:469
+#: src/xitk/actions.c:1952 src/xitk/actions.c:2010 src/xitk/event_sender.c:469
 #: src/xitk/mediamark.c:3002
 msgid "Select"
 msgstr "Vybra»"
 
-#: src/xitk/actions.c:1943
+#: src/xitk/actions.c:1955
 msgid "Select all"
 msgstr "Vybra» v¹etko"
 
-#: src/xitk/actions.c:1948
+#: src/xitk/actions.c:1960
 msgid "Stream(s) loading"
 msgstr "Prúd(y) nahra» "
 
-#: src/xitk/actions.c:2019 src/xitk/mediamark.c:3023
+#: src/xitk/actions.c:2031 src/xitk/mediamark.c:3023
 msgid "Pick a subtitle file"
 msgstr "Vyberte súbor titulkov"
 
@@ -1745,8 +1745,8 @@ msgstr "Ovládanie hlasitosti"
 
 #: src/xitk/menus.c:442
 #, fuzzy
-msgid "Fullscreen\\/Windowed View"
-msgstr "Plnoobrazovkový/Okenný re¾im"
+msgid "Fullscreen"
+msgstr "Plnoobrazovkový\\/Okenný re¾im"
 
 #: src/xitk/menus.c:450
 msgid "Open"
@@ -2880,8 +2880,8 @@ msgid "Refresh"
 msgstr "Obnovi»"
 
 #, fuzzy
-#~ msgid "Fullscreen"
-#~ msgstr "Plnoobrazovkový\\/Okenný re¾im"
+#~ msgid "Fullscreen\\/Windowed View"
+#~ msgstr "Plnoobrazovkový/Okenný re¾im"
 
 #~ msgid "GUI visiblity"
 #~ msgstr "GUI viditeµnos»"

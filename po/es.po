@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.99.1\n"
-"POT-Creation-Date: 2004-05-07 23:11+0000\n"
+"POT-Creation-Date: 2004-05-08 21:49+0000\n"
 "PO-Revision-Date: 2004-05-07 23:17+0000\n"
 "Last-Translator: César Chaparro <wendigo3@terra.com.pe>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -63,75 +63,75 @@ msgstr ""
 msgid "Start Playback ?"
 msgstr "¿Comenzar a reproducir?"
 
-#: src/xitk/actions.c:666
+#: src/xitk/actions.c:670
 msgid "No MRL (input stream) specified"
 msgstr "No se especificó MRL (flujo de entrada)"
 
-#: src/xitk/actions.c:964
+#: src/xitk/actions.c:968
 #, c-format
 msgid "Aspect ratio: %s"
 msgstr "Tasa de aspecto: %s"
 
-#: src/xitk/actions.c:979
+#: src/xitk/actions.c:983
 #, c-format
 msgid "Deinterlace: %s"
 msgstr "Desentrelazado: %s"
 
-#: src/xitk/actions.c:979 src/xitk/actions.c:1633
+#: src/xitk/actions.c:983 src/xitk/actions.c:1645
 msgid "enabled"
 msgstr "habilitado"
 
-#: src/xitk/actions.c:979 src/xitk/actions.c:1633
+#: src/xitk/actions.c:983 src/xitk/actions.c:1645
 msgid "disabled"
 msgstr "deshabilitado"
 
-#: src/xitk/actions.c:1198 src/xitk/actions.c:1215 src/xitk/lirc.c:165
+#: src/xitk/actions.c:1202 src/xitk/actions.c:1219 src/xitk/lirc.c:165
 #: src/xitk/stdctl.c:112
 #, c-format
 msgid "%s(): can't create new thread (%s)\n"
 msgstr "%s(): no se puede crear un hilo nuevo (%s)\n"
 
-#: src/xitk/actions.c:1527
+#: src/xitk/actions.c:1539
 msgid "There is no mrl."
 msgstr "No hay mrl."
 
-#: src/xitk/actions.c:1633
+#: src/xitk/actions.c:1645
 #, c-format
 msgid "Post plugins: %s."
 msgstr "Plugin de audio post: %s."
 
-#: src/xitk/actions.c:1724
+#: src/xitk/actions.c:1736
 msgid "Amplification Level"
 msgstr "Nivel de amplificación"
 
-#: src/xitk/actions.c:1742 src/xitk/menus.c:297 src/xitk/menus.c:311
+#: src/xitk/actions.c:1754 src/xitk/menus.c:297 src/xitk/menus.c:311
 msgid "Audio Volume"
 msgstr "Volumen de audio"
 
-#: src/xitk/actions.c:1801
+#: src/xitk/actions.c:1813
 #, c-format
 msgid "TV Mode: %d"
 msgstr "Modo TV: %d"
 
-#: src/xitk/actions.c:1822
+#: src/xitk/actions.c:1834
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) falló.\n"
 
-#: src/xitk/actions.c:1940 src/xitk/actions.c:1998 src/xitk/event_sender.c:469
+#: src/xitk/actions.c:1952 src/xitk/actions.c:2010 src/xitk/event_sender.c:469
 #: src/xitk/mediamark.c:3002
 msgid "Select"
 msgstr "Selecc."
 
-#: src/xitk/actions.c:1943
+#: src/xitk/actions.c:1955
 msgid "Select all"
 msgstr "Seleccionar todo"
 
-#: src/xitk/actions.c:1948
+#: src/xitk/actions.c:1960
 msgid "Stream(s) loading"
 msgstr "Cargando flujo(s)"
 
-#: src/xitk/actions.c:2019 src/xitk/mediamark.c:3023
+#: src/xitk/actions.c:2031 src/xitk/mediamark.c:3023
 msgid "Pick a subtitle file"
 msgstr "Seleccione un archivo de subtítulos"
 
@@ -1807,8 +1807,8 @@ msgstr "Control de volumen"
 
 #: src/xitk/menus.c:442
 #, fuzzy
-msgid "Fullscreen\\/Windowed View"
-msgstr "Modo pantalla completa/ventana"
+msgid "Fullscreen"
+msgstr "Pantalla completa\\/Ventana"
 
 #: src/xitk/menus.c:450
 msgid "Open"
@@ -2957,8 +2957,8 @@ msgid "Refresh"
 msgstr "Refrescar"
 
 #, fuzzy
-#~ msgid "Fullscreen"
-#~ msgstr "Pantalla completa\\/Ventana"
+#~ msgid "Fullscreen\\/Windowed View"
+#~ msgstr "Modo pantalla completa/ventana"
 
 #~ msgid "GUI visiblity"
 #~ msgstr "Visibilidad del GUI"
