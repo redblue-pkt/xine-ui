@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2003 the xine project
+ * Copyright (C) 2000-2004 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -279,15 +279,17 @@ static void gui_signal_handler (int sig, void *data) {
 char *pts2str(int64_t pts) {
   static char buf[40];
   int64_t min;
-  int ds;
   double sec;
+  int ds;
+  int sign;
 
+  if ((sign = pts < 0) != 0) pts = -pts;
   min = pts / (90000 * 60);
-  sec = fabs((double)pts / 90000 - 60 * min);
+  sec = (double)pts / 90000 - 60 * min;
   ds = sec / 10;
   sec -= 10 * ds;
 
-  snprintf(buf, sizeof(buf), "%s%02" PRIi64 ":%d%.2f (%" PRIi64 " pts)", pts < 0 ? "-" : "", min, ds, sec, pts >= 0 ? pts : -pts);
+  snprintf(buf, sizeof(buf), "%s%02" PRIi64 ":%d%.2f (%" PRIi64 " pts)", sign ? "-" : "", min, ds, sec, pts);
 
   return buf;
 }
