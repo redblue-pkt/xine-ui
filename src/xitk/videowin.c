@@ -159,11 +159,11 @@ void video_window_hide_logo(void) {
 #endif
     XUnlockDisplay (gGui->display);
   }
-  /*
+
+/* 2001-10-07 ehasenle: activated this code for dxr3 overlay */
     gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
     GUI_DATA_EX_DRAWABLE_CHANGED, 
     (void*)gGui->video_window);
-  */
 }
 
 /*
