@@ -141,16 +141,17 @@ static char *_get_expanded_command(xitk_skin_config_t *skonfig, char *cmd) {
  * Nullify all entried from s element.
  */
 static void _nullify_me(xitk_skin_element_t *s) {
-  s->prev        = NULL;
-  s->next        = NULL;
-  s->section     = NULL;
-  s->pixmap      = NULL;
-  s->pixmap_pad  = NULL;
-  s->pixmap_font = NULL;
-  s->color       = NULL;
-  s->color_focus = NULL;
-  s->color_click = NULL;
-  s->font        = NULL;
+  s->prev            = NULL;
+  s->next            = NULL;
+  s->section         = NULL;
+  s->pixmap          = NULL;
+  s->pixmap_pad      = NULL;
+  s->pixmap_font     = NULL;
+  s->color           = NULL;
+  s->color_focus     = NULL;
+  s->color_click     = NULL;
+  s->font            = NULL;
+  s->browser_entries = -2;
 }
 
 /*
@@ -335,7 +336,21 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
     *(skonfig->ln + brace_offset) = '\0';
     skin_clean_eol(skonfig);
 
-    if(!strncasecmp(skonfig->ln, "coords", 6)) {
+    if(!strncasecmp(skonfig->ln, "browser", 7)) {
+
+      while(skin_end_section(skonfig) < 0) {
+	skin_get_next_line(skonfig);
+	p = skonfig->ln;
+
+	if(!strncasecmp(skonfig->ln, "entries", 7)) {
+	  skin_set_pos_to_value(&p);
+	  skonfig->celement->browser_entries = strtol(p, &p, 10);
+	}
+
+      }
+      skin_get_next_line(skonfig);
+    }
+    else if(!strncasecmp(skonfig->ln, "coords", 6)) {
 
       while(skin_end_section(skonfig) < 0) {
 	skin_get_next_line(skonfig);
@@ -600,6 +615,9 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
 	printf("  slider type = %d\n", s->slider_type);
 	printf("  pad pixmap  = '%s'\n", s->pixmap_pad);
       }
+
+      if(s->browser_entries > -1)
+	printf("  browser entries = %d\n", s->browset_entries);
 
       printf("  animation   = %d\n", s->animation);
       printf("  print       = %d\n", s->print);
@@ -1071,6 +1089,20 @@ char *xitk_skin_get_logo(xitk_skin_config_t *skonfig) {
   assert(skonfig);
   
   return skonfig->logo;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_browser_entries(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->browser_entries;
+
+  return -1;
 }
 
 /*

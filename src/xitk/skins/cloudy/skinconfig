@@ -7,7 +7,7 @@
 #      add load/unload command support.
 #
 skin.name           = cloudy
-skin.version        = 1
+skin.version        = 2
 skin.date           = 2002.01.09
 skin.author         = Daniel Erat <dan_erat@pobox.com>
 skin.url            = http://www.pobox.com/~dan_erat/
@@ -336,6 +336,9 @@ skin.PlItemBtn {
 	  y = 15
 	}
 	pixmap = PlItem.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = #000000
@@ -634,6 +637,9 @@ skin.CtlSkItemBtn {
 	  y = 31
 	}
 	pixmap = CtlSkinItem.png
+	browser {
+	  entries = 5
+	}
 	label {
 	  color = #000000
 	  color_focus = #000000
@@ -672,6 +678,9 @@ skin.MrlItemBtn {
 	  y = 15
 	}
 	pixmap = MrlItem.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = #000000

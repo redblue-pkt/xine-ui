@@ -1,5 +1,5 @@
 skin.name    = lcd
-skin.version = 1
+skin.version = 2
 #skin.logo = file://media/MPEG-I/wong.mpg
 
 ## Main GUI ##
@@ -318,6 +318,9 @@ skin.PlItemBtn {
 	  y = 40
 	}
 	pixmap = pl_itembtn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = Black
@@ -628,6 +631,9 @@ skin.CtlSkItemBtn {
 	  y = 48
 	}
 	pixmap = sk_itembtn.png
+	browser {
+	  entries = 5
+	}
 	label {
 	  color = Black
 	  color_focus = Yellow
@@ -666,6 +672,9 @@ skin.MrlItemBtn {
 	  y = 40
 	}
 	pixmap = pl_itembtn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = Black

@@ -47,7 +47,7 @@
 */
 
 #define DEFAULT_SKIN        "xinetic"
-#define SKIN_IFACE_VERSION  1
+#define SKIN_IFACE_VERSION  2
 
 extern gGui_t             *gGui;
 

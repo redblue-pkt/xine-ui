@@ -48,8 +48,6 @@
 #define __FUNCTION__    __func__
 #endif
 
-#define MAX_LIST 9
-
 extern gGui_t          *gGui;
 
 typedef struct {
@@ -241,6 +239,7 @@ static void pl_delete_all(xitk_widget_t *w, void *data) {
  */
 static void pl_move_updown(xitk_widget_t *w, void *data) {
   int j;
+  int max_entries = xitk_browser_get_num_entries(playlist->playlist);
   
   j = xitk_browser_get_current_selected(playlist->playlist);
   
@@ -264,10 +263,10 @@ static void pl_move_updown(xitk_widget_t *w, void *data) {
       for(i=0; i<gGui->playlist_num; i++)
 	gGui->playlist[i] = tmplist[i];
 
-      if(j > MAX_LIST || (xitk_browser_get_current_start(playlist->playlist) != 0)) {
-	j -= ((MAX_LIST-1)/2);
+      if(j > max_entries || (xitk_browser_get_current_start(playlist->playlist) != 0)) {
+	j -= ((max_entries - 1) / 2);
 	xitk_browser_rebuild_browser(playlist->playlist, j);
-	xitk_browser_set_select(playlist->playlist, ((MAX_LIST-1)/2)-1);
+	xitk_browser_set_select(playlist->playlist, ((max_entries - 1) / 2) - 1);
       }
       else {
 	j = xitk_browser_get_current_selected(playlist->playlist);
@@ -293,7 +292,7 @@ static void pl_move_updown(xitk_widget_t *w, void *data) {
       for(i=0; i<gGui->playlist_num; i++)
 	gGui->playlist[i] = tmplist[i];
 
-      if(j >= (MAX_LIST-1)) {
+      if(j >= (max_entries - 1)) {
 	xitk_browser_rebuild_browser(playlist->playlist, j);
 	xitk_browser_set_select(playlist->playlist, 1);
       }
@@ -883,7 +882,6 @@ void playlist_editor(void) {
   br.slider.skin_element_name      = "SliderPl";
   br.arrow_dn.skin_element_name    = "PlDn";
   br.browser.skin_element_name     = "PlItemBtn";
-  br.browser.max_displayed_entries = 9;
   br.browser.num_entries           = gGui->playlist_num;
   br.browser.entries               = gGui->playlist;
   br.callback                      = handle_selection;

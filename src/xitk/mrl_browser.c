@@ -43,8 +43,6 @@
 
 #include "xitk.h"
 
-#define MAX_LIST 9
-
 extern gGui_t            *gGui;
 static xitk_widget_t     *mrlb = NULL;
 
@@ -232,18 +230,13 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   /* The browser */
 
   mb.browser.arrow_up.skin_element_name = "MrlUp";
-
-  mb.browser.slider.skin_element_name = "SLiderMrl";
-
+  mb.browser.slider.skin_element_name   = "SLiderMrl";
   mb.browser.arrow_dn.skin_element_name = "MrlDn";
-
-  mb.browser.browser.skin_element_name = "MrlItemBtn";
-  mb.browser.browser.max_displayed_entries = MAX_LIST;
-  mb.browser.browser.num_entries    = 0;
-  mb.browser.browser.entries        = NULL;
-
-  mb.browser.callback               = sel_cb;
-  mb.browser.userdata               = NULL;
+  mb.browser.browser.skin_element_name  = "MrlItemBtn";
+  mb.browser.browser.num_entries        = 0;
+  mb.browser.browser.entries            = NULL;
+  mb.browser.callback                   = sel_cb;
+  mb.browser.userdata                   = NULL;
 
   mrlb = xitk_mrlbrowser_create(gGui->skin_config, &mb);
 

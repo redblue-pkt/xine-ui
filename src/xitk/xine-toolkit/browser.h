@@ -92,6 +92,10 @@ void xitk_browser_set_select(xitk_widget_t *w, int select);
  */
 void xitk_browser_release_all_buttons(xitk_widget_t *w);
 /**
+ * Return the number of displayed entries
+ */
+int xitk_browser_get_num_entries(xitk_widget_t *w);
+/**
  * Return the real number of first displayed in list
  */
 int xitk_browser_get_current_start(xitk_widget_t *w);

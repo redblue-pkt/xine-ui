@@ -1,7 +1,7 @@
 #Xine skin data file
 # revision 0.7
 skin.name    = Xinetic
-skin.version = 1
+skin.version = 2
 skin.date    = 08.05.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
@@ -327,6 +327,9 @@ skin.PlItemBtn {
 	  y = 20
 	}
 	pixmap = PlItemBtn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = #a4abb0
@@ -625,6 +628,9 @@ skin.CtlSkItemBtn {
 	  y = 44
 	}
 	pixmap = SkItemBtn.png
+	browser {
+	  entries = 5
+	}
 	label {
 	  color = #a4aab4
 	  color_focus = #a4aab4
@@ -662,6 +668,9 @@ skin.MrlItemBtn {
 	  y = 20
 	}
 	pixmap = PlItemBtn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = #a4aab4

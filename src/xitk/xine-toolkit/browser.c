@@ -133,6 +133,21 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 }
 
 /**
+ * Return the number of displayed entries
+ */
+int xitk_browser_get_num_entries(xitk_widget_t *w) {
+  browser_private_data_t *private_data;
+
+  if(w && (((w->widget_type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER) &&
+	   (w->widget_type & WIDGET_GROUP_WIDGET))) {
+    private_data = (browser_private_data_t *) w->private_data;
+    return private_data->max_length;
+  }
+
+  return -1;
+}
+
+/**
  * Return the real number of first displayed in list
  */
 int xitk_browser_get_current_start(xitk_widget_t *w) {
@@ -632,6 +647,10 @@ xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_wid
   private_data = (browser_private_data_t *) xitk_xmalloc(sizeof(browser_private_data_t));
   private_data->skonfig = skonfig;
 
+  
+  br->browser.max_displayed_entries = xitk_skin_get_browser_entries(skonfig, 
+								    br->browser.skin_element_name);
+  
   {
 
     int x, y, i;

@@ -682,7 +682,6 @@ void control_panel(void) {
   br.slider.skin_element_name      = "SliderCtlSk";
   br.arrow_dn.skin_element_name    = "CtlSkDn";
   br.browser.skin_element_name     = "CtlSkItemBtn";
-  br.browser.max_displayed_entries = 5;
   br.browser.num_entries           = control->skins_num;
   br.browser.entries               = control->skins;
   br.callback                      = control_select_new_skin;

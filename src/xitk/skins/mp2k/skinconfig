@@ -7,7 +7,7 @@
 # by default, each widget is visible and enable.
 #
 skin.name    = mp2k
-skin.version = 1
+skin.version = 2
 
 ## Main GUI ##
 skin.BackGround {
@@ -327,6 +327,9 @@ skin.PlItemBtn {
 	  y = 78
 	}
 	pixmap = pl_item_btn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = Black
@@ -624,6 +627,9 @@ skin.CtlSkItemBtn {
 	  y = 73
 	}
 	pixmap = ctl_sk_item.png
+	browser {
+	  entries = 5
+	}
 	label {
 	  align = left
 	  color = Black
@@ -664,6 +670,9 @@ skin.MrlItemBtn {
 	  y = 78
 	}
 	pixmap = pl_item_btn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = Black

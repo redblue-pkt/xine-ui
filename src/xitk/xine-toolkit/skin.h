@@ -38,6 +38,9 @@ typedef struct xitk_skin_element_s {
   int                           x;
   int                           y;
 
+  /* browser */
+  int                           browser_entries;
+  
   /* slider */
   char                         *pixmap_pad;
   int                           slider_type;

@@ -1,7 +1,7 @@
 #Xine skin data file
 # revision 0.4
 skin.name    = CelomaChrome
-skin.version = 1
+skin.version = 2
 skin.date    = 08.04.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
@@ -328,6 +328,9 @@ skin.PlItemBtn {
 	  y = 50
 	}
 	pixmap = PlItemBtn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = #adc9ff
@@ -626,6 +629,9 @@ skin.CtlSkItemBtn {
 	  y = 19
 	}
 	pixmap = SkItemBtn.png
+	browser {
+	  entries = 5
+	}
 	label {
 	  color = #adc9ff
 	  color_focus = #adc9ff
@@ -663,6 +669,9 @@ skin.MrlItemBtn {
 	  y=  50
 	}
 	pixmap = PlItemBtn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = #adc9ff

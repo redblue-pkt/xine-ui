@@ -1017,6 +1017,11 @@ void xitk_browser_set_select(xitk_widget_t *w, int select);
 void xitk_browser_release_all_buttons(xitk_widget_t *w);
 
 /**
+ * Return the number of displayed entries
+ */
+int xitk_browser_get_num_entries(xitk_widget_t *w);
+
+/**
  * Return the real number of first displayed in list
  */
 int xitk_browser_get_current_start(xitk_widget_t *w);
@@ -1428,17 +1433,22 @@ int xitk_skin_get_slider_radius(xitk_skin_config_t *, const char *);
 /*
  *
  */
-char *xitk_skin_get_logo(xitk_skin_config_t *skonfig);
+char *xitk_skin_get_logo(xitk_skin_config_t *);
 
 /*
  *
  */
-void xitk_skin_lock(xitk_skin_config_t *skonfig);
+int xitk_skin_get_browser_entries(xitk_skin_config_t *, const char *);
 
 /*
  *
  */
-void xitk_skin_unlock(xitk_skin_config_t *skonfig);
+void xitk_skin_lock(xitk_skin_config_t *);
+
+/*
+ *
+ */
+void xitk_skin_unlock(xitk_skin_config_t *);
 
 
 /**

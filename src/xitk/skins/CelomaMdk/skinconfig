@@ -1,7 +1,7 @@
 #Xine skin data file
 # revision 0.4
 skin.name    = CelomaMdk
-skin.version = 1
+skin.version = 2
 skin.date    = 08.04.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
@@ -328,6 +328,9 @@ skin.PlItemBtn {
 	  y = 50
 	}
 	pixmap = PlItemBtn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = #f5d500
@@ -626,6 +629,9 @@ skin.CtlSkItemBtn {
 	  y = 19
 	}
 	pixmap = SkItemBtn.png
+	browser {
+	  entries = 5
+	}
 	label {
 	  color = #f5d500
 	  color_focus = #f5d500
@@ -663,6 +669,9 @@ skin.MrlItemBtn {
 	  y=  50
 	}
 	pixmap = PlItemBtn.png
+	browser {
+	  entries = 9
+	}
 	label {
 	  align = left
 	  color = #f5d500

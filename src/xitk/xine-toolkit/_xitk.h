@@ -510,6 +510,7 @@ char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *, const char *);
 int xitk_skin_get_slider_type(xitk_skin_config_t *, const char *);
 int xitk_skin_get_slider_radius(xitk_skin_config_t *, const char *);
 char *xitk_skin_get_logo(xitk_skin_config_t *);
+int xitk_skin_get_browser_entries(xitk_skin_config_t *, const char *);
 void xitk_skin_lock(xitk_skin_config_t *);
 void xitk_skin_unlock(xitk_skin_config_t *);
 
