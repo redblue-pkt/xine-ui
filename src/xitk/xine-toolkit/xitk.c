@@ -149,6 +149,12 @@ typedef struct {
 
   pthread_t                  *tips_thread;
   unsigned long               tips_timeout;
+
+  struct {
+    Window                    window;
+    int                       focus;
+  } parent;
+  
 } __xitk_t;
 
 static __xitk_t    *gXitk;
@@ -1786,6 +1792,7 @@ void xitk_init(Display *display, XColor black, int verbosity) {
   gXitk->x_error_handler = NULL;
   gXitk->modalw          = None;
   gXitk->tips_timeout    = TIPS_TIMEOUT;
+  XGetInputFocus(display, &(gXitk->parent.window), &(gXitk->parent.focus));
 
   memset(&gXitk->keypress, 0, sizeof(gXitk->keypress));
 
@@ -2019,6 +2026,9 @@ void xitk_stop(void) {
   xitk_tips_deinit();
   xitk_cursors_deinit(gXitk->display);
   gXitk->running = 0;
+
+  if(gXitk->parent.window != None)
+    XSetInputFocus(gXitk->display, gXitk->parent.window, gXitk->parent.focus, CurrentTime);
 }
  
 char *xitk_get_system_font(void) {
