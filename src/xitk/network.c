@@ -307,7 +307,9 @@ static commands_t commands[] = {
     "  get audio mute\n"
     "  get spu channel\n"
     "  get spu lang\n"
-    "  get speed"
+    "  get speed\n"
+    "  get position\n"
+    "  get length"
   },
   { "set",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_set,
     "set values", 
@@ -2045,6 +2047,30 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 	}
 
 	sprintf(buf, "%s%c", buf, '\n');
+	sock_write(client_info->socket, buf);
+      }
+      else if(is_arg_contain(client_info, 1, "position")) {
+	char buf[64];
+	int pos_stream;
+	int pos_time;
+	int length_time;
+	xine_get_pos_length(gGui->stream,
+			    &pos_stream,
+			    &pos_time,
+			    &length_time);
+	sprintf(buf,"Current position: %d\n",pos_time);
+	sock_write(client_info->socket, buf);
+      }
+      else if(is_arg_contain(client_info, 1, "length")) {
+	char buf[64];
+	int pos_stream;
+	int pos_time;
+	int length_time;
+	xine_get_pos_length(gGui->stream,
+			    &pos_stream,
+			    &pos_time,
+			    &length_time);
+	sprintf(buf,"Current length: %d\n",length_time);
 	sock_write(client_info->socket, buf);
       }
     }
