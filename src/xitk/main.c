@@ -84,6 +84,9 @@ typedef struct {
   char     buf[256];
 } file_info_t;
 
+static char **video_driver_ids;
+static char **audio_driver_ids;
+    
 
 #define	OPTION_VISUAL		1000
 #define	OPTION_INSTALL_COLORMAP	1001
@@ -378,11 +381,11 @@ void show_usage (void) {
 /*
  * Try to load video output plugin, by stored name or probing
  */
-static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
+static xine_video_port_t *load_video_out_driver(int driver_number) {
   xine_video_port_t      *video_port = NULL;
   double                  res_h, res_v;
   x11_visual_t            vis;
-  const char             *default_driver;
+  int                     driver_num;
 
   vis.display           = gGui->display;
   vis.screen            = gGui->screen;
@@ -405,30 +408,35 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
   /*
    * Setting default (configfile stuff need registering before updating, etc...).
    */
-  default_driver = xine_config_register_string (gGui->xine, "video.driver", "auto",
-						_("video driver to use"),
-						CONFIG_NO_HELP, 
-						CONFIG_LEVEL_ADV,
-						CONFIG_NO_CB, 
-						CONFIG_NO_DATA);
-  if (!video_driver_id) {
+  driver_num = 
+    xine_config_register_enum(gGui->xine, "video.driver", 
+			      0, video_driver_ids,
+			      _("video driver to use"),
+			      _("Choose video driver. "
+				"NOTE: you may restart xine to use the new driver"),
+			      CONFIG_LEVEL_ADV,
+			      CONFIG_NO_CB, 
+			      CONFIG_NO_DATA);
+  
+  if (driver_number < 0) {
     /* video output driver auto-probing */
     const char *const *driver_ids;
-    int    i;
+    int                i;
     
-    if((!strcasecmp(default_driver, "none")) || (!strcasecmp(default_driver, "null"))) {
+    if((!strcasecmp(video_driver_ids[driver_num], "none")) || 
+       (!strcasecmp(video_driver_ids[driver_num], "null"))) {
       video_port = xine_open_video_driver(gGui->xine,
-					  default_driver,
+					  video_driver_ids[driver_num],
 					  XINE_VISUAL_TYPE_NONE,
 					  (void *) &vis);
       if (video_port)
 	return video_port;
       
     }
-    else if(strcasecmp(default_driver, "auto")) {
+    else if(strcasecmp(video_driver_ids[driver_num], "auto")) {
       
       video_port = xine_open_video_driver(gGui->xine, 
-					  default_driver,
+					  video_driver_ids[driver_num],
 					  XINE_VISUAL_TYPE_X11,
 					  (void *) &vis);
       if (video_port)
@@ -465,9 +473,10 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
   else {
     
     /* 'none' plugin is a special case, just change the visual type */
-    if((!strcasecmp(video_driver_id, "none")) || (!strcasecmp(video_driver_id, "null"))) {
+    if((!strcasecmp(video_driver_ids[driver_number], "none")) 
+       || (!strcasecmp(video_driver_ids[driver_number], "null"))) {
       video_port = xine_open_video_driver(gGui->xine,
-					  video_driver_id,
+					  video_driver_ids[driver_number],
 					  XINE_VISUAL_TYPE_NONE,
 					  (void *) &vis);
       
@@ -475,17 +484,17 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
     }
     else {
       video_port = xine_open_video_driver(gGui->xine,
-					  video_driver_id,
+					  video_driver_ids[driver_number],
 					  XINE_VISUAL_TYPE_X11, 
 					  (void *) &vis);
       
       /* save requested driver (-V) */ 
-      if( video_port )
-        config_update_string("video.driver", video_driver_id);
+      if(video_port)
+        config_update_num("video.driver", driver_number);
     }
-
-    if (!video_port) {
-      printf (_("main: video driver <%s> failed\n"), video_driver_id);
+    
+    if(!video_port) {
+      printf (_("main: video driver <%s> failed\n"), video_driver_ids[driver_number]);
       exit (1);
     }
     
@@ -497,34 +506,48 @@ static xine_video_port_t *load_video_out_driver(char *video_driver_id) {
 /*
  * Try to load audio output plugin, by stored name or probing
  */
-static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
+static xine_audio_port_t *load_audio_out_driver(int driver_number) {
   xine_audio_port_t      *audio_port = NULL;
-  const char             *default_driver;
+  int                     driver_num;
   
   /*
    * Setting default (configfile stuff need registering before updating, etc...).
    */
-  default_driver = xine_config_register_string (gGui->xine, "audio.driver", "auto",
-						_("audio driver to use"),
-						CONFIG_NO_HELP, 
-						CONFIG_LEVEL_ADV,
-						CONFIG_NO_CB, 
-						CONFIG_NO_DATA);
+  driver_num = 
+    xine_config_register_enum(gGui->xine, "video.driver", 
+			      0, video_driver_ids,
+			      _("video driver to use"),
+			      _("Choose video driver. "
+				"NOTE: you may restart xine to use the new driver"),
+			      CONFIG_LEVEL_ADV,
+			      CONFIG_NO_CB, 
+			      CONFIG_NO_DATA);
+  
 
-  if (!audio_driver_id) {
+  driver_num = 
+    xine_config_register_enum(gGui->xine, "audio.driver", 
+			      0, audio_driver_ids,
+			      _("audio driver to use"),
+			      _("Choose audio driver. "
+				"NOTE: you may restart xine to use the new driver"),
+			      CONFIG_LEVEL_ADV,
+			      CONFIG_NO_CB, 
+			      CONFIG_NO_DATA);
+  
+  if (driver_number < 0) {
     const char *const *driver_ids;
     int    i;
     
-    if (strcasecmp(default_driver, "auto")) {
+    if (strcasecmp(audio_driver_ids[driver_num], "auto")) {
       
       /* don't want to load an audio driver ? */
-      if (!strncasecmp(default_driver, "NULL", 4)) {
+      if (!strncasecmp(audio_driver_ids[driver_num], "NULL", 4)) {
         printf(_("main: not using any audio driver (as requested).\n"));
         return NULL;
       }
       
       audio_port = xine_open_audio_driver(gGui->xine, 
-					  default_driver,
+					  audio_driver_ids[driver_num],
 					  NULL);
       if (audio_port)
 	return audio_port;
@@ -555,7 +578,7 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
   else {
     
     /* don't want to load an audio driver ? */
-    if (!strncasecmp (audio_driver_id, "NULL", 4)) {
+    if (!strncasecmp (audio_driver_ids[driver_number], "NULL", 4)) {
 
       printf(_("main: not using any audio driver (as requested).\n"));
 
@@ -567,15 +590,15 @@ static xine_audio_port_t *load_audio_out_driver(char *audio_driver_id) {
     }
     else {
     
-      audio_port = xine_open_audio_driver(gGui->xine, audio_driver_id, NULL);
+      audio_port = xine_open_audio_driver(gGui->xine, audio_driver_ids[driver_number], NULL);
 
       if (!audio_port) {
-        printf (_("main: audio driver <%s> failed\n"), audio_driver_id);
+        printf (_("main: audio driver <%s> failed\n"), audio_driver_ids[driver_number]);
         exit (1);
       }
     
       /* save requested driver (-A) */ 
-      config_update_string("audio.driver", audio_driver_id);
+      config_update_num("audio.driver", driver_number);
     }
   
   }
@@ -708,7 +731,8 @@ int main(int argc, char *argv[]) {
   sigset_t                vo_mask;
   char                  **_argv;
   int                     _argc;
-    
+  int                     driver_num;
+
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
     setlocale(LC_ALL, "");
@@ -1026,7 +1050,7 @@ int main(int argc, char *argv[]) {
   gGui->actions_on_start[aos] = ACTID_NOKEY;
 
   gGui->xine = xine_new();
-  xine_config_load (gGui->xine, gGui->configfile);
+  xine_config_load(gGui->xine, gGui->configfile);
   /*
    * init gui
    */
@@ -1046,10 +1070,37 @@ int main(int argc, char *argv[]) {
    * load and init output drivers
    */
   /* Video out plugin */
-  gGui->vo_port = load_video_out_driver(video_driver_id);
-  if(video_driver_id && (!strcasecmp(video_driver_id, "dxr3"))) {
+  driver_num = -1;
+  {
+    const char *const *vids = xine_list_video_output_plugins(gGui->xine);
+    int                i = 0;
+    
+    while(vids[i++]);
+    
+    video_driver_ids = (char **) xine_xmalloc(sizeof(char *) * (i + 1));
+    i = 0;
+    video_driver_ids[i] = strdup("auto");
+    while(vids[i]) {
+      video_driver_ids[i + 1] = strdup(vids[i]);
+      i++;
+    }
+    
+    video_driver_ids[i + 1] = NULL;
+    
+    if(video_driver_id) {
+      for(i = 0; video_driver_ids[i] != NULL; i++) {
+	if(!strcasecmp(video_driver_id, video_driver_ids[i])) {
+	  driver_num = i;
+	  break;
+	}
+      }
+    }
+    gGui->vo_port = load_video_out_driver(driver_num);
+  }  
+  
+  if((driver_num >= 0) && (!strcasecmp(video_driver_ids[driver_num], "dxr3"))) {
     xine_cfg_entry_t  cfg_entry;
-
+    
     if(xine_config_lookup_entry(gGui->xine, "dxr3.videoout_mode", &cfg_entry)) {
       if(((!strcmp(cfg_entry.str_value, "letterboxed tv")) ||
 	  (!strcmp(cfg_entry.str_value, "widescreen tv"))) && 
@@ -1061,7 +1112,34 @@ int main(int argc, char *argv[]) {
   SAFE_FREE(video_driver_id);
 
   /* Audio out plugin */
-  gGui->ao_port = load_audio_out_driver(audio_driver_id);
+  driver_num = -1;
+  {
+    const char *const *aids = xine_list_audio_output_plugins(gGui->xine);
+    int                i = 0;
+    
+    while(aids[i++]);
+    
+    audio_driver_ids = (char **) xine_xmalloc(sizeof(char *) * (i + 2));
+    i = 0;
+    audio_driver_ids[i] = strdup("auto");
+    audio_driver_ids[i + 1] = strdup("null");
+    while(aids[i]) {
+      audio_driver_ids[i + 2] = strdup(aids[i]);
+      i++;
+    }
+    
+    audio_driver_ids[i + 1] = NULL;
+    
+    if(audio_driver_id) {
+      for(i = 0; audio_driver_ids[i] != NULL; i++) {
+	if(!strcasecmp(audio_driver_id, audio_driver_ids[i])) {
+	  driver_num = i;
+	  break;
+	}
+      }
+    }
+    gGui->ao_port = load_audio_out_driver(driver_num);
+  }
   SAFE_FREE(audio_driver_id);
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
