@@ -558,7 +558,6 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 
-  printf("****LEAVE\n");
   return image;
 }
 xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
