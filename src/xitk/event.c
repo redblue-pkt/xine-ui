@@ -257,6 +257,8 @@ void config_reset(void) {
 /*
  *
  */
+static void dummy_sighandler(int dummy) {
+}
 static void gui_signal_handler (int sig, void *data) {
   pid_t     cur_pid = getppid();
   
@@ -284,7 +286,19 @@ static void gui_signal_handler (int sig, void *data) {
   case SIGINT:
   case SIGTERM:
     if(cur_pid == xine_pid) {
+      struct sigaction action;
+      
       config_save();
+      
+      action.sa_handler = dummy_sighandler;
+      sigemptyset(&(action.sa_mask));
+      action.sa_flags = 0;
+      if(sigaction(SIGALRM, &action, NULL) != 0) {
+	fprintf(stderr, "sigaction(SIGALRM) failed: %s\n", strerror(errno));
+      }
+      alarm(5);
+      
+      xine_stop(gGui->xine);
     }
     break;
   }
