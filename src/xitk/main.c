@@ -2045,11 +2045,6 @@ int main(int argc, char *argv[]) {
   xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
   xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
-  /* Playlist scanning feature stream */
-  gGui->playlist.scan_stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
-  xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
-  xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_SPU_CHANNEL, -2);
-
   /* subtitle stream */
   gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
   xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);

@@ -554,70 +554,75 @@ void playlist_mmk_editor(void) {
   }
 }
 
+static void _scan_for_playlist_infos(xine_stream_t *stream, int n) {
+  
+  if(xine_open(stream, gGui->playlist.mmk[n]->mrl)) {
+    char  *ident;
+    
+    if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
+      
+      if(gGui->playlist.mmk[n]->ident)
+	free(gGui->playlist.mmk[n]->ident);
+      
+      gGui->playlist.mmk[n]->ident = strdup(ident);
+      
+      if(n == gGui->playlist.cur) {
+	
+	if(gGui->mmk.ident)
+	  free(gGui->mmk.ident);
+	
+	gGui->mmk.ident = strdup(ident);
+	
+	panel_update_mrl_display();
+      }
+      
+      free(ident);
+    }
+    xine_close(stream);
+  }
+}
+
+void playlist_scan_for_infos_selected(void) {
+
+  if(gGui->playlist.num) {
+    int                 selected = xitk_browser_get_current_selected(playlist->playlist);
+    xine_video_port_t  *vo_port;
+    
+    
+    if((vo_port = xine_open_video_driver(gGui->xine, "none", XINE_VISUAL_TYPE_NONE, NULL))) {
+      xine_stream_t  *stream;
+
+      stream = xine_stream_new(gGui->xine, NULL, vo_port);
+      _scan_for_playlist_infos(stream, selected);
+      
+      xine_dispose(stream);
+      xine_close_video_driver(gGui->xine, vo_port);
+    }
+    
+    playlist_mrlident_toggle();
+  }
+}
+
 void playlist_scan_for_infos(void) {
   
   if(gGui->playlist.num) {
-    int            i;
-    char          *ident;
-    int            old_pos = 0, rerun = 0;
-    xine_stream_t *stream = gGui->playlist.scan_stream;
-    int            mute = gGui->mixer.mute;
-
-    /* 
-     * Because we share audio driver (and since we can't stat infos of
-     * audio only streams without audio driver), pausing the gGui->stream
-     * avoid some sync/crash problems.
-     */
-    if(((xine_get_status(gGui->stream)) != XINE_STATUS_STOP) && (gGui->logo_mode == 0)) {
-      if(!gui_xine_get_pos_length(gGui->stream, &old_pos, NULL, NULL))
-	old_pos = 0;
-      gui_stop(NULL, NULL);
-      rerun = 1;
-    }
-    if((!mute) && gGui->mixer.caps & MIXER_CAP_MUTE) {
-      mute = 1;
-      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, 1);
-    }
-    else
-      mute = 0;
+    int                 i;
+    xine_video_port_t  *vo_port;
+  
     
-    for(i = 0; i < gGui->playlist.num; i++) {
+    if((vo_port = xine_open_video_driver(gGui->xine, "none", XINE_VISUAL_TYPE_NONE, NULL))) {
+      xine_stream_t *stream;
       
-      if(xine_open(stream, gGui->playlist.mmk[i]->mrl)) {
-
-	if((ident = stream_infos_get_ident_from_stream(stream)) != NULL) {
-	  
-	  if(gGui->playlist.mmk[i]->ident)
-	    free(gGui->playlist.mmk[i]->ident);
-	  
-	  gGui->playlist.mmk[i]->ident = strdup(ident);
-	  
-	  if(i == gGui->playlist.cur) {
-	    
-	    if(gGui->mmk.ident)
-	      free(gGui->mmk.ident);
-	    
-	    gGui->mmk.ident = strdup(ident);
-	    
-	    panel_update_mrl_display();
-	  }
-	  
-	  free(ident);
-	}
-
-	xine_close(stream);
-      }
+      stream = xine_stream_new(gGui->xine, NULL, vo_port);
+      
+      for(i = 0; i < gGui->playlist.num; i++)
+	_scan_for_playlist_infos(stream, i);
+      
+      xine_dispose(stream);
+      xine_close_video_driver(gGui->xine, vo_port);
+      
+      playlist_mrlident_toggle();
     }
-    
-    /* Restoring previous play status */
-    if(mute)
-      xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, !mute);
-    
-    if(rerun)
-      gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, old_pos, 
-			     0, gGui->mmk.av_offset, gGui->mmk.spu_offset);
-    
-    playlist_mrlident_toggle();
   }
 }
 

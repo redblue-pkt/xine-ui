@@ -81,6 +81,12 @@ static char *menu_get_shortcut(char *action) {
 static void menu_open_mrlbrowser(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   open_mrlbrowser_from_playlist(w, data);
 }
+static void menu_scan_infos(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  playlist_scan_for_infos();
+}
+static void menu_scan_infos_selected(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  playlist_scan_for_infos_selected();
+}
 static void menu_playlist_mmk_editor(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   playlist_mmk_editor();
 }
@@ -1108,6 +1114,8 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
+    { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
+    { _("Scan"),       NULL,          NULL,          menu_scan_infos,              NULL                    },
     { NULL,            NULL,          NULL,          NULL,                         NULL                    }
   };
   xitk_menu_entry_t    menu_entries_sel[] = {
@@ -1115,6 +1123,7 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Play"),       NULL,          NULL,          menu_playlist_play_current,   NULL                    },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
+    { _("Scan"),       NULL,          NULL,          menu_scan_infos_selected,     NULL                    },
     { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
     { _("Edit"),       NULL,          NULL,          menu_playlist_mmk_editor,     NULL                    },
     { _("Delete"),     NULL,          NULL,          menu_playlist_delete_current, NULL                    },
