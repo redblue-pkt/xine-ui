@@ -198,12 +198,12 @@ void gui_handle_xine_error(void) {
 			 gGui->filename);
     break;
     
-  case XINE_ERROR_NO_DEMUXER_PLUGIN:
+  case XINE_ERROR_NO_DEMUX_PLUGIN:
     xine_error_with_more(_("- xine engine error -\n\nThere is no demuxer plugin available "
 			   "to handle '%s'.\nUsually this means that the file format was not recognized."), gGui->filename);
     break;
 
-  case XINE_ERROR_DEMUXER_FAILED:
+  case XINE_ERROR_DEMUX_FAILED:
     xine_error_with_more(_("- xine engine error -\n\ndemuxer failed. Maybe '%s' is a broken file?\n"), 
 			 gGui->filename);
     break;
