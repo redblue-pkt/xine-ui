@@ -80,7 +80,8 @@ dvd_device              path to your local dvd device file
 dvd_raw_device          path to a raw device set up for dvd access
 			(option, e.g. /dev/rdvd)
 
-dxr3_XXX		see README.dxr3
+dxr3_XXX	and	
+dxr3enc_XXX		see README.dxr3
 
 esd_latency             latency between time of audio sample
 			output to esd and actual playback 

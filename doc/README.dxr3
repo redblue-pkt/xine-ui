@@ -50,6 +50,70 @@ location with
 
 otherwise a ./configure without parameters will do.
 
+XINE dxr3 plugins
+=================
+
+There are two different ways in which xine can make use of the dxr3 
+card.
+
+1. [dxr3] mpeg-1/mpeg-2 (DVD, VCD, ...) decoding and displaying. 
+
+This is the normal use.  Instead of doing the mpeg decoding in
+software, xine sets up the display (TV or overlay) and sends the mpeg
+data via the kernel driver to the mpeg decoder on the dxr3 card, very
+much like the Windows player that you problably got with the card. In
+this mode, you should be using the mpeg2-dxr3 decoder plugin together
+with the dxr3 video out plugin. 
+
+Xine should select the mpeg2-dxr3 decoder plugin automatically when it
+encounters an mpeg stream, but it is possible it does not use the dxr3
+video out plugin by default. In that case, start xine with the 
+"-V dxr3" argument to specify the dxr3 video out plugin. Remember not
+to use this driver for non-mpeg content!
+
+Here's a short overview what happens when you play a dvd with xine:
+
+DVD -> split mpeg video and audio and audio streams 
+-> send mpeg video to dxr3 -> image appears on screen
+
+2. [dxr3enc] EXPERIMENTAL: displaying non-mpeg video on dxr3 hardware. 
+
+Xine has an experimental video out driver for displaying non-mpeg
+streams using a dxr3 card called dxr3enc. Non-mpeg video may be AVI,
+quicktime, windows media files or whatever else xine can decode. 
+
+Because this driver is still in development (although it works
+quite well at the moment) it is not yet integrated in the build
+system. You need to manually edit the Makefile.am in xine-lib/src/dxr3
+and (re)compile. The driver itself is in video_out_dxr3enc.c in
+the same directory. Please read the source comments at the top
+of this file for more developer related information.
+
+In order to use this driver for output instead of, say, Xv, start
+xine with the command line option "-V dxr3enc", for example
+% xine -V dxr3enc my_movie.avi
+
+Unlike in case 1), where the card does the video decoding, in this
+case Xine does the decoding in software, as usual, and sends the
+decompressed image to the video out driver.  The dxr3enc video out
+driver encodes, in real time, this image as an mpeg-1 intra frame and
+sends it to the mpeg decoder on the card.
+
+Using this trick, we can display arbitrary video formats via the
+tv out port of the dxr3 card. Nifty huh? The only downside is that
+it requires extra computational power, because we have to both
+decode the original video and encode to mpeg-1 in software. The
+cpu power needed depends of course on the resolution and the source
+format, but as a rule of thumb it is recommended to do this on a
+system with at least 128 MB of RAM and a P-III/Athlon at 800 MHz.
+
+Here's an overview what happens when you play an AVI this way
+(compare this with the previous overview!)
+
+-> split video and audio streams -> decode video stream 
+-> encode video as mpeg-1 -> send mpeg-1 stream to dxr3
+-> image appears on screen
+
 
 XINE run-time configuration
 ===========================
@@ -57,7 +121,12 @@ XINE run-time configuration
 XINE has several configuration options in $HOME/.xinerc
 (see also doc/README.xinerc)
 
-Some of them are important for dxr3 playback:
+Some of them are important for dxr3 playback. The variables
+starting with "dxr3_" are general, the ones starting with
+"dxr3enc_" are only of importance for the dxr3enc video out
+plugin. 
+
+
 *) dxr3_tvmode:
 	default Keep the current driver setting
 	ntsc    NTSC 60Hz
@@ -110,21 +179,26 @@ Some of them are important for dxr3 playback:
 		wrong device, the demanded device can be set using
 		this option.
 
+The following settings only concern the dxr3enc video out driver:
+
+dxr3enc_quality: 
+	0-100	The quality setting of the mpeg1 encoding. Lower
+		is faster but gives noticeable artefacts. Higher is
+		better but slower. Values between 0 and 100, 90
+		is a good initial value.
+
+dxr3enc_file:
+	<none>  If the value is anything other than "<none>", xine
+		tries to open a file with that name to write the
+		encoded mpeg-1 stream to instead of the dxr3 device. 
+		This is for debugging the driver and not meant for 
+		users.
+	
 It is recommented to run XINE one time before editing the config,
 since all options get written in .xinerc and have their default
 values. The dxr3 video driver can be forced using the "-V dxr3"
 command line option. Only the tvmode value has to be edited
 if the default driver setting is not correct.
-
-
-Running XINE with dxr3/hw+
-==========================
-
-The hardware decoder is activated automatically if the driver
-can be opened correctly. Mpeg1/2 videos (e.g. DVDs) are played
-on the hardware decoder, whereas other content is played on the
-screen. Remember to activate a different video out than "dxr3"
-in that case!
 
 
 VGA overlay feature
