@@ -1210,7 +1210,7 @@ void gui_seek_relative (int off_sec) {
   int        err;
   pthread_t  pth;
   
-  if((err = pthread_create(&sthread, NULL, _gui_seek_relative, (void *)off_sec)) != 0) {
+  if((err = pthread_create(&pth, NULL, _gui_seek_relative, (void *)off_sec)) != 0) {
     printf(_("%s(): can't create new thread (%s)\n"), __XINE_FUNCTION__, strerror(err));
     abort();
   }
