@@ -7,7 +7,8 @@ data_DATA = arrowdn.png fastf.png  pl_bg.png  power.png smallbtn.png \
 	bg.png       largebtn.png  pl_itembtn.png  ptdn.png \
 	close.png    letters.png   pl_slidpad.png  ptup.png \
 	eject.png    next.png      pl_slidv.png    slider_bg.png \
-	fastb.png    pause.png     play.png        slider_pad.png  skinconfig
+	fastb.png    pause.png     play.png        slider_pad.png\
+	playlist.png setup.png mrl.png skinconfig
 
 install-debug: install
 

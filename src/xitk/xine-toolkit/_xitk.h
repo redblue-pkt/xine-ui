@@ -19,7 +19,6 @@
  *
  * $Id$
  *
- * Unique public header file for xitk µTK.
  *
  */
 

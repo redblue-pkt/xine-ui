@@ -264,7 +264,7 @@ void gui_handle_event (XEvent *event, void *data) {
 
     case XK_c:
     case XK_C:
-      gui_control_show(NULL, NULL, 0);
+      gui_control_show(NULL, NULL);
       break;
 
     case XK_h:

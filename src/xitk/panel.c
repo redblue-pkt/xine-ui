@@ -536,33 +536,32 @@ void panel_init (void) {
   */
 
   gui_list_append_content (panel->widget_list->l, 
-			   label_button_create (gGui->display, 
-						gGui->imlib_data, 
-						gui_get_skinX("PlBtn"),
-						gui_get_skinY("PlBtn"),
-						CLICK_BUTTON,
-						"Playlist",
-						gui_playlist_show, 
-						NULL, 
-						gui_get_skinfile("PlBtn"),
-						gui_get_ncolor("PlBtn"),
-						gui_get_fcolor("PlBtn"),
-						gui_get_ccolor("PlBtn")));
+			   button_create (gGui->display, 
+					  gGui->imlib_data, 
+					  gui_get_skinX("PlBtn"),
+					  gui_get_skinY("PlBtn"),
+					  gui_playlist_show, 
+					  NULL,
+					  gui_get_skinfile("PlBtn")));
+  
+  gui_list_append_content (panel->widget_list->l, 
+			   button_create (gGui->display, 
+					  gGui->imlib_data, 
+					  gui_get_skinX("CtlBtn"),
+					  gui_get_skinY("CtlBtn"),
+					  gui_control_show, 
+					  NULL, 
+					  gui_get_skinfile("CtlBtn")));
 
   gui_list_append_content (panel->widget_list->l, 
-			   label_button_create (gGui->display, 
-						gGui->imlib_data, 
-						gui_get_skinX("CtlBtn"),
-						gui_get_skinY("CtlBtn"),
-						CLICK_BUTTON,
-						"Setup",
-						gui_control_show, 
-						NULL, 
-						gui_get_skinfile("CtlBtn"),
-						gui_get_ncolor("CtlBtn"),
-						gui_get_fcolor("CtlBtn"),
-						gui_get_ccolor("CtlBtn")));
-
+			   button_create (gGui->display, 
+					  gGui->imlib_data, 
+					  gui_get_skinX("MrlBtn"),
+					  gui_get_skinY("MrlBtn"),
+					  gui_mrl_browser_show, 
+					  NULL, 
+					  gui_get_skinfile("MrlBtn")));
+  
   /* 
    * show panel 
    */

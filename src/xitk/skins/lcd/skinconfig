@@ -22,9 +22,10 @@ Play:		149	77	play.png
 Stop:		174 	77	stop.png
 Prev:		249	77	prev.png
 Eject:		349	77	eject.png
-AutoPlayGUI:	322	55	smallbtn.png	Black	Yellow	White
-PlBtn:		355	52	largebtn.png        Black   Blue    White
-CtlBtn:		415	52	largebtn.png        Black   Blue    White
+AutoPlayGUI:	420	55	smallbtn.png	Black	Yellow	White
+PlBtn:		68	24	playlist.png
+CtlBtn:		67	46	setup.png
+MrlBtn:		81	7	mrl.png
 SliderBGPlay:	149	70	slider_bg.png
 SliderFGPlay:	0	0	slider_pad.png
 

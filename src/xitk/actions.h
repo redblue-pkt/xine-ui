@@ -31,37 +31,38 @@
 #define GUI_NEXT     1
 #define GUI_PREV     2
 
-void gui_exit (widget_t *w, void *data) ;
+void gui_exit (widget_t *w, void *data);
 
-void gui_play (widget_t *w, void *data) ;
+void gui_play (widget_t *w, void *data);
 
-void gui_stop (widget_t *w, void *data) ;
+void gui_stop (widget_t *w, void *data);
 
 void gui_pause (widget_t *w, void *data, int state) ;
 
-void gui_eject(widget_t *w, void *data) ;
+void gui_eject(widget_t *w, void *data);
 
-void gui_toggle_fullscreen(widget_t *w, void *data) ;
+void gui_toggle_fullscreen(widget_t *w, void *data);
 
-void gui_toggle_aspect(void) ;
+void gui_toggle_aspect(void);
 
-void gui_change_audio_channel(widget_t *w, void *data) ;
+void gui_change_audio_channel(widget_t *w, void *data);
 
-void gui_change_spu_channel(widget_t *w, void *data) ;
+void gui_change_spu_channel(widget_t *w, void *data);
 
-void gui_set_current_position (int pos) ;
+void gui_set_current_position (int pos);
 
-void gui_dndcallback (char *filename) ;
+void gui_dndcallback (char *filename);
 
-void gui_nextprev(widget_t *w, void *data) ;
+void gui_nextprev(widget_t *w, void *data);
 
-void gui_playlist_show(widget_t *w, void *datan, int st);
+void gui_playlist_show(widget_t *w, void *data);
 
-void gui_set_current_mrl(const char *mrl) ;
+void gui_set_current_mrl(const char *mrl);
 
-char *gui_get_next_mrl () ;
+char *gui_get_next_mrl (void);
 
-void gui_control_show(widget_t *w, void *data, int st) ;
+void gui_control_show(widget_t *w, void *data);
 
+void gui_mrl_browser_show(widget_t *w, void *data);
 
 #endif

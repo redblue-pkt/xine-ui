@@ -18,10 +18,12 @@ Play:		222	89	play.png
 Stop:		197 	88	stop.png
 Prev:		173	88	prev.png
 Eject:		23	88	eject.png
-AutoPlayGUI:	55	58	smallbtn.png	Black	Black	Black
-PlBtn:		220	55	largebtn.png	Black	Black	Black
 SliderBGPlay:	23	78	slider_bg.png
 SliderFGPlay:	0	0	slider_pad.png
+AutoPlayGUI:	178	58	smallbtn.png	Black	Black	Black
+MrlBtn:		241	58	mrl.png
+PlBtn:		258	58	playlist.png
+CtlBtn:		275	58	setup.png
 
 ## SPU ##
 SpuPrev:	267	36	ptdn.png
@@ -65,7 +67,6 @@ FBSortRev:	340	145	arrowup.png
 FBSortDef:	340	160	arrowdn.png
 
 ## control panel ##
-CtlBtn:		149	55	largebtn.png	Black	Black	Black
 CtlBG:		0	0	pl_bg.png
 CtlHueBG:	80	40	pl_slidv.png
 CtlHueFG:	0	0	pl_slidpad.png

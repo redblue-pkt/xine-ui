@@ -263,7 +263,7 @@ void gui_nextprev(widget_t *w, void *data) {
   panel_check_pause();
 }
 
-void gui_playlist_show(widget_t *w, void *datan, int st) {
+void gui_playlist_show(widget_t *w, void *data) {
 
   if(!pl_is_running()) {
     playlist_editor();
@@ -298,7 +298,7 @@ void gui_notify_demux_branched () {
 }
 */
 
-void gui_control_show(widget_t *w, void *data, int st) {
+void gui_control_show(widget_t *w, void *data) {
 
   if(control_is_running() && !control_is_visible())
     control_toggle_panel_visibility(NULL, NULL);
@@ -306,4 +306,12 @@ void gui_control_show(widget_t *w, void *data, int st) {
     control_panel();
   else
     control_exit(NULL, NULL);
+}
+
+/*
+ * FIXME: fill me.
+ */
+void gui_mrl_browser_show(widget_t *w, void *data) {
+
+  printf("%s() is not implemented yet.\n", __FUNCTION__);
 }

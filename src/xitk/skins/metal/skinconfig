@@ -26,9 +26,10 @@ SliderBGPlay:	17	3	slider_bg.png
 SliderFGPlay:	0	0	slider_pad.png
 SliderBGVol:	2	20	slider_v.png
 SliderFGVol:	0	0	slider_pad.png
-AutoPlayGUI:	117	45	smallbtn.png	LightGray	Yellow	White
-PlBtn:		150	42	largebtn.png	LightGray	White	Red
-CtlBtn:		210	42	largebtn.png    LightGray	White	Red
+AutoPlayGUI:	185	45	smallbtn.png	LightGray	Yellow	White
+MrlBtn:		218	45	mrl.png
+PlBtn:		234	45	playlist.png
+CtlBtn:		250	45	setup.png
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png
