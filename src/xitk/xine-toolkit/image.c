@@ -1404,7 +1404,9 @@ xitk_image_t *xitk_image_load_image(ImlibData *im, char *image) {
   
   XLOCK(im->x.disp);
   if(!(img = Imlib_load_image(im, (char *)image))) {
-    XITK_DIE("%s(): couldn't find image %s\n", __FUNCTION__, image);
+    XITK_WARNING("%s(): couldn't find image %s\n", __FUNCTION__, image);
+    XUNLOCK(im->x.disp);
+    return NULL;
   }
   
   Imlib_render (im, img, img->rgb_width, img->rgb_height);
@@ -1445,7 +1447,6 @@ static void notify_destroy(xitk_widget_t *w) {
   if(w && ((w->type & WIDGET_TYPE_MASK) == WIDGET_TYPE_IMAGE)) {
     private_data = (image_private_data_t *) w->private_data;
     XITK_FREE(private_data->skin_element_name);
-    xitk_image_free_image(private_data->imlibdata, &private_data->skin);
     XITK_FREE(private_data);
   }
 }
@@ -1521,9 +1522,8 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       
       xitk_skin_lock(skonfig);
 
-      xitk_image_free_image(private_data->imlibdata, &private_data->skin);
-      private_data->skin = xitk_image_load_image(private_data->imlibdata,
-						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      private_data->skin = xitk_skin_get_image(skonfig,
+					       xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
       
       w->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
       w->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
@@ -1617,9 +1617,8 @@ xitk_widget_t *xitk_image_create (xitk_widget_list_t *wl,
 			    (xitk_skin_get_coord_x(skonfig, im->skin_element_name)),
 			    (xitk_skin_get_coord_y(skonfig, im->skin_element_name)),
 			    im->skin_element_name,
-			    (xitk_image_load_image(im->imlibdata,
-						   xitk_skin_get_skin_filename(skonfig, 
-								       im->skin_element_name))));
+			    (xitk_skin_get_image(skonfig,
+						 xitk_skin_get_skin_filename(skonfig, im->skin_element_name))));
 }
 
 /*

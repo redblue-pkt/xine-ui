@@ -258,6 +258,7 @@ static int change_skin(skins_locations_t *sk) {
   int                  twice = 0, twice_load = 0;
   int                  ret = 0;
   char                *skin_anim;
+  xitk_skin_config_t  *nskin_config, *oskin_config;
 
   if(!sk)
     return -1;
@@ -266,15 +267,13 @@ static int change_skin(skins_locations_t *sk) {
 
   old_skin = DEFAULT_SKIN;
   
-  xitk_skin_unload_config(gGui->skin_config);
-
-  gGui->skin_config = xitk_skin_init_config();
+  nskin_config = xitk_skin_init_config(gGui->imlib_data);
 
  __reload_skin:
   memset(&buf, 0, sizeof(buf));
   sprintf(buf, "%s/%s", sks->pathname, sks->skin);
 
-  if(!xitk_skin_load_config(gGui->skin_config, buf, "skinconfig")) {
+  if(!xitk_skin_load_config(nskin_config, buf, "skinconfig")) {
     skins_locations_t   *osks;
     
     ret = get_skin_offset(old_skin);
@@ -302,9 +301,9 @@ static int change_skin(skins_locations_t *sk) {
   twice_load = 0;
 
   /* Check skin version */
-  if(xitk_skin_check_version(gGui->skin_config, SKIN_IFACE_VERSION) < 1) {
-    xitk_skin_unload_config(gGui->skin_config);
-    gGui->skin_config = xitk_skin_init_config();
+  if(xitk_skin_check_version(nskin_config, SKIN_IFACE_VERSION) < 1) {
+    xitk_skin_unload_config(nskin_config);
+    nskin_config = xitk_skin_init_config(gGui->imlib_data);
     xine_error(_("Failed to load %s, wrong version. Load fallback skin '%s'.\n"), 
 	       buf, DEFAULT_SKIN);
     ret = get_skin_offset(DEFAULT_SKIN);
@@ -317,10 +316,13 @@ static int change_skin(skins_locations_t *sk) {
     free(gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]);
     gGui->visual_anim.mrls[gGui->visual_anim.num_mrls--] = NULL;
   }
-  if((skin_anim = xitk_skin_get_animation(gGui->skin_config)) != NULL) {
+  if((skin_anim = xitk_skin_get_animation(nskin_config)) != NULL) {
     gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++] = strdup(skin_anim);
   }
   
+  oskin_config = gGui->skin_config;
+  gGui->skin_config = nskin_config;
+
   { /* Now, change skins for each window */
     typedef struct {
       void (*change_skins)(void);
@@ -341,6 +343,8 @@ static int change_skin(skins_locations_t *sk) {
       }
     }
   }
+
+  xitk_skin_unload_config(oskin_config);
 
   return ret;
 }
@@ -410,7 +414,7 @@ void preinit_skins_support(void) {
 
   change_config_entry = 0;
   
-  gGui->skin_config = xitk_skin_init_config();
+  gGui->skin_config = xitk_skin_init_config(gGui->imlib_data);
   
   looking_for_available_skins();
   
@@ -488,7 +492,7 @@ void init_skins_support(void) {
   /* Check skin version */
   if(xitk_skin_check_version(gGui->skin_config, SKIN_IFACE_VERSION) < 1) {
     xitk_skin_unload_config(gGui->skin_config);
-    gGui->skin_config = xitk_skin_init_config();
+    gGui->skin_config = xitk_skin_init_config(gGui->imlib_data);
     fprintf(stderr, _("Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"), 
 	    buf, (skins_avail[(get_skin_offset(DEFAULT_SKIN))]->skin));
     config_update_num("gui.skin", (get_skin_offset(DEFAULT_SKIN)));

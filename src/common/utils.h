@@ -33,10 +33,6 @@
 #include <X11/Xlib.h>
 #endif
 
-#ifdef HAVE_ICONV
-#include <iconv.h>
-#endif
-
 /* sys/time.h does not define timersub() on all platforms... */
 #ifndef timersub
 # define timersub(a, b, result)                                               \
@@ -61,14 +57,6 @@
 #else
 #define _PATH_MAX          PATH_MAX
 #endif
-
-typedef struct {
-#ifdef HAVE_ICONV
-  iconv_t id;
-#else
-  int id;
-#endif
-} xitk_recode_t;
 
 /*
  * Execute a shell command.
@@ -102,28 +90,5 @@ void dump_host_info(void);
 void dump_cpu_infos(void);
 void dump_xfree_info(Display *display, int screen, int complete);
 #endif
-
-/* 
- * get current locale encoding 
- */
-char *xitk_get_system_encoding(void);
-
-/*
- * prepare recoding
- *   - when one of encoding is NULL, is prepared no conversion, strings will
- *     be strdup()ed
- *   - when encoding is "", it's got from system
- */
-xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding);
-
-/*
- * destroy recoding
- */
-void xitk_recode_done(xitk_recode_t *xr);
-
-/*
- * recode string 'src' into 'dst' according to prepared 'xr'
- */
-char *xitk_recode(xitk_recode_t *xr, const char *src);
 
 #endif

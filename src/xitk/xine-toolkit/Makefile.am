@@ -77,7 +77,7 @@ noinst_HEADERS = \
 
 test_SOURCES = test.c
 test_DEPENDENCIES = libxitk.la
-test_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la $(top_builddir)/src/common/libcommon.la
+test_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la
 
 $(top_builddir)/src/xitk/Imlib-light/libImlib-light.la:
 	@cd $(top_builddir)/src/xitk/Imlib-light && $(MAKE) libImlib-light.la

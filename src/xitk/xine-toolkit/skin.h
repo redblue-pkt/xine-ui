@@ -62,12 +62,22 @@ typedef struct xitk_skin_element_s {
   char                         *font;
 } xitk_skin_element_t;
 
+typedef struct cache_entry_s cache_entry_t;
+struct cache_entry_s {
+  xitk_image_t   *image;
+  char           *filename;
+  cache_entry_t  *next;
+};
+
 struct xitk_skin_config_s {
+  ImlibData                    *im;
   FILE                         *fd;
   char                         *path;
   char                         *skinfile;
   char                         *ln;
   char                          buf[256];
+
+  cache_entry_t                *cache;
   
   char                         *name;
   int                           version;
@@ -77,7 +87,6 @@ struct xitk_skin_config_s {
   char                         *logo;
   char                         *animation;
 
-  pthread_mutex_t               mutex;
   char                         *load_command;
   char                         *unload_command;
   

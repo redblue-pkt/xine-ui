@@ -37,6 +37,10 @@
 #include <stdarg.h>
 #include "xitk/Imlib-light/Imlib.h"
 
+#ifdef HAVE_ICONV
+#include <iconv.h>
+#endif
+
 #ifdef NEED_MRLBROWSER
 #include <xine.h>
 #endif
@@ -1582,7 +1586,7 @@ void xitk_inputtext_change_text(xitk_widget_t *it, char *text);
 /*
  * Alloc a xitk_skin_config_t* memory area, nullify pointers.
  */
-xitk_skin_config_t *xitk_skin_init_config(void);
+xitk_skin_config_t *xitk_skin_init_config(ImlibData *);
 
 /*
  * Release all allocated memory of a xitk_skin_config_t* variable (element chained struct too).
@@ -1726,6 +1730,11 @@ int xitk_skin_get_browser_entries(xitk_skin_config_t *, const char *);
 /*
  *
  */
+xitk_image_t *xitk_skin_get_image(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
 void xitk_skin_lock(xitk_skin_config_t *);
 
 /*
@@ -1810,6 +1819,37 @@ int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
  *
  */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
+
+typedef struct {
+#ifdef HAVE_ICONV
+  iconv_t    id;
+#else
+  int        id;
+#endif
+} xitk_recode_t;
+
+/**
+ * get current locale encoding 
+ */
+char *xitk_get_system_encoding(void);
+
+/**
+ * prepare recoding
+ *   - when one of encoding is NULL, is prepared no conversion, strings will
+ *     be strdup()ed
+ *   - when encoding is "", it's got from system
+ */
+xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding);
+
+/**
+ * destroy recoding
+ */
+void xitk_recode_done(xitk_recode_t *xr);
+
+/**
+ * recode string 'src' into 'dst' according to prepared 'xr'
+ */
+char *xitk_recode(xitk_recode_t *xr, const char *src);
 
 
 /**

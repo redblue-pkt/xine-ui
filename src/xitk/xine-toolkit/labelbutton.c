@@ -44,7 +44,6 @@ static void notify_destroy(xitk_widget_t *w) {
     private_data = (lbutton_private_data_t *) w->private_data;
     XITK_FREE(private_data->label);
     XITK_FREE(private_data->skin_element_name);
-    xitk_image_free_image(private_data->imlibdata, &private_data->skin);
     XITK_FREE(private_data->normcolor);
     XITK_FREE(private_data->focuscolor);
     XITK_FREE(private_data->clickcolor);
@@ -428,9 +427,8 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       
       xitk_skin_lock(skonfig);
       
-      xitk_image_free_image(private_data->imlibdata, &private_data->skin);
-      private_data->skin          = xitk_image_load_image(private_data->imlibdata, 
-		       xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      private_data->skin          = xitk_skin_get_image(skonfig, 
+							xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
       XITK_FREE(private_data->normcolor);
       private_data->normcolor     = strdup(xitk_skin_get_label_color(skonfig, 
 							     private_data->skin_element_name));
@@ -725,7 +723,7 @@ xitk_widget_t *xitk_labelbutton_create (xitk_widget_list_t *wl,
 		  (xitk_skin_get_coord_x(skonfig, b->skin_element_name)),
 		  (xitk_skin_get_coord_y(skonfig, b->skin_element_name)),
 		   b->skin_element_name,
-		  (xitk_image_load_image(b->imlibdata, xitk_skin_get_skin_filename(skonfig, b->skin_element_name))),
+		  (xitk_skin_get_image(skonfig, xitk_skin_get_skin_filename(skonfig, b->skin_element_name))),
 		  (xitk_skin_get_label_color(skonfig, b->skin_element_name)),
 		  (xitk_skin_get_label_color_focus(skonfig, b->skin_element_name)),
 		  (xitk_skin_get_label_color_click(skonfig, b->skin_element_name)),

@@ -119,9 +119,6 @@ static void notify_destroy(xitk_widget_t *w) {
     XITK_FREE(private_data->fontname);
     XITK_FREE(private_data->skin_element_name);
 
-    if(private_data->font)
-      xitk_image_free_image(private_data->imlibdata, &private_data->font);
-
     pthread_mutex_destroy(&private_data->paint_mutex);
 
     XITK_FREE(private_data);
@@ -210,13 +207,12 @@ static void paint_label(xitk_widget_t *w) {
     else {
       int width = private_data->char_length * private_data->length;
       
-
       XLOCK(private_data->imlibdata->x.disp);
       XCopyArea(private_data->imlibdata->x.disp, 
 		private_data->labelpix->pixmap, w->wl->win, font->image->gc, 
 		private_data->anim_offset, 0, width, private_data->char_height, 
 		w->x, w->y);
-
+      
       /* We can't wait here, otherwise the rolling effect is really jerky */
       if(private_data->animation && (private_data->on_change == 0))
 	XSync(private_data->imlibdata->x.disp, False);
@@ -340,9 +336,8 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       
       xitk_skin_lock(skonfig);
 
-      xitk_image_free_image(private_data->imlibdata, &private_data->font);
-      private_data->font        = xitk_image_load_image(private_data->imlibdata, 
-							xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
+      private_data->font        = xitk_skin_get_image(skonfig,
+						      xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
       private_data->char_length = (private_data->font->width/32);
       private_data->char_height = (private_data->font->height/3);
       
@@ -488,8 +483,8 @@ static xitk_widget_t *_xitk_label_create(xitk_widget_list_t *wl,
     private_data->length       = width;
   }
   else {
-    private_data->font         = xitk_image_load_image(private_data->imlibdata, 
-							 xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
+    private_data->font         = xitk_skin_get_image(skonfig, 
+						     xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
   
     private_data->fontname     = NULL;
     private_data->char_length  = (private_data->font->width/32);

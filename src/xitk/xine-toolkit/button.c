@@ -38,7 +38,6 @@ static void notify_destroy(xitk_widget_t *w) {
     private_data = (button_private_data_t *) w->private_data;
     
     XITK_FREE(private_data->skin_element_name);
-    xitk_image_free_image(private_data->imlibdata, &private_data->skin);
     XITK_FREE(private_data);
   }
 }
@@ -147,9 +146,8 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
     
     if(private_data->skin_element_name) {
       xitk_skin_lock(skonfig);
-      xitk_image_free_image(private_data->imlibdata, &private_data->skin);
-      private_data->skin              = xitk_image_load_image(private_data->imlibdata,
-							      (xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)));
+      private_data->skin              = xitk_skin_get_image(skonfig, 
+							    (xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)));
       w->x                            = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
       w->y                            = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       w->width                        = private_data->skin->width/3;
@@ -301,8 +299,8 @@ xitk_widget_t *xitk_button_create (xitk_widget_list_t *wl,
 			     (xitk_skin_get_coord_x(skonfig, b->skin_element_name)),
 			     (xitk_skin_get_coord_y(skonfig, b->skin_element_name)),
 			     b->skin_element_name,
-			     xitk_image_load_image(b->imlibdata,
-						   (xitk_skin_get_skin_filename(skonfig, b->skin_element_name))),
+			     xitk_skin_get_image(skonfig,
+						 (xitk_skin_get_skin_filename(skonfig, b->skin_element_name))),
 			     (xitk_skin_get_visibility(skonfig, b->skin_element_name)) ? 1 : -1,
 			     xitk_skin_get_enability(skonfig, b->skin_element_name));
 }

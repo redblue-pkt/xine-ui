@@ -47,14 +47,6 @@
 #include <X11/Xutil.h>
 #endif /* !HAVE_X11 */
 
-#ifdef HAVE_ICONV
-#include <iconv.h>
-#endif
-
-#ifdef HAVE_LANGINFO_CODESET
-#include <langinfo.h>
-#endif
-
 #include <xine/xineutils.h>
 
 #include "utils.h"
@@ -833,84 +825,3 @@ void dump_xfree_info(Display *display, int screen, int complete) {
 }
 
 #endif /* !HAVE_X11 */
-
-char *xitk_get_system_encoding(void) {
-#ifdef HAVE_LANGINFO_CODESET
-  char *encoding;
-  
-  encoding = nl_langinfo(CODESET);
-  return encoding ? strdup(encoding) : NULL;
-#else
-  return NULL;
-#endif
-}
-
-xitk_recode_t *xitk_recode_init(const char *src_encoding, const char *dst_encoding) {
-#ifdef HAVE_ICONV
-  iconv_t id;
-  char *src_enc, *dst_enc;
-  xitk_recode_t *xr;
-
-  if (!src_encoding || !dst_encoding) return NULL;
-  
-  if (!src_encoding[0]) src_enc = xitk_get_system_encoding();
-  else src_enc = strdup(src_encoding);
-  if (!src_enc) return NULL;
-  
-  if (!dst_encoding[0]) dst_enc = xitk_get_system_encoding();
-  else dst_enc = strdup(dst_encoding);
-  if (!dst_enc) goto exception1;
-  
-  if ((id = iconv_open(dst_encoding, src_encoding)) == (iconv_t)-1) goto exception2;
-  
-  free(src_enc);
-  free(dst_enc);
-  xr = malloc(sizeof(xitk_recode_t));
-  xr->id = id;
-  return xr;
-  
-exception2:
-  free(dst_enc);
-exception1:
-  free(src_enc);
-  return NULL;
-#else
-  return NULL;
-#endif
-}
-
-void xitk_recode_done(xitk_recode_t *xr) {
-  if (xr) {
-#ifdef HAVE_ICONV
-    if (xr->id != (iconv_t)-1) iconv_close(xr->id);
-#endif
-    free(xr);
-  }
-}
-
-char *xitk_recode(xitk_recode_t *xr, const char *src) {
-#ifdef HAVE_ICONV
-  char *inbuf, *outbuf, *buffer = NULL;
-  size_t inbytes, outbytes;
-
-  if (xr && xr->id != (iconv_t)-1) {
-    inbytes = strlen(src);
-    outbytes = 2 * inbytes;
-    buffer = calloc(outbytes + 1, 1);
-    inbuf = (char *)src;
-    outbuf = buffer;
-
-    while (inbytes) {
-      if (iconv(xr->id, &inbuf, &inbytes, &outbuf, &outbytes) == (size_t)-1) {
-	free(buffer);
-	buffer = NULL;
-	break;
-      }
-    }
-  }
-
-  return buffer ? buffer : strdup(src);
-#else
-  return strdup(src);
-#endif
-}

@@ -211,8 +211,6 @@ static void notify_destroy(xitk_widget_t *w) {
     private_data = (slider_private_data_t *) w->private_data;
 
     XITK_FREE(private_data->skin_element_name);
-    xitk_image_free_image(private_data->imlibdata, &private_data->paddle_skin);
-    xitk_image_free_image(private_data->imlibdata, &private_data->bg_skin);
     XITK_FREE(private_data);
   }
 }
@@ -450,11 +448,9 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
 
       xitk_skin_lock(skonfig);
 
-      xitk_image_free_image(private_data->imlibdata, &private_data->paddle_skin);
-      private_data->paddle_skin     = xitk_image_load_image(private_data->imlibdata, xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
+      private_data->paddle_skin     = xitk_skin_get_image(skonfig, xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
       private_data->button_width    = private_data->paddle_skin->width / 3;
-      xitk_image_free_image(private_data->imlibdata, &private_data->bg_skin);
-      private_data->bg_skin         = xitk_image_load_image(private_data->imlibdata, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      private_data->bg_skin         = xitk_skin_get_image(skonfig, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
       private_data->sType = xitk_skin_get_slider_type(skonfig, private_data->skin_element_name);
       private_data->paddle_cover_bg = 0;
       
@@ -855,10 +851,10 @@ xitk_widget_t *xitk_slider_create(xitk_widget_list_t *wl,
 			     (xitk_skin_get_coord_x(skonfig, s->skin_element_name)),
 			     (xitk_skin_get_coord_y(skonfig, s->skin_element_name)),
 			     s->skin_element_name,
-			     (xitk_image_load_image(s->imlibdata, 
-						    xitk_skin_get_skin_filename(skonfig, s->skin_element_name))),
-			     (xitk_image_load_image(s->imlibdata, 
-						    xitk_skin_get_slider_skin_filename(skonfig, s->skin_element_name))),
+			     (xitk_skin_get_image(skonfig, 
+						  xitk_skin_get_skin_filename(skonfig, s->skin_element_name))),
+			     (xitk_skin_get_image(skonfig, 
+						  xitk_skin_get_slider_skin_filename(skonfig, s->skin_element_name))),
 			     (xitk_skin_get_slider_type(skonfig, s->skin_element_name)),
 			     (xitk_skin_get_slider_radius(skonfig, s->skin_element_name)),
 			     ((xitk_skin_get_visibility(skonfig, s->skin_element_name)) ? 1 : -1),

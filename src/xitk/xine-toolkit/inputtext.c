@@ -74,7 +74,6 @@ static void notify_destroy(xitk_widget_t *w) {
     XUNLOCK(private_data->imlibdata->x.disp);
 
     XITK_FREE(private_data->skin_element_name);
-    xitk_image_free_image(private_data->imlibdata, &private_data->skin);
     XITK_FREE(private_data->text);
     XITK_FREE(private_data->normal_color);
     XITK_FREE(private_data->focused_color);
@@ -582,9 +581,8 @@ static void notify_change_skin(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
       XITK_FREE(private_data->fontname);
       private_data->fontname      = strdup(xitk_skin_get_label_fontname(skonfig, private_data->skin_element_name));
       
-      xitk_image_free_image(private_data->imlibdata, &private_data->skin);
-      private_data->skin          = xitk_image_load_image(private_data->imlibdata, 
-							  xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      private_data->skin          = xitk_skin_get_image(skonfig,
+							xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
       
       private_data->max_visible   = (private_data->skin->width/2);
       
@@ -1184,8 +1182,8 @@ xitk_widget_t *xitk_inputtext_create (xitk_widget_list_t *wl,
 				 (xitk_skin_get_coord_x(skonfig, it->skin_element_name)),
 				 (xitk_skin_get_coord_y(skonfig, it->skin_element_name)),
 				 it->skin_element_name,
-				 (xitk_image_load_image(it->imlibdata, 
-							xitk_skin_get_skin_filename(skonfig, it->skin_element_name))),
+				 (xitk_skin_get_image(skonfig,
+						      xitk_skin_get_skin_filename(skonfig, it->skin_element_name))),
 				 (xitk_skin_get_label_fontname(skonfig, it->skin_element_name)),
 				 (xitk_skin_get_label_color(skonfig, it->skin_element_name)),
 				 (xitk_skin_get_label_color_focus(skonfig, it->skin_element_name)),
