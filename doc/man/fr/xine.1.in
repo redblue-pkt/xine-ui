@@ -438,7 +438,7 @@ Déplace la position courante de -15 secondes dans le flux en cours de lecture.
 Déplace la position courante de +15 secondes dans le flux en cours de lecture.
 .IP "\fBM3\fP\-\fB\<Left\>\fP"
 Déplace la position courante de -7 secondes dans le flux en cours de lecture.
-.IP "\fBM3\fP\-\fB\<Right\>\fP"
+IP "\fBM3\fP\-\fB\<Right\>\fP"
 Déplace la position courante de +7 secondes dans le flux en cours de lecture.
 .IP "\fBC\fP\-\fB0\fP"
 Déplace la position courante au debut du flux en cours de lecture.
@@ -520,6 +520,8 @@ Redimensionne la fenêtre de sortie à la taille du flux.
 Bascule du mode fenêtré/plein écran.
 .IP "\fBF\fP"
 Bascule du mode plein écran Xinerama.
+.IP "\fBb\fP"
+Bascule du l'affichage des bordures de la fenêtre de sortie.
 .IP "\fB\<Escape\>\fP"
 Va au Menu du media
 .IP "\fB\<F1\>\fP"

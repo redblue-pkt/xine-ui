@@ -619,6 +619,8 @@ Resize output window to stream size
 Fullscreen toggle
 .IP "\fBF\fP"
 Xinerama fullscreen toggle
+.IP "\fBb\fP"
+Video window borders appearence toggle
 .IP "\fB\<Escape\>\fP"
 Jump to media Menu
 .IP "\fB\<F1\>\fP"
