@@ -1,8 +1,8 @@
 #Xine skin data file
-# revision 0.5
+# revision 0.6
 skin.name    = CelomaChrome
 skin.version = 2
-skin.date    = 06.10.2002
+skin.date    = 06.18.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
 
@@ -329,7 +329,7 @@ skin.PlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 5
+	  entries = 7
 	}
 	label {
 	  align = left
@@ -343,7 +343,7 @@ skin.PlItemBtn {
 skin.PlPlay {
 	coords {
 	  x = 16
-	  y = 134
+	  y = 162
 	}
 	pixmap = PlPlay.png
 }
@@ -351,7 +351,7 @@ skin.PlPlay {
 skin.PlDelete {
 	coords {
 	  x = 79
-	  y = 134
+	  y = 162
 	}
 	pixmap = PlDelete.png
 }
@@ -359,7 +359,7 @@ skin.PlDelete {
 skin.PlDeleteAll {
 	coords {
 	  x = 142
-	  y = 134
+	  y = 162
 	}
 	pixmap = PlDeleteAll.png
 }
@@ -367,7 +367,7 @@ skin.PlDeleteAll {
 skin.PlMoveUp {
 	coords {
 	  x = 205
-	  y = 134
+	  y = 162
 	}
 	pixmap = PlMoveUp.png
 }
@@ -375,7 +375,7 @@ skin.PlMoveUp {
 skin.PlMoveDn {
 	coords {
 	  x = 268
-	  y = 134
+	  y = 162
 	}
 	pixmap = PlMoveDn.png
 }
@@ -383,7 +383,7 @@ skin.PlMoveDn {
 skin.PlDismiss {
 	coords {
 	  x = 331
-	  y = 134
+	  y = 162
 	}
 	pixmap = PlDismiss.png
 	label {
@@ -417,7 +417,7 @@ skin.SliderPl {
 skin.PlDn {
 	coords {
 	  x = 333
-	  y = 136
+	  y = 171
 	}
 	pixmap = BigArrowDown.png
 }
@@ -452,7 +452,7 @@ skin.AutoPlayBG {
 skin.PlInputText {
 	coords {
 	  x = 81
-	  y = 136
+	  y = 171
 	}
 	pixmap = PlInputTxt.png
 	label {
@@ -474,163 +474,163 @@ skin.CtlBG {
 
 skin.SliderCtlHue {
 	coords {
-	  x = 96
-	  y = 19
+	  x = 18
+	  y = 68
 	}
-	pixmap = CtlSliderBg.png
+	pixmap = SliderVBg.png
 	slider {
-	  pixmap = CtlSliderPad.png
+	  pixmap = SliderVPad.png
 	  type = vertical
 	}
 }
 
 skin.CtlHueLbl {
 	coords {
-	  x = 105
-	  y = 82
+	  x = 37
+	  y = 190
 	}
 	label {
 	  length = 3
 	  animation = False
-	pixmap = LettersGrey.png
+	pixmap = LettersBlue.png
 	}
 }
 
 skin.SliderCtlSat {
 	coords {
-	  x = 118
-	  y = 19
+	  x = 81
+	  y = 68
 	}
-	pixmap = CtlSliderBg.png
+	pixmap = SliderVBg.png
 	slider {
-	pixmap = CtlSliderPad.png
+	pixmap = SliderVPad.png
 	type = vertical
 	}
 }
 
 skin.CtlSatLbl {
 	coords {
-	  x = 127
-	  y = 82
+	  x = 100
+	  y = 190
 	}
 	label {
 	  length = 3
 	  animation = False
-	pixmap = LettersGrey.png
+	pixmap = LettersBlue.png
 	}
 }
 
 skin.SliderCtlBright {
 	coords {
-	  x = 140
-	  y = 19
+	  x = 144
+	  y = 68
 	}
-	pixmap = CtlSliderBg.png
+	pixmap = SliderVBg.png
 	slider {
-	  pixmap = CtlSliderPad.png
+	  pixmap = SliderVPad.png
 	  type = vertical
 	}
 }
 
 skin.CtlBrightLbl {
 	coords {
-	  x = 148
-	  y = 82
+	  x = 163
+	  y = 190
 	}
 
 	label {
 	  length = 3
 	  animation = False
-	pixmap = LettersGrey.png
+	pixmap = LettersBlue.png
 	}
 }
 
 skin.SliderCtlCont {
 	coords {
-	  x = 162
-	  y = 19
+	  x = 207
+	  y = 68
 	}
-	pixmap = CtlSliderBg.png
+	pixmap = SliderVBg.png
 	slider {
-	  pixmap = CtlSliderPad.png
+	  pixmap = SliderVPad.png
 	  type = vertical
 	}
 }
 
 skin.CtlContLbl {
 	coords {
-	  x = 171
-	  y = 82
+	  x = 226
+	  y = 190
 	}
 	label {
 	  length = 3
 	  animation = False
-	pixmap = LettersGrey.png
+	pixmap = LettersBlue.png
 	}
 }
 
 skin.CtlSave {
 	coords {
-	  x = 13
-	  y = 214
+	  x = 270
+	  y = 162
 	}
-	pixmap = CtlSave.png
+	pixmap = PlDismiss.png
 	label {
-	  color = #9fa4ad
-	  color_focus = #081e2f
-	  color_click = #081e2f
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
 
 skin.CtlSkLbl {
 	coords {
-	  x = 288
-	  y = 109
+	  x = 290
+	  y = 172
 	}
 	label {
-	  length = 13
+	  length = 16
 	  animation = True
-	pixmap = LettersMiddle.png
+	pixmap = LettersBlue.png
 	}
 }
 
 skin.CtlSkUp {
 	coords {
-	  x = 339
-	  y = 19
+	  x = 270
+	  y = 51
 	}
-	pixmap = SkArrowUp.png
+	pixmap = BigArrowUp.png
 }
 
 skin.SliderCtlSk {
 	coords {
-	  x = 339
-	  y = 30
+	  x = 270
+	  y = 68
 	}
-	pixmap = SkSlidBG.png
+	pixmap = SliderVBg.png
 	slider {
-	  pixmap = SkSlidPad.png
+	  pixmap = SliderVPad.png
 	  type = vertical
 	}
 }
 
 skin.CtlSkDn {
 	coords {
-	  x = 339
-	  y = 63
+	  x = 270
+	  y = 171
 	}
-	pixmap = SkArrowDown.png
+	pixmap = BigArrowDown.png
 }
 
 skin.CtlSkItemBtn {
 	coords {
-	  x = 260
-	  y = 19
+	  x = 288
+	  y = 50
 	}
-	pixmap = SkItemBtn.png
+	pixmap = CtlItemBtn.png
 	browser {
-	  entries = 5
+	  entries = 7
 	}
 	label {
 	  color = #adc9ff
@@ -642,14 +642,14 @@ skin.CtlSkItemBtn {
 
 skin.CtlDismiss {
 	coords {
-	  x = 23
-	  y = 11
+	  x = 331
+	  y = 162
 	}
-	pixmap = CtlDismiss.png
+	pixmap = PlDismiss.png
 	label {
-	  color = #a0967a
-	  color_focus = #a0967a
-	  color_click = #a0967a
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-helvetica-*-r-*-12-*-*-*-*-*-*-*
 	}
 }
@@ -670,7 +670,7 @@ skin.MrlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	browser {
-	  entries = 5
+	  entries = 7
 	}
 	label {
 	  align = left
@@ -684,7 +684,7 @@ skin.MrlItemBtn {
 skin.MrlSelect {
 	coords {
 	  x = 79
-	  y = 134
+	  y = 162
 	}
 	pixmap = MrlSelect.png
 	label {
@@ -698,7 +698,7 @@ skin.MrlSelect {
 skin.MrlPlay {
 	coords {
 	  x = 16
-	  y = 134
+	  y = 162
 	}
 	pixmap = PlPlay.png
 }
@@ -706,7 +706,7 @@ skin.MrlPlay {
 skin.MrlDismiss {
 	coords {
 	  x = 331
-	  y = 134
+	  y = 162
 	}
 	pixmap = MrlDismiss.png
 	label {
@@ -740,7 +740,7 @@ skin.SliderMrl {
 skin.MrlDn {
 	coords {
 	  x = 333
-	  y = 136
+	  y = 171
 	}
 	pixmap = BigArrowDown.png
 }
@@ -748,12 +748,13 @@ skin.MrlDn {
 skin.MrlCurOrigin {
 	coords {
 	  x = 83
-	  y = 138
+	  y = 171
 	}
+
 	label {
 	  length = 41
 	  animation = True
-	  pixmap = LettersMiddle.png
+	pixmap = LettersMiddle.png
 	}
 }
 
@@ -785,12 +786,12 @@ skin.MrlPlugLabel {
 
 skin.MrlFilt {
 	coords {
-	  x = 176
-	  y = 162
+	  x = 150
+	  y = 189
 	}
 	pixmap = SkArrowDown.png
 	label {
-	  length = 18
+	  length = 27
 	  animation = False
 	  pixmap = LettersMiddle.png
 	}
