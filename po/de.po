@@ -540,7 +540,7 @@ msgstr "  VCD:   'vcd://<Track Nummer>'\n"
 
 #: src/xitk/main.c:377
 msgid "video driver to use"
-msgstr "Zu benutzender Video-Treiber\n"
+msgstr "Zu benutzender Video-Treiber"
 
 #: src/xitk/main.c:405
 #, c-format
@@ -558,7 +558,7 @@ msgstr "main: Video Treiber <%s> unbrauchbar\n"
 
 #: src/xitk/main.c:454
 msgid "audio driver to use"
-msgstr "Zu benutzender Audio-Treiber\n"
+msgstr "Zu benutzender Audio-Treiber"
 
 #: src/xitk/main.c:470
 msgid "main: probing audio drivers...\n"
