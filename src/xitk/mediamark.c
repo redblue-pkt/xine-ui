@@ -2649,7 +2649,7 @@ int mediamark_get_shuffle_next(void) {
       next = gGui->playlist.cur;
 
   }
-  else if(gGui->playlist.num)
+  else if(gGui->playlist.num == 2)
     next = !gGui->playlist.cur;
   
   return next;

@@ -1189,7 +1189,6 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    * init playlist
    */
   for (i = 0; i < nfiles; i++) {
-    char *sub = NULL;
     char *file = atoa(filenames[i]);
 
     /* grab recursively all files from dir */
@@ -1201,16 +1200,23 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
       mediamark_collect_from_directory(file);
     }
     else {
-      if((sub = (char *)get_last_double_semicolon(file)) != NULL) {
-	if(is_ipv6_last_double_semicolon(file))
-	  sub = NULL;
-	else {
-	  *sub = 0;
-	  sub += 2;
+
+      if(mrl_look_like_playlist(file))
+	(void) mediamark_concat_mediamarks(file);
+      else {
+	char *sub = NULL;
+
+	if((sub = (char *)get_last_double_semicolon(file)) != NULL) {
+	  if(is_ipv6_last_double_semicolon(file))
+	    sub = NULL;
+	  else {
+	    *sub = 0;
+	    sub += 2;
+	  }
 	}
+	
+	mediamark_append_entry((const char *)file, (const char *)file, sub, 0, -1, 0, 0);
       }
-      
-      mediamark_append_entry((const char *)file, (const char *)file, sub, 0, -1, 0, 0);
     }
   }
   
