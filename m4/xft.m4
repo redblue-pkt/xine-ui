@@ -25,7 +25,14 @@ AC_DEFUN(AM_PATH_XFT2,
 [
 
   if test "x$PKG_CONFIG" = "xno" ; then
-    ifelse([$2], , :, [$2])
+    AC_PATH_PROG(XFT_CONFIG, xft-config, no)
+    if test "x$XFT_CONFIG" = "xno" ; then
+      ifelse([$2], , :, [$2])
+    else
+      XFT_CFLAGS=`$XFT_CONFIG --cflags`
+      XFT_LIBS=`$XFT_CONFIG --libs`
+      ifelse([$1], , :, [$1])
+    fi
   else
     XFT_CFLAGS=`$PKG_CONFIG --cflags xft`
     XFT_LIBS=`$PKG_CONFIG --libs xft`
