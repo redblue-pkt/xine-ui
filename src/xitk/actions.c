@@ -213,7 +213,15 @@ void gui_exit (xitk_widget_t *w, void *data) {
 void gui_play (xitk_widget_t *w, void *data) {
 
   video_window_reset_ssaver();
-
+  
+  if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
+    if(gGui->logo_mode != 0) {
+      gGui->ignore_next = 1;
+      xine_stop(gGui->stream);
+      gGui->ignore_next = 0; 
+    }
+  }
+  
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
 
     if (!strncmp(gGui->filename, "xine-ui version", 15)) {

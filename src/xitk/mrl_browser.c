@@ -173,10 +173,9 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
 
 xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   xitk_mrlbrowser_filter_t **filters = NULL;
-  xine_cfg_entry_t          entry;
-  int                       cfg_err_result;
   int                        num_endings = 0;
-  memset(&entry, 0, sizeof(xine_cfg_entry_t)); /* Make sure those pointers are NULL */
+  char                      *mrl_exts;
+  
   filters                      = (xitk_mrlbrowser_filter_t **) 
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
   filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
@@ -184,54 +183,30 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   filters[num_endings]->name   = strdup("All");
   filters[num_endings]->ending = strdup("*");
 
-  cfg_err_result = xine_config_get_first_entry(gGui->xine, &entry);
-  while(cfg_err_result) {
-    char *point;
+  mrl_exts = xine_get_file_extensions(gGui->xine);
+  if(mrl_exts) {
+    char  patterns[2048];
+    char *e;
     
-    point = strchr(entry.key, '.');
-    
-    if(entry.type == XINE_CONFIG_TYPE_STRING && point) {
-      int len;
+    while((e = xine_strsep(&mrl_exts, " ")) != NULL) {
       
-      len = point - entry.key;
-      point++;
+      memset(&patterns, 0, sizeof(patterns));
+      strcat(patterns, "*.");
+      strcat(patterns, e);
       
-      if(!strncmp("mrl", entry.key, len)) {
-	
-	if(!strncmp("ends", point, 4)) {
-	  char *ends, *e;
-	  char patterns[2048];
-	  num_endings++;
-	  
-	  memset(&patterns, 0, sizeof(patterns));
-	  
-	  filters                      = (xitk_mrlbrowser_filter_t **) 
-	    realloc(filters, sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
-	  
-	  filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
-	    xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
-	  
-	  xine_strdupa(ends, entry.str_value);
+      num_endings++;
+      
+      filters                      = (xitk_mrlbrowser_filter_t **) 
+	realloc(filters, sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
+      
+      filters[num_endings]         = (xitk_mrlbrowser_filter_t *)
+	xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
 
-	  while((e = xine_strsep(&ends, ",")) != NULL) {
-	    while((*e == ' ') || (*e == '\t')) e++;
-	    
-	    if(strlen(patterns))
-	      strcat(patterns, ",");
-	    
-	    strcat(patterns, "*.");
-	    strcat(patterns, e);
-	  }
-	  
-	  filters[num_endings]->name   = strdup(patterns);
-	  filters[num_endings]->ending = strdup(entry.str_value);
-	}
-      }
-
-    }      
-    cfg_err_result = xine_config_get_next_entry(gGui->xine, &entry);
+      filters[num_endings]->name   = strdup(patterns);
+      filters[num_endings]->ending = strdup(e);
+    }
   }
-  
+
   filters[num_endings + 1]         = (xitk_mrlbrowser_filter_t *)
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
   filters[num_endings + 1]->name   = NULL;

@@ -45,12 +45,13 @@
 #include "xitk.h"
 	
 #define WINDOW_WIDTH        500
-#define WINDOW_HEIGHT       420
+#define WINDOW_HEIGHT       460
 
 extern gGui_t          *gGui;
 
 static char            *sinfosfontname     = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 static char            *lfontname          = "-*-helvetica-bold-r-*-*-11-*-*-*-*-*-*-*";
+static char            *btnfontname        = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*";
 
 typedef struct {
   xitk_window_t        *xwin;
@@ -59,7 +60,7 @@ typedef struct {
 
   xitk_widget_t        *close;
 
-  struct {                       /* labels */
+  struct {
     xitk_widget_t      *title;
     xitk_widget_t      *comment;
     xitk_widget_t      *artist;
@@ -73,30 +74,29 @@ typedef struct {
   } meta_infos;
 
   struct {
-    xitk_widget_t      *bitrate;  /* label */
-    xitk_widget_t      *seekable; /* checkbox */
-    xitk_widget_t      *video_width; /* label */
-    xitk_widget_t      *video_height; /* label */
-
-    xitk_widget_t      *video_ratio; /* label */
-    xitk_widget_t      *video_channels; /* label */
-    xitk_widget_t      *video_streams; /* label */
-    xitk_widget_t      *video_bitrate; /* label */
-
-    xitk_widget_t      *video_fourcc; /* label */
-    xitk_widget_t      *video_handled; /* checkbox */
-    xitk_widget_t      *frame_duration; /* label */
-    xitk_widget_t      *audio_channels; /* label */
-
-    xitk_widget_t      *audio_bits; /* label */
-    xitk_widget_t      *audio_samplerate; /* label */
-    xitk_widget_t      *audio_bitrate; /* label */
-    xitk_widget_t      *audio_fourcc; /* label */
-
-    xitk_widget_t      *audio_handled; /* checkbox */
-    xitk_widget_t      *has_chapters; /* checkbox */
-    xitk_widget_t      *has_video; /* checkbox */
-    xitk_widget_t      *has_audio; /* checkbox */
+    xitk_widget_t      *bitrate;
+    xitk_widget_t      *seekable;
+    xitk_widget_t      *video_width;
+    xitk_widget_t      *video_height;
+    xitk_widget_t      *video_ratio;
+    xitk_widget_t      *video_channels;
+    xitk_widget_t      *video_streams;
+    xitk_widget_t      *video_bitrate;
+    xitk_widget_t      *video_fourcc;
+    xitk_widget_t      *video_handled;
+    xitk_widget_t      *frame_duration;
+    xitk_widget_t      *audio_channels;
+    xitk_widget_t      *audio_bits;
+    xitk_widget_t      *audio_samplerate;
+    xitk_widget_t      *audio_bitrate;
+    xitk_widget_t      *audio_fourcc;
+    xitk_widget_t      *audio_handled;
+    xitk_widget_t      *has_chapters;
+    xitk_widget_t      *has_video;
+    xitk_widget_t      *has_audio;
+    xitk_widget_t      *ignore_video;
+    xitk_widget_t      *ignore_audio;
+    xitk_widget_t      *ignore_spu;
   } infos;
 
   int                   running;
@@ -111,6 +111,16 @@ static char *get_yesno_string(uint32_t val) {
   static char *yesno[] =  { "No", "Yes" };
 
   return ((val > 0) ? yesno[1] : yesno[0]);
+}
+
+static char *get_fourcc_string(uint32_t fourcc) {
+  static char fourcc_txt[10];
+  
+  memset(&fourcc_txt, 0, sizeof(fourcc_txt));
+  *(uint32_t *)fourcc_txt = fourcc;
+  fourcc_txt[4] = '\0';
+  
+  return &fourcc_txt[0];
 }
 
 void stream_infos_exit(xitk_widget_t *w, void *data) {
@@ -249,6 +259,9 @@ static void stream_info_update_undefined(void) {
   xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_chapters, "---");
   xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_video, "---");
   xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_audio, "---");
+  xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_video, "---");
+  xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_audio, "---");
+  xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_spu, "---");
 }
 
 void stream_infos_update_infos(void) {
@@ -329,9 +342,7 @@ void stream_infos_update_infos(void) {
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_bitrate, buffer);
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_FOURCC);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_fourcc, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_fourcc, (get_fourcc_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HANDLED);
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.video_handled, (get_yesno_string(iinfo)));;
@@ -362,9 +373,7 @@ void stream_infos_update_infos(void) {
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_bitrate, buffer);
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_FOURCC);
-      memset(&buffer, 0, sizeof(buffer));
-      snprintf(buffer, 1023, "%d", iinfo);
-      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_fourcc, buffer);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_fourcc, (get_fourcc_string(iinfo)));
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_AUDIO_HANDLED);
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.audio_handled, (get_yesno_string(iinfo)));
@@ -377,6 +386,15 @@ void stream_infos_update_infos(void) {
 
       iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_HAS_AUDIO);
       xitk_label_change_label(sinfos->widget_list, sinfos->infos.has_audio, (get_yesno_string(iinfo)));
+
+      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_IGNORE_VIDEO);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_video, (get_yesno_string(iinfo)));
+
+      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_IGNORE_AUDIO);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_audio, (get_yesno_string(iinfo)));
+
+      iinfo = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_IGNORE_SPU);
+      xitk_label_change_label(sinfos->widget_list, sinfos->infos.ignore_spu, (get_yesno_string(iinfo)));
     }
   }
 }
@@ -391,7 +409,7 @@ void stream_infos_panel(void) {
   xitk_label_widget_t         lbl;
   xitk_checkbox_widget_t      cb;
   xitk_pixmap_t              *bg;
-  int                         x, y, i, w, width, height;
+  int                         x, y, w, width, height;
 
   /* this shouldn't happen */
   if(sinfos != NULL) {
@@ -819,7 +837,46 @@ void stream_infos_panel(void) {
 			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
 						     x + (w * 3) + 45, y, w, 20, sinfosfontname)));
 
-  ////
+  y += 35;
+  w = (WINDOW_WIDTH - 60 - 1) / 3;
+  draw_outter_frame(gGui->imlib_data, bg, _("Ignore Video: "), lfontname, 
+		    x - 5, y - 2, w + 10, 20 + 15);
+  lbl.window            = xitk_window_get_window(sinfos->xwin);
+  lbl.gc                = sinfos->widget_list->gc;
+  lbl.skin_element_name = NULL;
+  lbl.label             = "";
+  lbl.callback          = NULL;
+  xitk_list_append_content(sinfos->widget_list->l, 
+			   (sinfos->infos.ignore_video = 
+			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
+						     x, y, w, 20, sinfosfontname)));
+  
+  draw_outter_frame(gGui->imlib_data, bg, _("Ignore Audio: "), lfontname, 
+		    (x + w + 15 + 1) - 5, y - 2, w + 10, 20 + 15);
+  lbl.window            = xitk_window_get_window(sinfos->xwin);
+  lbl.gc                = sinfos->widget_list->gc;
+  lbl.skin_element_name = NULL;
+  lbl.label             = "";
+  lbl.callback          = NULL;
+  xitk_list_append_content(sinfos->widget_list->l, 
+			   (sinfos->infos.ignore_audio = 
+			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
+						     x + w + 15, y, w, 20, sinfosfontname)));
+  
+  draw_outter_frame(gGui->imlib_data, bg, _("Ignore Spu: "), lfontname, 
+		    (x + (w * 2) + 30 + 2) - 5, y - 2, w + 10, 20 + 15);
+  lbl.window            = xitk_window_get_window(sinfos->xwin);
+  lbl.gc                = sinfos->widget_list->gc;
+  lbl.skin_element_name = NULL;
+  lbl.label             = "";
+  lbl.callback          = NULL;
+  xitk_list_append_content(sinfos->widget_list->l, 
+			   (sinfos->infos.ignore_spu = 
+			    xitk_noskin_label_create(sinfos->widget_list, &lbl,
+						     x + (w * 2) + 30, y, w, 20, sinfosfontname)));
+
+
+  /*  */
   y = WINDOW_HEIGHT - (23 + 15);
   x = 15;
 
@@ -833,7 +890,7 @@ void stream_infos_panel(void) {
   xitk_list_append_content(sinfos->widget_list->l, 
 	   xitk_noskin_labelbutton_create(sinfos->widget_list, 
 					  &lb, x, y, 100, 23,
-					  "Black", "Black", "White", lfontname));
+					  "Black", "Black", "White", btnfontname));
   x = WINDOW_WIDTH - 115;
 
   lb.button_type       = CLICK_BUTTON;
@@ -846,7 +903,7 @@ void stream_infos_panel(void) {
   xitk_list_append_content(sinfos->widget_list->l, 
 	   xitk_noskin_labelbutton_create(sinfos->widget_list, 
 					  &lb, x, y, 100, 23,
-					  "Black", "Black", "White", lfontname));
+					  "Black", "Black", "White", btnfontname));
   
   xitk_window_change_background(gGui->imlib_data, sinfos->xwin, bg->pixmap, width, height);
   xitk_image_destroy_xitk_pixmap(bg);
