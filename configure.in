@@ -111,7 +111,7 @@ AC_SUBST(DEBUG_CFLAGS)
 dnl
 dnl Check for xine-lib
 dnl
-AM_PATH_XINE(0.9.9,, AC_MSG_ERROR(*** You should install xine-lib first ***))
+AM_PATH_XINE(0.9.10,, AC_MSG_ERROR(*** You should install xine-lib first ***))
 
 
 dnl
