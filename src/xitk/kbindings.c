@@ -1389,67 +1389,71 @@ static kbinding_entry_t *kbindings_lookup_binding(kbinding_t *kbt, const char *k
   return kret;
 }
 
+/* Convert X(Button|Key)(Press|Release) events into string identifier. */
+static int xevent2id(XEvent *event, int *modifier, char *buf, int size) {
+  int    mod;
+  KeySym mkey;
+  char  *keySym;
+
+  if (event == NULL)
+    return -1;
+
+  switch (event->type) {
+  case ButtonPress:
+  case ButtonRelease:
+    (void) xitk_get_key_modifier(event, &mod);
+    kbindings_convert_modifier(mod, modifier);
+    snprintf(buf, size, "XButton_%d", event->xbutton.button);
+    return 0;
+
+  case KeyPress:
+  case KeyRelease:
+    (void) xitk_get_key_modifier(event, &mod);
+    kbindings_convert_modifier(mod, modifier);
+    mkey = xitk_get_key_pressed(event);
+
+    switch (mkey) {
+      default:
+        XLockDisplay (event->xany.display);
+        keySym = XKeysymToString(mkey);
+        XUnlockDisplay (event->xany.display);
+        if (keySym != NULL) {
+          strncpy(buf, keySym, size);
+          return 0;
+        }
+      case 0: /* Key without assigned KeySymbol */
+      case XK_VoidSymbol:
+        /* For keys without assigned KeySyms. */
+        snprintf(buf, size, "XKey_%d", event->xkey.keycode);
+        return 0;
+    }
+
+  default:
+    memset(buf, 0, size);
+    return -1;
+  }
+}
+
 /*
  * Handle key event from an XEvent.
  */
 void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
+  int               modifier;
+  char              buf[256];
+  kbinding_entry_t *k;
 
   if((kbt == NULL) || (event == NULL))
     return;
 
-  switch(event->type) {
-    
-  case ButtonRelease: {
-    kbinding_entry_t    *k;
-    char                 xbutton[256];
-    int                  mod, modifier;
-
-    (void) xitk_get_key_modifier(event, &mod);
-    kbindings_convert_modifier(mod, &modifier);
-    
-    memset(&xbutton, 0, sizeof(xbutton));
-    snprintf(xbutton, sizeof(xbutton), "XButton_%d", event->xbutton.button);
-
-#ifdef TRACE_KBINDINGS
-    printf("ButtonRelease: %s, modifier: %d\n", xbutton, modifier);
-#endif    
-
-    k = kbindings_lookup_binding(kbt, xbutton, modifier);
-
-    if(k && !(gGui->no_gui && k->is_gui))
-      gui_execute_action_id(k->action_id);
+  if (xevent2id(event, &modifier, buf, sizeof(buf)))
+    return;
+  k = kbindings_lookup_binding(kbt, buf, modifier);
+  if(k && !(gGui->no_gui && k->is_gui))
+    gui_execute_action_id(k->action_id);
 #if 0  /* DEBUG */
-    else
-      printf("%s unhandled\n", kbuf);
-#endif    
-  }
-  break;
-
-  case KeyPress: {
-    KeySym               mkey;
-    int                  mod, modifier;
-    kbinding_entry_t    *k;
-
-    (void) xitk_get_key_modifier(event, &mod);
-    kbindings_convert_modifier(mod, &modifier);
-    mkey = xitk_get_key_pressed(event);
-
-#ifdef TRACE_KBINDINGS
-    printf("KeyPress: %s, modifier: %d\n", (XKeysymToString(mkey)), modifier);
-#endif    
-    k = kbindings_lookup_binding(kbt, XKeysymToString(mkey), modifier);
-    XUnlockDisplay (gGui->display);
-  
-    if(k && !(gGui->no_gui && k->is_gui))
-      gui_execute_action_id(k->action_id);
-#if 0  /* DEBUG */
-    else
-      printf("%s unhandled\n", kbuf);
+  else
+    printf("%s unhandled\n", kbuf);
 #endif
-    
-  }
-  break;
-  }
 }
 
 /*
@@ -1934,27 +1938,12 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 
   kbe->modifier = modifier;
   
-  if(xev.type == KeyRelease) {  
-    XKeyEvent mykeyevent;
-    KeySym    mykey;
-    char      kbuf[256];
-    int       len;
-    
-    mykeyevent = xev.xkey;
-   
-    XLockDisplay (gGui->display);
-    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    kbe->key = strdup((XKeysymToString(mykey)));
-    XUnlockDisplay (gGui->display);
 
-  }
-  else if(xev.type == ButtonRelease) {
-    char  xbutton[256];
-    
-    memset(&xbutton, 0, sizeof(xbutton));
-    snprintf(xbutton, sizeof(xbutton), "XButton_%d", xev.xbutton.button);
-    kbe->key = strdup(xbutton);
-    kbe->modifier &= 0xFFFFFFEF;
+  {
+    char buf[256];
+    xevent2id(&xev, &kbe->modifier, buf, sizeof(buf));
+    kbe->key = strdup(buf);
+    kbe->modifier &= ~MODIFIER_NUML;
   }
   
   xitk_labelbutton_change_label(kbedit->grab, olbl);
