@@ -177,6 +177,9 @@
     plugin's point of view - at least none I'm aware of yet.  Working on
     it... (yeah that's what everyone says *grin*)
 
+  + support for anything besides 3 plane YUV420  format  is  broken  and
+    disabled at the moment
+
   + those you may report will be known soon too. :-)
 
 
