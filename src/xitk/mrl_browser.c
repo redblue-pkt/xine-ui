@@ -41,8 +41,18 @@
 
 #define MAX_LIST 9
 
-extern gGui_t       *gGui;
+extern gGui_t            *gGui;
 static xitk_widget_t     *mrlb = NULL;
+
+/*
+ *
+ */
+void mrl_browser_show_tips(int enabled, unsigned long timeout) {
+  
+  if(mrlb)
+    xitk_mrlbrowser_set_tips_timeout(mrlb, enabled, timeout);
+
+}
 
 /*
  *

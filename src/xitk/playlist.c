@@ -76,6 +76,19 @@ void playlist_handle_event(XEvent *event, void *data);
 /*
  *
  */
+void playlist_show_tips(int enabled, unsigned long timeout) {
+  
+  if(playlist) {
+    if(enabled)
+      xitk_set_widgets_tips_timeout(playlist->widget_list, timeout);
+    else
+      xitk_disable_widgets_tips(playlist->widget_list);
+  }
+}
+
+/*
+ *
+ */
 void pl_update_playlist(void) {
 
   if(playlist)
@@ -649,11 +662,12 @@ void playlist_editor(void) {
   Atom                       prop, XA_WIN_LAYER;
   MWMHints                   mwmhints;
   XClassHint                *xclasshint;
-  xitk_browser_widget_t       br;
-  xitk_labelbutton_widget_t   lb;
-  xitk_label_widget_t         lbl;
-  xitk_inputtext_widget_t     inp;
-  xitk_button_widget_t        b;
+  xitk_browser_widget_t      br;
+  xitk_labelbutton_widget_t  lb;
+  xitk_label_widget_t        lbl;
+  xitk_inputtext_widget_t    inp;
+  xitk_button_widget_t       b;
+  xitk_widget_t             *w;
   long data[1];
 
   /* This shouldn't be happend */
@@ -782,31 +796,37 @@ void playlist_editor(void) {
   b.callback          = pl_move_updown;
   b.userdata          = (void *)MOVEUP;
   xitk_list_append_content (playlist->widget_list->l, 
-			    xitk_button_create (gGui->skin_config, &b));
+			    (w = xitk_button_create (gGui->skin_config, &b)));
+  xitk_set_widget_tips(w, _("Move up selected MRL"));
+
 
   b.skin_element_name = "PlMoveDn";
   b.callback          = pl_move_updown;
   b.userdata          = (void *)MOVEDN;
   xitk_list_append_content (playlist->widget_list->l, 
-			   xitk_button_create (gGui->skin_config, &b));
+			    (w = xitk_button_create (gGui->skin_config, &b)));
+  xitk_set_widget_tips(w, _("Move down selected MRL"));
 
   b.skin_element_name = "PlPlay";
   b.callback          = pl_play;
   b.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-			   xitk_button_create (gGui->skin_config, &b));
-
+			    (w = xitk_button_create (gGui->skin_config, &b)));
+  xitk_set_widget_tips(w, _("Start playback of selected MRL"));
+  
   b.skin_element_name = "PlDelete";
   b.callback          = pl_delete;
   b.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-			   xitk_button_create (gGui->skin_config, &b));
+			    (w = xitk_button_create (gGui->skin_config, &b)));
+  xitk_set_widget_tips(w, _("Delete selected MRL from playlist"));
 
   b.skin_element_name = "PlDeleteAll";
   b.callback          = pl_delete_all;
   b.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-			   xitk_button_create (gGui->skin_config, &b));
+			    (w = xitk_button_create (gGui->skin_config, &b)));
+  xitk_set_widget_tips(w, _("Delete all entries in playlist"));
 
   lb.skin_element_name = "PlAdd";
   lb.button_type       = CLICK_BUTTON;
@@ -815,7 +835,9 @@ void playlist_editor(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-                           xitk_labelbutton_create (gGui->skin_config, &lb));
+			    (w = xitk_labelbutton_create (gGui->skin_config, &lb)));
+  xitk_set_widget_tips(w, _("Add one or more entries in playlist"));
+    
 
   lb.skin_element_name = "PlLoad";
   lb.button_type       = CLICK_BUTTON;
@@ -824,7 +846,8 @@ void playlist_editor(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-			   xitk_labelbutton_create (gGui->skin_config, &lb));
+			    (w = xitk_labelbutton_create (gGui->skin_config, &lb)));
+  xitk_set_widget_tips(w, _("Load saved playlist"));
 
   lb.skin_element_name = "PlSave";
   lb.button_type       = CLICK_BUTTON;
@@ -833,7 +856,8 @@ void playlist_editor(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-			   xitk_labelbutton_create (gGui->skin_config, &lb));
+			    (w = xitk_labelbutton_create (gGui->skin_config, &lb)));
+  xitk_set_widget_tips(w, _("Save playlist"));
 
   lb.skin_element_name = "PlDismiss";
   lb.button_type       = CLICK_BUTTON;
@@ -842,7 +866,8 @@ void playlist_editor(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l, 
-			   xitk_labelbutton_create (gGui->skin_config, &lb));
+			    (w = xitk_labelbutton_create (gGui->skin_config, &lb)));
+  xitk_set_widget_tips(w, _("Close playlist window"));
 
   br.arrow_up.skin_element_name    = "PlUp";
   br.slider.skin_element_name      = "SliderPl";
@@ -871,6 +896,7 @@ void playlist_editor(void) {
   inp.userdata          = NULL;
   xitk_list_append_content (playlist->widget_list->l,
 			   (playlist->winput = xitk_inputtext_create (gGui->skin_config, &inp)));
+  xitk_set_widget_tips(playlist->winput, _("Direct MRL entry"));
 
   {
     int x, y;
@@ -891,9 +917,11 @@ void playlist_editor(void) {
       xitk_list_append_content (playlist->widget_list->l,
 	       (playlist->autoplay_plugins[i] = 
 		xitk_labelbutton_create (gGui->skin_config, &lb)));
-
+      xitk_set_widget_tips(playlist->autoplay_plugins[i], 
+			   xine_get_input_plugin_description(gGui->xine, autoplay_plugins[i]));
+      
       (void) xitk_set_widget_pos(playlist->autoplay_plugins[i], x, y);
-
+      
       y += xitk_get_widget_height(playlist->autoplay_plugins[i]) + 1;
       i++;
     }

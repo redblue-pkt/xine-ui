@@ -33,5 +33,6 @@ void pl_toggle_visibility(xitk_widget_t *, void *);
 void pl_raise_window(void);
 void pl_scan_input(xitk_widget_t *, void *);
 void pl_update_playlist(void);
+void playlist_show_tips(int enabled, unsigned long timeout);
 
 #endif

@@ -88,6 +88,7 @@ void xitk_mrlbrowser_show(xitk_widget_t *w);
 void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window);
 void xitk_mrlbrowser_destroy(xitk_widget_t *w);
 int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
+void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned long timeout);
 
 #endif
 

@@ -189,7 +189,7 @@ typedef struct xitk_widget_s {
   widget_get_skin_t               get_skin;
 
   pthread_t                       tips_thread;
-  int                             tips_timeout;
+  unsigned long                   tips_timeout;
   char                           *tips_string;
 
   void                           *private_data;
@@ -1197,6 +1197,11 @@ int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
  *
  */
 Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w);
+
+/**
+ *
+ */
+void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned long timeout);
 
 #endif
 

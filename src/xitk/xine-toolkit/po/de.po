@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-01-24 00:03+0100\n"
+"POT-Creation-Date: 2002-01-28 04:58+0100\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: FULL NAME <siggi at users dot sf dot net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,7 +52,8 @@ msgstr "!Bumm!"
 msgid ""
 "New entries selected in combo box is:\n"
 "%s [%d]."
-msgstr "Der neu gewählte Eintrag der Combobox ist:\n"
+msgstr ""
+"Der neu gewählte Eintrag der Combobox ist:\n"
 "%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:728
@@ -86,3 +87,15 @@ msgstr "Nein"
 #: src/xitk/xine-toolkit/window.c:975
 msgid "Cancel"
 msgstr "Abbrechen"
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:905
+msgid "Select current entry"
+msgstr ""
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:912
+msgid "Play selected entry"
+msgstr ""
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:922
+msgid "Close MRL browser window"
+msgstr ""

@@ -73,6 +73,19 @@ typedef struct {
 static _control_t    *control = NULL;
 
 /*
+ *
+ */
+void control_show_tips(int enabled, unsigned long timeout) {
+  
+  if(control) {
+    if(enabled)
+      xitk_set_widgets_tips_timeout(control->widget_list, timeout);
+    else
+      xitk_disable_widgets_tips(control->widget_list);
+  }
+}
+
+/*
  * Get current property 'prop' value from vo_driver.
  */
 static int get_current_prop(int prop) {
@@ -377,6 +390,7 @@ void control_panel(void) {
   xitk_label_widget_t        lbl;
   xitk_slider_widget_t       sl;
   xitk_combo_widget_t        cmb;
+  xitk_widget_t             *w;
   long                       data[1];
 
   /* This shouldn't be happend */
@@ -520,7 +534,8 @@ void control_panel(void) {
     xitk_list_append_content(control->widget_list->l,
 			    (control->hue = xitk_slider_create(gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->hue, cur);
-
+    xitk_set_widget_tips(control->hue, _("Control HUE value"));
+  
     lbl.skin_element_name = "CtlHueLbl";
     lbl.label             = _("Hue");
     xitk_list_append_content(control->widget_list->l,
@@ -543,6 +558,7 @@ void control_panel(void) {
     xitk_list_append_content(control->widget_list->l,
 	      (control->sat = xitk_slider_create(gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->sat, cur);
+    xitk_set_widget_tips(control->sat, _("Control SATURATION value"));
 
     lbl.skin_element_name = "CtlSatLbl";
     lbl.label             = _("Sat");
@@ -566,6 +582,7 @@ void control_panel(void) {
     xitk_list_append_content(control->widget_list->l,
 	    (control->bright = xitk_slider_create(gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->bright, cur);
+    xitk_set_widget_tips(control->bright, _("Control BRIGHTNESS value"));
 
     lbl.skin_element_name = "CtlBrightLbl";
     lbl.label             = _("Brt");
@@ -589,6 +606,7 @@ void control_panel(void) {
     xitk_list_append_content(control->widget_list->l,
 	      (control->contr = xitk_slider_create(gGui->skin_config, &sl)));
     xitk_slider_set_pos(control->widget_list, control->contr, cur);
+    xitk_set_widget_tips(control->contr, _("Control CONTRAST value"));
 
     lbl.skin_element_name = "CtlContLbl";
     lbl.label             = _("Ctr");
@@ -669,7 +687,8 @@ void control_panel(void) {
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   xitk_list_append_content (control->widget_list->l, 
-			  xitk_labelbutton_create (gGui->skin_config, &lb));
+			    (w = xitk_labelbutton_create (gGui->skin_config, &lb)));
+  xitk_set_widget_tips(w, _("Close control window"));
 
   XMapRaised(gGui->display, control->window); 
 

@@ -63,6 +63,10 @@ void panel_show_tips(void) {
     xitk_set_widgets_tips_timeout(panel->widget_list, panel->tips.timeout);
   else
     xitk_disable_widgets_tips(panel->widget_list);
+
+  playlist_show_tips(panel->tips.enable, panel->tips.timeout);
+  control_show_tips(panel->tips.enable, panel->tips.timeout);
+  mrl_browser_show_tips(panel->tips.enable, panel->tips.timeout);
 }
 
 /*
@@ -795,6 +799,7 @@ void panel_init (void) {
   sl.motion_userdata   = NULL;
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->slider_play = xitk_slider_create(gGui->skin_config, &sl)));
+  xitk_set_widget_tips(panel->slider_play, _("Stream playback position slider"));
 
   /* Mixer volume slider */
   sl.skin_element_name = "SliderVol";

@@ -290,6 +290,22 @@ static void mrlbrowser_dumpmrl(xitk_widget_t *w, void *data) {
  *****************************************************************************/
 
 /*
+ * Enable/Disable tips.
+ */
+void xitk_mrlbrowser_set_tips_timeout(xitk_widget_t *w, int enabled, unsigned long timeout) {
+  mrlbrowser_private_data_t *private_data;
+  
+  if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
+    private_data = (mrlbrowser_private_data_t *)w->private_data;
+    
+    if(enabled)
+      xitk_set_widgets_tips_timeout(private_data->widget_list, timeout);
+    else
+      xitk_disable_widgets_tips(private_data->widget_list);
+  }
+}
+
+/*
  * Return window id of widget.
  */
 Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w) {
@@ -734,6 +750,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   xitk_labelbutton_widget_t   lb;
   xitk_button_widget_t        pb;
   xitk_label_widget_t         lbl;
+  xitk_widget_t              *w;
   long                        data[1];
   
   XITK_CHECK_CONSTITENCY(mb);
@@ -884,13 +901,15 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   lb.userdata          = (void *)private_data;
   lb.skin_element_name = mb->select.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
-			  xitk_labelbutton_create (skonfig, &lb));
-
+			   (w = xitk_labelbutton_create (skonfig, &lb)));
+  xitk_set_widget_tips(w, _("Select current entry"));
+  
   pb.skin_element_name = mb->play.skin_element_name;
   pb.callback          = mrlbrowser_play;
   pb.userdata          = (void *)private_data;
   xitk_list_append_content(private_data->widget_list->l,
-			  xitk_button_create (skonfig, &pb));
+			   (w = xitk_button_create (skonfig, &pb)));
+  xitk_set_widget_tips(w, _("Play selected entry"));
 
   lb.button_type       = CLICK_BUTTON;
   lb.label             = mb->dismiss.caption;
@@ -899,7 +918,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   lb.userdata          = (void *)mywidget;
   lb.skin_element_name = mb->dismiss.skin_element_name;
   xitk_list_append_content(private_data->widget_list->l,
-			  xitk_labelbutton_create (skonfig, &lb));
+			   (w = xitk_labelbutton_create (skonfig, &lb)));
+  xitk_set_widget_tips(w, _("Close MRL browser window"));
   
   private_data->add_callback      = mb->select.callback;
   private_data->play_callback     = mb->play.callback;
@@ -954,8 +974,10 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
       lb.userdata       = (void *)private_data;
       lb.skin_element_name = mb->ip_name.button.skin_element_name;
       xitk_list_append_content(private_data->widget_list->l,
-			      (private_data->autodir_plugins[i] = xitk_labelbutton_create (skonfig, &lb)));
-
+			       (private_data->autodir_plugins[i] = xitk_labelbutton_create (skonfig, &lb)));
+      xitk_set_widget_tips(private_data->autodir_plugins[i], 
+			   xine_get_input_plugin_description(mb->xine, mb->ip_availables[i]));
+      
       (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
 
       y += xitk_get_widget_height(private_data->autodir_plugins[i]) + 1;

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.4\n"
-"POT-Creation-Date: 2002-01-24 00:03+0100\n"
+"POT-Creation-Date: 2002-01-28 04:58+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -87,3 +87,15 @@ msgstr "Non"
 #: src/xitk/xine-toolkit/window.c:975
 msgid "Cancel"
 msgstr "Abandon"
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:905
+msgid "Select current entry"
+msgstr "Sélectionne l'entrée courante"
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:912
+msgid "Play selected entry"
+msgstr "Joue l'entrée sélectionnée"
+
+#: src/xitk/xine-toolkit/mrlbrowser.c:922
+msgid "Close MRL browser window"
+msgstr "Ferme la fenêtre du brouteur de MRL"
