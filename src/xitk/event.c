@@ -910,8 +910,16 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   /*
    * init playlist
    */
-  for (i = 0; i < nfiles; i++)
-    mediamark_add_entry((const char *)filenames[i], (const char *)filenames[i], NULL, 0, -1);
+  for (i = 0; i < nfiles; i++) {
+    char *sub;
+    
+    if((sub = strstr(filenames[i], "::")) != NULL) {
+      *sub = 0;
+      sub += 2;
+    }
+    
+    mediamark_add_entry((const char *)filenames[i], (const char *)filenames[i], sub, 0, -1);
+  }
   
   if((gGui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) || 
      (gGui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS))
