@@ -1,0 +1,107 @@
+#-*- mode: shell-script;-*-
+
+# sample code for bash's "Programmable Completion":
+# provides command line / plugin name / file name competion for xine
+# (c) 2002 Siggi Langauf <siggi@users.sf.net>
+# note: this (at least the filename part) is still beta quality...
+
+#if have xine; then
+
+_xine_plugin_names() {
+    local plugindir=/usr/lib/xine/plugins
+    (cd $plugindir;
+     ls xineplug_$1_*.so | sed -e "s/^xineplug_$1_//" -e 's/\.so$//')
+}
+
+
+_xine() {
+    local cur prev file1 file2
+    
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+    prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    case "$prev" in
+      -a | --audio-channel | -u | --spu-channel)
+	# these require numeric parameters, no sane list possible, but def.=0
+	COMPREPLY=( $( compgen -W '0 1 2 3 4 5 6 7 8 9' -- "$cur" ) )
+	;;
+      -V | --video-driver)
+	COMPREPLY=( $(_xine_plugin_names vo_out |grep -- "^$cur" ) )
+	;;
+      -A | --audio-driver)
+	COMPREPLY=( $(_xine_plugin_names ao_out |grep -- "^$cur" ) )
+	;;
+      -s | --auto-scan)
+	COMPREPLY=( $(_xine_plugin_names inp |grep -- "^$cur" ) )
+	;;
+      --visual)
+        COMPREPLY=( FIXME )
+	;;
+      --keymap)
+	COMPREPLY=( $( compgen -W "default lirc remapped" -- "$cur" ) )
+	;;
+
+      *)
+	case "$cur" in
+	    -*)
+	       COMPREPLY=( $( compgen -W '--help --audio-channel \
+			   --video-driver \
+			   --audio-driver --spu-channel --auto-play \
+			   --auto-scan --fullscreen --hide-gui --hide-video \
+			   --no-lirc --visual --install --keymap --network \
+			   --root -h -a -V -A -u -p -s -f -g -H -L -n -R' \
+			   -- "$cur" ) )
+		;;
+	    stdin:*)
+		COMPREPLY=( compgen -W 'stdin://mpeg1 stdin://mpeg2' "$cur" )
+		;;
+	    fifo:*)
+		file2=$( echo "$cur"|sed -e 's/^fifo:\/\/mpeg.:\///' \
+					 -e 's/^fifo://' )
+		case "$cur" in
+		  fifo://mpeg1:/*)
+		    file1="fifo://mpeg1:/"
+		    ;;
+		  fifo://mpeg2:/*)
+		    file1="fifo://mpeg2:/"
+		    ;;
+		  *)
+		    file1="fifo:"
+		    ;;
+		esac
+		IFS=$'\n' COMPREPLY=( $(compgen -f -P "$file1" -- "$file2" \
+					|sed -e 's/ /\\ /g' ) )
+		unset IFS
+		;;
+	    *%* | file:*%*)
+		file1=$( echo "$cur" | sed -e 's/%.*$//' -e 's/^file://')
+		file2=$( echo "$cur" | sed -e 's/^.*\%//' )
+		IFS=$'\n' COMPREPLY=( $(compgen -f -P "$file1%" -- "$file2") )
+		unset IFS
+	       ;;
+	    * | file:*)
+		file1=$( echo "$cur" |sed -e 's/^file://' )
+		if eval test -f "$file1"; then
+		  file2=( "$file1"% )
+		else
+		  file2=( )
+		fi
+		IFS=$'\n' COMPREPLY=( $file2
+			    $( eval compgen -f \"$file1\" -W \
+			       "'fifo:// stdin:// dvd:// vcd:// nav://'" \
+			       -- \"$cur\" ) 
+			    $file2 $( compgen -W \
+			    'fifo:// stdin:// dvd:// vcd:// nav://' \
+			    "$cur") )
+		unset IFS
+		;;		  
+
+	esac
+    esac
+    
+}
+
+complete -o filenames -F _xine xine
+
+#fi
