@@ -493,12 +493,12 @@ static void session_update_prompt(session_t *session) {
     return;
 
   if(session->socket >= 0) {
-    snprintf(buf, 514, "%s:%s", session->host, session->port);
+    snprintf(buf, sizeof(buf), "%s:%s", session->host, session->port);
   }
   else
-    snprintf(buf, 514, "%s", "******:****");
+    snprintf(buf, sizeof(buf), "%s", "******:****");
 
-  snprintf(session->prompt, 256, "[%s]%s >", buf, PROGNAME);
+  snprintf(session->prompt, sizeof(session->prompt), "[%s]%s >", buf, PROGNAME);
 }
 
 static void session_create_commands(session_t *session) {
