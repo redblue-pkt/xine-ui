@@ -619,13 +619,8 @@ static void codec_reporting(void *user_data, int codec_type,
  * initialize codec reporting stuff.
  */
 static void init_report_codec(void) {
-  static char *warn_unhandled_codec[5];
-  
-  warn_unhandled_codec[0] = _("never");
-  warn_unhandled_codec[1] = _("video only");
-  warn_unhandled_codec[2] = _("audio only");
-  warn_unhandled_codec[3] = _("always");
-  warn_unhandled_codec[4] = NULL;
+  static char *warn_unhandled_codec[] = 
+    { "never", "video only", "audio only", "always", NULL };
   
   /*
    * Register codec reporting
