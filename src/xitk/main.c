@@ -140,7 +140,7 @@ void show_usage (void) {
   }
   printf ("\n");
   printf("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n");
-  printf("                               ");
+  printf("                               null ");
   driver_ids = xine_list_audio_output_plugins ();
   driver_id  = *driver_ids++;
   while (driver_id) {
@@ -385,7 +385,7 @@ static void load_audio_out_driver(char *audio_driver_id,
     while(driver_ids[i] != NULL && *audio_driver == NULL) {
       audio_driver_id = driver_ids[i];
 
-      printf("try to autoload '%s' audio driver: ", driver_ids[i]);
+      printf("main: trying to autoload '%s' audio driver: ", driver_ids[i]);
       
       *audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						    driver_ids[i]);
@@ -398,12 +398,18 @@ static void load_audio_out_driver(char *audio_driver_id,
     if(!strncasecmp(audio_driver_id, "NULL", strlen(audio_driver_id))) {
       /* We don't store NULL driver name, i guess it's not very useful */
       *audio_driver = NULL;
-      printf("Don't use any audio driver (requested).\n");
+      printf("main: not using any audio driver (as requested).\n");
       return;
     }
-    else
+    else {
       *audio_driver = xine_load_audio_output_plugin(gGui->config, 
 						    audio_driver_id);
+      if (!*audio_driver) {
+	printf ("main: the specified audio driver <%s> failed\n", 
+		audio_driver_id);
+	exit(1);
+      }
+    }
   }
   
   if (*audio_driver)
