@@ -14,8 +14,10 @@ skins_DATA = ComBox.png		MainBg.png	    MainPower.png	    MrlPlay.png		\
 	CtlSkinScrollBg.png	MainPlBtn.png	    MainVolumeBg.png	    PlMoveUp.png	\
 	CtlSliderBg.png		MainPlay.png	    MainVolumePad.png	    PlPlay.png		\
 	CtlSliderPad.png	MainPlayFast.png    MrlBg.png					\
-	MainAutoButton.png	MainPlaySlow.png    MrlItem.png					\
-	fatsolid.pcf.gz 	smooth.pcf.gz 	    fonts.dir \
+	MainAutoButton.png	MainPlaySlow.png    MrlItem.png		    MainNav.png         \
+	ComScrollArrowLeft.png	ComScrollArrowRight.png			    CtlSkinScrollHBg.png \
+	ComScrollHPad.png	ComScrollHBg.png    MrlSlidHBg.png                              \
+	fatsolid.pcf.gz 	smooth.pcf.gz 	    fonts.dir                                   \
 	skinconfig
 
 

@@ -7,7 +7,7 @@
 #      add load/unload command support.
 #
 skin.name           = cloudy
-skin.version        = 2
+skin.version        = 4
 skin.date           = 2002.01.09
 skin.author         = Daniel Erat <dan_erat@pobox.com>
 skin.url            = http://www.pobox.com/~dan_erat/
@@ -37,6 +37,14 @@ skin.Eject {
 	  y = 33
 	}
 	pixmap = MainEject.png
+}
+
+skin.Nav {
+	coords {
+	  x = 560
+	  y = 42
+	}
+	pixmap = MainNav.png
 }
 
 skin.Exit {
@@ -337,7 +345,7 @@ skin.PlItemBtn {
 	}
 	pixmap = PlItem.png
 	browser {
-	  entries = 9
+	  entries = 8
 	}
 	label {
 	  align = left
@@ -429,6 +437,34 @@ skin.PlDn {
 	  y = 142
 	}
 	pixmap = ComScrollArrowDown.png
+}
+
+skin.PlLeft {
+	coords {
+	  x = 15
+	  y = 139
+	}
+	pixmap = ComScrollArrowLeft.png
+}
+
+skin.SliderHPl {
+	coords {
+	  x = 27
+	  y = 140
+	}
+	pixmap = ComScrollHBg.png
+	slider {
+	  pixmap = ComScrollHPad.png
+	  type = horizontal
+	}	  
+}
+
+skin.PlRight {
+	coords {
+	  x = 250
+	  y = 139
+	}
+	pixmap = ComScrollArrowRight.png
 }
 
 skin.AutoPlayLbl {
@@ -631,6 +667,34 @@ skin.CtlSkDn {
 	pixmap = ComScrollArrowDown.png
 }
 
+skin.CtlSkLeft {
+	coords {
+	  x = 100
+	  y = 95
+	}
+	pixmap = ComScrollArrowLeft.png
+}
+
+skin.SliderHCtlSk {
+	coords {
+	  x = 112
+	  y = 96
+	}
+	pixmap = CtlSkinScrollHBg.png
+	slider {
+	  pixmap = ComScrollHPad.png
+	  type = horizontal
+	}	  
+}
+
+skin.CtlSkRight {
+	coords {
+	  x = 195
+	  y = 95
+	}
+	pixmap = ComScrollArrowRight.png
+}
+
 skin.CtlSkItemBtn {
 	coords {
 	  x = 103
@@ -638,7 +702,7 @@ skin.CtlSkItemBtn {
 	}
 	pixmap = CtlSkinItem.png
 	browser {
-	  entries = 5
+	  entries = 4
 	}
 	label {
 	  color = #000000
@@ -679,7 +743,7 @@ skin.MrlItemBtn {
 	}
 	pixmap = MrlItem.png
 	browser {
-	  entries = 9
+	  entries = 8
 	}
 	label {
 	  align = left
@@ -756,6 +820,34 @@ skin.MrlDn {
 	pixmap = ComScrollArrowDown.png
 }
 
+skin.MrlLeft {
+	coords {
+	  x = 66
+	  y = 139
+	}
+	pixmap = ComScrollArrowLeft.png
+}
+
+skin.SliderHMrl {
+	coords {
+	  x = 78
+	  y = 140
+	}
+	pixmap = MrlSlidHBg.png
+	slider {
+	  pixmap = ComScrollHPad.png
+	  type = horizontal
+	}	  
+}
+
+skin.MrlRight {
+	coords {
+	  x = 250
+	  y = 139
+	}
+	pixmap = ComScrollArrowRight.png
+}
+
 skin.MrlCurOrigin {
 	coords {
 	  x = 15
@@ -805,118 +897,4 @@ skin.MrlFilt {
 	  animation = False
 	  pixmap = ComLetters.png
 	}
-}
-
-### File Browser ##
-# FIXME: These files don't exist, but it doesn't seem that the file browser
-# is being created anywhere in the source...  More deprecated stuff?
-skin.FBBG {
-	coords {
-	  x = 0
-	  y = 0
-	}
-	pixmap = MrlBg.png
-}
-skin.FBItemBtn {
-	coords {
-	  x = 75
-	  y = 40
-	}
-	pixmap = PlItemBtn.png
-	label {
-	  align = left
-	  color = #a4aab4
-	  color_focus = #a4aab4
-	  color_click = #081e2f
-	  font = *-lucida-*-r-*-*-12-*-*-*-*-*-*-*
-	}
-}
-skin.FBHome {
-	coords {	
-	  x = 179
-	  y = 227
-	}
-	pixmap = MrlSelect.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBSelect {
-	coords {
-	  x = 257
-	  y = 227
-	}
-	pixmap = MrlSelect.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBDismiss {
-	coords {
-	  x = 400
-	  y = 227
-	}
-	pixmap = MrlDismiss.png
-	label {
-	  color = Black
-	  color_focus = Yellow
-	  color_click = White
-	}
-}
-skin.FBUp {
-	coords {
-	  x = 375
-	  y = 40
-	}
-	pixmap = SmallArrowUp.png
-}
-skin.SliderFB {
-	coords {
-	  x = 377
-	  y = 55
-	}
-	pixmap = SliderVBg.png
-	slider {
-	  pixmap = SliderVPad.png
-	  type = vertical
-	}
-}
-skin.FBDn {
-	coords {
-	  x = 375
-	  y = 178
-	}
-	pixmap = SmallArrowUp.png
-}
-skin.FBCurDirLbl {
-	coords {
-	  x = 75
-	  y = 200
-	}
-	pixmap = ComLetters.png
-}
-skin.FBCurDir {
-	coords {
-	  x = 140
-	  y = 200
-	}
-	pixmap = ComLetters.png
-}
-skin.FBSortRev {
-	coords {
-	  x = 362
-	  y = 150
-	}
-	pixmap = SmallArrowUp.png
-}
-skin.FBSortDef {
-	coords {
-	  x = 362
-	  y = 165
-	}
-	pixmap = SmallArrowDown.png
 }
