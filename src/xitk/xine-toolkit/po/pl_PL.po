@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
 "POT-Creation-Date: 2002-03-24 05:17+0100\n"
-"PO-Revision-Date: 2002-02-06 08:00+0100\n"
+"PO-Revision-Date: 2002-03-31 08:00+0100\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -36,12 +36,12 @@ msgstr "Nie mogê otworzyæ okna wy¶wietlania\n"
 
 #: src/xitk/xine-toolkit/test.c:128
 msgid "Imlib_init_with_params() failed.\n"
-msgstr "Imlib_init_with_params() zawiod³o.\n"
+msgstr "Imlib_init_with_params() zawiodlo.\n"
 
 #: src/xitk/xine-toolkit/test.c:350
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
-msgstr "Nowa warto¶æ integer to: %d. Potwierdzasz ?"
+msgstr "Nowa wartosc integer to: %d. Potwierdzasz ?"
 
 #: src/xitk/xine-toolkit/test.c:424
 msgid "My Frame"
@@ -57,7 +57,7 @@ msgstr "Ognia !!"
 
 #: src/xitk/xine-toolkit/test.c:550
 msgid "!BOOM!"
-msgstr "!BOOM!"
+msgstr "!BUM!"
 
 #: src/xitk/xine-toolkit/test.c:638
 #, c-format
@@ -65,7 +65,7 @@ msgid ""
 "New entries selected in combo box is:\n"
 "%s [%d]."
 msgstr ""
-"Nowy wybór w polu wyboru to:\n"
+"Nowy wybor w polu wyboru to:\n"
 "%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:753
@@ -78,7 +78,7 @@ msgstr "Moje Okno"
 
 #: src/xitk/xine-toolkit/test.c:787
 msgid "Quit"
-msgstr "Zakoñcz"
+msgstr "Zakoncz"
 
 #: src/xitk/xine-toolkit/window.c:743
 msgid "OK"
