@@ -443,7 +443,7 @@ static void xitk_font_unload_one(xitk_font_t *xtfs) {
  * init font cache subsystem
  */
 void xitk_font_cache_init(void) {
-
+  
   cache.n      = 0;
   cache.life   = 0;
   cache.loaded = xitk_list_new();	
@@ -451,7 +451,14 @@ void xitk_font_cache_init(void) {
   pthread_mutex_init(&cache.mutex, NULL);
   
 #ifdef WITH_XFT
-  cache.xr = xitk_recode_init("", "UTF-8");
+  {
+    char *encoding = xitk_get_system_encoding();
+
+    cache.xr = xitk_recode_init((encoding ? encoding : ""), "UTF-8");
+
+    if(encoding)
+      free(encoding);
+  }
 #else
   cache.xr = NULL;
 #endif
