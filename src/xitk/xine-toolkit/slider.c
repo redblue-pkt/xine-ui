@@ -268,7 +268,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       private_data->button_width    = private_data->paddle_skin->width / 3;
       XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->bg_skin);
       private_data->bg_skin         = xitk_image_load_image(private_data->imlibdata, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
-      
+      private_data->sType = xitk_skin_get_slider_type(skonfig, private_data->skin_element_name);
       private_data->paddle_cover_bg = 0;
       
       if(private_data->sType == XITK_HSLIDER) {
