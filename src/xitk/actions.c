@@ -241,6 +241,9 @@ void gui_toggle_fullscreen(xitk_widget_t *w, void *data) {
 
   if(viewlog_is_visible())
     viewlog_raise_window();
+
+  if(kbedit_is_visible())
+    kbedit_raise_window();
 }
 
 void gui_toggle_aspect(void) {
@@ -486,7 +489,7 @@ void gui_viewlog_show(xitk_widget_t *w, void *data) {
   if (viewlog_is_running() && !viewlog_is_visible())
     viewlog_toggle_visibility(NULL, NULL);
   else if(!viewlog_is_running())
-    viewlog_window(NULL, NULL);
+    viewlog_window();
   else
     viewlog_exit(NULL, NULL);
 }

@@ -49,7 +49,7 @@ static void _errors_display_log(xitk_widget_t *w, void *data, int state) {
   if(viewlog_is_visible())
     viewlog_raise_window();
   else
-    viewlog_window(NULL, NULL);
+    viewlog_window();
 }
 
 /*

@@ -41,6 +41,8 @@
 #include "videowin.h"
 #include "panel.h"
 #include "mrl_browser.h"
+#include "setup.h"
+#include "viewlog.h"
 #include "snapshot.h"
 #include "errors.h"
 #include "utils.h"
@@ -277,6 +279,21 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
   if(!panel->visible && mrl_browser_is_visible()) {}
   else {
     mrl_browser_toggle_visibility(NULL, NULL);
+  }
+
+  if(!panel->visible && setup_is_visible()) {}
+  else {
+    setup_toggle_visibility(NULL, NULL);
+  }
+
+  if(!panel->visible && viewlog_is_visible()) {}
+  else {
+    viewlog_toggle_visibility(NULL, NULL);
+  }
+
+  if(!panel->visible && kbedit_is_visible()) {}
+  else {
+    kbedit_toggle_visibility(NULL, NULL);
   }
 
 
