@@ -85,7 +85,7 @@ static void get_available_skins_from(char *path) {
 	     && !(strlen(pdirent->d_name) == 2 
 		  && (pdirent->d_name[0] == '.' && pdirent->d_name[1] == '.')))) {
 	skins_avail = (skins_locations_t **) 
-	  realloc(skins_avail, (skins_avail_num + 1) * sizeof(skins_locations_t*));
+	  realloc(skins_avail, (skins_avail_num + 2) * sizeof(skins_locations_t*));
 	skins_avail[skins_avail_num] = (skins_locations_t *) xmalloc(sizeof(skins_locations_t));
 	
 	skins_avail[skins_avail_num]->pathname = strdup(path);
