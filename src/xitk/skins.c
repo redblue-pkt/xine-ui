@@ -810,7 +810,7 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
 
 	download_update_preview();
       }
-      
+
       unlink(tmpfile);
     }
   }
@@ -1013,6 +1013,7 @@ void download_skin(char *url) {
   xitk_window_t        *xwin;
   xitk_pixmap_t        *bg;
   int                   x, y, w, h, width, height;
+  xitk_widget_t        *widget;
 
   w = 300;
   h = 50;
@@ -1136,6 +1137,7 @@ void download_skin(char *url) {
     xitk_browser_update_list(skdloader->browser, 
     			     (const char *const *)skdloader->entries, skdloader->num, 0);
     
+    xitk_enable_and_show_widget(skdloader->browser);
     
     draw_rectangular_inner_box(gGui->imlib_data, bg, 8, y - 2, (WINDOW_WIDTH - 20) + 5, (5 * 20) + 10 + 5);
     
@@ -1153,9 +1155,11 @@ void download_skin(char *url) {
     lb.userdata          = NULL;
     lb.skin_element_name = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(skdloader->widget_list)), 
-			     xitk_noskin_labelbutton_create(skdloader->widget_list, 
-							    &lb, x, y, 100, 23,
-							    "Black", "Black", "White", btnfontname));
+	     (widget = xitk_noskin_labelbutton_create(skdloader->widget_list, 
+						      &lb, x, y, 100, 23,
+						      "Black", "Black", "White", btnfontname)));
+    xitk_enable_and_show_widget(widget);
+
     x = WINDOW_WIDTH - 115;
     
     lb.button_type       = CLICK_BUTTON;
@@ -1166,10 +1170,11 @@ void download_skin(char *url) {
     lb.userdata          = NULL;
     lb.skin_element_name = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(skdloader->widget_list)), 
-			     xitk_noskin_labelbutton_create(skdloader->widget_list, 
-							    &lb, x, y, 100, 23,
-							    "Black", "Black", "White", btnfontname));
-
+	     (widget = xitk_noskin_labelbutton_create(skdloader->widget_list, 
+						      &lb, x, y, 100, 23,
+						      "Black", "Black", "White", btnfontname)));
+    xitk_enable_and_show_widget(widget);
+    
     skdloader->widget_key = xitk_register_event_handler("skdloader", 
 							(xitk_window_get_window(skdloader->xwin)),
 							download_skin_handle_event,
