@@ -40,7 +40,7 @@ DFBEnumerationResult enum_layers_callback( unsigned int                 id,
      if (caps & DLCAPS_ALPHACHANNEL)
           printf( "  - Supports blending based on alpha channel.\n" );
 
-     if (caps & DLCAPS_COLORKEYING)
+     if (caps & DLCAPS_SRC_COLORKEY)
           printf( "  - Supports color keying.\n" );
 
      if (caps & DLCAPS_FLICKER_FILTERING)
@@ -114,7 +114,7 @@ int init_dfb() {
 					    &provider));
   DFBCHECK (provider->GetSurfaceDescription (provider, &desc));
   DFBCHECK(dfbxine.dfb->CreateSurface(dfbxine.dfb, &desc, &(dfbxine.pointer)));
-  DFBCHECK(provider->RenderTo(provider, dfbxine.pointer));
+  DFBCHECK(provider->RenderTo(provider, dfbxine.pointer,NULL));
   provider->Release(provider);
   dfbxine.layer->SetCursorShape(dfbxine.layer, dfbxine.pointer, 1,1);
 
