@@ -377,6 +377,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ViewlogShow",            ACTID_VIEWLOG	            , "l",	  KEYMOD_META    , 0 },
   { "Key binding editor",
     "KeyBindingEditor",       ACTID_KBEDIT	            , "k",	  KEYMOD_META    , 0 },
+  { "Switch Monitor to DPMS standby mode",
+    "DPMSStandby",            ACTID_DPMSSTANDBY             , "d",        KEYMOD_NOMOD   , 0 },
   { 0,
     0,                        0,                            0,            0              , 0 }
 };

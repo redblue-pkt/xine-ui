@@ -37,6 +37,7 @@
 #include <signal.h>
 #include <limits.h>
 #include <zlib.h>
+#include <sys/wait.h>
 
 #include <xine.h>
 #include <xine/xineutils.h>
@@ -547,6 +548,15 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_KBEDIT:
     gui_kbedit_show(NULL, NULL);
+    break;
+
+  case ACTID_DPMSSTANDBY:
+    {
+      pid_t pid;
+      if ((pid = fork()) == 0)
+	execlp("xset", "xset", "dpms", "force", "standby", NULL);
+      waitpid(pid, NULL, 0);
+    }
     break;
 
   default:

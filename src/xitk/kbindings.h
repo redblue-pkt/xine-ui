@@ -109,6 +109,7 @@ typedef enum {
   ACTID_SETUP,
   ACTID_VIEWLOG,
   ACTID_KBEDIT,
+  ACTID_DPMSSTANDBY,
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 
    */
