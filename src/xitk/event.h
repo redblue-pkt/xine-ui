@@ -63,6 +63,7 @@ typedef struct {
   char                *configfile;
 
   const char          *logo_mrl;
+  int                  logo_mode;
 
   /* stuff like FULL_ON_START, QUIT_ON_STOP */
   action_id_t          actions_on_start[16];
@@ -103,7 +104,7 @@ typedef struct {
   int                  playlist_cur;
 
   int                  running;
-  int                  ignore_status;
+  int                  ignore_next;
 
 #ifdef HAVE_LIRC
   int                  lirc_enable;
@@ -172,22 +173,18 @@ int actions_on_start(action_id_t actions[], action_id_t a);
 char *gui_get_skindir(void);
 char *gui_get_configfile(void);
 
-void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attribute);
+void gui_init(int nfiles, char *filenames[], window_attributes_t *window_attribute);
 
-void gui_init_imlib (Visual *vis);
+void gui_init_imlib(Visual *vis);
 
 void gui_run (void);
 
-void gui_status_callback (int nStatus) ;
+void gui_playlist_start_next(void);
 
-void gui_dndcallback (char *filename) ;
+void gui_dndcallback(char *filename);
 
 void gui_execute_action_id(action_id_t);
 
-void gui_handle_event (XEvent *event, void *data);
-
-const char *gui_next_mrl_callback (void) ;
-
-void gui_branched_callback (void) ;
+void gui_handle_event(XEvent *event, void *data);
 
 #endif

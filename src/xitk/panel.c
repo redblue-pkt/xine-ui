@@ -293,7 +293,7 @@ static void *slider_loop(void *dummy) {
       if(panel_is_visible()) {
 	if(gGui->xine) {
 	  
-	  if(status == XINE_STATUS_PLAY) {
+	  if((status == XINE_STATUS_PLAY) && (!gGui->logo_mode)) {
 	    int pos;
 	    
 	    xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
@@ -452,11 +452,16 @@ void panel_check_pause(void) {
   
 }
 
+void panel_reset_runtime_label(void) {
+  xitk_label_change_label (panel->widget_list, panel->runtime_label, "00:00:00"); 
+}
+
 /*
  * Reset the slider of panel window (set to 0).
  */
 void panel_reset_slider (void) {
   xitk_slider_reset(panel->widget_list, panel->playback_widgets.slider_play);
+  panel_reset_runtime_label();
 }
 
 /*
@@ -990,7 +995,7 @@ void panel_init (void) {
    * Init to default, otherwise if panel is hide
    * at startup, label is empty 'till it's updated
    */
-  xitk_label_change_label (panel->widget_list, panel->runtime_label, "00:00:00"); 
+  panel_reset_runtime_label();
 
   /*  Audio channel label */
   lbl.skin_element_name = "AudioLabel";

@@ -34,7 +34,9 @@
 
 void gui_display_logo(void);
 
-int gui_open_and_start(char *mrl, int start_pos, int start_time);
+int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time);
+
+int gui_xine_open_and_play(char *mrl, int start_pos, int start_time);
 
 void gui_exit (xitk_widget_t *w, void *data);
 

@@ -38,6 +38,9 @@
 #include <limits.h>
 #include <zlib.h>
 
+#include <xine.h>
+#include <xine/xineutils.h>
+
 #include "Imlib-light/Imlib.h"
 
 #include "event.h"
@@ -47,8 +50,6 @@
 #include "videowin.h"
 #include "panel.h"
 #include "actions.h"
-#include <xine.h>
-#include <xine/xineutils.h>
 #include "mrl_browser.h"
 #include "skins.h"
 #include "errors.h"
@@ -608,59 +609,36 @@ void gui_handle_event (XEvent *event, void *data) {
 }
 
 /*
- * Callback functions called by Xine engine.
+ * Start playback to next entry in playlist (or stop the engine, then display logo).
  */
+void gui_playlist_start_next(void) {
 
-void gui_status_callback (int nStatus) {
-
-  if (gGui->ignore_status)
+  if (gGui->ignore_next)
     return;
 
-  /* printf ("gui status callback : %d\n", nStatus); */
+  gGui->playlist_cur++;
+  panel_reset_slider ();
   
-  if (nStatus == XINE_STATUS_STOP) {
-    gGui->playlist_cur++;
-    panel_reset_slider ();
-
-    if (gGui->playlist_cur < gGui->playlist_num) {
-      gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-      gui_open_and_start(gGui->filename, 0, 0);
-      
-    } 
-    else {
-      
-      if(gGui->actions_on_start[0] == ACTID_QUIT)
-	gui_exit(NULL, NULL);
-      
-      gGui->playlist_cur--;
-    }
+  if(gGui->playlist_cur < gGui->playlist_num) {
+    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+    
+    (void) gui_xine_open_and_play(gGui->filename, 0, 0);
+    
   }
-
+  else {
+    
+    if(gGui->actions_on_start[0] == ACTID_QUIT)
+      gui_exit(NULL, NULL);
+    
+    gGui->playlist_cur--;
+    gui_display_logo();
+  }
+  
   if(is_playback_widgets_enabled() && (!gGui->playlist_num) && (!gGui->filename)) {
     gui_set_current_mrl(NULL);
     enable_playback_controls(0);
-    gui_display_logo();
   }
-
-}
-
-const char *gui_next_mrl_callback (void) {
-
-  if (gGui->playlist_cur >= (gGui->playlist_num-1)) 
-    return NULL;
-
-  return gGui->playlist[gGui->playlist_cur+1];
-}
-
-void gui_branched_callback (void) {
-
-  if (gGui->playlist_cur < (gGui->playlist_num-1)) {
   
-    gGui->playlist_cur++;
-    panel_reset_slider ();
-
-    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-  }
 }
 
 static void gui_find_visual (Visual **visual_return, int *depth_return) {

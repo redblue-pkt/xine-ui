@@ -1818,23 +1818,25 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
   if(nargs) {
     if(nargs == 1) {
       if(is_arg_contain(client_info, 1, "next")) {
-	gGui->ignore_status = 1;
+	gGui->ignore_next = 1;
 	xine_stop (gGui->stream);
-	gGui->ignore_status = 0;
-	gui_status_callback (XINE_STATUS_STOP);
+	gGui->ignore_next = 0;
+	gui_playlist_start_next();
       }
       else if(is_arg_contain(client_info, 1, "prev")) {
-	gGui->ignore_status = 1;
+	gGui->ignore_next = 1;
 	xine_stop (gGui->stream);
 	gGui->playlist_cur--;
 	if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	  (void) gui_open_and_start(gGui->filename, 0, 0);
+	  (void) gui_xine_open_and_play(gGui->filename, 0, 0);
 	  
-	} else {
+	} 
+	else {
 	  gGui->playlist_cur = 0;
+	  gui_display_logo();
 	}
-	gGui->ignore_status = 0;
+	gGui->ignore_next = 0;
       }
     }
     else if(nargs >= 2) {
@@ -1851,13 +1853,15 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info) {
 	gui_dndcallback((char *)(get_arg(client_info, 2)));
 	
 	if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
-	  gGui->ignore_status = 1;
-	  xine_stop (gGui->stream);
-	  gGui->ignore_status = 0;
+	  gGui->ignore_next = 1;
+	  xine_stop(gGui->stream);
+	  gGui->ignore_next = 0;
 	}
 	gui_set_current_mrl(gGui->playlist[gGui->playlist_num - 1]);
 	if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 )))
 	  handle_xine_error(client_info);
+	else
+	  gGui->logo_mode = 0;
       }
     }
   }
@@ -1959,6 +1963,8 @@ static void do_play(commands_t *cmd, client_info_t *client_info) {
   if (xine_get_status (gGui->stream) != XINE_STATUS_PLAY) {
     if(!(xine_open(gGui->stream, gGui->filename) && xine_play (gGui->stream, 0, 0 )))
       handle_xine_error(client_info);
+    else
+      gGui->logo_mode = 0;
   } 
   else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -1967,9 +1973,10 @@ static void do_play(commands_t *cmd, client_info_t *client_info) {
 }
 
 static void do_stop(commands_t *cmd, client_info_t *client_info) {
-  gGui->ignore_status = 1;
-  xine_stop (gGui->stream);
-  gGui->ignore_status = 0; 
+  gGui->ignore_next = 1;
+  xine_stop(gGui->stream);
+  gGui->ignore_next = 0; 
+  gui_display_logo();
 }
 
 static void do_pause(commands_t *cmd, client_info_t *client_info) {
@@ -2362,10 +2369,13 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 	if(pos > 100) pos = 100;
 	if(pos < 0) pos = 0;
 	
-	gGui->ignore_status = 1;
+	gGui->ignore_next = 1;
 	if(!xine_play(gGui->stream, ((int) (655.35 * pos)), 0))
 	  gui_handle_xine_error();
-	gGui->ignore_status = 0;
+	else
+	  gGui->logo_mode = 0;
+
+	gGui->ignore_next = 0;
 	
       }
 
@@ -2388,10 +2398,13 @@ static void do_seek(commands_t *cmd, client_info_t *client_info) {
 	else 
 	  sec = pos;
 	
-	gGui->ignore_status = 1;
+	gGui->ignore_next = 1;
 	if(!xine_play(gGui->stream, 0, sec))
 	  gui_handle_xine_error();
-	gGui->ignore_status = 0;
+	else
+	  gGui->logo_mode = 0;
+
+	gGui->ignore_next = 0;
       }
     }
   }

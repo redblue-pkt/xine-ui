@@ -102,6 +102,8 @@ void panel_check_pause(void);
 
 void panel_check_mute(void);
 
+void panel_reset_runtime_label(void);
+
 void panel_reset_slider (void);
 
 void panel_update_channel_display (void);

@@ -304,7 +304,7 @@ static void video_window_adapt_size (void) {
   switch (gVw->fullscreen_req) {
   case 0:
   case 1:
-#warning FIXME NEWAPI
+#warning TVMODE NEWAPI
 #if 0
     if(gGui->xine)
       xine_tvmode_switch2 (gGui->xine, 
@@ -312,7 +312,7 @@ static void video_window_adapt_size (void) {
 #endif
     break;
   case 2:
-#warning FIXME NEWAPI
+#warning TVMODE NEWAPI
 #if 0
     if(gGui->xine)
       if (xine_tvmode_switch2 (gGui->xine,
@@ -321,7 +321,7 @@ static void video_window_adapt_size (void) {
 #endif
     break;
   default:
-#warning FIXME NEWAPI
+#warning TVMODE NEWAPI
 #if 0
     if(gGui->xine)
       xine_tvmode_switch2 (gGui->xine, 
@@ -453,7 +453,7 @@ static void video_window_adapt_size (void) {
   gVw->visible_aspect = gGui->pixel_aspect;
 
   if(gGui->xine) {
-#warning FIXME NEWAPI
+#warning TVMODE NEWAPI
 #if 0
     xine_tvmode_size2 (gGui->xine, &gVw->visible_width, &gVw->visible_height, &gVw->visible_aspect, NULL);
     xine_tvmode_size2 (gGui->xine, &hint.width, &hint.height, NULL, NULL);
@@ -1266,7 +1266,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
  * Necessary cleanup
  */
 void video_window_exit (void) {
-#warning FIXME NEWAPI
+#warning TVMODE NEWAPI
 #if 0
   xine_tvmode_exit2 (gGui->xine);
 #endif

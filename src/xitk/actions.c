@@ -64,17 +64,35 @@ static pthread_t        seek_thread;
  *
  */
 void gui_display_logo(void) {
-  (void) gui_open_and_start((char *)gGui->logo_mrl, 0, 0);
+
+  gGui->logo_mode = 1;
+  (void) gui_xine_open_and_play((char *)gGui->logo_mrl, 0, 0);
+  gGui->logo_mode = 1;
+  panel_reset_slider();
 }
 
-int gui_open_and_start(char *mrl, int start_pos, int start_time) {
+int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
+  int ret;
   
-  if(!(xine_open(gGui->stream, (const char *)mrl) 
-       && xine_play(gGui->stream, start_pos, start_time))) {
+  if((ret = xine_play(stream, start_pos, start_time)) == 0) {
+    gui_handle_xine_error();
+  }
+  else
+    gGui->logo_mode = 0;
+  
+  return ret;
+}
+
+int gui_xine_open_and_play(char *mrl, int start_pos, int start_time) {
+  
+  if(!xine_open(gGui->stream, (const char *)mrl)) {
     gui_handle_xine_error();
     return 0;
   }
-  
+  if(!gui_xine_play(gGui->stream, start_pos, start_time)) {
+    return 0;
+  }
+
   return 1;
 }
 
@@ -137,14 +155,14 @@ void gui_play (xitk_widget_t *w, void *data) {
 
   video_window_reset_ssaver();
 
-  if (xine_get_status (gGui->stream) != XINE_STATUS_PLAY) {
+  if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY) {
 
-    if (!strncmp (gGui->filename, "xine-ui version", 15)) {
+    if (!strncmp(gGui->filename, "xine-ui version", 15)) {
       xine_error (_("No MRL (input stream) specified"));
       return;
     }
-
-    (void) gui_open_and_start(gGui->filename, 0, 0);
+    
+    (void) gui_xine_open_and_play(gGui->filename, 0, 0);
   } 
   else
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
@@ -154,9 +172,9 @@ void gui_play (xitk_widget_t *w, void *data) {
 
 void gui_stop (xitk_widget_t *w, void *data) {
 
-  gGui->ignore_status = 1;
+  gGui->ignore_next = 1;
   xine_stop (gGui->stream);
-  gGui->ignore_status = 0; 
+  gGui->ignore_next = 0; 
   panel_reset_slider ();
   panel_check_pause();
   panel_update_runtime_display();
@@ -394,10 +412,9 @@ void *gui_set_current_position_thread(void *data) {
 
   pthread_detach(pthread_self());
   
-  if(!xine_play (gGui->stream, pos, 0))
-    gui_handle_xine_error();
+  (void) gui_xine_play(gGui->stream, pos, 0);
   
-  gGui->ignore_status = 0;
+  gGui->ignore_next = 0;
   panel_check_pause();
 
   pthread_exit(NULL);
@@ -417,10 +434,9 @@ void *gui_seek_relative_thread(void *data) {
   else
     sec += off_sec;
 
-  if(!xine_play (gGui->stream, 0, sec))
-    gui_handle_xine_error();
+  (void) gui_xine_play(gGui->stream, 0, sec);
 
-  gGui->ignore_status = 0;
+  gGui->ignore_next = 0;
   panel_check_pause();
 
   pthread_exit(NULL);
@@ -430,13 +446,13 @@ void gui_set_current_position (int pos) {
   int err;
   
   if(((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
-     (gGui->ignore_status == 1))
+     (gGui->ignore_next == 1))
     return;
     
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY)
     xine_open(gGui->stream, gGui->filename);
   
-  gGui->ignore_status = 1;
+  gGui->ignore_next = 1;
   
   if ((err = pthread_create(&seek_thread,
 			    NULL, gui_set_current_position_thread, (void *)pos)) != 0) {
@@ -449,13 +465,13 @@ void gui_seek_relative (int off_sec) {
   int err;
   
   if(((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE)) == 0) || 
-     (gGui->ignore_status == 1))
+     (gGui->ignore_next == 1))
     return;
   
   if(xine_get_status(gGui->stream) != XINE_STATUS_PLAY)
     return;
   
-  gGui->ignore_status = 1;
+  gGui->ignore_next = 1;
   
   if ((err = pthread_create(&seek_thread,
 			    NULL, gui_seek_relative_thread, (void *)off_sec)) != 0) {
@@ -540,8 +556,8 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 
 	gGui->playlist_cur += (value - 1);
 	
-	gGui->ignore_status = 0;
-	gui_status_callback (XINE_STATUS_STOP);
+	gGui->ignore_next = 0;
+	gui_playlist_start_next();
       }
 
     }
@@ -559,20 +575,20 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 
       if((gGui->playlist_cur - value) >= 0) {
 	
-	gGui->ignore_status = 1;
+	gGui->ignore_next = 1;
 	gGui->playlist_cur -= value;
 	
 	if((gGui->playlist_cur < gGui->playlist_num)) {
 	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
 	  
-	  (void) gui_open_and_start(gGui->filename, 0, 0);
+	  (void) gui_xine_open_and_play(gGui->filename, 0, 0);
   
 	}
 	else {
 	  gGui->playlist_cur = 0;
 	}
 	
-	gGui->ignore_status = 0;
+	gGui->ignore_next = 0;
       }
 
     }

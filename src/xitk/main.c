@@ -501,7 +501,7 @@ static xine_ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 
       printf(_("main: not using any audio driver (as requested).\n"));
       config_update_string("audio.driver", "null");
-      
+
     }
     else {
     
@@ -525,17 +525,20 @@ static xine_ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
 static void event_listener(void *user_data, const xine_event_t *event) {
   struct timeval tv;
 
+  /* Ignoring all events when logo is displayed (or played) */
+  if(gGui->logo_mode)
+    return;
+  
   gettimeofday (&tv, NULL);
   
   if((tv.tv_sec - event->tv.tv_sec) > 3) {
     printf("Event too old, discarding\n");
     return;
   }
-
+  
   switch(event->type) { 
     
   case XINE_EVENT_UI_CHANNELS_CHANGED:
-    /* Update the panel */
     panel_update_channel_display ();
     break;
     
@@ -547,26 +550,8 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     break;
     
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
-    gui_status_callback (XINE_STATUS_STOP);
+      gui_playlist_start_next();
     break;
-    
-#warning GONE
-#if 0
-  case XINE_EVENT_NEED_NEXT_MRL: {
-    xine_next_mrl_event_t *uevent = (xine_next_mrl_event_t *)event;
-    
-    uevent->handled = 1;
-    uevent->mrl = gui_next_mrl_callback ();
-  }
-    break;
-#endif
-    
-#warning GONE
-#if 0
-  case XINE_EVENT_BRANCHED:
-    gui_branched_callback ();
-    break;
-#endif
     
 #warning REWRITE ME
 #if 0
@@ -1000,12 +985,10 @@ int main(int argc, char *argv[]) {
   
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_driver, gGui->vo_driver);
 
-  gGui->event_queue = xine_event_new_queue(gGui->stream);
-  xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
-  
   /*
    * Setup logo.
    */
+  gGui->logo_mode = 0;
   gGui->logo_mrl = xine_config_register_string (gGui->xine, "gui.gui.logo_mrl", XINE_LOGO_MRL,
 						_("Logo mrl"),
 						CONFIG_NO_HELP, 
@@ -1013,6 +996,9 @@ int main(int argc, char *argv[]) {
 						main_change_logo_cb, 
 						CONFIG_NO_DATA);
 
+  gGui->event_queue = xine_event_new_queue(gGui->stream);
+  xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
+  
 #warning FIXME NEWAPI
 #if 0
   xine_tvmode_init2(gGui->xine);
