@@ -1897,7 +1897,11 @@ void post_deinterlace(void) {
   else {
     _pplugin_unwire();
     
-    if(gGui->post_enable)
-      _pplugin_rewire_from_post_elements(gGui->post_elements, gGui->post_elements_num);
+    if(gGui->post_enable) {
+      if(pplugin_is_visible() && pplugin)
+	_pplugin_rewire();
+      else
+	_pplugin_rewire_from_post_elements(gGui->post_elements, gGui->post_elements_num);
+    }
   }
 }
