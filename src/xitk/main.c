@@ -532,7 +532,7 @@ void event_listener (void *user_data, xine_event_t *event) {
     break;
 
   case XINE_EVENT_UI_SET_TITLE: {
-    xine_ui_event_t *uevent = (xine_ui_event_t *)event;
+    xine_event_t *uevent = (xine_ui_event_t *)event;
     panel_set_title((char*)(uevent->data));
   }
   break;
