@@ -364,6 +364,30 @@ void *ctrlsocket_func(void *data) {
       send_ack(shdr);
       break;
 	
+    case CMD_PLAYLIST_FIRST:
+      if(gGui->playlist.num) {
+	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
+	  gui_stop(NULL, NULL);
+	
+	gGui->playlist.cur = 0;
+	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	gui_play(NULL, NULL);
+      }
+      send_ack(shdr);
+      break;
+      
+    case CMD_PLAYLIST_LAST:
+      if(gGui->playlist.num) {
+	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
+	  gui_stop(NULL, NULL);
+	
+	gGui->playlist.cur = gGui->playlist.num - 1;
+	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	gui_play(NULL, NULL);
+      }
+      send_ack(shdr);
+      break;
+
     case CMD_PLAYLIST_FLUSH:
       playlist_delete_all(NULL, NULL);
       send_ack(shdr);
@@ -397,12 +421,12 @@ void *ctrlsocket_func(void *data) {
       {
 	uint32_t *vol = (uint32_t *)shdr->data;
 
-	if((*vol >= 0) && (*vol <= 100) && (gGui->mixer.caps & MIXER_CAP_VOL)) { 
-	  gGui->mixer.volume_level = *vol;
-	  xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
-	  osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
-	}
-
+	if((gGui->mixer.method == SOUND_CARD_MIXER) && 
+	   (gGui->mixer.caps & MIXER_CAP_VOL) && ((*vol >= 0) && (*vol <= 100)))
+	  change_audio_vol(*vol);
+	else if((gGui->mixer.method == SOFTWARE_MIXER) && ((*vol >= 0) && (*vol <= 200)))
+	  change_amp_vol(*vol);
+	
 	send_ack(shdr);
       }
       break;
@@ -410,9 +434,9 @@ void *ctrlsocket_func(void *data) {
     case CMD_AMP:
       {
 	uint32_t *amp = (uint32_t *)shdr->data;
-
+	
 	if((*amp >= 0) && (*amp <= 200))
-	  config_update_num("gui.amp_level", (int) *amp);
+	  change_amp_vol(*amp);
 
 	send_ack(shdr);
       }
@@ -501,7 +525,7 @@ int init_session(void) {
 void session_handle_subopt(char *suboptarg, int *session) {
   char        *sopts = suboptarg;
   int          optsess = -1;
-  int          playlist_clear, playlist_next, playlist_prev = 0;
+  int          playlist_first, playlist_last, playlist_clear, playlist_next, playlist_prev;
   int          audio_next, audio_prev, spu_next, spu_prev;
   int          volume, amp;
   char        *playlist_load = NULL;
@@ -516,7 +540,7 @@ void session_handle_subopt(char *suboptarg, int *session) {
     "audio", "spu", "session", "mrl", "playlist", "pl", "volume", "amp", NULL
   };
   
-  playlist_clear = playlist_next = playlist_prev = fullscreen = 0;
+  playlist_first = playlist_last = playlist_clear = playlist_next = playlist_prev = fullscreen = 0;
   audio_next = audio_prev = spu_next = spu_prev = 0;
   volume = amp = -1;
   state = 0;
@@ -574,7 +598,11 @@ void session_handle_subopt(char *suboptarg, int *session) {
       /* playlist */
     case 14:
     case 15:
-      if(!strcasecmp(optstr, "clear"))
+      if(!strcasecmp(optstr, "first"))
+	playlist_first = 1;
+      else if(!strcasecmp(optstr, "last"))
+	playlist_last = 1;
+      else if(!strcasecmp(optstr, "clear"))
 	playlist_clear = 1;
       else if(!strcasecmp(optstr, "next"))
 	playlist_next++;
@@ -670,6 +698,12 @@ void session_handle_subopt(char *suboptarg, int *session) {
 
     if(amp >= 0)
       send_uint32(*session, CMD_AMP, (uint32_t) amp);
+
+    if(playlist_first)
+      remote_cmd(*session, CMD_PLAYLIST_FIRST);
+
+    if(playlist_last)
+      remote_cmd(*session, CMD_PLAYLIST_LAST);
 
   }
   else

@@ -1425,12 +1425,17 @@ void gui_init_imlib (Visual *vis) {
 /*
  *
  */
+typedef struct {
+  int      start;
+  char   **session_opts;
+} _startup_t;
+
 static void on_start(void *data) {
-  int start = (int) data;
+  _startup_t *startup = (_startup_t *) data;
 
   splash_destroy();
 
-  if((!start && !gGui->playlist.num) || (!start && gGui->playlist.num)) {
+  if((!startup->start && !gGui->playlist.num) || (!startup->start && gGui->playlist.num)) {
 
     gui_display_logo();
     
@@ -1444,10 +1449,10 @@ static void on_start(void *data) {
    * The lib seems unable to display OSD until the stream got 
    * any video data.
    */
-  if(start || (!start && !gGui->display_logo)) {
+  if(startup->start || (!startup->start && !gGui->display_logo)) {
     (void) xine_open(gGui->stream, (const char *) XINE_BLACK_STREAM);
     
-    if(!start && !gGui->display_logo)
+    if(!startup->start && !gGui->display_logo)
       xine_play(gGui->stream, 0, 0);
     
     gGui->ignore_next = 1;
@@ -1455,13 +1460,23 @@ static void on_start(void *data) {
     gGui->ignore_next = 0;
   }
   
-  if(start)
+  if(startup->session_opts) {
+    int i = 0;
+    int dummy_session;
+    
+    while(startup->session_opts[i])
+      session_handle_subopt(startup->session_opts[i++], &dummy_session);
+    
+  }
+  
+  if(startup->start)
     gui_execute_action_id(ACTID_PLAY);
   
 }
 
-void gui_run(void) {
-  int       i, auto_start = 0;
+void gui_run(char **session_opts) {
+  _startup_t  startup;
+  int         i, auto_start = 0;
   
   video_window_change_skins();
   panel_add_autoplay_buttons();
@@ -1596,7 +1611,10 @@ void gui_run(void) {
     }
   }
 
-  xitk_run(on_start, (void *)auto_start);
+  startup.start        = auto_start;
+  startup.session_opts = session_opts;
+
+  xitk_run(on_start, (void *)&startup);
 
   /* save playlist */
   if(gGui->playlist.mmk && gGui->playlist.num) {

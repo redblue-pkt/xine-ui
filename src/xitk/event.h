@@ -37,7 +37,7 @@ int actions_on_start(action_id_t actions[], action_id_t a);
 void gui_deinit(void);
 void gui_init(int nfiles, char *filenames[], window_attributes_t *window_attribute);
 void gui_init_imlib(Visual *vis);
-void gui_run (void);
+void gui_run(char **session_opts);
 void gui_playlist_start_next(void);
 void gui_dndcallback(char *filename);
 void gui_execute_action_id(action_id_t);

@@ -643,8 +643,10 @@ static void show_usage (void) {
   printf(_("                    (playlist|pl)=p\n"));
   printf(_("                                 <p> can be:\n"));
   printf(_("                                   'clear'  clear the playlist,\n"));
-  printf(_("                                   'next'   play next playlist entry,\n"));
+  printf(_("                                   'first'  play first entry in the playlist,\n"));
   printf(_("                                   'prev'   play previous playlist entry,\n"));
+  printf(_("                                   'next'   play next playlist entry,\n"));
+  printf(_("                                   'last'   play last entry in the playlist,\n"));
   printf(_("                                   'load:s' load playlist file <s>.\n"));
   printf(_("                    play, slow2, slow4, pause, fast2,\n"));
   printf(_("                    fast4, stop, quit, fullscreen, eject.\n"));
@@ -1275,9 +1277,11 @@ int main(int argc, char *argv[]) {
   int                     old_playlist_cfg, no_old_playlist = 0;
   char                  **pplugins        = NULL;
   int                     pplugins_num    = 0;
-  char                   *tvout           = NULL;
-  char                   *pdeinterlace    = NULL;
-
+  char                   *tvout            = NULL;
+  char                   *pdeinterlace     = NULL;
+  char                  **session_argv     = NULL;
+  int                     session_argv_num = 0;
+  
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
     setlocale(LC_ALL, "");
@@ -1570,7 +1574,7 @@ int main(int argc, char *argv[]) {
     case OPTION_SK_SERVER:
       gGui->skin_server_url = strdup(optarg);
       break;
-
+      
     case OPTION_ENQUEUE:
       if(is_remote_running(((session >= 0) ? session : 0))) {
 	if(session < 0)
@@ -1597,7 +1601,18 @@ int main(int argc, char *argv[]) {
       break;
 
     case 'S':
-      session_handle_subopt(optarg, &session);
+      if(is_remote_running(((session >= 0) ? session : 0)))
+	session_handle_subopt(optarg, &session);
+      else {
+
+	if(!session_argv_num)
+	  session_argv = (char **) xine_xmalloc(sizeof(char *) * 2);
+	else
+	  session_argv = (char **) realloc(session_argv, sizeof(char *) * (session_argv_num + 2));
+
+	session_argv[session_argv_num++] = strdup(optarg);
+	session_argv[session_argv_num]   = NULL;
+      }
       break;
 
     case 'Z':
@@ -1625,8 +1640,7 @@ int main(int argc, char *argv[]) {
       else
 	pplugins = (char **) realloc(pplugins, sizeof(char *) * (pplugins_num + 2));
       
-      pplugins[pplugins_num] = optarg;
-      pplugins_num++;
+      pplugins[pplugins_num++] = optarg;
       pplugins[pplugins_num] = NULL;
       break;
 
@@ -1965,10 +1979,19 @@ int main(int argc, char *argv[]) {
     pplugin_rewire_posts();
   }
   
-  gui_run();
+  gui_run(session_argv);
 
   if(pplugins)
     free(pplugins);
   
+  if(session_argv_num) {
+    int i = 0;
+
+    while(session_argv[i])
+      free(session_argv[i++]);
+    
+    free(session_argv);
+  }
+
   return 0;
 }

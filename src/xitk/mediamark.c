@@ -318,9 +318,9 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 		  if(entries_pls) {
 		    int   entry;
 		    
-		    if((sscanf(ln, "File%d=", &entry)) == 1) {
+		    if((!strncasecmp(ln, "file", 4)) && ((sscanf(ln + 4, "%d=", &entry)) == 1)) {
 		      char *mrl = strchr(ln, '=');
-
+		      
 		      if(mrl)
 			mrl++;
 		      
@@ -333,7 +333,8 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 		    
 		  }
 		  else {
-		    if((sscanf(ln, "NumberOfEntries=%d", &entries_pls)) == 1) {
+		    if((!strncasecmp(ln, "numberofentries", 15))
+		       && ((sscanf(ln + 15, "=%d", &entries_pls)) == 1)) {
 
 		      if(entries_pls) {
 			playlist->entries = entries_pls;
