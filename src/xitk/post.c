@@ -932,12 +932,14 @@ static int __pplugin_retrieve_parameters(post_object_t *pobj) {
 }
 
 static void _pplugin_show_help(xitk_widget_t *w, void *data) {
+#if 0
   post_object_t *pobj = (post_object_t *) data;
   printf("(FIXME: create help window)\n"
          "--------------------------------------------------\n"
          "%s"
          "--------------------------------------------------\n",
          pobj->api->get_help());
+#endif
 }
 
 static void _pplugin_retrieve_parameters(post_object_t *pobj) {
