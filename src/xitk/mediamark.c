@@ -188,7 +188,7 @@ static void set_pos_to_value(char **p) {
 /*
  * Playlists guessing
  */
-static mediamark_t **guess_xmms_playlist_pls(playlist_t *playlist, const char *filename) {
+static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filename) {
   mediamark_t **mmk = NULL;
   char         *extension;
 
@@ -249,94 +249,42 @@ static mediamark_t **guess_xmms_playlist_pls(playlist_t *playlist, const char *f
   return NULL;
 }
 
-static mediamark_t **guess_xmms_playlist_m3u(playlist_t *playlist, const char *filename) {
-  mediamark_t **mmk = NULL;
-  char         *extension;
-
-  if(filename) {
-    if(playlist_check_for_file(filename)) {
-      
-      extension = strrchr(filename, '.');
-      
-      if((extension) && (!strcmp(extension, ".m3u"))) {
-	
-	if((playlist->fd = fopen(filename, "r")) != NULL) {
-	  int valid_pls = 0;
-	  int entries_pls = 0;
-	  
-	  while(playlist_get_next_line(playlist)) {
-
-	    if(playlist->ln) {
-	      
-	      if(valid_pls) {
-		entries_pls++;
-		
-		if(entries_pls == 1)
-		  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
-		else
-		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_pls + 1));
-		
-		mediamark_store_mmk(&mmk[(entries_pls - 1)], playlist->ln, NULL, 0, -1);
-		playlist->entries = entries_pls;
-		
-	      }
-	      else {
-		struct stat   vstat;
-		
-		/* 
-		 * Validate the playlist by stating first found entry.
-		 */
-		if((stat(playlist->ln, &vstat)) > -1)
-		  valid_pls = 1;
-
-	      }
-
-	    }
-	  }
-	  
-	  fclose(playlist->fd);
-	  
-	  if(valid_pls && entries_pls) {
-	    mmk[entries_pls] = NULL;
-	    playlist->type = strdup("M3U");
-	    return mmk;
-	  }
-	}
-      }
-    }
-  }
-
-  return NULL;
-}
-
-static mediamark_t **guess_xmms_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filename) {
   mediamark_t **mmk = NULL;
   
   if(filename) {
     if(playlist_check_for_file(filename)) {
       
       if((playlist->fd = fopen(filename, "r")) != NULL) {
-	int valid_pls = 0;
-	int entries_pls = 0;
+	int   valid_pls   = 0;
+	int   entries_pls = 0;
+	char *ptitle      = NULL;
+	char *title       = NULL;
 	
 	while(playlist_get_next_line(playlist)) {
-
+	  
 	  if(playlist->ln) {
 	    
 	    if(valid_pls) {
 	      
-	      if(strncmp(playlist->ln, "#", 1)) {
+	      if(!strncmp(playlist->ln, "#EXTINF", 7)) {
+		if((ptitle = strchr(playlist->ln, ',')) != NULL) {
+		  ptitle++;
+		  xine_strdupa(title, ptitle);
+		}
+	      }
+	      else {
 		
 		entries_pls++;
-
+		
 		if(entries_pls == 1)
 		  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
 		else
 		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_pls + 1));
 		
-		mediamark_store_mmk(&mmk[(entries_pls - 1)], playlist->ln, NULL, 0, -1);
+		mediamark_store_mmk(&mmk[(entries_pls - 1)], playlist->ln, title, 0, -1);
 		playlist->entries = entries_pls;
-
+		ptitle = title = NULL;
 	      }
 
 	    }
@@ -349,7 +297,7 @@ static mediamark_t **guess_xmms_playlist(playlist_t *playlist, const char *filen
 	
 	if(valid_pls && entries_pls) {
 	  mmk[entries_pls] = NULL;
-	  playlist->type = strdup("XMMS");
+	  playlist->type = strdup("M3U");
 	  return mmk;
 	}
       }
@@ -872,9 +820,8 @@ void mediamark_load_mediamarks(const char *filename) {
   playlist_guess_func_t   guess_functions[] = {
     guess_asx_playlist,
     guess_toxine_playlist,
-    guess_xmms_playlist_pls,
-    guess_xmms_playlist_m3u,
-    guess_xmms_playlist,
+    guess_pls_playlist,
+    guess_m3u_playlist,
     guess_sfv_playlist,
     guess_raw_playlist,
     NULL
