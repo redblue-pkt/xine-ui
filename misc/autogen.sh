@@ -51,7 +51,11 @@ if [ "$DIE" -eq 1 ]; then
         exit 1
 fi
 
-aclocalinclude=`xine-config --acflags`; \
+if [ -z "$XINE_CONFIG" ]; then
+  aclocalinclude=`xine-config --acflags`; \
+else \
+  aclocalinclude=`${XINE_CONFIG} --acflags`; \
+fi; \
 (echo $_echo_n " + Running aclocal: $_echo_c"; \
     aclocal $aclocalinclude -I m4; \
  echo "done.") && \
