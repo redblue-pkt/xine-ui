@@ -7,8 +7,6 @@
 #
 OLDCWD=`pwd`
 
-cd ../
-
 CWD=`pwd`
 PACKAGE=@PACKAGE@.tgz
 SLCK=$CWD/slack
