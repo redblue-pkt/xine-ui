@@ -450,7 +450,8 @@ static int notify_click_inputtext(xitk_widget_list_t *wl,
     if(w->have_focus == FOCUS_LOST)
       w->have_focus = private_data->have_focus = FOCUS_RECEIVED;
     
-    _cursor_focus(private_data, wl->win, 1);
+    if(xitk_is_mouse_over_widget(private_data->imlibdata->x.disp, wl->win, w))
+      _cursor_focus(private_data, wl->win, 1);
     
     pos = x - w->x;
 
