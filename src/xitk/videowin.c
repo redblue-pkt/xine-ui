@@ -354,9 +354,35 @@ static void video_window_adapt_size (void) {
     /* just switching to a different modeline if necessary */
     if(!(search >= gVw->XF86_modelines_count)) {
        if(XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[search])) {
+          double res_h, res_v;
+	  
 	  gGui->XF86VidMode_fullscreen = 1;	  
 	  gVw->fullscreen_width        = gVw->XF86_modelines[search]->hdisplay;
 	  gVw->fullscreen_height       = gVw->XF86_modelines[search]->vdisplay;
+	  
+	  /* update pixel aspect */
+	  res_h = (DisplayWidth  (gGui->display, gGui->screen)*1000 
+		   / DisplayWidthMM (gGui->display, gGui->screen));
+	  res_v = (DisplayHeight (gGui->display, gGui->screen)*1000
+		   / DisplayHeightMM (gGui->display, gGui->screen));
+  
+	  gGui->pixel_aspect    = res_h / res_v;
+#ifdef DEBUG
+	  printf("pixel_aspect: %f\n", gGui->pixel_aspect);
+#endif
+
+	  if (fabs(gGui->pixel_aspect - 1.0) < 0.01) {
+	    /*
+	     * we have a display with *almost* square pixels (<1% error),
+	     * to avoid time consuming software scaling in video_out_xshm,
+	     * correct this to the exact value of 1.0 and pretend we have
+	     * perfect square pixels.
+	     */
+	    gGui->pixel_aspect  = 1.0;
+#ifdef DEBUG
+	    printf("display_ratio: corrected to square pixels!\n");
+#endif
+	  }
 	  
 	  // TODO
 	  /*
@@ -589,6 +615,8 @@ static void video_window_adapt_size (void) {
 	 * the original modeline
 	 */
 	if(gVw->XF86_modelines_count > 1) {
+	   double res_h, res_v;
+	   
 	   XF86VidModeSwitchToMode(gGui->display, XDefaultScreen(gGui->display), gVw->XF86_modelines[0]);
 	   XF86VidModeSetViewPort(gGui->display, XDefaultScreen(gGui->display), 0, 0);
 
@@ -596,6 +624,30 @@ static void video_window_adapt_size (void) {
        
 	   gVw->fullscreen_width  = gVw->XF86_modelines[0]->hdisplay;
 	   gVw->fullscreen_height = gVw->XF86_modelines[0]->vdisplay;
+	   
+	   /* update pixel aspect */
+	   res_h = (DisplayWidth  (gGui->display, gGui->screen)*1000 
+		    / DisplayWidthMM (gGui->display, gGui->screen));
+	   res_v = (DisplayHeight (gGui->display, gGui->screen)*1000
+		    / DisplayHeightMM (gGui->display, gGui->screen));
+  
+	   gGui->pixel_aspect    = res_h / res_v;
+#ifdef DEBUG
+	   printf("pixel_aspect: %f\n", gGui->pixel_aspect);
+#endif
+
+	   if (fabs(gGui->pixel_aspect - 1.0) < 0.01) {
+	     /*
+	      * we have a display with *almost* square pixels (<1% error),
+	      * to avoid time consuming software scaling in video_out_xshm,
+	      * correct this to the exact value of 1.0 and pretend we have
+	      * perfect square pixels.
+	      */
+	     gGui->pixel_aspect  = 1.0;
+#ifdef DEBUG
+	     printf("display_ratio: corrected to square pixels!\n");
+#endif
+	   }
 	}
 #endif
 
