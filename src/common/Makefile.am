@@ -1,6 +1,6 @@
 noinst_LTLIBRARIES = libcommon.la
 
-AM_CFLAGS = @XINE_CFLAGS@ @BUILD_LIB_STATIC@
+AM_CFLAGS = @XINE_CFLAGS@ @X_CFLAGS@ @BUILD_LIB_STATIC@
 
 EXTRA_DIST = getopt.c getopt1.c getopt.h
 
