@@ -1,6 +1,6 @@
-/* 
+/*
  * Copyright (C) 2000-2001 the xine project
- * 
+ *
  * This file is part of xine, a unix video player.
  * 
  * xine is free software; you can redistribute it and/or modify
@@ -86,12 +86,13 @@ static const char *short_options = "?hS4"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::";
+ "u:a:V:A:D:p::";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
   {"audio-channel"  , required_argument, 0, 'a' },
   {"video-driver"   , required_argument, 0, 'V' },
   {"audio-driver"   , required_argument, 0, 'A' },
+  {"deinterlace"    , required_argument, 0, 'D' },
   {"spu-channel"    , required_argument, 0, 'u' },
   {"auto-play"      , optional_argument, 0, 'p' },
 #ifdef HAVE_LIRC
@@ -111,9 +112,9 @@ static struct option long_options[] = {
 void show_banner(void) {
 
   printf("This is xine (X11 gui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
-  printf("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n", 
+  printf("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n",
 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
-  printf("Found xine library version: %d.%d.%d (%s).\n", 
+  printf("Found xine library version: %d.%d.%d (%s).\n",
 	 xine_get_major_version(), xine_get_minor_version(),
 	 xine_get_sub_version(), xine_get_str_version());
 
@@ -123,7 +124,7 @@ XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_BUILD_DATE, XINE_
  *
  */
 void show_usage (void) {
-  
+
   char **driver_ids;
   char  *driver_id;
 
@@ -152,6 +153,7 @@ void show_usage (void) {
 
   printf("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
+  printf("  -D, --deinterlace <method>   Enable soft deinterlacing ('help' for list).\n");
   printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
   printf("                                 'f': start in fullscreen mode,\n");
   printf("                                 'h': hide control panel,\n");
@@ -192,8 +194,8 @@ int handle_debug_subopt(char *sopt) {
   char *str = sopt;
   char *val = NULL;
   char *debuglvl[] = {
-    "verbose", "metronom", "audio", "demux", 
-    "input", "video", "pts", "mpeg", "avi", 
+    "verbose", "metronom", "audio", "demux",
+    "input", "video", "pts", "mpeg", "avi",
     "ac3", "loop", "gui",
     NULL
   };
@@ -228,6 +230,45 @@ int handle_debug_subopt(char *sopt) {
 
 /* ------------------------------------------------------------------------- */
 /*
+ * Handle soft deinterlace method selection
+ * FIXME: should we have a function for obtaining available methods?
+ */
+
+int handle_deinterlace_subopt(char *sopt) {
+  int i, subopt;
+  char *str = sopt;
+  char *val = NULL;
+  char *method[] = {
+    "none","bob",
+    NULL
+  };
+
+  while(*str) {
+    subopt = getsubopt(&str, method, &val);
+    switch(subopt) {
+    case -1:
+      i = 0;
+      fprintf(stderr, "Valid methods are:\n\t");
+      while(method[i] != NULL) {
+	fprintf(stderr,"%s, ", method[i]);
+	i++;
+      }
+      fprintf(stderr, "\b\b.\n");
+      fprintf(stderr, "\nwarning: some methods may require MMX.\n");
+      fprintf(stderr, "         currently only implemented for Xv driver.\n");
+      return 0;
+    default:
+      return subopt;
+      break;
+    }
+  }
+
+  return -1;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/*
  * Handle sub-option of 'recognize-by' command line argument
  */
 int handle_demux_strategy_subopt(char *sopt) {
@@ -254,13 +295,13 @@ int handle_demux_strategy_subopt(char *sopt) {
 
     case DS_DEFAULT:
       return DEMUX_DEFAULT_STRATEGY;
-      break;      
+      break;
     case DS_REVERT:
       return DEMUX_REVERT_STRATEGY;
-      break;      
+      break;
     case DS_CONTENT:
       return DEMUX_CONTENT_STRATEGY;
-      break;      
+      break;
     case DS_EXT:
       return DEMUX_EXTENSION_STRATEGY;
       break;      
@@ -287,7 +328,7 @@ int handle_demux_strategy_subopt(char *sopt) {
 static void load_video_out_driver(char *video_driver_id) {
   double        res_h, res_v;
   x11_visual_t  vis;
-  
+
   vis.display           = gGui->display;
   vis.screen            = gGui->screen;
   vis.d                 = gGui->video_window;
@@ -320,14 +361,14 @@ static void load_video_out_driver(char *video_driver_id) {
     /* video output driver auto-probing */
     char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
     int    i;
-    
+
     /* Try to init video with stored information */
     video_driver_id = config_lookup_str("video_driver_name", NULL);
     if(video_driver_id) {
-      
+
       gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
 						      video_driver_id,
-						      VISUAL_TYPE_X11, 
+						      VISUAL_TYPE_X11,
 						      (void *) &vis);
       if (gGui->vo_driver) {
 	if(driver_ids)
@@ -341,7 +382,7 @@ static void load_video_out_driver(char *video_driver_id) {
       video_driver_id = driver_ids[i];
       
       printf ("main: probing <%s> video output plugin\n", video_driver_id);
-      
+
       gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
 						      video_driver_id,
 						      VISUAL_TYPE_X11, 
@@ -363,8 +404,8 @@ static void load_video_out_driver(char *video_driver_id) {
 
   } 
   else {
-    
-    gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
+
+    gGui->vo_driver = xine_load_video_output_plugin(gGui->config,
 						    video_driver_id,
 						    VISUAL_TYPE_X11, 
 						    (void *) &vis);
@@ -399,7 +440,7 @@ static void load_audio_out_driver(char *audio_driver_id,
 	return;
       }
     }
-    
+
     while(driver_ids[i] != NULL && *audio_driver == NULL) {
       audio_driver_id = driver_ids[i];
 
@@ -429,7 +470,7 @@ static void load_audio_out_driver(char *audio_driver_id,
       }
     }
   }
-  
+
   if (*audio_driver)
     config_set_str("audio_driver_name", audio_driver_id);
   else
@@ -466,8 +507,9 @@ int main(int argc, char *argv[]) {
   int              c = '?';
   int              option_index = 0;
   int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
-  int              audio_channel = 0; 
+  int              audio_channel = 0;
   int              spu_channel = -1;
+  int		   deinterlace_method = 0;
   /*  int              audio_options = 0; FIXME */
   char            *audio_driver_id = NULL;
   char            *video_driver_id = NULL;
@@ -476,7 +518,7 @@ int main(int argc, char *argv[]) {
 
   /* Check xine library version */
   if(!xine_check_version(0, 5, 0)) {
-    fprintf(stderr, "Require xine library version 0.5.0, found %d.%d.%d.\n", 
+    fprintf(stderr, "Require xine library version 0.5.0, found %d.%d.%d.\n",
 	    xine_get_major_version(), xine_get_minor_version(),
 	    xine_get_sub_version());
     exit(1);
@@ -515,14 +557,14 @@ int main(int argc, char *argv[]) {
    * parse command line
    */
   opterr = 0;
-  while((c = getopt_long(argc, argv, short_options, 
+  while((c = getopt_long(argc, argv, short_options,
 			 long_options, &option_index)) != EOF) {
     switch(c) {
 
     case 'a': /* Select audio channel */
       sscanf(optarg, "%i", &audio_channel);
       break;
-      
+
     case 'u': /* Select SPU channel */
       sscanf(optarg, "%i", &spu_channel);
       break;
@@ -547,6 +589,15 @@ int main(int argc, char *argv[]) {
 	exit (1);
       }
       break;
+
+    case 'D': /* Select soft deinterlace */
+      if(optarg != NULL) {
+	deinterlace_method=handle_deinterlace_subopt(chomp(optarg));
+        if( deinterlace_method == -1 )
+	  exit(1);
+      }
+      break;
+
 
     case 'p':/* Play [[in fullscreen][then quit]] on start */
       gGui->autoplay_options |= PLAY_ON_START;
@@ -574,7 +625,7 @@ int main(int argc, char *argv[]) {
       no_lirc = 1;
       break;
 #endif
-      
+
     case 'R': /* Set a strategy to recognizing stream type */
       if(optarg != NULL)
 	demux_strategy = handle_demux_strategy_subopt(chomp(optarg));
@@ -582,7 +633,7 @@ int main(int argc, char *argv[]) {
 	demux_strategy = DEMUX_REVERT_STRATEGY;
       break;
 
-#ifdef DEBUG      
+#ifdef DEBUG
     case 'd': /* Select debug levels */
       if(optarg != NULL) {
 	if(!(handle_debug_subopt(chomp(optarg))))
@@ -590,13 +641,13 @@ int main(int argc, char *argv[]) {
       }
       break;
 #endif
-      
+
     case 'h': /* Display usage */
     case '?':
       show_usage();
       exit(1);
       break;
-      
+
     default:
       show_usage();
       fprintf (stderr, "invalid argument %d => exit\n",c);
@@ -643,14 +694,16 @@ int main(int argc, char *argv[]) {
    * xine init
    */
 
-  gGui->xine = xine_init (gGui->vo_driver, audio_driver, 
+  gGui->xine = xine_init (gGui->vo_driver, audio_driver,
 			  gGui->config,
-			  gui_status_callback, 
-			  gui_next_mrl_callback, 
+			  gui_status_callback,
+			  gui_next_mrl_callback,
 			  gui_branched_callback);
 
   xine_select_audio_channel (gGui->xine, audio_channel);
   xine_select_spu_channel (gGui->xine, spu_channel);
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_SOFT_DEINTERLACE,
+                                 deinterlace_method);
 
   /*
    * Register an event listener
