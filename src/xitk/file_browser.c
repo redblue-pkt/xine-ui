@@ -408,7 +408,7 @@ static void fb_update_origin(filebrowser_t *fb) {
       sprintf(buf, "%s", fb->current_dir);
   }
   
-  xitk_inputtext_change_text(fb->widget_list, fb->origin, buf); 
+  xitk_inputtext_change_text(fb->origin, buf); 
 }
 
 static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
@@ -779,7 +779,7 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     fb->directories_sort_direction = (fb->directories_sort_direction == DEFAULT_SORT) ? 
       REVERSE_SORT : DEFAULT_SORT;
     
-    xitk_hide_widget(fb->widget_list, fb->directories_sort);
+    xitk_hide_widget(fb->directories_sort);
 
     if(fb->directories_sort_direction == DEFAULT_SORT)
       xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
@@ -788,7 +788,7 @@ static void fb_sort(xitk_widget_t *w, void *data) {
       xitk_image_change_image(gGui->imlib_data, fb->sort_skin_up, 
 			    dsimage, dsimage->width, dsimage->height);
 
-    xitk_show_widget(fb->widget_list, fb->directories_sort);
+    xitk_show_widget(fb->directories_sort);
     
     sort_directories(fb);
   }
@@ -798,7 +798,7 @@ static void fb_sort(xitk_widget_t *w, void *data) {
     fb->files_sort_direction = (fb->files_sort_direction == DEFAULT_SORT) ? 
       REVERSE_SORT : DEFAULT_SORT;
     
-    xitk_hide_widget(fb->widget_list, fb->files_sort);
+    xitk_hide_widget(fb->files_sort);
 
     if(fb->files_sort_direction == DEFAULT_SORT)
       xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
@@ -807,7 +807,7 @@ static void fb_sort(xitk_widget_t *w, void *data) {
       xitk_image_change_image(gGui->imlib_data, fb->sort_skin_up, 
 			    fsimage, fsimage->width, fsimage->height);
 
-    xitk_show_widget(fb->widget_list, fb->files_sort);
+    xitk_show_widget(fb->files_sort);
 
     sort_files(fb);
   }    
@@ -1396,7 +1396,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(fb->widget_list)), 
 	   (fb->filters = 
 	    xitk_noskin_combo_create(fb->widget_list, &cmb, x, y, w, NULL, NULL)));
-  xitk_combo_set_select(fb->widget_list, fb->filters, fb->filter_selected);
+  xitk_combo_set_select(fb->filters, fb->filter_selected);
 
   x = 15;
 
@@ -1407,9 +1407,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
 	    (fb->show_hidden = 
 	     xitk_noskin_checkbox_create(fb->widget_list, &cb, x, y+5, 10, 10)));
 
-  xitk_checkbox_set_state(fb->show_hidden, fb->show_hidden_files, 
-			  (XITK_WIDGET_LIST_WINDOW(fb->widget_list)), 
-			  (XITK_WIDGET_LIST_GC(fb->widget_list)));
+  xitk_checkbox_set_state(fb->show_hidden, fb->show_hidden_files);
 
   lbl.window            = xitk_window_get_window(fb->xwin);
   lbl.gc                = (XITK_WIDGET_LIST_GC(fb->widget_list));
@@ -1527,7 +1525,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
 
 
   if(fb->cb_buttons[0])
-    xitk_set_focus_to_widget(fb->widget_list, fb->cb_buttons[0]);
+    xitk_set_focus_to_widget(fb->cb_buttons[0]);
 
   {
     char buffer[256];

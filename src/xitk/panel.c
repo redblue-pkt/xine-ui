@@ -243,7 +243,7 @@ void panel_update_runtime_display(void) {
   
   sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
   
-  xitk_label_change_label(panel->widget_list, panel->runtime_label, timestr); 
+  xitk_label_change_label(panel->runtime_label, timestr); 
 }
 
 /*
@@ -307,7 +307,7 @@ static void *slider_loop(void *dummy) {
 	  
 	  if(panel_is_visible()) {
 	    
-	    xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
+	    xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
 	    panel_update_runtime_display();
 	    
 	    if(!(i % 20)) {
@@ -317,7 +317,7 @@ static void *slider_loop(void *dummy) {
 	    
 	    if(gGui->mixer.caps & MIXER_CAP_VOL) { 
 	      gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-	      xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+	      xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
 	      panel_check_mute();
 	    }
 	  }
@@ -467,7 +467,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
       int pos;
 
       xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
-      xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
+      xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
       panel_update_runtime_display();
       panel_update_mrl_display();
     }
@@ -479,8 +479,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
 void panel_check_mute(void) {
 
-  xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute, 
-  			  gGui->panel_window, (XITK_WIDGET_LIST_GC(panel->widget_list)));
+  xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
 }
 
 /*
@@ -490,13 +489,12 @@ void panel_check_pause(void) {
   
   xitk_checkbox_set_state(panel->playback_widgets.pause, 
 	  (((xine_get_status(gGui->stream) == XINE_STATUS_PLAY) && 
-	    (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)) ? 1 : 0 ), 
-			  gGui->panel_window, (XITK_WIDGET_LIST_GC(panel->widget_list)));
+	    (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)) ? 1 : 0));
   
 }
 
 void panel_reset_runtime_label(void) {
-  xitk_label_change_label (panel->widget_list, panel->runtime_label, "00:00:00"); 
+  xitk_label_change_label (panel->runtime_label, "00:00:00"); 
 }
 
 static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
@@ -509,7 +507,7 @@ static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
  * Reset the slider of panel window (set to 0).
  */
 void panel_reset_slider (void) {
-  xitk_slider_reset(panel->widget_list, panel->playback_widgets.slider_play);
+  xitk_slider_reset(panel->playback_widgets.slider_play);
   panel_reset_runtime_label();
 }
 
@@ -541,7 +539,7 @@ void panel_update_channel_display (void) {
     lang = buffer;
     break;
   }
-  xitk_label_change_label (panel->widget_list, panel->audiochan_label, lang);
+  xitk_label_change_label (panel->audiochan_label, lang);
 
   memset(&buffer, 0, sizeof(buffer));
   channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
@@ -563,7 +561,7 @@ void panel_update_channel_display (void) {
     lang = buffer;
     break;
   }
-  xitk_label_change_label (panel->widget_list, panel->spuid_label, lang);
+  xitk_label_change_label (panel->spuid_label, lang);
 }
 
 /*
@@ -613,7 +611,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
       int pos;
       
       xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
-      xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
+      xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
       panel_update_runtime_display();
     }
   }
@@ -731,14 +729,13 @@ void panel_add_mixer_control(void) {
   if(gGui->mixer.caps & MIXER_CAP_VOL) { 
     xitk_enable_widget(panel->mixer.slider);
     gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-    xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+    xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
   }
 
   if(gGui->mixer.caps & MIXER_CAP_MUTE) {
     xitk_enable_widget(panel->mixer.mute);
     gGui->mixer.mute = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_MUTE);
-    xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute,
-			    gGui->panel_window, (XITK_WIDGET_LIST_GC(panel->widget_list)));
+    xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
   }
 
   /* Tips should be available only if widgets are enabled */
@@ -1080,7 +1077,7 @@ void panel_init (void) {
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(panel->widget_list)), 
     (panel->playback_widgets.slider_play = xitk_slider_create(panel->widget_list, gGui->skin_config, &sl)));
   xitk_set_widget_tips(panel->playback_widgets.slider_play, _("Stream playback position slider"));
-  xitk_slider_reset(panel->widget_list, panel->playback_widgets.slider_play);
+  xitk_slider_reset(panel->playback_widgets.slider_play);
 
   /* Mixer volume slider */
   sl.skin_element_name = "SliderVol";
@@ -1093,7 +1090,7 @@ void panel_init (void) {
   sl.motion_userdata   = NULL;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(panel->widget_list)), 
 	   (panel->mixer.slider = xitk_slider_create(panel->widget_list, gGui->skin_config, &sl)));
-  xitk_slider_reset(panel->widget_list, panel->mixer.slider);
+  xitk_slider_reset(panel->mixer.slider);
   xitk_disable_widget(panel->mixer.slider);
 
   /*  Mute toggle */
@@ -1233,5 +1230,5 @@ void panel_init (void) {
 
 void panel_set_title(char *title) {
   if(panel && panel->title_label)
-    xitk_label_change_label(panel->widget_list, panel->title_label, title);
+    xitk_label_change_label(panel->title_label, title);
 }

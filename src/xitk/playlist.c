@@ -160,8 +160,7 @@ static void _playlist_create_playlists(void) {
 static void _playlist_handle_selection(xitk_widget_t *w, void *data, int selected) {
 
   if(playlist->playlist_mrls[selected] != NULL) {
-    xitk_inputtext_change_text(playlist->widget_list, 
-			       playlist->winput, playlist->playlist_mrls[selected]);
+    xitk_inputtext_change_text(playlist->winput, playlist->playlist_mrls[selected]);
     mmkeditor_set_mmk(&gGui->playlist.mmk[selected]);
   }
 
@@ -249,8 +248,7 @@ static void _playlist_delete(xitk_widget_t *w, void *data) {
 	gui_stop(NULL, NULL);
       
       gui_set_current_mrl(NULL);
-      xitk_inputtext_change_text(playlist->widget_list, 
-				 playlist->winput, NULL);
+      xitk_inputtext_change_text(playlist->winput, NULL);
     }
   }
 
@@ -267,8 +265,7 @@ static void _playlist_delete_all(xitk_widget_t *w, void *data) {
   if(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
     gui_stop(NULL, NULL);
 
-  xitk_inputtext_change_text(playlist->widget_list, 
-			     playlist->winput, NULL);
+  xitk_inputtext_change_text(playlist->winput, NULL);
   gui_set_current_mrl(NULL);
   enable_playback_controls(0);
 }
@@ -797,15 +794,14 @@ void playlist_update_focused_entry(void) {
 	    else
 	      _playlist_update_browser_list(gGui->playlist.num - max_displayed);
 	    
-	    xitk_inputtext_change_text(playlist->widget_list, 
-				       playlist->winput, 
+	    xitk_inputtext_change_text(playlist->winput, 
 				       playlist->playlist_mrls[gGui->playlist.cur]);
 	    
 	  }
 	  
 	}
 	else
-	  xitk_inputtext_change_text(playlist->widget_list, playlist->winput, NULL);
+	  xitk_inputtext_change_text(playlist->winput, NULL);
 
       }
     }
@@ -1233,5 +1229,5 @@ void playlist_editor(void) {
   XSetInputFocus(gGui->display, playlist->window, RevertToParent, CurrentTime);
   XUnlockDisplay(gGui->display);
 
-  xitk_set_focus_to_widget(playlist->widget_list, playlist->winput);
+  xitk_set_focus_to_widget(playlist->winput);
 }

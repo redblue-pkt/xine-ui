@@ -95,20 +95,16 @@ static void set_current_param(int param, int value) {
 static void update_sliders_video_settings(void) {
 
   if(xitk_is_widget_enabled(control->hue)) {
-    xitk_slider_set_pos(control->widget_list, control->hue, 
-			get_current_param(XINE_PARAM_VO_HUE));
+    xitk_slider_set_pos(control->hue, get_current_param(XINE_PARAM_VO_HUE));
   }
   if(xitk_is_widget_enabled(control->sat)) {
-    xitk_slider_set_pos(control->widget_list, control->sat, 
-			get_current_param(XINE_PARAM_VO_SATURATION));
+    xitk_slider_set_pos(control->sat, get_current_param(XINE_PARAM_VO_SATURATION));
   }
   if(xitk_is_widget_enabled(control->bright)) {
-    xitk_slider_set_pos(control->widget_list, control->bright, 
-			get_current_param(XINE_PARAM_VO_BRIGHTNESS));
+    xitk_slider_set_pos(control->bright, get_current_param(XINE_PARAM_VO_BRIGHTNESS));
   }
   if(xitk_is_widget_enabled(control->contr)) {
-    xitk_slider_set_pos(control->widget_list, control->contr, 
-			get_current_param(XINE_PARAM_VO_CONTRAST));
+    xitk_slider_set_pos(control->contr, get_current_param(XINE_PARAM_VO_CONTRAST));
   }
 }
 
@@ -546,7 +542,7 @@ void control_panel(void) {
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 	     (control->hue = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
-    xitk_slider_set_pos(control->widget_list, control->hue, cur);
+    xitk_slider_set_pos(control->hue, cur);
     xitk_set_widget_tips(control->hue, _("Control HUE value"));
     
     lbl.skin_element_name = "CtlHueLbl";
@@ -569,7 +565,7 @@ void control_panel(void) {
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 	      (control->sat = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
-    xitk_slider_set_pos(control->widget_list, control->sat, cur);
+    xitk_slider_set_pos(control->sat, cur);
     xitk_set_widget_tips(control->sat, _("Control SATURATION value"));
 
     lbl.skin_element_name = "CtlSatLbl";
@@ -592,7 +588,7 @@ void control_panel(void) {
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 	    (control->bright = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
-    xitk_slider_set_pos(control->widget_list, control->bright, cur);
+    xitk_slider_set_pos(control->bright, cur);
     xitk_set_widget_tips(control->bright, _("Control BRIGHTNESS value"));
 
     lbl.skin_element_name = "CtlBrightLbl";
@@ -615,7 +611,7 @@ void control_panel(void) {
     sl.motion_userdata   = NULL;
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(control->widget_list)),
 	      (control->contr = xitk_slider_create(control->widget_list, gGui->skin_config, &sl)));
-    xitk_slider_set_pos(control->widget_list, control->contr, cur);
+    xitk_slider_set_pos(control->contr, cur);
     xitk_set_widget_tips(control->contr, _("Control CONTRAST value"));
 
     lbl.skin_element_name = "CtlContLbl";

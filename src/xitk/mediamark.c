@@ -1261,8 +1261,8 @@ void mmkeditor_set_mmk(mediamark_t **mmk) {
   if(mmkeditor) {
     mmkeditor->mmk = mmk;
     
-    xitk_inputtext_change_text(mmkeditor->widget_list, mmkeditor->mrl, (*mmk)->mrl);
-    xitk_inputtext_change_text(mmkeditor->widget_list, mmkeditor->ident, (*mmk)->ident);
+    xitk_inputtext_change_text(mmkeditor->mrl, (*mmk)->mrl);
+    xitk_inputtext_change_text(mmkeditor->ident, (*mmk)->ident);
     xitk_intbox_set_value(mmkeditor->start, (*mmk)->start);
     xitk_intbox_set_value(mmkeditor->end, (*mmk)->end);
   }

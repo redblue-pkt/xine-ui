@@ -286,7 +286,7 @@ void event_sender_update_menu_buttons(void) {
       lbls = menu_items_dvd;
     
     for(i = 0; i < 7; i++)
-      xitk_labelbutton_change_label(eventer->widget_list, eventer->menus.menu[i], lbls[i]);
+      xitk_labelbutton_change_label(eventer->menus.menu[i], lbls[i]);
 
   }
 }

@@ -111,16 +111,16 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
 #define DISABLE_ME(wtriplet) {                                                                  \
     if((wtriplet)->frame) {                                                                     \
       xitk_disable_widget((wtriplet)->frame);                                                   \
-      xitk_hide_widget(setup->widget_list, (wtriplet)->frame);                                  \
+      xitk_hide_widget((wtriplet)->frame);                                                      \
     }                                                                                           \
     if((wtriplet)->label) {                                                                     \
       xitk_disable_widget((wtriplet)->label);                                                   \
-      xitk_hide_widget(setup->widget_list, (wtriplet)->label);                                  \
+      xitk_hide_widget((wtriplet)->label);                                                      \
       xitk_disable_widget_tips((wtriplet)->label);                                              \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
       xitk_disable_widget((wtriplet)->widget);                                                  \
-      xitk_hide_widget(setup->widget_list, (wtriplet)->widget);                                 \
+      xitk_hide_widget((wtriplet)->widget);                                                     \
       xitk_disable_widget_tips((wtriplet)->widget);                                             \
     }                                                                                           \
 }
@@ -128,16 +128,16 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
 #define ENABLE_ME(wtriplet) {                                                                   \
     if((wtriplet)->frame) {                                                                     \
       xitk_enable_widget((wtriplet)->frame);                                                    \
-      xitk_show_widget(setup->widget_list, (wtriplet)->frame);                                  \
+      xitk_show_widget((wtriplet)->frame);                                                      \
     }                                                                                           \
     if((wtriplet)->label) {                                                                     \
       xitk_enable_widget((wtriplet)->label);                                                    \
-      xitk_show_widget(setup->widget_list, (wtriplet)->label);                                  \
+      xitk_show_widget((wtriplet)->label);                                                      \
       xitk_enable_widget_tips((wtriplet)->label);                                               \
     }                                                                                           \
     if((wtriplet)->widget) {                                                                    \
       xitk_enable_widget((wtriplet)->widget);                                                   \
-      xitk_show_widget(setup->widget_list, (wtriplet)->widget);                                 \
+      xitk_show_widget((wtriplet)->widget);                                                     \
       xitk_enable_widget_tips((wtriplet)->widget);                                              \
     }                                                                                           \
 }
@@ -410,14 +410,14 @@ static void setup_handle_event(XEvent *event, void *data) {
 	
       case XK_Up:
 	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) {
-	  xitk_slider_make_step(setup->widget_list, setup->slider_wg);
+	  xitk_slider_make_step(setup->slider_wg);
 	  xitk_slider_callback_exec(setup->slider_wg);
 	}
 	break;
 	
       case XK_Down:
 	if((modifier & 0xFFFFFFEF) == MODIFIER_NOMOD) { 
-	  xitk_slider_make_backstep(setup->widget_list, setup->slider_wg);
+	  xitk_slider_make_backstep(setup->slider_wg);
 	  xitk_slider_callback_exec(setup->slider_wg);
 	}
 	break;
@@ -484,7 +484,7 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   config_update_string((char *)entry->key, str);
   if(xine_config_lookup_entry(gGui->xine, entry->key, &check_entry)) {
     if(((xitk_get_widget_type(w)) & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)
-      xitk_inputtext_change_text(setup->widget_list, w, check_entry.str_value);
+      xitk_inputtext_change_text(w, check_entry.str_value);
   }
 }
 
@@ -515,7 +515,7 @@ static widget_triplet_t *setup_add_slider (const char *title, const char *labelk
 			   (slider = xitk_noskin_slider_create(setup->widget_list, &sl,
 							       x, y, 150, 16,
 							       XITK_HSLIDER)));
-  xitk_slider_set_pos(setup->widget_list, slider, entry->num_value);
+  xitk_slider_set_pos(slider, entry->num_value);
 
   ADD_LABEL(slider);
 
@@ -627,9 +627,7 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
 			   (checkbox = 
 			    xitk_noskin_checkbox_create(setup->widget_list, &cb,
 							x, y, 10, 10)));
-  xitk_checkbox_set_state (checkbox, entry->num_value, xitk_window_get_window(setup->xwin),
-			   (XITK_WIDGET_LIST_GC(setup->widget_list)));
-  
+  xitk_checkbox_set_state (checkbox, entry->num_value);  
   ADD_LABEL(checkbox);
 
   setup->tmp_widgets[setup->num_tmp_widgets] = checkbox;
@@ -665,7 +663,7 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
 			   (combo = 
 			    xitk_noskin_combo_create(setup->widget_list, &cmb,
 						     x, y - 4, 150, &lw, &bw)));
-  xitk_combo_set_select(setup->widget_list, combo, entry->num_value );
+  xitk_combo_set_select(combo, entry->num_value );
 
   ADD_LABEL(combo);
 
@@ -842,7 +840,7 @@ static void setup_section_widgets(int s) {
       slidmax = 1;
     
     xitk_slider_set_max(setup->slider_wg, slidmax);
-    xitk_slider_set_pos(setup->widget_list, setup->slider_wg, slidmax);
+    xitk_slider_set_pos(setup->slider_wg, slidmax);
   }
 }
 
@@ -865,7 +863,7 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
     while (w) {
       
       if (setup->tmp_widgets[i] == w) {
-	xitk_destroy_widget(setup->widget_list, setup->tmp_widgets[i]);
+	xitk_destroy_widget(setup->tmp_widgets[i]);
 
 	xitk_list_delete_current ((XITK_WIDGET_LIST_LIST(setup->widget_list)));
 	
@@ -1116,7 +1114,7 @@ void setup_panel(void) {
      (setup->slider_wg = xitk_noskin_slider_create(setup->widget_list, &sl,
 						   (WINDOW_WIDTH - 41), 70, 
 						   16, (WINDOW_HEIGHT - 140), XITK_VSLIDER)));
-    xitk_slider_set_pos(setup->widget_list, setup->slider_wg, 1);
+    xitk_slider_set_pos(setup->slider_wg, 1);
   }
 
   setup_sections();

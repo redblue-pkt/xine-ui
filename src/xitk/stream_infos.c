@@ -103,7 +103,7 @@ static void stream_infos_update(xitk_widget_t *w, void *data) {
 }
 
 static void set_label(xitk_widget_t *w, char *label) {
-  xitk_label_change_label(sinfos->widget_list, w, label);
+  xitk_label_change_label(w, label);
 }
 
 static char *get_yesno_string(uint32_t val) {
@@ -323,14 +323,14 @@ void stream_infos_toggle_auto_update(void) {
   if(sinfos != NULL) {
 
     if(gGui->stream_info_auto_update) {
-      xitk_hide_widget(sinfos->widget_list, sinfos->update);
+      xitk_hide_widget(sinfos->update);
       XLockDisplay(gGui->display);
       XClearWindow(gGui->display, xitk_window_get_window(sinfos->xwin));
       XUnlockDisplay(gGui->display);
       xitk_paint_widget_list(sinfos->widget_list);
     }
     else
-      xitk_show_widget(sinfos->widget_list, sinfos->update);
+      xitk_show_widget(sinfos->update);
 
   }
 }
@@ -994,7 +994,7 @@ void stream_infos_panel(void) {
 					   "Black", "Black", "White", btnfontname)));
 
   if(gGui->stream_info_auto_update)
-    xitk_hide_widget(sinfos->widget_list, sinfos->update);
+    xitk_hide_widget(sinfos->update);
   
   x = WINDOW_WIDTH - 115;
   

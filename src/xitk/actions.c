@@ -1088,7 +1088,7 @@ void gui_increase_audio_volume(void) {
     if(gGui->mixer.volume_level < 100) {
       gGui->mixer.volume_level++;
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
-      xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+      xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
       osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
     }
   }
@@ -1100,7 +1100,7 @@ void gui_decrease_audio_volume(void) {
     if(gGui->mixer.volume_level > 0) {
       gGui->mixer.volume_level--;
       xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
-      xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+      xitk_slider_set_pos(panel->mixer.slider, gGui->mixer.volume_level);
       osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
     }
   }
