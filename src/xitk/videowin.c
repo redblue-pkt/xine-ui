@@ -39,19 +39,20 @@
 
 extern gGui_t *gGui;
 
-XVisualInfo    gvw_vinfo;
-Cursor         gvw_cursor[2]; /* Cursor pointers     */
-XClassHint    *gvw_xclasshint;
-GC             gvw_gc;
-int            gvw_video_width, gvw_video_height; /* size of currently displayed video */
-int            gvw_fullscreen_mode; /* are we currently in fullscreen mode?  */
-int            gvw_fullscreen_req;  /* ==1 => gui_setup_video_window will switch to fullscreen mode */
-int            gvw_fullscreen_width, gvw_fullscreen_height;
-int            gvw_completion_type;
-int            gvw_depth;
-int            gvw_show;
-XWMHints      *gvw_wm_hint;
-static DND_struct_t    xdnd_videowin;
+static XVisualInfo    gvw_vinfo;
+static Cursor         gvw_cursor[2]; /* Cursor pointers     */
+static int            gvw_cursor_visible;
+static XClassHint    *gvw_xclasshint;
+static GC             gvw_gc;
+static int            gvw_video_width, gvw_video_height; /* size of currently displayed video */
+static int            gvw_fullscreen_mode; /* are we currently in fullscreen mode?  */
+static int            gvw_fullscreen_req;  /* ==1 => gui_setup_video_window will switch to fullscreen mode */
+static int            gvw_fullscreen_width, gvw_fullscreen_height;
+static int            gvw_completion_type;
+static int            gvw_depth;
+static int            gvw_show;
+static XWMHints      *gvw_wm_hint;
+static DND_struct_t   xdnd_videowin;
 
 
 void video_window_draw_logo(void) {
@@ -139,6 +140,7 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
   MWMHints              mwmhints;
   XEvent                xev;
   XGCValues             xgcv;
+  Window                old_video_window = None;
 
   XLockDisplay (gGui->display);
 
@@ -159,9 +161,7 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
 	return;
       }
 
-      XDestroyWindow(gGui->display, gGui->video_window);
-      gGui->video_window = 0;
-
+      old_video_window = gGui->video_window;
     }
 
     gvw_fullscreen_mode = 1;
@@ -214,10 +214,9 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
 
     if (gGui->video_window) {
 
-      if (gvw_fullscreen_mode) {
-	XDestroyWindow(gGui->display, gGui->video_window);
-	gGui->video_window = 0;
-      } else {
+      if (gvw_fullscreen_mode)
+	old_video_window = gGui->video_window;
+      else {
 	
 	XResizeWindow (gGui->display, gGui->video_window, 
 		       gvw_video_width, gvw_video_height);
@@ -255,6 +254,7 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
       gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
 					  GUI_DATA_EX_DRAWABLE_CHANGED, 
 					  (void*)gGui->video_window);
+    
     if (gvw_xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gvw_xclasshint);
 
@@ -316,23 +316,21 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
   dnd_set_callback (&xdnd_videowin, gui_dndcallback);
   dnd_make_window_aware (&xdnd_videowin, gGui->video_window);
 
-  /*
-   * make cursor disappear
-   */
-
-  /* FIXME: implement in a clean way
-
-    Cursor not already created.
-  if(gXv.current_cursor == -1) {
-    create_cursor_xv(theCmap);
-    gXv.current_cursor = SHOW_CURSOR;
-  };
-  */
+  /* The old window should be destroyed now */
+  if(old_video_window != None)
+    XDestroyWindow(gGui->display, old_video_window);
 }
 
 /* hide/show cursor in video window*/
 void video_window_set_cursor_visibility(int show_cursor) {
-  XDefineCursor(gGui->display, gGui->video_window, gvw_cursor[show_cursor]);
+  gvw_cursor_visible = show_cursor;
+  XDefineCursor(gGui->display, gGui->video_window, 
+		gvw_cursor[gvw_cursor_visible]);
+}
+
+/* Get cursor visiblity (boolean) */
+int video_window_is_cursor_visibility(void) {
+  return gvw_cursor_visible;
 }
 
 /* hide/show video window */

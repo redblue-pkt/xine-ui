@@ -248,12 +248,8 @@ void gui_handle_event (XEvent *event) {
 
     case XK_Control_L:
     case XK_Control_R:
-      /* FIXME
-      if(!gui_panel_visible) {
-	cursor_visible = !cursor_visible;
-	xine_set_display_cursor(gGui->xine, cursor_visible);
-      }
-      */
+      if(!panel_is_visible())
+	video_window_set_cursor_visibility(!video_window_is_cursor_visibility());
       break;
 
     case XK_Next:
@@ -492,13 +488,12 @@ void gui_init (int nfiles, char *filenames[]) {
   video_window_init ();
   panel_init ();
 
-  dnd_init_dnd(gGui->display, &gGui->xdnd);
-  dnd_set_callback (&gGui->xdnd, gui_dndcallback);
-  dnd_make_window_aware (&gGui->xdnd, gGui->panel_window); 
-
 }
 
-void gui_run () {
+/*
+ *
+ */
+void gui_run (void) {
   
   XEvent                myevent;
   struct sigaction      action;

@@ -226,6 +226,10 @@ void panel_handle_event(XEvent *event) {
     }
   }
 }
+
+/*
+ *
+ */
 void panel_init (void) {
   GC                      gc;
   XSizeHints              hint;
@@ -334,8 +338,9 @@ void panel_init (void) {
   /*
    * drag and drop
    */
-  
-  dnd_make_window_aware (&gGui->xdnd, gGui->panel_window);
+  dnd_init_dnd(gGui->display, &gGui->xdnd);
+  dnd_set_callback (&gGui->xdnd, gui_dndcallback);
+  dnd_make_window_aware (&gGui->xdnd, gGui->panel_window); 
 
 
   /*
