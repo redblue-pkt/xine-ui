@@ -411,30 +411,23 @@ static void fb_extract_path_and_file(filebrowser_t *fb, char *filepathname) {
     
     xine_strdupa(_filepathname, filepathname);
     
-    printf("filepathname: %s\n", _filepathname);
-    
     if(!is_a_dir((char *)_filepathname))
       filename = strrchr(_filepathname, '/');
     
     if(filename && (strlen(filename) > 1)) {
       
       *filename++ = '\0';
-      
-      printf("filename: %s\n", filename);
       sprintf(fb->filename, "%s", filename);
       
-      if(is_a_dir(_filepathname)) {
+      if(is_a_dir(_filepathname))
 	sprintf(fb->current_dir, "%s", _filepathname);
-	printf("new current dir: %s\n", fb->current_dir);
-      }
+
     }
     else {
-      printf("don't have filename: %s\n", _filepathname);
       if(is_a_dir((char *)_filepathname)) {
 	sprintf(fb->current_dir, "%s", _filepathname);
 	memset(&fb->filename, 0, sizeof(fb->filename));
       }
-      
     }
   }
 }

@@ -383,8 +383,6 @@ static kbinding_entry_t default_binding_table[] = {
     "AddMediamark",           ACTID_ADDMEDIAMARK            , "a",        KEYMOD_CONTROL , 0 },
   { "Download a skin from the skin server.",
     "SkinDownload",           ACTID_SKINDOWNLOAD            , "d",        KEYMOD_CONTROL , 0 },
-  { "File Browser.",
-    "FileBrowser",            ACTID_FILEBROWSER             , "f",        KEYMOD_META    , 0 },
   { "Open file selector.",
     "FileSelector",           ACTID_FILESELECTOR            , "o",        KEYMOD_CONTROL , 0 },
   { 0,

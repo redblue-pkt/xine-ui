@@ -202,25 +202,6 @@ static void gui_signal_handler (int sig, void *data) {
 /*
  *
  */
-static void filebrowser_callback1(filebrowser_t *fb) {
-  char **files;
-
-  printf("Current dir: %s\n", filebrowser_get_current_dir(fb));
-  printf("Current file: %s\n", filebrowser_get_current_filename(fb));
-  printf("Full filename: %s\n", filebrowser_get_full_filename(fb));
-  files = filebrowser_get_all_files(fb);
-  if(files) {
-    int i = 0;
-
-    while(files[i])
-      printf("file %d: '%s'\n", i, files[i++]);
-
-    i = 0;
-    while(files[i])
-      free(files[i++]);
-    free(files);
-  }
-}
 void gui_execute_action_id(action_id_t action) {
   xine_event_t   xine_event;
   
@@ -642,19 +623,6 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_OSD_SINFOS:
     osd_stream_infos();
-    break;
-
-  case ACTID_FILEBROWSER:
-   {
-     filebrowser_callback_button_t cbb[2];
-     
-     cbb[0].label = _("Load");
-     cbb[0].callback = filebrowser_callback1;
-     /* cbb[1].label = _("Load all"); */
-     /* cbb[1].callback = filebrowser_callback1; */
-     
-     create_filebrowser(_("Load a playlist"), "/tmp/myfile.tox", &cbb[0], NULL);
-    }
     break;
 
   case ACTID_FILESELECTOR:
