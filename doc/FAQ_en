@@ -44,7 +44,7 @@
    
    5.1 GENERAL QUESTIONS
    5.1.1 I have a lot of dropped frames - what can I do?   
-   5.1.2 I have problems when using xine on FreeBSD, Solaris!   
+   5.1.2 I have problems when using xine on FreeBSD, Solaris, ... !
    5.1.3 How do I play streams from STDIN?
    5.1.4 How do I change the skin of the xine gui?
    5.1.5 What is aalib? How do I use it in xine?
@@ -133,8 +133,9 @@
     
     xine-ui is basically the user interface which makes use of the xine-lib.
     
-    xine-plugin will be a general browser plugin that will make it possible to
-    watch your favorite Internet streams within your browser with xine.
+    xine-plugin is a general browser plugin that makes it possible to
+    watch your favorite video streams within your browser (e.g. mozilla)
+    using the xine engine.
 
     gnome-xine is a gnome frontend for the xine-engine and can be used
     as a replacement for xine-ui. It is more focused on the general
@@ -171,8 +172,8 @@
 
     First of all an official and stable release of gcc because there seem
     to be still problems with gcc-3.x. Also be aware that patched gcc versions
-    may break parts of xine and are therefore not supported by us. (libmpeg2
-    will be broken when compiled with pgcc)
+    may break parts of xine and are therefore not supported by us (libmpeg2
+    is broken when compiled with pgcc).
 
     Furthermore you'll have to use GNU make to compile xine. On most GNU/Linux
     systems "make" is GNU make - on other platforms use "gmake" instead.
@@ -206,15 +207,15 @@
 3.2.2 complete build instructions
 
       The build process is the same for all of the xine modules (see 2.1 for
-      an explanation about the modules).
+      an explanation of the modules).
 
-      You have to start with xine-lib. If build and installed successfully, you
+      You have to start with xine-lib. If built and installed successfully, you
       can continue with xine-ui and/or xine-plugin.
-    
-      Please note that if you have installed xine-lib to a non-standard prefix,
-      make sure you have $prefix/bin in your PATH and your linker will find
-      libs in $prefix/lib - otherwise the compilation of every module that
-      relies on xine-lib will fail with configure complaining about not
+
+      If you have installed xine-lib to a non-standard prefix, make sure you
+      that you have $prefix/bin in your PATH and that your linker finds
+      libs in $prefix/lib - otherwise trying to build modules that
+      rely on xine-lib will fail with configure complaining about not
       finding certain parts of libxine. Using bash you can do something like:
     
        export PATH="$prefix/bin:$PATH"
@@ -263,11 +264,7 @@
 
 3.4 Are there binaries for my K7 available? Can I build them?
 
-    At the moment we do not provide K7 binaries, since the latest stable gcc
-    version (2.92.2 at the time of this writing) doesn't have K7 support. Use
-    the 686 binaries instead. These binaries should run ok and will use 3DNow!
-
-    If you have a newer gcc you can try to compile "more" k7 support in (esp.
+    If you have a recent gcc you can try to compile "more" k7 support in (esp.
     better instruction scheduling). If the configure script should fail to
     detect your processor/gcc correctly, try setting the xine_BUILD envvar
     explicitly to a valid description string for your configuration, e.g.
@@ -305,7 +302,6 @@
 
       Now you should be ready to build the Xv video-out plugin on your system.
 
-
 3.6 Build problems: xine-ui.
 
 3.6.1 I have installed xine-lib but xine-ui complains about not finding it!
@@ -313,15 +309,11 @@
       First of all take a closer look at 3.2 again. You will probably find your
       answer there right away.
 
-      Like stated in 3.2 (there again that hint *grin*), make sure that you've
-      $prefix/bin in your path and that your linker is able to find libraries
-      installed in $prefix/lib. (by the way, $prefix is where you installed
-      your xine-lib in earlier (yes, installing xine-lib with "make install"
-      would be a great idea to be able to compile xine-ui *grin*).
-    
-      See question 3.2 for details about how to properly compile and install
-      all of the xine modules. But I guess I already mentioned that just a few
-      lines before. ;-)
+      Like stated in 3.2 (there again that hint *grin*), make sure that you
+      have $prefix/bin in your path and that your linker is able to find
+      libraries installed in $prefix/lib (by the way, $prefix is where you
+      installed your xine-lib to earlier (yes, installing xine-lib with
+      "make install" would be a good idea before trying to compile xine-ui ;)).
 
 3.7 Can I install xine in my home directory (without being root) ?
 
@@ -329,8 +321,8 @@
 
     $ mkdir ~/usr
 
-    then, you have to set a few environment variables - perhaps its a good
-    idea to add this to your  ~/.bashrc or somewhere similar:
+    then you have to set a few environment variables - it's probably a good
+    idea to add this to your  ~/.bashrc (or somewhere similar):
 
     export PATH="$HOME/usr/bin:$PATH"
     export LD_LIBRARY_PATH="$HOME/usr/lib:$LD_LIBRARY_PATH"
@@ -348,12 +340,11 @@
    
 4.1 Is it possible to use windows codecs with xine?
 
-    Yes, xine is able to use some win32 dlls from your windows system
-    to decode a few obscure formats. We do not generally endorse the use
-    of binary codecs, the user is solely responsible for any license
-    conflict or malfunctioning.
+    Yes, xine is able to use some win32 dlls (as used on windows systems)
+    to decode a few obscure formats. We do not endorse such use of binary
+    codecs, the user is solely responsible for any license conflicts.
     
-    Some codecs that are known to work (not an exaustive list):
+    Some codecs that are known to work (not an exhaustive list):
       
       mpg4c32.dll - Microsoft MPEG-4 v1/v2
       ir50_32.dll - Indeo Video 5 format
@@ -366,7 +357,7 @@
       divxa32.acm - DivX audio (WMA)
       voxmsdec.ax - Voxware Metasound
       
-    These win32 dlls do only work in x86 systems.
+    These win32 dlls only work on x86 systems.
 
 4.2 Where should I put the win32 codec dlls for xine?
 
@@ -381,11 +372,12 @@
    
 4.3 This is great! Could you provide these dlls?
 
-    Unfortunately not. These files are generally freely available on the
-    web but we can't provide them due legal reasons (read license 
+    No. The code in these dlls is proprietary software (owned by microsoft,
+    intel and others). Some of them are available for download on the web
+    (at no cost), but we can't provide them for legal reasons (due to license
     restrictions, both from xine and codec sides).
     
-    Besides you may already have these codecs in your computer if you have
+    You may already have these codecs in your computer if you have
     a windows partition.
     
 
@@ -395,7 +387,7 @@
 
 5.1.1 I have a lot of dropped frames - what can I do?
 
-      Your hardware is too slow for xine. Make sure you turn on all
+      Your hardware might be too slow for xine. Make sure you turn on all
       speed optimizing options. A few things you should check:
 
        - first of all, run the xine-check script included in xine-ui
@@ -430,7 +422,7 @@
            [ good ] your Xv extension supports packed YUV overlays
            [ good ] Xv ports:  YUY2 YV12 I420 UYVY      
        
-       - use a recent kernel optimized for your hardware
+       - use a recent kernel which is optimized for your hardware
 
        - use the latest gas/gcc
 
@@ -440,10 +432,10 @@
        - if you are not using Xv, make sure your display is set up
          to 16bpp, not 24 or higher (reduces memory bandwith)
 
-       - make sure the hard drive which supplies the video data
-         is in DMA mode (if supported) 
+       - make sure the hard drive (or cdrom/dvd drive) which supplies the
+         video data is in DMA mode (if supported) 
        
-         Under linux, you can use hdparm to check this. 
+         On most linux-based systems, you can use hdparm to check this. 
          Example:
 
           hdparm /dev/hda
@@ -472,9 +464,6 @@
          This website centers around a windows-tool to tweak the chipset, you
          can do the same on FreeBSD with pciconf. On some linux distributions
          there are similar tools.
-
-         Please contact Heiko if you have any problems or tips about via apollo
-         pro chipset tweaking.
 
        - a nice performance tuning tool can be found here:
 
@@ -507,7 +496,7 @@
 
           ln -s /dev/raw1 /dev/rdvd
 
-5.1.2 I have problems when using xine on FreeBSD, Solaris!
+5.1.2 I have problems when using xine on FreeBSD, Solaris, ... !
 
       Check out the the corresponding README files in the directory:
        
@@ -532,7 +521,7 @@
       chooser. Click your desired skin and your new theme will come into
       affect immediately.
       
-      And if you wanna do it the complicated way :), you can also edit the
+      And if you wanna do it the hard way :) you can also edit the
       appropriate entry in your ~/.xine/config file (gui.skin).
 
 5.1.5 What is aalib? How do I use it in xine?
@@ -541,10 +530,10 @@
       plugin so you can watch movies in your xterm, on the console or on your
       old vt100 - very cool ;>
 
-      To use it simply make sure you have aalib installed correctly before you
-      configure/build xine-lib and xine-ui. Besides the "xine" binary a
-      "aaxine" binary should get built and installed, so you can use something
-      like:
+      To use it make sure you have aalib installed correctly before you
+      configure/build xine-lib and xine-ui. In addition to the "xine" binary a
+      binary named "aaxine" should get built and installed. You can then use
+      something like:
 
        aaxine foo.mpg
 
@@ -552,49 +541,50 @@
 
 5.1.6 What do all these ~/.xine/config entries mean?
      
-      You'll find more info about them in xine-ui/doc/README.config_en.
+      You can find information about them in xine-ui/doc/README.config_en.
 
 5.1.7 How do I use the dvd plugin?
 
       First of all:
     
-      The dvd plugin delivered with xine currently does not support playback
-      of locked and/or encrypted dvds. You will need external programs or
-      something like an "improved" xine_dvd_plugin to view these DVDs with xine
-      directly. Of course you could play back the decrypted mpeg2 stream
-      (technically speaking) that is the movie on the dvd with xine with the
-      help of additional programs.
+      The dvd plugin delivered with xine does not support playback of locked
+      and/or encrypted dvds. You will need external programs or something
+      like an "enhanced" xine_dvd_plugin to view these DVDs with xine
+      directly. Of course (technically speaking) you can easily play back the
+      decrypted mpeg2 stream (which is the movie on the dvd) with xine, if
+      the data on the dvd is decoded with the help of additional programs.
       
-      xine standard dvd plugin also can't handle menus. For more information
+      xine's standard dvd plugin also can't handle menus. For more information
       about menu support please check http://dvd.sf.net
       
-      If you install a different or "improved" dvd plugin in xine it will be
-      accessible from another button. Hitting "DVD" button will _always_ give
-      you the standard, no menu support and unencrypted dvd plugin.
+      If you install a different or "enhanced" dvd plugin, it will be
+      accessible on xine-ui as a new button. Hitting "DVD" button will
+      _always_ give you the standard dvd plugin (without menu support and
+      decryption/unlocking) .
     
-      Due to the uncertain legal situation regarding css encryption we do not
+      Due to the uncertain legal situation regarding css decryption we do not
       include anything of that nature in the xine distribution, nor do we
       generally endorse the use of such software (you should check if the use
       of such software is legal where you live).
     
       We hope that this situation will change soon.
       
-      The easiest way to play an unlocked/unencrypted dvd is, press the DVD
-      button on the xine panel and then play. Now everything should work
-      out-of-the-box. Please note that for this to work you will not have to
-      mount your dvd. You can lean back and enjoy the movie... :-)
+      The easiest way to play an unlocked/unencrypted dvd is to press the DVD
+      button on the xine panel and then the play button. Now everything should
+      work out-of-the-box. Please note that for this to work you don't need to
+      mount your dvd. Just lean back and enjoy the movie... :-)
       
       Alternatively you can also do all the work by yourself (even though
       unnecessary but if you want to: the user is the king *grin*):
 
       Please note, if you go this way, you will *not* have seamless branching
-      of the dvd movie. You have to play each part of the movie manually. So
-      once again: why don't just press the dvd button anyway!? ;-)
+      of the dvd movie. You have to play each part of the movie manually.
+      (...why don't just press the dvd button anyway!? ;-))
 
       Mount your dvd and check what files are on the disc. There should be
       some files like:
      
-       ../VIDEO_TS/VTS_xx_x.VOB, where x are numbers.
+       [...]/VIDEO_TS/VTS_xx_x.VOB, where x are numbers.
      
       If you look for the big .VOB files on a dvd, those are probably the
       ones where the movie is in. To play one of those big files, start xine
@@ -659,7 +649,7 @@
 
 5.2.3 What about ALSA 0.5.x?
 
-      Don't use it. :-)
+      Don't use it :-)
 
 5.2.4 Can xine produce 4-/5-channel surround audio output?
 
@@ -674,7 +664,7 @@
 
       On this machine 4-channel surround would be possible. However, since xine
       cannot detect if there are actually speakers connected to the additional
-      channels, you'll have to manually activate that feature.
+      channels, you'll have to activate that feature manually.
       
       You can do this either in the config dialog while xine is running (press
       the config button on the xine panel and go to the AUDIO tab) or have it
@@ -701,8 +691,9 @@
 5.2.6 Changing the volume with the GUI control has not affect! What's up!?
 
       Some xine drivers do not support volume changing although the GUI
-      will show the volume bar. Usually this is not a xine fault: aRts C
+      will show the volume bar. Usually this is not xines fault: aRts C
       API, for example, doesn't offer any volume property to applications.
+      Similarly, with ac3 pass through it is not possible to set the volume.
       
 
 5.3 VIDEO RELATED QUESTIONS
@@ -760,7 +751,7 @@
 
 5.3.5 The aspect ratio of the video is wrong!
 
-      Try pressing "a" to toggle the aspect ratio
+      Try pressing "a" to change the aspect ratio
 
 5.3.6 How can I change color/brightness/contrast?
 
@@ -784,12 +775,12 @@
 
       Naturally you can also use the specific gui button for this to change
       these video settings interactively. Yet please keep in mind that the gui
-      element will only work, if the video-out plugin you are using is also
+      element will only work if the video-out plugin you are using is also
       supporting brightness, saturation and/or contrast - otherwise you won't
-      be able to change the specific setting. (logical, isn't it? *grin*)
+      be able to change the specific setting.
       
       (Please also refer to README.config_en for more details about xine's
-       config file or use the config dialog accessible through the xine panel)
+      config file or use the config dialog accessible through the xine panel)
 
 
 5.4 ERROR MESSAGES: WHAT THEY MEAN AND WHAT YOU CAN DO.
@@ -840,15 +831,16 @@
 
       Probably xine can't access your input source. Most commonly this happens
       when you're trying to play locked/encrypted DVDs. Remember that xine
-      can't play such DVDs out-of-the box (for legal reasons). (see 5.1.7)
+      can't play such DVDs out-of-the box for legal reasons (see 5.1.7).
 
-      You could use a css-enabled DVD input plugin to avoid this.
+      You could try to use a css-enabled DVD input plugin to avoid this
+      (if that is legal where you live).
 
       Another reason could be that your (RPC-2) DVD drive isn't set up
-      for the right region. (see also 5.1.8)
+      for the right region (see also 5.1.8).
       
       Recent xine versions will properly check if the DVD you are trying to
-      play is encrypted and warn you about it. (see 5.4.5)
+      play is encrypted and warn you about it (see 5.4.5).
 
 5.4.5 "input_dvd: Sorry, xine doesn't play encrypted DVDs. The legal status
        of CSS decryption is unclear and we will not provide such code."
@@ -857,12 +849,12 @@
       refer to question 5.1.7 and to the general README included with xine for
       more information about this matter.
       
-      We are sorry for the inconvenience, yet this is out of our hands. :-(
+      We are sorry for the inconvenience, yet this is out of our hands :-(
 
 5.4.6 "audio driver 'oss' failed, using null driver instead"
 
-      First of all, make sure that your OSS Audio drivers are working (ie you
-      can play music with other software).
+      First of all, make sure that your OSS Audio drivers are working (i.e.
+      you can play music with other software).
 
       The most common reason for this is that some other program is accesing
       your audio device. If you're using linux, the command "fuser /dev/dsp"
@@ -902,7 +894,7 @@
       
       You have tried to play a stream using a unknown or unhandled codec.
       Most likely, the file uses some obscure proprietary format and no
-      information is available to decode it.
+      information is available on how to decode it.
       
       This popup window can be disabled from xine setup for audio, video
       codecs or both. see gui.warn_unhandled_codec setting.
@@ -918,10 +910,10 @@
 6.1 I did the impossible - I really found a bug! Who can I inform about it?
     
     Even though we try to make each release as bug free as possible, xine is
-    still under heavy development. (nice excuse, isn't it? *grin*)
+    still under heavy development (nice excuse, isn't it? *grin*).
 
     Please take a look at our bug report form which is located in the xine-ui
     package (doc/bug_report_form). Fill it out accordingly and sent it to our
     user mailing list: xine-user@lists.sourceforge.net
 
-    Thanks for taking the time to help improve xine even more!
+    Thanks for taking the time to help improve xine.
