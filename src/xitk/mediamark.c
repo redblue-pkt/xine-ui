@@ -137,7 +137,7 @@ static char *_read_file(const char *filename, int *size) {
   
   extension = strrchr(filename, '.');
   if(extension && 
-     ((!strncasecmp(extension, ".asx", 4)) || 
+     ((!strncasecmp(extension, ".asx", 4)) || (!strncasecmp(extension, ".xml", 4)) ||
       (!strncasecmp(extension, ".smi", 4)) || (!strncasecmp(extension, ".smil", 5))) && 
      ((!strncasecmp(filename, "http://", 7)) || (!strncasecmp(filename, "ftp://", 6))))
     return _download_file(filename, size);
@@ -2704,6 +2704,7 @@ int mrl_look_like_playlist(char *mrl) {
       (!strncasecmp(extension, ".pls", 4))  ||
       (!strncasecmp(extension, ".m3u", 4))  ||
       (!strncasecmp(extension, ".sfv", 4))  ||
+      (!strncasecmp(extension, ".xml", 4))  ||
       (!strncasecmp(extension, ".tox", 4)))) {
     return 1;
   }
@@ -2750,7 +2751,7 @@ void mediamark_collect_from_directory(char *filepathname) {
 	if((extension = strrchr(fullpathname, '.')) && (strlen(extension) > 1)) {
 	  char ext[strlen(extension) + 2];
 	  char *valid_endings = 
-	    ".pls .m3u .sfv .tox .asx .smil" /* Playlists */
+	    ".pls .m3u .sfv .tox .asx .smi .smil .xml " /* Playlists */
 	    ".4xm .ac3 .aif .aiff .asf .wmv .wma .wvx .wax .aud .avi .cin .cpk .cak "
 	    ".film .dv .dif .fli .flc .mjpg .mov .qt .mp4 .mp3 .mp2 .mpa .mpega .mpg .mpeg "
 	    ".mpv .mve .mve .mv8 .nsf .nsv .ogg .ogm .spx .pes .png .png .mng .pva .ra .rm "
