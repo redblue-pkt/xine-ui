@@ -1164,6 +1164,8 @@ static int smil_get_time_in_seconds(const char *time_str) {
     unit = 3;
   else if(strstr(time_str, "h"))
     unit = 4;
+  else
+    unit = 2;
   
   if(unit == 0) {
     if((sscanf(time_str, "%d:%d:%d.%d", &hours, &mins, &secs, &msecs)) == 4)
@@ -1258,7 +1260,7 @@ static void smil_get_properties(smil_property_t *dprop, xml_property_t *props) {
       printf("BEGIN: %d\n", dprop->begin);
 #endif
     }
-    else if(!strcasecmp(prop->name, "CLIP-BEGIN")) {
+    else if((!strcasecmp(prop->name, "CLIP-BEGIN")) || (!strcasecmp(prop->name, "CLIPBEGIN"))) { 
       dprop->clip_begin = smil_get_time_in_seconds(prop->value);
 #ifdef DEBUG_SMIL
       palign;
@@ -1272,7 +1274,7 @@ static void smil_get_properties(smil_property_t *dprop, xml_property_t *props) {
       printf("END: %d\n", dprop->end);
 #endif
     }
-    else if(!strcasecmp(prop->name, "CLIP-END")) {
+    else if((!strcasecmp(prop->name, "CLIP-END")) || (!strcasecmp(prop->name, "CLIPEND"))) { 
       dprop->clip_end = smil_get_time_in_seconds(prop->value);
 #ifdef DEBUG_SMIL
       palign;
@@ -1372,7 +1374,7 @@ static void smil_properties(smil_t *smil, smil_node_t **snode,
 	printf("begin: %d\n",(*snode)->prop.begin);
 #endif
       }
-      else if(!strcasecmp(prop->name, "CLIP-BEGIN")) {
+      else if((!strcasecmp(prop->name, "CLIP-BEGIN")) || (!strcasecmp(prop->name, "CLIPBEGIN"))) { 
 	(*snode)->prop.clip_begin = smil_get_time_in_seconds(prop->value);
 #ifdef DEBUG_SMIL
 	printf("clip-begin: %d\n",(*snode)->prop.clip_begin);
@@ -1384,7 +1386,7 @@ static void smil_properties(smil_t *smil, smil_node_t **snode,
 	printf("end: %d\n",(*snode)->prop.end);
 #endif
       }
-      else if(!strcasecmp(prop->name, "CLIP-END")) {
+      else if((!strcasecmp(prop->name, "CLIP-END")) || (!strcasecmp(prop->name, "CLIPEND"))) { 
 	(*snode)->prop.clip_end = smil_get_time_in_seconds(prop->value);
 #ifdef DEBUG_SMIL
 	printf("clip-end: %d\n",(*snode)->prop.clip_end);
@@ -1849,12 +1851,12 @@ static mediamark_t **guess_smil_playlist(playlist_t *playlist, const char *filen
 	    printf("| IN BODY |\n");
 	    printf("+---------+\n");
 #endif
+	    __kino:
 	    smil_ref = smil_entry->child;
 	    while(smil_ref) {
 #ifdef DEBUG_SMIL
 	      printf("  smil_ref '%s'\n", smil_ref->name);
 #endif
-	      
 	      if(!strcasecmp(smil_ref->name, "SEQ")) {
 		smil_property_t  smil_props;
 		smil_node_t     *node = smil.node;
@@ -1915,6 +1917,9 @@ static mediamark_t **guess_smil_playlist(playlist_t *playlist, const char *filen
 
 	      smil_ref = smil_ref->next;
 	    }
+	  }
+	  else if(!strcasecmp(smil_entry->name, "SEQ")) { /* smil2, kino format(no body) */
+	    goto __kino;
 	  }
 	  
 	  smil_entry = smil_entry->next;
