@@ -423,7 +423,7 @@ Number9 {
 .PP
 Nach den obigen Änderungen können numerische Eingaben genutzt werden, um Zahlen für Kommandos einzugeben. Dazu wird zuerst die Zahl und danach das eigentliche Kommando eingegeben. Die Eingabe "99/" (zweimal die `9'-Taste und danach die `/'-Taste) würde zum Beispiel an die Position 99% des Eingabedatenstroms springen.
 .PP
-Das neue, experimentelle VCD/SVCD-Plugin `VCDX' erlaubt die numerische Eingabe. Die Eingabe einer Zahl gefolgt von "Ereignis-Auswahl" (normalerweise \fBZffernblock Enter\fP) springt in das angegebene "Kapitel" (Track oder Eintrag). Im Laufer der Zeit werden sicherlich weitere Plugins diese neue Funktionalität benutzen.
+Das neue, experimentelle VCD/SVCD-Plugin `VCDX' erlaubt die numerische Eingabe. Die Eingabe einer Zahl gefolgt von "Ereignis-Auswahl" (normalerweise \fBZiffernblock Enter\fP) springt in das angegebene "Kapitel" (Track oder Eintrag). Im Laufer der Zeit werden sicherlich weitere Plugins diese neue Funktionalität benutzen.
 .PP
 Die Kommandos "nächste/vorherige MRL" (\fBMRL_NEXT\fP, \fBMRL_PRIOR\fP), "nächster/vorheriger Untertitel" (\fBSPU_NEXT\fP, \fBSPU_PRIOR\fP) und "nächster/vorheriger Tonkanal" (\fBAUDIOCHAN_NEXT\fP, \fBAUDIOCHAN_PRIOR\fP) nutzen bereits die Funktion der numerischen Eingabe. Wird vor diesen Kommandos eine Zahl eingegeben, so wird das Kommando sooft wie angegeben ausgeführt. Eine "0" wird hier als "einmal" interpretiert, da dies ansonsten sinnlos wäre.
 
