@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2000-2003 the xine project
  * 
  * This file is part of xine, a unix video player.
@@ -688,14 +688,21 @@ int xitk_font_get_char_height(xitk_font_t *xtfs, char *c, int maxnbytes, int *nb
 void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
 			   int *lbearing, int *rbearing, int *width, int *ascent, int *descent) {
 
+#ifdef WITH_XMB
+  XRectangle logic;
+#else
+  XCharStruct ov;
+  int         dir;
+  int         fascent, fdescent;
+#endif
+
 #ifdef DEBUG
   if (nbytes > strlen(c) + 1) {
     XITK_WARNING("extent: %d > %d\n", nbytes, strlen(c));
   }
 #endif
-#ifdef WITH_XMB
-  XRectangle logic;
 
+#ifdef WITH_XMB
   ABORT_IF_NULL(xtfs);
   ABORT_IF_NULL(xtfs->fontset);
   ABORT_IF_NULL(c);
@@ -749,10 +756,6 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int nbytes,
   if (ascent) *ascent   = -logic.y;
   if (descent) *descent = logic.height + logic.y;
 #else
-  XCharStruct ov;
-  int         dir;
-  int         fascent, fdescent;
-
   ABORT_IF_NULL(xtfs);
   ABORT_IF_NULL(xtfs->font);
   ABORT_IF_NULL(xtfs->display);
