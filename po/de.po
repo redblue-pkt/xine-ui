@@ -1914,7 +1914,7 @@ msgstr "Playliste/SEP"
 
 #: src/xitk/menus.c:476
 msgid "Playlist/Loop modes"
-msgstr "Playliste/Wiederholen."
+msgstr "Playliste/Wiederholen"
 
 #: src/xitk/menus.c:479
 msgid "Playlist/Loop modes/Disabled"
