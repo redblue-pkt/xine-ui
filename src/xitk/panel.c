@@ -559,7 +559,8 @@ static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
 #if defined(HAVE_XINERAMA) || defined(HAVE_XF86VIDMODE)
     if(
 #ifdef HAVE_XINERAMA
-       ((video_window_get_fullscreen_mode()) & FULLSCR_XI_MODE)
+       (((video_window_get_fullscreen_mode()) & (WINDOWED_MODE | FULLSCR_MODE)) &&
+	(!(video_window_get_fullscreen_mode()) & FULLSCR_XI_MODE))
 #ifdef HAVE_XF86VIDMODE
        ||
 #endif
