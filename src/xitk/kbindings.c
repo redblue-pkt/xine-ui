@@ -1733,7 +1733,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     memset(&xbutton, 0, sizeof(xbutton));
     snprintf(xbutton, 255, "XButton_%d", xev.xbutton.button);
     kbe->key = strdup(xbutton);
-    
+    kbe->modifier &= 0xFFFFFFEF;
   }
   
   xitk_labelbutton_change_label(kbedit->grab, olbl);
