@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.13\n"
 "POT-Creation-Date: 2002-08-30 16:27+0200\n"
-"PO-Revision-Date: 2002-09-01 21:59+0200\n"
+"PO-Revision-Date: 2002-09-05 08:26+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polski <pl@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -249,7 +249,7 @@ msgstr "         Protokó³ w wersji: %d, Rewizja %d,\n"
 #: src/xitk/event.c:832
 #, c-format
 msgid "        Available Screen(s): %d, using %d\n"
-msgstr "         Dostêpny ekran(y): %d, y¿ywany %d\n"
+msgstr "         Dostêpny ekran(y): %d, u¿ywany %d\n"
 
 # src/xitk/event.c:767
 #: src/xitk/event.c:834
@@ -422,7 +422,7 @@ msgid ""
 "(c) 2000-2002 by G. Bartsch and the xine project team.\n"
 msgstr ""
 "To jest XINE (interfejs u¿ytkownika X11) - wolny odtwarzacz wideo v%s\n"
-"(c) 2000-2002 G. Bartsch i grupa projektu XINE. \n"
+"(c) 2000-2002 G. Bartsch i grupa projektu xine. \n"
 
 # src/xitk/main.c:255
 #: src/xitk/main.c:255
@@ -1114,7 +1114,7 @@ msgstr "snapshot.c: nie wspierane dla tego sterownika wyj¶cia obrazu\n"
 #: src/xitk/snapshot.c:947
 #, c-format
 msgid "File open failed (%s)\n"
-msgstr "Otwarcie pliku nie udane (%s)\n"
+msgstr "Nie udane otwarcie pliku (%s)\n"
 
 # src/xitk/snapshot.c:1095
 #.
@@ -1147,7 +1147,7 @@ msgstr ""
 #.
 #: src/xitk/videowin.c:229
 msgid "xine video output"
-msgstr "wyj¶cie obrazu XINE"
+msgstr "wyj¶cie obrazu xine"
 
 # src/xitk/videowin.c:361
 #: src/xitk/videowin.c:369
@@ -1157,17 +1157,17 @@ msgstr "XF86VidMode Extension: zawiod³o prze³±czanie modeline.\n"
 # src/xitk/videowin.c:1015
 #: src/xitk/videowin.c:1043
 msgid "Xine Video Window"
-msgstr "Okno wy¶wietlania obrazu XINE"
+msgstr "Okno wy¶wietlania obrazu xine"
 
 # src/xitk/videowin.c:1019
 #: src/xitk/videowin.c:1047
 msgid "Xine Video Fullscreen Window"
-msgstr "Tryb pe³noekranowy okna obrazu XINE"
+msgstr "Tryb pe³noekranowy okna obrazu xine"
 
 # src/xitk/videowin.c:1023
 #: src/xitk/videowin.c:1051
 msgid "Xine Video Borderless Window"
-msgstr "Nie obramowane okno wyj¶cia obrazu XINE"
+msgstr "Nie obramowane okno wyj¶cia obrazu xine"
 
 # src/xitk/videowin.c:1044
 #: src/xitk/videowin.c:1072
@@ -1177,7 +1177,7 @@ msgstr "XAllocWMHints() zawiod³o\n"
 # src/xitk/videowin.c:1068
 #: src/xitk/videowin.c:1096
 msgid "New stream sizes resize output window"
-msgstr "Rozmiar nowego strumienia zmienia rozmiar wyj¶cia obrazu"
+msgstr "Rozmiar nowego strumienia zmienia rozmiar okna wyj¶cia obrazu"
 
 # src/xitk/videowin.c:1074
 #: src/xitk/videowin.c:1102
@@ -1193,7 +1193,7 @@ msgstr "u¿ywaj XVidModeExtension podczas prze³±czania do trybu pe³noekranowego"
 #: src/xitk/videowin.c:1140
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
-msgstr "Zanleziono rozszerzenie XF86VidMode (%d.%d), próba u¿ycia go.\n"
+msgstr "Zanleziono rozszerzenie XF86VidMode (%d.%d), próba u¿ycia.\n"
 
 # src/xitk/videowin.c:1115
 #: src/xitk/videowin.c:1143
@@ -1222,7 +1222,7 @@ msgstr "info o logach"
 #: src/xitk/viewlog.c:330
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
-msgstr "Nie ma wpisu w logach o sekcji '%s'.\n"
+msgstr "Brak w logach wpisu o sekcji '%s'.\n"
 
 # src/xitk/viewlog.c:427
 #: src/xitk/viewlog.c:429
@@ -1234,19 +1234,4 @@ msgstr "podgl±d logów xine"
 msgid "Refresh"
 msgstr "Od¶wie¿anie"
 
-# src/xitk/main.c:624
-#~ msgid "never"
-#~ msgstr "Nigdy"
-
-# src/xitk/main.c:625
-#~ msgid "video only"
-#~ msgstr "wy³±cznie obraz"
-
-# src/xitk/main.c:626
-#~ msgid "audio only"
-#~ msgstr "wy³±cznie d¼wiêk"
-
-# src/xitk/main.c:627
-#~ msgid "always"
-#~ msgstr "Zawsze"
 
