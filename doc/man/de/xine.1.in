@@ -389,9 +389,9 @@ Ereignis auswählen.
 Einige Titel haben schlechte Zeitmarken, so daß die Synchonisation nicht funktioniert.
 Dies kann mit folgenden Tasten korrigiert werden:
 .IP  "\fBn\fP | \fBN\fP"
-Falls das Video dem Ton vorauseilt
-.IP  "\fBm\fP | \fBM\fP"
 Falls das Video dem Ton hinterherhinkt.
+.IP  "\fBm\fP | \fBM\fP"
+Falls das Video dem Ton vorauseilt.
 .IP  "\fB<Pos1>\fP"
 Video/Ton\-Differenz auf \fB0\fP zurücksetzen, so daß die Zeitmarken unverändert bleiben.
 

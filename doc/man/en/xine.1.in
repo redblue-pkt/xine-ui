@@ -461,9 +461,9 @@ Select event
 Some streams have bad timestamps, so synchronization fails. This can be
 tweaked using these keys:
 .IP "n"
-press if video runs ahead of audio
-.IP "m"
 press if video lags behind audio
+.IP "m"
+press if video runs ahead of audio
 .IP "\fB<home>\fP"
 press to reset audio/video offset to \fB0\fP, so stream timestamps are unchanged.
 

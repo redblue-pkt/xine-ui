@@ -432,9 +432,9 @@ Wybierz.
 Niektóre strumienie maj± b³êdne znaczniki czasu, wiêc synchronizacja siê nie
 udaje. Mo¿na to poprawiæ u¿ywaj±c nastêpuj±cych klawiszy:
 .IP "n | N"
-Naci¶nij je¶li d¼wiêk nie nad±¿a za obrazem
-.IP "m | "
 Naci¶nij je¶li obraz nie nad±¿a za d¼wiêkiem
+.IP "m | "
+Naci¶nij je¶li d¼wiêk nie nad±¿a za obrazem
 .IP "\fB<home>\fP"
 Naci¶nij aby zresetowaæ ustawienia przesuniêæ na \fB0\fP, tak aby znaczniki
 czasu strumienia pozosta³y niezmienione.
