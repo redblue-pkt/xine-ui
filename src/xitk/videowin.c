@@ -470,6 +470,18 @@ static void video_window_adapt_size (void) {
   gVw->visible_height = gVw->fullscreen_height;
   gVw->visible_aspect = gGui->pixel_aspect;
 
+  /* Retrieve size/aspect from tvout backend, if it should be set */
+  if(gGui->tvout) {
+    tvout_get_size_and_aspect(gGui->tvout,
+			      &gVw->visible_width, &gVw->visible_height,
+			      &gVw->visible_aspect);
+    tvout_get_size_and_aspect(gGui->tvout,
+			      &hint.width, &hint.height, NULL);    
+    tvout_set_fullscreen_mode(gGui->tvout, 
+			      !(gVw->fullscreen_req & WINDOWED_MODE) ? 1 : 0,
+			      gVw->visible_width, gVw->visible_height);
+  }
+
 #ifdef HAVE_XINERAMA
   /* ask for xinerama fullscreen mode */
   if (gVw->xinerama && (gVw->fullscreen_req & FULLSCR_XI_MODE)) {
@@ -1021,8 +1033,7 @@ void video_window_frame_output_cb (void *data,
  *
  */
 void video_window_set_fullscreen_mode (int req_fullscreen) {
-  int previous_fullscreen_mode = gVw->fullscreen_mode;
-
+  
   if(!(gVw->fullscreen_mode & req_fullscreen)) {
 
 #ifdef HAVE_XINERAMA
@@ -1049,13 +1060,6 @@ void video_window_set_fullscreen_mode (int req_fullscreen) {
   }
 
   video_window_adapt_size ();
-
-  if(gGui->tvout && (previous_fullscreen_mode & (WINDOWED_MODE | FULLSCR_MODE))) {
-    if(gVw->fullscreen_mode & WINDOWED_MODE)
-      tvout_set_fullscreen_mode(gGui->tvout, 0, gVw->visible_width, gVw->visible_height);
-    else if(gVw->fullscreen_mode & FULLSCR_MODE)
-      tvout_set_fullscreen_mode(gGui->tvout, 1, gVw->visible_width, gVw->visible_height);
-  }
 }
 
 /*

@@ -37,6 +37,7 @@ extern gGui_t  *gGui;
 struct tvout_s {
   int    (*init)(Display *display, void **private);
   int    (*setup)(void *private);
+  void   (*get_size_and_aspect)(int *width, int *height, double *pixaspect, void *private);
   int    (*set_fullscreen)(int fullscreen, int width, int height, void *private);
   int    (*get_fullscreen)(void *private);
   void   (*deinit)(void *private);
@@ -70,6 +71,8 @@ static struct {
 typedef struct {
   nvtv_simple_tvsystem  tv_system;
   int                   xrandr;
+  int                   fw, fh;
+  double                pa;
 } nvtv_private_t;
 
 static char *tv_systems[] = { "PAL", "NTSC", NULL };
@@ -108,24 +111,45 @@ static int nvtv_tvout_init(Display *display, void **data) {
 
 static int nvtv_tvout_setup(void *data) {
   nvtv_private_t *private = (nvtv_private_t *) data;
-  
+  double          fps;
+
+  nvtv_simple_enable(1);
+
   if(private->xrandr)
     (void) nvtv_enable_autoresize(1);
-
+  
   nvtv_simple_set_tvsystem((nvtv_simple_tvsystem) private->tv_system);
+
+  /* Retrieve MAX width/height */
+  (void) nvtv_simple_switch(NVTV_SIMPLE_TV_ON, 0, 0);
+  nvtv_simple_size(&(private->fw), &(private->fh), &(private->pa), &fps);
+  (void) nvtv_simple_switch(NVTV_SIMPLE_TV_OFF, 0, 0);
   
   return 1;
 }
 
+static void nvtv_get_size_and_aspect(int *width, int *height, double *pixaspect, void *data) {
+  nvtv_private_t *private = (nvtv_private_t *) data;
+  
+  if(width)
+    *width = private->fw;
+  if(height)
+    *height = private->fh;
+  if(pixaspect)
+    *pixaspect = private->pa;
+}
+
 static int nvtv_tvout_set_fullscreen_mode(int fullscreen, int width, int height, void *data) {
-  double pixel_ratio, fps;
+  nvtv_private_t *private = (nvtv_private_t *) data;
+
+  if((width > private->fw) || (height > private->fh)) {
+    width = private->fw;
+    height = private->fh;
+  }
   
-  nvtv_simple_enable(fullscreen);
-  
-  (void) nvtv_simple_switch(fullscreen ? NVTV_SIMPLE_TV_ON : NVTV_SIMPLE_TV_OFF, width, height);
-  
-  if(fullscreen)
-    nvtv_simple_size (&width, &height, &pixel_ratio, &fps);
+  (void) nvtv_simple_switch(fullscreen ?
+			    NVTV_SIMPLE_TV_ON : NVTV_SIMPLE_TV_OFF, 
+			    width, height);
   
   return 1;
 }
@@ -151,12 +175,13 @@ static void nvtv_tvout_deinit(void *data) {
 static tvout_t *nvtv_backend(Display *display) {
   static tvout_t tvout;
   
-  tvout.init           = nvtv_tvout_init;
-  tvout.setup          = nvtv_tvout_setup;
-  tvout.set_fullscreen = nvtv_tvout_set_fullscreen_mode;
-  tvout.get_fullscreen = nvtv_tvout_get_fullscreen_mode;
-  tvout.deinit         = nvtv_tvout_deinit;
-  tvout.private        = NULL;
+  tvout.init                = nvtv_tvout_init;
+  tvout.setup               = nvtv_tvout_setup;
+  tvout.get_size_and_aspect = nvtv_get_size_and_aspect;
+  tvout.set_fullscreen      = nvtv_tvout_set_fullscreen_mode;
+  tvout.get_fullscreen      = nvtv_tvout_get_fullscreen_mode;
+  tvout.deinit              = nvtv_tvout_deinit;
+  tvout.private             = NULL;
 
   return &tvout;
 }
@@ -175,7 +200,7 @@ static int ati_tvout_init(Display *display, void **data) {
   
   private->atitvout_cmds[0] = (char *) 
     xine_config_register_string (gGui->xine, "gui.tvout_ati_cmd_off", 
-				 "sudo /usr/local/sbin/atitvout l",
+				 "sudo /usr/local/sbin/atitvout c",
 				 _("Command to turn off TV out"),
 				 _("atitvout command line used to turn on TV output."),
 				 CONFIG_LEVEL_BEG,
@@ -184,7 +209,7 @@ static int ati_tvout_init(Display *display, void **data) {
 
   private->atitvout_cmds[1] = (char *) 
     xine_config_register_string (gGui->xine, "gui.tvout_ati_cmd_on", 
-				 "sudo /usr/local/sbin/atitvout pal lt",
+				 "sudo /usr/local/sbin/atitvout pal ct",
 				 _("Command to turn on TV out"),
 				 _("atitvout command line used to turn on TV output."),
 				 CONFIG_LEVEL_BEG,
@@ -198,6 +223,9 @@ static int ati_tvout_init(Display *display, void **data) {
 
 static int ati_tvout_setup(void *data) {
   return 1;
+}
+
+static void ati_get_size_and_aspect(int *width, int *height, double *pixaspect, void *private) {
 }
 
 static int ati_tvout_set_fullscreen_mode(int fullscreen, int width, int height, void *data) {
@@ -239,12 +267,13 @@ static void ati_tvout_deinit(void *data) {
 static tvout_t *ati_backend(Display *display) {
   static tvout_t tvout;
 
-  tvout.init           = ati_tvout_init;
-  tvout.setup          = ati_tvout_setup;
-  tvout.set_fullscreen = ati_tvout_set_fullscreen_mode;
-  tvout.get_fullscreen = ati_tvout_get_fullscreen_mode;
-  tvout.deinit         = ati_tvout_deinit;
-  tvout.private        = NULL;
+  tvout.init                = ati_tvout_init;
+  tvout.setup               = ati_tvout_setup;
+  tvout.get_size_and_aspect = ati_get_size_and_aspect;
+  tvout.set_fullscreen      = ati_tvout_set_fullscreen_mode;
+  tvout.get_fullscreen      = ati_tvout_get_fullscreen_mode;
+  tvout.deinit              = ati_tvout_deinit;
+  tvout.private             = NULL;
   
   return &tvout;
 }
@@ -286,6 +315,11 @@ int tvout_setup(tvout_t *tvout) {
     return (tvout->setup(tvout->private));
   
   return 0;
+}
+
+void tvout_get_size_and_aspect(tvout_t *tvout, int *width, int *height, double *pix_aspect) {
+  if(tvout)
+    tvout->get_size_and_aspect(width, height, pix_aspect, tvout->private);
 }
 
 int tvout_set_fullscreen_mode(tvout_t *tvout, int fullscreen, int width, int height) {
