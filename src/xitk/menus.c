@@ -1113,9 +1113,8 @@ void playlist_menu(xitk_widget_list_t *wl, int x, int y, int selected) {
   xitk_menu_entry_t    menu_entries_nosel[] = {
     { NULL ,           NULL,          "<title>",     NULL,                         NULL                    },
     { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
-    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
-    { "SEP",           NULL,          "<separator>", NULL,                         NULL                    },
     { _("Scan"),       NULL,          NULL,          menu_scan_infos,              NULL                    },
+    { _("Add"),        NULL,          NULL,          menu_open_mrlbrowser,         NULL                    },
     { NULL,            NULL,          NULL,          NULL,                         NULL                    }
   };
   xitk_menu_entry_t    menu_entries_sel[] = {

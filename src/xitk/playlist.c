@@ -750,13 +750,12 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
       
       if(!strcasecmp(autoplay_plugins[i], xitk_labelbutton_get_label(w))) {
 	int                num_mrls = 0;
-	char             **autoplay_mrls = 
-	  xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i], &num_mrls);
+	char             **autoplay_mrls = xine_get_autoplay_mrls(gGui->xine, autoplay_plugins[i], &num_mrls);
 	
 	if(autoplay_mrls) {
-	  int            j;
-	  int            cdda_mode = 0;
-	  xine_stream_t *stream = gGui->playlist.scan_stream;
+	  int                j;
+	  int                cdda_mode = 0;
+	  xine_video_port_t *vo_port;
 
 	  if(!strcasecmp(autoplay_plugins[i], "cd"))
 	    cdda_mode = 1;
@@ -769,22 +768,30 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	      xitk_inputtext_change_text(playlist->winput, NULL);
 	    gGui->playlist.cur = 0;
 	  }
-
+	  
 	  if(!gGui->playlist.num)
 	    gGui->playlist.cur = 0;
 	  
-	  for (j = 0; j < num_mrls; j++) {
-	    char *ident = NULL;
+	  if((vo_port = xine_open_video_driver(gGui->xine, "none", XINE_VISUAL_TYPE_NONE, NULL))) {
+	    xine_stream_t  *stream;
+
+	    stream = xine_stream_new(gGui->xine, NULL, vo_port);
 	    
-	    if(cdda_mode && xine_open(stream, autoplay_mrls[j])) {
-	      ident = stream_infos_get_ident_from_stream(stream);
-	      xine_close(stream);
+	    for (j = 0; j < num_mrls; j++) {
+	      char *ident = NULL;
+	      
+	      if(cdda_mode && xine_open(stream, autoplay_mrls[j])) {
+		ident = stream_infos_get_ident_from_stream(stream);
+		xine_close(stream);
+	      }
+	      
+	      mediamark_add_entry(autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
+	      
+	      if(ident)
+		free(ident);
 	    }
-
-	    mediamark_add_entry(autoplay_mrls[j], ident ? ident : autoplay_mrls[j], NULL, 0, -1, 0, 0);
-
-	    if(ident)
-	      free(ident);
+	    xine_dispose(stream);
+	    xine_close_video_driver(gGui->xine, vo_port);
 	  }
 	  
 	  if(gGui->playlist.cur == 0)
@@ -799,7 +806,6 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	      gui_stop(NULL, NULL);
 	    gui_play(NULL, NULL);
 	  }
-	  
 	}
       }
       
