@@ -1448,8 +1448,10 @@ void xitk_xevent_notify(XEvent *event) {
 	    if(w && ((w->type & WIDGET_GROUP_MASK) & WIDGET_GROUP_BROWSER)) {
 	      xitk_widget_t *b = xitk_browser_get_browser(w);
 	      
-	      if(b)
+	      if(b) {
+		handled = 1;
 		xitk_browser_warp_jump(b, kbuf, modifier);
+	      }
 
 	    }
 	  }
