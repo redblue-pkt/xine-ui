@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: xine 0.99.1-cvs\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2004-12-12 15:18+0100\n"
-"PO-Revision-Date: 2004-12-12 14:00+0900\n"
+"PO-Revision-Date: 2004-12-14 06:56+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -341,7 +341,7 @@ msgstr "もっと..."
 
 #: src/xitk/errors.c:332
 msgid "Disable this warning."
-msgstr ""
+msgstr "この警告を無効にします。"
 
 #: src/xitk/event.c:387
 msgid "Zoom: 1:1"
@@ -756,9 +756,9 @@ msgid "Unable to delete file '%s': %s."
 msgstr "ファイル '%s' のふぁ駆除に失敗しました: %s"
 
 #: src/xitk/file_browser.c:1006
-#, fuzzy, c-format
+#, c-format
 msgid "Do you really want to delete the file: '%s'"
-msgstr "本当にファイルを削除しますか: '%s"
+msgstr "本当にこのファイルを削除しますか: '%s"
 
 #: src/xitk/file_browser.c:1012
 msgid "Confirm deletion ?"
@@ -1130,9 +1130,9 @@ msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
 msgstr "  -g, --hide-gui               GUI を隠す (パネルなど)\n"
 
 #: src/xitk/main.c:626
-#, fuzzy, c-format
+#, c-format
 msgid "  -I, --no-gui                 disable GUI\n"
-msgstr "  -g, --hide-gui               GUI を隠す (パネルなど)\n"
+msgstr "  -I, --no-gui                 GUI 無効化\n"
 
 #: src/xitk/main.c:627
 #, c-format
@@ -1179,10 +1179,9 @@ msgstr ""
 "  -n, --network                ネットワークリモート制御サーバーを有効にする\n"
 
 #: src/xitk/main.c:641
-#, fuzzy, c-format
+#, c-format
 msgid "      --network-port           Specify network server port number.\n"
-msgstr ""
-"  -n, --network                ネットワークリモート制御サーバーを有効にする\n"
+msgstr "      --network-port           ネットワークサーバーポート番号の指定をする\n"
 
 #: src/xitk/main.c:642
 #, c-format
@@ -1427,7 +1426,8 @@ msgstr "メイン: 自動検査から <%s> 音声出力プラグインを飛ば�
 #: src/xitk/main.c:947
 #, c-format
 msgid "main: audio driver probing failed => no audio output\n"
-msgstr "メイン: 音声ドライバーの調査に失敗しました => 音声出力はありません\n"
+msgstr ""
+"メイン: 音声ドライバーの調査に失敗しました => 音声出力はありません\n"
 
 #: src/xitk/main.c:968
 #, c-format
@@ -1468,7 +1468,7 @@ msgstr ""
 
 #: src/xitk/main.c:1131
 msgid "The specified file or mrl is not found. Please check it twice."
-msgstr ""
+msgstr "指定のファイル化 MRL は見つかりません。調べてください。"
 
 #: src/xitk/main.c:1138
 msgid ""
@@ -1501,6 +1501,8 @@ msgid ""
 "The audio device is unavailable. Please verify if another program already "
 "use it."
 msgstr ""
+"オーディオデバイスが利用可能ではありません。"
+"他のプログラムが既に使用していないか確認してください。"
 
 #: src/xitk/main.c:1181
 msgid "*sight*, unkown error."
@@ -1510,7 +1512,8 @@ msgstr ""
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr ""
-"xine ライブラリバージョン 1.0.0 が必要です。見つけたのは %d.%d.%d です。\n"
+"xine ライブラリバージョン 1.0.0 が必要です。"
+"発見したのは %d.%d.%d です。\n"
 
 #: src/xitk/main.c:1418
 #, c-format
@@ -1532,7 +1535,7 @@ msgstr ""
 #: src/xitk/main.c:1579
 #, c-format
 msgid "Bad port number: %d\n"
-msgstr ""
+msgstr "間違ったポート番号: %d\n"
 
 #: src/xitk/main.c:1591
 #, c-format
@@ -1563,7 +1566,7 @@ msgstr "無効な引数 %d => 終了\n"
 #: src/xitk/main.c:1813
 #, c-format
 msgid "You should specify one MRL to enqueue, at least!.\n"
-msgstr ""
+msgstr "少なくともキューに入れるために 1 つのMRLを指定しなければなりません!\n"
 
 #: src/xitk/main.c:1895
 msgid "Automatically reload old playlist"
@@ -1646,7 +1649,7 @@ msgstr ""
 
 #: src/xitk/mediamark.c:3340
 msgid "Select a subtitle file to use together with the mrl."
-msgstr ""
+msgstr "MRL と共に使用する字幕ファイルを選択する"
 
 #: src/xitk/mediamark.c:3346
 msgid "Start at"
@@ -1701,9 +1704,8 @@ msgid "Show controls"
 msgstr "コントロール表示"
 
 #: src/xitk/menus.c:445
-#, fuzzy
 msgid "Show video window"
-msgstr "xine ビデオウィンドウ"
+msgstr "ビデオウィンドウ表示"
 
 #: src/xitk/menus.c:449
 msgid "Fullscreen"
@@ -2285,23 +2287,24 @@ msgstr ""
 #: src/xitk/post.c:517
 #, c-format
 msgid "Entered value is out of bounds (%d>%d<%d)."
-msgstr ""
+msgstr "入力値は限界値外です (%d>%d<%d)"
 
 #: src/xitk/post.c:540
 #, c-format
 msgid "Entered value is out of bounds (%e>%e<%e)."
-msgstr ""
+msgstr "入力値は限界値外です (%e>%e<%e)"
 
 #: src/xitk/post.c:567
 msgid "parameter type POST_PARAM_TYPE_STRING not supported yet.\n"
 msgstr ""
-"パラメータータイプ POST_PARAM_TYPE_STRING はまだサポートされていません。\n"
+"パラメータータイプ POST_PARAM_TYPE_STRING は"
+"まだサポートされていません。\n"
 
 #: src/xitk/post.c:577
 msgid "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"
 msgstr ""
-"パラメータータイプ POST_PARAM_TYPE_STRINGLIST はまだサポートされていませ"
-"ん。\n"
+"パラメータータイプ POST_PARAM_TYPE_STRINGLIST は"
+"まだサポートされていません。\n"
 
 #: src/xitk/post.c:602
 msgid "No description available"
@@ -2366,7 +2369,9 @@ msgstr "利用可能なヘルプがありません"
 #: src/xitk/setup.c:899
 msgid ""
 "There is no configuration option available in this user experience level."
-msgstr "このユーザーの体験レベルでの利用可能な設定オプションはありません。"
+msgstr ""
+"このユーザーの体験レベルでの利用可能な"
+"設定オプションはありません。"
 
 #: src/xitk/setup.c:1097
 msgid "xine setup"
@@ -2374,7 +2379,9 @@ msgstr "xine セットアップ"
 
 #: src/xitk/setup.c:1132
 msgid "(*)  you need to restart xine for this setting to take effect"
-msgstr "(*) この設定の効果を反映するために xine を再起動する必要があります"
+msgstr ""
+"(*) この設定の効果を反映するために"
+" xine を再起動する必要があります"
 
 #: src/xitk/setup.c:1162
 msgid "OK"
@@ -2383,19 +2390,23 @@ msgstr "OK"
 #: src/xitk/skins.c:282 src/xitk/skins.c:478
 #, c-format
 msgid "Failed to load %s/%s. Load fallback skin %s\n"
-msgstr "%s/%s の読み込みに失敗しました。前のスキン %s を読み込みます\n"
+msgstr ""
+"%s/%s の読み込みに失敗しました。"
+"前のスキン %s を読み込みます\n"
 
 #: src/xitk/skins.c:288
 #, c-format
 msgid "Failed to load %s/%s. Reload old skin '%s'.\n"
-msgstr "%s/%s の読み込みに失敗しました。古いスキン '%s' を再読み込みします。\n"
+msgstr ""
+"%s/%s の読み込みに失敗しました。"
+"古いスキン '%s' を再読み込みします。\n"
 
 #: src/xitk/skins.c:306
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"%s の読み込みに失敗しました。おかしいバージョンです。前のスキン '%s'を読み込"
-"みます。\n"
+"%s の読み込みに失敗しました。おかしいバージョンです。"
+"前のスキン '%s'を読み込みます。\n"
 
 #: src/xitk/skins.c:364
 #, c-format
@@ -2414,7 +2425,7 @@ msgstr "GUI スキンテーマ"
 #: src/xitk/skins.c:454
 #, c-format
 msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
-msgstr ""
+msgstr "gui.skin 設定エントリは登録されていません。さようなら。\n"
 
 #: src/xitk/skins.c:461
 #, c-format
@@ -2425,8 +2436,8 @@ msgstr "スキン '%s' が見つかりません。前の '%s' を使います。
 #, c-format
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
 msgstr ""
-"スキンのフォールバック読み込みに失敗しました。インストール済みスキンを確認し"
-"てください。終了します。\n"
+"スキンのフォールバック読み込みに失敗しました。"
+"インストール済みスキンを確認してください。終了します。\n"
 
 #: src/xitk/skins.c:485
 #, c-format
@@ -2437,8 +2448,8 @@ msgstr "%s/%s の読み込みに失敗しました。終了中です。\n"
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
-"スキン %s の読み込みに失敗しました。バージョンが不正です。スキン '%s' を"
-"フォールバック読み込みします。\n"
+"スキン %s の読み込みに失敗しました。"
+"バージョンが不正です。スキン '%s' をフォールバック読み込みします。\n"
 
 #: src/xitk/skins.c:663
 #, c-format
@@ -2534,7 +2545,7 @@ msgstr "rgb_alloc() 失敗しました\n"
 
 #: src/xitk/snapshot.c:1207
 msgid "File written: "
-msgstr ""
+msgstr "ファイルは書き込まれました: "
 
 #: src/xitk/splash.c:65
 msgid "xine Splash"
@@ -2726,16 +2737,18 @@ msgstr "MPEG2"
 #: src/xitk/videowin.c:307
 #, c-format
 msgid "videowin: output driver cannot select a working visual\n"
-msgstr ""
+msgstr "videowin: 映像を処理する出力ドライバーが選択できませんでした\n"
 
 #: src/xitk/videowin.c:314
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
+"videowin: 選択された映像の出力ドライバーは"
+"映像 ID 0x%lx に上書きされました\n"
 
 #: src/xitk/videowin.c:500
 msgid "XF86VidMode Extension: modeline switching failed.\n"
-msgstr ""
+msgstr "XF86VidMode 拡張: モードラインの切り替えに失敗しました。\n"
 
 #: src/xitk/videowin.c:1460
 msgid ""
@@ -2801,18 +2814,20 @@ msgstr ""
 #: src/xitk/videowin.c:1682
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr ""
+msgstr "XF86VidMode 拡張:  %d 個のモードラインを見つけました。\n"
 
 #: src/xitk/videowin.c:1691
 #, c-format
 msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
-msgstr ""
+msgstr "XF86VidModeModeLine %dx%d は有効ではありません: 破棄されました。\n"
 
 #: src/xitk/videowin.c:1722
 #, c-format
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr ""
+"XF86VidMode 拡張: 利用可能なモードラインの一覧を"
+"取得できませんでした。失敗しました。\n"
 
 #: src/xitk/videowin.c:1725
 #, c-format
