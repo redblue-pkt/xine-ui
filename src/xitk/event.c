@@ -380,6 +380,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_stop(NULL, NULL);
     break;
 
+  case ACTID_SETUP:
+    gui_setup_show(NULL, NULL);
+    break;
+
   case ACTID_MRL_NEXT:
     gui_nextprev(NULL, (void*)GUI_NEXT);
     break;

@@ -189,6 +189,8 @@ static kbinding_entry_t default_binding_table[] = {
     "Quit",                   ACTID_QUIT                    , "q",        KEYMOD_NOMOD   },
   { "Start playback.",
     "Play",                   ACTID_PLAY                    , "Return",   KEYMOD_NOMOD   },
+  { "Visibility toggle of the setup window.",
+    "SetupShow",              ACTID_SETUP                   , "s",        KEYMOD_META    },
   { "Stop playback.",
     "Stop",                   ACTID_STOP                    , "S",        KEYMOD_NOMOD   },
   { "Select and play next mrl in the playlist.",

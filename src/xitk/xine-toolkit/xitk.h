@@ -1402,6 +1402,11 @@ unsigned int xitk_get_pixel_color_darkgray(ImlibData *im);
 xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
 
 /**
+ * Free an image object.
+ */
+void xitk_image_free_image(ImlibData *im, xitk_image_t **src);
+
+/**
  *
  */
 void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest);

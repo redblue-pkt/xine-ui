@@ -213,6 +213,8 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
 
   XUNLOCK(im->x.disp);
 
+  xitk_window_move_window(im, xwin, x, y);
+
   return xwin;
 }
 

@@ -80,7 +80,11 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
 			      private_data->parent_wlist->win, private_data->parent_wlist->gc);
       _combo_rollunroll(NULL, (void *)w, 0);
     }
-    if(!w->visible) {
+    if(w->visible) {
+      xitk_show_widget(private_data->widget_list, private_data->label_widget);
+      xitk_show_widget(private_data->widget_list, private_data->button_widget);
+    }
+    else {
       xitk_hide_widget(private_data->widget_list, private_data->label_widget);
       xitk_hide_widget(private_data->widget_list, private_data->button_widget);
     }

@@ -43,31 +43,116 @@
 #include "actions.h"
 #include "skins.h"
 
-extern gGui_t          *gGui;
+extern gGui_t              *gGui;
 
-static char            *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
+static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
 
-#define WINDOW_WIDTH  640
-#define WINDOW_HEIGHT 600
+#define WGPREV              1
+#define WGNEXT              2
 
-#define FRAME_WIDTH   350
-#define FRAME_HEIGHT  40
+#define WINDOW_WIDTH        500
+#define WINDOW_HEIGHT       600
 
-#define PLACE_LABEL(widget) {                                                            \
-    int           wx, wy, wh, fh;                                                        \
-    xitk_font_t  *fs;                                                                    \
-                                                                                         \
-    fs = xitk_font_load_font(gGui->display, fontname);                                   \
-    xitk_font_set_font(fs, setup->widget_list->gc);                                      \
-    fh = xitk_font_get_string_height(fs, labelkey);                                      \
-    xitk_font_unload_font(fs);                                                           \
-                                                                                         \
-    xitk_get_widget_pos(widget, &wx, &wy);                                               \
-    wx += xitk_get_widget_width(widget);                                                 \
-    wh = xitk_get_widget_height(widget);                                                 \
-                                                                                         \
-    setup_add_label (wx + 20, (wy + (wh >> 1)) - (fh>>1), (FRAME_WIDTH - wx), labelkey); \
-  } 
+#define FRAME_WIDTH         350
+#define FRAME_HEIGHT        40
+
+#define MAX_DISPLAY_WIDGETS 11
+
+#define ADD_FRAME(title) {                                                                      \
+    xitk_widget_t       *frame = NULL;                                                          \
+    xitk_image_t        *image;                                                                 \
+    xitk_image_widget_t  im;                                                                    \
+    int                  lbearing, rbearing, width, ascent, descent;                            \
+    char                *fontname = "*-lucida-*-r-*-*-10-*-*-*-*-*-*-*";                        \
+    xitk_font_t         *fs;                                                                    \
+                                                                                                \
+    image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);       \
+    xitk_image_add_mask(gGui->imlib_data, image); \
+                                                                                                \
+    fs = xitk_font_load_font(gGui->display, fontname);                                          \
+    xitk_font_set_font(fs, setup->widget_list->gc);                                             \
+    xitk_font_text_extent(fs, title, strlen(title),                                             \
+                          &lbearing, &rbearing, &width, &ascent, &descent);                     \
+    xitk_font_unload_font(fs);                                                                  \
+                                                                                                \
+    XLockDisplay(gGui->display);                                                                \
+                                                                                                \
+    XSetForeground(gGui->display, setup->widget_list->gc,                                       \
+		   xitk_get_pixel_color_gray(gGui->imlib_data));                                \
+    XFillRectangle(gGui->display, image->image, setup->widget_list->gc,                         \
+		   0, 0, image->width, image->height);                                          \
+    XUnlockDisplay(gGui->display);                                                              \
+                                                                                                \
+    draw_inner_frame(gGui->imlib_data, image->image, title, fontname,                           \
+                     0, (ascent+descent), FRAME_WIDTH, FRAME_HEIGHT);                           \
+	                                                                                        \
+    XITK_WIDGET_INIT(&im, gGui->imlib_data);                                                    \
+    im.skin_element_name = NULL;                                                                \
+                                                                                                \
+    xitk_list_append_content (setup->widget_list->l,                                            \
+			      (frame = xitk_noskin_image_create(&im, image, x, y)));            \
+                                                                                                \
+    setup->tmp_widgets[setup->num_tmp_widgets] = frame;                                         \
+    setup->num_tmp_widgets++;                                                                   \
+    wt->frame = frame;                                                                          \
+    x += 10;                                                                                    \
+    y += FRAME_HEIGHT >> 1;                                                                     \
+  }
+
+#define ADD_LABEL(widget) {                                                                     \
+    int           wx, wy, wh, fh;                                                               \
+    xitk_font_t  *fs;                                                                           \
+    xitk_widget_t *lbl;                                                                         \
+                                                                                                \
+    fs = xitk_font_load_font(gGui->display, fontname);                                          \
+    xitk_font_set_font(fs, setup->widget_list->gc);                                             \
+    fh = xitk_font_get_string_height(fs, labelkey);                                             \
+    xitk_font_unload_font(fs);                                                                  \
+                                                                                                \
+    xitk_get_widget_pos(widget, &wx, &wy);                                                      \
+    wx += xitk_get_widget_width(widget);                                                        \
+    wh = xitk_get_widget_height(widget);                                                        \
+                                                                                                \
+    lbl = setup_add_label (wx + 20, (wy + (wh >> 1)) - (fh>>1), (FRAME_WIDTH - wx), labelkey);  \
+    wt->label = lbl;                                                                            \
+  }
+
+#define DISABLE_ME(wtriplet) {                                                                  \
+    if((wtriplet)->frame) {                                                                     \
+      xitk_disable_widget((wtriplet)->frame);                                                   \
+      xitk_hide_widget(setup->widget_list, (wtriplet)->frame);                                  \
+    }                                                                                           \
+    if((wtriplet)->label) {                                                                     \
+      xitk_disable_widget((wtriplet)->label);                                                   \
+      xitk_hide_widget(setup->widget_list, (wtriplet)->label);                                  \
+    }                                                                                           \
+    if((wtriplet)->widget) {                                                                    \
+      xitk_disable_widget((wtriplet)->widget);                                                  \
+      xitk_hide_widget(setup->widget_list, (wtriplet)->widget);                                 \
+    }                                                                                           \
+}
+
+#define ENABLE_ME(wtriplet) {                                                                   \
+    if((wtriplet)->frame) {                                                                     \
+      xitk_enable_widget((wtriplet)->frame);                                                    \
+      xitk_show_widget(setup->widget_list, (wtriplet)->frame);                                  \
+    }                                                                                           \
+    if((wtriplet)->label) {                                                                     \
+      xitk_enable_widget((wtriplet)->label);                                                    \
+      xitk_show_widget(setup->widget_list, (wtriplet)->label);                                  \
+    }                                                                                           \
+    if((wtriplet)->widget) {                                                                    \
+      xitk_enable_widget((wtriplet)->widget);                                                   \
+      xitk_show_widget(setup->widget_list, (wtriplet)->widget);                                 \
+    }                                                                                           \
+}
+
+
+typedef struct {
+  xitk_widget_t *frame;
+  xitk_widget_t *label;
+  xitk_widget_t *widget;
+} widget_triplet_t;
 
 typedef struct {
   xitk_window_t        *xwin;
@@ -84,25 +169,16 @@ typedef struct {
   xitk_widget_t        *tmp_widgets[200];
   int                   num_tmp_widgets;
 
+  xitk_widget_t        *btnup, *btndn;
+  widget_triplet_t     *wg[100];
+  int                   num_wg;
+  int                   first_displayed;
+
   xitk_register_key_t   kreg;
 
 } _setup_t;
 
 static _setup_t    *setup = NULL;
-
-/*
- *
- */
-static void setup_clear_tab(void) {
-  xitk_image_t *im;
-
-  im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), (WINDOW_HEIGHT - 95)+1);
-  draw_outter(gGui->imlib_data, im->image, im->width, im->height);
-  XLockDisplay(gGui->display);
-  XCopyArea(gGui->display, im->image, (xitk_window_get_window(setup->xwin)),
-	    setup->widget_list->gc, 0, 0, im->width, im->height, 20, 51);
-  XUnlockDisplay(gGui->display);
-}
 
 /*
  * Get current property 'prop' value from vo_driver.
@@ -229,6 +305,86 @@ void setup_toggle_panel_visibility (xitk_widget_t *w, void *data) {
 }
 
 /*
+ *
+ */
+static void setup_clear_tab(void) {
+  xitk_image_t *im;
+
+  im = xitk_image_create_image(gGui->imlib_data, (WINDOW_WIDTH - 40), 
+			       (WINDOW_HEIGHT - (51 + 57) + 1));
+
+  draw_outter(gGui->imlib_data, im->image, im->width, im->height);
+
+  XLockDisplay(gGui->display);
+  XCopyArea(gGui->display, im->image, (xitk_window_get_window(setup->xwin)),
+	    setup->widget_list->gc, 0, 0, im->width, im->height, 20, 51);
+  XUnlockDisplay(gGui->display);
+
+  xitk_image_free_image(gGui->imlib_data, &im);
+}
+
+/*
+ *
+ */
+static void setup_paint_widgets(void) {
+  int     i;
+  int     last;
+  int     wx, wy, y = 70;
+
+  last = setup->num_wg <= (setup->first_displayed + MAX_DISPLAY_WIDGETS)
+    ? setup->num_wg : (setup->first_displayed + MAX_DISPLAY_WIDGETS);
+
+  /* First, disable all widgets */
+  for(i = 0; i < setup->num_wg; i++)
+    DISABLE_ME(setup->wg[i]);
+
+  /* Move widgets to new position, then display its */
+  for(i = setup->first_displayed; i < last; i++) {
+
+    xitk_get_widget_pos(setup->wg[i]->frame, &wx, &wy);
+    xitk_set_widget_pos(setup->wg[i]->frame, wx, y);
+
+    y += FRAME_HEIGHT >> 1;
+
+    xitk_get_widget_pos(setup->wg[i]->label, &wx, &wy);
+    xitk_set_widget_pos(setup->wg[i]->label, wx, y);
+
+    xitk_get_widget_pos(setup->wg[i]->widget, &wx, &wy);
+    /* Input text widgets have special treatments */
+    if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT)
+      xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
+    else
+      xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
+      
+    ENABLE_ME(setup->wg[i]);
+
+    y += (FRAME_HEIGHT>>1) + 2;
+  }
+
+  /* Hide Up/Down button only i first displayed triplet is 0 and there no extra widgets */
+  if((setup->first_displayed == 0) && (i >= setup->num_wg)) {
+    xitk_disable_widget(setup->btnup);
+    xitk_hide_widget(setup->widget_list, setup->btnup);
+    xitk_disable_widget(setup->btndn);
+    xitk_hide_widget(setup->widget_list, setup->btndn);
+  }
+
+  if(i<setup->num_wg) {
+    xitk_enable_widget(setup->btnup);
+    xitk_show_widget(setup->widget_list, setup->btnup);
+    xitk_enable_widget(setup->btndn);
+    xitk_show_widget(setup->widget_list, setup->btndn);
+  }
+  /* Disable widget out of window */
+  for(; i < setup->num_wg; i++) {
+    DISABLE_ME(setup->wg[i]);
+  }
+    
+  /* Repaint them now */
+  xitk_paint_widget_list (setup->widget_list); 
+}
+
+/*
  * Handle X events here.
  */
 void setup_handle_event(XEvent *event, void *data) {
@@ -268,12 +424,11 @@ void setup_handle_event(XEvent *event, void *data) {
 /*
  *
  */
-static void setup_add_label (int x, int y, int w, char *str) {
-
-  xitk_label_widget_t lb;
-  xitk_widget_t      *label;
-  xitk_font_t        *fs;
-  int                 height;
+static xitk_widget_t *setup_add_label (int x, int y, int w, char *str) {
+  xitk_label_widget_t   lb;
+  xitk_widget_t        *label;
+  xitk_font_t          *fs;
+  int                   height;
 
   fs = xitk_font_load_font(gGui->display, fontname);
   xitk_font_set_font(fs, setup->widget_list->gc);
@@ -293,6 +448,8 @@ static void setup_add_label (int x, int y, int w, char *str) {
 
   setup->tmp_widgets[setup->num_tmp_widgets] = label;
   setup->num_tmp_widgets++;
+
+  return label;
 }
 
 /*
@@ -321,12 +478,17 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
 /*
  *
  */
-static void setup_add_slider (char *labelkey, int x, int y, cfg_entry_t *entry ) {
-
-  xitk_slider_widget_t  sl;
-  xitk_widget_t        *slider;
+static widget_triplet_t *setup_add_slider (char *title, char *labelkey, 
+					   int x, int y, cfg_entry_t *entry ) {
+  xitk_slider_widget_t     sl;
+  xitk_widget_t           *slider;
+  static widget_triplet_t *wt; 
+  
+  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&sl, gGui->imlib_data);
+
+  ADD_FRAME(title);
 
   sl.min                      = entry->range_min;
   sl.max                      = entry->range_max;
@@ -342,21 +504,30 @@ static void setup_add_slider (char *labelkey, int x, int y, cfg_entry_t *entry )
 							       XITK_HSLIDER)));
   xitk_slider_set_pos(setup->widget_list, slider, entry->num_value);
 
-  PLACE_LABEL(slider);
+  ADD_LABEL(slider);
 
   setup->tmp_widgets[setup->num_tmp_widgets] = slider;
   setup->num_tmp_widgets++;
+
+  wt->widget = slider;
+
+  return wt;
 }
 
 /*
  *
  */
-static void setup_add_inputtext(char *labelkey, int x, int y, cfg_entry_t *entry) {
+static widget_triplet_t *setup_add_inputtext(char *title, char *labelkey, 
+					     int x, int y, cfg_entry_t *entry) {
+  xitk_inputtext_widget_t   inp;
+  xitk_widget_t            *input;
+  static widget_triplet_t  *wt;
 
-  xitk_inputtext_widget_t  inp;
-  xitk_widget_t           *input;
+  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&inp, gGui->imlib_data);
+
+  ADD_FRAME(title);
 
   inp.skin_element_name = NULL;
   inp.text              = entry->str_value;
@@ -369,21 +540,30 @@ static void setup_add_inputtext(char *labelkey, int x, int y, cfg_entry_t *entry
 							 x, y - 5, 150, 20,
 							 "Black", "Black", fontname)));
 
-  PLACE_LABEL(input);
+  ADD_LABEL(input);
 
   setup->tmp_widgets[setup->num_tmp_widgets] = input;
   setup->num_tmp_widgets++;
+  
+  wt->widget = input;
+
+  return wt;
 }
 
 /*
  *
  */
-static void setup_add_checkbox (char *labelkey, int x, int y, cfg_entry_t *entry) {
+static widget_triplet_t *setup_add_checkbox (char *title, char *labelkey, 
+					     int x, int y, cfg_entry_t *entry) {
+  xitk_checkbox_widget_t    cb;
+  xitk_widget_t            *checkbox;
+  static widget_triplet_t  *wt;
 
-  xitk_checkbox_widget_t   cb;
-  xitk_widget_t           *checkbox;
+  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&cb, gGui->imlib_data);
+
+  ADD_FRAME(title);
 
   cb.skin_element_name = NULL;
   cb.callback          = numtype_update;
@@ -396,21 +576,30 @@ static void setup_add_checkbox (char *labelkey, int x, int y, cfg_entry_t *entry
   xitk_checkbox_set_state (checkbox, entry->num_value, xitk_window_get_window(setup->xwin),
 			   setup->widget_list->gc);
   
-  PLACE_LABEL(checkbox);
+  ADD_LABEL(checkbox);
 
   setup->tmp_widgets[setup->num_tmp_widgets] = checkbox;
   setup->num_tmp_widgets++;
+
+  wt->widget = checkbox;
+
+  return wt;
 }
 
 /*
  *
  */
-static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry ) {
+static widget_triplet_t *setup_add_combo (char *title, char *labelkey, 
+					  int x, int y, cfg_entry_t *entry ) {
+  xitk_combo_widget_t       cmb;
+  xitk_widget_t            *combo, *lw, *bw;
+  static widget_triplet_t  *wt;
 
-  xitk_combo_widget_t      cmb;
-  xitk_widget_t           *combo, *lw, *bw;
+  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
 
   XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
+
+  ADD_FRAME(title);
 
   cmb.skin_element_name = NULL;
   cmb.parent_wlist      = setup->widget_list;
@@ -424,7 +613,7 @@ static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry ) 
 						     x, y, 150, &lw, &bw)));
   xitk_combo_set_select(setup->widget_list, combo, entry->num_value );
 
-  PLACE_LABEL(combo);
+  ADD_LABEL(combo);
 
   setup->tmp_widgets[setup->num_tmp_widgets] = lw;
   setup->num_tmp_widgets++;
@@ -432,14 +621,17 @@ static void setup_add_combo (char *labelkey, int x, int y, cfg_entry_t *entry ) 
   setup->num_tmp_widgets++;
   setup->tmp_widgets[setup->num_tmp_widgets] = combo;
   setup->num_tmp_widgets++;
+
+  wt->widget = combo;
+
+  return wt;
 }
 
 /*
  *
  */
 static void setup_section_widgets (int s) {
-
-  int                  x = 40;
+  int                  x = ((WINDOW_WIDTH>>1) - (FRAME_WIDTH>>1) - 10);
   int                  y = 70;
   cfg_entry_t         *entry;
   int                  len;
@@ -454,85 +646,47 @@ static void setup_section_widgets (int s) {
 
     if (!strncmp (entry->key, section, len) && entry->description) {
       
-      /* Made frames */
-      {
-	xitk_image_t        *image;
-	xitk_image_widget_t  im;
-	int                  lbearing, rbearing, width, ascent, descent;
-	char                *fontname = "*-lucida-*-r-*-*-10-*-*-*-*-*-*-*";
-	xitk_font_t         *fs;
-
-	image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);
-	xitk_image_add_mask(gGui->imlib_data, image);
-
-	fs = xitk_font_load_font(gGui->display, fontname);
-	xitk_font_set_font(fs, setup->widget_list->gc);
-	xitk_font_text_extent(fs, entry->description, strlen(entry->description), 
-			      &lbearing, &rbearing, &width, &ascent, &descent);
-	xitk_font_unload_font(fs);
-
-	XLockDisplay(gGui->display);
-
-	XSetForeground(gGui->display, setup->widget_list->gc, 
-		       xitk_get_pixel_color_gray(gGui->imlib_data));
-	XFillRectangle(gGui->display, image->image, setup->widget_list->gc,
-		       0, 0, image->width, image->height);
-	XUnlockDisplay(gGui->display);
-
-	draw_inner_frame(gGui->imlib_data, image->image, 
-			 entry->description, fontname, 
-			 0, (ascent+descent), 
-			 FRAME_WIDTH, FRAME_HEIGHT);
-	
-	XITK_WIDGET_INIT(&im, gGui->imlib_data);
-	im.skin_element_name = NULL;
-
-	{
-	  xitk_widget_t *frame;
-
-	  xitk_list_append_content (setup->widget_list->l,
-				    (frame = xitk_noskin_image_create(&im, image, x, y)));
-	  
-	  setup->tmp_widgets[setup->num_tmp_widgets] = frame;
-	  setup->num_tmp_widgets++;
-	  
-	}
-      }	
-      
-      y += FRAME_HEIGHT >> 1;
-
       labelkey = &entry->key[len+1];
 
       switch (entry->type) {
 
       case CONFIG_TYPE_RANGE: /* slider */
-	setup_add_slider (labelkey, x + 10, y, entry);
+	setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
 	break;
 	
       case CONFIG_TYPE_STRING:
-	setup_add_inputtext (labelkey, x + 10, y, entry);
+	setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
 	break;
 	
       case CONFIG_TYPE_ENUM:
-	setup_add_combo (labelkey, x + 10, y, entry);
+	setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
 	break;
 	
       case CONFIG_TYPE_NUM:
-	printf("%s is CONFIG_TYPE_NUM\n", labelkey);
+	printf("%s is CONFIG_TYPE_NUM(%s)\n", labelkey, entry->description);
+	//	setup->cur_w_offset++;
 	break;
 
       case CONFIG_TYPE_BOOL:
-	setup_add_checkbox (labelkey, x + 10, y, entry);
+	setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
+	DISABLE_ME(setup->wg[setup->num_wg]);
+	setup->num_wg++;
 	break;
 
       }
       
-      y += (FRAME_HEIGHT >> 1) + 2;
+      y += (FRAME_HEIGHT) + 2;
       
     }
-    
+
     entry = entry->next;
-  } 
+  }
 
 }
 
@@ -541,6 +695,10 @@ static void setup_section_widgets (int s) {
  */
 static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   int i;
+
+  for (i = 0; i < setup->num_wg; i++ ) {
+    free(setup->wg[i]);
+  }
 
   /* remove old widgets */
   for (i=0; i<setup->num_tmp_widgets; i++ ) {
@@ -563,11 +721,13 @@ static void setup_change_section(xitk_widget_t *wx, void *data, int section) {
   }
 
   setup->num_tmp_widgets = 0;
-  
+  setup->num_wg = 0;
+  setup->first_displayed = 0;
+
   setup_section_widgets (section);
   
   setup_clear_tab();
-  xitk_paint_widget_list (setup->widget_list); 
+  setup_paint_widgets();
 }
 
 /* 
@@ -634,7 +794,7 @@ static void setup_sections (void) {
   XUnlockDisplay(gGui->display);
   
   draw_rectangular_outter_box(gGui->imlib_data, bg, 20, 51, 
-			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - 95));
+			      (WINDOW_WIDTH - 40) - 1, (WINDOW_HEIGHT - (51 + 57)));
   xitk_window_change_background(gGui->imlib_data, setup->xwin, bg, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay(gGui->display);
@@ -642,6 +802,9 @@ static void setup_sections (void) {
   XUnlockDisplay(gGui->display);
   
   setup->num_tmp_widgets = 0;
+  setup->num_wg = 0;
+  setup->first_displayed = 0;
+
   setup_section_widgets (0);
 }
 
@@ -653,11 +816,36 @@ static void setup_end(xitk_widget_t *w, void *data) {
 }
 
 /*
+ *
+ */
+static void setup_nextprev_wg(xitk_widget_t *w, void *data) {
+
+  switch((int)data) {
+
+  case WGPREV:
+    if(setup->first_displayed)
+      setup->first_displayed--;
+    break;
+
+  case WGNEXT:
+    if((setup->first_displayed + MAX_DISPLAY_WIDGETS) < setup->num_wg)
+      setup->first_displayed++;
+    break;
+  }
+
+  setup_clear_tab();
+  setup_paint_widgets();
+}
+
+/*
  * Create setup panel window
  */
 void setup_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
+  xitk_button_widget_t       b;
+  char                      *fontname = "*-lucida-*-r-*-*-10-*-*-*-*-*-*-*";
+  int                        x, y;
 
   /* this shouldn't happen */
   if(setup != NULL) {
@@ -667,11 +855,13 @@ void setup_panel(void) {
   
   setup = (_setup_t *) xine_xmalloc(sizeof(_setup_t));
 
+  x = gGui->config->register_num (gGui->config, "gui.setup_x", 100, NULL, NULL, NULL, NULL);
+  y = gGui->config->register_num (gGui->config, "gui.setup_y", 100, NULL, NULL, NULL, NULL);
+
   /* Create window */
   setup->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
 						 _("xine setup"), 
-						 100, 100, 
-						 WINDOW_WIDTH, WINDOW_HEIGHT);
+						 x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
   XLockDisplay (gGui->display);
 
@@ -685,8 +875,41 @@ void setup_panel(void) {
   setup->widget_list->win           = (xitk_window_get_window(setup->xwin));
   setup->widget_list->gc            = gc;
 
-  setup_sections ();
 
+  XITK_WIDGET_INIT(&b, gGui->imlib_data);
+
+  {
+    xitk_image_t  *wimage;
+    
+    b.skin_element_name = NULL;
+    b.callback          = setup_nextprev_wg;
+    b.userdata          = (void *)WGPREV;
+    xitk_list_append_content(setup->widget_list->l,
+	     (setup->btnup = xitk_noskin_button_create(&b, (WINDOW_WIDTH - 40) + 2, 53, 16, 16)));
+    
+    wimage = xitk_get_widget_foreground_skin(setup->btnup);
+    if(wimage)
+      draw_arrow_up(gGui->imlib_data, wimage);
+    
+    
+    b.skin_element_name = NULL;
+    b.callback          = setup_nextprev_wg;
+    b.userdata          = (void *)WGNEXT;
+    xitk_list_append_content(setup->widget_list->l,
+	     (setup->btndn = xitk_noskin_button_create(&b, (WINDOW_WIDTH - 40) + 2, 69, 16, 16)));
+    
+    wimage = xitk_get_widget_foreground_skin(setup->btndn);
+    if(wimage)
+      draw_arrow_down(gGui->imlib_data, wimage);
+    
+    xitk_disable_widget(setup->btnup);
+    xitk_hide_widget(setup->widget_list, setup->btnup);
+    xitk_disable_widget(setup->btndn);
+    xitk_hide_widget(setup->widget_list, setup->btndn);
+  }
+
+  setup_sections();
+  setup_paint_widgets();
 
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
