@@ -24,7 +24,7 @@
  */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
+#endif
 
 #include <stdio.h>
 #include <X11/Xlib.h>
@@ -190,13 +190,6 @@ void gui_execute_action_id(action_id_t action) {
       numeric_arg += 10;
     } else numeric_arg = 0;
     
-    /* events for advanced input plugins. */
-    xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
-    xine_send_event(gGui->xine, &xine_event);
-    return;
-  }
-
-  if(action & ACTID_IS_INPUT_EVENT) {
     /* events for advanced input plugins. */
     xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
     xine_send_event(gGui->xine, &xine_event);
