@@ -34,6 +34,7 @@
 #include "options.h"
 #include "osd.h"
 #include "post.h"
+#include "config_wrapper.h"
 
 #define XINE_CONFIG_DIR  ".xine"
 #define XINE_CONFIG_FILE "config"
@@ -93,6 +94,13 @@ static void event_listener(void *user_data, const xine_event_t *event)
 
 static int open_and_play(const char *mrl)
 {
+
+        if(!strncasecmp(mrl, "cfg:/", 5)) 
+	{
+	        config_mrl(mrl);
+		return 0;
+	}
+
 	if((!xine_open(fbxine.stream, fbxine.mrl[fbxine.current_mrl])) ||
 	   (!xine_play(fbxine.stream, 0, 0)))
 	{
