@@ -1,6 +1,11 @@
-man_MANS = xine.1 aaxine.1
+manfiles = xine.1 aaxine.1 xine-check.1
+man_MANS = $(manfiles) xine-bugreport.1
 
-EXTRA_DIST = $(man_MANS) xine.1.in aaxine.1.in
+EXTRA_DIST = $(manfiles) xine.1.in aaxine.1.in
+
+xine-bugreport.1: xine-check.1
+	ln -s xine-check.1 xine-bugreport.1
+
 
 mostlyclean-generic:
 	-rm -f *~ \#* .*~ .\#*
