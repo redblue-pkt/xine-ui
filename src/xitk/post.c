@@ -1003,7 +1003,7 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
     xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
      (pobj->comment = xitk_noskin_label_create(pplugin->widget_list, &lb,
 					       pobj->x, (pobj->y + 25), 
-					       FRAME_WIDTH - 20, 20, boldfontname)));
+					       FRAME_WIDTH - 50, 20, boldfontname)));
     
     pobj->properties = NULL;
   }
