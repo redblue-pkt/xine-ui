@@ -133,9 +133,21 @@ dxr3.preferred_tvmode:
 	pal60   PAL 60Hz
 
 dxr3.videoout_mode:
-	overlay	Overlay Video output on the VGA screen
+	letterboxed overlay
+		Overlay Video output on the VGA screen
 		with the option of switching on-the-fly
 		to tvout (see 'VGA Overlay Feature' below).
+		The overlay will be displayed with black borders
+		if it is anamorphic. This is only useful in
+		the rare case of a DVD subtitle that would
+		only display properly in letterbox mode.
+		A good example for that are the animated
+		commentator's silhouettes on "Ghostbusters".
+	widescreen overlay
+		Overlay Video output on the VGA screen
+		with the option of switching on-the-fly
+		to tvout (see 'VGA Overlay Feature' below).
+		The more common variant of dxr3 overlay.
 	letterboxed tv
 		Send video to the tv out connector only.
 		This is the mode used for the standard 4:3
