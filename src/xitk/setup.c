@@ -459,6 +459,17 @@ static void setup_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
     
+  case ButtonPress:
+    if(event->xbutton.button == Button4) {
+      xitk_slider_make_step(setup->slider_wg);
+      xitk_slider_callback_exec(setup->slider_wg);
+    }
+    else if(event->xbutton.button == Button5) {
+      xitk_slider_make_backstep(setup->slider_wg);
+      xitk_slider_callback_exec(setup->slider_wg);
+    }
+    break;
+
   case KeyPress: {
     XKeyEvent      mykeyevent;
     KeySym         mykey;
