@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui-0.9.18\n"
-"POT-Creation-Date: 2003-12-13 11:47+0100\n"
-"PO-Revision-Date: 2003-12-03 7:30+0200\n"
+"POT-Creation-Date: 2003-12-17 12:09+0100\n"
+"PO-Revision-Date: 2003-12-17 12:17+0100\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1238,11 +1238,10 @@ msgid "      --skin-server-url <url>  Define the skin server url.\n"
 msgstr "      --skin-server-url <URL>  Definovat URL serveru se skiny.\n"
 
 #: src/xitk/main.c:638
+#, fuzzy
 msgid ""
-"      --enqueue <mrl>          Enqueue mrl of a running session (session 0)\n"
-msgstr ""
-"      --enqueue <MRL>          Zaøadit MRL do fronty bì¾ící relace (relace "
-"0)\n"
+"      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
+msgstr "      --enqueue <MRL> ...      Zaøadit MRL do fronty bì¾ící relace (relace 0)\n"
 
 #: src/xitk/main.c:639
 msgid "  -S, --session <option1,option2,...>\n"
@@ -1674,57 +1673,57 @@ msgstr ""
 msgid "*sight*, unkown error."
 msgstr "*sight*, neznámá chyba."
 
-#: src/xitk/main.c:1311
+#: src/xitk/main.c:1312
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr "Vy¾adována knihovna xine verze 1.0.0, nalezena %d.%d.%d.\n"
 
-#: src/xitk/main.c:1397
+#: src/xitk/main.c:1398
 msgid "video driver id required for -V option\n"
 msgstr "u volby -V vy¾adován video ovladaè\n"
 
-#: src/xitk/main.c:1406
+#: src/xitk/main.c:1407
 msgid "audio driver id required for -A option\n"
 msgstr "u volby -A vy¾adován zvukový ovladaè\n"
 
-#: src/xitk/main.c:1484
+#: src/xitk/main.c:1485
 #, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr "©patný re¾im pomìru stran '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:1548
+#: src/xitk/main.c:1549
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "©patnì zadaná velikost a umístìní '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:1580
+#: src/xitk/main.c:1581
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "©patný re¾im opakování '%s', viz. xine --help\n"
 
-#: src/xitk/main.c:1709
+#: src/xitk/main.c:1710
 msgid "*** NOTE ***\n"
 msgstr ""
 
-#: src/xitk/main.c:1710
+#: src/xitk/main.c:1711
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
 
-#: src/xitk/main.c:1748
+#: src/xitk/main.c:1749
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "neplatný argument %d ==> konec\n"
 
-#: src/xitk/main.c:1768
+#: src/xitk/main.c:1769
 msgid "You should specify one MRL to enqueue, at least!.\n"
 msgstr "K zaøazení do fronty byste mìli uvést jedno MRL, nejménì!.\n"
 
-#: src/xitk/main.c:1833
+#: src/xitk/main.c:1834
 msgid "Automatically reload old playlist"
 msgstr "Automaticky znovu naèítat starý playlist"
 
-#: src/xitk/main.c:1834
+#: src/xitk/main.c:1835
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
@@ -1732,15 +1731,25 @@ msgstr ""
 "Je-li povoleno a jestli¾e nespecifikujete na pøíkazové øádce ¾ádné MRL, xine "
 "bude automaticky naèítat poslední playlist."
 
-#: src/xitk/main.c:1849
+#: src/xitk/main.c:1850
 msgid "Subtitle autoloading"
 msgstr "Automatické naèítání titulkù"
 
-#: src/xitk/main.c:1850
+#: src/xitk/main.c:1851
 msgid "Automatically load subtitles if they exist."
 msgstr "Automaticky naèíst titulky, pokud existují"
 
-#: src/xitk/main.c:1983
+#: src/xitk/main.c:1859
+msgid "Enable deinterlacing by default"
+msgstr ""
+
+#: src/xitk/main.c:1860
+msgid ""
+"Deinterlace plugin will be enabled on startup. Progressive streams are "
+"automaticaly detected with no performance penalty."
+msgstr ""
+
+#: src/xitk/main.c:1998
 msgid "Logo mrl"
 msgstr "MRL loga"
 

@@ -8,8 +8,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
-"POT-Creation-Date: 2003-12-13 11:47+0100\n"
-"PO-Revision-Date: 2003-12-16 17:57+0100\n"
+"POT-Creation-Date: 2003-12-17 12:09+0100\n"
+"PO-Revision-Date: 2003-12-17 12:13+0100\n"
 "Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"
 "MIME-Version: 1.0\n"
@@ -1249,11 +1249,10 @@ msgstr ""
 "      --skin-server-url <URL>  Definisce la URL del server delle skin.\n"
 
 #: src/xitk/main.c:638
+#, fuzzy
 msgid ""
-"      --enqueue <mrl>          Enqueue mrl of a running session (session 0)\n"
-msgstr ""
-"      --enqueue <MRL>          Accoda MRL di una sessione in esecuzione  "
-"(sessione 0)\n"
+"      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
+msgstr "      --enqueue <MRL> ...      Accoda MRL di una sessione in esecuzione  (sessione 0)\n"
 
 #: src/xitk/main.c:639
 msgid "  -S, --session <option1,option2,...>\n"
@@ -1692,59 +1691,59 @@ msgstr ""
 msgid "*sight*, unkown error."
 msgstr "*sigh*, errore sconosciuto."
 
-#: src/xitk/main.c:1311
+#: src/xitk/main.c:1312
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr "Richiesta libreria Xine versione 1.0.0, trovata %d.%d.%d.\n"
 
-#: src/xitk/main.c:1397
+#: src/xitk/main.c:1398
 msgid "video driver id required for -V option\n"
 msgstr "id per driver video richiesto per l'opzione -V\n"
 
-#: src/xitk/main.c:1406
+#: src/xitk/main.c:1407
 msgid "audio driver id required for -A option\n"
 msgstr "id per driver audio richiesto per l'opzione -A\n"
 
-#: src/xitk/main.c:1484
+#: src/xitk/main.c:1485
 #, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr "Modalità '%s' di proporzioni errate, vedi xine --help\n"
 
-#: src/xitk/main.c:1548
+#: src/xitk/main.c:1549
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Geomentria '%s' errata, vedi xine --help\n"
 
-#: src/xitk/main.c:1580
+#: src/xitk/main.c:1581
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr "Modalità di ciclo '%s' errata, vedi xine --help\n"
 
-#: src/xitk/main.c:1709
+#: src/xitk/main.c:1710
 msgid "*** NOTE ***\n"
 msgstr "*** NOTA ***\n"
 
-#: src/xitk/main.c:1710
+#: src/xitk/main.c:1711
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
 " Modo riporta Bug: tutti i messaggi saranno aggiunti nel file BUG-REPORT."
 "TXT.\n"
 
-#: src/xitk/main.c:1748
+#: src/xitk/main.c:1749
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "argomento %d non valido => uscita\n"
 
-#: src/xitk/main.c:1768
+#: src/xitk/main.c:1769
 msgid "You should specify one MRL to enqueue, at least!.\n"
 msgstr "Dovresti specificare al meno un MRL per accodare!.\n"
 
-#: src/xitk/main.c:1833
+#: src/xitk/main.c:1834
 msgid "Automatically reload old playlist"
 msgstr "Ricarica automaticamente la vecchia playlist"
 
-#: src/xitk/main.c:1834
+#: src/xitk/main.c:1835
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
@@ -1752,15 +1751,25 @@ msgstr ""
 "Se è abilitato e se non specifichi alcuna MRL dalla linea di commando, Xine "
 "caricherà automaticamente la precedente playlist."
 
-#: src/xitk/main.c:1849
+#: src/xitk/main.c:1850
 msgid "Subtitle autoloading"
 msgstr "Caricamento automatico sottotitolo"
 
-#: src/xitk/main.c:1850
+#: src/xitk/main.c:1851
 msgid "Automatically load subtitles if they exist."
 msgstr "Carica automaticamente i sottotitoli se esistono."
 
-#: src/xitk/main.c:1983
+#: src/xitk/main.c:1859
+msgid "Enable deinterlacing by default"
+msgstr ""
+
+#: src/xitk/main.c:1860
+msgid ""
+"Deinterlace plugin will be enabled on startup. Progressive streams are "
+"automaticaly detected with no performance penalty."
+msgstr ""
+
+#: src/xitk/main.c:1998
 msgid "Logo mrl"
 msgstr "Logo MRL"
 

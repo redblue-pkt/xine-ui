@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2003-12-13 11:47+0100\n"
+"POT-Creation-Date: 2003-12-17 12:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1140,7 +1140,7 @@ msgstr ""
 
 #: src/xitk/main.c:638
 msgid ""
-"      --enqueue <mrl>          Enqueue mrl of a running session (session 0)\n"
+"      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
 msgstr ""
 
 #: src/xitk/main.c:639
@@ -1511,71 +1511,81 @@ msgstr ""
 msgid "*sight*, unkown error."
 msgstr ""
 
-#: src/xitk/main.c:1311
+#: src/xitk/main.c:1312
 #, c-format
 msgid "Require xine library version 1.0.0, found %d.%d.%d.\n"
 msgstr ""
 
-#: src/xitk/main.c:1397
+#: src/xitk/main.c:1398
 msgid "video driver id required for -V option\n"
 msgstr ""
 
-#: src/xitk/main.c:1406
+#: src/xitk/main.c:1407
 msgid "audio driver id required for -A option\n"
 msgstr ""
 
-#: src/xitk/main.c:1484
+#: src/xitk/main.c:1485
 #, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1548
+#: src/xitk/main.c:1549
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1580
+#: src/xitk/main.c:1581
 #, c-format
 msgid "Bad loop mode '%s', see xine --help\n"
 msgstr ""
 
-#: src/xitk/main.c:1709
+#: src/xitk/main.c:1710
 msgid "*** NOTE ***\n"
 msgstr ""
 
-#: src/xitk/main.c:1710
+#: src/xitk/main.c:1711
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
 
-#: src/xitk/main.c:1748
+#: src/xitk/main.c:1749
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr ""
 
-#: src/xitk/main.c:1768
+#: src/xitk/main.c:1769
 msgid "You should specify one MRL to enqueue, at least!.\n"
 msgstr ""
 
-#: src/xitk/main.c:1833
+#: src/xitk/main.c:1834
 msgid "Automatically reload old playlist"
 msgstr ""
 
-#: src/xitk/main.c:1834
+#: src/xitk/main.c:1835
 msgid ""
 "If it's enabled and if you don't specify any MRL in command line, xine will "
 "automatically load previous playlist."
 msgstr ""
 
-#: src/xitk/main.c:1849
+#: src/xitk/main.c:1850
 msgid "Subtitle autoloading"
 msgstr ""
 
-#: src/xitk/main.c:1850
+#: src/xitk/main.c:1851
 msgid "Automatically load subtitles if they exist."
 msgstr ""
 
-#: src/xitk/main.c:1983
+#: src/xitk/main.c:1859
+msgid "Enable deinterlacing by default"
+msgstr ""
+
+#: src/xitk/main.c:1860
+msgid ""
+"Deinterlace plugin will be enabled on startup. Progressive streams are "
+"automaticaly detected with no performance penalty."
+msgstr ""
+
+#: src/xitk/main.c:1998
 msgid "Logo mrl"
 msgstr ""
 

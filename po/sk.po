@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.23\n"
 "POT-Creation-Date: 2003-12-13 11:47+0100\n"
-"PO-Revision-Date: 2003-10-16 12:20+ZONE\n"
+"PO-Revision-Date: 2003-12-17 12:19+0100\n"
 "Last-Translator: Daniel Bena <Daniel.Bena at dm-drogeriemarkt dot sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -1219,8 +1219,7 @@ msgstr "      --skin-server-url <url>  Definova» adresu skin servera.\n"
 #: src/xitk/main.c:638
 msgid ""
 "      --enqueue <mrl>          Enqueue mrl of a running session (session 0)\n"
-msgstr ""
-"      --enqueue <mrl>          Prida» mrl be¾iacej session (session 0)\n"
+msgstr "      --enqueue <mrl> ...      Prida» mrl be¾iacej session (session 0)\n"
 
 #: src/xitk/main.c:639
 msgid "  -S, --session <option1,option2,...>\n"
