@@ -1048,16 +1048,26 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   for (i = 0; i < nfiles; i++) {
     char *sub = NULL;
     
-    if((sub = (char *)get_last_double_semicolon(filenames[i])) != NULL) {
-      if(is_ipv6_last_double_semicolon(filenames[i]))
-	sub = NULL;
-      else {
-	*sub = 0;
-	sub += 2;
-      }
+    /* grab recursively all files from dir */
+    if(is_a_dir(filenames[i])) {
+      if(filenames[i][strlen(filenames[i]) - 1] == '/')
+	filenames[i][strlen(filenames[i]) - 1] = '\0'; 
+      
+      mediamark_collect_from_directory(filenames[i]);
     }
-    
-    mediamark_add_entry((const char *)filenames[i], (const char *)filenames[i], sub, 0, -1, 0, 0);
+    else {
+      if((sub = (char *)get_last_double_semicolon(filenames[i])) != NULL) {
+	if(is_ipv6_last_double_semicolon(filenames[i]))
+	  sub = NULL;
+	else {
+	  *sub = 0;
+	  sub += 2;
+	}
+      }
+      
+      mediamark_add_entry((const char *)filenames[i], 
+			  (const char *)filenames[i], sub, 0, -1, 0, 0);
+    }
   }
   
   if((gGui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) || 

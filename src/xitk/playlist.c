@@ -869,12 +869,11 @@ void playlist_update_focused_entry(void) {
 	    
 	    if(gGui->playlist.num <= max_displayed)
 	      _playlist_update_browser_list(-1);
-	    else if(gGui->playlist.cur <= (gGui->playlist.num - max_displayed)) {
+	    else if(gGui->playlist.cur <= (gGui->playlist.num - max_displayed))
 	      _playlist_update_browser_list(gGui->playlist.cur);
-	    }
 	    else
 	      _playlist_update_browser_list(gGui->playlist.num - max_displayed);
-
+	    
 	    if(selected >= 0) {
 	      xitk_browser_set_select(playlist->playlist, selected);
  	      xitk_inputtext_change_text(playlist->winput,

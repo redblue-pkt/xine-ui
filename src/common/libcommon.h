@@ -24,6 +24,5 @@
 #define _LIBCOMMON__H
 
 #include "utils.h"
-#include "xscreensaver-remote.h"
 
 #endif

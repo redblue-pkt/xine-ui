@@ -101,7 +101,7 @@ static void get_available_skins_from(char *path) {
     return;
 
   if((pdir = opendir(path)) != NULL) {
-    struct stat   pstat, sstat;
+    struct stat   sstat;
     char          fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     char          skcfgname[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     
@@ -109,9 +109,7 @@ static void get_available_skins_from(char *path) {
       memset(&fullfilename, 0, sizeof(fullfilename));
       sprintf(fullfilename, "%s/%s", path, pdirent->d_name);
       
-      stat(fullfilename, &pstat);
-      
-      if((S_ISDIR(pstat.st_mode))
+      if((is_a_dir(fullfilename))
 	 && (!(strlen(pdirent->d_name) == 1 && pdirent->d_name[0] == '.' )
 	     && !(strlen(pdirent->d_name) == 2 
 		  && (pdirent->d_name[0] == '.' && pdirent->d_name[1] == '.')))) {

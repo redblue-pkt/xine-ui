@@ -314,3 +314,12 @@ int is_ipv6_last_double_semicolon(const char *str) {
 
   return 0;
 }
+
+int is_a_dir(char *filename) {
+  struct stat  pstat;
+  
+  if((stat(filename, &pstat)) < 0)
+    return 0;
+  
+  return (S_ISDIR(pstat.st_mode));
+}

@@ -61,6 +61,7 @@ void mediamark_load_mediamarks(const char *filename);
 void mediamark_save_mediamarks(const char *filename);
 
 int mrl_looks_playlist(char *mrl);
+void mediamark_collect_from_directory(char *filepathname);
 
 void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data);
 int mmk_editor_is_visible(void);

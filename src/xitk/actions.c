@@ -1131,17 +1131,35 @@ void gui_dndcallback(char *filename) {
 
       __second_stat:
 
-	if((stat(p, &pstat)) == 0)
-	  sprintf(buffer, "file:/%s", p);
+	if((stat(p, &pstat)) == 0) {
+	  if(is_a_dir(p)) {
+	    if(*(p + (strlen(p) - 1)) == '/')
+	      *(p + (strlen(p) - 1)) = '\0'; 
+	    
+	    mediamark_collect_from_directory(p);
+	    goto __do_play;
+	  }
+	  else
+	    sprintf(buffer, "file:/%s", p);
+	}
 	else {
-	  
 	  sprintf(buffer2, "/%s", p);
-
+	  
 	  /* file don't exist, add it anyway */
 	  if((stat(buffer2, &pstat)) == -1)
 	    sprintf(buffer, "%s", filename);
-	  else
-	    sprintf(buffer, "file:/%s", buffer2);
+	  else {
+	    if(is_a_dir(buffer2)) {
+	      
+	      if(buffer2[strlen(buffer2) - 1] == '/')
+		buffer2[strlen(buffer2) - 1] = '\0'; 
+	      
+	      mediamark_collect_from_directory(buffer2);
+	      goto __do_play;
+	    }
+	    else
+	      sprintf(buffer, "file:/%s", buffer2);
+	  }
 	  
 	}
       }
@@ -1153,7 +1171,19 @@ void gui_dndcallback(char *filename) {
     else
       sprintf(buffer, "%s", filename);
     
-    mediamark_add_entry(buffer, buffer, NULL, 0, -1, 0, 0);
+    if(is_a_dir(buffer)) {
+      
+      if(buffer[strlen(buffer) - 1] == '/')
+	buffer[strlen(buffer) - 1] = '\0'; 
+      
+      mediamark_collect_from_directory(buffer);
+    }
+    else
+      mediamark_add_entry(buffer, buffer, NULL, 0, -1, 0, 0);
+    
+  __do_play:
+    
+    playlist_update_playlist();
     
     if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
       gGui->playlist.cur = (gGui->playlist.num - 1);
@@ -1161,8 +1191,6 @@ void gui_dndcallback(char *filename) {
       if(gGui->smart_mode)
 	gui_play(NULL, NULL);
     }   
-
-    playlist_update_playlist();
     
     if((!is_playback_widgets_enabled()) && gGui->playlist.num)
       enable_playback_controls(1);

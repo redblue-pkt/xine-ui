@@ -405,18 +405,6 @@ static int is_file_match_to_filter(filebrowser_t *fb, char *file) {
   return 0;
 }
 
-/*
- * Return 1 is filepathname is a directory, otherwise 0
- */
-static int is_a_dir(char *filepathname) {
-  struct stat  pstat;
-  
-  if((stat(filepathname, &pstat)) < 0)
-    return 0;
-
-  return (S_ISDIR(pstat.st_mode));
-}
-
 static void fb_update_origin(filebrowser_t *fb) {
   char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   

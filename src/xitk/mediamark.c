@@ -30,6 +30,7 @@
 #include <string.h>
 #include <assert.h>
 #include <sys/types.h>
+#include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <errno.h>
@@ -2546,6 +2547,37 @@ int mrl_looks_playlist(char *mrl) {
   }
   
  return 0;
+}
+
+void mediamark_collect_from_directory(char *filepathname) {
+  DIR           *dir;
+  struct dirent *dentry;
+  
+  if((dir = opendir(filepathname))) {
+    
+    while((dentry = readdir(dir))) {
+      char fullpathname[XITK_PATH_MAX + XITK_NAME_MAX];
+      
+      snprintf(fullpathname, (XITK_PATH_MAX + XITK_NAME_MAX) - 1,
+	       "%s/%s", filepathname, dentry->d_name);
+      
+      if(fullpathname[strlen(fullpathname) - 1] == '/')
+	fullpathname[strlen(fullpathname) - 1] = '\0';
+      
+      if(is_a_dir(fullpathname)) {
+	if(!((strlen(dentry->d_name) == 1) && (dentry->d_name[0] == '.'))
+	   && !((strlen(dentry->d_name) == 2) && 
+		((dentry->d_name[0] == '.') && dentry->d_name[1] == '.'))) {
+	  mediamark_collect_from_directory(fullpathname);
+	}
+      }
+      else
+	mediamark_add_entry((const char *)fullpathname, 
+			    (const char *)fullpathname, NULL, 0, -1, 0, 0);
+    }
+    
+    closedir(dir);
+  }
 }
 
 /*

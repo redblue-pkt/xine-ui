@@ -2,7 +2,7 @@ noinst_LTLIBRARIES = libcommon.la
 
 AM_CFLAGS = @XINE_CFLAGS@ @X_CFLAGS@ @BUILD_LIB_STATIC@
 
-EXTRA_DIST = getopt.c getopt1.c getopt.h
+EXTRA_DIST = getopt.c getopt1.c getopt.h xscreensaver-remote.c xscreensaver-remote.h 
 
 if HAVE_GETOPT_LONG
 else
@@ -10,13 +10,13 @@ GETOPT_SRC = getopt.c getopt1.c
 GETOPT_HDR = getopt.h
 endif
 
-if HAVE_X11
-xscreensaver_remote = xscreensaver-remote.c
-endif
+##if HAVE_X11
+##xscreensaver_remote = xscreensaver-remote.c
+##endif
 
-libcommon_la_SOURCES = $(GETOPT_SRC) $(xscreensaver_remote) utils.c
+libcommon_la_SOURCES = $(GETOPT_SRC) utils.c
 
-noinst_HEADERS = $(GETOPT_HDR) utils.h xscreensaver-remote.h libcommon.h
+noinst_HEADERS = $(GETOPT_HDR) utils.h libcommon.h
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
