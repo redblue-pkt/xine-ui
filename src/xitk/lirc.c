@@ -32,6 +32,7 @@
 #include "event.h"
 #include "panel.h"
 #include "actions.h"
+#include "playlist.h"
 
 #include "xitk.h"
 
@@ -55,6 +56,38 @@ typedef struct {
 } _lirc_t;
 
 static _lirc_t lirc;
+
+static void lirc_get_playlist(char *from) {
+  int    i;
+  char **autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+
+  for(i = 0; autoscan_plugins[i] != NULL; ++i) {
+    if(!strcasecmp(autoscan_plugins[i], from)) {
+      int    num_mrls;
+      int    j;
+      char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
+						     from,
+						     &num_mrls);
+      if(autoplay_mrls) {
+
+	/* First, free existing playlist */
+	for(j = 0; j < gGui->playlist_num; j++)
+	  gGui->playlist[j] = NULL;
+	
+	gGui->playlist_num = 0;
+	gGui->playlist_cur = 0;
+	
+	for (j = 0; j < num_mrls; j++)
+	  gGui->playlist[j] = autoplay_mrls[j];
+	
+	gGui->playlist_num = j;
+	gGui->playlist_cur = 0;
+	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	pl_update_playlist();
+      }    
+    }
+  }
+}
 
 void *xine_lirc_loop(void *dummy) {
   char             *code, *c;
@@ -86,6 +119,15 @@ void *xine_lirc_loop(void *dummy) {
 	k = kbindings_lookup_action(gGui->kbindings, c);
 	if(k)
 	  gui_execute_action_id((kbindings_get_action_id(k)));
+	else {
+	  char from[256];
+	  
+	  memset(&from, 0, sizeof(from));
+	  if(sscanf(c, "PlaylistFrom:%s", &from[0]) == 1) {
+	    if(strlen(from))
+	      lirc_get_playlist(from);   
+	  }
+	}
 	
       }
       xitk_paint_widget_list (panel->widget_list);

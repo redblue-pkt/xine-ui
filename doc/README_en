@@ -377,6 +377,21 @@
 
       It's yours to specify the remote name, and assign the button.
 
+      Playlist:
+      ---------
+      To Retrieve a playlist from a given input plugin, you can use the
+      special 'PlaylistFrom:' keyword, followed by the plugin name (the same
+      in the button in the panel window):
+
+       # Retrieve playlist from NAV plugin.
+       begin
+               remote = xxxxx
+               button = xxxxx
+               prog   = xine
+               repeat = 0
+               config = PlaylistFrom:NAV
+       end
+
 
 3   WHAT'S LEFT TO SAY
 

@@ -524,7 +524,9 @@ void xitk_xevent_notify(XEvent *event) {
 
 	  if(w && (((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT) &&
 		   (mykey != XK_Tab) && (mykey != XK_KP_Tab) && (mykey != XK_ISO_Left_Tab))) {
-
+	    
+	    xitk_send_key_event(fx->widget_list, w, event);
+	    
 	    if((mykey == XK_Return) || 
 	       (mykey == XK_KP_Enter) || (mykey == XK_ISO_Enter) || (mykey == XK_ISO_Enter)) {
 	      
@@ -533,8 +535,6 @@ void xitk_xevent_notify(XEvent *event) {
 	      
 	      xitk_set_focus_to_next_widget(fx->widget_list, 0);
 	    }
-	    else
-	      xitk_send_key_event(fx->widget_list, w, event);
 
 	    return;
 	  }
