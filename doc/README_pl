@@ -3,53 +3,54 @@
             xine
    ----------------------
 
-     wolny odtwarzacz wideo
+     wolny i darmowy odtwarzacz wideo
 
 zakres tego documentu:
------------------------
+----------------------
 
-to jest dokumentacja u¿ytkownika koñcowego xine-ib i xine-ui. Znajdziesz
-wiêcej dokumentacji w katalogu doc/ obydwóch pakietów.
+To jest dokumentacja u¿ytkownika koñcowego xine-ib i xine-ui. Wiêcej
+informacji znajdziesz w katalogu doc/ obydwóch pakietów.
 
 o xine:
------------
+-------
 
-xine to wolny, na licncji GPL, odtwarzacz wideo dla systemów unixowych.
+xine to wolny (wolny jak wolno¶æ a nie powolno¶æ przyp. t³um.)
+i darmowy, na licncji GPL, odtwarzacz wideo dla systemów unixowych.
 Obs³uguje sekwencje mpeg-2 i mpeg-1 (zawieraj±ce audio + wideo) ,
-elementarne sekwencje mpeg (tylko audio/wideo, np. pliki mp3) i
+elementarne sekwencje mpeg (tylko audio/wideo, np. pliki mp3) jak i
 pliki typu AVI (u¿ywaj±c kodeków dll win32).
 
-xine odtwarza obraz i d¼wiêk z sekwencji i synchronizuje je.
+xine odtwarza z sekwencji obraz i d¼wiêk i synchronizuje je.
 Zale¿nie od w³a¶ciwo¶ci sekwencji odtwarzanie bêdzie wymaga³o wiêcej lub
 mniej czasu procesora, pe³na czêstotliwo¶æ wy¶wietlania ramek sekwencji 
-mpeg-2by³a widziana ju¿ przy procesorze Pentium II 400 MHz.
+mpeg-2 uda³a siê ju¿ przy procesorze Pentium II 400 MHz.
 
 xine mo¿e odtwarzaæ VideoCD, CD, SVCD i bezpo¶rednio DVD. Niestety status
 prawny zaszyfrowanych/zablokowanych dysków DVD jest niepewny w niektórych
-krajach wiêc nie mo¿emy dodaæ do xine ¿adnego kodu odszyfrowywuj±cego DVD.
-Aby odgrywaæ takie DVD bêdziesz potrzebowaæ zewnêtrznych programów lub
-czego¶ na kszta³t wtyczki do xine 'xine_dvd_plugin' który mo¿e obs³u¿yæ
-uwierzytelnianie/ odszyfrowywanie DVD.
+krajach, wiêc nie mo¿emy dodaæ do xine ¿adnego kodu odszyfrowuj±cego DVD.
+Aby odtwarzaæ takie DVD bêdziesz potrzebowaæ zewnêtrznych programów lub
+czego¶ na kszta³t wtyczki do xine 'xine_dvd_plugin', który mo¿e obs³u¿yæ
+uwierzytelnianie/odszyfrowanie DVD.
 
 Od wersji xine 5.0 zaimplementowana zosta³a architektura oferuj±ca
 u¿ycie ró¿nych wtyczek do ró¿nych celów dziêki którym mo¿liwe
-bêdzie wsparcie wielu innych typów sekwencji i urz±dzeñ wyj¶ciowych
-w przysz³o¶ci.
+bêdzie w przysz³o¶ci wsparcie wielu innych typów sekwencji
+i urz±dzeñ wyj¶ciowych.
 
 Obs³ugiwane platformy / wymagania:
 -----------------------------------
 
-- xine wymaga serwera X11 z 15, 16 24 lub 32 bitowy± g³êbi± kolorów
+- xine wymaga serwera X11 z 15, 16 24 lub 32 bitow± g³êbi± kolorów
   dla wyj¶cia wideo.
-- aaxine u¿ywa bibliotek aalib dla wyj¶cia i mo¿e byæ uruchomiony na
-  prawie ka¿dym typie terminala.
+- aaxine u¿ywa bibliotek aalib dla wyj¶cia wideo i mo¿e byæ uruchomiony
+  na prawie ka¿dym typie terminala.
 - xine wykrywa i u¿ywa rozszerzeñ MIT X video i X shared memory dla
   lepszej wydajno¶ci.
 - je¶li nie mo¿esz uruchomiæ Xv na twojej platformie, powiniene¶
-  u¿yæ 16bpp g³êbiê kolorów dla uzyskania wy¿szej prêdko¶ci.
-  Xv wydaje siê dobrze pracowaæ z 16 i 24 bpp.
-- je¶li masz kartê graficzn± mga 200/400 mo¿esz u¿yæ jako opcji
-  wyj¶cia wtyczki sybcfb/teletux. Szczegó³y zobacz w README.syncfb 
+  u¿yæ 16bpp g³êbi kolorów dla uzyskania lepszej wydajno¶ci.
+  Xv wydaje siê ca³kiem dobrze pracowaæ w 16bpp i 24bpp.
+- je¿eli masz kartê graficzn± mga 200/400 mo¿esz u¿yæ jako opcji
+  wyj¶cia - wtyczki syncfb/teletux. Szczegó³y zobacz w README.syncfb 
 - odtwarzanie audio jest wspomagane przez OSS, ALSA, ESD i ARTSD.
 - ¿eby skompilowaæ xine potrzebujesz w miarê nowych wersji gmake, gcc
   i binutils.
@@ -72,7 +73,7 @@ Na razie xine zosta³o przetestowane na nastêpuj±cym sprzêcie:
 - Linux na Celeronie 633
   z u¿yciem XFree86 4.0.1 i kart± ATI AIW Rage128-16MB
 - Linux na AMD K7@550
-  z y¿yciem Xfree 4.0.1 i kart± Ati Rage 128 16 Mb 
+  z u¿yciem Xfree 4.0.1 i kart± Ati Rage 128 16 Mb 
   (Xv dzia³a z t± konfiguracj± na sterownikach z projektu GATOS)
 - Linux na Celeronie 667
   z u¿yciem XFree86 4.0.2 i kart± Riva TNT 16Mb 
@@ -85,15 +86,15 @@ Na razie xine zosta³o przetestowane na nastêpuj±cym sprzêcie:
   z u¿yciem Xsun i kart± ATI Xpert@Work & Xpert98 (3D RAGE PRO)
   Szczegó³y zobacz w README.solaris.
 
-Platwormy non-intel:
+Platformy nie-intel:
 - Solaris 8 na procesorze SPARC
   z u¿yciem Xsun i kart± Creator-3D framebuffer
   Szczegó³y zobacz w README.solaris.
 - IRIX na procesorze MIPS
-  na tej platwormie wci±¿ brakuje obs³ugi audio.
+  na tej platformie wci±¿ brakuje obs³ugi audio.
 
-u¿ycie:
-------
+u¿ytkowanie:
+------------
 
 Mo¿esz uruchomiæ xine bez ¿adncyh opcji lub podaj±c jedn± lub wiêcej
 sekwencji wej¶ciowych bezpo¶rednio. xine testuje czy mo¿e u¿yæ
@@ -110,13 +111,13 @@ Je¶li chcesz wys³aæ d¼wiêk przez sieæ za pomoc± ESD, ustaw zmienn±
 Sekwencj± wej¶cia mo¿e byæ nazwa pliku lub co¶ co nazywamy
 "MediaResourceLocator" MRL, który wygl±da podobnie do URLa.
 Najpierw podaj ¼ród³o wej¶cia przed "://" i specyficzny identyfikator
-¼ród³a wej¶cia. Jakich ¼róde³ wej¶cia mo¿esz u¿yæ zale¿y od tego
+¼ród³a wej¶cia. Jakich ¼róde³ wej¶cia mo¿esz u¿yæ, zale¿y od tego
 jakie wtyczki wej¶cia zainstalowa³e¶ (dla zwyk³ych plików mo¿esz
 pomin±æ identyfikator ¼ród³a wej¶cia). Spróbuj
 
 $ xine --help
 
-by otrzymaæ pe³n± listê opcji u¿ycia.
+by otrzymaæ pe³n± listê opcji u¿ytkowania.
 
 xine u¿ywa protoko³u xdnd (Versja 3) wiêc je¶li masz wyszukiwarkê plików
 z nim wspó³pracuj±c± (np gmc) mo¿esz po prostu "przci±gn±æ" pliki wideo
@@ -126,8 +127,6 @@ Odtwarzanie scie¿ki 3 z VCD:
 
 $ xine vcd://3
 
-Playing track 3 from a VCD:
-
 Przyk³ad bezpo¶redniego dostêpu do DVD:
 
 $ xine dvd://VTS_01_1.VOB
@@ -135,28 +134,28 @@ $ xine dvd://VTS_01_1.VOB
 Skróty klawiatury:
 -------------------
 
-Klawisz       Akcja
+Klawisz           Akcja
 
-RETURN        odtwórz
-SPACJA, P     stop klatka
-Góra/Dó³      szybki podgl±d / zwolnienie
+RETURN            odtwórz
+SPACJA, P         stop klatka
+Góra/Dó³          szybki podgl±d / zwolnienie
 
-0             znajd¼ pocz±tek aktualnej sekwencji
-1-9           przejd¼ do 10-90% aktualnej sekwencji
-Lewo/Prawo    przeskocz -+ 15 sec (+CTRL: 60 sec)
-PgUp/Wstecz   jump to previous playlist entry
+0                 znajd¼ pocz±tek aktualnej sekwencji
+1-9               przejd¼ do 10-90% aktualnej sekwencji
+Lewo/Prawo        przeskocz -+ 15 sec (+CTRL: 60 sec)
+PgUp/Wstecz       jump to previous playlist entry
 PgDown/Nastêpny   jump to next playlist entry
 
-F             Prze³±cz do trybu pe³noekranowego
-A             prze³±cz proporcje ekranu (AUTO/16:9/4:3/DVB)
-I             w³±cz tryb przeplotu
-< >           zmodyfikuj rozmiar okna wyj¶wietlania
-+ -           zmieñ kana³ audio
-, .           zmieñ kana³ napisów
-n m           wyreguluj synchronizacjê a/v
-home          zresetuj synchronizacjê a/v
+F                 Prze³±cz do trybu pe³noekranowego/okna
+A                 prze³±cz proporcje ekranu (AUTO/16:9/4:3/DVB)
+I                 w³±cz tryb przeplotu
+< >               zmodyfikuj rozmiar okna wyj¶wietlania
++ -               zmieñ kana³ audio
+, .               zmieñ kana³ napisów
+n m               wyreguluj synchronizacjê a/v
+home              zresetuj synchronizacjê a/v
 
-Q             wyj¶cie
+Q                 zakoñcz
 
 wiêcej w krótce.
 
@@ -169,26 +168,26 @@ Podaj opcjê "-a" aby wybraæ wymagan± ¶cie¿kê audio:
 
 xine -a 3 test.mpg
 
-Odtwarza 3-ci± dostêpn± sicie¿kê audio (wraz z obrazem, oczywi¶cie).
+odtworzy 3-ci± dostêpn± ¶cie¿kê audio (wraz z obrazem, oczywi¶cie).
 
 wybieranie napisów:
---------------------
+-------------------
 
-Napisy s± do³±czany w oddzielnych ¶cie¿kach tak jak d¼wiêk.
-Generalnie, ¶cie¿ka 0 to napisy w domy¶lnym jêzyku. U¿yj
-opcji "-u" by wybraæ potrzebn± ¶cie¿kê napisów:
+Napisy s± do³±czane w oddzielnych ¶cie¿kach, tak jak d¼wiêk.
+Zazwyczaj ¶cie¿ka 0 to napisy w domy¶lnym jêzyku. U¿yj
+opcji "-u" aby wybraæ potrzebn± ¶cie¿kê napisów:
 
 xine -u 0 test.vob
 
 wy¶wietla napisy ze ¶cie¿ki 0.
 
 sterowanie xine przez CORBA:
----------------------------
+----------------------------
 
 [ POPRAWIÆ: wspomaganie CORBA nie dzia³a w xine 0.6 ]
 
 xine ma zaimplementowan± obs³ugê interfejsu servera CORBA,
-aby udostêpniæ zdalne sterowanie i u¿ywanie skryptów. Dlatego
+w celu udostêpnienia zdalnego sterowania i u¿ywania skryptów. Dlatego
 potrzebujesz ORBit który zreszt± powiniene¶ mieæ zainstalowany
 je¶li u¿ywasz GNOME. W przeciwnym wypadku mo¿esz go zciagn±æ z:
 
@@ -199,7 +198,7 @@ Ka¿da wersja ORBit >= 0.4.0 powinna pracowaæ poprawnie.
 Aby aktywowaæ interfejs CORBA, musisz dodaæ argument "--enable-corba"
 do skryptu ./configure i ponownie przekompilowaæ xine.
 
-Definicja interfejsu servera xine mo¿esz znale¼æ w pliku "corba/xine.idl"
+Definicjê interfejsu serwera xine mo¿esz znale¼æ w pliku "corba/xine.idl"
 który jest instalowany domy¶lnie w "/usr/share/idl/xine.idl".
 
 Do komunikacji z xine przez CORBA'ê, potrzebujesz jego IOR (Interoperable
@@ -222,7 +221,7 @@ u¿ywanie LIRC z xine:
 ---------------------
 
 xine mo¿e byæ sterowany zdalnie przez podczerwieñ. Do tego potrzebujesz
-mieæ zainstalowany LIRC (http://www.lirc.org), powiniene¶ zci±gn±æ
+zainstalowanego LIRC'a (http://www.lirc.org), powiniene¶ zci±gn±æ
 najnowsz± wersjê CVS je¶li twój system pracuje na najnowszych j±drach
 linux'a (seria 2.2 lub 2.4).
 
@@ -275,10 +274,10 @@ Wszystkie dzia³aj±ce komendy to:
  - prze³±czenie trybu wy¶wietlania okno <-> pe³ny ekran
       fullscr
 
-¯adne komendy nie s± "uczulone" na wielko¶æ liter.
+Wielko¶æ liter nie ma znaczenia.
 
-u¿yte oprogramowanie:
---------------
+U¿yte oprogramowanie:
+---------------------
 
 xine u¿ywa oprogramowania z nastêpuj±cych projektów wolnego oprogramowania:
 
@@ -287,8 +286,8 @@ xine u¿ywa oprogramowania z nastêpuj±cych projektów wolnego oprogramowania:
 - libmpg123 z projektu mpg123 Michaela Hippa
   (zobacz http://www.mpg123.de/)
 
-...Bez tych ¶wietnych programów xine nie by³oby oczywi¶cie tam
-gdzie jest teraz.
+...Bez tych ¶wietnych programów xine nie by³oby oczywi¶cie tym
+czym jest teraz.
 
 Równie¿ wielkie podziêkowania dla Linux Video and DVD Project "LiViD"
 (http://www.linuxvideo.org/), sk±d oryginalny pomys³
@@ -312,17 +311,18 @@ Deweloperzy xine:
   ...i wielu innych, zobacz plik AUTHORS
 
 
-kontakt z projektem xine:
+Kontakt z projektem xine:
 ----------------------------
 
   Strona domowa projektu xine:
 
        http://xine.sourceforge.net
 
-   Informacja zwrotna albo chêæ pomocy mile widziana, skontaktuj siê
+   Informacja zwrotna lub chêæ pomocy mile widziana, kontakt:
 
        lista dyskusyjna u¿ytkowników xine <xine-user@lists.sourceforge.net>
 
--- 
-T³umaczenie: Bart³omiej Muryn
-mailto: _4ever_@irc.pl
+*********************************
+* T³umaczenie: Bart³omiej Muryn *
+* mailto: _4ever_@irc.pl        *
+*********************************
