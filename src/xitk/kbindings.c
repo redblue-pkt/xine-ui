@@ -367,6 +367,8 @@ static kbinding_entry_t default_binding_table[] = {
     "ToggleTVmode",           ACTID_TOGGLE_TVMODE	    , "o",	  KEYMOD_CONTROL , 0 },
   { "Visibility toggle of log viewer.",
     "ViewlogShow",            ACTID_VIEWLOG	            , "l",	  KEYMOD_META    , 0 },
+  { "Loop mode toggle.",
+    "ToggleLoopMode",         ACTID_LOOPMODE	            , "l",	  KEYMOD_NOMOD   , 0 },
   { "Key binding editor.",
     "KeyBindingEditor",       ACTID_KBEDIT	            , "k",	  KEYMOD_META    , 0 },
   { "Switch Monitor to DPMS standby mode.",

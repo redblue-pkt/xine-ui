@@ -696,7 +696,7 @@ void stream_infos_panel(void) {
   /* video frame */
   x = 5;
   y += 40;
-  draw_outter_frame(gGui->imlib_data, bg, "Video", btnfontname, 
+  draw_outter_frame(gGui->imlib_data, bg, _("Video"), btnfontname, 
 		    x, y, WINDOW_WIDTH - 10, (2 * 20) + (2 * 15) + 15 + 5);
 
   /* New Line */

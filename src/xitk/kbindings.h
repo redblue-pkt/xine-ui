@@ -113,6 +113,7 @@ typedef enum {
   ACTID_MRLIDENTTOGGLE,
   ACTID_SCANPLAYLIST,
   ACTID_MMKEDITOR,
+  ACTID_LOOPMODE,
 
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 

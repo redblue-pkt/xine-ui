@@ -728,6 +728,8 @@ void playlist_update_focused_entry(void) {
 	    
 	    if((gGui->playlist.num - gGui->playlist.cur) >= max_displayed)
 	      _playlist_update_browser_list(gGui->playlist.cur);
+	    else
+	      _playlist_update_browser_list(gGui->playlist.num - max_displayed);
 	    
 	    xitk_inputtext_change_text(playlist->widget_list, 
 				       playlist->winput, 

@@ -91,6 +91,11 @@
 #define MIXER_CAP_VOL       0x00000001
 #define MIXER_CAP_MUTE      0x00000002
 
+/* Playlist loop modes */
+#define PLAYLIST_LOOP_NO_LOOP   0 /* no loop (default) */
+#define PLAYLIST_LOOP_LOOP      1 /* loop the whole playlist */
+#define PLAYLIST_LOOP_REPEAT    2 /* loop the current mrl */
+#define PLAYLIST_LOOP_SHUFFLE   3 /* random selection in playlist */
 
 #define SAFE_FREE(x)     do {                                             \
                            if((x)) {                                      \

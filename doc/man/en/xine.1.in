@@ -287,6 +287,8 @@ Hide/show the gui.
 Hide/show the video output window.
 .IP "\fBi\fP | \fBI\fP"
 Toggle deinterlace methods.
+.IP "\fBl\fP"
+Toggle between loop modes.
 .IP "\fBM\fP\-\fBl\fP"
 Show/hide log window.
 .IP "\fBM\fP\-\fBm\fP"

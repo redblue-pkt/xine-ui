@@ -717,16 +717,45 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
     }
     else {
 
-      if((gGui->playlist.cur + value) < gGui->playlist.num) {
-	
-	gGui->playlist.cur += (value - 1);
-	
+      switch(gGui->playlist.loop) {
+      
+      case PLAYLIST_LOOP_SHUFFLE:
 	gGui->ignore_next = 0;
 	gui_playlist_start_next();
+	break;
+
+      case PLAYLIST_LOOP_NO_LOOP:
+      case PLAYLIST_LOOP_REPEAT:
+	if((gGui->playlist.cur + value) < gGui->playlist.num) {
+
+	  if(gGui->playlist.loop == PLAYLIST_LOOP_NO_LOOP)
+	    gGui->playlist.cur += (value - 1);
+	  else
+	    gGui->playlist.cur += value;
+	  
+	  gGui->ignore_next = 0;
+	  gui_playlist_start_next();
+	}
+	break;
+
+      case PLAYLIST_LOOP_LOOP:
+	if((gGui->playlist.cur + value) > gGui->playlist.num) {
+	  int newcur = value - (gGui->playlist.num - gGui->playlist.cur);
+	  
+	  gGui->ignore_next = 1;
+	  gGui->playlist.cur = newcur;
+	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+	  gGui->ignore_next = 0;
+	}
+	else {
+	  gGui->playlist.cur += (value - 1);
+	  gGui->ignore_next = 0;
+	  gui_playlist_start_next();
+	}
+	break;
       }
-
     }
-
   }
   else if(((int)data) == GUI_PREV) {
     
@@ -738,24 +767,57 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
     }
     else {
 
-      if((gGui->playlist.cur - value) >= 0) {
-	
-	gGui->ignore_next = 1;
-	gGui->playlist.cur -= value;
-	
-	if((gGui->playlist.cur < gGui->playlist.num)) {
-	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+      switch(gGui->playlist.loop) {
+      case PLAYLIST_LOOP_SHUFFLE:
+	gGui->ignore_next = 0;
+	gui_playlist_start_next();
+	break;
 
-	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
-  
+      case PLAYLIST_LOOP_NO_LOOP:
+      case PLAYLIST_LOOP_REPEAT:
+	if((gGui->playlist.cur - value) >= 0) {
+	  
+	  gGui->ignore_next = 1;
+	  gGui->playlist.cur -= value;
+	  
+	  if((gGui->playlist.cur < gGui->playlist.num)) {
+	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+	  }
+	  else
+	    gGui->playlist.cur = 0;
+	  
+	  gGui->ignore_next = 0;
+	}
+	break;
+
+      case PLAYLIST_LOOP_LOOP:
+	gGui->ignore_next = 1;
+
+	if((gGui->playlist.cur - value) >= 0) {
+
+	  gGui->playlist.cur -= value;
+	  
+	  if((gGui->playlist.cur < gGui->playlist.num)) {
+	    gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	    (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
+	  }
+	  else
+	    gGui->playlist.cur = 0;
+	  
 	}
 	else {
-	  gGui->playlist.cur = 0;
+	  int newcur = (gGui->playlist.cur - value) + gGui->playlist.num;
+	  
+	  gGui->playlist.cur = newcur;
+	  
+	  gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
+	  (void) gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start);
 	}
-	
-	gGui->ignore_next = 0;
-      }
 
+	gGui->ignore_next = 0;
+	break;
+      }
     }
   }
 

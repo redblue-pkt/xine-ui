@@ -296,6 +296,9 @@ Bascule des méthodes de dé-entrelacement.
 .BR M\-i :
 Affiche/masque la fenêtre d'informations de flux.
 .br
+.BR l :
+Bascule entre les modes de boucle.
+.br
 .BR M\-l :
 Affiche/masque la fenêtre de log.
 .br

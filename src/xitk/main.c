@@ -100,7 +100,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::s:RG:BN:P:";
+ "u:a:V:A:p::s:RG:BN:P:l::";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
@@ -127,6 +127,7 @@ static struct option long_options[] = {
   {"borderless"     , no_argument      , 0, 'B'                      },
   {"animation"      , required_argument, 0, 'N'                      },
   {"playlist"       , required_argument, 0, 'P'                      },
+  {"loop"           , optional_argument, 0, 'l'                      },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -340,6 +341,10 @@ void show_usage (void) {
   printf(_("  -N, --animation <mrl>        Specify mrl to play when video output isn't used.\n"));
   printf(_("                                 -can be used more than one time.\n"));
   printf(_("  -P, --playlist <filename>    Load a playlist file.\n"));
+  printf(_("  -l, --loop [mode]            Set playlist loop mode (default: loop). Modes are:\n"));
+  printf(_("                                 'loop': loop entire playlist.\n"));
+  printf(_("                                 'repeat': repeat current playlist entry.\n"));
+  printf(_("                                 'shuffle': select randomly an entry in playlist.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -707,6 +712,7 @@ int main(int argc, char *argv[]) {
   gGui->XF86VidMode_fullscreen = 0;
 #endif
   gGui->actions_on_start[aos]  = ACTID_NOKEY;
+  gGui->playlist.loop          = PLAYLIST_LOOP_NO_LOOP;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -890,6 +896,23 @@ int main(int argc, char *argv[]) {
 
     case 'P':
       mediamark_load_mediamarks(optarg);
+      break;
+
+    case 'l':
+      if(optarg != NULL) {
+	if(!strcmp(optarg, "loop"))
+	  gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
+	else if(!strcmp(optarg, "repeat"))
+	  gGui->playlist.loop = PLAYLIST_LOOP_REPEAT;
+	else if(!strcmp(optarg, "shuffle"))
+	  gGui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
+	else {
+	  printf(_("Bad loop mode '%s', see xine --help\n"), optarg);
+	  exit(1);
+	}
+      }
+      else
+	gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
       break;
 
     case 'v': /* Display version and exit*/
