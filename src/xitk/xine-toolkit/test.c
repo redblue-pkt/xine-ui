@@ -515,7 +515,7 @@ static void combo_select(xitk_widget_t *w, void *data, int select) {
 static void create_combo(void) {
   xitk_combo_widget_t    cmb;
   char                  *fontname = "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*";
-  int                    x = 150, y = 40, width = 100, height;
+  int                    x = 150, y = 36, width = 100, height;
   xitk_font_t           *fs;
 
   XITK_WIDGET_INIT(&cmb, test->imlibdata);

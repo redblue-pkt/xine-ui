@@ -81,6 +81,13 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
       _combo_rollunroll(NULL, (void *)w, 0);
     }
     if(w->visible) {
+      int bx, lw;
+
+      lw = xitk_get_widget_width(private_data->label_widget);
+      xitk_set_widget_pos(private_data->label_widget, w->x, w->y);
+      bx = w->x + lw;
+      xitk_set_widget_pos(private_data->button_widget, bx, w->y);
+
       xitk_show_widget(private_data->widget_list, private_data->label_widget);
       xitk_show_widget(private_data->widget_list, private_data->button_widget);
     }
@@ -234,6 +241,7 @@ void xitk_combo_update_pos(xitk_widget_t *w) {
       }
       
       xitk_get_widget_pos(private_data->label_widget, &xx, &yy);
+
       yy += xitk_get_widget_height(private_data->label_widget);
       x += xx;
       y += yy;
@@ -529,7 +537,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     xitk_list_append_content(c->parent_wlist->l, 
 			     (private_data->label_widget = 
 			      xitk_noskin_label_create(&lbl,
-						       x, y-4, (width - height), (height + 8), DEFAULT_FONT_12)));
+						       x, y, (width - height), (height + 8), DEFAULT_FONT_12)));
 
     cb.skin_element_name = NULL;
     cb.callback          = _combo_rollunroll;
@@ -538,7 +546,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     xitk_list_append_content(c->parent_wlist->l, 
 			     (private_data->button_widget = 
 			      xitk_noskin_checkbox_create(&cb,
-							  x + (width - height), (y - 4),
+							  x + (width - height), y,
 							  (height + 8), (height + 8))));
 
     if(lw)
@@ -547,8 +555,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
       *bw = private_data->button_widget;
     
     mywidget->x = x;
-    mywidget->y = y-4;
-    
+    mywidget->y = y;
     mywidget->width = (width - height) + (height + 8);
     mywidget->height = (height + 8);
     
@@ -573,5 +580,3 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
 
   return _xitk_combo_create(NULL, c, NULL, mywidget, private_data);
 }
-
-

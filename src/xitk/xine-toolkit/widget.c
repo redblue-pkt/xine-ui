@@ -989,8 +989,10 @@ int xitk_set_widget_pos(xitk_widget_t *w, int x, int y) {
     XITK_WARNING("widget is NULL\n");
     return 0;
   }
+
   w->x = x;
   w->y = y;
+
   return 1;
 }
 

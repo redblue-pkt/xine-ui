@@ -229,7 +229,6 @@ void *xitk_label_animation_loop(void *data) {
 static void label_setup_label(xitk_widget_t *l, char *label_) {
   label_private_data_t *private_data = 
     (label_private_data_t *) l->private_data;
-
   int label_len;
 
   pthread_mutex_lock(&private_data->mutex);
@@ -238,7 +237,7 @@ static void label_setup_label(xitk_widget_t *l, char *label_) {
     XITK_FREE(private_data->label);
     private_data->label = NULL;
   }
-
+  
   if (private_data->animated_label) {
     XITK_FREE(private_data->animated_label);
     private_data->animated_label = NULL;

@@ -349,12 +349,15 @@ static void setup_paint_widgets(void) {
     xitk_set_widget_pos(setup->wg[i]->label, wx, y);
 
     xitk_get_widget_pos(setup->wg[i]->widget, &wx, &wy);
-    /* Input text widgets have special treatments */
-    if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT)
+    /* Inputtext/combo widgets have special treatments */
+    if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_COMBO) {
+      xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 4);
+    }
+    else if(setup->wg[i]->widget->widget_type & WIDGET_TYPE_INPUTTEXT)
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y - 5);
     else
       xitk_set_widget_pos(setup->wg[i]->widget, wx, y);
-      
+    
     ENABLE_ME(setup->wg[i]);
 
     y += (FRAME_HEIGHT>>1) + 2;
@@ -667,16 +670,16 @@ static widget_triplet_t *setup_add_combo (char *title, char *labelkey,
   xitk_list_append_content(setup->widget_list->l, 
 			   (combo = 
 			    xitk_noskin_combo_create(&cmb,
-						     x, y, 150, &lw, &bw)));
+						     x, y - 4, 150, &lw, &bw)));
   xitk_combo_set_select(setup->widget_list, combo, entry->num_value );
 
   ADD_LABEL(combo);
 
+  setup->tmp_widgets[setup->num_tmp_widgets] = combo;
+  setup->num_tmp_widgets++;
   setup->tmp_widgets[setup->num_tmp_widgets] = lw;
   setup->num_tmp_widgets++;
   setup->tmp_widgets[setup->num_tmp_widgets] = bw;
-  setup->num_tmp_widgets++;
-  setup->tmp_widgets[setup->num_tmp_widgets] = combo;
   setup->num_tmp_widgets++;
 
   wt->widget = combo;
@@ -738,8 +741,6 @@ static void setup_section_widgets (int s) {
 	break;
 
       }
-      
-      y += (FRAME_HEIGHT) + 2;
       
     }
 
