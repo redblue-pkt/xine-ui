@@ -250,9 +250,17 @@ static void active_sliders_video_settings(void) {
     xitk_enable_widget(control->contr);
 }
 
-void control_config_register(void) {
+static void probe_active_controls(void) {
+  hue_ena    = test_vo_property(XINE_PARAM_VO_HUE);
+  bright_ena = test_vo_property(XINE_PARAM_VO_BRIGHTNESS);
+  sat_ena    = test_vo_property(XINE_PARAM_VO_SATURATION);
+  contr_ena  = test_vo_property(XINE_PARAM_VO_CONTRAST);
+}
 
-  hue_ena = test_vo_property(XINE_PARAM_VO_HUE);
+void control_config_register(void) {
+  
+  probe_active_controls();
+  
   if(hue_ena)
     set_current_param(XINE_PARAM_VO_HUE,
 		    (gGui->video_settings.hue = 
@@ -265,7 +273,6 @@ void control_config_register(void) {
 						hue_changes_cb, 
 						CONFIG_NO_DATA)));
   
-  bright_ena = test_vo_property(XINE_PARAM_VO_BRIGHTNESS);
   if(bright_ena)
     set_current_param(XINE_PARAM_VO_BRIGHTNESS, 
 		    (gGui->video_settings.brightness = 
@@ -278,7 +285,6 @@ void control_config_register(void) {
 						brightness_changes_cb, 
 						CONFIG_NO_DATA)));
 
-  sat_ena = test_vo_property(XINE_PARAM_VO_SATURATION);
   if(sat_ena)
     set_current_param(XINE_PARAM_VO_SATURATION,
 		    (gGui->video_settings.saturation = 
@@ -291,7 +297,6 @@ void control_config_register(void) {
 						saturation_changes_cb, 
 						CONFIG_NO_DATA)));
 
-  contr_ena = test_vo_property(XINE_PARAM_VO_CONTRAST);
   if(contr_ena)
     set_current_param(XINE_PARAM_VO_CONTRAST,
 		    (gGui->video_settings.contrast = 
@@ -759,6 +764,7 @@ void control_panel(void) {
 			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
     xitk_disable_widget(control->contr);
 
+    probe_active_controls();
     active_sliders_video_settings();
   }
 
