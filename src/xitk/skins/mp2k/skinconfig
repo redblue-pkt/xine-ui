@@ -11,7 +11,7 @@ skin.BackGround {
 skin.Close {
 	coords {
 	  x = 343
-	  y = 5
+	  y = 6
 	}
 	pixmap = reduce_btn.png
 }
@@ -19,7 +19,7 @@ skin.Close {
 skin.Exit {
 	coords {
 	  x = 377
-	  y = 5
+	  y = 6
 	}
 	pixmap = close_btn.png
 }
@@ -27,7 +27,7 @@ skin.Exit {
 skin.FullScreen {
 	coords {
 	  x = 359
-	  y = 5
+	  y = 6
 	}
 	pixmap = enlarge_btn.png
 }
@@ -35,7 +35,7 @@ skin.FullScreen {
 skin.TitleLabel {
 	coords {
 	  x = 45
-	  y = 357
+	  y = 359
 	}
 	label {
 	  length = 57
@@ -47,7 +47,7 @@ skin.TitleLabel {
 skin.TimeLabel {
 	coords {
 	  x = 340
-	  y = 250
+	  y = 252
 	}
 	label {
 	  length = 8
@@ -59,7 +59,7 @@ skin.TimeLabel {
 skin.AudioPrev {
 	coords {
 	  x = 150
-	  y = 388
+	  y = 390
 	}
 	pixmap = point_btn.png
 }
@@ -67,7 +67,7 @@ skin.AudioPrev {
 skin.AudioNext {
 	coords {
 	  x = 150
-	  y = 378
+	  y = 380
 	}
 	pixmap = point_btn.png
 }
@@ -75,7 +75,7 @@ skin.AudioNext {
 skin.AudioLabel {
 	coords {
 	  x = 110
-	  y = 379
+	  y = 381
 	}
 	label {
 	  length = 6
@@ -87,7 +87,7 @@ skin.AudioLabel {
 skin.SpuPrev {
 	coords {
 	  x = 350
-	  y = 388
+	  y = 390
 	}
 	pixmap = point_btn.png
 }
@@ -95,7 +95,7 @@ skin.SpuPrev {
 skin.SpuNext {
 	coords {
 	  x = 350
-	  y = 378
+	  y = 380
 	}
 	pixmap = point_btn.png
 }
@@ -103,7 +103,7 @@ skin.SpuNext {
 skin.SpuLabel {
 	coords {
 	  x = 310
-	  y = 379
+	  y = 380
 	}
 	label {
 	  length = 6
@@ -115,7 +115,7 @@ skin.SpuLabel {
 skin.PlaySlow {
 	coords {
 	  x = 104
-	  y = 295
+	  y = 297
 	}
 	pixmap = slow_btn.png
 }
@@ -123,7 +123,7 @@ skin.PlaySlow {
 skin.PlayFast {
 	coords {
 	  x = 126
-	  y = 295
+	  y = 297
 	}
 	pixmap = fast_btn.png
 }
@@ -131,7 +131,7 @@ skin.PlayFast {
 skin.Next {
 	coords {
 	  x = 148
-	  y = 295
+	  y = 297
 	}
 	pixmap = next_btn.png
 }
@@ -139,7 +139,7 @@ skin.Next {
 skin.Pause {
 	coords {
 	  x = 28
-	  y = 295
+	  y = 297
 	}
 	pixmap = pause_btn.png
 }
@@ -147,7 +147,7 @@ skin.Pause {
 skin.Play {
 	coords {
 	  x = 5
-	  y = 295
+	  y = 297
 	}
 	pixmap = play_btn.png
 }
@@ -155,7 +155,7 @@ skin.Play {
 skin.Stop {
 	coords {
 	  x = 50
-	  y = 295
+	  y = 297
 	}
 	pixmap = stop_btn.png
 }
@@ -163,7 +163,7 @@ skin.Stop {
 skin.Prev {
 	coords {
 	  x = 81
-	  y = 295
+	  y = 297
 	}
 	pixmap = prev_btn.png
 }
@@ -171,7 +171,7 @@ skin.Prev {
 skin.Eject {
 	coords {
 	  x = 179
-	  y = 295
+	  y = 297
 	}
 	pixmap = eject_btn.png
 }
@@ -179,7 +179,7 @@ skin.Eject {
 skin.AutoPlayGUI {
 	coords {
 	  x = 333
-	  y = 327
+	  y = 330
 	}
 	pixmap = autoplay_btn.png
 	label {
@@ -193,7 +193,7 @@ skin.AutoPlayGUI {
 skin.Setup {
 	coords {
 	  x = 10
-	  y = 24
+	  y = 26
 	}
 	pixmap = setup_btn.png
 }
@@ -201,7 +201,7 @@ skin.Setup {
 skin.PlBtn {
 	coords {
 	  x = 64
-	  y = 24
+	  y = 26
 	}
 	pixmap = pl_btn.png
 }
@@ -209,7 +209,7 @@ skin.PlBtn {
 skin.MrlBtn {
 	coords {
 	  x = 128
-	  y = 24
+	  y = 26
 	}
 	pixmap = mrl_btn.png
 }
@@ -217,7 +217,7 @@ skin.MrlBtn {
 skin.CtlBtn {
 	coords {
 	  x = 210
-	  y = 24
+	  y = 26
 	}
 	pixmap = ctrl_btn.png
 }
@@ -225,7 +225,7 @@ skin.CtlBtn {
 skin.SliderPlay {
 	coords {
 	  x = 5
-	  y = 277
+	  y = 278
 	}
 	pixmap = slider_bg.png
 	slider {
@@ -237,7 +237,7 @@ skin.SliderPlay {
 skin.Mute {
 	coords {
 	  x = 319
-	  y = 295
+	  y = 297
 	}
 	pixmap = mute_btn.png
 }
@@ -245,7 +245,7 @@ skin.Mute {
 skin.SliderVol {
 	coords {
 	  x = 344
-	  y = 296
+	  y = 298
 	}
 	pixmap = volumebg.png
 	slider {
@@ -257,7 +257,7 @@ skin.SliderVol {
 skin.Snapshot {
 	coords {
 	  x = 288
-	  y = 295
+	  y = 297
 	}
 	pixmap = cam_btn.png
 }
