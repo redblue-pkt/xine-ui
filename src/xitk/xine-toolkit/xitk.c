@@ -1869,8 +1869,10 @@ const char *xitk_get_homedir(void) {
       homedir[sizeof(homedir) - 1] = '\0';
     }
   } else {
-    strncpy(homedir, pw->pw_dir, sizeof(homedir));
+    char *s = strdup(pw->pw_dir);
+    strncpy(homedir, s, sizeof(homedir));
     homedir[sizeof(homedir) - 1] = '\0';
+    free(s);
   }
 
   if(!homedir[0]) {
