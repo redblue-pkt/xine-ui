@@ -4,13 +4,10 @@ SUBDIRS = man
 EXTRA_DIST = $(docs_DOCS)
 
 docdir = ${prefix}/share/doc/xine-ui
-docs_DOCS = \
-	FAQ FAQ_es FAQ_it FAQ_fr FAQ_pl \
-	README README_pl README_es \
-	README.corba README.dxr3 README.mrl README.syncfb README.xinerc \
-	README.freebsd README.irix README.solaris \
+docs_DOCS = FAQ FAQ_es FAQ_fr FAQ_it FAQ_pl \
+	README README.corba README.dxr3 README.freebsd README.irix README.mrl \
+	README.solaris README.syncfb README.xinerc README_es README_pl \
 	bug_report_form
-
 
 check:
 	@documentations='$(docs_DOCS)'; \

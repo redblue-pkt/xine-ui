@@ -1,7 +1,7 @@
 
-   ----------------------
-    some .xinerc options
-   ----------------------
+			----------------------
+			 some .xinerc options
+			----------------------
 
 option                  meaning
 --------------------------------------------------------------------
@@ -97,28 +97,52 @@ xine_debug		Various decimal values.
 			See ./xine-lib/xine-engine/monitor.h
 			for a list.
 
-The following exist, but details are not yet available.
-control_x		Unknown
-control_y		Unknown
-demux_strategy          Unknown
-oss_static_delay	Unknown
-panel_x			Unknown
-panel_y			Unknown
-panel_visible		Unknown
-playlist_x		Unknown
-playlist_y		Unknown
-sun_static_delay	Unknown
-XV_COLORKEY		Unknown
-XV_BRIGHTNESS		Unknown
-XV_CONTRAST		Unknown
-XV_SATURATION		Unknown
-XV_HUE			Unknown
-x_file_browser		Unknown
-y_file_browser		Unknown
-x_mrl_browser		Unknown
-y_mrl_browser		Unknown
-filebrowser_dir		Unknown
+XV_COLORKEY             -1000..1000: X11 XVideo COLORKEY property value.
 
+XV_BRIGHTNESS           -1000..1000: X11 XVideo BRIGHTNESS property value.
+
+XV_CONTRAST             -1000..1000: X11 XVideo CONTRAST property value.
+
+XV_SATURATION           -1000..1000: X11 XVideo SATURATION property value.
+
+XV_HUE                  -1000..1000: X11 XVideo HUE property value.
+
+mixer_name              Name of mixer device.
+
+mixer_volume            0..100%: Mixer volume.
+
+demux_strategy          0..3: Demuxer detection strategy. (see xine.h for details about values).
+
+
+xine-ui specific values:
+-----------------------
+
+layer_above             Boolean value of WM layer property using.
+
+*** NOTE: following values shouldn't be changed by user:
+panel_x                 X coords of panel window in root window.
+
+panel_y                 Y coords of panel window in root window.
+
+panel_visible           Visibility boolean value of panel window.
+
+control_x               X coords of control window in root window.
+
+control_y               Y coords of control window in root window.
+
+playlist_x              X coords of playlist window in root window.
+
+playlist_y              Y coords of playlist window in root window.
+
+x_mrl_browser           X coords of mrl browser window in root window.
+
+y_mrl_browser           Y coords of mrl browser window in root window.
+***
+
+
+The following exist, but details are not yet available.
+oss_static_delay        Unknown
+sun_static_delay        Unknown
 
 --- 
 version of this file:

@@ -198,21 +198,31 @@ rm -rf $RPM_BUILD_ROOT
 # documentation
 %{prefix}/man/fr/man1/xine.1*
 %{prefix}/man/es/man1/xine.1*
+%{prefix}/man/pl/man1/xine.1*
 %{prefix}/man/man1/xine.1*
 %{prefix}/share/doc/xine-ui/FAQ
 %{prefix}/share/doc/xine-ui/FAQ_es
-%{prefix}/share/doc/xine-ui/FAQ_it
 %{prefix}/share/doc/xine-ui/FAQ_fr
+%{prefix}/share/doc/xine-ui/FAQ_it
+%{prefix}/share/doc/xine-ui/FAQ_pl
+%{prefix}/share/doc/xine-ui/README
+%{prefix}/share/doc/xine-ui/README.corba
+%{prefix}/share/doc/xine-ui/README.dxr3
 %{prefix}/share/doc/xine-ui/README.freebsd
 %{prefix}/share/doc/xine-ui/README.irix
+%{prefix}/share/doc/xine-ui/README.mrl
 %{prefix}/share/doc/xine-ui/README.solaris
 %{prefix}/share/doc/xine-ui/README.syncfb
+%{prefix}/share/doc/xine-ui/README.xinerc
+%{prefix}/share/doc/xine-ui/README_es
+%{prefix}/share/doc/xine-ui/README_pl
 %{prefix}/share/doc/xine-ui/bug_report_form
 
 @HAVE_AA_TRUE@%files aa
 @HAVE_AA_TRUE@%defattr(-,root,root)
 @HAVE_AA_TRUE@%{prefix}/bin/aaxine
 @HAVE_AA_TRUE@%{prefix}/man/man1/aaxine.1*
+@HAVE_AA_TRUE@%{prefix}/man/pl/man1/aaxine.1*
 
 %changelog
 * Wed Oct 3 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
