@@ -38,6 +38,7 @@ extern _panel_t                *panel;
 #define PLAYB_PREV              5
 #define PLAYB_SPEEDM            6
 #define PLAYB_SPEEDL            7
+#define PLAYB_ADDMMK            8
 
 #define PLAYL_LOAD              10
 #define PLAYL_SAVE              11
@@ -164,6 +165,10 @@ static void menu_playback_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
 
   case PLAYB_SPEEDL:
     gui_execute_action_id(ACTID_SPEED_SLOW);
+    break;
+
+  case PLAYB_ADDMMK:
+    gui_execute_action_id(ACTID_ADDMEDIAMARK);
     break;
 
   default:
@@ -956,6 +961,26 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu_entry.user_data = (void *)i;
       xitk_menu_add_entry(w, &menu_entry);
     }
+  }
+
+  /* Mediamark */
+  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
+    xitk_menu_entry_t   menu_entry;
+
+    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
+    menu_entry.menu      = _("Playback/SEP");
+    menu_entry.type      = "<separator>";
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    memset(&menu_entry, 0, sizeof(xitk_menu_entry_t));
+    menu_entry.menu      = _("Playback/Add Mediamark");
+    menu_entry.shortcut  = menu_get_shortcut("AddMediamark");
+    menu_entry.cb        = menu_playback_ctrl;
+    menu_entry.user_data = (void *) PLAYB_ADDMMK;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    if(menu_entry.shortcut)
+      free(menu_entry.shortcut);
   }
 
   xitk_menu_show_menu(w);
