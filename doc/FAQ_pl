@@ -29,6 +29,7 @@
    3.5.2 Wtyczka wyj¶cia wideo Xv nie kompiluje siê!
    3.6 Problemy z kompilacj±: xine-ui.
    3.6.1 Zainstalowa³em xine-lib a xine-ui twierdzi ¿e nie mo¿e go znale¼æ!
+   3.7 Czy mogê zainstalowaæ xine w moim katalogu domowym (nie bed±c administratorem)?
 
    4   INSTALACJA
    4.1 Gdzie powinienem skopiowaæ biblioteki windowsowych kodeków dla xine?
@@ -45,6 +46,7 @@
    5.1.7 Jak u¿ywaæ wtyczki DVD?
    5.1.8 Mam problemy z ustawieniem odpowiedniego regionu w moim napêdzie RPC-2!
    5.1.9 Czy xine mo¿e odtwarzaæ dyski (S)VCD?
+   5.1.10 Jak mo¿na ogl±daæ filmy z zewnêtrznymi napisami AVI?
    
    5.2 PYTANIA DOTYCZ¡CE D¬WIÊKU
    5.2.1 Kiedy odtwarzam tê próbkê widzê obraz ale nie ma d¼wiêku!
@@ -105,6 +107,13 @@
      
      xine-user@lists.sourceforge.net    
 
+    Proszê dostarcz jakich¶ informacji o twojich ustawieniach tak aby ludzie
+    mieli szanse Ci pomóc, np. dodaj informacje o Twoim sprzêcie audio/video
+    i sterownikach jakich u¿ywasz, systemie operacyjnym, typie procesora oraz
+    jakie¶ komunikaty o b³êdach z konsoli. Do³±cz równie¿ parametry i opcje
+    jakie poda³e¶, iformacje o typie odtwarzanego strumienia. Bardzo wa¿n±
+    informacj± jest równie¿ versja xine której u¿ywasz i dodatkowe wtyczki jakie
+    masz zainstalowane w swoim systemie. 
 
 2   PYTANIA OGÓLNE
 
@@ -121,6 +130,10 @@
     xine-plugin bêdzie uniwersaln± wtyczk± do przegl±darek internetowych
     pozwalaj±c± na ogl±danie Twoich ulubionych strumieni internetowych
     w twojej przegl±darce za pomoc± xine.
+    
+    gnome-xine to frontend silnika xine i mo¿e byæ u¿ywany wymiennie z xine-ui.
+    Jest on bardziej skierowany na ogólne odtwarzanie mediów przez xine w
+    przeciwieñstwie do xine-ui które skupia siê raczej na pe³nej obs³udze DVD.
 
 2.2 Gdzie i jak mogê znale¼æ najnowsz± wersjê rozwojow±?
 
@@ -179,13 +192,13 @@
 
 3.3 Czy mogê dodaæ dodatkowe CFLAGS dla kompilacji?
     
-    Tak, mo¿esz podaæ takowe poprzez ustawienie zmeinnej GLOBAL_CFLAGS i
+    Tak, mo¿esz podaæ takowe poprzez ustawienie zmeinnej CFLAGS i
     przez uruchomienie skryptu configure jeszcze raz.
 
     To mo¿e byæ przydatne do ustawienia dodatkowych ¶cie¿ek include i
     bibliotek dla kompilatora.
     
-    Przyk³ad: export GLOBAL_CFLAGS="-I/usr/include -L/home/guenter/xine_libs"
+    Przyk³ad: export CFLAGS="-I/usr/include -L/home/guenter/xine_libs"
 
 3.4 Czy s± dostêpne binaria dla mojego K7? Mogê je skompilowaæ?
 
@@ -242,7 +255,7 @@
 
 3.6.1 Zainstalowa³em xine-lib a xine-ui twierdzi ¿e nie mo¿e go znale¼æ!
 
-      Przede wszystkim przyjrzyj siê jeszcze raz dok³adnie punktowi 3.2. Tam
+      Przede wszystkim przyjrzyj siê jeszcze raz dok³adnie punktowi 32.. Tam
       prawdopodobnie znajdziesz odpowid¼ na swoje pytanie.
 
       Tak jak to jest opisane w punkcie 3.2 (jeszcze raz ta podpowied¼), upewnij
@@ -256,7 +269,27 @@
       i zainstalowaæ wszystkie modu³y xine. Ale wydaje mi siê ¿e wspomnia³em o
       tym kilka linii wcze¶niej. ;-)
 
+3.7 Czy mogê zainstalowaæ xine w moim katalogu domowym (nie bed±c administratorem)?
 
+    Tak. Po pierwsze ustaw sobie podkatalog w którym instalujesz swoje prywatne
+    oprogramowanie, np:
+    
+    $ mkdir ~/usr
+    
+    wtedy, musisz ustawiæ kilka zmiennych ¶rodowiskowych - dobrym pomys³em
+    by³oby dodanie ich do twojego ~/.bashrc lub czego¶ podobnego:
+    
+    export PATH="$HOME/usr/bin:$PATH"
+    export LD_LIBRARY_PATH="$HOME/usr/lib:$LD_LIBRARY_PATH"
+    export CFLAGS="-I$HOME/usr/include -L$HOME/usr/lib -O3"
+    export ACLOCAL_FLAGS="-I $HOME/usr/share/aclocal"
+
+    teraz mo¿esz rozpakowaæ zbiory tar w np: ~/usr/src (mkdir ~/usr/src je¶li
+    potrzebne) i zrobiæ:
+    
+    $ ./configure --prefix=$HOME/usr
+    $ make install
+    
 4   INSTALACJA
 
 4.1 Gdzie powinienem skopiowaæ biblioteki windowsowych kodeków dla xine?
@@ -346,7 +379,7 @@
 
        - ustaw i u¿ywaj "surowego" urz±dzenia dla DVD-ROM (raw device).
 
-         Surowe urz±dzenia powinny byæ dostêpne w j±drach serii 2.4.x i
+         Surowe urz±dzenia powinny byæ dostêpne w j±drach serii 24..x i
          ³aty dla starszych j±der mo¿na znale¼æ tutaj:
 
           => ftp://ftp.kernel.org/pub/linux/kernel/people/sct/raw-io/
@@ -473,12 +506,18 @@
 
        xine VCD://[numer ¶cie¿ki]
 
+5.1.10 Jak mo¿na ogl±daæ filmy z zewnêtrznymi napisami AVI?
+
+       U¿yj nastêpuj±cego MRL:
+       
+       xine foo.avi%bar.sub
+
 
 5.2 PYTANIA DOTYCZ¡CE D¬WIÊKU
 
 5.2.1 Kiedy odtwarzam tê próbkê widzê obraz ale nie ma d¼wiêku!
 
-      To mo¿e siê zdarzyæ z niektórymi materia³ami mpeg-2 jak DVD.
+      To mo¿e siê zdarzyæ z niektórymi materia³ami mpeg-2 jak DVD..
       Spróbuj inny kana³ wideo:
 
        xine -a channel stream.vob
@@ -545,7 +584,7 @@
 5.2.6 Zmiana g³o¶no¶ci przez interfejs u¿ytkonika xine nic nie daje! Co jest!?
 
       Niektóre ze sterowników xine nie wspieraj± zmiany natê¿enia d¼wiêku,
-      mimo ¿e suwak zmiany g³o¶no¶ci pozostaje widoczny na panelu. Czêsto nie
+      mimo ¿e suwak zmiany g³o¶no¶ci pozostaje widoczny na panelu Czêsto nie
       jest to b³±d xine: aRts C API, na przyk³ad, nie oferuje ¿adnej w³a¶ciwo¶ci
       g³o¶no¶ci dla aplikacji.
 
@@ -665,7 +704,7 @@
 
 5.4.2 "no video port found"
 
-      Masz rozszerzenie Xv, ale sterownik Twojej karty wideo nie wspiera go.
+      Masz rozszerzenie Xv, ale sterownik Twojej karty wideo nie wspiera go..
       Po pierwsze spróbuj znale¼æ sterownik który wspiera Xv na Twoim sprzêcie
       (sprawdz u dystrybutora twojej karty graficznej). Je¶li Twój sterownik
       wspiera Xv ale wci±¿ nie mo¿esz go uruchomiæ, spróbuj ni¿sz± rozdzielczo¶æ
@@ -701,7 +740,7 @@
       na odpowiedni kod regionu. (zobacz równie¿ 5.1.8)
 
       Ostatnie wesje xine prawdopodobnie sprawdz± czy DVD, które próbujesz
-      odtworzyæ, jest zaszyfrowane i poinformuj± Ciê o tym. (zobacz 5.4.5)      
+      odtworzyæ, jest zaszyfrowane i poinformuj± Ciê o tym. (zobacz 5..4.5)      
 
 5.4.5 "input_dvd: Sorry, xine doesn't play encrypted DVDs. The legal status
        of CSS decryption is unclear and we will not provide such code."
@@ -763,4 +802,5 @@
     # T³umaczenie: Bart³omiej Muryn #
     #    mailto: _4ever_@irc.pl     #
     #################################
+
 
