@@ -71,6 +71,7 @@ typedef struct {
   xine_video_port_t   *vo_port;
   xine_audio_port_t   *ao_port;
   xine_stream_t       *stream;
+  xine_post_t         *post_plugin;
   xine_event_queue_t  *event_queue;
 
   int                  logo_mode;
@@ -82,7 +83,11 @@ typedef struct {
   int                  current_mrl;
   int                  running;
   int                  auto_quit;
-  
+
+  int                  no_post;
+  char                *post_plugin_name;
+  int                  post_running;
+
   struct {
     int                enable;
     int                caps;
@@ -100,7 +105,7 @@ void            *xlib_handle = NULL;
 
 /* options args */
 static const char *short_options = "?h"
- "da:qA:V:R::v";
+ "da:qA:V:R::NP:v";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
   {"debug"          , no_argument      , 0, 'd' },
@@ -108,6 +113,8 @@ static struct option long_options[] = {
   {"auto-quit"      , no_argument      , 0, 'q' },
   {"audio-driver"   , required_argument, 0, 'A' },
   {"video-driver"   , required_argument, 0, 'V' },
+  {"no-post"        , no_argument      , 0, 'N' },
+  {"post-plugin"    , required_argument, 0, 'P' },
   {"version"        , no_argument      , 0, 'v' },
   {0                , no_argument      , 0,  0  }
 };
@@ -276,6 +283,9 @@ static void print_usage (void) {
   }
   printf ("\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
+  printf("  -P, --post-plugin <name>     Use plugin <name> for video less stream animation.\n");
+  printf("                                 (default is goom).\n");
+  printf("  -N, --no-post                Don't use post effect at all\n");
   printf("  -d, --debug                  Show debug messages.\n");
   printf("\n");
   printf("Examples for valid MRLs (media resource locator):\n");
@@ -337,9 +347,32 @@ static void aaxine_handle_xine_error(xine_stream_t *stream) {
 
 static int aaxine_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) {
   int ret;
+  int has_video;
   
   if(start_time_in_secs)
     start_time_in_secs *= 1000;
+
+  has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
+
+  if(has_video)
+    has_video = !xine_get_stream_info(stream, XINE_STREAM_INFO_IGNORE_VIDEO);
+
+  if(has_video && aaxine.post_running) {
+    xine_post_out_t * audio_source;
+    
+    audio_source = xine_get_audio_source(stream);
+    if(xine_post_wire_audio_port(audio_source, aaxine.ao_port))
+      aaxine.post_running = 0;
+    
+  }
+  else if((!has_video) && (!aaxine.no_post) && (!aaxine.post_running)) {
+    xine_post_out_t * audio_source;
+    
+    audio_source = xine_get_audio_source(stream);
+    if(xine_post_wire_audio_port(audio_source, aaxine.post_plugin->audio_input[0]))
+      aaxine.post_running = 1;
+    
+  }
   
   if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0)
     aaxine_handle_xine_error(stream);
@@ -511,6 +544,9 @@ int main(int argc, char *argv[]) {
   aaxine.auto_quit = 0; /* default: loop forever */
   aaxine.debug_messages = 0;
   aaxine.ignore_next = 0; 
+  aaxine.no_post = 0;
+  aaxine.post_running = 0;
+  aaxine.post_plugin_name = NULL;
 
   /* 
    * AALib help and option-parsing
@@ -556,6 +592,15 @@ int main(int argc, char *argv[]) {
 	fprintf (stderr, "video driver id required for -V option\n");
 	exit (1);
       }
+      break;
+      
+    case 'P':
+      if(!aaxine.post_plugin_name)
+	aaxine.post_plugin_name = strdup(optarg);
+      break;
+
+    case 'N':
+      aaxine.no_post = 1;
       break;
       
     case 'v': /* Display version and exit*/
@@ -685,9 +730,31 @@ int main(int argc, char *argv[]) {
   
   aaxine.ao_port = xine_open_audio_driver(aaxine.xine, audio_driver_id, NULL);
   
-  if (!aaxine.ao_port)
+  if(!aaxine.ao_port) {
     printf ("main: audio driver %s failed\n", audio_driver_id);
+    aaxine.no_post = 1;
+  }
   
+  /* Init post plugin, is desired */
+  if(!aaxine.no_post) {
+    if(aaxine.post_plugin_name == NULL)
+      aaxine.post_plugin_name = "goom";
+    
+    if(aaxine.ao_port) {
+      const char *const *pol = xine_list_post_plugins_typed(aaxine.xine, 
+							    XINE_POST_TYPE_AUDIO_VISUALIZATION);
+      
+      if(pol) {
+	aaxine.post_plugin = xine_post_init(aaxine.xine, aaxine.post_plugin_name,
+					    0, &aaxine.ao_port, &aaxine.vo_port);
+	if(aaxine.post_plugin == NULL) {
+	  printf("failed to initialize post plugins '%s'\n", aaxine.post_plugin_name);
+	  aaxine.no_post = 1;
+	}
+      }
+    }
+  }
+
   aaxine.stream = xine_stream_new(aaxine.xine, aaxine.ao_port, aaxine.vo_port);
   
   /* Init mixer control */
