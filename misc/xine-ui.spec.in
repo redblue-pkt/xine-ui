@@ -1,7 +1,7 @@
 # Note that this is NOT a relocatable package
 %define ver     @SPEC_VERSION@
 %define rel     0
-%define prefix  @prefix@
+%define prefix  /usr
 %define name    @PACKAGE@
 
 Name:        %{name}
@@ -14,13 +14,13 @@ Group:       Applications/Multimedia
 Source:      http://xine.sourceforge.net/files/@PACKAGE@-@VERSION@.tar.gz
 URL:         http://xine.sourceforge.net
 Packager:    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
-Requires:    xine-lib >= 0.5.0
+Requires:    xine-lib >= %{ver}
 BuildRoot:   /tmp/%{name}-root
 
 @HAVE_AA_TRUE@%package aa
 @HAVE_AA_TRUE@Summary:     XINE - Ascii Art player.
 @HAVE_AA_TRUE@Group:       Applications/Multimedia
-@HAVE_AA_TRUE@Requires:    xine-lib >= 0.5.0, xine-lib-aa, libaa
+@HAVE_AA_TRUE@Requires:    xine-lib >= %{ver}, xine-lib-aa, aalib
 
 %description
 xine is a free gpl-licensed video player for unix-like systems.
@@ -47,6 +47,16 @@ la lecture aura besoin de plus ou moins de puissance du processeur,
 xine ´Â GPL¶óÀÌ¼±½º¸¦ µû¸£´Â UNIX¿ë °ø°³ µ¿¿µ»ó ÇÃ·¹ÀÌ¾îÀÔ´Ï´Ù. ÀÌ
 ÇÃ·¹ÀÌ¾î´Â mpeg-2 ¿Í mpeg 1 ½ºÆ®¸²À» Áö¿øÇÏ¸ç, ÇöÀç´Â Áö¿øÇÏÁö
 ¾ÊÁö¸¸ ³ªÁß¿¡´Â mpeg-4 ¿Í ´Ù¸¥ Çü½ÄÀÇ µ¿¿µ»óµµ Áö¿øÇÒ ¿¹Á¤ÀÔ´Ï´Ù.
+
+%description -l pt
+O xine é um leitor de vídeo livre ao abrigo da GPL para sistemas tipo
+Unix. Lê ficheiros MPEG-2 e MPEG-1, bem como AVIs que contenham
+MS MPEG-4 / OpenDivX Video.
+
+O xine lê o conteúdo vídeo e áudio e sincroniza-os em tempo-real. As
+necessidades de processador dependem das propriedades de cada ficheiro.
+Em princípio, um sistema equipado com um Pentium-II a 400 MHz consegue
+ler qualquer vídeo com máximo desempenho.
 
 @HAVE_AA_TRUE@%description aa
 @HAVE_AA_TRUE@Video player using Ascii Art library.
@@ -85,8 +95,8 @@ rm -rf $RPM_BUILD_ROOT
 @XINE_SKINDIR@/pitt/*
 @XINE_SKINDIR@/xinetic/*
 # documentation
-%{prefix}/man/fr/man1/xine.1
-%{prefix}/man/man1/xine.1
+%{prefix}/man/fr/man1/xine.1*
+%{prefix}/man/man1/xine.1*
 %{prefix}/share/doc/xine-ui/FAQ
 %{prefix}/share/doc/xine-ui/FAQ_es
 %{prefix}/share/doc/xine-ui/FAQ_it
@@ -100,8 +110,14 @@ rm -rf $RPM_BUILD_ROOT
 @HAVE_AA_TRUE@%files aa
 @HAVE_AA_TRUE@%defattr(-,root,root)
 @HAVE_AA_TRUE@%{prefix}/bin/aaxine
+@HAVE_AA_TRUE@%{prefix}/man/man1/aaxine.1*
 
 %changelog
+* Sun Sep 16 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+- Merge patch from José Carlos Monteiro <jcm@netcabo.pt>:
+  - Filelist and other minor updates,
+  - Fixed some SuSE compatibility issues,
+  - Added Portuguese summary.
 * Sun Sep 16 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add missing files.
 * Thu Jul 26 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>

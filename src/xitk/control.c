@@ -39,6 +39,7 @@
 #include "event.h"
 #include "parseskin.h"
 #include "utils.h"
+#include "actions.h"
 #include "xine.h"
 
 extern gGui_t        *gGui;

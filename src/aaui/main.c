@@ -332,8 +332,8 @@ int main(int argc, char *argv[]) {
   /*
    * Check xine library version 
    */
-  if(!xine_check_version(0, 5, 0)) {
-    fprintf(stderr, "require xine library version 0.5.0, found %d.%d.%d.\n", 
+  if(!xine_check_version(0, 9, 0)) {
+    fprintf(stderr, "require xine library version 0.9.0, found %d.%d.%d.\n", 
 	    xine_get_major_version(), xine_get_minor_version(),
 	    xine_get_sub_version());
     goto failure;

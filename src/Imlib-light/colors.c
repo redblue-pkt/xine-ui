@@ -81,7 +81,7 @@ PaletteLUTSet(ImlibData *id)
 {
   Atom                to_set;
   unsigned char       *prop;
-  int                 i, j, r, g, b;
+  int                 i, j;
 
   to_set = XInternAtom(id->x.disp, "_IMLIB_COLORMAP", False);
   prop = malloc((id->num_colors * 4) + 1 + (32 * 32 * 32));

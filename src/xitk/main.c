@@ -58,6 +58,7 @@
 #include "utils.h"
 #include "event.h"
 #include "videowin.h"
+#include "panel.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"
@@ -78,48 +79,56 @@ int       no_lirc;
 #endif
 
 /* options args */
-static const char *short_options = "?hS4"
+static const char *short_options = "?h"
 #ifdef HAVE_LIRC
  "L"
 #endif
- "R::"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:D:p::";
+ "R::u:a:V:A:D:p::v";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
+#ifdef HAVE_LIRC
+  {"no-lirc"        , no_argument      , 0, 'L' },
+#endif
+#ifdef debug
+  {"debug"          , required_argument, 0, 'd' },
+#endif
+  {"recognize-by"   , optional_argument, 0, 'R' },
+  {"spu-channel"    , required_argument, 0, 'u' },
   {"audio-channel"  , required_argument, 0, 'a' },
   {"video-driver"   , required_argument, 0, 'V' },
   {"audio-driver"   , required_argument, 0, 'A' },
   {"deinterlace"    , required_argument, 0, 'D' },
-  {"spu-channel"    , required_argument, 0, 'u' },
   {"auto-play"      , optional_argument, 0, 'p' },
-#ifdef HAVE_LIRC
-  {"no-lirc"        , no_argument      , 0, 'L' },
-#endif
-  {"recognize-by"   , optional_argument, 0, 'R' },
-#ifdef debug
-  {"debug"          , required_argument, 0, 'd' },
-#endif
+  {"version"        , no_argument      , 0, 'v' },
   {0                , no_argument      , 0,  0  }
 };
 
-/* ------------------------------------------------------------------------- */
+/*
+ *
+ */
+void show_version(void) {
+
+  printf("This is xine (X11 gui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
+}
+
 /*
  *
  */
 void show_banner(void) {
 
-  printf("This is xine (X11 gui) - a free video player v%s\n(c) 2000, 2001 by G. Bartsch and the xine project team.\n", VERSION);
+  show_version();
   printf("Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n",
-XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
+	 XINE_MAJOR_VERSION, XINE_MINOR_VERSION, XINE_SUB_VERSION, 
+	 XINE_BUILD_DATE, XINE_BUILD_CC, XINE_BUILD_OS);
   printf("Found xine library version: %d.%d.%d (%s).\n",
 	 xine_get_major_version(), xine_get_minor_version(),
 	 xine_get_sub_version(), xine_get_str_version());
 
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  *
  */
@@ -184,7 +193,7 @@ void show_usage (void) {
   printf("  VCD:   'vcd://<track number>'\n");
   printf("\n");
 }
-/* ------------------------------------------------------------------------- */
+
 /*
  *
  */
@@ -228,7 +237,6 @@ int handle_debug_subopt(char *sopt) {
 }
 #endif
 
-/* ------------------------------------------------------------------------- */
 /*
  * Handle soft deinterlace method selection
  * FIXME: should we have a function for obtaining available methods?
@@ -266,8 +274,6 @@ int handle_deinterlace_subopt(char *sopt) {
   return -1;
 }
 
-
-/* ------------------------------------------------------------------------- */
 /*
  * Handle sub-option of 'recognize-by' command line argument
  */
@@ -477,6 +483,9 @@ static void load_audio_out_driver(char *audio_driver_id,
     printf ("main: audio driver <%s> failed\n", audio_driver_id);
 }
 
+/*
+ *
+ */
 void event_listener (xine_t *xine, event_t *event, void *data) {
   /* Check Xine handle is not NULL */
   if(xine == NULL) {
@@ -497,7 +506,6 @@ void event_listener (xine_t *xine, event_t *event, void *data) {
   }
 }
 
-/* ------------------------------------------------------------------------- */
 /*
  *
  */
@@ -517,8 +525,8 @@ int main(int argc, char *argv[]) {
   sigset_t         vo_mask;
 
   /* Check xine library version */
-  if(!xine_check_version(0, 5, 0)) {
-    fprintf(stderr, "Require xine library version 0.5.0, found %d.%d.%d.\n",
+  if(!xine_check_version(0, 9, 0)) {
+    fprintf(stderr, "Require xine library version 0.9.0, found %d.%d.%d.\n",
 	    xine_get_major_version(), xine_get_minor_version(),
 	    xine_get_sub_version());
     exit(1);
@@ -529,8 +537,6 @@ int main(int argc, char *argv[]) {
   if (sigprocmask (SIG_BLOCK,  &vo_mask, NULL)) {
     printf ("video_out: sigprocmask failed.\n");
   }
-
-  show_banner();
 
   gGui = (gGui_t *) xmalloc(sizeof(gGui_t));
 
@@ -561,22 +567,34 @@ int main(int argc, char *argv[]) {
 			 long_options, &option_index)) != EOF) {
     switch(c) {
 
-    case 'a': /* Select audio channel */
-      sscanf(optarg, "%i", &audio_channel);
+#ifdef HAVE_LIRC
+    case 'L': /* Disable LIRC support */
+      no_lirc = 1;
+      break;
+#endif
+
+#ifdef DEBUG
+    case 'd': /* Select debug levels */
+      if(optarg != NULL) {
+	if(!(handle_debug_subopt(chomp(optarg))))
+	  exit(1);
+      }
+      break;
+#endif
+
+    case 'R': /* Set a strategy to recognizing stream type */
+      if(optarg != NULL)
+	demux_strategy = handle_demux_strategy_subopt(chomp(optarg));
+      else
+	demux_strategy = DEMUX_REVERT_STRATEGY;
       break;
 
     case 'u': /* Select SPU channel */
       sscanf(optarg, "%i", &spu_channel);
       break;
 
-    case 'A': /* Select audio driver */
-      if(optarg != NULL) {
-	audio_driver_id = xmalloc (strlen (optarg) + 1);
-	strcpy (audio_driver_id, optarg);
-      } else {
-	fprintf (stderr, "audio driver id required for -A option\n");
-	exit (1);
-      }
+    case 'a': /* Select audio channel */
+      sscanf(optarg, "%i", &audio_channel);
       break;
 
     case 'V': /* select video driver by plugin id */
@@ -590,6 +608,16 @@ int main(int argc, char *argv[]) {
       }
       break;
 
+    case 'A': /* Select audio driver */
+      if(optarg != NULL) {
+	audio_driver_id = xmalloc (strlen (optarg) + 1);
+	strcpy (audio_driver_id, optarg);
+      } else {
+	fprintf (stderr, "audio driver id required for -A option\n");
+	exit (1);
+      }
+      break;
+
     case 'D': /* Select soft deinterlace */
       if(optarg != NULL) {
 	deinterlace_method=handle_deinterlace_subopt(chomp(optarg));
@@ -597,7 +625,6 @@ int main(int argc, char *argv[]) {
 	  exit(1);
       }
       break;
-
 
     case 'p':/* Play [[in fullscreen][then quit]] on start */
       gGui->autoplay_options |= PLAY_ON_START;
@@ -620,27 +647,10 @@ int main(int argc, char *argv[]) {
       }
       break;
 
-#ifdef HAVE_LIRC
-    case 'L': /* Disable LIRC support */
-      no_lirc = 1;
+    case 'v': /* Display version and exit*/
+      show_version();
+      exit(1);
       break;
-#endif
-
-    case 'R': /* Set a strategy to recognizing stream type */
-      if(optarg != NULL)
-	demux_strategy = handle_demux_strategy_subopt(chomp(optarg));
-      else
-	demux_strategy = DEMUX_REVERT_STRATEGY;
-      break;
-
-#ifdef DEBUG
-    case 'd': /* Select debug levels */
-      if(optarg != NULL) {
-	if(!(handle_debug_subopt(chomp(optarg))))
-	  exit(1);
-      }
-      break;
-#endif
 
     case 'h': /* Display usage */
     case '?':
@@ -654,6 +664,8 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
   }
+
+  show_banner();
 
   /*
    * generate and init a config "object"
