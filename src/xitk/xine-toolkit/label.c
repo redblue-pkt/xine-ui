@@ -371,7 +371,7 @@ int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *w, char *newl
   if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_LABEL)) {
     label_private_data_t *private_data = (label_private_data_t *) w->private_data;
     
-    if(!newlabel ||
+    if(!newlabel || !private_data->label ||
        (newlabel && (strcmp(private_data->label, newlabel)))) {
       
       label_setup_label(w, newlabel);
