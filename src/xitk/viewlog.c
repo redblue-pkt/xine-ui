@@ -413,12 +413,6 @@ void viewlog_window(void) {
   xitk_browser_widget_t      br;
   int                        x, y;
   
-  /* this shouldn't happen */
-  if(viewlog != NULL) {
-    if(viewlog->xwin)
-      return;
-  }
-  
   viewlog = (_viewlog_t *) xine_xmalloc(sizeof(_viewlog_t));
   viewlog->log = (const char **) xine_xmalloc(sizeof(char **));
 

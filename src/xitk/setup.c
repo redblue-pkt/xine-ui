@@ -1091,12 +1091,6 @@ void setup_panel(void) {
   xitk_slider_widget_t       sl;
   int                        x, y;
 
-  /* this shouldn't happen */
-  if(setup != NULL) {
-    if(setup->xwin)
-      return;
-  }
-  
   setup = (_setup_t *) xine_xmalloc(sizeof(_setup_t));
 
   x = xine_config_register_num (gGui->xine, "gui.setup_x", 

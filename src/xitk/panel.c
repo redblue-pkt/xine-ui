@@ -272,6 +272,7 @@ void panel_update_runtime_display(void) {
  */
 static void *slider_loop(void *dummy) {
   int screensaver_timer = 0;
+  int i = 0;
   
   pthread_detach(pthread_self());
 
@@ -291,6 +292,11 @@ static void *slider_loop(void *dummy) {
 	  screensaver_timer = 0;
 	  video_window_reset_ssaver();
 	}
+
+	if(!(i % 10)) {
+	  panel_update_channel_display();
+	  i = 0;
+	}
       }
       
       if(panel_is_visible()) {
@@ -301,6 +307,7 @@ static void *slider_loop(void *dummy) {
 	    
 	    xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
 	    xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
+	    
 	  }
 	  
 	  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
@@ -323,6 +330,7 @@ static void *slider_loop(void *dummy) {
       video_window_update_logo();
     
     sleep(1);
+    i++;
   }
 
   pthread_exit(NULL);
@@ -491,7 +499,6 @@ void panel_update_channel_display (void) {
     break;
 
   case -1:
-    /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
     if(!xine_get_audio_lang (gGui->stream, channel, &buffer[0]))
       lang = "auto";
     else
@@ -513,7 +520,6 @@ void panel_update_channel_display (void) {
     break;
 
   case -1:
-    /* FIXME: ask for the language more often when xine-lib really evaluates the channel */
     if(!xine_get_spu_lang (gGui->stream, channel, &buffer[0]))
       lang = "auto";
     else
@@ -723,9 +729,6 @@ void panel_init (void) {
   xitk_widget_t            *w;
   long                     data[1];
   
-  if (gGui->panel_window)
-    return ; /* panel already open  - FIXME: bring to foreground */
-
   xine_strdupa(title, _("Xine Panel"));
 
   XITK_WIDGET_INIT(&b, gGui->imlib_data);

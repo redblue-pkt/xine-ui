@@ -382,12 +382,6 @@ void control_panel(void) {
   xitk_widget_t             *w;
   long                       data[1];
 
-  /* This shouldn't be happend */
-  if(control != NULL) {
-    if(control->window)
-      return;
-  }
-  
   xine_strdupa(title, _("Xine Control Panel"));
 
   XITK_WIDGET_INIT(&br, gGui->imlib_data);

@@ -314,12 +314,6 @@ void event_sender_panel(void) {
   xitk_labelbutton_widget_t  lb;
   int                        x, y, i;
 
-  /* this shouldn't happen */
-  if(eventer != NULL) {
-    if(eventer->xwin)
-      return;
-  }
-  
   eventer = (_eventer_t *) xine_xmalloc(sizeof(_eventer_t));
 
   eventer->x = xine_config_register_num (gGui->xine, "gui.eventer_x", 

@@ -1649,11 +1649,6 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     xitk_get_window_position(gGui->display, 
 			     (xitk_window_get_window(kbedit->xwin)), &x, &y, &w, &h);
         
-    //    w = 500;
-    //    h = 200;
-    //    x = ((DisplayWidth(gGui->display, (DefaultScreen(gGui->display)))) / 2) - (w / 2);
-    //    y = ((DisplayHeight(gGui->display, (DefaultScreen(gGui->display)))) / 2) -(h / 2);
-    
     xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
 					    _("Event receiver window"), x, y, w, h);
     
@@ -1816,11 +1811,6 @@ void kbedit_window(void) {
   int                        btnw = 80;
   int                        lbear, rbear, wid, asc, des;
   xitk_font_t               *fs;
-  
-  if(kbedit != NULL) {
-    if(kbedit->xwin)
-      return;
-  }
   
   x = xine_config_register_num(gGui->xine, "gui.kbedit_x", 
 			       100, 

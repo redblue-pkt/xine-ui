@@ -743,12 +743,6 @@ void playlist_editor(void) {
   xitk_widget_t             *w;
   long data[1];
 
-  /* This shouldn't be happend */
-  if(playlist != NULL) {
-    if(playlist->window)
-      return;
-  }
-
   xine_strdupa(title, _("Xine Playlist Editor"));
 
   XITK_WIDGET_INIT(&br, gGui->imlib_data);

@@ -395,12 +395,6 @@ void stream_infos_panel(void) {
   xitk_pixmap_t              *bg;
   int                         x, y, w, width, height;
 
-  /* this shouldn't happen */
-  if(sinfos != NULL) {
-    if(sinfos->xwin)
-      return;
-  }
-  
   sinfos = (_stream_infos_t *) xine_xmalloc(sizeof(_stream_infos_t));
   
   x = xine_config_register_num (gGui->xine, "gui.sinfos_x", 
