@@ -1528,6 +1528,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->video_screen = DefaultScreen(gGui->video_display);
   XUnlockDisplay (gGui->video_display);
 
+  
+
   /* Some infos */
   if(gGui->verbosity) {
     dump_host_info();
@@ -1809,13 +1811,6 @@ void gui_run(char **session_opts) {
     
     snprintf(buffer, sizeof(buffer), "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
     mediamark_save_mediamarks(buffer);
-  }
-
-  { /* Give focus to the ROOT window, to get C-Tab working */
-    Window rootwindow, wparent;
-    
-    if((rootwindow = xitk_get_desktop_root_window(gGui->video_display, gGui->video_screen, &wparent)) != None)
-      try_to_set_input_focus(rootwindow);
   }
 
   gGui->running = 0;
