@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
 "POT-Creation-Date: 2002-06-04 21:43+0200\n"
-"PO-Revision-Date: 2002-05-02 11:26+0200\n"
+"PO-Revision-Date: 2002-06-05 07:52+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -188,12 +188,12 @@ msgid ""
 "This key bindings is redundant with action:\n"
 "\"%s\".\n"
 msgstr ""
-"Diese Tastaturbelegung ist redundant mit Aktion:\n"
+"Diese Tastenbelegung ist redundant mit Aktion:\n"
 "\"%s\".\n"
 
 #: src/xitk/kbindings.c:1695
 msgid "key binding editor"
-msgstr "Tastaturbelegungseditor"
+msgstr "Tastenbelegungseditor"
 
 #: src/xitk/kbindings.c:1721
 msgid "Binding action"
@@ -679,12 +679,11 @@ msgstr "xine Einrichtung"
 
 #: src/xitk/setup.c:1143
 msgid "Logs"
-msgstr ""
+msgstr "Meldungen"
 
 #: src/xitk/setup.c:1154
-#, fuzzy
 msgid "Key Bindings"
-msgstr "Tastaturbelegungseditor"
+msgstr "Tastenbelegungen"
 
 #: src/xitk/setup.c:1165 src/xitk/viewlog.c:488
 msgid "Close"
