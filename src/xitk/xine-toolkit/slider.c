@@ -292,8 +292,6 @@ static void paint_slider(xitk_widget_t *w) {
     XLOCK(private_data->imlibdata->x.disp);
     bgc = XCreateGC(private_data->imlibdata->x.disp, bg->image->pixmap, None, None);
     XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, bgc);
-    pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image->pixmap, None, None);
-    XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, pgc);
     XUNLOCK(private_data->imlibdata->x.disp);
       
     if(bg->mask) {
@@ -309,118 +307,129 @@ static void paint_slider(xitk_widget_t *w) {
       
     XUNLOCK(private_data->imlibdata->x.disp);
 
-    if(private_data->sType == XITK_RSLIDER) {
-      
-      button_width = private_data->bg_skin->width;
-      button_height = private_data->bg_skin->height;
+    if(w->enable == WIDGET_ENABLE) {
 
-      xcenter       = (bg->width /2) + w->x;
-      ycenter       = (bg->width /2) + w->y;
-      paddle_width  = paddle->width / 3;
-      paddle_height = paddle->height;
-      angle         = private_data->angle;
-      
-      if(angle < M_PI / -2)
-	angle = angle + M_PI * 2;
-      
-      x = (int) (0.5 + xcenter + private_data->radius * cos(angle)) - (paddle_width / 2);
-      y = (int) (0.5 + ycenter - private_data->radius * sin(angle)) - (paddle_height / 2);
-
-      srcx1 = 0;
-      
-      if((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
-	srcx1 += paddle_width;
-	if(private_data->bClicked)
+      XLOCK(private_data->imlibdata->x.disp);
+      pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image->pixmap, None, None);
+      XCopyGC(private_data->imlibdata->x.disp, w->wl->gc, (1 << GCLastBit) - 1, pgc);
+      XUNLOCK(private_data->imlibdata->x.disp);
+    
+      if(private_data->sType == XITK_RSLIDER) {
+	
+	button_width = private_data->bg_skin->width;
+	button_height = private_data->bg_skin->height;
+	
+	xcenter       = (bg->width /2) + w->x;
+	ycenter       = (bg->width /2) + w->y;
+	paddle_width  = paddle->width / 3;
+	paddle_height = paddle->height;
+	angle         = private_data->angle;
+	
+	if(angle < M_PI / -2)
+	  angle = angle + M_PI * 2;
+	
+	x = (int) (0.5 + xcenter + private_data->radius * cos(angle)) - (paddle_width / 2);
+	y = (int) (0.5 + ycenter - private_data->radius * sin(angle)) - (paddle_height / 2);
+	
+	srcx1 = 0;
+	
+	if((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
 	  srcx1 += paddle_width;
-      }
-      
-      srcy1 = 0;
-      srcx2 = paddle_width;
-      srcy2 = paddle_height;
-      destx1 = x;
-      desty1 = y;
-
-    }
-    else {
-      int   dir_area;
-      float tmp;
-
-      button_width = private_data->button_width;
-      button_height = paddle->height;
-      
-      dir_area = (float)(private_data->sType == XITK_HSLIDER) ? 
-	w->width - button_width : w->height - button_height;
-	
-      tmp = (dir_area * .01) * (private_data->percentage * 100.0);
-      
-      if(private_data->sType == XITK_HSLIDER) {
-	x = rint(w->x + tmp);
-	y = w->y;
-      }
-      else if(private_data->sType == XITK_VSLIDER) {
-	x = w->x;
-	y = rint(w->y + private_data->bg_skin->height - button_height - tmp);
-      }
-      
-      if(private_data->paddle_cover_bg == 1) {
-	int pixpos;
-	int direction;
-	
-	x = w->x;
-	y = w->y;
-	
-	direction = (private_data->sType == XITK_HSLIDER) ? 
-	  private_data->bg_skin->width : private_data->bg_skin->height;
-	
-	pixpos = (int)private_data->value / 
-	  ((private_data->upper - private_data->lower) / direction);
-	
-	if(private_data->sType == XITK_VSLIDER) {
-	  pixpos = button_height - pixpos;
-	  srcx1  = 0;
-	  srcy1  = pixpos;
-	  srcx2  = button_width;
-	  srcy2  = paddle->height - pixpos;
-	  destx1 = w->x;
-	  desty1 = w->y + pixpos;
+	  if(private_data->bClicked)
+	    srcx1 += paddle_width;
 	}
-	else if(private_data->sType == XITK_HSLIDER) {
-	  srcx1  = 0;
-	  srcy1  = 0;
-	  srcx2  = pixpos;
-	  srcy2  = paddle->height;
-	  destx1 = w->x;
-	  desty1 = w->y;
-	}
-      }
-      else {
-	srcy1  = 0;
-	srcx2  = button_width;
-	srcy2  = paddle->height;
+	
+	srcy1 = 0;
+	srcx2 = paddle_width;
+	srcy2 = paddle_height;
 	destx1 = x;
 	desty1 = y;
+	
+      }
+      else {
+	int   dir_area;
+	float tmp;
+	
+	button_width = private_data->button_width;
+	button_height = paddle->height;
+	
+	dir_area = (float)(private_data->sType == XITK_HSLIDER) ? 
+	  w->width - button_width : w->height - button_height;
+	
+	tmp = (dir_area * .01) * (private_data->percentage * 100.0);
+	
+	if(private_data->sType == XITK_HSLIDER) {
+	  x = rint(w->x + tmp);
+	  y = w->y;
+	}
+	else if(private_data->sType == XITK_VSLIDER) {
+	  x = w->x;
+	  y = rint(w->y + private_data->bg_skin->height - button_height - tmp);
+	}
+	
+	if(private_data->paddle_cover_bg == 1) {
+	  int pixpos;
+	  int direction;
+	  
+	  x = w->x;
+	  y = w->y;
+	  
+	  direction = (private_data->sType == XITK_HSLIDER) ? 
+	    private_data->bg_skin->width : private_data->bg_skin->height;
+	  
+	  pixpos = (int)private_data->value / 
+	    ((private_data->upper - private_data->lower) / direction);
+	  
+	  if(private_data->sType == XITK_VSLIDER) {
+	    pixpos = button_height - pixpos;
+	    srcx1  = 0;
+	    srcy1  = pixpos;
+	    srcx2  = button_width;
+	    srcy2  = paddle->height - pixpos;
+	    destx1 = w->x;
+	    desty1 = w->y + pixpos;
+	  }
+	  else if(private_data->sType == XITK_HSLIDER) {
+	    srcx1  = 0;
+	    srcy1  = 0;
+	    srcx2  = pixpos;
+	    srcy2  = paddle->height;
+	    destx1 = w->x;
+	    desty1 = w->y;
+	  }
+	}
+	else {
+	  srcy1  = 0;
+	  srcx2  = button_width;
+	  srcy2  = paddle->height;
+	  destx1 = x;
+	  desty1 = y;
+	}
+	
+	if((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
+	  if(private_data->bClicked)
+	    srcx1 = 2*button_width;
+	  else
+	    srcx1 = button_width;
+	}
+	
       }
       
-      if((private_data->focus == FOCUS_RECEIVED) || (private_data->focus == FOCUS_MOUSE_IN)) {
-	if(private_data->bClicked)
-	  srcx1 = 2*button_width;
-	else
-	  srcx1 = button_width;
+      if(paddle->mask) {
+	XLOCK(private_data->imlibdata->x.disp);
+	XSetClipOrigin(private_data->imlibdata->x.disp, pgc, x, y);
+	XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask->pixmap);
+	XUNLOCK(private_data->imlibdata->x.disp);
       }
-
-    }
-    
-    if(paddle->mask) {
+      
       XLOCK(private_data->imlibdata->x.disp);
-      XSetClipOrigin(private_data->imlibdata->x.disp, pgc, x, y);
-      XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask->pixmap);
+      XCopyArea(private_data->imlibdata->x.disp, paddle->image->pixmap, w->wl->win, pgc,
+		srcx1, srcy1, srcx2, srcy2, destx1, desty1);
+      XFreeGC(private_data->imlibdata->x.disp, pgc);
       XUNLOCK(private_data->imlibdata->x.disp);
     }
     
     XLOCK(private_data->imlibdata->x.disp);
-    XCopyArea(private_data->imlibdata->x.disp, paddle->image->pixmap, w->wl->win, pgc,
-	      srcx1, srcy1, srcx2, srcy2, destx1, desty1);
-    XFreeGC(private_data->imlibdata->x.disp, pgc);
     XFreeGC(private_data->imlibdata->x.disp, bgc);
     XUNLOCK(private_data->imlibdata->x.disp);
   }

@@ -729,6 +729,7 @@ static void setup_section_widgets(int s) {
   int                  slidmax = 1;
 
   xitk_disable_widget(setup->slider_wg);
+  xitk_hide_widget(setup->slider_wg);
   
   /* Selected tab is one of help sections */
   if(s >= (setup->num_sections - 3)) {
@@ -826,6 +827,7 @@ static void setup_section_widgets(int s) {
 
     if(setup->num_wg > MAX_DISPLAY_WIDGETS) {
       slidmax = setup->num_wg - MAX_DISPLAY_WIDGETS;
+      xitk_show_widget(setup->slider_wg);
       xitk_enable_widget(setup->slider_wg);
     }
     else
@@ -1113,6 +1115,8 @@ void setup_panel(void) {
 						   (WINDOW_WIDTH - 41), 70, 
 						   16, (WINDOW_HEIGHT - 140), XITK_VSLIDER)));
     xitk_slider_set_pos(setup->slider_wg, 1);
+    xitk_disable_widget(setup->slider_wg);
+    xitk_hide_widget(setup->slider_wg);
   }
 
   setup_sections();
