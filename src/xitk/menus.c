@@ -73,6 +73,9 @@ static void menu_file_selector(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
 static void menu_mrl_browser(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   gui_execute_action_id(ACTID_MRLBROWSER);
 }
+static void menu_subtitle_selector(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
+  gui_execute_action_id(ACTID_SUBSELECT);
+}
 static void menu_playback_ctrl(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int ctrl = (int) data;
 
@@ -503,6 +506,22 @@ void video_window_menu(xitk_widget_list_t *wl) {
   
   w = xitk_noskin_menu_create(wl, &menu, x, y);
 
+  /* Subtitle loader */
+  if(gGui->playlist.num) {
+    xitk_menu_entry_t   menu_entry;
+    char                buffer[2048];
+    char               *location = "Open";
+    
+    memset(&buffer, 0, sizeof(buffer));
+    sprintf(buffer, "%s/%s", location, "Subtitle...");
+    
+    menu_entry.menu      = buffer;
+    menu_entry.type      = NULL;
+    menu_entry.cb        = menu_subtitle_selector;
+    menu_entry.user_data = NULL;
+    xitk_menu_add_entry(w, &menu_entry);
+  }
+  
   { /* Autoplay plugins */
     xitk_menu_entry_t   menu_entry;
     char                buffer[2048];
