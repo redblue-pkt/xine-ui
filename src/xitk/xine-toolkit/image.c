@@ -125,8 +125,8 @@ Pixmap xitk_image_create_pixmap(ImlibData *im, int width, int height) {
   Pixmap p;
   
   ABORT_IF_NULL(im);
-  ABORT_IF_ZERO(width);
-  ABORT_IF_ZERO(height);
+  ABORT_IF_NOT_COND(width > 0);
+  ABORT_IF_NOT_COND(height > 0);
   
   XLOCK(im->x.disp);
   p = XCreatePixmap(im->x.disp, im->x.base_window, width, height, im->x.depth);
@@ -179,8 +179,8 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
 #endif
   
   ABORT_IF_NULL(im);
-  ABORT_IF_ZERO(width);
-  ABORT_IF_ZERO(height);
+  ABORT_IF_NOT_COND(width > 0);
+  ABORT_IF_NOT_COND(height > 0);
   
   xpix = (xitk_pixmap_t *) xitk_xmalloc(sizeof(xitk_pixmap_t));
   xpix->imlibdata = im;
@@ -310,8 +310,8 @@ Pixmap xitk_image_create_mask_pixmap(ImlibData *im, int width, int height) {
   Pixmap p;
   
   ABORT_IF_NULL(im);
-  ABORT_IF_ZERO(width);
-  ABORT_IF_ZERO(height);
+  ABORT_IF_NOT_COND(width > 0);
+  ABORT_IF_NOT_COND(height > 0);
   
   XLOCK(im->x.disp);
   p = XCreatePixmap(im->x.disp, im->x.base_window, width, height, 1);
@@ -328,8 +328,8 @@ void xitk_image_change_image(ImlibData *im,
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(src);
   ABORT_IF_NULL(dest);
-  ABORT_IF_ZERO(width);
-  ABORT_IF_ZERO(height);
+  ABORT_IF_NOT_COND(width > 0);
+  ABORT_IF_NOT_COND(height > 0);
   
   if(dest->mask)
     xitk_image_destroy_xitk_pixmap(dest->mask);
@@ -369,8 +369,8 @@ xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height) {
   xitk_image_t *i;
 
   ABORT_IF_NULL(im);
-  ABORT_IF_ZERO(width);
-  ABORT_IF_ZERO(height);
+  ABORT_IF_NOT_COND(width > 0);
+  ABORT_IF_NOT_COND(height > 0);
 
   i = (xitk_image_t *) xitk_xmalloc(sizeof(xitk_image_t));
   i->mask = NULL;
@@ -402,7 +402,7 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(fontname);
   ABORT_IF_NULL(str);
-  ABORT_IF_ZERO(width);
+  ABORT_IF_NOT_COND(width > 0);
 
   XLOCK(im->x.disp);
   gc = XCreateGC(im->x.disp, im->x.base_window, None, None);
@@ -720,8 +720,6 @@ static void _draw_rectangular_box(ImlibData *im, xitk_pixmap_t *p,
 				  int width, int height, int relief) {
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
-  ABORT_IF_ZERO(width);
-  ABORT_IF_ZERO(height);
 
   XLOCK(im->x.disp);
   if(relief == DRAW_OUTTER)
@@ -753,8 +751,6 @@ static void _draw_rectangular_box_light(ImlibData *im, xitk_pixmap_t *p,
 					int width, int height, int relief) {
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
-  ABORT_IF_ZERO(width);
-  ABORT_IF_ZERO(height);
 
   XLOCK(im->x.disp);
   if(relief == DRAW_OUTTER)
@@ -787,8 +783,6 @@ static void _draw_rectangular_box_with_colors(ImlibData *im, xitk_pixmap_t *p,
 					      int relief) {
   ABORT_IF_NULL(im);
   ABORT_IF_NULL(p);
-  ABORT_IF_ZERO(width);
-  ABORT_IF_ZERO(height);
 
   XLOCK(im->x.disp);
   if(relief == DRAW_OUTTER)

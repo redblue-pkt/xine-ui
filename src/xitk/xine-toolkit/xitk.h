@@ -43,8 +43,8 @@
 
 #define XITK_MAJOR_VERSION          (0)
 #define XITK_MINOR_VERSION          (10)
-#define XITK_SUB_VERSION            (5)
-#define XITK_VERSION                "0.10.5"
+#define XITK_SUB_VERSION            (6)
+#define XITK_VERSION                "0.10.6"
 
 #define XITK_CHECK_VERSION(major, minor, sub)                          \
                                     (XITK_MAJOR_VERSION > (major) ||   \

@@ -89,37 +89,55 @@
 #define MIN(a, b)  (((a) < (b)) ? (a) : (b))
 
 #ifdef	__GNUC__
-#define XITK_DIE(FMT, ARGS...) do { fprintf(stderr, "xiTK DIE: "FMT, ##ARGS); exit(-1); } while(0)
-#define XITK_WARNING(FMT, ARGS...) do { fprintf(stderr, "xiTK WARNING(%s:%d): ", __FUNCTION__, __LINE__); fprintf(stderr, FMT, ##ARGS); } while(0)
+#define XITK_DIE(FMT, ARGS...)                                        \
+  do {                                                                \
+    fprintf(stderr, "xiTK DIE: "FMT, ##ARGS);                         \
+    exit(-1);                                                         \
+  } while(0)
+
+#define XITK_WARNING(FMT, ARGS...)                                    \
+  do {                                                                \
+    fprintf(stderr, "xiTK WARNING(%s:%d): ", __FUNCTION__, __LINE__); \
+    fprintf(stderr, FMT, ##ARGS);                                     \
+  } while(0)
 #else	/* C99 version: */
-#define XITK_DIE(...) do { fprintf(stderr, "xiTK DIE: "__VA_ARGS__); exit(-1); } while(0)
-#define XITK_WARNING(...) do { fprintf(stderr, "xiTK WARNING(%s:%d): ", __FUNCTION__, __LINE__); fprintf(stderr, __VA_ARGS__); } while(0)
+#define XITK_DIE(...)                                                 \
+  do {                                                                \
+    fprintf(stderr, "xiTK DIE: "__VA_ARGS__);                         \
+    exit(-1);                                                         \
+  } while(0)
+
+#define XITK_WARNING(...)                                             \
+  do {                                                                \
+    fprintf(stderr, "xiTK WARNING(%s:%d): ", __FUNCTION__, __LINE__); \
+    fprintf(stderr, __VA_ARGS__);                                     \
+  } while(0)
 #endif
 
-#define ABORT_IF_NULL(p)                                                                 \
-  do {                                                                                   \
-    if((p) == NULL) {                                                                    \
-      fprintf(stderr, "%s(%d): '%s' is NULL. Aborting.\n",  __FUNCTION__, __LINE__, #p); \
-      abort();                                                                           \
-    }                                                                                    \
+#define ABORT_IF_NOT_COND(cond)                                                                      \
+  do {                                                                                               \
+    if(!(cond)) {                                                                                    \
+      fprintf(stderr, "%s(%d): condition '%s' failed. Aborting.\n",  __FUNCTION__, __LINE__, #cond); \
+      abort();                                                                                       \
+    }                                                                                                \
   } while(0)
 
-#define ABORT_IF_ZERO(p)                                                                      \
-  do {                                                                                        \
-    if((p) == 0) {                                                                            \
-      fprintf(stderr, "%s(%d): '%s' == 0 (%d). Aborting.\n",  __FUNCTION__, __LINE__, #p, p); \
-      abort();                                                                                \
-    }                                                                                         \
+#define ABORT_IF_NULL(p) ABORT_IF_NOT_COND((p) != NULL)
+
+#define XITK_FREE(X) \
+  do {               \
+    if((X)) {        \
+      free((X));     \
+      (X) = NULL;    \
+    }                \
   } while(0)
 
-#define XITK_FREE(X) do { if((X)) { free((X)); (X) = NULL; } } while(0)
-
-#define XITK_CHECK_CONSTITENCY(X) do {                                                    \
-                                    if(((X) == NULL) || ((X)->magic != XITK_WIDGET_MAGIC) \
-                                       || ((X)->imlibdata == NULL))                       \
-                                      XITK_DIE("%s(): widget constitency failed.!\n",     \
-                                               __FUNCTION__);                             \
-                                  } while(0)
+#define XITK_CHECK_CONSTITENCY(X)                                                \
+  do {                                                                           \
+    if(((X) == NULL) || ((X)->magic != XITK_WIDGET_MAGIC)                        \
+       || ((X)->imlibdata == NULL))                                              \
+      XITK_DIE("%s(%d): widget consistency failed.!\n", __FUNCTION__, __LINE__); \
+  } while(0)
 
 /*
  * timeradd/timersub is missing on solaris' sys/time.h, provide
