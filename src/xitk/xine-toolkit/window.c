@@ -204,7 +204,7 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
   XSizeHints             hint;
   XWMHints              *wm_hint;
   XSetWindowAttributes   attr;
-  Atom                   prop, XA_WIN_LAYER;
+  Atom                   prop, XA_WIN_LAYER, XA_DELETE_WINDOW;
   XColor                 black, dummy;
   MWMHints               mwmhints;
   XClassHint            *xclasshint;
@@ -267,6 +267,9 @@ xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
+  XA_DELETE_WINDOW = XInternAtom(im->x.disp, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols(im->x.disp, xwin->window, &XA_DELETE_WINDOW, 1);
+
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = "Xine Window";
     xclasshint->res_class = "Xitk";
