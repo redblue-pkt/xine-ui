@@ -583,7 +583,7 @@ int main(int argc, char *argv[]) {
       break;
       
     case '-':
-      if(xine_get_audio_channel(aaxine.xine))
+      if(xine_get_audio_selection(aaxine.xine))
 	xine_select_audio_channel(aaxine.xine,
 				  (xine_get_audio_selection(aaxine.xine) - 1));
       break;
