@@ -646,7 +646,8 @@ static void _pplugin_set_param_double(xitk_widget_t *w, void *data, double value
   if(pobj->readonly)
     return;
 
-  if(value < pobj->param->range_min || value > pobj->param->range_max) {
+  if(pobj->param->range_min && pobj->param->range_max && 
+     (value < pobj->param->range_min || value > pobj->param->range_max)) {
     xine_error(_("Entered value is out of bounds (%e>%e<%e)."),
 	       pobj->param->range_min, value, pobj->param->range_max);
   }
