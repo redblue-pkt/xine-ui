@@ -132,8 +132,8 @@ static void _playlist_free_playlists(void) {
       playlist->playlist_len--;
     }
     
-    free(playlist->playlist_mrls);
-    free(playlist->playlist_idents);
+    SAFE_FREE(playlist->playlist_mrls);
+    SAFE_FREE(playlist->playlist_idents);
     playlist->playlist_len = 0;
   }
 }
