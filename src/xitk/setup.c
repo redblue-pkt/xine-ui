@@ -318,7 +318,7 @@ void setup_toggle_visibility (xitk_widget_t *w, void *data) {
   }
 }
 
-static void setup_save(xitk_widget_t *w, void *data) {
+static void setup_apply(xitk_widget_t *w, void *data) {
 
   if(setup->num_wg > 0) {
     int i;
@@ -1267,9 +1267,9 @@ void setup_panel(void) {
 				  "Black", "Black", "White", tabsfontname));
   
   lb.button_type       = CLICK_BUTTON;
-  lb.label             = _("Save");
+  lb.label             = _("Apply");
   lb.align             = ALIGN_CENTER;
-  lb.callback          = setup_save; 
+  lb.callback          = setup_apply; 
   lb.state_callback    = NULL;
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
