@@ -92,6 +92,12 @@ static unsigned char xine_bits[] = {
    0x00, 0x00, 0xf8, 0x1f, 0x00, 0x00, 0x00, 0xf8
 };
 
+static void auto_vo_visibility_cb(void *data, cfg_entry_t *cfg) {
+  gGui->auto_vo_visibility = cfg->num_value;
+}
+static void auto_panel_visibility_cb(void *data, cfg_entry_t *cfg) {
+  gGui->auto_panel_visibility = cfg->num_value;
+}
 static void skip_by_chapter_cb(void *data, cfg_entry_t *cfg) {
   gGui->skip_by_chapter = cfg->num_value;
   panel_update_nextprev_tips();
@@ -801,7 +807,16 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
     gGui->config->register_bool (gGui->config, "gui.skip_by_chapter", 1,
 				 _("play next|previous chapter instead of mrl (dvdnav)"), 
 				 NULL, skip_by_chapter_cb, NULL);
-  
+
+  gGui->auto_vo_visibility = 
+    gGui->config->register_bool (gGui->config, "gui.auto_video_output_visibility", 0,
+				 _("show/hide video output window regarding to the stream type"), 
+				 NULL, auto_vo_visibility_cb, NULL);
+  gGui->auto_panel_visibility = 
+    gGui->config->register_bool (gGui->config, "gui.auto_panel_visibility", 0,
+				 _("automatically show/hide panel window, according to auto_video_output_visibility"), 
+				 NULL, auto_panel_visibility_cb, NULL); 
+ 
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
 

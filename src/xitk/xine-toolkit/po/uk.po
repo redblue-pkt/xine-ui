@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui (xitk) 0.9.8\n"
-"POT-Creation-Date: 2002-08-22 04:21+0200\n"
+"POT-Creation-Date: 2002-08-30 00:45+0200\n"
 "PO-Revision-Date: 2002-03-23 20:42GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -13,15 +13,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1081
+#: src/xitk/xine-toolkit/mrlbrowser.c:1137
 msgid "Select current entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1089
+#: src/xitk/xine-toolkit/mrlbrowser.c:1145
 msgid "Play selected entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1100
+#: src/xitk/xine-toolkit/mrlbrowser.c:1156
 msgid "Close MRL browser window"
 msgstr ""
 
@@ -79,30 +79,30 @@ msgstr "В╕кно"
 msgid "Quit"
 msgstr "Вих╕д"
 
-#: src/xitk/xine-toolkit/window.c:811
+#: src/xitk/xine-toolkit/window.c:787
 msgid "OK"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:874 src/xitk/xine-toolkit/window.c:1072
+#: src/xitk/xine-toolkit/window.c:850 src/xitk/xine-toolkit/window.c:1048
 msgid "Question?"
 msgstr "Питання?"
 
-#: src/xitk/xine-toolkit/window.c:1003 src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
 msgid "Yes"
 msgstr "Так"
 
-#: src/xitk/xine-toolkit/window.c:1003 src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
 msgid "No"
 msgstr "Н╕"
 
-#: src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:1190
 msgid "Cancel"
 msgstr "В╕дмова"
 
-#: src/xitk/xine-toolkit/xitk.h:1921 src/xitk/xine-toolkit/xitk.h:1937
+#: src/xitk/xine-toolkit/xitk.h:1945 src/xitk/xine-toolkit/xitk.h:1961
 msgid "Error"
 msgstr ""
 
-#: src/xitk/xine-toolkit/xitk.h:1926 src/xitk/xine-toolkit/xitk.h:1942
+#: src/xitk/xine-toolkit/xitk.h:1950 src/xitk/xine-toolkit/xitk.h:1966
 msgid "Information"
 msgstr ""

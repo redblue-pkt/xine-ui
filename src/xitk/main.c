@@ -534,29 +534,60 @@ void event_listener (void *user_data, xine_event_t *event) {
     panel_update_channel_display ();
     break;
 
-  case XINE_EVENT_UI_SET_TITLE: 
-    {
-      xine_ui_event_t *uevent = (xine_ui_event_t *)event;
-      panel_set_title((char*)(uevent->data));
-    }
-    break;
-
+  case XINE_EVENT_UI_SET_TITLE: {
+    xine_ui_event_t *uevent = (xine_ui_event_t *)event;
+    panel_set_title((char*)(uevent->data));
+  }
+  break;
+  
   case XINE_EVENT_PLAYBACK_FINISHED:
     gui_status_callback (XINE_STOP);
     break;
-
-  case XINE_EVENT_NEED_NEXT_MRL:
-    {
-      xine_next_mrl_event_t *uevent = (xine_next_mrl_event_t *)event;
-
-      uevent->handled = 1;
-      uevent->mrl = gui_next_mrl_callback ();
-    }
-    break;
-
+    
+  case XINE_EVENT_NEED_NEXT_MRL: {
+    xine_next_mrl_event_t *uevent = (xine_next_mrl_event_t *)event;
+    
+    uevent->handled = 1;
+    uevent->mrl = gui_next_mrl_callback ();
+  }
+  break;
+  
   case XINE_EVENT_BRANCHED:
     gui_branched_callback ();
     break;
+    
+  case XINE_EVENT_OUTPUT_VIDEO: {
+    xine_ui_event_t *uevent = (xine_ui_event_t *)event;
+    cfg_entry_t     *cfg_entry;
+
+    cfg_entry = gGui->config->lookup_entry(gGui->config, "misc.logo_mrl");
+
+    if(strcmp(cfg_entry->str_value, uevent->data)) {
+      if(gGui->auto_vo_visibility) {
+
+	if(!video_window_is_visible())
+	  video_window_set_visibility(1);
+	
+	if(gGui->auto_panel_visibility && (panel_is_visible()))
+	  panel_toggle_visibility(NULL, NULL);
+      }
+    }
+  }
+  break;
+  
+  case XINE_EVENT_OUTPUT_NO_VIDEO: {
+    /*  xine_ui_event_t *uevent = (xine_ui_event_t *)event; */
+
+    if(gGui->auto_vo_visibility && (video_window_is_visible())) {
+
+      if(!panel_is_visible())
+	panel_toggle_visibility(NULL, NULL);
+      
+      video_window_set_visibility(0);
+    }
+  }
+  break;
+  
   }      
  
 }

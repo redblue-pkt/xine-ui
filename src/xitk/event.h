@@ -118,6 +118,9 @@ typedef struct {
 
   int                  skip_by_chapter;
 
+  int                  auto_vo_visibility;
+  int                  auto_panel_visibility;
+
   kbinding_t          *kbindings;
 
   struct {

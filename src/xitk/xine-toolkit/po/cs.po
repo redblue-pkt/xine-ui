@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-0.9.9\n"
-"POT-Creation-Date: 2002-08-22 04:21+0200\n"
+"POT-Creation-Date: 2002-08-30 00:45+0200\n"
 "PO-Revision-Date: 2002-06-20 16:55+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -13,15 +13,15 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1081
+#: src/xitk/xine-toolkit/mrlbrowser.c:1137
 msgid "Select current entry"
 msgstr "Vybrání aktuální polo¾ky"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1089
+#: src/xitk/xine-toolkit/mrlbrowser.c:1145
 msgid "Play selected entry"
 msgstr "Pøehrání aktuální polo¾ky"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1100
+#: src/xitk/xine-toolkit/mrlbrowser.c:1156
 msgid "Close MRL browser window"
 msgstr "Zavøení okna prohlí¾eèe MRL"
 
@@ -79,30 +79,30 @@ msgstr "Mé pos*** okno"
 msgid "Quit"
 msgstr "Konec"
 
-#: src/xitk/xine-toolkit/window.c:811
+#: src/xitk/xine-toolkit/window.c:787
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:874 src/xitk/xine-toolkit/window.c:1072
+#: src/xitk/xine-toolkit/window.c:850 src/xitk/xine-toolkit/window.c:1048
 msgid "Question?"
 msgstr "Otázka?"
 
-#: src/xitk/xine-toolkit/window.c:1003 src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
 msgid "Yes"
 msgstr "Ano"
 
-#: src/xitk/xine-toolkit/window.c:1003 src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
 msgid "No"
 msgstr "Ne"
 
-#: src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:1190
 msgid "Cancel"
 msgstr "Zru¹it"
 
-#: src/xitk/xine-toolkit/xitk.h:1921 src/xitk/xine-toolkit/xitk.h:1937
+#: src/xitk/xine-toolkit/xitk.h:1945 src/xitk/xine-toolkit/xitk.h:1961
 msgid "Error"
 msgstr "Chyba"
 
-#: src/xitk/xine-toolkit/xitk.h:1926 src/xitk/xine-toolkit/xitk.h:1942
+#: src/xitk/xine-toolkit/xitk.h:1950 src/xitk/xine-toolkit/xitk.h:1966
 msgid "Information"
 msgstr "Informace"

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-08-22 04:21+0200\n"
+"POT-Creation-Date: 2002-08-30 00:45+0200\n"
 "PO-Revision-Date: 2002-05-31 22:21+0200\n"
 "Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
 "Language-Team: Polski <pl@li.org>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.6\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1081
+#: src/xitk/xine-toolkit/mrlbrowser.c:1137
 msgid "Select current entry"
 msgstr "Wybór aktualnego wpisu"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1089
+#: src/xitk/xine-toolkit/mrlbrowser.c:1145
 msgid "Play selected entry"
 msgstr "Odtwarzanie wybranego wpisu"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:1100
+#: src/xitk/xine-toolkit/mrlbrowser.c:1156
 msgid "Close MRL browser window"
 msgstr "Zamkniêcie okna przegl±darki MRL"
 
@@ -80,30 +80,30 @@ msgstr "Moje Okno"
 msgid "Quit"
 msgstr "Koniec"
 
-#: src/xitk/xine-toolkit/window.c:811
+#: src/xitk/xine-toolkit/window.c:787
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:874 src/xitk/xine-toolkit/window.c:1072
+#: src/xitk/xine-toolkit/window.c:850 src/xitk/xine-toolkit/window.c:1048
 msgid "Question?"
 msgstr "Pytanie?"
 
-#: src/xitk/xine-toolkit/window.c:1003 src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
 msgid "Yes"
 msgstr "Tak"
 
-#: src/xitk/xine-toolkit/window.c:1003 src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:979 src/xitk/xine-toolkit/window.c:1190
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1214
+#: src/xitk/xine-toolkit/window.c:1190
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: src/xitk/xine-toolkit/xitk.h:1921 src/xitk/xine-toolkit/xitk.h:1937
+#: src/xitk/xine-toolkit/xitk.h:1945 src/xitk/xine-toolkit/xitk.h:1961
 msgid "Error"
 msgstr "B³±d"
 
-#: src/xitk/xine-toolkit/xitk.h:1926 src/xitk/xine-toolkit/xitk.h:1942
+#: src/xitk/xine-toolkit/xitk.h:1950 src/xitk/xine-toolkit/xitk.h:1966
 msgid "Information"
 msgstr "Informacja"
