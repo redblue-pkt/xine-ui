@@ -1312,6 +1312,13 @@ void video_window_set_visibility(int show_window) {
       xitk_set_layer_above(gGui->video_window);
     }
 
+    /* inform the window manager that we are fullscreen. This info musn't be set for xinerama-fullscreen,
+       otherwise there are 2 different window size for one fullscreen mode ! (kwin doesn't accept this) */
+    if( !(gVw->fullscreen_mode & WINDOWED_MODE)
+     && !(gVw->fullscreen_mode & FULLSCR_XI_MODE)
+     && wm_not_ewmh_only())
+      xitk_set_ewmh_fullscreen(gGui->video_window);
+    
   }
   else
     XUnmapWindow (gGui->video_display, gGui->video_window);
