@@ -144,9 +144,11 @@ oss_resample            xine can play different sample rates than your
 			          Dont use, needs missing timer plugin!
 			2 = ON:   Always resample, mainly for debugging.
 
-syncfb_device           This is specific to the SyncFB video out plugin.
-                        Path to the syncfb device (default: /dev/syncfb)
-			(see README.syncfb for more information)
+syncfb_device           Path to the syncfb device (default: /dev/syncfb)
+			
+syncfb_default_repeat   Specifies how many times a frame is repeated.
+			Defaults to 3.
+			(note: hardware deinterlacing will always use 1)
 
 skin                    skin to use, see <prefix>/share/xine/skins
                         for installed skins
