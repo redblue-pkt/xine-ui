@@ -679,6 +679,7 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 
 	if((fd = fopen(tmpskin, "w+b")) != NULL) {
 	  char   buffer[2048];
+	  int    i, skin_found = -1;
 	  
 	  fwrite(download->buf, download->size, 1, fd);
 	  fflush(fd);
@@ -688,40 +689,50 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
 	  
 	  sprintf(buffer, "`which tar`||tar -C %s -xzf %s", skindir, tmpskin);
 	  xine_system(0, buffer);
-
+	  
 	  memset(&buffer, 0, sizeof(buffer));
 	  snprintf(buffer, ((strlen(filename) + 1) - 7), "%s", filename);
 
-	  skins_avail = (skins_locations_t **) realloc(skins_avail, 
-						       (skins_avail_num + 2) * sizeof(skins_locations_t*));
-	  skin_names = (char **) realloc(skin_names, (skins_avail_num + 2) * sizeof(char *));
+	  for(i = 0; i < skins_avail_num; i++) {
+	    if((!strcmp(skins_avail[i]->pathname, skindir)) 
+	       && (!strcmp(skins_avail[i]->skin, buffer))) {
+	      skin_found = i;
+	      break;
+	    }
+	  }
 	  
-	  skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
-	  skins_avail[skins_avail_num]->pathname = strdup(skindir);
-	  skins_avail[skins_avail_num]->skin = strdup(buffer);
-	  skins_avail[skins_avail_num]->number = skins_avail_num;
-	  
-	  skin_names[skins_avail_num] = strdup(skins_avail[skins_avail_num]->skin);
-	  
-	  skins_avail_num++;
-	  
-	  skins_avail[skins_avail_num] = NULL;
-	  skin_names[skins_avail_num] = NULL;
-	  
-	  /* Re-register skin enum config, a new one has been added */
-	  (void) xine_config_register_enum (gGui->xine, "gui.skin", 
-					    (get_skin_offset(DEFAULT_SKIN)),
-					    skin_names,
-					    _("gui skin theme"), 
-					    CONFIG_NO_HELP, 
-					    CONFIG_LEVEL_EXP,
-					    skin_change_cb, 
-					    CONFIG_NO_DATA);
-
-	  xine_info(_("Skin %s correctly installed"), buffer);
+	  if(skin_found == -1) {
+	    skins_avail = (skins_locations_t **) realloc(skins_avail, 
+							 (skins_avail_num + 2) * sizeof(skins_locations_t*));
+	    skin_names = (char **) realloc(skin_names, (skins_avail_num + 2) * sizeof(char *));
+	    
+	    skins_avail[skins_avail_num] = (skins_locations_t *) xine_xmalloc(sizeof(skins_locations_t));
+	    skins_avail[skins_avail_num]->pathname = strdup(skindir);
+	    skins_avail[skins_avail_num]->skin = strdup(buffer);
+	    skins_avail[skins_avail_num]->number = skins_avail_num;
+	    
+	    skin_names[skins_avail_num] = strdup(skins_avail[skins_avail_num]->skin);
+	    
+	    skins_avail_num++;
+	    
+	    skins_avail[skins_avail_num] = NULL;
+	    skin_names[skins_avail_num] = NULL;
+	    
+	    /* Re-register skin enum config, a new one has been added */
+	    (void) xine_config_register_enum (gGui->xine, "gui.skin", 
+					      (get_skin_offset(DEFAULT_SKIN)),
+					      skin_names,
+					      _("gui skin theme"), 
+					      CONFIG_NO_HELP, 
+					      CONFIG_LEVEL_EXP,
+					      skin_change_cb, 
+					      CONFIG_NO_DATA);
+	  }
+	  else
+	    xine_info(_("Skin %s correctly installed"), buffer);
 	  
 	  /* Okay, load this skin */
-	  select_new_skin(skins_avail_num - 1);
+	  select_new_skin((skin_found >= 0) ? skin_found : skins_avail_num - 1);
 	}
 	else
 	  xine_error(_("Unable to create '%s'."), tmpskin);
