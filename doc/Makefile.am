@@ -1,7 +1,8 @@
 
 SUBDIRS = man
 
-EXTRA_DIST = $(docs_DATA)
+EXTRA_DIST = $(docs_DATA) README.corba
+
 
 docsdir = @XINE_DOCDIR@
 
@@ -13,7 +14,6 @@ docs_DATA = FAQ_de \
 	FAQ_pl \
 	FAQ_uk \
 	README_en \
-	README.corba \
 	README.divx4 \
 	README.dxr3 \
 	README.dxr3_pl \

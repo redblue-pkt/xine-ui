@@ -1,5 +1,5 @@
 
-SUBDIRS = common Imlib-light corba xitk aaui dfb
+SUBDIRS = common Imlib-light xitk aaui dfb
 
 debug:
 	@list='$(SUBDIRS)'; for subdir in $$list; do \

@@ -504,6 +504,12 @@ dnl
 AC_CHECK_LIRC
 
 
+
+dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+dnl  CORBA:
+dnl  Temporary disabled, port to new API needed
+dnl NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE NOTE
+if test "x" != "x"; then
 dnl
 dnl CORBA support
 dnl
@@ -525,6 +531,8 @@ else
    CORBA_DEP="#"
 fi
 AC_SUBST(CORBA_DEP)
+
+fi
 
 
 if test "$GCC" = yes; then
@@ -823,7 +831,6 @@ intl/Makefile
 readline/Makefile
 src/Makefile
 src/common/Makefile
-src/corba/Makefile
 src/Imlib-light/Makefile
 src/xitk/Makefile
 src/xitk/xine-toolkit/Makefile
