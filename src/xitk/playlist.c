@@ -351,8 +351,13 @@ static void _playlist_load_callback(filebrowser_t *fb) {
     mediamark_load_mediamarks(file);
     gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
     playlist_update_playlist();
+
+    if((xine_get_status(gGui->stream) == XINE_STATUS_PLAY))
+      gui_stop(NULL, NULL);
+
     if((!is_playback_widgets_enabled()) && gGui->playlist.num)
       enable_playback_controls(1);
+
     free(file);
   }
   playlist_reactivate();
@@ -836,19 +841,16 @@ void playlist_update_focused_entry(void) {
 	  
 	  if(!strcmp(pa_mrl, pl_mrl)) {
 	    int max_displayed = xitk_browser_get_num_entries(playlist->playlist);
-	    int start = xitk_browser_get_current_start(playlist->playlist);
 	    int selected = xitk_browser_get_current_selected(playlist->playlist);
 	    
-	    /* current is bottom */
-	    if((selected >= 0) && (gGui->playlist.cur != selected))
-	      _playlist_update_browser_list(start);
-	    else if((gGui->playlist.cur - start) >= max_displayed)
+	    if(gGui->playlist.num <= max_displayed)
+	      _playlist_update_browser_list(-1);
+	    else if(gGui->playlist.cur <= (gGui->playlist.num - max_displayed)) {
 	      _playlist_update_browser_list(gGui->playlist.cur);
-	    else if((gGui->playlist.cur - start) < start)
-	      _playlist_update_browser_list(gGui->playlist.num - max_displayed);
+	    }
 	    else
-	      _playlist_update_browser_list(start);
-	    
+	      _playlist_update_browser_list(gGui->playlist.num - max_displayed);
+
 	    if(selected >= 0) {
 	      xitk_browser_set_select(playlist->playlist, selected);
  	      xitk_inputtext_change_text(playlist->winput,
