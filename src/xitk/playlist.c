@@ -987,6 +987,14 @@ void playlist_change_skins(void) {
   }
 }
 
+void playlist_deinit(void) {
+  if(playlist) {
+    if(playlist_is_visible())
+      playlist_toggle_visibility(NULL, NULL);
+    xitk_unregister_event_handler(&playlist->widget_key);
+  }
+}
+
 /*
  * Create playlist editor window
  */

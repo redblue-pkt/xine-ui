@@ -412,6 +412,13 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
   }
 }
 
+void mrl_browser_deinit(void) {
+  if(mrlb) {
+    if(mrl_browser_is_running())
+      destroy_mrl_browser();
+  }
+}
+
 /*
  * Create a new mrl browser.
  */

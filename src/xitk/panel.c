@@ -274,7 +274,7 @@ static void *slider_loop(void *dummy) {
   
   pthread_detach(pthread_self());
 
-  while(gGui->running) {
+  while(gGui->on_quit == 0) {
 
     if(gGui->stream) {
       
@@ -409,7 +409,7 @@ int panel_is_visible(void) {
 /*
  * Show/Hide panel window.
  */
-void panel_toggle_visibility (xitk_widget_t *w, void *data) {
+void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   int visible = xitk_is_window_visible(gGui->display, gGui->panel_window);
 
   if(!panel->visible && playlist_is_visible()) {
@@ -546,7 +546,10 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     }
     
   }
+}
 
+void panel_toggle_visibility (xitk_widget_t *w, void *data) {
+  _panel_toggle_visibility(w, data);
   config_update_num ("gui.panel_visible", panel->visible);
 }
 
@@ -835,6 +838,12 @@ void panel_add_mixer_control(void) {
     xitk_disable_widget_tips(panel->mixer.mute);
   }
 
+}
+
+void panel_deinit(void) {
+  if(panel_is_visible())
+    _panel_toggle_visibility(NULL, NULL);
+  xitk_unregister_event_handler(&panel->widget_key);
 }
 
 /*

@@ -495,6 +495,14 @@ static void control_select_new_skin(xitk_widget_t *w, void *data, int selected) 
   select_new_skin(selected);
 }
 
+void control_deinit(void) {
+  if(control) {
+    if(control_is_visible())
+      control_toggle_visibility(NULL, NULL);
+    xitk_unregister_event_handler(&control->widget_key);
+  }
+}
+
 /*
  * Create control panel window
  */

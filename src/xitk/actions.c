@@ -424,21 +424,23 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time
  * Callback-functions for widget-button click
  */
 void gui_exit (xitk_widget_t *w, void *data) {
+
+  if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
+    gui_stop(NULL, NULL);
+    while(xine_get_status(gGui->stream) != XINE_STATUS_STOP)
+      xine_usec_sleep(50000);
+  }
   
   gGui->on_quit = 1;
-
-  if(panel_is_visible()) {
-    XLockDisplay(gGui->display);
-    XUnmapWindow(gGui->display, gGui->panel_window);
-    XSync(gGui->display, False);
-    XUnlockDisplay(gGui->display);
-  }
+  
+  panel_deinit();
+  playlist_deinit();
+  control_deinit();
+  mrl_browser_deinit();
 
   if(video_window_is_visible())
     video_window_set_visibility(0);
-
-  gui_stop(NULL, NULL);
-
+  
   video_window_exit ();
 
 #ifdef HAVE_XF86VIDMODE
