@@ -47,9 +47,11 @@
 
 
 #include "xine.h"
+#include <xine/video_out_x11.h>
 #include "utils.h"
 #include "gui_main.h"
 #include "gui_dnd.h"
+#include "gui_videowin.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"
@@ -65,6 +67,9 @@
  * global variables
  */
 gGui_t   *gGui;
+#ifdef HAVE_LIRC
+int       no_lirc;
+#endif
 
 /* options args */
 static const char *short_options = "?hS4"
@@ -286,7 +291,8 @@ int main(int argc, char *argv[]) {
   char            *video_driver_id = NULL;
   ao_functions_t  *audio_driver = NULL ;
   vo_driver_t     *video_driver = NULL;
-  char            *display_name = ":0.0";
+  double           res_h, res_v;
+  x11_visual_t     vis;
 
   show_banner();
 
@@ -422,26 +428,12 @@ int main(int argc, char *argv[]) {
 
   gGui->config = config_file_init (gGui->configfile);
 
+
   /*
-   * init X11
+   * init gui
    */
-  
-  if (!XInitThreads ()) {
-    printf ("\nXInitThreads failed - looks like you don't have a thread-safe xlib.\n");
-    exit (1);
-  } 
 
-  if(getenv("DISPLAY"))
-    display_name = getenv("DISPLAY");
-
-  gGui->display = XOpenDisplay(display_name);
-
-  if (gGui->display == NULL) {
-    fprintf(stderr,"Can not open display\n");
-    exit(1);
-  }
-
-  gGui->screen = DefaultScreen(gGui->display);
+  gui_init(argc-optind, &argv[optind]);
 
   /*
    * load and init output drivers
@@ -456,9 +448,18 @@ int main(int argc, char *argv[]) {
 
   }
 
+  vis.display           = gGui->display;
+  vis.screen            = gGui->screen;
+  res_h = (DisplayWidth  (gGui->display, gGui->screen)*1000 / DisplayWidthMM (gGui->display, gGui->screen));
+  res_v = (DisplayHeight (gGui->display, gGui->screen)*1000 / DisplayHeightMM (gGui->display, gGui->screen));
+  vis.display_ratio     = res_h / res_v;
+  vis.d                 = gGui->video_window;
+  vis.calc_dest_size    = video_window_calc_dest_size;
+  vis.request_dest_size = video_window_adapt_size;
+
   video_driver = xine_load_video_output_plugin(gGui->config, video_driver_id,
 					       VISUAL_TYPE_X11, 
-					       (void *) gGui->display);
+					       (void *) &vis);
   
   if (!video_driver) {
     printf ("main: video driver <%s> failed\n", video_driver_id);
@@ -511,7 +512,7 @@ int main(int argc, char *argv[]) {
    * hand control over to gui
    */
 
-  gui_start(argc-optind, &argv[optind]);
+  gui_run();
 
 #ifdef HAVE_ORBIT
   if (!no_lirc)

@@ -271,11 +271,24 @@ void panel_init (void) {
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
+
+  /*
+  printf ("imlib_data: %d visual : %d\n",gGui->imlib_data,gGui->imlib_data->x.visual);
+  printf ("w : %d h : %d\n",hint.width, hint.height);
+  */
+
+  /* FIXME: somhow gGui->imlib_data->x.visual is wrong
   gGui->panel_window = XCreateWindow (gGui->display, DefaultRootWindow(gGui->display), 
-					hint.x, hint.y, hint.width, hint.height, 0, 
-					gGui->imlib_data->x.depth, CopyFromParent, 
-					gGui->imlib_data->x.visual,
-					0, &attr);
+				      hint.x, hint.y, hint.width, hint.height, 0, 
+				      gGui->imlib_data->x.depth, CopyFromParent, 
+				      gGui->imlib_data->x.visual,
+				      0, &attr);
+  */
+  gGui->panel_window = XCreateWindow (gGui->display, DefaultRootWindow(gGui->display), 
+				      hint.x, hint.y, hint.width, hint.height, 0, 
+				      CopyFromParent, CopyFromParent, 
+				      CopyFromParent,
+				      0, &attr);
   
   XSetStandardProperties(gGui->display, gGui->panel_window, title, title,
 			 None, NULL, 0, &hint);

@@ -275,6 +275,8 @@ ImlibData *Imlib_init(Display * disp) {
       id->fastrend = 0;
   }
 
+  /* printf ("Imlib init, d : %d visual : %d\n", id, id->x.visual); */
+
   return id;
 }
 

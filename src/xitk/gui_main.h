@@ -119,7 +119,9 @@ void config_save(void);
 void config_reset(void);
 
 
-void gui_start (int nfiles, char *filenames[]);
+void gui_init (int nfiles, char *filenames[]);
+
+void gui_run ();
 
 void gui_status_callback (int nStatus) ;
 

@@ -397,12 +397,11 @@ void gui_status_callback (int nStatus) {
                 &startevent);                                                 \
    }
 
-void gui_start (int nfiles, char *filenames[]) {
+void gui_init (int nfiles, char *filenames[]) {
 
-  XEvent                myevent;
   int                   i;
-  struct sigaction      action;
   XColor                dummy;
+  char                 *display_name = ":0.0";
 
   /*
    * init playlist
@@ -422,11 +421,27 @@ void gui_start (int nfiles, char *filenames[]) {
    * X / imlib stuff
    */
 
-  gGui->imlib_data = Imlib_init (gGui->display);
+  if (!XInitThreads ()) {
+    printf ("\nXInitThreads failed - looks like you don't have a thread-safe xlib.\n");
+    exit (1);
+  } 
+
+  if(getenv("DISPLAY"))
+    display_name = getenv("DISPLAY");
+
+  gGui->display = XOpenDisplay(display_name);
+
+  if (gGui->display == NULL) {
+    fprintf(stderr,"Can not open display\n");
+    exit(1);
+  }
 
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);
+  gGui->imlib_data = Imlib_init (gGui->display);
+
+  printf ("imlib visual : %d\n", gGui->imlib_data->x.visual);
 
   //  gGui->black = BlackPixel (gGui->display, gGui->screen);
   XAllocNamedColor(gGui->display, 
@@ -452,8 +467,16 @@ void gui_start (int nfiles, char *filenames[]) {
 
   video_window_init ();
   panel_init ();
+}
 
+void gui_run () {
   
+  XEvent                myevent;
+  struct sigaction      action;
+
+  panel_update_channel_display () ;
+  panel_update_mrl_display ();
+
   /*  The user request "play on start" */
   if(gGui->autoplay_options & PLAY_ON_START) {
     /* probe DVD && VCD  */

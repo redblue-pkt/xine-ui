@@ -67,7 +67,7 @@ struct _xdata
     Display            *disp;
     int                 screen;
     Window              root;
-    Visual             *visual;
+    Visual             *visual; 
     int                 depth;
     int                 render_depth;
     Colormap            root_cmap;

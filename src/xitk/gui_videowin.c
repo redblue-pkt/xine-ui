@@ -44,6 +44,7 @@ int            gvw_fullscreen_width, gvw_fullscreen_height;
 int            gvw_completion_type;
 int            gvw_depth;
 int            gvw_show;
+XWMHints      *gvw_wm_hint;
 
 
 void video_window_set_fullscreen (int req_fullscreen) {
@@ -133,6 +134,7 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
     if (gvw_xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gvw_xclasshint);
 
+    XSetWMHints(gGui->display, gGui->video_window, gvw_wm_hint);
 
     /*
      * wm, no borders please
@@ -199,6 +201,8 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
 
     if (gvw_xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gvw_xclasshint);
+
+    XSetWMHints(gGui->display, gGui->video_window, gvw_wm_hint);
 
     /*
      * drag and drop
@@ -378,6 +382,21 @@ void video_window_init () {
   gvw_cursor[0] = XCreatePixmapCursor(gGui->display, bm_no, bm_no,
 				      &gGui->black, &gGui->black, 0, 0);
   gvw_cursor[1] = XCreateFontCursor(gGui->display, XC_left_ptr);
+
+  /*
+   * wm hints
+   */
+
+  gvw_wm_hint = XAllocWMHints();
+  if (!gvw_wm_hint) {
+    printf ("XAllocWMHints failed\n");
+    exit (1);
+  }
+
+  gvw_wm_hint->input         = True;
+  gvw_wm_hint->initial_state = NormalState;
+  gvw_wm_hint->icon_pixmap   = gGui->icon;
+  gvw_wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
 
   XUnlockDisplay (gGui->display);
 
