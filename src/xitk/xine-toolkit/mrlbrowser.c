@@ -194,7 +194,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
     private_data->mc->mrls_to_disp = 0;
 
     xitk_strdupa(filter_ends, private_data->mrl_filters[private_data->filter_selected]->ending);
-    p = filter_ends;
+    xitk_strdupa(p, filter_ends);
 
     for(i = 0; i < private_data->mrls_num; i++) {
 
@@ -210,12 +210,10 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 	ending = strrchr(private_data->mc->mrls[i]->mrl, '.');
 	
 	if(ending) {
+
 	  while((m = xitk_strsep(&filter_ends, ",")) != NULL) {
 	    
-	    while(*m == ' ' || *m == '\t') m++;
-	    
 	    if(!strcasecmp((ending + 1), m)) {
-
 	      if(private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] == NULL)
 		private_data->mc->filtered_mrls[private_data->mc->mrls_to_disp] = (xine_mrl_t *) xitk_xmalloc(sizeof(xine_mrl_t));
 	      
@@ -223,8 +221,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 	      private_data->mc->mrls_to_disp++;
 	    }
 	  }
-	  
-	  filter_ends = p;
+	  xitk_strdupa(filter_ends, p);
 	}
       }    
     }
@@ -1282,6 +1279,8 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
 				private_data->widget_list,
 				(void *) private_data);
 
+  
+  xitk_mrlbrowser_change_skins(mywidget, skonfig);
   
   XLOCK(mb->imlibdata->x.disp);
   XSetInputFocus(mb->imlibdata->x.disp, private_data->window, RevertToParent, CurrentTime);

@@ -174,7 +174,7 @@ static void mrl_browser_kill(xitk_widget_t *w, void *data) {
 xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
   xitk_mrlbrowser_filter_t **filters = NULL;
   int                        num_endings = 0;
-  char                      *mrl_exts;
+  char                      *mrl_exts, *p, *pp;
   
   filters                      = (xitk_mrlbrowser_filter_t **) 
     xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t *) * (num_endings + 2));
@@ -188,12 +188,27 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
     char  patterns[2048];
     char *e;
     
+    p = strdup(mrl_exts);
+
+    num_endings++;
+    
+    pp = p;
+    while(*p != '\0') {
+      if(*p == ' ')
+	*p = ',';
+      p++;
+    }
+    
+    filters[num_endings]         = (xitk_mrlbrowser_filter_t *) xitk_xmalloc(sizeof(xitk_mrlbrowser_filter_t));
+    filters[num_endings]->name   = strdup(_("All extensions"));
+    filters[num_endings]->ending = pp;
+
     while((e = xine_strsep(&mrl_exts, " ")) != NULL) {
       
       memset(&patterns, 0, sizeof(patterns));
       strcat(patterns, "*.");
       strcat(patterns, e);
-      
+
       num_endings++;
       
       filters                      = (xitk_mrlbrowser_filter_t **) 
@@ -205,7 +220,7 @@ xitk_mrlbrowser_filter_t **mrl_browser_get_valid_mrl_ending(void) {
       filters[num_endings]->name   = strdup(patterns);
       filters[num_endings]->ending = strdup(e);
     }
-
+    
     free(mrl_exts);
   }
 
