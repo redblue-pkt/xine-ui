@@ -282,7 +282,6 @@ static void mrl_add_and_play(xitk_widget_t *w, void *data, mrl_t *mrl) {
     gui_set_current_mrl(gGui->playlist[gGui->playlist_num - 1]);
     if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
       gui_handle_xine_error();
-    video_window_stream_has_changed();
 
   }
 }

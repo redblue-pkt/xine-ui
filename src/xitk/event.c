@@ -315,78 +315,21 @@ void gui_execute_action_id(action_id_t action) {
   switch(action) {
     
   case ACTID_WINDOWREDUCE:
+    video_window_set_mag (0.8 * video_window_get_mag());
+    break;
   case ACTID_WINDOWENLARGE:
-    if(!video_window_is_fullscreen()) {
-      int x, y;
-      unsigned int w, h, b, d;
-      Window rootwin;
-      
-      XLockDisplay (gGui->display);
-      
-      if(XGetGeometry(gGui->display, 
-		      gGui->video_window, &rootwin, 
-		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
-      }
-
-      XUnlockDisplay(gGui->display);
-
-      if(action == ACTID_WINDOWREDUCE) {
-	w /= 1.2;
-	h /= 1.2;
-      }
-      else {
-	w *= 1.2;
-	h *= 1.2;
-      }
-      
-      video_window_change_size (w, h);
-    }
+    video_window_set_mag (1.2 * video_window_get_mag());
     break;
 
-  case ACTID_WINDOWREDUCE_H_PIXEL:
-  case ACTID_WINDOWREDUCE_V_PIXEL:
-  case ACTID_WINDOWREDUCE_PIXEL:
-  case ACTID_WINDOWENLARGE_H_PIXEL:
-  case ACTID_WINDOWENLARGE_V_PIXEL:
-  case ACTID_WINDOWENLARGE_PIXEL:
-
-    if(!video_window_is_fullscreen()) {
-      int x, y;
-      unsigned int w, h, b, d;
-      Window rootwin;
-      
-      XLockDisplay (gGui->display);
-      
-      if(XGetGeometry(gGui->display, 
-		      gGui->video_window, &rootwin, 
-		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
-      }
-      
-      XUnlockDisplay(gGui->display);
-
-      if(action == ACTID_WINDOWREDUCE_H_PIXEL) {
-	w--;
-      }
-      else if(action == ACTID_WINDOWREDUCE_V_PIXEL) {
-	h--;
-      }
-      else if(action == ACTID_WINDOWREDUCE_PIXEL) {
-	w--;
-	h--;
-      }
-      else if(action == ACTID_WINDOWENLARGE_H_PIXEL) {
-	w++;
-      }
-      else if(action == ACTID_WINDOWENLARGE_V_PIXEL) {
-	h++;
-      }
-      else if(action == ACTID_WINDOWENLARGE_PIXEL) {
-	w++;
-	h++;
-      }
-      
-      video_window_change_size (w, h);
-    }
+  case ACTID_ZOOM_1_1:
+  case ACTID_WINDOW100:
+    video_window_set_mag (1.0);
+    break;
+  case ACTID_WINDOW200:
+    video_window_set_mag (2.0);
+    break;
+  case ACTID_WINDOW50:
+    video_window_set_mag (0.5);
     break;
 
   case ACTID_SPU_NEXT:
@@ -623,20 +566,6 @@ void gui_execute_action_id(action_id_t action) {
     xine_send_event(gGui->xine, &xine_event);
     break;
     
-  case ACTID_ZOOM_1_1:
-    if(!video_window_is_fullscreen()) {
-      int width, height, ratio_code, format;
-      uint8_t *y, *u, *v;
-      
-      if( xine_get_current_frame (gGui->xine, &width, &height,
-				  &ratio_code, &format,
-				  &y, &u, &v) ) {
-	
-	video_window_change_size (width, height);
-      }
-    }
-    break;
-    
   case ACTID_ZOOM_IN:
     gui_change_zoom(1);
     break;
@@ -745,7 +674,7 @@ void gui_status_callback (int nStatus) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
       if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
 	gui_handle_xine_error();
-      video_window_stream_has_changed();
+
     } else {
       
       if(gGui->actions_on_start[0] == ACTID_QUIT)

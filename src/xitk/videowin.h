@@ -52,7 +52,7 @@ int video_window_is_cursor_visible(void);
 void video_window_set_visibility(int show_window);
 int video_window_is_visible (void);
 
-void video_window_stream_has_changed(void);
-void video_window_change_size(int width, int height);
+void video_window_set_mag (float mag);
+float video_window_get_mag ();
 
 #endif

@@ -93,7 +93,6 @@ void gui_play (xitk_widget_t *w, void *data) {
   if (xine_get_status (gGui->xine) != XINE_PLAY) {
     if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
       gui_handle_xine_error();
-    video_window_stream_has_changed();
   } else {
     xine_set_speed(gGui->xine, SPEED_NORMAL);
   }
@@ -315,8 +314,6 @@ void gui_set_current_position (int pos) {
   if(!xine_play (gGui->xine, gGui->filename, pos, 0))
     gui_handle_xine_error();
   
-  video_window_stream_has_changed();
-
   gGui->ignore_status = 0;
   panel_check_pause();
 }
@@ -338,8 +335,6 @@ void gui_seek_relative (int off_sec) {
 
   if(!xine_play (gGui->xine, gGui->filename, 0, sec))
     gui_handle_xine_error();
-
-  video_window_stream_has_changed();
 
   gGui->ignore_status = 0;
   panel_check_pause();
@@ -376,8 +371,6 @@ void gui_nextprev(xitk_widget_t *w, void *data) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
       if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
 	gui_handle_xine_error();
-
-      video_window_stream_has_changed();
 
     } else {
       gGui->playlist_cur = 0;
