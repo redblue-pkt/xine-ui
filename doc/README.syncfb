@@ -153,8 +153,8 @@
   
 * KNOWN BUGs
 
-  + activating hardware deinterlacing produces a flashing  line  at  the
-    bottom of the picture
+  + toggling hardware deinterlacing fast will result in decreasing image
+    size constantly - bug is located, a fix is being worked on.
 
   + stopping playback doesn't turn off the syncfb overlay
     
