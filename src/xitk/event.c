@@ -33,7 +33,6 @@
 #include <errno.h>
 #include <pthread.h>
 #include <signal.h>
-#include <setjmp.h>
 
 #include "xitk.h"
 
@@ -64,7 +63,6 @@ extern int errno;
  */
 extern gGui_t          *gGui;
 
-static sigjmp_buf       jmp_exit;
 static pid_t            xine_pid;
 
 /* Icon data */
@@ -123,14 +121,18 @@ int config_lookup_int(char *key, int def) {
 
 void config_set_str(char *key, char *value) {
 
-  if(key)
+  if(key) {
     gGui->config->set_str(gGui->config, key, value);
+    config_save();
+  }
 }
 
 void config_set_int(char *key, int value) {
   
-  if(key)
-  gGui->config->set_int(gGui->config, key, value);
+  if(key) {
+    gGui->config->set_int(gGui->config, key, value);
+    config_save();
+  }
 }
 
 void config_save(void) {
@@ -148,39 +150,8 @@ void config_reset(void) {
  */
 static void gui_signal_handler (int sig) {
   pid_t     cur_pid = getppid();
-#ifndef DEBUG
-  XEvent    myevent;
-  Status    status;
-#endif
 
   switch (sig) {
-
-#ifndef DEBUG    
-  case SIGINT: /* External killing request */
-  case SIGTERM:
-  case SIGQUIT:
-    
-    if(cur_pid == xine_pid) {
-      gui_exit(NULL, NULL);
-
-      myevent.type                = MotionNotify;
-      myevent.xmotion.type        = MotionNotify;
-      myevent.xmotion.send_event  = True;
-      myevent.xmotion.display     = gGui->display;
-      myevent.xmotion.window      = gGui->panel_window;
-      myevent.xmotion.root        = DefaultRootWindow(gGui->display);
-      myevent.xmotion.time        = CurrentTime;
-      myevent.xmotion.same_screen = True;
-
-      status = XSendEvent (gGui->display, 
-			   gGui->panel_window, True, KeyPressMask, &myevent);
-      
-      XFlush (gGui->display);
-
-      siglongjmp(jmp_exit, 1);
-    }
-    break;
-#endif
 
   case SIGHUP:
     if(cur_pid == xine_pid) {
@@ -212,22 +183,17 @@ void gui_handle_event (XEvent *event) {
   char           kbuf[256];
   int            len;
 
-  video_window_handle_event(event);
-  panel_handle_event(event);
-  playlist_handle_event(event);
-  control_handle_event(event);
-  
   switch(event->type) {
 
   case MappingNotify:
     /* printf ("MappingNotify\n");*/
-    XLockDisplay (gGui->display);
+    XLockDisplay(gGui->display);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUnlockDisplay (gGui->display);
+    XUnlockDisplay(gGui->display);
     break;
 
   case DestroyNotify:
-    printf ("DestroyNotify\n"); 
+    /*  printf ("DestroyNotify\n");  */
     if(event->xany.window == gGui->panel_window
        || event->xany.window == gGui->video_window) {
       xine_exit (gGui->xine);
@@ -235,15 +201,6 @@ void gui_handle_event (XEvent *event) {
     }
     break;
     
-    /* FIXED
-  case VisibilityNotify:
-     FIXME
-    if(event->xany.window == gGui->video_window)
-      xine_window_handle_event(gGui->xine, (void *)event);
-    
-    break;
-    */
-
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
     /* printf ("ButtonPress\n"); */
@@ -584,7 +541,6 @@ void gui_init (int nfiles, char *filenames[]) {
   gGui->video_window_logo_pixmap.height = 
     gGui->video_window_logo_image->rgb_height;
 
-  //  gGui->black = BlackPixel (gGui->display, gGui->screen);
   XAllocNamedColor(gGui->display, 
 		   DefaultColormap(gGui->display, gGui->screen), 
 		   "black", &gGui->black, &dummy);
@@ -605,6 +561,8 @@ void gui_init (int nfiles, char *filenames[]) {
    */
 
   xine_pid = getppid();
+
+  widget_init(gGui->display);
 
   video_window_init ();
   
@@ -641,7 +599,6 @@ void gui_init (int nfiles, char *filenames[]) {
  */
 void gui_run (void) {
   
-  XEvent                myevent;
   struct sigaction      action;
 
   panel_add_autoplay_buttons();
@@ -705,26 +662,6 @@ void gui_run (void) {
   }
 
   /* install sighandler */
-#ifndef DEBUG
-  action.sa_handler = gui_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGINT, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGINT) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = gui_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGTERM, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGTERM) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = gui_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGQUIT, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGQUIT) failed: %s\n", strerror(errno));
-  }
-#endif
   action.sa_handler = gui_signal_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
@@ -756,17 +693,13 @@ void gui_run (void) {
   }
 #endif
 
-  while (gGui->running) {
-    
-    if(sigsetjmp(jmp_exit, 1) != 0)
-      goto loop_end;
-
-    XNextEvent (gGui->display, &myevent) ;
-    
-    gui_handle_event (&myevent) ;
-  }
+  //global event handler
+  gGui->widget_key = widget_register_event_handler("NO WINDOW", None,
+						   gui_handle_event, 
+						   NULL,
+						   gui_dndcallback, NULL);
   
- loop_end: /* Killed by signal */
+  widget_run();
   
   /*
    * Restore screensaver parameters

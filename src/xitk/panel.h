@@ -26,6 +26,28 @@
 #ifndef PANEL_H
 #define PANEL_H
 
+#include "xitk.h"
+
+typedef struct {
+  widget_list_t   *widget_list;
+  
+  widget_t        *title_label;
+  widget_t        *runtime_label;
+  widget_t        *slider_play;
+  widget_t        *slider_mixer;
+  widget_t        *checkbox_pause;
+  int              visible;
+  char             runtime[20];
+  char             audiochan[20];
+  widget_t        *audiochan_label;
+  char             spuid[20];
+  widget_t        *spuid_label;
+  ImlibImage      *bg_image;
+#define MAX_UPDSLD 25
+  int              slider_timer; /* repaint slider if slider_timer<=0 */
+  widgetkey_t      widget_key;
+} _panel_t;
+
 void panel_init (void) ;
 
 void panel_add_autoplay_buttons(void);

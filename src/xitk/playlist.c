@@ -44,28 +44,44 @@
 
 extern gGui_t        *gGui;
 
-static widget_t       *pl_list = NULL;
+typedef struct {
+  Window              window;
+  widget_t           *playlist;
+  ImlibImage         *bg_image;
+  widget_list_t      *widget_list;
+  
+  int                 running;
+  int                 visible;
+  widgetkey_t         widget_key;
+} _playlist_t;
 
-static Window          pl_win;
-static DND_struct_t    xdnd_pl_win;
-static ImlibImage     *pl_bg_image;
-static gui_move_t      pl_move; 
-static widget_list_t  *pl_widget_list;
-
-static int             pl_running;
-static int             pl_panel_visible;
+static _playlist_t   *playlist;
 
 #define MOVEUP 1
 #define MOVEDN 2
 
 #define PL_FILENAME  ".xinepl"
 
+
+void playlist_handle_event(XEvent *event);
+
+/*
+ * Toolkit event handler will call this function with new
+ * coords of playlist window.
+ */
+static void playlist_store_new_position(int x, int y, int w, int h) {
+
+  config_set_int("playlist_x", x);
+  config_set_int("playlist_y", y);
+}
+
 /*
  *
  */
 void pl_update_playlist(void) {
 
-  browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
+  browser_update_list(playlist->playlist, 
+		      gGui->playlist, gGui->playlist_num, 0);
 }
 
 /*
@@ -82,18 +98,23 @@ static void handle_selection(widget_t *w, void *data) {
  */
 void pl_exit(widget_t *w, void *data) {
 
-  pl_running = 0;
-  pl_panel_visible = 0;
+  playlist->running = 0;
+  playlist->visible = 0;
 
-  XUnmapWindow(gGui->display, pl_win);
+  widget_unregister_event_handler(&playlist->widget_key);
+  XUnmapWindow(gGui->display, playlist->window);
 
-  gui_list_free(pl_widget_list->l);
-  free(pl_widget_list);
-  pl_widget_list = NULL;
+  XDestroyWindow(gGui->display, playlist->window);
+  XFlush(gGui->display);
 
-  XDestroyWindow(gGui->display, pl_win);
+  Imlib_destroy_image(gGui->imlib_data, playlist->bg_image);
+  playlist->window = None;
+  gui_list_free(playlist->widget_list->l);
+  free(playlist->widget_list->gc);
+  free(playlist->widget_list);
 
-  pl_win = 0;
+  free(playlist);
+  playlist = NULL;
 }
 
 /*
@@ -102,7 +123,7 @@ void pl_exit(widget_t *w, void *data) {
 static void pl_play(widget_t *w, void *data) {
   int j;
   
-  j = browser_get_current_selected(pl_list);
+  j = browser_get_current_selected(playlist->playlist);
 
   if(j>=0 && gGui->playlist[j] != NULL) {
     
@@ -113,7 +134,7 @@ static void pl_play(widget_t *w, void *data) {
     gGui->playlist_cur = j;
     
     gui_play(NULL, NULL);
-    browser_release_all_buttons(pl_list);
+    browser_release_all_buttons(playlist->playlist);
   }
 }
 
@@ -123,7 +144,7 @@ static void pl_play(widget_t *w, void *data) {
 static void pl_delete(widget_t *w, void *data) {
   int i, j;
 
-  j = browser_get_current_selected(pl_list);
+  j = browser_get_current_selected(playlist->playlist);
   
   if(j >= 0) {
     for(i = j; i < gGui->playlist_num; i++) {
@@ -133,7 +154,7 @@ static void pl_delete(widget_t *w, void *data) {
     if(gGui->playlist_cur) gGui->playlist_cur--;
   }
 
-  browser_rebuild_browser(pl_list, 0);
+  browser_rebuild_browser(playlist->playlist, 0);
   
   if(gGui->playlist_num)
     gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
@@ -155,7 +176,7 @@ static void pl_delete_all(widget_t *w, void *data) {
   gGui->playlist_num = 0;
   gGui->playlist_cur = 0;
 
-  browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
+  browser_update_list(playlist->playlist, gGui->playlist, gGui->playlist_num, 0);
   gui_set_current_mrl(NULL);
 
 }
@@ -166,7 +187,7 @@ static void pl_delete_all(widget_t *w, void *data) {
 static void pl_move_updown(widget_t *w, void *data) {
   int j;
   
-  j = browser_get_current_selected(pl_list);
+  j = browser_get_current_selected(playlist->playlist);
   
   if((j >= 0) && gGui->playlist[gGui->playlist_cur] != NULL) {
     
@@ -188,15 +209,15 @@ static void pl_move_updown(widget_t *w, void *data) {
       for(i=0; i<gGui->playlist_num; i++)
 	gGui->playlist[i] = tmplist[i];
 
-      if(j > MAX_LIST || (browser_get_current_start(pl_list) != 0)) {
+      if(j > MAX_LIST || (browser_get_current_start(playlist->playlist) != 0)) {
 	j -= ((MAX_LIST-1)/2);
-	browser_rebuild_browser(pl_list, j);
-	browser_set_select(pl_list, ((MAX_LIST-1)/2)-1);
+	browser_rebuild_browser(playlist->playlist, j);
+	browser_set_select(playlist->playlist, ((MAX_LIST-1)/2)-1);
       }
       else {
-	j = browser_get_current_selected(pl_list);
-	browser_rebuild_browser(pl_list, -1);
-	browser_set_select(pl_list, j-1);
+	j = browser_get_current_selected(playlist->playlist);
+	browser_rebuild_browser(playlist->playlist, -1);
+	browser_set_select(playlist->playlist, j-1);
       }
     }
     else if(((int)data) == MOVEDN && (j < (gGui->playlist_num-1))) {
@@ -218,13 +239,13 @@ static void pl_move_updown(widget_t *w, void *data) {
 	gGui->playlist[i] = tmplist[i];
 
       if(j >= (MAX_LIST-1)) {
-	browser_rebuild_browser(pl_list, j);
-	browser_set_select(pl_list, 1);
+	browser_rebuild_browser(playlist->playlist, j);
+	browser_set_select(playlist->playlist, 1);
       }
       else {
-	j = browser_get_current_selected(pl_list);
-	browser_rebuild_browser(pl_list, -1);
-	browser_set_select(pl_list, j+1);
+	j = browser_get_current_selected(playlist->playlist);
+	browser_rebuild_browser(playlist->playlist, -1);
+	browser_set_select(playlist->playlist, j+1);
       }      
     }
   }
@@ -235,7 +256,10 @@ static void pl_move_updown(widget_t *w, void *data) {
  */
 int pl_is_running(void) {
 
-  return pl_running;
+  if(playlist != NULL)
+    return playlist->running;
+ 
+  return 0;
 }
 
 /*
@@ -243,7 +267,10 @@ int pl_is_running(void) {
  */
 int pl_is_visible(void) {
 
-  return pl_panel_visible;
+  if(playlist != NULL)
+    return playlist->visible;
+
+  return 0;
 }
 
 /*
@@ -295,8 +322,9 @@ static void pl_load_pl(widget_t *w, void *data) {
     for(i = 0; i < tmp_playlist_num; i++)
       gGui->playlist[i] = tmp_playlist[i];
     
-    browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
-    //    browser_rebuild_browser(pl_list, 0);
+    browser_update_list(playlist->playlist, 
+			gGui->playlist, gGui->playlist_num, 0);
+    //    browser_rebuild_browser(playlist->playlist, 0);
   }
   
 }
@@ -369,24 +397,29 @@ void pl_scan_input(widget_t *w, void *ip) {
 	i++;
       }
       
-      browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
+      if(playlist)
+	browser_update_list(playlist->playlist, 
+			    gGui->playlist, gGui->playlist_num, 0);
     }
   }
 }
 
 /*
- * Raise pl_win
+ * Raise playlist->window
  */
 void pl_raise_window(void) {
   
-  if(pl_win) {
-    if(pl_panel_visible && pl_running) {
-      if(pl_running) {
-	XMapRaised(gGui->display, pl_win); 
-  	XSetTransientForHint (gGui->display, pl_win, gGui->video_window);
+  if(playlist != NULL) {
+    if(playlist->window) {
+      if(playlist->visible && playlist->running) {
+	if(playlist->running) {
+	  XMapRaised(gGui->display, playlist->window); 
+	  XSetTransientForHint (gGui->display, 
+				playlist->window, gGui->video_window);
+	}
+      } else {
+	XUnmapWindow (gGui->display, playlist->window);
       }
-    } else {
-      XUnmapWindow (gGui->display, pl_win);
     }
   }
 }
@@ -396,14 +429,17 @@ void pl_raise_window(void) {
  */
 void pl_toggle_visibility (widget_t *w, void *data) {
   
-  if (pl_panel_visible && pl_running) {
-    pl_panel_visible = 0;
-    XUnmapWindow (gGui->display, pl_win);
-  } else {
-    if(pl_running) {
-      pl_panel_visible = 1;
-      XMapRaised(gGui->display, pl_win); 
-      XSetTransientForHint (gGui->display, pl_win, gGui->video_window);
+  if(playlist != NULL) {
+    if (playlist->visible && playlist->running) {
+      playlist->visible = 0;
+      XUnmapWindow (gGui->display, playlist->window);
+    } else {
+      if(playlist->running) {
+	playlist->visible = 1;
+	XMapRaised(gGui->display, playlist->window); 
+	XSetTransientForHint (gGui->display, 
+			      playlist->window, gGui->video_window);
+      }
     }
   }
 }
@@ -412,75 +448,15 @@ void pl_toggle_visibility (widget_t *w, void *data) {
  * Handle X events here.
  */
 void playlist_handle_event(XEvent *event) {
-  XExposeEvent  *myexposeevent;
-  static XEvent *old_event;
-  if(event->xany.window == pl_win || event->xany.window == gGui->video_window) {
-    
-    switch(event->type) {
-    case Expose: {
-      myexposeevent = (XExposeEvent *) event;
-      
-      if(event->xexpose.count == 0) {
-	if (event->xany.window == pl_win)
-	  paint_widget_list (pl_widget_list);
-      }
-    }
+
+  switch(event->type) {
+
+  case MappingNotify:
+    XLockDisplay(gGui->display);
+    XRefreshKeyboardMapping((XMappingEvent *) event);
+    XUnlockDisplay(gGui->display);
     break;
     
-    case MotionNotify:      
-      if (event->xany.window == pl_win) {
-	/* printf ("MotionNotify\n"); */
-	motion_notify_widget_list (pl_widget_list,
-				   event->xbutton.x, event->xbutton.y);
-	/* if window-moving is enabled move the window */
-	old_event = event;
-	if (pl_move.enabled) {
-	  int x,y;
-	  x = (event->xmotion.x_root) 
-	    + (event->xmotion.x_root - old_event->xmotion.x_root) 
-	    - pl_move.offset_x;
-	  y = (event->xmotion.y_root) 
-	    + (event->xmotion.y_root - old_event->xmotion.y_root) 
-	    - pl_move.offset_y;
-	  
-	  if(event->xany.window == pl_win) {
-	    /* FIXME XLOCK (); */
-	    XMoveWindow(gGui->display, pl_win, x, y);
-	    /* FIXME XUNLOCK (); */
-	    config_set_int ("x_playlist",x);
-	    config_set_int ("y_playlist",y);
-	  }
-	}
-      }
-      break;
-      
-    case ButtonPress: {
-      XButtonEvent *bevent = (XButtonEvent *) event;
-      
-      /* if no widget is hit enable moving the window */
-      if(bevent->window == pl_win) {
-	pl_move.enabled = !click_notify_widget_list (pl_widget_list, 
-						     event->xbutton.x, 
-						     event->xbutton.y, 0);
-	if (pl_move.enabled) {
-	  pl_move.offset_x = event->xbutton.x;
-	  pl_move.offset_y = event->xbutton.y;
-	}
-      }
-    }
-    break;
-    
-    case ButtonRelease: {
-      XButtonEvent *bevent = (XButtonEvent *) event;
-      
-      if(bevent->window == pl_win) {
-	click_notify_widget_list (pl_widget_list, event->xbutton.x, 
-				  event->xbutton.y, 1);
-	pl_move.enabled = 0; /* disable moving the window       */
-      }
-      break;
-    }
-    }      
   }
 }
 
@@ -492,48 +468,49 @@ void playlist_editor(void) {
   XSizeHints              hint;
   XWMHints               *wm_hint;
   XSetWindowAttributes    attr;
-  int                     screen;
   char                    title[] = {"Xine Playlist Editor"};
   Atom                    prop;
   MWMHints                mwmhints;
   XClassHint             *xclasshint;
 
   /* This shouldn't be happend */
-  if(pl_win) {
-    /* FIXME XLOCK(); */
-    XMapRaised(gGui->display, pl_win); 
-    /* FIXME  XUNLOCK(); */
-    pl_panel_visible = 1;
-    pl_running = 1;
-    return;
+  if(playlist != NULL) {
+    if(playlist->window)
+      return;
   }
 
-  pl_running = 1;
-  
-  /* FIXME XLOCK(); */
+  playlist = (_playlist_t *) xmalloc(sizeof(_playlist_t));
 
-  if (!(pl_bg_image = Imlib_load_image(gGui->imlib_data,
+  XLockDisplay (gGui->display);
+
+  if (!(playlist->bg_image = Imlib_load_image(gGui->imlib_data,
 				       gui_get_skinfile("PlBG")))) {
     fprintf(stderr, "xine-playlist: couldn't find image for background\n");
     exit(-1);
   }
 
-  screen = DefaultScreen(gGui->display);
-  hint.x = config_lookup_int ("x_playlist", 200);
-  hint.y = config_lookup_int ("y_playlist", 100);
-  hint.width = pl_bg_image->rgb_width;
-  hint.height = pl_bg_image->rgb_height;
+  hint.x = config_lookup_int ("playlist_x", 200);
+  hint.y = config_lookup_int ("playlist_y", 100);
+  hint.width = playlist->bg_image->rgb_width;
+  hint.height = playlist->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
-  pl_win = XCreateWindow (gGui->display, DefaultRootWindow(gGui->display), 
-			  hint.x, hint.y, hint.width, hint.height, 0, 
-			  CopyFromParent, CopyFromParent, 
-			  CopyFromParent,
-			  0, &attr);
+  playlist->window = XCreateWindow (gGui->display, 
+				    DefaultRootWindow(gGui->display), 
+				    hint.x, hint.y, hint.width, 
+				    hint.height, 0, 
+				    gGui->imlib_data->x.depth, CopyFromParent, 
+				    gGui->imlib_data->x.visual,
+				    0, &attr);
   
-  XSetStandardProperties(gGui->display, pl_win, title, title,
+  XSetStandardProperties(gGui->display, playlist->window, title, title,
 			 None, NULL, 0, &hint);
+  
+  XSelectInput(gGui->display, playlist->window,
+	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
+	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+  
   /*
    * wm, no border please
    */
@@ -542,56 +519,46 @@ void playlist_editor(void) {
   mwmhints.flags = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
 
-  XChangeProperty(gGui->display, pl_win, prop, prop, 32,
+  XChangeProperty(gGui->display, playlist->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  XSetTransientForHint (gGui->display, pl_win, gGui->video_window);
+  XSetTransientForHint (gGui->display, playlist->window, gGui->video_window);
 
   /* set xclass */
 
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = "Xine Playlist Editor";
     xclasshint->res_class = "Xine";
-    XSetClassHint(gGui->display, pl_win, xclasshint);
+    XSetClassHint(gGui->display, playlist->window, xclasshint);
   }
-
-  gc = XCreateGC(gGui->display, pl_win, 0, 0);
-
-  XSelectInput(gGui->display, pl_win,
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
-	       | KeyPressMask | ExposureMask | StructureNotifyMask);
 
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
     wm_hint->flags = InputHint | StateHint;
-    XSetWMHints(gGui->display, pl_win, wm_hint);
+    XSetWMHints(gGui->display, playlist->window, wm_hint);
     XFree(wm_hint);
   }
   
-  Imlib_apply_image(gGui->imlib_data, pl_bg_image, pl_win);
-  XSync(gGui->display, False); 
-
-  /* FIXME XUNLOCK (); */
+  gc = XCreateGC(gGui->display, playlist->window, 0, 0);
   
-  dnd_init_dnd(gGui->display, &xdnd_pl_win);
-  dnd_set_callback (&xdnd_pl_win, gui_dndcallback);
-  dnd_make_window_aware (&xdnd_pl_win, pl_win);
+  Imlib_apply_image(gGui->imlib_data, playlist->bg_image, playlist->window);
+  XSync(gGui->display, False); 
 
   /*
    * Widget-list
    */
-  pl_widget_list = (widget_list_t *) xmalloc (sizeof (widget_list_t));
-  pl_widget_list->l = gui_list_new ();
-  pl_widget_list->focusedWidget = NULL;
-  pl_widget_list->pressedWidget = NULL;
-  pl_widget_list->win           = pl_win;
-  pl_widget_list->gc            = gc;
+  playlist->widget_list                = widget_list_new();
+  playlist->widget_list->l             = gui_list_new ();
+  playlist->widget_list->focusedWidget = NULL;
+  playlist->widget_list->pressedWidget = NULL;
+  playlist->widget_list->win           = playlist->window;
+  playlist->widget_list->gc            = gc;
 
-  gui_list_append_content (pl_widget_list->l, 
-			   create_label_button (gGui->display, 
+  gui_list_append_content (playlist->widget_list->l, 
+			    create_label_button (gGui->display, 
 						gGui->imlib_data, 
 						gui_get_skinX("PlMoveUp"),
 						gui_get_skinY("PlMoveUp"),
@@ -602,7 +569,7 @@ void playlist_editor(void) {
 						gui_get_fcolor("PlMoveUp"),
 						gui_get_ccolor("PlMoveUp")));
 
-  gui_list_append_content (pl_widget_list->l, 
+  gui_list_append_content (playlist->widget_list->l, 
 			   create_label_button (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlMoveDn"),
@@ -614,7 +581,7 @@ void playlist_editor(void) {
 						gui_get_fcolor("PlMoveDn"),
 						gui_get_ccolor("PlMoveDn")));
 
-  gui_list_append_content (pl_widget_list->l, 
+  gui_list_append_content (playlist->widget_list->l, 
 			   create_label_button (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlPlay"),
@@ -626,7 +593,7 @@ void playlist_editor(void) {
 						gui_get_fcolor("PlPlay"),
 						gui_get_ccolor("PlPlay")));
 
-  gui_list_append_content (pl_widget_list->l, 
+  gui_list_append_content (playlist->widget_list->l, 
 			   create_label_button (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlDelete"),
@@ -638,7 +605,7 @@ void playlist_editor(void) {
 						gui_get_fcolor("PlDelete"),
 						gui_get_ccolor("PlDelete")));
 
-  gui_list_append_content (pl_widget_list->l, 
+  gui_list_append_content (playlist->widget_list->l, 
 			   create_label_button (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlDeleteAll"),
@@ -650,7 +617,7 @@ void playlist_editor(void) {
 						gui_get_fcolor("PlDeleteAll"),
 						gui_get_ccolor("PlDeleteAll")));
 
-  gui_list_append_content (pl_widget_list->l, 
+  gui_list_append_content (playlist->widget_list->l, 
 			   create_label_button (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlLoad"),
@@ -662,7 +629,7 @@ void playlist_editor(void) {
 						gui_get_fcolor("PlLoad"),
 						gui_get_ccolor("PlLoad")));
 
-  gui_list_append_content (pl_widget_list->l, 
+  gui_list_append_content (playlist->widget_list->l, 
 			   create_label_button (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlSave"),
@@ -674,7 +641,7 @@ void playlist_editor(void) {
 						gui_get_fcolor("PlSave"),
 						gui_get_ccolor("PlSave")));
 
-  gui_list_append_content (pl_widget_list->l, 
+  gui_list_append_content (playlist->widget_list->l, 
 			   create_label_button (gGui->display,
 						gGui->imlib_data, 
 						gui_get_skinX("PlDismiss"),
@@ -687,11 +654,11 @@ void playlist_editor(void) {
 						gui_get_ccolor("PlDismiss")));
 
 
-  gui_list_append_content (pl_widget_list->l, 
-		   (pl_list = 
+  gui_list_append_content (playlist->widget_list->l, 
+		   (playlist->playlist = 
 		    create_browser(gGui->display,
 				   gGui->imlib_data,
-				   pl_widget_list,
+				   playlist->widget_list,
 				   gui_get_skinX("PlUp"),
 				   gui_get_skinY("PlUp"),
 				   gui_get_skinfile("PlUp"),
@@ -711,7 +678,7 @@ void playlist_editor(void) {
 				   9, gGui->playlist_num, gGui->playlist,
 				   handle_selection, NULL)));
   
-  gui_list_append_content (pl_widget_list->l,
+  gui_list_append_content (playlist->widget_list->l,
 			   create_label (gGui->display, gGui->imlib_data, 
 					 gui_get_skinX("AutoPlayLbl"),
 					 gui_get_skinY("AutoPlayLbl"),
@@ -728,7 +695,7 @@ void playlist_editor(void) {
     y = gui_get_skinY("AutoPlayBG");
     
     while(autoplay_plugins[i] != NULL) {
-      gui_list_append_content (pl_widget_list->l, 
+      gui_list_append_content (playlist->widget_list->l,
 	       (tmp =
 		create_label_button (gGui->display, gGui->imlib_data, 
 				     x, y,
@@ -743,10 +710,22 @@ void playlist_editor(void) {
       i++;
     }
   }
-  browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
-  
-  XMapRaised(gGui->display, pl_win); 
-  
-  pl_panel_visible = 1;
-  
+  browser_update_list(playlist->playlist, 
+		      gGui->playlist, gGui->playlist_num, 0);
+
+  XMapRaised(gGui->display, playlist->window); 
+
+  playlist->widget_key = 
+    widget_register_event_handler("playlist", 
+				  playlist->window, 
+				  playlist_handle_event,
+				  playlist_store_new_position,
+				  gui_dndcallback,
+				  playlist->widget_list);
+
+  playlist->visible = 1;
+  playlist->running = 1;
+   
+  XUnlockDisplay (gGui->display);
+  XSync(gGui->display, False);
 }

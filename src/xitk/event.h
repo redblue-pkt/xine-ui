@@ -80,16 +80,12 @@ typedef struct {
   int                  lirc_enable;
 #endif
 
+  widgetkey_t          widget_key;
+
 } gGui_t;
 
 
 char *gui_get_skindir(const char file[]);
-
-typedef struct gui_move_s {
-    int enabled;
-    int offset_x;
-    int offset_y;
-} gui_move_t;
 
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5

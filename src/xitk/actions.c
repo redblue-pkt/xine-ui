@@ -60,6 +60,7 @@ void gui_exit (widget_t *w, void *data) {
     deinit_lirc();
   }
 #endif
+  widget_stop();
 }
 
 void gui_play (widget_t *w, void *data) {

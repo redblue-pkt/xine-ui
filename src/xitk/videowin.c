@@ -59,13 +59,29 @@ typedef struct {
   int            depth;
   int            show;
   XWMHints      *wm_hint;
-  DND_struct_t   xdnd;
+
+  widgetkey_t    widget_key;
+  widgetkey_t    old_widget_key;
 
   int            completion_event;
 
 } gVw_t;
 
 static gVw_t    *gVw;
+
+void video_window_handle_event (XEvent *);
+
+#ifndef XShmGetEventBase
+extern int XShmGetEventBase(Display *);
+#endif
+
+/*
+ * Will called by toolkit on every move/resize event.
+ */
+void video_window_change_sizepos(int x, int y, int w, int h) {
+  
+  //  printf("video window change: %d %d %d %d\n", x, y, w, h);
+}
 
 /*
  *
@@ -110,6 +126,9 @@ void video_window_draw_logo(void) {
   XUnlockDisplay (gGui->display);
 }
 
+/*
+ * Hide the logo in video output window.
+ */
 void video_window_hide_logo(void) {
 
   XLockDisplay (gGui->display);
@@ -123,6 +142,9 @@ void video_window_hide_logo(void) {
 				      */
 }
 
+/*
+ * Show the logo in video output window.
+ */
 void video_window_show_logo(void) {
 
   XLockDisplay (gGui->display);
@@ -211,6 +233,7 @@ void video_window_adapt_size (int video_width, int video_height,
 	return;
       }
 
+      widget_unregister_event_handler(&gVw->old_widget_key);
       old_video_window = gGui->video_window;
     }
 
@@ -254,12 +277,6 @@ void video_window_adapt_size (int video_width, int video_height,
     XSetTransientForHint(gGui->display, gGui->video_window, None);
     XRaiseWindow(gGui->display, gGui->video_window);
 
-    /*
-     * drag and drop
-     */
-    
-    dnd_make_window_aware (&gVw->xdnd, gGui->video_window);
-
   } else {
 
     *dest_width  = gVw->video_width;
@@ -267,8 +284,10 @@ void video_window_adapt_size (int video_width, int video_height,
 
     if (gGui->video_window) {
 
-      if (gVw->fullscreen_mode)
+      if (gVw->fullscreen_mode) {
+	widget_unregister_event_handler(&gVw->old_widget_key);
 	old_video_window = gGui->video_window;
+      }
       else {
 	
 	XResizeWindow (gGui->display, gGui->video_window, 
@@ -314,12 +333,6 @@ void video_window_adapt_size (int video_width, int video_height,
 
     XSetWMHints(gGui->display, gGui->video_window, gVw->wm_hint);
 
-    /*
-     * drag and drop
-     */
-    
-    dnd_make_window_aware (&gVw->xdnd, gGui->video_window);
-      
     /* Tell other applications about gGui window */
 
     XSetStandardProperties(gGui->display, gGui->video_window, 
@@ -366,15 +379,20 @@ void video_window_adapt_size (int video_width, int video_height,
     XMoveWindow (gGui->display, gGui->video_window, 0, 0);
   }
 
-  XUnlockDisplay (gGui->display);
-
-  dnd_init_dnd(gGui->display, &gVw->xdnd);
-  dnd_set_callback (&gVw->xdnd, gui_dndcallback);
-  dnd_make_window_aware (&gVw->xdnd, gGui->video_window);
 
   /* The old window should be destroyed now */
   if(old_video_window != None)
     XDestroyWindow(gGui->display, old_video_window);
+
+  gVw->old_widget_key = gVw->widget_key;
+  gVw->widget_key = widget_register_event_handler("video_window", 
+						  gGui->video_window, 
+						  video_window_handle_event,
+						  video_window_change_sizepos,
+						  gui_dndcallback,
+						  NULL);
+  
+  XUnlockDisplay (gGui->display);
 }
 
 /*
@@ -426,10 +444,11 @@ void video_window_init (void) {
 
   gVw = (gVw_t *) xmalloc(sizeof(gVw_t));
 
-  gVw->fullscreen_req  = 0;
-  gVw->fullscreen_mode = 0;
-  gGui->video_window   = 0;
-  gVw->show            = 1;
+  gVw->fullscreen_req                   = 0;
+  gVw->fullscreen_mode                  = 0;
+  gGui->video_window                    = None;
+  gVw->show                             = 1;
+  gVw->widget_key = gVw->old_widget_key = 0;
 
   XLockDisplay (gGui->display);
 
@@ -586,9 +605,6 @@ void video_window_handle_event (XEvent *event) {
     }
     break;
     
-  case ClientMessage:
-    dnd_process_client_message (&gVw->xdnd, event);
-    break;
   }
 
   if (event->type == gVw->completion_event) 

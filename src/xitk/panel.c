@@ -29,116 +29,118 @@
 
 #include "xitk.h"
 
+#include "utils.h"
+
 #include "event.h"
 #include "actions.h"
 #include "control.h"
 #include "playlist.h"
 #include "videowin.h"
 #include "parseskin.h"
+#include "panel.h"
 
-extern gGui_t          *gGui;
+extern gGui_t     *gGui;
 
-widget_list_t          *panel_widget_list;
+_panel_t          *panel;
 
-static widget_t        *panel_title_label;
-static widget_t        *panel_runtime_label;
-static widget_t        *panel_slider_play;
-static widget_t        *panel_slider_mixer;
-widget_t               *panel_checkbox_pause;
-static int              panel_visible;
-static char             panel_runtime[20];
-static gui_move_t       panel_move; 
-static char             panel_audiochan[20];
-static widget_t        *panel_audiochan_label;
-static char             panel_spuid[20];
-static widget_t        *panel_spuid_label;
-static ImlibImage      *panel_bg_image;
-#define MAX_UPDSLD 25
-static int              panel_slider_timer; /* repaint slider if slider_timer<=0 */
-
+/*
+ * Toolkit event handler will call this function with new
+ * coords of panel window.
+ */
+static void panel_store_new_position(int x, int y, int w, int h) {
+ 
+  config_set_int("panel_x", x);
+  config_set_int("panel_y", y);
+}
 
 int panel_is_visible(void) {
-  return panel_visible;
+
+  if(panel)
+    return panel->visible;
+
+  return 0;
 }
 
 void panel_toggle_visibility (widget_t *w, void *data) {
 
   pl_toggle_visibility(NULL, NULL);
 
-  if(!panel_visible && control_is_visible()) {}
+  if(!panel->visible && control_is_visible()) {}
   else control_toggle_panel_visibility(NULL, NULL);
 
-  if (panel_visible) {
+  if (panel->visible) {
     
     if (video_window_is_visible ()) {
-      panel_visible = 0;
+      panel->visible = 0;
       XUnmapWindow (gGui->display, gGui->panel_window);
     }
     
   } else {
 
-    panel_visible = 1;
+    panel->visible = 1;
     XMapRaised(gGui->display, gGui->panel_window); 
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
 
   }
 
-  video_window_set_cursor_visibility (panel_visible);
-
-  config_set_int("open_panel", panel_visible);
-
+  video_window_set_cursor_visibility (panel->visible);
+  
+  config_set_int("open_panel", panel->visible);
+  
 }
 
 void panel_check_pause(void) {
   
-  checkbox_set_state(panel_checkbox_pause, ((xine_get_status(gGui->xine)==XINE_PAUSE)?1:0), 
-		     gGui->panel_window, panel_widget_list->gc);
+  checkbox_set_state(panel->checkbox_pause, 
+		     ((xine_get_status(gGui->xine)==XINE_PAUSE)?1:0), 
+		     gGui->panel_window, panel->widget_list->gc);
 
 }
 
-void panel_reset_slider () {
-  slider_reset(panel_widget_list, panel_slider_play);
+void panel_reset_slider (void) {
+  slider_reset(panel->widget_list, panel->slider_play);
 }
 
-void panel_update_channel_display () {
+void panel_update_channel_display (void) {
 
-  sprintf (panel_audiochan, "%3d", xine_get_audio_channel(gGui->xine));
-  label_change_label (panel_widget_list, panel_audiochan_label, panel_audiochan);
+  sprintf (panel->audiochan, "%3d", xine_get_audio_channel(gGui->xine));
+  label_change_label (panel->widget_list, panel->audiochan_label, 
+		      panel->audiochan);
 
   if(xine_get_spu_channel(gGui->xine) >= 0) 
-    sprintf (panel_spuid, "%3d", xine_get_spu_channel (gGui->xine));
+    sprintf (panel->spuid, "%3d", xine_get_spu_channel (gGui->xine));
   else 
-    sprintf (panel_spuid, "%3s", "off");
+    sprintf (panel->spuid, "%3s", "off");
 
-  label_change_label (panel_widget_list, panel_spuid_label, panel_spuid);
+  label_change_label (panel->widget_list, panel->spuid_label, panel->spuid);
 }
 
 void panel_update_mrl_display (void) {
-  label_change_label (panel_widget_list, panel_title_label, gGui->filename);
+  label_change_label (panel->widget_list, panel->title_label, gGui->filename);
 }
 
 void panel_update_slider (void) {
 
   if (panel_is_visible()) {
-    if(panel_slider_timer > MAX_UPDSLD) {
-      slider_set_pos(panel_widget_list, panel_slider_play, 
+    if(panel->slider_timer > MAX_UPDSLD) {
+      slider_set_pos(panel->widget_list, panel->slider_play, 
 		     xine_get_current_position(gGui->xine));
     
-      panel_slider_timer = 0;
+      panel->slider_timer = 0;
     }
-    panel_slider_timer++;
+    panel->slider_timer++;
   }
 }
 
 static void panel_slider_cb(widget_t *w, void *data, int pos) {
 
-  if(w == panel_slider_play) {
+  if(w == panel->slider_play) {
     gui_set_current_position (pos);
     if(xine_get_status(gGui->xine) != XINE_PLAY)
-      slider_reset(panel_widget_list, panel_slider_play);
+      slider_reset(panel->widget_list, panel->slider_play);
   }
-  else if(w == panel_slider_mixer) {
+  else if(w == panel->slider_mixer) {
     // TODO
   }
   else
@@ -152,78 +154,14 @@ static void panel_slider_cb(widget_t *w, void *data, int pos) {
  */
 void panel_handle_event(XEvent *event) {
 
-  XExposeEvent  *myexposeevent;
-  static XEvent *old_event;
+  switch(event->type) {
 
-  if(event->xany.window == gGui->panel_window || event->xany.window == gGui->video_window) {
-    
-    switch(event->type) {
-    case Expose: {
-      myexposeevent = (XExposeEvent *) event;
-      
-      if(event->xexpose.count == 0) {
-	if (event->xany.window == gGui->panel_window)
-	  paint_widget_list (panel_widget_list);
-      }
-    }
+  case MappingNotify:
+    XLockDisplay(gGui->display);
+    XRefreshKeyboardMapping((XMappingEvent *) event);
+    XUnlockDisplay(gGui->display);
     break;
     
-    case MotionNotify:      
-
-      if(event->xany.window == gGui->panel_window) {
-
-	/* printf ("MotionNotify\n"); */
-	motion_notify_widget_list (panel_widget_list,
-				   event->xbutton.x, event->xbutton.y);
-	/* if window-moving is enabled move the window */
-	old_event = event;
-	if (panel_move.enabled) {
-	  int x,y;
-	  x = (event->xmotion.x_root) 
-	    + (event->xmotion.x_root - old_event->xmotion.x_root) 
-	    - panel_move.offset_x;
-	  y = (event->xmotion.y_root) 
-	    + (event->xmotion.y_root - old_event->xmotion.y_root) 
-	    - panel_move.offset_y;
-	  
-	  if(event->xany.window == gGui->panel_window) {
-	    XLockDisplay (gGui->display);
-	    XMoveWindow(gGui->display,gGui->panel_window, x, y);
-	    XUnlockDisplay (gGui->display);
-	    config_set_int ("x_panel", x);
-	    config_set_int ("y_panel", y);
-	  }
-	}
-      }
-      break;
-      
-    case ButtonPress: {
-      XButtonEvent *bevent = (XButtonEvent *) event;
-      
-      /* if no widget is hit enable moving the window */
-      if(bevent->window == gGui->panel_window) {
-	panel_move.enabled = !click_notify_widget_list (panel_widget_list, 
-							event->xbutton.x, 
-							event->xbutton.y, 0);
-	if (panel_move.enabled) {
-	  panel_move.offset_x = event->xbutton.x;
-	  panel_move.offset_y = event->xbutton.y;
-	}
-      }
-    }
-    break;
-    
-    case ButtonRelease: {
-      XButtonEvent *bevent = (XButtonEvent *) event;
-      
-      if(bevent->window == gGui->panel_window) {
-	click_notify_widget_list (panel_widget_list, event->xbutton.x, 
-				  event->xbutton.y, 1);
-	panel_move.enabled = 0; /* disable moving the window       */
-      }
-      break;
-    }      
-    }
   }
 }
 
@@ -242,7 +180,7 @@ void panel_add_autoplay_buttons(void) {
   y = gui_get_skinY("AutoPlayGUI");
     
   while(autoplay_plugins[i] != NULL) {
-    gui_list_append_content (panel_widget_list->l,
+    gui_list_append_content (panel->widget_list->l,
 	     (tmp =
 	      create_label_button (gGui->display, gGui->imlib_data, 
 				   x, y,
@@ -275,13 +213,15 @@ void panel_init (void) {
   if (gGui->panel_window)
     return ; /* panel already open  - FIXME: bring to foreground */
 
+  panel = (_panel_t *) xmalloc(sizeof(_panel_t));
+
   XLockDisplay (gGui->display);
   
   /*
    * load bg image before opening window, so we can determine it's size
    */
 
-  if (!(panel_bg_image = 
+  if (!(panel->bg_image = 
 	Imlib_load_image(gGui->imlib_data,
 			 gui_get_skinfile("BackGround")))) {
     fprintf(stderr, "xine-panel: couldn't find image for background\n");
@@ -292,22 +232,18 @@ void panel_init (void) {
    * open the panel window
    */
 
-  hint.x = config_lookup_int ("x_panel", 200);
-  hint.y = config_lookup_int ("y_panel", 100);
-
-  hint.x = 200;
-  hint.y = 100;
-  hint.width = panel_bg_image->rgb_width;
-  hint.height = panel_bg_image->rgb_height;
+  hint.x = config_lookup_int ("panel_x", 200);
+  hint.y = config_lookup_int ("panel_y", 100);
+  hint.width = panel->bg_image->rgb_width;
+  hint.height = panel->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
-  attr.override_redirect = True;
-
-  /*
-  printf ("imlib_data: %d visual : %d\n",gGui->imlib_data,gGui->imlib_data->x.visual);
-  printf ("w : %d h : %d\n",hint.width, hint.height);
+  /*  
+      printf ("imlib_data: %d visual : %d\n",gGui->imlib_data,gGui->imlib_data->x.visual);
+      printf ("w : %d h : %d\n",hint.width, hint.height);
   */
-
+  
+  attr.override_redirect = True;
   gGui->panel_window = XCreateWindow (gGui->display, 
 				      DefaultRootWindow(gGui->display), 
 				      hint.x, hint.y,
@@ -356,6 +292,7 @@ void panel_init (void) {
     wm_hint->icon_pixmap   = gGui->icon;
     wm_hint->flags         = InputHint | StateHint | IconPixmapHint;
     XSetWMHints(gGui->display, gGui->panel_window, wm_hint);
+    XFree(wm_hint); /* CHECKME */
   }
 
   /*
@@ -364,35 +301,24 @@ void panel_init (void) {
   
   gc = XCreateGC(gGui->display, gGui->panel_window, 0, 0);
 
-  Imlib_apply_image(gGui->imlib_data, panel_bg_image, gGui->panel_window);
-  XSync(gGui->display, False); 
-
-  XUnlockDisplay (gGui->display);
-
-  /*
-   * drag and drop
-   */
-  dnd_init_dnd(gGui->display, &gGui->xdnd);
-  dnd_set_callback (&gGui->xdnd, gui_dndcallback);
-  dnd_make_window_aware (&gGui->xdnd, gGui->panel_window); 
-
+  Imlib_apply_image(gGui->imlib_data, panel->bg_image, gGui->panel_window);
 
   /*
    * Widget-list
    */
 
-  panel_widget_list = (widget_list_t *) malloc (sizeof (widget_list_t));
-  panel_widget_list->l = gui_list_new ();
-  panel_widget_list->focusedWidget = NULL;
-  panel_widget_list->pressedWidget = NULL;
-  panel_widget_list->win           = gGui->panel_window;
-  panel_widget_list->gc            = gc;
+  panel->widget_list                = widget_list_new();
+  panel->widget_list->l             = gui_list_new ();
+  panel->widget_list->focusedWidget = NULL;
+  panel->widget_list->pressedWidget = NULL;
+  panel->widget_list->win           = gGui->panel_window;
+  panel->widget_list->gc            = gc;
  
   /* Check and place some extra images on GUI */
-  gui_place_extra_images(panel_widget_list);
+  gui_place_extra_images(panel->widget_list);
 
   //PREV-BUTTON
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("Prev"),
 					  gui_get_skinY("Prev"),
@@ -401,22 +327,22 @@ void panel_init (void) {
 					  gui_get_skinfile("Prev")));
 
   //STOP-BUTTON
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("Stop"),
 					  gui_get_skinY("Stop"), gui_stop, 
 					  NULL, gui_get_skinfile("Stop")));
   
   //PLAY-BUTTON
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("Play"),
 					  gui_get_skinY("Play"), gui_play,
 					  NULL, gui_get_skinfile("Play")));
 
   // PAUSE-BUTTON
-  gui_list_append_content (panel_widget_list->l, 
-			   (panel_checkbox_pause = 
+  gui_list_append_content (panel->widget_list->l, 
+			   (panel->checkbox_pause = 
 			    create_checkbox (gGui->display, gGui->imlib_data, 
 					     gui_get_skinX("Pause"),
 					     gui_get_skinY("Pause"), 
@@ -424,7 +350,7 @@ void panel_init (void) {
 					     gui_get_skinfile("Pause"))));
   
   // NEXT-BUTTON
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("Next"),
 					  gui_get_skinY("Next"),
@@ -432,7 +358,7 @@ void panel_init (void) {
 					  gui_get_skinfile("Next")));
 
   //Eject Button
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("Eject"),
 					  gui_get_skinY("Eject"),
@@ -440,28 +366,28 @@ void panel_init (void) {
 					  gui_get_skinfile("Eject")));
 
   // EXIT-BUTTON
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("Exit"),
 					  gui_get_skinY("Exit"), gui_exit,
 					  NULL, gui_get_skinfile("Exit")));
 
   // Close-BUTTON
-  gui_list_append_content (panel_widget_list->l, 
-			   create_button (gGui->display, gGui->imlib_data, 
+  gui_list_append_content (panel->widget_list->l, 
+			    create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("Close"),
 					  gui_get_skinY("Close"), 
 					  panel_toggle_visibility,
 					  NULL, gui_get_skinfile("Close"))); 
   // Fullscreen-BUTTON
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("FullScreen"),
 					  gui_get_skinY("FullScreen"),
 					  gui_toggle_fullscreen, NULL, 
 					  gui_get_skinfile("FullScreen")));
   // Prev audio channel
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("AudioNext"),
 					  gui_get_skinY("AudioNext"),
@@ -469,7 +395,7 @@ void panel_init (void) {
 					  (void*)GUI_NEXT, 
 					  gui_get_skinfile("AudioNext")));
   // Next audio channel
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("AudioPrev"),
 					  gui_get_skinY("AudioPrev"),
@@ -478,7 +404,7 @@ void panel_init (void) {
 					  gui_get_skinfile("AudioPrev")));
 
   // Prev spuid
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("SpuNext"),
 					  gui_get_skinY("SpuNext"),
@@ -486,7 +412,7 @@ void panel_init (void) {
 					  (void*)GUI_NEXT, 
 					  gui_get_skinfile("SpuNext")));
   // Next spuid
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_button (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("SpuPrev"),
 					  gui_get_skinY("SpuPrev"),
@@ -495,8 +421,8 @@ void panel_init (void) {
 					  gui_get_skinfile("SpuPrev")));
 
   /* LABEL TITLE */
-  gui_list_append_content (panel_widget_list->l,
-			   (panel_title_label = 
+  gui_list_append_content (panel->widget_list->l, 
+			   (panel->title_label = 
 			    create_label (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("TitleLabel"),
 					  gui_get_skinY("TitleLabel"),
@@ -504,36 +430,36 @@ void panel_init (void) {
 					  gui_get_skinfile("TitleLabel"))));
 
   /* runtime label */
-  gui_list_append_content (panel_widget_list->l,
-			   (panel_runtime_label = 
+  gui_list_append_content (panel->widget_list->l, 
+			   (panel->runtime_label = 
 			    create_label (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("TimeLabel"),
 					  gui_get_skinY("TimeLabel"),
-					  8, panel_runtime,
+					  8, panel->runtime,
 					  gui_get_skinfile("TimeLabel"))));
 
   /* Audio channel label */
-  gui_list_append_content (panel_widget_list->l,
-			   (panel_audiochan_label = 
+  gui_list_append_content (panel->widget_list->l, 
+			   (panel->audiochan_label = 
 			    create_label (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("AudioLabel"),
 					  gui_get_skinY("AudioLabel"),
-					  3, panel_audiochan, 
+					  3, panel->audiochan, 
 					  gui_get_skinfile("AudioLabel"))));
 
   /* Spuid label */
-  gui_list_append_content (panel_widget_list->l,
-			   (panel_spuid_label = 
+  gui_list_append_content (panel->widget_list->l, 
+			   (panel->spuid_label = 
 			    create_label (gGui->display, gGui->imlib_data, 
 					  gui_get_skinX("SpuLabel"),
 					  gui_get_skinY("SpuLabel"),
-					  3, panel_spuid, 
+					  3, panel->spuid, 
 					  gui_get_skinfile("SpuLabel"))));
 
   /* SLIDERS */
-  panel_slider_timer = MAX_UPDSLD;
-  gui_list_append_content (panel_widget_list->l,
-			   (panel_slider_play = 
+  panel->slider_timer = MAX_UPDSLD;
+  gui_list_append_content (panel->widget_list->l, 
+			   (panel->slider_play = 
 			    create_slider(gGui->display, gGui->imlib_data, 
 					  HSLIDER,
 					  gui_get_skinX("SliderBGPlay"),
@@ -545,8 +471,8 @@ void panel_init (void) {
 					  panel_slider_cb, NULL)));
 
   /* FIXME: Need to implement mixer control
-  gui_list_append_content (panel_widget_list->l,
-			   (panel_slider_mixer = 
+  gui_list_append_content (panel->widget_list->l, 
+			   (panel->slider_mixer = 
 			    create_slider(gGui->display, gGui->imlib_data, 
 			    VSLIDER, 
 			    gui_get_skinX("SliderBGVol"),
@@ -557,7 +483,7 @@ void panel_init (void) {
 			    panel_slider_cb, NULL)));
   */
 
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_label_button (gGui->display, 
 						gGui->imlib_data, 
 						gui_get_skinX("PlBtn"),
@@ -571,7 +497,7 @@ void panel_init (void) {
 						gui_get_fcolor("PlBtn"),
 						gui_get_ccolor("PlBtn")));
 
-  gui_list_append_content (panel_widget_list->l, 
+  gui_list_append_content (panel->widget_list->l, 
 			   create_label_button (gGui->display, 
 						gGui->imlib_data, 
 						gui_get_skinX("CtlBtn"),
@@ -585,30 +511,28 @@ void panel_init (void) {
 						gui_get_fcolor("CtlBtn"),
 						gui_get_ccolor("CtlBtn")));
 
-  /*
-   * moving the window
-   */
-
-  panel_move.enabled  = 0;
-  panel_move.offset_x = 0;
-  panel_move.offset_y = 0; 
-
   /* 
    * show panel 
    */
 
-  XLockDisplay (gGui->display);
-  
-  if (config_lookup_int("open_panel", 1)) {
+  if (config_lookup_int("panel_visible", 1)) {
     XMapRaised(gGui->display, gGui->panel_window); 
-    panel_visible = 1;
+    panel->visible = 1;
   } 
   else {
-    panel_visible = 0;
+    panel->visible = 0;
   }
 
-  video_window_set_cursor_visibility (panel_visible);
+  panel->widget_key = widget_register_event_handler("panel", 
+						    gGui->panel_window, 
+						    panel_handle_event,
+						    panel_store_new_position,
+						    gui_dndcallback,
+						    panel->widget_list);
+
+  video_window_set_cursor_visibility (panel->visible);
 
   XUnlockDisplay (gGui->display);
+  XSync(gGui->display, False); 
 }
 

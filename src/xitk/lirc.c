@@ -40,12 +40,15 @@
 
 extern gGui_t          *gGui;
 
-extern widget_t        *panel_checkbox_pause;
-extern widget_list_t   *panel_widget_list;
+extern _panel_t        *panel;
 
-struct lirc_config     *xlirc_config;
-int                     lirc_fd;
-pthread_t               lirc_thread;
+typedef struct {
+  struct lirc_config   *config;
+  int                   fd;
+  pthread_t             thread;
+} _lirc_t;
+
+static _lirc_t lirc;
 
 /*
  * Check if rxcmd is present in tockens[] array.
@@ -143,7 +146,7 @@ void *xine_lirc_loop(void *dummy) {
       
       pthread_testcancel();
       
-      while((ret = lirc_code2char(xlirc_config, code, &c)) == 0 
+      while((ret = lirc_code2char(lirc.config, code, &c)) == 0 
 	    && c != NULL) {
 	//fprintf(stdout, "Command Received = '%s'\n", c);
 	
@@ -178,7 +181,7 @@ void *xine_lirc_loop(void *dummy) {
 	    break;
 
 	  case lPAUSE:
-	    gui_pause (panel_checkbox_pause, (void*)(1), 0); 
+	    gui_pause (panel->checkbox_pause, (void*)(1), 0); 
 	    break;
 
 	  case lNEXT:
@@ -250,7 +253,7 @@ void *xine_lirc_loop(void *dummy) {
 	  }*/
 	
       }
-      paint_widget_list (panel_widget_list);
+      paint_widget_list (panel->widget_list);
       free(code);
 
       if(ret == -1) 
@@ -265,19 +268,19 @@ void *xine_lirc_loop(void *dummy) {
 void init_lirc(void) {
   /*  int flags; */
 
-  if((lirc_fd = lirc_init("xine", 1)) == -1) {
+  if((lirc.fd = lirc_init("xine", 1)) == -1) {
     gGui->lirc_enable = 0;
     return;
   }
   /*
   else {
-    flags = fcntl(gGui->lirc_fd, F_GETFL, 0);
+    flags = fcntl(gGui->lirc.fd, F_GETFL, 0);
     if(flags != -1)
-      fcntl(gGui->lirc_fd, F_SETFL, flags|FASYNC|O_NONBLOCK);
+      fcntl(gGui->lirc.fd, F_SETFL, flags|FASYNC|O_NONBLOCK);
   }
   */
 
-  if(lirc_readconfig(NULL, &xlirc_config, NULL) != 0) {
+  if(lirc_readconfig(NULL, &lirc.config, NULL) != 0) {
     gGui->lirc_enable = 0;
     return;
   }
@@ -285,17 +288,17 @@ void init_lirc(void) {
   gGui->lirc_enable = 1;
 
   if(gGui->lirc_enable) {
-    pthread_create (&lirc_thread, NULL, xine_lirc_loop, NULL) ;
+    pthread_create (&lirc.thread, NULL, xine_lirc_loop, NULL) ;
     printf ("gui_main: LIRC thread created\n");
   }
 }
 
 void deinit_lirc(void) {
 
-  pthread_cancel(lirc_thread);
+  pthread_cancel(lirc.thread);
   
   if(gGui->lirc_enable) {
-    lirc_freeconfig(xlirc_config);
+    lirc_freeconfig(lirc.config);
     lirc_deinit();
   }
 }
