@@ -1,7 +1,7 @@
 ##
 ## Process this file with automake to produce Makefile.in
 ##
-EXTRA_DIST = _xine.m4 ORBit.m4 xine.m4
+EXTRA_DIST = _xine.m4 ORBit.m4 xine.m4 aa.m4
 
 debug:
 

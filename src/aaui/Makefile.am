@@ -1,4 +1,4 @@
-CFLAGS = @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @XINE_CFLAGS@ 
+CFLAGS = $(AALIB_CFLAGS) @BUILD_LIB_STATIC@ @GLOBAL_CFLAGS@ @XINE_CFLAGS@
 
 if HAVE_AA
 aa_programs = aaxine
@@ -7,10 +7,11 @@ endif
 bin_PROGRAMS = ${aa_programs} 
 
 aaxine_SOURCES = main.c
-aaxine_LDADD = @XINE_LIBS@  -laa -lm $(THREAD_LIBS) $(DYNAMIC_LD_LIBS) 
+aaxine_LDADD = @XINE_LIBS@ $(AALIB_STATIC_LIBS) \
+	$(THREAD_LIBS) $(DYNAMIC_LD_LIBS) -lm
 
 debug:
-	$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"
+	$(MAKE) CFLAGS="$(AALIB_CFLAGS) $(DEBUG_CFLAGS)"
 
 install-debug: debug
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am

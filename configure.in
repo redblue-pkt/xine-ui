@@ -136,11 +136,8 @@ fi
 dnl
 dnl check for ascii-art library
 dnl
-
-AC_CHECK_LIB(aa, main,
-	AC_DEFINE(HAVE_AA)
-	ac_have_aa="yes",,)
-AM_CONDITIONAL(HAVE_AA, test x$ac_have_aa = "xyes")
+AM_PATH_AALIB(1.2,,)
+AM_CONDITIONAL(HAVE_AA, test x$no_aalib != "xyes")
 
 
 dnl
