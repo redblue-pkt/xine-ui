@@ -366,9 +366,10 @@ static void widget_xevent_notify(XEvent *event) {
 	
 	switch(event->type) {
 	case Expose:
-	  if(fx->widget_list) {// && event->xexpose.count == 0) {
+	  if (fx->widget_list && (event->xexpose.count == 0)) {
 	    paint_widget_list (fx->widget_list);
 	  }
+	  /*
 	  else {
 	    
 	    if(event->xexpose.count > 0) {
@@ -377,6 +378,7 @@ static void widget_xevent_notify(XEvent *event) {
 	    }
 
 	  }
+	  */
 	  break;
 	  
 	case MotionNotify: {
@@ -560,18 +562,21 @@ void widget_run(void) {
   gXitk->running = 1;
 
   while(gXitk->running) {
-    XLOCK(gXitk->display);
+    /* XLOCK(gXitk->display); 
 
-    if(XPending (gXitk->display)) { 
+    if(XPending (gXitk->display)) { */
       XNextEvent (gXitk->display, &myevent) ;
-      XUNLOCK(gXitk->display); 
+      /* XUNLOCK(gXitk->display);  */
       widget_xevent_notify(&myevent);
+      /*
     } else {  
       XUNLOCK(gXitk->display); 
-      usleep(16666); /* 1/60 sec */ 
+      usleep(16666);  1/60 sec 
     } 
+
+    */
   }
-  XUNLOCK(gXitk->display);
+  /*XUNLOCK(gXitk->display); */
 
   gui_list_free(gXitk->list);
   gui_list_free(gXitk->gfx);
