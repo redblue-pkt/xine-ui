@@ -112,7 +112,7 @@ int network_download(const char *url, download_t *download) {
     curl_easy_setopt(curl, CURLOPT_NOPROGRESS, FALSE);
     curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, progress_callback);
     curl_easy_setopt(curl, CURLOPT_PROGRESSDATA, (void *)download);
-
+    
     curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, &error_buffer);
     
     if((res = curl_easy_perform(curl)) != 0) {
