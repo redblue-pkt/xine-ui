@@ -1,0 +1,36 @@
+controlling xine via CORBA:
+---------------------------
+
+[ FIXME: corba support is not known to work as of xine 0.6 ]
+
+xine implements a CORBA server interface to enable remote control and
+scripting. For this, you need ORBit which should already be installed if
+you are using GNOME. Otherwise you can get it from
+
+  http://orbit-resource.sourceforge.net/
+
+Any version of ORBit >= 0.4.0 should work fine.
+
+To enable the CORBA interface, you need to supply the "--enable-corba"
+argument to the ./configure script and recompile xine.
+
+The xine server interface definition can be found in "corba/xine.idl" which
+gets installed to "/usr/share/idl/xine.idl" by default.
+
+To communicate with xine via CORBA, you need to get its IOR (Interoperable
+Object Reference). Upon startup, xine writes it to the file ~/.xine.ior
+where you can read it from. If the ORBit name service is running, xine
+also registers itself there under the name "Xine". Unfortunately, the
+ORBit name server is usually not activated by default. You have to run
+it manually like this:
+
+  orbit-name-server >/tmp/name-service-ior &
+
+See the ORBit docs for more information.
+
+Two example client programs are provided:
+  1. "xine-remote" is an example client written in C which can be used to
+     send play/stop/pause commands to a running instance of xine
+  2. "example.py" is a small Python script that demonstrates how to easily
+     control xine from a scripting language
+
