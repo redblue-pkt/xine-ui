@@ -966,13 +966,11 @@ int main(int argc, char *argv[]) {
   /*
    * init gui
    */
-  
   gui_init(_argc - optind, &_argv[optind], &window_attribute);
 
   /*
    * load and init output drivers
    */
-  
   /* Video out plugin */
   gGui->vo_driver = load_video_out_driver(video_driver_id);
   free(video_driver_id);
@@ -981,11 +979,22 @@ int main(int argc, char *argv[]) {
   gGui->ao_driver = load_audio_out_driver(audio_driver_id);
   free(audio_driver_id);
   
-  
   /*
    * xine init
    */
   xine_init (gGui->xine);
+
+  /*
+   * Setup logo.
+   */
+  gGui->stream = xine_stream_new(gGui->xine, gGui->ao_driver, gGui->vo_driver);
+#warning USE REAL LOGO
+#if 0
+    if(!xine_open(gGui->stream, XINE_LOGO_MRL)) {
+    printf("Can't open the logo\n");
+    exit(1);
+  }
+#endif
 
 #warning FIXME NEWAPI
 #if 0
@@ -1019,7 +1028,6 @@ int main(int argc, char *argv[]) {
   /*
    * hand control over to gui
    */
-
   gui_run();
 
 #ifdef HAVE_ORBIT

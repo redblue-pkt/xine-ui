@@ -257,40 +257,40 @@ static void *slider_loop(void *dummy) {
   
   pthread_detach(pthread_self());
 
-  /* Wait for xine_init() call */
-  while(gGui->xine == NULL)
-    xine_usec_sleep(100000);
-  
   while(gGui->running) {
-    int status = xine_get_status(gGui->stream);
+    int status;
     
-    if(status == XINE_STATUS_PLAY && gGui->ssaver_timeout) {
+    if(gGui->stream) {
+      status = xine_get_status(gGui->stream);
       
-      screensaver_timer++;
-      
-      if(screensaver_timer >= gGui->ssaver_timeout) {
-	screensaver_timer = 0;
-	video_window_reset_ssaver();
-      }
-    }
-
-    if(panel_is_visible()) {
-      if(gGui->xine) {
+      if(status == XINE_STATUS_PLAY && gGui->ssaver_timeout) {
 	
-	if(status == XINE_STATUS_PLAY) {
-	  int pos;
-
-	  xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
-	  xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
+	screensaver_timer++;
+	
+	if(screensaver_timer >= gGui->ssaver_timeout) {
+	  screensaver_timer = 0;
+	  video_window_reset_ssaver();
 	}
-	
-        if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
-          gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
-          xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
-	  panel_check_mute();
-        }
-	if(status != XINE_STATUS_STOP)
-	  panel_update_runtime_display();
+      }
+      
+      if(panel_is_visible()) {
+	if(gGui->xine) {
+	  
+	  if(status == XINE_STATUS_PLAY) {
+	    int pos;
+	    
+	    xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
+	    xitk_slider_set_pos(panel->widget_list, panel->playback_widgets.slider_play, pos);
+	  }
+	  
+	  if(gGui->mixer.caps & (XINE_PARAM_AO_MIXER_VOL | XINE_PARAM_AO_PCM_VOL)) { 
+	    gGui->mixer.volume_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
+	    xitk_slider_set_pos(panel->widget_list, panel->mixer.slider, gGui->mixer.volume_level);
+	    panel_check_mute();
+	  }
+	  if(status != XINE_STATUS_STOP)
+	    panel_update_runtime_display();
+	}
       }
     }
     
