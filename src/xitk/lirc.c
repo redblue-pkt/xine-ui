@@ -98,7 +98,7 @@ static void *xine_lirc_loop(void *dummy) {
 
     select(lirc.fd + 1, &set, NULL, NULL, &tv);
     
-    while(lirc_nextcode(&code) == 0) {
+    while((ret = lirc_nextcode(&code)) == 0) {
 
       if(code == NULL) 
 	break;
@@ -134,6 +134,8 @@ static void *xine_lirc_loop(void *dummy) {
 	break;
 
     }
+    if(ret == -1) 
+      break;
   }
   
   pthread_exit(NULL);

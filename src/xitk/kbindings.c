@@ -869,7 +869,7 @@ static void _kbindings_display_kbindings_to_stream(kbinding_t *kbt, int mode, FI
 	sprintf(buf, "%s\trepeat = 0\n", buf);
 	sprintf(buf, "%s\tconfig = %s\n", buf, k[i]->action);
 	sprintf(buf, "%send\n\n", buf);
-	fprintf(stream, buf);
+	fputs(buf, stream);
 	memset(&buf, 0, sizeof(buf));
       }
     }
