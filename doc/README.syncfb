@@ -15,12 +15,12 @@
   Matrox G200 and newer cards like hardware  deinterlacing, scaling  and
   synchronization of your video output to the vertical retrace  of  your
   monitor - just to name a few. The  plugin  makes  all  those  features
-  available to xine and because all this tasks are done by the  graphics
+  available to xine and because all this tasks are done by  the  graphic
   card there  is  no need for xine to do them in software -- so you save
   precious CPU time which you may gonna need for other things. :-)
   
   Ok ok -- why should you want to have your video output synchronized to
-  the vertical retrace of your monitor?! Well... :)
+  something called the vertical retrace of your monitor?! Well... :)
   
   In order to have an optimal DVD playback the update of the image needs
   to be syncronized with the vertical refresh of the screen.   Otherwise
@@ -30,6 +30,12 @@
   When using this plugin the update of the screen  is  done  during  the
   vertical retrace of your monitor and  those tearing artefacts are gone
   forever.
+  
+  Also the SyncFB kernel module and this plugin totally  by-pass XFree86
+  for anything else but some data gathering routines needed to place the
+  overlay at the right spot.      So on some machines you will gain some
+  performance too because of the different way the SyncFB kernel  module
+  handles your video output.
 
   Last but not least, you may ask what's so special about deinterlacing?
   There are already several deinterlacing methods  available in xine and
@@ -37,8 +43,8 @@
   
   All current deinterlacers in xine are done in software  and  therefore
   will cost you some CPU power. The SyncFB video out plugin will use the
-  hardware deinterlacing support of your graphics card, thus saving your
-  CPU power because everything is done by your graphic processor...
+  hardware deinterlacing support of your graphic card,  thus saving your
+  CPU power because everything is done by your GPU...
 
 
 * WILL IT WORK WITH MY G200/G400/G450/... CARD?
@@ -49,6 +55,9 @@
   
   Nevertheless we have received positive feedback that the SyncFB kernel
   module and this plugin work fine with G450 cards too.
+  
+  If you have got things working on older/newer  chips,  please  let  us
+  know about your success and we will place a note here... :-)
   
 
 * AND HOW DOES IT WORK?
@@ -63,34 +72,51 @@
 
 * OK I HEARD ENOUGH - HOW DO I INSTALL and USE IT? :)
 
-  First of all you will need to get the SyncFB kernel  module  which  is
-  part of the Teletux project. (URL: http://teletux.sourceforge.net)
-  
-  Please note that we do recommend a recent CVS checkout.
-  
-  Once you have got your copy of the  module,  please  read  the  README
-  included with it and follow the compilation instructions.   (usually a
-  normal "make" *should* work out-of-the-box)
-  
-  (Currently you *might* experience some problems with  the  compilation
-   process - we know about it and will try to fix them soon)
+  Currently the Teletux project  which maintains the kernel module seems
+  orphaned and therefore there hasn't been any progress nor release in a
+  fair amount of time. :(  We will try to resolve this situation so that
+  the development continues again. As soon as there are any news on this
+  matter, this README will be updated accordingly.    For the time being
+  you can still use the current Teletux SyncFB kernel module which works
+  just fine, so there is no need to worry. :-)
 
-  Now there are only a few things left for you to do...
+  Back to the original subject.   In order to install and use the SyncFB
+  kernel module,  you  *will*  need a fresh CVS checkout  of the sources
+  because the last official release is rather outdated.
   
-  1) Become root. Hey now you can take over the world *evil laugh* :-)))
-  2) Create a device called /dev/syncfb  ===>  mknod /dev/syncfb c 178 0
-  3) Copy the file "syncfb.o" to your modules directory (usually this is
-     /lib/modules/YOUR_KERNEL_VERSION/) and do a "depmod -a".
-  
-  This should be it.  In order to use the SyncFB kernel module, you will
-  have to load it with the command "insmod syncfb.o" -- please note that
-  it is necessary to load the module like this  every  time  you  reboot
-  your system to use this plugin.
+  This sounds more complicated than it actually is.   You will only have
+  to execute the following two commands to get the sources in  a sub-dir
+  called teletux. When you are asked for password, just press return.
 
-  Now just start xine once with the following parameter: "-V SyncFB" and
-  the SyncFB video out plugin will be used as default plugin.    (please
-  remember to load the SyncFB module before starting xine, otherwise  it
-  will fall back to the Xv video out plugin as default)
+  cvs -d:pserver:anonymous@cvs.teletux.sf.net:/cvsroot/teletux login
+  cvs -d:pserver:anonymous@cvs.teletux.sf.net:/cvsroot/teletux co -P teletux
+
+  Now enter the directory teletux/syncfb, that's where the actual kernel
+  modul sources are located. Before you can compile the module, you will
+  have to change two lines in the Makefile itself to make it work.
+  
+  In the second line, there is a phrase like  "-I/usr/include" which you
+  have to change to "-I/usr/src/linux/include".  In line seven, you need
+  to remove syncfbtv and syncfb_test from the OBJ list.
+
+  Now execute a  "make"  and  the  module  will  be  compiled. Place the
+  resulting syncfb.o in your modules dir which is usually...
+   
+   /lib/modules/KERNEL_VERSION/
+
+  ... and issue a "depmod -a" after it. That's it - the kernel module is
+  installed.  To load the syncfb module, execute "modprobe syncfb" every
+  time you (re)start your computer.   This will automatically create the
+  required /dev/syncfb device if you have devfs support,  otherwise  you
+  need  to  issue  a  "mknod /dev/syncfb c 178 0"  once  to  create  the
+  device yourself permanently.
+  
+  Once the module is loaded, you can start  xine  with  the  "-V SyncFB"
+  option to use this plugin.  xine automatically remembers the video out
+  plugin you last used, so you only have to use this option once too. :)
+  But don't forget, the module *always* has to be already loaded  before
+  you start xine, otherwise xine will fallback to  Xv/XShm or some other
+  available video out plugin.
 
 
 * THE VIDEO IS JERKING - WHAT'S THE MATTER?!
@@ -118,8 +144,7 @@
   So much for the standard disclaimer. :)
 
   Note: If you want to be on the  safe  side,  generate  your  very  own
-        modelines with an application like kvideogen or  use  a  service
-	like http://zaph.com/Modeline/ on the web.
+        modelines with an application like kvideogen for example.
 	
 	Also the modelines may need some fine tuning for your setup. You
 	can use xvidtune (comes with XFree86) to do that.
@@ -153,15 +178,17 @@
   accordingly. So you shouldn't switch down to 1024x768 yourself if  you
   are running 1280x1024 because that  gives  you  a  virtual  screensize
   of 1280x1024 in a resolution of 1024x768 - and the plugin can't handle
-  that - and probably never will.
+  that - and probably never will... ok... never say never. ;)
 
   You may want to have a look at the XF86VidMode support in  xine  which
   will enable on-the-fly resolution switching when activating fullscreen.
 
-  Now back to the question. A screensize of 1024x768 should be it. A DVD
-  is always 720x576 for pal and 720x480 for ntsc. If you've an anamorphe
-  DVD the image only has to be horizontally scaled to get  back  to  the
-  original geometry of 16:9 which is easier to be done.
+  Now back to the question.     A screensize of 800x600 should be it for
+  non-anamorphic DVDs because their resolution is 720x576 for  pal  DVDs
+  and 720x480 for ntsc ones. If you've an anamorphic DVD, you should use
+  a higher resolution - 1024x768 will be best because the image only has
+  to be horizontally scaled to get back to the original geometry of 16:9
+  which is easier to be done.
 
 
 * WHAT ABOUT DEINTERLACING?!
@@ -174,6 +201,9 @@
   and is totally independent from the software deinterlacing in xine. So
   specifing a different deinterlacing method in your .xinerc won't  have
   any effect on this feature.
+  
+  Nevertheless we are thinking about making software  deinterlacing also
+  available as an option. It's on the TODO list... :)
 
 
 * HEY! THE OVERLAY TURNS OFF WHEN THE WINDOW IS PARTLY OFF THE DESKTOP!?
@@ -211,12 +241,14 @@
     with the SyncFB kernel module
     [for now, don't expect this to be fixed soon - sorry]
 
+  + the syncfb kernel module needs updating pretty badly
+
 
 * WHAT IS ON THE TODO LIST?
 
   + fix above listed bugs in the SyncFB kernel module
   
-  + rework this README - at least parts of it
+  + make software deinterlacing available as an option
   
   + RGB support
     (unlikely at the moment because there is no need for it)
