@@ -598,6 +598,30 @@ void gui_execute_action_id(action_id_t action) {
     }
     break;
     
+  case ACTID_ZOOM_IN:
+    gui_change_zoom(1,1);
+    break;
+
+  case ACTID_ZOOM_OUT:
+    gui_change_zoom(-1,-1);
+    break;
+
+  case ACTID_ZOOM_X_IN:
+    gui_change_zoom(1,0);
+    break;
+
+  case ACTID_ZOOM_X_OUT:
+    gui_change_zoom(-1,0);
+    break;
+
+  case ACTID_ZOOM_Y_IN:
+    gui_change_zoom(0,1);
+    break;
+
+  case ACTID_ZOOM_Y_OUT:
+    gui_change_zoom(0,-1);
+    break;
+
   case ACTID_GRAB_POINTER:
     if(!gGui->cursor_grabbed) {
       if(!panel_is_visible())

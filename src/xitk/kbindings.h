@@ -89,7 +89,13 @@ typedef enum {
   ACTID_EVENT_NEXT,
   ACTID_EVENT_ANGLE_NEXT,
   ACTID_EVENT_ANGLE_PRIOR,
-  ACTID_EVENT_SELECT
+  ACTID_EVENT_SELECT,
+  ACTID_ZOOM_IN,
+  ACTID_ZOOM_OUT,
+  ACTID_ZOOM_X_IN,
+  ACTID_ZOOM_X_OUT,
+  ACTID_ZOOM_Y_IN,
+  ACTID_ZOOM_Y_OUT,
 } action_id_t;
   
 kbinding_t *kbindings_init_kbinding(void);

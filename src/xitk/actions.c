@@ -491,3 +491,17 @@ void gui_decrease_audio_volume(void) {
     }
   }
 }
+
+void gui_change_zoom(int zoom_dx, int zoom_dy) {
+  
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_X,
+				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ZOOM_X) + zoom_dx);
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ZOOM_Y,
+				 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_ZOOM_Y) + zoom_dy);
+  
+  if (panel_is_visible())  {
+    XRaiseWindow (gGui->display, gGui->panel_window);
+    XSetTransientForHint (gGui->display, 
+			  gGui->panel_window, gGui->video_window);
+  }
+}
