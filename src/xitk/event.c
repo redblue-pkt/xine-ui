@@ -1188,6 +1188,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   /*
    * init playlist
    */
+  gGui->playlist.cur = -1;
   for (i = 0; i < nfiles; i++) {
     char *file = atoa(filenames[i]);
 
@@ -1747,10 +1748,13 @@ void gui_run(char **session_opts) {
 
     /* User load a playlist on startup */
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) {
-      gGui->playlist.cur = 0;
       gui_set_current_mmk(mediamark_get_current_mmk());
-      if((!is_playback_widgets_enabled()) && gGui->playlist.num)
-	enable_playback_controls(1);
+
+      if(gGui->playlist.num) {
+	gGui->playlist.cur = 0;
+	if(!is_playback_widgets_enabled())
+	  enable_playback_controls(1);
+      }
     }
 
     if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_INTERLEAVE))

@@ -809,10 +809,10 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	mediamark_free_mediamarks();
 	if(mmk)
 	  gGui->playlist.mmk = mmk;
-
-	gGui->playlist.num = new_num;
 	
-	if(new_num)
+	if(!(gGui->playlist.num = new_num))
+	  gGui->playlist.cur = -1;
+	else if(new_num)
 	  gGui->playlist.cur = 0;
       }
       else {
@@ -828,10 +828,9 @@ void gui_eject(xitk_widget_t *w, void *data) {
 	gGui->playlist.mmk = (mediamark_t **) realloc(gGui->playlist.mmk, sizeof(mediamark_t *) * (gGui->playlist.num + 2));
 
 	gGui->playlist.mmk[gGui->playlist.num] = NULL;
-
+	
 	if(gGui->playlist.cur)
 	  gGui->playlist.cur--;
-
       }
 
       if(is_playback_widgets_enabled() && (!gGui->playlist.num))
@@ -847,6 +846,10 @@ void gui_eject(xitk_widget_t *w, void *data) {
     if(gGui->playlist.num)
       goto __remove_current_mrl;
   }
+
+  if(!gGui->playlist.num)
+    gGui->playlist.cur = -1;
+
 }
 
 void gui_toggle_visibility(xitk_widget_t *w, void *data) {
@@ -1333,8 +1336,8 @@ static void *_gui_dndcallback(void *data) {
     playlist_update_playlist();
 
     if(!(gGui->playlist.control & PLAYLIST_CONTROL_IGNORE)) {
-      if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
 
+      if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
 	if((more_than_one > -2) && ((more_than_one + 1) < gGui->playlist.num))
 	  gGui->playlist.cur = more_than_one + 1;
 	else

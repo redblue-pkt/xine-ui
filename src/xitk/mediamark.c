@@ -2584,7 +2584,7 @@ void mediamark_free_mediamarks(void) {
     
     SAFE_FREE(gGui->playlist.mmk);
     gGui->playlist.num = 0;
-    gGui->playlist.cur = 0;
+    gGui->playlist.cur = -1;
   }
 }
 

@@ -236,14 +236,17 @@ void playlist_delete_current(xitk_widget_t *w, void *data) {
     
     gGui->playlist.mmk[gGui->playlist.num] = NULL;
     
-    gGui->playlist.cur = 0;
     
     playlist_update_playlist();
     
-    if(gGui->playlist.num)
+    if(gGui->playlist.num) {
       gui_set_current_mmk(mediamark_get_current_mmk());
+      gGui->playlist.cur = 0;
+    }
     else {
       
+      gGui->playlist.cur = -1;
+
       if(is_playback_widgets_enabled())
 	enable_playback_controls(0);
       
@@ -755,13 +758,8 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	    playlist_update_playlist();
 	    if(playlist != NULL)
 	      xitk_inputtext_change_text(playlist->winput, NULL);
-	    gGui->playlist.cur = 0;
 	  }
 	  
-	  if(!gGui->playlist.num)
-	    gGui->playlist.cur = 0;
-	  
-
 	  stream = xine_stream_new(gGui->xine, gGui->ao_none, gGui->vo_none);
 	  
 	  for (j = 0; j < num_mrls; j++) {
@@ -779,6 +777,8 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	  }
 
 	  xine_dispose(stream);
+	  
+	  gGui->playlist.cur = gGui->playlist.num ? 0 : -1;
 	  
 	  if(gGui->playlist.cur == 0)
 	    gui_set_current_mmk(mediamark_get_current_mmk());

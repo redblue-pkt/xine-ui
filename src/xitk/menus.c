@@ -238,12 +238,10 @@ static void menu_playlist_from(xitk_widget_t *w, xitk_menu_entry_t *me, void *da
     /* Flush playlist in newbie mode */
     if(gGui->smart_mode) {
       mediamark_free_mediamarks();
-      gGui->playlist.cur = 0;
       playlist_update_playlist();
     }
     
-    if(!gGui->playlist.num)
-      gGui->playlist.cur = 0;
+    gGui->playlist.cur = gGui->playlist.num ? 0 : -1;
     
     for (j = 0; j < num_mrls; j++)
       mediamark_append_entry(autoplay_mrls[j], autoplay_mrls[j], NULL, 0, -1, 0, 0);
