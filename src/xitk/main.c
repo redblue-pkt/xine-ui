@@ -690,6 +690,12 @@ static void show_usage (void) {
   printf(_("                               Optional <type> can be:\n"));
   printf(_("                    audio_out, video_out, demux, input, sub, post,\n"));
   printf(_("                    audio_decoder, video_decoder.\n"));
+  printf(_("      --bug-report [=mrl]      Enable bug report mode:\n"));
+  printf(_("                                 This will turn on verbosity, gather all output\n"));
+  printf(_("                                 messages and write them into a file named\n"));
+  printf(_("                                 BUG-REPORT.TXT.\n"));
+  printf(_("                                 If <mrl> is given, xine will play the mrl\n"));
+  printf(_("                                 then quit (like -pq).\n")); 
   printf("\n\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1725,6 +1731,9 @@ int main(int argc, char *argv[]) {
 	  session_argv[session_argv_num] = (char *) xine_xmalloc(strlen(p) + 5);
 	  sprintf(session_argv[session_argv_num], "mrl=%s", p);
 	  session_argv[++session_argv_num]   = NULL;
+
+	  gGui->actions_on_start[aos++] = ACTID_PLAY;
+	  gGui->actions_on_start[aos++] = ACTID_QUIT;
 	}
       }
       break;
