@@ -5,6 +5,7 @@
 EXTRA_DIST = \
 	ORBit.m4 \
 	aa.m4 \
+	caca.m4 \
 	codeset.m4 \
 	gettext.m4 \
 	glibc21.m4 \

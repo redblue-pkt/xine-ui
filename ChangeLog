@@ -8,6 +8,7 @@ xine-ui (0.99.1) unstable; urgency=low
   * Xft support in xitk (thanks to Drew 'dantealiegri' Ogle <dantealiegri@umbc.edu>),
   * fix a problem with special characters in OSD for some locales
   * display offsets on OSD in mm:ss format too, SPU offset reset
+  * enhanced ASCII art frontend for using CACA (Colored ASCII art)
 
 xine-ui (0.9.23) unstable; urgency=low
 

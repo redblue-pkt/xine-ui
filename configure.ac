@@ -350,6 +350,12 @@ dnl
 AM_PATH_AALIB(1.2.0,,)
 AM_CONDITIONAL(HAVE_AA, test x$no_aalib != "xyes")
 
+dnl 
+dnl checks for Color AsCii Art library
+dnl 
+AM_PATH_CACA(0.3,, AC_MSG_RESULT([*** All CACA-dependent parts will be disabled ***]))
+AM_CONDITIONAL(HAVE_CACA, test x$no_caca != "xyes")
+
 dnl option for font sets and multibyte string support
 AC_ARG_ENABLE(mbs, [  --disable-mbs           Disable multibyte string support], echo $enable_mbs, enable_mbs="yes")
 if test "x$enable_mbs" = "xyes"; then

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2003 the xine project
+ * Copyright (C) 2000-2004 the xine project
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -19,12 +19,13 @@
  *
  * $Id$
  *
- * xine main for aalib
+ * xine main for aalib and caca
  *
  * Changes: 
  * - first working version (guenter)
  * - autoquit patch from Jens Viebig (siggi)
  * - more using of aalib, many changes, new api port (daniel)
+ * - added caca (frantisek)
  *
  */
 
@@ -43,7 +44,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#include <aalib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -56,6 +56,14 @@
 #  include <getopt.h>
 #else
 #  include "getopt.h"
+#endif
+
+#ifdef AA
+#  include <aalib.h>
+#endif
+
+#ifdef CACA
+#  include <caca.h>
 #endif
 
 /* Sound mixer capabilities */
@@ -77,7 +85,9 @@ typedef struct {
   int                  logo_mode;
   int                  ignore_next;
   char                *configfile;
+#ifdef AA
   aa_context          *context;
+#endif
   char                *mrl[1024];
   int                  num_mrls;
   int                  current_mrl;
@@ -101,7 +111,23 @@ typedef struct {
 static aaxine_t  aaxine;
 void            *xlib_handle = NULL;
 
-#define CONFIGFILE "aaxine_config"
+#ifdef AA
+#  define CONFIGFILE "aaxine_config"
+
+#  define KEY_UP AA_UP
+#  define KEY_DOWN AA_DOWN
+#  define KEY_LEFT AA_LEFT
+#  define KEY_RIGHT AA_RIGHT
+#endif
+
+#ifdef CACA
+#  define CONFIGFILE "cacaxine_config"
+
+#  define KEY_UP CACA_KEY_UP
+#  define KEY_DOWN CACA_KEY_DOWN
+#  define KEY_LEFT CACA_KEY_LEFT
+#  define KEY_RIGHT CACA_KEY_RIGHT
+#endif
 
 /* options args */
 static const char *short_options = "?h"
@@ -216,9 +242,14 @@ static void config_update_string(char *key, char *string) {
  * Display version.
  */
 static void show_version(void) {
-  
+#ifdef AA
   printf("This is xine (aalib ui) - a free video player v%s\n"
-	 "(c) 2000-2003 by G. Bartsch and the xine project team.\n", VERSION);
+	 "(c) 2000-2004 by G. Bartsch and the xine project team.\n", VERSION);
+#endif
+#ifdef CACA
+  printf("This is xine (caca ui) - a free video player v%s\n"
+	 "(c) 2000-2004 The xine Team.\n", VERSION);
+#endif
 }
 
 /*
@@ -263,13 +294,19 @@ static void print_usage (void) {
   xine = xine_new();
   xine_config_load(xine, configfile);
   xine_init(xine);
-  
+
+#ifdef AA
   printf("usage: aaxine [aalib-options] [aaxine-options] mrl ...\n"
 	 "aalib-options:\n"
 	 "%s", aa_help);
   printf("\n");
-  printf("  -v, --version                Display version.\n");
   printf("AAXINE options:\n");
+#endif
+#ifdef CACA
+  printf("usage: cacaxine [cacaxine-options] mrl ...\n");
+  printf("CACAXINE options:\n");
+#endif
+  printf("  -v, --version                Display version.\n");
   printf("  -q, --auto-quit              Quit after playing all mrl's.\n");
   printf("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n");
   printf("                               ");
@@ -490,9 +527,11 @@ static void aaxine_event_listener(void *user_data, const xine_event_t *event) {
   }
 }
 
+#ifdef AA
 static void aaxine_resize_handler(aa_context *context) {
   aa_resize(context);
 }
+#endif
 
 /*
  * Seek in current stream.
@@ -530,6 +569,31 @@ static void xinit_thread(void) {
      printf("dlopen() failed: %s\n", dlerror());
 }
 
+int aaxine_get_key_event() {
+#ifdef AA
+  int key;
+
+  key = AA_NONE;
+  while(((key = aa_getevent(aaxine.context, 0)) == AA_NONE) && aaxine.running)
+    usleep(50000);
+
+  if (key >= AA_RELEASE || key == AA_NONE) return 0;
+
+  return key;
+#endif
+
+#ifdef CACA
+  unsigned int key;
+
+  key = CACA_EVENT_NONE;
+  while (((key = caca_get_event(CACA_EVENT_KEY_PRESS)) == CACA_EVENT_NONE) && aaxine.running)
+    usleep(50000);
+
+  if (!aaxine.running) return 0;
+  return key & ~CACA_EVENT_ANY;
+#endif
+}
+
 /*
  * Errrr, i forget my mind ;-).
  */
@@ -564,6 +628,7 @@ int main(int argc, char *argv[]) {
   aaxine.post_running = 0;
   aaxine.post_plugin_name = NULL;
 
+#ifdef AA
   /* 
    * AALib help and option-parsing
    */
@@ -571,6 +636,7 @@ int main(int argc, char *argv[]) {
     print_usage();
     goto failure;
   }
+#endif
 
   /*
    * parse command line
@@ -691,7 +757,8 @@ int main(int argc, char *argv[]) {
    */
   if(getenv("DISPLAY"))
     xinit_thread();
-  
+
+#ifdef AA
   /*
    * Initialize AALib
    */
@@ -715,7 +782,7 @@ int main(int argc, char *argv[]) {
   aa_hidecursor(aaxine.context);
   aa_resizehandler(aaxine.context, aaxine_resize_handler);
   /*
-   * init video output driver
+   * init aalib video output driver
    */
   if(!video_driver_id)
     video_driver_id = "aa";
@@ -724,7 +791,21 @@ int main(int argc, char *argv[]) {
 					  video_driver_id,
 					  XINE_VISUAL_TYPE_AA, 
 					  (void *)aaxine.context);
+#endif
+
+#ifdef CACA
+  /*
+   * init caca video output driver
+   */
+  if(!video_driver_id)
+    video_driver_id = "caca";
   
+  aaxine.vo_port = xine_open_video_driver(aaxine.xine,
+					  video_driver_id,
+					  XINE_VISUAL_TYPE_CACA,
+					  NULL);
+#endif
+
   if (!aaxine.vo_port) {
     aaxine.vo_port = xine_open_video_driver(aaxine.xine, 
 					    video_driver_id,
@@ -824,6 +905,7 @@ int main(int argc, char *argv[]) {
   /* Select audio channel */
   xine_set_param(aaxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
 
+#ifdef AA
   /* Kick off terminal pollution */
   if((!aaxine.debug_messages)
      && ((!strcasecmp(aaxine.context->driver->shortname, "linux"))
@@ -837,6 +919,7 @@ int main(int argc, char *argv[]) {
 	printf("cannot dup2 stdout");
     }
   }
+#endif
   
   aaxine.event_queue = xine_event_new_queue(aaxine.stream);
   xine_event_create_listener_thread(aaxine.event_queue, aaxine_event_listener, NULL);
@@ -851,16 +934,12 @@ int main(int argc, char *argv[]) {
   aaxine.running = 1;
 
   while (aaxine.running) {
-    
-    key = AA_NONE;
-    while(((key = aa_getevent(aaxine.context, 0)) == AA_NONE) && aaxine.running );
-    
-    if((key >= AA_UNKNOWN && key < AA_UNKNOWN) || (key >= AA_RELEASE)) 
-      continue;
+
+    if ((key = aaxine_get_key_event()) == 0) continue;
 
     switch (key) {
 
-    case AA_UP:
+    case KEY_UP:
       aaxine.ignore_next = 1;
       xine_stop(aaxine.stream);
       aaxine.current_mrl--;
@@ -875,20 +954,20 @@ int main(int argc, char *argv[]) {
       aaxine.ignore_next = 0;
       break;
 
-    case AA_DOWN:
+    case KEY_DOWN:
       aaxine.ignore_next = 1;
       xine_stop(aaxine.stream);
       aaxine.ignore_next = 0;
       aaxine_start_next();
       break;
 
-    case AA_LEFT:
+    case KEY_LEFT:
       if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
         xine_set_param(aaxine.stream, XINE_PARAM_SPEED, 
 		       (xine_get_param(aaxine.stream, XINE_PARAM_SPEED)) / 2);
       break;
       
-    case AA_RIGHT:
+    case KEY_RIGHT:
       if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) < XINE_SPEED_FAST_4) {
         if(xine_get_param(aaxine.stream, XINE_PARAM_SPEED) > XINE_SPEED_PAUSE)
           xine_set_param(aaxine.stream, XINE_PARAM_SPEED, 
@@ -1022,11 +1101,13 @@ int main(int argc, char *argv[]) {
   if(aaxine.xine)
     xine_exit(aaxine.xine); 
 
+#ifdef AA
   if(aaxine.context) {
     aa_showcursor(aaxine.context);
     aa_uninitkbd(aaxine.context);
     aa_close(aaxine.context);
   }
+#endif
   
   if(xlib_handle)
     dlclose(xlib_handle);
