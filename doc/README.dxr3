@@ -83,7 +83,7 @@ streams using a dxr3 card called dxr3enc. Non-mpeg video may be AVI,
 quicktime, windows media files or whatever else xine can decode. 
 
 This driver requires libfame from fame.sourceforge.net to build, and
-will compile and install automatically if it finds it.
+will compile and install automatically if configure finds it.
 The driver itself is in video_out_dxr3enc.c in the dxr3 directory. 
 Please read the source comments at the top of this file for more 
 developer related information.
