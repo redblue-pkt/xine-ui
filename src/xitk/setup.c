@@ -206,7 +206,9 @@ void setup_exit(xitk_widget_t *w, void *data) {
 
   xitk_unregister_event_handler(&setup->kreg);
 
+  printf("destroy widgets\n"); fflush(stdout);
   xitk_destroy_widgets(setup->widget_list);
+  printf("destroy widgets DONE\n"); fflush(stdout);
   xitk_window_destroy_window(gGui->imlib_data, setup->xwin);
 
   setup->xwin = None;

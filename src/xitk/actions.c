@@ -87,8 +87,6 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
     if(gGui->logo_mode == 0) {
       int has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
       
-      osd_update_status();
-      
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
       
@@ -165,7 +163,6 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
       
       xine_usec_sleep(100);
       osd_update_status();
-      
     }
   }
   
