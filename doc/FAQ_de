@@ -6,7 +6,7 @@
                          FAQ (Häufig gestellte Fragen)
 
 
-______________________________________________________________2002/05/27 (1.12)
+______________________________________________________________2002/05/27 (1.16)
 INDEX
 
 
@@ -38,14 +38,16 @@ INDEX
 
 
 4       INSTALLATION
-4.1     Wo müssen die Windows DLLs hin?
+4.1     Können die Windows DLLs als codes in xine benutzt werden?
+4.2     Wo müssen die Windows DLLs hin?
+4.3     Fantastisch! Warum werden die DLLs nicht mitgeliefert?
 
 
 5       JETZT GEHTS RICHTIG LOS...
 
 5.1     Allgemeine Fragen
 5.1.1      Ich habe lauter "dropped frames". Was tun?
-5.1.2      Ich krieg xine auf FreeBSD oder Solaris nicht zum Laufen.
+5.1.2      Ich krieg xine unter FreeBSD, Solaris, ... nicht zum Laufen.
 5.1.3      Wie kann ich Streams von der Standarteingabe (stdin) spielen?
 5.1.4      Wie kann ich das Aussehen der Bedienoberfläche ändern?
 5.1.5      Was ist "aalib"? Wie kann ich es mit xine verwenden?
@@ -70,6 +72,8 @@ INDEX
 5.3.4      Teile des Desktops werden durchsichtig!
 5.3.5      Das Verhältnis Höhe/Breite des Videos stimmt nicht!
 5.3.6      Wie kann ich Farben/Helligkeit/Kontrast änderm?
+5.3.7      Was ist der Unterschied zwischen verworfenen ('discarded') und
+           übersprungenen ('skipped') Frames?
 
 5.4     Fehlermeldungen
 5.4.1      xine startet nicht und beklagt sich über Audio- oder Video-Treiber
@@ -78,6 +82,10 @@ INDEX
 5.4.4      "demux error! 00 00 00 (should be 0x000001)"
 5.4.5      "input_dvd: Sorry, Xine, doesn't play encrypted DVDs. ..."
 5.4.6      "audio driver 'oss' failed, using null driver instead"
+5.4.7      "video_out: throwing away image with pts xxx because it's too old"
+5.4.8      "No video plugin available to decode 'xxxxxx'."
+5.4.9      "w32codec: decoder failed to start. Is 'xxxxxx' installed?"
+5.4.10     "xine-lib xxx expected. Version xxx found"
 
 
 6       BUGS - RAUS MIT DEN KÄFERN!
@@ -130,8 +138,9 @@ _____________________________________________________________________________
 
         "xine-ui" ist die Bedienoberfläche (User Interface).
 
-        "xine-plugin" ist ein noch unfertiges Plugin für Browser. Damit
-        werden Sie Video-Streams über das Internet ansehen können.
+        "xine-plugin" ist ein Plugin für Browser, dass es ihnen ermöglicht,
+        ihre beliebten Video-Streams innerhalb ihres Browsers (z.B. mozilla)
+        mit Hilfe von xine ansehen.
 
 	"gnome-xine" ist eine gnome-Bedienoberfläche, die als Ersatz für
 	"xine-ui" verwendet werden kann. Sie konzentriert sich mehr auf die
@@ -175,8 +184,8 @@ _____________________________________________________________________________
         Sie benötigen eine offizielle und stabile Version von GCC. Mit
         gcc-3.x gibt es immer noch Probleme, also sollten Sie eine 2.95.x
         Version einsetzen. Verwenden Sie keine gepatchten GCC-Version, sonst
-        werden Sie xine nicht korrekt kompilieren können. (libmpeg2 kann mit
-        pgcc nicht fehlerfrei kompiliert werden)
+        werden Sie xine nicht korrekt kompilieren können (libmpeg2 kann mit
+        pgcc nicht fehlerfrei kompiliert werden).
 
         Ausserdem benötigen Sie GNU make. Auf den meisten Linux-Systemen wird
         GNU make mit dem Befehl "make" aufgerufen, auf allen anderen Systemen
@@ -217,11 +226,14 @@ _____________________________________________________________________________
         kompiliert UND installiert haben, können Sie xine-ui und/oder
         xine-plugin kompilieren.
 
-        Wenn Sie xine nicht mit dem Standart-Verzeichnispräfix
-        /usr/local/bin installiert haben haben, müssen Sie dafür sorgen,
-        dass $prefix/bin in der PATH-Variable ist und das der Linker die
-        Bibliotheken in $prefix/lib finden kann. Verwenden Sie in der bash
-        folgende Befehle, um das sicherzustellen:
+        Wenn Sie xine-lib nicht mit dem Standart-Verzeichnispräfix
+        /usr/local/bin installiert haben haben, müssen Sie dafür sorgen, dass
+        $prefix/bin in der PATH-Variable vorhanden ist und das der Linker die
+        Bibliotheken in $prefix/lib finden kann. Anderenfalls wird das Erzeugen
+        von Modulen, die xine-lib benötigen, fehlschlagen und Sie werden
+        Fehlermeldungen bezüglich fehlender Module von xine-lib bekommen.
+        Verwenden Sie in der bash folgende Befehle, um die Verfügbarkeit
+        sicherzustellen:
 
            export PATH="$PATH:$prefix/bin"
            export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$prefix/lib"
@@ -244,7 +256,7 @@ _____________________________________________________________________________
 	die Quellcode-tar-Dateien von der WWW-Seite heruntergeladen haben:
 
 	   rpm -ta DER_NAME_DES_TAR_ARCHIVES
-	
+
 	Dies wird das Erzeugen der Binär-RPMs und Quellen-RPMs starten. Nach
 	dem Übersetzen finden Sie das Binär-RPM in ihrem RPM-Binärverzeichnis,
 	welches normalerweise /usr/src/RPM/RPMS/[IHRE_CPU_ARCHITEKTUR] ist.
@@ -276,12 +288,7 @@ _____________________________________________________________________________
 
 3.4     Gibt es für den AMD K7 optimierte Binaries?
 
-        Zur Zeit sind keine Binaries für den K7 verfügbar, weil GCC in der
-        aktuellen stabilen Version (2.95.3) den K7 nicht unterstützt.
-        Benützen Sie stattdessen die Binaries für den i686, diese
-        unterstützen auch 3DNow!.
-
-        Wenn Sie eine neuere Version von GCC haben (3.x), können Sie
+        Wenn Sie eine aktuelle Version von GCC haben (3.x), können Sie
         versuchen, xine mit "mehr" K7-Unterstützung zu kompilieren.
         Falls configure Ihren Prozessor oder Ihre GCC-Version nicht korrekt
         erkennt, können Sie mit der Variable xine_BUILD die Konfiguration
@@ -337,8 +344,8 @@ _____________________________________________________________________________
            Überprüfen Sie, dass Sie $prefix/bin in der PATH Variable haben
            und dass der Linker die Bibliotheken in $prefix/lib finden kann.
            $prefix ist dasselbe Verzeichnis, in das Sie davor xine-lib
-           installiert haben sollten (ja, xine-lib mit "make install"
-           installieren wäre nicht schlecht...)
+           installiert haben sollten (ja, xine-lib mit "make install" zu
+           installieren wäre wirklich nicht schlecht...)
 
 3.7     Läßt sich xine im Benutzerverzeichnis ohne root-Rechte installieren ?
 
@@ -366,7 +373,29 @@ _____________________________________________________________________________
 _____________________________________________________________________________
 4       INSTALLATION
 
-4.1     Wo müssen die Windows DLLs hin?
+4.1     Können die Windows DLLs als codes in xine benutzt werden?
+
+        Ja, xine kann einige win32-DLLs (von Windows) benutzen, um einige
+        obskure Formate zu dekodieren. Wir heissen solche Binär-Codecs nicht
+        für gut, und Sie als Benutzer sind daür verantwortlich, eventuelle
+        Lizenzkonflikte zu beachten.
+
+        Hier einige funktinoierende CODECs (keine vollständige Liste):
+
+           mpg4c32.dll - Microsoft MPEG-4 v1/v2
+           ir50_32.dll - Indeo Video 5 format
+           ir41_32.dll - Indeo Video 4.1 format
+           ir32_32.dll - Indeo Video 3.2 format
+           iccvid.dll - Cinepak video
+           wmvds32.ax - Windows Media Video 7
+           wmv8ds32.ax - Windows Media Video 8
+           vp31vfw.dll - VP32 Video format
+           divxa32.acm - DivX audio (WMA)
+           voxmsdec.ax - Voxware Metasound
+
+        Diese win32-DLLs funktionieren nur auf x86-Systemen.
+
+4.2     Wo müssen die Windows DLLs hin?
 
         xine verwendet als Standart das Verzeichnis
 
@@ -379,8 +408,16 @@ _____________________________________________________________________________
         editieren und den Eintrag
 
          codec.win32_path:/usr/lib/win32
-         
+
         direkt anpassen.
+
+4.3     Fantastisch! Warum werden die DLLs nicht mitgeliefert?
+
+        Nein. Der Code in diesen DLLs ist propietäre Software (gehört
+        Microsoft, Intel und anderen). Einige können kostenlos aus dem WWW
+        heruntergeladen werden, aber aus rechtlichen Gründen können wir diese
+        nicht mitliefern (wegen Lizenzeinschränkungen, sowohl von xine alsauch
+        von den CODECs selbst).
 
 
 _____________________________________________________________________________
@@ -392,6 +429,39 @@ _____________________________________________________________________________
 
            Ihre Hardware ist für xine zu langsam. Versuchen Sie, Ihren PC auf
            optimale Leistung einzustellen:
+
+           -  Zu allererst führen Sie bitte das xine-check Skript aus, dass bei
+              xine-ui dabei ist (Evtl. bereits auf ihrem System installiert).
+              xine-check kann einige der am meisten vorkommenden Probleme
+              finden und melden. Wenn alles stimmt, sollte die Ausgabe von
+              xine-check so aussehen:
+
+                 $ xine-check
+                 Please be patient, this script may take a while to run...
+                 [ good ] you're using Linux, doing specific tests
+                 [ good ] looks like you have a /proc filesystem mounted.
+                 [ good ] You seem to have a reasonable kernel version (2.4.18)
+                 [ good ] intel compatible processor, checking MTRR support
+                 [ good ] you have MTRR support and there are some ranges set.
+                 [ good ] found the player at /usr/local/bin/xine
+                 [ good ] /usr/local/bin/xine is in your PATH
+                 [ good ] found /usr/local/bin/xine-config in your PATH
+                 [ good ] plugin directory /usr/local/lib/xine/plugins exists.
+                 [ good ] found input plugins
+                 [ good ] found demux plugins
+                 [ good ] found decoder plugins
+                 [ good ] found video_out plugins
+                 [ good ] found audio_out plugins
+                 [ good ] skin directory /usr/local/share/xine/skins exists.
+                 [ good ] found logo in /usr/local/share/xine/skins
+                 [ good ] I even found some skins.
+                 [ good ] /dev/cdrom points to /dev/hdc
+                 [ good ] /dev/dvd points to /dev/hdc
+                 [ good ] DMA is enabled for your DVD drive
+                 [ good ] found xvinfo: X-Video Extension version 2.2
+                 [ good ] your Xv extension supports YUV overlays (improves MPEG performance)
+                 [ good ] your Xv extension supports packed YUV overlays
+                 [ good ] Xv ports:  YUY2 YV12 I420 UYVY      
 
            -  verwenden Sie einen aktuellen, für Ihre Hardware optimierten
               Kernel (2.4.x).
@@ -406,11 +476,11 @@ _____________________________________________________________________________
               16 Bit Farbtiefe ein. 24 Bit oder mehr benötigen wesentlich mehr
               Bandbreite.
 
-           -  Stellen Sie sicher, dass Ihre Festplatte/DVD-Laufwerk DMA
+           -  Stellen Sie sicher, dass Ihre Festplatte/CDROM-/DVD-Laufwerk DMA
               unterstützt und dass es eingeschaltet ist.
 
-              Unter Linux können Sie "hdparm" verwenden, um das zu
-              überprüfen. Beispiel:
+              Bei den meisten Linux-Systemen können Sie "hdparm" verwenden, um
+              das zu überprüfen. Beispiel:
 
                  hdparm /dev/hda
 
@@ -433,7 +503,7 @@ _____________________________________________________________________________
               xine benötigen schnelle RAM-Bausteine, also aktivieren Sie alle
               Optionen für mehr Geschwindigkeit.
 
-              For allem der VIA Apollo Pro Chipsatz ist berüchtig für seine
+              Vor allem der VIA Apollo Pro Chipsatz ist berüchtig für seine
               schlechte RAM-Ansteuerung (entgegen meinen Ehrfahrungen, Anm.
               d. Übers.). Wenn Sie die Ansprechung des RAMs mit dem BIOS
               Setup nicht einstellen können, können Sie ein paar wüste Tricks
@@ -445,9 +515,6 @@ _____________________________________________________________________________
               dem Sie den Chipsatz "frisieren" können, under FreeBSD können
               Sie dasselbe mit "pciconf" erreichen. Manche Linux-
               Distributionen enthalten ähnliche Tools.
-
-              Wenden Sie sich an Heiko Schaefer (hschaefer@fto.de), wenn Sie
-              Probleme oder Anregungen haben.
 
            -  Verwenden Sie PowerTweak, ein gutes "Frisierwerkzeug":
 
@@ -485,7 +552,7 @@ _____________________________________________________________________________
                  ln -s /dev/raw1 /dev/rdvd
 
 
-5.1.2      Ich krieg xine auf FreeBSD oder Solaris nicht zum Laufen.
+5.1.2      Ich krieg xine unter FreeBSD, Solaris, ... nicht zum Laufen.
 
            Lesen Sie die jeweilige README-Datei:
 
@@ -508,15 +575,12 @@ _____________________________________________________________________________
 
            Verwenden Sie den Konfigurationsdialog (auf das Schrauben-
            schlüssel-Symbol klicken). Im Feld "gui skin theme" geben Sie den
-           Namen des "Skins" ein. Standartmässig vorhanden sind:
+           Namen des "Skins" ein.
 
-              lcd
-              pitt
-              xinetic
+           In neuerer Versionen von xine wird nur noch ein Skin mitgeliefert.
+           Weitere Skins finden Sie auf der xine-Homepage unter
 
-           Weitere Skins:
-
-              cloudy     => http://www.pobox.com/~dan_erat/files/
+           => http://xine.sourceforge.net/xine_frame.php?page=skins.html
 
            "sinek" ist kein Skin, sondern ein GTK+ Frontend
 
@@ -544,7 +608,8 @@ _____________________________________________________________________________
 
 5.1.6      Was bedeutet dieses Zeugs in der Datei "~/.xine/config"?
 
-           Lesen Sie dazu die Datei xine-ui-x.x.x/doc/README.xinerc
+           Lesen Sie dazu die Datei xine-ui-x.x.x/doc/README.config_en
+           (Zur Zeit leider nur in englischer Sprache)
 
 
 5.1.7      Wie verwende ich das DVD-Plugin?
@@ -555,6 +620,15 @@ _____________________________________________________________________________
            Plugin, um solche DVDs mit xine abzuspielen. Natürlich können Sie
            den Film abspielen, wenn Sie ihn mit zusätzlicher Software
            entschlüsseln.
+
+           Das standard DVD-Plugin von xine unterstützt auch keine Menüs. Für
+           weitere Informationen zur Menüunterstützung schauen Sie bitte auf
+           http://dvd.sf.net/ nach.
+
+           Wenn Sie ein anderes oder "erweitertes" DVD-Plugin installieren,
+           wird ein zusätzlicher Knopf in xine-ui erscheinen. Der "DVD"-Knopf
+           wird weiterhin das alte Plugin (ohne Menüunterstützung und
+           Entschlüsselung/Entsperrung) aktivieren.
 
            Da die rechtliche Situation in diesem Bereich alles andere als
            klar ist, verfügt xine nicht über irgendwelche Software(teile)
@@ -571,10 +645,10 @@ _____________________________________________________________________________
            Plugins "dvdnav" oder "d5d".
 
            Das xine-eigene Plugin verwenden Sie folgendermassen: Mounten Sie
-           die DVD zuerst, um einen Überblick über die Dateien darauf zu
+           zuerst die DVD, um einen Überblick über die Dateien darauf zu
            erhalten. Sie sollten folgende Dateien finden:
 
-              ./VIDEO_TS/VTS_xx_x.VOB           (x sind Ziffern)
+              [...]/VIDEO_TS/VTS_xx_x.VOB           (x sind Ziffern)
 
            Suchen Sie grosse VOB-Dateien. In ihnen ist der Film gespeichert.
            Um diese Datei abzuspielen, geben Sie folgendes ein:
@@ -673,7 +747,7 @@ _____________________________________________________________________________
            Hier ist 4-Kanal Surround-Sound möglich. Da xine aber nicht
            sicherstellen kann, ob auch wirklich Lautsprecher angeschlossen
            sind, müssen Sie diesen Modus von Hand aktivieren.
-           
+
            Sie können dies entweder im Konfigurationsdialog während der
            Laufzeit von xine machen (Drücken Sie den Konfigurationsknopf und
            wechseln Sie auf die AUDIO-Karte) oder direkt die Konfigurationsdatei
@@ -681,7 +755,7 @@ _____________________________________________________________________________
 
            # 4-channel:
              audio.four_channel:1
-         
+
            # 5-channel:
              audio.five_channel:1
 
@@ -704,6 +778,9 @@ _____________________________________________________________________________
 
            Dies ist kein "Bug". aRts (das Sound-System von KDE) hat z.B.
            diese Funktion nicht.
+
+           Mit Sie lediglich AC3 durchschleifen, kann die Lautstärke ebenfalls
+           nicht angepasst werden.
 
 
 5.3     Fragen zu Video
@@ -791,8 +868,40 @@ _____________________________________________________________________________
            Beachten Sie dass alle diese Massnahmen keine Wirkung haben, falls
            ihr Videotreiber das Einstellen der Werte nicht ermöglicht.
 
-           Lesen Sie die Datei README.xinerc für mehr Informationen zur
+           Lesen Sie die Datei README.config_en für mehr Informationen zur
            Konfigurationsdatei.
+
+5.3.7      Was ist der Unterschied zwischen verworfenen ('discarded') und
+           übersprungenen ('skipped') Frames?
+
+           Ab und zu wird xine Nachrichten ausgeben, die etwa so aussehen:
+
+              200 frames delivered, XX frames skipped, YY frames discarded
+
+           Der Unterschied zwischen diesen Zählern ist für Nicht-Programmierer
+           nur von sehr feiner Natur. xine benutzt zwei Threads, um das Video
+           zu dekodieren: Der Decoder-Thread reicht die Bilder an den
+           Video-Ausgabe-Thread weiter, der dafür zuständig ist, diese zum
+           richtigen Zeitpunkt anzuzeigen.
+
+           Wenn Ihr System mit der Dekodierung nicht nachkommt, wird der
+           Dekoder Bilder verspätet übergeben. Beispielsweise ist die
+           Dekodierung des Bildes für den Zeitpunkt 11:30 erst dann beendet,
+           als die Uhr von xine schon auf 11:31 steht. Wenn diese Situation
+           auftritt, versucht xine einige Bilder nicht zu dekodieren und diese
+           zu überspringen. Allerdings unterstützen nicht alle Dekoder dieses
+           Vorgehen.
+
+           Wenn ein Bild bereits dekodiert ist, um in der Zukunft angezeigt zu
+           werden, aber der Ausgabe-Thread nicht rechtzeitig vom Betriebssystem
+           ausgeführt wird, um das Bild anzuzeigen, wird das Bild verworfen.
+           Ein Grund dafür kann Festplattenaktivität sein, die ein System ohne
+           DMA für einige Millisekunden anhalten kann. Siehe dazu auch
+           Abschnitt 5.1.1.
+
+           Beachten Sie bitte auch, dass wenn Dekoder aus irgendwelchen Gründen
+           keine Bilder überspringen können, Sie niemals übersprungene
+           ('skipped') Bilder angezeigt bekommen (diese werden alle verworfen).
 
 
 5.4     Fehlermeldungen
@@ -902,6 +1011,53 @@ _____________________________________________________________________________
               xine -A arts
 
 
+5.4.7      "video_out: throwing away image with pts xxx because it's too old"
+
+           Siehe Abschnitt 5.1.1, es handelt sich um ein Geschwindigkeitsproblem.
+
+           Falls Sie einen schnellen Rechner haben und diese Nachricht von Zeit
+           zu Zeit auftaucht, wenn Sie eine DVD/CDROM abspielen, dann
+           unterstützt ihr Laufwerk evtl. kein DMA oder es ist nicht aktiviert.
+
+
+5.4.8      "No video plugin available to decode 'xxxxxx'."
+
+           Sie haben versucht, einen Stream abzuspielen, der einen unbekannten
+           oder nicht unterstützten CODEC verwendet. Wahrscheinlich benutzt die
+           Datei ein obskures und propietäres Format, zu dem keine öffentlichen
+           Informationen bekannt sind, um es zu dekodieren.
+
+           Diese Meldung kann gentrennt für Audio, Video oder beide zusammen
+           deaktiviert werden. Siehe die 'gui.warn_unhandled_codec' Einstellung.
+
+
+5.4.9      "w32codec: decoder failed to start. Is 'xxxxxx' installed?"
+
+           Wahrscheinlich haben Sie die win32-DLLs nicht installiert, die zum
+           Dekodieren der Datei benötigt werden. Siehe dazu Abschnitt 4.1 und
+           4.2.
+
+
+5.4.10     "xine-lib xxx expected. Version xxx found"
+
+           Ihre xine-ui Installation passt nicht zu ihrer xine-lib Installation.
+
+           Falls Sie nicht gerade vergessen haben, ihr aktuelles xine-lib (bzw.
+           xine-ui) zu installieren,  haben Sie wahrscheinlich von einer
+           älteren Version aufgerüstet, wovon noch einige alte Dateien
+           übriggeblieben sind und im Weg stehen. Evtl. handelt es sich auch
+           nur um einen fehlerhaften symbolischen Verweis.
+
+           Das kann passieren, wenn Sie von den Quellen installieren oder eine
+           Packetverwaltung benutzen, die alte Versionen nicht gründlich genug
+           deinstalliert.
+
+           Entfernen Sie bitte von Hand alle alten xine-Bibliotheken
+           ("rm $prefix/lib/libxine*", und wo Sie schon dabei sind auch alle
+           alten Plugins in $prefix/lib/xine/plugins/). Installieren Sie danach
+           xine-lib und xine-ui erneut, womit das Problem behoben sein sollte.
+
+
 _____________________________________________________________________________
 6       BUGS - RAUS MIT DEN KÄFERN!
 
@@ -916,6 +1072,11 @@ _____________________________________________________________________________
         xine-ui-x.x.x/doc/bug_report_form, um einen Bug zu melden. Füllen Sie
         es so vollständig wie möglich aus und senden Sie es an unsere
         Mailinglist: xine-user@lists.sourceforge.net
+
+        Sie können auch das Proramm xine-bugreport benutzen, dass automatisch
+        einen solchen Fehlerbericht erstellt und gleichzeitig für die
+        Entwickler hilfreiche Informationen ihres Systems herausfindet und
+        mitschickt.
 
         Danke, dass Sie sich Zeit nehmen, damit xine noch besser wird!
 
