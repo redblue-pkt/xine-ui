@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-03-24 05:17+0100\n"
+"POT-Creation-Date: 2002-04-16 01:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:909
+#: src/xitk/xine-toolkit/mrlbrowser.c:913
 msgid "Select current entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:916
+#: src/xitk/xine-toolkit/mrlbrowser.c:920
 msgid "Play selected entry"
 msgstr ""
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:926
+#: src/xitk/xine-toolkit/mrlbrowser.c:930
 msgid "Close MRL browser window"
 msgstr ""
 
@@ -78,22 +78,22 @@ msgstr ""
 msgid "Quit"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:743
+#: src/xitk/xine-toolkit/window.c:755
 msgid "OK"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:805 src/xitk/xine-toolkit/window.c:998
+#: src/xitk/xine-toolkit/window.c:817 src/xitk/xine-toolkit/window.c:1010
 msgid "Question?"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:932 src/xitk/xine-toolkit/window.c:1138
+#: src/xitk/xine-toolkit/window.c:944 src/xitk/xine-toolkit/window.c:1150
 msgid "Yes"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:932 src/xitk/xine-toolkit/window.c:1138
+#: src/xitk/xine-toolkit/window.c:944 src/xitk/xine-toolkit/window.c:1150
 msgid "No"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:1138
+#: src/xitk/xine-toolkit/window.c:1150
 msgid "Cancel"
 msgstr ""

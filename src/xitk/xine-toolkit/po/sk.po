@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-03-24 05:17+0100\n"
+"POT-Creation-Date: 2002-04-16 01:33+0200\n"
 "PO-Revision-Date: 2002-01-25 10:11+0100\n"
 "Last-Translator: Daniel Bena  <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -14,15 +14,15 @@ msgstr ""
 "Content-Type: text/plain; charset=iso8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:909
+#: src/xitk/xine-toolkit/mrlbrowser.c:913
 msgid "Select current entry"
 msgstr "Vybra» aktuálnu polo¾ku"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:916
+#: src/xitk/xine-toolkit/mrlbrowser.c:920
 msgid "Play selected entry"
 msgstr "Prehra» aktuálnu polo¾ku"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:926
+#: src/xitk/xine-toolkit/mrlbrowser.c:930
 msgid "Close MRL browser window"
 msgstr "Zatvori» okno MRL prehliadaèa"
 
@@ -80,22 +80,22 @@ msgstr "Moje okno"
 msgid "Quit"
 msgstr "Skonèi»"
 
-#: src/xitk/xine-toolkit/window.c:743
+#: src/xitk/xine-toolkit/window.c:755
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:805 src/xitk/xine-toolkit/window.c:998
+#: src/xitk/xine-toolkit/window.c:817 src/xitk/xine-toolkit/window.c:1010
 msgid "Question?"
 msgstr "Otázka?"
 
-#: src/xitk/xine-toolkit/window.c:932 src/xitk/xine-toolkit/window.c:1138
+#: src/xitk/xine-toolkit/window.c:944 src/xitk/xine-toolkit/window.c:1150
 msgid "Yes"
 msgstr "Áno"
 
-#: src/xitk/xine-toolkit/window.c:932 src/xitk/xine-toolkit/window.c:1138
+#: src/xitk/xine-toolkit/window.c:944 src/xitk/xine-toolkit/window.c:1150
 msgid "No"
 msgstr "Nie"
 
-#: src/xitk/xine-toolkit/window.c:1138
+#: src/xitk/xine-toolkit/window.c:1150
 msgid "Cancel"
 msgstr "Zru¹i»"

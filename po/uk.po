@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.8\n"
-"POT-Creation-Date: 2002-04-12 21:53+0200\n"
+"POT-Creation-Date: 2002-04-16 01:33+0200\n"
 "PO-Revision-Date: 2002-02-24 17:35GMT+2\n"
 "Last-Translator: Sergiy Kudryk <linux_ua@yahoo.com>\n"
 "Language-Team: Ukrainian <linux@linux.org.ua>\n"
@@ -25,53 +25,53 @@ msgstr "%s(): не можу знайти зображення тла\n"
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "список композиц╕й xine: не можу знайти зображення для тла\n"
 
-#: src/xitk/control.c:542
+#: src/xitk/control.c:540
 msgid "Control HUE value"
 msgstr "Контролювати в╕дт╕нок"
 
 # src/xitk/control.c:512
-#: src/xitk/control.c:545
+#: src/xitk/control.c:543
 msgid "Hue"
 msgstr "В╕дт╕нок"
 
-#: src/xitk/control.c:566
+#: src/xitk/control.c:564
 msgid "Control SATURATION value"
 msgstr "Контролювати насиченн╕сть"
 
 # src/xitk/control.c:535
-#: src/xitk/control.c:569
+#: src/xitk/control.c:567
 msgid "Sat"
 msgstr "Суб"
 
-#: src/xitk/control.c:590
+#: src/xitk/control.c:588
 msgid "Control BRIGHTNESS value"
 msgstr "Контролювати яскрав╕сть"
 
 # src/xitk/control.c:558
-#: src/xitk/control.c:593
+#: src/xitk/control.c:591
 msgid "Brt"
 msgstr "Яскр"
 
-#: src/xitk/control.c:614
+#: src/xitk/control.c:612
 msgid "Control CONTRAST value"
 msgstr "Контролювати контраст"
 
 # src/xitk/control.c:581
-#: src/xitk/control.c:617
+#: src/xitk/control.c:615
 msgid "Ctr"
 msgstr "Ctrl"
 
 # src/xitk/control.c:617
-#: src/xitk/control.c:653
+#: src/xitk/control.c:651
 msgid "Choose a Skin"
 msgstr "Виберить стиль Г╤К"
 
 # src/xitk/control.c:654 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:828
-#: src/xitk/control.c:690 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:869
+#: src/xitk/control.c:688 src/xitk/mrl_browser.c:217 src/xitk/playlist.c:867
 msgid "Dismiss"
 msgstr "В╕дмова"
 
-#: src/xitk/control.c:696
+#: src/xitk/control.c:694
 msgid "Close control window"
 msgstr "Закрити в╕кно управл╕ння"
 
@@ -152,13 +152,13 @@ msgid "Select"
 msgstr "Вибрати"
 
 # src/xitk/kbindings.c:307
-#: src/xitk/kbindings.c:306
+#: src/xitk/kbindings.c:283
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Прив'язка ключ╕в '%s' ╕ '%s' ╕дентична.\n"
 
 # src/xitk/kbindings.c:663
-#: src/xitk/kbindings.c:662
+#: src/xitk/kbindings.c:639
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Опс: таблиця прив'язк╕ ключ╕в пуста .\n"
 
@@ -470,106 +470,106 @@ msgid "Mute toggle"
 msgstr "Прокрутка"
 
 # src/xitk/panel.c:655
-#: src/xitk/panel.c:697
+#: src/xitk/panel.c:695
 msgid "Play previous entry from playlist"
 msgstr "Програти попередню композиц╕ю в списку"
 
 # src/xitk/panel.c:662
-#: src/xitk/panel.c:704
+#: src/xitk/panel.c:702
 msgid "Stop playback"
 msgstr "Зупинити програвання"
 
 # src/xitk/panel.c:669
-#: src/xitk/panel.c:711
+#: src/xitk/panel.c:709
 msgid "Play selected entry"
 msgstr "Програти вибрану позиц╕ю"
 
 # src/xitk/panel.c:677
-#: src/xitk/panel.c:719
+#: src/xitk/panel.c:717
 msgid "Pause/Resume playback"
 msgstr "Пауза/В╕дновлення програвання"
 
 # src/xitk/panel.c:684
-#: src/xitk/panel.c:726
+#: src/xitk/panel.c:724
 msgid "Play next entry from playlist"
 msgstr "Програти наступну позиц╕ю в списку композиц╕й"
 
 # src/xitk/panel.c:691
-#: src/xitk/panel.c:733
+#: src/xitk/panel.c:731
 msgid "Eject current medium"
 msgstr "Викинути диск"
 
 # src/xitk/panel.c:698
-#: src/xitk/panel.c:740
+#: src/xitk/panel.c:738
 msgid "Quit"
 msgstr "Вих╕д"
 
 # src/xitk/panel.c:705
-#: src/xitk/panel.c:747
+#: src/xitk/panel.c:745
 msgid "Setup window"
 msgstr "В╕кно установок"
 
 # src/xitk/panel.c:712
-#: src/xitk/panel.c:754
+#: src/xitk/panel.c:752
 msgid "Hide GUI"
 msgstr "Сховати Г╤К"
 
 # src/xitk/panel.c:719
-#: src/xitk/panel.c:761
+#: src/xitk/panel.c:759
 msgid "Fullscreen/Window mode"
 msgstr "Повноекранний/В╕конний режим"
 
 # src/xitk/panel.c:726
-#: src/xitk/panel.c:768
+#: src/xitk/panel.c:766
 msgid "Next audio channel"
 msgstr "Наступний ауд╕о канал"
 
 # src/xitk/panel.c:733
-#: src/xitk/panel.c:775
+#: src/xitk/panel.c:773
 msgid "Previous audio channel"
 msgstr "Попередн╕й ауд╕о канал"
 
 # src/xitk/panel.c:740
-#: src/xitk/panel.c:782
+#: src/xitk/panel.c:780
 msgid "Next SPU channel"
 msgstr "Наступний канал (субтитр╕в)"
 
 # src/xitk/panel.c:747
-#: src/xitk/panel.c:789
+#: src/xitk/panel.c:787
 msgid "Previous SPU channel"
 msgstr "Попередн╕й канал субтитр╕в"
 
-#: src/xitk/panel.c:826
+#: src/xitk/panel.c:824
 msgid "Stream playback position slider"
 msgstr "Повзунок позиц╕╖ програвання"
 
 # src/xitk/panel.c:811
-#: src/xitk/panel.c:854
+#: src/xitk/panel.c:852
 msgid "Take a snapshot"
 msgstr "Зробити знимок екрану"
 
 # src/xitk/panel.c:818
-#: src/xitk/panel.c:861
+#: src/xitk/panel.c:859
 msgid "Slow motion"
 msgstr "Пов╕льне програвання"
 
 # src/xitk/panel.c:825
-#: src/xitk/panel.c:868
+#: src/xitk/panel.c:866
 msgid "Fast motion"
 msgstr "Швидке програвання"
 
 # src/xitk/panel.c:832
-#: src/xitk/panel.c:875
+#: src/xitk/panel.c:873
 msgid "Playlist"
 msgstr "Список композиц╕й"
 
 # src/xitk/panel.c:839
-#: src/xitk/panel.c:882
+#: src/xitk/panel.c:880
 msgid "Control"
 msgstr "Управл╕ння"
 
 # src/xitk/panel.c:846
-#: src/xitk/panel.c:889
+#: src/xitk/panel.c:887
 msgid "MRL Browser"
 msgstr "MRL нав╕гатор"
 
@@ -579,66 +579,66 @@ msgstr "MRL нав╕гатор"
 msgid "Can't read %s: %s\n"
 msgstr "Не можу прочитати %s: %s\n"
 
-#: src/xitk/playlist.c:805
+#: src/xitk/playlist.c:803
 msgid "Move up selected MRL"
 msgstr "Пересунути вгору вибраний MRL"
 
-#: src/xitk/playlist.c:813
+#: src/xitk/playlist.c:811
 msgid "Move down selected MRL"
 msgstr "Пересунути вниз вибраний MRL"
 
-#: src/xitk/playlist.c:820
+#: src/xitk/playlist.c:818
 msgid "Start playback of selected MRL"
 msgstr "Програти вибраний MRL"
 
 # src/xitk/panel.c:684
-#: src/xitk/playlist.c:827
+#: src/xitk/playlist.c:825
 msgid "Delete selected MRL from playlist"
 msgstr "Видалити вибраний MRL з списку"
 
 # src/xitk/panel.c:684
-#: src/xitk/playlist.c:834
+#: src/xitk/playlist.c:832
 msgid "Delete all entries in playlist"
 msgstr "Видалити вс╕ елементи списку"
 
 # src/xitk/playlist.c:801
-#: src/xitk/playlist.c:838
+#: src/xitk/playlist.c:836
 msgid "Add"
 msgstr "Додати"
 
-#: src/xitk/playlist.c:844
+#: src/xitk/playlist.c:842
 msgid "Add one or more entries in playlist"
 msgstr "Додати дек╕лька елемент╕в до списку"
 
 # src/xitk/playlist.c:810
-#: src/xitk/playlist.c:849
+#: src/xitk/playlist.c:847
 msgid "Load"
 msgstr "Завантаження"
 
-#: src/xitk/playlist.c:855
+#: src/xitk/playlist.c:853
 msgid "Load saved playlist"
 msgstr "Завантаження збереженого списку"
 
 # src/xitk/playlist.c:819
-#: src/xitk/playlist.c:859
+#: src/xitk/playlist.c:857
 msgid "Save"
 msgstr "Зберегти"
 
 # src/xitk/panel.c:832
-#: src/xitk/playlist.c:865
+#: src/xitk/playlist.c:863
 msgid "Save playlist"
 msgstr "Зберегти список"
 
-#: src/xitk/playlist.c:875
+#: src/xitk/playlist.c:873
 msgid "Close playlist window"
 msgstr "Закрити в╕кно списку"
 
 # src/xitk/playlist.c:851
-#: src/xitk/playlist.c:893
+#: src/xitk/playlist.c:891
 msgid "Scan for:"
 msgstr "Сканувати на:"
 
-#: src/xitk/playlist.c:904
+#: src/xitk/playlist.c:902
 msgid "Direct MRL entry"
 msgstr "Ввести адресу MRL"
 
