@@ -1,3 +1,12 @@
+xine-ui (0.9.9-1) unstable; urgency=low
+
+  * new upstream release
+  * added "Video" menu hint (closes: #121037)
+  * added icon to menu file
+  * added KDE/GMOME/WindowMaker desktop stuff (hope I got it right!)
+
+ -- Siggi Langauf <siggi@debian.org>  Sat,  2 Feb 2002 14:57:59 +0100
+
 xine-ui (0.9.8-3) testing unstable; urgency=high
 
   * added Conflicts: with future xine-lib (closes: #129942, #128440)
