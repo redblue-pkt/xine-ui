@@ -81,6 +81,12 @@ Some of them are important for dxr3 playback:
 		unix system timer will be used. >5 forces to use
 		dxr3 as sync source. If you don't understand this
 		keep the default value.
+
+*) dxr3_contrast:
+*) dxr3_brightness:
+*) dxr3_saturation:
+	500	Should not need to be changed manually.  Use xine
+		to adjust these as necessary.  Range: 1 - 1000	
 	
 *) video_driver_name:
 	dxr3    Needed for setting the tv_mode, brightness, contrast,
@@ -130,7 +136,8 @@ it is possible to output the em8300 overlay directly in the video
 out window. 
 
 The initial idea and the first working sample code came from 
-Mike Lampard <mjl@datafast.net.au>. Kudos to him for this new feature.
+Mike Lampard <mlampard@users.sourceforge.net>. Kudos to him for this
+new feature.
 
 In order to activate it, "dxr3_tvmode" must be set to "overlay". But
 it won't work until the old dxr3view works too (just a check). Before
