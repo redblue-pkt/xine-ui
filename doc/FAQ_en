@@ -227,16 +227,24 @@
 
 3.2.3 making your own RPM packages (xine-lib, xine-ui)
       
-      Things couldn't be easier - just issue the following command:
-       
+      Basically you will only have to issue one command, if you have just
+      downloaded a source tarball from our web site:
+      
        rpm -ta THE_NAME_OF_YOUR_SOURCE_TAR_BALL
       
-      and building of your binary RPMs will start. The final RPMs will be
-      placed in your rpm binary directory (e.g. /usr/src/RPM/RPMS/i686) and
-      one source rpm will be written to your rpm source dir.
+      This will start the binary and source RPM building. After compiling is
+      finished, a binary rpm is placed in your rpm binary directory which is
+      usally /usr/src/RPM/RPMS/[YOUR_ARCHITECTURE] and a source RPM is written
+      to your rpm source dir (e.g. /usr/src/RPM/SRPMS).
       
-      Please keep in mind that you have to build/install xine-lib first before
-      you can proceed with xine-ui.
+      In case that you have a fresh CVS checkout, you will need to do the
+      following first in order to get a tarball release out of it which you
+      can later use with the "rpm -ta" command above:
+       
+       ./cvscompile.sh && make clean && make dist
+      
+      In every case, please keep in mind that you have to build and install
+      xine-lib first before you can proceed with xine-ui.
       
 3.3 Can I provide additional CFLAGS for compilation?
     
