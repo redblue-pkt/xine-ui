@@ -107,9 +107,6 @@ static int xitk_font_guess_error(XFontSet fs, char *name, char **missing, int co
 char * xitk_font_core_string_to_xft( char * old_name) {
   static char new_name[255];
 
-  if((strncmp(old_name, "*", 1) == 0))
-    XITK_DIE("font name '%s' is invalid, CU!.\n", old_name);
-  
   if( strncmp(old_name, "-*", 2) == 0 || strncmp(old_name, "*-", 2) == 0
       || strncmp(old_name, "-", 1) == 0 || strncmp(old_name, "*", 1) == 0) {
     char  font[50];
