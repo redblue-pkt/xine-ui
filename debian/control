@@ -10,8 +10,6 @@ Architecture: any
 Depends: ${shlibs:Depends}
 Recommends: ${shlibs:Recommends}
 Suggests: ${shlibs:Suggests}
-Conflicts: xine (<<0.5.0), libxine0 (>= 0.9.10)
-Replaces: xine
 Description: the xine video player, user interface 
  This is an X11 based GUI for the libxine video player library.
  It provides xine, a skin based media player that can play all the

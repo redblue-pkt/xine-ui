@@ -2,10 +2,13 @@ xine-ui (0.9.10-1) unstable; urgency=medium
 
   * new upstream release
     - contains xine-check fixes (closes: #141962)
+    - doesn't segfault on SIGINT any more (closes: #147994)
   
   * added build-dependancy on liblircclient-dev (closes: #137715)
-
- -- Siggi Langauf <siggi@debian.org>  Fri, 10 May 2002 01:39:19 +0200
+  * recompiled agains libxine0-0.9.10 (with versioned shlibs) (closes: #147273)
+  * removed references to the (never released, long obsolete) "xine" package
+  
+ -- Siggi Langauf <siggi@debian.org>  Sun, 26 May 2002 00:37:52 +0200
 
 xine-ui (0.9.9-1) unstable; urgency=medium
 
