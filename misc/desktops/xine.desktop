@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Xine
+Name=xine
 Comment=Video Player
 Exec=xine
 MimeType=video/mpeg;video/quicktime;video/x-msvideo;audio/x-mp3;audio/x-mp2;
