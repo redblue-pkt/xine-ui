@@ -28,7 +28,7 @@ prune-cache:
 
 release-check: misc/relchk.sh
 	@mv -f .cvsversion .cvsversion.tmp
-	@./configure && $(SHELL) misc/relchk.sh
+	@./autogen.sh && $(SHELL) misc/relchk.sh
 	@mv -f .cvsversion.tmp .cvsversion
 
 mostlyclean-generic:

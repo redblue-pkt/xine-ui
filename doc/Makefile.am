@@ -24,6 +24,7 @@ docs_DATA = FAQ_de \
 	README.syncfb \
 	README.opengl \
 	README.config_en \
+	README_cs \
 	README_es \
 	README_pl \
 	README_it \

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.9.15\n"
-"POT-Creation-Date: 2003-01-28 18:29+0100\n"
+"POT-Creation-Date: 2003-01-29 22:06+0100\n"
 "PO-Revision-Date: 2003-01-21 16:42+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -37,12 +37,12 @@ msgstr ""
 msgid "%sVideo Codec: %s (%s)\n"
 msgstr "Codec de vídeo%s: %s (%s)\n"
 
-#: src/xitk/actions.c:267 src/xitk/actions.c:278 src/xitk/stream_infos.c:152
-#: src/xitk/stream_infos.c:361 src/xitk/stream_infos.c:362
-#: src/xitk/stream_infos.c:363 src/xitk/stream_infos.c:364
-#: src/xitk/stream_infos.c:365 src/xitk/stream_infos.c:367
-#: src/xitk/stream_infos.c:368 src/xitk/stream_infos.c:369
-#: src/xitk/stream_infos.c:370
+#: src/xitk/actions.c:267 src/xitk/actions.c:278 src/xitk/stream_infos.c:156
+#: src/xitk/stream_infos.c:365 src/xitk/stream_infos.c:366
+#: src/xitk/stream_infos.c:367 src/xitk/stream_infos.c:368
+#: src/xitk/stream_infos.c:369 src/xitk/stream_infos.c:371
+#: src/xitk/stream_infos.c:372 src/xitk/stream_infos.c:373
+#: src/xitk/stream_infos.c:374
 msgid "Unavailable"
 msgstr "No disponible"
 
@@ -87,7 +87,7 @@ msgstr "%s(): no se puede crear un hilo nuevo (%s)\n"
 msgid "There is no mrl."
 msgstr "No hay mrl."
 
-#: src/xitk/actions.c:1324 src/xitk/actions.c:1336 src/xitk/panel.c:670
+#: src/xitk/actions.c:1324 src/xitk/actions.c:1336 src/xitk/panel.c:674
 msgid "Audio Volume"
 msgstr "Volumen de audio"
 
@@ -102,7 +102,7 @@ msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) falló.\n"
 
 #: src/xitk/actions.c:1495 src/xitk/actions.c:1553 src/xitk/event_sender.c:482
-#: src/xitk/mediamark.c:1441 src/xitk/mrl_browser.c:271
+#: src/xitk/mediamark.c:1442 src/xitk/mrl_browser.c:271
 msgid "Select"
 msgstr "Selecc."
 
@@ -114,96 +114,96 @@ msgstr "Seleccionar todo"
 msgid "Stream(s) loading"
 msgstr "Cargando flujo(s)"
 
-#: src/xitk/actions.c:1558 src/xitk/mediamark.c:1446
+#: src/xitk/actions.c:1558 src/xitk/mediamark.c:1447
 msgid "Pick a subtitle file"
 msgstr "Seleccione un archivo de subtítulos"
 
-#: src/xitk/control.c:231
+#: src/xitk/control.c:235
 msgid "hue value"
 msgstr "valor de transparencia"
 
-#: src/xitk/control.c:232
+#: src/xitk/control.c:236
 msgid "Hue value."
 msgstr "Valor de transparencia."
 
-#: src/xitk/control.c:242
+#: src/xitk/control.c:246
 msgid "brightness value"
 msgstr "valor de brillo"
 
-#: src/xitk/control.c:243
+#: src/xitk/control.c:247
 msgid "Brightness value."
 msgstr "Valor de brillo."
 
-#: src/xitk/control.c:253
+#: src/xitk/control.c:257
 msgid "saturation value"
 msgstr "valor de saturación"
 
-#: src/xitk/control.c:254
+#: src/xitk/control.c:258
 msgid "Saturation value."
 msgstr "Valor de saturación."
 
-#: src/xitk/control.c:264
+#: src/xitk/control.c:268
 msgid "contrast value"
 msgstr "valor de contraste"
 
-#: src/xitk/control.c:265
+#: src/xitk/control.c:269
 msgid "Contrast value."
 msgstr "Valor de contraste."
 
-#: src/xitk/control.c:416 src/xitk/panel.c:147 src/xitk/playlist.c:890
+#: src/xitk/control.c:420 src/xitk/panel.c:151 src/xitk/playlist.c:894
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): no se pudo encontrar la imagen de fondo\n"
 
-#: src/xitk/control.c:486
+#: src/xitk/control.c:490
 msgid "Xine Control Panel"
 msgstr "Panel de control de xine"
 
-#: src/xitk/control.c:501
+#: src/xitk/control.c:505
 msgid "control: couldn't find image for background\n"
 msgstr "control: no se pudo encontrar la imagen de fondo\n"
 
-#: src/xitk/control.c:622
+#: src/xitk/control.c:626
 msgid "Control HUE value"
 msgstr "Control del valor de TRANSPARENCIA"
 
-#: src/xitk/control.c:625
+#: src/xitk/control.c:629
 msgid "Hue"
 msgstr "Tte"
 
-#: src/xitk/control.c:645
+#: src/xitk/control.c:649
 msgid "Control SATURATION value"
 msgstr "Control del valor de SATURACIÓN"
 
-#: src/xitk/control.c:648
+#: src/xitk/control.c:652
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:668
+#: src/xitk/control.c:672
 msgid "Control BRIGHTNESS value"
 msgstr "Control del valor de BRILLO"
 
-#: src/xitk/control.c:671
+#: src/xitk/control.c:675
 msgid "Brt"
 msgstr "Brl"
 
-#: src/xitk/control.c:691
+#: src/xitk/control.c:695
 msgid "Control CONTRAST value"
 msgstr "Control del valor de CONTRASTE"
 
-#: src/xitk/control.c:694
+#: src/xitk/control.c:698
 msgid "Ctr"
 msgstr "Ctr"
 
-#: src/xitk/control.c:715
+#: src/xitk/control.c:719
 msgid "Choose a Skin"
 msgstr "Seleccione piel"
 
-#: src/xitk/control.c:742 src/xitk/mrl_browser.c:278 src/xitk/playlist.c:1174
+#: src/xitk/control.c:746 src/xitk/mrl_browser.c:278 src/xitk/playlist.c:1178
 msgid "Dismiss"
 msgstr "Cancel."
 
-#: src/xitk/control.c:748
+#: src/xitk/control.c:752
 msgid "Close control window"
 msgstr "Cerrar la ventana de control"
 
@@ -216,7 +216,7 @@ msgstr "Descarga en progreso"
 msgid "Download progress: %d%%."
 msgstr "Descarga en progreso: %d%%."
 
-#: src/xitk/errors.c:61 src/xitk/kbindings.c:2022
+#: src/xitk/errors.c:61 src/xitk/kbindings.c:2026
 msgid "Done"
 msgstr "Hecho"
 
@@ -620,7 +620,7 @@ msgstr "Título"
 msgid "Subpicture"
 msgstr "Subimagen"
 
-#: src/xitk/event_sender.c:633 src/xitk/stream_infos.c:849
+#: src/xitk/event_sender.c:633 src/xitk/stream_infos.c:853
 msgid "Audio"
 msgstr "Audio"
 
@@ -632,81 +632,81 @@ msgstr "Ángulo"
 msgid "Part"
 msgstr "Parte"
 
-#: src/xitk/event_sender.c:671 src/xitk/file_browser.c:1564
-#: src/xitk/mediamark.c:1646 src/xitk/setup.c:1289
-#: src/xitk/stream_infos.c:1002 src/xitk/viewlog.c:472
+#: src/xitk/event_sender.c:671 src/xitk/file_browser.c:1568
+#: src/xitk/mediamark.c:1647 src/xitk/setup.c:1289
+#: src/xitk/stream_infos.c:1006 src/xitk/viewlog.c:472
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/xitk/file_browser.c:311 src/xitk/mediamark.c:1631 src/xitk/setup.c:1278
+#: src/xitk/file_browser.c:315 src/xitk/mediamark.c:1632 src/xitk/setup.c:1278
 msgid "Apply"
 msgstr "Aplicar"
 
-#: src/xitk/file_browser.c:326 src/xitk/skins.c:1160
+#: src/xitk/file_browser.c:330 src/xitk/skins.c:1160
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/xitk/file_browser.c:627
+#: src/xitk/file_browser.c:631
 #, fuzzy, c-format
 msgid "Unable to open directory '%s': %s."
 msgstr "No se puede crear el directorio «%s»: %s."
 
-#: src/xitk/file_browser.c:941
+#: src/xitk/file_browser.c:945
 #, c-format
 msgid "Unable to delete file '%s': %s."
 msgstr "No se puede borrar el archivo «%s»: %s."
 
-#: src/xitk/file_browser.c:964
+#: src/xitk/file_browser.c:968
 msgid "Confirm deletion ?"
 msgstr "¿Confirmar el borrado?"
 
-#: src/xitk/file_browser.c:983
+#: src/xitk/file_browser.c:987
 #, c-format
 msgid "Unable to rename file '%s' to '%s': %s."
 msgstr "No se puede renombrar el archivo «%s» a «%s»: %s."
 
-#: src/xitk/file_browser.c:1002
+#: src/xitk/file_browser.c:1006
 msgid "Rename file"
 msgstr "Renombrar archivo"
 
-#: src/xitk/file_browser.c:1010
+#: src/xitk/file_browser.c:1014
 #, c-format
 msgid "Unable to create the directory '%s': %s."
 msgstr "No se puede crear el directorio «%s»: %s."
 
-#: src/xitk/file_browser.c:1024
+#: src/xitk/file_browser.c:1028
 msgid "Create a new directory"
 msgstr "Crear un directorio nuevo"
 
-#: src/xitk/file_browser.c:1177
+#: src/xitk/file_browser.c:1181
 msgid "File Browser"
 msgstr "Navegador de archivos"
 
-#: src/xitk/file_browser.c:1198
+#: src/xitk/file_browser.c:1202
 msgid "All files"
 msgstr "Todos los archivos"
 
-#: src/xitk/file_browser.c:1199
+#: src/xitk/file_browser.c:1203
 msgid "All known playlists"
 msgstr "Todas las listas conocidas"
 
-#: src/xitk/file_browser.c:1468
+#: src/xitk/file_browser.c:1472
 msgid "Show hidden file"
 msgstr "Mostrar los archivos ocultos"
 
-#: src/xitk/file_browser.c:1479
+#: src/xitk/file_browser.c:1483
 msgid "Rename"
 msgstr "Renombrar"
 
-#: src/xitk/file_browser.c:1494 src/xitk/kbindings.c:1981
+#: src/xitk/file_browser.c:1498 src/xitk/kbindings.c:1985
 msgid "Delete"
 msgstr "Borrar"
 
-#: src/xitk/file_browser.c:1509
+#: src/xitk/file_browser.c:1513
 msgid "Create a directory"
 msgstr "Crea un directorio"
 
-#: src/xitk/kbindings.c:429
+#: src/xitk/kbindings.c:433
 #, c-format
 msgid ""
 "Key bindings of '%s' and '%s' are the same.\n"
@@ -717,48 +717,48 @@ msgstr ""
 "\n"
 "¿Qué quiere hacer con los atajos de teclado actuales?\n"
 
-#: src/xitk/kbindings.c:434
+#: src/xitk/kbindings.c:438
 msgid "Keybindings error!"
 msgstr "Error en los atajos de teclado"
 
-#: src/xitk/kbindings.c:435 src/xitk/kbindings.c:2009
+#: src/xitk/kbindings.c:439 src/xitk/kbindings.c:2013
 msgid "Reset"
 msgstr "Reiniciar"
 
-#: src/xitk/kbindings.c:436
+#: src/xitk/kbindings.c:440
 msgid "Editor"
 msgstr "Editor"
 
-#: src/xitk/kbindings.c:806
+#: src/xitk/kbindings.c:810
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "OOCH: la tabla de atajos de teclado es NULL.\n"
 
-#: src/xitk/kbindings.c:1388
+#: src/xitk/kbindings.c:1392
 msgid "Nothing selected"
 msgstr "Nada seleccionado"
 
-#: src/xitk/kbindings.c:1389 src/xitk/post.c:115
+#: src/xitk/kbindings.c:1393 src/xitk/post.c:115
 msgid "None"
 msgstr "Ninguno"
 
-#: src/xitk/kbindings.c:1543
+#: src/xitk/kbindings.c:1547
 msgid "You can only delete alias entries."
 msgstr "Sólo puede borrar entradas del alias."
 
-#: src/xitk/kbindings.c:1671
+#: src/xitk/kbindings.c:1675
 msgid "Press Keyboard Keys..."
 msgstr "Presione teclas del teclado..."
 
-#: src/xitk/kbindings.c:1684
+#: src/xitk/kbindings.c:1688
 msgid "Event receiver window"
 msgstr "Ventana receptora de eventos"
 
 #. Ask if uses want/wont store new shorcut
-#: src/xitk/kbindings.c:1772
+#: src/xitk/kbindings.c:1776
 msgid "Accept?"
 msgstr "¿Aceptar?"
 
-#: src/xitk/kbindings.c:1776
+#: src/xitk/kbindings.c:1780
 #, c-format
 msgid ""
 "Store %s as\n"
@@ -767,7 +767,7 @@ msgstr ""
 "¿Guardar %s como\n"
 "atajo de teclado «%s»?."
 
-#: src/xitk/kbindings.c:1783
+#: src/xitk/kbindings.c:1787
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
@@ -776,55 +776,55 @@ msgstr ""
 "Este atajo de teclado es redundante con la acción:\n"
 "«%s».\n"
 
-#: src/xitk/kbindings.c:1869
+#: src/xitk/kbindings.c:1873
 msgid "key binding editor"
 msgstr "editor de atajos de teclado"
 
-#: src/xitk/kbindings.c:1898
+#: src/xitk/kbindings.c:1902
 msgid "Binding action"
 msgstr "Acción del atajo"
 
-#: src/xitk/kbindings.c:1904
+#: src/xitk/kbindings.c:1908
 msgid "Key"
 msgstr "Tecla"
 
-#: src/xitk/kbindings.c:1909
+#: src/xitk/kbindings.c:1913
 msgid "Modifiers"
 msgstr "Modificadores"
 
-#: src/xitk/kbindings.c:1953
+#: src/xitk/kbindings.c:1957
 msgid "Alias"
 msgstr "Alias"
 
-#: src/xitk/kbindings.c:1967
+#: src/xitk/kbindings.c:1971
 msgid "Edit"
 msgstr "Editar"
 
-#: src/xitk/kbindings.c:1995 src/xitk/playlist.c:402 src/xitk/playlist.c:1164
+#: src/xitk/kbindings.c:1999 src/xitk/playlist.c:406 src/xitk/playlist.c:1168
 msgid "Save"
 msgstr "Guardar"
 
-#: src/xitk/kbindings.c:2086
+#: src/xitk/kbindings.c:2090
 msgid "ctrl"
 msgstr "ctrl"
 
-#: src/xitk/kbindings.c:2107
+#: src/xitk/kbindings.c:2111
 msgid "meta"
 msgstr "alt"
 
-#: src/xitk/kbindings.c:2129
+#: src/xitk/kbindings.c:2133
 msgid "mod3"
 msgstr "mod3"
 
-#: src/xitk/kbindings.c:2151
+#: src/xitk/kbindings.c:2155
 msgid "mod4"
 msgstr "mod4"
 
-#: src/xitk/kbindings.c:2172
+#: src/xitk/kbindings.c:2176
 msgid "mod5"
 msgstr "mod5"
 
-#: src/xitk/kbindings.c:2181
+#: src/xitk/kbindings.c:2185
 msgid "Grab"
 msgstr "Capturar"
 
@@ -1287,84 +1287,84 @@ msgstr "argumento %d no válido => fin\n"
 msgid "Logo mrl"
 msgstr "Logo mrl"
 
-#: src/xitk/mediamark.c:1160 src/xitk/mediamark.c:1205
+#: src/xitk/mediamark.c:1161 src/xitk/mediamark.c:1206
 #, c-format
 msgid "Playlist file (%s) is valid (%s).\n"
 msgstr "El archivo de la lista (%s) es válido (%s).\n"
 
-#: src/xitk/mediamark.c:1162 src/xitk/mediamark.c:1207
+#: src/xitk/mediamark.c:1163 src/xitk/mediamark.c:1208
 #, c-format
 msgid "Playlist file (%s) is invalid.\n"
 msgstr "El archivo de la lista de reproducción (%s) no es válido.\n"
 
-#: src/xitk/mediamark.c:1276
+#: src/xitk/mediamark.c:1277
 #, c-format
 msgid "Playlist '%s' saved.\n"
 msgstr "Lista de reproducción «%s» guardado.\n"
 
-#: src/xitk/mediamark.c:1279
+#: src/xitk/mediamark.c:1280
 #, c-format
 msgid "Unable to save playlist (%s): %s.\n"
 msgstr "No se puede guardar la lista de reproducción (%s): %s.\n"
 
 #. Create window
-#: src/xitk/mediamark.c:1489
+#: src/xitk/mediamark.c:1490
 msgid "Mediamark Editor"
 msgstr "Editor de marcas"
 
-#: src/xitk/mediamark.c:1518
+#: src/xitk/mediamark.c:1519
 msgid "Identifier"
 msgstr "Identificador"
 
-#: src/xitk/mediamark.c:1534
+#: src/xitk/mediamark.c:1535
 msgid "Mediamark Identifier"
 msgstr "Identificador de la marca"
 
-#: src/xitk/mediamark.c:1538
+#: src/xitk/mediamark.c:1539
 msgid "Mrl"
 msgstr "Mrl"
 
-#: src/xitk/mediamark.c:1553
+#: src/xitk/mediamark.c:1554
 msgid "Mediamark Mrl"
 msgstr "Marca Mrl"
 
-#: src/xitk/mediamark.c:1557
+#: src/xitk/mediamark.c:1558
 msgid "Subtitle"
 msgstr "Subtítulo"
 
-#: src/xitk/mediamark.c:1572
+#: src/xitk/mediamark.c:1573
 msgid "Subtitle File"
 msgstr "Archivo de subtítulos"
 
-#: src/xitk/mediamark.c:1576
+#: src/xitk/mediamark.c:1577
 msgid "Sub File"
 msgstr "Archivo sub"
 
-#: src/xitk/mediamark.c:1586
+#: src/xitk/mediamark.c:1587
 msgid "Select a subtitle file to use together with the mrl."
 msgstr "Seleccionar un archivo de subtítulos para usarlo junto al mrl."
 
-#: src/xitk/mediamark.c:1592
+#: src/xitk/mediamark.c:1593
 msgid "Start at"
 msgstr "Comienza en"
 
-#: src/xitk/mediamark.c:1607
+#: src/xitk/mediamark.c:1608
 msgid "Mediamark start time (secs)."
 msgstr "Tiempo de comienzo de la marca (segs)."
 
-#: src/xitk/mediamark.c:1611
+#: src/xitk/mediamark.c:1612
 msgid "End at"
 msgstr "Acaba en"
 
-#: src/xitk/mediamark.c:1626
+#: src/xitk/mediamark.c:1627
 msgid "Mediamark end time (secs)."
 msgstr "Tiempo de fin de la marca (segs)."
 
-#: src/xitk/mediamark.c:1641
+#: src/xitk/mediamark.c:1642
 msgid "Apply the changes to the playlist."
 msgstr "Aplica los cambios a la lista de reproducción."
 
-#: src/xitk/mediamark.c:1656
+#: src/xitk/mediamark.c:1657
 msgid "Discard changes and dismiss the window."
 msgstr "Descarta los cambios y cierra la ventana."
 
@@ -1401,217 +1401,217 @@ msgstr "%d:%.2d:%.2d (%.0f%%) of %d:%.2d:%.2d"
 msgid "Position in Stream"
 msgstr "Posición en el flujo"
 
-#: src/xitk/panel.c:43
+#: src/xitk/panel.c:47
 msgid "Play previous chapter or mrl"
 msgstr "Reproduce el capítulo anterior o el mrl"
 
-#: src/xitk/panel.c:44
+#: src/xitk/panel.c:48
 msgid "Play next chapter or mrl"
 msgstr "Reproduce el capítulo siguiente o el mrl"
 
-#: src/xitk/panel.c:47
+#: src/xitk/panel.c:51
 msgid "Play previous entry from playlist"
 msgstr "Reproduce la entrada anterior de la lista de reproducción"
 
-#: src/xitk/panel.c:48
+#: src/xitk/panel.c:52
 msgid "Play next entry from playlist"
 msgstr "Reproduce la siguiente entrada de la lista de reproducción"
 
-#: src/xitk/panel.c:253
+#: src/xitk/panel.c:257
 #, c-format
 msgid "Total time: %02d:%02d:%02d"
 msgstr "Tiempo total: %02d:%02d:%02d"
 
-#: src/xitk/panel.c:627
+#: src/xitk/panel.c:631
 #, fuzzy, c-format
 msgid "Audio: %s"
 msgstr "Audio: "
 
-#: src/xitk/panel.c:627
+#: src/xitk/panel.c:631
 msgid "Muted"
 msgstr ""
 
-#: src/xitk/panel.c:627
+#: src/xitk/panel.c:631
 msgid "Unmuted"
 msgstr ""
 
-#: src/xitk/panel.c:793
+#: src/xitk/panel.c:797
 msgid "Volume control"
 msgstr "Control de volumen"
 
-#: src/xitk/panel.c:795
+#: src/xitk/panel.c:799
 msgid "Mute toggle"
 msgstr "Cambiar el modo silencio"
 
-#: src/xitk/panel.c:822
+#: src/xitk/panel.c:826
 msgid "Xine Panel"
 msgstr "Panel de Xine"
 
-#: src/xitk/panel.c:843
+#: src/xitk/panel.c:847
 msgid "panel: couldn't find image for background\n"
 msgstr "panel: no se pudo encontrar imagen para fondo\n"
 
-#: src/xitk/panel.c:980
+#: src/xitk/panel.c:984
 msgid "Stop playback"
 msgstr "Detiene la reproducción"
 
-#: src/xitk/panel.c:988
+#: src/xitk/panel.c:992
 msgid "Play selected entry"
 msgstr "Reproduce la entrada seleccionada"
 
-#: src/xitk/panel.c:996
+#: src/xitk/panel.c:1000
 msgid "Pause/Resume playback"
 msgstr "Pausa/Reanudación de la reproducción"
 
-#: src/xitk/panel.c:1011
+#: src/xitk/panel.c:1015
 msgid "Eject current medium"
 msgstr "Expulsa el soporte actual"
 
-#: src/xitk/panel.c:1019
+#: src/xitk/panel.c:1023
 msgid "Quit"
 msgstr "Salir"
 
-#: src/xitk/panel.c:1027
+#: src/xitk/panel.c:1031
 msgid "Setup window"
 msgstr "Ventana de configuración"
 
-#: src/xitk/panel.c:1035
+#: src/xitk/panel.c:1039
 msgid "Navigator"
 msgstr "Navegador"
 
-#: src/xitk/panel.c:1043
+#: src/xitk/panel.c:1047
 msgid "Hide GUI"
 msgstr "Ocultar GUI"
 
-#: src/xitk/panel.c:1051
+#: src/xitk/panel.c:1055
 msgid "Fullscreen/Window mode"
 msgstr "Modo pantalla completa/ventana"
 
-#: src/xitk/panel.c:1059
+#: src/xitk/panel.c:1063
 msgid "Next audio channel"
 msgstr "Siguiente canal de audio"
 
-#: src/xitk/panel.c:1067
+#: src/xitk/panel.c:1071
 msgid "Previous audio channel"
 msgstr "Anterior canal de audio"
 
-#: src/xitk/panel.c:1075
+#: src/xitk/panel.c:1079
 msgid "Next SPU channel"
 msgstr "Siguiente canal SPU"
 
-#: src/xitk/panel.c:1083
+#: src/xitk/panel.c:1087
 msgid "Previous SPU channel"
 msgstr "Anterior canal SPU"
 
-#: src/xitk/panel.c:1098
+#: src/xitk/panel.c:1102
 msgid "Total time: --:--:--"
 msgstr "Tiempo total: --:--:--"
 
-#: src/xitk/panel.c:1132
+#: src/xitk/panel.c:1136
 msgid "Stream playback position slider"
 msgstr "Barra de posición de reproducción del stream"
 
-#: src/xitk/panel.c:1166
+#: src/xitk/panel.c:1170
 msgid "Take a snapshot"
 msgstr "Captura la pantalla"
 
-#: src/xitk/panel.c:1174
+#: src/xitk/panel.c:1178
 msgid "Slow motion"
 msgstr "Reproducción más lenta"
 
-#: src/xitk/panel.c:1182
+#: src/xitk/panel.c:1186
 msgid "Fast motion"
 msgstr "Reproducción más rápida"
 
-#: src/xitk/panel.c:1190
+#: src/xitk/panel.c:1194
 msgid "Playlist"
 msgstr "Lista de reproducción"
 
-#: src/xitk/panel.c:1198
+#: src/xitk/panel.c:1202
 msgid "Control"
 msgstr "Control"
 
-#: src/xitk/panel.c:1206
+#: src/xitk/panel.c:1210
 msgid "MRL Browser"
 msgstr "Navegador MRL"
 
-#: src/xitk/panel.c:1211
+#: src/xitk/panel.c:1215
 msgid "gui tips visibility"
 msgstr "visibilidad de los consejos del gui"
 
-#: src/xitk/panel.c:1218
+#: src/xitk/panel.c:1222
 msgid "tips timeout (ms)"
 msgstr "duración del consejo (ms)"
 
-#: src/xitk/panel.c:1233
+#: src/xitk/panel.c:1237
 msgid "gui panel visibility"
 msgstr "visibilidad del panel del gui"
 
-#: src/xitk/playlist.c:374 src/xitk/playlist.c:1154 src/xitk/skins.c:1147
+#: src/xitk/playlist.c:378 src/xitk/playlist.c:1158 src/xitk/skins.c:1147
 msgid "Load"
 msgstr "Cargar"
 
-#: src/xitk/playlist.c:380
+#: src/xitk/playlist.c:384
 msgid "Load a playlist"
 msgstr "Carga una lista"
 
-#: src/xitk/playlist.c:408
+#: src/xitk/playlist.c:412
 msgid "Save a playlist"
 msgstr "Guarda una lista"
 
-#: src/xitk/playlist.c:988
+#: src/xitk/playlist.c:992
 msgid "Xine Playlist Editor"
 msgstr "Editor de listas de reproducción de xine"
 
-#: src/xitk/playlist.c:1006
+#: src/xitk/playlist.c:1010
 msgid "playlist: couldn't find image for background\n"
 msgstr "playlist: no se pudo encontrar la imagen de fondo\n"
 
-#: src/xitk/playlist.c:1110
+#: src/xitk/playlist.c:1114
 msgid "Move up selected MRL"
 msgstr "Sube MRL seleccionado"
 
-#: src/xitk/playlist.c:1118
+#: src/xitk/playlist.c:1122
 msgid "Move down selected MRL"
 msgstr "Baja MRL seleccionado"
 
-#: src/xitk/playlist.c:1125
+#: src/xitk/playlist.c:1129
 msgid "Start playback of selected MRL"
 msgstr "Inicia reproducción de MRL seleccionado"
 
-#: src/xitk/playlist.c:1132
+#: src/xitk/playlist.c:1136
 msgid "Delete selected MRL from playlist"
 msgstr "Borra la entrada seleccionada de la lista de reproducción"
 
-#: src/xitk/playlist.c:1139
+#: src/xitk/playlist.c:1143
 msgid "Delete all entries in playlist"
 msgstr "Borra todas las entradas de la lista de reproducción"
 
-#: src/xitk/playlist.c:1143
+#: src/xitk/playlist.c:1147
 msgid "Add"
 msgstr "Añadir"
 
-#: src/xitk/playlist.c:1149
+#: src/xitk/playlist.c:1153
 msgid "Add one or more entries in playlist"
 msgstr "Añade una o más entrada en la lista de reproducción"
 
-#: src/xitk/playlist.c:1160
+#: src/xitk/playlist.c:1164
 msgid "Load saved playlist"
 msgstr "Carga una lista de reproducción salvada"
 
-#: src/xitk/playlist.c:1170
+#: src/xitk/playlist.c:1174
 msgid "Save playlist"
 msgstr "Guarda la lista de reproducción"
 
-#: src/xitk/playlist.c:1180
+#: src/xitk/playlist.c:1184
 msgid "Close playlist window"
 msgstr "Cierra la ventana de lista de reproducción"
 
-#: src/xitk/playlist.c:1198
+#: src/xitk/playlist.c:1202
 msgid "Scan for:"
 msgstr "Buscar:"
 
-#: src/xitk/playlist.c:1210
+#: src/xitk/playlist.c:1214
 msgid "Direct MRL entry"
 msgstr "Entrada directa de MRL"
 
@@ -1779,134 +1779,134 @@ msgid "File '%s' written.\n"
 msgstr "Archivo '%s' escrito.\n"
 
 #. Create window
-#: src/xitk/stream_infos.c:469
+#: src/xitk/stream_infos.c:473
 msgid "Stream Information"
 msgstr "Información sobre los flujos"
 
-#: src/xitk/stream_infos.c:497
+#: src/xitk/stream_infos.c:501
 msgid "General"
 msgstr "General"
 
-#: src/xitk/stream_infos.c:504
+#: src/xitk/stream_infos.c:508
 msgid "Title: "
 msgstr "Título: "
 
-#: src/xitk/stream_infos.c:519
+#: src/xitk/stream_infos.c:523
 msgid "Comment: "
 msgstr "Comentario: "
 
-#: src/xitk/stream_infos.c:534
+#: src/xitk/stream_infos.c:538
 msgid "Artist: "
 msgstr "Artista: "
 
-#: src/xitk/stream_infos.c:548
+#: src/xitk/stream_infos.c:552
 msgid "Genre: "
 msgstr "Género: "
 
-#: src/xitk/stream_infos.c:561
+#: src/xitk/stream_infos.c:565
 msgid "Year: "
 msgstr "Año: "
 
-#: src/xitk/stream_infos.c:577
+#: src/xitk/stream_infos.c:581
 msgid "Album: "
 msgstr "Álbum: "
 
-#: src/xitk/stream_infos.c:592
+#: src/xitk/stream_infos.c:596
 msgid "Misc"
 msgstr "Misc"
 
-#: src/xitk/stream_infos.c:598
+#: src/xitk/stream_infos.c:602
 msgid "Input Plugin: "
 msgstr "Plugin de entrada: "
 
-#: src/xitk/stream_infos.c:611
+#: src/xitk/stream_infos.c:615
 msgid "System Layer: "
 msgstr "Capa del sistema: "
 
-#: src/xitk/stream_infos.c:624 src/xitk/stream_infos.c:794
-#: src/xitk/stream_infos.c:939
+#: src/xitk/stream_infos.c:628 src/xitk/stream_infos.c:798
+#: src/xitk/stream_infos.c:943
 msgid "Bitrate: "
 msgstr "Tasa de bits: "
 
-#: src/xitk/stream_infos.c:637
+#: src/xitk/stream_infos.c:641
 msgid "Frame Duration: "
 msgstr "Duración del marco: "
 
-#: src/xitk/stream_infos.c:652
+#: src/xitk/stream_infos.c:656
 msgid "Is Seekable: "
 msgstr "Es posicionable: "
 
-#: src/xitk/stream_infos.c:665
+#: src/xitk/stream_infos.c:669
 msgid "Has Chapters: "
 msgstr "Tiene capítulos: "
 
-#: src/xitk/stream_infos.c:678
+#: src/xitk/stream_infos.c:682
 msgid "Ignore Spu: "
 msgstr "Ignorar spu: "
 
-#: src/xitk/stream_infos.c:691
+#: src/xitk/stream_infos.c:695
 msgid "Has Still: "
 msgstr "Tiene aún: "
 
-#: src/xitk/stream_infos.c:706
+#: src/xitk/stream_infos.c:710
 msgid "Video"
 msgstr "Vídeo"
 
-#: src/xitk/stream_infos.c:714 src/xitk/stream_infos.c:857
+#: src/xitk/stream_infos.c:718 src/xitk/stream_infos.c:861
 msgid "Has: "
 msgstr "Tiene: "
 
-#: src/xitk/stream_infos.c:726 src/xitk/stream_infos.c:870
+#: src/xitk/stream_infos.c:730 src/xitk/stream_infos.c:874
 msgid "Handled: "
 msgstr "Gestionado: "
 
-#: src/xitk/stream_infos.c:739 src/xitk/stream_infos.c:883
+#: src/xitk/stream_infos.c:743 src/xitk/stream_infos.c:887
 msgid "Ignore: "
 msgstr "Ignorar: "
 
-#: src/xitk/stream_infos.c:752 src/xitk/stream_infos.c:897
+#: src/xitk/stream_infos.c:756 src/xitk/stream_infos.c:901
 msgid "Codec: "
 msgstr "Codec: "
 
-#: src/xitk/stream_infos.c:768 src/xitk/stream_infos.c:913
+#: src/xitk/stream_infos.c:772 src/xitk/stream_infos.c:917
 msgid "FourCC: "
 msgstr "FourCC: "
 
-#: src/xitk/stream_infos.c:781 src/xitk/stream_infos.c:926
+#: src/xitk/stream_infos.c:785 src/xitk/stream_infos.c:930
 msgid "Channel(s): "
 msgstr "Canal(es): "
 
-#: src/xitk/stream_infos.c:808
+#: src/xitk/stream_infos.c:812
 msgid "Resolution: "
 msgstr "Resolución: "
 
-#: src/xitk/stream_infos.c:821
+#: src/xitk/stream_infos.c:825
 msgid "Ratio: "
 msgstr "Proporción: "
 
-#: src/xitk/stream_infos.c:834
+#: src/xitk/stream_infos.c:838
 msgid "Stream(s): "
 msgstr "Flujo(s): "
 
-#: src/xitk/stream_infos.c:952
+#: src/xitk/stream_infos.c:956
 msgid "Bits: "
 msgstr "Bits: "
 
-#: src/xitk/stream_infos.c:966
+#: src/xitk/stream_infos.c:970
 msgid "Samplerate: "
 msgstr "Tasa de la muestra: "
 
-#: src/xitk/stream_infos.c:984
+#: src/xitk/stream_infos.c:988
 msgid "Update"
 msgstr "Actualizar"
 
-#: src/xitk/videowin.c:179
+#: src/xitk/videowin.c:183
 msgid "videowin: output driver cannot select a working visual\n"
 msgstr ""
 "videowin: el manejador de salida no puede seleccionar un visual que "
 "funcione\n"
 
-#: src/xitk/videowin.c:186
+#: src/xitk/videowin.c:190
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
 msgstr ""
@@ -1921,15 +1921,15 @@ msgstr ""
 #. *           dest_width,
 #. *           dest_height);
 #.
-#: src/xitk/videowin.c:228
+#: src/xitk/videowin.c:232
 msgid "xine video output"
 msgstr "salida de vídeo de xine"
 
-#: src/xitk/videowin.c:403
+#: src/xitk/videowin.c:407
 msgid "XF86VidMode Extension: modeline switching failed.\n"
 msgstr "Extensión XF86VidMode: falló el cambio de modeline.\n"
 
-#: src/xitk/videowin.c:1208
+#: src/xitk/videowin.c:1212
 msgid ""
 "Screens to use in order to do a very fullscreen in xinerama mode. (example 0 "
 "2 3)"
@@ -1937,75 +1937,80 @@ msgstr ""
 "Pantallas que utilizar en orden para un modo xinearama a múltiples pantallas "
 "completas. (ejemplo 0 2 3)"
 
-#: src/xitk/videowin.c:1209
+#: src/xitk/videowin.c:1213
 msgid ""
 "Example, if you want the display to expand on screen 0, 2 and 3, enter 0 2 3"
 msgstr ""
 "Por ejemplo, si quiere que la pantalla se expanda a las pantallas 0, 2 y 3, "
 "introduzca 0 2 3"
 
-#: src/xitk/videowin.c:1257
+#: src/xitk/videowin.c:1261
 msgid "x coordinate for xinerama fullscreen (-8192 = autodetect)"
 msgstr "coordenada x para pantalla completa de xinerama (-8192 = autodetectar)"
 
-#: src/xitk/videowin.c:1267
+#: src/xitk/videowin.c:1271
 msgid "y coordinate for xinerama fullscreen (-8192 = autodetect)"
 msgstr "coordenada y para pantalla completa de xinerama (-8192 = autodetectar)"
 
-#: src/xitk/videowin.c:1277
+#: src/xitk/videowin.c:1281
 msgid "width for xinerama fullscreen (-8192 = autodetect)"
 msgstr "ancho para la pantalla completa de xinerama (-8192 = autodetectar)"
 
-#: src/xitk/videowin.c:1287
+#: src/xitk/videowin.c:1291
 msgid "height for xinerama fullscreen (-8192 = autodetect)"
 msgstr "alto para la pantalla completa de xinerama (-8192 = autodetectar)"
 
-#: src/xitk/videowin.c:1320
+#: src/xitk/videowin.c:1324
 msgid "Xine Video Window"
 msgstr "Ventana de vídeo de xine"
 
-#: src/xitk/videowin.c:1324
+#: src/xitk/videowin.c:1328
 msgid "Xine Video Fullscreen Window"
 msgstr "Ventana de vídeo a pantalla completa de xine"
 
-#: src/xitk/videowin.c:1328
+#: src/xitk/videowin.c:1332
 msgid "Xine Video Borderless Window"
 msgstr "Ventana de vídeo sin bordes de xine"
 
-#: src/xitk/videowin.c:1349
+#: src/xitk/videowin.c:1353
 msgid "XAllocWMHints() failed\n"
 msgstr "XAllocWMHints() falló\n"
 
-#: src/xitk/videowin.c:1374
+#: src/xitk/videowin.c:1378
 msgid "New stream sizes resize output window"
 msgstr "Nuevo tamaño del flujo redimensiona la ventana de salida"
 
-#: src/xitk/videowin.c:1384
+#: src/xitk/videowin.c:1388
 msgid "Double size for small streams (require stream_resize_window)"
 msgstr "Tamaño doble para flujos pequeños (requiere stream_resize_window)"
 
-#: src/xitk/videowin.c:1408
+#: src/xitk/videowin.c:1412
 msgid "use XVidModeExtension when switching to fullscreen"
 msgstr "usar XVidModeExtension al cambiar a pantalla completa"
 
-#: src/xitk/videowin.c:1429
+#: src/xitk/videowin.c:1433
 #, c-format
 msgid "XF86VidMode Extension (%d.%d) detected, trying to use it.\n"
 msgstr "Extensión XF86VidMode (%d.%d) detectada, intentando usarla.\n"
 
-#: src/xitk/videowin.c:1432
+#: src/xitk/videowin.c:1438
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
 msgstr "Extensión XF86VidMode: %d modelines encontrados.\n"
 
-#: src/xitk/videowin.c:1450
+#: src/xitk/videowin.c:1447
+#, c-format
+msgid "XF86VidModeModeLine %dx%d isn't valid: discarded.\n"
+msgstr ""
+
+#: src/xitk/videowin.c:1478
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
 msgstr ""
 "Extensión XF86VidMode: no se pudo obtener la lista de modelines disponible. "
 "Falló.\n"
 
-#: src/xitk/videowin.c:1453
+#: src/xitk/videowin.c:1481
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
 msgstr "Extensión XF86VidMode: falló la iniciación, no se usa.\n"
 
