@@ -84,6 +84,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   int      ret;
   int      has_video, has_audio;
   uint32_t video_handled, audio_handled;
+  char	  *video_name, *audio_name;
   
   if(gGui->visual_anim.post_changed && (xine_get_status(stream) == XINE_STATUS_STOP)) {
     post_rewire_visual_anim();
@@ -94,14 +95,16 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
     start_time_in_secs *= 1000;
       
   has_video     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
+  video_name    = xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC);
   printf("XINE_STREAM_INFO_HAS_VIDEO %d (%s)\n", has_video, 
-	 xine_get_meta_info(stream, XINE_META_INFO_VIDEOCODEC));
+	 video_name ? video_name : "-");
   #if 1 /* Will be enabled sooner */
   video_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_VIDEO_HANDLED);
   printf("XINE_STREAM_INFO_VIDEO_HANDLED %d\n", video_handled);
   has_audio     = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_AUDIO);
+  audio_name    = xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC);
   printf("XINE_STREAM_INFO_HAS_AUDIO %d (%s)\n", has_audio,
-	 xine_get_meta_info(stream, XINE_META_INFO_AUDIOCODEC));
+	 audio_name ? audio_name : "-");
   audio_handled = xine_get_stream_info(stream, XINE_STREAM_INFO_AUDIO_HANDLED);
   printf("XINE_STREAM_INFO_AUDIO_HANDLED %d\n", audio_handled);
 
