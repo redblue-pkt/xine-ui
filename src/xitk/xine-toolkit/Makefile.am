@@ -55,6 +55,7 @@ noinst_HEADERS = \
 	checkbox.c \
 	checkbox.h \
 	combo.h \
+	cursors.h \
 	dnd.h \
 	doublebox.h \
 	font.h \
