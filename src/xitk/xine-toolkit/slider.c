@@ -435,7 +435,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
  */
 static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp, int x, int y) {
   slider_private_data_t *private_data;
-
+    
   if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_SLIDER)) {
     
     private_data = (slider_private_data_t *) w->private_data;    
@@ -448,7 +448,9 @@ static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp
     
     if((bUp == 0) && (private_data->focus == FOCUS_RECEIVED)) {
       XEvent sliderevent;
-
+      int new_value = (int) private_data->value;
+      int old_value = !new_value;
+      
       /*
        * Exec motion callback function (if available)
        */
@@ -473,10 +475,14 @@ static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp
 	  while(XCheckMaskEvent (private_data->imlibdata->x.disp, ButtonMotionMask,
 				 &sliderevent));
 
-	  slider_update(w, (sliderevent.xbutton.x - w->x), (sliderevent.xbutton.y - w->y));
+	  slider_update(w, (sliderevent.xbutton.x - w->x), (sliderevent.xbutton.y - w->y));	
+	  new_value = (int) private_data->value;
 
-	  paint_slider(w, wl->win, wl->gc);
-
+	  if(new_value != old_value) {
+	    old_value = new_value;
+	    paint_slider(w, wl->win, wl->gc);
+	  }
+	  
  	  if(private_data->motion_callback) {
 	    private_data->motion_callback(private_data->sWidget,
 					  private_data->motion_userdata,
@@ -486,18 +492,18 @@ static int notify_click_slider(xitk_widget_list_t *wl, xitk_widget_t *w, int bUp
 	}
 	break;
 
-	case ButtonRelease:
+	case ButtonRelease: {
 	  private_data->bClicked = 0;
-
-	  paint_slider(w, wl->win, wl->gc);
-
+	  
+	  xitk_slider_set_pos(wl, w, private_data->value);
+	  
 	  if(private_data->callback) {
 	    private_data->callback(private_data->sWidget,
 				   private_data->userdata,
 				   (int) private_data->value);
 	  }
-
-	  break;
+	}
+	break;
 
 	default:
 	  xitk_xevent_notify (&sliderevent);

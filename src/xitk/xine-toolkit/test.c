@@ -635,6 +635,7 @@ static void create_sliders(void) {
   xitk_slider_set_pos(test->widget_list, test->rslider, 0);
   
   xitk_set_widget_tips_default(test->rslider, "This is a rotate button");
+
 }
 
 static void combo_select(xitk_widget_t *w, void *data, int select) {
