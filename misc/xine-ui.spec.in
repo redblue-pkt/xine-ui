@@ -13,6 +13,7 @@
 Name:        %{name}
 Summary:     A Free Audio/Video Player.
 Summary(cs): Volnì ¹iøitelný audio/video pøehrávaè
+Summary(de): Ein freies Audio- und Video-Abspielprogramm
 Version:     %{version}
 Release:     %{release}
 Copyright:   GPL
@@ -30,10 +31,17 @@ uses libxine for audio/video decoding and playback. For more informations on
 what formats are supported, please refer to the libxine documentation.
 
 %description -l cs
-xine je velmi atraktivní volnì ¹iøitelný audio/video pøehrávaè pro unixovské 
-systémy, který pou¾ívá libxine pro dekódování zvuku a videa a pøehrávání. 
-Více informací o tom, jaké formáty jsou podporovány získáte v dokumentaci 
+xine je velmi atraktivní volnì ¹iøitelný audio/video pøehrávaè pro unixovské
+systémy, který pou¾ívá libxine pro dekódování zvuku a videa a pøehrávání.
+Více informací o tom, jaké formáty jsou podporovány získáte v dokumentaci
 od libxine.
+
+%description -l de
+xine ist ein funktionsreiches, freies Audio- und Video-Abspielprogramm für
+Unix-basierende Systeme, welches die xine-Bibliothek libxine für Audio- und
+Videodekodierung, sowie -wiedergabe verwendet. Um mehr Informationen über die
+unterstützten Formate zu erhalten, lesen Sie bitte in der Dokumentation der
+xine-Bibliothek libxine nach.
 
 %prep
 %setup -n %{name}-%{version}
@@ -64,19 +72,19 @@ make DESTDIR=%{?buildroot:%{buildroot}} install
 if test -d %{skindir}/metal; then rm -rf %{skindir}/metal; fi
 if test -d %{skindir}/default; then rm -rf %{skindir}/default && ln -s %{skindir}/xinetic %{skindir}/default; fi
 
-if test ! -d %{_datadir}/icons; then 
+if test ! -d %{_datadir}/icons; then
   %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/icons
 fi
 %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm %{_datadir}/icons/xine.xpm
-if test ! -d %{_datadir}/pixmaps; then 
+if test ! -d %{_datadir}/pixmaps; then
   %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/pixmaps
 fi
 %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm %{_datadir}/pixmaps/xine.xpm
-if test -d %{_sysconfdir}/X11/wmconfig; then 
+if test -d %{_sysconfdir}/X11/wmconfig; then
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.wmconfig %{_sysconfdir}/X11/wmconfig/xine
 fi
 if test -d %{_sysconfdir}/X11/applnk; then
-  if test ! -d %{_sysconfdir}/X11/applnk/Multimedia; then 
+  if test ! -d %{_sysconfdir}/X11/applnk/Multimedia; then
     %{ginstall} -m 755 -o 0 -g 0 -d %{_sysconfdir}/X11/applnk/Multimedia
   fi
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop
@@ -84,7 +92,7 @@ fi
 # End Icons
 # Gnome
 if test -d /opt/gnome; then
-  if test ! -d /opt/gnome/share/pixmaps; then 
+  if test ! -d /opt/gnome/share/pixmaps; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/gnome/share/pixmaps
   fi
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm /opt/gnome/share/pixmaps/xine.xpm
@@ -132,21 +140,22 @@ if test -d /opt/kde2/; then
   DIR_LO=/opt/kde2/share/icons/locolor
   HIRES='48x48 32x32 22x22'
   LORES='32x32 22x22 16x16'
-  for hires in $$HIRES; do
+  for hires in $HIRES; do
     %{ginstall} -m 755 -o 0 -g 0 -d $DIR_HI/$hires/apps
     %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$hires.png $DIR_HI/$hires/apps/xine.png
   done
-  for lores in $$LORES; do
+  for lores in $LORES; do
     %{ginstall} -m 755 -o 0 -g 0 -d $DIR_LO/$lores/apps
     %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine_$lores.png $DIR_LO/$lores/apps/xine.png
   done
-  if test ! -d /opt/kde2/share/applnk/Multimedia; then 
+  if test ! -d /opt/kde2/share/applnk/Multimedia; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde2/share/applnk/Multimedia
   fi
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop
+  cat /opt/kde2/share/applnk/Multimedia/xine.desktop | sed -e "s/xine.xpm/\xine/g" > /opt/kde2/share/applnk/Multimedia/xine.desktop
 else
   if test -d %{_datadir}/applnk/Multimedia; then
-    if test ! -d %{_datadir}/applnk/Multimedia; then 
+    if test ! -d %{_datadir}/applnk/Multimedia; then
       %{ginstall} -m 755 -o 0 -g 0 -d %{_datadir}/applnk/Multimedia
     fi
     %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
@@ -155,16 +164,16 @@ fi
 # End Kde2
 # Kde
 if test -d /opt/kde; then
-  if test ! -d /opt/kde/share/icons; then 
+  if test ! -d /opt/kde/share/icons; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/icons
   fi
-  if test ! -d /opt/kde/share/applnk/Multimedia; then 
+  if test ! -d /opt/kde/share/applnk/Multimedia; then
     %{ginstall} -m 755 -o 0 -g 0 -d /opt/kde/share/applnk/Multimedia
   fi
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.xpm /opt/kde/share/icons/xine.xpm
   %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop /opt/kde/share/applnk/Multimedia/xine.desktop
 else
-  if test -d %{_datadir}/applnk/Multimedia; then 
+  if test -d %{_datadir}/applnk/Multimedia; then
     %{ginstall} -m 644 -o 0 -g 0 %{deskdir}/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop
   fi
 fi
@@ -173,29 +182,29 @@ fi
 %preun
   DIR_HI=/opt/kde2/share/icons/hicolor
   DIR_LO=/opt/kde2/share/icons/locolor
-  
+  DIR_HI3=/opt/kde3/share/icons/hicolor
+  DIR_LO3=/opt/kde3/share/icons/locolor
+  # icon dimensions
   HIRES='48x48 32x32 22x22'
   LORES='32x32 22x22 16x16'
-
-  HIRES3='48x48 32x32 22x22'
-  LORES3='32x32 22x22 16x16'
-
+  # files to remove
   REMOVALS='%{_datadir}/icons/xine.xpm %{_datadir}/pixmaps/xine.xpm %{_sysconfdir}/X11/wmconfig/xine %{_sysconfdir}/X11/applnk/Multimedia/xine.desktop /opt/gnome/share/pixmaps/xine.xpm /opt/gnome/share/gnome/apps/Multimedia/xine.desktop %{_datadir}/gnome/apps/Multimedia/xine.desktop /opt/kde2/share/applnk/Multimedia/xine.desktop /opt/kde3/share/applnk/Multimedia/xine.desktop  %{_datadir}/applnk/Multimedia/xine.desktop /opt/kde/share/icons/xine.xpm /opt/kde/share/applnk/Multimedia/xine.desktop %{_datadir}/applnk/Multimedia/xine.desktop'
-  
+  # remove files in $REMOVALS
   for remove in $REMOVALS; do
     rm -f $remove
   done
+  # KDE2 icons
   for hires in $HIRES; do
     rm -f $DIR_HI/$hires/apps/xine.png
   done
   for lores in $LORES; do
     rm -f $DIR_LO/$lores/apps/xine.png
   done
-  
-  for hires in $HIRES3; do
+  # KDE3 icons
+  for hires in $HIRES; do
     rm -f $DIR_HI3/$hires/apps/xine.png
   done
-  for lores in $LORES3; do
+  for lores in $LORES; do
     rm -f $DIR_LO3/$lores/apps/xine.png
   done
 
@@ -217,8 +226,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sun May 26 2002 Matthias Dahl <matthew2k@web.de>
+- added more kde2 and kde3 fixes by Manfred Tremmel <Manfred.Tremmel@iiv.de>
 * Sun May 20 2002 Matthias Dahl <matthew2k@web.de>
-- added kde3 support by Manfred Tremmel <Manfred.Tremmel@iiv.de> 
+- added kde2 bugfix by Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- added german description by Manfred Tremmel <Manfred.Tremmel@iiv.de>
+* Sun May 20 2002 Matthias Dahl <matthew2k@web.de>
+- added kde3 support by Manfred Tremmel <Manfred.Tremmel@iiv.de>
 * Sat May 18 2002 Matthias Dahl <matthew2k@web.de>
 - added czech translations by valtri@atlas.cz
 * Thu May 16 2002 Matthias Dahl <matthew2k@web.de>
