@@ -109,7 +109,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef HAVE_XF86VIDMODE
  "F"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:c:";
+ "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:c:E";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
@@ -150,6 +150,7 @@ static struct option long_options[] = {
   {"broadcast-port" , required_argument, 0, OPTION_BROADCAST_PORT    },
 #endif
   {"no-logo"        , no_argument      , 0, OPTION_NO_LOGO           },
+  {"no-reload"      , no_argument      , 0, 'E'                      },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -533,6 +534,7 @@ void show_usage (void) {
   printf(_("                               Slave is started with 'xine slave://address:port'\n"));
 #endif
   printf(_("      --no-logo                Don't display the logo.\n"));
+  printf(_("  -E, --no-reload              Don't reload old playlist.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1110,6 +1112,7 @@ int main(int argc, char *argv[]) {
   int                     no_auto_start   = 0;
   char                   *cfgdir          = CONFIGDIR;
   char                   *cfgfile         = CONFIGFILE;
+  int                     old_playlist_cfg, no_old_playlist = 0;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1139,6 +1142,7 @@ int main(int argc, char *argv[]) {
   
   gGui->stream                 = NULL;
   gGui->debug_level            = 0;
+
   gGui->autoscan_plugin        = NULL;
   gGui->prefered_visual_class  = -1;
   gGui->prefered_visual_id     = None;
@@ -1444,6 +1448,10 @@ int main(int argc, char *argv[]) {
       }
       break;
 
+    case 'E':
+      no_old_playlist = 1;
+      break;
+
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -1534,6 +1542,26 @@ int main(int argc, char *argv[]) {
   gGui->xine = xine_new();
   xine_config_load(gGui->xine, gGui->configfile);
   xine_engine_set_param(gGui->xine, XINE_ENGINE_PARAM_VERBOSITY, gGui->verbosity);
+  
+  /* 
+   * Playlist auto reload 
+   */
+  old_playlist_cfg = 
+    xine_config_register_bool(gGui->xine, "gui.playlist_auto_reload", 
+			      1,
+			      _("Automatically reload old playlist"),
+			      _("If it's enabled and if you don't specify any MRL in command "
+				"line, xine will automatically load previous playlist."), 
+			      CONFIG_LEVEL_BEG,
+			      CONFIG_NO_CB,
+			      CONFIG_NO_DATA);
+
+  if(old_playlist_cfg && (!(_argc - optind)) && (!no_old_playlist)) {
+    char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    
+    sprintf(buffer, "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
+    mediamark_load_mediamarks(buffer);
+  }
 
   /*
    * init gui
@@ -1541,7 +1569,7 @@ int main(int argc, char *argv[]) {
   gui_init(_argc - optind, &_argv[optind], &window_attribute);
 
   pthread_mutex_init(&gGui->download_mutex, NULL);
-  
+
   /* Automatically start playback if new_mode is enabled and playlist is filled */
   if((gGui->smart_mode && 
       (gGui->playlist.num || actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) &&

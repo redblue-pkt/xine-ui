@@ -176,7 +176,6 @@ static void amp_level_cb(void *data, xine_cfg_entry_t *cfg) {
   osd_draw_bar(_("Amplification Level"), 0, 200, gGui->mixer.amp, OSD_BAR_STEPPER);
 }
 
-
 int wm_not_ewmh_only(void) {
   int wm_type = xitk_get_wm_type();
   
@@ -1084,7 +1083,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   if (xine_config_register_bool (gGui->xine, "gui.xsynchronize", 
 				 0,
-				 _("synchronized X protocol (debug)"), 
+				 _("Synchronized X protocol (debug)"), 
 				 CONFIG_NO_HELP,
 				 CONFIG_LEVEL_ADV,
 				 CONFIG_NO_CB,
@@ -1219,7 +1218,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->smart_mode = 
     xine_config_register_bool(gGui->xine, "gui.smart_mode", 
 			      1,
-			      _("change xine's behavior for unexperienced user"), 
+			      _("Change xine's behavior for unexperienced user"), 
 			      _("In this mode, xine take some decisions to simplify user's life."),
 			      CONFIG_LEVEL_BEG,
 			      smart_mode_cb,
@@ -1238,7 +1237,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   gGui->experience_level =
     (xine_config_register_enum(gGui->xine, "gui.experience_level", 
 			       0, exp_levels,
-			       _("configuration experience level"),
+			       _("Configuration experience level"),
 			       _("Level of user's experience, this will show more or less "
 				 "configuration options."), 
 			       CONFIG_LEVEL_BEG,
@@ -1247,7 +1246,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->mixer.amp =  xine_config_register_range(gGui->xine, "gui.amp_level", 
 						100, 0, 200,
-						_("amplification level"),
+						_("Amplification level"),
 						NULL,
 						CONFIG_LEVEL_ADV,
 						amp_level_cb, 
@@ -1507,6 +1506,14 @@ void gui_run(void) {
   }
 
   xitk_run(on_start, (void *)auto_start);
+
+  /* save playlist */
+  if(gGui->playlist.mmk && gGui->playlist.num) {
+    char buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1];
+    
+    sprintf(buffer, "%s/.xine/xine-ui_old_playlist.tox", xine_get_homedir());
+    mediamark_save_mediamarks(buffer);
+  }
 
   gGui->running = 0;
   deinit_session();

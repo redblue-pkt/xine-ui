@@ -2318,8 +2318,11 @@ int mediamark_concat_mediamarks(const char *_filename) {
       found = 1;
   }
   
-  if(found)
-    printf(_("Playlist file (%s) is valid (%s).\n"), filename, playlist->type);
+  if(found) {
+#ifdef DEBUG
+    printf("Playlist file (%s) is valid (%s).\n", filename, playlist->type);
+#endif
+  }
   else {
     fprintf(stderr, _("Playlist file (%s) is invalid.\n"), filename);
     SAFE_FREE(playlist);
@@ -2372,8 +2375,11 @@ void mediamark_load_mediamarks(const char *_filename) {
       found = 1;
   }
   
-  if(found)
-    printf(_("Playlist file (%s) is valid (%s).\n"), filename, playlist->type);
+  if(found) {
+#ifdef DEBUG
+    printf("Playlist file (%s) is valid (%s).\n", filename, playlist->type);
+#endif
+  }
   else {
     fprintf(stderr, _("Playlist file (%s) is invalid.\n"), filename);
     SAFE_FREE(playlist);
@@ -2445,7 +2451,9 @@ void mediamark_save_mediamarks(const char *filename) {
       fprintf(fd, "# END\n");
       
       fclose(fd);
-      printf(_("Playlist '%s' saved.\n"), filename);
+#ifdef DEBUG
+      printf("Playlist '%s' saved.\n", filename);
+#endif
     }
     else
       fprintf(stderr, _("Unable to save playlist (%s): %s.\n"), filename, strerror(errno));
@@ -2794,7 +2802,6 @@ void mmk_edit_mediamark(mediamark_t **mmk, apply_callback_t callback, void *data
   x = 5;
   y += 40;
   w = 60;
-  printf("w: %d\n", w);
   draw_outter_frame(gGui->imlib_data, bg, _("Start at"), btnfontname, 
 		    x, y, w + 60, 20 + 15 + 10);
 

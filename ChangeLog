@@ -1,5 +1,6 @@
 xine-ui (0.9.22) unstable; urgency=low
 
+  * reload old playlist if no MRL is given (can be turned off).
   * new widget, double box,
   * font caching (+fix) and cleanups from Frantisek Dvorak,
   * change policy of created widget, all non skinned are disabled and hidden,
