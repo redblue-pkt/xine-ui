@@ -114,11 +114,11 @@ void panel_update_channel_display () {
   label_change_label (panel_widget_list, panel_spuid_label, panel_spuid);
 }
 
-void panel_update_mrl_display () {
+void panel_update_mrl_display (void) {
   label_change_label (panel_widget_list, panel_title_label, gGui->filename);
 }
 
-void panel_update_slider () {
+void panel_update_slider (void) {
 
   if (panel_is_visible()) {
     if(panel_slider_timer > MAX_UPDSLD) {
@@ -228,7 +228,38 @@ void panel_handle_event(XEvent *event) {
 }
 
 /*
- *
+ * Create buttons from information if input plugins autoplay featured. 
+ * We couldn't do this into panel_init(), this function is
+ * called before xine engine initialization.
+ */
+void panel_add_autoplay_buttons(void) {
+  int x, y;
+  int i = 0;
+  char **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+  widget_t *tmp;
+  
+  x = gui_get_skinX("AutoPlayGUI");
+  y = gui_get_skinY("AutoPlayGUI");
+    
+  while(autoplay_plugins[i] != NULL) {
+    gui_list_append_content (panel_widget_list->l,
+	     (tmp =
+	      create_label_button (gGui->display, gGui->imlib_data, 
+				   x, y,
+				   CLICK_BUTTON,
+				   autoplay_plugins[i],
+				   pl_scan_input, NULL, 
+				   gui_get_skinfile("AutoPlayGUI"),
+				   gui_get_ncolor("AutoPlayGUI"),
+				   gui_get_fcolor("AutoPlayGUI"),
+				   gui_get_ccolor("AutoPlayGUI"))));
+    x -= widget_get_width(tmp) + 1;
+    i++;
+  }
+}
+
+/*
+ * Create the panel window, and fit all widgets in.
  */
 void panel_init (void) {
   GC                      gc;
@@ -277,9 +308,12 @@ void panel_init (void) {
   printf ("w : %d h : %d\n",hint.width, hint.height);
   */
 
-  gGui->panel_window = XCreateWindow (gGui->display, DefaultRootWindow(gGui->display), 
-				      hint.x, hint.y, hint.width, hint.height, 0, 
-				      gGui->imlib_data->x.depth, CopyFromParent, 
+  gGui->panel_window = XCreateWindow (gGui->display, 
+				      DefaultRootWindow(gGui->display), 
+				      hint.x, hint.y,
+				      hint.width, hint.height, 0, 
+				      gGui->imlib_data->x.depth,
+				      CopyFromParent, 
 				      gGui->imlib_data->x.visual,
 				      0, &attr);
   
@@ -460,22 +494,6 @@ void panel_init (void) {
 					  (void*)GUI_PREV, 
 					  gui_get_skinfile("SpuPrev")));
 
-/*    gui_list_append_content (panel_widget_list->l,  */
-/*  			   create_button (gGui->display, gGui->imlib_data, 
-			                  gui_get_skinX("DVDScan"), */
-/*  					  gui_get_skinY("DVDScan"), */
-/*  					  gui_scan_input, */
-/*  					  (void*)SCAN_DVD,  */
-/*  					  gui_get_skinfile("DVDScan"))); */
-
-/*    gui_list_append_content (panel_widget_list->l,  */
-/*  			   create_button (gGui->display, gGui->imlib_data, 
-			                  gui_get_skinX("VCDScan"), */
-/*  					  gui_get_skinY("VCDScan"), */
-/*  					  gui_scan_input, */
-/*  					  (void*)SCAN_VCD,  */
-/*  					  gui_get_skinfile("VCDScan"))); */
-
   /* LABEL TITLE */
   gui_list_append_content (panel_widget_list->l,
 			   (panel_title_label = 
@@ -538,39 +556,6 @@ void panel_init (void) {
 			    gui_get_skinfile("SliderFGVol"),
 			    panel_slider_cb, NULL)));
   */
-
-  /* FIXME
-  {  
-    int x, y, i, num_plugins;
-    input_plugin_t *ip;
-    widget_t *tmp;
-    
-    x = gui_get_skinX("AutoPlayGUI");
-    y = gui_get_skinY("AutoPlayGUI");
-    
-    ip = xine_get_input_plugin_list (&num_plugins);
-    fprintf (stderr, "%d input plugins ...\n",num_plugins);
-    for (i = 0; i < num_plugins; i++) {
-      fprintf (stderr, "plugin #%d : id=%s\n", i, ip->get_identifier());
-      if(ip->get_capabilities() & INPUT_CAP_AUTOPLAY) {
-	gui_list_append_content (panel_widget_list->l,
-		       (tmp =
-			create_label_button (gGui->display, gGui->imlib_data, 
-			                     x, y,
-					     CLICK_BUTTON,
-					     ip->get_identifier(),
-					     pl_scan_input, (void*)ip, 
-					     gui_get_skinfile("AutoPlayGUI"),
-					     gui_get_ncolor("AutoPlayGUI"),
-					     gui_get_fcolor("AutoPlayGUI"),
-					     gui_get_ccolor("AutoPlayGUI"))));
-	x -= widget_get_width(tmp) + 1;
-      }
-      ip++;
-    }
-  }
-  */
-
 
   gui_list_append_content (panel_widget_list->l, 
 			   create_label_button (gGui->display, 

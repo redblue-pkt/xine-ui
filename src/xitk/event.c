@@ -269,12 +269,38 @@ void gui_handle_event (XEvent *event) {
 
     switch (mykey) {
     
-    case XK_greater:
+    case XK_less:
+    case XK_greater: {
+      int x, y;
+      unsigned int w, h, b, d;
+      Window rootwin;
+      
+      XLockDisplay (gGui->display);
+      
+      if(XGetGeometry(gGui->display, 
+		      gGui->video_window, &rootwin, 
+		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
+      }
+
+      if(mykey == XK_less) {
+	w /= 1.2;
+	h /= 1.2;
+      }
+      else {
+	w *= 1.2;
+	h *= 1.2;
+      }
+      
+      XResizeWindow (gGui->display, gGui->video_window, w, h);
+      XUnlockDisplay(gGui->display);
+
+    }
+      break;
+
     case XK_period:
       gui_change_spu_channel(NULL, (void*)GUI_NEXT);
       break;
       
-    case XK_less:
     case XK_comma:
       gui_change_spu_channel(NULL, (void*)GUI_PREV);
       break;
@@ -501,7 +527,7 @@ void gui_init (int nfiles, char *filenames[]) {
    */
 
   for (i=0; i<nfiles; i++)
-    gGui->playlist[i]     = filenames[i];
+    gGui->playlist[i] = filenames[i];
   gGui->playlist_num = nfiles; 
   gGui->playlist_cur = 0;
 
@@ -581,6 +607,7 @@ void gui_init (int nfiles, char *filenames[]) {
   xine_pid = getppid();
 
   video_window_init ();
+  
   panel_init ();
 
   /*
@@ -617,6 +644,8 @@ void gui_run (void) {
   XEvent                myevent;
   struct sigaction      action;
 
+  panel_add_autoplay_buttons();
+
   panel_update_channel_display () ;
   panel_update_mrl_display ();
 
@@ -626,21 +655,22 @@ void gui_run (void) {
     int i = 0;
     char **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     
-    perr("autoplay\n");
-    
     while(autoplay_plugins[i] != NULL) {
       
-      perr("try '%s'\n", autoplay_plugins[i]);
       if(gGui->autoplay_options & PLAY_FROM_DVD)
 
 	if(!strcasecmp(autoplay_plugins[i], "DVD")) {
 	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine, "DVD");
 	  int j = 0;
-	    
+	  
 	  while(autoplay_mrls[j]) {
-	    printf("DVD: autoplaylist[%d]='%s'\n", j, autoplay_mrls[j]);
+	    gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
 	    j++;
 	  }
+	  gGui->playlist_num += j;
+	  gGui->playlist_cur = 0;
+	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	  
 	}
 
       if(gGui->autoplay_options & PLAY_FROM_VCD)
@@ -649,14 +679,17 @@ void gui_run (void) {
 	  int j = 0;
 	    
 	  while(autoplay_mrls[j]) {
-	    printf("VCD: autoplaylist[%d]='%s'\n", j, autoplay_mrls[j]);
+	    gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
 	    j++;
 	  }
+	  gGui->playlist_num += j;
+	  gGui->playlist_cur = 0;
+	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
 	}
 
       i++;
     }
-
+    
     /*  The user wants to hide control panel  */
     if(panel_is_visible() && (gGui->autoplay_options & HIDEGUI_ON_START))
       SEND_KEVENT(XK_G);

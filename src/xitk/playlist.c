@@ -67,6 +67,7 @@ void pl_update_playlist(void) {
 
   browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
 }
+
 /*
  *
  */
@@ -75,6 +76,7 @@ static void handle_selection(widget_t *w, void *data) {
   //  perr(" +++ Selection called = %d = '%s'\n", 
   //       ((int)data), gGui->gui_playlist[((int)data)]);
 }
+
 /*
  * Leaving playlist editor
  */
@@ -93,6 +95,7 @@ void pl_exit(widget_t *w, void *data) {
 
   pl_win = 0;
 }
+
 /*
  * Start playing an MRL
  */
@@ -113,6 +116,7 @@ static void pl_play(widget_t *w, void *data) {
     browser_release_all_buttons(pl_list);
   }
 }
+
 /*
  * Delete selected MRL
  */
@@ -137,6 +141,7 @@ static void pl_delete(widget_t *w, void *data) {
     gui_set_current_mrl(NULL);
 
 }
+
 /*
  * Delete all MRLs
  */
@@ -154,6 +159,7 @@ static void pl_delete_all(widget_t *w, void *data) {
   gui_set_current_mrl(NULL);
 
 }
+
 /*
  * Move entry up/down in playlist
  */
@@ -223,6 +229,7 @@ static void pl_move_updown(widget_t *w, void *data) {
     }
   }
 }
+
 /*
  * return 1 if playlist editor is ON
  */
@@ -230,6 +237,7 @@ int pl_is_running(void) {
 
   return pl_running;
 }
+
 /*
  * Return 1 if playlist editor is visible
  */
@@ -237,6 +245,7 @@ int pl_is_visible(void) {
 
   return pl_panel_visible;
 }
+
 /*
  * Load $HOME/.xinepl playlist file
  */
@@ -291,6 +300,7 @@ static void pl_load_pl(widget_t *w, void *data) {
   }
   
 }
+
 /*
  * Save playlist to $HOME/.xinepl file
  */
@@ -326,51 +336,40 @@ static void pl_save_pl(widget_t *w, void *data) {
   fclose(plfile);
   
 }
+
 /*
- * Handle autoplay buttons hitting
+ * Handle autoplay buttons hitting (from panel and playlist windows)
  */
 void pl_scan_input(widget_t *w, void *ip) {
-  /* FIXME
+  
   if(xine_get_status(gGui->xine) == XINE_STOP) {
+    char **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+    int i = 0;
     
-    // FIXME: unifying both
-    if(!strcasecmp(((input_plugin_t*)ip)->get_identifier(), "DVD")) {
-      char **list;
-      int nfiles, i;
-      
-      if ((list = ((input_plugin_t*)ip)->get_autoplay_list (&nfiles))) {
+    while(autoplay_plugins[i] != NULL) {
+
+      if(!strcasecmp(autoplay_plugins[i], labelbutton_get_label(w))) {
+	char **autoplay_mrls = 
+	  xine_get_autoplay_mrls (gGui->xine, autoplay_plugins[i]);
+	int j = 0;
 	
-	for (i=0; i<nfiles; i++) {
-	  gGui->playlist[gGui->playlist_num + i] = list[i]; 
+	while(autoplay_mrls[j]) {
+	  gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
+	  j++;
 	}
-	
-	gGui->playlist_num += nfiles; 
-	for (i=0; i<gGui->playlist_num; i++) {
-	}
-	gGui->playlist_cur = 0;
-	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);	
-      }
-    }
-    else if(!strcasecmp(((input_plugin_t*)ip)->get_identifier(), "VCD")) {
-      char **list;
-      int nfiles, i;
-      
-      if ((list = ((input_plugin_t*)ip)->get_autoplay_list (&nfiles))) {
-	
-	for (i=0; i<nfiles; i++) {
-	  gGui->playlist[gGui->playlist_num + i]     = list[i]; 
-	}
-	
-	gGui->playlist_num += nfiles; 
+
+	gGui->playlist_num += j;
 	gGui->playlist_cur = 0;
 	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
       }
+
+      i++;
     }
-    //    pl_rebuild_buttons(0);
+
     browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
   }
-  */
 }
+
 /*
  * Raise pl_win
  */
@@ -387,6 +386,7 @@ void pl_raise_window(void) {
     }
   }
 }
+
 /*
  * Hide/show the pl panel
  */
@@ -403,6 +403,7 @@ void pl_toggle_visibility (widget_t *w, void *data) {
     }
   }
 }
+
 /*
  * Handle X events here.
  */
@@ -478,6 +479,7 @@ void playlist_handle_event(XEvent *event) {
     }      
   }
 }
+
 /*
  * Create playlist editor window
  */
@@ -682,27 +684,28 @@ void playlist_editor(void) {
 
 
   gui_list_append_content (pl_widget_list->l, 
-			   (pl_list = create_browser(gGui->display,
-						     gGui->imlib_data,
-						     pl_widget_list,
-						     gui_get_skinX("PlUp"),
-						     gui_get_skinY("PlUp"),
-						     gui_get_skinfile("PlUp"),
-						     gui_get_skinX("PlSlidBG"),
-						     gui_get_skinY("PlSlidBG"),
-						     gui_get_skinfile("PlSlidBG"),
-						     gui_get_skinfile("PlSlidFG"),
-						     gui_get_skinX("PlDn"),
-						     gui_get_skinY("PlDn"),
-						     gui_get_skinfile("PlDn"),
-						     gui_get_skinX("PlItemBtn"),
-						     gui_get_skinY("PlItemBtn"),
-						     gui_get_ncolor("PlItemBtn"),
-						     gui_get_fcolor("PlItemBtn"),
-						     gui_get_ccolor("PlItemBtn"),
-						     gui_get_skinfile("PlItemBtn"),
-						     9, gGui->playlist_num, gGui->playlist,
-						     handle_selection, NULL)));
+		   (pl_list = 
+		    create_browser(gGui->display,
+				   gGui->imlib_data,
+				   pl_widget_list,
+				   gui_get_skinX("PlUp"),
+				   gui_get_skinY("PlUp"),
+				   gui_get_skinfile("PlUp"),
+				   gui_get_skinX("PlSlidBG"),
+				   gui_get_skinY("PlSlidBG"),
+				   gui_get_skinfile("PlSlidBG"),
+				   gui_get_skinfile("PlSlidFG"),
+				   gui_get_skinX("PlDn"),
+				   gui_get_skinY("PlDn"),
+				   gui_get_skinfile("PlDn"),
+				   gui_get_skinX("PlItemBtn"),
+				   gui_get_skinY("PlItemBtn"),
+				   gui_get_ncolor("PlItemBtn"),
+				   gui_get_fcolor("PlItemBtn"),
+				   gui_get_ccolor("PlItemBtn"),
+				   gui_get_skinfile("PlItemBtn"),
+				   9, gGui->playlist_num, gGui->playlist,
+				   handle_selection, NULL)));
   
   gui_list_append_content (pl_widget_list->l,
 			   create_label (gGui->display, gGui->imlib_data, 
@@ -710,41 +713,36 @@ void playlist_editor(void) {
 					 gui_get_skinY("AutoPlayLbl"),
 					 9, "Scan for:",
 					 gui_get_skinfile("AutoPlayLbl")));
-  /* FIXME   
+  
   {
-    int x, y, i, num_plugins;
-    input_plugin_t *ip;
+    int x, y;
+    int i = 0;
+    char **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
     widget_t *tmp;
     
     x = gui_get_skinX("AutoPlayBG");
     y = gui_get_skinY("AutoPlayBG");
     
-    ip = xine_get_input_plugin_list (&num_plugins);
-    fprintf (stderr, "%d input plugins ...\n",num_plugins);
-    for (i = 0; i < num_plugins; i++) {
-      fprintf (stderr, "plugin #%d : id=%s\n", i, ip->get_identifier());
-      if(ip->get_capabilities() & INPUT_CAP_AUTOPLAY) {
-	gui_list_append_content (pl_widget_list->l, 
-		       (tmp =
-		        create_label_button (gGui->display, gGui->imlib_data, 
-		                             x, y,
-					     CLICK_BUTTON,
-					     ip->get_identifier(),
-					     pl_scan_input, (void*)ip, 
-					     gui_get_skinfile("AutoPlayBG"),
-					     gui_get_ncolor("AutoPlayBG"),
-					     gui_get_fcolor("AutoPlayBG"),
-					     gui_get_ccolor("AutoPlayBG"))));
-	y += widget_get_height(tmp) + 1;
-      }
-      ip++;
+    while(autoplay_plugins[i] != NULL) {
+      gui_list_append_content (pl_widget_list->l, 
+	       (tmp =
+		create_label_button (gGui->display, gGui->imlib_data, 
+				     x, y,
+				     CLICK_BUTTON,
+				     autoplay_plugins[i],
+				     pl_scan_input, NULL, 
+				     gui_get_skinfile("AutoPlayBG"),
+				     gui_get_ncolor("AutoPlayBG"),
+				     gui_get_fcolor("AutoPlayBG"),
+				     gui_get_ccolor("AutoPlayBG"))));
+      y += widget_get_height(tmp) + 1;
+      i++;
     }
   }
-  */
   browser_update_list(pl_list, gGui->playlist, gGui->playlist_num, 0);
-
+  
   XMapRaised(gGui->display, pl_win); 
-
+  
   pl_panel_visible = 1;
-
+  
 }

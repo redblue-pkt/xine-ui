@@ -28,6 +28,8 @@
 
 void panel_init (void) ;
 
+void panel_add_autoplay_buttons(void);
+
 int panel_is_visible(void) ;
 
 void panel_toggle_visibility (widget_t *w, void *data) ;
