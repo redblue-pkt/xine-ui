@@ -124,7 +124,7 @@ typedef struct {
   Bool                   have_xtest;
 #ifdef HAVE_XTESTEXTENSION
   int                    fake_key_cur;
-  KeyCode                fake_keys[3];    /* Fake key to send */
+  KeyCode                fake_keys[2];    /* Fake key to send */
 #endif
 
   XWMHints              *wm_hint;
@@ -1398,7 +1398,6 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
 #ifdef HAVE_XTESTEXTENSION
   gVw->fake_keys[0] = XKeysymToKeycode(gGui->video_display, XK_Shift_L);
   gVw->fake_keys[1] = XKeysymToKeycode(gGui->video_display, XK_Control_L);
-  gVw->fake_keys[2] = XKeysymToKeycode(gGui->video_display, XK_Meta_L);
   gVw->fake_key_cur = 0;
 #endif
   
@@ -2088,7 +2087,7 @@ void video_window_reset_ssaver(void) {
       
       gVw->fake_key_cur++;
       
-      if(gVw->fake_key_cur >= 3)
+      if(gVw->fake_key_cur >= 2)
 	gVw->fake_key_cur = 0;
 
       XLockDisplay(gGui->video_display);
