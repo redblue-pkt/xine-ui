@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.99.1-cvs\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-17 00:53+0100\n"
+"POT-Creation-Date: 2005-03-02 22:47+0100\n"
 "PO-Revision-Date: 2004-12-14 06:38+0900\n"
 "Last-Translator: Tadashi Jokagi <elf2000@users.sourceforge.net>\n"
 "Language-Team: Japanese <ja@li.org>\n"
@@ -42,33 +42,33 @@ msgstr "ディスプレイが開けません\n"
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_params() 失敗しました。\n"
 
-#: src/xitk/xine-toolkit/test.c:377
+#: src/xitk/xine-toolkit/test.c:378
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "新規数値は %d です。確認しましたか?"
 
-#: src/xitk/xine-toolkit/test.c:429
+#: src/xitk/xine-toolkit/test.c:430
 #, c-format
 msgid "New double value is: %e. Confirm ?"
 msgstr "新規浮動小数点は %e です。確認しましたか?"
 
-#: src/xitk/xine-toolkit/test.c:531
+#: src/xitk/xine-toolkit/test.c:532
 msgid "My Frame"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:571
+#: src/xitk/xine-toolkit/test.c:572
 msgid "A Label"
 msgstr "ラベル"
 
-#: src/xitk/xine-toolkit/test.c:631
+#: src/xitk/xine-toolkit/test.c:632
 msgid "Fire !!"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:662
+#: src/xitk/xine-toolkit/test.c:663
 msgid "!BOOM!"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:754
+#: src/xitk/xine-toolkit/test.c:755
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -77,36 +77,36 @@ msgstr ""
 "コンボボックスから選択した新規エントリ:\n"
 "%s [%d]"
 
-#: src/xitk/xine-toolkit/test.c:961
+#: src/xitk/xine-toolkit/test.c:962
 #, c-format
 msgid "init_test() failed\n"
 msgstr "init_test() 失敗しました\n"
 
-#: src/xitk/xine-toolkit/test.c:976
+#: src/xitk/xine-toolkit/test.c:977
 msgid "My Fucking Window"
 msgstr ""
 
-#: src/xitk/xine-toolkit/test.c:993
+#: src/xitk/xine-toolkit/test.c:1010
 msgid "Quit"
 msgstr "終了"
 
-#: src/xitk/xine-toolkit/window.c:1086
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1164 src/xitk/xine-toolkit/window.c:1405
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr ""
 
-#: src/xitk/xine-toolkit/window.c:1335 src/xitk/xine-toolkit/window.c:1557
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "はい"
 
-#: src/xitk/xine-toolkit/window.c:1335 src/xitk/xine-toolkit/window.c:1557
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "いいえ"
 
-#: src/xitk/xine-toolkit/window.c:1557
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "取り消し"
 

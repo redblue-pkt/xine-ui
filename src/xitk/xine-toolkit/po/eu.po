@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xitk-eu\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-02-08 22:31+0100\n"
+"POT-Creation-Date: 2005-03-02 22:47+0100\n"
 "PO-Revision-Date: 2005-02-08 18:51+0100\n"
 "Last-Translator: Piarres Beobide  <pi@beobide.net>\n"
 "Language-Team: Librezale.org <librezale@librezale.org>\n"
@@ -66,11 +66,11 @@ msgstr "Etiketa"
 msgid "Fire !!"
 msgstr "Sua !!"
 
-#: src/xitk/xine-toolkit/test.c:661
+#: src/xitk/xine-toolkit/test.c:663
 msgid "!BOOM!"
 msgstr "BOOM!"
 
-#: src/xitk/xine-toolkit/test.c:751
+#: src/xitk/xine-toolkit/test.c:755
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -79,43 +79,43 @@ msgstr ""
 "Aukera zerrendan aukeratutako sarrera berriak:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:964
+#: src/xitk/xine-toolkit/test.c:962
 #, c-format
 msgid "init_test() failed\n"
 msgstr "init_test()-ek huts egin du\n"
 
-#: src/xitk/xine-toolkit/test.c:979
+#: src/xitk/xine-toolkit/test.c:977
 msgid "My Fucking Window"
 msgstr "Nire Leiho Madarikatua"
 
-#: src/xitk/xine-toolkit/test.c:1012
+#: src/xitk/xine-toolkit/test.c:1010
 msgid "Quit"
 msgstr "Itxi"
 
-#: src/xitk/xine-toolkit/window.c:1096
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "Ados"
 
-#: src/xitk/xine-toolkit/window.c:1174 src/xitk/xine-toolkit/window.c:1415
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr "Galdera?"
 
-#: src/xitk/xine-toolkit/window.c:1345 src/xitk/xine-toolkit/window.c:1567
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "Bai"
 
-#: src/xitk/xine-toolkit/window.c:1345 src/xitk/xine-toolkit/window.c:1567
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "Ez"
 
-#: src/xitk/xine-toolkit/window.c:1567
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "Utzi"
 
-#: src/xitk/xine-toolkit/xitk.h:2183 src/xitk/xine-toolkit/xitk.h:2192
+#: src/xitk/xine-toolkit/xitk.h:2250 src/xitk/xine-toolkit/xitk.h:2259
 msgid "Error"
 msgstr "Errorea"
 
-#: src/xitk/xine-toolkit/xitk.h:2186 src/xitk/xine-toolkit/xitk.h:2195
+#: src/xitk/xine-toolkit/xitk.h:2253 src/xitk/xine-toolkit/xitk.h:2262
 msgid "Information"
 msgstr "Argiobideak"

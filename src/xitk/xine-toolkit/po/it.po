@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xitk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-12-17 00:53+0100\n"
+"POT-Creation-Date: 2005-03-02 22:47+0100\n"
 "PO-Revision-Date: 2003-12-26 12:42+0100\n"
 "Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"
@@ -45,33 +45,33 @@ msgstr "Impossibile aprire display\n"
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Imlib_init_with_params() fallita.\n"
 
-#: src/xitk/xine-toolkit/test.c:377
+#: src/xitk/xine-toolkit/test.c:378
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "Il nuovo valore intero è: %d. Confermi?"
 
-#: src/xitk/xine-toolkit/test.c:429
+#: src/xitk/xine-toolkit/test.c:430
 #, c-format
 msgid "New double value is: %e. Confirm ?"
 msgstr "Il nuovo valore reale è: %e. Confermi?"
 
-#: src/xitk/xine-toolkit/test.c:531
+#: src/xitk/xine-toolkit/test.c:532
 msgid "My Frame"
 msgstr "Mia Cornice"
 
-#: src/xitk/xine-toolkit/test.c:571
+#: src/xitk/xine-toolkit/test.c:572
 msgid "A Label"
 msgstr "Un'etichetta"
 
-#: src/xitk/xine-toolkit/test.c:631
+#: src/xitk/xine-toolkit/test.c:632
 msgid "Fire !!"
 msgstr "Spara !!"
 
-#: src/xitk/xine-toolkit/test.c:662
+#: src/xitk/xine-toolkit/test.c:663
 msgid "!BOOM!"
 msgstr "!BOOM!"
 
-#: src/xitk/xine-toolkit/test.c:754
+#: src/xitk/xine-toolkit/test.c:755
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -80,36 +80,36 @@ msgstr ""
 "Il nuovo elemento selezionato nella casella combinata è:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:961
+#: src/xitk/xine-toolkit/test.c:962
 #, c-format
 msgid "init_test() failed\n"
 msgstr "init_test() fallito\n"
 
-#: src/xitk/xine-toolkit/test.c:976
+#: src/xitk/xine-toolkit/test.c:977
 msgid "My Fucking Window"
 msgstr "La mia finestra"
 
-#: src/xitk/xine-toolkit/test.c:993
+#: src/xitk/xine-toolkit/test.c:1010
 msgid "Quit"
 msgstr "Esci"
 
-#: src/xitk/xine-toolkit/window.c:1086
+#: src/xitk/xine-toolkit/window.c:1090
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1164 src/xitk/xine-toolkit/window.c:1405
+#: src/xitk/xine-toolkit/window.c:1168 src/xitk/xine-toolkit/window.c:1409
 msgid "Question?"
 msgstr "Domande?"
 
-#: src/xitk/xine-toolkit/window.c:1335 src/xitk/xine-toolkit/window.c:1557
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "Yes"
 msgstr "Sì"
 
-#: src/xitk/xine-toolkit/window.c:1335 src/xitk/xine-toolkit/window.c:1557
+#: src/xitk/xine-toolkit/window.c:1339 src/xitk/xine-toolkit/window.c:1561
 msgid "No"
 msgstr "No"
 
-#: src/xitk/xine-toolkit/window.c:1557
+#: src/xitk/xine-toolkit/window.c:1561
 msgid "Cancel"
 msgstr "Annulla"
 
