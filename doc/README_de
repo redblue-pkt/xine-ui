@@ -6,7 +6,7 @@
                             Ein freier Video-Player
 
 
-______________________________________________________________2002/01/27 (1.3)
+______________________________________________________________2002/01/27 (1.5)
 INHALT
 
 1       DOKUMENTATION
@@ -234,8 +234,8 @@ _____________________________________________________________________________
         ~/.xine/keymap bearbeiten. Die Syntax lautet wie folgt:
 
            WindowReduce {
-           	key = less
-	        modifier = none
+                key = less
+                modifier = none
            }
 
         Vor der Klammer "{" steht die auszuführende Funktion. Nach "key = "
@@ -351,6 +351,22 @@ _____________________________________________________________________________
         "--keymap=lirc" starten und die Ausgabe in eine Datei lenken. Die
         Datei müssen Sie aber noch nachbearbeiten und die Namen der
         Fernbedienung und der zuzuweisenden Knöpfe eingeben.
+
+        Titellisten:
+        ------------
+        Um automatisch Titellisten für ein Input-Plugin zu erstellen, können
+        Sie das spezielle Schlüsselwort 'PlaylistFrom:' gefolgt vom Namen des
+        Plugins angeben. (Der Name entspricht der Bezeichnung des Knopfes im
+        Bedienfenster):
+
+           # Titelliste für NAV-Plugin erstellen
+           begin
+                remote = xxx
+                button = xxx
+                prog   = xine
+                repeat = 0
+                config = PlaylistFrom:NAV
+           end
 
 
 _____________________________________________________________________________
