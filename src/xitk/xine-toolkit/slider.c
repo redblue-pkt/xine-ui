@@ -38,7 +38,7 @@
 #define COMPUTE_COORDS(X,Y)                                                \
      {                                                                     \
        if(private_data->sType == XITK_HSLIDER) {                           \
-         private_data->pos = rint ((X - sl->x) * private_data->ratio);    \
+         private_data->pos = (int) ((X - sl->x) * private_data->ratio);    \
        }                                                                   \
        else if(private_data->sType == XITK_VSLIDER) {                      \
          private_data->pos = (int) ((private_data->bg_skin->height         \

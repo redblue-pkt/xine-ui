@@ -37,13 +37,6 @@
 
 #define MAXFILES      65535
 
-#ifndef NAME_MAX
-#define NAME_MAX 256
-#endif
-#ifndef PATH_MAX
-#define PATH_MAX 768
-#endif
-
 typedef struct {
   mrl_t                    *mrls[MAXFILES];
   char                     *mrls_disp[MAXFILES];
@@ -72,7 +65,7 @@ typedef struct {
   char                     *last_mrl_source;
 
   xitk_widget_t            *widget_origin; /* Current directory widget */
-  char                      current_origin[PATH_MAX + 1]; /* Current directory */
+  char                      current_origin[XITK_PATH_MAX + 1]; /* Current directory */
 
   int                       running; /* Boolean status */
   int                       visible; /* Boolean status */

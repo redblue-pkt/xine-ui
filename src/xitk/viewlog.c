@@ -76,6 +76,8 @@ typedef struct {
 
 static _viewlog_t    *viewlog = NULL;
 
+static void viewlog_end(xitk_widget_t *, void *);
+
 /*
  * Leaving setup panel, release memory.
  */
@@ -189,6 +191,40 @@ void viewlog_toggle_panel_visibility (xitk_widget_t *w, void *data) {
  */
 void viewlog_handle_event(XEvent *event, void *data) {
 
+  switch(event->type) {
+    
+  case KeyPress: {
+    XKeyEvent      mykeyevent;
+    KeySym         mykey;
+    char           kbuf[256];
+    int            len;
+    
+    mykeyevent = event->xkey;
+    
+    XLockDisplay(gGui->display);
+    len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+    XUnlockDisplay(gGui->display);
+    
+    switch (mykey) {
+      
+    case XK_Return:
+      viewlog_end(NULL, NULL);
+      break;
+      
+    default:
+      gui_handle_event(event, data);
+      break;
+    }
+  }
+  break;
+  
+  case MappingNotify:
+    XLockDisplay(gGui->display);
+    XRefreshKeyboardMapping((XMappingEvent *) event);
+    XUnlockDisplay(gGui->display);
+    break;
+    
+  }
 }
 
 /*

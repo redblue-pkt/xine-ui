@@ -858,15 +858,12 @@ static void gui_find_visual (Visual **visual_return, int *depth_return) {
 /*
  * Initialize the GUI
  */
-#ifndef	NAME_MAX
-#define	NAME_MAX	20
-#endif
 void gui_init (int nfiles, char *filenames[]) {
 
   int                   i;
   XColor                dummy;
   char                 *display_name = ":0.0";
-  char                  buffer[PATH_MAX + NAME_MAX + 1]; /* Enought ?? ;-) */
+  char                  buffer[XITK_PATH_MAX + XITK_NAME_MAX + 1]; /* Enought ?? ;-) */
   ImlibInitParams	imlib_init;
 
   /*

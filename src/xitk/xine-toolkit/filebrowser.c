@@ -395,7 +395,7 @@ static void load_files(xitk_widget_t *w, void *data) {
   DIR             *pdir;
   struct dirent   *pdirent;
   finfo_t         *hide_files, *dir_files, *norm_files;
-  char             fullfilename[PATH_MAX + NAME_MAX + 1];
+  char             fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   int              num_hide_files  = 0;
   int              num_dir_files   = 0;
   int              num_norm_files  = 0;
@@ -429,11 +429,11 @@ static void load_files(xitk_widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(dir_files[num_dir_files].marker == '@') {
-	char linkbuf[PATH_MAX + NAME_MAX + 1];
+	char linkbuf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
+	memset(&linkbuf, 0, XITK_PATH_MAX + XITK_NAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, XITK_PATH_MAX + XITK_NAME_MAX);
 	
 	if(linksize < 0) {
 	  XITK_WARNING("%s(%d): readlink() failed: %s\n", __FUNCTION__, __LINE__, strerror(errno));
@@ -457,11 +457,11 @@ static void load_files(xitk_widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(hide_files[num_hide_files].marker == '@') {
-	char linkbuf[PATH_MAX + NAME_MAX + 1];
+	char linkbuf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
+	memset(&linkbuf, 0, XITK_PATH_MAX + XITK_NAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, XITK_PATH_MAX + XITK_NAME_MAX);
 	
 	if(linksize < 0) {
 	  XITK_WARNING("%s(%d): readlink() failed: %s\n", __FUNCTION__, __LINE__, strerror(errno));
@@ -484,11 +484,11 @@ static void load_files(xitk_widget_t *w, void *data) {
       
       /* The file is a link, follow it */
       if(norm_files[num_norm_files].marker == '@') {
-	char linkbuf[PATH_MAX + NAME_MAX + 1];
+	char linkbuf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 	int linksize;
 	
-	memset(&linkbuf, 0, PATH_MAX + NAME_MAX);
-	linksize = readlink(fullfilename, linkbuf, PATH_MAX + NAME_MAX);
+	memset(&linkbuf, 0, XITK_PATH_MAX + XITK_NAME_MAX);
+	linksize = readlink(fullfilename, linkbuf, XITK_PATH_MAX + XITK_NAME_MAX);
 	
 	if(linksize < 0) {
 	  XITK_WARNING("%s(%d): readlink() failed: %s\n", __FUNCTION__, __LINE__, strerror(errno));
@@ -792,7 +792,7 @@ static void filebrowser_homedir(xitk_widget_t *w, void *data) {
  *
  */
 static void filebrowser_select_entry(filebrowser_private_data_t *private_data, int j) {
-  char buf[PATH_MAX + NAME_MAX + 1];
+  char buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
   /* Want to re-read current dir */
   if(!strcasecmp(private_data->fc->dir_contents[j], ".")) {

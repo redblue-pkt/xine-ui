@@ -528,7 +528,7 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
 static void mrlbrowser_select_mrl(mrlbrowser_private_data_t *private_data,
 				  int j, int do_callback) {
   mrl_t *ms = private_data->mc->mrls[j];
-  char   buf[PATH_MAX + NAME_MAX + 1];
+  char   buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
   memset(&buf, '\0', sizeof(buf));
   sprintf(buf, "%s", ms->mrl);

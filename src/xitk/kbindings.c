@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <limits.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -36,13 +35,6 @@
 #include "event.h"
 #include "kbindings.h"
 #include "xitk.h"
-
-#ifndef NAME_MAX
-#define NAME_MAX 256
-#endif
-#ifndef PATH_MAX
-#define PATH_MAX 768
-#endif
 
 extern gGui_t                 *gGui;
 
@@ -788,7 +780,7 @@ static kbinding_t *_kbindings_init_to_default(void) {
  */
 kbinding_t *kbindings_init_kbinding(void) {
   kbinding_t *kbt = NULL;
-  char        buf[PATH_MAX + NAME_MAX + 1];
+  char        buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
 
   kbt = _kbindings_init_to_default();
 
@@ -807,7 +799,7 @@ kbinding_t *kbindings_init_kbinding(void) {
  */
 void kbindings_save_kbinding(kbinding_t *kbt) {
   FILE   *f;
-  char    buf[PATH_MAX + NAME_MAX + 1];
+  char    buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   
   sprintf(buf, "%s/.xine/%s", xine_get_homedir(), "keymap");
   if((f = fopen(buf, "w")) == NULL) {

@@ -25,7 +25,6 @@
 #endif
 
 #include <stdio.h>
-#include <limits.h>	/*PATH_MAX*/
 #include <dirent.h>
 #include <sys/stat.h>       
 #include "panel.h"
@@ -36,13 +35,6 @@
 #include "skins.h"
 #include "xitk.h"
 #include <xine/xineutils.h>
-
-#ifndef NAME_MAX
-#define NAME_MAX 256
-#endif
-#ifndef PATH_MAX
-#define PATH_MAX 768
-#endif
 
 
 #define DEFAULT_SKIN "xinetic"
@@ -64,7 +56,7 @@ static void get_available_skins_from(char *path) {
 
   if((pdir = opendir(path)) != NULL) {
     struct stat   pstat;
-    char          fullfilename[PATH_MAX + NAME_MAX + 1];
+    char          fullfilename[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     
     while((pdirent = readdir(pdir)) != NULL) {
       memset(&fullfilename, 0, sizeof(fullfilename));
@@ -94,7 +86,7 @@ static void get_available_skins_from(char *path) {
  * Grab all available skins from $HOME/.xineskins/ and XINE_SKINDIR locations.
  */
 static void looking_for_available_skins(void) {
-  char    buf[NAME_MAX];
+  char    buf[XITK_NAME_MAX];
 
   skins_avail = (skins_locations_t **) xine_xmalloc(sizeof(skins_locations_t*));
   
@@ -177,7 +169,7 @@ skins_locations_t *get_skin_location(char *skin) {
  * skin file. There is fallback if that fail.
  */
 void change_skin(skins_locations_t *sk) {
-  char                 buf[PATH_MAX + NAME_MAX + 1];
+  char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char                *old_skin;
   skins_locations_t   *sks = sk;
   int                  twice = 0;
@@ -224,7 +216,7 @@ void change_skin(skins_locations_t *sk) {
 void init_skins_support(void) {
   skins_locations_t   *sk;
   char                *skin;
-  char                buf[PATH_MAX + NAME_MAX + 1];
+  char                buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
     
   gGui->skin_config = xitk_skin_init_config();
   

@@ -38,13 +38,6 @@
 #define DEFAULT_SORT 0
 #define REVERSE_SORT 1
 
-#ifndef NAME_MAX
-#define NAME_MAX 256
-#endif
-#ifndef PATH_MAX
-#define PATH_MAX 768
-#endif
-
 typedef struct {
   /* Files handle by the file browser */
   char                  *dir_contents[MAXFILES];
@@ -77,7 +70,7 @@ typedef struct {
   int                     dir_contents_num; /* number of entries in file browser */
 
   xitk_widget_t          *widget_current_dir; /* Current directory widget */
-  char                    current_dir[PATH_MAX + 1]; /* Current directory */
+  char                    current_dir[XITK_PATH_MAX + 1]; /* Current directory */
 
   int                     running; /* Boolean status */
   int                     visible; /* Boolean status */

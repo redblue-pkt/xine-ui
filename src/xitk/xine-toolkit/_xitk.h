@@ -30,6 +30,7 @@
 #endif
 
 #include <stdio.h>
+#include <limits.h>
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
 
@@ -51,6 +52,18 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 
 #ifndef BUFSIZ
 #define BUFSIZ 8192
+#endif
+
+#ifndef NAME_MAX
+#define XITK_NAME_MAX   256
+#else
+#define XITK_NAME_MAX   NAME_MAX
+#endif
+
+#ifndef PATH_MAX
+#define XITK_PATH_MAX   768
+#else
+#define XITK_PATH_MAX   PATH_MAX
 #endif
 
 #ifdef	__GNUC__

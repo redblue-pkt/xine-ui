@@ -413,7 +413,7 @@ skin.AutoPlayLbl {
 	}
 	label {
 	  length = 9
-	  animation = False
+	  animation = True
 	  pixmap = letters.png
 	}
 }
@@ -586,7 +586,7 @@ skin.CtlSkLbl {
 	}
 	label {
 	  length = 15
-	  animation = False
+	  animation = True
 	  pixmap = letters.png
 	}
 }

@@ -41,7 +41,7 @@ msgstr "Ctr"
 
 #: src/xitk/control.c:607
 msgid "Choose a Skin"
-msgstr "Choix des Peaux"
+msgstr "Choisir une apparence"
 
 #: src/xitk/control.c:644 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:818
 msgid "Dismiss"
@@ -391,15 +391,15 @@ msgstr "Le fichier '%s' a été crée.\n"
 
 #: src/xitk/setup.c:940
 msgid "Help"
-msgstr ""
+msgstr "Aide"
 
 #: src/xitk/setup.c:942
 msgid "README"
-msgstr ""
+msgstr "Lisez Moi"
 
 #: src/xitk/setup.c:944
 msgid "FAQ"
-msgstr ""
+msgstr "FAQ"
 
 #: src/xitk/setup.c:1095
 msgid "xine setup"
@@ -411,12 +411,12 @@ msgstr "Fermer"
 
 #: src/xitk/viewlog.c:262
 msgid "log info"
-msgstr ""
+msgstr "log info"
 
 #: src/xitk/viewlog.c:264
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
-msgstr ""
+msgstr "Il n'y a aucune entrée dans le log de la section '%s'.\n"
 
 #: src/xitk/viewlog.c:361
 msgid "xine log viewer"

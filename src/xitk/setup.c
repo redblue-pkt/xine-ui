@@ -27,7 +27,6 @@
 
 #include <stdio.h>
 #include <errno.h>
-#include <limits.h>	/*PATH_MAX*/
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/shape.h>
@@ -44,14 +43,6 @@
 #include "actions.h"
 #include "skins.h"
 #include "lang.h"
-
-#ifndef NAME_MAX
-#define NAME_MAX 256
-#endif
-#ifndef PATH_MAX
-#define PATH_MAX 768
-#endif
-
 
 extern gGui_t              *gGui;
 
@@ -1020,7 +1011,7 @@ static void setup_nextprev_wg(xitk_widget_t *w, void *data) {
  * Read adn store some files.
  */
 static char **_setup_read_given(char *given, int *ndest) {
-  char            buf[PATH_MAX + NAME_MAX + 1];
+  char            buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   char            buffer[256], *ln;
   const langs_t  *l;
   FILE           *fd;

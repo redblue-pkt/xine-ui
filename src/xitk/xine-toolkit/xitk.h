@@ -31,6 +31,7 @@
 #endif
 
 #include <stdlib.h>
+#include <limits.h>
 #include <X11/Xlib.h>
 #include "xitkintl.h"
 #include "Imlib-light/Imlib.h"
@@ -39,7 +40,19 @@
 #include <xine.h>
 #endif
 
-#define XITK_WIDGET_MAGIC 0x7869746b
+#define XITK_WIDGET_MAGIC       0x7869746b
+
+#ifndef NAME_MAX
+#define XITK_NAME_MAX           256
+#else
+#define XITK_NAME_MAX           NAME_MAX
+#endif
+
+#ifndef PATH_MAX
+#define XITK_PATH_MAX           768
+#else
+#define XITK_PATH_MAX           PATH_MAX
+#endif
 
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
