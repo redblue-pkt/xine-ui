@@ -1121,9 +1121,6 @@ void gui_run (void) {
 
   gGui->running = 0;
 
-  if(gGui->use_root_window)
-    video_window_restore_background();
-
   kbindings_save_kbinding(gGui->kbindings);
   kbindings_free_kbinding(&gGui->kbindings);
 

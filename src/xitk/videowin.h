@@ -50,8 +50,6 @@ int video_window_is_cursor_visible(void);
 /* hide/show video window */
 void video_window_set_visibility(int show_window);
 int video_window_is_visible (void);
-void video_window_backup_background(void);
-void video_window_restore_background(void);
 
 void video_window_stream_has_changed(void);
 
