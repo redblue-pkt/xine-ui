@@ -1,0 +1,265 @@
+.\" -*-Nroff-*-
+.\""
+.TH XINE 1x 2001-10-09 "Projekt xine"
+.\" NAZWY powinny byæ ca³e du¿ymi literami , SEKCJA powinna byæ 1-8, mo¿e z podsekcj±
+.\" inne parametry s± dozwolone: zobacz man(7), man(1)
+.\""
+.SH NAZWA
+.B xine
+\- wolny odtwarzacz wideo
+.SH SK£ADNIA
+.B xine
+.I "[opcje] [MRL] ..."
+.SH "OPIS"
+Ta strona manuala skrótowo opisuje
+odtwarzacz audio/wideo
+.BR xine.
+.PP
+.B xine
+odtwarza sekwencje MPEG (audio and video), elementarne sekwencje MPEG
+(np. pliki .mp3 lub .mpv), pliki avi (u¿ywaj±c kodeków win32), (S)VCD
+i DVD.
+.SH OPCJE
+Program na¶laduje sk³adniê wiersza poleceñ w stylu GNU, z d³ugimi nazwami
+opcji zaczynaj±cymi siê od podwójnego my¶lnika (`-').
+Lista opcji jest zebrana poni¿ej.
+Pe³nego opisu szukaj w dokumentach README i FAQ w katalogu @prefix@/share/doc/xine-ui
+lub na stronie g³ównej
+.B xine
+.
+.TP
+.B \-h, \-\-help
+Pokazuje listê opcji i dostêpnych sterowników wyj¶cia (wtyczek).
+.TP
+.B \-a, \-\-audio\-channel <numer>
+Wybiera podany kana³ d¼wiêkowy. <numer> jest numerem kana³u d¼wiêkowego,
+domy¶lnym jest "0".
+.br
+xine 0.5 i nowszy próbuje najlepiej jak umie skompletowaæ listê kana³ów
+(ac3, mpeg audio, avi audio, ...) z sekwencji d¼wiêkowych i mapuje je
+do "kana³ów wirtualnych" z numerami kana³ów zaczynaj±cymi siê od "0".
+.TP
+.B \-V, \-\-video\-driver <sterownik wideo>
+Wybiera sterownik wideo. Spróbuj "xine --help" by otrzymaæ listê dostêpnych
+sterowników wideo w Twoim systemie. Ten wybór zostanie automatycznie zapisany
+do Twojego .xinerc wiêc musisz zdefiniowaæ sterownik wideo tylko raz.
+.TP
+.B \-A, \-\-audio\-driver <sterownik d¼wiêku>
+Wybiera sterownik d¼wiêku. Sróbuj "xine --help" by otrzymaæ listê dostêpnych
+sterowników d¼wiêku w Twoim systemie. Ten wybór jest automatycznie zapisywany
+do Twojego .xinerc wiêc bêdziesz musia³ zdefiniowaæ sterownik d¼wiêku tylko raz.
+.TP
+.B \-u, \-\-spu\-channel <numer>
+Wybierz kana³ "podobrazu" (napisów)(napisy w DVD s± zapisane jako bitmapy
+a nie czcionka. przyp. t³um.).
+<numer> to numer kana³u napisów domy¶lnie jest "brak" (-1).
+.TP
+.B \-p[q][d][v], \-\-auto\-play=[q][d][v]
+Zaczyna odtwarzaæ od razy po starcie programu. Mo¿na dodaæ "q" ¿eby zakoñczyæ
+program po zakoñczeniu odtwarzania. Tak jak we wcze¶niejszych wersjach
+.B xine
+mo¿liwe jest równie¿ zapytanie o listê odtwarzania z DVD 'd', lub VCD 'v'.
+Teraz jest dostêpna opcja bardziej generalna
+.B \-\-auto\-scan.
+(patrz ni¿ej). Tak wiêc podopcje "d" i "v" mog± byæ usuniête pewnego dnia.
+.TP
+.B \-s <plugin>, \-\-auto\-scan <wtyczka>
+Automatycznie skanuj listê odtwarzania z wywo³anej wtyczki wej¶cia.
+Wiele wtyczek pozwala na odczyt domy¶lnych list odtwarzania, by móc odtwarzaæ
+"wszystko". To pracuje poprawnie, na przyk³ad, z DVD lub VCD. Podanie tej opcji
+daje ten sam efekt jak przyci¶niêcie odpowiedniego przycisku na g³ównym panelu
+.B xine.
+
+Opcja ta jest zw³aszcza u¿yteczna w kombinacji z automatycznym odtwarzaniem
+(
+.B \-\-auto\-play
+). Mo¿esz uruchomiæ "xine --auto-play --auto-scan dvd" aby
+odtworzyæ ca³y DVD bez naciskania ¿adnych dodatkowych przycisków. To dzia³a
+równie¿ z wtyczkami które nie s± dostarczane z
+.B xine
+, poprostu wpisz nazwê przycisku który jest dodany przez wtyczkê której chcesz u¿yæ.
+.TP
+.B \-f, \-\-fullscreen
+Prze³±cz
+.B xine
+do trybu pe³noekranowego przy uruchomieniu (tak jak naci¶niêcie "F")
+.TP
+.B \-g, \-\-hide\-gui
+Ukryj wszystkie okna interfejsu u¿ytkownika (z wyj±tkiem okna wideo) przy uruchomieniu.
+Dzia³a tak samo jak naci¶niêcie "G" w uruchomionym
+.B xine.
+.TP
+.B \-R, \-\-recognize\-by <opcja>
+Zmienia sposób w jaki
+.B xine
+próbuje rozpoznaæ typ sekwencji.
+Poprawne opcje to:
+.br
+"default" (najpierw po zawarto¶ci, potem po rozszerzeniu),
+.br
+"revert" (najpierw po rozszerzeniu, potem po zawarto¶ci),
+.br
+"content" (tylko po zawarto¶ci),
+.br
+"extension" (tylko po rozszerzeniu). Je¶li ¿adna opcja nie jest podana,
+.B xine
+wybierze "revert".
+.TP
+.B \-\-visual <typ-wy¶witlania-lub-id>
+Próbuje u¿yæ specyficznego typu wy¶wietlania serwera X11 dla okien
+.B xine.
+Parametr <typ-wy¶wietlania-lub-id> jest albo nazw± typu wy¶wietlania X11
+(StaticGray, GrayScale, StaticColor, PseudoColor, TrueColor lub DirectColor),
+albo jego warto¶ci± szesnastkow±.
+
+Je¿eli u¿yte z nazw± typu wy¶witlania kolorów,
+.B xine
+próbuje znale¼æ taki typ sp¶ród g³êbii 15, lub 16, 24, 32, 8 (w tej kolejno¶ci).
+Domy¶lny typ wy¶wietlania u¿ywany przez
+.B xine
+w przypadku braku opcji
+.B \-\-visual
+to TrueColor.
+
+Je¿eli ¿adna g³êbia kolorów nie zostanie znaleziona,
+.B xine
+przeskoczy z powrotem do g³êbii u¿ytej przez g³ówne okno serwera X11.
+.TP
+.B \-\-install
+Kiedy u¿yta jest wy¶witlanie X11 ze zmienn± map± kolorów, instaluje
+osobist± mapê kolorów dla
+.B xine.
+Z osobist± map± kolorów,
+.B xine
+mo¿e mapowaæ wiêcej kolorów tak ¿e wyj¶ciowy ekran wideo mo¿e wygl±daæ lepiej.
+.TP
+.B MRL (media resource locator)
+.br
+MRL jest podobny do URL w Twojej przegl±darce internetowej. One opisuj±
+medium z którego nale¿y czytaæ. Poprawnym MRL mo¿e byæ nazwa pliku, lub jeden z:
+.BR file://<¶cie¿ka>
+.br
+.BR fifo://<¶cie¿ka>
+.br
+.BR stdin://mpeg1
+or
+.BR "stdin://mpeg2"
+.br
+.BR "dvd://VTS_xx_y.VOB"
+.br
+.BR "vcd://<numer ¶cie¿ki>"
+.br
+.BR "tcp://<host>:<port>"
+.br
+.BR "rtp://<host>:<port>"
+.br
+.BR "udp://<host>:<port>"
+.LP
+Mo¿na zdefiniowaæ kilka MRL, aby odtwarzaæ jak±¶ ilo¶æ nastêpuj±cych
+po sobie sekwencji.
+.LP
+Je¶li nie zdefiniujesz ¿adnego MRL'a, bêdziesz musia³ wybrany plik przeci±gn±æ
+myszk± na okno panela
+.B xine.
+Przeci±ganie i upuszczanie pliku by³o przetestowane z
+GNOME Midnight Commander (gmc).
+.SH ZOBACZ TAK¯E
+Program jest w pe³ni udokumentowany na stronie g³ównej
+.B xine
+:
+.IR "http://xine.sourceforge.net/"
+.SH KLAWISZE KONTROLNE
+Wiele funkcji mo¿e byæ kontrolowanych przez naci¶niêcie odpowiednich klawiszy.
+Skróty klawiszowe to:
+.LP
+.BR RETURN :
+Odtwarzaj
+.br
+.BR SPACE
+lub
+.BR P :
+Stop klatka
+.br
+.BR UP/DOWN :
+szybki podgl±d / zwolnienie
+.br
+.br
+.BR F :
+Prze³±cza tryb pe³noekranowy.
+.br
+.BR G :
+Ukryj/odkryj interfejs u¿ytkownika.
+.br
+.BR H :
+Ukryj/odkryj okno wy¶wietlania wideo.
+.br
+.BR A :
+Prze³±cz proporcje ekranu (AUTO/16:9/4:3/DVB) 
+.br
+.BR B :
+Ukryj/odkryj przegl±darkê MRL.
+.br
+.BR C :
+Ukryj/odkryj okno ustawieñ wideo.
+.br
+.BR E :
+Wysuñ aktualnie u¿ywane media.
+.br
+.BR 0 :
+Przeskocz do pocz±tku bie¿±cej sekwencji
+.br
+.BR 1..9 :
+Przeskocz do 10%..90% bie¿±cej sekwencji
+.br
+.BR Left/Right :
+Szukaj -+ 15 sek. (+CTRL: 60 sek.)
+.br
+.BR PgUp :
+Przeskocz do poprzedniej sekwencji nali¶cie
+.br
+.BR PgDown :
+Przeskocz do nastêpnej sekwencji nali¶cie
+.br
+.BR + :
+Wybierz nastêpny kana³ audio (mo¿e trwaæ do kilku sekund)
+.br
+.BR - :
+Wybierz poprzedni kana³ audio
+.br
+.BR > :
+Powiêksz okno odtwarzania.
+.br
+.BR . :
+Wybierz nastêpny kana³ napisów.
+.br
+.BR < :
+Zmniejsz okno odtwarzania..
+.br
+.BR , :
+Wybierz poprzedni kana³ napisów.
+.br
+.BR Q :
+Zakoñcz dzia³anie programu.
+.br
+.SH DOSTRAJANIE SYNCHRONIZACJI
+Niektóre sekwencje maj± b³êdne znaczniki czasu, wiêc synchronizacja nie dzia³a.
+Mo¿na to skorygowaæ u¿ywaj±c klawiszy:
+.br
+.BR n :
+naci¶nij je¶li wideo odgrywane jest przed d¼wiêkiem.
+.br
+.BR m :
+naci¶nij je¶li wideo spó¼nia siê za d¼wiêkiem.
+.br
+.BR Home :
+naci¶nij by zresetowaæ opó¼nienie wideo/d¼wiêk do "0",
+aby znaczniki czasu pozosta³y nie zmienione.
+
+.SH AUTORZY
+Ta strona manuala zosta³a napisana przez Siggi'ego Langauf'a <siggi@debian.org>,
+dla projektu
+.B xine.
+Du¿o dodatków Guenter Bartsch <guenter@users.sourceforge.net> i
+Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+.SH T£UMACZENIE
+Bart³omiej Muryn <_4ever_@irc.pl>

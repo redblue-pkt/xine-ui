@@ -1,0 +1,148 @@
+.TH aaxine 1 "Pa¼dziernik 9, 2001" "Projekt xine"
+
+.SH NAME
+aaxine \- odtwarzacz wideo ASCII art
+
+.SH SK£ADNIA
+.B aaxine 
+.RI [ opcje-aalib ] 
+.RI [ -A <sterownik-d¼wiêku>] 
+.RI [ -a <kana³-d¼wiêku>] 
+.RI [ -R <detekcja-wg>] 
+.RI [ MRL ...]
+.br
+
+.SH OPIS
+Ta strona manuala opisuje program
+.B aaxine.
+Aaxine to, bazowany na bibliotece aalib, frontend do libxine,
+odtwarzacza DVD/multimediów. 
+.PP
+\fBaaxine\fP jest dla tych którzy nie maj± karty wideo wysokiej jako¶ci,
+ale chc± obejrzeæ DVD na ich starym, dobrym terminalu VT100 ;-)
+
+Tak jak xine, \fBaaxine\fP odtwarza sekwencje MPEG (audio and video),
+elementarne sekwencje MPEG (np. pliki .mp3 lub .mpv), pliki avi
+(u¿ywaj±c kodeków win32) , (S)VCD i DVD. Krótko - wszystko to
+co wspiera xinelib.
+
+.SH OPCJE
+Program na¶laduje sk³adniê wiersza poleceñ w stylu GNU, z d³ugimi nazwami
+opcji zaczynaj±cymi siê od podwójnego my¶lnika (`-').
+Lista opcji jest zebrana poni¿ej.
+Pe³nego opisu szukaj w dokumentach README i FAQ w katalogu
+@prefix@/share/doc/xine-ui lub na stronie g³ównej xine.
+.B
+.IP \-h,\ \-\-help
+Pokazuje listê opcji i dostêpnych sterowników wyj¶cia (wtyczek).
+Wielki bukiet opcji i dostêpnych sterowników wyj¶cia (wtyczek)
+jest udostêpniany przez aalib. Proszê siê odnie¶æ do dokumentacji aalib.
+
+Pozosta³e opcje, nazwane
+.B opcjami AAXINE:
+gdy s± wylistowane przez "aaxine \-\-help", s± wyt³umacznoe poni¿ej.
+.B
+.IP \-A,\ \-\-audio-driver\ <id>
+U¿yj podanego sterownika audio. Dostêpne sterowniki mog± byæ wy¶wietlone przez
+"aaxine \-\-help"
+.B
+.IP \-a,\ \-\-audio-channel\ #
+U¿yj podanego kana³u d¼wiêkowego. Kana³y s± sekwencyjnie ponumerowane
+od 0 dla pierwszego kana³u audio.
+.B
+.IP \-R,\ \-\-recognize-by\ [option]
+Okre¶la sposób w jaki xine próbuje rozpoznaæ typ sekwencji. Mo¿liwe opcje to:
+.br
+default: najpierw po zawarto¶ci, potem po rozszerzeniu,
+.br
+revert: najpierw po rozszerzeniu, potem po zawarto¶ci
+.br
+content: tylko po zawarto¶ci,
+.br
+extension: tylko po rozszerzeniu.
+.br
+Je¿eli \-R jest podany bez dodatkowej opcji, wybierany jest 'revert'.
+
+.SH MRL
+MRL jest podobny do URL w Twojej przegl±darce internetowej. One opisuj±
+medium z którego nale¿y czytaæ. Poprawnym MRL mo¿e byæ nazwa pliku, lub jeden z:
+.br
+.BR file://<¶cie¿ka>
+.br
+.BR fifo://<¶cie¿ka>
+.br
+.BR stdin://mpeg1
+or
+.BR "stdin://mpeg2"
+.br
+.BR "dvd://VTS_xx_y.VOB"
+.br
+.BR "vcd://<numer ¶cie¿ki>"
+.br
+.BR "tcp://<host>:<port>"
+.br
+.BR "rtp://<host>:<port>"
+.br
+.BR "udp://<host>:<port>"
+.LP
+Mo¿na zdefiniowaæ kilka MRL, aby odtwarzaæ jak±¶ ilo¶æ nastêpuj±cych
+po sobie sekwencji. Dodatkowo podane MRL pozwalaj± na okre¶lenie dodatowych typów
+no¶ników. Te wymienione powy¿ej s± dostêpne wraz z libxine.
+
+.SH KLAWISZE KONTROLNE
+Wiele funkcji mo¿e byæ kontrolowanych przez naci¶niêcie odpowiednich klawiszy.
+Skróty klawiszowe to:
+.LP
+.BR RETURN
+lub
+.BR R :
+Odtwarzaj
+.br
+.BR SPACE
+lub
+.BR P :
+Stop klatka
+.br
+.BR 0 :
+Przeskocz do pocz±tku bie¿±cej sekwencji
+.br
+.BR 1 .. 9 :
+Przeskocz do 10%..90% bie¿±cej sekwencji
+.br
+.BR PgUp :
+Przeskocz do poprzedniej sekwencji nali¶cie
+.br
+.BR PgDown :
+Przeskocz do nastêpnej sekwencji nali¶cie
+.br
+.BR + :
+Wybierz nastêpny kana³ audio (mo¿e trwaæ do kilku sekund)
+.br
+.BR \- :
+Wybierz poprzedni kana³ audio
+.br
+.BR Q :
+Zakoñcz pracê programu
+
+.SH B£ÊDY
+oczywi¶cie, ¿adnych ;-)
+
+No dobrze, jakie¶ na pewno s±. Mo¿esz prawdopodobnie poprosiæ o pomoc,
+(i zg³osiæ b³êdy) na naszej li¶cie dyskusyjnej
+pod adresem <xine-user@lists.sf.net>.
+
+.SH ZOBACZ RÓWNIE¯
+.BR xine (1)
+.br
+.BR http://xine.sf.net
+.br
+.BR http://aa-project.sf.net/aalib
+.br
+.BR xine-lib (3)
+
+.SH AUTOR
+Siggi Langauf for the xine project.
+.br
+Copyright \(co 2001 The xine project
+.SH T£UMACZENIE
+Bart³omiej Muryn <_4ever_@irc.pl>
