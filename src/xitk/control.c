@@ -99,39 +99,6 @@ static void set_current_param(int param, int value) {
 }
 
 /*
- * Enable or disable video settings sliders.
- */
-static void active_sliders_video_settings(void) {
-  //  int vidcap;
-  
-#warning FIXME NEWAPI MISSING
-#if 0
-  if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) {
-    
-    if(vidcap & VO_CAP_BRIGHTNESS)
-      xitk_enable_widget(control->bright);
-    else
-      xitk_disable_widget(control->bright);
-    
-    if(vidcap & VO_CAP_SATURATION)
-      xitk_enable_widget(control->sat);
-    else
-      xitk_disable_widget(control->sat);
-    
-    if(vidcap & VO_CAP_HUE)
-      xitk_enable_widget(control->hue);
-    else
-      xitk_disable_widget(control->hue);
-    
-    if(vidcap & VO_CAP_CONTRAST)
-      xitk_enable_widget(control->contr);
-    else
-      xitk_disable_widget(control->contr);
-  }
-#endif
-}
-
-/*
  * Update silders positions
  */
 static void update_sliders_video_settings(void) {
@@ -382,7 +349,6 @@ void control_change_skins(void) {
     xitk_change_skins_widget_list(control->widget_list, gGui->skin_config);
     xitk_paint_widget_list(control->widget_list);
 
-    active_sliders_video_settings();
   }
 }
 
@@ -544,17 +510,12 @@ void control_panel(void) {
   control->widget_list->gc            = gc;
   
   { /* All of sliders are disabled by default*/
-    int min = 0, max = 0, cur;
+    int min = 0, max = 65535, cur;
 
     lbl.window = control->widget_list->win;
     lbl.gc     = control->widget_list->gc;
 
     /* HUE */
-#warning FIXME NEWAPI MISSING
-#if 0
-    gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_HUE, &min, &max);
-#endif
     cur = get_current_param(XINE_PARAM_VO_HUE);
     
     sl.skin_element_name = "SliderCtlHue";
@@ -575,14 +536,8 @@ void control_panel(void) {
     lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
-    xitk_disable_widget(control->hue);
 
     /* SATURATION */
-#warning FIXME NEWAPI MISSING
-#if 0
-    gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_SATURATION, &min, &max);
-#endif
     cur = get_current_param(XINE_PARAM_VO_SATURATION);
 
     sl.skin_element_name = "SliderCtlSat";
@@ -603,14 +558,8 @@ void control_panel(void) {
     lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
-    xitk_disable_widget(control->sat);
-      
+
     /* BRIGHTNESS */
-#warning FIXME NEWAPI MISSING
-#if 0
-    gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_BRIGHTNESS, &min, &max);
-#endif
     cur = get_current_param(XINE_PARAM_VO_BRIGHTNESS);
 
     sl.skin_element_name = "SliderCtlBright";
@@ -631,14 +580,8 @@ void control_panel(void) {
     lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
-    xitk_disable_widget(control->bright);
       
     /* CONTRAST */
-#warning FIXME NEWAPI MISSING
-#if 0
-    gGui->vo_driver->get_property_min_max(gGui->vo_driver, 
-					  VO_PROP_CONTRAST, &min, &max);
-#endif
     cur = get_current_param(XINE_PARAM_VO_CONTRAST);
 
     sl.skin_element_name = "SliderCtlCont";
@@ -659,9 +602,6 @@ void control_panel(void) {
     lbl.callback          = NULL;
     xitk_list_append_content(control->widget_list->l,
 			    xitk_label_create(control->widget_list, gGui->skin_config, &lbl));
-    xitk_disable_widget(control->contr);
-
-    active_sliders_video_settings();
   }
 
   {
@@ -700,18 +640,6 @@ void control_panel(void) {
   xitk_browser_update_list(control->skinlist, 
 			   control->skins, control->skins_num, 0);
 
-  /* Temporary test, don't remove me.
-  cmb.skin_element_name = "combotest";
-  cmb.layer_above       = gGui->layer_above;
-  cmb.parent_wlist      = control->widget_list;
-  cmb.entries           = control->skins;
-  cmb.parent_wkey       = &control->widget_key;
-  cmb.callback          = NULL;
-  cmb.userdata          = NULL;
-  xitk_list_append_content(control->widget_list->l, 
-			   (control->combo = xitk_combo_create(gGui->skin_config, &cmb)));
-  xitk_combo_set_select(control->widget_list, control->combo, 3);
-  */
 
   lb.skin_element_name = "CtlDismiss";
   lb.button_type       = CLICK_BUTTON;
