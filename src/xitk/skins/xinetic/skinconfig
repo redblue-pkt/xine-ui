@@ -5,6 +5,7 @@ skin.version = 4
 skin.date    = 08.05.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
+#skin.logo = file://$(SKIN_PARENT_PATH)/xine-ui_logo.mpv
 
 ## Main GUI ##
 skin.BackGround {
@@ -71,6 +72,8 @@ skin.TitleLabel {
 	label {
 	  length = 51
 	  animation = True
+	  step = 6
+          timer = 500000
 	  pixmap = Letters.png
 	}
 }
@@ -222,7 +225,7 @@ skin.SliderVol {
 
 skin.Snapshot {
 	coords {
-	  x = 346
+	  x = 348
 	  y = 75
 	}
 	pixmap = MainCam.png
@@ -290,7 +293,7 @@ skin.PlBG {
 skin.PlAdd {
 	coords {
 	  x = 333
-	  y = 110
+	  y = 150
 	}
 	pixmap = Onglet.png
 	label {
@@ -304,7 +307,7 @@ skin.PlAdd {
 skin.PlLoad {
 	coords {
 	  x = 333
-	  y = 127
+	  y = 167
 	}
 	pixmap = Onglet.png
 	label {
@@ -318,7 +321,7 @@ skin.PlLoad {
 skin.PlSave {
 	coords {
 	  x = 333
-	  y = 144
+	  y = 184
 	}
 	pixmap = Onglet.png
 	label {
@@ -331,7 +334,7 @@ skin.PlSave {
 
 skin.PlItemBtn {
 	coords {
-	  x = 20
+	  x = 10
 	  y = 20
 	}
 	pixmap = PlItemBtn.png
@@ -403,7 +406,7 @@ skin.PlDismiss {
 
 skin.PlUp {
 	coords {
-	  x = 310
+	  x = 300
 	  y = 17
 	}
 	pixmap = BigArrowUp.png
@@ -411,8 +414,8 @@ skin.PlUp {
 
 skin.SliderPl {
 	coords {
-	  x = 310
-	  y = 36
+	  x = 300
+	  y = 38
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -423,7 +426,7 @@ skin.SliderPl {
 
 skin.PlDn {
 	coords {
-	  x = 310
+	  x = 300
 	  y = 164
 	}
 	pixmap = BigArrowDown.png
@@ -431,16 +434,16 @@ skin.PlDn {
 
 skin.PlLeft {
         coords {
-          x = 16
-          y = 166
+          x = 10
+          y = 164
         }
         pixmap = BigArrowLeft.png
 }
 
 skin.SliderHPl {
         coords {
-          x = 33
-          y = 166
+          x = 31
+          y = 164
         }
         pixmap = PlSlidHBg.png
         slider {
@@ -451,8 +454,8 @@ skin.SliderHPl {
 
 skin.PlRight {
         coords {
-          x = 293
-          y = 166
+          x = 273
+          y = 164
         }
         pixmap = BigArrowRight.png
 }
@@ -466,7 +469,7 @@ skin.AutoPlayLbl {
 	label {
 	  length = 9
 	  animation = True
-	  pixmap = Letters.png
+	  pixmap = Letters2.png
 	}
 }
 
@@ -487,8 +490,8 @@ skin.AutoPlayBG {
 
 skin.PlInputText {
 	coords {
-	  x = 26
-	  y = 192
+	  x = 10
+	  y = 185
 	}
 	pixmap = PlInputTxt.png
 	label {
@@ -522,13 +525,13 @@ skin.SliderCtlHue {
 
 skin.CtlHueLbl {
 	coords {
-	  x = 23
-	  y = 190
+	  x = 34
+	  y = 175
 	}
 	label {
 	  length = 3
 	  animation = False
-	pixmap = Letters.png
+	pixmap = Letters2.png
 	}
 }
 
@@ -546,13 +549,13 @@ skin.SliderCtlSat {
 
 skin.CtlSatLbl {
 	coords {
-	  x = 67
-	  y = 190
+	  x = 78
+	  y = 175
 	}
 	label {
 	  length = 3
 	  animation = False
-	pixmap = Letters.png
+	pixmap = Letters2.png
 	}
 }
 
@@ -570,14 +573,14 @@ skin.SliderCtlBright {
 
 skin.CtlBrightLbl {
 	coords {
-	  x = 111
-	  y = 190
+	  x = 122
+	  y = 175
 	}
 
 	label {
 	  length = 3
 	  animation = False
-	pixmap = Letters.png
+	pixmap = Letters2.png
 	}
 }
 
@@ -595,13 +598,13 @@ skin.SliderCtlCont {
 
 skin.CtlContLbl {
 	coords {
-	  x = 155
-	  y = 190
+	  x = 166
+	  y = 175
 	}
 	label {
 	  length = 3
 	  animation = False
-	pixmap = Letters.png
+	pixmap = Letters2.png
 	}
 }
 
@@ -627,7 +630,7 @@ skin.CtlSkLbl {
 	label {
 	  length = 25
 	  animation = False
-	pixmap = Letters.png
+	pixmap = Letters2.png
 	}
 }
 
@@ -636,13 +639,13 @@ skin.CtlSkUp {
 	  x = 372
 	  y = 17
 	}
-	pixmap = SkArrowUp.png
+	pixmap = BigArrowUp.png
 }
 
 skin.SliderCtlSk {
 	coords {
 	  x = 372
-	  y = 36
+	  y = 38
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -656,21 +659,21 @@ skin.CtlSkDn {
 	  x = 372
 	  y = 164
 	}
-	pixmap = SkArrowDown.png
+	pixmap = BigArrowDown.png
 }
 
 skin.CtlSkLeft {
         coords {
-          x = 190
-          y = 164
+          x = 200
+          y = 163
         }
-        pixmap = SkArrowLeft.png
+        pixmap = BigArrowLeft.png
 }
 
 skin.SliderHCtlSk {
         coords {
-          x = 209
-          y = 164
+          x = 221
+          y = 163
         }
         pixmap = SkSlidHBg.png
         slider {
@@ -681,10 +684,10 @@ skin.SliderHCtlSk {
 
 skin.CtlSkRight {
         coords {
-          x = 350
-          y = 164
+          x = 341
+          y = 163
         }
-        pixmap = SkArrowRight.png
+        pixmap = BigArrowRight.png
 }
 
 skin.CtlSkItemBtn {
@@ -707,7 +710,7 @@ skin.CtlSkItemBtn {
 skin.CtlDismiss {
 	coords {
 	  x = 333
-	  y = 208
+	  y = 182
 	}
 	pixmap = CtlDismiss.png
 	label {
@@ -729,7 +732,7 @@ skin.MrlBG {
 
 skin.MrlItemBtn {
 	coords {
-	  x = 20
+	  x = 10
 	  y = 20
 	}
 	pixmap = PlItemBtn.png
@@ -748,7 +751,7 @@ skin.MrlItemBtn {
 skin.MrlSelect {
 	coords {
 	  x = 69
-	  y = 224
+	  y = 202
 	}
 	pixmap = MrlSelect.png
 	label {
@@ -762,7 +765,7 @@ skin.MrlSelect {
 skin.MrlPlay {
 	coords {
 	  x = 15
-	  y = 235
+	  y = 213
 	}
 	pixmap = PlPlay.png
 }
@@ -770,7 +773,7 @@ skin.MrlPlay {
 skin.MrlDismiss {
 	coords {
 	  x = 333
-	  y = 224
+	  y = 202
 	}
 	pixmap = MrlDismiss.png
 	label {
@@ -783,7 +786,7 @@ skin.MrlDismiss {
 
 skin.MrlUp {
 	coords {
-	  x = 310
+	  x = 300
 	  y = 17
 	}
 	pixmap = BigArrowUp.png
@@ -791,8 +794,8 @@ skin.MrlUp {
 
 skin.SliderMrl {
 	coords {
-	  x = 310
-	  y = 36
+	  x = 300
+	  y = 38
 	}
 	pixmap = SliderVBg.png
 	slider {
@@ -803,7 +806,7 @@ skin.SliderMrl {
 
 skin.MrlDn {
 	coords {
-	  x = 310
+	  x = 300
 	  y = 164
 	}
 	pixmap = BigArrowDown.png
@@ -811,16 +814,16 @@ skin.MrlDn {
 
 skin.MrlLeft {
         coords {
-          x = 16
-          y = 166
+          x = 10
+          y = 164
         }
         pixmap = BigArrowLeft.png
 }
 
 skin.SliderHMrl {
         coords {
-          x = 33
-          y = 166
+          x = 31
+          y = 164
         }
         pixmap = PlSlidHBg.png
         slider {
@@ -831,22 +834,22 @@ skin.SliderHMrl {
 
 skin.MrlRight {
         coords {
-          x = 293
-          y = 166
+          x = 273
+          y = 164
         }
         pixmap = BigArrowRight.png
 }
 
 skin.MrlCurOrigin {
 	coords {
-	  x = 21
-	  y = 189
+	  x = 10
+	  y = 190
 	}
 
 	label {
-	  length = 43
+	  length = 35
 	  animation = True
-	pixmap = Letters.png
+	pixmap = Letters2.png
 	}
 }
 
@@ -873,19 +876,19 @@ skin.MrlPlugLabel {
 	label {
 	  length = 7
 	  animation = False
-	pixmap = Letters.png
+	pixmap = Letters2.png
 	}
 }
 
 skin.MrlFilt {
 	coords {
-	  x = 155
-	  y = 213
+	  x = 255
+	  y = 190
 	}
-	pixmap = SkArrowDown.png
+	pixmap = MrlFlit.png
 	label {
 	  length = 18
 	  animation = False
-	  pixmap = Letters.png
+	  pixmap = Letters2.png
 	}
 }
