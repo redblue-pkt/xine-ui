@@ -707,7 +707,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
-      char   langbuf[16];
+      char   langbuf[XINE_LANG_MAX];
       
       memset(&langbuf, 0, sizeof(langbuf));
       
@@ -757,7 +757,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
-      char   langbuf[16];
+      char   langbuf[XINE_LANG_MAX];
       
       memset(&langbuf, 0, sizeof(langbuf));
       
@@ -857,7 +857,7 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
-      char  langbuf[16];
+      char  langbuf[XINE_LANG_MAX];
       
       memset(&langbuf, 0, sizeof(langbuf));
       
@@ -929,7 +929,7 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
     xitk_menu_add_entry(w, &menu_entry);
     
     for(i = 0; i < 32; i++) {
-      char   langbuf[16];
+      char   langbuf[32];
       
       memset(&langbuf, 0, sizeof(langbuf));
       

@@ -638,7 +638,7 @@ void panel_reset_slider (void) {
  */
 void panel_update_channel_display (void) {
   int   channel;
-  char  buffer[10];
+  char  buffer[XINE_LANG_MAX];
   char *lang = NULL;
 
   memset(&buffer, 0, sizeof(buffer));

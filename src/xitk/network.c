@@ -2120,7 +2120,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 		     (xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL)));
 	}
 	else if(is_arg_contain(client_info, 2, "lang")) {
-	  char buf[20];
+	  char buf[XINE_LANG_MAX];
 
 	  xine_get_audio_lang(gGui->stream,
 	                      xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL),
@@ -2148,7 +2148,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info) {
 		     (xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL)));
 	}
 	else if(is_arg_contain(client_info, 2, "lang")) {
-	  char buf[20];
+	  char buf[XINE_LANG_MAX];
 
 	  xine_get_spu_lang (gGui->stream,
 	                     xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL),

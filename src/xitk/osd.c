@@ -599,7 +599,7 @@ void osd_update_status(void) {
 
 void osd_display_spu_lang(void) {
   char   buffer[32];
-  char   lang_buffer[10];
+  char   lang_buffer[XINE_LANG_MAX];
   char  *lang = NULL;
   int    channel;
   
@@ -628,7 +628,7 @@ void osd_display_spu_lang(void) {
 
 void osd_display_audio_lang(void) {
   char   buffer[32];
-  char   lang_buffer[10];
+  char   lang_buffer[XINE_LANG_MAX];
   char  *lang = NULL;
   int    channel;
 
