@@ -123,3 +123,58 @@ void config_reset(void) {
   xine_config_reset(gGui->xine);
   xine_config_load(gGui->xine, gGui->configfile);
 }
+
+/*
+ * Handle 'cfg:/' mrl style
+ */
+void config_mrl(char *mrl) {
+  char *key;
+  char *config;
+  char *_mrl;
+
+  xine_strdupa(_mrl, mrl);
+  config = strchr(_mrl, '/');
+  
+  if(config && strlen(config))
+    config++;
+
+  while((key = xine_strsep(&config, ",")) != NULL) {
+    char *str_value = strchr(key, ':');
+
+    if(str_value && strlen(str_value))
+      *str_value++ = '\0';
+
+    if(str_value && strlen(str_value)) {
+      xine_cfg_entry_t entry;
+      
+      if(xine_config_lookup_entry(gGui->xine, key, &entry)) {
+
+	switch(entry.type) {
+
+	case XINE_CONFIG_TYPE_STRING:
+	  config_update(&entry, entry.type, 0, 0, 0, str_value);
+	  break;
+	  
+	case XINE_CONFIG_TYPE_RANGE:
+	case XINE_CONFIG_TYPE_ENUM:
+	case XINE_CONFIG_TYPE_NUM:
+	  config_update(&entry, ((entry.type == XINE_CONFIG_TYPE_RANGE) ? 
+				 XINE_CONFIG_TYPE_NUM : entry.type), 
+			0, 0, (strtol(str_value, &str_value, 10)), NULL);
+	  break;
+
+	case XINE_CONFIG_TYPE_BOOL:
+	  config_update(&entry, entry.type, 0, 0, (get_bool_value(str_value)), NULL);
+	  break;
+	
+	case XINE_CONFIG_TYPE_UNKNOWN:
+	default:
+	  fprintf(stderr, "WOW, key %s isn't registered\n", key);
+	  break;
+	}
+      }
+
+    }
+  }
+
+}

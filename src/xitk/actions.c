@@ -349,7 +349,12 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos, int start_time) {
   char *mrl = _mrl;
   
-  if((!strncasecmp(mrl, "ftp://", 6)) || (!strncasecmp(mrl, "dload:/", 7)))  {
+  if(!strncasecmp(mrl, "cfg:/", 5)) {
+    config_mrl(mrl);
+    gui_playlist_start_next();
+    return 1;
+  }
+  else if((!strncasecmp(mrl, "ftp://", 6)) || (!strncasecmp(mrl, "dload:/", 7)))  {
     char        *url = mrl;
     download_t   download;
     

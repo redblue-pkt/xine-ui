@@ -32,5 +32,6 @@ void config_update_num(char *key, int value);
 void config_load(void);
 void config_save(void);
 void config_reset(void);
+void config_mrl(char *mrl);
 
 #endif
