@@ -360,6 +360,8 @@ Hide/show the event sender window.
 Hide/show the stream informations window.
 .IP "\fBC\fP\-\fBt\fP"
 Toggle display mode between mrl and identifier.
+.IP "\fBC\fP\-\fBs\fP"
+Update playlist's stream informations (if available).
 
 .SS Third party plugins
 Following shortcuts are used by third party plugins, generally for DVD navigation:
