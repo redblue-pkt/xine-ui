@@ -401,12 +401,6 @@ void panel_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case EnterNotify:
-    XLockDisplay(gGui->display);
-    XRaiseWindow(gGui->display, gGui->panel_window);
-    XUnlockDisplay(gGui->display);
-    break;
-
   case KeyPress:
     gui_handle_event(event, data);
     break;
@@ -448,7 +442,9 @@ void panel_add_autoplay_buttons(void) {
     xitk_list_append_content (panel->widget_list->l,
 	     (panel->autoplay_plugins[i] =
 	      xitk_labelbutton_create (gGui->skin_config, &lb)));
-
+    xitk_set_widget_tips(panel->autoplay_plugins[i], 
+			 xine_get_input_plugin_description(gGui->xine, autoplay_plugins[i]));
+    
     (void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
 
     x -= xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
@@ -486,6 +482,12 @@ void panel_add_mixer_control(void) {
     xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute,
 			    gGui->panel_window, panel->widget_list->gc);
   }
+
+  /* Tips should be available only if widgets are enabled */
+  if(gGui->mixer.caps & (AO_CAP_MIXER_VOL | AO_CAP_PCM_VOL))
+    xitk_set_widget_tips(panel->mixer.slider, _("Volume control"));
+  if(gGui->mixer.caps & AO_CAP_MUTE_VOL)
+    xitk_set_widget_tips(panel->mixer.mute, _("Mute toggle"));
 
 }
 
@@ -542,7 +544,7 @@ void panel_init (void) {
   hint.height = panel->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
-  attr.override_redirect = True;
+  attr.override_redirect = False;
   attr.background_pixel  = gGui->black.pixel;
   /*
    * XXX:multivis
@@ -573,9 +575,8 @@ void panel_init (void) {
 			 None, NULL, 0, &hint);
 
   XSelectInput(gGui->display, gGui->panel_window,
-	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask 
-	       | KeyPressMask | ExposureMask | StructureNotifyMask);
+	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask
+	       | KeyPressMask | KeymapStateMask | ExposureMask | StructureNotifyMask);
 
   /*
    * wm, no border please
@@ -803,7 +804,6 @@ void panel_init (void) {
   xitk_list_append_content (panel->widget_list->l, 
 			   (panel->mixer.mute = xitk_checkbox_create (gGui->skin_config, &cb)));
   xitk_disable_widget(panel->mixer.mute);
-  xitk_set_widget_tips(panel->mixer.mute, _("Mute toggle"));
 
   /* Snapshot */
   b.skin_element_name = "Snapshot";

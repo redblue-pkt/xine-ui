@@ -225,6 +225,11 @@ void gui_toggle_fullscreen(xitk_widget_t *w, void *data) {
   if(control_is_visible())
     control_raise_window();
   
+  if(setup_is_visible())
+    setup_raise_window();
+
+  if(viewlog_is_visible())
+    viewlog_raise_window();
 }
 
 void gui_toggle_aspect(void) {

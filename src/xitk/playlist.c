@@ -512,12 +512,6 @@ void playlist_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
-  case EnterNotify:
-    XLockDisplay(gGui->display);
-    XRaiseWindow(gGui->display, playlist->window);
-    XUnlockDisplay(gGui->display);
-    break;
-
   case ButtonPress: {
     XButtonEvent *bevent = (XButtonEvent *) event;
     if (bevent->button == Button4)
@@ -679,7 +673,7 @@ void playlist_editor(void) {
   hint.height = playlist->bg_image->rgb_height;
   hint.flags = PPosition | PSize;
   
-  attr.override_redirect = True;
+  attr.override_redirect = False;
   attr.background_pixel  = gGui->black.pixel;
   /*
    * XXX:multivis
@@ -705,8 +699,7 @@ void playlist_editor(void) {
 			 None, NULL, 0, &hint);
   
   XSelectInput(gGui->display, playlist->window, 
-	       EnterWindowMask | LeaveWindowMask | FocusChangeMask |
-	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask
+	       ButtonPressMask | ButtonReleaseMask | KeymapStateMask | PointerMotionMask
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
   /*

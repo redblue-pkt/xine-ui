@@ -35,6 +35,19 @@
 #define XITK_WINDOW_ANSWER_CANCEL  4
 
 /*
+ * Set/Change window title.
+ */
+void xitk_set_window_title(Display *display, Window window, char *title);
+void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, char *title);
+
+/*
+ * Get (safely) window pos.
+ */
+void xitk_get_window_position(Display *display, Window window, 
+			      int *x, int *y, int *width, int *height);
+void xitk_window_get_window_position(ImlibData *im, xitk_window_t *w, 
+				     int *x, int *y, int *width, int *height);
+/*
  * Move window to xy coords.
  */
 void xitk_window_move_window(ImlibData *im, xitk_window_t *w, int x, int y);

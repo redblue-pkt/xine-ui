@@ -1657,6 +1657,28 @@ int xitk_window_change_background(ImlibData *im, xitk_window_t *w, Pixmap bg, in
  */
 void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height);
 
+/*
+ *
+ */
+void xitk_get_window_position(Display *display, Window window, 
+			      int *x, int *y, int *width, int *height);
+
+/*
+ *
+ */
+void xitk_window_get_window_position(ImlibData *im, xitk_window_t *w, 
+				     int *x, int *y, int *width, int *height);
+
+/*
+ *
+ */
+void xitk_set_window_title(Display *display, Window window, char *title);
+
+/*
+ *
+ */
+void xitk_window_set_window_title(ImlibData *im, xitk_window_t *w, char *title);
+
 #define ALIGN_LEFT    1
 #define ALIGN_CENTER  2
 #define ALIGN_RIGHT   3

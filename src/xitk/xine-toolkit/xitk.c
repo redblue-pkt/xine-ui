@@ -443,20 +443,6 @@ void xitk_xevent_notify(XEvent *event) {
 	
 	switch(event->type) {
 
-	case EnterNotify:
-	  XLOCK(gXitk->display);
-	  XSetInputFocus(gXitk->display, fx->window, RevertToParent, CurrentTime);
-	  XUNLOCK(gXitk->display);
-	  break;
-	  
-	case LeaveNotify:
-	  /*
-	    XLOCK(gXitk->display);
-	    XSetInputFocus(gXitk->display, PointerRoot, RevertToNone, CurrentTime);
-	    XUNLOCK(gXitk->display);
-	  */
-	  break;
-
 	case Expose:
 	  if (fx->widget_list && (event->xexpose.count == 0)) {
 	    xitk_paint_widget_list (fx->widget_list);
@@ -517,7 +503,26 @@ void xitk_xevent_notify(XEvent *event) {
 	}
 	break;
 	
-	case ButtonPress:
+	case ButtonPress: {
+	  XWindowAttributes   wattr;
+	  Status              status;
+	  Window              focused_window;
+	  int                 revert;
+	  
+	  XLOCK(gXitk->display);
+	  status = XGetWindowAttributes(gXitk->display, fx->window, &wattr);
+	  XGetInputFocus(gXitk->display, &focused_window, &revert);
+
+	  /* 
+	   * Give focus(and raise) to a window after a click, and 
+	   * only if window isn't the current focused one.
+	   */
+	  if((status != BadDrawable) && (status != BadWindow) 
+	     && (wattr.map_state == IsViewable) && (focused_window != fx->window)) {
+	    XRaiseWindow(gXitk->display, fx->window);
+	    XSetInputFocus(gXitk->display, fx->window, RevertToParent, CurrentTime);
+	  }
+	  XUNLOCK(gXitk->display);
 	  
 	  if(fx->widget_list) {
 
@@ -544,7 +549,8 @@ void xitk_xevent_notify(XEvent *event) {
 
 	    }
 	  }
-	  break;
+	}
+	break;
 	  
 	case ButtonRelease:
 	  
