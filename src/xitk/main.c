@@ -359,6 +359,7 @@ void show_usage (void) {
   printf(_("                                 'loop': loop entire playlist.\n"));
   printf(_("                                 'repeat': repeat current playlist entry.\n"));
   printf(_("                                 'shuffle': select randomly a yet unplayed entry from playlist\n"));
+  printf(_("                                 'shuffle+': same as 'shuffle', but indefinetely replay the playlist.\n"));
   printf(_("      --skin-server-url <url>  Define the skin server url.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
@@ -937,6 +938,8 @@ int main(int argc, char *argv[]) {
 	  gGui->playlist.loop = PLAYLIST_LOOP_LOOP;
 	else if(!strcasecmp(optarg, "repeat"))
 	  gGui->playlist.loop = PLAYLIST_LOOP_REPEAT;
+	else if(!strcasecmp(optarg, "shuffle+"))
+	  gGui->playlist.loop = PLAYLIST_LOOP_SHUF_PLUS;
 	else if(!strcasecmp(optarg, "shuffle"))
 	  gGui->playlist.loop = PLAYLIST_LOOP_SHUFFLE;
 	else {

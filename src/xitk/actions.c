@@ -861,6 +861,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
       switch(gGui->playlist.loop) {
       
       case PLAYLIST_LOOP_SHUFFLE:
+      case PLAYLIST_LOOP_SHUF_PLUS:
 	gGui->ignore_next = 0;
 	gui_playlist_start_next();
 	break;
@@ -912,6 +913,7 @@ void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
 
       switch(gGui->playlist.loop) {
       case PLAYLIST_LOOP_SHUFFLE:
+      case PLAYLIST_LOOP_SHUF_PLUS:
 	gGui->ignore_next = 0;
 	gui_playlist_start_next();
 	break;

@@ -206,6 +206,8 @@ mode \fBloop\fP est utilisé. Les modes possibles sont:
 \fBrepeat\fP: répète l'entrée courante dans la liste de lecture.
 .br
 \fBshuffle\fP: sélection aléatoire d'une entrée, non encore jouée, dans la liste de lecture.
+.br
+\fBshuffle\+\fP: identique à shuffle, mais rejoue indéfiniement la liste de lecture.
 .TP
 .B MRL (media resource locator)
 .br

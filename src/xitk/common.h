@@ -103,6 +103,8 @@
 #define PLAYLIST_LOOP_LOOP      1 /* loop the whole playlist */
 #define PLAYLIST_LOOP_REPEAT    2 /* loop the current mrl */
 #define PLAYLIST_LOOP_SHUFFLE   3 /* random selection in playlist */
+#define PLAYLIST_LOOP_SHUF_PLUS 4 /* random selection in playlist, never ending */
+#define PLAYLIST_LOOP_MODES_NUM 5
 
 #define SAFE_FREE(x)            do {           \
                                   if((x)) {    \

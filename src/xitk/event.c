@@ -597,7 +597,7 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_LOOPMODE:
     gGui->playlist.loop++;
-    if(gGui->playlist.loop > PLAYLIST_LOOP_SHUFFLE)
+    if(gGui->playlist.loop == PLAYLIST_LOOP_MODES_NUM)
       gGui->playlist.loop = PLAYLIST_LOOP_NO_LOOP;
 #if 1
     printf("Playlist loop mode:");
@@ -613,6 +613,9 @@ void gui_execute_action_id(action_id_t action) {
       break;
     case PLAYLIST_LOOP_SHUFFLE:
       printf("PLAYLIST_LOOP_SHUFFLE");
+      break;
+    case PLAYLIST_LOOP_SHUF_PLUS:
+      printf("PLAYLIST_LOOP_SHUF_PLUS");
       break;
     }
     printf("\n");
@@ -742,16 +745,22 @@ void gui_playlist_start_next(void) {
     break;
 
   case PLAYLIST_LOOP_SHUFFLE:
+  case PLAYLIST_LOOP_SHUF_PLUS:
     if(!mediamark_all_played()) {
       
+    __shuffle_restart:
       gGui->playlist.cur = mediamark_get_shuffle_next();
-     
+      
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       if(!gui_xine_open_and_play(gGui->mmk.mrl, 0, gGui->mmk.start))
 	gui_display_logo();
     }
     else {
       mediamark_reset_played_state();
+
+      if(gGui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS)
+	goto __shuffle_restart;
+
       gui_display_logo();
     }
     break;
@@ -865,8 +874,9 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
    */
   for (i = 0; i < nfiles; i++)
     mediamark_add_entry((const char *)filenames[i], (const char *)filenames[i], 0, -1);
-
-  if(gGui->playlist.loop == PLAYLIST_LOOP_SHUFFLE)
+  
+  if((gGui->playlist.loop == PLAYLIST_LOOP_SHUFFLE) || 
+     (gGui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS))
     gGui->playlist.cur = mediamark_get_shuffle_next();
   
   gGui->is_display_mrl = 0;
