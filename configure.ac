@@ -310,80 +310,18 @@ AM_CONDITIONAL(HAVE_XTESTEXTENSION, test x$ac_have_xtest = "xyes")
 dnl
 dnl readline
 dnl
-dnl configure defaults
-LIBVERSION=4.2a
-opt_curses=no
-opt_shared=no
+AC_CHECK_READLINE
+AM_CONDITIONAL(HAVE_READLINE, test x"$have_readline" = "xyes")
 
-dnl arguments to configure
-AC_ARG_WITH(curses, 
-  [  --with-curses           use the curses library instead of the termcap library],
-  opt_curses=$withval)
-
-if test "$opt_curses" = "yes"; then
-	prefer_curses=yes
-fi
-AC_TYPE_SIGNAL([])
-
-AC_HEADER_STAT
-AC_HEADER_DIRENT
-AC_CHECK_FUNCS(lstat memmove putenv select setenv setlocale \
-	strcasecmp strpbrk tcgetattr vsnprintf isascii isxdigit getpwuid_r)
-
-AC_FUNC_STRCOLL
-
-AC_CHECK_HEADERS(unistd.h stdlib.h varargs.h stdarg.h string.h strings.h \
-		limits.h sys/ptem.h sys/pte.h sys/stream.h sys/select.h \
-		termcap.h termios.h termio.h sys/file.h locale.h memory.h)
-
-dnl BASH_SYS_SIGNAL_VINTAGE dnl pure 2.50
-dnl BASH_SYS_REINSTALL_SIGHANDLERS dnl pure 2.50
-BASH_SIGNAL_CHECK
-BASH_REINSTALL_SIGHANDLERS
-
-BASH_FUNC_POSIX_SETJMP
-BASH_FUNC_LSTAT
-BASH_CHECK_GETPW_FUNCS
-BASH_FUNC_STRCOLL
-
-BASH_TYPE_SIGHANDLER
-BASH_HAVE_TIOCGWINSZ
-BASH_HAVE_TIOCSTAT
-BASH_HAVE_FIONREAD
-BASH_MISC_SPEED_T
-BASH_STRUCT_WINSIZE
-BASH_STRUCT_DIRENT_D_INO
-BASH_STRUCT_DIRENT_D_FILENO
-dnl yuck
-case "$host_os" in
-aix*)   prefer_curses=yes ;;
-esac
-
-BASH_CHECK_LIB_TERMCAP([],
-                       AC_MSG_RESULT([*** All of READLINE dependent parts will be disabled ***]))
-
-case "$host_cpu" in
-*cray*)	READLINE_LOCAL_CFLAGS=-DCRAY ;;
-*s390*) READLINE_LOCAL_CFLAGS=-fsigned-char ;;
-esac
-
-case "$host_os" in
-isc*)	READLINE_LOCAL_CFLAGS=-Disc386 ;;
-esac
-
-AC_SUBST(READLINE_LOCAL_CFLAGS)
-AC_SUBST(TERMCAP_LIB)
-AC_SUBST(LIBVERSION)
-AM_CONDITIONAL(HAVE_TERMCAP, test x"$no_termcap" != "xyes")
 
 dnl
 dnl ncurses
 dnl
 AC_CHECK_HEADERS(curses.h)
 AC_CHECK_LIB(ncurses, cbreak,
-	      AC_DEFINE(HAVE_NCURSES,,[Define this if you have ncurses installed])
-	      ac_have_ncurses="yes"
-	      NCURSES_LIB="-lncurses")
+             AC_DEFINE(HAVE_NCURSES,,[Define this if you have ncurses installed])
+             ac_have_ncurses="yes"
+             NCURSES_LIB="-lncurses")
 AC_SUBST(NCURSES_LIB)
 AM_CONDITIONAL(HAVE_NCURSES, test x$ac_have_ncurses = "xyes")
 
@@ -394,6 +332,7 @@ AM_PATH_CURL(7.10.2, [
    AC_DEFINE(HAVE_CURL,,[Define this if you have libcurl installed])], [
    AC_MSG_RESULT(*** All of curl dependent parts will be disabled ***)])
 AM_CONDITIONAL(HAVE_CURL, test x$no_curl != "xyes")
+
 
 dnl
 dnl
@@ -936,7 +875,7 @@ AC_SUBST(SYSCONF_DIR)
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
 dnl
-INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/readline -I$(top_builddir)/readline -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
+INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
 AC_SUBST(INCLUDES)
 
 AC_DEFINE(NEED_MRLBROWSER,,[Define this to add mrl browser into xitk lib])
@@ -956,7 +895,6 @@ AC_CONFIG_FILES([
 Makefile
 m4/Makefile
 intl/Makefile
-readline/Makefile
 src/Makefile
 src/common/Makefile
 src/xitk/Makefile

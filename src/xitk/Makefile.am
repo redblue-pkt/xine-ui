@@ -1,8 +1,8 @@
 SUBDIRS = Imlib-light xine-toolkit skins
 
-AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ -I$(top_srcdir)/src/xitk/xine-toolkit
+AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @CURL_CFLAGS@ @NVTVSIMPLE_CFLAGS@ @READLINE_INCLUDES@ -I$(top_srcdir)/src/xitk/xine-toolkit
 
-if HAVE_TERMCAP
+if HAVE_READLINE
 remote = xine-remote
 endif
 
@@ -64,11 +64,9 @@ xine_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la \
 	     -lX11 -lm $(DBG_LIBS)
 
 xine_remote_SOURCES = xine-remote.c
-xine_remote_DEPENDENCIES = $(top_builddir)/readline/libreadline.la \
-			   $(top_builddir)/src/common/libcommon.la \
+xine_remote_DEPENDENCIES = $(top_builddir)/src/common/libcommon.la \
 			   xine-remote.c
-xine_remote_LDADD = $(INTLLIBS) $(NET_LIBS) $(THREAD_LIBS) \
-	$(top_builddir)/readline/libreadline.la $(TERMCAP_LIB) \
+xine_remote_LDADD = $(INTLLIBS) $(NET_LIBS) $(THREAD_LIBS) $(READLINE_LIBS) $(NCURSES_LIB) \
 	$(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
 
 session_ctrl_LDADD = @XINE_LIBS@ $(top_builddir)/src/common/libcommon.la $(DBG_LIBS)
@@ -108,9 +106,6 @@ noinst_HEADERS = \
 	tvset.h \
 	videowin.h \
 	viewlog.h
-
-$(top_builddir)/readline/libreadline.la:
-	@cd $(top_builddir)/readline && $(MAKE) libreadline.la
 
 $(top_builddir)/src/common/libcommon.la:
 	@cd $(top_builddir)/src/common && $(MAKE) libcommon.la
