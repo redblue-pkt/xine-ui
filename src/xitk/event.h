@@ -124,6 +124,10 @@ void gui_set_current_mrl(const char *mrl);
 
 void gui_handle_event (XEvent *event, void *data);
 
+char *gui_next_mrl_callback () ;
+
+void gui_branched_callback () ;
+
 #endif
 
 

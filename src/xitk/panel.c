@@ -77,6 +77,7 @@ static void *slider_loop(void *dummy) {
     sleep(3);
   }
   pthread_exit(NULL);
+  return NULL;
 }
 
 /*

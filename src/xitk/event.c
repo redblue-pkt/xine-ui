@@ -436,8 +436,9 @@ void gui_handle_event (XEvent *event, void *data) {
 }
 
 /*
- * Callback function called by Xine engine.
+ * Callback functions called by Xine engine.
  */
+
 void gui_status_callback (int nStatus) {
 
   if (gGui->ignore_status)
@@ -460,6 +461,26 @@ void gui_status_callback (int nStatus) {
       video_window_show_logo();
       gGui->playlist_cur--;
     }
+  }
+}
+
+char *gui_next_mrl_callback () {
+
+
+  if (gGui->playlist_cur >= (gGui->playlist_num-1)) 
+    return NULL;
+
+  return gGui->playlist[gGui->playlist_cur+1];
+}
+
+void gui_branched_callback () {
+
+  if (gGui->playlist_cur < (gGui->playlist_num-1)) {
+  
+    gGui->playlist_cur++;
+    panel_reset_slider ();
+
+    gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
   }
 }
 

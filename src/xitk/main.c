@@ -604,13 +604,12 @@ int main(int argc, char *argv[]) {
   /*
    * xine init
    */
-  printf ("main: starting xine engine\n");
 
   gGui->xine = xine_init (gGui->vo_driver, audio_driver, 
 			  gGui->config,
-			  gui_status_callback, NULL, NULL);
-
-  printf ("main: (pre-)selection audio/spu channels\n");
+			  gui_status_callback, 
+			  gui_next_mrl_callback, 
+			  gui_branched_callback);
 
   xine_select_audio_channel (gGui->xine, audio_channel);
   xine_select_spu_channel (gGui->xine, spu_channel);
