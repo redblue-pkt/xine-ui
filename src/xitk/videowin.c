@@ -455,6 +455,9 @@ void video_window_adapt_size (int video_width, int video_height,
   /* The old window should be destroyed now */
   if(old_video_window != None) {
     XDestroyWindow(gGui->display, old_video_window);
+     
+    if(gGui->cursor_grabbed)
+       XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
   }
 
   gVw->old_widget_key = gVw->widget_key;

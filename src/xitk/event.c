@@ -596,6 +596,19 @@ void gui_handle_event (XEvent *event, void *data) {
         }
       }
       break;
+    
+    case XK_Insert:
+      if(!gGui->cursor_grabbed) {
+	 if(!panel_is_visible())
+	   XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
+	 
+	 gGui->cursor_grabbed = 1;
+      } else {
+	 XUngrabPointer(gGui->display, CurrentTime);
+	 gGui->cursor_grabbed = 0;
+      }
+      break;
+	    
     }
   }
   break;

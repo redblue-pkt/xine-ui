@@ -520,6 +520,7 @@ int main(int argc, char *argv[]) {
   gGui->prefered_visual_class = -1;
   gGui->prefered_visual_id = None;
   gGui->install_colormap = 0;
+  gGui->cursor_grabbed = 0;
 
 #ifdef DEBUG
   /* If XINE_DEBUG envvar is set, parse it */

@@ -173,7 +173,10 @@ void panel_toggle_visibility (widget_t *w, void *data) {
       XUnmapWindow (gGui->display, gGui->panel_window);
       widget_hide_widgets(panel->widget_list);
     }
-    
+
+    if(gGui->cursor_grabbed)
+       XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
+     
   } else {
 
     panel->visible = 1;
@@ -183,6 +186,9 @@ void panel_toggle_visibility (widget_t *w, void *data) {
 			  gGui->panel_window, gGui->video_window);
     
     layer_above_video(gGui->panel_window);
+     
+    if(gGui->cursor_grabbed)
+       XUngrabPointer(gGui->display, CurrentTime);
   }
 
   config_set_int("panel_visible", panel->visible);

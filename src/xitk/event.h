@@ -74,6 +74,7 @@ typedef struct {
   ImlibImage          *video_window_logo_image;
   gui_image_t          video_window_logo_pixmap;
   int                  cursor_visible;
+  int                  cursor_grabbed;
 
   Window               panel_window;
 

@@ -148,6 +148,8 @@ I               toggle interlaced mode
 N M             adjust a/v sync
 <HOME>          reset a/v sync
 
+<INSERT>        toggle grabbing of the mouse cursor in the video output window
+
 Q               quit
 
 more to come.
