@@ -1,3 +1,4 @@
+
 /* 
  * Copyright (C) 2000-2001 the xine project
  * 
@@ -126,12 +127,15 @@ void config_reset(void) {
  *
  */
 static void gui_signal_handler (int sig) {
+  pid_t     cur_pid = getppid();
+#ifndef DEBUG
   XEvent    myevent;
   Status    status;
-  pid_t     cur_pid = getppid();
+#endif
 
   switch (sig) {
-    
+
+#ifndef DEBUG    
   case SIGINT: /* External killing request */
   case SIGTERM:
   case SIGQUIT:
@@ -156,7 +160,8 @@ static void gui_signal_handler (int sig) {
       siglongjmp(jmp_exit, 1);
     }
     break;
-      
+#endif
+
   case SIGHUP:
     if(cur_pid == xine_pid) {
       printf("SIGHUP received: re-read config file\n");
@@ -624,6 +629,7 @@ void gui_run (void) {
   }
 
   /* install sighandler */
+#ifndef DEBUG
   action.sa_handler = gui_signal_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
@@ -642,6 +648,7 @@ void gui_run (void) {
   if(sigaction(SIGQUIT, &action, NULL) != 0) {
     fprintf(stderr, "sigaction(SIGQUIT) failed: %s\n", strerror(errno));
   }
+#endif
   action.sa_handler = gui_signal_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
