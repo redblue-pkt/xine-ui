@@ -109,11 +109,14 @@ struct filebrowser_s {
   xitk_widget_t                  *origin;
 
   xitk_widget_t                  *directories_browser;
-  xitk_widget_t                  *directory_sort;
-  int                             directory_sort_direction;
+  xitk_widget_t                  *directories_sort;
+  int                             directories_sort_direction;
   xitk_widget_t                  *files_browser;
   xitk_widget_t                  *files_sort;
   int                             files_sort_direction;
+
+  xitk_image_t                   *sort_skin_up;
+  xitk_image_t                   *sort_skin_down;
 
   xitk_widget_t                  *rename;
   xitk_widget_t                  *delete;
@@ -172,7 +175,7 @@ static void _fb_enability(filebrowser_t *fb, int enable) {
   
   enability(fb->origin);
   enability(fb->directories_browser);
-  enability(fb->directory_sort);
+  enability(fb->directories_sort);
   enability(fb->files_browser);
   enability(fb->files_sort);
   enability(fb->rename);
@@ -184,6 +187,7 @@ static void _fb_enability(filebrowser_t *fb, int enable) {
     if(fb->cb_buttons[1])
       enability(fb->cb_buttons[1]);
   }
+  enability(fb->show_hidden);
   enability(fb->close);
 }
 static void fb_deactivate(filebrowser_t *fb) {
@@ -557,9 +561,9 @@ static void sort_directories(filebrowser_t *fb) {
   if(fb->directories_num) {
     int i;
     
-    if(fb->directory_sort_direction == DEFAULT_SORT)
+    if(fb->directories_sort_direction == DEFAULT_SORT)
       func = _sortfiles_default;
-    else if(fb->directory_sort_direction == REVERSE_SORT)
+    else if(fb->directories_sort_direction == REVERSE_SORT)
       func = _sortfiles_reverse;
     
     qsort(fb->dir_files, fb->directories_num, sizeof(fileinfo_t), func);
@@ -767,34 +771,41 @@ static void fb_change_origin(xitk_widget_t *w, void *data, char *currenttext) {
 static void fb_sort(xitk_widget_t *w, void *data) {
   filebrowser_t *fb = (filebrowser_t *) data;
 
-#warning DRAW ARROWS (relief)
-
-  if(w == fb->directory_sort) {
-    xitk_image_t *wimage = xitk_get_widget_foreground_skin(w);
-
-    fb->directory_sort_direction = (fb->directory_sort_direction == DEFAULT_SORT) ? 
+  if(w == fb->directories_sort) {
+    xitk_image_t *dsimage = xitk_get_widget_foreground_skin(fb->directories_sort);
+    
+    fb->directories_sort_direction = (fb->directories_sort_direction == DEFAULT_SORT) ? 
       REVERSE_SORT : DEFAULT_SORT;
+    
+    xitk_hide_widget(fb->widget_list, fb->directories_sort);
 
-    /*
-    if(fb->directory_sort_direction == DEFAULT_SORT)
-      draw_arrow_down(gGui->imlib_data, wimage);
+    if(fb->directories_sort_direction == DEFAULT_SORT)
+      xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
+			      dsimage, dsimage->width, dsimage->height);
     else
-      draw_arrow_up(gGui->imlib_data, wimage);
-    */
+      xitk_image_change_image(gGui->imlib_data, fb->sort_skin_up, 
+			    dsimage, dsimage->width, dsimage->height);
+
+    xitk_show_widget(fb->widget_list, fb->directories_sort);
+    
     sort_directories(fb);
   }
   else if(w == fb->files_sort) {
-    xitk_image_t *wimage = xitk_get_widget_foreground_skin(w);
+    xitk_image_t *fsimage = xitk_get_widget_foreground_skin(fb->files_sort);
     
     fb->files_sort_direction = (fb->files_sort_direction == DEFAULT_SORT) ? 
       REVERSE_SORT : DEFAULT_SORT;
+    
+    xitk_hide_widget(fb->widget_list, fb->files_sort);
 
-    /*
     if(fb->files_sort_direction == DEFAULT_SORT)
-      draw_arrow_down(gGui->imlib_data, wimage);
+      xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
+			      fsimage, fsimage->width, fsimage->height);
     else
-      draw_arrow_up(gGui->imlib_data, wimage);
-    */
+      xitk_image_change_image(gGui->imlib_data, fb->sort_skin_up, 
+			    fsimage, fsimage->width, fsimage->height);
+
+    xitk_show_widget(fb->widget_list, fb->files_sort);
 
     sort_files(fb);
   }    
@@ -866,6 +877,9 @@ static void fb_exit(xitk_widget_t *w, void *data) {
     SAFE_FREE(fb->cbb[0].label);
     SAFE_FREE(fb->cbb[1].label);
     
+    xitk_image_free_image(gGui->imlib_data, &fb->sort_skin_up);
+    xitk_image_free_image(gGui->imlib_data, &fb->sort_skin_down);
+
     free(fb);
     fb = NULL;
   }
@@ -1110,13 +1124,13 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
 					      (window_title) ? window_title : _("File Browser"), 
 					      x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
   
-  fb->directories              = NULL;
-  fb->directories_num          = 0;
-  fb->files                    = NULL;
-  fb->files_num                = 0;
-  fb->directory_sort_direction = DEFAULT_SORT;
-  fb->files_sort_direction     = DEFAULT_SORT;
-  fb->show_hidden_files        = 1;
+  fb->directories                = NULL;
+  fb->directories_num            = 0;
+  fb->files                      = NULL;
+  fb->files_num                  = 0;
+  fb->directories_sort_direction = DEFAULT_SORT;
+  fb->files_sort_direction       = DEFAULT_SORT;
+  fb->show_hidden_files          = 1;
 
   sprintf(fb->current_dir, "%s", xine_get_homedir());
   memset(&fb->filename, 0, sizeof(fb->filename));
@@ -1210,7 +1224,7 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   b.callback          = fb_sort;
   b.userdata          = (void *)fb;
   xitk_list_append_content(fb->widget_list->l, 
-	   (fb->directory_sort =
+	   (fb->directories_sort =
 	    xitk_noskin_button_create(fb->widget_list, &b, x - 1, y, w + 12 + 2, 15)));
 
   x = WINDOW_WIDTH - (w + 15 + 12);
@@ -1244,6 +1258,124 @@ filebrowser_t *create_filebrowser(char *window_title, char *filepathname,
   xitk_list_append_content(fb->widget_list->l, 
 	   (fb->files_sort =
 	    xitk_noskin_button_create(fb->widget_list, &b, x - 1, y, w + 12 + 2, 15)));
+
+
+  {
+    xitk_image_t *dsimage = xitk_get_widget_foreground_skin(fb->directories_sort);
+    xitk_image_t *fsimage = xitk_get_widget_foreground_skin(fb->files_sort);
+    xitk_image_t *image;
+    XPoint        points[4];
+    int           i, j, w, h, offset;
+    short         x1, x2, x3;
+    short         y1, y2, y3;
+
+    fb->sort_skin_up = xitk_image_create_image(gGui->imlib_data, 
+					       dsimage->width, dsimage->height);
+    fb->sort_skin_down = xitk_image_create_image(gGui->imlib_data, 
+						 dsimage->width, dsimage->height);
+    
+    draw_bevel_three_state(gGui->imlib_data, fb->sort_skin_up);
+    draw_bevel_three_state(gGui->imlib_data, fb->sort_skin_down);
+
+    w = dsimage->width / 3;
+    h = dsimage->height;
+    
+    for(j = 0; j < 2; j++) {
+      if(j == 0)
+	image = fb->sort_skin_up;
+      else
+	image = fb->sort_skin_down;
+      
+      offset = 0;
+      for(i = 0; i < 2; i++) {
+	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+				    5, 4 + offset, w - 45, 1);
+	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+				    w - 20, 4 + offset, 10, 1);
+	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+				    w + 5, 4 + offset, w - 45, 1);
+	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+				    (w * 2) - 20, 4 + offset, 10, 1);
+	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+				    (w * 2) + 5 + 1, 4 + 1 + offset, w - 45, 1);
+	draw_rectangular_outter_box(gGui->imlib_data, image->image, 
+				    ((w * 3) - 20) + 1, 4 + 1 + offset, 10 + 1, 1);
+	offset += 4;
+      }
+      
+      offset = 0;
+      for(i = 0; i < 3; i++) {
+	int k;
+
+	if(j == 0) {
+	  x1 = (w - 30) + offset;
+	  y1 = (2);
+	  
+	  x2 = (w - 30) - 7 + offset;
+	  y2 = (2 + 8);
+	  
+	  x3 = (w - 30) + 7 + offset;
+	  y3 = (2 + 8);
+	}
+	else {
+	  x1 = (w - 30) + offset;
+	  y1 = (2 + 8);
+	  
+	  x2 = (w - 30) - 6 + offset;
+	  y2 = (3);
+	  
+	  x3 = (w - 30) + 6 + offset;
+	  y3 = (3);
+	}
+	
+	if(i == 2) {
+	  x1++; x2++; x3++;
+	  y1++; y2++; y3++;
+	}
+	
+	points[0].x = x1;
+	points[0].y = y1;
+	points[1].x = x2;
+	points[1].y = y2;
+	points[2].x = x3;
+	points[2].y = y3;
+	points[3].x = x1;
+	points[3].y = y1;
+	
+	offset += w;
+	
+	XLockDisplay(gGui->display);
+	XSetForeground(gGui->display, image->image->gc, 
+		       xitk_get_pixel_color_lightgray(gGui->imlib_data));
+	XFillPolygon(gGui->display, image->image->pixmap, image->image->gc, 
+		     &points[0], 4, Complex, CoordModeOrigin);
+	XUnlockDisplay(gGui->display);
+	
+	XLockDisplay(gGui->display);
+	for(k = 0; k < 3; k++) {
+	  if(k == 0)
+	    XSetForeground(gGui->display, image->image->gc, 
+			   xitk_get_pixel_color_black(gGui->imlib_data));
+	  else if(k == 1)
+	    XSetForeground(gGui->display, image->image->gc, 
+			   xitk_get_pixel_color_darkgray(gGui->imlib_data));
+	  else
+	    XSetForeground(gGui->display, image->image->gc, 
+			   xitk_get_pixel_color_white(gGui->imlib_data));
+	  
+	  XDrawLine(gGui->display, image->image->pixmap, image->image->gc,
+		    points[k].x, points[k].y, points[k+1].x, points[k+1].y);
+	}
+	XUnlockDisplay(gGui->display);
+	
+      }
+    }
+
+    xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
+			    dsimage, dsimage->width, dsimage->height);
+    xitk_image_change_image(gGui->imlib_data, fb->sort_skin_down,
+			    fsimage, fsimage->width, fsimage->height);
+  }
 
   x--;
   y += xitk_get_widget_height(fb->files_browser) + 16 + 5;
