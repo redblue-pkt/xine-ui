@@ -326,6 +326,7 @@ void control_handle_event(XEvent *event, void *data) {
 void control_change_skins(void) {
   ImlibImage   *new_img, *old_img;
   XSizeHints    hint;
+  int           vidcap = 0;
 
   if(control_is_running()) {
     
@@ -372,6 +373,29 @@ void control_change_skins(void) {
     
     xitk_change_skins_widget_list(control->widget_list, gGui->skin_config);
     xitk_paint_widget_list(control->widget_list);
+
+    if((vidcap = gGui->vo_driver->get_capabilities(gGui->vo_driver)) > 0) {
+      
+      if(vidcap & VO_CAP_BRIGHTNESS)
+	xitk_enable_widget(control->bright);
+      else
+	xitk_disable_widget(control->bright);
+      
+      if(vidcap & VO_CAP_SATURATION)
+      	xitk_enable_widget(control->sat);
+      else
+	xitk_disable_widget(control->sat);
+      
+      if(vidcap & VO_CAP_HUE)
+	xitk_enable_widget(control->hue);
+      else
+	xitk_disable_widget(control->hue);
+      
+      if(vidcap & VO_CAP_CONTRAST)
+	xitk_enable_widget(control->contr);
+      else
+	xitk_disable_widget(control->contr);
+    }
   }
 }
 
