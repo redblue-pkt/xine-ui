@@ -67,6 +67,9 @@ extern _panel_t           *panel;
 #define STREAM_OSDI       50     
 #define STREAM_WINI       51
 
+#define IS_CHANNEL_CHECKED(C, N) (C == N) ? "<checked>" : "<check>"
+
+
 static void menu_menus_selection(xitk_widget_t *w, xitk_menu_entry_t *me, void *data) {
   int event     = (int) data;
   int events[7] = {
@@ -603,8 +606,6 @@ void video_window_menu(xitk_widget_list_t *wl) {
     }
   }
 
-#define IS_CHANNEL_CHECKED(C, N) (C == N) ? "<checked>" : "<check>"
-
   { /* Audio channels */
     xitk_menu_entry_t   menu_entry;
     int                 i;
@@ -730,6 +731,150 @@ void video_window_menu(xitk_widget_list_t *wl) {
       menu_entry.user_data = (void *)i;
       xitk_menu_add_entry(w, &menu_entry);
     }
+  }
+
+  xitk_menu_show_menu(w);
+}
+
+void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
+  xitk_menu_widget_t   menu;
+  char                 buffer[2048];
+  xitk_widget_t       *w;
+  xitk_menu_entry_t    menu_entries[] = {
+    { NULL , "<title>",      NULL, NULL },
+    { "SEP", "<separator>",  NULL, NULL },
+    { NULL,  NULL,           NULL, NULL }
+  };
+
+  sprintf(buffer, "%s", _("Audio"));
+  menu_entries[0].menu = buffer;
+  
+  XITK_WIDGET_INIT(&menu, gGui->imlib_data);
+
+  menu.menu_tree         = &menu_entries[0];
+  menu.parent_wlist      = wl;
+  menu.skin_element_name = NULL;
+  
+  w = xitk_noskin_menu_create(wl, &menu, x, y);
+
+  { /* Audio channels */
+    xitk_menu_entry_t   menu_entry;
+    int                 i;
+    char                buffer[2048];
+    int                 channel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+    
+    menu_entry.menu      = "Off";
+    menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
+    menu_entry.cb        = menu_audio_chan;
+    menu_entry.user_data = (void *) -2;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    menu_entry.menu      = "Auto";
+    menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
+    menu_entry.cb        = menu_audio_chan;
+    menu_entry.user_data = (void *) -1;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    for(i = 0; i < 15; i++) {
+      char   langbuf[16];
+      
+      memset(&langbuf, 0, sizeof(langbuf));
+      
+      if(!xine_get_audio_lang(gGui->stream, i, &langbuf[0])) {
+
+	if(i == 0) {
+	  for(i = 0; i < 15; i++) {
+	    sprintf(buffer, "%d", i);
+	    menu_entry.menu      = buffer;
+	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
+	    menu_entry.cb        = menu_audio_chan;
+	    menu_entry.user_data = (void *) i;
+	    xitk_menu_add_entry(w, &menu_entry);
+	  }
+	}
+
+	break;
+      }
+      
+      menu_entry.menu      = langbuf;
+      menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
+      menu_entry.cb        = menu_audio_chan;
+      menu_entry.user_data = (void *) i;
+      xitk_menu_add_entry(w, &menu_entry);
+    }
+
+  }
+
+  xitk_menu_show_menu(w);
+}
+
+void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
+  xitk_menu_widget_t   menu;
+  char                 buffer[2048];
+  xitk_widget_t       *w;
+  xitk_menu_entry_t    menu_entries[] = {
+    { NULL , "<title>",      NULL, NULL },
+    { "SEP", "<separator>",  NULL, NULL },
+    { NULL,  NULL,           NULL, NULL }
+  };
+
+  sprintf(buffer, "%s", _("Subtitle"));
+  menu_entries[0].menu = buffer;
+  
+  XITK_WIDGET_INIT(&menu, gGui->imlib_data);
+
+  menu.menu_tree         = &menu_entries[0];
+  menu.parent_wlist      = wl;
+  menu.skin_element_name = NULL;
+  
+  w = xitk_noskin_menu_create(wl, &menu, x, y);
+
+  { /* SPU channels */
+    xitk_menu_entry_t   menu_entry;
+    int                 i;
+    char                buffer[2048];
+    int                 channel = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
+    
+    menu_entry.menu      = "Off";
+    menu_entry.type      = IS_CHANNEL_CHECKED(channel, -2);
+    menu_entry.cb        = menu_spu_chan;
+    menu_entry.user_data = (void *) -2;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    menu_entry.menu      = "Auto";
+    menu_entry.type      = IS_CHANNEL_CHECKED(channel, -1);
+    menu_entry.cb        = menu_spu_chan;
+    menu_entry.user_data = (void *) -1;
+    xitk_menu_add_entry(w, &menu_entry);
+    
+    for(i = 0; i < 15; i++) {
+      char   langbuf[16];
+      
+      memset(&langbuf, 0, sizeof(langbuf));
+      
+      if(!xine_get_spu_lang(gGui->stream, i, &langbuf[0])) {
+	
+	if(i == 0) {
+	  for(i = 0; i < 15; i++) {
+	    sprintf(buffer, "%d", i);
+	    menu_entry.menu      = buffer;
+	    menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
+	    menu_entry.cb        = menu_spu_chan;
+	    menu_entry.user_data = (void *) i;
+	    xitk_menu_add_entry(w, &menu_entry);
+	  }
+	}
+
+	break;
+      }
+      
+      menu_entry.menu      = langbuf;
+      menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
+      menu_entry.cb        = menu_spu_chan;
+      menu_entry.user_data = (void *) i;
+      xitk_menu_add_entry(w, &menu_entry);
+    }
+
   }
 
   xitk_menu_show_menu(w);

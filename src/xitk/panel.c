@@ -430,7 +430,7 @@ int panel_is_visible(void) {
 /*
  * Show/Hide panel window.
  */
-void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
+static void _panel_toggle_visibility (xitk_widget_t *w, void *data) {
   int visible = xitk_is_window_visible(gGui->display, gGui->panel_window);
 
   if(!panel->visible && playlist_is_visible()) {
@@ -575,7 +575,6 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 }
 
 void panel_check_mute(void) {
-
   xitk_checkbox_set_state(panel->mixer.mute, gGui->mixer.mute);
 }
 
@@ -668,6 +667,27 @@ void panel_update_channel_display (void) {
   xitk_label_change_label (panel->spuid_label, lang);
 }
 
+static void panel_audio_lang_list(xitk_widget_t *w, void *data) {
+  int x, y;
+  int wx, wy;
+
+  xitk_get_window_position(gGui->display, gGui->panel_window, &wx, &wy, NULL, NULL);
+  xitk_get_widget_pos(panel->audiochan_label, &x, &y);
+  x += wx;
+  y += (wy + xitk_get_widget_height(panel->audiochan_label));
+  audio_lang_menu(panel->widget_list, x, y);
+}
+
+static void panel_spu_lang_list(xitk_widget_t *w, void *data) {
+  int x, y;
+  int wx, wy;
+
+  xitk_get_window_position(gGui->display, gGui->panel_window, &wx, &wy, NULL, NULL);
+  xitk_get_widget_pos(panel->audiochan_label, &x, &y);
+  x += wx;
+  y += (wy + xitk_get_widget_height(panel->audiochan_label));
+  spu_lang_menu(panel->widget_list, x, y);
+}
 /*
  * Update displayed MRL according to the current one.
  */
@@ -1173,14 +1193,14 @@ void panel_init (void) {
   /*  Audio channel label */
   lbl.skin_element_name = "AudioLabel";
   lbl.label             = "";
-  lbl.callback          = NULL;
+  lbl.callback          = panel_audio_lang_list;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(panel->widget_list)), 
 	   (panel->audiochan_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));
 
   /*  Spuid label */
   lbl.skin_element_name = "SpuLabel";
   lbl.label             = "";
-  lbl.callback          = NULL;
+  lbl.callback          = panel_spu_lang_list;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(panel->widget_list)), 
 	   (panel->spuid_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));
 
