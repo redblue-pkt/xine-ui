@@ -3,19 +3,18 @@ EXTRA_DIST = $(data_DATA)
 datadir = $(XINE_SKINDIR)/xinetic
 
 data_DATA =                                                                                       \
-	BigArrowDown.png  LettersMiddle.png   MainPlay.png	 PlBtn.png	  SkItemBtn.png   \
-	BigArrowUp.png	  LettersMini.png     MainPower.png	 PlDelete.png	  SkSlidBG.png    \
-	CtlBg.png	  MainAutoButton.png  MainPrev.png	 PlDeleteAll.png  SkSlidPad.png   \
-	CtlBtn.png	  MainBg.png	      MainStop.png	 PlDismiss.png	  SliderHBg.png   \
-	CtlDismiss.png	  MainButton.png      MainVolumeBg.png	 PlInputTxt.png   SliderHPad.png  \
-	MainDummy.png     MainVolumePad.png   PlItemBtn.png	 SliderVBg.png                    \
-	MainEject.png     MrlBg.png	      PlMoveDn.png	 SliderVPad.png                   \
-	FsBtn.png	  MainFastB.png       MrlBtn.png	 PlMoveUp.png	  SnapBtn.png     \
-	HideBtn.png	  MainFastF.png       MrlDismiss.png	 PlPlay.png	  LettersBlue.png \
-	LettersBig.png	  MainMute.png	      MrlSelect.png	 SetupBtn.png     CtlItemBtn.png  \
-	LettersDigit.png  MainNext.png	      Onglet.png	 OngletSmall.png  SkArrowDown.png \
-	MainPause.png     PlBg.png	      SkArrowUp.png      skinconfig
-
+	ArrowDown.png	   MainBg.png	      MainPower.png	PlBg.png        SkItemBtn.png     \
+	ArrowUp.png	   MainCam.png	      MainPrev.png	PlBtn.png	SkSlidBG.png      \
+	BigArrowDown.png   MainClose.png      MainSetup.png	PlDelete.png    SkSlidPad.png     \
+	BigArrowUp.png	   MainDown.png	      MainStop.png	PlDeleteAll.png SliderHBg.png     \
+	CtlBg.png	   MainEject.png      MainUp.png	PlDismiss.png   SliderHPad.png    \
+	CtlBtn.png	   MainFastB.png      MainVolumeBg.png  PlInputTxt.png  SliderVBg.png     \
+	CtlDismiss.png	   MainFastF.png      MainVolumePad.png PlItemBtn.png   SliderVPad.png    \
+	CtlDummy.png	   MainFullScreen.png MrlBg.png	        PlMoveDn.png    SmallArrowDown.png\
+	CtlReset.png	   MainMute.png	      MrlBtn.png	PlMoveUp.png    SmallArrowUp.png  \
+	CtlSave.png	   MainNext.png	      MrlDismiss.png	PlPlay.png	Letters.png       \
+	MainPause.png      MrlSelect.png      SkArrowDown.png	                                  \
+	MainAutoButton.png MainPlay.png	      Onglet.png	SkArrowUp.png   skinconfig
 
 debug:
 install-debug: install

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.12\n"
-"POT-Creation-Date: 2002-08-01 10:44+0200\n"
+"POT-Creation-Date: 2002-08-03 21:36+0200\n"
 "PO-Revision-Date: 2002-07-21 13:28+0200\n"
 "Last-Translator: Bartlomiej Muryn <forever@klub.chip.pl>\n"
 "Language-Team: Polski <pl@li.org>\n"

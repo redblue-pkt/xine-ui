@@ -1,5 +1,6 @@
 xine-ui (0.9.13) unstable; urgency=low
-
+  
+  * includes the most popular themes: xinetic(default), cloudy, CelomaChrome
   * improved TV mode selection (untested)
   * localization updates (including correct numeric plural forms)
   * aaxine should work with linux or slang drivers again
@@ -10,7 +11,7 @@ xine-ui (0.9.13) unstable; urgency=low
   
   And, of course, lots of other small bugfixes and improvements...
 
- -- Siggi Langauf <siggi@debian.org>  Sat,  3 Aug 2002 20:38:11 +0200
+ -- Siggi Langauf <siggi@debian.org>  Sat,  3 Aug 2002 22:58:00 +0200
 
 xine-ui (0.9.12) unstable; urgency=low
 

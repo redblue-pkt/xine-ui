@@ -4,8 +4,9 @@ xine-ui (0.9.13-1) unstable; urgency=low
     - doesn't choke on empty skins any more (closes: #151104)
     - aaxine closes stderr/stdout when running without X (closes: #154612)
     - includes "xinetic" as default theme again
-  
- -- Siggi Langauf <siggi@debian.org>  Fri,  2 Aug 2002 15:41:59 +0200
+    - includes the three most popular themes (closes: #155215)
+
+ -- Siggi Langauf <siggi@debian.org>  Sat,  3 Aug 2002 22:56:45 +0200
 
 xine-ui (0.9.12-1) unstable; urgency=low
 
