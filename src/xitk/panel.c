@@ -275,6 +275,18 @@ static void *slider_loop(void *dummy) {
 	    goto __next_iteration;
 	  }
 	}
+
+	if((xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_SEEKABLE))) {
+	  if(!xitk_is_widget_enabled(panel->playback_widgets.slider_play))
+	    xitk_enable_widget(panel->playback_widgets.slider_play);
+	}
+	else {
+	  if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+	    xitk_slider_reset(panel->playback_widgets.slider_play);
+	    xitk_disable_widget(panel->playback_widgets.slider_play);
+	  }
+	}
+
       }
       else
 	pos = secs = 0;
@@ -307,8 +319,10 @@ static void *slider_loop(void *dummy) {
 	  
 	  if(panel_is_visible()) {
 	    
-	    xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
-	    panel_update_runtime_display();
+	    if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+	      xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+	      panel_update_runtime_display();
+	    }
 	    
 	    if(!(i % 20)) {
 	      panel_update_channel_display();
@@ -610,9 +624,11 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
     else {
       int pos;
       
-      xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
-      xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
-      panel_update_runtime_display();
+      if(xitk_is_widget_enabled(panel->playback_widgets.slider_play)) {
+	xine_get_pos_length(gGui->stream, &pos, NULL, NULL);
+	xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+	panel_update_runtime_display();
+      }
     }
   }
   else if(w == panel->mixer.slider) {
