@@ -995,7 +995,6 @@ void xitk_subst_special_chars(char *src, char *dest) {
   if(!strlen(src))
     return;
 
-  printf("src '%s'\n", src);
   memset(dest, 0, sizeof(dest));
   s = src;
   d = dest;

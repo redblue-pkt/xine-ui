@@ -1248,30 +1248,16 @@ static void kbedit_display_kbinding(char *action, kbinding_entry_t *kbe) {
     xitk_label_change_label(kbedit->widget_list, kbedit->comment, action);
     xitk_label_change_label(kbedit->widget_list, kbedit->key, kbe->key);
     
-    if(kbe->modifier & KEYMOD_CONTROL)
-      xitk_checkbox_set_state(kbedit->ctrl, 1, kbedit->widget_list->win, kbedit->widget_list->gc);
-    else
-      xitk_checkbox_set_state(kbedit->ctrl, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
-  
-    if(kbe->modifier & KEYMOD_META)
-      xitk_checkbox_set_state(kbedit->meta, 1, kbedit->widget_list->win, kbedit->widget_list->gc);
-    else
-      xitk_checkbox_set_state(kbedit->meta, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
-    
-    if(kbe->modifier & KEYMOD_MOD3)
-      xitk_checkbox_set_state(kbedit->mod3, 1, kbedit->widget_list->win, kbedit->widget_list->gc);
-    else
-      xitk_checkbox_set_state(kbedit->mod3, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
-    
-    if(kbe->modifier & KEYMOD_MOD4)
-      xitk_checkbox_set_state(kbedit->mod4, 1, kbedit->widget_list->win, kbedit->widget_list->gc);
-    else
-      xitk_checkbox_set_state(kbedit->mod4, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
-  
-    if(kbe->modifier & KEYMOD_MOD5)
-      xitk_checkbox_set_state(kbedit->mod5, 1, kbedit->widget_list->win, kbedit->widget_list->gc);
-    else
-      xitk_checkbox_set_state(kbedit->mod5, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
+    xitk_checkbox_set_state(kbedit->ctrl, (kbe->modifier & KEYMOD_CONTROL) ? 1 : 0,
+			    kbedit->widget_list->win, kbedit->widget_list->gc);
+    xitk_checkbox_set_state(kbedit->meta, (kbe->modifier & KEYMOD_META) ? 1 : 0,
+			    kbedit->widget_list->win, kbedit->widget_list->gc);
+    xitk_checkbox_set_state(kbedit->mod3, (kbe->modifier & KEYMOD_MOD3) ? 1 : 0,
+			    kbedit->widget_list->win, kbedit->widget_list->gc);
+    xitk_checkbox_set_state(kbedit->mod4, (kbe->modifier & KEYMOD_MOD4) ? 1 : 0,
+			    kbedit->widget_list->win, kbedit->widget_list->gc);
+    xitk_checkbox_set_state(kbedit->mod5, (kbe->modifier & KEYMOD_MOD5) ? 1 : 0,
+			    kbedit->widget_list->win, kbedit->widget_list->gc);
   }
 }
 
@@ -1500,6 +1486,65 @@ static void kbedit_done(xitk_widget_t *w, void *data) {
   kbedit_exit(NULL, NULL);
 }
 
+static void kbedit_accept_yes(xitk_widget_t *w, void *data, int state) {
+  kbinding_entry_t *kbe = (kbinding_entry_t *) data;
+  
+  switch(kbedit->action_wanted) {
+    
+  case KBEDIT_ALIASING:
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment = strdup(kbedit->ksel->comment);
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action = strdup(kbedit->ksel->action);
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->key = strdup(kbe->key);
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->modifier = kbe->modifier;
+    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias = 1;
+    
+    kbedit->kbt->entry[kbedit->kbt->num_entries] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->comment = NULL;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->action = NULL;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->key = NULL;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->modifier = 0;
+    kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias = 0;
+    
+    kbedit->kbt->num_entries++;
+    
+    kbedit_create_browser_entries();
+    xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
+    break;
+    
+  case KBEDIT_EDITING:
+    kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char *) * (strlen(kbe->key) + 1));
+    sprintf(kbedit->ksel->key, "%s", kbe->key);
+    kbedit->ksel->modifier = kbe->modifier;
+    
+    kbedit_create_browser_entries();
+    xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
+    break;
+  }
+
+  kbedit->action_wanted = KBEDIT_NOOP;
+  
+  SAFE_FREE(kbe->comment);
+  SAFE_FREE(kbe->action);
+  SAFE_FREE(kbe->key);
+  SAFE_FREE(kbe);
+  kbedit_unset();
+}
+
+static void kbedit_accept_no(xitk_widget_t *w, void *data, int state) {
+  kbinding_entry_t *kbe = (kbinding_entry_t *) data;
+  
+  kbedit->action_wanted = KBEDIT_NOOP;
+  
+  xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
+  SAFE_FREE(kbe->comment);
+  SAFE_FREE(kbe->action);
+  SAFE_FREE(kbe->key);
+  SAFE_FREE(kbe);
+  kbedit_unset();
+}
+
 /*
  * Grab key binding.
  */
@@ -1509,7 +1554,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   XEvent             xev;
   int                mod, modifier;
   xitk_window_t     *xwin;
-  kbinding_entry_t   kbe;
+  kbinding_entry_t  *kbe;
   int                redundant;
   
   /* We are already grabbing keybinding */
@@ -1520,10 +1565,11 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
  
   kbedit->grabbing = 1;
   
-  kbe.comment   = strdup(kbedit->ksel->comment);
-  kbe.action    = strdup(kbedit->ksel->action);
-  kbe.action_id = kbedit->ksel->action_id;
-  kbe.is_alias  = kbedit->ksel->is_alias;
+  kbe = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_entry_t));
+  kbe->comment   = strdup(kbedit->ksel->comment);
+  kbe->action    = strdup(kbedit->ksel->action);
+  kbe->action_id = kbedit->ksel->action_id;
+  kbe->is_alias  = kbedit->ksel->is_alias;
   
   xitk_labelbutton_change_label(kbedit->widget_list, kbedit->grab, _("Press Keyboard Keys..."));
   XLockDisplay(gGui->display);
@@ -1532,15 +1578,14 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   {
     int x, y, w, h;
 
-    /*
-      xitk_get_window_position(gGui->display, 
-      (xitk_window_get_window(kbedit->xwin)), &x, &y, &w, &h);
-    */
     
-    w = 500;
-    h = 200;
-    x = ((DisplayWidth(gGui->display, (DefaultScreen(gGui->display)))) / 2) - (w / 2);
-    y = ((DisplayHeight(gGui->display, (DefaultScreen(gGui->display)))) / 2) -(h / 2);
+    xitk_get_window_position(gGui->display, 
+			     (xitk_window_get_window(kbedit->xwin)), &x, &y, &w, &h);
+        
+    //    w = 500;
+    //    h = 200;
+    //    x = ((DisplayWidth(gGui->display, (DefaultScreen(gGui->display)))) / 2) - (w / 2);
+    //    y = ((DisplayHeight(gGui->display, (DefaultScreen(gGui->display)))) / 2) -(h / 2);
     
     xwin = xitk_window_create_dialog_window(gGui->imlib_data, 
 					    _("Event receiver window"), x, y, w, h);
@@ -1558,13 +1603,14 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 
   do {
     XMaskEvent(gGui->display, ButtonReleaseMask | KeyReleaseMask, &xev);
+    XMapRaised(gGui->display, (xitk_window_get_window(xwin)));
   } while ((xev.type != KeyRelease && xev.type != ButtonRelease) ||
 	   xev.xmap.event != xitk_window_get_window(xwin));
   
   (void) xitk_get_key_modifier(&xev, &mod);
   kbindings_convert_modifier(mod, &modifier);
 
-  kbe.modifier = modifier;
+  kbe->modifier = modifier;
   
   if(xev.type == KeyRelease) {  
     XKeyEvent mykeyevent;
@@ -1576,7 +1622,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
    
     XLockDisplay (gGui->display);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    kbe.key = strdup((XKeysymToString(mykey)));
+    kbe->key = strdup((XKeysymToString(mykey)));
     XUnlockDisplay (gGui->display);
 
   }
@@ -1585,7 +1631,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     
     memset(&xbutton, 0, sizeof(xbutton));
     snprintf(xbutton, 255, "XButton_%d", xev.xbutton.button);
-    kbe.key = strdup(xbutton);
+    kbe->key = strdup(xbutton);
     
   }
   
@@ -1599,45 +1645,41 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
 
   kbedit->grabbing = 0;
   
-  if((redundant = bkedit_check_redundancy(kbedit->kbt, &kbe)) == -1) {
+  if((redundant = bkedit_check_redundancy(kbedit->kbt, kbe)) == -1) {
+    char shortcut[256];
     
     xine_strdupa(action, (xitk_label_get_label(kbedit->comment)));
-    kbedit_display_kbinding(action, &kbe);
-  
-    switch(kbedit->action_wanted) {
+    kbedit_display_kbinding(action, kbe);
+    
+    memset(&shortcut, 0, sizeof(shortcut));
+    sprintf(shortcut, "%2s", "[ ");
+    
+    if(kbe->modifier != KEYMOD_NOMOD) {
       
-    case KBEDIT_ALIASING:
-      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment = strdup(kbedit->ksel->comment);
-      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action = strdup(kbedit->ksel->action);
-      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
-      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->key = strdup(kbe.key);
-      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->modifier = kbe.modifier;
-      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias = 1;
-      
-      kbedit->kbt->entry[kbedit->kbt->num_entries] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
-      kbedit->kbt->entry[kbedit->kbt->num_entries]->comment = NULL;
-      kbedit->kbt->entry[kbedit->kbt->num_entries]->action = NULL;
-      kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
-      kbedit->kbt->entry[kbedit->kbt->num_entries]->key = NULL;
-      kbedit->kbt->entry[kbedit->kbt->num_entries]->modifier = 0;
-      kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias = 0;
+      if(kbe->modifier & KEYMOD_CONTROL)
+	sprintf(shortcut, "%s%c", shortcut, 'C');
+      if(kbe->modifier & KEYMOD_META)
+	sprintf(shortcut, "%s%c", shortcut, 'M');
+      if(kbe->modifier & KEYMOD_MOD3)
+	sprintf(shortcut, "%s%2s", shortcut, "M3");
+      if(kbe->modifier & KEYMOD_MOD4)
+	sprintf(shortcut, "%s%2s", shortcut, "M4");
+      if(kbe->modifier & KEYMOD_MOD5)
+	sprintf(shortcut, "%s%2s", shortcut, "M5");
 
-      kbedit->kbt->num_entries++;
-      
-      kbedit_create_browser_entries();
-      xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
-      break;
-      
-    case KBEDIT_EDITING:
-      kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char *) * (strlen(kbe.key) + 1));
-      sprintf(kbedit->ksel->key, "%s", kbe.key);
-      kbedit->ksel->modifier = kbe.modifier;
-
-      kbedit_create_browser_entries();
-      xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
-      break;
+      sprintf(shortcut, "%s%c", shortcut, '-');
     }
     
+    sprintf(shortcut, "%s%s ]", shortcut, kbe->key);
+
+    /* Ask if uses want/wont store new shorcut */
+    xitk_window_dialog_yesno_with_width(gGui->imlib_data, _("Accept?"),
+					kbedit_accept_yes, 
+					kbedit_accept_no, 
+					(void *) kbe, 400, ALIGN_CENTER,
+					_("Store %s as\n'%s' key binding ?."),
+					shortcut, kbedit->ksel->comment);
+
   }
   else {
     /* error, redundant */
@@ -1647,13 +1689,8 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
     }
   }
 
-  SAFE_FREE(kbe.comment);
-  SAFE_FREE(kbe.action);
-  SAFE_FREE(kbe.key);
-  
   xitk_labelbutton_set_state(kbedit->alias, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
   xitk_labelbutton_set_state(kbedit->edit, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
-  kbedit->action_wanted = KBEDIT_NOOP;
   xitk_disable_widget(kbedit->grab);
 }
 
@@ -1728,7 +1765,6 @@ void kbedit_window(void) {
   kbedit->xwin          = xitk_window_create_dialog_window(gGui->imlib_data,
 							   _("key binding editor"), 
 							   x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
-  
   XLockDisplay (gGui->display);
   
   gc = XCreateGC(gGui->display, 
