@@ -106,6 +106,12 @@ subpictures will be ignored
 .BI demux: <demux\ name>
 specify the demux plugin to use
 .TP
+.BI volume: <level>
+set audio volume
+.TP
+.BI compression: <level>
+set audio dynamic range compression
+.TP
 .IB <config\ entry> : <config\ value>
 assign a new value to any config entry
 

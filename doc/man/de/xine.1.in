@@ -223,6 +223,12 @@ Untertitel werden ignoriert
 .BI demux: <Demuxer\ Name>
 bestimmt das zu verwendende Demuxer Plugin
 .TP
+.BI volume: <Pegel>
+setzt die Lautstärke
+.TP
+.BI compression: <Pegel>
+setzt die Dynamikkompression
+.TP
 .IB <Konfigurationseintrag> : <Wert>
 weist einem Konfigurationseintrag einen neuen Wert zu
 .RE

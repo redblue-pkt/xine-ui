@@ -249,8 +249,14 @@ audio will be ignored
 .B nospu
 subpictures will be ignored
 .TP
-.BI demux: <demuxer\ name>
+.BI demux: <demux\ name>
 specify the demux plugin to use
+.TP
+.BI volume: <level>
+set audio volume
+.TP
+.BI compression: <level>
+set audio dynamic range compression
 .TP
 .IB <config\ entry> : <config\ value>
 assign a new value to any config entry
