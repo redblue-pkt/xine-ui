@@ -129,11 +129,16 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
     attr.background_pixel  = gGui->black.pixel;
 
     gGui->video_window = XCreateWindow (gGui->display, 
-				     RootWindow (gGui->display, DefaultScreen(gGui->display)), 
-				     0, 0, gvw_fullscreen_width, gvw_fullscreen_height, 
-				     0, gvw_depth, CopyFromParent, gvw_vinfo.visual,
-				     CWBackPixel, &attr);
-
+					RootWindow (gGui->display, DefaultScreen(gGui->display)), 
+					0, 0, gvw_fullscreen_width, gvw_fullscreen_height, 
+					0, gvw_depth, CopyFromParent, gvw_vinfo.visual,
+					CWBackPixel, &attr);
+    
+    if(gGui->vo_driver)
+      gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
+					  GUI_DATA_EX_DRAWABLE_CHANGED, 
+					  (void*)gGui->video_window);
+    
     if (gvw_xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gvw_xclasshint);
 
@@ -202,6 +207,10 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
 				 gvw_depth, CopyFromParent, gvw_vinfo.visual,
 				 CWBackPixel | CWBorderPixel , &attr);
 
+    if(gGui->vo_driver)
+      gGui->vo_driver->gui_data_exchange (gGui->vo_driver,
+					  GUI_DATA_EX_DRAWABLE_CHANGED, 
+					  (void*)gGui->video_window);
     if (gvw_xclasshint != NULL)
       XSetClassHint(gGui->display, gGui->video_window, gvw_xclasshint);
 
@@ -219,6 +228,7 @@ void video_window_adapt_size (int video_width, int video_height, int *dest_x, in
 			   None, NULL, 0, &hint);
 
   }
+  
   
   XSelectInput(gGui->display, gGui->video_window, StructureNotifyMask | ExposureMask | KeyPressMask | ButtonPressMask);
 
