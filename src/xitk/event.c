@@ -1034,9 +1034,11 @@ void gui_run (void) {
       gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
 
     /*  The user wants to hide video window  */
-    if(panel_is_visible() && video_window_is_visible() &&
-       actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY))
+    if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_WINOUT_VISIBLITY)) {
+      if(!panel_is_visible())
+	gui_execute_action_id(ACTID_TOGGLE_VISIBLITY);
       gui_execute_action_id(ACTID_TOGGLE_WINOUT_VISIBLITY);
+    }
 
     /*  The user wants to see in fullscreen mode  */
     if(actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_FULLSCREEN))

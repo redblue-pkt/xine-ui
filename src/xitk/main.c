@@ -181,6 +181,7 @@ void show_usage (void) {
   printf(_("  -p, --auto-play [opt]        Play on start. Can be followed by:\n"));
   printf(_("                    'f': in fullscreen mode.\n"));
   printf(_("                    'h': hide GUI (panel, etc.).\n"));
+  printf(_("                    'w': hide video window.\n"));
   printf(_("                    'q': quit when play is done.\n"));
   printf(_("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n"));
   printf(_("                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n"));
@@ -553,6 +554,9 @@ int main(int argc, char *argv[]) {
 	}
 	if(strrchr(optarg, 'q')) {
 	  gGui->actions_on_start[aos++] = ACTID_QUIT;
+	}
+	if(strrchr(optarg, 'w')) {
+	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_WINOUT_VISIBLITY;
 	}
 	if(strrchr(optarg, 'd')) {
 	  gGui->autoscan_plugin = "DVD";
