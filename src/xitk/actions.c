@@ -479,6 +479,10 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   }
   
   if(!xine_open(gGui->stream, (const char *) mrl)) {
+    
+    if(!strcmp(mrl, gGui->mmk.mrl))
+      gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
+    
     gui_handle_xine_error(gGui->stream, mrl);
     return 0;
   }
@@ -495,8 +499,11 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, av_offset);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
 
-  if(!gui_xine_play(gGui->stream, start_pos, start_time, 1))
+  if(!gui_xine_play(gGui->stream, start_pos, start_time, 1)) {
+    if(!strcmp(mrl, gGui->mmk.mrl))
+      gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
     return 0;
+  }
   
   if(!strcmp(mrl, gGui->mmk.mrl))
     gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
@@ -628,9 +635,12 @@ void gui_play (xitk_widget_t *w, void *data) {
     }
     
     if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-			       gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset))
+			       gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
+      
+      if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+	gui_exit(NULL, NULL);
       gui_display_logo();
-    
+    }
   }
   else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);

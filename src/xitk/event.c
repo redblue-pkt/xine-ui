@@ -927,8 +927,11 @@ void gui_playlist_start_next(void) {
     if(gGui->playlist.cur < gGui->playlist.num) {
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset))
+				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
+	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+	  gui_exit(NULL, NULL);
 	gui_display_logo();
+      }
     }
     else {
       
@@ -943,9 +946,12 @@ void gui_playlist_start_next(void) {
       else if(gGui->playlist.loop == PLAYLIST_LOOP_LOOP) {
 	gGui->playlist.cur = 0;
 	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
-	if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				   gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset))
+	if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0,
+				   gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
+	  if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+	    gui_exit(NULL, NULL);
 	  gui_display_logo();
+	}
       }
 
     }
@@ -954,8 +960,11 @@ void gui_playlist_start_next(void) {
   case PLAYLIST_LOOP_REPEAT:
     gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
     if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-			       gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset))
+			       gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
+      if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+	gui_exit(NULL, NULL);
       gui_display_logo();
+    }
     break;
 
   case PLAYLIST_LOOP_SHUFFLE:
@@ -967,15 +976,20 @@ void gui_playlist_start_next(void) {
       
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       if(!gui_xine_open_and_play(gGui->mmk.mrl, gGui->mmk.sub, 0, 
-				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset))
+				 gGui->mmk.start, gGui->mmk.av_offset, gGui->mmk.spu_offset)) {
+	if(mediamark_all_played() && (gGui->actions_on_start[0] == ACTID_QUIT))
+	  gui_exit(NULL, NULL);
 	gui_display_logo();
+      }
     }
     else {
       mediamark_reset_played_state();
 
       if(gGui->playlist.loop == PLAYLIST_LOOP_SHUF_PLUS)
 	goto __shuffle_restart;
-
+      else if(gGui->actions_on_start[0] == ACTID_QUIT)
+      	gui_exit(NULL, NULL);
+      
       gui_display_logo();
     }
     break;
