@@ -365,12 +365,15 @@ int xitk_label_change_label(xitk_widget_t *w, char *newlabel) {
     
     if(!newlabel || !private_data->label ||
        (newlabel && (strcmp(private_data->label, newlabel)))) {
-      
-      label_setup_label(w, newlabel);
-      
-      pthread_mutex_lock(&private_data->paint_mutex);
-      paint_label(w);
-      pthread_mutex_unlock(&private_data->paint_mutex);
+
+      /* Don't change label if another thread is currently doing the same thing */
+      if(!private_data->on_change) {
+	label_setup_label(w, newlabel);
+	
+	pthread_mutex_lock(&private_data->paint_mutex);
+	paint_label(w);
+	pthread_mutex_unlock(&private_data->paint_mutex);
+      }
     }
     return 1;
   }
