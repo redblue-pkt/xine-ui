@@ -446,11 +446,18 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   while(fx) {
 
     if((fx->key == key) && (fx->window != None)) {
+      Window c;
       
       winf->window = fx->window;
-
+      
       if(fx->name)
 	winf->name = strdup(fx->name);
+      
+      XLOCK(gXitk->display);
+      XTranslateCoordinates(gXitk->display, fx->window, DefaultRootWindow(gXitk->display), 
+			    0, 0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
+      XUNLOCK(gXitk->display);
+      
       
       winf->x      = fx->new_pos.x;
       winf->y      = fx->new_pos.y;
@@ -757,15 +764,10 @@ void xitk_xevent_notify(XEvent *event) {
 	case ButtonRelease:
 	  
 	  if(fx->move.enabled) {
-	    Window c;
 
 	    fx->move.enabled = 0;
 	    /* Inform application about window movement. */
-	    XLOCK(gXitk->display);
-	    XTranslateCoordinates(gXitk->display, fx->window, DefaultRootWindow(gXitk->display), 
-				  0, 0, &(fx->new_pos.x), &(fx->new_pos.y), &c);
-	    XUNLOCK(gXitk->display);
-	    
+
 	    if(fx->newpos_callback)
 	      fx->newpos_callback(fx->new_pos.x, fx->new_pos.y, 
 				  fx->width, fx->height);
