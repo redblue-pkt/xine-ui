@@ -5,15 +5,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: xine-ui 0.9.18\n"
-"POT-Creation-Date: 2003-05-02 19:48+0200\n"
-"PO-Revision-Date: 2003-03-13 18:06+0100\n"
+"Project-Id-Version: xine-ui 0.9.20\n"
+"POT-Creation-Date: 2003-04-27 01:05+0200\n"
+"PO-Revision-Date: 2003-05-01 12:24+0200\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.0\n"
+"X-Generator: KBabel 1.0.1\n"
 
 #: src/xitk/actions.c:279
 #, c-format
@@ -282,7 +282,7 @@ msgstr ""
 "Mrl mal formado. El mrl «%s» parece mal formado/no válido.\n"
 
 #: src/xitk/errors.c:245
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -290,7 +290,7 @@ msgid ""
 msgstr ""
 "- error del motor de xine -\n"
 "\n"
-"¡¡ Error no manipulable !!\n"
+"Fallo del plugin de entrada al abrir el mrl «%s»\n"
 
 #: src/xitk/errors.c:250
 msgid ""
@@ -355,19 +355,16 @@ msgid "Playlist: shuffle forever."
 msgstr "Playlist: siempre aleatorio."
 
 #: src/xitk/event.c:753 src/xitk/event.c:760
-#, fuzzy
 msgid "Saturation"
-msgstr "Valor de saturación."
+msgstr "Saturación"
 
 #: src/xitk/event.c:768 src/xitk/event.c:775
-#, fuzzy
 msgid "Brightness"
-msgstr "Valor de brillo."
+msgstr "Brillo"
 
 #: src/xitk/event.c:783 src/xitk/event.c:790
-#, fuzzy
 msgid "Contrast"
-msgstr "Valor de contraste."
+msgstr "Contraste"
 
 #: src/xitk/event.c:985
 #, c-format
@@ -642,9 +639,8 @@ msgid "Menu 7"
 msgstr "Menú 7"
 
 #: src/xitk/event_sender.c:644
-#, fuzzy
 msgid "Menu toggle"
-msgstr "Cambiar el modo silencio"
+msgstr "Cambiar el menú"
 
 #: src/xitk/event_sender.c:645
 msgid "Title"
@@ -868,9 +864,8 @@ msgid "Grab"
 msgstr "Capturar"
 
 #: src/xitk/lang.c:487
-#, fuzzy
 msgid "Unknown"
-msgstr "desconocido"
+msgstr "Desconocido"
 
 #: src/xitk/main.c:349
 #, c-format
@@ -911,12 +906,13 @@ msgstr "  -v, --version                Mostrar versión.\n"
 
 #: src/xitk/main.c:429
 msgid "      --verbose [=level]       Set verbosity level. Default is 1.\n"
-msgstr ""
+msgstr "      --verbose [=nivel]       Nivel de información. Por defecto, 1.\n"
 
 #: src/xitk/main.c:430
 msgid ""
 "  -c, --config <file>          Use config file instead of default one.\n"
 msgstr ""
+"  -c, --config <arch>          Usar arch. config. en vez del predeterm.\n"
 
 #: src/xitk/main.c:431
 msgid ""
@@ -1059,13 +1055,12 @@ msgstr ""
 "usuario.\n"
 
 #: src/xitk/main.c:480
-#, fuzzy
 msgid ""
 "                                 'file:<filename>': use <filename> as "
 "keymap.\n"
 msgstr ""
-"                                 'remapped': mapeo tecl. remapeado por "
-"usuario.\n"
+"                                 'file:<nomarch>':  usar <nomarch> como "
+"keymap.\n"
 
 #: src/xitk/main.c:481
 msgid ""
@@ -1344,37 +1339,44 @@ msgid ""
 "*drum roll*, xine lib wants to take your attention to deliver an important "
 "message to you ;-):"
 msgstr ""
+"*solo de batería*. La biblioteca de xine le quiere informar de que "
+"hay un mensaje importante para usted ;-):"
 
 #: src/xitk/main.c:895
-#, fuzzy
 msgid "No Informations available."
-msgstr "No está disponible la ayuda"
+msgstr "No hay información disponible."
 
 #: src/xitk/main.c:901
 msgid ""
 "The host you're trying to connect is unknown.\n"
 "Check the validity of the specified hostname."
 msgstr ""
+"La máquina a la que está intentando conectarse es desonocida.\n"
+"Compruebe la validez del nombre de la máquina especificado."
 
 #: src/xitk/main.c:909
 msgid "The device name you specified seems invalid."
-msgstr ""
+msgstr "El nombre de dispositivo que especiicó parece no válido."
 
 #: src/xitk/main.c:916
 msgid ""
 "The network looks unreachable.\n"
 "Check your network setup and/or the server name."
 msgstr ""
+"Parece que la red no se puede alcanzar.\n"
+"Compruebe la configuración de su red y/o el nombre del servidor."
 
 #: src/xitk/main.c:924
 msgid ""
 "The connection was refused.\n"
 "Check the host name."
 msgstr ""
+"La conexión fue rechazada.\n"
+"Compruebe el nombre de la máquina."
 
 #: src/xitk/main.c:931
 msgid "The specified file or mrl is not found. Please check it twice."
-msgstr ""
+msgstr "El archivo o mrl especificado no se encontró. Vuelva a comprobarlo."
 
 #: src/xitk/main.c:938
 msgid ""
@@ -1382,14 +1384,17 @@ msgid ""
 "Maybe you don't have enough rights for this, or source doesn't contain data "
 "(e.g: not disc in drive)."
 msgstr ""
+"No se pudo leer el origen.\n"
+"Puede ser que no tenga suficientes privilegios o que el origen no tenga datos "
+"(por ejemplo, que no haya disco en la unidad)."
 
 #: src/xitk/main.c:947
 msgid "A problem occur while loading a library or a decoder"
-msgstr ""
+msgstr "Ocurrió un problema al cargar una biblioteca o un decodificador"
 
 #: src/xitk/main.c:954
 msgid "The source seems encrypted, and can't be read."
-msgstr ""
+msgstr "El origen parece cifrado y no se puede leer."
 
 #: src/xitk/main.c:956
 msgid ""
@@ -1397,10 +1402,13 @@ msgid ""
 "You DVD is probably crypted. According to your country laws, you can or "
 "can't install/use libdvdcss to be able to read this disc, which you bought."
 msgstr ""
+"\n"
+"Probablemente su DVD esté cifrado. Según las leyes de su país, podrá "
+"instalar/usar o no libdvdcss para permitirle leer el disco que compró."
 
 #: src/xitk/main.c:966
 msgid "*sight*, unkown error."
-msgstr ""
+msgstr "*suspiro*, error desconocido."
 
 #: src/xitk/main.c:1088
 #, c-format
@@ -1443,7 +1451,7 @@ msgstr "argumento %d no válido => fin\n"
 
 #: src/xitk/main.c:1424
 msgid "You should specify one MRL to enqueue, at least!.\n"
-msgstr ""
+msgstr "Debe especificar un MRL al menos para ser encolado.\n"
 
 #: src/xitk/main.c:1599
 msgid "Logo mrl"
@@ -1573,14 +1581,14 @@ msgid "Position in Stream"
 msgstr "Posición en el flujo"
 
 #: src/xitk/osd.c:625
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitles: %s"
-msgstr "Subtítulo"
+msgstr "Subtítulos: %s"
 
 #: src/xitk/osd.c:654
-#, fuzzy, c-format
+#, c-format
 msgid "Audio Channel: %s"
-msgstr "Canal(es) de audio: "
+msgstr "Canal de audio: %s"
 
 #: src/xitk/panel.c:47
 msgid "Play previous chapter or mrl"
