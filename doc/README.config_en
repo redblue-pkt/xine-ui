@@ -115,7 +115,8 @@ audio.sun_static_delay          sun driver static delay (latency)
 codec specific values:
 ----------------------
 
-codec.a52_dynrng                1/0: enable a/52 dynamic range compensation
+codec.a52_dynrng                1/0: enable a/52 dynamic range compression
+                                (normalize audio - flatten dynamics)
 
 codec.a52_level                 0..~200% : a/52 volume control
 
