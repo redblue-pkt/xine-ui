@@ -6,8 +6,8 @@
 %define libname libxine%{major}
 %define libvers 1
 
-%define skindir	 %{_datadir}/xine/skins
-%define deskdir	 %{_datadir}/xine/desktop
+%define skindir    %{_datadir}/xine/skins
+%define deskdir    %{_datadir}/xine/desktop
 
 %define	ginstall install -c
 
@@ -47,11 +47,25 @@ werden die xine-Bibliotheken aus libxine verwendet. Weitere Informationen
 %prep
 %setup -n %{name}-%{version}
 
+docdir=%{_docdir}
+export docdir
+# change for lsf conform architectures
+if [ "${docdir}" = "/usr/share/doc/packages" ] ; then
+   mv configure.ac configure.ac.save
+   cat configure.ac.save | sed  -e "s/\${datadir}\/doc\/xine-ui/\${datadir}\/doc\/packages\/xine-ui/g" > configure.ac
+fi
+
 %build
 export CFLAGS="%{optflags}"
 
 if [ ! -f configure ]; then
    NO_CONFIGURE=1 ./autogen.sh
+fi
+
+# change for lsf conform architectures
+if [ "${docdir}" = "/usr/share/doc/packages" ] ; then
+   mv configure configure.save
+   cat configure.save | sed  -e "s/\${datadir}\/doc\/xine-ui/\${datadir}\/doc\/packages\/xine-ui/g" > configure
 fi
 
 #
@@ -222,11 +236,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc doc/FAQ_* doc/README.* doc/README_* doc/bug_report_form
+%doc %{_docdir}/*
+%doc %{_datadir}/doc/xitk/*
 %{_bindir}/*xine*
 %{skindir}/*
-%{_datadir}/xine/desktop/*
+%{deskdir}/*
 %{_datadir}/pixmaps/*
+%{_datadir}/xine/visuals/*
 %lang(de) %{_mandir}/de/man1/*
 %lang(fr) %{_mandir}/fr/man1/*
 %lang(es) %{_mandir}/es/man1/*
@@ -235,6 +251,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sun Mar 09 2003 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- Some more cleanups
+- lsf patch included
 * Sat Jan 11 2003 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - Some cleanups
 * Fri Dec 06 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
