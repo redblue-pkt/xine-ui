@@ -870,15 +870,15 @@ int main(int argc, char *argv[]) {
     xine_dispose(aaxine.stream);
   }
 
-  if(aaxine.xine)
-    xine_exit(aaxine.xine); 
-
   if(aaxine.vo_port)
     xine_close_video_driver(aaxine.xine, aaxine.vo_port);
   
   if(aaxine.ao_port)
     xine_close_audio_driver(aaxine.xine, aaxine.ao_port);
   
+  if(aaxine.xine)
+    xine_exit(aaxine.xine); 
+
   if(aaxine.context) {
     aa_showcursor(aaxine.context);
     aa_uninitkbd(aaxine.context);
