@@ -754,7 +754,12 @@ void panel_update_mrl_display (void) {
  */
 void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
 
-  if(gGui->mixer.caps & MIXER_CAP_MUTE) {
+  if(gGui->mixer.method == SOFTWARE_MIXER) {
+    gGui->mixer.mute = state;
+    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_AMP_MUTE, gGui->mixer.mute);
+    osd_display_info(_("Amp: %s"), gGui->mixer.mute ? _("Muted") : _("Unmuted"));
+  }
+  else if(gGui->mixer.caps & MIXER_CAP_MUTE) {
     gGui->mixer.mute = state;
     xine_set_param(gGui->stream, XINE_PARAM_AUDIO_MUTE, gGui->mixer.mute);
     osd_display_info(_("Audio: %s"), gGui->mixer.mute ? _("Muted") : _("Unmuted"));
