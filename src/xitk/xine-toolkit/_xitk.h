@@ -106,8 +106,8 @@
 
 #define ABORT_IF_ZERO(p)                                                                      \
   do {                                                                                        \
-    if((p) <= 0) {                                                                            \
-      fprintf(stderr, "%s(%d): '%s' <= 0 (%d). Aborting.\n",  __FUNCTION__, __LINE__, #p, p); \
+    if((p) == 0) {                                                                            \
+      fprintf(stderr, "%s(%d): '%s' == 0 (%d). Aborting.\n",  __FUNCTION__, __LINE__, #p, p); \
       abort();                                                                                \
     }                                                                                         \
   } while(0)
