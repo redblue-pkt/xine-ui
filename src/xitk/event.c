@@ -756,7 +756,7 @@ void gui_playlist_start_next(void) {
     gui_set_current_mrl(NULL);
     enable_playback_controls(0);
   }
-  
+
 }
 
 static void gui_find_visual (Visual **visual_return, int *depth_return) {

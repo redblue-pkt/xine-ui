@@ -463,8 +463,7 @@ static int notify_event(xitk_widget_t *w, widget_event_t *event, widget_event_re
     paint_labelbutton(w);
     break;
   case WIDGET_EVENT_CLICK:
-    notify_click_labelbutton(w, event->button_pressed, event->x, event->y);
-    result->value = 1;
+    result->value = notify_click_labelbutton(w, event->button_pressed, event->x, event->y);
     retval = 1;
     break;
   case WIDGET_EVENT_FOCUS:
