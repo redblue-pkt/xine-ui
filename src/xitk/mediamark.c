@@ -84,6 +84,7 @@ typedef struct {
 } playlist_t;
 
 typedef mediamark_t **(*playlist_guess_func_t)(playlist_t *, const char *);
+typedef mediamark_t **(*playlist_xml_guess_func_t)(playlist_t *, char *xml_content, xml_node_t *);
 
 static char *_download_file(const char *filename, int *size) {
   download_t  *download;
@@ -1003,189 +1004,179 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
   return mmk;
 }
 
-static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filename) {
+/*
+ * XML based playlists
+ */
+static mediamark_t **xml_asx_playlist(playlist_t *playlist, char *xml_content, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
-  if(filename) {
-    char            *asx_content;
-    int              size;
-    int              result;
-    xml_node_t      *xml_tree, *asx_entry, *asx_ref;
+  if(xml_tree) {
+    xml_node_t      *asx_entry, *asx_ref;
     xml_property_t  *asx_prop;
+    int              entries_asx = 0;
 
+    if(!strcasecmp(xml_tree->name, "ASX")) {
 
-    if((asx_content = _read_file(filename, &size)) != NULL) {
-      int entries_asx = 0;
+      asx_prop = xml_tree->props;
 
-      xml_parser_init(asx_content, size, XML_PARSER_CASE_INSENSITIVE);
-      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
-	goto __failure;
-
-      if(!strcasecmp(xml_tree->name, "ASX")) {
-
-	asx_prop = xml_tree->props;
-
-	while((asx_prop) && (strcasecmp(asx_prop->name, "VERSION")))
-	  asx_prop = asx_prop->next;
+      while((asx_prop) && (strcasecmp(asx_prop->name, "VERSION")))
+	asx_prop = asx_prop->next;
 	
-	if(asx_prop) {
-	  int  version_major, version_minor = 0;
+      if(asx_prop) {
+	int  version_major, version_minor = 0;
 
-	  if((((sscanf(asx_prop->value, "%d.%d", &version_major, &version_minor)) == 2) ||
-	      ((sscanf(asx_prop->value, "%d", &version_major)) == 1)) && 
-	     ((version_major == 3) && (version_minor == 0))) {
+	if((((sscanf(asx_prop->value, "%d.%d", &version_major, &version_minor)) == 2) ||
+	    ((sscanf(asx_prop->value, "%d", &version_major)) == 1)) && 
+	   ((version_major == 3) && (version_minor == 0))) {
 	    
-	  __parse_anyway:
-	    asx_entry = xml_tree->child;
-	    while(asx_entry) {
-	      if((!strcasecmp(asx_entry->name, "ENTRY")) ||
-		 (!strcasecmp(asx_entry->name, "ENTRYREF"))) {
-		char *title  = NULL;
-		char *href   = NULL;
-		char *author = NULL;
+	__parse_anyway:
+	  asx_entry = xml_tree->child;
+	  while(asx_entry) {
+	    if((!strcasecmp(asx_entry->name, "ENTRY")) ||
+	       (!strcasecmp(asx_entry->name, "ENTRYREF"))) {
+	      char *title  = NULL;
+	      char *href   = NULL;
+	      char *author = NULL;
 
-		asx_ref = asx_entry->child;
-		while(asx_ref) {
+	      asx_ref = asx_entry->child;
+	      while(asx_ref) {
 		  
-		  if(!strcasecmp(asx_ref->name, "TITLE")) {
+		if(!strcasecmp(asx_ref->name, "TITLE")) {
 
-		    if(!title)
-		      title = asx_ref->data;
+		  if(!title)
+		    title = asx_ref->data;
 
-		  }
-		  else if(!strcasecmp(asx_ref->name, "AUTHOR")) {
+		}
+		else if(!strcasecmp(asx_ref->name, "AUTHOR")) {
 
-		    if(!author)
-		      author = asx_ref->data;
+		  if(!author)
+		    author = asx_ref->data;
 
-		  }
-		  else if(!strcasecmp(asx_ref->name, "REF")) {
+		}
+		else if(!strcasecmp(asx_ref->name, "REF")) {
 		    
-		    for(asx_prop = asx_ref->props; asx_prop; asx_prop = asx_prop->next) {
+		  for(asx_prop = asx_ref->props; asx_prop; asx_prop = asx_prop->next) {
 
-		      if(!strcasecmp(asx_prop->name, "HREF")) {
+		    if(!strcasecmp(asx_prop->name, "HREF")) {
 
-			if(!href)
-			  href = asx_prop->value;
-		      }
+		      if(!href)
+			href = asx_prop->value;
+		    }
 		      
-		      if(href)
-			break;
-		    }
-		  }		    
-		  
-		  asx_ref = asx_ref->next;
-		}
-		
-		if(href && strlen(href)) {
-		  char *atitle     = NULL;
-		  char *aauthor    = NULL;
-		  char *real_title = NULL;
-		  int   len        = 0;
-		  
-		  if(title && strlen(title)) {
-		    atitle = strdup(title);
-		    atitle = atoa(atitle);
-		    len = strlen(atitle);
-		    
-		    if(author && strlen(author)) {
-		      aauthor = strdup(author);
-		      aauthor = atoa(aauthor);
-		      len += strlen(aauthor) + 3;
-		    }
-		    
-		    len++;
+		    if(href)
+		      break;
 		  }
+		}		    
 		  
-		  if(atitle && strlen(atitle)) {
-		    real_title = (char *) xine_xmalloc(len);
-		    sprintf(real_title, "%s", atitle);
-		    
-		    if(aauthor && strlen(aauthor))
-		      sprintf(real_title, "%s (%s)", real_title, aauthor);
-		  }
-		  
-		  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
-		  
-		  mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1, 0, 0);
-		  playlist->entries = ++entries_asx;
-
-		  SAFE_FREE(real_title);
-		  SAFE_FREE(atitle);
-		  SAFE_FREE(aauthor);
-		}
-		
-		href = title = author = NULL;
+		asx_ref = asx_ref->next;
 	      }
-	      asx_entry = asx_entry->next;
-	    }
-	  }
-	  else
-	    fprintf(stderr, "%s(): Wrong ASX version: %s\n", __XINE_FUNCTION__, asx_prop->value);
-
-	}
-	else {
-	  fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
-	  fprintf(stderr, "%s(): last chance: try to parse it anyway\n", __XINE_FUNCTION__);
-	  goto __parse_anyway;
-	}
-	
-      }
-      else
-	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
-      
-      xml_parser_free_tree(xml_tree);
-    __failure:
-
-      /* Maybe it's 'ASF <url> */
-      if(entries_asx == 0) {
-	
-	playlist->data = asx_content;
-	
-	if(playlist_split_data(playlist)) {
-	  int    linen = 0;
-	  char  *ln;
-
-	  while((ln = playlist->lines[linen++]) != NULL) {
-	    
-	    if(!strncasecmp("ASF", ln, 3)) {
-	      char *p = ln + 3;
-	      
-	      while(p && ((*p == ' ') || (*p == '\t')))
-		p++;
-
-	      if(p && strlen(p)) {
+		
+	      if(href && strlen(href)) {
+		char *atitle     = NULL;
+		char *aauthor    = NULL;
+		char *real_title = NULL;
+		int   len        = 0;
+		  
+		if(title && strlen(title)) {
+		  atitle = strdup(title);
+		  atitle = atoa(atitle);
+		  len = strlen(atitle);
+		    
+		  if(author && strlen(author)) {
+		    aauthor = strdup(author);
+		    aauthor = atoa(aauthor);
+		    len += strlen(aauthor) + 3;
+		  }
+		    
+		  len++;
+		}
+		  
+		if(atitle && strlen(atitle)) {
+		  real_title = (char *) xine_xmalloc(len);
+		  sprintf(real_title, "%s", atitle);
+		    
+		  if(aauthor && strlen(aauthor))
+		    sprintf(real_title, "%s (%s)", real_title, aauthor);
+		}
+		  
 		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
-		
-		mediamark_store_mmk(&mmk[entries_asx], p, p, NULL, 0, -1, 0, 0);
+		  
+		mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1, 0, 0);
 		playlist->entries = ++entries_asx;
+
+		SAFE_FREE(real_title);
+		SAFE_FREE(atitle);
+		SAFE_FREE(aauthor);
 	      }
+		
+	      href = title = author = NULL;
+	    }
+	    asx_entry = asx_entry->next;
+	  }
+	}
+	else
+	  fprintf(stderr, "%s(): Wrong ASX version: %s\n", __XINE_FUNCTION__, asx_prop->value);
+
+      }
+      else {
+	fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
+	fprintf(stderr, "%s(): last chance: try to parse it anyway\n", __XINE_FUNCTION__);
+	goto __parse_anyway;
+      }
+	
+    }
+#ifdef DEBUG
+    else
+      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+#endif
+      
+    /* Maybe it's 'ASF <url> */
+    if(entries_asx == 0) {
+      
+      playlist->data = xml_content;
+      
+      if(playlist_split_data(playlist)) {
+	int    linen = 0;
+	char  *ln;
+	
+	while((ln = playlist->lines[linen++]) != NULL) {
+	  
+	  if(!strncasecmp("ASF", ln, 3)) {
+	    char *p = ln + 3;
+	    
+	    while(p && ((*p == ' ') || (*p == '\t')))
+	      p++;
+	    
+	    if(p && strlen(p)) {
+	      mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 2));
+	      
+	      mediamark_store_mmk(&mmk[entries_asx], p, p, NULL, 0, -1, 0, 0);
+	      playlist->entries = ++entries_asx;
 	    }
 	  }
 	}
       }
+    }
 
-      free(asx_content);
-      
-      if(entries_asx) {
-	mmk[entries_asx] = NULL;
-	playlist->type = strdup("ASX3");
-	return mmk;
-      }
+    if(entries_asx) {
+      mmk[entries_asx] = NULL;
+      playlist->type = strdup("ASX3");
+      return mmk;
     }
   }
   
   return NULL;
 }
 
-static void gx_get_entries(playlist_t *playlist, 
-			   mediamark_t ***mmk, int *entries, xml_node_t *entry) {
+static void __gx_get_entries(playlist_t *playlist, mediamark_t ***mmk, int *entries, xml_node_t *entry) {
   xml_property_t  *prop;
   xml_node_t      *ref;
   xml_node_t      *node = entry;  
   
   while(node) {
-    if(!strcasecmp(node->name, "ENTRY")) {
+    if(!strcasecmp(node->name, "SUB"))
+      __gx_get_entries(playlist, mmk, entries, node->child);
+    else if(!strcasecmp(node->name, "ENTRY")) {
       char *title  = NULL;
       char *href   = NULL;
       int   start  = 0;
@@ -1213,234 +1204,206 @@ static void gx_get_entries(playlist_t *playlist,
 	  }
 	}		    
 	else if(!strcasecmp(ref->name, "TIME")) {
-	  prop = ref->props;
-	  start = strtol(prop->value, &prop->value, 10);
+
+	  for(prop = ref->props; prop; prop = prop->next) {
+	    if(!strcasecmp(prop->name, "START")) {
+
+	      if(prop->value && strlen(prop->value))
+		start = atoi(prop->value);
+
+	    }
+	  }
 	}
-	
+
 	ref = ref->next;
       }
       
       if(href && strlen(href)) {
-	char *real_title = NULL;
-	char *atitle     = NULL;
-	int   len        = 0;
+	char *atitle = NULL;
 	
 	if(title && strlen(title)) {
-	  xine_strdupa(atitle, title);
+	  atitle = strdup(title);
 	  atitle = atoa(atitle);
-	  len = strlen(atitle);
-	  
-	  len++;
 	}
-	
-	if(atitle && strlen(atitle)) {
-	  real_title = (char *) alloca(len);
-	  sprintf(real_title, "%s", atitle);
-	  
-	}
-	
+
 	(*mmk) = (mediamark_t **) realloc((*mmk), sizeof(mediamark_t *) * (*entries + 2));
 	
-	mediamark_store_mmk(&(*mmk)[*entries], href, real_title, NULL, start, -1, 0, 0);
+	mediamark_store_mmk(&(*mmk)[*entries], href, (atitle && strlen(atitle)) ? atitle : NULL, NULL, start, -1, 0, 0);
 	playlist->entries = ++(*entries);
+	
+	if(atitle)
+	  free(atitle);
       }
       
       href = title = NULL;
+      start = 0;
     }
+
     node = node->next;
   }
 }
-static mediamark_t **guess_gx_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **xml_gx_playlist(playlist_t *playlist, char *xml_content, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
-  if(filename) {
-    char            *gx_content;
-    int              size;
-    int              result;
-    xml_node_t      *xml_tree, *gx_entry;
+  if(xml_tree) {
+    xml_node_t      *gx_entry;
     xml_property_t  *gx_prop;
+    int              entries_gx = 0;
 
-
-    if((gx_content = _read_file(filename, &size)) != NULL) {
-      int entries_gx = 0;
-
-      xml_parser_init(gx_content, size, XML_PARSER_CASE_INSENSITIVE);
-      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
-	goto __failure;
-
-      if(!strcasecmp(xml_tree->name, "GXINEMM")) {
-
-	gx_prop = xml_tree->props;
-
-	while((gx_prop) && (strcasecmp(gx_prop->name, "VERSION")))
-	  gx_prop = gx_prop->next;
+    if(!strcasecmp(xml_tree->name, "GXINEMM")) {
+      
+      gx_prop = xml_tree->props;
+      
+      while((gx_prop) && (strcasecmp(gx_prop->name, "VERSION")))
+	gx_prop = gx_prop->next;
+      
+      if(gx_prop) {
+	int  version_major;
 	
-	if(gx_prop) {
-	  int  version_major;
+	if(((sscanf(gx_prop->value, "%d", &version_major)) == 1) && (version_major == 1)) {
 
-	  if(((sscanf(gx_prop->value, "%d", &version_major)) == 1) && (version_major == 1)) {
-	    
-	    gx_entry = xml_tree->child;
-	    while(gx_entry) {
-	      
-	      if(!strcasecmp(gx_entry->name, "SUB"))
-		gx_get_entries(playlist, &mmk, &entries_gx, gx_entry->child);
-	      
-	      if(!strcasecmp(gx_entry->name, "ENTRY"))
-		gx_get_entries(playlist, &mmk, &entries_gx, gx_entry);
-	      
-	      gx_entry = gx_entry->next;
+	  gx_entry = xml_tree->child;
+	  while(gx_entry) {
+
+	    if(!strcasecmp(gx_entry->name, "SUB")) {
+	      __gx_get_entries(playlist, &mmk, &entries_gx, gx_entry->child);
 	    }
-	  }
-	  else
-	    fprintf(stderr, "%s(): Wrong GXINEMM version: %s\n", __XINE_FUNCTION__, gx_prop->value);
+	    else if(!strcasecmp(gx_entry->name, "ENTRY"))
+	      __gx_get_entries(playlist, &mmk, &entries_gx, gx_entry);
 
+	    gx_entry = gx_entry->next;
+	  }
 	}
 	else
-	  fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
-	
+	  fprintf(stderr, "%s(): Wrong GXINEMM version: %s\n", __XINE_FUNCTION__, gx_prop->value);
       }
       else
-	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
-      
-      xml_parser_free_tree(xml_tree);
-    __failure:
-      
-      free(gx_content);
-      
-      if(entries_gx) {
-	mmk[entries_gx] = NULL;
-	playlist->type = strdup("GXMM");
-	return mmk;
-      }
+	fprintf(stderr, "%s(): Unable to find VERSION tag.\n", __XINE_FUNCTION__);
+    }
+#ifdef DEBUG
+    else
+      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+#endif
+    
+    if(entries_gx) {
+      mmk[entries_gx] = NULL;
+      playlist->type = strdup("GXMM");
+      return mmk;
     }
   }
-  
+
   return NULL;
 }
 
-static mediamark_t **guess_noatun_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **xml_noatun_playlist(playlist_t *playlist, char *xml_content, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
-  if(filename) {
-    char            *noa_content;
-    int              size;
-    int              result;
-    xml_node_t      *xml_tree, *noa_entry;
+  if(xml_tree) {
+    xml_node_t      *noa_entry;
     xml_property_t  *noa_prop;
+    int              entries_noa = 0;
 
-    if((noa_content = _read_file(filename, &size)) != NULL) {
-      int entries_noa = 0;
-
-      xml_parser_init(noa_content, size, XML_PARSER_CASE_INSENSITIVE);
-      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
-	goto __failure;
-
-      if(!strcasecmp(xml_tree->name, "PLAYLIST")) {
-	int found = 0;
-	
-	noa_prop = xml_tree->props;
-	
-	while(noa_prop) {
-	  if((!strcasecmp(noa_prop->name, "CLIENT")) && (!strcasecmp(noa_prop->value, "NOATUN")))
-	    found++;
-	  else if(!strcasecmp(noa_prop->name, "VERSION")) {
-	    int  version_major;
-	    
-	    if(((sscanf(noa_prop->value, "%d", &version_major)) == 1) && (version_major == 1))
-	      found++;
-	  }
-
-	  noa_prop = noa_prop->next;
-	}
-
-	if(found >= 2) {
-	  noa_entry = xml_tree->child;
+    if(!strcasecmp(xml_tree->name, "PLAYLIST")) {
+      int found = 0;
+      
+      noa_prop = xml_tree->props;
+      
+      while(noa_prop) {
+	if((!strcasecmp(noa_prop->name, "CLIENT")) && (!strcasecmp(noa_prop->value, "NOATUN")))
+	  found++;
+	else if(!strcasecmp(noa_prop->name, "VERSION")) {
+	  int  version_major;
 	  
-	  while(noa_entry) {
-
-	    if(!strcasecmp(noa_entry->name, "ITEM")) {
-	      char *real_title = NULL;
-	      char *title      = NULL;
-	      char *album      = NULL;
-	      char *artist     = NULL;
-	      char *url        = NULL;
-
-	      for(noa_prop = noa_entry->props; noa_prop; noa_prop = noa_prop->next) {
-		if(!strcasecmp(noa_prop->name, "TITLE"))
-		  title = noa_prop->value;
-		else if(!strcasecmp(noa_prop->name, "ALBUM"))
-		  album = noa_prop->value;
-		else if(!strcasecmp(noa_prop->name, "ARTIST"))
-		  artist = noa_prop->value;
-		else if(!strcasecmp(noa_prop->name, "URL"))
-		  url = noa_prop->value;
-	      }
-
-	      if(url) {
-		int   titlen = 0;
-
-		/*
-		  title (artist - album)
-		*/
-		if(title && (titlen = strlen(title))) {
-		  int artlen = 0;
-		  int alblen = 0;
-
-		  if(artist && (artlen = strlen(artist)) && album && (alblen = strlen(album))) {
-		    int len = titlen + artlen + alblen + 7;
-
-		    real_title = (char *) xine_xmalloc(len);
-		    sprintf(real_title, "%s (%s - %s)", title, artist, album);
-		  }
-		  else if(artist && (artlen = strlen(artist))) {
-		    int len = titlen + artlen + 4;
-
-		    real_title = (char *) xine_xmalloc(len);
-		    sprintf(real_title, "%s (%s)", title, artist);
-		  }
-		  else if(album && (alblen = strlen(album))) {
-		    int len = titlen + alblen + 4;
-
-		    real_title = (char *) xine_xmalloc(len);
-		    sprintf(real_title, "%s (%s)", title, album);
-		  }
-		  else
-		    real_title = strdup(title);
-		  
-		}
-		
-		mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_noa + 2));
-		
-		mediamark_store_mmk(&mmk[entries_noa], url, real_title, NULL, 0, -1, 0, 0);
-		playlist->entries = ++entries_noa;
-
-		if(real_title)
-		  free(real_title);
-
-	      }
+	  if(((sscanf(noa_prop->value, "%d", &version_major)) == 1) && (version_major == 1))
+	    found++;
+	}
+	
+	noa_prop = noa_prop->next;
+      }
+      
+      if(found >= 2) {
+	noa_entry = xml_tree->child;
+	
+	while(noa_entry) {
+	  
+	  if(!strcasecmp(noa_entry->name, "ITEM")) {
+	    char *real_title = NULL;
+	    char *title      = NULL;
+	    char *album      = NULL;
+	    char *artist     = NULL;
+	    char *url        = NULL;
+	    
+	    for(noa_prop = noa_entry->props; noa_prop; noa_prop = noa_prop->next) {
+	      if(!strcasecmp(noa_prop->name, "TITLE"))
+		title = noa_prop->value;
+	      else if(!strcasecmp(noa_prop->name, "ALBUM"))
+		album = noa_prop->value;
+	      else if(!strcasecmp(noa_prop->name, "ARTIST"))
+		artist = noa_prop->value;
+	      else if(!strcasecmp(noa_prop->name, "URL"))
+		url = noa_prop->value;
 	    }
 	    
-	    noa_entry = noa_entry->next;
+	    if(url) {
+	      int   titlen = 0;
+	      
+	      /*
+		title (artist - album)
+	      */
+	      if(title && (titlen = strlen(title))) {
+		int artlen = 0;
+		int alblen = 0;
+		
+		if(artist && (artlen = strlen(artist)) && album && (alblen = strlen(album))) {
+		  int len = titlen + artlen + alblen + 7;
+		  
+		  real_title = (char *) xine_xmalloc(len);
+		  sprintf(real_title, "%s (%s - %s)", title, artist, album);
+		}
+		else if(artist && (artlen = strlen(artist))) {
+		  int len = titlen + artlen + 4;
+		  
+		  real_title = (char *) xine_xmalloc(len);
+		  sprintf(real_title, "%s (%s)", title, artist);
+		}
+		else if(album && (alblen = strlen(album))) {
+		  int len = titlen + alblen + 4;
+		  
+		  real_title = (char *) xine_xmalloc(len);
+		  sprintf(real_title, "%s (%s)", title, album);
+		}
+		else
+		  real_title = strdup(title);
+		
+	      }
+	      
+	      mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_noa + 2));
+	      
+	      mediamark_store_mmk(&mmk[entries_noa], url, real_title, NULL, 0, -1, 0, 0);
+	      playlist->entries = ++entries_noa;
+	      
+	      if(real_title)
+		free(real_title);
+	      
+	    }
 	  }
+	  
+	  noa_entry = noa_entry->next;
 	}
       }
-      else
-	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
-      
-      xml_parser_free_tree(xml_tree);
-    __failure:
-      
-      free(noa_content);
-      
-      if(entries_noa) {
-	mmk[entries_noa] = NULL;
-	playlist->type = strdup("NOATUN");
-	return mmk;
-      }
+    }
+#ifdef DEBUG
+    else
+      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+#endif    
+    
+    if(entries_noa) {
+      mmk[entries_noa] = NULL;
+      playlist->type = strdup("NOATUN");
+      return mmk;
     }
   }
-  
+
   return NULL;
 }
 
@@ -2228,158 +2191,145 @@ static void smil_free_smil(smil_t *smil) {
   SAFE_FREE(smil->base);
 }
 
-static mediamark_t **guess_smil_playlist(playlist_t *playlist, const char *filename) {
+static mediamark_t **xml_smil_playlist(playlist_t *playlist, char *xml_content, xml_node_t *xml_tree) {
   mediamark_t **mmk = NULL;
 
-  if(filename) {
-    char            *smil_content;
-    int              size;
-    int              result;
-    xml_node_t      *xml_tree, *smil_entry, *smil_ref;
+  if(xml_tree) {
+    xml_node_t      *smil_entry, *smil_ref;
     smil_t           smil;
+    int              entries_smil = 0;
+
+    memset(&smil, 0, sizeof(smil_t));
     
-    if((smil_content = _read_file(filename, &size)) != NULL) {
-      int entries_smil = 0;
-
-      xml_parser_init(smil_content, size, XML_PARSER_CASE_INSENSITIVE);
-      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
-	goto __failure;
+    if(!strcasecmp(xml_tree->name, "SMIL")) {
       
-      memset(&smil, 0, sizeof(smil_t));
-
-      if(!strcasecmp(xml_tree->name, "SMIL")) {
-
-	smil.first = smil.node = smil_new_node();
-	smil_entry = xml_tree->child;
-
-	while(smil_entry) {
-	  
+      smil.first = smil.node = smil_new_node();
+      smil_entry = xml_tree->child;
+      
+      while(smil_entry) {
+	
 #ifdef DEBUG_SMIL
-	  printf("smil_entry '%s'\n", smil_entry->name);
+	printf("smil_entry '%s'\n", smil_entry->name);
 #endif	  
-	  if(!strcasecmp(smil_entry->name, "HEAD")) {
+	if(!strcasecmp(smil_entry->name, "HEAD")) {
 #ifdef DEBUG_SMIL
-	    printf("+---------+\n");
-	    printf("| IN HEAD |\n");
-	    printf("+---------+\n");
+	  printf("+---------+\n");
+	  printf("| IN HEAD |\n");
+	  printf("+---------+\n");
 #endif	    
-	    smil_ref = smil_entry->child;
-	    while(smil_ref) {
+	  smil_ref = smil_entry->child;
+	  while(smil_ref) {
 #ifdef DEBUG_SMIL
-	      printf("  smil_ref '%s'\n", smil_ref->name);
+	    printf("  smil_ref '%s'\n", smil_ref->name);
 #endif	      
-	      smil_header(&smil, smil_ref->props);
+	    smil_header(&smil, smil_ref->props);
+	    
+	    smil_ref = smil_ref->next;
+	  }
+	}
+	else if(!strcasecmp(smil_entry->name, "BODY")) {
+#ifdef DEBUG_SMIL
+	  printf("+---------+\n");
+	  printf("| IN BODY |\n");
+	  printf("+---------+\n");
+#endif
+	__kino:
+	  smil_ref = smil_entry->child;
+	  while(smil_ref) {
+#ifdef DEBUG_SMIL
+	    printf("  smil_ref '%s'\n", smil_ref->name);
+#endif
+	    if(!strcasecmp(smil_ref->name, "SEQ")) {
+	      smil_property_t  smil_props;
+	      smil_node_t     *node = smil.node;
 	      
-	      smil_ref = smil_ref->next;
-	    }
-	  }
-	  else if(!strcasecmp(smil_entry->name, "BODY")) {
 #ifdef DEBUG_SMIL
-	    printf("+---------+\n");
-	    printf("| IN BODY |\n");
-	    printf("+---------+\n");
-#endif
-	    __kino:
-	    smil_ref = smil_entry->child;
-	    while(smil_ref) {
-#ifdef DEBUG_SMIL
-	      printf("  smil_ref '%s'\n", smil_ref->name);
-#endif
-	      if(!strcasecmp(smil_ref->name, "SEQ")) {
-		smil_property_t  smil_props;
-		smil_node_t     *node = smil.node;
-		
-#ifdef DEBUG_SMIL
-		palign;
-		printf("SEQ Found\n");
+	      palign;
+	      printf("SEQ Found\n");
 #endif		
-		smil_init_smil_property(&smil_props);
-
-		smil_get_properties(&smil_props, smil_ref->props);
-		smil_seq(&smil, &(smil.node), smil_ref->child, &smil_props);
-		smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
-		smil_free_properties(&smil_props);
-	      }
-	      else if(!strcasecmp(smil_ref->name, "PAR")) {
-		smil_property_t  smil_props;
-		smil_node_t     *node = smil.node;
-	
-#ifdef DEBUG_SMIL
-		palign;
-		printf("PAR Found\n");
-#endif
-		
-		smil_init_smil_property(&smil_props);
-
-		smil_get_properties(&smil_props, smil_ref->props);
-		smil_par(&smil, &(smil.node), smil_ref->child, &smil_props);
-		smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
-		smil_free_properties(&smil_props);
-	      }
-	      else if(!strcasecmp(smil_ref->name, "A")) {
-#ifdef DEBUG_SMIL
-		palign;
-		printf("  IN A\n");
-#endif
-		smil_properties(&smil, &(smil.node), smil_ref->props, NULL);
-	      }
-	      else if(!strcasecmp(smil_ref->name, "SWITCH")) {
-		smil_property_t  smil_props;
-		smil_node_t     *node = smil.node;
-	
-#ifdef DEBUG_SMIL
-		palign;
-		printf("SWITCH Found\n");
-#endif
-		
-		smil_init_smil_property(&smil_props);
-		
-		smil_get_properties(&smil_props, smil_ref->props);
-		smil_switch(&smil, &(smil.node), smil_ref->child, &smil_props);
-		smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
-		smil_free_properties(&smil_props);
-	      }
-	      else {
-		smil_properties(&smil, &smil.node, smil_ref->props, NULL);
-	      }
-
-	      smil_ref = smil_ref->next;
+	      smil_init_smil_property(&smil_props);
+	      
+	      smil_get_properties(&smil_props, smil_ref->props);
+	      smil_seq(&smil, &(smil.node), smil_ref->child, &smil_props);
+	      smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
+	      smil_free_properties(&smil_props);
 	    }
+	    else if(!strcasecmp(smil_ref->name, "PAR")) {
+	      smil_property_t  smil_props;
+	      smil_node_t     *node = smil.node;
+	      
+#ifdef DEBUG_SMIL
+	      palign;
+	      printf("PAR Found\n");
+#endif
+	      
+	      smil_init_smil_property(&smil_props);
+	      
+	      smil_get_properties(&smil_props, smil_ref->props);
+	      smil_par(&smil, &(smil.node), smil_ref->child, &smil_props);
+	      smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
+	      smil_free_properties(&smil_props);
+	    }
+	    else if(!strcasecmp(smil_ref->name, "A")) {
+#ifdef DEBUG_SMIL
+	      palign;
+	      printf("  IN A\n");
+#endif
+	      smil_properties(&smil, &(smil.node), smil_ref->props, NULL);
+	    }
+	    else if(!strcasecmp(smil_ref->name, "SWITCH")) {
+	      smil_property_t  smil_props;
+	      smil_node_t     *node = smil.node;
+	      
+#ifdef DEBUG_SMIL
+	      palign;
+	      printf("SWITCH Found\n");
+#endif
+	      
+	      smil_init_smil_property(&smil_props);
+	      
+	      smil_get_properties(&smil_props, smil_ref->props);
+	      smil_switch(&smil, &(smil.node), smil_ref->child, &smil_props);
+	      smil_repeat(smil_props.repeat, node, &(smil.node), &smil_props);
+	      smil_free_properties(&smil_props);
+	    }
+	    else {
+	      smil_properties(&smil, &smil.node, smil_ref->props, NULL);
+	    }
+	    
+	    smil_ref = smil_ref->next;
 	  }
-	  else if(!strcasecmp(smil_entry->name, "SEQ")) { /* smil2, kino format(no body) */
-	    goto __kino;
-	  }
-	  
-	  smil_entry = smil_entry->next;
+	}
+	else if(!strcasecmp(smil_entry->name, "SEQ")) { /* smil2, kino format(no body) */
+	  goto __kino;
 	}
 	
+	smil_entry = smil_entry->next;
+      }
+      
 #ifdef DEBUG_SMIL
-	printf("DUMPING TREE:\n");
-	printf("-------------\n");
-	smil_dump_tree(smil.first);
-	
-	printf("DUMPING HEADER:\n");
-	printf("---------------\n");
-	smil_dump_header(&smil);
+      printf("DUMPING TREE:\n");
+      printf("-------------\n");
+      smil_dump_tree(smil.first);
+      
+      printf("DUMPING HEADER:\n");
+      printf("---------------\n");
+      smil_dump_header(&smil);
 #endif
-
-	entries_smil = smil_fill_mmk(&smil, &mmk);
-	smil_free_smil(&smil);
-      }
-      else
-	fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
       
-      xml_parser_free_tree(xml_tree);
-      
-    __failure:
-      free(smil_content);
-      
-      if(entries_smil) {
-	mmk[entries_smil] = NULL;
-	playlist->entries = entries_smil;
-	playlist->type    = strdup("SMIL");
-	return mmk;
-      }
+      entries_smil = smil_fill_mmk(&smil, &mmk);
+      smil_free_smil(&smil);
+    }
+#ifdef DEBUG
+    else
+      fprintf(stderr, "%s(): Unsupported XML type: '%s'.\n", __XINE_FUNCTION__, xml_tree->name);
+#endif    
+    
+    if(entries_smil) {
+      mmk[entries_smil] = NULL;
+      playlist->entries = entries_smil;
+      playlist->type    = strdup("SMIL");
+      return mmk;
     }
   }
   
@@ -2387,6 +2337,50 @@ static mediamark_t **guess_smil_playlist(playlist_t *playlist, const char *filen
 }
 /*
  * ********************************** SMIL END ***********************************
+ */
+
+static mediamark_t **guess_xml_based_playlist(playlist_t *playlist, const char *filename) {
+  mediamark_t **mmk = NULL;
+
+  if(filename) {
+    char            *xml_content;
+    int              size;
+    int              result;
+    xml_node_t      *xml_tree, *top_xml_tree;
+    
+    if((xml_content = _read_file(filename, &size)) != NULL) {
+      int                         i;
+      playlist_xml_guess_func_t   guess_functions[] = {
+	xml_asx_playlist,
+	xml_gx_playlist,
+	xml_noatun_playlist,
+	xml_smil_playlist,
+	NULL
+      };
+
+      xml_parser_init(xml_content, size, XML_PARSER_CASE_INSENSITIVE);
+      if((result = xml_parser_build_tree(&xml_tree)) != XML_PARSER_OK)
+	goto __failure;
+      
+      top_xml_tree = xml_tree;
+
+      /* Check all playlists */
+      for(i = 0; guess_functions[i]; i++) {
+	if((mmk = guess_functions[i](playlist, xml_content, xml_tree)))
+	  break;
+      }
+      
+      xml_parser_free_tree(top_xml_tree);
+    __failure:
+      
+      free(xml_content);
+    }
+  }
+  
+  return mmk;
+}
+/*
+ * XML based playlists end.
  */
 
 /*
@@ -2593,14 +2587,11 @@ void mediamark_free_entry(int offset) {
 
 int mediamark_concat_mediamarks(const char *_filename) {
   playlist_t             *playlist;
-  int                     i, found;
+  int                     i;
   mediamark_t           **mmk = NULL;
   const char             *filename = _filename;
   playlist_guess_func_t   guess_functions[] = {
-    guess_asx_playlist,
-    guess_gx_playlist,
-    guess_noatun_playlist,
-    guess_smil_playlist,
+    guess_xml_based_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
     guess_m3u_playlist,
@@ -2616,12 +2607,12 @@ int mediamark_concat_mediamarks(const char *_filename) {
 
   playlist = (playlist_t *) xine_xmalloc(sizeof(playlist_t));
 
-  for(i = 0, found = 0; (guess_functions[i] != NULL) && (found == 0); i++) {
-    if((mmk = guess_functions[i](playlist, filename)) != NULL)
-      found = 1;
+  for(i = 0; guess_functions[i]; i++) {
+    if((mmk = guess_functions[i](playlist, filename)))
+      break;
   }
   
-  if(found) {
+  if(mmk) {
 #ifdef DEBUG
     printf("Playlist file (%s) is valid (%s).\n", filename, playlist->type);
 #endif
@@ -2650,15 +2641,12 @@ int mediamark_concat_mediamarks(const char *_filename) {
 
 void mediamark_load_mediamarks(const char *_filename) {
   playlist_t             *playlist;
-  int                     i, found, onum;
+  int                     i, onum;
   mediamark_t           **mmk = NULL;
   mediamark_t           **ommk;
   const char             *filename = _filename;
   playlist_guess_func_t   guess_functions[] = {
-    guess_asx_playlist,
-    guess_gx_playlist,
-    guess_noatun_playlist,
-    guess_smil_playlist,
+    guess_xml_based_playlist,
     guess_toxine_playlist,
     guess_pls_playlist,
     guess_m3u_playlist,
@@ -2674,12 +2662,12 @@ void mediamark_load_mediamarks(const char *_filename) {
 
   playlist = (playlist_t *) xine_xmalloc(sizeof(playlist_t));
 
-  for(i = 0, found = 0; (guess_functions[i] != NULL) && (found == 0); i++) {
-    if((mmk = guess_functions[i](playlist, filename)) != NULL)
-      found = 1;
+  for(i = 0; guess_functions[i]; i++) {
+    if((mmk = guess_functions[i](playlist, filename)))
+      break;
   }
   
-  if(found) {
+  if(mmk) {
 #ifdef DEBUG
     printf("Playlist file (%s) is valid (%s).\n", filename, playlist->type);
 #endif
