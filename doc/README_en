@@ -137,18 +137,31 @@
 
 2.3 Developers of xine
 
-    main xine developer
-      Guenter Bartsch
+    main xine programming
 
-    various suggestions, bug and build fixes, alsa plugin, gui
-      Daniel Caujolle-Bert 
+      Guenter Bartsch <guenter@users.sourceforge.net>
 
-    audio programming
-      Siegfried Langauf 
+    various suggestions, bug and build fixes, alsa plugin, gui 
 
-    contributes great libmpeg2 and libac3 hacks:
-      Michael Lespinasse
-  
+      Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+
+    many bug and deadlock fixes, bitrate detection, soft deinterlacer, 
+    massive libwin32 updates
+
+      Miguel Freitas <miguel@cetuc.puc-rio.br>
+
+    teletux/syncfb video output module, various bugfixes/reviews, alsa
+
+      Joachim Koenig <Joachim.Koenig@gmx.net>
+
+    liba52/libmpeg2 developement
+
+      Michel Lespinasse <walken@zoy.org>
+
+    Debian package, user support
+
+      Siegfried Langauf <siggi@users.sourceforge.net>
+
     Plus various other contributors, see the xine-lib/AUTHORS file
 
 2.4 Usage
@@ -196,15 +209,15 @@
 
       Key             Action
 
-      <RETURN>        play
-      <SPACE>         pause
-      <Up>/<Down>     fast forward / slow motion
+      [RETURN]        play
+      [SPACE]         pause
+      [Up]/[Down]     fast forward / slow motion
 
       0               seek start of current stream
       1-9             seek to 10-90% of current stream
-      <Left>/<Right>  seek -+ 15 sec (+CTRL: 60 sec)
-      <PgUp>/<Prior>  jump to previous playlist entry
-      <PgDown>/<Next> jump to next playlist entry
+      [Left]/[Right]  seek -+ 15 sec (+CTRL: 60 sec)
+      [PgUp]/[Prior]  jump to previous playlist entry
+      [PgDown]/[Next] jump to next playlist entry
 
       f               toggle fullscreen mode
       a               toggle aspect ratio (AUTO/16:9/4:3/DVB)
@@ -217,9 +230,9 @@
       + -             change audio channel
       , .             change subtitle channel
       n m             adjust a/v sync
-      <HOME>          reset a/v sync
+      [HOME]          reset a/v sync
 
-      <INSERT>        toggle mouse cursor grabbing in the video output window
+      [INSERT]        toggle mouse cursor grabbing in the video output window
 
       q               quit
 

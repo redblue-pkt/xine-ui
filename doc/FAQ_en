@@ -125,7 +125,7 @@
 
      cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine login
 
-     <empty password>
+     [empty password]
 
      cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-lib
      cvs -d :pserver:anonymous@cvs.xine.sourceforge.net:/cvsroot/xine co xine-ui
@@ -478,7 +478,7 @@
      
       Yes, use a MRL like:
 
-       xine VCD://<track number>
+       xine VCD://[track number]
 
 
 5.2 AUDIO RELATED QUESTIONS
