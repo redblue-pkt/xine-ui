@@ -398,6 +398,12 @@ static void setup_apply(xitk_widget_t *w, void *data) {
     config_save();
   }
 }
+
+static void setup_ok(xitk_widget_t *w, void *data) {
+  setup_apply(w, data);
+  setup_end(w, data);
+}
+
 /*
  *
  */
@@ -1279,6 +1285,17 @@ void setup_panel(void) {
   x = (WINDOW_WIDTH - (3 * 100))>>2;
   
   lb.button_type       = CLICK_BUTTON;
+  lb.label             = _("OK");
+  lb.align             = ALIGN_CENTER;
+  lb.callback          = setup_ok; 
+  lb.state_callback    = NULL;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
+   xitk_noskin_labelbutton_create(setup->widget_list, &lb, x, WINDOW_HEIGHT - 40, 100, 23,
+				  "Black", "Black", "White", tabsfontname));
+  
+  lb.button_type       = CLICK_BUTTON;
   lb.label             = _("Apply");
   lb.align             = ALIGN_CENTER;
   lb.callback          = setup_apply; 
@@ -1286,7 +1303,7 @@ void setup_panel(void) {
   lb.userdata          = NULL;
   lb.skin_element_name = NULL;
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
-   xitk_noskin_labelbutton_create(setup->widget_list, &lb, x, WINDOW_HEIGHT - 40, 100, 23,
+   xitk_noskin_labelbutton_create(setup->widget_list, &lb, (x * 2) + 100, WINDOW_HEIGHT - 40, 100, 23,
 				  "Black", "Black", "White", tabsfontname));
 
   lb.button_type       = CLICK_BUTTON;
