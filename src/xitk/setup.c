@@ -89,7 +89,7 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
     y += FRAME_HEIGHT >> 1;                                                                     \
   }
 
-#define ADD_LABEL(widget) {                                                                     \
+#define ADD_LABEL(widget, cb, data) {                                                           \
     int           wx, wy, wh, fh;                                                               \
     xitk_font_t  *fs;                                                                           \
     xitk_widget_t *lbl;                                                                         \
@@ -103,7 +103,8 @@ static char                *tabsfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*
     wx += xitk_get_widget_width(widget);                                                        \
     wh = xitk_get_widget_height(widget);                                                        \
                                                                                                 \
-    lbl = setup_add_label (wx + 20, (wy + (wh >> 1)) - (fh>>1), (FRAME_WIDTH - wx), labelkey);  \
+    lbl = setup_add_label (wx + 20, (wy + (wh >> 1)) - (fh>>1),                                 \
+                           (FRAME_WIDTH - wx), labelkey, cb, data);                             \
     wt->label = lbl;                                                                            \
   }
 
@@ -530,10 +531,11 @@ static void setup_handle_event(XEvent *event, void *data) {
   }
 }
 
-/*q
+/*
  *
  */
-static xitk_widget_t *setup_add_label (int x, int y, int w, const char *str) {
+static xitk_widget_t *setup_add_label (int x, int y, int w, 
+				       const char *str, xitk_simple_callback_t cb, void *data) {
   xitk_label_widget_t   lb;
   xitk_widget_t        *label;
   xitk_font_t          *fs;
@@ -550,7 +552,8 @@ static xitk_widget_t *setup_add_label (int x, int y, int w, const char *str) {
   lb.gc                  = (XITK_WIDGET_LIST_GC(setup->widget_list));
   lb.skin_element_name   = NULL;
   lb.label               = (char *)str;
-  lb.callback            = NULL;
+  lb.callback            = cb;
+  lb.userdata            = data;
 
   xitk_list_append_content((XITK_WIDGET_LIST_LIST(setup->widget_list)), 
 			   (label = xitk_noskin_label_create(setup->widget_list, &lb,
@@ -580,12 +583,11 @@ static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
   triplet->changed = 1;
 }
 
-
 static widget_triplet_t *setup_add_nothing_available(const char *title, int x, int y) {
   static widget_triplet_t *wt; 
-  xitk_widget_t       *frame = NULL;
-  xitk_image_t        *image;
-  xitk_image_widget_t  im;
+  xitk_widget_t           *frame = NULL;
+  xitk_image_t            *image;
+  xitk_image_widget_t      im;
   
   wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
   
@@ -636,7 +638,7 @@ static widget_triplet_t *setup_add_slider (const char *title, const char *labelk
 							       XITK_HSLIDER)));
   xitk_slider_set_pos(slider, entry->num_value);
   
-  ADD_LABEL(slider);
+  ADD_LABEL(slider, NULL, NULL);
   
   add_widget_to_list(slider);
   
@@ -671,7 +673,7 @@ static widget_triplet_t *setup_add_inputnum(const char *title, const char *label
     (intbox = 
      xitk_noskin_intbox_create(setup->widget_list, &ib, x, y - 5, 60, 20, &wi, &wbu, &wbd)));
 
-  ADD_LABEL(intbox);
+  ADD_LABEL(intbox, NULL, NULL);
   
   add_widget_to_list(intbox);
   add_widget_to_list(wi);
@@ -710,7 +712,7 @@ static widget_triplet_t *setup_add_inputtext(const char *title, const char *labe
 							 x, y - 5, 150, 20,
 							 "Black", "Black", fontname)));
 
-  ADD_LABEL(input);
+  ADD_LABEL(input, NULL, NULL);
 
   add_widget_to_list(input);
     
@@ -723,6 +725,12 @@ static widget_triplet_t *setup_add_inputtext(const char *title, const char *labe
 /*
  *
  */
+static void label_cb(xitk_widget_t *w, void *data) {
+  xitk_widget_t  *checkbox = (xitk_widget_t *) data;
+
+  xitk_checkbox_set_state(checkbox, !(xitk_checkbox_get_state(checkbox)));
+  xitk_checkbox_callback_exec(checkbox);
+}
 static widget_triplet_t *setup_add_checkbox (const char *title, const char *labelkey, 
 					     int x, int y, xine_cfg_entry_t *entry) {
   xitk_checkbox_widget_t    cb;
@@ -744,7 +752,7 @@ static widget_triplet_t *setup_add_checkbox (const char *title, const char *labe
 			    xitk_noskin_checkbox_create(setup->widget_list, &cb,
 							x, y, 10, 10)));
   xitk_checkbox_set_state (checkbox, entry->num_value);  
-  ADD_LABEL(checkbox);
+  ADD_LABEL(checkbox, label_cb, (void *) checkbox);
 
   add_widget_to_list(checkbox);
 
@@ -781,7 +789,7 @@ static widget_triplet_t *setup_add_combo (const char *title, const char *labelke
 						     x, y - 4, 150, &lw, &bw)));
   xitk_combo_set_select(combo, entry->num_value );
 
-  ADD_LABEL(combo);
+  ADD_LABEL(combo, NULL, NULL);
 
   add_widget_to_list(combo);
   add_widget_to_list(lw);
