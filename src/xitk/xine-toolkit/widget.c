@@ -1528,6 +1528,8 @@ void xitk_disable_widget(xitk_widget_t *w) {
       
       event.type = WIDGET_EVENT_PAINT;
       (void) w->event(w, &event, NULL);
+
+      w->have_focus = FOCUS_LOST;
     }
   }
   
