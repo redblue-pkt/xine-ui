@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.22\n"
 "POT-Creation-Date: 2003-12-17 12:09+0100\n"
-"PO-Revision-Date: 2003-12-17 12:14+0100\n"
+"PO-Revision-Date: 2003-12-18 09:52+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -1235,10 +1235,10 @@ msgid "      --skin-server-url <url>  Define the skin server url.\n"
 msgstr "      --skin-server-url <url>  URL für Skin-Server.\n"
 
 #: src/xitk/main.c:638
-#, fuzzy
 msgid ""
 "      --enqueue <mrl> ...      Enqueue mrl of a running session (session 0)\n"
-msgstr "      --enqueue <mrl> ...      MRL in laufende Sitzung (Sitzung 0) anhängen\n"
+msgstr ""
+"      --enqueue <mrl> ...      MRL in laufende Sitzung (Sitzung 0) anhängen\n"
 
 #: src/xitk/main.c:639
 msgid "  -S, --session <option1,option2,...>\n"
@@ -1477,36 +1477,34 @@ msgstr "                    audio_decoder, video_decoder.\n"
 
 #: src/xitk/main.c:693
 msgid "      --bug-report [=mrl]      Enable bug report mode:\n"
-msgstr ""
+msgstr "      --bug-report [=mrl]      Fehlerberichtmodus aktivieren:\n"
 
 #: src/xitk/main.c:694
-#, fuzzy
 msgid "                                 Turn on verbosity, gather all output\n"
-msgstr "                                   'clear'  Playliste löschen,\n"
+msgstr "                                   Ausführlichere Meldung, alle\n"
 
 #: src/xitk/main.c:695
-#, fuzzy
 msgid ""
 "                                 messages and write them into a file named\n"
-msgstr "                                 -Kann mehrfach angegeben werden.\n"
+msgstr ""
+"                                 Ausgaben sammeln und in Datei BUG-REPORT."
+"TXT\n"
 
 #: src/xitk/main.c:696
-#, fuzzy
 msgid "                                 BUG-REPORT.TXT.\n"
-msgstr "                                 <p> kann sein:\n"
+msgstr "                                 schreiben.\n"
 
 #: src/xitk/main.c:697
-#, fuzzy
 msgid ""
 "                                 If <mrl> is given, xine will play the mrl\n"
 msgstr ""
-"                                  -wenn keine Option gegeben ist, wird "
-"'default' benutzt.\n"
+"                                 Falls <mrl> angegeben ist, wird xine diese\n"
 
 #: src/xitk/main.c:698
-#, fuzzy
 msgid "                                 then quit (like -pq).\n"
-msgstr "                                 <p> kann sein:\n"
+msgstr ""
+"                                 mrl abspielen und sich danach beenden (wie -"
+"pq).\n"
 
 #: src/xitk/main.c:700
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -1707,12 +1705,14 @@ msgstr "Fehlerhafter Wiederholmodus '%s', siehe xine --help\n"
 
 #: src/xitk/main.c:1710
 msgid "*** NOTE ***\n"
-msgstr ""
+msgstr "*** HINWEIS ***\n"
 
 #: src/xitk/main.c:1711
 msgid ""
 " Bug Report mode: All output messages will be added in BUG-REPORT.TXT file.\n"
 msgstr ""
+" Fehlerberichtmodus: Alle Ausgaben werden werden in die Datei BUG-REPORT.TXT "
+"geschrieben.\n"
 
 #: src/xitk/main.c:1749
 #, c-format
@@ -1745,13 +1745,15 @@ msgstr "Automatische Untertitel laden falls vorhanden."
 
 #: src/xitk/main.c:1859
 msgid "Enable deinterlacing by default"
-msgstr ""
+msgstr "Deinterlacing automatisch aktivieren"
 
 #: src/xitk/main.c:1860
 msgid ""
 "Deinterlace plugin will be enabled on startup. Progressive streams are "
 "automaticaly detected with no performance penalty."
 msgstr ""
+"Deinterlace-Plugin  wird beim Starten aktiviert. Progressive Datenströme "
+"werden automatisch ohne Leistungseinbußen erkannt ."
 
 #: src/xitk/main.c:1998
 msgid "Logo mrl"
@@ -2564,6 +2566,8 @@ msgstr "gui skin Thema"
 #: src/xitk/skins.c:451
 msgid "Ooch, gui.skin config entry isn't registered. Say goodbye.\n"
 msgstr ""
+"Auch, gui.skin-Konfigurationseintrag ist nicht registriert. Auf "
+"Wiedersehen.\n"
 
 #: src/xitk/skins.c:458
 #, c-format
