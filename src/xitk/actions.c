@@ -181,7 +181,6 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
   }
   
   if (panel_is_visible())  {
-    printf("panel is visible\n");
     XMapRaised (gGui->display, gGui->panel_window);
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
