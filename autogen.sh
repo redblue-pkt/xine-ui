@@ -39,7 +39,7 @@ esac
 
 detect_configure_ac() {
 
-  local srcdir=`dirname $0`
+  srcdir=`dirname $0`
   test -z "$srcdir" && srcdir=.
 
   (test -f $srcdir/configure.ac) || {
@@ -55,12 +55,12 @@ detect_configure_ac() {
 #-------------------
 detect_autoconf() {
   set -- `type autoconf 2>/dev/null`
-  local RETVAL=$?
-  local NUM_RESULT=$#
-  local RESULT_FILE=$3
+  RETVAL=$?
+  NUM_RESULT=$#
+  RESULT_FILE=$3
   if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
-    local AC="`autoconf --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    local AUTOCONF_MIN="`echo $AUTOCONF_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
+    AC="`autoconf --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
+    AUTOCONF_MIN="`echo $AUTOCONF_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
     if test $AC -lt 100 ; then
       AC=`expr $AC \* 10`
     fi
@@ -107,12 +107,12 @@ run_autoconf () {
 #-------------------
 detect_libtool() {
   set -- `type libtool 2>/dev/null`
-  local RETVAL=$?
-  local NUM_RESULT=$#
-  local RESULT_FILE=$3
+  RETVAL=$?
+  NUM_RESULT=$#
+  RESULT_FILE=$3
   if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
-    local LT="`libtool --version | awk '{ print $4 }' | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    local LIBTOOL_MIN="`echo $LIBTOOL_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
+    LT="`libtool --version | awk '{ print $4 }' | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
+    LIBTOOL_MIN="`echo $LIBTOOL_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
     if test $LT -lt 100 ; then
       LT=`expr $LT \* 10`
     fi
@@ -150,12 +150,12 @@ detect_automake() {
   #   automake is /usr/local/bin/automake
   #
   set -- `type automake 2>/dev/null`
-  local RETVAL=$?
-  local NUM_RESULT=$#
-  local RESULT_FILE=$3
+  RETVAL=$?
+  NUM_RESULT=$#
+  RESULT_FILE=$3
   if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
-    local AM="`automake --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    local AUTOMAKE_MIN="`echo $AUTOMAKE_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
+    AM="`automake --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
+    AUTOMAKE_MIN="`echo $AUTOMAKE_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
     if test $AM -lt 100 ; then
       AM=`expr $AM \* 10`
     fi
@@ -192,12 +192,12 @@ detect_aclocal() {
 
   # if no automake, don't bother testing for aclocal
   set -- `type aclocal 2>/dev/null`
-  local RETVAL=$?
-  local NUM_RESULT=$#
-  local RESULT_FILE=$3
+  RETVAL=$?
+  NUM_RESULT=$#
+  RESULT_FILE=$3
   if [ $RETVAL -eq 0 -a $NUM_RESULT -eq 3 -a -f "$RESULT_FILE" ]; then
-    local AC="`aclocal --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
-    local ACLOCAL_MIN="`echo $AUTOMAKE_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
+    AC="`aclocal --version | sed -n 1p | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
+    ACLOCAL_MIN="`echo $AUTOMAKE_MIN | sed -e 's/[a-zA-Z\ \.\(\)\-]//g'`"
     if test $AC -lt 100 ; then
       AC=`expr $AC \* 10`
     fi
@@ -223,7 +223,7 @@ run_aclocal () {
   fi
   
   echo $_echo_n " + Running aclocal: $_echo_c"
-  local aclocalinclude=`xine-config --acflags`
+  aclocalinclude=`xine-config --acflags`
 
   aclocal $aclocalinclude -I m4
   echo "done." 
