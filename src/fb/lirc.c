@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2003 the xine project
+ * Copyright (C) 2000-2003 the xine project and Fredrik Noring
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -27,59 +27,39 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_LIRC
+
 #include <pthread.h>
 #include <signal.h>
 
-#ifdef HAVE_LIRC
 #include <lirc/lirc_client.h>
-#endif
 
 #include "main.h"
 #include "keys.h"
 #include "actions.h"
 
-#ifdef HAVE_LIRC
-
-#ifdef DEBUG
-#define LIRC_VERBOSE 1
-#else
-#define LIRC_VERBOSE 0
-#endif
-
-typedef struct
+static void *lirc_loop(void *dummy)
 {
-	struct lirc_config   *config;
-	int                   fd;
-	pthread_t             thread;
-} _lirc_t;
-
-static _lirc_t lirc;
-
-static void *xine_lirc_loop(void *dummy)
-{
-	kbinding_entry_t *k;
 	char *code, *c;
-	int ret;
+	int k, ret;
 	
 	pthread_detach(pthread_self());
 	
-	while(fbxine.running && lirc_nextcode(&code) == 0)
+	while(lirc_nextcode(&code) == 0)
 	{
 		pthread_testcancel();
 		
 		if(!code) 
 			continue;
-		
-		pthread_testcancel();
 
 		for(;;)
 		{
-			ret = lirc_code2char(lirc.config, code, &c);
+			ret = lirc_code2char(fbxine.lirc.config, code, &c);
 			if(ret || !c)
 				break;
-			k = kbindings_lookup_action(c);
+			k = default_command_action(c);
 			if(k)
-				do_action(k->action_id);
+				do_action(k);
 		}
 		free(code);
 		
@@ -90,34 +70,27 @@ static void *xine_lirc_loop(void *dummy)
 	pthread_exit(0);
 }
 
-void init_lirc(void)
+static void exit_lirc(void)
 {
-	if((lirc.fd = lirc_init("xine", LIRC_VERBOSE)) == -1)
-	{
-		fbxine.lirc_enable = 0;
-		return;
-	}
+	pthread_cancel(fbxine.lirc.thread);
 
-	if(lirc_readconfig(0, &lirc.config, 0) != 0)
-	{
-		fbxine.lirc_enable = 0;
-		return;
-	}
-	
-	fbxine.lirc_enable = 1;
-	
-	if(fbxine.lirc_enable)
-		pthread_create(&lirc.thread, 0, xine_lirc_loop, 0);
+	lirc_freeconfig(fbxine.lirc.config);
+	lirc_deinit();
 }
 
-void exit_lirc(void)
+int fbxine_init_lirc(void)
 {
-	pthread_cancel(lirc.thread);
+	static struct fbxine_callback exit_callback;
 	
-	if(fbxine.lirc_enable)
-	{
-		lirc_freeconfig(lirc.config);
-		lirc_deinit();
-	}
+	if((fbxine.lirc.fd = lirc_init("xine", 0)) == -1)
+		return 0;
+	if(lirc_readconfig(0, &fbxine.lirc.config, 0) != 0)
+		return 0;
+	
+	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_lirc);
+	
+	pthread_create(&fbxine.lirc.thread, 0, lirc_loop, 0);
+	return 1;
 }
-#endif
+
+#endif /* HAVE_LIRC */

@@ -358,6 +358,17 @@ AC_SUBST(LIBVERSION)
 AM_CONDITIONAL(HAVE_TERMCAP, test x"$no_termcap" != "xyes")
 
 dnl
+dnl ncurses
+dnl
+AC_CHECK_HEADERS(curses.h)
+AC_CHECK_LIB(ncurses, cbreak,
+	      AC_DEFINE(HAVE_NCURSES,,[Define this if you have ncurses installed])
+	      ac_have_ncurses="yes"
+	      NCURSES_LIB="-lncurses")
+AC_SUBST(NCURSES_LIB)
+AM_CONDITIONAL(HAVE_NCURSES, test x$ac_have_ncurses = "xyes")
+
+dnl
 dnl Libcurl
 dnl
 AM_PATH_CURL(7.10.2, [

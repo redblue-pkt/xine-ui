@@ -25,26 +25,22 @@
 #include "config.h"
 #endif
 
-#include "main.h"
-#ifdef HAVE_LIRC
+#include <signal.h>
+
 #include "lirc.h"
-#endif
+#include "main.h"
 #include "keys.h"
 #include "options.h"
 
 #define XINE_CONFIG_DIR  ".xine"
 #define XINE_CONFIG_FILE "config2"
 
-#ifdef HAVE_GETOPT_LONG
-#  include <getopt.h>
-#else
-#  include "getopt.h"
-#endif
-
 struct fbxine fbxine =
 {
 	tty_fd:        -1,
-	video_port_id: "fb"
+	video_port_id: "fb",
+
+	exit_cond: PTHREAD_COND_INITIALIZER
 };
 
 static void load_config(void)
@@ -78,6 +74,11 @@ static int check_version(void)
 	return 0;
 }
 
+static void exit_video(void)
+{
+	xine_close_video_driver(fbxine.xine, fbxine.video_port);
+}
+
 static int init_video(void)
 {
 	fbxine.video_port =
@@ -90,6 +91,11 @@ static int init_video(void)
 	}
 
 	return 1;
+}
+
+static void exit_audio(void)
+{
+	xine_close_audio_driver(fbxine.xine, fbxine.audio_port);
 }
 
 static int init_audio(void)
@@ -111,6 +117,13 @@ static int init_audio(void)
 	return 1;
 }
 
+static void exit_stream(void)
+{
+        xine_close(fbxine.stream);
+	xine_event_dispose_queue(fbxine.event_queue);
+	xine_dispose(fbxine.stream);
+}
+
 static int init_stream(void)
 {
 	fbxine.stream = xine_stream_new(fbxine.xine, fbxine.audio_port,
@@ -128,8 +141,17 @@ static int init_stream(void)
 	return 1;
 }
 
+static void exit_xine(void)
+{
+	xine_exit(fbxine.xine);
+}
+
 static int init_xine(void)
 {
+	static struct fbxine_callback exit_callback;
+
+	fbxine_register_exit(&exit_callback, (fbxine_callback_t)exit_xine);
+	
 	fbxine.xine = xine_new();
 	if(!fbxine.xine)
 	{
@@ -141,57 +163,70 @@ static int init_xine(void)
 	return 1;
 }
 
+static void wait_for_exit(void)
+{
+	pthread_cond_wait(&fbxine.exit_cond, &fbxine.mutex);
+}
+
+void fbxine_exit(void)
+{
+	pthread_mutex_lock(&fbxine.mutex);
+	pthread_cond_signal(&fbxine.exit_cond);
+	pthread_mutex_unlock(&fbxine.mutex);
+}
+
+static int fbxine_init(int argc, char **argv)
+{
+	if(!check_version())
+		return 0;
+	if(!init_xine())
+		return 0;
+	switch(parse_options(argc, argv))
+	{
+		case 0:
+		case -1:
+			return 0;
+	}
+	if(!fbxine_init_keyboard())
+		return 0;;
+	if(!init_video())
+		return 0;
+	if(!init_audio())
+		return 0;
+	if(!init_stream())
+		return 0;
+#ifdef HAVE_LIRC
+	fbxine_init_lirc();
+#endif
+	return 1;
+}
+
+static void install_abort(void)
+{
+	int trapped[] = { SIGINT, SIGQUIT, SIGILL,
+			  SIGFPE, SIGKILL, SIGBUS,
+			  SIGSEGV, SIGSYS, SIGPIPE,
+			  SIGTERM, SIGSTKFLT };
+	int i;
+	
+	for(i = 0; i < sizeof(trapped)/sizeof(int); i++)
+		signal(trapped[i], (void(*)(int))fbxine_do_abort);
+}
+
 int main(int argc, char *argv[])
 {
 	int exit_code = 1;
 	
-	if(!check_version())
-		goto err_version;
-	if(!init_xine())
-		goto err_xine;
-	switch(parse_options(argc, argv))
+	install_abort();
+	
+	pthread_mutex_lock(&fbxine.mutex);
+	if(fbxine_init(argc, argv))
 	{
-		case 0:
-			exit_code = 0;
-			goto exit_option;
-		case -1:
-			goto exit_option;
+		wait_for_exit();
+		exit_code = 0;
 	}
+	fbxine_do_exit();
+	pthread_mutex_unlock(&fbxine.mutex);
 	
-	fbxine.running = 1;
-	
-	if(!init_video())
-		goto err_video;
-	if(!init_audio())
-		goto err_audio;
-	if(!init_stream())
-		goto err_stream;
-	if(!init_keyboard())
-		goto err_keyboard;
-#ifdef HAVE_LIRC
-	init_lirc();
-#endif
-
-	wait_for_key();
-
-	exit_code = 0;
-	
-#ifdef HAVE_LIRC
-	exit_lirc();
-#endif
-	exit_keyboard();
-err_keyboard:
-	xine_close(fbxine.stream);
-	xine_event_dispose_queue(fbxine.event_queue);
-	xine_dispose(fbxine.stream);
-err_stream:
-	xine_close_audio_driver(fbxine.xine, fbxine.audio_port);
-err_audio:
-	xine_close_video_driver(fbxine.xine, fbxine.video_port);
-err_video:
-exit_option:
-	xine_exit(fbxine.xine);
-err_xine:
-err_version:
 	return exit_code;
 }

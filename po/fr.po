@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
 "POT-Creation-Date: 2003-01-28 18:29+0100\n"
-"PO-Revision-Date: 2003-01-28 18:50+0100\n"
+"PO-Revision-Date: 2003-01-29 02:01+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: Frensh <fr@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -312,7 +312,7 @@ msgstr "Offset SPU: %d"
 
 #: src/xitk/event.c:674
 msgid "Playlist: no loop."
-msgstr "List de lecture: pas de boucle."
+msgstr "Liste de lecture: pas de boucle."
 
 #: src/xitk/event.c:677
 msgid "Playlist: loop."

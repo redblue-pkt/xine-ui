@@ -76,12 +76,16 @@ typedef enum {
   ACTID_SET_CURPOS_90,
   ACTID_SEEK_REL_m,
   ACTID_SEEK_REL_p,
+  ACTID_SEEK_REL_m600,
+  ACTID_SEEK_REL_p600,
   ACTID_SEEK_REL_m60,
   ACTID_SEEK_REL_p60,
-  ACTID_SEEK_REL_m15,
-  ACTID_SEEK_REL_p15,
   ACTID_SEEK_REL_m30,
   ACTID_SEEK_REL_p30,
+  ACTID_SEEK_REL_m15,
+  ACTID_SEEK_REL_p15,
+  ACTID_SEEK_REL_m10,
+  ACTID_SEEK_REL_p10,
   ACTID_SEEK_REL_m7,
   ACTID_SEEK_REL_p7,
   ACTID_MRLBROWSER,
@@ -154,6 +158,7 @@ typedef enum {
    */
 } action_id_t;
 
+int default_command_action(char *action_str);
 void do_action(int action);
 
 #endif /* ACTIONS_H */

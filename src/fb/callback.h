@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2000-2003 the xine project
+ * Copyright (C) 2003 by Fredrik Noring
  * 
  * This file is part of xine, a unix video player.
  * 
@@ -17,23 +17,19 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
  *
- * $Id$
- *
- * lirc specific stuff
- *
  */
 
-#ifdef HAVE_LIRC
+typedef void(*fbxine_callback_t)(void);
 
-#ifndef LIRC_H
-#define LIRC_H
+struct fbxine_callback
+{
+	struct fbxine_callback *next;
+	fbxine_callback_t func;
+};
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-void fbxine_init_lirc(void);
-
-#endif /* LIRC_H */
-
-#endif /* HAVE_LIRC */
+void fbxine_register_exit(struct fbxine_callback *callback,
+			  fbxine_callback_t func);
+void fbxine_register_abort(struct fbxine_callback *callback,
+			   fbxine_callback_t func);
+void fbxine_do_exit(void);
+void fbxine_do_abort(void);

@@ -35,8 +35,12 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
+#include <pthread.h>
+
 #include <xine.h>
 #include <xine/xineutils.h>
+
+#include "callback.h"
 
 struct fbxine
 {
@@ -56,7 +60,6 @@ struct fbxine
 	char                     *mrl[1024];
 	int                      num_mrls;
 	int                      current_mrl;
-	int                      running;
 
 	const char               *audio_port_id;
 	const char               *video_port_id;
@@ -68,15 +71,21 @@ struct fbxine
 	int                      debug;
 
 	int                      ignore_next;
-	
+
+#ifdef HAVE_LIRC
 	struct
 	{
-		int              enable;
-		int              caps;
-		int              volume_mixer;
-		int              volume_level;
-		int              mute;
-	} mixer;
+		struct lirc_config *config;
+		int                fd;
+		pthread_t          thread;
+	} lirc;
+#endif /* HAVE_LIRC */
+	
+	pthread_mutex_t mutex;
+	pthread_cond_t exit_cond;
+
+	pthread_t keyboard_thread;
 };
 
 extern struct fbxine fbxine;
+void fbxine_exit(void);

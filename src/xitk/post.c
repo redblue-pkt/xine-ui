@@ -64,7 +64,7 @@ void post_init(void) {
       /* We're only interested by post plugin which handle audio in input */
       while(pol[i]) {
 	xine_post_t *post = xine_post_init(gGui->xine, pol[i], 0, &gGui->ao_port, &gGui->vo_port);
-	
+
 	if(post) {
 	  if(num_plug == 0)
 	    post_audio_plugins = (char **) xine_xmalloc(sizeof(char *) * 2);
