@@ -68,7 +68,7 @@
 #define DEFAULT_SERVER       "localhost"
 
 #define PROGNAME             "xine-remote"
-#define PROGVERSION          "0.1.1"
+#define PROGVERSION          "0.1.2"
 
 #define _BUFSIZ              20480
 
@@ -91,7 +91,6 @@ extern int errno;
 #endif
 
 # include <xine/xineutils.h>
-
 
 /* options args */
 static const char *short_options = "?hH:P:ncv";
@@ -151,34 +150,37 @@ static session_commands_t  **session_commands = NULL;
 
 #else  /* NETWORK_CLIENT */
 
-#include <pwd.h>
-
-# include "event.h"
+# include <pwd.h>
+# include <X11/Xlib.h>
 # include <xine.h>
 # include <xine/xineutils.h>
+# include "event.h"
+# include "panel.h"
 
 typedef struct commands_s commands_t;
 typedef struct client_info_s client_info_t;
 typedef struct passwds_s passwds_t;
-typedef void (*cmd_func_t)(commands_t *, client_info_t *, void *);
+typedef void (*cmd_func_t)(commands_t *, client_info_t *);
 
 static pthread_t     thread_server;
 static passwds_t   **passwds = NULL;
 
-static void do_commands(commands_t *, client_info_t *, void *);
-static void do_help(commands_t *, client_info_t *, void *);
-static void do_syntax(commands_t *, client_info_t *, void *);
-static void do_auth(commands_t *, client_info_t *, void *);
-static void do_mrl(commands_t *, client_info_t *, void *);
-static void do_playlist(commands_t *, client_info_t *, void *);
-static void do_play(commands_t *, client_info_t *, void *);
-static void do_stop(commands_t *, client_info_t *, void *);
-static void do_pause(commands_t *, client_info_t *, void *);
-static void do_exit(commands_t *, client_info_t *, void *);
-static void do_fullscreen(commands_t *, client_info_t *, void *);
-static void do_get(commands_t *, client_info_t *, void *);
-static void do_set(commands_t *, client_info_t *, void *);
-/*  static void do_gui(commands_t *, client_info_t *, void *); */
+static void do_commands(commands_t *, client_info_t *);
+static void do_help(commands_t *, client_info_t *);
+static void do_syntax(commands_t *, client_info_t *);
+static void do_auth(commands_t *, client_info_t *);
+static void do_mrl(commands_t *, client_info_t *);
+static void do_playlist(commands_t *, client_info_t *);
+static void do_play(commands_t *, client_info_t *);
+static void do_stop(commands_t *, client_info_t *);
+static void do_pause(commands_t *, client_info_t *);
+static void do_exit(commands_t *, client_info_t *);
+static void do_fullscreen(commands_t *, client_info_t *);
+static void do_get(commands_t *, client_info_t *);
+static void do_set(commands_t *, client_info_t *);
+static void do_gui(commands_t *, client_info_t *);
+static void do_event(commands_t *, client_info_t *);
+static void do_seek(commands_t *, client_info_t *);
 
 static void handle_client_command(client_info_t *);
 static const char *get_homedir(void);
@@ -313,16 +315,37 @@ static commands_t commands[] = {
     "  set speed <SPEED_PAUSE|SPEED_SLOW_4|SPEED_SLOW_2|SPEED_NORMAL|SPEED_FAST_2|SPEED_FAST_4>\n"
     "            <     |     |     /4     |     /2     |     =      |     *2     |     *4     >"
   },
-  /*
   { "gui",         REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_gui,
     "manage gui windows",
-    "  gui hide·\n"
+    "  gui hide\n"
     "  gui output\n"
     "  gui panel\n"
+    "  gui playlist\n"
     "  gui control\n"
-    "  gui mrl"
+    "  gui mrl\n"
+    "  gui setup\n"
+    "  gui log"
   },
-  */
+  { "event",       REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_event,
+    "Send an event to xine",
+    "  event menu1\n"
+    "  event menu2\n"
+    "  event menu3\n"
+    "  event up\n"
+    "  event down\n"
+    "  event left\n"
+    "  event right\n"
+    "  event next\n"
+    "  event previous\n"
+    "  event angle next\n"
+    "  event angle previous\n"
+    "  event select"
+  },
+  { "seek",        REQUIRE_ARGS,    PUBLIC,          NEED_AUTH,     do_seek,
+    "Seek in current stream",
+    "seek %[0...100]\n"
+    "seek [+|-][secs]"
+  },
   { NULL,          -1,              NOT_PUBLIC,      AUTH_UNNEEDED, NULL, 
     NULL, 
     NULL
@@ -346,7 +369,6 @@ int sock_create(const char *service, const char *transport, struct sockaddr_in *
   struct protoent *itransport;
   int                sock;
   int                type;
-  int                on = 1;
   int                proto;
 
   memset(sin, 0, sizeof(*sin));
@@ -381,8 +403,6 @@ int sock_create(const char *service, const char *transport, struct sockaddr_in *
     sock_err("Cannot create socket: %s\n", strerror(errno));
     return -1;
   }
-  
-  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int));
   
   return sock;
 }
@@ -419,8 +439,11 @@ int sock_client(const char *host, const char *service, const char *transport) {
 int sock_serv(const char *service, const char *transport, int queue_length) {
   struct sockaddr_in  sin;
   int                 sock;
+  int                 on = 1;
 
   sock = sock_create(service, transport, &sin);
+  
+  setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(int));
   
   if(bind(sock, (struct sockaddr *)&sin, sizeof(sin)) < 0)
     sock_err("Unable to link socket %s: %s\n", service, strerror(errno));
@@ -486,7 +509,7 @@ int sock_read(int socket, char *buf, int len) {
 
     if((nl = memchr(pbuf, '\n', r)) != NULL)
       r = ((char *) nl) - pbuf + 1;
-
+    
     if((rr = read(socket, pbuf, r)) < 0)
       return -1;
     
@@ -544,12 +567,12 @@ static int __sock_write(int socket, int cr, char *msg, ...) {
   return _sock_write(socket, buf, strlen(buf));
 }
 
-#ifdef __GNUC__
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
 #define sock_write(socket, msg, args...) __sock_write(socket, 1, msg, ##args)
 #define sock_write_nocr(socket, msg, args...) __sock_write(socket, 0, msg, ##args)
 #else
-#define sock_write(socket, msg, args...) __sock_write(socket, 1, msg, __VA_ARGS__)
-#define sock_write_nocr(socket, msg, args...) __sock_write(socket, 0, msg, __VA_ARGS__)
+#define sock_write(socket, msg, ...) __sock_write(socket, 1, msg, __VA_ARGS__)
+#define sock_write_nocr(socket, msg, ...) __sock_write(socket, 0, msg, __VA_ARGS__)
 #endif
 
 static char *_atoa(char *str) {
@@ -601,12 +624,12 @@ static int get_bool_value(const char *val) {
 
 #ifdef NETWORK_CLIENT
 
-#ifdef __GNUC__
+#if __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95)
 #define write_to_console_unlocked(session, msg, args...)  __sock_write(session->console, 1, msg, ##args)
 #define write_to_console_unlocked_nocr(session, msg, args...) __sock_write(session->console, 0, msg, ##args)
 #else
-#define write_to_console_unlocked(session, msg, args...)  __sock_write(session->console, 1, msg, __VA_ARGS__)
-#define write_to_console_unlocked_nocr(session, msg, args...) __sock_write(session->console, 0, msg, __VA_ARGS__)
+#define write_to_console_unlocked(session, msg, ...)  __sock_write(session->console, 1, msg, __VA_ARGS__)
+#define write_to_console_unlocked_nocr(session, msg, ...) __sock_write(session->console, 0, msg, __VA_ARGS__)
 #endif
 
 static int write_to_console(session_t *session, const char *msg, ...) {
@@ -746,6 +769,7 @@ static void client_version(session_t *session, session_commands_t *command, cons
   write_to_console(session, "%s version %s\n\n", PROGNAME, PROGVERSION);
 }
 static void client_close(session_t *session, session_commands_t *command, const char *cmd) {
+  
   if((session == NULL) || (command == NULL))
     return;
 
@@ -876,7 +900,7 @@ static void signals_handler (int sig) {
 
 static void *select_thread(void *data) {
   session_t       *session = (session_t *) data;
-  fd_set           session_sets;
+  fd_set           readfds;
   struct timeval   timeout;
   char             obuffer[_BUFSIZ];
   int              ocount;
@@ -889,23 +913,25 @@ static void *select_thread(void *data) {
   memset(&buffer, 0, sizeof(buffer));
   memset(&obuffer, 0, sizeof(obuffer));
   ocount = 0;
-
+  
   while(session->running) {
-    
+
     if(session->socket >= 0) {
+
       if(was_down) {
-	FD_ZERO(&session_sets);
-	FD_SET(session->socket, &session_sets);
+	FD_ZERO(&readfds);
+	FD_SET(session->socket, &readfds);
 	timeout.tv_sec  = 0;
 	timeout.tv_usec = 200000;
 	
-	select(session->socket + 1, &session_sets, (fd_set *) 0, (fd_set *) 0, &timeout);
+	select(session->socket + 1, &readfds, (fd_set *) 0, (fd_set *) 0, &timeout);
 	was_down = 0;
       }
       
-      if(FD_ISSET(session->socket, &session_sets)) {
-	size = read(session->socket, buffer, sizeof(buffer));
+      if(FD_ISSET(session->socket, &readfds)) {
 
+	size = recvfrom(session->socket, buffer, sizeof(buffer), MSG_NOSIGNAL, NULL, NULL);
+	
 	if(size > 0) {
 
 	  for(i = 0; i < size; i++) {
@@ -982,7 +1008,7 @@ static void *select_thread(void *data) {
       was_down = 1;
     }
   }
-  
+
   pthread_exit(NULL);
 }
 
@@ -1000,6 +1026,7 @@ static void client_handle_command(session_t *session, const char *command) {
     *p = '\0';
   
   i = found = 0;
+
   /* looking for command matching */
   while((session_commands[i]->command != NULL) && (found == 0)) {
     if(!strncasecmp(cmd, session_commands[i]->command, strlen(cmd))) {
@@ -1010,8 +1037,37 @@ static void client_handle_command(session_t *session, const char *command) {
 	  session_commands[i]->function(session, session_commands[i], command);
       }
       else {
-	//	send_to_server(session, (char *)command);
-	if((sock_write(session->socket, (char *)command)) == -1) {
+	char *p, *pp;
+	char buf[_BUFSIZ];
+	
+	/*
+	 * Duplicate single '%' char, vsnprintf() seems 
+	 * confused with single one in *format string 
+	 */
+	p = (char *)command;
+	pp = buf;
+	while(*p != '\0') {
+	  
+	  switch(*p) {
+	  case '%':
+	    if(*(p + 1) != '%') {
+	      *pp++ = '%';
+	      *pp++ = '%';
+	    }
+	    break;
+
+	  default:
+	    *pp = *p;
+	    pp++;
+	    break;
+	  }
+
+	  p++;
+	}
+
+	*pp = '\0';
+
+	if((sock_write(session->socket, buf)) == -1) {
 	  session->running = 0;
 	}
       }
@@ -1022,7 +1078,6 @@ static void client_handle_command(session_t *session, const char *command) {
 
   /* Perhaps a ';' separated commands, so send anyway to server */
   if(found == 0) {
-    //    send_to_server(session, (char *)command);
     if((sock_write(session->socket, (char *)command)) == -1) 
       session->running = 0;
   }
@@ -1048,11 +1103,8 @@ static void session_single_shot(session_t *session, int num_commands, char *comm
   }
 
   client_handle_command(session, buf);
+  usleep(10000);
   sock_write(session->socket, "exit");
-  
-  /* Wait til' socket is closed. */
-  while(session->socket <= 0)
-    usleep(10000);
 }
 
 static void show_version(void) {
@@ -1151,7 +1203,7 @@ int main(int argc, char **argv) {
       }
       break;
 
-    case 'c':
+    case 'c': /* Execute argv[] command, then leave */
       single_shot = 1;
       break;
       
@@ -1525,7 +1577,7 @@ static void command_syntax(commands_t *command, client_info_t *client_info) {
   }
 }
 
-static void do_commands(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_commands(commands_t *cmd, client_info_t *client_info) {
   int i = 0;
   char buf[_BUFSIZ];
 
@@ -1542,7 +1594,7 @@ static void do_commands(commands_t *cmd, client_info_t *client_info, void *data)
   sock_write(client_info->socket, buf);
 }
 
-static void do_help(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_help(commands_t *cmd, client_info_t *client_info) {
   char buf[_BUFSIZ];
 
   if(!client_info->command.num_args) {
@@ -1601,7 +1653,7 @@ static void do_help(commands_t *cmd, client_info_t *client_info, void *data) {
   }
 }
 
-static void do_syntax(commands_t *command, client_info_t *client_info, void *data) {
+static void do_syntax(commands_t *command, client_info_t *client_info) {
   int i;
   
   for(i = 0; commands[i].command != NULL; i++) {
@@ -1614,7 +1666,7 @@ static void do_syntax(commands_t *command, client_info_t *client_info, void *dat
   sock_write(client_info->socket, "Unknown command '%s'.\n", (get_arg(client_info, 1)));
 }
 
-static void do_auth(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_auth(commands_t *cmd, client_info_t *client_info) {
   int nargs;
   
   nargs = is_args(client_info);
@@ -1651,7 +1703,7 @@ static void do_auth(commands_t *cmd, client_info_t *client_info, void *data) {
   }
 }
 
-static void do_mrl(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_mrl(commands_t *cmd, client_info_t *client_info) {
   int nargs;
 
   nargs = is_args(client_info);
@@ -1704,7 +1756,7 @@ static void do_mrl(commands_t *cmd, client_info_t *client_info, void *data) {
   }
 }
 
-static void do_playlist(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_playlist(commands_t *cmd, client_info_t *client_info) {
   int nargs;
   
   nargs = is_args(client_info);
@@ -1779,7 +1831,7 @@ static void do_playlist(commands_t *cmd, client_info_t *client_info, void *data)
   }
 }
 
-static void do_play(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_play(commands_t *cmd, client_info_t *client_info) {
 
   if (xine_get_status (gGui->xine) != XINE_PLAY) {
     if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
@@ -1790,32 +1842,32 @@ static void do_play(commands_t *cmd, client_info_t *client_info, void *data) {
 
 }
 
-static void do_stop(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_stop(commands_t *cmd, client_info_t *client_info) {
   gGui->ignore_status = 1;
   xine_stop (gGui->xine);
   gGui->ignore_status = 0; 
 }
 
-static void do_pause(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_pause(commands_t *cmd, client_info_t *client_info) {
   if (xine_get_speed (gGui->xine) != SPEED_PAUSE)
     xine_set_speed(gGui->xine, SPEED_PAUSE);
   else
     xine_set_speed(gGui->xine, SPEED_NORMAL);
 }
 
-static void do_exit(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_exit(commands_t *cmd, client_info_t *client_info) {
   if(client_info) {
     client_info->finished = 1;
   }
 }
 
-static void do_fullscreen(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_fullscreen(commands_t *cmd, client_info_t *client_info) {
   action_id_t action = ACTID_TOGGLE_FULLSCREEN;
 
   gui_execute_action_id(action);
 }
 
-static void do_get(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_get(commands_t *cmd, client_info_t *client_info) {
   int nargs;
   
   nargs = is_args(client_info);
@@ -1923,7 +1975,7 @@ static void do_get(commands_t *cmd, client_info_t *client_info, void *data) {
   }
 }
 	
-static void do_set(commands_t *cmd, client_info_t *client_info, void *data) {
+static void do_set(commands_t *cmd, client_info_t *client_info) {
   int nargs;
 
   nargs = is_args(client_info);
@@ -1993,8 +2045,165 @@ static void do_set(commands_t *cmd, client_info_t *client_info, void *data) {
   }
 }
 
-/*  static void do_gui(commands_t *cmd, client_info_t *client_info, void *data) { */
-/*  } */
+static void do_gui(commands_t *cmd, client_info_t *client_info) {
+  int nargs;
+  
+  nargs = is_args(client_info);
+  if(nargs) {
+    if(nargs == 1) {
+      int flushing = 0;
+
+      if(is_arg_contain(client_info, 1, "hide")) {
+	if(panel_is_visible()) {
+	  panel_toggle_visibility(NULL, NULL);
+	  flushing++;
+	}
+      }
+      else if(is_arg_contain(client_info, 1, "output")) {
+	gui_toggle_visibility(NULL, NULL);
+	flushing++;
+      }
+      else if(is_arg_contain(client_info, 1, "panel")) {
+	panel_toggle_visibility(NULL, NULL);
+	flushing++;
+      }
+      else if(is_arg_contain(client_info, 1, "playlist")) {
+	gui_playlist_show(NULL, NULL);
+	flushing++;
+      }
+      else if(is_arg_contain(client_info, 1, "control")) {
+	gui_control_show(NULL, NULL);
+	flushing++;
+      }
+      else if(is_arg_contain(client_info, 1, "mrl")) {
+	gui_mrlbrowser_show(NULL, NULL);
+	flushing++;
+      }
+      else if(is_arg_contain(client_info, 1, "setup")) {
+	gui_setup_show(NULL, NULL);
+	flushing++;
+      }
+      else if(is_arg_contain(client_info, 1, "log")) {
+	gui_viewlog_show(NULL, NULL);
+	flushing++;
+      }
+
+      /* Flush event when xine !play */
+      if(flushing && ((xine_get_status(gGui->xine) != XINE_PLAY))) {
+	XFlush(gGui->display);
+      }
+    }
+  }
+}
+
+static void do_event(commands_t *cmd, client_info_t *client_info) {
+  xine_event_t   xine_event;
+  int            nargs;
+  
+  nargs = is_args(client_info);
+  if(nargs) {
+
+    xine_event.type = 0;
+
+    if(nargs == 1) {
+      if(is_arg_contain(client_info, 1, "menu1")) {
+	xine_event.type = XINE_EVENT_INPUT_MENU1;
+      }
+      else if(is_arg_contain(client_info, 1, "menu2")) {
+	xine_event.type = XINE_EVENT_INPUT_MENU2;
+      }
+      else if(is_arg_contain(client_info, 1, "menu3")) {
+	xine_event.type = XINE_EVENT_INPUT_MENU3;
+      }
+      else if(is_arg_contain(client_info, 1, "up")) {
+	xine_event.type = XINE_EVENT_INPUT_UP;
+      }
+      else if(is_arg_contain(client_info, 1, "down")) {
+	xine_event.type = XINE_EVENT_INPUT_DOWN;
+      }
+      else if(is_arg_contain(client_info, 1, "left")) {
+	xine_event.type = XINE_EVENT_INPUT_LEFT;
+      }
+      else if(is_arg_contain(client_info, 1, "right")) {
+	xine_event.type = XINE_EVENT_INPUT_RIGHT;
+      }
+      else if(is_arg_contain(client_info, 1, "next")) {
+	xine_event.type = XINE_EVENT_INPUT_NEXT;
+      }
+      else if(is_arg_contain(client_info, 1, "previous")) {
+	xine_event.type = XINE_EVENT_INPUT_PREVIOUS;
+      }
+      else if(is_arg_contain(client_info, 1, "select")) {
+	xine_event.type = XINE_EVENT_INPUT_SELECT;
+      }
+    }
+    else if(nargs >= 2) {
+      if(is_arg_contain(client_info, 1, "angle")) {
+	if(is_arg_contain(client_info, 2, "next")) {
+	  xine_event.type = XINE_EVENT_INPUT_ANGLE_NEXT;
+	}
+	else if(is_arg_contain(client_info, 2, "previous")) {
+	  xine_event.type = XINE_EVENT_INPUT_ANGLE_PREVIOUS;
+	}
+      }
+    }
+
+    if(xine_event.type != 0)
+      xine_send_event(gGui->xine, &xine_event);
+
+  }
+}
+
+static void do_seek(commands_t *cmd, client_info_t *client_info) {
+  int            nargs;
+  
+  if((xine_is_stream_seekable(gGui->xine)) == 0)
+    return;
+  
+  nargs = is_args(client_info);
+  if(nargs) {
+    
+    if(nargs == 1) {
+      int      pos;
+      char    *arg = (char *)get_arg(client_info, 1);
+      
+      if(sscanf(arg, "%%%d", &pos) == 1) {
+	
+	if(pos > 100) pos = 100;
+	if(pos < 0) pos = 0;
+	
+	gGui->ignore_status = 1;
+	if(!xine_play(gGui->xine, gGui->filename, ((int) (655.35 * pos)), 0))
+	  gui_handle_xine_error();
+	gGui->ignore_status = 0;
+	
+      }
+
+      else if((((arg[0] == '+') || (arg[0] == '-')) && (isdigit(arg[1])))
+	      || (isdigit(arg[0]))) {
+	int sec;
+	
+	pos = atoi(arg);
+	
+	if(((arg[0] == '+') || (arg[0] == '-')) && (isdigit(arg[1]))) {
+	  sec = xine_get_current_time(gGui->xine);
+	  if((sec + pos) < 0) 
+	    sec = 0;
+	  else
+	    sec += pos;
+	}
+	else 
+	  sec = pos;
+	
+	gGui->ignore_status = 1;
+	if(!xine_play(gGui->xine, gGui->filename, 0, sec))
+	  gui_handle_xine_error();
+	gGui->ignore_status = 0;
+      }
+    }
+  }
+}
+
 /*
  * *********** COMMANDS ENDS **********
  */
@@ -2188,7 +2397,7 @@ static void parse_command(client_info_t *client_info) {
       pb = buf;
       
       while(*(pcmd - 1) != '\0') {
-	
+
 	switch(*pcmd) {
 
 	case '\'':
@@ -2249,10 +2458,10 @@ static void parse_command(client_info_t *client_info) {
 #if 0
   {
     int k;
-    pinfo("client_info->command = '%s'\n", client_info->command.command);
+    printf("client_info->command = '%s'\n", client_info->command.command);
     if(client_info->command.num_args)
       for(k = 0; k < client_info->command.num_args; k++)
-	pinfo("client_info->command_arg[%d] = '%s'\n", k, client_info->command.args[k]);
+	printf("client_info->command_arg[%d] = '%s'\n", k, client_info->command.args[k]);
   }
 #endif
 }
@@ -2296,7 +2505,7 @@ static void handle_client_command(client_info_t *client_info) {
 	      found++;
 	    }
 	    else {
-	      commands[i].function(&commands[i], client_info, NULL);
+	      commands[i].function(&commands[i], client_info);
 	      found++;
 	    }
 	  }
@@ -2322,7 +2531,9 @@ static void *client_thread(void *data) {
   char               buffer[_BUFSIZ];
   int                i;
   int                len;
-
+  
+  pthread_detach(pthread_self());
+  
   client_info->finished = 0;
   memset(&client_info->name, 0, sizeof(client_info->name));
   memset(&client_info->passwd, 0, sizeof(client_info->passwd));
@@ -2353,6 +2564,8 @@ static void *client_thread(void *data) {
     _FREE(client_info->command.args[i]);
   
   _FREE(client_info);
+
+  client_info = NULL;
 
   pthread_exit(NULL);
 }
@@ -2441,7 +2654,7 @@ static void *server_thread(void *data) {
 
  __failed:
   free(service);
- 
+
   pthread_exit(NULL);
 }
 

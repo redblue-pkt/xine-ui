@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-04-06 11:02+0200\n"
-"PO-Revision-Date: 2002-02-21 11:42+0100\n"
+"POT-Creation-Date: 2002-04-07 18:17+0200\n"
+"PO-Revision-Date: 2002-04-07 17:22+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -68,15 +68,15 @@ msgstr "Einstellungen-Fenster schließen"
 
 #: src/xitk/errors.c:63
 msgid "Done"
-msgstr ""
+msgstr "Fertig"
 
 #: src/xitk/errors.c:63
 msgid "More..."
-msgstr ""
+msgstr "Mehr..."
 
 #: src/xitk/errors.c:131
 msgid "Error"
-msgstr ""
+msgstr "Fehler"
 
 #: src/xitk/errors.c:183
 #, c-format
@@ -295,12 +295,12 @@ msgstr ""
 
 #: src/xitk/main.c:206
 msgid "  -n, --network                Enable network remote control server.\n"
-msgstr ""
+msgstr "  -n, --network                Aktiviere Fernsteuerung über Netzwerk.\n"
 
 #: src/xitk/main.c:207
-#, fuzzy
 msgid "  -R, --root                   Use root window as video window.\n"
-msgstr "  -R, --root                   Desktophintergrund für Video benutzen\n"
+msgstr ""
+"  -R, --root                   Desktophintergrund für Video benutzen.\n"
 
 #: src/xitk/main.c:209
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -624,13 +624,11 @@ msgstr "xine Log Betrachter"
 msgid "Refresh"
 msgstr "Aktualisieren"
 
-#, fuzzy
 #~ msgid "Select current entry"
-#~ msgstr "Momentanes Medium auswerfen"
+#~ msgstr "Wähle momentanen Eintrag"
 
-#, fuzzy
 #~ msgid "Close MRL browser window"
-#~ msgstr "Einstellungen-Fenster schließen"
+#~ msgstr "MRL-Browser-Fenster schließen"
 
 #~ msgid "Unable to load %s logo\n"
 #~ msgstr "Kann %s Logo nicht laden\n"
