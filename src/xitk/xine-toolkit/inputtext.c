@@ -119,6 +119,56 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier) {
 }
 
 /*
+ * Recalculate display offsets.
+ */
+static void inputtext_recalc_offsets(xitk_widget_list_t *wl, 
+				     inputtext_private_data_t *private_data) {
+  char         *label = private_data->text;
+  char         *p = private_data->text;
+  xitk_font_t  *fs = NULL;
+  int           width;
+  int           i = 0;
+
+  if(private_data->cursor_pos >= 0) {
+    
+    if(private_data->fontname)
+      fs = xitk_font_load_font(private_data->display, private_data->fontname);
+
+    if(fs == NULL) 
+      fs = xitk_font_load_font(private_data->display, "fixed");
+
+    if(fs == NULL) {
+      XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
+    }
+    
+    xitk_font_set_font(fs, wl->gc);
+
+    private_data->disp_offset = private_data->pos_in_pos = 0;
+    
+    while(i < private_data->cursor_pos) {
+      
+      p = label;
+      p += private_data->disp_offset;
+      
+      width = xitk_font_get_string_length(fs, p);
+
+      if(((i == (strlen(label))) && (width > private_data->max_visible)) 
+	 || ((xitk_font_get_text_width(fs, p, 
+				       (i - private_data->disp_offset))) 
+	     >= private_data->max_visible)) {
+	
+	private_data->pos[++private_data->pos_in_pos] = i - 1;
+	private_data->disp_offset = private_data->pos[private_data->pos_in_pos];
+      }
+
+      i++;
+    }
+
+    xitk_font_unload_font(fs);
+  }
+}
+
+/*
  * Return a pixmap with text drawed.
  */
 static Pixmap create_labelofinputtext(xitk_widget_t *it, 
@@ -128,6 +178,7 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
   inputtext_private_data_t *private_data = 
     (inputtext_private_data_t *) it->private_data;
   char               *plabel = label;
+  char               *p = label;
   xitk_font_t        *fs = NULL;
   int                 lbear, rbear, width, asc, des;
   int                 yoff = 0, DefaultColor = -1;
@@ -138,10 +189,10 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
   color.flags = DoRed|DoBlue|DoGreen;
 
   /* Try to load font */
-  /* Should be fixed later.
+
   if(private_data->fontname)
     fs = xitk_font_load_font(private_data->display, private_data->fontname);
-  */
+
   if(fs == NULL) 
     fs = xitk_font_load_font(private_data->display, "fixed");
 
@@ -193,14 +244,31 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
 
   XUNLOCK(private_data->display);
 
-  if((private_data->cursor_pos - private_data->disp_offset)
-     > private_data->max_visible) {
-    private_data->disp_offset += private_data->max_visible - 1;
-  }
-  else if(private_data->disp_offset > private_data->cursor_pos) {
-    private_data->disp_offset -= private_data->max_visible;
-    if(private_data->disp_offset < 0)
-      private_data->disp_offset = 0;
+  if(private_data->cursor_pos >= 0) {
+
+    if(private_data->disp_offset)
+      p += private_data->disp_offset;
+    
+    width = xitk_font_get_string_length(fs, p);
+    
+    if(private_data->disp_offset > private_data->cursor_pos && private_data->pos_in_pos) {
+      
+      private_data->disp_offset = private_data->pos[--private_data->pos_in_pos];
+      
+      if(private_data->disp_offset < 0) {
+	private_data->pos[private_data->pos_in_pos] = private_data->disp_offset = 0;
+      }
+      
+    }
+    else if(((private_data->cursor_pos == (strlen(label)))
+	     && (width > private_data->max_visible))
+	    || ((xitk_font_get_text_width(fs, p, 
+					  (private_data->cursor_pos - private_data->disp_offset)))
+		>= private_data->max_visible)) {
+      
+      private_data->pos[++private_data->pos_in_pos] = private_data->cursor_pos - 1;
+      private_data->disp_offset = private_data->pos[private_data->pos_in_pos];
+    }
   }
 
   if(private_data->disp_offset)
@@ -213,26 +281,20 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
 	      2, ((ysize+asc+des+yoff)>>1)-des, 
 	      plabel, strlen(plabel));
 
+  width = xitk_font_get_text_width(fs, plabel,
+				   (private_data->cursor_pos - private_data->disp_offset));
+  
   /* Draw cursor pointer */
   if(private_data->cursor_pos >= 0) {
     
     XDrawLine(private_data->display, pix, gc,
-	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 1,
-	      2, 
-	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 3,
-	      2);
+	      width + 1, 2, width + 3, 2);
 
     XDrawLine(private_data->display, pix, gc, 
-	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 2
-	      , 2, 
-	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 2,
-	      ysize - 3);
+	      width + 2, 2, width + 2, ysize - 3);
 
     XDrawLine(private_data->display, pix, gc, 
-	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 1,
-	      ysize - 3, 
-	      (6 * (private_data->cursor_pos - private_data->disp_offset)) + 3,
-	      ysize - 3);
+	      width + 1, ysize - 3, width + 3, ysize - 3);
 
   }
   
@@ -332,8 +394,35 @@ static int notify_click_inputtext(xitk_widget_list_t *wl, xitk_widget_t *it,
     }
 
     pos = x - it->x;
-    pos /= 6;
+    
+    {
+      char        *p = private_data->text;
+      xitk_font_t *fs = NULL;
+      int          width = 0, i = 0;
+      
+      p += private_data->disp_offset;
 
+      if(private_data->fontname)
+	fs = xitk_font_load_font(private_data->display, private_data->fontname);
+      
+      if(fs == NULL) 
+	fs = xitk_font_load_font(private_data->display, "fixed");
+      
+      if(fs == NULL) {
+	XITK_DIE("%s()@%d: xitk_font_load_font() failed. Exiting\n", __FUNCTION__, __LINE__);
+      }
+      
+      xitk_font_set_font(fs, wl->gc);
+      
+      while(width < pos) {
+	
+	width = xitk_font_get_text_width(fs, p, i);
+	i++;
+      }
+      xitk_font_unload_font(fs);
+      pos = (i-2) + private_data->disp_offset;
+    }
+    
     if(private_data->text) {
       if(pos > strlen(private_data->text))
 	pos = strlen(private_data->text);
@@ -341,7 +430,7 @@ static int notify_click_inputtext(xitk_widget_list_t *wl, xitk_widget_t *it,
     else
       pos = 0;
 
-    private_data->cursor_pos = pos;
+    private_data->cursor_pos = (pos < 0) ? 0 : pos;
 
     paint_inputtext(it, wl->win, wl->gc);
 
@@ -366,10 +455,7 @@ static int notify_focus_inputtext(xitk_widget_list_t *wl,
   if (it->widget_type & WIDGET_TYPE_INPUTTEXT) {
     private_data->have_focus = bEntered;
     if(bEntered == FOCUS_LOST) {
-      private_data->cursor_pos = -1;
-    }
-    else {
-      private_data->cursor_pos = strlen(private_data->text);
+      private_data->cursor_pos = 0;
     }
     paint_inputtext(it, wl->win, wl->gc);
 
@@ -612,7 +698,8 @@ static void inputtext_move_bol(xitk_widget_list_t *wl, xitk_widget_t *it) {
     (inputtext_private_data_t *) it->private_data;
 
   if(private_data->text) {
-    private_data->cursor_pos = 0;
+    private_data->cursor_pos = private_data->disp_offset = 0;
+    inputtext_recalc_offsets(wl, private_data);
     paint_inputtext(it, wl->win, wl->gc);
   }
 }
@@ -626,7 +713,28 @@ static void inputtext_move_eol(xitk_widget_list_t *wl, xitk_widget_t *it) {
 
   if(private_data->text) {
     private_data->cursor_pos = strlen(private_data->text);
+    inputtext_recalc_offsets(wl, private_data);
+    
     paint_inputtext(it, wl->win, wl->gc);
+  }
+}
+
+/*
+ * Transpose two characters.
+ */
+static void inputtext_transpose_chars(xitk_widget_list_t *wl, xitk_widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+  
+  if(private_data->text && (strlen(private_data->text) >= 2)) {
+    if((private_data->cursor_pos >= 2)) {
+      int c = private_data->text[private_data->cursor_pos - 2];
+
+      private_data->text[private_data->cursor_pos - 2] = private_data->text[private_data->cursor_pos - 1];
+      private_data->text[private_data->cursor_pos - 1] = c;
+      
+      paint_inputtext(it, wl->win, wl->gc);
+    }
   }
 }
 
@@ -724,6 +832,14 @@ static void notify_keyevent_inputtext(xitk_widget_list_t *wl,
       case XK_M:
 	if(modifier & MODIFIER_CTRL) {
 	  inputtext_exec_return(wl, it);
+	}
+	break;
+
+	/* Transpose chars */
+      case XK_t:
+      case XK_T:
+	if(modifier & MODIFIER_CTRL) {
+	  inputtext_transpose_chars(wl, it);
 	}
 	break;
 
@@ -867,7 +983,7 @@ xitk_widget_t *xitk_inputtext_create (xitk_skin_config_t *skonfig, xitk_inputtex
   private_data->skin              = xitk_load_image(private_data->imlibdata, 
 						    xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
 
-  private_data->max_visible       = (private_data->skin->width/2) / 6;
+  private_data->max_visible       = (private_data->skin->width/2);
   private_data->disp_offset       = 0;
   
   private_data->callback          = it->callback;
@@ -875,6 +991,9 @@ xitk_widget_t *xitk_inputtext_create (xitk_skin_config_t *skonfig, xitk_inputtex
   
   private_data->normal_color      = xitk_skin_get_label_color(skonfig, private_data->skin_element_name);
   private_data->focused_color     = xitk_skin_get_label_color_focus(skonfig, private_data->skin_element_name);
+
+  private_data->pos_in_pos        = 0;
+  private_data->pos[0]            = 0;
 
   mywidget->private_data          = private_data;
 

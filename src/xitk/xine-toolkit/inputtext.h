@@ -63,6 +63,9 @@ typedef struct {
   int                     max_visible;
   int                     disp_offset;
   int                     cursor_pos;
+  
+  unsigned int            pos[128];
+  int                     pos_in_pos;
 
 } inputtext_private_data_t;
 
