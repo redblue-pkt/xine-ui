@@ -85,6 +85,8 @@ int        no_lirc;
 #endif
 int        unhandled_codec_mode; /* 0 = never, 1 = video, 2 = audio, 3 = always */
 
+#define CONFIGFILE "config2"
+
 
 typedef struct {
   FILE    *fd;
@@ -269,9 +271,26 @@ void show_banner(void) {
  *
  */
 void show_usage (void) {
-  const char *const *driver_ids;
-  const char *driver_id;
-  xine_t            *xine = (xine_t *)xine_new();
+  const char   *const *driver_ids;
+  const char   *driver_id;
+  xine_t       *xine;
+  char         *cfgdir = ".xine";
+  char         *cfgfile = CONFIGFILE;
+  char         *configfile;
+  
+  if(!(configfile = getenv("XINERC"))) {
+    configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
+				       + strlen(cfgdir) 
+				       + strlen(cfgfile)
+				       + 3);
+    sprintf(configfile, "%s/%s", xine_get_homedir(), cfgdir);
+    mkdir(configfile, 0755);
+    sprintf(configfile + strlen(configfile), "/%s", cfgfile);
+  }
+  
+  xine = xine_new();
+  xine_config_load(xine, configfile);
+  xine_init(xine);
   
   printf("\n");
   printf(_("Usage: xine [OPTIONS]... [MRL]\n"));
@@ -944,7 +963,7 @@ int main(int argc, char *argv[]) {
    */
   {
     char *cfgdir = ".xine";
-    char *cfgfile = "config2";
+    char *cfgfile = CONFIGFILE;
     struct stat st;
     
     if (!(gGui->configfile = getenv ("XINERC"))) {
