@@ -158,7 +158,7 @@ static struct option long_options[] = {
   {"disable-post"   , no_argument      , 0, OPTION_DISABLE_POST      },
   {"no-splash"      , no_argument      , 0, OPTION_NO_SPLASH         },
   {"tvout"          , required_argument, 0, 'T'                      },
-  {"list-plugins"   , no_argument      , 0, OPTION_LIST_PLUGINS      },
+  {"list-plugins"   , optional_argument, 0, OPTION_LIST_PLUGINS      },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -429,27 +429,61 @@ static void show_banner(void) {
 
 }
 
-static void list_plugins(void) {
+static void print_formatted(char *title, const char *const *plugins) {
+  const char  *plugin;
+  char         buffer[81];
+  int          len;
+  char        *blanks = "     ";
+
+  printf(title);
+  
+  sprintf(buffer, "%s", blanks);
+  plugin = *plugins++;
+  
+  while(plugin) {
+    
+    len = strlen(buffer);
+    
+    if((len + (strlen(plugin) + 3)) < 80) {
+      sprintf(buffer, "%s%s%s", buffer, 
+	      (strlen(buffer) == strlen(blanks)) ? "" : ", ", plugin);
+    }
+    else {
+      printf(buffer);
+      printf(",\n");
+      sprintf(buffer, "%s%s", blanks, plugin);
+    }
+    
+    plugin = *plugins++;
+  }
+  
+  if(strlen(buffer))
+    printf(buffer);
+  
+  printf(".\n\n");
+}
+static void list_plugins(char *type) {
   typedef struct {
     const char *const *(*func)(xine_t *);
-    char         *name;
+    char                *name;
+    char                *type;
   } _list_plugin_t;
-  const char   *const *plugins;
-  xine_t       *xine;
-  char         *cfgdir     = CONFIGDIR;
-  char         *cfgfile    = CONFIGFILE;
-  char         *configfile = NULL;
-  int           i;
-  _list_plugin_t list_functions[] = {
-    { xine_list_audio_output_plugins,  _("   -Audio output:\n")    },
-    { xine_list_video_output_plugins,  _("   -Video output:\n")    },
-    { xine_list_demuxer_plugins,       _("   -Demuxer:\n")         },
-    { xine_list_input_plugins,         _("   -Input:\n")           },
-    { xine_list_spu_plugins,           _("   -Subpicture:\n")      },
-    { xine_list_post_plugins,          _("   -Post processing:\n") },
-    { xine_list_audio_decoder_plugins, _("   -Audio decoder:\n")  },
-    { xine_list_video_decoder_plugins, _("   -Video decoder:\n")  },
-    { NULL,                            NULL                     }
+  const char   *const  *plugins;
+  xine_t               *xine;
+  char                 *cfgdir     = CONFIGDIR;
+  char                 *cfgfile    = CONFIGFILE;
+  char                 *configfile = NULL;
+  int                   i;
+  _list_plugin_t        list_functions[] = {
+    { xine_list_audio_output_plugins,  _("   -Audio output:\n"),    "audio_out"     },
+    { xine_list_video_output_plugins,  _("   -Video output:\n"),    "video_out"     },
+    { xine_list_demuxer_plugins,       _("   -Demuxer:\n"),         "demux"         },
+    { xine_list_input_plugins,         _("   -Input:\n"),           "input"         },
+    { xine_list_spu_plugins,           _("   -Subpicture:\n"),      "sub"           },
+    { xine_list_post_plugins,          _("   -Post processing:\n"), "post"          },
+    { xine_list_audio_decoder_plugins, _("   -Audio decoder:\n"),   "audio_decoder" },
+    { xine_list_video_decoder_plugins, _("   -Video decoder:\n"),   "video_decoder" },
+    { NULL,                            NULL,                        NULL            }
   };
     
   configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
@@ -465,46 +499,37 @@ static void list_plugins(void) {
   xine_init(xine);
 
   show_version();
-  printf(_("\n Available xine's plugins:\n"));
 
-  i = 0;
-  
-  while(list_functions[i].name) {
-    if((plugins = list_functions[i].func(xine))) {
-      const char  *plugin;
-      char         buffer[81];
-      int          len;
-      char        *blanks = "     ";
-      
-      printf(list_functions[i].name);
-      
-      sprintf(buffer, "%s", blanks);
-      plugin = *plugins++;
-      
-      while(plugin) {
-	
-	len = strlen(buffer);
-	
-	if((len + (strlen(plugin) + 3)) < 80) {
-	  sprintf(buffer, "%s%s%s", buffer, 
-		  (strlen(buffer) == strlen(blanks)) ? "" : ", ", plugin);
-	}
-	else {
-	  printf(buffer);
-	  printf(",\n");
-	  sprintf(buffer, "%s%s", blanks, plugin);
-	}
-	
-	plugin = *plugins++;
-      }
-      
-      if(strlen(buffer))
-	printf(buffer);
-      
-      printf(".\n\n");
-    }
+  if(type && strlen(type)) {
+    i = 0;
     
-    i++;
+    while(list_functions[i].name) {
+      
+      if(!strncasecmp(type, list_functions[i].type, strlen(type))) {
+	if((plugins = list_functions[i].func(xine))) {
+	  printf(_("\n Available xine's plugins:\n"));
+	  print_formatted(list_functions[i].name, plugins);
+	  break;
+	}
+      }
+
+      i++;
+    }
+
+    printf(_("No available plugins found of %s type!.\n"), type);
+  }
+  else {
+    printf(_("\n Available xine's plugins:\n"));
+    
+    i = 0;
+    
+    while(list_functions[i].name) {
+
+      if((plugins = list_functions[i].func(xine)))
+	print_formatted(list_functions[i].name, plugins);
+      
+      i++;
+    }
   }
 
   xine_exit(xine);
@@ -651,7 +676,11 @@ static void show_usage (void) {
       backend = *backends++;
     }
   }
-  printf(_("      --list-plugins           Display the list of all available plugins\n"));
+  printf("\n");
+  printf(_("      --list-plugins [=type]   Display the list of all available plugins,\n"));
+  printf(_("                               Optional <type> can be:\n"));
+  printf(_("                    audio_out, video_out, demux, input, sub, post,\n"));
+  printf(_("                    audio_decoder, video_decoder.\n"));
   printf("\n\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1626,8 +1655,15 @@ int main(int argc, char *argv[]) {
       break;
       
     case OPTION_LIST_PLUGINS:
-      list_plugins();
-      exit(1);
+      {
+	char *p = NULL;
+	
+	if(optarg)
+	  p = xine_chomp(optarg);
+	
+	list_plugins(p);
+	exit(1);
+      }
       break;
 
     default:
