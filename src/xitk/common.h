@@ -59,6 +59,7 @@
 #include "download.h"
 #include "osd.h"
 #include "file_browser.h"
+#include "post.h"
 
 #include "utils.h"
 
@@ -153,6 +154,7 @@ typedef struct {
     
     int                     post_plugin_num;
     xine_post_t            *post_output;
+    int                     post_changed;
     
   } visual_anim;
   

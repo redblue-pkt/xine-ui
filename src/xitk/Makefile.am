@@ -30,6 +30,7 @@ xine_SOURCES = \
 	snapshot.c \
 	panel.c \
 	playlist.c \
+	post.c \
 	mediamark.c \
 	stream_infos.c \
 	videowin.c \
@@ -70,6 +71,7 @@ noinst_HEADERS = \
 	osd.h \
 	panel.h \
 	playlist.h \
+	post.h \
 	mediamark.h \
 	setup.h \
 	skins.h \

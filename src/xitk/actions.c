@@ -84,33 +84,32 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
   int ret;
   int has_video;
   
+  if(gGui->visual_anim.post_changed && (xine_get_status(stream) == XINE_STATUS_STOP)) {
+    post_rewire_visual_anim();
+    gGui->visual_anim.post_changed = 0;
+  }
+  
   if(start_time_in_secs)
     start_time_in_secs *= 1000;
       
   has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
   
   if((has_video && gGui->visual_anim.enabled == 1) && gGui->visual_anim.running) {
-    xine_post_out_t * audio_source;
 
-    audio_source = xine_get_audio_source(stream);
-    if(xine_post_wire_audio_port(audio_source, gGui->ao_port))
+    if(post_rewire_audio_port_to_stream(stream))
       gGui->visual_anim.running = 0;
-    
+
   } else if (!has_video && (gGui->visual_anim.enabled == 1) && 
 	     (gGui->visual_anim.running == 0) && gGui->visual_anim.post_output) {
-    xine_post_out_t * audio_source;
 
-    audio_source = xine_get_audio_source(stream);
-    if(xine_post_wire_audio_port(audio_source, gGui->visual_anim.post_output->audio_input[0]))
+    if(post_rewire_audio_post_to_stream(stream))
       gGui->visual_anim.running = 1;
 
   }
   else if(has_video && gGui->post_video && (gGui->post_video_num > 0)) {
-    xine_post_out_t *video_source;
 
-    video_source = xine_get_video_source(stream);
-    if(xine_post_wire_video_port(video_source, gGui->post_video->video_input[0]))
-      printf("xine_post_wire_video_port() succeed\n");
+    (void) post_rewire_video_post_to_stream(stream);
+
   }
   
   if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0) {
@@ -407,7 +406,8 @@ void gui_stop (xitk_widget_t *w, void *data) {
 
   if(gGui->visual_anim.running) {
     xine_stop(gGui->visual_anim.stream);
-    gGui->visual_anim.running = 0;
+    if(gGui->visual_anim.enabled == 2)
+      gGui->visual_anim.running = 0;
   }
 
   osd_update_status();
