@@ -1,12 +1,12 @@
 # Slovak xine-ui.po file.
 # Copyright (C) 2002 Free Software Foundation, Inc.
-# Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>, 2002.
+# Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>, 2003.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
 "POT-Creation-Date: 2003-02-15 00:05+0100\n"
-"PO-Revision-Date: 2003-01-30 9:20+ZONE\n"
+"PO-Revision-Date: 2003-02-18 12:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
 "MIME-Version: 1.0\n"
@@ -155,9 +155,8 @@ msgid "%s(): couldn't find image for background\n"
 msgstr "%s() : nemô¾em nájs» obrázok na pozadie.\n"
 
 #: src/xitk/control.c:517
-#, fuzzy
 msgid "xine Control Window"
-msgstr "Zavrie» okno nastavenia"
+msgstr "xine ovládanie"
 
 #: src/xitk/control.c:532
 msgid "control: couldn't find image for background\n"
@@ -306,9 +305,8 @@ msgid "A/V offset: %d"
 msgstr "A/V offset: %d"
 
 #: src/xitk/event.c:540
-#, fuzzy
 msgid "A/V Offset: reset."
-msgstr "SPU Offset: reset"
+msgstr "A/V Offset: reset"
 
 #: src/xitk/event.c:548 src/xitk/event.c:557
 #, c-format
@@ -954,9 +952,8 @@ msgid "      --install                Install a private colormap.\n"
 msgstr "      --install                Nain¹talova» osobitnú mapu farieb.\n"
 
 #: src/xitk/main.c:476
-#, fuzzy
 msgid "      --keymap [=option]       Display keymap. Option are:\n"
-msgstr "      --keymap [option]        Zobrazi» kláv. mapu. Mo¾nosti sú :\n"
+msgstr "      --keymap [=voµba]        Zobrazi» kláv. mapu. Voµby sú :\n"
 
 #: src/xitk/main.c:477
 msgid ""
@@ -1022,12 +1019,11 @@ msgid "  -P, --playlist <filename>    Load a playlist file.\n"
 msgstr "  -P, --playlist <menosúboru>    Nahra» playlist.\n"
 
 #: src/xitk/main.c:488
-#, fuzzy
 msgid ""
 "  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes "
 "are:\n"
 msgstr ""
-"  -l, --loop [mód]          Nastavi» mód opakovania playlist-u (default: "
+"  -l, --loop [=mód]          Nastavi» mód opakovania playlist-u (default: "
 "loop). Módy sú:\n"
 
 #: src/xitk/main.c:489
@@ -1297,7 +1293,7 @@ msgstr "Mediamark MRL"
 
 #: src/xitk/mediamark.c:1568
 msgid "Subtitle"
-msgstr "Titulky: "
+msgstr "Titulky"
 
 #: src/xitk/mediamark.c:1583
 msgid "Subtitle File"
@@ -1336,18 +1332,17 @@ msgid "Discard changes and dismiss the window."
 msgstr "Zahodi» zmeny a zavrie» okno"
 
 #: src/xitk/menus.c:491
-#, fuzzy, c-format
+#, c-format
 msgid "xine %s"
-msgstr "nastavenie Xine"
+msgstr "xine %s"
 
 #: src/xitk/mrl_browser.c:193
 msgid "All extensions"
 msgstr "V¹etky prípony"
 
 #: src/xitk/mrl_browser.c:261
-#, fuzzy
 msgid "xine MRL Browser"
-msgstr "Xine MRL prehliadaè"
+msgstr "xine MRL prehliadaè"
 
 #: src/xitk/mrl_browser.c:288
 msgid "Source:"
@@ -1417,9 +1412,8 @@ msgid "Mute toggle"
 msgstr "Vypnú» zvuk"
 
 #: src/xitk/panel.c:852
-#, fuzzy
 msgid "xine Panel"
-msgstr "Xine panel"
+msgstr "xine panel"
 
 #: src/xitk/panel.c:873
 msgid "panel: couldn't find image for background\n"
@@ -1534,9 +1528,8 @@ msgid "Save a playlist"
 msgstr "Ulo¾i» playlist"
 
 #: src/xitk/playlist.c:1006
-#, fuzzy
 msgid "xine Playlist Editor"
-msgstr "Xine Playlist Editor"
+msgstr "xine Playlist Editor"
 
 #: src/xitk/playlist.c:1024
 msgid "playlist: couldn't find image for background\n"
@@ -1800,7 +1793,7 @@ msgstr "Systémová úroveò: "
 #: src/xitk/stream_infos.c:643 src/xitk/stream_infos.c:813
 #: src/xitk/stream_infos.c:958
 msgid "Bitrate: "
-msgstr "Bitová rýchlos»: "
+msgstr "Bit.rýchlos»: "
 
 #: src/xitk/stream_infos.c:656
 msgid "Frame Duration: "
@@ -1808,7 +1801,7 @@ msgstr "Trvanie snímku: "
 
 #: src/xitk/stream_infos.c:671
 msgid "Is Seekable: "
-msgstr "Je mo¾ne sa posúva»: "
+msgstr "Posúvanie: "
 
 #: src/xitk/stream_infos.c:684
 msgid "Has Chapters: "
@@ -1868,11 +1861,11 @@ msgstr "Bitov: "
 
 #: src/xitk/stream_infos.c:985
 msgid "Samplerate: "
-msgstr "Vzorkovacia frekv.: "
+msgstr "Vzork.frekv.: "
 
 #: src/xitk/stream_infos.c:1003
 msgid "Update"
-msgstr "Aktualizácia"
+msgstr "Aktualizova»"
 
 #: src/xitk/videowin.c:184
 msgid "videowin: output driver cannot select a working visual\n"
@@ -1929,19 +1922,16 @@ msgid "height for xinerama fullscreen (-8192 = autodetect)"
 msgstr "vý¹ka pre xinerama pln. obrazovka (-8192 = autodetekcia)"
 
 #: src/xitk/videowin.c:1350
-#, fuzzy
 msgid "xine Video Window"
-msgstr "Xine Video okno"
+msgstr "xine video okno"
 
 #: src/xitk/videowin.c:1354
-#, fuzzy
 msgid "xine Video Fullscreen Window"
-msgstr "Plnoobrazovkový/Okenný re¾im"
+msgstr "xine plnoobrazovkové okno"
 
 #: src/xitk/videowin.c:1358
-#, fuzzy
 msgid "xine Video Borderless Window"
-msgstr "Xine Video okno bez rámu"
+msgstr "xine Video okno bez rámu"
 
 #: src/xitk/videowin.c:1379
 msgid "XAllocWMHints() failed\n"
