@@ -1259,10 +1259,12 @@ void xitk_show_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
     return;
   }
 
-  w->visible = 1;
-  
-  if(w->paint)
-    w->paint(w, wl->win, wl->gc);
+  if(w->visible == 0) {
+    w->visible = 1;
+    
+    if(w->paint)
+      w->paint(w, wl->win, wl->gc);
+  }
 }
 
 /*
@@ -1296,11 +1298,12 @@ void xitk_hide_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
     return;
   }
 
-  w->visible = 0;
-
-  if(w->paint)
-    w->paint(w, wl->win, wl->gc);
-  
+  if(w->visible == 1) {
+    w->visible = 0;
+    
+    if(w->paint)
+      w->paint(w, wl->win, wl->gc);
+  }
 }
 
 /*

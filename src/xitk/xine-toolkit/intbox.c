@@ -54,7 +54,7 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
   
   if(w->widget_type & WIDGET_TYPE_INTBOX) {
 
-    if(w->visible) {
+    if((w->visible == 1)) {
       int bx, ih, iw;
 
       iw = xitk_get_widget_width(private_data->input_widget);

@@ -86,7 +86,7 @@ static int notify_inside(xitk_widget_t *it, int x, int y) {
     (inputtext_private_data_t *) it->private_data;
   
   if(it->widget_type & WIDGET_TYPE_INPUTTEXT) {
-    if(it->visible) {
+    if((it->visible == 1)) {
       xitk_image_t *skin = private_data->skin;
       
       return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, it, skin->mask, x, y);
@@ -358,7 +358,7 @@ static void paint_inputtext(xitk_widget_t *it, Window win, GC gc) {
   GC                  lgc;
   XWindowAttributes   attr;
 
-  if ((it->widget_type & WIDGET_TYPE_INPUTTEXT) && it->visible) {
+  if ((it->widget_type & WIDGET_TYPE_INPUTTEXT) && (it->visible == 1)) {
         
     XGetWindowAttributes(private_data->imlibdata->x.disp, win, &attr);
     
@@ -521,7 +521,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       it->y                       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       it->width                   = private_data->skin->width/2;
       it->height                  = private_data->skin->height;
-      it->visible                 = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      it->visible                 = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       it->enable                  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
      
       xitk_skin_unlock(skonfig);
@@ -1055,7 +1055,7 @@ xitk_widget_t *xitk_inputtext_create (xitk_skin_config_t *skonfig, xitk_inputtex
 				 (xitk_skin_get_label_fontname(skonfig, it->skin_element_name)),
 				 (xitk_skin_get_label_color(skonfig, it->skin_element_name)),
 				 (xitk_skin_get_label_color_focus(skonfig, it->skin_element_name)),
-				 (xitk_skin_get_visibility(skonfig, it->skin_element_name)),
+				 ((xitk_skin_get_visibility(skonfig, it->skin_element_name)) ? 1 : -1),
 				 (xitk_skin_get_enability(skonfig, it->skin_element_name)));
 }
 

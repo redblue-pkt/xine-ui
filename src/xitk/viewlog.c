@@ -377,7 +377,7 @@ static void viewlog_refresh(xitk_widget_t *w, void *data) {
 static void viewlog_create_tabs(void) {
   Pixmap               bg;
   xitk_tabs_widget_t   tab;
-  const char         **log_sections = xine_get_log_names(gGui->xine);
+  char               **log_sections = xine_get_log_names(gGui->xine);
   unsigned int         log_section_count = xine_get_log_section_count(gGui->xine);
   char                *tab_sections[log_section_count + 1];
   int                  i;

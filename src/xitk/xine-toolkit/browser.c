@@ -61,7 +61,7 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
   if(w->widget_type & WIDGET_TYPE_BROWSER) {
     int i;
 
-    if(w->visible) {
+    if((w->visible == 1)) {
       int x     = w->x;
       int y     = w->y;
       int itemw = xitk_get_widget_width(private_data->item_tree[WBSTART]);
@@ -114,7 +114,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       
       x          = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
       y          = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-      w->visible = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      w->visible = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       w->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
@@ -637,7 +637,7 @@ xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_wid
   
   return _xitk_browser_create(skonfig, br, 
 			      0, 0, 0, 0, br->browser.skin_element_name, mywidget, private_data,
-			      xitk_skin_get_visibility(skonfig, br->browser.skin_element_name),
+			      (xitk_skin_get_visibility(skonfig, br->browser.skin_element_name)) ? 1 : -1,
 			      xitk_skin_get_enability(skonfig, br->browser.skin_element_name));
 }
 

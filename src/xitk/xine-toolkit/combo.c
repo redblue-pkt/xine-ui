@@ -75,12 +75,12 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
   combo_private_data_t *private_data = (combo_private_data_t *) w->private_data;
 
   if(w->widget_type & WIDGET_TYPE_COMBO) {
-    if(private_data->visible == 1 && w->visible == 0) {
+    if(private_data->visible == 1 && (w->visible < 1)) {
       xitk_checkbox_set_state(private_data->button_widget, 0,
 			      private_data->parent_wlist->win, private_data->parent_wlist->gc);
       _combo_rollunroll(NULL, (void *)w, 0);
     }
-    if(w->visible) {
+    if((w->visible == 1)) {
       int bx, lw;
 
       lw = xitk_get_widget_width(private_data->label_widget);
@@ -172,7 +172,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 
       xitk_skin_lock(skonfig);
 
-      c->visible = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      c->visible = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       c->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
 
       xitk_set_widget_pos(c, c->x, c->y);
@@ -507,7 +507,7 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
   XUNLOCK(c->imlibdata->x.disp);
 
   return _xitk_combo_create(skonfig, c, c->skin_element_name, mywidget, private_data,
-			    xitk_skin_get_visibility(skonfig, c->skin_element_name),
+			    (xitk_skin_get_visibility(skonfig, c->skin_element_name)) ? 1 : -1,
 			    xitk_skin_get_enability(skonfig, c->skin_element_name));
 }
 

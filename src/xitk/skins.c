@@ -213,13 +213,11 @@ void change_skin(skins_locations_t *sk) {
   //  skonfig = gGui->skin_config;
 
   gGui->skin_config = xitk_skin_init_config();
-  
-    
+
   if(change_config_entry) {
     gGui->config->update_string(gGui->config, "gui.skin", (char *)sk->skin);
   }
-  
-  
+
  __reload_skin:
   memset(&buf, 0, sizeof(buf));
   sprintf(buf, "%s/%s", sks->pathname, sks->skin);

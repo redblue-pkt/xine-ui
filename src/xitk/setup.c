@@ -790,7 +790,7 @@ static widget_triplet_t *setup_list_browser(int x, int y, char **content, int le
 /*
  *
  */
-static void setup_section_widgets (int s) {
+static void setup_section_widgets(int s) {
   int                  x = ((WINDOW_WIDTH>>1) - (FRAME_WIDTH>>1) - 10);
   int                  y = 70;
   cfg_entry_t         *entry;
@@ -866,6 +866,7 @@ static void setup_section_widgets (int s) {
       
       entry = entry->next;
     }
+
   }
 }
 
@@ -939,18 +940,39 @@ static void setup_sections (void) {
 	  break;
 	}
       }
-      
-      if (!found) {
 
-	setup->sections[setup->num_sections] = xine_xmalloc (len+1);
-	strncpy (setup->sections[setup->num_sections], entry->key, len);
-	setup->sections[setup->num_sections][len] = 0;
-	setup->num_sections++;
+      /* 
+       * Only add a tab for non-empty sections (we don't need to handle
+       * sinek/gnome-xine/etc... specific entries)
+       */
+      if (!found) {
+	cfg_entry_t *check_entry = gGui->config->first;
+	int          num_entries = 0;
+	
+	while (check_entry) {
+	  
+	  if(!strncmp(check_entry->key, entry->key, len) && check_entry->description) {
+	    switch(check_entry->type) {
+	    default:
+	      num_entries++;
+	      break;
+	    }
+	  }
+	  check_entry = check_entry->next;
+	}
+	
+	if(num_entries) {
+	  setup->sections[setup->num_sections] = xine_xmalloc (len + 1);
+	  strncpy (setup->sections[setup->num_sections], entry->key, len);
+	  setup->sections[setup->num_sections][len] = 0;
+	  setup->num_sections++;
+	}
       }
     }      
-
+    
     entry = entry->next;
   }
+
   setup->sections[setup->num_sections] = strdup(_("Help"));
   setup->num_sections++;
   setup->sections[setup->num_sections] = strdup(_("README"));

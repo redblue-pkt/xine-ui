@@ -125,7 +125,8 @@ void panel_change_skins(void) {
 
   XLockDisplay(gGui->display);
   
-  XUnmapWindow(gGui->display, gGui->panel_window);
+  if(panel->visible)
+    XUnmapWindow(gGui->display, gGui->panel_window);
   
   if(!(new_img = Imlib_load_image(gGui->imlib_data,
 				  xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
@@ -136,13 +137,14 @@ void panel_change_skins(void) {
   XResizeWindow (gGui->display, gGui->panel_window,
 		 (unsigned int)new_img->rgb_width,
 		 (unsigned int)new_img->rgb_height);
-
+  
   old_img = panel->bg_image;
   panel->bg_image = new_img;
   
   Imlib_destroy_image(gGui->imlib_data, old_img);
   
   XMapRaised(gGui->display, gGui->panel_window); 
+  
   XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
   
   do  {
@@ -151,8 +153,12 @@ void panel_change_skins(void) {
   
   Imlib_apply_image(gGui->imlib_data, new_img, gGui->panel_window);
   
+  /* Video window was hidded, hide it again */
+  if(!panel->visible)
+    XUnmapWindow(gGui->display, gGui->panel_window);
+  
   XUnlockDisplay(gGui->display);
-
+  
   xitk_skin_unlock(gGui->skin_config);
   
   xitk_change_skins_widget_list(panel->widget_list, gGui->skin_config);
@@ -176,7 +182,6 @@ void panel_change_skins(void) {
   }
 
   xitk_paint_widget_list(panel->widget_list);
-
 }
 
 /*

@@ -103,7 +103,7 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
   int                   x_dest, y_dest, nCWidth, nCHeight, len, i;
   char                 *label_to_display;
 
-  if ((l->widget_type & WIDGET_TYPE_LABEL) && l->visible) {
+  if ((l->widget_type & WIDGET_TYPE_LABEL) && (l->visible == 1)) {
 
     /* non skinable widget */
     if(private_data->skin_element_name == NULL) {
@@ -195,7 +195,7 @@ void *xitk_label_animation_loop(void *data) {
 
   do {
     
-    if(w->visible) {
+    if((w->visible == 1)) {
 
       private_data->anim_offset++;
       if (private_data->anim_offset>(strlen(private_data->label) + 4))
@@ -321,7 +321,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       l->y                      = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       l->width                  = private_data->char_length * private_data->length;
       l->height                 = private_data->char_height;
-      l->visible                = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      l->visible                = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       l->enable                 = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       xitk_skin_unlock(skonfig);
@@ -446,7 +446,7 @@ xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_
 			    -1,
 			    l->skin_element_name, 
 			    NULL,
-			    (xitk_skin_get_visibility(skonfig, l->skin_element_name)),
+			    ((xitk_skin_get_visibility(skonfig, l->skin_element_name)) ? 1 : -1),
 			    (xitk_skin_get_enability(skonfig, l->skin_element_name)));
 }
 

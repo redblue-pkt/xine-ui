@@ -1186,7 +1186,7 @@ static void paint_image (xitk_widget_t *i, Window win, GC gc) {
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
   
-  if ((i->widget_type & WIDGET_TYPE_IMAGE) && i->visible) {
+  if ((i->widget_type & WIDGET_TYPE_IMAGE) && (i->visible == 1)) {
 
     skin = private_data->skin;
     
@@ -1218,7 +1218,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   image_private_data_t *private_data = 
     (image_private_data_t *) i->private_data;
   
-  if ((i->widget_type & WIDGET_TYPE_IMAGE) && i->visible) {
+  if ((i->widget_type & WIDGET_TYPE_IMAGE) && (i->visible == 1)) {
     if(private_data->skin_element_name) {
       
       xitk_skin_lock(skonfig);

@@ -67,7 +67,7 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 static void tabs_arrange(xitk_widget_t *w) {
   tabs_private_data_t  *private_data;
 
-  if((w->widget_type & WIDGET_TYPE_TABS) && (w->visible)) {
+  if((w->widget_type & WIDGET_TYPE_TABS) && (w->visible == 1)) {
     int i = 0, width, x;
     
     private_data = (tabs_private_data_t*) w->private_data;
@@ -145,7 +145,7 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
 
   if(w->widget_type & WIDGET_TYPE_TABS) {
     private_data = (tabs_private_data_t*)w->private_data;
-    if(w->visible) {
+    if((w->visible == 1)) {
       tabs_arrange(w);
       if(private_data->old_offset == -2)
 	private_data->old_offset = private_data->offset;

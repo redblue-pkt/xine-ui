@@ -83,7 +83,7 @@ static int notify_inside(xitk_widget_t *lb, int x, int y) {
     (lbutton_private_data_t *) lb->private_data;
   
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
-    if(lb->visible) {
+    if((lb->visible == 1)) {
       xitk_image_t *skin = private_data->skin;
       
       return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, lb, skin->mask, x, y);
@@ -217,7 +217,7 @@ static void paint_labelbutton (xitk_widget_t *lb, Window win, GC gc) {
   Pixmap       btn, bgtmp;
   XWindowAttributes attr;
 
-  if ((lb->widget_type & WIDGET_TYPE_LABELBUTTON) && lb->visible) {
+  if ((lb->widget_type & WIDGET_TYPE_LABELBUTTON) && (lb->visible == 1)) {
     
     XLOCK(private_data->imlibdata->x.disp);
 
@@ -430,7 +430,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       lb->y                    = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       lb->width                = private_data->skin->width/3;
       lb->height               = private_data->skin->height;
-      lb->visible              = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      lb->visible              = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       lb->enable               = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       xitk_skin_unlock(skonfig);
@@ -595,7 +595,7 @@ xitk_widget_t *xitk_labelbutton_create (xitk_skin_config_t *skonfig, xitk_labelb
 		  (xitk_skin_get_label_color_click(skonfig, b->skin_element_name)),
 		  (xitk_skin_get_label_fontname(skonfig, b->skin_element_name)),
 		  (xitk_skin_get_label_printable(skonfig, b->skin_element_name)),
-		  (xitk_skin_get_visibility(skonfig, b->skin_element_name)),
+		  ((xitk_skin_get_visibility(skonfig, b->skin_element_name)) ? 1 : -1),
 		  (xitk_skin_get_enability(skonfig, b->skin_element_name)));
 }
 

@@ -84,8 +84,10 @@ void *xine_lirc_loop(void *dummy) {
 #endif
 
 	k = kbindings_lookup_action(gGui->kbindings, c);
-	if(k)
+	if(k) {
+	  /* FIXME: Need to add synthetic Expose events on few cases */
 	  gui_execute_action_id((kbindings_get_action_id(k)));
+	}
 	
       }
       xitk_paint_widget_list (panel->widget_list);

@@ -70,7 +70,7 @@ static int notify_inside(xitk_widget_t *c, int x, int y) {
     (checkbox_private_data_t *) c->private_data;
   
   if(c->widget_type & WIDGET_TYPE_CHECKBOX) {
-    if(c->visible) {
+    if((c->visible == 1)) {
       xitk_image_t *skin = private_data->skin;
       
       return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, c, skin->mask, x, y);
@@ -92,7 +92,7 @@ static void paint_checkbox (xitk_widget_t *c, Window win, GC gc) {
   int           checkbox_width;
   xitk_image_t  *skin;
   
-  if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && c->visible) {
+  if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && (c->visible == 1)) {
     
     skin           = private_data->skin;
     checkbox_width = skin->width / 3;
@@ -195,7 +195,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       c->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       c->width           = private_data->skin->width/3;
       c->height          = private_data->skin->height;
-      c->visible         = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      c->visible         = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1: -1;
       c->enable          = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
 
       xitk_skin_unlock(skonfig);
@@ -314,7 +314,7 @@ xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_
 			       cb->skin_element_name,
 			       (xitk_image_load_image(cb->imlibdata,
 						      xitk_skin_get_skin_filename(skonfig, cb->skin_element_name))),
-			       xitk_skin_get_visibility(skonfig, cb->skin_element_name),
+			       (xitk_skin_get_visibility(skonfig, cb->skin_element_name)) ? 1 : -1,
 			       xitk_skin_get_enability(skonfig, cb->skin_element_name));
 
 }

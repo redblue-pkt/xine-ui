@@ -200,7 +200,7 @@ static int notify_inside(xitk_widget_t *sl, int x, int y) {
   slider_private_data_t *private_data = (slider_private_data_t *) sl->private_data;
 
   if(sl->widget_type & WIDGET_TYPE_SLIDER) {
-    if(sl->visible) {
+    if((sl->visible == 1)) {
       xitk_image_t *skin;
       
       if(private_data->paddle_cover_bg == 1)
@@ -227,7 +227,7 @@ static void paint_slider(xitk_widget_t *sl, Window win, GC gc) {
   xitk_image_t           *bg = (xitk_image_t *) private_data->bg_skin;
   xitk_image_t           *paddle = (xitk_image_t *) private_data->paddle_skin;
   
-  if((sl->widget_type & WIDGET_TYPE_SLIDER) && sl->visible) {
+  if((sl->widget_type & WIDGET_TYPE_SLIDER) && (sl->visible == 1)) {
     int    x, y, srcx1, srcx2, destx1, srcy1, srcy2, desty1;
     int    xcenter, ycenter;
     int    paddle_width;
@@ -402,7 +402,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       sl->y       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       sl->width   = private_data->bg_skin->width;
       sl->height  = private_data->bg_skin->height;
-      sl->visible = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      sl->visible = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       sl->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       xitk_skin_unlock(skonfig);
@@ -737,7 +737,7 @@ xitk_widget_t *xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widge
 						    xitk_skin_get_slider_skin_filename(skonfig, s->skin_element_name))),
 			     (xitk_skin_get_slider_type(skonfig, s->skin_element_name)),
 			     (xitk_skin_get_slider_radius(skonfig, s->skin_element_name)),
-			     (xitk_skin_get_visibility(skonfig, s->skin_element_name)),
+			     ((xitk_skin_get_visibility(skonfig, s->skin_element_name)) ? 1 : -1),
 			     (xitk_skin_get_enability(skonfig, s->skin_element_name)));
 }
 

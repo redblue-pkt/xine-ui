@@ -72,7 +72,7 @@ static int notify_inside(xitk_widget_t *b, int x, int y) {
     (button_private_data_t *) b->private_data;
 
   if(b->widget_type & WIDGET_TYPE_BUTTON) {
-    if(b->visible) {
+    if((b->visible == 1)) {
       xitk_image_t *skin = private_data->skin;
       
       return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, b, skin->mask, x, y);
@@ -94,7 +94,7 @@ static void paint_button (xitk_widget_t *b, Window win, GC gc) {
   int                 button_width;
   xitk_image_t       *skin;
 
-  if((b->widget_type & WIDGET_TYPE_BUTTON) && b->visible) {
+  if((b->widget_type & WIDGET_TYPE_BUTTON) && (b->visible == 1)) {
 
     skin         = private_data->skin;
     button_width = skin->width / 3;
@@ -153,7 +153,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       b->width                        = private_data->skin->width/3;
       b->height                       = private_data->skin->height;
       
-      b->visible                      = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      b->visible                      = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       b->enable                       = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
     
       xitk_skin_unlock(skonfig);
@@ -269,7 +269,7 @@ xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widg
 			     b->skin_element_name,
 			     xitk_image_load_image(b->imlibdata,
 						   (xitk_skin_get_skin_filename(skonfig, b->skin_element_name))),
-			     xitk_skin_get_visibility(skonfig, b->skin_element_name),
+			     (xitk_skin_get_visibility(skonfig, b->skin_element_name)) ? 1 : -1,
 			     xitk_skin_get_enability(skonfig, b->skin_element_name));
 }
 
