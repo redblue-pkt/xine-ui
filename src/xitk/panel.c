@@ -574,38 +574,45 @@ void panel_add_autoplay_buttons(void) {
   int                        i = 0;
   xitk_labelbutton_widget_t  lb;
   const char *const         *autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+  const char                *autoplay_label;
   
   XITK_WIDGET_INIT(&lb, gGui->imlib_data);
 
   x = xitk_skin_get_coord_x(gGui->skin_config, "AutoPlayGUI");
   y = xitk_skin_get_coord_y(gGui->skin_config, "AutoPlayGUI");
   
-  while(autoplay_plugins[i] != NULL) {
-
-    lb.skin_element_name = "AutoPlayGUI";
-    lb.button_type       = CLICK_BUTTON;
-    lb.label             = autoplay_plugins[i];
-    lb.callback          = pl_scan_input;
-    lb.state_callback    = NULL;
-    lb.userdata          = NULL;
-    xitk_list_append_content (panel->widget_list->l,
-	     (panel->autoplay_plugins[i] =
-	      xitk_labelbutton_create (panel->widget_list, gGui->skin_config, &lb)));
-    xitk_set_widget_tips(panel->autoplay_plugins[i], 
-		 xine_get_input_plugin_description(gGui->xine, (char *)autoplay_plugins[i]));
-
-    if(!panel->tips.enable)
-      xitk_disable_widget_tips(panel->autoplay_plugins[i]);
-
-    (void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
-
-    x -= xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
-    i++;
+  if(autoplay_plugins) {
+    autoplay_label = *autoplay_plugins++;
+    while(autoplay_label) {
+      
+      lb.skin_element_name = "AutoPlayGUI";
+      lb.button_type       = CLICK_BUTTON;
+      lb.label             = (char *)autoplay_label;
+      lb.callback          = pl_scan_input;
+      lb.state_callback    = NULL;
+      lb.userdata          = NULL;
+      xitk_list_append_content (panel->widget_list->l,
+				(panel->autoplay_plugins[i] =
+				 xitk_labelbutton_create (panel->widget_list, 
+							  gGui->skin_config, &lb)));
+      xitk_set_widget_tips(panel->autoplay_plugins[i], 
+			   xine_get_input_plugin_description(gGui->xine, autoplay_label));
+      
+      if(!panel->tips.enable)
+	xitk_disable_widget_tips(panel->autoplay_plugins[i]);
+      
+      (void) xitk_set_widget_pos(panel->autoplay_plugins[i], x, y);
+      
+      x -= xitk_get_widget_width(panel->autoplay_plugins[i]) + 1;
+      i++;
+      
+      autoplay_label = *autoplay_plugins++;
+    }
   }
-
+  
   if(i)
     panel->autoplay_plugins[i+1] = NULL;
-
+  
 }
 
 /*

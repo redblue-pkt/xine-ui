@@ -266,9 +266,9 @@ void show_banner(void) {
  *
  */
 void show_usage (void) {
-  char  **driver_ids;
-  char    *driver_id;
-  xine_t  *xine = (xine_t *)xine_new();
+  const char *const *driver_ids;
+  const char *driver_id;
+  xine_t            *xine = (xine_t *)xine_new();
   
   printf("\n");
   printf(_("Usage: xine [OPTIONS]... [MRL]\n"));
@@ -277,7 +277,7 @@ void show_usage (void) {
   printf(_("  -v, --version                Display version.\n"));
   printf(_("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n"));
   printf("                               ");
-  driver_ids = (char **)xine_list_video_output_plugins (xine);
+  driver_ids = xine_list_video_output_plugins (xine);
   driver_id  = *driver_ids++;
   while (driver_id) {
     printf ("%s ", driver_id);
@@ -287,7 +287,7 @@ void show_usage (void) {
 
   printf(_("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n"));
   printf("                               null ");
-  driver_ids = (char **)xine_list_audio_output_plugins (xine);
+  driver_ids = xine_list_audio_output_plugins (xine);
   driver_id  = *driver_ids++;
   while (driver_id) {
     printf ("%s ", driver_id);
@@ -471,7 +471,7 @@ static const xine_ao_driver_t *load_audio_out_driver(char *audio_driver_id) {
     audio_driver_id = (char *)default_driver;
 
   /* probe ? */
-  if (!strncmp (audio_driver_id, "auto",4)) {
+  if (!strncmp (audio_driver_id, "auto", 4)) {
     const char *const *driver_ids = xine_list_audio_output_plugins (gGui->xine);
     int         i = 0;
     
