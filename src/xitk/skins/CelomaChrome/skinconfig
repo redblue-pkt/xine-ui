@@ -1,6 +1,6 @@
 #Xine skin data file
 # revision 0.4
-skin.name    = CelomaMdk
+skin.name    = CelomaChrome
 skin.version = 1
 skin.date    = 08.04.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
@@ -18,9 +18,9 @@ skin.BackGround {
 skin.Close {
 	coords {
 	  x = 183
-	  y = 54
+	  y = 40
 	}
-	pixmap = MainButton.png
+	pixmap = HideBtn.png
 }
 
 skin.Eject {
@@ -44,15 +44,15 @@ skin.Setup {
 	  x = 218
 	  y = 24
 	}
-	pixmap = MainButton.png
+	pixmap = SetupBtn.png
 }
 
 skin.FullScreen {
 	coords {
 	  x = 148
-	  y = 54
+	  y = 40
 	}
-	pixmap = MainButton.png
+	pixmap = FsBtn.png
 }
 
 skin.TitleLabel {
@@ -208,7 +208,7 @@ skin.SliderVol {
 	slider {
 	  pixmap = MainVolumePad.png
 	  type = rotate
-	  radius = 25
+	  radius = 28
 	}
 
 }
@@ -216,9 +216,9 @@ skin.SliderVol {
 skin.Snapshot {
 	coords {
 	  x = 218
-	  y = 54
+	  y = 40
 	}
-	pixmap = MainButton.png
+	pixmap = SnapBtn.png
 }
 
 skin.AutoPlayGUI {
@@ -228,9 +228,9 @@ skin.AutoPlayGUI {
 	}
 	pixmap = MainAutoButton.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
 	}
 }
@@ -240,7 +240,7 @@ skin.PlBtn {
 	  x = 113
 	  y = 24
 	}
-	pixmap = MainButton.png
+	pixmap = PlBtn.png
 }
 
 skin.CtlBtn {
@@ -248,7 +248,7 @@ skin.CtlBtn {
 	  x = 183
 	  y = 24
 	}
-	pixmap = MainButton.png
+	pixmap = CtlBtn.png
 }
 
 skin.MrlBtn {
@@ -256,7 +256,7 @@ skin.MrlBtn {
 	  x = 148
 	  y = 24
 	}
-	pixmap = MainButton.png
+	pixmap = MrlBtn.png
 }
 
 skin.SliderPlay {
@@ -287,9 +287,9 @@ skin.PlAdd {
 	}
 	pixmap = Onglet.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
 	}
 }
@@ -301,9 +301,9 @@ skin.PlLoad {
 	}
 	pixmap = Onglet.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
 	}
 }
@@ -315,9 +315,9 @@ skin.PlSave {
 	}
 	pixmap = Onglet.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
 	}
 }
@@ -329,9 +329,9 @@ skin.PlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	label {
-	  color = #f5d500
-	  color_focus = #f5d500
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #adc9ff
+	  color_click = #303947
 	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
 	}
 }
@@ -383,9 +383,9 @@ skin.PlDismiss {
 	}
 	pixmap = PlDismiss.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
 	}
 }
@@ -438,9 +438,9 @@ skin.AutoPlayBG {
 	}
 	pixmap =  Onglet.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
 	}
 }
@@ -452,9 +452,9 @@ skin.PlInputText {
 	}
 	pixmap = PlInputTxt.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
 	}
 }
@@ -626,9 +626,9 @@ skin.CtlSkItemBtn {
 	}
 	pixmap = SkItemBtn.png
 	label {
-	  color = #f5d500
-	  color_focus = #f5d500
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #adc9ff
+	  color_click = #303947
 	  font = *-lucida-*-i-*-*-8-*-*-*-*-*-*-*
 	}
 }
@@ -663,9 +663,9 @@ skin.MrlItemBtn {
 	}
 	pixmap = PlItemBtn.png
 	label {
-	  color = #f5d500
-	  color_focus = #f5d500
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #adc9ff
+	  color_click = #303947
 	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
 	}
 }
@@ -677,9 +677,9 @@ skin.MrlSelect {
 	}
 	pixmap = MrlSelect.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
 	}
 }
@@ -699,9 +699,9 @@ skin.MrlDismiss {
 	}
 	pixmap = MrlDismiss.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-8-*-*-*-*-*-*-*
 	}
 }
@@ -754,9 +754,9 @@ skin.MrlPlugNameBG {
 	}
 	pixmap = Onglet.png
 	label {
-	  color = #f5d500
-	  color_focus = #383800
-	  color_click = #383800
+	  color = #adc9ff
+	  color_focus = #303947
+	  color_click = #303947
 	  font = -*-courier-*-*-*-10-*-*-*-*-*-*-*
 	}
 }

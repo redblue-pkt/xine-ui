@@ -1,8 +1,8 @@
 #Xine skin data file
-# revision 0.3
+# revision 0.4
 skin.name    = CelomaGold
 skin.version = 1
-skin.date    = 22.02.2002
+skin.date    = 08.04.2002
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
 
@@ -57,11 +57,11 @@ skin.FullScreen {
 
 skin.TitleLabel {
 	coords {
-	  x = 262
-	  y = 29
+	  x = 264
+	  y = 28
 	}
 	label {
-	  length = 45
+	  length = 37
 	  animation = True
 	  pixmap = LettersMiddle.png
 	}
@@ -736,12 +736,12 @@ skin.MrlDn {
 
 skin.MrlCurOrigin {
 	coords {
-	  x = 110
+	  x = 124
 	  y = 150
 	}
 
 	label {
-	  length = 38
+	  length = 30
 	  animation = True
 	pixmap = LettersMiddle.png
 	}
