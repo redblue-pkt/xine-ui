@@ -682,8 +682,10 @@ static void handle_dbl_click(xitk_widget_t *w, void *data, int selected) {
   XUNLOCK(private_data->imlibdata->x.disp);
 
   xitk_get_key_modifier(&xev, &modifier);
-
-  if(modifier & MODIFIER_META)
+  
+  if((modifier & MODIFIER_CTRL) && (modifier & MODIFIER_SHIFT))
+    mrlbrowser_select_mrl(private_data, selected, 1, 1);
+  else if(modifier & MODIFIER_CTRL)
     mrlbrowser_select_mrl(private_data, selected, 1, 0);
   else
     mrlbrowser_select_mrl(private_data, selected, 0, 1);
