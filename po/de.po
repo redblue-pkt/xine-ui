@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
 "POT-Creation-Date: 2002-04-26 15:31+0200\n"
-"PO-Revision-Date: 2002-04-07 17:22+0200\n"
+"PO-Revision-Date: 2002-04-28 08:54+0200\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -79,7 +79,7 @@ msgid "Error"
 msgstr "Fehler"
 
 #: src/xitk/errors.c:183
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -89,9 +89,10 @@ msgstr ""
 "- xine Basis Fehler -\n"
 "\n"
 "Es ist kein Eingabe-Plugin vorhanden um '%s' zu nutzen.\n"
+"Vielleicht ist die MRL falsch oder die Datei/Datenstrom existieren nicht."
 
 #: src/xitk/errors.c:189
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -100,10 +101,10 @@ msgid ""
 msgstr ""
 "- xine Basis Fehler -\n"
 "\n"
-"Es ist kein Eingabe-Plugin vorhanden um '%s' zu nutzen.\n"
+"Es ist kein demuxer-Plugin vorhanden um '%s' zu nutzen.\n"
+"In der Regel bedeutet dies, daﬂ das Dateiformat nicht erkannt wurde."
 
 #: src/xitk/errors.c:194
-#, fuzzy, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -111,7 +112,7 @@ msgid ""
 msgstr ""
 "- xine Basis Fehler -\n"
 "\n"
-"!! Unbekannter Fehler !!\n"
+"demuxer Fehler. Ist '%s' vielleicht kaputt?\n"
 
 #: src/xitk/errors.c:199
 msgid ""
