@@ -226,11 +226,22 @@ int post_rewire_audio_post_to_stream(xine_stream_t *stream) {
 
 static void _pplugin_unwire(void) {
   xine_post_out_t  *vo_source;
-
+  int               paused = 0;
+  
   vo_source = xine_get_video_source(gGui->stream);
+
+  if((paused = (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
+    xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
+  
   (void) xine_post_wire_video_port(vo_source, gGui->vo_port);
+  
+  if(paused)
+    xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+  
   /* Waiting a small chunk of time helps to avoid crashing */
   xine_usec_sleep(500000);
+  
+
 }
 
 static void _pplugin_rewire(void) {
@@ -244,6 +255,10 @@ static void _pplugin_rewire(void) {
       post_num--;
     
     if(post_num) {
+      int paused = 0;
+      
+      if((paused = (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
+	xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
       
       for(i = (post_num - 1); i >= 0; i--) {
 	const char *const *outs = xine_post_list_outputs(pplugin->post_objects[i]->post);
@@ -274,6 +289,10 @@ static void _pplugin_rewire(void) {
 
       vo_source = xine_get_video_source(gGui->stream);
       xine_post_wire_video_port(vo_source, pplugin->post_objects[0]->post->video_input[0]);
+      
+      if(paused)
+	xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+
     }
   }
 }
@@ -1357,6 +1376,10 @@ void pplugin_rewire_posts(void) {
     if(gGui->post_enable) {
       xine_post_out_t   *vo_source;
       int                i = 0;
+      int                paused = 0;
+      
+      if((paused = (xine_get_param(gGui->stream, XINE_PARAM_SPEED) == XINE_SPEED_PAUSE)))
+	xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_SLOW_4);
       
       for(i = (gGui->post_elements_num - 1); i >= 0; i--) {
 	const char *const *outs = xine_post_list_outputs(gGui->post_elements[i]->post);
@@ -1374,6 +1397,10 @@ void pplugin_rewire_posts(void) {
       
       vo_source = xine_get_video_source(gGui->stream);
       xine_post_wire_video_port(vo_source, gGui->post_elements[0]->post->video_input[0]);
+
+      if(paused)
+ 	xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+
     }
   }
 }
