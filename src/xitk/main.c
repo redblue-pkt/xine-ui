@@ -386,13 +386,8 @@ static void load_video_out_driver(const char *video_driver_id) {
 					       video_driver_id,
 					       XINE_VISUAL_TYPE_X11,
 					       (void *) &vis);
-      if (gGui->vo_driver) {
-        entry = xine_config_lookup_entry(gGui->xine, "video.driver");
-	free(entry->str_value);
-	entry->str_value = strdup(video_driver_id);
-	xine_config_update_entry (gGui->xine, entry);
+      if (gGui->vo_driver)
 	return;
-      } 
     }
     
     i = 0;
@@ -520,12 +515,6 @@ static const xine_ao_driver_t *load_audio_out_driver(const char *audio_driver_id
 		audio_driver_id);
 	exit(1);
       }
-
-      entry = xine_config_lookup_entry(gGui->xine, "audio.driver");
-      free(entry->str_value);
-      entry->str_value = strdup(audio_driver_id);
-      xine_config_update_entry (gGui->xine, entry);
-      
     }
   }
 
