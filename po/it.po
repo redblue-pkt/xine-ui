@@ -3,18 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER.
 # Giovanni Venturi <jumpyj@libero.it>, 2003.
+# Giovanni Venturi <jumpyj@tiscali.it>, 2003.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui\n"
 "POT-Creation-Date: 2003-11-02 19:43+0100\n"
-"PO-Revision-Date: 2003-10-18 22:19+0200\n"
-"Last-Translator: Giovanni Venturi <jumpyj@libero.it>\n"
+"PO-Revision-Date: 2003-11-09 22:50+0100\n"
+"Last-Translator: Giovanni Venturi <jumpyj@tiscali.it>\n"
 "Language-Team: Italiano <kde-i18n-it@mail.kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.2\n"
+"X-Generator: KBabel 1.0.2\n"
 
 #: src/xitk/actions.c:340
 #, c-format
@@ -141,6 +142,8 @@ msgid ""
 "For security reason, you're not allowed to change the configuration entry "
 "named '%s'."
 msgstr ""
+"Per motivi di sicurezza non ti è permesso di cambiare la voce di "
+"configurazione nominata '%s'."
 
 #: src/xitk/control.c:270
 msgid "hue value"
@@ -771,16 +774,15 @@ msgstr "Crea una directory"
 
 #: src/xitk/help.c:124
 msgid "Undefined"
-msgstr ""
+msgstr "Non definito"
 
 #: src/xitk/help.c:331 src/xitk/post.c:1143
 msgid "Help"
 msgstr "Aiuto"
 
 #: src/xitk/help.c:356
-#, fuzzy
 msgid "No Help Section Available"
-msgstr "Nessuna descrizione disponibile"
+msgstr "Nessuna sessione di aiuto disponibile"
 
 #: src/xitk/kbindings.c:467
 #, c-format
@@ -1609,14 +1611,12 @@ msgstr ""
 "caricherà automaticamente la precedente playlist."
 
 #: src/xitk/main.c:1646
-#, fuzzy
 msgid "Subtitle autoloading"
-msgstr "File sottotitoli"
+msgstr "Caricamento automatico sottotitolo"
 
 #: src/xitk/main.c:1647
-#, fuzzy
 msgid "Automatically load subtitles if they exist."
-msgstr "Ricarica automaticamente la vecchia playlist"
+msgstr "Carica automaticamente i sottotitoli se esistono."
 
 #: src/xitk/main.c:1782
 msgid "Logo mrl"
@@ -1758,9 +1758,8 @@ msgid "Playback/Pause"
 msgstr "Riproduzione/Pausa"
 
 #: src/xitk/menus.c:438 src/xitk/menus.c:447
-#, fuzzy
 msgid "Playback/SEP"
-msgstr "Riproduzione"
+msgstr "Riproduzione/SEP"
 
 #: src/xitk/menus.c:441
 msgid "Playback/Next MRL"
@@ -1783,7 +1782,6 @@ msgid "Playlist"
 msgstr "Playlist"
 
 #: src/xitk/menus.c:459 src/xitk/menus.c:668
-#, fuzzy
 msgid "Playlist/Get from"
 msgstr "Playlist/Preleva da..."
 
@@ -1828,28 +1826,24 @@ msgid "Menus"
 msgstr "Menu"
 
 #: src/xitk/menus.c:495
-#, fuzzy
 msgid "Menus/Navigation..."
-msgstr "Apri/Indirizzo..."
+msgstr "Menu/Navigazione..."
 
 #: src/xitk/menus.c:498
-#, fuzzy
 msgid "Menus/SEP"
-msgstr "Menu"
+msgstr "Menu/SEP"
 
 #: src/xitk/menus.c:504
 msgid "Stream"
 msgstr "Stream"
 
 #: src/xitk/menus.c:507
-#, fuzzy
 msgid "Stream/Information..."
-msgstr "Informazioni stream"
+msgstr "Stream/Informazioni..."
 
 #: src/xitk/menus.c:510
-#, fuzzy
 msgid "Stream/Information (OSD)"
-msgstr "Informazioni stream"
+msgstr "Stream/Informazioni (OSD)"
 
 #: src/xitk/menus.c:513
 msgid "Fullscreen\\/Window"
@@ -1912,9 +1906,8 @@ msgid "Video/Postprocess/Chain Reaction..."
 msgstr "Video/Post processo/Catena di Reazione..."
 
 #: src/xitk/menus.c:561
-#, fuzzy
 msgid "Video/Postprocess/Enable Postprocessing"
-msgstr "Video/Post processo/Abilita"
+msgstr "Video/Post processo/Abilita post processo"
 
 #: src/xitk/menus.c:567
 msgid "Audio/Volume"
@@ -1969,14 +1962,12 @@ msgid "Settings/TV Analog..."
 msgstr "Impostazioni/TV Analogica..."
 
 #: src/xitk/menus.c:617
-#, fuzzy
 msgid "Help..."
-msgstr "Aiuto"
+msgstr "Aiuto..."
 
 #: src/xitk/menus.c:620
-#, fuzzy
 msgid "Logs..."
-msgstr "Impostazioni/Log..."
+msgstr "Log..."
 
 #: src/xitk/menus.c:626 src/xitk/panel.c:1159
 msgid "Quit"
@@ -2309,9 +2300,8 @@ msgid "Entered value is out of bounds (%e>%e<%e)."
 msgstr "Inserito valore fuori dai limiti (%e>%e<%e)."
 
 #: src/xitk/post.c:589
-#, fuzzy
 msgid "parameter type POST_PARAM_TYPE_STRING not supported yet.\n"
-msgstr "tipo paramentro POST_PARAM_TYPE_STRING) non ancora supportato.\n"
+msgstr "tipo paramentro POST_PARAM_TYPE_STRING non ancora supportato.\n"
 
 #: src/xitk/post.c:599
 msgid "parameter type POST_PARAM_TYPE_STRINGLIST not supported yet.\n"
@@ -2327,7 +2317,7 @@ msgstr "Nessun filtro"
 
 #: src/xitk/post.c:994
 msgid "Plugin Help"
-msgstr ""
+msgstr "Aiuto plugin"
 
 #: src/xitk/post.c:1163
 msgid "There is no parameter available for this plugin."
@@ -2364,13 +2354,15 @@ msgstr "La sessione %d non è in esecuzione.\n"
 
 #: src/xitk/setup.c:344
 msgid "Important Notice"
-msgstr ""
+msgstr "Avviso importante"
 
 #: src/xitk/setup.c:347
 msgid ""
 "You changed some configuration value which require to restart xine to take "
 "effect."
 msgstr ""
+"Hai modificato alcuni valori di configurazione che richiedono di riavviare "
+"xine per aver effetto."
 
 #: src/xitk/setup.c:828 src/xitk/setup.c:830 src/xitk/setup.c:838
 #: src/xitk/setup.c:840 src/xitk/setup.c:848 src/xitk/setup.c:850
@@ -2663,71 +2655,70 @@ msgstr "Aggiorna"
 
 #: src/xitk/tvout.c:93
 msgid "nvtv TV output system"
-msgstr ""
+msgstr "sistema di output TV nvtv"
 
 #: src/xitk/tvout.c:94
 msgid "Select which TV output system supported by your TV."
-msgstr ""
+msgstr "Seleziona quale sistema di output TV supporta la tua TV."
 
 #: src/xitk/tvout.c:101
 msgid "Enable XRandr extension"
-msgstr ""
+msgstr "Abilita estensione XRandr."
 
 #: src/xitk/tvout.c:102
 msgid ""
 "Enable the use of xrandr to autofit the screen to match the TV-resolution"
 msgstr ""
+"Abilita l'uso di xrandr per impostare automaticamente lo schermo da "
+"confrontare con la risoluzione TV"
 
 #: src/xitk/tvout.c:204
 msgid "Command to turn off TV out"
-msgstr ""
+msgstr "Commando per disabilitare l'output TV"
 
 #: src/xitk/tvout.c:205 src/xitk/tvout.c:214
 msgid "atitvout command line used to turn on TV output."
-msgstr ""
+msgstr "linea di comando atitvout usata per abilitare l'output su TV."
 
 #: src/xitk/tvout.c:213
 msgid "Command to turn on TV out"
-msgstr ""
+msgstr "Commando per abilitare l'output su TV"
 
 #: src/xitk/tvset.c:315
 msgid "TV/Analog Video parameters"
-msgstr ""
+msgstr "Parametri TV/Video analogico"
 
 #: src/xitk/tvset.c:351
-#, fuzzy
 msgid "Input: "
-msgstr "Plugin di input: "
+msgstr "Input: "
 
 #: src/xitk/tvset.c:375
 msgid "Broadcast system: "
-msgstr ""
+msgstr "Sistema broadcast: "
 
 #: src/xitk/tvset.c:397
-#, fuzzy
 msgid "Channel: "
-msgstr "Canale(i): "
+msgstr "Canale: "
 
 #: src/xitk/tvset.c:416
 msgid "Standard"
-msgstr ""
+msgstr "Standard"
 
 #: src/xitk/tvset.c:423
-#, fuzzy
 msgid "Frame Rate: "
-msgstr "Durata frame: "
+msgstr "Frame rate: "
 
 #: src/xitk/tvset.c:448
 msgid "Analog Standard: "
-msgstr ""
+msgstr "Standard analogico: "
 
 #: src/xitk/tvset.c:467
 msgid "Frame Size"
-msgstr ""
+msgstr "Dimensione frame"
 
 #: src/xitk/tvset.c:477
 msgid "MPEG2"
-msgstr ""
+msgstr "MPEG2"
 
 #: src/xitk/videowin.c:181
 msgid "videowin: output driver cannot select a working visual\n"
