@@ -847,7 +847,10 @@ fi
 if test "x$exec_prefix" = xNONE; then
    exec_prefix='${prefix}'
 fi
-XINE_DOCPATH="${datadir}/doc/xine-ui"
+
+if test "x$XINE_DOCPATH" = "x"; then
+   XINE_DOCPATH="${datadir}/doc/xine-ui"
+fi
 eval XINE_DOCDIR=`eval echo "$XINE_DOCPATH"`
 AC_SUBST(XINE_DOCDIR)
 AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR",[Location of documentation files])
