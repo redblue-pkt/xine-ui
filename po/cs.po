@@ -323,6 +323,7 @@ msgstr ""
 
 #: src/xitk/main.c:210
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
+msgstr ""
 "  -G, --geometry <WxH[+X+Y]>   Nastavení geometrie výstupního okna (ve stylu "
 "X).\n"
 
