@@ -249,10 +249,25 @@ void change_skin(skins_locations_t *sk) {
     goto __reload_skin;
   }
   
-  panel_change_skins();
-  control_change_skins();
-  playlist_change_skins();
-  mrl_browser_change_skins();
+  { /* Now, change skins for each window */
+    typedef struct {
+      void (*change_skins)(void);
+    } visible_state_t;
+    int i;
+    visible_state_t visible_state[] = {
+      { panel_change_skins       },
+      { control_change_skins     },
+      { playlist_change_skins    },
+      { mrl_browser_change_skins },
+      { NULL                     }
+    };
+    
+    for(i = 0; visible_state[i].change_skins != NULL; i++) {
+      if(visible_state[i].change_skins)
+	visible_state[i].change_skins();
+    }
+
+  }
 }
 
 /*

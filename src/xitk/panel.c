@@ -109,32 +109,41 @@ static void panel_store_new_position(int x, int y, int w, int h) {
  * Change the current skin.
  */
 void panel_change_skins(void) {
-
+  XEvent        xev;
+  ImlibImage   *new_img, *old_img;
+  
   XLockDisplay(gGui->display);
-
-  Imlib_destroy_image(gGui->imlib_data, panel->bg_image);
-    
-  if(!(panel->bg_image = 
-       Imlib_load_image(gGui->imlib_data,
-			xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
+  
+  XUnmapWindow(gGui->display, gGui->panel_window);
+  
+  if(!(new_img = Imlib_load_image(gGui->imlib_data,
+				  xitk_skin_get_skin_filename(gGui->skin_config, "BackGround")))) {
     xine_error("%s(): couldn't find image for background\n", __FUNCTION__);
     exit(-1);
   }
-
+  
   XResizeWindow (gGui->display, gGui->panel_window,
-		 (unsigned int)panel->bg_image->rgb_width,
-		 (unsigned int)panel->bg_image->rgb_height);
+		 (unsigned int)new_img->rgb_width,
+		 (unsigned int)new_img->rgb_height);
 
-  /*
-   * We should here, otherwise new skined window will have wrong size.
-   */
-  XFlush(gGui->display);
-
-  Imlib_apply_image(gGui->imlib_data, panel->bg_image, gGui->panel_window);
+  old_img = panel->bg_image;
+  panel->bg_image = new_img;
+  
+  Imlib_destroy_image(gGui->imlib_data, old_img);
+  
+  XMapRaised(gGui->display, gGui->panel_window); 
+  XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
+  
+  do  {
+    XMaskEvent(gGui->display, StructureNotifyMask, &xev) ;
+  } while (xev.type != MapNotify || xev.xmap.event != gGui->panel_window);
+  
+  Imlib_apply_image(gGui->imlib_data, new_img, gGui->panel_window);
   
   XUnlockDisplay(gGui->display);
   
   xitk_change_skins_widget_list(panel->widget_list, gGui->skin_config);
+
   /*
    * Update position of dynamic buttons.
    */
@@ -240,12 +249,12 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
   if(!panel->visible && control_is_visible()) {}
   else {
-    control_toggle_panel_visibility(NULL, NULL);
+    control_toggle_visibility(NULL, NULL);
   }
 
   if(!panel->visible && mrl_browser_is_visible()) {}
   else {
-    mrl_browser_toggle_visibility();
+    mrl_browser_toggle_visibility(NULL, NULL);
   }
 
 

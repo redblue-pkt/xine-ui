@@ -576,30 +576,38 @@ static void pl_add_input(xitk_widget_t *w, void *data, char *filename) {
  * Change the current skin.
  */
 void playlist_change_skins(void) {
+  XEvent        xev;
+  ImlibImage   *new_img, *old_img;
 
   if(pl_is_running()) {
     
     XLockDisplay(gGui->display);
     
-    Imlib_destroy_image(gGui->imlib_data, playlist->bg_image);
+    XUnmapWindow(gGui->display, playlist->window);
     
-    if(!(playlist->bg_image = 
-	 Imlib_load_image(gGui->imlib_data,
-			  xitk_skin_get_skin_filename(gGui->skin_config, "PlBG")))) {
+    if(!(new_img = Imlib_load_image(gGui->imlib_data,
+				    xitk_skin_get_skin_filename(gGui->skin_config, "PlBG")))) {
       xine_error("%s(): couldn't find image for background\n", __FUNCTION__);
       exit(-1);
     }
     
     XResizeWindow (gGui->display, playlist->window,
-		   (unsigned int)playlist->bg_image->rgb_width,
-		   (unsigned int)playlist->bg_image->rgb_height);
+		   (unsigned int)new_img->rgb_width,
+		   (unsigned int)new_img->rgb_height);
     
-    /*
-     * We should here, otherwise new skined window will have wrong size.
-     */
-    XFlush(gGui->display);
+    old_img = playlist->bg_image;
+    playlist->bg_image = new_img;
     
-    Imlib_apply_image(gGui->imlib_data, playlist->bg_image, playlist->window);
+    Imlib_destroy_image(gGui->imlib_data, old_img);
+    
+    XMapRaised(gGui->display, playlist->window); 
+    XSetTransientForHint(gGui->display, playlist->window, gGui->video_window);
+    
+    do  {
+      XMaskEvent(gGui->display, StructureNotifyMask, &xev) ;
+    } while (xev.type != MapNotify || xev.xmap.event != playlist->window);
+    
+    Imlib_apply_image(gGui->imlib_data, new_img, playlist->window);
     
     XUnlockDisplay(gGui->display);
     

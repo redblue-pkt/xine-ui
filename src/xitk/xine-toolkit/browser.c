@@ -111,8 +111,10 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     if(private_data->skin_element_name) {
       int x, y, i = 0;
       
-      x = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-      y = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      x          = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+      y          = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      w->visible = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      w->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
 	
@@ -488,7 +490,8 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
 					   int x, int y, int width, int height,
 					   char *skin_element_name,
 					   xitk_widget_t *mywidget,
-					   browser_private_data_t *_private_data) {
+					   browser_private_data_t *_private_data,
+					   int visible, int enable) {
   browser_private_data_t        *private_data = _private_data;
   xitk_button_widget_t           b;
   xitk_labelbutton_widget_t      lb;
@@ -527,9 +530,9 @@ static xitk_widget_t *_xitk_browser_create(xitk_skin_config_t *skonfig, xitk_bro
   
   mywidget->private_data               = private_data;
 
-  mywidget->enable                     = 1;
+  mywidget->enable                     = enable;
   mywidget->running                    = 1;
-  mywidget->visible                    = 1;
+  mywidget->visible                    = visible;
   mywidget->have_focus                 = FOCUS_LOST;
   
   mywidget->imlibdata                  = private_data->imlibdata;
@@ -631,7 +634,9 @@ xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_wid
   }
   
   return _xitk_browser_create(skonfig, br, 
-			      0, 0, 0, 0, br->browser.skin_element_name, mywidget, private_data);
+			      0, 0, 0, 0, br->browser.skin_element_name, mywidget, private_data,
+			      xitk_skin_get_visibility(skonfig, br->browser.skin_element_name),
+			      xitk_skin_get_enability(skonfig, br->browser.skin_element_name));
 }
 
 /*
@@ -743,5 +748,5 @@ xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, int 
   
   return _xitk_browser_create(NULL, br, x, y, 
 			      (itemw + slidw), (itemh * br->browser.max_displayed_entries), 
-			      NULL, mywidget, private_data);
+			      NULL, mywidget, private_data, 1, 1);
 }

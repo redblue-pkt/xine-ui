@@ -171,7 +171,7 @@ void viewlog_raise_window(void) {
 /*
  * Hide/show the viewlog window.
  */
-void viewlog_toggle_panel_visibility (xitk_widget_t *w, void *data) {
+void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
   
   if(viewlog != NULL) {
     if (viewlog->visible && viewlog->running) {

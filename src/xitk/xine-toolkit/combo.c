@@ -170,6 +170,9 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     if(private_data->skin_element_name) {
       int x, y;
 
+      c->visible = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      c->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
+
       xitk_set_widget_pos(c, c->x, c->y);
       xitk_get_widget_pos(private_data->label_widget, &x, &y);
       x += xitk_get_widget_width(private_data->label_widget);
@@ -307,7 +310,8 @@ void xitk_combo_update_list(xitk_widget_t *w, char **list, int len) {
 static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
 					 xitk_combo_widget_t *c, char *skin_element_name,
 					 xitk_widget_t *mywidget, 
-					 combo_private_data_t *private_data) {
+					 combo_private_data_t *private_data,
+					 int visible, int enable) {
   Atom                        XA_WIN_LAYER;
   long                        data[1];
   char                      **entries = c->entries;
@@ -422,9 +426,9 @@ static xitk_widget_t *_xitk_combo_create(xitk_skin_config_t *skonfig,
 
   mywidget->private_data                 = private_data;
 
-  mywidget->enable                       = 1;
+  mywidget->enable                       = enable;
   mywidget->running                      = 1;
-  mywidget->visible                      = 1;
+  mywidget->visible                      = visible;
   mywidget->have_focus                   = FOCUS_LOST;
 
 
@@ -498,7 +502,9 @@ xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_
 
   XUNLOCK(c->imlibdata->x.disp);
 
-  return _xitk_combo_create(skonfig, c, c->skin_element_name, mywidget, private_data);
+  return _xitk_combo_create(skonfig, c, c->skin_element_name, mywidget, private_data,
+			    xitk_skin_get_visibility(skonfig, c->skin_element_name),
+			    xitk_skin_get_enability(skonfig, c->skin_element_name));
 }
 
 /*
@@ -582,5 +588,5 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
 
   XUNLOCK(c->imlibdata->x.disp);
 
-  return _xitk_combo_create(NULL, c, NULL, mywidget, private_data);
+  return _xitk_combo_create(NULL, c, NULL, mywidget, private_data, 1, 1);
 }

@@ -518,7 +518,9 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       it->y                       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       it->width                   = private_data->skin->width/2;
       it->height                  = private_data->skin->height;
-      
+      it->visible                 = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      it->enable                  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
+     
       xitk_set_widget_pos(it, it->x, it->y);
     }
   }
@@ -971,7 +973,8 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_skin_config_t *skonfig,
 					      int x, int y, char *skin_element_name,
 					      xitk_image_t *skin,
 					      char *fontname,
-					      char *ncolor, char *fcolor) {
+					      char *ncolor, char *fcolor,
+					      int visible, int enable) {
   xitk_widget_t             *mywidget;
   inputtext_private_data_t  *private_data;
   
@@ -1007,9 +1010,9 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_skin_config_t *skonfig,
 
   mywidget->private_data          = private_data;
 
-  mywidget->enable                = 1;
+  mywidget->enable                = enable;
   mywidget->running               = 1;
-  mywidget->visible               = 1;
+  mywidget->visible               = visible;
   mywidget->have_focus            = FOCUS_LOST;
   mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
@@ -1046,7 +1049,9 @@ xitk_widget_t *xitk_inputtext_create (xitk_skin_config_t *skonfig, xitk_inputtex
 							xitk_skin_get_skin_filename(skonfig, it->skin_element_name))),
 				 (xitk_skin_get_label_fontname(skonfig, it->skin_element_name)),
 				 (xitk_skin_get_label_color(skonfig, it->skin_element_name)),
-				 (xitk_skin_get_label_color_focus(skonfig, it->skin_element_name)));
+				 (xitk_skin_get_label_color_focus(skonfig, it->skin_element_name)),
+				 (xitk_skin_get_visibility(skonfig, it->skin_element_name)),
+				 (xitk_skin_get_enability(skonfig, it->skin_element_name)));
 }
 
 /*
@@ -1062,6 +1067,6 @@ xitk_widget_t *xitk_noskin_inputtext_create (xitk_inputtext_widget_t *it,
   draw_bevel_two_state(it->imlibdata, i);
   
 
-  return _xitk_inputtext_create(NULL, it, x, y, NULL, i, fontname, ncolor, fcolor);
+  return _xitk_inputtext_create(NULL, it, x, y, NULL, i, fontname, ncolor, fcolor, 1, 1);
 }
 

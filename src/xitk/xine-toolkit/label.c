@@ -318,6 +318,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       l->y                      = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       l->width                  = private_data->char_length * private_data->length;
       l->height                 = private_data->char_height;
+      l->visible                = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      l->enable                 = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       xitk_set_widget_pos(l, l->x, l->y);
     }
@@ -346,7 +348,8 @@ int xitk_label_change_label (xitk_widget_list_t *wl, xitk_widget_t *l, char *new
  */
 static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_t *l,
 					 int x, int y, int width, int height,
-					 char *skin_element_name, char *fontname) {
+					 char *skin_element_name, char *fontname,
+					 int visible, int enable) {
   xitk_widget_t          *mywidget;
   label_private_data_t   *private_data;
   
@@ -388,9 +391,9 @@ static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label
 
   mywidget->private_data       = private_data;
 
-  mywidget->enable             = 1;
+  mywidget->enable             = enable;
   mywidget->running            = 1;
-  mywidget->visible            = 1;
+  mywidget->visible            = visible;
   mywidget->have_focus         = FOCUS_LOST;
   mywidget->imlibdata          = private_data->imlibdata;
   mywidget->x                  = x;
@@ -437,7 +440,9 @@ xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_
 			    (xitk_skin_get_label_length(skonfig, l->skin_element_name)),
 			    -1,
 			    l->skin_element_name, 
-			    NULL);
+			    NULL,
+			    (xitk_skin_get_visibility(skonfig, l->skin_element_name)),
+			    (xitk_skin_get_enability(skonfig, l->skin_element_name)));
 }
 
 /*
@@ -447,5 +452,5 @@ xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
 					int x, int y, int width, int height, char *fontname) {
   XITK_CHECK_CONSTITENCY(l);
 
-  return _xitk_label_create(NULL, l, x, y, width, height, NULL, fontname);
+  return _xitk_label_create(NULL, l, x, y, width, height, NULL, fontname, 1, 1);
 }

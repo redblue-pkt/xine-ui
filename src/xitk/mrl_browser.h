@@ -41,7 +41,7 @@ void open_mrlbrowser(xitk_widget_t *w, void *data);
 void destroy_mrl_browser(void);
 int mrl_browser_is_running(void);
 int mrl_browser_is_visible(void);
-void mrl_browser_toggle_visibility(void);
+void mrl_browser_toggle_visibility(xitk_widget_t *w, void *data);
 void hide_mrl_browser(void);
 void show_mrl_browser(void);
 void set_mrl_browser_transient(void);

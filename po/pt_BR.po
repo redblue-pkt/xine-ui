@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-01-16 22:05+0100\n"
+"POT-Creation-Date: 2002-01-20 01:44+0100\n"
 "PO-Revision-Date: 2001-12-13 20:06GMT\n"
 "Last-Translator: Miguel Freitas <miguel@cetuc.puc-rio.br>\n"
 "Language-Team: \n"
@@ -14,36 +14,36 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: src/xitk/control.c:317
+#: src/xitk/control.c:319
 #, c-format
 msgid "%s(): couldn't find image for background\n"
 msgstr "%s(): Não é possível encontrar a imagem de fundo\n"
 
-#: src/xitk/control.c:388
+#: src/xitk/control.c:397
 msgid "xine-playlist: couldn't find image for background\n"
 msgstr "xine-playlist: não é possível encontrar a imagem de fundo\n"
 
-#: src/xitk/control.c:512
+#: src/xitk/control.c:521
 msgid "Hue"
 msgstr "Hue"
 
-#: src/xitk/control.c:535
+#: src/xitk/control.c:544
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:558
+#: src/xitk/control.c:567
 msgid "Brt"
 msgstr "Bri"
 
-#: src/xitk/control.c:581
+#: src/xitk/control.c:590
 msgid "Ctr"
 msgstr "Ctr"
 
-#: src/xitk/control.c:617
+#: src/xitk/control.c:626
 msgid "Choose a Skin"
 msgstr "Escolha um skin"
 
-#: src/xitk/control.c:654 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:828
+#: src/xitk/control.c:663 src/xitk/mrl_browser.c:205 src/xitk/playlist.c:836
 msgid "Dismiss"
 msgstr "Fechar"
 
@@ -104,7 +104,7 @@ msgstr "Não é possível carregar o logo %s \n"
 msgid "Xine File Browser"
 msgstr "Xine File Browser"
 
-#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:196
+#: src/xitk/file_browser.c:201 src/xitk/mrl_browser.c:198
 msgid "Select"
 msgstr "Selecione"
 
@@ -349,100 +349,100 @@ msgstr "identificador do driver de audio é obrigatório para a opção -A\n"
 msgid "invalid argument %d => exit\n"
 msgstr "argumento inválido %d => abortando\n"
 
-#: src/xitk/mrl_browser.c:185
+#: src/xitk/mrl_browser.c:187
 msgid "Xine MRL Browser"
 msgstr "Xine MRL Browser"
 
-#: src/xitk/mrl_browser.c:212
+#: src/xitk/mrl_browser.c:214
 msgid "Source:"
 msgstr "Source:"
 
-#: src/xitk/panel.c:486
+#: src/xitk/panel.c:495
 msgid "Volume control"
 msgstr ""
 
-#: src/xitk/panel.c:488
+#: src/xitk/panel.c:497
 msgid "Mute toggle"
 msgstr ""
 
-#: src/xitk/panel.c:655
+#: src/xitk/panel.c:664
 msgid "Play previous entry from playlist"
 msgstr ""
 
-#: src/xitk/panel.c:662
+#: src/xitk/panel.c:671
 msgid "Stop playback"
 msgstr ""
 
-#: src/xitk/panel.c:669
+#: src/xitk/panel.c:678
 msgid "Play selected entry"
 msgstr ""
 
-#: src/xitk/panel.c:677
+#: src/xitk/panel.c:686
 msgid "Pause/Resume playback"
 msgstr ""
 
-#: src/xitk/panel.c:684
+#: src/xitk/panel.c:693
 msgid "Play next entry from playlist"
 msgstr ""
 
-#: src/xitk/panel.c:691
+#: src/xitk/panel.c:700
 msgid "Eject current medium"
 msgstr ""
 
-#: src/xitk/panel.c:698
+#: src/xitk/panel.c:707
 msgid "Quit"
 msgstr ""
 
-#: src/xitk/panel.c:705
+#: src/xitk/panel.c:714
 msgid "Setup window"
 msgstr ""
 
-#: src/xitk/panel.c:712
+#: src/xitk/panel.c:721
 msgid "Hide GUI"
 msgstr ""
 
-#: src/xitk/panel.c:719
+#: src/xitk/panel.c:728
 msgid "Fullscreen/Window mode"
 msgstr ""
 
-#: src/xitk/panel.c:726
+#: src/xitk/panel.c:735
 msgid "Next audio channel"
 msgstr ""
 
-#: src/xitk/panel.c:733
+#: src/xitk/panel.c:742
 msgid "Previous audio channel"
 msgstr ""
 
-#: src/xitk/panel.c:740
+#: src/xitk/panel.c:749
 msgid "Next SPU channel"
 msgstr ""
 
-#: src/xitk/panel.c:747
+#: src/xitk/panel.c:756
 msgid "Previous SPU channel"
 msgstr ""
 
-#: src/xitk/panel.c:811
+#: src/xitk/panel.c:820
 msgid "Take a snapshot"
 msgstr ""
 
-#: src/xitk/panel.c:818
+#: src/xitk/panel.c:827
 msgid "Slow motion"
 msgstr ""
 
-#: src/xitk/panel.c:825
+#: src/xitk/panel.c:834
 msgid "Fast motion"
 msgstr ""
 
-#: src/xitk/panel.c:832
+#: src/xitk/panel.c:841
 msgid "Playlist"
 msgstr ""
 
-#: src/xitk/panel.c:839
+#: src/xitk/panel.c:848
 #, fuzzy
 msgid "Control"
 msgstr "Ctr"
 
-#: src/xitk/panel.c:846
+#: src/xitk/panel.c:855
 #, fuzzy
 msgid "MRL Browser"
 msgstr "Xine MRL Browser"
@@ -452,19 +452,19 @@ msgstr "Xine MRL Browser"
 msgid "Can't read %s: %s\n"
 msgstr "Não é possível ler %s: %s\n"
 
-#: src/xitk/playlist.c:801
+#: src/xitk/playlist.c:809
 msgid "Add"
 msgstr "Adiciona"
 
-#: src/xitk/playlist.c:810
+#: src/xitk/playlist.c:818
 msgid "Load"
 msgstr "Carrega"
 
-#: src/xitk/playlist.c:819
+#: src/xitk/playlist.c:827
 msgid "Save"
 msgstr "Salva"
 
-#: src/xitk/playlist.c:851
+#: src/xitk/playlist.c:859
 msgid "Scan for:"
 msgstr "Procura por:"
 
@@ -498,25 +498,25 @@ msgstr ""
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
 msgstr ""
 
-#: src/xitk/skins.c:271 src/xitk/skins.c:310
+#: src/xitk/skins.c:286 src/xitk/skins.c:325
 #, c-format
 msgid "Ooch, skin '%s' not found, use fallback '%s'.\n"
 msgstr ""
 
-#: src/xitk/skins.c:298
+#: src/xitk/skins.c:313
 msgid "No available skin found. Say goodbye.\n"
 msgstr ""
 
-#: src/xitk/skins.c:314
+#: src/xitk/skins.c:329
 msgid "Failed to load fallback skin. Check your installed skins. Exiting.\n"
 msgstr ""
 
-#: src/xitk/skins.c:323
+#: src/xitk/skins.c:338
 #, fuzzy, c-format
 msgid "Failed to load %s/%s. Exiting.\n"
 msgstr "Não é possível carregar o logo %s \n"
 
-#: src/xitk/skins.c:332
+#: src/xitk/skins.c:347
 #, c-format
 msgid "Failed to load %s skin, wrong version. Load fallback skin '%s'.\n"
 msgstr ""

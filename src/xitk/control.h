@@ -29,7 +29,7 @@ void control_change_skins(void);
 void control_exit(xitk_widget_t *, void *);
 int control_is_visible(void);
 int control_is_running(void);
-void control_toggle_panel_visibility(xitk_widget_t *, void *);
+void control_toggle_visibility(xitk_widget_t *, void *);
 void control_raise_window(void);
 
 #endif

@@ -249,10 +249,11 @@ void control_raise_window(void) {
     }
   }
 }
+
 /*
  * Hide/show the control panel
  */
-void control_toggle_panel_visibility (xitk_widget_t *w, void *data) {
+void control_toggle_visibility (xitk_widget_t *w, void *data) {
   
   if(control != NULL) {
     if (control->visible && control->running) {
@@ -304,31 +305,39 @@ void control_handle_event(XEvent *event, void *data) {
  * Change the current skin.
  */
 void control_change_skins(void) {
-  
+  XEvent        xev;
+  ImlibImage   *new_img, *old_img;
+ 
   if(control_is_running()) {
     
     XLockDisplay(gGui->display);
     
-    Imlib_destroy_image(gGui->imlib_data, control->bg_image);
+    XUnmapWindow(gGui->display, control->window);
     
-    if(!(control->bg_image = 
-	 Imlib_load_image(gGui->imlib_data,
-			  xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
+    if(!(new_img = Imlib_load_image(gGui->imlib_data,
+				    xitk_skin_get_skin_filename(gGui->skin_config, "CtlBG")))) {
       xine_error(_("%s(): couldn't find image for background\n"), __FUNCTION__);
       exit(-1);
     }
     
     XResizeWindow (gGui->display, control->window,
-		   (unsigned int)control->bg_image->rgb_width,
-		   (unsigned int)control->bg_image->rgb_height);
+		   (unsigned int)new_img->rgb_width,
+		   (unsigned int)new_img->rgb_height);
     
-    /*
-     * We should here, otherwise new skined window will have wrong size.
-     */
-    XFlush(gGui->display);
+    old_img = control->bg_image;
+    control->bg_image = new_img;
     
-    Imlib_apply_image(gGui->imlib_data, control->bg_image, control->window);
+    Imlib_destroy_image(gGui->imlib_data, old_img);
     
+    XMapRaised(gGui->display, control->window); 
+    XSetTransientForHint(gGui->display, control->window, gGui->video_window);
+    
+    do  {
+      XMaskEvent(gGui->display, StructureNotifyMask, &xev) ;
+    } while (xev.type != MapNotify || xev.xmap.event != control->window);
+    
+    Imlib_apply_image(gGui->imlib_data, new_img, control->window);
+        
     XUnlockDisplay(gGui->display);
     
     xitk_change_skins_widget_list(control->widget_list, gGui->skin_config);

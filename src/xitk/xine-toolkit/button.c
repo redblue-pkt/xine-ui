@@ -153,6 +153,9 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       b->width                        = private_data->skin->width/3;
       b->height                       = private_data->skin->height;
       
+      b->visible                      = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      b->enable                       = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
+    
       xitk_set_widget_pos(b, b->x, b->y);
     }
   }
@@ -204,7 +207,8 @@ static int notify_focus_button (xitk_widget_list_t *wl, xitk_widget_t *b, int bE
  */
 static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widget_t *b,
 					   int x, int y, 
-					   char *skin_element_name, xitk_image_t *skin) {
+					   char *skin_element_name, xitk_image_t *skin,
+					   int visible, int enable) {
   xitk_widget_t          *mywidget;
   button_private_data_t  *private_data;
   
@@ -226,9 +230,9 @@ static xitk_widget_t *_xitk_button_create (xitk_skin_config_t *skonfig, xitk_but
   
   mywidget->private_data          = private_data;
 
-  mywidget->enable                = 1;
+  mywidget->enable                = enable;
   mywidget->running               = 1;
-  mywidget->visible               = 1;
+  mywidget->visible               = visible;
   mywidget->have_focus            = FOCUS_LOST; 
   mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
@@ -263,7 +267,9 @@ xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widg
 			     (xitk_skin_get_coord_y(skonfig, b->skin_element_name)),
 			     b->skin_element_name,
 			     xitk_image_load_image(b->imlibdata,
-						   (xitk_skin_get_skin_filename(skonfig, b->skin_element_name))));
+						   (xitk_skin_get_skin_filename(skonfig, b->skin_element_name))),
+			     xitk_skin_get_visibility(skonfig, b->skin_element_name),
+			     xitk_skin_get_enability(skonfig, b->skin_element_name));
 }
 
 /*
@@ -278,5 +284,5 @@ xitk_widget_t *xitk_noskin_button_create (xitk_button_widget_t *b,
   i = xitk_image_create_image(b->imlibdata, width * 3, height);
   draw_bevel_three_state(b->imlibdata, i);
 
-  return _xitk_button_create(NULL, b, x, y, NULL, i);
+  return _xitk_button_create(NULL, b, x, y, NULL, i, 1, 1);
 }

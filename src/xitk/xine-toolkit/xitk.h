@@ -1287,6 +1287,16 @@ void xitk_skin_unload_config(xitk_skin_config_t *);
 /*
  *
  */
+int xitk_skin_get_visibility(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
+int xitk_skin_get_enability(xitk_skin_config_t *, const char *);
+
+/*
+ *
+ */
 int xitk_skin_get_coord_x(xitk_skin_config_t *, const char *);
 
 /*

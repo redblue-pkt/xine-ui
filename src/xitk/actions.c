@@ -441,7 +441,7 @@ void gui_notify_demux_branched () {
 void gui_control_show(xitk_widget_t *w, void *data) {
 
   if(control_is_running() && !control_is_visible())
-    control_toggle_panel_visibility(NULL, NULL);
+    control_toggle_visibility(NULL, NULL);
   else if(!control_is_running())
     control_panel();
   else
@@ -451,7 +451,7 @@ void gui_control_show(xitk_widget_t *w, void *data) {
 void gui_setup_show(xitk_widget_t *w, void *data) {
 
   if (setup_is_running() && !setup_is_visible())
-    setup_toggle_panel_visibility(NULL, NULL);
+    setup_toggle_visibility(NULL, NULL);
   else if(!setup_is_running())
     setup_panel();
   else
@@ -461,7 +461,7 @@ void gui_setup_show(xitk_widget_t *w, void *data) {
 void gui_viewlog_show(xitk_widget_t *w, void *data) {
 
   if (viewlog_is_running() && !viewlog_is_visible())
-    viewlog_toggle_panel_visibility(NULL, NULL);
+    viewlog_toggle_visibility(NULL, NULL);
   else if(!viewlog_is_running())
     viewlog_window();
   else

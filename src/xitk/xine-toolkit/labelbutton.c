@@ -427,6 +427,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       lb->y                    = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       lb->width                = private_data->skin->width/3;
       lb->height               = private_data->skin->height;
+      lb->visible              = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      lb->enable               = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       xitk_set_widget_pos(lb, lb->x, lb->y);
     }
@@ -511,7 +513,8 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_skin_config_t *skonfig,
 						int x, int y, 
 						char *skin_element_name, xitk_image_t *skin,
 						char *ncolor, char *fcolor, char *ccolor,
-						char *fontname, int label_visible) {
+						char *fontname, int label_visible,
+						int visible, int enable) {
   xitk_widget_t               *mywidget;
   lbutton_private_data_t *private_data;
   
@@ -545,9 +548,9 @@ static xitk_widget_t *_xitk_labelbutton_create (xitk_skin_config_t *skonfig,
 
   mywidget->private_data          = private_data;
 
-  mywidget->enable                = 1;
+  mywidget->enable                = enable;
   mywidget->running               = 1;
-  mywidget->visible               = 1;
+  mywidget->visible               = visible;
   mywidget->have_focus            = FOCUS_LOST;
   mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
@@ -586,7 +589,9 @@ xitk_widget_t *xitk_labelbutton_create (xitk_skin_config_t *skonfig, xitk_labelb
 		  (xitk_skin_get_label_color_focus(skonfig, b->skin_element_name)),
 		  (xitk_skin_get_label_color_click(skonfig, b->skin_element_name)),
 		  (xitk_skin_get_label_fontname(skonfig, b->skin_element_name)),
-		  (xitk_skin_get_label_printable(skonfig, b->skin_element_name)));
+		  (xitk_skin_get_label_printable(skonfig, b->skin_element_name)),
+		  (xitk_skin_get_visibility(skonfig, b->skin_element_name)),
+		  (xitk_skin_get_enability(skonfig, b->skin_element_name)));
 }
 
 /*
@@ -603,5 +608,5 @@ xitk_widget_t *xitk_noskin_labelbutton_create (xitk_labelbutton_widget_t *b,
   i = xitk_image_create_image(b->imlibdata, width * 3, height);
   draw_bevel_three_state(b->imlibdata, i);
 
-  return _xitk_labelbutton_create(NULL, b, x, y, NULL, i, ncolor, fcolor, ccolor, fname, 1);
+  return _xitk_labelbutton_create(NULL, b, x, y, NULL, i, ncolor, fcolor, ccolor, fname, 1, 1, 1);
 }

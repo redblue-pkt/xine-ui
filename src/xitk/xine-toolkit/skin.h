@@ -29,6 +29,9 @@ typedef struct xitk_skin_element_s {
 
   char                         *section;
 
+  int                           enable;
+  int                           visible;
+  
   char                         *pixmap;
   int                           x;
   int                           y;

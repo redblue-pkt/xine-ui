@@ -28,7 +28,7 @@ void viewlog_window(void);
 void viewlog_exit(xitk_widget_t *, void *);
 int viewlog_is_visible(void);
 int viewlog_is_running(void);
-void viewlog_toggle_panel_visibility(xitk_widget_t *, void *);
+void viewlog_toggle_visibility(xitk_widget_t *, void *);
 void viewlog_raise_window(void);
 
 #endif

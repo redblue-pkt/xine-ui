@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include <assert.h>
 #include <errno.h>
 
@@ -169,6 +170,21 @@ static int skin_end_section(xitk_skin_config_t *skonfig) {
   return _is_there_char(skonfig->ln, '}');
 }
 
+static int istriplet(char *c) {
+  int dummy1, dummy2, dummy3;
+
+  if((strncasecmp(c, "#", 1) <= 0) && (strlen(c) >= 7)) {
+
+    if(((isalnum(*(c+1))) && (isalnum(*(c+2))) && (isalnum(*(c+3))) 
+       && (isalnum(*(c+4))) && (isalnum(*(c+5))) && (isalnum(*(c+6)))
+       && ((*(c+7) == '\0') || (*(c+7) == '\n') || (*(c+7) == '\r') || (*(c+7) == ' ')))
+       && (sscanf(c, "#%2x%2x%2x", &dummy1, &dummy2, &dummy3) == 3)) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
 /*
  * Cleanup the EOL ('\n','\r',' ')
  */
@@ -181,10 +197,12 @@ static void skin_clean_eol(xitk_skin_config_t *skonfig) {
 
   if(p) {
     while(*p != '\0') {
-      if(*p == '\n' || *p == '\r') {
+      if(*p == '\n' || *p == '\r' || (*p == '#' && (istriplet(p) == 0)) || *p == ';' 
+	 || (*p == '/' && (*(p+1) == '/' || *(p+1) == '*'))) {
 	*p = '\0';
 	break;
       }
+
       p++;
     }
 
@@ -430,7 +448,8 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	  }
 
 	  s->section = strdup(section);
-	  
+	  s->visible = s->enable = 1;
+
 	  skin_get_next_line(skonfig);
 
 	__next_subsection:
@@ -444,15 +463,27 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	    else
 	     goto  __next_subsection;
 	  }
-	  else
-	    if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
+	  else {
+
+	    if(!strncasecmp(skonfig->ln, "visible", 7)) {
+	      skin_set_pos_to_value(&p);
+	      s->visible = skin_get_bool_value(p);
+	    }
+	    else if(!strncasecmp(skonfig->ln, "pixmap", 6)) {
 	      skin_set_pos_to_value(&p);
 	      s->pixmap = (char *) xitk_xmalloc(strlen(skonfig->path) + strlen(p) + 2);
 	      sprintf(s->pixmap, "%s/%s", skonfig->path, p);
 	    }
-	  
+	    else if(!strncasecmp(skonfig->ln, "enable", 6)) {
+	      skin_set_pos_to_value(&p);
+	      s->enable = skin_get_bool_value(p);
+	    }
+	    
+	  }
+
 	  skin_get_next_line(skonfig);
-	  
+	  p = skonfig->ln;
+
 	  if(skin_end_section(skonfig) >= 0) {
 	    return;
 	  }
@@ -525,6 +556,8 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
 
     while(s) {
       printf("Section '%s'\n", s->section);
+      printf("  enable      = %d\n", s->enable);
+      printf("  visible     = %d\n", s->visible);
       printf("  X           = %d\n", s->x);
       printf("  Y           = %d\n", s->y);
       printf("  pixmap      = '%s'\n", s->pixmap);
@@ -548,7 +581,9 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
     printf("revert order\n");
     s = skonfig->last;
     while(s) {
-      printf("Section '%s'\n", s->section);
+      printf("Section '%s'\n", s->section); 
+      printf("  enable      = %d\n", s->enable);
+      printf("  visible     = %d\n", s->visible);
       printf("  X           = %d\n", s->x);
       printf("  Y           = %d\n", s->y);
       printf("  pixmap      = '%s'\n", s->pixmap);
@@ -732,6 +767,34 @@ int xitk_skin_check_version(xitk_skin_config_t *skonfig, int min_version) {
     return 2;
 
   return -1;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_visibility(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->visible;
+
+  return 1;
+}
+
+/*
+ *
+ */
+int xitk_skin_get_enability(xitk_skin_config_t *skonfig, const char *str) {
+  xitk_skin_element_t *s;
+  
+  assert(skonfig);
+  
+  if((s = skin_lookup_section(skonfig, str)) != NULL)
+    return s->enable;
+
+  return 1;
 }
 
 /*

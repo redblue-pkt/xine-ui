@@ -88,6 +88,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       /*      
       int x, y;
 
+      // visibility && enability
+
       xitk_set_widget_pos(c, c->x, c->y);
       xitk_get_widget_pos(private_data->label_widget, &x, &y);
       x += xitk_get_widget_width(private_data->label_widget);
@@ -190,7 +192,8 @@ static void intbox_stepup(xitk_widget_t *x, void *data) {
 static xitk_widget_t *_xitk_intbox_create(xitk_skin_config_t *skonfig,
 					  xitk_intbox_widget_t *ib, char *skin_element_name,
 					  xitk_widget_t *mywidget, 
-					  intbox_private_data_t *private_data) {
+					  intbox_private_data_t *private_data,
+					  int visible, int enable) {
   
   private_data->imlibdata                = ib->imlibdata;
   private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(skin_element_name);
@@ -203,9 +206,9 @@ static xitk_widget_t *_xitk_intbox_create(xitk_skin_config_t *skonfig,
 
   mywidget->private_data                 = private_data;
 
-  mywidget->enable                       = 1;
+  mywidget->enable                       = enable;
   mywidget->running                      = 1;
-  mywidget->visible                      = 1;
+  mywidget->visible                      = visible;
   mywidget->have_focus                   = FOCUS_LOST;
   
   mywidget->imlibdata                    = private_data->imlibdata;
@@ -299,5 +302,5 @@ xitk_widget_t *xitk_noskin_intbox_create(xitk_intbox_widget_t *ib,
   
   XUNLOCK(ib->imlibdata->x.disp);
 
-  return _xitk_intbox_create(NULL, ib, NULL, mywidget, private_data);
+  return _xitk_intbox_create(NULL, ib, NULL, mywidget, private_data, 1, 1);
 }

@@ -470,6 +470,8 @@ void xitk_mrlbrowser_exit(xitk_widget_t *w, void *data) {
  *
  */
 void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
+  XEvent                     xev;
+  ImlibImage                *new_img, *old_img;
   mrlbrowser_private_data_t *private_data;
   
   if(w && (w->widget_type & WIDGET_TYPE_MRLBROWSER)) {
@@ -477,26 +479,31 @@ void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig)
     
     XLOCK(private_data->imlibdata->x.disp);
     
-    Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
-    
-    if(!(private_data->bg_image = 
-	 Imlib_load_image(private_data->imlibdata,
-			  xitk_skin_get_skin_filename(skonfig, 
-						      private_data->skin_element_name)))) {
+    XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
+
+    if(!(new_img = Imlib_load_image(private_data->imlibdata,
+				    xitk_skin_get_skin_filename(skonfig, 
+							private_data->skin_element_name)))) {
       XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
     }
     
     XResizeWindow (private_data->imlibdata->x.disp, private_data->window,
-		   (unsigned int)private_data->bg_image->rgb_width,
-		   (unsigned int)private_data->bg_image->rgb_height);
+		   (unsigned int)new_img->rgb_width,
+		   (unsigned int)new_img->rgb_height);
+
+    old_img = private_data->bg_image;
+    private_data->bg_image = new_img;
     
-    /*
-     * We should here, otherwise new skined window will have wrong size.
-     */
-    XFlush(private_data->imlibdata->x.disp);
+    Imlib_destroy_image(private_data->imlibdata, old_img);
     
-    Imlib_apply_image(private_data->imlibdata, private_data->bg_image, private_data->window);
+    XMapRaised(private_data->imlibdata->x.disp, private_data->window); 
     
+    do  {
+      XMaskEvent(private_data->imlibdata->x.disp, StructureNotifyMask, &xev) ;
+    } while (xev.type != MapNotify || xev.xmap.event != private_data->window);
+    
+    Imlib_apply_image(private_data->imlibdata, new_img, private_data->window);
+
     XUNLOCK(private_data->imlibdata->x.disp);
     
     xitk_change_skins_widget_list(private_data->widget_list, skonfig);
@@ -959,7 +966,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrows
   }
     
   private_data->visible        = 1;
-
+  
   mywidget->enable             = 1;
   mywidget->running            = 1;
   mywidget->visible            = 1;

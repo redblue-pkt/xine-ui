@@ -284,6 +284,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       sl->y       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       sl->width   = private_data->bg_skin->width;
       sl->height  = private_data->bg_skin->height;
+      sl->visible = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      sl->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       xitk_set_widget_pos(sl, sl->x, sl->y);
     }
@@ -587,7 +589,7 @@ void xitk_slider_set_pos(xitk_widget_list_t *wl, xitk_widget_t *sl, int pos) {
 static xitk_widget_t *_xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widget_t *s,
 					   int x, int y, char *skin_element_name,
 					   xitk_image_t *bg_skin, xitk_image_t *pad_skin,
-					   int stype) {
+					   int stype, int visible, int enable) {
   xitk_widget_t           *mywidget;
   slider_private_data_t   *private_data;
 
@@ -649,9 +651,9 @@ static xitk_widget_t *_xitk_slider_create (xitk_skin_config_t *skonfig, xitk_sli
 
   mywidget->private_data                 = private_data;
 
-  mywidget->enable                       = 1;
+  mywidget->enable                       = enable;
   mywidget->running                      = 1;
-  mywidget->visible                      = 1;
+  mywidget->visible                      = visible;
   mywidget->have_focus                   = FOCUS_LOST;
   mywidget->imlibdata                    = private_data->imlibdata;
   mywidget->x                            = x;
@@ -689,7 +691,9 @@ xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widg
 						    xitk_skin_get_skin_filename(skonfig, s->skin_element_name))),
 			     (xitk_image_load_image(s->imlibdata, 
 						    xitk_skin_get_slider_skin_filename(skonfig, s->skin_element_name))),
-			     (xitk_skin_get_slider_type(skonfig, s->skin_element_name)));
+			     (xitk_skin_get_slider_type(skonfig, s->skin_element_name)),
+			     (xitk_skin_get_visibility(skonfig, s->skin_element_name)),
+			     (xitk_skin_get_enability(skonfig, s->skin_element_name)));
 }
 
 /*
@@ -717,5 +721,5 @@ xitk_widget_t *xitk_noskin_slider_create (xitk_slider_widget_t *s,
   b = xitk_image_create_image(s->imlibdata, width, height);
   draw_inner(s->imlibdata, b->image, width, height);
 
-  return _xitk_slider_create(NULL, s, x, y, NULL, b, p, type);
+  return _xitk_slider_create(NULL, s, x, y, NULL, b, p, type, 1, 1);
 }

@@ -194,6 +194,8 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       c->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
       c->width           = private_data->skin->width/3;
       c->height          = private_data->skin->height;
+      c->visible         = xitk_skin_get_visibility(skonfig, private_data->skin_element_name);
+      c->enable          = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
       xitk_set_widget_pos(c, c->x, c->y);
     }
@@ -247,7 +249,8 @@ void xitk_checkbox_set_state(xitk_widget_t *c, int state, Window win, GC gc) {
  */
 static xitk_widget_t *_xitk_checkbox_create(xitk_skin_config_t *skonfig, 
 					    xitk_checkbox_widget_t *cb, int x, int y, 
-					    char *skin_element_name, xitk_image_t *skin) {
+					    char *skin_element_name, xitk_image_t *skin,
+					    int visible, int enable) {
   xitk_widget_t *mywidget;
   checkbox_private_data_t *private_data;
 
@@ -270,9 +273,9 @@ static xitk_widget_t *_xitk_checkbox_create(xitk_skin_config_t *skonfig,
 
   mywidget->private_data          = private_data;
 
-  mywidget->enable                = 1;
+  mywidget->enable                = enable;
   mywidget->running               = 1;
-  mywidget->visible               = 1;
+  mywidget->visible               = visible;
   mywidget->have_focus            = FOCUS_LOST;
   mywidget->imlibdata             = private_data->imlibdata;
   mywidget->x                     = x;
@@ -307,7 +310,9 @@ xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_
 			       (xitk_skin_get_coord_y(skonfig, cb->skin_element_name)),
 			       cb->skin_element_name,
 			       (xitk_image_load_image(cb->imlibdata,
-						      xitk_skin_get_skin_filename(skonfig, cb->skin_element_name))));
+						      xitk_skin_get_skin_filename(skonfig, cb->skin_element_name))),
+			       xitk_skin_get_visibility(skonfig, cb->skin_element_name),
+			       xitk_skin_get_enability(skonfig, cb->skin_element_name));
 
 }
 
@@ -323,5 +328,5 @@ xitk_widget_t *xitk_noskin_checkbox_create(xitk_checkbox_widget_t *cb,
   i = xitk_image_create_image(cb->imlibdata, width * 3, height);
   draw_bevel_three_state(cb->imlibdata, i);
   
-  return _xitk_checkbox_create(NULL, cb, x, y, NULL, i);
+  return _xitk_checkbox_create(NULL, cb, x, y, NULL, i, 1, 1);
 }

@@ -1,5 +1,11 @@
 # Revision 0.1
 #
+# Comments can be prefixed by '#', '//', ';', '/*' (if a comment character is found
+# in a line, following characters will be ignored.
+# 
+# You can set visiblity and/or enability for each widget (see Close widget section),
+# by default, each widget is visible and enable.
+#
 skin.name    = mp2k
 skin.version = 1
 
@@ -9,6 +15,8 @@ skin.BackGround {
 }
 
 skin.Close {
+	visible = true # Don't display widget
+	enable = true  # Disable widget (will be paint anyway)
 	coords {
 	  x = 343
 	  y = 6

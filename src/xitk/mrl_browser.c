@@ -47,10 +47,22 @@ static xitk_widget_t     *mrlb = NULL;
 /*
  *
  */
+void set_mrl_browser_transient(void) {
+
+  if(mrlb) {
+    xitk_mrlbrowser_set_transient(mrlb, gGui->video_window);
+  }
+}
+
+/*
+ *
+ */
 void mrl_browser_change_skins(void) {
 
-  if(mrlb)
+  if(mrlb) {
     xitk_mrlbrowser_change_skins(mrlb, gGui->skin_config);
+    set_mrl_browser_transient();
+  }
 }
 
 /*
@@ -78,16 +90,6 @@ int mrl_browser_is_running(void) {
 /*
  *
  */
-void set_mrl_browser_transient(void) {
-
-  if(mrlb) {
-    xitk_mrlbrowser_set_transient(mrlb, gGui->video_window);
-  }
-}
-
-/*
- *
- */
 void show_mrl_browser(void) {
 
   if(mrlb) {
@@ -110,10 +112,10 @@ void hide_mrl_browser(void) {
 /*
  *
  */
-void mrl_browser_toggle_visibility(void) {
-
+void mrl_browser_toggle_visibility(xitk_widget_t *w, void *data) {
+  
   if(mrlb) {
-
+    
     if(mrl_browser_is_visible())
       hide_mrl_browser();
     else

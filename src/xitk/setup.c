@@ -320,7 +320,7 @@ void setup_raise_window(void) {
 /*
  * Hide/show the setup panel
  */
-void setup_toggle_panel_visibility (xitk_widget_t *w, void *data) {
+void setup_toggle_visibility (xitk_widget_t *w, void *data) {
   
   if(setup != NULL) {
     if (setup->visible && setup->running) {
