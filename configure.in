@@ -318,6 +318,7 @@ if test x"$png_prefix" != "x"; then
     CPPFLAGS="$CPPFLAGS $PNG_CFLAGS"
 fi
 
+
 dnl
 dnl First, add -L and -R options for png and X11 to LDFLAGS.
 dnl LDFLAGS are passed to the compiler before LIBS; this is important for
@@ -335,24 +336,32 @@ dnl Look for a -lpng library, that provides a png_read_info routine
 dnl If we find such a library,  check that the png.h header is available, too.
 dnl
 AC_CHECK_LIB(png, png_read_info,
-  [AC_CHECK_HEADER(png.h, png_ok=yes, png_ok=no)],
+  [AC_CHECK_HEADERS(png.h libpng/png.h,,)],
   [AC_MSG_ERROR([*** libpng is needed (PNG library not found) - try to use --with-png-prefix option ***])], [-lz -lm])
+
+dnl Recent png install header files into $prefix/include/libpng
+if test x"$ac_cv_header_libpng_png_h" = "xyes"; then
+    PNG_H="libpng/png.h"
+fi
+if test x"$ac_cv_header_png_h" = "xyes"; then
+    PNG_H="png.h"
+fi
 
 if test x"$png_prefix" != "x"; then
     CPPFLAGS="$old_CPPFLAGS"
 fi
 LDFLAGS="$old_LDFLAGS"
 
-if test x"$png_ok" = xyes; then
+if test x"$ac_cv_header_png_h" = "xyes" -o x"$ac_cv_header_libpng_png_h" = "xyes"; then
 
-    dnl OK, -lpng library and <png.h> header found.
+    dnl OK, -lpng library and <png.h|libpng/png.h> header found.
     dnl Check if this png is an old png version.
 
     saved_CFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS $PNG_CFLAGS"
 
-    AC_MSG_CHECKING([for png_structp in png.h])
-    AC_TRY_COMPILE([#include <png.h>],
+    AC_MSG_CHECKING([for png_structp in $PNG_H])
+    AC_TRY_COMPILE([#include <$PNG_H>],
 	[
 	png_structp pp; 
 	png_infop info; 

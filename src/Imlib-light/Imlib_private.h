@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,7 +24,12 @@
 #include <X11/Xos.h>
 #include <X11/extensions/shape.h>
 #include <X11/cursorfont.h>
+
+#ifdef HAVE_PNG_H
 #include <png.h>
+#elif HAVE_LIBPNG_PNG_H
+#include <libpng/png.h>
+#endif
 
 #define BYTE_ORD_24_RGB 0
 #define BYTE_ORD_24_RBG 1

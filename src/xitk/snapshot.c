@@ -58,15 +58,18 @@
 #endif
 #include <pthread.h>
 
-#include "xitk.h"
-#include "event.h"
+#ifdef HAVE_PNG_H
+#include <png.h>
+#elif HAVE_LIBPNG_PNG_H
+#include <libpng/png.h>
+#endif
 
 #include <xine.h>
 #include <xine/xineutils.h>
-#include "errors.h"
 
-#include "png.h"
-#include "pngconf.h"
+#include "xitk.h"
+#include "event.h"
+#include "errors.h"
 
 #define PIXSZ 3
 #define BIT_DEPTH 8
