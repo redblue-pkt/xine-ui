@@ -55,6 +55,7 @@
 #include "skins.h"
 #include "errors.h"
 #include "network.h"
+#include "event_sender.h"
 #include "i18n.h"
 
 #include "xitk.h"
@@ -858,6 +859,13 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       auto_panel_visibility_cb,
 			       CONFIG_NO_DATA); 
  
+  gGui->eventer_sticky = xine_config_register_bool(gGui->xine, "gui.eventer_sticky", 
+						   1,
+						   _("Event sender window stick to main panel"), 
+						   CONFIG_NO_HELP,
+						   CONFIG_LEVEL_EXP,
+						   event_sender_sticky_cb,
+						   CONFIG_NO_DATA);
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
 

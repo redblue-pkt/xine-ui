@@ -146,6 +146,8 @@ typedef struct {
     int                set;
     int                arg;
   } numeric;
+  
+  int                  eventer_sticky;
 
 } gGui_t;
 

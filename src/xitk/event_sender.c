@@ -54,7 +54,6 @@ static char            *eventerfontname = "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-
 typedef struct {
   xitk_window_t        *xwin;
 
-  int                   sticky;
   int                   x;
   int                   y;
   int                   move_forced;
@@ -91,13 +90,15 @@ typedef struct {
 
 static _eventer_t    *eventer = NULL;
 
-static void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
-
-  if(eventer) {
-    int old_sticky_value = eventer->sticky;
-    eventer->sticky = cfg->num_value;
-
-    if((!old_sticky_value) && eventer->sticky) {
+void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
+  
+  if(!eventer)
+    gGui->eventer_sticky = cfg->num_value;
+  else {
+    int old_sticky_value = gGui->eventer_sticky;
+    gGui->eventer_sticky = cfg->num_value;
+    
+    if((!old_sticky_value) && gGui->eventer_sticky) {
       int  px, py, pw, ph;
       xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, &ph);
       eventer->x = px + pw;
@@ -106,11 +107,12 @@ static void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg) {
       xitk_window_move_window(gGui->imlib_data, eventer->xwin, eventer->x, eventer->y);
     }
   }
+
 }
 
 static void event_sender_store_new_position(int x, int y, int w, int h) {
 
-  if(eventer->sticky) {
+  if(gGui->eventer_sticky) {
     if(eventer->move_forced == 0) {
       if(panel_is_visible()) {
 	eventer->move_forced++;
@@ -293,7 +295,7 @@ void event_sender_raise_window(void) {
 void event_sender_move(int x, int y) {
 
   if(eventer != NULL) {
-    if(eventer->sticky) {
+    if(gGui->eventer_sticky) {
       eventer->x = x;
       eventer->y = y;
       config_update_num ("gui.eventer_x", x);
@@ -335,14 +337,7 @@ void event_sender_panel(void) {
 					 CONFIG_NO_CB,
 					 CONFIG_NO_DATA);
   
-  eventer->sticky = xine_config_register_bool(gGui->xine, "gui.eventer_sticky", 
-					      1,
-					      _("Event sender window stick to main panel"), 
-					      CONFIG_NO_HELP,
-					      CONFIG_LEVEL_EXP,
-					      event_sender_sticky_cb,
-					      CONFIG_NO_DATA);
-  if(eventer->sticky) {
+    if(gGui->eventer_sticky) {
     int  px, py, pw, ph;
     xitk_get_window_position(gGui->display, gGui->panel_window, &px, &py, &pw, &ph);
     eventer->x = px + pw;

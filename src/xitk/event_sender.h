@@ -24,6 +24,7 @@
 #ifndef EVENT_SENDER_H
 #define EVENT_SENDER_H
 
+void event_sender_sticky_cb(void *data, xine_cfg_entry_t *cfg);
 void event_sender_panel(void);
 void event_sender_exit(xitk_widget_t *, void *);
 void event_sender_move(int x, int y);
