@@ -31,6 +31,7 @@
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/cursorfont.h>
 #include <X11/keysym.h>
 
 #include "common.h"
@@ -52,11 +53,16 @@ typedef struct {
 #define WINDOW_WIDTH  400
 #define WINDOW_HEIGHT 380
 
+#define NORMAL_CURS   0
+#define WAIT_CURS     1
+
 typedef struct {
   xitk_window_t        *xwin;
   
   xitk_widget_t        *browser;
   
+  Cursor                cursor[2];
+
   xitk_image_t         *preview_image;
   int                   preview_width;
   int                   preview_height;
@@ -475,6 +481,14 @@ void init_skins_support(void) {
 /*
  * Remote skin loader
  */
+static void download_set_cursor_state(int state) {
+  XLockDisplay(gGui->display);
+  XDefineCursor(gGui->display, 
+		(xitk_window_get_window(skdloader->xwin)), skdloader->cursor[state]);
+  XSync(gGui->display, False);
+  XUnlockDisplay(gGui->display);
+}
+
 static slx_entry_t **skins_get_slx_entries(char *url) {
   int              result;
   slx_entry_t    **slxs = NULL, slx;
@@ -641,6 +655,8 @@ static void download_skin_cancel(xitk_widget_t *w, void *data) {
   xitk_list_free((XITK_WIDGET_LIST_LIST(skdloader->widget_list)));
   
   XLockDisplay(gGui->display);
+  XFreeCursor(gGui->display, skdloader->cursor[NORMAL_CURS]);
+  XFreeCursor(gGui->display, skdloader->cursor[WAIT_CURS]);
   XFreeGC(gGui->display, (XITK_WIDGET_LIST_GC(skdloader->widget_list)));
   XUnlockDisplay(gGui->display);
   
@@ -723,6 +739,8 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
   download.size   = 0;
   download.status = 0; 
 
+  download_set_cursor_state(WAIT_CURS);
+
   if((network_download(skdloader->slxs[selected]->skin.preview, &download))) {
     char          *skpname;
     FILE          *fd;
@@ -802,6 +820,8 @@ static void download_skin_preview(xitk_widget_t *w, void *data, int selected) {
     download_update_blank_preview();
   }
 
+  download_set_cursor_state(NORMAL_CURS);
+
   if(download.buf)
     free(download.buf);
   if(download.error)
@@ -820,9 +840,11 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
   download.size   = 0;
   download.status = 0; 
 
+  download_set_cursor_state(WAIT_CURS);
+
   if((network_download(skdloader->slxs[selected]->skin.href, &download))) {
     char *filename;
-    
+
     filename = strrchr(skdloader->slxs[selected]->skin.href, '/');
     if(strlen(filename) >= 2) {
       struct stat  st;
@@ -916,6 +938,8 @@ static void download_skin_select(xitk_widget_t *w, void *data) {
   else
     xine_error(_("Unable to download '%s': %s\n"), 
 	       skdloader->slxs[selected]->skin.href, download.error);
+
+  download_set_cursor_state(NORMAL_CURS);
   
   if(download.buf)
     free(download.buf);
@@ -1049,6 +1073,8 @@ void download_skin(char *url) {
 						       x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
     
     XLockDisplay(gGui->display);
+    skdloader->cursor[NORMAL_CURS] = XCreateFontCursor(gGui->display, XC_left_ptr);
+    skdloader->cursor[WAIT_CURS] = XCreateFontCursor(gGui->display, XC_watch);
     gc = XCreateGC(gGui->display, 
 		   (xitk_window_get_window(skdloader->xwin)), None, None);
     XUnlockDisplay(gGui->display);
