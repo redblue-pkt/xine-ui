@@ -98,6 +98,7 @@ typedef struct {
 #define OPTION_BROADCAST_PORT   1006
 #define OPTION_NO_LOGO          1007
 #define OPTION_POST             1008
+#define OPTION_DISABLE_POST     1009
 
 /* options args */
 static const char *short_options = "?hHgfvn"
@@ -153,6 +154,7 @@ static struct option long_options[] = {
   {"no-logo"        , no_argument      , 0, OPTION_NO_LOGO           },
   {"no-reload"      , no_argument      , 0, 'E'                      },
   {"post"           , required_argument, 0, OPTION_POST              },
+  {"disable-post"   , no_argument      , 0, OPTION_DISABLE_POST      },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -541,6 +543,7 @@ void show_usage (void) {
   printf(_("                               Load a post plugin.\n"));
   printf(_("                               Parameters are comma separated.\n"));
   printf(_("                               This option can be used more than one time.\n"));
+  printf(_("      --disable-post           Don't enable post plugin(s).\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -1170,6 +1173,7 @@ int main(int argc, char *argv[]) {
   gGui->display_logo           = 1;
   gGui->post_elements          = NULL;
   gGui->post_elements_num      = 0;
+  gGui->post_enable            = 1;
 
   window_attribute.x     = window_attribute.y      = -8192;
   window_attribute.width = window_attribute.height = -1;
@@ -1467,7 +1471,10 @@ int main(int argc, char *argv[]) {
       pplugins[pplugins_num] = optarg;
       pplugins_num++;
       pplugins[pplugins_num] = NULL;
+      break;
 
+    case OPTION_DISABLE_POST:
+      gGui->post_enable = 0;
       break;
 
     case 'v': /* Display version and exit*/
@@ -1763,35 +1770,13 @@ int main(int argc, char *argv[]) {
   /* Initialize posts, if required */
   if(pplugins_num) {
     char             **plugin = pplugins;
-    xine_post_out_t   *vo_source;
-    int                i = 0;
-
+    
     while(*plugin) {
       pplugin_parse_and_store_post((const char *) *plugin);
       *plugin++;
     }
-
-    /* Rewire */
-    if(gGui->post_elements_num) {
-      
-      for(i = (gGui->post_elements_num - 1); i >= 0; i--) {
-	const char *const *outs = xine_post_list_outputs(gGui->post_elements[i]->post);
-	const xine_post_out_t *vo_out = xine_post_output(gGui->post_elements[i]->post, (char *) *outs);
-	if(i == (gGui->post_elements_num - 1)) {
-	  xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
-	}
-	else {
-	  const xine_post_in_t *vo_in = xine_post_input(gGui->post_elements[i + 1]->post, "video");
-	  int                   err;
-	  
-	  err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
-	}
-      }
-      
-      vo_source = xine_get_video_source(gGui->stream);
-      xine_post_wire_video_port(vo_source, gGui->post_elements[0]->post->video_input[0]);
-    }
     
+    pplugin_rewire_posts();
   }
   
   gui_run();

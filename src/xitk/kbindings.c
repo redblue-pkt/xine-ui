@@ -432,6 +432,10 @@ static kbinding_entry_t default_binding_table[] = {
     "ContrastControl-",       ACTID_CONTRASTCONTROLm        , "VOID",     KEYMOD_NOMOD   , 0 },
   { "Visibility toggle of video post pluggin window.",
     "VPProcessShow",          ACTID_VPP                     , "P",        KEYMOD_META    , 0 },
+
+  { "Enability toggle of post plugin(s) usage.",
+    "VPProcessEnable",        ACTID_VPP_ENABLE              , "P",        KEYMOD_CONTROL | KEYMOD_META , 0 },
+
   { 0,
     0,                        0,                              0,          0              , 0 }
 };

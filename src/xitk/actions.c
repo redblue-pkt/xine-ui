@@ -1459,6 +1459,10 @@ void gui_vpp_show(xitk_widget_t *w, void *data) {
   }
 }
 
+void gui_vpp_enable(void) {
+  gGui->post_enable = !gGui->post_enable;
+  pplugin_rewire_posts();
+}
 
 void gui_viewlog_show(xitk_widget_t *w, void *data) {
 

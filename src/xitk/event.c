@@ -804,6 +804,10 @@ void gui_execute_action_id(action_id_t action) {
     gui_vpp_show(NULL, NULL);
     break;
 
+  case ACTID_VPP_ENABLE:
+    gui_vpp_enable();
+    break;
+
   default:
     break;
   }

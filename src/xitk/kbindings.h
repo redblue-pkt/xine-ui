@@ -135,6 +135,7 @@ typedef enum {
   ACTID_CONTRASTCONTROLp,
   ACTID_CONTRASTCONTROLm,
   ACTID_VPP,
+  ACTID_VPP_ENABLE,
 
   /*
    * The below events map one-to-one with definitions in xine-lib's events.h 

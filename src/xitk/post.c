@@ -411,7 +411,7 @@ static void _pplugin_unwire(void) {
 
 static void _pplugin_rewire(void) {
 
-  if(pplugin) {
+  if(pplugin && gGui->post_enable) {
     xine_post_out_t  *vo_source;
     int               post_num = pplugin->object_num;
     int               i = 0;
@@ -990,7 +990,7 @@ static void _pplugin_kill_filters_from(post_object_t *pobj) {
   }
 }
 
-static int __pplugins_retrieve_parameters(post_object_t *pobj) {
+static int __pplugin_retrieve_parameters(post_object_t *pobj) {
   xine_post_in_t             *input_api;
   
   if((input_api = (xine_post_in_t *) xine_post_input(pobj->post, "parameters"))) {
@@ -1035,7 +1035,7 @@ static int __pplugins_retrieve_parameters(post_object_t *pobj) {
 static void _pplugin_retrieve_parameters(post_object_t *pobj) {
   xitk_combo_widget_t         cmb;
   
-  if(__pplugins_retrieve_parameters(pobj)) {
+  if(__pplugin_retrieve_parameters(pobj)) {
     
     XITK_WIDGET_INIT(&cmb, gGui->imlib_data);
     cmb.skin_element_name = NULL;
@@ -1343,99 +1343,6 @@ static void _pplugin_save_chain(void) {
   }
 }
 
-#if 0
-static void _pplugin_apply_filters(xitk_widget_t *w, void *data) {
-  
-  if(pplugin) {
-    xine_post_out_t   *vo_source;
-    int                i = 0;
-
-    if(!xitk_combo_get_current_selected(pplugin->post_objects[pplugin->object_num - 1]->plugins)) {
-      _pplugin_destroy_base_obj(pplugin->post_objects[pplugin->object_num - 1]);
-      
-      if(pplugin->object_num) {
-	pplugin->post_objects = (post_object_t **) 
-	  realloc(pplugin->post_objects, sizeof(post_object_t *) * (pplugin->object_num + 2));
-	pplugin->post_objects[pplugin->object_num + 1] = NULL;
-      }
-      else {
-	free(pplugin->post_objects);
-	pplugin->post_objects = NULL;
-      }
-    }
-    
-    if(!gGui->post_elements && pplugin->object_num)
-      gGui->post_elements = (post_element_t **) 
-	xine_xmalloc(sizeof(post_element_t *) * (pplugin->object_num + 1));
-    else {
-      int j;
-      
-      for(j = 0; j < gGui->post_elements_num; j++) {
-	free(gGui->post_elements[j]->name);
-	free(gGui->post_elements[j]);
-      }
-      if(j)
-	free(gGui->post_elements[j]);
-      
-      if(pplugin->object_num)
-	gGui->post_elements = (post_element_t **) 
-	  realloc(gGui->post_elements, sizeof(post_element_t *) * (pplugin->object_num + 1));
-      else {
-	free(gGui->post_elements);
-	gGui->post_elements = NULL;
-      }
-    }
-    
-    gGui->post_elements_num = pplugin->object_num;
-
-    vo_source = xine_get_video_source(gGui->stream);
-    (void) xine_post_wire_video_port(vo_source, gGui->vo_port);
-    
-    if(pplugin->post_objects) {
-      
-      for(i = (pplugin->object_num - 1); i >= 0; i--) {
-	const char *const *outs = xine_post_list_outputs(pplugin->post_objects[i]->post);
-	const xine_post_out_t *vo_out = xine_post_output(pplugin->post_objects[i]->post, (char *) *outs);
-	if(i == (pplugin->object_num - 1)) {
-#ifdef TRACE_REWIRE
-	  printf("  VIDEO_OUT .. OUT<-[PLUGIN %d]\n", i);
-#endif
-	  xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
-	}
-	else {
-	  const xine_post_in_t *vo_in = xine_post_input(pplugin->post_objects[i+1]->post, "video");
-	  int                   err;
-	  
-#ifdef TRACE_REWIRE
-	  printf("  [PLUGIN %d]->IN ... OUT<-[PLUGIN %d]", i+1, i);
-#endif
-	  err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
-#ifdef TRACE_REWIRE
-	  printf(" (RESULT: %d)\n", err);
-#endif
-	}
-	
-	gGui->post_elements[i] = (post_element_t *) xine_xmalloc(sizeof(post_element_t));
-	gGui->post_elements[i]->post = pplugin->post_objects[i]->post;
-	gGui->post_elements[i]->name = 
-	  strdup(xitk_combo_get_current_entry_selected(pplugin->post_objects[i]->plugins));
-      }
-      
-      //gGui->post_elements[gGui->post_elements_num] = (post_element_t *) 
-      //	xine_xmalloc(sizeof(post_element_t));
-      gGui->post_elements[gGui->post_elements_num] = NULL;
-      
-#ifdef TRACE_REWIRE
-      printf("  [PLUGIN %d]->IN .. STREAM\n", 0);
-#endif
-      xine_post_wire_video_port(vo_source, pplugin->post_objects[0]->post->video_input[0]);
-
-      gGui->post_elements[gGui->post_elements_num] = NULL;
-    }
-  }
-}
-#endif
-
 static void _pplugin_nextprev(xitk_widget_t *w, void *data, int pos) {
   int rpos = (xitk_slider_get_max(pplugin->slider)) - pos;
 
@@ -1573,6 +1480,42 @@ static void _pplugin_handle_event(XEvent *event, void *data) {
   }
     break;
 
+  }
+}
+
+static void _pplugin_enability(xitk_widget_t *w, void *data, int state) {
+  gGui->post_enable = state;
+  _pplugin_unwire();
+  _pplugin_rewire();
+}
+
+void pplugin_rewire_posts(void) {
+
+  if(gGui->post_elements_num) {
+
+    _pplugin_unwire();
+
+    if(gGui->post_enable) {
+      xine_post_out_t   *vo_source;
+      int                i = 0;
+      
+      for(i = (gGui->post_elements_num - 1); i >= 0; i--) {
+	const char *const *outs = xine_post_list_outputs(gGui->post_elements[i]->post);
+	const xine_post_out_t *vo_out = xine_post_output(gGui->post_elements[i]->post, (char *) *outs);
+	if(i == (gGui->post_elements_num - 1)) {
+	  xine_post_wire_video_port((xine_post_out_t *) vo_out, gGui->vo_port);
+	}
+	else {
+	  const xine_post_in_t *vo_in = xine_post_input(gGui->post_elements[i + 1]->post, "video");
+	  int                   err;
+	  
+	  err = xine_post_wire((xine_post_out_t *) vo_out, (xine_post_in_t *) vo_in);	
+	}
+      }
+      
+      vo_source = xine_get_video_source(gGui->stream);
+      xine_post_wire_video_port(vo_source, gGui->post_elements[0]->post->video_input[0]);
+    }
   }
 }
 
@@ -1738,6 +1681,22 @@ void pplugin_panel(void) {
 							 "Black", "Black", "White", btnfontname)));
   xitk_show_widget(pplugin->new_filter);
 
+  x += 115;
+
+  lb.button_type       = RADIO_BUTTON;
+  lb.label             = _("Enable");
+  lb.align             = ALIGN_CENTER;
+  lb.callback          = NULL;
+  lb.state_callback    = _pplugin_enability;
+  lb.userdata          = NULL;
+  lb.skin_element_name = NULL;
+  xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
+   (w = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+							 &lb, x, y, 100, 23,
+							 "Black", "Black", "White", btnfontname)));
+  xitk_labelbutton_set_state(w, gGui->post_enable);
+  xitk_enable_and_show_widget(w);
+
   /* IMPLEMENT ME
   x += 115;
 
@@ -1846,7 +1805,7 @@ void pplugin_parse_and_store_post(const char *post) {
       memset(&pobj, 0, sizeof(post_object_t));
       pobj.post = post;
 
-      if(__pplugins_retrieve_parameters(&pobj)) {
+      if(__pplugin_retrieve_parameters(&pobj)) {
 	int   i;
 
 	if(pobj.properties_names && args) {

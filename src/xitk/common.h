@@ -118,6 +118,7 @@ typedef struct {
 
   post_element_t          **post_elements;
   int                       post_elements_num;
+  int                       post_enable;
 
   struct {
     int                     hue;
