@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-toolkit 0.9.5\n"
 "POT-Creation-Date: 2001-12-26 00:47+0100\n"
-"PO-Revision-Date: 2001-11-26 23:56+0100\n"
+"PO-Revision-Date: 2001-12-28 21:26+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanmagm@mail.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -29,7 +29,7 @@ msgstr "Falló Imlib_init_with_params().\n"
 #: src/xitk/xine-toolkit/test.c:337
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
-msgstr ""
+msgstr "El nuevo valor entero es: %d. ¿Confirmar?"
 
 #: src/xitk/xine-toolkit/test.c:411
 msgid "My Frame"

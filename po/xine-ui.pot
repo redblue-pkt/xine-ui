@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-12-26 00:24+0100\n"
+"POT-Creation-Date: 2001-12-28 03:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -298,15 +298,15 @@ msgstr ""
 msgid "Require xine library version 0.9.4, found %d.%d.%d.\n"
 msgstr ""
 
-#: src/xitk/main.c:528
+#: src/xitk/main.c:530
 msgid "video driver id required for -V option\n"
 msgstr ""
 
-#: src/xitk/main.c:538
+#: src/xitk/main.c:540
 msgid "audio driver id required for -A option\n"
 msgstr ""
 
-#: src/xitk/main.c:635
+#: src/xitk/main.c:637
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr ""
@@ -444,7 +444,7 @@ msgstr ""
 msgid "xine setup"
 msgstr ""
 
-#: src/xitk/setup.c:1168 src/xitk/viewlog.c:472
+#: src/xitk/setup.c:1168 src/xitk/viewlog.c:519
 msgid "Close"
 msgstr ""
 
@@ -492,19 +492,19 @@ msgstr ""
 msgid "File '%s' written.\n"
 msgstr ""
 
-#: src/xitk/viewlog.c:306
+#: src/xitk/viewlog.c:355
 msgid "log info"
 msgstr ""
 
-#: src/xitk/viewlog.c:308
+#: src/xitk/viewlog.c:357
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
 msgstr ""
 
-#: src/xitk/viewlog.c:405
+#: src/xitk/viewlog.c:455
 msgid "xine log viewer"
 msgstr ""
 
-#: src/xitk/viewlog.c:455 src/xitk/viewlog.c:458
+#: src/xitk/viewlog.c:505
 msgid "Refresh"
 msgstr ""
