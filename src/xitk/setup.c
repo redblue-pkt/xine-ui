@@ -65,7 +65,7 @@ static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
     xitk_image_t        *image;                                                                 \
     xitk_image_widget_t  im;                                                                    \
     int                  lbearing, rbearing, width, ascent, descent;                            \
-    char                *fontname = "*-lucida-*-r-*-*-10-*-*-*-*-*-*-*";                        \
+    char                *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";                        \
     xitk_font_t         *fs;                                                                    \
                                                                                                 \
     image = xitk_image_create_image(gGui->imlib_data, FRAME_WIDTH + 1, FRAME_HEIGHT + 1);       \
@@ -1111,7 +1111,7 @@ void setup_panel(void) {
   GC                         gc;
   xitk_labelbutton_widget_t  lb;
   xitk_button_widget_t       b;
-  char                      *fontname = "*-lucida-*-r-*-*-10-*-*-*-*-*-*-*";
+  char                      *fontname = "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*";
   int                        x, y;
 
   /* this shouldn't happen */
@@ -1215,3 +1215,6 @@ void setup_panel(void) {
   setup->running = 1;
 
 }
+
+
+

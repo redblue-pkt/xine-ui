@@ -231,9 +231,15 @@ void xitk_font_text_extent(xitk_font_t *xtfs, const char *c, int length,
   if(width)
     *width    = ov.width;
   if(ascent)
+    *ascent  = xtfs->font->ascent;
+  if(descent)
+    *descent = xtfs->font->descent;
+#if 0
+  if(ascent)
     *ascent   = ov.ascent;
   if(descent)
     *descent  = ov.descent;
+#endif
 }
 
 /*

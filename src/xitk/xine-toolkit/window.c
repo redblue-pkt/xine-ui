@@ -352,78 +352,82 @@ xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int
  */
 xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title, 
 						int x, int y, int width, int height) {
-  GC             gc;
-  XGCValues      gcv;
-  xitk_window_t *xwin;
-  Pixmap         bar, pix_bg;
-  unsigned int   colorblack, colorwhite, colorgray;
-  xitk_font_t   *fs = NULL;
-  int            lbear, rbear, wid, asc, des;
-  
-  if((im == NULL) || (title == NULL) || (width == 0 || height == 0))
+  xitk_window_t         *xwin;
+  XSizeHints             hint;
+  XWMHints              *wm_hint;
+  XSetWindowAttributes   attr;
+  XColor                 black, dummy;
+  XClassHint            *xclasshint;
+  GC                     gc;
+  XGCValues              gcv;
+
+  if((im == NULL) || (width == 0 || height == 0))
     return NULL;
 
-  xwin = xitk_window_create_simple_window(im, x, y, width, height);
-
-  xitk_window_set_window_title(im, xwin, title);
-
-  bar = xitk_image_create_pixmap(im, width, TITLE_BAR_HEIGHT);
-  pix_bg = xitk_image_create_pixmap(im, width, height);
-
+  xwin             = (xitk_window_t *) xitk_xmalloc(sizeof(xitk_window_t));
+  xwin->background = None;
+  xwin->width      = width;
+  xwin->height     = height;
+  
   XLOCK(im->x.disp);
 
-  gcv.graphics_exposures = False;
-  gc = XCreateGC(im->x.disp, xwin->window, GCGraphicsExposures, &gcv);
+  memset(&hint, 0, sizeof(hint));
+  hint.x               = x;
+  hint.y               = y;
+  hint.width           = width;
+  hint.base_width      = width;
+  hint.min_width       = width;
+  hint.height          = height;
+  hint.base_height     = height;
+  hint.min_height      = height;
+  hint.win_gravity     = NorthWestGravity;
+  hint.flags           = PWinGravity | PBaseSize | PMinSize | USSize | USPosition;
+  
+  XAllocNamedColor(im->x.disp, Imlib_get_colormap(im), "black", &black, &dummy);
 
-  XCopyArea(im->x.disp, xwin->background, pix_bg, gc, 0, 0, width, height, 0, 0);
+  attr.override_redirect = False;
+  attr.background_pixel  = black.pixel;
+  attr.border_pixel      = black.pixel;
+  attr.colormap          = Imlib_get_colormap(im);
+  attr.win_gravity       = NorthWestGravity;
 
-  colorblack = xitk_get_pixel_color_black(im);
-  colorwhite = xitk_get_pixel_color_white(im);
-  colorgray = xitk_get_pixel_color_gray(im);
+  xwin->window = XCreateWindow(im->x.disp, im->x.root, hint.x, hint.y, hint.width, hint.height,
+			       0, im->x.depth,  InputOutput, im->x.visual,
+			       CWBackPixel | CWBorderPixel | CWColormap | CWWinGravity ,
+			       &attr);
+  
+  XSetStandardProperties(im->x.disp, xwin->window, title, title, None, NULL, 0, &hint);
 
-  { /* Draw window title bar background */
-    int s, bl = 255;
-    unsigned int colorblue;
-
-    colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
-    for(s = 0; s <= TITLE_BAR_HEIGHT; s++, bl -= 8) {
-      XSetForeground(im->x.disp, gc, colorblue);
-      XDrawLine(im->x.disp, bar, gc, 0, s, width, s);
-      colorblue = xitk_get_pixel_color_from_rgb(im, 0, 0, bl);
-    }
+  XSelectInput(im->x.disp, xwin->window, INPUT_MOTION | KeymapStateMask);
+  
+  if((xclasshint = XAllocClassHint()) != NULL) {
+    xclasshint->res_name = "Xine Window";
+    xclasshint->res_class = "Xitk";
+    XSetClassHint(im->x.disp, xwin->window, xclasshint);
+    XFree(xclasshint);
+  }
+  
+  wm_hint = XAllocWMHints();
+  if (wm_hint != NULL) {
+    wm_hint->input         = True;
+    wm_hint->initial_state = NormalState;
+    wm_hint->flags         = InputHint | StateHint;
+    XSetWMHints(im->x.disp, xwin->window, wm_hint);
+    XFree(wm_hint);
   }
 
-  XSetForeground(im->x.disp, gc, colorwhite);
-  XDrawLine(im->x.disp, bar, gc, 0, 0, width, 0);
-  XDrawLine(im->x.disp, bar, gc, 0, 0, 0, TITLE_BAR_HEIGHT - 1);
-  XSetForeground(im->x.disp, gc, colorgray);
-  XDrawLine(im->x.disp, bar, gc, width - 1, 0, width - 1, TITLE_BAR_HEIGHT - 1);
-  XDrawLine(im->x.disp, bar, gc, 0, TITLE_BAR_HEIGHT - 1, width - 1, TITLE_BAR_HEIGHT - 1);
-  XUNLOCK(im->x.disp);
-
-  fs = xitk_font_load_font(im->x.disp, DEFAULT_FONT_12);
-  xitk_font_set_font(fs, gc);
-  xitk_font_string_extent(fs, title, &lbear, &rbear, &wid, &asc, &des);
-
-  XLOCK(im->x.disp);
-  XSetForeground(im->x.disp, gc, colorwhite);
-  XDrawString(im->x.disp, bar, gc, 
-	      (width - wid) - TITLE_BAR_HEIGHT, ((TITLE_BAR_HEIGHT+asc+des) >> 1) - des, 
-	      title, strlen(title));
-
-  XUNLOCK(im->x.disp);
-
-  xitk_font_unload_font(fs);
-
-  XLOCK(im->x.disp);
-  XCopyArea(im->x.disp, bar, pix_bg, gc, 0, 0, width, TITLE_BAR_HEIGHT, 0, 0);
+  xwin->width = width;
+  xwin->height = height;
+  
+  gcv.graphics_exposures = False;
+  gc = XCreateGC(im->x.disp, xwin->window, GCGraphicsExposures, &gcv);
   XUNLOCK(im->x.disp);
   
-  xitk_window_change_background(im, xwin, pix_bg, width, height);
-  
-  XUNLOCK(im->x.disp);
-  XFreePixmap(im->x.disp, bar);
-  XFreePixmap(im->x.disp, pix_bg);
+  xwin->background = xitk_image_create_pixmap(im, width, height);
+  draw_outter(im, xwin->background, width, height);
+  xitk_window_apply_background(im, xwin);
+
+  XLOCK(im->x.disp);
   XFreeGC(im->x.disp, gc);
   XUNLOCK(im->x.disp);
 

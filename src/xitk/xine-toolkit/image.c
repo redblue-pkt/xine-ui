@@ -527,6 +527,43 @@ static void _draw_rectangular_box(ImlibData *im, Pixmap p,
   if(relief == DRAW_OUTTER)
     XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
   else if(relief == DRAW_INNER)
+    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+
+  XDrawLine(im->x.disp, p, gc, x, y, (x + excstart), y);
+  XDrawLine(im->x.disp, p, gc, (x + excstop), y, (x + width), y);
+  XDrawLine(im->x.disp, p, gc, x, y, x, (y + height));
+  if(relief == DRAW_OUTTER)
+    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
+  else if(relief == DRAW_INNER)
+    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+  
+  XDrawLine(im->x.disp, p, gc, (x + width), y, (x + width), (y + height));
+  XDrawLine(im->x.disp, p, gc, x, (y + height), (x + width), (y + height));
+
+  XFreeGC(im->x.disp, gc);
+
+  XUNLOCK(im->x.disp);
+}
+
+/*
+ *
+ */
+static void _draw_rectangular_box_light(ImlibData *im, Pixmap p, 
+					int x, int y, int excstart, int excstop,
+					int width, int height, int relief) {
+  GC            gc;
+  XGCValues     gcv;
+
+  assert(im && p && width && height);
+
+  XLOCK(im->x.disp);
+
+  gcv.graphics_exposures = False;
+  gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
+  
+  if(relief == DRAW_OUTTER)
+    XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
+  else if(relief == DRAW_INNER)
     XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
 
   XDrawLine(im->x.disp, p, gc, x, y, (x + excstart), y);
@@ -624,21 +661,29 @@ static void _draw_three_state(ImlibData *im, xitk_image_t *p, int style) {
   
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
   if(style == STYLE_BEVEL) {
-    XDrawLine(im->x.disp, p->image, gc, (w - 1), 0, (w - 1), (h - 1));
-    XDrawLine(im->x.disp, p->image, gc, 0, (h - 1), w, (h - 1));
+    XDrawLine(im->x.disp, p->image, gc, (w - 2), 2, (w - 2), (h - 3));
+    XDrawLine(im->x.disp, p->image, gc, 2, (h - 2), w-2, (h - 2));
   }
-  XDrawLine(im->x.disp, p->image, gc, (w * 2) - 1, 0, (w * 2) - 1, h);
-  XDrawLine(im->x.disp, p->image, gc, w, (h - 1), (w * 2), (h - 1));
+  XDrawLine(im->x.disp, p->image, gc, 2*w - 2,     2, 2*w - 2, h - 3);
+  XDrawLine(im->x.disp, p->image, gc,     w+2, h - 2, 2*w - 2, h - 2);
+  XDrawLine(im->x.disp, p->image, gc,   w * 2,     0,   w * 3,     0);
+  XDrawLine(im->x.disp, p->image, gc,   w * 2,     0,   w * 2, h - 1);
 
   XFillRectangle(im->x.disp, p->image, gc, w * 2 , 0, (w - 1), (h - 1));
  
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
-  XDrawLine(im->x.disp, p->image, gc, (w * 2), 0, (w * 3), 0);
-  XDrawLine(im->x.disp, p->image, gc, (w * 2), 0, (w * 2), (h - 1));
+  if(style == STYLE_BEVEL) {
+    XDrawLine(im->x.disp, p->image, gc, (w - 1), 0, (w - 1), (h - 1));
+    XDrawLine(im->x.disp, p->image, gc, 0, (h - 1), w-1, (h - 1));
+  }
+  XDrawLine(im->x.disp, p->image, gc, (w * 2)+1, 1, (w * 3)-1, 1);
+  XDrawLine(im->x.disp, p->image, gc, (w * 2)+1, 1, (w * 2)+1, (h - 2));
+  XDrawLine(im->x.disp, p->image, gc, (w * 2) - 1, 0, (w * 2) - 1, h);
+  XDrawLine(im->x.disp, p->image, gc, w, (h - 1), (w * 2)-1, (h - 1));
 
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
-  XDrawLine(im->x.disp, p->image, gc, (w * 3) - 1, 0, (w * 3) - 1, (h - 1));
-  XDrawLine(im->x.disp, p->image, gc, (w * 2), (h - 1), (w * 3), (h - 1));
+  XDrawLine(im->x.disp, p->image, gc, (w * 3) - 1, 1, (w * 3) - 1, (h - 1));
+  XDrawLine(im->x.disp, p->image, gc, (w * 2) + 1, (h - 1), (w * 3), (h - 1));
 
   XFreeGC(im->x.disp, gc);
 
@@ -793,11 +838,11 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
   
   _draw_rectangular_box_with_colors(im, p->image, 2, 2, (w-1)-4, (h-1)-4, 
 				    xitk_get_pixel_color_white(im),
-				    xitk_get_pixel_color_darkgray(im),
+				    xitk_get_pixel_color_black(im),
 				    DRAW_OUTTER);
   _draw_rectangular_box_with_colors(im, p->image, w+2, 2, (w-1)-4, (h-1)-4, 
 				    xitk_get_pixel_color_white(im),
-				    xitk_get_pixel_color_darkgray(im),
+				    xitk_get_pixel_color_black(im),
 				    DRAW_OUTTER);
   _draw_rectangular_box_with_colors(im, p->image, (w*2)+2, 2, (w-1)-4, (h-1)-4, 
 				    xitk_get_pixel_color_white(im),
@@ -938,16 +983,16 @@ static void _draw_frame(ImlibData *im, Pixmap p,
     xstart = 3;
     xstop = fwidth + 12;
   }
-  _draw_rectangular_box(im, p, x, (y - yoff), 
-			xstart, xstop,
-			w, (h - yoff), sty[0]);
+  _draw_rectangular_box_light(im, p, x, (y - yoff), 
+			      xstart, xstop,
+			      w, (h - yoff), sty[0]);
   
   if(title)
     xstart--;
   
-  _draw_rectangular_box(im, p, (x + 1), ((y - yoff) + 1), 
-			xstart, xstop,
-			(w - 2), ((h - yoff) - 2), sty[1]);
+  _draw_rectangular_box_light(im, p, (x + 1), ((y - yoff) + 1), 
+			      xstart, xstop,
+			      (w - 2), ((h - yoff) - 2), sty[1]);
   
   if(title) {
     XLOCK(im->x.disp);
@@ -994,11 +1039,11 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
   gc = XCreateGC(im->x.disp, p->image, GCGraphicsExposures, &gcv);
   
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
-  XFillRectangle(im->x.disp, p->image, gc, 0, 0, (w * 3) , h);
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
+  XFillRectangle(im->x.disp, p->image, gc, 0, 0, (w * 3), h);
+  /*
   XFillRectangle(im->x.disp, p->image, gc, 0, 3, (w - 1), h);
   XFillRectangle(im->x.disp, p->image, gc, w, 0, (w - 1), h);
-
+  */
 
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
   XDrawLine(im->x.disp, p->image, gc, 0, 3, w, 3);
@@ -1009,7 +1054,7 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
   XDrawLine(im->x.disp, p->image, gc, (w * 2), 3, (w * 2), (h - 1));
   XDrawLine(im->x.disp, p->image, gc, (w * 2), 3, (w * 2) + 3, 0);
 
-  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_darkgray(im));
+  XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
   XDrawLine(im->x.disp, p->image, gc, (w - 1), 3, (w - 1), h);
   XDrawLine(im->x.disp, p->image, gc, (w * 2) - 1, 0, (w * 2) - 1, h);
   XDrawLine(im->x.disp, p->image, gc, (w * 3) - 1, 0, (w * 3) - 1, h);

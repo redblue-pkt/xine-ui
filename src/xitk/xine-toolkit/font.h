@@ -28,9 +28,9 @@
 
 #include "_xitk.h"
 
-#define DEFAULT_FONT_10 "*-lucida-*-r-*-*-10-*-*-*-*-*-*-*"
-#define DEFAULT_FONT_12 "*-lucida-*-r-*-*-12-*-*-*-*-*-*-*"
-#define DEFAULT_FONT_14 "*-lucida-*-r-*-*-14-*-*-*-*-*-*-*"
+#define DEFAULT_FONT_10 "*-helvetica-medium-r-*-*-10-*-*-*-*-*-*-*"
+#define DEFAULT_FONT_12 "*-helvetica-medium-r-*-*-12-*-*-*-*-*-*-*"
+#define DEFAULT_FONT_14 "*-helvetica-medium-r-*-*-14-*-*-*-*-*-*-*"
 
 /*
  * load font from font name. Return NULL on failure.

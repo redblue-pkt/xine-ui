@@ -533,7 +533,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     xitk_font_t    *fs;
     int             height;
     
-    fs = xitk_font_load_font(c->imlibdata->x.disp, DEFAULT_FONT_12);
+    fs = xitk_font_load_font(c->imlibdata->x.disp, DEFAULT_FONT_10);
     xitk_font_set_font(fs, c->parent_wlist->gc);
     height = xitk_font_get_string_height(fs, "HEIGHT");
     xitk_font_unload_font(fs);
@@ -546,7 +546,7 @@ xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c,
     xitk_list_append_content(c->parent_wlist->l, 
 			     (private_data->label_widget = 
 			      xitk_noskin_label_create(&lbl,
-						       x, y, (width - height), (height + 8), DEFAULT_FONT_12)));
+						       x, y, (width - height), (height + 8), DEFAULT_FONT_10)));
 
     cb.skin_element_name = NULL;
     cb.callback          = _combo_rollunroll;

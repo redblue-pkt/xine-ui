@@ -315,7 +315,7 @@ xitk_widget_t *xitk_noskin_tabs_create(xitk_tabs_widget_t *t, int x, int y, int 
     XITK_WIDGET_INIT(&lb, t->imlibdata);
     XITK_WIDGET_INIT(&b, t->imlibdata);
 
-    private_data->bheight = fheight * 3;
+    private_data->bheight = fheight * 2;
 
     for(i = 0; i < t->num_entries; i++) {
 
