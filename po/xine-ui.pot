@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2001-11-18 18:14+0100\n"
+"POT-Creation-Date: 2001-11-19 03:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,7 +43,7 @@ msgstr ""
 msgid "Choose a Skin"
 msgstr ""
 
-#: src/xitk/control.c:646 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:808
+#: src/xitk/control.c:646 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:817
 msgid "Dismiss"
 msgstr ""
 
@@ -306,19 +306,19 @@ msgstr ""
 msgid "Can't read %s: %s\n"
 msgstr ""
 
-#: src/xitk/playlist.c:781
+#: src/xitk/playlist.c:790
 msgid "Add"
 msgstr ""
 
-#: src/xitk/playlist.c:790
+#: src/xitk/playlist.c:799
 msgid "Load"
 msgstr ""
 
-#: src/xitk/playlist.c:799
+#: src/xitk/playlist.c:808
 msgid "Save"
 msgstr ""
 
-#: src/xitk/playlist.c:831
+#: src/xitk/playlist.c:840
 msgid "Scan for:"
 msgstr ""
 

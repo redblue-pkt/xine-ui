@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.4\n"
-"POT-Creation-Date: 2001-11-18 18:14+0100\n"
+"POT-Creation-Date: 2001-11-19 03:13+0100\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -43,7 +43,7 @@ msgstr "Ctr"
 msgid "Choose a Skin"
 msgstr "Choix de peaux"
 
-#: src/xitk/control.c:646 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:808
+#: src/xitk/control.c:646 src/xitk/mrl_browser.c:203 src/xitk/playlist.c:817
 msgid "Dismiss"
 msgstr "Quitte"
 
@@ -326,19 +326,19 @@ msgstr "Source:"
 msgid "Can't read %s: %s\n"
 msgstr "Ne peux pas lire %s: %s\n"
 
-#: src/xitk/playlist.c:781
+#: src/xitk/playlist.c:790
 msgid "Add"
 msgstr "Ajoute"
 
-#: src/xitk/playlist.c:790
+#: src/xitk/playlist.c:799
 msgid "Load"
 msgstr "Charge"
 
-#: src/xitk/playlist.c:799
+#: src/xitk/playlist.c:808
 msgid "Save"
 msgstr "Sauve"
 
-#: src/xitk/playlist.c:831
+#: src/xitk/playlist.c:840
 msgid "Scan for:"
 msgstr "Source:"
 

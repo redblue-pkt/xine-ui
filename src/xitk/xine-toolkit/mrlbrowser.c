@@ -646,6 +646,15 @@ static void mrlbrowser_handle_event(XEvent *event, void *data) {
   
   switch(event->type) {
 
+  case ButtonPress: {
+    XButtonEvent *bevent = (XButtonEvent *) event;
+    if (bevent->button == Button4)
+      xitk_browser_step_down((xitk_widget_t *)private_data->mrlb_list, NULL);
+    else if(bevent->button == Button5)
+      xitk_browser_step_up((xitk_widget_t *)private_data->mrlb_list, NULL);
+  }
+  break;
+
   case MappingNotify:
     XLOCK(private_data->imlibdata->x.disp);
     XRefreshKeyboardMapping((XMappingEvent *) event);

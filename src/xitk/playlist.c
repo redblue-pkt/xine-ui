@@ -502,6 +502,15 @@ void playlist_handle_event(XEvent *event, void *data) {
 
   switch(event->type) {
 
+  case ButtonPress: {
+    XButtonEvent *bevent = (XButtonEvent *) event;
+    if (bevent->button == Button4)
+      xitk_browser_step_down(playlist->playlist, NULL);
+    else if(bevent->button == Button5)
+      xitk_browser_step_up(playlist->playlist, NULL);
+  }
+  break;
+
   case KeyPress:
     if(xitk_is_widget_focused(playlist->winput)) {
       xitk_send_key_event(playlist->widget_list, playlist->winput, event);
