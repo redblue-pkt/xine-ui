@@ -42,6 +42,7 @@
 #include "event.h"
 #include "actions.h"
 #include "skins.h"
+#include "lang.h"
 
 /*
 #define DEBUG_VIEWLOG
@@ -229,7 +230,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   for(i = 0; i <= viewlog->log_entries; i++) {
     free(viewlog->log[i]);
   }
-
+  
   /* Compute log entries */
   viewlog->log_entries = 0;
   
@@ -238,7 +239,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
     /* Look for entries number */
     while(log[viewlog->log_entries] != NULL)
       viewlog->log_entries++;
-
+    
     viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * (viewlog->log_entries + 1));
     
     for(i = 0; i < viewlog->log_entries; i++) {
@@ -263,9 +264,9 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 			  _("There is no log entry for logging section '%s'.\n"), 
 			  xitk_tabs_get_current_tab_selected(viewlog->tabs));
 #endif
-
+  
   xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->log_entries, 0);
-
+  
   viewlog_clear_tab();
   viewlog_paint_widgets();
 }
@@ -283,23 +284,23 @@ static void viewlog_refresh(xitk_widget_t *w, void *data) {
 static void viewlog_create_tabs(void) {
   Pixmap               bg;
   xitk_tabs_widget_t   tab;
-  char                *log_sections[XINE_LOG_NUM + 1] = {
-    "messages",
-    "codecs",
-    NULL
-  };
+  const char         **log_sections = xine_get_log_names();
+  char                *tab_sections[XINE_LOG_NUM + 1];
+  int                  i;
 
   /* 
-     create log sections
-  */
-  
-  //  viewlog->logs = log_sections;
-  
+   * create log sections
+   */
+  for(i = 0; i < (XINE_LOG_NUM); i++) {
+    tab_sections[i] = (char *)log_sections[i];
+  }
+  tab_sections[i] = NULL;
+
   XITK_WIDGET_INIT(&tab, gGui->imlib_data);
   
   tab.skin_element_name = NULL;
   tab.num_entries       = XINE_LOG_NUM;
-  tab.entries           = log_sections;
+  tab.entries           = tab_sections;
   tab.parent_wlist      = viewlog->widget_list;
   tab.callback          = viewlog_change_section;
   tab.userdata          = NULL;
@@ -332,6 +333,7 @@ static void viewlog_end(xitk_widget_t *w, void *data) {
   viewlog_exit(NULL, NULL);
 }
 
+
 /*
  * Create viewlog window
  */
@@ -350,7 +352,7 @@ void viewlog_window(void) {
   
   viewlog = (_viewlog_t *) xine_xmalloc(sizeof(_viewlog_t));
   viewlog->log = (char **) xine_xmalloc(sizeof(char **));
-  
+
   x = gGui->config->register_num (gGui->config, "gui.viewlog_x", 100, NULL, NULL, NULL, NULL);
   y = gGui->config->register_num (gGui->config, "gui.viewlog_y", 100, NULL, NULL, NULL, NULL);
 

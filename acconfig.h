@@ -57,4 +57,7 @@
 /* Path where catalog files will be. */
 #undef XITK_LOCALE
 
+/* Path where docs files will be. */
+#undef XINE_DOCDIR
+
 #endif

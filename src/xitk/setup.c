@@ -42,6 +42,7 @@
 #include "event.h"
 #include "actions.h"
 #include "skins.h"
+#include "lang.h"
 
 extern gGui_t              *gGui;
 
@@ -57,6 +58,7 @@ static char                *fontname = "-*-helvetica-medium-r-*-*-10-*-*-*-*-*-*
 #define FRAME_HEIGHT        40
 
 #define MAX_DISPLAY_WIDGETS 8
+#define BROWSER_MAX_DISP_ENTRIES 17
 
 #define ADD_FRAME(title) {                                                                      \
     xitk_widget_t       *frame = NULL;                                                          \
@@ -173,6 +175,13 @@ typedef struct {
   int                   num_wg;
   int                   first_displayed;
 
+  char                **config_content;
+  int                   config_lines;
+  char                **readme_content;
+  int                   readme_lines;
+  char                **faq_content;
+  int                   faq_lines;
+
   xitk_register_key_t   kreg;
 
 } _setup_t;
@@ -202,6 +211,7 @@ static int set_current_prop(int prop, int value) {
  */
 void setup_exit(xitk_widget_t *w, void *data) {
   window_info_t wi;
+  int           i;
 
   setup->running = 0;
   setup->visible = 0;
@@ -232,7 +242,28 @@ void setup_exit(xitk_widget_t *w, void *data) {
   XUnlockDisplay(gGui->display);
 
   free(setup->widget_list);
-  
+
+  if(setup->config_content) {
+    for(i = 0; i < setup->config_lines; i++) {
+      free(setup->config_content[i]);
+    }
+    free(setup->config_content);
+  }
+
+  if(setup->faq_content) {
+    for(i = 0; i < setup->faq_lines; i++) {
+      free(setup->faq_content[i]);
+    }
+    free(setup->faq_content);
+  }
+
+  if(setup->readme_content) {
+    for(i = 0; i < setup->readme_lines; i++) {
+      free(setup->readme_content[i]);
+    }
+    free(setup->readme_content);
+  }
+
   free(setup);
   setup = NULL;
 
@@ -342,13 +373,17 @@ static void setup_paint_widgets(void) {
   /* Move widgets to new position, then display its */
   for(i = setup->first_displayed; i < last; i++) {
 
-    xitk_get_widget_pos(setup->wg[i]->frame, &wx, &wy);
-    xitk_set_widget_pos(setup->wg[i]->frame, wx, y);
+    if(setup->wg[i]->frame) {
+      xitk_get_widget_pos(setup->wg[i]->frame, &wx, &wy);
+      xitk_set_widget_pos(setup->wg[i]->frame, wx, y);
 
-    y += FRAME_HEIGHT >> 1;
+      y += FRAME_HEIGHT >> 1;
+    }
 
-    xitk_get_widget_pos(setup->wg[i]->label, &wx, &wy);
-    xitk_set_widget_pos(setup->wg[i]->label, wx, y);
+    if(setup->wg[i]->label) {
+      xitk_get_widget_pos(setup->wg[i]->label, &wx, &wy);
+      xitk_set_widget_pos(setup->wg[i]->label, wx, y);
+    }
 
     xitk_get_widget_pos(setup->wg[i]->widget, &wx, &wy);
     /* Inputtext/intbox/combo widgets have special treatments */
@@ -694,6 +729,51 @@ static widget_triplet_t *setup_add_combo (char *title, char *labelkey,
 }
 
 /*
+ * Add a browser (needed for help files display).
+ */
+static widget_triplet_t *setup_list_browser(int x, int y, char **content, int len) {
+  xitk_browser_widget_t     br;
+  xitk_widget_t            *browser;
+  static widget_triplet_t  *wt;
+
+  wt = (widget_triplet_t *) xine_xmalloc(sizeof(widget_triplet_t));
+
+  XITK_WIDGET_INIT(&br, gGui->imlib_data);
+
+  br.arrow_up.skin_element_name    = NULL;
+  br.slider.skin_element_name      = NULL;
+  br.arrow_dn.skin_element_name    = NULL;
+  br.browser.skin_element_name     = NULL;
+  br.browser.max_displayed_entries = BROWSER_MAX_DISP_ENTRIES;
+  br.browser.num_entries           = len;
+  br.browser.entries               = content;
+  br.callback                      = NULL;
+  br.dbl_click_callback            = NULL;
+  br.dbl_click_time                = DEFAULT_DBL_CLICK_TIME;
+  br.parent_wlist                  = setup->widget_list;
+  br.userdata                      = NULL;
+  xitk_list_append_content(setup->widget_list->l, 
+			   (browser = 
+			    xitk_noskin_browser_create(&br,
+						       setup->widget_list->gc, 
+						       x, y,
+						       (WINDOW_WIDTH - 50) - 16,
+						       20, 16, fontname)));
+  
+  xitk_browser_set_alignment(browser, LABEL_ALIGN_LEFT);
+  xitk_browser_update_list(browser, content, len, 0);
+
+  setup->tmp_widgets[setup->num_tmp_widgets] = browser;
+  setup->num_tmp_widgets++;
+
+  wt->widget = browser;
+  wt->frame  = NULL;
+  wt->label  = NULL;
+
+  return wt;
+}
+
+/*
  *
  */
 static void setup_section_widgets (int s) {
@@ -704,55 +784,75 @@ static void setup_section_widgets (int s) {
   char                *section;
   char                *labelkey;
 
-  section = setup->sections[s];
-  len     = strlen (section);
-  entry   = gGui->config->first;
-  
-  while (entry) {
-
-    if (!strncmp (entry->key, section, len) && entry->description) {
+  /* Selected tab is one of help sections */
+  if(s >= (setup->num_sections - 3)) {
+    if(s == (setup->num_sections - 3)) {
+      setup->wg[setup->num_wg] = setup_list_browser (25, 70, 
+						     setup->config_content, setup->config_lines);
+    }
+    else if(s == (setup->num_sections - 2)) {
+      setup->wg[setup->num_wg] = setup_list_browser (25, 70, 
+						     setup->readme_content, setup->readme_lines);
+    }
+    else if(s == (setup->num_sections - 1)) {
+      setup->wg[setup->num_wg] = setup_list_browser (25, 70, 
+						     setup->faq_content, setup->faq_lines);
+    }
+    
+    DISABLE_ME(setup->wg[setup->num_wg]);
+    setup->num_wg++;
+  }
+  else {
+    
+    section = setup->sections[s];
+    len     = strlen (section);
+    entry   = gGui->config->first;
+    
+    while (entry) {
       
-      labelkey = &entry->key[len+1];
-
-      switch (entry->type) {
-
-      case CONFIG_TYPE_RANGE: /* slider */
-	setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
-	DISABLE_ME(setup->wg[setup->num_wg]);
-	setup->num_wg++;
-	break;
+      if (!strncmp (entry->key, section, len) && entry->description) {
 	
-      case CONFIG_TYPE_STRING:
-	setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
-	DISABLE_ME(setup->wg[setup->num_wg]);
-	setup->num_wg++;
-	break;
+	labelkey = &entry->key[len+1];
 	
-      case CONFIG_TYPE_ENUM:
-	setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
-	DISABLE_ME(setup->wg[setup->num_wg]);
-	setup->num_wg++;
-	break;
+	switch (entry->type) {
+	  
+	case CONFIG_TYPE_RANGE: /* slider */
+	  setup->wg[setup->num_wg] = setup_add_slider (entry->description, labelkey, x, y, entry);
+	  DISABLE_ME(setup->wg[setup->num_wg]);
+	  setup->num_wg++;
+	  break;
+	  
+	case CONFIG_TYPE_STRING:
+	  setup->wg[setup->num_wg] = setup_add_inputtext (entry->description, labelkey, x, y, entry);
+	  DISABLE_ME(setup->wg[setup->num_wg]);
+	  setup->num_wg++;
+	  break;
+	  
+	case CONFIG_TYPE_ENUM:
+	  setup->wg[setup->num_wg] = setup_add_combo (entry->description, labelkey, x, y, entry);
+	  DISABLE_ME(setup->wg[setup->num_wg]);
+	  setup->num_wg++;
+	  break;
+	  
+	case CONFIG_TYPE_NUM:
+	  setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
+	  DISABLE_ME(setup->wg[setup->num_wg]);
+	  setup->num_wg++;
+	  break;
+	  
+	case CONFIG_TYPE_BOOL:
+	  setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
+	  DISABLE_ME(setup->wg[setup->num_wg]);
+	  setup->num_wg++;
+	  break;
+	  
+	}
 	
-      case CONFIG_TYPE_NUM:
-	setup->wg[setup->num_wg] = setup_add_inputnum (entry->description, labelkey, x, y, entry);
-	DISABLE_ME(setup->wg[setup->num_wg]);
-	setup->num_wg++;
-	break;
-
-      case CONFIG_TYPE_BOOL:
-	setup->wg[setup->num_wg] = setup_add_checkbox (entry->description, labelkey, x, y, entry);
-	DISABLE_ME(setup->wg[setup->num_wg]);
-	setup->num_wg++;
-	break;
-
       }
       
+      entry = entry->next;
     }
-
-    entry = entry->next;
   }
-
 }
 
 /*
@@ -837,7 +937,12 @@ static void setup_sections (void) {
 
     entry = entry->next;
   }
-
+  setup->sections[setup->num_sections] = strdup(_("Help"));
+  setup->num_sections++;
+  setup->sections[setup->num_sections] = strdup(_("README"));
+  setup->num_sections++;
+  setup->sections[setup->num_sections] = strdup(_("FAQ"));
+  setup->num_sections++;
 
   XITK_WIDGET_INIT(&tab, gGui->imlib_data);
 
@@ -903,6 +1008,68 @@ static void setup_nextprev_wg(xitk_widget_t *w, void *data) {
 }
 
 /*
+ * Read adn store some files.
+ */
+static char **_setup_read_given(char *given, int *ndest) {
+  char            buf[PATH_MAX + NAME_MAX + 1];
+  char            buffer[256], *ln;
+  const langs_t  *l;
+  FILE           *fd;
+  int             first_try = 1;
+  char          **dest = NULL;
+
+  if((given == NULL) || (ndest == NULL))
+    return NULL;
+  
+  *ndest = 0;
+  
+  memset(&buf, 0, sizeof(buf));
+  
+  l = get_lang();
+
+ __redo:
+
+  sprintf(buf, "%s/%s%s", XINE_DOCDIR, given, l->ext);
+  
+  if((fd = fopen(buf, "r")) != NULL) {
+    
+    while((ln = fgets(buffer, 255, fd)) != NULL) {
+      dest = (char **) realloc(dest, sizeof(char *) * (*ndest + 2));
+      
+      /* label widget hate empty labels */
+      dest[*ndest] = strdup(strlen(ln) ? ln : " ");
+      
+      /* Remove newline */
+      if(dest[*ndest][strlen(dest[*ndest]) - 1] == '\n')
+	dest[*ndest][strlen(dest[*ndest]) - 1] = '\0';
+      
+      (*ndest)++;
+    }
+    
+    dest[*ndest] = NULL;
+    
+    fclose(fd);
+  }
+
+  if(first_try && (dest == NULL)) {
+    l = get_default_lang();
+    first_try--;
+    goto __redo;
+  }
+
+  return dest;  
+}
+static void setup_read_config(void) {
+  setup->config_content = _setup_read_given("README.config", &setup->config_lines);
+}
+static void setup_read_readme(void) {
+  setup->readme_content = _setup_read_given("README", &setup->readme_lines);
+}
+static void setup_read_faq(void) {
+  setup->faq_content =  _setup_read_given("FAQ", &setup->faq_lines);
+}
+
+/*
  * Create setup panel window
  */
 void setup_panel(void) {
@@ -927,6 +1094,11 @@ void setup_panel(void) {
   setup->xwin = xitk_window_create_dialog_window(gGui->imlib_data,
 						 _("xine setup"), 
 						 x, y, WINDOW_WIDTH, WINDOW_HEIGHT);
+
+  /* Read some help files */
+  setup_read_config();
+  setup_read_readme();
+  setup_read_faq();
   
   XLockDisplay (gGui->display);
 
@@ -999,8 +1171,6 @@ void setup_panel(void) {
 					   NULL,
 					   setup->widget_list,
 					   NULL);
-
-  //  XUnlockDisplay (gGui->display);
 
   XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
 

@@ -5,9 +5,9 @@ EXTRA_DIST = $(docs_DATA)
 
 docsdir = $(datadir)/doc/xine-ui
 
-docs_DATA = FAQ FAQ_es FAQ_fr FAQ_it FAQ_pl \
-	README README.corba README.dxr3 README.dxr3_pl README.freebsd README.irix README.mrl \
-	README.solaris README.syncfb README.xinerc README_es README_pl README_it \
+docs_DATA = FAQ_en FAQ_es FAQ_fr FAQ_it FAQ_pl \
+	README_en README.corba README.dxr3 README.dxr3_pl README.freebsd README.irix README.mrl \
+	README.solaris README.syncfb README.config_en README_es README_pl README_it \
 	bug_report_form README.divx4
 
 debug:

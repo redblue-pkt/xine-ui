@@ -513,13 +513,13 @@ AC_SUBST(XINE_SKINDIR)
 dnl
 dnl desktop dir location, xine-config told us about this.
 dnl
-
 escapedprefix="`echo $prefix | sed -e 's/\\//\\\\\//g'`"
 XINE_SCRIPTDIR="`echo $xine_script_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_SCRIPTDIR)
 AC_DEFINE_UNQUOTED(XINE_SCRIPTDIR, "$XINE_SCRIPTDIR")
 XINE_DESKTOPDIR="`echo $xine_desktop_dir|sed -e 's/\^'$escapedprefix/'\${prefix}'/`"
 AC_SUBST(XINE_DESKTOPDIR)
+
 
 dnl
 dnl NLS, part II
@@ -534,6 +534,11 @@ XITK_LOCALEDIR="${datadir}/locale"
 eval XITK_LOCALE=`eval echo "$XITK_LOCALEDIR"`
 AC_SUBST(XITK_LOCALE)
 AC_DEFINE_UNQUOTED(XITK_LOCALE, "$XITK_LOCALE")
+
+XINE_DOCPATH="${datadir}/doc/xine-ui"
+eval XINE_DOCDIR=`eval echo "$XINE_DOCPATH"`
+AC_SUBST(XINE_DOCDIR)
+AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR")
 
 
 dnl

@@ -39,8 +39,8 @@ typedef struct {
 
   xitk_widget_t          *bWidget;
   xitk_widget_t          *item_tree[BROWSER_MAX_ENTRIES];
-  Window                  win;
-  GC                      gc;
+  xitk_widget_list_t     *parent_wlist;
+
 
   char                  **content;
   int                     max_length;
