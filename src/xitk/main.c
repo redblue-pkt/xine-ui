@@ -1141,6 +1141,16 @@ int main(int argc, char *argv[]) {
     gGui->ao_port = load_audio_out_driver(driver_num);
   }
   SAFE_FREE(audio_driver_id);
+  
+
+  gGui->vis = xine_post_init(gGui->xine, "goom", 0, &gGui->ao_port, &gGui->vo_port);
+  if (gGui->vis) {
+    
+    /*gGui->ao_port = gGui->post1->audio_input[0];*/
+    
+    printf("xine: post plugin successfully initialized\n");
+  }
+  gGui->using_vis = 0;
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
 

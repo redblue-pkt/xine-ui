@@ -132,6 +132,10 @@ typedef struct {
 
   xine_stream_t            *stream;
 
+  xine_post_t              *vis;
+  
+  int                       using_vis;
+  
   xine_t                   *xine;
 
   xine_event_queue_t       *event_queue;

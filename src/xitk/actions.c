@@ -82,10 +82,30 @@ void gui_display_logo(void) {
 
 int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) {
   int ret;
+  int has_video;
   
   if(start_time_in_secs)
     start_time_in_secs *= 1000;
-
+      
+  has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
+  
+  if( (has_video || gGui->visual_anim.enabled) && gGui->using_vis ) {
+    xine_post_out_t * audio_source;
+    
+    audio_source = xine_get_audio_source(stream);
+    if( xine_post_wire_audio_port( audio_source, gGui->ao_port ) )
+      gGui->using_vis = 0;
+  
+  } else if ( !has_video && !gGui->visual_anim.enabled && 
+              !gGui->using_vis && gGui->vis ) {
+    xine_post_out_t * audio_source;
+    
+    audio_source = xine_get_audio_source(stream);
+    if( xine_post_wire_audio_port( audio_source, gGui->vis->audio_input[0] ) )
+      gGui->using_vis = 1;
+    
+  }
+  
   if((ret = xine_play(stream, start_pos, start_time_in_secs)) == 0) {
     gui_handle_xine_error(stream);
   }
@@ -96,8 +116,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
       gGui->logo_mode = 0;
     
     if(gGui->logo_mode == 0) {
-      int has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
-      
+     
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
       
