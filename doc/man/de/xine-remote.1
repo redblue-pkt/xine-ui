@@ -1,0 +1,76 @@
+.\" -*-Nroff-*-
+.\""
+.\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
+.\" other parms are allowed: see man(7), man(1)
+.\""
+.TH "XINE-REMOTE" 1x "30. April 2002" "Das xine Projekt"
+.SH NAME
+xine-remote \- Ein kleines Programm um xine fernzusteuern.
+
+.SH "SYNTAX"
+.B xine-remote
+.I "[Optionen]"
+
+.SH "BESCHREIBUNG"
+Diese Handbuchseite beschreibt kurz das
+.BR xine-remote
+Programm.
+.PP
+.B xine-remote
+kann eine "rohe" telnet\-Verbindung zum Fernsteuern von xine ersetzen.
+Es benutzt die Möglichkeiten von \fBreadline\fP (Vervollständigung, vi/emacs\-Kürzel, Kommandohisorie, usw...).
+Normalerweise wird eine Verbindung zum lokalen Rechner (\fBlocalhost\fP)  und dem Standardport (siehe \fIxine\fP(1)) hergestellt.
+
+.SH "OPTIONEN"
+Dieses Programm folgt dem üblichen Format der GNU Kommandozeilenoptionen, in dem lange Optionen mit 2 Minuszeichen (`\-') beginnen.
+Eine Zusammenfassung der Optionen ist unten aufgeführt.
+.TP
+.BR \-H,\ \-\-host\  <Rechnername>
+Verbindung zu <\fBRechnername\fP> versuchen.
+.TP
+.BR \-P,\ \-\-port\  <Port>
+Verbindung zum Rechner unter Portnummer <\fBport\fP> versuchen.
+.TP
+.BR \-c,\ \-\-command\  <Kommando>
+Sende <\fBKommando\fP> zum Server und danach beenden.
+Der Befehl sollte in Hochkommata gestellt sein, falls er Leerzeichen oder andere spezielle Zeichen enthält.
+.TP
+.B \-n, \-\-noconnect
+Keine Verbindung nach dem Start initiieren.
+.TP
+.B \-v, \-\-version
+Version anzeigen.
+.TP
+.B \-h, \-\-help
+Zusammenfassung der Optionen anzeigen.
+.br
+
+.SH "KOMMANDOS"
+Einige wenige Befehle sind verfügbar, die zum öffnen und schließen der Verbindung diesen:
+.TP
+.B ?
+Zeigt die verfügbaren Kommandos an (Die von \fBxine-remove\fP und die des Servers, wenn eine Verbindung besteht),
+.TP
+.B version
+Zeigt die Version an.
+.TP
+.BR open\  <Server[:Port]>
+Öffnet erine Verbindung zu \fBServer\fP.
+Der \fBPort\fP kann optional durch einen Doppelpunkt (\fB:\fP) getrennt angegeben werden.
+Der Standardport ist \fB6789\fP.
+.TP
+.B close
+Schließt die Verbindung.
+.TP
+.B quit
+Beendet \fBxine-remote\fP.
+.LP
+Die übrigen Befehle hängen vom Server ab, der momentan verbunden ist.
+
+.SH "SIEHE AUCH"
+.BR xine (1).
+
+.SH AUTHOR
+Diese Hilfe wurde von Philipp Hahn <pmhahn@users.sf.net> für das xine Project übersetzt.
+
+Das englische Original wurde von Daniel Caujolle-Bert <f1rmb@users.sourceforge.net> für das xine Projekt geschrieben.
