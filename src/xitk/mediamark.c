@@ -733,7 +733,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 	    if((ln) && (strlen(ln))) {
 	      
 	      if(strncmp(ln, "#", 1)) {
-
+		
 		pp = ln;
 		
 		while(*pp != '\0') {
@@ -890,8 +890,8 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 		  if(*pp != '\0') {
 		    *p = *pp;
 		    p++;
+		    pp++;
 		  }
-		  pp++;
 		}
 		
 	      }
