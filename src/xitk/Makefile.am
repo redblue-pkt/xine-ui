@@ -20,7 +20,7 @@ xine_LDADD = $(top_builddir)/src/xitk/xine-toolkit/libxitk.la \
 	@XINE_LIBS@ $(LIRC_LIBS) $(THREAD_LIBS) \
 	$(DYNAMIC_LD_LIBS) $(X_LIBS) $(DPMS_LIBS) -lX11 -lm
 
-noinst_HEADERS = event.h parseskin.h playlist.h control.h \
+noinst_HEADERS = $(GETOPT_H) event.h parseskin.h playlist.h control.h \
 	panel.h lirc.h actions.h videowin.h mrl_browser.h
 
 utils.c:
