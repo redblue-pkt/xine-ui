@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-06-11 01:22+0200\n"
+"POT-Creation-Date: 2002-06-12 11:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 msgid "No MRL (input stream) specified"
 msgstr ""
 
-#: src/xitk/actions.c:621
+#: src/xitk/actions.c:618
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr ""
@@ -550,19 +550,19 @@ msgstr ""
 msgid "No audio plugin available to decode '%s'."
 msgstr ""
 
-#: src/xitk/main.c:623
+#: src/xitk/main.c:624
 msgid "never"
 msgstr ""
 
-#: src/xitk/main.c:624
+#: src/xitk/main.c:625
 msgid "video only"
 msgstr ""
 
-#: src/xitk/main.c:625
+#: src/xitk/main.c:626
 msgid "audio only"
 msgstr ""
 
-#: src/xitk/main.c:626
+#: src/xitk/main.c:627
 msgid "always"
 msgstr ""
 

@@ -95,7 +95,6 @@ static struct option long_options[] = {
   {"auto-quit"      , no_argument      , 0, 'q' },
   {"audio-driver"   , required_argument, 0, 'A' },
   {"video-driver"   , required_argument, 0, 'V' },
-  {"recognize-by"   , optional_argument, 0, 'R' },
   {"version"        , no_argument      , 0, 'v' },
   {0                , no_argument      , 0,  0  }
 };
@@ -161,12 +160,6 @@ static void print_usage (void) {
   }
   printf ("\n");
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
-  printf("  -R, --recognize-by [option]  Try to recognize stream type. Option are:\n");
-  printf("                                 'default': by content, then by extension,\n");
-  printf("                                 'revert': by extension, then by content,\n");
-  printf("                                 'content': only by content,\n");
-  printf("                                 'extension': only by extension.\n");
-  printf("                                 -if no option is given, 'revert' is selected\n");
   printf("  -d, --debug                  Show debug messages.\n");
   printf("\n");
   printf("Examples for valid MRLs (media resource locator):\n");
