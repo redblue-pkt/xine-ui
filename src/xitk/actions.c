@@ -475,7 +475,8 @@ void gui_exit (xitk_widget_t *w, void *data) {
   if(video_window_is_visible())
     video_window_set_visibility(0);
   
-  video_window_exit ();
+  tvout_deinit(gGui->tvout);
+  video_window_exit();
 
 #ifdef HAVE_XF86VIDMODE
   /* just in case a different modeline than the original one is running,

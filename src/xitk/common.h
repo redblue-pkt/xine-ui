@@ -65,6 +65,7 @@
 #include "osd.h"
 #include "file_browser.h"
 #include "post.h"
+#include "tvout.h"
 
 #include "libcommon.h"
 
@@ -115,6 +116,8 @@
 
 typedef struct {
   xine_video_port_t        *vo_port;
+
+  tvout_t                  *tvout;
 
   post_element_t          **post_elements;
   int                       post_elements_num;

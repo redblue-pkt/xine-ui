@@ -110,7 +110,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef HAVE_XF86VIDMODE
  "F"
 #endif
- "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:c:E";
+ "u:a:V:A:p::s:RG:BN:P:l::S:ZDr:c:ET:";
 
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
@@ -156,6 +156,7 @@ static struct option long_options[] = {
   {"post"           , required_argument, 0, OPTION_POST              },
   {"disable-post"   , no_argument      , 0, OPTION_DISABLE_POST      },
   {"no-splash"      , no_argument      , 0, OPTION_NO_SPLASH         },
+  {"tvout"          , required_argument, 0, 'T'                      },
   {0                , no_argument      , 0, 0                        }
 };
 
@@ -429,6 +430,7 @@ void show_usage (void) {
   char         *cfgdir     = CONFIGDIR;
   char         *cfgfile    = CONFIGFILE;
   char         *configfile = NULL;
+  char        **backends, *backend;
   
   configfile = (char *) xine_xmalloc(strlen(xine_get_homedir())
 				     + strlen(cfgdir) 
@@ -451,24 +453,25 @@ void show_usage (void) {
   printf(_("  -c, --config <file>          Use config file instead of default one.\n"));
   printf(_("  -V, --video-driver <drv>     Select video driver by id. Available drivers: \n"));
   printf("                               ");
-  driver_ids = xine_list_video_output_plugins (xine);
-  driver_id  = *driver_ids++;
-  while (driver_id) {
-    printf ("%s ", driver_id);
+  if((driver_ids = xine_list_video_output_plugins (xine))) {
     driver_id  = *driver_ids++;
+    while (driver_id) {
+      printf ("%s ", driver_id);
+      driver_id  = *driver_ids++;
+    }
   }
   printf ("\n");
 
   printf(_("  -A, --audio-driver <drv>     Select audio driver by id. Available drivers: \n"));
   printf("                               null ");
-  driver_ids = xine_list_audio_output_plugins (xine);
-  driver_id  = *driver_ids++;
-  while (driver_id) {
-    printf ("%s ", driver_id);
+  if((driver_ids = xine_list_audio_output_plugins (xine))) {
     driver_id  = *driver_ids++;
+    while (driver_id) {
+      printf ("%s ", driver_id);
+      driver_id  = *driver_ids++;
+    }
   }
   printf ("\n");
-
   printf(_("  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"));
   printf(_("  -a, --audio-channel <#>      Select audio channel '#'.\n"));
   printf(_("  -p, --auto-play [opt]        Play on start. Can be followed by:\n"));
@@ -547,7 +550,16 @@ void show_usage (void) {
   printf(_("      --disable-post           Don't enable post plugin(s).\n"));
   printf(_("      --no-splash              Don't display the splash screen.\n"));
   printf(_("      --stdctl                 Control xine by the console, using lirc commands.\n"));
-  printf("\n");
+  printf(_("  -T, --tvout <backend>        Turn on tvout support. Backend can be:\n"));
+  printf("                               ");
+  if((backends = tvout_get_backend_names())) {
+    backend = *backends++;
+    while(backend) {
+      printf("%s ", backend);
+      backend = *backends++;
+    }
+  }
+  printf("\n\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
   printf(_("         '/path/foo.vob'\n"));
@@ -1127,6 +1139,7 @@ int main(int argc, char *argv[]) {
   int                     old_playlist_cfg, no_old_playlist = 0;
   char                  **pplugins        = NULL;
   int                     pplugins_num    = 0;
+  char                   *tvout           = NULL;
 
 #ifdef HAVE_SETLOCALE
   if((xitk_set_locale()) != NULL)
@@ -1494,6 +1507,10 @@ int main(int argc, char *argv[]) {
     case OPTION_STDCTL:
       gGui->stdctl_enable = 1;
       break;
+
+    case 'T':
+      tvout = optarg;
+      break;
       
     default:
       show_usage();
@@ -1731,6 +1748,11 @@ int main(int argc, char *argv[]) {
 
   gGui->event_queue = xine_event_new_queue(gGui->stream);
   xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
+
+  if(tvout && strlen(tvout)) {
+    if((gGui->tvout = tvout_init(gGui->display, tvout)))
+      tvout_setup(gGui->tvout);
+  }
 
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);

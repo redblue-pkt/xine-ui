@@ -1481,6 +1481,14 @@ void gui_run(void) {
   start_remote_server();
   init_session();
 
+  if(gGui->tvout) {
+    int w, h;
+    
+    video_window_get_visible_size(&w, &h);
+    tvout_set_fullscreen_mode(gGui->tvout, 
+			      ((video_window_get_fullscreen_mode() & WINDOWED_MODE) ? 0 : 1), w, h);
+  }
+  
   if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
     /* Popup setup window if there is no config file */

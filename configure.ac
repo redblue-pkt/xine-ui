@@ -570,6 +570,12 @@ dnl AC_SUBST(CORBA_DEP)
 
 
 dnl
+dnl Check for nvtvsimple library
+dnl
+AC_CHECK_NVTV
+
+
+dnl
 dnl
 dnl
 BUILD_CC="`$CC -v 2>&1 | tail -1`"

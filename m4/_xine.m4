@@ -53,6 +53,27 @@ AC_DEFUN([AC_CHECK_LIRC],
      AC_SUBST(LIRC_INCLUDE)
 ])
 
+dnl
+AC_DEFUN([AC_CHECK_NVTV],
+  [AC_ARG_ENABLE(nvtv,
+     [  --disable-nvtv          Turn off nvtv support.],
+     [], enable_nvtv=yes)
+
+  if test x"$enable_nvtv" = xyes; then
+     have_nvtv=yes
+     AC_REQUIRE_CPP
+     AC_CHECK_LIB(nvtvsimple, nvtv_simple_init,
+           [AC_CHECK_HEADER(nvtv/nvtv_simple.h, true, have_nvtv=no)], have_nvtv=no)
+     if test "$have_nvtv" = "yes"; then
+        AC_DEFINE([HAVE_NVTV],,[Define this if you have libnvtvsimple installed])
+	NVTV_LIBS="-lnvtvsimple"
+     fi
+  else
+     AC_MSG_RESULT([*** NVTV support not available, nv tvout support disabled ***]);
+  fi
+
+  AC_SUBST(NVTV_LIBS)
+])
 
 dnl AC_C_ATTRIBUTE_ALIGNED
 dnl define ATTRIBUTE_ALIGNED_MAX to the maximum alignment if this is supported

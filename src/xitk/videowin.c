@@ -101,7 +101,7 @@ typedef struct {
 
   int            visible_width;   /* Size of currently visible portion of screen */
   int            visible_height;  /* May differ from fullscreen_* e.g. for TV mode */
-  double         visible_aspect;  /* Pixel ratio of currently vissible screen */
+  double         visible_aspect;  /* Pixel ratio of currently visible screen */
 
   int            using_xinerama;
 #ifdef HAVE_XINERAMA
@@ -1005,7 +1005,8 @@ void video_window_frame_output_cb (void *data,
  *
  */
 void video_window_set_fullscreen_mode (int req_fullscreen) {
-  
+  int previous_fullscreen_mode = gVw->fullscreen_mode;
+
   if(!(gVw->fullscreen_mode & req_fullscreen)) {
 
 #ifdef HAVE_XINERAMA
@@ -1032,6 +1033,13 @@ void video_window_set_fullscreen_mode (int req_fullscreen) {
   }
 
   video_window_adapt_size ();
+
+  if(gGui->tvout && (previous_fullscreen_mode & (WINDOWED_MODE | FULLSCR_MODE))) {
+    if(gVw->fullscreen_mode & WINDOWED_MODE)
+      tvout_set_fullscreen_mode(gGui->tvout, 0, gVw->visible_width, gVw->visible_height);
+    else if(gVw->fullscreen_mode & FULLSCR_MODE)
+      tvout_set_fullscreen_mode(gGui->tvout, 1, gVw->visible_width, gVw->visible_height);
+  }
 }
 
 /*
@@ -1882,4 +1890,11 @@ void video_window_get_frame_size(int *w, int *h) {
     *w = gVw->frame_width;
   if(h)
     *h = gVw->frame_height;
+}
+
+void video_window_get_visible_size(int *w, int *h) {
+  if(w)
+    *w = gVw->visible_width;
+  if(h)
+    *h = gVw->visible_height;
 }
