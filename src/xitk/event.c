@@ -951,7 +951,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
   }
 
   gGui->layer_above = 
-    xine_config_register_bool (gGui->xine, "gui.layer_above", 1,
+    xine_config_register_bool (gGui->xine, "gui.layer_above", 0,
 			       _("Windows stacking"),
 			       _("Use wm layer property to place window on top."), 
 			       CONFIG_LEVEL_ADV,
@@ -1021,7 +1021,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 
   gGui->visual_anim.enabled = 
     xine_config_register_enum(gGui->xine, "gui.visual_anim", 
-			      0,
+			      1, /* Post plugin */
 			      visual_anim_style,
 			      _("Visual animation style"),
 			      _("Display some video animations when "
@@ -1293,8 +1293,10 @@ void gui_run (void) {
   if(gGui->actions_on_start[0] != ACTID_NOKEY) {
 
     /* Popup setup window if there is no config file */
-    if(actions_on_start(gGui->actions_on_start, ACTID_SETUP))
+    if(actions_on_start(gGui->actions_on_start, ACTID_SETUP)) {
+      config_save();
       gui_execute_action_id(ACTID_SETUP);
+    }
     
     /*  The user wants to hide control panel  */
     if(panel_is_visible() && (actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_VISIBLITY)))

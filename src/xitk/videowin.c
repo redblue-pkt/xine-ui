@@ -1382,7 +1382,7 @@ void video_window_init (window_attributes_t *window_attribute, int hide_on_start
   gVw->stream_resize_window = 
     xine_config_register_bool(gGui->xine, 
 			      "gui.stream_resize_window", 
-			      0,
+			      1,
 			      _("New stream sizes resize output window"),
 			      CONFIG_NO_HELP,
 			      CONFIG_LEVEL_ADV,

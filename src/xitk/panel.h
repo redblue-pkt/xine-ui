@@ -43,6 +43,7 @@ typedef struct {
 
   xitk_widget_t        *title_label;
   xitk_widget_t        *runtime_label;
+  int                   runtime_mode;
 
   struct {
     int                 enabled;

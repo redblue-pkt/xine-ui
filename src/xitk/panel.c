@@ -232,19 +232,29 @@ void panel_change_skins(void) {
  * Update runtime displayed informations.
  */
 void panel_update_runtime_display(void) {
-  int seconds;
-  char timestr[10];
+  int seconds, length, remain;
+  char timestr[10], buffer[256];
 
   if(!panel_is_visible())
     return;
 
-  if(!gui_xine_get_pos_length(gGui->stream, NULL, &seconds, NULL))
+  if(!gui_xine_get_pos_length(gGui->stream, NULL, &seconds, &length))
     return;
-    
+
+  remain = (length - seconds) / 1000;
   seconds /= 1000;
+  length /= 1000;
   
-  sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
-  
+  if(panel->runtime_mode == 0)
+    sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
+  else
+    sprintf(timestr, "%02d:%02d:%02d", remain / (60*60), (remain / 60) % 60, remain % 60);
+
+  sprintf(buffer, _("Total time: %02d:%02d:%02d"), 
+	  length / (60*60), (length / 60) % 60, length % 60);
+
+  xitk_set_widget_tips(panel->runtime_label, buffer);
+
   xitk_label_change_label(panel->runtime_label, timestr); 
 }
 
@@ -519,13 +529,20 @@ void panel_check_pause(void) {
 }
 
 void panel_reset_runtime_label(void) {
-  xitk_label_change_label (panel->runtime_label, "00:00:00"); 
+  if(panel->runtime_mode == 0)
+    xitk_label_change_label (panel->runtime_label, "00:00:00"); 
+  else
+    xitk_label_change_label (panel->runtime_label, "--:--:--"); 
 }
 
 static void _panel_change_display_mode(xitk_widget_t *w, void *data) {
   gGui->is_display_mrl = !gGui->is_display_mrl;
   panel_update_mrl_display();
   playlist_mrlident_toggle();
+}
+static void _panel_change_time_label(xitk_widget_t *w, void *data) {
+  panel->runtime_mode = !panel->runtime_mode;
+  panel_update_runtime_display();
 }
 
 /*
@@ -1071,13 +1088,15 @@ void panel_init (void) {
   /*  Runtime label */
   lbl.skin_element_name = "TimeLabel";
   lbl.label             = "00:00:00";
-  lbl.callback          = NULL;
+  lbl.callback          = _panel_change_time_label;
   xitk_list_append_content ((XITK_WIDGET_LIST_LIST(panel->widget_list)), 
 	   (panel->runtime_label = xitk_label_create (panel->widget_list, gGui->skin_config, &lbl)));
+  xitk_set_widget_tips(panel->runtime_label, _("Total time: --:--:--"));
   /* 
    * Init to default, otherwise if panel is hide
    * at startup, label is empty 'till it's updated
    */
+  panel->runtime_mode   = 0;
   panel_reset_runtime_label();
 
   /*  Audio channel label */
