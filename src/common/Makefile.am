@@ -6,21 +6,17 @@ EXTRA_DIST = getopt.c getopt1.c getopt.h
 
 if HAVE_GETOPT_LONG
 else
-GETOPT_SRC = getopt.c \
-	     getopt1.c
+GETOPT_SRC = getopt.c getopt1.c
 GETOPT_HDR = getopt.h
 endif
 
-libcommon_la_SOURCES = \
-	$(GETOPT_SRC) \
-	utils.c \
-	xscreensaver-remote.c
+if HAVE_X11
+xscreensaver_remote = xscreensaver-remote.c
+endif
 
-noinst_HEADERS = \
-	$(GETOPT_HDR) \
-	utils.h \
-	xscreensaver-remote.h \
-	libcommon.h
+libcommon_la_SOURCES = $(GETOPT_SRC) $(xscreensaver_remote) utils.c
+
+noinst_HEADERS = $(GETOPT_HDR) utils.h xscreensaver-remote.h libcommon.h
 
 debug:
 	@$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"

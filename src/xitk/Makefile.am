@@ -6,7 +6,11 @@ if HAVE_TERMCAP
 remote = xine-remote
 endif
 
-bin_PROGRAMS = xine $(remote)
+if HAVE_X11
+xine_ui = xine $(remote)
+endif
+
+bin_PROGRAMS = $(xine_ui)
 EXTRA_PROGRAMS = session_ctrl
 
 ## xscreensaver-remote.c

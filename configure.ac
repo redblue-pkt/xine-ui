@@ -179,6 +179,7 @@ AC_PATH_XTRA
 if test x"$no_x" != x"yes"; then
     AC_DEFINE(HAVE_X11,,[Define this if you have X11R6 installed])
 fi
+AM_CONDITIONAL(HAVE_X11, [test x"$no_x" != "xyes"])
 
 
 dnl

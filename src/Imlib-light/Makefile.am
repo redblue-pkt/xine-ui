@@ -1,7 +1,11 @@
 AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@
 DEBUG_CFLAGS = @BUILD_LIB_STATIC@ @DEBUG_CFLAGS@ @X_CFLAGS@
 
-noinst_LTLIBRARIES = libImlib-light.la
+if HAVE_X11
+imlib_lib = libImlib-light.la
+endif
+
+noinst_LTLIBRARIES = $(imlib_lib)
 
 libImlib_light_la_SOURCES = \
 	cache.c \

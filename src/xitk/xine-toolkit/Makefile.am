@@ -9,8 +9,12 @@ docs_DATA = README
 
 AM_CFLAGS = @BUILD_LIB_STATIC@ @X_CFLAGS@ @XINE_CFLAGS@ @THREAD_CFLAGS@
 
+if HAVE_X11
+xitk_lib = libxitk.la
+endif
+
 EXTRA_PROGRAMS = test
-noinst_LTLIBRARIES = libxitk.la
+noinst_LTLIBRARIES = $(xitk_lib)
 
 libxitk_la_SOURCES = \
 	browser.c \
