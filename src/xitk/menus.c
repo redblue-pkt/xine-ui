@@ -646,7 +646,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	break;
       }
       
-      sprintf(buffer, "%s/%s", location, langbuf);
+      sprintf(buffer, "%s/%s", location, (get_language_from_iso639_1(langbuf)));
       menu_entry.menu      = buffer;
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_audio_chan;
@@ -696,7 +696,7 @@ void video_window_menu(xitk_widget_list_t *wl) {
 	break;
       }
       
-      sprintf(buffer, "%s/%s", location, langbuf);
+      sprintf(buffer, "%s/%s", location, (get_language_from_iso639_1(langbuf)));
       menu_entry.menu      = buffer;
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_spu_chan;
@@ -796,7 +796,7 @@ void audio_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 	break;
       }
       
-      menu_entry.menu      = langbuf;
+      menu_entry.menu      = (char *) get_language_from_iso639_1(langbuf);
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_audio_chan;
       menu_entry.user_data = (void *) i;
@@ -868,7 +868,7 @@ void spu_lang_menu(xitk_widget_list_t *wl, int x, int y) {
 	break;
       }
       
-      menu_entry.menu      = langbuf;
+      menu_entry.menu      = (char *) get_language_from_iso639_1(langbuf);
       menu_entry.type      = IS_CHANNEL_CHECKED(channel, i);
       menu_entry.cb        = menu_spu_chan;
       menu_entry.user_data = (void *) i;

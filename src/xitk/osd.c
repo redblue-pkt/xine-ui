@@ -622,7 +622,7 @@ void osd_display_spu_lang(void) {
     break;
   }
   
-  sprintf(buffer, _("Subtitles: %s"), lang);
+  sprintf(buffer, _("Subtitles: %s"), get_language_from_iso639_1(lang));
   osd_display_info(buffer);
 }
 
@@ -651,6 +651,6 @@ void osd_display_audio_lang(void) {
     break;
   }
 
-  sprintf(buffer, _("Audio Channel: %s"), lang);
+  sprintf(buffer, _("Audio Channel: %s"), get_language_from_iso639_1(lang));
   osd_display_info(buffer);
 }
