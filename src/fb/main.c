@@ -74,6 +74,20 @@ static int check_version(void)
 	return 0;
 }
 
+static void event_listener(void *user_data, const xine_event_t *event)
+{
+	switch(event->type)
+	{
+		case XINE_EVENT_UI_PLAYBACK_FINISHED:
+			pthread_mutex_lock(&fbxine.mutex);
+			pthread_cond_signal(&fbxine.exit_cond);
+			pthread_mutex_unlock(&fbxine.mutex);
+			break;
+		default:
+			break;
+	}
+}
+
 static void exit_video(void)
 {
 	xine_close_video_driver(fbxine.xine, fbxine.video_port);
@@ -141,6 +155,9 @@ static int init_stream(void)
 	fbxine.stream = xine_stream_new(fbxine.xine, fbxine.audio_port,
 					fbxine.video_port);
 	fbxine.event_queue = xine_event_new_queue(fbxine.stream);  
+  
+	xine_event_create_listener_thread(fbxine.event_queue, 
+	                                  event_listener, NULL);
 
 	if((!xine_open(fbxine.stream, fbxine.mrl[fbxine.current_mrl])) ||
 	   (!xine_play(fbxine.stream, 0, 0)))
