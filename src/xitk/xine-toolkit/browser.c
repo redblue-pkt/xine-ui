@@ -39,37 +39,6 @@
 
 #include "_xitk.h"
 
-
-/*
- * timeradd/timersub is missing on solaris' sys/time.h, provide
- * some fallback macros
- */
-#ifndef	timeradd
-#define timeradd(a, b, result)                                                \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;                          \
-    if ((result)->tv_usec >= 1000000)                                         \
-      {                                                                       \
-        ++(result)->tv_sec;                                                   \
-        (result)->tv_usec -= 1000000;                                         \
-      }                                                                       \
-  } while (0)
-#endif
-
-#ifndef timersub
-#define timersub(a, b, result)                                                \
-  do {                                                                        \
-    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
-    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
-    if ((result)->tv_usec < 0) {                                              \
-      --(result)->tv_sec;                                                     \
-      (result)->tv_usec += 1000000;                                           \
-    }                                                                         \
-  } while (0)
-#endif
-
-
 typedef struct {
   widget_t    *itemlist;
   int          sel;
@@ -531,6 +500,7 @@ widget_t *browser_create(xitk_browser_t *br) {
   mywidget->private_data               = private_data;
 
   mywidget->enable                     = 1;
+  mywidget->have_focus                 = FOCUS_LOST;
   
   mywidget->x = mywidget->x = mywidget->width = mywidget->height = 0;    
   
@@ -538,6 +508,7 @@ widget_t *browser_create(xitk_browser_t *br) {
   mywidget->paint                      = NULL;
   mywidget->notify_click               = NULL;
   mywidget->notify_focus               = NULL;
+  mywidget->notify_keyevent            = NULL;
 
   return mywidget;
 }

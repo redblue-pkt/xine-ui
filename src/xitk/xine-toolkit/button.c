@@ -155,16 +155,17 @@ widget_t *button_create (xitk_button_t *b) {
 
   mywidget->private_data = private_data;
 
-  mywidget->enable       = 1;
-
-  mywidget->x            = b->x;
-  mywidget->y            = b->y;
-  mywidget->width        = private_data->skin->width/3;
-  mywidget->height       = private_data->skin->height;
-  mywidget->widget_type  = WIDGET_TYPE_BUTTON;
-  mywidget->paint        = paint_button;
-  mywidget->notify_click = notify_click_button;
-  mywidget->notify_focus = notify_focus_button;
+  mywidget->enable          = 1;
+  mywidget->have_focus      = FOCUS_LOST; 
+  mywidget->x               = b->x;
+  mywidget->y               = b->y;
+  mywidget->width           = private_data->skin->width/3;
+  mywidget->height          = private_data->skin->height;
+  mywidget->widget_type     = WIDGET_TYPE_BUTTON;
+  mywidget->paint           = paint_button;
+  mywidget->notify_click    = notify_click_button;
+  mywidget->notify_focus    = notify_focus_button;
+  mywidget->notify_keyevent = NULL;
 
   return mywidget;
 }

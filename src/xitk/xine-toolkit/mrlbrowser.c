@@ -835,17 +835,19 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
     }
   }
     
-  private_data->visible    = 1;
+  private_data->visible     = 1;
 
-  mywidget->enable         = 1;
-  mywidget->x              = mb->x;
-  mywidget->y              = mb->y;
-  mywidget->width          = private_data->bg_image->width;
-  mywidget->height         = private_data->bg_image->height;
-  mywidget->widget_type    = WIDGET_TYPE_MRLBROWSER | WIDGET_TYPE_GROUP;
-  mywidget->paint          = NULL;
-  mywidget->notify_click   = NULL;
-  mywidget->notify_focus   = NULL;
+  mywidget->enable          = 1;
+  mywidget->have_focus      = FOCUS_LOST;
+  mywidget->x               = mb->x;
+  mywidget->y               = mb->y;
+  mywidget->width           = private_data->bg_image->width;
+  mywidget->height          = private_data->bg_image->height;
+  mywidget->widget_type     = WIDGET_TYPE_MRLBROWSER | WIDGET_TYPE_GROUP;
+  mywidget->paint           = NULL;
+  mywidget->notify_click    = NULL;
+  mywidget->notify_focus    = NULL;
+  mywidget->notify_keyevent = NULL;
 
   browser_update_list(private_data->mrlb_list, 
 		      private_data->mc->mrls_disp, 

@@ -134,7 +134,9 @@ widget_t *label_create (xitk_label_t *l) {
   private_data->label       = (l->label ? strdup(l->label) : "");
 
   mywidget->private_data    = private_data;
+
   mywidget->enable          = 1;
+  mywidget->have_focus      = FOCUS_LOST;
   mywidget->x               = l->x;
   mywidget->y               = l->y;
   mywidget->width           = (private_data->char_length 
@@ -144,6 +146,7 @@ widget_t *label_create (xitk_label_t *l) {
   mywidget->paint           = paint_label;
   mywidget->notify_click    = NULL;
   mywidget->notify_focus    = NULL;
+  mywidget->notify_keyevent = NULL;
   
   return mywidget;
 }

@@ -279,6 +279,11 @@ void motion_notify_widget_list (widget_list_t *wl, int x, int y) ;
 int click_notify_widget_list (widget_list_t *wl, int x, int y, int bUp) ;
 
 /**
+ *
+ */
+void widget_send_key_event(widget_list_t *, widget_t *, XEvent *);
+
+/**
  * Return width (in pixel) of widget.
  */
 int widget_get_width(widget_t *);
@@ -287,6 +292,11 @@ int widget_get_width(widget_t *);
  * Return height (in pixel) of widget.
  */
 int widget_get_height(widget_t *);
+
+/**
+ * Boolean, return 1 if widget 'w' have focus.
+ */
+int widget_have_focus(widget_t *);
 
 /**
  * Boolean, enable state of widget.
@@ -661,6 +671,14 @@ void browser_rebuild_browser(widget_t *w, int start);
  */
 void browser_update_list(widget_t *w, char **list, int len, int start);
 /**
+ * slide up.
+ */
+void browser_step_up(widget_t *w, void *data);
+/**
+ * slide Down.
+ */
+void browser_step_down(widget_t *w, void *data);
+/**
  * Return the current selected button (if not, return -1)
  */
 int browser_get_current_selected(widget_t *w);
@@ -846,5 +864,36 @@ void mrlbrowser_destroy(widget_t *w);
 int mrlbrowser_get_window_info(widget_t *w, window_info_t *inf);
 
 #endif
+
+typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
+  int                     x;
+  int                     y;
+  const char             *text;
+  int                     max_length;
+
+  xitk_string_callback_t  callback;
+  void                   *userdata;
+
+  const char             *skin_filename;
+
+  const char             *normal_color;
+  const char             *focused_color;
+} xitk_inputtext_t;
+
+/**
+ * Create an input text box.
+ */
+widget_t *inputtext_create (xitk_inputtext_t *it);
+/**
+ * Return the text of widget.
+ */
+char *inputttext_get_text(widget_t *it);
+/**
+ * Change and redisplay the text of widget.
+ */
+void inputtext_change_text(widget_list_t *wl, widget_t *it, const char *text);
+
 
 #endif

@@ -45,75 +45,91 @@ typedef int widgetkey_t;
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
 typedef struct {
-  uint32_t flags;
-  uint32_t functions;
-  uint32_t decorations;
-  int32_t  input_mode;
-  uint32_t status;
+  uint32_t                    flags;
+  uint32_t                    functions;
+  uint32_t                    decorations;
+  int32_t                     input_mode;
+  uint32_t                    status;
 } MWMHints;
 
 typedef struct {
-  int red;
-  int green;
-  int blue;
-  char *colorname;
+  int                         red;
+  int                         green;
+  int                         blue;
+  char                       *colorname;
 } gui_color_names_t;
 
 typedef struct {
-  Pixmap image;
-  int width;
-  int height;
+  Pixmap                      image;
+  int                         width;
+  int                         height;
 } gui_image_t;
 
 typedef struct {
-    XColor red;
-    XColor blue;
-    XColor green;
-    XColor white;
-    XColor black;
-    XColor tmp;
+  XColor                      red;
+  XColor                      blue;
+  XColor                      green;
+  XColor                      white;
+  XColor                      black;
+  XColor                      tmp;
 } gui_color_t;
 
 typedef struct {
-    int enabled;
-    int offset_x;
-    int offset_y;
+  int                         enabled;
+  int                         offset_x;
+  int                         offset_y;
 } gui_move_t;
 
 struct widget_list_s;
+
+struct widget_s;
+
+typedef void (*widget_paint_callback_t)(struct widget_s *, Window, GC);
+
+typedef int (*widget_click_callback_t) (struct widget_list_s *, struct widget_s *, int, int, int);
+
+typedef int (*widget_focus_callback_t)(struct widget_list_s *, struct widget_s *, int);
+
+typedef void (*widget_keyevent_callback_t)(struct widget_list_s *, struct widget_s *, XEvent *);
+
 typedef struct widget_s {
-  int      x,y;
-  int      width,height;
+  int                        x;
+  int                        y;
+  int                        width;
+  int                        height;
 
-  int      enable;
+  int                        enable;
+  int                        have_focus;
 
-  void (*paint) (struct widget_s *, Window, GC) ; 
-  
+  widget_paint_callback_t    paint;
+
   /* notify callback return value : 1 => repaint necessary 0=> do nothing */
                                        /*   parameter: up (1) or down (0) */
-  int (*notify_click) (struct widget_list_s *, struct widget_s *,int,int,int);
+  widget_click_callback_t    notify_click;
                                        /*            entered (1) left (0) */
-  int (*notify_focus) (struct widget_list_s *, struct widget_s *,int);
- 
-  void    *private_data;
-  int      widget_type;
+  widget_focus_callback_t    notify_focus;
+
+  widget_keyevent_callback_t notify_keyevent;
+
+  void                      *private_data;
+  uint32_t                   widget_type;
 } widget_t;
 
 typedef struct widget_list_s {
 
-  gui_list_t        *l;
+  gui_list_t                 *l;
 
-  widget_t          *focusedWidget;
-  widget_t          *pressedWidget;
+  widget_t                   *focusedWidget;
+  widget_t                   *pressedWidget;
 
-  Window             win;
-  GC                 gc;
+  Window                      win;
+  GC                          gc;
 } widget_list_t;
 
 /* ****************************************************************** */
 
 /**
- * Allocate an clean memory of "size" bytes.
+ * Allocate an clean memory area of size "size".
  */
 void *gui_xmalloc(size_t size);
 
@@ -148,6 +164,11 @@ void motion_notify_widget_list (widget_list_t *wl, int x, int y) ;
 int click_notify_widget_list (widget_list_t *wl, int x, int y, int bUp) ;
 
 /**
+ *
+ */
+void widget_send_key_event(widget_list_t *, widget_t *, XEvent *);
+
+/**
  * Return width (in pixel) of widget.
  */
 int widget_get_width(widget_t *);
@@ -156,6 +177,11 @@ int widget_get_width(widget_t *);
  * Return height (in pixel) of widget.
  */
 int widget_get_height(widget_t *);
+
+/*
+ * Boolean, return 1 if widget 'w' have focus.
+ */
+int widget_have_focus(widget_t *);
 
 /**
  * Boolean, enable state of widget.
@@ -177,13 +203,34 @@ void widget_disable(widget_t *);
  */
 
 /* #define DEBUG_XLOCK */
-
 #ifdef DEBUG_XLOCK
-#define XLOCK(DISP) {printf ("%s: %s(%d) XLockDisplay (%d)\n",__FILE__,__FUNCTION__,__LINE__,DISP); fflush(stdout); XLockDisplay (DISP); printf ("%s: %s(%d) got the lock (%d)\n",__FILE__,__FUNCTION__,__LINE__,DISP);}
-#define XUNLOCK(DISP) {printf ("%s: %s(%d) XUnlockDisplay (%d)\n",__FILE__,__FUNCTION__,__LINE__,DISP); fflush(stdout); XUnlockDisplay (DISP);}
+
+#define XLOCK(DISP) {                                                         \
+    printf("%s: %s(%d) XLockDisplay (%d)\n",                                  \
+           __FILE__, __FUNCTION__, __LINE__, DISP);                           \
+    fflush(stdout);                                                           \
+    XLockDisplay(DISP);                                                       \
+    printf("%s: %s(%d) got the lock (%d)\n",                                  \
+           __FILE__, __FUNCTION__, __LINE__, DISP);                           \
+  }
+
+#define XUNLOCK(DISP) {                                                       \
+    printf("%s: %s(%d) XUnlockDisplay (%d)\n",                                \
+           __FILE__, __FUNCTION__, __LINE__, DISP);                           \
+    fflush(stdout);                                                           \
+    XUnlockDisplay(DISP);                                                     \
+  }
+
 #else
-#define XLOCK(DISP) {XLockDisplay (DISP);}
-#define XUNLOCK(DISP) {XUnlockDisplay (DISP);}
+
+#define XLOCK(DISP) {                                                         \
+    XLockDisplay(DISP);                                                       \
+  }
+
+#define XUNLOCK(DISP) {                                                       \
+    XUnlockDisplay(DISP);                                                     \
+  }
+
 #endif
 
 #endif

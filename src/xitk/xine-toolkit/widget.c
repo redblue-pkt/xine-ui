@@ -768,22 +768,26 @@ void motion_notify_widget_list (widget_list_t *wl,
 				int x, int y) {
   int bRepaint = 0;
   widget_t *mywidget = get_widget_at (wl, x, y);
-
+  
   if (mywidget != wl->focusedWidget) {
-      if (wl->focusedWidget) {
-	if (wl->focusedWidget->notify_focus 
-	    && wl->focusedWidget->enable == WIDGET_ENABLE)
-	  bRepaint |= (wl->focusedWidget->notify_focus) (wl, wl->focusedWidget, FOCUS_LOST);
-      }
-      
-      wl->focusedWidget = mywidget;
-      
-      if (mywidget) {
-	if (mywidget->notify_focus && mywidget->enable == WIDGET_ENABLE)
-	  bRepaint |= (mywidget->notify_focus) (wl, mywidget, FOCUS_RECEIVED);
+    if (wl->focusedWidget) {
+      if (wl->focusedWidget->notify_focus 
+	  && wl->focusedWidget->enable == WIDGET_ENABLE) {
+	bRepaint |= (wl->focusedWidget->notify_focus) (wl, wl->focusedWidget, FOCUS_LOST);
+	wl->focusedWidget->have_focus = FOCUS_LOST;
       }
     }
-
+    
+    wl->focusedWidget = mywidget;
+    
+    if (mywidget) {
+      if (mywidget->notify_focus && mywidget->enable == WIDGET_ENABLE) {
+	bRepaint |= (mywidget->notify_focus) (wl, mywidget, FOCUS_RECEIVED);
+	mywidget->have_focus = FOCUS_RECEIVED;
+      }
+    }
+  }
+  
   if (bRepaint)
     paint_widget_list (wl);
 }
@@ -827,6 +831,15 @@ int click_notify_widget_list (widget_list_t *wl,
 /*
  *
  */
+void widget_send_key_event(widget_list_t *wl, widget_t *w, XEvent *xev) {
+  
+  if(w->notify_keyevent)
+    w->notify_keyevent(wl, w, xev);
+}
+
+/*
+ *
+ */
 int widget_get_width(widget_t *lb) {
  
   return lb->width;  
@@ -846,6 +859,14 @@ int widget_get_height(widget_t *lb) {
 int widget_enabled(widget_t *w) {
 
   return (w->enable == WIDGET_ENABLE);
+}
+
+/*
+ *
+ */
+int widget_have_focus(widget_t *w) {
+
+  return(w->have_focus == FOCUS_RECEIVED);
 }
 
 /*

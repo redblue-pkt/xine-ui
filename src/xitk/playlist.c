@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/keysym.h>
 
 #include "xitk.h"
 
@@ -51,6 +52,8 @@ typedef struct {
   widget_t           *playlist;
   ImlibImage         *bg_image;
   widget_list_t      *widget_list;
+
+  widget_t           *winput;
   
   int                 running;
   int                 visible;
@@ -81,8 +84,12 @@ void pl_update_playlist(void) {
  *
  */
 static void handle_selection(widget_t *w, void *data) {
+  int selected = (int)data;
 
-  //  perr(" +++ Selection called = %d = '%s'\n", 
+  if(gGui->playlist[selected] != NULL) {
+    inputtext_change_text(playlist->widget_list, 
+			  playlist->winput, gGui->playlist[selected]);
+  }
 }
 
 /*
@@ -475,11 +482,40 @@ void pl_toggle_visibility (widget_t *w, void *data) {
  * Handle X events here.
  */
 void playlist_handle_event(XEvent *event, void *data) {
+  XKeyEvent      mykeyevent;
+  KeySym         mykey;
+  char           kbuf[256];
+  int            len;
 
   switch(event->type) {
 
   case KeyPress:
-    gui_handle_event(event, data);
+    if(widget_have_focus(playlist->winput)) {
+      widget_send_key_event(playlist->widget_list, playlist->winput, event);
+    }
+    else {
+      
+      mykeyevent = event->xkey;
+      
+      XLockDisplay(gGui->display);
+      len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
+      XUnlockDisplay(gGui->display);
+      
+      switch (mykey) {
+	
+      case XK_Down:
+	browser_step_up(playlist->playlist, NULL);
+	break;
+	
+      case XK_Up:
+	browser_step_down(playlist->playlist, NULL);
+	break;
+	
+      default:
+	gui_handle_event(event, data);
+	break;
+      }
+    }
     break;
 
   case MappingNotify:
@@ -489,6 +525,16 @@ void playlist_handle_event(XEvent *event, void *data) {
     break;
     
   }
+}
+
+
+/*
+ *
+ */
+static void pl_add_input(widget_t *w, void *data, const char *filename) {
+
+  if(filename)
+    gui_dndcallback((char *)filename);
 }
 
 /*
@@ -506,6 +552,8 @@ void playlist_editor(void) {
   xitk_browser_t          br;
   xitk_labelbutton_t      lb;
   xitk_label_t            lbl;
+  xitk_inputtext_t        inp;
+  xitk_button_t           b;
 
   /* This shouldn't be happend */
   if(playlist != NULL) {
@@ -602,80 +650,56 @@ void playlist_editor(void) {
   lbl.display       = gGui->display;
   lbl.imlibdata     = gGui->imlib_data;
 
-  lb.x              = gui_get_skinX("PlMoveUp");
-  lb.y              = gui_get_skinY("PlMoveUp");
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = "Move Up";
-  lb.callback       = pl_move_updown;
-  lb.state_callback = NULL;
-  lb.userdata       = (void *)MOVEUP;
-  lb.skin           = gui_get_skinfile("PlMoveUp");
-  lb.normcolor      = gui_get_ncolor("PlMoveUp");
-  lb.focuscolor     = gui_get_fcolor("PlMoveUp");
-  lb.clickcolor     = gui_get_ccolor("PlMoveUp");
+  b.display         = gGui->display;
+  b.imlibdata       = gGui->imlib_data;
+
+  inp.display       = gGui->display;
+  inp.imlibdata     = gGui->imlib_data;
+
+  b.x              = gui_get_skinX("PlMoveUp");
+  b.y              = gui_get_skinY("PlMoveUp");
+  b.callback       = pl_move_updown;
+  b.userdata       = (void *)MOVEUP;
+  b.skin           = gui_get_skinfile("PlMoveUp");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (&lb));
+			   button_create (&b));
 
-  lb.x              = gui_get_skinX("PlMoveDn");
-  lb.y              = gui_get_skinY("PlMoveDn");
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = "Move Dn";
-  lb.callback       = pl_move_updown;
-  lb.state_callback = NULL;
-  lb.userdata       = (void *)MOVEDN;
-  lb.skin           = gui_get_skinfile("PlMoveDn");
-  lb.normcolor      = gui_get_ncolor("PlMoveDn");
-  lb.focuscolor     = gui_get_fcolor("PlMoveDn");
-  lb.clickcolor     = gui_get_ccolor("PlMoveDn");
+  b.x              = gui_get_skinX("PlMoveDn");
+  b.y              = gui_get_skinY("PlMoveDn");
+  b.callback       = pl_move_updown;
+  b.userdata       = (void *)MOVEDN;
+  b.skin           = gui_get_skinfile("PlMoveDn");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (&lb));
+			   button_create (&b));
 
-  lb.x              = gui_get_skinX("PlPlay");
-  lb.y              = gui_get_skinY("PlPlay");
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = "Play";
-  lb.callback       = pl_play;
-  lb.state_callback = NULL;
-  lb.userdata       = NULL;
-  lb.skin           = gui_get_skinfile("PlPlay");
-  lb.normcolor      = gui_get_ncolor("PlPlay");
-  lb.focuscolor     = gui_get_fcolor("PlPlay");
-  lb.clickcolor     = gui_get_ccolor("PlPlay");
+  b.x              = gui_get_skinX("PlPlay");
+  b.y              = gui_get_skinY("PlPlay");
+  b.callback       = pl_play;
+  b.userdata       = NULL;
+  b.skin           = gui_get_skinfile("PlPlay");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (&lb));
+			   button_create (&b));
 
-  lb.x              = gui_get_skinX("PlDelete");
-  lb.y              = gui_get_skinY("PlDelete");
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = "Delete";
-  lb.callback       = pl_delete;
-  lb.state_callback = NULL;
-  lb.userdata       = NULL;
-  lb.skin           = gui_get_skinfile("PlDelete");
-  lb.normcolor      = gui_get_ncolor("PlDelete");
-  lb.focuscolor     = gui_get_fcolor("PlDelete");
-  lb.clickcolor     = gui_get_ccolor("PlDelete");
+  b.x              = gui_get_skinX("PlDelete");
+  b.y              = gui_get_skinY("PlDelete");
+  b.callback       = pl_delete;
+  b.userdata       = NULL;
+  b.skin           = gui_get_skinfile("PlDelete");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (&lb));
+			   button_create (&b));
 
-  lb.x              = gui_get_skinX("PlDeleteAll");
-  lb.y              = gui_get_skinY("PlDeleteAll");
-  lb.button_type    = CLICK_BUTTON;
-  lb.label          = "Delete All";
-  lb.callback       = pl_delete_all;
-  lb.state_callback = NULL;
-  lb.userdata       = NULL;
-  lb.skin           = gui_get_skinfile("PlDeleteAll");
-  lb.normcolor      = gui_get_ncolor("PlDeleteAll");
-  lb.focuscolor     = gui_get_fcolor("PlDeleteAll");
-  lb.clickcolor     = gui_get_ccolor("PlDeleteAll");
+  b.x              = gui_get_skinX("PlDeleteAll");
+  b.y              = gui_get_skinY("PlDeleteAll");
+  b.callback       = pl_delete_all;
+  b.userdata       = NULL;
+  b.skin           = gui_get_skinfile("PlDeleteAll");
 
   gui_list_append_content (playlist->widget_list->l, 
-			   label_button_create (&lb));
+			   button_create (&b));
 
   lb.x              = gui_get_skinX("PlAdd");
   lb.y              = gui_get_skinY("PlAdd");
@@ -775,6 +799,19 @@ void playlist_editor(void) {
   gui_list_append_content (playlist->widget_list->l,
 			   label_create (&lbl));
   
+  inp.x             = gui_get_skinX("PlInputText");
+  inp.y             = gui_get_skinY("PlInputText");
+  inp.text          = NULL;
+  inp.max_length    = 256;
+  inp.callback      = pl_add_input;
+  inp.userdata      = NULL;
+  inp.skin_filename = gui_get_skinfile("PlInputText");
+  inp.normal_color  = gui_get_ncolor("PlInputText");
+  inp.focused_color = gui_get_fcolor("PlInputText");
+
+  gui_list_append_content (playlist->widget_list->l,
+			   (playlist->winput = inputtext_create (&inp)));
+
   {
     int x, y;
     int i = 0;
@@ -816,7 +853,7 @@ void playlist_editor(void) {
 				  playlist_handle_event,
 				  NULL,
 				  gui_dndcallback,
-				  playlist->widget_list, NULL);
+				  playlist->widget_list, (void*) playlist);
 
   playlist->visible = 1;
   playlist->running = 1;

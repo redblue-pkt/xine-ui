@@ -209,15 +209,17 @@ widget_t *checkbox_create (xitk_checkbox_t *cb) {
 
   mywidget->private_data = private_data;
 
-  mywidget->enable       = 1;
-  mywidget->x            = cb->x;
-  mywidget->y            = cb->y;
-  mywidget->width        = private_data->skin->width/3;
-  mywidget->height       = private_data->skin->height;
-  mywidget->widget_type  = WIDGET_TYPE_CHECKBOX;
-  mywidget->paint        = paint_checkbox;
-  mywidget->notify_click = notify_click_checkbox;
-  mywidget->notify_focus = notify_focus_checkbox;
+  mywidget->enable          = 1;
+  mywidget->have_focus      = FOCUS_LOST;
+  mywidget->x               = cb->x;
+  mywidget->y               = cb->y;
+  mywidget->width           = private_data->skin->width/3;
+  mywidget->height          = private_data->skin->height;
+  mywidget->widget_type     = WIDGET_TYPE_CHECKBOX;
+  mywidget->paint           = paint_checkbox;
+  mywidget->notify_click    = notify_click_checkbox;
+  mywidget->notify_focus    = notify_focus_checkbox;
+  mywidget->notify_keyevent = NULL;
 
   return mywidget;
 }

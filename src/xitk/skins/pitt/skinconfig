@@ -32,22 +32,23 @@ SpuLabel:	271	15	letters.png
 
 ## Playlist ##
 PlBG:		0	0	pl_bg.png
-PlAdd:		355	202	pl_btn.png	Black   Black	Black
-PlLoad:		251	185	pl_btn.png	Black   Black	Black
-PlSave:		251	202	pl_btn.png	Black   Black	Black
-PlItemBtn:	30	20	pl_itembtn.png	Black   Black	Black
-PlMoveUp:	143	185	pl_btn.png	Black	Black	Black
-PlMoveDn:	143	202	pl_btn.png	Black	Black	Black
-PlPlay:		30	234	pl_btn.png	Black	Black	Black
-PlDelete:	143 	234	pl_btn.png	Black	Black	Black
-PlDeleteAll:	251	234	pl_btn.png	Black	Black	Black
+PlAdd:		355	168	pl_btn.png	Black   Black	Black
+PlLoad:		355	185	pl_btn.png	Black   Black	Black
+PlSave:		355	202	pl_btn.png	Black   Black	Black
 PlDismiss:	355	234	pl_btn.png	Black	Black	Black
+PlPlay:		30	233	pl_play.png
+PlDelete:	77	233	pl_delete.png
+PlDeleteAll:	124	233	pl_deleteall.png
+PlMoveUp:	171	233	pl_moveup.png
+PlMoveDn:	218	233	pl_movedown.png
+PlItemBtn:	30	20	pl_itembtn.png	Black   Black	Black
 PlUp:		324	21	arrowup.png
 PlSlidBG:	326	36	pl_slidv.png
 PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		324	160	arrowdn.png
 AutoPlayLbl:	355	20	letters.png
 AutoPlayBG:	355	40	pl_btn.png	Black   Black	Black
+PlInputText:	30	202	pl_inputtxt.png	Black	Black	Black
 
 # Control panel
 CtlBG:		0	0	pl_bg.png

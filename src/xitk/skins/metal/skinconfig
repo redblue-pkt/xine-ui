@@ -37,11 +37,11 @@ PlAdd:		350	141	pl_btn.png	LightGray	White	Red
 PlLoad:		350	164	pl_btn.png	LightGray	White	Red
 PlSave:		350	187	pl_btn.png	LightGray	White	Red
 PlItemBtn:	35	30	pl_itembtn.png	LightGray	White	Red
-PlMoveUp:	100	186	pl_btn.png	LightGray	White	Red
-PlMoveDn:	178	186	pl_btn.png	LightGray	White	Red
-PlPlay:		61	210	pl_btn.png	LightGray	White	Red
-PlDelete:	139 	210	pl_btn.png	LightGray	White	Red
-PlDeleteAll:	217	210	pl_btn.png	LightGray	White	Red
+PlPlay:		62	210	pl_play.png
+PlDelete:	109 	210	pl_delete.png
+PlDeleteAll:	156	210	pl_deleteall.png
+PlMoveUp:	203	210	pl_moveup.png
+PlMoveDn:	250	210	pl_movedown.png
 PlDismiss:	350	210	pl_btn.png	LightGray	White	Red
 PlUp:		328	30	arrowup2.png
 PlSlidBG:	327	45	pl_slidv.png
@@ -49,6 +49,7 @@ PlSlidFG:	0	0	pl_slidpad.png
 PlDn:		328	175	arrowdn2.png
 AutoPlayLbl:	360	40	letters.png
 AutoPlayBG:	350	62	pl_btn.png	LightGray	White	Red
+PlInputText:	35	186     pl_inputtxt.png	LightGray	White	Red
 
 ### File Browser ##
 FBBG:		0	0	pl_bg.png

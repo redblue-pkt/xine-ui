@@ -1142,15 +1142,17 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   
   private_data->visible    = 1;
 
-  mywidget->enable         = 1;
-  mywidget->x              = fb->x;
-  mywidget->y              = fb->y;
-  mywidget->width          = private_data->bg_image->width;
-  mywidget->height         = private_data->bg_image->height;
-  mywidget->widget_type    = WIDGET_TYPE_FILEBROWSER | WIDGET_TYPE_GROUP;
-  mywidget->paint          = NULL;
-  mywidget->notify_click   = NULL;
-  mywidget->notify_focus   = NULL;
+  mywidget->enable          = 1;
+  mywidget->have_focus      = FOCUS_LOST;
+  mywidget->x               = fb->x;
+  mywidget->y               = fb->y;
+  mywidget->width           = private_data->bg_image->width;
+  mywidget->height          = private_data->bg_image->height;
+  mywidget->widget_type     = WIDGET_TYPE_FILEBROWSER | WIDGET_TYPE_GROUP;
+  mywidget->paint           = NULL;
+  mywidget->notify_click    = NULL;
+  mywidget->notify_focus    = NULL;
+  mywidget->notify_keyevent = NULL;
 
   load_files(NULL, (void *)private_data);
   

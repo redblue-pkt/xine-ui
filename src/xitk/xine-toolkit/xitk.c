@@ -52,22 +52,24 @@ extern int              errno;
 
 #ifdef TRACE_LOCKS
 static int ml = 0;
-#define MUTLOCK() \
-  {                                      \
-    int i;                               \
-    ml++;                                \
-    for(i=0; i<ml; i++) printf(".");     \
-    printf("LOCK\n");                    \
-    pthread_mutex_lock(&gXitk->mutex);    \
+#define MUTLOCK()                                                             \
+  {                                                                           \
+    int i;                                                                    \
+    ml++;                                                                     \
+    for(i=0; i<ml; i++) printf(".");                                          \
+    printf("LOCK\n");                                                         \
+    pthread_mutex_lock(&gXitk->mutex);                                        \
   }
-#define MUTUNLOCK() \
-  {                                      \
-    int i;                               \
-    for(i=0; i<ml; i++) printf(".");     \
-    printf("UNLOCK\n");                  \
-    ml--;                                \
-    pthread_mutex_unlock(&gXitk->mutex);  \
+
+#define MUTUNLOCK()                                                           \
+  {                                                                           \
+    int i;                                                                    \
+    for(i=0; i<ml; i++) printf(".");                                          \
+    printf("UNLOCK\n");                                                       \
+    ml--;                                                                     \
+    pthread_mutex_unlock(&gXitk->mutex);                                      \
   }
+
 #else
 #define MUTLOCK()   { pthread_mutex_lock(&gXitk->mutex); }
 #define MUTUNLOCK() { pthread_mutex_unlock(&gXitk->mutex); }

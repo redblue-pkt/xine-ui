@@ -44,6 +44,35 @@ typedef void (*xitk_string_callback_t)(widget_t *, void *, const char *);
 typedef void (*xitk_mrl_callback_t)(widget_t *, void *, mrl_t *);
 #endif
 
+/*
+ * timeradd/timersub is missing on solaris' sys/time.h, provide
+ * some fallback macros
+ */
+#ifndef	timeradd
+#define timeradd(a, b, result)                                                \
+  do {                                                                        \
+    (result)->tv_sec = (a)->tv_sec + (b)->tv_sec;                             \
+    (result)->tv_usec = (a)->tv_usec + (b)->tv_usec;                          \
+    if ((result)->tv_usec >= 1000000)                                         \
+      {                                                                       \
+        ++(result)->tv_sec;                                                   \
+        (result)->tv_usec -= 1000000;                                         \
+      }                                                                       \
+  } while (0)
+#endif
+
+#ifndef timersub
+#define timersub(a, b, result)                                                \
+  do {                                                                        \
+    (result)->tv_sec = (a)->tv_sec - (b)->tv_sec;                             \
+    (result)->tv_usec = (a)->tv_usec - (b)->tv_usec;                          \
+    if ((result)->tv_usec < 0) {                                              \
+      --(result)->tv_sec;                                                     \
+      (result)->tv_usec += 1000000;                                           \
+    }                                                                         \
+  } while (0)
+#endif
+
 /* Duplicate s to d timeval values */
 #define timercpy(s, d) {                                                      \
       (d)->tv_sec = (s)->tv_sec;                                              \
@@ -339,6 +368,23 @@ typedef struct {
 
 } xitk_mrlbrowser_t;
 #endif
+
+typedef struct {
+  Display                *display;
+  ImlibData              *imlibdata;
+  int                     x;
+  int                     y;
+  const char             *text;
+  int                     max_length;
+
+  xitk_string_callback_t  callback;
+  void                   *userdata;
+
+  const char             *skin_filename;
+  const char             *normal_color;
+  const char             *focused_color;
+
+} xitk_inputtext_t;
 
 #ifndef _XITK_C_
 

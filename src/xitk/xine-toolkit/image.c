@@ -102,15 +102,17 @@ widget_t *image_create (xitk_image_t *im) {
 
   mywidget->private_data  = private_data;
 
-  mywidget->enable        = 1;
-  mywidget->x             = im->x;
-  mywidget->y             = im->y;
-  mywidget->width         = private_data->skin->width;
-  mywidget->height        = private_data->skin->height;
-  mywidget->widget_type   = WIDGET_TYPE_IMAGE;
-  mywidget->paint         = paint_image;
-  mywidget->notify_click  = NULL;
-  mywidget->notify_focus  = NULL;
+  mywidget->enable          = 1;
+  mywidget->have_focus      = FOCUS_LOST;
+  mywidget->x               = im->x;
+  mywidget->y               = im->y;
+  mywidget->width           = private_data->skin->width;
+  mywidget->height          = private_data->skin->height;
+  mywidget->widget_type     = WIDGET_TYPE_IMAGE;
+  mywidget->paint           = paint_image;
+  mywidget->notify_click    = NULL;
+  mywidget->notify_focus    = NULL;
+  mywidget->notify_keyevent = NULL;
 
   return mywidget;
 }

@@ -86,7 +86,7 @@ static Pixmap create_labelofbutton(widget_t *lb,
     break;
     
   case FOCUS:
-    if(!strcasecmp(private_data->clickcolor, "Default")) {
+    if(!strcasecmp(private_data->focuscolor, "Default")) {
       DefaultColor = 0;
     }
     else {
@@ -99,7 +99,7 @@ static Pixmap create_labelofbutton(widget_t *lb,
     break;
     
   case NORMAL:
-    if(!strcasecmp(private_data->clickcolor, "Default")) {
+    if(!strcasecmp(private_data->normcolor, "Default")) {
       DefaultColor = 0;
     }
     else {
@@ -155,7 +155,7 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
   bgtmp = XCreatePixmap(private_data->display, skin->image,
 			button_width, skin->height, attr.depth);
 
-  XLockDisplay(private_data->display);
+  XLOCK(private_data->display);
 
   if (lb->widget_type & WIDGET_TYPE_LABELBUTTON) {
     
@@ -219,8 +219,7 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
 	     "that is not a label button\n", lb->widget_type);
 #endif
   
-  XUnlockDisplay (private_data->display);
-  /* XSync (private_data->display, False); */
+  XUNLOCK(private_data->display);
 }
 
 /*
@@ -419,6 +418,7 @@ widget_t *label_button_create (xitk_labelbutton_t *b) {
   mywidget->private_data       = private_data;
 
   mywidget->enable             = 1;
+  mywidget->have_focus         = FOCUS_LOST;
   mywidget->x                  = b->x;
   mywidget->y                  = b->y;
   mywidget->width              = private_data->skin->width/3;
@@ -427,6 +427,7 @@ widget_t *label_button_create (xitk_labelbutton_t *b) {
   mywidget->paint              = paint_labelbutton;
   mywidget->notify_click       = notify_click_labelbutton;
   mywidget->notify_focus       = notify_focus_labelbutton;
+  mywidget->notify_keyevent    = NULL;
 
   return mywidget;
 }
