@@ -350,19 +350,9 @@ AM_CONDITIONAL(HAVE_GETOPT_LONG, test x"$ac_getopt_long" = "xyes")
 
 
 dnl
-dnl XINE_ROOTDIR does not work if architecture independent files are 
-dnl installed to another place than architecture dependent files !!!
+dnl skins dir location, xine-config told us about this.
 dnl
-if test "x$prefix" = xNONE; then
-   prefix="${ac_default_prefix}"
-fi
-if test "x$exec_prefix" = xNONE; then
-   exec_prefix='${prefix}'
-fi
-XINE_SKINDIR="${datadir}/xine/skins"
-eval XINE_SKINPATH="$XINE_SKINDIR"
-AC_DEFINE_UNQUOTED(XINE_SKINDIR,"$XINE_SKINPATH")
-AC_SUBST(XINE_SKINPATH)
+XINE_SKINDIR="$xine_skin_dir"
 AC_SUBST(XINE_SKINDIR)
 
 dnl

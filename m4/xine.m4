@@ -70,6 +70,8 @@ AC_ARG_ENABLE(xinetest,
              sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\2/'`
       xine_config_sub_version=`$XINE_CONFIG $xine_config_args --version | \
              sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)/\3/'`
+      xine_skin_dir=`$XINE_CONFIG $xine_config_args --skindir`
+      xine_plugin_dir=`$XINE_CONFIG $xine_config_args --plugindir`
       dnl    if test "x$enable_xinetest" = "xyes" ; then
       ac_save_CFLAGS="$CFLAGS"
       ac_save_LIBS="$LIBS"
@@ -169,7 +171,7 @@ main ()
           CFLAGS="$CFLAGS $XINE_CFLAGS"
           LIBS="$LIBS $XINE_LIBS"
           AC_TRY_LINK([
-#include <xine/xine.h>
+#include <xine.h>
 #include <stdio.h>
 ],      [ return ((XINE_MAJOR_VERSION) || (XINE_MINOR_VERSION) || (XINE_SUB_VERSION)); ],
         [ echo "*** The test program compiled, but did not run. This usually means"
