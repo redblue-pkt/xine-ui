@@ -62,6 +62,20 @@ typedef struct {
 
 static _control_t    *control = NULL;
 
+
+static void hue_changes_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->video_settings.hue = cfg->num_value;
+}
+static void brightness_changes_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->video_settings.brightness = cfg->num_value;
+}
+static void saturation_changes_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->video_settings.saturation = cfg->num_value;
+}
+static void contrast_changes_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->video_settings.contrast = cfg->num_value;
+}
+
 /*
  *
  */
@@ -112,40 +126,56 @@ static void update_sliders_video_settings(void) {
  * Set hue
  */
 static void set_hue(xitk_widget_t *w, void *data, int value) {
+  int hue;
+
   set_current_param(XINE_PARAM_VO_HUE, value);
   
-  if(get_current_param(XINE_PARAM_VO_HUE) != value)
+  if((hue = get_current_param(XINE_PARAM_VO_HUE)) != value)
     update_sliders_video_settings();
+  
+  config_update_num("gui.vo_hue", hue);
 }
 
 /*
  * Set saturation
  */
 static void set_saturation(xitk_widget_t *w, void *data, int value) {
+  int saturation;
+
   set_current_param(XINE_PARAM_VO_SATURATION, value);
    
-  if(get_current_param(XINE_PARAM_VO_SATURATION) != value)
+  if((saturation = get_current_param(XINE_PARAM_VO_SATURATION)) != value)
     update_sliders_video_settings();
+
+  config_update_num("gui.vo_saturation", saturation);
 }
 
 /*
  * Set brightness
  */
 static void set_brightness(xitk_widget_t *w, void *data, int value) {
+  int brightness;
+
   set_current_param(XINE_PARAM_VO_BRIGHTNESS, value);
     
-  if(get_current_param(XINE_PARAM_VO_BRIGHTNESS) != value)
+  if((brightness = get_current_param(XINE_PARAM_VO_BRIGHTNESS)) != value)
     update_sliders_video_settings();
+  
+  config_update_num("gui.vo_brightness", brightness);
 }
 
 /*
  * Set contrast
  */
 static void set_contrast(xitk_widget_t *w, void *data, int value) {
+  int contrast;
+
   set_current_param(XINE_PARAM_VO_CONTRAST, value);
-    
-  if(get_current_param(XINE_PARAM_VO_CONTRAST) != value)
+  
+  if((contrast = get_current_param(XINE_PARAM_VO_CONTRAST)) != value)
     update_sliders_video_settings();
+  
+  config_update_num("gui.vo_contrast", contrast);
 }
 
 /*
@@ -190,6 +220,52 @@ static void active_sliders_video_settings(void) {
     set_current_param(XINE_PARAM_VO_CONTRAST, cur);
   }
 
+}
+
+void control_config_register(void) {
+  set_current_param(XINE_PARAM_VO_HUE,
+		    (gGui->video_settings.hue = 
+		     xine_config_register_range(gGui->xine, "gui.vo_hue",
+						(get_current_param(XINE_PARAM_VO_HUE)),
+						0, 65535,
+						_("hue value"),
+						_("Hue value."), 
+						CONFIG_LEVEL_DEB,
+						hue_changes_cb, 
+						CONFIG_NO_DATA)));
+  
+  set_current_param(XINE_PARAM_VO_BRIGHTNESS, 
+		    (gGui->video_settings.brightness = 
+		     xine_config_register_range(gGui->xine, "gui.vo_brightness",
+						(get_current_param(XINE_PARAM_VO_BRIGHTNESS)),
+						0, 65535,
+						_("brightness value"),
+						_("Brightness value."), 
+						CONFIG_LEVEL_DEB,
+						brightness_changes_cb, 
+						CONFIG_NO_DATA)));
+
+  set_current_param(XINE_PARAM_VO_SATURATION,
+		    (gGui->video_settings.saturation = 
+		     xine_config_register_range(gGui->xine, "gui.vo_saturation",
+						(get_current_param(XINE_PARAM_VO_SATURATION)),
+						0, 65535,
+						_("saturation value"),
+						_("Saturation value."), 
+						CONFIG_LEVEL_DEB,
+						saturation_changes_cb, 
+						CONFIG_NO_DATA)));
+
+  set_current_param(XINE_PARAM_VO_CONTRAST,
+		    (gGui->video_settings.contrast = 
+		     xine_config_register_range(gGui->xine, "gui.vo_contrast",
+						(get_current_param(XINE_PARAM_VO_CONTRAST)),
+						0, 65535,
+						_("contrast value"),
+						_("Contrast value."), 
+						CONFIG_LEVEL_DEB,
+						contrast_changes_cb, 
+						CONFIG_NO_DATA)));
 }
 
 /*

@@ -73,11 +73,11 @@
 /*
  * config related constants
  */
-#define CONFIG_LEVEL_BEG        0 /* => beginner */
+#define CONFIG_LEVEL_BEG         0 /* => beginner */
 #define CONFIG_LEVEL_ADV        10 /* advanced user */
 #define CONFIG_LEVEL_EXP        20 /* expert */
-#define CONFIG_LEVEL_MAS        40 /* motku */
-#define CONFIG_LEVEL_DEB        50 /* debugger (only available in debug mode) */
+#define CONFIG_LEVEL_MAS        30 /* motku */
+#define CONFIG_LEVEL_DEB        40 /* debugger (only available in debug mode) */
 
 #define CONFIG_NO_DESC          NULL
 #define CONFIG_NO_HELP          NULL
@@ -120,6 +120,14 @@
 
 typedef struct {
   xine_video_port_t        *vo_port;
+
+  struct {
+    int                     hue;
+    int                     brightness;
+    int                     saturation;
+    int                     contrast;
+  } video_settings;
+
   xine_audio_port_t        *ao_port;
 
   xine_stream_t            *stream;

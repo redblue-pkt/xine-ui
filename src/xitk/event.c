@@ -1069,15 +1069,14 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      CONFIG_NO_DATA);
 
   gGui->experience_level =
-    xine_config_register_enum(gGui->xine, "gui.experience_level", 
-			      0, exp_levels,
-			      _("configuration experience level"),
-			      _("Level of user's experience, this will show more or less "
-				"configuration options."), 
-			      CONFIG_LEVEL_BEG,
-			      exp_level_cb, 
-			      CONFIG_NO_DATA);
-
+    (xine_config_register_enum(gGui->xine, "gui.experience_level", 
+			       0, exp_levels,
+			       _("configuration experience level"),
+			       _("Level of user's experience, this will show more or less "
+				 "configuration options."), 
+			       CONFIG_LEVEL_BEG,
+			       exp_level_cb, 
+			       CONFIG_NO_DATA)) * 10;
 
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
@@ -1196,6 +1195,9 @@ void gui_run (void) {
   panel_update_channel_display () ;
   panel_update_mrl_display ();
   panel_update_runtime_display();
+
+  /* Register config entries related to video control settings */
+  control_config_register();
 
   gui_display_logo();
 

@@ -24,6 +24,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+void control_config_register(void);
+
 void control_panel(void);
 void control_change_skins(void);
 void control_exit(xitk_widget_t *, void *);
