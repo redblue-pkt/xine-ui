@@ -62,7 +62,7 @@ typedef enum {
   ACTID_MRL_NEXT,
   ACTID_MRL_PRIOR,
   ACTID_EJECT,
-  ACTID_SET_CURPOS,    /* Could replace all of the ACTID_SET_CURPOS_xx below */
+  ACTID_SET_CURPOS,
   ACTID_SET_CURPOS_0,
   ACTID_SET_CURPOS_10,
   ACTID_SET_CURPOS_20,
@@ -73,8 +73,8 @@ typedef enum {
   ACTID_SET_CURPOS_70,
   ACTID_SET_CURPOS_80,
   ACTID_SET_CURPOS_90,
-  ACTID_SEEK_REL_m,    /* Could replace all of the ACTID_SEEK_REL_mx below */
-  ACTID_SEEK_REL_p,    /* Could replace all of the ACTID_SEEK_REL_px below */
+  ACTID_SEEK_REL_m,
+  ACTID_SEEK_REL_p,
   ACTID_SEEK_REL_m60,
   ACTID_SEEK_REL_p60,
   ACTID_SEEK_REL_m15,

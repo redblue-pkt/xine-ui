@@ -183,17 +183,42 @@ static void gui_signal_handler (int sig, void *data) {
  */
 void gui_execute_action_id(action_id_t action) {
   xine_event_t   xine_event;
-  static long int numeric_arg = 0;  /* Saves accumulated numeric value */
-
+  
   if(action & ACTID_IS_INPUT_EVENT) {
-
-    if (action >= ACTID_EVENT_NUMBER_0 && action <= ACTID_EVENT_NUMBER_9) {
-      numeric_arg *= 10;
-      numeric_arg += (action - ACTID_EVENT_NUMBER_0);
-    } else if (action == ACTID_EVENT_NUMBER_10_ADD) {
-      numeric_arg += 10;
-    } else numeric_arg = 0;
     
+    if((action >= ACTID_EVENT_NUMBER_0) && (action <= ACTID_EVENT_NUMBER_9)) {
+
+      if(!gGui->numeric.set) {
+	gGui->numeric.set = 1;
+	gGui->numeric.arg = 0;
+      }
+      
+      if(((gGui->numeric.arg * 10) + (action - ACTID_EVENT_NUMBER_0)) <= INT_MAX) {
+	gGui->numeric.arg *= 10;
+	gGui->numeric.arg += (action - ACTID_EVENT_NUMBER_0);
+      }
+      else
+	printf("WARNING: Input number canceled, avoid overflow\n");
+
+    } 
+    else if(action == ACTID_EVENT_NUMBER_10_ADD) {
+
+      if(!gGui->numeric.set) {
+	gGui->numeric.set = 1;
+	gGui->numeric.arg = 0;
+      }
+      
+      if((gGui->numeric.arg + 10) <= INT_MAX)
+	gGui->numeric.arg += 10;
+      else
+	printf("WARNING: Input number canceled, avoid overflow\n");
+
+    }
+    else {
+      gGui->numeric.set = 0;
+      gGui->numeric.arg = 0;
+    }
+
     /* events for advanced input plugins. */
     xine_event.type = action & ~ACTID_IS_INPUT_EVENT;
     xine_send_event(gGui->xine, &xine_event);
@@ -223,20 +248,18 @@ void gui_execute_action_id(action_id_t action) {
     video_window_set_mag (0.5);
     break;
 
-  case ACTID_SPU_NEXT: {
-      int i;
-      if (numeric_arg == 0) numeric_arg = 1;
-      for (i=1; i<=numeric_arg; i++)       
-	gui_change_spu_channel(NULL, (void*)GUI_NEXT);
-    }
+  case ACTID_SPU_NEXT:
+    if(!gGui->numeric.set)
+      gui_change_spu_channel(NULL, (void*)GUI_NEXT);
+    else
+      gui_direct_change_spu_channel(NULL, (void*)GUI_NEXT, gGui->numeric.arg);
     break;
     
-  case ACTID_SPU_PRIOR: {
-      int i;
-      if (numeric_arg == 0) numeric_arg = 1;
-      for (i=1; i<=numeric_arg; i++)       
-	gui_change_spu_channel(NULL, (void*)GUI_PREV);
-    }
+  case ACTID_SPU_PRIOR:
+    if(!gGui->numeric.set)
+      gui_change_spu_channel(NULL, (void*)GUI_PREV);
+    else
+      gui_direct_change_spu_channel(NULL, (void*)GUI_PREV, gGui->numeric.arg);
     break;
     
   case ACTID_CONTROLSHOW:
@@ -246,21 +269,19 @@ void gui_execute_action_id(action_id_t action) {
   case ACTID_TOGGLE_WINOUT_VISIBLITY:
     gui_toggle_visibility (NULL, NULL);
     break;
-      
-  case ACTID_AUDIOCHAN_NEXT: {
-      int i;
-      if (numeric_arg == 0) numeric_arg = 1;
-      for (i=1; i<=numeric_arg; i++)       
-	gui_change_audio_channel(NULL, (void*)GUI_NEXT);
-    }
-      break;
-      
-  case ACTID_AUDIOCHAN_PRIOR: {
-      int i;
-      if (numeric_arg == 0) numeric_arg = 1;
-      for (i=1; i<=numeric_arg; i++)       
-	gui_change_audio_channel(NULL, (void*)GUI_PREV);
-  }
+    
+  case ACTID_AUDIOCHAN_NEXT:
+    if(!gGui->numeric.set)
+      gui_change_audio_channel(NULL, (void*)GUI_NEXT);
+    else
+      gui_direct_change_audio_channel(NULL, (void*)GUI_NEXT, gGui->numeric.arg);
+    break;
+    
+  case ACTID_AUDIOCHAN_PRIOR:
+    if(!gGui->numeric.set)
+      gui_change_audio_channel(NULL, (void*)GUI_PREV);
+    else
+      gui_direct_change_audio_channel(NULL, (void*)GUI_PREV, gGui->numeric.arg);
     break;
     
   case ACTID_PAUSE:
@@ -303,20 +324,18 @@ void gui_execute_action_id(action_id_t action) {
     gui_setup_show(NULL, NULL);
     break;
 
-  case ACTID_MRL_NEXT: {
-    int i;
-    if (numeric_arg == 0) numeric_arg = 1;
-    for (i=1; i<=numeric_arg; i++)       
+  case ACTID_MRL_NEXT:
+    if(!gGui->numeric.set)
       gui_nextprev(NULL, (void*)GUI_NEXT);
-  }
+    else
+      gui_direct_nextprev(NULL, (void*)GUI_NEXT, gGui->numeric.arg);
     break;
-
-  case ACTID_MRL_PRIOR: {
-    int i;
-    if (numeric_arg == 0) numeric_arg = 1;
-    for (i=1; i<=numeric_arg; i++)       
+    
+  case ACTID_MRL_PRIOR:
+    if (!gGui->numeric.set)
       gui_nextprev(NULL, (void*)GUI_PREV);
-  }
+    else
+      gui_direct_nextprev(NULL, (void*)GUI_PREV, gGui->numeric.arg);
     break;
       
   case ACTID_EJECT:
@@ -325,7 +344,8 @@ void gui_execute_action_id(action_id_t action) {
 
   case ACTID_SET_CURPOS:
     /* Number is a percentage */
-    gui_set_current_position((65534 * numeric_arg)/100);
+    gGui->numeric.arg %= 100; /* range [0..100] */
+    gui_set_current_position((65534 * gGui->numeric.arg) / 100);
     break;
 
   case ACTID_SET_CURPOS_10:
@@ -369,9 +389,15 @@ void gui_execute_action_id(action_id_t action) {
     break;
 
   case ACTID_SEEK_REL_m:
-    numeric_arg = -numeric_arg;
+    if(gGui->numeric.set) {
+      gGui->numeric.arg = -gGui->numeric.arg;
+      gui_seek_relative (gGui->numeric.arg);
+    }
+  break;
+
   case ACTID_SEEK_REL_p:
-    if (numeric_arg != 0) gui_seek_relative (numeric_arg);
+    if(gGui->numeric.set)
+      gui_seek_relative (gGui->numeric.arg);
     break;
 
   case ACTID_SEEK_REL_m60:
@@ -493,7 +519,8 @@ void gui_execute_action_id(action_id_t action) {
   }
 
   /* Some sort of function was done given. Clear numeric argument. */
-  numeric_arg = 0;
+  gGui->numeric.set = 0;
+  gGui->numeric.arg = 0;
 
 }	    
 
@@ -759,6 +786,9 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 				 _("play next|previous chapter instead of mrl (dvdnav)"), 
 				 NULL, skip_by_chapter_cb, NULL);
   
+  gGui->numeric.set = 0;
+  gGui->numeric.arg = 0;
+
   XLockDisplay (gGui->display);
 
   gGui->screen = DefaultScreen(gGui->display);

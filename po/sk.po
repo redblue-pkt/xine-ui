@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.11\n"
-"POT-Creation-Date: 2002-07-20 13:07+0200\n"
+"POT-Creation-Date: 2002-07-31 02:48+0200\n"
 "PO-Revision-Date: 2002-01-17 00:20+ZONE\n"
 "Last-Translator: Daniel Bena <Daniel.Bena@dm-drogeriemarkt.sk>\n"
 "Language-Team: Slovak <sk-i18n@list.linux.sk>\n"
@@ -17,12 +17,12 @@ msgstr ""
 msgid "No MRL (input stream) specified"
 msgstr "MRL (vstupný prúd) nebolo ¹pecifikované"
 
-#: src/xitk/actions.c:386 src/xitk/actions.c:401
+#: src/xitk/actions.c:395 src/xitk/actions.c:410
 #, c-format
 msgid "gui_set_current_position: can't create new thread (%s)\n"
 msgstr ""
 
-#: src/xitk/actions.c:711
+#: src/xitk/actions.c:745
 #, c-format
 msgid "XSendEvent(display, 0x%x ...) failed.\n"
 msgstr "XSendEvent(display, 0x%x ...) zlyhal.\n"
@@ -84,7 +84,7 @@ msgstr "Zavrie»"
 msgid "Close control window"
 msgstr "Zavrie» okno nastavenia"
 
-#: src/xitk/errors.c:64 src/xitk/kbindings.c:1948
+#: src/xitk/errors.c:64 src/xitk/kbindings.c:1947
 msgid "Done"
 msgstr "Hotovo"
 
@@ -144,16 +144,16 @@ msgstr ""
 "\n"
 "!! Neo¹etrená chyba !!\n"
 
-#: src/xitk/event.c:661
+#: src/xitk/event.c:690
 #, c-format
 msgid "gui_main: selected visual %#lx does not exist, trying default visual\n"
 msgstr "gui_main: vybrané zobrazenie %#lx neexistuje, skú¹am default\n"
 
-#: src/xitk/event.c:680
+#: src/xitk/event.c:709
 msgid "gui_main: couldn't find true color visual.\n"
 msgstr "gui_main: nemô¾em nájs» true color zobrazenie.\n"
 
-#: src/xitk/event.c:720
+#: src/xitk/event.c:749
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -161,56 +161,56 @@ msgstr ""
 "\n"
 "XInitThreads zlyhali - vyzerá to tak, ¾e nemáte pre thready bezpeènú xlib.\n"
 
-#: src/xitk/event.c:729
+#: src/xitk/event.c:758
 msgid "Cannot open display\n"
 msgstr "Nemô¾em otvori» display.\n"
 
-#: src/xitk/event.c:734
+#: src/xitk/event.c:763
 msgid "synchronized X protocol (debug)"
 msgstr "synchronizovaný X protokol (debug)"
 
-#: src/xitk/event.c:736
+#: src/xitk/event.c:765
 msgid "Warning! Synchronized X activated - this is way slow...\n"
 msgstr "Varovanie! Synchronizovaný X aktivovaný - toto je pomalé..\n"
 
-#: src/xitk/event.c:741
+#: src/xitk/event.c:770
 msgid "use wm layer property to place window on top"
 msgstr "pou¾i» vlastnos» wm layer na umiestnenie okna do popredia"
 
-#: src/xitk/event.c:747
+#: src/xitk/event.c:776
 msgid "where snapshots will be saved"
 msgstr "kam budú ulo¾ené obrázky - obsah obrazovky"
 
-#: src/xitk/event.c:752
+#: src/xitk/event.c:781
 msgid "time between two screensaver fake events, 0 to disable"
 msgstr "èas medzi screensaver fake udalos»ami, 0 na zakázanie"
 
-#: src/xitk/event.c:757
+#: src/xitk/event.c:786
 msgid "play next|previous chapter instead of mrl (dvdnav)"
 msgstr ""
 
 #. Some infos
-#: src/xitk/event.c:765
+#: src/xitk/event.c:797
 #, c-format
 msgid "XServer Vendor: %s. Release: %d,\n"
 msgstr "XServer Vendor: %s. Release: %d,\n"
 
-#: src/xitk/event.c:767
+#: src/xitk/event.c:799
 #, c-format
 msgid "        Protocol Version: %d, Revision: %d,\n"
 msgstr "        Protocol Version: %d, Revision: %d,\n"
 
-#: src/xitk/event.c:769
+#: src/xitk/event.c:801
 #, c-format
 msgid "        Available Screen(s): %d, using %d\n"
 msgstr "        Dostupné obrazovky: %d, pou¾ívam %d\n"
 
-#: src/xitk/event.c:771
+#: src/xitk/event.c:803
 #, c-format
 msgid "        Depth: %d.\n"
 msgstr "        Håbka: %d.\n"
 
-#: src/xitk/event.c:830
+#: src/xitk/event.c:862
 msgid "Unable to initialize Imlib\n"
 msgstr "Nemô¾em inicializova» Imlib.\n"
 
@@ -231,32 +231,32 @@ msgstr "Klávesové skratky '%s' a '%s' sú rovnaké.\n"
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Ajajáj: tabuµka klávesových skratiek je PRÁZDNA.\n"
 
-#: src/xitk/kbindings.c:1324
+#: src/xitk/kbindings.c:1323
 msgid "Nothing selected"
 msgstr "Nebolo niè vybrané"
 
-#: src/xitk/kbindings.c:1325
+#: src/xitk/kbindings.c:1324
 msgid "None"
 msgstr "Niè"
 
-#: src/xitk/kbindings.c:1486
+#: src/xitk/kbindings.c:1485
 msgid "You can only delete alias entries."
 msgstr "Mô¾ete vymaza» len aliasy."
 
-#: src/xitk/kbindings.c:1610
+#: src/xitk/kbindings.c:1609
 msgid "Press Keyboard Keys..."
 msgstr "Stlaète klávesy ..."
 
-#: src/xitk/kbindings.c:1627
+#: src/xitk/kbindings.c:1626
 msgid "Event receiver window"
 msgstr "Okno príjemcu udalostí"
 
 #. Ask if uses want/wont store new shorcut
-#: src/xitk/kbindings.c:1712
+#: src/xitk/kbindings.c:1711
 msgid "Accept?"
 msgstr "Akceptova»?"
 
-#: src/xitk/kbindings.c:1716
+#: src/xitk/kbindings.c:1715
 #, c-format
 msgid ""
 "Store %s as\n"
@@ -265,7 +265,7 @@ msgstr ""
 "Ulo¾i» %s ako\n"
 "'%s' priradenie kláves ?."
 
-#: src/xitk/kbindings.c:1723
+#: src/xitk/kbindings.c:1722
 #, c-format
 msgid ""
 "This key bindings is redundant with action:\n"
@@ -274,64 +274,64 @@ msgstr ""
 "Toto priradenie je redundantné s akciou:\n"
 "\"%s\".\n"
 
-#: src/xitk/kbindings.c:1802
+#: src/xitk/kbindings.c:1801
 msgid "key binding editor"
 msgstr "editor priradenia kláves"
 
-#: src/xitk/kbindings.c:1827
+#: src/xitk/kbindings.c:1826
 msgid "Binding action"
 msgstr "Priradenie akcie"
 
-#: src/xitk/kbindings.c:1833
+#: src/xitk/kbindings.c:1832
 msgid "Key"
 msgstr "Klávesa"
 
-#: src/xitk/kbindings.c:1838
+#: src/xitk/kbindings.c:1837
 msgid "Modifiers"
 msgstr "Modifikátor"
 
-#: src/xitk/kbindings.c:1879
+#: src/xitk/kbindings.c:1878
 msgid "Alias"
 msgstr "Alias"
 
-#: src/xitk/kbindings.c:1893
+#: src/xitk/kbindings.c:1892
 msgid "Edit"
 msgstr "Editova»"
 
-#: src/xitk/kbindings.c:1907
+#: src/xitk/kbindings.c:1906
 #, fuzzy
 msgid "Delete"
 msgstr "Vymaza»"
 
-#: src/xitk/kbindings.c:1921 src/xitk/playlist.c:906
+#: src/xitk/kbindings.c:1920 src/xitk/playlist.c:906
 msgid "Save"
 msgstr "Ulo¾i»"
 
-#: src/xitk/kbindings.c:1935
+#: src/xitk/kbindings.c:1934
 msgid "Reset"
 msgstr "Reset"
 
-#: src/xitk/kbindings.c:2012
+#: src/xitk/kbindings.c:2011
 msgid "ctrl"
 msgstr ""
 
-#: src/xitk/kbindings.c:2033
+#: src/xitk/kbindings.c:2032
 msgid "meta"
 msgstr ""
 
-#: src/xitk/kbindings.c:2055
+#: src/xitk/kbindings.c:2054
 msgid "mod3"
 msgstr ""
 
-#: src/xitk/kbindings.c:2077
+#: src/xitk/kbindings.c:2076
 msgid "mod4"
 msgstr ""
 
-#: src/xitk/kbindings.c:2098
+#: src/xitk/kbindings.c:2097
 msgid "mod5"
 msgstr ""
 
-#: src/xitk/kbindings.c:2107
+#: src/xitk/kbindings.c:2106
 msgid "Grab"
 msgstr "Grab"
 
@@ -853,19 +853,19 @@ msgstr "Èítaj ma"
 msgid "FAQ"
 msgstr "FAQ"
 
-#: src/xitk/setup.c:1103
+#: src/xitk/setup.c:1107
 msgid "xine setup"
 msgstr "nastavenie Xine"
 
-#: src/xitk/setup.c:1150
+#: src/xitk/setup.c:1154
 msgid "Logs"
 msgstr "Záznamy"
 
-#: src/xitk/setup.c:1161
+#: src/xitk/setup.c:1165
 msgid "Key Bindings"
 msgstr "Mapovanie kláves"
 
-#: src/xitk/setup.c:1172 src/xitk/viewlog.c:488
+#: src/xitk/setup.c:1176 src/xitk/viewlog.c:488
 msgid "Close"
 msgstr "Zavrie»"
 

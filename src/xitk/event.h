@@ -120,6 +120,11 @@ typedef struct {
 
   kbinding_t          *kbindings;
 
+  struct {
+    int                set;
+    int                arg;
+  } numeric;
+
 } gGui_t;
 
 

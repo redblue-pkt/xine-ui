@@ -230,7 +230,7 @@ static kbinding_entry_t default_binding_table[] = {
   { "Eject the current medium.",
     "Eject",                  ACTID_EJECT                   , "e",        KEYMOD_NOMOD   , 0 },
   { "Set position to numeric-argument%% of current stream.",
-    "SetPosition%",           ACTID_SET_CURPOS              , "slash",        KEYMOD_NOMOD   , 0 },
+    "SetPosition%",           ACTID_SET_CURPOS              , "slash",    KEYMOD_NOMOD   , 0 },
   { "Set position to beginning of current stream.",
     "SetPosition0%",          ACTID_SET_CURPOS_0            , "0",        KEYMOD_NOMOD   , 0 },
   { "Set position to 10%% of current stream.",
@@ -252,33 +252,33 @@ static kbinding_entry_t default_binding_table[] = {
   { "Set position to 90%% of current stream.",
     "SetPosition90%",         ACTID_SET_CURPOS_90           , "9",        KEYMOD_NOMOD   , 0 },
   { "Enter the number 0.",
-    "Number0",                ACTID_EVENT_NUMBER_0          , "0",        KEYMOD_MOD3   , 0 },
+    "Number0",                ACTID_EVENT_NUMBER_0          , "0",        KEYMOD_MOD3    , 0 },
   { "Enter the number 1.",
-    "Number1",                ACTID_EVENT_NUMBER_1          , "1",        KEYMOD_MOD3   , 0 },
+    "Number1",                ACTID_EVENT_NUMBER_1          , "1",        KEYMOD_MOD3    , 0 },
   { "Enter the number 2.",
-    "Number2",                ACTID_EVENT_NUMBER_2          , "2",        KEYMOD_MOD3   , 0 },
+    "Number2",                ACTID_EVENT_NUMBER_2          , "2",        KEYMOD_MOD3    , 0 },
   { "Enter the number 3.",
-    "Number3",                ACTID_EVENT_NUMBER_3          , "3",        KEYMOD_MOD3   , 0 },
+    "Number3",                ACTID_EVENT_NUMBER_3          , "3",        KEYMOD_MOD3    , 0 },
   { "Enter the number 4.",
-    "Number4",                ACTID_EVENT_NUMBER_4          , "4",        KEYMOD_MOD3   , 0 },
+    "Number4",                ACTID_EVENT_NUMBER_4          , "4",        KEYMOD_MOD3    , 0 },
   { "Enter the number 5.",
-    "Number5",                ACTID_EVENT_NUMBER_5          , "5",        KEYMOD_MOD3   , 0 },
+    "Number5",                ACTID_EVENT_NUMBER_5          , "5",        KEYMOD_MOD3    , 0 },
   { "Enter the number 6.",
-    "Number6",                ACTID_EVENT_NUMBER_6          , "6",        KEYMOD_MOD3   , 0 },
+    "Number6",                ACTID_EVENT_NUMBER_6          , "6",        KEYMOD_MOD3    , 0 },
   { "Enter the number 7.",
-    "Number7",                ACTID_EVENT_NUMBER_7          , "7",        KEYMOD_MOD3   , 0 },
+    "Number7",                ACTID_EVENT_NUMBER_7          , "7",        KEYMOD_MOD3    , 0 },
   { "Enter the number 8.",
-    "Number8",                ACTID_EVENT_NUMBER_8          , "8",        KEYMOD_MOD3   , 0 },
+    "Number8",                ACTID_EVENT_NUMBER_8          , "8",        KEYMOD_MOD3    , 0 },
   { "Enter the number 9.",
-    "Number9",                ACTID_EVENT_NUMBER_9          , "9",        KEYMOD_MOD3   , 0 },
+    "Number9",                ACTID_EVENT_NUMBER_9          , "9",        KEYMOD_MOD3    , 0 },
   { "Add 10 to the next entered number.",
-    "Number10add",            ACTID_EVENT_NUMBER_10_ADD     , "-",        KEYMOD_MOD3   , 0 },
+    "Number10add",            ACTID_EVENT_NUMBER_10_ADD     , "plus",     KEYMOD_MOD3    , 0 },
   { "Set position back by numeric argument in current stream.",
-    "SeekRelative-",          ACTID_SEEK_REL_m              , "Up",       KEYMOD_MOD3   , 0 }, 
+    "SeekRelative-",          ACTID_SEEK_REL_m              , "Up",       KEYMOD_MOD3    , 0 }, 
   { "Set position to -60 seconds in current stream.",
     "SeekRelative-60",        ACTID_SEEK_REL_m60            , "Left",     KEYMOD_NOMOD   , 0 }, 
   { "Set position forward by numeric argument in current stream.",
-    "SeekRelative+",          ACTID_SEEK_REL_p              , "Up",       KEYMOD_META   , 0 }, 
+    "SeekRelative+",          ACTID_SEEK_REL_p              , "Up",       KEYMOD_META    , 0 }, 
   { "Set position to +60 seconds in current stream.",
     "SeekRelative+60",        ACTID_SEEK_REL_p60            , "Right",    KEYMOD_NOMOD   , 0 },
   { "Set position to -30 seconds in current stream.",
@@ -1091,7 +1091,7 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
     
     memset(&xbutton, 0, sizeof(xbutton));
     snprintf(xbutton, 255, "XButton_%d", event->xbutton.button);
-    
+
     k = kbindings_lookup_binding(kbt, xbutton, modifier);
     
     if(k) {
@@ -1113,7 +1113,7 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
     kbinding_entry_t    *k;
     
     mykeyevent = event->xkey;
-    
+
     (void) xitk_get_key_modifier(event, &mod);
     kbindings_convert_modifier(mod, &modifier);
 
@@ -1121,10 +1121,9 @@ void kbindings_handle_kbinding(kbinding_t *kbt, XEvent *event) {
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
     k = kbindings_lookup_binding(kbt, XKeysymToString(mykey), modifier);
     XUnlockDisplay (gGui->display);
-
-    if(k) {
+    
+    if(k)
       gui_execute_action_id(k->action_id);
-    }
 #if 0  /* DEBUG */
     else
       printf("%s unhandled\n", kbuf);

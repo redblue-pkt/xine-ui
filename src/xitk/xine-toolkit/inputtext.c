@@ -44,6 +44,8 @@
 #define NORMAL                  1
 #define FOCUS                   2
 
+unsigned int mods_used = (ShiftMask | ControlMask | Mod1Mask |
+			  Mod2Mask| Mod3Mask| Mod4Mask| Mod5Mask);
 /*
  *
  */
@@ -103,57 +105,35 @@ static int notify_inside(xitk_widget_t *w, int x, int y) {
  * Extract modifier keys.
  */
 int xitk_get_key_modifier(XEvent *xev, int *modifier) {
-  
+  unsigned int state = 0;
+
   *modifier = MODIFIER_NOMOD;
 
   if(!xev)
     return 0;
 
-  /*
-  printf("%s(): ", __FUNCTION__);
-  if(xev->xbutton.state & ShiftMask)
-    printf("Shift ");
-  if(xev->xbutton.state & LockMask)
-    printf("CapsLock ");
-  if(xev->xbutton.state & ControlMask)
-    printf("Control ");
-  if(xev->xbutton.state & Mod1Mask)
-    printf("Meta(mod1) ");
-  if(xev->xbutton.state & Mod2Mask)
-    printf("NumLock(mod2) ");
-  if(xev->xbutton.state & Mod3Mask)
-    printf("Mod3 ");
-  if(xev->xbutton.state & Mod4Mask)
-    printf("Mod4 ");
-  if(xev->xbutton.state & Mod5Mask)
-    printf("Mod5 ");
-  printf(".\n");
-  */
-
-  if(xev->xbutton.state & ShiftMask)
+  if((xev->type == ButtonPress) || (xev->type == ButtonRelease))
+    state = xev->xbutton.state;
+  else if ((xev->type == KeyPress) || (xev->type == KeyRelease))
+    state = xev->xkey.state;
+  
+  if(state & ShiftMask)
     *modifier |= MODIFIER_SHIFT;
-
-  if(xev->xbutton.state & LockMask)
+  if(state & LockMask)
     *modifier |= MODIFIER_LOCK;
-
-  if(xev->xbutton.state & ControlMask)
+  if(state & ControlMask)
     *modifier |= MODIFIER_CTRL;
-
-  if(xev->xbutton.state & Mod1Mask)
+  if(state & Mod1Mask)
     *modifier |= MODIFIER_META;
-
-  if(xev->xbutton.state & Mod2Mask)
+  if(state & Mod2Mask)
     *modifier |= MODIFIER_NUML;
-
-  if(xev->xbutton.state & Mod3Mask)
+  if(state & Mod3Mask)
     *modifier |= MODIFIER_MOD3;
-
-  if(xev->xbutton.state & Mod4Mask)
+  if(state & Mod4Mask)
     *modifier |= MODIFIER_MOD4;
-
-  if(xev->xbutton.state & Mod5Mask)
+  if(state & Mod5Mask)
     *modifier |= MODIFIER_MOD5;
-
+  
   return (*modifier != MODIFIER_NOMOD);
 }
 

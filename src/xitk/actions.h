@@ -50,8 +50,10 @@ void gui_toggle_aspect(void);
 
 void gui_toggle_interlaced(void);
 
+void gui_direct_change_audio_channel(xitk_widget_t *w, void *data, int value);
 void gui_change_audio_channel(xitk_widget_t *w, void *data);
 
+void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value);
 void gui_change_spu_channel(xitk_widget_t *w, void *data);
 
 void gui_change_speed_playback(xitk_widget_t *w, void *data);
@@ -64,6 +66,7 @@ void gui_dndcallback (char *filename);
 
 void gui_change_skin(xitk_widget_t *w, void *data);
 
+void gui_direct_nextprev(xitk_widget_t *w, void *data, int value);
 void gui_nextprev(xitk_widget_t *w, void *data);
 
 void gui_playlist_show(xitk_widget_t *w, void *data);

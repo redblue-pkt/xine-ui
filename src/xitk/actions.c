@@ -289,33 +289,42 @@ void gui_toggle_interlaced(void) {
   }
 }
 
+void gui_direct_change_audio_channel(xitk_widget_t *w, void *data, int value) {
+  xine_select_audio_channel(gGui->xine, value);
+  panel_update_channel_display ();
+}
+
 void gui_change_audio_channel(xitk_widget_t *w, void *data) {
+  int dir = (int)data;
+  int channel;
   
-  if(((int)data) == GUI_NEXT) {
-    xine_select_audio_channel(gGui->xine,
-			      (xine_get_audio_selection(gGui->xine) + 1));
-  }
-  else if(((int)data) == GUI_PREV) {
-    xine_select_audio_channel(gGui->xine, 
-			      (xine_get_audio_selection(gGui->xine) - 1));
-  }
+  channel = xine_get_audio_selection(gGui->xine);
   
+  if(dir == GUI_NEXT)
+    channel++;
+  else if(dir == GUI_PREV)
+    channel--;
+  
+  gui_direct_change_audio_channel(w, data, channel);
+}
+
+void gui_direct_change_spu_channel(xitk_widget_t *w, void *data, int value) {
+  xine_select_spu_channel(gGui->xine, value);
   panel_update_channel_display ();
 }
 
 void gui_change_spu_channel(xitk_widget_t *w, void *data) {
+  int dir = (int)data;
+  int channel;
   
-  if(((int)data) == GUI_NEXT) {
-    xine_select_spu_channel(gGui->xine, 
-			    (xine_get_spu_channel(gGui->xine) + 1));
-  }
-  else if(((int)data) == GUI_PREV) {
-    xine_select_spu_channel(gGui->xine, 
-			    (xine_get_spu_channel(gGui->xine) - 1));
-  }
+  channel = xine_get_spu_channel(gGui->xine);
 
-  panel_update_channel_display ();
+  if(dir == GUI_NEXT)
+    channel++;
+  else if(dir == GUI_PREV)
+    channel--;
   
+  gui_direct_change_spu_channel(w, data, channel);
 }
 
 void gui_change_speed_playback(xitk_widget_t *w, void *data) {
@@ -458,46 +467,71 @@ void gui_dndcallback (char *filename) {
   }
 }
 
-void gui_nextprev(xitk_widget_t *w, void *data) {
+void gui_direct_nextprev(xitk_widget_t *w, void *data, int value) {
+  int i;
   int by_chapter;
-  
+
   by_chapter = (gGui->skip_by_chapter &&
 		((xine_get_input_plugin_capabilities(gGui->xine)) & INPUT_CAP_CHAPTERS)) ? 1 : 0;
   
-  if(((int)data) == GUI_NEXT)
-    
-    if(by_chapter)
-      gui_execute_action_id(ACTID_EVENT_NEXT);
-    else {
-      gGui->ignore_status = 0;
-      gui_status_callback (XINE_STOP);
+  if(((int)data) == GUI_NEXT) {
+
+    if(by_chapter) {
+
+      for(i = 0; i < value; i++)
+	gui_execute_action_id(ACTID_EVENT_NEXT);
+
     }
-  
+    else {
+
+      if((gGui->playlist_cur + value) < gGui->playlist_num) {
+
+	gGui->playlist_cur += (value - 1);
+	
+	gGui->ignore_status = 0;
+	gui_status_callback (XINE_STOP);
+      }
+
+    }
+
+  }
   else if(((int)data) == GUI_PREV) {
     
-    if(by_chapter)
-      gui_execute_action_id(ACTID_EVENT_PRIOR);
+    if(by_chapter) {
+
+      for(i = 0; i < value; i++)
+	gui_execute_action_id(ACTID_EVENT_PRIOR);
+
+    }
     else {
 
-      gGui->ignore_status = 1;
-      gGui->playlist_cur--;
-
-      if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
-        gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-
-        if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
-	  gui_handle_xine_error();
+      if((gGui->playlist_cur - value) >= 0) {
 	
+	gGui->ignore_status = 1;
+	gGui->playlist_cur -= value;
+	
+	if((gGui->playlist_cur < gGui->playlist_num)) {
+	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	  
+	  if(!xine_play (gGui->xine, gGui->filename, 0, 0))
+	    gui_handle_xine_error();
+	  
+	}
+	else {
+	  gGui->playlist_cur = 0;
+	}
+	
+	gGui->ignore_status = 0;
       }
-      else {
-        gGui->playlist_cur = 0;
-      }
-      
-      gGui->ignore_status = 0;
+
     }
   }
-
+  
   panel_check_pause();
+}
+  
+void gui_nextprev(xitk_widget_t *w, void *data) {
+  gui_direct_nextprev(w, data, 1);
 }
 
 void gui_playlist_show(xitk_widget_t *w, void *data) {
