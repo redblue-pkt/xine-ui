@@ -364,7 +364,7 @@ static void load_video_out_driver(char *video_driver_id) {
  * Try to load audio output plugin, by stored name or probing
  */
 static void load_audio_out_driver(char *audio_driver_id, 
-				  ao_functions_t **audio_driver) {
+				  ao_driver_t **audio_driver) {
   
   if (!audio_driver_id) {
     char **driver_ids = xine_list_audio_output_plugins ();
@@ -433,7 +433,7 @@ int main(int argc, char *argv[]) {
   /*  int              audio_options = 0; FIXME */
   char            *audio_driver_id = NULL;
   char            *video_driver_id = NULL;
-  ao_functions_t  *audio_driver = NULL ;
+  ao_driver_t  *audio_driver = NULL ;
   sigset_t         vo_mask;
 
   /* Check xine library version */
