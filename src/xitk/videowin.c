@@ -386,9 +386,11 @@ static void video_window_adapt_size (void) {
       if(gGui->video_display == gGui->display)
         xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
 
-      if(gGui->vo_port)
-	xine_port_send_gui_data(gGui->vo_port, 
-			      XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+      if(gGui->vo_port) {
+        XUnlockDisplay (gGui->video_display);
+	xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+        XLockDisplay (gGui->video_display);
+      }
 
       XSelectInput(gGui->video_display, gGui->video_window, ExposureMask);
       
@@ -662,9 +664,11 @@ static void video_window_adapt_size (void) {
     if(gGui->video_display == gGui->display)
       xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
 
-    if(gGui->vo_port)
-      xine_port_send_gui_data(gGui->vo_port,
-			    XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+    if(gGui->vo_port) {
+      XUnlockDisplay (gGui->video_display);
+      xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+      XLockDisplay (gGui->video_display);
+    }
 
     if (gVw->xclasshint_fullscreen != NULL)
       XSetClassHint(gGui->video_display, gGui->video_window, gVw->xclasshint_fullscreen);
@@ -757,9 +761,11 @@ static void video_window_adapt_size (void) {
     if(gGui->video_display == gGui->display)
       xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
     
-    if(gGui->vo_port)
-      xine_port_send_gui_data(gGui->vo_port,
-			    XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+    if(gGui->vo_port) {
+      XUnlockDisplay (gGui->video_display);
+      xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+      XLockDisplay (gGui->video_display);
+    }
     
     if (gVw->xclasshint_fullscreen != NULL)
       XSetClassHint(gGui->video_display, gGui->video_window, gVw->xclasshint_fullscreen);
@@ -891,8 +897,11 @@ static void video_window_adapt_size (void) {
     if(gGui->video_display == gGui->display)
       xitk_widget_list_set(gVw->wl, WIDGET_LIST_WINDOW, (void *) gGui->video_window);
 
-    if(gGui->vo_port)
+    if(gGui->vo_port) {
+      XUnlockDisplay (gGui->video_display);
       xine_port_send_gui_data(gGui->vo_port, XINE_GUI_SEND_DRAWABLE_CHANGED, (void*)gGui->video_window);
+      XLockDisplay (gGui->video_display);
+    }
     
     if(gVw->borderless) {
       if (gVw->xclasshint_borderless != NULL)
