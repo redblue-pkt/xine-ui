@@ -1,6 +1,7 @@
 #Xine skin data file
+# revision 0.5.2
 skin.name    = Xinetic
-skin.version = 0.5.2
+skin.version = 1
 skin.date    = 14.11.2001
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none

@@ -55,7 +55,7 @@ typedef struct {
   char                          buf[256];
 
   char                         *name;
-  char                         *version;
+  int                           version;
   char                         *author;
   char                         *date;
   char                         *url;

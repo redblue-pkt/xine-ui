@@ -1,4 +1,5 @@
-skin.name = pitt
+skin.name    = pitt
+skin.version = 1
 
 ## Main GUI ##
 skin.BackGround {

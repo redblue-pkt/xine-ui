@@ -528,11 +528,17 @@ static void numtype_update(xitk_widget_t *w, void *data, int value) {
  *
  */
 static void stringtype_update(xitk_widget_t *w, void *data, char *str) {
-  cfg_entry_t *entry;
+  cfg_entry_t *entry, *check_entry;
   
   entry = (cfg_entry_t *)data;
- 
+  
   entry->config->update_string(entry->config, entry->key, str );
+  check_entry = gGui->config->lookup_entry(gGui->config, entry->key);
+
+  if(check_entry) {
+    if(w->widget_type & WIDGET_TYPE_INPUTTEXT)
+      xitk_inputtext_change_text(setup->widget_list, w, check_entry->str_value);
+  }
 }
 
 /*

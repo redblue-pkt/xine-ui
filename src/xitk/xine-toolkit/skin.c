@@ -333,7 +333,7 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	else {
 	  skin_set_pos_to_value(&p);
 	  if(!strncasecmp(section, "version", 7)) {
-	    skonfig->version = strdup(p);
+	    skonfig->version = strtol(p, &p, 10);
 	    return;
 	  }
 	  else if(!strncasecmp(section, "author", 6)) {
@@ -373,7 +373,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
   if(s) {
 
     printf("Skin name '%s'\n", skonfig->name);
-    printf("     version '%s'\n", skonfig->version);
+    printf("     version '%d'\n", skonfig->version);
     printf("     author  '%s'\n", skonfig->author);
     printf("     date    '%s'\n", skonfig->date);
     printf("     URL     '%s'\n", skonfig->url);
@@ -447,8 +447,9 @@ xitk_skin_config_t *xitk_skin_init_config(void) {
   if((skonfig = (xitk_skin_config_t *) xitk_xmalloc(sizeof(xitk_skin_config_t))) == NULL) {
     XITK_DIE("%s(): xitk_xmalloc() failed: %s\n", __FUNCTION__, strerror(errno));
   }
+  skonfig->version = -1;
   skonfig->first = skonfig->last = skonfig->celement = NULL;
-  skonfig->name = skonfig->version = skonfig->author = skonfig->date = skonfig->url = NULL;
+  skonfig->name = skonfig->author = skonfig->date = skonfig->url = NULL;
   skonfig->skinfile = skonfig->path = NULL;
 
   skonfig->ln = skonfig->buf;
@@ -487,7 +488,6 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   }
   
   XITK_FREE(skonfig->name);
-  XITK_FREE(skonfig->version);
   XITK_FREE(skonfig->author);
   XITK_FREE(skonfig->date);
   XITK_FREE(skonfig->url);
@@ -504,9 +504,8 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, char *path, char *filenam
 
   assert(skonfig != NULL && path != NULL && filename != NULL);
 
-  skonfig->path = strdup(path);
+  skonfig->path     = strdup(path);
   skonfig->skinfile = strdup(filename);
-
   snprintf(buf, 2048, "%s/%s", skonfig->path, skonfig->skinfile);
 
   if((skonfig->fd = fopen(buf, "r")) != NULL) {
@@ -546,7 +545,31 @@ int xitk_skin_load_config(xitk_skin_config_t *skonfig, char *path, char *filenam
  * Unload (free) xitk_skin_config_t object.
  */
 void xitk_skin_unload_config(xitk_skin_config_t *skonfig) {
-  xitk_skin_free_config(skonfig);
+  if(skonfig)
+    xitk_skin_free_config(skonfig);
+}
+
+/*
+ * Check skin version.
+ * return: 0 if version found < min_version
+ *         1 if version found == min_version
+ *         2 if version found > min_version
+ *        -1 if no version found
+ */
+int xitk_skin_check_version(xitk_skin_config_t *skonfig, int min_version) {
+
+  assert(skonfig);
+
+  if(skonfig->version == -1)
+    return -1;
+  else if(skonfig->version < min_version)
+    return 0;
+  else if(skonfig->version == min_version)
+    return 1;
+  else if(skonfig->version > min_version)
+    return 2;
+
+  return -1;
 }
 
 /*
@@ -554,6 +577,8 @@ void xitk_skin_unload_config(xitk_skin_config_t *skonfig) {
  */
 int xitk_skin_get_coord_x(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
+
+  assert(skonfig);
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->x;
@@ -567,6 +592,8 @@ int xitk_skin_get_coord_x(xitk_skin_config_t *skonfig, const char *str) {
 int xitk_skin_get_coord_y(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
+  assert(skonfig);
+
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->y;
 
@@ -578,6 +605,8 @@ int xitk_skin_get_coord_y(xitk_skin_config_t *skonfig, const char *str) {
  */
 char *xitk_skin_get_label_color(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
+
+  assert(skonfig);
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->color;
@@ -591,6 +620,8 @@ char *xitk_skin_get_label_color(xitk_skin_config_t *skonfig, const char *str) {
 char *xitk_skin_get_label_color_focus(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
+  assert(skonfig);
+
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->color_focus;
 
@@ -602,6 +633,8 @@ char *xitk_skin_get_label_color_focus(xitk_skin_config_t *skonfig, const char *s
  */
 char *xitk_skin_get_label_color_click(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
+
+  assert(skonfig);
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->color_click;
@@ -615,6 +648,8 @@ char *xitk_skin_get_label_color_click(xitk_skin_config_t *skonfig, const char *s
 int xitk_skin_get_label_length(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
+  assert(skonfig);
+
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->length;
 
@@ -626,6 +661,8 @@ int xitk_skin_get_label_length(xitk_skin_config_t *skonfig, const char *str) {
  */
 int xitk_skin_get_label_animation(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
+
+  assert(skonfig);
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->animation;
@@ -639,6 +676,8 @@ int xitk_skin_get_label_animation(xitk_skin_config_t *skonfig, const char *str) 
 char *xitk_skin_get_label_fontname(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
+  assert(skonfig);
+
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->font;
   
@@ -651,6 +690,8 @@ char *xitk_skin_get_label_fontname(xitk_skin_config_t *skonfig, const char *str)
 char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
   
+  assert(skonfig);
+
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->pixmap_font;
   
@@ -662,6 +703,8 @@ char *xitk_skin_get_label_skinfont_filename(xitk_skin_config_t *skonfig, const c
  */
 char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
+
+  assert(skonfig);
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return s->pixmap;
@@ -675,6 +718,8 @@ char *xitk_skin_get_skin_filename(xitk_skin_config_t *skonfig, const char *str) 
 char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
 
+  assert(skonfig);
+
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     if(s->slider_type)
       return s->pixmap_pad;
@@ -687,6 +732,8 @@ char *xitk_skin_get_slider_skin_filename(xitk_skin_config_t *skonfig, const char
  */
 int xitk_skin_get_slider_type(xitk_skin_config_t *skonfig, const char *str) {
   xitk_skin_element_t *s;
+
+  assert(skonfig);
 
   if((s = skin_lookup_section(skonfig, str)) != NULL)
     return((s->slider_type) ? s->slider_type : XITK_HSLIDER);

@@ -1,4 +1,5 @@
-skin.name = lcd
+skin.name    = lcd
+skin.version = 1
 
 ## Main GUI ##
 skin.BackGround {

@@ -1214,6 +1214,15 @@ void xitk_skin_free_config(xitk_skin_config_t *);
 int xitk_skin_load_config(xitk_skin_config_t *, char *, char *);
 
 /*
+ * Check skin version.
+ * return: 0 if version found < min_version
+ *         1 if version found == min_version
+ *         2 if version found > min_version
+ *        -1 if no version found
+ */
+int xitk_skin_check_version(xitk_skin_config_t *, int);
+
+/*
  * Unload (free) xitk_skin_config_t object.
  */
 void xitk_skin_unload_config(xitk_skin_config_t *);
