@@ -995,6 +995,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   xitk_widget_t              *mywidget;
   mrlbrowser_private_data_t  *private_data;
   xitk_labelbutton_widget_t   lb;
+  xitk_widget_t               *default_source = NULL;
   xitk_button_widget_t        pb;
   xitk_label_widget_t         lbl;
   xitk_combo_widget_t         cmb;
@@ -1242,6 +1243,7 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
       lb.state_callback = NULL;
       lb.userdata       = (void *)private_data;
       lb.skin_element_name = mb->ip_name.button.skin_element_name;
+
       xitk_list_append_content(private_data->widget_list->l,
 		       (private_data->autodir_plugins[i] = 
 			xitk_labelbutton_create (private_data->widget_list, skonfig, &lb)));
@@ -1250,6 +1252,10 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
       private_data->autodir_plugins[i]->type |= WIDGET_GROUP | WIDGET_GROUP_MRLBROWSER;
       
       (void) xitk_set_widget_pos(private_data->autodir_plugins[i], x, y);
+
+      /* make "file" the default mrl source */
+      if( !strcasecmp(lb.label, "file") )
+        default_source = private_data->autodir_plugins[i];
       
       switch(dir) {
       case DIRECTION_UP:
@@ -1329,6 +1335,10 @@ xitk_widget_t *xitk_mrlbrowser_create(xitk_widget_list_t *wl,
   XLOCK(mb->imlibdata->x.disp);
   XSetInputFocus(mb->imlibdata->x.disp, private_data->window, RevertToParent, CurrentTime);
   XUNLOCK(mb->imlibdata->x.disp);
+
+  if( default_source && !private_data->last_mrl_source ) {
+    mrlbrowser_grab_mrls(default_source, private_data);
+  }
 
   return mywidget;
 }
