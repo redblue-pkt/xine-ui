@@ -174,16 +174,13 @@ Hide/show the MRL browser.
 .BR C\-m | C\-M :
 Audio mute toggle.
 .br
-.BR p | P :
-Pause
-.br
 .BR M\-p | M\-P:
 Show/hide the playlist window.
 .br
 .BR Q :
 Exit.
 .br
-.BR s | S :
+.BR z | Z :
 Zoom in/out.
 .br
 .BR v :
@@ -192,7 +189,7 @@ Decrease audio volume.
 .BR V :
 Increase audio volume.
 .br
-.BR x | X :
+.BR t :
 Take a snapshot.
 .br
 .BR <return> :
@@ -204,10 +201,10 @@ Pause
 .BR <up>/<down> :
 fast forward / slow motion
 .br
-.BR <left>/<right> :
+.BR c\-<left>/C\-<right> :
 seek -+ 15 sec.
 .br
-.BR C\-<left> / C\-<right> :
+.BR <left> / <right> :
 seek +- 60 sec.
 .br
 .BR <page\ up> :
@@ -216,10 +213,10 @@ Jump to previous stream in playlist
 .BR <page\ down> :
 Jump to next stream in playlist
 .br
-.BR C\-< :
+.BR < :
 Reduce the output window.
 .br
-.BR C\-> :
+.BR > :
 Enlarge the ouput window.
 .br
 .BR . :
@@ -242,6 +239,9 @@ Menu 2 (e.g. title menu)
 .br
 .BR F2 :
 Menu 3
+.br
+.BR M\-L :
+show log viewer window
 .br
 
 .SH Synchronization fine tuning
