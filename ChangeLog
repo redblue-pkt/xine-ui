@@ -1,3 +1,6 @@
+  * do not save unsupported controls (hue, sat, etc) on config
+  * fix image controls for latest SiS driver
+
 xine-ui (0.9.18) unstable; urgency=low
 
   * aaxine use post plugin for video less streams.
