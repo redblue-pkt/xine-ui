@@ -264,6 +264,11 @@ AC_SUBST(TERMCAP_LIB)
 AC_SUBST(LIBVERSION)
 
 
+NET_LIBS=""
+AC_CHECK_LIB(socket, socket, NET_LIBS="-lsocket $NET_LIBS",)
+AC_CHECK_LIB(nsl, gethostbyname, NET_LIBS="-lnsl $NET_LIBS",)
+AC_SUBST(NET_LIBS)
+
 dnl
 dnl check for ascii-art library
 dnl
@@ -660,7 +665,7 @@ AC_DEFINE_UNQUOTED(XINE_DOCDIR, "$XINE_DOCDIR")
 dnl
 dnl Some include paths ( !!! DO NOT REMOVE !!! )
 dnl
-INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/readline -I$(top_builddir)/readline -I$(top_srcdir)/srcw -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
+INCLUDES='-I$(top_srcdir) -I$(top_builddir) -I$(top_srcdir)/readline -I$(top_builddir)/readline -I$(top_srcdir)/src -I$(top_builddir)/src -I$(top_srcdir)/src/common -I$(top_builddir)/src/common -I$(top_srcdir)/src/xitk/xine-toolkit -I$(top_builddir)/src/xitk/xine-toolkit -I$(prefix)/include $(INTLDIR)'
 AC_SUBST(INCLUDES)
 
 AC_DEFINE(NEED_MRLBROWSER)

@@ -22,6 +22,10 @@
  */
 #define _XITK_C_
 
+/* required to enable POSIX variant of getpwuid_r on solaris */
+#define _POSIX_PTHREAD_SEMANTICS 1
+
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif

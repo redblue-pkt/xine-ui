@@ -22,12 +22,15 @@
  * xine network related stuff
  *
  */
-/* required for getsubopt(); the __sun test gives us strncasecmp() on solaris */
+/* required for getsubopt(); the __sun test avoids compilation problems on */
+/* solaris */
 #ifndef __sun
 #define _XOPEN_SOURCE 500
 #endif
 /* required for strncasecmp() */
 #define _BSD_SOURCE 1
+/* required to enable POSIX variant of getpwuid_r on solaris */
+#define _POSIX_PTHREAD_SEMANTICS 1
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -86,6 +89,9 @@ extern int errno;
 #else
 #  include "getopt.h"
 #endif
+
+# include <xine/xineutils.h>
+
 
 /* options args */
 static const char *short_options = "?hH:P:ncv";
@@ -383,24 +389,12 @@ int sock_create(const char *service, const char *transport, struct sockaddr_in *
 
 int sock_client(const char *host, const char *service, const char *transport) {
   struct sockaddr_in   sin;
-  struct in_addr       interface;
   struct hostent      *ihost;
   int                  sock;
   
   sock = sock_create(service, transport, &sin);
 
-  sin.sin_addr.s_addr = inet_addr(host);
-
-  if(!inet_aton(host, &interface)) {
-    ihost = gethostbyname(host);
-    if(!ihost) {
-      sock_err("Unknown host: %s\n", host);
-      return -1;
-    }
-    memcpy(&sin.sin_addr, ihost->h_addr, ihost->h_length);
-  }
-  
-  if(interface.s_addr == INADDR_NONE) {
+  if ((sin.sin_addr.s_addr = inet_addr(host)) == -1) {
     ihost = gethostbyname(host);
     
     if(!ihost) {
@@ -933,7 +927,7 @@ static void *select_thread(void *data) {
 		  int    i = (sizeof(client_commands) / sizeof(client_commands[0])) - 1;
 		  
 		  pp = special + 11;
-		  while((p = strsep(&pp, "\t")) != NULL) {
+		  while((p = xine_strsep(&pp, "\t")) != NULL) {
 		    if(strlen(p)) {
 		      while(*p == ' ' || *p == '\t') p++;
 		      session_commands = (session_commands_t **) realloc(session_commands, (i + 2) * (sizeof(session_commands_t *)));
