@@ -33,13 +33,13 @@ en partant du canal \fB0\fP.
 .B \-V, \-\-video\-driver <drv>
 Sélectionne le pilote vidéo. Utilisez \fIxine \-\-help\fP pour avoir la
 liste des pilotes disponible sur votre système. Cette sélection est
-automatiquement enregistrée dans votre .xinerc, donc vous n'avez à
+automatiquement enregistrée dans votre \fB~/.xine/config\fP, donc vous n'avez à
 spécifier ce paramêtre qu'une seule fois.
 .TP
 .B \-A, \-\-audio\-driver <drv>
 Sélectionne le pilote audio. Utilisez \fIxine \-\-help\fP pour avoir la
 liste des pilotes disponible sur votre système. Cette sélection est
-automatiquement enregistrée dans votre .xinerc, donc vous n'avez à
+automatiquement enregistrée dans votre \fB~/.xine/config\fP, donc vous n'avez à
 spécifier ce paramêtre qu'une seule fois.
 .TP
 .B \-u, \-\-spu\-channel <num>
@@ -410,6 +410,15 @@ fichier d'assignement des touches de xine-ui
 .br
 .BR ~/.xine/passwd :
 fichier de mots de passes de xine-ui
+.BR ~/xine/xinerc :
+vous pouvez ajouter des arguments de ligne de commande habituel dans ce 
+fichier (un argument par ligne), comme ci\-dessous:
+.nf
+\-\-geometry 720x576+0+0
+\-\-network
+\-s DVD
+\-p
+.fi
 .SH "VOIR AUSSI"
 \fBxine-remote\fP(1).
 .br

@@ -39,12 +39,12 @@ to "virtual channels" with channel numbers starting at \fB0\fP.
 .B \-V, \-\-video\-driver <drv>
 Select video driver. Check out \fIxine\ \-\-help\fP for a list of available
 video output plugins on your system. This selection is stored automatically
-in your \fI.xinerc\fP so you'll have to specify the video driver only once.
+in your \fB~/.xine/config\fP so you'll have to specify the video driver only once.
 .TP
 .B \-A, \-\-audio\-driver <drv>
 Select audio driver. Check out \fIxine \-\-help\fP for a list of available
 audio output plugins on your system. This selection is stored automatically
-in your \fI.xinerc\fP so you'll have to specify the audio driver only once.
+in your \fB~/.xine/config\fP so you'll have to specify the audio driver only once.
 .TP
 .B \-u, \-\-spu\-channel <num>
 Select subpicture (subtitle) channel. \fB<num>\fP is the subpicture channel
@@ -408,6 +408,15 @@ key bindings for xine-ui
 .br
 .BR ~/.xine/passwd :
 passwords file xine-ui
+.br
+.BR ~/xine/xinerc :
+you can add usual command argument(s) in this file (one argument per line), like:
+.nf
+\-\-geometry 720x576+0+0
+\-\-network
+\-s DVD
+\-p
+.fi
 .SH "SEE ALSO"
 \fBxine-remote\fP(1).
 .br
