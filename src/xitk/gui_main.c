@@ -1276,7 +1276,6 @@ void gui_start (int nfiles, char *filenames[]) {
   if(gGlob->autoplay_options & PLAY_ON_START) {
     /* probe DVD && VCD  */
     int i = 0;
-    int num_plugins;
     char **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGlob->gXine);
     
     perr("autoplay\n");

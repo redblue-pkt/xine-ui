@@ -181,7 +181,7 @@ int handle_debug_subopt(char *sopt) {
   int subopt;
   char *str = sopt;
   char *val = NULL;
-  char *debuglvl[] = {
+  const char *debuglvl[] = {
     "verbose", "metronom", "audio", "demux", 
     "input", "video", "pts", "mpeg", "avi", 
     "ac3", "loop", "gui",
@@ -225,7 +225,7 @@ int handle_demux_strategy_subopt(char *sopt) {
   int subopt;
   char *str = sopt;
   char *val = NULL;
-  char *ds_available[] = {
+  const char *ds_available[] = {
     "default",
     "revert",
     "content",
@@ -283,7 +283,7 @@ int main(int argc, char *argv[]) {
   int              demux_strategy = DEMUX_DEFAULT_STRATEGY;
   int              audio_channel = 0; 
   int              spu_channel = -1;
-  int              audio_options = 0;
+  /*  int              audio_options = 0; FIXME */
   char            *audio_driver_id = NULL;
   char            *video_driver_id = NULL;
   ao_functions_t  *audio_driver = NULL ;
