@@ -24,7 +24,7 @@
 #ifndef HAVE_WIDGET_H
 #define HAVE_WIDGET_H
 
-#include <stdint.h>
+/* #include <stdint.h> */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 

@@ -36,6 +36,9 @@
 #define DEFAULT_SORT 0
 #define REVERSE_SORT 1
 
+#define NAME_MAX 256
+#define PATH_MAX 768
+
 typedef struct {
   /* Files handle by the file browser */
   char                  *dir_contents[MAXFILES];
