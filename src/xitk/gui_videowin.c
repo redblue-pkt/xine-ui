@@ -29,8 +29,9 @@
 
 #include "gui_main.h"
 
-extern gGlob_t *gGui;
+extern gGui_t *gGui;
 
+/*
 typedef struct
 {
   int          flags;
@@ -42,6 +43,7 @@ typedef struct
 
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
+*/
 
 void gui_setup_video_window (int video_width, int video_height, int *dest_x, int *dest_y,
 			     int *dest_width, int *dest_height) {
@@ -56,7 +58,7 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
   XEvent                xev;
   XGCValues             xgcv;
 
-  XLockDisplay (display);
+  XLockDisplay (gGui->display);
 
   gGui->video_width = video_width;
   gGui->video_height = video_height;
@@ -86,124 +88,124 @@ void gui_setup_video_window (int video_width, int video_height, int *dest_x, int
      * open fullscreen window
      */
 
-    attr.background_pixel  = gGui->black;
+    attr.background_pixel  = gGui->black.pixel;
 
     gGui->video_win = XCreateWindow (gGui->display, 
-				     RootWindow (display, DefaultScreen(gGui->display)), 
+				     RootWindow (gGui->display, DefaultScreen(gGui->display)), 
 				     0, 0, gGui->fullscreen_width, gGui->fullscreen_height, 
 				     0, gGui->depth, CopyFromParent, gGui->vinfo.visual,
 				     CWBackPixel, &attr);
 
-    if (this->xclasshint != NULL)
-      XSetClassHint(this->display, this->window, this->xclasshint);
+    if (gGui->xclasshint != NULL)
+      XSetClassHint(gGui->display, gGui->video_win, gGui->xclasshint);
 
     /*
      * wm, no borders please
      */
     
-    prop = XInternAtom(this->display, "_MOTIF_WM_HINTS", False);
+    prop = XInternAtom(gGui->display, "_MOTIF_WM_HINTS", False);
     mwmhints.flags = MWM_HINTS_DECORATIONS;
     mwmhints.decorations = 0;
-    XChangeProperty(this->display, this->window, prop, prop, 32,
+    XChangeProperty(gGui->display, gGui->video_win, prop, prop, 32,
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
-    XSetTransientForHint(this->display, this->window, None);
-    XRaiseWindow(this->display, this->window);
+    XSetTransientForHint(gGui->display, gGui->video_win, None);
+    XRaiseWindow(gGui->display, gGui->video_win);
 
   } else {
 
     *dest_width  = gGui->video_width;
     *dest_height = gGui->video_height;
 
-    if (this->window) {
+    if (gGui->video_win) {
 
-      if (this->fullscreen_mode) {
-	XDestroyWindow(this->display, this->window);
-	this->window = 0;
+      if (gGui->fullscreen_mode) {
+	XDestroyWindow(gGui->display, gGui->video_win);
+	gGui->video_win = 0;
       } else {
 	
-	XResizeWindow (this->display, this->window, 
-		       this->video_width, this->video_height);
+	XResizeWindow (gGui->display, gGui->video_win, 
+		       gGui->video_width, gGui->video_height);
 
-	XUnlockDisplay (this->display);
+	XUnlockDisplay (gGui->display);
 	
 	return;
 	
       }
     }
 
-    this->fullscreen_mode = 0;
+    gGui->fullscreen_mode = 0;
 
     hint.x = 0;
     hint.y = 0;
-    hint.width  = this->video_width;
-    hint.height = this->video_height;
+    hint.width  = gGui->video_width;
+    hint.height = gGui->video_height;
     hint.flags  = PPosition | PSize;
 
     /*
     theCmap   = XCreateColormap(display, RootWindow(display,gXv.screen), 
     gXv.vinfo.visual, AllocNone); */
   
-    attr.background_pixel  = this->black.pixel;
+    attr.background_pixel  = gGui->black.pixel;
     attr.border_pixel      = 1;
     /* attr.colormap          = theCmap; */
     
 
-    this->window = XCreateWindow(this->display, RootWindow(this->display, this->screen),
+    gGui->video_win = XCreateWindow(gGui->display, RootWindow(gGui->display, gGui->screen),
 				 hint.x, hint.y, hint.width, hint.height, 4, 
-				 this->depth, CopyFromParent, this->vinfo.visual,
+				 gGui->depth, CopyFromParent, gGui->vinfo.visual,
 				 CWBackPixel | CWBorderPixel , &attr);
 
-    if (this->xclasshint != NULL)
-      XSetClassHint(this->display, this->window, this->xclasshint);
+    if (gGui->xclasshint != NULL)
+      XSetClassHint(gGui->display, gGui->video_win, gGui->xclasshint);
 
     
-    /* Tell other applications about this window */
+    /* Tell other applications about gGui window */
 
-    XSetStandardProperties(this->display, this->window, window_title, window_title, 
+    XSetStandardProperties(gGui->display, gGui->video_win, window_title, window_title, 
 			   None, NULL, 0, &hint);
 
   }
   
-  XSelectInput(this->display, this->window, StructureNotifyMask | ExposureMask | KeyPressMask | ButtonPressMask);
+  XSelectInput(gGui->display, gGui->video_win, StructureNotifyMask | ExposureMask | KeyPressMask | ButtonPressMask);
 
   wm_hint = XAllocWMHints();
   if (wm_hint != NULL) {
     wm_hint->input = True;
     wm_hint->initial_state = NormalState;
     wm_hint->flags = InputHint | StateHint;
-    XSetWMHints(this->display, this->window, wm_hint);
+    XSetWMHints(gGui->display, gGui->video_win, wm_hint);
     XFree(wm_hint);
   }
 
   /* FIXME
-  wm_delete_window = XInternAtom(this->display, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols(this->display, this->window, &wm_delete_window, 1);
+  wm_delete_window = XInternAtom(gGui->display, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols(gGui->display, gGui->video_win, &wm_delete_window, 1);
   */
 
   /* Map window. */
   
-  XMapRaised(this->display, this->window);
+  XMapRaised(gGui->display, gGui->video_win);
   
   /* Wait for map. */
 
   do  {
-    XMaskEvent(this->display, 
+    XMaskEvent(gGui->display, 
 	       StructureNotifyMask, 
 	       &xev) ;
-  } while (xev.type != MapNotify || xev.xmap.event != this->window);
+  } while (xev.type != MapNotify || xev.xmap.event != gGui->video_win);
 
-  XFlush(this->display);
-  XSync(this->display, False);
+  XFlush(gGui->display);
+  XSync(gGui->display, False);
   
-  this->gc = XCreateGC(this->display, this->window, 0L, &xgcv);
+  gGui->gc = XCreateGC(gGui->display, gGui->video_win, 0L, &xgcv);
 
-  if (this->fullscreen_mode) {
-    XSetInputFocus (this->display, this->window, RevertToNone, CurrentTime);
-    XMoveWindow (this->display, this->window, 0, 0);
+  if (gGui->fullscreen_mode) {
+    XSetInputFocus (gGui->display, gGui->video_win, RevertToNone, CurrentTime);
+    XMoveWindow (gGui->display, gGui->video_win, 0, 0);
   }
 
-  XUnlockDisplay (this->display);
+  XUnlockDisplay (gGui->display);
 
   /* drag and drop FIXME: implement */
 

@@ -30,6 +30,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/extensions/shape.h>
+#include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <errno.h>
 #include <pthread.h>
@@ -47,8 +48,9 @@
 #include "gui_parseskin.h"
 #include "gui_image.h"
 #include "gui_playlist.h"
+/* FIXME
 #include "gui_control.h"
-
+*/
 #include <xine/video_out_x11.h>
 #include "xine.h"
 #include "utils.h"
@@ -358,7 +360,7 @@ void gui_toggle_fullscreen(widget_t *w, void *data) {
   cursor_visible = gui_panel_visible;
   if (gui_panel_visible)  {
     pl_raise_window();
-    control_raise_window();
+    /*FIXME    control_raise_window();*/
     XRaiseWindow (gGui->display, gGui->gui_panel_win);
     XSetTransientForHint (gGui->display, 
 			  gGui->gui_panel_win, gGui->video_window);
@@ -385,16 +387,18 @@ void gui_toggle_panel_visibility (widget_t *w, void *data) {
 
   pl_toggle_panel_visibility(NULL, NULL);
 
+  /* FIXME
   if(!gui_panel_visible && control_is_visible()) {}
   else control_toggle_panel_visibility(NULL, NULL);
-
+  */
   if (gui_panel_visible) {
-
+    
+    /* FIXME
     if (xine_get_window_visible(gGui->xine)) {
       gui_panel_visible = 0;
       XUnmapWindow (gGui->display, gGui->gui_panel_win);
-  }
-    
+    }
+    */
   } else {
 
     gui_panel_visible = 1;
@@ -404,10 +408,12 @@ void gui_toggle_panel_visibility (widget_t *w, void *data) {
     update_slider = MAX_UPDSLD;
 
   }
-
+  /* FIXME
   xine_set_display_cursor(gGui->xine, gui_panel_visible);
   cursor_visible = gui_panel_visible;
+  */
   config_set_int("open_panel", gui_panel_visible);
+
 }
 
 void gui_change_audio_channel(widget_t *w, void *data) {
@@ -493,6 +499,7 @@ void gui_playlist_show(widget_t *w, void *datan, int st) {
   }
 }
 
+/* FIXME
 void gui_control_show(widget_t *w, void *data, int st) {
 
   if(control_is_running() && !control_is_visible())
@@ -502,6 +509,7 @@ void gui_control_show(widget_t *w, void *data, int st) {
   else
     control_exit(NULL, NULL);
 }
+*/
 
 void gui_nothing (void)
 {
@@ -539,7 +547,7 @@ void gui_open_panel (void) {
     exit(-1);
   }
 
-  screen = DefaultScreen(gGui->display);
+  gGui->screen = DefaultScreen(gGui->display);
 
   hint.x = config_lookup_int ("x_panel", 200);
   hint.y = config_lookup_int ("y_panel", 100);
@@ -551,10 +559,10 @@ void gui_open_panel (void) {
   hint.flags = PPosition | PSize;
   
   attr.override_redirect = True;
-  gGlob->gui_panel_win = XCreateWindow (gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay), 
+  gGui->gui_panel_win = XCreateWindow (gGui->display, DefaultRootWindow(gGui->display), 
 					hint.x, hint.y, hint.width, hint.height, 0, 
-					gGlob.gImlib_data->x.depth, CopyFromParent, 
-					gGlob.gImlib_data->x.visual,
+					gGui->imlib_data->x.depth, CopyFromParent, 
+					gGui->imlib_data->x.visual,
 					0, &attr);
   
   XSetStandardProperties(gGui->display, gGui->gui_panel_win, title, title,
@@ -857,7 +865,7 @@ void gui_open_panel (void) {
 						gui_get_fcolor("PlBtn"),
 						gui_get_ccolor("PlBtn")));
 
-
+  /* FIXME
   gui_list_append_content (gui_widget_list->l, 
 			   create_label_button (gGui->display, 
 						gGui->imlib_data, 
@@ -871,6 +879,7 @@ void gui_open_panel (void) {
 						gui_get_ncolor("CtlBtn"),
 						gui_get_fcolor("CtlBtn"),
 						gui_get_ccolor("CtlBtn")));
+  */
 
 }
 
@@ -883,7 +892,7 @@ void gui_handle_event (XEvent *event) {
   int len;
 
   playlist_handle_event(event);
-  control_handle_event(event);
+  /* FIXME  control_handle_event(event); */
 
   switch(event->type) {
   case Expose: {
@@ -891,9 +900,11 @@ void gui_handle_event (XEvent *event) {
     myexposeevent = (XExposeEvent *) event;
 
     if(event->xexpose.count == 0) {
+      /* FIXME
       if (myexposeevent->window == gGui->video_window)
 	xine_window_handle_event(gGui->xine, (void *)event);
-      else if (event->xany.window == gGui->gui_panel_win)
+	else */
+	if (event->xany.window == gGui->gui_panel_win)
 	paint_widget_list (gui_widget_list);
     }
   }
@@ -939,8 +950,10 @@ void gui_handle_event (XEvent *event) {
     break;
     
   case VisibilityNotify:
+    /* FIXME
     if(event->xany.window == gGui->video_window)
       xine_window_handle_event(gGui->xine, (void *)event);
+    */
     break;  
 
   case ButtonPress: {
@@ -1005,13 +1018,15 @@ void gui_handle_event (XEvent *event) {
 
     case XK_c:
     case XK_C:
-      gui_control_show(NULL, NULL, 0);
+      /* FIXME      gui_control_show(NULL, NULL, 0);*/
       break;
 
     case XK_h:
     case XK_H:
+      /* FIXME 
       xine_set_window_visible(gGui->xine, 
 			      !(xine_get_window_visible(gGui->xine)));
+      */
       break;
       
     case XK_plus:
@@ -1057,10 +1072,12 @@ void gui_handle_event (XEvent *event) {
 
     case XK_Control_L:
     case XK_Control_R:
+      /* FIXME
       if(!gui_panel_visible) {
 	cursor_visible = !cursor_visible;
 	xine_set_display_cursor(gGui->xine, cursor_visible);
       }
+      */
       break;
 
     case XK_Next:
@@ -1141,7 +1158,9 @@ void gui_handle_event (XEvent *event) {
     break;
 
   case ConfigureNotify:
+    /* FIXME
     xine_window_handle_event(gGui->xine, (void *)event);
+    */
 
     /* printf ("ConfigureNotify\n"); */
     /*  background */
@@ -1160,9 +1179,10 @@ void gui_handle_event (XEvent *event) {
     /* printf ("ClientMessage\n"); */
     if(event->xany.window == gGui->gui_panel_win)
       gui_dnd_process_client_message (gGui->xdnd_panel_win, event);
+    /* FIXME
     else if(event->xany.window == gGui->video_window)
       xine_window_handle_event(gGui->xine, (void *)event);
-
+    */
     break;
     /*
   default:
@@ -1236,7 +1256,7 @@ void gui_start (int nfiles, char *filenames[]) {
   struct sigaction      action;
   XWindowAttributes     attribs;
   Pixmap                bm_no;
-
+  XColor                dummy;
   /*
    * moving the window
    */
@@ -1264,29 +1284,32 @@ void gui_start (int nfiles, char *filenames[]) {
   else
     sprintf (gui_spuid, "%3s", "off");
 
-  gGlob->gImlib_data = Imlib_init (gGlob->gDisplay);
+  gGui->imlib_data = Imlib_init (gGui->display);
 
   /*
    * examine this X display 
    */
 
-  XLockDisplay (gGlob->gDisplay);
+  XLockDisplay (gGui->display);
 
-  gGlob->black = BlackPixel (gGlob->gDisplay, gGlob->screen);
+  //  gGui->black = BlackPixel (gGui->display, gGui->screen);
+  XAllocNamedColor(gGui->display, 
+		   DefaultColormap(gGui->display, gGui->screen), 
+		   "black", &gGui->black, &dummy);
 
-  XGetWindowAttributes(gGlob->gDisplay, DefaultRootWindow(gGlob->gDisplay), &attribs);
+  XGetWindowAttributes(gGui->display, DefaultRootWindow(gGui->display), &attribs);
 
-  gGlob->depth = attribs.depth;
+  gGui->depth = attribs.depth;
   
-  if (this->depth != 15 && this->depth != 16 && this->depth != 24 && this->depth != 32)  {
+  if (gGui->depth != 15 && gGui->depth != 16 && gGui->depth != 24 && gGui->depth != 32)  {
     /* The root window may be 8bit but there might still be
      * visuals with other bit depths. For example this is the 
      * case on Sun/Solaris machines.
      */
-    this->depth = 24;
+    gGui->depth = 24;
   }
 
-  if (!XMatchVisualInfo(gGlob->gDisplay, gGlob->screen, gGlob->depth, TrueColor, &gGlob->vinfo)) {
+  if (!XMatchVisualInfo(gGui->display, gGui->screen, gGui->depth, TrueColor, &gGui->vinfo)) {
     printf ("gui_main: couldn't find truecolor visual for video window.\n");
     exit (1);
   }
@@ -1297,33 +1320,33 @@ void gui_start (int nfiles, char *filenames[]) {
    * I want to figure out what fullscreen means for this setup
    */
 
-  if ((XineramaQueryExtension (gGlob->gDisplay, &dummy_a, &dummy_b)) 
-      && (screeninfo = XineramaQueryScreens(gGlob->gDisplay, &screens))) {
+  if ((XineramaQueryExtension (gGui->display, &dummy_a, &dummy_b)) 
+      && (screeninfo = XineramaQueryScreens(gGui->display, &screens))) {
     /* Xinerama Detected */
-    xprintf (VERBOSE|VIDEO, 
-	     "Display is using Xinerama with %d screens\n", screens);
-    xprintf (VERBOSE|VIDEO, 
-	     " going to assume we are using the first screen.\n");
-    xprintf (VERBOSE|VIDEO, " size of the first screen is %dx%d.\n", 
+#ifdef DEBUG
+    printf ("Display is using Xinerama with %d screens\n", screens);
+    printf (" going to assume we are using the first screen.\n");
+    printf (" size of the first screen is %dx%d.\n", 
 	     screeninfo[0].width, screeninfo[0].height);
-    
-    if (XineramaIsActive(gGlob->gDisplay)) {
-      gGlob->fullscreen_width  = screeninfo[0].width;
-      gGlob->fullscreen_height = screeninfo[0].height;
+#endif
+    if (XineramaIsActive(gGui->display)) {
+      gGui->fullscreen_width  = screeninfo[0].width;
+      gGui->fullscreen_height = screeninfo[0].height;
     } else {
-      gGlob->fullscreen_width  = DisplayWidth  (gGlob->gDisplay, gGlob->screen);
-      gGlob->fullscreen_height = DisplayHeight (gGlob->gDisplay, gGlob->screen);
+      gGui->fullscreen_width  = DisplayWidth  (gGui->display, gGui->screen);
+      gGui->fullscreen_height = DisplayHeight (gGui->display, gGui->screen);
     }
 
-  } else {
+  } else 
+#endif
+  {
     /* no Xinerama */
-    xprintf (VERBOSE|VIDEO, "Display is not using Xinerama.\n");
-    gGlob->fullscreen_width  = DisplayWidth (gGlob->gDisplay, gGlob->screen);
-    gGlob->fullscreen_height = DisplayHeight (gGlob->gDisplay, gGlob->screen);
+    printf ("Display is not using Xinerama.\n");
+    gGui->fullscreen_width  = DisplayWidth (gGui->display, gGui->screen);
+    gGui->fullscreen_height = DisplayHeight (gGui->display, gGui->screen);
   } 
-  gGui->imlib_data = Imlib_init (gGui->display);
 
-  XUnlockDisplay (gGlob->gDisplay);
+  XUnlockDisplay (gGui->display);
 
   /*
    * setup the panel
@@ -1335,19 +1358,19 @@ void gui_start (int nfiles, char *filenames[]) {
    * create cursors
    */
 
-  XLockDisplay (gGlob->gDisplay);
+  XLockDisplay (gGui->display);
 
-  bm_no = XCreateBitmapFromData(gGlob->gDisplay, gGlob->gui_panel_win, bm_no_data, 8, 8);
-  gGlob->cursor[0] = XCreatePixmapCursor(gGlob->gDisplay, bm_no, bm_no,
-					 gGlob->black, gGlob->black, 0, 0);
-  gGlob->cursor[1] = XCreateFontCursor(gGlob->gDisplay, XC_left_ptr);
+  bm_no = XCreateBitmapFromData(gGui->display, gGui->gui_panel_win, bm_no_data, 8, 8);
+  gGui->cursor[0] = XCreatePixmapCursor(gGui->display, bm_no, bm_no,
+					&gGui->black, &gGui->black, 0, 0);
+  gGui->cursor[1] = XCreateFontCursor(gGui->display, XC_left_ptr);
 
 
   /* create xclass hint for video window */
 
-  if ((gGlob->xclasshint = XAllocClassHint()) != NULL) {
-    gGlob->xclasshint->res_name = "Xine Video Window";
-    gGlob->xclasshint->res_class = "Xine";
+  if ((gGui->xclasshint = XAllocClassHint()) != NULL) {
+    gGui->xclasshint->res_name = "Xine Video Window";
+    gGui->xclasshint->res_class = "Xine";
   }
 
   /* 
@@ -1364,8 +1387,10 @@ void gui_start (int nfiles, char *filenames[]) {
     gui_panel_visible = 0;
   }
 
-  gui_set_display_cursor(gGlob->gXine, gui_panel_visible);
+  /* FIXME
+  gui_set_display_cursor(gGui->xine, gui_panel_visible);
   cursor_visible = gui_panel_visible;
+  */
   XUnlockDisplay (gGui->display);
   
   /*  The user request "play on start" */
@@ -1623,8 +1648,10 @@ static void *xine_lirc_loop(void *dummy) {
 	    break;
 
 	  case lHIDEOUTPUT:
+	    /* FIXME
 	    xine_set_window_visible(gGui->xine, 
 				    !(xine_get_window_visible(gGui->xine)));
+	    */
 	    break;
 	  }
 	}

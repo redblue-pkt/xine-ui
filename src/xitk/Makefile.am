@@ -12,7 +12,8 @@ GETOPT_C = getopt.c getopt1.c
 GETOPT_H = getopt.h
 endif
 
-xine_SOURCES = $(GETOPT_C) main.c gui_main.c gui_control.c gui_playlist.c \
+##gui_control.c 
+xine_SOURCES = $(GETOPT_C) main.c gui_main.c gui_playlist.c \
 	gui_parseskin.c gui_videowin.c utils.c monitor.c
 xine_DEPENDENTIES = utils.h monitor.h
 xine_LDADD = @XINE_LIBS@  $(LIRC_LIBS) -lm $(THREAD_LIBS) \

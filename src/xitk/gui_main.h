@@ -66,6 +66,7 @@ typedef struct {
   XVisualInfo          vinfo;
   Cursor               cursor[2]; /* Cursor pointers     */
   XClassHint          *xclasshint;
+  GC                   gc;
   int                  completion_type;
   int                  depth;
   int                  video_width, video_height; /* size of currently displayed video */
