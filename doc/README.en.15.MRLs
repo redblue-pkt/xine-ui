@@ -1,0 +1,97 @@
+To specify what you want xine to play, we use a system called MRL, Media
+Ressource Locator. As the name suggests, MRLs are very similar to the URLs you
+know from your webbrowser. In fact, there is a common superset of both, the URIs
+(Uniform Ressource Identifier) as defined in RFC2396.
+
+xine's MRLs are divided into two major parts, the input source and the stream
+setup. The latter is optional. If it exists, it is separated from the input
+source by a crosshatch '#' character.
+
+
+input source
+------------
+
+The input source part tells xine, where to get the data to play. To start with
+something well known, almost all UNIX-like paths and filenames are valid here.
+There are some characters which require special treatment, but xine tries to
+handle even slightly invalid MRLs gracefully.
+
+For input sources other than filenames, you must start with the class of input
+followed by a colon ':'. What comes after that depends on the actual input.
+Some prominent examples should clarify:
+
+     file:/path/to/file             plays the given file
+     stdin:/                        receives a stream from standard input
+     fifo:/path/to/file             receives a stream from the given fifo
+     
+     cdda:/                         plays a CD audio
+     cdda:/5                        plays track 5 from a CD audio
+     
+     dvd:/                          plays a DVD
+     dvd:/2                         plays a DVD starting at title 2
+     dvd:/2.4                       plays a DVD starting at title 2, part 4
+     
+     http://server/location/file    plays a file from the web
+     mms://server/location/file     plays a file via MMS streaming
+     pnm://server/location/file     plays a file via PNM streaming
+     rtsp://server/location/file    plays a file via RTSP streaming
+     
+     tcp://host:port                receives a stream through a TCP socket
+     slave://host:port              receives a stream from a xine broadcast
+     udp://host:port                receives a multicast stream through UDP
+     rtp://host:port                receives a RTP multicast stream
+     
+     dvb:/                          shows a Digital Video Broadcast
+     dvb:/7                         shows DVB station 7
+     
+     v4l:/tuner/frequency           receives a stream from a Video4Linux device
+
+
+stream setup
+------------
+
+The stream setup part allows you to pass special options for playback directly
+in the MRL. The various options are separated by a semicolon ';'.
+Possible options are:
+
+     novideo                        ignore the stream's video data
+     noaudio                        ignore the stream's audio data
+     nospu                          ignore the stream's subtitle data
+     
+     volume:value                   set the volume to the given value
+     compression:value              set the compression level to the given value
+     
+     subtitle:file                  show subtitles from a separate file
+     
+     save:filename                  save the stream in the designated file
+     
+     config_entry:config_value      change the config entry to the given value
+     
+     demux:demuxer_plugin           use the given demuxer "demuxer_plugin"
+     lastdemuxprobe:demuxer_plugin  used for debugging
+     
+
+examples
+--------
+
+Some examples should show you, how powerful the MRLs are:
+
+     yourmovie.avi#subtitle:yoursubtitles.srt
+     
+                                    plays the specified avi overlaying the
+                                    subtitles from the given file
+
+     http://some.server.org/stream.mpg#save:savedstream.mpg
+     
+                                    streams the file over HTTP and saves it
+                                    to disk while playing it
+
+     dvd:/1.1#novideo
+     
+                                    plays the first part in the first title
+                                    of the DVD, but audio only
+
+     stdin:/#demux:rawdv
+     
+                                    plays a DV stream from standard input,
+                                    can be used for live DV streams

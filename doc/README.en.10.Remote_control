@@ -1,0 +1,49 @@
+xine can be remotely controlled with an infrared control. For this, you should
+have LIRC installed. See http://www.lirc.org/ for details.
+
+You should add some entries in your ~/.lircrc file, like this:
+
+       begin
+               remote = SAMSUNG
+               button = Button_Play
+               prog   = xine
+               repeat = 0
+               config = Play
+       end
+       begin
+               remote = SAMSUNG
+               button = Button_1
+               prog   = xine
+               repeat = 0
+               config = SetPosition10%
+       end
+
+xine can self generate a lirc entries draft, using 'xine --keymap=lirc',
+then you can redirect the output to a file and polish the settings there.
+
+Each entry will look like this:
+
+       # Reduce the output window size.
+       begin
+               remote = xxxxx
+               button = xxxxx
+               prog   = xine
+               repeat = 0
+               config = WindowReduce
+       end
+
+It's yours to specify the remote name, and assign the button.
+
+
+To Retrieve a playlist from a given input plugin, you can use the special
+'PlaylistFrom:' keyword, followed by the plugin name (the same as the button
+label in the xine panel):
+
+       # Retrieve playlist from DVD plugin.
+       begin
+               remote = xxxxx
+               button = xxxxx
+               prog   = xine
+               repeat = 0
+               config = PlaylistFrom:DVD
+       end

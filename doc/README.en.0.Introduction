@@ -1,0 +1,32 @@
++++++++++++++++++++++++++                           +++++++++++++++++++++++++
+                           XINE: A Free Video Player       
++++++++++++++++++++++++++                           +++++++++++++++++++++++++
+
+
+xine is a free, GPL licensed media player designed to play everything you want.
+(We might not have reached that goal yet, but we are pretty close.)
+
+This is the end-user documentation for xine. You can find more documentation in
+the documentation directories of the xine-lib and xine-ui packages, usually
+these will be installed in /usr/share/doc/ or /usr/share/doc/packages, or, if
+you compiled xine yourself in /usr/local/share/doc/ or
+/usr/local/share/doc/packages.
+
+Further information like a feature list, the software of other projects we use
+and the developer's wishlists in case you want to donate something can be found
+on the xine website at http://xinehq.de/.
+
+If you experience any problems with xine, be sure to first have a look at the
+FAQ, which should come together with xine-lib. Additionally, the latest version
+can always be found on the website.
+
+There is also a developer's document available, called the xine hacker's guide.
+If you are going to help in extending xine or simply want to know, how xine
+works inside, have a look at this. You should find it installed in your system
+in HTML form, but you can also browse the latest version at http://xinehq.de/.
+
+If all else fails and you still have questions, consult the xine-user mailing
+list at sourceforge for usage problems or the xine-devel list for questions on
+xine development.
+
+Have fun with xine.

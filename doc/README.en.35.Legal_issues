@@ -1,0 +1,31 @@
+xine is free software. "free software" is somewhat related to being
+"open-source". However, the meaning of "free software" goes further than just
+that: it is about the freedom of users of software. If you have the time, please
+read what the free software foundation says about the topics of freedom and
+software at http://www.gnu.org/philosophy/free-sw.html.
+
+There is a very special threat to freedom when it comes to DVDs: the movie
+industry is making huge efforts to restrict playback of DVDs to controlled
+devices. Most DVDs that are currently sold are encrypted in a proprietary way -
+and in some countries (most notably the USA, but most EU countries will most
+likely enter the circle as well), it is possibly illegal to decrypt them -
+even for private viewing. Hopefully most people will agree that this is a very
+questionable way to treat customers. The xine project team condemns these
+efforts of the movie industry - trying to prevent loss of sales in such a way
+surely shows a lot of disrespect towards all their honest customers. On the
+other hand, the xine project team is against breaking existing law. No one knows
+exactly if it is actually illegal anywhere in the world to write, own and use
+software for viewing encrypted DVDs. But as this is an unclear topic (that seems
+potentially very dangerous), xine does not contain any specific code for
+decrypting DVDs. It seems, however, that third parties are working on such
+extensions. Possibly in some places it is legal to use these. Whichever way -
+you will not be able to play encrypted DVDs with xine out-of-the-box.
+
+Please note that this is not a bug or 'missing feature', but a genuine legal
+problem. It would be great to solve the problem (i.e. convincing America and/or
+the movie industry that they are really annoying and unnecessarily unfair to
+customers as well as users and developers of free software), but including code
+to decrypt DVDs in xine won't solve this problem. We therefore invite all xine
+users to fight decisions of their governments regarding the ciminalization of
+DVD playback and fair use of information in general with all available means
+your legal system provides you with.
