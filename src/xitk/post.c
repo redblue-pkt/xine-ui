@@ -35,7 +35,7 @@ extern gGui_t    *gGui;
 
 #undef TRACE_REWIRE
 
-#define DEFAULT_DEINTERLACER "tvtime:method=Linear,cheap_mode=1,pulldown=0,use_progressive_frame_flag=1"
+#define DEFAULT_DEINTERLACER "tvtime:method=LinearBlend,cheap_mode=1,pulldown=0,use_progressive_frame_flag=1"
 
 #define WINDOW_WIDTH        500
 #define WINDOW_HEIGHT       500
