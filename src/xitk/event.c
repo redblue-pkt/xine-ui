@@ -901,61 +901,49 @@ void gui_run (void) {
   panel_update_mrl_display ();
   panel_update_runtime_display();
 
+  /* autoscan playlist  */
+  if(gGui->autoscan_plugin != NULL) {
+
+    char **autoscan_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
+    
+    int i;
+    for(i=0; autoscan_plugins[i] != NULL; ++i) {
+      if(!strcasecmp(autoscan_plugins[i], gGui->autoscan_plugin)) {
+	int num_mrls;
+	char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine,
+						       gGui->autoscan_plugin,
+						       &num_mrls);
+	int j;
+	
+	for (j=0; j<num_mrls; j++) {
+	  gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
+	}
+	gGui->playlist_num += j;
+	gGui->playlist_cur = 0;
+	gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
+	  
+      }    
+    }
+  }  
+
+  /*  The user wants to hide control panel  */
+  if(panel_is_visible() && (gGui->autoplay_options & HIDEGUI_ON_START))
+    SEND_KEVENT(XK_G);
+  
+  /*  The user wants to see in fullscreen mode  */
+  if(gGui->autoplay_options & FULL_ON_START)
+    SEND_KEVENT(XK_F);  
+
   /*  The user request "play on start" */
   if(gGui->autoplay_options & PLAY_ON_START) {
-    /* probe DVD && VCD  */
-    int i = 0;
-    char **autoplay_plugins = xine_get_autoplay_input_plugin_ids(gGui->xine);
-    
-    while(autoplay_plugins[i] != NULL) {
       
-      if(gGui->autoplay_options & PLAY_FROM_DVD)
-
-	if(!strcasecmp(autoplay_plugins[i], "DVD")) {
-	  int num_mrls;
-	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine, "DVD", &num_mrls);
-	  int j;
-	  
-	  for (j=0; j<num_mrls; j++) 
-	    gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
-
-	  gGui->playlist_num += j;
-	  gGui->playlist_cur = 0;
-	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	  
-	}
-
-      if(gGui->autoplay_options & PLAY_FROM_VCD)
-	if(!strcasecmp(autoplay_plugins[i], "VCD")) {
-	  int num_mrls;
-	  char **autoplay_mrls = xine_get_autoplay_mrls (gGui->xine, "VCD", &num_mrls);
-	  int j;
-	    
-	  for (j=0; j<num_mrls; j++) 
-	    gGui->playlist[gGui->playlist_num + j] = autoplay_mrls[j];
-
-	  gGui->playlist_num += j;
-	  gGui->playlist_cur = 0;
-	  gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
-	}
-
-      i++;
-    }
-    
-    /*  The user wants to hide control panel  */
-    if(panel_is_visible() && (gGui->autoplay_options & HIDEGUI_ON_START))
-      SEND_KEVENT(XK_G);
-    
-    /*  The user wants to see in fullscreen mode  */
-    if(gGui->autoplay_options & FULL_ON_START)
-      SEND_KEVENT(XK_F);
-    
     if(gGui->playlist[0] != NULL)
       SEND_KEVENT(XK_Return);
-
+    
+    /* this isn't used anywhere ?! */
     gGui->autoplay_options |= PLAYED_ON_START;    
   }
-
+  
   /* install sighandler */
   action.sa_handler = gui_signal_handler;
   sigemptyset(&(action.sa_mask));

@@ -52,6 +52,7 @@ typedef struct {
 
   /* stuff like FULL_ON_START, QUIT_ON_STOP */
   int                  autoplay_options;
+  char                *autoscan_plugin;
 
   /* basic X11 stuff */
   Display             *display;

@@ -89,7 +89,7 @@ static const char *short_options = "?h"
 #ifdef DEBUG
  "d:"
 #endif
- "R::u:a:V:A:D:p::v";
+ "R::u:a:V:A:D:p::s:g:f:v";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h' },
 #ifdef HAVE_LIRC
@@ -105,6 +105,9 @@ static struct option long_options[] = {
   {"audio-driver"   , required_argument, 0, 'A' },
   {"deinterlace"    , required_argument, 0, 'D' },
   {"auto-play"      , optional_argument, 0, 'p' },
+  {"auto-scan"      , required_argument, 0, 's' },
+  {"hide-gui"       , no_argument,       0, 'g' },
+  {"fullscreen"     , no_argument,       0, 'f' },
   {"visual"	    , required_argument, 0,  OPTION_VISUAL },
   {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
   {"version"        , no_argument      , 0, 'v' },
@@ -170,11 +173,12 @@ void show_usage (void) {
   printf("  -a, --audio-channel <#>      Select audio channel '#'.\n");
   printf("  -D, --deinterlace <method>   Enable soft deinterlacing ('help' for list).\n");
   printf("  -p, --auto-play [opt]        Play on start. Can be followed by:\n");
-  printf("                                 'f': start in fullscreen mode,\n");
-  printf("                                 'h': hide control panel,\n");
-  printf("                                 'q': quit when play is done.\n");
-  printf("                                 'd': retrieve playlist from DVD.\n");
-  printf("                                 'v': retrieve playlist from VCD.\n");
+  printf("                    'q': quit when play is done.\n");
+  printf("                    'd': retrieve playlist from DVD. (deprecated. use -s DVD)\n");
+  printf("                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n");
+  printf("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n");
+  printf("  -f, --fullscreen             start in fullscreen mode,\n");
+  printf("  -g, --hide-gui               hide GUI (panel, etc.),\n");
 #ifdef HAVE_LIRC
   printf("  -L, --no-lirc                Turn off LIRC support.\n");
 #endif
@@ -555,6 +559,7 @@ int main(int argc, char *argv[]) {
 
   gGui->debug_level = 0;
   gGui->autoplay_options = 0;
+  gGui->autoscan_plugin = NULL;
   gGui->prefered_visual_class = -1;
   gGui->prefered_visual_id = None;
   gGui->install_colormap = 0;
@@ -645,22 +650,36 @@ int main(int argc, char *argv[]) {
     case 'p':/* Play [[in fullscreen][then quit]] on start */
       gGui->autoplay_options |= PLAY_ON_START;
       if(optarg != NULL) {
+	/*
 	if(strrchr(optarg, 'f')) {
 	  gGui->autoplay_options |= FULL_ON_START;
 	}
 	if(strrchr(optarg, 'h')) {
 	  gGui->autoplay_options |= HIDEGUI_ON_START;
 	}
+	*/
 	if(strrchr(optarg, 'q')) {
 	  gGui->autoplay_options |= QUIT_ON_STOP;
 	}
 	if(strrchr(optarg, 'd')) {
-	  gGui->autoplay_options |= PLAY_FROM_DVD;
+	  gGui->autoscan_plugin = "DVD";
 	}
 	if(strrchr(optarg, 'v')) {
-	  gGui->autoplay_options |= PLAY_FROM_VCD;
+	  gGui->autoscan_plugin = "VCD";
 	}
       }
+      break;
+
+    case 's': /* autoscan on start */
+      gGui->autoscan_plugin = chomp(optarg);
+      break;
+
+    case 'g': /* hide panel on start */
+      gGui->autoplay_options |= HIDEGUI_ON_START;
+      break;
+
+    case 'f': /* full screen mode on start */
+      gGui->autoplay_options |= FULL_ON_START;
       break;
 
     case OPTION_VISUAL:
