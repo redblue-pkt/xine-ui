@@ -223,6 +223,8 @@ rm -rf $RPM_BUILD_ROOT
 ## intl files
 %{prefix}/share/locale/fr/LC_MESSAGES/xine-ui.mo
 %{prefix}/share/locale/fr/LC_MESSAGES/xitk.mo
+%{prefix}/share/locale/es/LC_MESSAGES/xine-ui.mo
+%{prefix}/share/locale/es/LC_MESSAGES/xitk.mo
 
 @HAVE_AA_TRUE@%files aa
 @HAVE_AA_TRUE@%defattr(-,root,root)
@@ -231,6 +233,8 @@ rm -rf $RPM_BUILD_ROOT
 @HAVE_AA_TRUE@%{prefix}/man/pl/man1/aaxine.1*
 
 %changelog
+* Tue Nov 27 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
+- Add spanish *.mo files: thanks to Juan Manuel García Molina <juanmagm@mail.com>
 * Sun Nov 18 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 - Add *.mo files
 * Wed Oct 3 2001 Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>

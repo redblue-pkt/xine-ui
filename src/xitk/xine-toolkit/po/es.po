@@ -1,46 +1,46 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Free Software Foundation, Inc.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# xine-toolkit es .po file
+# Copyright (C) 2001 Free Software Foundation, Inc.
+# Juan Manuel García Molina <juanmagm@mail.com>, 2001.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: xine-toolkit 0.9.5\n"
 "POT-Creation-Date: 2001-11-26 13:42+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2001-11-26 23:56+0100\n"
+"Last-Translator: Juan Manuel García Molina <juanmagm@mail.com>\n"
+"Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 0.9.5\n"
 
 #: src/xitk/xine-toolkit/test.c:76
 msgid "XInitThreads() failed.\n"
-msgstr ""
+msgstr "Falló XInitThreads().\n"
 
 #: src/xitk/xine-toolkit/test.c:86
 msgid "Cannot open display\n"
-msgstr ""
+msgstr "No se puede abrir la pantalla\n"
 
 #: src/xitk/xine-toolkit/test.c:100
 msgid "Imlib_init_with_params() failed.\n"
-msgstr ""
+msgstr "Falló Imlib_init_with_params().\n"
 
 #: src/xitk/xine-toolkit/test.c:344
 msgid "My Frame"
-msgstr ""
+msgstr "Mi marco"
 
 #: src/xitk/xine-toolkit/test.c:381
 msgid "A Label"
-msgstr ""
+msgstr "Una etiqueta"
 
 #: src/xitk/xine-toolkit/test.c:433
 msgid "Fire !!"
-msgstr ""
+msgstr "¡¡ Fuego !!"
 
 #: src/xitk/xine-toolkit/test.c:464
 msgid "!BOOM!"
-msgstr ""
+msgstr "¡BOOM!"
 
 #: src/xitk/xine-toolkit/test.c:533
 #, c-format
@@ -48,35 +48,37 @@ msgid ""
 "New entries selected in combo box is:\n"
 "%s [%d]."
 msgstr ""
+"Entradas nuevas seleccionadas en la lista de selección:\n"
+"%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:646
 msgid "init_test() failed\n"
-msgstr ""
+msgstr "Falló init_test()\n"
 
 #: src/xitk/xine-toolkit/test.c:661
 msgid "My Fucking Window"
-msgstr ""
+msgstr "Mi jodida ventana"
 
 #: src/xitk/xine-toolkit/test.c:679
 msgid "Quit"
-msgstr ""
+msgstr "Salir"
 
 #: src/xitk/xine-toolkit/window.c:538
 msgid "OK"
-msgstr ""
+msgstr "Aceptar"
 
 #: src/xitk/xine-toolkit/window.c:646 src/xitk/xine-toolkit/window.c:794
 msgid "Question?"
-msgstr ""
+msgstr "¿Pregunta?"
 
 #: src/xitk/xine-toolkit/window.c:670 src/xitk/xine-toolkit/window.c:819
 msgid "Yes"
-msgstr ""
+msgstr "Sí"
 
 #: src/xitk/xine-toolkit/window.c:683 src/xitk/xine-toolkit/window.c:832
 msgid "No"
-msgstr ""
+msgstr "No"
 
 #: src/xitk/xine-toolkit/window.c:845
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
