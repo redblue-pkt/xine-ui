@@ -111,13 +111,7 @@ static void panel_enable_tips_cb(void *data, xine_cfg_entry_t *cfg) {
 static void panel_timeout_tips_cb(void *data, xine_cfg_entry_t *cfg) {
   panel->tips.timeout = (unsigned long) cfg->num_value;
 
-  xitk_set_widgets_tips_timeout(panel->widget_list, panel->tips.timeout);
-  control_update_tips_timeout(panel->tips.timeout);
-  event_sender_update_tips_timeout(panel->tips.timeout);
-  mmk_editor_update_tips_timeout(panel->tips.timeout);
-  mrl_browser_update_tips_timeout(panel->tips.timeout);
-  playlist_update_tips_timeout(panel->tips.timeout);
-  setup_update_tips_timeout(panel->tips.timeout);
+  panel_show_tips();
 }
 
 /*
