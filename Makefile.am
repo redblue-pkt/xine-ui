@@ -4,7 +4,7 @@
 
 AUTOMAKE_OPTIONS = 1.3
 
-SUBDIRS = src m4 misc 
+SUBDIRS = src m4 doc misc
 
 EXTRA_DIST = cvscompile.sh automake.diff
 

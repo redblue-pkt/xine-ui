@@ -431,6 +431,14 @@ src/xitk/skins/metal/Makefile
 src/xitk/skins/lcd/Makefile
 src/xitk/skins/pitt/Makefile
 src/aaui/Makefile
+doc/Makefile
+doc/FAQ
+doc/FAQ_es
+doc/man/Makefile
+doc/man/en/Makefile
+doc/man/en/xine.1
+doc/man/fr/Makefile
+doc/man/fr/xine.1
 misc/Makefile
 misc/build_rpms.sh
 misc/SlackBuild
