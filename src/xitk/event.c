@@ -175,7 +175,16 @@ static void amp_level_cb(void *data, xine_cfg_entry_t *cfg) {
 }
 
 
-
+int wm_not_ewmh_only(void) {
+  int wm_type = xitk_get_wm_type();
+  
+  if((wm_type & WM_TYPE_GNOME_COMP) && !(wm_type & WM_TYPE_EWMH_COMP))
+    return 0;
+  else if(wm_type & WM_TYPE_EWMH_COMP)
+    return 1;
+  
+  return 0;
+}
 
 int actions_on_start(action_id_t actions[], action_id_t a) {
   int i = 0, num = 0;

@@ -140,6 +140,7 @@ typedef struct {
 static __xitk_t    *gXitk;
 static pid_t        xitk_pid;
 static Atom XA_WIN_LAYER = None, XA_STAYS_ON_TOP = None;
+static Atom XA_NET_WM_STATE = None, XA_NET_WM_STATE_ABOVE = None;
 
 
 void widget_stop(void);
@@ -521,14 +522,16 @@ static uint32_t xitk_check_wm(Display *display) {
   }
 
   if(type & WM_TYPE_EWMH_COMP) {
-    XA_WIN_LAYER    = XInternAtom(display, "_NET_WM_STATE", False);
-    XA_STAYS_ON_TOP = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
+    XA_WIN_LAYER          = XInternAtom(display, "_NET_WM_STATE", False);
+    XA_STAYS_ON_TOP       = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
+    XA_NET_WM_STATE       = XInternAtom(display, "_NET_WM_STATE", False);
+    XA_NET_WM_STATE_ABOVE = XInternAtom(display, "_NET_WM_STATE_ABOVE", False);
   }
   
   switch(type & WM_TYPE_COMP_MASK) {
   case WM_TYPE_KWIN:
-    if(XA_WIN_LAYER == None)
-      XA_WIN_LAYER    = XInternAtom(display, "_NET_WM_STATE", False);
+    if(XA_NET_WM_STATE == None)
+      XA_NET_WM_STATE    = XInternAtom(display, "_NET_WM_STATE", False);
     if(XA_STAYS_ON_TOP == None)
       XA_STAYS_ON_TOP = XInternAtom(display, "_NET_WM_STATE_STAYS_ON_TOP", False);
     break;
@@ -618,10 +621,7 @@ uint32_t xitk_get_wm_type(void) {
 int xitk_get_layer_level(void) {
   int level = 10;
   
-  if(gXitk->wm_type & WM_TYPE_GNOME_COMP)
-    level = 10;
-
-  if(gXitk->wm_type & WM_TYPE_EWMH_COMP)
+  if((gXitk->wm_type & WM_TYPE_GNOME_COMP) || (gXitk->wm_type & WM_TYPE_EWMH_COMP))
     level = 10;
   
   switch(gXitk->wm_type & WM_TYPE_COMP_MASK) {
@@ -651,7 +651,7 @@ int xitk_get_layer_level(void) {
 
 void xitk_set_layer_above(Window window) {
 
-  if(gXitk->wm_type & WM_TYPE_GNOME_COMP) {
+  if((gXitk->wm_type & WM_TYPE_GNOME_COMP) && !(gXitk->wm_type & WM_TYPE_EWMH_COMP)) {
     long propvalue[1];
     
     propvalue[0] = xitk_get_layer_level();
@@ -666,10 +666,46 @@ void xitk_set_layer_above(Window window) {
   
 
   if(gXitk->wm_type & WM_TYPE_EWMH_COMP) {
-    XLockDisplay(gXitk->display);
-    XChangeProperty(gXitk->display, window, XA_WIN_LAYER,
-		    XA_ATOM, 32, PropModeReplace, (unsigned char *)&XA_STAYS_ON_TOP, 1);
-    XUnlockDisplay(gXitk->display);
+    if(gXitk->wm_type & WM_TYPE_KWIN) {
+      XEvent xev;
+      
+      XLockDisplay(gXitk->display);
+      
+      xev.type                 = ClientMessage;
+      xev.xclient.window       = window;
+      xev.xclient.message_type = XA_NET_WM_STATE;
+      xev.xclient.format       = 32;
+      xev.xclient.data.l[0]    = 1;
+      xev.xclient.data.l[1]    = XA_STAYS_ON_TOP;
+      xev.xclient.data.l[2]    = None;
+      
+      XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), 
+		 False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
+
+      XUnlockDisplay(gXitk->display);
+    }
+    else {
+      XEvent xev;
+      
+      XLockDisplay(gXitk->display);
+      
+      xev.xclient.type         = ClientMessage;
+      xev.xclient.serial       = 0;
+      xev.xclient.send_event   = True;
+      xev.xclient.display      = gXitk->display;
+      xev.xclient.window       = window;
+      xev.xclient.message_type = XA_NET_WM_STATE;
+      xev.xclient.format       = 32;
+      xev.xclient.data.l[0]    = (long) 1;
+      xev.xclient.data.l[1]    = (long) XA_NET_WM_STATE_ABOVE;
+      xev.xclient.data.l[2]    = (long) None;
+      
+      XSendEvent(gXitk->display, DefaultRootWindow(gXitk->display), 
+		 False, SubstructureRedirectMask | SubstructureNotifyMask, (XEvent*) &xev);
+      
+      XUnlockDisplay(gXitk->display);
+    }
+    
     return;
   }
   
@@ -713,8 +749,10 @@ void xitk_set_layer_above(Window window) {
 void xitk_set_window_layer(Window window, int layer) {
   XEvent xev;
 
-  if((gXitk->wm_type & WM_TYPE_COMP_MASK) == WM_TYPE_KWIN)
+  if(((gXitk->wm_type & WM_TYPE_COMP_MASK) == WM_TYPE_KWIN) ||
+     ((gXitk->wm_type & WM_TYPE_EWMH_COMP) && !(gXitk->wm_type & WM_TYPE_GNOME_COMP))) {
     return;
+  }
 
   xev.type                 = ClientMessage;
   xev.xclient.type         = ClientMessage;

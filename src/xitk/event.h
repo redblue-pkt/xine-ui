@@ -42,4 +42,5 @@ void gui_dndcallback(char *filename);
 void gui_execute_action_id(action_id_t);
 void gui_handle_event(XEvent *event, void *data);
 
+int wm_not_ewmh_only(void);
 #endif

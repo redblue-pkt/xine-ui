@@ -679,9 +679,6 @@ static void video_window_adapt_size (void) {
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
 
-    if(!gGui->use_root_window)
-      XSetTransientForHint(gGui->display, gGui->video_window, None);
-
     XRaiseWindow(gGui->display, gGui->video_window);
 
   } else {
@@ -830,8 +827,10 @@ static void video_window_adapt_size (void) {
   else {
     /* Map window. */
 
-    if(gGui->always_layer_above || (gVw->fullscreen_mode && is_layer_above()))
+    if((gGui->always_layer_above || (gVw->fullscreen_mode && is_layer_above())) && 
+       !wm_not_ewmh_only()) {
       xitk_set_layer_above(gGui->video_window);
+    }
         
     XRaiseWindow(gGui->display, gGui->video_window);
     XMapWindow(gGui->display, gGui->video_window);
@@ -843,6 +842,10 @@ static void video_window_adapt_size (void) {
 		 &xev) ;
     } while (xev.type != MapNotify || xev.xmap.event != gGui->video_window);
     
+    if((gGui->always_layer_above || (gVw->fullscreen_mode && is_layer_above())) && 
+       wm_not_ewmh_only()) {
+      xitk_set_layer_above(gGui->video_window);
+    }
   }
   
   XSync(gGui->display, False);
@@ -1107,15 +1110,20 @@ void video_window_set_visibility(int show_window) {
   XLockDisplay(gGui->display);
   
   if(gVw->show == 1) {
-    
-    if((gGui->always_layer_above || (gVw->fullscreen_mode && is_layer_above())) && 
-       (gVw->hide_on_start == 0)) {
+
+    if((gGui->always_layer_above || ((gVw->fullscreen_mode && is_layer_above()) && 
+       (gVw->hide_on_start == 0))) && (!wm_not_ewmh_only())) {
       xitk_set_layer_above(gGui->video_window);
     }
     
     XRaiseWindow(gGui->display, gGui->video_window);
     XMapWindow(gGui->display, gGui->video_window);
     
+    if((gGui->always_layer_above || ((gVw->fullscreen_mode && is_layer_above()) && 
+       (gVw->hide_on_start == 0))) && (wm_not_ewmh_only())) {
+      xitk_set_layer_above(gGui->video_window);
+    }
+
   }
   else
     XUnmapWindow (gGui->display, gGui->video_window);
