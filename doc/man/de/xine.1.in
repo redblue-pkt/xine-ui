@@ -3,7 +3,7 @@
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\" 
-.\" Zuletzt synchronisiert mit en/xine.1.in 1.49 2003-05-29
+.\" Zuletzt synchronisiert mit en/xine.1.in 1.52 2003-07-28
 
 .de Vb \" Begin verbatim text
 .ft CW
@@ -161,6 +161,26 @@ Deinterlace Video-Fenster.
 .BI \-r,\ \-\-aspect\-ratio\  <Modus>
 Setze das Seitenverhältnis für die Video-Ausgabe. Mögliche Modi sind:
 \fBauto\fP, \fBsquare\fP, \fB4:3\fP, \fBanamorphic\fP, \fBdvb\fP.
+.TP
+.BI \-\-broadcast\-port\  <Port>
+Setzt den Port für den xine Broadcaster (Sender-Seite), Empfänger werden mit 'xine slave://Adresse:Port' gestartet.
+.TP
+.B \-\-no\-logo
+Das Logo nicht anzeigen.
+.TP
+.B \-E,\ \-\-no\-reload
+Alte Playlist nicht laden.
+Die Playlist wird beim Beenden von xine gesichert und erneut geladen, wenn xine das nächste mal gestartet wird.
+Diese Funktion kann über das Setup deaktiviert werden.
+.TP
+.BI \-\-post\  <Plugin>[:Parameter=Wert[,...]]
+Lädt ein Post-Plugin.
+Parameter sind Komma-separiert.
+Diese Option kann mehrfach angegeben werden, um zwei oder mehr Video-Nachbearbeitungs-Plugins in Reihe zu schalten.
+.TP
+.B \-\-disable\-post
+Post-Plugins nicht aktivieren.
+Auf diese Weise können mehrere Plugins mit der \fB\-\-post\fP-Option angegeben werden, ohne daß diese Effekte aktiviert werden.
 .TP
 .B \-H, \-\-hide\-video
 Verdeckt nach dem Start nur das Video\-Fenster.
