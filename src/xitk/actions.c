@@ -1786,7 +1786,8 @@ static void fileselector_cancel_callback(filebrowser_t *fb) {
 
 static void fileselector_callback(filebrowser_t *fb) {
   char *file;
-
+  int   status = xine_get_status(gGui->stream);
+  
   sprintf(gGui->curdir, "%s", (filebrowser_get_current_dir(fb)));
   config_update_string("input.file_origin_path", gGui->curdir);
 
@@ -1795,18 +1796,17 @@ static void fileselector_callback(filebrowser_t *fb) {
 
     if(file)
       gui_dndcallback(file);
+
     free(file);
-
-    if(gGui->smart_mode) {
-      if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY)
-	gui_stop(NULL, NULL);
-
+    
+    if(gGui->smart_mode && (status == XINE_STATUS_PLAY)) {
+      gui_stop(NULL, NULL);
+      
       gGui->playlist.cur = first;
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       gui_play(NULL, NULL);
-    }   
+    }
   }
-  
 }
 
 static void fileselector_all_callback(filebrowser_t *fb) {
