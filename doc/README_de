@@ -6,7 +6,7 @@
                             Ein freier Video-Player
 
 
-______________________________________________________________2002/01/27 (1.5)
+______________________________________________________________2002/01/27 (1.7)
 INHALT
 
 1       DOKUMENTATION
@@ -21,6 +21,7 @@ INHALT
 2.4.2   Audio-Kanäle (Sprachen)
 2.4.3   Untertitel
 2.4.4   LIRC
+2.4.5   xine-Konfiguration über die Kommandozeile setzen
 
 3       SONSTIGES
 3.1     Was DVDs mit Freiheit zu tun haben
@@ -368,6 +369,21 @@ _____________________________________________________________________________
                 config = PlaylistFrom:NAV
            end
 
+
+2.4.5   xine-Konfiguration über die Kommandozeile setzen
+
+        Sie können jede Optionen (siehe README.config_en) von der Kommando-
+        zeile aus benutzen, um die Standardwerte aus der Konfigurationsdatei
+        $HOME/.xine/config zu überschreiben.
+
+        Zum Beispiel können Sie folgendes tun
+
+           xine vcd://1 opt:input.vcd_device=/dev/cdrom2 vcd://1
+
+        um zwischen dem Abspielen zweier MRLs das Laufwerk zu wechseln.
+
+        Solche opt:-Optionen werden nicht in der Konfigurationsdatei
+        abgespeichert, sondern gelten nur temporär.
 
 _____________________________________________________________________________
 3       SONSTIGES
