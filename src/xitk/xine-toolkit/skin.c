@@ -424,9 +424,10 @@ static void skin_parse_subsection(xitk_skin_config_t *skonfig) {
       skin_get_next_line(skonfig);
     }
     else if(!strncasecmp(skonfig->ln, "label", 5)) {
-      skonfig->celement->print = 1;
-      
-      skonfig->celement->align = ALIGN_CENTER;
+      skonfig->celement->print           = 1;
+      skonfig->celement->animation_step  = 1;
+      skonfig->celement->animation_timer = xitk_get_timer_label_animation();
+      skonfig->celement->align           = ALIGN_CENTER;
 
       while(skin_end_section(skonfig) < 0) {
 	skin_get_next_line(skonfig);
