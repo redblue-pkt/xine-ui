@@ -116,6 +116,9 @@ typedef struct {
   int            borderless;      /* borderless window (for windowed mode)? */
 
   Bool           have_xtest;
+#ifdef HAVE_XTESTEXTENSION
+  KeyCode        kc_shift_l;      /* Fake key to send */
+#endif
 
   XWMHints      *wm_hint;
 
@@ -950,7 +953,6 @@ void video_window_init (window_attributes_t *window_attribute) {
   gVw->borderless         = window_attribute->borderless;
   gVw->have_xtest         = have_xtestextention();
 
-
   XLockDisplay (gGui->display);
 
   gVw->depth	          = gGui->depth;
@@ -962,6 +964,10 @@ void video_window_init (window_attributes_t *window_attribute) {
   gVw->ywin               = window_attribute->y;
   gVw->desktopWidth       = DisplayWidth(gGui->display, gGui->screen);
   gVw->desktopHeight      = DisplayHeight(gGui->display, gGui->screen);
+
+#ifdef HAVE_XTESTEXTENSION
+  gVw->kc_shift_l         = XKeysymToKeycode(gGui->display, XK_Shift_L);
+#endif
 
   gVw->using_xinerama     = 0;
 #ifdef HAVE_XINERAMA
@@ -1408,11 +1414,9 @@ static void video_window_handle_event (XEvent *event, void *data) {
 void video_window_reset_ssaver(void) {
 #ifdef HAVE_XTESTEXTENSION
   if(gVw->have_xtest == True) {
-    KeyCode kc_shift_l;
     XLockDisplay(gGui->display);
-    kc_shift_l = XKeysymToKeycode(gGui->display, XK_Shift_L);
-    XTestFakeKeyEvent(gGui->display, kc_shift_l, True, CurrentTime);
-    XTestFakeKeyEvent(gGui->display, kc_shift_l, False, CurrentTime);
+    XTestFakeKeyEvent(gGui->display, gVw->kc_shift_l, True, CurrentTime);
+    XTestFakeKeyEvent(gGui->display, gVw->kc_shift_l, False, CurrentTime);
     XSync(gGui->display, False);
     XUnlockDisplay(gGui->display);
   }
