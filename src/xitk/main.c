@@ -1916,8 +1916,6 @@ int main(int argc, char *argv[]) {
   post_init();
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
-  gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
-  xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
 
   osd_init();
 
@@ -1962,7 +1960,11 @@ int main(int argc, char *argv[]) {
   gGui->playlist.scan_stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
   xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
   xine_set_param(gGui->playlist.scan_stream, XINE_PARAM_SPU_CHANNEL, -2);
-  
+
+  /* subtitle stream */
+  gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+  xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+
   /* init the video window */
   video_window_select_visual();
 
