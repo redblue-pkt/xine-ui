@@ -141,7 +141,7 @@ void config_mrl(const char *mrl) {
   char *config;
   char *_mrl;
 
-  if (!xine_config_lookup_entry(gGui->xine, "misc.implicit_config", &entry) ||
+  if (!xine_config_lookup_entry(fbxine.xine, "misc.implicit_config", &entry) ||
       entry.type != XINE_CONFIG_TYPE_BOOL || !entry.num_value) {
     fprintf(stderr, "You tried to change the configuration with a cfg: MRL.\n"
 	    "This is not allowed unless you enable the 'misc.implicit_config' setting "
