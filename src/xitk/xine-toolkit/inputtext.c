@@ -31,6 +31,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+#include <X11/cursorfont.h>
 
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
@@ -46,6 +47,22 @@
 
 unsigned int mods_used = (ShiftMask | ControlMask | Mod1Mask |
 			  Mod2Mask| Mod3Mask| Mod4Mask| Mod5Mask);
+
+/*
+ *
+ */
+static void _cursor_focus(inputtext_private_data_t *private_data, Window win, int focus) {
+  XLOCK(private_data->imlibdata->x.disp);
+
+  if(focus)
+    XDefineCursor(private_data->imlibdata->x.disp, win, private_data->cursor[1]);
+  else
+    XDefineCursor(private_data->imlibdata->x.disp, win, private_data->cursor[0]);
+
+  XSync(private_data->imlibdata->x.disp, False);
+  XUNLOCK(private_data->imlibdata->x.disp);
+}
+
 /*
  *
  */
@@ -54,7 +71,12 @@ static void notify_destroy(xitk_widget_t *w, void *data) {
 
   if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
-    
+  
+    XLOCK(private_data->imlibdata->x.disp);
+    XFreeCursor(private_data->imlibdata->x.disp, private_data->cursor[0]);
+    XFreeCursor(private_data->imlibdata->x.disp, private_data->cursor[1]);
+    XUNLOCK(private_data->imlibdata->x.disp);
+
     XITK_FREE(private_data->skin_element_name);
     xitk_image_free_image(private_data->imlibdata, &private_data->skin);
     XITK_FREE(private_data->text);
@@ -425,10 +447,11 @@ static int notify_click_inputtext(xitk_widget_list_t *wl,
   if(w && ((w->widget_type & WIDGET_TYPE_MASK) == WIDGET_TYPE_INPUTTEXT)) {
     private_data = (inputtext_private_data_t *) w->private_data;
 
-    if(w->have_focus == FOCUS_LOST) {
+    if(w->have_focus == FOCUS_LOST)
       w->have_focus = private_data->have_focus = FOCUS_RECEIVED;
-    }
-
+    
+    _cursor_focus(private_data, wl->win, 1);
+    
     pos = x - w->x;
 
     {
@@ -485,7 +508,12 @@ static int notify_focus_inputtext(xitk_widget_list_t *wl, xitk_widget_t *w, int 
     
     if((private_data->have_focus = focus) == FOCUS_LOST)
       private_data->cursor_pos = -1;
-    
+  
+    if((focus == FOCUS_MOUSE_OUT) || (focus == FOCUS_LOST))
+      _cursor_focus(private_data, wl->win, 0);
+    else if(focus == FOCUS_MOUSE_IN)
+      _cursor_focus(private_data, wl->win, 1);
+
   }
   
   return 1;
@@ -698,6 +726,7 @@ static void inputtext_exec_return(xitk_widget_list_t *wl, xitk_widget_t *w) {
   w->have_focus              = 
     private_data->have_focus = FOCUS_LOST;
   //  wl->widget_focused = NULL;
+  _cursor_focus(private_data, wl->win, 0);
   paint_inputtext(w, wl->win, wl->gc);
   
   if(strlen(private_data->text) > 0) {
@@ -715,6 +744,7 @@ static void inputtext_exec_escape(xitk_widget_list_t *wl, xitk_widget_t *w) {
   private_data->cursor_pos = -1;
   w->have_focus = private_data->have_focus = FOCUS_LOST;
   wl->widget_focused = NULL;
+  _cursor_focus(private_data, wl->win, 0);
   paint_inputtext(w, wl->win, wl->gc);
 }
 
@@ -1008,7 +1038,12 @@ static xitk_widget_t *_xitk_inputtext_create (xitk_widget_list_t *wl,
     private_data->max_visible -= 2;
 
   private_data->disp_offset       = 0;
-  
+
+  XLOCK(private_data->imlibdata->x.disp);
+  private_data->cursor[0] = XCreateFontCursor(private_data->imlibdata->x.disp, XC_left_ptr);
+  private_data->cursor[1] = XCreateFontCursor(private_data->imlibdata->x.disp, XC_xterm);
+  XUNLOCK(private_data->imlibdata->x.disp);
+
   private_data->callback          = it->callback;
   private_data->userdata          = it->userdata;
   

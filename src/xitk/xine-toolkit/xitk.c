@@ -552,7 +552,7 @@ void xitk_xevent_notify(XEvent *event) {
 
     if(fx->window != None) {
       
-      //      printf("event %d\n", event->type);
+      //printf("event %d\n", event->type);
 
       if(fx->window == event->xany.window) {
 	
