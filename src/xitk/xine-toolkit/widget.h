@@ -190,26 +190,6 @@ static int displ;
 #endif
 
 /**
- * Boolean function, if x and y coords is in widget.
- */
-int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y);
-
-/**
- * Return widget from widget list 'wl' localted at x,y coords.
- */
-xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) ;
-
-/**
- * Notify widget (if enabled) if motion happend at x, y coords.
- */
-void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) ;
-
-/**
- * Notify widget (if enabled) if click event happend at x, y coords.
- */
-int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp) ;
-
-/**
  *
  */
 void xitk_set_focus_to_next_widget(xitk_widget_list_t *wl, int backward);

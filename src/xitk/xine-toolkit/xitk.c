@@ -1200,9 +1200,12 @@ void xitk_xevent_notify(XEvent *event) {
 
 	  }
 	  else {
+	    //	    printf("event->xmotion.x %d event->xmotion.y %d\n", event->xmotion.x, event->xmotion.y);
+	    //	    printf("event->xbutton.x %d event->xbutton.y %d\n", event->xbutton.x, event->xbutton.y);
 	    if(fx->widget_list)
 	      xitk_motion_notify_widget_list (fx->widget_list,
-					      event->xbutton.x, event->xbutton.y);
+					      event->xmotion.x, 
+					      event->xmotion.y, event->xmotion.state);
 	  }
 	}
 	break;

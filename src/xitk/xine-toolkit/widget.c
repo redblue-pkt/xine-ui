@@ -891,18 +891,34 @@ xitk_widget_t *xitk_get_widget_at (xitk_widget_list_t *wl, int x, int y) {
  * Call notify_focus (with FOCUS_MOUSE_[IN|OUT] as focus state), 
  * function in right widget (the one who get, and the one who lose focus).
  */
-void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) { 
+void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y, unsigned int state) { 
   xitk_widget_t *mywidget;
+  widget_event_t event;
   
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
+    return;
+  }
+  
+  /* Slider still pressed, mouse pointer outside widget */
+  if(wl->widget_pressed && wl->widget_focused && 
+     (wl->widget_focused->type & WIDGET_TYPE_SLIDER)) {
+    widget_event_result_t   result;
+    
+    if(state & Button1Mask) {
+      event.type           = WIDGET_EVENT_CLICK;
+      event.x              = x;
+      event.y              = y;
+      event.button_pressed = LBUTTON_DOWN;
+      
+      (void) wl->widget_pressed->event(wl->widget_pressed, &event, &result);
+    }
     return;
   }
   
   mywidget = xitk_get_widget_at (wl, x, y);
   
   if (mywidget != wl->widget_under_mouse) {
-    widget_event_t event;
     
     if (wl->widget_under_mouse) {
       
@@ -915,9 +931,9 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) {
 	event.type  = WIDGET_EVENT_FOCUS;
 	event.focus = FOCUS_MOUSE_OUT;
 	(void) wl->widget_under_mouse->event(wl->widget_under_mouse, &event, NULL);
-	
-	event.type = WIDGET_EVENT_PAINT;
-	(void) wl->widget_under_mouse->event(wl->widget_under_mouse, &event, NULL);
+
+      event.type = WIDGET_EVENT_PAINT;
+      (void) wl->widget_under_mouse->event(wl->widget_under_mouse, &event, NULL);
       }
     }
     
@@ -935,12 +951,25 @@ void xitk_motion_notify_widget_list (xitk_widget_list_t *wl, int x, int y) {
 	event.type  = WIDGET_EVENT_FOCUS;
 	event.focus = FOCUS_MOUSE_IN;
 	(void) mywidget->event(mywidget, &event, NULL);
-	
+
 	event.type  = WIDGET_EVENT_PAINT;
 	(void) mywidget->event(mywidget, &event, NULL);
       }
     }
-    
+  }
+  else {
+    if(mywidget && (mywidget->type & WIDGET_TYPE_SLIDER)) {
+      widget_event_result_t   result;
+      
+      if(state & Button1Mask) {
+	event.type           = WIDGET_EVENT_CLICK;
+	event.x              = x;
+	event.y              = y;
+	event.button_pressed = LBUTTON_DOWN;
+	
+	(void) mywidget->event(mywidget, &event, &result);
+      }
+    }
   }
 }
 
@@ -955,7 +984,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
   widget_event_result_t  result;
 
   if(!wl) {
-    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    XITK_WARNING("widget list was NULL.\n");
     return 0;
   }
 
@@ -1032,7 +1061,7 @@ int xitk_click_notify_widget_list (xitk_widget_list_t *wl, int x, int y, int bUp
 	  bRepaint |= result.value;
       }      
     }
-  } 
+  }
   else {
     if(wl->widget_pressed) {
       if((wl->widget_pressed->type & WIDGET_CLICKABLE) &&
