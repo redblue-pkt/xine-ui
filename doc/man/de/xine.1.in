@@ -3,7 +3,7 @@
 .\" NAME should be all caps, SECTION should be 1-8, maybe w/ subsection
 .\" other parms are allowed: see man(7), man(1)
 .\" 
-.\" Zuletzt synchronisiert mit en/xine.1.in 1.22 2002-08-02
+.\" Zuletzt synchronisiert mit en/xine.1.in 1.22 2002-12-17
 
 .de Vb \" Begin verbatim text
 .ft CW
@@ -51,11 +51,13 @@ Wählt den Audio\-Treiber aus. \fIxine \-\-help\fP zeigt eine Liste der Audio\-Tr
 .BI \-u,\ \-\-spu\-channel\  <Zahl>
 Wählt einen Bilduntertitel\-Kanal aus. \fI<Zahl>\fP gibt die Nummer des Kanals an. \fB\-1\fP steht für "keinen Untertitel" und ist die Standardeinstellung.
 .TP 
-.BI \-p,\ \-\-auto\-play= [f][h][w][q][d][v]
+.BI \-p,\ \-\-auto\-play= [f][F][h][w][q][d][v]
 Startet die Wiedergabe sofort nach dem Laden den Programms.
 Folgende Optionen können angehängt werden:
 .br
 `\fIf\fP' Vollbildmodus,
+.br
+`\fIF\fP' Xinerama Vollbildmodus,
 .br
 `\fIh\fP' GUI (Steuerfenster, etc...) ausbelnden,
 .br
@@ -74,8 +76,13 @@ Durch Starten von \fIxine \-\-auto\-play \-\-auto\-scan dvd\fP kann eine gesamte
 Dies funktioniert auch mit Plugins, die nicht mit xine ausgeliefert werden, indem einfach der Name des Knopfes angegeben wird, wie er im xine\-Fenster dargestellt wird.
 .TP 
 .B \-f, \-\-fullscreen
-Schaltet xine nach dem Start in den Vollbildschirm\-Modus.
+Schaltet xine nach dem Start in den Vollbildschirmmodus.
+(Wie das Betätigen von `\fBf\fP')
+.TP 
+.B \-f, \-\-xineramafull
+Schaltet xine nach dem Start in den Xinerama Vollbildschirmmodus.
 (Wie das Betätigen von `\fBF\fP')
+Dadurch werden mehrere Bildschirme (festgelegt durch die Konfigurationsdatei) zur Anzeige verwendet.
 .TP 
 .B \-g, \-\-hide\-gui
 Verdeckt nach dem Start nur das Steuerfenster, das Video\-Fenster bleibt sichtbar.
@@ -98,6 +105,8 @@ Setzt den Wiedergabeliste-Wiederholmodus. Wenn der Modus nicht angegeben ist, wi
 `\fIrepeat\fP': Aktuellen Wiedergabelisteneintrag wiederholen.
 .br
 `\fIshuffle\fP': Zufälligen Eintrag aus noch nicht gespielter Wiedergabeliste auswählen.
+.br
+`\fIshuffle+\fP': Das Selbe wie shuffle, nur wird die Playliste unendlichoft wiederholt.
 .TP
 .B \-H, \-\-hide\-video
 Verdeckt nach dem Start nur das Video\-Fenster.
@@ -264,8 +273,10 @@ Mediamark für aktuelle Apspielposition der Wiedergabeliste hinzufügen.
 Fenster mit Video\-Einstellungen anzeigen/verdecken.
 .IP  "\fBE\fP"
 Momentanes Medium/Titel auswerfen.
-.IP  "\fBF\fP"
+.IP  "\fBf\fP"
 Vollbildmodues umschalten.
+.IP  "\fBF\fP"
+Xinerama Vollbildmodues umschalten.
 .IP  "\fBG\fP"
 Bedienfenster anzeigen/verdecken.
 .IP  "\fBH\fP"
