@@ -2,7 +2,7 @@ EXTRA_DIST = $(skins_DATA)
 
 skinsdir = $(datadir)/xine/skins/CelomaChrome
 
-skins_DATA =                                                                                       \
+skins_DATA =                                                                                      \
 	BigArrowDown.png  LettersMiddle.png   MainPlay.png	 PlBtn.png	  SkItemBtn.png   \
 	BigArrowUp.png	  LettersMini.png     MainPower.png	 PlDelete.png	  SkSlidBG.png    \
 	CtlBg.png	  MainAutoButton.png  MainPrev.png	 PlDeleteAll.png  SkSlidPad.png   \
@@ -12,11 +12,11 @@ skins_DATA =                                                                    
 	MainEject.png     MrlBg.png	      PlMoveDn.png	 SliderVPad.png                   \
 	FsBtn.png	  MainFastB.png       MrlBtn.png	 PlMoveUp.png	  SnapBtn.png     \
 	HideBtn.png	  MainFastF.png       MrlDismiss.png	 PlPlay.png	  LettersBlue.png \
-	LettersBig.png	  MainMute.png	      MrlSelect.png	 SetupBtn.png     CtlItemBtn.png  \
-	LettersDigit.png  MainNext.png	      Onglet.png	 OngletSmall.png  SkArrowDown.png \
-	MainPause.png     PlBg.png	      SkArrowUp.png      MainNav.png      		  \
-	ArrowLeft.png	  BigArrowLeft.png    ArrowRight.png	 BigArrowRight.png		  \
-	SkSlidHBg.png	  SliderHPad.png      SlidHPad.png	 PlSlidHBg.png    PlSlidHPad.png  \
+	MainMute.png	  MrlSelect.png	      SetupBtn.png       CtlItemBtn.png                   \
+	LettersDigit.png  MainNext.png	      Onglet.png	 OngletSmall.png                  \
+	MainPause.png     PlBg.png	      MainNav.png      		                          \
+	BigArrowLeft.png  BigArrowRight.png		                                          \
+	SkSlidHBg.png	  SliderHPad.png      PlSlidHBg.png    PlSlidHPad.png                     \
 	skinconfig
 
 

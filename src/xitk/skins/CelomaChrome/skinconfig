@@ -2,7 +2,7 @@
 # revision 0.6
 skin.name    = CelomaChrome
 skin.version = 4
-skin.date    = 06.18.2002
+skin.date    = 15.03.2003
 skin.author  = Jérôme Villette <villette@chem.leidenuniv.nl>
 skin.url     = none
 
@@ -71,13 +71,15 @@ skin.TitleLabel {
 	label {
 	  length = 39
 	  animation = True
+	  step = 6
+          timer = 500000
 	  pixmap = LettersMiddle.png
 	}
 }
 
 skin.TimeLabel {
 	coords {
-	  x = 411
+	  x = 423
 	  y = 42
 	}
 	label {
@@ -270,7 +272,7 @@ skin.MrlBtn {
 
 skin.SliderPlay {
 	coords {
-	  x = 356
+	  x = 346
 	  y = 42
 	}
 	pixmap = SliderHBg.png
@@ -525,7 +527,7 @@ skin.SliderCtlHue {
 skin.CtlHueLbl {
 	coords {
 	  x = 37
-	  y = 190
+	  y = 189
 	}
 	label {
 	  length = 3
@@ -549,7 +551,7 @@ skin.SliderCtlSat {
 skin.CtlSatLbl {
 	coords {
 	  x = 100
-	  y = 190
+	  y = 189
 	}
 	label {
 	  length = 3
@@ -573,7 +575,7 @@ skin.SliderCtlBright {
 skin.CtlBrightLbl {
 	coords {
 	  x = 163
-	  y = 190
+	  y = 189
 	}
 
 	label {
@@ -598,7 +600,7 @@ skin.SliderCtlCont {
 skin.CtlContLbl {
 	coords {
 	  x = 226
-	  y = 190
+	  y = 189
 	}
 	label {
 	  length = 3
@@ -884,7 +886,7 @@ skin.MrlFilt {
 	  x = 150
 	  y = 189
 	}
-	pixmap = SkArrowDown.png
+	pixmap = FlitArrowDown.png
 	label {
 	  length = 27
 	  animation = False
