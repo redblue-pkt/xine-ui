@@ -184,6 +184,13 @@ if test x"$no_x" != x"yes"; then
 fi
 AM_CONDITIONAL(HAVE_X11, [test x"$no_x" != "xyes"])
 
+AC_CHECK_LIB(Xv, XvQueryExtension, 
+            [ XV_LIB="-lXv"
+	      AC_DEFINE(HAVE_XV, 1, [Define this if you have libXv installed])
+            ],, [$X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS])
+AC_SUBST(XV_LIB)
+AM_CONDITIONAL(HAVE_XV, test x$ac_have_xv = "xyes")
+
 
 dnl
 dnl Shm

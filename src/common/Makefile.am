@@ -12,7 +12,7 @@ endif
 
 if HAVE_X11
 ##xscreensaver_remote = xscreensaver-remote.c
-X11_COMMON_LIBS = $(X_LIBS) $(X_PRE_LIBS) -lX11 $(X_EXTRA_LIBS) -lXext
+X11_COMMON_LIBS = $(X_LIBS) $(X_PRE_LIBS) @XV_LIB@ -lX11 $(X_EXTRA_LIBS) -lXext
 endif
 
 
