@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine 0.9.15\n"
 "POT-Creation-Date: 2002-12-09 21:08+0100\n"
-"PO-Revision-Date: 2002-12-02 18:29+0100\n"
+"PO-Revision-Date: 2002-12-10 21:54+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -42,14 +42,12 @@ msgid "Select"
 msgstr "Selecc."
 
 #: src/xitk/actions.c:1237
-#, fuzzy
 msgid "Select all"
-msgstr "Selecc."
+msgstr "Seleccionar todo"
 
 #: src/xitk/actions.c:1240
-#, fuzzy
 msgid "Stream(s) loading"
-msgstr "Flujo(s): "
+msgstr "Cargando flujo(s)"
 
 #: src/xitk/control.c:344 src/xitk/panel.c:147 src/xitk/playlist.c:829
 #, c-format
@@ -466,52 +464,51 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: src/xitk/file_browser.c:910
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to delete file '%s': %s."
-msgstr "No se puede crear «%s»."
+msgstr "No se puede borrar el archivo «%s»: %s."
 
 #: src/xitk/file_browser.c:933
 msgid "Confirm deletion ?"
-msgstr ""
+msgstr "¿Confirmar el borrado?"
 
 #: src/xitk/file_browser.c:952
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to rename file '%s' to '%s': %s."
-msgstr "No se puede crear el directorio «%s»: %s."
+msgstr "No se puede renombrar el archivo «%s» a «%s»: %s."
 
 #: src/xitk/file_browser.c:971
 msgid "Rename file"
-msgstr ""
+msgstr "Renombrar archivo"
 
 #: src/xitk/file_browser.c:979
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to create the directory '%s': %s."
 msgstr "No se puede crear el directorio «%s»: %s."
 
 #: src/xitk/file_browser.c:993
 msgid "Create a new directory"
-msgstr ""
+msgstr "Crear un directorio nuevo"
 
 #: src/xitk/file_browser.c:1124
-#, fuzzy
 msgid "File Browser"
-msgstr "Navegador de archivos de xine"
+msgstr "Navegador de archivos"
 
 #: src/xitk/file_browser.c:1145
 msgid "All files"
-msgstr ""
+msgstr "Todos los archivos"
 
 #: src/xitk/file_browser.c:1146
 msgid "All known playlists"
-msgstr ""
+msgstr "Todas las listas conocidas"
 
 #: src/xitk/file_browser.c:1410
 msgid "Show hidden file"
-msgstr ""
+msgstr "Mostrar los archivos ocultos"
 
 #: src/xitk/file_browser.c:1421
 msgid "Rename"
-msgstr ""
+msgstr "Renombrar"
 
 #: src/xitk/file_browser.c:1436 src/xitk/kbindings.c:1940
 msgid "Delete"
@@ -519,7 +516,7 @@ msgstr "Borrar"
 
 #: src/xitk/file_browser.c:1451
 msgid "Create a directory"
-msgstr ""
+msgstr "Crea un directorio"
 
 #: src/xitk/kbindings.c:407
 #, c-format
@@ -1174,14 +1171,12 @@ msgid "Load"
 msgstr "Cargar"
 
 #: src/xitk/playlist.c:350
-#, fuzzy
 msgid "Load a playlist"
-msgstr "Carga una lista de reproducción salvada"
+msgstr "Carga una lista"
 
 #: src/xitk/playlist.c:377
-#, fuzzy
 msgid "Save a playlist"
-msgstr "Guarda la lista de reproducción"
+msgstr "Guarda una lista"
 
 #: src/xitk/playlist.c:935
 msgid "Xine Playlist Editor"
@@ -1457,9 +1452,8 @@ msgid "Ignore Spu: "
 msgstr "Ignorar spu: "
 
 #: src/xitk/stream_infos.c:690
-#, fuzzy
 msgid "Has Still: "
-msgstr "Tiene: "
+msgstr "Tiene aún: "
 
 #: src/xitk/stream_infos.c:705
 msgid "Video"
@@ -1665,3 +1659,4 @@ msgstr "Refrescar"
 
 #~ msgid "Warning: %s\n"
 #~ msgstr "Aviso: %s\n"
+
