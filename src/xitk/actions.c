@@ -93,8 +93,10 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs) 
     xine_post_out_t * audio_source;
     
     audio_source = xine_get_audio_source(stream);
-    if(xine_post_wire_audio_port(audio_source, gGui->ao_port))
-      gGui->visual_anim.running = 0;
+    if(xine_post_wire_audio_port(audio_source, gGui->ao_port)) {
+      if(gGui->visual_anim.enabled == 1)
+	gGui->visual_anim.running = 0;
+    }
     
   } else if (!has_video && (gGui->visual_anim.enabled == 1) && 
 	     (gGui->visual_anim.running == 0) && gGui->visual_anim.post_output) {
