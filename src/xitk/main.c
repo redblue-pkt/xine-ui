@@ -419,14 +419,15 @@ void event_listener (void *user_data, xine_event_t *event) {
 
   case XINE_EVENT_UI_SET_TITLE: 
     {
-
       xine_ui_event_t *uevent = (xine_ui_event_t *)event;
       panel_set_title((char*)(uevent->data));
     }
     break;
+
   case XINE_EVENT_PLAYBACK_FINISHED:
     gui_status_callback (XINE_STOP);
     break;
+
   case XINE_EVENT_NEED_NEXT_MRL:
     {
       xine_next_mrl_event_t *uevent = (xine_next_mrl_event_t *)event;
@@ -435,6 +436,7 @@ void event_listener (void *user_data, xine_event_t *event) {
       uevent->mrl = gui_next_mrl_callback ();
     }
     break;
+
   case XINE_EVENT_BRANCHED:
     gui_branched_callback ();
     break;

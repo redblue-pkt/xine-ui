@@ -341,6 +341,51 @@ void gui_execute_action_id(action_id_t action) {
     }
     break;
 
+  case ACTID_WINDOWREDUCE_H_PIXEL:
+  case ACTID_WINDOWREDUCE_V_PIXEL:
+  case ACTID_WINDOWREDUCE_PIXEL:
+  case ACTID_WINDOWENLARGE_H_PIXEL:
+  case ACTID_WINDOWENLARGE_V_PIXEL:
+  case ACTID_WINDOWENLARGE_PIXEL:
+
+    if(!video_window_is_fullscreen()) {
+      int x, y;
+      unsigned int w, h, b, d;
+      Window rootwin;
+      
+      XLockDisplay (gGui->display);
+      
+      if(XGetGeometry(gGui->display, 
+		      gGui->video_window, &rootwin, 
+		      &x, &y, &w, &h, &b, &d) != BadDrawable) {
+      }
+      
+      if(action == ACTID_WINDOWREDUCE_H_PIXEL) {
+	w--;
+      }
+      else if(action == ACTID_WINDOWREDUCE_V_PIXEL) {
+	h--;
+      }
+      else if(action == ACTID_WINDOWREDUCE_PIXEL) {
+	w--;
+	h--;
+      }
+      else if(action == ACTID_WINDOWENLARGE_H_PIXEL) {
+	w++;
+      }
+      else if(action == ACTID_WINDOWENLARGE_V_PIXEL) {
+	h++;
+      }
+      else if(action == ACTID_WINDOWENLARGE_PIXEL) {
+	w++;
+	h++;
+      }
+      
+      XResizeWindow (gGui->display, gGui->video_window, w, h);
+      XUnlockDisplay(gGui->display);
+    }
+    break;
+
   case ACTID_SPU_NEXT:
     gui_change_spu_channel(NULL, (void*)GUI_NEXT);
     break;
@@ -734,6 +779,7 @@ void gui_status_callback (int nStatus) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
       if(!xine_play (gGui->xine, gGui->filename, 0, 0 ))
 	gui_handle_xine_error();
+      video_window_stream_has_changed();
     } else {
       
       if(gGui->actions_on_start[0] == ACTID_QUIT)
