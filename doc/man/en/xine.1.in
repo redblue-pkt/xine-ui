@@ -246,7 +246,7 @@ Seek to the percentage specified by the numeric argument. This is more
 general than the above 0..9 commands. See the section on "Numeric Input" below.
 .IP "\fBA\fP"
 Toggle aspect ratio (AUTO/16:9/4:3/DVB) 
-.IP "\fBM\fP\-\fBC\fP | \fBM\fP\-\fBc\fP"
+.IP "\fBM\fP\-\fBC\fP"
 Show/hide the video settings window.
 .IP "\fBE\fP"
 Eject the current media.
@@ -258,15 +258,15 @@ Hide/show the gui.
 Hide/show the video output window.
 .IP "\fBi\fP | \fBI\fP"
 Toggle deinterlace methods.
-.IP "\fBM\fP\-\fBl\fP | \fBM\fP\-\fBL\fP"
+.IP "\fBM\fP\-\fBl\fP"
 Show/hide log window.
-.IP "\fBM\fP\-\fBm\fP | \fBM\fP\-\fBM\fP"
+.IP "\fBM\fP\-\fBm\fP"
 Hide/show the MRL browser.
-.IP "\fBC\fP\-\fBm\fP | \fBC\fP\-\fBM\fP"
+.IP "\fBC\fP\-\fBm\fP"
 Audio mute toggle.
 .IP "\fBC\fP\-\fBo\fP"
 Toggle TV modes on the DXR3
-.IP "\fBM\fP\-\fBp\fP | \fBM\fP\-\fBP\fP"
+.IP "\fBM\fP\-\fBp\fP"
 Show/hide the playlist window.
 .IP "\fBQ\fP"
 Exit.
@@ -326,6 +326,10 @@ Menu 2 (e.g. title menu)
 Menu 3
 .IP "\fB<Insert>\fP"
 Grab pointer toggle.
+.IP "\fBM\fP\-\fBe\fP"
+Hide/show the event sender window.
+.IP "\fBM\fP\-\fBi\fP"
+Hide/show the stream informations window.
 
 .SS Third party plugins
 Following shortcuts are used by third party plugins, generally for DVD navigation:

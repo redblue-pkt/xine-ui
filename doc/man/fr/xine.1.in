@@ -236,7 +236,7 @@ Saute à 0%..90% du flux courant.
 .BR A :
 Bascule du ratio d'aspect (AUTO/16:9/4:3/DVB).
 .br
-.BR M\-C | M\-c :
+.BR M\-c :
 Affiche/masque la fenêtre des réglages vidéo.
 .br
 .BR E :
@@ -254,19 +254,19 @@ Affiche/masque la fenêtre de sortie.
 .BR i | I :
 Bascule des méthodes de dé-entrelacement.
 .br
-.BR M\-l | M\-L:
-affiche/masque la fenêtre de log.
+.BR M\-l :
+Affiche/masque la fenêtre de log.
 .br
-.BR M\-m | M\-M :
+.BR M\-m :
 Affiche/masque le gestionnaire de MRL.
 .br
-.BR C\-m | C\-M :
+.BR C\-m :
 Bascule du mode muêt.
 .br
 .BR C\-o :
 Bascule du mode TV pour les carte DXR3.
 .br
-.BR M\-p | M\-P:
+.BR M\-p :
 Affiche/masque le fenêtre de liste de lecture.
 .br
 .BR Q :
@@ -356,6 +356,10 @@ Menu 3
 .BR <Insert> :
 Bascule capture de pointeur.
 .br
+.BR M\-e :
+Affiche/masque la fenêtre d'envoi d'évènement.
+.BR M\-i :
+Affiche/masque la fenêtre d'informations de flux.
 
 Les raccourcis suivant sont utilisés dans des plugin tiers, généralement pour la navigation de DVD:
 .LP
