@@ -620,7 +620,7 @@ case "$host_or_hostalias" in
 
 	dnl add x86 specific CFLAGS
 	CFLAGS="$CFLAGS -O3 -pipe -fomit-frame-pointer $f_af $f_al $f_aj $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -finline-functions"
-	DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
+	DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
 	
 	dnl enable x86 specific parts of the code
 
@@ -675,19 +675,19 @@ case "$host_or_hostalias" in
   alphaev56-*)
     AC_DEFINE(__alpha__,1,[Define this if you're running Alpha architecture])
     CFLAGS="$CFLAGS -O3 -mcpu=ev56 -mieee"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mcpu=ev56 -mieee"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O -mcpu=ev56 -mieee"
     ;;
 
   alpha*)
     AC_DEFINE(__alpha__,1,[Define this if you're running Alpha architecture])
     CFLAGS="$CFLAGS -O3 -mieee"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3 -mieee"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O -mieee"
     ;;
 
   ppc-*-linux-* | powerpc-*) 
     AC_DEFINE(__ppc__,1,[Define this if you're running PowerPC architecture])
     CFLAGS="$CFLAGS -O3 -pipe -fomit-frame-pointer $m_wm $m_psb -fexpensive-optimizations $f_si $f_nsa -ffast-math -funroll-loops -funroll-all-loops -finline-functions"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
     ;;
 
   sparc64-*-linux-* | sparc-*)
@@ -714,12 +714,12 @@ case "$host_or_hostalias" in
 
   ia64-*)
     CFLAGS="$CFLAGS -O3"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
     ;;
 
   s390-*)
     CFLAGS="$CFLAGS -O3"
-    DEBUG_CFLAGS="$DEBUG_CFLAGS -O3"
+    DEBUG_CFLAGS="$DEBUG_CFLAGS -O"
     ;;
 
   *)

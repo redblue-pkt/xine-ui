@@ -53,7 +53,7 @@ run_autoconf () {
 detect_libtool() {
   (libtool --version) < /dev/null > /dev/null 2>&1 || {
     echo
-    echo "**Error**: You must have \`libtool' installed to compile gxine."
+    echo "**Error**: You must have \`libtool' installed to compile xine-ui."
     echo "Get ftp://ftp.gnu.org/pub/gnu/libtool-1.4.tar.gz"
     echo "(or a newer version if it is available)"
     exit 1
