@@ -364,7 +364,7 @@
        end
 
       xine can self generate a lirc entries draft, using 'xine --keymap=lirc',
-      then you can redirect the output toa  file to polish the settings.
+      then you can redirect the output to a file to polish the settings.
       
       Each entry will look like this:
 
