@@ -128,6 +128,10 @@ codec.a52_surround_downmix      Enable audio downmixing to 2.0 surround stereo.
 
 codec.divx4_XXX                 see README.divx4
 
+codec.ffmpeg_illegal_vlc        1/0: allow illegal vlc codes in mpeg4 streams.
+                                allow playing videos created with MS ISO MPEG4 codec.
+                                warning: error resilience will be disabled.
+
 codec.win32_path                path to where you have installed win32
                                 codec dlls for avi playback, e.g. 
                                 /usr/lib/win32
