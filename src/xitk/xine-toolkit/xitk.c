@@ -628,13 +628,13 @@ int xitk_get_layer_level(void) {
   case WM_TYPE_ICE:
   case WM_TYPE_AFTERSTEP:
   case WM_TYPE_BLACKBOX:
+  case WM_TYPE_WINDOWMAKER:
     level = 10; /* Wrong, but we need to provide a default value */
     break;
   case WM_TYPE_XFCE:
     level = 8;
     break;
   case WM_TYPE_E:
-  case WM_TYPE_WINDOWMAKER:
     level = 6;
     break;
   case WM_TYPE_MOTIF:
