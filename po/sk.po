@@ -81,15 +81,15 @@ msgstr "Zavrie» okno nastavenia"
 
 #: src/xitk/errors.c:64 src/xitk/kbindings.c:1920
 msgid "Done"
-msgstr ""
+msgstr "Hotovo"
 
 #: src/xitk/errors.c:64
 msgid "More..."
-msgstr ""
+msgstr "Viac..."
 
 #: src/xitk/errors.c:139
 msgid "Error"
-msgstr ""
+msgstr "Chyba"
 
 #: src/xitk/errors.c:196
 #, fuzzy, c-format
@@ -105,7 +105,7 @@ msgstr ""
 "Mo¾no je MRL názov zlý alebo súbor/zdroj neexistuje."
 
 #: src/xitk/errors.c:202
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -127,6 +127,7 @@ msgstr ""
 "- chyba xine enginu -\n"
 "\n"
 "!! Neo¹etrená chyba !!\n"
+"demuxer zlyhal. Mo¾no je '%s' po¹kodený súbor?\n"
 
 #: src/xitk/errors.c:212
 msgid ""
@@ -161,23 +162,23 @@ msgstr "Nemô¾em otvori» display.\n"
 
 #: src/xitk/event.c:735
 msgid "synchronized X protocol (debug)"
-msgstr ""
+msgstr "synchronizovaný X protokol (debug)"
 
 #: src/xitk/event.c:737
 msgid "Warning! Synchronized X activated - this is way slow...\n"
-msgstr "Varovanie! Synchronized X aktivovaný - toto je pomalé...\n"
+msgstr "Varovanie! Synchronizovaný X aktivovaný - toto je pomalé..\n"
 
 #: src/xitk/event.c:742
 msgid "use wm layer property to place window on top"
-msgstr ""
+msgstr "pou¾i» vlastnos» wm layer na umiestnenie okna do popredia"
 
 #: src/xitk/event.c:748
 msgid "where snapshots will be saved"
-msgstr "kam snapshots budú ulo¾ené"
+msgstr "kam budú ulo¾ené obrázky - obsah obrazovky"
 
 #: src/xitk/event.c:753
 msgid "time between two screensaver fake events, 0 to disable"
-msgstr "èas medzi screensaver fake event-mi, 0 na zakázanie"
+msgstr "èas medzi screensaver fake udalos»ami, 0 na zakázanie"
 
 #. Some infos
 #: src/xitk/event.c:761
@@ -331,6 +332,8 @@ msgid ""
 "This is xine (X11 gui) - a free video player v%s\n"
 "(c) 2000-2002 by G. Bartsch and the xine project team.\n"
 msgstr ""
+"Toto je xine (X11 gui) - slobodný video prehrávaè v%s\n"
+"(c) 2000-2002 by G. Bartsch and the xine project team.\n"
 
 #: src/xitk/main.c:255
 #, c-format
@@ -469,8 +472,8 @@ msgid ""
 "                                 'lirc': display draft of a .lircrc config "
 "file.\n"
 msgstr ""
-"                                 'lirc' : zobrazi» vzor .lircrc "
-"konfiguraèného                                           súboru\n"
+"                                 'lirc' : zobrazi» vzor .lircrc konfiguraèného"
+"                                          súboru\n"
 
 #: src/xitk/main.c:318
 msgid ""
@@ -489,7 +492,7 @@ msgstr ""
 
 #: src/xitk/main.c:320
 msgid "  -n, --network                Enable network remote control server.\n"
-msgstr ""
+msgstr "  -n, --network                Povoli» sie»ový server diaµkového ovládania.\n"
 
 #: src/xitk/main.c:321
 #, fuzzy
@@ -499,12 +502,12 @@ msgstr ""
 
 #: src/xitk/main.c:322
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
-msgstr ""
+msgstr "  -G, --geometry <WxH[+X+Y]>   Nastvi» výstupné okno (X style).\n"
 
 #: src/xitk/main.c:323
 #, fuzzy
 msgid "  -B, --borderless             Borderless video output window.\n"
-msgstr "  -H, --hide-video             skry» video okno.\n"
+msgstr "  -B, --borderless             Výstupné okno bez rámu.\n"
 
 #: src/xitk/main.c:325
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -539,9 +542,8 @@ msgid "  VCD:   'vcd://<track number>'\n"
 msgstr "  VCD:   'vcd://<èíslo stopy>'\n"
 
 #: src/xitk/main.c:377
-#, fuzzy
 msgid "video driver to use"
-msgstr "main : video ovládaè <%s> zlyhal\n"
+msgstr "pou¾i» video ovládaè"
 
 #: src/xitk/main.c:405
 #, c-format
@@ -574,7 +576,7 @@ msgstr "main : skú¹am automaticky natiahnu» audio ovládaè '%s' : "
 #: src/xitk/main.c:481
 #, fuzzy, c-format
 msgid "main: ...worked, using '%s' audio driver.\n"
-msgstr "main: ... vy¹lo to, pou¾ívam audio ovládaè '%s' "
+msgstr "main: ... vy¹lo to, pou¾ívam audio ovládaè '%s'\n"
 
 #: src/xitk/main.c:491
 msgid "main: audio driver probing failed => no audio output\n"
@@ -583,12 +585,12 @@ msgstr "main : zlyhal test pou¾iteµnosti audio ovládaèa => bez zvuku\n"
 #: src/xitk/main.c:501
 #, fuzzy
 msgid "main: not using any audio driver (as requested).\n"
-msgstr "main : nepou¾ívam ¾iaden audio ovládaè (ako po¾adované)\n"
+msgstr "main: nepou¾ívam ¾iaden audio ovládaè (ako po¾adované)\n"
 
 #: src/xitk/main.c:510
 #, c-format
 msgid "main: the specified audio driver '%s' failed\n"
-msgstr "main : vybraný audio ovládaè '%s' zlyhal\n"
+msgstr "main: vybraný audio ovládaè '%s' zlyhal\n"
 
 #: src/xitk/main.c:598
 #, c-format
@@ -653,11 +655,11 @@ msgstr "Xine MRL prehliadaè"
 
 #: src/xitk/mrl_browser.c:226
 msgid "Source:"
-msgstr "Zdroj :"
+msgstr "Zdroj:"
 
 #: src/xitk/panel.c:466
 msgid "unknown widget slider caller\n"
-msgstr ""
+msgstr "neznámy widget slider caller\n"
 
 #: src/xitk/panel.c:565
 msgid "Volume control"
@@ -675,7 +677,7 @@ msgstr "Xine panel"
 #: src/xitk/panel.c:615
 #, fuzzy
 msgid "xine-panel: couldn't find image for background\n"
-msgstr "xine-playlist : nemô¾em nájs» obrázok na pozadie.\n"
+msgstr "xine-panel: nemô¾em nájs» obrázok na pozadie.\n"
 
 #: src/xitk/panel.c:738
 msgid "Play previous entry from playlist"
@@ -699,7 +701,7 @@ msgstr "Ïal¹ia polo¾ka z playlistu"
 
 #: src/xitk/panel.c:774
 msgid "Eject current medium"
-msgstr "Eject - vyhodi» médium"
+msgstr "Eject - vysunú» médium"
 
 #: src/xitk/panel.c:781
 msgid "Quit"
@@ -707,7 +709,7 @@ msgstr "Skonèi»"
 
 #: src/xitk/panel.c:788
 msgid "Setup window"
-msgstr "Nastavi» okno"
+msgstr "Nastavenia"
 
 #: src/xitk/panel.c:795
 msgid "Hide GUI"
@@ -852,11 +854,11 @@ msgstr "nastavenie Xine"
 
 #: src/xitk/setup.c:1143
 msgid "Logs"
-msgstr ""
+msgstr "Záznamy"
 
 #: src/xitk/setup.c:1154
 msgid "Key Bindings"
-msgstr ""
+msgstr "Mapovanie kláves"
 
 #: src/xitk/setup.c:1165 src/xitk/viewlog.c:488
 msgid "Close"
@@ -940,7 +942,7 @@ msgstr "videowin: výstupný driver nemô¾e vybra» fungujúcu vizualizáciu\n"
 #: src/xitk/videowin.c:181
 #, c-format
 msgid "videowin: output driver overrides selected visual to visual id 0x%lx\n"
-msgstr "videowin: výstupný driver vybral vizualizáciu id 0x%lx\n"
+msgstr "videowin: výstupný driver nasilu vybral vizualizáciu id 0x%lx\n"
 
 #. printf("window_adapt:vw=%d, vh=%d, dx=%d, dy=%d, dw=%d, dh=%d\n",
 #. *           video_width,
@@ -963,7 +965,6 @@ msgid "Xine Video Window"
 msgstr "Xine Video okno"
 
 #: src/xitk/videowin.c:1013
-#, fuzzy
 msgid "Xine Video Fullscreen Window"
 msgstr "Plnoobrazovkový/Okenný re¾im"
 
@@ -995,16 +996,16 @@ msgstr "XF86VidMode Extension (%d.%d) detekovaná, skú¹am ju pou¾i».\n"
 #: src/xitk/videowin.c:1109
 #, c-format
 msgid "XF86VidMode Extension: %d modelines found.\n"
-msgstr "XF86VidMode Extension: %d modeline najdené.\n"
+msgstr "XF86VidMode Extension: %d modeline nájdené.\n"
 
 #: src/xitk/videowin.c:1127
 msgid ""
 "XF86VidMode Extension: could not get list of available modelines. Failed.\n"
-msgstr "XF86VidMode Extension: nemohol získa» zoznam dost. modeline Zlyhal.\n"
+msgstr "XF86VidMode Extension: nemohol získa» zoznam dost. modeline. Zlyhal.\n"
 
 #: src/xitk/videowin.c:1130
 msgid "XF86VidMode Extension: initialization failed, not using it.\n"
-msgstr "XF86VidMode Extension: initializácia zlyhala, nepou¾ívam.\n"
+msgstr "XF86VidMode Extension: initializácia zlyhala, nepou¾ívam to.\n"
 
 #: src/xitk/viewlog.c:328
 msgid "log info"
@@ -1033,7 +1034,7 @@ msgstr "Obnovi»"
 
 #, fuzzy
 #~ msgid "Select current entry"
-#~ msgstr "Eject - vyhodi» médium"
+#~ msgstr "Eject - vysunú» médium"
 
 #, fuzzy
 #~ msgid "Close MRL browser window"
