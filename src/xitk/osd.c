@@ -409,11 +409,10 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     vwidth  = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_WIDTH);
     vheight = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
     
-    xine_osd_set_position(gGui->osd.bar[0], 
-			  (vwidth - BAR_WIDTH) >> 1 , (vheight - BAR_HEIGHT) - 40);
-    xine_osd_set_position(gGui->osd.bar[1], 
-			  (vwidth - BAR_WIDTH) >> 1 , (vheight - (BAR_HEIGHT * 2)) - 40);
-
+    x = (vwidth - BAR_WIDTH) >> 1;
+    xine_osd_set_position(gGui->osd.bar[0], (x >= 0) ? x : 0, (vheight - BAR_HEIGHT) - 40);
+    xine_osd_set_position(gGui->osd.bar[1], (x >= 0) ? x : 0, (vheight - (BAR_HEIGHT * 2)) - 40);
+    
     xine_osd_show(gGui->osd.bar[0], 0);
     if(title)
       xine_osd_show(gGui->osd.bar[1], 0);
