@@ -471,6 +471,8 @@ static void load_audio_out_driver(char *audio_driver_id,
  *
  */
 void event_listener (void *user_data, xine_event_t *event) {
+
+  /* printf ("main: event listener, got event type %d\n", event->type); */
   
   switch(event->type) { 
   case XINE_EVENT_UI_CHANNELS_CHANGED:
@@ -490,10 +492,10 @@ void event_listener (void *user_data, xine_event_t *event) {
     break;
   case XINE_EVENT_NEED_NEXT_MRL:
     {
-      xine_ui_event_t *uevent = (xine_ui_event_t *)event;
+      xine_next_mrl_event_t *uevent = (xine_next_mrl_event_t *)event;
 
       uevent->handled = 1;
-      uevent->data = gui_next_mrl_callback ();
+      uevent->mrl = gui_next_mrl_callback ();
     }
     break;
   case XINE_EVENT_BRANCHED:
