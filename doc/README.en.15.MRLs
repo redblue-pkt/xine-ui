@@ -38,8 +38,11 @@ Some prominent examples should clarify:
      
      tcp://host:port                receives a stream through a TCP socket
      slave://host:port              receives a stream from a xine broadcast
+     
      udp://host:port                receives a multicast stream through UDP
+     udp://host:port?iface=eth0     receives a multicast stream through UDP from eth0
      rtp://host:port                receives a RTP multicast stream
+     rtp://host:port?iface=eth0     receives a RTP multicast stream from eth0
      
      dvb:/                          shows a Digital Video Broadcast
      dvb:/7                         shows DVB station 7
