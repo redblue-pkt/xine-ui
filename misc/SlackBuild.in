@@ -22,9 +22,9 @@ do_doinst() {
    cd install
   cat > doinst.sh <<EOF
 if [ -d @XINE_SKINDIR@/default ]; then
-  echo "Removing old <default> skin, <metal> is the new default skin."
+  echo "Removing old <default> skin, <xinetic> is the new default skin."
   rm -rf @XINE_SKINDIR@/default && \
-  ln -s @XINE_SKINDIR@/metal @XINE_SKINDIR@/default;
+  ln -s @XINE_SKINDIR@/xinetic @XINE_SKINDIR@/default;
 fi
 /sbin/ldconfig
 EOF

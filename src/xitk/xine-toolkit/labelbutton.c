@@ -73,9 +73,12 @@ static Pixmap create_labelofbutton(widget_t *lb,
     exit(1);
   }
 
+  XLOCK(private_data->display);
   XSetFont(private_data->display, gc, fs->fid);
 
   XTextExtents(fs, label, strlen(label), &dir, &as, &des, &cs);
+  XUNLOCK(private_data->display);
+
   len = cs.width;
 
   /*  Some colors configurations */
@@ -119,6 +122,8 @@ static Pixmap create_labelofbutton(widget_t *lb,
     color.green = gColor->green<<8;
   }
 
+  XLOCK(private_data->display);
+
   XAllocColor(private_data->display, DefaultColormap(private_data->display, 0), &color);
   fg = color.pixel;
   
@@ -130,6 +135,8 @@ static Pixmap create_labelofbutton(widget_t *lb,
 	      label, strlen(label));
   
   XFreeFont(private_data->display, fs);
+
+  XUNLOCK(private_data->display);
 
   if(gColor) {
     free(gColor->colorname);
@@ -152,6 +159,8 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
 
   if ((lb->widget_type & WIDGET_TYPE_LABELBUTTON) && lb->visible) {
     
+    XLOCK(private_data->display);
+
     XGetWindowAttributes(private_data->display, win, &attr);
     
     skin = private_data->skin;
@@ -160,8 +169,6 @@ static void paint_labelbutton (widget_t *lb, Window win, GC gc) {
     bgtmp = XCreatePixmap(private_data->display, skin->image,
 			  button_width, skin->height, attr.depth);
     
-    XLOCK(private_data->display);
-
     if (private_data->bArmed) {
       if (private_data->bClicked) {
 	state = CLICK;

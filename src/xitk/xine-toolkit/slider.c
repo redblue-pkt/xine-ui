@@ -185,8 +185,10 @@ static int notify_click_slider (widget_list_t *wl,
        * Loop of death ;-)
        */
       do {
+	XLOCK (private_data->display);
 	XNextEvent (private_data->display, &sliderevent) ;
-	
+	XUNLOCK (private_data->display);
+
 	switch(sliderevent.type) {
 	  
 	case MotionNotify:
@@ -227,7 +229,7 @@ static int notify_click_slider (widget_list_t *wl,
 	}
       } while (sliderevent.type != ButtonRelease); 
     }
-    paint_widget_list (wl);
+    /* CHECKME    paint_widget_list (wl); */
   }
 #ifdef DEBUG_GUI
   else

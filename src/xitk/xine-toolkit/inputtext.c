@@ -87,9 +87,14 @@ static Pixmap create_labelofinputtext(widget_t *it,
     exit(1);
   }
 
+  XLOCK(private_data->display);
+
   XSetFont(private_data->display, gc, fs->fid);
 
   XTextExtents(fs, label, strlen(label), &dir, &as, &des, &cs);
+
+  XUNLOCK(private_data->display);
+
   len = cs.width;
 
   /*  Some colors configurations */
@@ -123,11 +128,15 @@ static Pixmap create_labelofinputtext(widget_t *it,
     color.green = gColor->green<<8;
   }
 
+  XLOCK(private_data->display);
+
   XAllocColor(private_data->display,
 	      DefaultColormap(private_data->display, 0), &color);
   fg = color.pixel;
   
   XSetForeground(private_data->display, gc, fg);
+
+  XUNLOCK(private_data->display);
 
   if((private_data->cursor_pos - private_data->disp_offset)
      > private_data->max_visible) {
@@ -143,6 +152,8 @@ static Pixmap create_labelofinputtext(widget_t *it,
     plabel += private_data->disp_offset;
 
   /*  Put text in the right place */
+  XLOCK(private_data->display);
+
   XDrawString(private_data->display, pix, gc, 
 	      2, ((ysize+as+des+yoff)>>1)-des, 
 	      plabel, strlen(plabel));
@@ -171,6 +182,8 @@ static Pixmap create_labelofinputtext(widget_t *it,
   }
   
   XFreeFont(private_data->display, fs);
+
+  XUNLOCK(private_data->display);
 
   if(gColor) {
     free(gColor->colorname);

@@ -11,7 +11,7 @@ Version:     %{ver}
 Release:     %{rel}
 Copyright:   GPL
 Group:       Applications/X11
-Source:      http://xine.sourceforge.net/files/@PACKAGE@_@VERSION@.tar.gz
+Source:      http://xine.sourceforge.net/files/@PACKAGE@-@VERSION@.tar.gz
 URL:         http://xine.sourceforge.net
 Packager:    Daniel Caujolle-Bert <f1rmb@users.sourceforge.net>
 Requires:    xine-lib >= 0.5.0
@@ -61,7 +61,7 @@ make install-strip prefix=$RPM_BUILD_ROOT%{prefix}
 
 %post
 #/sbin/ldconfig
-if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/metal @XINE_SKINDIR@/default; fi
+if test -d @XINE_SKINDIR@/default; then rm -rf @XINE_SKINDIR@/default && ln -s @XINE_SKINDIR@/xinetic @XINE_SKINDIR@/default; fi
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -73,6 +73,7 @@ rm -rf $RPM_BUILD_ROOT
 @XINE_SKINDIR@/lcd/*
 @XINE_SKINDIR@/metal/*
 @XINE_SKINDIR@/pitt/*
+@XINE_SKINDIR@/xinetic/*
 
 %changelog
 * Tue Jul 03 2001 Matthias Dahl <matthew2k@web.de>

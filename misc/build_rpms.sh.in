@@ -14,18 +14,18 @@ if [ `expr $RPMVERSION` -lt 100 ]; then
 fi
 
 if [ `expr $RPMVERSION` -lt 400 ]; then
-  RPM_BA="rpm -ba -ta ./@PACKAGE@_@VERSION@.tar.gz"
-  RPM_BB="rpm -bb -ta ./@PACKAGE@_@VERSION@.tar.gz"
+  RPM_BA="rpm -ba -ta ./@PACKAGE@-@VERSION@.tar.gz"
+  RPM_BB="rpm -bb -ta ./@PACKAGE@-@VERSION@.tar.gz"
 else
-  RPM_BA="rpm -ta ./@PACKAGE@_@VERSION@.tar.gz -ba"
-  RPM_BB="rpm -ta ./@PACKAGE@_@VERSION@.tar.gz -bb"
+  RPM_BA="rpm -ta ./@PACKAGE@-@VERSION@.tar.gz -ba"
+  RPM_BB="rpm -ta ./@PACKAGE@-@VERSION@.tar.gz -bb"
 fi
 
 ##VERSION="@XINE_MAJOR@.@XINE_MINOR@.@XINE_SUB@"
 
 echo "Creating tarball..."
 rm -f config.cache && ./cvscompile.sh && make dist
-mv -f @TAR_NAME@.tar.gz  @PACKAGE@_@VERSION@.tar.gz
+##mv -f @TAR_NAME@.tar.gz  @PACKAGE@-@VERSION@.tar.gz
 rm -rf rpms
 mkdir rpms
 

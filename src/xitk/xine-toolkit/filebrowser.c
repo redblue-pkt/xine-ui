@@ -198,8 +198,10 @@ void filebrowser_destroy(widget_t *w) {
     private_data->running = 0;
     private_data->visible = 0;
     
+    XLOCK(private_data->display);
     XUnmapWindow(private_data->display, private_data->window);
-    
+    XUNLOCK(private_data->display);
+	
     widget_stop_widgets(private_data->widget_list);
     gui_list_free(private_data->widget_list->l);
     free(private_data->widget_list);
@@ -212,7 +214,9 @@ void filebrowser_destroy(widget_t *w) {
       }
     }
     free(private_data->fc);
+    XLOCK(private_data->display);
     XDestroyWindow(private_data->display, private_data->window);
+    XUNLOCK(private_data->display);
 
     widget_unregister_event_handler(&private_data->widget_key);
     free(private_data->fbWidget);
@@ -727,7 +731,9 @@ void filebrowser_exit(widget_t *w, void *data) {
   private_data->running = 0;
   private_data->visible = 0;
   
+  XLOCK(private_data->display);
   XUnmapWindow(private_data->display, private_data->window);
+  XUNLOCK(private_data->display);
   
   widget_stop_widgets(private_data->widget_list);
   gui_list_free(private_data->widget_list->l);
@@ -741,7 +747,10 @@ void filebrowser_exit(widget_t *w, void *data) {
     }
   }
   free(private_data->fc);
+
+  XLOCK(private_data->display);
   XDestroyWindow(private_data->display, private_data->window);
+  XUNLOCK(private_data->display);
 
   widget_unregister_event_handler(&private_data->widget_key);
   free(private_data->fbWidget);
@@ -786,6 +795,9 @@ static void filebrowser_homedir(widget_t *w, void *data) {
   paint_widget_list (private_data->widget_list);
 }
 
+/*
+ *
+ */
 static void filebrowser_select_entry(filebrowser_private_data_t *private_data, int j) {
   char buf[PATH_MAX + NAME_MAX + 1];
 
