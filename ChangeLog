@@ -6,6 +6,8 @@ xine-ui (0.9.20) unstable; urgency=low
   * fb:
   *   fix xine's driver initialization.
   * xitk:
+  *   add get position/length in network control, 
+  *     (patch from Henrik (Mauritz) Johnson <henrik@spinbox.se>),
   *   support fb output,
   *   many skins updates (don't forget to update you local copies),
   *   add menu events in main menu,
