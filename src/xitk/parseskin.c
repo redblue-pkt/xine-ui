@@ -28,9 +28,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "gui_main.h"
-#include "gui_list.h"
-#include "gui_image.h"
+#include "xitk.h"
+
+#include "event.h"
 #include "utils.h"
 
 extern gGui_t          *gGui; 

@@ -34,22 +34,26 @@
 #include <pthread.h>
 #include <signal.h>
 
+#include "xitk.h"
+
 #include "Imlib-light/Imlib.h"
-#include "gui_main.h"
-#include "gui_list.h"
-#include "gui_dnd.h"
-#include "gui_parseskin.h"
-#include "gui_image.h"
-#include "gui_playlist.h"
-#include "gui_control.h"
-#include "gui_lirc.h"
-#include "gui_videowin.h"
-#include "gui_panel.h"
-#include "gui_actions.h"
+#include "event.h"
+#include "parseskin.h"
+#include "playlist.h"
+#include "control.h"
+#include "lirc.h"
+#include "videowin.h"
+#include "panel.h"
+#include "actions.h"
 #include <xine/video_out_x11.h>
 #include "xine.h"
 #include "utils.h"
 
+#ifdef HAVE_LIRC
+extern int no_lirc;
+#endif
+
+extern int errno;
 
 /*
  * global variables
@@ -347,7 +351,7 @@ void gui_handle_event (XEvent *event) {
 
   case ClientMessage:
 
-    gui_dnd_process_client_message (&gGui->xdnd, event);
+    dnd_process_client_message (&gGui->xdnd, event);
 
     break;
     /*
@@ -450,9 +454,6 @@ void gui_init (int nfiles, char *filenames[]) {
 		   DefaultColormap(gGui->display, gGui->screen), 
 		   "black", &gGui->black, &dummy);
 
-  gui_dnd_set_callback (&gGui->xdnd, gui_dndcallback);
-  gui_init_dnd(gGui->display, &gGui->xdnd);
-
   /*
    * create an icon pixmap
    */
@@ -469,6 +470,11 @@ void gui_init (int nfiles, char *filenames[]) {
 
   video_window_init ();
   panel_init ();
+
+  dnd_init_dnd(gGui->display, &gGui->xdnd);
+  dnd_set_callback (&gGui->xdnd, gui_dndcallback);
+  dnd_make_window_aware (&gGui->xdnd, gGui->panel_window); 
+
 }
 
 void gui_run () {

@@ -45,13 +45,13 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
+#include "xitk.h"
 
 #include "xine.h"
 #include <xine/video_out_x11.h>
 #include "utils.h"
-#include "gui_main.h"
-#include "gui_dnd.h"
-#include "gui_videowin.h"
+#include "event.h"
+#include "videowin.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"

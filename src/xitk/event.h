@@ -27,7 +27,7 @@
 #include <X11/Xlib.h>
 #include "Imlib-light/Imlib.h"
 #include "xine.h"
-#include "gui_dnd.h"
+#include "xitk.h"
 
 #define perr(FMT,ARGS...) fprintf(stderr, FMT, ##ARGS);fflush(stderr)
 
@@ -74,6 +74,10 @@ typedef struct {
 
   int                  running;
   int                  ignore_status;
+
+#ifdef HAVE_LIRC
+  int                  lirc_enable;
+#endif
 } gGui_t;
 
 

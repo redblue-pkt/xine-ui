@@ -102,16 +102,16 @@ typedef struct DND_struct_s {
 
 
 
-void gui_init_dnd(Display *display, DND_struct_t *);
+void dnd_init_dnd(Display *display, DND_struct_t *);
 
-void gui_make_window_dnd_aware (DND_struct_t *, Window);
+void dnd_make_window_aware (DND_struct_t *, Window);
 
 //Bool gui_accept_dnd(Window window);
 
-Bool gui_dnd_process_client_message(DND_struct_t *, XEvent *);
+Bool dnd_process_client_message(DND_struct_t *, XEvent *);
 
 //typedef void (*gui_dnd_callback_t) (char *filename);
 
-void gui_dnd_set_callback (DND_struct_t *, void *);
+void dnd_set_callback (DND_struct_t *, void *);
 
 #endif

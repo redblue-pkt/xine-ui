@@ -52,7 +52,7 @@ Atom _XA_XINE_XDNDEXCHANGE;
 
 //static gui_dnd_callback_t gui_dnd_callback;
 
-void gui_init_dnd(Display *display, DND_struct_t *xdnd) {
+void dnd_init_dnd(Display *display, DND_struct_t *xdnd) {
 
   xdnd->display = display;
 
@@ -75,8 +75,11 @@ void gui_init_dnd(Display *display, DND_struct_t *xdnd) {
   xdnd->callback = NULL;
 }
 
-void gui_make_window_dnd_aware (DND_struct_t *xdnd, Window window) {
+void dnd_make_window_aware (DND_struct_t *xdnd, Window window) {
   
+  if(!xdnd->display)
+    return;
+
   XLockDisplay (xdnd->display);
   xdnd->win = window;
   XChangeProperty (xdnd->display, xdnd->win, xdnd->_XA_XdndAware, XA_ATOM,
@@ -84,7 +87,7 @@ void gui_make_window_dnd_aware (DND_struct_t *xdnd, Window window) {
   XUnlockDisplay (xdnd->display);
 }
 
-Bool gui_dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
+Bool dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
   Atom ret_type;
   int ret_format;
   unsigned long ret_item;
@@ -119,7 +122,6 @@ Bool gui_dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
   if (delme) {
     int x;
 
-    fprintf (stderr, "drop received : %s\n", delme);
     x = strlen(delme)-1;
 
     while ((x>=0) && ((delme[x]==10) || (delme[x]==12) || (delme[x]==13))) {
@@ -135,11 +137,11 @@ Bool gui_dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
   return False;
 }
 
-void gui_dnd_set_callback (DND_struct_t *xdnd, void *cb) {
+void dnd_set_callback (DND_struct_t *xdnd, void *cb) {
   xdnd->callback = cb;
 }
 
-Bool gui_dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
+Bool dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
 
   if (event->xclient.format == 32 && event->xclient.data.l[0] == xdnd->_XA_WM_DELETE_WINDOW) {
     raise(SIGINT); /* video window closed, quit program */
@@ -166,7 +168,7 @@ Bool gui_dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
       XUnlockDisplay (xdnd->display);
 
 
-      gui_dnd_process_selection (xdnd, event);
+      dnd_process_selection (xdnd, event);
     }
 
     return True;

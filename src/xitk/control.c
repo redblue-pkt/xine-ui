@@ -33,18 +33,11 @@
 #include <X11/keysym.h>
 #include <pthread.h>
 
+#include "xitk.h"
+
 #include "Imlib-light/Imlib.h"
-#include "gui_main.h"
-#include "gui_list.h"
-#include "gui_button.h"
-#include "gui_labelbutton.h"
-#include "gui_checkbox.h"
-#include "gui_label.h"
-#include "gui_dnd.h"
-#include "gui_slider.h"
-#include "gui_parseskin.h"
-#include "gui_image.h"
-#include "gui_browser.h"
+#include "event.h"
+#include "parseskin.h"
 #include "utils.h"
 #include "xine.h"
 
@@ -155,9 +148,6 @@ void control_exit(widget_t *w, void *data) {
   ctl_widget_list = NULL;
 
   XDestroyWindow(gGui->display, ctl_win);
-
-  //  if(xdnd_ctl_win)
-  //    free(xdnd_ctl_win);
 
   ctl_win = 0;
 }
@@ -289,7 +279,7 @@ void control_handle_event(XEvent *event) {
       
     case ClientMessage:
       if(event->xany.window == ctl_win)
-	gui_dnd_process_client_message (&xdnd_ctl_win, event);
+	dnd_process_client_message (&xdnd_ctl_win, event);
       break;
       
     }
@@ -388,11 +378,9 @@ void control_panel(void) {
 
   /*  XUNLOCK (); FIXME  */
   
-  //  if((xdnd_ctl_win = (DND_struct_t *) xmalloc(sizeof(DND_struct_t))) != NULL) {
-  gui_init_dnd(gGui->display, &xdnd_ctl_win);
-  gui_dnd_set_callback (&xdnd_ctl_win, gui_dndcallback);
-  gui_make_window_dnd_aware (&xdnd_ctl_win, ctl_win);
-    //  }
+  dnd_init_dnd(gGui->display, &xdnd_ctl_win);
+  dnd_set_callback (&xdnd_ctl_win, gui_dndcallback);
+  dnd_make_window_aware (&xdnd_ctl_win, ctl_win);
 
   /*
    * Widget-list

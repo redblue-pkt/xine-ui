@@ -378,6 +378,7 @@ src/common/Makefile
 src/corba/Makefile
 src/Imlib-light/Makefile
 src/xitk/Makefile
+src/xitk/xine-toolkit/Makefile
 src/xitk/skins/Makefile
 src/xitk/skins/default/Makefile
 src/xitk/skins/metal/Makefile

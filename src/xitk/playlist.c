@@ -30,19 +30,13 @@
 #include <errno.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+
+#include "xitk.h"
+
 #include "Imlib-light/Imlib.h"
-#include "gui_main.h"
-#include "gui_list.h"
-#include "gui_button.h"
-#include "gui_labelbutton.h"
-#include "gui_checkbox.h"
-#include "gui_label.h"
-#include "gui_dnd.h"
-#include "gui_slider.h"
-#include "gui_parseskin.h"
-#include "gui_image.h"
-#include "gui_browser.h"
-#include "gui_actions.h"
+#include "event.h"
+#include "parseskin.h"
+#include "actions.h"
 #include "utils.h"
 #include "xine.h"
 
@@ -53,7 +47,7 @@ extern gGui_t        *gGui;
 static widget_t       *pl_list = NULL;
 
 static Window          pl_win;
-static DND_struct_t   *xdnd_pl_win;
+static DND_struct_t    xdnd_pl_win;
 static ImlibImage     *pl_bg_image;
 static gui_move_t      pl_move; 
 static widget_list_t  *pl_widget_list;
@@ -96,9 +90,6 @@ void pl_exit(widget_t *w, void *data) {
   pl_widget_list = NULL;
 
   XDestroyWindow(gGui->display, pl_win);
-
-  if(xdnd_pl_win)
-    free(xdnd_pl_win);
 
   pl_win = 0;
 }
@@ -579,11 +570,9 @@ void playlist_editor(void) {
 
   /* FIXME XUNLOCK (); */
   
-  if((xdnd_pl_win = (DND_struct_t *) xmalloc(sizeof(DND_struct_t))) != NULL) {
-    gui_init_dnd(gGui->display, xdnd_pl_win);
-    gui_dnd_set_callback (xdnd_pl_win, gui_dndcallback);
-    gui_make_window_dnd_aware (xdnd_pl_win, pl_win);
-  }
+  dnd_init_dnd(gGui->display, &xdnd_pl_win);
+  dnd_set_callback (&xdnd_pl_win, gui_dndcallback);
+  dnd_make_window_aware (&xdnd_pl_win, pl_win);
 
   /*
    * Widget-list

@@ -19,20 +19,29 @@
  *
  * $Id$
  *
+ * xine panel related stuff
+ *
  */
 
-#ifndef GUI_PARSESKIN_H
-#define GUI_PARSESKIN_H
+#ifndef HAVE_GUI_PANEL_H
+#define HAVE_GUI_PANEL_H
 
-#include "gui_widget.h"
+void panel_init (void) ;
 
-char *gui_get_skindir(const char *);
-int gui_get_skinX(const char *);
-int gui_get_skinY(const char *);
-char *gui_get_skinfile(const char *);
-void gui_place_extra_images(widget_list_t *);
-char *gui_get_ncolor(const char *str);
-char *gui_get_fcolor(const char *str);
-char *gui_get_ccolor(const char *str);
+int panel_is_visible(void) ;
+
+void panel_toggle_visibility (widget_t *w, void *data) ;
+
+void panel_handle_event(XEvent *event) ;
+
+void panel_check_pause(void) ;
+
+void panel_reset_slider ();
+
+void panel_update_channel_display () ;
+
+void panel_update_mrl_display ();
+
+void panel_update_slider () ;
 
 #endif
