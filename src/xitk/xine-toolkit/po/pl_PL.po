@@ -1,51 +1,51 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR Free Software Foundation, Inc.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Bart³omiej Muryn <_4ever_@irc.pl>, 2002.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: xine-ui 0.9.9\n"
 "POT-Creation-Date: 2002-02-07 15:16+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2002-02-06 08:00+0100\n"
+"Last-Translator: Bart³omiej Muryn <_4ever_@irc.pl>\n"
+"Language-Team: Polish <pl@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: src/xitk/xine-toolkit/test.c:103
 msgid "XInitThreads() failed.\n"
-msgstr ""
+msgstr "XInitThreads() zawiod³o.\n"
 
 #: src/xitk/xine-toolkit/test.c:113
 msgid "Cannot open display\n"
-msgstr ""
+msgstr "Nie mogê otworzyæ okna wy¶wietlania\n"
 
 #: src/xitk/xine-toolkit/test.c:127
 msgid "Imlib_init_with_params() failed.\n"
-msgstr ""
+msgstr "Imlib_init_with_params() zawiod³o.\n"
 
 #: src/xitk/xine-toolkit/test.c:341
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
-msgstr ""
+msgstr "Nowa warto¶æ integer to: %d. Potwierdzasz ?"
 
 #: src/xitk/xine-toolkit/test.c:415
 msgid "My Frame"
-msgstr ""
+msgstr "Moja Ramka"
 
 #: src/xitk/xine-toolkit/test.c:454
 msgid "A Label"
-msgstr ""
+msgstr "Etykieta"
 
 #: src/xitk/xine-toolkit/test.c:510
 msgid "Fire !!"
-msgstr ""
+msgstr "Ognia !!"
 
 #: src/xitk/xine-toolkit/test.c:541
 msgid "!BOOM!"
-msgstr ""
+msgstr "!BOOM!"
 
 #: src/xitk/xine-toolkit/test.c:613
 #, c-format
@@ -53,47 +53,49 @@ msgid ""
 "New entries selected in combo box is:\n"
 "%s [%d]."
 msgstr ""
+"Nowy wpis wybrany w combo-box'ie to:\n"
+"%s [%d]."
 
 #: src/xitk/xine-toolkit/test.c:728
 msgid "init_test() failed\n"
-msgstr ""
+msgstr "init_test() zawiód³\n"
 
 #: src/xitk/xine-toolkit/test.c:744
 msgid "My Fucking Window"
-msgstr ""
+msgstr "Moje Pieprzone Okno"
 
 #: src/xitk/xine-toolkit/test.c:762
 msgid "Quit"
-msgstr ""
+msgstr "Zakoñcz"
 
 #: src/xitk/xine-toolkit/window.c:658
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: src/xitk/xine-toolkit/window.c:770 src/xitk/xine-toolkit/window.c:922
 msgid "Question?"
-msgstr ""
+msgstr "Pytanie?"
 
 #: src/xitk/xine-toolkit/window.c:794 src/xitk/xine-toolkit/window.c:947
 msgid "Yes"
-msgstr ""
+msgstr "Tak"
 
 #: src/xitk/xine-toolkit/window.c:808 src/xitk/xine-toolkit/window.c:961
 msgid "No"
-msgstr ""
+msgstr "Nie"
 
 #: src/xitk/xine-toolkit/window.c:975
 msgid "Cancel"
-msgstr ""
+msgstr "Anuluj"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:909
 msgid "Select current entry"
-msgstr ""
+msgstr "Wybierz aktualny wpis"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:916
 msgid "Play selected entry"
-msgstr ""
+msgstr "Odtwarzaj wybrany wpis"
 
 #: src/xitk/xine-toolkit/mrlbrowser.c:926
 msgid "Close MRL browser window"
-msgstr ""
+msgstr "Zamknij okno wyszukiwarki MRL"
