@@ -35,7 +35,7 @@ dnl   * use aalib-config instead of aainfo now.
 dnl 17/06/2001 
 dnl   * First shot
 dnl
-AC_DEFUN(AM_PATH_AALIB,
+AC_DEFUN([AM_PATH_AALIB],
 [dnl 
 dnl
 AC_ARG_WITH(aalib-prefix,

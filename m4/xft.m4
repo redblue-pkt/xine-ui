@@ -21,7 +21,7 @@ dnl FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 dnl DEALINGS IN THE SOFTWARE.
 
 dnl AM_PATH_XFT2([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
-AC_DEFUN(AM_PATH_XFT2,
+AC_DEFUN([AM_PATH_XFT2],
 [
 
   if test "x$PKG_CONFIG" = "xno" ; then
@@ -43,7 +43,7 @@ AC_DEFUN(AM_PATH_XFT2,
 
 dnl AM_PATH_XFT(default-value, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl Test for Xft, and define XFT_CFLAGS and XFT_LIBS
-AC_DEFUN(AM_PATH_XFT,
+AC_DEFUN([AM_PATH_XFT],
 [
   AC_ARG_ENABLE(xft, [  --enable-xft            Xft (antialias) support (default=$1)],
     [ if test "x$enableval" = "xyes"; then

@@ -2,7 +2,7 @@ dnl stolen from libgadu
 dnl Rewritten from scratch. --wojtekka
 dnl 
 
-AC_DEFUN(AC_CHECK_READLINE,[
+AC_DEFUN([AC_CHECK_READLINE],[
   AC_SUBST(READLINE_LIBS)
   AC_SUBST(READLINE_INCLUDES)
 
