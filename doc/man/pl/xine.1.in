@@ -244,7 +244,7 @@ no¶nik z którego nale¿y czytaæ. Poprawnym MRL mo¿e byæ nazwa pliku, lub jeden z:
 .br
 .BI rtp:// <host> : <port>
 .br
-.BI udp:// <host> : <port>
+.BI udp:// <host> : <port> <?iface=interface>
 .br
 .BI http:// <host>
 .LP

@@ -334,7 +334,7 @@ to read from. valid MRLs may be plain file names or one of the following:
 .br
 .BI rtp://<host>:<port>
 .br
-.BI udp://<host>:<port>
+.BI udp://<host>:<port><?iface=interface>
 .br
 .BI mms://<host>...
 .br

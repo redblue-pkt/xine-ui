@@ -332,7 +332,7 @@ Les MRLs valides peuvent être des noms de fichiers ou un de ceux qui suit:
 .br
 .BI rtp:// <hôte> : <port>
 .br
-.BI udp:// <hôte> : <port>
+.BI udp:// <hôte> : <port> <?iface=interface>
 .br
 .BI mms:// <hôte>...
 .br

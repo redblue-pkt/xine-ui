@@ -292,7 +292,7 @@ MRLs sind ähnlich wir URLs im Web\-Browser und beschreiben die zu spielenden Tit
 .TP 
 .BI rtp:// <host> : <port>
 .TP 
-.BI udp:// <host> : <port>
+.BI udp:// <host> : <port> <?iface=interface>
 .TP
 .BI mms:// <host>...
 .TP
