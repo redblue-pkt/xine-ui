@@ -1359,7 +1359,7 @@ void xitk_enable_widget(xitk_widget_t *w) {
 /*
  * Disable a widget.
  */
-static void xitk_disable_widget_no_notify(xitk_widget_t *w) {
+void xitk_disable_widget(xitk_widget_t *w) {
 
   if(!w) {
     XITK_WARNING("widget is NULL\n");
@@ -1385,16 +1385,6 @@ static void xitk_disable_widget_no_notify(xitk_widget_t *w) {
   }
   
   w->enable = !WIDGET_ENABLE;
-}
-void xitk_disable_widget(xitk_widget_t *w) {
-
-  if(!w) {
-    XITK_WARNING("widget is NULL\n");
-    return;
-  }
-
-  xitk_disable_widget_no_notify(w);
-
   if((w->widget_type & WIDGET_GROUP) && (w->notify_enable))
     w->notify_enable(w);
 }
@@ -1430,7 +1420,7 @@ void xitk_destroy_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
 
   xitk_hide_widget(wl, w);
   xitk_stop_widget(w);
-  xitk_disable_widget_no_notify(w);
+  xitk_disable_widget(w);
 
   xitk_free_widget(w);
 }
