@@ -24,6 +24,8 @@ URL:         http://xinehq.de
 Packager:    Manfred Tremmel <Manfred.Tremmel@iiv.de>
 Obsoletes:   xine
 Requires:    %{libname} >= %{libvers}
+Requires:    curl
+Requires:    readline 
 BuildPreReq: %{libname}-devel >= %{libvers}
 BuildRoot:   %{_tmppath}/%{name}-buildroot
 
@@ -252,6 +254,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sun Jan 18 2004 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- added readline and curl dependency
 * Wed May 14 2003 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - Update for > 0.9.20
 * Sun Mar 09 2003 Manfred Tremmel <Manfred.Tremmel@iiv.de>
