@@ -1649,7 +1649,9 @@ void xitk_init(Display *display, int verbosity) {
   }
 #endif
 
-#ifdef WITH_XMB
+#ifdef WITH_XFT
+  sprintf(buffer, "%s%s", buffer, "[XFT]");
+#elif defined(WITH_XMB)
   sprintf(buffer, "%s%s", buffer, "[XMB]");
 #endif
   
@@ -1933,7 +1935,10 @@ char *xitk_set_locale(void) {
  * Return home directory.
  */
 const char *xitk_get_homedir(void) {
-  struct passwd  pwd, *pw = NULL;
+#ifdef HAVE_GETPWUID_R
+  struct passwd  pwd;
+#endif
+  struct passwd *pw = NULL;
   static char    homedir[BUFSIZ] = {0,};
 
   if(homedir[0])
