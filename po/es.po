@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
 "POT-Creation-Date: 2003-03-12 16:05+0100\n"
-"PO-Revision-Date: 2003-02-17 18:08+0100\n"
+"PO-Revision-Date: 2003-03-13 18:06+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -292,7 +292,7 @@ msgstr ""
 
 #: src/xitk/event.c:174
 msgid "Amplification Level"
-msgstr ""
+msgstr "Nivel de amplificación"
 
 #: src/xitk/event.c:306
 msgid "Zoom: 1:1"
@@ -529,7 +529,7 @@ msgstr ""
 
 #: src/xitk/event.c:1164
 msgid "amplification level"
-msgstr ""
+msgstr "nivel de amplificación"
 
 #. Some infos
 #: src/xitk/event.c:1178
@@ -1129,14 +1129,12 @@ msgstr ""
 "                    spu=c       elige canal de spu (<c>: «next» o «prev»),\n"
 
 #: src/xitk/main.c:503
-#, fuzzy
 msgid "                    volume=v    set audio volume,\n"
-msgstr "                    session=n   especifica número <n> de sesión,\n"
+msgstr "                    volume=v    volumen de audio,\n"
 
 #: src/xitk/main.c:504
-#, fuzzy
 msgid "                    amp=v       set amplification level,\n"
-msgstr "                                 <p> puede ser:\n"
+msgstr "                    amp=v       nivel de amplificación,\n"
 
 #: src/xitk/main.c:505
 msgid "                    (playlist|pl)=p\n"
@@ -1175,29 +1173,31 @@ msgid "                    fast4, stop, quit, fullscreen, eject.\n"
 msgstr "                    fast4, stop, quit, fullscreen, eject.\n"
 
 #: src/xitk/main.c:513
-#, fuzzy
 msgid ""
 "  -Z                           Don't automatically start playback (smart "
 "mode).\n"
-msgstr "                                 'loop': repetir la lista completa.\n"
+msgstr ""
+"  -Z                           No empezar reprod. automática (modo "
+"inteligente).\n"
 
 #: src/xitk/main.c:514
-#, fuzzy
 msgid "  -D, --deinterlace            Deinterlace video output\n"
 msgstr ""
-"  -B, --borderless             Ventana de salida de vídeo sin bordes.\n"
+"  -D, --deinterlace            No entrelazar salida de vídeo\n"
 
 #: src/xitk/main.c:515
 msgid ""
 "  -r, --aspect-ratio <mode>    Set aspect ratio of video output. Modes are:\n"
 msgstr ""
+"  -r, --aspect-ratio <mode>    Fija aspecto de salida de vídeo. Modos:\n"
 
 #: src/xitk/main.c:516
-#, fuzzy
 msgid ""
 "                                 'auto', 'square', '4:3', 'anamorphic', "
 "'dvb'.\n"
-msgstr "                                   «clear»  borra la lista,\n"
+msgstr ""
+"                                 'auto', 'square', '4:3', 'anamorphic', "
+"'dvb'.\n"
 
 #: src/xitk/main.c:518
 msgid "examples for valid MRLs (media resource locator):\n"
@@ -1304,9 +1304,9 @@ msgid "audio driver id required for -A option\n"
 msgstr "id. manejador de vídeo requerido en opción -A\n"
 
 #: src/xitk/main.c:1099
-#, fuzzy, c-format
+#, c-format
 msgid "Bad aspect ratio mode '%s', see xine --help\n"
-msgstr "Modo de repetición «%s» incorrecto, vea xine --help\n"
+msgstr "Modo de aspecto '%s' incorrecto, vea xine --help\n"
 
 #: src/xitk/main.c:1151
 #, c-format
