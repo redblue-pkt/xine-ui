@@ -1554,6 +1554,11 @@ char *xitk_skin_get_logo(xitk_skin_config_t *);
 /*
  *
  */
+char *xitk_skin_get_animation(xitk_skin_config_t *);
+
+/*
+ *
+ */
 int xitk_skin_get_browser_entries(xitk_skin_config_t *, const char *);
 
 /*

@@ -73,6 +73,10 @@ void gui_display_logo(void) {
     xine_stop(gGui->stream);
     gGui->ignore_next = 0; 
   }
+
+  if(gGui->visual_anim.running)
+    visual_anim_stop();
+
   (void) gui_xine_open_and_play((char *)gGui->logo_mrl, 0, 0);
   gGui->logo_mode = 1;
   panel_reset_slider();
@@ -84,7 +88,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
   int ret;
   
   if((ret = xine_play(stream, start_pos, start_time)) == 0) {
-    gui_handle_xine_error();
+    gui_handle_xine_error(stream);
   }
   else {
 
@@ -92,12 +96,15 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
       gGui->logo_mode = 0;
 
     if(gGui->logo_mode == 0) {
-      int has_video = xine_get_stream_info(gGui->stream, XINE_STREAM_INFO_HAS_VIDEO);
+      int has_video = xine_get_stream_info(stream, XINE_STREAM_INFO_HAS_VIDEO);
       
       if(stream_infos_is_visible())
 	stream_infos_update_infos();
 
       if(has_video) {
+	
+	if(gGui->visual_anim.running)
+	  visual_anim_stop();
 	
 	if(gGui->auto_vo_visibility) {
 	  
@@ -106,7 +113,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
 	  
 	  if(gGui->auto_panel_visibility && (panel_is_visible()))
 	    panel_toggle_visibility(NULL, NULL);
-
+	  
 	}
 	else {
 	  
@@ -140,6 +147,9 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
 	  if(gGui->auto_panel_visibility && (video_window_is_visible()) && (!panel_is_visible()))
 	    panel_toggle_visibility(NULL, NULL);
 	  
+	  if((video_window_is_visible()) && (!gGui->visual_anim.running))
+	    visual_anim_play();
+
 	}
       }
     }
@@ -151,7 +161,7 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time) {
 int gui_xine_open_and_play(char *mrl, int start_pos, int start_time) {
   
   if(!xine_open(gGui->stream, (const char *)mrl)) {
-    gui_handle_xine_error();
+    gui_handle_xine_error(gGui->stream);
     return 0;
   }
   if(!gui_xine_play(gGui->stream, start_pos, start_time)) {
@@ -187,10 +197,13 @@ void gui_exit (xitk_widget_t *w, void *data) {
   config_save();
 
   xine_close(gGui->stream);
+  xine_close(gGui->visual_anim.stream);
 
   xine_event_dispose_queue(gGui->event_queue);
+  xine_event_dispose_queue(gGui->visual_anim.event_queue);
 
   xine_dispose(gGui->stream);
+  xine_dispose(gGui->visual_anim.stream);
 
   if(gGui->vo_driver)
     xine_close_video_driver(gGui->xine, gGui->vo_driver);
@@ -237,8 +250,10 @@ void gui_play (xitk_widget_t *w, void *data) {
     
     (void) gui_xine_open_and_play(gGui->filename, 0, 0);
   } 
-  else
+  else {
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+    visual_anim_pause();
+  }
   
   panel_check_pause();
 }
@@ -247,7 +262,13 @@ void gui_stop (xitk_widget_t *w, void *data) {
 
   gGui->ignore_next = 1;
   xine_stop (gGui->stream);
-  gGui->ignore_next = 0; 
+  gGui->ignore_next = 0;
+
+  if(gGui->visual_anim.running) {
+    xine_stop(gGui->visual_anim.stream);
+    gGui->visual_anim.running = 0;
+  }
+
   panel_reset_slider ();
   panel_check_pause();
   panel_update_runtime_display();
@@ -266,6 +287,7 @@ void gui_pause (xitk_widget_t *w, void *data, int state) {
   else
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   panel_check_pause();
+  visual_anim_pause();
 }
 
 void gui_eject(xitk_widget_t *w, void *data) {
@@ -533,7 +555,7 @@ void gui_set_current_position (int pos) {
   
   if(gGui->logo_mode && (gGui->playlist[gGui->playlist_cur])) {
     if(!xine_open(gGui->stream, (const char *)gGui->playlist[gGui->playlist_cur])) {
-      gui_handle_xine_error();
+      gui_handle_xine_error(gGui->stream);
       return;
     }
   }
@@ -950,4 +972,65 @@ void gui_send_expose_to_window(Window window) {
   XSync(gGui->display, False);
   XUnlockDisplay(gGui->display);
   
+}
+
+/*
+ *
+ */
+void visual_anim_init(void) {
+  char buffer[4096];
+  
+  memset(&buffer, 0, sizeof(buffer));
+  sprintf(buffer, "%s/%s", XINE_VISDIR, "default.avi");
+  
+  gGui->visual_anim.mrls = (char **) xine_xmalloc(sizeof(char *) * 3);
+  gGui->visual_anim.num_mrls = 0;
+  
+  gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++]   = strdup(buffer);
+  gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]     = NULL;
+  gGui->visual_anim.mrls[gGui->visual_anim.num_mrls + 1] = NULL;
+}
+void visual_anim_add_animation(char *mrl) {
+  gGui->visual_anim.mrls = (char **) realloc(gGui->visual_anim.mrls, sizeof(char *) * 
+					     (gGui->visual_anim.num_mrls + 2));
+  
+  gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++]   = strdup(mrl);
+  gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]     = NULL;
+  gGui->visual_anim.mrls[gGui->visual_anim.num_mrls + 1] = NULL;
+}
+static int visual_anim_open_and_play(xine_stream_t *stream, const char *mrl) {
+  if((!xine_open(stream, mrl)) || (!xine_play(stream, 0, 0)))
+    return 0;
+
+  return 1;
+}
+void visual_anim_play(void) {
+  if(gGui->visual_anim.enabled) {
+    if(!visual_anim_open_and_play(gGui->visual_anim.stream, 
+				  gGui->visual_anim.mrls[gGui->visual_anim.current]))
+      gui_handle_xine_error(gGui->visual_anim.stream);
+    gGui->visual_anim.running = 1;
+  }
+}
+void visual_anim_play_next(void) {
+  if(gGui->visual_anim.enabled) {
+    gGui->visual_anim.current++;
+    if(gGui->visual_anim.mrls[gGui->visual_anim.current] == NULL)
+      gGui->visual_anim.current = 0;
+    visual_anim_play();
+  }
+}
+void visual_anim_pause(void) {
+  if(gGui->visual_anim.enabled) {
+    if(xine_get_param(gGui->visual_anim.stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
+      xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
+    else
+      xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
+  }
+}
+void visual_anim_stop(void) {
+  if(gGui->visual_anim.enabled) {
+    xine_stop(gGui->visual_anim.stream);
+    gGui->visual_anim.running = 0;
+  }
 }

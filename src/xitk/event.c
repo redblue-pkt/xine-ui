@@ -108,6 +108,9 @@ static void ssaver_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
   gGui->ssaver_timeout = cfg->num_value;
 }
 
+static void visual_anim_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->visual_anim.enabled = cfg->num_value;
+}
 /*
  * Layer above callbacks
  */
@@ -866,6 +869,16 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 						   CONFIG_LEVEL_EXP,
 						   event_sender_sticky_cb,
 						   CONFIG_NO_DATA);
+
+  gGui->visual_anim.enabled = xine_config_register_bool(gGui->xine, "gui.visual_anim", 
+							1,
+							_("Display some video animations when "
+							  "current stream is audio only (eg: mp3)."), 
+							CONFIG_NO_HELP,
+							CONFIG_LEVEL_EXP,
+							visual_anim_cb,
+							CONFIG_NO_DATA);
+  
   gGui->numeric.set = 0;
   gGui->numeric.arg = 0;
 

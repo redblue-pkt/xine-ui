@@ -111,7 +111,7 @@ static const char *short_options = "?hHgfvn"
 #ifdef DEBUG
  "d:"
 #endif
- "u:a:V:A:p::s:RG:B";
+ "u:a:V:A:p::s:RG:BN:";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
@@ -136,6 +136,7 @@ static struct option long_options[] = {
   {"root"           , no_argument      , 0, 'R'                      },
   {"geometry"       , required_argument, 0, 'G'                      },
   {"borderless"     , no_argument      , 0, 'B'                      },
+  {"animation"      , required_argument, 0, 'N'                      },
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
@@ -346,6 +347,8 @@ void show_usage (void) {
   printf(_("  -R, --root                   Use root window as video window.\n"));
   printf(_("  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"));
   printf(_("  -B, --borderless             Borderless video output window.\n"));
+  printf(_("  -N, --animation              Specify mrl to play when video output isn't used.\n"));
+  printf(_("                                 -can be used more than one time.\n"));
   printf("\n");
   printf(_("examples for valid MRLs (media resource locator):\n"));
   printf(_("  File:  'path/foo.vob'\n"));
@@ -378,6 +381,7 @@ static xine_vo_driver_t *load_video_out_driver(char *video_driver_id) {
 			   / DisplayHeightMM (gGui->display, gGui->screen));
   
   gGui->pixel_aspect    = res_h / res_v;
+  
 #ifdef DEBUG
   printf("pixel_aspect: %f\n", gGui->pixel_aspect);
 #endif
@@ -560,12 +564,18 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     
     /* frontend can e.g. move on to next playlist entry */
   case XINE_EVENT_UI_PLAYBACK_FINISHED:
-    gui_playlist_start_next();
+    if(event->stream == gGui->stream) {
+      gui_playlist_start_next();
+    }
+    else if(event->stream == gGui->visual_anim.stream) {
+      visual_anim_play_next();
+    }
     break;
     
     /* inform ui that new channel info is available */
   case XINE_EVENT_UI_CHANNELS_CHANGED:
-    panel_update_channel_display ();
+    if(event->stream == gGui->stream)
+      panel_update_channel_display ();
     break;
     
     /* request title display change in ui */
@@ -582,7 +592,8 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     {
       xine_ui_data_t *uevent = (xine_ui_data_t *) event->data;
       
-      xine_info((char *)uevent->str);
+      if(event->stream == gGui->stream)
+	xine_info((char *)uevent->str);
     }
     break;
     
@@ -595,8 +606,9 @@ static void event_listener(void *user_data, const xine_event_t *event) {
     {
       xine_audio_level_data_t *aevent = (xine_audio_level_data_t *) event->data;
 
-      printf("XINE_EVENT_AUDIO_LEVEL: left 0>%d<255, right 0>%d<255\n", 
-	     aevent->left, aevent->right);
+      if(event->stream == gGui->stream)
+	printf("XINE_EVENT_AUDIO_LEVEL: left 0>%d<255, right 0>%d<255\n", 
+	       aevent->left, aevent->right);
     }
     break;
 
@@ -611,15 +623,19 @@ static void event_listener(void *user_data, const xine_event_t *event) {
       char                  buffer[1024];
 
 #warning FIXME
-      memset(&buffer, 0, sizeof(buffer));
-      printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
-      sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
-      panel_set_title(buffer);
+      if(event->stream == gGui->stream) {
+	memset(&buffer, 0, sizeof(buffer));
+	printf("XINE_EVENT_PROGRESS: %s [%d%%]\n", pevent->description, pevent->percent);
+	sprintf(buffer, "%s [%d%%]\n", pevent->description, pevent->percent);
+	panel_set_title(buffer);
+      }
     }
     break;
   }
 }
   
+#warning ADAPT ME
+#if 0
 /*
  * Callback of config value change about reporting mode.
  */
@@ -630,8 +646,6 @@ static void unhandled_codec_mode_cb(void *dummy, xine_cfg_entry_t *entry) {
 /*
  * Callback called on codec reporting.
  */
-#warning ADAPT ME
-#if 0
 static void codec_reporting(void *user_data, int codec_type,
 			    uint32_t fourcc, const char *description, int handled) {
   char fourcc_txt[10];
@@ -674,19 +688,18 @@ static void codec_reporting(void *user_data, int codec_type,
  * initialize codec reporting stuff.
  */
 static void init_report_codec(void) {
+#warning ADAPT ME
+#if 0
   static char *warn_unhandled_codec[] = 
     { "never", "video only", "audio only", "always", NULL };
   
   /*
    * Register codec reporting
    */
-#warning ADAPT ME
-#if 0
   if(!xine_register_report_codec_cb(gGui->xine, codec_reporting, (void *) gGui)){
     fprintf(stderr, "xine_register_report_codec_cb() failed: exit\n");
     exit(1);
   }
-#endif
   
   unhandled_codec_mode =
     xine_config_register_enum (gGui->xine,
@@ -698,6 +711,7 @@ static void init_report_codec(void) {
 			       CONFIG_LEVEL_EXP,
 			       unhandled_codec_mode_cb, 
 			       CONFIG_NO_DATA);
+#endif
 }
 
 /*
@@ -772,6 +786,8 @@ int main(int argc, char *argv[]) {
   if (!no_lirc)
     xine_server_init (&_argc, _argv);
 #endif
+
+  visual_anim_init();
 
   /*
    * parse command line
@@ -930,6 +946,10 @@ int main(int argc, char *argv[]) {
       window_attribute.borderless = 1;
       break;
 
+    case 'N':
+      visual_anim_add_animation(optarg);
+      break;
+
     case 'v': /* Display version and exit*/
       show_version();
       exit(1);
@@ -1024,14 +1044,22 @@ int main(int argc, char *argv[]) {
 
   gGui->event_queue = xine_event_new_queue(gGui->stream);
   xine_event_create_listener_thread(gGui->event_queue, event_listener, NULL);
-  
+
 #warning FIXME NEWAPI
 #if 0
   xine_tvmode_init2(gGui->xine);
 #endif
-
+  
   xine_set_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, audio_channel);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_CHANNEL, spu_channel);
+
+  /* Visual animation stream init */
+  gGui->visual_anim.stream = xine_stream_new(gGui->xine, NULL, gGui->vo_driver);
+  gGui->visual_anim.event_queue = xine_event_new_queue(gGui->visual_anim.stream);
+  gGui->visual_anim.current = 0;
+  xine_event_create_listener_thread(gGui->visual_anim.event_queue, event_listener, NULL);
+  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -2);
+  xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
   
   /* init the video window */
   video_window_select_visual ();

@@ -232,9 +232,13 @@ static void video_window_adapt_size (void) {
 
   if(gGui->use_root_window) { /* Using root window, but not really */
 
+    gVw->xwin = gVw->ywin = 0;
     gVw->output_width    = gVw->fullscreen_width;
     gVw->output_height   = gVw->fullscreen_height;
-    
+    gVw->visible_width   = gVw->fullscreen_width;
+    gVw->visible_height  = gVw->fullscreen_height;
+    gVw->visible_aspect  = gGui->pixel_aspect = 1.0;
+
     if(gGui->video_window == None) {
       XGCValues   gcv;
       
@@ -1414,7 +1418,7 @@ void video_window_update_logo(void) {
 	}
 	if((!xine_open(gGui->stream, gGui->logo_mrl)) 
 	   || (!xine_play(gGui->stream, 0, 0))) {
-	  gui_handle_xine_error();
+	  gui_handle_xine_error(gGui->stream);
 	  goto __done;
 	}
 	gGui->logo_mode = 1;

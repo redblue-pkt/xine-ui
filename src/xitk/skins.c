@@ -226,6 +226,7 @@ static int change_skin(skins_locations_t *sk) {
   skins_locations_t   *sks = sk;
   int                  twice = 0, twice_load = 0;
   int                  ret = 0;
+  char                *skin_anim;
 
   if(!sk)
     return -1;
@@ -280,7 +281,15 @@ static int change_skin(skins_locations_t *sk) {
     twice++;
     goto __reload_skin;
   }
-
+  
+  if(gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]) {
+    free(gGui->visual_anim.mrls[gGui->visual_anim.num_mrls]);
+    gGui->visual_anim.mrls[gGui->visual_anim.num_mrls--] = NULL;
+  }
+  if((skin_anim = xitk_skin_get_animation(gGui->skin_config)) != NULL) {
+    gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++] = strdup(skin_anim);
+  }
+  
   { /* Now, change skins for each window */
     typedef struct {
       void (*change_skins)(void);
@@ -347,6 +356,7 @@ void init_skins_support(void) {
   char                 buf[XITK_PATH_MAX + XITK_NAME_MAX + 1];
   int                  twice = 0, twice_load = 0;
   int                  skin_num, i;
+  char                *skin_anim;
     
   change_config_entry = 0;
 
@@ -425,5 +435,9 @@ void init_skins_support(void) {
   }
   
   change_config_entry = 1;
+
+  if((skin_anim = xitk_skin_get_animation(gGui->skin_config)) != NULL) {
+    gGui->visual_anim.mrls[gGui->visual_anim.num_mrls++] = strdup(skin_anim);
+  }
   
 }

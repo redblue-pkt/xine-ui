@@ -72,6 +72,7 @@ typedef struct {
   char                         *date;
   char                         *url;
   char                         *logo;
+  char                         *animation;
 
   pthread_mutex_t               mutex;
   char                         *load_command;

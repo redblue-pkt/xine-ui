@@ -546,6 +546,10 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	    skonfig->load_command = _get_expanded_command(skonfig, p);
 	    return;
 	  }
+	  else if(!strncasecmp(section, "animation", 9)) {
+	    skonfig->animation = strdup(p);
+	    return;
+	  }
 	  else if(!strncasecmp(section, "version", 7)) {
 	    skonfig->version = strtol(p, &p, 10);
 	    return;
@@ -602,6 +606,7 @@ static void check_skonfig(xitk_skin_config_t *skonfig) {
     printf("     uload cmd '%s'\n", skonfig->unload_command);
     printf("     URL       '%s'\n", skonfig->url);
     printf("     logo      '%s'\n", skonfig->logo);
+    printf("     animation '%s'\n", skonfig->animation);
 
     while(s) {
       printf("Section '%s'\n", s->section);
@@ -688,7 +693,8 @@ xitk_skin_config_t *xitk_skin_init_config(void) {
   skonfig->version = -1;
   skonfig->first = skonfig->last = skonfig->celement = NULL;
   skonfig->name = skonfig->author = skonfig->date = skonfig->url = 
-    skonfig->load_command = skonfig->unload_command = skonfig->logo = NULL;
+    skonfig->load_command = skonfig->unload_command = skonfig->logo = 
+    skonfig->animation = NULL;
   skonfig->skinfile = skonfig->path = NULL;
 
   skonfig->ln = skonfig->buf;
@@ -731,6 +737,7 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   XITK_FREE(skonfig->date);
   XITK_FREE(skonfig->url);
   XITK_FREE(skonfig->logo);
+  XITK_FREE(skonfig->animation);
   XITK_FREE(skonfig->path);
   XITK_FREE(skonfig->load_command);
   XITK_FREE(skonfig->unload_command);
@@ -1080,6 +1087,15 @@ int xitk_skin_get_slider_radius(xitk_skin_config_t *skonfig, const char *str) {
     return s->radius;
 
   return 0;
+}
+
+/*
+ *
+ */
+char *xitk_skin_get_animation(xitk_skin_config_t *skonfig) {
+  assert(skonfig);
+  
+  return skonfig->animation;
 }
 
 /*

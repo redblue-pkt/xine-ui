@@ -112,4 +112,11 @@ void gui_reset_zoom(void);
 void gui_toggle_tvmode(void);
 
 void gui_send_expose_to_window(Window window);
+
+void visual_anim_init(void);
+void visual_anim_add_animation(char *mrl);
+void visual_anim_play(void);
+void visual_anim_play_next(void);
+void visual_anim_pause(void);
+void visual_anim_stop(void);
 #endif

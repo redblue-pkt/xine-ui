@@ -36,6 +36,7 @@
 #include "event.h"
 #include "i18n.h"
 #include "viewlog.h"
+#include "actions.h"
 
 #include "xitk.h"
 
@@ -181,10 +182,10 @@ void xine_info(char *message, ...) {
 /*
  * Display an error window error from a xine engine error.
  */
-void gui_handle_xine_error(void) {
+void gui_handle_xine_error(xine_stream_t *stream) {
   int err;
 
-  err = xine_get_error(gGui->stream);
+  err = xine_get_error(stream);
 
   switch(err) {
 
@@ -196,26 +197,26 @@ void gui_handle_xine_error(void) {
     xine_error_with_more(_("- xine engine error -\n\n"
 			   "There is no input plugin available to handle '%s'.\n"
 			   "Maybe MRL syntax is wrong or file/stream source doesn't exist."),
-			 gGui->filename);
+			 (stream == gGui->stream) ? gGui->filename : gGui->visual_anim.mrls[gGui->visual_anim.current]);
     break;
     
   case XINE_ERROR_NO_DEMUX_PLUGIN:
     xine_error_with_more(_("- xine engine error -\n\nThere is no demuxer plugin available "
 			   "to handle '%s'.\n"
 			   "Usually this means that the file format was not recognized."), 
-			 gGui->filename);
+			 (stream == gGui->stream) ? gGui->filename : gGui->visual_anim.mrls[gGui->visual_anim.current]);
     break;
-
+    
   case XINE_ERROR_DEMUX_FAILED:
     xine_error_with_more(_("- xine engine error -\n\nDemuxer failed. "
 			   "Maybe '%s' is a broken file?\n"), 
-			 gGui->filename);
+			 (stream == gGui->stream) ? gGui->filename : gGui->visual_anim.mrls[gGui->visual_anim.current]);
     break;
     
   case XINE_ERROR_MALFORMED_MRL:
     xine_error_with_more(_("- xine engine error -\n\nMalformed mrl. "
 			   "Mrl '%s' seems malformed/invalid.\n"), 
-			 gGui->filename);
+			 (stream == gGui->stream) ? gGui->filename : gGui->visual_anim.mrls[gGui->visual_anim.current]);
     break;
     
   default:

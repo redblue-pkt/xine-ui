@@ -59,6 +59,18 @@ typedef struct {
 
   xine_event_queue_t  *event_queue;
 
+  /* Visual stuff (like animation in video window while audio only playback) */
+  struct {
+    xine_stream_t       *stream;
+    xine_event_queue_t  *event_queue;
+    int                  running;
+    int                  current;
+    int                  enabled;
+
+    char               **mrls;
+    int                  num_mrls;
+  } visual_anim;
+  
   /* xine lib/gui configuration filename */
   char                *configfile;
 
