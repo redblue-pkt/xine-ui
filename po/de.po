@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.18\n"
 "POT-Creation-Date: 2003-02-15 00:05+0100\n"
-"PO-Revision-Date: 2003-02-10 10:20+0100\n"
+"PO-Revision-Date: 2003-02-18 09:01+0100\n"
 "Last-Translator: Philipp Hahn <pmhahn@users.sf.net>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -305,9 +305,8 @@ msgid "A/V offset: %d"
 msgstr "A/V Versatz: %d"
 
 #: src/xitk/event.c:540
-#, fuzzy
 msgid "A/V Offset: reset."
-msgstr "SPU Versatz: Zurücksetzen"
+msgstr "A/V Versatz: Zurücksetzen"
 
 #: src/xitk/event.c:548 src/xitk/event.c:557
 #, c-format
@@ -968,9 +967,8 @@ msgid "      --install                Install a private colormap.\n"
 msgstr "      --install                Installiert eine eigene Farbtabelle.\n"
 
 #: src/xitk/main.c:476
-#, fuzzy
 msgid "      --keymap [=option]       Display keymap. Option are:\n"
-msgstr "      --keymap [option]        Zeigt Tastentabelle. Optionen sind:\n"
+msgstr "      --keymap [=option]       Zeigt Tastentabelle. Optionen sind:\n"
 
 #: src/xitk/main.c:477
 msgid ""
@@ -1037,12 +1035,11 @@ msgid "  -P, --playlist <filename>    Load a playlist file.\n"
 msgstr "  -P, --playlist <Dateiname>   Lädt eine Playliste.\n"
 
 #: src/xitk/main.c:488
-#, fuzzy
 msgid ""
 "  -l, --loop [=mode]           Set playlist loop mode (default: loop). Modes "
 "are:\n"
 msgstr ""
-"  -l, --loop [Modus]           Setzt Playlistwiederholungsmodus (Standard: "
+"  -l, --loop [=Modus]          Setzt Playlistwiederholungsmodus (Standard: "
 "loop). Modi sind:\n"
 
 #: src/xitk/main.c:489
@@ -1357,9 +1354,9 @@ msgid "Discard changes and dismiss the window."
 msgstr "Änderungen verwerfen und Fenster schließen."
 
 #: src/xitk/menus.c:491
-#, fuzzy, c-format
+#, c-format
 msgid "xine %s"
-msgstr "xine Konfiguration"
+msgstr "xine %s"
 
 #: src/xitk/mrl_browser.c:193
 msgid "All extensions"
@@ -1659,7 +1656,7 @@ msgstr "xine Konfiguration"
 
 #: src/xitk/setup.c:1288
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: src/xitk/skins.c:289 src/xitk/skins.c:442
 #, c-format
