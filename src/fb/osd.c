@@ -128,6 +128,13 @@ static void *osd_loop(void *dummy)
 	pthread_detach(pthread_self());
 	while(1) {
 	    sleep(1);
+	    if(fbxine.osd.sinfo_visible) {
+	      fbxine.osd.sinfo_visible--;
+	      if(!fbxine.osd.sinfo_visible) {
+		xine_osd_hide(fbxine.osd.sinfo, 0);
+	      }
+	    }
+
 	    if(fbxine.osd.status_visible) {
 	        fbxine.osd.status_visible--;
 		if(!fbxine.osd.status_visible)
@@ -176,6 +183,11 @@ static char *_osd_get_status_sym(int status) {
 void osd_init(void) {
   int fonth = 20;
 
+  fbxine.osd.sinfo = xine_osd_new(fbxine.stream, 0, 0, 900, (fonth * 6) + (5 * 3));
+  xine_osd_set_font(fbxine.osd.sinfo, "sans", fonth);
+  xine_osd_set_text_palette(fbxine.osd.sinfo, 
+			    XINE_TEXTPALETTE_WHITE_BLACK_TRANSPARENT, XINE_OSD_TEXT1);
+
   memcpy(color, textpalettes_color, sizeof(textpalettes_color));
   memcpy(trans, textpalettes_trans, sizeof(textpalettes_trans));
 
@@ -207,6 +219,11 @@ void osd_deinit(void) {
 
   pthread_cancel(fbxine.osd_thread);
 
+  if(fbxine.osd.sinfo_visible) {
+    fbxine.osd.sinfo_visible = 0;
+    xine_osd_hide(fbxine.osd.sinfo, 0);
+  }
+
   if(fbxine.osd.bar_visible) {
     fbxine.osd.bar_visible = 0;
     xine_osd_hide(fbxine.osd.bar[0], 0);
@@ -223,6 +240,7 @@ void osd_deinit(void) {
     xine_osd_hide(fbxine.osd.info, 0);
   } 
 
+  xine_osd_free(fbxine.osd.sinfo);
   xine_osd_free(fbxine.osd.bar[0]);
   xine_osd_free(fbxine.osd.bar[1]);
   xine_osd_free(fbxine.osd.status);
@@ -322,6 +340,118 @@ void osd_update_status(void) {
     xine_osd_set_position(fbxine.osd.status, 20, 10);
     xine_osd_show(fbxine.osd.status, 0);
     fbxine.osd.status_visible = fbxine.osd.timeout;
+  }
+}
+
+void osd_stream_infos(void) {
+
+  if(fbxine.osd.enabled) {
+    uint32_t    vwidth, vheight, asrate;
+    const char *vcodec, *acodec;
+    char        buffer[256], *p;
+    int         x, y;
+    int         w, h, osdw;
+    int         playedtime, totaltime, pos;
+    int         audiochannel, spuchannel, len;
+
+    vcodec       = xine_get_meta_info(fbxine.stream, XINE_META_INFO_VIDEOCODEC);
+    acodec       = xine_get_meta_info(fbxine.stream, XINE_META_INFO_AUDIOCODEC);
+    vwidth       = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_VIDEO_WIDTH);
+    vheight      = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_VIDEO_HEIGHT);
+    asrate       = xine_get_stream_info(fbxine.stream, XINE_STREAM_INFO_AUDIO_SAMPLERATE);
+    audiochannel = xine_get_param(fbxine.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
+    spuchannel   = xine_get_param(fbxine.stream, XINE_PARAM_SPU_CHANNEL);
+
+    if(!get_pos_length(fbxine.stream, &pos, &playedtime, &totaltime))
+      return;
+    
+    playedtime /= 1000;
+    totaltime  /= 1000;
+
+    xine_osd_clear(fbxine.osd.sinfo);
+
+    y = x = 0;
+
+    xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &osdw, &h);
+    p = buffer;
+    
+    if(vcodec && vwidth && vheight) {
+      sprintf(buffer, "%s: %dX%d", vcodec, vwidth, vheight);
+      xine_osd_draw_text(fbxine.osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &w, &h);
+      if(w > osdw)
+	osdw = w;
+      y += h;
+    }
+
+    if(acodec && asrate) {
+      sprintf(buffer, "%s: %dHz", acodec, asrate);
+      xine_osd_draw_text(fbxine.osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &w, &h);
+      if(w > osdw)
+	osdw = w;
+      y += h;
+    }
+    
+    memset(&buffer, 0, sizeof(buffer));
+
+    sprintf(buffer, "Audio: ");
+    len = strlen(buffer);
+    switch(audiochannel) {
+    case -2:
+      sprintf(buffer, "%soff", buffer);
+      break;
+    case -1:
+      if(!xine_get_audio_lang (fbxine.stream, audiochannel, &buffer[len]))
+	sprintf(buffer, "%sauto", buffer);
+      break;
+    default:
+      if(!xine_get_audio_lang (fbxine.stream, audiochannel, &buffer[len]))
+	sprintf(buffer, "%s%3d", buffer, audiochannel);
+      break;
+    }
+
+    sprintf(buffer, "%s, Spu: ", buffer);
+    len = strlen(buffer);
+    switch (spuchannel) {
+    case -2:
+      sprintf(buffer, "%soff", buffer);
+      break;
+    case -1:
+      if(!xine_get_spu_lang (fbxine.stream, spuchannel, &buffer[len]))
+	sprintf(buffer, "%sauto", buffer);
+      break;
+    default:
+      if(!xine_get_spu_lang (fbxine.stream, spuchannel, &buffer[len]))
+        sprintf(buffer, "%s%3d", buffer, spuchannel);
+      break;
+    }
+    sprintf(buffer, "%s.", buffer);
+    xine_osd_draw_text(fbxine.osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
+    xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &w, &h);
+    if(w > osdw)
+      osdw = w;
+    
+    y += (h);
+
+    if(totaltime) {
+      sprintf(buffer, "%d:%.2d:%.2d (%.0f%%) of %d:%.2d:%.2d",
+	      playedtime / 3600, (playedtime % 3600) / 60, playedtime % 60,
+	      ((float)playedtime / (float)totaltime) * 100,
+	      totaltime / 3600, (totaltime % 3600) / 60, totaltime % 60);
+      xine_osd_draw_text(fbxine.osd.sinfo, x, y, buffer, XINE_OSD_TEXT1);
+      xine_osd_get_text_size(fbxine.osd.sinfo, buffer, &w, &h);
+      if(w > osdw)
+	osdw = w;
+
+      osd_stream_position();
+    }
+    
+    x = (vwidth - osdw) - 40;
+    xine_osd_set_position(fbxine.osd.sinfo, (x >= 0) ? x : 0, 15);
+
+    xine_osd_show(fbxine.osd.sinfo, 0);
+    fbxine.osd.sinfo_visible = fbxine.osd.timeout;
   }
 }
 

@@ -51,6 +51,8 @@ static const struct
 		  "SpuNext", ACTID_SPU_NEXT },
 	{ "Select previous sub picture (subtitle) channel.",
 		  "SpuPrior", ACTID_SPU_PRIOR },
+	{ "Select default sub picture (subtitle) channel.",
+		  "SpuDefault", ACTID_SPU_DEFAULT },
 	{ "Select next audio channel.",
 		  "AudioChannelNext", ACTID_AUDIOCHAN_NEXT },
 	{ "Select previous audio channel.",
@@ -322,6 +324,24 @@ void change_audio_channel(void *data)
 	osd_display_audio_lang();
 }
 
+void change_spu(void *data) 
+{
+        int dir = (int)data;
+	int channel;
+  
+	channel = xine_get_param(fbxine.stream, XINE_PARAM_SPU_CHANNEL);
+  
+	if(dir == GUI_NEXT)
+	     channel++;
+	else if(dir == GUI_PREV)
+	     channel--;
+	else if(dir == GUI_RESET)
+	     channel = -1;
+  
+        xine_set_param(fbxine.stream, XINE_PARAM_SPU_CHANNEL, channel);
+	osd_display_spu_lang();
+}
+
 void do_action(int action)
 {
 	if(action & ACTID_IS_INPUT_EVENT)
@@ -394,6 +414,22 @@ void do_action(int action)
 		        change_audio_channel((void*)GUI_RESET);
 			break;
 			
+	        case ACTID_SPU_NEXT:
+		        change_spu((void*)GUI_NEXT);
+			break;
+
+	        case ACTID_SPU_PRIOR:
+		        change_spu((void*)GUI_PREV);
+			break;
+
+	        case ACTID_SPU_DEFAULT:
+		        change_spu((void*)GUI_RESET);
+			break;
+			
+	        case ACTID_OSD_SINFOS:
+		        osd_stream_infos();
+		        break;
+		  
 		case ACTID_PAUSE:
 			action_pause();
 			break;

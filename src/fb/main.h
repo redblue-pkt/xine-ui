@@ -104,6 +104,9 @@ struct fbxine
     int                     enabled;
     int                     timeout;
 
+    xine_osd_t             *sinfo;
+    int                     sinfo_visible;
+
     xine_osd_t             *bar[2];
     int                     bar_visible;
 
