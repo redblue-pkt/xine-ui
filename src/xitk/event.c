@@ -257,9 +257,9 @@ void config_reset(void) {
 /*
  *
  */
-static void gui_signal_handler (int sig) {
+static void gui_signal_handler (int sig, void *data) {
   pid_t     cur_pid = getppid();
-
+  
   switch (sig) {
 
   case SIGHUP:
@@ -278,6 +278,13 @@ static void gui_signal_handler (int sig) {
   case SIGUSR2:
     if(cur_pid == xine_pid) {
       printf("SIGUSR2 received\n");
+    }
+    break;
+
+  case SIGINT:
+  case SIGTERM:
+    if(cur_pid == xine_pid) {
+      config_save();
     }
     break;
   }
@@ -992,7 +999,6 @@ void gui_init (int nfiles, char *filenames[]) {
  *
  */
 void gui_run (void) {
-  struct sigaction      action;
 
   panel_add_autoplay_buttons();
   panel_add_mixer_control();
@@ -1051,25 +1057,11 @@ void gui_run (void) {
       gGui->actions_on_start[1] = ACTID_NOKEY;
     }
   }
-  /* install sighandler */
-  action.sa_handler = gui_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGHUP, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGHUP) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = gui_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGUSR1, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGUSR1) failed: %s\n", strerror(errno));
-  }
-  action.sa_handler = gui_signal_handler;
-  sigemptyset(&(action.sa_mask));
-  action.sa_flags = 0;
-  if(sigaction(SIGUSR2, &action, NULL) != 0) {
-    fprintf(stderr, "sigaction(SIGUSR2) failed: %s\n", strerror(errno));
-  }
+
+  /* We can't handle signals here, xitk handle this, so
+   * give a function callback for this.
+   */
+  xitk_register_signal_handler(gui_signal_handler, NULL);
 
   /*
    * event loop

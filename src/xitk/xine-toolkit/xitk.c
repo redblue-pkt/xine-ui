@@ -79,6 +79,7 @@ static int ml = 0;
 
 typedef void (*widget_event_callback_t)(XEvent *event, void *user_data);
 typedef void (*widget_newpos_callback_t)(int, int, int, int);
+typedef void (*xitk_signal_callback_t)(int, void *);
 
 typedef struct {
   Window                      window;
@@ -117,6 +118,8 @@ typedef struct {
   int                         running;
   xitk_register_key_t         key;
   xitk_config_t              *config;
+  xitk_signal_callback_t      sig_callback;
+  void                       *sig_data;
 } __xitk_t;
 
 static __xitk_t    *gXitk;
@@ -148,6 +151,10 @@ void xitk_usec_sleep(unsigned usec) {
 static void xitk_signal_handler(int sig) {
   pid_t cur_pid = getppid();
 
+  /* First, call registered handler */
+  if(gXitk->sig_callback)
+    gXitk->sig_callback(sig, gXitk->sig_data);
+  
   switch (sig) {
 
   case SIGINT:
@@ -247,6 +254,17 @@ void xitk_change_window_for_event_handler (xitk_register_key_t key, Window windo
 
   MUTUNLOCK();
 }
+
+/*
+ * Register a callback function called when a signal happen.
+ */
+void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data) {
+  if(sigcb) {
+    gXitk->sig_callback = sigcb;
+    gXitk->sig_data     = user_data;
+  }
+}
+
 /*
  * Register a window, with his own event handler, callback
  * for DND events, and widget list.
@@ -588,12 +606,13 @@ void xitk_init(Display *display) {
 
   gXitk = (__xitk_t *) xitk_xmalloc(sizeof(__xitk_t));
 
-  gXitk->list    = xitk_list_new();
-  gXitk->gfx     = xitk_list_new();
-  gXitk->display = display;
-  gXitk->key     = 0;
-
-  gXitk->config = xitk_config_init();
+  gXitk->list         = xitk_list_new();
+  gXitk->gfx          = xitk_list_new();
+  gXitk->display      = display;
+  gXitk->key          = 0;
+  gXitk->sig_callback = NULL;
+  gXitk->sig_data     = NULL;
+  gXitk->config       = xitk_config_init();
   
   pthread_mutex_init (&gXitk->mutex, NULL);
 
@@ -608,6 +627,24 @@ void xitk_run(void) {
   struct sigaction  action;
   __gfx_t          *fx;
 
+  action.sa_handler = xitk_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGHUP, &action, NULL) != 0) {
+    XITK_WARNING("sigaction(SIGHUP) failed: %s\n", strerror(errno));
+  }
+  action.sa_handler = xitk_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGUSR1, &action, NULL) != 0) {
+    XITK_WARNING("sigaction(SIGUSR1) failed: %s\n", strerror(errno));
+  }
+  action.sa_handler = xitk_signal_handler;
+  sigemptyset(&(action.sa_mask));
+  action.sa_flags = 0;
+  if(sigaction(SIGUSR2, &action, NULL) != 0) {
+    XITK_WARNING("sigaction(SIGUSR2) failed: %s\n", strerror(errno));
+  }
   action.sa_handler = xitk_signal_handler;
   sigemptyset(&(action.sa_mask));
   action.sa_flags = 0;
@@ -626,18 +663,18 @@ void xitk_run(void) {
   if(sigaction(SIGQUIT, &action, NULL) != 0) {
     XITK_WARNING("sigaction(SIGQUIT) failed: %s\n", strerror(errno));
   }
-
+  
   gXitk->running = 1;
-
+  
   /*
    * Force to repain the widget list if it exist
    */
   MUTLOCK();
-
+  
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
   
   while(fx) {
-
+    
     if(fx->window != None && fx->widget_list) {
       XEvent xexp;
       

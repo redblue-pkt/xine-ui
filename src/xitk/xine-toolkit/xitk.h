@@ -240,6 +240,12 @@ typedef void (*widget_event_callback_t)(XEvent *event, void *data);
 typedef void (*widget_newpos_callback_t)(int, int, int, int);
 
 /*
+ * Signal handler callback function.
+ * Xitk will call this function when a signal happen.
+ */
+typedef void (*xitk_signal_callback_t)(int, void *);
+
+/*
  * A unique key returned by register function.
  * It is necessary to store it at program side,
  * because it will be necessary to pass it for
@@ -257,6 +263,11 @@ xitk_widget_list_t *xitk_widget_list_new (void);
  * Humm, this should be probably removed soon.
  */
 void xitk_change_window_for_event_handler (xitk_register_key_t key, Window window);
+
+/*
+ * Register a callback function called when a signal heppen.
+ */
+void xitk_register_signal_handler(xitk_signal_callback_t sigcb, void *user_data);
 
 /*
  * Register function:
