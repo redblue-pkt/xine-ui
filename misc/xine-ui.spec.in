@@ -50,7 +50,7 @@ werden die xine-Bibliotheken aus libxine verwendet. Weitere Informationen
 export CFLAGS="%{optflags}"
 
 if [ ! -f configure ]; then
-   NO_CONFIGURE=1 ./cvscompile.sh
+   NO_CONFIGURE=1 ./autogen.sh
 fi
 
 #
@@ -231,6 +231,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_datadir}/locale/*
 
 %changelog
+* Sat Nov 16 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
+- replaced cvscompile.sh with autogen.sh
 * Sat Nov 09 2002 Manfred Tremmel <Manfred.Tremmel@iiv.de>
 - Final changes for libxine 1.0alpha1
 * Wed Nov 06 2002 Bill Fink <billfink@mindspring.com>
