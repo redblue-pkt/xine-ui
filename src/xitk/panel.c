@@ -251,7 +251,9 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
 
   if (panel->visible) {
-
+    
+    XLockDisplay(gGui->display);
+    
     if (video_window_is_visible ()) {
       panel->visible = 0;
       XUnmapWindow (gGui->display, gGui->panel_window);
@@ -260,14 +262,20 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
 
     if(gGui->cursor_grabbed)
        XGrabPointer(gGui->display, gGui->video_window, 1, None, GrabModeAsync, GrabModeAsync, gGui->video_window, None, CurrentTime);
+    
+    XUnlockDisplay(gGui->display);
      
   } else {
 
     panel->visible = 1;
     xitk_show_widgets(panel->widget_list);
+
+    XLockDisplay(gGui->display);
+
     XMapRaised(gGui->display, gGui->panel_window); 
     XSetTransientForHint (gGui->display, 
 			  gGui->panel_window, gGui->video_window);
+
 
     layer_above_video(gGui->panel_window);
      
@@ -282,6 +290,8 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     if(gGui->XF86VidMode_fullscreen)
        XMoveWindow(gGui->display, gGui->panel_window, 0, 0);
 #endif
+
+    XUnlockDisplay(gGui->display);
   }
 
   gGui->config->update_num (gGui->config, "gui.panel_visible", panel->visible);
@@ -360,7 +370,7 @@ void panel_toggle_audio_mute(xitk_widget_t *w, void *data, int state) {
  *  to snapshot current frame.
  */
 void panel_snapshot(xitk_widget_t *w, void *data) {
-  create_snapshot( gGui );
+  create_snapshot(gGui);
 }
 
 /*

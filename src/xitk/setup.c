@@ -300,14 +300,18 @@ void setup_raise_window(void) {
     if(setup->xwin) {
       if(setup->visible && setup->running) {
 	if(setup->running) {
+	  XLockDisplay(gGui->display);
 	  XMapRaised(gGui->display, xitk_window_get_window(setup->xwin));
 	  setup->visible = 1;
 	  XSetTransientForHint (gGui->display, 
 				xitk_window_get_window(setup->xwin), gGui->video_window);
+	  XUnlockDisplay(gGui->display);
 	  layer_above_video(xitk_window_get_window(setup->xwin));
 	}
       } else {
+	XLockDisplay(gGui->display);
 	XUnmapWindow (gGui->display, xitk_window_get_window(setup->xwin));
+	XUnlockDisplay(gGui->display);
 	setup->visible = 0;
       }
     }
@@ -322,14 +326,18 @@ void setup_toggle_panel_visibility (xitk_widget_t *w, void *data) {
     if (setup->visible && setup->running) {
       setup->visible = 0;
       xitk_hide_widgets(setup->widget_list);
+      XLockDisplay(gGui->display);
       XUnmapWindow (gGui->display, xitk_window_get_window(setup->xwin));
+      XUnlockDisplay(gGui->display);
     } else {
       if(setup->running) {
 	setup->visible = 1;
 	xitk_show_widgets(setup->widget_list);
+	XLockDisplay(gGui->display);
 	XMapRaised(gGui->display, xitk_window_get_window(setup->xwin)); 
 	XSetTransientForHint (gGui->display, 
 			      xitk_window_get_window(setup->xwin), gGui->video_window);
+	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(setup->xwin));
       }
     }

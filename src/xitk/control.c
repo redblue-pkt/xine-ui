@@ -240,7 +240,9 @@ void control_raise_window(void) {
 	  layer_above_video(control->window);
 	}
       } else {
+	XLockDisplay(gGui->display);
 	XUnmapWindow (gGui->display, control->window);
+	XUnlockDisplay(gGui->display);
 	control->visible = 0;
       }
     }

@@ -466,7 +466,9 @@ void pl_raise_window(void) {
 	  layer_above_video(playlist->window);
 	}
       } else {
+	XLockDisplay(gGui->display);
 	XUnmapWindow (gGui->display, playlist->window);
+	XUnlockDisplay(gGui->display);
       }
     }
   }

@@ -41,6 +41,7 @@
 
 typedef struct {
   pthread_t             thread;
+  pthread_mutex_t       mutex;
   xitk_widget_t        *w;
   xitk_widget_list_t   *wl;
   xitk_window_t        *xwin;
@@ -58,9 +59,13 @@ static void *xitk_tips_destroy_thread(void *data) {
   disptips = tp;
 
   pthread_detach(pthread_self());
+
+  pthread_mutex_init(&tp->mutex, NULL);
   
   /* Waiting enought time to read the tips */
   xitk_usec_sleep(1500000);
+
+  pthread_mutex_lock(&tp->mutex);
 
   /* Kill tips window */
   xitk_window_destroy_window(tp->w->imlibdata, tp->xwin);
@@ -69,6 +74,9 @@ static void *xitk_tips_destroy_thread(void *data) {
   XLOCK(tp->w->imlibdata->x.disp);
   XFlush(tp->w->imlibdata->x.disp);
   XUNLOCK(tp->w->imlibdata->x.disp);
+
+  pthread_mutex_unlock(&tp->mutex);
+  pthread_mutex_destroy(&tp->mutex);
 
   XITK_FREE(tp);
 
@@ -82,7 +90,7 @@ static void *xitk_tips_destroy_thread(void *data) {
  */
 static void *xitk_tips_thread(void *data) {
   tips_private_t     *tp = (tips_private_t *)data;
-  int                 x, y, string_length;
+  int                 x, y, string_length, string_ascent, string_descent;
   xitk_image_t       *i;
   xitk_font_t        *fs;
   XWindowAttributes   wattr;
@@ -109,6 +117,8 @@ static void *xitk_tips_thread(void *data) {
   fs = xitk_font_load_font(tp->w->imlibdata->x.disp, DEFAULT_FONT_10);
   xitk_font_set_font(fs, tp->wl->gc);
   string_length = xitk_font_get_string_length(fs, tp->w->tips_string);
+  string_ascent = xitk_font_get_ascent(fs, tp->w->tips_string);
+  string_descent = xitk_font_get_descent(fs, tp->w->tips_string);
   xitk_font_unload_font(fs);
 
   i = xitk_image_create_image_from_string(tp->w->imlibdata, DEFAULT_FONT_10,
@@ -131,7 +141,7 @@ static void *xitk_tips_thread(void *data) {
     XCopyArea(tp->w->imlibdata->x.disp, (xitk_window_get_background(tp->xwin)), bg,
     	      gc, 0, 0, width, height, 0, 0);
     XCopyArea(tp->w->imlibdata->x.disp, i->image, bg, 
-	      gc, 0, 0, i->width, i->height, (width - i->width)>>1, (height - i->height)>>1);
+	      gc, 0, 0, i->width, i->height, (width - i->width)>>1, ((height - i->height)>>1) + 1);
     XUNLOCK(tp->w->imlibdata->x.disp);
     
     xitk_window_change_background(tp->w->imlibdata, tp->xwin, bg, width, height);
@@ -150,7 +160,7 @@ static void *xitk_tips_thread(void *data) {
 
   if(wattr.map_state == IsViewable)
     XSetInputFocus(tp->w->imlibdata->x.disp, tp->wl->win, RevertToNone, CurrentTime);
-
+  
   XUNLOCK(tp->w->imlibdata->x.disp);
   
   tp->key = xitk_register_event_handler("xitk tips", 
@@ -190,6 +200,9 @@ void xitk_tips_create(xitk_widget_t *w, xitk_widget_list_t *wl) {
   
   /* If there a current tips displayed, hide it */
   if(disptips != NULL) {
+
+    pthread_mutex_lock(&disptips->mutex);
+
     pthread_cancel(disptips->thread);
     
     xitk_window_destroy_window(disptips->w->imlibdata, disptips->xwin);
@@ -199,6 +212,9 @@ void xitk_tips_create(xitk_widget_t *w, xitk_widget_list_t *wl) {
     XFlush(disptips->w->imlibdata->x.disp);
     XUNLOCK(disptips->w->imlibdata->x.disp);
     
+    pthread_mutex_unlock(&disptips->mutex);
+    pthread_mutex_destroy(&disptips->mutex);
+
     XITK_FREE(disptips);
     disptips = NULL;
   }
@@ -217,8 +233,8 @@ void xitk_tips_create(xitk_widget_t *w, xitk_widget_list_t *wl) {
     
     pthread_create(&w->tips_thread, &pth_attrs, xitk_tips_thread, (void *)tp);
   }
-  else 
-    w->tips_thread = 0;
+  //  else 
+  //    w->tips_thread = 0;
 }
 
 /*
