@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-0.9.9\n"
-"POT-Creation-Date: 2003-04-17 14:59+0200\n"
-"PO-Revision-Date: 2002-06-20 16:55+0200\n"
+"POT-Creation-Date: 2003-07-18 21:47+0200\n"
+"PO-Revision-Date: 2002-07-18 22:36+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -25,40 +25,45 @@ msgstr "Pøehrání aktuální polo¾ky"
 msgid "Close MRL browser window"
 msgstr "Zavøení okna prohlí¾eèe MRL"
 
-#: src/xitk/xine-toolkit/test.c:112
+#: src/xitk/xine-toolkit/test.c:116
 msgid "XInitThreads() failed.\n"
 msgstr "Funkce XInitThreads() selhala.\n"
 
-#: src/xitk/xine-toolkit/test.c:119
+#: src/xitk/xine-toolkit/test.c:123
 msgid "Cannot open display\n"
 msgstr "Nelze inicializovat obrazovku\n"
 
-#: src/xitk/xine-toolkit/test.c:133
+#: src/xitk/xine-toolkit/test.c:137
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Funkce Imlib_init_with_params() selhala.\n"
 
-#: src/xitk/xine-toolkit/test.c:355
+#: src/xitk/xine-toolkit/test.c:366
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "Nová èíselná hodnota je: %d. Potvrdit ?"
 
-#: src/xitk/xine-toolkit/test.c:449
+#: src/xitk/xine-toolkit/test.c:418
+#, c-format
+msgid "New double value is: %e. Confirm ?"
+msgstr "Nová èíselná hodnota je: %e. Potvrdit ?"
+
+#: src/xitk/xine-toolkit/test.c:514
 msgid "My Frame"
 msgstr "Mùj rámec"
 
-#: src/xitk/xine-toolkit/test.c:488
+#: src/xitk/xine-toolkit/test.c:554
 msgid "A Label"
 msgstr "Popisek"
 
-#: src/xitk/xine-toolkit/test.c:546
+#: src/xitk/xine-toolkit/test.c:614
 msgid "Fire !!"
 msgstr "Pal !!"
 
-#: src/xitk/xine-toolkit/test.c:577
+#: src/xitk/xine-toolkit/test.c:645
 msgid "!BOOM!"
 msgstr "!BUM!"
 
-#: src/xitk/xine-toolkit/test.c:666
+#: src/xitk/xine-toolkit/test.c:737
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -67,42 +72,42 @@ msgstr ""
 "Nový výbìr polo¾ek v seznamu je:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:848
+#: src/xitk/xine-toolkit/test.c:923
 msgid "init_test() failed\n"
 msgstr "Funkce init_test() selhala\n"
 
-#: src/xitk/xine-toolkit/test.c:864
+#: src/xitk/xine-toolkit/test.c:939
 msgid "My Fucking Window"
 msgstr "Mé pos*** okno"
 
-#: src/xitk/xine-toolkit/test.c:881
+#: src/xitk/xine-toolkit/test.c:956
 msgid "Quit"
 msgstr "Konec"
 
-#: src/xitk/xine-toolkit/window.c:968
+#: src/xitk/xine-toolkit/window.c:973
 msgid "OK"
 msgstr "OK"
 
-#: src/xitk/xine-toolkit/window.c:1032 src/xitk/xine-toolkit/window.c:1235
+#: src/xitk/xine-toolkit/window.c:1037 src/xitk/xine-toolkit/window.c:1243
 msgid "Question?"
 msgstr "Otázka?"
 
-#: src/xitk/xine-toolkit/window.c:1165 src/xitk/xine-toolkit/window.c:1382
+#: src/xitk/xine-toolkit/window.c:1173 src/xitk/xine-toolkit/window.c:1393
 msgid "Yes"
 msgstr "Ano"
 
-#: src/xitk/xine-toolkit/window.c:1165 src/xitk/xine-toolkit/window.c:1382
+#: src/xitk/xine-toolkit/window.c:1173 src/xitk/xine-toolkit/window.c:1393
 msgid "No"
 msgstr "Ne"
 
-#: src/xitk/xine-toolkit/window.c:1382
+#: src/xitk/xine-toolkit/window.c:1393
 msgid "Cancel"
 msgstr "Zru¹it"
 
-#: src/xitk/xine-toolkit/xitk.h:2124 src/xitk/xine-toolkit/xitk.h:2133
+#: src/xitk/xine-toolkit/xitk.h:2166 src/xitk/xine-toolkit/xitk.h:2175
 msgid "Error"
 msgstr "Chyba"
 
-#: src/xitk/xine-toolkit/xitk.h:2127 src/xitk/xine-toolkit/xitk.h:2136
+#: src/xitk/xine-toolkit/xitk.h:2169 src/xitk/xine-toolkit/xitk.h:2178
 msgid "Information"
 msgstr "Informace"
