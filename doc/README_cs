@@ -23,7 +23,7 @@
    2.4.4 LIRC
    2.4.5 Nastavení konfiguraèních voleb xine na pøíkazové øádce
 
-   3   CO JE©TÌ NENÍ ØEÈENO
+   3   CO JE©TÌ NEBYLO ØEÈENO
    3.1 Svoboda a DVD...
 
    4   Kontakt na projekt xine
@@ -348,10 +348,23 @@
       Eventuálnì mù¾e být k výbìru kanálu s titulky pou¾ito grafické 
       u¾ivatelské rozhraní.
 
-      Titulky v oddìleném textovém souboru lze také pou¾ít, soubor s titulky
-      se oddìluje znakem '%':
+      Titulky v oddìleném textovém souboru lze také pou¾ít. Volba pro soubor
+      s titulky se uvede za znakem '#':
 
-       xine test.avi%test.sub
+       xine test.avi#subtitle:test.sub
+
+      Pro správné zobrazení èeských znakù musíte zmìnit font titulkù ze "sans"
+      na "sanshu". Lze to provést buï v konfiguraèním dialogu nebo editací
+      konfiguraèního souboru ~/.xine/config2. Ten by mìl obsahovat tyto údaje:
+
+      # string, default: sans
+        codec.spu_font:sanshu
+
+      # string, default: windows-1250
+        codec.spu_src_encoding:windows-1250
+
+      # string, default: iso-8859-2
+        codec.spu_dst_encoding:iso-8859-2
 
 2.4.4 LIRC
 
@@ -422,7 +435,7 @@
       Tato nastavení nebudou ulo¾ena v konfiguraèním souboru, jsou pouze
       doèasná.
 
-3   CO JE©TÌ NENÍ ØEÈENO
+3   CO JE©TÌ NEBYLO ØEÈENO
 
 3.1 Svoboda a DVD...
 
