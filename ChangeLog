@@ -1,9 +1,33 @@
 xine-ui (0.9.23) unstable; urgency=low
   * xinerama bug fixes (very fullscreen, window position when switching from
-    fullscreen to normal mode)
-  * shiny new help dialog
-  * some small usability improvements
-
+    fullscreen to normal mode),
+  * shiny new help dialog,
+  * some small usability improvements,
+  * fix some memleaks,
+  * main menu reorg, localized,
+  * new deinterlacing, it use post plugins now,
+  * add --bug-report and --list-plugins option to xine-ui,
+  * splash screen per skin is possible,
+  * all meta infos are retrieve at the same time, when playing audio CD,
+  * support new unscaled OSD (note: osd need a complete rework),
+  * new playlist management command in xine-remote,
+  * new "stop after this stream" feature,
+  * grab streams recusively (with enqueuing and file browser),
+  * fix reference mrl handling,
+  * add 'loop' and two new playlist options 'first' and 'last', in session control,
+  * fix shortcut grabber,
+  * sound volume control can be sets with sound card mixer or software amplification,
+  * add help in chain reaction window,
+  * double clicking in output window is a fullscreen toggle now,
+  * subtitle autoload feature added,
+  * new TVout feature, using libnvtvsimple for nVIDIA cards, and atitvout for ATI,
+  * store spu offset in toxine's playlist,
+  * fix skin downloder,
+  * fix support of huge playlists,
+  * contextual menu popup in playlist window,
+  * fix control's window sliders,
+  * bunch of other fix.
+	
 xine-ui (0.9.22) unstable; urgency=low
 
   * control xine and fbxine via stdin, patch from Dirk Meyer <dmeyer@tzi.de>,
