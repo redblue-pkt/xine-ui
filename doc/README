@@ -82,8 +82,8 @@
     - if you can't get Xv to run on your platform you should use 16bpp 
       colordepth for speed. Xv seems to work nicely for any color-depth.
       
-    - if you have a mga G200 / G400 graphics adaptor you can optionally
-      use the sybcfb/teletux video ouput driver. See README.syncfb for 
+    - if you have a Matrox G200/G400/G450 graphics adaptor you can optionally
+      use the sybcfb/teletux video ouput driver. See README.syncfb for more
       details.
       
     - for audio playback OSS, ALSA, ESD and ARTSD are supported.

@@ -1,7 +1,7 @@
 
-  =====                                                            =====
-       XINE video output plugin for MATROX G400 / G200 cards *only*
-  =====                                                            =====
+  =====                                                               =====
+       XINE video output plugin for MATROX G200/G400/G450 cards *only*
+  =====                                                               =====
 
 
    VERSION
@@ -24,8 +24,8 @@
 * WHAT IS THIS PLUGIN ABOUT and WHY SHOULD I EVEN CONSIDER TO USE IT? :)
   
   This XINE video output plugin uses the so called  SyncFB  driver (from
-  the Teletux project) which provides special hardware  features  of the
-  Matrox G400 and G200 cards like hardware  deinterlacing,  scaling  and
+  the Teletux project)  which  provides  special  hardware  features  of
+  Matrox G200 and newer cards like hardware  deinterlacing, scaling  and
   synchronization of your video output to the vertical retrace  of  your
   monitor - just to name a few. The  plugin  makes  all  those  features
   available to XINE and because all this tasks are done by the  graphics
@@ -51,7 +51,17 @@
   All current deinterlacers in XINE are done in software  and  therefore
   will cost you some CPU power. The SyncFB video out plugin will use the
   hardware deinterlacing support of your graphics card, thus saving your
-  CPU power because everything is done by your G400/G200 card...
+  CPU power because everything is done by your graphic processor...
+
+
+* WILL IT WORK WITH MY G200/G400/G450/... CARD?
+
+  So far the plugin and the kernel module itself are only  being  tested
+  on G400 cards by its  developers  thus  we  cannot  tell  about  newer
+  or older generation chips.
+  
+  Nevertheless we have received positive feedback that the SyncFB kernel
+  module and this plugin work fine with G450 cards too.
   
 
 * AND HOW DOES IT WORK?
