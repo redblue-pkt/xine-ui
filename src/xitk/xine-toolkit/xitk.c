@@ -1567,6 +1567,8 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   fd_set            r;
   Bool              got_event;
   __gfx_t          *fx;
+  struct timeval    tv;
+  int               xconnection;
 
   action.sa_handler = xitk_signal_handler;
   sigemptyset(&(action.sa_mask));
@@ -1652,28 +1654,40 @@ void xitk_run(xitk_startup_callback_t cb, void *data) {
   if(cb)
     cb(data);
 
+  XLOCK(gXitk->display);
+  xconnection = ConnectionNumber(gXitk->display);
+  XUNLOCK(gXitk->display);
+  
   /*
    * Now, wait for a new xevent
    */
   while(gXitk->running) {
     
     FD_ZERO(&r);
-    FD_SET(ConnectionNumber(gXitk->display), &r);
-    select(ConnectionNumber(gXitk->display) + 1, &r, 0, 0, NULL);
+    FD_SET(xconnection, &r);
+
+    tv.tv_sec  = 0;
+    tv.tv_usec = 33000;
+
+    select(xconnection + 1, &r, 0, 0, &tv);
     
-    XLOCK(gXitk->display);
-    got_event = XCheckIfEvent(gXitk->display, &myevent, is_event, (XPointer) NULL);
-    XUNLOCK(gXitk->display);
-    
-    while(got_event == True) {
-      
-      xitk_xevent_notify(&myevent);
-      
+    if(FD_ISSET(xconnection, &r)) {
+
       XLOCK(gXitk->display);
       got_event = XCheckIfEvent(gXitk->display, &myevent, is_event, (XPointer) NULL);
       XUNLOCK(gXitk->display);
+      
+      while(got_event == True) {
+	
+	xitk_xevent_notify(&myevent);
+	
+	XLOCK(gXitk->display);
+	got_event = XCheckIfEvent(gXitk->display, &myevent, is_event, (XPointer) NULL);
+	XUNLOCK(gXitk->display);
+      }
+
     }
-   
+
   }
 
   xitk_list_free(gXitk->list);
