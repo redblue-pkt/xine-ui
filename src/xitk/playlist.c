@@ -707,8 +707,12 @@ int playlist_is_running(void) {
  */
 int playlist_is_visible(void) {
 
-  if(playlist != NULL)
-    return playlist->visible;
+  if(playlist != NULL) {
+    if(gGui->use_root_window)
+      return xitk_is_window_visible(gGui->display, playlist->window);
+    else
+      return playlist->visible;
+  }
 
   return 0;
 }
@@ -787,8 +791,8 @@ void playlist_raise_window(void) {
 	XUnmapWindow(gGui->display, playlist->window); 
 	XRaiseWindow(gGui->display, playlist->window); 
 	XMapWindow(gGui->display, playlist->window); 
-	XSetTransientForHint (gGui->display, 
-			      playlist->window, gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, playlist->window, gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(playlist->window);
       }
@@ -801,23 +805,32 @@ void playlist_raise_window(void) {
  * Hide/show the pl panel
  */
 void playlist_toggle_visibility (xitk_widget_t *w, void *data) {
-  
+
   if(playlist != NULL) {
     if (playlist->visible && playlist->running) {
-      playlist->visible = 0;
-      xitk_hide_widgets(playlist->widget_list);
       XLockDisplay(gGui->display);
-      XUnmapWindow (gGui->display, playlist->window);
+      if(gGui->use_root_window) {
+	if(xitk_is_window_visible(gGui->display, playlist->window))
+	  XIconifyWindow(gGui->display, playlist->window, gGui->screen);
+	else
+	  XMapWindow(gGui->display, playlist->window);
+      }
+      else {
+	playlist->visible = 0;
+	xitk_hide_widgets(playlist->widget_list);
+	XUnmapWindow (gGui->display, playlist->window);
+      }
       XUnlockDisplay(gGui->display);
-    } else {
+    } 
+    else {
       if(playlist->running) {
 	playlist->visible = 1;
 	xitk_show_widgets(playlist->widget_list);
 	XLockDisplay(gGui->display);
 	XRaiseWindow(gGui->display, playlist->window); 
 	XMapWindow(gGui->display, playlist->window); 
-	XSetTransientForHint (gGui->display, 
-			      playlist->window, gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, playlist->window, gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(playlist->window);
       }
@@ -916,7 +929,8 @@ void playlist_change_skins(void) {
 
     XLockDisplay(gGui->display);
     
-    XSetTransientForHint(gGui->display, playlist->window, gGui->video_window);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, playlist->window, gGui->video_window);
     
     Imlib_destroy_image(gGui->imlib_data, old_img);
     Imlib_apply_image(gGui->imlib_data, new_img, playlist->window);

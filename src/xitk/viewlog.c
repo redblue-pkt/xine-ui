@@ -121,8 +121,12 @@ int viewlog_is_running(void) {
  */
 int viewlog_is_visible(void) {
 
-  if(viewlog != NULL)
-    return viewlog->visible;
+  if(viewlog != NULL) {
+    if(gGui->use_root_window)
+      return xitk_is_window_visible(gGui->display, xitk_window_get_window(viewlog->xwin));
+    else
+      return viewlog->visible;
+  }
 
   return 0;
 }
@@ -139,8 +143,9 @@ void viewlog_raise_window(void) {
 	XUnmapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
 	XRaiseWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
 	XMapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
-	XSetTransientForHint (gGui->display, 
-			      xitk_window_get_window(viewlog->xwin), gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, 
+				xitk_window_get_window(viewlog->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(viewlog->xwin));
       }
@@ -154,20 +159,30 @@ void viewlog_toggle_visibility (xitk_widget_t *w, void *data) {
   
   if(viewlog != NULL) {
     if (viewlog->visible && viewlog->running) {
-      viewlog->visible = 0;
-      xitk_hide_widgets(viewlog->widget_list);
       XLockDisplay(gGui->display);
-      XUnmapWindow (gGui->display, xitk_window_get_window(viewlog->xwin));
+      if(gGui->use_root_window) {
+	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(viewlog->xwin)))
+	  XIconifyWindow(gGui->display, xitk_window_get_window(viewlog->xwin), gGui->screen);
+	else
+	  XMapWindow(gGui->display, xitk_window_get_window(viewlog->xwin));
+      }
+      else {
+	viewlog->visible = 0;
+	xitk_hide_widgets(viewlog->widget_list);
+	XUnmapWindow (gGui->display, xitk_window_get_window(viewlog->xwin));
+      }
       XUnlockDisplay(gGui->display);
-    } else {
+    } 
+    else {
       if(viewlog->running) {
 	viewlog->visible = 1;
 	xitk_show_widgets(viewlog->widget_list);
 	XLockDisplay(gGui->display);
 	XRaiseWindow(gGui->display, xitk_window_get_window(viewlog->xwin)); 
 	XMapWindow(gGui->display, xitk_window_get_window(viewlog->xwin)); 
-	XSetTransientForHint (gGui->display, 
-			      xitk_window_get_window(viewlog->xwin), gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, 
+				xitk_window_get_window(viewlog->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(viewlog->xwin));
       }

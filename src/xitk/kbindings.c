@@ -442,8 +442,8 @@ static void _kbindings_check_redundancy(kbinding_t *kbt) {
 							 (void *) kbt, 400, ALIGN_CENTER,
 							 buffer);
 	  XLockDisplay(gGui->display);
-	  XSetTransientForHint(gGui->display, 
-			       xitk_window_get_window(xw), gGui->video_window);
+	  if(!gGui->use_root_window)
+	    XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
 	  XSync(gGui->display, False);
 	  XUnlockDisplay(gGui->display);
 	  layer_above_video(xitk_window_get_window(xw));
@@ -1232,8 +1232,12 @@ int kbedit_is_running(void) {
  */
 int kbedit_is_visible(void) {
 
-  if(kbedit != NULL)
-    return kbedit->visible;
+  if(kbedit != NULL) {
+    if(gGui->use_root_window)
+      return xitk_is_window_visible(gGui->display, xitk_window_get_window(kbedit->xwin));
+    else
+      return kbedit->visible;
+  }
 
   return 0;
 }
@@ -1250,8 +1254,9 @@ void kbedit_raise_window(void) {
 	XUnmapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
 	XRaiseWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
 	XMapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
-	XSetTransientForHint (gGui->display, 
-			      xitk_window_get_window(kbedit->xwin), gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, 
+				xitk_window_get_window(kbedit->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(kbedit->xwin));
       }
@@ -1266,20 +1271,30 @@ void kbedit_toggle_visibility (xitk_widget_t *w, void *data) {
   
   if(kbedit != NULL) {
     if (kbedit->visible && kbedit->running) {
-      kbedit->visible = 0;
-      xitk_hide_widgets(kbedit->widget_list);
       XLockDisplay(gGui->display);
-      XUnmapWindow (gGui->display, xitk_window_get_window(kbedit->xwin));
+      if(gGui->use_root_window) {
+	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(kbedit->xwin)))
+	  XIconifyWindow(gGui->display, xitk_window_get_window(kbedit->xwin), gGui->screen);
+	else
+	  XMapWindow(gGui->display, xitk_window_get_window(kbedit->xwin));
+      }
+      else {
+	kbedit->visible = 0;
+	xitk_hide_widgets(kbedit->widget_list);
+	XUnmapWindow (gGui->display, xitk_window_get_window(kbedit->xwin));
+      }
       XUnlockDisplay(gGui->display);
-    } else {
+    } 
+    else {
       if(kbedit->running) {
 	kbedit->visible = 1;
 	xitk_show_widgets(kbedit->widget_list);
 	XLockDisplay(gGui->display);
 	XRaiseWindow(gGui->display, xitk_window_get_window(kbedit->xwin)); 
 	XMapWindow(gGui->display, xitk_window_get_window(kbedit->xwin)); 
-	XSetTransientForHint (gGui->display, 
-			      xitk_window_get_window(kbedit->xwin), gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, 
+				xitk_window_get_window(kbedit->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(kbedit->xwin));
       }

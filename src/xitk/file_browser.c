@@ -355,8 +355,9 @@ static void fb_create_input_window(char *title, char *text,
   XLockDisplay(gGui->display);
   XRaiseWindow(gGui->display, xitk_window_get_window(fne->xwin));
   XMapWindow(gGui->display, xitk_window_get_window(fne->xwin));
-  XSetTransientForHint(gGui->display, 
-		       xitk_window_get_window(fne->xwin), gGui->video_window);
+  if(!gGui->use_root_window)
+    XSetTransientForHint(gGui->display, 
+			 xitk_window_get_window(fne->xwin), gGui->video_window);
   XUnlockDisplay(gGui->display);
   layer_above_video(xitk_window_get_window(fne->xwin));
   
@@ -1072,8 +1073,9 @@ void filebrowser_raise_window(filebrowser_t *fb) {
 	  XUnmapWindow(gGui->display, xitk_window_get_window(fb->xwin));
 	  XRaiseWindow(gGui->display, xitk_window_get_window(fb->xwin));
 	  XMapWindow(gGui->display, xitk_window_get_window(fb->xwin));
-	  XSetTransientForHint (gGui->display, 
-				xitk_window_get_window(fb->xwin), gGui->video_window);
+	  if(!gGui->use_root_window)
+	    XSetTransientForHint (gGui->display, 
+				  xitk_window_get_window(fb->xwin), gGui->video_window);
 	  XUnlockDisplay(gGui->display);
 	  layer_above_video(xitk_window_get_window(fb->xwin));
       }

@@ -173,7 +173,8 @@ void panel_change_skins(void) {
 
   XLockDisplay(gGui->display);
 
-  XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
+  if(!gGui->use_root_window)
+    XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
 
   Imlib_destroy_image(gGui->imlib_data, old_img);
   Imlib_apply_image(gGui->imlib_data, new_img, gGui->panel_window);
@@ -389,8 +390,12 @@ static void *slider_loop(void *dummy) {
  */
 int panel_is_visible(void) {
 
-  if(panel)
-    return panel->visible;
+  if(panel) {
+    if(gGui->use_root_window)
+      return xitk_is_window_visible(gGui->display, gGui->panel_window);
+    else
+      return panel->visible;
+  }
 
   return 0;
 }
@@ -399,45 +404,62 @@ int panel_is_visible(void) {
  * Show/Hide panel window.
  */
 void panel_toggle_visibility (xitk_widget_t *w, void *data) {
+  int visible = xitk_is_window_visible(gGui->display, gGui->panel_window);
 
-  if(!panel->visible && playlist_is_visible()) {}
+  if(!panel->visible && playlist_is_visible()) {
+  }
   else {
-    playlist_toggle_visibility(NULL, NULL);
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && playlist_is_visible()))
+      playlist_toggle_visibility(NULL, NULL);
   }
     
-  if(!panel->visible && control_is_visible()) {}
+  if(!panel->visible && control_is_visible()) {
+  }
   else {
-    control_toggle_visibility(NULL, NULL);
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && control_is_visible()))
+      control_toggle_visibility(NULL, NULL);
   }
 
-  if(!panel->visible && mrl_browser_is_visible()) {}
+  if(!panel->visible && mrl_browser_is_visible()) {
+  }
   else {
-    mrl_browser_toggle_visibility(NULL, NULL);
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && mrl_browser_is_visible()))
+      mrl_browser_toggle_visibility(NULL, NULL);
   }
 
-  if(!panel->visible && setup_is_visible()) {}
+  if(!panel->visible && setup_is_visible()) {
+  }
   else {
-    setup_toggle_visibility(NULL, NULL);
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && setup_is_visible()))
+      setup_toggle_visibility(NULL, NULL);
   }
 
-  if(!panel->visible && viewlog_is_visible()) {}
+  if(!panel->visible && viewlog_is_visible()) {
+  }
   else {
-    viewlog_toggle_visibility(NULL, NULL);
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && viewlog_is_visible()))
+      viewlog_toggle_visibility(NULL, NULL);
   }
 
-  if(!panel->visible && kbedit_is_visible()) {}
+  if(!panel->visible && kbedit_is_visible()) {
+  }
   else {
-    kbedit_toggle_visibility(NULL, NULL);
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && kbedit_is_visible()))
+      kbedit_toggle_visibility(NULL, NULL);
   }
 
-  if(!panel->visible && event_sender_is_visible()) {}
+  if(!panel->visible && event_sender_is_visible()) {
+  }
   else {
-    event_sender_toggle_visibility(NULL, NULL);
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && event_sender_is_visible()))
+      event_sender_toggle_visibility(NULL, NULL);
   }
 
-  if(!panel->visible && stream_infos_is_visible()) {}
+  if(!panel->visible && stream_infos_is_visible()) {
+  }
   else {
-    stream_infos_toggle_visibility(NULL, NULL);
+    if(!gGui->use_root_window || (gGui->use_root_window && visible && stream_infos_is_visible()))
+      stream_infos_toggle_visibility(NULL, NULL);
   }
 
   if (panel->visible) {
@@ -446,7 +468,10 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     if (video_window_is_visible ()) {
       if(gGui->use_root_window) { /* Using root window */
-	XIconifyWindow(gGui->display, gGui->panel_window, gGui->screen);
+	if(xitk_is_window_visible(gGui->display, gGui->panel_window))
+	  XIconifyWindow(gGui->display, gGui->panel_window, gGui->screen);
+	else
+	  XMapWindow(gGui->display, gGui->panel_window);
       }
       else {
 	panel->visible = 0;
@@ -463,7 +488,7 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     XSetInputFocus(gGui->display, gGui->video_window, RevertToParent, CurrentTime);
     XUnlockDisplay(gGui->display);
      
-  } 
+  }
   else {
     
     panel->visible = 1;
@@ -473,8 +498,8 @@ void panel_toggle_visibility (xitk_widget_t *w, void *data) {
     
     XRaiseWindow(gGui->display, gGui->panel_window); 
     XMapWindow(gGui->display, gGui->panel_window); 
-    XSetTransientForHint (gGui->display, 
-			  gGui->panel_window, gGui->video_window);
+    if(!gGui->use_root_window)
+      XSetTransientForHint (gGui->display,  gGui->panel_window, gGui->video_window);
     XUnlockDisplay (gGui->display);
 
     layer_above_video(gGui->panel_window);
@@ -694,8 +719,9 @@ void panel_handle_event(XEvent *event, void *data) {
     XRefreshKeyboardMapping((XMappingEvent *) event);
     XUnlockDisplay(gGui->display);
     break;
-    
+
   }
+  
 }
 
 /*
@@ -925,7 +951,8 @@ void panel_init (void) {
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);
   
-  XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
+  if(!gGui->use_root_window)
+    XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
 
   /* 
    * set wm properties 

@@ -21,6 +21,7 @@ libxitk_la_SOURCES = \
 	dnd.c \
 	filebrowser.c \
 	font.c \
+	getdeskroot.c \
 	image.c \
 	inputtext.c \
 	intbox.c \

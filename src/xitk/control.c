@@ -335,8 +335,12 @@ int control_is_running(void) {
  */
 int control_is_visible(void) {
 
-  if(control != NULL)
-    return control->visible;
+  if(control != NULL) {
+    if(gGui->use_root_window)
+      return xitk_is_window_visible(gGui->display, control->window);
+    else
+      return control->visible;
+  }
 
   return 0;
 }
@@ -352,7 +356,8 @@ void control_raise_window(void) {
 	XUnmapWindow(gGui->display, control->window);
 	XRaiseWindow(gGui->display, control->window);
 	XMapWindow(gGui->display, control->window);
-	XSetTransientForHint (gGui->display, control->window, gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, control->window, gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(control->window);
       }
@@ -367,19 +372,29 @@ void control_toggle_visibility (xitk_widget_t *w, void *data) {
   
   if(control != NULL) {
     if (control->visible && control->running) {
-      control->visible = 0;
-      xitk_hide_widgets(control->widget_list);
       XLockDisplay(gGui->display);
-      XUnmapWindow (gGui->display, control->window);
+      if(gGui->use_root_window) {
+	if(xitk_is_window_visible(gGui->display, control->window))
+	  XIconifyWindow(gGui->display, control->window, gGui->screen);
+	else
+	  XMapWindow(gGui->display, control->window);
+      }
+      else {
+	control->visible = 0;
+	xitk_hide_widgets(control->widget_list);
+	XUnmapWindow (gGui->display, control->window);
+      }
       XUnlockDisplay(gGui->display);
-    } else {
+    }
+    else {
       if(control->running) {
 	control->visible = 1;
 	xitk_show_widgets(control->widget_list);
 	XLockDisplay(gGui->display);
 	XRaiseWindow(gGui->display, control->window); 
 	XMapWindow(gGui->display, control->window); 
-	XSetTransientForHint (gGui->display, control->window, gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, control->window, gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(control->window);
       }
@@ -444,7 +459,8 @@ void control_change_skins(void) {
     control->bg_image = new_img;
     
     XLockDisplay(gGui->display);
-    XSetTransientForHint(gGui->display, control->window, gGui->video_window);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, control->window, gGui->video_window);
     
     Imlib_destroy_image(gGui->imlib_data, old_img);
     Imlib_apply_image(gGui->imlib_data, new_img, control->window);

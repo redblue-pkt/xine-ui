@@ -2028,6 +2028,11 @@ int xitk_is_window_visible(Display *display, Window window);
 /*
  *
  */
+Window xitk_get_desktop_root_window(Display *display, int screen, Window *clientparent);
+
+/*
+ *
+ */
 int xitk_is_window_size(Display *display, Window window, int width, int height);
 
 xitk_window_t *xitk_window_dialog_button_free_with_width(ImlibData *im, char *title,

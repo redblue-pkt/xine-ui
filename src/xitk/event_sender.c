@@ -323,9 +323,13 @@ void event_sender_exit(xitk_widget_t *w, void *data) {
 
 int event_sender_is_visible(void) {
   
-  if(eventer != NULL)
-    return eventer->visible;
-  
+  if(eventer != NULL) {
+    if(gGui->use_root_window)
+      return xitk_is_window_visible(gGui->display, xitk_window_get_window(eventer->xwin));
+    else
+      return eventer->visible;
+  }  
+
   return 0;
 }
 
@@ -340,20 +344,30 @@ int event_sender_is_running(void) {
 void event_sender_toggle_visibility(xitk_widget_t *w, void *data) {
   if(eventer != NULL) {
     if (eventer->visible && eventer->running) {
-      eventer->visible = 0;
-      xitk_hide_widgets(eventer->widget_list);
       XLockDisplay(gGui->display);
-      XUnmapWindow (gGui->display, xitk_window_get_window(eventer->xwin));
+      if(gGui->use_root_window) {
+	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(eventer->xwin)))
+	  XIconifyWindow(gGui->display, xitk_window_get_window(eventer->xwin), gGui->screen);
+	else
+	  XMapWindow(gGui->display, xitk_window_get_window(eventer->xwin));
+      }
+      else {
+	eventer->visible = 0;
+	xitk_hide_widgets(eventer->widget_list);
+	XUnmapWindow (gGui->display, xitk_window_get_window(eventer->xwin));
+      }
       XUnlockDisplay(gGui->display);
-    } else {
+    }
+    else {
       if(eventer->running) {
 	eventer->visible = 1;
 	xitk_show_widgets(eventer->widget_list);
 	XLockDisplay(gGui->display);
 	XRaiseWindow(gGui->display, xitk_window_get_window(eventer->xwin)); 
 	XMapWindow(gGui->display, xitk_window_get_window(eventer->xwin)); 
-	XSetTransientForHint (gGui->display, 
-			      xitk_window_get_window(eventer->xwin), gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, 
+				xitk_window_get_window(eventer->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(eventer->xwin));
       }
@@ -369,8 +383,9 @@ void event_sender_raise_window(void) {
 	XUnmapWindow(gGui->display, xitk_window_get_window(eventer->xwin));
 	XRaiseWindow(gGui->display, xitk_window_get_window(eventer->xwin));
 	XMapWindow(gGui->display, xitk_window_get_window(eventer->xwin));
-	XSetTransientForHint (gGui->display, 
-			      xitk_window_get_window(eventer->xwin), gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint (gGui->display, 
+				xitk_window_get_window(eventer->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(eventer->xwin));
       }

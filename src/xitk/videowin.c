@@ -244,18 +244,25 @@ static void video_window_adapt_size (void) {
 
     if(gGui->video_window == None) {
       XGCValues   gcv;
-      
+      Window      wparent;
+      Window      rootwindow = None;
+
       gVw->fullscreen_mode = 1;
       gVw->visual          = gGui->visual;
       gVw->depth           = gGui->depth;
       gVw->colormap        = gGui->colormap;
       
+      /* This couldn't happen, but we're paranoid ;-) */
+      if((rootwindow = xitk_get_desktop_root_window(gGui->display, 
+						    gGui->screen, &wparent)) == None)
+	rootwindow = DefaultRootWindow(gGui->display);
+
       attr.override_redirect = True;
       attr.background_pixel  = gGui->black.pixel;
       
       border_width = 0;
       
-      gGui->video_window = XCreateWindow(gGui->display, DefaultRootWindow(gGui->display),
+      gGui->video_window = XCreateWindow(gGui->display, rootwindow,
 					 0, 0, gVw->fullscreen_width, gVw->fullscreen_height, 
 					 border_width, 
 					 CopyFromParent, CopyFromParent, CopyFromParent, 
@@ -289,7 +296,7 @@ static void video_window_adapt_size (void) {
       XMapWindow(gGui->display, gGui->video_window);
       
       XLowerWindow(gGui->display, gGui->video_window);
-      
+
       gVw->old_widget_key = gVw->widget_key;
 
       XUnlockDisplay (gGui->display);
@@ -570,7 +577,9 @@ static void video_window_adapt_size (void) {
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
 
-    XSetTransientForHint(gGui->display, gGui->video_window, None);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, gGui->video_window, None);
+
     XRaiseWindow(gGui->display, gGui->video_window);
 
   } else
@@ -669,7 +678,9 @@ static void video_window_adapt_size (void) {
 		    PropModeReplace, (unsigned char *) &mwmhints,
 		    PROP_MWM_HINTS_ELEMENTS);
 
-    XSetTransientForHint(gGui->display, gGui->video_window, None);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, gGui->video_window, None);
+
     XRaiseWindow(gGui->display, gGui->video_window);
 
   } else {
@@ -857,7 +868,7 @@ static void video_window_adapt_size (void) {
   }
 
   /* Update WM_TRANSIENT_FOR hints on other windows for the new video_window */
-  if (gGui->panel_window != None) {
+  if ((gGui->panel_window != None) && (!gGui->use_root_window)) {
     XSetTransientForHint(gGui->display, gGui->panel_window,
 			 gGui->video_window);
   }
@@ -1531,6 +1542,23 @@ void video_window_exit (void) {
     XUnlockDisplay(gGui->display);
   }
 #endif
+
+  if(gGui->use_root_window) {
+    XExposeEvent event;
+    
+    XLockDisplay(gGui->display);
+    XClearWindow(gGui->display, gGui->video_window);
+    event.type       = Expose;
+    event.send_event = True;
+    event.display    = gGui->display;
+    event.window     = gGui->video_window;
+    event.x          = 0;
+    event.y          = 0;
+    event.width      = gVw->video_width;
+    event.height     = gVw->video_height;
+    XSendEvent(gGui->display, gGui->video_window, False, Expose, (XEvent *) &event);
+    XUnlockDisplay(gGui->display);
+  }
 }
 
 

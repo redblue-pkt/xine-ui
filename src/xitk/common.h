@@ -62,7 +62,7 @@
 #include "file_browser.h"
 #include "post.h"
 
-#include "utils.h"
+#include "libcommon.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"

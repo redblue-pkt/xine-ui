@@ -301,8 +301,8 @@ int gui_xine_play(xine_stream_t *stream, int start_pos, int start_time_in_secs, 
 					       NULL, 400, ALIGN_CENTER,
 					       buffer);
       XLockDisplay(gGui->display);
-      XSetTransientForHint(gGui->display, 
-      			   xitk_window_get_window(xw), gGui->video_window);
+      if(!gGui->use_root_window)
+	XSetTransientForHint(gGui->display, xitk_window_get_window(xw), gGui->video_window);
       XSync(gGui->display, False);
       XUnlockDisplay(gGui->display);
       layer_above_video(xitk_window_get_window(xw));
@@ -704,8 +704,8 @@ static void set_fullscreen_mode(int fullscreen_mode) {
     XUnmapWindow(gGui->display, gGui->panel_window);
     XRaiseWindow(gGui->display, gGui->panel_window);
     XMapWindow(gGui->display, gGui->panel_window);
-    XSetTransientForHint (gGui->display, 
-			  gGui->panel_window, gGui->video_window);
+    if(!gGui->use_root_window)
+      XSetTransientForHint (gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
     layer_above_video(gGui->panel_window);
   }
@@ -713,7 +713,8 @@ static void set_fullscreen_mode(int fullscreen_mode) {
   if(mrl_browser_is_visible()) {
     hide_mrl_browser();
     show_mrl_browser();
-    set_mrl_browser_transient();
+    if(!gGui->use_root_window)
+      set_mrl_browser_transient();
   }
 
   if(playlist_is_visible())
@@ -765,8 +766,8 @@ void gui_toggle_aspect(void) {
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
-    XSetTransientForHint(gGui->display, 
-			 gGui->panel_window, gGui->video_window);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
     
   }
@@ -783,8 +784,8 @@ void gui_toggle_interlaced(void) {
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
-    XSetTransientForHint(gGui->display,
-			 gGui->panel_window, gGui->video_window);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
   }
 }
@@ -1158,7 +1159,10 @@ void gui_playlist_show(xitk_widget_t *w, void *data) {
   }
   else {
     if(playlist_is_visible())
-      playlist_exit(NULL, NULL);
+      if(gGui->use_root_window)
+	playlist_toggle_visibility(NULL, NULL);
+      else
+	playlist_exit(NULL, NULL);
     else
       playlist_toggle_visibility(NULL, NULL);
   }
@@ -1174,10 +1178,14 @@ void gui_mrlbrowser_show(xitk_widget_t *w, void *data) {
 
     if(!mrl_browser_is_visible()) {
       show_mrl_browser();
-      set_mrl_browser_transient();
+      if(!gGui->use_root_window)
+	set_mrl_browser_transient();
     }
     else {
-      destroy_mrl_browser();
+      if(gGui->use_root_window)
+	show_mrl_browser();
+      else
+	destroy_mrl_browser();
     }
 
   }
@@ -1224,8 +1232,12 @@ void gui_control_show(xitk_widget_t *w, void *data) {
     control_toggle_visibility(NULL, NULL);
   else if(!control_is_running())
     control_panel();
-  else
-    control_exit(NULL, NULL);
+  else {
+    if(gGui->use_root_window)
+      control_toggle_visibility(NULL, NULL);
+    else
+      control_exit(NULL, NULL);
+  }
 }
 
 void gui_setup_show(xitk_widget_t *w, void *data) {
@@ -1234,8 +1246,12 @@ void gui_setup_show(xitk_widget_t *w, void *data) {
     setup_toggle_visibility(NULL, NULL);
   else if(!setup_is_running())
     setup_panel();
-  else
-    setup_exit(NULL, NULL);
+  else {
+    if(gGui->use_root_window)
+      setup_toggle_visibility(NULL, NULL);
+    else
+      setup_exit(NULL, NULL);
+  }
 }
 
 void gui_event_sender_show(xitk_widget_t *w, void *data) {
@@ -1244,8 +1260,12 @@ void gui_event_sender_show(xitk_widget_t *w, void *data) {
     event_sender_toggle_visibility(NULL, NULL);
   else if(!event_sender_is_running())
     event_sender_panel();
-  else
-    event_sender_exit(NULL, NULL);
+  else {
+    if(gGui->use_root_window)
+      event_sender_toggle_visibility(NULL, NULL);
+    else
+      event_sender_exit(NULL, NULL);
+  }
 }
 
 void gui_stream_infos_show(xitk_widget_t *w, void *data) {
@@ -1254,8 +1274,12 @@ void gui_stream_infos_show(xitk_widget_t *w, void *data) {
     stream_infos_toggle_visibility(NULL, NULL);
   else if(!stream_infos_is_running())
     stream_infos_panel();
-  else
-    stream_infos_end();
+  else {
+    if(gGui->use_root_window)
+      stream_infos_toggle_visibility(NULL, NULL);
+    else
+      stream_infos_end();
+  }
 }
 
 void gui_viewlog_show(xitk_widget_t *w, void *data) {
@@ -1264,8 +1288,12 @@ void gui_viewlog_show(xitk_widget_t *w, void *data) {
     viewlog_toggle_visibility(NULL, NULL);
   else if(!viewlog_is_running())
     viewlog_window();
-  else
-    viewlog_exit(NULL, NULL);
+  else {
+    if(gGui->use_root_window)
+      viewlog_toggle_visibility(NULL, NULL);
+    else
+      viewlog_exit(NULL, NULL);
+  }
 }
 
 void gui_kbedit_show(xitk_widget_t *w, void *data) {
@@ -1274,8 +1302,12 @@ void gui_kbedit_show(xitk_widget_t *w, void *data) {
     kbedit_toggle_visibility(NULL, NULL);
   else if(!kbedit_is_running())
     kbedit_window();
-  else
-    kbedit_exit(NULL, NULL);
+  else {
+    if(gGui->use_root_window)
+      kbedit_toggle_visibility(NULL, NULL);
+    else
+      kbedit_exit(NULL, NULL);
+  }
 }
 
 /*
@@ -1348,8 +1380,8 @@ void gui_change_zoom(int zoom_dx, int zoom_dy) {
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
-    XSetTransientForHint(gGui->display, 
-			 gGui->panel_window, gGui->video_window);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
   }
 }
@@ -1365,8 +1397,8 @@ void gui_reset_zoom(void) {
   if (panel_is_visible())  {
     XLockDisplay(gGui->display);
     XRaiseWindow(gGui->display, gGui->panel_window);
-    XSetTransientForHint(gGui->display, 
-			 gGui->panel_window, gGui->video_window);
+    if(!gGui->use_root_window)
+      XSetTransientForHint(gGui->display, gGui->panel_window, gGui->video_window);
     XUnlockDisplay(gGui->display);
   }
 }

@@ -1339,10 +1339,18 @@ int mmk_editor_is_running(void) {
 void mmk_editor_toggle_visibility(void) {
   if(mmkeditor != NULL) {
     if (mmkeditor->visible && mmkeditor->running) {
-      mmkeditor->visible = 0;
-      xitk_hide_widgets(mmkeditor->widget_list);
       XLockDisplay(gGui->display);
-      XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+      if(gGui->use_root_window) {
+	if(xitk_is_window_visible(gGui->display, xitk_window_get_window(mmkeditor->xwin)))
+	  XIconifyWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin), gGui->screen);
+	else
+	  XMapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+      }
+      else {
+	mmkeditor->visible = 0;
+	xitk_hide_widgets(mmkeditor->widget_list);
+	XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
+      }
       XUnlockDisplay(gGui->display);
     } else {
       if(mmkeditor->running) {
@@ -1351,8 +1359,9 @@ void mmk_editor_toggle_visibility(void) {
 	XLockDisplay(gGui->display);
 	XRaiseWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin)); 
 	XMapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin)); 
-	XSetTransientForHint(gGui->display, 
-			     xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
+	if(!gGui->use_root_window)
+	  XSetTransientForHint(gGui->display, 
+			       xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(mmkeditor->xwin));
       }
@@ -1368,8 +1377,9 @@ void mmk_editor_raise_window(void) {
 	XUnmapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
 	XRaiseWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
 	XMapWindow(gGui->display, xitk_window_get_window(mmkeditor->xwin));
-	XSetTransientForHint(gGui->display, 
-			     xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
+	if(!gGui->use_root_window)	
+	  XSetTransientForHint(gGui->display, 
+			       xitk_window_get_window(mmkeditor->xwin), gGui->video_window);
 	XUnlockDisplay(gGui->display);
 	layer_above_video(xitk_window_get_window(mmkeditor->xwin));
       }
