@@ -20,6 +20,12 @@
 /* Define this if you have X11R6 installed */
 #undef HAVE_X11
 
+#undef HAVE_IPC_H
+#undef HAVE_SHM_H
+#undef HAVE_XSHM_H
+#undef HAVE_SHM
+#undef IPC_RMID_DEFERRED_RELEASE
+
 /* Define this if you have libXtst installed */
 #undef HAVE_XTESTEXTENSION
 

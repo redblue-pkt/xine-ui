@@ -148,13 +148,39 @@ static void xitk_config_timers(xitk_config_t *xtcf) {
 }
 
 /*
+ * Extract features.
+ */
+static void xitk_config_features(xitk_config_t *xtcf) {
+  char  *p = NULL;
+  char  *c = NULL;
+
+  assert(xtcf != NULL && xtcf->ln != NULL);
+
+  p = xtcf->ln + 8;
+  if(p)
+    c = strchr(p, '=');
+  
+  if(c) {
+    
+    *(c++) = '\0';
+    
+    while(*c == ' ' || *c == '\t') c++;
+    
+    if(!strncasecmp(p, "shm", 3))
+      xtcf->features.shm = strtol(c, &c, 10);
+  }
+}
+
+/*
  * Guess entries.
  */
 static void xitk_config_store_entry(xitk_config_t *xtcf) {
 
   assert(xtcf != NULL);
 
-  if(!strncasecmp(xtcf->ln, "color.", 6))
+  if(!strncasecmp(xtcf->ln, "feature.", 8))
+    xitk_config_features(xtcf);
+  else if(!strncasecmp(xtcf->ln, "color.", 6))
     xitk_config_colors(xtcf);
   else if(!strncasecmp(xtcf->ln, "timer.", 6))
     xitk_config_timers(xtcf);
@@ -254,11 +280,23 @@ static void xitk_config_init_default_values(xitk_config_t *xtcf) {
   xtcf->colors.warn_background = -1;
   xtcf->timers.label_anim      = 50000;
   xtcf->timers.dbl_click       = 400;
+#ifdef HAVE_SHM
+  xtcf->features.shm           = 1;
+#else
+  xtcf->features.shm           = 0;
+#endif
 }
 
 /*
  * Get stored values.
  */
+int xitk_config_get_shm_feature(xitk_config_t *xtcf) {
+
+  if(!xtcf)
+    return -1;
+  
+  return (xtcf->features.shm > 0) ? 1 : 0;
+}
 char *xitk_config_get_system_font(xitk_config_t *xtcf) {
 
   if(!xtcf)

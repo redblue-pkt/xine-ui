@@ -195,7 +195,7 @@ int xitk_system(int dont_run_as_root, char *command) {
  * A thread-safe usecond sleep
  */
 void xitk_usec_sleep(unsigned long usec) {
-#if HAVE_NANOSLEEP
+#ifdef HAVE_NANOSLEEP
   /* nanosleep is prefered on solaris, because it's mt-safe */
   struct timespec ts;
   
@@ -883,10 +883,10 @@ void xitk_init(Display *display) {
   gXitk->sig_callback = NULL;
   gXitk->sig_data     = NULL;
   gXitk->config       = xitk_config_init();
-  gXitk->use_xshm     = xitk_check_xshm(display);
+  gXitk->use_xshm     = (xitk_config_get_shm_feature(gXitk->config)) ? (xitk_check_xshm(display)) : 0;
   
   pthread_mutex_init (&gXitk->mutex, NULL);
-
+  
 }
 
 /*

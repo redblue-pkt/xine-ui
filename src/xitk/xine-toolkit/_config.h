@@ -53,11 +53,16 @@ typedef struct {
     long int        dbl_click;
   } timers;
 
+  struct {
+    int             shm;
+  } features;
+
 } xitk_config_t;
 
 
 xitk_config_t *xitk_config_init(void);
 void xitk_config_deinit(xitk_config_t *xtcf);
+int xitk_config_get_shm_feature(xitk_config_t *xtcf);
 char *xitk_config_get_system_font(xitk_config_t *xtcf);
 char *xitk_config_get_default_font(xitk_config_t *xtcf);
 int xitk_config_get_black_color(xitk_config_t *xtcf);

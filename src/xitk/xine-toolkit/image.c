@@ -145,7 +145,7 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 
   XLOCK(xpix->imlibdata->x.disp);
 
-#if HAVE_SHM
+#ifdef HAVE_SHM
   if(xpix->shm)
     XShmDetach(xpix->imlibdata->x.disp, xpix->shminfo);
 #endif
@@ -155,7 +155,7 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 
   XUNLOCK(xpix->imlibdata->x.disp);
 
-#if HAVE_SHM
+#ifdef HAVE_SHM
   if(xpix->shm) {
     shmdt(xpix->shminfo->shmaddr);
     shmctl(xpix->shminfo->shmid, IPC_RMID, 0);
@@ -169,7 +169,7 @@ static void xitk_image_xitk_pixmap_destroyer(xitk_pixmap_t *xpix) {
 xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im, 
 							int width, int height, int depth) {
   xitk_pixmap_t    *xpix;
-#if HAVE_SHM
+#ifdef HAVE_SHM
   XShmSegmentInfo  *shminfo;
 #endif
   
@@ -183,7 +183,7 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
   
   XLOCK(im->x.disp);
   
-#if HAVE_SHM
+#ifdef HAVE_SHM
   shminfo = (XShmSegmentInfo *) xitk_xmalloc(sizeof(XShmSegmentInfo));
   if(xitk_is_use_xshm() == 2) {
     XImage           *xim;
@@ -239,11 +239,11 @@ xitk_pixmap_t *xitk_image_create_xitk_pixmap_with_depth(ImlibData *im,
   else
 #endif
     {
-#if HAVE_SHM /* Just to make GCC happy */
+#ifdef HAVE_SHM /* Just to make GCC happy */
     __noxshm_pixmap:
 #endif
       xpix->shm     = 0;
-#if HAVE_SHM
+#ifdef HAVE_SHM
       xpix->shminfo = NULL;
 #endif
       xpix->pixmap  = XCreatePixmap(im->x.disp, im->x.base_window, width, height, depth);
@@ -292,6 +292,9 @@ void xitk_image_change_image(ImlibData *im,
   if(src->mask) {
     dest->mask = xitk_image_create_xitk_pixmap(im, width, height);
     XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+    XSync(im->x.disp, False);
+#endif
     gcv.graphics_exposures = False;
     gc = XCreateGC(im->x.disp, dest->mask->pixmap, GCGraphicsExposures, &gcv);
     XCopyArea(im->x.disp, src->mask->pixmap, dest->mask->pixmap, gc, 0, 0, width, height, 0, 0);
@@ -307,6 +310,9 @@ void xitk_image_change_image(ImlibData *im,
   dest->image = xitk_image_create_xitk_pixmap(im, width, height);
 
   XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, dest->image->pixmap, GCGraphicsExposures, &gcv);
   XCopyArea(im->x.disp, src->image->pixmap, dest->image->pixmap, gc, 0, 0, width, height, 0, 0);
@@ -459,6 +465,9 @@ xitk_image_t *xitk_image_create_image_with_colors_from_string(ImlibData *im,
 	x = (width - length);
       
       XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+      XSync(im->x.disp, False);
+#endif
       XDrawString(im->x.disp, image->image->pixmap, gc, 
 		  x, (j - descent), lines[i], strlen(lines[i]));
       XUNLOCK(im->x.disp);
@@ -498,6 +507,9 @@ void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest) {
   dest->mask = xitk_image_create_xitk_mask_pixmap(im, dest->width, dest->height);
 
   XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, dest->mask->pixmap, GCGraphicsExposures, &gcv);
   XSetForeground(im->x.disp, gc, 1);
@@ -595,6 +607,9 @@ static void _draw_arrow(ImlibData *im, xitk_image_t *p, int direction) {
     offset += w;
 
     XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+    XSync(im->x.disp, False);
+#endif
     XFillPolygon(im->x.disp, p->image->pixmap, gc, &points[0], 4, Complex, CoordModeOrigin);
     XUNLOCK(im->x.disp);
   }
@@ -632,10 +647,12 @@ static void _draw_rectangular_box(ImlibData *im, Pixmap p,
   assert(im && p && width && height);
 
   XLOCK(im->x.disp);
-
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
-  
+
   if(relief == DRAW_OUTTER)
     XSetForeground(im->x.disp, gc, xitk_get_pixel_color_white(im));
   else if(relief == DRAW_INNER)
@@ -669,7 +686,9 @@ static void _draw_rectangular_box_light(ImlibData *im, Pixmap p,
   assert(im && p && width && height);
 
   XLOCK(im->x.disp);
-
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
   
@@ -707,7 +726,9 @@ static void _draw_rectangular_box_with_colors(ImlibData *im, Pixmap p,
   assert(im && p && width && height);
 
   XLOCK(im->x.disp);
-
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
   
@@ -757,7 +778,9 @@ static void _draw_three_state(ImlibData *im, xitk_image_t *p, int style) {
   h = p->height;
 
   XLOCK(im->x.disp);
-
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
   
@@ -820,10 +843,12 @@ static void _draw_two_state(ImlibData *im, xitk_image_t *p, int style) {
   h = p->height;
 
   XLOCK(im->x.disp);
-
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
-  
+
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_gray(im));
   XFillRectangle(im->x.disp, p->image->pixmap, gc, 0, 0, w - 1, h - 1);
   XSetForeground(im->x.disp, gc, xitk_get_pixel_color_lightgray(im));
@@ -860,7 +885,9 @@ static void _draw_relief(ImlibData *im, Pixmap p, int w, int h, int relief, int 
   assert(im && p);
 
   XLOCK(im->x.disp);
-
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
   
@@ -926,6 +953,9 @@ static void _draw_paddle_three_state(ImlibData *im, xitk_image_t *p, int directi
   h = p->height;
 
   XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
 
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
@@ -1046,7 +1076,10 @@ void draw_flat_with_color(ImlibData *im, Pixmap p, int w, int h, unsigned int co
   assert(im && (p != None));
 
   XLOCK(im->x.disp);
-  
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
+
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
   
@@ -1074,6 +1107,9 @@ static void _draw_frame(ImlibData *im, Pixmap p,
   if(title) {
 
     XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+    XSync(im->x.disp, False);
+#endif
     gcv.graphics_exposures = False;
     gc = XCreateGC(im->x.disp, p, GCGraphicsExposures, &gcv);
     XUNLOCK(im->x.disp);
@@ -1125,6 +1161,9 @@ static void _draw_frame(ImlibData *im, Pixmap p,
   
   if(title) {
     XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+    XSync(im->x.disp, False);
+#endif
     XSetForeground(im->x.disp, gc, xitk_get_pixel_color_black(im));
     XDrawString(im->x.disp, p, gc, (x + 6), y, buf, strlen(buf));
     XUNLOCK(im->x.disp);
@@ -1161,6 +1200,9 @@ void draw_tab(ImlibData *im, xitk_image_t *p) {
   assert(im && p);
 
   XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
 
   w = p->width / 3;
   h = p->height;
@@ -1215,6 +1257,10 @@ void draw_paddle_rotate(ImlibData *im, xitk_image_t *p) {
   
   XLOCK(im->x.disp);
   
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
+
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
   
@@ -1266,6 +1312,10 @@ void draw_rotate_button(ImlibData *im, xitk_image_t *p) {
 
   XLOCK(im->x.disp);
 
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
+
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
 
@@ -1312,7 +1362,9 @@ void draw_button_plus(ImlibData *im, xitk_image_t *p) {
   h = p->height;
   
   XLOCK(im->x.disp);
-
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
 
@@ -1340,6 +1392,9 @@ void draw_button_minus(ImlibData *im, xitk_image_t *p) {
   h = p->height;
   
   XLOCK(im->x.disp);
+#ifdef HAVE_SHM
+  XSync(im->x.disp, False);
+#endif
   gcv.graphics_exposures = False;
   gc = XCreateGC(im->x.disp, p->image->pixmap, GCGraphicsExposures, &gcv);
 

@@ -814,10 +814,22 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 	 XServerVendor(gGui->display), XVendorRelease(gGui->display));
   printf(_("        Protocol Version: %d, Revision: %d,\n"), 
 	 XProtocolVersion(gGui->display), XProtocolRevision(gGui->display));
-  printf(_("        Available Screen(s): %d, using %d\n")
-	 , XScreenCount(gGui->display), gGui->screen);
-  printf(_("        Depth: %d.\n"),
-	 XDisplayPlanes(gGui->display, gGui->screen));
+    printf(_("        Available Screen(s): %d, using %d\n")
+	   , XScreenCount(gGui->display), gGui->screen);
+    printf(_("        Depth: %d.\n"),
+	   XDisplayPlanes(gGui->display, gGui->screen));
+#ifdef HAVE_SHM
+    {
+      int major, minor, ignore;
+      Bool pixmaps;
+      
+      if(XQueryExtension(gGui->display, "MIT-SHM", &ignore, &ignore, &ignore)) {
+	if(XShmQueryVersion(gGui->display, &major, &minor, &pixmaps ) == True) {
+	  printf(_("        XShmQueryVersion: %d.%d.\n"), major, minor);
+	}
+      }
+    }
+#endif
 
   gui_find_visual(&gGui->visual, &gGui->depth);
 

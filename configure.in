@@ -161,9 +161,88 @@ fi
 
 
 dnl
+dnl Shm
+dnl
+AC_ARG_ENABLE(shm, [  --disable-shm           Disable shared memory support if available.], echo $enable_shm, enable_shm="yes")
+
+dnl If we are compiling without shared memory support, then don\'t do
+dnl the checks for XShm
+if test "x$enable_shm" = "xyes"; then
+  # Check for the Xext library (needed for XShm extension)
+  AC_CHECK_LIB(Xext, XShmAttach, 
+      X_LIBS="-lXext $X_LIBS", 
+      # On AIX, it is in XextSam instead, but we still need -lXext
+      AC_CHECK_LIB(XextSam, XShmAttach, 
+          X_LIBS="-lXextSam -lXext $X_LIBS", 
+          no_xshm_ext=yes, $X_LIBS),
+      $X_LIBS)
+
+  dnl Test for shared memory headers and semantics, unless we are
+  dnl configured to build without shared memory extensions.
+
+  dnl Check for shared memory
+  AC_CHECK_HEADER(sys/ipc.h, AC_DEFINE(HAVE_IPC_H), no_sys_ipc=yes)
+  AC_CHECK_HEADER(sys/shm.h, AC_DEFINE(HAVE_SHM_H), no_sys_shm=yes)
+
+  if test "x$no_sys_ipc" != "xyes" \
+     && test "x$no_sys_shm" != "xyes" \
+     && test "x$no_xshm_ext" != "xyes" ; then
+    AC_DEFINE(HAVE_SHM)
+  fi
+
+  # Check whether shmctl IPC_RMID allowes subsequent attaches
+  if test "$ac_cv_header_sys_shm_h" = "yes"; then
+    AC_MSG_CHECKING(whether shmctl IPC_RMID allowes subsequent attaches)
+    AC_TRY_RUN([
+          #include <sys/types.h>
+          #include <sys/ipc.h>
+          #include <sys/shm.h>
+          int main()
+          {
+            int id;
+            char *shmaddr;
+          id = shmget (IPC_PRIVATE, 4, IPC_CREAT | 0777);
+          if (id == -1)
+            exit (2);
+            shmaddr = shmat (id, 0, 0);
+            shmctl (id, IPC_RMID, 0);
+            if ((char*) shmat (id, 0, 0) == (char*) -1)
+            {
+              shmdt (shmaddr);
+              exit (1);
+            }
+            shmdt (shmaddr);
+            shmdt (shmaddr);
+            exit (0);
+          }
+      ],
+      AC_DEFINE(IPC_RMID_DEFERRED_RELEASE)
+        AC_MSG_RESULT(yes),
+      AC_MSG_RESULT(no),
+      AC_MSG_RESULT(assuming no))
+  fi
+
+  # Check for the X shared memory extension header file
+  AC_MSG_CHECKING(X11/extensions/XShm.h)
+  if test "x$no_xext_lib" = "xyes"; then
+    # If we couldn't find XShmAttach earlier, don't use the header
+    AC_MSG_RESULT(no)
+    no_xshm=yes
+  else
+    if test -f "$x_includes/X11/extensions/XShm.h"; then
+      AC_MSG_RESULT(yes)
+      AC_DEFINE(HAVE_XSHM_H)
+    else
+      AC_MSG_RESULT(no)
+      no_xshm=yes
+    fi
+  fi
+fi
+
+
+dnl
 dnl Checks for Xinerama extension
 dnl
-
 AC_CHECK_LIB(Xinerama, XineramaQueryExtension, 
              X_PRE_LIBS="$X_PRE_LIBS -lXinerama"
              AC_DEFINE(HAVE_XINERAMA)
@@ -171,10 +250,10 @@ AC_CHECK_LIB(Xinerama, XineramaQueryExtension,
              $X_LIBS $X_PRE_LIBS -lXext $X_EXTRA_LIBS)
 AM_CONDITIONAL(HAVE_XINERAMA, test x$ac_have_xinerama = "xyes")
 
+
 dnl
 dnl Checks for XF86VidMode extension
 dnl
-
 AC_CHECK_LIB(Xxf86vm, XF86VidModeQueryExtension, 
              X_PRE_LIBS="$X_PRE_LIBS -lXxf86vm"
              AC_DEFINE(HAVE_XF86VIDMODE)
