@@ -388,14 +388,11 @@ void gui_dndcallback (char *filename) {
 void gui_nextprev(xitk_widget_t *w, void *data) {
 
   if(((int)data) == GUI_NEXT) {
-    gGui->ignore_status = 1;
-    xine_stop (gGui->xine);
     gGui->ignore_status = 0;
     gui_status_callback (XINE_STOP);
   }
   else if(((int)data) == GUI_PREV) {
     gGui->ignore_status = 1;
-    xine_stop (gGui->xine);
     gGui->playlist_cur--;
     if ((gGui->playlist_cur>=0) && (gGui->playlist_cur < gGui->playlist_num)) {
       gui_set_current_mrl(gGui->playlist[gGui->playlist_cur]);
