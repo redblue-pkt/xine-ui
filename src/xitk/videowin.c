@@ -532,8 +532,8 @@ void video_window_handle_event (XEvent *event) {
 
 	area.x = 0;
 	area.y = 0;
-	gVw->video_width = area.w = cev->width;
-	gVw->video_height = area.h = cev->height;
+	area.w = cev->width;
+	area.h = cev->height;
 	
 	gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
 					    GUI_DATA_EX_DEST_POS_SIZE_CHANGED, 
