@@ -81,11 +81,15 @@ to read from. valid MRLs may be plain file names or one of the following:
 or
 .BR "stdin://mpeg2"
 .br
-.BR dvd://VTS_xx_y.VOB
+.BR "dvd://VTS_xx_y.VOB"
 .br
 .BR "vcd://<track number>"
 .br
-.BR "net://???"
+.BR "tcp://<host>:<port>"
+.br
+.BR "rtp://<host>:<port>"
+.br
+.BR "udp://<host>:<port>"
 .LP
 Several MRLs may be specified in order to play a number of consecutive
 streams.

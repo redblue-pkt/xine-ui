@@ -476,6 +476,7 @@ doc/Makefile
 doc/man/Makefile
 doc/man/en/Makefile
 doc/man/en/xine.1
+doc/man/en/aaxine.1
 doc/man/fr/Makefile
 doc/man/fr/xine.1
 misc/Makefile
