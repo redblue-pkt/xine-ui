@@ -109,7 +109,6 @@ AM_CONDITIONAL(INCLUDE_INTL, test x$USE_INCLUDED_LIBINTL = "xyes")
 if test x"$USE_INCLUDED_LIBINTL" = x"yes"; then
    INTLDIR="-I\$(top_builddir)/intl -I\$(top_srcdir)/intl"
 fi
-AC_SUBST(INTLDIR)
 
 
 dnl
