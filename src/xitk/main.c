@@ -315,10 +315,8 @@ static void xrm_parse(void) {
   
   sprintf(wide_dbname, "%s%s", "/usr/lib/X11/app-defaults/", classname);
   
-  if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL) {
-    fprintf(stderr, _("Cannot open display\n"));
-    exit(1);
-  }
+  if((display = XOpenDisplay((getenv("DISPLAY")))) == NULL)
+    return;
   
   application_rmdb = XrmGetFileDatabase(wide_dbname);
   (void) XrmMergeDatabases(application_rmdb, &rmdb);
