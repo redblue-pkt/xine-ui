@@ -1525,7 +1525,10 @@ void xitk_show_widgets(xitk_widget_list_t *wl) {
 
   while(mywidget) {
     
-    xitk_show_widget(wl, mywidget);
+    if(mywidget->visible == -1) 
+      mywidget->visible = 0;
+    else
+      xitk_show_widget(wl, mywidget);
     
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
@@ -1563,8 +1566,11 @@ void xitk_hide_widgets(xitk_widget_list_t *wl) {
   mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
 
   while(mywidget) {
-    
-    xitk_hide_widget(wl, mywidget);
+
+    if(mywidget->visible == 0)
+      mywidget->visible = -1;
+    else
+      xitk_hide_widget(wl, mywidget);
     
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
