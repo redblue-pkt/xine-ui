@@ -620,13 +620,14 @@ static void _pplugin_set_param_int(xitk_widget_t *w, void *data, int value) {
   
   if(pobj->readonly)
     return;
-
+  
   //can be int[]:
   //int num_of_int = pobj->param->size / sizeof(char);
-
-  if(value < pobj->param->range_min || value > pobj->param->range_max) {
+  
+  if(pobj->param->range_min && pobj->param->range_max && 
+     (value < (int)pobj->param->range_min || value > (int)pobj->param->range_max)) {
     xine_error(_("Entered value is out of bounds (%d>%d<%d)."),
-	       pobj->param->range_min, value, pobj->param->range_max);
+	       (int)pobj->param->range_min, value, (int)pobj->param->range_max);
   }
   else {
     *(int *)(pobj->param_data + pobj->param->offset) = value;
