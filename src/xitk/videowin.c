@@ -196,7 +196,7 @@ void video_window_set_fullscreen (int req_fullscreen) {
 
   gVw->fullscreen_req = req_fullscreen;
 
-  video_window_adapt_size (gVw->video_width, gVw->video_height, 
+  video_window_adapt_size (NULL, gVw->video_width, gVw->video_height, 
 			   &area.x, &area.y, &area.w, &area.h);
 
   gGui->vo_driver->gui_data_exchange (gGui->vo_driver, 
@@ -214,7 +214,8 @@ int video_window_is_fullscreen (void) {
 /*
  *
  */
-void video_window_calc_dest_size (int video_width, int video_height,
+void video_window_calc_dest_size (void *this,
+				  int video_width, int video_height,
 				  int *dest_width, int *dest_height)  {
 
   if (gVw->fullscreen_mode) {
@@ -233,7 +234,8 @@ void video_window_calc_dest_size (int video_width, int video_height,
 /*
  *
  */
-void video_window_adapt_size (int video_width, int video_height, 
+void video_window_adapt_size (void *this,
+			      int video_width, int video_height, 
 			      int *dest_x, int *dest_y,
 			      int *dest_width, int *dest_height) {
 
@@ -735,7 +737,7 @@ void video_window_init (void) {
 
   XUnlockDisplay (gGui->display);
 
-  video_window_adapt_size (768, 480, &x, &y, &w, &h);
+  video_window_adapt_size (NULL, 768, 480, &x, &y, &w, &h);
   video_window_draw_logo();
 
 }

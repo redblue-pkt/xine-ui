@@ -27,11 +27,13 @@
 
 void video_window_init (void);
 
-void video_window_adapt_size (int video_width, int video_height, 
+void video_window_adapt_size (void *this,
+			      int video_width, int video_height, 
 			      int *dest_x, int *dest_y,
 			      int *dest_width, int *dest_height);
 
-void video_window_calc_dest_size (int video_width, int video_height,
+void video_window_calc_dest_size (void *this,
+				  int video_width, int video_height,
 				  int *dest_width, int *dest_height);
 
 /* set/get fullscreen mode */

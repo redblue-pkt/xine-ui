@@ -579,13 +579,13 @@ int main(int argc, char *argv[]) {
 
     case '+':
       xine_select_audio_channel(aaxine.xine,
-				(xine_get_audio_channel(aaxine.xine) + 1));
+				(xine_get_audio_selection(aaxine.xine) + 1));
       break;
       
     case '-':
       if(xine_get_audio_channel(aaxine.xine))
 	xine_select_audio_channel(aaxine.xine,
-				  (xine_get_audio_channel(aaxine.xine) - 1));
+				  (xine_get_audio_selection(aaxine.xine) - 1));
       break;
 
     case 'q':

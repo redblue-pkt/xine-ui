@@ -345,6 +345,7 @@ static void load_video_out_driver(char *video_driver_id) {
 
   vis.calc_dest_size    = video_window_calc_dest_size;
   vis.request_dest_size = video_window_adapt_size;
+  vis.user_data         = NULL;
   
   if (!video_driver_id) {
     /* video output driver auto-probing */
