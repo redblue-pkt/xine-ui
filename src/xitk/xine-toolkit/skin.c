@@ -307,20 +307,16 @@ static void skin_get_next_line(xitk_skin_config_t *skonfig) {
   ABORT_IF_NULL(skonfig);
   ABORT_IF_NULL(skonfig->fd);
   
- __get_next_line:
+  do {
+    skonfig->ln = fgets(skonfig->buf, 255, skonfig->fd);
+    
+    while(skonfig->ln && (*skonfig->ln == ' ' || *skonfig->ln == '\t')) ++skonfig->ln;
 
-  skonfig->ln = fgets(skonfig->buf, 255, skonfig->fd);
-
-  while(skonfig->ln && (*skonfig->ln == ' ' || *skonfig->ln == '\t')) ++skonfig->ln;
-
-  if(skonfig->ln) {
-    if((strncmp(skonfig->ln, "//", 2) == 0) ||
-       (strncmp(skonfig->ln, "/*", 2) == 0) || /**/
-       (strncmp(skonfig->ln, ";", 1) == 0) ||
-       (strncmp(skonfig->ln, "#", 1) == 0)) {
-      goto __get_next_line;
-    }
-  }
+  } while(skonfig->ln && 
+	  (!strncmp(skonfig->ln, "//", 2) ||
+	   !strncmp(skonfig->ln, "/*", 2) || /* */
+	   !strncmp(skonfig->ln, ";", 1) ||
+	   !strncmp(skonfig->ln, "#", 1)));
 
   skin_clean_eol(skonfig);
 }
