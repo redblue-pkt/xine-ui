@@ -233,7 +233,7 @@ void panel_update_channel_display (void) {
  */
 void panel_set_no_mrl(void) {
 
-  sprintf(gGui->filename, "Drop a file on Xine v%s *** Drop a file on Xine v%s *** Drop a file on Xine v%s", VERSION, VERSION, VERSION);
+  sprintf(gGui->filename, "xine-ui version %s", VERSION);
 }
 
 /*
