@@ -23,6 +23,51 @@ Bêdziesz musia³ u¿yæ GNU make do skompilowania xine, w wiekszo¶ci sustemów
 GNU/Linux 'make' to GNU make, na innych platformach u¿ywaj
 zamiast make - "gmake".
 
+xine jest dystrybuowane w dwóch (oficjalnych) czêsciach, xine-lib i xine-ui.
+
+Najpierw musisz skompilowaæ i zainstalowaæ xine-lib:
+
+./cvscompile.sh  <--- wymagane tylko je¶li zci±ga³e¶ wersjê CVS
+./configure
+make
+make install
+
+Je¶li zainstalowa³e¶ xine-lib z jakim¶ nie standardowym prefiksem,
+upewnij siê ¿e <prefix>/bin jest w twojej zmiennej PATH i linker
+znajdzie biblioteki w <prefix>/libs. U¿ywaj±c pow³oki bash mo¿esz
+zrobiæ co¶ takiego:
+
+export PATH="<prefix>/bin:$PATH"
+export LD_LIBRARY_PATH="<prefix>/lib:$LD_LIBRARY_PATH"
+
+by siê upewniæ ¿e libxine zostanie znalezione przez xine-ui.
+
+Teraz mo¿esz skompilowaæ i zainstalowaæ xine-ui, u¿ywaj±c tej samej
+procedury co w przypadku xine-lib:
+
+./cvscompile.sh  <--- wymagane tylko je¶li zci±ga³e¶ wersjê CVS
+./configure
+make
+make install
+
+Je¿eli ./configure stwiedza ¿e nie mo¿e znale¼æ xine-lib, znów
+(zobacz wy¿ej): sprawd¼ czy <prefix>/bin jest w twojej zmiennej PATH,
+i ¿e linker znajdzie biblioteki zainstalowane uprzednio w </prefix>/lib.
+
+xine-lib zainstalowa³o siê poprawnie ale xine-ui stwierdza ¿e
+nie mo¿e znale¼æ xine-lib
+-------------------------------------------------------------
+
+upewnij siê ¿e  <prefix>/bin jest w twojej zmiennej PATH i ¿e
+linker mo¿e znale¼æ biblioteki zainstalowane w <prefix>/lib,
+gdzie <prefix> to katalog w jakim zainstalowa³e¶ xine-lib
+(TAK, musisz "make install" xine-lib zanim bêdziesz móg³ skompilowaæ
+xine-ui). Przeczytaj odpowied¼ na poprzednie pytania na temat
+jak poprawnie skompilowaæ i zainstalowaæ xine-lib i xine-ui
+
+Problemy ze skompilowaniem Xv
+-----------------------------
+
 Je¶li chcesz mieæ wbudowan± obs³ugê rozszerzenia Xv, upewnij siê ¿e masz
 albo wspó³dzielon± bibliotekê Xv w swoim systemie, np.
 
@@ -40,37 +85,7 @@ mo¿esz stworzyæ sobie sam wersjê wspó³dzielon±:
 # ln -s libXv.so.1 libXv.so
 # ldconfig
 
-teraz powiniene¶ móc skompilowaæ xine na swoim systemie:
-
-xine jest dystrybuowane w dwóch (oficjalnych) czêsciach, xine-lib i xine-ui.
-
-Najpierw musisz skompilowaæ i zainstalowaæ xine-lib:
-
-./cvscompile.sh  <--- wymagane tylko je¶li zci±ga³e¶ wersjê CVS
-./configure
-make
-make install
-
-Je¶li zainstalowa³e¶ xine-lib z jakim¶ nie standardowym prefiksem,
-upewnij siê ¿e <prefix>/bin jest w twojej zmiennej PATH i linker
-znajdzie biblioteki w <prefix>/libs. W pow³oce bash mo¿esz u¿yæ:
-
-export PATH="<prefix>/bin:$PATH"
-export LD_LIBRARY_PATH="<prefix>/lib:$LD_LIBRARY_PATH"
-
-by siê upewniæ ¿e program zadzia³a.
-
-Teraz mo¿esz skompilowaæ i zainstalowaæ xine-ui, u¿ywaj±c tej samej
-procedury co w przypadku xine-lib:
-
-./cvscompile.sh  <--- wymagane tylko je¶li zci±ga³e¶ wersjê CVS
-./configure
-make
-make install
-
-Je¿eli ./configure stwiedza ¿e nie mo¿e znale¼æ xine-lib, znów
-(zobacz wy¿ej): sprawd¼ czy <prefix>/bin jest w twojej zmiennej PATH,
-i ¿e linker znajdzie biblioteki zainstalowane uprzednio w </prefix>/lib.
+teraz powiniene¶ móc skompilowaæ xine na swoim systemie.
 
 xine-lib siê nie kompiluje
 --------------------------
@@ -79,16 +94,6 @@ xine-lib siê nie kompiluje
 bibliotekê kompresji zlib wraz z odpowiednimi nag³ówkami (headers), które
 czêsto mo¿na znale¼æ w pakiecie zwanym zlib-devel lub podobnym.
 
-xine-lib zainstalowa³o siê poprawnie ale xine-ui stwierdza ¿e
-nie mo¿e znale¼æ xine-lib
--------------------------------------------------------------
-
-upewnij siê ¿e  <prefix>/bin jest w twojej zmiennej PATH i ¿e
-linker mo¿e znale¼æ biblioteki zainstalowane w <prefix>/lib,
-gdzie <prefix> to katalog w jakim zainstalowa³e¶ xine-lib
-(TAK, musisz "make install" xine-lib zanim bêdziesz móg³ skompilowaæ
-xine-ui). Przeczytaj odpowied¼ na poprzednie pytania na temat
-jak poprawnie skompilowaæ i zainstalowaæ xine-lib i xine-ui
 
 Jak mo¿na podaæ dodatkowe CFLAGS do kompilacji ?
 ------------------------------------------------
@@ -124,6 +129,11 @@ make install
 
 Jak mo¿na zmusiæ xine do u¿ycia rozszerzenia Xv?
 ------------------------------------------------
+
+xine bêdzie zazwyczaj u¿ywaæ Xv domy¶lnie je¶li to rozszerzenie
+bêdzie dostêpne. W niektórych przypadkach bêdziesz jednak musia³
+wybraæ odtwarzanie poprzez Xv rêcznie (kiedy z jakiego¶ powodu
+.xinerc stwierdza ¿e chcesz u¿ywaæ XShm):
 
 xine -V Xv foo.mpg
 
@@ -166,22 +176,17 @@ xine wy¶wietla swoje logo ale nie widzê obrazu?
 -----------------------------------------------
 
 U¿yj przycisku PLAY albo wci¶nij RETURN
-¿eby rozpocz±æ odtwarzanie.
+¿eby rozpocz±æ odtwarzanie. Upewnij siê ¿e na pewno
+wskaza³e¶ porgramowi co ma odtwarzaæ - naprzyk³ad
+podaj±c argument z lini poleceñ:
 
+xine foo-movie.mpg
 
 xine odtwarza d¼wiêk ale nie widzê obrazu
 -----------------------------------------
 
-Je¶li widzisz du¿o komunikatów zawieraj±cych "rejected"
-oznacza ¿e Twój sprzêt jest nie skonfigurowany do xine.
-Mo¿liwe równie¿, ¿e Twoja karta d¼wiêkowa nie obs³uguje
-us³ugi "realtime" (xine testuje to przy starcie wiêc mo¿esz
-mo¿esz sprawdziæ czytaj±c komunikaty startowe). Spróbuj
-wtedy znale¼æ lepsze sterowniki.
-
-Mo¿liwe ¿e po prostu Twój sprzêt jest zbyt wolny - zobacz
+Prawdopodobnie Twój sprzêt jest po prostu zbyt wolny - zobacz
 "xine opuszcza bardzo du¿o klatek" poni¿ej. 
-
 
 Gdzie powinienem skopiowaæ kodeki win32 dll dla xine?
 -----------------------------------------------------
@@ -209,12 +214,16 @@ Innym powodem mo¿e byæ fakt ¿e Twój napêd DVD (RPC-2) nie jest
 ustawiony na odpowiedni region.
 
 
-Kiedy odtwarzam t± sekwencjê widzê obraz ale nie odtwarza d¼wiêku?
-------------------------------------------------------------------
+Kiedy odtwarzam t± sekwencjê, xine pokazuje jakie¶ obrazy
+ale nie odtwarza d¼wiêku?
+---------------------------------------------------------
 
+To mo¿e siê zdarzyæ z materia³ami mpeg-2 jak np. DVD
 Spróbuj inny kana³ audio:
 
-xine -a channel stream.vob
+xine -a kana³ stream.vob
+
+(lub wybierz inny kana³ u¿ywaj±c przycisków na panelu xine)
 
 niektóre pliki .vob maj± kana³y d¼wiêku na dziwnych pozycjach
 (np. 3, 7, 10)
@@ -317,9 +326,10 @@ sterowników:
 
 g200/g400    : xfree 4.x obs³uguje Xv
 karty nvidia : www.nvidia.com (Tam znajdziesz binaria sterowników)
+	       XFree 4.1.x ju¿ zawiera obs³ugê Xv dla kart NVidia
 ATI cards    : GATOS www.linuxvideo.org/gatos/
-i815         : ostatnia wersja xfree 4.x obs³uguje Xv
-3dfx (voodoo): ostatnia wersja xfree 4.x obs³uguje Xv
+i815         : xfree 4.x obs³uguje Xv
+3dfx (voodoo): xfree 4.x obs³uguje Xv
 savage       : http://www.probo.com/timr/savage40.html
 
 
@@ -354,7 +364,7 @@ ac3_pass_through:1
 Co oznaczaj± wszystkie te wpisy w .xinerc?
 ------------------------------------------
 
-Wiêcej informacji znajdziesz w doc/README.xinerc
+Wiêcej informacji znajdziesz w xine-ui/doc/README.xinerc
 
 
 Sk±d i w jaki sposób mogê zci±gn±æ najnowsz± wersjê rozwojow±?
@@ -438,7 +448,6 @@ Proporcje obrazu s± b³êdne!
 Spróbuj nacisn±æ 'A' by prze³±czyæ siê miedzy mo¿liwymi proporcjami.
 
 
-
 Jak odtwarzaæ potoki z STDIN ?
 ----------------------------------
 
@@ -472,6 +481,8 @@ contrast:128
 Warto¶ci i mo¿liwe zakresy zale¿± od Twojego sterownika Xv wiêc bêdziesz
 musia³ trochê poexperymentowaæ aby otrzymaæ dobry obraz.
 
+Mo¿esz równie¿ u¿yæ przycisku w panelu xine aby interaktywnie
+kontrolowaæ te ustawinia wy¶wietlania.
 
 Niektóre czê¶ci mojego X Desktop robi± siê przezroczyste gdy
 xine odtwarza obraz!
@@ -491,10 +502,10 @@ nie odtwarza d¼wiêku,
 ale "audio driver 'oss' failed, using null driver instead."
 -----------------------------------------------------------
 
-Przedewszystkim, upewnij siê ¿e Twój sterownik d¼wiêku OSS dzia³a
+Przede wszystkim, upewnij siê ¿e Twój sterownik d¼wiêku OSS dzia³a
 (np. mo¿esz odtwarzaæ muzykê za pomoc± innego oprogramowania)
 
-Najczêstrzym wspólnym powodem tego jest jaki¶ inny program u¿ywaj±cy
+Najczêstrzym, wspólnym powodem tego jest jaki¶ inny program u¿ywaj±cy
 Twojego urz±dzenia d¼wiêkowego. Je¶li u¿ywasz linuxa, komenda "fuser /dev/dsp"
 powinna zwróciæ ci PID takiego procesu.
 
@@ -506,21 +517,21 @@ xine do u¿ycia ESD jako wyj¶cia audio nastêpuj±c± komend±:
 
 xine -A esd
 
-To mo¿e powodowaæ bardziej zniekszta³conym odtwarzaniem, wiêc pierwszy sposób
-jest preferowany.
+To mo¿e powodowaæ gorszym odtwarzaniem - dok³adna synchronizacja
+nie jest mo¿liwa z u¿yciem esd, wiêc u¿ywanie oss jest preferowane.
 
 
 mam problemy z uruchomieniem xine na FreeBSD, Solaris
 -----------------------------------------------------
 
-Przeczytaj odpowiednie README w katalogu doc.
+Przeczytaj odpowiednie README w katalogu xine-ui/doc.
 
 co to jest aalib? Jak tego u¿ywaæ w xine?
 -----------------------------------------
 
 aalib to biblioteka "ascii art". xine jest dostarczany wraz z wtyczk±
 aalib video za pomoc± której mo¿esz ogl±daæ filmy w xterm'ie, na konsoli
-lub starym dobrym vt100 - nawiasem mówi±c, bardzo fajne ;>
+lub starym dobrym vt100 - bardzo fajne ;>
 
 By go u¿ywaæ po prostu upewnij siê ¿e masz zainstalowan± bibliotekê aalib
 zanim uruchomisz skrypt configure i zanim skompilujesz xine-lib i xine-ui.
@@ -547,17 +558,28 @@ alsa_ac3_device:plughw:0,2
 gdzie¶ do Twojego ~/.xinerc i spróbuj ponownie.
 
 
+alsa 05
+-------
+
+Nie u¿ywaj tej wersji.
+
+
 My¶lê ¿e znalaz³em B£¡D!
-----------------------
+------------------------
 
 xine jest w ci±g³ym rozwoju. Proszê b±d¼ cierpliwy. Je¶li masz czas,
 skontaktuj siê z nami i wy¶lij nam pe³ny raport o b³êdzie.
 Proszê dodaj wszystkie komunikaty wyj¶cia z konsoli pojawiaj±ce siê
-po uruchomieniu xine, i parê szczegó³ów o Twoim systemie i sprzêcie.
+po uruchomieniu xine, i parê szczegó³ów o Twoim systemie i sprzêcie
+(przeczytaj xine-ui/doc/bug_report_form).
 
 Mo¿esz do nas pisaæ na adres email:
 
-  Xine Mailing List <xine-user@lists.sourceforge.net>
+  Lista Dyskusyjna u¿ytkowników xine <xine-user@lists.sourceforge.net>
+
+---
+versja tego pliku:
+$Id$
 
 ********************************
 * T³umaczenie Bart³omiej Muryn *
