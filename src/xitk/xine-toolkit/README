@@ -6,9 +6,9 @@ made small changes). You can change default colors, fonts, and timers.
 
 			       RC file
 			       -------
-User can add a '.xitkrc' in their home directory, and system admins can add 
-a 'xitkrc' file in /etc (system wide rc file). 
-If the user have his own .xitkrc file, the system wide rc file is simply ignored.
+User can add a '.xitkrc' in their home directory or 'xitkrc' in the '.xine' directory,
+and system admins can add a 'xitkrc' file in /etc (system wide rc file). 
+The first one found will be used, the others will be ignored.
 
 NOTE: colors can be: pixel color value, tripled value or named colors (see widget.c)
 

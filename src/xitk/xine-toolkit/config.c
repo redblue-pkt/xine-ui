@@ -391,19 +391,23 @@ unsigned long xitk_config_get_warning_background(xitk_config_t *xtcf) {
 xitk_config_t *xitk_config_init(void) {
   xitk_config_t *xtcf;
   char          *rcfile;
-  char          *user_rc = ".xitkrc";
+  char          *user_rc = "xitkrc";
 
   xtcf = (xitk_config_t *) xitk_xmalloc(sizeof(xitk_config_t));
   
-  rcfile = (char *) xitk_xmalloc((strlen((xitk_get_homedir())) + strlen(user_rc)) + 2);
-  sprintf(rcfile, "%s/%s", (xitk_get_homedir()), user_rc);
+  rcfile = (char *) xitk_xmalloc(strlen(xitk_get_homedir()) + strlen(user_rc) + 3);
+  sprintf(rcfile, "%s/.%s", xitk_get_homedir(), user_rc);
   
   if((xtcf->fd = fopen(rcfile, "r")) == NULL) {
-    rcfile = (char *) realloc(rcfile, (strlen(SYSTEM_RC) + 1));
-    sprintf(rcfile, "%s", SYSTEM_RC);
+    rcfile = (char *) realloc(rcfile, strlen(rcfile) + 6);
+    sprintf(rcfile, "%s/.xine/%s", xitk_get_homedir(), user_rc);
     if((xtcf->fd = fopen(rcfile, "r")) == NULL) {
-      XITK_FREE(rcfile);
-      rcfile = NULL;
+      rcfile = (char *) realloc(rcfile, (strlen(SYSTEM_RC) + 1));
+      sprintf(rcfile, "%s", SYSTEM_RC);
+      if((xtcf->fd = fopen(rcfile, "r")) == NULL) {
+        XITK_FREE(rcfile);
+        rcfile = NULL;
+      }
     }
   }
   
