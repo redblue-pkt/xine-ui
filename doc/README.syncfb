@@ -4,11 +4,8 @@
   =====                                                            =====
 
 
-  PLEASE NOTE: There is a rewrite in progress for the SyncFB plugin. The
-  version included in this XINE release  is  *not*  100%  functional. We
-  apologize for that and hope to have a  brand-new plugin available soon
-  which will be included in the next XINE release.
-
+  PLEASE NOTE: currently the plugin is *not* 100% functional.
+  
 
 * WHAT IS THIS PLUGIN ABOUT and WHY SHOULD I EVEN CONSIDER TO USE IT? :)
   
@@ -135,6 +132,7 @@
 
 * WHAT IS ON THE TODO LIST?
   
+  fixing the plugin to support all features it did before XINE's API change
   The plugin does not yet activate the hardware deinterlacing.
   The mouse cursor doesn't disappear yet when it should be disappearing.
   Prevent the panel from hidding behind the overlay by moving it out of range.
