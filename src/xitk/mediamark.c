@@ -568,16 +568,18 @@ static mediamark_t **guess_sfv_playlist(playlist_t *playlist, const char *filena
 		  int        h, m, s;
 		  int        Y, M, D;
 		  char       fn[_PATH_MAX + _NAME_MAX + 1];
+		  char       mon[4];
 		  int        n, t;
-		  
-		  if((sscanf(ln, ";%ld %d:%d.%d %d-%d-%d %s",
-			     &size, &h, &m, &s, &Y, &M, &D, &fn[0])) == 8) {
+
+		  if(((sscanf(ln, ";%ld %d:%d.%d %d-%d-%d %s", &size, &h, &m, &s, &Y, &M, &D, &fn[0])) == 8) ||
+		     ((sscanf(ln, ";%ld %3s %d %d:%d:%d %d %s", &size, &mon[0], &D, &h, &m, &s, &Y, &fn[0])) == 8)) {
 		    char  *p = ln;
-		    
+
 		    while((*p != '\0') && (*p != '[')) p++;
 		    
 		    if(p && ((sscanf(p, "[%dof%d]", &n, &t)) == 2))
 		      valid_sfv = 1;
+
 		  }
 		}		
 	      }
