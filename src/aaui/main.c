@@ -52,6 +52,7 @@ config_values_t  *config;
 xine_t           *xine;
 aa_context       *context;
 ao_functions_t   *ao_driver;
+char             *mrl;
 
 void show_banner(void) {
 
@@ -117,9 +118,15 @@ void print_usage () {
   printf("\n");
 }
 
+void set_position (int pos) {
+
+  xine_stop (xine);
+  xine_play (xine, mrl, pos);
+
+}
+
 int main(int argc, char *argv[]) {
 
-  char          *mrl;
   char          *configfile;
   struct termios stored_settings;
   struct termios new_settings;
@@ -272,6 +279,40 @@ int main(int argc, char *argv[]) {
     case 'S':
       xine_stop (xine);
       break;
+
+    case '1':
+      set_position (6553);
+      break;
+    case '2':
+      set_position (6553*2);
+      break;
+    case '3':
+      set_position (6553*3);
+      break;
+    case '4':
+      set_position (6553*4);
+      break;
+    case '5':
+      set_position (6553*5);
+      break;
+    case '6':
+      set_position (6553*6);
+      break;
+    case '7':
+      set_position (6553*7);
+      break;
+    case '8':
+      set_position (6553*8);
+      break;
+    case '9':
+      set_position (6553*9);
+      break;
+    case '0':
+      set_position (0);
+      break;
+
+
+
     }
   }
 
