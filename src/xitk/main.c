@@ -86,7 +86,7 @@ int       no_lirc;
 #define DISPLAY_KEYMAP          1002
 
 /* options args */
-static const char *short_options = "?hgH"
+static const char *short_options = "?hHgfv"
 #ifdef HAVE_LIRC
  "L"
 #endif
@@ -96,7 +96,7 @@ static const char *short_options = "?hgH"
 #ifdef DEBUG
  "d:"
 #endif
- "R::u:a:V:A:D:p::s:f:v";
+ "u:a:V:A:p::s:";
 static struct option long_options[] = {
   {"help"           , no_argument      , 0, 'h'                      },
 #ifdef HAVE_LIRC
@@ -638,7 +638,7 @@ int main(int argc, char *argv[]) {
   /*
    * init gui
    */
-
+  
   gui_init(argc-optind, &argv[optind]);
 
   /*
