@@ -1244,6 +1244,8 @@ void gui_start (int nfiles, char *filenames[]) {
   else
     sprintf (gui_spuid, "%3s", "off");
 
+  gImlib_data = Imlib_init (gDisplay);
+
   /*
    * setup panel
    */
