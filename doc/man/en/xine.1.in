@@ -255,14 +255,14 @@ Options are:
 \fBloop=\fP\fIm\fP    set loop mode (\<\fIm\fP\>: \fBnone\fP \fBloop\fP \fBrepeat\fP \fBshuffle\fP or \fBshuffle+\fP),
 .br
 \fBget_speed\fP       get current speed status. Return values are:
-    - 1: Error
-    - 2: Stop
-    - 3: * 1
-    - 4: Pause
-    - 5: / 4
-    - 6: / 2
-    - 7: * 2
-    - 8: * 4
+    - 1: error
+    - 2: stop
+    - 3: play
+    - 4: pause
+    - 5: slow4
+    - 6: slow2
+    - 7: fast2
+    - 8: fast4
 .br
 (\fBplaylist\fP|\fBpl\fP)\fB=\fP\fIp\fP
 .br
