@@ -36,10 +36,13 @@ vstupu. Nìkteré dùle¾ité pøíklady by mìly být vysvìtleny:
      pnm://server/umístìní/soubor   pøehraje soubor pøes protokol PNM
      rtsp://server/umístìní/soubor  pøehraje soubor pøes protokol RTSP
 
-     tcp://hostitel:port            pøijmá data pøes soket TCP
-     slave://hostitel:port          pøijmá data vysílaná pomocí xine
-     udp://hostitel:port            pøijmá vícesmìrová data pøes UDP
-     rtp://hostitel:port            pøijmá vícesmìrová data RTP
+     tcp://host:port                pøijímá data pøes soket TCP
+     slave://host:port              pøijímá data vysílaná pomocí xine
+
+     udp://host:port                pøijímá vícesmìrová data pøes UDP
+     udp://host:port?iface=eth0     pøijímá vícesmìrová data pøes UDP z eth0
+     rtp://host:port                pøijímá vícesmìrová data RTP
+     rtp://host:port?iface=eth0     pøijímá vícesmìrová data RTP
 
      dvb:/                          uká¾e digitální vysílání videa (Digital
                                     Video Broadcast)
