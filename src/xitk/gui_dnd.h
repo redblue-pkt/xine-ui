@@ -32,6 +32,7 @@
 //} dnd_callback_t;
 
 typedef struct DND_struct_s {
+  Display *display;
   Window  win;
   
   void (*callback) (char *fname);
@@ -101,13 +102,13 @@ typedef struct DND_struct_s {
 
 
 
-void gui_init_dnd(DND_struct_t *) ;
+void gui_init_dnd(Display *display, DND_struct_t *);
 
-void gui_make_window_dnd_aware (DND_struct_t *, Window) ;
+void gui_make_window_dnd_aware (DND_struct_t *, Window);
 
 //Bool gui_accept_dnd(Window window);
 
-Bool gui_dnd_process_client_message(DND_struct_t *, XEvent *) ;
+Bool gui_dnd_process_client_message(DND_struct_t *, XEvent *);
 
 //typedef void (*gui_dnd_callback_t) (char *filename);
 

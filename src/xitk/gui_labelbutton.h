@@ -24,13 +24,15 @@
 #ifndef HAVE_GUI_LBUTTON_H
 #define HAVE_GUI_LBUTTON_H
 
-#include "gui_main.h"
+#include <X11/Xlib.h>
+#include "Imlib.h"
 #include "gui_widget.h"
 
 #define CLICK_BUTTON 1
 #define RADIO_BUTTON 2
 
-widget_t *create_label_button (int x, int y, int btype, const char *label, 
+widget_t *create_label_button (Display *display, ImlibData *idata,
+			       int x, int y, int btype, const char *label, 
 			       void* f, void* ud, const char *skin,
  			       const char *normcolor, const char *focuscolor, 
 			       const char *clickcolor);
@@ -41,6 +43,8 @@ void labelbutton_set_state(widget_t *, int, Window, GC);
 
 
 typedef struct lbutton_private_data_s {
+
+  Display     *display;
   widget_t    *bWidget;
   int          bType;
   int          bClicked;

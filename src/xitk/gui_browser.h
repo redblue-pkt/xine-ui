@@ -24,11 +24,15 @@
 #ifndef HAVE_GUI_BROWSER_H
 #define HAVE_GUI_BROWSER_H
 
-#include "gui_main.h"
+#include <X11/Xlib.h>
+
+#include "Imlib.h"
 #include "gui_widget.h"
 
-                         /* The receiver list */
-widget_t *create_browser(widget_list_t *thelist, 
+                         
+widget_t *create_browser(Display *display, ImlibData *idata,
+			 /* The receiver list */
+			 widget_list_t *thelist, 
 			 /* X, Y, skin for slider up button */
 			 int upX, int upY, char *upSK,
 			 /* X, Y, backgrnd, foregrnd skin for slider */
@@ -57,6 +61,8 @@ typedef struct btnlist_s {
 } btnlist_t;
 
 typedef struct browser_private_data_s {
+
+  Display       *display;
 
   widget_t      *bWidget;
 

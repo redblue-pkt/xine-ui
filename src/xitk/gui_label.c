@@ -26,17 +26,15 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <pthread.h>
-#include "xine.h"
-#include "utils.h"
+
+#include "Imlib.h"
 #include "gui_widget.h"
+#include "gui_image.h"
 #include "gui_label.h"
 #include "gui_widget_types.h"
-#include "gui_main.h"
-
-extern gGlob_t          *gGlob;
-extern gui_color_t       gui_color;
-extern uint32_t          xine_debug;
 
 /*
  *
@@ -47,7 +45,7 @@ void paint_label (widget_t *l,  Window win, GC gc) {
   gui_image_t *font = (gui_image_t *) private_data->font;
   int x_dest, y_dest, nCWidth, nCHeight, nLen, i;
   
-  XLockDisplay (gGlob->gDisplay);
+  XLockDisplay (private_data->display);
   
   x_dest = l->x;
   y_dest = l->y;
@@ -70,7 +68,7 @@ void paint_label (widget_t *l,  Window win, GC gc) {
 	px = (c % 32) * nCWidth;
 	py = (c / 32) * nCHeight;
 	
-	XCopyArea (gGlob->gDisplay, font->image, win, gc, px, py,
+	XCopyArea (private_data->display, font->image, win, gc, px, py,
 		   nCWidth, nCHeight, x_dest, y_dest);
 	
       }
@@ -82,7 +80,7 @@ void paint_label (widget_t *l,  Window win, GC gc) {
     fprintf (stderr, "paint labal on something (%d) that "
 	     "is not a label\n", l->widget_type);
 
-  XUnlockDisplay (gGlob->gDisplay);
+  XUnlockDisplay (private_data->display);
 }
 /*
  *
@@ -108,33 +106,36 @@ int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel) {
 /*
  *
  */
-widget_t *create_label (int x, int y, int length, 
+widget_t *create_label (Display *display, ImlibData *idata,
+			int x, int y, int length, 
 			const char *label, char *font) {
   widget_t              *mywidget;
   label_private_data_t *private_data;
 
-  mywidget = (widget_t *) xmalloc(sizeof(widget_t));
+  mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
 
   private_data = (label_private_data_t *) 
-    xmalloc(sizeof(label_private_data_t));
+    gui_xmalloc(sizeof(label_private_data_t));
+
+  private_data->display     = display;
 
   private_data->lWidget     = mywidget;
-  private_data->font        = gui_load_image(font);
+  private_data->font        = gui_load_image(idata, font);
   private_data->char_length = (private_data->font->width/32);
   private_data->char_height = (private_data->font->height/3);
   private_data->length      = length;
   private_data->label       = strdup(label);
 
-  mywidget->private_data = private_data;
-  mywidget->enable       = 1;
-  mywidget->x            = x;
-  mywidget->y            = y;
-  mywidget->width        = (private_data->char_length * strlen(label));
-  mywidget->height       = private_data->char_height;
-  mywidget->widget_type  = WIDGET_TYPE_LABEL;
-  mywidget->paint        = paint_label;
-  mywidget->notify_click = NULL;
-  mywidget->notify_focus = NULL;
+  mywidget->private_data    = private_data;
+  mywidget->enable          = 1;
+  mywidget->x               = x;
+  mywidget->y               = y;
+  mywidget->width           = (private_data->char_length * strlen(label));
+  mywidget->height          = private_data->char_height;
+  mywidget->widget_type     = WIDGET_TYPE_LABEL;
+  mywidget->paint           = paint_label;
+  mywidget->notify_click    = NULL;
+  mywidget->notify_focus    = NULL;
   
   return mywidget;
 }

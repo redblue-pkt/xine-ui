@@ -27,13 +27,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "xine.h"
+
 #include "gui_main.h"
 #include "gui_list.h"
 #include "gui_image.h"
 #include "utils.h"
 
-extern config_values_t *gConfig;
+extern gGui_t          *gGui; 
 
 /*
  * Return full pathname of a skin file.
@@ -264,7 +264,9 @@ void gui_place_extra_images(widget_list_t *gui_widget_list) {
 	  tmp2[strlen(ln) - 1] = '\0';
 	  sprintf(skinfile, "%s/%s/%s", XINE_SKINDIR, skin, tmp2);
 	  gui_list_append_content (gui_widget_list->l, 
-				   create_image (x, y, skinfile));
+				   create_image (gGui->display, 
+						 gGui->imlib_data, 
+						 x, y, skinfile));
 	  
 	}
       }

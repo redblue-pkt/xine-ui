@@ -24,13 +24,16 @@
 #ifndef HAVE_GUI_LABEL_H
 #define HAVE_GUI_LABEL_H
 
+#include <X11/Xlib.h>
+#include "Imlib.h"
 #include "gui_widget.h"
-#include "gui_main.h"
 
-widget_t *create_label (int x, int y, int length, const char *label, char *bg);
+widget_t *create_label (Display *display, ImlibData *idata,
+			int x, int y, int length, const char *label, char *bg);
 int label_change_label (widget_list_t *wl, widget_t *l, const char *newlabel);
 
 typedef struct label_private_data_s {
+  Display       *display;
 
   widget_t      *lWidget;
 

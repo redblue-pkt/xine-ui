@@ -23,10 +23,12 @@
 #ifndef HAVE_GUI_CHECKBOX_H
 #define HAVE_GUI_CHECKBOX_H
 
-#include "gui_main.h"
+#include <X11/Xlib.h>
+#include "Imlib.h"
 #include "gui_widget.h"
 
 typedef struct checkbox_private_data_s {
+  Display     *display;
   widget_t    *cWidget;
   int          cClicked;
   int          cArmed;
@@ -39,7 +41,8 @@ typedef struct checkbox_private_data_s {
 
 } checkbox_private_data_t;
 
-widget_t *create_checkbox (int x, int y, void* f, void* ud, const char *skin) ;
+widget_t *create_checkbox (Display *display, ImlibData *idata,
+			   int x, int y, void* f, void* ud, const char *skin) ;
 int checkbox_get_state(widget_t *);
 void checkbox_set_state(widget_t *, int, Window, GC);
 

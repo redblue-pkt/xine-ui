@@ -28,9 +28,7 @@
 #include <setjmp.h>
 #include <pthread.h>
 
-#include "xine.h"
-#include "utils.h"
-#include "gui_main.h"
+#include "Imlib.h"
 #include "gui_widget.h"
 #include "gui_widget_types.h"
 #include "gui_browser.h"
@@ -38,9 +36,6 @@
 #include "gui_button.h"
 #include "gui_labelbutton.h"
 #include "gui_slider.h"
-
-extern uint32_t         xine_debug;
-extern pthread_mutex_t  gXLock;
 
 #define WBUP    0  /*  Position of button up in item_tree  */
 #define WSLID   1  /*  Position of slider in item_tree  */
@@ -122,7 +117,7 @@ void browser_rebuild_browser(widget_t *w, int start) {
     if(start >= 0)
       private_data->current_start = start;
     
-    wl = (widget_list_t*) xmalloc(sizeof(widget_list_t));
+    wl = (widget_list_t*) gui_xmalloc(sizeof(widget_list_t));
     wl->win = private_data->win;
     wl->gc = private_data->gc;
     
@@ -201,7 +196,7 @@ static void browser_up(widget_t *w, void *data) {
   widget_list_t* wl;
 
   if(w->widget_type & WIDGET_TYPE_BUTTON) {
-    wl = (widget_list_t*) xmalloc(sizeof(widget_list_t));
+    wl = (widget_list_t*) gui_xmalloc(sizeof(widget_list_t));
     wl->win = private_data->win;
     wl->gc = private_data->gc;
     
@@ -220,7 +215,7 @@ static void browser_down(widget_t *w, void *data) {
   widget_list_t* wl;
 
   if(w->widget_type & WIDGET_TYPE_BUTTON) {
-    wl = (widget_list_t*) xmalloc(sizeof(widget_list_t));
+    wl = (widget_list_t*) gui_xmalloc(sizeof(widget_list_t));
     wl->win = private_data->win;
     wl->gc = private_data->gc;
     
@@ -267,7 +262,8 @@ static void browser_select(widget_t *w, void *data, int state) {
 /*
  * Create the list browser
  */
-widget_t *create_browser(widget_list_t *thelist, int upX, int upY, char *upSK,
+widget_t *create_browser(Display *display, ImlibData *idata,
+			 widget_list_t *thelist, int upX, int upY, char *upSK,
 			 int slX, int slY, char *slSKB, char *slSKF,
 			 int dnX, int dnY, char *dnSK,
 			 int btnX, int btnY, 
@@ -277,10 +273,10 @@ widget_t *create_browser(widget_list_t *thelist, int upX, int upY, char *upSK,
   widget_t *mywidget;
   browser_private_data_t *private_data;
 
-  mywidget = (widget_t *) xmalloc(sizeof(widget_t));
+  mywidget = (widget_t *) gui_xmalloc(sizeof(widget_t));
 
   private_data = 
-    (browser_private_data_t *) xmalloc(sizeof(browser_private_data_t));
+    (browser_private_data_t *) gui_xmalloc(sizeof(browser_private_data_t));
 
   private_data->bWidget = mywidget;
   private_data->content = content;
@@ -289,12 +285,12 @@ widget_t *create_browser(widget_list_t *thelist, int upX, int upY, char *upSK,
   
   gui_list_append_content(thelist->l, 
 			  (private_data->item_tree[WBUP] = 
-			   create_button(upX, upY, 
+			   create_button(display, idata, upX, upY, 
 					 browser_up, (void*)mywidget, upSK)));
   
   gui_list_append_content(thelist->l,
 			  (private_data->item_tree[WSLID] = 
-			   create_slider(VSLIDER,
+			   create_slider(display, idata, VSLIDER,
 					 slX, slY, 0,
 					 (list_length>(max_length-1)
 					  ? list_length-1 : 0), 
@@ -306,7 +302,7 @@ widget_t *create_browser(widget_list_t *thelist, int upX, int upY, char *upSK,
   
   gui_list_append_content(thelist->l, 
 			  (private_data->item_tree[WBDN] = 
-			   create_button (dnX, dnY, 
+			   create_button (display, idata, dnX, dnY, 
 					  browser_down, 
 					  (void*)mywidget, dnSK)));
   
@@ -319,14 +315,15 @@ widget_t *create_browser(widget_list_t *thelist, int upX, int upY, char *upSK,
     
     for(i = WBSTART; i < max_length+WBSTART; i++) {
       
-      bt = (btnlist_t *) xmalloc(sizeof(btnlist_t));
-      bt->itemlist = (widget_t *) xmalloc(sizeof(widget_t));
+      bt = (btnlist_t *) gui_xmalloc(sizeof(btnlist_t));
+      bt->itemlist = (widget_t *) gui_xmalloc(sizeof(widget_t));
       bt->itemlist = mywidget;
       bt->sel = i;
       
       gui_list_append_content(thelist->l, 
 			      (private_data->item_tree[i] =
-			       create_label_button (x, y,
+			       create_label_button (display, idata, 
+						    x, y,
 						    RADIO_BUTTON, 
 						    "",
 						    browser_select, 

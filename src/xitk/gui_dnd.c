@@ -32,12 +32,8 @@
 #include <string.h>
 #include <signal.h>
 
-#include "xine.h"
-#include "gui_main.h"
 #include "gui_widget.h"
 #include "gui_dnd.h"
-
-extern uint32_t xine_debug;
 
 /*
 Atom _XA_XdndAware;
@@ -55,25 +51,25 @@ Atom _XA_XINE_XDNDEXCHANGE;
 
 #define XDND_VERSION 3
 
-extern gGlob_t         *gGlob;
-
 //static gui_dnd_callback_t gui_dnd_callback;
 
-void gui_init_dnd(DND_struct_t *xdnd) {
-  
-  xdnd->_XA_XdndAware = XInternAtom(gGlob->gDisplay, "XdndAware", False);
-  xdnd->_XA_XdndEnter = XInternAtom(gGlob->gDisplay, "XdndEnter", False);
-  xdnd->_XA_XdndLeave = XInternAtom(gGlob->gDisplay, "XdndLeave", False);
-  xdnd->_XA_XdndDrop = XInternAtom(gGlob->gDisplay, "XdndDrop", False);
-  xdnd->_XA_XdndPosition = XInternAtom(gGlob->gDisplay, "XdndPosition", False);
-  xdnd->_XA_XdndStatus = XInternAtom(gGlob->gDisplay, "XdndStatus", False);
-  xdnd->_XA_XdndActionCopy = XInternAtom(gGlob->gDisplay, "XdndActionCopy", False);
-  xdnd->_XA_XdndSelection = XInternAtom(gGlob->gDisplay, "XdndSelection", False);
-  xdnd->_XA_XdndFinished = XInternAtom(gGlob->gDisplay, "XdndFinished", False);
+void gui_init_dnd(Display *display, DND_struct_t *xdnd) {
 
-  xdnd->_XA_WM_DELETE_WINDOW = XInternAtom(gGlob->gDisplay, "WM_DELETE_WINDOW", False);
+  xdnd->display = display;
 
-  xdnd->_XA_XINE_XDNDEXCHANGE = XInternAtom(gGlob->gDisplay, "_XINE_XDNDEXCHANGE", 
+  xdnd->_XA_XdndAware = XInternAtom(xdnd->display, "XdndAware", False);
+  xdnd->_XA_XdndEnter = XInternAtom(xdnd->display, "XdndEnter", False);
+  xdnd->_XA_XdndLeave = XInternAtom(xdnd->display, "XdndLeave", False);
+  xdnd->_XA_XdndDrop = XInternAtom(xdnd->display, "XdndDrop", False);
+  xdnd->_XA_XdndPosition = XInternAtom(xdnd->display, "XdndPosition", False);
+  xdnd->_XA_XdndStatus = XInternAtom(xdnd->display, "XdndStatus", False);
+  xdnd->_XA_XdndActionCopy = XInternAtom(xdnd->display, "XdndActionCopy", False);
+  xdnd->_XA_XdndSelection = XInternAtom(xdnd->display, "XdndSelection", False);
+  xdnd->_XA_XdndFinished = XInternAtom(xdnd->display, "XdndFinished", False);
+
+  xdnd->_XA_WM_DELETE_WINDOW = XInternAtom(xdnd->display, "WM_DELETE_WINDOW", False);
+
+  xdnd->_XA_XINE_XDNDEXCHANGE = XInternAtom(xdnd->display, "_XINE_XDNDEXCHANGE", 
 					    False);
   xdnd->version = XDND_VERSION;
 
@@ -82,11 +78,11 @@ void gui_init_dnd(DND_struct_t *xdnd) {
 
 void gui_make_window_dnd_aware (DND_struct_t *xdnd, Window window) {
   
-  XLockDisplay (gGlob->gDisplay);
+  XLockDisplay (xdnd->display);
   xdnd->win = window;
-  XChangeProperty (gGlob->gDisplay, xdnd->win, xdnd->_XA_XdndAware, XA_ATOM,
+  XChangeProperty (xdnd->display, xdnd->win, xdnd->_XA_XdndAware, XA_ATOM,
 		   32, PropModeAppend, (unsigned char *)&xdnd->version, 1);
-  XUnlockDisplay (gGlob->gDisplay);
+  XUnlockDisplay (xdnd->display);
 }
 
 Bool gui_dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
@@ -98,11 +94,11 @@ Bool gui_dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
   XEvent xevent;
   Window selowner;
 
-  XLockDisplay (gGlob->gDisplay);
+  XLockDisplay (xdnd->display);
 
-  selowner = XGetSelectionOwner(gGlob->gDisplay, xdnd->_XA_XdndSelection);
+  selowner = XGetSelectionOwner(xdnd->display, xdnd->_XA_XdndSelection);
 
-  XGetWindowProperty(gGlob->gDisplay, event->xselection.requestor,
+  XGetWindowProperty(xdnd->display, event->xselection.requestor,
 		     xdnd->_XA_XINE_XDNDEXCHANGE,
 		     0, 65536, True, xdnd->atom_support, 
 		     &ret_type, &ret_format,
@@ -112,14 +108,14 @@ Bool gui_dnd_process_selection(DND_struct_t *xdnd, XEvent *event) {
   /*send finished*/
   memset (&xevent, 0, sizeof(xevent));
   xevent.xany.type = ClientMessage;
-  xevent.xany.display = gGlob->gDisplay;
+  xevent.xany.display = xdnd->display;
   xevent.xclient.window = selowner;
   xevent.xclient.message_type = xdnd->_XA_XdndFinished;
   xevent.xclient.format = 32;
   XDND_FINISHED_TARGET_WIN(&xevent) = event->xselection.requestor;
-  XSendEvent(gGlob->gDisplay, selowner, 0, 0, &xevent);
+  XSendEvent(xdnd->display, selowner, 0, 0, &xevent);
 
-  XUnlockDisplay (gGlob->gDisplay);
+  XUnlockDisplay (xdnd->display);
   
   if (delme) {
     int x;
@@ -161,14 +157,14 @@ Bool gui_dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
   } else if (event->xclient.message_type == xdnd->_XA_XdndDrop) {
 
     if (event->xclient.data.l[0] == 
-	XGetSelectionOwner(gGlob->gDisplay, xdnd->_XA_XdndSelection)){
-      XLockDisplay (gGlob->gDisplay);
+	XGetSelectionOwner(xdnd->display, xdnd->_XA_XdndSelection)){
+      XLockDisplay (xdnd->display);
 
-      XConvertSelection(gGlob->gDisplay, xdnd->_XA_XdndSelection, xdnd->atom_support,
+      XConvertSelection(xdnd->display, xdnd->_XA_XdndSelection, xdnd->atom_support,
 			xdnd->_XA_XINE_XDNDEXCHANGE, event->xclient.window, 
 			CurrentTime);
 
-      XUnlockDisplay (gGlob->gDisplay);
+      XUnlockDisplay (xdnd->display);
 
 
       gui_dnd_process_selection (xdnd, event);
@@ -179,16 +175,16 @@ Bool gui_dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
     XEvent xevent;
     Window srcwin = event->xclient.data.l[0];
     
-    XLockDisplay (gGlob->gDisplay);
+    XLockDisplay (xdnd->display);
   
-    if (xdnd->atom_support != XInternAtom(gGlob->gDisplay, "text/uri-list", False)) {
-      XUnlockDisplay (gGlob->gDisplay);
+    if (xdnd->atom_support != XInternAtom(xdnd->display, "text/uri-list", False)) {
+      XUnlockDisplay (xdnd->display);
       return True;
     }
     
     memset (&xevent, 0, sizeof(xevent));
     xevent.xany.type = ClientMessage;
-    xevent.xany.display = gGlob->gDisplay;
+    xevent.xany.display = xdnd->display;
     xevent.xclient.window = srcwin;
     xevent.xclient.message_type = xdnd->_XA_XdndStatus;
     xevent.xclient.format = 32; 
@@ -199,9 +195,9 @@ Bool gui_dnd_process_client_message(DND_struct_t *xdnd, XEvent *event) {
     XDND_STATUS_RECT_SET(&xevent, 0, 0, 1024,768);
     XDND_STATUS_ACTION(&xevent) = xdnd->_XA_XdndActionCopy;
     
-    XSendEvent(gGlob->gDisplay, srcwin, 0, 0, &xevent);
+    XSendEvent(xdnd->display, srcwin, 0, 0, &xevent);
 
-    XUnlockDisplay (gGlob->gDisplay);
+    XUnlockDisplay (xdnd->display);
 
     return True;
   }

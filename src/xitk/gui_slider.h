@@ -24,7 +24,8 @@
 #ifndef HAVE_GUI_SLIDER_H
 #define HAVE_GUI_SLIDER_H
 
-#include "gui_main.h"
+#include <X11/Xlib.h>
+#include "Imlib.h"
 #include "gui_widget.h"
 
 /*  To handle a vertical slider */
@@ -32,7 +33,8 @@
 /*  To handle an horizontal slider */
 #define HSLIDER 2
 
-widget_t *create_slider(int type, int x, int y, int min, int max, 
+widget_t *create_slider(Display *display, ImlibData *idata,
+			int type, int x, int y, int min, int max, 
 			int step, const char *bg, const char *paddle, 
 /* cb for motion      */void *fm, void *udm,
 /* cb for btn release */void *f, void *ud) ;
@@ -49,6 +51,8 @@ void slider_make_step(widget_list_t *, widget_t *);
 void slider_make_backstep(widget_list_t *, widget_t *);
 
 typedef struct slider_private_data_s {
+  Display    *display;
+
   widget_t   *sWidget;
   int         sType;
   int         bClicked;

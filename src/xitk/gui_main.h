@@ -40,27 +40,27 @@
 
 typedef struct {
   /* Xine lib engine configuration */
-  config_values_t     *gConfig;
+  config_values_t     *config;
   
   /* Xine lib instance */
-  xine_t              *gXine;
+  xine_t              *xine;
 
   /* Xine lib/gui configuration filename */
-  char                *gConfigFilename;
+  char                *configfile;
 
   /* stuff like FULL_ON_START, QUIT_ON_STOP */
   int                  autoplay_options;
 
-  Display             *gDisplay;
+  Display             *display;
 
-  Window               gVideoWin; /* video output window */
+  Window               video_window; /* video output window */
 
   Window               gui_panel_win;
   DND_struct_t        *xdnd_panel_win;
 
   uint32_t             debug_level;
 
-  ImlibData           *gImlib_data;
+  ImlibData           *imlib_data;
   ImlibImage          *gui_bg_image;     /* background image */
 
 #ifdef HAVE_LIRC
@@ -79,7 +79,7 @@ typedef struct {
 
 
 
-} gGlob_t;
+} gGui_t;
 
 
 char *gui_get_skindir(const char file[]);
@@ -89,22 +89,6 @@ typedef struct gui_move_s {
     int offset_x;
     int offset_y;
 } gui_move_t;
-
-typedef struct gui_color_s {
-    XColor red;
-    XColor blue;
-    XColor green;
-    XColor white;
-    XColor black;
-    XColor tmp;
-} gui_color_t;
-gui_color_t gui_color;
-
-typedef struct gui_image_s {
-  Pixmap image;
-  int width;
-  int height;
-} gui_image_t;
 
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
@@ -139,8 +123,6 @@ void config_set_int(char *, int);
 void config_save(void);
 void config_reset(void);
 
-
-gui_image_t *gui_load_image(const char *image);
 
 void gui_start (int nfiles, char *filenames[]);
 

@@ -27,15 +27,12 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include "xine.h"
+
+#include "Imlib.h"
+#include "gui_image.h"
 #include "gui_widget.h"
 #include "gui_slider.h"
 #include "gui_widget_types.h"
-#include "gui_main.h"
-#include "utils.h"
-
-extern gGlob_t         *gGlob;
-extern uint32_t         xine_debug;
 
 #define COMPUTE_COORDS(X,Y)                                                \
      {                                                                     \
@@ -66,14 +63,15 @@ extern uint32_t         xine_debug;
  * Draw widget
  */
 void paint_slider (widget_t *sl, Window win, GC gc) {
-  float tmp = 0L;
-  int button_width, button_height;	
+  float                  tmp = 0L;
+  int                    button_width, button_height;	
   slider_private_data_t *private_data = 
     (slider_private_data_t *) sl->private_data;
-  gui_image_t *bg = (gui_image_t *) private_data->bg_skin;
-  gui_image_t *paddle = (gui_image_t *) private_data->paddle_skin;
+  gui_image_t           *bg = (gui_image_t *) private_data->bg_skin;
+  gui_image_t           *paddle = (gui_image_t *) private_data->paddle_skin;
+  gui_color_t            gui_color;
   
-  XLockDisplay (gGlob->gDisplay);
+  XLockDisplay (private_data->display);
 
   if(private_data->pos > private_data->max
      || private_data->pos < private_data->min)
@@ -90,7 +88,7 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
   tmp /= private_data->max;
   tmp *= private_data->pos;
 
-  XCopyArea (gGlob->gDisplay, bg->image, win, gc, 0, 0,
+  XCopyArea (private_data->display, bg->image, win, gc, 0, 0,
 	     bg->width, bg->height, sl->x, sl->y);
   
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {
@@ -105,27 +103,27 @@ void paint_slider (widget_t *sl, Window win, GC gc) {
     }
     if (private_data->bArmed) {
       if (private_data->bClicked) {
-	XCopyArea (gGlob->gDisplay, paddle->image, win, gc, 2*button_width, 0,
+	XCopyArea (private_data->display, paddle->image, win, gc, 2*button_width, 0,
 		   button_width, paddle->height, x, y);
 	
       } else {
-	XCopyArea (gGlob->gDisplay, paddle->image, win, gc, button_width, 0,
+	XCopyArea (private_data->display, paddle->image, win, gc, button_width, 0,
 		   button_width, paddle->height, x, y);
       }
     } else {
-      XCopyArea (gGlob->gDisplay, paddle->image, win, gc, 0, 0,
+      XCopyArea (private_data->display, paddle->image, win, gc, 0, 0,
 		 button_width, paddle->height, x, y);
     }
-    XSetForeground(gGlob->gDisplay, gc, gui_color.white.pixel);
+    XSetForeground(private_data->display, gc, gui_color.white.pixel);
     
-    XFlush (gGlob->gDisplay);
+    XFlush (private_data->display);
     
   } 
   else
     fprintf (stderr, "paint slider on something (%d) "
 	     "that is not a slider\n", sl->widget_type);
   
-  XUnlockDisplay (gGlob->gDisplay);
+  XUnlockDisplay (private_data->display);
 
 }
 /* ------------------------------------------------------------------------- */
@@ -167,7 +165,7 @@ int notify_click_slider (widget_list_t *wl,
        * Loop of death ;-)
        */
       do {
-	XNextEvent (gGlob->gDisplay, &sliderevent) ;
+	XNextEvent (private_data->display, &sliderevent) ;
 	
 	switch(sliderevent.type) {
 	  
@@ -458,15 +456,18 @@ void slider_set_pos(widget_list_t *wl, widget_t *sl, int pos) {
 /*
  * Create the widget
  */
-widget_t *create_slider (int type, int x, int y, int min, int max, 
+widget_t *create_slider (Display *display, ImlibData *idata,
+			 int type, int x, int y, int min, int max, 
 			 int step, const char *bg, const char *paddle,
 			 void *fm, void *udm, void *f, void *ud) {
   widget_t                *mywidget;
   slider_private_data_t   *private_data;
 
-  mywidget = (widget_t *) xmalloc (sizeof(widget_t));
+  mywidget = (widget_t *) gui_xmalloc (sizeof(widget_t));
   private_data = (slider_private_data_t *) 
-    xmalloc (sizeof (slider_private_data_t));
+    gui_xmalloc (sizeof (slider_private_data_t));
+
+  private_data->display      = display;
   
   private_data->sWidget      = mywidget;
   private_data->sType        = type;
@@ -490,10 +491,10 @@ widget_t *create_slider (int type, int x, int y, int min, int max,
   
   private_data->pos          = 0;
   private_data->step         = step;
-  private_data->paddle_skin  = gui_load_image(paddle);
+  private_data->paddle_skin  = gui_load_image(idata, paddle);
   private_data->button_width = private_data->paddle_skin->width / 3;
 
-  private_data->bg_skin      = gui_load_image(bg);
+  private_data->bg_skin      = gui_load_image(idata, bg);
 
   if(type == HSLIDER)
     private_data->ratio      = (float)(private_data->max - private_data->min)/private_data->bg_skin->width;

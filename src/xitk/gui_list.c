@@ -32,9 +32,6 @@
 
 #include "gui_widget.h"
 #include "gui_list.h"
-#include "utils.h"
-
-extern uint32_t xine_debug;
 
 /*
  *
@@ -42,7 +39,7 @@ extern uint32_t xine_debug;
 gui_list_t *gui_list_new (void) {
   gui_list_t *list;
 
-  list = (gui_list_t *) xmalloc(sizeof(gui_list_t));
+  list = (gui_list_t *) gui_xmalloc(sizeof(gui_list_t));
 
   list->first=NULL;
   list->last =NULL;
@@ -144,7 +141,7 @@ void *gui_list_prev_content (gui_list_t *l){
 void gui_list_append_content (gui_list_t *l, void *content) {
   gui_node_t *node;
 
-  node = (gui_node_t *) xmalloc(sizeof(gui_node_t));
+  node = (gui_node_t *) gui_xmalloc(sizeof(gui_node_t));
   node->content = content;
 
   if (l->last) {

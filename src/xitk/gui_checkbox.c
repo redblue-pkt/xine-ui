@@ -28,15 +28,11 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#include "xine.h"
+#include "Imlib.h"
 #include "gui_widget.h"
+#include "gui_image.h"
 #include "gui_checkbox.h"
 #include "gui_widget_types.h"
-#include "gui_main.h"
-#include "utils.h"
-
-extern gGlob_t         *gGlob;
-extern uint32_t         xine_debug;
 
 /*
  *
@@ -47,7 +43,7 @@ void paint_checkbox (widget_t *c, Window win, GC gc) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
   
-  XLockDisplay (gGlob->gDisplay);
+  XLockDisplay (private_data->display);
   
   skin = private_data->skin;
   
@@ -56,30 +52,30 @@ void paint_checkbox (widget_t *c, Window win, GC gc) {
     
     if (private_data->cArmed) {
       if (private_data->cClicked) { //click
-	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 2*checkbox_width, 0,
+	XCopyArea (private_data->display, skin->image,  win, gc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       }
       else {
 	if(!private_data->cState) //focus
-	  XCopyArea (gGlob->gDisplay, skin->image,  win, gc, checkbox_width, 0,
+	  XCopyArea (private_data->display, skin->image,  win, gc, checkbox_width, 0,
 		     checkbox_width, skin->height, c->x, c->y);
       }
     } else {
       if(private_data->cState) //click
-	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 2*checkbox_width, 0,
+	XCopyArea (private_data->display, skin->image,  win, gc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       else  //normal
-	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 0, 0,
+	XCopyArea (private_data->display, skin->image,  win, gc, 0, 0,
 		   checkbox_width, skin->height, c->x, c->y);
     }
 
-    XFlush (gGlob->gDisplay);
+    XFlush (private_data->display);
   } 
   else
     fprintf (stderr, "paint checkbox something (%d) "
 	     "that is not a checkbox\n", c->widget_type);
   
-  XUnlockDisplay (gGlob->gDisplay);
+  XUnlockDisplay (private_data->display);
 }
 
 /*
@@ -174,20 +170,23 @@ void checkbox_set_state(widget_t *c, int state, Window win, GC gc) {
 /*
  *
  */
-widget_t *create_checkbox (int x, int y, void* f, void* ud, const char *skin) {
+widget_t *create_checkbox (Display *display, ImlibData *idata,
+			   int x, int y, void* f, void* ud, const char *skin) {
   widget_t *mywidget;
   checkbox_private_data_t *private_data;
 
-  mywidget = (widget_t *) xmalloc (sizeof(widget_t));
+  mywidget = (widget_t *) gui_xmalloc (sizeof(widget_t));
 
   private_data = (checkbox_private_data_t *) 
-    xmalloc (sizeof (checkbox_private_data_t));
+    gui_xmalloc (sizeof (checkbox_private_data_t));
+
+  private_data->display   = display;
 
   private_data->cWidget   = mywidget;
   private_data->cClicked  = 0;
   private_data->cState    = 0;
   private_data->cArmed    = 0;
-  private_data->skin      = gui_load_image(skin);
+  private_data->skin      = gui_load_image(idata, skin);
   private_data->function  = f;
   private_data->user_data = ud;
 

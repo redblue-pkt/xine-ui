@@ -12,14 +12,20 @@ GETOPT_C = getopt.c getopt1.c
 GETOPT_H = getopt.h
 endif
 
-xine_SOURCES =  $(GETOPT_C) main.c gui_button.c gui_labelbutton.c gui_label.c \
-	gui_main.c \
-	gui_widget.c gui_dnd.c gui_list.c gui_slider.c gui_parseskin.c \
-	gui_checkbox.c gui_image.c gui_playlist.c gui_browser.c gui_control.c \
-	utils.c monitor.c
+xine_SOURCES = $(GETOPT_C) main.c gui_main.c gui_control.c gui_playlist.c \
+	gui_parseskin.c utils.c monitor.c
 xine_DEPENDENTIES = utils.h monitor.h
 xine_LDADD = @XINE_LIBS@  $(LIRC_LIBS) -lm $(THREAD_LIBS) \
-	$(DYNAMIC_LD_LIBS) $(X_PRE_LIBS) $(X_LIBS) -lXext \
+	$(DYNAMIC_LD_LIBS) libxitk.la
+
+#####
+## Our "almost" toolkit
+##
+noinst_LTLIBRARIES = libxitk.la
+libxitk_la_SOURCES = gui_button.c gui_labelbutton.c gui_label.c \
+	gui_widget.c gui_dnd.c gui_list.c gui_slider.c gui_checkbox.c \
+	gui_image.c gui_browser.c
+libxitk_la_LIBADD = $(X_PRE_LIBS) $(X_LIBS) -lXext \
 	$(top_builddir)/src/Imlib-light/libImlib-light.la
 
 noinst_HEADERS = gui_button.h gui_labelbutton.h gui_label.h gui_main.h \
@@ -37,6 +43,10 @@ $(GETOPT_C):
 	$(LN_S) $(top_srcdir)/src/common/getopt.c ./getopt.c
 	$(LN_S) $(top_srcdir)/src/common/getopt1.c ./getopt1.c
 	$(LN_S) $(top_srcdir)/src/common/getopt.h ./getopt.h
+
+$(top_builddir)/src/Imlib-light/libImlib-light.la:
+	@cd $(top_builddir)/src/Imlib-light && $(MAKE) libImlib-light.la
+
 
 debug:
 	$(MAKE) CFLAGS="$(DEBUG_CFLAGS)"

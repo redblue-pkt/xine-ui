@@ -28,15 +28,11 @@
 #include <stdio.h>
 #include <pthread.h>
 
-#include "xine.h"
-#include "utils.h"
+#include "Imlib.h"
 #include "gui_widget.h"
+#include "gui_image.h"
 #include "gui_button.h"
 #include "gui_widget_types.h"
-#include "gui_main.h"
-
-extern gGlob_t         *gGlob;
-extern uint32_t         xine_debug;
 
 void paint_button (widget_t *b,  Window win, GC gc) {
 
@@ -45,7 +41,7 @@ void paint_button (widget_t *b,  Window win, GC gc) {
   
   button_private_data_t *private_data = (button_private_data_t *) b->private_data;
 
-  XLockDisplay (gGlob->gDisplay);
+  XLockDisplay (private_data->display);
 
   skin = private_data->skin;
 
@@ -55,26 +51,26 @@ void paint_button (widget_t *b,  Window win, GC gc) {
     
     if (private_data->bArmed) {
       if (private_data->bClicked) {
-	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 2*button_width, 0,
+	XCopyArea (private_data->display, skin->image,  win, gc, 2*button_width, 0,
 		   button_width, skin->height, b->x, b->y);
 	
       } else {
-	XCopyArea (gGlob->gDisplay, skin->image,  win, gc, button_width, 0,
+	XCopyArea (private_data->display, skin->image,  win, gc, button_width, 0,
 		   button_width, skin->height, b->x, b->y);
       }
     } else {
-      XCopyArea (gGlob->gDisplay, skin->image,  win, gc, 0, 0,
+      XCopyArea (private_data->display, skin->image,  win, gc, 0, 0,
 		 button_width, skin->height, b->x, b->y);
     }
     
     
-    XFlush (gGlob->gDisplay);
+    XFlush (private_data->display);
     
   } else
     fprintf (stderr, "paint button on something (%d) that is not a button\n",
 	     b->widget_type);
   
-  XUnlockDisplay (gGlob->gDisplay);
+  XUnlockDisplay (private_data->display);
 }
 
 int notify_click_button (widget_list_t *wl, widget_t *b,int bUp, int x, int y){
@@ -113,18 +109,21 @@ int notify_focus_button (widget_list_t *wl, widget_t *b, int bEntered) {
   return 1;
 }
 
-widget_t *create_button (int x, int y, void* f, void* ud, const char *skin) {
+widget_t *create_button (Display *display, ImlibData *idata,
+			 int x, int y, void* f, void* ud, const char *skin) {
   widget_t              *mywidget;
   button_private_data_t *private_data;
 
-  mywidget = (widget_t *) xmalloc (sizeof(widget_t));
+  mywidget = (widget_t *) gui_xmalloc (sizeof(widget_t));
 
-  private_data = (button_private_data_t *) xmalloc (sizeof (button_private_data_t));
+  private_data = (button_private_data_t *) gui_xmalloc (sizeof (button_private_data_t));
+
+  private_data->display   = display;
 
   private_data->bWidget   = mywidget;
   private_data->bClicked  = 0;
   private_data->bArmed    = 0;
-  private_data->skin      = gui_load_image(skin);
+  private_data->skin      = gui_load_image(idata, skin);
   private_data->function  = f;
   private_data->user_data = ud;
 
