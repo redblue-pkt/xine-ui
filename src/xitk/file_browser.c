@@ -177,7 +177,7 @@ void file_browser(xitk_string_callback_t add_cb,
 
   fbr.imlibdata                      = gGui->imlib_data;
   fbr.window_trans                   = gGui->video_window;
-  fbr.layer_above                    = gGui->layer_above;
+  fbr.layer_above                    = (is_layer_above());
   
   fbr.x                              = xine_config_register_num(gGui->xine,
 								"gui.filebrowser_x", 

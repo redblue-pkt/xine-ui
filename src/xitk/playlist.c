@@ -818,7 +818,7 @@ void playlist_editor(void) {
    * WIN_LAYER_ABOVE_DOCK  = 10
    *
    */
-  if(gGui->layer_above) {
+  if(is_layer_above()) {
     XA_WIN_LAYER = XInternAtom(gGui->display, "_WIN_LAYER", False);
     
     data[0] = 10;

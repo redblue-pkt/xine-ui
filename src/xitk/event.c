@@ -108,28 +108,15 @@ static void ssaver_timeout_cb(void *data, xine_cfg_entry_t *cfg) {
 }
 
 /*
- * Layer above callback
+ * Layer above callbacks
  */
-static void *layer_above_change_thread(void *data) {
-  pthread_detach(pthread_self());
-  sleep(1);
-  config_update_num("gui.layer_above", 1);
-  pthread_exit(NULL);
-  return NULL;
+static void layer_above_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->layer_above = cfg->num_value;
 }
 static void always_layer_above_cb(void *data, xine_cfg_entry_t *cfg) {
-  pthread_t th;
-  
   gGui->always_layer_above = cfg->num_value;
-  
-  if(gGui->always_layer_above && (!gGui->layer_above)) {
-    /*
-     * This is really ugly, but xine config functions are mutex locked,
-     * so we can't access to config stuff within config callback function.
-     */
-    pthread_create(&th, NULL, layer_above_change_thread, NULL);
-  }
 }
+
 /*
  * Callback for snapshots saving location.
  */
@@ -816,7 +803,7 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			       _("use wm layer property to place window on top"), 
 			       CONFIG_NO_HELP,
 			       CONFIG_LEVEL_EXP,
-			       CONFIG_NO_CB,
+			       layer_above_cb,
 			       CONFIG_NO_DATA);
 
   gGui->always_layer_above = 

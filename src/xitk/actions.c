@@ -806,6 +806,19 @@ void gui_kbedit_show(xitk_widget_t *w, void *data) {
 }
 
 /*
+ * Return 1 if layer should be set
+ */
+int is_layer_above(void) {
+  
+  if(gGui->always_layer_above || gGui->layer_above) {
+    if(!gGui->layer_above)
+      config_update_num("gui.layer_above", 1);
+    return 1;
+  }
+  
+  return 0;
+}
+/*
  * set window layer property to something above GNOME (and KDE?) panel
  * (reset to normal if do_raise == 0)
  */
@@ -814,7 +827,7 @@ void layer_above_video(Window w) {
   static Atom XA_WIN_LAYER = None;
   XEvent xev;
 
-  if(!gGui->layer_above)
+  if(!(is_layer_above()))
     return;
   
   if(XA_WIN_LAYER == None) {
@@ -834,7 +847,7 @@ void layer_above_video(Window w) {
     xev.xclient.data.l[0] = (long) 10;
   }
   else {
-    if(gGui->layer_above)
+    if(is_layer_above())
       xev.xclient.data.l[0] = (long) 10;
     else
       xev.xclient.data.l[0] = (long) 4;

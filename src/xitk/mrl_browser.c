@@ -251,7 +251,7 @@ void mrl_browser(xitk_mrl_callback_t add_cb, xitk_mrl_callback_t add_and_play_cb
   XITK_WIDGET_INIT(&mb, gGui->imlib_data);
 
   mb.window_trans                   = gGui->video_window;
-  mb.layer_above                    = gGui->layer_above;
+  mb.layer_above                    = (is_layer_above());
 
   mb.x                              = xine_config_register_num (gGui->xine, "gui.mrl_browser_x", 
 								200,
