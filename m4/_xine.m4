@@ -26,13 +26,13 @@ dnl
 AC_DEFUN([AC_CHECK_LIRC],
   [AC_ARG_ENABLE(lirc,
      [  --disable-lirc          Turn off LIRC support.],
-     , enable_lirc=yes)
+     [], enable_lirc=yes)
 
   if test x"$enable_lirc" = xyes; then
      have_lirc=yes
      AC_REQUIRE_CPP
      AC_CHECK_LIB(lirc_client,lirc_init,
-           AC_CHECK_HEADER(lirc/lirc_client.h, true, have_lirc=no), have_lirc=no)
+           [AC_CHECK_HEADER(lirc/lirc_client.h, true, have_lirc=no)], have_lirc=no)
      if test "$have_lirc" = "yes"; then
 
         if test x"$LIRC_PREFIX" != "x"; then
@@ -40,9 +40,9 @@ AC_DEFUN([AC_CHECK_LIRC],
   	   LIRC_INCLUDE="-I$LIRC_PREFIX/include"
         fi
         for llirc in $lirc_libprefix /lib /usr/lib /usr/local/lib; do
-          AC_CHECK_FILE("$llirc/liblirc_client.a",
-             LIRC_LIBS="$llirc/liblirc_client.a"
-             AC_DEFINE(HAVE_LIRC),,)
+          AC_CHECK_FILE(["$llirc/liblirc_client.a"],
+             [LIRC_LIBS="$llirc/liblirc_client.a"]
+             AC_DEFINE([HAVE_LIRC]),,)
         done
      else
          AC_MSG_RESULT([*** LIRC client support not available, LIRC support will be disabled ***]);

@@ -1,0 +1,82 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2001-11-26 13:42+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/xitk/xine-toolkit/test.c:76
+msgid "XInitThreads() failed.\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:86
+msgid "Cannot open display\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:100
+msgid "Imlib_init_with_params() failed.\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:344
+msgid "My Frame"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:381
+msgid "A Label"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:433
+msgid "Fire !!"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:464
+msgid "!BOOM!"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:533
+#, c-format
+msgid ""
+"New entries selected in combo box is:\n"
+"%s [%d]."
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:646
+msgid "init_test() failed\n"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:661
+msgid "My Fucking Window"
+msgstr ""
+
+#: src/xitk/xine-toolkit/test.c:679
+msgid "Quit"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:538
+msgid "OK"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:646 src/xitk/xine-toolkit/window.c:794
+msgid "Question?"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:670 src/xitk/xine-toolkit/window.c:819
+msgid "Yes"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:683 src/xitk/xine-toolkit/window.c:832
+msgid "No"
+msgstr ""
+
+#: src/xitk/xine-toolkit/window.c:845
+msgid "Cancel"
+msgstr ""
