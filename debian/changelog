@@ -1,3 +1,16 @@
+xine-ui (0.9.8-1) unstable; urgency=medium
+
+  * new upstream release with countless improvements (see upstream ChangeLog)
+  * includes xine-check script to detect most common problems.
+
+ -- Siggi Langauf <sigg@debian.org>  Mon, 14 Jan 2002 00:03:18 +0100
+
+xine-ui (0.9.7-1) unstable; urgency=low
+
+  * new upstream release, featuring gui based status log
+
+ -- Siggi Langauf <siggi@debian.org>  Wed, 12 Dec 2001 19:46:02 +0100
+
 xine-ui (0.9.6-1) unstable; urgency=high
 
   * new upstream release, features working config dialogs
