@@ -29,7 +29,7 @@
 #include "_xitk.h"
 
 typedef struct {
-  Display               *display;
+
   ImlibData             *imlibdata;
   char                  *skin_element_name;
   xitk_widget_t         *cWidget;
@@ -49,6 +49,12 @@ typedef struct {
  * Create a checkbox.
  */
 xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cb);
+
+/*
+ * Same as above, without skinable feature.
+ */
+xitk_widget_t *xitk_noskin_checkbox_create(xitk_checkbox_widget_t *cb,
+					   int x, int y, int width, int height);
 
 /**
  * get state of checkbox "widget".

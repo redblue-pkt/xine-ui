@@ -54,7 +54,6 @@ typedef struct {
 
   xitk_widget_t            *fbWidget; /*  My widget */
 
-  Display                  *display; /* Current display */
   ImlibData                *imlibdata;
   char                     *skin_element_name;
   char                     *skin_element_name_ip;

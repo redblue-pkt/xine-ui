@@ -33,19 +33,6 @@
 #include "widget.h"
 #include "dnd.h"
 
-/*
-Atom _XA_XdndAware;
-Atom _XA_XdndEnter;
-Atom _XA_XdndLeave;
-Atom _XA_XdndDrop;
-Atom _XA_XdndPosition;
-Atom _XA_XdndStatus;
-Atom _XA_XdndActionCopy;
-Atom _XA_XdndSelection;
-Atom _XA_XdndFinished;
-Atom _XA_XINE_XDNDEXCHANGE;
-//Atom atom_support;
-*/
 
 #define XDND_VERSION 3
 

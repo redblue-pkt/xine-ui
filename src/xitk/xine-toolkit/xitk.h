@@ -38,6 +38,8 @@
 #include "xine.h"
 #endif
 
+#define XITK_WIDGET_MAGIC 0x7869746b
+
 #define MWM_HINTS_DECORATIONS   (1L << 1)
 #define PROP_MWM_HINTS_ELEMENTS 5
 typedef struct _mwmhints {
@@ -62,6 +64,7 @@ typedef struct {
   int       height;
   int       width;
 } window_info_t;
+
 #define WINDOW_INFO_ZERO(w) {                                                 \
       if((w)->name)                                                           \
 	free((w)->name);                                                      \
@@ -72,6 +75,11 @@ typedef struct {
       (w)->height = 0;                                                        \
       (w)->width  = 0;                                                        \
     }
+
+#define XITK_WIDGET_INIT(X, IMLIBDATA) {                                      \
+                                         (X)->magic = XITK_WIDGET_MAGIC;      \
+                                         (X)->imlibdata = IMLIBDATA;          \
+                                       }
 
 typedef struct {
   Pixmap    image;
@@ -354,6 +362,21 @@ void xitk_enable_widget(xitk_widget_t *);
 void xitk_disable_widget(xitk_widget_t *);
 
 /**
+ *
+ */
+void xitk_free_widget(xitk_widget_t *w);
+
+/**
+ * Destroy and free widget.
+ */
+void xitk_destroy_widget(xitk_widget_t *w);
+
+/**
+ * Destroy widgets from widget list.
+ */
+void xitk_destroy_widgets(xitk_widget_list_t *wl);
+
+/**
  * Stop each (if widget handle it) widgets of widget list.
  */
 void xitk_stop_widgets(xitk_widget_list_t *wl);
@@ -367,6 +390,16 @@ void xitk_show_widgets(xitk_widget_list_t *);
  * Set widgets of widget list not visible.
  */
 void xitk_hide_widgets(xitk_widget_list_t *);
+
+/**
+ *
+ */
+xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w);
+
+/**
+ *
+ */
+xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
 
 /**
  * Pass events to UI
@@ -383,7 +416,7 @@ void xitk_xevent_notify(XEvent *event);
 #define XITK_HSLIDER 2
 
 typedef struct {
-  Display                *display;
+  int                       magic;
   ImlibData              *imlibdata;
   int                     min;
   int                     max;
@@ -399,6 +432,12 @@ typedef struct {
  * Create a slider
  */
 xitk_widget_t *xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widget_t *sl);
+
+/**
+ *
+ */
+xitk_widget_t *xitk_noskin_slider_create (xitk_slider_widget_t *s,
+					  int x, int y, int width, int height, int type);
 
 /**
  * Get current position of paddle.
@@ -505,14 +544,13 @@ void xitk_list_insert_content (xitk_list_t *l, void *content);
 void xitk_list_delete_current (xitk_list_t *l);
 
 
-
 /*
  * *** Label Buttons
  */
 #define CLICK_BUTTON 1
 #define RADIO_BUTTON 2
 typedef struct {
-  Display                *display;
+  int                       magic;
   ImlibData              *imlibdata;
   int                     button_type;
   char                   *label;
@@ -526,6 +564,14 @@ typedef struct {
  * Create a labeled button.
  */
 xitk_widget_t *xitk_labelbutton_create(xitk_skin_config_t *skonfig, xitk_labelbutton_widget_t *b);
+
+/**
+ *
+ */
+xitk_widget_t *xitk_noskin_labelbutton_create (xitk_labelbutton_widget_t *b,
+					       int x, int y, int width, int height,
+					       char *ncolor, char *fcolor, char *ccolor, 
+					       char *fname);
 
 /**
  * Change label of button 'widget'.
@@ -552,7 +598,7 @@ void xitk_labelbutton_set_state(xitk_widget_t *, int, Window, GC);
  * *** Labels
  */
 typedef struct {
-  Display                *display;
+  int                       magic;
   ImlibData              *imlibdata;
   Window                  window;
   GC                      gc;
@@ -564,6 +610,12 @@ typedef struct {
  * Create a label widget.
  */
 xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_t *l);
+
+/**
+ *
+ */
+xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
+					int x, int y, int len, char *fontname);
 
 /**
  * Change label of widget 'widget'.
@@ -578,10 +630,10 @@ int xitk_label_change_label(xitk_widget_list_t *wl, xitk_widget_t *l, char *newl
 /**
  * Load image and return a xitk_image_t data type.
  */
-xitk_image_t *xitk_load_image(ImlibData *idata, char *image);
+xitk_image_t *xitk_image_load_image(ImlibData *idata, char *image);
 
 typedef struct {
-  Display                *display;
+  int                       magic;
   ImlibData              *imlibdata;
   char                   *skin_element_name;
 } xitk_image_widget_t;
@@ -590,6 +642,11 @@ typedef struct {
  * Create an image widget type.
  */
 xitk_widget_t *xitk_image_create(xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
+
+/**
+ *
+ */
+void xitk_change_image(ImlibData *im, GC gc, xitk_image_t *i, Pixmap pix, int width, int height);
 
 /*
  * *** DND
@@ -607,7 +664,7 @@ void xitk_set_dnd_callback(xitk_dnd_t *, void *);
  * *** Checkbox
  */
 typedef struct {
-  Display                *display;
+  int                       magic;
   ImlibData              *imlibdata;
   xitk_state_callback_t  callback;
   void                   *userdata;
@@ -635,14 +692,23 @@ void xitk_checkbox_set_state(xitk_widget_t *, int, Window, GC);
  * Create a button
  */
 typedef struct {
-  Display                  *display;
+  int                       magic;
   ImlibData                *imlibdata;
   char                     *skin_element_name;
   xitk_simple_callback_t    callback;
   void                     *userdata;
 } xitk_button_widget_t;
 
+/**
+ *
+ */
 xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widget_t *b);
+
+/**
+ *
+ */
+xitk_widget_t *xitk_noskin_button_create (xitk_button_widget_t *b,
+					  int x, int y, int width, int height);
 
 
 /*
@@ -654,7 +720,7 @@ xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widg
 /* Default time (in ms) between mouse click to act as double click */
 #define DEFAULT_DBL_CLICK_TIME 200
 typedef struct {
-  Display                *display;
+  int                       magic;
   ImlibData              *imlibdata;
 
   struct {
@@ -686,36 +752,53 @@ typedef struct {
   xitk_widget_list_t          *parent_wlist;
 } xitk_browser_widget_t;
 
+/**
+ *
+ */
 xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
+
+/**
+ *
+ */
+xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, 
+					  int x, int y, 
+					  int itemw, int itemh, int slidw, char *fontname);
 
 /**
  * Redraw buttons/slider
  */
 void xitk_browser_rebuild_browser(xitk_widget_t *w, int start);
+
 /**
  * Update the list, and rebuild button list
  */
 void xitk_browser_update_list(xitk_widget_t *w, char **list, int len, int start);
+
 /**
  * slide up.
  */
 void xitk_browser_step_up(xitk_widget_t *w, void *data);
+
 /**
  * slide Down.
  */
 void xitk_browser_step_down(xitk_widget_t *w, void *data);
+
 /**
  * Return the current selected button (if not, return -1)
  */
 int xitk_browser_get_current_selected(xitk_widget_t *w);
+
 /**
  * Select the item 'select' in list
  */
 void xitk_browser_set_select(xitk_widget_t *w, int select);
+
 /**
  * Release all enabled buttons
  */
 void xitk_browser_release_all_buttons(xitk_widget_t *w);
+
 /**
  * Return the real number of first displayed in list
  */
@@ -725,7 +808,7 @@ int xitk_browser_get_current_start(xitk_widget_t *w);
  * Filebrowser
  */
 typedef struct {
-  Display                   *display;
+  int                       magic;
   ImlibData                 *imlibdata;
   char                      *skin_element_name;
   Window                     window_trans;
@@ -775,22 +858,65 @@ typedef struct {
   xitk_browser_widget_t             browser;
 } xitk_filebrowser_widget_t;
 
+/**
+ *
+ */
 xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebrowser_widget_t *fb);
+
+/**
+ *
+ */
 void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig);
+
+/**
+ *
+ */
 int xitk_filebrowser_is_running(xitk_widget_t *w);
+
+/**
+ *
+ */
 int xitk_filebrowser_is_visible(xitk_widget_t *w);
+
+/**
+ *
+ */
 void xitk_filebrowser_hide(xitk_widget_t *w);
+
+/**
+ *
+ */
 void xitk_filebrowser_show(xitk_widget_t *w);
+
+/**
+ *
+ */
 void xitk_filebrowser_set_transient(xitk_widget_t *w, Window window);
+
+/**
+ *
+ */
 void xitk_filebrowser_destroy(xitk_widget_t *w);
+
+/**
+ *
+ */
 char *xitk_filebrowser_get_current_dir(xitk_widget_t *w);
+
+/**
+ *
+ */
 int xitk_filebrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
+
+/**
+ *
+ */
 Window xitk_filebrowser_get_window_id(xitk_widget_t *w);
 
 #ifdef NEED_MRLBROWSER
 
 typedef struct {
-  Display                   *display;
+  int                       magic;
   ImlibData                 *imlibdata;
   char                      *skin_element_name;
   Window                     window_trans;
@@ -846,25 +972,64 @@ typedef struct {
   
   xine_t                    *xine;
 
-  xitk_browser_widget_t             browser;
+  xitk_browser_widget_t      browser;
 
 } xitk_mrlbrowser_widget_t;
 
+/**
+ *
+ */
 xitk_widget_t *xitk_mrlbrowser_create(xitk_skin_config_t *skonfig, xitk_mrlbrowser_widget_t *mb);
+
+/**
+ *
+ */
 void xitk_mrlbrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig);
+
+/**
+ *
+ */
 int xitk_mrlbrowser_is_running(xitk_widget_t *w);
+
+/**
+ *
+ */
 int xitk_mrlbrowser_is_visible(xitk_widget_t *w);
+
+/**
+ *
+ */
 void xitk_mrlbrowser_hide(xitk_widget_t *w);
+
+/**
+ *
+ */
 void xitk_mrlbrowser_show(xitk_widget_t *w);
+
+/**
+ *
+ */
 void xitk_mrlbrowser_set_transient(xitk_widget_t *w, Window window);
+
+/**
+ *
+ */
 void xitk_mrlbrowser_destroy(xitk_widget_t *w);
+
+/**
+ *
+ */
 int xitk_mrlbrowser_get_window_info(xitk_widget_t *w, window_info_t *inf);
+
+/**
+ *
+ */
 Window xitk_mrlbrowser_get_window_id(xitk_widget_t *w);
 
 #endif
 
 typedef struct {
-  Display                *display;
+  int                       magic;
   ImlibData              *imlibdata;
   char                   *text;
   int                     max_length;
@@ -896,10 +1061,18 @@ int xitk_get_key_modifier(XEvent *xev, int *modifier);
  * Create an input text box.
  */
 xitk_widget_t *xitk_inputtext_create (xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it);
+
+/**
+ *
+ */
+xitk_widget_t *xitk_noskin_inputtext_create (xitk_inputtext_widget_t *it,
+					     int x, int y, int width, int height,
+					     char *ncolor, char *fcolor, char *fontname);
 /**
  * Return the text of widget.
  */
 char *xitk_inputttext_get_text(xitk_widget_t *it);
+
 /**
  * Change and redisplay the text of widget.
  */
@@ -1060,5 +1233,279 @@ void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
 /*
  *
  */
+int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c);
+
+/*
+ *
+ */
+int xitk_font_get_descent(xitk_font_t *xtfs, const char *c);
+
+/*
+ *
+ */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc);
+
+
+typedef struct {
+  int                       magic;
+  ImlibData               *imlibdata;
+  char                    *skin_element_name;
+  xitk_widget_list_t      *parent_wlist;
+  char                   **entries;
+  int                      layer_above;
+  xitk_state_callback_t    callback;
+  void                    *userdata;
+  xitk_register_key_t     *parent_wkey;
+} xitk_combo_widget_t;
+
+/**
+ *
+ */
+xitk_widget_t *xitk_combo_create(xitk_skin_config_t *skonfig, xitk_combo_widget_t *c);
+
+/**
+ *
+ */
+xitk_widget_t *xitk_noskin_combo_create(xitk_combo_widget_t *c, int x, int y, int width);
+
+/**
+ *
+ */
+int xitk_combo_get_current_selected(xitk_widget_t *w);
+
+/**
+ *
+ */
+char *xitk_combo_get_current_entry_selected(xitk_widget_t *w);
+
+/**
+ *
+ */
+void xitk_combo_set_select(xitk_widget_list_t *wl, xitk_widget_t *w, int select);
+
+/**
+ *
+ */
+void xitk_combo_update_list(xitk_widget_t *w, char **list, int len);
+
+/**
+ *
+ */
+void xitk_combo_update_pos(xitk_widget_t *w);
+
+
+/**
+ *
+ */
+unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b);
+
+/**
+ *
+ */
+unsigned int xitk_get_pixel_color_black(ImlibData *im);
+
+/**
+ *
+ */
+unsigned int xitk_get_pixel_color_white(ImlibData *im);
+
+/**
+ *
+ */
+unsigned int xitk_get_pixel_color_lightgray(ImlibData *im);
+
+/**
+ *
+ */
+unsigned int xitk_get_pixel_color_gray(ImlibData *im);
+
+/**
+ *
+ */
+unsigned int xitk_get_pixel_color_darkgray(ImlibData *im);
+
+/**
+ *
+ */
+Pixmap xitk_image_create_pixmap(ImlibData *idata, int width, int height);
+
+/**
+ *
+ */
+void draw_flat_three_state(ImlibData *im, GC gc, xitk_image_t *p);
+
+/**
+ *
+ */
+void draw_bevel_three_state(ImlibData *im, GC gc, xitk_image_t *p);
+
+/**
+ *
+ */
+void draw_bevel_two_state(ImlibData *im, xitk_image_t *p);
+
+/**
+ *
+ */
+void draw_inner(ImlibData *im, GC gc, Pixmap p, int w, int h);
+
+/**
+ *
+ */
+void draw_outter(ImlibData *im, GC gc, Pixmap p, int w, int h);
+
+/**
+ *
+ */
+void draw_flat(ImlibData *im, GC gc, Pixmap p, int w, int h);
+
+/**
+ *
+ */
+void draw_arrow_up(ImlibData *im, GC gc, xitk_image_t *p);
+
+/**
+ *
+ */
+void draw_arrow_down(ImlibData *im, GC gc, xitk_image_t *p);
+
+/**
+ *
+ */
+void draw_rectangular_inner_box(ImlibData *im, Pixmap p, int x, int y, int width, int height);
+
+/**
+ *
+ */
+void draw_rectangular_outter_box(ImlibData *im, Pixmap p, int x, int y, int width, int height);
+
+#define XITK_WINDOW_ANSWER_UNKNOWN 0
+#define XITK_WINDOW_ANSWER_OK      1
+#define XITK_WINDOW_ANSWER_YES     2
+#define XITK_WINDOW_ANSWER_NO      3
+#define XITK_WINDOW_ANSWER_CANCEL  4
+
+/*
+ * Windows
+ */
+typedef void xitk_window_t;
+
+/**
+ *
+ */
+xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width, int height);
+
+/**
+ *
+ */
+xitk_window_t *xitk_window_create_simple_window(ImlibData *im, int x, int y, int width, int height);
+
+/**
+ *
+ */
+xitk_window_t *xitk_window_create_dialog_window(ImlibData *im, char *title, int x, int y, int width, int height);
+
+/**
+ *
+ */
+void xitk_window_destroy_window(ImlibData *im, xitk_window_t *w);
+
+/**
+ *
+ */
+void xitk_window_move_window(ImlibData *im, xitk_window_t *w, int x, int y);
+
+/**
+ *
+ */
+void xitk_window_center_window(ImlibData *im, xitk_window_t *w);
+
+/**
+ *
+ */
+Window xitk_window_get_window(xitk_window_t *w);
+
+/**
+ *
+ */
+Pixmap xitk_window_get_background(xitk_window_t *w);
+
+/**
+ *
+ */
+void xitk_window_apply_background(ImlibData *im, xitk_window_t *w);
+
+/**
+ *
+ */
+int xitk_window_change_background(ImlibData *im, xitk_window_t *w, Pixmap bg, int width, int height);
+
+/**
+ *
+ */
+void xitk_window_get_window_size(xitk_window_t *w, int *width, int *height);
+
+/**
+ *
+ */
+void xitk_window_dialog_error_with_width(ImlibData *im, char *title,
+					 xitk_state_callback_t cb, void *userdata, 
+					 int window_width, char *message);
+
+/**
+ *
+ */
+void xitk_window_dialog_error(ImlibData *im, char *title,
+			      xitk_state_callback_t cb, void *userdata, char *message);
+
+/**
+ *
+ */
+void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
+					 xitk_state_callback_t ycb, 
+					 xitk_state_callback_t ncb, 
+					 void *userdata, int window_width, char *message);
+
+/**
+ *
+ */
+void xitk_window_dialog_yesno(ImlibData *im, char *title,
+			      xitk_state_callback_t ycb, 
+			      xitk_state_callback_t ncb, 
+			      void *userdata, char *message);
+
+/**
+ *
+ */
+void xitk_window_dialog_yesno_with_width(ImlibData *im, char *title,
+					 xitk_state_callback_t ycb, 
+					 xitk_state_callback_t ncb, 
+					 void *userdata, int window_width, char *message);
+
+/**
+ *
+ */
+void xitk_window_dialog_yesno(ImlibData *im, char *title,
+			      xitk_state_callback_t ycb, 
+			      xitk_state_callback_t ncb, 
+			      void *userdata, char *message);
+
+/**
+ *
+ */
+void xitk_window_dialog_yesnocancel_with_width(ImlibData *im, char *title,
+					       xitk_state_callback_t ycb, 
+					       xitk_state_callback_t ncb, 
+					       xitk_state_callback_t ccb, 
+					       void *userdata, int window_width, char *message);
+
+/**
+ *
+ */
+void xitk_window_dialog_yesnocancel(ImlibData *im, char *title,
+				    xitk_state_callback_t ycb, 
+				    xitk_state_callback_t ncb, 
+				    xitk_state_callback_t ccb, 
+				    void *userdata, char *message);
+
 #endif

@@ -42,15 +42,15 @@
 #define MODIFIER_MOD5  0x00000080
 
 typedef struct {
-  Display                *display;
+
   ImlibData              *imlibdata;
   char                   *skin_element_name;
 
   xitk_widget_t          *iWidget;
 
-  xitk_image_t            *skin;
+  xitk_image_t           *skin;
 
-  xitk_string_callback_t callback;
+  xitk_string_callback_t  callback;
   void                   *userdata;
 
   char                   *text;
@@ -71,9 +71,31 @@ typedef struct {
 
 /* ***************************************************************** */
 
+/*
+ * Create an input text widget.
+ */
 xitk_widget_t *xitk_inputtext_create(xitk_skin_config_t *skonfig, xitk_inputtext_widget_t *it);
-char *xitk_inputttext_get_text(xitk_widget_t *it);
+
+/*
+ * Same as above, without skinable feature.
+ */
+xitk_widget_t *xitk_noskin_inputtext_create (xitk_inputtext_widget_t *it,
+					     int x, int y, int width, int height,
+					     char *ncolor, char *fcolor, char *fontname);
+
+/*
+ * Return current text in inputtext widget.
+ */
+char *xitk_inputtext_get_text(xitk_widget_t *it);
+
+/*
+ * Set text in inputtext widget.
+ */
 void xitk_inputtext_change_text(xitk_widget_list_t *wl, xitk_widget_t *it, char *text);
+
+/*
+ * Return key modifier from an xevent struct.
+ */
 int xitk_get_key_modifier(XEvent *xev, int *modifier);
 
 #endif

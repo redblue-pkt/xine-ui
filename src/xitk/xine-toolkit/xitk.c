@@ -35,6 +35,7 @@
 #include <inttypes.h>
 #include <unistd.h>
 #include <signal.h>
+#include <time.h>
 #include <setjmp.h>
 
 #include <X11/Xlib.h>
@@ -122,6 +123,21 @@ static sigjmp_buf   kill_jmp;
 
 void widget_stop(void);
 
+/*
+ * A thread-safe usecond sleep
+ */
+void xitk_usec_sleep(unsigned usec) {
+#if HAVE_NANOSLEEP
+  /* nanosleep is prefered on solaris, because it's mt-safe */
+  struct timespec ts;
+  
+  ts.tv_sec =   usec / 1000000;
+  ts.tv_nsec = (usec % 1000000) * 1000;
+  nanosleep(&ts, NULL);
+#else
+  usleep(usec);
+#endif
+}
 
 static void xitk_signal_handler(int sig) {
   pid_t cur_pid = getppid();
@@ -267,9 +283,11 @@ xitk_register_key_t xitk_register_event_handler(char *name, Window window,
 
   if(cb)
     fx->xevent_callback = cb;
+#if 0
   else {
     XITK_DIE("%s()@%d: Callback should be non NULL\n", __FUNCTION__, __LINE__);
   }
+#endif
 
   if(pos_cb && window)
     fx->newpos_callback = pos_cb;
@@ -647,7 +665,7 @@ void xitk_run(void) {
       /*
     } else {  
       XUNLOCK(gXitk->display); 
-      xine_usec_sleep(16666); // 1/60 sec
+      xitk_usec_sleep(16666); // 1/60 sec
     } 
 
     */

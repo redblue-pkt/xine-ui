@@ -50,12 +50,6 @@ typedef struct {
 
 } xitk_dnd_t;
 
-/*  void wXDNDInitializeAtoms(); */
-/*  Bool wXDNDProcessSelection(XEvent *event); */
-/*  Bool wXDNDProcessClientMessage(XClientMessageEvent *event); */
-/*  void wXDNDMakeAwareness(Window window); */
-/*  void wXDNDClearAwareness(Window window); */
-
 /* header was ripped from xdnd's example on its page */
 
 #define XDND_THREE 3

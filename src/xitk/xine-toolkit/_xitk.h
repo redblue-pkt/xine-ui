@@ -36,6 +36,8 @@
 #include "widget.h"
 #include "skin.h"
 
+#define XITK_WIDGET_MAGIC 0x7869746b
+
 typedef void (*xitk_simple_callback_t)(xitk_widget_t *, void *);
 typedef void (*xitk_state_callback_t)(xitk_widget_t *, void *, int);
 typedef void (*xitk_string_callback_t)(xitk_widget_t *, void *, char *);
@@ -53,7 +55,7 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 #define XITK_WARNING(...) fprintf(stder, "XITK WARNING: "__VA_ARGS__)
 #endif
 
-#define XITK_FREE(X) if(X) free(X)
+#define XITK_FREE(X) if((X)) free((X));
 #define XITK_FREE_XITK_IMAGE(D, X) {                                                     \
                                      if(((X)) && ((X)->image)) {                         \
                                        XFreePixmap((D), (X)->image);                     \
@@ -64,12 +66,16 @@ typedef void (*xitk_mrl_callback_t)(xitk_widget_t *, void *, mrl_t *);
 
 
 
-#define XITK_CHECK_CONSTITENCY(X) {                                                      \
-                                    if(((X) == NULL) ||                                  \
-                                       ((X)->display == NULL) ||                         \
-                                       ((X)->imlibdata == NULL))                         \
-                                      XITK_DIE("%s(): widget constitency failed.!\n",    \
-                                               __FUNCTION__);                            \
+#define XITK_WIDGET_INIT(X, IMLIBDATA) {                                                 \
+                                         (X)->magic = XITK_WIDGET_MAGIC;                 \
+                                         (X)->imlibdata = IMLIBDATA;                     \
+                                       }
+
+#define XITK_CHECK_CONSTITENCY(X) {                                                       \
+                                    if(((X) == NULL) || ((X)->magic != XITK_WIDGET_MAGIC) \
+                                       || ((X)->imlibdata == NULL))                       \
+                                      XITK_DIE("%s(): widget constitency failed.!\n",     \
+                                               __FUNCTION__);                             \
                                   }
 
 /*
@@ -128,7 +134,7 @@ typedef struct {
 } window_info_t;
 
 typedef struct {
-  Display                  *display;
+  int                       magic;
   ImlibData                *imlibdata;
   char                     *skin_element_name;
   xitk_simple_callback_t    callback;
@@ -136,210 +142,210 @@ typedef struct {
 } xitk_button_widget_t;
 
 typedef struct {
-  Display                *display;
-  ImlibData              *imlibdata;
-  int                     button_type;
-  char                   *label;
-  xitk_simple_callback_t  callback;
-  xitk_state_callback_t   state_callback;
-  void                   *userdata;
-  char                   *skin_element_name;
+  int                       magic;
+  ImlibData                *imlibdata;
+  int                       button_type;
+  char                     *label;
+  xitk_simple_callback_t    callback;
+  xitk_state_callback_t     state_callback;
+  void                     *userdata;
+  char                     *skin_element_name;
 } xitk_labelbutton_widget_t;
 
 typedef struct {
-  Display                *display;
-  ImlibData              *imlibdata;
-  char                   *skin_element_name;
+  int                       magic;
+  ImlibData                *imlibdata;
+  char                     *skin_element_name;
 } xitk_image_widget_t;
 
 typedef struct {
-  Display                *display;
-  ImlibData              *imlibdata;
-  xitk_state_callback_t  callback;
-  void                   *userdata;
-  char                   *skin_element_name;
+  int                       magic;
+  ImlibData                *imlibdata;
+  xitk_state_callback_t     callback;
+  void                     *userdata;
+  char                     *skin_element_name;
 } xitk_checkbox_widget_t;
 
 typedef struct {
-  Display                *display;
-  ImlibData              *imlibdata;
-  Window                  window;
-  GC                      gc;
-  char                   *label;
-  char                   *skin_element_name;
+  int                       magic;
+  ImlibData                *imlibdata;
+  Window                    window;
+  GC                        gc;
+  char                     *label;
+  char                     *skin_element_name;
 } xitk_label_widget_t;
 
 #define XITK_VSLIDER 1
 #define XITK_HSLIDER 2
 
 typedef struct {
-  Display                *display;
-  ImlibData              *imlibdata;
-  int                     min;
-  int                     max;
-  int                     step;
-  char                   *skin_element_name;
-  xitk_state_callback_t   callback;
-  void                   *userdata;
-  xitk_state_callback_t   motion_callback;
-  void                   *motion_userdata;
+  int                       magic;
+  ImlibData                *imlibdata;
+  int                       min;
+  int                       max;
+  int                       step;
+  char                     *skin_element_name;
+  xitk_state_callback_t     callback;
+  void                     *userdata;
+  xitk_state_callback_t     motion_callback;
+  void                     *motion_userdata;
 } xitk_slider_widget_t;
 
 typedef struct {
-  Display                *display;
-  ImlibData              *imlibdata;
+  int                       magic;
+  ImlibData                *imlibdata;
 
   struct {
-    char                 *skin_element_name;
+    char                   *skin_element_name;
   } arrow_up;
   
   struct {
-    char                 *skin_element_name;
+    char                   *skin_element_name;
   } slider;
 
   struct {
-    char                 *skin_element_name;
+    char                   *skin_element_name;
   } arrow_dn;
 
   struct {
-    char                 *skin_element_name;
-    int                   max_displayed_entries;
-    int                   num_entries;
-    char                **entries;
+    char                   *skin_element_name;
+    int                     max_displayed_entries;
+    int                     num_entries;
+    char                  **entries;
   } browser;
   
-  int                     dbl_click_time;
-  xitk_state_callback_t   dbl_click_callback;
+  int                       dbl_click_time;
+  xitk_state_callback_t     dbl_click_callback;
 
   /* Callback on selection function */
-  xitk_simple_callback_t  callback;
-  void                   *userdata;
+  xitk_simple_callback_t    callback;
+  void                     *userdata;
 
-  xitk_widget_list_t          *parent_wlist;
+  xitk_widget_list_t       *parent_wlist;
 } xitk_browser_widget_t;
 
 typedef struct {
-  Display                   *display;
-  ImlibData                 *imlibdata;
-  char                      *skin_element_name;
-  Window                     window_trans;
-  int                        layer_above;
+  int                       magic;
+  ImlibData                *imlibdata;
+  char                     *skin_element_name;
+  Window                    window_trans;
+  int                       layer_above;
 
-  int                        x;
-  int                        y;
-  char                      *window_title;
-  char                      *resource_name;
-  char                      *resource_class;
+  int                       x;
+  int                       y;
+  char                     *window_title;
+  char                     *resource_name;
+  char                     *resource_class;
 
   struct {
-    char                    *skin_element_name;
+    char                   *skin_element_name;
   } sort_default;
 
   struct {
-    char                    *skin_element_name;
+    char                   *skin_element_name;
   } sort_reverse;
 
   struct {
-    char                    *cur_directory;
-    char                    *skin_element_name;
+    char                   *cur_directory;
+    char                   *skin_element_name;
   } current_dir;
   
-  xitk_dnd_callback_t        dndcallback;
+  xitk_dnd_callback_t       dndcallback;
 
   struct {
-    char                    *caption;
-    char                    *skin_element_name;
+    char                   *caption;
+    char                   *skin_element_name;
   } homedir;
 
   struct {
-    char                    *caption;
-    char                    *skin_element_name;
-    xitk_string_callback_t   callback;
+    char                   *caption;
+    char                   *skin_element_name;
+    xitk_string_callback_t  callback;
   } select;
 
   struct {
-    char                    *caption;
-    char                    *skin_element_name;
+    char                   *caption;
+    char                   *skin_element_name;
   } dismiss;
 
   struct {
-    xitk_simple_callback_t   callback;
+    xitk_simple_callback_t  callback;
   } kill;
  
-  xitk_browser_widget_t             browser;
+  xitk_browser_widget_t     browser;
 } xitk_filebrowser_widget_t;
 
 #ifdef NEED_MRLBROWSER
 typedef struct {
-  Display                   *display;
-  ImlibData                 *imlibdata;
-  char                      *skin_element_name;
-  Window                     window_trans;
-  int                        layer_above;
+  int                       magic;
+  ImlibData                *imlibdata;
+  char                     *skin_element_name;
+  Window                    window_trans;
+  int                       layer_above;
 
-  int                        x;
-  int                        y;
-  char                      *window_title;
-  char                      *resource_name;
-  char                      *resource_class;
+  int                       x;
+  int                       y;
+  char                     *window_title;
+  char                     *resource_name;
+  char                     *resource_class;
 
   struct {
-    char                    *cur_origin;
-    char                    *skin_element_name;
+    char                   *cur_origin;
+    char                   *skin_element_name;
   } origin;
   
-  xitk_dnd_callback_t        dndcallback;
+  xitk_dnd_callback_t       dndcallback;
 
   struct {
-    char                    *caption;
-    char                    *skin_element_name;
-    xitk_mrl_callback_t      callback;
+    char                   *caption;
+    char                   *skin_element_name;
+    xitk_mrl_callback_t     callback;
   } select;
 
   struct {
-    char                    *skin_element_name;
-    xitk_mrl_callback_t      callback;
+    char                   *skin_element_name;
+    xitk_mrl_callback_t     callback;
   } play;
 
   struct {
-    char                    *caption;
-    char                    *skin_element_name;
+    char                   *caption;
+    char                   *skin_element_name;
   } dismiss;
 
   struct {
-    xitk_simple_callback_t   callback;
+    xitk_simple_callback_t  callback;
   } kill;
 
-  char                     **ip_availables;
+  char                    **ip_availables;
   
   struct {
 
     struct {
-      char                  *skin_element_name;
+      char                 *skin_element_name;
     } button;
 
     struct {
-      char                  *label_str;
-      char                  *skin_element_name;
+      char                 *label_str;
+      char                 *skin_element_name;
     } label;
 
   } ip_name;
   
-  xine_t                    *xine;
+  xine_t                   *xine;
 
-  xitk_browser_widget_t      browser;
+  xitk_browser_widget_t     browser;
 
 } xitk_mrlbrowser_widget_t;
 #endif
 
 typedef struct {
-  Display                *display;
-  ImlibData              *imlibdata;
-  char                   *text;
-  int                     max_length;
-  xitk_string_callback_t  callback;
-  void                   *userdata;
-  char                   *skin_element_name;
+  int                       magic;
+  ImlibData                *imlibdata;
+  char                     *text;
+  int                       max_length;
+  xitk_string_callback_t    callback;
+  void                     *userdata;
+  char                     *skin_element_name;
 } xitk_inputtext_widget_t;
 
 #ifndef _XITK_C_
@@ -360,6 +366,7 @@ void xitk_xevent_notify(XEvent *event);
 
 #endif
 
+void xitk_usec_sleep(unsigned usec);
 int xitk_skin_get_coord_x(xitk_skin_config_t *, const char *);
 int xitk_skin_get_coord_y(xitk_skin_config_t *, const char *);
 char *xitk_skin_get_label_color(xitk_skin_config_t *, const char *);
@@ -377,5 +384,27 @@ typedef struct {
   Display       *display;
   XFontStruct   *font;
 } xitk_font_t;
+
+
+typedef struct {
+  int                       magic;
+  ImlibData                *imlibdata;
+  char                     *skin_element_name;
+  xitk_widget_list_t       *parent_wlist;
+  char                    **entries;
+  int                       layer_above;
+  xitk_state_callback_t     callback;
+  void                     *userdata;
+  xitk_register_key_t      *parent_wkey;
+} xitk_combo_widget_t;
+
+
+typedef struct {
+  Window   window;
+  Pixmap   background;
+  int      width;
+  int      height;
+} xitk_window_t;
+
 
 #endif

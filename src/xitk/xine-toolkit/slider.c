@@ -81,6 +81,39 @@
 /*
  *
  */
+static void notify_destroy(xitk_widget_t *w, void *data) {
+  slider_private_data_t *private_data = (slider_private_data_t *) w->private_data;
+
+  if(w->widget_type & WIDGET_TYPE_SLIDER) {
+    XITK_FREE(private_data->skin_element_name);
+    xitk_image_free_image(private_data->imlibdata, &private_data->paddle_skin);
+    xitk_image_free_image(private_data->imlibdata, &private_data->bg_skin);
+    XITK_FREE(private_data);
+  }
+}
+
+/*
+ *
+ */
+static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
+  slider_private_data_t *private_data = 
+    (slider_private_data_t *) w->private_data;
+  
+  if(w->widget_type & WIDGET_TYPE_SLIDER) {
+    if(sk == FOREGROUND_SKIN && private_data->paddle_skin) {
+      return private_data->paddle_skin;
+    }
+    else if(sk == BACKGROUND_SKIN && private_data->bg_skin) {
+      return private_data->bg_skin;
+    }
+  }
+
+  return NULL;
+}
+
+/*
+ *
+ */
 static int notify_inside(xitk_widget_t *sl, int x, int y) {
   slider_private_data_t *private_data = 
     (slider_private_data_t *) sl->private_data;
@@ -93,7 +126,7 @@ static int notify_inside(xitk_widget_t *sl, int x, int y) {
     else
       skin = private_data->bg_skin;
 
-    return xitk_is_cursor_out_mask(private_data->display, sl, skin->mask, x, y);
+    return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, sl, skin->mask, x, y);
   }
 
   return 1;
@@ -103,14 +136,13 @@ static int notify_inside(xitk_widget_t *sl, int x, int y) {
  * Draw widget
  */
 static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
-  float                  tmp = 0L;
-  int                    button_width, button_height;	
-  slider_private_data_t *private_data = 
-    (slider_private_data_t *) sl->private_data;
-  GC                     bgc, pgc;
+  float                   tmp = 0L;
+  int                     button_width, button_height;	
+  slider_private_data_t  *private_data = (slider_private_data_t *) sl->private_data;
+  GC                      bgc, pgc;
   xitk_image_t           *bg = (xitk_image_t *) private_data->bg_skin;
   xitk_image_t           *paddle = (xitk_image_t *) private_data->paddle_skin;
-  int                    srcx1, srcx2, destx1, srcy1, srcy2, desty1;
+  int                     srcx1, srcx2, destx1, srcy1, srcy2, desty1;
   
   if ((sl->widget_type & WIDGET_TYPE_SLIDER) && sl->visible) {
     int x=0, y=0;
@@ -119,21 +151,21 @@ static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
        || private_data->pos < private_data->min)
       return;
     
-    XLOCK (private_data->display);
+    XLOCK (private_data->imlibdata->x.disp);
     
     button_width = private_data->button_width;
     button_height = private_data->paddle_skin->height;
 
     srcx1 = srcx2 = destx1 = srcy1 = srcy2 = desty1 = 0;
 
-    bgc = XCreateGC(private_data->display, win, None, None);
-    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, bgc);
-    pgc = XCreateGC(private_data->display, win, None, None);
-    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, pgc);
+    bgc = XCreateGC(private_data->imlibdata->x.disp, bg->image, None, None);
+    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, bgc);
+    pgc = XCreateGC(private_data->imlibdata->x.disp, paddle->image, None, None);
+    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, pgc);
     
     if (bg->mask) {
-      XSetClipOrigin(private_data->display, bgc, sl->x, sl->y);
-      XSetClipMask(private_data->display, bgc, bg->mask);
+      XSetClipOrigin(private_data->imlibdata->x.disp, bgc, sl->x, sl->y);
+      XSetClipMask(private_data->imlibdata->x.disp, bgc, bg->mask);
     }
     
     if(private_data->sType == XITK_HSLIDER)
@@ -144,7 +176,7 @@ static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
     tmp /= private_data->max;
     tmp *= private_data->pos;
     
-    XCopyArea (private_data->display, bg->image, win, bgc, 0, 0,
+    XCopyArea (private_data->imlibdata->x.disp, bg->image, win, bgc, 0, 0,
 	       bg->width, bg->height, sl->x, sl->y);
     
     if(private_data->sType == XITK_HSLIDER) {
@@ -180,17 +212,17 @@ static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
       }
 
                   
-      if (paddle->mask) {
-	XSetClipOrigin(private_data->display, pgc, sl->x, sl->y);
-	XSetClipMask(private_data->display, pgc, paddle->mask);
+      if(paddle->mask) {
+	XSetClipOrigin(private_data->imlibdata->x.disp, pgc, sl->x, sl->y);
+	XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask);
       }
       
     }
     else {
       
-      if (paddle->mask) {
-	XSetClipOrigin(private_data->display, pgc, x, y);
-	XSetClipMask(private_data->display, pgc, paddle->mask);
+      if(paddle->mask) {
+	XSetClipOrigin(private_data->imlibdata->x.disp, pgc, x, y);
+	XSetClipMask(private_data->imlibdata->x.disp, pgc, paddle->mask);
       }
       
       srcy1  = 0;
@@ -201,26 +233,20 @@ static void paint_slider (xitk_widget_t *sl, Window win, GC gc) {
 
     }
 
-    if (private_data->bArmed) {
-      if (private_data->bClicked)
+    if(private_data->bArmed) {
+      if(private_data->bClicked)
 	srcx1 = 2*button_width;
       else
 	srcx1 = button_width;
     }
 
-    XCopyArea (private_data->display, paddle->image, win, pgc,
-	       srcx1, srcy1, srcx2, srcy2, destx1, desty1);
+    XCopyArea(private_data->imlibdata->x.disp, paddle->image, win, pgc,
+	      srcx1, srcy1, srcx2, srcy2, destx1, desty1);
     
-    XFreeGC(private_data->display, pgc);
-    XFreeGC(private_data->display, bgc);
-    
-    XUNLOCK (private_data->display);
+    XFreeGC(private_data->imlibdata->x.disp, pgc);
+    XFreeGC(private_data->imlibdata->x.disp, bgc);
+    XUNLOCK(private_data->imlibdata->x.disp);
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "paint slider on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
-#endif
 }
 
 /*
@@ -232,30 +258,31 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     (slider_private_data_t *) sl->private_data;
   
   if(sl->widget_type & WIDGET_TYPE_SLIDER) {
-    
-    XITK_FREE_XITK_IMAGE(private_data->display, private_data->paddle_skin);
-    private_data->paddle_skin     = xitk_load_image(private_data->imlibdata, xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
-    private_data->button_width    = private_data->paddle_skin->width / 3;
-    XITK_FREE_XITK_IMAGE(private_data->display, private_data->bg_skin);
-    private_data->bg_skin         = xitk_load_image(private_data->imlibdata, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
-
-    private_data->paddle_cover_bg = 0;
-
-    if(private_data->sType == XITK_HSLIDER) {
-      if(private_data->button_width == private_data->bg_skin->width)
-	private_data->paddle_cover_bg = 1;
+    if(private_data->skin_element_name) {
+      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->paddle_skin);
+      private_data->paddle_skin     = xitk_image_load_image(private_data->imlibdata, xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
+      private_data->button_width    = private_data->paddle_skin->width / 3;
+      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->bg_skin);
+      private_data->bg_skin         = xitk_image_load_image(private_data->imlibdata, xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      
+      private_data->paddle_cover_bg = 0;
+      
+      if(private_data->sType == XITK_HSLIDER) {
+	if(private_data->button_width == private_data->bg_skin->width)
+	  private_data->paddle_cover_bg = 1;
+      }
+      else if(private_data->sType == XITK_VSLIDER) {
+	if(private_data->paddle_skin->height == private_data->bg_skin->height)
+	  private_data->paddle_cover_bg = 1;
+      }
+      
+      sl->x       = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+      sl->y       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      sl->width   = private_data->bg_skin->width;
+      sl->height  = private_data->bg_skin->height;
+      
+      xitk_set_widget_pos(sl, sl->x, sl->y);
     }
-    else if(private_data->sType == XITK_VSLIDER) {
-      if(private_data->paddle_skin->height == private_data->bg_skin->height)
-	private_data->paddle_cover_bg = 1;
-    }
-    
-    sl->x       = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-    sl->y       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-    sl->width   = private_data->bg_skin->width;
-    sl->height  = private_data->bg_skin->height;
-
-    xitk_set_widget_pos(sl, sl->x, sl->y);
   }
 }
 
@@ -296,15 +323,15 @@ static int notify_click_slider (xitk_widget_list_t *wl,
        * Loop of death ;-)
        */
       do {
-	/* XLOCK (private_data->display); */
-	XNextEvent (private_data->display, &sliderevent) ;
-	/* XUNLOCK (private_data->display); */
+	/* XLOCK (private_data->imlibdata->x.disp); */
+	XNextEvent (private_data->imlibdata->x.disp, &sliderevent) ;
+	/* XUNLOCK (private_data->imlibdata->x.disp); */
 
 	switch(sliderevent.type) {
 	  
 	case MotionNotify:
 	  
-	  while (XCheckMaskEvent (private_data->display, ButtonMotionMask,
+	  while (XCheckMaskEvent (private_data->imlibdata->x.disp, ButtonMotionMask,
 				  &sliderevent));
 
 	  COMPUTE_COORDS(sliderevent.xbutton.x, sliderevent.xbutton.y);
@@ -330,6 +357,8 @@ static int notify_click_slider (xitk_widget_list_t *wl,
 	case ButtonRelease:
 	  private_data->bClicked = 0;
 
+	  paint_slider(sl, wl->win, wl->gc);
+
 	  if(private_data->realmin < 0)
 	    retpos = (private_data->realmin + private_data->pos);
 	  else
@@ -350,11 +379,6 @@ static int notify_click_slider (xitk_widget_list_t *wl,
     }
     /* CHECKME    paint_widget_list (wl); */
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify click slider on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
-#endif
 
   return 1;
 }
@@ -369,11 +393,6 @@ static int notify_focus_slider (xitk_widget_list_t *wl,
 
   if (sl->widget_type & WIDGET_TYPE_SLIDER)
     private_data->bArmed = bEntered;    
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "notify slider button on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
-#endif
 
   return 1;
 }
@@ -390,11 +409,7 @@ void xitk_slider_make_step(xitk_widget_list_t *wl, xitk_widget_t *sl) {
     if((xitk_slider_get_pos(sl) + private_data->step) <= private_data->max)
       xitk_slider_set_pos(wl, sl, xitk_slider_get_pos(sl) + private_data->step);
   } 
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "slider_make_step on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
-#endif
+
 }
 
 /*
@@ -409,11 +424,7 @@ void xitk_slider_make_backstep(xitk_widget_list_t *wl, xitk_widget_t *sl) {
     if((xitk_slider_get_pos(sl) - private_data->step) >= private_data->min)
       xitk_slider_set_pos(wl, sl, xitk_slider_get_pos(sl) - private_data->step);
   } 
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "slider_make_step on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
-#endif
+
 }
 
 /*
@@ -436,11 +447,6 @@ void xitk_slider_set_min(xitk_widget_t *sl, int min) {
 	XITK_WARNING("Unknown slider type (%d)\n", private_data->sType);
     }
   }
-#ifdef DEBUG_GUI
- else
-    fprintf(stderr, "slider_set_min on something (%d) "
-	    "that is not a slider\n", sl->widget_type);
-#endif
 }
 
 /*
@@ -453,11 +459,7 @@ int xitk_slider_get_min(xitk_widget_t *sl) {
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {
     return private_data->realmin;
   } 
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "slider_get_pos on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
-#endif
+
   return -1;
 }
 
@@ -471,11 +473,7 @@ int xitk_slider_get_max(xitk_widget_t *sl) {
   if (sl->widget_type & WIDGET_TYPE_SLIDER) {
     return private_data->max;
   } 
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "slider_get_pos on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
-#endif
+
   return -1;
 }
 
@@ -495,18 +493,8 @@ void xitk_slider_set_max(xitk_widget_t *sl, int max) {
       else if(private_data->sType == XITK_VSLIDER)
 	private_data->ratio = (float)
 	  (private_data->max-private_data->min)/private_data->bg_skin->height;
-#ifdef DEBUG_GUI
-      else
-	fprintf(stderr, "Unknown slider type (%d)\n", 
-		private_data->sType);
-#endif
     }
   } 
-#ifdef DEBUG_GUI
-  else
-    fprintf(stderr, "slider_set_min on something (%d) "
-	    "that is not a slider\n", sl->widget_type);
-#endif
 }
 
 /*
@@ -525,11 +513,6 @@ void xitk_slider_reset(xitk_widget_list_t *wl, xitk_widget_t *sl) {
     private_data->bClicked = 0;
     paint_slider(sl, wl->win, wl->gc);
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf(stderr, "slider_set_min on something (%d) "
-	    "that is not a slider\n", sl->widget_type);
-#endif
 }
 
 /*
@@ -548,11 +531,6 @@ void xitk_slider_set_to_max(xitk_widget_list_t *wl, xitk_widget_t *sl) {
 
     paint_slider(sl, wl->win, wl->gc);
   }
-#ifdef DEBUG_GUI
-  else
-    fprintf(stderr, "slider_set_min on something (%d) "
-	    "that is not a slider\n", sl->widget_type);
-#endif
 }
 
 /*
@@ -568,11 +546,7 @@ int xitk_slider_get_pos(xitk_widget_t *sl) {
     else
       return private_data->pos;
   } 
-#ifdef DEBUG_GUI
-  else
-    fprintf (stderr, "slider_get_pos on something (%d) "
-	     "that is not a slider\n", sl->widget_type);
-#endif
+
   return -1;
 }
 
@@ -597,34 +571,27 @@ void xitk_slider_set_pos(xitk_widget_list_t *wl, xitk_widget_t *sl, int pos) {
     else
       xitk_slider_reset(wl, sl);    
   } 
-#ifdef DEBUG_GUI
-  else {
-    if(!(sl->widget_type & WIDGET_TYPE_SLIDER))
-      fprintf (stderr, "slider_set_pos on something (%d) "
-	       "that is not a slider\n", sl->widget_type);
-  }
-#endif
 }
 
 /*
  * Create the widget
  */
-xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widget_t *s) {
-  xitk_widget_t                *mywidget;
+static xitk_widget_t *_xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widget_t *s,
+					   int x, int y, char *skin_element_name,
+					   xitk_image_t *bg_skin, xitk_image_t *pad_skin,
+					   int stype) {
+  xitk_widget_t           *mywidget;
   slider_private_data_t   *private_data;
-
-  XITK_CHECK_CONSTITENCY(s);
 
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   private_data = (slider_private_data_t *) xitk_xmalloc (sizeof (slider_private_data_t));
 
-  private_data->display                  = s->display;
   private_data->imlibdata                = s->imlibdata;
-  private_data->skin_element_name        = strdup(s->skin_element_name);
+  private_data->skin_element_name        = (skin_element_name == NULL) ? NULL : strdup(s->skin_element_name);
 
   private_data->sWidget                  = mywidget;
-  private_data->sType                    = xitk_skin_get_slider_type(skonfig, private_data->skin_element_name);
+  private_data->sType                    = stype;
   private_data->bClicked                 = 0;
   private_data->bArmed                   = 0;
   private_data->min                      = s->min;
@@ -645,12 +612,10 @@ xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widg
   
   private_data->pos                      = 0;
   private_data->step                     = s->step;
-  private_data->paddle_skin              = xitk_load_image(private_data->imlibdata, 
-							   xitk_skin_get_slider_skin_filename(skonfig, private_data->skin_element_name));
+  private_data->paddle_skin              = pad_skin;
   private_data->button_width             = private_data->paddle_skin->width / 3;
   
-  private_data->bg_skin                  = xitk_load_image(private_data->imlibdata, 
-							   xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+  private_data->bg_skin                  = bg_skin;
 
   if(private_data->sType == XITK_HSLIDER)
     private_data->ratio                  = (float)(private_data->max - private_data->min)/private_data->bg_skin->width;
@@ -680,8 +645,8 @@ xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widg
   mywidget->running                      = 1;
   mywidget->visible                      = 1;
   mywidget->have_focus                   = FOCUS_LOST;
-  mywidget->x                            = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-  mywidget->y                            = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+  mywidget->x                            = x;
+  mywidget->y                            = y;
   mywidget->width                        = private_data->bg_skin->width;
   mywidget->height                       = private_data->bg_skin->height;
   mywidget->widget_type                  = WIDGET_TYPE_SLIDER;
@@ -690,7 +655,55 @@ xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widg
   mywidget->notify_focus                 = notify_focus_slider;
   mywidget->notify_keyevent              = NULL;
   mywidget->notify_inside                = notify_inside;
-  mywidget->notify_change_skin           = notify_change_skin;
+  mywidget->notify_change_skin           = (skin_element_name == NULL) ? NULL : notify_change_skin;
+  mywidget->notify_destroy               = notify_destroy;
+  mywidget->get_skin                     = get_skin;
 
   return mywidget;
+}
+
+/*
+ * Create the widget
+ */
+xitk_widget_t *xitk_slider_create (xitk_skin_config_t *skonfig, xitk_slider_widget_t *s) {
+
+  XITK_CHECK_CONSTITENCY(s);
+
+  return _xitk_slider_create(skonfig, s,
+			     (xitk_skin_get_coord_x(skonfig, s->skin_element_name)),
+			     (xitk_skin_get_coord_y(skonfig, s->skin_element_name)),
+			     s->skin_element_name,
+			     (xitk_image_load_image(s->imlibdata, 
+						    xitk_skin_get_skin_filename(skonfig, s->skin_element_name))),
+			     (xitk_image_load_image(s->imlibdata, 
+						    xitk_skin_get_slider_skin_filename(skonfig, s->skin_element_name))),
+			     (xitk_skin_get_slider_type(skonfig, s->skin_element_name)));
+}
+
+/*
+ * Create the widget (not skined).
+ */
+xitk_widget_t *xitk_noskin_slider_create (xitk_slider_widget_t *s,
+					  int x, int y, int width, int height, int type) {
+  xitk_image_t   *b, *p;
+
+  XITK_CHECK_CONSTITENCY(s);
+  
+  if(type == XITK_VSLIDER)
+    p = xitk_image_create_image(s->imlibdata, width * 3, height / 5);
+  else if(type == XITK_HSLIDER)
+    p = xitk_image_create_image(s->imlibdata, (width / 5) * 3, height);
+  else
+    XITK_DIE("Slider type unhandled.\n");
+
+  xitk_image_add_mask(s->imlibdata, p);
+  if(type == XITK_VSLIDER)
+    draw_paddle_three_state_vertical(s->imlibdata, p);
+  else if(type == XITK_HSLIDER)
+    draw_paddle_three_state_horizontal(s->imlibdata, p);
+  
+  b = xitk_image_create_image(s->imlibdata, width, height);
+  draw_inner(s->imlibdata, b->image, width, height);
+
+  return _xitk_slider_create(NULL, s, x, y, NULL, b, p, type);
 }

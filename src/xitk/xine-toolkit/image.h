@@ -26,12 +26,23 @@
 
 #include <X11/Xlib.h>
 
+#define STYLE_FLAT     1
+#define STYLE_BEVEL    2
+
+#define DIRECTION_UP     1
+#define DIRECTION_DOWN   2
+#define DIRECTION_LEFT   3
+#define DIRECTION_RIGHT  4
+
+#define DRAW_INNER     1
+#define DRAW_OUTTER    2
+#define DRAW_FLATTER   3
+
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
 #include "_xitk.h"
 
 typedef struct {
-  Display              *display;
   ImlibData            *imlibdata;
   char                 *skin_element_name;
   xitk_widget_t        *bWidget;
@@ -40,14 +51,121 @@ typedef struct {
 
 /* *************************************************************** */
 
+/*
+ * Return pixel value of RGB values.
+ */
+unsigned int xitk_get_pixel_color_from_rgb(ImlibData *im, int r, int g, int b);
+
+/*
+ * Some presets of colors.
+ */
+unsigned int xitk_get_pixel_color_black(ImlibData *im);
+unsigned int xitk_get_pixel_color_white(ImlibData *im);
+unsigned int xitk_get_pixel_color_lightgray(ImlibData *im);
+unsigned int xitk_get_pixel_color_gray(ImlibData *im);
+unsigned int xitk_get_pixel_color_darkgray(ImlibData *im);
+
+/*
+ * Create an image object.
+ */
+xitk_image_t *xitk_image_create_image(ImlibData *im, int width, int height);
+
+/*
+ * Free an image object.
+ */
+void xitk_image_free_image(ImlibData *im, xitk_image_t **src);
+
+/*
+ * Change image object from src.
+ */
+void xitk_image_change_image(ImlibData *im, 
+			     xitk_image_t *src, xitk_image_t *dest, int width, int height);
+
+/*
+ * Create a pixmap.
+ */
+Pixmap xitk_image_create_pixmap(ImlibData *idata, int width, int height);
+
+/*
+ * Add a mask to image object.
+ */
+void xitk_image_add_mask(ImlibData *im, xitk_image_t *dest);
+
 /**
  * Load image and return a xitk_image_t data type.
  */
-xitk_image_t *xitk_load_image(ImlibData *idata, char *image);
+xitk_image_t *xitk_image_load_image(ImlibData *idata, char *image);
 
 /**
  * Create an image widget type.
  */
-xitk_widget_t *xitk_image_create (xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
+xitk_widget_t *xitk_image_create(xitk_skin_config_t *skonfig, xitk_image_widget_t *im);
+
+/*
+ * Create and image object from a string, width is limited.
+ */
+xitk_image_t *xitk_image_create_image_from_string(ImlibData *im, 
+						  char *fontname, char *str, int width);
+/*
+ * Draw in image object a three state pixmap (first state is flat styled).
+ */
+void draw_flat_three_state(ImlibData *im, xitk_image_t *p);
+
+/*
+ * Draw in image object a three state pixmap.
+ */
+void draw_bevel_three_state(ImlibData *im, xitk_image_t *p);
+
+/*
+ * Draw in image object a two state pixmap.
+ */
+void draw_bevel_two_state(ImlibData *im, xitk_image_t *p);
+
+/*
+ * Drawing some paddle (for slider).
+ */
+void draw_paddle_bevel_three_state(ImlibData *im, xitk_image_t *p);
+void draw_paddle_three_state_vertical(ImlibData *im, xitk_image_t *p);
+void draw_paddle_three_state_horizontal(ImlibData *im, xitk_image_t *p);
+
+/*
+ * Draw an inner box.
+ */
+void draw_inner(ImlibData *im, Pixmap p, int w, int h);
+
+/*
+ * Draw and outter box.
+ */
+void draw_outter(ImlibData *im, Pixmap p, int w, int h);
+
+/*
+ * Draw a flat box.
+ */
+void draw_flat(ImlibData *im, Pixmap p, int w, int h);
+
+/*
+ * Draw a flat box with specified color.
+ */
+void draw_flat_with_color(ImlibData *im, Pixmap p, int w, int h, unsigned int color);
+
+/*
+ * Draw and arrow (direction is UP).
+ */
+void draw_arrow_up(ImlibData *im, xitk_image_t *p);
+
+/*
+ * Draw and arrow (direction is DOWN).
+ */
+void draw_arrow_down(ImlibData *im, xitk_image_t *p);
+
+/*
+ * Draw a rectangular inner box (only the relief effect).
+ */
+void draw_rectangular_inner_box(ImlibData *im, Pixmap p, int x, int y, int width, int height);
+
+/*
+ * Draw a rectangular outter box (only the relief effect).
+ */
+void draw_rectangular_outter_box(ImlibData *im, Pixmap p, int x, int y, int width, int height);
 
 #endif

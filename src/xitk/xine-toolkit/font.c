@@ -232,6 +232,32 @@ void xitk_font_string_extent(xitk_font_t *xtfs, const char *c,
 /*
  *
  */
+int xitk_font_get_ascent(xitk_font_t *xtfs, const char *c) {
+  int lbearing, rbearing, width, ascent, descent;
+  
+  assert((xtfs != NULL) && (xtfs->font != NULL) && (xtfs->display != NULL) && (c != NULL));
+
+  xitk_font_text_extent(xtfs, c, strlen(c), &lbearing, &rbearing, &width, &ascent, &descent);
+
+  return ascent;
+}
+
+/*
+ *
+ */
+int xitk_font_get_descent(xitk_font_t *xtfs, const char *c) {
+  int lbearing, rbearing, width, ascent, descent;
+  
+  assert((xtfs != NULL) && (xtfs->font != NULL) && (xtfs->display != NULL) && (c != NULL));
+
+  xitk_font_text_extent(xtfs, c, strlen(c), &lbearing, &rbearing, &width, &ascent, &descent);
+
+  return descent;
+}
+
+/*
+ *
+ */
 void xitk_font_set_font(xitk_font_t *xtfs, GC gc) {
 
   assert((xtfs != NULL) && (xtfs->display != NULL));

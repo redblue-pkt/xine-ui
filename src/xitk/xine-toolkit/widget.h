@@ -39,6 +39,11 @@
 
 #define WIDGET_ENABLE  1
 
+
+#define FOREGROUND_SKIN 1
+#define BACKGROUND_SKIN 2
+
+
 #define BROWSER_MAX_ENTRIES 65535
 
 typedef int xitk_register_key_t;
@@ -60,7 +65,7 @@ typedef struct {
   char                       *colorname;
 } xitk_color_names_t;
 
-typedef struct {
+typedef struct xitk_image_s {
   Pixmap                      image;
   Pixmap                      mask;
   int                         width;
@@ -82,6 +87,14 @@ typedef struct {
   int                         offset_y;
 } xitk_move_t;
 
+typedef struct {
+  struct {
+    int                       x;
+    int                       y;
+  } pos;
+  xitk_image_t               *image;
+} xitk_image_and_pos_t;
+
 struct xitk_widget_list_s;
 
 struct xitk_widget_s;
@@ -97,6 +110,10 @@ typedef void (*widget_keyevent_callback_t)(struct xitk_widget_list_s *, struct x
 typedef int (*widget_inside_callback_t)(struct xitk_widget_s *, int, int);
 
 typedef void (*widget_change_skin_callback_t)(struct xitk_widget_list_s *, struct xitk_widget_s *, xitk_skin_config_t *);
+
+typedef xitk_image_t *(*widget_get_skin_t)(struct xitk_widget_s *, int);
+
+typedef void (*widget_destroy_t)(struct xitk_widget_s *, void *);
 
 typedef struct xitk_widget_s {
   int                             x;
@@ -122,6 +139,10 @@ typedef struct xitk_widget_s {
   widget_inside_callback_t        notify_inside;
 
   widget_change_skin_callback_t   notify_change_skin;
+
+  widget_destroy_t                notify_destroy;
+
+  widget_get_skin_t               get_skin;
 
   void                           *private_data;
   uint32_t                        widget_type;
@@ -158,7 +179,7 @@ xitk_color_names_t *xitk_get_color_name(char *color);
 /**
  * (re)Paint a widget list.
  */
-int xitk_paint_widget_list (xitk_widget_list_t *wl) ;
+int xitk_paint_widget_list (xitk_widget_list_t *wl);
 
 /*
  *
@@ -175,7 +196,7 @@ int xitk_is_cursor_out_mask(Display *display, xitk_widget_t *w, Pixmap mask, int
 /**
  * Boolean function, if x and y coords is in widget.
  */
-int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) ;
+int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y);
 
 /**
  * Return widget from widget list 'wl' localted at x,y coords.
@@ -238,9 +259,34 @@ void xitk_enable_widget(xitk_widget_t *);
 void xitk_disable_widget(xitk_widget_t *);
 
 /**
+ *
+ */
+void xitk_free_widget(xitk_widget_t *w);
+
+/**
+ * Destroy and free widget.
+ */
+void xitk_destroy_widget(xitk_widget_list_t *wl, xitk_widget_t *w);
+
+/**
+ * Destroy widgets from widget list.
+ */
+void xitk_destroy_widgets(xitk_widget_list_t *wl);
+
+/**
+ * Stop widget.
+ */
+void xitk_stop_widget(xitk_widget_t *w);
+
+/**
  * Stop each (if widget handle it) widgets of widget list.
  */
 void xitk_stop_widgets(xitk_widget_list_t *);
+
+/**
+ * Show a widget.
+ */
+void xitk_show_widget(xitk_widget_t *);
 
 /**
  * Set widgets of widget list visible.
@@ -248,10 +294,18 @@ void xitk_stop_widgets(xitk_widget_list_t *);
 void xitk_show_widgets(xitk_widget_list_t *);
 
 /**
+ * Hide a widget.
+ */
+void xitk_hide_widget(xitk_widget_list_t *, xitk_widget_t *);
+
+/**
  * Set widgets of widget list not visible.
  */
 void xitk_hide_widgets(xitk_widget_list_t *);
 
+
+xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w);
+xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w);
 
 #ifndef __GNUC__
 #define	__FUNCTION__	__func__

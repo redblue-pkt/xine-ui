@@ -34,7 +34,7 @@
 
 typedef struct {
 
-  Display                *display;
+  ImlibData              *imlibdata;
   char                   *skin_element_name;
 
   xitk_widget_t          *bWidget;
@@ -57,7 +57,6 @@ typedef struct {
   int                     current_button_clicked;
   struct timeval          click_time;
 
-
 } browser_private_data_t;
 
 /* ****************************************************************** */
@@ -67,6 +66,12 @@ typedef struct {
  */
 xitk_widget_t *xitk_browser_create(xitk_skin_config_t *skonfig, xitk_browser_widget_t *b);
 
+/*
+ * Same as above, without skinable feature.
+ */
+xitk_widget_t *xitk_noskin_browser_create(xitk_browser_widget_t *br, GC gc, 
+					  int x, int y, 
+					  int itemw, int itemh, int slidw, char *fontname);
 /**
  * Redraw buttons/slider
  */

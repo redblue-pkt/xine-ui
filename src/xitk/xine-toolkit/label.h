@@ -32,7 +32,6 @@
 #include "_xitk.h"
 
 typedef struct {
-  Display          *display;
   ImlibData        *imlibdata;
   char             *skin_element_name;
   GC                gc;
@@ -45,7 +44,8 @@ typedef struct {
   int               char_height; /* height of 1 char */
 
   int               length;      /* length in char */
-  xitk_image_t      *font;
+  xitk_image_t     *font;
+  char             *fontname;
   char             *label;
 
   int               animation;
@@ -65,8 +65,13 @@ typedef struct {
  */
 xitk_widget_t *xitk_label_create (xitk_skin_config_t *skonfig, xitk_label_widget_t *l);
 
+/*
+ * Same as above, without skinable feature.
+ */
+xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
+					int x, int y, int len, char *fontname);
 /**
- * Change label of wodget 'widget'.
+ * Change label of widget 'widget'.
  */
 int xitk_label_change_label (xitk_widget_list_t *wl, xitk_widget_t *l, char *newlabel);
 

@@ -159,10 +159,10 @@ void xitk_filebrowser_hide(xitk_widget_t *w) {
     private_data = (filebrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
-      XLOCK(private_data->display);
-      XUnmapWindow(private_data->display, private_data->window);
+      XLOCK(private_data->imlibdata->x.disp);
+      XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
       xitk_hide_widgets(private_data->widget_list);
-      XUNLOCK(private_data->display);
+      XUNLOCK(private_data->imlibdata->x.disp);
       private_data->visible = 0;
     }
   }
@@ -177,10 +177,10 @@ void xitk_filebrowser_show(xitk_widget_t *w) {
   if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
     private_data = (filebrowser_private_data_t *)w->private_data;
 
-    XLOCK(private_data->display);
+    XLOCK(private_data->imlibdata->x.disp);
     xitk_show_widgets(private_data->widget_list);
-    XMapRaised(private_data->display, private_data->window); 
-    XUNLOCK(private_data->display);
+    XMapRaised(private_data->imlibdata->x.disp, private_data->window); 
+    XUNLOCK(private_data->imlibdata->x.disp);
     private_data->visible = 1;
   }
 }
@@ -195,11 +195,11 @@ void xitk_filebrowser_set_transient(xitk_widget_t *w, Window window) {
     private_data = (filebrowser_private_data_t *)w->private_data;
 
     if(private_data->visible) {
-      XLOCK(private_data->display);
-      XSetTransientForHint (private_data->display,
+      XLOCK(private_data->imlibdata->x.disp);
+      XSetTransientForHint (private_data->imlibdata->x.disp,
 			    private_data->window, 
 			    window);
-      XUNLOCK(private_data->display);
+      XUNLOCK(private_data->imlibdata->x.disp);
     }
   }
 }
@@ -216,12 +216,26 @@ void xitk_filebrowser_destroy(xitk_widget_t *w) {
     private_data->running = 0;
     private_data->visible = 0;
     
-    XLOCK(private_data->display);
-    XUnmapWindow(private_data->display, private_data->window);
-    XUNLOCK(private_data->display);
-	
-    xitk_stop_widgets(private_data->widget_list);
+    xitk_unregister_event_handler(&private_data->widget_key);
+    
+    XLOCK(private_data->imlibdata->x.disp);
+    XUnmapWindow(private_data->imlibdata->x.disp, private_data->window);
+    XUNLOCK(private_data->imlibdata->x.disp);
+    
+    xitk_destroy_widgets(private_data->widget_list);
+    
+    XLOCK(private_data->imlibdata->x.disp);
+    XDestroyWindow(private_data->imlibdata->x.disp, private_data->window);
+    Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
+    XUNLOCK(private_data->imlibdata->x.disp);
+    
+    private_data->window = None;
     xitk_list_free(private_data->widget_list->l);
+    
+    XLOCK(private_data->imlibdata->x.disp);
+    XFreeGC(private_data->imlibdata->x.disp, private_data->widget_list->gc);
+    XUNLOCK(private_data->imlibdata->x.disp);
+    
     XITK_FREE(private_data->widget_list);
     
     {
@@ -232,12 +246,7 @@ void xitk_filebrowser_destroy(xitk_widget_t *w) {
       }
     }
     XITK_FREE(private_data->fc);
-    XLOCK(private_data->display);
-    XDestroyWindow(private_data->display, private_data->window);
-    XUNLOCK(private_data->display);
-
-    xitk_unregister_event_handler(&private_data->widget_key);
-    XITK_FREE(private_data->fbWidget);
+    XITK_FREE(private_data->skin_element_name);
     XITK_FREE(private_data);
   }
 }
@@ -740,33 +749,7 @@ void xitk_filebrowser_exit(xitk_widget_t *w, void *data) {
   if(private_data->kill_callback)
     private_data->kill_callback(private_data->fbWidget, NULL);
 
-  private_data->running = 0;
-  private_data->visible = 0;
-  
-  XLOCK(private_data->display);
-  XUnmapWindow(private_data->display, private_data->window);
-  XUNLOCK(private_data->display);
-  
-  xitk_stop_widgets(private_data->widget_list);
-  xitk_list_free(private_data->widget_list->l);
-  XITK_FREE(private_data->widget_list);
-  
-  {
-    int i;
-    for(i = 0; i < private_data->dir_contents_num; i++) {
-      XITK_FREE(private_data->fc->dir_contents[i]);
-      XITK_FREE(private_data->fc->dir_disp_contents[i]);
-    }
-  }
-  XITK_FREE(private_data->fc);
-
-  XLOCK(private_data->display);
-  XDestroyWindow(private_data->display, private_data->window);
-  XUNLOCK(private_data->display);
-
-  xitk_unregister_event_handler(&private_data->widget_key);
-  XITK_FREE(private_data->fbWidget);
-  XITK_FREE(private_data);
+  xitk_filebrowser_destroy(private_data->fbWidget);
 }
 
 /*
@@ -897,17 +880,17 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
   switch(event->type) {
 
   case MappingNotify:
-    XLOCK(private_data->display);
+    XLOCK(private_data->imlibdata->x.disp);
     XRefreshKeyboardMapping((XMappingEvent *) event);
-    XUNLOCK(private_data->display);
+    XUNLOCK(private_data->imlibdata->x.disp);
     break;
 
   case KeyPress:
     mykeyevent = event->xkey;
 
-    XLOCK (private_data->display);
+    XLOCK (private_data->imlibdata->x.disp);
     len = XLookupString(&mykeyevent, kbuf, sizeof(kbuf), &mykey, NULL);
-    XUNLOCK (private_data->display);
+    XUNLOCK (private_data->imlibdata->x.disp);
 
     switch (mykey) {
       
@@ -936,13 +919,23 @@ static void filebrowser_handle_event(XEvent *event, void *data) {
 /*
  *
  */
+static void notify_destroy(xitk_widget_t *w, void *data) {
+  
+  if(w->widget_type & WIDGET_TYPE_FILEBROWSER) {
+    xitk_filebrowser_destroy(w);
+  }
+}
+
+/*
+ *
+ */
 void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig) {
   filebrowser_private_data_t *private_data;
 
   if(w && (w->widget_type & WIDGET_TYPE_FILEBROWSER)) {
     private_data = (filebrowser_private_data_t *)w->private_data;
     
-    XLOCK(private_data->display);
+    XLOCK(private_data->imlibdata->x.disp);
     
     Imlib_destroy_image(private_data->imlibdata, private_data->bg_image);
     
@@ -952,18 +945,18 @@ void xitk_filebrowser_change_skins(xitk_widget_t *w, xitk_skin_config_t *skonfig
       XITK_DIE("%s(): couldn't find image for background\n", __FUNCTION__);
     }
     
-    XResizeWindow (private_data->display, private_data->window,
+    XResizeWindow (private_data->imlibdata->x.disp, private_data->window,
 		   (unsigned int)private_data->bg_image->rgb_width,
 		   (unsigned int)private_data->bg_image->rgb_height);
     
     /*
      * We should here, otherwise new skined window will have wrong size.
      */
-    XFlush(private_data->display);
+    XFlush(private_data->imlibdata->x.disp);
     
     Imlib_apply_image(private_data->imlibdata, private_data->bg_image, private_data->window);
     
-    XUNLOCK(private_data->display);
+    XUNLOCK(private_data->imlibdata->x.disp);
     
     xitk_change_skins_widget_list(private_data->widget_list, skonfig);
     
@@ -994,6 +987,10 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   
   XITK_CHECK_CONSTITENCY(fb);
 
+  XITK_WIDGET_INIT(&b, fb->imlibdata);
+  XITK_WIDGET_INIT(&lb, fb->imlibdata);
+  XITK_WIDGET_INIT(&lbl, fb->imlibdata);
+
   mywidget                        = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
 
   private_data                    = (filebrowser_private_data_t *) xitk_xmalloc(sizeof(filebrowser_private_data_t));
@@ -1002,18 +999,17 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 
   private_data->fbWidget          = mywidget;
 
-  private_data->display           = fb->display;
   private_data->imlibdata         = fb->imlibdata;
   private_data->skin_element_name = strdup(fb->skin_element_name);
   private_data->running           = 1;
 
-  XLOCK(fb->display);
+  XLOCK(fb->imlibdata->x.disp);
   
   if(!(private_data->bg_image  = Imlib_load_image(fb->imlibdata, 
 						  xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name)))) {
     XITK_WARNING("%s(%d): couldn't find image for background\n", __FILE__, __LINE__);
     
-    XUNLOCK(fb->display);
+    XUNLOCK(fb->imlibdata->x.disp);
     return NULL;
   }
 
@@ -1027,9 +1023,9 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   hint.height                  = private_data->bg_image->rgb_height;
   hint.flags                   = PPosition | PSize;
 
-  screen                       = DefaultScreen(fb->display);
+  screen                       = DefaultScreen(fb->imlibdata->x.disp);
 
-  XAllocNamedColor(fb->display, 
+  XAllocNamedColor(fb->imlibdata->x.disp, 
 		   Imlib_get_colormap(fb->imlibdata),
                    "black", &black, &dummy);
 
@@ -1047,7 +1043,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   attr.colormap		       = Imlib_get_colormap(fb->imlibdata);
 
   private_data->window = 
-    XCreateWindow (fb->display, DefaultRootWindow(fb->display), 
+    XCreateWindow (fb->imlibdata->x.disp, DefaultRootWindow(fb->imlibdata->x.disp), 
 		   hint.x, hint.y, hint.width, 
 		   hint.height, 0, 
 		   fb->imlibdata->x.depth, 
@@ -1055,10 +1051,10 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 		   fb->imlibdata->x.visual,
 		   CWBackPixel | CWBorderPixel | CWColormap, &attr);
   
-  XSetStandardProperties(fb->display, private_data->window, title, title,
+  XSetStandardProperties(fb->imlibdata->x.disp, private_data->window, title, title,
 			 None, NULL, 0, &hint);
 
-  XSelectInput(fb->display, private_data->window,
+  XSelectInput(fb->imlibdata->x.disp, private_data->window,
 	       ButtonPressMask | ButtonReleaseMask | PointerMotionMask 
 	       | KeyPressMask | ExposureMask | StructureNotifyMask);
   
@@ -1068,10 +1064,10 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
    *
    */
   if(fb->layer_above) {
-    XA_WIN_LAYER = XInternAtom(fb->display, "_WIN_LAYER", False);
+    XA_WIN_LAYER = XInternAtom(fb->imlibdata->x.disp, "_WIN_LAYER", False);
     
     data[0] = 10;
-    XChangeProperty(fb->display, private_data->window, XA_WIN_LAYER,
+    XChangeProperty(fb->imlibdata->x.disp, private_data->window, XA_WIN_LAYER,
 		    XA_CARDINAL, 32, PropModeReplace, (unsigned char *)data,
 		    1);
   }
@@ -1079,22 +1075,22 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   /*
    * wm, no border please
    */
-  prop                 = XInternAtom(fb->display, "_MOTIF_WM_HINTS", True);
+  prop                 = XInternAtom(fb->imlibdata->x.disp, "_MOTIF_WM_HINTS", True);
   mwmhints.flags       = MWM_HINTS_DECORATIONS;
   mwmhints.decorations = 0;
   
-  XChangeProperty(fb->display, private_data->window, prop, prop, 32,
+  XChangeProperty(fb->imlibdata->x.disp, private_data->window, prop, prop, 32,
                   PropModeReplace, (unsigned char *) &mwmhints,
                   PROP_MWM_HINTS_ELEMENTS);						
   if(fb->window_trans != None)
-    XSetTransientForHint (fb->display, private_data->window, fb->window_trans);
+    XSetTransientForHint (fb->imlibdata->x.disp, private_data->window, fb->window_trans);
   
   /* set xclass */
   
   if((xclasshint = XAllocClassHint()) != NULL) {
     xclasshint->res_name = fb->resource_name ? fb->resource_name : "xitk file browser";
     xclasshint->res_class = fb->resource_class ? fb->resource_class : "xitk";
-    XSetClassHint(fb->display, private_data->window, xclasshint);
+    XSetClassHint(fb->imlibdata->x.disp, private_data->window, xclasshint);
   }
   
   wm_hint = XAllocWMHints();
@@ -1102,11 +1098,11 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
     wm_hint->input         = True;
     wm_hint->initial_state = NormalState;
     wm_hint->flags         = InputHint | StateHint;
-    XSetWMHints(fb->display, private_data->window, wm_hint);
+    XSetWMHints(fb->imlibdata->x.disp, private_data->window, wm_hint);
     XFree(wm_hint);
   }
   
-  gc = XCreateGC(fb->display, private_data->window, 0, 0);
+  gc = XCreateGC(fb->imlibdata->x.disp, private_data->window, 0, 0);
   
   Imlib_apply_image(fb->imlibdata, 
 		    private_data->bg_image, private_data->window);
@@ -1118,13 +1114,10 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   private_data->widget_list->win           = private_data->window;
   private_data->widget_list->gc            = gc;
   
-  b.display            = fb->display;
   b.imlibdata          = fb->imlibdata;
 
-  lb.display           = fb->display;
   lb.imlibdata         = fb->imlibdata;
 
-  lbl.display          = fb->display;
   lbl.imlibdata        = fb->imlibdata;
 
 
@@ -1203,22 +1196,25 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
   else
     sprintf(private_data->current_dir, "%s", filebrowser_get_homedir());
   
-  private_data->visible     = 1;
+  private_data->visible        = 1;
 
-  mywidget->enable          = 1;
-  mywidget->running         = 1;
-  mywidget->visible         = 1;
-  mywidget->have_focus      = FOCUS_LOST;
-  mywidget->x               = fb->x;
-  mywidget->y               = fb->y;
-  mywidget->width           = private_data->bg_image->width;
-  mywidget->height          = private_data->bg_image->height;
-  mywidget->widget_type     = WIDGET_TYPE_FILEBROWSER | WIDGET_TYPE_GROUP;
-  mywidget->paint           = NULL;
-  mywidget->notify_click    = NULL;
-  mywidget->notify_focus    = NULL;
-  mywidget->notify_keyevent = NULL;
-  mywidget->notify_inside   = NULL;
+  mywidget->enable             = 1;
+  mywidget->running            = 1;
+  mywidget->visible            = 1;
+  mywidget->have_focus         = FOCUS_LOST;
+  mywidget->x                  = fb->x;
+  mywidget->y                  = fb->y;
+  mywidget->width              = private_data->bg_image->width;
+  mywidget->height             = private_data->bg_image->height;
+  mywidget->widget_type        = WIDGET_TYPE_FILEBROWSER | WIDGET_TYPE_GROUP;
+  mywidget->paint              = NULL;
+  mywidget->notify_click       = NULL;
+  mywidget->notify_focus       = NULL;
+  mywidget->notify_keyevent    = NULL;
+  mywidget->notify_inside      = NULL;
+  mywidget->notify_change_skin = NULL;
+  mywidget->notify_destroy     = notify_destroy;
+  mywidget->get_skin           = NULL;
 
   load_files(NULL, (void *)private_data);
   
@@ -1226,7 +1222,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 			   private_data->fc->dir_disp_contents,
 			   private_data->dir_contents_num, 0);
 
-  XMapRaised(fb->display, private_data->window); 
+  XMapRaised(fb->imlibdata->x.disp, private_data->window); 
 
   private_data->widget_key = 
     xitk_register_event_handler("file browser",
@@ -1237,8 +1233,7 @@ xitk_widget_t *xitk_filebrowser_create(xitk_skin_config_t *skonfig, xitk_filebro
 				private_data->widget_list,
 				(void *) private_data);
 
-  XUNLOCK (fb->display);
-  /* XSync(fb->display, False); */
+  XUNLOCK (fb->imlibdata->x.disp);
 
   return mywidget;
 }

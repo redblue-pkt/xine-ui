@@ -807,9 +807,8 @@ int xitk_is_inside_widget (xitk_widget_t *widget, int x, int y) {
     return 0;
   }
 
-  if ((x >= widget->x) && 
-      (x <= (widget->x + widget->width)) && 
-      (y >= widget->y) && (y <= (widget->y + widget->height))) {
+  if(((x >= widget->x) && (x <= (widget->x + widget->width))) && 
+     ((y >= widget->y) && (y <= (widget->y + widget->height)))) {
     
     inside = 1;
     
@@ -1034,6 +1033,62 @@ void xitk_disable_widget(xitk_widget_t *w) {
 }
 
 /*
+ *
+ */
+void xitk_free_widget(xitk_widget_t *w) {
+  
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+  
+  if(w->notify_destroy)
+    w->notify_destroy(w, NULL);
+  
+  XITK_FREE(w);
+  w = NULL;
+  
+}
+
+/*
+ * Destroy a widget.
+ */
+void xitk_destroy_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  xitk_hide_widget(wl, w);
+  xitk_stop_widget(w);
+  xitk_disable_widget(w);
+
+  xitk_free_widget(w);
+}
+
+/*
+ * Show widgets from widget list.
+ */
+void xitk_destroy_widgets(xitk_widget_list_t *wl) {
+  xitk_widget_t *mywidget;
+  
+  if(!wl) {
+    XITK_WARNING("%s(): widget list was NULL.\n", __FUNCTION__);
+    return;
+  }
+  
+  mywidget = (xitk_widget_t *) xitk_list_last_content (wl->l);
+
+  while(mywidget) {
+    
+    xitk_destroy_widget(wl, mywidget);
+    
+    mywidget = (xitk_widget_t *) xitk_list_prev_content (wl->l);
+  }
+}
+
+/*
  * Return the struct of color names/values.
  */
 xitk_color_names_t *gui_get_color_names(void) {
@@ -1107,6 +1162,20 @@ xitk_color_names_t *xitk_get_color_name(char *color) {
 /*
  * Stop a widget.
  */
+void xitk_stop_widget(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  w->running = 0;
+  
+}
+
+/*
+ * Stop a widgets from widget list.
+ */
 void xitk_stop_widgets(xitk_widget_list_t *wl) {
   xitk_widget_t *mywidget;
   
@@ -1119,10 +1188,24 @@ void xitk_stop_widgets(xitk_widget_list_t *wl) {
 
   while(mywidget) {
     
-    mywidget->running = 0;
+    xitk_stop_widget(mywidget);
     
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
+}
+
+/*
+ * Show a widget.
+ */
+void xitk_show_widget(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  w->visible = 1;
+  
 }
 
 /*
@@ -1140,10 +1223,27 @@ void xitk_show_widgets(xitk_widget_list_t *wl) {
 
   while(mywidget) {
     
-    mywidget->visible = 1;
+    xitk_show_widget(mywidget);
     
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
+}
+
+/*
+ * Hide a widget.
+ */
+void xitk_hide_widget(xitk_widget_list_t *wl, xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return;
+  }
+
+  w->visible = 0;
+
+  if(w->paint)
+    w->paint(w, wl->win, wl->gc);
+  
 }
 
 /*
@@ -1161,8 +1261,40 @@ void xitk_hide_widgets(xitk_widget_list_t *wl) {
 
   while(mywidget) {
     
-    mywidget->visible = 0;
+    xitk_hide_widget(wl, mywidget);
     
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l);
   }
+}
+
+/*
+ *
+ */
+xitk_image_t *xitk_get_widget_foreground_skin(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return NULL;
+  }
+
+  if(w->get_skin)
+    return w->get_skin(w, FOREGROUND_SKIN);
+
+  return NULL;
+}
+
+/*
+ *
+ */
+xitk_image_t *xitk_get_widget_background_skin(xitk_widget_t *w) {
+
+  if(!w) {
+    XITK_WARNING("widget is NULL\n");
+    return NULL;
+  }
+
+  if(w->get_skin)
+    return w->get_skin(w, BACKGROUND_SKIN);
+
+  return NULL;
 }

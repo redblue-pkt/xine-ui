@@ -32,11 +32,36 @@
 
 #include "Imlib-light/Imlib.h"
 #include "widget.h"
+#include "font.h"
 #include "image.h"
 #include "label.h"
 #include "widget_types.h"
 #include "utils.h"
 #include "_xitk.h"
+
+/*
+ *
+ */
+static void notify_destroy(xitk_widget_t *w, void *data) {
+  label_private_data_t *private_data = (label_private_data_t *) w->private_data;
+
+  if(w->widget_type & WIDGET_TYPE_LABEL) {
+
+    if(private_data->anim_running) {
+      void *dummy;
+      
+      private_data->anim_running = 0;
+      pthread_join(private_data->thread, &dummy);
+    }
+
+    XITK_FREE(private_data->animated_label);
+    XITK_FREE(private_data->fontname);
+    XITK_FREE(private_data->skin_element_name);
+    if(private_data->font)
+      xitk_image_free_image(private_data->imlibdata, &private_data->font);
+    XITK_FREE(private_data);
+  }
+}
 
 /*
  *
@@ -50,7 +75,58 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
 
   if ((l->widget_type & WIDGET_TYPE_LABEL) && l->visible) {
 
+    /* non skinable widget */
+    if(private_data->skin_element_name == NULL) {
+      xitk_font_t   *fs = NULL;
+      int            lbear, rbear, wid, asc, des;
+      int            w, h;
+      xitk_image_t  *bg;
+
+      /* Clean old */
+      if(private_data->font) {
+	draw_flat(private_data->imlibdata, private_data->font->image, 
+		  private_data->font->width, private_data->font->height);
+	XLOCK (private_data->imlibdata->x.disp);
+	XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, win, 
+		   gc, 0, 0, private_data->font->width, private_data->font->height, l->x, l->y);
+	XUNLOCK (private_data->imlibdata->x.disp);
+	xitk_image_free_image(private_data->imlibdata, &private_data->font);
+      }
+
+      fs = xitk_font_load_font(private_data->imlibdata->x.disp, private_data->fontname);
+      xitk_font_set_font(fs, gc);
+      xitk_font_string_extent(fs, private_data->label, &lbear, &rbear, &wid, &asc, &des);
+
+      l->width = w = private_data->length;
+      l->height = h = asc + des;
+      bg = xitk_image_create_image(private_data->imlibdata, w, h);
+      draw_flat(private_data->imlibdata, bg->image, w, h);
+
+      XLOCK (private_data->imlibdata->x.disp);
+      XSetForeground(private_data->imlibdata->x.disp, gc, 
+		     xitk_get_pixel_color_black(private_data->imlibdata));
+      XDrawString(private_data->imlibdata->x.disp, bg->image, gc,
+		  0, (asc+des)-des, private_data->label, strlen(private_data->label));
+      XUNLOCK (private_data->imlibdata->x.disp);
+      
+      private_data->font = xitk_image_create_image(private_data->imlibdata, w, h);
+
+      xitk_image_change_image(private_data->imlibdata, bg, private_data->font, w, h);
+
+      XLOCK (private_data->imlibdata->x.disp);
+      XCopyArea (private_data->imlibdata->x.disp, private_data->font->image, win, 
+		 gc, 0, 0, w, h, l->x, l->y);
+
+      xitk_image_free_image(private_data->imlibdata, &bg);
+      XUNLOCK (private_data->imlibdata->x.disp);
+      
+      xitk_font_unload_font(fs);
+
+      return;
+    }
+
     pthread_mutex_lock(&private_data->mutex);
+
     if (private_data->anim_running) {
       label_to_display = 
 	&private_data->animated_label[private_data->anim_offset];
@@ -61,10 +137,10 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
       len = strlen(label_to_display);
     }
     pthread_mutex_unlock(&private_data->mutex);
-
+    
     x_dest = l->x;
     y_dest = l->y;
-  
+    
     nCWidth = font->width / 32;
     nCHeight = font->height / 3;
     
@@ -80,10 +156,10 @@ static void paint_label(xitk_widget_t *l, Window win, GC gc) {
 	px = (c % 32) * nCWidth;
 	py = (c / 32) * nCHeight;
 	
-	XLOCK (private_data->display);
-	XCopyArea (private_data->display, font->image, win, gc, px, py,
+	XLOCK (private_data->imlibdata->x.disp);
+	XCopyArea (private_data->imlibdata->x.disp, font->image, win, gc, px, py,
 		   nCWidth, nCHeight, x_dest, y_dest);
-	XUNLOCK (private_data->display);
+	XUNLOCK (private_data->imlibdata->x.disp);
 	
       }
       
@@ -117,13 +193,13 @@ void *xitk_label_animation_loop(void *data) {
 		  private_data->window, private_data->gc);
       
       /* We can't wait here, otherwise the rolling effect is really jerky */
-      XLOCK (private_data->display);
-      XSync(private_data->display, False);
-      XUNLOCK (private_data->display);
+      XLOCK (private_data->imlibdata->x.disp);
+      XSync(private_data->imlibdata->x.disp, False);
+      XUNLOCK (private_data->imlibdata->x.disp);
       
     }
 
-    xine_usec_sleep(400000);
+    xitk_usec_sleep(400000);
     
   } while(w->running && private_data->anim_running);
   
@@ -209,22 +285,23 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     (label_private_data_t *) l->private_data;
   
   if(l->widget_type & WIDGET_TYPE_LABEL) {
-    
-    XITK_FREE_XITK_IMAGE(private_data->display, private_data->font);
-    private_data->font        = xitk_load_image(private_data->imlibdata, 
-						   xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
-    private_data->char_length = (private_data->font->width/32);
-    private_data->char_height = (private_data->font->height/3);
-    
-    private_data->length      = xitk_skin_get_label_length(skonfig, private_data->skin_element_name);
-    private_data->animation   = xitk_skin_get_label_animation(skonfig, private_data->skin_element_name);
-    
-    l->x                      = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-    l->y                      = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-    l->width                  = private_data->char_length * private_data->length;
-    l->height                 = private_data->char_height;
-
-    xitk_set_widget_pos(l, l->x, l->y);
+    if(private_data->skin_element_name) {
+      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->font);
+      private_data->font        = xitk_image_load_image(private_data->imlibdata, 
+							xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
+      private_data->char_length = (private_data->font->width/32);
+      private_data->char_height = (private_data->font->height/3);
+      
+      private_data->length      = xitk_skin_get_label_length(skonfig, private_data->skin_element_name);
+      private_data->animation   = xitk_skin_get_label_animation(skonfig, private_data->skin_element_name);
+      
+      l->x                      = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+      l->y                      = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      l->width                  = private_data->char_length * private_data->length;
+      l->height                 = private_data->char_height;
+      
+      xitk_set_widget_pos(l, l->x, l->y);
+    }
   }
 }
 
@@ -253,33 +330,40 @@ int xitk_label_change_label (xitk_widget_list_t *wl, xitk_widget_t *l, char *new
 /*
  *
  */
-xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_t *l) {
-  xitk_widget_t              *mywidget;
-  label_private_data_t  *private_data;
+static xitk_widget_t *_xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_t *l,
+					 int x, int y, int width, int height,
+					 char *skin_element_name, char *fontname) {
+  xitk_widget_t          *mywidget;
+  label_private_data_t   *private_data;
   
-  XITK_CHECK_CONSTITENCY(l);
-
-  //  if(!l->skin_element_name) XITK_DIE("skin element name is required.\n");
-
   mywidget = (xitk_widget_t *) xitk_xmalloc(sizeof(xitk_widget_t));
   
-  private_data = (label_private_data_t *) 
-    xitk_xmalloc(sizeof(label_private_data_t));
+  private_data = (label_private_data_t *) xitk_xmalloc(sizeof(label_private_data_t));
 
-  private_data->display        = l->display;
   private_data->imlibdata      = l->imlibdata;
-  private_data->skin_element_name = strdup(l->skin_element_name);
+  private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(l->skin_element_name);
 
   private_data->lWidget        = mywidget;
 
-  private_data->font           = xitk_load_image(private_data->imlibdata, 
-						 xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
-  private_data->char_length    = (private_data->font->width/32);
-  private_data->char_height    = (private_data->font->height/3);
+  if(skin_element_name == NULL) {
+    private_data->font         = NULL;
+    private_data->fontname     = strdup(fontname);
+    private_data->char_length  = 0;
+    private_data->char_height  = 0;
+    private_data->length       = width;
+  }
+  else {
+    private_data->font         = xitk_image_load_image(private_data->imlibdata, 
+							 xitk_skin_get_label_skinfont_filename(skonfig, private_data->skin_element_name));
+  
+    private_data->fontname     = NULL;
+    private_data->char_length  = (private_data->font->width/32);
+    private_data->char_height  = (private_data->font->height/3);
+    private_data->length       = xitk_skin_get_label_length(skonfig, private_data->skin_element_name);
+  }
 
-  private_data->length         = xitk_skin_get_label_length(skonfig, private_data->skin_element_name);
   private_data->label          = NULL;
-  private_data->animation      = xitk_skin_get_label_animation(skonfig, private_data->skin_element_name);
+  private_data->animation      = (skin_element_name == NULL) ? 0 : xitk_skin_get_label_animation(skonfig, private_data->skin_element_name);
   private_data->animated_label = NULL;
   private_data->anim_running   = 0;
   private_data->window         = l->window;
@@ -291,21 +375,64 @@ xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_
   mywidget->running            = 1;
   mywidget->visible            = 1;
   mywidget->have_focus         = FOCUS_LOST;
-  mywidget->x                  = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-  mywidget->y                  = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-  mywidget->width              = private_data->char_length * private_data->length;
-  mywidget->height             = private_data->char_height;
+  mywidget->x                  = x;
+  mywidget->y                  = y;
+
+  if(skin_element_name == NULL) {
+    mywidget->width            = width;
+    mywidget->height           = height;
+  }
+  else {
+    mywidget->width            = private_data->char_length * private_data->length;
+    mywidget->height           = private_data->char_height;
+  }
   mywidget->widget_type        = WIDGET_TYPE_LABEL;
   mywidget->paint              = paint_label;
   mywidget->notify_click       = NULL;
   mywidget->notify_focus       = NULL;
   mywidget->notify_keyevent    = NULL;
   mywidget->notify_inside      = NULL;
-  mywidget->notify_change_skin = notify_change_skin;
+  mywidget->notify_change_skin = (skin_element_name == NULL) ? NULL : notify_change_skin;
+  mywidget->notify_destroy     = notify_destroy;
+  mywidget->get_skin           = NULL;
   
   pthread_mutex_init(&private_data->mutex, NULL);
 
   label_setup_label(mywidget, l->label);
 
   return mywidget;
+}
+
+/*
+ *
+ */
+xitk_widget_t *xitk_label_create(xitk_skin_config_t *skonfig, xitk_label_widget_t *l) {
+
+  XITK_CHECK_CONSTITENCY(l);
+  
+  return _xitk_label_create(skonfig, l, 
+			    (xitk_skin_get_coord_x(skonfig, l->skin_element_name)),
+			    (xitk_skin_get_coord_y(skonfig, l->skin_element_name)),
+			    (xitk_skin_get_label_length(skonfig, l->skin_element_name)),
+			    -1,
+			    l->skin_element_name, 
+			    NULL);
+}
+
+/*
+ *
+ */
+xitk_widget_t *xitk_noskin_label_create(xitk_label_widget_t *l,
+					int x, int y, int width, char *fontname) {
+  xitk_font_t  *fs;
+  int           height;
+
+  XITK_CHECK_CONSTITENCY(l);
+  
+  fs = xitk_font_load_font(l->imlibdata->x.disp, fontname);
+  xitk_font_set_font(fs, l->gc);
+  height = xitk_font_get_string_height(fs, "HEIGHT");
+  xitk_font_unload_font(fs);
+
+  return _xitk_label_create(NULL, l, x, y, width, height, NULL, fontname);
 }

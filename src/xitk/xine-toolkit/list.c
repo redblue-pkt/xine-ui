@@ -69,7 +69,7 @@ void xitk_list_free(xitk_list_t *l) {
   while(node) {
     xitk_node_t *n = node;
     
-    XITK_FREE(n->content);
+    /* XITK_FREE(n->content);  Content should (IS) be fried elswhere */
     node = n->next;
     XITK_FREE(n);
   }

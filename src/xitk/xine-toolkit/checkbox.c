@@ -36,6 +36,35 @@
 /*
  *
  */
+static void notify_destroy(xitk_widget_t *w, void *data) {
+  checkbox_private_data_t *private_data = 
+    (checkbox_private_data_t *) w->private_data;
+  
+  if(w->widget_type & WIDGET_TYPE_CHECKBOX) {
+    XITK_FREE(private_data->skin_element_name);
+    xitk_image_free_image(private_data->imlibdata, &private_data->skin);
+    XITK_FREE(private_data);
+  }
+}
+
+/*
+ *
+ */
+static xitk_image_t *get_skin(xitk_widget_t *w, int sk) {
+  checkbox_private_data_t *private_data = (checkbox_private_data_t *) w->private_data;
+  
+  if(w->widget_type & WIDGET_TYPE_CHECKBOX) {
+    if(sk == FOREGROUND_SKIN && private_data->skin) {
+      return private_data->skin;
+    }
+  }
+  
+  return NULL;
+}
+
+/*
+ *
+ */
 static int notify_inside(xitk_widget_t *c, int x, int y) {
   checkbox_private_data_t *private_data = 
     (checkbox_private_data_t *) c->private_data;
@@ -43,7 +72,7 @@ static int notify_inside(xitk_widget_t *c, int x, int y) {
   if ((c->widget_type & WIDGET_TYPE_CHECKBOX) && c->visible) {
     xitk_image_t *skin = private_data->skin;
     
-    return xitk_is_cursor_out_mask(private_data->display, c, skin->mask, x, y);
+    return xitk_is_cursor_out_mask(private_data->imlibdata->x.disp, c, skin->mask, x, y);
   }
 
   return 1;
@@ -64,41 +93,41 @@ static void paint_checkbox (xitk_widget_t *c, Window win, GC gc) {
     skin           = private_data->skin;
     checkbox_width = skin->width / 3;
     
-    XLOCK (private_data->display);
+    XLOCK (private_data->imlibdata->x.disp);
     
-    lgc = XCreateGC(private_data->display, win, None, None);
-    XCopyGC(private_data->display, gc, (1 << GCLastBit) - 1, lgc);
+    lgc = XCreateGC(private_data->imlibdata->x.disp, win, None, None);
+    XCopyGC(private_data->imlibdata->x.disp, gc, (1 << GCLastBit) - 1, lgc);
 
     if (skin->mask) {
-      XSetClipOrigin(private_data->display, lgc, c->x, c->y);
-      XSetClipMask(private_data->display, lgc, skin->mask);
+      XSetClipOrigin(private_data->imlibdata->x.disp, lgc, c->x, c->y);
+      XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
     }
 
     if (private_data->cArmed) {
       if (private_data->cClicked) { //click
-	XCopyArea (private_data->display, skin->image, 
+	XCopyArea (private_data->imlibdata->x.disp, skin->image, 
 		   win, lgc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       }
       else {
 	if(!private_data->cState) //focus
-	  XCopyArea (private_data->display, skin->image, 
+	  XCopyArea (private_data->imlibdata->x.disp, skin->image, 
 		     win, lgc, checkbox_width, 0,
 		     checkbox_width, skin->height, c->x, c->y);
       }
     } else {
       if(private_data->cState) //click
-	XCopyArea (private_data->display, skin->image, 
+	XCopyArea (private_data->imlibdata->x.disp, skin->image, 
 		   win, lgc, 2*checkbox_width, 0,
 		   checkbox_width, skin->height, c->x, c->y);
       else  //normal
-	XCopyArea (private_data->display, skin->image, win, lgc, 0, 0,
+	XCopyArea (private_data->imlibdata->x.disp, skin->image, win, lgc, 0, 0,
 		   checkbox_width, skin->height, c->x, c->y);
     }
 
-    XFreeGC(private_data->display, lgc);
+    XFreeGC(private_data->imlibdata->x.disp, lgc);
 
-    XUNLOCK (private_data->display);
+    XUNLOCK (private_data->imlibdata->x.disp);
   }
 #ifdef DEBUG_GUI
   else
@@ -168,16 +197,17 @@ static void notify_change_skin(xitk_widget_list_t *wl,
     (checkbox_private_data_t *) c->private_data;
   
   if (c->widget_type & WIDGET_TYPE_CHECKBOX) {
-    
-    XITK_FREE_XITK_IMAGE(private_data->display, private_data->skin);
-    private_data->skin = xitk_load_image(private_data->imlibdata,
-					 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
-    c->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-    c->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
-    c->width           = private_data->skin->width/3;
-    c->height          = private_data->skin->height;
-       
-    xitk_set_widget_pos(c, c->x, c->y);
+    if(private_data->skin_element_name) {
+      XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->skin);
+      private_data->skin = xitk_image_load_image(private_data->imlibdata,
+						 xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+      c->x               = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
+      c->y               = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+      c->width           = private_data->skin->width/3;
+      c->height          = private_data->skin->height;
+      
+      xitk_set_widget_pos(c, c->x, c->y);
+    }
   }
 }
 
@@ -235,28 +265,26 @@ void xitk_checkbox_set_state(xitk_widget_t *c, int state, Window win, GC gc) {
 /*
  *
  */
-xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cb) {
+static xitk_widget_t *_xitk_checkbox_create(xitk_skin_config_t *skonfig, 
+					    xitk_checkbox_widget_t *cb, int x, int y, 
+					    char *skin_element_name, xitk_image_t *skin) {
   xitk_widget_t *mywidget;
   checkbox_private_data_t *private_data;
-
-  XITK_CHECK_CONSTITENCY(cb);
 
   mywidget = (xitk_widget_t *) xitk_xmalloc (sizeof(xitk_widget_t));
 
   private_data = (checkbox_private_data_t *) 
     xitk_xmalloc (sizeof (checkbox_private_data_t));
 
-  private_data->display           = cb->display;
   private_data->imlibdata         = cb->imlibdata;
-  private_data->skin_element_name = strdup(cb->skin_element_name);
+  private_data->skin_element_name = (skin_element_name == NULL) ? NULL : strdup(cb->skin_element_name);
 
   private_data->cWidget           = mywidget;
   private_data->cClicked          = 0;
   private_data->cState            = 0;
   private_data->cArmed            = 0;
 
-  private_data->skin              = xitk_load_image(private_data->imlibdata,
-						    xitk_skin_get_skin_filename(skonfig, private_data->skin_element_name));
+  private_data->skin              = skin;
   private_data->callback          = cb->callback;
   private_data->userdata          = cb->userdata;
 
@@ -266,8 +294,8 @@ xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_
   mywidget->running               = 1;
   mywidget->visible               = 1;
   mywidget->have_focus            = FOCUS_LOST;
-  mywidget->x                     = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
-  mywidget->y                     = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
+  mywidget->x                     = x;
+  mywidget->y                     = y;
   mywidget->width                 = private_data->skin->width/3;
   mywidget->height                = private_data->skin->height;
   mywidget->widget_type           = WIDGET_TYPE_CHECKBOX;
@@ -276,7 +304,40 @@ xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_
   mywidget->notify_focus          = notify_focus_checkbox;
   mywidget->notify_keyevent       = NULL;
   mywidget->notify_inside         = notify_inside;
-  mywidget->notify_change_skin    = notify_change_skin;
+  mywidget->notify_change_skin    = (skin_element_name == NULL) ? NULL : notify_change_skin;
+  mywidget->notify_destroy        = notify_destroy;
+  mywidget->get_skin              = get_skin;
   
   return mywidget;
+}
+
+/*
+ *
+ */
+xitk_widget_t *xitk_checkbox_create (xitk_skin_config_t *skonfig, xitk_checkbox_widget_t *cb) {
+
+  XITK_CHECK_CONSTITENCY(cb);
+
+  return _xitk_checkbox_create(skonfig, cb,
+			       (xitk_skin_get_coord_x(skonfig, cb->skin_element_name)),
+			       (xitk_skin_get_coord_y(skonfig, cb->skin_element_name)),
+			       cb->skin_element_name,
+			       (xitk_image_load_image(cb->imlibdata,
+						      xitk_skin_get_skin_filename(skonfig, cb->skin_element_name))));
+
+}
+
+/*
+ *
+ */
+xitk_widget_t *xitk_noskin_checkbox_create(xitk_checkbox_widget_t *cb,
+					   int x, int y, int width, int height) {
+  xitk_image_t  *i;
+  
+  XITK_CHECK_CONSTITENCY(cb);
+
+  i = xitk_image_create_image(cb->imlibdata, width * 3, height);
+  draw_bevel_three_state(cb->imlibdata, i);
+  
+  return _xitk_checkbox_create(NULL, cb, x, y, NULL, i);
 }

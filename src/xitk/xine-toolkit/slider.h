@@ -35,7 +35,6 @@
 #define XITK_HSLIDER 2
 
 typedef struct {
-  Display                *display;
   ImlibData              *imlibdata;
   char                   *skin_element_name;
 
@@ -53,7 +52,6 @@ typedef struct {
   xitk_image_t            *paddle_skin;
   xitk_image_t            *bg_skin;
 
-  /* callback function (active_widget, user_data, current_position) */
   xitk_state_callback_t   motion_callback;
   void                   *motion_userdata;
 			  
@@ -74,6 +72,11 @@ typedef struct {
  */
 xitk_widget_t *xitk_slider_create(xitk_skin_config_t *skonfig, xitk_slider_widget_t *s);
 
+/**
+ * Same as above, without skinable feature.
+ */
+xitk_widget_t *xitk_noskin_slider_create (xitk_slider_widget_t *s,
+					  int x, int y, int width, int height, int type);
 /**
  * Get current position of paddle.
  */

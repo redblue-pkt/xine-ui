@@ -30,7 +30,6 @@
 #include "_xitk.h"
 
 typedef struct {
-  Display                *display;
   ImlibData              *imlibdata;
   char                   *skin_element_name;
   xitk_widget_t          *bWidget;
@@ -51,4 +50,9 @@ typedef struct {
  */
 xitk_widget_t *xitk_button_create (xitk_skin_config_t *skonfig, xitk_button_widget_t *b);
 
+/*
+ * Same as above, without skinable feature.
+ */
+xitk_widget_t *xitk_noskin_button_create (xitk_button_widget_t *b,
+					  int x, int y, int width, int height);
 #endif
