@@ -2046,7 +2046,7 @@ int main(int argc, char *argv[]) {
 	}
       }
     }
-    gGui->ao_port = load_audio_out_driver(driver_num);
+    gGui->ao_port = load_audio_out_driver(driver_num);    
   }
   SAFE_FREE(audio_driver_id);
 
@@ -2054,7 +2054,11 @@ int main(int argc, char *argv[]) {
   post_init();
 
   gGui->stream = xine_stream_new(gGui->xine, gGui->ao_port, gGui->vo_port);
-  
+
+  /* Store audio mixer level */
+  if(gGui->ao_port && (gGui->mixer.method == SOUND_CARD_MIXER))
+    gGui->mixer.original_level = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME);
+
   gGui->vo_none = xine_open_video_driver(gGui->xine, "none", XINE_VISUAL_TYPE_NONE, NULL);
   gGui->ao_none = xine_open_audio_driver(gGui->xine, "none", NULL);
 

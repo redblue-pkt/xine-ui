@@ -617,7 +617,11 @@ void gui_exit (xitk_widget_t *w, void *data) {
 
   config_update_num("gui.amp_level", gGui->mixer.amp_level);
   config_save();
-
+  
+  /* Restore old audio volume */
+  if(gGui->ao_port && (gGui->mixer.method == SOUND_CARD_MIXER))
+    xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.original_level);
+  
   xine_close(gGui->stream);
   xine_close(gGui->visual_anim.stream);
 
@@ -742,7 +746,6 @@ void gui_stop (xitk_widget_t *w, void *data) {
 }
 
 void gui_pause (xitk_widget_t *w, void *data, int state) {
-  
   if(xine_get_param(gGui->stream, XINE_PARAM_SPEED) != XINE_SPEED_PAUSE)
     xine_set_param(gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_PAUSE);
   else
@@ -1063,7 +1066,6 @@ void gui_change_speed_playback(xitk_widget_t *w, void *data) {
   else if(((int)data) == GUI_RESET) {
     xine_set_param (gGui->stream, XINE_PARAM_SPEED, XINE_SPEED_NORMAL);
   }
-
   osd_update_status();
 }
 
