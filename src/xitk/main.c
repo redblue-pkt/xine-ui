@@ -281,6 +281,83 @@ int handle_demux_strategy_subopt(char *sopt) {
   
   return DEMUX_DEFAULT_STRATEGY;
 }
+
+/*
+ * Try to load an video output plugin, by stored name or probing
+ */
+static void load_video_out_driver(char *video_driver_id) {
+  double        res_h, res_v;
+  x11_visual_t  vis;
+  
+  vis.display           = gGui->display;
+  vis.screen            = gGui->screen;
+  res_h                 = (DisplayWidth  (gGui->display, gGui->screen)*1000 
+			   / DisplayWidthMM (gGui->display, gGui->screen));
+  res_v                 = (DisplayHeight (gGui->display, gGui->screen)*1000
+			   / DisplayHeightMM (gGui->display, gGui->screen));
+  vis.display_ratio     = res_h / res_v;
+  vis.d                 = gGui->video_window;
+  vis.calc_dest_size    = video_window_calc_dest_size;
+  vis.request_dest_size = video_window_adapt_size;
+  
+  if (!video_driver_id) {
+    /* video output driver auto-probing */
+    char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
+    int    i;
+    
+    /* Try to init video with stored information */
+    video_driver_id = config_lookup_str("video_driver_name", NULL);
+    if(video_driver_id) {
+      
+      gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
+						      video_driver_id,
+						      VISUAL_TYPE_X11, 
+						      (void *) &vis);
+      if (gGui->vo_driver) {
+	return;
+      } 
+    }
+    
+    i = 0;
+    while (driver_ids[i]) {
+      video_driver_id = driver_ids[i];
+      
+      printf ("main: probing <%s> video output plugin\n", video_driver_id);
+      
+      gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
+						      video_driver_id,
+						      VISUAL_TYPE_X11, 
+						      (void *) &vis);
+      if (gGui->vo_driver) {
+	config_set_str("video_driver_name", video_driver_id);
+	return;
+      } 
+     
+      i++;
+    }
+      
+    if (!gGui->vo_driver) {
+      printf ("main: all available video drivers failed.\n");
+      exit (1);
+    }
+
+  } 
+  else {
+    
+    gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
+						    video_driver_id,
+						    VISUAL_TYPE_X11, 
+						    (void *) &vis);
+    
+    if (!gGui->vo_driver) {
+      printf ("main: video driver <%s> failed\n", video_driver_id);
+      exit (1);
+    }
+    
+    config_set_str("video_driver_name", video_driver_id);
+  }
+}
+
 /* ------------------------------------------------------------------------- */
 /*
  *
@@ -297,8 +374,6 @@ int main(int argc, char *argv[]) {
   char            *audio_driver_id = NULL;
   char            *video_driver_id = NULL;
   ao_functions_t  *audio_driver = NULL ;
-  double           res_h, res_v;
-  x11_visual_t     vis;
   sigset_t         vo_mask;
 
   /* Check xine library version */
@@ -460,56 +535,10 @@ int main(int argc, char *argv[]) {
    * load and init output drivers
    */
 
-  
-  vis.display           = gGui->display;
-  vis.screen            = gGui->screen;
-  res_h = (DisplayWidth  (gGui->display, gGui->screen)*1000 / DisplayWidthMM (gGui->display, gGui->screen));
-  res_v = (DisplayHeight (gGui->display, gGui->screen)*1000 / DisplayHeightMM (gGui->display, gGui->screen));
-  vis.display_ratio     = res_h / res_v;
-  vis.d                 = gGui->video_window;
-  vis.calc_dest_size    = video_window_calc_dest_size;
-  vis.request_dest_size = video_window_adapt_size;
+  /* Video out plugin */
+  load_video_out_driver(video_driver_id);
 
-
-  if (!video_driver_id) {
-    /* video output driver auto-probing */
-    char **driver_ids = xine_list_video_output_plugins (VISUAL_TYPE_X11);
-    int    i;
-
-    i = 0;
-    while (driver_ids[i]) {
-      video_driver_id = driver_ids[i];
-
-      printf ("main: probing <%s> video output plugin\n", video_driver_id);
-
-      gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
-						      video_driver_id,
-						      VISUAL_TYPE_X11, 
-						      (void *) &vis);
-      if (gGui->vo_driver)
-	break;
-      
-      i++;
-    }
-      
-    if (!gGui->vo_driver) {
-      printf ("main: all available video drivers failed.\n");
-      exit (1);
-    }
-
-  } else {
-
-    gGui->vo_driver = xine_load_video_output_plugin(gGui->config, 
-						    video_driver_id,
-						    VISUAL_TYPE_X11, 
-						    (void *) &vis);
-  
-    if (!gGui->vo_driver) {
-      printf ("main: video driver <%s> failed\n", video_driver_id);
-      exit (1);
-    }
-  }
-  
+  /* Audio out plugin */
   if (!audio_driver_id) {
     char **driver_ids = xine_list_audio_output_plugins ();
     int i = 0;
