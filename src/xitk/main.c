@@ -82,6 +82,14 @@ gGui_t   *gGui;
 int       no_lirc;
 #endif
 
+typedef struct {
+  FILE    *fd;
+  char    *filename;
+  char    *ln;
+  char     buf[256];
+} file_info_t;
+
+
 #define	OPTION_VISUAL		1000
 #define	OPTION_INSTALL_COLORMAP	1001
 #define DISPLAY_KEYMAP          1002
@@ -125,6 +133,104 @@ static struct option long_options[] = {
   {"version"        , no_argument      , 0, 'v'                      },
   {0                , no_argument      , 0,  0                       }
 };
+
+
+/*
+ *    RC file related functions
+ */
+#if DEBUG
+static void _rc_file_check_args(int argc, char **argv) {
+  int i;
+  
+  printf("%s(): argc %d\n", __FUNCTION__, argc);
+
+  for(i = 0; i < argc; i++)
+    printf("argv[%d] = '%s'\n", i, argv[i]);
+}
+#endif
+static void _rc_file_clean_eol(file_info_t *rcfile) {
+  char *p;
+
+  p = rcfile->ln;
+
+  if(p) {
+    while(*p != '\0') {
+      if(*p == '\n' || *p == '\r') {
+	*p = '\0';
+	break;
+      }
+      
+      p++;
+    }
+    
+    while(p > rcfile->ln) {
+      --p;
+      
+      if(*p == ' ') 
+	*p = '\0';
+      else
+	break;
+    }
+  }
+}
+static int _rc_file_get_next_line(file_info_t *rcfile) {
+
+ __get_next_line:
+  rcfile->ln = fgets(rcfile->buf, 255, rcfile->fd);
+  
+  while(rcfile->ln && (*rcfile->ln == ' ' || *rcfile->ln == '\t')) ++rcfile->ln;
+  
+  if(rcfile->ln) {
+    if(!strncmp(rcfile->ln, "#", 1))
+      goto __get_next_line;
+  }
+  
+  _rc_file_clean_eol(rcfile);
+  
+  if(rcfile->ln && !strlen(rcfile->ln))
+    goto __get_next_line;
+
+  return((rcfile->ln != NULL));
+}
+/*
+ * This function duplicate argv[] to an char** array,, 
+ * try to open and parse a "~/.xine/xinerc" rc file, 
+ * and concatenate found entries to the char **array.
+ * This allow user to always specify a command line argument.
+ */
+static char **build_command_line_args(int argc, char *argv[], int *_argc) {
+  int            i;
+  char          *xinerc = ".xine/xinerc";
+  file_info_t   *rcfile;
+  char        **_argv = NULL;
+  
+  _argv  = (char **) xine_xmalloc(sizeof(char **) * (argc + 1));
+  (*_argc) = argc;
+  for(i = 0; i < argc; i++)
+    _argv[i] = strdup(argv[i]);
+
+  rcfile           = (file_info_t *) xine_xmalloc(sizeof(file_info_t));
+  rcfile->filename = (char *) xine_xmalloc((strlen((xine_get_homedir())) + strlen(xinerc)) + 2);
+  sprintf(rcfile->filename, "%s/%s", (xine_get_homedir()), xinerc);
+  
+  if((rcfile->fd = fopen(rcfile->filename, "r")) != NULL) {
+    
+    while(_rc_file_get_next_line(rcfile)) {
+      _argv = (char **) realloc(_argv, sizeof(char **) * ((*_argc) + 2));
+      _argv[(*_argc)] = strdup(rcfile->ln);
+      (*_argc)++;
+    }
+    
+    fclose(rcfile->fd);
+  }
+
+  _argv[(*_argc)] = NULL;
+  
+  free(rcfile->filename);
+  free(rcfile);
+
+  return _argv;
+}
 
 /*
  *
@@ -466,6 +572,8 @@ int main(int argc, char *argv[]) {
   char                 *video_driver_id = NULL;
   ao_driver_t          *audio_driver = NULL ;
   sigset_t              vo_mask;
+  char                **_argv;
+  int                   _argc;
 
   /* Check xine library version */
   if(!xine_check_version(0, 9, 9)) {
@@ -509,19 +617,24 @@ int main(int argc, char *argv[]) {
   window_attribute.width = window_attribute.height = -1;
   window_attribute.borderless = 0;
 
+  _argv = build_command_line_args(argc, argv, &_argc);
+#if DEBUG
+  _rc_file_check_args(_argc, _argv);
+#endif
+
   /*
    * initialize CORBA server
    */
 #ifdef HAVE_ORBIT
   if (!no_lirc)
-    xine_server_init (&argc, argv);
+    xine_server_init (&_argc, _argv);
 #endif
 
   /*
    * parse command line
    */
   opterr = 0;
-  while((c = getopt_long(argc, argv, short_options,
+  while((c = getopt_long(_argc, _argv, short_options,
 			 long_options, &option_index)) != EOF) {
     switch(c) {
 
@@ -733,7 +846,7 @@ int main(int argc, char *argv[]) {
    * init gui
    */
   
-  gui_init(argc-optind, &argv[optind], &window_attribute);
+  gui_init(_argc - optind, &_argv[optind], &window_attribute);
 
   /*
    * load and init output drivers
