@@ -239,7 +239,7 @@ void xitk_window_center_window(ImlibData *im, xitk_window_t *w) {
  */
 xitk_window_t *xitk_window_create_window(ImlibData *im, int x, int y, int width, int height) {
   xitk_window_t         *xwin;
-  char                   title[] = {"XiTK Window"};
+  char                   title[] = {"xiTK Window"};
   XSizeHints             hint;
   XWMHints              *wm_hint;
   XSetWindowAttributes   attr;
