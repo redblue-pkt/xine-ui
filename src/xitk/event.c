@@ -1197,6 +1197,10 @@ void gui_run (void) {
     for (i = actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_FULLSCREEN); i > 0; i--)
       gui_execute_action_id(ACTID_TOGGLE_FULLSCREEN);
 
+    /* The user wants to see in xinerama fullscreen mode  */
+    for (i = actions_on_start(gGui->actions_on_start, ACTID_TOGGLE_XINERAMA_FULLSCR); i > 0; i--)
+      gui_execute_action_id(ACTID_TOGGLE_XINERAMA_FULLSCR);
+
     /* User load a playlist on startup */
     if(actions_on_start(gGui->actions_on_start, ACTID_PLAYLIST)) {
       mediamark_load_mediamarks(gGui->playlist.on_start);

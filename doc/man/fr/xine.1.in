@@ -46,10 +46,12 @@ spécifier ce paramêtre qu'une seule fois.
 Sélectionne le canal de sous-titre. \fBnum\fP est le numéro
 du canal de sous-titre. par défaut il n'y a pas de sous-titre (\fB\-1\fP)
 .TP
-.B \-p[f][h][w][q][d][v], \-\-auto\-play=[f][h][w][q][d][v]
+.B \-p[f][F][h][w][q][d][v], \-\-auto\-play=[f][F][h][w][q][d][v]
 Démarre la lecture immédiatement apres l'exécution. Peut être suivi par:
 .br
 \'\fBf\fP\' en mode plein écran,
+.br
+\'\fBf\fP\' en mode vraiment plein écran (avec xinerama),
 .br
 \'\fBh\fP\' cache l'interface utilisateur (panneau principal, etc...),
 .br
@@ -74,7 +76,11 @@ fonctionne aussi avec des plugins non fournis avec xine, donnez seulement le nom
 du bouton que le plugin affiche dans le paneau principal de xine!.
 .TP
 .B \-f, \-\-fullscreen
-Passe en mode plein écran au lancement (comme en pressant \'\fBF\fP\').
+Passe en mode plein écran au lancement (comme en pressant \'\fBf\fP\').
+.TP
+.B \-F, \-\-xineramafull
+Passe en mode plein écran sur plusieurs ecran au lancement (comme en pressant \'\fBF\fP\').
+Les ecrans à utiliser sont définis dans le fichier de configuration.
 .TP
 .B \-g, \-\-hide\-gui
 Cache toutes les fenêtre graphique (excepté la fenêtre vidéo) au démarrage.
@@ -296,6 +302,9 @@ Affiche/masque la fenêtre d'envoi d'évènement.
 .br
 .BR f :
 Bascule plein écran/fenêtré.
+.br
+.BR F :
+Bascule plein écran xinerama/fenêtré.
 .br
 .BR g :
 Affiche/masque le panneau de contrôle.

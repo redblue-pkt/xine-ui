@@ -92,6 +92,9 @@ typedef struct {
 
 /* options args */
 static const char *short_options = "?hHgfvn"
+#ifdef HAVE_XINERAMA
+ "F"
+#endif
 #ifdef HAVE_LIRC
  "L"
 #endif
@@ -119,6 +122,9 @@ static struct option long_options[] = {
   {"hide-gui"       , no_argument      , 0, 'g'                      },
   {"hide-video"     , no_argument      , 0, 'H'                      },
   {"fullscreen"     , no_argument      , 0, 'f'                      },
+#ifdef HAVE_XINERAMA
+  {"xineramafull"   , no_argument      , 0, 'F'                      },
+#endif
   {"visual"	    , required_argument, 0,  OPTION_VISUAL           },
   {"install"	    , no_argument      , 0,  OPTION_INSTALL_COLORMAP },
   {"keymap"         , optional_argument, 0,  DISPLAY_KEYMAP          },
@@ -316,6 +322,9 @@ void show_usage (void) {
   printf(_("  -a, --audio-channel <#>      Select audio channel '#'.\n"));
   printf(_("  -p, --auto-play [opt]        Play on start. Can be followed by:\n"));
   printf(_("                    'f': in fullscreen mode.\n"));
+#ifdef HAVE_XINERAMA
+  printf(_("                    'F': in xinerama fullscreen mode.\n"));
+#endif
   printf(_("                    'h': hide GUI (panel, etc.).\n"));
   printf(_("                    'w': hide video window.\n"));
   printf(_("                    'q': quit when play is done.\n"));
@@ -323,6 +332,9 @@ void show_usage (void) {
   printf(_("                    'v': retrieve playlist from VCD. (deprecated. use -s VCD)\n"));
   printf(_("  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"));
   printf(_("  -f, --fullscreen             start in fullscreen mode,\n"));
+#ifdef HAVE_XINERAMA
+  printf(_("  -F, --xineramafull           start in xinerama fullscreen (display on several screens),\n"));
+#endif
   printf(_("  -g, --hide-gui               hide GUI (panel, etc.)\n"));
   printf(_("  -H, --hide-video             hide video window\n"));
 #ifdef HAVE_LIRC
@@ -790,6 +802,11 @@ int main(int argc, char *argv[]) {
 	if(strrchr(optarg, 'f')) {
 	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
 	}
+#ifdef HAVE_XINERAMA
+	if(strrchr(optarg, 'F')) {
+	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCR;
+	}
+#endif
 	if(strrchr(optarg, 'h')) {
 	  gGui->actions_on_start[aos++] = ACTID_TOGGLE_VISIBLITY;
 	}
@@ -819,7 +836,11 @@ int main(int argc, char *argv[]) {
     case 'f': /* full screen mode on start */
       gGui->actions_on_start[aos++] = ACTID_TOGGLE_FULLSCREEN;
       break;
-
+#ifdef HAVE_XINERAMA
+    case 'F': /* xinerama full screen mode on start */
+      gGui->actions_on_start[aos++] = ACTID_TOGGLE_XINERAMA_FULLSCR;
+      break;
+#endif
     case 's': /* autoscan on start */
       gGui->autoscan_plugin = xine_chomp(optarg);
       break;

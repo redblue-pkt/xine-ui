@@ -60,10 +60,12 @@ in your \fI~/.xine/config\fP so you'll have to specify the audio driver only onc
 Select subpicture (subtitle) channel. \fI<num>\fP is the subpicture channel
 id, default is no subtitle (\fB\-1\fP).
 .TP
-.BI \-p,\ \-\-auto\-play= [f][h][w][q][d][v]
+.BI \-p,\ \-\-auto\-play= [f][F][h][w][q][d][v]
 Start playing immediately after start. Can be followed by:
 .br
 `\fIf\fP' in fullscreen mode,
+.br
+`\fIF\fP' in xinerama fullscreen mode,
 .br
 `\fIh\fP' hide GUI (main panel, etc...),
 .br
@@ -87,7 +89,11 @@ not supplied with xine, just give the name of the button that the desired
 plugin adds to the xine panel!
 .TP
 .B \-f,\ \-\-fullscreen
-Switch xine to fullscreen mode on start (just like pressing `\fBF\fP')
+Switch xine to fullscreen mode on start (just like pressing `\fBf\fP')
+.TP
+.B \-F,\ \-\-xineramafull
+Switch xine to xinerama fullscreen mode on start (just like pressing `\fBF\fP').
+That is to say, try to expand display on several screens. Screens to use are defined in config file.
 .TP
 .B \-g, \-\-hide\-gui
 Hide all GUI windows (except the video window) on start. This is the same as
@@ -290,8 +296,10 @@ Add a mediamark to the playlist from the current position stream playback.
 Show/hide the video settings window.
 .IP "\fBE\fP"
 Eject the current media.
-.IP "\fBF\fP"
+.IP "\fBf\fP"
 Toggle fullscreen mode.
+.IP "\fBF\fP"
+Toggle xinerama fullscreen mode.
 .IP "\fBG\fP"
 Hide/show the gui.
 .IP "\fBH\fP"
