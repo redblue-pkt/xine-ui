@@ -706,9 +706,9 @@ static void _pplugin_get_plugins(void) {
 	realloc(pplugin->plugin_names, sizeof(char *) * (i + 1 + 2));
       
       pplugin->plugin_names[i + 1] = strdup(pol[i]);
-      pplugin->plugin_names[i + 2] = NULL;
       i++;
     }
+    pplugin->plugin_names[i + 1] = NULL;
   }
 }
 
