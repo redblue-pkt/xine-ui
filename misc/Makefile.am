@@ -3,7 +3,7 @@ SUBDIRS = desktops
 
 EXTRA_DIST = $(bin_SCRIPTS) autogen.sh SlackBuild.in SlackBuild build_rpms.sh \
 	xine-ui.spec.in xine-ui.spec xine-check.sh.in xine-check.en \
-	build-xine-check
+	build-xine-check.pl
 
 # should use real bindir...
 #bindir = @XINE_SCRIPTDIR@
