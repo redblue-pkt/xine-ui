@@ -1313,7 +1313,7 @@ void gui_run (void) {
     }
   }
 
-  xitk_run(on_start, (void *)&auto_start);
+  xitk_run(on_start, (void *)auto_start);
 
   gGui->running = 0;
 
