@@ -425,6 +425,11 @@ void gui_handle_event (XEvent *event, void *data) {
       gui_toggle_aspect();
       break;
 
+    case XK_i:
+    case XK_I:
+      gui_toggle_interlaced();
+      break;
+
     case XK_q:
     case XK_Q:
       gui_exit(NULL, NULL);

@@ -45,6 +45,8 @@ void gui_toggle_fullscreen(widget_t *w, void *data);
 
 void gui_toggle_aspect(void);
 
+void gui_toggle_interlaced(void);
+
 void gui_change_audio_channel(widget_t *w, void *data);
 
 void gui_change_spu_channel(widget_t *w, void *data);

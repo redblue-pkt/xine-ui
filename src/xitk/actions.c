@@ -171,6 +171,18 @@ void gui_toggle_aspect(void) {
   }
 }
 
+void gui_toggle_interlaced(void) {
+
+  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_INTERLACED,
+                                 gGui->vo_driver->get_property (gGui->vo_driver, VO_PROP_INTERLACED) + 1);
+
+  if (panel_is_visible())  {
+    XRaiseWindow (gGui->display, gGui->panel_window);
+    XSetTransientForHint (gGui->display,
+                          gGui->panel_window, gGui->video_window);
+  }
+}
+
 void gui_change_audio_channel(widget_t *w, void *data) {
   
   if(((int)data) == GUI_NEXT) {
