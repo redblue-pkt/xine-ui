@@ -17,6 +17,7 @@
    2   GENERAL QUESTIONS
    2.1 What are those xine-lib, xine-ui and xine-plugin modules for?
    2.2 Where and how do I get the latest development version?
+   2.3 Where can I find pre-compiled binaries, e.g. RPMs?
    
    3   THE BUILD PROCESS
    3.1 What do I need to compile everything properly?
@@ -147,6 +148,16 @@
      
      Or you alternatively get daily checkouts as tar archive on our web site.
     
+2.3 Where can I find pre-compiled binaries, e.g. RPMs?
+
+    The xine project does not provide pre-compiled binaries for legal
+    reasons (some parts of xine may be covered by patents in some countries).
+    Some OS projects/vendors (e.g. debian, freebsd, ...) offer binaries
+    for their distributions - please contact them for further info.
+    You can also find links to thrid parties providing xine RPMs on
+    the xine homepage.
+    See section 3 of this faq for instructions on how to build xine
+    from source.
 
 3   THE BUILD PROCESS
 
