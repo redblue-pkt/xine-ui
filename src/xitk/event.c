@@ -536,7 +536,9 @@ void gui_execute_action_id(action_id_t action) {
     {
       int offset = (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET) - 3600);
 
-      gGui->mmk.offset = gGui->playlist.mmk[gGui->playlist.cur]->offset = offset;
+      gGui->mmk.offset = offset;
+      if (gGui->playlist.cur < gGui->playlist.num)
+        gGui->playlist.mmk[gGui->playlist.cur]->offset = offset;
       xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, offset);
       osd_display_info(_("A/V offset: %d"), offset);
     }
@@ -546,7 +548,9 @@ void gui_execute_action_id(action_id_t action) {
     {
       int offset = (xine_get_param(gGui->stream, XINE_PARAM_AV_OFFSET) + 3600);
       
-      gGui->mmk.offset = gGui->playlist.mmk[gGui->playlist.cur]->offset = offset;
+      gGui->mmk.offset = offset;
+      if (gGui->playlist.cur < gGui->playlist.num)
+        gGui->playlist.mmk[gGui->playlist.cur]->offset = offset;
       xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, offset);
       osd_display_info(_("A/V offset: %d"), offset);
     }
