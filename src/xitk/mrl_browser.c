@@ -33,14 +33,15 @@
 
 #include <xine/xineutils.h>
 
-#include "xitk.h"
-
 #include "event.h"
 #include "actions.h"
 #include "videowin.h"
 #include "playlist.h"
 #include "mrl_browser.h"
 #include "errors.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 #define MAX_LIST 9
 

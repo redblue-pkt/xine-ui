@@ -40,8 +40,6 @@
 #include <limits.h>
 #include <zlib.h>
 
-#include "xitk.h"
-
 #include "Imlib-light/Imlib.h"
 
 #include "event.h"
@@ -59,6 +57,9 @@
 #include "skins.h"
 #include "errors.h"
 #include "network.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 #ifdef HAVE_LIRC
 extern int no_lirc;

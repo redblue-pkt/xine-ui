@@ -33,8 +33,6 @@
 #include <X11/Xlib.h>
 #include <xine/video_out_x11.h>
 
-#include "xitk.h"
-
 #include "event.h"
 #include "control.h"
 #include "actions.h"
@@ -46,6 +44,9 @@
 #include "setup.h"
 #include "viewlog.h"
 #include "errors.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 extern gGui_t          *gGui;
 extern _panel_t        *panel;

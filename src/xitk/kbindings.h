@@ -25,6 +25,8 @@
 
 #include <X11/Xlib.h>
 
+#include "xitk.h"
+
 /* Opaque structure */
 typedef struct kbinding_s kbinding_t;
 typedef struct kbinding_entry_s kbinding_entry_t;
@@ -116,5 +118,6 @@ void kbindings_display_default_bindings(void);
 kbinding_entry_t *kbindings_lookup_action(kbinding_t *, const char *);
 void kbindings_handle_kbinding(kbinding_t *, XEvent *);
 action_id_t kbindings_get_action_id(kbinding_entry_t *);
+void kbindings_editor(xitk_widget_t *, void *);
 
 #endif

@@ -40,8 +40,6 @@
 #include <xine/video_out_x11.h>
 #include <xine/xineutils.h>
 
-#include "xitk.h"
-
 #include "Imlib-light/Imlib.h"
 
 #include "event.h"
@@ -49,6 +47,8 @@
 #include "panel.h"
 #include "actions.h"
 #include "errors.h"
+
+#include "xitk.h"
 
 extern gGui_t *gGui;
 

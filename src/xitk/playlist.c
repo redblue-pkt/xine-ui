@@ -32,13 +32,14 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include "xitk.h"
-
 #include "Imlib-light/Imlib.h"
 #include "event.h"
 #include "actions.h"
 #include "mrl_browser.h"
 #include "errors.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 #include <xine.h>
 #include <xine/xineutils.h>

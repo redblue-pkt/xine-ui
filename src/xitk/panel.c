@@ -34,8 +34,6 @@
 #include <xine/xineutils.h>
 #include <zlib.h>
 
-#include "xitk.h"
-
 #include "event.h"
 #include "actions.h"
 #include "control.h"
@@ -46,6 +44,9 @@
 #include "snapshot.h"
 #include "errors.h"
 #include "utils.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 #ifndef __GNUC__
 #define __FUNCTION__    __func__

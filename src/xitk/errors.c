@@ -33,10 +33,11 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
-#include "xitk.h"
 #include "event.h"
 #include "i18n.h"
 #include "viewlog.h"
+
+#include "xitk.h"
 
 extern gGui_t          *gGui;
 

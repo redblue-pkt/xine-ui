@@ -35,6 +35,8 @@
 #include "event.h"
 #include "kbindings.h"
 #include "errors.h"
+#include "i18n.h"
+
 #include "xitk.h"
 
 extern gGui_t                 *gGui;
@@ -1201,6 +1203,31 @@ static void kbedit_unset(void) {
 }
 
 /*
+ * Check for redundancy.
+ * return: -2 on failure (null pointer passed)
+ *         -1 on success
+ *         >=0 if a redundant entry found (bkt array entry num).
+ */
+static int bkedit_check_redundancy(kbinding_t *kbt, kbinding_entry_t *kbe) {
+  int ret = -1;
+  
+  if(kbt && kbe) {
+    int i;
+    
+    for(i = 0; kbt->entry[i]->action != NULL; i++) {
+      if((!strcmp(kbt->entry[i]->key, kbe->key)) &&
+	 (kbt->entry[i]->modifier == kbe->modifier)) {
+	return i;
+      }
+    }
+  }
+  else
+    ret = -2;
+  
+  return ret;
+}
+
+/*
  *
  */
 void kbedit_exit(xitk_widget_t *w, void *data) {
@@ -1281,7 +1308,6 @@ static void kbedit_alias(xitk_widget_t *w, void *data, int state) {
 /*
  * Change shortcut, should take care about reduncancy.
  */
-#warning check redundancy
 static void kbedit_edit(xitk_widget_t *w, void *data, int state) {
 
   xitk_labelbutton_set_state(kbedit->alias, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
@@ -1328,7 +1354,7 @@ static void kbedit_delete(xitk_widget_t *w, void *data) {
       xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
     }
     else {
-      xitk_window_dialog_error(gGui->imlib_data, _("You can only delete alias entries."));
+      xine_error(_("You can only delete alias entries."));
     }
   }
 }
@@ -1377,6 +1403,7 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   int                mod, modifier;
   xitk_window_t     *xwin;
   kbinding_entry_t   kbe;
+  int                redundant;
   
   /* We are already grabbing keybinding */
   if(kbedit->grabbing)
@@ -1398,6 +1425,11 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   {
     int x, y, w, h;
 
+    /*
+      xitk_get_window_position(gGui->display, 
+      (xitk_window_get_window(kbedit->xwin)), &x, &y, &w, &h);
+    */
+    
     w = 500;
     h = 200;
     x = ((DisplayWidth(gGui->display, (DefaultScreen(gGui->display)))) / 2) - (w / 2);
@@ -1458,52 +1490,61 @@ static void kbedit_grab(xitk_widget_t *w, void *data) {
   XSync(gGui->display, False);
   XUnlockDisplay(gGui->display);
 
-  xine_strdupa(action, (xitk_label_get_label(kbedit->comment)));
-  kbedit_display_kbinding(action, &kbe);
-  
   kbedit->grabbing = 0;
   
-  switch(kbedit->action_wanted) {
-
-  case KBEDIT_ALIASING:
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment = strdup(kbedit->ksel->comment);
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action = strdup(kbedit->ksel->action);
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->key = strdup(kbe.key);
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->modifier = kbe.modifier;
-    kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias = 1;
-
-    kbedit->kbt->entry[kbedit->kbt->num_entries] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->comment = NULL;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->action = NULL;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->key = NULL;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->modifier = 0;
-    kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias = 0;
-
-    kbedit->kbt->num_entries++;
-
-    kbedit_create_browser_entries();
-
-    xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
-    break;
+  if((redundant = bkedit_check_redundancy(kbedit->kbt, &kbe)) == -1) {
     
-  case KBEDIT_EDITING:
-    kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char *) * (strlen(kbe.key) + 1));
-    sprintf(kbedit->ksel->key, "%s", kbe.key);
-    kbedit->ksel->modifier = kbe.modifier;
-    break;
+    xine_strdupa(action, (xitk_label_get_label(kbedit->comment)));
+    kbedit_display_kbinding(action, &kbe);
+  
+    switch(kbedit->action_wanted) {
+      
+    case KBEDIT_ALIASING:
+      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->comment = strdup(kbedit->ksel->comment);
+      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action = strdup(kbedit->ksel->action);
+      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->action_id = kbedit->ksel->action_id;
+      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->key = strdup(kbe.key);
+      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->modifier = kbe.modifier;
+      kbedit->kbt->entry[kbedit->kbt->num_entries - 1]->is_alias = 1;
+      
+      kbedit->kbt->entry[kbedit->kbt->num_entries] = (kbinding_entry_t *) xine_xmalloc(sizeof(kbinding_t));
+      kbedit->kbt->entry[kbedit->kbt->num_entries]->comment = NULL;
+      kbedit->kbt->entry[kbedit->kbt->num_entries]->action = NULL;
+      kbedit->kbt->entry[kbedit->kbt->num_entries]->action_id = 0;
+      kbedit->kbt->entry[kbedit->kbt->num_entries]->key = NULL;
+      kbedit->kbt->entry[kbedit->kbt->num_entries]->modifier = 0;
+      kbedit->kbt->entry[kbedit->kbt->num_entries]->is_alias = 0;
 
+      kbedit->kbt->num_entries++;
+      
+      kbedit_create_browser_entries();
+      
+      xitk_browser_update_list(kbedit->browser, kbedit->entries, kbedit->num_entries, 0);
+      break;
+      
+    case KBEDIT_EDITING:
+      kbedit->ksel->key = (char *) realloc(kbedit->ksel->key, sizeof(char *) * (strlen(kbe.key) + 1));
+      sprintf(kbedit->ksel->key, "%s", kbe.key);
+      kbedit->ksel->modifier = kbe.modifier;
+      break;
+    }
+    
+  }
+  else {
+    /* error, redundant */
+    if(redundant >= 0) {
+      xine_error(_("This key bindings is redundant with action:\n\"%s\".\n"),
+		 kbedit->kbt->entry[redundant]->comment);
+    }
   }
 
   SAFE_FREE(kbe.comment);
   SAFE_FREE(kbe.action);
   SAFE_FREE(kbe.key);
-
+  
   xitk_labelbutton_set_state(kbedit->alias, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
   xitk_labelbutton_set_state(kbedit->edit, 0, kbedit->widget_list->win, kbedit->widget_list->gc);
   kbedit->action_wanted = KBEDIT_NOOP;
-  xitk_paint_widget_list(kbedit->widget_list);
   xitk_disable_widget(kbedit->grab);
 }
 

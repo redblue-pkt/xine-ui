@@ -1852,12 +1852,12 @@ void xitk_window_dialog_ok(ImlibData *im, char *title,
 #define xitk_window_dialog_error(im, message, args...) {                                         \
   if(((im) == NULL) || ((message) == NULL))                                                      \
     return;                                                                                      \
-  xitk_window_dialog_ok_with_width(im, "Error", NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
+  xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
 }
 #define xitk_window_dialog_info(im, message, args...) {                                                \
   if(((im) == NULL) || ((message) == NULL))                                                            \
     return;                                                                                            \
-  xitk_window_dialog_ok_with_width(im, "Information", NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
+  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, message, ##args); \
 }
 #else
 #define xitk_window_dialog_ok(im, title, cb, userdata, align, ...) {                               \
@@ -1868,12 +1868,12 @@ void xitk_window_dialog_ok(ImlibData *im, char *title,
 #define xitk_window_dialog_error(im, ...) {                                                        \
   if(((im) == NULL))                                                                               \
     return;                                                                                        \
-  xitk_window_dialog_ok_with_width(im, "Error", NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__);       \
+  xitk_window_dialog_ok_with_width(im, _("Error"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__);       \
 }
 #define xitk_window_dialog_info(im, ...) {                                                         \
   if(((im) == NULL))                                                                               \
     return;                                                                                        \
-  xitk_window_dialog_ok_with_width(im, "Information", NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__); \
+  xitk_window_dialog_ok_with_width(im, _("Information"), NULL, NULL, 400, ALIGN_CENTER, __VA_ARGS__); \
 }
 #endif
 

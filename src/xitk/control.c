@@ -36,13 +36,14 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#include "xitk.h"
-
 #include "Imlib-light/Imlib.h"
 #include "event.h"
 #include "actions.h"
 #include "skins.h"
 #include "errors.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 #ifndef __GNUC__
 #define __FUNCTION__    __func__

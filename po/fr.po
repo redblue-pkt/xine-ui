@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-ui 0.9.9\n"
-"POT-Creation-Date: 2002-05-22 16:00+0200\n"
+"POT-Creation-Date: 2002-05-31 14:04+0200\n"
 "PO-Revision-Date: 2001-11-18 21:22+0100\n"
 "Last-Translator: Daniel Caujolle-Bert <segfault@club-internet.fr>\n"
 "Language-Team: Frensh <fr@li.org>\n"
@@ -34,55 +34,55 @@ msgstr "Contrôle la TEINTE"
 msgid "Hue"
 msgstr "Tte"
 
-#: src/xitk/control.c:600
+#: src/xitk/control.c:601
 msgid "Control SATURATION value"
 msgstr "Contrôle la SATURATION"
 
-#: src/xitk/control.c:603
+#: src/xitk/control.c:604
 msgid "Sat"
 msgstr "Sat"
 
-#: src/xitk/control.c:624
+#: src/xitk/control.c:626
 msgid "Control BRIGHTNESS value"
 msgstr "Contrôle la BRILLANCE"
 
-#: src/xitk/control.c:627
+#: src/xitk/control.c:629
 msgid "Brt"
 msgstr "Bri"
 
-#: src/xitk/control.c:648
+#: src/xitk/control.c:651
 msgid "Control CONTRAST value"
 msgstr "Contrôle le CONTRASTE"
 
-#: src/xitk/control.c:651
+#: src/xitk/control.c:654
 msgid "Ctr"
 msgstr "Ctr"
 
-#: src/xitk/control.c:671
+#: src/xitk/control.c:675
 msgid "Choose a Skin"
 msgstr "Choisir une apparence"
 
-#: src/xitk/control.c:707 src/xitk/mrl_browser.c:218 src/xitk/playlist.c:873
+#: src/xitk/control.c:712 src/xitk/mrl_browser.c:218 src/xitk/playlist.c:873
 msgid "Dismiss"
 msgstr "Annuler"
 
-#: src/xitk/control.c:713
+#: src/xitk/control.c:718
 msgid "Close control window"
 msgstr "Ferme la fenêtre de contrôle"
 
-#: src/xitk/errors.c:63
+#: src/xitk/errors.c:64 src/xitk/kbindings.c:1765
 msgid "Done"
 msgstr "Terminé"
 
-#: src/xitk/errors.c:63
+#: src/xitk/errors.c:64
 msgid "More..."
 msgstr "Plus..."
 
-#: src/xitk/errors.c:131
+#: src/xitk/errors.c:132
 msgid "Error"
 msgstr "Erreur"
 
-#: src/xitk/errors.c:183
+#: src/xitk/errors.c:184
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -96,7 +96,7 @@ msgstr ""
 "Ceci est peux être dut à une mauvaise syntaxe de la MRL\n"
 "ou le flux/fichier n'existe pas."
 
-#: src/xitk/errors.c:189
+#: src/xitk/errors.c:190
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -109,7 +109,7 @@ msgstr ""
 "Il n'y a aucun plugin de démultiplexage disponible pour gérer '%s'.\n"
 "La plupart du temps celà est dut à un format de fichier non reconnu."
 
-#: src/xitk/errors.c:194
+#: src/xitk/errors.c:195
 #, c-format
 msgid ""
 "- xine engine error -\n"
@@ -120,7 +120,7 @@ msgstr ""
 "\n"
 "echec du démultiplexeur. Le fichier '%s' est peux être corrompu?\n"
 
-#: src/xitk/errors.c:199
+#: src/xitk/errors.c:200
 msgid ""
 "- xine engine error -\n"
 "\n"
@@ -130,7 +130,7 @@ msgstr ""
 "\n"
 "!! Erreur non gérée !!\n"
 
-#: src/xitk/event.c:857
+#: src/xitk/event.c:862
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -138,11 +138,11 @@ msgstr ""
 "\n"
 "XInitThreads a échoué - il semble que vous ne possédez pas une xlib sûre.\n"
 
-#: src/xitk/event.c:866
+#: src/xitk/event.c:871
 msgid "Cannot open display\n"
 msgstr "Ne peut pas ouvrir l'affichage.\n"
 
-#: src/xitk/event.c:952
+#: src/xitk/event.c:957
 msgid "Unable to initialize Imlib\n"
 msgstr "Impossible d'initialiser Imlib.\n"
 
@@ -154,34 +154,123 @@ msgstr "Brouteur de fichier de Xine"
 msgid "Select"
 msgstr "Choisir"
 
-#: src/xitk/kbindings.c:295
+#: src/xitk/kbindings.c:346
 #, c-format
 msgid "Key bindings of '%s' and '%s' are similar.\n"
 msgstr "Les sequences de touches '%s' et '%s' sont similaires.\n"
 
-#: src/xitk/kbindings.c:655
+#: src/xitk/kbindings.c:706
 msgid "OOCH: key binding table is NULL.\n"
 msgstr "Aïe : la table des séquences de touches est NULLE.\n"
 
-#: src/xitk/main.c:249
+#: src/xitk/kbindings.c:1193
+msgid "Nothing selected"
+msgstr "Aucune entrée sélectionnée"
+
+#: src/xitk/kbindings.c:1194
+msgid "None"
+msgstr "Aucune"
+
+#: src/xitk/kbindings.c:1355
+msgid "You can only delete alias entries."
+msgstr "Vous ne pouvez supprimer que les entrées alias."
+
+#: src/xitk/kbindings.c:1419
+msgid "Press Keyboard Keys..."
+msgstr "Appuyez sur les touches du clavier..."
+
+#: src/xitk/kbindings.c:1437
+msgid "Event receiver window"
+msgstr "Fenetre de reception d'evènement"
+
+#: src/xitk/kbindings.c:1534
+#, c-format
+msgid ""
+"This key bindings is redundant with action:\n"
+"\"%s\".\n"
+msgstr ""
+"Cette séquence de touches est redondante avec l'action:\n"
+"\"%\".\n"
+
+#: src/xitk/kbindings.c:1618
+msgid "key binding editor"
+msgstr "Editeur de raccourcis clavier"
+
+#: src/xitk/kbindings.c:1644
+msgid "Binding action"
+msgstr "Action du raccourci"
+
+#: src/xitk/kbindings.c:1650
+msgid "Key"
+msgstr "Touche"
+
+#: src/xitk/kbindings.c:1655
+msgid "Modifiers"
+msgstr "Modifieurs"
+
+#: src/xitk/kbindings.c:1696
+msgid "Alias"
+msgstr "Alias"
+
+#: src/xitk/kbindings.c:1710
+msgid "Edit"
+msgstr "Edite"
+
+#: src/xitk/kbindings.c:1724
+msgid "Delete"
+msgstr "Supprime"
+
+#: src/xitk/kbindings.c:1738 src/xitk/playlist.c:863
+msgid "Save"
+msgstr "Sauve"
+
+#: src/xitk/kbindings.c:1752
+msgid "Reset"
+msgstr "Ràz"
+
+#: src/xitk/kbindings.c:1829
+msgid "ctrl"
+msgstr "ctrl"
+
+#: src/xitk/kbindings.c:1850
+msgid "meta"
+msgstr "mèta"
+
+#: src/xitk/kbindings.c:1872
+msgid "mod3"
+msgstr "mod3"
+
+#: src/xitk/kbindings.c:1894
+msgid "mod4"
+msgstr "mod4"
+
+#: src/xitk/kbindings.c:1915
+msgid "mod5"
+msgstr "mod5"
+
+#: src/xitk/kbindings.c:1924
+msgid "Grab"
+msgstr "Capture"
+
+#: src/xitk/main.c:250
 #, c-format
 msgid "Built with xine library %d.%d.%d [%s]-[%s]-[%s].\n"
 msgstr "Généré avec la bibliothèque xine %d.%d.%d [%s]-[%s]-[%s].\n"
 
-#: src/xitk/main.c:252
+#: src/xitk/main.c:253
 #, c-format
 msgid "Found xine library version: %d.%d.%d (%s).\n"
 msgstr "Version de la bibliothèque de xine trouvée : %d.%d.%d (%s).\n"
 
-#: src/xitk/main.c:267
+#: src/xitk/main.c:268
 msgid "Usage: xine [OPTIONS]... [MRL]\n"
 msgstr "Usage : xine [OPTIONS]...[MRL]\n"
 
-#: src/xitk/main.c:270
+#: src/xitk/main.c:271
 msgid "  -v, --version                Display version.\n"
 msgstr "  -v, --version                Affiche la version.\n"
 
-#: src/xitk/main.c:271
+#: src/xitk/main.c:272
 msgid ""
 "  -V, --video-driver <drv>     Select video driver by id. Available "
 "drivers: \n"
@@ -189,7 +278,7 @@ msgstr ""
 "  -V, --video-driver <drv>     Sélection du pilote video par nom. Pilotes\n"
 "                               disponibles : \n"
 
-#: src/xitk/main.c:280
+#: src/xitk/main.c:281
 msgid ""
 "  -A, --audio-driver <drv>     Select audio driver by id. Available "
 "drivers: \n"
@@ -197,39 +286,39 @@ msgstr ""
 "  -A, --audio-drivers <drv>    Sélection du pilote audio par nom. Pilotes\n"
 "                               disponibles : \n"
 
-#: src/xitk/main.c:290
+#: src/xitk/main.c:291
 msgid "  -u, --spu-channel <#>        Select SPU (subtitle) channel '#'.\n"
 msgstr ""
 "  -u, --spu-channel <#>        Sélection du canal SPU (sous-titre) '#'.\n"
 
-#: src/xitk/main.c:291
+#: src/xitk/main.c:292
 msgid "  -a, --audio-channel <#>      Select audio channel '#'.\n"
 msgstr "  -a, --audio-channel <#>      Sélection du canal audio '#'.\n"
 
-#: src/xitk/main.c:292
+#: src/xitk/main.c:293
 msgid "  -p, --auto-play [opt]        Play on start. Can be followed by:\n"
 msgstr ""
 "  -p, --auto-play [opt]        Lecture au démarrage. Peut-être suivi par :\n"
 
-#: src/xitk/main.c:293
+#: src/xitk/main.c:294
 msgid "                    'f': in fullscreen mode.\n"
 msgstr "                    'f' : en mode plein ecran.\n"
 
-#: src/xitk/main.c:294
+#: src/xitk/main.c:295
 msgid "                    'h': hide GUI (panel, etc.).\n"
 msgstr ""
 "                    'h' : cache l'interface utilisateur (panneau "
 "principal, ...).\n"
 
-#: src/xitk/main.c:295
+#: src/xitk/main.c:296
 msgid "                    'w': hide video window.\n"
 msgstr "                    'w': cache la fenêtre de sortie.\n"
 
-#: src/xitk/main.c:296
+#: src/xitk/main.c:297
 msgid "                    'q': quit when play is done.\n"
 msgstr "                    'q' : quitte quand la lecture est terminée.\n"
 
-#: src/xitk/main.c:297
+#: src/xitk/main.c:298
 msgid ""
 "                    'd': retrieve playlist from DVD. (deprecated. use -s "
 "DVD)\n"
@@ -237,7 +326,7 @@ msgstr ""
 "                    'd' : récupère la liste de lecture a partir du DVD.\n"
 "                         (déprécié, utilisez -s DVD)\n"
 
-#: src/xitk/main.c:298
+#: src/xitk/main.c:299
 msgid ""
 "                    'v': retrieve playlist from VCD. (deprecated. use -s "
 "VCD)\n"
@@ -245,33 +334,33 @@ msgstr ""
 "                    'v' : récupère la liste de lecture à partir du VCD.\n"
 "                         (déprécié, utilisez -s VCD)\n"
 
-#: src/xitk/main.c:299
+#: src/xitk/main.c:300
 msgid "  -s, --auto-scan <plugin>     auto-scan play list from <plugin>\n"
 msgstr "  -s, --auto-scan <plugin>     liste de lecture à partir de <plugin>\n"
 
-#: src/xitk/main.c:300
+#: src/xitk/main.c:301
 msgid "  -f, --fullscreen             start in fullscreen mode,\n"
 msgstr "  -f, --fullscreen             passe en plein écran au démarrage,\n"
 
-#: src/xitk/main.c:301
+#: src/xitk/main.c:302
 msgid "  -g, --hide-gui               hide GUI (panel, etc.)\n"
 msgstr ""
 "  -g, --hide-gui               cache l'interface utilisateur (panneau, ...)\n"
 
-#: src/xitk/main.c:302
+#: src/xitk/main.c:303
 msgid "  -H, --hide-video             hide video window\n"
 msgstr "  -H, --hide-video             cache la fenêtre de sortie video.\n"
 
-#: src/xitk/main.c:304
+#: src/xitk/main.c:305
 msgid "  -L, --no-lirc                Turn off LIRC support.\n"
 msgstr "  -L, --no-list                Désactivation du support de LIRC.\n"
 
-#: src/xitk/main.c:306
+#: src/xitk/main.c:307
 msgid ""
 "      --visual <class-or-id>   Use the specified X11 visual. <class-or-id>\n"
 msgstr "      --visual <classe-ou-nom> Utilise le visuel X11 spécifié.\n"
 
-#: src/xitk/main.c:307
+#: src/xitk/main.c:308
 msgid ""
 "                               is either an X11 visual class, or a visual "
 "id.\n"
@@ -279,25 +368,25 @@ msgstr ""
 "                               si c'est une classe visuelle X11 ou un\n"
 "                               nom de visuel.\n"
 
-#: src/xitk/main.c:308
+#: src/xitk/main.c:309
 msgid "      --install                Install a private colormap.\n"
 msgstr ""
 "      --install                Installe une table de couleurs privée.\n"
 
-#: src/xitk/main.c:309
+#: src/xitk/main.c:310
 msgid "      --keymap [option]        Display keymap. Option are:\n"
 msgstr ""
 "      --keymap [option]        Affiche les séquences clavier. Les options "
 "sont :\n"
 
-#: src/xitk/main.c:310
+#: src/xitk/main.c:311
 msgid ""
 "                                 'default': display default keymap table,\n"
 msgstr ""
 "                                 'default' : affiche les séquences clavier "
 "originales,\n"
 
-#: src/xitk/main.c:311
+#: src/xitk/main.c:312
 msgid ""
 "                                 'lirc': display draft of a .lircrc config "
 "file.\n"
@@ -306,14 +395,14 @@ msgstr ""
 "de \n"
 "                                         de configuration .lircrc.\n"
 
-#: src/xitk/main.c:312
+#: src/xitk/main.c:313
 msgid ""
 "                                 'remapped': user remapped keymap table.\n"
 msgstr ""
 "                                 'remapped' : affiche les séquences "
 "modifiées.\n"
 
-#: src/xitk/main.c:313
+#: src/xitk/main.c:314
 msgid ""
 "                                 -if no option is given, 'default' is "
 "selected.\n"
@@ -321,106 +410,106 @@ msgstr ""
 "                                 -si aucune option n'est donnée, 'default' \n"
 "                                  sera sélectionné.\n"
 
-#: src/xitk/main.c:314
+#: src/xitk/main.c:315
 msgid "  -n, --network                Enable network remote control server.\n"
 msgstr ""
 "  -n, --network                Démarrage sur serveur de contrôle distant.\n"
 
-#: src/xitk/main.c:315
+#: src/xitk/main.c:316
 msgid "  -R, --root                   Use root window as video window.\n"
 msgstr ""
 "  -R, --root                   Utilise la fenêtre root pour l'affichage "
 "vidéo.\n"
 
-#: src/xitk/main.c:316
+#: src/xitk/main.c:317
 msgid "  -G, --geometry <WxH[+X+Y]>   Set output window geometry (X style).\n"
 msgstr ""
 "  -G, --geometry <WxH[+X+Y]>   Défini la géométrie de la fenêtre de sortie "
 "(style X).\n"
 
-#: src/xitk/main.c:317
+#: src/xitk/main.c:318
 msgid "  -B, --borderless             Borderless video output window.\n"
 msgstr "  -B, --borderless             Fenêtre sans bordures.\n"
 
-#: src/xitk/main.c:319
+#: src/xitk/main.c:320
 msgid "examples for valid MRLs (media resource locator):\n"
 msgstr "exemples de MRL valides (Media Resource Locator) :\n"
 
-#: src/xitk/main.c:320
+#: src/xitk/main.c:321
 msgid "  File:  'path/foo.vob'\n"
 msgstr "  Fichier :   'chemin/fichier.vob'\n"
 
-#: src/xitk/main.c:321
+#: src/xitk/main.c:322
 msgid "         '/path/foo.vob'\n"
 msgstr "             '/chemin/fichier.vob'\n"
 
-#: src/xitk/main.c:322
+#: src/xitk/main.c:323
 msgid "         'file://path/foo.vob'\n"
 msgstr "             'file://chemin/fichier.vob'\n"
 
-#: src/xitk/main.c:323
+#: src/xitk/main.c:324
 msgid "         'fifo://[[mpeg1|mpeg2]:/]path/foo'\n"
 msgstr "             'fifo://[[mpeg1|mpeg2]:/]chemin/fichier'\n"
 
-#: src/xitk/main.c:324
+#: src/xitk/main.c:325
 msgid "         'stdin://[mpeg1|mpeg2]' or '-' (mpeg2 only)\n"
 msgstr "             'stdin://[mpeg1|mpeg2]' ou '-' (mpeg2 seulement)\n"
 
-#: src/xitk/main.c:325
+#: src/xitk/main.c:326
 msgid "  DVD:   'dvd://VTS_01_2.VOB'\n"
 msgstr "  DVD:       'dvd://VTS_01_2.VOB'\n"
 
-#: src/xitk/main.c:326
+#: src/xitk/main.c:327
 msgid "  VCD:   'vcd://<track number>'\n"
 msgstr "  VCD:       'vcd://<numero piste>'\n"
 
-#: src/xitk/main.c:399
+#: src/xitk/main.c:400
 #, c-format
 msgid "main: probing <%s> video output plugin\n"
 msgstr "main : détection du plugin de sortie vidéo <%s>\n"
 
-#: src/xitk/main.c:416
+#: src/xitk/main.c:417
 msgid "main: all available video drivers failed.\n"
 msgstr "main : tous les pilotes vidéo ont échoué.\n"
 
-#: src/xitk/main.c:428
+#: src/xitk/main.c:429
 #, c-format
 msgid "main: video driver <%s> failed\n"
 msgstr "main : le pilote vidéo <%s> a échoué\n"
 
-#: src/xitk/main.c:469
+#: src/xitk/main.c:470
 #, c-format
 msgid "main: trying to autoload '%s' audio driver: "
 msgstr "main : tente de charger automatiquement le pilote audio '%s' : "
 
-#: src/xitk/main.c:486
+#: src/xitk/main.c:487
 msgid "main: audio driver probing failed => no audio output\n"
 msgstr "main : échec d'auto-détection du pilote audio => pas de sortie son\n"
 
-#: src/xitk/main.c:505
+#: src/xitk/main.c:506
 #, c-format
 msgid "main: the specified audio driver '%s' failed\n"
 msgstr "main : le pilote audio spécifié '%s' a échoué\n"
 
-#: src/xitk/main.c:580
+#: src/xitk/main.c:589
 #, c-format
-msgid "Require xine library version 0.9.9, found %d.%d.%d.\n"
-msgstr "Requière la bibliothèque xine version 0.9.9, a trouvé %d.%d.%d.\n"
+msgid "Require xine library version 0.9.10, found %d.%d.%d.\n"
+msgstr "Requière la bibliothèque xine version 0.9.10, a trouvé %d.%d.%d.\n"
 
-#: src/xitk/main.c:661
+#: src/xitk/main.c:670
 msgid "video driver id required for -V option\n"
 msgstr "Nom du pilote video requis pour l'option -V\n"
 
-#: src/xitk/main.c:671
+#: src/xitk/main.c:680
 msgid "audio driver id required for -A option\n"
 msgstr "Nom du pilote audio requis pour l'option -A\n"
 
-#: src/xitk/main.c:782
+#: src/xitk/main.c:791
 #, c-format
 msgid "Bad geometry '%s', see xine --help\n"
 msgstr "Mauvaise géométrie '%s', voir xine --help\n"
 
-#: src/xitk/main.c:806
+#: src/xitk/main.c:815
 #, c-format
 msgid "invalid argument %d => exit\n"
 msgstr "Argument %d non valide => quitte\n"
@@ -497,31 +586,31 @@ msgstr "Canal sous-titre suivant"
 msgid "Previous SPU channel"
 msgstr "Canal sous-titre precédent"
 
-#: src/xitk/panel.c:830
+#: src/xitk/panel.c:834
 msgid "Stream playback position slider"
 msgstr "Curseur de position de lecture du flux"
 
-#: src/xitk/panel.c:860
+#: src/xitk/panel.c:864
 msgid "Take a snapshot"
 msgstr "Capture une image"
 
-#: src/xitk/panel.c:867
+#: src/xitk/panel.c:871
 msgid "Slow motion"
 msgstr "Ralenti"
 
-#: src/xitk/panel.c:874
+#: src/xitk/panel.c:878
 msgid "Fast motion"
 msgstr "Accélère"
 
-#: src/xitk/panel.c:881
+#: src/xitk/panel.c:885
 msgid "Playlist"
 msgstr "Liste de lecture"
 
-#: src/xitk/panel.c:888
+#: src/xitk/panel.c:892
 msgid "Control"
 msgstr "Contrôle"
 
-#: src/xitk/panel.c:895
+#: src/xitk/panel.c:899
 msgid "MRL Browser"
 msgstr "Brouteur de MRL"
 
@@ -566,10 +655,6 @@ msgstr "Charge"
 msgid "Load saved playlist"
 msgstr "Charge la liste de lecture sauvée"
 
-#: src/xitk/playlist.c:863
-msgid "Save"
-msgstr "Sauve"
-
 #: src/xitk/playlist.c:869
 msgid "Save playlist"
 msgstr "Sauve la list de lecture"
@@ -582,27 +667,27 @@ msgstr "Ferme la fenêtre de la liste de lecture"
 msgid "Scan for:"
 msgstr "Source :"
 
-#: src/xitk/playlist.c:907
+#: src/xitk/playlist.c:908
 msgid "Direct MRL entry"
 msgstr "Entrée directe de MRL"
 
-#: src/xitk/setup.c:968
+#: src/xitk/setup.c:926
 msgid "Help"
 msgstr "Aide"
 
-#: src/xitk/setup.c:970
+#: src/xitk/setup.c:928
 msgid "README"
 msgstr "Lisez Moi"
 
-#: src/xitk/setup.c:972
+#: src/xitk/setup.c:930
 msgid "FAQ"
 msgstr "FAQ"
 
-#: src/xitk/setup.c:1122
+#: src/xitk/setup.c:1080
 msgid "xine setup"
 msgstr "Réglage de Xine"
 
-#: src/xitk/setup.c:1179 src/xitk/viewlog.c:515
+#: src/xitk/setup.c:1137 src/xitk/viewlog.c:485
 msgid "Close"
 msgstr "Fermer"
 
@@ -614,15 +699,12 @@ msgstr "Echec au chargement de %s/%s. Recharge l'ancienne apparence '%s'.\n"
 #: src/xitk/skins.c:256
 #, c-format
 msgid "Failed to load %s, wrong version. Load fallback skin '%s'.\n"
-msgstr ""
-"Echec au chargement de %s, mauvaise version. Charge l'apparence de secours '%"
-"s'.\n"
+msgstr "Echec au chargement de %s, mauvaise version. Charge l'apparence de secours '%s'.\n"
 
 #: src/xitk/skins.c:298
-#, fuzzy, c-format
+#, c-format
 msgid "Ooch, skin not found, use fallback '%s'.\n"
-msgstr ""
-"Ouille, apparence '%s' non trouvée, utilise l'apparence de secours '%s'.\n"
+msgstr "Ouille, apparence non trouvée, utilise l'apparence de secours '%s'.\n"
 
 #: src/xitk/skins.c:325
 msgid "No available skin found. Say goodbye.\n"
@@ -652,31 +734,31 @@ msgstr ""
 "Echec au chargement de l'apparence %s, mauvaise version. Charge l'apparence "
 "de secours '%s'.\n"
 
-#: src/xitk/snapshot.c:945
+#: src/xitk/snapshot.c:946
 #, c-format
 msgid "File open failed (%s)\n"
 msgstr "Echec à l'ouverture du fichier (%s)\n"
 
 #.
-#: src/xitk/snapshot.c:1093
+#: src/xitk/snapshot.c:1094
 #, c-format
 msgid "File '%s' written.\n"
 msgstr "Le fichier '%s' a été crée.\n"
 
-#: src/xitk/viewlog.c:355
+#: src/xitk/viewlog.c:325
 msgid "log info"
 msgstr "log info"
 
-#: src/xitk/viewlog.c:357
+#: src/xitk/viewlog.c:327
 #, c-format
 msgid "There is no log entry for logging section '%s'.\n"
 msgstr "Il n'y a aucune entrée dans le log de la section '%s'.\n"
 
-#: src/xitk/viewlog.c:454
+#: src/xitk/viewlog.c:424
 msgid "xine log viewer"
 msgstr "Visualisateur des logs de xine"
 
-#: src/xitk/viewlog.c:501
+#: src/xitk/viewlog.c:471
 msgid "Refresh"
 msgstr "Rafraîchir"
 

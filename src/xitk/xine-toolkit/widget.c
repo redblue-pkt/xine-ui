@@ -782,8 +782,18 @@ int xitk_paint_widget_list (xitk_widget_list_t *wl) {
   mywidget = (xitk_widget_t *) xitk_list_first_content (wl->l);
   while (mywidget && wl && wl->l && wl->win && wl->gc) {
     
-    if(mywidget->paint)
-      (mywidget->paint) (mywidget, wl->win, wl->gc);
+    if((mywidget->enable != WIDGET_ENABLE) && (mywidget->have_focus != FOCUS_LOST)) {
+      if(mywidget->notify_focus)
+	(void) (mywidget->notify_focus)(wl, mywidget, FOCUS_LOST);
+      
+      if(mywidget->paint)
+	(mywidget->paint) (mywidget, wl->win, wl->gc);
+      
+    }
+    else {
+      if(mywidget->paint)
+	(mywidget->paint) (mywidget, wl->win, wl->gc);
+    }
     
     mywidget = (xitk_widget_t *) xitk_list_next_content (wl->l); 
   }
@@ -1291,7 +1301,6 @@ void xitk_disable_widget(xitk_widget_t *w) {
   }
 
   w->enable = !WIDGET_ENABLE;
-
 }
 
 /*

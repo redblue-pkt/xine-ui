@@ -29,11 +29,11 @@
 #include <pthread.h>
 #include <signal.h>
 
-#include "xitk.h"
-
 #include "event.h"
 #include "panel.h"
 #include "actions.h"
+
+#include "xitk.h"
 
 #ifdef HAVE_LIRC
 #include "lirc/lirc_client.h"

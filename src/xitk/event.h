@@ -29,9 +29,9 @@
 
 #include "Imlib-light/Imlib.h"
 #include "kbindings.h"
-#include "xitk.h"
-#include "i18n.h"
 #include "videowin.h"
+
+#include "xitk.h"
 
 #define MAX_PLAYLIST_LENGTH  1024
 
@@ -159,6 +159,5 @@ void gui_handle_event (XEvent *event, void *data);
 char *gui_next_mrl_callback (void) ;
 
 void gui_branched_callback (void) ;
+
 #endif
-
-

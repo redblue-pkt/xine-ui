@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: xine-0.9.9\n"
-"POT-Creation-Date: 2002-05-22 16:00+0200\n"
+"POT-Creation-Date: 2002-05-31 13:07+0200\n"
 "PO-Revision-Date: 2002-05-11 00:32+0200\n"
 "Last-Translator: Frantisek Dvorak <valtri@atlas.cz>\n"
 "Language-Team: Czech <cs@li.org>\n"
@@ -13,52 +13,52 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:940
+#: src/xitk/xine-toolkit/mrlbrowser.c:949
 msgid "Select current entry"
 msgstr "Vybrání aktuální polo¾ky"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:947
+#: src/xitk/xine-toolkit/mrlbrowser.c:957
 msgid "Play selected entry"
 msgstr "Pøehrání aktuální polo¾ky"
 
-#: src/xitk/xine-toolkit/mrlbrowser.c:957
+#: src/xitk/xine-toolkit/mrlbrowser.c:968
 msgid "Close MRL browser window"
 msgstr "Zavøení okna prohlí¾eèe MRL"
 
-#: src/xitk/xine-toolkit/test.c:107
+#: src/xitk/xine-toolkit/test.c:109
 msgid "XInitThreads() failed.\n"
 msgstr "Funkce XInitThreads() selhala.\n"
 
-#: src/xitk/xine-toolkit/test.c:117
+#: src/xitk/xine-toolkit/test.c:119
 msgid "Cannot open display\n"
 msgstr "Nelze inicializovat obrazovku\n"
 
-#: src/xitk/xine-toolkit/test.c:131
+#: src/xitk/xine-toolkit/test.c:133
 msgid "Imlib_init_with_params() failed.\n"
 msgstr "Funkce Imlib_init_with_params() selhala.\n"
 
-#: src/xitk/xine-toolkit/test.c:346
+#: src/xitk/xine-toolkit/test.c:348
 #, c-format
 msgid "New integer value is: %d. Confirm ?"
 msgstr "Nová èíselná hodnota je: %d. Potvrdit ?"
 
-#: src/xitk/xine-toolkit/test.c:440
+#: src/xitk/xine-toolkit/test.c:442
 msgid "My Frame"
 msgstr "Mùj rámec"
 
-#: src/xitk/xine-toolkit/test.c:479
+#: src/xitk/xine-toolkit/test.c:481
 msgid "A Label"
 msgstr "Popisek"
 
-#: src/xitk/xine-toolkit/test.c:535
+#: src/xitk/xine-toolkit/test.c:538
 msgid "Fire !!"
 msgstr "Pal !!"
 
-#: src/xitk/xine-toolkit/test.c:566
+#: src/xitk/xine-toolkit/test.c:569
 msgid "!BOOM!"
 msgstr "!BUM!"
 
-#: src/xitk/xine-toolkit/test.c:654
+#: src/xitk/xine-toolkit/test.c:657
 #, c-format
 msgid ""
 "New entries selected in combo box is:\n"
@@ -67,15 +67,15 @@ msgstr ""
 "Nový výbìr polo¾ek v seznamu je:\n"
 "%s [%d]."
 
-#: src/xitk/xine-toolkit/test.c:768
+#: src/xitk/xine-toolkit/test.c:770
 msgid "init_test() failed\n"
 msgstr "Funkce init_test() selhala\n"
 
-#: src/xitk/xine-toolkit/test.c:784
+#: src/xitk/xine-toolkit/test.c:786
 msgid "My Fucking Window"
 msgstr "Mé pos*** okno"
 
-#: src/xitk/xine-toolkit/test.c:800
+#: src/xitk/xine-toolkit/test.c:802
 msgid "Quit"
 msgstr "Konec"
 
@@ -98,3 +98,11 @@ msgstr "Ne"
 #: src/xitk/xine-toolkit/window.c:1201
 msgid "Cancel"
 msgstr "Zru¹it"
+
+#: src/xitk/xine-toolkit/xitk.h:1857 src/xitk/xine-toolkit/xitk.h:1873
+msgid "Error"
+msgstr ""
+
+#: src/xitk/xine-toolkit/xitk.h:1862 src/xitk/xine-toolkit/xitk.h:1878
+msgid "Information"
+msgstr ""

@@ -58,12 +58,13 @@
 #include <xine/video_out_x11.h>
 #include <xine/xineutils.h>
 
-#include "xitk.h"
-
 #include "event.h"
 #include "videowin.h"
 #include "panel.h"
 #include "actions.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 #ifdef HAVE_ORBIT 
 #include "../corba/xine-server.h"

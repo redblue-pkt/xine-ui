@@ -67,9 +67,11 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#include "xitk.h"
 #include "event.h"
 #include "errors.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 #define PIXSZ 3
 #define BIT_DEPTH 8

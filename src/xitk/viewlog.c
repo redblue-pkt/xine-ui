@@ -36,13 +36,14 @@
 #include <xine.h>
 #include <xine/xineutils.h>
 
-#include "xitk.h"
-
 #include "Imlib-light/Imlib.h"
 #include "event.h"
 #include "actions.h"
 #include "skins.h"
 #include "lang.h"
+#include "i18n.h"
+
+#include "xitk.h"
 
 /*
 #define DEBUG_VIEWLOG
@@ -68,6 +69,7 @@ typedef struct {
 
   char                **log;
   int                   log_entries;
+  int                   real_num_entries;
   
   xitk_widget_t        *browser_widget;
 
@@ -248,7 +250,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
   }
   
   /* Compute log entries */
-  viewlog->log_entries = k = 0;
+  viewlog->log_entries = viewlog->real_num_entries = k = 0;
   
   if(log) {
     
@@ -281,13 +283,14 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 	    if(strlen(buf)) {
 	      viewlog->log = (char **) realloc(viewlog->log, sizeof(char **) * ((j + 1) + 1));
 	      viewlog->log[j++] = strdup(buf);
-	      //	      printf("added line '%s'\n", viewlog->log[j-1]);
+	      viewlog->real_num_entries++;
+	      // printf("added line '%s'\n", viewlog->log[j-1]);
 	    }
 	    memset(&buf, 0, sizeof(buf));
 	    break;
 	    
 	  default:
-	    //	    printf("- %c", *p);
+	    // printf("- %c", *p);
 	    sprintf(buf, "%s%c", buf, *p);
 	    break;
 	  }
@@ -328,7 +331,7 @@ static void viewlog_change_section(xitk_widget_t *wx, void *data, int section) {
 			  xitk_tabs_get_current_tab_selected(viewlog->tabs));
 #endif
   
-  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->log_entries, 0);
+  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->real_num_entries, 0);
   
   viewlog_clear_tab();
   viewlog_paint_widgets();
@@ -386,7 +389,7 @@ static void viewlog_create_tabs(void) {
   XLockDisplay(gGui->display);
   XFreePixmap(gGui->display, bg);
   XUnlockDisplay(gGui->display);
-
+  
   viewlog_change_section(NULL, NULL, 0);
 }
 
@@ -458,7 +461,7 @@ void viewlog_window(void) {
 						       16, br_fontname)));
 
   xitk_browser_set_alignment(viewlog->browser_widget, LABEL_ALIGN_LEFT);
-  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->log_entries, 0);
+  xitk_browser_update_list(viewlog->browser_widget, viewlog->log, viewlog->real_num_entries, 0);
   
   viewlog_paint_widgets();
   

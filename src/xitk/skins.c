@@ -35,11 +35,12 @@
 #include "event.h"
 #include "skins.h"
 #include "errors.h"
-
-#include "xitk.h"
+#include "i18n.h"
 
 #include <xine.h>
 #include <xine/xineutils.h>
+
+#include "xitk.h"
 
 /*
 #define SKIN_DEBUG 1
