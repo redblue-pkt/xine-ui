@@ -98,10 +98,10 @@ static int notify_inside(xitk_widget_t *lb, int x, int y) {
 /*
  * Draw the string in pixmap pix, then return it
  */
-static Pixmap create_labelofbutton(xitk_widget_t *lb, 
-				   Window win, GC gc, Pixmap pix, 
-				   int xsize, int ysize, 
-				   char *label, int state) {
+static void create_labelofbutton(xitk_widget_t *lb, 
+				 Window win, GC gc, Pixmap pix, 
+				 int xsize, int ysize, 
+				 char *label, int state) {
   lbutton_private_data_t  *private_data = 
     (lbutton_private_data_t *) lb->private_data;
   xitk_font_t             *fs = NULL;
@@ -202,7 +202,7 @@ static Pixmap create_labelofbutton(xitk_widget_t *lb,
     XITK_FREE(gColor);
   }
     
-  return pix;
+  //  return pix;
 }
 
 /*
@@ -211,10 +211,10 @@ static Pixmap create_labelofbutton(xitk_widget_t *lb,
 static void paint_labelbutton (xitk_widget_t *lb, Window win, GC gc) {
   lbutton_private_data_t *private_data = 
     (lbutton_private_data_t *) lb->private_data;
-  int          button_width, state = 0;
-  GC           lgc;
-  xitk_image_t *skin;
-  Pixmap       btn, bgtmp;
+  int               button_width, state = 0;
+  GC                lgc;
+  xitk_image_t     *skin;
+  Pixmap            btn;
   XWindowAttributes attr;
 
   if ((lb->widget_type & WIDGET_TYPE_LABELBUTTON) && (lb->visible == 1)) {
@@ -232,30 +232,30 @@ static void paint_labelbutton (xitk_widget_t *lb, Window win, GC gc) {
       XSetClipOrigin(private_data->imlibdata->x.disp, lgc, lb->x, lb->y);
       XSetClipMask(private_data->imlibdata->x.disp, lgc, skin->mask);
     }
-
+    
     button_width = skin->width / 3;
-    bgtmp = XCreatePixmap(private_data->imlibdata->x.disp, skin->image,
-			  button_width, skin->height, attr.depth);
+    btn = XCreatePixmap(private_data->imlibdata->x.disp, skin->image,
+			button_width, skin->height, attr.depth);
     
     if (private_data->bArmed) {
       if (private_data->bClicked) {
 	state = CLICK;
 	XCopyArea (private_data->imlibdata->x.disp, skin->image, 
-		   bgtmp, gc, 2*button_width, 0,
+		   btn, gc, 2*button_width, 0,
 		   button_width, skin->height, 0, 0);
       }
       else {
 	if(!private_data->bState || private_data->bType == CLICK_BUTTON) {
 	  state = FOCUS;
 	  XCopyArea (private_data->imlibdata->x.disp, skin->image,
-		     bgtmp, gc, button_width, 0,
+		     btn, gc, button_width, 0,
 		     button_width, skin->height, 0, 0);
 	}
 	else {
 	  if(private_data->bType == RADIO_BUTTON) {
 	    state = CLICK;
 	    XCopyArea (private_data->imlibdata->x.disp, skin->image,
-		       bgtmp, gc, 2*button_width, 0,
+		       btn, gc, 2*button_width, 0,
 		       button_width, skin->height, 0, 0);
 	  }
 	}
@@ -265,41 +265,36 @@ static void paint_labelbutton (xitk_widget_t *lb, Window win, GC gc) {
       if(private_data->bState && private_data->bType == RADIO_BUTTON) {
 	if(private_data->bOldState == 1 && private_data->bClicked == 1) {
 	  state = NORMAL;
-	  XCopyArea (private_data->imlibdata->x.disp, skin->image, bgtmp, gc, 0, 0,
+	  XCopyArea (private_data->imlibdata->x.disp, skin->image, btn, gc, 0, 0,
 		     button_width, skin->height, 0, 0);
 	}
 	else {
 	  state = CLICK;
 	  XCopyArea (private_data->imlibdata->x.disp, skin->image, 
-		     bgtmp, gc, 2*button_width, 0,
+		     btn, gc, 2*button_width, 0,
 		     button_width, skin->height, 0, 0);
 	}
       }
       else {
 	state = NORMAL;
-	XCopyArea (private_data->imlibdata->x.disp, skin->image, bgtmp, gc, 0, 0,
+	XCopyArea (private_data->imlibdata->x.disp, skin->image, btn, gc, 0, 0,
 		   button_width, skin->height, 0, 0);
       }
     }
     
     /* Only draw text of label is visible */
     XUNLOCK(private_data->imlibdata->x.disp);
-
+    
     if(private_data->label_visible) {
-      btn = create_labelofbutton(lb, win, gc, bgtmp,
-				 button_width, skin->height, 
-				 private_data->label, state);
-      XLOCK(private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, btn, win, lgc, 0, 0,
-		 button_width, skin->height, lb->x, lb->y);
+      create_labelofbutton(lb, win, gc, btn,
+			   button_width, skin->height, 
+			   private_data->label, state);
     }
-    else {
-      XLOCK(private_data->imlibdata->x.disp);
-      XCopyArea (private_data->imlibdata->x.disp, bgtmp, win, lgc, 0, 0,
-		 button_width, skin->height, lb->x, lb->y);
-    }
-
-    XFreePixmap(private_data->imlibdata->x.disp, bgtmp);
+    
+    XLOCK(private_data->imlibdata->x.disp);
+    XCopyArea (private_data->imlibdata->x.disp, btn, win, lgc, 0, 0,
+	       button_width, skin->height, lb->x, lb->y);
+    XFreePixmap(private_data->imlibdata->x.disp, btn);
     XFreeGC(private_data->imlibdata->x.disp, lgc);
     XUNLOCK(private_data->imlibdata->x.disp);
   }

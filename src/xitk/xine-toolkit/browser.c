@@ -62,17 +62,14 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
     int i;
 
     if((w->visible == 1)) {
-      int x     = w->x;
-      int y     = w->y;
-      int itemw = xitk_get_widget_width(private_data->item_tree[WBSTART]);
-      int itemh = xitk_get_widget_height(private_data->item_tree[WBSTART]);
-      int iy    = w->y;
-      int bh;
-      
-      if(private_data->skin_element_name) {
-	notify_change_skin(private_data->parent_wlist, w, private_data->skonfig);
-      }
-      else {
+      if(!private_data->skin_element_name) {
+	int x     = w->x;
+	int y     = w->y;
+	int itemw = xitk_get_widget_width(private_data->item_tree[WBSTART]);
+	int itemh = xitk_get_widget_height(private_data->item_tree[WBSTART]);
+	int iy    = w->y;
+	int bh;
+	
 	(void) xitk_set_widget_pos(private_data->item_tree[WBUP], x + itemw, y);
 	bh = xitk_get_widget_height(private_data->item_tree[WBUP]);
 	(void) xitk_set_widget_pos(private_data->item_tree[WSLID], x + itemw, y + bh);
@@ -89,7 +86,6 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
 	  iy += itemh;
 	}
       }
-      
     }
     else {
       for(i = 0; i < private_data->max_length+WBSTART; i++) {
@@ -104,11 +100,11 @@ static void paint(xitk_widget_t *w, Window win, GC gc) {
  */
 static void notify_change_skin(xitk_widget_list_t *wl, 
 			       xitk_widget_t *w, xitk_skin_config_t *skonfig) {
-  browser_private_data_t *private_data = 
-    (browser_private_data_t *) w->private_data;
-
+  browser_private_data_t *private_data = (browser_private_data_t *) w->private_data;
+  
   if(w->widget_type & WIDGET_TYPE_BROWSER) {
     xitk_skin_lock(skonfig);
+    
     if(private_data->skin_element_name) {
       int x, y, i = 0;
       
@@ -117,7 +113,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       w->visible = (xitk_skin_get_visibility(skonfig, private_data->skin_element_name)) ? 1 : -1;
       w->enable  = xitk_skin_get_enability(skonfig, private_data->skin_element_name);
       
-      for(i = WBSTART; i < private_data->max_length+WBSTART; i++) {
+      for(i = WBSTART; i < private_data->max_length + WBSTART; i++) {
 	
 	(void) xitk_set_widget_pos(private_data->item_tree[i], x, y);
 	
@@ -125,7 +121,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
 	
       }
     }
-      xitk_skin_unlock(skonfig);
+    xitk_skin_unlock(skonfig);
   }
 }
 

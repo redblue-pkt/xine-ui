@@ -208,10 +208,10 @@ static void inputtext_recalc_offsets(xitk_widget_list_t *wl,
 /*
  * Return a pixmap with text drawed.
  */
-static Pixmap create_labelofinputtext(xitk_widget_t *it, 
-				      Window win, GC gc, Pixmap pix, 
-				      int xsize, int ysize, 
-				      char *label, int state) {
+static void create_labelofinputtext(xitk_widget_t *it, 
+				    Window win, GC gc, Pixmap pix, 
+				    int xsize, int ysize, 
+				    char *label, int state) {
   inputtext_private_data_t *private_data = 
     (inputtext_private_data_t *) it->private_data;
   char               *plabel = label;
@@ -343,7 +343,6 @@ static Pixmap create_labelofinputtext(xitk_widget_t *it,
     XITK_FREE(gColor);
   }
 
-  return pix;
 }
 
 /*
@@ -354,7 +353,7 @@ static void paint_inputtext(xitk_widget_t *it, Window win, GC gc) {
     (inputtext_private_data_t *) it->private_data;
   int                 button_width, state = 0;
   xitk_image_t        *skin;
-  Pixmap              btn, bgtmp;
+  Pixmap              btn;
   GC                  lgc;
   XWindowAttributes   attr;
 
@@ -375,33 +374,32 @@ static void paint_inputtext(xitk_widget_t *it, Window win, GC gc) {
 
     button_width = skin->width/2;
     
-    bgtmp = XCreatePixmap(private_data->imlibdata->x.disp, skin->image,
-			  button_width, skin->height, attr.depth);
+    btn = XCreatePixmap(private_data->imlibdata->x.disp, skin->image,
+			button_width, skin->height, attr.depth);
     
     if(private_data->have_focus) {
       state = FOCUS;
       XCopyArea (private_data->imlibdata->x.disp, skin->image,
-		 bgtmp, gc, button_width, 0,
+		 btn, gc, button_width, 0,
 		 button_width, skin->height, 0, 0);
     }
     else {
       state = NORMAL;
       XCopyArea (private_data->imlibdata->x.disp, skin->image,
-		 bgtmp, gc, 0, 0,
+		 btn, gc, 0, 0,
 		 button_width, skin->height, 0, 0);
     }
     
     XUNLOCK(private_data->imlibdata->x.disp);
     
-    btn = create_labelofinputtext(it, win, gc, bgtmp,
-				  button_width, skin->height, 
-				  private_data->text, state);
+    create_labelofinputtext(it, win, gc, btn,
+			    button_width, skin->height, 
+			    private_data->text, state);
     
     XLOCK(private_data->imlibdata->x.disp);
     XCopyArea (private_data->imlibdata->x.disp, btn, win, lgc, 0, 0,
 	       button_width, skin->height, it->x, it->y);
-
-    XFreePixmap(private_data->imlibdata->x.disp, bgtmp);
+    XFreePixmap(private_data->imlibdata->x.disp, btn);
     XFreeGC(private_data->imlibdata->x.disp, lgc);
     XUNLOCK(private_data->imlibdata->x.disp);
   }

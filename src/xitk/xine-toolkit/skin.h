@@ -71,7 +71,7 @@ typedef struct {
   pthread_mutex_t               mutex;
   char                         *load_command;
   char                         *unload_command;
-
+  
   xitk_skin_element_t          *first, *last;
   xitk_skin_element_t          *celement;
 } xitk_skin_config_t;

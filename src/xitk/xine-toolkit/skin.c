@@ -138,6 +138,22 @@ static char *_get_expanded_command(xitk_skin_config_t *skonfig, char *cmd) {
 }
 
 /*
+ * Nullify all entried from s element.
+ */
+static void _nullify_me(xitk_skin_element_t *s) {
+  s->prev        = NULL;
+  s->next        = NULL;
+  s->section     = NULL;
+  s->pixmap      = NULL;
+  s->pixmap_pad  = NULL;
+  s->pixmap_font = NULL;
+  s->color       = NULL;
+  s->color_focus = NULL;
+  s->color_click = NULL;
+  s->font        = NULL;
+}
+
+/*
  * Return position in str of char 'c'. -1 if not found
  */
 static int _is_there_char(const char *str, int c) {
@@ -444,7 +460,8 @@ static void skin_parse_section(xitk_skin_config_t *skonfig) {
 	  xitk_skin_element_t *s;
 	  
 	  s = (xitk_skin_element_t *) xitk_xmalloc(sizeof(xitk_skin_element_t));
-
+	  _nullify_me(s);
+	  
 	  if(skonfig->celement) {
 	    skonfig->celement->next = s;
 	    s->prev = skonfig->celement;
@@ -616,8 +633,10 @@ static xitk_skin_element_t *skin_lookup_section(xitk_skin_config_t *skonfig, con
 
   s = skonfig->first;
   while(s) {
+
     if(!strcasecmp(str, s->section))
       return s;
+
     s = s->next;
   }
 
@@ -661,22 +680,20 @@ void xitk_skin_free_config(xitk_skin_config_t *skonfig) {
   if(skonfig->celement) {
     s = skonfig->last;
     
-    if(s) {
-      while(s) {
-	XITK_FREE(s->section);
-	XITK_FREE(s->pixmap);
-	XITK_FREE(s->pixmap_pad);
-	XITK_FREE(s->pixmap_font);
-	XITK_FREE(s->color);
-	XITK_FREE(s->color_focus);
-	XITK_FREE(s->color_click);
-	XITK_FREE(s->font);
-	
-	c = s;
-	s = s->prev;
-	
-	XITK_FREE(c);
-      }
+    while(s) {
+      XITK_FREE(s->section);
+      XITK_FREE(s->pixmap);
+      XITK_FREE(s->pixmap_pad);
+      XITK_FREE(s->pixmap_font);
+      XITK_FREE(s->color);
+      XITK_FREE(s->color_focus);
+      XITK_FREE(s->color_click);
+      XITK_FREE(s->font);
+      
+      c = s;
+      s = c->prev;
+      
+      XITK_FREE(c);
     }
   }
   

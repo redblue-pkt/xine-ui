@@ -39,7 +39,7 @@
 
 #define XDND_VERSION 3
 
-#undef DEBUG_DND
+#define DEBUG_DND
 
 /*
  * PRIVATES
@@ -596,7 +596,7 @@ int xitk_process_client_dnd_message(xitk_dnd_t *xdnd, XEvent *event) {
     } 
     
     XITK_FREE(xdnd->dragger_typelist);
-    
+
     retval = 1;
   }
   
