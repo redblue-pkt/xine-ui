@@ -124,6 +124,11 @@ void xine_error_with_more(char *message, ...) {
   char     *buf;
   int       n, size = 100;
   
+  if (gGui->stdctl_enable) {
+    printf("%s\n", message);
+    return;
+  }
+  
   if((buf = xitk_xmalloc(size)) == NULL) 
     return;
   
