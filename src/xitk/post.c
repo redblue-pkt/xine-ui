@@ -914,7 +914,7 @@ static void _pplugin_select_filter(xitk_widget_t *w, void *data, int select) {
       
       if(!xitk_is_widget_enabled(pplugin->new_filter))
 	xitk_enable_widget(pplugin->new_filter);
-      
+     
     }
 
     if(pplugin->object_num <= MAX_DISPLAY_FILTERS)
@@ -1319,11 +1319,32 @@ static void _pplugin_enability(xitk_widget_t *w, void *data, int state) {
   _pplugin_rewire();
 }
 
+int pplugin_is_post_selected(void) {
+  
+  if(pplugin) {
+    int post_num = pplugin->object_num;
+    
+    if(!xitk_combo_get_current_selected(pplugin->post_objects[post_num - 1]->plugins))
+      post_num--;
+
+    return (post_num > 0);
+  }
+  
+  return gGui->post_elements_num;
+}
+
+void pplugin_rewire_from_posts_window(void) {
+  if(pplugin) {
+    _pplugin_unwire();
+    _pplugin_rewire();
+  }
+}
+
 void pplugin_rewire_posts(void) {
 
-  if(gGui->post_elements_num) {
+  _pplugin_unwire();
 
-    _pplugin_unwire();
+  if(gGui->post_elements_num) {
 
     if(gGui->post_enable) {
       xine_post_out_t   *vo_source;
@@ -1529,6 +1550,7 @@ void pplugin_panel(void) {
    (pplugin->enable = xitk_noskin_labelbutton_create(pplugin->widget_list, 
 						     &lb, x, y, 100, 23,
 						     "Black", "Black", "White", btnfontname)));
+
   xitk_labelbutton_set_state(pplugin->enable, gGui->post_enable);
   xitk_enable_and_show_widget(pplugin->enable);
 
