@@ -254,7 +254,7 @@ static int _gui_xine_play(xine_stream_t *stream,
 
       if(has_video) {
 	
-	if((gGui->visual_anim.enabled == 2) && gGui->visual_anim.running)
+	if(gGui->visual_anim.running)
 	  visual_anim_stop();
 	
 	if(gGui->auto_vo_visibility) {
@@ -501,13 +501,18 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
   }
   
   if(_sub) {
-    
+    if(!gGui->spu_stream) {
+     gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+     xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+    }
     if(xine_open(gGui->spu_stream, _sub))
       xine_stream_master_slave(gGui->stream, 
 			       gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
   }
-  else
-    xine_close (gGui->spu_stream);
+  else if (gGui->spu_stream) {
+    xine_dispose (gGui->spu_stream);
+    gGui->spu_stream = NULL;
+  }
   
   xine_set_param(gGui->stream, XINE_PARAM_AV_OFFSET, av_offset);
   xine_set_param(gGui->stream, XINE_PARAM_SPU_OFFSET, spu_offset);
@@ -534,7 +539,7 @@ void gui_exit (xitk_widget_t *w, void *data) {
   if(xine_get_status(gGui->stream) != XINE_STATUS_STOP) {
     gGui->ignore_next = 1;
 
-    if(gGui->visual_anim.running) {
+    if((gGui->visual_anim.enabled == 2) && gGui->visual_anim.running) {
       xine_post_out_t * audio_source;
 
       xine_stop(gGui->visual_anim.stream);
@@ -584,10 +589,12 @@ void gui_exit (xitk_widget_t *w, void *data) {
   config_save();
 
   xine_close(gGui->stream);
-  xine_close(gGui->visual_anim.stream);
+  if (gGui->visual_anim.stream)
+    xine_close(gGui->visual_anim.stream);
 
   xine_event_dispose_queue(gGui->event_queue);
-  xine_event_dispose_queue(gGui->visual_anim.event_queue);
+  if (gGui->visual_anim.event_queue)
+    xine_event_dispose_queue(gGui->visual_anim.event_queue);
 
   /* we are going to dispose this stream, so make sure slider_loop 
    * won't use it anymore (otherwise -> segfault on exit).
@@ -598,13 +605,20 @@ void gui_exit (xitk_widget_t *w, void *data) {
     xine_post_dispose(gGui->xine, gGui->visual_anim.post_output);
 
   xine_dispose(gGui->stream);
-  /* xine_dispose(gGui->visual_anim.stream); */
+  if (gGui->visual_anim.stream)
+    xine_dispose(gGui->visual_anim.stream);
+  if (gGui->spu_stream)
+    xine_dispose(gGui->spu_stream);
 
   if(gGui->vo_port)
     xine_close_video_driver(gGui->xine, gGui->vo_port);
+  if(gGui->vo_none)
+    xine_close_video_driver(gGui->xine, gGui->vo_none);
 
   if(gGui->ao_port)
     xine_close_audio_driver(gGui->xine, gGui->ao_port);
+  if(gGui->ao_none)
+    xine_close_audio_driver(gGui->xine, gGui->ao_none);
 
   xine_exit(gGui->xine); 
 
@@ -673,12 +687,9 @@ void gui_stop (xitk_widget_t *w, void *data) {
   gGui->stream_length.pos = gGui->stream_length.time = gGui->stream_length.length = 0;
   
   mediamark_reset_played_state();
-  if(gGui->visual_anim.running) {
-    xine_stop(gGui->visual_anim.stream);
-    if(gGui->visual_anim.enabled == 2)
-      gGui->visual_anim.running = 0;
-  }
-
+  if(gGui->visual_anim.running)
+    visual_anim_stop();
+  
   osd_update_status();
   panel_reset_slider ();
   panel_check_pause();
@@ -1055,12 +1066,18 @@ static void *gui_set_current_position_thread(void *data) {
     xine_open(gGui->stream, gGui->mmk.mrl);
 
     if(gGui->mmk.sub) {
+      if(!gGui->spu_stream) {
+	gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+	xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+      }
       if(xine_open(gGui->spu_stream, gGui->mmk.sub))
 	xine_stream_master_slave(gGui->stream, 
 				 gGui->spu_stream, XINE_MASTER_SLAVE_PLAY | XINE_MASTER_SLAVE_STOP);
     }
-    else
-      xine_close (gGui->spu_stream);
+    else if (gGui->spu_stream) {
+      xine_dispose (gGui->spu_stream);
+      gGui->spu_stream = NULL;
+    }
   }
   
   gGui->ignore_next = 1;
@@ -1935,7 +1952,12 @@ static void subselector_callback(filebrowser_t *fb) {
 	
 	if(xine_get_status(gGui->stream) == XINE_STATUS_PLAY) {
 	  int curpos;
-	  xine_close (gGui->spu_stream);
+	  if (gGui->spu_stream)
+	    xine_close (gGui->spu_stream);
+	  else {
+	    gGui->spu_stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+	    xine_set_param(gGui->spu_stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+	  }
 
 	  if(xine_open(gGui->spu_stream, mmk->sub))
 	    xine_stream_master_slave(gGui->stream, 
@@ -2021,6 +2043,13 @@ static int visual_anim_open_and_play(xine_stream_t *stream, const char *mrl) {
 }
 void visual_anim_play(void) {
   if(gGui->visual_anim.enabled == 2) {
+    gGui->visual_anim.stream = xine_stream_new(gGui->xine, NULL, gGui->vo_port);
+    gGui->visual_anim.event_queue = xine_event_new_queue(gGui->visual_anim.stream);
+    xine_event_create_listener_thread(gGui->visual_anim.event_queue, event_listener, NULL);
+    xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL, -2);
+    xine_set_param(gGui->visual_anim.stream, XINE_PARAM_SPU_CHANNEL, -2);
+    xine_set_param(gGui->visual_anim.stream, XINE_PARAM_AUDIO_REPORT_LEVEL, 0);
+
     if(!visual_anim_open_and_play(gGui->visual_anim.stream, 
 				  gGui->visual_anim.mrls[gGui->visual_anim.current]))
       gui_handle_xine_error(gGui->visual_anim.stream, 
@@ -2038,7 +2067,10 @@ void visual_anim_play_next(void) {
 }
 void visual_anim_stop(void) {
   if(gGui->visual_anim.enabled == 2) {
-    xine_stop(gGui->visual_anim.stream);
+    xine_dispose(gGui->visual_anim.stream);
+    xine_event_dispose_queue(gGui->visual_anim.event_queue);
+    gGui->visual_anim.stream = NULL;
+    gGui->visual_anim.event_queue = NULL;
     gGui->visual_anim.running = 0;
   }
 }

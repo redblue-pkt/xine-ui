@@ -590,7 +590,7 @@ void playlist_scan_for_infos_selected(void) {
     int                 selected = xitk_browser_get_current_selected(playlist->playlist);
     xine_stream_t      *stream;
     
-    stream = xine_stream_new(gGui->xine, NULL, NULL);
+    stream = xine_stream_new(gGui->xine, gGui->ao_none, gGui->vo_none);
     _scan_for_playlist_infos(stream, selected);
     
     xine_dispose(stream);
@@ -605,7 +605,7 @@ void playlist_scan_for_infos(void) {
     int                 i;
     xine_stream_t      *stream;
     
-    stream = xine_stream_new(gGui->xine, NULL, NULL);
+    stream = xine_stream_new(gGui->xine, gGui->ao_none, gGui->vo_none);
     
     for(i = 0; i < gGui->playlist.num; i++)
       _scan_for_playlist_infos(stream, i);
@@ -763,7 +763,7 @@ void playlist_scan_input(xitk_widget_t *w, void *ip) {
 	    gGui->playlist.cur = 0;
 	  
 
-	  stream = xine_stream_new(gGui->xine, NULL, NULL);
+	  stream = xine_stream_new(gGui->xine, gGui->ao_none, gGui->vo_none);
 	  
 	  for (j = 0; j < num_mrls; j++) {
 	    char *ident = NULL;

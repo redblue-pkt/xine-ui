@@ -101,6 +101,12 @@ static char *mixer_control_method[] = {
   NULL
 };
 
+static char *shortcut_style[] = {
+  "Windows style",
+  "Emacs style",
+  NULL
+};
+
 void dummy_config_cb(void *data, xine_cfg_entry_t *cfg) {
   /* It exist to avoid "restart" window message in setup window */
 }
@@ -198,6 +204,9 @@ static void audio_mixer_method_cb(void *data, xine_cfg_entry_t *cfg) {
 
   xitk_slider_set_max(panel->mixer.slider, max);
   xitk_slider_set_pos(panel->mixer.slider, vol);
+}
+static void shortcut_style_cb(void *data, xine_cfg_entry_t *cfg) {
+  gGui->shortcut_style = cfg->num_value;
 }
 
 int wm_not_ewmh_only(void) {
@@ -1385,6 +1394,15 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 			      _("Which method used to control audio volume."), 
 			      CONFIG_LEVEL_ADV,
 			      audio_mixer_method_cb,
+			      CONFIG_NO_DATA);
+
+  gGui->shortcut_style = 
+    xine_config_register_enum(gGui->xine, "gui.shortcut_style", 
+			      0, shortcut_style,
+			      _("Menu shortcut style"),
+			      _("Shortcut representation in menu, 'Ctrl,Alt' or 'C,M'."), 
+			      CONFIG_LEVEL_ADV,
+			      shortcut_style_cb,
 			      CONFIG_NO_DATA);
 
   gGui->numeric.set = 0;

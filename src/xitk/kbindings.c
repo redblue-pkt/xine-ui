@@ -1150,30 +1150,30 @@ static char *_kbindings_get_shortcut_from_kbe(kbinding_entry_t *kbe) {
   if(kbe) {
     memset(&shortcut, 0, sizeof(shortcut));
     
-#define EMACS_SHORTCUTS
-#ifdef EMACS_SHORTCUTS
-    if(kbe->modifier & KEYMOD_CONTROL)
-      sprintf(shortcut, "%s%s", shortcut, "C-");
-    if(kbe->modifier & KEYMOD_META)
-      sprintf(shortcut, "%s%s", shortcut, "M-");
-    if(kbe->modifier & KEYMOD_MOD3)
-      sprintf(shortcut, "%s%s", shortcut, "M3-");
-    if(kbe->modifier & KEYMOD_MOD4)
-      sprintf(shortcut, "%s%s", shortcut, "M4-");
-    if(kbe->modifier & KEYMOD_MOD5)
-      sprintf(shortcut, "%s%s", shortcut, "M5-");
-#else
-    if(kbe->modifier & KEYMOD_CONTROL)
-      sprintf(shortcut, "%s%s", shortcut, "Ctrl+");
-    if(kbe->modifier & KEYMOD_META)
-      sprintf(shortcut, "%s%s", shortcut, "Alt+");
-    if(kbe->modifier & KEYMOD_MOD3)
-      sprintf(shortcut, "%s%s", shortcut, "M3+");
-    if(kbe->modifier & KEYMOD_MOD4)
-      sprintf(shortcut, "%s%s", shortcut, "M4+");
-    if(kbe->modifier & KEYMOD_MOD5)
-      sprintf(shortcut, "%s%s", shortcut, "M5+");
-#endif
+    if(gGui->shortcut_style == 0) {
+      if(kbe->modifier & KEYMOD_CONTROL)
+	sprintf(shortcut, "%s%s", shortcut, "Ctrl+");
+      if(kbe->modifier & KEYMOD_META)
+	sprintf(shortcut, "%s%s", shortcut, "Alt+");
+      if(kbe->modifier & KEYMOD_MOD3)
+	sprintf(shortcut, "%s%s", shortcut, "M3+");
+      if(kbe->modifier & KEYMOD_MOD4)
+	sprintf(shortcut, "%s%s", shortcut, "M4+");
+      if(kbe->modifier & KEYMOD_MOD5)
+	sprintf(shortcut, "%s%s", shortcut, "M5+");
+    }
+    else {
+      if(kbe->modifier & KEYMOD_CONTROL)
+	sprintf(shortcut, "%s%s", shortcut, "C-");
+      if(kbe->modifier & KEYMOD_META)
+	sprintf(shortcut, "%s%s", shortcut, "M-");
+      if(kbe->modifier & KEYMOD_MOD3)
+	sprintf(shortcut, "%s%s", shortcut, "M3-");
+      if(kbe->modifier & KEYMOD_MOD4)
+	sprintf(shortcut, "%s%s", shortcut, "M4-");
+      if(kbe->modifier & KEYMOD_MOD5)
+	sprintf(shortcut, "%s%s", shortcut, "M5-");
+    }
     
     sprintf(shortcut, "%s%s", shortcut, kbe->key);
     

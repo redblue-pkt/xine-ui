@@ -153,6 +153,8 @@
 
 typedef struct {
   xine_video_port_t        *vo_port;
+  xine_video_port_t        *vo_none;
+  xine_audio_port_t        *ao_none;
 
   tvout_t                  *tvout;
 
@@ -319,7 +321,7 @@ typedef struct {
 
   int                       layer_above;
   int                       always_layer_above;
-
+  
   int                       network;
   
   int                       use_root_window;
@@ -335,6 +337,7 @@ typedef struct {
 
   char                      *keymap_file;
   kbinding_t                *kbindings;
+  int                        shortcut_style;
 
   struct {
     int                      set;
@@ -358,6 +361,7 @@ typedef struct {
 
 } gGui_t;
 
+void event_listener(void *user_data, const xine_event_t *event);
 
 void set_window_states_start(Window window);
 #define set_window_states_start(window)                                   \
