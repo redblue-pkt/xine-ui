@@ -739,24 +739,26 @@ static void browser_select(xitk_widget_t *w, void *data, int state) {
 	      && (private_data->current_button_clicked > -1)) {
 	struct timeval old_click_time, tm_diff;
 	long int click_diff;
+	int      cur_clicked = private_data->current_button_clicked;
 	
 	timercpy(&private_data->click_time, &old_click_time);
 	gettimeofday(&private_data->click_time, 0);
 	timersub(&private_data->click_time, &old_click_time, &tm_diff);
 	click_diff = (tm_diff.tv_sec * 1000) + (tm_diff.tv_usec / 1000.0);
 	
+	private_data->last_button_clicked = private_data->current_button_clicked;
+	private_data->current_button_clicked = -1;
+
+	gettimeofday(&private_data->click_time, 0);
+	
 	/* Ok, double click occur, call cb */
 	if(click_diff < private_data->dbl_click_time) {
 	  if(private_data->dbl_click_callback)
-	    private_data->dbl_click_callback(((btnlist_t*)data)->itemlist/*w*/, 
-					     private_data->userdata,
-					     private_data->current_button_clicked);
+	    private_data->dbl_click_callback(((btnlist_t*)data)->itemlist, 
+					     private_data->userdata, cur_clicked);
 	}
-	private_data->last_button_clicked = private_data->current_button_clicked;
-	private_data->current_button_clicked = -1;
       }
       
-      gettimeofday(&private_data->click_time, 0);
     }
     else {
       /* If there no callback, release selected button */
