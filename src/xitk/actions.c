@@ -263,17 +263,6 @@ void gui_toggle_aspect(void) {
   }
 }
 
-void gui_set_aspect_ratio(int ratio_code) {
-  
-  gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_ASPECT_RATIO, ratio_code);
-  
-  if (panel_is_visible())  {
-    XRaiseWindow (gGui->display, gGui->panel_window);
-    XSetTransientForHint (gGui->display, 
-			  gGui->panel_window, gGui->video_window);
-  }
-}
-
 void gui_toggle_interlaced(void) {
 
   gGui->vo_driver->set_property (gGui->vo_driver, VO_PROP_INTERLACED,
