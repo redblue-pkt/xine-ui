@@ -669,7 +669,7 @@ widget_t *mrlbrowser_create(xitk_mrlbrowser_t *mb) {
   screen = DefaultScreen(mb->display);
 
   XAllocNamedColor(mb->display, 
-                   DefaultColormap(mb->display, screen), 
+		   Imlib_get_colormap(mb->imlibdata),
 		   "black", &black, &dummy);
 
   attr.override_redirect = True;

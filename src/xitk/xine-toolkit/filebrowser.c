@@ -978,7 +978,7 @@ widget_t *filebrowser_create(xitk_filebrowser_t *fb) {
   screen                       = DefaultScreen(fb->display);
 
   XAllocNamedColor(fb->display, 
-                   DefaultColormap(fb->display, screen), 
+		   Imlib_get_colormap(fb->imlibdata),
                    "black", &black, &dummy);
 
   attr.override_redirect       = True;

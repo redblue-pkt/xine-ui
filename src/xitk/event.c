@@ -850,7 +850,7 @@ void gui_init (int nfiles, char *filenames[]) {
     gGui->video_window_logo_image->rgb_height;
 
   XAllocNamedColor(gGui->display, 
-		   DefaultColormap(gGui->display, gGui->screen), 
+		   Imlib_get_colormap(gGui->imlib_data),
 		   "black", &gGui->black, &dummy);
 
   /*
