@@ -434,17 +434,27 @@
       of such software is legal where you live).
     
       We hope that this situation will change soon.
+      
+      The easiest way to play an unlocked/unencrypted dvd is, press the DVD
+      button on the xine panel and then play. Now everything should work
+      out-of-the-box. Please note that for this to work you will not have to
+      mount your dvd. You can lean back and enjoy the movie... :-)
+      
+      Alternatively you can also do all the work by yourself (even though
+      unnecessary but if you want to: the user is the king *grin*):
 
-      For unlocked/unencrypted dvds it is a good idea first to check what files
-      are on the dvd by mounting it. The files are called something like:
+      Please note, if you go this way, you will *not* have seamless branching
+      of the dvd movie. You have to play each part of the movie manually. So
+      once again: why don't just press the dvd button anyway!? ;-)
+
+      Mount your dvd and check what files are on the disc. There should be
+      some files like:
      
        ../VIDEO_TS/VTS_xx_x.VOB, where x are numbers.
      
-      If you look for the big .VOB files on a dvd these are probably where the
-      movie is in. Currently we don't support seamless playback of complete
-      movies - you will have to play back all of its individual parts.
-
-      To play that VOB file use something like:
+      If you look for the big .VOB files on a dvd, those are probably the
+      ones where the movie is in. To play one of those big files, start xine
+      like that:
 
        xine dvd://VTS_xx_x.VOB
 
