@@ -235,6 +235,7 @@ skin.AutoPlayGUI {
 	  y = 39
 	}
 	pixmap = MainAutoButton.png
+	direction = left
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
@@ -477,6 +478,7 @@ skin.AutoPlayBG {
 	  y = 50
 	}
 	pixmap =  OngletSmall.png
+	direction = down
 	label {
 	  color = #adc9ff
 	  color_focus = #303947
@@ -856,6 +858,7 @@ skin.MrlPlugNameBG {
 	  y = 50
 	}
 	pixmap = Onglet.png
+	direction = down
 	label {
 	  color = #adc9ff
 	  color_focus = #303947

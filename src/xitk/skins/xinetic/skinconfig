@@ -234,6 +234,7 @@ skin.AutoPlayGUI {
 	  y = 43
 	}
 	pixmap = MainAutoButton.png
+	direction = left
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
@@ -476,6 +477,7 @@ skin.AutoPlayBG {
 	  y = 42
 	}
 	pixmap =  Onglet.png
+	direction = down
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
@@ -845,7 +847,7 @@ skin.MrlCurOrigin {
 	label {
 	  length = 43
 	  animation = True
-	pixmap = Letters.png
+	  pixmap = Letters.png
 	}
 }
 
@@ -855,6 +857,7 @@ skin.MrlPlugNameBG {
 	  y = 42
 	}
 	pixmap = Onglet.png
+	direction = down
 	label {
 	  color = #9fa4ad
 	  color_focus = #081e2f
@@ -871,7 +874,7 @@ skin.MrlPlugLabel {
 	label {
 	  length = 7
 	  animation = False
-	pixmap = Letters.png
+	  pixmap = Letters.png
 	}
 }
 
