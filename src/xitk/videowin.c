@@ -122,7 +122,7 @@ void video_window_select_visual (void) {
     }
     if (gGui->visual != gVw->visual)
     {
-      printf ("videowin: output driver overrides selected visual to visual id 0x%x\n", gGui->visual->visualid);
+      printf ("videowin: output driver overrides selected visual to visual id 0x%lx\n", gGui->visual->visualid);
       gui_init_imlib (gGui->visual);
     }
   }

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-01-20 01:44+0100\n"
+"POT-Creation-Date: 2002-01-24 00:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,21 +70,21 @@ msgid ""
 "!! Unhandled error !!\n"
 msgstr ""
 
-#: src/xitk/event.c:903
+#: src/xitk/event.c:900
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
 msgstr ""
 
-#: src/xitk/event.c:913
+#: src/xitk/event.c:910
 msgid "Cannot open display\n"
 msgstr ""
 
-#: src/xitk/event.c:952
+#: src/xitk/event.c:984
 msgid "Unable to initialize Imlib\n"
 msgstr ""
 
-#: src/xitk/event.c:962
+#: src/xitk/event.c:997
 #, c-format
 msgid "Unable to load %s logo\n"
 msgstr ""

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XINE 1.0\n"
-"POT-Creation-Date: 2002-01-20 01:44+0100\n"
+"POT-Creation-Date: 2002-01-24 00:03+0100\n"
 "PO-Revision-Date: 2002-01-16 18:28+0100\n"
 "Last-Translator: Juan Manuel García Molina <juanma_gm@wanadoo.es>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -79,7 +79,7 @@ msgstr ""
 "\n"
 "¡¡ Error no manipulable !!\n"
 
-#: src/xitk/event.c:903
+#: src/xitk/event.c:900
 msgid ""
 "\n"
 "XInitThreads failed - looks like you don't have a thread-safe xlib.\n"
@@ -87,15 +87,15 @@ msgstr ""
 "\n"
 "XInitThreads falló - parece que su librería xlib no tiene hilos seguros.\n"
 
-#: src/xitk/event.c:913
+#: src/xitk/event.c:910
 msgid "Cannot open display\n"
 msgstr "No se puede abrir la pantalla\n"
 
-#: src/xitk/event.c:952
+#: src/xitk/event.c:984
 msgid "Unable to initialize Imlib\n"
 msgstr "No se puede iniciar Imlib\n"
 
-#: src/xitk/event.c:962
+#: src/xitk/event.c:997
 #, c-format
 msgid "Unable to load %s logo\n"
 msgstr "No se puede cargar el logo %s\n"
