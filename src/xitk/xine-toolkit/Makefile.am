@@ -78,9 +78,6 @@ $(top_builddir)/src/Imlib-light/libImlib-light.la:
 $(top_builddir)/src/xitk/xine-toolkit/libxitk.la:
 	@cd $(top_builddir)/src/xitk/xine-toolkit && $(MAKE) libxitk.la
 
-$(top_builddir)/src/common/libcommon.la:
-	@cd $(top_builddir)/src/common && $(MAKE) libcommonla
-
 if INCLUDE_INTL
 @INTLLIBS@:
 	@cd $(top_builddir)/intl && $(MAKE) @INTLLIBS@
