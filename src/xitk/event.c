@@ -574,6 +574,23 @@ void gui_handle_event (XEvent *event, void *data) {
     case XK_X:
       panel_execute_snapshot(NULL, NULL);
       break;
+    
+    case XK_s:
+    case XK_S:
+      if(!video_window_is_fullscreen()) {
+        int width, height, ratio_code, format;
+        uint8_t *y, *u, *v;
+        
+        if( xine_get_current_frame (gGui->xine, &width, &height,
+                                   &ratio_code, &format,
+                                   &y, &u, &v) ) {
+          
+          XLockDisplay (gGui->display);
+          XResizeWindow (gGui->display, gGui->video_window, width, height);
+          XUnlockDisplay(gGui->display);
+        }
+      }
+      break;
     }
   }
   break;
