@@ -194,7 +194,7 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 
     private_data->mc->mrls_to_disp = 0;
 
-    xitk_strdupa(filter_ends, private_data->mrl_filters[private_data->filter_selected]->ending);
+    filter_ends = strdup(private_data->mrl_filters[private_data->filter_selected]->ending);
     xitk_strdupa(p, filter_ends);
 
     for(i = 0; i < private_data->mrls_num; i++) {
@@ -222,10 +222,15 @@ static void mrlbrowser_filter_mrls(mrlbrowser_private_data_t *private_data) {
 	      private_data->mc->mrls_to_disp++;
 	    }
 	  }
-	  xitk_strdupa(filter_ends, p);
+	  free(filter_ends);
+	  filter_ends = strdup(p);
 	}
       }    
     }
+    
+    if(filter_ends)
+      free(filter_ends);
+    
   }
   else { /* no filtering */
 

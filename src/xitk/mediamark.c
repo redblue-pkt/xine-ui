@@ -319,8 +319,14 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 		    
 		    memset(buffer, 0, sizeof(buffer));
 		    
-		    if((sscanf(ln, "File%d=%s", &entry, &buffer[0])) == 2)
-		      mediamark_store_mmk(&mmk[(entry - 1)], buffer, NULL, NULL, 0, -1, 0);
+		    if((sscanf(ln, "File%d=%s", &entry, &buffer[0])) == 2) {
+		      
+		      if((entry) && 
+			 ((entry) <= entries_pls) && 
+			 (mmk && (!mmk[(entry - 1)])))
+			mediamark_store_mmk(&mmk[(entry - 1)], buffer, NULL, NULL, 0, -1, 0);
+		      
+		    }
 		    
 		  }
 		  else {
@@ -340,7 +346,16 @@ static mediamark_t **guess_pls_playlist(playlist_t *playlist, const char *filena
 	    }
 	    
 	    if(valid_pls && entries_pls) {
+	      int i;
+
 	      mmk[entries_pls] = NULL;
+
+	      /* Fill missing entries */
+	      for(i = 0; i < entries_pls; i++) {
+		if(!mmk[i])
+		  mediamark_store_mmk(&mmk[i], _("!!Invalid entry!!"), NULL, NULL, 0, -1, 0);
+	      }
+
 	      playlist->type = strdup("PLS");
 	      return mmk;
 	    }
@@ -399,7 +414,14 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		if(!strncmp(ln, "#EXTINF", 7)) {
 		  if((ptitle = strchr(ln, ',')) != NULL) {
 		    ptitle++;
-		    xine_strdupa(title, ptitle);
+
+		    if(title) {
+		      free(title);
+		      title = NULL;
+		    }
+
+		    if(ptitle && strlen(ptitle))
+		      title = strdup(ptitle);
 		  }
 		}
 		else {
@@ -428,7 +450,12 @@ static mediamark_t **guess_m3u_playlist(playlist_t *playlist, const char *filena
 		    
 		  mediamark_store_mmk(&mmk[entries_m3u], entry, title, NULL, 0, -1, 0);
 		  playlist->entries = ++entries_m3u;
-		  ptitle = title = NULL;
+
+		  if(title)
+		    free(title);
+		  
+		  title = NULL;
+		  ptitle = NULL;
 		}
 		
 	      }
@@ -728,7 +755,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			mmkf_members[4] = 0;  /* offset */
 			mmkf_members[5] = 0;  /* sub */
 			
-			xine_strdupa(line, (atoa(buffer)));
+			line = strdup(atoa(buffer));
 			
 			while((m = xine_strsep(&line, ";")) != NULL) {
 			  char *key;
@@ -740,14 +767,14 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			      if(mmkf_members[0] == 0) {
 				mmkf_members[0] = 1;
 				set_pos_to_value(&key);
-				xine_strdupa(mmkf.ident, key);
+				mmkf.ident = strdup(key);
 			      }
 			    }
 			    else if(!strncasecmp(key, "subtitle", 8)) {
 			      if(mmkf_members[5] == 0) {
 				mmkf_members[5] = 1;
 				set_pos_to_value(&key);
-				xine_strdupa(mmkf.sub, key);
+				mmkf.sub = strdup(key);
 			      }
 			    }
 			    else if(!strncasecmp(key, "offset", 6)) {
@@ -775,7 +802,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			      if(mmkf_members[1] == -1) {
 				mmkf_members[1] = 1;
 				set_pos_to_value(&key);
-				xine_strdupa(mmkf.mrl, key);
+				mmkf.mrl = strdup(key);
 			      }
 			    }
 			  }
@@ -787,7 +814,7 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			}
 			
 			if(mmkf_members[0] == 0)
-			  xine_strdupa(mmkf.ident, mmkf.mrl);
+			  mmkf.ident = mmkf.mrl;
 			
 			/*
 			  STORE new mmk;
@@ -806,12 +833,20 @@ static mediamark_t **guess_toxine_playlist(playlist_t *playlist, const char *fil
 			  mmk = (mediamark_t **) xine_xmalloc(sizeof(mediamark_t *) * 2);
 			else
 			  mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_tox + 2));
+
 			mediamark_store_mmk(&mmk[entries_tox], 
 					    mmkf.mrl, mmkf.ident, mmkf.sub, 
 					    mmkf.start, mmkf.end, mmkf.offset);
 			
 			playlist->entries = ++entries_tox;
+
+			free(line);
 			
+			if(mmkf_members[0])
+			  free(mmkf.ident);
+			
+			free(mmkf.sub);
+			free(mmkf.mrl);
 		      }
 		      
 		    }
@@ -933,12 +968,12 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		  int   len        = 0;
 		  
 		  if(title && strlen(title)) {
-		    xine_strdupa(atitle, title);
+		    atitle = strdup(title);
 		    atitle = atoa(atitle);
 		    len = strlen(atitle);
 		    
 		    if(author && strlen(author)) {
-		      xine_strdupa(aauthor, author);
+		      aauthor = strdup(author);
 		      aauthor = atoa(aauthor);
 		      len += strlen(aauthor) + 3;
 		    }
@@ -947,7 +982,7 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		  }
 		  
 		  if(atitle && strlen(atitle)) {
-		    real_title = (char *) alloca(len);
+		    real_title = (char *) xine_malloc(sizeof(char *) * len);
 		    sprintf(real_title, "%s", atitle);
 		    
 		    if(aauthor && strlen(aauthor))
@@ -961,6 +996,13 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		  
 		  mediamark_store_mmk(&mmk[entries_asx], href, real_title, NULL, 0, -1, 0);
 		  playlist->entries = ++entries_asx;
+
+		  if(real_title)
+		    free(real_title);
+		  if(atitle)
+		    free(atitle);
+		  if(aauthor)
+		    free(aauthor);
 		}
 		
 		href = title = author = NULL;
