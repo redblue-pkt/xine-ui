@@ -305,6 +305,8 @@ void xitk_browser_set_select(xitk_widget_t *w, int select) {
     xitk_browser_release_all_buttons(w);
     
     xitk_labelbutton_set_state(private_data->item_tree[(select - private_data->current_start) + WBSTART], 1);
+    private_data->current_button_clicked = xitk_browser_get_current_selected(w);
+    gettimeofday(&private_data->click_time, 0);
   }
 }
 
