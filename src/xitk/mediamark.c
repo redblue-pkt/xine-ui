@@ -2220,7 +2220,7 @@ void mediamark_add_entry(const char *mrl, const char *ident,
    */
   if(mrl && (!sub) && gGui->subtitle_autoload) {
     
-    if(mrl_looks_like_file((char *) mrl)) {
+    if(mrl_look_like_file((char *) mrl)) {
       char        *know_subs = "sub,srt,asc,smi,ssa";
       char        *vsubs;
       char        *_mrl, *ending, *ext;
@@ -2570,7 +2570,7 @@ void mediamark_save_mediamarks(const char *filename) {
   }
 }
 
-int mrl_looks_playlist(char *mrl) {
+int mrl_look_like_playlist(char *mrl) {
   char *extension;
   
   extension = strrchr(mrl, '.');
@@ -2588,7 +2588,7 @@ int mrl_looks_playlist(char *mrl) {
   return 0;
 }
  
-int mrl_looks_like_file(char *mrl) {
+int mrl_look_like_file(char *mrl) {
   
   if(mrl && strlen(mrl)) {
     if((strncasecmp(mrl, "file:", 5)) && 
@@ -2818,7 +2818,7 @@ static void mmkeditor_select_sub(xitk_widget_t *w, void *data) {
   
   path = (*mmkeditor->mmk)->sub ? (*mmkeditor->mmk)->sub : (*mmkeditor->mmk)->mrl;
   
-  if(mrl_looks_like_file(path)) {
+  if(mrl_look_like_file(path)) {
     char *p;
     
     xine_strdupa(open_path, path);

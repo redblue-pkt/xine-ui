@@ -183,7 +183,7 @@ static void _playlist_xine_play(void) {
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
 
-    if(mrl_looks_playlist(mmk->mrl)) {
+    if(mrl_look_like_playlist(mmk->mrl)) {
       if(mediamark_concat_mediamarks(mmk->mrl)) {
 	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	mmk = mediamark_get_current_mmk();

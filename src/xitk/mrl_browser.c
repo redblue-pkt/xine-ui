@@ -392,7 +392,7 @@ static void mrl_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);
 
-    if(mrl_looks_playlist(_mrl)) {
+    if(mrl_look_like_playlist(_mrl)) {
       if(mediamark_concat_mediamarks(_mrl)) {
 	gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
 	_mrl = (char *) mediamark_get_current_mrl();

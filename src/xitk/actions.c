@@ -424,7 +424,7 @@ int gui_xine_open_and_play(char *_mrl, char *_sub, int start_pos,
 
   }
 
-  if(mrl_looks_playlist(mrl)) {
+  if(mrl_look_like_playlist(mrl)) {
     if(mediamark_concat_mediamarks(mrl)) {
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       mrl = gGui->mmk.mrl;
@@ -1120,6 +1120,7 @@ void gui_seek_relative (int off_sec) {
 }
 
 void gui_dndcallback(char *filename) {
+  int more_than_one = -1;
 
   if(filename) {
     char  buffer[strlen(filename) + 10];
@@ -1148,6 +1149,7 @@ void gui_dndcallback(char *filename) {
 	      *(p + (strlen(p) - 1)) = '\0'; 
 	    
 	    mediamark_collect_from_directory(p);
+	    more_than_one = gGui->playlist.cur;
 	    goto __do_play;
 	  }
 	  else
@@ -1166,6 +1168,7 @@ void gui_dndcallback(char *filename) {
 		buffer2[strlen(buffer2) - 1] = '\0'; 
 	      
 	      mediamark_collect_from_directory(buffer2);
+	      more_than_one = gGui->playlist.cur;
 	      goto __do_play;
 	    }
 	    else
@@ -1183,11 +1186,11 @@ void gui_dndcallback(char *filename) {
       sprintf(buffer, "%s", filename);
     
     if(is_a_dir(buffer)) {
-      
       if(buffer[strlen(buffer) - 1] == '/')
 	buffer[strlen(buffer) - 1] = '\0'; 
       
       mediamark_collect_from_directory(buffer);
+      more_than_one = gGui->playlist.cur;
     }
     else
       mediamark_add_entry(buffer, buffer, NULL, 0, -1, 0, 0);
@@ -1197,7 +1200,10 @@ void gui_dndcallback(char *filename) {
     playlist_update_playlist();
     
     if((xine_get_status(gGui->stream) == XINE_STATUS_STOP) || gGui->logo_mode) {
-      gGui->playlist.cur = (gGui->playlist.num - 1);
+      if((more_than_one > -1) && ((more_than_one + 1) < gGui->playlist.num))
+	gGui->playlist.cur = more_than_one + 1;
+      else
+	gGui->playlist.cur = gGui->playlist.num - 1;
       gui_set_current_mrl((mediamark_t *)mediamark_get_current_mmk());
       if(gGui->smart_mode)
 	gui_play(NULL, NULL);
@@ -1849,7 +1855,7 @@ void gui_select_sub(void) {
       
       path = mmk->sub ? mmk->sub : mmk->mrl;
       
-      if(mrl_looks_like_file(path)) {
+      if(mrl_look_like_file(path)) {
 	char *p;
 	
 	xine_strdupa(open_path, path);
