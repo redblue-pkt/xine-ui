@@ -672,8 +672,9 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 	    asx_entry = xml_tree->child;
 	    while(asx_entry) {
 	      if((!strcmp(asx_entry->name, "ENTRY")) || (!strcmp(asx_entry->name, "ENTRYREF"))) {
-		char *title = NULL;
-		char *href  = NULL;
+		char *title  = NULL;
+		char *href   = NULL;
+		char *author = NULL;
 
 		asx_ref = asx_entry->child;
 		while(asx_ref) {
@@ -682,13 +683,20 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 
 		    if(!title)
 		      title = asx_ref->data;
-		    
+
+		  }
+		  else if(!strcmp(asx_ref->name, "AUTHOR")) {
+
+		    if(!author)
+		      author = asx_ref->data;
+
 		  }
 		  else if(!strcmp(asx_ref->name, "REF")) {
 		    
 		    for(asx_prop = asx_ref->props; asx_prop; asx_prop = asx_prop->next) {
 
 		      if(!strcmp(asx_prop->name, "HREF")) {
+
 			if(!href)
 			  href = asx_prop->value;
 		      }
@@ -696,15 +704,34 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		      if(href)
 			break;
 		    }
-
 		  }		    
 
 		  if(href && strlen(href)) {
-		    char *atitle = NULL;
-		    
+		    char *atitle     = NULL;
+		    char *aauthor    = NULL;
+		    char *real_title = NULL;
+		    int   len        = 0;
+
 		    if(title && strlen(title)) {
 		      xine_strdupa(atitle, title);
 		      atitle = atoa(atitle);
+		      len = strlen(atitle);
+
+		      if(author && strlen(author)) {
+			xine_strdupa(aauthor, author);
+			aauthor = atoa(aauthor);
+			len += strlen(aauthor) + 3;
+		      }
+		      
+		      len++;
+		    }
+
+		    if(atitle && strlen(atitle)) {
+		      real_title = (char *) alloca(len);
+		      sprintf(real_title, "%s", atitle);
+		      
+		      if(aauthor && strlen(aauthor))
+			sprintf(real_title, "%s (%s)", real_title, aauthor);
 		    }
 		    
 		    entries_asx++;
@@ -714,13 +741,14 @@ static mediamark_t **guess_asx_playlist(playlist_t *playlist, const char *filena
 		    else
 		      mmk = (mediamark_t **) realloc(mmk, sizeof(mediamark_t *) * (entries_asx + 1));
 		    
-		    mediamark_store_mmk(&mmk[(entries_asx - 1)], href, atitle, 0, -1);
+		    mediamark_store_mmk(&mmk[(entries_asx - 1)], href, real_title, 0, -1);
 		    playlist->entries = entries_asx;
-		    href = title = NULL;
+		    href = title = author = NULL;
 		  }
 		  
 		  asx_ref = asx_ref->next;
 		}
+		href = title = author = NULL;
 	      }
 	      asx_entry = asx_entry->next;
 	    }
