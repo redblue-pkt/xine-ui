@@ -48,7 +48,7 @@
 #define MODIFIER_LOCK  0x00000002
 #define MODIFIER_CTRL  0x00000004
 #define MODIFIER_META  0x00000008
-#define MODIFIER_MOD2  0x00000010
+#define MODIFIER_NUML  0x00000010
 #define MODIFIER_MOD3  0x00000020
 #define MODIFIER_MOD4  0x00000040
 #define MODIFIER_MOD5  0x00000080
@@ -306,8 +306,8 @@ static void inputtext_erase_with_delete(widget_list_t *wl, widget_t *it) {
   char *p, *pp;
   int offset;
   
-  if(strlen(private_data->text) > 1) {
-    if((private_data->cursor_pos > 0)
+  if(strlen(private_data->text) > 0) {
+    if((private_data->cursor_pos >= 0)
        && (private_data->cursor_pos < strlen(private_data->text))) {
       
       oldtext = strdup(private_data->text);
@@ -335,7 +335,7 @@ static void inputtext_erase_with_delete(widget_list_t *wl, widget_t *it) {
       *pp = 0;
       
       free(private_data->text);
-      private_data->text = strdup(newtext);
+      private_data->text = strdup((newtext != NULL) ? newtext : "");
       
       paint_inputtext(it, wl->win, wl->gc);
       
@@ -487,11 +487,56 @@ static void inputtext_exec_escape(widget_list_t *wl, widget_t *it) {
 }
 
 /*
+ *
+ */
+static void inputtext_move_bol(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+
+  if(private_data->text) {
+    private_data->cursor_pos = 0;
+    paint_inputtext(it, wl->win, wl->gc);
+  }
+}
+
+/*
+ *
+ */
+static void inputtext_move_eol(widget_list_t *wl, widget_t *it) {
+  inputtext_private_data_t *private_data = 
+    (inputtext_private_data_t *) it->private_data;
+
+  if(private_data->text) {
+    private_data->cursor_pos = strlen(private_data->text);
+    paint_inputtext(it, wl->win, wl->gc);
+  }
+}
+
+/*
  * Extract modifier keys.
  */
 static int get_key_modifier(XEvent *xev, int *mod) {
   
   *mod = MODIFIER_NOMOD;
+
+  /*
+  if(xev->xbutton.state & ShiftMask)
+    printf("Shift\n");
+  if(xev->xbutton.state & LockMask)
+    printf("Lock\n");
+  if(xev->xbutton.state & ControlMask)
+    printf("Control\n");
+  if(xev->xbutton.state & Mod1Mask)
+    printf("Mod1\n");
+  if(xev->xbutton.state & Mod2Mask)
+    printf("Mod2\n");
+  if(xev->xbutton.state & Mod3Mask)
+    printf("Mod3\n");
+  if(xev->xbutton.state & Mod4Mask)
+    printf("Mod4\n");
+  if(xev->xbutton.state & Mod5Mask)
+    printf("Mod5\n");
+  */
   
   if(xev->xbutton.state & ShiftMask)
     *mod |= MODIFIER_SHIFT;
@@ -506,7 +551,7 @@ static int get_key_modifier(XEvent *xev, int *mod) {
     *mod |= MODIFIER_META;
 
   if(xev->xbutton.state & Mod2Mask)
-    *mod |= MODIFIER_MOD2;
+    *mod |= MODIFIER_NUML;
 
   if(xev->xbutton.state & Mod3Mask)
     *mod |= MODIFIER_MOD3;
@@ -544,20 +589,20 @@ static void notify_keyevent_inputtext(widget_list_t *wl,
     get_key_modifier(xev, &modifier);
 
     /* One of modifier key is pressed, none of keylock or shift */
-    if(((buf[0] != 0) && (buf[1] == 0)) && 
-       (((modifier != MODIFIER_NOMOD) &&
-	 ((modifier != MODIFIER_SHIFT) && (modifier != MODIFIER_LOCK))))) {
-
+    if(((buf[0] != 0) && (buf[1] == 0)) 
+       && ((modifier & MODIFIER_CTRL) 
+	   || (modifier & MODIFIER_META)
+	   || (modifier & MODIFIER_MOD3) 
+	   || (modifier & MODIFIER_MOD4)
+	   || (modifier & MODIFIER_MOD5))) {
+      
       switch(key) {
 
 	/* BOL */
       case XK_a:
       case XK_A:
 	if(modifier & MODIFIER_CTRL) {
-	  if(private_data->text) {
-	    private_data->cursor_pos = 0;
-	    paint_inputtext(it, wl->win, wl->gc);
-	  }
+	  inputtext_move_bol(wl, it);
 	}
 	break;
 	
@@ -576,7 +621,7 @@ static void notify_keyevent_inputtext(widget_list_t *wl,
 	  inputtext_exec_escape(wl, it);
 	}
 	break;
-
+	
 	/* Delete current char */
       case XK_d:
       case XK_D:
@@ -589,10 +634,7 @@ static void notify_keyevent_inputtext(widget_list_t *wl,
       case XK_e:
       case XK_E:
 	if(modifier & MODIFIER_CTRL) {
-	  if(private_data->text) {
-	    private_data->cursor_pos = strlen(private_data->text);
-	    paint_inputtext(it, wl->win, wl->gc);
-	  }
+	  inputtext_move_eol(wl, it);
 	}
 	break;
 
@@ -619,7 +661,13 @@ static void notify_keyevent_inputtext(widget_list_t *wl,
 	  inputtext_exec_return(wl, it);
 	}
 	break;
-	
+
+      case XK_question:
+	if(modifier & MODIFIER_CTRL) {
+	  inputtext_erase_with_backspace(wl, it);
+	}
+	break;
+
       }
     }
     else if(key == XK_Delete) {
@@ -633,6 +681,12 @@ static void notify_keyevent_inputtext(widget_list_t *wl,
     }
     else if(key == XK_Right) {
       inputtext_move_right(wl, it);
+    }
+    else if(key == XK_Home) {
+      inputtext_move_bol(wl, it);
+    }
+    else if(key == XK_End) {
+      inputtext_move_eol(wl, it);
     }
     else if((key == XK_Return) || (key == XK_KP_Enter)) {
       inputtext_exec_return(wl, it);
