@@ -77,7 +77,9 @@ static void _playlist_update_browser_list(int start) {
 			     playlist->playlist_len, start);
 
   if((sel >= 0) && (start == -1))
-    xitk_browser_set_select(playlist->playlist, sel);
+    xitk_browser_set_select(playlist->playlist, 
+			    sel - (xitk_browser_get_current_start(playlist->playlist)));
+
 }
 
 
