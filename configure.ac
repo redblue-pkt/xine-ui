@@ -97,7 +97,7 @@ dnl NLS Support
 dnl
 dnl AM_WITH_NLS(use-libtool,,)
 dnl ALL_LINGUAS="cs da de el en@quot en@boldquot es et fr gl id it ja ko nl nn no pl pt pt_BR ru sl sv tr zh"
-ALL_LINGUAS="fr es pt_BR de sk pl_PL uk cs"
+ALL_LINGUAS="fr es pt_BR de sk pl_PL uk cs it"
 AM_GNU_GETTEXT(use-libtool)
 dnl ac_sources="$nls_cv_header_libgt"
 dnl ac_dests="$nls_cv_header_intl"
