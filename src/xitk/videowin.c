@@ -171,7 +171,21 @@ void video_window_hide_logo(void) {
      * Remove the logo by clearing the window.
      */
     XClearWindow (gGui->display, gGui->video_window);
-     
+
+    /* Force ConfigureNotify event */
+    {
+      Window        rootwin;
+      int           xwin, ywin;
+      unsigned int  wwin, hwin, bwin, dwin;
+      
+      if(XGetGeometry(gGui->display, gGui->video_window, &rootwin, 
+		      &xwin, &ywin, &wwin, &hwin, &bwin, &dwin) != BadDrawable) {
+	
+	XMoveResizeWindow (gGui->display, gGui->video_window, xwin, ywin, wwin-1, hwin-1);
+	XMoveResizeWindow (gGui->display, gGui->video_window, xwin, ywin, wwin, hwin);
+      }
+    }
+    
     gGui->vo_driver->gui_data_exchange(gGui->vo_driver, GUI_DATA_EX_LOGO_VISIBILITY, (int *)0);
 #endif
     XUnlockDisplay (gGui->display);
