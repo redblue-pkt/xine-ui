@@ -255,7 +255,7 @@
 
 3.6.1 Zainstalowa³em xine-lib a xine-ui twierdzi ¿e nie mo¿e go znale¼æ!
 
-      Przede wszystkim przyjrzyj siê jeszcze raz dok³adnie punktowi 32.. Tam
+      Przede wszystkim przyjrzyj siê jeszcze raz dok³adnie punktowi 3.2. Tam
       prawdopodobnie znajdziesz odpowid¼ na swoje pytanie.
 
       Tak jak to jest opisane w punkcie 3.2 (jeszcze raz ta podpowied¼), upewnij
@@ -379,7 +379,7 @@
 
        - ustaw i u¿ywaj "surowego" urz±dzenia dla DVD-ROM (raw device).
 
-         Surowe urz±dzenia powinny byæ dostêpne w j±drach serii 24..x i
+         Surowe urz±dzenia powinny byæ dostêpne w j±drach serii 2.4.x i
          ³aty dla starszych j±der mo¿na znale¼æ tutaj:
 
           => ftp://ftp.kernel.org/pub/linux/kernel/people/sct/raw-io/
@@ -517,7 +517,7 @@
 
 5.2.1 Kiedy odtwarzam tê próbkê widzê obraz ale nie ma d¼wiêku!
 
-      To mo¿e siê zdarzyæ z niektórymi materia³ami mpeg-2 jak DVD..
+      To mo¿e siê zdarzyæ z niektórymi materia³ami mpeg-2 jak DVD.
       Spróbuj inny kana³ wideo:
 
        xine -a channel stream.vob
@@ -584,7 +584,7 @@
 5.2.6 Zmiana g³o¶no¶ci przez interfejs u¿ytkonika xine nic nie daje! Co jest!?
 
       Niektóre ze sterowników xine nie wspieraj± zmiany natê¿enia d¼wiêku,
-      mimo ¿e suwak zmiany g³o¶no¶ci pozostaje widoczny na panelu Czêsto nie
+      mimo ¿e suwak zmiany g³o¶no¶ci pozostaje widoczny na panelu. Czêsto nie
       jest to b³±d xine: aRts C API, na przyk³ad, nie oferuje ¿adnej w³a¶ciwo¶ci
       g³o¶no¶ci dla aplikacji.
 
@@ -704,7 +704,7 @@
 
 5.4.2 "no video port found"
 
-      Masz rozszerzenie Xv, ale sterownik Twojej karty wideo nie wspiera go..
+      Masz rozszerzenie Xv, ale sterownik Twojej karty wideo nie wspiera go.
       Po pierwsze spróbuj znale¼æ sterownik który wspiera Xv na Twoim sprzêcie
       (sprawdz u dystrybutora twojej karty graficznej). Je¶li Twój sterownik
       wspiera Xv ale wci±¿ nie mo¿esz go uruchomiæ, spróbuj ni¿sz± rozdzielczo¶æ
@@ -740,7 +740,7 @@
       na odpowiedni kod regionu. (zobacz równie¿ 5.1.8)
 
       Ostatnie wesje xine prawdopodobnie sprawdz± czy DVD, które próbujesz
-      odtworzyæ, jest zaszyfrowane i poinformuj± Ciê o tym. (zobacz 5..4.5)      
+      odtworzyæ, jest zaszyfrowane i poinformuj± Ciê o tym. (zobacz 5.4.5)      
 
 5.4.5 "input_dvd: Sorry, xine doesn't play encrypted DVDs. The legal status
        of CSS decryption is unclear and we will not provide such code."
@@ -802,5 +802,3 @@
     # T³umaczenie: Bart³omiej Muryn #
     #    mailto: _4ever_@irc.pl     #
     #################################
-
-
