@@ -26,7 +26,9 @@
 #endif
 
 #include "main.h"
+#ifdef HAVE_LIRC
 #include "lirc.h"
+#endif
 #include "keys.h"
 #include "options.h"
 
@@ -163,14 +165,18 @@ int main(int argc, char *argv[])
 		goto err_stream;
 	if(!init_keyboard())
 		goto err_keyboard;
+#ifdef HAVE_LIRC
 	init_lirc();
+#endif
 
 	fbxine.running = 1;
 	wait_for_key();
 
 	exit_code = 0;
 	
+#ifdef HAVE_LIRC
 	exit_lirc();
+#endif
 	exit_keyboard();
 err_keyboard:
 	xine_close(fbxine.stream);
