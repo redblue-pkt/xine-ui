@@ -138,9 +138,23 @@
   That's done on purpose.  It  prevents  possible  yet  harmless  screen
   corruption. And by the way - why would you want to see  a  movie  just
   partly?! ;-)
-  
+
+
+* MY DESKTOP BACKGROUND IMAGE GETS CORRUPTED WHEN USING THIS PLUGIN!
+
+  Even though it doesn't look nice, it's nevertheless harmless.    So no
+  need to worry about it. XFree86 is using your  free  video  memory  as
+  cache for certain things. Now when you use this plugin  that  part  of
+  your video memory could also be used by the syncfb module.     So your
+  image data cached there will be corrupted.   Unfortunately there is no
+  way to avoid it. Yet, like stated earlier, it is truely  harmless  and
+  just a cosmetical side effect.
+
   
 * KNOWN BUGs
+
+  + activating hardware deinterlacing produces a flashing  line  at  the
+    bottom of the picture
 
   + stopping playback doesn't turn off the syncfb overlay
     
@@ -153,8 +167,11 @@
 
 * WHAT IS ON THE TODO LIST?
 
-  + hardware deinterlacing support
-   
+  + fixing hardware deinterlacing support
+  + patching the syncfb kernel module itself for devfs and the  recently
+    introduced license tag support
+  + updating the documentation
+  
   + bug fixes
   + new features
   + optimizations
