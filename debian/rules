@@ -80,6 +80,11 @@ install: build
 
 	$(MAKE) $(INSTALL_TARGET) DESTDIR=$(CURDIR)/debian/xine-ui
 	install -m 644 README debian/xine-ui/usr/share/doc/xine-ui
+	# these must not be compressed, or xine's online help will fail:
+	cd debian/xine-ui/usr/share/doc/xine-ui; \
+	mkdir -p ../../xine/doc; \
+	mv README.config_?? README_?? FAQ_?? ../../xine/doc; \
+	ln -s ../../xine/doc/* .
 
 binary-indep: build install
 # We have nothing to do by default.

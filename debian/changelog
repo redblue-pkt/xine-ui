@@ -1,3 +1,9 @@
+xine-ui (0.9.17-2) unstable; urgency=low
+
+  * keeping uncompressed versions of onliine documentation (closes: #158838)
+
+ -- Siggi Langauf <siggi@debian.org>  Thu,  9 Jan 2003 00:47:31 +0100
+
 xine-ui (0.9.17-1) unstable; urgency=medium
 
   * new upstream release
