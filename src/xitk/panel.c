@@ -294,7 +294,7 @@ static void *slider_loop(void *dummy) {
       if(panel_is_visible()) {
 	if(gGui->xine) {
 	  
-	  if((status == XINE_STATUS_PLAY) && (!gGui->logo_mode)) {
+	  if((status == XINE_STATUS_PLAY) && (gGui->logo_mode == 0)) {
 	    int pos;
 	    
 	    xine_get_pos_length(gGui->stream, &pos, NULL, NULL);

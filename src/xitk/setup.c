@@ -29,7 +29,6 @@
 #include <errno.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/extensions/shape.h>
 #include <X11/keysym.h>
 #include <pthread.h>
 #include <assert.h>
