@@ -216,8 +216,8 @@
       [MEZERNÍK]       pozastavit
       [Nahoru]/[Dolù]  rychle vpøed / pomalý pohyb
 
-      0                posuv na zaèátek aktuální sekvence
-      1-9              posuv na 10-90% aktuální sekvence
+      0-9              zadání odpovídajícího èísla
+      /                posuv na zadaný poèet procent
       [Vlevo]/[Vpravo] skoèit o -+ 15 sekund (+CTRL: 60 sekund)
       [PgUp]/[Prior]   skoèit na pøedcházející polo¾ku playlistu
       [PgDown]/[Next]  skoèit na dal¹í polo¾ku playlistu
@@ -353,18 +353,20 @@
 
        xine test.avi#subtitle:test.sub
 
-      Pro správné zobrazení èeských znakù musíte zmìnit font titulkù ze "sans"
-      na "sanshu". Lze to provést buï v konfiguraèním dialogu nebo editací
+      Pro správné zobrazení èeských znakù zkontrolujte nastavené kódování
+      souboru s titulky, pøednastaveno je windows-1250.
+      Ve verzi xine-lib <= beta12 bylo tøeba zmìnit i font titulkù ze 
+      "sans" na "sanshu". Nyní u¾ pøednastavený font "sans" obsahuje v¹echny
+      èeské znaky s diakritikou.
+
+      Úpravy lze provést buï v konfiguraèním dialogu nebo editací
       konfiguraèního souboru ~/.xine/config2. Ten by mìl obsahovat tyto údaje:
 
       # string, default: sans
-        codec.spu_font:sanshu
+        codec.spu_font:sans
 
       # string, default: windows-1250
         codec.spu_src_encoding:windows-1250
-
-      # string, default: iso-8859-2
-        codec.spu_dst_encoding:iso-8859-2
 
 2.4.4 LIRC
 
