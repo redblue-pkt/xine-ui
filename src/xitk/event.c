@@ -1292,8 +1292,8 @@ void gui_init (int nfiles, char *filenames[], window_attributes_t *window_attrib
 						     100, 0, 200,
 						     _("Amplification level"),
 						     NULL,
-						     CONFIG_LEVEL_ADV,
-						     CONFIG_NO_CB, 
+						     CONFIG_LEVEL_DEB,
+						     dummy_config_cb, 
 						     CONFIG_NO_DATA);
 
   gGui->splash = 
