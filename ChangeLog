@@ -1,4 +1,24 @@
+xine-ui (0.9.17) unstable; urgency=low
+
+  * keep in mind origin path for filebrowser (per session),
+  * support X resource manager,
+  * fix combo widget autoroll bug,
+  * fix segfault with large playlists,
+  * fix "slider jump to 0 on seek" bug,
+  * Polish man updates,
+  * fix autoplay button mrls handling,
+  * fix playback control locking with playlist loading and mrl browser selections,
+  * add save button in configuration window,
+  * support origin path for m3u playlists,
+  * some OSD cleanups,
+  * fix OSD crashing with small steams or when video window was hidded
+  * automatically hide video window when DXR3 and TVout is used,
+  * user level experience configuration support,
+  * setup enumerate audio/video plugins.
+  * add support of post plugins.
+	
 xine-ui (0.9.16) unstable; urgency=low
+
   * some bug fixes: config dialog segfault, several race conditions
   * add a real file browser, used to load/save playlist, open a stream,
   * aspect ratio fix
