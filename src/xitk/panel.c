@@ -253,26 +253,29 @@ void panel_update_runtime_display(void) {
       return;
   }
 
-  if((pos || seconds) && length) {
+  if(pos || seconds) {
     remain = (length - seconds) / 1000;
     seconds /= 1000;
-    length /= 1000;
     
     if(panel->runtime_mode == 0)
       sprintf(timestr, "%02d:%02d:%02d", seconds / (60*60), (seconds / 60) % 60, seconds % 60);
     else
       sprintf(timestr, "%02d:%02d:%02d", remain / (60*60), (remain / 60) % 60, remain % 60);
     
+  }
+  else
+    sprintf(timestr, "%s", "--:--:--");
+  
+  if(length) {
+    length /= 1000;
     sprintf(buffer, _("Total time: %02d:%02d:%02d"), 
 	    length / (60*60), (length / 60) % 60, length % 60);
   }
-  else {
-    sprintf(timestr, "%s", "--:--:--");
+  else
     sprintf(buffer, "%s", _("Total time: --:--:--"));
-  }
-
+  
   xitk_set_widget_tips(panel->runtime_label, buffer);
-
+  
   xitk_label_change_label(panel->runtime_label, timestr); 
 }
 
