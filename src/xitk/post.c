@@ -134,11 +134,12 @@ static char         **post_audio_plugins;
 
 /* Some functions prototype */
 static void _pplugin_unwire(void);
-static post_element_t **pplugin_parse_and_load(const char *pchain, int *post_elements_num);
+static post_element_t **pplugin_parse_and_load(const char *, int *);
 static void _pplugin_rewire(void);
-void _pplugin_rewire_from_post_elements(post_element_t **post_elements, int post_elements_num);
-static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *post_elements_num);
+void _pplugin_rewire_from_post_elements(post_element_t **, int);
+static post_element_t **_pplugin_join_deinterlace_and_post_elements(int *);
 static void _pplugin_save_chain(void);
+static void _pplugin_close_help(xitk_widget_t *, void *);
 
 static void post_deinterlace_plugin_cb(void *data, xine_cfg_entry_t *cfg) {
   post_element_t **posts = NULL;
@@ -381,6 +382,7 @@ static void _pplugin_hide_obj(post_object_t *pobj) {
     DISABLE_ME(pobj->comment);
     DISABLE_ME(pobj->up);
     DISABLE_ME(pobj->down);
+    DISABLE_ME(pobj->help);
   }
 }
 
@@ -397,6 +399,9 @@ static void _pplugin_show_obj(post_object_t *pobj) {
     if(pobj->properties)
       xitk_set_widget_pos(pobj->properties, pobj->x + 200, pobj->y + 2);
     
+    if(pobj->help)
+      xitk_set_widget_pos(pobj->help, pobj->x + 390, pobj->y);
+
     if(pobj->comment)
       xitk_set_widget_pos(pobj->comment, pobj->x + 30, (pobj->y + 27));
     
@@ -415,6 +420,9 @@ static void _pplugin_show_obj(post_object_t *pobj) {
     ENABLE_ME(pobj->value);
     ENABLE_ME(pobj->comment);
 
+    if(pobj->help)
+      ENABLE_ME(pobj->help);
+    
     if((!_pplugin_is_first_filter(pobj)) && (xitk_combo_get_current_selected(pobj->plugins)))
       ENABLE_ME(pobj->up);
     
@@ -810,6 +818,14 @@ static void _pplugin_destroy_only_obj(post_object_t *pobj) {
       _pplugin_destroy_widget(pobj->value);
       pobj->value = NULL;
     }
+
+    if(pobj->api && pobj->help) {
+      if(pplugin->help_running)
+	_pplugin_close_help(NULL,NULL);
+      _pplugin_destroy_widget(pobj->help);
+      pobj->help = NULL;
+    }
+    
   }
 }
 
@@ -961,7 +977,14 @@ static void _pplugin_show_help(xitk_widget_t *w, void *data) {
   xitk_labelbutton_widget_t   lb;
   xitk_browser_widget_t       br;
 
+  if(!pobj->api) {
+    if(pplugin->help_running)
+      _pplugin_close_help(NULL,NULL);
+    return;
+  }
+  
   /* create help window if needed */
+
   if( !pplugin->help_running ) {
     x = y = 100;
     pplugin->helpwin = xitk_window_create_dialog_window(gGui->imlib_data, 
@@ -1114,21 +1137,23 @@ static void _pplugin_retrieve_parameters(post_object_t *pobj) {
     xitk_combo_set_select(pobj->properties, 0);
     xitk_combo_callback_exec(pobj->properties);
 
+    if(pobj->api && pobj->api->get_help) {
 
-    XITK_WIDGET_INIT(&lb, gGui->imlib_data);
-    lb.button_type       = CLICK_BUTTON;
-    lb.label             = _("Help");
-    lb.align             = ALIGN_CENTER;
-    lb.callback          = _pplugin_show_help; 
-    lb.state_callback    = NULL;
-    lb.userdata          = pobj;
-    lb.skin_element_name = NULL;
-    xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
-     (pobj->help = xitk_noskin_labelbutton_create(pplugin->widget_list, 
-						  &lb, pobj->x + 390, pobj->y, 50, 20,
-						  "Black", "Black", "White", btnfontname)));
-    xitk_show_widget(pobj->help);
-    xitk_enable_widget(pobj->help);
+      XITK_WIDGET_INIT(&lb, gGui->imlib_data);
+      lb.button_type       = CLICK_BUTTON;
+      lb.label             = _("Help");
+      lb.align             = ALIGN_CENTER;
+      lb.callback          = _pplugin_show_help; 
+      lb.state_callback    = NULL;
+      lb.userdata          = pobj;
+      lb.skin_element_name = NULL;
+      xitk_list_append_content((XITK_WIDGET_LIST_LIST(pplugin->widget_list)), 
+			       (pobj->help = xitk_noskin_labelbutton_create(pplugin->widget_list, 
+									    &lb, pobj->x + 390, pobj->y, 50, 20,
+									    "Black", "Black", "White", btnfontname)));
+      xitk_show_widget(pobj->help);
+      xitk_enable_widget(pobj->help);
+    }
   }
   else {
     xitk_label_widget_t   lb;

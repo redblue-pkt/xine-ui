@@ -1068,7 +1068,6 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
   
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
   
-  
   while(fx) {
     
     if(fx->key == *key) {
@@ -1079,10 +1078,15 @@ void xitk_unregister_event_handler(xitk_register_key_t *key) {
 	free(fx->xdnd);
       }
 
+      fx->xevent_callback = NULL;
+      fx->newpos_callback = NULL;
+      fx->user_data       = NULL;
+
       xitk_list_delete_current(gXitk->gfx); 
 
       free(fx->name);
       free(fx);
+      fx = NULL;
       
       MUTUNLOCK();
       return;
@@ -1105,7 +1109,7 @@ int xitk_get_window_info(xitk_register_key_t key, window_info_t *winf) {
   fx = (__gfx_t *) xitk_list_first_content(gXitk->gfx);
     
   while(fx) {
-
+    
     if((fx->key == key) && (fx->window != None)) {
       Window c;
       
