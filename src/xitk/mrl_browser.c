@@ -354,20 +354,14 @@ static void mrl_add(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 static void mrl_add_and_play(xitk_widget_t *w, void *data, xine_mrl_t *mrl) {
 
   if(mrl) {
-    mediamark_t mmk;
-
+    
     if((xine_get_status(gGui->stream) != XINE_STATUS_STOP)) {
       gGui->ignore_next = 1;
-      xine_stop (gGui->stream);
+      xine_stop(gGui->stream);
       gGui->ignore_next = 0;
     }
-
-    mmk.mrl = mrl->mrl;
-    mmk.ident = mrl->mrl;
-    mmk.start = 0;
-    mmk.end = -1;
-
-    gui_set_current_mrl(&mmk);
+    
+    gui_dndcallback((char *)mrl->mrl);
     
     if(!is_playback_widgets_enabled())
       enable_playback_controls(1);

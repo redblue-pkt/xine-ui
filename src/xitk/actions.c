@@ -257,9 +257,9 @@ int gui_xine_open_and_play(char *_mrl, int start_pos, int start_time) {
     return 0;
   }
 
-  /*if(!strcmp(mrl, gGui->mmk.mrl))
-    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;*/
-
+  if(!strcmp(mrl, gGui->mmk.mrl))
+    gGui->playlist.mmk[gGui->playlist.cur]->played = 1;
+  
   return 1;
 }
 
