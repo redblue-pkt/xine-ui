@@ -501,7 +501,7 @@ static void notify_change_skin(xitk_widget_list_t *wl,
   if (it->widget_type & WIDGET_TYPE_INPUTTEXT) {
     if(private_data->skin_element_name) {
       XITK_FREE(private_data->fontname);
-      private_data->fontname      = xitk_skin_get_label_fontname(skonfig, private_data->skin_element_name);
+      private_data->fontname      = strdup(xitk_skin_get_label_fontname(skonfig, private_data->skin_element_name));
       
       XITK_FREE_XITK_IMAGE(private_data->imlibdata->x.disp, private_data->skin);
       private_data->skin          = xitk_image_load_image(private_data->imlibdata, 
@@ -510,9 +510,9 @@ static void notify_change_skin(xitk_widget_list_t *wl,
       private_data->max_visible   = (private_data->skin->width/2);
       
       XITK_FREE(private_data->normal_color);
-      private_data->normal_color  = xitk_skin_get_label_color(skonfig, private_data->skin_element_name);
+      private_data->normal_color  = strdup(xitk_skin_get_label_color(skonfig, private_data->skin_element_name));
       XITK_FREE(private_data->focused_color);
-      private_data->focused_color = xitk_skin_get_label_color_focus(skonfig, private_data->skin_element_name);
+      private_data->focused_color = strdup(xitk_skin_get_label_color_focus(skonfig, private_data->skin_element_name));
       
       it->x                       = xitk_skin_get_coord_x(skonfig, private_data->skin_element_name);
       it->y                       = xitk_skin_get_coord_y(skonfig, private_data->skin_element_name);
