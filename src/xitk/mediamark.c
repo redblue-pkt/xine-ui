@@ -2925,10 +2925,9 @@ int mrl_look_like_file(char *mrl) {
   return 1;
 }
 
-void mediamark_collect_from_directory(char *_filepathname) {
+void mediamark_collect_from_directory(char *filepathname) {
   DIR           *dir;
   struct dirent *dentry;
-  char          *filepathname = strdup(_filepathname);
   
   if((dir = opendir(filepathname))) {
     
@@ -2951,7 +2950,7 @@ void mediamark_collect_from_directory(char *_filepathname) {
 	}
 	else {
 	  char *p, *extension;
-	  char  loname[XITK_PATH_MAX + XITK_NAME_MAX];
+	  char  loname[XITK_PATH_MAX + XITK_NAME_MAX] = "";
 	  
 	  p = strncat(loname, fullpathname, strlen(fullpathname));
 	  while(*p && (*p != '\0')) {
@@ -2981,7 +2980,6 @@ void mediamark_collect_from_directory(char *_filepathname) {
     }
     closedir(dir);
   }
-  free(filepathname);
 }
 
 /*
