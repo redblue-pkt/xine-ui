@@ -388,6 +388,9 @@ void gui_set_current_position (int pos) {
   
   if(!xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE) || (gGui->ignore_status == 1))
     return;
+    
+  if(xine_get_status(gGui->xine) != XINE_STATUS_PLAY)
+    xine_open(gGui->xine, gGui->filename);
   
   gGui->ignore_status = 1;
   
@@ -402,6 +405,9 @@ void gui_seek_relative (int off_sec) {
   int err;
   
   if(!xine_get_stream_info(gGui->xine, XINE_STREAM_INFO_SEEKABLE) || (gGui->ignore_status == 1))
+    return;
+  
+  if(xine_get_status(gGui->xine) != XINE_STATUS_PLAY)
     return;
   
   gGui->ignore_status = 1;
