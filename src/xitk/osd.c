@@ -218,7 +218,7 @@ void osd_stream_infos(void) {
     char        buffer[256], *p;
     int         x, y;
     int         w, h, osdw;
-    int         playedtime, totaltime;
+    int         playedtime, totaltime, pos;
     int         audiochannel, spuchannel, len;
 
     vcodec       = xine_get_meta_info(gGui->stream, XINE_META_INFO_VIDEOCODEC);
@@ -229,7 +229,7 @@ void osd_stream_infos(void) {
     audiochannel = xine_get_param(gGui->stream, XINE_PARAM_AUDIO_CHANNEL_LOGICAL);
     spuchannel   = xine_get_param(gGui->stream, XINE_PARAM_SPU_CHANNEL);
 
-    if(!gui_xine_get_pos_length(gGui->stream, NULL, &playedtime, &totaltime))
+    if(!gui_xine_get_pos_length(gGui->stream, &pos, &playedtime, &totaltime))
       return;
     
     playedtime /= 1000;
@@ -335,8 +335,7 @@ void osd_stream_infos(void) {
       if(w > osdw)
 	osdw = w;
 
-      osd_draw_bar(_("Position in Stream"), 0, 100, 
-		   (((float)playedtime / (float)totaltime) * 100), OSD_BAR_PROGRESS);
+      osd_stream_position(pos);
     }
     
     x = (vwidth - osdw) - 40;
@@ -446,6 +445,10 @@ void osd_draw_bar(char *title, int min, int max, int val, int type) {
     
     gGui->osd.bar_visible = gGui->osd.timeout;
   }
+}
+
+void osd_stream_position(int pos) {
+  osd_draw_bar(_("Position in Stream"), 0, 65535, pos, OSD_BAR_PROGRESS);
 }
 
 void osd_update_status(void) {

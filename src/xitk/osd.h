@@ -34,6 +34,7 @@ void osd_deinit(void);
 void osd_update(void);
 void osd_stream_infos(void);
 void osd_update_status(void);
+void osd_stream_position(int pos);
   /* see OSD_BAR_* */
 void osd_draw_bar(char *title, int min, int max, int val, int type);
 #endif

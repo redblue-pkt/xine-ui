@@ -638,6 +638,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
 	
 	if(gui_xine_get_pos_length(gGui->stream, &pos, NULL, NULL))
 	  xitk_slider_set_pos(panel->playback_widgets.slider_play, pos);
+	
 	panel_update_runtime_display();
         }
       }
@@ -645,6 +646,7 @@ static void panel_slider_cb(xitk_widget_t *w, void *data, int pos) {
   else if(w == panel->mixer.slider) {
     gGui->mixer.volume_level = pos;
     xine_set_param(gGui->stream, XINE_PARAM_AUDIO_VOLUME, gGui->mixer.volume_level);
+    osd_draw_bar(_("Audio Volume"), 0, 100, gGui->mixer.volume_level, OSD_BAR_STEPPER);
   }
   
   panel_check_pause();
