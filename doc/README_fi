@@ -1,0 +1,424 @@
+ Here's the Finnish translation of readme file (also thanks to Robin & Siggi):
+
+
+
+
+
+ ++++++++++++++++++++++                                 +++++++++++++++++++++
+                        XINE: Ilmainen/vapaa videosoitin       
+ ++++++++++++++++++++++                                 +++++++++++++++++++++
+
+
+  VERSION
+    => $Id$
+     
+     
+ INDEX
+ -===-
+   
+   1   K‰yttˆohje
+   1.1 Esikatselmus
+   
+   2   Xine:st‰
+   2.1 Tuetut k‰yttˆj‰rjestelm‰t ja vaatimukset
+   2.2 K‰ytetyt ohjelmat
+   2.3 Xine:n kehitt‰j‰t
+   2.4 K‰yttˆ
+   2.4.1 Pik‰n‰pp‰imet
+   2.4.2 Audio-kanavien valinta
+   2.4.3 Tekstityksen valinta
+   
+   3   Viel‰ sanottavaa
+   3.1 Vapaus, dvd:t ja muuta...
+   
+   4   Yhteyden ottaminen 
+
+
+
+
+
+
+
+1   K‰yttˆohje
+
+1.1 Esikatselmus
+
+    T‰m‰ on loppuk‰ytt‰j‰n k‰yttˆhje xine-lib:lle ja xine-ui:lle. Lˆyd‰t
+    lis‰‰ dokumentaatiota molempien pakettien doc/ hakemistosta.
+    
+    Katso myˆs tarkemmin FAQ (Useimmiten Kysytyt Kysymykset/UKK) tiedostoa
+    xine-ui paketissa, jossa voi olla jo vastaus kysymykseesi.
+
+
+2   Xine:st‰
+
+    Xine on ilmainen/vapaa GPL-lisensoitu videosoitin unix-tyylisille k‰yttˆ-
+    j‰rjestelmille. Xine tukee mpeg-2 ja mpeg-1 (audio + video) tiedostoita,
+    mpeg p‰‰virtoja (audio/video ainostaan, esim. mp3 tiedostoja), AVI
+    tiedostoja useilla video-formaateilla (joitakin k‰ytt‰en win32 dll:‰)
+    ja Vorbis OGG virtoja. Sek‰ hieman quicktime virtoja (mutta useimmat
+    quicktime video ja audio koodekit ovat patentoituja ja siksi ei tuettuja).
+    
+    Xine toistaa video ja audio dataa virrasta ja synkronoi niiden toiston.
+    Riippuen virran ominaisuuksista, toistaminen vaatii enemm‰n tai v‰hemm‰n
+    tehoa, t‰ydell‰ toistolla mpeg-2 on n‰hty toimivan 400 MHz P II j‰rjes-
+    telm‰ll‰.
+    
+    Xine voi toistaa Vdeo CD:t‰, SVCD:t‰ ja DVD:t‰ suoraan. Ik‰v‰ kyll‰
+    salatun/lukitun DVD:n toistamisen laillisuus joissakin maissa on
+    ep‰varmaa, joten Xine ei sis‰ll‰ DVD koodin purkamista. Sellaisen
+    DVD:n toistamiseen tarvitset erillisen ohjelman tai kuten
+    xine_dvd_plugin:n joka osaa hoitaa DVD:n purkamisen.
+    
+    Xine:n projekti tiimi kielt‰‰ kaiken vastuun xine:n k‰ytt‰misen ko.
+    tarkoituksiin.
+
+    Xine 0.5 versiosta l‰htien Xine:n arkkitehtuuri sallii joustavat
+    "pluginit", joten monenlaiset muut virta-tyypit ja ulostulo-laitteet
+    voisivat olla tuettuja tulevaisuudessa.
+    
+2.1 Tuetut k‰yttˆj‰rjestelm‰t ja vaatimukset
+
+    - Xine vaatii X11 serverin video-ulostulolle
+      (8, 15, 16, 24 or 32 bitin v‰risyvyydell‰)
+      
+    - Xine voi tunnistaa ja k‰ytt‰‰ MIT X videota ja X:n jaetun muistin
+      laajennusta parempaan toistoon suoritukseen.
+      
+    - Jos et saa Xv:t‰ toimimaan k‰yttˆj‰rjestelm‰ss‰si, t‰ytyisi sinun
+      k‰ytt‰‰ 16 bitin v‰risyvyytt‰ nopeuden takia. Xv n‰ytt‰‰ toimivan
+      hyvin mill‰ tahansa v‰risyvyydell‰.
+      
+    - Jos omistat Matrox G200/G400/G450 n‰ytˆnohjaimen voit myˆs k‰ytt‰‰
+      sybcfb/teletux video-ulostulo ajuria. Katso README.syncfb :st‰
+      lis‰tietoa.
+      
+    - ‰‰nen toistamiseen OSS, ALSA, ESD ja ARTSD ovat tuettuja.
+    - aaxine k‰ytt‰‰ aalib :i‰ ulostuloon ja toimii l‰hes kaikilla
+      terminaaleilla.
+    - Xine:n k‰‰nt‰miseen vaaditaan melko uusi GNU make, gcc ja binutils.
+
+    Xine:n pit‰isi toimia i386-yhteensopivilla koneilla (pentium tai
+    uudempi) joka k‰ytt‰‰ GNU/linux:ia tai FreeBSD:t‰. Riippuen toista-
+    mastasi video-virrasta, tarvitset enemm‰n tai v‰hemm‰n prosessori-
+    tehoa. Peruss‰‰ntˆn‰ on, ett‰ DVD:t yleens‰ pyˆriv‰t hyvin
+    Pentium II 400 j‰rjestelm‰ll‰ (tai vastaavalla). T‰h‰n vaikuttaa
+    useita tekijˆit‰, joten vaatimukset voivat vaihdella.
+
+    Onnistuneesti testatut n‰ytˆnohjaimet (k‰ytt‰en Xv:t‰) Pc:lle ovat:
+    nVidia Riva TNT (suljetuille nvidia ajureilla), nVidia Riva TNT 2,
+    Matrox G400, ATI AIW Rage128-16MB, 3dfx voodoo 2000 PCI 16Mb.
+    
+    Seuraavien korttien on raportoitu toimivan, mutta on ep‰selv‰‰ toimi-
+    vatko ne Xv:n vaiko vain XShm:n kanssa (raportoikaa asiasta xine-user
+    postituslistalle):
+         
+     Trident 9660, ATI AIW M64-8Mb PCI, ATI RageII 8MB.
+
+    Xine:n pit‰isi pysty‰ n‰ytt‰m‰‰n videota mill‰ tahansa toimivalla
+    xserver:ll‰ mill‰ tahansa n‰ytˆnohjaimella, mutta huonommalla tuloksella
+    kuin Xv:n kanssa.
+
+    Vaihtoehtoisesti, Xine pyˆrii myˆs i386-solariksella, sparc koneilla
+    jotka k‰ytt‰v‰t linuxia ja solarista (Creator-3d framebufferin tiedet‰‰n
+    toimivan), katso README.solaris :sta lis‰tietoa.
+    
+    Viimeisinp‰n‰, muttei v‰himm‰isen‰, Xine:n on kuultu toimivan Alphalla,
+    IA-64 ja S/390 koneilla.
+
+2.2 K‰ytetetyt ohjelmat
+
+    Xine k‰ytt‰‰ koodia seuraavista ulkoisista projekteista:
+
+     - liba52 - Aaron Holtzman ja Michel Lespinasse
+     - libmpeg2 - Aaron Holtzman ja Michel Lespinasse
+     - libmad - Robert Leslie
+     - libffmpeg - Gerard Lantau
+
+    Ilman n‰it‰ mahtavia ohjelman palasia Xine ei tietenk‰‰n olisi
+    nykyisess‰ pisteess‰‰n.
+
+    Sek‰ lis‰ksi paljon kiitoksia Linux Video ja DVD Projektille "LiViD",
+    josta alkuper‰iset Xine videosoittimen ideat tuli.
+     
+     => http://www.linuxvideo.org/
+
+2.3 Xine:n kehitt‰j‰t
+
+    p‰‰-xine-kehitt‰j‰
+      Guenter Bartsch
+
+    useita ehdotuksia, bugi ja k‰‰nt‰misen korjauksia, alsa plugini, gui
+      Daniel Caujolle-Bert 
+
+    audio ohjelmointi
+      Siegfried Langauf 
+
+    mahtavat libmpeg2 ja libac3 hakkeroinnit:
+      Michael Lespinasse
+  
+    Plus useita muita kehitt‰ji‰, katso xine-lib/AUTHORS tiedosto
+
+2.4 K‰yttˆ
+    
+    Voit k‰ynnist‰‰ Xine:n ilman komentorivin parametrej‰ tai voit valita
+    yhden tai useamman virran suoraan. Xine yritt‰‰ tunnistaa voiko se k‰ytt‰‰
+    Xv laajennusta ja palaa takaisin XShm:n, mutta t‰m‰ tunnistus voi ep‰-
+    onnistua. Voit m‰‰ritell‰ video-ulostulo pluginin k‰ytt‰m‰ll‰ "-V"
+    parametri‰. Esim.
+
+     xine -V XShm
+
+    pakottaa Xine:n k‰ytt‰m‰‰n XShm:‰‰ tai pelkk‰‰ X11:ta.
+
+    Jos haluat l‰hett‰‰ ‰‰nen verkon yli ESD:ll‰, aseta ESPEAKER
+    ymp‰ristˆmuuttuja (enviroment variable) ennen Xine:n k‰ynnistyst‰.
+
+    K‰ytett‰v‰ virta voi olla tiedostonimi tai joko k‰ytt‰m‰mme
+    "MediaResourceLocator" (tai MRL), joka n‰ytt‰‰ samanlaiselta kuin URL.
+    Ensimm‰iseksi m‰‰ritell‰‰n k‰ytett‰v‰ l‰hde jota seuraa "://" ja
+    l‰hteen tarkennustunniste. K‰ytt‰m‰si l‰hteen muoto riippuu
+    asennetuista plugineista (pelkille tiedostoille voit laittaa l‰hteen
+    tunnisteen).
+
+    Kokeile:
+
+     xine --help
+
+    saadaksesi enemm‰n tietoa k‰ytˆst‰.
+
+    Xine tukee xdnd protokollaa (versio 3) joten voit jos sinulla on
+    tiedostojen hallintaohjelma joka tukee t‰t‰ protokollaa (esim gmc),
+    voit laittaa ne toistamaan Xine:ll‰.
+
+    3. raidan toistaminen VCD:lt‰:
+
+     xine vcd://3
+
+    Esimerkki suoraan DVD toistoon:
+
+     xine dvd://VTS_01_1.VOB
+
+
+2.4.1 Pikan‰pp‰imet
+
+      N‰pp‰in         Toiminto
+      
+      <Entteri>       toista
+      <v‰lilyˆnti>    tauko
+      <Ylˆs>/<Alas>   pikakelaus / hidastus
+
+      0               selaa virran alkuun
+      1-9             selaa 10-90% :n
+      <Vasen>/<Oikea> selaa -+ 15 sekunttia (+CTRL: 60 sek.)
+      <PgUp>/<Edell.> edellinen soittolistan kohta
+      <PgDown>/<Seur.> seuraava soittolistan kohta
+
+      f               kokon‰yttˆ / ikkuna
+      a               kuvasuhde (AUTO/16:9/4:3/DVB)
+      i               "interlaced" tila
+
+      z / Shift-Z     zoomaa l‰hemm‰ksi / kauemmaksi
+                      lis‰ttyn‰ Ctrl n‰pp‰imell‰ horisontaalisesti tai
+		      Alt n‰pp‰imell‰ vertikaalisesti
+
+      "<", ">"        muokkaa videoikkunan kokoa
+      + -             vaihda audio-kanava
+      , .             vaihda tekstitys-kanava
+      n m             s‰‰d‰ a/v sync:i‰
+      <HOME>          resetoi a/v sync
+
+      <INSERT>        hiiren "grabbaus" videokuvaan (p‰‰lle/pois)
+
+      q               lopetus
+
+      h               piilota video ikkuna (k‰yt‰nnˆlllinen mp3 toistoon)
+
+      
+      Lis‰‰ tulossa :-)
+
+      Klikkaa oikeanpuoleisella napilla (tai paina 'g') video ikkunaa
+      vaihtaaksesi paneelin n‰kyvyytt‰.
+
+      Pikan‰pp‰inten vaihtaminen:
+        Voit myˆs vaihtaa yht‰/useita/kaikkia pik‰n‰pp‰imi‰. Sinulla pit‰isi
+	olla .xine_keymap tiedosto $HOME hakemistossa. Perussyntaksi:
+
+         WindowReduce {
+            key = less
+            modifier = none
+         }
+
+        N‰pp‰imen pit‰isi t‰sm‰t‰ X11 key stringiin (alla). Vaihtamis-
+	n‰pp‰in voisi olla:
+	         - 'none' ei vaihtamisn‰pp‰int‰,
+                 - 'control' (tai 'ctrl')  control n‰pp‰imelle,
+                 - 'meta' (tai 'alt'  PC:ll‰) alt n‰pp‰imelle,
+                 - 'mod3' tai 'mod4' tai 'mod5' joissakin j‰rjestelmiss‰.
+
+        Vaihtajia voi olla useita. Ne erotetaan pilkulla:
+	
+         WindowReduce {
+           key = less
+           modifier = control, alt
+         }
+
+        Jos et m‰‰rit‰ vaihtaja rivi‰ se vastaa samaa kuin 'none'.
+
+        Voit myˆs m‰‰ritt‰‰ aliaksia n‰pp‰imille:
+	 
+	 Alias {
+           entry = Pause
+           key = p
+         }
+
+        Jos lis‰‰t toisen n‰pp‰imen 'Pause' komennolle, painamalla 'p'
+	voit myˆs lis‰t‰ vaihtajan‰pp‰imen (katso yll‰). Jos et m‰‰rit‰
+	sit‰, niin vaihtajan‰pp‰in tulee olemaan sama kuin alkuper‰isess‰
+	('Pause' t‰ss‰ tapauksessa).
+
+      X11 key name:
+        Tiet‰‰ksesi X11 key stringin, voit k‰ytt‰‰ 'xev':‰, joka tulee X11
+	paketin mukana. K‰ynnist‰ 'xev' xterm:st‰, klikkaa ilmestyv‰‰ pient‰
+	ikkunaa (ts. anna focus ikkunalle) ja paina haluamaasi n‰pp‰int‰.
+      
+        Sitten n‰et seuraavanlaista:
+	
+         ...
+         KeyRelease event, serial 27, synthetic NO, window 0x3200001,
+         root 0x3c, subw 0x0, time 4144050914, (259,265), root:(272,319),
+         state 0x0, keycode 81 (keysym 0xff9a, KP_Prior), same_screen YES,
+                                               ^^^^^^^^
+					       T‰t‰ kohtaa etsit.
+
+      Muutettujen/oletus pikan‰pp‰inten katsominen:
+        Voit k‰ytt‰‰ 'xine --keymap' tai 'xine--keymap=default' komentoa
+	katsoaksesi pikan‰pp‰imet. Voit ohjata tuloksen tiedostoon, josta
+	voi tulla .xine_keymap itsess‰‰n.
+	
+	Katsoaksesi muutokset, k‰yt‰ komentoa 'xine --keymap=remapped'
+
+2.4.2 Audio kanavien valinta
+
+      K‰yt‰ -a parametri‰ audio raidan valintaan:
+       
+       xine -a 3 test.mpg
+
+      Toistaa kolmannen audio raidan (ja videon, tietysti)
+
+      Myˆs gui:ta (graafista k‰yttˆliittym‰‰) voidaan k‰ytt‰‰ audio
+      kanavan valintaan.
+
+2.4.3 Tekstityksen valitseminen
+
+      Tekstitykset ovat sis‰llytettyj‰ raitoja kuten audiokin. Yleisesti
+      raita 0 on oletuskielinen tekstitys. K‰yt‰ -u parametri‰ tekstitys-
+      raidan valintaan:
+
+       xine -u 0 test.vob
+
+      N‰ytt‰‰ tekstityksen 0 raidalta.
+
+      Myˆs gui:ta (graafista k‰yttˆliittym‰‰) voidaan k‰ytt‰‰ audio
+      kanavan valintaan.
+
+2.4.4 LIRC
+
+      Xine:‰ voidaan myˆs ohjata infrapunakaukos‰‰timell‰. T‰t‰ varten,
+      sinulla pit‰isi olla LIRC asennettuna (http://www.lirc.org).
+
+      Lis‰‰ muutamia kohtia ~/.lircrc tiedostoon seuraavasti:
+      
+       begin
+               remote = SAMSUNG
+               button = Button_Play
+               prog   = xine
+               repeat = 0
+               config = Play
+       end
+       begin
+               remote = SAMSUNG
+               button = Button_1
+               prog   = xine
+               repeat = 0
+               config = SetPosition10%
+       end
+
+      Xine voi itsess‰‰n luoda lirc kohtien oletuslistan komennolla
+      'xine --keymap=lirc', jonka voit ohjata tiedostoon asetusten
+      hiomiseksi.
+            
+      Jokainen kohta n‰yt‰‰ suurinpiirtein seuraavalta: 
+
+       # Reduce the output window size.
+       begin
+               remote = xxxxx
+               button = xxxxx
+               prog   = xine
+               repeat = 0
+               config = WindowReduce
+       end
+
+      Teht‰v‰ksesi j‰‰ kaukos‰‰timen nimen ja n‰pp‰inten asettaminen.
+
+
+3   Viel‰ sanottavaa
+
+3.1 Vapaus, DVD:t ja muuta...
+
+    Xine on vapaata ohjelmistoa ('free software'). Vapaa ohjelmisto liittyy
+    avoimeen l‰hdekoodiin ('open-source'). Kuitenkin, vapaan ohjelmiston
+    k‰site menee pitemm‰lle: se on ohjelmiston k‰ytt‰jien vapautta. Voit
+    k‰yd‰ katsomassa mit‰ 'free software foundation' sanoo vapaudesta ja
+    ohjelmistoista:
+     
+     => http://www.gnu.org/philosophy/free-sw.html
+
+    On olemassa uhka mit‰ tulee DVD:siin: elokuvateollisuus on tekem‰ss‰
+    suuria ponnistuksia DVD:n toiston est‰miseksi ohjatuilla laitteistoilla.
+    Useimmat DVD:t myyd‰‰n koodattuina - ja joissakin maissa (ainakin
+    USA:ssa) on laitonta purkaa t‰m‰ koodi yksityiseenkin k‰yttˆˆn.
+    Toivottavasti useimmat ihmiset ovat samaa mielt‰, ett‰ t‰m‰ on eritt‰in
+    kyseenalainen tapa kohdella kuluttujia. Xine projekti tuomitsee n‰m‰
+    elokuvateollisuuden ponnistukset - yritt‰en samalla est‰‰ myyntien laskua
+    sill‰ tavalla joka osoittaa paljon ep‰kunnioitusta kaikkia rehellisi‰
+    asiakkaita kohtaan. Toisaalta Xine projektin tiimi on olemassa olevien
+    lakien rikkomista vastaan. Kukaan ei oikeastaan tied‰, onko miss‰‰n maassa
+    laillista kirjoittaa, omistaa tai k‰ytt‰‰ ohjelmaa salatun DVD:n
+    katseluun. Mutta, koska t‰m‰ on ep‰selv‰‰ (ja ilmeisesti vaarallista),
+    xine ei sis‰ll‰ suoranaista koodia DVD salauksen purkamaseksi. N‰ytt‰‰
+    silt‰, ett‰ kolmannet osapuolet tekev‰t t‰llaisia laajennuksia.
+    Mahdollisesti joissakin paikoissa on laitonta k‰ytt‰‰ n‰it‰. Oli miten
+    oli - niin xine:ll‰ ilman erillisi‰ laajennuksia ei voi toistaa
+    salattuja DVD:t‰. Huomioikaa, ettei t‰m‰ ole mik‰‰n bugi tai puuttuva
+    ominaisuus, mutta aidosti laillisuus ongelma. Olisi mahtavaa ratkaista
+    t‰m‰ ongelma (esim. vakuuttumalla amerikalle/elokuvateollisuudelle,
+    ett‰ he ‰rsytt‰v‰t ja ovat turhaan ep‰reiluja asiakkaita sek‰ k‰ytt‰ji‰
+    ja vapaan ohjelmistojen kehitt‰ji‰ kohtaan), mutta sis‰llytt‰m‰ll‰
+    DVD:n purkukoodi xine:n ei ratkaise t‰t‰ ongelmaa.
+
+
+4   Yhteyden ottaminen
+
+    Xine projektin kotisivu:
+
+     => http://xine.sourceforge.net
+
+    Palaute ja avustusehdotukset ovat eritt‰in arvostettuja, ota yhtett‰:
+
+     xine-user postituslista (englanniksi) <xine-user@lists.sourceforge.net>
+
+
+
+
+-- 
+Tommi Asiala
++358(0)407755091
+sir@kase.fi
+
+
+
+_______________________________________________
+xine-user mailing list
+xine-user@lists.sourceforge.net
+https://lists.sourceforge.net/lists/listinfo/xine-user
