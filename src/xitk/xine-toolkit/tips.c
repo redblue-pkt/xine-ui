@@ -39,20 +39,17 @@ typedef struct {
   Display             *display;
   pthread_t            thread;
 
-  xitk_widget_t       *widget;
+  xitk_widget_t       *widget, *new_widget;
   int                  visible;
   int                  running;
 
   pthread_mutex_t      mutex;
   
-  pthread_mutex_t      new_mutex;
   pthread_cond_t       new_cond;
   
-  pthread_mutex_t      timer_mutex;
   pthread_cond_t       timer_cond;
 
   int                  prewait;
-  pthread_mutex_t      prewait_mutex;
   pthread_cond_t       prewait_cond;
 } _tips_t;
 
@@ -60,7 +57,6 @@ static _tips_t tips;
 
 static void _tips_handle_event(XEvent *event, void *data) {
   switch(event->type) {
-  case MotionNotify:
   case ButtonRelease:
   case ButtonPress:
     xitk_tips_hide_tips();
@@ -72,34 +68,37 @@ static void *_tips_loop_thread(void *data) {
 
   tips.running = 1;
   
+  pthread_mutex_lock(&tips.mutex);
+
   while(tips.running) {
     struct timeval       tv;
     struct timespec      ts;
-    int                  result = 1;
 
-    pthread_mutex_lock(&tips.new_mutex);
-    pthread_cond_wait(&tips.new_cond, &tips.new_mutex);
-    pthread_mutex_unlock(&tips.new_mutex);
-    
-    pthread_mutex_lock(&tips.prewait_mutex);
+    /* Wait for a new tip to show */
+    if(!tips.new_widget)
+      pthread_cond_wait(&tips.new_cond, &tips.mutex);
+
+    /* Start over if nothing */
+    if(!tips.new_widget)
+      continue;
     
     tips.prewait = 1;
     
     gettimeofday(&tv, NULL);
-    ts.tv_sec  = tv.tv_sec;
-    ts.tv_nsec = (tv.tv_usec + 300000) * 1000;      
+    ts.tv_sec  = tv.tv_sec + (tv.tv_usec + 500000) / 1000000;
+    ts.tv_nsec = ((tv.tv_usec + 500000) % 1000000) * 1000;
     
-    result = pthread_cond_timedwait(&tips.prewait_cond, &tips.prewait_mutex, &ts);
-    tips.prewait = 0;
+    pthread_cond_timedwait(&tips.prewait_cond, &tips.mutex, &ts);
     
-    if(!result) {
-      tips.widget = NULL;
-      pthread_mutex_unlock(&tips.prewait_mutex);
+    /* Start over if interrupted */
+    if(!tips.prewait)
       continue;
-    }
-    
-    pthread_mutex_unlock(&tips.prewait_mutex);
 
+    tips.prewait = 0;
+
+    tips.widget = tips.new_widget;
+    tips.new_widget = NULL;
+    
     if(tips.widget && (tips.widget->tips_timeout > 0) && tips.widget->tips_string && strlen(tips.widget->tips_string)) {
       int                  x, y, string_length;
       xitk_window_t       *xwin;
@@ -203,19 +202,15 @@ static void *_tips_loop_thread(void *data) {
 					_tips_handle_event,
 					NULL,
 					NULL,
-					NULL,
+					tips.widget->wl,
 					NULL);
-      {
-	unsigned int     secs = (tips.widget->tips_timeout / 1000);
-	long int         nsecs = (tips.widget->tips_timeout * 1000000) - (secs * 1000000000);
-	
-	gettimeofday(&tv, NULL);
-	ts.tv_sec  = tv.tv_sec + secs;
-	ts.tv_nsec = (tv.tv_usec * 1000) + nsecs;
-      }
+
+      gettimeofday(&tv, NULL);
+      /* We round to ms instead of us (tips_timeout is ms anyway) to get out most of an int */
+      ts.tv_sec  = tv.tv_sec + ((tv.tv_usec + 500) / 1000 + tips.widget->tips_timeout) / 1000;
+      ts.tv_nsec = (((tv.tv_usec + 500) / 1000 + tips.widget->tips_timeout) % 1000) * 1000000;
       
-      pthread_mutex_lock(&tips.timer_mutex);
-      pthread_cond_timedwait(&tips.timer_cond, &tips.timer_mutex, &ts);
+      pthread_cond_timedwait(&tips.timer_cond, &tips.mutex, &ts);
 
       xitk_unregister_event_handler(&key);
       xitk_window_destroy_window(tips.widget->imlibdata, xwin);
@@ -225,14 +220,12 @@ static void *_tips_loop_thread(void *data) {
       XSync(tips.display, False);
       XUNLOCK(tips.display);
 
-      tips.widget = NULL;
-      
       tips.visible = 0;
-
-      pthread_mutex_unlock(&tips.timer_mutex);
     }
 
   }
+
+  pthread_mutex_unlock(&tips.mutex);
 
   pthread_exit(NULL);
 }
@@ -248,15 +241,13 @@ void xitk_tips_init(Display *disp) {
     struct sched_param   pth_params;
 #endif
 
-    tips.visible = 0;
-    tips.display = disp;
-    tips.widget  = NULL;
-    tips.prewait = 0;
+    tips.visible    = 0;
+    tips.display    = disp;
+    tips.widget     = NULL;
+    tips.new_widget = NULL;
+    tips.prewait    = 0;
 
     pthread_mutex_init(&tips.mutex, NULL);
-    pthread_mutex_init(&tips.new_mutex, NULL);
-    pthread_mutex_init(&tips.timer_mutex, NULL);
-    pthread_mutex_init(&tips.prewait_mutex, NULL);
 
     pthread_cond_init(&tips.new_cond, NULL);
     pthread_cond_init(&tips.timer_cond, NULL);
@@ -281,24 +272,20 @@ void xitk_tips_deinit(void) {
   tips.running = 0;
   
   pthread_mutex_lock(&tips.mutex);
-  if(tips.prewait)
+  tips.new_widget = NULL;
+  if(tips.prewait) {
+    tips.prewait = 0;
     pthread_cond_signal(&tips.prewait_cond);
+  }
   else if(tips.visible)
     pthread_cond_signal(&tips.timer_cond);
   else
     pthread_cond_signal(&tips.new_cond);
-  
-  pthread_mutex_lock(&tips.timer_mutex);
+  pthread_mutex_unlock(&tips.mutex);
 
   pthread_join(tips.thread, NULL);
 
-  pthread_mutex_unlock(&tips.mutex);
-  pthread_mutex_unlock(&tips.timer_mutex);
-
   pthread_mutex_destroy(&tips.mutex);
-  pthread_mutex_destroy(&tips.new_mutex);
-  pthread_mutex_destroy(&tips.timer_mutex);
-  pthread_mutex_destroy(&tips.prewait_mutex);
   
   pthread_cond_destroy(&tips.new_cond);
   pthread_cond_destroy(&tips.timer_cond);
@@ -311,7 +298,12 @@ void xitk_tips_deinit(void) {
 void xitk_tips_hide_tips(void) {
   pthread_mutex_lock(&tips.mutex);
   if(tips.running) {
-    if(tips.widget && tips.visible)
+    tips.new_widget = NULL;
+    if(tips.prewait) {
+      tips.prewait = 0;
+      pthread_cond_signal(&tips.prewait_cond);
+    }
+    else if(tips.visible)
       pthread_cond_signal(&tips.timer_cond);
   }
   pthread_mutex_unlock(&tips.mutex);
@@ -323,13 +315,14 @@ void xitk_tips_hide_tips(void) {
 void xitk_tips_show_widget_tips(xitk_widget_t *w) {
   pthread_mutex_lock(&tips.mutex);
   if(tips.running) {
-    
-    if(tips.prewait)
+    tips.new_widget = w;
+    if(tips.prewait) {
+      tips.prewait = 0;
       pthread_cond_signal(&tips.prewait_cond);
-    else if(tips.widget && tips.visible)
+    }
+    else if(tips.visible)
       pthread_cond_signal(&tips.timer_cond);
-    
-    if((tips.widget != w) && (tips.widget = w))
+    else
       pthread_cond_signal(&tips.new_cond);
   }
   pthread_mutex_unlock(&tips.mutex);
