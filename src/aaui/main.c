@@ -250,6 +250,7 @@ int main(int argc, char *argv[]) {
     switch (c) {
     case 'q':
     case 'Q':
+      xine_exit (xine);
       running = 0;
       break;
       
